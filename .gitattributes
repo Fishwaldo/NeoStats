@@ -18,6 +18,7 @@
 /Unreal.h -text
 /acconfig.h -text
 /aclocal.m4 -text
+adns/Makefile -text
 adns/adns.h -text
 adns/check.c -text
 adns/config.h -text
