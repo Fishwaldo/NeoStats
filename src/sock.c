@@ -147,7 +147,11 @@ ConnectTo (char *host, int port)
 #ifdef WIN32
 		nlog (LOG_ERROR, "Winsock error: %d", WSAGetLastError());
 #endif
+#ifdef WIN32
+		closesocket (s);
+#else
 		close (s);
+#endif      			
 		return NS_FAILURE;
 	}
 #ifdef SQLSRV
@@ -525,7 +529,11 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 			break;
 		default:
 			nlog (LOG_WARNING, "Socket %s(%s) cant connect %s", name, moduleptr->info->name, strerror (errno));
+#ifdef WIN32
+			closesocket (s);
+#else
 			close (s);
+#endif      			
 			return NS_FAILURE;
 		}
 	}
@@ -566,7 +574,11 @@ sock_disconnect (const char *name)
 		return NS_FAILURE;
 	}
 	dlog(DEBUG3, "Closing Socket %s with Number %d", name, sock->sock_no);
+#ifdef WIN32
+	closesocket (sock->sock_no);
+#else
 	close (sock->sock_no);
+#endif      			
 	del_socket (name);
 	return NS_SUCCESS;
 }
@@ -594,7 +606,11 @@ sts (const char *buf, const int buflen)
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
 		/* Try to close socket then reset the servsock value to avoid cyclic calls */
-		close(servsock);
+#ifdef WIN32
+		closesocket (servsock);
+#else
+		close (servsock);
+#endif      			
 		servsock = -1;
 		do_exit (NS_EXIT_ERROR, NULL);
 	}
@@ -700,7 +716,11 @@ sql_accept_conn(int srvfd)
   /* if we reached our max connection, just exit */
   if (list_count(sqlconnections) > 5) {
   	nlog(LOG_NOTICE, "Can not accept new SQL connection. Full");
-  	close (srvfd);
+#ifdef WIN32
+	closesocket (srvfd);
+#else
+	close (srvfd);
+#endif      			
   	return;
   }
   
@@ -717,7 +737,11 @@ sql_accept_conn(int srvfd)
   {
     nlog(LOG_WARNING, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
     sfree(newui);
-    close(srvfd);
+#ifdef WIN32
+	closesocket (srvfd);
+#else
+	close (srvfd);
+#endif      			
     return;
   }
   else
@@ -726,7 +750,11 @@ sql_accept_conn(int srvfd)
     if (!match(me.sqlhost, tmp)) {
     	/* we didnt get a match, bye bye */
 	nlog(LOG_NOTICE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
-	close(newui->fd);
+#ifdef WIN32
+	closesocket (newui->fd);
+#else
+	close (newui->fd);
+#endif      			
 	sfree(newui);
         return;
     }
@@ -777,8 +805,13 @@ sql_handle_ui_request(lnode_t *sqlnode)
   /* We read data from the connection into the buffer in the ui struct. 
      Once we've read all of the data we can, we call the DB routine to
      parse out the SQL command and to execute it. */
+#ifdef WIN32
+  ret = recv(sqlconn->fd,
+    &(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos));
+#else
   ret = read(sqlconn->fd,
     &(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos));
+#endif
 
   /* shutdown manager conn on error or on zero bytes read */
   if (ret <= 0)
@@ -787,7 +820,11 @@ sql_handle_ui_request(lnode_t *sqlnode)
        client program? */
     dlog(DEBUG1, "Disconnecting SqlClient for failed read");
     deldbconnection(sqlconn->fd);
+#ifdef WIN32
+	closesocket (sqlconn->fd);
+#else
     close(sqlconn->fd);
+#endif      			
     list_delete(sqlconnections, sqlnode);
     lnode_destroy(sqlnode);
     sfree(sqlconn);
@@ -845,7 +882,11 @@ sql_handle_ui_output(lnode_t *sqlnode)
     {
     	nlog(LOG_WARNING, "Got a write error when attempting to return data to the SQL Server");
 	deldbconnection(sqlconn->fd);
-      	close(sqlconn->fd);
+#ifdef WIN32
+		closesocket (sqlconn->fd);
+#else
+	    close(sqlconn->fd);
+#endif      			
 	list_delete(sqlconnections, sqlnode);
 	lnode_destroy(sqlnode);
 	sfree(sqlconn);
@@ -889,7 +930,11 @@ int FiniSocks (void)
 	sfree(TimeOut);
 	sfree(ufds);
 	if (servsock > 0)
-		close (servsock);
+#ifdef WIN32
+		closesocket (servsock);
+#else
+		close(servsock);
+#endif      			
 	hash_destroy(sockethash);
 	return NS_SUCCESS;
 }
