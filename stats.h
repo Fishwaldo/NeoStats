@@ -223,7 +223,8 @@ typedef enum {
 /* NeoStats levels */
 #define NS_ULEVEL_ROOT	200
 #define NS_ULEVEL_ADMIN	185
-#define NS_ULEVEL_OPER	40
+#define NS_ULEVEL_OPER	50
+#define NS_ULEVEL_LOCOPER 40
 #define NS_ULEVEL_REG	10
 
 /* transfer stuff */

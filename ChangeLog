@@ -5,6 +5,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fixed up Ultimate2 Token Support (M)
  - Added some new params (Quit, KILL, part messages) to existing defines. Should not break backwards compat (F)
  - Fixed up a UserLevel problem with Smodes and made UserLevel function as per M's comments (F)
+ - The built in Bot Message functions were not setting SEGV_INMODULE correctly, so logging was kinda screwed up. Fixed (F)
 
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.12
  - Fixed a compile problem with some compilers with C++ comments etc (M)

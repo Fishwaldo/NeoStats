@@ -1025,7 +1025,7 @@ int
 spart_cmd (const char *who, const char *chan)
 {
 	send_part(who, chan);
-	part_chan (finduser (who), (char *) chan);
+	part_chan (finduser (who), (char *) chan, NULL);
 	return 1;
 }
 
@@ -1093,7 +1093,7 @@ int
 skick_cmd (const char *who, const char *target, const char *chan, const char *reason)
 {
 	send_kick (who, target, chan, reason);
-	part_chan (finduser (target), (char *) chan);
+	part_chan (finduser (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
 	return 1;
 }
 

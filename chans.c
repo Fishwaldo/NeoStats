@@ -417,12 +417,13 @@ del_chan (Chans * c)
  * @param User u, user structure of user getting kicked
  * @param channel name user being kicked from
  * @param User k, the user doing the kick
+ * @param kickreason the reason the user was kicked
  * 
  *
  */
 
 void
-kick_chan (const char *chan, const char *kicked, const char *kickby)		
+kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickreason)		
 {
 	char **av;
 	int ac = 0;
@@ -463,6 +464,7 @@ kick_chan (const char *chan, const char *kicked, const char *kickby)
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
 			AddStringToList (&av, k->nick, &ac);
+			if (kickreason != NULL) AddStringToList (&av, kickreason, &ac);
 			ModuleEvent (EVENT_KICK, av, ac);
 			free (av);
 			ac = 0;
@@ -474,6 +476,7 @@ kick_chan (const char *chan, const char *kicked, const char *kickby)
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
 			AddStringToList (&av, k->nick, &ac);
+			if (kickreason != NULL) AddStringToList (&av, kickreason, &ac);
 			ModuleEvent (EVENT_KICKBOT, av, ac);
 			free (av);
 			ac = 0;
@@ -510,13 +513,14 @@ kick_chan (const char *chan, const char *kicked, const char *kickby)
  *
  * @param u the User structure corrosponding to the user that left the channel
  * @param chan the channel to part them from
+ * @param partreason the reason the user parted, if any
  *
  * @returns Nothing
 */
 
 
 void
-part_chan (User * u, const char *chan)
+part_chan (User * u, const char *chan, char *partreason)
 {
 	Chans *c;
 	lnode_t *un;
@@ -552,6 +556,7 @@ part_chan (User * u, const char *chan)
 			free (cm);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
+			if (partreason != NULL) AddStringToList (&av, partreason, &ac);
 			ModuleEvent (EVENT_PARTCHAN, av, ac);
 			free (av);
 			ac = 0;
@@ -562,6 +567,7 @@ part_chan (User * u, const char *chan)
 			del_bot_from_chan (u->nick, c->name);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
+			if (partreason != NULL) AddStringToList (&av, partreason, &ac);
 			ModuleEvent (EVENT_PARTBOT, av, ac);
 			free (av);
 			ac = 0;

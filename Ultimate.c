@@ -224,7 +224,7 @@ UserModes user_umodes[] = {
 	{UMODE_ADMIN, 'z', 70},
 	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
 	{UMODE_SUPER, 'p', NS_ULEVEL_LOCOPER},
-	{UMODE_LOCOP, 'O', NS_ULEVEL_LOCOPER},,
+	{UMODE_LOCOP, 'O', NS_ULEVEL_LOCOPER},
 	{UMODE_REGNICK, 'r', NS_ULEVEL_REG},
 	{UMODE_INVISIBLE, 'i', 0},
 	{UMODE_WALLOP, 'w', 0},
@@ -688,7 +688,10 @@ Usr_Squit (char *origin, char **argv, int argc)
 static void
 Usr_Quit (char *origin, char **argv, int argc)
 {
-	UserQuit (origin, NULL);
+	char *tmpbuf;
+	tmpbuf = joinbuf(argv, argc, 1);
+	UserQuit (origin, tmpbuf);
+	free(tmpbuf);
 }
 
 static void
@@ -719,7 +722,10 @@ Usr_Mode (char *origin, char **argv, int argc)
 static void
 Usr_Kill (char *origin, char **argv, int argc)
 {
-	KillUser (argv[0]);
+	char *tmpbuf;
+	tmpbuf = joinbuf(argv, argc, 1);
+	KillUser (argv[0], tmpbuf);
+	free(tmpbuf);
 }
 static void
 Usr_Vhost (char *origin, char **argv, int argc)
@@ -772,7 +778,10 @@ Usr_Topic (char *origin, char **argv, int argc)
 static void
 Usr_Kick (char *origin, char **argv, int argc)
 {
-	kick_chan(argv[0], argv[1], origin);
+	char *tmpbuf;
+	tmpbuf = joinbuf(argv, argc, 2);
+	kick_chan(argv[0], argv[1], origin, tmpbuf);
+	free(tmpbuf);
 }
 static void
 Usr_Join (char *origin, char **argv, int argc)
@@ -789,7 +798,14 @@ Usr_Join (char *origin, char **argv, int argc)
 static void
 Usr_Part (char *origin, char **argv, int argc)
 {
-	part_chan (finduser (origin), argv[0]);
+	char *tmpbuf;
+	if (argc > 1)
+		tmpbuf = joinbuf(argv, argc, 1);
+	else 
+		tmpbuf = NULL;
+	
+	part_chan (finduser (origin), argv[0], tmpbuf);
+	if (tmpbuf[0] != 0) free(tmpbuf);
 }
 
 static void

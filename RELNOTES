@@ -1,26 +1,10 @@
-* NeoStats * M & Fish * Version 2.5.9
+* NeoStats * M & Fish * Version 2.5.13
 ==============================================================================
 Important Changes you should know: (READ THIS!)
 ==============================================================================
 RedHat 9.0 / Fedora / Slakware 9.0 Users:
-        There have been some changes to the RedHat/Fedora 9.0 and slakware 9 Kernels that
-	affects NeoStats. If you are running RedHat 9.0 or Fedora or Slakware 9.0 please 
-	read http://www.neostats.net/boards/viewtopic.php?t=391
+        There have been some changes to the RedHat/Fedora 9.0 and slakware 9 
+	Kernels that affects NeoStats. If you are running RedHat 9.0 or Fedora
+	or Slakware 9.0 please read 
+	http://www.neostats.net/boards/viewtopic.php?t=391
  
-Unreal Users:
-	Due to compatibility issues between Unreal 3.1.x and 3.2.x series of
-	IRCd's we have no had to change the ./configure options so you now have to
-	specify --enable-unreal31 or --enable-unreal32 depending on what version of
-	Unreal you use. 
-
-SQL Server Emulation:
-	NeoStats can now Emulate a PostgreSQL Server. This means you can use
-	PHP/Perl to query Stats directly. This is Experimental at this stage, and
-	chances are it might crash your NeoStats. Read README.sqlsrv in the docs
-	directory for more information. 
-
-Command Syntax:
-	Some of the commands for bots have changed. Consult the Online help
-	for the exact syntax of the commands. 
-
-Read the ChangeLog for a complete description of what has changed

@@ -36,7 +36,7 @@ void UserSMode (const char *nick, const char *modes);
 #endif
 int init_user_hash (void);
 void UserAway (User *u, const char *awaymsg);
-void KillUser (const char *nick);
+void KillUser (const char *nick, const char *killmsg);
 int InitExtAuth(void);
 
 #endif /* _USERS_H_ */

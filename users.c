@@ -38,8 +38,11 @@
 
 hash_t *uh;
 
-static void doDelUser (const char *nick, int killflag);
+static void doDelUser (const char *nick, int killflag, const char *quitreason);
 static User *new_user (const char *nick);
+
+char quitreason[BUFSIZE];
+
 
 static User *
 new_user (const char *nick)
@@ -111,23 +114,23 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 void
 UserPart (list_t * list, lnode_t * node, void *v)
 {
-	part_chan ((User *)v, lnode_get (node));
+	part_chan ((User *)v, lnode_get (node), quitreason[0] != 0 ? quitreason : NULL);
 }
 
 void
-KillUser (const char *nick)
+KillUser (const char *nick, const char *reason)
 {
-	doDelUser (nick, 1);
+	doDelUser (nick, 1, reason);
 }
 
 void
 UserQuit (const char *nick, const char *quitmsg)
 {
-	doDelUser (nick, 0);
+	doDelUser (nick, 0, quitmsg);
 }
 
 static void
-doDelUser (const char *nick, int killflag)
+doDelUser (const char *nick, int killflag, const char *reason)
 {
 	User *u;
 	hnode_t *un;
@@ -144,7 +147,9 @@ doDelUser (const char *nick, int killflag)
 	}
 	u = hnode_get (un);
 
+	strlcpy(quitreason, reason, BUFSIZE);
 	list_process (u->chans, u, UserPart);
+	bzero(quitreason, BUFSIZE);
 
 	/* run the event to delete a user */
 	AddStringToList (&av, u->nick, &ac);
