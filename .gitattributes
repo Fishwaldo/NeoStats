@@ -7,6 +7,7 @@
 /TODO -text
 /Unreal.h -text
 /chans.c -text
+/chkstats -text
 /conf.c -text
 /config.h.in -text
 /configure -text
@@ -69,6 +70,7 @@ doc/read-userman -text
 /list.c -text
 /list.h -text
 /main.c -text
+/makeconf -text
 /ns_help.c -text
 /servers.c -text
 /services.c -text
