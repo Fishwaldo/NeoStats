@@ -1360,4 +1360,7 @@ EXPORTFUNC void clear_server_moddata (Client* s);
 EXPORTFUNC void set_server_moddata (Client* s, void *data);
 EXPORTFUNC void *get_server_moddata (Client* s);
 
+EXPORTFUNC void rtaserv_add_table (void *ptbl);
+
+
 #endif /* NEOSTATS_H */

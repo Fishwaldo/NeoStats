@@ -182,9 +182,9 @@ init_services_bot (void)
 	ns_botptr = AddBot (&ns_botinfo);
 	ns_module.synched = 1;
 	me.synched = 1;
+	rtaserv_init ();
 	SynchAllModules ();
 	RequestServerUptimes();	
-	rtaserv_init ();
 	return NS_SUCCESS;
 }
 

@@ -25,7 +25,6 @@
 
 #include "neostats.h"
 #include "statserv.h"
-#ifdef RTA_SUPPORT
 #include "rta.h"
 
 COLDEF statserv_chanscols[] = {
@@ -831,17 +830,17 @@ void statserv_rta_init (void)
 	/* find the address of each list/hash, and export to rta */
 	 
 	statserv_chans.address = Chead;
-	rta_add_table(&statserv_chans);
+	rtaserv_add_table (&statserv_chans);
 	statserv_tld.address = Thead;
-	rta_add_table(&statserv_tld);
+	rtaserv_add_table (&statserv_tld);
 	statserv_servers.address = Shead;
-	rta_add_table(&statserv_servers);
+	rtaserv_add_table (&statserv_servers);
 	statserv_versions.address = Vhead;
-	rta_add_table(&statserv_versions);
+	rtaserv_add_table (&statserv_versions);
 	statserv_network.address = fakenetwork;
-	rta_add_table(&statserv_network);
+	rtaserv_add_table (&statserv_network);
 	statserv_daily.address = fakedaily;
-	rta_add_table(&statserv_daily);
+	rtaserv_add_table (&statserv_daily);
 }
 
 void statserv_rta_fini (void)
@@ -852,4 +851,3 @@ void statserv_rta_fini (void)
 	list_destroy (fakenetwork);
 }
 
-#endif

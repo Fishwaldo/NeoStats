@@ -245,6 +245,4 @@ void FiniTLD(void);
 /* htmlstats.c */
 int ss_html(void);
 
-/* #define RTA_SUPPORT */
-
 #endif

@@ -185,11 +185,6 @@ int ModInit (Module *mod_ptr)
 	/* TODO get user modes */
 	GetChannelList(StatsAddChan);
 	/* TODO get member counts */
-
-#ifdef RTA_SUPPORT
-	statserv_rta_init ();
-#endif
-
 #ifdef USE_BERKELEY
 	DBOpenDatabase();
 #endif
@@ -209,6 +204,7 @@ int ModInit (Module *mod_ptr)
 int ModSynch (void)
 {
 	SET_SEGV_LOCATION();
+	statserv_rta_init ();
 	ss_bot = AddBot (&ss_botinfo);
 	if (!ss_bot) {
 		return NS_FAILURE;
@@ -240,11 +236,7 @@ void ModFini (void)
 	FiniStats ();
 	FiniTLD ();
 	save_client_versions ();
-
-#ifdef RTA_SUPPORT
 	statserv_rta_fini();
-#endif      
-
 #ifdef USE_BERKELEY
 	DBCloseDatabase();
 #endif      

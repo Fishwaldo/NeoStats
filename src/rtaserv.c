@@ -552,3 +552,8 @@ void rtaserv_fini (void)
 }
 
 #endif
+
+void rtaserv_add_table (void *ptbl)
+{
+	rta_add_table ((TBLDEF *)ptbl);
+}
