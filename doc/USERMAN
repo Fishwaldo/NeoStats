@@ -491,8 +491,11 @@ Example:
 3.3.3 SET
 ---------
 Syntax: 
-    /msg StatServ Set <option> [<value>]
+    /msg StatServ SET LIST
+    /msg StatServ SET <option> [<value>]
 Description: 
+	SET LIST will show the current settings
+    
     Available Options are:
     HTMLPATH <path>
     Set the Pathname (including filename) to write HTML statistics to
@@ -512,8 +515,6 @@ Description:
     many seconds, issue a warning
     if <seconds> is equal to 0, then disable Lag Monitoring
 
-    If you specify SET without any options, the current settings are 
-    displayed
 Example:
     /msg statserv set msgthrottle off
 

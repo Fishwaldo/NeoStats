@@ -189,13 +189,6 @@ servicesbot (char *nick, char **av, int ac)
 
 	me.requests++;
 
-	/* Check user authority to use this command set */
-	if (me.onlyopers && (UserLevel (u) < NS_ULEVEL_OPER)) {
-		prefmsg (u->nick, s_Services, "This service is only available to IRCops.");
-		chanalert (s_Services, "%s Requested %s, but he is Not an Operator!", u->nick, av[1]);
-		return;
-	}
-
 	/* Use fake bot structure so we can use the main command routine */
 	strlcpy(fake_bot.nick, s_Services, MAXNICK);
 	fake_bot.botcmds = botcmds;
