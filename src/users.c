@@ -792,7 +792,7 @@ int IsServiceRoot(User* u)
 	return (0);
 }
 
-EXPORTFUNC void
+void
 AddFakeUser(const char *mask)
 {
 	char maskcopy[MAXHOST];
@@ -824,7 +824,7 @@ AddFakeUser(const char *mask)
 	u->chans = list_create (MAXJOINCHANS);
 }
 
-EXPORTFUNC void
+void
 DelFakeUser(const char *mask)
 {
 	char maskcopy[MAXHOST];

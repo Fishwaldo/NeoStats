@@ -24,6 +24,7 @@
 #include "client.h"
 #include "neostats.h"
 #include "bots.h"
+#include "users.h"
 #include "ircd.h"
 
 static void client_private (char* origin, char **av, int ac, int cmdptr);

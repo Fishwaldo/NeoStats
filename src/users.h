@@ -38,5 +38,7 @@ void UserAway (const char *nick, const char *awaymsg);
 User *finduserbase64 (const char *num);
 void UserDump (const char *nick);
 void QuitServerUsers (Server* s);
+EXPORTFUNC void AddFakeUser(const char *mask);
+EXPORTFUNC void DelFakeUser(const char *mask);
 
 #endif /* _USERS_H_ */
