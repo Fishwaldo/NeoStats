@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: services.c,v 1.48 2002/12/30 12:09:38 fishwaldo Exp $
+** $Id: services.c,v 1.49 2003/01/30 11:49:55 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -299,7 +299,7 @@ extern void ns_shutdown(User *u, char *reason)
 
 
 	globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
-	sprintf(quitmsg, "%s Set SHUTDOWN: %s", u->nick, (reason ? reason : "No Reason"));
+	snprintf(quitmsg, 255, "%s Set SHUTDOWN: %s", u->nick, (reason ? reason : "No Reason"));
 	squit_cmd(s_Services, quitmsg);
 	ssquit_cmd(me.name);
 	sleep(1);
@@ -319,7 +319,7 @@ static void ns_reload(User *u, char *reason)
 	strcpy(segv_location, "ns_reload");
 	globops(s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
 	log("%s requested RELOAD. -> reason", u->nick);
-	sprintf(quitmsg, "%s Sent RELOAD: %s", u->nick, reason);
+	snprintf(quitmsg, 255, "%s Sent RELOAD: %s", u->nick, reason);
 	hash_scan_begin(&ms, mh);
 	while ((mn = hash_scan_next(&ms)) != NULL) {
 		mod_ptr = hnode_get(mn);
@@ -360,7 +360,7 @@ static void ns_jupe(User *u, char *server)
 {
 	char infoline[255];
 	strcpy(segv_location, "ns_jupe");
-	sprintf(infoline, "[Jupitered by %s]", u->nick);
+	snprintf(infoline, 255, "[Jupitered by %s]", u->nick);
 	sserver_cmd(server, 1, infoline);
 	log("%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, server);
 }

@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.2 2002/10/27 04:44:00 fishwaldo Exp $
+** $Id: neoircd.c,v 1.3 2003/01/30 11:49:55 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -127,7 +127,7 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 	char tmp[512];
 
 	sts(":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, time(NULL));
-	sprintf(tmp, "%s %s %s", chan, mode, args);
+	snprintf(tmp, 512, "%s %s %s", chan, mode, args);
 	ac = split_buf(tmp, &av, 0);
 	ChanMode("", av, ac);
 	free(av);
@@ -140,7 +140,7 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host, const ch
 	newmode[1] = '\0';
 	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1); i++) {
 		if (mode & usr_mds[i].umodes) {
-			sprintf(newmode, "%s%c", newmode, usr_mds[i].mode);
+			snprintf(newmode, 512, "%s%c", newmode, usr_mds[i].mode);
 		}
 	}
 	sts("%s %s 1 %lu %s %s %s * %s 0 :%s", MSG_NICK, nick, time(NULL), newmode, ident, host, me.name, realname);
@@ -161,7 +161,7 @@ int sumode_cmd(const char *who, const char *target, long mode) {
 	newmode[1] = '\0';
 	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1); i++) {
 		if (mode & usr_mds[i].umodes) {
-			sprintf(newmode, "%s%c", newmode, usr_mds[i].mode);
+			snprintf(newmode, 512, "%s%c", newmode, usr_mds[i].mode);
 		}
 	}
 	sts(":%s %s %s :%s", who, MSG_MODE, target, newmode);
@@ -321,7 +321,7 @@ void chanalert(char *who, char *buf,...)
 	vsnprintf (tmp, 512, buf, ap);
 
 	if (me.onchan) {
-		sprintf(out,":%s PRIVMSG %s :%s",who, me.chan, tmp);
+		snprintf(out,512, ":%s PRIVMSG %s :%s",who, me.chan, tmp);
 #ifdef DEBUG
 		log("SENT: %s", out);
 #endif
@@ -350,9 +350,9 @@ void prefmsg(char *to, const char *from, char *fmt, ...)
                 return;
         }
 	if (me.want_privmsg) {
-		sprintf(buf, ":%s PRIVMSG %s :%s", from, to, buf2);
+		snprintf(buf, 512, ":%s PRIVMSG %s :%s", from, to, buf2);
 	} else {
-		sprintf(buf, ":%s NOTICE %s :%s", from, to, buf2);
+		snprintf(buf, 512, ":%s NOTICE %s :%s", from, to, buf2);
 	}
 	sts("%s", buf);
 	va_end(ap);
@@ -369,7 +369,7 @@ void privmsg(char *to, const char *from, char *fmt, ...)
 
 	va_start(ap, fmt);
 	vsnprintf(buf2, sizeof(buf2), fmt, ap);
-	sprintf(buf, ":%s PRIVMSG %s :%s", from, to, buf2);
+	snprintf(buf, 512, ":%s PRIVMSG %s :%s", from, to, buf2);
 	sts("%s", buf);
 	va_end(ap);
 }
@@ -386,7 +386,7 @@ void notice(char *to, const char *from, char *fmt, ...)
 
 	va_start(ap, fmt);
 	vsnprintf(buf2, sizeof(buf2), fmt, ap);
-	sprintf(buf, ":%s NOTICE %s :%s", from, to, buf2);
+	snprintf(buf, 512, ":%s NOTICE %s :%s", from, to, buf2);
 	sts("%s", buf);
 	va_end(ap);
 }
@@ -416,7 +416,7 @@ void globops(char *from, char *fmt, ...)
 
 /* Fish - now that was crackhead coding! */
 	if (me.onchan) { 
-		sprintf(buf, ":%s GLOBOPS :%s", from, buf2);
+		snprintf(buf, 512, ":%s GLOBOPS :%s", from, buf2);
 		sts("%s", buf);
 	} else {
 		log("%s", buf2);

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.109 2003/01/23 10:53:38 fishwaldo Exp $
+** $Id: ircd.c,v 1.110 2003/01/30 11:49:55 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -317,7 +317,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	sjoin_cmd(nick, me.chan, MODE_CHANADMIN);
 #else /* ulitmate3 */
 	sjoin_cmd(nick, me.chan);
-	sprintf(cmd, "%s %s", nick, nick);
+	snprintf(cmd, 63, "%s %s", nick, nick);
 #ifndef HYBRID7
 #ifdef NEOIRCD
 	schmode_cmd(me.name, me.chan, "+a", cmd);
@@ -452,9 +452,9 @@ extern char *joinbuf(char **av, int ac, int from) {
 	char *buf;
 
 	buf = malloc(512);
-	sprintf(buf, "%s", av[from]);
+	snprintf(buf, 512, "%s", av[from]);
 	for (i = from+1; i < ac; i++) {
-		sprintf(buf, "%s %s", buf, av[i]);
+		snprintf(buf, 512, "%s %s", buf, av[i]);
 	}
 	return (char *)buf;
 }
@@ -644,8 +644,8 @@ void init_ServBot()
 	strcpy(segv_location, "init_ServBot");
 	if (finduser(s_Services))
 		/* nick already exists on the network */
-		sprintf(s_Services, "NeoStats1");
-	sprintf(rname, "/msg %s \2HELP\2", s_Services);
+		snprintf(s_Services, MAXNICK, "NeoStats1");
+	snprintf(rname, 63, "/msg %s \2HELP\2", s_Services);
 
 
 #ifdef ULTIMATE3
@@ -668,7 +668,7 @@ void init_ServBot()
 	sjoin_cmd(s_Services, me.chan, MODE_CHANADMIN);
 #else
 	sjoin_cmd(s_Services, me.chan);
-	sprintf(rname, "%s %s", s_Services, s_Services);
+	snprintf(rname, 63, "%s %s", s_Services, s_Services);
 #if !defined(HYBRID7)
 #ifdef NEOIRCD
 
