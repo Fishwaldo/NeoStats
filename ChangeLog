@@ -1,4 +1,70 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Version 2.5.0-Alpha3
+ - Moved Module/Bot/Timer/Sockets to Kazlib as well
+ - CrossIRCD support has been implemented. Basic commands for Core Neo implemented
+ - Moved usr_mds structure to Unreal/Ultimate.c files
+ - had to hack in a if (usr_mds) into each file that has stats.h  included becoase of a crazy compiler warning
+ - a Crackhead Shmad fix for globops that was segv'ing the proggy
+ - Ultimate IRCD support still broken.. Fix scheduled soon
+
+
+* NeoStats * Fish * NeoStats 2.5 Alpha 2
+ - Merged 2.0.14 and 2.5Alpha 1 together (as they were seperate Branches before that
+ - More Ultimate CrossIRCD updates (broken in Alpha3)
+
+* NeoStats * Shmad *  NeoStats 2.5 Alpha 1
+-  - Added new SERVICES_ROOT option to config. list your roots here " " the line (Shmad)
+-  - Started implementing new user access (old will still exist) (Shmad)
+
+
+* NeoStats * Shmad ^Enigma^ - NeoStats 2.1 Beta 2
+-  - Fixed another problem with strlower() :)
+-  - Fixed a problem with StatServ segfaulting on Boot
+-  - Issue with UNLOCKing modules. module_name = NICk not the modules filename..
+-  - Module locking is using file permissions, much wiser/easier than original .lock
+-    files. (Shmad)
+-  - Modules are now being unlocked when unloaded (can write to them). (Shmad)
+-  - Modules are now being locked when loaded (can't write to them). (Shmad)
+-  - All Module Locking code (except the actual chmod) have been coded... just the
+-    permission chmod to code. Removed crackhead code written initially (^Enigma^)
+-  - Added beginnings of Module locking.. (Shmad/^Enigma^)
+-  - OperLog Module coded ready for Alpha testing (^Enigma^)
+-  - Added /admin command support for external admin file (^Enigma^)
+-  - Created a purdy HTML table whcich shows what needs to be coded, if it
+-    has been coded and how long it would take. (Shmad)
+-  - Fixed a few other misc. bugs too numerous to list. (Shmad)
+-  - Fixes to StatServ segfaults as per strlower below. (Shmad)
+-  - Fixed problems with strlower (re-wrote this stupid POS it doesnt strip first
+-    char now) (Shmad)
+-  - Re-Worded the segmentation fault message... now shows the 'real' core location
+-    (^Enigma^)
+-  - When NeoStats seggies or is shutdown, the stats.pid file is now removed
+-    (^Enigma^)
+-  - 'README' file modified... now tells users what to do with the 'core' file (Both)
+
+
+- * NeoStats * Shmad & ^Enigma^ * Version 2.1
+-  - Moved MOTD to external stats.motd (Shmad)
+-  - Fixed some spelling errors. (Shmad)
+-  - Changed access levels for CHANDUMP, USERDUMP, and SERVERDUMP to be NetAdmins use
+-    wisely!!! (Shmad)
+-  - New Bug report forums added to www.NeoStats.Net (^Enigma^)
+-  - Fixes to StatServ... stats now more accurate than before. (Shmad)
+-  - Changes to the name "netstats" in some files... is now "neostats"
+-    *thwaps the lazy shmad* (^Enigma^)
+-  - Not a big change.. but.. CVS headers taken out... new nice-looking header format
+-    put in (^Enigma^)
+-  - HTMLSTATS coded for StatServ... will now output HTML stats when turned on. Will
+-    update automatically every hour if the output is turned on. TAs/NAs can turn the
+-    ouput command on and off and can force an update of the HTML file by using the
+-    FORCEUPDATE command. (^Enigma^)
+-  - ConnectServ has been created... will now watch for user signon/signoff, oper flag
+-    settings and /kills Takes pressure off StatServ (less cycles) and NA's/TA's have
+-    the OPTION to choose if they want to that information or not. (^Enigma^)
+-  - Fixed Neostats UPTIME in the INFO command... it now works w00t! (^Enigma^)
+-  - Incremented Version number to 2.1
+
+
 * NeoStats * Fish * Version 2.0.14-jh1
  - Lots of Updates and fixes
  - kazlib is now used for Users/Servers list. Has self checks for corruption

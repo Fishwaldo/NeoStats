@@ -41,7 +41,7 @@ int sprotocol_cmd(const char *option) {
 }
 
 int squit_cmd(const char *who, const char *quitmsg) {
-	sts("%s %s :%s", who, (me.token ? TOK_QUIT : MSG_QUIT), quitmsg);
+	sts(":%s %s :%s", who, (me.token ? TOK_QUIT : MSG_QUIT), quitmsg);
 	DelUser(who);
 	return 1;
 }

@@ -34,7 +34,7 @@ static void ss_netstats(User *);
 static int Online(Server *);
 static int pong(Server *);
 static int s_user_away(User *);
-static int s_new_server(Server *);
+int *s_new_server(Server *);
 static int s_del_server(Server *);
 static int s_new_user(User *);
 static int s_del_user(User *);
@@ -151,7 +151,7 @@ void _fini() {
     
 }
 
-static int s_new_server(Server *s) {
+int *s_new_server(Server *s) {
     segv_location = sstrdup("StatServ-s_new_server");
 
     AddStats(s);
