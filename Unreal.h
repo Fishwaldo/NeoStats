@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.13 2002/03/12 13:34:20 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.14 2002/03/18 07:13:01 fishwaldo Exp $
  */
 
 
@@ -383,18 +383,6 @@
 #define MODE_ONLYSECURE		0x40000000
 #define MODE_NONICKCHANGE	0x80000000
 
-
-
-
-
-
-
-
-
-
-
-
-
 struct ircd_srv_ {
 	int uprot;
 	char cloak[10];
@@ -451,3 +439,4 @@ extern int ssvspart_cmd(const char *target, const char *chan);
 extern int skick_cmd(const char *who, const char *target, const char *chan, const char *reason);
 extern int swallops_cmd(const char *who, const char *msg,...);
 #endif  /* UNREAL_H Define */
+

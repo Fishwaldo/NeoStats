@@ -46,6 +46,10 @@ void Srv_Nick(char *, char **, int argc);
 void Srv_Svsnick(char *, char **, int argc);
 void Srv_Kill(char *, char **, int argc);
 void Srv_Connect(char *, char **, int argc);
+#ifdef ULTIMATE
+void Srv_Vctrl(char *, char **, int argc);
+#endif
+
 
 
 static void ShowMOTD(char *);
@@ -176,8 +180,10 @@ IntCommands cmd_list[] = {
 	{TOK_PART,	Usr_Part,		1},
 	{MSG_PING,	Srv_Ping,		0},
 	{TOK_PING,	Srv_Ping,		0},
-	{MSG_NETINFO,	Srv_Netinfo,		0},
-	{TOK_NETINFO,	Srv_Netinfo,		0},
+	{MSG_SNETINFO,	Srv_Netinfo,		0},
+	{TOK_SNETINFO,	Srv_Netinfo,		0},
+	{MSG_VCTRL,	Srv_Vctrl, 		0},
+	{TOK_VCTRL,	Srv_Vctrl, 		0},
 	{MSG_PASS,	Srv_Pass,		0},
 	{TOK_PASS,	Srv_Pass,		0},
 	{MSG_SERVER,	Srv_Server,		0},
@@ -213,7 +219,11 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	}
 	add_mod_user(nick, mod_name);
 	snewnick_cmd(nick, user, host, rname);
+#ifdef UNREAL
 	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
+#elif ULTIMATE
+	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+#endif
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
 	schmode_cmd(me.name, me.chan, "+oa", cmd);
@@ -498,7 +508,11 @@ void init_ServBot()
 	strcpy(segv_location, "init_ServBot");
 	sprintf(rname, "/msg %s \2HELP\2", s_Services);
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname);
+#ifdef UNREAL
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
+#elif ULTIMATE
+	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+#endif
 	sjoin_cmd(s_Services, me.chan);
 	sprintf(rname, "%s %s", s_Services, s_Services);
 	schmode_cmd(me.name, me.chan, "+oa", rname);
@@ -692,13 +706,22 @@ void Usr_Part(char *origin, char **argv, int argc) {
 void Srv_Ping(char *origin, char **argv, int argc) {
 			spong_cmd(origin);
 }
+#ifdef ULTIMATE
+void Srv_Vctrl(char *origin, char **argv, int argc) {
+		ircd_srv.uprot = atoi(argv[0]);
+		strcpy(me.netname, argv[14]);
+		vctrl_cmd(atoi(argv[1]));
+
+}
+#endif
+
+
+
 void Srv_Netinfo(char *origin, char **argv, int argc) {
 		        me.onchan = 1;
-#ifdef UNREAL
 			ircd_srv.uprot = atoi(argv[2]);
 			strcpy(ircd_srv.cloak, argv[3]);
 			strcpy(me.netname, argv[7]);
-#endif
 
 			snetinfo_cmd();
 			globops(me.name,"Link with Network \2Complete!\2");

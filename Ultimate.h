@@ -315,19 +315,93 @@
 #define UMODE_NETMON		0x8000000 /* Marks the client as an Network Monitor */
 #define UMODE_SERVADMIN		0x10000000 /* Marks the client as a Server Admin */
 #define UMODE_TECHADMIN		0x20000000 /* Marks the client as a Technical Admin */
+#define UMODE_DEAF		0x40000000 /* client is deaf on channels */
+
+#define	MODE_CHANOP	0x0001
+#define MODE_HALFOP	0x0002
+#define	MODE_VOICE	0x0004
+#define	MODE_PRIVATE	0x0008
+#define	MODE_SECRET	0x0010
+#define	MODE_MODERATED  0x0020
+#define	MODE_TOPICLIMIT 0x0040
+#define	MODE_INVITEONLY 0x0080
+#define	MODE_NOPRIVMSGS 0x0100
+#define	MODE_KEY	0x0200
+#define MODE_EXCEPT	0x0400
+#define	MODE_BAN	0x0800
+#define	MODE_LIMIT	0x1000
+#define MODE_RGSTR	0x2000
+#define MODE_RGSTRONLY  0x4000
+
+#define MODE_OPERONLY   0x8000
+#define MODE_ADMONLY   	0x10000
+#define MODE_LINK	0x20000
+#define MODE_NOCOLOR	0x40000
+#define MODE_STRIP	0x80000
+#define MODE_NOKNOCK	0x100000
+#define MODE_NOINVITE  	0x200000
+#define MODE_FLOODLIMIT 0x400000
 
 
-struct Oper_Modes {
+
+
+
+
+struct ircd_srv_ {
+	int uprot;
+	char cloak[10];
+} ircd_srv;
+
+typedef struct {
+	long mode;
+	char flag;
+	unsigned  nickparam : 1;		/* 1 = yes 0 = no */
+	unsigned  parameters : 1; 
+} aCtab;
+
+
+
+
+
+typedef struct {
 	long umodes;
 	char mode;
 	int level;
-};
+} Oper_Modes;
+
+
+aCtab cFlagTab[33];
+Oper_Modes usr_mds[27];
+
+
 
 
 /* function declarations */
-extern void sts(char *, ...);
+extern void init_ircd();
 extern void notice(char *,char *, ...);
-
-
+extern int sserver_cmd(const char *, const int numeric, const char *);
+extern int slogin_cmd(const char *, const int numeric, const char *, const char *);
+extern int ssquit_cmd(const char *);
+extern int sprotocol_cmd(const char *);
+extern int squit_cmd(const char *, const char *);
+extern int spart_cmd(const char *, const char *);
+extern int sjoin_cmd(const char *, const char *);
+extern int schmode_cmd(const char *, const char *, const char *, const char *);
+extern int snewnick_cmd(const char *, const char *, const char *, const char *);
+extern int sping_cmd(const char *from, const char *reply, const char *to);
+extern int sumode_cmd(const char *who, const char *target, long mode);
+extern int snumeric_cmd(const int numeric, const char *target, const char *data,...);
+extern int spong_cmd(const char *reply);
+extern int snetinfo_cmd();
+extern int skill_cmd(const char *from, const char *target, const char *reason,...);
+extern int ssmo_cmd(const char *from, const char *umodetarget, const char *msg);
+extern int snick_cmd(const char *oldnick, const char *newnick);
+extern int sswhois_cmd(const char *target, const char *swhois);
+extern int ssvsnick_cmd(const char *target, const char *newnick);
+extern int ssvsjoin_cmd(const char *target, const char *chan);
+extern int ssvspart_cmd(const char *target, const char *chan);
+extern int skick_cmd(const char *who, const char *target, const char *chan, const char *reason);
+extern int swallops_cmd(const char *who, const char *msg,...);
+extern int vctrl_cmd(int nl);
 
 #endif

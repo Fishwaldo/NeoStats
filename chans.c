@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.14 2002/03/18 05:44:10 fishwaldo Exp $
+** $Id: chans.c,v 1.15 2002/03/18 07:13:01 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -161,7 +161,9 @@ void del_chan(Chans *c) {
 		log("Hu, Deleting a Non Existand Channel?");
 		return;
 	} else {
+#ifdef DEBUG
 		log("Deleting Channel %s", c->name);
+#endif
 		cm = list_first(c->modeparms);
 		while (cm) {
 			free(lnode_get(cm));
@@ -209,7 +211,9 @@ void part_chan(User *u, char *chan) {
 			lnode_destroy(list_delete(c->chanmembers, un));
 			c->cur_users--;
 		}
+#ifdef DEBUG
 		log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
+#endif
 		if (c->cur_users <= 0) {
 			del_chan(c);
 		}
