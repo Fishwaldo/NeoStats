@@ -358,12 +358,20 @@ int s_user_modes(char **av, int ac)
 		return -1;
 	modes = u->modes;
 #endif
+	s = findstats(u->server->name);
+	if (!s) {
+		nlog(LOG_WARNING, LOG_MOD,
+			"Hrm, Couldn't find stats for %s", u->server->name);
+		return -1;
+	}
+
 	if (ac < 2) {
 		nlog(LOG_WARNING, LOG_MOD, "Didn't get mode for Umode Event");
 		return -1;
 	}
 	modes = av[1];
 	while (*modes) {
+		nlog(LOG_DEBUG1, LOG_MOD, "Checking %c mode", *modes);
 		switch (*modes) {
 		case '+':
 			add = 1;
@@ -374,9 +382,8 @@ int s_user_modes(char **av, int ac)
 		case 'O':
 		case 'o':
 			if (add) {
-				nlog(LOG_DEBUG1, LOG_MOD, "Increasing OperCount for %s", u->server->name);
-				IncreaseOpers(findstats(u->server->name));
-				s = findstats(u->server->name);
+				nlog(LOG_DEBUG1, LOG_MOD, "Increasing OperCount for %s (%d)", u->server->name, s->opers);
+				IncreaseOpers(s);
 				if (stats_network.maxopers <
 				    stats_network.opers) {
 					stats_network.maxopers =
