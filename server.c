@@ -68,7 +68,7 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	char **av;
 	int ac = 0;
 
-	nlog (LOG_DEBUG1, LOG_CORE, "New Server: %s", name);
+	nlog (LOG_DEBUG1, LOG_CORE, "New Server: %s Uplink; %s", name, uplink);
 	s = new_server (name);
 	if(hops) {
 		s->hops = atoi (hops);

@@ -70,7 +70,7 @@ new_user (const char *nick)
 	}
 	return (u);
 }
-#ifndef GOTNICKIP
+#ifndef GOTNICKIP1
 static void 
 lookupnickip(char *data, adns_answer *a) {
 	User *u;
@@ -95,7 +95,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	int ac = 0;
 	User *u;
 	int i;
-#ifndef GOTNICKIP
+#ifndef GOTNICKIP1
 	struct in_addr *ipad;
 	int res;
 #endif
@@ -106,11 +106,10 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 		nlog (LOG_WARNING, LOG_CORE, "AddUser: trying to add a user that already exists %s", nick);
 		return;
 	}
-
-	if(ip) {
+	if (ip) {
 		ipaddress = strtoul (ip, NULL, 10);
-	} else {
-#ifndef GOTNICKIP
+	}
+	if(ipaddress == 0) {
 		if (me.want_nickip == 1) {
 			/* first, if the u->host is a ip address, just convert it */
 			ipad = malloc(sizeof(struct in_addr));
@@ -124,10 +123,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 				dns_lookup((char *)host, adns_r_addr, lookupnickip, (void *)nick);
 				ipaddress = 0;
 			}		
-		} else {
-			ipaddress = 0;
-		}
-#endif
+		} 
 	}
 	if(TS) {
 		time = strtoul (TS, NULL, 10);
