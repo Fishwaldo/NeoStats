@@ -301,5 +301,6 @@ extern void change_user_nick(Chans *c, char *newnick, char *oldnick);
 extern Chans *findchan(char *chan);
 extern int ChanMode(char *origin, char **av, int ac);
 extern void Change_Topic(char *, Chans *, time_t t, char *);
+extern void ChangeChanUserMode(Chans *c, User *u, int add, long mode);
 #endif
 

@@ -28,6 +28,7 @@ char *get_chantop10();
 char *get_chantop10eva();
 char *get_unwelcomechan();
 char *get_title();
+char *get_tldmap();
 void ss_html() {
 	FILE *tpl, *opf;
 	char *buf;
@@ -120,6 +121,9 @@ void ss_html() {
 #ifdef DEBUG
 			log("gotdailytopics");
 #endif
+		}
+		if (strstr(buf, "!TLDMAP!")) {
+			strnrepl(buf, 10240, "!TLDMAP", get_tldmap());
 		}
 		if (strstr(buf, "!VERSION!")) {
 			strnrepl(buf, 10240, "!VERSION!", version);
@@ -305,6 +309,19 @@ char *get_chantop10eva() {
 	sprintf(tmpbuf, "%s</table>", tmpbuf);
 	return tmpbuf;
 }
+char *get_tldmap() {
+	TLD *t;
+	sprintf(tmpbuf, "<table border = 0><tr><th>tld</th><th>Country</th><th>Current Users</th><th>Daily Total</th></tr>");
+	for (t = tldhead; t; t = t->next) {
+		sprintf(tmpbuf, "%s\n<tr><td>%s</td><td>%s</td><td>%3d</td><td>%3d</td></tr>", tmpbuf, t->tld, t->country, t->users, t->daily_users);
+	}
+	sprintf(tmpbuf, "%s</table>", tmpbuf);
+	return tmpbuf;
+}
+
+
+
+
 char *get_unwelcomechan() {
 	CStats *cs;
 	lnode_t *cn;

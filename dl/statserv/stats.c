@@ -235,7 +235,7 @@ extern int s_user_modes(User *u) {
 		log("Changing modes for unknown user: %s", u->nick);
 		return -1;
 	}
-	 if (!u->modes) return -1; 
+	if (!u->modes) return -1; 
 	modes = u->modes;
 	while (*modes) {
 		switch(*modes) {
@@ -279,12 +279,29 @@ void re_init_bot() {
 }
 extern int s_del_user(User *u) {
 	SStats *s;
+	int add = 1;
+	char *modes;
+
 #ifdef DEBUG
 	log(" Server %s", u->server->name);
 #endif
 	s=findstats(u->server->name);
-	if (UserLevel(u) >= 40) {
-		DecreaseOpers(s);
+
+	if (!u->modes) return -1; 
+	modes = u->modes;
+	while (*modes) {
+		switch(*modes) {
+			case '+': add = 1;	break;
+			case '-': add = 0;	break;
+			case 'o':
+				if (!add) {
+				DecreaseOpers(s);
+				}
+				break;
+			default: 
+				break;
+		}
+		modes++;
 	}
 	DecreaseUsers(s);
 	DelTLD(u);

@@ -99,6 +99,15 @@ cellspacing="0" border="1">
 				<a name=map>!MAP!
 			</td>
 			</tr>
+
+			<tr>
+	 	 	<td class="cat" height="30"><span class="cattitle"><b>Current</b>&nbsp;Top Level Domain Statistics</span></td>
+			</tr>
+			<tr>
+				<td class="row1" align="center">
+				<a name=tldmap>!TLDMAP!
+			</td>
+			</tr>
 	
 			<tr>
 	 	 	<td class="cat" height="30"><span class="cattitle"><b>Current</b>&nbsp;Network Statistics</span></td>

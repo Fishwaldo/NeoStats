@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.17 2002/03/22 10:44:47 fishwaldo Exp $
+** $Id: chans.c,v 1.18 2002/05/02 10:13:06 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -14,7 +14,6 @@
 #include "hash.h"
 
 
-void ChangeChanUserMode(Chans *c, User *u, int add, long mode);
 
 void init_chan_hash()
 {
