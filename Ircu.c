@@ -322,7 +322,7 @@ send_join (const char *sender, const char *who, const char *chan, const unsigned
 void 
 send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %s %s", who, TOK_MODE, chan, mode, args);
+	send_cmd ("%s %s %s %s %s", neonumericbuf, TOK_MODE, chan, mode, args);
 }
 
 void
@@ -595,12 +595,16 @@ m_nick (char *origin, char **argv, int argc, int srv)
 	if(argc > 2) {
 		char IPAddress[32]; /* argv[argc-3] */
 		char *realname;
-        		
+		unsigned long IP = base64toint(argv[argc-3], 6);
+		
+		ircsnprintf( IPAddress, 32, "%lu.%lu.%lu.%lu", 
+			(IP >> 24) & 255, (IP >> 16) & 255, (IP >> 8) & 255, IP & 255 );
+
 		realname = joinbuf (argv, argc, (argc - 1));
 		/*       nick,    hopcount, TS,     user,    host, */
         do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
 			/* server, ip, servicestamp, modes*/
-			origin, NULL, NULL, (argv[5][0] == '+' ? argv[5]: NULL),
+			origin, IPAddress, NULL, (argv[5][0] == '+' ? argv[5]: NULL),
 			/*, vhost, realname, numeric*/ 
 			NULL, realname, argv[argc-2]);
 		free (realname);
