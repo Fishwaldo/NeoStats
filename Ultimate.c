@@ -161,17 +161,15 @@ int sjoin_cmd(const char *who, const char *chan) {
 }
 
 int schmode_cmd(const char *who, const char *chan, const char *mode, const char *args) {
-	char *tmp;
-	EvntMsg *EM;
+	char **av;
+	int ac;	
+	char tmp[512];
 
 	sts(":%s %s %s %s %s %lu", who, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args, time(NULL));
-	tmp = malloc(512);
-	sprintf(tmp, "MODE %s %s %s", chan, mode, args);
-	EM = split_buf(tmp, 0);
-	ChanMode("", EM->av, EM->ac);
-	FreeList(EM->av, EM->ac);
-	free(EM);
-	free(tmp);
+	sprintf(tmp, "%s %s %s", chan, mode, args);
+	ac = split_buf(tmp, &av, 0);
+	ChanMode("", av, ac);
+	free(av);
 	return 1;
 }
 #ifndef ULTIMATE3
@@ -239,23 +237,6 @@ int snetinfo_cmd() {
 int vctrl_cmd() {
 	sts("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, ircd_srv.nicklg, ircd_srv.modex, ircd_srv.gc, me.netname);
 	return 1;
-}
-
-int ssvskill_cmd(const char *target, const char *reason, ...) {
-        User *u;
-        va_list ap;
-        char buf[512];
-        u = finduser(target);
-        if (!u) {
-	        log("Cant find user %s for ssvskill_cmd", target);
-                return 0;
-        } else {
-        	va_start(ap, reason);
-                vsnprintf(buf, 512, reason, ap);
-                sts(":%s %s %s :%s", me.name, (me.token ? TOK_SVSKILL : MSG_SVSKILL), target, buf);
-                va_end(ap);
-                return 1;
-        }   
 }
 int skill_cmd(const char *from, const char *target, const char *reason,...) {
 	va_list ap;
@@ -326,19 +307,6 @@ int ssvshost_cmd(const char *who, const char *vhost) {
 		return 1;
 	}
 }
-int ssvsmode_cmd(const char *nick, const char *mode) {
-	User *u;
-	u = finduser(nick);
-	if (!u) {
-		log("Can't Find user %s for ssvsmode_cmd", nick);
-		return 0;
-	} else {
-		sts(":%s %s %s %s", me.name, (me.token ? TOK_SVSMODE : MSG_SVSMODE), nick, mode);
-		UserMode(nick, mode);
-	}
-}
-
-
 int ssvinfo_cmd() {
 	sts("SVINFO 5 3 0 :%d", time(NULL));
 	return 1;
@@ -369,7 +337,6 @@ void sts(char *fmt,...)
 	sent = write (servsock, buf, strlen (buf));
 	if (sent == -1) {
 		log("Write error.");
-		shutdown_neo();
 		exit(0);
 	}
 	me.SendM++;
@@ -397,7 +364,6 @@ void notice(char *who, char *buf,...)
 		if (sent == -1) {
 			me.onchan = 0;
 			log("Write error.");
-			shutdown_neo();
 			exit(0);
 		}
 		me.SendM++;

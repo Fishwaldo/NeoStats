@@ -29,221 +29,220 @@ static void ns_chan_dump(User *, char *);
 static void ns_uptime(User *);
 static void ns_version(User *); 
 
-void servicesbot(EvntMsg *EM) {
+void servicesbot(char *nick, char **av, int ac) {
+	User *u;
 	int rval;
 	char *tmp;
-		
-		
-	printf("%d\n", EM->isserv);	
-	/* we don't process messages from servers */	
-	if ((EM->isserv == 1) || (EM->isserv == -1))
-		return;
 			
-	printf("nick: %s\n", EM->u->nick);
+	u = finduser(nick);
+	if (!u) {
+		log("Unable to finduser %s (%s)", nick,s_Services);
+		return;
+	}
 
 	me.requests++;
 
-	if (flood(EM->u))
+	if (flood(u))
 		return;
 
-	if (me.onlyopers && (UserLevel(EM->u) < 40)) {
-		privmsg(EM->u->nick, s_Services,
+	if (me.onlyopers && (UserLevel(u) < 40)) {
+		privmsg(u->nick, s_Services,
 			"This service is only available to IRCops.");
-		notice (s_Services,"%s Requested %s, but he is Not a Operator!", EM->u->nick, EM->av[1]);
+		notice (s_Services,"%s Requested %s, but he is Not a Operator!", u->nick, av[1]);
 		return;
 	}
-	if (!strcasecmp(EM->av[1], "HELP")) {
-		if (EM->ac > 2) {
-			notice(s_Services,"%s Requested %s Help on %s",EM->u->nick, s_Services, EM->av[2]);
+	if (!strcasecmp(av[1], "HELP")) {
+		if (ac > 2) {
+			notice(s_Services,"%s Requested %s Help on %s",u->nick, s_Services, av[2]);
 		} else {
-			notice(s_Services, "%s Requested %s Help",EM->u->nick, s_Services);
+			notice(s_Services, "%s Requested %s Help",u->nick, s_Services);
 		}
-		if (EM->ac < 3) {
-			privmsg_list(EM->u->nick, s_Services, ns_help);
-			if (UserLevel(EM->u) >= 180)
-				privmsg_list(EM->u->nick, s_Services, ns_myuser_help);
-		} else if (!strcasecmp(EM->av[2], "VERSION"))
-		 	privmsg_list(EM->u->nick, s_Services, ns_version_help);
-		else if (!strcasecmp(EM->av[2], "SHUTDOWN") && (UserLevel(EM->u) >= 180))
-			privmsg_list(EM->u->nick, s_Services, ns_shutdown_help);
-		else if (!strcasecmp(EM->av[2], "RELOAD") && (UserLevel(EM->u) >= 180))
-			privmsg_list(EM->u->nick, s_Services, ns_reload_help);
-		else if (!strcasecmp(EM->av[2], "LOGS") && (UserLevel(EM->u) >= 180))
-			privmsg_list(EM->u->nick, s_Services, ns_logs_help);
-		else if (!strcasecmp(EM->av[2], "LOAD") && (UserLevel(EM->u) >= 180))
-			privmsg_list(EM->u->nick, s_Services, ns_load_help);
-		else if (!strcasecmp(EM->av[2], "UNLOAD") && (UserLevel(EM->u) >= 180))
-			privmsg_list(EM->u->nick, s_Services, ns_unload_help);
-		else if (!strcasecmp(EM->av[2], "MODLIST") && (UserLevel(EM->u) >= 180))
-			privmsg_list(EM->u->nick, s_Services, ns_modlist_help);
-		else if (!strcasecmp(EM->av[2], "USERDUMP") && (UserLevel(EM->u) >= 180) && (me.coder_debug))
-			privmsg_list(EM->u->nick, s_Services, ns_userdump_help);
-		else if (!strcasecmp(EM->av[2], "CHANDUMP") && (UserLevel(EM->u) >= 180) && (me.coder_debug))
-			privmsg_list(EM->u->nick, s_Services, ns_chandump_help);
-		else if (!strcasecmp(EM->av[2], "SERVERDUMP") && (UserLevel(EM->u) >= 180) && (me.coder_debug))
-			privmsg_list(EM->u->nick, s_Services, ns_serverdump_help);
-		else if (!strcasecmp(EM->av[2], "JUPE") && (UserLevel(EM->u) >= 180))
-			privmsg_list(EM->u->nick, s_Services, ns_jupe_help);
-		else if (!strcasecmp(EM->av[2], "RAW") && (UserLevel(EM->u) >= 180))
-			privmsg_list(EM->u->nick, s_Services, ns_raw_help);
-		else if (!strcasecmp(EM->av[2], "LEVEL"))
-			privmsg_list(EM->u->nick, s_Services, ns_level_help);
+		if (ac < 3) {
+			privmsg_list(nick, s_Services, ns_help);
+			if (UserLevel(u) >= 180)
+				privmsg_list(nick, s_Services, ns_myuser_help);
+		} else if (!strcasecmp(av[2], "VERSION"))
+		 	privmsg_list(nick, s_Services, ns_version_help);
+		else if (!strcasecmp(av[2], "SHUTDOWN") && (UserLevel(u) >= 180))
+			privmsg_list(nick, s_Services, ns_shutdown_help);
+		else if (!strcasecmp(av[2], "RELOAD") && (UserLevel(u) >= 180))
+			privmsg_list(nick, s_Services, ns_reload_help);
+		else if (!strcasecmp(av[2], "LOGS") && (UserLevel(u) >= 180))
+			privmsg_list(nick, s_Services, ns_logs_help);
+		else if (!strcasecmp(av[2], "LOAD") && (UserLevel(u) >= 180))
+			privmsg_list(nick, s_Services, ns_load_help);
+		else if (!strcasecmp(av[2], "UNLOAD") && (UserLevel(u) >= 180))
+			privmsg_list(nick, s_Services, ns_unload_help);
+		else if (!strcasecmp(av[2], "MODLIST") && (UserLevel(u) >= 180))
+			privmsg_list(nick, s_Services, ns_modlist_help);
+		else if (!strcasecmp(av[2], "USERDUMP") && (UserLevel(u) >= 180) && (me.coder_debug))
+			privmsg_list(nick, s_Services, ns_userdump_help);
+		else if (!strcasecmp(av[2], "CHANDUMP") && (UserLevel(u) >= 180) && (me.coder_debug))
+			privmsg_list(nick, s_Services, ns_chandump_help);
+		else if (!strcasecmp(av[2], "SERVERDUMP") && (UserLevel(u) >= 180) && (me.coder_debug))
+			privmsg_list(nick, s_Services, ns_serverdump_help);
+		else if (!strcasecmp(av[2], "JUPE") && (UserLevel(u) >= 180))
+			privmsg_list(nick, s_Services, ns_jupe_help);
+		else if (!strcasecmp(av[2], "RAW") && (UserLevel(u) >= 180))
+			privmsg_list(nick, s_Services, ns_raw_help);
+		else if (!strcasecmp(av[2], "LEVEL"))
+			privmsg_list(nick, s_Services, ns_level_help);
 		else
-		privmsg(EM->u->nick, s_Services, "Unknown Help Topic: \2%s\2", EM->av[2]);
-	} else if (!strcasecmp(EM->av[1], "LEVEL")) {
-		privmsg(EM->u->nick, s_Services, "Your Level is %d", UserLevel(EM->u));
-	} else if (!strcasecmp(EM->av[1], "LOAD")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to LOAD, but is not at least a NetAdmin",EM->u->nick);
+		privmsg(nick, s_Services, "Unknown Help Topic: \2%s\2", av[2]);
+	} else if (!strcasecmp(av[1], "LEVEL")) {
+		privmsg(nick, s_Services, "Your Level is %d", UserLevel(u));
+	} else if (!strcasecmp(av[1], "LOAD")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to LOAD, but is not at least a NetAdmin",nick);
 			return;
 		}
-		if (EM->ac <= 2) {
-			privmsg(EM->u->nick,s_Services,"Please Specify a Module");
+		if (ac <= 2) {
+			privmsg(nick,s_Services,"Please Specify a Module");
 			return;
 		}
-		rval = load_module(EM->av[2],EM->u);
+		rval = load_module(av[2],u);
 		if (!rval) {
-			notice(s_Services,"%s Loaded Module %s",EM->u->nick,EM->av[2]);
+			notice(s_Services,"%s Loaded Module %s",u->nick,av[2]);
 
 		} else {
-			notice(s_Services,"%s Tried to Load Module %s, but Failed",EM->u->nick,EM->av[2]);
+			notice(s_Services,"%s Tried to Load Module %s, but Failed",u->nick,av[2]);
 		}
-	} else if (!strcasecmp(EM->av[1],"MODLIST")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to MODLIST, but is not a Techadmin",EM->u->nick);
+	} else if (!strcasecmp(av[1],"MODLIST")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to MODLIST, but is not a Techadmin",nick);
 			return;
 		}
-		list_module(EM->u);
-	} else if (!strcasecmp(EM->av[1],"UNLOAD")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to UNLOAD, but is not a Techadmin",EM->u->nick);
+		list_module(u);
+	} else if (!strcasecmp(av[1],"UNLOAD")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to UNLOAD, but is not a Techadmin",nick);
 			return;
 		}
-		if (EM->ac <= 2) {
-			privmsg(EM->u->nick,s_Services," Please Specify a Module Name");
+		if (ac <= 2) {
+			privmsg(nick,s_Services," Please Specify a Module Name");
 			return;
 		}
-		rval = unload_module(EM->av[2],EM->u);
+		rval = unload_module(av[2],u);
 		if (rval) { 
-			notice(s_Services,"%s Unloaded Module %s", EM->u->nick, EM->av[2]);
+			notice(s_Services,"%s Unloaded Module %s", u->nick, av[2]);
 		} else {
-			notice(s_Services,"%s Tried to Unload the Module %s, but that does not exist", EM->u->nick, EM->av[2]);
-			privmsg(s_Services, EM->u->nick, "Module %s does not exist. Try modlist", EM->av[2]);
+			notice(s_Services,"%s Tried to Unload the Module %s, but that does not exist", u->nick, av[2]);
+			privmsg(s_Services, u->nick, "Module %s does not exist. Try modlist", av[2]);
 		}
-	} else if (!strcasecmp(EM->av[1], "MODBOTLIST")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to MODBOTLIST, but is not a Techadmin",EM->u->nick);
+	} else if (!strcasecmp(av[1], "MODBOTLIST")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to MODBOTLIST, but is not a Techadmin",nick);
 			return;
 		}
-		list_module_bots(EM->u);
-	} else if (!strcasecmp(EM->av[1], "MODSOCKLIST")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to MODSOCKLIST, but is not a Techadmin",EM->u->nick);
+		list_module_bots(u);
+	} else if (!strcasecmp(av[1], "MODSOCKLIST")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to MODSOCKLIST, but is not a Techadmin",nick);
 			return;
 		}
-		list_sockets(EM->u);
-	} else if (!strcasecmp(EM->av[1], "MODTIMERLIST")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to MODTIMERLIST, but is not a Techadmin",EM->u->nick);
+		list_sockets(u);
+	} else if (!strcasecmp(av[1], "MODTIMERLIST")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to MODTIMERLIST, but is not a Techadmin",nick);
 			return;
 		}
-		list_module_timer(EM->u);
-	} else if (!strcasecmp(EM->av[1], "INFO")) {
-		ns_uptime(EM->u);
-		notice(s_Services,"%s Wanted to see %s's info",EM->u->nick,me.name);
-	} else if (!strcasecmp(EM->av[1], "SHUTDOWN")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to SHUTDOWN, but is not a Techadmin",EM->u->nick);
+		list_module_timer(u);
+	} else if (!strcasecmp(av[1], "INFO")) {
+		ns_uptime(u);
+		notice(s_Services,"%s Wanted to see %s's info",u->nick,me.name);
+	} else if (!strcasecmp(av[1], "SHUTDOWN")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to SHUTDOWN, but is not a Techadmin",nick);
 			return;
 				}
-		notice(s_Services,"%s Wants me to Go to BED!!! Good Night!",EM->u->nick);
-		tmp = joinbuf(EM->av, EM->ac, 2);
-		ns_shutdown(EM->u,tmp);
+		notice(s_Services,"%s Wants me to Go to BED!!! Good Night!",u->nick);
+		tmp = joinbuf(av, ac, 2);
+		ns_shutdown(u,tmp);
 		free(tmp);
-	} else if (!strcasecmp(EM->av[1], "VERSION")) {
-		ns_version(EM->u);
-		notice(s_Services,"%s Wanted to know our version number ",EM->u->nick);
-	} else if (!strcasecmp(EM->av[1], "RELOAD")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to RELOAD, but is not a Techadmin",EM->u->nick);
+	} else if (!strcasecmp(av[1], "VERSION")) {
+		ns_version(u);
+		notice(s_Services,"%s Wanted to know our version number ",u->nick);
+	} else if (!strcasecmp(av[1], "RELOAD")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to RELOAD, but is not a Techadmin",nick);
 			return;
 		}
-		notice(s_Services,"%s Wants me to RELOAD! Be back in a few!",EM->u->nick);
-		tmp = joinbuf(EM->av, EM->ac, 2);
-		ns_reload(EM->u,tmp);
+		notice(s_Services,"%s Wants me to RELOAD! Be back in a few!",u->nick);
+		tmp = joinbuf(av, ac, 2);
+		ns_reload(u,tmp);
 		free(tmp);
-	} else if (!strcasecmp(EM->av[1], "LOGS")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to view LOGS, but is not a Techadmin",EM->u->nick);
+	} else if (!strcasecmp(av[1], "LOGS")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to view LOGS, but is not a Techadmin",nick);
 			return;
 		}
-		ns_logs(EM->u);
-		notice(s_Services,"%s Wants to Look at my Logs!!",EM->u->nick);
-	} else if (!strcasecmp(EM->av[1], "JUPE")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to JUPE, but is not a Techadmin",EM->u->nick);
+		ns_logs(u);
+		notice(s_Services,"%s Wants to Look at my Logs!!",u->nick);
+	} else if (!strcasecmp(av[1], "JUPE")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to JUPE, but is not a Techadmin",nick);
 			return;
 		}
-		if (EM->ac <= 2) {
-			privmsg(EM->u->nick, s_Services, "You must supply a ServerName to Jupe");
+		if (ac <= 2) {
+			privmsg(nick, s_Services, "You must supply a ServerName to Jupe");
 			return;
 		}
-		ns_jupe(EM->u, EM->av[2]);
-		notice(s_Services,"%s Wants to JUPE this Server %s",EM->u->nick,EM->av[2]);
-	} else if (!strcasecmp(EM->av[1], "DEBUG")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick, s_Services, "Permission Denied, you need to be a Techadmin to Enable Debug Mode!");
+		ns_jupe(u, av[2]);
+		notice(s_Services,"%s Wants to JUPE this Server %s",u->nick,av[2]);
+	} else if (!strcasecmp(av[1], "DEBUG")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(u->nick, s_Services, "Permission Denied, you need to be a Techadmin to Enable Debug Mode!");
 			return;
 		}		
-		ns_debug_to_coders(EM->u->nick);
-	} else if (!strcasecmp(EM->av[1], "USERDUMP")) {
+		ns_debug_to_coders(u->nick);
+	} else if (!strcasecmp(av[1], "USERDUMP")) {
 		if (!me.coder_debug) {
-			privmsg(EM->u->nick,s_Services,"\2Error:\2 Debug Mode Disabled");
+			privmsg(u->nick,s_Services,"\2Error:\2 Debug Mode Disabled");
 			return;
 		}
-		if (EM->ac <= 2) {
-			ns_user_dump(EM->u, NULL);
+		if (ac <= 2) {
+			ns_user_dump(u, NULL);
 		} else {
-			ns_user_dump(EM->u, EM->av[2]);
+			ns_user_dump(u, av[2]);
 		}
-	} else if (!strcasecmp(EM->av[1], "CHANDUMP")) {
+	} else if (!strcasecmp(av[1], "CHANDUMP")) {
 		if (!me.coder_debug) {
-			privmsg(EM->u->nick,s_Services,"\2Error:\2 Debug Mode Disabled");
+			privmsg(u->nick,s_Services,"\2Error:\2 Debug Mode Disabled");
 			return;
 		}
-		if (EM->ac < 3) {
-			ns_chan_dump(EM->u, NULL);
+		if (ac < 3) {
+			ns_chan_dump(u, NULL);
 		} else {
-			ns_chan_dump(EM->u, EM->av[2]);
+			ns_chan_dump(u, av[2]);
 		}
-	} else if (!strcasecmp(EM->av[1], "SERVERDUMP")) {
+	} else if (!strcasecmp(av[1], "SERVERDUMP")) {
 		if (!me.coder_debug) {
-			privmsg(EM->u->nick,s_Services,"\2Error:\2 Debug Mode Disabled");
+			privmsg(u->nick,s_Services,"\2Error:\2 Debug Mode Disabled");
 			return;
 		}
-		ns_server_dump(EM->u);
-	} else if (!strcasecmp(EM->av[1], "RAW")) {
-		if (!(UserLevel(EM->u) >= 180)) {
-			privmsg(EM->u->nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to use RAW, but is not a Techadmin",EM->u->nick);
+		ns_server_dump(u);
+	} else if (!strcasecmp(av[1], "RAW")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to use RAW, but is not a Techadmin",nick);
 			return;
 		}
-		tmp = joinbuf(EM->av, EM->ac, 2);
-		ns_raw(EM->u, tmp);
+		tmp = joinbuf(av, ac, 2);
+		ns_raw(u, tmp);
 		free(tmp);
 	} else {
-		privmsg(EM->u->nick, s_Services, "Unknown Command: \2%s\2", EM->av[1]);
-		notice(s_Services,"%s Reqested %s, but that is a Unknown Command",EM->u->nick,EM->av[1]);
+		privmsg(nick, s_Services, "Unknown Command: \2%s\2", av[1]);
+		notice(s_Services,"%s Reqested %s, but that is a Unknown Command",u->nick,av[1]);
 	}
 }
 
@@ -265,8 +264,8 @@ extern void ns_shutdown(User *u, char *reason)
 	}
 
 
-	globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, (reason ? "No Reason" : reason));
-	sprintf(quitmsg, "%s Set SHUTDOWN: %s", u->nick, (reason ? "No Reason" : reason));
+	globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
+	sprintf(quitmsg, "%s Set SHUTDOWN: %s", u->nick, (reason ? reason : "No Reason"));
 	squit_cmd(s_Services, quitmsg);
 	ssquit_cmd(me.name);
 	sleep(1);
@@ -274,7 +273,6 @@ extern void ns_shutdown(User *u, char *reason)
 	remove("stats.pid");
 	log("%s [%s](%s) requested SHUTDOWN.", u->nick, u->username,
 		u->hostname);
-	shutdown_neo();
 	exit(0);
 }
 
@@ -297,7 +295,6 @@ static void ns_reload(User *u, char *reason)
 	squit_cmd(s_Services, quitmsg);
 	ssquit_cmd(me.name);
 	sleep(5);
-   	shutdown_neo();
 	execve("./stats", NULL, NULL);
 }
 
@@ -380,7 +377,6 @@ static void ns_raw(User *u, char *message)
         sent = write (servsock, message, strlen (message));
         if (sent == -1) {
         	log("Write error.");
-        	shutdown_neo();
                 exit(0);
         }
         me.SendM++;

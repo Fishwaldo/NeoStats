@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.18 2002/06/05 11:26:03 fishwaldo Exp $
+** $Id: sock.c,v 1.19 2002/06/21 07:06:13 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -119,7 +119,6 @@ void read_loop()
 				close(servsock);
 				sleep(5);
 				log("Eeek, Zombie Server, Reconnecting");
-				shutdown_neo();
 				execve("./stats", NULL, NULL);
 			}
 		} else if (SelectResult == -1) {

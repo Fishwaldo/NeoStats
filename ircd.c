@@ -17,46 +17,44 @@
 extern const char version_date[], version_time[];
 extern const char protocol_version[];
 
-void Usr_Version(EvntMsg *EM);
-void Usr_ShowMOTD(EvntMsg *EM);
-void Usr_ShowADMIN(EvntMsg *EM);
-void Usr_Showcredits(EvntMsg *EM);
-void Usr_AddServer(EvntMsg *EM);
-void Usr_DelServer(EvntMsg *EM);
-void Usr_DelUser(EvntMsg *EM);
-void Usr_Mode(EvntMsg *EM);
-void Usr_Smode(EvntMsg *EM);
-void Usr_Kill(EvntMsg *EM);
-void Usr_Pong(EvntMsg *EM);
-void Usr_Away(EvntMsg *EM);
-void Usr_Nick(EvntMsg *EM);
-void Usr_Topic(EvntMsg *EM);
-void Usr_Kick(EvntMsg *EM);
-void Usr_Join(EvntMsg *EM);
-void Usr_Part(EvntMsg *EM);
-void Usr_Stats(EvntMsg *EM);
-void Usr_Vhost(EvntMsg *EM);
-void Srv_Topic(EvntMsg *EM);
-void Srv_Ping(EvntMsg *EM);
-void Srv_Netinfo(EvntMsg *EM);
-void Srv_Pass(EvntMsg *EM);
-void Srv_Server(EvntMsg *EM);
-void Srv_Squit(EvntMsg *EM);
-void Srv_Nick(EvntMsg *EM);
-void Srv_Svsnick(EvntMsg *EM);
-void Srv_Kill(EvntMsg *EM);
-void Srv_Connect(EvntMsg *EM);
+void Usr_Version(char *, char **, int argc);
+void Usr_ShowMOTD(char *, char **, int argc);
+void Usr_ShowADMIN(char *, char **, int argc);
+void Usr_Showcredits(char *, char **, int argc);
+void Usr_AddServer(char *, char **, int argc);
+void Usr_DelServer(char *, char **, int argc);
+void Usr_DelUser(char *, char **, int argc);
+void Usr_Mode(char *, char **, int argc);
+void Usr_Smode(char *, char **, int argc);
+void Usr_Kill(char *, char **, int argc);
+void Usr_Pong(char *, char **, int argc);
+void Usr_Away(char *, char **, int argc);
+void Usr_Nick(char *, char **, int argc);
+void Usr_Topic(char *, char **, int argc);
+void Usr_Kick(char *, char **, int argc);
+void Usr_Join(char *, char **, int argc);
+void Usr_Part(char *, char **, int argc);
+void Usr_Stats(char *, char **, int argc);
+void Usr_Vhost(char *, char **, int argc);
+void Srv_Topic(char *, char **, int argc);
+void Srv_Ping(char *, char **, int argc);
+void Srv_Netinfo(char *, char **, int argc);
+void Srv_Pass(char *, char **, int argc);
+void Srv_Server(char *, char **, int argc);
+void Srv_Squit(char *, char **, int argc);
+void Srv_Nick(char *, char **, int argc);
+void Srv_Svsnick(char *, char **, int argc);
+void Srv_Kill(char *, char **, int argc);
+void Srv_Connect(char *, char **, int argc);
 #ifdef ULTIMATE
-void Srv_Vctrl(EvntMsg *EM);
+void Srv_Vctrl(char *, char **, int argc);
 #endif
 #ifdef ULTIMATE3
-void Srv_Svinfo(EvntMsg *EM);
-void Srv_Burst(EvntMsg *EM);
-void Srv_Sjoin(EvntMsg *EM);
+void Srv_Svinfo(char *, char **, int argc);
+void Srv_Burst(char *origin, char **argv, int argc);
+void Srv_Sjoin(char *origin, char **argv, int argc);
 #endif
 
-void AddStringToList(char ***List,char S[],int *C);
-void FreeList(char **List,int C);
 
 
 static void ShowMOTD(char *);
@@ -67,9 +65,8 @@ static void Showcredits(char *);
 
 struct int_commands {
 	char *name;
-	void (*function)();
+	void (*function)(char *origin, char **argv, int argc);
 	int srvmsg; /* Should this be a Server Message(1), or a User Message?(0) */
-	int exec;
 };
 
 /* The Following Array is a list of Commands that are Handled Internally by NeoStats 
@@ -84,137 +81,137 @@ typedef struct int_commands IntCommands;
 #ifdef UNREAL
 IntCommands cmd_list[] = {
 	/* Command	Function		srvmsg*/
-	{MSG_STATS,	Usr_Stats, 		1, 	0},
-	{TOK_STATS,	Usr_Stats,		1, 	0},
-	{MSG_SETHOST, 	Usr_Vhost,		1, 	0},
-	{TOK_SETHOST, 	Usr_Vhost, 		1, 	0},
-	{MSG_VERSION,	Usr_Version,		1, 	0},
-	{TOK_VERSION,	Usr_Version,		1, 	0},
-	{MSG_MOTD,	Usr_ShowMOTD,		1, 	0},
-	{TOK_MOTD,	Usr_ShowMOTD,		1, 	0},
-	{MSG_ADMIN,	Usr_ShowADMIN,		1, 	0},
-	{TOK_ADMIN,	Usr_ShowADMIN,		1, 	0},
-	{MSG_CREDITS,	Usr_Showcredits,	1, 	0},
-	{TOK_CREDITS,	Usr_Showcredits,	1, 	0},
-	{MSG_SERVER,	Usr_AddServer,		1, 	0},
-	{TOK_SERVER,	Usr_AddServer,		1, 	0},
-	{MSG_SQUIT,	Usr_DelServer,		1, 	0},
-	{TOK_SQUIT,	Usr_DelServer,		1, 	0},
-	{MSG_QUIT,	Usr_DelUser,		1, 	0},
-	{TOK_QUIT,	Usr_DelUser,		1, 	0},
-	{MSG_MODE,	Usr_Mode,		1, 	0},
-	{TOK_MODE,	Usr_Mode,		1, 	0},
-	{MSG_SVSMODE,	Usr_Smode,		1, 	0},
-	{TOK_SVSMODE,	Usr_Smode,		1, 	0},
-	{MSG_SVS2MODE,	Usr_Smode,		1, 	0},
-	{TOK_SVS2MODE,	Usr_Smode,		1, 	0},
-	{MSG_KILL,	Usr_Kill,		1, 	0},
-	{TOK_KILL,	Usr_Kill,		1, 	0},
-	{MSG_PONG,	Usr_Pong,		1, 	0},
-	{TOK_PONG,	Usr_Pong,		1, 	0},
-	{MSG_AWAY,	Usr_Away,		1, 	0},
-	{TOK_AWAY,	Usr_Away,		1, 	0},
-	{MSG_NICK,	Usr_Nick,		1, 	0},
-	{TOK_NICK,	Usr_Nick,		1, 	0},
-	{MSG_TOPIC,	Usr_Topic,		1, 	0},
-	{TOK_TOPIC,	Usr_Topic,		1, 	0},
-	{MSG_TOPIC, 	Usr_Topic, 		0, 	0},
-	{TOK_TOPIC, 	Usr_Topic, 		0, 	0},
-	{MSG_KICK,	Usr_Kick,		1, 	0},
-	{TOK_KICK,	Usr_Kick,		1, 	0},
-	{MSG_JOIN,	Usr_Join,		1, 	0},
-	{TOK_JOIN,	Usr_Join,		1, 	0},
-	{MSG_PART,	Usr_Part,		1, 	0},
-	{TOK_PART,	Usr_Part,		1, 	0},
-	{MSG_PING,	Srv_Ping,		0, 	0},
-	{TOK_PING,	Srv_Ping,		0, 	0},
-	{MSG_NETINFO,	Srv_Netinfo,		0, 	0},
-	{TOK_NETINFO,	Srv_Netinfo,		0, 	0},
-	{MSG_PASS,	Srv_Pass,		0, 	0},
-	{TOK_PASS,	Srv_Pass,		0, 	0},
-	{MSG_SERVER,	Srv_Server,		0, 	0},
-	{TOK_SERVER,	Srv_Server,		0, 	0},
-	{MSG_SQUIT,	Srv_Squit,		0, 	0},
-	{TOK_SQUIT,	Srv_Squit,		0, 	0},
-	{MSG_NICK,	Srv_Nick,		0, 	0},
-	{TOK_NICK,	Srv_Nick,		0, 	0},
-	{MSG_SVSNICK,	Srv_Svsnick,		0, 	0},
-	{TOK_SVSNICK,	Srv_Svsnick,		0, 	0},
-	{MSG_KILL,	Srv_Kill,		0, 	0},
-	{TOK_KILL,	Srv_Kill,		0, 	0},
-	{MSG_PROTOCTL, 	Srv_Connect, 		0, 	0},
-	{TOK_PROTOCTL,	Srv_Connect,		0, 	0},
-	{NULL,		NULL,			0, 	0}
+	{MSG_STATS,	Usr_Stats, 		1},
+	{TOK_STATS,	Usr_Stats,		1},
+	{MSG_SETHOST, 	Usr_Vhost,		1},
+	{TOK_SETHOST, 	Usr_Vhost, 		1},
+	{MSG_VERSION,	Usr_Version,		1},
+	{TOK_VERSION,	Usr_Version,		1},
+	{MSG_MOTD,	Usr_ShowMOTD,		1},
+	{TOK_MOTD,	Usr_ShowMOTD,		1},
+	{MSG_ADMIN,	Usr_ShowADMIN,		1},
+	{TOK_ADMIN,	Usr_ShowADMIN,		1},
+	{MSG_CREDITS,	Usr_Showcredits,	1},
+	{TOK_CREDITS,	Usr_Showcredits,	1},
+	{MSG_SERVER,	Usr_AddServer,		1},
+	{TOK_SERVER,	Usr_AddServer,		1},
+	{MSG_SQUIT,	Usr_DelServer,		1},
+	{TOK_SQUIT,	Usr_DelServer,		1},
+	{MSG_QUIT,	Usr_DelUser,		1},
+	{TOK_QUIT,	Usr_DelUser,		1},
+	{MSG_MODE,	Usr_Mode,		1},
+	{TOK_MODE,	Usr_Mode,		1},
+	{MSG_SVSMODE,	Usr_Smode,		1},
+	{TOK_SVSMODE,	Usr_Smode,		1},
+	{MSG_SVS2MODE,	Usr_Smode,		1},
+	{TOK_SVS2MODE,	Usr_Smode,		1},
+	{MSG_KILL,	Usr_Kill,		1},
+	{TOK_KILL,	Usr_Kill,		1},
+	{MSG_PONG,	Usr_Pong,		1},
+	{TOK_PONG,	Usr_Pong,		1},
+	{MSG_AWAY,	Usr_Away,		1},
+	{TOK_AWAY,	Usr_Away,		1},
+	{MSG_NICK,	Usr_Nick,		1},
+	{TOK_NICK,	Usr_Nick,		1},
+	{MSG_TOPIC,	Usr_Topic,		1},
+	{TOK_TOPIC,	Usr_Topic,		1},
+	{MSG_TOPIC, 	Usr_Topic, 		0},
+	{TOK_TOPIC, 	Usr_Topic, 		0},
+	{MSG_KICK,	Usr_Kick,		1},
+	{TOK_KICK,	Usr_Kick,		1},
+	{MSG_JOIN,	Usr_Join,		1},
+	{TOK_JOIN,	Usr_Join,		1},
+	{MSG_PART,	Usr_Part,		1},
+	{TOK_PART,	Usr_Part,		1},
+	{MSG_PING,	Srv_Ping,		0},
+	{TOK_PING,	Srv_Ping,		0},
+	{MSG_NETINFO,	Srv_Netinfo,		0},
+	{TOK_NETINFO,	Srv_Netinfo,		0},
+	{MSG_PASS,	Srv_Pass,		0},
+	{TOK_PASS,	Srv_Pass,		0},
+	{MSG_SERVER,	Srv_Server,		0},
+	{TOK_SERVER,	Srv_Server,		0},
+	{MSG_SQUIT,	Srv_Squit,		0},
+	{TOK_SQUIT,	Srv_Squit,		0},
+	{MSG_NICK,	Srv_Nick,		0},
+	{TOK_NICK,	Srv_Nick,		0},
+	{MSG_SVSNICK,	Srv_Svsnick,		0},
+	{TOK_SVSNICK,	Srv_Svsnick,		0},
+	{MSG_KILL,	Srv_Kill,		0},
+	{TOK_KILL,	Srv_Kill,		0},
+	{MSG_PROTOCTL, 	Srv_Connect, 		0},
+	{TOK_PROTOCTL,	Srv_Connect,		0},
+	{NULL,		NULL,			0}
 };
 #endif
 #ifdef ULTIMATE
 IntCommands cmd_list[] = {
 	/* Command	Function		srvmsg*/
-	{MSG_STATS,	Usr_Stats, 		1, 	0},
-	{TOK_STATS,	Usr_Stats,		1, 	0},
-	{MSG_SETHOST, 	Usr_Vhost,		1, 	0},
-	{TOK_SETHOST, 	Usr_Vhost, 		1, 	0},
-	{MSG_VERSION,	Usr_Version,		1, 	0},
-	{TOK_VERSION,	Usr_Version,		1, 	0},
-	{MSG_MOTD,	Usr_ShowMOTD,		1, 	0},
-	{TOK_MOTD,	Usr_ShowMOTD,		1, 	0},
-	{MSG_CREDITS,	Usr_Showcredits,	1, 	0},
-	{TOK_CREDITS,	Usr_Showcredits,	1, 	0},
-	{MSG_SERVER,	Usr_AddServer,		1, 	0},
-	{TOK_SERVER,	Usr_AddServer,		1, 	0},
-	{MSG_SQUIT,	Usr_DelServer,		1, 	0},
-	{TOK_SQUIT,	Usr_DelServer,		1, 	0},
-	{MSG_QUIT,	Usr_DelUser,		1, 	0},
-	{TOK_QUIT,	Usr_DelUser,		1, 	0},
-	{MSG_MODE,	Usr_Mode,		1, 	0},
-	{TOK_MODE,	Usr_Mode,		1, 	0},
-	{MSG_SVSMODE,	Usr_Smode,		1, 	0},
-	{TOK_SVSMODE,	Usr_Smode,		1, 	0},
-	{MSG_KILL,	Usr_Kill,		1, 	0},
-	{TOK_KILL,	Usr_Kill,		1, 	0},
-	{MSG_PONG,	Usr_Pong,		1, 	0},
-	{TOK_PONG,	Usr_Pong,		1, 	0},
-	{MSG_AWAY,	Usr_Away,		1, 	0},
-	{TOK_AWAY,	Usr_Away,		1, 	0},
-	{MSG_NICK,	Usr_Nick,		1, 	0},
-	{TOK_NICK,	Usr_Nick,		1, 	0},
-	{MSG_TOPIC,	Usr_Topic,		1, 	0},
-	{TOK_TOPIC,	Usr_Topic,		1, 	0},
-	{MSG_KICK,	Usr_Kick,		1, 	0},
-	{TOK_KICK,	Usr_Kick,		1, 	0},
-	{MSG_JOIN,	Usr_Join,		1, 	0},
-	{TOK_JOIN,	Usr_Join,		1, 	0},
-	{MSG_PART,	Usr_Part,		1, 	0},
-	{TOK_PART,	Usr_Part,		1, 	0},
-	{MSG_PING,	Srv_Ping,		0, 	0},
-	{TOK_PING,	Srv_Ping,		0, 	0},
+	{MSG_STATS,	Usr_Stats, 		1},
+	{TOK_STATS,	Usr_Stats,		1},
+	{MSG_SETHOST, 	Usr_Vhost,		1},
+	{TOK_SETHOST, 	Usr_Vhost, 		1},
+	{MSG_VERSION,	Usr_Version,		1},
+	{TOK_VERSION,	Usr_Version,		1},
+	{MSG_MOTD,	Usr_ShowMOTD,		1},
+	{TOK_MOTD,	Usr_ShowMOTD,		1},
+	{MSG_CREDITS,	Usr_Showcredits,	1},
+	{TOK_CREDITS,	Usr_Showcredits,	1},
+	{MSG_SERVER,	Usr_AddServer,		1},
+	{TOK_SERVER,	Usr_AddServer,		1},
+	{MSG_SQUIT,	Usr_DelServer,		1},
+	{TOK_SQUIT,	Usr_DelServer,		1},
+	{MSG_QUIT,	Usr_DelUser,		1},
+	{TOK_QUIT,	Usr_DelUser,		1},
+	{MSG_MODE,	Usr_Mode,		1},
+	{TOK_MODE,	Usr_Mode,		1},
+	{MSG_SVSMODE,	Usr_Smode,		1},
+	{TOK_SVSMODE,	Usr_Smode,		1},
+	{MSG_KILL,	Usr_Kill,		1},
+	{TOK_KILL,	Usr_Kill,		1},
+	{MSG_PONG,	Usr_Pong,		1},
+	{TOK_PONG,	Usr_Pong,		1},
+	{MSG_AWAY,	Usr_Away,		1},
+	{TOK_AWAY,	Usr_Away,		1},
+	{MSG_NICK,	Usr_Nick,		1},
+	{TOK_NICK,	Usr_Nick,		1},
+	{MSG_TOPIC,	Usr_Topic,		1},
+	{TOK_TOPIC,	Usr_Topic,		1},
+	{MSG_KICK,	Usr_Kick,		1},
+	{TOK_KICK,	Usr_Kick,		1},
+	{MSG_JOIN,	Usr_Join,		1},
+	{TOK_JOIN,	Usr_Join,		1},
+	{MSG_PART,	Usr_Part,		1},
+	{TOK_PART,	Usr_Part,		1},
+	{MSG_PING,	Srv_Ping,		0},
+	{TOK_PING,	Srv_Ping,		0},
 #ifndef ULTIMATE3
-	{MSG_SNETINFO,	Srv_Netinfo,		0, 	0},
-	{TOK_SNETINFO,	Srv_Netinfo,		0, 	0},
+	{MSG_SNETINFO,	Srv_Netinfo,		0},
+	{TOK_SNETINFO,	Srv_Netinfo,		0},
 #endif
 #ifdef ULTIMATE3
-	{MSG_SVINFO,	Srv_Svinfo,		0, 	0},
-	{MSG_CAPAB,	Srv_Connect, 		0, 	0},
-	{MSG_BURST,	Srv_Burst, 		0, 	0},
-	{MSG_SJOIN,	Srv_Sjoin,		1, 	0},
+	{MSG_SVINFO,	Srv_Svinfo,		0},
+	{MSG_CAPAB,	Srv_Connect, 		0},
+	{MSG_BURST,	Srv_Burst, 		0},
+	{MSG_SJOIN,	Srv_Sjoin,		1},
 #endif
-	{MSG_VCTRL,	Srv_Vctrl, 		0, 	0},
-	{TOK_VCTRL,	Srv_Vctrl, 		0, 	0},
-	{MSG_PASS,	Srv_Pass,		0, 	0},
-	{TOK_PASS,	Srv_Pass,		0, 	0},
-	{MSG_SERVER,	Srv_Server,		0, 	0},
-	{TOK_SERVER,	Srv_Server,		0, 	0},
-	{MSG_SQUIT,	Srv_Squit,		0, 	0},
-	{TOK_SQUIT,	Srv_Squit,		0, 	0},
-	{MSG_NICK,	Srv_Nick,		0, 	0},
-	{TOK_NICK,	Srv_Nick,		0, 	0},
-	{MSG_SVSNICK,	Srv_Svsnick,		0, 	0},
-	{TOK_SVSNICK,	Srv_Svsnick,		0, 	0},
-	{MSG_KILL,	Srv_Kill,		0, 	0},
-	{TOK_KILL,	Srv_Kill,		0, 	0},
-	{MSG_PROTOCTL, 	Srv_Connect, 		0, 	0},
-	{TOK_PROTOCTL,	Srv_Connect,		0, 	0},
-	{NULL,		NULL,			0, 	0}
+	{MSG_VCTRL,	Srv_Vctrl, 		0},
+	{TOK_VCTRL,	Srv_Vctrl, 		0},
+	{MSG_PASS,	Srv_Pass,		0},
+	{TOK_PASS,	Srv_Pass,		0},
+	{MSG_SERVER,	Srv_Server,		0},
+	{TOK_SERVER,	Srv_Server,		0},
+	{MSG_SQUIT,	Srv_Squit,		0},
+	{TOK_SQUIT,	Srv_Squit,		0},
+	{MSG_NICK,	Srv_Nick,		0},
+	{TOK_NICK,	Srv_Nick,		0},
+	{MSG_SVSNICK,	Srv_Svsnick,		0},
+	{TOK_SVSNICK,	Srv_Svsnick,		0},
+	{MSG_KILL,	Srv_Kill,		0},
+	{TOK_KILL,	Srv_Kill,		0},
+	{MSG_PROTOCTL, 	Srv_Connect, 		0},
+	{TOK_PROTOCTL,	Srv_Connect,		0},
+	{NULL,		NULL,			0}
 };
 #endif
 
@@ -227,7 +224,6 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 {
 	User *u;
 	char cmd[63];
-	EvntMsg *EM;
 	strcpy(segv_location, "init_bot");
 	u = finduser(nick);
 	if (u) {
@@ -248,20 +244,14 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 #endif
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
-	schmode_cmd(nick, me.chan, "+oa", cmd);
-	EM = malloc(sizeof(EvntMsg));
-	EM->fndata[0] = finduser(nick);
-	EM->fc = 1;
-	EM->canfree[0] = 0;
-	Module_Event("SIGNON", EM);
-	free(EM);
+	schmode_cmd(me.name, me.chan, "+oa", cmd);
+	Module_Event("SIGNON", finduser(nick));
 	return 1;
 }
 
 int del_bot(char *nick, char *reason)
 {
 	User *u;
-	EvntMsg *EM;
 	strcpy(segv_location, "del_bot");
 	u = finduser(nick);
 #ifdef DEBUG
@@ -271,12 +261,7 @@ int del_bot(char *nick, char *reason)
 		log("Attempting to Logoff with a Nickname that does not Exists: %s",nick);
 		return -1;
 	}
-	EM = malloc(sizeof(EvntMsg));
-	EM->fndata[0] = finduser(nick);
-	EM->fc = 1;
-	EM->canfree[0] = 0;
-	Module_Event("SIGNOFF", EM);
-	free(EM);
+	Module_Event("SIGNOFF", finduser(nick));
 	squit_cmd(nick, reason);
 	del_mod_user(nick);
 	return 1;
@@ -285,7 +270,7 @@ int del_bot(char *nick, char *reason)
 		
 
 
-void Module_Event(char *event, EvntMsg *EM) {
+void Module_Event(char *event, void *data) {
 	Module *module_ptr;
 	EventFnList *ev_list;
 	hscan_t ms;
@@ -306,7 +291,7 @@ void Module_Event(char *event, EvntMsg *EM) {
 						strcpy(segv_location, module_ptr->info->module_name);
 						strcpy(segvinmodule, module_ptr->info->module_name);
 						if (setjmp(sigvbuf) == 0) {
-							ev_list->function(EM);			
+							ev_list->function(data);			
 						} else {
 							log("setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
 						}
@@ -334,36 +319,43 @@ void Module_Event(char *event, EvntMsg *EM) {
  *             the buffer by side effect.
  */
 
-EvntMsg *split_buf(char *buf, int colon_special)
+extern int split_buf(char *buf, char ***argv, int colon_special)
 {
+    int argvsize = 8;
+    int argc;
     char *s;
     int flag = 0;
-    EvntMsg *EM;
 
-    EM = malloc(sizeof(EvntMsg));
-    EM->ac = 0;
-    EM->fc = 0;
-    EM->cmdptr = 1;
-    if (*buf == ':') {
-    	/* its a origin */
-	buf++;
-	EM->origin = strtok(buf, " ");
-	EM->cmd = strtok(NULL, " ");
-    } else {
-    	EM->origin = NULL;
-	EM->cmd = strtok(buf, " ");
-	EM->cmdptr = 0;
-    }	      
-    while ((s = strtok(NULL, " ")) != NULL) {
-	if (*s == ':') {
-		s++;
-		flag = 1;
+    *argv = calloc(sizeof(char *) * argvsize, 1);
+    argc = 0;
+    if (*buf == ':') buf++;
+    while (*buf) {
+	if (argc == argvsize) {
+	    argvsize += 8;
+	    *argv = realloc(*argv, sizeof(char *) * argvsize);
 	}
-	AddStringToList(&EM->av, s, &EM->ac);
-	if (flag) strncat(EM->data, s, sizeof(EM->data));
-	if (flag) strncat(EM->data, " ", sizeof(EM->data));
+	if ((colon_special ==1) && (*buf==':')) {
+		(*argv)[argc++] = buf+1;
+		buf = "";
+		flag = 1;
+	} else if (*buf == ':') {
+		buf++;
+	}
+	s = strpbrk(buf, " ");
+	if (s) {
+		*s++ = 0; 
+	    	while (isspace(*s))
+		    s++;
+	} else {
+		s = buf + strlen(buf);
+	}
+	if (*buf == 0) {
+		buf++;
+	}
+	(*argv)[argc++] = buf;
+	buf = s;
     }
-    return EM;
+    return argc - flag;
 }
 
 extern char *joinbuf(char **av, int ac, int from) {
@@ -381,14 +373,16 @@ extern char *joinbuf(char **av, int ac, int from) {
 
 void parse(char *line)
 {
+	char origin[64], cmd[64], *coreLine;
+	int cmdptr = 0;
 	int I = 0;
-	char *tonick;
+	int ac;
+	char **av;
 	Module *module_ptr;
 	Functions *fn_list;
 	Mod_User *list;
 	hscan_t ms;
 	hnode_t *mn;
-	EvntMsg *EM;
 		
 	strcpy(segv_location, "parse");
 	strip(line);
@@ -398,50 +392,54 @@ void parse(char *line)
 #ifdef DEBUG
 	log("R: %s", line);
 #endif
+	
+    	if (*line == ':') {
+		coreLine = strpbrk(line, " ");
+		if (!coreLine)
+	    		return;
+		*coreLine = 0;
+		while (isspace(*++coreLine))
+	    	;
+		strncpy(origin, line+1, sizeof(origin));
+		memmove(line, coreLine, strlen(coreLine)+1);
+		cmdptr = 1;
+    	} else {
+    		cmdptr = 0;
+		*origin = 0;
+    	}
+    	if (!*line)
+		return;
+    	coreLine = strpbrk(line, " ");
+    	if (coreLine) {
+		*coreLine = 0;
+		while (isspace(*++coreLine))
+	    	;
+    	} else
+		coreLine = line + strlen(line);
+    	strncpy(cmd, line, sizeof(cmd));
 
-	EM = split_buf(line, 0);	
-	if (EM->cmdptr == 1) {
-		if (findserver(EM->origin)) {
-			EM->s = findserver(EM->origin);
-			EM->u = NULL;
-			EM->isserv = 1;
-		} else if (finduser(EM->origin)) {
-			EM->u = finduser(EM->origin);
-			EM->s = NULL;
-			EM->u->ulevel = _UserLevel(EM->u);
-			EM->isserv = 0;
-		} else if (me.onchan) {
-			log("Got Message from Unknown Origin, Ignoring!!!");
-			log("Message was: %s", recbuf);
-			EM->isserv = -1;
-			EM->u = NULL;
-			goto parend;
-		}
-	}
+	ac = split_buf(coreLine, &av, 0);
+	
+
+
         /* First, check if its a privmsg, and if so, handle it in the correct Function */
- 	if (!strcasecmp("PRIVMSG",EM->cmd) || (!strcasecmp("!",EM->cmd))) {
+ 	if (!strcasecmp("PRIVMSG",cmd) || (!strcasecmp("!",cmd))) {
  		/* its a privmsg, now lets see who too... */       
+
 		/* if its a message from our own internal bots, silently drop it */
-                if (findbot(EM->origin)) {
-			goto parend;
+                if (findbot(origin)) {
+			free(av);
+	                return;
 		}
-
-		tonick = strtok(EM->av[0], "@");
-		/* this handles PRIVMSG neostats@stats.neostat.net messages, and ordinary messages */
-// TODO: still channel support for bots here
-
-		if (*tonick == '#') {
-			log("Channel Message to one of our Bots, on TODO list");
-			goto parend;
-		}
-		if (!strcasecmp(s_Services,tonick)) {
+		if (!strcasecmp(s_Services,av[0])) {
 			/* its to the Internal Services Bot */
 			strcpy(segv_location, "servicesbot");
-			servicesbot(EM);
+			servicesbot(origin,av, ac);
 			strcpy(segv_location, "ServicesBot_return");
-			goto parend;
+			free(av);
+			return;
 		} else {
-			list = findbot(tonick);
+			list = findbot(av[0]);
 			/* Check to see if any of the Modules have this nick Registered */
 			if (list) {
 #ifdef DEBUG
@@ -449,33 +447,34 @@ void parse(char *line)
 #endif
 
 				/* Check to make sure there are no blank spaces so we dont crash */
-			        if (strlen(EM->av[1]) >= 350) {
-			                privmsg(EM->origin, s_Services, "command line too long!");
-			                notice (s_Services,"%s tried to send a very LARGE command, we told them to shove it!", EM->origin);
-					goto parend;
+			        if (strlen(av[1]) >= 350) {
+			                privmsg(origin, s_Services, "command line too long!");
+			                notice (s_Services,"%s tried to send a very LARGE command, we told them to shove it!", origin);
+					free(av);
+			                return;
 			        }
 
                                 strcpy(segv_location, list->modname);
 				strcpy(segvinmodule, list->modname);
 				if (setjmp(sigvbuf) == 0) {
-					list->function(EM);
+					list->function(origin, av, ac);
 				}
 				strcpy(segvinmodule, "");
 				strcpy(segv_location, "Return from Module Message");
-				goto parend;
+				free(av);
+				return;
 			}
-			log("Recieved a Message for %s, but that user is not registered with us!!! buf: %s", EM->av[0], EM->av[1]);
+			log("Recieved a Message for %s, but that user is not registered with us!!! buf: %s", av[0], av[1]);
 		}
         }	
         	
         /* now, Parse the Command to the Internal Functions... */
 	strcpy(segv_location, "Parse - Internal Functions");
 	for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
-		if (!strcmp(cmd_list[I].name, EM->cmd)) {
-			if (cmd_list[I].srvmsg == EM->cmdptr) {
-				cmd_list[I].exec++;
+		if (!strcmp(cmd_list[I].name, cmd)) {
+			if (cmd_list[I].srvmsg == cmdptr) {
 				strcpy(segv_location, cmd_list[I].name);
-				cmd_list[I].function(EM);
+				cmd_list[I].function(origin, av, ac);
 				break; log("should never get here-Parse");
 			}	
 		}
@@ -488,15 +487,15 @@ void parse(char *line)
 		fn_list = module_ptr->function_list;
 		while (fn_list->cmd_name != NULL) {
 			/* This goes through each Command */
-			if (!strcasecmp(fn_list->cmd_name, EM->cmd)) {
-				if (fn_list->srvmsg == EM->cmdptr) {
+			if (!strcasecmp(fn_list->cmd_name, cmd)) {
+				if (fn_list->srvmsg == cmdptr) {
 #ifdef DEBUG
 					log("Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
 #endif
 					strcpy(segv_location, module_ptr->info->module_name);
 					strcpy(segvinmodule, module_ptr->info->module_name);
 					if (setjmp(sigvbuf) == 0) {
-						fn_list->function(EM);			
+						fn_list->function(origin, av, ac);			
 					}
 					strcpy(segvinmodule, "");
 					strcpy(segv_location, "Parse_Return_Module");
@@ -507,23 +506,7 @@ void parse(char *line)
 		fn_list++;
 		}	
 	}
-	parend:
-	FreeList(EM->av, EM->ac);
-/* its upto the calling function of EM->fndata to free it, as we don't know if we are allowed to free some function data */
-	for (I = 0; I< EM->fc; I++) {
-		if (EM->canfree[I] == 1) {
-			free(EM->fndata[I]);
-			EM->canfree[I] = 0;
-		}
-		EM->fndata[I] = NULL;
-	}
-	EM->fc = 0;
-	if (EM->isserv) {
-		EM->s = NULL;
-	} else {
-		EM->u = NULL;
-	}
-	//free(EM);
+        free(av);
 }
 
 
@@ -540,7 +523,6 @@ they should update the internal Structures */
 void init_ServBot()
 {
 	char rname[63];
-	EvntMsg *EM;
 	strcpy(segv_location, "init_ServBot");
 	sprintf(rname, "/msg %s \2HELP\2", s_Services);
 #ifdef ULTIMATE3
@@ -551,28 +533,24 @@ void init_ServBot()
 #endif
 #ifdef UNREAL
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
+	sjoin_cmd(s_Services, me.chan);
+	sprintf(rname, "%s %s", s_Services, s_Services);
+	schmode_cmd(me.name, me.chan, "+oa", rname);
 #elif !ULTIMATE
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif
-	EM = malloc(sizeof(EvntMsg));
-	EM->fndata[0] = finduser(s_Services);
-	EM->fc = 1;
-	EM->canfree[0] = 0;
-	Module_Event("SIGNON", EM);
+//	ssjoin_cmd(s_Services, me.chan, 
 	sjoin_cmd(s_Services, me.chan);
-	EM->fndata[1] = findchan(me.chan);
-	EM->fc = 1;
-	EM->canfree[1] = 0;
-	Module_Event("JOINCHAN", EM);
 	sprintf(rname, "%s %s", s_Services, s_Services);
-	schmode_cmd(s_Services, me.chan, "+oa", rname);
-	Module_Event("CMODE", EM);
+	schmode_cmd(me.name, me.chan, "+oa", rname);
 	me.onchan = 1;
-	free(EM);
+	Module_Event("SIGNON", finduser(s_Services));
+	
 }
 
 #ifdef ULTIMATE3
-void Srv_Sjoin(EvntMsg *EM) {
+void Srv_Sjoin(char *origin, char **argv, int argc) {
+	char nick[MAXNICK];
 	long mode = 0;
 	long mode1 = 0;
 	char *modes;
@@ -581,13 +559,13 @@ void Srv_Sjoin(EvntMsg *EM) {
 	Chans *c;
 	lnode_t *mn = NULL;
 	list_t *tl;
-	if (EM->ac <= 2) {
-		modes = EM->av[1];
+	if (argc <= 2) {
+		modes = argv[1];
 	} else {
-		modes = EM->av[2];
+		modes = argv[2];
 	}
 	if (*modes == '#') {
-		join_chan(EM->u, modes);
+		join_chan(finduser(origin), modes);
 		return;
 	}		
 	if (*modes != '+') {
@@ -598,9 +576,9 @@ void Srv_Sjoin(EvntMsg *EM) {
 		for (i=0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -1);i++) {
 			if (*modes == cFlagTab[i].flag) {
 				if (cFlagTab[i].parameters) {
-					m = malloc(sizeof(ModesParm));
+					m = smalloc(sizeof(ModesParm));
 					m->mode = cFlagTab[i].mode;
-					strcpy(m->param, EM->av[j]);										
+					strcpy(m->param, argv[j]);										
 					mn = lnode_create(m);
 					if (!list_isfull(tl)) {
 						list_append(tl, mn);
@@ -617,8 +595,8 @@ void Srv_Sjoin(EvntMsg *EM) {
 	modes++;
 	}	
 
-	while (EM->ac > j) {
-		modes = EM->av[j];
+	while (argc > j) {
+		modes = argv[j];
 		while (ok == 1) {
 			if (*modes == '@') {
 				mode |= MODE_CHANOP;
@@ -633,23 +611,16 @@ void Srv_Sjoin(EvntMsg *EM) {
 				mode |= MODE_VOICE;
 				modes++;
 			} else {
-				EM->fndata[0] = finduser(modes);
-				EM->fc = 1;
-				EM->canfree[0] = 0;
+				strcpy(nick, modes);
 				ok = 0;
 			}
 		}
-		join_chan(EM->fndata[0], EM->av[1]);
-		EM->fndata[1] = findchan(EM->av[1]);
-		EM->fc = 2;
-		EM->canfree[1] = 1;
-		Module_Event("JOINCHAN", EM);
-		ChangeChanUserMode(EM->fndata[1], EM->fndata[0], 1, mode);
-		Module_Event("CMODE", EM);
+		join_chan(finduser(nick), argv[1]);
+		ChangeChanUserMode(findchan(argv[1]), finduser(nick), 1, mode);
 		j++;
 		ok = 1;
 	}
-	c = EM->fndata[1];
+	c = findchan(argv[1]);
 	c->modes = mode1;
 	if (!list_isempty(tl)) {
 		if (!list_isfull(c->modeparms)) {
@@ -662,8 +633,8 @@ void Srv_Sjoin(EvntMsg *EM) {
 	}
 	list_destroy(tl);
 }
-void Srv_Burst(EvntMsg *EM) {
-	if (EM->ac > 0) {
+void Srv_Burst(char *origin, char **argv, int argc) {
+	if (argc > 0) {
 		if (ircd_srv.burst == 1) {
 			sburst_cmd(0);
 			ircd_srv.burst = 0;
@@ -675,11 +646,11 @@ void Srv_Burst(EvntMsg *EM) {
 	
 }
 #endif
-void Srv_Connect(EvntMsg *EM) {
+void Srv_Connect(char *origin, char **argv, int argc) {
 	int i;
 
-	for (i = 0; i < EM->ac; i++) {
-		if (!strcasecmp("TOKEN", EM->av[i])) {
+	for (i = 0; i < argc; i++) {
+		if (!strcasecmp("TOKEN", argv[i])) {
 			me.token = 1;
 		}
 	}
@@ -689,250 +660,228 @@ void Srv_Connect(EvntMsg *EM) {
 }
 
 
-void Usr_Stats(EvntMsg *EM) {
+void Usr_Stats(char *origin, char **argv, int argc) {
+	User *u;
 	time_t tmp;
 	time_t tmp2;
-	int I;
 #ifdef EXTAUTH
 	int dl;
 	int (*listauth)(User *u);
 #endif
 		
-	if (EM->isserv != 0) {
-		log("Recieved a Message from a Unknown User! (%s)", EM->origin);
+	u=finduser(origin);
+	if (!u) {
+		log("Recieved a Message from a Unknown User! (%s)", origin);
 	}
-	if (!strcasecmp(EM->av[0], "u")) {
+	if (!strcasecmp(argv[0], "u")) {
 		/* server uptime - Shmad */ 
                 int uptime = time (NULL) - me.t_start;
-                snumeric_cmd(242, EM->u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime/86400, (uptime/3600) % 24, (uptime/60) % 60,
+                snumeric_cmd(242, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime/86400, (uptime/3600) % 24, (uptime/60) % 60,
                 uptime % 60);
-	} else if (!strcasecmp(EM->av[0], "c")) {
+	} else if (!strcasecmp(argv[0], "c")) {
 		/* Connections */
-		snumeric_cmd(214, EM->u->nick, "N *@%s * * %d 50", me.uplink, me.port);
-		snumeric_cmd(213, EM->u->nick, "C *@%s * * %d 50", me.uplink, me.port);
-	} else if (!strcasecmp(EM->av[0], "o")) {
+		snumeric_cmd(214, u->nick, "N *@%s * * %d 50", me.uplink, me.port);
+		snumeric_cmd(213, u->nick, "C *@%s * * %d 50", me.uplink, me.port);
+	} else if (!strcasecmp(argv[0], "o")) {
 		/* Operators */
 #ifdef EXTAUTH
 		dl = get_dl_handle("extauth");
 		if (dl > 0) {
 			listauth = dlsym((int *)dl, "__list_auth");
 			if (listauth)  
-				(*listauth)(EM->u);
+				(*listauth)(u);
 		} else
 #endif
-		snumeric_cmd(243, EM->u->nick, "Operators think they are God, but you and I know they are not!");
-	} else if (!strcasecmp(EM->av[0], "l")) {
+		snumeric_cmd(243, u->nick, "Operators think they are God, but you and I know they are not!");
+	} else if (!strcasecmp(argv[0], "l")) {
 		/* Port Lists */
 		tmp = time(NULL) - me.lastmsg; 
 		tmp2 = time(NULL) - me.t_start;
-		snumeric_cmd(211, EM->u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
-		snumeric_cmd(241, EM->u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
-	} else if (!strcasecmp(EM->av[0], "m")) {
-		for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
-			if (cmd_list[I].exec > 0) {
-			snumeric_cmd(212, EM->u->nick, "%s - %d", cmd_list[I].name, cmd_list[I].exec);
-			}
-		}
+		snumeric_cmd(211, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
+		snumeric_cmd(241, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
 	}
-
-	
-	snumeric_cmd(219, EM->u->nick, "%s :End of /STATS report", EM->av[0]);
-	notice(s_Services,"%s Requested Stats %s", EM->u->nick, EM->av[0]);
+	snumeric_cmd(219, u->nick, "%s :End of /STATS report", argv[0]);
+	notice(s_Services,"%s Requested Stats %s", u->nick, argv[0]);
 }
 
-void Usr_Version(EvntMsg *EM) {
-	snumeric_cmd(351, EM->u->nick, "%s :%s -> %s %s", version, me.name, version_date, version_time); 
+void Usr_Version(char *origin, char **argv, int argc) {
+	snumeric_cmd(351, origin, "%s :%s -> %s %s", version, me.name, version_date, version_time); 
 }
-void Usr_ShowMOTD(EvntMsg *EM) {
-	ShowMOTD(EM->u->nick);
+void Usr_ShowMOTD(char *origin, char **argv, int argc) {
+	ShowMOTD(origin);
 }
-void Usr_ShowADMIN(EvntMsg *EM) {
-	ShowADMIN(EM->u->nick);
+void Usr_ShowADMIN(char *origin, char **argv, int argc) {
+	ShowADMIN(origin);
 }
-void Usr_Showcredits(EvntMsg *EM) {
-	Showcredits(EM->u->nick);
+void Usr_Showcredits(char *origin, char **argv, int argc) {
+	Showcredits(origin);
 }
-void Usr_AddServer(EvntMsg *EM){
-	AddServer(EM->av[0],EM->u->nick,atoi(EM->av[1]));
-	Module_Event("NEWSERVER", EM);
+void Usr_AddServer(char *origin, char **argv, int argc){
+	AddServer(argv[0],origin,atoi(argv[1]));
+	Module_Event("NEWSERVER", findserver(argv[0]));
 }
-void Usr_DelServer(EvntMsg *EM){
-	Module_Event("DELSERVER", EM);
-	DelServer(EM->av[0]);
+void Usr_DelServer(char *origin, char **argv, int argc){
+	Module_Event("DELSERVER", findserver(argv[0]));
+	DelServer(argv[0]);
 }
-void Usr_DelUser(EvntMsg *EM) {
-	Module_Event("SIGNOFF", EM);
-	DelUser(EM->u->nick);
+void Usr_DelUser(char *origin, char **argv, int argc) {
+	Module_Event("SIGNOFF", finduser(origin));
+	DelUser(origin);
 }
-void Usr_Smode(EvntMsg *EM) {
-	EM->fndata[0] = finduser(EM->av[0]);
-	EM->fc = 1;
-	EM->canfree[0] = 0;
+void Usr_Smode(char *origin, char **argv, int argc) {
 #ifdef ULTIMATE3
-	UserMode(EM->av[0], EM->av[2]);
-	EM->fndata[1] = EM->av[2];
+	UserMode(argv[0], argv[2]);
 #else
-	UserMode(EM->av[0], EM->av[1]);
-	EM->fndata[1] = EM->av[1];
+	UserMode(argv[0], argv[1]);
 #endif
-	EM->fc = 2;
-	EM->canfree[1] = 0;
-	Module_Event("UMODE", EM);
+	Module_Event("UMODE", finduser(argv[0]));
 }
-void Usr_Mode(EvntMsg *EM) {
-			if (!strchr(EM->av[0], '#')) {
+void Usr_Mode(char *origin, char **argv, int argc) {
+			if (!strchr(argv[0], '#')) {
 #ifdef DEBUG
-				log("Mode: UserMode: %s",EM->av[0]);
+				log("Mode: UserMode: %s",argv[0]);
 #endif
-				UserMode(EM->av[0], EM->av[1]);
-				EM->fndata[0] = EM->av[0];
-				EM->canfree[0] = 0;
-				EM->fndata[1] = EM->av[1];
-				EM->fc = 2;
-				EM->canfree[1] = 0;
-				Module_Event("UMODE", EM);
+				UserMode(argv[0], argv[1]);
+				Module_Event("UMODE", finduser(argv[0]));
 			} else {
-				ChanMode(EM->u->nick, EM->av, EM->ac);
-				Module_Event("CMODE", EM);
+				ChanMode(origin, argv, argc);
 			}	
 }	
-void Usr_Kill(EvntMsg *EM) {
+void Usr_Kill(char *origin, char **argv, int argc) {
 	User *u;
 	Mod_User *mod_ptr;
 	
-	mod_ptr = findbot(EM->av[0]);
+	mod_ptr = findbot(argv[0]);
 	if (mod_ptr) { /* Oh Oh, one of our Bots has been Killed off! */
-		Module_Event("BOTKILL", EM);
-		DelUser(EM->av[0]);
+		Module_Event("BOTKILL", argv[0]);
+		DelUser(argv[0]);
 		return;
 	}
-	u = finduser(EM->av[0]);
+	u = finduser(argv[0]);
 	if (u) {
-		Module_Event("KILL", EM);
-		DelUser(EM->av[0]);
+		Module_Event("KILL", u);
+		DelUser(argv[0]);
 	}
 }
-void Usr_Vhost(EvntMsg *EM) {
+void Usr_Vhost(char *origin, char **argv, int argc) {
 	User *u;
 #ifndef ULTIMATE3
-	u = finduser(EM->u->nick);
+	u = finduser(origin);
 #else 
-	u = finduser(EM->av[0]);
+	u = finduser(argv[0]);
 #endif
 	if (u) {
 #ifndef ULTIMATE3
-		strcpy(u->vhost, EM->av[0]);
+		strcpy(u->vhost, argv[0]);
 #else
-		strcpy(u->vhost, EM->av[1]);
+		strcpy(u->vhost, argv[1]);
 #endif
 	}
 }
-void Usr_Pong(EvntMsg *EM) {
+void Usr_Pong(char *origin, char **argv, int argc) {
 			Server *s;
-			s = findserver(EM->av[0]);
+			s = findserver(argv[0]);
 			if (s) {
 				s->ping = time(NULL) - ping.last_sent;
 				if (ping.ulag > 1)
 					s->ping -= (float) ping.ulag;
 				if (!strcmp(me.s->name, s->name))
 					ping.ulag = me.s->ping;
-				Module_Event("PONG", EM);
+				Module_Event("PONG", s);
 
 			} else {
-				log("Received PONG from unknown server: %s", EM->av[0]);
+				log("Received PONG from unknown server: %s", argv[0]);
 			}
 }
-void Usr_Away(EvntMsg *EM) {
-			if (EM->u) {
-				if (EM->u->is_away) {
-					EM->u->is_away = 0;
+void Usr_Away(char *origin, char **argv, int argc) {
+			User *u = finduser(origin);
+			if (u) {
+				if (u->is_away) {
+					u->is_away = 0;
 				} else {
-					EM->u->is_away = 1;
+					u->is_away = 1;
 				}
-				Module_Event("AWAY", EM);
+				Module_Event("AWAY", u);
 			} else {
-				log("Warning, Unable to find User %s for Away", EM->u->nick);
+				log("Warning, Unable to find User %s for Away", origin);
 			}
 }	
-void Usr_Nick(EvntMsg *EM) {
-			if (EM->u) {
-				Change_User(EM->u, EM->av[0]);
-				Module_Event("NICK_CHANGE", EM);
+void Usr_Nick(char *origin, char **argv, int argc) {
+			User *u = finduser(origin);
+			if (u) {
+				Change_User(u, argv[0]);
+				Module_Event("NICK_CHANGE",argv[0]);
+
 			}
 }
-void Usr_Topic(EvntMsg *EM) {
+void Usr_Topic(char *origin, char **argv, int argc) {
 	char *buf;
 	Chans *c;
-	c = findchan(EM->av[0]);
+	c = findchan(argv[0]);
 	if (c) {
-		buf = joinbuf(EM->av, EM->ac, 3);
-		Change_Topic(EM->av[1], c, atoi(EM->av[2]), buf);
+		buf = joinbuf(argv, argc, 3);
+		Change_Topic(argv[1], c, atoi(argv[2]), buf);
 		free(buf);
-		Module_Event("TOPICCHANGE", EM);
 	} else {
-		log("Ehhh, Can't find Channel %s", EM->av[0]);
+		log("Ehhh, Can't find Channel %s", argv[0]);
 	}
-	
 
 }
 
-void Usr_Kick(EvntMsg *EM) {
-	Module_Event("KICK", EM);
-	part_chan(finduser(EM->av[1]), EM->av[0]);
+void Usr_Kick(char *origin, char **argv, int argc) {
+	Module_Event("KICK", findchan(argv[0]));
+	part_chan(finduser(argv[1]), argv[0]);
 	
 }
-void Usr_Join(EvntMsg *EM) {
+void Usr_Join(char *origin, char **argv, int argc) {
 	char *s, *t;
-	t = EM->av[0];
+	t = argv[0];
 	while (*(s=t)) {
 		t = s + strcspn(s, ",");
                 if (*t)
                 	*t++ = 0;
-		join_chan(EM->u, s);
-		Module_Event("JOINCHAN", EM);
+		join_chan(finduser(origin), s);
 	}
 }
-void Usr_Part(EvntMsg *EM) {
-	part_chan(EM->u, EM->av[0]);
-	Module_Event("PARTCHAN", EM);
-
+void Usr_Part(char *origin, char **argv, int argc) {
+	part_chan(finduser(origin), argv[0]);
 }
-void Srv_Ping(EvntMsg *EM) {
-			spong_cmd(EM->av[0]);
+void Srv_Ping(char *origin, char **argv, int argc) {
+			spong_cmd(argv[0]);
 #ifdef ULTIMATE3
 			if (ircd_srv.burst) {
-				sping_cmd(me.name, EM->av[0], EM->av[0]);
+				sping_cmd(me.name, argv[0], argv[0]);
 			}
 #endif
 }
 #ifdef ULTIMATE
-void Srv_Vctrl(EvntMsg *EM) {
-		ircd_srv.uprot = atoi(EM->av[0]);
-		ircd_srv.nicklg = atoi(EM->av[1]);
-		ircd_srv.modex = atoi(EM->av[2]);
-		ircd_srv.gc = atoi(EM->av[3]);
-		strcpy(me.netname, EM->av[14]);
+void Srv_Vctrl(char *origin, char **argv, int argc) {
+		ircd_srv.uprot = atoi(argv[0]);
+		ircd_srv.nicklg = atoi(argv[1]);
+		ircd_srv.modex = atoi(argv[2]);
+		ircd_srv.gc = atoi(argv[3]);
+		strcpy(me.netname, argv[14]);
 		vctrl_cmd();
 
 }
 #endif
 #ifdef ULTIMATE3
-void Srv_Svinfo(EvntMsg *EM) {
+void Srv_Svinfo(char *origin, char **argv, int argc) {
 	ssvinfo_cmd();
 }
 #endif
 #ifndef ULTIMATE3
-void Srv_Netinfo(EvntMsg *EM) {
+void Srv_Netinfo(char *origin, char **argv, int argc) {
 		        me.onchan = 1;
-			ircd_srv.uprot = atoi(EM->av[2]);
-			strcpy(ircd_srv.cloak, EM->av[3]);
-			strcpy(me.netname, EM->av[7]);
+			ircd_srv.uprot = atoi(argv[2]);
+			strcpy(ircd_srv.cloak, argv[3]);
+			strcpy(me.netname, argv[7]);
 
 			snetinfo_cmd();
 			globops(me.name,"Link with Network \2Complete!\2");
-#ifdef DEBUG
-       			ns_debug_to_coders("");
-#endif
+			#ifdef DEBUG
+        			ns_debug_to_coders("");
+        		#endif
 			if (ircd_srv.uprot == 2109) {
 				me.usesmo = 1;
 			} 
@@ -940,62 +889,55 @@ void Srv_Netinfo(EvntMsg *EM) {
 }
 #endif
 
-void Srv_Pass(EvntMsg *EM) {
+void Srv_Pass(char *origin, char **argv, int argc) {
 }
-void Srv_Server(EvntMsg *EM) {
+void Srv_Server(char *origin, char **argv, int argc) {
 			Server *s;
-			if (!EM->origin) {
-				AddServer(EM->av[0],me.name, atoi(EM->av[1]));
+			if (*origin == 0) {
+				AddServer(argv[0],me.name, atoi(argv[1]));
 			} else {
-				AddServer(EM->av[0],EM->origin, atoi(EM->av[1]));
+				AddServer(argv[0],origin, atoi(argv[1]));
 			}
-			s = findserver(EM->av[0]);
+			s = findserver(argv[0]);
 			me.s = s;
-			Module_Event("ONLINE", EM);
-			Module_Event("NEWSERVER", EM);
+			Module_Event("ONLINE", s);
+			Module_Event("NEWSERVER", s);
 }
-void Srv_Squit(EvntMsg *EM) {
-			if (EM->s) {
-				Module_Event("SQUIT", EM);
-				DelServer(EM->av[0]);
+void Srv_Squit(char *origin, char **argv, int argc) {
+			Server *s;
+			s = findserver(argv[0]);
+			if (s) {
+				Module_Event("SQUIT", s);
+				DelServer(argv[0]);
 			} else {
-				log("Waring, Squit from Unknown Server %s", EM->av[0]);
+				log("Waring, Squit from Unknown Server %s", argv[0]);
 			}
 						
 }
-void Srv_Nick(EvntMsg *EM) {
+void Srv_Nick(char *origin, char **argv, int argc) {
 #ifndef ULTIMATE3
-			AddUser(EM->av[0], EM->av[3], EM->av[4], EM->av[5]);
-			EM->fndata[0] = finduser(EM->av[0]);
-			EM->fc = 1;
-			EM->canfree[0] = 0;
-			Module_Event("SIGNON", EM);
+			AddUser(argv[0], argv[3], argv[4], argv[5]);
+			Module_Event("SIGNON", finduser(argv[0]));
 #else
-			AddUser(EM->av[0], EM->av[4], EM->av[5], EM->av[6]);
+			AddUser(argv[0], argv[4], argv[5], argv[6]);
 #ifdef DEBUG
-			log("Mode: UserMode: %s",EM->av[3]);
+			log("Mode: UserMode: %s",argv[3]);
 #endif
-			UserMode(EM->av[0], EM->av[3]);
-			EM->fndata[0] = finduser(EM->av[0]);
-			EM->fc = 1;
-		 	EM->canfree[0] = 0;
-			EM->fndata[1] = EM->av[3];
-			EM->fc = 2;
-			EM->canfree[1] = 0;
-			Module_Event("SIGNON", EM);
-		 	Module_Event("UMODE", EM);
+			UserMode(argv[0], argv[3]);
+			Module_Event("SIGNON", finduser(argv[0]));
+			Module_Event("UMODE", finduser(argv[0]));
 			
 #endif
 }
-void Srv_Svsnick(EvntMsg *EM) {
+void Srv_Svsnick(char *origin, char **argv, int argc) {
 			User *u;
 
-			u = finduser(EM->av[0]);
-			Change_User(u, EM->av[1]);
-			Module_Event("NICK_CHANGE",EM);
+			u = finduser(argv[0]);
+			Change_User(u, argv[1]);
+			Module_Event("NICK_CHANGE",argv[1]);
 
 }		
-void Srv_Kill(EvntMsg *EM) {
+void Srv_Kill(char *origin, char **argv, int argc) {
 }
 
 
@@ -1087,30 +1029,3 @@ static void Showcredits(char *nick)
 	snumeric_cmd(351, nick, ":- sre and Jacob for development systems and access");
 }
 
-void AddStringToList(char ***List,char S[],int *C)
-{
-  int c;
-  char **l;
-
-  c = *C;
-  l = *List;
-
-  c++;
-  if(c == 1)
-    l = (char **)malloc(sizeof(char *));
-  else
-    l = (char **)realloc(l,c*sizeof(char *));
-  l[c-1] = strdup(S);
-
-  *C = c;
-  *List = l;
-}
-
-void FreeList(char **List,int C)
-{
-  int i;
-  for(i=0;i<C;i++)
-    free(List[i]);
-  if(C != 0)
-    free(List);
-}

@@ -39,7 +39,7 @@ static Mod_Timer *new_timer(char *timer_name)
 #ifdef DEBUG
 	log("New Timer: %s", timer_name);
 #endif
-	t = malloc(sizeof(Mod_Timer));
+	t = smalloc(sizeof(Mod_Timer));
 	if (!timer_name)
 		timer_name="";
 	t->timername = timer_name;	
@@ -126,7 +126,7 @@ static Sock_List *new_sock(char *sock_name)
 #ifdef DEBUG	
 	log("New Socket: %s", sock_name);
 #endif	
-	s = malloc(sizeof(Sock_List));
+	s = smalloc(sizeof(Sock_List));
 	if (!sock_name)
 		sock_name="";
 	s->sockname = sock_name;	
@@ -212,7 +212,7 @@ static Mod_User *new_bot(char *bot_name)
 #ifdef DEBUG	
 	log("New Bot: %s", bot_name);
 #endif
-	u = malloc(sizeof(Mod_User));
+	u = smalloc(sizeof(Mod_User));
 	if (!bot_name)
 		bot_name="";
 	u->nick = sstrdup(bot_name);	
@@ -357,7 +357,6 @@ int load_module(char *path1, User *u) {
 	int do_msg;
 	char *path = NULL;
 	char p[255];
-	EvntMsg *EM;
 #ifndef DEBUG
 	char buf[512];
 	int fmode;
@@ -447,7 +446,7 @@ int load_module(char *path1, User *u) {
 			return -1;
 	}
 	
-	mod_ptr = (Module *)malloc(sizeof(Module));
+	mod_ptr = (Module *)smalloc(sizeof(Module));
 
 	mn = hnode_create(mod_ptr);
 	if (hash_isfull(mh)) {
@@ -471,9 +470,7 @@ int load_module(char *path1, User *u) {
 	if (me.onchan == 1) {
 		while (event_fn_ptr->cmd_name != NULL ) {
 			if (!strcasecmp(event_fn_ptr->cmd_name, "ONLINE")) {
-				EM = malloc(sizeof(EvntMsg));
-				event_fn_ptr->function(EM);
-				free(EM);
+				event_fn_ptr->function(me.s);
 				break;
 			}
 			event_fn_ptr++;

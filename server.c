@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: server.c,v 1.9 2002/06/05 11:26:03 fishwaldo Exp $
+** $Id: server.c,v 1.10 2002/06/21 07:06:13 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -116,11 +116,6 @@ void ServerDump()
 	}
 	sendcoders("End of Listing.");
 }
-void fini_server_hash() {
-	log("Deleting Server Hash");
-	hash_free(sh);
-}
-
 
 void init_server_hash()
 {

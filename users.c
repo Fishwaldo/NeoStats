@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.31 2002/06/10 05:02:42 fishwaldo Exp $
+** $Id: users.c,v 1.32 2002/06/21 07:06:14 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -40,7 +40,7 @@ User *new_user(const char *nick)
 		notice(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
 		log("Eeek, Users table is corrupted!");
 	}
-	u = malloc(sizeof(User));
+	u = smalloc(sizeof(User));
 	if (!nick)
 		nick = "";
 	memcpy(u->nick, nick, MAXNICK);
@@ -176,20 +176,6 @@ User *finduser(const char *nick)
 
 }
 
-void fini_user_hash() 
-{
-	hscan_t us;
-	hnode_t *un;
-	User *u;
-	log("Deleting User hash");
-	hash_scan_begin(&us, uh);
-	while ((un = hash_scan_next(&us)) != NULL) {
-		u = hnode_get(un);
-		list_destroy_nodes(u->chans);
-	}
-	hash_free(uh);
-
-}
 
 void init_user_hash()
 {
@@ -232,7 +218,7 @@ void UserDump(char *nick)
 	}
 }
 
-int _UserLevel(User *u) {
+int UserLevel(User *u) {
 	int i, tmplvl = 0;
 #ifdef EXTAUTH
 	int (*getauth)(User *, int curlvl);

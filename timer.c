@@ -89,15 +89,11 @@ void TimerMidnight()
 
 int is_midnight()
 {
-	time_t current ;
-	struct tm *ltm;
-	
-	current = time(NULL);
-	
-	ltm = localtime(&current);
+	time_t current = time(NULL);
+	struct tm *ltm = localtime(&current);
 
-	if (ltm->tm_hour == 0) {
+	if (ltm->tm_hour == 0)
 		return 1;
-	}
+
 	return 0;	
 }
