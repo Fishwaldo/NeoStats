@@ -41,6 +41,7 @@ adns/types.c -text
 /config.sub -text
 /configure -text
 /configure.in -text
+/cronchk -text
 data/niconfig.db -text
 data/tlds.nfo -text
 /dl.c -text
@@ -123,7 +124,6 @@ doc/read-userman -text
 /hybrid7.h -text
 /install-sh -text
 /ircd.c -text
-/ircdchk -text
 /list.c -text
 /list.h -text
 logs/.keepme -text
