@@ -19,33 +19,7 @@
 **  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 **  USA
 **
-**  Portions borrowed from Unreal. Original Header follows:
 */
-
-
-
-/**********************************************************************t
-*
- *   IRC - Internet Relay Chat, include/msg.h
- *   Copyright (C) 1990 Jarkko Oikarinen and
- *                      University of Oulu, Computing Center
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 1, or (at your option)
- *   any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *   $Id$
- */
 
 #ifndef UNREAL_H
 #define UNREAL_H
@@ -79,7 +53,7 @@
 /* we have svskill support */
 #define GOTSVSKILL
 
-/* IRCD specific buffer sizes */
+/* buffer sizes */
 #define MAXHOST			63
 #define MAXPASS			32
 #define MAXNICK			30
@@ -88,17 +62,7 @@
 #define CHANLEN			32
 #define TOPICLEN		307
 
-/* IRCD Specific mode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_COADMIN 'C'
-#define UMODE_CH_ADMIN 'A'
-#define UMODE_CH_NETADMIN 'N'
-#define UMODE_CH_SADMIN 'a'
-#define UMODE_CH_SERVICES 'S'
-#define UMODE_CH_BOT 'B'
-
-
+/* Messages/Tokens */
 #ifdef UNREAL32
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"	/* 33 */
@@ -642,6 +606,17 @@
 #define TOK_BOTSERV	"BS"
 #endif
 
+/* Umode chars */
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_COADMIN 'C'
+#define UMODE_CH_ADMIN 'A'
+#define UMODE_CH_NETADMIN 'N'
+#define UMODE_CH_SADMIN 'a'
+#define UMODE_CH_SERVICES 'S'
+#define UMODE_CH_BOT 'B'
+
+/* Umodes */
 #ifdef UNREAL32
 #define	UMODE_INVISIBLE		0x0001	
 #define	UMODE_OPER			0x0002	
@@ -705,6 +680,7 @@
 #define UMODE_STRIPBADWORDS 0x80000000	/* */
 #endif /* UNREAL32 */
 
+/* Cmodes */
 #define	CMODE_CHANOP		0x0001
 #define	CMODE_VOICE		0x0002
 #define	CMODE_PRIVATE		0x0004
@@ -738,16 +714,13 @@
 #define CMODE_ONLYSECURE		0x40000000
 #define CMODE_NONICKCHANGE	0x80000000
 
-
+/* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY)))
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_ADMONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_RGSTRONLY)))
+#define is_priv_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_ADMONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_RGSTRONLY)))
+
+/* Umode macros */
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
 #define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
-#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_ADMONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_RGSTRONLY)))
-
-
-struct ircd_srv_ {
-	int uprot;
-	char cloak[10];
-} ircd_srv;
 
 #endif /* UNREAL_H Define */

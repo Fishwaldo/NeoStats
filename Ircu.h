@@ -56,7 +56,7 @@
 /* we don't have svskill support */
 #undef GOTSVSKILL
 
-/* IRCD specific buffer sizes */
+/* buffer sizes */
 #define MAXHOST			128
 #define MAXPASS			32
 #define MAXNICK			32
@@ -65,11 +65,7 @@
 #define CHANLEN			50
 #define TOPICLEN		512
 
-/* IRCD Specific mode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_ADMIN 'a'
-
+/* Messages/Tokens */
 #define MSG_EOB		"EOB"	/* end of burst */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define MSG_WHO		"WHO"	/* WHO  -> WHOC */
@@ -219,9 +215,12 @@
 #define MSG_SJOIN	"SJOIN"
 #define MSG_TBURST	"TBURST"
 
+/* Umode chars */
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_ADMIN 'a'
 
-
-
+/* Umodes */
 #define UMODE_OPER	0x0001	/* oper flag */
 #define UMODE_ADMIN	0x0002	/* admin flag */
 #define UMODE_BOTS	0x0004	/* shows bots */
@@ -242,7 +241,7 @@
 #define UMODE_OPERWALL	0x20000	/* client gets operwalls */
 #define UMODE_SERVICES	0x40000	/* client is services */
 
-
+/* Cmodes */
 #define	CMODE_CHANOP	0x0001
 #define CMODE_HALFOP	0x0002
 #define	CMODE_VOICE	0x0004
@@ -259,19 +258,13 @@
 #define CMODE_HIDEOPS	0x2000
 #define CMODE_INVEX	0x4000
 
+/* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))
-#define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
 #define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
-#define is_bot(x) (0)
+#define is_priv_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
 
-
-struct ircd_srv_ {
-	int uprot;
-	int modex;
-	int nicklg;
-	int gc;
-	char cloak[25];
-	int burst;
-} ircd_srv;
+/* Umode macros */
+#define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
+#define is_bot(x) (0)           
 
 #endif

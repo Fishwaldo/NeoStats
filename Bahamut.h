@@ -54,7 +54,7 @@
 /* we have svskill support */
 #define GOTSVSKILL
 
-/* IRCD specific buffer sizes */
+/* buffer sizes */
 #define MAXHOST			63
 #define MAXPASS			63
 #define MAXNICK			30
@@ -63,11 +63,7 @@
 #define CHANLEN			32
 #define TOPICLEN		307
 
-/* IRCD Specific mode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_ADMIN 'a'
-
+/* Messages/Tokens */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define MSG_WHO		"WHO"	/* WHO  -> WHOC */
 #define MSG_WHOIS	"WHOIS"	/* WHOI */
@@ -208,8 +204,12 @@
 #define MSG_CLIENT	"CLIENT"
 #define MSG_SMODE	"SMODE"
 
+/* Umode chars */
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_ADMIN 'a'
 
-
+/* Umodes */
 #define	UMODE_INVISIBLE  	0x0001	/* makes user invisible */
 #define	UMODE_OPER       	0x0002	/* Operator */
 #define UMODE_REGONLY		0x0010	/* only registered nicks may PM */
@@ -217,9 +217,7 @@
 #define UMODE_SERVADMIN		0x0040	/* server admin */
 #define UMODE_SERVICESADMIN	0x0080	/* Marks the client as a Services Administrator */
 
-
-
-
+/* Cmodes */
 #define CMODE_CHANOP	0x0001
 #define	CMODE_VOICE	0x0004
 #define	CMODE_PRIVATE	0x0008
@@ -237,20 +235,13 @@
 #define CMODE_LINK	0x20000
 #define CMODE_NOCOLOR	0x40000
 
-
+/* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_priv_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+
+/* Umode macros */
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
 #define is_bot(x) (0)
-#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
-
-
-struct ircd_srv_ {
-	int uprot;
-	int modex;
-	int nicklg;
-	int gc;
-	char cloak[25];
-	int burst;
-} ircd_srv;
 
 #endif

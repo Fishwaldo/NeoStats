@@ -73,11 +73,18 @@ static void Srv_Vctrl (char *origin, char **argv, int argc);
 static void Srv_Client (char *origin, char **argv, int argc);
 static void Srv_Smode (char *origin, char **argv, int argc);
 #endif
-
 static int vctrl_cmd ();
 
-static char ircd_buf[BUFSIZE];
+static struct ircd_srv_ {
+	int uprot;
+	int modex;
+	int nicklg;
+	int gc;
+	char cloak[25];
+	int burst;
+} ircd_srv;
 
+static char ircd_buf[BUFSIZE];
 #ifndef ULTIMATE3
 const char ircd_version[] = "(UL)";
 const char services_bot_modes[]= "+oS";

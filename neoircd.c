@@ -59,6 +59,15 @@ static void Srv_Burst (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
 static void Srv_Tburst (char *origin, char **argv, int argc);
 
+static struct ircd_srv_ {
+	int uprot;
+	int modex;
+	int nicklg;
+	int gc;
+	char cloak[25];
+	int burst;
+} ircd_srv;
+
 const char ircd_version[] = "(N)";
 const char services_bot_modes[]= "+oS";
 long services_bot_umode= 0;

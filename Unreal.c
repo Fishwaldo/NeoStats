@@ -64,6 +64,11 @@ static void Srv_Kill (char *origin, char **argv, int argc);
 static void Srv_Protocol (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
 
+static struct ircd_srv_ {
+	int uprot;
+	char cloak[10];
+} ircd_srv;
+
 #ifdef UNREAL32
 const char ircd_version[] = "(U32)";
 #else

@@ -77,7 +77,7 @@
 
 #endif /* ULTIMATE3 */
 
-/* IRCD specific buffer sizes */
+/* buffer sizes */
 #define MAXHOST			128
 #define MAXPASS			32
 #define MAXNICK			32
@@ -86,34 +86,7 @@
 #define CHANLEN			50
 #define TOPICLEN		512
 
-/* IRCD Specific mode chars */
-#ifdef ULTIMATE3
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_GUESTADMIN 'G'
-#define UMODE_CH_COADMIN 'J'
-#define UMODE_CH_ADMIN 'A'
-#define UMODE_CH_CONETADMIN 'n'
-#define UMODE_CH_NETADMIN 'N'
-#define UMODE_CH_COTECHADMIN 't'
-#define UMODE_CH_TECHADMIN 'T'		/* Set to a number as we dont use */
-#define UMODE_CH_SADMIN 'a'
-#define UMODE_CH_SERVICES 'S'
-#else
-/* IRCD Specific mode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_COADMIN 'J'
-#define UMODE_CH_ADMIN 'A'
-#define UMODE_CH_CONETADMIN 't'
-#define UMODE_CH_NETADMIN 'N'
-#define UMODE_CH_TECHADMIN 'T'
-#define UMODE_CH_SADMIN 'P'
-#define UMODE_CH_SERVICES 'S'
-#define UMODE_CH_BOT 'B'
-#endif
-
-
+/* Messages/Tokens */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"	/* 33 */
 #define MSG_WHO		"WHO"	/* WHO  -> WHOC */
@@ -401,8 +374,35 @@
 #define MSG_CLIENT	"CLIENT"
 #define MSG_SMODE	"SMODE"
 
+/* IRCD Specific mode chars */
+#ifdef ULTIMATE3
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_GUESTADMIN 'G'
+#define UMODE_CH_COADMIN 'J'
+#define UMODE_CH_ADMIN 'A'
+#define UMODE_CH_CONETADMIN 'n'
+#define UMODE_CH_NETADMIN 'N'
+#define UMODE_CH_COTECHADMIN 't'
+#define UMODE_CH_TECHADMIN 'T'		/* Set to a number as we dont use */
+#define UMODE_CH_SADMIN 'a'
+#define UMODE_CH_SERVICES 'S'
+#else
 
+/* Umode chars */
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_COADMIN 'J'
+#define UMODE_CH_ADMIN 'A'
+#define UMODE_CH_CONETADMIN 't'
+#define UMODE_CH_NETADMIN 'N'
+#define UMODE_CH_TECHADMIN 'T'
+#define UMODE_CH_SADMIN 'P'
+#define UMODE_CH_SERVICES 'S'
+#define UMODE_CH_BOT 'B'
+#endif
 
+/* Umodes */
 #define	UMODE_INVISIBLE  	0x0001	/* makes user invisible */
 #define	UMODE_OPER       	0x0002	/* Operator */
 #define	UMODE_WALLOP     	0x0004	/* send wallops to them */
@@ -449,8 +449,7 @@
 #define UMODE_IRCADMIN 		0x1000000	/* Marks the client as an IRC Administrator */
 #define UMODE_SERVICESADMIN	0x2000000	/* Marks the client as a Services Administrator */
 
-
-
+/* Smodes */
 #define SMODE_SSL		0x1	/* ssl client */
 #define SMODE_COADMIN		0x2	/* co admin on a server */
 #define SMODE_SERVADMIN		0x4	/* server admin */
@@ -460,7 +459,7 @@
 #define SMODE_NETADMIN		0x40	/* Network Admin */
 #define SMODE_GUEST		0x80	/* Guest Admin */
 
-
+/* Cmodes */
 #define CMODE_CHANOP	0x0001
 #define CMODE_HALFOP	0x0002
 #define	CMODE_VOICE	0x0004
@@ -486,23 +485,17 @@
 #define CMODE_FLOODLIMIT 0x400000
 #define CMODE_CHANADMIN  0x800000
 
-
+/* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY)))
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_ADMONLY) || CheckChanMode(x, CMODE_OPERONLY) ))
+#define is_priv_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_ADMONLY) || CheckChanMode(x, CMODE_OPERONLY) ))
+
+/* Umode macros */
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
 #ifdef ULTIMATE3
 #define is_bot(x) (0)
 #else /* !ULTIMATE3 */
 #define is_bot(x) ((x) && ((x->Umode & UMODE_RBOT) || (x->Umode & UMODE_SBOT)))
 #endif /* ULTIMATE3 */
-#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_ADMONLY) || CheckChanMode(x, CMODE_OPERONLY) ))
-
-struct ircd_srv_ {
-	int uprot;
-	int modex;
-	int nicklg;
-	int gc;
-	char cloak[25];
-	int burst;
-} ircd_srv;
 
 #endif

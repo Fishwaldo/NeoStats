@@ -62,8 +62,16 @@ static void Srv_Svsnick (char *origin, char **argv, int argc);
 static void Srv_Kill (char *origin, char **argv, int argc);
 static void Srv_Protocol (char *origin, char **argv, int argc);
 static void Srv_Vctrl (char *origin, char **argv, int argc);
-
 static int vctrl_cmd ();
+
+static struct ircd_srv_ {
+	int uprot;
+	int modex;
+	int nicklg;
+	int gc;
+	char cloak[25];
+	int burst;
+} ircd_srv;
 
 const char ircd_version[] = "(M)";
 const char services_bot_modes[]= "+oS";

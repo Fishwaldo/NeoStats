@@ -54,7 +54,7 @@
 /* we have svskill support */
 #define GOTSVSKILL
 
-/* IRCD specific buffer sizes */
+/* buffer sizes */
 #define MAXHOST			128
 #define MAXPASS			32
 #define MAXNICK			32
@@ -63,16 +63,7 @@
 #define CHANLEN			50
 #define TOPICLEN		512
 
-/* IRCD Specific mode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_ADMIN 'A'
-#define UMODE_CH_NETADMIN 'N'
-#define UMODE_CH_TECHADMIN 'T'
-#define UMODE_CH_SADMIN 'a'
-#define UMODE_CH_SERVICES 'S'
-#define UMODE_CH_BOT 'B'
-
+/* Messages/Tokens */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define MSG_WHO		"WHO"	/* WHO  -> WHOC */
 #define MSG_WHOIS	"WHOIS"	/* WHOI */
@@ -213,8 +204,17 @@
 #define MSG_CLIENT	"CLIENT"
 #define MSG_SMODE	"SMODE"
 
+/* Umode chars */
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_ADMIN 'A'
+#define UMODE_CH_NETADMIN 'N'
+#define UMODE_CH_TECHADMIN 'T'
+#define UMODE_CH_SADMIN 'a'
+#define UMODE_CH_SERVICES 'S'
+#define UMODE_CH_BOT 'B'
 
-
+/* Umodes */
 #define	UMODE_INVISIBLE  	0x0001	/* makes user invisible */
 #define	UMODE_OPER       	0x0002	/* Operator */
 #define UMODE_LOCOP             0x0004  /* Local Operator */
@@ -236,8 +236,10 @@
 #define UMODE_WHOIS             0x40000  /* */
 #define UMODE_HIDE              0x80000  /* */
 
+/* Smodes */
 #define SMODE_SSL              0x1  /* */
 
+/* Cmodes */
 #define CMODE_CHANOP	0x0001
 #define CMODE_CHANOWNER  0x0002
 #define	CMODE_VOICE	0x0004
@@ -262,20 +264,13 @@
 #define CMODE_UOP        0x200000
 #define CMODE_HALFOP     0x400000
 
-
+/* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))
-#define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-#define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
 #define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_priv_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
 
-
-struct ircd_srv_ {
-	int uprot;
-	int modex;
-	int nicklg;
-	int gc;
-	char cloak[25];
-	int burst;
-} ircd_srv;
+/* Umode macros */
+#define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
+#define is_bot(x) ((x) && (x->Umode & UMODE_BOT))    
 
 #endif

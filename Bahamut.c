@@ -63,8 +63,16 @@ static void Srv_Svinfo (char *origin, char **argv, int argc);
 static void Srv_Burst (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
 
-static char ircd_buf[BUFSIZE];
+static struct ircd_srv_ {
+	int uprot;
+	int modex;
+	int nicklg;
+	int gc;
+	char cloak[25];
+	int burst;
+} ircd_srv;
 
+static char ircd_buf[BUFSIZE];
 const char ircd_version[] = "(B)";
 const char services_bot_modes[]= "+oS";
 long services_bot_umode= 0;
