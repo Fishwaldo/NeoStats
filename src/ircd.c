@@ -1032,7 +1032,7 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int
-irc_part (const Bot *botptr, const char *chan)
+irc_part (const Bot *botptr, const char *chan, const char *quitmsg)
 {
 	Channel *c;
 
@@ -1048,8 +1048,8 @@ irc_part (const Bot *botptr, const char *chan)
 	if (botptr->flags & BOT_FLAG_PERSIST) {
 		c->persistentusers --;
 	}
-	irc_send_part (botptr->u->name, chan, NULL);
-	PartChannel (botptr->u, (char *) chan, NULL);
+	irc_send_part (botptr->u->name, chan, quitmsg ? quitmsg : "");
+	PartChannel (botptr->u, (char *) chan, quitmsg);
 	return NS_SUCCESS;
 }
 
@@ -1069,8 +1069,8 @@ irc_nickchange (const Bot *botptr, const char *newnick)
 		nlog (LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", botptr->name, newnick);
 		return NS_FAILURE;
 	}
-	UserNickChange (botptr->name, newnick, NULL);
 	irc_send_nickchange (botptr->name, newnick, me.now);
+	UserNickChange (botptr->name, newnick, NULL);
 	return NS_SUCCESS;
 }
 

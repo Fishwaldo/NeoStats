@@ -404,6 +404,9 @@
 				RelativePath="..\doc\README.dev">
 			</File>
 			<File
+				RelativePath="..\README.win32">
+			</File>
+			<File
 				RelativePath="..\Relnotes">
 			</File>
 			<File

@@ -1108,7 +1108,7 @@ EXPORTFUNC int irc_numeric (const int numeric, const char *target, const char *d
 EXPORTFUNC int irc_nickchange (const Bot *botptr, const char *newnick);
 EXPORTFUNC int irc_quit (const Bot *botptr, const char *quitmsg);
 EXPORTFUNC int irc_join (const Bot *botptr, const char *chan, const char *chanmodes);
-EXPORTFUNC int irc_part (const Bot *botptr, const char *chan);
+EXPORTFUNC int irc_part (const Bot *botptr, const char *chan, const char *quitmsg);
 EXPORTFUNC int irc_kick (const Bot *botptr, const char *chan, const char *target, const char *reason);
 EXPORTFUNC int irc_invite (const Bot *botptr, const Client *target, const char *chan);
 EXPORTFUNC int irc_cloakhost (const Bot *botptr);

@@ -703,7 +703,7 @@ void handle_dead_channel (Channel *c)
 			chan = (char *) lnode_get (cm);
 			if (ircstrcasecmp (cmdparams->channel->name, chan) == 0) {
 				/* Force the bot to leave the channel */
-				irc_part (cmdparams->bot, cmdparams->channel->name);
+				irc_part (cmdparams->bot, cmdparams->channel->name, NULL);
 				/* Tell the module we kicked them out */
 				SendModuleEvent (EVENT_EMPTYCHAN, cmdparams, cmdparams->bot->moduleptr);
 				break;
