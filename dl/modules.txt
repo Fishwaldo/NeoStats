@@ -90,7 +90,15 @@ to check that they are compatible.
 
 We also need to export a list of any responses to IRCd commands sent by 
 users to our modules that we wish to support e.g. /VERSION mymodule. This
-is optional.
+is optional. 
+
+******************************** WARNING ********************************
+This table is optional but depreciated. You should respond to module 
+events to be portable across all ircds and only use this table as a
+last resort if a module event is not available. This table will be 
+removed from operation in a future release. If you need to use this 
+table for anything, tell us so we can add an appropiate event handler.
+******************************** WARNING ********************************
 
 NeoStats, and many IRCD's use tokens now, and the strings differ between
 IRCds so a hard coded string such as "VERSION" might not always work. 

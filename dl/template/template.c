@@ -40,35 +40,24 @@ char s_module_bot_name[MAXNICK];
  * This structure is required for your module to load and run on NeoStats
  */
 ModuleInfo __module_info = {
-	"example",
-	"example Module Description",
-	"version 1.0",
+	"Template",
+	"Template Module Description",
+	"Version 1.0",
 	__DATE__,
 	__TIME__
 };
 
-/** printf version information
- * respond to the /VERSION command on IRC with this text
- * This is recommended for your module to load and run on NeoStats
- */
-int new_m_version(char *origin, char **av, int ac)
-{
-	numeric(351, origin, "Module Template Loaded, Version: %s %s %s",
-		__module_info.module_version, __module_info.module_build_date,
-		__module_info.module_build_time);
-	return 0;
-}
-
 /** Module function list
  * A list of IRCd (server) commands that we will respond to
- * e.g. VERSION
- * This table is optional 
+******************************** WARNING ********************************
+This table is optional but depreciated. You should respond to module 
+events to be portable across all ircds and only use this table as a
+last resort if a module event is not available. This table will be 
+removed from operation in a future release. If you need to use this 
+table for anything, tell us so we can add an appropiate event handler.
+******************************** WARNING ********************************
  */
 Functions __module_functions[] = {
-	{MSG_VERSION, new_m_version, 1},
-#ifdef GOTTOKENSUPPORT
-	{TOK_VERSION, new_m_version, 1},
-#endif
 	{NULL, NULL, 0}
 };
 
@@ -127,7 +116,7 @@ static int Online(char **av, int ac)
 /** Module event list
  * What events we will act on
  * This is required if you want your module to respond to events on IRC
- * see modules.txt for a list of all events available
+ * see events.h for a list of all events available
  */
 EventFnList __module_events[] = {
 	{EVENT_ONLINE, Online},

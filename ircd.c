@@ -539,7 +539,7 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
  * @return none
  */
 void
-m_privmsg (char* origin, char **av, int ac, int cmdptr)
+m_private (char* origin, char **av, int ac, int cmdptr)
 {
 #ifndef IRCU
 	int argc;

@@ -80,7 +80,7 @@ long UmodeStringToMask(const char* UmodeString, long Umode);
 char* SmodeMaskToString(const long Umode);
 long SmodeStringToMask(const char* UmodeString, long Smode);
 int init_services_bot (void);
-void m_privmsg (char* origin, char **av, int ac, int cmdptr);
+void m_private (char* origin, char **av, int ac, int cmdptr);
 void m_notice (char* origin, char **av, int ac, int cmdptr);
 void do_motd (const char* nick, const char *remoteserver);
 void do_admin (const char* nick, const char *remoteserver);

@@ -185,9 +185,37 @@
  */
 #define EVENT_CLIENTVERSION	"CLIENTVERSION"
 
-
 /* CHANMODE params are:
  *	channel name
  *	mode string
  */
 #define EVENT_CHANMODE		"CHANMODE"
+
+/* PRIVATE params are:
+ *	from nick 
+ *	to nick 
+ *	message
+ */
+#define EVENT_PRIVATE		"PRIVATE"
+
+/* NOTICE params are:
+ *	from nick 
+ *	to nick 
+ *	message
+ */
+#define EVENT_NOTICE		"NOTICE"
+
+/* CPRIVATE params are:
+ *	from nick 
+ *	to channel
+ *	message
+ */
+#define EVENT_CPRIVATE		"CPRIVATE"
+
+/* CNOTICE params are:
+ *	from nick 
+ *	to channel
+ *	message
+ */
+#define EVENT_CNOTICE		"CNOTICE"
+
