@@ -1524,7 +1524,6 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 	char* nicklist;
 	int modeexists;
 	long mode = 0;
-	long mode1 = 0;
 	int ok = 1, i, j = 3;
 	ModesParm *m;
 	Chans *c;
