@@ -383,7 +383,9 @@ send_wallops (const char *who, const char *buf)
 void
 send_end_of_burst_ack(void)
 {
-	init_services_bot ();
+	if (!me.synced) {
+		init_services_bot ();
+	}
 	send_end_of_burst ();
 	send_cmd ("%s %s", neonumericbuf, TOK_END_OF_BURST_ACK);
 	me.synced = 1;
