@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c 581 2003-09-20 08:44:59Z Fish $
+** $Id$
 */
 
 #include <fnmatch.h>

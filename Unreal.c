@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Unreal.c 581 2003-09-20 08:44:59Z Fish $
+** $Id$
 */
 
 #include "stats.h"

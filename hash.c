@@ -39,7 +39,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: hash.c 581 2003-09-20 08:44:59Z Fish $
+ * $Id$
  * $Name:  $
  */
 
@@ -54,7 +54,7 @@
 
 
 #ifdef KAZLIB_RCSID
-static const char rcsid[] = "$Id: hash.c 581 2003-09-20 08:44:59Z Fish $";
+static const char rcsid[] = "$Id$";
 #endif
 
 #define INIT_BITS	6

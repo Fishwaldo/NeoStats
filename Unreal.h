@@ -44,7 +44,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h 581 2003-09-20 08:44:59Z Fish $
+ *   $Id$
  */
 
 

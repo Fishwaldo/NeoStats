@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.h 581 2003-09-20 08:44:59Z Fish $
+** $Id$
 */
 
 

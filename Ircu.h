@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ircu.h 581 2003-09-20 08:44:59Z Fish $
+** $Id$
 */
 
 

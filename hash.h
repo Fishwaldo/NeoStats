@@ -37,7 +37,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: hash.h 581 2003-09-20 08:44:59Z Fish $
+ * $Id$
  * $Name:  $
  */
 

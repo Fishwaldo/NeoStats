@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.h 581 2003-09-20 08:44:59Z Fish $
+** $Id$
 */
 #ifndef ULTIMATE_H
 #define ULTIMATE_H

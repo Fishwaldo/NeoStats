@@ -42,7 +42,7 @@
 
 /*
 ** NeoStats CVS Identification
-** $Id: dotconf.c 581 2003-09-20 08:44:59Z Fish $
+** $Id$
 */
 
 #include <time.h>
