@@ -123,8 +123,8 @@ ns_shutdown (User * u, char **av, int ac)
 			u->nick, u->username, u->hostname, tmp);
 		free (tmp);
 	}
-	globops (s_Services, quitmsg);
-	nlog (LOG_NOTICE, LOG_CORE, quitmsg);
+	globops (s_Services, "%s", quitmsg);
+	nlog (LOG_NOTICE, LOG_CORE, "%s", quitmsg);
 	do_exit (NS_EXIT_NORMAL, quitmsg);
    	return 1;
 }
@@ -153,8 +153,8 @@ ns_reload (User * u, char **av, int ac)
 	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested RELOAD for %s.", 
 		u->nick, u->username, u->hostname, tmp);
 	free (tmp);
-	globops (s_Services, quitmsg);
-	nlog (LOG_NOTICE, LOG_CORE, quitmsg);
+	globops (s_Services, "%s", quitmsg);
+	nlog (LOG_NOTICE, LOG_CORE, "%s", quitmsg);
 	do_exit (NS_EXIT_RELOAD, quitmsg);
    	return 1;
 }
@@ -452,7 +452,7 @@ ns_raw (User * u, char **av, int ac)
 	message = joinbuf (av, ac, 2);
 	chanalert (s_Services, "\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)", u->nick, message);
 	nlog (LOG_INFO, LOG_CORE, "RAW COMMAND %sIssued a Raw Command!(%s)", u->nick, message);
-	sts(message);
+	sts ("%s", message);
 	free (message);
    	return 1;
 }
