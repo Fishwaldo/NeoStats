@@ -885,8 +885,7 @@ static void makemap(char *uplink, User * u, int level)
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
 		ss = findstats(s->name);
-
-		if ((level == 0) && (s->uplink[0] != 0)) {
+		if ((level == 0) && (s->uplink[0] == 0)) {
 			/* its the root server */
 			prefmsg(u->nick, s_StatServ,
 				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
