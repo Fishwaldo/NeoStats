@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.2 2000/02/04 04:52:45 fishwaldo Exp $
+** $Id: ircd.c,v 1.3 2000/02/05 02:51:50 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -151,7 +151,7 @@ int del_bot(char *nick, char *reason)
 		
 
 
-void Module_Event(char *event) {
+void Module_Event(char *event, void *data) {
 	Module *module_ptr;
 	EventFnList *ev_list;
 
@@ -167,7 +167,7 @@ void Module_Event(char *event) {
 			/* This goes through each Command */
 			if (!strcasecmp(ev_list->cmd_name, event)) {
 					segv_location = module_ptr->info->module_name;
-					ev_list->function();			
+					ev_list->function(data);			
 					break;
 					log("should never get here-Parse");
 			}
@@ -286,14 +286,17 @@ void Usr_AddServer(char *origin, char *coreLine){
 	char *cmd;
 	cmd = strtok(coreLine, " ");
 	AddServer(cmd,1);
+	Module_Event("NEWSERVER", coreLine);
 }
 void Usr_DelServer(char *origin, char *coreLine){
 	char *cmd;
 	cmd = strtok(coreLine, " ");
 	DelServer(cmd);
+	Module_Event("DELSERVER", coreLine);
 }
 void Usr_DelUser(char *origin, char *coreLine) {
 	DelUser(origin);
+	Module_Event("SIGNOFF", coreLine);
 }
 void Usr_Mode(char *origin, char *coreLine) {
 			char *rest, *cmd;
@@ -302,16 +305,19 @@ void Usr_Mode(char *origin, char *coreLine) {
 				log("Mode: UserMode: %s",cmd);
 				cmd = strtok(NULL, "");
 				UserMode(origin, cmd);
+				Module_Event("UMODE", coreLine);
 			} else {
 				log("Mode: ChanMode: %s",cmd);
 				rest = strtok(NULL, "");
 				ChanMode(cmd, rest);
-			}			
+				Module_Event("CMODE", coreLine);
+			}	
 }	
 void Usr_Kill(char *origin, char *coreLine) {
 	char *cmd;
 	cmd = strtok(coreLine, " ");
 	DelUser(cmd);
+	Module_Event("SIGNOFF", coreLine);
 }
 void Usr_Pong(char *origin, char *coreLine) {
 			Server *s;
@@ -327,6 +333,7 @@ void Usr_Pong(char *origin, char *coreLine) {
 			} else {
 				log("Received PONG from unknown server: %s", cmd);
 			}
+			Module_Event("PONG", coreLine);
 }
 void Usr_Away(char *origin, char *coreLine) {
 			User *u = finduser(origin);
@@ -335,12 +342,14 @@ void Usr_Away(char *origin, char *coreLine) {
 			} else {
 				u->is_away = 1;
 			}
+			Module_Event("AWAY", u);
 }	
 void Usr_Nick(char *origin, char *coreLine) {
 			char *cmd;
 			User *u = finduser(origin);
 			if (u) {
 				cmd = strtok(coreLine, " ");
+				Module_Event("NICK_CHANGE",coreLine);
 				Change_User(u, cmd);
 			}
 }
@@ -393,22 +402,26 @@ void Srv_Netinfo(char *origin, char *coreLine) {
         		#endif
 			if (!strcmp(cmd ,"2109")) {
 				me.usesmo = 1;
-			} 
+			}
+			Module_Event("NETINFO", coreLine); 
 }
 void Srv_Pass(char *origin, char *coreLine) {
 }
 void Srv_Server(char *origin, char *coreLine) {
 			Server *s;
-			Module_Event("ONLINE");
 			AddServer(strtok(coreLine, " "), 1);
 			s = findserver(coreLine);
 			me.s = s;
+			Module_Event("ONLINE", s);
 }
 void Srv_Squit(char *origin, char *coreLine) {
 			Server *s;
 			s = findserver(coreLine);
-			if (s) 
+			if (s) {
+				Module_Event("SQUIT", s);
 				DelServer(coreLine);
+			}
+						
 }
 void Srv_Nick(char *origin, char *coreLine) {
 			char *user, *host, *server, *cmd;
@@ -420,6 +433,7 @@ void Srv_Nick(char *origin, char *coreLine) {
 			host = strtok(NULL, " ");
 			server = strtok(NULL, " ");
 			AddUser(cmd, user, host, server);
+			Module_Event("SIGNON", coreLine);
 }
 void Srv_Svsnick(char *origin, char *coreLine) {
 			char *nnick;
@@ -429,11 +443,14 @@ void Srv_Svsnick(char *origin, char *coreLine) {
 			u = finduser(nnick);
 			nnick = strtok(NULL, " ");
 			Change_User(u, nnick);
+			Module_Event("NICK_CHANGE",coreLine);
+
 }		
 void Srv_Kill(char *origin, char *coreLine) {
 			char *user, *rest;
 			user = strtok(coreLine, " ");
 			rest = strtok(NULL, " ");
+
 }
 
 void privmsg(char *to, const char *from, char *fmt, ...)

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.c,v 1.2 2000/02/04 00:48:16 fishwaldo Exp $
+** $Id: statserv.c,v 1.3 2000/02/05 02:51:50 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -18,7 +18,8 @@ static void ss_tld(User *u, char *tld);
 static void ss_operlist(User *origuser, char *flags, char *server);
 static void ss_botlist(User *origuser);
 static void ss_version(User *u);
-static int Online();
+static int Online(Server *);
+static int pong(char *);
 static void ss_cb_Config(char *, int);
 static int new_m_version(char *av, char *tmp);
 
@@ -39,6 +40,7 @@ Functions StatServ_fn_list[] = {
 
 EventFnList StatServ_Event_List[] = {
 	{"ONLINE", 	Online},
+	{"PONG", 	pong},
 	{ NULL, 	NULL}
 };
 
@@ -79,7 +81,11 @@ void _fini() {
 	
 }
 
-int Online() {
+int pong(char *coreLine) {
+	log("got pong %s", coreLine);
+	return 1;
+}
+int Online(Server *s) {
 
 /* We should go the the existing server/user lists and add them to stats, cause its possible 
    that this has been called after the server already connected */

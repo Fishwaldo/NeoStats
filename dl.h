@@ -42,7 +42,7 @@ struct functions {
 
 struct evtfunctions {
 	char *cmd_name;
-	int (*function)();
+	int (*function)(void *data);
 };
 
 

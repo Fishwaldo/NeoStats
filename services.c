@@ -4,11 +4,13 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: services.c,v 1.3 2000/02/05 00:22:59 fishwaldo Exp $
+** $Id: services.c,v 1.4 2000/02/05 02:51:50 fishwaldo Exp $
 */
  
 #include "stats.h"
 #include "dl.h"
+
+
 
 extern const char version_date[], version_time[];
 extern const char protocol_version[];
@@ -146,8 +148,6 @@ void servicesbot(char *nick, char *line) {
 		}
 		list_module_timer(u);
 	} else if (!strcasecmp(cmd, "UPTIME")) {
-		notice(s_Services,"Broken atm :(");
-		return;
 		ns_uptime(u);
 		notice(s_Services,"%s Wanted to see %s's Uptime ",u->nick,me.name);
 	} else if (!strcasecmp(cmd, "SHUTDOWN")) {
@@ -442,10 +442,21 @@ static void ns_chan_dump(User *u)
 }
 static void ns_uptime(User *u)
 {
+	struct rusage *prog_stats;
 	segv_location = "ns_uptime";
+
+	if (getrusage(RUSAGE_SELF, prog_stats) == 1) {
+		log("GetRusage Failed");
+	}
+
 	log("time %d", me.t_start);
 	privmsg(u->nick, s_Services, "Statistics Information:");
-	privmsg(u->nick, s_Services, "%s", uptime(me.t_start));
+	/* Broken atm */
+	
+	privmsg(u->nick, s_Services, "Kernel User Time: %ld",prog_stats->ru_utime);	
+	privmsg(u->nick, s_Services, "Kernel System Time: %ld", prog_stats->ru_stime);
+	privmsg(u->nick, s_Services, "Signals Recieved: %ld", prog_stats->ru_nsignals);
+/*	privmsg(u->nick, s_Services, "%s", uptime(me.t_start)); */
 	privmsg(u->nick, s_Services, "Reconnect Time: %d", me.r_time);
 	privmsg(u->nick, s_Services, "Statistic Requests: %d", me.requests);
 	privmsg(u->nick, s_Services, "Spam Service: %s",

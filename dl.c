@@ -344,7 +344,7 @@ int load_module(char *path1, User *u) {
 	if (me.onchan == 1) {
 		while (event_fn_ptr->cmd_name != NULL ) {
 			if (!strcasecmp(event_fn_ptr->cmd_name, "ONLINE")) {
-				event_fn_ptr->function();
+				event_fn_ptr->function(me.s);
 				break;
 			}
 			event_fn_ptr++;

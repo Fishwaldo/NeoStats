@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.2 2000/02/04 04:52:45 fishwaldo Exp $
+** $Id: stats.h,v 1.3 2000/02/05 02:51:50 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -25,6 +25,8 @@
 #include <sys/time.h>
 #include <ctype.h>
 #include <sys/stat.h>
+#include <sys/resource.h>
+
 #include "m_stats.h"
 #include "Unreal.h"
 
@@ -215,7 +217,7 @@ extern void globops(char *, char *, ...);
 extern int flood(User *);
 extern int init_bot(char *, char *, char *, char *, char *,char *);
 extern int del_bot(char *, char *);
-extern void Module_Event(char *);
+extern void Module_Event(char *, void *);
 extern int bot_nick_change(char *, char *);
 
 /* timer.c */

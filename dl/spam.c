@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.2 2000/02/05 00:22:59 fishwaldo Exp $
+** $Id: spam.c,v 1.3 2000/02/05 02:51:50 fishwaldo Exp $
 */
 
 
@@ -81,7 +81,9 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 	return 1;
 }
 
-int Online() {
+int Online(Server *data) {
+
+	log("testing %s", data->name);
 	if (init_bot(s_Spam,"please",me.name,"Chat to me", "+xd", my_info[0].module_name) == -1 ) {
 		/* Nick was in use!!!! */
 		s_Spam = strcat(s_Spam, "_");
