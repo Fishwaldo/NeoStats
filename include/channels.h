@@ -33,5 +33,6 @@ void KickChannel (const char *kickby, const char *chan, const char *kicked, cons
 int InitChannels (void);
 void FiniChannels (void);
 void CleanupChannelModdata (int index);
+int comparechanmember (const void *key1, const void *key2);
 
 #endif /* _CHANNELS_H_ */

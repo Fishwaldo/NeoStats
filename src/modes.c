@@ -625,7 +625,7 @@ ChanUserMode (const char *chan, const char *nick, int add, const unsigned int ma
 		nlog (LOG_WARNING, "ChanUserMode: can't find channel %s", chan);
 		return;
 	}
-	cm = lnode_find (c->members, u->name, comparef);
+	cm = lnode_find (c->members, u->name, comparechanmember);
 	if (!cm) {
 		nlog (LOG_WARNING, "ChanUserMode: %s is not a member of channel %s", u->name, c->name);
 		return;
