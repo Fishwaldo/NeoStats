@@ -202,6 +202,7 @@ joinbuf (char **av, int ac, int from)
 void
 parse (char *line)
 {
+	User *u;
 	char origin[64], cmd[64], *coreLine;
 	int cmdptr = 0;
 	int I = 0;
@@ -310,10 +311,17 @@ parse (char *line)
 				SET_SEGV_LOCATION();
 				SET_SEGV_INMODULE(mod_usr->modname);
 				if (setjmp (sigvbuf) == 0) {
-					if(mod_usr->function)
+					if(mod_usr->function) {
 						mod_usr->function (origin, av, ac);
-					else
-						run_bot_cmd(mod_usr, origin, av, ac);
+					}
+					else {
+						u = finduser (origin);
+						if (!u) {
+							nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", origin, mod_usr->nick);
+							return;
+						}
+						run_bot_cmd(mod_usr, u, av, ac);
+					}
 				}
 				CLEAR_SEGV_INMODULE();
 				SET_SEGV_LOCATION();

@@ -121,10 +121,7 @@ new_timer (char *timer_name)
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "New Timer: %s", timer_name);
 	mod_tmr = malloc (sizeof (ModTimer));
-	if (!timer_name)
-		strsetnull (mod_tmr->timername);
-	else
-		strlcpy (mod_tmr->timername, timer_name, MAX_MOD_NAME);
+	strlcpy (mod_tmr->timername, timer_name, MAX_MOD_NAME);
 	tn = hnode_create (mod_tmr);
 	if (hash_isfull (th)) {
 		nlog (LOG_WARNING, LOG_CORE, "new_timer(): Couldn't add new Timer, Hash is Full!");
@@ -323,10 +320,7 @@ new_sock (char *sock_name)
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "New Socket: %mod_sock", sock_name);
 	mod_sock = smalloc (sizeof (ModSock));
-	if (!sock_name)
-		strsetnull (mod_sock->sockname);
-	else
-		strlcpy (mod_sock->sockname, sock_name, MAX_MOD_NAME);
+	strlcpy (mod_sock->sockname, sock_name, MAX_MOD_NAME);
 	sn = hnode_create (mod_sock);
 	if (hash_isfull (sockh)) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Eeek, SocketHash is full, can not add a new socket");
@@ -655,11 +649,7 @@ new_bot (char *bot_name)
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "New Bot: %s", bot_name);
 	mod_usr = malloc (sizeof (ModUser));
-	
-	if (!bot_name)
-		strsetnull (mod_usr->nick);
-	else
-		strlcpy (mod_usr->nick, bot_name, MAXNICK);
+	strlcpy (mod_usr->nick, bot_name, MAXNICK);
 	bn = hnode_create (mod_usr);
 	if (hash_isfull (bh)) {
 		chanalert (s_Services, "Warning ModuleBotlist is full");
@@ -683,18 +673,18 @@ add_mod_user (char *nick, char *mod_name)
 	hnode_t *mn;
 
 	SET_SEGV_LOCATION();
-	mod_usr = new_bot (nick);
-	/* add a brand new user */
-	strlcpy (mod_usr->nick, nick, MAXNICK);
-	strlcpy (mod_usr->modname, mod_name, MAX_MOD_NAME);
-
 	mn = hash_lookup (mh, mod_name);
 	if (mn) {
 		mod_ptr = hnode_get (mn);
-		mod_usr->function = dlsym (mod_ptr->dl_handle, "__BotMessage");
-		mod_usr->chanfunc = dlsym (mod_ptr->dl_handle, "__ChanMessage");
-		mod_usr->botcmds = hash_create(-1, 0, 0);
-		return NS_SUCCESS;
+		if(mod_ptr) {
+			/* add a brand new user */
+			mod_usr = new_bot (nick);
+			strlcpy (mod_usr->modname, mod_name, MAX_MOD_NAME);
+			mod_usr->function = dlsym (mod_ptr->dl_handle, "__BotMessage");
+			mod_usr->chanfunc = dlsym (mod_ptr->dl_handle, "__ChanMessage");
+			mod_usr->botcmds = hash_create(-1, 0, 0);
+			return NS_SUCCESS;
+		}
 	}
 	nlog (LOG_WARNING, LOG_CORE, "add_mod_user(): Couldn't Add ModuleBot to List");
 	return NS_FAILURE;

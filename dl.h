@@ -239,9 +239,9 @@ int get_mod_num (char *mod_name);
 void unload_modules(void);
 int bot_nick_change (char * oldnick, char *newnick);
 void verify_hashes(void);
-int add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* cmd_list);
-int del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* cmd_list);
-void run_bot_cmd (ModUser* bot_ptr, char *nick, char **av, int ac);
+int add_bot_cmd_list(ModUser *bot_ptr, bot_cmd *cmd_list);
+int del_bot_cmd_list(ModUser *bot_ptr, bot_cmd *cmd_list);
+void run_bot_cmd (ModUser *bot_ptr, User *u, char **av, int ac);
 
 /* 
  * Module Interface 

@@ -23,28 +23,9 @@
 ** $Id$
 */
 
-const char *cs_help[] = {
-	"The following commands can be used with ConnectServ",
-	"",
-	"    ABOUT       About ConnectServ",
-	"    VERSION     Display version info",
-	"    SET         Configure ConnectServ",
-	NULL
-};
-
 const char cs_help_about_oneline[] = "About ConnectServ";
 const char cs_help_version_oneline[] = "Display version info";
-const char cs_help_status_oneline[] = "Configure ConnectServ";
-
-
-const char *cs_help_on_help[] = {
-	"",
-	"To use a command, type",
-	"    \2/msg ConnectServ command\2",
-	"For for more information on a command, type", 
-	"    \2/msg ConnectServ HELP command\2.",
-	NULL
-};
+const char cs_help_set_oneline[] = "Configure ConnectServ";
 
 const char *cs_help_about[] = {
 	"\2ConnectServ\2 is designed to track users signing on and",
@@ -61,7 +42,7 @@ const char *cs_help_version[] = {
 	NULL
 };
 
-const char *cs_help_status[] = {
+const char *cs_help_set[] = {
 	"Syntax: \2SET LIST\2",
 	"        \2SET SIGNWATCH <ON|OFF>\2",
 	"        \2SET KILLWATCH <ON|OFF>\2",

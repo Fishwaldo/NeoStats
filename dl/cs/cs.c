@@ -104,7 +104,7 @@ char msg_invisible[]="\2%s\2 Is Using \2Invisible Mode\2 (+%c)";
 char msg_invisibleoff[]="\2%s\2 Is no longer using \2Invisible Mode\2 (-%c)";
 #endif
 
-char s_ConnectServ[MAXNICK];
+static char s_ConnectServ[MAXNICK];
 
 static int cs_new_user(char **av, int ac);
 static int cs_user_modes(char **av, int ac);
@@ -115,6 +115,7 @@ static int cs_del_user(char **av, int ac);
 static int cs_user_kill(char **av, int ac);
 static int cs_user_nick(char **av, int ac);
 static void do_set(User * u, char **av, int ac);
+static void do_about(User * u, char **av, int ac);
 static void LoadConfig(void);
 
 static void cs_version(User * u, char **av, int ac);
@@ -152,7 +153,7 @@ ModuleInfo __module_info = {
 	__TIME__
 };
 
-int new_m_version(char *origin, char **av, int ac)
+static int new_m_version(char *origin, char **av, int ac)
 {
 	snumeric_cmd(RPL_VERSION, origin,
 		     "Module ConnectServ Loaded, Version: %s %s %s",
@@ -171,67 +172,19 @@ Functions __module_functions[] = {
 	{NULL, NULL, 0}
 };
 
-bot_cmd cs_commands[]=
+static bot_cmd cs_commands[]=
 {
-/*	{"HELP",		ns_do_help,		0, 	NS_ULEVEL_ADMIN,	cs_help_on_help, 	1, 	ns_help_help_oneline},*/
-	{"SET",			do_set,			0, 	NS_ULEVEL_ADMIN,	cs_help_status, 	1, 	cs_help_status_oneline },
-	{"ABOUT",		NULL,			0, 	NS_ULEVEL_ADMIN,	cs_help_about, 		1, 	cs_help_about_oneline },
-	{"VERSION",		cs_version,		0, 	NS_ULEVEL_ADMIN,	cs_help_version, 	1, 	cs_help_version_oneline },
+	{"SET",			do_set,			0, 	NS_ULEVEL_ADMIN,	cs_help_set, 	1, 	cs_help_set_oneline },
+	{"ABOUT",		do_about,		0, 	NS_ULEVEL_ADMIN,	cs_help_about, 	1, 	cs_help_about_oneline },
+	{"VERSION",		cs_version,		0, 	NS_ULEVEL_ADMIN,	cs_help_version,1, 	cs_help_version_oneline },
 };
 
-int __BotMessageOff(char *origin, char **av, int ac)
+static void do_about(User * u, char **av, int ac)
 {
-	User *u;
-	u = finduser(origin);
-	if (!u) /* User not found */
-		return 1;
-
-	if (!cs_online)
-		return 1;
-
-	if ((UserLevel(u) < NS_ULEVEL_ADMIN)) {
-		prefmsg(u->nick, s_ConnectServ, "Permission Denied!");
-		return 1;
-	}
-	if (!strcasecmp(av[1], "HELP")) {
-		if (ac <= 2) {
-			privmsg_list(u->nick, s_ConnectServ, cs_help);
-			privmsg_list(u->nick, s_ConnectServ, cs_help_on_help);			
-			return 1;
-		} else if (!strcasecmp(av[2], "SET")) {
-			privmsg_list(u->nick, s_ConnectServ,
-				     cs_help_status);
-			return 1;
-		} else if (!strcasecmp(av[2], "ABOUT")) {
-			privmsg_list(u->nick, s_ConnectServ,
-				     cs_help_about);
-			return 1;
-		} else if (!strcasecmp(av[2], "VERSION")) {
-			privmsg_list(u->nick, s_ConnectServ,
-				     cs_help_version);
-			return 1;
-		} else
-			prefmsg(u->nick, s_ConnectServ,
-				"Unknown Help Topic: \2%s\2", av[2]);
-	} else if (!strcasecmp(av[1], "ABOUT")) {
-		privmsg_list(u->nick, s_ConnectServ,
-				    cs_help_about);
-	} else if (!strcasecmp(av[1], "SET")) {
-		do_set(u, av, ac);
-	} else if (!strcasecmp(av[1], "VERSION")) {
-		chanalert(s_Services,
-			  "%s Wanted to know the current version information for %s",
-			  u->nick, s_ConnectServ);
-		cs_version(u, av, ac);
-	} else {
-		prefmsg(u->nick, s_ConnectServ,
-			"Unknown Command: \2%s\2, perhaps you need some HELP?",
-			av[1]);
-	}
-	return 1;
+	privmsg_list(u->nick, s_ConnectServ, cs_help_about);
 }
 
-void do_set(User * u, char **av, int ac)
+static void do_set(User * u, char **av, int ac)
 {
 	if (ac < 3) {
 		prefmsg(u->nick, s_ConnectServ,
@@ -267,7 +220,7 @@ void do_set(User * u, char **av, int ac)
 	}
 }
 
-int Online(char **av, int ac)
+static int Online(char **av, int ac)
 {
 	ModUser *mybot;
 	if (init_bot
@@ -336,7 +289,7 @@ static void cs_version(User * u, char **av, int ac)
 /* 
  * Echo signon
  */
-int cs_new_user(char **av, int ac)
+static int cs_new_user(char **av, int ac)
 {
 	User *u;
 
@@ -354,7 +307,7 @@ int cs_new_user(char **av, int ac)
 	}
 
 	/* Print Connection Notice */
-	if (u && cs_cfg.sign_watch) {
+	if (cs_cfg.sign_watch) {
 		chanalert(s_ConnectServ, msg_signon,
 			  u->nick, u->username, u->hostname,
 			  u->server->name);
@@ -365,7 +318,7 @@ int cs_new_user(char **av, int ac)
 /* 
  * Echo signoff
  */
-int cs_del_user(char **av, int ac)
+static int cs_del_user(char **av, int ac)
 {
 	char *cmd, *lcl, *QuitMsg, *KillMsg;
 	User *u;
@@ -431,7 +384,7 @@ int cs_del_user(char **av, int ac)
 /* 
  * Echo oper mode changes
  */
-int cs_user_modes(char **av, int ac)
+static int cs_user_modes(char **av, int ac)
 {
 	int add = 1;
 	char *modes;
@@ -633,7 +586,7 @@ int cs_user_modes(char **av, int ac)
 
 #ifdef ULTIMATE3
 /* smode support for Ultimate3 */
-int cs_user_smodes(char **av, int ac)
+static int cs_user_smodes(char **av, int ac)
 {
 	int add = 1;
 	char *modes;
@@ -768,7 +721,7 @@ int cs_user_smodes(char **av, int ac)
 /* 
  * Echo kills
  */
-int cs_user_kill(char **av, int ac)
+static int cs_user_kill(char **av, int ac)
 {
 	char *cmd, *GlobalMsg;
 	User *u;
@@ -813,7 +766,7 @@ int cs_user_kill(char **av, int ac)
 /* 
  * Echo nick changes
  */
-int cs_user_nick(char **av, int ac)
+static int cs_user_nick(char **av, int ac)
 {
 	User *u;
 

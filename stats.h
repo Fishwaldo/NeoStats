@@ -340,6 +340,14 @@ struct ping {
 	int ulag;
 } ping;
 
+/* Comand list handling */
+/** @brief flags for command list
+ *  flags to provide more information on a command to the core
+ */
+#define CMD_FLAG_NORMAL	0x00000001
+#define CMD_FLAG_SET	0x00000002
+#define CMD_FLAG_HELP	0x00000004
+
 /** @brief bot_cmd_handler type
  *  defines handler function definition
  */
@@ -358,7 +366,34 @@ typedef struct bot_cmd {
 	const char* 	onelinehelp;	/* single line help for generic help function */
 }bot_cmd;
 
-#include "dl.h"
+/* SET Comand handling */
+/* (Work in progress) */
+
+typedef enum SET_TYPE {
+	SET_TYPE_BOOLEAN,
+	SET_TYPE_INT,
+	SET_TYPE_INTRANGE,
+	SET_TYPE_STRING,
+	SET_TYPE_STRINGRANGE,
+	SET_TYPE_NICK,
+	SET_TYPE_USER,
+	SET_TYPE_HOST,
+	SET_TYPE_RNAME,
+	SET_TYPE_CUSTOM,
+}SET_TYPE;
+
+/* "TESTSTRING", &teststring, TYPE_STRING, 0,string_buffer_size 
+   "TESTINT",    &testint, TYPE_INT 0, 200 */ 
+typedef struct bot_set_option {
+	const char		*option;	/* option string */
+	void*			varptr;		/* pointer to var */
+	SET_TYPE		type;		/* type of var */
+	unsigned int	min;		/* min value */
+	unsigned int	max;		/* max value */
+	const char		*confitem;	/* config string for kptool */
+	const char		*desc;		/* description of setting for messages */
+	bot_cmd_handler	handler;	/* handler for custom/post-set processing */
+}bot_set_option;
 
 /* sock.c */
 int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);

@@ -56,7 +56,7 @@ static void ns_do_help (User * u, char **av, int ac);
 static void ns_load_module (User * u, char **av, int ac);
 static void ns_unload_module (User * u, char **av, int ac);
 
-bot_cmd ns_commands[]=
+static bot_cmd ns_commands[]=
 {
 	{"HELP",		ns_do_help,		0, 	0,					ns_help_on_help, 	1, 	ns_help_help_oneline},
 	{"LEVEL",		ns_show_level,	0, 	0,					ns_level_help, 		1, 	ns_level_help_oneline},
@@ -82,6 +82,15 @@ bot_cmd ns_commands[]=
 	{"SERVERDUMP",	ns_server_dump,	0, 	NS_ULEVEL_ROOT,  	ns_serverdump_help, 1,	ns_serverdump_help_oneline},
 	{NULL,			NULL,			0, 	0,			NULL, 			0,	NULL}
 };
+
+int 
+init_services() 
+{
+	/* Add command list to services bot */
+	add_services_cmd_list(ns_commands);
+
+	return NS_SUCCESS;
+}
 
 static void
 ns_shutdown (User * u, char **av, int ac)
@@ -124,7 +133,6 @@ ns_reload (User * u, char **av, int ac)
 
 	globops (s_Services, quitmsg);
 	nlog (LOG_NOTICE, LOG_CORE, quitmsg);
-
 	do_exit (NS_EXIT_RELOAD, quitmsg);
 }
 
