@@ -505,8 +505,8 @@ typedef enum SET_TYPE {
 	SET_TYPE_USER,
 	SET_TYPE_HOST,
 	SET_TYPE_RNAME,
-	SET_TYPE_CUSTOM,
 #endif
+	SET_TYPE_CUSTOM,
 }SET_TYPE;
 
 /* "TESTSTRING", &teststring, TYPE_STRING, 0,string_buffer_size 
@@ -521,9 +521,7 @@ typedef struct bot_setting {
 	char			*confitem;	/* config string for kptool */
 	const char		*desc;		/* description of setting for messages e.g. seconds, days*/
 	const char**	helptext;	/* pointer to help text */
-#if 0   /* Work in progress */
 	bot_cmd_handler	handler;	/* handler for custom/post-set processing */
-#endif
 }bot_setting;
 
 /* sock.c */

@@ -600,6 +600,11 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 						prefmsg(u->nick, bot_ptr->nick, "%s: %s",
 							set_ptr->option, (char*)set_ptr->varptr);
 						break;
+					case SET_TYPE_CUSTOM:
+						if(set_ptr->handler) {
+							set_ptr->handler(u, av, ac);
+						}
+						break;
 					default:
 						prefmsg(u->nick, bot_ptr->nick, "%s: uses an unsupported type",
 							set_ptr->option);
@@ -708,6 +713,11 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
 			prefmsg(u->nick, bot_ptr->nick,
 				"%s set to %s", set_ptr->option, av[3]);
+			break;
+		case SET_TYPE_CUSTOM:
+			if(set_ptr->handler) {
+				set_ptr->handler(u, av, ac);
+			}
 			break;
 		default:
 			chanalert(bot_ptr->nick, "Unsupported SET type %d requested by %s for %s %s", 
