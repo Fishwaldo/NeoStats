@@ -37,9 +37,9 @@ static void Usr_Version (char *origin, char **argv, int argc);
 static void Usr_MOTD (char *origin, char **argv, int argc);
 static void Usr_Admin (char *origin, char **argv, int argc);
 static void Usr_Credits (char *origin, char **argv, int argc);
-static void Usr_AddServer (char *origin, char **argv, int argc);
-static void Usr_DelServer (char *origin, char **argv, int argc);
-static void Usr_DelUser (char *origin, char **argv, int argc);
+static void Usr_Server (char *origin, char **argv, int argc);
+static void Usr_Squit (char *origin, char **argv, int argc);
+static void Usr_Quit (char *origin, char **argv, int argc);
 static void Usr_Mode (char *origin, char **argv, int argc);
 static void Usr_Smode (char *origin, char **argv, int argc);
 static void Usr_Kill (char *origin, char **argv, int argc);
@@ -80,11 +80,11 @@ IntCommands cmd_list[] = {
 	,
 	{MSG_CREDITS, Usr_Credits, 1, 0}
 	,
-	{MSG_SERVER, Usr_AddServer, 1, 0}
+	{MSG_SERVER, Usr_Server, 1, 0}
 	,
-	{MSG_SQUIT, Usr_DelServer, 1, 0}
+	{MSG_SQUIT, Usr_Squit, 1, 0}
 	,
-	{MSG_QUIT, Usr_DelUser, 1, 0}
+	{MSG_QUIT, Usr_Quit, 1, 0}
 	,
 	{MSG_MODE, Usr_Mode, 1, 0}
 	,
@@ -494,85 +494,27 @@ sburst_cmd (int b)
 }
 
 void
-chanalert (char *who, char *fmt, ...)
+chan_privmsg (char *who, char *buf)
 {
-	va_list ap;
-
-	if (!me.onchan)
-		return;
-
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	sts (":%s %s %s :%s", who, MSG_PRIVATE, me.chan, ircd_buf);
+	sts (":%s %s %s :%s", who, MSG_PRIVATE, me.chan, buf);
 }
 
 void
-prefmsg (char *to, const char *from, char *fmt, ...)
+send_privmsg (char *to, const char *from, char *buf)
 {
-	va_list ap;
-
-	if (findbot (to)) {
-		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
-		return;
-	}
-
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	if (me.want_privmsg) {
-		sts (":%s %s %s :%s", from, MSG_PRIVATE, to, ircd_buf);
-	} else {
-		sts (":%s %s %s :%s", from, MSG_NOTICE, to, ircd_buf);
-	}
+	sts (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
 }
 
 void
-privmsg (char *to, const char *from, char *fmt, ...)
+send_notice (char *to, const char *from, char *buf)
 {
-	va_list ap;
-
-	if (findbot (to)) {
-		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
-		return;
-	}
-
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	sts (":%s %s %s :%s", from, MSG_PRIVATE, to, ircd_buf);
+	sts (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
 }
 
 void
-notice (char *to, const char *from, char *fmt, ...)
+send_globops (char *from, char *buf)
 {
-	va_list ap;
-
-	if (findbot (to)) {
-		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
-		return;
-	}
-
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	sts (":%s %s %s :%s", from, MSG_NOTICE, to, ircd_buf);
-}
-
-void
-globops (char *from, char *fmt, ...)
-{
-	va_list ap;
-
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-
-	if (me.onchan) {
-		sts (":%s %s :%s", from, MSG_GLOBOPS, ircd_buf);
-	} else {
-		nlog (LOG_NORMAL, LOG_CORE, ircd_buf);
-	}
+	sts (":%s %s :%s", from, MSG_GLOBOPS, buf);
 }
 
 static void
@@ -692,7 +634,7 @@ Usr_Stats (char *origin, char **argv, int argc)
 static void
 Usr_Version (char *origin, char **argv, int argc)
 {
-	snumeric_cmd (RPL_VERSION, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, ircd_version, me.name, version_date, version_time);
+	ns_usr_version (origin, argv, argc);
 }
 
 static void
@@ -714,19 +656,19 @@ Usr_Credits (char *origin, char **argv, int argc)
 }
 
 static void
-Usr_AddServer (char *origin, char **argv, int argc)
+Usr_Server (char *origin, char **argv, int argc)
 {
 	AddServer (argv[0], origin, atoi (argv[1]));
 }
 
 static void
-Usr_DelServer (char *origin, char **argv, int argc)
+Usr_Squit (char *origin, char **argv, int argc)
 {
 	DelServer (argv[0]);
 }
 
 static void
-Usr_DelUser (char *origin, char **argv, int argc)
+Usr_Quit (char *origin, char **argv, int argc)
 {
 	DelUser (origin);
 }
@@ -755,13 +697,7 @@ Usr_Mode (char *origin, char **argv, int argc)
 static void
 Usr_Kill (char *origin, char **argv, int argc)
 {
-	User *u;
-	u = finduser (argv[0]);
-	if (u) {
-		KillUser (argv[0]);
-	} else {
-		nlog (LOG_WARNING, LOG_CORE, "Can't find user %s for Kill", argv[0]);
-	}
+	KillUser (argv[0]);
 }
 static void
 Usr_Pong (char *origin, char **argv, int argc)

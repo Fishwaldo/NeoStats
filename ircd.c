@@ -31,6 +31,7 @@
 #include "log.h"
 #include "services.h"
 
+static char ircd_buf[BUFSIZE];
 static char UmodeStringBuf[64];
 
 /** @brief UmodeMaskToString
@@ -558,6 +559,18 @@ flood (User * u)
 	return 0;
 }
 
+/** @brief Display NeoStats version info
+ *
+ * 
+ *
+ * @return 
+ */
+void
+ns_usr_version (char *origin, char **argv, int argc)
+{
+	snumeric_cmd (RPL_VERSION, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, ircd_version, me.name, version_date, version_time);
+}
+
 /** @brief Display our MOTD Message of the Day from the external neostats.motd file 
  *
  * 
@@ -722,3 +735,86 @@ privmsg_list (char *to, char *from, const char **text)
 		text++;
 	}
 }
+
+void
+chanalert (char *who, char *fmt, ...)
+{
+	va_list ap;
+
+	if (!me.onchan)
+		return;
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	chan_privmsg(who, ircd_buf);
+}
+
+void
+prefmsg (char *to, const char *from, char *fmt, ...)
+{
+	va_list ap;
+
+	if (findbot (to)) {
+		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+		return;
+	}
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	if (me.want_privmsg) {
+		send_privmsg (to, from, ircd_buf);
+	} else {
+		send_notice (to, from, ircd_buf);
+	}
+}
+
+void
+privmsg (char *to, const char *from, char *fmt, ...)
+{
+	va_list ap;
+
+	if (findbot (to)) {
+		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+		return;
+	}
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	send_privmsg (to, from, ircd_buf);
+}
+
+void
+notice (char *to, const char *from, char *fmt, ...)
+{
+	va_list ap;
+
+	if (findbot (to)) {
+		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+		return;
+	}
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	send_notice (to, from, ircd_buf);
+}
+
+void
+globops (char *from, char *fmt, ...)
+{
+	va_list ap;
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+
+	if (me.onchan) {
+		send_globops(from, ircd_buf);
+	} else {
+		nlog (LOG_NORMAL, LOG_CORE, ircd_buf);
+	}
+}
+

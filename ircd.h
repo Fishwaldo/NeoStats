@@ -67,9 +67,15 @@ void ns_usr_admin (char *nick, char **argv, int argc);
 void ns_usr_credits (char *nick, char **argv, int argc);
 void ns_usr_stats (char *origin, char **argv, int argc);
 void ns_usr_pong (char *origin, char **argv, int argc);
+void ns_usr_version (char *origin, char **argv, int argc);
 
 /* Defined in ircd specific files but common to all */
 int SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode);
 void init_ircd (void);
+void chan_privmsg (char *who, char *buf);
+void send_privmsg (char *to, const char *from, char *buf);
+void send_notice (char *to, const char *from, char *buf);
+void send_globops (char *from, char *buf);
+
 
 #endif
