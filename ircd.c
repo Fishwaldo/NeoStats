@@ -990,7 +990,7 @@ chanalert (char *from, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	send_privmsg (me.chan, from, ircd_buf);
+	send_privmsg (from, me.chan, ircd_buf);
 }
 
 void
@@ -1007,9 +1007,9 @@ prefmsg (char *to, const char *from, char *fmt, ...)
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 	if (me.want_privmsg) {
-		send_privmsg (to, from, ircd_buf);
+		send_privmsg (from, to, ircd_buf);
 	} else {
-		send_notice (to, from, ircd_buf);
+		send_notice (from, to, ircd_buf);
 	}
 }
 
@@ -1026,7 +1026,7 @@ privmsg (char *to, const char *from, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	send_privmsg (to, from, ircd_buf);
+	send_privmsg (from, to, ircd_buf);
 }
 
 void
@@ -1042,7 +1042,7 @@ notice (char *to, const char *from, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	send_notice (to, from, ircd_buf);
+	send_notice (from, to, ircd_buf);
 }
 
 void
@@ -1081,7 +1081,7 @@ numeric (const int numeric, const char *target, const char *data, ...)
 	va_start (ap, data);
 	ircvsnprintf (ircd_buf, BUFSIZE, data, ap);
 	va_end (ap);
-	send_numeric (numeric, target, ircd_buf);
+	send_numeric (me.name, numeric, target, ircd_buf);
 	return NS_SUCCESS;
 }
 
@@ -1107,8 +1107,8 @@ spart_cmd (const char *who, const char *chan)
 int
 snick_cmd (const char *oldnick, const char *newnick)
 {
-	UserNick (oldnick, newnick, NULL);
-	send_nickchange (oldnick, newnick);
+	do_nickchange (oldnick, newnick, NULL);
+	send_nickchange (oldnick, newnick, me.now);
 	return NS_SUCCESS;
 }
 
@@ -1130,7 +1130,7 @@ int
 squit_cmd (const char *who, const char *quitmsg)
 {
 	send_quit (who, quitmsg);
-	UserQuit (who, quitmsg);
+	do_quit (who, quitmsg);
 	return NS_SUCCESS;
 }
 
@@ -1143,7 +1143,7 @@ skill_cmd (const char *from, const char *target, const char *reason, ...)
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
 	send_kill (from, target, ircd_buf);
-	UserQuit (target, ircd_buf);
+	do_quit (target, ircd_buf);
 	return NS_SUCCESS;
 }
 
@@ -1159,15 +1159,15 @@ ssvskill_cmd (const char *target, const char *reason, ...)
 	send_svskill (target, ircd_buf);
 #else
 	send_kill (me.name, target, ircd_buf);
-	UserQuit (target, ircd_buf);
+	do_quit (target, ircd_buf);
 #endif
 	return NS_SUCCESS;
 }
 
 int
-skick_cmd (const char *who, const char *target, const char *chan, const char *reason)
+skick_cmd (const char *who, const char *chan, const char *target, const char *reason)
 {
-	send_kick (who, target, chan, reason);
+	send_kick (who, chan, target, reason);
 	part_chan (finduser (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
 	return NS_SUCCESS;
 }
@@ -1261,7 +1261,7 @@ int
 ssvsnick_cmd (const char *target, const char *newnick)
 {
 #ifdef GOTSVSNICK
-	send_svsnick (target, newnick);
+	send_svsnick (target, newnick, me.now);
 #else
 	notice (s_Services, "Warning Module %s tried to SVSNICK, which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSNICK, which is not supported", segvinmodule);
@@ -1651,8 +1651,101 @@ do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, c
 }
 #endif
 
+void
+do_join (const char* nick, const char* chanlist, const char* keys)
+{
+	char *s, *t;
+	t = (char*)chanlist;
+	while (*(s = t)) {
+		t = s + strcspn (s, ",");
+		if (*t)
+			*t++ = 0;
+		join_chan (nick, s);
+	}
+}
+
 void 
 do_part (const char* nick, const char* chan, const char* reason)
 {
 	part_chan (finduser (nick), chan, reason);
+}
+
+void 
+do_nick (const char *nick, const char *hopcount, const char* TS, 
+		 const char *user, const char *host, const char *server, 
+		 const char *ip, const char *servicestamp, const char *modes, 
+		 const char *vhost, const char *realname
+#ifdef GOTUSERSMODES
+		 , const char *smodes
+#endif
+		 )
+{
+	AddUser (nick, user, host, realname, server, ip, TS);
+	if(modes) {
+		UserMode (nick, modes);
+	}
+	if(vhost) {
+		SetUserVhost(nick, vhost);
+	}
+#ifdef GOTUSERSMODES
+	if(smodes) {
+		UserSMode (nick, smodes);
+	}
+#endif		
+}
+
+void
+do_kill (const char *nick, const char *reason)
+{
+	DelUser (nick, 1, reason);
+}
+
+void
+do_quit (const char *nick, const char *quitmsg)
+{
+	DelUser (nick, 0, quitmsg);
+}
+
+void do_squit(const char *name, const char* reason)
+{
+	DelServer (name, reason);
+}
+
+void
+do_kick (const char *kickby, const char *chan, const char *kicked, const char *kickreason)
+{
+	kick_chan (kickby, chan, kicked, kickreason);
+}
+
+#ifdef MSG_SVINFO
+void 
+do_svinfo (void)
+{
+	send_svinfo (TS_CURRENT, TS_MIN, me.now);
+}
+#endif
+
+#ifdef MSG_VCTRL
+void 
+do_vctrl (const char* uprot, const char* nicklen, const char* modex, const char* gc, const char* netname)
+{
+	ircd_srv.uprot = uprot;
+	ircd_srv.nicklen = nicklen;
+	ircd_srv.modex = modex;
+	ircd_srv.gc = gc;
+	strlcpy (me.netname, netname, MAXPASS);
+	send_vctrl ();
+}
+#endif
+
+void 
+do_mode_user (const char* nick, const char* modes)
+{
+	UserMode (nick, modes);
+}
+
+void 
+do_mode_channel (char *origin, char **argv, int argc)
+{
+	ChanMode (origin, argv, argc);
 }

@@ -208,9 +208,9 @@ send_umode (const char *who, const char *target, const char *mode)
 }
 
 void 
-send_numeric (const int numeric, const char *target, const char *buf)
+send_numeric (const char *from, const int numeric, const char *target, const char *buf)
 {
-	sts (":%s %d %s :%s", me.name, numeric, target, buf);
+	sts (":%s %d %s :%s", from, numeric, target, buf);
 }
 
 void
@@ -232,19 +232,19 @@ send_svskill (const char *target, const char *reason)
 }
 
 void 
-send_nickchange (const char *oldnick, const char *newnick)
+send_nickchange (const char *oldnick, const char *newnick, const time_t ts)
 {
-	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int)me.now);
+	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int)ts);
 }
 
 void 
-send_svsnick (const char *target, const char *newnick)
+send_svsnick (const char *target, const char *newnick, const time_t ts)
 {
-	sts ("%s %s %s :%d", MSG_SVSNICK, target, newnick, (int)me.now);
+	sts ("%s %s %s :%d", MSG_SVSNICK, target, newnick, (int)ts);
 }
 
 void 
-send_kick (const char *who, const char *target, const char *chan, const char *reason)
+send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
 	sts (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
 }
@@ -274,9 +274,9 @@ send_rakill (const char *host, const char *ident)
 }
 
 void
-send_svinfo (void)
+send_svinfo (const int tscurrent, const int tsmin, const int tsnow)
 {
-	sts ("%s %d %d 0 :%ld", MSG_SVINFO, TS_CURRENT, TS_MIN, (long)me.now);
+	sts ("%s %d %d 0 :%ld", MSG_SVINFO, tscurrent, tsmin, (long)tsnow);
 }
 
 void
@@ -290,13 +290,13 @@ send_burst (int b)
 }
 
 void
-send_privmsg (const char *to, const char *from, const char *buf)
+send_privmsg (const char *from, const char *to, const char *buf)
 {
 	sts (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
 }
 
 void
-send_notice (const char *to, const char *from, const char *buf)
+send_notice (const char *from, const char *to, const char *buf)
 {
 	sts (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
 }
@@ -374,46 +374,37 @@ m_server (char *origin, char **argv, int argc, int srv)
 static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	SquitServer (argv[0], tmpbuf);
-	free(tmpbuf);
+	do_squit (argv[0], argv[1]);
 }
 
 static void
 m_quit (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 0);
-	UserQuit (origin, tmpbuf);
-	free(tmpbuf);
+	do_quit (origin, argv[0]);
 }
 
 static void
 m_svsmode (char *origin, char **argv, int argc, int srv)
 {
 	if (argv[0][0] == '#') {
-		ChanMode (origin, argv, argc);
+		do_svsmode_channel (origin, argv, argc);
 	} else {
-		UserMode (argv[0], argv[2]);
+		do_svsmode_user (argv[0], argv[2]);
 	}
 }
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
 	if (argv[0][0] == '#') {
-		ChanMode (origin, argv, argc);
+		do_mode_channel (origin, argv, argc);
 	} else {
-		UserMode (argv[0], argv[1]);
+		do_mode_user (argv[0], argv[1]);
 	}
 }
 static void
 m_kill (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	KillUser (argv[0], tmpbuf);
-	free(tmpbuf);
+	do_kill (argv[0], argv[1]);
 }
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
@@ -423,61 +414,61 @@ m_pong (char *origin, char **argv, int argc, int srv)
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
-	char *buf;
-
 	if (argc > 0) {
-		buf = joinbuf (argv, argc, 0);
-		UserAway (origin, buf);
-		free (buf);
+		UserAway (origin, argv[0]);
 	} else {
 		UserAway (origin, NULL);
 	}
 }
+
+/* m_nick 
+ * argv[0] = nickname 
+ * argv[1] = hopcount when new user; TS when nick change 
+ * argv[2] = TS
+ * ---- new user only below ---- 
+ * argv[3] = umode 
+ * argv[4] = username 
+ * argv[5] = hostname 
+ * argv[6] = server 
+ * argv[7] = serviceid
+ * -- If NICKIP
+ * argv[8] = IP
+ * argv[9] = ircname
+ * -- else
+ * argv[8] = ircname
+ * -- endif
+ */
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
-		char *realname;
-
-		realname = joinbuf (argv, argc, 9);
-		AddUser (argv[0], argv[4], argv[5], realname, argv[6], argv[8], argv[2]);
-		free (realname);
+		AddUser (argv[0], argv[4], argv[5], argv[9], argv[6], argv[8], argv[2]);
 		UserMode (argv[0], argv[3]);
 	} else {
-		UserNick (origin, argv[0], NULL);
+		do_nickchange (origin, argv[0], argv[1]);
 	}
 }
 
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	char *buf;
-
-	buf = joinbuf (argv, argc, 3);
-	ChanTopic (argv[1], argv[0], argv[2], buf);
-	free (buf);
+	ChanTopic (argv[0], argv[1], argv[2], argv[3]);
 }
 
 static void
 m_kick (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 2);
-	kick_chan(argv[0], argv[1], origin, tmpbuf);
-	free(tmpbuf);
+	do_kick (origin, argv[0], argv[1], argv[2]);
 }
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
-	UserJoin (origin, argv[0]);
+	do_join (origin, argv[0], NULL);
 }
 static void
 m_part (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	do_part (origin, argv[0], tmpbuf);
-	free(tmpbuf);
+	do_part (origin, argv[0], argv[1]);
 }
 
 static void
@@ -489,9 +480,8 @@ m_ping (char *origin, char **argv, int argc, int srv)
 static void
 m_svinfo (char *origin, char **argv, int argc, int srv)
 {
-	send_svinfo ();
+	do_svinfo ();
 }
-
 
 static void
 m_pass (char *origin, char **argv, int argc, int srv)
@@ -501,6 +491,5 @@ m_pass (char *origin, char **argv, int argc, int srv)
 static void
 m_svsnick (char *origin, char **argv, int argc, int srv)
 {
-	UserNick (argv[0], argv[1], NULL);
+	do_nickchange (argv[0], argv[1], NULL);
 }
-

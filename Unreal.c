@@ -260,9 +260,9 @@ send_umode (const char *who, const char *target, const char *mode)
 }
 
 void 
-send_numeric (const int numeric, const char *target, const char *buf)
+send_numeric (const char *from, const int numeric, const char *target, const char *buf)
 {
-	sts (":%s %d %s :%s", me.name, numeric, target, buf);
+	sts (":%s %d %s :%s", from, numeric, target, buf);
 }
 
 void
@@ -290,9 +290,9 @@ send_smo (const char *from, const char *umodetarget, const char *msg)
 }
 
 void 
-send_nickchange (const char *oldnick, const char *newnick)
+send_nickchange (const char *oldnick, const char *newnick, const time_t ts)
 {
-	sts (":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, (int)me.now);
+	sts (":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, (int)ts);
 }
 
 void
@@ -302,9 +302,9 @@ send_swhois (const char *target, const char *swhois)
 }
 
 void 
-send_svsnick (const char *target, const char *newnick)
+send_svsnick (const char *target, const char *newnick, const time_t ts)
 {
-	sts ("%s %s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, (int)me.now);
+	sts ("%s %s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, (int)ts);
 }
 
 void
@@ -320,7 +320,7 @@ send_svspart (const char *target, const char *chan)
 }
 
 void 
-send_kick (const char *who, const char *target, const char *chan, const char *reason)
+send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
 	sts (":%s %s %s %s :%s", who, (me.token ? TOK_KICK : MSG_KICK), chan, target, (reason ? reason : "No Reason Given"));
 }
@@ -369,13 +369,13 @@ send_rakill (const char *host, const char *ident)
 }
 
 void
-send_privmsg (const char *to, const char *from, const char *buf)
+send_privmsg (const char *from, const char *to, const char *buf)
 {
 	sts (":%s %s %s :%s", from, (me.token ? TOK_PRIVATE : MSG_PRIVATE), to, buf);
 }
 
 void
-send_notice (const char *to, const char *from, const char *buf)
+send_notice (const char *from, const char *to, const char *buf)
 {
 	sts (":%s %s %s :%s", from, (me.token ? TOK_NOTICE : MSG_NOTICE), to, buf);
 }
@@ -480,7 +480,7 @@ m_server (char *origin, char **argv, int argc, int srv)
 static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
-	SquitServer (argv[0], argv[1]);
+	do_squit (argv[0], argv[1]);
 }
 
 /* m_quit
@@ -489,7 +489,7 @@ m_squit (char *origin, char **argv, int argc, int srv)
 static void
 m_quit (char *origin, char **argv, int argc, int srv)
 {
-	UserQuit (origin, argv[0]);
+	do_quit (origin, argv[0]);
 }
 
 /* m_svsmode
@@ -501,12 +501,12 @@ static void
 m_svsmode (char *origin, char **argv, int argc, int srv)
 {
 	if (argv[0][0] == '#') {
-		ChanMode (origin, argv, argc);
+		do_svsmode_channel (origin, argv, argc);
 	} else {
 		if (argv[2] && isdigit(*argv[2])) {
 			SetUserServicesTS(argv[0], argv[2]); 
 		} else {
-			UserMode (argv[0], argv[1]);
+			do_svsmode_user (argv[0], argv[1]);
 		}
 	}
 }
@@ -526,9 +526,9 @@ static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
 	if (argv[0][0] == '#') {
-		ChanMode (origin, argv, argc);
+		do_mode_channel (origin, argv, argc);
 	} else {
-		UserMode (argv[0], argv[1]);
+		do_mode_user (argv[0], argv[1]);
 	}
 }
 
@@ -538,7 +538,7 @@ m_mode (char *origin, char **argv, int argc, int srv)
 static void
 m_umode2 (char *origin, char **argv, int argc, int srv)
 {
-	UserMode (origin, argv[0]);
+	do_mode_user (origin, argv[0]);
 }
 
 /* m_kill
@@ -548,7 +548,7 @@ m_umode2 (char *origin, char **argv, int argc, int srv)
 static void
 m_kill (char *origin, char **argv, int argc, int srv)
 {
-	KillUser (argv[0], argv[1]);
+	do_kill (argv[0], argv[1]);
 }
 static void
 m_vhost (char *origin, char **argv, int argc, int srv)
@@ -599,14 +599,18 @@ m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 #ifdef NICKV2	
-		AddUser (argv[0], argv[3], argv[4], argv[9], argv[5], NULL, argv[2]);
+		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+			NULL, argv[6], argv[7], argv[8], argv[9]);
+/*		AddUser (argv[0], argv[3], argv[4], argv[9], argv[5], NULL, argv[2]);
 		UserMode (argv[0], argv[7]);
-		SetUserVhost(argv[0], argv[8]);
+		SetUserVhost(argv[0], argv[8]);*/
 #else
-		AddUser (argv[0], argv[3], argv[4], argv[7], argv[5], NULL, argv[2]);
+/*		AddUser (argv[0], argv[3], argv[4], argv[7], argv[5], NULL, argv[2]);*/
+		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+			NULL, argv[6], NULL, NULL, argv[9]);
 #endif
 	} else {
-		UserNick (origin, argv[0], NULL);
+		do_nickchange (origin, argv[0], NULL);
 	}
 }
 
@@ -618,11 +622,11 @@ m_nick (char *origin, char **argv, int argc, int srv)
  *  argv[2] = topic time
  *  argv[3] = topic text
  */
-/* TOPIC #channel ownder TS :topic */
+/* TOPIC #channel owner TS :topic */
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	ChanTopic (argv[1], argv[0], argv[2], argv[3]);
+	ChanTopic (argv[0], argv[1], argv[2], argv[3]);
 }
 
 /* m_kick
@@ -633,7 +637,7 @@ m_topic (char *origin, char **argv, int argc, int srv)
 static void
 m_kick (char *origin, char **argv, int argc, int srv)
 {
-	kick_chan(argv[0], argv[1], origin, argv[2]);
+	do_kick (origin, argv[0], argv[1], argv[2]);
 }
 
 /* m_join
@@ -643,7 +647,7 @@ m_kick (char *origin, char **argv, int argc, int srv)
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
-	UserJoin (origin, argv[0]);
+	do_join (origin, argv[0], argv[1]);
 }
 
 /* m_part
@@ -721,8 +725,7 @@ m_sjoin (char *origin, char **argv, int argc, int srv)
 	do_sjoin (argv[0], argv[1], argv[2], 4, origin, argv, argc);
 }
 
-/*
- * m_pass
+/* m_pass
  *	argv[0] = password
  */
 static void
@@ -730,8 +733,7 @@ m_pass (char *origin, char **argv, int argc, int srv)
 {
 }
 
-/*
- * m_svsnick
+/* m_svsnick
  *  argv[0] = old nickname
  *  argv[1] = new nickname
  *  argv[2] = timestamp
@@ -739,7 +741,7 @@ m_pass (char *origin, char **argv, int argc, int srv)
 static void
 m_svsnick (char *origin, char **argv, int argc, int srv)
 {
-	UserNick (argv[0], argv[1], argv[2]);
+	do_nickchange (argv[0], argv[1], argv[2]);
 }
 
 /* m_whois

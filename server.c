@@ -95,7 +95,7 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 }
 
 void 
-SquitServer (const char *name, const char* reason)
+DelServer (const char *name, const char* reason)
 {
 	Server *s;
 	hnode_t *sn;
@@ -107,7 +107,7 @@ SquitServer (const char *name, const char* reason)
 	}
 	sn = hash_lookup (sh, name);
 	if (!sn) {
-		nlog (LOG_WARNING, LOG_CORE, "SquitServer: squit from unknown server %s", name);
+		nlog (LOG_WARNING, LOG_CORE, "DelServer: squit from unknown server %s", name);
 		return;
 	}
 	s = hnode_get (sn);

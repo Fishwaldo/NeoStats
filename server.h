@@ -25,7 +25,7 @@
 #define _SERVER_H_
 
 Server *AddServer (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline);
-void SquitServer(const char *name, const char* reason);
+void DelServer(const char *name, const char* reason);
 void ServerDump (void);
 int init_server_hash (void);
 void PingServers (void);

@@ -140,33 +140,7 @@ UserPart (list_t * list, lnode_t * node, void *v)
 }
 
 void
-UserJoin (const char* nick, const char* chanlist)
-{
-	char *s, *t;
-	t = (char*)chanlist;
-	while (*(s = t)) {
-		t = s + strcspn (s, ",");
-		if (*t)
-			*t++ = 0;
-		join_chan (nick, s);
-	}
-
-}
-
-void
-KillUser (const char *nick, const char *reason)
-{
-	doDelUser (nick, 1, reason);
-}
-
-void
-UserQuit (const char *nick, const char *quitmsg)
-{
-	doDelUser (nick, 0, quitmsg);
-}
-
-static void
-doDelUser (const char *nick, int killflag, const char *reason)
+DelUser (const char *nick, int killflag, const char *reason)
 {
 	User *u;
 	hnode_t *un;
@@ -244,7 +218,7 @@ UserAway (const char *nick, const char *awaymsg)
 }
 
 int 
-UserNick (const char * oldnick, const char *newnick, const char * ts)
+do_nickchange (const char * oldnick, const char *newnick, const char * ts)
 {
 	hnode_t *un;
 	lnode_t *cm;
@@ -256,7 +230,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	SET_SEGV_LOCATION();
 	u = finduser (oldnick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "UserNick: can't find user %s", oldnick);
+		nlog (LOG_WARNING, LOG_CORE, "do_nickchange: can't find user %s", oldnick);
 		return NS_FAILURE;
 	}
 
@@ -266,10 +240,10 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 		time = me.now;
 	}
 
-	nlog (LOG_DEBUG2, LOG_CORE, "UserNick: s -> %s", u->nick, newnick);
+	nlog (LOG_DEBUG2, LOG_CORE, "do_nickchange: s -> %s", u->nick, newnick);
 	un = hash_lookup (uh, u->nick);
 	if (!un) {
-		nlog (LOG_WARNING, LOG_CORE, "UserNick: s -> %s failed!", u->nick, newnick);
+		nlog (LOG_WARNING, LOG_CORE, "do_nickchange: s -> %s failed!", u->nick, newnick);
 		return NS_FAILURE;
 	}
 	cm = list_first (u->chans);
@@ -636,7 +610,7 @@ UserLevel (User * u)
 }
 
 void
-SetUserVhost(char* nick, char* vhost) 
+SetUserVhost(const char* nick, const char* vhost) 
 {
 	User *u;
 	u = finduser (nick);
@@ -712,7 +686,7 @@ UserSMode (const char *nick, const char *modes)
 }
 #endif
 
-void SetUserServicesTS(char* nick, char* ts) 
+void SetUserServicesTS(const char* nick, const char* ts) 
 {
 	User* u;
 	u = finduser(nick);

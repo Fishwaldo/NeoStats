@@ -207,9 +207,9 @@ send_umode (const char *who, const char *target, const char *mode)
 }
 
 void 
-send_numeric (const int numeric, const char *target, const char *buf)
+send_numeric (const char *from, const int numeric, const char *target, const char *buf)
 {
-	sts (":%s %d %s :%s", me.name, numeric, target, buf);
+	sts (":%s %d %s :%s", from, numeric, target, buf);
 }
 
 void
@@ -237,13 +237,13 @@ send_kill (const char *from, const char *target, const char *reason)
 }
 
 void 
-send_nickchange (const char *oldnick, const char *newnick)
+send_nickchange (const char *oldnick, const char *newnick, const time_t ts)
 {
 	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int)me.now);
 }
 
 void 
-send_kick (const char *who, const char *target, const char *chan, const char *reason)
+send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
 	sts (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
 }
@@ -261,9 +261,9 @@ send_invite (const char *from, const char *to, const char *chan)
 }
 
 void
-send_svinfo (void)
+send_svinfo (const int tscurrent, const int tsmin, const int tsnow)
 {
-	sts ("%s %d %d 0 :%ld", MSG_SVINFO, TS_CURRENT, TS_MIN, (long)me.now);
+	sts ("%s %d %d 0 :%ld", MSG_SVINFO, tscurrent, tsmin, (long)tsnow);
 }
 
 /* there isn't an akill on Hybrid, so we send a kline to all servers! */
@@ -284,13 +284,13 @@ send_rakill (const char *host, const char *ident)
 }
 
 void
-send_privmsg (const char *to, const char *from, const char *buf)
+send_privmsg (const char *from, const char *to, const char *buf)
 {
 	sts (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
 }
 
 void
-send_notice (const char *to, const char *from, const char *buf)
+send_notice (const char *from, const char *to, const char *buf)
 {
 	sts (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
 }
@@ -367,38 +367,29 @@ m_server (char *origin, char **argv, int argc, int srv)
 static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	SquitServer (argv[0], tmpbuf);
-	free(tmpbuf);
+	do_squit (argv[0], argv[1]);
 }
 
 static void
 m_quit (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 0);
-	UserQuit (origin, tmpbuf);
-	free(tmpbuf);
+	do_quit (origin, argv[0]);
 }
 
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
 	if (argv[0][0] == '#') {
-		ChanMode (origin, argv, argc);
+		do_mode_channel (origin, argv, argc);
 	} else {
-		UserMode (argv[0], argv[1]);
+		do_mode_user (argv[0], argv[1]);
 	}
 }
 
 static void
 m_kill (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	KillUser (argv[0], tmpbuf);
-	free(tmpbuf);
+	do_kill (argv[0], argv[1]);
 }
 
 static void
@@ -410,12 +401,8 @@ m_pong (char *origin, char **argv, int argc, int srv)
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
-	char *buf;
-
 	if (argc > 0) {
-		buf = joinbuf (argv, argc, 0);
-		UserAway (origin, buf);
-		free (buf);
+		UserAway (origin, argv[0]);
 	} else {
 		UserAway (origin, NULL);
 	}
@@ -425,14 +412,10 @@ static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
-		char *realname;
-
-		realname = joinbuf (argv, argc, 7);
-		AddUser (argv[0], argv[4], argv[5], realname, argv[6], NULL, argv[2]);
-		free (realname);
+		AddUser (argv[0], argv[4], argv[5], argv[7], argv[6], NULL, argv[2]);
 		UserMode (argv[0], argv[3]);
 	} else {
-		UserNick (origin, argv[0], NULL);
+		do_nickchange (origin, argv[0], NULL);
 	}
 }
 
@@ -450,13 +433,9 @@ m_topic (char *origin, char **argv, int argc, int srv)
 	** - Hwy
 	*/	
 	if (finduser(origin)) {
-		buf = joinbuf (argv, argc, 1);
-		ChanTopic (origin, argv[0], NULL, buf);
-		free (buf);
+		ChanTopic (argv[0], origin, NULL, argv[1]);
 	} else if (findserver(origin)) {
-		buf = joinbuf (argv, argc, 3);
-		ChanTopic (argv[1], argv[0], argv[2], buf);
-		free (buf);
+		ChanTopic (argv[0], argv[1], argv[2], argv[3]);
 	} else {
 		nlog(LOG_WARNING, LOG_CORE, "m_topic: can't find topic setter %s for topic %s", origin, argv[1]); 
 	}
@@ -465,25 +444,19 @@ m_topic (char *origin, char **argv, int argc, int srv)
 static void
 m_kick (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf; 
-	tmpbuf = joinbuf(argv, argc, 2); 
-	kick_chan(argv[0], argv[1], origin, tmpbuf); 
-	free(tmpbuf);
+	do_kick (origin, argv[0], argv[1], argv[2]); 
 }
 
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
-	UserJoin (origin, argv[0]);
+	do_join (origin, argv[0], NULL);
 }
 
 static void
 m_part (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	do_part (origin, argv[0], tmpbuf);
-	free(tmpbuf);
+	do_part (origin, argv[0], argv[1]);
 }
 
 static void
@@ -495,7 +468,7 @@ m_ping (char *origin, char **argv, int argc, int srv)
 static void
 m_svinfo (char *origin, char **argv, int argc, int srv)
 {
-	send_svinfo ();
+	do_svinfo ();
 }
 
 static void

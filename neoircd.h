@@ -196,7 +196,7 @@
 #define MSG_IRCOPS	"IRCOPS"	/* Shows Online IRCOps */
 #define MSG_SVSPART	"SVSPART"	/* SVSPART */
 #define MSG_SAPART	"SAPART"	/* SAPART */
-#define MSG_VCTRL	"VCTRL"	/* VCTRL */
+/*#define MSG_VCTRL	"VCTRL"	*//* VCTRL */
 #define MSG_GCLIENT	"GCLIENT"	/* GLIENT */
 #define MSG_CHANNEL	"CHANNEL"	/* CHANNEL */
 #define MSG_UPTIME	"UPTIME"	/* UPTIME */

@@ -176,9 +176,9 @@ send_umode (const char *who, const char *target, const char *mode)
 }
 
 void 
-send_numeric (const int numeric, const char *target, const char *buf)
+send_numeric (const char *from, const int numeric, const char *target, const char *buf)
 {
-	sts (":%s %d %s :%s", me.name, numeric, target, buf);
+	sts (":%s %d %s :%s", from, numeric, target, buf);
 }
 
 void
@@ -194,7 +194,7 @@ send_kill (const char *from, const char *target, const char *reason)
 }
 
 void 
-send_nickchange (const char *oldnick, const char *newnick)
+send_nickchange (const char *oldnick, const char *newnick, const time_t ts)
 {
 	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int) me.now);
 }
@@ -210,7 +210,7 @@ send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
 }
 
 void 
-send_kick (const char *who, const char *target, const char *chan, const char *reason)
+send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
 	sts (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
 }
@@ -253,13 +253,13 @@ send_rakill (const char *host, const char *ident)
 }
 
 void
-send_privmsg (const char *to, const char *from, const char *buf)
+send_privmsg (const char *from, const char *to, const char *buf)
 {
 	sts (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
 }
 
 void
-send_notice (const char *to, const char *from, const char *buf)
+send_notice (const char *from, const char *to, const char *buf)
 {
 	sts (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
 }
@@ -314,7 +314,7 @@ m_squit (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 1);
-	SquitServer (argv[0], tmpbuf);
+	do_squit (argv[0], tmpbuf);
 	free(tmpbuf);
 }
 
@@ -323,7 +323,7 @@ m_quit (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 0);
-	UserQuit (origin, tmpbuf);
+	do_quit (origin, tmpbuf);
 	free(tmpbuf);
 }
 
@@ -331,9 +331,9 @@ static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
 	if (argv[0][0] == '#') {
-		ChanMode (origin, argv, argc);
+		do_mode_channel (origin, argv, argc);
 	} else {
-		UserMode (argv[0], argv[1]);
+		do_mode_user (argv[0], argv[1]);
 	}
 }
 static void
@@ -341,7 +341,7 @@ m_kill (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 1);
-	KillUser (argv[0], tmpbuf);
+	do_kill (argv[0], tmpbuf);
 	free(tmpbuf);
 }
 static void
@@ -373,7 +373,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		free (realname);
 		UserMode (argv[0], argv[3]);
 	} else {
-		UserNick (origin, argv[0], NULL);
+		do_nickchange (origin, argv[0], NULL);
 	}
 }
 static void
@@ -382,7 +382,7 @@ m_topic (char *origin, char **argv, int argc, int srv)
 	char *buf;
 
 	buf = joinbuf (argv, argc, 2);
-	ChanTopic (origin, argv[0], NULL, buf);
+	ChanTopic (argv[0], origin, NULL, buf);
 	free (buf);
 }
 
@@ -391,13 +391,13 @@ m_kick (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 2);
-	kick_chan(argv[0], argv[1], origin, tmpbuf);
+	do_kick (origin, argv[0], argv[1], tmpbuf);
 	free(tmpbuf);
 }
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
-	UserJoin (origin, argv[0]);
+	do_join (origin, argv[0], NULL);
 }
 static void
 m_part (char *origin, char **argv, int argc, int srv)

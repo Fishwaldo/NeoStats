@@ -77,7 +77,7 @@ SetChanTS (Chans * c, time_t tstime)
 */
 
 void
-ChanTopic (const char *owner, const char* chan, const char* ts, const char *topic)
+ChanTopic (const char* chan, const char *owner, const char* ts, const char *topic)
 {
 	char **av;
 	int ac = 0;
@@ -107,7 +107,7 @@ ChanTopic (const char *owner, const char* chan, const char* ts, const char *topi
 	if(topic) {
 		AddStringToList (&av, (char*)topic, &ac);
 	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "ChanTopic: NULL topic");
+		AddStringToList (&av, "", &ac);
 	}
 	ModuleEvent (EVENT_TOPICCHANGE, av, ac);
 	free (av);
@@ -438,7 +438,7 @@ del_chan (Chans * c)
  */
 
 void
-kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickreason)		
+kick_chan (const char *kickby, const char *chan, const char *kicked, const char *kickreason)		
 {
 	char **av;
 	int ac = 0;
@@ -484,7 +484,7 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 			AddStringToList (&av, u->nick, &ac);
 			AddStringToList (&av, (char *)kickby, &ac);
 			if (kickreason != NULL) {
-				AddStringToList (&av, kickreason, &ac);
+				AddStringToList (&av, (char*)kickreason, &ac);
 			}
 			ModuleEvent (EVENT_KICK, av, ac);
 			free (av);
@@ -498,7 +498,7 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 			AddStringToList (&av, u->nick, &ac);
 			AddStringToList (&av, (char *)kickby, &ac);
 			if (kickreason != NULL) {
-				AddStringToList (&av, kickreason, &ac);
+				AddStringToList (&av, (char*)kickreason, &ac);
 			}
 			ModuleEvent (EVENT_KICKBOT, av, ac);
 			free (av);

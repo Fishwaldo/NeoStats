@@ -25,20 +25,18 @@
 #define _USERS_H_
 
 void AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS);
-void UserQuit (const char *nick, const char *quitmsg);
-int UserNick (const char * oldnick, const char * newnick, const char * ts);
+int do_nickchange (const char * oldnick, const char * newnick, const char * ts);
 void UserDump (const char *nick);
 void UserPart (list_t *list, lnode_t *node, void *v);
-void UserJoin (const char* nick, const char* chanlist);
-void SetUserVhost(char* nick, char* vhost);
-void SetUserServicesTS(char* nick, char* ts);
+void SetUserVhost (const char* nick, const char* vhost);
+void SetUserServicesTS (const char* nick, const char* ts);
 void UserMode (const char *nick, const char *modes);
 #ifdef GOTUSERSMODES
 void UserSMode (const char *nick, const char *modes);
 #endif
 int init_user_hash (void);
 void UserAway (const char *nick, const char *awaymsg);
-void KillUser (const char *nick, const char *killmsg);
+void DelUser (const char *nick, int killflag, const char *reason);
 int InitExtAuth(void);
 
 #endif /* _USERS_H_ */

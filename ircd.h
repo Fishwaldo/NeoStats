@@ -92,24 +92,50 @@ void do_protocol (char *origin, char **argv, int argc);
 void do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc);
 void do_netinfo (const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname);
 void do_snetinfo (const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname);
+void do_join (const char* nick, const char* chanlist, const char* keys);
 void do_part (const char* nick, const char* chan, const char* reason);
+void do_nick (const char *nick, const char *hopcount, const char* TS, 
+		 const char *user, const char *host, const char *server, 
+		 const char *ip, const char *servicestamp, const char *modes, 
+		 const char *vhost, const char *realname
+#ifdef GOTUSERSMODES
+		 , const char *smodes
+#endif
+		 );
+void do_quit (const char *nick, const char *quitmsg);
+void do_kill (const char *nick, const char *killmsg);
+void do_squit (const char *name, const char* reason);
+void do_kick (const char *kickby, const char *chan, const char *kicked, const char *kickreason);
+#ifdef MSG_SVINFO
+void do_svinfo (void);
+#endif
+#ifdef MSG_VCTRL
+void do_vctrl (const char* uprot, const char* nicklen, const char* modex, const char* gc, const char* netname);
+#endif
+void do_mode_user (const char* nick, const char* modes);
+void do_mode_channel (char *origin, char **argv, int argc);
+/* These are the same for now but we might need to be different in the 
+ * future so use macros
+ */
+#define do_svsmode_user do_mode_user
+#define do_svsmode_channel do_mode_channel
 
 /* Defined in ircd specific files but common to all */
 void init_ircd (void);
-void send_privmsg (const char *to, const char *from, const char *buf);
-void send_notice (const char *to, const char *from, const char *buf);
+void send_privmsg (const char *from, const char *to, const char *buf);
+void send_notice (const char *from, const char *to, const char *buf);
 void send_globops (const char *from, const char *buf);
 void send_wallops (const char *who, const char *buf);
-void send_numeric (const int numeric, const char *target, const char *buf);
+void send_numeric (const char *from, const int numeric, const char *target, const char *buf);
 void send_umode (const char *who, const char *target, const char *mode);
 void send_join (const char *who, const char *chan);
 void send_sjoin (const char *who, const char *chan, const char flag, time_t tstime);
 void send_part (const char *who, const char *chan);
-void send_nickchange (const char *oldnick, const char *newnick);
+void send_nickchange (const char *oldnick, const char *newnick, const time_t ts);
 void send_cmode (const char *who, const char *chan, const char *mode, const char *args);
 void send_quit (const char *who, const char *quitmsg);
 void send_kill (const char *from, const char *target, const char *reason);
-void send_kick (const char *who, const char *target, const char *chan, const char *reason);
+void send_kick (const char *who, const char *chan, const char *target, const char *reason);
 void send_invite(const char *from, const char *to, const char *chan);
 #ifdef GOTSVSKILL
 void send_svskill (const char *target, const char *reason);
@@ -127,7 +153,7 @@ void send_svsjoin (const char *target, const char *chan);
 void send_svspart (const char *target, const char *chan);
 #endif
 #ifdef GOTSVSNICK
-void send_svsnick (const char *target, const char *newnick);
+void send_svsnick (const char *target, const char *newnick, const time_t ts);
 #endif
 #ifdef GOTSWHOIS
 void send_swhois (const char *target, const char *swhois);
@@ -145,6 +171,12 @@ void send_nick (const char *nick, const char *ident, const char *host, const cha
 void send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass);
 void send_netinfo (const char* from, const int prot, const char* cloak, const char* netname);
 void send_snetinfo (const char* from, const int prot, const char* cloak, const char* netname);
+#ifdef MSG_SVINFO
+void send_svinfo (const int tscurrent, const int tsmin, const int tsnow);
+#endif
+#ifdef MSG_VCTRL
+void send_vctrl (const int uprot, const int nicklen, const int modex, const int gc, const char* netname);
+#endif
 
 int sserver_cmd (const char *name, const int numeric, const char *infoline);
 int ssquit_cmd (const char *server, const char *quitmsg);

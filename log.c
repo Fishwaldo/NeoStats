@@ -166,6 +166,7 @@ nlog (int level, int scope, char *fmt, ...)
 #endif
 		/* we update me.now here, becase some functions might be busy and not call the loop a lot */
 		me.now = time(NULL);
+		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%ld", me.now);
 		strftime (log_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime (&me.now));
 		va_start (ap, fmt);
 		ircvsnprintf (log_buf, BUFSIZE, fmt, ap);

@@ -70,22 +70,30 @@
 
 #if UNREAL == 1
 #include "Unreal.h"
+#define NEW_STYLE_SPLITBUF
 #elif ULTIMATE == 1
 #include "Ultimate.h"
-#elif HYBRID7 == 1
+#define NEW_STYLE_SPLITBUF
+#elif HYBRID7 == 1	
 #include "hybrid7.h"
+#define NEW_STYLE_SPLITBUF
 #elif NEOIRCD == 1
 #include "neoircd.h"
+#define NEW_STYLE_SPLITBUF
 #elif MYSTIC == 1
-#include "mystic.h"
+#include "mystic.h" 
+#define NEW_STYLE_SPLITBUF
 #elif IRCU == 1
 #include "Ircu.h"
 #elif BAHAMUT == 1
 #include "Bahamut.h"
+#define NEW_STYLE_SPLITBUF
 #elif QUANTUM == 1
 #include "QuantumIRCd.h"
+#define NEW_STYLE_SPLITBUF
 #elif LIQUID == 1
 #include "liquidircd.h"
+#define NEW_STYLE_SPLITBUF
 #else
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
@@ -191,6 +199,11 @@
  * used to determine buffer sizes for time formatting buffers
  */
 #define TIMEBUFSIZE		80
+
+/* STR_TIME_T_SIZE
+ * size of a time_t converted to a string. 
+ */
+#define STR_TIME_T_SIZE	24
 
 /* MAX_MOD_NAME
    ModuleInfo will allow any length since it is merely a char *
@@ -369,6 +382,7 @@ struct me {
 	time_t lastmsg;
 	int pingtime;
 	time_t now;
+	char strnow[STR_TIME_T_SIZE];
 #ifdef SQLSRV
 	char sqlhost[MAXHOST];
 	int sqlport;
@@ -568,7 +582,7 @@ int sjoin_cmd (const char *who, const char *chan);
 #endif
 int spart_cmd (const char *who, const char *chan);
 int squit_cmd (const char *who, const char *quitmsg);
-int skick_cmd (const char *who, const char *target, const char *chan, const char *reason);
+int skick_cmd (const char *who, const char *chan, const char *target, const char *reason);
 int sinvite_cmd (const char *from, const char *to, const char *chan);
 int schmode_cmd (const char *who, const char *chan, const char *mode, const char *args);
 int snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode);

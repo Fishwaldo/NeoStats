@@ -110,6 +110,7 @@ main (int argc, char *argv[])
 	/* set some defaults before we parse the config file */
 	me.t_start = time(NULL);
 	me.now = time(NULL);
+	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%ld", me.now);
 	me.want_privmsg = 0;
 	me.die = 0;
 	me.local[0] = '\0';
