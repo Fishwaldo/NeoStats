@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dotconf.h,v 1.3 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: dotconf.h,v 1.4 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 
@@ -28,32 +28,32 @@
 #define HAVE_CFG_H
 
 /* some buffersize definitions */
-#define CFG_BUFSIZE 4096          /* max length of one line */
-#define CFG_MAX_OPTION 32         /* max length of any option name */
-#define CFG_MAX_VALUE 4064        /* max length of any options value */
-#define CFG_MAX_FILENAME 256      /* max length of a filename */
-#define CFG_VALUES 16             /* max # of arguments an option takes */
-#define CFG_MODULES 64            /* max # of dynamically loadable modules */
+#define CFG_BUFSIZE 4096	/* max length of one line */
+#define CFG_MAX_OPTION 32	/* max length of any option name */
+#define CFG_MAX_VALUE 4064	/* max length of any options value */
+#define CFG_MAX_FILENAME 256	/* max length of a filename */
+#define CFG_VALUES 16		/* max # of arguments an option takes */
+#define CFG_MODULES 64		/* max # of dynamically loadable modules */
 
 #define CFG_INCLUDEPATH_ENV "DC_INCLUDEPATH"
 
 /* constants for type of option */
-#define ARG_TOGGLE    0           /* TOGGLE on,off; yes,no; 1, 0; */
-#define ARG_INT       1           /* callback wants an integer */
-#define ARG_STR       2           /* callback expects a \0 terminated str */
-#define ARG_LIST      3           /* wants list of strings */
-#define ARG_NAME      4           /* wants option name */
-#define ARG_RAW       5           /* wants raw argument data */
-#define ARG_NONE      6           /* does not expect ANY args */
+#define ARG_TOGGLE    0		/* TOGGLE on,off; yes,no; 1, 0; */
+#define ARG_INT       1		/* callback wants an integer */
+#define ARG_STR       2		/* callback expects a \0 terminated str */
+#define ARG_LIST      3		/* wants list of strings */
+#define ARG_NAME      4		/* wants option name */
+#define ARG_RAW       5		/* wants raw argument data */
+#define ARG_NONE      6		/* does not expect ANY args */
 
 /* for convenience of terminating the config_options list */
 #define LAST_OPTION 	{ "", 0, NULL, 0 }
 
 typedef struct _cfgoption {
-	char name[CFG_MAX_OPTION];      /* name of configuration option */
-	int type;                       /* for possible values, see above */ 
-	void (*callback)();             /* callback function */
-	int userdata;                   /* userdefinable value/flag */
+	char name[CFG_MAX_OPTION];	/* name of configuration option */
+	int type;		/* for possible values, see above */
+	void (*callback) ();	/* callback function */
+	int userdata;		/* userdefinable value/flag */
 } config_option;
 
 
@@ -62,7 +62,7 @@ typedef struct _cfgoption {
  * 2. the list of optionnames to recognize
  *
  * returns 0 on success; !0 on error */
-int config_read(char *, config_option *);
-void config_register_options(config_option *);
+int config_read (char *, config_option *);
+void config_register_options (config_option *);
 
-#endif  /* HAVE_CFG_H */
+#endif /* HAVE_CFG_H */

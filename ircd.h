@@ -18,16 +18,16 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.h,v 1.2 2003/06/26 05:14:16 fishwaldo Exp $
+** $Id: ircd.h,v 1.3 2003/07/30 13:58:22 fishwaldo Exp $
 */
 #ifndef IRCD_H
 #define IRCD_H
 
 struct int_cmds {
 	char *name;
-	void (*function)(char *origin, char **argv, int argc);
-	int srvmsg; /* Should this be a Server Message(1), or a User Message?(0) */
-	int usage; 
+	void (*function) (char *origin, char **argv, int argc);
+	int srvmsg;		/* Should this be a Server Message(1), or a User Message?(0) */
+	int usage;
 } int_cmds;
 
 typedef struct int_cmds IntCommands;
@@ -35,11 +35,11 @@ typedef struct int_cmds IntCommands;
 
 
 
-void ShowMOTD(char *);
-void ShowADMIN(char *);
-void Showcredits(char *);
-void ShowStats(char *, User *);
-void dopong(Server *);
+void ShowMOTD (char *);
+void ShowADMIN (char *);
+void Showcredits (char *);
+void ShowStats (char *, User *);
+void dopong (Server *);
 
 
 

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.h,v 1.27 2003/07/11 13:43:27 fishwaldo Exp $
+** $Id: dl.h,v 1.28 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 
@@ -40,22 +40,22 @@
 #include "stats.h"
 
 #ifndef RTLD_NOW
-#define RTLD_NOW RTLD_LAZY /* openbsd deficiency */
+#define RTLD_NOW RTLD_LAZY	/* openbsd deficiency */
 #endif
 #ifndef RTLD_GLOBAL
 #define RTLD_GLOBAL 0
 #endif
 
 
-extern char *sftime(time_t);
+extern char *sftime (time_t);
 
 struct sock_list_struct {
 	long hash;
 	int sock_no;
 	char sockname[MAXHOST];
-	int (*readfnc)(int sock_no, char *sockname);
-	int (*writefnc)(int sock_no, char *sockname);
-	int (*errfnc)(int sock_no, char *sockname);
+	int (*readfnc) (int sock_no, char *sockname);
+	int (*writefnc) (int sock_no, char *sockname);
+	int (*errfnc) (int sock_no, char *sockname);
 	char modname[MAXHOST];
 	long rmsgs;
 	long rbytes;
@@ -69,7 +69,7 @@ struct mod_timer_list {
 	char timername[MAXHOST];
 	int interval;
 	time_t lastrun;
-	int (*function)();
+	int (*function) ();
 };
 typedef struct mod_timer_list Mod_Timer;
 hash_t *th;
@@ -78,8 +78,8 @@ struct mod_user_list {
 	long hash;
 	char nick[MAXNICK];
 	char modname[MAXHOST];
-	int (*function)(char *origin, char **av, int ac);
-	int (*chanfunc)(char *origin, char *chan, char **av, int ac);
+	int (*function) (char *origin, char **av, int ac);
+	int (*chanfunc) (char *origin, char *chan, char **av, int ac);
 	hash_t *chanlist;
 };
 
@@ -97,13 +97,13 @@ hash_t *bch;
 
 struct functions {
 	char *cmd_name;
-	int (*function)(char *origin, char **av, int ac);
+	int (*function) (char *origin, char **av, int ac);
 	int srvmsg;
 };
 
 struct evtfunctions {
 	char *cmd_name;
-	int (*function)(char **av, int ac);
+	int (*function) (char **av, int ac);
 };
 
 
@@ -138,25 +138,25 @@ struct mod_num {
 struct mod_num ModNum[NUM_MODULES];
 
 
-extern void __init_mod_list();
-extern int load_module(char *path,User *u);
-extern int unload_module(char *module_name,User *u);
-extern int add_ld_path(char *path);
-extern void list_module(User *);
-extern void list_module_bots(User *);
-extern int add_mod_user(char *nick, char *mod_name);
-extern int del_mod_user(char *nick);
-extern int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interval);
-extern int del_mod_timer(char *timer_name);
-extern void list_module_timer(User *);
-extern int add_socket(char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name);
-extern int del_socket(char *sockname);
-extern void list_sockets(User *);
-extern Sock_List *findsock(char *sock_name);
-extern Mod_User *findbot(char *);
-extern int get_dl_handle(char *mod_name);
-extern void add_bot_to_chan(char *, char *);
-extern void del_bot_from_chan(char *, char *);
-extern void bot_chan_message(char *origin, char *chan, char **av, int ac);
-extern void botchandump(User *u);
+extern void __init_mod_list ();
+extern int load_module (char *path, User * u);
+extern int unload_module (char *module_name, User * u);
+extern int add_ld_path (char *path);
+extern void list_module (User *);
+extern void list_module_bots (User *);
+extern int add_mod_user (char *nick, char *mod_name);
+extern int del_mod_user (char *nick);
+extern int add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval);
+extern int del_mod_timer (char *timer_name);
+extern void list_module_timer (User *);
+extern int add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name);
+extern int del_socket (char *sockname);
+extern void list_sockets (User *);
+extern Sock_List *findsock (char *sock_name);
+extern Mod_User *findbot (char *);
+extern int get_dl_handle (char *mod_name);
+extern void add_bot_to_chan (char *, char *);
+extern void del_bot_from_chan (char *, char *);
+extern void bot_chan_message (char *origin, char *chan, char **av, int ac);
+extern void botchandump (User * u);
 #endif /* !_dl_h_ */

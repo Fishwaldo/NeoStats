@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.h,v 1.5 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: conf.h,v 1.6 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 
@@ -45,17 +45,17 @@ struct config {
 	/* debug level */
 	unsigned int debug;
 	/* enable recv.log */
-	unsigned int recvlog : 1;
+	unsigned int recvlog:1;
 	/* dont load modules on startup */
-	unsigned int modnoload : 1;
+	unsigned int modnoload:1;
 	/* dont output anything on start */
-	unsigned int quiet : 1;
+	unsigned int quiet:1;
 	/* dont detach into background */
-	unsigned int foreground : 1;
+	unsigned int foreground:1;
 } config;
 
-int GetConf(void **data, int type, const char *item);
-int SetConf(void *data, int type, char *item);
-int GetDir(char *item, char ***data);
+int GetConf (void **data, int type, const char *item);
+int SetConf (void *data, int type, char *item);
+int GetDir (char *item, char ***data);
 
 #endif

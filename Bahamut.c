@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Bahamut.c,v 1.4 2003/07/23 12:45:51 fishwaldo Exp $
+** $Id: Bahamut.c,v 1.5 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -150,55 +150,60 @@ Oper_Modes usr_mds[] = {
 	{0, 0, 0}
 };
 
-void init_ircd()
+void
+init_ircd ()
 {
 	/* count the number of commands */
-	ircd_srv.cmdcount = ((sizeof(cmd_list) / sizeof(cmd_list[0])) - 1);
+	ircd_srv.cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])) - 1);
 };
 
-int sserver_cmd(const char *name, const int numeric, const char *infoline)
+int
+sserver_cmd (const char *name, const int numeric, const char *infoline)
 {
-	sts(":%s %s %s %d :%s", me.name,
-	    MSG_SERVER, name, numeric, infoline);
+	sts (":%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
 	return 1;
 }
 
-int slogin_cmd(const char *name, const int numeric, const char *infoline,
-	       const char *pass)
+int
+slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass)
 {
-	sts("%s %s :TS", MSG_PASS, pass);
-	sts("CAPAB TS3 SSJOIN BURST NICKIP");
-	sts("%s %s %d :%s", MSG_SERVER, name,
-	    numeric, infoline);
+	sts ("%s %s :TS", MSG_PASS, pass);
+	sts ("CAPAB TS3 SSJOIN BURST NICKIP");
+	sts ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
 	return 1;
 }
 
-int ssquit_cmd(const char *server)
+int
+ssquit_cmd (const char *server)
 {
-	sts("%s %s", MSG_SQUIT, server);
+	sts ("%s %s", MSG_SQUIT, server);
 	return 1;
 }
 
-int sprotocol_cmd(const char *option)
+int
+sprotocol_cmd (const char *option)
 {
 	return 1;
 }
 
-int squit_cmd(const char *who, const char *quitmsg)
+int
+squit_cmd (const char *who, const char *quitmsg)
 {
-	sts(":%s %s :%s", who, MSG_QUIT, quitmsg);
-	DelUser(who);
+	sts (":%s %s :%s", who, MSG_QUIT, quitmsg);
+	DelUser (who);
 	return 1;
 }
 
-int spart_cmd(const char *who, const char *chan)
+int
+spart_cmd (const char *who, const char *chan)
 {
-	sts(":%s %s %s", who, MSG_PART, chan);
-	part_chan(finduser(who), (char *) chan);
+	sts (":%s %s %s", who, MSG_PART, chan);
+	part_chan (finduser (who), (char *) chan);
 	return 1;
 }
 
-int sjoin_cmd(const char *who, const char *chan, unsigned long chflag)
+int
+sjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 {
 	char flag;
 	char mode[2];
@@ -207,60 +212,58 @@ int sjoin_cmd(const char *who, const char *chan, unsigned long chflag)
 	time_t tstime;
 	char tmp[512];
 	Chans *c;
-	
-	c = findchan((char *)chan);
+
+	c = findchan ((char *) chan);
 	if (!c) {
-		tstime = time(NULL);
+		tstime = time (NULL);
 	} else {
 		tstime = c->tstime;
 	}
 	switch (chflag) {
 	case MODE_CHANOP:
 		flag = '@';
-		strcpy(mode, "o");
+		strcpy (mode, "o");
 		break;
 	case MODE_VOICE:
 		flag = '+';
-		strcpy(mode, "v");
+		strcpy (mode, "v");
 		break;
 	default:
 		flag = ' ';
-		strcpy(mode, "");
+		strcpy (mode, "");
 	}
-	sts(":%s %s %d %s + :%c%s", me.name, MSG_SJOIN, tstime, chan, flag, who);
-	join_chan(finduser(who), (char *) chan);
-	snprintf(tmp, 512, "%s +%s %s", chan, mode, who);
-	ac = split_buf(tmp, &av, 0);
-	ChanMode(me.name, av, ac);
-	free(av);
+	sts (":%s %s %d %s + :%c%s", me.name, MSG_SJOIN, tstime, chan, flag, who);
+	join_chan (finduser (who), (char *) chan);
+	snprintf (tmp, 512, "%s +%s %s", chan, mode, who);
+	ac = split_buf (tmp, &av, 0);
+	ChanMode (me.name, av, ac);
+	free (av);
 	return 1;
 }
 
-int schmode_cmd(const char *who, const char *chan, const char *mode,
-		const char *args)
+int
+schmode_cmd (const char *who, const char *chan, const char *mode, const char *args)
 {
 	char **av;
 	int ac;
 	char tmp[512];
 
-	sts(":%s %s %s %s %s %lu", me.name,
-	    MSG_MODE, chan, mode, args,
-	    time(NULL));
-	snprintf(tmp, 512, "%s %s %s", chan, mode, args);
-	ac = split_buf(tmp, &av, 0);
-	ChanMode("", av, ac);
-	free(av);
+	sts (":%s %s %s %s %s %lu", me.name, MSG_MODE, chan, mode, args, time (NULL));
+	snprintf (tmp, 512, "%s %s %s", chan, mode, args);
+	ac = split_buf (tmp, &av, 0);
+	ChanMode ("", av, ac);
+	free (av);
 	return 1;
 }
 
-int snewnick_cmd(const char *nick, const char *ident, const char *host,
-		 const char *realname, long mode)
+int
+snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
 {
 	int i, j;
 	char newmode[20];
 	newmode[0] = '+';
 	j = 1;
-	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) - 1); i++) {
+	for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
 		if (mode & usr_mds[i].umodes) {
 			newmode[j] = usr_mds[i].mode;
 			j++;
@@ -268,28 +271,27 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host,
 
 	}
 	newmode[j] = '\0';
-	sts("%s %s 1 %lu %s %s %s %s 0 %lu :%s",
-	    MSG_NICK, nick, time(NULL), newmode,
-	    ident, host, me.name, time(NULL), realname);
-	AddUser(nick, ident, host, me.name, 0, time(NULL));
-	UserMode(nick, newmode, 0);
+	sts ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", MSG_NICK, nick, time (NULL), newmode, ident, host, me.name, time (NULL), realname);
+	AddUser (nick, ident, host, me.name, 0, time (NULL));
+	UserMode (nick, newmode, 0);
 	return 1;
 }
 
-int sping_cmd(const char *from, const char *reply, const char *to)
+int
+sping_cmd (const char *from, const char *reply, const char *to)
 {
-	sts(":%s %s %s :%s", from, MSG_PING, reply,
-	    to);
+	sts (":%s %s %s :%s", from, MSG_PING, reply, to);
 	return 1;
 }
 
-int sumode_cmd(const char *who, const char *target, long mode)
+int
+sumode_cmd (const char *who, const char *target, long mode)
 {
 	int i, j;
 	char newmode[20];
 	newmode[0] = '+';
 	j = 1;
-	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) - 1); i++) {
+	for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
 		if (mode & usr_mds[i].umodes) {
 			newmode[j] = usr_mds[i].mode;
 			j++;
@@ -297,298 +299,289 @@ int sumode_cmd(const char *who, const char *target, long mode)
 
 	}
 	newmode[j] = '\0';
-	sts(":%s %s %s :%s", who, MSG_MODE, target,
-	    newmode);
-	UserMode(target, newmode, 0);
+	sts (":%s %s %s :%s", who, MSG_MODE, target, newmode);
+	UserMode (target, newmode, 0);
 	return 1;
 }
 
-int snumeric_cmd(const int numeric, const char *target, const char *data,
-		 ...)
+int
+snumeric_cmd (const int numeric, const char *target, const char *data, ...)
 {
 	va_list ap;
 	char buf[512];
-	va_start(ap, data);
-	vsnprintf(buf, 512, data, ap);
-	sts(":%s %d %s :%s", me.name, numeric, target, buf);
-	va_end(ap);
+	va_start (ap, data);
+	vsnprintf (buf, 512, data, ap);
+	sts (":%s %d %s :%s", me.name, numeric, target, buf);
+	va_end (ap);
 	return 1;
 }
 
-int spong_cmd(const char *reply)
+int
+spong_cmd (const char *reply)
 {
-	sts("%s %s", MSG_PONG, reply);
+	sts ("%s %s", MSG_PONG, reply);
 	return 1;
 }
+
 #if 0
-int snetinfo_cmd()
+int
+snetinfo_cmd ()
 {
-	sts(":%s %s 0 %d %d %s 0 0 0 :%s", me.name, MSG_SNETINFO,
-	    time(NULL), ircd_srv.uprot, ircd_srv.cloak, me.netname);
+	sts (":%s %s 0 %d %d %s 0 0 0 :%s", me.name, MSG_SNETINFO, time (NULL), ircd_srv.uprot, ircd_srv.cloak, me.netname);
 	return 1;
 }
 #endif
-int skill_cmd(const char *from, const char *target, const char *reason,
-	      ...)
+int
+skill_cmd (const char *from, const char *target, const char *reason, ...)
 {
 	va_list ap;
 	char buf[512];
-	va_start(ap, reason);
-	vsnprintf(buf, 512, reason, ap);
-	sts(":%s %s %s :%s", from, MSG_KILL,
-	    target, buf);
-	va_end(ap);
-	DelUser(target);
+	va_start (ap, reason);
+	vsnprintf (buf, 512, reason, ap);
+	sts (":%s %s %s :%s", from, MSG_KILL, target, buf);
+	va_end (ap);
+	DelUser (target);
 	return 1;
 }
 
-int ssvskill_cmd(const char *who, const char *reason, ...)
+int
+ssvskill_cmd (const char *who, const char *reason, ...)
 {
 	va_list ap;
 	char buf[512];
-	va_start(ap, reason);
-	vsnprintf(buf, 512, reason, ap);
-	sts(":%s %s %s :%s", me.name, MSG_SVSKILL,
-	    who, buf);
-	va_end(ap);
+	va_start (ap, reason);
+	vsnprintf (buf, 512, reason, ap);
+	sts (":%s %s %s :%s", me.name, MSG_SVSKILL, who, buf);
+	va_end (ap);
 	return 1;
 }
 
-int ssmo_cmd(const char *from, const char *umodetarget, const char *msg)
+int
+ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
 {
-	chanalert(s_Services,
-	       "Warning, Module %s tried to SMO, which is not supported in Bahamut",
-	       segvinmodule);
-	nlog(LOG_NOTICE, LOG_CORE,
-	     "Warning, Module %s tried to SMO, which is not supported in Bahamut",
-	     segvinmodule);
+	chanalert (s_Services, "Warning, Module %s tried to SMO, which is not supported in Bahamut", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to SMO, which is not supported in Bahamut", segvinmodule);
 	return 1;
 }
 
-int snick_cmd(const char *oldnick, const char *newnick)
+int
+snick_cmd (const char *oldnick, const char *newnick)
 {
-	Change_User(finduser(oldnick), newnick);
-	sts(":%s %s %s %d", oldnick, MSG_NICK,
-	    newnick, time(NULL));
-	return 1;
-}
-int sswhois_cmd(const char *target, const char *swhois)
-{
-	chanalert(s_Services,
-	       "Warning Module %s tried to SWHOIS, which is not supported in Bahamut",
-	       segvinmodule);
-	nlog(LOG_NOTICE, LOG_CORE,
-	     "Warning. Module %s tried to SWHOIS, which is not supported in Bahamut",
-	     segvinmodule);
-	return 1;
-}
-int ssvsnick_cmd(const char *target, const char *newnick)
-{
-	sts("%s %s %s :%d", MSG_SVSNICK, target,
-	    newnick, time(NULL));
+	Change_User (finduser (oldnick), newnick);
+	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, time (NULL));
 	return 1;
 }
 
-int ssvsjoin_cmd(const char *target, const char *chan)
+int
+sswhois_cmd (const char *target, const char *swhois)
 {
-	chanalert(s_Services,
-	       "Warning Module %s tried to SVSJOIN, which is not supported in Bahamut",
-	       segvinmodule);
-	nlog(LOG_NOTICE, LOG_CORE,
-	     "Warning. Module %s tried to SVSJOIN, which is not supported in Bahamut",
-	     segvinmodule);
+	chanalert (s_Services, "Warning Module %s tried to SWHOIS, which is not supported in Bahamut", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SWHOIS, which is not supported in Bahamut", segvinmodule);
 	return 1;
 }
 
-int ssvspart_cmd(const char *target, const char *chan)
+int
+ssvsnick_cmd (const char *target, const char *newnick)
 {
-	chanalert(s_Services,
-	       "Warning Module %s tried to SVSPART, which is not supported in Bahamut",
-	       segvinmodule);
-	nlog(LOG_NOTICE, LOG_CORE,
-	     "Warning. Module %s tried to SVSPART, which is not supported in Bahamut",
-	     segvinmodule);
+	sts ("%s %s %s :%d", MSG_SVSNICK, target, newnick, time (NULL));
 	return 1;
 }
 
-int skick_cmd(const char *who, const char *target, const char *chan,
-	      const char *reason)
+int
+ssvsjoin_cmd (const char *target, const char *chan)
 {
-	sts(":%s %s %s %s :%s", who, MSG_KICK,
-	    chan, target, (reason ? reason : "No Reason Given"));
-	part_chan(finduser(target), (char *) chan);
+	chanalert (s_Services, "Warning Module %s tried to SVSJOIN, which is not supported in Bahamut", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSJOIN, which is not supported in Bahamut", segvinmodule);
 	return 1;
 }
-int swallops_cmd(const char *who, const char *msg, ...)
+
+int
+ssvspart_cmd (const char *target, const char *chan)
+{
+	chanalert (s_Services, "Warning Module %s tried to SVSPART, which is not supported in Bahamut", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSPART, which is not supported in Bahamut", segvinmodule);
+	return 1;
+}
+
+int
+skick_cmd (const char *who, const char *target, const char *chan, const char *reason)
+{
+	sts (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
+	part_chan (finduser (target), (char *) chan);
+	return 1;
+}
+
+int
+swallops_cmd (const char *who, const char *msg, ...)
 {
 	va_list ap;
 	char buf[512];
-	va_start(ap, msg);
-	vsnprintf(buf, 512, msg, ap);
-	sts(":%s %s :%s", who, MSG_WALLOPS,
-	    buf);
-	va_end(ap);
+	va_start (ap, msg);
+	vsnprintf (buf, 512, msg, ap);
+	sts (":%s %s :%s", who, MSG_WALLOPS, buf);
+	va_end (ap);
 	return 1;
 }
 
-int ssvshost_cmd(const char *who, const char *vhost)
+int
+ssvshost_cmd (const char *who, const char *vhost)
 {
-	chanalert(s_Services,
-	       "Warning Module %s tried to SVSHOST, which is not supported in Bahamut",
-	       segvinmodule);
-	nlog(LOG_NOTICE, LOG_CORE,
-	     "Warning. Module %s tried to SVSHOST, which is not supported in Bahamut",
-	     segvinmodule);
-		return 1;
+	chanalert (s_Services, "Warning Module %s tried to SVSHOST, which is not supported in Bahamut", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSHOST, which is not supported in Bahamut", segvinmodule);
+	return 1;
 }
-int sakill_cmd(const char *host, const char *ident, const char *setby,
-	       const int length, const char *reason, ...)
+
+int
+sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
 {
 	va_list ap;
 	char buf[512];
-	va_start(ap, reason);
-	vsnprintf(buf, 512, reason, ap);
-	sts(":%s %s %s %s %d %s %d :%s", me.name,
-	    MSG_AKILL, host, ident, length, setby,
-	    time(NULL), buf);
-	va_end(ap);
+	va_start (ap, reason);
+	vsnprintf (buf, 512, reason, ap);
+	sts (":%s %s %s %s %d %s %d :%s", me.name, MSG_AKILL, host, ident, length, setby, time (NULL), buf);
+	va_end (ap);
 	return 1;
 }
 
-int srakill_cmd(const char *host, const char *ident)
+int
+srakill_cmd (const char *host, const char *ident)
 {
-	sts(":%s %s %s %s", me.name, MSG_RAKILL,
-	    host, ident);
+	sts (":%s %s %s %s", me.name, MSG_RAKILL, host, ident);
 	return 1;
 }
 
 
-int ssvinfo_cmd()
+int
+ssvinfo_cmd ()
 {
-	sts("SVINFO 3 3 0 :%d", time(NULL));
+	sts ("SVINFO 3 3 0 :%d", time (NULL));
 	return 1;
 }
-int sburst_cmd(int b)
+
+int
+sburst_cmd (int b)
 {
 	if (b == 0) {
-		sts("BURST 0");
+		sts ("BURST 0");
 	} else {
-		sts("BURST");
+		sts ("BURST");
 	}
 	return 1;
 }
 
 
 
-void chanalert(char *who, char *buf, ...)
+void
+chanalert (char *who, char *buf, ...)
 {
 	va_list ap;
 	char tmp[512];
 	char out[512];
-	va_start(ap, buf);
-	vsnprintf(tmp, 512, buf, ap);
+	va_start (ap, buf);
+	vsnprintf (tmp, 512, buf, ap);
 
 	if (me.onchan) {
-		snprintf(out, 512, ":%s PRIVMSG %s :%s", who, me.chan,
-			 tmp);
-		sts("%s", out);
+		snprintf (out, 512, ":%s PRIVMSG %s :%s", who, me.chan, tmp);
+		sts ("%s", out);
 	}
-	va_end(ap);
+	va_end (ap);
 }
-void prefmsg(char *to, const char *from, char *fmt, ...)
+
+void
+prefmsg (char *to, const char *from, char *fmt, ...)
 {
 	va_list ap;
 	char buf[512], buf2[512];
 
-	va_start(ap, fmt);
-	vsnprintf(buf2, sizeof(buf2), fmt, ap);
-	if (findbot(to)) {
-		chanalert(s_Services,
-			  "Message From our Bot(%s) to Our Bot(%s), Dropping Message",
-			  from, to);
+	va_start (ap, fmt);
+	vsnprintf (buf2, sizeof (buf2), fmt, ap);
+	if (findbot (to)) {
+		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
 		return;
 	}
 	if (me.want_privmsg) {
-		snprintf(buf, 512, ":%s PRIVMSG %s :%s", from, to, buf2);
+		snprintf (buf, 512, ":%s PRIVMSG %s :%s", from, to, buf2);
 	} else {
-		snprintf(buf, 512, ":%s NOTICE %s :%s", from, to, buf2);
+		snprintf (buf, 512, ":%s NOTICE %s :%s", from, to, buf2);
 	}
-	sts("%s", buf);
-	va_end(ap);
+	sts ("%s", buf);
+	va_end (ap);
 }
-void privmsg(char *to, const char *from, char *fmt, ...)
+
+void
+privmsg (char *to, const char *from, char *fmt, ...)
 {
 	va_list ap;
 	char buf[512], buf2[512];
 
-	if (findbot(to)) {
-		chanalert(s_Services,
-			  "Message From our Bot(%s) to Our Bot(%s), Dropping Message",
-			  from, to);
+	if (findbot (to)) {
+		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
 		return;
 	}
 
-	va_start(ap, fmt);
-	vsnprintf(buf2, sizeof(buf2), fmt, ap);
-	snprintf(buf, 512, ":%s PRIVMSG %s :%s", from, to, buf2);
-	sts("%s", buf);
-	va_end(ap);
+	va_start (ap, fmt);
+	vsnprintf (buf2, sizeof (buf2), fmt, ap);
+	snprintf (buf, 512, ":%s PRIVMSG %s :%s", from, to, buf2);
+	sts ("%s", buf);
+	va_end (ap);
 }
 
-void notice(char *to, const char *from, char *fmt, ...)
+void
+notice (char *to, const char *from, char *fmt, ...)
 {
 	va_list ap;
 	char buf[512], buf2[512];
 
-	if (findbot(to)) {
-		chanalert(s_Services,
-			  "Message From our Bot(%s) to Our Bot(%s), Dropping Message",
-			  from, to);
+	if (findbot (to)) {
+		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
 		return;
 	}
 
-	va_start(ap, fmt);
-	vsnprintf(buf2, sizeof(buf2), fmt, ap);
-	snprintf(buf, 512, ":%s NOTICE %s :%s", from, to, buf2);
-	sts("%s", buf);
-	va_end(ap);
+	va_start (ap, fmt);
+	vsnprintf (buf2, sizeof (buf2), fmt, ap);
+	snprintf (buf, 512, ":%s NOTICE %s :%s", from, to, buf2);
+	sts ("%s", buf);
+	va_end (ap);
 }
 
 
-void privmsg_list(char *to, char *from, const char **text)
+void
+privmsg_list (char *to, char *from, const char **text)
 {
 	while (*text) {
 		if (**text)
-			prefmsg(to, from, "%s", *text);
+			prefmsg (to, from, "%s", *text);
 		else
-			prefmsg(to, from, " ");
+			prefmsg (to, from, " ");
 		text++;
 	}
 }
 
 
-void globops(char *from, char *fmt, ...)
+void
+globops (char *from, char *fmt, ...)
 {
 	va_list ap;
 	char buf[512], buf2[512];
 
-	va_start(ap, fmt);
-	vsnprintf(buf2, sizeof(buf2), fmt, ap);
+	va_start (ap, fmt);
+	vsnprintf (buf2, sizeof (buf2), fmt, ap);
 
 /* Shmad - have to get rid of nasty term echos :-) */
 
 /* Fish - now that was crackhead coding! */
 	if (me.onchan) {
-		snprintf(buf, 512, ":%s GLOBOPS :%s", from, buf2);
-		sts("%s", buf);
+		snprintf (buf, 512, ":%s GLOBOPS :%s", from, buf2);
+		sts ("%s", buf);
 	} else {
-		nlog(LOG_NORMAL, LOG_CORE, "%s", buf2);
+		nlog (LOG_NORMAL, LOG_CORE, "%s", buf2);
 	}
-	va_end(ap);
+	va_end (ap);
 }
 
 
-void Srv_Sjoin(char *origin, char **argv, int argc)
+void
+Srv_Sjoin (char *origin, char **argv, int argc)
 {
 	char nick[MAXNICK];
 	long mode = 0;
@@ -604,34 +597,29 @@ void Srv_Sjoin(char *origin, char **argv, int argc)
 	} else {
 		modes = argv[1];
 	}
-printf("%s %s\n", argv[2], argv[1]);
+	printf ("%s %s\n", argv[2], argv[1]);
 	if (*modes == '#') {
-		join_chan(finduser(origin), modes);
+		join_chan (finduser (origin), modes);
 		return;
 	}
-printf("%s\n", modes);
-	tl = list_create(10);
+	printf ("%s\n", modes);
+	tl = list_create (10);
 	if (*modes != '+') {
 		goto nomodes;
 	}
 	while (*modes) {
-		for (i = 0;
-		     i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1);
-		     i++) {
+		for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
 			if (*modes == cFlagTab[i].flag) {
 				if (cFlagTab[i].parameters) {
-					m = smalloc(sizeof(ModesParm));
+					m = smalloc (sizeof (ModesParm));
 					m->mode = cFlagTab[i].mode;
-					strncpy(m->param, argv[j],
-						PARAMSIZE);
-					mn = lnode_create(m);
-					if (!list_isfull(tl)) {
-						list_append(tl, mn);
+					strncpy (m->param, argv[j], PARAMSIZE);
+					mn = lnode_create (m);
+					if (!list_isfull (tl)) {
+						list_append (tl, mn);
 					} else {
-						nlog(LOG_CRITICAL,
-						     LOG_CORE,
-						     "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
-						do_exit(0);
+						nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
+						do_exit (0);
 					}
 					j++;
 				} else {
@@ -646,10 +634,7 @@ printf("%s\n", modes);
 		modes = argv[j];
 		mode = 0;
 		while (ok == 1) {
-			for (i = 0;
-			     i <
-			     ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -
-			      1); i++) {
+			for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
 				if (cFlagTab[i].sjoin != 0) {
 					if (*modes == cFlagTab[i].sjoin) {
 						mode |= cFlagTab[i].mode;
@@ -659,288 +644,311 @@ printf("%s\n", modes);
 				} else {
 					/* sjoin's should be at the top of the list */
 					ok = 0;
-					strncpy(nick, modes, MAXNICK);
+					strncpy (nick, modes, MAXNICK);
 					break;
 				}
 			}
 		}
-		join_chan(finduser(nick), argv[1]);
-		ChangeChanUserMode(findchan(argv[1]), finduser(nick), 1,
-				   mode);
+		join_chan (finduser (nick), argv[1]);
+		ChangeChanUserMode (findchan (argv[1]), finduser (nick), 1, mode);
 		j++;
 		ok = 1;
 	}
-	c = findchan(argv[1]);
+	c = findchan (argv[1]);
 	/* update the TS time */
-	Change_Chan_Ts(c, atoi(argv[0]));
+	Change_Chan_Ts (c, atoi (argv[0]));
 	c->modes |= mode1;
-	if (!list_isempty(tl)) {
-		if (!list_isfull(c->modeparms)) {
-			list_transfer(c->modeparms, tl, list_first(tl));
+	if (!list_isempty (tl)) {
+		if (!list_isfull (c->modeparms)) {
+			list_transfer (c->modeparms, tl, list_first (tl));
 		} else {
 			/* eeeeeeek, list is full! */
-			nlog(LOG_CRITICAL, LOG_CORE,
-			     "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
-			do_exit(0);
+			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
+			do_exit (0);
 		}
 	}
-	list_destroy(tl);
+	list_destroy (tl);
 }
 
-void Srv_Burst(char *origin, char **argv, int argc)
+void
+Srv_Burst (char *origin, char **argv, int argc)
 {
 	if (argc > 0) {
 		if (ircd_srv.burst == 1) {
-			sburst_cmd(0);
+			sburst_cmd (0);
 			ircd_srv.burst = 0;
 			me.synced = 1;
-			init_ServBot();
+			init_ServBot ();
 		}
 	} else {
 		ircd_srv.burst = 1;
 	}
 }
 
-void Srv_Connect(char *origin, char **argv, int argc)
+void
+Srv_Connect (char *origin, char **argv, int argc)
 {
 }
 
 
-void Usr_Stats(char *origin, char **argv, int argc)
+void
+Usr_Stats (char *origin, char **argv, int argc)
 {
 	User *u;
-	u = finduser(origin);
+	u = finduser (origin);
 	if (!u) {
-		nlog(LOG_WARNING, LOG_CORE,
-		     "Recieved a Message from a Unknown User! (%s)",
-		     origin);
+		nlog (LOG_WARNING, LOG_CORE, "Recieved a Message from a Unknown User! (%s)", origin);
 		return;
 	}
-	ShowStats(argv[0], u);
+	ShowStats (argv[0], u);
 }
 
-void Usr_Version(char *origin, char **argv, int argc)
+void
+Usr_Version (char *origin, char **argv, int argc)
 {
-	snumeric_cmd(351, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR,
-		     REV, version, me.name, version_date, version_time);
+	snumeric_cmd (351, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, version, me.name, version_date, version_time);
 }
-void Usr_ShowMOTD(char *origin, char **argv, int argc)
+
+void
+Usr_ShowMOTD (char *origin, char **argv, int argc)
 {
-	ShowMOTD(origin);
+	ShowMOTD (origin);
 }
-void Usr_ShowADMIN(char *origin, char **argv, int argc)
+
+void
+Usr_ShowADMIN (char *origin, char **argv, int argc)
 {
-	ShowADMIN(origin);
+	ShowADMIN (origin);
 }
-void Usr_Showcredits(char *origin, char **argv, int argc)
+
+void
+Usr_Showcredits (char *origin, char **argv, int argc)
 {
-	Showcredits(origin);
+	Showcredits (origin);
 }
-void Usr_AddServer(char *origin, char **argv, int argc)
+
+void
+Usr_AddServer (char *origin, char **argv, int argc)
 {
-	AddServer(argv[0], origin, atoi(argv[1]));
+	AddServer (argv[0], origin, atoi (argv[1]));
 }
-void Usr_DelServer(char *origin, char **argv, int argc)
+
+void
+Usr_DelServer (char *origin, char **argv, int argc)
 {
-	DelServer(argv[0]);
+	DelServer (argv[0]);
 }
-void Usr_DelUser(char *origin, char **argv, int argc)
+
+void
+Usr_DelUser (char *origin, char **argv, int argc)
 {
-	DelUser(origin);
+	DelUser (origin);
 }
-void Usr_Smode(char *origin, char **argv, int argc)
+
+void
+Usr_Smode (char *origin, char **argv, int argc)
 {
-	if (!strchr(argv[0], '#')) {
+	if (!strchr (argv[0], '#')) {
 		/* its user svsmode change */
-		UserMode(argv[0], argv[2], 0);
+		UserMode (argv[0], argv[2], 0);
 	} else {
 		/* its a channel svsmode change */
-		ChanMode(origin, argv, argc);
+		ChanMode (origin, argv, argc);
 	}
 }
-void Usr_Mode(char *origin, char **argv, int argc)
+void
+Usr_Mode (char *origin, char **argv, int argc)
 {
-	if (!strchr(argv[0], '#')) {
-		nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[0]);
-		UserMode(argv[0], argv[1], 0);
+	if (!strchr (argv[0], '#')) {
+		nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[0]);
+		UserMode (argv[0], argv[1], 0);
 	} else {
-		ChanMode(origin, argv, argc);
+		ChanMode (origin, argv, argc);
 	}
 }
-void Usr_Kill(char *origin, char **argv, int argc)
+void
+Usr_Kill (char *origin, char **argv, int argc)
 {
 	User *u;
-	u = finduser(argv[0]);
+	u = finduser (argv[0]);
 	if (u) {
-		KillUser(argv[0]);
+		KillUser (argv[0]);
 	} else {
-		nlog(LOG_WARNING, LOG_CORE, "Can't find user %s for Kill",
-		     argv[0]);
+		nlog (LOG_WARNING, LOG_CORE, "Can't find user %s for Kill", argv[0]);
 	}
 }
-void Usr_Pong(char *origin, char **argv, int argc)
+void
+Usr_Pong (char *origin, char **argv, int argc)
 {
 	Server *s;
-	s = findserver(argv[0]);
+	s = findserver (argv[0]);
 	if (s) {
-		dopong(s);
+		dopong (s);
 	} else {
-		nlog(LOG_NOTICE, LOG_CORE,
-		     "Received PONG from unknown server: %s", argv[0]);
+		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", argv[0]);
 	}
 }
-void Usr_Away(char *origin, char **argv, int argc)
+void
+Usr_Away (char *origin, char **argv, int argc)
 {
 	char *Buf;
-	User *u = finduser(origin);
+	User *u = finduser (origin);
 	if (u) {
 		if (argc > 0) {
-			Buf = joinbuf(argv, argc, 0);
+			Buf = joinbuf (argv, argc, 0);
 		} else {
 			Buf = NULL;
 		}
-		Do_Away(u, Buf);
+		Do_Away (u, Buf);
 		if (argc > 0) {
-			free(Buf);
+			free (Buf);
 		}
 	} else {
-		nlog(LOG_NOTICE, LOG_CORE,
-		     "Warning, Unable to find User %s for Away", origin);
+		nlog (LOG_NOTICE, LOG_CORE, "Warning, Unable to find User %s for Away", origin);
 	}
 }
-void Usr_Nick(char *origin, char **argv, int argc)
+void
+Usr_Nick (char *origin, char **argv, int argc)
 {
-	User *u = finduser(origin);
+	User *u = finduser (origin);
 	if (u) {
-		Change_User(u, argv[0]);
+		Change_User (u, argv[0]);
 	}
 }
-void Usr_Topic(char *origin, char **argv, int argc)
+void
+Usr_Topic (char *origin, char **argv, int argc)
 {
 	char *buf;
 	Chans *c;
-	c = findchan(argv[0]);
+	c = findchan (argv[0]);
 	if (c) {
-		buf = joinbuf(argv, argc, 3);
-		Change_Topic(argv[1], c, atoi(argv[2]), buf);
-		free(buf);
+		buf = joinbuf (argv, argc, 3);
+		Change_Topic (argv[1], c, atoi (argv[2]), buf);
+		free (buf);
 	} else {
-		nlog(LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s",
-		     argv[0]);
+		nlog (LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);
 	}
 
 }
 
-void Usr_Kick(char *origin, char **argv, int argc)
+void
+Usr_Kick (char *origin, char **argv, int argc)
 {
 	User *u, *k;
-	u = finduser(argv[1]);
-	k = finduser(origin);
+	u = finduser (argv[1]);
+	k = finduser (origin);
 	if (u) {
-		kick_chan(u, argv[0], k);
+		kick_chan (u, argv[0], k);
 	} else {
-		nlog(LOG_WARNING, LOG_CORE,
-		     "Warning, Can't find user %s for kick %s", argv[1],
-		     argv[0]);
+		nlog (LOG_WARNING, LOG_CORE, "Warning, Can't find user %s for kick %s", argv[1], argv[0]);
 	}
 }
-void Usr_Join(char *origin, char **argv, int argc)
+void
+Usr_Join (char *origin, char **argv, int argc)
 {
 	char *s, *t;
 	t = argv[0];
 	while (*(s = t)) {
-		t = s + strcspn(s, ",");
+		t = s + strcspn (s, ",");
 		if (*t)
 			*t++ = 0;
-		join_chan(finduser(origin), s);
+		join_chan (finduser (origin), s);
 	}
 }
-void Usr_Part(char *origin, char **argv, int argc)
+void
+Usr_Part (char *origin, char **argv, int argc)
 {
-	part_chan(finduser(origin), argv[0]);
+	part_chan (finduser (origin), argv[0]);
 }
-void Srv_Ping(char *origin, char **argv, int argc)
+
+void
+Srv_Ping (char *origin, char **argv, int argc)
 {
-	spong_cmd(argv[0]);
+	spong_cmd (argv[0]);
 	if (ircd_srv.burst) {
-		sping_cmd(me.name, argv[0], argv[0]);
+		sping_cmd (me.name, argv[0], argv[0]);
 	}
 }
 
-void Srv_Svinfo(char *origin, char **argv, int argc)
+void
+Srv_Svinfo (char *origin, char **argv, int argc)
 {
-	ssvinfo_cmd();
+	ssvinfo_cmd ();
 }
 
 
-void Srv_Pass(char *origin, char **argv, int argc)
+void
+Srv_Pass (char *origin, char **argv, int argc)
 {
 }
-void Srv_Server(char *origin, char **argv, int argc)
+void
+Srv_Server (char *origin, char **argv, int argc)
 {
 	Server *s;
 	if (*origin == 0) {
-		AddServer(argv[0], me.name, atoi(argv[1]));
+		AddServer (argv[0], me.name, atoi (argv[1]));
 	} else {
-		AddServer(argv[0], origin, atoi(argv[1]));
+		AddServer (argv[0], origin, atoi (argv[1]));
 	}
-	s = findserver(argv[0]);
+	s = findserver (argv[0]);
 	me.s = s;
 }
-void Srv_Squit(char *origin, char **argv, int argc)
+
+void
+Srv_Squit (char *origin, char **argv, int argc)
 {
 	Server *s;
-	s = findserver(argv[0]);
+	s = findserver (argv[0]);
 	if (s) {
-		DelServer(argv[0]);
+		DelServer (argv[0]);
 	} else {
-		nlog(LOG_WARNING, LOG_CORE,
-		     "Waring, Squit from Unknown Server %s", argv[0]);
+		nlog (LOG_WARNING, LOG_CORE, "Waring, Squit from Unknown Server %s", argv[0]);
 	}
 
 }
 
 /* BE REALLY CAREFULL ABOUT THE ORDER OF THESE ifdef's */
 
-void Srv_Nick(char *origin, char **argv, int argc)
+void
+Srv_Nick (char *origin, char **argv, int argc)
 {
 	char *realname;
-	AddUser(argv[0], argv[4], argv[5], argv[6],
-		strtoul(argv[8], NULL, 10), strtoul(argv[2], NULL, 10));
-	realname = joinbuf(argv, argc, 9);
-	AddRealName(argv[0], realname);
-	free(realname);
-	nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[3]);
-	UserMode(argv[0], argv[3], 0);
+	AddUser (argv[0], argv[4], argv[5], argv[6], strtoul (argv[8], NULL, 10), strtoul (argv[2], NULL, 10));
+	realname = joinbuf (argv, argc, 9);
+	AddRealName (argv[0], realname);
+	free (realname);
+	nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[3]);
+	UserMode (argv[0], argv[3], 0);
 }
 
-void Srv_Svsnick(char *origin, char **argv, int argc)
+void
+Srv_Svsnick (char *origin, char **argv, int argc)
 {
 	User *u;
-	u = finduser(argv[0]);
+	u = finduser (argv[0]);
 	if (u) {
-		Change_User(u, argv[1]);
+		Change_User (u, argv[1]);
 	} else {
-		nlog(LOG_WARNING, LOG_CORE,
-		     "Warning, Can't find user %s for SVSNICK", argv[0]);
+		nlog (LOG_WARNING, LOG_CORE, "Warning, Can't find user %s for SVSNICK", argv[0]);
 	}
 
 }
-void Srv_Kill(char *origin, char **argv, int argc)
+void
+Srv_Kill (char *origin, char **argv, int argc)
 {
 }
 
 
 
-int SignOn_NewBot(const char *nick, const char *user,
-		  const char *host, const char *rname, long Umode)
+int
+SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
 {
 
-	snewnick_cmd(nick, user, host, rname, Umode);
+	snewnick_cmd (nick, user, host, rname, Umode);
 	if ((me.allbots > 0) || (Umode & UMODE_SERVICES)) {
-		sjoin_cmd(nick, me.chan, MODE_CHANOP);
+		sjoin_cmd (nick, me.chan, MODE_CHANOP);
 #if 0
-		schmode_cmd(nick, me.chan, "+o", nick);
+		schmode_cmd (nick, me.chan, "+o", nick);
 #endif
 		/* all bots join */
 	}

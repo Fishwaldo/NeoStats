@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.h,v 1.5 2003/07/18 06:09:17 fishwaldo Exp $
+** $Id: log.h,v 1.6 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 
@@ -74,17 +74,17 @@
 #ifndef __ASSERT_VOID_CAST
 #define __ASSERT_VOID_CAST (void)
 #endif
-extern void nassert_fail(const char *expr, const char *file, const int line, const char *infunk);
+extern void nassert_fail (const char *expr, const char *file, const int line, const char *infunk);
 
 #define nassert(expr) \
   (__ASSERT_VOID_CAST ((expr) ? 0 :                                           \
 	(nassert_fail(__STRING(expr), __FILE__, __LINE__, __NASSERT_FUNCTION), 0)))
-            
 
 
 
-extern void nlog(int level, int scope, char *fmt, ...);
-void *close_logs();
-void init_logs();
+
+extern void nlog (int level, int scope, char *fmt, ...);
+void *close_logs ();
+void init_logs ();
 
 #endif

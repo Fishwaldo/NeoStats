@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dns.c,v 1.14 2003/06/13 13:11:48 fishwaldo Exp $
+** $Id: dns.c,v 1.15 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 
@@ -72,56 +72,46 @@ list_t *dnslist;
  * @return returns 1 on success, 0 on failure (to add the lookup, not a successfull lookup
 */
 
-int dns_lookup(char *str, adns_rrtype type,
-	       void (*callback) (char *data, adns_answer * a), char *data)
+int
+dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data)
 {
 	lnode_t *dnsnode;
 	DnsLookup *dnsdata;
 	int status;
 	struct sockaddr_in sa;
 
-	strcpy(segv_location, "dns_lookup");
+	strcpy (segv_location, "dns_lookup");
 
-	if (list_isfull(dnslist)) {
-		nlog(LOG_ERROR, LOG_CORE, "DNS: Lookup list is full");
+	if (list_isfull (dnslist)) {
+		nlog (LOG_ERROR, LOG_CORE, "DNS: Lookup list is full");
 		return 0;
 	}
-	dnsdata = malloc(sizeof(DnsLookup));
+	dnsdata = malloc (sizeof (DnsLookup));
 	if (!dnsdata) {
-		nlog(LOG_CRITICAL, LOG_CORE, "DNS: Out of Memory");
+		nlog (LOG_CRITICAL, LOG_CORE, "DNS: Out of Memory");
 		return 0;
 	}
 	/* set the module name */
-	strncpy(dnsdata->mod_name, segvinmodule, MAXHOST);
-	strncpy(dnsdata->data, data, 254);
+	strncpy (dnsdata->mod_name, segvinmodule, MAXHOST);
+	strncpy (dnsdata->data, data, 254);
 	dnsdata->callback = callback;
 	if (type == adns_r_ptr) {
 		sa.sin_family = AF_INET;
-		sa.sin_addr.s_addr = inet_addr(str);
-		status =
-		    adns_submit_reverse(ads, (const struct sockaddr *) &sa,
-					type,
-					adns_qf_owner |
-					adns_qf_cname_loose, NULL,
-					&dnsdata->q);
+		sa.sin_addr.s_addr = inet_addr (str);
+		status = adns_submit_reverse (ads, (const struct sockaddr *) &sa, type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
 	} else {
-		status =
-		    adns_submit(ads, str, type,
-				adns_qf_owner | adns_qf_cname_loose, NULL,
-				&dnsdata->q);
+		status = adns_submit (ads, str, type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
 	}
 	if (status) {
-		nlog(LOG_WARNING, LOG_CORE, "DNS: adns_submit error: %s",
-		     strerror(status));
-		free(dnsdata);
+		nlog (LOG_WARNING, LOG_CORE, "DNS: adns_submit error: %s", strerror (status));
+		free (dnsdata);
 		return 0;
 	}
 
-	nlog(LOG_DEBUG1, LOG_CORE, "DNS: Added dns query %s to list",
-	     data);
+	nlog (LOG_DEBUG1, LOG_CORE, "DNS: Added dns query %s to list", data);
 	/* if we get here, then the submit was successfull. Add it to the list of queryies */
-	dnsnode = lnode_create(dnsdata);
-	list_append(dnslist, dnsnode);
+	dnsnode = lnode_create (dnsdata);
+	list_append (dnslist, dnsnode);
 
 	return 1;
 }
@@ -134,25 +124,24 @@ int dns_lookup(char *str, adns_rrtype type,
  * @return returns 1 on success, 0 on failure
 */
 
-int init_dns()
+int
+init_dns ()
 {
 	int adnsstart;
 
-	strcpy(segv_location, "init_dns");
+	strcpy (segv_location, "init_dns");
 
-	dnslist = list_create(DNS_QUEUE_SIZE);
+	dnslist = list_create (DNS_QUEUE_SIZE);
 	if (!dnslist)
 		return 0;
 #ifndef DEBUG
-	adnsstart =
-	    adns_init(&ads, adns_if_noerrprint | adns_if_noautosys, 0);
+	adnsstart = adns_init (&ads, adns_if_noerrprint | adns_if_noautosys, 0);
 #else
-	adnsstart = adns_init(&ads, adns_if_debug | adns_if_noautosys, 0);
+	adnsstart = adns_init (&ads, adns_if_debug | adns_if_noautosys, 0);
 #endif
 	if (adnsstart) {
-		printf("ADNS init failed: %s\n", strerror(adnsstart));
-		nlog(LOG_CRITICAL, LOG_CORE, "ADNS init failed: %s",
-		     strerror(adnsstart));
+		printf ("ADNS init failed: %s\n", strerror (adnsstart));
+		nlog (LOG_CRITICAL, LOG_CORE, "ADNS init failed: %s", strerror (adnsstart));
 		return 0;
 	}
 	return 1;
@@ -168,66 +157,60 @@ int init_dns()
  * @return Nothing
 */
 
-void do_dns()
+void
+do_dns ()
 {
 	lnode_t *dnsnode, *dnsnode1;
 	int status;
 	DnsLookup *dnsdata;
 
-	strcpy(segv_location, "do_dns");
+	strcpy (segv_location, "do_dns");
 
 	/* if the list is empty, no use doing anything */
-	if (list_isempty(dnslist))
+	if (list_isempty (dnslist))
 		return;
 
-	dnsnode = list_first(dnslist);
+	dnsnode = list_first (dnslist);
 	while (dnsnode) {
 		/* loop through the list */
-		dnsdata = lnode_get(dnsnode);
-		status = adns_check(ads, &dnsdata->q, &dnsdata->a, NULL);
+		dnsdata = lnode_get (dnsnode);
+		status = adns_check (ads, &dnsdata->q, &dnsdata->a, NULL);
 		/* if status == eagain, the lookup hasn't completed yet */
 		if (status == EAGAIN) {
-			nlog(LOG_DEBUG2, LOG_CORE,
-			     "DNS: Lookup hasn't completed for %s",
-			     &dnsdata->data);
-			dnsnode = list_next(dnslist, dnsnode);
+			nlog (LOG_DEBUG2, LOG_CORE, "DNS: Lookup hasn't completed for %s", &dnsdata->data);
+			dnsnode = list_next (dnslist, dnsnode);
 			break;
 		}
 		/* there was a error */
 		if (status) {
-			nlog(LOG_CRITICAL, LOG_CORE,
-			     "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group",
-			     strerror(status));
-			chanalert(s_Services,
-				  "Bad Error on DNS lookup. Please check logfile");
+			nlog (LOG_CRITICAL, LOG_CORE, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror (status));
+			chanalert (s_Services, "Bad Error on DNS lookup. Please check logfile");
 
 			/* set this so nlog works good */
-			strncpy(segvinmodule, dnsdata->mod_name, MAXHOST);
+			strncpy (segvinmodule, dnsdata->mod_name, MAXHOST);
 
 			/* call the callback function with answer set to NULL */
-			dnsdata->callback(dnsdata->data, NULL);
-			strcpy(segvinmodule, "");
+			dnsdata->callback (dnsdata->data, NULL);
+			strcpy (segvinmodule, "");
 			/* delete from list */
-			dnsnode1 = list_delete(dnslist, dnsnode);
-			dnsnode = list_next(dnslist, dnsnode1);
-			free(dnsdata->a);
-			free(dnsdata);
-			lnode_destroy(dnsnode1);
+			dnsnode1 = list_delete (dnslist, dnsnode);
+			dnsnode = list_next (dnslist, dnsnode1);
+			free (dnsdata->a);
+			free (dnsdata);
+			lnode_destroy (dnsnode1);
 			break;
 		}
-		nlog(LOG_DEBUG2, LOG_CORE,
-		     "DNS: Calling callback function with data %s",
-		     dnsdata->data);
-		strncpy(segvinmodule, dnsdata->mod_name, MAXHOST);
+		nlog (LOG_DEBUG2, LOG_CORE, "DNS: Calling callback function with data %s", dnsdata->data);
+		strncpy (segvinmodule, dnsdata->mod_name, MAXHOST);
 		/* call the callback function */
-		dnsdata->callback(dnsdata->data, dnsdata->a);
-		strcpy(segvinmodule, "");
+		dnsdata->callback (dnsdata->data, dnsdata->a);
+		strcpy (segvinmodule, "");
 		/* delete from list */
-		dnsnode1 = list_delete(dnslist, dnsnode);
-		dnsnode = list_next(dnslist, dnsnode1);
-		free(dnsdata->a);
-		free(dnsdata);
-		lnode_destroy(dnsnode1);
+		dnsnode1 = list_delete (dnslist, dnsnode);
+		dnsnode = list_next (dnslist, dnsnode1);
+		free (dnsdata->a);
+		free (dnsdata);
+		lnode_destroy (dnsnode1);
 	}
 
 }

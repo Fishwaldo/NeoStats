@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.c,v 1.11 2003/07/17 10:13:51 fishwaldo Exp $
+** $Id: log.c,v 1.12 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -51,17 +51,18 @@ struct logs_ {
 
 hash_t *logs;
 
-void *close_logs();
+void *close_logs ();
 
 /** @brief Initilize the logging functions 
  */
-void init_logs()
+void
+init_logs ()
 {
-	logs = hash_create(-1, 0, 0);
+	logs = hash_create (-1, 0, 0);
 	if (!logs) {
-		printf("ERROR: Can't Initilize Log SubSystem. Exiting!");
+		printf ("ERROR: Can't Initilize Log SubSystem. Exiting!");
 		/* if this fails, no need to call do_exit, as this is the first thing that runs... so nothing to do! */
-		exit(-1);
+		exit (-1);
 	}
 }
 
@@ -69,25 +70,25 @@ void init_logs()
  */
 
 
-void *close_logs()
+void *
+close_logs ()
 {
 	hscan_t hs;
 	hnode_t *hn;
 	struct logs_ *logentry;
 
-	hash_scan_begin(&hs, logs);
-	while ((hn = hash_scan_next(&hs)) != NULL) {
-		logentry = hnode_get(hn);
-		fflush(logentry->logfile);
+	hash_scan_begin (&hs, logs);
+	while ((hn = hash_scan_next (&hs)) != NULL) {
+		logentry = hnode_get (hn);
+		fflush (logentry->logfile);
 		logentry->flush = 0;
 #ifdef DEBUG
-		printf("Closing Logfile %s (%s)\n", logentry->name,
-		       (char *) hnode_getkey(hn));
+		printf ("Closing Logfile %s (%s)\n", logentry->name, (char *) hnode_getkey (hn));
 #endif
-		fclose(logentry->logfile);
-		hash_scan_delete(logs, hn);
-		hnode_destroy(hn);
-		free(logentry);
+		fclose (logentry->logfile);
+		hash_scan_delete (logs, hn);
+		hnode_destroy (hn);
+		free (logentry);
 	}
 	return NULL;
 }
@@ -95,113 +96,101 @@ void *close_logs()
 
 /** @Configurable logging function
  */
-void nlog(int level, int scope, char *fmt, ...)
+void
+nlog (int level, int scope, char *fmt, ...)
 {
 	va_list ap;
 	char buf[512], fmttime[80];
 	int gotlog;
 	hnode_t *hn;
 	struct logs_ *logentry;
-	time_t ts = time(NULL);
+	time_t ts = time (NULL);
 
 	if (level <= config.debug) {
 		/* if scope is > 0, then log to a diff file */
 		if (scope > 0) {
-			if (strlen(segvinmodule) > 1) {
-				hn = hash_lookup(logs, segvinmodule);
+			if (strlen (segvinmodule) > 1) {
+				hn = hash_lookup (logs, segvinmodule);
 			} else {
-				nlog(LOG_ERROR, LOG_CORE,
-				     "Warning, nlog called with LOG_MOD, but segvinmodule is blank! Logging to Core");
-				hn = hash_lookup(logs, "core");
+				nlog (LOG_ERROR, LOG_CORE, "Warning, nlog called with LOG_MOD, but segvinmodule is blank! Logging to Core");
+				hn = hash_lookup (logs, "core");
 			}
 		} else {
-			hn = hash_lookup(logs, "core");
+			hn = hash_lookup (logs, "core");
 		}
 		if (hn) {
 			/* we found our log entry */
-			logentry = hnode_get(hn);
+			logentry = hnode_get (hn);
 			gotlog = 1;
 		} else {
 			/* log file not found */
-			if ((strlen(segvinmodule) <= 1) && (scope > 0)) {
+			if ((strlen (segvinmodule) <= 1) && (scope > 0)) {
 #ifdef DEBUG
-				printf
-				    ("segvinmodule is blank, but scope is for Modules!\n");
+				printf ("segvinmodule is blank, but scope is for Modules!\n");
 #endif
 				/* bad, but hey ! */
 				scope = 0;
 			}
-			logentry = malloc(sizeof(struct logs_));
-			strncpy(logentry->name,
-				scope > 0 ? segvinmodule : "core", 30);
-			snprintf(buf, 40, "logs/%s.log",
-				 scope > 0 ? segvinmodule : "NeoStats");
-			logentry->logfile = fopen(buf, "a");
+			logentry = malloc (sizeof (struct logs_));
+			strncpy (logentry->name, scope > 0 ? segvinmodule : "core", 30);
+			snprintf (buf, 40, "logs/%s.log", scope > 0 ? segvinmodule : "NeoStats");
+			logentry->logfile = fopen (buf, "a");
 			logentry->flush = 0;
-			hn = hnode_create(logentry);
-			hash_insert(logs, hn, logentry->name);
+			hn = hnode_create (logentry);
+			hash_insert (logs, hn, logentry->name);
 		}
 
 		if (!logentry->logfile) {
 
 #ifdef DEBUG
-			printf("%s\n", strerror(errno));
-			do_exit(0);
+			printf ("%s\n", strerror (errno));
+			do_exit (0);
 #endif
 		}
-		strftime(fmttime, 80, "%d/%m/%Y[%H:%M]", localtime(&ts));
-		va_start(ap, fmt);
-		vsnprintf(buf, 512, fmt, ap);
+		strftime (fmttime, 80, "%d/%m/%Y[%H:%M]", localtime (&ts));
+		va_start (ap, fmt);
+		vsnprintf (buf, 512, fmt, ap);
 
-		fprintf(logentry->logfile, "(%s) %s %s - %s\n", fmttime,
-			loglevels[level - 1],
-			scope > 0 ? segvinmodule : "CORE", buf);
+		fprintf (logentry->logfile, "(%s) %s %s - %s\n", fmttime, loglevels[level - 1], scope > 0 ? segvinmodule : "CORE", buf);
 		logentry->flush = 1;
 #ifndef DEBUG
 		if (config.foreground)
 #endif
-			printf("%s %s - %s\n", loglevels[level - 1],
-			       scope > 0 ? segvinmodule : "CORE", buf);
-		va_end(ap);
+			printf ("%s %s - %s\n", loglevels[level - 1], scope > 0 ? segvinmodule : "CORE", buf);
+		va_end (ap);
 	}
 }
-void ResetLogs()
+void
+ResetLogs ()
 {
 	char tmp[255], tmp2[255];
-	time_t t = time(NULL);
+	time_t t = time (NULL);
 	hscan_t hs;
 	hnode_t *hn;
 	struct logs_ *logentry;
 
 
-	strcpy(segv_location, "ResetLogs");
-	hash_scan_begin(&hs, logs);
-	while ((hn = hash_scan_next(&hs)) != NULL) {
-		logentry = hnode_get(hn);
+	strcpy (segv_location, "ResetLogs");
+	hash_scan_begin (&hs, logs);
+	while ((hn = hash_scan_next (&hs)) != NULL) {
+		logentry = hnode_get (hn);
 		if (logentry->flush > 0) {
-			fflush(logentry->logfile);
+			fflush (logentry->logfile);
 			logentry->flush = 0;
 #ifdef DEBUG
-			printf("Closing Logfile %s (%s)\n", logentry->name,
-			       (char *) hnode_getkey(hn));
+			printf ("Closing Logfile %s (%s)\n", logentry->name, (char *) hnode_getkey (hn));
 #endif
-			fclose(logentry->logfile);
-			if (!strcasecmp(logentry->name, "core")) {
-				strftime(tmp, 255,
-					 "logs/NeoStats-%m-%d.log",
-					 localtime(&t));
-				rename("logs/NeoStats.log", tmp);
-				logentry->logfile =
-				    fopen("logs/NeoStats.log", "a");
+			fclose (logentry->logfile);
+			if (!strcasecmp (logentry->name, "core")) {
+				strftime (tmp, 255, "logs/NeoStats-%m-%d.log", localtime (&t));
+				rename ("logs/NeoStats.log", tmp);
+				logentry->logfile = fopen ("logs/NeoStats.log", "a");
 			} else {
-				strftime(tmp2, 255, "%m-%d.log",
-					 localtime(&t));
-				snprintf(tmp, 255, "logs/%s-%s",
-					 logentry->name, tmp2);
-				snprintf(tmp2, 255, "logs/%s.log",
-					 logentry->name);
-				rename(tmp2, tmp);
-				logentry->logfile = fopen(tmp2, "a");
+				strftime (tmp2, 255, "%m-%d.log", localtime (&t));
+				snprintf (tmp, 255, "logs/%s-%s", logentry->name, tmp2);
+				snprintf (tmp2, 255, "logs/%s.log", logentry->name);
+				rename (tmp2, tmp);
+				logentry->logfile = fopen (tmp2, "a");
 			}
 		}
 	}
@@ -210,26 +199,27 @@ void ResetLogs()
 
 
 /* this is for printing out details during a assertion failure */
-extern void nassert_fail(const char *expr, const char *file, const int line, const char *infunk) {
+extern void
+nassert_fail (const char *expr, const char *file, const int line, const char *infunk)
+{
 #ifdef HAVE_BACKTRACE
 	void *array[50];
 	size_t size;
 	char **strings;
 	size_t i;
 /* thanks to gnulibc libary for letting me find this usefull function */
-	size = backtrace(array, 10);
-	strings = backtrace_symbols(array, size);
+	size = backtrace (array, 10);
+	strings = backtrace_symbols (array, size);
 #endif
 
-	nlog(LOG_CRITICAL, LOG_CORE, "Assertion Failure!!!!!!!!!!!");
-	nlog(LOG_CRITICAL, LOG_CORE, "Function: %s (%s:%d)", infunk, file, line);
-	nlog(LOG_CRITICAL, LOG_CORE, "Expression: %s", expr);
+	nlog (LOG_CRITICAL, LOG_CORE, "Assertion Failure!!!!!!!!!!!");
+	nlog (LOG_CRITICAL, LOG_CORE, "Function: %s (%s:%d)", infunk, file, line);
+	nlog (LOG_CRITICAL, LOG_CORE, "Expression: %s", expr);
 #ifdef HAVE_BACKTRACE
-		for (i = 1; i < size; i++) {
-			nlog(LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s",
-			     i - 1, strings[i]);
-		}
+	for (i = 1; i < size; i++) {
+		nlog (LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s", i - 1, strings[i]);
+	}
 #endif
-	nlog(LOG_CRITICAL, LOG_CORE, "Shutting Down!");
-	exit(-1);
+	nlog (LOG_CRITICAL, LOG_CORE, "Shutting Down!");
+	exit (-1);
 }

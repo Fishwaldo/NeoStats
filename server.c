@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: server.c,v 1.20 2003/07/15 09:16:15 fishwaldo Exp $
+** $Id: server.c,v 1.21 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -31,64 +31,67 @@
 #include "hash.h"
 #include "log.h"
 
-int fnmatch(const char *, const char *, int flags);
-Server *new_server(char *);
+int fnmatch (const char *, const char *, int flags);
+Server *new_server (char *);
 
 
-void init_server()
+void
+init_server ()
 {
 	if (usr_mds);
 }
 
-Server *new_server(char *name)
+Server *
+new_server (char *name)
 {
 	Server *s;
 	hnode_t *sn;
 
-	s = calloc(sizeof(Server), 1);
+	s = calloc (sizeof (Server), 1);
 	if (!name)
 		name = "";
-	memcpy(s->name, name, MAXHOST);
-	sn = hnode_create(s);
+	memcpy (s->name, name, MAXHOST);
+	sn = hnode_create (s);
 	if (!sn) {
-		nlog(LOG_WARNING, LOG_CORE, "Eeek, Hash is broken\n");
+		nlog (LOG_WARNING, LOG_CORE, "Eeek, Hash is broken\n");
 	}
-	if (hash_isfull(sh)) {
-		nlog(LOG_WARNING, LOG_CORE,
-		     "Eeek, Server Hash is full!\n");
+	if (hash_isfull (sh)) {
+		nlog (LOG_WARNING, LOG_CORE, "Eeek, Server Hash is full!\n");
 	} else {
-		hash_insert(sh, sn, s->name);
+		hash_insert (sh, sn, s->name);
 	}
 	return s;
 }
 
-void AddServer(char *name, char *uplink, int hops)
+void
+AddServer (char *name, char *uplink, int hops)
 {
 	Server *s;
 	char **av;
 	int ac = 0;
 
-	nlog(LOG_DEBUG1, LOG_CORE, "New Server: %s", name);
-	s = new_server(name);
+	nlog (LOG_DEBUG1, LOG_CORE, "New Server: %s", name);
+	s = new_server (name);
 	s->hops = hops;
-	s->connected_since = time(NULL);
+	s->connected_since = time (NULL);
 	/* this is kionda useless right ? */
 /*	s->last_announce = time(NULL); */
 	if (uplink) {
-		memcpy(s->uplink, uplink, MAXHOST);
+		memcpy (s->uplink, uplink, MAXHOST);
 	} else {
-		strcpy(s->uplink, "\0");
+		strcpy (s->uplink, "\0");
 	}
 	s->ping = 0;
 
 	/* run the module event for a new server. */
-	AddStringToList(&av, s->name, &ac);
-	Module_Event("NEWSERVER", av, ac);
-	free(av);
+	AddStringToList (&av, s->name, &ac);
+	Module_Event ("NEWSERVER", av, ac);
+	free (av);
 
 }
 
-void DelServer(char *name)
+void
+DelServer (char *name)
 {
 	Server *s;
 	hnode_t *sn;
@@ -98,83 +101,84 @@ void DelServer(char *name)
 	if (!name) {
 		return;
 	}
-	sn = hash_lookup(sh, name);
+	sn = hash_lookup (sh, name);
 	if (!sn) {
-		nlog(LOG_DEBUG1, LOG_CORE, "DelServer(): %s not found!",
-		     name);
+		nlog (LOG_DEBUG1, LOG_CORE, "DelServer(): %s not found!", name);
 		return;
 	}
-	s = hnode_get(sn);
+	s = hnode_get (sn);
 
 	/* run the event for delete server */
-	AddStringToList(&av, s->name, &ac);
-	Module_Event("SQUIT", av, ac);
-	free(av);
+	AddStringToList (&av, s->name, &ac);
+	Module_Event ("SQUIT", av, ac);
+	free (av);
 
-	hash_delete(sh, sn);
-	hnode_destroy(sn);
-	free(s);
+	hash_delete (sh, sn);
+	hnode_destroy (sn);
+	free (s);
 }
 
-Server *findserver(const char *name)
+Server *
+findserver (const char *name)
 {
 	Server *s;
 	hnode_t *sn;
 
-	sn = hash_lookup(sh, name);
+	sn = hash_lookup (sh, name);
 	if (sn) {
-		s = hnode_get(sn);
+		s = hnode_get (sn);
 		return s;
 	} else {
-		nlog(LOG_DEBUG2, LOG_CORE, "FindServer(): %s not found!",
-		     name);
+		nlog (LOG_DEBUG2, LOG_CORE, "FindServer(): %s not found!", name);
 		return NULL;
 	}
 }
 
-void ServerDump()
+void
+ServerDump ()
 {
 	Server *s;
 	hscan_t ss;
 	hnode_t *sn;
 
-	sendcoders("Server Listing:");
+	sendcoders ("Server Listing:");
 
-	hash_scan_begin(&ss, sh);
-	while ((sn = hash_scan_next(&ss)) != NULL) {
-		s = hnode_get(sn);
-		sendcoders("Server Entry: %s", s->name);
+	hash_scan_begin (&ss, sh);
+	while ((sn = hash_scan_next (&ss)) != NULL) {
+		s = hnode_get (sn);
+		sendcoders ("Server Entry: %s", s->name);
 	}
-	sendcoders("End of Listing.");
+	sendcoders ("End of Listing.");
 }
 
-void init_server_hash()
+void
+init_server_hash ()
 {
-	sh = hash_create(S_TABLE_SIZE, 0, 0);
+	sh = hash_create (S_TABLE_SIZE, 0, 0);
 	if (!sh) {
-		nlog(LOG_CRITICAL, LOG_CORE,
-		     "Create Server Hash Failed\n");
-		do_exit(1);
+		nlog (LOG_CRITICAL, LOG_CORE, "Create Server Hash Failed\n");
+		do_exit (1);
 	}
-	AddServer(me.name, NULL, 0);
+	AddServer (me.name, NULL, 0);
 }
 
-void TimerPings()
+void
+TimerPings ()
 {
 	Server *s;
 	hscan_t ss;
 	hnode_t *sn;
 
-	nlog(LOG_DEBUG3, LOG_CORE, "Sendings pings...");
+	nlog (LOG_DEBUG3, LOG_CORE, "Sendings pings...");
 	ping.ulag = 0;
 
-	hash_scan_begin(&ss, sh);
-	while ((sn = hash_scan_next(&ss)) != NULL) {
-		s = hnode_get(sn);
-		if (!strcmp(me.name, s->name)) {
+	hash_scan_begin (&ss, sh);
+	while ((sn = hash_scan_next (&ss)) != NULL) {
+		s = hnode_get (sn);
+		if (!strcmp (me.name, s->name)) {
 			s->ping = 0;
 			continue;
 		}
-		sping_cmd(me.name, me.name, s->name);
+		sping_cmd (me.name, me.name, s->name);
 	}
 }

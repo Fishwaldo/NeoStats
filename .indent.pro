@@ -1,1 +1,1 @@
--br -ce -ts8 -kr -i8 -ut -v -cdw
+-v -br -brs -cdw -ce -l200 -nbc -ut -ts8 -i8

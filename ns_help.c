@@ -22,12 +22,13 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ns_help.c,v 1.8 2003/06/13 13:11:49 fishwaldo Exp $
+** $Id: ns_help.c,v 1.9 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 #include "stats.h"
 
-void init_ns_help()
+void
+init_ns_help ()
 {
 	if (usr_mds);
 }

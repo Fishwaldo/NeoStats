@@ -42,7 +42,7 @@
 
 /*
 ** NeoStats CVS Identification
-** $Id: dotconf.c,v 1.9 2003/06/13 13:11:48 fishwaldo Exp $
+** $Id: dotconf.c,v 1.10 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 #include <time.h>
@@ -74,16 +74,16 @@ static config_option *config_options[CFG_MODULES];
  * some 'magic' options that are predefined by dot.conf itself for
  * advanced functionality
  */
-static void dotconf_cb_include(char *);	/* magic 'Include' */
-static void dotconf_cb_includepath(char *);	/* magic 'IncludePath' */
+static void dotconf_cb_include (char *);	/* magic 'Include' */
+static void dotconf_cb_includepath (char *);	/* magic 'IncludePath' */
 
-static config_option dotconf_options[] =
-    { {"Include", ARG_STR, dotconf_cb_include, 0},
+static config_option dotconf_options[] = { {"Include", ARG_STR, dotconf_cb_include, 0},
 {"IncludePath", ARG_STR, dotconf_cb_includepath, 0},
 LAST_OPTION
 };
 
-void config_substitute_env(char *str)
+void
+config_substitute_env (char *str)
 {
 	char *cp1, *cp2, *cp3, *eos, *eob;
 	char *env_value;
@@ -91,9 +91,9 @@ void config_substitute_env(char *str)
 	char env_default[CFG_MAX_VALUE + 1];
 	char tmp_value[CFG_MAX_VALUE + 1];
 
-	bzero(env_name, CFG_MAX_VALUE + 1);
-	bzero(env_default, CFG_MAX_VALUE + 1);
-	bzero(tmp_value, CFG_MAX_VALUE + 1);
+	bzero (env_name, CFG_MAX_VALUE + 1);
+	bzero (env_default, CFG_MAX_VALUE + 1);
+	bzero (tmp_value, CFG_MAX_VALUE + 1);
 	cp1 = str;
 	eob = cp1 + CFG_MAX_VALUE + 1;
 	cp2 = tmp_value;
@@ -122,17 +122,15 @@ void config_substitute_env(char *str)
 					cp1++;
 
 			if (*cp1 != '}')
-				fprintf(stderr, "%s:%d: Unbalanced '{'\n",
-					dotconf_file, dotconf_line);
+				fprintf (stderr, "%s:%d: Unbalanced '{'\n", dotconf_file, dotconf_line);
 			else {
 				cp1++;	/* skip } */
-				if ((env_value = getenv(env_name)) != NULL) {
-					strncat(cp2, env_value, eos - cp2);
-					cp2 += strlen(env_value);
+				if ((env_value = getenv (env_name)) != NULL) {
+					strncat (cp2, env_value, eos - cp2);
+					cp2 += strlen (env_value);
 				} else {
-					strncat(cp2, env_default,
-						eos - cp2);
-					cp2 += strlen(env_default);
+					strncat (cp2, env_default, eos - cp2);
+					cp2 += strlen (env_default);
 				}
 			}
 
@@ -142,10 +140,11 @@ void config_substitute_env(char *str)
 	}
 	*cp2 = '\0';		/* terminate buffer */
 
-	strncpy(str, tmp_value, CFG_MAX_VALUE + 1);
+	strncpy (str, tmp_value, CFG_MAX_VALUE + 1);
 }
 
-void config_register_options(config_option * options)
+void
+config_register_options (config_option * options)
 {
 	int i;
 	for (i = 0; i < CFG_MODULES && config_options[i]; i++) {
@@ -153,14 +152,15 @@ void config_register_options(config_option * options)
 	config_options[i] = options;
 }
 
-int config_parse(FILE * config)
+int
+config_parse (FILE * config)
 {
 	static char buffer[CFG_BUFSIZE];
 	static char *here_string;	/* Damn FreeBSD */
 	static char *here_limit;
 	static char *here_doc;
 
-	while ((fgets(buffer, CFG_BUFSIZE, config)) != NULL) {	/* for each line */
+	while ((fgets (buffer, CFG_BUFSIZE, config)) != NULL) {	/* for each line */
 		char *cp1, *cp2;	/* generic char pointer                          */
 		char *eob, *eos;	/* end of buffer; end of string                  */
 		char sq, dq;	/* state flags: single/double quote              */
@@ -181,10 +181,10 @@ int config_parse(FILE * config)
 
 		/* initialize char pointer */
 		cp1 = buffer;
-		eob = cp1 + strlen(cp1);	/* calculate end of buffer */
+		eob = cp1 + strlen (cp1);	/* calculate end of buffer */
 
 		/* skip any whitspace of indented lines */
-		while ((cp1 != eob) && (isspace(*cp1)))
+		while ((cp1 != eob) && (isspace (*cp1)))
 			cp1++;
 		/* skip line if it only contains whitespace */
 		if (cp1 == eob)
@@ -192,18 +192,15 @@ int config_parse(FILE * config)
 
 		/* get first token: read the name of a possible option */
 		cp2 = name;
-		while ((*cp1 != '\0') && (!isspace(*cp1)))
+		while ((*cp1 != '\0') && (!isspace (*cp1)))
 			*cp2++ = *cp1++;
 		*cp2 = '\0';
 
 		/* and now find the entry in the option table, and call the callback */
-		bzero(&opt, sizeof(config_option));
-		for (mod = 0; mod < CFG_MODULES && config_options[mod];
-		     mod++)
+		bzero (&opt, sizeof (config_option));
+		for (mod = 0; mod < CFG_MODULES && config_options[mod]; mod++)
 			for (i = 0; config_options[mod][i].name[0]; i++)
-				if (!strncmp
-				    (name, config_options[mod][i].name,
-				     CFG_MAX_OPTION)) {
+				if (!strncmp (name, config_options[mod][i].name, CFG_MAX_OPTION)) {
 					opt = config_options[mod][i];
 					break;	/* found it; break out of for */
 				}
@@ -216,58 +213,54 @@ int config_parse(FILE * config)
 		} else if (opt.type == ARG_RAW) {
 			/* if it is an ARG_RAW type, save some time and call the
 			   callback now */
-			opt.callback(cp1, opt.userdata);
+			opt.callback (cp1, opt.userdata);
 			continue;
 		} else if (opt.type == ARG_STR) {
 			/* check if it's a here-document and act accordingly */
 			char *cp3 = cp1;
 
-			bzero(&here_limit, 9);
+			bzero (&here_limit, 9);
 
 			/* skip whitespace */
 			while ((cp3 < eob) && (*cp3 != '\0')
-			       && (isspace(*cp3)))
+			       && (isspace (*cp3)))
 				cp3++;
 
-			if (!strncmp("<<", cp3, 2)) {	/* here string sign */
+			if (!strncmp ("<<", cp3, 2)) {	/* here string sign */
 				/* it's a here-document: yeah, what a cool feature ;) */
 				struct stat finfo;
 
-				stat(dotconf_file, &finfo);
+				stat (dotconf_file, &finfo);
 				/* 
 				 * allocate a buffer of filesize bytes; should be enough to
 				 * prevent buffer overflows
 				 */
-				here_doc = malloc(finfo.st_size + 1);	/* allocate  buffer memory */
-				bzero(here_doc, finfo.st_size + 1);
+				here_doc = malloc (finfo.st_size + 1);	/* allocate  buffer memory */
+				bzero (here_doc, finfo.st_size + 1);
 
-				strncpy(here_limit, cp3 + 2, 8);	/*   copy here-delimiter */
-				while (fgets(buffer, CFG_BUFSIZE, config)) {
-					if (!strncmp
-					    (here_limit, buffer,
-					     strlen(here_limit))) {
+				strncpy (here_limit, cp3 + 2, 8);	/*   copy here-delimiter */
+				while (fgets (buffer, CFG_BUFSIZE, config)) {
+					if (!strncmp (here_limit, buffer, strlen (here_limit))) {
 						here_string = 0;
 						break;
 					}
-					strcat(here_doc, buffer);	/*     append to  buffer */
+					strcat (here_doc, buffer);	/*     append to  buffer */
 				}
 				if (here_string)
-					fprintf(stderr,
-						"Line %d: Unterminated here-document!\n",
-						dotconf_line);
-				here_doc[strlen(here_doc) - 1] = '\0';	/*    strip newline */
-				opt.callback(here_doc, opt.userdata);	/* call back */
+					fprintf (stderr, "Line %d: Unterminated here-document!\n", dotconf_line);
+				here_doc[strlen (here_doc) - 1] = '\0';	/*    strip newline */
+				opt.callback (here_doc, opt.userdata);	/* call back */
 
-				free(here_doc);	/*  free buffer memory */
+				free (here_doc);	/*  free buffer memory */
 
 				continue;
 			}
 
 		}
 
-		free(here_doc);
+		free (here_doc);
 		/* skip whitespace */
-		while ((cp1 < eob) && (*cp1 != '\0') && (isspace(*cp1)))
+		while ((cp1 < eob) && (*cp1 != '\0') && (isspace (*cp1)))
 			cp1++;
 
 		/* start reading option arguments */
@@ -302,18 +295,17 @@ int config_parse(FILE * config)
 				break;
 			}
 			/* unquoted space: start a new option argument */
-			if (isspace(*cp1) && !dq && !sq) {
+			if (isspace (*cp1) && !dq && !sq) {
 				*cp2 = '\0';	/* terminate current argument */
 				/* increment word counter and update char pointer */
 				cp2 = values[++word_count];
 				/* skip all whitespace between 2 arguments */
-				while (isspace(*(cp1 + 1))
+				while (isspace (*(cp1 + 1))
 				       && (*cp1 != '\0'))
 					cp1++;
 			}
 			/* not space or quoted ; eat it: */
-			else if ((((!isspace(*cp1) && !dq && !sq
-				    && *cp1 != '"' && *cp1 != '\'')
+			else if ((((!isspace (*cp1) && !dq && !sq && *cp1 != '"' && *cp1 != '\'')
 				   /* dont take quote if quoting: */
 				   || (dq && (*cp1 != '"'))
 				   || (sq && *cp1 != '\''))))
@@ -329,29 +321,24 @@ int config_parse(FILE * config)
 				{
 					/* the value is true if the argument is Yes, On or 1 */
 					/* kludge code follows ;) */
-					int arg = ((values[0][0] == 'Y'
-						    || values[0][1] == 'y')
+					int arg = ((values[0][0] == 'Y' || values[0][1] == 'y')
 						   || (values[0][0] == '1')
-						   || ((values[0][0] == 'o'
-							|| values[0][0] ==
-							'O')
-						       && (values[0][1] ==
-							   'n'
-							   || values[0][1]
+						   || ((values[0][0] == 'o' || values[0][0] == 'O')
+						       && (values[0][1] == 'n' || values[0][1]
 							   == 'N')));
-					opt.callback(arg, USER_DATA);
+					opt.callback (arg, USER_DATA);
 					break;
 				}
 			case ARG_INT:
 				{
-					int arg = atoi(values[0]);
-					opt.callback(arg, USER_DATA);
+					int arg = atoi (values[0]);
+					opt.callback (arg, USER_DATA);
 					break;
 				}
 			case ARG_STR:
 				{
-					config_substitute_env(values[0]);
-					opt.callback(values[0], USER_DATA);
+					config_substitute_env (values[0]);
+					opt.callback (values[0], USER_DATA);
 					break;
 				}
 			case ARG_LIST:
@@ -359,22 +346,19 @@ int config_parse(FILE * config)
 					char *data[CFG_VALUES];
 					int i;
 					for (i = 0; i < word_count; i++) {	/* prepare list */
-						config_substitute_env
-						    (values[i]);
-						data[i] =
-						    strdup(values[i]);
+						config_substitute_env (values[i]);
+						data[i] = strdup (values[i]);
 					}
-					opt.callback(data, word_count,
-						     USER_DATA);
+					opt.callback (data, word_count, USER_DATA);
 
 					for (i = 0; i < word_count; i++)	/* dump list */
-						free(data[i]);
+						free (data[i]);
 
 					break;
 				}
 			case ARG_NONE:
 				{
-					opt.callback();
+					opt.callback ();
 					break;
 				}
 			case ARG_RAW:	/* this has been handled before */
@@ -392,83 +376,78 @@ int config_parse(FILE * config)
  * open and parse the config-file using the config_options list
  * as reference for what callback to call and what type of arguments to provide
  */
-int config_read(char *fname, config_option * options)
+int
+config_read (char *fname, config_option * options)
 {
 	FILE *config;
 	char *dc_env;		/* pointer to DC_INCLUDEPATH */
 
-	if (access(fname, R_OK)) {
-		fprintf(stderr, "Error opening configuration file '%s'\n",
-			fname);
+	if (access (fname, R_OK)) {
+		fprintf (stderr, "Error opening configuration file '%s'\n", fname);
 		return 1;
 	}
 
-	dotconf_file = malloc(CFG_MAX_FILENAME + 1);	/* allocate fname buffer */
-	bzero(dotconf_file, CFG_MAX_FILENAME + 1);
-	bzero(dotconf_includepath, CFG_MAX_FILENAME + 1);
+	dotconf_file = malloc (CFG_MAX_FILENAME + 1);	/* allocate fname buffer */
+	bzero (dotconf_file, CFG_MAX_FILENAME + 1);
+	bzero (dotconf_includepath, CFG_MAX_FILENAME + 1);
 
-	strncpy(dotconf_file, fname, CFG_MAX_FILENAME);	/* fill fname buffer */
+	strncpy (dotconf_file, fname, CFG_MAX_FILENAME);	/* fill fname buffer */
 
 	/* take includepath from environment if present */
-	if ((dc_env = getenv(CFG_INCLUDEPATH_ENV)) != NULL)
-		strncpy(dotconf_includepath, dc_env, CFG_MAX_FILENAME);
+	if ((dc_env = getenv (CFG_INCLUDEPATH_ENV)) != NULL)
+		strncpy (dotconf_includepath, dc_env, CFG_MAX_FILENAME);
 
-	config_register_options(dotconf_options);	/* internal options */
-	config_register_options(options);	/* register main options */
+	config_register_options (dotconf_options);	/* internal options */
+	config_register_options (options);	/* register main options */
 
-	config = fopen(dotconf_file, "r");
-	config_parse(config);	/* fire off parser */
-	fclose(config);
+	config = fopen (dotconf_file, "r");
+	config_parse (config);	/* fire off parser */
+	fclose (config);
 
-	free(dotconf_file);	/* free fname buffer */
+	free (dotconf_file);	/* free fname buffer */
 
 	return 0;
 }
 
 /* callbacks for internal options */
 
-void dotconf_cb_include(char *str)
+void
+dotconf_cb_include (char *str)
 {
 	FILE *config;
 	char old_fname[CFG_MAX_FILENAME];
 
-	bzero(&old_fname, CFG_MAX_FILENAME);
-	strcpy(old_fname, dotconf_file);
+	bzero (&old_fname, CFG_MAX_FILENAME);
+	strcpy (old_fname, dotconf_file);
 	if (str[0] != '/' && dotconf_includepath[0] != '\0') {
 		/* relative file AND include path is used */
 
 		/* check for length of fully qualified filename */
-		if ((strlen(str) + strlen(dotconf_includepath) + 1) ==
-		    CFG_MAX_FILENAME) {
-			fprintf(stderr,
-				"%s:%d: Absolute filename too long (>%d)\n",
-				dotconf_file, dotconf_line,
-				CFG_MAX_FILENAME);
+		if ((strlen (str) + strlen (dotconf_includepath) + 1) == CFG_MAX_FILENAME) {
+			fprintf (stderr, "%s:%d: Absolute filename too long (>%d)\n", dotconf_file, dotconf_line, CFG_MAX_FILENAME);
 			return;
 		}
 
-		snprintf(dotconf_file, CFG_MAX_FILENAME + 1, "%s/%s",
-			 dotconf_includepath, str);
+		snprintf (dotconf_file, CFG_MAX_FILENAME + 1, "%s/%s", dotconf_includepath, str);
 	} else			/* fully qualified, or no includepath */
-		strncpy(dotconf_file, str, CFG_MAX_FILENAME);
+		strncpy (dotconf_file, str, CFG_MAX_FILENAME);
 
-	if (access(dotconf_file, R_OK)) {
-		fprintf(stderr,
-			"Error in %s line %d: Cannot open %s for inclusion\n",
-			old_fname, dotconf_line, dotconf_file);
-		strcpy(dotconf_file, old_fname);	/* restore settings */
+	if (access (dotconf_file, R_OK)) {
+		fprintf (stderr, "Error in %s line %d: Cannot open %s for inclusion\n", old_fname, dotconf_line, dotconf_file);
+		strcpy (dotconf_file, old_fname);	/* restore settings */
 		return;
 	}
 
-	config = fopen(dotconf_file, "r");
-	config_parse(config);
-	fclose(config);
-	strcpy(dotconf_file, old_fname);
+	config = fopen (dotconf_file, "r");
+	config_parse (config);
+	fclose (config);
+	strcpy (dotconf_file, old_fname);
 }
 
-void dotconf_cb_includepath(char *str)
+void
+dotconf_cb_includepath (char *str)
 {
-	char *env = getenv("DC_INCLUDEPATH");
+	char *env = getenv ("DC_INCLUDEPATH");
 	if (!env)		/* environment overrides configuration file setting */
-		strncpy(dotconf_includepath, str, CFG_MAX_FILENAME - 1);
+		strncpy (dotconf_includepath, str, CFG_MAX_FILENAME - 1);
 }

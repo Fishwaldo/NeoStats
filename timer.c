@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: timer.c,v 1.24 2003/06/13 13:11:49 fishwaldo Exp $
+** $Id: timer.c,v 1.25 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -33,68 +33,69 @@ static time_t last_cache_save;
 static int midnight = 0;
 
 
-void chk()
+void
+chk ()
 {
 	Mod_Timer *mod_ptr = NULL;
-	time_t current = time(NULL);
+	time_t current = time (NULL);
 	hscan_t ts;
 	hnode_t *tn;
 
-	strcpy(segv_location, "chk");
 /* First, lets see if any modules have a function that is due to run..... */
-	hash_scan_begin(&ts, th);
-	while ((tn = hash_scan_next(&ts)) != NULL) {
-		mod_ptr = hnode_get(tn);
+	hash_scan_begin (&ts, th);
+	while ((tn = hash_scan_next (&ts)) != NULL) {
+		strcpy (segv_location, "chk");
+		mod_ptr = hnode_get (tn);
 		if (current - mod_ptr->lastrun > mod_ptr->interval) {
-			strcpy(segv_location, mod_ptr->modname);
-			strcpy(segvinmodule, mod_ptr->modname);
-			if (setjmp(sigvbuf) == 0) {
-				mod_ptr->function();
-				mod_ptr->lastrun = (int) time(NULL);
+			strcpy (segv_location, mod_ptr->modname);
+			strcpy (segvinmodule, mod_ptr->modname);
+			if (setjmp (sigvbuf) == 0) {
+				if (mod_ptr->function () < 0) {
+					nlog(LOG_DEBUG2, LOG_CORE, "Deleting Timer %s for Module %s as requested", mod_ptr->timername, mod_ptr->modname);
+					hash_scan_delete(th, tn);
+					hnode_destroy(tn);
+					free(mod_ptr);
+				} else {
+					mod_ptr->lastrun = (int) time (NULL);
+				}
 			} else {
-				nlog(LOG_CRITICAL, LOG_CORE,
-				     "setjmp() Failed, Can't call Module %s\n",
-				     mod_ptr->modname);
+				nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", mod_ptr->modname);
 			}
-			strcpy(segvinmodule, "");
-			strcpy(segv_location, "Module_Event_Return");
+			strcpy (segvinmodule, "");
 		}
 	}
 
-	if (current - ping.last_sent > 60) {
-		TimerPings();
-		ping.last_sent = time(NULL);
-		if (hash_verify(sockh) == 0) {
-			nlog(LOG_CRITICAL, LOG_CORE,
-			     "Eeeek, Corruption of the socket hash");
+	if (current - ping.last_sent > me.pingtime) {
+		TimerPings ();
+		ping.last_sent = time (NULL);
+		if (hash_verify (sockh) == 0) {
+			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the socket hash");
 		}
-		if (hash_verify(mh) == 0) {
-			nlog(LOG_CRITICAL, LOG_CORE,
-			     "Eeeek, Corruption of the Module hash");
+		if (hash_verify (mh) == 0) {
+			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Module hash");
 		}
-		if (hash_verify(bh) == 0) {
-			nlog(LOG_CRITICAL, LOG_CORE,
-			     "Eeeek, Corruption of the Bot hash");
+		if (hash_verify (bh) == 0) {
+			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Bot hash");
 		}
-		if (hash_verify(th) == 0) {
-			nlog(LOG_CRITICAL, LOG_CORE,
-			     "Eeeek, Corruption of the Timer hash");
+		if (hash_verify (th) == 0) {
+			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Timer hash");
 		}
 		/* flush log files */
-		fflush(NULL);
+		fflush (NULL);
 	}
-	if (is_midnight() == 1 && midnight == 0) {
-		TimerMidnight();
+	if (is_midnight () == 1 && midnight == 0) {
+		TimerMidnight ();
 		midnight = 1;
 	} else {
-		if (midnight == 1 && is_midnight() == 0)
+		if (midnight == 1 && is_midnight () == 0)
 			midnight = 0;
 	}
 }
 
-void TimerReset()
+void
+TimerReset ()
 {
-	time_t current = time(NULL);
+	time_t current = time (NULL);
 	last_stats_save = current;
 	last_lag_check = current;
 	last_cache_save = current;
@@ -104,17 +105,18 @@ void TimerReset()
 
 
 
-void TimerMidnight()
+void
+TimerMidnight ()
 {
-	nlog(LOG_DEBUG1, LOG_CORE, "Its midnight!!! -> %s",
-	     sctime(time(NULL)));
-	ResetLogs();
+	nlog (LOG_DEBUG1, LOG_CORE, "Its midnight!!! -> %s", sctime (time (NULL)));
+	ResetLogs ();
 }
 
-int is_midnight()
+int
+is_midnight ()
 {
-	time_t current = time(NULL);
-	struct tm *ltm = localtime(&current);
+	time_t current = time (NULL);
+	struct tm *ltm = localtime (&current);
 
 	if (ltm->tm_hour == 0)
 		return 1;

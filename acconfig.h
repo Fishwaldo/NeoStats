@@ -17,19 +17,20 @@
 /* Define if we want to include rpc/types.h.  Crap BSDs put INADDR_LOOPBACK there. */
 #undef HAVEUSE_RPCTYPES_H
 
-@BOTTOM@
-
+@ BOTTOM @
 /* Use the definitions: */
-
 #ifndef HAVE_INLINE
 #define inline
 #endif
-
 #ifdef HAVE_POLL
 #include <sys/poll.h>
 #else
 /* kludge it up */
-struct pollfd { int fd; short events; short revents; };
+	struct pollfd {
+	int fd;
+	short events;
+	short revents;
+};
 #define POLLIN  1
 #define POLLPRI 2
 #define POLLOUT 4

@@ -20,14 +20,14 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.h,v 1.1 2003/06/26 05:25:09 fishwaldo Exp $
+** $Id: sock.h,v 1.2 2003/07/30 13:58:22 fishwaldo Exp $
 */
 
 #ifndef SOCK_H
 #define SOCK_H
 
 
-void sts(char *fmt, ...);
+void sts (char *fmt, ...);
 
 
 #endif
