@@ -91,12 +91,12 @@ int new_m_version(char *origin, char **av, int ac)
 	return 0;
 }
 
-int __ModInit()
+int __ModInit(int modnum, int apiver)
 {
 	srconf.auth = 0;
 	/* only a max of 10 serviceroots */
 	srconf.ul = list_create(10);
-	if (!config_read("neostats.cfg", options) == 0) {
+	if (!config_read(CONFIG_NAME, options) == 0) {
 		nlog(LOG_WARNING, LOG_CORE,
 		     "ServiceRoots: ehh, config failed");
 		/* we can't unload the extauth module so don't return -1 */
