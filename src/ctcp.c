@@ -156,14 +156,14 @@ int irc_ctcp_version_req (Bot* botptr, Client* target)
 static int ctcp_req_finger (CmdParams* cmdparams)
 {
 	dlog (DEBUG5, "CTCP FINGER request from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	dlog (DEBUG5, "CTCP finger requests currently not supported");
+	SendModuleEvent (EVENT_CTCPFINGERREQ, cmdparams, cmdparams->bot->moduleptr);
 	return NS_SUCCESS;
 }
 
 static int ctcp_rpl_finger (CmdParams* cmdparams)
 {
 	dlog (DEBUG5, "CTCP FINGER reply from %s to %s", cmdparams->bot->name, cmdparams->source->name);
-	dlog (DEBUG5, "CTCP finger replies currently not supported");
+	SendModuleEvent (EVENT_CTCPFINGERRPL, cmdparams, cmdparams->bot->moduleptr);
 	return NS_SUCCESS;
 }
 
@@ -177,7 +177,7 @@ int irc_ctcp_finger_req (Bot* botptr, Client* target)
 static int ctcp_req_action (CmdParams* cmdparams)
 {
 	dlog (DEBUG5, "CTCP ACTION request from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	dlog (DEBUG5, "CTCP action requests currently not supported");
+	SendModuleEvent (EVENT_CTCPACTIONREQ, cmdparams, cmdparams->bot->moduleptr);
 	return NS_SUCCESS;
 }
 
@@ -205,14 +205,14 @@ static int ctcp_rpl_dcc (CmdParams* cmdparams)
 static int ctcp_req_time (CmdParams* cmdparams)
 {
 	dlog (DEBUG5, "CTCP TIME request from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	dlog (DEBUG5, "CTCP TIME requests currently not supported");
+	SendModuleEvent (EVENT_CTCPTIMEREQ, cmdparams, cmdparams->bot->moduleptr);
 	return NS_SUCCESS;
 }
 
 static int ctcp_rpl_time (CmdParams* cmdparams)
 {
 	dlog (DEBUG5, "CTCP TIME reply from %s to %s", cmdparams->bot->name, cmdparams->source->name);
-	dlog (DEBUG5, "CTCP TIME replies currently not supported");
+	SendModuleEvent (EVENT_CTCPTIMERPL, cmdparams, cmdparams->bot->moduleptr);
 	return NS_SUCCESS;
 }
 
@@ -226,6 +226,7 @@ int irc_ctcp_time_req (Bot* botptr, Client* target)
 static int ctcp_req_ping (CmdParams* cmdparams)
 {
 	dlog (DEBUG5, "CTCP PING request from %s to %s", cmdparams->source->name, cmdparams->bot->name);
+	SendModuleEvent (EVENT_CTCPPINGREQ, cmdparams, cmdparams->bot->moduleptr);
 	dlog (DEBUG5, "CTCP PING requests currently not supported");
 	return NS_SUCCESS;
 }
@@ -233,7 +234,7 @@ static int ctcp_req_ping (CmdParams* cmdparams)
 static int ctcp_rpl_ping (CmdParams* cmdparams)
 {
 	dlog (DEBUG5, "CTCP PING reply from %s to %s", cmdparams->bot->name, cmdparams->source->name);
-	dlog (DEBUG5, "CTCP PING replies currently not supported");
+	SendModuleEvent (EVENT_CTCPPINGRPL, cmdparams, cmdparams->bot->moduleptr);
 	return NS_SUCCESS;
 }
 

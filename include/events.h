@@ -278,6 +278,51 @@ typedef enum Event {
  */
 	EVENT_CTCPVERSIONREQ,
 
+/*  EVENT_CTCPFINGERRPL 
+ *    parameters:
+ *      user in cmdparams->source
+ *      finger in cmdparams->param
+ */
+	EVENT_CTCPFINGERRPL,
+
+/*  EVENT_CTCPFINGERREQ
+ *    parameters:
+ *      user in cmdparams->source
+ */
+	EVENT_CTCPFINGERREQ,
+
+/*  EVENT_CTCPACTIONREQ
+ *    parameters:
+ *      user in cmdparams->source
+ */
+	EVENT_CTCPACTIONREQ,
+
+/*  EVENT_CTCPTIMERPL 
+ *    parameters:
+ *      user in cmdparams->source
+ *      time in cmdparams->param
+ */
+	EVENT_CTCPTIMERPL,
+
+/*  EVENT_CTCPTIMEREQ
+ *    parameters:
+ *      user in cmdparams->source
+ */
+	EVENT_CTCPTIMEREQ,
+
+/*  EVENT_CTCPPINGRPL 
+ *    parameters:
+ *      user in cmdparams->source
+ *      ping in cmdparams->param
+ */
+	EVENT_CTCPPINGRPL,
+
+/*  EVENT_CTCPPINGREQ
+ *    parameters:
+ *      user in cmdparams->source
+ */
+	EVENT_CTCPPINGREQ,
+
 /*  DCC events 
  *    Generated in response to ctcp dcc events
  */
