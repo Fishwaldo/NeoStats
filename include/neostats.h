@@ -1017,6 +1017,7 @@ EXPORTFUNC void AddStringToList (char ***List, char S[], int *C);
 EXPORTFUNC void strip_mirc_codes(char *text);
 EXPORTFUNC char *sctime (time_t t);
 EXPORTFUNC char *sftime (time_t t);
+EXPORTFUNC char *make_safe_filename (char *name);
 
 /* ircd.c */
 EXPORTFUNC char *joinbuf (char **av, int ac, int from);
@@ -1249,7 +1250,7 @@ EXPORTFUNC void DisableEvent (Event event);
  */
 
 /* File system functions */
-int sys_mkdir (const char *filename, mode_t mode);
+EXPORTFUNC int sys_mkdir (const char *filename, mode_t mode);
 
 /* Socket functions */
 #ifdef WIN32

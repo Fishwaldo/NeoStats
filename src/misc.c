@@ -27,6 +27,42 @@
 #include "neostats.h"
 #include "services.h"
 
+/* @brief Make the name of a file safe for a filename
+ * 
+ * given a name, make sure its a safe name for a filename
+ * 
+ * @params name the name to check. Warning, the name is modified
+ *
+ * @returns a modified version of the name, that is safe to use as a filename
+ */
+
+char *make_safe_filename (char *name) 
+{
+	char *ptr;
+
+	ptr = name;
+	while (*ptr) {
+		switch (*ptr) {
+#ifdef WIN32
+			case '#':
+			*ptr = '_';
+			break;
+#endif
+			case '/':
+#ifdef WIN32
+			*ptr = '.';
+#else
+			*ptr = ':';
+#endif
+			break;
+		}
+		ptr++;
+	}
+	return name;
+}
+
+
+
 /** @brief strip newlines carriage returns
  *
  * removes newlines and carriage returns from a string
