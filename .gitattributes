@@ -247,7 +247,9 @@ lib/curl/version.c -text
 lib/gdbm/COPYING -text
 lib/gdbm/ChangeLog -text
 lib/gdbm/INSTALL -text
+lib/gdbm/Makefile.am -text
 lib/gdbm/Makefile.in -text
+lib/gdbm/Makefile.in.old -text
 lib/gdbm/NEWS -text
 lib/gdbm/README -text
 lib/gdbm/aclocal.m4 -text

@@ -59,7 +59,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = adns rta gdbm curl pcre
+DIST_SUBDIRS = adns rta curl pcre
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 pkglibdir = $(prefix)/modules
 ACLOCAL = @ACLOCAL@
@@ -185,7 +185,7 @@ wi_PWD = @wi_PWD@
 @BUILD_PCRE_TRUE@PCREDIR = pcre
 @BUILD_CURL_FALSE@CURLDIR = 
 @BUILD_CURL_TRUE@CURLDIR = curl
-SUBDIRS = adns rta gdbm $(CURLDIR) $(PCREDIR)
+SUBDIRS = adns rta $(CURLDIR) $(PCREDIR)
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
