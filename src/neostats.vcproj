@@ -420,6 +420,9 @@
 			RelativePath="..\makeconf">
 		</File>
 		<File
+			RelativePath=".\Makefile.am">
+		</File>
+		<File
 			RelativePath="..\modules\modules.txt">
 		</File>
 		<File

@@ -3,7 +3,9 @@ NeoStats 3.x ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
-* NeoStats * Version 3.0.prealpha2-dev
+* NeoStats * Version 3.0.prealpha2
+ - First recommended release to devlist only as prealpha2. (M)
+ - Port all database interaction to new DBA interface. (M)
  - Add support for GDBM as an alternative to BDB. (M)
  - New DB interface to replace keeper calls. (M)
  - Lots of AutoMake updates so that distros work again and external modules
@@ -13,7 +15,7 @@ Fish (F), Mark (M)
  - Fix up memory leaks and missing list/hash clean ups. (M)
 
 * NeoStats * Version 3.0.prealpha1
- - First recommened release to devlist only as prealpha1. (M)
+ - First recommended release to devlist only as prealpha1. (M)
  - New moddata API. We now have two values for use by modules, one being an 
    allocated address and one a value. This allows the core to clean up after
    modules in the event that they fail to. (M)

@@ -232,7 +232,7 @@ const char *ns_help_set_joinserviceschan[] = {
 };
 
 const char *ns_help_set_splittime[] = {
-	"\SPLITTIME <timediff>\2",
+	"\2SPLITTIME <timediff>\2",
 	"This is used to determine if users connecting to the network",
 	"are part of a net join (when two servers link together)",
 	"This setting should not be changed unless you know the",
