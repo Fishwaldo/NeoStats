@@ -250,7 +250,7 @@ bot_setting ss_settings[]=
 	{"HTMLPATH",	&StatServ.htmlpath,	SET_TYPE_STRING,	0, 255,	NS_ULEVEL_ADMIN,	"HTML_Path",		NULL,		ss_help_set_htmlpath },
 	{"MSGTHROTTLE",	&StatServ.interval,	SET_TYPE_INT,		0, 99, 	NS_ULEVEL_ADMIN,	"Wallop_Throttle",	"seconds",	ss_help_set_msgthrottle },
 	{"LAGWALLOP",	&StatServ.lag,		SET_TYPE_INT,		0, 99, 	NS_ULEVEL_ADMIN,	"Lag",				"seconds",	ss_help_set_lagwallop },
-	{NULL,			NULL,				0,					0, 0,	NULL,				NULL,		NULL },
+	{NULL,			NULL,				0,					0, 0,	0,					NULL,				NULL,		NULL },
 };
 
 int topchan(const void *key1, const void *key2)
