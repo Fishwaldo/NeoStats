@@ -524,6 +524,10 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 	char **argv;
 
 	SET_SEGV_LOCATION();
+	if( av[0] == NULL) {
+		nlog (LOG_DEBUG1, LOG_CORE, "m_private: dropping unknown privmsg from %s, to %s : %s", origin, av[0], privmsgbuffer);
+		return;
+	}
 	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], privmsgbuffer);
 	argc = split_buf (privmsgbuffer, &argv, 1);
 	ModuleFunction (cmdptr, MSG_NOTICE, origin, argv, argc);
@@ -556,6 +560,10 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 	char target[64];
 
 	SET_SEGV_LOCATION();
+	if( av[0] == NULL) {
+		nlog (LOG_DEBUG1, LOG_CORE, "m_private: dropping unknown privmsg from %s, to %s : %s", origin, av[0], privmsgbuffer);
+		return;
+	}
 	nlog (LOG_DEBUG1, LOG_CORE, "m_private: from %s, to %s : %s", origin, av[0], privmsgbuffer);
 	/* its a privmsg, now lets see who too... */
 	if (strstr (av[0], "!")) {
