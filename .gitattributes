@@ -126,6 +126,7 @@ doc/read-userman -text
 /hybrid7.h -text
 /install-sh -text
 /ircd.c -text
+/ircd.h -text
 /keeper.c -text
 keeper/Makefile -text
 keeper/keeper.h -text
