@@ -1,7 +1,6 @@
 * text=auto !eol
 /ChangeLog -text
 /INSTALL -text
-/LICENCE -text
 /Makefile.in -text
 /README -text
 /TODO -text
@@ -13,9 +12,6 @@
 /config.h.in -text
 /configure -text
 /configure.in -text
-data/niconfig.db -text
-data/nstats.db -text
-data/stats.db -text
 data/tlds.nfo -text
 /dl.c -text
 /dl.h -text
@@ -36,12 +32,9 @@ dl/loveserv/ChangeLog -text
 dl/loveserv/Makefile -text
 dl/loveserv/loveserv.c -text
 dl/loveserv/ls_help.c -text
-dl/modules.txt -text
 dl/netinfo/Makefile.in -text
 dl/netinfo/netinfo.c -text
 dl/netinfo/ni_help.c -text
-dl/services/DOESNOTCOMPILE -text
-dl/services/Makefile.in -text
 dl/services/build -text
 dl/services/services.c -text
 dl/services/services.lo -text svneol=unset#unset
@@ -49,18 +42,14 @@ dl/spam/Makefile.in -text
 dl/spam/spam.c -text
 dl/statserv/Makefile.in -text
 dl/statserv/m_stats.h -text
-dl/statserv/ss_help.c -text
 dl/statserv/stats.c -text
 dl/statserv/statserv.c -text
 dl/statserv/statserv.h -text
 dl/version/Makefile.in -text
 dl/version/version.c -text
-doc/FAQ -text
-doc/USERMAN -text
 doc/read-faq -text
 doc/read-userman -text
 /dotconf.c -text
-/dotconf.h -text
 /hash.c -text
 /hash.h -text
 /ircd.c -text
@@ -74,7 +63,6 @@ logs/.keepme -text
 /server.c -text
 /services.c -text
 /sock.c -text
-/ss_help.c -text
 /stats.cfg.dist -text
 /stats.h -text
 /timer.c -text
