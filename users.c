@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.46 2003/04/11 09:26:31 fishwaldo Exp $
+** $Id: users.c,v 1.47 2003/05/14 14:00:04 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -83,6 +83,8 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 	u = new_user(nick);
 	strncpy(u->hostname,host, MAXHOST);
 	strncpy(u->username, user, MAXUSER);
+	/* its empty for the moment */
+	strncpy(u->realname, "", MAXREALNAME);
 	u->server = findserver(server);
 	u->t_flood = time(NULL);
 	u->flood = 0;
@@ -96,6 +98,16 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 	strcpy(u->modes,"");
 	u->ipaddr.s_addr = htonl(ipaddr);
 	u->TS = TS;
+}
+void AddRealName(const char *nick, const char *realname) {
+	User *u = finduser(nick);
+	
+	if (!u) {
+		nlog(LOG_WARNING, LOG_CORE, "Warning, Can not find User %s for Realname", nick);
+		return;
+	}
+	nlog(LOG_DEBUG2, LOG_CORE, "RealName(%s): %s", nick, realname);
+	strncpy(u->realname, realname, MAXREALNAME);
 }
 
 void part_u_chan(list_t *list, lnode_t *node, void *v) {

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.118 2003/05/07 09:29:27 fishwaldo Exp $
+** $Id: ircd.c,v 1.119 2003/05/14 14:00:04 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -1222,15 +1222,22 @@ void Srv_Squit(char *origin, char **argv, int argc) {
 void Srv_Nick(char *origin, char **argv, int argc) {
 			char **av;
 			int ac = 0;
+			char *realname;
 #ifdef NEOIRCD
 			User *u;
 #endif
 			AddStringToList(&av, argv[0], &ac);
 #ifdef UNREAL 
 			AddUser(argv[0], argv[3], argv[4], argv[5], 0, strtol(argv[2], NULL, 10));
+			realname = joinbuf(argv, argc, 7);
+			AddRealName(argv[0], realname);
+			free(realname);
 			Module_Event("SIGNON", av, ac);
 #elif ULTIMATE3
 			AddUser(argv[0], argv[4], argv[5], argv[6], strtoul(argv[8], NULL, 10), strtoul(argv[2], NULL, 10));
+			realname = joinbuf(argv, argc, 9);
+			AddRealName(argv[0], realname);
+			free(realname);
 			Module_Event("SIGNON", av, ac);
 			nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s",argv[3]);
 			UserMode(argv[0], argv[3], 0);
@@ -1238,9 +1245,15 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			Module_Event("UMODE", av, ac);
 #elif ULTIMATE
 			AddUser(argv[0], argv[3], argv[4], argv[5], 0, strtoul(argv[2], NULL, 10));
+			realname = joinbuf(argv, argc, 7);
+			AddRealName(argv[0], realname);
+			free(realname);
 			Module_Event("SIGNON", av, ac);
 #elif HYBRID7
 			AddUser(argv[0], argv[4], argv[5], argv[6], 0, strtoul(argv[2], NULL, 10));
+			realname = joinbuf(argv, argc, 7);
+			AddRealName(argv[0], realname);
+			free(realname);
 			Module_Event("SIGNON", av, ac);
 			nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s",argv[3]);
 			UserMode(argv[0], argv[3]);
@@ -1248,6 +1261,9 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			Module_Event("UMODE", av, ac);
 #elif NEOIRCD
 			AddUser(argv[0], argv[4], argv[5], argv[7], 0, strtoul(argv[2], NULL, 10));
+			realname = joinbuf(argv, argc, 9);
+			AddRealName(argv[0], realname);
+			free(realname);
 			Module_Event("SIGNON", av, ac);
 			u = finduser(argv[0]);
 			if (u) {
@@ -1267,8 +1283,13 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 void Srv_Client(char *origin, char **argv, int argc) {
 			char **av;
 			int ac = 0;
+			char *realname;
+			
 			AddStringToList(&av, argv[0], &ac);
 			AddUser(argv[0], argv[5], argv[6], argv[8], strtoul(argv[10], NULL, 10), strtoul(argv[2], NULL, 10));
+			realname = joinbuf(argv, argc, 11);
+			AddRealName(argv[0], realname);
+			free(realname);
 			Module_Event("SIGNON", av, ac);
 			nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s",argv[3]);
 			UserMode(argv[0], argv[3], 0);

@@ -40,7 +40,7 @@ kptool -s S StatServ g/statserv:/Nick
 To retrieve StatServ's Nickname
 =================================
 cd ~/NeoStats
-kptool -g S StatServ g/statserv:/Nick
+kptool -g S g/statserv:/Nick
 
 =================================
 To remove the StatServ's Nickname

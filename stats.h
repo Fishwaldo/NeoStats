@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.74 2003/04/21 10:30:37 fishwaldo Exp $
+** $Id: stats.h,v 1.75 2003/05/14 14:00:04 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -78,6 +78,7 @@
 #define MAXPASS			32
 #define MAXNICK			32
 #define MAXUSER			15
+#define MAXREALNAME		50
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
 #define NUM_MODULES		255
@@ -191,6 +192,7 @@ struct user_ {
 	char nick[MAXNICK];
 	char hostname[MAXHOST];
 	char username[MAXUSER];
+	char realname[MAXREALNAME];
 	char vhost[MAXHOST];
 	Server *server;
 	MyUser *myuser;
@@ -301,6 +303,7 @@ extern int is_midnight();
 extern MyUser *myuhead;
 extern void AddUser(const char *, const char *, const char *, const char *, const unsigned long ip, const unsigned long TS);
 extern void DelUser(const char *);
+void AddRealName(const char *, const char *);
 extern void Change_User(User *, const char *);
 extern void sendcoders(char *message,...);
 extern User *finduser(const char *);
