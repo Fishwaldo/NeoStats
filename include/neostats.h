@@ -119,12 +119,17 @@
 #define _(x) (x)
 #define __(x, y) (x)
 #else
+#ifdef HAVE_NETDB_H
 char *LANGgettext(const char *string, int mylang);
 /* our own defines for language support */
 /* this one is for standard language support */
 #define _(x) LANGgettext(x, me.lang)
 /* this one is for custom langs based on chan/user struct */
 #define __(x,y) LANGgettext(x,(y)->lang)
+#else
+#define _(x) (x)
+#define __(x, y) (x)
+#endif
 #endif
 
 /* If we're not using GNU C, elide __attribute__ */
