@@ -1,7 +1,7 @@
 /* NeoStats - IRC Statistical Services Copryight (c) 1999-2002 NeoStats Group.
 *
 ** Module:  HostServ
-** Version: 1.3
+** Version: 1.6
 ** Authors: Shmad & ^Enigma^
 */
 

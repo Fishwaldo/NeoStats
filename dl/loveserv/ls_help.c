@@ -1,7 +1,9 @@
-/* NeoStats - IRC Statistical Services Copryight (c) 1999-2001 NeoStats Group.
+/* NeoStats - IRC Statistical Services Copryight (c) 1999-2002 NeoStats Group.
 *
 ** Module:  LoveServ
-** Version: 1.0
+** Description:  Network Love Service
+** Version: 1.5
+** Author: Shmad
 */
 
 const char *ls_help[] = {

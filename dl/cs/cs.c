@@ -21,9 +21,6 @@ static int cs_user_modes(User *);
 static int cs_del_user(User *);
 static int cs_user_kill(User *);
 
-
-
-
 static void cs_status(User *);
 static void cs_signwatch(User *u);
 static void cs_killwatch(User *u);

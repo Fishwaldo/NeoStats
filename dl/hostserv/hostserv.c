@@ -2,7 +2,7 @@
 *
 ** Module: HostServ
 ** Description: Network User Virtual Host Service
-** Version: 1.5
+** Version: 1.6
 ** Authors: ^Enigma^ & Shmad
 */
 
@@ -17,10 +17,10 @@ const char hsversion_time[] = __TIME__;
 char *s_HostServ;
 typedef struct hs_map_ HS_Map;
 struct hs_map_ {
-	HS_Map *next, *prev;
+    HS_Map *next, *prev;
     char nnick[30];
-	char host[MAXHOST];
-	char vhost[MAXHOST];
+    char host[MAXHOST];
+    char vhost[MAXHOST];
 };
 HS_Map *nnickmap;
 
@@ -31,43 +31,53 @@ static int hs_sign_on(User *);
 
 static void hs_add(User *u, char *cmd, char *m, char *h);
 static void hs_list(User *u);
-static void hs_del(User *u, char *cmd);
+static void hs_del(User *u, char *cmd, char *m, char *h);
 
 void hslog(char *, ...);
 void hsdat(char *, ...);
 void hshsamend(char *, ...);
 void Loadhosts();
 
+char **LoadArry;
+char **DelArry;
+char **ListArry;
+int LoadArryCount = 0;
+int DelArryCount = 0;
+int ListArryCount = 0;
 
 Module_Info my_info[] = { {
     "HostServ",
     "Network User Virtual Host Service",
-    "1.5"
+    "1.6"
 } };
 
 int new_m_version(char *av, char *tmp) {
-    sts(":%s 351 %s :Module HostServ Loaded, Version: %s %s %s",me.name,av,my_info[0].module_version,hsversion_date,hsversion_time);
+    snumeric_cmd(351, av, "Module HostServ Loaded, Version: %s %s %s",my_info[0].module_version,hsversion_date,hsversion_time);
     return 0;
 }
 
 
-
 /* Routine For Setting the Virtual Host */
 static int hs_sign_on(User *u) {
+    char *tmp = NULL;
 	HS_Map *map;
 
     Loadhosts();
 
-	if (findbot(u->nick)) return 1;
-	/* Check HostName Against Data Contained in vhosts.data */		
+    if (findbot(u->nick)) return 1;
+
+    /* Check HostName Against Data Contained in vhosts.data */        
       for (map = nnickmap; map; map = map->next) {
-	   if (fnmatch(strlower(map->nnick), strlower(u->nick), 0) == 0) {
-		  if (fnmatch(map->host, strlower(u->hostname), 0) == 0) {
-              sts(":%s CHGHOST %s %s", me.name, u->nick, map->vhost);
+	   if (!strcasecmp(map->nnick, u->nick)) {
+          tmp = map->host;
+		  if (fnmatch(strlower(tmp), strlower(u->hostname), 0) == 0) {
+              ssvshost_cmd(u->nick, map->vhost);
               return 1;
            }
        }
     }
+
+
 return 1;
 }
 
@@ -77,53 +87,54 @@ Functions my_fn_list[] = {
     { NULL,        NULL,     0}
 };
 
-int __Bot_Message(char *origin, char *coreLine, int type)
+int __Bot_Message(char *origin, char **av, int ac)
 {
     User *u;
-    char *cmd;
-	u = finduser(origin);
+    u = finduser(origin);
 
-    if (coreLine == NULL) return -1;
-    cmd = strtok(coreLine, " ");
-    if (!strcasecmp(cmd, "HELP")) {
-        coreLine = strtok(NULL, " ");
-        if (!coreLine && (!(UserLevel(u) >= 40))) {
+    if (!strcasecmp(av[1], "HELP")) {
+        if (ac <= 2 && (!(UserLevel(u) < 40))) {
             privmsg(u->nick, s_HostServ, "Permission Denied.");
             return 1;
-        } else if (!coreLine && (UserLevel(u) >= 40)) {
+        } else if (ac <= 2 && (UserLevel(u) >= 40)) {
             privmsg_list(u->nick, s_HostServ, hs_help); 
             return 1;
-        } else if (!strcasecmp(coreLine, "ADD") && (UserLevel(u) >= 40)) {
+        } else if (!strcasecmp(av[2], "ADD") && (UserLevel(u) >= 40)) {
             privmsg_list(u->nick, s_HostServ, hs_help_add);
             return 1;
-        } else if (!strcasecmp(coreLine, "DEL") && (UserLevel(u) >= 60)) {
+        } else if (!strcasecmp(av[2], "DEL") && (UserLevel(u) >= 60)) {
             privmsg_list(u->nick, s_HostServ, hs_help_del);
-            return 1;		
-		} else if (!strcasecmp(coreLine, "LIST") && (UserLevel(u) >= 40)) {
+            return 1;        
+        } else if (!strcasecmp(av[2], "LIST") && (UserLevel(u) >= 40)) {
             privmsg_list(u->nick, s_HostServ, hs_help_list);
             return 1;
-        } else if (!strcasecmp(coreLine, "ABOUT") && (UserLevel(u) >= 40)) {
+        } else if (!strcasecmp(av[2], "ABOUT") && (UserLevel(u) >= 40)) {
             privmsg_list(u->nick, s_HostServ, hs_help_about);
             return 1;
         } else 
-            privmsg(u->nick, s_HostServ, "Unknown Help Topic: \2%s\2",coreLine);
+            privmsg(u->nick, s_HostServ, "Unknown Help Topic: \2%s\2", av[2]);
         }
 
-    if (!strcasecmp(cmd, "ABOUT")) {
+    if (!strcasecmp(av[1], "ABOUT")) {
                 privmsg_list(u->nick, s_HostServ, hs_help_about);
-    } else if (!strcasecmp(cmd, "ADD") && (UserLevel(u) >= 40)) {
-				char *m, *h;
-				cmd = strtok(NULL, " ");
-				m = strtok(NULL, " ");
-				h = strtok(NULL, "");
-				hs_add(u, cmd, m, h);
-    } else if (!strcasecmp(cmd, "DEL") && (UserLevel(u) >= 60)) {
-				cmd = strtok(NULL, "");
-				hs_del(u, cmd);				
-	} else if (!strcasecmp(cmd, "LIST") && (UserLevel(u) >= 40)) {
+    } else if (!strcasecmp(av[1], "ADD") && (UserLevel(u) >= 40)) {
+                if (ac < 5) {
+                    privmsg(u->nick, s_HostServ, "Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME>", s_HostServ);
+                    privmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
+                    return -1;
+                }
+                hs_add(u, av[2], av[3], av[4]);
+    } else if (!strcasecmp(av[1], "DEL") && (UserLevel(u) >= 60)) {
+                if (ac < 5) {
+                    privmsg(u->nick, s_HostServ, "Syntax: /msg %s DEL <NICK> <HOST NAME> <VIRTUAL HOST NAME>", s_HostServ);
+                    privmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
+                    return -1;
+                }
+                hs_del(u, av[2], av[3], av[4]);    
+    } else if (!strcasecmp(av[1], "LIST") && (UserLevel(u) >= 40)) {
                 hs_list(u);
-	} else {
-        privmsg(u->nick, s_HostServ, "Unknown Command: \2%s\2, perhaps you need some HELP?",cmd);
+    } else {
+        privmsg(u->nick, s_HostServ, "Unknown Command: \2%s\2, perhaps you need some HELP?", av[1]);
     }
     return 1;
 
@@ -141,7 +152,7 @@ int Online(Server *data) {
 
 EventFnList my_event_list[] = {
     { "ONLINE", Online},
-	{ "SIGNON", hs_sign_on},
+    { "SIGNON", hs_sign_on},
     { NULL, NULL}
 };
 
@@ -157,14 +168,15 @@ EventFnList *__module_get_events() {
     return my_event_list;
 };
 
+
 void _init() {
     s_HostServ = "HostServ";
-    sts(":%s GLOBOPS :HostServ Module Loaded",me.name);
-	Loadhosts();
+    globops(me.name, "HostServ Module Loaded",me.name);
+    Loadhosts();
 }
 
 void _fini() {
-    sts(":%s GLOBOPS :HostServ Module Unloaded",me.name);
+    globops(me.name, "HostServ Module Unloaded",me.name);
 
 };
 
@@ -187,7 +199,7 @@ void hslog(char *fmt, ...)
         return;
         }
 
-    fprintf(hsfile, "(%s) %s\n", fmtime, buf);
+       fprintf(hsfile, "(%s) %s\n", fmtime, buf);
         va_end(ap);
         fclose(hsfile);
 
@@ -210,9 +222,9 @@ void hsdat(char *fmt, ...)
         if (!hsfile) {
         log("Unable to open data/vhosts.db for writing.");
         return;
-    }
+        }
 
-    fprintf(hsfile, "%s\n", buf);
+        fprintf(hsfile, "%s\n", buf);
         va_end(ap);
         fclose(hsfile);
 
@@ -235,9 +247,9 @@ void hsamend(char *fmt, ...)
         if (!hsamend) {
         log("Unable to open data/vhosts.new for writing.");
         return;
-    }
+        }
 
-    fprintf(hsamend, "%s\n", buf);
+        fprintf(hsamend, "%s\n", buf);
         va_end(ap);
         fclose(hsamend);
 
@@ -247,37 +259,19 @@ void hsamend(char *fmt, ...)
 /* Routine for ADD */
 static void hs_add(User *u, char *cmd, char *m, char *h) {
 
-	if (!cmd) {
-            privmsg(u->nick, s_HostServ, "Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME>", s_HostServ);
-            privmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
-            return;
-        }
-
-	if (!h) {
-            privmsg(u->nick, s_HostServ, "Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME>", s_HostServ);
-            privmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
-            return;
-        } 
-    if (!m) {
-            privmsg(u->nick, s_HostServ, "Syntax: /msg %s ADD ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME>", s_HostServ);
-            privmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
-            return;
-   }
-   /* The user has passed the minimum requirements for input */
-    
-    segv_location = sstrdup("hs_add");
-	hsdat("%s %s %s", cmd, m, h);
+    strcpy(segv_location, "hs_add");
+    hsdat(":%s %s %s", cmd, m, h);
     privmsg(u->nick, s_HostServ, "%s has sucessfuly been registered under realhost: %s and vhost: %s",cmd, m, h);
 
-	/* Apply The New Hostname If The User Is Online */		
-	if (finduser(cmd)) {
+    /* Apply The New Hostname If The User Is Online */        
+    if (finduser(cmd)) {
           u = finduser(cmd);
           if (findbot(u->nick)) return;
-		  if (fnmatch(m, strlower(u->hostname), 0) == 0) {
-              sts(":%s CHGHOST %s %s", me.name, u->nick, h);
+          if (fnmatch(m, strlower(u->hostname), 0) == 0) {
+              ssvshost_cmd(u->nick, h);
               return;
           }
-	}
+    }
 }
 
 
@@ -287,7 +281,7 @@ static void hs_list(User *u)
     FILE *fp;
     char buf[512];
 
-    segv_location = sstrdup("hs_list");
+    strcpy(segv_location, "hs_list");
     if (!(UserLevel(u) >= 40)) {
         hslog("Access Denied (LIST) to %s", u->nick);
         privmsg(u->nick, s_HostServ, "Access Denied.");
@@ -301,7 +295,9 @@ static void hs_list(User *u)
     }
     while (fgets(buf, sizeof(buf), fp)) {
         buf[strlen(buf)] = '\0';
-        privmsg(u->nick, s_HostServ, "%s", buf);
+
+        ListArryCount = split_buf(buf, &ListArry, 0);
+        privmsg(u->nick, s_HostServ, "%s %s %s", ListArry[0], ListArry[1], ListArry[2]);
     }
     fclose(fp);
 }
@@ -310,118 +306,91 @@ static void hs_list(User *u)
 /* Routine For Loading The Hosts into Array */
 void Loadhosts()
 {
-	FILE *fp = fopen("data/vhosts.db", "r");
-	HS_Map *map;
-	char buf[BUFSIZE];
-	char *tmp;
+    FILE *fp = fopen("data/vhosts.db", "r");
+    HS_Map *map;
+    char buf[BUFSIZE];
 
-	if (fp) {
-		while (fgets(buf, BUFSIZE, fp)) {
-			strip(buf);
-			map = smalloc(sizeof(HS_Map));
-			tmp = strtok(buf, " ");
+    if (fp) {
+        while (fgets(buf, BUFSIZE, fp)) {
+            strip(buf);
+            map = smalloc(sizeof(HS_Map));
 
-			strcpy(map->nnick, tmp);
-			strcpy(map->host, strtok(NULL, " "));
-			strcpy(map->vhost, strtok(NULL, ""));
-			if (!nnickmap) {
-				nnickmap = map;
-				nnickmap->next = NULL;
-			} else {
-				map->next = nnickmap;
-				nnickmap = map;
-			}
+            LoadArryCount = split_buf(buf, &LoadArry, 0);
+            strcpy(map->nnick, LoadArry[0]);
+            strcpy(map->host, LoadArry[1]);
+            strcpy(map->vhost, LoadArry[2]);
+            if (!nnickmap) {
+                nnickmap = map;
+                nnickmap->next = NULL;
+            } else {
+                map->next = nnickmap;
+                nnickmap = map;
+            }
     }
-	  fclose(fp);
+      fclose(fp);
     } else {
-		notice(s_Services, "data/vhosts.db Database Not Found! Either Add a User or Disable This Function");
-	}
+        notice(s_Services, "data/vhosts.db Database Not Found! Either Add a User or Disable This Function");
+    }
 }
 
 
 /* Routine for HostServ to delete the given information */
-static void hs_del(User *u, char *cmd)
+static void hs_del(User *u, char *cmd, char *m, char *h)
 {
 
     FILE *fp = fopen("data/vhosts.db", "r");
     FILE *hstmp;
-    int del_verify = 0;
     char buf[BUFSIZE];
     char dat[512];
-    char *ipname, *iphost, *ipvhost;
-    char *temp = NULL;
+    int del_verify = 0;
+    char *compare = NULL;
 
-    segv_location = sstrdup("hs_del");
+    strcpy(segv_location, "hs_del");
     if (!(UserLevel(u) >= 60)) {
         hslog("Access Denied To %s To Delete User: %s", u->nick, cmd);
         privmsg(u->nick, s_HostServ, "Access Denied To %s To Delete User: %s", u->nick, cmd);
         return;
     }
-    if (!cmd) {
-        privmsg(u->nick, s_HostServ, "Syntax: /msg %s DEL <NICK> <HOST NAME> <VIRTUAL HOST NAME>", s_HostServ);
-        privmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
-        return;
-    }
 
     hstmp = fopen("data/HostServ.tmp","w");
-    fprintf(hstmp, "%s", cmd);
+    fprintf(hstmp, ":%s %s %s", cmd, m, h);
     fclose(hstmp);
                         
     hstmp = fopen("data/HostServ.tmp", "r");
     while (fgets(dat, sizeof(dat), hstmp)) {
         buf[strlen(dat)] = '\0';
-        temp = dat;
+        compare = dat;
     }
     fclose(hstmp);
     remove("data/HostServ.tmp");
 
-    ipname = strtok(temp, " ");
-    iphost = strtok(NULL, " ");
-    ipvhost = strtok(NULL, "");
-
-    if (!ipname) {
-        privmsg(u->nick, s_HostServ, "Syntax: /msg %s DEL <NICK> <HOST NAME> <VIRTUAL HOST NAME>", s_HostServ);
-        privmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
-        return;
-    }
-	if (!iphost) {
-        privmsg(u->nick, s_HostServ, "Syntax: /msg %s DEL <NICK> <HOST NAME> <VIRTUAL HOST NAME>", s_HostServ);
-        privmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
-        return;
-    }
-	if (!ipvhost) {
-        privmsg(u->nick, s_HostServ, "Syntax: /msg %s DEL <NICK> <HOST NAME> <VIRTUAL HOST NAME>", s_HostServ);
-        privmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
-        return;
-    }
-
     if (!fp) {
         privmsg(u->nick, s_HostServ, "Unable to open data/vhosts.db");
         return;
-	}
+    }
 
-	if (fp) {
-		while (fgets(buf, BUFSIZE, fp)) {
-			strip(buf);
+    if (fp) {
+        while (fgets(buf, BUFSIZE, fp)) {
+            strip(buf);
 
-            if (fnmatch(buf, cmd, 0) != 0) {
+            if (fnmatch(buf, compare, 0) != 0) {
                 hsamend("%s", buf);
             }
 
-            if (fnmatch(buf, cmd, 0) == 0) {
-                privmsg(u->nick, s_HostServ, "%s Was Removed From The Vhosts Database", cmd);
+            if (fnmatch(buf, compare, 0) == 0) {
+                privmsg(u->nick, s_HostServ, "%s (%s) Was Removed From The Vhosts Database", cmd, h);
                 del_verify=1;
-			} 
+            } 
 
-	}
- 	fclose(fp);
+    }
+     fclose(fp);
     remove("data/vhosts.db");
-    rename("data/vhosts.new", "data/vhosts.db");	
+    rename("data/vhosts.new", "data/vhosts.db");    
     } 
 
     if (!del_verify) {
-        privmsg(u->nick, s_HostServ, "Sorry, The User '%s' With A Host Of '%s' Was Unable To Be Removed From The Vhosts Database.", ipname, iphost);
+        privmsg(u->nick, s_HostServ, "Sorry, The User '%s' With A Host Of '%s' Was Unable To Be Removed From The Vhosts Database.", cmd, h);
         return;
-	}
+    }
 
 }
