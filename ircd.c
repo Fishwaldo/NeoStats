@@ -332,8 +332,6 @@ void Module_Event(char *event, EvntMsg *EM) {
 
 EvntMsg *split_buf(char *buf, int colon_special)
 {
-    int argvsize = 8;
-    int argc;
     char *s;
     int flag = 0;
     EvntMsg *EM;
@@ -341,33 +339,25 @@ EvntMsg *split_buf(char *buf, int colon_special)
     EM = malloc(sizeof(EvntMsg));
     EM->ac = 0;
     EM->fc = 0;
-    argc = 0;
-    if (*buf == ':') buf++;
-    while (*buf) {
-	if (argc == argvsize) {
-	    argvsize += 8;
-	}
-	if ((colon_special ==1) && (*buf==':')) {
-		strncpy(EM->data, buf, 512);
-		buf = "";
+    EM->cmdptr = 1;
+    if (*buf == ':') {
+    	/* its a origin */
+	buf++;
+	EM->origin = strtok(buf, " ");
+	EM->cmd = strtok(NULL, " ");
+    } else {
+    	EM->origin = NULL;
+	EM->cmd = strtok(buf, " ");
+	EM->cmdptr = 0;
+    }	      
+    while ((s = strtok(NULL, " ")) != NULL) {
+	if (*s == ':') {
+		s++;
 		flag = 1;
-	} else if (*buf == ':') {
-		buf++;
-		strncpy(EM->data, buf, 512);
 	}
-	s = strpbrk(buf, " ");
-	if (s) {
-		*s++ = 0; 
-	    	while (isspace(*s))
-		    s++;
-	} else {
-		s = buf + strlen(buf);
-	}
-	if (*buf == 0) {
-		buf++;
-	}
-	AddStringToList(&EM->av, buf, &EM->ac);
-	buf = s;
+	AddStringToList(&EM->av, s, &EM->ac);
+	if (flag) strncat(EM->data, s, sizeof(EM->data));
+	if (flag) strncat(EM->data, " ", sizeof(EM->data));
     }
     return EM;
 }
@@ -387,8 +377,6 @@ extern char *joinbuf(char **av, int ac, int from) {
 
 void parse(char *line)
 {
-	char origin[64], cmd[64], *coreLine;
-	int cmdptr = 0;
 	int I = 0;
 	char *tonick;
 	Module *module_ptr;
@@ -399,8 +387,6 @@ void parse(char *line)
 	EvntMsg *EM;
 		
 	strcpy(segv_location, "parse");
-	memset(origin, 0, 64);
-	memset(cmd, 0, 64);
 	strip(line);
 	strcpy(recbuf, line);
 	if (!(*line))
@@ -408,44 +394,17 @@ void parse(char *line)
 #ifdef DEBUG
 	log("R: %s", line);
 #endif
-	
-    	if (*line == ':') {
-		coreLine = strpbrk(line, " ");
-		if (!coreLine)
-	    		return;
-		*coreLine = 0;
-		while (isspace(*++coreLine))
-	    	;
-		strncpy(origin, line+1, sizeof(origin));
-		memmove(line, coreLine, strlen(coreLine)+1);
-		cmdptr = 1;
-    	} else {
-    		cmdptr = 0;
-		*origin = 0;
-    	}
-    	if (!*line)
-		return;
-    	coreLine = strpbrk(line, " ");
-    	if (coreLine) {
-		*coreLine = 0;
-		while (isspace(*++coreLine))
-	    	;
-    	} else
-		coreLine = line + strlen(line);
-    	strncpy(cmd, line, sizeof(cmd));
 
-	EM = split_buf(coreLine, 0);
-	strncpy(EM->origin, origin, sizeof(EM->origin));
-	strncpy(EM->cmd, cmd, sizeof(EM->cmd));
-	if (findserver(origin)) {
-		EM->s = findserver(origin);
-		EM->isserv = 1;
-	} else if (finduser(origin)) {
-		EM->u = finduser(origin);
-		EM->u->ulevel = _UserLevel(EM->u);
-		EM->isserv = 0;
-	} else  {
-		if ((cmdptr == 1) && (me.onchan)) {
+	EM = split_buf(line, 0);	
+	if (EM->cmdptr == 1) {
+		if (findserver(EM->origin)) {
+			EM->s = findserver(EM->origin);
+			EM->isserv = 1;
+		} else if (finduser(EM->origin)) {
+			EM->u = finduser(EM->origin);
+			EM->u->ulevel = _UserLevel(EM->u);
+			EM->isserv = 0;
+		} else if (me.onchan) {
 			log("Got Message from Unknown Origin, Ignoring!!!");
 			log("Message was: %s", recbuf);
 			EM->isserv = -1;
@@ -453,13 +412,11 @@ void parse(char *line)
 			goto parend;
 		}
 	}
-
-
         /* First, check if its a privmsg, and if so, handle it in the correct Function */
  	if (!strcasecmp("PRIVMSG",EM->cmd) || (!strcasecmp("!",EM->cmd))) {
  		/* its a privmsg, now lets see who too... */       
 		/* if its a message from our own internal bots, silently drop it */
-                if (findbot(origin)) {
+                if (findbot(EM->origin)) {
 			goto parend;
 		}
 
@@ -487,8 +444,8 @@ void parse(char *line)
 
 				/* Check to make sure there are no blank spaces so we dont crash */
 			        if (strlen(EM->av[1]) >= 350) {
-			                privmsg(origin, s_Services, "command line too long!");
-			                notice (s_Services,"%s tried to send a very LARGE command, we told them to shove it!", origin);
+			                privmsg(EM->origin, s_Services, "command line too long!");
+			                notice (s_Services,"%s tried to send a very LARGE command, we told them to shove it!", EM->origin);
 					goto parend;
 			        }
 
@@ -508,8 +465,8 @@ void parse(char *line)
         /* now, Parse the Command to the Internal Functions... */
 	strcpy(segv_location, "Parse - Internal Functions");
 	for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
-		if (!strcmp(cmd_list[I].name, cmd)) {
-			if (cmd_list[I].srvmsg == cmdptr) {
+		if (!strcmp(cmd_list[I].name, EM->cmd)) {
+			if (cmd_list[I].srvmsg == EM->cmdptr) {
 				cmd_list[I].exec++;
 				strcpy(segv_location, cmd_list[I].name);
 				cmd_list[I].function(EM);
@@ -525,8 +482,8 @@ void parse(char *line)
 		fn_list = module_ptr->function_list;
 		while (fn_list->cmd_name != NULL) {
 			/* This goes through each Command */
-			if (!strcasecmp(fn_list->cmd_name, cmd)) {
-				if (fn_list->srvmsg == cmdptr) {
+			if (!strcasecmp(fn_list->cmd_name, EM->cmd)) {
+				if (fn_list->srvmsg == EM->cmdptr) {
 #ifdef DEBUG
 					log("Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
 #endif
