@@ -610,7 +610,7 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 			break;
 		}
 	}
-#if 1
+#if 0
 	if(i >= ircd_cmdcount) {
 		nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);
 	}
