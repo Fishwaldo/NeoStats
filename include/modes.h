@@ -23,7 +23,7 @@
 #ifndef MODES_H
 #define MODES_H
 
-int InitIrcdModes (void);
+int InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const mode_init* user_umodes, const mode_init* user_smodes);
 
 EXPORTFUNC int ChanMode (char *origin, char **av, int ac);
 int ChanModeHandler (Channel* c, char *modes, int j, char **av, int ac);

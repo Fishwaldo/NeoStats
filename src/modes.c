@@ -29,6 +29,12 @@
 #include "channels.h"
 #include "modules.h"
 
+typedef struct mode_data {
+	unsigned int mask;
+	unsigned int flags;
+	unsigned char sjoin;
+} mode_data;
+
 unsigned char UmodeChRegNick = 'r';
 static char ModeStringBuf[64];
 static char PrefixStringBuf[64];
@@ -36,10 +42,6 @@ unsigned int ircd_supported_umodes = 0;
 unsigned int ircd_supported_smodes = 0;
 unsigned int ircd_supported_cmodes = 0;
 unsigned int ircd_supported_cumodes = 0;
-mode_init* chan_umodes;
-mode_init* chan_modes;
-mode_init* user_umodes;
-mode_init* user_smodes;
 
 static mode_data ircd_cmodes[MODE_TABLE_SIZE];
 static mode_data ircd_umodes[MODE_TABLE_SIZE];
@@ -94,7 +96,7 @@ static ModeDesc SmodeDesc[] = {
 	{0, 0},
 };
 
-/** @brief InitIrcdModes
+/** @brief BuildModeTable
  *
  *  Build internal mode tables by translating the protocol information
  *  into a faster indexed lookup table
@@ -102,7 +104,7 @@ static ModeDesc SmodeDesc[] = {
  * @return 
  */
 unsigned int
-BuildModeTable (char *mode_char_map, mode_data * dest, mode_init * src, unsigned int flagall)
+BuildModeTable (char *mode_char_map, mode_data * dest, const mode_init * src, unsigned int flagall)
 {
 	unsigned int maskall = 0;
 
@@ -120,7 +122,7 @@ BuildModeTable (char *mode_char_map, mode_data * dest, mode_init * src, unsigned
 	return maskall;
 }
 
-/** @brief InitIrcdModes
+/** @brief InitModeTables
  *
  *  Build internal mode tables by translating the protocol information
  *  into a faster indexed lookup table
@@ -128,7 +130,7 @@ BuildModeTable (char *mode_char_map, mode_data * dest, mode_init * src, unsigned
  * @return 
  */
 int
-InitIrcdModes (void)
+InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const mode_init* user_umodes, const mode_init* user_smodes)
 {
 	/* build cmode lookup table */
 	memset(&ircd_cmodes, 0, sizeof(ircd_cmodes));

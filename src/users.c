@@ -43,8 +43,7 @@
 
 static hash_t *userhash;
 
-static Client *
-new_user (const char *nick)
+static Client *new_user (const char *nick)
 {
 	Client *u;
 
@@ -53,7 +52,7 @@ new_user (const char *nick)
 		nlog (LOG_CRITICAL, "new_user: user hash is full");
 		return NULL;
 	}
-	dlog(DEBUG2, "new_user: %s", nick);
+	dlog (DEBUG2, "new_user: %s", nick);
 	u = ns_calloc (sizeof (Client));
 	strlcpy (u->name, nick, MAXNICK);
 	u->user = ns_calloc (sizeof (User));
@@ -61,12 +60,12 @@ new_user (const char *nick)
 	return u;
 }
 
-static void lookupnickip(char *data, adns_answer *a) 
+static void lookupnickip (char *data, adns_answer *a) 
 {
 	CmdParams * cmdparams;
 	Client *u;
 	
-	u = find_user((char *)data);
+	u = find_user ((char *)data);
 	if (a && a->nrrs > 0 && u && a->status == adns_s_ok) {
 		u->ip.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
 		cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
@@ -76,8 +75,9 @@ static void lookupnickip(char *data, adns_answer *a)
 	}
 }
 
-Client *
-AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric)
+Client *AddUser (const char *nick, const char *user, const char *host, 
+	const char *realname, const char *server, const char *ip, const char *TS, 
+	const char *numeric)
 {
 	CmdParams * cmdparams;
 	unsigned long ipaddress = 0;
@@ -89,31 +89,31 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 		nlog (LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick);
 		return NULL;
 	}
-	if(ip) {
+	if (ip) {
 		ipaddress = strtoul (ip, NULL, 10);
 	} else if (!(ircd_srv.protocol&PROTOCOL_NICKIP) && me.want_nickip == 1) {
 		struct in_addr *ipad;
 		int res;
 
 		/* first, if the u->host is a ip address, just convert it */
-		ipad = ns_malloc(sizeof(struct in_addr));
-		res = inet_aton(host, ipad);
+		ipad = ns_malloc (sizeof(struct in_addr));
+		res = inet_aton (host, ipad);
 		if (res > 0) {
 			/* its valid */
-			ipaddress = htonl(ipad->s_addr);
-			ns_free(ipad);
+			ipaddress = htonl (ipad->s_addr);
+			ns_free (ipad);
 		} else {		
 			/* kick of a dns reverse lookup for this host */
-			dns_lookup((char *)host, adns_r_addr, lookupnickip, (void *)nick);
+			dns_lookup ((char *)host, adns_r_addr, lookupnickip, (void *)nick);
 			ipaddress = 0;
 		}		
 	}
-	dlog(DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, (int)htonl (ipaddress), server, TS);
+	dlog (DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, (int)htonl (ipaddress), server, TS);
 	u = new_user (nick);
 	if (!u) {
 		return NULL;
 	}
-	if(TS) {
+	if (TS) {
 		u->tsconnect = strtoul (TS, NULL, 10);
 	} else {
 		u->tsconnect = me.now;
@@ -127,13 +127,13 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	u->user->tslastmsg = me.now;
 	u->user->chans = list_create (MAXJOINCHANS);
 	u->ip.s_addr = htonl (ipaddress);
-	strlcpy(u->hostip, inet_ntoa (u->ip), HOSTIPLEN);
+	strlcpy (u->hostip, inet_ntoa (u->ip), HOSTIPLEN);
 	if (IsMe(u->uplink)) {
 		u->flags |= CLIENT_FLAG_ME;
 	}
 	/* check if the user is excluded */
 	ns_do_exclude_user(u);
-	if((ircd_srv.protocol & PROTOCOL_B64SERVER) && numeric) {
+	if ((ircd_srv.protocol & PROTOCOL_B64SERVER) && numeric) {
 		setnickbase64 (u->name, numeric);
 	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
@@ -145,13 +145,13 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	}
 	ns_free (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
-	if(is_synched && config.versionscan && !IsExcluded(u) && !IsMe(u)) {
+	if (is_synched && config.versionscan && !IsExcluded(u) && !IsMe(u)) {
 		irc_ctcp_version_req (ns_botptr, u);
 	}
 	return u;
 }
 
-static void deluser(Client * u)
+static void deluser (Client *u)
 {
 	hnode_t *un;
 
@@ -161,7 +161,7 @@ static void deluser(Client * u)
 		return;
 	}
 	/* if its one of our bots, remove it from the modlist */
-	if ( IsMe(u) ) {
+	if (IsMe(u)) {
 		del_bot (u->name);
 	}
 	hash_delete (userhash, un);
@@ -171,8 +171,7 @@ static void deluser(Client * u)
 	ns_free (u);
 }
 
-void 
-KillUser (const char* source, const char *nick, const char *reason)
+void KillUser (const char* source, const char *nick, const char *reason)
 {
 	char *killbuf;
 	char *killreason;
@@ -182,9 +181,9 @@ KillUser (const char* source, const char *nick, const char *reason)
 	Client *u;
 
 	SET_SEGV_LOCATION();
-	dlog(DEBUG2, "KillUser: %s", nick);
+	dlog (DEBUG2, "KillUser: %s", nick);
 	u = find_user (nick);
-	if(!u) {
+	if (!u) {
 		nlog (LOG_WARNING, "KillUser: %s failed!", nick);
 		return;
 	}
@@ -209,27 +208,26 @@ KillUser (const char* source, const char *nick, const char *reason)
 		SendAllModuleEvent (EVENT_SERVERKILL, cmdparams); 		
 	}
 	/* if its one of our bots inform the module */
-	if ( IsMe(u) ) {
+	if (IsMe(u)) {
 		nlog (LOG_NOTICE, "KillUser: deleting bot %s as it was killed", u->name);
 		SendModuleEvent (EVENT_BOTKILL, cmdparams, u->user->bot->moduleptr);
 	}
-	deluser(u);
+	deluser (u);
 	ns_free (killbuf);
 	ns_free (killreason);
 	ns_free (av);
 	ns_free (cmdparams);
 }
 
-void 
-QuitUser (const char *nick, const char *reason)
+void QuitUser (const char *nick, const char *reason)
 {
 	CmdParams * cmdparams;
 	Client *u;
 
 	SET_SEGV_LOCATION();
-	dlog(DEBUG2, "QuitUser: %s", nick);
+	dlog (DEBUG2, "QuitUser: %s", nick);
 	u = find_user (nick);
-	if(!u) {
+	if (!u) {
 		nlog (LOG_WARNING, "QuitUser: %s failed!", nick);
 		return;
 	}
@@ -237,7 +235,7 @@ QuitUser (const char *nick, const char *reason)
 	/* run the event to delete a user */
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;
-	if(reason) {
+	if (reason) {
 		cmdparams->param = (char*)reason;
 	}
 	SendAllModuleEvent (EVENT_QUIT, cmdparams);
@@ -251,7 +249,7 @@ QuitUser (const char *nick, const char *reason)
 		char** av;
 		int ac = 0;
 
-		killbuf = sstrdup(cmdparams->param);
+		killbuf = sstrdup (cmdparams->param);
 		ac = split_buf (killbuf, &av, 0);
 		killreason = joinbuf(av, ac, 5);
 		cmdparams->source = find_user (av[4]);
@@ -262,12 +260,11 @@ QuitUser (const char *nick, const char *reason)
 		ns_free (killreason);
 		ns_free (av);
 	}
-	deluser(u);
+	deluser (u);
 	ns_free (cmdparams);
 }
 
-void
-UserAway (const char *nick, const char *awaymsg)
+void UserAway (const char *nick, const char *awaymsg)
 {
 	CmdParams * cmdparams;
 	Client *u;
@@ -278,7 +275,7 @@ UserAway (const char *nick, const char *awaymsg)
 		return;
 	}
 	if (awaymsg) {
-		strlcpy(u->user->awaymsg, awaymsg, MAXHOST);
+		strlcpy (u->user->awaymsg, awaymsg, MAXHOST);
 	} else {
 		u->user->awaymsg[0] = 0;
 	}
@@ -293,8 +290,7 @@ UserAway (const char *nick, const char *awaymsg)
 	ns_free (cmdparams);
 }
 
-int 
-UserNick (const char * oldnick, const char *newnick, const char * ts)
+int UserNick (const char * oldnick, const char *newnick, const char * ts)
 {
 	CmdParams * cmdparams;
 	hnode_t *un;
@@ -302,7 +298,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	Client * u;
 
 	SET_SEGV_LOCATION();
-	dlog(DEBUG2, "UserNick: %s -> %s", oldnick, newnick);
+	dlog (DEBUG2, "UserNick: %s -> %s", oldnick, newnick);
 	un = hash_lookup (userhash, oldnick);
 	if (!un) {
 		nlog (LOG_WARNING, "UserNick: can't find user %s", oldnick);
@@ -317,7 +313,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	SET_SEGV_LOCATION();
 	hash_delete (userhash, un);
 	strlcpy (u->name, newnick, MAXNICK);
-	if(ts) {
+	if (ts) {
 		u->tsconnect = atoi (ts);
 	} else {
 		u->tsconnect = me.now;
@@ -331,8 +327,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	return NS_SUCCESS;
 }
 
-Client *
-finduserbase64 (const char *num)
+Client *finduserbase64 (const char *num)
 {
 	Client *u;
 	hnode_t *un;
@@ -341,32 +336,30 @@ finduserbase64 (const char *num)
 	hash_scan_begin (&us, userhash);
 	while ((un = hash_scan_next (&us)) != NULL) {
 		u = hnode_get (un);
-		if(strncmp(u->name64, num, BASE64NICKSIZE) == 0) {
-			dlog(DEBUG1, "finduserbase64: %s -> %s", num, u->name);
+		if (strncmp (u->name64, num, BASE64NICKSIZE) == 0) {
+			dlog (DEBUG1, "finduserbase64: %s -> %s", num, u->name);
 			return u;
 		}
 	}
-	dlog(DEBUG3, "finduserbase64: %s not found", num);
+	dlog (DEBUG3, "finduserbase64: %s not found", num);
 	return NULL;
 }
 
-Client *
-find_user (const char *nick)
+Client *find_user (const char *nick)
 {
 	Client *u;
 
 	u = (Client *)hnode_find (userhash, nick);
 	if (!u) {
-		dlog(DEBUG3, "find_user: %s not found", nick);
+		dlog (DEBUG3, "find_user: %s not found", nick);
 	}
 	return u;
 }
 
-int
-InitUsers (void)
+int InitUsers (void)
 {
 	userhash = hash_create (USER_TABLE_SIZE, 0, 0);
-	if(!userhash)	{
+	if (!userhash)	{
 		nlog (LOG_CRITICAL, "Unable to create user hash");
 		return NS_FAILURE;
 	}
@@ -374,8 +367,7 @@ InitUsers (void)
 	return NS_SUCCESS;
 }
 
-static void
-dumpuser (CmdParams* cmdparams, Client * u)
+static void dumpuser (CmdParams *cmdparams, Client *u)
 {
 	lnode_t *cm;
 	int i = 0;
@@ -390,14 +382,14 @@ dumpuser (CmdParams* cmdparams, Client * u)
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Flags:    0x%x", cmdparams->source), u->flags);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Modes:    %s (0x%x)", cmdparams->source), UmodeMaskToString(u->user->Umode), u->user->Umode);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Smodes:   %s (0x%x)", cmdparams->source), SmodeMaskToString(u->user->Smode), u->user->Smode);
-	if(u->user->is_away) {
+	if (u->user->is_away) {
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Away:     %s", cmdparams->source), u->user->awaymsg);
 	}
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Version:  %s", cmdparams->source), u->version);
 
 	cm = list_first (u->user->chans);
 	while (cm) {
-		if(i==0) {
+		if (i==0) {
 			irc_prefmsg (ns_botptr, cmdparams->source, __("Channels: %s", cmdparams->source), (char *) lnode_get (cm));
 		} else {
 			irc_prefmsg (ns_botptr, cmdparams->source, "          %s", (char *) lnode_get (cm));
@@ -408,8 +400,7 @@ dumpuser (CmdParams* cmdparams, Client * u)
 	irc_prefmsg (ns_botptr, cmdparams->source, "========================================");
 }
 
-void
-UserDump (CmdParams* cmdparams, const char *nick)
+void UserDump (CmdParams *cmdparams, const char *nick)
 {
 	Client *u;
 	hscan_t us;
@@ -438,26 +429,24 @@ UserDump (CmdParams* cmdparams, const char *nick)
 	}
 }
 
-int
-UserLevel (Client * u)
+int UserLevel (Client *u)
 {
 	/* Have we already calculated the user level? */
-	if(u->user->ulevel != -1) {
+	if (u->user->ulevel != -1) {
 		return u->user->ulevel;
 	}
 	u->user->ulevel = UserAuth(u);
 	/* Set user level so we no longer need to calculate */
-	dlog(DEBUG1, "UserLevel for %s is %d", u->name, u->user->ulevel);
+	dlog (DEBUG1, "UserLevel for %s is %d", u->name, u->user->ulevel);
 	return u->user->ulevel;
 }
 
-void
-SetUserVhost(const char* nick, const char* vhost) 
+void SetUserVhost (const char *nick, const char *vhost) 
 {
 	Client *u;
 
 	u = find_user (nick);
-	dlog(DEBUG1, "Vhost %s", vhost);
+	dlog (DEBUG1, "Vhost %s", vhost);
 	if (u) {
 		strlcpy (u->user->vhost, vhost, MAXHOST);
 		/* sethost on Unreal doesn't send +xt, but /umode +x sends +x 
@@ -469,15 +458,14 @@ SetUserVhost(const char* nick, const char* vhost)
 	}
 }
 
-void
-UserMode (const char *nick, const char *modes)
+void UserMode (const char *nick, const char *modes)
 {
 	CmdParams * cmdparams;
 	Client *u;
 	long oldmode;
 
 	SET_SEGV_LOCATION();
-	dlog(DEBUG1, "UserMode: user %s modes %s", nick, modes);
+	dlog (DEBUG1, "UserMode: user %s modes %s", nick, modes);
 	u = find_user (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "UserMode: mode change for unknown user %s %s", nick, modes);
@@ -490,11 +478,11 @@ UserMode (const char *nick, const char *modes)
 	u->user->Umode |= UmodeStringToMask (modes);
 	if (ircd_srv.features&FEATURE_UMODECLOAK) {
 		/* Do we have a hidden host any more? */
-		if((oldmode & UMODE_HIDE) && (!(u->user->Umode & UMODE_HIDE))) {
-			strlcpy(u->user->vhost, u->user->hostname, MAXHOST);
+		if ((oldmode & UMODE_HIDE) && (!(u->user->Umode & UMODE_HIDE))) {
+			strlcpy (u->user->vhost, u->user->hostname, MAXHOST);
 		}
 	}
-	dlog(DEBUG1, "UserMode: modes for %s now %x", u->name, u->user->Umode);
+	dlog (DEBUG1, "UserMode: modes for %s now %x", u->name, u->user->Umode);
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;	
 	cmdparams->param = (char*)modes;
@@ -502,14 +490,13 @@ UserMode (const char *nick, const char *modes)
 	ns_free (cmdparams);
 }
 
-void
-UserSMode (const char *nick, const char *modes)
+void UserSMode (const char *nick, const char *modes)
 {
 	CmdParams * cmdparams;
 	Client *u;
 
 	SET_SEGV_LOCATION();
-	dlog(DEBUG1, "UserSMode: user %s smodes %s", nick, modes);
+	dlog (DEBUG1, "UserSMode: user %s smodes %s", nick, modes);
 	u = find_user (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "UserSMode: smode change for unknown user %s %s", nick, modes);
@@ -518,7 +505,7 @@ UserSMode (const char *nick, const char *modes)
 	/* Reset user level so it will be recalculated */
 	u->user->ulevel = -1;
 	u->user->Smode |= SmodeStringToMask(modes);
-	dlog(DEBUG1, "UserSMode: smode for %s is now %x", u->name, u->user->Smode);
+	dlog (DEBUG1, "UserSMode: smode for %s is now %x", u->name, u->user->Smode);
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;	
 	cmdparams->param = (char*)modes;
@@ -526,12 +513,12 @@ UserSMode (const char *nick, const char *modes)
 	ns_free (cmdparams);
 }
 
-void SetUserServicesTS(const char* nick, const char* ts) 
+void SetUserServicesTS (const char *nick, const char *ts) 
 {
-	Client * u;
+	Client *u;
 
 	u = find_user (nick);
-	if(u) {
+	if (u) {
 		u->user->servicestamp = strtoul(ts, NULL, 10);
 	}
 }
@@ -546,12 +533,12 @@ void FiniUsers (void)
 	hscan_t hs;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin(&hs, userhash);
-	while ((un = hash_scan_next(&hs)) != NULL) {
+	hash_scan_begin (&hs, userhash);
+	while ((un = hash_scan_next (&hs)) != NULL) {
 		u = hnode_get (un);
 		PartAllChannels (u, NULL);
 		/* something is wrong if its our bots */
-		if ( IsMe(u) ) {
+		if (IsMe(u)) {
 			nlog (LOG_NOTICE, "FiniUsers called with a neostats bot online: %s", u->name);
 		}
 		hash_scan_delete (userhash, un);
@@ -560,7 +547,7 @@ void FiniUsers (void)
 		ns_free (u->user);
 		ns_free (u);
 	}
-	hash_destroy(userhash);
+	hash_destroy (userhash);
 }
 
 void QuitServerUsers (Client *s)
@@ -570,33 +557,32 @@ void QuitServerUsers (Client *s)
 	hscan_t hs;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin(&hs, userhash);
-	while ((un = hash_scan_next(&hs)) != NULL) {
+	hash_scan_begin (&hs, userhash);
+	while ((un = hash_scan_next (&hs)) != NULL) {
 		u = hnode_get (un);
-		if(u->uplink == s) 
+		if (u->uplink == s) 
 		{
 			dlog (DEBUG1, "QuitServerUsers: deleting %s from %s", u->name, s->name);
-			QuitUser(u->name, s->name);
+			QuitUser (u->name, s->name);
 		}
 	}
 }
 
-void GetUserList(UserListHandler handler)
+void GetUserList (UserListHandler handler)
 {
 	Client *u;
 	hscan_t scan;
 	hnode_t *node;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin(&scan, userhash);
-	while ((node = hash_scan_next(&scan)) != NULL) {
-		u = hnode_get(node);
-		handler(u);
+	hash_scan_begin (&scan, userhash);
+	while ((node = hash_scan_next (&scan)) != NULL) {
+		u = hnode_get (node);
+		handler (u);
 	}
 }
 
-void
-AddFakeUser(const char *mask)
+void AddFakeUser (const char *mask)
 {
 	char maskcopy[MAXHOST];
 	char *nick;
@@ -627,8 +613,7 @@ AddFakeUser(const char *mask)
 	u->user->chans = list_create (MAXJOINCHANS);
 }
 
-void
-DelFakeUser(const char *mask)
+void DelFakeUser (const char *mask)
 {
 	char maskcopy[MAXHOST];
 	char *nick;
@@ -650,7 +635,7 @@ hash_t *GetUserHash (void)
 	return userhash;
 }
 
-void clear_user_moddata (Client* u)
+void clear_user_moddata (Client *u)
 {
 	if (u)
 	{
@@ -658,7 +643,7 @@ void clear_user_moddata (Client* u)
 	}
 }
 
-void set_user_moddata (Client* u, void * data)
+void set_user_moddata (Client *u, void * data)
 {
 	if (u)
 	{
@@ -666,7 +651,7 @@ void set_user_moddata (Client* u, void * data)
 	}
 }
 
-void* get_user_moddata (Client* u)
+void* get_user_moddata (Client *u)
 {
 	if (u)
 	{

@@ -223,6 +223,7 @@ void del_chan_user (Channel *c, Client *u)
 void
 kick_chan (const char *kickby, const char *chan, const char *kicked, const char *kickreason)		
 {
+	CmdParams * cmdparams;
 	Channel *c;
 	Chanmem *cm;
 	lnode_t *un;
@@ -239,36 +240,41 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 	if (!c) {
 		nlog (LOG_WARNING, "kick_chan: channel %s not found", chan);
 		return;
-	} else {
-		un = list_find (c->chanmembers, u->name, comparef);
-		if (!un) {
-			nlog (LOG_WARNING, "kick_chan: %s isn't a member of channel %s", u->name, chan);
-		} else {
-			CmdParams * cmdparams;
-			cm = lnode_get (un);
-			lnode_destroy (list_delete (c->chanmembers, un));
-			ns_free (cm);
-			cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-			cmdparams->target = u;
-			cmdparams->channel = c;
-			//AddStringToList (&av, (char *)kickby, &ac);
-			if (kickreason != NULL) {
-				cmdparams->param = (char*)kickreason;
-			}
-			SendAllModuleEvent (EVENT_KICK, cmdparams);
-			if ( IsMe (u) ) {
-				/* its one of our bots */
-				SendModuleEvent (EVENT_KICKBOT, cmdparams, u->user->bot->moduleptr);
-			}
-			c->users--;
-			del_chan_user(c, u);
-			if (c->neousers > 0 && c->neousers == c->users) {
-				/* all real users have left the channel */
-				handle_dead_channel (c);
-			}
-			ns_free (cmdparams);
+	} 
+	un = list_find (c->chanmembers, u->name, comparef);
+	if (!un) {
+		nlog (LOG_WARNING, "kick_chan: %s isn't a member of channel %s", u->name, chan);
+		return;
+	}
+	cm = lnode_get (un);
+	lnode_destroy (list_delete (c->chanmembers, un));
+	ns_free (cm);
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
+	cmdparams->target = u;
+	cmdparams->channel = c;
+	cmdparams->source = find_user (kickby);
+	if (!cmdparams->source) {
+		cmdparams->source = find_server (kickby);
+	}
+	if (kickreason != NULL) {
+		cmdparams->param = (char*)kickreason;
+	}
+	SendAllModuleEvent (EVENT_KICK, cmdparams);
+	if (IsMe (u)) {
+		/* its one of our bots */
+		SendModuleEvent (EVENT_KICKBOT, cmdparams, u->user->bot->moduleptr);
+	}
+	/* If PROTOCOL_KICKPART then we will get a part aswell so 
+		* DO NOT REMOVE USER */
+	if (!(ircd_srv.protocol & PROTOCOL_KICKPART)) {
+		c->users--;
+		del_chan_user (c, u);
+		if (c->neousers > 0 && c->neousers == c->users) {
+			/* all real users have left the channel */
+			handle_dead_channel (c);
 		}
 	}
+	ns_free (cmdparams);
 }
 
 /** @brief Parts a user from a channel
@@ -287,6 +293,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 void
 part_chan (Client * u, const char *chan, const char *reason)
 {
+	CmdParams * cmdparams;
 	Channel *c;
 	lnode_t *un;
 	Chanmem *cm;
@@ -301,36 +308,34 @@ part_chan (Client * u, const char *chan, const char *reason)
 	if (!c) {
 		nlog (LOG_WARNING, "part_chan: channel %s not found", chan);
 		return;
-	} else {
-		un = list_find (c->chanmembers, u->name, comparef);
-		if (!un) {
-			nlog (LOG_WARNING, "part_chan: user %s isn't a member of channel %s", u->name, chan);
-		} else {
-			CmdParams * cmdparams;
-			cm = lnode_get (un);
-			lnode_destroy (list_delete (c->chanmembers, un));
-			ns_free (cm);
-			cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-			cmdparams->channel = c;
-			cmdparams->source = u;
-			if (reason != NULL) {
-				cmdparams->param = (char*)reason;
-			}
-			SendAllModuleEvent (EVENT_PART, cmdparams);
-			if ( IsMe (u) ) {
-				/* its one of our bots */
-				SendModuleEvent (EVENT_PARTBOT, cmdparams, u->user->bot->moduleptr);
-				c->neousers --;
-			}
-			c->users--;
-			del_chan_user(c, u);
-			if (c->neousers > 0 && c->neousers == c->users) {
-				/* all real users have left the channel */
-				handle_dead_channel (c);
-			}
-			ns_free (cmdparams);
-		}
 	}
+	un = list_find (c->chanmembers, u->name, comparef);
+	if (!un) {
+		nlog (LOG_WARNING, "part_chan: user %s isn't a member of channel %s", u->name, chan);
+		return;
+	}
+	cm = lnode_get (un);
+	lnode_destroy (list_delete (c->chanmembers, un));
+	ns_free (cm);
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
+	cmdparams->channel = c;
+	cmdparams->source = u;
+	if (reason != NULL) {
+		cmdparams->param = (char*)reason;
+	}
+	SendAllModuleEvent (EVENT_PART, cmdparams);
+	if (IsMe (u)) {
+		/* its one of our bots */
+		SendModuleEvent (EVENT_PARTBOT, cmdparams, u->user->bot->moduleptr);
+		c->neousers --;
+	}
+	c->users--;
+	del_chan_user(c, u);
+	if (c->neousers > 0 && c->neousers == c->users) {
+		/* all real users have left the channel */
+		handle_dead_channel (c);
+	}
+	ns_free (cmdparams);
 }
 
 /** @brief Change channel records when a nick change occurs
@@ -356,11 +361,9 @@ ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 		nlog (LOG_WARNING, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
 		return;
 	}
-    	dlog(DEBUG3, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
+    dlog(DEBUG3, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
 	strlcpy (cml->nick, newnick, MAXNICK);
 }
-
-
 
 /** @brief Process a user joining a channel
  *
@@ -426,7 +429,7 @@ join_chan (const char* nick, const char *chan)
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;
 	cmdparams->channel = c;
-	if ( IsMe (u) ) {
+	if (IsMe (u)) {
 		/* its one of our bots */
 		c->neousers ++;
 	}

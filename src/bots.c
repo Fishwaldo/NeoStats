@@ -548,7 +548,7 @@ Bot *init_bot (BotInfo* botinfo)
 
 	SET_SEGV_LOCATION();
 	modptr = GET_CUR_MODULE();
-	if(!modptr->synched) {
+	if(!modptr->insynch) {
 		nlog (LOG_WARNING, "Module %s attempted to init a bot %s but is not yet synched", modptr->info->name, botinfo->nick);
 		modptr->error = 1;
 		return NULL;

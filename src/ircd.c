@@ -38,59 +38,112 @@
 #include "auth.h"
 #include "dns.h"
 
+typedef struct ircd_sym {
+	void **ptr;
+	char *sym;
+	unsigned int required;
+	unsigned int feature;
+} ircd_sym;
+
 #define MOTD_FILENAME	"neostats.motd"
 #define ADMIN_FILENAME	"neostats.admin"
 
 ircd_server ircd_srv;
 
 static char ircd_buf[BUFSIZE];
+static char protocol_path[MAXPATH];
 
-ProtocolInfo* protocol_info;
+static ProtocolInfo *protocol_info;
 
-ircd_cmd* cmd_list;
+static ircd_cmd *cmd_list;
 
 static void *protocol_module_handle;
 
-void (*irc_send_privmsg) (const char *from, const char *to, const char *buf);
-void (*irc_send_notice) (const char *from, const char *to, const char *buf);
-void (*irc_send_globops) (const char *from, const char *buf);
-void (*irc_send_wallops) (const char *who, const char *buf);
-void (*irc_send_numeric) (const char *from, const int numeric, const char *target, const char *buf);
-void (*irc_send_umode) (const char *who, const char *target, const char *mode);
-void (*irc_send_join) (const char *who, const char *chan, const unsigned long ts);
-void (*irc_send_sjoin) (const char *source, const char *who, const char *chan, const unsigned long ts);
-void (*irc_send_part) (const char *who, const char *chan);
-void (*irc_send_nickchange) (const char *oldnick, const char *newnick, const unsigned long ts);
-void (*irc_send_cmode) (const char *source, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts);
-void (*irc_send_quit) (const char *who, const char *quitmsg);
-void (*irc_send_kill) (const char *from, const char *target, const char *reason);
-void (*irc_send_kick) (const char *source, const char *chan, const char *target, const char *reason);
-void (*irc_send_invite) (const char *from, const char *to, const char *chan);
-void (*irc_send_svskill) (const char *source, const char *target, const char *reason);
-void (*irc_send_svsmode) (const char *source, const char *target, const char *modes);
-void (*irc_send_svshost) (const char *source, const char *who, const char *vhost);
-void (*irc_send_svsjoin) (const char *source, const char *target, const char *chan);
-void (*irc_send_svspart) (const char *source, const char *target, const char *chan);
-void (*irc_send_svsnick) (const char *source, const char *target, const char *newnick, const unsigned long ts);
-void (*irc_send_swhois) (const char *source, const char *target, const char *swhois);
-void (*irc_send_smo) (const char *from, const char *umodetarget, const char *msg);
-void (*irc_send_akill) (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, unsigned long ts);
-void (*irc_send_rakill) (const char *source, const char *host, const char *ident);
-void (*irc_send_ping) (const char *from, const char *reply, const char *to);
-void (*irc_send_pong) (const char *reply);
-void (*irc_send_server) (const char *source, const char *name, const int numeric, const char *infoline);
-void (*irc_send_squit) (const char *server, const char *quitmsg);
-void (*irc_send_nick) (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname);
-void (*irc_send_server_connect) (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink);
-void (*irc_send_netinfo) (const char* from, const int prot, const char* cloak, const char* netname, const unsigned long ts);
-void (*irc_send_snetinfo) (const char* from, const int prot, const char* cloak, const char* netname, const unsigned long ts);
-void (*irc_send_svinfo) (const int tscurrent, const int tsmin, const unsigned long tsnow);
-void (*irc_send_vctrl) (const int uprot, const int nicklen, const int modex, const int gc, const char* netname);
-void (*irc_send_burst) (int b);
-void (*irc_send_svstime) (const char *source, const unsigned long ts);
-void (*irc_send_setname) (const char* nick, const char* realname);
-void (*irc_send_sethost) (const char* nick, const char* host);
-void (*irc_send_setident) (const char* nick, const char* ident);
+static void (*irc_send_privmsg) (const char *source, const char *to, const char *buf);
+static void (*irc_send_notice) (const char *source, const char *to, const char *buf);
+static void (*irc_send_globops) (const char *source, const char *buf);
+static void (*irc_send_wallops) (const char *source, const char *buf);
+static void (*irc_send_numeric) (const char *source, const int numeric, const char *target, const char *buf);
+static void (*irc_send_umode) (const char *source, const char *target, const char *mode);
+static void (*irc_send_join) (const char *source, const char *chan, const unsigned long ts);
+static void (*irc_send_sjoin) (const char *source, const char *who, const char *chan, const unsigned long ts);
+static void (*irc_send_part) (const char *source, const char *chan);
+static void (*irc_send_nickchange) (const char *oldnick, const char *newnick, const unsigned long ts);
+static void (*irc_send_cmode) (const char *source, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts);
+static void (*irc_send_quit) (const char *source, const char *quitmsg);
+static void (*irc_send_kill) (const char *source, const char *target, const char *reason);
+static void (*irc_send_kick) (const char *source, const char *chan, const char *target, const char *reason);
+static void (*irc_send_invite) (const char *source, const char *to, const char *chan);
+static void (*irc_send_svskill) (const char *source, const char *target, const char *reason);
+static void (*irc_send_svsmode) (const char *source, const char *target, const char *modes);
+static void (*irc_send_svshost) (const char *source, const char *who, const char *vhost);
+static void (*irc_send_svsjoin) (const char *source, const char *target, const char *chan);
+static void (*irc_send_svspart) (const char *source, const char *target, const char *chan);
+static void (*irc_send_svsnick) (const char *source, const char *target, const char *newnick, const unsigned long ts);
+static void (*irc_send_swhois) (const char *source, const char *target, const char *swhois);
+static void (*irc_send_smo) (const char *source, const char *umodetarget, const char *msg);
+static void (*irc_send_akill) (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, unsigned long ts);
+static void (*irc_send_rakill) (const char *source, const char *host, const char *ident);
+static void (*irc_send_ping) (const char *source, const char *reply, const char *to);
+static void (*irc_send_pong) (const char *reply);
+static void (*irc_send_server) (const char *source, const char *name, const int numeric, const char *infoline);
+static void (*irc_send_squit) (const char *server, const char *quitmsg);
+static void (*irc_send_nick) (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname);
+static void (*irc_send_server_connect) (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink);
+static void (*irc_send_netinfo) (const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts);
+static void (*irc_send_snetinfo) (const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts);
+static void (*irc_send_svinfo) (const int tscurrent, const int tsmin, const unsigned long tsnow);
+static void (*irc_send_vctrl) (const int uprot, const int nicklen, const int modex, const int gc, const char* netname);
+static void (*irc_send_burst) (int b);
+static void (*irc_send_svstime) (const char *source, const unsigned long ts);
+static void (*irc_send_setname) (const char* nick, const char* realname);
+static void (*irc_send_sethost) (const char* nick, const char* host);
+static void (*irc_send_setident) (const char* nick, const char* ident);
+
+static ircd_sym ircd_sym_table[] = 
+{
+	{(void *)&irc_send_privmsg, "send_privmsg", 1, 0},
+	{(void *)&irc_send_notice, "send_notice", 1, 0},
+	{(void *)&irc_send_globops, "send_globops", 0, 0},
+	{(void *)&irc_send_wallops, "send_wallops", 0, 0},
+	{(void *)&irc_send_numeric, "send_numeric", 0, 0},
+	{(void *)&irc_send_umode, "send_umode", 0, 0},
+	{(void *)&irc_send_join, "send_join", 0, 0},
+	{(void *)&irc_send_sjoin, "send_sjoin", 0, 0},
+	{(void *)&irc_send_part, "send_part", 0, 0},
+	{(void *)&irc_send_nickchange, "send_nickchange", 0, 0},
+	{(void *)&irc_send_cmode, "send_cmode", 0, 0},
+	{(void *)&irc_send_quit, "send_quit", 0, 0},
+	{(void *)&irc_send_kill, "send_kill", 0, 0},
+	{(void *)&irc_send_kick, "send_kick", 0, 0},
+	{(void *)&irc_send_invite, "send_invite", 0, 0},
+	{(void *)&irc_send_svskill, "send_svskill", 0, FEATURE_SVSKILL},
+	{(void *)&irc_send_svsmode, "send_svsmode", 0, FEATURE_SVSMODE},
+	{(void *)&irc_send_svshost, "send_svshost", 0, FEATURE_SVSHOST},
+	{(void *)&irc_send_svsjoin, "send_svsjoin", 0, FEATURE_SVSJOIN},
+	{(void *)&irc_send_svspart, "send_svspart", 0, FEATURE_SVSPART},
+	{(void *)&irc_send_svsnick, "send_svsnick", 0, FEATURE_SVSNICK},
+	{(void *)&irc_send_swhois, "send_swhois", 0, FEATURE_SWHOIS},
+	{(void *)&irc_send_smo, "send_smo", 0, FEATURE_SMO},
+	{(void *)&irc_send_svstime, "send_svstime", 0, FEATURE_SVSTIME},
+	{(void *)&irc_send_akill, "send_akill", 0, 0},
+	{(void *)&irc_send_rakill, "send_rakill", 0, 0},
+	{(void *)&irc_send_ping, "send_ping", 0, 0},
+	{(void *)&irc_send_pong, "send_pong", 0, 0},
+	{(void *)&irc_send_server, "send_server", 0, 0},
+	{(void *)&irc_send_squit, "send_squit", 0, 0},
+	{(void *)&irc_send_nick, "send_nick", 1, 0},
+	{(void *)&irc_send_server_connect, "send_server_connect", 1, 0},
+	{(void *)&irc_send_netinfo, "send_netinfo", 0, 0},
+	{(void *)&irc_send_snetinfo, "send_snetinfo", 0, 0},
+	{(void *)&irc_send_svinfo, "send_svinfo", 0, 0},
+	{(void *)&irc_send_vctrl, "send_vctrl", 0, 0},
+	{(void *)&irc_send_burst, "send_burst", 0, 0},
+	{(void *)&irc_send_setname, "send_setname", 0, 0},
+	{(void *)&irc_send_sethost, "send_sethost", 0, 0},
+	{(void *)&irc_send_setident, "send_setident", 0, 0},
+	{NULL, NULL, 0, 0},
+};
 
 static void m_numeric242 (char *origin, char **argv, int argc, int srv);
 static void m_numeric351 (char *origin, char **argv, int argc, int srv);
@@ -104,8 +157,41 @@ ircd_cmd numeric_cmd_list[] = {
 
 static void IrcdError(char* err)
 {
-	printf ("\nERROR: Unable to find %s in selected IRCd module\n", err);
 	nlog (LOG_CRITICAL, "Unable to find %s in selected IRCd module", err);
+}
+
+/** @brief InitIrcdProtocol
+ *
+ *  Init protocol info
+ *
+ * @return 
+ */
+static int
+InitIrcdProtocol ()
+{
+	protocol_info = ns_dlsym (protocol_module_handle, "protocol_info");
+	if (!protocol_info) {
+		nlog (LOG_CRITICAL, "Unable to find protocol_info in protocol module %s\n", protocol_path);
+		return NS_FAILURE;	
+	}
+	if (protocol_info->minprotocol & PROTOCOL_CLIENTMODE) {
+		config.singlebotmode = 1;
+	}
+	strlcpy (me.servicescmode, protocol_info->services_cmode, MODESIZE);
+	strlcpy (me.servicesumode, protocol_info->services_umode, MODESIZE);
+	/* set min protocol */
+	ircd_srv.protocol = protocol_info->minprotocol;
+	/* Allow protocol module to "override" the parser */
+	irc_parse = ns_dlsym (protocol_module_handle, "parse");
+	if (irc_parse == NULL) {
+		irc_parse = parse;
+	}
+	cmd_list = ns_dlsym (protocol_module_handle, "cmd_list");
+	if (!cmd_list) {
+		IrcdError("command list");
+		return NS_FAILURE;	
+	}
+	return NS_SUCCESS;
 }
 
 /** @brief InitIrcdSymbols
@@ -118,39 +204,32 @@ static void IrcdError(char* err)
 static int
 InitIrcdSymbols (void)
 {
-	static char protocol_name[MAXHOST];
-  
-	ircsnprintf (protocol_name, 255, "%s/%s%s", MOD_PATH, me.protocol,MOD_EXT);
-	protocol_module_handle = ns_dlopen(protocol_name, RTLD_NOW || RTLD_GLOBAL);
-	if (!protocol_module_handle) {
-		printf ("\nERROR: Unable to load protocol module %s\n", protocol_name);
-		nlog (LOG_CRITICAL, "Unable to load protocol module %s\n", protocol_name);
-		return NS_FAILURE;	
-	}
-	protocol_info = ns_dlsym (protocol_module_handle, "protocol_info");
-	if (!protocol_info) {
-		printf ("\nERROR: Unable to find protocol_info in protocol module %s\n", protocol_name);
-		nlog (LOG_CRITICAL, "Unable to find protocol_info in protocol module %s\n", protocol_name);
-		return NS_FAILURE;	
-	}
+	ircd_sym * pircd_sym;
 
-	if (protocol_info->minprotocol & PROTOCOL_CLIENTMODE) {
-		config.singlebotmode = 1;
+	pircd_sym = ircd_sym_table;
+	while (pircd_sym->ptr)
+	{
+		*pircd_sym->ptr = ns_dlsym (protocol_module_handle, pircd_sym->sym);
+		if (pircd_sym->required) {
+			if (!*pircd_sym->ptr) {
+				IrcdError(pircd_sym->sym);
+				return NS_FAILURE;	
+			}
+		}
+		ircd_srv.features |= pircd_sym->feature;
+		pircd_sym ++;
 	}
+	return NS_SUCCESS;
+}
 
-	strlcpy (me.servicescmode, protocol_info->services_cmode, MODESIZE);
-	strlcpy (me.servicesumode, protocol_info->services_umode, MODESIZE);
+static int
+InitIrcdModes (void)
+{
+	mode_init *chan_umodes;
+	mode_init *chan_modes;
+	mode_init *user_umodes;
+	mode_init *user_smodes;
 
-	/* Allow protocol module to "override" the parser */
-	irc_parse = ns_dlsym (protocol_module_handle, "parse");
-	if (irc_parse == NULL)
-		irc_parse = parse;
-
-	cmd_list = ns_dlsym (protocol_module_handle, "cmd_list");
-	if (!cmd_list) {
-		IrcdError("command list");
-		return NS_FAILURE;	
-	}
 	chan_umodes = ns_dlsym (protocol_module_handle, "chan_umodes");
 	if (!chan_umodes) {
 		IrcdError("channel umode table");
@@ -171,91 +250,8 @@ InitIrcdSymbols (void)
 	if (user_smodes) {
 		ircd_srv.features |= FEATURE_USERSMODES;
 	}
-
-	irc_send_privmsg = ns_dlsym (protocol_module_handle, "send_privmsg");
-	if (!irc_send_privmsg) {
-		IrcdError("send_privmsg handler");
-		return NS_FAILURE;	
-	}
-	irc_send_notice = ns_dlsym (protocol_module_handle, "send_notice");
-	if (!irc_send_notice) {
-		IrcdError("send_notice handler");
-		return NS_FAILURE;	
-	}
-	irc_send_globops = ns_dlsym (protocol_module_handle, "send_globops");
-	irc_send_wallops = ns_dlsym (protocol_module_handle, "send_wallops");
-	irc_send_numeric = ns_dlsym (protocol_module_handle, "send_numeric");
-	irc_send_umode = ns_dlsym (protocol_module_handle, "send_umode");
-	irc_send_join = ns_dlsym (protocol_module_handle, "send_join");
-	irc_send_sjoin = ns_dlsym (protocol_module_handle, "send_sjoin");
-	irc_send_part = ns_dlsym (protocol_module_handle, "send_part");
-	irc_send_nickchange = ns_dlsym (protocol_module_handle, "send_nickchange");
-	irc_send_cmode = ns_dlsym (protocol_module_handle, "send_cmode");
-	irc_send_quit = ns_dlsym (protocol_module_handle, "send_quit");
-	irc_send_kill = ns_dlsym (protocol_module_handle, "send_kill");
-	irc_send_kick = ns_dlsym (protocol_module_handle, "send_kick");
-	irc_send_invite = ns_dlsym (protocol_module_handle, "send_invite");
-	irc_send_svskill = ns_dlsym (protocol_module_handle, "send_svskill");
-	if (irc_send_svskill) {
-		ircd_srv.features |= FEATURE_SVSKILL;
-	}
-	irc_send_svsmode = ns_dlsym (protocol_module_handle, "send_svsmode");
-	if (irc_send_svsmode) {
-		ircd_srv.features |= FEATURE_SVSMODE;
-	}
-	irc_send_svshost = ns_dlsym (protocol_module_handle, "send_svshost");
-	if (irc_send_svshost) {
-		ircd_srv.features |= FEATURE_SVSHOST;
-	}
-	irc_send_svsjoin = ns_dlsym (protocol_module_handle, "send_svsjoin");
-	if (irc_send_svsjoin) {
-		ircd_srv.features |= FEATURE_SVSJOIN;
-	}
-	irc_send_svspart = ns_dlsym (protocol_module_handle, "send_svspart");
-	if (irc_send_svspart) {
-		ircd_srv.features |= FEATURE_SVSPART;
-	}
-	irc_send_svsnick = ns_dlsym (protocol_module_handle, "send_svsnick");
-	if (irc_send_svsnick) {
-		ircd_srv.features |= FEATURE_SVSNICK;
-	}
-	irc_send_swhois = ns_dlsym (protocol_module_handle, "send_swhois");
-	if (irc_send_swhois) {
-		ircd_srv.features |= FEATURE_SWHOIS;
-	}
-	irc_send_smo = ns_dlsym (protocol_module_handle, "send_smo");
-	if (irc_send_smo) {
-		ircd_srv.features |= FEATURE_SMO;
-	}
-	irc_send_svstime = ns_dlsym (protocol_module_handle, "send_svstime");
-	if (irc_send_svstime) {
-		ircd_srv.features |= FEATURE_SVSTIME;
-	}
-	irc_send_akill = ns_dlsym (protocol_module_handle, "send_akill");
-	irc_send_rakill = ns_dlsym (protocol_module_handle, "send_rakill");
-	irc_send_ping = ns_dlsym (protocol_module_handle, "send_ping");
-	irc_send_pong = ns_dlsym (protocol_module_handle, "send_pong");
-	irc_send_server = ns_dlsym (protocol_module_handle, "send_server");
-	irc_send_squit = ns_dlsym (protocol_module_handle, "send_squit");
-	irc_send_nick = ns_dlsym (protocol_module_handle, "send_nick");
-	if (!irc_send_nick) {
-		IrcdError("nick handler");
-		return NS_FAILURE;	
-	}
-	irc_send_server_connect = ns_dlsym (protocol_module_handle, "send_server_connect");
-	if (!irc_send_server_connect) {
-		IrcdError("server connect handler");
-		return NS_FAILURE;	
-	}
-	irc_send_netinfo = ns_dlsym (protocol_module_handle, "send_netinfo");
-	irc_send_snetinfo = ns_dlsym (protocol_module_handle, "send_snetinfo");
-	irc_send_svinfo = ns_dlsym (protocol_module_handle, "send_svinfo");
-	irc_send_vctrl = ns_dlsym (protocol_module_handle, "send_vctrl");
-	irc_send_burst = ns_dlsym (protocol_module_handle, "send_burst");
-	irc_send_setname = ns_dlsym (protocol_module_handle, "send_setname");
-	irc_send_sethost = ns_dlsym (protocol_module_handle, "send_sethost");
-	irc_send_setident = ns_dlsym (protocol_module_handle, "send_setident");
-
+	if (InitModeTables(chan_umodes, chan_modes, user_umodes, user_smodes) != NS_SUCCESS) 
+		return NS_FAILURE;
 	return NS_SUCCESS;
 }
 
@@ -266,17 +262,26 @@ InitIrcdSymbols (void)
  * @return 
  */
 int
-InitIrcd ()
+InitIrcd (void)
 {
 	/* Clear IRCD info */
 	memset(&ircd_srv, 0, sizeof(ircd_srv));
+	/* Open protocol module */
+	ircsnprintf (protocol_path, 255, "%s/%s%s", MOD_PATH, me.protocol,MOD_EXT);
+	protocol_module_handle = ns_dlopen (protocol_path, RTLD_NOW || RTLD_GLOBAL);
+	if (!protocol_module_handle) {
+		nlog (LOG_CRITICAL, "Unable to load protocol module %s\n", protocol_path);
+		return NS_FAILURE;	
+	}
+	/* Setup protocol options */
+	if (InitIrcdProtocol () != NS_SUCCESS) {
+		return NS_FAILURE;	
+	}
 	/* Setup IRCD function calls */
 	if (InitIrcdSymbols() != NS_SUCCESS) 
 		return NS_FAILURE;
-	/* set min protocol */
-	ircd_srv.protocol = protocol_info->minprotocol;
 	/* Build mode tables */
-	if (InitIrcdModes() != NS_SUCCESS) 
+	if (InitIrcdModes () != NS_SUCCESS) 
 		return NS_FAILURE;
 	return NS_SUCCESS;
 }
@@ -291,7 +296,7 @@ void
 m_notice (char* origin, char **av, int ac, int cmdptr)
 {
 	SET_SEGV_LOCATION();
-	if ( av[0] == NULL) {
+	if (av[0] == NULL) {
 		dlog(DEBUG1, "m_notice: dropping notice from %s to NULL: %s", origin, av[ac-1]);
 		return;
 	}
@@ -323,7 +328,7 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 	char target[64];
 
 	SET_SEGV_LOCATION();
-	if ( av[0] == NULL) {
+	if (av[0] == NULL) {
 		dlog(DEBUG1, "m_private: dropping privmsg from %s to NULL: %s", origin, av[ac-1]);
 		return;
 	}
@@ -523,7 +528,7 @@ irc_chanalert (const Bot *botptr, const char *fmt, ...)
 {
 	va_list ap;
 
-	if (!is_synched)
+	if (!is_synched || !botptr)
 		return NS_SUCCESS;
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);

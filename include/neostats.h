@@ -164,6 +164,7 @@ char *LANGgettext(const char *string, int mylang);
 #define PROTOCOL_B64NICK	0x00004000  /* Nick names use Base 64 */
 #define PROTOCOL_UNKLN		0x00008000  /* Have UNKLINE support */
 #define PROTOCOL_NICKIP		0x00010000  /* NICK passes IP address */
+#define PROTOCOL_KICKPART	0x00020000  /* KICK also generates PART */
 
 #define PROTOCOL_CLIENTMODE	0x80000000  /* Client mode */
 
@@ -426,8 +427,9 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 #define NS_FLAG_EXCLUDED	0x00000001 /* matches a exclusion */
 
 /* Flags for clients (users and servers) */
-#define CLIENT_FLAG_ME		0x00000001 /* client is a NeoStats one */
-#define CLIENT_FLAG_SYNCHED	0x00000002 /* client is synched */
+#define CLIENT_FLAG_EXCLUDED	NS_FLAG_EXCLUDED /* client is excluded */
+#define CLIENT_FLAG_ME			0x00000002 /* client is a NeoStats one */
+#define CLIENT_FLAG_SYNCHED		0x00000004 /* client is synched */
 #if 0
 #define NS_FLAGS_NETJOIN	0x00000008 /* client is on a net join */
 #endif
@@ -885,6 +887,7 @@ typedef struct Module {
 	mod_auth userauth;
 	void *dl_handle;
 	unsigned int modnum;
+	unsigned int insynch;
 	unsigned int synched;
 	unsigned int error;
 }Module;

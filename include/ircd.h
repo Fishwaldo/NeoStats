@@ -47,12 +47,6 @@ typedef struct mode_init {
 	unsigned char sjoin;
 } mode_init;
 
-typedef struct mode_data {
-	unsigned int mask;
-	unsigned int flags;
-	unsigned char sjoin;
-} mode_data;
-
 typedef struct ircd_server {
 	int burst;
 	int uprot;
@@ -68,37 +62,27 @@ typedef struct ircd_server {
 
 typedef struct ProtocolInfo {
 	/* Minimum protocols that are required for the selected protocol
-	* e.g. IRCu requires NOQUIT */
+	 * e.g. NOQUIT */
 	const unsigned int minprotocol;
 	/* Optional protocols that are negotiated during connection that the
-	* protocol module supports but will work when not available e.g. SJOIN */
+	 * protocol module supports but will work when not available e.g. SJOIN */
 	const unsigned int optprotocol;
 	/* Features provided by this protocol module e.g. SVSNICK support. */
 	const unsigned int features;
-	char* services_umode;
-	char* services_cmode;
+	char *services_umode;
+	char *services_cmode;
 } ProtocolInfo;
 
-#ifdef NEOSTATSCORE
-extern mode_init* chan_umodes;
-extern mode_init* chan_modes;
-extern mode_init* user_umodes;
-extern mode_init* user_smodes;
-#else
+#ifndef NEOSTATSCORE
 MODULEVAR extern ircd_cmd cmd_list[];
 MODULEVAR extern mode_init chan_umodes[];
 MODULEVAR extern mode_init chan_modes[];
 MODULEVAR extern mode_init user_umodes[];
 MODULEVAR extern mode_init user_smodes[];
+MODULEVAR extern ProtocolInfo protocol_info;
 #endif
 
 EXPORTVAR extern ircd_server ircd_srv;
-
-#ifdef NEOSTATSCORE
-extern ProtocolInfo* protocol_info;
-#else
-MODULEVAR extern ProtocolInfo protocol_info;
-#endif
 
 extern const int proto_maxhost;
 extern const int proto_maxpass;
@@ -109,25 +93,25 @@ extern const int proto_chanlen;
 extern const int proto_topiclen;
 
 EXPORTFUNC int ircsplitbuf (char *buf, char ***argv, int colon_special);
-EXPORTFUNC void process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac);
+EXPORTFUNC void process_ircd_cmd (int cmdptr, char *cmd, char *origin, char **av, int ac);
 
 /* IRCD protocol module API */
 EXPORTFUNC int init_services_bot (void);
-EXPORTFUNC void m_private (char* origin, char **av, int ac, int cmdptr);
-EXPORTFUNC void m_notice (char* origin, char **av, int ac, int cmdptr);
-EXPORTFUNC void do_motd (const char* nick, const char *remoteserver);
-EXPORTFUNC void do_admin (const char* nick, const char *remoteserver);
-EXPORTFUNC void do_credits (const char* nick, const char *remoteserver);
-EXPORTFUNC void do_stats (const char* nick, const char *what);
-EXPORTFUNC void do_ping (const char* origin, const char *destination);
-EXPORTFUNC void do_pong (const char* origin, const char* destination);
-EXPORTFUNC void do_version (const char* nick, const char *remoteserver);
+EXPORTFUNC void m_private (char *origin, char **av, int ac, int cmdptr);
+EXPORTFUNC void m_notice (char *origin, char **av, int ac, int cmdptr);
+EXPORTFUNC void do_motd (const char *nick, const char *remoteserver);
+EXPORTFUNC void do_admin (const char *nick, const char *remoteserver);
+EXPORTFUNC void do_credits (const char *nick, const char *remoteserver);
+EXPORTFUNC void do_stats (const char *nick, const char *what);
+EXPORTFUNC void do_ping (const char *origin, const char *destination);
+EXPORTFUNC void do_pong (const char *origin, const char *destination);
+EXPORTFUNC void do_version (const char *nick, const char *remoteserver);
 EXPORTFUNC void do_protocol (char *origin, char **argv, int argc);
-EXPORTFUNC void do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **argv, int argc);
-EXPORTFUNC void do_netinfo (const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname);
-EXPORTFUNC void do_snetinfo (const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname);
-EXPORTFUNC void do_join (const char* nick, const char* chanlist, const char* keys);
-EXPORTFUNC void do_part (const char* nick, const char* chan, const char* reason);
+EXPORTFUNC void do_sjoin (char *tstime, char *channame, char *modes, char *sjoinnick, char **argv, int argc);
+EXPORTFUNC void do_netinfo (const char *maxglobalcnt, const char *tsendsync, const char *prot, const char *cloak, const char *netname);
+EXPORTFUNC void do_snetinfo (const char *maxglobalcnt, const char *tsendsync, const char *prot, const char *cloak, const char *netname);
+EXPORTFUNC void do_join (const char *nick, const char *chanlist, const char *keys);
+EXPORTFUNC void do_part (const char *nick, const char *chan, const char *reason);
 EXPORTFUNC void do_nick (const char *nick, const char *hopcount, const char *TS, 
 		const char *user, const char *host, const char *server, 
 		const char *ip, const char *servicestamp, const char *modes, 
@@ -140,36 +124,36 @@ EXPORTFUNC void do_client (const char *nick, const char *arg1, const char *TS,
 		const char *ip, const char *realname);
 EXPORTFUNC void do_quit (const char *target, const char *quitmsg);
 EXPORTFUNC void do_kill (const char *source, const char *target, const char *killmsg);
-EXPORTFUNC void do_squit (const char *name, const char* reason);
+EXPORTFUNC void do_squit (const char *name, const char *reason);
 EXPORTFUNC void do_kick (const char *kickby, const char *chan, const char *kicked, const char *kickreason);
 EXPORTFUNC void do_svinfo (void);
-EXPORTFUNC void do_vctrl (const char* uprot, const char* nicklen, const char* modex, const char* gc, const char* netname);
-EXPORTFUNC void do_smode (const char* target, const char* modes);
-EXPORTFUNC void do_mode_user (const char* target, const char* modes);
+EXPORTFUNC void do_vctrl (const char *uprot, const char *nicklen, const char *modex, const char *gc, const char *netname);
+EXPORTFUNC void do_smode (const char *target, const char *modes);
+EXPORTFUNC void do_mode_user (const char *target, const char *modes);
 EXPORTFUNC void do_mode_channel (char *origin, char **argv, int argc);
-EXPORTFUNC void do_svsmode_user (const char* target, const char* modes, const char* ts);
+EXPORTFUNC void do_svsmode_user (const char *target, const char *modes, const char *ts);
 /* These are the same for now but we might need to be different in the 
  * future so use macros
  */
 #define do_svsmode_channel do_mode_channel
-EXPORTFUNC void do_away (const char* target, const char *reason);
-EXPORTFUNC void do_vhost (const char* target, const char *vhost);
-EXPORTFUNC void do_nickchange (const char * oldnick, const char *newnick, const char * ts);
-EXPORTFUNC void do_topic (const char* chan, const char *owner, const char* ts, const char *topic);
-EXPORTFUNC void do_server (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline, int srv);
+EXPORTFUNC void do_away (const char *target, const char *reason);
+EXPORTFUNC void do_vhost (const char *target, const char *vhost);
+EXPORTFUNC void do_nickchange (const char *oldnick, const char *newnick, const char *ts);
+EXPORTFUNC void do_topic (const char *chan, const char *owner, const char *ts, const char *topic);
+EXPORTFUNC void do_server (const char *name, const char *uplink, const char *hops, const char *numeric, const char *infoline, int srv);
 EXPORTFUNC void do_burst (char *origin, char **argv, int argc);
 EXPORTFUNC void do_swhois (char *who, char *swhois);
 EXPORTFUNC void do_tkl(const char *add, const char *type, const char *user, const char *host, const char *setby, const char *tsexpire, const char *tsset, const char *reason);
 EXPORTFUNC void do_eos(const char *name);
-EXPORTFUNC void do_setname(const char* nick, const char* realname);
+EXPORTFUNC void do_setname(const char *nick, const char *realname);
 EXPORTFUNC void do_sethost (const char *nick, const char *host);
 EXPORTFUNC void do_setident (const char *nick, const char *ident);
 
 /* Defined in ircd specific files */
-MODULEFUNC void send_privmsg (const char *source, const char *to, const char *buf);
-MODULEFUNC void send_notice (const char *source, const char *to, const char *buf);
+MODULEFUNC void send_privmsg (const char *source, const char *target, const char *buf);
+MODULEFUNC void send_notice (const char *source, const char *target, const char *buf);
 MODULEFUNC void send_globops (const char *source, const char *buf);
-MODULEFUNC void send_wallops (const char *who, const char *buf);
+MODULEFUNC void send_wallops (const char *source, const char *buf);
 MODULEFUNC void send_numeric (const char *source, const int numeric, const char *target, const char *buf);
 MODULEFUNC void send_umode (const char *who, const char *target, const char *mode);
 MODULEFUNC void send_join (const char *who, const char *chan, const unsigned long ts);
@@ -180,7 +164,7 @@ MODULEFUNC void send_cmode (const char *source, const char *who, const char *cha
 MODULEFUNC void send_quit (const char *who, const char *quitmsg);
 MODULEFUNC void send_kill (const char *source, const char *target, const char *reason);
 MODULEFUNC void send_kick (const char *source, const char *chan, const char *target, const char *reason);
-MODULEFUNC void send_invite(const char *source, const char *to, const char *chan);
+MODULEFUNC void send_invite(const char *source, const char *target, const char *chan);
 MODULEFUNC void send_svskill (const char *source, const char *target, const char *reason);
 MODULEFUNC void send_svsmode (const char *source, const char *target, const char *modes);
 MODULEFUNC void send_svshost (const char *source, const char *target, const char *vhost);
@@ -191,19 +175,19 @@ MODULEFUNC void send_swhois (const char *source, const char *target, const char 
 MODULEFUNC void send_smo (const char *source, const char *umodetarget, const char *msg);
 MODULEFUNC void send_akill (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts);
 MODULEFUNC void send_rakill (const char *source, const char *host, const char *ident);
-MODULEFUNC void send_ping (const char *source, const char *reply, const char *to);
+MODULEFUNC void send_ping (const char *source, const char *reply, const char *target);
 MODULEFUNC void send_pong (const char *reply);
 MODULEFUNC void send_server (const char *source, const char *name, const int numeric, const char *infoline);
 MODULEFUNC void send_squit (const char *server, const char *quitmsg);
-MODULEFUNC void send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname);
+MODULEFUNC void send_nick (const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname);
 MODULEFUNC void send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink);
-MODULEFUNC void send_netinfo (const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts);
-MODULEFUNC void send_snetinfo (const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts);
+MODULEFUNC void send_netinfo (const char *source, const int prot, const char *cloak, const char *netname, const unsigned long ts);
+MODULEFUNC void send_snetinfo (const char *source, const int prot, const char *cloak, const char *netname, const unsigned long ts);
 MODULEFUNC void send_svinfo (const int tscurrent, const int tsmin, const unsigned long tsnow);
-MODULEFUNC void send_vctrl (const int uprot, const int nicklen, const int modex, const int gc, const char* netname);
+MODULEFUNC void send_vctrl (const int uprot, const int nicklen, const int modex, const int gc, const char *netname);
 MODULEFUNC void send_burst (int b);
 MODULEFUNC void send_svstime (const char *source, const unsigned long ts);
-MODULEFUNC void send_setname(const char* nick, const char* realname);
+MODULEFUNC void send_setname(const char *nick, const char *realname);
 MODULEFUNC void send_sethost (const char *nick, const char *host);
 MODULEFUNC void send_setident (const char *nick, const char *ident);
 
@@ -216,21 +200,20 @@ int irc_squit (const char *server, const char *quitmsg);
 /*int ssvinfo_cmd (void);*/
 /*int sburst_cmd (int b);*/
 /*int seob_cmd (const char *server);*/
-int irc_smo (const char *from, const char *umodetarget, const char *msg);
+int irc_smo (const char *source, const char *umodetarget, const char *msg);
 
 EXPORTFUNC void send_cmd (char *fmt, ...) __attribute__((format(printf,1,2))); /* 2=format 3=params */
 
-EXPORTFUNC void setserverbase64 (const char *name, const char* num);
-EXPORTFUNC char* servertobase64 (const char* name);
-EXPORTFUNC char* base64toserver (const char* num);
+EXPORTFUNC void setserverbase64 (const char *name, const char *num);
+EXPORTFUNC char *servertobase64 (const char *name);
+EXPORTFUNC char *base64toserver (const char *num);
 
-EXPORTFUNC void setnickbase64 (const char *nick, const char* num);
-EXPORTFUNC char* nicktobase64 (const char* nick);
-EXPORTFUNC char* base64tonick (const char* num);
+EXPORTFUNC void setnickbase64 (const char *nick, const char *num);
+EXPORTFUNC char *nicktobase64 (const char *nick);
+EXPORTFUNC char *base64tonick (const char *num);
 
-MODULEFUNC void parse (char* line);
-int flood (Client * u);
+MODULEFUNC void parse (char *line);
 
-void (*irc_parse) (char* line);
+void (*irc_parse) (char *line);
 
 #endif

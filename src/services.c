@@ -177,8 +177,9 @@ init_services_bot (void)
 	ircsnprintf (ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick);
 	if(config.onlyopers) 
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
-	ns_module.synched = 1;
+	ns_module.insynch = 1;
 	ns_botptr = init_bot (&ns_botinfo);
+	ns_module.synched = 1;
 	me.synched = 1;
 	SynchAllModules ();
 	RequestServerUptimes();	

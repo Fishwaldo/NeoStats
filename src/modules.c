@@ -83,13 +83,14 @@ int SynchModule (Module* module_ptr)
 	int err = NS_SUCCESS; /*FAILURE;*/
 	int (*ModSynch) (void);
 
-	module_ptr->synched = 1;
+	module_ptr->insynch = 1;
 	ModSynch = ns_dlsym ((int *) module_ptr->dl_handle, "ModSynch");
 	if (ModSynch) {
 		SET_RUN_LEVEL(module_ptr);
 		err = (*ModSynch) (); 
 		RESET_RUN_LEVEL();
 	}
+	module_ptr->synched = 1;
 	return err;
 }
 

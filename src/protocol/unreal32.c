@@ -341,33 +341,33 @@ send_squit (const char *server, const char *quitmsg)
 }
 
 void 
-send_quit (const char *who, const char *quitmsg)
+send_quit (const char *source, const char *quitmsg)
 {
-	send_cmd (":%s %s :%s", who, MSGTOK(QUIT), quitmsg);
+	send_cmd (":%s %s :%s", source, MSGTOK(QUIT), quitmsg);
 }
 
 void 
-send_part (const char *who, const char *chan)
+send_part (const char *source, const char *chan)
 {
-	send_cmd (":%s %s %s", who, MSGTOK(PART), chan);
+	send_cmd (":%s %s %s", source, MSGTOK(PART), chan);
 }
 
 void 
-send_join (const char *who, const char *chan, const unsigned long ts)
+send_join (const char *source, const char *chan, const unsigned long ts)
 {
-	send_cmd (":%s %s %s", who, MSGTOK(JOIN), chan);
+	send_cmd (":%s %s %s", source, MSGTOK(JOIN), chan);
 }
 
 void 
-send_sjoin (const char *source, const char *who, const char *chan, const unsigned long ts)
+send_sjoin (const char *source, const char *target, const char *chan, const unsigned long ts)
 {
-	send_cmd (":%s %s %lu %s + :%s", source, MSGTOK(SJOIN), ts, chan, who);
+	send_cmd (":%s %s %lu %s + :%s", source, MSGTOK(SJOIN), ts, chan, target);
 }
 
 void 
 send_cmode (const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %s %s %lu", who, MSGTOK(MODE), chan, mode, args, ts);
+	send_cmd (":%s %s %s %s %s %lu", source, MSGTOK(MODE), chan, mode, args, ts);
 }
 
 /* m_nick
@@ -403,21 +403,21 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 }
 
 void
-send_ping (const char *from, const char *reply, const char *to)
+send_ping (const char *source, const char *reply, const char *target)
 {
-	send_cmd (":%s %s %s :%s", from, MSGTOK(PING), reply, to);
+	send_cmd (":%s %s %s :%s", source, MSGTOK(PING), reply, target);
 }
 
 void 
-send_umode (const char *who, const char *target, const char *mode)
+send_umode (const char *source, const char *target, const char *mode)
 {
-	send_cmd (":%s %s %s :%s", who, MSGTOK(MODE), target, mode);
+	send_cmd (":%s %s %s :%s", source, MSGTOK(MODE), target, mode);
 }
 
 void 
-send_numeric (const char *from, const int numeric, const char *target, const char *buf)
+send_numeric (const char *source, const int numeric, const char *target, const char *buf)
 {
-	send_cmd (":%s %d %s :%s", from, numeric, target, buf);
+	send_cmd (":%s %d %s :%s", source, numeric, target, buf);
 }
 
 void
@@ -427,21 +427,21 @@ send_pong (const char *reply)
 }
 
 void
-send_netinfo (const char* from, const int prot, const char* cloak, const char* netname, const unsigned long ts)
+send_netinfo (const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts)
 {
-	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", from, MSGTOK(NETINFO), ts, prot, cloak, netname);
+	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSGTOK(NETINFO), ts, prot, cloak, netname);
 }
 
 void 
-send_kill (const char *from, const char *target, const char *reason)
+send_kill (const char *source, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s :%s", from, MSGTOK(KILL), target, reason);
+	send_cmd (":%s %s %s :%s", source, MSGTOK(KILL), target, reason);
 }
 
 void 
-send_smo (const char *from, const char *umodetarget, const char *msg)
+send_smo (const char *source, const char *umodetarget, const char *msg)
 {
-	send_cmd (":%s %s %s :%s", from, MSGTOK(SMO), umodetarget, msg);
+	send_cmd (":%s %s %s :%s", source, MSGTOK(SMO), umodetarget, msg);
 }
 
 void 
@@ -499,21 +499,21 @@ send_kick (const char *source, const char *chan, const char *target, const char 
 }
 
 void 
-send_wallops (const char *who, const char *buf)
+send_wallops (const char *source, const char *buf)
 {
-	send_cmd (":%s %s :%s", who, MSGTOK(WALLOPS), buf);
+	send_cmd (":%s %s :%s", source, MSGTOK(WALLOPS), buf);
 }
 
 void
-send_svshost (const char *source, const char *who, const char *vhost)
+send_svshost (const char *source, const char *target, const char *vhost)
 {
-	send_cmd (":%s %s %s %s", source, MSGTOK(CHGHOST), who, vhost);
+	send_cmd (":%s %s %s %s", source, MSGTOK(CHGHOST), target, vhost);
 }
 
 void
-send_invite (const char *from, const char *to, const char *chan) 
+send_invite (const char *source, const char *target, const char *chan) 
 {
-	send_cmd (":%s %s %s %s", from, MSGTOK(INVITE), to, chan);
+	send_cmd (":%s %s %s %s", source, MSGTOK(INVITE), target, chan);
 }
 
 void
@@ -542,21 +542,21 @@ send_rakill (const char *source, const char *host, const char *ident)
 }
 
 void
-send_privmsg (const char *from, const char *to, const char *buf)
+send_privmsg (const char *source, const char *target, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, MSGTOK(PRIVATE), to, buf);
+	send_cmd (":%s %s %s :%s", source, MSGTOK(PRIVATE), target, buf);
 }
 
 void
-send_notice (const char *from, const char *to, const char *buf)
+send_notice (const char *source, const char *target, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, MSGTOK(NOTICE), to, buf);
+	send_cmd (":%s %s %s :%s", source, MSGTOK(NOTICE), target, buf);
 }
 
 void
-send_globops (const char *from, const char *buf)
+send_globops (const char *source, const char *buf)
 {
-	send_cmd (":%s %s :%s", from, MSGTOK(GLOBOPS), buf);
+	send_cmd (":%s %s :%s", source, MSGTOK(GLOBOPS), buf);
 }
 
 void 

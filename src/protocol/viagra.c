@@ -167,27 +167,27 @@ send_squit (const char *server, const char *quitmsg)
 }
 
 void 
-send_quit (const char *who, const char *quitmsg)
+send_quit (const char *source, const char *quitmsg)
 {
-	send_cmd (":%s %s :%s", who, MSG_QUIT, quitmsg);
+	send_cmd (":%s %s :%s", source, MSG_QUIT, quitmsg);
 }
 
 void 
-send_part (const char *who, const char *chan)
+send_part (const char *source, const char *chan)
 {
-	send_cmd (":%s %s %s", who, MSG_PART, chan);
+	send_cmd (":%s %s %s", source, MSG_PART, chan);
 }
 
 void 
-send_sjoin (const char *source, const char *who, const char *chan, const unsigned long ts)
+send_sjoin (const char *source, const char *target, const char *chan, const unsigned long ts)
 {
-	send_cmd (":%s %s %lu %s + :%s", source, MSG_SJOIN, ts, chan, who);
+	send_cmd (":%s %s %lu %s + :%s", source, MSG_SJOIN, ts, chan, target);
 }
 
 void 
-send_join (const char *who, const char *chan, const unsigned long ts)
+send_join (const char *source, const char *chan, const unsigned long ts)
 {
-	send_cmd (":%s %s %s", who, MSG_JOIN, chan);
+	send_cmd (":%s %s %s", source, MSG_JOIN, chan);
 }
 
 void 
@@ -203,21 +203,21 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 }
 
 void
-send_ping (const char *from, const char *reply, const char *to)
+send_ping (const char *source, const char *reply, const char *target)
 {
-	send_cmd (":%s %s %s :%s", from, MSG_PING, reply, to);
+	send_cmd (":%s %s %s :%s", source, MSG_PING, reply, target);
 }
 
 void 
-send_umode (const char *who, const char *target, const char *mode)
+send_umode (const char *source, const char *target, const char *mode)
 {
-	send_cmd (":%s %s %s :%s", who, MSG_MODE, target, mode);
+	send_cmd (":%s %s %s :%s", source, MSG_MODE, target, mode);
 }
 
 void 
-send_numeric (const char *from, const int numeric, const char *target, const char *buf)
+send_numeric (const char *source, const int numeric, const char *target, const char *buf)
 {
-	send_cmd (":%s %d %s :%s", from, numeric, target, buf);
+	send_cmd (":%s %d %s :%s", source, numeric, target, buf);
 }
 
 void
@@ -227,9 +227,9 @@ send_pong (const char *reply)
 }
 
 void 
-send_kill (const char *from, const char *target, const char *reason)
+send_kill (const char *source, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s :%s", from, MSG_KILL, target, reason);	
+	send_cmd (":%s %s %s :%s", source, MSG_KILL, target, reason);	
 }
 
 void 
@@ -262,9 +262,9 @@ send_svspart (const char *source, const char *target, const char *chan)
 	send_cmd ("%s %s %s", MSG_SVSPART, target, chan);
 }
 void
-send_svshost (const char *source, const char *who, const char *vhost)
+send_svshost (const char *source, const char *target, const char *vhost)
 {
-	send_cmd (":%s %s %s %s", source, MSG_CHGHOST, who, vhost);
+	send_cmd (":%s %s %s %s", source, MSG_CHGHOST, target, vhost);
 }
 void
 send_svsmode (const char *source, const char *target, const char *modes)
@@ -278,9 +278,9 @@ send_kick (const char *source, const char *target, const char *chan, const char 
 }
 
 void 
-send_wallops (const char *who, const char *buf)
+send_wallops (const char *source, const char *buf)
 {
-	send_cmd (":%s %s :%s", who, MSG_WALLOPS, buf);
+	send_cmd (":%s %s :%s", source, MSG_WALLOPS, buf);
 }
 void
 send_akill (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
@@ -288,9 +288,9 @@ send_akill (const char *source, const char *host, const char *ident, const char 
 	send_cmd (":%s %s %s %s %lu %s %lu :%s", source, MSG_AKILL, host, ident, length, setby, ts, reason);
 }
 void
-send_invite (const char *from, const char *to, const char *chan) 
+send_invite (const char *source, const char *target, const char *chan) 
 {
-	send_cmd (":%s %s %s %s", from, MSG_INVITE, to, chan);
+	send_cmd (":%s %s %s %s", source, MSG_INVITE, target, chan);
 }
 void
 send_rakill (const char *source, const char *host, const char *ident)
@@ -316,21 +316,21 @@ send_burst (int b)
 }
 
 void
-send_privmsg (const char *from, const char *to, const char *buf)
+send_privmsg (const char *source, const char *target, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
+	send_cmd (":%s %s %s :%s", source, MSG_PRIVATE, target, buf);
 }
 
 void
-send_notice (const char *from, const char *to, const char *buf)
+send_notice (const char *source, const char *target, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
+	send_cmd (":%s %s %s :%s", source, MSG_NOTICE, target, buf);
 }
 
 void
-send_globops (const char *from, const char *buf)
+send_globops (const char *source, const char *buf)
 {
-	send_cmd (":%s %s :%s", from, MSG_GLOBOPS, buf);
+	send_cmd (":%s %s :%s", source, MSG_GLOBOPS, buf);
 }
 
 static void

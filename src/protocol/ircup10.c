@@ -71,7 +71,7 @@ const int proto_topiclen	= (250 + 1);
 
 ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
-	PROTOCOL_TOKEN|PROTOCOL_NOQUIT|PROTOCOL_B64SERVER|PROTOCOL_B64NICK|PROTOCOL_NICKIP,
+	PROTOCOL_TOKEN|PROTOCOL_NOQUIT|PROTOCOL_B64SERVER|PROTOCOL_B64NICK|PROTOCOL_NICKIP|PROTOCOL_KICKPART,
 	/* Protocol options negotiated at link by this IRCd */
 	0,
 	/* Features supported by this IRCd */
@@ -342,26 +342,26 @@ send_squit (const char *server, const char *quitmsg)
 }
 
 void 
-send_quit (const char *who, const char *quitmsg)
+send_quit (const char *source, const char *quitmsg)
 {
 	char* num;
 
 	/* Clear numeric */
-	num = nicktobase64 (who);
+	num = nicktobase64 (source);
 	neonicknumerics[convert2n[(int)num[4]]] = 0;
-	send_cmd ("%s %s :%s", nicktobase64 (who), TOK_QUIT, quitmsg);
+	send_cmd ("%s %s :%s", nicktobase64 (source), TOK_QUIT, quitmsg);
 }
 
 void 
-send_part (const char *who, const char *chan)
+send_part (const char *source, const char *chan)
 {
-	send_cmd ("%s %s %s", nicktobase64 (who), TOK_PART, chan);
+	send_cmd ("%s %s %s", nicktobase64 (source), TOK_PART, chan);
 }
 
 void
-send_join (const char *who, const char *chan, const unsigned long ts)
+send_join (const char *source, const char *chan, const unsigned long ts)
 {
-	send_cmd ("%s %s %s %lu", nicktobase64 (who), TOK_JOIN, chan, ts);
+	send_cmd ("%s %s %s %lu", nicktobase64 (source), TOK_JOIN, chan, ts);
 }
 
 /* R: ABAAH M #c3 +tn */
@@ -392,19 +392,19 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 }
 
 void
-send_ping (const char *from, const char *reply, const char *to)
+send_ping (const char *source, const char *reply, const char *target)
 {
-	send_cmd ("%s %s %s :%s", neostatsbase64, TOK_PING, reply, to);
+	send_cmd ("%s %s %s :%s", neostatsbase64, TOK_PING, reply, target);
 }
 
 void 
-send_umode (const char *who, const char *target, const char *mode)
+send_umode (const char *source, const char *target, const char *mode)
 {
-	send_cmd ("%s %s %s :%s", nicktobase64 (who), TOK_MODE, target, mode);
+	send_cmd ("%s %s %s :%s", nicktobase64 (source), TOK_MODE, target, mode);
 }
 
 void 
-send_numeric (const char *from, const int numeric, const char *target, const char *buf)
+send_numeric (const char *source, const int numeric, const char *target, const char *buf)
 {
 	send_cmd ("%s %d %s :%s", neostatsbase64, numeric, nicktobase64 (target), buf);
 }
@@ -416,7 +416,7 @@ send_pong (const char *reply)
 }
 
 void 
-send_kill (const char *from, const char *target, const char *reason)
+send_kill (const char *source, const char *target, const char *reason)
 {
 	send_cmd ("%s %s %s :%s", neostatsbase64, TOK_KILL, nicktobase64 (target), reason);
 }
@@ -428,9 +428,9 @@ send_nickchange (const char *oldnick, const char *newnick, const unsigned long t
 }
 
 void
-send_invite (const char *from, const char *to, const char *chan) 
+send_invite (const char *source, const char *target, const char *chan) 
 {
-	send_cmd ("%s %s %s %s", nicktobase64 (from), TOK_INVITE, to, chan);
+	send_cmd ("%s %s %s %s", nicktobase64 (source), TOK_INVITE, target, chan);
 }
 
 void 
@@ -440,12 +440,12 @@ send_kick (const char *source, const char *chan, const char *target, const char 
 }
 
 void 
-send_wallops (const char *who, const char *buf)
+send_wallops (const char *source, const char *buf)
 {
-	if(nicktobase64 (who)) {
-		send_cmd ("%s %s :%s", nicktobase64 (who), TOK_WALLUSERS, buf);
-	} else if(servertobase64 (who)) {
-		send_cmd ("%s %s :%s", servertobase64 (who), TOK_WALLUSERS, buf);
+	if(nicktobase64 (source)) {
+		send_cmd ("%s %s :%s", nicktobase64 (source), TOK_WALLUSERS, buf);
+	} else if(servertobase64 (source)) {
+		send_cmd ("%s %s :%s", servertobase64 (source), TOK_WALLUSERS, buf);
 	}
 }
 
@@ -479,28 +479,28 @@ send_rakill (const char *source, const char *host, const char *ident)
 }
 
 void
-send_privmsg (const char *from, const char *to, const char *buf)
+send_privmsg (const char *source, const char *target, const char *buf)
 {
-	if(to[0] == '#') {
-		send_cmd ("%s %s %s :%s", nicktobase64 (from), TOK_PRIVATE, to, buf);
+	if(target[0] == '#') {
+		send_cmd ("%s %s %s :%s", nicktobase64 (source), TOK_PRIVATE, target, buf);
 	} else {
-		send_cmd ("%s %s %s :%s", nicktobase64 (from), TOK_PRIVATE, nicktobase64 (to), buf);
+		send_cmd ("%s %s %s :%s", nicktobase64 (source), TOK_PRIVATE, nicktobase64 (target), buf);
 	}
 }
 
 void
-send_notice (const char *from, const char *to, const char *buf)
+send_notice (const char *source, const char *target, const char *buf)
 {
-	send_cmd ("%s %s %s :%s", nicktobase64 (from), TOK_NOTICE, nicktobase64 (to), buf);
+	send_cmd ("%s %s %s :%s", nicktobase64 (source), TOK_NOTICE, nicktobase64 (target), buf);
 }
 
 void
-send_globops (const char *from, const char *buf)
+send_globops (const char *source, const char *buf)
 {
-	if(nicktobase64 (from)) {
-		send_cmd ("%s %s :%s", nicktobase64 (from), TOK_WALLOPS, buf);
-	} else if(servertobase64 (from)) {
-		send_cmd ("%s %s :%s", servertobase64 (from), TOK_WALLOPS, buf);
+	if(nicktobase64 (source)) {
+		send_cmd ("%s %s :%s", nicktobase64 (source), TOK_WALLOPS, buf);
+	} else if(servertobase64 (source)) {
+		send_cmd ("%s %s :%s", servertobase64 (source), TOK_WALLOPS, buf);
 	}
 }
 
