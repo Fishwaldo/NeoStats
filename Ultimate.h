@@ -525,8 +525,8 @@
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY)))
-#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_ADMONLY) || CheckChanMode(x, CMODE_OPERONLY) ))
-#define is_priv_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_ADMONLY) || CheckChanMode(x, CMODE_OPERONLY) ))
+#define is_pub_chan(x)  ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_INVITEONLY|CMODE_ADMONLY|CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_INVITEONLY|CMODE_ADMONLY|CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY)))
 
 /* Umode macros */
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))

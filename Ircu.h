@@ -240,8 +240,8 @@
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))
-#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
-#define is_priv_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_pub_chan(x)  ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
 
 /* Umode macros */
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
