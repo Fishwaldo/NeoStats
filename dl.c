@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.55 2003/05/09 13:37:53 fishwaldo Exp $
+** $Id: dl.c,v 1.56 2003/05/14 16:07:18 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -488,13 +488,16 @@ int load_module(char *path1, User *u) {
 	} else {
 		do_msg = 1;
 	}
+#if 0
 	snprintf(path, 255, "%s.so", path1);
-
 	dl_handle = dlopen(path, RTLD_NOW || RTLD_GLOBAL); 
 	if (!dl_handle) {
-		snprintf(p, 255, "%s/%s", me.modpath, path);
+#endif
+		snprintf(p, 255, "dl/%s.so", path1);
 		dl_handle = dlopen(p, RTLD_NOW || RTLD_GLOBAL); 
+#if 0
 	}
+#endif
 	strcpy(segvinmodule, "");
 	if (!dl_handle) {
 		if (do_msg) prefmsg(u->nick, s_Services, "Error, Couldn't Load Module");
