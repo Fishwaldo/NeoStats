@@ -145,6 +145,7 @@ int InitCore(void)
 	if (init_curl () != NS_SUCCESS)
 		return NS_FAILURE;
 	init_ircd ();
+	return NS_SUCCESS;
 }
 
 /** @brief Main Entry point into program
