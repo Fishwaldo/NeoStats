@@ -40,18 +40,19 @@ void ss_html() {
 	} else {
 		return;
 	}
-#ifdef DEBUG
 	tpl = fopen("dl/statserv/html/index.tpl", "r");
-#else
-	tpl = fopen("data/index.tpl", "r");
-#endif
 	if (!tpl) {
-		printf("can't open template\n");
+		tpl = fopen("data/index.tpl", "r");
+	}
+	if (!tpl) {
+		log("can't open StatServ HTML template");
+		notice(s_StatServ, "Can't Open StatServ HTML Template");
 		return;
 	}
 	opf = fopen(StatServ.htmlpath, "w");
 	if (!opf) {
-		printf("can't open output file\n");
+		log("Can't open StatServ HTML output file - Check Permissions");
+		notice(s_StatServ, "Can't open StatServ HTML output file - Check Permissions");
 		return;
 	}
 	buf = malloc(20480);

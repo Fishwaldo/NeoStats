@@ -348,7 +348,7 @@
 #define MODE_CHANADMIN  0x800000
 
 
-#define is_hidden_chan(x) (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY))
+#define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
 
 
 

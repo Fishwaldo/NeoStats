@@ -718,7 +718,11 @@ void Usr_DelUser(char *origin, char **argv, int argc) {
 	DelUser(origin);
 }
 void Usr_Smode(char *origin, char **argv, int argc) {
+#ifdef ULTIMATE3
+	UserMode(argv[0], argv[2]);
+#else
 	UserMode(argv[0], argv[1]);
+#endif
 	Module_Event("UMODE", finduser(argv[0]));
 }
 void Usr_Mode(char *origin, char **argv, int argc) {

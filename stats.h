@@ -50,7 +50,7 @@
 #undef CODERHACK
 
 
-#define CHANLEN			32
+#define CHANLEN			50
 #define BUFSIZE			512
 #define CONFIG_NAME		"stats.cfg"
 #define MAXHOST			63
