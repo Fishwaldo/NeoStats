@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.94 2002/09/24 10:54:05 fishwaldo Exp $
+** $Id: ircd.c,v 1.95 2002/10/13 06:57:43 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -159,7 +159,7 @@ IntCommands cmd_list[] = {
 	{NULL,		NULL,			0,	0}
 };
 #endif
-#ifdef HYBRID7
+#if defined(HYBRID7) || defined(NEOIRCD)
 IntCommands cmd_list[] = {
 	/* Command	Function		srvmsg*/
 	{MSG_STATS,	Usr_Stats, 		1,	0},
@@ -285,8 +285,10 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 
 #ifdef ULTIMATE3
 	snewnick_cmd(nick, user, host, rname, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
-#elif HYBRID7
+#elif defined(HYBRID7) 
 	snewnick_cmd(nick, user, host, rname, UMODE_ADMIN);
+#elif defined(NEOIRCD)
+	snewnick_cmd(nick, user, host, rname, UMODE_ADMIN | UMODE_SERVICES);
 #else 
 	snewnick_cmd(nick, user, host, rname);
 //	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
@@ -294,16 +296,20 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 #ifdef UNREAL
 	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
 #elif !ULTIMATE
-#ifndef HYBRID7
+#if !defined(HYBRID7) && !defined(NEOIRCD)
 	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif
 #endif
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
-#ifndef HYBRID
-	schmode_cmd(nick, me.chan, "+oa", cmd);
+#ifndef HYBRID7
+#ifdef NEOIRCD
+
+	schmode_cmd(me.name, me.chan, "+a", cmd);
 #else
-	schmode_cmd(nick, me.chan, "+o", cmd);
+	schmode_cmd(nick, me.chan, "+oa", cmd);
+#endif
+#else
 #endif
 	AddStringToList(&av, nick, &ac);
 	Module_Event("SIGNON", av, ac);
@@ -599,7 +605,7 @@ void init_ServBot()
 #ifdef ULTIMATE3
 	sburst_cmd(1);
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
-#elif HYBRID7
+#elif defined(HYBRID7) || defined(NEOIRCD)
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_ADMIN | UMODE_SERVICES);
 #else 
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname);
@@ -607,15 +613,20 @@ void init_ServBot()
 #ifdef UNREAL
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
 #elif !ULTIMATE
-#ifndef HYBRID7
+#if !defined(HYBRID7) && !defined(NEOIRCD)
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif
 #endif
 
 	sjoin_cmd(s_Services, me.chan);
 	sprintf(rname, "%s %s", s_Services, s_Services);
-#ifndef HYBRID7
+#if !defined(HYBRID7)
+#ifdef NEOIRCD
+
+	schmode_cmd(me.name, me.chan, "+a", rname);
+#else
 	schmode_cmd(s_Services, me.chan, "+oa", rname);
+#endif
 #else
 	schmode_cmd(s_Services, me.chan, "+o", rname);
 #endif
@@ -646,7 +657,7 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 	}
 
 	if (*modes == '#') {
-#ifdef HYBRID7
+#if defined(HYBRID7) || defined(NEOIRCD)
 		join_chan(finduser(argv[4]), modes);
 #else
 		join_chan(finduser(origin), modes);
@@ -686,11 +697,13 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 			if (*modes == '@') {
 				mode |= MODE_CHANOP;
 				modes++;
-#ifdef ULTIMATE3
+#if defined(ULTIMATE3) || defined(NEOIRCD)
 			/* Ultimate3 has had 3 different flags for Chan Admins! */
 			} else if (*modes == '!') {
 				mode |= MODE_CHANADMIN;
 				modes++;
+#endif
+#ifdef ULTIMATE3
 			} else if (*modes == '¤') {
 				mode |= MODE_CHANADMIN;
 				modes++;
@@ -742,8 +755,8 @@ void Srv_Burst(char *origin, char **argv, int argc) {
 	} else {
 		ircd_srv.burst = 1;
 	}
-#ifdef HYBRID7
-	seob_cmd(origin);
+#if defined(HYBRID7) || defined(NEOIRCD)
+	seob_cmd(me.name);
 	init_ServBot();
 #endif
 	
@@ -971,7 +984,7 @@ void Usr_Topic(char *origin, char **argv, int argc) {
 	Chans *c;
 	c = findchan(argv[0]);
 	if (c) {
-#ifndef HYBRID7
+#if !defined(HYBRID7) && !defined(NEOIRCD)
 		buf = joinbuf(argv, argc, 3);
 		Change_Topic(argv[1], c, atoi(argv[2]), buf);
 #else
@@ -1038,7 +1051,7 @@ void Srv_Netinfo(char *origin, char **argv, int argc) {
 			strcpy(ircd_srv.cloak, argv[3]);
 			strcpy(me.netname, argv[7]);
 
-#ifndef HYBRID7
+#if !defined(HYBRID7) && !defined(NEOIRCD)
 			snetinfo_cmd();
 #endif
 			init_ServBot();
@@ -1092,6 +1105,9 @@ void Srv_Squit(char *origin, char **argv, int argc) {
 void Srv_Nick(char *origin, char **argv, int argc) {
 			char **av;
 			int ac = 0;
+#ifdef NEOIRCD
+			User *u;
+#endif
 			AddStringToList(&av, argv[0], &ac);
 #ifdef UNREAL 
 			AddUser(argv[0], argv[3], argv[4], argv[5], 0, strtol(argv[2], NULL, 10));
@@ -1111,6 +1127,19 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 #elif HYBRID7
 			AddUser(argv[0], argv[4], argv[5], argv[6], 0, strtoul(argv[2], NULL, 10));
 			Module_Event("SIGNON", av, ac);
+#ifdef DEBUG
+			log("Mode: UserMode: %s",argv[3]);
+#endif
+			UserMode(argv[0], argv[3]);
+			AddStringToList(&av, argv[3], &ac);
+			Module_Event("UMODE", av, ac);
+#elif NEOIRCD
+			AddUser(argv[0], argv[4], argv[5], argv[7], 0, strtoul(argv[2], NULL, 10));
+			Module_Event("SIGNON", av, ac);
+			u = finduser(argv[0]);
+			if (u) {
+				strcpy(u->vhost, argv[6]);
+			}
 #ifdef DEBUG
 			log("Mode: UserMode: %s",argv[3]);
 #endif

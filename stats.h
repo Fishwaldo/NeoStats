@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.59 2002/09/04 08:40:27 fishwaldo Exp $
+** $Id: stats.h,v 1.60 2002/10/13 06:57:43 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -54,6 +54,8 @@
 #include "Ultimate.h"
 #elif HYBRID7 == 1
 #include "hybrid7.h"
+#elif NEOIRCD == 1
+#include "neoircd.h"
 #else
 #error Error, you must select a IRCD to use. See ./configure --help for more information
 #endif

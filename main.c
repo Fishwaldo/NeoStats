@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.69 2002/09/24 10:44:18 fishwaldo Exp $
+** $Id: main.c,v 1.70 2002/10/13 06:57:43 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -44,6 +44,8 @@ const char version[] = "NeoStats-2.5_Rc1(UL3)";
 const char version[] = "NeoStats-2.5_Rc1(UL)";
 #elif HYBRID7
 const char version[] = "NeoStats-2.5_Rc1(H)";
+#elif NEOIRCD
+const char version[] = "NeoStats-2.5_Rc1(N)";
 #endif
 
 

@@ -113,9 +113,11 @@
 /* 'Enable Unreal Support' */
 #undef UNREAL
 
-/* enable hybbid support */
+/* enable hybrid support */
 #undef HYBRID7
 
+/* enable neoircd support */
+#undef NEOIRCD
 
 /* Version number of package */
 #undef VERSION

@@ -828,6 +828,7 @@ Optional Features:
  --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support
  --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support
  --enable-hybrid7 - enable Hybrid7 IRCD Support
+ --enable-neoircd - enable NeoIRCd IRCD Support
  --enable-auth==TYPE - what type of Authentication to use. See Readme File
  --enable-modules="MODULES" - space seperated list of modules to compile
 
@@ -4825,6 +4826,33 @@ echo "${ECHO_T}no" >&6
 
 fi;
 
+echo "$as_me:$LINENO: checking Whether to Enable NeoIRCd IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable NeoIRCd IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-neoircd or --disable-neoircd was given.
+if test "${enable_neoircd+set}" = set; then
+  enableval="$enable_neoircd"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define NEOIRCD 1
+_ACEOF
+
+	IRCD_FILES_SRC="neoircd.c"
+	IRCD_FILES_OBJS="neoircd.o"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
 
 echo "$as_me:$LINENO: checking A compatible IRCD is specified" >&5
 echo $ECHO_N "checking A compatible IRCD is specified... $ECHO_C" >&6
@@ -4845,6 +4873,10 @@ echo "${ECHO_T}yes" >&6
 	echo "Please report any bugs, or Desyncs to:"
 	echo "http://www.neostats.net/boards"
 	echo "*******************************************************"
+	;;
+   "neoircd.c")
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
 	;;
   *)
 	echo "$as_me:$LINENO: result: no" >&5
