@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.1 2002/10/14 05:44:39 fishwaldo Exp $
+** $Id: neoircd.c,v 1.2 2002/10/27 04:44:00 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -208,25 +208,21 @@ int snick_cmd(const char *oldnick, const char *newnick) {
 	return 1;
 }
 int sswhois_cmd(const char *target, const char *swhois) {
-	notice(s_Services, "Warning Module %s tried to SWHOIS, which is not supported in Hybrid", segvinmodule);
-	log("Warning. Module %s tried to SWHOIS, which is not supported in Hybrid", segvinmodule);
+	sts(":%s SWHOIS %s :%s", me.name, target, swhois);
 	return 1;
 }
 int ssvsnick_cmd(const char *target, const char *newnick) {
-	notice(s_Services, "Warning Module %s tried to SVSNICK, which is not supported in Hybrid", segvinmodule);
-	log("Warning. Module %s tried to SVSNICK, which is not supported in Hybrid", segvinmodule);
+	sts(":%s SVSNICK %s %s :%lu", me.name, target, newnick, time(NULL));
 	return 1;
 }
 
 int ssvsjoin_cmd(const char *target, const char *chan) {
-	notice(s_Services, "Warning Module %s tried to SJOIN, which is not supported in Hybrid", segvinmodule);
-	log("Warning. Module %s tried to SJOIN, which is not supported in Hybrid", segvinmodule);
+	sts(":%s SVSJOIN %s %s", me.name, target, chan);
 	return 1;
 }
 
 int ssvspart_cmd(const char *target, const char *chan) {
-	notice(s_Services, "Warning Module %s tried to SVSPART, which is not supported in Hybrid", segvinmodule);
-	log("Warning. Module %s tried to SVSPART, which is not supported in Hybrid", segvinmodule);
+	sts(":%s SVSPART %s %s", me.name, target, chan);
 	return 1;
 }
 
@@ -246,9 +242,17 @@ int swallops_cmd(const char *who, const char *msg,...) {
 }
 
 int ssvshost_cmd(const char *who, const char *vhost) {
-	notice(s_Services, "Warning Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
-	log("Warning. Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
-	return 1;
+	User *u;
+	u = finduser(who);
+	if (u) {
+		strncpy(u->vhost, vhost, MAXHOST);
+		sts(":%s SVSHOST %s :%s", me.name, who, vhost);
+		return 1;
+	} else {
+                log("Can't Find user %s for ssvshost_cmd", who);
+                return 0;
+	}		                                
+	return 0;
 }
 int ssvinfo_cmd() {
 	sts("SVINFO 5 3 0 :%d", time(NULL));
