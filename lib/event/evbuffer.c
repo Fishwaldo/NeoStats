@@ -160,6 +160,9 @@ bufferevent_writecb(int fd, short event, void *arg)
 	if (EVBUFFER_LENGTH(bufev->output)) {
 	    res = evbuffer_write(bufev->output, fd);
 	    if (res == -1) {
+#ifdef WIN32
+		errno = WSAGetLastError();
+#endif
 		    if (errno == EAGAIN ||
 			errno == EINTR ||
 			errno == EINPROGRESS)
