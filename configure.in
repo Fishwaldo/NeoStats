@@ -12,8 +12,8 @@ CFLAGS="$CFLAGS -O2 -g"
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL 
-
-AC_PROG_CPP
+AC_PROG_LEX
+AC_PROG_YACC
 AC_PROG_RANLIB
 
 dnl Checks for libraries.
@@ -475,7 +475,7 @@ AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_CONFIG_HEADER(adns/config.h)
 AC_CONFIG_HEADER(pcre/config.h)
-AC_OUTPUT(Makefile.inc Makefile tools/Makefile pcre/Makefile pcre.h:pcre/pcre.in)
+AC_OUTPUT(Makefile.inc Makefile sqlsrv/Makefile tools/Makefile pcre/Makefile pcre.h:pcre/pcre.in)
 NEO_SUBDIR_CONFIG(curl, [--disable-thread --disable-ipv6 --enable-nonblocking --without-ssl])
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"

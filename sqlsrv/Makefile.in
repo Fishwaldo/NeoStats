@@ -1,3 +1,4 @@
+include ../Makefile.inc
 ################################################################
  # Run Time Access
  # Copyright (C) 2003 Robert W Smith (bsmith@linuxtoys.org)
@@ -14,40 +15,36 @@
 ################################################################
 # We use the default make rules for .c and .l 
 
-CC = gcc
-OPT =  -fPIC -c -I. -I..
-DEBUG = -g -DDEBUG -DYYDEBUG -ggdb -Wall
-CFLAGS = $(OPT) $(DEBUG)
 OBJS   = api.o token.o parse.tab.o do_sql.o rtatables.o
+SQLINCLUDES = -I. -I..
 LIBS   = 
-
+LEX    = @LEX@
+LEXLIBS= @LEXLIBS@
+YACC   = @YACC@
 
 
 all: librtadb.a
 
+.c.o:
+	$(CC) $(SQLINCLUDES) $(CFLAGS) -c $<
+
+
 librtadb.a: $(OBJS)
 	ar -rcs librtadb.a $(OBJS)
+
+token.c:
+	$(LEX) -otoken.c token.l 
 
 token.o: parse.tab.c do_sql.h
 
 parse.tab.c: parse.y do_sql.h
-	yacc -dv -bparse parse.y
+	$(YACC) -dv -bparse parse.y 
 
 api.o: api.c rta.h do_sql.h
 
 do_sql.o: do_sql.c do_sql.h rta.h
 
 rtatables.o: rtatables.c do_sql.h rta.h
-
-standard: clean
-	for i in *.h *.c ; \
-	do \
-	 indent  -bad -bap -nbbb -bli0 -cdw -cli2 -cbi0 -saf -nut \
-		-sai -saw -di9 -nbc -bfda -bls -lp -ci2 -i2 -nbbo -l72 \
-		-fca -nbfda -nbfde -nlp -bbo -sob -cd24 -ts0 -npcs -nut \
-		-T TBLDEF -T COLDEF -T PRXPORT $$i ; \
-	 rm $$i~ ; \
-	done
 
 
 clean: 

@@ -303,7 +303,7 @@ pcre/study.c eol=lf
 /services.h eol=lf
 /sock.c eol=lf
 /sock.h eol=lf
-sqlsrv/Makefile -text
+sqlsrv/Makefile.in -text
 sqlsrv/README -text
 sqlsrv/api.c -text
 sqlsrv/do_sql.c -text
