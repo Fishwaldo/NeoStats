@@ -24,7 +24,6 @@
 */
 
 #include <stdio.h>
-#include <fnmatch.h>
 #include "neostats.h"
 #include "hostserv.h"
 
@@ -225,7 +224,7 @@ static int hs_sign_on(char **av, int ac)
 	if (hn) {
 		map = lnode_get(hn);
 		nlog(LOG_DEBUG1, LOG_MOD, "Checking %s against %s for HostName Match", map->host, u->hostname);
-		if (fnmatch(map->host, u->hostname, 0) == 0) {
+		if (match(map->host, u->hostname)) {
 			ssvshost_cmd(u->nick, map->vhost);
 			prefmsg(u->nick, s_HostServ,
 				"Automatically setting your Virtual Host to %s",
@@ -571,7 +570,7 @@ static int hs_chpass(User * u, char **av, int ac)
 	hn = list_find(vhosts, nick, findnick);
 	if (hn) {
 		map = lnode_get(hn);
-		if ((fnmatch(map->host, u->hostname, 0) == 0)
+		if ((match(map->host, u->hostname))
 		    || (UserLevel(u) >= 100)) {
 			if (!ircstrcasecmp(map->passwd, oldpass)) {
 				strlcpy(map->passwd, newpass, MAXPASSWORD);
@@ -627,7 +626,7 @@ static int hs_add(User * u, char **av, int ac)
 	SET_SEGV_LOCATION();
 	hash_scan_begin(&hs, bannedvhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
-		if (fnmatch(hnode_get(hn), h, 0) == 0) {
+		if (match(hnode_get(hn), h)) {
 			prefmsg(u->nick, s_HostServ,
 				"The Hostname %s has been matched against the banned hostname %s",
 				h, (char *) hnode_get(hn));
@@ -659,7 +658,7 @@ static int hs_add(User * u, char **av, int ac)
 		if ((nu = finduser(cmd)) != NULL) {
 			if (findbot(cmd))
 				return 1;
-			if (fnmatch(m, nu->hostname, 0) == 0) {
+			if (match(m, nu->hostname)) {
 				ssvshost_cmd(nu->nick, h);
 				prefmsg(u->nick, s_HostServ,
 					"%s is online now, setting vhost to %s",

@@ -2,6 +2,9 @@ HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
 ==============================================================================
+* July 07, 2004 * Fish
+ - use "match" rather than fnmatch
+
 * Version 3.4 * Mark (M) * Feb 17, 2004
  - SET interface for nick/user/host/realname added (M)
 
