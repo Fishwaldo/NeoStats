@@ -29,6 +29,9 @@
  */
 
 #include "neostats.h"
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h> 
+#endif
 
 int os_sock_close( OS_SOCKET sock )
 {
