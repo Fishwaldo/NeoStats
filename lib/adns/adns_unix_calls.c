@@ -90,25 +90,3 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 	return 0;
 }
-
-/* Memory allocated in the DLL must be freed in the dll, so
-   we provide memory manegement functions. */
-
-#ifdef ADNS_DLL
-
-void *adns_malloc(const size_t bytes)
-{
-	return malloc(bytes);
-}
-
-void *adns_realloc(void *ptr, const size_t bytes)
-{
-	return realloc(ptr, bytes);
-}
-
-void adns_free(void *ptr)
-{
-	free(ptr);
-}
-
-#endif /* ADNS_DLL */

@@ -855,7 +855,7 @@ int adns__internal_check(adns_state ads,
 	if (context_r)
 		*context_r = qu->ctx.ext;
 	*query_io = qu;
-  adns_free(qu);
+  ns_free(qu);
 	return 0;
 }
 

@@ -39,12 +39,12 @@ static adns_query query_alloc(adns_state ads, const typeinfo * typei,
 	/* Allocate a virgin query and return it. */
 	adns_query qu;
 
-	qu = malloc(sizeof(*qu));
+	qu = ns_malloc(sizeof(*qu));
 	if (!qu)
 		return 0;
-	qu->answer = malloc(sizeof(*qu->answer));
+	qu->answer = ns_malloc(sizeof(*qu->answer));
 	if (!qu->answer) {
-		free(qu);
+		ns_free(qu);
 		return 0;
 	}
 
@@ -101,7 +101,7 @@ static void query_submit(adns_state ads, adns_query qu,
 	qu->vb = *qumsg_vb;
 	adns__vbuf_init(qumsg_vb);
 
-	qu->query_dgram = malloc(qu->vb.used);
+	qu->query_dgram = ns_malloc(qu->vb.used);
 	if (!qu->query_dgram) {
 		adns__query_fail(qu, adns_s_nomemory);
 		return;
@@ -192,7 +192,7 @@ void adns__search_next(adns_state ads, adns_query qu, struct timeval now)
 		}
 	}
 
-	free(qu->query_dgram);
+	ns_free(qu->query_dgram);
 	qu->query_dgram = 0;
 	qu->query_dglen = 0;
 
@@ -328,7 +328,7 @@ int adns_submit_reverse_any(adns_state ads,
 
 	lreq = strlen(zone) + 4 * 4 + 1;
 	if (lreq > sizeof(shortbuf)) {
-		buf = malloc(strlen(zone) + 4 * 4 + 1);
+		buf = ns_malloc(strlen(zone) + 4 * 4 + 1);
 		if (!buf)
 			return errno;
 		buf_free = buf;
@@ -340,7 +340,7 @@ int adns_submit_reverse_any(adns_state ads,
 		iaddr[0], zone);
 
 	r = adns_submit(ads, buf, type, flags, context, query_r);
-	free(buf_free);
+	ns_free(buf_free);
 	return r;
 }
 
@@ -382,7 +382,7 @@ static void *alloc_common(adns_query qu, size_t sz)
 	if (!sz)
 		return qu;	/* Any old pointer will do */
 	assert(!qu->final_allocspace);
-	an = malloc(MEM_ROUND(MEM_ROUND(sizeof(*an)) + sz));
+	an = ns_malloc(MEM_ROUND(MEM_ROUND(sizeof(*an)) + sz));
 	if (!an)
 		return 0;
 	LIST_LINK_TAIL(qu->allocations, an);
@@ -484,12 +484,12 @@ static void free_query_allocs(adns_query qu)
 	cancel_children(qu);
 	for (an = qu->allocations.head; an; an = ann) {
 		ann = an->next;
-		free(an);
+		ns_free(an);
 	}
 	ALIST_INIT(qu->allocations);
 	adns__vbuf_free(&qu->vb);
 	adns__vbuf_free(&qu->search_vb);
-	free(qu->query_dgram);
+	ns_free(qu->query_dgram);
 	qu->query_dgram = 0;
 }
 
@@ -518,8 +518,8 @@ void adns_cancel(adns_query qu)
 		abort();
 	}
 	free_query_allocs(qu);
-	free(qu->answer);
-	free(qu);
+	ns_free(qu->answer);
+	ns_free(qu);
 	adns__consistency(ads, 0, cc_entex);
 }
 
@@ -544,7 +544,7 @@ static void makefinal_query(adns_query qu)
 
 	if (qu->interim_allocd) {
 		ans =
-		    realloc(qu->answer,
+		    ns_realloc(qu->answer,
 			    MEM_ROUND(MEM_ROUND(sizeof(*ans)) +
 				      qu->interim_allocd));
 		if (!ans)
@@ -615,8 +615,8 @@ void adns__query_done(adns_query qu)
 		LIST_UNLINK(qu->ads->childw, parent);
 		qu->ctx.callback(parent, qu);
 		free_query_allocs(qu);
-		free(qu->answer);
-		free(qu);
+		ns_free(qu->answer);
+		ns_free(qu);
 	} else {
 		makefinal_query(qu);
 		LIST_LINK_TAIL(qu->ads->output, qu);

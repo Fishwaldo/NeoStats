@@ -131,12 +131,6 @@ ADNS_API int adns_writev (int FileDescriptor, const struct iovec * iov, int iovC
 ADNS_API int adns_inet_aton(const char *cp, struct in_addr *inp);
 ADNS_API int adns_getpid();
 
-#ifdef ADNS_DLL
- ADNS_API void *adns_malloc(const size_t bytes);
- ADNS_API void *adns_realloc(void *ptr, const size_t bytes);
- ADNS_API void adns_free(void *ptr);
-#endif
-
 #define gettimeofday(tv, tz) adns_gettimeofday(tv, tz)
 #define writev(FileDescriptor, iov, iovCount) adns_writev(FileDescriptor, iov, iovCount)
 #define inet_aton(ap, inp) adns_inet_aton(ap, inp)

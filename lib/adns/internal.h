@@ -34,46 +34,13 @@
 #ifndef ADNS_INTERNAL_H_INCLUDED
 #define ADNS_INTERNAL_H_INCLUDED
 
-#ifdef WIN32
-#include "configwin32.h"
-#else
-#include "config.h"
-#endif
-
 #include "neostats.h"
 
 typedef unsigned char byte;
 
-#include <stddef.h>
-#include <stdio.h>
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
-#include <errno.h>
-#include <stdlib.h>
-#ifndef WIN32
-#include <unistd.h>
-#endif
-
-#include <stdarg.h>
-#include <assert.h>
 #include <signal.h>
-#include <string.h>
-#ifndef WIN32
+#ifdef HAVE_POLL_H
 #include <poll.h>
-#include <sys/time.h>
-#endif
-#ifdef HAVE_TIME_H
-#include <time.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif
-#ifdef HAVE_NETINET_IN_H
-#include <netinet/in.h>
-#endif                                                                                                            
-#ifdef HAVE_NETDB_H
-#include <netdb.h>
 #endif
 
 #include "adns.h"

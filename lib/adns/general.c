@@ -132,7 +132,7 @@ int adns__vbuf_ensure(vbuf * vb, int want)
 
 	if (vb->avail >= want)
 		return 1;
-	nb = realloc(vb->buf, want);
+	nb = ns_realloc(vb->buf, want);
 	if (!nb)
 		return 0;
 	vb->buf = nb;
@@ -156,10 +156,10 @@ int adns__vbuf_append(vbuf * vb, const byte * data, int len)
 		if (newlen < 20)
 			newlen = 20;
 		newlen <<= 1;
-		nb = realloc(vb->buf, newlen);
+		nb = ns_realloc(vb->buf, newlen);
 		if (!nb) {
 			newlen = vb->used + len;
-			nb = realloc(vb->buf, newlen);
+			nb = ns_realloc(vb->buf, newlen);
 		}
 		if (!nb)
 			return 0;
@@ -179,7 +179,7 @@ int adns__vbuf_appendstr(vbuf * vb, const char *data)
 
 void adns__vbuf_free(vbuf * vb)
 {
-	free(vb->buf);
+	ns_free(vb->buf);
 	adns__vbuf_init(vb);
 }
 
@@ -244,7 +244,7 @@ adns_status adns_rr_info(adns_rrtype type,
 		goto x_freevb;
 	}
 	assert(strlen(vb.buf) == vb.used - 1);
-	*data_r = realloc(vb.buf, vb.used);
+	*data_r = ns_realloc(vb.buf, vb.used);
 	if (!*data_r)
 		*data_r = vb.buf;
 	return adns_s_ok;
