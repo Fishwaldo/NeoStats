@@ -1072,6 +1072,11 @@ EXPORTFUNC char *make_safe_filename (char *name);
 EXPORTFUNC char *joinbuf (char **av, int ac, int from);
 EXPORTFUNC int split_buf (char *buf, char ***argv, int colon_special);
 
+/*  For use by modules to report command information channel which 
+ *  takes account of neostats reporting options
+ */
+EXPORTFUNC void command_report (const Bot *botptr, const char *fmt, ...);
+
 /* IRC interface for modules 
  *  Modules use these functions to perform actions on IRC
  *  They use a similar naming convention to the same actions as IRC commands 
