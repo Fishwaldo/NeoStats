@@ -1042,6 +1042,17 @@ COLDEF neo_chanscols[] = {
 		NULL,
 		"when the channel was created"
 	},
+	{	
+		"chans",
+		"flags",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct Chans, flags),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"Flags for this channel"
+	},
 
 };
 

@@ -206,6 +206,17 @@ COLDEF neo_serverscols[] = {
 		NULL,
 		"The last ping time to this server from the NeoStats Server"
 	},
+	{
+		"servers",
+		"flags",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct Server, flags),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"Flags that specify special functions for this Server"
+	},
 	{	
 		"servers",
 		"uplink",

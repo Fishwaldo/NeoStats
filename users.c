@@ -377,6 +377,17 @@ COLDEF neo_userscols[] = {
 	},
 	{	
 		"users",
+		"flags",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct User, flags),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"Flags for this user"
+	},
+	{	
+		"users",
 		"server",
 		RTA_STR,
 		MAXHOST,
