@@ -39,6 +39,7 @@
 #define CFGFLOAT 3
 #define CFGBOOL  4
 
+#define CONFBUFSIZE 256
 
 /* general configuration items */
 struct config {
