@@ -657,9 +657,9 @@ void Srv_Sjoin(EvntMsg *EM) {
 				ok = 0;
 			}
 		}
+		join_chan(EM->fndata[0], EM->av[1]);
 		EM->fndata[1] = findchan(EM->av[1]);
 		EM->fc = 2;
-		join_chan(EM->fndata[0], EM->av[1]);
 		ChangeChanUserMode(EM->fndata[1], EM->fndata[0], 1, mode);
 		j++;
 		ok = 1;
