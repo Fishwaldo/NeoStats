@@ -1,4 +1,11 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStast * Fish * Version 2.5.0-Alpha5
+ - Updated the ./configure/Makefile setup. Full autoconf support now
+ - NeoStats now installs into ~/NeoStats
+ - Beta skeleton for add on modules to get NeoStats configuration from ~/NeoStats/include/*.h (include files)
+
+* NeoStats * Fish * Version 2.5.0-Alpha4.8 
+ - More bug fixes with Channel support. It looks pretty stable now :)
 * NeoStats * Fish * Version 2.5.0-Alpha4.7 (hu, what happened to 4.6?)
  - Bug fixes (maybe) with channel support
  - New option to userdump to specify a user to dump out particulars
