@@ -12,4 +12,3 @@ all clean ::
 		echo "<=== $(SDP)modules/$$i"; \
 	  fi; \
 	done
-	/bin/rm -rf Makefile ;

@@ -1,7 +1,7 @@
 INCLUDES = -I../..
 
-SOURCES= icq.c
-OBJECTS= icq.lo
+SOURCES= icq.c icqlib.c
+OBJECTS= icq.o icqlib.o
 TARGET= icq.so
 
 CC=@CC@
@@ -9,7 +9,7 @@ CFLAGS=@CFLAGS@ -fPIC
 LINKER=ld
 
 all:
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(OBJECTS) -c $(SOURCES)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $(SOURCES)
 	$(LINKER) -shared -o $(TARGET) $(LIBS) $(OBJECTS)
 	/bin/cp $(TARGET) ../
 

@@ -99,6 +99,21 @@ esac],
 [ MODULES="$MODULES spam"
 AC_MSG_RESULT(yes)
 ])
+
+AC_MSG_CHECKING(Whether to Enable Icq Module?)
+AC_ARG_ENABLE(icq,
+[ --enablee-icq - Do Compile Icq Module],
+[ case "$enableval" in
+  yes)  
+	MODULES="$MODULES icq"
+	AC_MSG_RESULT(yes)
+	;;
+  *) 
+	AC_MSG_RESULT(no)
+	;;
+esac],
+AC_MSG_RESULT(no)
+])
 	
 AC_MSG_CHECKING(Whether to Enable Version Module?)
 AC_ARG_ENABLE(version,

@@ -12,6 +12,8 @@ typedef signed short S_WORD;
 typedef signed char S_BYTE;
 typedef unsigned char BOOL;
 
+int icq_Sok;
+
 typedef void (*cback)(void);
 
 //#define SOCKREAD(s,p,l) read(s,p,l)

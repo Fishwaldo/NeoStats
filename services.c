@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: services.c,v 1.7 2000/02/29 07:28:53 fishwaldo Exp $
+** $Id: services.c,v 1.8 2000/03/02 01:31:24 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -143,6 +143,13 @@ void servicesbot(char *nick, char *line) {
 			return;
 		}
 		list_module_bots(u);
+	} else if (!strcasecmp(cmd, "MODSOCKLIST")) {
+		if (!(UserLevel(u) >= 200)) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to MODSOCKLIST, but is not a Coder",nick);
+			return;
+		}
+		list_sockets(u);
 	} else if (!strcasecmp(cmd, "MODTIMERLIST")) {
 		if (!(UserLevel(u) >= 200)) {
 			privmsg(nick,s_Services,"Permission Denied");

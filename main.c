@@ -50,9 +50,6 @@ int main()
 	me.noticelag=0;
 	me.usesmo=0;
 	me.r_time=10;
-	IcqServ.loginok=0;
-	IcqServ.loglevel=2;
-        IcqServ.onchan=0;
 	__init_mod_list();
 	setup_signals();
 	ConfLoad();
@@ -207,16 +204,19 @@ void login()
 
 void init_ServBot()
 {
-	User *u;
 	segv_location = "init_ServBot";
 	sts("NICK %s 1 %d %s %s %s 0 :/msg %s \2HELP\2", s_Services, time(NULL),
 		Servbot.user, Servbot.host, me.name, s_Services);
 	AddUser(s_Services, Servbot.user, Servbot.host, me.name);
+	segv_location = "init_ServBot";
 	sts(":%s MODE %s +Sqd", s_Services, s_Services);
 	sts(":%s JOIN %s",s_Services ,me.chan);
 	sts(":%s MODE %s +o %s",me.name,me.chan,s_Services);
 	sts(":%s MODE %s +a %s",s_Services,me.chan,s_Services);
-	UserMode(s_Services, "+Sqd");
+/*	UserMode(s_Services, "+Sqd"); */
+#ifdef DEBUG
+	log ("Return from Mode");
+#endif
 }
 
 void *smalloc(long size)

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: timer.c,v 1.3 2000/02/22 03:32:32 fishwaldo Exp $
+** $Id: timer.c,v 1.4 2000/03/02 01:31:24 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -26,14 +26,8 @@ void chk()
 	for (j = 0; j < T_TABLE_SIZE; j++) {
 		for (mod_ptr = module_timer_lists[j]; mod_ptr; mod_ptr = mod_ptr->next) {
 			if (current - mod_ptr->lastrun > mod_ptr->interval) {
-#ifdef DEBUG
-				log("timer: Running Module %s Timers",mod_ptr->modname);
-#endif
 				mod_ptr->function();
 				mod_ptr->lastrun = time(NULL);
-#ifdef DEBUG
-				log("Finished Timer");
-#endif
 			}
 		}
 	}

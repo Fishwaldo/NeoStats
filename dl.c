@@ -17,6 +17,7 @@ void __init_mod_list() {
 	int i;
 	Mod_Timer *t, *Tprev;
 	Mod_User *u, *Uprev;
+	Sock_List *s, *Sprev;
 	
 	segv_location = "__init_mod_list";
 	module_list = (Module *)malloc(sizeof(Module));
@@ -47,6 +48,16 @@ void __init_mod_list() {
 		module_timer_lists[i] = NULL;
 	}
 	bzero((char *)module_timer_lists, sizeof(module_timer_lists));
+	for (i = 0; i < MAX_SOCKS; i++) {
+		s = Socket_lists[i];
+		while (s) {
+			Sprev = s->next;
+			free(s);
+			s = Sprev;
+		}
+		Socket_lists[i] = NULL;
+	}
+	bzero((char *)Socket_lists, sizeof(Socket_lists));
 };
 
 int add_ld_path(char *path) {
@@ -175,6 +186,117 @@ void list_module_timer(User *u) {
 	privmsg(u->nick,s_Services,"End of Module timer List");
 	free(mod_ptr);
 }		
+
+static void add_sock_to_hash_table(char *sockname, Sock_List *s) {
+	s->hash = HASH(sockname, MAX_SOCKS);
+	s->next = Socket_lists[s->hash];
+	Socket_lists[s->hash] = (void *)s;
+}
+
+static void del_sock_from_hash_table(char *sockname, Sock_List *s) {
+	Sock_List *tmp = NULL, *prev = NULL;
+	
+	for (tmp = Socket_lists[s->hash]; tmp; tmp = tmp->next) {
+		if (tmp == s) {
+			if (prev)
+				prev->next = tmp->next;
+			else
+				Socket_lists[s->hash] = tmp->next;
+			tmp->next = NULL;
+			return;
+		}
+		prev = tmp;
+	}
+}
+
+static Sock_List *new_sock(char *sock_name)
+{
+	Sock_List *s;
+	
+	log("New Socket: %s", sock_name);
+	s = smalloc(sizeof(Sock_List));
+	if (!sock_name)
+		sock_name="";
+	s->sockname = sock_name;	
+	add_sock_to_hash_table(sock_name, s);
+	return s;
+}
+
+Sock_List *findsock(char *sock_name) {
+	Sock_List *s;
+	
+	s = Socket_lists[HASH(sock_name, MAX_SOCKS)];
+	while (s && strcmp(s->sockname, sock_name) != 0)
+		s = s->next;
+	return s;
+}
+int add_socket(char *func_name, char *sock_name, int socknum, char *mod_name) {
+	Sock_List *Sockets_mod_list;
+	Module *list_ptr;
+
+	segv_location = "add_Socket";
+
+
+	Sockets_mod_list = new_sock(sock_name);
+	Sockets_mod_list->sock_no = socknum;
+	Sockets_mod_list->modname = sstrdup(mod_name);
+
+	list_ptr = module_list->next;
+	while (list_ptr != NULL) {
+		if (!strcasecmp(list_ptr->info->module_name, mod_name)) {
+			/* Check to see if the function exists */
+			if (dlsym(list_ptr->dl_handle, func_name) == NULL) {
+				log("Oh Oh, the Socket function doesn't exist");
+				del_socket(Sockets_mod_list->sockname);
+				return -1;
+			}
+			Sockets_mod_list->function = dlsym(list_ptr->dl_handle, func_name);
+			log("Registered Module %s with Socket for Function %s", list_ptr->info->module_name, func_name);
+			return 1;
+		}
+		list_ptr = list_ptr->next;
+	}
+	return 0;
+}
+
+int del_socket(char *sock_name) {
+	Sock_List *list;
+
+	segv_location = "del_mod_timer";
+#ifdef DEBUG
+	log("Del_Sock");
+#endif
+	
+	list = findsock(sock_name);
+		
+	if (list) {
+#ifdef DEBUG
+		log("Unregistered Socket function %s from Module %s", sock_name, list->modname);
+#endif
+		del_sock_from_hash_table(sock_name, list);
+		free(list);
+		return 1;
+	}		
+	return -1;
+}
+
+void list_sockets(User *u) {
+	Sock_List *mod_ptr = NULL;
+	register int j;
+	segv_location = "list_sockets";
+	privmsg(u->nick,s_Services,"Sockets List:");
+	for (j = 0; j < MAX_SOCKS; j++) {
+		for (mod_ptr = Socket_lists[j]; mod_ptr; mod_ptr = mod_ptr->next) { 
+			privmsg(u->nick,s_Services,"%s:--------------------------------",mod_ptr->modname);
+			privmsg(u->nick,s_Services,"Socket Name: %s",mod_ptr->sockname);
+			privmsg(u->nick,s_Services,"Socket Number: %d",mod_ptr->sock_no);
+		}
+	}
+	privmsg(u->nick,s_Services,"End of Socket List");
+	free(mod_ptr);
+}		
+
+
 static void add_bot_to_hash_table(char *bot_name, Mod_User *u) {
 	u->hash = HASH(bot_name, B_TABLE_SIZE);
 	u->next = module_bot_lists[u->hash];
@@ -215,7 +337,7 @@ Mod_User *findbot(char *bot_name) {
 	Mod_User *u;
 	
 	u = module_bot_lists[HASH(bot_name, B_TABLE_SIZE)];
-	while (u && strcmp(u->nick, bot_name) != 0)
+	while (u && strcasecmp(u->nick, bot_name) != 0)
 		u = u->next;
 	return u;
 }

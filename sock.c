@@ -5,10 +5,11 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.3 2000/02/23 05:39:24 fishwaldo Exp $
+** $Id: sock.c,v 1.4 2000/03/02 01:31:24 fishwaldo Exp $
 */
 
 #include "stats.h"
+#include "dl.h"
 
 fd_set readfds, nullfds;
 
@@ -41,18 +42,26 @@ int ConnectTo(char *host, int port)
 void read_loop()
 {
 	register int i, j, SelectResult;
+	int k;
 	struct timeval TimeOut;
 	char c;
 	char buf[BUFSIZE];
+	Sock_List *mod_sock;
 
 	while (1) {
 		segv_location = "Read_Loop";
 		memset(buf, '\0', BUFSIZE);
 		chk();
+		segv_location = "Read_Loop";
 		FD_ZERO(&readfds);
 		TimeOut.tv_sec = 1;
 		TimeOut.tv_usec = 0;
 		FD_SET(servsock, &readfds);
+		for (k = 0; k < MAX_SOCKS; k++) {
+			for (mod_sock = Socket_lists[k]; mod_sock; mod_sock = mod_sock->next) {
+				FD_SET(mod_sock->sock_no, &readfds);
+			}
+		}
 		SelectResult = select(FD_SETSIZE, &readfds, &nullfds, &nullfds, &TimeOut);
 		if (SelectResult > 0) {
 			for (j = 0; j < BUFSIZE; j++) {
@@ -69,15 +78,22 @@ void read_loop()
 						return;
 					}
 				} else {
-					log("FDISSET failed");
+				/* this checks if there is any data waiting on a socket for a module */
+					for (k = 0; k < MAX_SOCKS; k++) {
+						for (mod_sock = Socket_lists[k]; mod_sock; mod_sock = mod_sock->next) {
+							if (FD_ISSET(mod_sock->sock_no, &readfds)) {
+								mod_sock->function();
+								break;
+							}
+						}
+					}
+/*					log("FDISSET failed"); */
 					break;
 				}
 			}
-		} else {
-			if (SelectResult < 0) {
+		} else if (SelectResult == -1) {
 				log("Lost connection to server."); 
 				return; 
-			}
 		}
 	}
  log("hu, how did we get here");

@@ -1,6 +1,10 @@
 /*
-$Id: icqlib.c,v 1.1 2000/02/18 02:10:29 fishwaldo Exp $
+$Id: icqlib.c,v 1.2 2000/03/02 01:31:24 fishwaldo Exp $
 $Log: icqlib.c,v $
+Revision 1.2  2000/03/02 01:31:24  fishwaldo
+Lots and Lots of Bug fixes, and New Socket API for Modules
+a Working ICQServ
+
 Revision 1.1  2000/02/18 02:10:29  fishwaldo
 Changed Module Layout, and Makefiles
 
@@ -30,8 +34,8 @@ Fixed SOCKS5 proxy support
 
  */
 
-#include "icq.h"
 #include "icqlib.h"
+#include "icq.h"
 
 #include <stdio.h>
 #include <netdb.h>
@@ -52,7 +56,6 @@ Fixed SOCKS5 proxy support
 #include <assert.h>
 #include <errno.h>*/
 
-int icq_Sok;
 BOOL icq_Russian = TRUE;
 BYTE icq_ServMess[8192]; /* 65536 seqs max, 1 bit per seq -> 65536/8 = 8192 */
 WORD icq_SeqNum = 1;

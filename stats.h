@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.8 2000/02/29 10:19:52 fishwaldo Exp $
+** $Id: stats.h,v 1.9 2000/03/02 01:31:24 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -40,6 +40,7 @@
 #define MAXNICK			32
 #define MAXUSER			10
 #define NUM_MODULES		255
+#define MAX_SOCKS		10
 #define S_TABLE_SIZE	97
 #define U_TABLE_SIZE	1999
 #define D_TABLE_SIZE	1999
@@ -123,18 +124,6 @@ struct chans_ {
 	char *topicowner;
 } chans_;
 
-struct IcqServ {
-	char user[MAXUSER];
-	char host[MAXHOST];
-	long uin;
-	char passwd[MAXPASS];
-	char server[MAXHOST];
-	int port;
-	unsigned int loginok :1;
-	unsigned int online :1;
-	int loglevel;
-	unsigned int onchan :1;
-} IcqServ;
 
 struct server_ {
 	Server *next, *prev;
@@ -291,6 +280,11 @@ extern int del_mod_user(char *nick);
 extern int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interval);
 extern int del_mod_timer(char *timer_name);
 extern void list_module_timer(User *);
+extern int add_socket(char *func_name, char *sock_name, int socknum, char *mod_name);
+extern int del_socket(char *sockname);
+extern void list_sockets(User *);
+
+
 
 
 /* services.c */

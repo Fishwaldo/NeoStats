@@ -14,7 +14,17 @@
 
 extern char *sftime(time_t);
 
-
+struct sock_list_struct {
+	struct sock_list_struct *prev;
+	struct sock_list_struct *next;
+	long hash;
+	int sock_no;
+	char *sockname;
+	int (*function)();
+	char *modname;
+};
+typedef struct sock_list_struct Sock_List;
+Sock_List *Socket_lists[MAX_SOCKS];
 
 struct mod_timer_list {
 	struct mod_timer_list *prev;
