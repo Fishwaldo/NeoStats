@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.93 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: main.c,v 1.94 2003/06/08 05:59:25 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 	init_server_hash();
 	init_user_hash();
 	init_chan_hash();
-	
+	init_ircd();	
 
 
 #ifndef DEBUG
@@ -208,7 +208,7 @@ void get_options(int argc, char **argv) {
 	
 	/* set some defaults first */
 #ifdef DEBUG
-	config.debug = 8;
+	config.debug = 10;
 	config.foreground = 1;
 #else
 	config.debug = 5;

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.49 2003/05/26 09:18:29 fishwaldo Exp $
+** $Id: users.c,v 1.50 2003/06/08 05:59:25 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -100,6 +100,9 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 	u->TS = TS;
 }
 void AddRealName(const char *nick, const char *realname) {
+	char **av;
+	int ac = 0;
+
 	User *u = finduser(nick);
 	
 	if (!u) {
@@ -108,6 +111,9 @@ void AddRealName(const char *nick, const char *realname) {
 	}
 	nlog(LOG_DEBUG2, LOG_CORE, "RealName(%s): %s", nick, realname);
 	strncpy(u->realname, realname, MAXREALNAME);
+	AddStringToList(&av, u->nick, &ac);
+	Module_Event("SIGNON", av, ac);
+	free(av);
 }
 
 void part_u_chan(list_t *list, lnode_t *node, void *v) {
@@ -119,6 +125,8 @@ void DelUser(const char *nick)
 {
 	User *u;
 	hnode_t *un;
+	char **av;
+	int ac = 0;
 
 	strcpy(segv_location, "DelUser");
 	nlog(LOG_DEBUG2, LOG_CORE, "DelUser(%s)", nick);
@@ -129,6 +137,10 @@ void DelUser(const char *nick)
 		return;
 	}
 	u = hnode_get(un);
+	/* run the event to delete a user */
+	AddStringToList(&av, u->nick, &ac);
+	Module_Event("SIGNOFF", av, ac);
+	free(av);
 
 	list_process(u->chans, u, part_u_chan);	
 
@@ -139,10 +151,31 @@ void DelUser(const char *nick)
 	free(u);
 }
 
+void Do_Away(User *u, const char *awaymsg) {
+	char **av;
+	int ac = 0;
+	if (u) {
+		AddStringToList(&av, u->nick, &ac);
+		if ((u->is_away == 1) && (!awaymsg)) {
+			u->is_away = 0;
+			Module_Event("AWAY", av, ac);
+		} else if ((u->is_away == 0) && (awaymsg)) {
+			u->is_away = 1;
+			AddStringToList(&av, (char *)awaymsg, &ac);
+			Module_Event("AWAY", av, ac);
+		}
+		free(av);
+	}
+}
+
 void Change_User(User *u, const char *newnick)
 {
 	hnode_t *un;
 	lnode_t *cm;
+	char **av;
+	int ac = 0;
+	char *oldnick;
+
 	strcpy(segv_location, "Change_User");
 	nlog(LOG_DEBUG2, LOG_CORE, "Change_User(%s, %s)", u->nick, newnick);
 	un = hash_lookup(uh, u->nick);
@@ -157,9 +190,16 @@ void Change_User(User *u, const char *newnick)
 	}
 	strcpy(segv_location, "Change_User_Return");
 	hash_delete(uh, un);
+	oldnick = malloc(MAXNICK);
+	strncpy(oldnick, u->nick, MAXNICK);
+	AddStringToList(&av, oldnick, &ac);
 	strncpy(u->nick, newnick, MAXNICK);
 	hash_insert(uh, un, u->nick);
 
+	AddStringToList(&av, u->nick, &ac);
+	Module_Event("NICK_CHANGE",av, ac);
+	free(av);
+	free(oldnick);
 }
 void sendcoders(char *message,...)
 {
@@ -298,6 +338,8 @@ void UserMode(const char *nick, const char *modes)
 	int add = 0;
 	int i;
 	char tmpmode;
+	char **av;
+	int ac = 0;
 	
 	strcpy(segv_location, "UserMode");	
 	u = finduser(nick);
@@ -361,4 +403,12 @@ void UserMode(const char *nick, const char *modes)
 	else 
 #endif
 	nlog(LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, u->Umode);
+
+	AddStringToList(&av, u->nick, &ac);
+	AddStringToList(&av, (char *)modes, &ac);
+	Module_Event("UMODE", av, ac);
+	free(av);
+
+
+
 }

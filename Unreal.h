@@ -44,7 +44,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.27 2003/05/26 09:18:28 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.28 2003/06/08 05:59:25 fishwaldo Exp $
  */
 
 
@@ -55,7 +55,7 @@
 
 
 /* we have token support */
-#define HAVE_TOKEN_SUP
+#define HAVE_TOKEN_SUP 1
 
 
 

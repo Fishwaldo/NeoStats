@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: server.c,v 1.17 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: server.c,v 1.18 2003/06/08 05:59:25 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -63,6 +63,8 @@ Server *new_server(char *name)
 void AddServer(char *name,char *uplink, int hops)
 {
 	Server *s;
+	char **av;
+	int ac = 0;
 
 	nlog(LOG_DEBUG1, LOG_CORE, "New Server: %s", name);
 	s = new_server(name);
@@ -76,12 +78,20 @@ void AddServer(char *name,char *uplink, int hops)
 		strcpy(s->uplink, "\0");
 	}
 	s->ping = 0;
+	
+	/* run the module event for a new server. */
+	AddStringToList(&av, s->name, &ac);
+	Module_Event("NEWSERVER", av, ac);
+	free(av);
+
 }
 
 void DelServer(char *name)
 {
 	Server *s;
 	hnode_t *sn;
+	char **av;
+	int ac = 0;
 
 	if (!name) {
 		return;
@@ -91,8 +101,14 @@ void DelServer(char *name)
 		nlog(LOG_DEBUG1, LOG_CORE, "DelServer(): %s not found!", name);
 		return;
 	}
-	hash_delete(sh, sn);
 	s = hnode_get(sn);
+
+	/* run the event for delete server */
+	AddStringToList(&av, s->name, &ac);
+	Module_Event("DELSERVER", av, ac);
+	free(av);
+	
+	hash_delete(sh, sn);
 	hnode_destroy(sn);
 	free(s);
 }

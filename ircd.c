@@ -22,73 +22,22 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.122 2003/06/03 15:08:50 fishwaldo Exp $
+** $Id: ircd.c,v 1.123 2003/06/08 05:59:25 fishwaldo Exp $
 */
- 
 #include <setjmp.h>
 #include "stats.h"
+#include "ircd.h"
 #include "dl.h"
 #include "log.h"
 
-
-extern const char version_date[], version_time[];
 extern const char protocol_version[];
 
-void Usr_Version(char *, char **, int argc);
-void Usr_ShowMOTD(char *, char **, int argc);
-void Usr_ShowADMIN(char *, char **, int argc);
-void Usr_Showcredits(char *, char **, int argc);
-void Usr_AddServer(char *, char **, int argc);
-void Usr_DelServer(char *, char **, int argc);
-void Usr_DelUser(char *, char **, int argc);
-void Usr_Mode(char *, char **, int argc);
-void Usr_Smode(char *, char **, int argc);
-void Usr_Kill(char *, char **, int argc);
-void Usr_Pong(char *, char **, int argc);
-void Usr_Away(char *, char **, int argc);
-void Usr_Nick(char *, char **, int argc);
-void Usr_Topic(char *, char **, int argc);
-void Usr_Kick(char *, char **, int argc);
-void Usr_Join(char *, char **, int argc);
-void Usr_Part(char *, char **, int argc);
-void Usr_Stats(char *, char **, int argc);
-void Usr_Vhost(char *, char **, int argc);
-void Srv_Topic(char *, char **, int argc);
-void Srv_Ping(char *, char **, int argc);
-void Srv_Netinfo(char *, char **, int argc);
-void Srv_Pass(char *, char **, int argc);
-void Srv_Server(char *, char **, int argc);
-void Srv_Squit(char *, char **, int argc);
-void Srv_Nick(char *, char **, int argc);
-void Srv_Svsnick(char *, char **, int argc);
-void Srv_Kill(char *, char **, int argc);
-void Srv_Connect(char *, char **, int argc);
-void Srv_Svinfo(char *, char **, int argc);
-void Srv_Burst(char *origin, char **argv, int argc);
-void Srv_Sjoin(char *origin, char **argv, int argc);
-#ifdef ULTIMATE
-void Srv_Vctrl(char *, char **, int argc);
-#endif
-#ifdef NEOIRCD
-void Srv_Tburst(char *origin, char **argv, int argc);
-#endif
-#ifdef ULTIMATE3
-void Srv_Client(char *, char **, int argc);
-void Srv_Smode(char *origin, char **argv, int argc);
-#endif
-
-static void ShowMOTD(char *);
-static void ShowADMIN(char *);
-static void Showcredits(char *);
+extern IntCommands cmd_list[];
 
 
 
-struct int_commands {
-	char *name;
-	void (*function)(char *origin, char **argv, int argc);
-	int srvmsg; /* Should this be a Server Message(1), or a User Message?(0) */
-	int usage; 
-};
+
+
 
 /* The Following Array is a list of Commands that are Handled Internally by NeoStats 
 they have Nothing to do with the Array that the Modules use. These Functions are called before any
@@ -97,7 +46,6 @@ or Channel array.
 if "srvmsg" is defined, it means that the command must be prefixed by ":" indicating a message from a Server (I think)
 
 */
-typedef struct int_commands IntCommands;
  
 #ifdef UNREAL
 IntCommands cmd_list[] = {
@@ -166,40 +114,6 @@ IntCommands cmd_list[] = {
 };
 #endif
 #if defined(HYBRID7) || defined(NEOIRCD)
-IntCommands cmd_list[] = {
-	/* Command	Function		srvmsg*/
-	{MSG_STATS,	Usr_Stats, 		1,	0},
-	{MSG_VERSION,	Usr_Version,		1,	0},
-	{MSG_MOTD,	Usr_ShowMOTD,		1,	0},
-	{MSG_ADMIN,	Usr_ShowADMIN,		1,	0},
-	{MSG_CREDITS,	Usr_Showcredits,	1,	0},
-	{MSG_SERVER,	Usr_AddServer,		1,	0},
-	{MSG_SQUIT,	Usr_DelServer,		1,	0},
-	{MSG_QUIT,	Usr_DelUser,		1,	0},
-	{MSG_MODE,	Usr_Mode,		1,	0},
-	{MSG_KILL,	Usr_Kill,		1,	0},
-	{MSG_PONG,	Usr_Pong,		1,	0},
-	{MSG_AWAY,	Usr_Away,		1,	0},
-	{MSG_NICK,	Usr_Nick,		1,	0},
-	{MSG_TOPIC,	Usr_Topic,		1,	0},
-	{MSG_TOPIC, 	Usr_Topic, 		0, 	0},
-	{MSG_KICK,	Usr_Kick,		1,	0},
-	{MSG_JOIN,	Usr_Join,		1,	0},
-	{MSG_PART,	Usr_Part,		1,	0},
-	{MSG_PING,	Srv_Ping,		0, 	0},
-	{MSG_SVINFO,	Srv_Svinfo,		0, 	0},
-	{MSG_PASS,	Srv_Pass,		0, 	0},
-	{MSG_SERVER,	Srv_Server,		0, 	0},
-	{MSG_SQUIT,	Srv_Squit,		0, 	0},
-	{MSG_NICK,	Srv_Nick,		0, 	0},
-	{MSG_KILL,	Srv_Kill,		0, 	0},
-	{MSG_EOB, 	Srv_Burst, 		1,	0},
-	{MSG_SJOIN,	Srv_Sjoin,		1,	0},
-#ifdef NEOIRCD
-	{MSG_TBURST, 	Srv_Tburst,		1,	0},
-#endif
-	{NULL,		NULL,			0,	0}
-};
 #endif
 #ifdef ULTIMATE
 IntCommands cmd_list[] = {
@@ -275,17 +189,15 @@ IntCommands cmd_list[] = {
 };
 #endif
 
-void init_main() {
-	if (usr_mds);
-}
-
 
 int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char *mod_name)
 {
 	User *u;
+#if 0
 #ifndef ULTIMATE3
 #ifndef HYBRID7
 	char cmd[63];
+#endif
 #endif
 #endif
 	char **av;
@@ -327,7 +239,9 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 		}
 	tmpmode = *modes++;
 	}
-
+	SignOn_NewBot(nick, user, host, rname, Umode);
+/* split code */
+#if 0	
 
 #ifdef ULTIMATE3
 	snewnick_cmd(nick, user, host, rname, Umode);
@@ -370,6 +284,8 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	/* all bots join */
 	}
 #endif
+/* split code */
+#endif 
 	AddStringToList(&av, nick, &ac);
 	Module_Event("SIGNON", av, ac);
 	free(av);
@@ -393,7 +309,6 @@ int del_bot(char *nick, char *reason)
 	AddStringToList(&av, nick, &ac);
 	Module_Event("SIGNOFF", av, ac);
 	free(av);
-//	FreeList(av, ac);
 	squit_cmd(nick, reason);
 	del_mod_user(nick);
 	return 1;
@@ -629,7 +544,7 @@ void parse(char *line)
         	
         /* now, Parse the Command to the Internal Functions... */
 	strcpy(segv_location, "Parse - Internal Functions");
-	for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
+	for (I=0; I < ircd_srv.cmdcount; I++) {	
 		if (!strcmp(cmd_list[I].name, cmd)) {
 			if (cmd_list[I].srvmsg == cmdptr) {
 				strcpy(segv_location, cmd_list[I].name);
@@ -688,7 +603,11 @@ void init_ServBot()
 		snprintf(s_Services, MAXNICK, "NeoStats1");
 	snprintf(rname, 63, "/msg %s \2HELP\2", s_Services);
 
+/* split code */
 
+	SignOn_NewBot(s_Services, Servbot.user, Servbot.host, rname, UMODE_SERVICES);
+
+#if 0 
 #ifdef ULTIMATE3
 	sburst_cmd(1);
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_SERVICES);
@@ -721,18 +640,25 @@ void init_ServBot()
 	schmode_cmd(s_Services, me.chan, "+o", rname);
 #endif
 #endif /* ultimate3 */
+
+#endif /* SPLIT CODE */
 	me.onchan = 1;
 	AddStringToList(&av, me.uplink, &ac);
 	Module_Event("ONLINE", av, ac);
 	free(av);
 	ac = 0;
-//	FreeList(av, ac);
 	AddStringToList(&av, s_Services, &ac);
 	Module_Event("SIGNON", av, ac);
 	free(av);
-//	FreeList(av, ac);
 	
 }
+
+
+// XXXXX Start of SplitCode
+#if 0
+
+
+
 
 void Srv_Sjoin(char *origin, char **argv, int argc) {
 	char nick[MAXNICK];
@@ -915,8 +841,10 @@ void Usr_Stats(char *origin, char **argv, int argc) {
 		snumeric_cmd(211, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
 		snumeric_cmd(241, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
 	} else if (!strcasecmp(argv[0], "M")) {
-		for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
-		if (cmd_list[I].usage > 0) snumeric_cmd(212, u->nick, "Command %s Usage %d", cmd_list[I].name, cmd_list[I].usage);		
+		if (UserLevel(u) > 40) {
+			for (I=0; I < ircd_srv.cmdcount; I++) {
+				if (cmd_list[I].usage > 0) snumeric_cmd(212, u->nick, "Command %s Usage %d", cmd_list[I].name, cmd_list[I].usage);		
+			}
 		}
 	}
 	snumeric_cmd(219, u->nick, "%s :End of /STATS report", argv[0]);
@@ -1358,6 +1286,30 @@ void Srv_Tburst(char *origin, char **argv, int argc) {
 
 }
 #endif
+
+
+// XXXX end of split code
+#endif
+
+void dopong(Server *s) {
+	char **av;
+	int ac = 0;
+	if (s) {
+		s->ping = time(NULL) - ping.last_sent;
+		if (ping.ulag > 1)
+			s->ping -= (float) ping.ulag;
+		if (!strcmp(me.s->name, s->name))
+			ping.ulag = me.s->ping;
+		AddStringToList(&av, s->name, &ac);
+		Module_Event("PONG", av, ac);
+		free(av);
+	} else {
+		nlog(LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", recbuf);
+	}
+}
+
+
+
 int flood(User *u)
 {
 	time_t current = time(NULL);
@@ -1383,55 +1335,57 @@ int flood(User *u)
 }
 
 /* Display our MOTD Message of the Day from the external neostats.motd file */
-static void ShowMOTD(char *nick)
+void ShowMOTD(char *nick)
 {
-    FILE *fp;
-    char buf[BUFSIZE];
+	FILE *fp;
+    	char buf[BUFSIZE];
 
-    snumeric_cmd(375, nick, ":- %s Message of the Day -", me.name);
-    snumeric_cmd(372, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
-    snumeric_cmd(372, nick, ":-");
+    	snumeric_cmd(375, nick, ":- %s Message of the Day -", me.name);
+    	snumeric_cmd(372, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
+    	snumeric_cmd(372, nick, ":-");
 
-    fp = fopen ("neostats.motd", "r");
+    	fp = fopen ("neostats.motd", "r");
 
-    if (fp)
-    {
-	while (fgets (buf, sizeof (buf), fp))
-	{
-	    buf[strlen (buf) - 1] = 0;
-	    snumeric_cmd(372, nick, ":- %s", buf);
+    	if (fp)
+    	{
+		while (fgets (buf, sizeof (buf), fp))
+		{
+	    		buf[strlen (buf) - 1] = 0;
+	    		snumeric_cmd(372, nick, ":- %s", buf);
+		}
+		fclose (fp);
+    	} else {
+    		snumeric_cmd(372, nick, ":- MOTD file Missing");
 	}
-	fclose (fp);
-    }
 	snumeric_cmd(376, nick, ":End of /MOTD command.");
 }
 
 
 /* Display the ADMIN Message from the external stats.admin file */
-static void ShowADMIN(char *nick)
+void ShowADMIN(char *nick)
 {
-    FILE *fp;
-    char buf[BUFSIZE];
+	FILE *fp;
+    	char buf[BUFSIZE];
 
-    snumeric_cmd(256, nick, ":- %s NeoStats Admins -", me.name);
-    snumeric_cmd(256, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
+    	snumeric_cmd(256, nick, ":- %s NeoStats Admins -", me.name);
+    	snumeric_cmd(256, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
 
-    fp = fopen ("stats.admin", "r");
+    	fp = fopen ("stats.admin", "r");
 
-    if (fp)
-    {
-	while (fgets (buf, sizeof (buf), fp))
-	{
-	    buf[strlen (buf) - 1] = 0;
-	    snumeric_cmd(257, nick, ":- %s", buf);
-	}
-	fclose (fp);
-    }
+    	if (fp)
+    	{
+		while (fgets (buf, sizeof (buf), fp))
+		{
+	    		buf[strlen (buf) - 1] = 0;
+	    		snumeric_cmd(257, nick, ":- %s", buf);
+		}
+		fclose (fp);
+    	}
 	snumeric_cmd(258, nick, ":End of /ADMIN command.");
 }
 
 
-static void Showcredits(char *nick)
+void Showcredits(char *nick)
 {
 	snumeric_cmd(351, nick, ":- NeoStats %d.%d.%d%s Credits ",MAJOR, MINOR, REV, version);
 	snumeric_cmd(351, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
@@ -1452,3 +1406,52 @@ static void Showcredits(char *nick)
 	snumeric_cmd(351, nick, ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
 }
 
+void ShowStats(char *what, User *u) {
+	time_t tmp;
+	time_t tmp2;
+	int I;
+#ifdef EXTAUTH
+	int dl;
+	int (*listauth)(User *u);
+#endif
+		
+	if (!u) {
+		return;
+	}
+	if (!strcasecmp(what, "u")) {
+		/* server uptime - Shmad */ 
+                int uptime = time (NULL) - me.t_start;
+                snumeric_cmd(242, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime/86400, (uptime/3600) % 24, (uptime/60) % 60,
+                uptime % 60);
+	} else if (!strcasecmp(what, "c")) {
+		/* Connections */
+		snumeric_cmd(214, u->nick, "N *@%s * * %d 50", me.uplink, me.port);
+		snumeric_cmd(213, u->nick, "C *@%s * * %d 50", me.uplink, me.port);
+	} else if (!strcasecmp(what, "o")) {
+		/* Operators */
+#ifdef EXTAUTH
+		dl = get_dl_handle("extauth");
+		if (dl > 0) {
+			listauth = dlsym((int *)dl, "__list_auth");
+			if (listauth)  
+				(*listauth)(u);
+		} else
+#endif
+		snumeric_cmd(243, u->nick, "Operators think they are God, but you and I know they are not!");
+	} else if (!strcasecmp(what, "l")) {
+		/* Port Lists */
+		tmp = time(NULL) - me.lastmsg; 
+		tmp2 = time(NULL) - me.t_start;
+		snumeric_cmd(211, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
+		snumeric_cmd(241, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
+	} else if (!strcasecmp(what, "M")) {
+		for (I=0; I < 29; I++) {
+#if 0
+		for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
+#endif
+			if (cmd_list[I].usage > 0) snumeric_cmd(212, u->nick, "Command %s Usage %d", cmd_list[I].name, cmd_list[I].usage);		
+		}
+	}
+	snumeric_cmd(219, u->nick, "%s :End of /STATS report", what);
+	chanalert(s_Services,"%s Requested Stats %s", u->nick, what);
+};

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.77 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: stats.h,v 1.78 2003/06/08 05:59:25 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -114,6 +114,9 @@ hash_t *ch;
 
 /* this is the dns structure */
 adns_state ads;
+
+/* version info */
+extern const char version_date[], version_time[];
 
 
 

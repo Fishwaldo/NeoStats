@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.42 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: chans.c,v 1.43 2003/06/08 05:59:25 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -288,6 +288,16 @@ void del_chan(Chans *c) {
 		hnode_destroy(cn);
 		free(c);
 	}
+}
+
+void kick_chan(User *u, char *chan) {
+	char **av;
+	int ac = 0;
+	AddStringToList(&av, chan, &ac);
+	AddStringToList(&av, u->nick, &ac);
+	Module_Event("KICK", av, ac);
+	free(av);
+	part_chan(u, chan);
 }
 
 /** @brief Parts a user from a channel
