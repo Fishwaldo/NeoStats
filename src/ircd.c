@@ -154,7 +154,6 @@ UmodeMaskToString(const long Umode)
 long
 UmodeStringToMask(const char* UmodeString, long Umode)
 {
-	int i;
 	int add = 0;
 	char* tmpmode;
 
@@ -214,7 +213,6 @@ SmodeMaskToString(const long Smode)
 long
 SmodeStringToMask(const char* SmodeString, long Smode)
 {
-	int i;
 	int add = 0;
 	char* tmpmode;
 
@@ -1296,7 +1294,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 					modeexists = 0;
 					while (mn) {
 						m = lnode_get (mn);
-						if (((int *) m->mode == (int *) ircd_cmodes[*modes].mode) && !ircstrcasecmp (m->param, argv[j])) {
+						if ((m->mode == ircd_cmodes[*modes].mode) && !ircstrcasecmp (m->param, argv[j])) {
 							dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", *modes, argv[j]);
 							j++;
 							modeexists = 1;

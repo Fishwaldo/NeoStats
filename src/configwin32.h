@@ -653,3 +653,24 @@
 #define bcopy(a, b, c) memcpy(b, a, c)
 #define index strchr
 #define vsnprintf _vsnprintf
+#define __PRETTY_FUNCTION__ __FUNCTION__
+#define ssize_t int
+#define inline __inline
+#define sleep(n)
+#define snprintf _snprintf
+#include <io.h>
+#define access _access
+#include <direct.h>
+//#define S_IWUSR _S_IWRITE
+//#define S_IRUSR _S_IREAD
+#define S_ISDIR(mode) ((mode) & _S_IFDIR ? 1 : 0)
+#define S_ISREG(mode) ((mode) & _S_IFREG ? 1 : 0)
+#define R_OK 04
+
+/* Disable warning for:
+   warning C4267: 'function' : conversion from 'size_t' to 'const int', possible loss of data */
+#pragma warning( disable : 4267 )
+/* Disable warning for:
+   warning C4311: 'type cast' : pointer truncation from 'void *' to 'int' */
+#pragma warning( disable : 4311 )
+

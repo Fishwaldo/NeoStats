@@ -689,7 +689,7 @@ UserMode (const char *nick, const char *modes)
 		strlcpy(u->vhost, u->hostname, MAXHOST);
 	}
 #endif
-	dlog(DEBUG1, "UserMode: modes for %s is now %p", u->nick, (int *)u->Umode);
+	dlog(DEBUG1, "UserMode: modes for %s is now %x", u->nick, u->Umode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.user = u;	
 	cmdparams->param = (char*)modes;
@@ -711,7 +711,7 @@ UserSMode (const char *nick, const char *modes)
 		return;
 	}
 	u->Smode = SmodeStringToMask(modes, u->Smode);
-	dlog(DEBUG1, "UserSMode: smode for %s is now %p", u->nick, (int *)u->Smode);
+	dlog(DEBUG1, "UserSMode: smode for %s is now %x", u->nick, u->Smode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.user = u;	
 	cmdparams->param = (char*)modes;
