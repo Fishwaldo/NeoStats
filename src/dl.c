@@ -30,11 +30,7 @@
 #include "neostats.h"
 #include "dl.h"
 
-#ifndef HAVE_LIBDL
 char *ns_dlerrormsg;
-#else /* HAVE_LIBDL */
-char *ns_dlerrormsg;
-#endif /* HAVE_LIBDL */
 
 void *ns_dlsym (void *handle, const char *name)
 {

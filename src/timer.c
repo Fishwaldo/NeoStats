@@ -29,6 +29,8 @@
 #include "modules.h"
 #include "log.h"
 
+#define TIMER_TABLE_SIZE	300	/* Number of Timers */
+
 /* @brief Module Timer hash list */
 static hash_t *timerhash;
 
@@ -40,7 +42,7 @@ static void run_mod_timers (int ismidnight);
 
 int InitTimers (void)
 {
-	timerhash = hash_create (T_TABLE_SIZE, 0, 0);
+	timerhash = hash_create (TIMER_TABLE_SIZE, 0, 0);
 	if(!timerhash) {
 		nlog (LOG_CRITICAL, "Unable to create timer hash");
 		return NS_FAILURE;

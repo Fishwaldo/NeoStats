@@ -31,7 +31,7 @@
 #endif
 #include "lang.h"
 
-#ifndef HAVE_DB_H
+#if (!defined HAVE_DB_H) || (defined WIN32)
 void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc) 
 {
 }
@@ -64,8 +64,13 @@ char TranslatedLang[STRSIZE];
 hash_t *langcache[MAXLANG];
 static void* LANGGetData(void* key, int lang);
 
+#if (defined WIN32)
+#define LANGDEBUG
+#define LANGERROR
+#else
 #define LANGDEBUG(fmt,...) LANGDebug(__FILE__, __LINE__, __FUNCTION__, 0, fmt, __VA_ARGS__)
 #define LANGERROR(fmt,...) LANGDebug(__FILE__, __LINE__, __FUNCTION__, 1, fmt, __VA_ARGS__)
+#endif
 
 static void LANGDebug(char *file, int line, char *func, int err, char *fmt, ...) {
 	va_list ap;
@@ -75,9 +80,9 @@ static void LANGDebug(char *file, int line, char *func, int err, char *fmt, ...)
 		return;
 	}
 	va_start(ap, fmt);
-	vsnprintf(buf, 800, fmt, ap);
+	vircsnprintf(buf, 800, fmt, ap);
 	va_end(ap);
-	snprintf(buf2, 1024, "%s:%d(%s): %s", file, line, func, buf);
+	ircsnprintf(buf2, 1024, "%s:%d(%s): %s", file, line, func, buf);
 	if (lang_info.debugfunc) {
 		lang_info.debugfunc("%s", buf2);
 	} else {
@@ -128,7 +133,7 @@ static int LANGOpenDatabase()
 			abort();
 			continue;
 		}
-		snprintf(lang_list[lang_info.nooflangs].langname, data.size+1, "%s", (char *)data.data);
+		ircsnprintf(lang_list[lang_info.nooflangs].langname, data.size+1, "%s", (char *)data.data);
 		LANGDEBUG("Databases: %.*s : %.*s",
 		    (int)key.size, (char *)key.data,
     		    (int)data.size, (char *)data.data);
@@ -194,7 +199,7 @@ int LANGDumpDB(char *lang, int missing, void *mylist)
 	count = 0;
 	/* Walk through the database and print out the key/data pairs. */
 	while ((rc = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0) {
-		snprintf(tmpbuf, STRSIZE, "%.*s", data.size, (char *)data.data);
+		ircsnprintf(tmpbuf, STRSIZE, "%.*s", data.size, (char *)data.data);
 		if (!missing) {
 			/* only dump the missing values) */
 			if (LANGGotData(tmpbuf, lang) == 1) {
@@ -206,9 +211,9 @@ int LANGDumpDB(char *lang, int missing, void *mylist)
 		    (int)data.size, (char *)data.data);
 		count++;
 		dump = malloc(sizeof(langdump));
-		snprintf(dump->key, KEYSIZE, "%.*s", key.size, (char *)key.data);
-		snprintf(dump->realstring, STRSIZE, "%.*s", data.size, (char *)data.data);
-		snprintf(dump->string, STRSIZE, "%s", (char *)LANGGetData(tmpbuf, mylang));
+		ircsnprintf(dump->key, KEYSIZE, "%.*s", key.size, (char *)key.data);
+		ircsnprintf(dump->realstring, STRSIZE, "%.*s", data.size, (char *)data.data);
+		ircsnprintf(dump->string, STRSIZE, "%s", (char *)LANGGetData(tmpbuf, mylang));
 		node = hnode_create(dump);
 		hash_insert((hash_t *)mylist, node, dump->realstring);
 	}
@@ -240,7 +245,7 @@ int LANGNewLang(char *lang)
 	}
 
 	
-	snprintf(lang_list[lang_info.nooflangs].langname, LANGNAMESIZE, "%s", lang);
+	ircsnprintf(lang_list[lang_info.nooflangs].langname, LANGNAMESIZE, "%s", lang);
 	if ((dbret = db_create(&lang_list[lang_info.nooflangs].dbp, NULL, 0)) != 0) {
 		LANGERROR("db_create: %s", db_strerror(dbret));
 		return -1;
@@ -295,7 +300,7 @@ static void* LANGGetData(void* key, int lang)
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	/* XXX Fix this */
-	snprintf(tmpbuf, KEYSIZE, "%x", (unsigned int)hash_fun_default(key));
+	ircsnprintf(tmpbuf, KEYSIZE, "%x", (unsigned int)hash_fun_default(key));
 	LANGDEBUG("LangGetData: Looking for %s (%s)", (char *)key, tmpbuf);
 	dbkey.data = tmpbuf;
 	dbkey.size = strlen(tmpbuf);
@@ -308,7 +313,7 @@ static void* LANGGetData(void* key, int lang)
 			abort();
 			/* continue anyway, so at least we can return a partial string */
 		}
-		snprintf(TranslatedLang, STRSIZE, "%.*s", dbdata.size, (char *)dbdata.data);
+		ircsnprintf(TranslatedLang, STRSIZE, "%.*s", dbdata.size, (char *)dbdata.data);
 		/* XXX Fixme, we shouldn't use a global var here*/
 		return TranslatedLang;
 	}
@@ -358,9 +363,9 @@ restart:
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	if (keydone == 0) {
-		snprintf(tmpbuf, KEYSIZE, "%x", (unsigned int)hash_fun_default(key));
+		ircsnprintf(tmpbuf, KEYSIZE, "%x", (unsigned int)hash_fun_default(key));
 	} else {
-		snprintf(tmpbuf, KEYSIZE, "%s", key);
+		ircsnprintf(tmpbuf, KEYSIZE, "%s", key);
 	}
 	LANGDEBUG("LANGSetData %s = %.*s (%s) (%d)", key, size, (char *)data, tmpbuf, rc);
 	dbkey.data = tmpbuf;

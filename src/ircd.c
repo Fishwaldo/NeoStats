@@ -38,6 +38,9 @@
 #include "auth.h"
 #include "dns.h"
 
+#define MOTD_FILENAME	"neostats.motd"
+#define ADMIN_FILENAME	"neostats.admin"
+
 ircd_server ircd_srv;
 
 static char ircd_buf[BUFSIZE];
@@ -135,8 +138,8 @@ InitIrcdSymbols (void)
 		config.singlebotmode = 1;
 	}
 
-	strcpy(me.servicescmode,protocol_info->services_cmode);
-	strcpy(me.servicesumode,protocol_info->services_umode);
+	strlcpy (me.servicescmode, protocol_info->services_cmode, MODESIZE);
+	strlcpy (me.servicesumode, protocol_info->services_umode, MODESIZE);
 
 	/* Allow protocol module to "override" the parser */
 	irc_parse = ns_dlsym( protocol_module_handle, "parse");
@@ -925,6 +928,10 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
 			irc_send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
 		}
 		join_chan (botptr->u->name, chan);
+		/* Increment number of persistent users if needed */
+		if (botptr->flags & BOT_FLAG_PERSIST) {
+			c->persistentusers ++;
+		}
 		if (mode) {
 			ChanUserMode(chan, botptr->u->name, 1, CmodeStringToMask(mode));
 		}
@@ -945,6 +952,16 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
 int
 irc_part (const Bot *botptr, const char *chan)
 {
+	Channel *c;
+
+	c = find_chan (chan);
+	/* Decrement number of persistent users if needed 
+	 * Must be BEFORE we part the channel in order to trigger
+	 * empty channel processing for other bots
+	 */
+	if (botptr->flags & BOT_FLAG_PERSIST) {
+		c->persistentusers --;
+	}
 	irc_send_part(botptr->u->name, chan);
 	part_chan (botptr->u, (char *) chan, NULL);
 	return NS_SUCCESS;
@@ -1314,7 +1331,6 @@ do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, co
 	irc_send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
 	irc_globops (NULL, _("Link with Network \2Complete!\2"));
-	SendAllModuleEvent (EVENT_NETINFO, NULL);	
 }
 
 void 
@@ -1326,7 +1342,6 @@ do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, c
 	irc_send_snetinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
 	irc_globops (NULL, _("Link with Network \2Complete!\2"));
-	SendAllModuleEvent (EVENT_NETINFO, NULL);
 }
 
 void
@@ -1635,7 +1650,7 @@ send_cmd (char *fmt, ...)
 		buf[BUFSIZE - 2] = '\n';
 	}
 	buflen = strnlen (buf, BUFSIZE);
-	sts (buf, buflen);
+	send_to_socket (buf, buflen);
 }
 
 void

@@ -25,25 +25,27 @@
  */
 
 #include "neostats.h"
-#ifdef HAVE_SYS_POLL_H 
-#include <poll.h>
-#endif
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h> 
 #endif
 
+int os_errno;
 static char tempbuf[BUFSIZE*2];
 
-int sys_mkdir (const char *filename, mode_t mode)
+int os_mkdir (const char *filename, mode_t mode)
 {
+	int retval;
+
 #ifdef WIN32
-	return mkdir (filename);
+	retval = mkdir (filename);
 #else
-	return mkdir (filename, mode);
+	retval = mkdir (filename, mode);
 #endif
+	os_errno = errno;
+	return retval;
 }
 
-int sys_check_create_dir (const char* dirname)
+int os_check_create_dir (const char* dirname)
 {
 	struct stat st;
 	int res;
@@ -54,7 +56,7 @@ int sys_check_create_dir (const char* dirname)
 		/* hrm, error */
 		if (errno == ENOENT) {
 			/* ok, it doesn't exist, create it */
-			res = sys_mkdir (dirname, 0700);
+			res = os_mkdir (dirname, 0700);
 			if (res != 0) {
 				/* error */
 				nlog (LOG_CRITICAL, "Couldn't create directory: %s", strerror(errno));
@@ -72,108 +74,147 @@ int sys_check_create_dir (const char* dirname)
 	return NS_SUCCESS;
 }
 
-FILE_HANDLE sys_file_open (const char * filename, int filemode)
+FILE* os_fopen (const char * filename, const char * filemode)
 {
-	switch (filemode) 
-	{ 
-		case FILE_MODE_APPEND:
-			return fopen (filename, "a");
-			break;
-		case FILE_MODE_READ:
-			return fopen (filename, "r");
-			break;
-		default:
-			break;
-	}
-	return fopen (filename, "r");
+	FILE* retval;
+
+	retval = fopen (filename, filemode);
+	os_errno = errno;
+	return retval;
 }
 
-int sys_file_close (FILE_HANDLE handle)
+int os_fclose (FILE* handle)
 {
-	return fclose (handle);
+	int retval;
+
+	retval = fclose (handle);
+	os_errno = errno;
+	return retval;
 }
 
-int sys_file_seek (FILE_HANDLE handle, long offset, int origin)
+int os_fseek (FILE* handle, long offset, int origin)
 {
-	return fseek (handle, offset, origin);
+	int retval;
+
+	retval = fseek (handle, offset, origin);
+	os_errno = errno;
+	return retval;
 }
 
-long sys_file_tell (FILE_HANDLE handle)
+long os_ftell (FILE* handle)
 {
-	return ftell(handle);
+	int retval;
+
+	retval = ftell (handle);
+	os_errno = errno;
+	return retval;
 }
 
-int sys_file_printf (FILE_HANDLE handle, char *fmt, ...)
+int os_fprintf (FILE* handle, char *fmt, ...)
 {
+	int retval;
 	va_list ap;
 
 	va_start (ap, fmt);
 	ircvsnprintf (tempbuf, BUFSIZE*2, fmt, ap);
 	va_end (ap);
-	return fprintf (handle, "%s", tempbuf);	
+	retval = fprintf (handle, "%s", tempbuf);	
+	os_errno = errno;
+	return retval;
 }
 
-int sys_file_read (void *buffer, size_t size, size_t count, FILE_HANDLE handle)
+int os_fread (void *buffer, size_t size, size_t count, FILE* handle)
 {
-	return fread (buffer, size, count, handle);
+	int retval;
+
+	retval = fread (buffer, size, count, handle);
+	os_errno = errno;
+	return retval;
 }
 
-char* sys_file_gets (char *string, int n, FILE_HANDLE handle)
+char* os_fgets (char *string, int n, FILE* handle)
 {
-	return fgets (string, n, handle);
-}
-int sys_file_write (const void *buffer, size_t size, size_t count, FILE_HANDLE handle)
-{
-	return fwrite (buffer, size, count, handle);
+	char* retval;
+
+	retval = fgets (string, n, handle);
+	os_errno = errno;
+	return retval;
 }
 
-int sys_file_flush (FILE_HANDLE handle)
+int os_fwrite (const void *buffer, size_t size, size_t count, FILE* handle)
 {
-	return fflush (handle);
+	int retval;
+
+	retval = fwrite (buffer, size, count, handle);
+	os_errno = errno;
+	return retval;
 }
 
-int sys_file_rename (const char* oldname, const char* newname)
+int os_fflush (FILE* handle)
 {
+	int retval;
+
+	retval = fflush (handle);
+	os_errno = errno;
+	return retval;
+}
+
+int os_rename (const char* oldname, const char* newname)
+{
+	int retval;
+    
 	/*  WIN32 does not allow rename if the file exists 
-	 *  Behaviour is undefined on various systems so maybe
-	 *  we should remove on all platforms?
+	 *  Behaviour is undefined on various systems so 
+	 *  remove on all platforms
 	 */
-#ifdef WIN32
 	remove (newname);
-#endif
-	return rename (oldname, newname);
+	retval = rename (oldname, newname);
+	os_errno = errno;
+	return retval;
 }
 
-char* sys_file_get_last_error_string (void)
+int os_stat (const char *path, struct stat *buffer)
+{
+	int retval;
+
+	retval = stat (path, buffer);
+	os_errno = errno;
+	return retval;
+}
+
+int os_access(const char *path, int mode)
+{
+	int retval;
+
+	retval = access(path, mode);
+	os_errno = errno;
+	return retval;
+}
+
+char* os_strerror (void)
 {
 	return strerror (errno);
 }
 
-int sys_file_get_last_error (void)
-{
-	return errno;
-}
-
-int sys_file_get_size (const char* filename)
+int os_file_get_size (const char* filename)
 {
 	struct stat st;
 	int res;
 
-	res = stat(filename, &st);
+	res = stat (filename, &st);
 	if (res != 0) {
-		if (sys_file_get_last_error () == ENOENT) {
-			/* wtf, this is bad */
+		if (errno == ENOENT) {
 			nlog (LOG_CRITICAL, "No such file: %s", filename);
 			return -1;
 		} else {
-			nlog (LOG_CRITICAL, "File error: %s", sys_file_get_last_error_string ());
+			nlog (LOG_CRITICAL, "File error: %s", os_strerror ());
 			return -1;
 		}
 	}
 	return st.st_size;
 }
 
-int sys_sock_close (SYS_SOCKET sock)
+int os_sock_close (OS_SOCKET sock)
 {
 #ifdef WIN32
 	return closesocket (sock);
@@ -182,7 +223,7 @@ int sys_sock_close (SYS_SOCKET sock)
 #endif      			
 }
 
-int sys_sock_write (SYS_SOCKET s, const char* buf, int len)
+int os_sock_write (OS_SOCKET s, const char* buf, int len)
 {
 #ifdef WIN32
 	return send (s, buf, len, 0);
@@ -191,7 +232,7 @@ int sys_sock_write (SYS_SOCKET s, const char* buf, int len)
 #endif
 }
 
-int sys_sock_read (SYS_SOCKET s, char* buf, int len)
+int os_sock_read (OS_SOCKET s, char* buf, int len)
 {
 #ifdef WIN32
 	return recv (s, buf, len, 0);
@@ -200,7 +241,7 @@ int sys_sock_read (SYS_SOCKET s, char* buf, int len)
 #endif
 }
 
-int sys_sock_set_nonblocking (SYS_SOCKET s)
+int os_sock_set_nonblocking (OS_SOCKET s)
 {
 	int flags;
 #ifdef WIN32
@@ -214,13 +255,22 @@ int sys_sock_set_nonblocking (SYS_SOCKET s)
 #endif
 }
 
-size_t sys_strftime (char *strDest, size_t maxsize, const char *format, const struct tm *timeptr)
+size_t os_strftime (char *strDest, size_t maxsize, const char *format, const struct tm *timeptr)
 {
 	return strftime (strDest, maxsize, format, timeptr);
 }
 
-struct tm* sys_localtime (const time_t *timer)
+struct tm* os_localtime (const time_t *timer)
 {
 	return localtime (timer);
 }
 
+void *os_memset (void *dest, int c, size_t count)
+{
+	return memset (dest, c, count);
+}
+
+void *os_memcpy (void *dest, const void *src, size_t count)
+{
+	return memcpy (dest, src, count);
+}

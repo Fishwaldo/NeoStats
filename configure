@@ -19283,13 +19283,18 @@ fi
 
 
 
+
+
+
 for ac_header in sys/types.h \
         sys/time.h \
         sys/select.h \
         sys/socket.h \
         unistd.h \
         malloc.h \
+        stdio.h \
         stdlib.h \
+        stdarg.h \
         arpa/inet.h \
         net/if.h \
         netinet/in.h \
@@ -19297,6 +19302,7 @@ for ac_header in sys/types.h \
         sys/sockio.h \
         sys/stat.h \
         sys/param.h \
+        sys/resource.h \
         termios.h \
         termio.h \
         sgtty.h \

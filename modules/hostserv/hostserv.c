@@ -195,7 +195,7 @@ static int hs_event_quit(CmdParams* cmdparams)
 	if (hs) {
 		dlog(DEBUG2, "hs_event_quit: free module data");
 		ns_free(hs);
-		set_user_moddata (cmdparams->source, NULL);
+		clear_user_moddata (cmdparams->source);
 	}
 	return NS_SUCCESS;
 }
@@ -208,7 +208,7 @@ static int hs_event_kill(CmdParams* cmdparams)
 	if (hs) {
 		dlog(DEBUG2, "hs_event_kill: free module data");
 		ns_free(hs);
-		set_user_moddata (cmdparams->target, NULL);
+		clear_user_moddata (cmdparams->target);
 	}
 	return NS_SUCCESS;
 }
@@ -516,7 +516,7 @@ static void SaveBans()
 	hnode_t *hn;
 	hscan_t hs;
 
-	bzero(ban_buf, BANBUFSIZE);
+	memset (ban_buf, 0, BANBUFSIZE);
 	hash_scan_begin(&hs, bannedvhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
 		strlcat(ban_buf, (char *) hnode_get(hn), BANBUFSIZE);

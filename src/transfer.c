@@ -28,6 +28,8 @@
 #include "transfer.h"
 #include "curl.h"
 
+#define MAX_TRANSFERS	10	/* number of curl transfers */
+
 int InitCurl(void) 
 {
 	/* global curl init */

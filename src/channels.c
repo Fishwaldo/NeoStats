@@ -31,6 +31,10 @@
 #include "services.h"
 #include "modules.h"
 
+#define CHANNEL_TABLE_SIZE	-1
+#define CHANNEL_MEM_SIZE	-1
+#define CHANNEL_MAXMODES	-1
+
 static hash_t *channelhash;
 static char quitreason[BUFSIZE];
 
@@ -42,7 +46,7 @@ ChanPartHandler (list_t * list, lnode_t * node, void *v)
 
 void PartAllChannels (Client * u, const char* reason)
 {
-	bzero(quitreason, BUFSIZE);
+	memset (quitreason, 0, BUFSIZE);
 	if(reason) {
 		strlcpy(quitreason, reason, BUFSIZE);
 		strip_mirc_codes(quitreason);
@@ -133,8 +137,8 @@ new_chan (const char *chan)
 	c = ns_calloc (sizeof (Channel));
 	strlcpy (c->name, chan, MAXCHANLEN);
 	hnode_create_insert (channelhash, c, c->name);
-	c->chanmembers = list_create (CHAN_MEM_SIZE);
-	c->modeparms = list_create (MAXMODES);
+	c->chanmembers = list_create (CHANNEL_MEM_SIZE);
+	c->modeparms = list_create (CHANNEL_MAXMODES);
 	c->creationtime = me.now;
 	/* XXX TODO: Set the channel language */
 	c->lang = me.lang;
@@ -480,7 +484,7 @@ void ChanDump (CmdParams* cmdparams, const char *chan)
 		return;
 #endif
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source, __("================CHANDUMP================",cmdparams->source));
+	irc_prefmsg (ns_botptr, cmdparams->source, __("================CHANLIST================",cmdparams->source));
 	if (!chan) {
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Channels %d", cmdparams->source), (int)hash_count (channelhash));
 		hash_scan_begin (&sc, channelhash);
@@ -582,7 +586,7 @@ int test_cumode(char* chan, char* nick, int flag)
 int 
 InitChannels ()
 {
-	channelhash = hash_create (C_TABLE_SIZE, 0, 0);
+	channelhash = hash_create (CHANNEL_TABLE_SIZE, 0, 0);
 	if(!channelhash)	{
 		nlog (LOG_CRITICAL, "Unable to create channel hash");
 		return NS_FAILURE;
@@ -611,6 +615,14 @@ void GetChannelList(ChannelListHandler handler)
 hash_t *GetChannelHash (void)
 {
 	return channelhash;
+}
+
+void clear_channel_moddata (Channel* c)
+{
+	if (c)
+	{
+		c->moddata[GET_CUR_MODNUM()] = NULL;
+	}
 }
 
 void set_channel_moddata (Channel* c, void * data)

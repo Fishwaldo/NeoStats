@@ -32,6 +32,7 @@
 #include "dns.h"
 #include "services.h"
 
+#define DNS_QUEUE_SIZE  300	/* number on concurrent DNS lookups */
 #define DNS_DATA_SIZE	255
 
 typedef struct DnsLookup {

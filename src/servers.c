@@ -31,6 +31,8 @@
 #include "services.h"
 #include "users.h"
 
+#define SERVER_TABLE_SIZE	-1
+
 tconfig config;
 static hash_t *serverhash;
 
@@ -75,7 +77,7 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	}
 	s->tsconnect = me.now;
 	if (!ircstrcasecmp(name, me.name)) {
-		s->flags |= NS_FLAGS_ME;
+		s->flags |= CLIENT_FLAG_ME;
 	}
 	/* check exclusions */
 	ns_do_exclude_server(s);
@@ -193,7 +195,7 @@ ServerDump (const char *name)
 	hscan_t ss;
 	hnode_t *sn;
 
-	irc_chanalert (ns_botptr, _("===============SERVERDUMP==============="));
+	irc_chanalert (ns_botptr, _("===============SERVERLIST==============="));
 	if (!name) {
 		hash_scan_begin (&ss, serverhash);
 		while ((sn = hash_scan_next (&ss)) != NULL) {
@@ -215,7 +217,7 @@ ServerDump (const char *name)
 int 
 InitServers (void)
 {
-	serverhash = hash_create (S_TABLE_SIZE, 0, 0);
+	serverhash = hash_create (SERVER_TABLE_SIZE, 0, 0);
 	if (!serverhash) {
 		nlog (LOG_CRITICAL, "Unable to create server hash");
 		return NS_FAILURE;
@@ -297,6 +299,14 @@ void RequestServerUptimes (void)
 hash_t *GetServerHash (void)
 {
 	return serverhash;
+}
+
+void clear_server_moddata (Client* s)
+{
+	if (s)
+	{
+		s->moddata[GET_CUR_MODNUM()] = NULL;
+	}
 }
 
 void set_server_moddata (Client* s, void * data)

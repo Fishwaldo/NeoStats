@@ -31,7 +31,7 @@
 /* sqlsrv struct for tracking connections */
 typedef struct Sql_Conn {
 	struct sockaddr_in cliskt;
-	SYS_SOCKET fd;
+	OS_SOCKET fd;
 	long long nbytein;
 	long long nbyteout;
 	char response[50000];
@@ -40,7 +40,7 @@ typedef struct Sql_Conn {
 	int cmd[1000];
 } Sql_Conn;
 
-SYS_SOCKET sqlListenSock = -1;
+OS_SOCKET sqlListenSock = -1;
 
 list_t *sqlconnections;
 char sqlsrvuser[MAXUSER];
@@ -48,8 +48,8 @@ char sqlsrvpass[MAXPASS];
 char sqlsrvhost[MAXHOST];
 int sqlsrvport;
 
-static void sql_accept_conn(SYS_SOCKET srvfd);
-static SYS_SOCKET sqllisten_on_port(int port);
+static void sql_accept_conn(OS_SOCKET srvfd);
+static OS_SOCKET sqllisten_on_port(int port);
 static int sql_handle_ui_request(lnode_t *sqlnode);
 static int sql_handle_ui_output(lnode_t *sqlnode);
 int check_sql_sock();
@@ -182,10 +182,10 @@ int check_sql_sock()
  * Output:       The file descriptor of the socket
  * Effects:      none
  ***************************************************************/
-SYS_SOCKET
+OS_SOCKET
 sqllisten_on_port(int port)
 {
-	SYS_SOCKET srvfd;      /* FD for our listen server socket */
+	OS_SOCKET srvfd;      /* FD for our listen server socket */
 	struct sockaddr_in srvskt;
 	int      adrlen;
 
@@ -204,7 +204,7 @@ sqllisten_on_port(int port)
 		nlog(LOG_CRITICAL, "SqlSrv: Unable to get socket for port %d.", port);
 		return -1;
 	}
-	sys_sock_set_nonblocking (srvfd);
+	os_sock_set_nonblocking (srvfd);
 	if (bind(srvfd, (struct sockaddr *) &srvskt, adrlen) < 0)
 	{
 		nlog(LOG_CRITICAL, "Unable to bind to port %d", port);
@@ -232,7 +232,7 @@ sqllisten_on_port(int port)
  * Effects:      manager connection table (ui)
  ***************************************************************/
 void
-sql_accept_conn(SYS_SOCKET srvfd)
+sql_accept_conn(OS_SOCKET srvfd)
 {
 	int      adrlen;     /* length of an inet socket address */
 	Sql_Conn *newui;
@@ -241,7 +241,7 @@ sql_accept_conn(SYS_SOCKET srvfd)
 	/* if we reached our max connection, just exit */
 	if (list_count(sqlconnections) > 5) {
 		nlog(LOG_NOTICE, "Can not accept new SQL connection. Full");
-		sys_sock_close (srvfd);
+		os_sock_close (srvfd);
 		return;
 	}
 
@@ -257,7 +257,7 @@ sql_accept_conn(SYS_SOCKET srvfd)
 	{
 		nlog(LOG_WARNING, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
 		ns_free(newui);
-		sys_sock_close (srvfd);
+		os_sock_close (srvfd);
 		return;
 	}
 	else
@@ -266,12 +266,12 @@ sql_accept_conn(SYS_SOCKET srvfd)
 		if (!match(sqlsrvhost, tmp)) {
     	/* we didnt get a match, bye bye */
 			nlog(LOG_NOTICE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
-			sys_sock_close (newui->fd);
+			os_sock_close (newui->fd);
 			ns_free(newui);
 			return;
 		}
 		/* inc number ui, then init new ui */
-		sys_sock_set_nonblocking (srvfd);
+		os_sock_set_nonblocking (srvfd);
 		newui->cmdpos = 0;
 		newui->responsefree = 50000; /* max response packetsize if 50000 */
 		newui->nbytein = 0;
@@ -313,7 +313,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
 	/* We read data from the connection into the buffer in the ui struct. 
        Once we've read all of the data we can, we call the DB routine to
        parse out the SQL command and to execute it. */
-	ret = sys_sock_read (sqlconn->fd,
+	ret = os_sock_read (sqlconn->fd,
 		&(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos));
 
 	/* shutdown manager conn on error or on zero bytes read */
@@ -323,7 +323,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
 		   client program? */
 		dlog(DEBUG1, "Disconnecting SqlClient for failed read");
 		deldbconnection(sqlconn->fd);
-		sys_sock_close (sqlconn->fd);
+		os_sock_close (sqlconn->fd);
 		list_delete(sqlconnections, sqlnode);
 		lnode_destroy(sqlnode);
 		ns_free(sqlconn);
@@ -377,12 +377,12 @@ sql_handle_ui_output(lnode_t *sqlnode)
   
 	if (sqlconn->responsefree < 50000)
 	{
-		ret = sys_sock_write (sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree));
+		ret = os_sock_write (sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree));
 		if (ret < 0)
 		{
 			nlog(LOG_WARNING, "Got a write error when attempting to return data to the SQL Server");
 			deldbconnection(sqlconn->fd);
-			sys_sock_close (sqlconn->fd);
+			os_sock_close (sqlconn->fd);
 			list_delete(sqlconnections, sqlnode);
 			lnode_destroy(sqlnode);
 			ns_free(sqlconn);

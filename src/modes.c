@@ -590,7 +590,7 @@ ChanMode (char *origin, char **av, int ac)
 	for (i = 0; i < ac; i++) {
 		AddStringToList(&cmdparams->av, av[i], &cmdparams->ac);	
 	}
-	SendAllModuleEvent(EVENT_CHANMODE, cmdparams);
+	SendAllModuleEvent(EVENT_CMODE, cmdparams);
 	ns_free(cmdparams);	
 
 	j = ChanModeHandler (c, av[1], j, av, ac);

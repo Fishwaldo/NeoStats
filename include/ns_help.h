@@ -31,10 +31,10 @@ extern const char *ns_help_exclude[];
 #ifdef USE_RAW
 extern const char *ns_help_raw[];
 #endif
-extern const char *ns_help_userdump[];
-extern const char *ns_help_chandump[];
-extern const char *ns_help_serverdump[];
-extern const char *ns_help_bandump[];
+extern const char *ns_help_userlist[];
+extern const char *ns_help_chanlist[];
+extern const char *ns_help_serverlist[];
+extern const char *ns_help_banlist[];
 extern const char *ns_help_load[];
 extern const char *ns_help_unload[];
 extern const char *ns_help_modlist[];
@@ -60,10 +60,10 @@ extern const char ns_help_botlist_oneline[];
 extern const char ns_help_socklist_oneline[];
 extern const char ns_help_timerlist_oneline[];
 extern const char ns_help_modlist_oneline[];
-extern const char ns_help_userdump_oneline[];
-extern const char ns_help_chandump_oneline[];
-extern const char ns_help_serverdump_oneline[];
-extern const char ns_help_bandump_oneline[];
+extern const char ns_help_userlist_oneline[];
+extern const char ns_help_chanlist_oneline[];
+extern const char ns_help_serverlist_oneline[];
+extern const char ns_help_banlist_oneline[];
 
 extern const char *ns_help_set_nick[];
 extern const char *ns_help_set_altnick[];

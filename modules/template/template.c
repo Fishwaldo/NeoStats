@@ -53,8 +53,13 @@ const char* template_copyright[] =
 
 /** 
  *  Help text for example command
+ *  Help text is in two parts:
+ *  1) A single line returned in the list when a user requests 
+ *     /msg help botname
+ *  2) Multi-line help text returned when a user requests:
+ *     /msg help botname command
  */
-const char template_help_hello_world_oneline[]="Give someone a rose";
+const char template_help_hello_world_oneline[]="Hello world example command";
 const char *template_help_hello_world[] = {
 	"Syntax: \2HELLOWORLD\2",
 	"",
@@ -64,7 +69,19 @@ const char *template_help_hello_world[] = {
 };
 
 /** 
+ *  Help text for example setting
+ */
+const char *example_help_set_example[] = {
+	"Syntax: \2EXAMPLE\2",
+	"",
+	"Example of a setting.",
+	NULL
+};
+
+/** 
  *  Example about text
+ *  Returned by an intrinsic command when a user requests
+ *  /msg botname about
  */
 const char* template_about[] = 
 {
@@ -76,7 +93,7 @@ const char* template_about[] =
 /** Module Info definition 
  *	This describes the module to the NeoStats core and provides information
  *  to end users when modules are queried.
- *  The presence of this structure is required but some fields are optional.
+ *  The structure is required but some fields are optional.
  */
 ModuleInfo module_info = {
 	/* REQUIRED: 
@@ -97,10 +114,12 @@ ModuleInfo module_info = {
 	template_about,
 	/* REQUIRED: 
 	 * version of neostats used to build module
-	 * must be NEOSTATS_VERSION */
+	 * must be NEOSTATS_VERSION or your module will not load */
 	NEOSTATS_VERSION,
 	/* REQUIRED: 
-	 * string containing version of module */
+	 * string containing version of module 
+	 * returned when a user requests 
+	 * /msg botname version */
 	"1.0",
 	/* REQUIRED: string containing build date of module 
 	 * should be __DATE__ */
@@ -132,13 +151,31 @@ static int template_hello_world(CmdParams* cmdparams)
 
 /** OPTIONAL:
  *  Table of commands available in our bot
- *  This lists commands that a user can send via privmsg
+ *  This lists commands that a user can send via privmsg or if your bot is 
+ *  in a channel and your bot is not "DEAF", users can issue via a channel 
+ *  of !command
  */
 static bot_cmd template_commands[]=
 {
-	{"HELLO",	template_hello_world,	0, 	0,	template_help_hello_world,		template_help_hello_world_oneline },
+	{
+	/* Command string*/
+	"HELLO",	
+	/* Function to call when this command is received */
+	template_hello_world,	
+	/* Minimum number of parameters for this command */
+	0, 	
+	/* Minimum user level for this command */
+	0,	
+	/* Multi line help text for this command */
+	template_help_hello_world,		
+	/* Single line help text for this command */
+	template_help_hello_world_oneline 
+	},
+	/* End command list with a NULL entry */
 	{NULL,		NULL,					0, 	0,	NULL, 			NULL}
 };
+
+int static example_setting = 0;
 
 /** OPTIONAL:
  *  Table of settings available in our bot
@@ -146,6 +183,31 @@ static bot_cmd template_commands[]=
  */
 static bot_setting template_settings[]=
 {
+	{
+	/* Set string */
+	"EXAMPLE",	
+	/* Address of vaue holding current setting */
+	&example_setting,	
+	/* Set type, see SET_TYPE in neostats.h for available types */
+	SET_TYPE_BOOLEAN,	
+	/* Minimum value for setting, only valid for certain types */
+	0, 
+	/* Maximum value for setting, only valid for certain types */
+	0, 	
+	/* Minimum user level for this set command */
+	NS_ULEVEL_ADMIN, 
+	/* Name for use in config storage, must be unique */
+	"example",	
+	/* Description of value e.g. seconds, only valid for certain types */
+	NULL,	
+	/* pointer to help text */
+	example_help_set_example, 
+	/* handler for custom/post-set processing */
+	NULL, 
+	/* default value for setting, must be cast to (void *) */
+	(void*)1 
+	},
+	/* End setting list with a NULL entry */
 	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
 
@@ -163,13 +225,20 @@ BotInfo template_bot_info =
 	 * user */
 	"changeme",
 	/* REQUIRED: 
-	 * host */
+	 * host that this bot will use 
+	 * for the neostats host, use BOT_COMMON_HOST */
 	BOT_COMMON_HOST,
 	/* REQUIRED: 
 	 * realname */
 	"Example NeoStats module",
+	/* OPTIONAL: 
+	 * flags */
 	0, 
+	/* OPTIONAL: 
+	 * bot command list pointer, use NULL if not needed */
 	template_commands, 
+	/* OPTIONAL: 
+	 * bot command setting pointer, use NULL if not needed */
 	template_settings,
 };
 

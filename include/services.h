@@ -58,7 +58,7 @@ typedef struct tconfig {
 	int debugtochan;
 	char debugchan[MAXCHANLEN];
 	int pingtime;
-	int joinservicechan;
+	int joinserviceschan;
 	neoroot rootuser;
 	char debugmodule[MAX_MOD_NAME];
 	unsigned int singlebotmode;

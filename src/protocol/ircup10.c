@@ -386,7 +386,7 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 			break;
 		}
 	}
-	snprintf(nicknumbuf, 6, "%sAA%c", neostatsbase64, (i+'A'));
+	ircsnprintf(nicknumbuf, 6, "%sAA%c", neostatsbase64, (i+'A'));
 	send_cmd ("%s %s %s 1 %lu %s %s %s AAAAAA %s :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, nicknumbuf, realname);
 	setnickbase64 (nick, nicknumbuf);
 }

@@ -31,7 +31,7 @@ int FiniSocks (void);
 int ns_cmd_socklist (CmdParams* cmdparams);
 int del_sockets (Module *mod_ptr);
 void Connect (void);
-void sts (const char *buf, const int buflen);
+void send_to_socket (const char *buf, const int buflen);
 int check_sql_sock();
 
 extern char recbuf[BUFSIZE];

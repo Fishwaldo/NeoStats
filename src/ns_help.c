@@ -40,10 +40,10 @@ const char ns_help_botlist_oneline[]="List module bots";
 const char ns_help_socklist_oneline[]="List module sockets";
 const char ns_help_timerlist_oneline[]="List module timers";
 const char ns_help_modlist_oneline[]="List loaded modules";
-const char ns_help_userdump_oneline[]="Dump user table";
-const char ns_help_chandump_oneline[]="Dump channel table";
-const char ns_help_serverdump_oneline[]="Dump server table";
-const char ns_help_bandump_oneline[]="Dump ban table";
+const char ns_help_userlist_oneline[]="Dump user table";
+const char ns_help_chanlist_oneline[]="Dump channel table";
+const char ns_help_serverlist_oneline[]="Dump server table";
+const char ns_help_banlist_oneline[]="Dump ban table";
 const char cmd_help_oneline[]="Online help";
 const char cmd_help_about_oneline[] = "Display About info";
 const char cmd_help_credits_oneline[] = "Display credits";
@@ -151,9 +151,9 @@ const char *ns_help_reload[] = {
 	NULL
 };
 
-const char *ns_help_userdump[] = {
-	"Syntax: \2USERDUMP\2",
-	"Syntax: \2USERDUMP <nick>\2",
+const char *ns_help_userlist[] = {
+	"Syntax: \2USERLIST\2",
+	"Syntax: \2USERLIST <nick>\2",
 	"",
 	"When in debug mode, Neostats will send its user table to",
 	"the services channel. Only useful for debugging Neostats",
@@ -162,9 +162,9 @@ const char *ns_help_userdump[] = {
 	NULL
 };
 
-const char *ns_help_serverdump[] = {
-	"Syntax: \2SERVERDUMP\2",
-	"Syntax: \2SERVERDUMP <name>\2",
+const char *ns_help_serverlist[] = {
+	"Syntax: \2SERVERLIST\2",
+	"Syntax: \2SERVERLIST <name>\2",
 	"",
 	"When in debug mode, Neostats will send its server table to",
 	"the services channel. Only useful for debugging Neostats",
@@ -173,17 +173,17 @@ const char *ns_help_serverdump[] = {
 	NULL
 };
 
-const char *ns_help_bandump[] = {
-	"Syntax: \2BANDUMP\2",
+const char *ns_help_banlist[] = {
+	"Syntax: \2BANLIST\2",
 	"",
 	"When in debug mode, Neostats will send its ban table to",
 	"the services channel. Only useful for debugging Neostats",
 	NULL
 };
 
-const char *ns_help_chandump[] = {
-	"Syntax: \2CHANDUMP\2",
-	"Syntax: \2CHANDUMP <channel>\2",
+const char *ns_help_chanlist[] = {
+	"Syntax: \2CHANLIST\2",
+	"Syntax: \2CHANLIST <channel>\2",
 	"",
 	"When in debug mode, Neostats will send its channel table to",
 	"the services channel. Only useful for debugging Neostats",
@@ -225,8 +225,8 @@ const char *ns_help_status[] = {
 };
 
 const char *ns_help_set_joinserviceschan[] = {
-	"\2JOINSERVICECHAN <on/off>\2",
-	"Set ping interval at which NeoStats pings servers",
+	"\2JOINSERVICESCHAN <on/off>\2",
+	"Whether NeoStats bots join services channel",
 	NULL
 };
 

@@ -45,10 +45,10 @@ static int ns_cmd_exclude (CmdParams* cmdparams);
 #ifdef USE_RAW
 static int ns_cmd_raw (CmdParams* cmdparams);
 #endif
-static int ns_cmd_userdump (CmdParams* cmdparams);
-static int ns_cmd_serverdump (CmdParams* cmdparams);
-static int ns_cmd_chandump (CmdParams* cmdparams);
-static int ns_cmd_bandump (CmdParams* cmdparams);
+static int ns_cmd_userlist (CmdParams* cmdparams);
+static int ns_cmd_serverlist (CmdParams* cmdparams);
+static int ns_cmd_chanlist (CmdParams* cmdparams);
+static int ns_cmd_banlist (CmdParams* cmdparams);
 static int ns_cmd_status (CmdParams* cmdparams);
 static int ns_cmd_level (CmdParams* cmdparams);
 static int ns_cmd_load (CmdParams* cmdparams);
@@ -107,17 +107,17 @@ static bot_cmd ns_commands[]=
 	{"BOTLIST",		ns_cmd_botlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist,	ns_help_botlist_oneline},
 	{"SOCKLIST",	ns_cmd_socklist,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist, 	ns_help_socklist_oneline},
 	{"TIMERLIST",	ns_cmd_timerlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist, 	ns_help_timerlist_oneline},
-	{"USERDUMP",	ns_cmd_userdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_userdump, 	ns_help_userdump_oneline},
-	{"CHANDUMP",	ns_cmd_chandump,	0, 	NS_ULEVEL_ROOT,  	ns_help_chandump, 	ns_help_chandump_oneline},
-	{"SERVERDUMP",	ns_cmd_serverdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverdump, ns_help_serverdump_oneline},
-	{"BANDUMP",		ns_cmd_bandump,		0, 	NS_ULEVEL_ROOT,  	ns_help_bandump,	ns_help_bandump_oneline},
+	{"USERLIST",	ns_cmd_userlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_userlist, 	ns_help_userlist_oneline},
+	{"CHANLIST",	ns_cmd_chanlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_chanlist, 	ns_help_chanlist_oneline},
+	{"SERVERLIST",	ns_cmd_serverlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverlist, ns_help_serverlist_oneline},
+	{"BANLIST",		ns_cmd_banlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_banlist,	ns_help_banlist_oneline},
 	{NULL,			NULL,			0, 	0,					NULL, 				NULL}
 };
 
 /** Bot setting table */
 static bot_setting ns_settings[]=
 {
-	{"JOINSERVICECHAN",	&config.joinservicechan, SET_TYPE_BOOLEAN,		0, 0, 	NS_ULEVEL_ADMIN, "joinserviceschan",	NULL,	ns_help_set_joinserviceschan, NULL, (void*)1 },
+	{"JOINSERVICESCHAN",&config.joinserviceschan, SET_TYPE_BOOLEAN,		0, 0, 	NS_ULEVEL_ADMIN, "joinserviceschan",	NULL,	ns_help_set_joinserviceschan, NULL, (void*)1 },
 	{"PINGTIME",		&config.pingtime,	SET_TYPE_INT,		0, 0, 	NS_ULEVEL_ADMIN, "pingtime",	NULL,	ns_help_set_pingtime, NULL, (void*)120 },
 	{"VERSIONSCAN",		&config.versionscan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL, (void*)1 },
 	{"SERVICECMODE",	&me.servicescmode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicescmode",	NULL,	ns_help_set_servicecmode, NULL, NULL },
@@ -143,7 +143,7 @@ BotInfo ns_botinfo = {
 	BOT_COMMON_HOST,
 	"",
 	/* 0x80000000 is a "hidden" flag to identify the core bot */
-	0x80000000|BOT_FLAG_SERVICEBOT,/*|BOT_FLAG_DEAF, */
+	0x80000000|BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF,
 	ns_commands, 
 	ns_settings,
 };
@@ -177,7 +177,6 @@ init_services_bot (void)
 	ircsnprintf (ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick);
 	if(config.onlyopers) 
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
-	ns_botinfo.flags |= BOT_FLAG_DEAF;
 	ns_module.synched = 1;
 	ns_botptr = init_bot (&ns_botinfo);
 	me.synched = 1;
@@ -198,21 +197,13 @@ static int
 ns_cmd_exclude (CmdParams* cmdparams) 
 {
 	if (!ircstrcasecmp(cmdparams->av[0], "ADD")) {
-		if (cmdparams->ac < 3) {
-			return NS_ERR_NEED_MORE_PARAMS;
-		}
-		ns_do_exclude_add(cmdparams->source, cmdparams->av[1], cmdparams->av[2]);
+		return ns_cmd_exclude_add(cmdparams);
 	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
-		if (cmdparams->ac < 2) {
-			return NS_ERR_NEED_MORE_PARAMS;
-		}
-		ns_do_exclude_del(cmdparams->source, cmdparams->av[1]);
+		return ns_cmd_exclude_del(cmdparams);
 	} else if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
-		ns_do_exclude_list(cmdparams->source, ns_botptr);
-	} else {
-		return NS_ERR_SYNTAX_ERROR;
+		return ns_cmd_exclude_list(cmdparams);
 	}
-	return NS_SUCCESS;
+	return NS_ERR_SYNTAX_ERROR;
 }
 /** @brief SHUTDOWN command handler
  *
@@ -275,7 +266,7 @@ ns_cmd_jupe (CmdParams* cmdparams)
    	return NS_SUCCESS;
 }
 
-/** @brief USERDUMP command handler
+/** @brief USERLIST command handler
  *
  *  Dump user list
  *   
@@ -283,7 +274,7 @@ ns_cmd_jupe (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_cmd_userdump (CmdParams* cmdparams)
+ns_cmd_userlist (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
@@ -296,7 +287,7 @@ ns_cmd_userdump (CmdParams* cmdparams)
    	return NS_SUCCESS;
 }
 
-/** @brief SERVERDUMP command handler
+/** @brief SERVERLIST command handler
  *
  *  Dump server list
  *   
@@ -304,7 +295,7 @@ ns_cmd_userdump (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_cmd_serverdump (CmdParams* cmdparams)
+ns_cmd_serverlist (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
@@ -317,7 +308,7 @@ ns_cmd_serverdump (CmdParams* cmdparams)
    	return NS_SUCCESS;
 }
 
-/** @brief CHANDUMP command handler
+/** @brief CHANLIST command handler
  *
  *  Dump channel list
  *   
@@ -325,7 +316,7 @@ ns_cmd_serverdump (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_cmd_chandump (CmdParams* cmdparams)
+ns_cmd_chanlist (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
@@ -338,7 +329,7 @@ ns_cmd_chandump (CmdParams* cmdparams)
    	return NS_SUCCESS;
 }
 
-/** @brief USERDUMP command handler
+/** @brief USERLIST command handler
  *
  *  Dump user list
  *   
@@ -346,7 +337,7 @@ ns_cmd_chandump (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_cmd_bandump (CmdParams* cmdparams)
+ns_cmd_banlist (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG

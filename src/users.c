@@ -38,6 +38,9 @@
 #include <arpa/inet.h>
 #endif
 
+#define USER_TABLE_SIZE	-1
+#define MAXJOINCHANS	-1
+
 static hash_t *userhash;
 
 static Client *
@@ -126,7 +129,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	u->ip.s_addr = htonl (ipaddress);
 	strlcpy(u->hostip, inet_ntoa (u->ip), HOSTIPLEN);
 	if (IsMe(u->uplink)) {
-		u->flags |= NS_FLAGS_ME;
+		u->flags |= CLIENT_FLAG_ME;
 	}
 	/* check if the user is excluded */
 	ns_do_exclude_user(u);
@@ -362,7 +365,7 @@ find_user (const char *nick)
 int
 InitUsers (void)
 {
-	userhash = hash_create (U_TABLE_SIZE, 0, 0);
+	userhash = hash_create (USER_TABLE_SIZE, 0, 0);
 	if(!userhash)	{
 		nlog (LOG_CRITICAL, "Unable to create user hash");
 		return NS_FAILURE;
@@ -416,7 +419,7 @@ UserDump (CmdParams* cmdparams, const char *nick)
 		return;
 #endif
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source, __("================USERDUMP================", cmdparams->source));
+	irc_prefmsg (ns_botptr, cmdparams->source, __("================USERLIST================", cmdparams->source));
 	if (!nick) {
 		hnode_t* un;
 
@@ -602,10 +605,10 @@ AddFakeUser(const char *mask)
 	Client *u;
 
 	SET_SEGV_LOCATION();
-	strcpy(maskcopy, mask);
-	nick = strtok(maskcopy, "!");
-	user = strtok(NULL, "@");
-	host = strtok(NULL, "");
+	strlcpy (maskcopy, mask, MAXHOST);
+	nick = strtok (maskcopy, "!");
+	user = strtok (NULL, "@");
+	host = strtok (NULL, "");
 	u = find_user (nick);
 	if (u) {
 		nlog (LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick);
@@ -634,17 +637,25 @@ DelFakeUser(const char *mask)
 	Client *u;
 
 	SET_SEGV_LOCATION();
-	strcpy(maskcopy, mask);
-	nick = strtok(maskcopy, "!");
-	user = strtok(NULL, "@");
-	host = strtok(NULL, "");
+	strlcpy (maskcopy, mask, MAXHOST);
+	nick = strtok (maskcopy, "!");
+	user = strtok (NULL, "@");
+	host = strtok (NULL, "");
 	u = find_user (nick);
-	deluser(u);
+	deluser (u);
 }
 
 hash_t *GetUserHash (void)
 {
 	return userhash;
+}
+
+void clear_user_moddata (Client* u)
+{
+	if (u)
+	{
+		u->moddata[GET_CUR_MODNUM()] = NULL;
+	}
 }
 
 void set_user_moddata (Client* u, void * data)

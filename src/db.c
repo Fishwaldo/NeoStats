@@ -40,6 +40,7 @@ db_entry db_list[NUM_MODULES];
 int DBOpenDatabase(void)
 {
 	int index;
+
 	dlog(DEBUG1, "DBOpenDatabase");
 	index = GET_CUR_MODNUM();
 	ircsnprintf(db_list[index].dbname, MAXPATH, "data/%s.db", GET_CUR_MODNAME());
@@ -75,7 +76,6 @@ void* DBGetData(char* key)
 	dbkey.size = strlen(key);
 	if ((dbret = db_list[index].dbp->get(db_list[index].dbp, NULL, &dbkey, &dbdata, 0)) == 0)
 	{
-/*		dlog(DEBUG1, "DBGetData %s", dbdata.data);*/
 		return dbdata.data;
 	}
 	dlog(DEBUG1, "dbp->get: fail");

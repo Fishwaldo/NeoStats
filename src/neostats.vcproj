@@ -32,10 +32,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curld.lib pcred.lib adnsd.lib keeperd.lib"
+				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curld.lib pcred.lib adnsd.lib keeperd.lib libdb42s.lib"
 				OutputFile="$(OutDir)/neostats.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib"
+				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/neostats.pdb"
 				SubSystem="2"
@@ -80,7 +81,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curl.lib pcre.lib adns.lib keeper.lib"
+				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curl.lib pcre.lib adns.lib keeper.lib libdb42s.lib"
 				OutputFile="$(OutDir)/neostats.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\lib"
@@ -195,6 +196,9 @@
 			</File>
 			<File
 				RelativePath=".\ns_help.c">
+			</File>
+			<File
+				RelativePath=".\nsmemory.c">
 			</File>
 			<File
 				RelativePath=".\portab.c">

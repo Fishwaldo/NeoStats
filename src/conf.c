@@ -30,6 +30,8 @@
 #include "services.h"
 #include "modules.h"
 
+#define CONFIG_NAME		"neostats.conf"
+
 static void cb_Server (char *arg, int configtype);
 static void cb_Module (char *arg, int configtype);
 
@@ -146,9 +148,9 @@ ConfLoadModules ()
 		for (i = 0; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
 			dlog(DEBUG1, "ConfLoadModules: Loading Module %s", (char *)load_mods[i]);
 			if (load_module (load_mods[i], NULL)) {
-				nlog (LOG_NORMAL, "Successfully Loaded Module %s", (char *)load_mods[i]);
+				nlog (LOG_NORMAL, "Loaded module %s", (char *)load_mods[i]);
 			} else {
-				nlog (LOG_WARNING, "Could Not Load Module %s, Please check above error Messages", (char *)load_mods[i]);
+				nlog (LOG_WARNING, "Failed to load module %s. Please check above error messages", (char *)load_mods[i]);
 			}
 			ns_free(load_mods[i]);
 		}
@@ -240,17 +242,4 @@ cb_Server (char *arg, int configtype)
 	} else if (configtype == 18) {
 		strlcpy(me.protocol,arg,MAXHOST);
 	}
-}
-
-/** @brief Rehash Function
- *
- * Called when we recieve a rehash signal. Does nothing atm
- *
- * @returns Nothing
- */
-
-void
-rehash ()
-{
-	/* nothing, yet */
 }

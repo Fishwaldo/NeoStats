@@ -25,9 +25,9 @@
 #define _EXCLUDE_H_
 
 int InitExcludes(void);
-void ns_do_exclude_add(Client *u, char *type, char *pattern);
-void ns_do_exclude_del(Client *u, char *position);
-void ns_do_exclude_list(Client *source, Bot* botptr);
+int ns_cmd_exclude_add (CmdParams* cmdparams);
+int ns_cmd_exclude_del (CmdParams* cmdparams);
+int ns_cmd_exclude_list (CmdParams* cmdparams);
 void ns_do_exclude_chan(Channel *c);
 void ns_do_exclude_server(Client *s);
 void ns_do_exclude_user(Client *u);

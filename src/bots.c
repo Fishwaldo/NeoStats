@@ -35,6 +35,8 @@
 #include "users.h"
 #include "ctcp.h"
 
+
+#define BOT_TABLE_SIZE	100	/* Number of Bots */
 #define MAX_CMD_LINE_LENGTH		350
 
 /* @brief Module Bot hash list */
@@ -48,7 +50,7 @@ static hash_t *bothash;
  */
 int InitBots (void)
 {
-	bothash = hash_create (B_TABLE_SIZE, 0, 0);
+	bothash = hash_create (BOT_TABLE_SIZE, 0, 0);
 	if(!bothash) {
 		nlog (LOG_CRITICAL, "Unable to create bot hash");
 		return NS_FAILURE;
@@ -598,14 +600,16 @@ Bot *init_bot (BotInfo* botinfo)
 	if(botinfo->flags&BOT_FLAG_SERVICEBOT) {
 		irc_nick (nick, botinfo->user, host, botinfo->realname, me.servicesumode);
 		UserMode (nick, me.servicesumode);
-		irc_join(botptr, me.serviceschan, me.servicescmode);
+		if (config.joinserviceschan) {
+			irc_join(botptr, me.serviceschan, me.servicescmode);
+		}
 	} else {
 		irc_nick (nick, botinfo->user, host, botinfo->realname, "");
 		if ((config.allbots > 0)) {
 			irc_join(botptr, me.serviceschan, me.servicescmode);
 		}
 	}	
-	if (0) {//botinfo->flags & BOT_FLAG_DEAF) {
+	if (botinfo->flags & BOT_FLAG_DEAF) {
 		if (HaveUmodeDeaf()) {
 			/* Set deaf mode at IRCd level */
 			irc_usermode (botptr, nick, UMODE_DEAF);
@@ -643,6 +647,9 @@ void handle_dead_channel (Channel *c)
 	if (ircstrcasecmp(c->name, me.serviceschan) == 0) {
 		/* Services channel so ignore */
 		return;
+	}
+	if (c->persistentusers) {
+		/* Channel has persistent bot(s) so ignore */
 	}
 	hash_scan_begin (&bs, bothash);
 	cmdparams = ns_calloc (sizeof (CmdParams));

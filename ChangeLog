@@ -4,6 +4,17 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Add support for persistent bots which do not auto leave channel when it is 
+   empty. (M)
+ - Remove NETINFO event. Not available on all ircds and useless since the 
+   ModSynch call will let a module know the network is synched. (M)
+ - Make joining services channel a SET option so people can prevent NeoStats
+   bots joining the services channel. Generally, the bots can message channels
+   without being in them. With them not being there means we can drop 
+   chanalerts when the channel is empty and save a bit of otherwise wasted 
+   bandwidth. (M)
+ - USERDUMP etc commands changed to USERLIST etc to be consistent with similar
+   commands. (M)
  - StatServ: updated to use core side kill types. (M)
  - ConnectServ: updated to use core side kill types. (M)
  - Process kill types within the core. (M)

@@ -43,6 +43,8 @@
 #include "signals.h"
 #include "lang.h"
 
+#define PID_FILENAME	"neostats.pid"
+
 char segv_location[SEGV_LOCATION_BUFSIZE];
 
 /*! Date when we were compiled */

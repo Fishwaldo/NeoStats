@@ -32,7 +32,7 @@
 #include "config.h"
 #endif
 
-#if 1
+#ifdef HAVE_STDDEF_H
 #include <stddef.h>
 #endif
 #ifdef HAVE_STDIO_H
@@ -41,7 +41,7 @@
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
-#if 1 /*def HAVE_ERRNO_H*/
+#ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
 #ifdef WIN32
@@ -62,7 +62,7 @@
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
-#ifndef WIN32
+#ifdef HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
 #endif
 #ifdef HAVE_TIME_H
@@ -73,13 +73,13 @@
 #include <string.h>
 #undef __USE_GNU
 #endif
-#if 1
+#ifdef HAVE_STDARG_H
 #include <stdarg.h>
 #endif
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
-#if 1 /*def HAVE_CTYPE_H*/
+#ifdef HAVE_CTYPE_H
 #include <ctype.h>
 #endif
 #ifdef HAVE_SYS_STAT_H
@@ -142,7 +142,6 @@ char *LANGgettext(const char *string, int mylang);
 #include "list.h"
 #include "hash.h"
 #include "support.h"
-#include "ircstring.h"
 #include "events.h"
 
 #define arraylen(a)	(sizeof(a) / sizeof(*(a)))
@@ -341,12 +340,8 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 
 #include "numeric.h"
 
-#define CONFIG_NAME		"neostats.conf"
 #define MOD_PATH		"modules"
 #define RECV_LOG		"logs/recv.log"
-#define MOTD_FILENAME	"neostats.motd"
-#define ADMIN_FILENAME	"neostats.admin"
-#define PID_FILENAME	"neostats.pid"
 
 #ifndef BASE64SERVERSIZE
 #define BASE64SERVERSIZE	2
@@ -370,7 +365,6 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
-#define MAXCMDSIZE		15
 #define MAXINFO			128
 #define B64SIZE			16
 
@@ -410,18 +404,7 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 
 /* doesn't have to be so big atm */
 #define NUM_MODULES		20
-#define S_TABLE_SIZE	-1
-#define U_TABLE_SIZE	-1
-#define C_TABLE_SIZE	-1
-#define CHAN_MEM_SIZE	-1
-#define MAXJOINCHANS	-1
-#define T_TABLE_SIZE	300	/* Number of Timers */
-#define B_TABLE_SIZE	100	/* Number of Bots */
-#define MAXMODES		-1
-#define DNS_QUEUE_SIZE  300	/* number on concurrent DNS lookups */
-#define MAX_TRANSFERS	10	/* number of curl transfers */
 
-#define bzero(x, y)		memset(x, '\0', y);
 #define is_synched		me.synched
 
 /* Early creation of unified return values and error system */
@@ -441,9 +424,9 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 #define NS_FALSE		0
 
 /* these defines are for the flags for users, channels and servers */
-#define NS_FLAGS_EXCLUDED	0x00000001 /* this entry matched a exclusion */
-#define NS_FLAGS_ME			0x00000002 /* indicates the server/user is a NeoStats one */
-#define NS_FLAGS_SYNCHED	0x00000004 /* indicates the server is now synched */
+#define CLIENT_FLAG_EXCLUDED	0x00000001 /* this entry matched a exclusion */
+#define CLIENT_FLAG_ME			0x00000002 /* indicates the client is a NeoStats one */
+#define CLIENT_FLAG_SYNCHED		0x00000004 /* indicates the server is now synched */
 #if 0
 #define NS_FLAGS_NETJOIN	0x00000008 /* indicates the user is on a net join */
 #endif
@@ -517,8 +500,6 @@ typedef struct Server {
 	time_t uptime;
 } Server;
 
-typedef struct _Client Client;
-
 /** @brief User structure
  *  
  */
@@ -546,13 +527,13 @@ typedef struct User {
 /** @brief Client structure
  *  
  */
-typedef struct _Client {
+typedef struct Client {
 	User *user;
 	Server *server;
 	char name[MAXNICK];
 	char name64[B64SIZE];
 	char uplinkname[MAXHOST];
-	Client* uplink;
+	struct Client* uplink;
 	char info[MAXREALNAME];
 	char version[MAXHOST];
 	unsigned int flags;
@@ -561,7 +542,7 @@ typedef struct _Client {
 	char hostip[HOSTIPLEN];
 	int lang;
 	void *moddata[NUM_MODULES];
-} _Client; 
+} Client; 
 
 /** @brief me structure
  *  structure containing information about the neostats core
@@ -580,9 +561,9 @@ typedef struct tme {
 	unsigned int maxsocks;
 	unsigned int cursocks;
 	unsigned int want_nickip:1;
-	char servicescmode[64];
+	char servicescmode[MODESIZE];
 	unsigned int servicescmodemask;
-	char servicesumode[64];
+	char servicesumode[MODESIZE];
 	unsigned int servicesumodemask;
 	char serviceschan[MAXCHANLEN];
 	unsigned int synched:1;
@@ -643,6 +624,7 @@ typedef struct Channel {
 	char name64[B64SIZE];
 	unsigned int users;
 	unsigned int neousers;
+	unsigned int persistentusers;
 	int lang;
 	unsigned int modes;
 	list_t *chanmembers;
@@ -732,6 +714,13 @@ typedef struct bot_cmd {
  * E.g. Connectserv
  */
 #define BOT_FLAG_SERVICEBOT	0x00000008
+/* Mark bot as persistent even when no users are left in a channel
+ * If not set, and there are no bots with this flag set, when all
+ * users leave a channel, the bot will automatically leave aswell.
+ * You should watch the NEWCHAN event to join channels when they
+ * are created. 
+ */
+#define BOT_FLAG_PERSIST	0x00000010
 
 /* This defines a "NULL" string for the purpose of BotInfo structures that 
  * want to inherit the main host used by NeoStats and still make the info
@@ -1064,13 +1053,15 @@ void do_exit (NS_EXIT_TYPE exitcode, char* quitmsg) __attribute__((noreturn));
 EXPORTFUNC void fatal_error(char* file, int line, char* func, char* error_text) __attribute__((noreturn));;
 #define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__,(error_text)); 
 
+/* nsmemory.c */
+EXPORTFUNC void *ns_malloc (const int size);
+EXPORTFUNC void *ns_calloc (const int size);
+EXPORTFUNC void *ns_realloc (void* ptr, const int size);
+EXPORTFUNC void _ns_free (void **buf);
+#define ns_free(ptr) _ns_free ((void **) &(ptr));
+
 /* misc.c */
 EXPORTFUNC void strip (char * line);
-EXPORTFUNC void *ns_malloc ( const int size );
-EXPORTFUNC void *ns_calloc ( const int size );
-EXPORTFUNC void *ns_realloc ( void* ptr, const int size );
-EXPORTFUNC void ns_realfree ( void **buf );
-#define ns_free(ptr) ns_realfree ( (void **) &(ptr) );
 EXPORTFUNC char *sstrdup (const char * s);
 char *strlwr (char * s);
 EXPORTFUNC void AddStringToList (char ***List, char S[], int *C);
@@ -1198,16 +1189,16 @@ EXPORTFUNC void transfer_status(void);
 EXPORTFUNC int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback);
 
 /* exclude */
-#define IsExcluded(x) ((x) && ((x)->flags & NS_FLAGS_EXCLUDED))
+#define IsExcluded(x) ((x) && ((x)->flags & CLIENT_FLAG_EXCLUDED))
 
 /* Is the user or server a NeoStats one? */
-#define IsMe(x) ((x) && ((x)->flags & NS_FLAGS_ME))
+#define IsMe(x) ((x) && ((x)->flags & CLIENT_FLAG_ME))
 
 /* Is the user or server synched? */
-#define IsSynched(x) ((x) && ((x)->flags & NS_FLAGS_SYNCHED))
+#define IsSynched(x) ((x) && ((x)->flags & CLIENT_FLAG_SYNCHED))
 
 /* Mark server as synched */
-#define SynchServer(x) (((x)->flags |= NS_FLAGS_SYNCHED))
+#define SynchServer(x) (((x)->flags |= CLIENT_FLAG_SYNCHED))
 
 EXPORTFUNC int validate_nick (char* nick);
 EXPORTFUNC int validate_user (char* user);
@@ -1306,45 +1297,57 @@ EXPORTFUNC void SetEventFlags (Event event, unsigned int flag, unsigned int enab
 EXPORTFUNC void EnableEvent (Event event);
 EXPORTFUNC void DisableEvent (Event event);
 
+/* String functions */
+/* [v]s[n]printf replacements */
+EXPORTFUNC int ircvsprintf(char *buf, const char *fmt, va_list args);
+EXPORTFUNC int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args);
+EXPORTFUNC int ircsprintf(char *buf, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC int ircsnprintf(char *buf, size_t size, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+
+/* str[n]casecmp replacements */
+EXPORTFUNC int ircstrcasecmp(const char *s1, const char *s2);
+EXPORTFUNC int ircstrncasecmp(const char *s1, const char *s2, size_t size);
+
+EXPORTFUNC extern int match(const char *mask, const char *name);
+
 /* 
  *  Portability wrapper functions
  */
 
 /* File system functions */
-#define FILE_MODE_APPEND	0x00000001
-#define FILE_MODE_READ		0x00000002
+EXPORTVAR int os_errno;
 
-#define FILE_HANDLE FILE*
-
-EXPORTFUNC int sys_mkdir (const char *filename, mode_t mode);
-EXPORTFUNC int sys_check_create_dir (const char* dirname);
-EXPORTFUNC FILE_HANDLE sys_file_open (const char * filename, int filemode);
-EXPORTFUNC int sys_file_close (FILE_HANDLE handle);
-EXPORTFUNC int sys_file_seek (FILE_HANDLE handle, long offset, int origin);
-EXPORTFUNC long sys_file_tell (FILE_HANDLE handle);
-EXPORTFUNC int sys_file_printf (FILE_HANDLE handle, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC int sys_file_read (void *buffer, size_t size, size_t count, FILE_HANDLE handle);
-EXPORTFUNC char* sys_file_gets (char *string, int n, FILE_HANDLE handle);
-EXPORTFUNC int sys_file_write (const void *buffer, size_t size, size_t count, FILE_HANDLE handle);
-EXPORTFUNC int sys_file_flush (FILE_HANDLE handle);
-EXPORTFUNC int sys_file_rename (const char* oldname, const char* newname);
-EXPORTFUNC char* sys_file_get_last_error_string (void);
-EXPORTFUNC int sys_file_get_last_error (void);
-EXPORTFUNC size_t sys_strftime (char *strDest, size_t maxsize, const char *format, const struct tm *timeptr);
-EXPORTFUNC struct tm* sys_localtime (const time_t *timer);
-EXPORTFUNC int sys_file_get_size (const char* filename);
-
+EXPORTFUNC int os_mkdir (const char *filename, mode_t mode);
+EXPORTFUNC int os_check_create_dir (const char* dirname);
+EXPORTFUNC FILE* os_fopen (const char * filename, const char * filemode);
+EXPORTFUNC int os_fclose (FILE* handle);
+EXPORTFUNC int os_fseek (FILE* handle, long offset, int origin);
+EXPORTFUNC long os_ftell (FILE* handle);
+EXPORTFUNC int os_fprintf (FILE* handle, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC int os_fread (void *buffer, size_t size, size_t count, FILE* handle);
+EXPORTFUNC char* os_fgets (char *string, int n, FILE* handle);
+EXPORTFUNC int os_fwrite (const void *buffer, size_t size, size_t count, FILE* handle);
+EXPORTFUNC int os_fflush (FILE* handle);
+EXPORTFUNC int os_rename (const char* oldname, const char* newname);
+EXPORTFUNC int os_stat (const char *path, struct stat *buffer);
+EXPORTFUNC int os_access(const char *path, int mode);
+EXPORTFUNC char* os_strerror (void);
+EXPORTFUNC size_t os_strftime (char *strDest, size_t maxsize, const char *format, const struct tm *timeptr);
+EXPORTFUNC struct tm* os_localtime (const time_t *timer);
+EXPORTFUNC int os_file_get_size (const char* filename);
+EXPORTFUNC void *os_memset (void *dest, int c, size_t count);
+EXPORTFUNC void *os_memcpy (void *dest, const void *src, size_t count);
 
 /* Socket functions */
 #ifdef WIN32
-typedef SOCKET SYS_SOCKET;
+typedef SOCKET OS_SOCKET;
 #else
-typedef int SYS_SOCKET;
+typedef int OS_SOCKET;
 #endif
-EXPORTFUNC int sys_sock_close (SYS_SOCKET sock);
-EXPORTFUNC int sys_sock_write (SYS_SOCKET s, const char* buf, int len);
-EXPORTFUNC int sys_sock_read (SYS_SOCKET s, char* buf, int len);
-EXPORTFUNC int sys_sock_set_nonblocking (SYS_SOCKET s);
+EXPORTFUNC int os_sock_close (OS_SOCKET sock);
+EXPORTFUNC int os_sock_write (OS_SOCKET s, const char* buf, int len);
+EXPORTFUNC int os_sock_read (OS_SOCKET s, char* buf, int len);
+EXPORTFUNC int os_sock_set_nonblocking (OS_SOCKET s);
 
 /* 
  * Module Interface 
@@ -1359,11 +1362,14 @@ MODULEVAR extern ModuleEvent module_events[];
 /* Module Auth Interface */
 MODULEFUNC int ModAuthUser (Client * u);
 
+EXPORTFUNC void clear_channel_moddata (Channel* c);
 EXPORTFUNC void set_channel_moddata (Channel* c, void * data);
-EXPORTFUNC void* get_channel_moddata (Channel* c);
+EXPORTFUNC void *get_channel_moddata (Channel* c);
+EXPORTFUNC void clear_user_moddata (Client* u);
 EXPORTFUNC void set_user_moddata (Client* u, void * data);
-EXPORTFUNC void* get_user_moddata (Client* u);
+EXPORTFUNC void *get_user_moddata (Client* u);
+EXPORTFUNC void clear_server_moddata (Client* s);
 EXPORTFUNC void set_server_moddata (Client* s, void * data);
-EXPORTFUNC void* get_server_moddata (Client* s);
+EXPORTFUNC void *get_server_moddata (Client* s);
 
 #endif /* NEOSTATS_H */

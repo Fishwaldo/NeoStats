@@ -189,8 +189,7 @@ char *inet_ntop(int af, const unsigned char *src, char *dst, size_t size)
 	{
 		return (NULL);
 	}
-	strcpy(dst, tmp);
-
+	strlcpy (dst, tmp, size);
 	return dst;
 }
 #endif

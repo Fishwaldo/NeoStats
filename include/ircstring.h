@@ -24,16 +24,6 @@
 #ifndef _IRCSTRING_H_
 #define _IRCSTRING_H_
 
-/* [v]s[n]printf replacements */
-EXPORTFUNC int ircvsprintf(char *buf, const char *fmt, va_list args);
-EXPORTFUNC int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args);
-EXPORTFUNC int ircsprintf(char *buf, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC int ircsnprintf(char *buf, size_t size, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-
-/* str[n]casecmp replacements */
-EXPORTFUNC int ircstrcasecmp(const char *s1, const char *s2);
-EXPORTFUNC int ircstrncasecmp(const char *s1, const char *s2, size_t size);
-
 /*
  * match - compare name with mask, mask may contain * and ? as wildcards
  * match - returns 1 on successful match, 0 otherwise
@@ -41,7 +31,6 @@ EXPORTFUNC int ircstrncasecmp(const char *s1, const char *s2, size_t size);
  * match_esc - compare with support for escaping chars
  * match_cidr - compares u!h@addr with u!h@addr/cidr
  */
-EXPORTFUNC extern int match(const char *mask, const char *name);
 extern int match_esc(const char *mask, const char *name);
 extern int match_cidr(const char *mask, const char *name);
 
@@ -54,15 +43,6 @@ extern int match_cidr(const char *mask, const char *name);
  */
 extern char* collapse(char *pattern);
 extern char *collapse_esc(char *pattern);
-
-/*
- * irccmp - case insensitive comparison of s1 and s2
- */
-extern int irccmp(const char *s1, const char *s2);
-/*
- * ircncmp - counted case insensitive comparison of s1 and s2
- */
-extern int ircncmp(const char *s1, const char *s2, int n);
 
 extern const unsigned char ToLowerTab[];
 #define ToLower(c) (ToLowerTab[(unsigned char)(c)])

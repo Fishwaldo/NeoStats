@@ -8,7 +8,7 @@
 #define HAVE_CTYPE_H 1
 
 /* Define to 1 if you have the <db.h> header file. */
-/* #define HAVE_DB_H 1 */
+#define HAVE_DB_H 1
 
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 /* #undef HAVE_DOPRNT */
@@ -426,15 +426,13 @@
 #define bcopy(a, b, c) memcpy(b, a, c)
 #define index strchr
 #define rindex strrchr
-#define vsnprintf _vsnprintf
 #define __PRETTY_FUNCTION__ __FUNCTION__
-#define ssize_t int
 #define inline __inline
 #define sleep(n)
 #define snprintf _snprintf
+#define vsnprintf _vsnprintf
 #include <io.h>
 #define access _access
-#define vsnprintf _vsnprintf
 #include <direct.h>
 //#define S_IWUSR _S_IWRITE
 //#define S_IRUSR _S_IREAD

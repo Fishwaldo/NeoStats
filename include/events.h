@@ -31,17 +31,6 @@ typedef enum Event {
  */
 	EVENT_NULL = -1,
 
-/*  Network events 
- *    Generated in response to network events
- */
-
-/*  EVENT_NETINFO 
- *    Called when the connection to the network is synched. 
- *    parameters:
- *      none
- */
-	EVENT_NETINFO  = 0,
-
 /*  Server events 
  *    Generated in response to server events
  */
@@ -51,7 +40,7 @@ typedef enum Event {
  *    parameters:
  *      server in cmdparams->source
  */
-	EVENT_SERVER,
+	EVENT_SERVER = 0,
 
 /*  EVENT_SQUIT 
  *    Called when a server squits the network 
@@ -253,12 +242,12 @@ typedef enum Event {
  */
 	EVENT_TOPIC,
 
-/*  EVENT_CHANMODE
+/*  EVENT_CMODE
  *    parameters:
  *      channel in cmdparams->channel
  *      modes in cmdparams->av[0]..av[cmdparams->ac-1]
  */
-	EVENT_CHANMODE,
+	EVENT_CMODE,
 
 /*  Messages event
  *    Generated in response to messages received 

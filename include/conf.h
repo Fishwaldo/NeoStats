@@ -28,7 +28,6 @@
 #define _conf_h_
 
 int ConfLoad (void);
-void rehash (void);
 int ConfLoadModules (void);
 
 #endif

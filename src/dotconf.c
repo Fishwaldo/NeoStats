@@ -70,9 +70,9 @@ config_substitute_env (char *str)
 	char env_default[CFG_MAX_VALUE + 1];
 	char tmp_value[CFG_MAX_VALUE + 1];
 
-	bzero (env_name, CFG_MAX_VALUE + 1);
-	bzero (env_default, CFG_MAX_VALUE + 1);
-	bzero (tmp_value, CFG_MAX_VALUE + 1);
+	memset (env_name, 0, CFG_MAX_VALUE + 1);
+	memset (env_default, 0, CFG_MAX_VALUE + 1);
+	memset (tmp_value, 0, CFG_MAX_VALUE + 1);
 	cp1 = str;
 	eob = cp1 + CFG_MAX_VALUE + 1;
 	cp2 = tmp_value;
@@ -176,7 +176,7 @@ config_parse (FILE * config)
 		*cp2 = '\0';
 
 		/* and now find the entry in the option table, and call the callback */
-		bzero (&opt, sizeof (config_option));
+		memset (&opt, 0, sizeof (config_option));
 		for (mod = 0; mod < CFG_MODULES && config_options[mod]; mod++)
 			for (i = 0; config_options[mod][i].name[0]; i++)
 				if (!strncmp (name, config_options[mod][i].name, CFG_MAX_OPTION)) {
@@ -198,7 +198,7 @@ config_parse (FILE * config)
 			/* check if it's a here-document and act accordingly */
 			char *cp3 = cp1;
 
-			bzero (&here_limit, 9);
+			memset (&here_limit, 0, 9);
 
 			/* skip whitespace */
 			while ((cp3 < eob) && (*cp3 != '\0')
@@ -365,7 +365,7 @@ config_read (char *fname, config_option * options)
 	}
 
 	dotconf_file = ns_calloc (CFG_MAX_FILENAME + 1);	/* allocate fname buffer */
-	bzero (dotconf_includepath, CFG_MAX_FILENAME + 1);
+	memset (dotconf_includepath, 0, CFG_MAX_FILENAME + 1);
 
 	strlcpy (dotconf_file, fname, CFG_MAX_FILENAME);	/* fill fname buffer */
 
@@ -393,7 +393,7 @@ dotconf_cb_include (char *str)
 	FILE *config;
 	char old_fname[CFG_MAX_FILENAME];
 
-	bzero (&old_fname, CFG_MAX_FILENAME);
+	memset (&old_fname, 0, CFG_MAX_FILENAME);
 	strlcpy (old_fname, dotconf_file, CFG_MAX_FILENAME);
 	if (str[0] != '/' && dotconf_includepath[0] != '\0') {
 		/* relative file AND include path is used */
