@@ -42,7 +42,7 @@
  * NeoStats core API version.
  * A module should check this when loaded to ensure compatibility
  */
-#define API_VER 1
+#define API_VER 2
 
 /* 
  *   Ensure RTLD flags correctly defined
