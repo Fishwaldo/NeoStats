@@ -373,13 +373,61 @@ CloakHost (ModUser *bot_ptr)
  *
  * @return 
  */
+#ifdef NEW_STYLE_SPLITBUF
 int
 split_buf (char *buf, char ***argv, int colon_special)
 {
 	int argvsize = 8;
 	int argc;
 	char *s;
-	int flag = 0;
+#ifndef IRCU
+	int colcount = 0;
+#endif
+	SET_SEGV_LOCATION();
+	*argv = calloc (sizeof (char *) * argvsize, 1);
+	argc = 0;
+#ifndef IRCU
+	if (*buf == ':')
+		buf++;
+#endif
+	while (*buf) {
+		if (argc == argvsize) {
+			argvsize += 8;
+			*argv = realloc (*argv, sizeof (char *) * argvsize);
+		}
+#ifndef IRCU
+		if ((*buf == ':') && (colcount < 1)) {
+			buf++;
+			colcount++;
+			if(colon_special) {
+				(*argv)[argc++] = buf;
+				break;
+			}
+		}
+#endif
+		s = strpbrk (buf, " ");
+		if (s) {
+			*s++ = 0;
+			while (isspace (*s))
+				s++;
+		} else {
+			s = buf + strnlen (buf, BUFSIZE);
+		}
+		if (*buf == 0) {
+			buf++;
+		}
+		(*argv)[argc++] = buf;
+		buf = s;
+	}
+	return argc;
+}
+#else
+int
+split_buf (char *buf, char ***argv, int colon_special)
+{
+	int argvsize = 8;
+	int argc;
+	char *s;
 #ifndef IRCU
 	int colcount = 0;
 #endif
@@ -415,8 +463,9 @@ split_buf (char *buf, char ***argv, int colon_special)
 		(*argv)[argc++] = buf;
 		buf = s;
 	}
-	return argc - flag;
+	return argc;
 }
+#endif
 
 /** @brief joinbuf 
  *
@@ -460,11 +509,25 @@ joinbuf (char **av, int ac, int from)
  * @return none
  */
 static void 
-process_ircd_cmd(int cmdptr, char *cmd, char* origin, char **av, int ac)
+process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 {
 	int i;
 
 	SET_SEGV_LOCATION();
+	/* temporary define while ircd commands are ported to new system */
+#ifdef NEW_STYLE_IRCDCMDS
+	for (i = 0; i < ircd_cmdcount; i++) {
+		if (!strcmp (cmd_list[i].name, cmd)
+#ifdef GOTTOKENSUPPORT
+			||(me.token && cmd_list[i].token && !strcmp (cmd_list[i].token, cmd))
+#endif
+			) {
+			cmd_list[i].function (origin, av, ac, cmdptr);
+			cmd_list[i].usage++;
+			break;
+		}
+	}
+#else
 	for (i = 0; i < ircd_cmdcount; i++) {
 		if (cmd_list[i].srvmsg == cmdptr) {
 			if (!strcmp (cmd_list[i].name, cmd)
@@ -478,7 +541,8 @@ process_ircd_cmd(int cmdptr, char *cmd, char* origin, char **av, int ac)
 			}
 		}
 	}
-#if 0
+#endif
+#if 1
 	if(i >= ircd_cmdcount) {
 		nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);
 	}
@@ -621,7 +685,7 @@ parse (char *line)
 	}
 
 	/* now, Parse the Command to the Internal Functions... */
-	process_ircd_cmd(cmdptr, cmd, origin, av, ac);
+	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	/* K, now Parse it to the Module functions */
 	ModuleFunction (cmdptr, cmd, origin, av, ac);
 	free (av);
@@ -1377,6 +1441,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 }
 
 /* SJOIN <TS> #<channel> <modes> :[@][+]<nick_1> ...  [@][+]<nick_n> */
+#ifndef NEW_STYLE_SPLITBUF
 void 
 handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoinchan, char **argv, int argc)
 {
@@ -1460,3 +1525,94 @@ handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoin
 	}
 	list_destroy (tl);
 }
+#else
+void 
+handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoinchan, char **argv, int argc)
+{
+	char nick[MAXNICK];
+	char* nicklist;
+	long mode = 0;
+	long mode1 = 0;
+	int ok = 1, i;
+	ModesParm *m;
+	Chans *c;
+	lnode_t *mn = NULL;
+	list_t *tl; 
+	char **param;
+	int paramcnt = 0;
+	int paramidx = 0;
+
+	if (*modes == '#') {
+		join_chan (sjoinchan, modes);
+		return;
+	}
+
+	paramcnt = split_buf(argv[offset], &param, 0);
+	tl = list_create (10);
+	if (*modes == '+') {
+		while (*modes) {
+			for (i = 0; i < ircd_cmodecount; i++) {
+				if (*modes == chan_modes[i].flag) {
+					if (chan_modes[i].parameters) {
+						m = smalloc (sizeof (ModesParm));
+						m->mode = chan_modes[i].mode;
+						strlcpy (m->param, param[paramidx], PARAMSIZE);
+						mn = lnode_create (m);
+						if (!list_isfull (tl)) {
+							list_append (tl, mn);
+						} else {
+							nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
+							do_exit (NS_EXIT_ERROR, "List full - see log file");
+						}
+						paramidx++;
+					} else {
+						mode1 |= chan_modes[i].mode;
+					}
+				}
+			}
+			modes++;
+		}
+	}
+	while (paramcnt > paramidx) {
+		nicklist = param[paramidx];
+		mode = 0;
+		while (ok == 1) {
+			for (i = 0; i < ircd_cmodecount; i++) {
+				if (chan_modes[i].sjoin != 0) {
+					if (*nicklist == chan_modes[i].sjoin) {
+						mode |= chan_modes[i].mode;
+						nicklist++;
+						i = -1;
+					}
+				} else {
+					/* sjoin's should be at the top of the list */
+					ok = 0;
+					strlcpy (nick, nicklist, MAXNICK);
+					break;
+				}
+			}
+		}
+		join_chan (nick, channame); 
+		ChanUserMode (channame, nick, 1, mode);
+		paramidx++;
+		ok = 1;
+	}
+	c = findchan (channame);
+	if(c) {
+		/* update the TS time */
+		SetChanTS (c, atoi (tstime)); 
+		c->modes |= mode1;
+		if (!list_isempty (tl)) {
+			if (!list_isfull (c->modeparms)) {
+				list_transfer (c->modeparms, tl, list_first (tl));
+			} else {
+				/* eeeeeeek, list is full! */
+				nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
+				do_exit (NS_EXIT_ERROR, "List full - see log file");
+			}
+		}
+	}
+	list_destroy (tl);
+	free(param);
+}
+#endif

@@ -33,37 +33,36 @@
 #include "server.h"
 #include "chans.h"
 
-static void Usr_Version (char *origin, char **argv, int argc, int srv);
-static void Usr_MOTD (char *origin, char **argv, int argc, int srv);
-static void Usr_Admin (char *origin, char **argv, int argc, int srv);
-static void Usr_Credits (char *origin, char **argv, int argc, int srv);
-static void Usr_Server (char *origin, char **argv, int argc, int srv);
-static void Usr_Squit (char *origin, char **argv, int argc, int srv);
-static void Usr_Quit (char *origin, char **argv, int argc, int srv);
-static void Usr_Mode (char *origin, char **argv, int argc, int srv);
-static void Usr_Svsmode (char *origin, char **argv, int argc, int srv);
-static void Usr_Kill (char *origin, char **argv, int argc, int srv);
-static void Usr_Pong (char *origin, char **argv, int argc, int srv);
-static void Usr_Away (char *origin, char **argv, int argc, int srv);
-static void Usr_Nick (char *origin, char **argv, int argc, int srv);
-static void Usr_Topic (char *origin, char **argv, int argc, int srv);
-static void Usr_Kick (char *origin, char **argv, int argc, int srv);
-static void Usr_Join (char *origin, char **argv, int argc, int srv);
-static void Usr_Part (char *origin, char **argv, int argc, int srv);
-static void Usr_Stats (char *origin, char **argv, int argc, int srv);
-static void Usr_Vhost (char *origin, char **argv, int argc, int srv);
+static void m_version (char *origin, char **argv, int argc, int srv);
+static void m_motd (char *origin, char **argv, int argc, int srv);
+static void m_admin (char *origin, char **argv, int argc, int srv);
+static void m_credits (char *origin, char **argv, int argc, int srv);
+static void m_server (char *origin, char **argv, int argc, int srv);
+static void m_squit (char *origin, char **argv, int argc, int srv);
+static void m_quit (char *origin, char **argv, int argc, int srv);
+static void m_mode (char *origin, char **argv, int argc, int srv);
+static void m_svsmode (char *origin, char **argv, int argc, int srv);
+static void m_kill (char *origin, char **argv, int argc, int srv);
+static void m_pong (char *origin, char **argv, int argc, int srv);
+static void m_away (char *origin, char **argv, int argc, int srv);
+static void m_nick (char *origin, char **argv, int argc, int srv);
+static void m_topic (char *origin, char **argv, int argc, int srv);
+static void m_kick (char *origin, char **argv, int argc, int srv);
+static void m_join (char *origin, char **argv, int argc, int srv);
+static void m_part (char *origin, char **argv, int argc, int srv);
+static void m_stats (char *origin, char **argv, int argc, int srv);
+static void m_vhost (char *origin, char **argv, int argc, int srv);
 #ifdef UNREAL32
-static void Usr_Eos (char *origin, char **argv, int argc, int srv);
+static void m_eos (char *origin, char **argv, int argc, int srv);
 #endif
-static void Srv_Ping (char *origin, char **argv, int argc, int srv);
-static void Srv_Netinfo (char *origin, char **argv, int argc, int srv);
-static void Srv_Sjoin (char *origin, char **argv, int argc, int srv);
-static void Srv_Pass (char *origin, char **argv, int argc, int srv);
-static void Srv_Server (char *origin, char **argv, int argc, int srv);
-static void Srv_Squit (char *origin, char **argv, int argc, int srv);
-static void Srv_Nick (char *origin, char **argv, int argc, int srv);
-static void Srv_Svsnick (char *origin, char **argv, int argc, int srv);
-static void Srv_Protocol (char *origin, char **argv, int argc, int srv);
+static void m_ping (char *origin, char **argv, int argc, int srv);
+static void m_netinfo (char *origin, char **argv, int argc, int srv);
+static void m_sjoin (char *origin, char **argv, int argc, int srv);
+static void m_pass (char *origin, char **argv, int argc, int srv);
+static void m_svsnick (char *origin, char **argv, int argc, int srv);
+static void m_protocol (char *origin, char **argv, int argc, int srv);
+static void m_whois (char *origin, char **argv, int argc, int srv);
+static void m_smo (char *origin, char **argv, int argc, int srv);
 
 static struct ircd_srv_ {
 	int uprot;
@@ -79,41 +78,38 @@ const char services_bot_modes[]= "+oSqd";
 long services_bot_umode= 0;
 
 IrcdCommands cmd_list[] = {
-	/* Command      Function                srvmsg */
-	{MSG_STATS, TOK_STATS, Usr_Stats, 1, 0},
-	{MSG_SETHOST, TOK_SETHOST, Usr_Vhost, 1, 0},
-	{MSG_VERSION, TOK_VERSION, Usr_Version, 1, 0},
-	{MSG_MOTD, TOK_MOTD, Usr_MOTD, 1, 0},
-	{MSG_ADMIN, TOK_ADMIN, Usr_Admin, 1, 0},
-	{MSG_CREDITS, TOK_CREDITS, Usr_Credits, 1, 0},
-	{MSG_SERVER, TOK_SERVER, Usr_Server, 1, 0},
-	{MSG_SQUIT, TOK_SQUIT, Usr_Squit, 1, 0},
-	{MSG_QUIT, TOK_QUIT, Usr_Quit, 1, 0},
-	{MSG_MODE, TOK_MODE, Usr_Mode, 1, 0},
-	{MSG_SVSMODE, TOK_SVSMODE, Usr_Svsmode, 1, 0},
-	{MSG_SVS2MODE, TOK_SVS2MODE, Usr_Svsmode, 1, 0},
-	{MSG_KILL, TOK_KILL, Usr_Kill, 1, 0},
-	{MSG_PONG, TOK_PONG, Usr_Pong, 1, 0},
-	{MSG_AWAY, TOK_AWAY, Usr_Away, 1, 0},
-	{MSG_NICK, TOK_NICK, Usr_Nick, 1, 0},
-	{MSG_TOPIC, TOK_TOPIC, Usr_Topic, 1, 0},
-	{MSG_TOPIC, TOK_TOPIC, Usr_Topic, 0, 0},
-	{MSG_KICK, TOK_KICK, Usr_Kick, 1, 0},
-	{MSG_JOIN, TOK_JOIN, Usr_Join, 1, 0},
-	{MSG_PART, TOK_PART, Usr_Part, 1, 0},
+	/*Message	Token	Function	usage */
+	{MSG_STATS, TOK_STATS, m_stats, 0},
+	{MSG_SETHOST, TOK_SETHOST, m_vhost, 0},
+	{MSG_VERSION, TOK_VERSION, m_version, 0},
+	{MSG_MOTD, TOK_MOTD, m_motd, 0},
+	{MSG_ADMIN, TOK_ADMIN, m_admin, 0},
+	{MSG_CREDITS, TOK_CREDITS, m_credits, 0},
+	{MSG_SERVER, TOK_SERVER, m_server, 0},
+	{MSG_SQUIT, TOK_SQUIT, m_squit, 0},
+	{MSG_QUIT, TOK_QUIT, m_quit, 0},
+	{MSG_MODE, TOK_MODE, m_mode, 0},
+	{MSG_SVSMODE, TOK_SVSMODE, m_svsmode, 0},
+	{MSG_SVS2MODE, TOK_SVS2MODE, m_svsmode, 0},
+	{MSG_KILL, TOK_KILL, m_kill, 0},
+	{MSG_PONG, TOK_PONG, m_pong, 0},
+	{MSG_AWAY, TOK_AWAY, m_away, 0},
+	{MSG_NICK, TOK_NICK, m_nick, 0},
+	{MSG_TOPIC, TOK_TOPIC, m_topic, 0},
+	{MSG_KICK, TOK_KICK, m_kick, 0},
+	{MSG_JOIN, TOK_JOIN, m_join, 0},
+	{MSG_PART, TOK_PART, m_part, 0},
 #ifdef UNREAL32
-	{MSG_EOS, TOK_EOS, Usr_Eos, 0, 0},
+	{MSG_EOS, TOK_EOS, m_eos, 0},
 #endif
-	{MSG_PING, TOK_PING, Srv_Ping, 0, 0},
-	{MSG_NETINFO, TOK_NETINFO, Srv_Netinfo, 0, 0},
-	{MSG_SJOIN, TOK_SJOIN, Srv_Sjoin, 1, 0},
-	{MSG_SJOIN, TOK_SJOIN, Srv_Sjoin, 0, 0},
-	{MSG_PASS, TOK_PASS, Srv_Pass, 0, 0},
-	{MSG_SERVER, TOK_SERVER, Srv_Server, 0, 0},
-	{MSG_SQUIT, TOK_SQUIT, Srv_Squit, 0, 0},
-	{MSG_NICK, TOK_NICK, Srv_Nick, 0, 0},
-	{MSG_SVSNICK, TOK_SVSNICK, Srv_Svsnick, 0, 0},
-	{MSG_PROTOCTL, TOK_PROTOCTL, Srv_Protocol, 0, 0},
+	{MSG_PING, TOK_PING, m_ping, 0},
+	{MSG_NETINFO, TOK_NETINFO, m_netinfo, 0},
+	{MSG_SJOIN, TOK_SJOIN, m_sjoin, 0},
+	{MSG_PASS, TOK_PASS, m_pass, 0},
+	{MSG_SVSNICK, TOK_SVSNICK, m_svsnick, 0},
+	{MSG_PROTOCTL, TOK_PROTOCTL, m_protocol, 0},
+	{MSG_WHOIS, TOK_WHOIS, m_whois, 0},
+	{MSG_SMO, TOK_SMO, m_smo, 0},
 };
 
 ChanModes chan_modes[] = {
@@ -391,71 +387,71 @@ send_globops (char *from, char *buf)
 	sts (":%s %s :%s", from, (me.token ? TOK_GLOBOPS : MSG_GLOBOPS), buf);
 }
 
-
 static void
-Srv_Protocol (char *origin, char **argv, int argc, int srv)
+m_protocol (char *origin, char **argv, int argc, int srv)
 {
-	int i;
-
-    /*  Dodgy code to determine if PREFIX_AQ is enabled on the server 
-	    we are connecting to. We should really parse CHANMODES properly
-		but this is just an early test. Clients get sent CHPFIX which maps
-		the mode to the sjoin char but this is enabled per server and 
-		should be enabled on all servers if someone uses it <sigh>
-		If not enabled we get something like:
-	    R: PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 
-	    VL SJ3 NS SJB64 CHANMODES=beqa,kfL,l,psmntirRcOAQKVGCuzNSM 
-		When enabled, this changes to have CHANMODES=be,... so let's 
-		look for that.
-		*/
-	for (i = 0; i < argc; i++) {
-		if (strstr ("CHANMODES=be,", argv[i])) {
-			chan_modes[3].sjoin = '&';
-			chan_modes[4].sjoin = '~';
-		}
-	}
 	ns_srv_protocol(origin, argv, argc);
 }
 
 static void
-Usr_Stats (char *origin, char **argv, int argc, int srv)
+m_stats (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_stats (origin, argv, argc);
 }
 
 static void
-Usr_Version (char *origin, char **argv, int argc, int srv)
+m_version (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_version (origin, argv, argc);
 }
 
 static void
-Usr_MOTD (char *origin, char **argv, int argc, int srv)
+m_motd (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_motd (origin, argv, argc);
 }
 
 static void
-Usr_Admin (char *origin, char **argv, int argc, int srv)
+m_admin (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_admin (origin, argv, argc);
 }
 
 static void
-Usr_Credits (char *origin, char **argv, int argc, int srv)
+m_credits (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_credits (origin, argv, argc);
 }
 
 /*SERVER servername hopcount :U<protocol>-flags-numeric serverdesc*/
 static void
-Usr_Server (char *origin, char **argv, int argc, int srv)
+m_server (char *origin, char **argv, int argc, int srv)
 {
-	AddServer (argv[0], origin, argv[1], NULL);
+	char* s = NULL;
+	/* server desc is in argv[2] but so is some other stuff
+	 * so we need to strip protocol, flags and numeric.
+	 */
+
+	if(argc > 2) {
+		s = argv[2];
+		while(*s != ' ')
+			s++;
+		s++;
+	}
+
+	if(!srv) {
+		if (*origin == 0) {
+			me.s = AddServer (argv[0], me.name, argv[1], s);
+		} else {
+			me.s = AddServer (argv[0], origin, argv[1], s);
+		}
+	} else {
+		AddServer (argv[0], origin, argv[1], s);
+	}
 }
 
 static void
-Usr_Squit (char *origin, char **argv, int argc, int srv)
+m_squit (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 1);
@@ -464,7 +460,7 @@ Usr_Squit (char *origin, char **argv, int argc, int srv)
 }
 
 static void
-Usr_Quit (char *origin, char **argv, int argc, int srv)
+m_quit (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 0);
@@ -473,7 +469,7 @@ Usr_Quit (char *origin, char **argv, int argc, int srv)
 }
 
 static void
-Usr_Svsmode (char *origin, char **argv, int argc, int srv)
+m_svsmode (char *origin, char **argv, int argc, int srv)
 {
 	if (!strchr (argv[0], '#')) {
 		/* its user svsmode change */
@@ -489,7 +485,7 @@ Usr_Svsmode (char *origin, char **argv, int argc, int srv)
  *  :servername MODE #channel +modes parameter list TS 
  */
 static void
-Usr_Mode (char *origin, char **argv, int argc, int srv)
+m_mode (char *origin, char **argv, int argc, int srv)
 {
 	if (!strchr (argv[0], '#')) {
 		UserMode (argv[0], argv[1]);
@@ -498,7 +494,7 @@ Usr_Mode (char *origin, char **argv, int argc, int srv)
 	}
 }
 static void
-Usr_Kill (char *origin, char **argv, int argc, int srv)
+m_kill (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 1);
@@ -506,17 +502,17 @@ Usr_Kill (char *origin, char **argv, int argc, int srv)
 	free(tmpbuf);
 }
 static void
-Usr_Vhost (char *origin, char **argv, int argc, int srv)
+m_vhost (char *origin, char **argv, int argc, int srv)
 {
 	SetUserVhost(origin, argv[0]);
 }
 static void
-Usr_Pong (char *origin, char **argv, int argc, int srv)
+m_pong (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_pong (origin, argv, argc);
 }
 static void
-Usr_Away (char *origin, char **argv, int argc, int srv)
+m_away (char *origin, char **argv, int argc, int srv)
 {
 	char *buf;
 
@@ -529,14 +525,22 @@ Usr_Away (char *origin, char **argv, int argc, int srv)
 	}
 }
 static void
-Usr_Nick (char *origin, char **argv, int argc, int srv)
+m_nick (char *origin, char **argv, int argc, int srv)
 {
-	UserNick (origin, argv[0]);
+	if(!srv) {
+		char *realname;
+	
+		realname = joinbuf (argv, argc, 7);
+		AddUser (argv[0], argv[3], argv[4], realname, argv[5], 0, strtol (argv[2], NULL, 10));
+		free (realname);
+	} else {
+		UserNick (origin, argv[0]);
+	}
 }
 
 /* TOPIC #channel ownder TS :topic */
 static void
-Usr_Topic (char *origin, char **argv, int argc, int srv)
+m_topic (char *origin, char **argv, int argc, int srv)
 {
 	char *buf;
 
@@ -546,7 +550,7 @@ Usr_Topic (char *origin, char **argv, int argc, int srv)
 }
 
 static void
-Usr_Kick (char *origin, char **argv, int argc, int srv)
+m_kick (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 2);
@@ -554,12 +558,12 @@ Usr_Kick (char *origin, char **argv, int argc, int srv)
 	free(tmpbuf);
 }
 static void
-Usr_Join (char *origin, char **argv, int argc, int srv)
+m_join (char *origin, char **argv, int argc, int srv)
 {
 	UserJoin (origin, argv[0]);
 }
 static void
-Usr_Part (char *origin, char **argv, int argc, int srv)
+m_part (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 1);
@@ -568,7 +572,7 @@ Usr_Part (char *origin, char **argv, int argc, int srv)
 }
 
 static void
-Srv_Ping (char *origin, char **argv, int argc, int srv)
+m_ping (char *origin, char **argv, int argc, int srv)
 {
 	send_pong (argv[0]);
 }
@@ -584,7 +588,7 @@ Srv_Ping (char *origin, char **argv, int argc, int srv)
  *  argv[7] :netname
  */
 static void
-Srv_Netinfo (char *origin, char **argv, int argc, int srv)
+m_netinfo (char *origin, char **argv, int argc, int srv)
 {
 	char *buf;
 	ircd_srv.uprot = atoi (argv[2]);
@@ -604,7 +608,7 @@ Srv_Netinfo (char *origin, char **argv, int argc, int srv)
  *  :servername EOS
  */
 static void 
-Usr_Eos (char *origin, char **argv, int argc, int srv)
+m_eos (char *origin, char **argv, int argc, int srv)
 {
     
 }
@@ -613,47 +617,30 @@ Usr_Eos (char *origin, char **argv, int argc, int srv)
 /*    MSG_SJOIN creationtime chname    modebuf parabuf :member list */
 /* R: ~         1073861298   #services +       <none>  :Mark */
 static void
-Srv_Sjoin (char *origin, char **argv, int argc, int srv)
+m_sjoin (char *origin, char **argv, int argc, int srv)
 {
 	handle_sjoin (argv[1], argv[0], argv[2], 4, origin, argv, argc);
 }
 
 static void
-Srv_Pass (char *origin, char **argv, int argc, int srv)
+m_pass (char *origin, char **argv, int argc, int srv)
 {
-}
-static void
-Srv_Server (char *origin, char **argv, int argc, int srv)
-{
-	if (*origin == 0) {
-		me.s = AddServer (argv[0], me.name, argv[1], NULL);
-	} else {
-		me.s = AddServer (argv[0], origin, argv[1], NULL);
-	}
 }
 
 static void
-Srv_Squit (char *origin, char **argv, int argc, int srv)
-{
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	SquitServer (argv[0], tmpbuf);
-	free(tmpbuf);
-}
-
-static void
-Srv_Nick (char *origin, char **argv, int argc, int srv)
-{
-	char *realname;
-
-	realname = joinbuf (argv, argc, 7);
-	AddUser (argv[0], argv[3], argv[4], realname, argv[5], 0, strtol (argv[2], NULL, 10));
-	free (realname);
-}
-
-static void
-Srv_Svsnick (char *origin, char **argv, int argc, int srv)
+m_svsnick (char *origin, char **argv, int argc, int srv)
 {
 	UserNick (argv[0], argv[1]);
 }
 
+static void
+m_whois (char *origin, char **argv, int argc, int srv)
+{
+	/* TODO */
+}
+
+static void
+m_smo (char *origin, char **argv, int argc, int srv)
+{
+	/* TODO */
+}

@@ -147,7 +147,7 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 	cmdnode = hnode_create(cmd_ptr);
 	if (cmdnode) {
 		hash_insert(cmd_hash, cmdnode, cmd_ptr->cmd);
-		nlog(LOG_DEBUG2, LOG_MOD, "add_bot_cmd: added a new command %s to services bot", cmd_ptr->cmd);
+		nlog(LOG_DEBUG3, LOG_MOD, "add_bot_cmd: added a new command %s to services bot", cmd_ptr->cmd);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
