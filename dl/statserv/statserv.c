@@ -53,7 +53,7 @@ void ss_html();
 char s_StatServ[MAXNICK];
 
 ModuleInfo __module_info = {
-	 "StatServ",
+	 "statserv",
 	 "Statistical Bot For NeoStats",
 	 "$Rev$",
 	__DATE__,

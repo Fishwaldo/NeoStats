@@ -26,6 +26,8 @@
 #include "statserv.h"
 #include "log.h"
 
+extern ModuleInfo __module_info;
+
 int ok_to_wallop()
 {
 	static int lasttime;
@@ -414,9 +416,9 @@ int s_user_modes(char **av, int ac)
 void re_init_bot()
 {
 	SET_SEGV_LOCATION();
-	chanalert(s_Services, "Re-Initilizing %s Bot", s_StatServ);
+	chanalert(s_Services, "Re-Initilizing %s Bot", __module_info.module_name);
 	init_bot(s_StatServ, StatServ.user, StatServ.host,
-		 "/msg Statserv HELP", services_bot_modes, s_StatServ);
+		 "/msg Statserv HELP", services_bot_modes, __module_info.module_name);
 }
 int s_del_user(char **av, int ac)
 {
@@ -562,13 +564,13 @@ int Online(char **av, int ac)
 		 services_bot_modes, s_StatServ);
 	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */
-	add_mod_timer("SaveStats", "Save_Stats_DB", s_StatServ, DBSAVETIME);
+	add_mod_timer("SaveStats", "Save_Stats_DB", __module_info.module_name, DBSAVETIME);
 
-	add_mod_timer("ss_html", "TimerWeb", s_StatServ, 3600);
+	add_mod_timer("ss_html", "TimerWeb", __module_info.module_name, 3600);
 
 	/* also add a timer to check if its midnight (to reset the daily stats */
-	add_mod_timer("Is_Midnight", "Daily_Stats_Reset", s_StatServ, 60);
-	add_mod_timer("DelOldChan", "DelOldStatServChans", s_StatServ, 3600);
+	add_mod_timer("Is_Midnight", "Daily_Stats_Reset", __module_info.module_name, 60);
+	add_mod_timer("DelOldChan", "DelOldStatServChans", __module_info.module_name, 3600);
 
 
 	return 1;
