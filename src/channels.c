@@ -674,7 +674,9 @@ char *GetRandomChannelKey( int length )
 	int i;
 	char *key;
 
-	key = ns_malloc( ( length + 1 ) );
+	if( length < 1 || length > ( KEYLEN - 1 ) )
+		length = KEYLEN - 1;
+	key = ns_malloc( KEYLEN );
 	for( i = 0; i < length; i++ )
 	{
 		key[i] = ( ( rand() % 26) + 'a' );
