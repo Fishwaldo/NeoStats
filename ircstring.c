@@ -31,7 +31,9 @@
 /* Temp disable for upcoming release until all external modules 
  * have been released with warnings fixed
  */
-#if 0
+#if 1
+#define __attribute__(x)  /* NOTHING */
+#else
 /* If we're not using GNU C, elide __attribute__ */
 #ifndef __GNUC__
 #define __attribute__(x)  /* NOTHING */
