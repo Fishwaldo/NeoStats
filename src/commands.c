@@ -324,8 +324,12 @@ add_bot_cmd_list(Bot* bot_ptr, bot_cmd* bot_cmd_list)
 int 
 del_bot_cmd_list(Bot* bot_ptr, bot_cmd* bot_cmd_list) 
 {
+	/* If no bot pointer return failure */
+	if(!bot_ptr) {
+		return NS_FAILURE;
+	}
 	/* If no hash return failure */
-	if(bot_ptr->botcmds == NULL) {
+	if(bot_ptr->botcmds) {
 		return NS_FAILURE;
 	}
 	/* Cycle through command list and delete them */
@@ -1136,8 +1140,12 @@ add_bot_setting_list (Bot* bot_ptr, bot_setting* set_ptr)
 int 
 del_bot_setting_list (Bot* bot_ptr, bot_setting* set_ptr) 
 {
+	/* If no bot pointer return failure */
+	if(!bot_ptr) {
+		return NS_FAILURE;
+	}
 	/* If no hash return failure */
-	if(bot_ptr->botsettings == NULL) {
+	if(!bot_ptr->botsettings) {
 		return NS_FAILURE;
 	}
 	/* Cycle through command list and delete them */
