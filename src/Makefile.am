@@ -13,6 +13,7 @@ AM_CFLAGS = -I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/keeper \
 		-I$(top_srcdir)/lib/sqlsrv \
 		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE
 neostats_LDADD = -ldl $(top_srcdir)/lib/keeper/libkeeper.a \
+		$(top_srcdir)/lib/sqlsrv/librtadb.a \
 		$(top_srcdir)/lib/adns/libadns.la @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@
 neostats_LDFLAGS = --export-dynamic -rdynamic
 

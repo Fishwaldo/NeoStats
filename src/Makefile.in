@@ -169,6 +169,7 @@ AM_CFLAGS = -I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/keeper \
 		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE
 
 neostats_LDADD = -ldl $(top_srcdir)/lib/keeper/libkeeper.a \
+		$(top_srcdir)/lib/sqlsrv/librtadb.a \
 		$(top_srcdir)/lib/adns/libadns.la @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
@@ -199,6 +200,7 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	rtausers.$(OBJEXT) base64.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/keeper/libkeeper.a \
+	$(top_srcdir)/lib/sqlsrv/librtadb.a \
 	$(top_srcdir)/lib/adns/libadns.la
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
