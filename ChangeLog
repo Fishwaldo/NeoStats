@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - StatServ: Merge GEOIP and GEOIPWIN32 libs. (M)
+ - Merge ADNS and ADNSWIN32 libs. (M)
  - Module command setup is now more strict. Commands will not be added if the
    main help text or the one line help text is not set. (M)
  - Module loads are now more strict. About text and copyright text are required
