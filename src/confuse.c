@@ -108,29 +108,6 @@ static char *strndup(const char *s, size_t n)
 }
 #endif
 
-#ifndef HAVE_STRCASECMP
-/* Implementation from GNU glibc 2.3.1
- * Copyright (C) 1991,1992,1995,1996,1997,2001,2002
- *   Free Software Foundation, Inc.
- * License: GNU LGPL
- */
-static int strcasecmp(const char *a, const char *b)
-{
-    int r;
-
-    if(a == b)
-        return 0;
-
-    while((r = tolower(*a) - tolower(*b++)) == 0)
-    {
-        if(*a++ == '\0')
-            break;
-    }
-
-    return r;
-}
-#endif
-
 cfg_opt_t *cfg_getopt(cfg_t *cfg, const char *name)
 {
     unsigned int i;
@@ -163,7 +140,7 @@ cfg_opt_t *cfg_getopt(cfg_t *cfg, const char *name)
     {
         if(is_set(CFGF_NOCASE, sec->flags))
         {
-            if(strcasecmp(sec->opts[i].name, name) == 0)
+            if(ircstrcasecmp(sec->opts[i].name, name) == 0)
                 return &sec->opts[i];
         }
         else
@@ -344,7 +321,7 @@ cfg_t *cfg_opt_gettsec(cfg_opt_t *opt, const char *title)
         assert(sec && sec->title);
         if(is_set(CFGF_NOCASE, opt->flags))
         {
-            if(strcasecmp(title, sec->title) == 0)
+            if(ircstrcasecmp(title, sec->title) == 0)
                 return sec;
         }
         else
@@ -412,13 +389,13 @@ static cfg_opt_t *cfg_dupopt_array(cfg_opt_t *opts)
 
 int cfg_parse_boolean(const char *s)
 {
-    if(strcasecmp(s, "true") == 0
-       || strcasecmp(s, "on") == 0
-       || strcasecmp(s, "yes") == 0)
+    if(ircstrcasecmp(s, "true") == 0
+       || ircstrcasecmp(s, "on") == 0
+       || ircstrcasecmp(s, "yes") == 0)
         return 1;
-    else if(strcasecmp(s, "false") == 0
-            || strcasecmp(s, "off") == 0
-            || strcasecmp(s, "no") == 0)
+    else if(ircstrcasecmp(s, "false") == 0
+            || ircstrcasecmp(s, "off") == 0
+            || ircstrcasecmp(s, "no") == 0)
         return 0;
     return -1;
 }
@@ -572,7 +549,7 @@ static cfg_value_t *cfg_setopt(cfg_t *cfg, cfg_opt_t *opt, char *value)
                     cfg_t *sec = opt->values[i]->section;
                     if(is_set(CFGF_NOCASE, cfg->flags))
                     {
-                        if(strcasecmp(value, sec->title) == 0)
+                        if(ircstrcasecmp(value, sec->title) == 0)
                             val = opt->values[i];
                     }
                     else
@@ -1587,7 +1564,7 @@ static cfg_opt_t *cfg_getopt_array(cfg_opt_t *rootopts, int cfg_flags, const cha
     {
         if(is_set(CFGF_NOCASE, cfg_flags))
         {
-            if(strcasecmp(opts[i].name, name) == 0)
+            if(ircstrcasecmp(opts[i].name, name) == 0)
                 return &opts[i];
         }
         else

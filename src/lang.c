@@ -325,7 +325,7 @@ static void* LANGGetData(void* key, int lang)
 int LANGfindlang(char *lang) {
 	int i;
 	for (i = 0; i < lang_info.nooflangs; i++) {
-		if (!strcasecmp(lang_list[i].langname, lang)) {
+		if (!ircstrcasecmp(lang_list[i].langname, lang)) {
 			LANGDEBUG("Found Lang %s as %d", lang, i);
 			return i;
 		}
