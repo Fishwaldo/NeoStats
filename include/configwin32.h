@@ -457,6 +457,7 @@
 #define strncasecmp strnicmp 
 #define bcopy(a, b, c) memcpy(b, a, c)
 #define index strchr
+#define rindex strrchr
 #define vsnprintf _vsnprintf
 #define __PRETTY_FUNCTION__ __FUNCTION__
 #define ssize_t int
@@ -487,4 +488,3 @@ struct pollfd { int fd; short events; short revents; };
 #define POLLPRI 2
 #define POLLOUT 4
 #define POLLERR 8
-

@@ -197,6 +197,13 @@ bot_chan_event (Event event, CmdParams* cmdparams)
 				chan = (char *) lnode_get (cm);
 				cmdparams->bot = botptr;
 				if (ircstrcasecmp(cmdparams->channel->name, chan) == 0) {
+					if (cmdparams->param[0] == config.cmdchar[0]) {
+						/* skip over command char */
+						cmdparams->param ++;
+						if (run_bot_cmd (cmdparams) != NS_FAILURE) {
+							return NS_SUCCESS;
+						}
+					}
 					SendModuleEvent (event, cmdparams, botptr->moduleptr);
 				}
 				cm = list_next (botptr->u->user->chans, cm);
@@ -599,7 +606,7 @@ Bot *init_bot (BotInfo* botinfo)
 			irc_join(botptr, me.serviceschan, me.servicescmode);
 		}
 	}	
-	if (botinfo->flags & BOT_FLAG_DEAF) {
+	if (0) {//botinfo->flags & BOT_FLAG_DEAF) {
 		if (HaveUmodeDeaf()) {
 			/* Set deaf mode at IRCd level */
 			irc_usermode (botptr, nick, UMODE_DEAF);
@@ -623,4 +630,44 @@ Bot *init_bot (BotInfo* botinfo)
 	add_bot_info_settings (botptr, botinfo);
 	RESET_RUN_LEVEL();
 	return botptr;
+}
+
+void handle_dead_channel (Channel *c)
+{
+	CmdParams* cmdparams;
+	lnode_t *cm;
+	Bot *botptr;
+	hnode_t *bn;
+	hscan_t bs;
+
+	SET_SEGV_LOCATION();
+	if (ircstrcasecmp(c->name, me.serviceschan) == 0) {
+		/* Services channel so ignore */
+		return;
+	}
+	hash_scan_begin (&bs, bothash);
+	cmdparams = ns_calloc (sizeof (CmdParams));
+	while ((bn = hash_scan_next (&bs)) != NULL) {
+		botptr = hnode_get (bn);
+restart:
+		cm = list_first (botptr->u->user->chans);
+		if (!(botptr->u->user->Umode & UMODE_DEAF)) {
+			while (cm) {
+				char* chan;
+
+				chan = (char *) lnode_get (cm);
+				cmdparams->bot = botptr;
+				cmdparams->channel = c;
+				if (ircstrcasecmp(c->name, chan) == 0) {
+					/* Force the bot to leave the channel */
+					irc_part (botptr, c->name);
+					/* Tell the module we kicked them out */
+					SendModuleEvent (EVENT_PARTBOTFORCE, cmdparams, botptr->moduleptr);
+					goto restart;
+				}
+				cm = list_next (botptr->u->user->chans, cm);
+			}
+		}
+	}
+	free (cmdparams);
 }

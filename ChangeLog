@@ -4,6 +4,13 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Automatically remove NeoStats bots from channels when there are no longer
+   any real users in the channel. The services channel is excluded. (M)
+ - Add neousers counter to Channel structure for tracking our bot counts in a
+   given channel. (M)
+ - Core command processor can now handle channel message commands e.g. !help
+   using the standard command tables. Command char is selectable via a SET
+   option. (M)
  - Add new timer type TIMER_TYPE_COUNTDOWN. This is a one shot timer that 
    deletes itself after it has triggered. (M)
  - Initial import of Language Functions. Two Macro's to use now, _(x) is for

@@ -602,7 +602,8 @@ typedef struct Chanmem {
 typedef struct Channel {
 	char name[MAXCHANLEN];
 	char name64[B64SIZE];
-	long users;
+	unsigned int users;
+	unsigned int neousers;
 	int lang;
 	unsigned int modes;
 	list_t *chanmembers;

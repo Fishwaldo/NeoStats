@@ -123,6 +123,7 @@ static bot_setting ns_settings[]=
 	{"VERSIONSCAN",		&config.versionscan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL, (void*)1 },
 	{"SERVICECMODE",	&me.servicescmode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicescmode",	NULL,	ns_help_set_servicecmode, NULL, NULL },
 	{"SERVICEUMODE",	&me.servicesumode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicesumode",	NULL,	ns_help_set_serviceumode, NULL, NULL },
+	{"CMDCHAR",			&config.cmdchar,	SET_TYPE_STRING,	0, 2, 	NS_ULEVEL_ADMIN, "cmdchar",	NULL,	ns_help_set_cmdchar, NULL, (void*)"!" },
 	{"LOGLEVEL",		&config.loglevel,	SET_TYPE_INT,		1, 6, 	NS_ULEVEL_ADMIN, "loglevel",	NULL,	ns_help_set_loglevel, NULL, (void*)5 },
 	{"DEBUG",			&config.debug,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debug, NULL, (void*)0 },
 	{"DEBUGLEVEL",		&config.debuglevel,	SET_TYPE_INT,		1, 10, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debuglevel, NULL, (void*)0 },
@@ -142,7 +143,7 @@ BotInfo ns_botinfo = {
 	BOT_COMMON_HOST,
 	"",
 	/* 0x80000000 is a "hidden" flag to identify the core bot */
-	0x80000000|BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
+	0x80000000|BOT_FLAG_SERVICEBOT,/*|BOT_FLAG_DEAF, */
 	ns_commands, 
 	ns_settings,
 };

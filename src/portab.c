@@ -30,6 +30,8 @@
 #endif
 #include <fcntl.h>                   
 
+static char tempbuf[BUFSIZE*2];
+
 int sys_mkdir (const char *filename, mode_t mode)
 {
 #ifdef WIN32
@@ -85,8 +87,6 @@ int sys_file_close (FILE_HANDLE handle)
 {
 	return fclose (handle);
 }
-
-static char tempbuf[BUFSIZE*2];
 
 int sys_file_printf (FILE_HANDLE handle, char *fmt, ...)
 {
@@ -204,3 +204,4 @@ struct tm* sys_localtime (const time_t *timer)
 {
 	return localtime (timer);
 }
+

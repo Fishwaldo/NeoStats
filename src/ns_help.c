@@ -243,6 +243,13 @@ const char *ns_help_set_loglevel[] = {
 	NULL
 };
 
+const char *ns_help_set_cmdchar[] = {
+	"\2CMDCHAR <char>\2",
+	"Sets the character used to indicate a command",
+	"in a channel message.",
+	NULL
+};
+
 const char *ns_help_set_debug[] = {
 	"\2DEBUG <ON|OFF>\2",
 	"When enabled, debugging information is sent to debug.log",

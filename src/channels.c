@@ -257,10 +257,14 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 				/* its one of our bots */
 				SendModuleEvent (EVENT_KICKBOT, cmdparams, u->user->bot->moduleptr);
 			}
-			ns_free (cmdparams);
 			c->users--;
+			del_chan_user(c, u);
+			if (c->neousers > 0 && c->neousers == c->users) {
+				/* all real users have left the channel */
+				handle_dead_channel (c);
+			}
+			ns_free (cmdparams);
 		}
-		del_chan_user(c, u);
 	}
 }
 
@@ -313,11 +317,16 @@ part_chan (Client * u, const char *chan, const char *reason)
 			if ( IsMe (u) ) {
 				/* its one of our bots */
 				SendModuleEvent (EVENT_PARTBOT, cmdparams, u->user->bot->moduleptr);
+				c->neousers --;
+			}
+			c->users--;
+			del_chan_user(c, u);
+			if (c->neousers > 0 && c->neousers == c->users) {
+				/* all real users have left the channel */
+				handle_dead_channel (c);
 			}
 			ns_free (cmdparams);
-			c->users--;
 		}
-		del_chan_user(c, u);
 	}
 }
 
@@ -414,6 +423,10 @@ join_chan (const char* nick, const char *chan)
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;
 	cmdparams->channel = c;
+	if ( IsMe (u) ) {
+		/* its one of our bots */
+		c->neousers ++;
+	}
 	SendAllModuleEvent (EVENT_JOIN, cmdparams);
 	ns_free (cmdparams);
 	dlog(DEBUG3, "join_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
