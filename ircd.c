@@ -247,9 +247,9 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 #else
 		sjoin_cmd (nick, me.chan);
 #if defined(IRCU)
-		schmode_cmd(nick, chan, "+o", getnumfromnick(nick));
+		schmode_cmd(nick, me.chan, "+o", getnumfromnick(nick));
 #else
-		schmode_cmd(nick, chan, "+o", nick);
+		schmode_cmd(nick, me.chan, "+o", nick);
 #endif
 
 #endif
