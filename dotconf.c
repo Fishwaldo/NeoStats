@@ -42,7 +42,7 @@
 
 /*
 ** NeoStats CVS Identification
-** $Id: dotconf.c,v 1.5 2002/09/04 08:40:26 fishwaldo Exp $
+** $Id: dotconf.c,v 1.6 2002/10/15 19:05:38 shmad Exp $
 */
 
 #include <time.h>
@@ -226,11 +226,6 @@ int config_parse(FILE *config)
 				{
 					/* check if it's a here-document and act accordingly */
 					char *cp3 = cp1;
-/* Shmad */
-				/*	ulong here_string = 0; */
-/*                                        char *here_string = 0;
-					char *here_limit[9];   
-					char *here_doc;       FreeBSD will die */
 					
 					bzero(&here_limit, 9);
 
@@ -248,11 +243,9 @@ int config_parse(FILE *config)
 							 * allocate a buffer of filesize bytes; should be enough to
 							 * prevent buffer overflows
 							 */
-/* Shmad */
 							here_doc = malloc(finfo.st_size+1); /* allocate  buffer memory */
 							bzero(here_doc, finfo.st_size+1); 
 							
-			/*				here_string = 1; */
 							strncpy(here_limit, cp3+2, 8); /*   copy here-delimiter */
 							while ( fgets(buffer, CFG_BUFSIZE, config) )
 								{
