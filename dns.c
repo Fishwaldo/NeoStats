@@ -46,7 +46,7 @@ struct dnslookup_struct {
 	char data[255];	/**< the User data based to the callback */
 	void (*callback) (char *data, adns_answer * a);
 						      /**< a function pointer to call when we have a result */
-	char mod_name[MAXHOST];
+	char mod_name[MAX_MOD_NAME];
 };
 
 /** @brief DNS structures
@@ -92,9 +92,9 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 	}
 	/* set the module name */
 	/* This is a bad bad hack... */
-	if (segv_inmodule) {
+	if (segv_inmodule[0]) {
 		/* why MAXHOST? because thats the size of mod_name!?!? */
-		strncpy(dnsdata->mod_name, segv_inmodule, MAXHOST);
+		strncpy(dnsdata->mod_name, segv_inmodule, MAX_MOD_NAME);
 	}
 	strncpy (dnsdata->data, data, 254);
 	dnsdata->callback = callback;
