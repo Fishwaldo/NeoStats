@@ -554,7 +554,7 @@ cat >> confdefs.h <<\EOF
 #define REV 1
 EOF
 
-VERSION=$MAJOR.$MINOR.$REV
+VERSION=2.5.1
 
 CFLAGS="$CFLAGS -O2"
 
