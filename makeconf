@@ -228,7 +228,7 @@ echo ""
 
 ###########################################################################
 # select datbase
-DATABASE_DEFAULT=1
+DATABASE_DEFAULT="1"
 DATABASE=
 validselection=0
 echo "Which datbase storage do you wish to use?"
@@ -241,11 +241,11 @@ while [ $validselection -eq 0 ] ; do
 		INPUT=$DATABASE_DEFAULT
 	fi
 	case $INPUT in
-		1)
+		"1")
  			DATABASE="gdbm"
 			validselection=1
 			;;
-		2)
+		"2")
  			DATABASE="bdb"
 			validselection=1
 			;;
@@ -374,7 +374,7 @@ PROTOCOL "$IRCD"
 #          DBM "gdbm"
 #      
 
-DBM "gdbm"
+DBM "$DATABASE"
 
 # ROOT_NICK <nick> [REQUIRED]
 #    Specifies the nick of the NeoStats root bot
