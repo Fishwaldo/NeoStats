@@ -12,8 +12,8 @@ KEEPER_OBJS = keeper/kp_cache.o keeper/kp_dir.o keeper/kp_enum.o keeper/kp_get.o
 		keeper/kp_util.o
 PROTOCOL_OBJS = protocol/@PROTOCOL@.o
 OBJS = ${SRCS:.c=.o} 
-SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
-		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
+SRCS =	dns.c channels.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
+		users.c ns_help.c dl.c list.c hash.c servers.c keeper.c log.c misc.c \
 		support.c ircstring.c commands.c transfer.c exclude.c match.c bans.c \
 		bots.c modules.c auth.c signals.c
 
@@ -21,13 +21,13 @@ INCLUDES = config.h dl.h dotconf.h hash.h list.h neostats.h \
 		conf.h log.h support.h ircstring.h events.h numeric.h pcre.h \
 		transfer.h
 COREINCS = dns.h services.h sock.h ircd.h exclude.h \
-		ns_help.h timer.h users.h chans.h server.h bans.h \
+		ns_help.h timer.h users.h channels.h servers.h bans.h \
 		bots.h modules.h commands.h auth.h signals.h
 BUILDFILES = *.in modules/Makefile modules/Makefile.inc.in
 
 DISTFILES = $(INCLUDES) $(COREINCS) $(SRCS) $(BUILDFILES) 
  
-DISTLIBS = protocol adns pcre curl sqlsrv keeper
+DISTLIBS = neoprotocol libs sqlsrv
 DISTMOD = connectserv extauth hostserv loveserv moraleserv statserv template
 
 all: buildversion @buildsqlsrv@ libs neoprotocol neostats neomodules utils 

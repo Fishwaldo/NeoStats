@@ -26,8 +26,8 @@
 #include "sock.h"
 #include "ircu.h"
 #include "users.h"
-#include "server.h"
-#include "chans.h"
+#include "servers.h"
+#include "channels.h"
 #include <arpa/inet.h> 
 
 void process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac);

@@ -24,7 +24,7 @@
 */
 
 #include "neostats.h"
-#include "server.h"
+#include "servers.h"
 #include "services.h"
 #include "modules.h"
 #include "log.h"

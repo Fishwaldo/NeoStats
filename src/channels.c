@@ -26,7 +26,7 @@
 #include "ircd.h"
 #include "hash.h"
 #include "users.h"
-#include "chans.h"
+#include "channels.h"
 #include "exclude.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"

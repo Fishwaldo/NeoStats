@@ -33,9 +33,9 @@
 #include "commands.h"
 #include "sock.h"
 #include "users.h"
-#include "chans.h"
+#include "channels.h"
 #include "services.h"
-#include "server.h"
+#include "servers.h"
 #include "bans.h"
 #include "auth.h"
 

@@ -28,8 +28,8 @@
 #include "log.h"
 #include "sock.h"
 #include "users.h"
-#include "server.h"
-#include "chans.h"
+#include "servers.h"
+#include "channels.h"
 #include "dns.h"
 #include "dotconf.h"
 #include "transfer.h"
@@ -47,9 +47,6 @@
 
 char segv_location[SEGV_LOCATION_BUFSIZE];
 char segv_inmodule[SEGV_INMODULE_BUFSIZE];
-
-/*! File handle for segfault report */
-static FILE *segfault;
 
 /*! Date when we were compiled */
 const char version_date[] = __DATE__;
