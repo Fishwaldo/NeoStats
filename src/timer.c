@@ -76,6 +76,7 @@ CheckTimers (void)
 		}
 	}
 	if (is_midnight () == 1 && midnight == 0) {
+		dlog (DEBUG1, "Its midnight!!! -> %s", sctime (me.now));
 		run_mod_timers (1);
 		ResetLogs ();
 		midnight = 1;
@@ -92,7 +93,6 @@ is_midnight (void)
 	struct tm *ltm = localtime (&me.now);
 
 	if (ltm->tm_hour == 0 && ltm->tm_min == 0) {
-		dlog (DEBUG1, "Its midnight!!! -> %s", sctime (me.now));
 		return 1;
 	}
 	return 0;
