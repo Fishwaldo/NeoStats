@@ -274,13 +274,23 @@ send_server (const char *sender, const char *name, const int numeric, const char
 	send_cmd ("%s %s * +%s 86400 %lu :%s", sender, TOK_SERVER, name, me.now, infoline);
 }
 
+/*
+1 <name of new server>
+2 <hops>
+3 <boot TS>
+4 <link TS>
+5 <protocol>
+6 <numeric of new server><max client numeric>
+7 <flags>
+-1 <description of new server>
+*/
 void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
 	neonumeric = numeric;
 	inttobase64(neonumericbuf, neonumeric, 2);
 	send_cmd ("%s %s", MSG_PASS, pass);
-    send_cmd ("%s %s 1 %lu %lu P10 %s]]] :[%s] %s\n", MSG_SERVER, name, (unsigned long)time(NULL), (unsigned long)time(NULL), neonumericbuf, name,  infoline);
+    send_cmd ("%s %s 1 %lu %lu P10 %s]]] +s :%s", MSG_SERVER, name, tsboot, tslink, neonumericbuf, infoline);
 	setservernumeric (name, neonumericbuf);
 }
 
