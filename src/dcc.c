@@ -27,6 +27,7 @@
 #endif
 #include "modules.h"
 #include "commands.h"
+#include "services.h"
 
 typedef int (*dcc_cmd_handler) (CmdParams* cmdparams);
 
@@ -44,7 +45,7 @@ static int DCCChatConnect(Client *dcc, int port);
 static int dcc_parse(void *arg, void *line, size_t);
 static int dcc_error(int what, void *arg);
 static void DelDCCClient(Client *dcc);
-
+static int dcc_write(Client *dcc, char *buf);
 static dcc_cmd dcc_cmds[]= {
 	{"SEND", dcc_req_send},
 	{"CHAT", dcc_req_chat},
@@ -177,13 +178,29 @@ static int DCCChatConnect(Client *dcc, int port) {
 	return NS_SUCCESS;
 }
 
+static int 
+dcc_partyline (Client *dcc, char *line) {
+	Client *todcc;
+	lnode_t *dccnode;
+	char tmpbuf[BUFSIZE];
+ 
+ 	ircsnprintf(tmpbuf, BUFSIZE, "\2%s\2: %s", dcc->name, line);
+	dccnode = list_first (dcclist);
+	while (dccnode) {
+		todcc = (Client *)lnode_get(dccnode);
+		dcc_write(todcc, tmpbuf);
+		dccnode = list_next(dcclist, dccnode);
+	}
+	irc_chanalert(ns_botptr, tmpbuf);
+	return NS_SUCCESS;
+}
 static int
 dcc_parse(void *arg, void *rline, size_t len)
 {
 	char buf[BUFSIZE];
 	char *cmd;
 	char *line = (char *)rline;
-	Client *dcc = (Client *)dcc;
+	Client *dcc = (Client *)arg;
 	CmdParams *cmdparams;
 
 	strcpy(buf, line);
@@ -201,6 +218,9 @@ dcc_parse(void *arg, void *rline, size_t len)
 			if (cmdparams->target) {
 				cmdparams->bot = cmdparams->target->user->bot;
 				if (!cmdparams->bot) {
+					dcc_write(dcc, "Use .<botname> to send a command to a NeoStats Bot");
+					dcc_write(dcc, "Otherwise, jsut type test without a leading . to send to the DCC");
+					dcc_write(dcc, "partyline");
 					return NS_FAILURE;
 				}
 			}
@@ -208,17 +228,18 @@ dcc_parse(void *arg, void *rline, size_t len)
 			{
 				cmdparams->param = cmd;
 				run_bot_cmd (cmdparams, 0);
+				return NS_SUCCESS;
 			}
 		}
 		ns_free (cmdparams);
 	}
+	dcc_partyline(dcc, line);
 	return NS_SUCCESS;
 }
 
 int dcc_write(Client *dcc, char *buf)
 {
 	static char dcc_buf[BUFSIZE];
-	int      ret;        /* write() return value */
 
 	dccoutput = 0;
 	dlog(DEBUG1, "DCCTX: %s", buf);
@@ -240,46 +261,14 @@ void dcc_send_msg(const Client* dcc, char * buf)
 int dcc_error(int sock_no, void *name)
 {
 	Sock *sock = (Sock *)name;
+	if (sock->data) {
+		DelDCCClient(sock->data);
+	} else {
+		nlog(LOG_WARNING, "Problem, Sock->data is NULL, therefore we can't delete DCCClient!");
+	}
 	del_sock(sock);
-	DelDCCClient(sock->data);
 	return NS_SUCCESS;
 }
-#if 0
-void dcc_hook_1 (fd_set *read_fd_set, fd_set *write_fd_set)
-{
-	Client *dcc;
-	lnode_t *dccnode;
-
-	dccnode = list_first (dcclist);
-	while (dccnode) {
-		dcc = (Client *)lnode_get(dccnode);
-		if (dccoutput) {
-			FD_SET(dcc->fd, write_fd_set);
-		} else {
-			FD_SET(dcc->fd, read_fd_set);			
-		}
-		dccnode = list_next(dcclist, dccnode);
-	}
-}
-
-void dcc_hook_2 (fd_set *read_fd_set, fd_set *write_fd_set)
-{
-
-	Client *dcc;
-	lnode_t *dccnode;
-
-	dccnode = list_first (dcclist);
-	while (dccnode) {
-		dcc = (Client *)lnode_get(dccnode);
-		if (FD_ISSET(dcc->fd, read_fd_set)) {
-			dcc_read(dcc);
-		} else if (FD_ISSET(dcc->fd, write_fd_set)) {
-			dcc_write(dcc, "TEST");
-		}
-		dccnode = list_next(dcclist, dccnode);
-	}
-}
-#endif
 
 int InitDCC(void)
 {
@@ -295,12 +284,11 @@ void FiniDCC(void)
 	dccnode = list_first (dcclist);
 	while (dccnode) {
 		dcc = (Client *)lnode_get(dccnode);
-		lnode_destroy (dccnode);
 		DCCChatDisconnect(dcc);
 		ns_free (dcc);
 		dccnode = list_next(dcclist, dccnode);
 	}
-	list_destroy (dcclist);
+	list_destroy_nodes (dcclist);
 }
 
 Client *AddDCCClient(CmdParams *cmdparams)

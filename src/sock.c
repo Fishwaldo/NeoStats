@@ -659,10 +659,10 @@ socket_linemode_error(struct bufferevent *bufferevent, short what, void *arg) {
 		case EVBUFFER_EOF:
 		case EVBUFFER_ERROR:
 		case EVBUFFER_TIMEOUT:
-			nlog(LOG_ERROR, "error_from_ircd_socket: Error: %d", what);
+			nlog(LOG_ERROR, "LinemodeSock Error: %d (%s)", what, strerror(errno));
 			break;
 		default:
-			nlog(LOG_ERROR, "Unknown Error from IRCd Socket: %d", what);
+			nlog(LOG_ERROR, "Unknown Error from Socket: %d (%s)", what, strerror(errno));
 			break;
 	}
 	sock->sfunc.linemode.errcb(what, sock->data);	
