@@ -39,7 +39,6 @@ static void m_topic (char *origin, char **argv, int argc, int srv);
 static void m_kick (char *origin, char **argv, int argc, int srv);
 static void m_join (char *origin, char **argv, int argc, int srv);
 static void m_part (char *origin, char **argv, int argc, int srv);
-static void m_stats (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
 static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_emotd (char *origin, char **argv, int argc, int srv);
@@ -370,12 +369,6 @@ send_globops (const char *from, const char *buf)
 void 
 send_svstime (const char *sender, const unsigned long ts)
 {
-}
-
-static void
-m_stats (char *origin, char **argv, int argc, int srv)
-{
-	do_stats (origin, argv[0]);
 }
 
 /*

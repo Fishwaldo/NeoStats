@@ -89,8 +89,8 @@ typedef struct ProtocolInfo {
 	const unsigned int optprotocol;
 	/* Features provided by this protocol module e.g. SVSNICK support. */
 	const unsigned int features;
-	const char* services_umode;
-	const char* services_cmode;
+	char* services_umode;
+	char* services_cmode;
 } ProtocolInfo;
 
 #ifndef NEOSTATSCORE

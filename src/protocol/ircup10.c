@@ -354,7 +354,7 @@ send_quit (const char *who, const char *quitmsg)
 
 	/* Clear numeric */
 	num = nicktobase64 (who);
-	neonicknumerics[convert2n[num[4]]] = 0;
+	neonicknumerics[(int)convert2n[num[4]]] = 0;
 	send_cmd ("%s %s :%s", nicktobase64 (who), TOK_QUIT, quitmsg);
 }
 
@@ -776,7 +776,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 				param++;
 				modes++;
 				while(*modes) {
-					if (ircd_cmodes[*modes].flags&MODEPARAM) {
+					if (ircd_cmodes[(int)*modes].flags&MODEPARAM) {
 						param ++;
 					}
 					modes++;
@@ -830,7 +830,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 					char **av;
 					int ac;
 
-					if (ircd_cmodes[*modes].flags&MODEPARAM) {
+					if (ircd_cmodes[(int)*modes].flags&MODEPARAM) {
 						ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], *modes, argv[param]);
 						param ++;
 					} else {
