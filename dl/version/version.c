@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: version.c,v 1.3 2002/09/04 08:40:29 fishwaldo Exp $
+** $Id: version.c,v 1.4 2003/01/21 13:15:35 fishwaldo Exp $
 */
 #include <stdio.h>
 #include "dl.h"
@@ -64,8 +64,6 @@ Functions *__module_get_functions() {
 };
 
 void _init() {
-	globops(me.name, "Version Module Loaded");
 }
 void _fini() {
-	globops(me.name, "Version Module Unloaded");
 }

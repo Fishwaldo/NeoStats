@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: operlog.c,v 1.5 2002/12/15 01:20:54 shmad Exp $
+** $Id: operlog.c,v 1.6 2003/01/21 13:15:34 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -90,12 +90,10 @@ EventFnList *__module_get_events() {
 void _init() {
 
     s_OperLog = "OperLog";
-    globops(me.name, "OperLog Module Loaded",me.name);
 
 }
 
 void _fini() {
-    globops(me.name, "OperLog Module Unloaded",me.name);
 
 };
 

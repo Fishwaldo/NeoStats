@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: spam.c,v 1.19 2002/10/14 01:06:23 shmad Exp $
+** $Id: spam.c,v 1.20 2003/01/21 13:15:34 fishwaldo Exp $
 */
 
 
@@ -129,11 +129,9 @@ EventFnList *__module_get_events() {
 
 void _init() {
 	s_Spam = "sumyungguy";
-	globops(me.name, "Spam Module Loaded");
 }
 
 
 void _fini() {
-	globops(me.name, "Spam Module Unloaded");
 
 };

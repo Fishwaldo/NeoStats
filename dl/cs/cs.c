@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.15 2003/01/21 13:09:23 fishwaldo Exp $
+** $Id: cs.c,v 1.16 2003/01/21 13:15:33 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -171,12 +171,10 @@ void _init() {
     Loadconfig();
 
     s_ConnectServ = "ConnectServ";
-    globops(me.name, "ConnectServ Module Loaded",me.name);
 
 }
 
 void _fini() {
-    globops(me.name, "ConnectServ Module Unloaded",me.name);
 
 };
 

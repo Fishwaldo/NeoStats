@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: loveserv.c,v 1.10 2002/10/27 05:55:31 fishwaldo Exp $
+** $Id: loveserv.c,v 1.11 2003/01/21 13:15:33 fishwaldo Exp $
 */
 
 
@@ -244,12 +244,10 @@ EventFnList *__module_get_events() {
 
 void _init() {
     s_LoveServ = "LoveServ";
-    globops(me.name, "LoveServ Module Loaded",me.name);
 }
 
 
 void _fini() {
-    globops(me.name, "LoveServ Module Unloaded",me.name);
 };
 
 

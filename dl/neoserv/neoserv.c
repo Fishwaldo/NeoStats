@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoserv.c,v 1.7 2003/01/13 07:20:53 fishwaldo Exp $
+** $Id: neoserv.c,v 1.8 2003/01/21 13:15:34 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -277,12 +277,10 @@ EventFnList *__module_get_events() {
 
 void _init() {
     s_NeoServ = "NeoServ";
-    globops(me.name, "NeoServ Help System Module Loaded",me.name);
 }
 
 
 void _fini() {
-    globops(me.name, "NeoServ Help System Module Unloaded",me.name);
 };
 
 

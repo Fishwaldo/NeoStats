@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: netinfo.c,v 1.9 2002/10/14 01:06:21 shmad Exp $
+** $Id: netinfo.c,v 1.10 2003/01/21 13:15:34 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -371,13 +371,11 @@ void _init() {
 	Loadconfig();
 
 
-	globops(me.name, "NetInfo Module Loaded",me.name);
 }
 
 
 void _fini() {
 	Saveconfig();
-	globops(me.name, "NetInfo Module Loaded",me.name);
 
 };
 void Saveconfig()
