@@ -36,7 +36,7 @@
 static void Usr_Version (char *origin, char **argv, int argc);
 static void Usr_MOTD (char *origin, char **argv, int argc);
 static void Usr_Admin (char *origin, char **argv, int argc);
-static void Usr_Credits (char *origin, char **argv, int argc);
+/*static void Usr_Credits (char *origin, char **argv, int argc);*/
 static void Usr_Server (char *origin, char **argv, int argc);
 static void Usr_Squit (char *origin, char **argv, int argc);
 static void Usr_Quit (char *origin, char **argv, int argc);
@@ -83,7 +83,7 @@ IntCommands cmd_list[] = {
 	{MSG_VERSION, Usr_Version, 1, 0},
 	{MSG_MOTD, Usr_MOTD, 1, 0},
 	{MSG_ADMIN, Usr_Admin, 1, 0},
-	{MSG_CREDITS, Usr_Credits, 1, 0},
+/*	{MSG_CREDITS, Usr_Credits, 1, 0}, */
 	{MSG_SERVER, Usr_Server, 1, 0},
 	{MSG_SQUIT, Usr_Squit, 1, 0},
 	{MSG_QUIT, Usr_Quit, 1, 0},
@@ -490,11 +490,11 @@ Usr_Admin (char *origin, char **argv, int argc)
 	ns_usr_admin (origin, argv, argc);
 }
 
-static void
+/*static void
 Usr_Credits (char *origin, char **argv, int argc)
 {
 	ns_usr_credits (origin, argv, argc);
-}
+}*/
 
 static void
 Usr_Server (char *origin, char **argv, int argc)
