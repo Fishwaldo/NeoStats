@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include <fnmatch.h>
 #include "dl.h"
 #include "stats.h"
 #include "statserv.h"
@@ -778,6 +779,7 @@ static void ss_botlist(User *origuser)
 
 static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 {
+        Server *s;
 	SStats *st;
 	hscan_t hs;
 	hnode_t *sn;
@@ -823,15 +825,20 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 				arg);
 			return;
 		}
+		chanalert(s_StatServ, "I am %s, you wanted to del %s",me.name,arg);
 		sn = hash_lookup(Shead, arg);
 		if (sn) {
 			hash_delete(Shead, sn);
 			st = hnode_get(sn);
-			hnode_destroy(sn);
+			hnode_destroy(sn); 
 			free(st);
-			log("Tried to delete %s",arg);
-			chanalert("Deleted %s",arg);
-			s_new_server(arg, 1);
+			chanalert(s_StatServ, "Deleted Statiscis for Server: %s",arg);
+		        s = findserver(arg);
+			if (s) {
+	        		AddStats(s);
+				st = findstats(arg);
+			}
+
 		}
 		prefmsg(u->nick, s_StatServ, "Removed %s from the database.", arg);
 		log("%s requested STATS DEL %s", u->nick, arg);
