@@ -343,6 +343,9 @@
 #define TOK_MODULE	"BQ"
 /* BR and BT are in use */
 
+#define MSG_SENDSNO	"SENDSNO"
+#define TOK_SENDSNO	"Ss"
+
 #define MSG_EOS		"EOS"
 #define TOK_EOS		"ES"
 
