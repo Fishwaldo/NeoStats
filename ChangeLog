@@ -22,6 +22,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Some Solaris Porting fixes thanks to Hwy.. Time to get onto the Solaris Compile file at sf though :(
  - Removed Bignet Support, and made lists dynamic now
  - Added ChangePass and Banned Vhosts to HostServ, and moved HostServ to Hash tables. 
+ - Fixed a bug with users being marked away multiple times, thus, screwing up statserv stats :(
 
 * NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 2 
  - Misc. Updates (S)

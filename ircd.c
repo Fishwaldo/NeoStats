@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.104 2003/01/06 12:07:25 fishwaldo Exp $
+** $Id: ircd.c,v 1.105 2003/01/07 13:23:13 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -1006,13 +1006,14 @@ void Usr_Away(char *origin, char **argv, int argc) {
 	int ac = 0;
 	User *u = finduser(origin);
 	if (u) {
-		if (u->is_away) {
-			u->is_away = 0;
-		} else {
-			u->is_away = 1;
-		}
 		AddStringToList(&av, origin, &ac);
-		Module_Event("AWAY", av, ac);
+		if ((u->is_away == 1) && (argc == 0)) {
+			u->is_away = 0;
+			Module_Event("AWAY", av, ac);
+		} else if ((u->is_away == 0) && (argc > 0)) {
+			u->is_away = 1;
+			Module_Event("AWAY", av, ac);
+		}
 		FreeList(av, ac);
 	} else {
 		log("Warning, Unable to find User %s for Away", origin);

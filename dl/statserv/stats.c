@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.31 2003/01/06 12:07:27 fishwaldo Exp $
+** $Id: stats.c,v 1.32 2003/01/07 13:23:13 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -347,7 +347,7 @@ int s_user_away(char **av, int ac) {
 	strcpy(segv_location, "StatServ-s_user_away");
 	u = finduser(av[0]);
 	if (!u) return 0;
-	if (u->is_away) {
+	if (u->is_away == 1) {
 		stats_network.away = stats_network.away +1;
 	} else {
 		stats_network.away = stats_network.away -1;
