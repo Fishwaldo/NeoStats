@@ -1522,13 +1522,13 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 {
 	char nick[MAXNICK];
 	char* nicklist;
+	int modeexists;
 	long mode = 0;
 	long mode1 = 0;
 	int ok = 1, i, j = 3;
 	ModesParm *m;
 	Chans *c;
 	lnode_t *mn = NULL;
-	list_t *tl; 
 	char **param;
 	int paramcnt = 0;
 	int paramidx = 0;
@@ -1536,32 +1536,6 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 	if (*modes == '#') {
 		join_chan (sjoinnick, modes);
 		return;
-	}
-
-	tl = list_create (10);
-	if (*modes == '+') {
-		while (*modes) {
-			for (i = 0; i < ircd_cmodecount; i++) {
-				if (*modes == chan_modes[i].flag) {
-					if (chan_modes[i].parameters) {
-						m = smalloc (sizeof (ModesParm));
-						m->mode = chan_modes[i].mode;
-						strlcpy (m->param, argv[j], PARAMSIZE);
-						mn = lnode_create (m);
-						if (!list_isfull (tl)) {
-							list_append (tl, mn);
-						} else {
-							nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
-							do_exit (NS_EXIT_ERROR, "List full - see log file");
-						}
-						j++;
-					} else {
-						mode1 |= chan_modes[i].mode;
-					}
-				}
-			}
-			modes++;
-		}
 	}
 
 	paramcnt = split_buf(argv[argc-1], &param, 0);
@@ -1602,18 +1576,56 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 	if(c) {
 		/* update the TS time */
 		SetChanTS (c, atoi (tstime)); 
-		c->modes |= mode1;
-		if (!list_isempty (tl)) {
-			if (!list_isfull (c->modeparms)) {
-				list_transfer (c->modeparms, tl, list_first (tl));
-			} else {
-				/* eeeeeeek, list is full! */
-				nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
-				do_exit (NS_EXIT_ERROR, "List full - see log file");
+		if (*modes == '+') {
+			while (*modes) {
+				for (i = 0; i < ircd_cmodecount; i++) {
+					if (*modes == chan_modes[i].flag) {
+						if (chan_modes[i].parameters) {
+							mn = list_first (c->modeparms);
+							modeexists = 0;
+							while (mn) {
+								m = lnode_get (mn);
+								/* mode limit and mode key replace current values */
+								if ((m->mode == CMODE_LIMIT) && (chan_modes[i].mode == CMODE_LIMIT)) {
+									strlcpy (m->param, argv[j], PARAMSIZE);
+									j++;
+									modeexists = 1;
+									break;
+								} else if ((m->mode == CMODE_KEY) && (chan_modes[i].mode == CMODE_KEY)) {
+									strlcpy (m->param, argv[j], PARAMSIZE);
+									j++;
+									modeexists = 1;
+									break;
+								} else if (((int *) m->mode == (int *) chan_modes[i].mode) && !ircstrcasecmp (m->param, argv[j])) {
+									nlog (LOG_INFO, LOG_CORE, "ChanMode: Mode %c (%s) already exists, not adding again", chan_modes[i].flag, argv[j]);
+									j++;
+									modeexists = 1;
+									break;
+								}
+								mn = list_next (c->modeparms, mn);
+							}
+							if (modeexists != 1) {
+								m = smalloc (sizeof (ModesParm));
+								m->mode = chan_modes[i].mode;
+								strlcpy (m->param, argv[j], PARAMSIZE);
+								mn = lnode_create (m);
+								if (list_isfull (c->modeparms)) {
+									nlog (LOG_CRITICAL, LOG_CORE, "ChanMode: modelist is full adding to channel %s", c->name);
+									do_exit (NS_EXIT_ERROR, "List full - see log file");
+								} else {
+									list_append (c->modeparms, mn);
+								}
+								j++;
+							}
+						} else {
+							c->modes |= chan_modes[i].mode;
+						}
+					}
+				}
+				modes++;
 			}
 		}
 	}
-	list_destroy (tl);
 	free(param);
 }
 
