@@ -33,11 +33,14 @@
 #include "config.h"
 #include "log.h"
 
-/* 
- * __init_mod_list 
- * Initialise module list hashes
- * Core use only
- */
+/** @brief Initialise module list hashes
+ *
+ * For core use only, initialises module list hashes
+ *
+ * @param none
+ * 
+ * @return none
+*/
 void
 __init_mod_list ()
 {
@@ -49,9 +52,14 @@ __init_mod_list ()
 	sockh = hash_create (me.maxsocks, 0, 0);
 }
 
-/* 
+/** @brief create new timer
  *
- */
+ * For core use only, creates a timer
+ *
+ * @param timer_name the name of new timer
+ * 
+ * @return pointer to new timer on success, NULL on error
+*/
 static Mod_Timer *
 new_timer (char *timer_name)
 {
@@ -74,10 +82,15 @@ new_timer (char *timer_name)
 	return t;
 }
 
-/* 
+/** @brief find timer
  *
- */
-Mod_Timer *
+ * For core use only, finds a timer in the current list of timers
+ *
+ * @param timer_name the name of timer to find
+ * 
+ * @return pointer to timer if found, NULL if not found
+*/
+static Mod_Timer *
 findtimer (char *timer_name)
 {
 	hnode_t *tn;
@@ -88,9 +101,17 @@ findtimer (char *timer_name)
 	return NULL;
 }
 
-/* 
+/** @brief add a timer to the timer list
  *
- */
+ * For module use. Adds a timer with the given function to the timer list
+ *
+ * @param func_name the name of function to register with this timer
+ * @param timer_name the name of timer to register
+ * @param mod_name the name of module registering the timer
+ * @param interval the interval at which the timer triggers in seconds
+ * 
+ * @return pointer to timer if found, NULL if not found
+*/
 int
 add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 {
@@ -114,9 +135,14 @@ add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 	}
 }
 
-/* 
+/** @brief delete a timer from the timer list
  *
- */
+ * For module use. Deletes a timer with the given name from the timer list
+ *
+ * @param timer_name the name of timer to delete
+ * 
+ * @return 1 if deleted, -1 if not found
+*/
 int
 del_mod_timer (char *timer_name)
 {
@@ -136,9 +162,14 @@ del_mod_timer (char *timer_name)
 	return -1;
 }
 
-/* 
+/** @brief list timers in use
  *
- */
+ * NeoStats command to list the current timers from IRC
+ *
+ * @param u pointer to user structure of the user issuing the request
+ * 
+ * @return none
+*/
 void
 list_module_timer (User * u)
 {
@@ -159,9 +190,14 @@ list_module_timer (User * u)
 	prefmsg (u->nick, s_Services, "End of Module timer List");
 }
 
-/* 
+/** @brief create a new socket
  *
- */
+ * For core use only, creates a new socket for a module
+ *
+ * @param sock_name the name of the socket to create
+ * 
+ * @return pointer to created socket on success, NULL on error
+*/
 static Sock_List *
 new_sock (char *sock_name)
 {
@@ -184,9 +220,14 @@ new_sock (char *sock_name)
 	return s;
 }
 
-/* 
+/** @brief find socket
  *
- */
+ * For core use only, finds a socket in the current list of socket
+ *
+ * @param sock_name the name of socket to find
+ * 
+ * @return pointer to socket if found, NULL if not found
+*/
 Sock_List *
 findsock (char *sock_name)
 {
@@ -198,9 +239,19 @@ findsock (char *sock_name)
 	return NULL;
 }
 
-/* 
+/** @brief add a socket to the socket list
  *
- */
+ * For core use. Adds a socket with the given functions to the socket list
+ *
+ * @param readfunc the name of read function to register with this socket
+ * @param writefunc the name of write function to register with this socket
+ * @param errfunc the name of error function to register with this socket
+ * @param sock_name the name of socket to register
+ * @param socknum the socket number to register with this socket
+ * @param mod_name the name of module registering the socket
+ * 
+ * @return pointer to socket if found, NULL if not found
+*/
 int
 add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name)
 {
@@ -235,9 +286,14 @@ add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int
 	return 1;
 }
 
-/* 
+/** @brief delete a socket from the socket list
  *
- */
+ * For module use. Deletes a socket with the given name from the socket list
+ *
+ * @param socket_name the name of socket to delete
+ * 
+ * @return 1 if deleted, -1 if not found
+*/
 int
 del_socket (char *sock_name)
 {
@@ -257,9 +313,14 @@ del_socket (char *sock_name)
 	return -1;
 }
 
-/* 
+/** @brief list sockets in use
  *
- */
+ * NeoStats command to list the current sockets from IRC
+ *
+ * @param u pointer to user structure of the user issuing the request
+ * 
+ * @return none
+*/
 void
 list_sockets (User * u)
 {
@@ -556,9 +617,9 @@ load_module (char *modfilename, User * u)
 {
 #ifndef HAVE_LIBDL
 	const char *dl_error;
-#else
+#else /* HAVE_LIBDL */
 	char *dl_error;
-#endif
+#endif /* HAVE_LIBDL */
 	void *dl_handle;
 	int do_msg;
 	char path[255];
@@ -593,13 +654,39 @@ load_module (char *modfilename, User * u)
 		return -1;
 	}
 
-	mod_get_info = dlsym (dl_handle, "__module_get_info");
+	/* new system */
+	mod_info_ptr = dlsym (dl_handle, "__module_info");
+#ifdef OLD_MODULE_EXPORT_SUPPORT
+	if(mod_info_ptr == NULL) {
+		/* old system */
+		mod_get_info = dlsym (dl_handle, "__module_get_info");
 #ifndef HAVE_LIBDL
-	if (mod_get_info == NULL) {
+		if (mod_get_info == NULL) {
+			dl_error = dlerror ();
+#else /* HAVE_LIBDL */
+		if ((dl_error = dlerror ()) != NULL) {
+#endif /* HAVE_LIBDL */
+			if (do_msg) {
+				prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
+			}
+			nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
+			dlclose (dl_handle);
+			return -1;
+		}
+		mod_info_ptr = (*mod_get_info) ();
+		if (mod_info_ptr == NULL) {
+			dlclose (dl_handle);
+			nlog (LOG_WARNING, LOG_CORE, "Module has no info structure: %s", path);
+			return -1;
+		}
+	}
+#else /* OLD_MODULE_EXPORT_SUPPORT */
+#ifndef HAVE_LIBDL
+	if(mod_info_ptr == NULL) {
 		dl_error = dlerror ();
-#else
+#else /* HAVE_LIBDL */
 	if ((dl_error = dlerror ()) != NULL) {
-#endif
+#endif /* HAVE_LIBDL */
 		if (do_msg) {
 			prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
 		}
@@ -607,20 +694,40 @@ load_module (char *modfilename, User * u)
 		dlclose (dl_handle);
 		return -1;
 	}
-	mod_info_ptr = (*mod_get_info) ();
-	if (mod_info_ptr == NULL) {
-		dlclose (dl_handle);
-		nlog (LOG_WARNING, LOG_CORE, "Module has no info structure: %s", path);
-		return -1;
-	}
-
-	mod_get_funcs = dlsym (dl_handle, "__module_get_functions");
+#endif /* OLD_MODULE_EXPORT_SUPPORT */
+	/* new system */
+	mod_funcs_ptr = dlsym (dl_handle, "__module_functions");
+#ifdef OLD_MODULE_EXPORT_SUPPORT
+	if(mod_funcs_ptr == NULL) {
+		/* old system */
+		mod_get_funcs = dlsym (dl_handle, "__module_get_functions");
 #ifndef HAVE_LIBDL
-	if (mod_get_funcs == NULL) {
+		if (mod_get_funcs == NULL) {
+			dl_error = dlerror ();
+#else /* HAVE_LIBDL */
+		if ((dl_error = dlerror ()) != NULL) {
+#endif /* HAVE_LIBDL */
+			if (do_msg) {
+				prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
+			}
+			nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
+			dlclose (dl_handle);
+			return -1;
+		}
+		mod_funcs_ptr = (*mod_get_funcs) ();
+		if (mod_funcs_ptr == NULL) {
+			dlclose (dl_handle);
+			nlog (LOG_WARNING, LOG_CORE, "Module has no function structure: %s", path);
+			return -1;
+		}
+	}
+#else /* OLD_MODULE_EXPORT_SUPPORT */
+#ifndef HAVE_LIBDL
+	if(mod_info_ptr == NULL) {
 		dl_error = dlerror ();
-#else
+#else /* HAVE_LIBDL */
 	if ((dl_error = dlerror ()) != NULL) {
-#endif
+#endif /* HAVE_LIBDL */
 		if (do_msg) {
 			prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
 		}
@@ -628,18 +735,21 @@ load_module (char *modfilename, User * u)
 		dlclose (dl_handle);
 		return -1;
 	}
-	mod_funcs_ptr = (*mod_get_funcs) ();
-	if (mod_funcs_ptr == NULL) {
-		dlclose (dl_handle);
-		nlog (LOG_WARNING, LOG_CORE, "Module has no function structure: %s", path);
-		return -1;
+#endif /* OLD_MODULE_EXPORT_SUPPORT */
+
+	/* new system */
+	event_fn_ptr = dlsym (dl_handle, "__module_events");
+#ifdef OLD_MODULE_EXPORT_SUPPORT
+	if(event_fn_ptr == NULL)
+	{
+		/* old system */
+		mod_get_events = dlsym (dl_handle, "__module_get_events");
+		/* no error check here - this one isn't essential to the functioning of the module */
+
+		if (mod_get_events)
+			event_fn_ptr = (*mod_get_events) ();
 	}
-
-	mod_get_events = dlsym (dl_handle, "__module_get_events");
-	/* no error check here - this one isn't essential to the functioning of the module */
-
-	if (mod_get_events)
-		event_fn_ptr = (*mod_get_events) ();
+#endif
 
 	/* Check that the Module hasn't already been loaded */
 	if (hash_lookup (mh, mod_info_ptr->module_name)) {
@@ -680,6 +790,7 @@ load_module (char *modfilename, User * u)
 	ModNum[i].mod = mod_ptr;
 	nlog (LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, ModNum[i].mod->info->module_name);
 
+	/* call __ModInit (replacement for library __init() call */
 	doinit = dlsym ((int *) dl_handle, "__ModInit");
 	if (doinit) {
 		SET_SEGV_LOCATION();
@@ -842,6 +953,8 @@ unload_module (char *module_name, User * u)
 
 		list = hnode_get (modnode);
 		SET_SEGV_INMODULE(module_name);
+		
+		/* call __ModFini (replacement for library __fini() call */
 		dofini = dlsym ((int *) list->dl_handle, "__ModFini");
 		if (dofini) {
 			(*dofini) ();

@@ -1,4 +1,5 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+==============================================================================
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.6
  - Added MrAllThats Colourisation of ConnectServ Messages (F)
  - Fixed ConnectServ to not show notices for local events (BugID: 44) (F)
@@ -33,6 +34,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Changed "not Tech Admin" type errors to "not authorised" (M)
  - Improved comments in makeconf and added support for custom log filenames (M)
  - HostServ supports Undernet style hidden hosts for Registered users now. (F)
+ - Module API improvements removing the need for the get functions to get function tables etc (M)
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number

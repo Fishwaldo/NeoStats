@@ -36,8 +36,6 @@
 */
 /*#define DISABLE_COLOUR_SUPPORT*/
 
-const char csversion_date[] = __DATE__;
-const char csversion_time[] = __TIME__;
 char *s_ConnectServ;
 
 int cs_new_user(char **av, int ac);
@@ -63,22 +61,24 @@ static int mode_watch;
 static int nick_watch;
 static int cs_online = 0;
 
-Module_Info my_info[] = { {
-			   "ConnectServ",
-			   "Network Connection & Mode Monitoring Service",
-			   "1.8"}
+ModuleInfo __module_info = {
+	"ConnectServ",
+	"Network Connection & Mode Monitoring Service",
+	"1.8",
+	__DATE__,
+	__TIME__
 };
 
 int new_m_version(char *origin, char **av, int ac)
 {
 	snumeric_cmd(351, origin,
 		     "Module ConnectServ Loaded, Version: %s %s %s",
-		     my_info[0].module_version, csversion_date,
-		     csversion_time);
+			 __module_info.module_version, __module_info.module_build_date,
+			 __module_info.module_build_time);
 	return 0;
 }
 
-Functions my_fn_list[] = {
+Functions __module_functions[] = {
 	{MSG_VERSION, new_m_version, 1}
 	,
 #ifdef HAVE_TOKEN_SUP
@@ -188,11 +188,11 @@ int Online(char **av, int ac)
 
 	if (init_bot
 	    (s_ConnectServ, user, host, rname, "+oS",
-	     my_info[0].module_name) == -1) {
+	     __module_info.module_name) == -1) {
 		/* Nick was in use */
 		s_ConnectServ = strcat(s_ConnectServ, "_");
 		init_bot(s_ConnectServ, user, host, rname, "+oS",
-			 my_info[0].module_name);
+			 __module_info.module_name);
 	}
 	cs_online = 1;
 	free(user);
@@ -201,7 +201,7 @@ int Online(char **av, int ac)
 	return 1;
 };
 
-EventFnList my_event_list[] = {
+EventFnList __module_events[] = {
 	{"ONLINE", Online}
 	,
 	{"SIGNON", cs_new_user}
@@ -219,21 +219,6 @@ EventFnList my_event_list[] = {
 	{"NICK_CHANGE", cs_user_nick}
 	,
 	{NULL, NULL}
-};
-
-Module_Info *__module_get_info()
-{
-	return my_info;
-};
-
-Functions *__module_get_functions()
-{
-	return my_fn_list;
-};
-
-EventFnList *__module_get_events()
-{
-	return my_event_list;
 };
 
 int __ModInit(int modnum, int apiver)
@@ -259,7 +244,7 @@ static void cs_version(User * u)
 		"-------------------------------------");
 	prefmsg(u->nick, s_ConnectServ,
 		"ConnectServ Version: %s Compiled %s at %s",
-		my_info[0].module_version, csversion_date, csversion_time);
+		__module_info.module_version, __module_info.module_build_date, __module_info.module_build_time);
 	prefmsg(u->nick, s_ConnectServ, "http://www.neostats.net");
 	prefmsg(u->nick, s_ConnectServ,
 		"-------------------------------------");
@@ -596,7 +581,7 @@ int cs_user_modes(char **av, int ac)
 			if (add) {
 				chanalert(s_ConnectServ,
 #ifdef DISABLE_COLOUR_SUPPORT
-					"\2Oper\2 %s is Now a Oper (+%c) on %s",
+					"\2Oper\2 %s is Now an Oper (+%c) on %s",
 #else
 					"\2\00313%s\2 is \2Now\2 a \2Global Operator\2 (+%c) on \2%s\2\003",
 #endif
@@ -604,7 +589,7 @@ int cs_user_modes(char **av, int ac)
 			} else {
 				chanalert(s_ConnectServ,
 #ifdef DISABLE_COLOUR_SUPPORT
-					"\2Oper\2 %s is No Longer a Oper (-%c) on %s",
+					"\2Oper\2 %s is No Longer an Oper (-%c) on %s",
 #else
 					"\2\00313%s\2 is \2No Longer\2 a \2Global Operator\2 (-%c) on \2%s\2\003",
 #endif
