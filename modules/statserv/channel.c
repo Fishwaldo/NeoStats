@@ -147,6 +147,11 @@ int ss_event_join( CmdParams *cmdparams )
 	channelstat *cs;
 
 	cs = GetChannelModValue( cmdparams->channel );
+	if( !cs )
+	{
+		dlog( DEBUG4, "Cannot find stats for channel %s", cmdparams->channel->name );
+		return NS_SUCCESS;
+	}
 	IncStatistic( &cs->users );
 	IncStatistic( &cs->joins );
 	return NS_SUCCESS;
@@ -157,6 +162,11 @@ int ss_event_part( CmdParams *cmdparams )
 	channelstat *cs;
 
 	cs = GetChannelModValue( cmdparams->channel );
+	if( !cs )
+	{
+		dlog( DEBUG4, "Cannot find stats for channel %s", cmdparams->channel->name );
+		return NS_SUCCESS;
+	}
 	DecStatistic( &cs->users );
 	cs->ts_lastseen = me.now;
 	return NS_SUCCESS;
@@ -167,6 +177,11 @@ int ss_event_topic( CmdParams *cmdparams )
 	channelstat *cs;
 
 	cs = GetChannelModValue( cmdparams->channel );
+	if( !cs )
+	{
+		dlog( DEBUG4, "Cannot find stats for channel %s", cmdparams->channel->name );
+		return NS_SUCCESS;
+	}
 	IncStatistic( &cs->topics );
 	return NS_SUCCESS;
 }
@@ -176,6 +191,11 @@ int ss_event_kick( CmdParams *cmdparams )
 	channelstat *cs;
 
 	cs = GetChannelModValue( cmdparams->channel );
+	if( !cs )
+	{
+		dlog( DEBUG4, "Cannot find stats for channel %s", cmdparams->channel->name );
+		return NS_SUCCESS;
+	}
 	IncStatistic( &cs->kicks );
 	DecStatistic( &cs->users );
 	return NS_SUCCESS;
