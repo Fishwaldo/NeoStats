@@ -830,8 +830,14 @@ swallops_cmd (const char *who, const char *msg, ...)
 	return 1;
 }
 
-void 
-send_numeric (const int numeric, const char *target, const char *buf)
+int
+snumeric_cmd (const int numeric, const char *target, const char *data, ...)
 {
-	sts (":%s %d %s :%s", me.name, numeric, target, buf);
+	va_list ap;
+
+	va_start (ap, data);
+	ircvsnprintf (ircd_buf, BUFSIZE, data, ap);
+	va_end (ap);
+	send_numeric (numeric, target, ircd_buf);
+	return 1;
 }
