@@ -56,6 +56,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Add CloakHost function to provide hidden hostname support for bots - currently only supports Unreal (M)
  - This should fix up the SQL emulation a bit. the RTA library needs to be re-written anyway, so this is a temp solution. 
  - Introduce flags structure to users/chans/servers. For upcomming "Global Exclude" list (BugID 98)
+ - Fix bug in unreal netinfo netname processing (M)
 
 * NeoStats * Fish (F) * Version 2.5.10
  - Fix a problem with Umode +T being reintroduced on Unreal Beta19 as a normal usermode. 
