@@ -462,10 +462,6 @@ int load_module(char *path1, User *u) {
 	char p[255];
 #ifndef DEBUG
 	char buf[512];
-	int fmode;
-	char *lock= NULL;
-	FILE *lockmod;
-	FILE *lmfile;
 #endif
 	char **av;
 	int ac = 0;
@@ -583,24 +579,6 @@ int load_module(char *path1, User *u) {
 			event_fn_ptr++;
 		}
 	}
-#ifndef DEBUG
-	/* Lock .so Module File With 555 Permissions */
-	lockmod = fopen("Neo-Lock.tmp","w");
-	fprintf(lockmod, "%s/%s", me.modpath, path);
-	fclose(lockmod);
-
-	lmfile = fopen("Neo-Lock.tmp", "r");
-	while (fgets(buf, sizeof(buf), lmfile)) {
-		buf[strlen(buf)] = '\0';
-		lock = buf;
-	}
-	fclose(lmfile);
-	fmode = 0555;
-
-	remove("Neo-Lock.tmp");
-	chmod(lock, fmode);
-	/* End .so Module 555 Permission Setting */
-#endif
 	if (do_msg) prefmsg(u->nick,s_Services,"Module %s Loaded, Description: %s",mod_info_ptr->module_name,mod_info_ptr->module_description);
 	return 0;
 
@@ -648,11 +626,6 @@ int unload_module(char *module_name, User *u) {
 	hnode_t *modnode;
 	hscan_t hscan;
 
-	char *lock= NULL;
-	char *moduname= NULL;
-	FILE *lockmod;
-	FILE *lmfile;
-
 	FILE *modnme;
 	FILE *getmname;
 
@@ -689,36 +662,6 @@ int unload_module(char *module_name, User *u) {
 			del_bot(mod_ptr->nick, "Module Unloaded");
 		}
 	}
-	strcpy(segv_location, "unload_unlock");
-	/* Unlock .so Module File to 755 Permissions */
-	modnme = fopen("Mod-Name.tmp","w");
-	fprintf(modnme, "%s", module_name);
-	fclose(modnme);
-
-	getmname = fopen("Mod-Name.tmp", "r");
-	while (fgets(fname, sizeof(fname), getmname)) {
-		fname[strlen(fname)] = '\0';
-		moduname = fname;
-	}
-	fclose(getmname);
-	remove("Mod-Name.tmp");
-
-	strlower(moduname);
-	lockmod = fopen("Neo-Lock.tmp","w");
-	fprintf(lockmod, "%s/%s.so", me.modpath, moduname);
-	fclose(lockmod); 
-
-	lmfile = fopen("Neo-Lock.tmp", "r");
-	while (fgets(buf, sizeof(buf), lmfile)) {
-		buf[strlen(buf)] = '\0';
-		lock = buf;
-	}
-	fclose(lmfile);
-	remove("Neo-Lock.tmp");
-
-	fmode = 0755;
-	chmod(lock, fmode);
-	/* End .so Module 755 Permission Setting */
 
 	modnode = hash_lookup(mh, module_name);
 	if (modnode) {

@@ -4,6 +4,7 @@
 /COPYING -text
 /ChangeLog -text
 /INSTALL -text
+/INSTALL.pt -text
 /LICENCE -text
 /Makefile.in -text
 /Makefile.inc.in -text

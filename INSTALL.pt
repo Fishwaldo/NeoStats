@@ -1,0 +1,148 @@
+Manual de Configuração do NeoStats 2.x
+--------------------------------------
+Este documento explica como INSTALAR e CONFIGURAR o NeoStats.
+Se tiver algum problema NÃO presente em um destes documentos de ajuda,
+por favor dirija-se ao nosso canal de iRC em irc.neostats.net e nós
+teremos todo o prazer em o ajudar.
+
+-Shmad
+http://www.neostats.net
+
+
+***************************************************************************
+* O NeoStats é um serviço de estatísticas de IRC que monitorizam recordes *
+* de utilizadores, netsplits, o número de utilizadores/operadores online  *
+* e muito mais.							  	  *
+* As versões 2.x permitem que os módulos sejam programmed e adicionados   *
+* ao NeoStats para melhorar a funcionalidade e costumizar o aspecto da    *
+* sua rede e cópia do NeoStats.						  *
+* NeoStats to increase functionability and to customize the look and      *
+* feel of your network and your copy of NeoStats.                         *
+***************************************************************************
+
+Parabéns por ter feito o download do NeoStats, um dos mais poderosos e
+robustos programas estatísticos de IRC do mercado. Este manual de configuração
+irá iniciá-lo no uso do NeoStats. Se tiver algumas questões que eu não
+referi neste manual, por favor visite-nos em irc.neostats.com e entre no canal
+#NeoStats e faça a sua pergunta. Se ninguém estiver disponível, pode enviar um
+memo para Shmad com a(s) sua(s) pergunta(s) e o seu endereço de email e nós
+contactar-lo-emos assim que possível.
+
+
+[1] Iniciando.
+
+Primeiro, vai querer descomprimir o NeoStats. Para tal escreva o segunte:
+
+tar xvfz NeoStats2.0.tar.gz (isto pode variar dependentemente da versão do NeoStats,
+                             modifique "NeoStats2.0.tar.gz" de modo a condizer com o
+                             ficheiro que possui)
+
+** Nota: Para alguns sistemas quen não estejam a correr uma versão actualizada do tar,
+	 poderá ser necessário fazer o seguinte:
+         	gzip -d NeoStats2.0.tar.gz
+         	tar xvf NeoStats2.0.tar
+
+
+
+[2] Correndo o configure
+
+Wow, funcionou! Deverá ter agora uma directoria chamada NeoStats-2.0.11
+Agora escreva:
+
+cd NeoStats2.0.11
+
+A linha de comando deverá ser algo parecido a:
+[shmad@coderz NeoStats2.0.11]$
+
+Agora escreva:
+./configure (isto é "CASE sensitive", lembre-se disso - tudo é)
+
+NOTA ADICIONAL: Se usar UnrealIRCd use --enable-unreal
+			Ultimate   use --enable-ultimate
+			Ultimate3  use --enable-ultimate3
+
+
+Agora o script irá verificar se todos os programas necessários para correr
+o NeoStats estão instalados no seu sistema. Uma pequena nota, para aqueles
+que me enviaram emails "paranóicos", o NeoStats NÃO vê o balanço da sua
+conta bancária, nem pode.
+
+
+
+[3] Compilando o NeoStats
+
+Ok, agora deverá estar de volta à linha de comando, agora escreva:
+
+make
+
+ele irá pelo código fonte e compilá-lo num ficheiro binário executável.
+Se vir alguns warnings, por favor ignore-os - estamos a tratar deles.
+
+
+[4] Configurando o ficheiro stats.cfg
+
+Escreva:
+
+./makeconf
+
+Isto irá levá-lo através do "criador" do stats.cfg. É recomendado após
+correr o makeconf, verificar o ficheiro stats.cfg manualmente.
+Isto pode ser feiro escrevendo:
+
+pico stats.cfg
+
+O ficheiro stats.cfg é bastante compreensível, se tiver alguma questão,
+esteja à vontade para me perguntar.. Uma vez terminada a edição do ficheiro
+carreguem em Ctrl-X e depois em Y e finalmente em enter para salvar o ficheiro.
+
+
+[5] Compilando os módulos
+
+Escreva:
+
+cd dl
+make
+
+Isto irá compilar TODOS os módulos que o NeoStats pode usar.
+
+
+[6] Editando o ficheiro niconfig.db (APENAS SE DESEJAR UTILIZAR O NetInfo)
+
+Ok estamos quase a acabar este trabalho árduo :)
+
+Escreva:
+
+cd ~/NeoStats-2.0.11/data
+pico niconfig.db (uma vez mais, é "CASE SenSiTiVe")
+
+Este ficheiro é também bastante compreensível. Uma vez terminada a edição deste
+ficheiro, carregue em Ctrl-X e depois em Y e finalmente em enter para salvar o
+ficheiro.
+
+[7] Correndo o NeoStats
+
+Ok, se tudo correu bem, está agora preparado para correr o NeoStats. Para correr
+o NeoStats a partir da shell, terá que escrever:
+
+cd ~/NeoStats-2.0.11
+./stats
+
+
+Ele deverá "linkar-se" e sincronizar-se com o seu servidor, numa questão de segundos.
+
+** Nota: Certifique-se que o(s) seu(s) servidor(es) têm U: Lines para o servidor
+**	 do NeoStats.
+	 Por favor, por favor, por favor! Certifique-se que adicionou as C: e N: Lines
+	 correctamente no seu servidor!
+
+
+** NOTA FINAL ** ** NOTA FINAL ** ** NOTA FINAL ** ** NOTA FINAL **
+EU NÃO O IREI AJUDAR A ADICIONAR AS C: N: E U: LINES AO SEU SERVIDOR,
+VOCÊ DEVERÁ LER A DOCUMENTAÇÃO DO IRCd SE NÃO O SABE FAZER!!!
+
+
+
+Manual de Configuração do NeoStats - Última actualização - 08 de Fevereiro de 2001 02:20 AM PST - Autor Shmad
+Traduzido por ErroR|51
+(c) 1999-2001 Codeworks. Todos os direitos reservados.
+http://www.neostats.net
