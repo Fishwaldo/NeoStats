@@ -30,13 +30,13 @@
 char s_Services[MAXNICK] = "NeoStats";
 
 #ifdef UNREAL
-const char version[] = "NeoStats-2.5_Beta3(U)";
+const char version[] = "NeoStats-2.5_Beta4(U)";
 #elif ULTIMATE3
-const char version[] = "NeoStats-2.5_Beta3(UL)";
+const char version[] = "NeoStats-2.5_Beta4(UL3)";
 #elif ULTIMATE
-const char version[] = "NeoStats-2.5_Beta3(UL3)";
+const char version[] = "NeoStats-2.5_Beta4(UL)";
 #elif HYBRID7
-const char version[] = "NeoStats-2.5_Beta3(H)";
+const char version[] = "NeoStats-2.5_Beta4(H)";
 #endif
 
 
