@@ -27,6 +27,9 @@
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 /* #undef HAVE_ARPA_INET_H */
 
+/* Define to 1 if you have the <arpa/nameser.h> header file. */
+/* #undef HAVE_ARPA_NAMESER_H */
+
 /* 'backtrace function available' */
 /* #undef HAVE_BACKTRACE */
 

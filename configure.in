@@ -59,6 +59,7 @@ AC_CHECK_HEADERS(
         stdlib.h \
         stdarg.h \
         arpa/inet.h \
+        arpa/nameser.h \
         net/if.h \
         netinet/in.h \
         netdb.h \
