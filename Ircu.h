@@ -295,7 +295,7 @@
 #define CMODE_DELJOINS 0x1000
 #endif
 #define CMODE_LISTED	0x10000
-#define CMODE_REGONLY	0x20000
+#define CMODE_RGSTRONLY	0x20000
 #if ( defined NEFARIOUS ) || (defined ASUKA )
 #define CMODE_NOCOLOUR	0x40000
 #define CMODE_NOCTCP	0x80000
