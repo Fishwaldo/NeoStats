@@ -63,7 +63,6 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *i
 	Server *s;
 	char **av;
 	int ac = 0;
-	int nhops;
 
 	nlog (LOG_DEBUG1, LOG_CORE, "New Server: %s", name);
 	s = new_server (name);

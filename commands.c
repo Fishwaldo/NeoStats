@@ -32,9 +32,6 @@ static int bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac);
 static int bot_cmd_about (ModUser* bot_ptr, User * u, char **av, int ac);
 static int bot_cmd_version (ModUser* bot_ptr, User * u, char **av, int ac);
 #endif
-/* hash for services bot command list */
-static hash_t *botcmds = NULL;
-static ModUser fake_bot;
 
 /* help title strings for different user levels */
 char * help_level_title[]=

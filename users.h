@@ -31,6 +31,7 @@ void UserDump (const char *nick);
 void UserPart (list_t *list, lnode_t *node, void *v);
 void UserJoin (const char* nick, const char* chanlist);
 void SetUserVhost(char* nick, char* vhost);
+void SetUserServicesTS(char* nick, char* ts);
 void UserMode (const char *nick, const char *modes);
 #ifdef GOTUSERSMODES
 void UserSMode (const char *nick, const char *modes);
