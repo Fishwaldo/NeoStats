@@ -36,7 +36,7 @@
 #include "lang.h"
 #include "hash.h"
 
-#ifdef HAVE_DB_H
+#ifndef HAVE_DB_H
 void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc) 
 {
 }
