@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: kp_exp.c,v 1.2 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id$
 */
 /*
  * kp_exp.c: export a standard file format from the keeper database

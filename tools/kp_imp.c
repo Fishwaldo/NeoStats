@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: kp_imp.c,v 1.2 2003/05/26 09:18:31 fishwaldo Exp $
+** $Id$
 */
 /*
  * kp_imp.c: import a standard file format into the keeper database

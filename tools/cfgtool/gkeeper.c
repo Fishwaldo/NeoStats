@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: gkeeper.c,v 1.3 2003/05/26 09:18:31 fishwaldo Exp $
+** $Id$
 */
 /*
  * gkeeper: A graphical tool for viewing and manipulating keeper

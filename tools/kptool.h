@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: kptool.h,v 1.2 2003/05/26 09:18:31 fishwaldo Exp $
+** $Id$
 */
 /*
  * kptool: A tool for viewing and manipulating keeper database
