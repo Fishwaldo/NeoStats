@@ -1,9 +1,16 @@
 #!/bin/sh
 # makeconf $Id$
 
+if [ "$1" ] ; then
+	NEOSTATSCONF=$1
+else
+	NEOSTATSCONF="neostats.conf"
+fi
+
+
 TIME=`date +"%H:%M:%S %Z"`
 DATE=`date +"%a, %b %e %Y"`
-NEOSTATSCONF="neostats.conf"
+#NEOSTATSCONF="neostats.conf"
 SERVNAME="stats.somenet.net"
 ROOTNICK="NeoStats"
 SERVNUMERIC="1"
@@ -37,6 +44,7 @@ __EOF__
 # mark repl_str as an executable
 chmod +x repl_str
 rm -f repl_str
+exit 0
 # Checking out how to specify not to make a new line with the current OS
 c=''
 n=''
