@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.65 2003/05/16 15:26:49 fishwaldo Exp $
+** $Id: statserv.c,v 1.66 2003/06/03 13:43:45 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -136,7 +136,7 @@ void ss_Config() {
 	} else {
 		/* assume that html is enabled if we don't have a setting for it */
 		StatServ.html = 1;
-		GetConf((void *)StatServ.html, CFGSTR, "HTML_Enabled");
+		GetConf((void *)StatServ.html, CFGINT, "HTML_Enabled");
 		snprintf(StatServ.htmlpath, 255, "%s", tmp);
 		free(tmp);
 	}
@@ -404,7 +404,7 @@ static void ss_set(User *u, char **av, int ac) {
 		if (!strcasecmp(av[3], "off")) {
 	 			prefmsg(u->nick, s_StatServ, "Record Yelling is Now Disabled. ");
 	 			chanalert(s_StatServ, "%s disabled Record Broadcasts", u->nick);
-			StatServ.interval = -1;
+				StatServ.interval = -1;
 		} else {
 	 		StatServ.interval = atoi(av[3]);
 			/* atoi will = 0 if av[3] != isnumeric */

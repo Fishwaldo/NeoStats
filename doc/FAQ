@@ -47,9 +47,11 @@ Frequently Asked Questions (FAQ)
 1.1 What is NeoStats?
 
 	NeoStats is based on GeoStats by Johnathan George net@lite.net. 
-	NeoStats is a set of IRC Statistical Services that keep track of 
-	user records, server splits, current users/opers online, and many 
-	more things.   
+	NeoStats is a set of IRC Services that can perform many many
+	different functions. Additionally, NeoStats can be easily 
+	expanded with "modules" that can provide new functionality. 
+	This means that you can configure neostats to only load what 
+	you need.
 
 -----------------------------------<>-----------------------------------
 
@@ -60,7 +62,7 @@ Frequently Asked Questions (FAQ)
 	of changes so although we one day hope to provide a Windows version,
 	don't be surprised if this is some time away. Once we have the 
 	remaining bugs ironed out, a windows version has a 50% chance of 
-	happening.
+	happening. Don't ask us when, we don't know. 
 
 -----------------------------------<>-----------------------------------
 
@@ -76,9 +78,9 @@ Frequently Asked Questions (FAQ)
 
 1.4 What Services package does the team recommend?
 
-	We recommend Epona Services, however NeoStats will also
-	function with other services such as Daylight II and IRC Services.
-	Other Services packages may also work with NeoStats.
+	NeoStats has been testing with most major Services Packages, such as
+	Epona, Anope, Daylight II, Magik, IRC Services. 
+	Other Services packages may also work with NeoStats. 
 
 -----------------------------------<>-----------------------------------
 
@@ -154,6 +156,8 @@ Frequently Asked Questions (FAQ)
 	them when it is first run. That is what you are experiencing. Once 
 	StatServ has generated statistics for the network, these messages 
 	will stop and you will only see them when new records are made. 
+	if your network is forever growing, you can disable these "Record"
+	wallops by typing "/msg statserv set msgthrottle off"
 
 -----------------------------------<>-----------------------------------
 
@@ -184,7 +188,10 @@ Frequently Asked Questions (FAQ)
 
 	sumyungguy is the spam module. It no longer changes its name and 
 	just it sits and waits for a user to spam it before it echos
-	the spammer's message, nick & hostname information.
+	the spammer's message, nick & hostname information. If you really
+	want to catch spammers, SecureServ is much more effective. 
+	SecureServ can be downloaded as a seperate module from the 
+	NeoStats website. 
 
 -----------------------------------<>-----------------------------------
 
@@ -193,9 +200,9 @@ Frequently Asked Questions (FAQ)
 	To operate NeoStats you must have the correct access privileges. 
 	You should check your oline flags before you try the command.
 
-	The old standard for NeoStats was 'Tech Admin' or higher but as
-	this flag is fading away, newer versions of NeoStats use 'Net 
-	Admin' or higher.
+	NeoStats works on a Level System, for LOAD/UNLOAD, you need at 
+	least level 185. /msg neostats level tells you what your current 
+	level is. 
 
 -----------------------------------<>-----------------------------------
 

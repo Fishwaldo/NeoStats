@@ -18,10 +18,6 @@ useful function on your network, other modules are developed for fun,
 and to make your IRC network more attractive to users (thats whats it 
 all about right?, IRC users?)
 
-Version 2.x releases allow Modules to be programmed and added into 
-NeoStats to increase functionalility and to customize the look and feel 
-of your network and your copy of NeoStats.                   
-
 With the release of 2.5 series of NeoStats, several changes have taken 
 place compared to the old version of NeoStats 2.0 series (don't ask me 
 what happened to versions 2.1, 2.2, 2.3 or 2.4, I don't know!)
@@ -44,7 +40,8 @@ Visit http://www.neostats.net for the latest news and NeoStats updates.
 
 Please read all documentation included with NeoStats carefully. The 
 documents contain all the information you need to get NeoStats running
-on your network.
+on your network. These Documents include README, and all the documents in
+the doc directory. 
 
 All documentation applies to version 2.5.3 and higher. For older 
 versions consult the documentation with that version or consider 
@@ -63,7 +60,14 @@ DOCS/FAQ -      Frequently asked questions about NeoStats.
 RELNOTES -      Release notes about the current version. This is 
 		        displayed during the installation process but you
 		        should refer to it if you have problems.
-                
+ChangeLog -     Information about what has changed between versions. Consult
+			this document for detailed information about the 
+			changes. Additionally, some modules contain Changelogs 
+			in their directorys (eg, dl/statserv) so you should 
+			consult these documents as well.                 
+README.kptool - Description and instructions for maintaining NeoStat's
+			Internal Database and Dynamic Configuration. 
+			FOR ADVANCED USERS ONLY!
 -----------------------------------<>-----------------------------------
 
 Contents
@@ -147,11 +151,17 @@ please see the Support section for how to contact us for help.
 	------------------
 	IRCD Support:
 		To specify the IRCD you are compiling for. eg:
+
 		    --enable-unreal - enable Unreal IRCD Support
+
 		    --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support
+
 		    --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support
+
 		    --enable-hybrid7 - enable Hybrid7 IRCD Support
+
 		    --enable-neoircd - enable NeoIRCd IRCD Support
+
 		    (Note, at the time of release of this version of NeoStats
 		    Ultimate 3.x.x was still in alpha, it is possible that 
 		    Ultimate3 compatibility might break in future releases 
@@ -167,10 +177,12 @@ please see the Support section for how to contact us for help.
 		This allows different ways of the NeoStats Privledge
 		system.
 		The Currently available options are:
+
 		--enable-auth=sr 	This Enables a ServiceRoots 
 			option, which a user must be identified to services
 			(with the +r flag) and they will have full access
 			to NeoStats.
+
 		if you do not specify --enable-auth then it uses IRCD
 		flags for access to NeoStats Default. This 	reverts back 
 		to the old NeoStats Privledge system, where 
@@ -197,7 +209,7 @@ please see the Support section for how to contact us for help.
 			StatServ		--enable-modules="statserv"
 			Version 		--enable-modules="version"
 
-		To compile multiple modules	combine the enable-modules 
+		To compile multiple modules combine the enable-modules 
 		options together as follows:
 			
 			--enable-modules="statserv spam"
@@ -300,66 +312,87 @@ please see the Support section for how to contact us for help.
 	distribution are:
 
 	The available options are:
+
 	SERVER_NAME	- Specifies the name of the NeoStats Server
 				as it will apear on the network. 
 		eg: SERVER_NAME stats.neostats.net		
-		-When it links, it will apear as stats.neostats.net.
+			-When it links, it will apear as stats.neostats.net.
+
 	SERVER_PORT	- Specifies the port to connect to on the
 		                IRC Server
 		eg: SERVER_PORT 6667		
-		-When connecting, NeoStats will connect to port 6667
+			-When connecting, NeoStats will connect to port 6667
+
 	CONNECT_TO	- Specifies the IP address to connect to.
 		eg: CONNECT_TO 127.0.0.1	
-		- This will force stats to connect to 127.0.0.1
+			- This will force stats to connect to 127.0.0.1
+	
 	CONNECT_PASS	-Specifies the password used to connect. 
 			This must match your CN lines in your 
 			IRCD configuration
-		eg:	CONNECT_PASS linkpass	- Send "linkpass"
-			as the password to connect
+		eg: CONNECT_PASS linkpass	
+			- Send "linkpass" as the password to connect
+
 	SERVER_INFOLINE	-Specify the description of the server that
 				appears when you do /links
 		eg: SERVER_INFOLINE Network Auxilurary Services	
+
 	SERVICES_CHAN	-Specify the channel that all bots on NeoStats
 				will automatically join, and echo out any
 				important information
-		eg: SERVICES_CHAN #services	-Makes NeoStats, and
-			all the other bots join #services channel on
-			startup/load.
-	STATSERV_NETNAME - Your network name
-		e.g. for irc.irc-chat.net put irc-chat, if unknown 
-		refer to your network file
+		eg: SERVICES_CHAN #services	
+			-Makes NeoStats, and all the other bots join #services 
+				channel on startup/load.
+
+	STATSERV_NETNAME - Your network name e.g. for irc.irc-chat.net put 
+				irc-chat, if unknown refer to your network 
+				file. Does not apply to All IRCd's
+
 	NEOSTAT_HOST - Specifies the Hostname that NeoStats comes from
-		Some people like to make it the same as the Services host 
-		(eg, services.irc-chat.net) or one just for NeoStats 
-		(eg, stats.irc-chat.net)
+			Some people like to make it the same as the Services 
+			host (eg, services.irc-chat.net) or one just for 
+			NeoStats (eg, stats.irc-chat.net)
 		eg: NEOSTATS_HOST stats.neostats.net	
-		 -Means the bot will apear as NeoStats!user@stats.neostats.net
+			 -Means the bot will apear as 
+				NeoStats!user@stats.neostats.net
+
 	NEOSTAT_USER - Specifies the User/ident of the NeoStats Bot
-		(the part before the @host)
+			(the part before the @host)
 		eg: NEOSTATS_USER neo	
-		 - Means the bot will apear as NeoStats!neo@Host
+			- Means the bot will apear as NeoStats!neo@Host
+
 	ONLY_OPERS - Restrict NeoStats and StatServ to opers use only.
 		If not specified, users will have some acesss to NeoStats
 		and StatServ commands. 
+
 	BINDTO - Make NeoStats bind to a particular IP Address. If not
 		specified NeoStats will attempt to find this address
 		itself.
-	WANT_PRIVMSG		-Specify if the bots should send all
+		eg: BINDTO 203.203.123.12
+			- All outgoing connections from NeoStats will
+			originate from thsi IP address. 
+
+	WANT_PRIVMSG -Specify if the bots should send all
 			messages as privmsg's or as notices (Most Services
 			use notice)
-		eg: WANT_PRIVMSG	- if present, will send all
-			messages as Privmsg's (if commented out, it will
-			send as Notices)
+		eg: WANT_PRIVMSG	
+			- if present, will send all messages as Privmsg's 
+			(if commented out, it will send as Notices)
+		*NOTE:* This option Violates IRC RFC, and can cause Flooding
+			Problems on your network. Its NOT recomended. 
+
 	NO_LOAD	- If this is in the neostats.cfg your NeoStats WILL
 		NOT START UP.  To disable this simply comment this
 		line out.  
 		eg: NO_LOAD  <- NeoStats will not load.
 		eg2: #NO_LOAD <- NeoStats will load.
-	RECONNECT_TIME	-If NeoStats server gets split from the
-		network, how long to wait before attempting to
-		reconnect to the network
-		eg: RECONNECT_TIME 10	-Specifies wait 10 seconds
-			before trying to reconnect
+
+	RECONNECT_TIME	-If NeoStats server gets split from the	network, how 
+			long to wait before attempting to reconnect to the 
+			network
+		eg: RECONNECT_TIME 10	
+			-Specifies wait 10 seconds before trying to reconnect
+
 	LOAD_MODULE	-what module to load at startup. Multiple
 		instances of LOAD_MODULE may be specified
 		eg: LOAD_MODULE statserv
@@ -369,17 +402,13 @@ please see the Support section for how to contact us for help.
 	the the additional configuration options are available:
 
 	SERVICE_ROOTS	-Who should get access to NeoStats regardless
-		of their O line flags (apart from having the Umode +r,
-		which means they identified to Nickserver) You can
-		specify this option upto 10 times to specify different
-		nicks who will be allowed this priveledge.
-		eg: SERVICE_ROOTS fish	-Will give "fish" access to
-		NeoStats privledged commands if fish has Umode +r
-	SERVICE_ROOTS_AUTH	-Should we only give access to
-		NeoStats privledged command to the nicks listed
-		in SERVICE_ROOTS and ignore users O line flags?
-		eg: SERVICE_ROOTS_AUTH 1	-Enable, and only let
-			fish access NeoStats, regardless of O line flags
+			of their O line flags. You can specify this option 
+			upto 10 times to specify different nicks who will 
+			be allowed this priveledge.
+		eg: SERVICE_ROOTS fish!?Fish@*.neostats.net
+			-Will give "fish" access to NeoStats privledged 
+			commands if fish has Umode +r and comes from the
+			specified hostname and ident. 
 
 1.7 Compiling additional modules
 --------------------------------
@@ -418,7 +447,7 @@ please see the Support section for how to contact us for help.
 	from an IRC Client.
 
 	If anything goes wrong, there *might* be a error message in
-	the log files. Have a look in ~/NeoStats/logs/stats.log it
+	the log files. Have a look in ~/NeoStats/logs/NeoStats.log it
 	might give you a clue to whats wrong! NeoStats might also 
 	send a wallops to the network about what went wrong. Check the
 	status window of your IRC client. 
@@ -490,7 +519,9 @@ site or not. If you have downloaded a CVS snapshot and are having
 problems, you should revert back to your previous working version or
 if this is your first installation, the current release build as indicated
 on the web site. Please do not contact us about problems with CVS
-versions.
+versions. We will advise users occasionally to try a CVS snapshot to fix a
+problem, but as we do not put our CVS versions through extensive testings,
+there might be new bugs or problems. 
 
 Before contacting us with a problem or a bug, please make sure you have 
 read all the documentation provided. You should then check the web site 
@@ -499,7 +530,9 @@ reported and if a solution has been posted.
 
 Before sending us a suggestion, you should check the forums carefully to 
 see if your suggestion has already been made and if the NeoStats team 
-have decided to implement it or not. 
+have decided to implement it or not. The use of the "Search" feature on the
+forums is a great way to quickly get answers to your problem if other users
+have already encountered the issue. 
 
 You do not have to read all the messages to find out if your issue has 
 already been discussed. The message board has a search function so 
@@ -538,8 +571,6 @@ the one that suits you best.
   There is a bot there called neoserv that contains the latest bugs and
   support information (duplicated from the NeoStats board)
 
-* Email us at support@neostats.net
-
 2.2 What to provide when requesting support
 -------------------------------------------
 
@@ -553,16 +584,16 @@ include at least the following information:
 	via /msg neostats modlist)
 	The type of IRCD you are attempting to connect to
 	(and version number)
+
 We may request that you enable debugging and submit us the
-results of debugging. if this is the case, we need you to
-re-run configure with the following option:
-./configure --enable-debug (any other options you need,
-	like IRCD type and module lists)
-"make"
-./neostats
+results of debugging. 
+To enable Debugging, use the following command to start NeoStats:
+
+./neostats -d 9 -r
 When it crashes, or the bug has been reproduced, send us:
-logs/stats.log
-logs/recv.log
+logs/NeoStats.log
+logs/recv.log (if it exists, You may wish to edit the first few lines of the
+file to remove the link password)
 and it will help us to be able to reproduce the bug
 
 -----------------------------------<>-----------------------------------

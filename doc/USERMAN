@@ -13,7 +13,8 @@ This document explains how to use NeoStats and the commands available
 for the various components. If you are looking for help configuring or 
 installing NeoStats or for support information please refer to the 
 README file. For help on downloaded modules, refer to the documentation
-that comes with the module.
+that comes with the module. Typically, after installation, the documentation
+for the downloaded modules in named "README.<modulename>"
 
 Most NeoStats components include online help so you can find out 
 how to use a command while on IRC.
@@ -72,7 +73,7 @@ Contents
 	4.1 About spam
 	4.2 Available Commands
 	4.3 Command Reference
-		4.1.1 ...
+
 5.  ConnectServ
 	5.1 About ConnectServ
 	5.2 Available Commands
@@ -132,7 +133,6 @@ Contents
 	9.1 About Version
 10. ExtAuth
 	10.1 About ExtAuth
-		TO DO
 
 -----------------------------------<>-----------------------------------
 
@@ -331,6 +331,7 @@ Description:
 	It is recommended that you never use this command.
 	It can cause desyncs and other problems. No support 
 	will be provided for use of this command.
+	NOTE: Problems with RAW are NOT SUPPORTED. 
 Example:
 	/msg NeoStats RAW COMMAND
 
@@ -359,9 +360,7 @@ Example:
 Syntax: 
 	/msg NeoStats DEBUG
 Description: 
-	This toggles the debug command, introducing a new user on the 
-	server called stats_debug. Any user that has their coder flag 
-	set will recieve debuging onformation. On a large network, this 
+	This toggles the debug command, On a large network, this 
 	command should be used considered dangerous as a large amount 
 	of information may be sent to you and may flood you off the 
 	network.
@@ -373,7 +372,7 @@ Example:
 Syntax: 
 	/msg NeoStats USERDUMP
 Description: 
-	When in debug mode, Neostats will send coders its entire user table
+	When in debug mode, Neostats will send you its entire user table
 	Only really usefull when you are debuging Neostats
 Example:
 	/msg NeoStats USERDUMP
@@ -383,7 +382,7 @@ Example:
 Syntax: 
 	/msg NeoStats SERVERDUMP
 Description: 
-	When in debug mode, Neostats will send coders its entire server
+	When in debug mode, Neostats will send you its entire server
 	table Only really usefull when you are debuging Neostats
 Example:
 	/msg NeoStats SERVERDUMP
@@ -393,7 +392,7 @@ Example:
 Syntax: 
 	/msg NeoStats CHANDUMP
 Description: 
-	When in debug mode, Neostats will send coders its entire channel
+	When in debug mode, Neostats will send you its entire channel
 	table Only really usefull when you are debuging Neostats
 Example:
 	/msg NeoStats CHANDUMP
@@ -452,6 +451,7 @@ Description:
 	Active <limit> Specifies how many results to show. Results are 
 	sorted by Most Popular to Least Popular
 Example:
+	/msg StatServ CLIENTVERSIONS
 
 3.3.3 SET
 ---------
@@ -478,8 +478,9 @@ Description:
 	if <seconds> is equal to 0, then disable Lag Monitoring
 
 	If you specify SET without any options, the current settings are 
-	disabled
+	displayed
 Example:
+	/msg statserv set msgthrottle off
 
 3.3.4 CHAN
 ----------
@@ -495,6 +496,7 @@ Description:
 	CHAN TOPICS Gives you the top10 Topic Changing Channels
 	CHAN <name> Gives you specific information on a channel
 Example:
+	/msg statserv chan #neostats
 
 3.3.5 SERVER
 ------------
@@ -503,6 +505,7 @@ Syntax:
 Description: 
 	Provides you with statistics on a specific server.
 Example:
+	/msg statserv server rollergirl.sg.as.irc-chat.net
 
 3.3.6 MAP
 ---------
@@ -572,7 +575,8 @@ Example:
 Syntax: 
 	/msg StatServ BOTLIST
 Description: 
-	Shows all current bots on the network. (umode +B users)
+	Shows all current bots on the network. (umode +B users if your IRCd
+	supports Umode +B)
 Example:
 	/msg StatServ BOTLIST
 
@@ -666,13 +670,7 @@ Currently the spam bot has a fixed name of "sumyungguy".
 ----------------------
 
 No commands are available for spam.
-To do - spam module needs config commands then this document
-will be updated accordingly
-
-4.3 Command Reference
----------------------
-
-To be provided when missing config functions are available.
+Just send it a message, and watch what happens. 
 
 -----------------------------------<>-----------------------------------
 
@@ -691,13 +689,13 @@ and Network Admins can turn these three settings on and off.
 5.2 Available Commands
 ----------------------
 	
-HELP        Online command help
+HELP        	Online command help
 ABOUT		Return description of ConnectServ
 STATUS		This will tell you the current status of 
 			the settings. 
-SIGNWATCH   Will enable or disable SIGNWATCH. 
-KILLWATCH   Will enable or disable KILLWATCH.
-MODEWATCH   Will enable or disable MODEWATCH.
+SIGNWATCH   	Will enable or disable SIGNWATCH. 
+KILLWATCH   	Will enable or disable KILLWATCH.
+MODEWATCH   	Will enable or disable MODEWATCH.
 NICKWATCH  	Will enable or disable NICKWATCH.
 
 5.3 Command Reference
@@ -793,13 +791,13 @@ and upon connection the user gets their unique host.
 6.2 Available Commands
 ----------------------
 
-HELP        Online command help
+HELP        	Online command help
 ABOUT		Return description of ConnectServ
 LOGIN		Login to HostServ
-ADD			Add a vhost
-DEL			Delete a vhost
+ADD		Add a vhost
+DEL		Delete a vhost
 LIST		List vhosts
-VIEW        Detailed vhost list
+VIEW        	Detailed vhost list
 CHPASS		Change password
 LISTBAN		List banned vhosts
 LEVELS		Levels to manage HostServ
@@ -938,14 +936,14 @@ on IRC.
 
 7.2 Available Commands
 ----------------------
-HELP        Online command help
-ROSE        Give someone on IRC a rose
+HELP        	Online command help
+ROSE        	Give someone on IRC a rose
 KISS		Give someone on IRC a kiss
 TONSIL		Give someone on IRC a tonsil kiss
-HUG			Give someone on IRC a hug
+HUG		Give someone on IRC a hug
 ADMIRER		Tell someone on IRC they have a secret admirer
 CHOCOLATE	Give someone on chocolate
-CANDY       Give someone on IRC candy
+CANDY       	Give someone on IRC candy
 LOVENOTE	Give someone on IRC a lovenote
 APOLOGY		Give someone on IRC an apology
 THANKYOU	Give someone on IRC a thank you
@@ -1076,15 +1074,15 @@ MoraleServ is a fun module to send sheery messages to friends on IRC.
 
 8.2 Available Commands
 ----------------------
-HELP        Online command help
+HELP        	Online command help
 HAIL		Hail someone on IRC
-ODE			Send an ODE to someone on IRC
+ODE		Send an ODE to someone on IRC
 POEM		Send a poem to someone on IRC
 LAPDANCE	Give someone on IRC a lapdance
-REDNECK	    Send a Redneck message.
+REDNECK	    	Send a Redneck message.
 CHEERUP		Send an cheer up message to someone on IRC
-BEHAPPY     Send an be happy song to someone on IRC
-WONDERFUL   Send an song to someone on IRC
+BEHAPPY     	Send an be happy song to someone on IRC
+WONDERFUL   	Send an song to someone on IRC
 VERSION		Display version info
 
 8.3 Command Reference
@@ -1197,7 +1195,7 @@ Example:
 -----------------
 
 Version is a dummy module designed to show module programmers
-how to setup a module.
+how to setup a module. It does absolutly nothing usefull at all. 
 	
 -----------------------------------<>-----------------------------------
 
@@ -1205,7 +1203,12 @@ how to setup a module.
 ----------
 10.1 About ExtAuth
 ------------------
-	TO DO
+
+ExtAuth may be listed as a loaded module, but its not a true module as
+described above. It allows you to provide a alternative Authentication
+/level scheme that is not based on Umodes. You should consult the README
+file for neostats for more detailed information regarding its 
+configuration. 
 
 -----------------------------------<>-----------------------------------
 
