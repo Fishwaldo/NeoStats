@@ -204,8 +204,11 @@ sserver_cmd (const char *name, const int numeric, const char *infoline)
 int
 slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass)
 {
-//	sts ("%s TOKEN SJOIN", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
-	sts ("%s TOKEN ", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
+#if 0
+	sts ("%s TOKEN SJOIN", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
+#else
+	sts ("%s TOKEN", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
+#endif
 	sts ("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
 	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 	return 1;
