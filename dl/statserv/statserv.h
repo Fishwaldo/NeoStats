@@ -185,6 +185,7 @@ int pong(char **av, int ac);
 int s_user_away(char **av, int ac);
 int s_new_server(char **av, int ac);
 int s_del_server(char **av, int ac);
+int s_got_nickip(char **av, int ac);
 int s_new_user(char **av, int ac);
 int s_del_user(char **av, int ac);
 int s_user_modes(char **av, int ac);

@@ -536,8 +536,15 @@ int s_user_away(char **av, int ac)
 	return 1;
 
 }
-
-
+int s_got_nickip(char **av, int ac)
+{
+	User *u;
+	u = finduser(av[0]);
+	if (u) {
+		AddTLD(u);
+	}
+	return 1;
+}
 
 int s_new_user(char **av, int ac)
 {
@@ -585,9 +592,10 @@ int s_new_user(char **av, int ac)
 	}
 
 
-	AddTLD(u);
 	return 1;
 }
+
+
 
 int pong(char **av, int ac)
 {

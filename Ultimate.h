@@ -61,7 +61,7 @@
 /* we don't have automatic host cloaking support via Umode */
 #undef GOTUMODECLOAKING
 /* we dont have a nickip field in the nick message */
-#undef GOTNICKIP
+#define GOTNICKIP
 
 #else /* !ULTIMATE3 */
 

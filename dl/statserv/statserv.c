@@ -63,6 +63,7 @@ EventFnList __module_events[] = {
 	{EVENT_SERVER, s_new_server},
 	{EVENT_SQUIT, s_del_server},
 	{EVENT_SIGNON, s_new_user},
+	{EVENT_GOTNICKIP, s_got_nickip},
 	{EVENT_UMODE, s_user_modes},
 	{EVENT_SIGNOFF, s_del_user},
 	{EVENT_AWAY, s_user_away},
@@ -163,6 +164,9 @@ int __ModInit(int modnum, int apiver)
 	}
 	StatServ.onchan = 0;
 	StatServ.shutdown = 0;
+	/* we want nickip messages */
+	me.want_nickip = 1;
+
 	ss_Config();
 	if (StatServ.html && StatServ.htmlpath[0] == 0) {
 		nlog(LOG_NOTICE, LOG_MOD,

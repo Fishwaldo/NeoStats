@@ -72,7 +72,7 @@ new_user (const char *nick)
 	}
 	return (u);
 }
-
+#ifndef GOTNICKIP
 static void 
 lookupnickip(char *data, adns_answer *a) {
 	User *u;
@@ -82,12 +82,11 @@ lookupnickip(char *data, adns_answer *a) {
 	u = finduser((char *)data);
 	if (a && a->nrrs > 0 && u && a->status == adns_s_ok) {
 		u->ipaddr.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
-printf("%s\n", inet_ntoa(u->ipaddr));
 		AddStringToList (&av, u->nick, &ac);
 		ModuleEvent (EVENT_GOTNICKIP, av, ac);
 	}
 }
-
+#endif
 void
 AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric)
 {
@@ -119,7 +118,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 			res = inet_aton(host, ipad);
 			if (res > 0) {
 				/* its valid */
-				ipaddress = ipad->s_addr;
+				ipaddress = htonl(ipad->s_addr);
 				free(ipad);
 			} else {		
 				/* kick of a dns reverse lookup for this host */
