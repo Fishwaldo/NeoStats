@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.56 2003/07/15 10:34:23 fishwaldo Exp $
+** $Id: users.c,v 1.57 2003/07/17 15:00:13 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -166,6 +166,13 @@ void doDelUser(const char *nick, int i)
 		Module_Event("KILL", av, ac);
 	}
 	free(av);
+	
+	/* if its one of our bots, remove it from the modlist */
+	if (findbot(u->nick)) {
+		if (i == 1) 
+			nlog(LOG_NOTICE, LOG_CORE, "Deleting Bot %s as it was killed", u->nick);
+		del_mod_user(u->nick);
+	}
 
 	hash_delete(uh, un);
 	hnode_destroy(un);

@@ -7,7 +7,7 @@ AC_DEFINE(MINOR, 5)
 AC_DEFINE(REV, 4)
 VERSION=2.5.4-Pre2
 AC_PREFIX_DEFAULT(~/NeoStats)
-CFLAGS="$CFLAGS -O2"
+CFLAGS="$CFLAGS -O2 -g"
 
 dnl Checks for programs.
 AC_PROG_CC
