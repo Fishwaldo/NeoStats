@@ -252,6 +252,15 @@ int os_access( const char *path, int mode )
 }
 
 /*
+ *  Wrapper function for tempnam
+ */
+
+char *os_tempnam( const char *dir, const char *prefix )
+{
+	return tempnam( dir, prefix );
+}
+
+/*
  *  Wrapper function for strerror
  */
 

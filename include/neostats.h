@@ -1357,6 +1357,7 @@ EXPORTFUNC int os_fflush( FILE *handle );
 EXPORTFUNC int os_rename( const char *oldname, const char *newname );
 EXPORTFUNC int os_stat( const char *path, struct stat *buffer );
 EXPORTFUNC int os_access( const char *path, int mode );
+EXPORTFUNC char *os_tempnam( const char *dir, const char *prefix );
 EXPORTFUNC char *os_strerror( void );
 EXPORTFUNC int os_file_get_size( const char *filename );
 EXPORTFUNC size_t os_strftime( char *strDest, size_t maxsize, const char *format, const struct tm *timeptr );
