@@ -292,6 +292,7 @@ src/pcre/maketables.c eol=lf
 src/pcre/pcre.c eol=lf
 src/pcre/pcre.in eol=lf
 src/pcre/study.c eol=lf
+src/protocol/Makefile.in -text
 src/protocol/bahamut.c eol=lf
 src/protocol/bahamut.h eol=lf
 src/protocol/hybrid7.c eol=lf

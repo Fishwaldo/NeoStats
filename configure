@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LEX LEXLIB LEX_OUTPUT_ROOT YACC RANLIB ac_ct_RANLIB CPP EGREP sqlsrvbuild buildsqlsrv GTK_CONFIG build_configtool LIBDB MAKEDEPENDENCIES DIRINST MODLDFLAGS LINK_SIZE MATCH_LIMIT NEWLINE PCRE_MAJOR PCRE_MINOR PCRE_DATE PCRE_VERSION PCRE_LIB_VERSION PCRE_POSIXLIB_VERSION POSIX_MALLOC_THRESHOLD UTF8 IRCD_FILES_SRC IRCD_FILES_OBJS IRCD_FILES_INC MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LEX LEXLIB LEX_OUTPUT_ROOT YACC RANLIB ac_ct_RANLIB CPP EGREP sqlsrvbuild buildsqlsrv GTK_CONFIG build_configtool LIBDB MAKEDEPENDENCIES DIRINST MODLDFLAGS LINK_SIZE MATCH_LIMIT NEWLINE PCRE_MAJOR PCRE_MINOR PCRE_DATE PCRE_VERSION PCRE_LIB_VERSION PCRE_POSIXLIB_VERSION POSIX_MALLOC_THRESHOLD UTF8 PROTOCOL MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -6110,6 +6110,10 @@ if diff $cache_file confcache >/dev/null 2>&1; then :; else
   fi
 fi
 rm -f confcache
+
+do_serviceroots=no
+PROTOCOL=no
+
 echo "$as_me:$LINENO: checking Whether to Enable Unreal 3.1.x IRCD Support..." >&5
 echo $ECHO_N "checking Whether to Enable Unreal 3.1.x IRCD Support...... $ECHO_C" >&6
 # Check whether --enable-unreal31 or --disable-unreal31 was given.
@@ -6122,9 +6126,7 @@ cat >>confdefs.h <<\_ACEOF
 #define UNREAL 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/unreal.h"
-	IRCD_FILES_SRC="protocol/unreal.c"
-	IRCD_FILES_OBJS="unreal.o"
+	PROTOCOL="unreal"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6154,9 +6156,7 @@ cat >>confdefs.h <<\_ACEOF
 #define UNREAL32 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/unreal.h"
-	IRCD_FILES_SRC="protocol/unreal.c"
-	IRCD_FILES_OBJS="unreal.o"
+	PROTOCOL="unreal"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6182,9 +6182,7 @@ cat >>confdefs.h <<\_ACEOF
 #define ULTIMATE 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/ultimate.h"
-	IRCD_FILES_SRC="protocol/ultimate.c"
-	IRCD_FILES_OBJS="ultimate.o"
+	PROTOCOL="ultimate"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6215,9 +6213,7 @@ cat >>confdefs.h <<\_ACEOF
 #define ULTIMATE3 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/ultimate.h"
-	IRCD_FILES_SRC="protocol/ultimate.c"
-	IRCD_FILES_OBJS="ultimate.o"
+	PROTOCOL="ultimate"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6244,9 +6240,18 @@ cat >>confdefs.h <<\_ACEOF
 #define HYBRID7 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/hybrid7.h"
-	IRCD_FILES_SRC="protocol/hybrid7.c"
-	IRCD_FILES_OBJS="hybrid7.o"
+	PROTOCOL="hybrid7"
+	echo "$as_me:$LINENO: checking Auto-Enabling ServiceRoots Authentication Module" >&5
+echo $ECHO_N "checking Auto-Enabling ServiceRoots Authentication Module... $ECHO_C" >&6
+	do_serviceroots=yes
+
+cat >>confdefs.h <<\_ACEOF
+#define EXTAUTH 1
+_ACEOF
+
+	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
+	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
+	MODULES="$MODULES extauth"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6273,9 +6278,7 @@ cat >>confdefs.h <<\_ACEOF
 #define NEOIRCD 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/neoircd.h"
-	IRCD_FILES_SRC="protocol/neoircd.c"
-	IRCD_FILES_OBJS="neoircd.o"
+	PROTOCOL="neoircd"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6302,9 +6305,7 @@ cat >>confdefs.h <<\_ACEOF
 #define QUANTUM 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/quantum.h"
-	IRCD_FILES_SRC="protocol/quantum.c"
-	IRCD_FILES_OBJS="quantum.o"
+	PROTOCOL="quantum"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6330,9 +6331,7 @@ cat >>confdefs.h <<\_ACEOF
 #define MYSTIC 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/mystic.h"
-	IRCD_FILES_SRC="protocol/mystic.c"
-	IRCD_FILES_OBJS="mystic.o"
+	PROTOCOL="mystic"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6358,9 +6357,7 @@ cat >>confdefs.h <<\_ACEOF
 #define BAHAMUT 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/bahamut.h"
-	IRCD_FILES_SRC="protocol/bahamut.c"
-	IRCD_FILES_OBJS="bahamut.o"
+	PROTOCOL="bahamut"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6386,9 +6383,7 @@ cat >>confdefs.h <<\_ACEOF
 #define IRCU 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/ircu.h"
-	IRCD_FILES_SRC="protocol/ircu.c"
-	IRCD_FILES_OBJS="ircu.o"
+	PROTOCOL="ircu"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6414,9 +6409,7 @@ cat >>confdefs.h <<\_ACEOF
 #define LIQUID 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/liquid.h"
-	IRCD_FILES_SRC="protocol/liquid.c"
-	IRCD_FILES_OBJS="liquid.o"
+	PROTOCOL="liquid"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6443,9 +6436,7 @@ cat >>confdefs.h <<\_ACEOF
 #define VIAGRA 1
 _ACEOF
 
-	IRCD_FILES_INC="protocol/viagra.h"
-	IRCD_FILES_SRC="protocol/viagra.c"
-	IRCD_FILES_OBJS="viagra.o"
+	PROTOCOL="viagra"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6460,39 +6451,20 @@ echo "${ECHO_T}no" >&6
 
 fi;
 
-do_serviceroots=no
 echo "$as_me:$LINENO: checking A compatible IRCD is specified" >&5
 echo $ECHO_N "checking A compatible IRCD is specified... $ECHO_C" >&6
-case "$IRCD_FILES_SRC" in
-   "protocol/hybrid7.c")
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	echo "$as_me:$LINENO: checking Auto-Enabling ServiceRoots Authentication Module" >&5
-echo $ECHO_N "checking Auto-Enabling ServiceRoots Authentication Module... $ECHO_C" >&6
-	do_serviceroots=yes
-
-cat >>confdefs.h <<\_ACEOF
-#define EXTAUTH 1
-_ACEOF
-
-	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
-	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
-	MODULES="$MODULES extauth"
-	echo "$as_me:$LINENO: result: OK" >&5
-echo "${ECHO_T}OK" >&6
-	;;
-   protocol*)
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
+echo $PROTOCOL
+if test "$PROTOCOL" = no; then
 	echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 	{ { echo "$as_me:$LINENO: error: 'You must define a IRCD to use. See ./configure --help for more information'" >&5
 echo "$as_me: error: 'You must define a IRCD to use. See ./configure --help for more information'" >&2;}
    { (exit 1); exit 1; }; }
-	;;
-esac
+else
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+fi
+
 if test "$do_serviceroots" = no; then
 		echo "$as_me:$LINENO: checking What type of Authentication to use..." >&5
 echo $ECHO_N "checking What type of Authentication to use...... $ECHO_C" >&6
@@ -6728,13 +6700,11 @@ _ACEOF
 
 
 
-
-
           ac_config_headers="$ac_config_headers src/adns/config.h"
 
           ac_config_headers="$ac_config_headers src/pcre/config.h"
 
-                                                                      ac_config_files="$ac_config_files src/Makefile.inc src/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile src/pcre/Makefile src/pcre.h:src/pcre/pcre.in"
+                                                                                ac_config_files="$ac_config_files src/Makefile.inc src/Makefile src/protocol/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile src/pcre/Makefile src/pcre.h:src/pcre/pcre.in"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -7261,6 +7231,7 @@ do
   # Handling of arguments.
   "src/Makefile.inc" ) CONFIG_FILES="$CONFIG_FILES src/Makefile.inc" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+  "src/protocol/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/protocol/Makefile" ;;
   "src/modules/Makefile.inc" ) CONFIG_FILES="$CONFIG_FILES src/modules/Makefile.inc" ;;
   "src/sqlsrv/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/sqlsrv/Makefile" ;;
   "src/tools/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/tools/Makefile" ;;
@@ -7398,9 +7369,7 @@ s,@PCRE_LIB_VERSION@,$PCRE_LIB_VERSION,;t t
 s,@PCRE_POSIXLIB_VERSION@,$PCRE_POSIXLIB_VERSION,;t t
 s,@POSIX_MALLOC_THRESHOLD@,$POSIX_MALLOC_THRESHOLD,;t t
 s,@UTF8@,$UTF8,;t t
-s,@IRCD_FILES_SRC@,$IRCD_FILES_SRC,;t t
-s,@IRCD_FILES_OBJS@,$IRCD_FILES_OBJS,;t t
-s,@IRCD_FILES_INC@,$IRCD_FILES_INC,;t t
+s,@PROTOCOL@,$PROTOCOL,;t t
 s,@MODULES@,$MODULES,;t t
 s,@EXTAUTH_SRC@,$EXTAUTH_SRC,;t t
 s,@EXTAUTH_OBJS@,$EXTAUTH_OBJS,;t t

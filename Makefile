@@ -11,7 +11,7 @@ BUILDFILES = configure config.sub config.guess *.in install-sh Config makeconf c
 
 DISTFILES = $(BUILDFILES) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF)	
 
-SUBDIRS = doc doc/old data logs src src/tools src/protocol src/modules
+SUBDIRS = doc doc/old data logs src src/tools src/modules
 
 all: 
 	(cd src; $(MAKE) $@)

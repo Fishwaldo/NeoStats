@@ -175,15 +175,17 @@ AC_MSG_RESULT(no)
 )
 
 AC_CACHE_SAVE
+
+do_serviceroots=no
+PROTOCOL=no
+
 dnl check to see if we should enable Unreal IRCD Support
 AC_MSG_CHECKING(Whether to Enable Unreal 3.1.x IRCD Support...)
 AC_ARG_ENABLE(unreal31, [ --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
-	IRCD_FILES_INC="protocol/unreal.h"
-	IRCD_FILES_SRC="protocol/unreal.c"
-	IRCD_FILES_OBJS="unreal.o"
+	PROTOCOL="unreal"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -197,9 +199,7 @@ AC_ARG_ENABLE(unreal32, [ --enable-unreal32 - enable Unreal 3.2.x IRCD Support],
   yes)  
 	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
 	AC_DEFINE(UNREAL32, 1, 'Enable Unreal 3.2.x Support')
-	IRCD_FILES_INC="protocol/unreal.h"
-	IRCD_FILES_SRC="protocol/unreal.c"
-	IRCD_FILES_OBJS="unreal.o"
+	PROTOCOL="unreal"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -214,9 +214,7 @@ AC_ARG_ENABLE(ultimate2, [ --enable-ultimate2 - enable Ultimate 2.x.x IRCD Suppo
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate Support')
-	IRCD_FILES_INC="protocol/ultimate.h"
-	IRCD_FILES_SRC="protocol/ultimate.c"
-	IRCD_FILES_OBJS="ultimate.o"
+	PROTOCOL="ultimate"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -231,9 +229,7 @@ AC_ARG_ENABLE(ultimate3, [ --enable-ultimate3 - enable Ultimate 3.x.x IRCD Suppo
   yes)  
 	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate 2.x.x Support')
 	AC_DEFINE(ULTIMATE3, 1, "Enable Ultimate 3.x.x Support')
-	IRCD_FILES_INC="protocol/ultimate.h"
-	IRCD_FILES_SRC="protocol/ultimate.c"
-	IRCD_FILES_OBJS="ultimate.o"
+	PROTOCOL="ultimate"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -248,9 +244,13 @@ AC_ARG_ENABLE(hybrid7, [ --enable-hybrid7 - enable Hybrid7 IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(HYBRID7, 1, 'Enable hybrid7 IRCD support')
-	IRCD_FILES_INC="protocol/hybrid7.h"
-	IRCD_FILES_SRC="protocol/hybrid7.c"
-	IRCD_FILES_OBJS="hybrid7.o"
+	PROTOCOL="hybrid7"
+	AC_MSG_CHECKING(Auto-Enabling ServiceRoots Authentication Module)
+	do_serviceroots=yes
+	AC_DEFINE(EXTAUTH, 1, 'Use IRCD Authentication')
+	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
+	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
+	MODULES="$MODULES extauth"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -265,9 +265,7 @@ AC_ARG_ENABLE(neoircd, [ --enable-neoircd - enable NeoIRCd IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(NEOIRCD, 1, 'Enable NeoIRCd IRCD support')
-	IRCD_FILES_INC="protocol/neoircd.h"
-	IRCD_FILES_SRC="protocol/neoircd.c"
-	IRCD_FILES_OBJS="neoircd.o"
+	PROTOCOL="neoircd"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -283,9 +281,7 @@ AC_ARG_ENABLE(quantum, [ --enable-quantum - enable Quantum IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(QUANTUM, 1, 'Enable Quantum Support')
-	IRCD_FILES_INC="protocol/quantum.h"
-	IRCD_FILES_SRC="protocol/quantum.c"
-	IRCD_FILES_OBJS="quantum.o"
+	PROTOCOL="quantum"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -300,9 +296,7 @@ AC_ARG_ENABLE(mystic, [ --enable-mystic - enable Mystic IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(MYSTIC, 1, 'Enable Mystic Support')
-	IRCD_FILES_INC="protocol/mystic.h"
-	IRCD_FILES_SRC="protocol/mystic.c"
-	IRCD_FILES_OBJS="mystic.o"
+	PROTOCOL="mystic"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -317,9 +311,7 @@ AC_ARG_ENABLE(bahamut, [ --enable-bahamut - enable Bahamut IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(BAHAMUT, 1, 'Enable Bahamut Support')
-	IRCD_FILES_INC="protocol/bahamut.h"
-	IRCD_FILES_SRC="protocol/bahamut.c"
-	IRCD_FILES_OBJS="bahamut.o"
+	PROTOCOL="bahamut"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -335,9 +327,7 @@ AC_ARG_ENABLE(ircu, [ --enable-ircu - enable IRCu IRCD Support],
   yes)  
 dnl	AC_MSG_ERROR('Sorry IRCu support isnt complete yet')
 	AC_DEFINE(IRCU, 1, 'Enable IRCu Support')
-	IRCD_FILES_INC="protocol/ircu.h"
-	IRCD_FILES_SRC="protocol/ircu.c"
-	IRCD_FILES_OBJS="ircu.o"
+	PROTOCOL="ircu"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -352,9 +342,7 @@ AC_ARG_ENABLE(liquid, [ --enable-liquid - enable Liquid IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(LIQUID, 1, 'Enable Liquid IRCd Support')
-	IRCD_FILES_INC="protocol/liquid.h"
-	IRCD_FILES_SRC="protocol/liquid.c"
-	IRCD_FILES_OBJS="liquid.o"
+	PROTOCOL="liquid"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -370,9 +358,7 @@ AC_ARG_ENABLE(viagra, [ --enable-viagra - enable Viagra IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(VIAGRA, 1, 'Enable Viagra IRCd Support')
-	IRCD_FILES_INC="protocol/viagra.h"
-	IRCD_FILES_SRC="protocol/viagra.c"
-	IRCD_FILES_OBJS="viagra.o"
+	PROTOCOL="viagra"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -382,27 +368,14 @@ esac],
 AC_MSG_RESULT(no)
 )
 
-do_serviceroots=no
 AC_MSG_CHECKING(A compatible IRCD is specified)
-case "$IRCD_FILES_SRC" in 
-   "protocol/hybrid7.c")
-	AC_MSG_RESULT(yes)
-	AC_MSG_CHECKING(Auto-Enabling ServiceRoots Authentication Module)
-	do_serviceroots=yes
-	AC_DEFINE(EXTAUTH, 1, 'Use IRCD Authentication')
-	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
-	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
-	MODULES="$MODULES extauth"
-	AC_MSG_RESULT(OK)
-	;;
-   protocol*)
-	AC_MSG_RESULT(yes)
-	;;
-  *)
+if test "$PROTOCOL" = no; then
 	AC_MSG_RESULT(no)
 	AC_MSG_ERROR('You must define a IRCD to use. See ./configure --help for more information')
-	;;
-esac
+else
+	AC_MSG_RESULT(yes)
+fi
+
 if test "$do_serviceroots" = no; then
 	dnl check to see what type of authentication to use
 	AC_MSG_CHECKING(What type of Authentication to use...)
@@ -532,9 +505,7 @@ AC_DEFINE(POSIX_MALLOC_THRESHOLD,10)
 AC_SUBST(POSIX_MALLOC_THRESHOLD)
 AC_SUBST(UTF8)
 
-AC_SUBST(IRCD_FILES_SRC)
-AC_SUBST(IRCD_FILES_OBJS)
-AC_SUBST(IRCD_FILES_INC)
+AC_SUBST(PROTOCOL)
 AC_SUBST(MODULES)
 AC_SUBST(LIBS)
 AC_SUBST(EXTAUTH_SRC)
@@ -543,7 +514,7 @@ AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_CONFIG_HEADER(src/adns/config.h)
 AC_CONFIG_HEADER(src/pcre/config.h)
-AC_OUTPUT(src/Makefile.inc src/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile src/pcre/Makefile src/pcre.h:src/pcre/pcre.in)
+AC_OUTPUT(src/Makefile.inc src/Makefile src/protocol/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile src/pcre/Makefile src/pcre.h:src/pcre/pcre.in)
 NEO_SUBDIR_CONFIG(src/curl, [--disable-thread --disable-ipv6 --enable-nonblocking --without-ssl])
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"

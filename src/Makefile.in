@@ -10,41 +10,30 @@ ADNS_OBJS =	adns/check.o adns/event.o adns/general.o adns/parse.o adns/query.o \
 KEEPER_OBJS = keeper/kp_cache.o keeper/kp_dir.o keeper/kp_enum.o keeper/kp_get.o \
 		keeper/kp_iface.o keeper/kp_recur.o keeper/kp_set.o keeper/kp_sort.o \
 		keeper/kp_util.o
-@IRCD_FILES_OBJS@: @IRCD_FILES_SRC@
-OBJS = ${SRCS:.c=.o} @IRCD_FILES_OBJS@
+PROTOCOL_OBJS = protocol/@PROTOCOL@.o
+OBJS = ${SRCS:.c=.o} 
 SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
 		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
-		support.c ircstring.c commands.c transfer.c exclude.c match.c bans.c 
-		IRCDSRC = protocol/ultimate.c protocol/unreal.c protocol/hybrid7.c protocol/neoircd.c \
-		protocol/bahamut.c protocol/ircu.c protocol/mystic.c protocol/quantum.c \
-		protocol/liquid.c protocol/viagra.c
-IRCDINC = ${IRCDSRC:.c=.h}
+		support.c ircstring.c commands.c transfer.c exclude.c match.c bans.c 		
 
-INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h neostats.h \
+INCLUDES = config.h dl.h dotconf.h hash.h list.h neostats.h \
 		conf.h log.h support.h ircstring.h events.h numeric.h pcre.h \
 		transfer.h
 COREINCS = dns.h services.h sock.h ircd.h exclude.h \
 		ns_help.h timer.h users.h chans.h server.h bans.h
 BUILDFILES = *.in modules/Makefile modules/Makefile.inc.in
 
-DISTFILES = $(INCLUDES) $(COREINCS) $(SRCS) $(IRCDSRC) $(IRCDINC) \
-		$(BUILDFILES) 
+DISTFILES = $(INCLUDES) $(COREINCS) $(SRCS) $(BUILDFILES) 
  
-DISTLIBS = adns pcre curl sqlsrv keeper
+DISTLIBS = protocol adns pcre curl sqlsrv keeper
 DISTMOD = connectserv extauth hostserv loveserv moraleserv statserv template
 
-all: @buildsqlsrv@ libadns libkeeper libpcre libcurl.a neostats modules utils 
+all: @buildsqlsrv@ libs libcurl.a neostats modules utils 
 
-modules:
-	(cd modules; $(MAKE) $@)
-
-libadns:
+libs:
+	(cd protocol; $(MAKE))
 	(cd adns; $(MAKE))
-
-libkeeper:
 	(cd keeper; $(MAKE))
-
-libpcre:
 	(cd pcre; $(MAKE))
 
 libcurl.a:
@@ -53,6 +42,9 @@ libcurl.a:
 sqlsrvlib:
 	(cd sqlsrv; $(MAKE))
 
+modules:
+	(cd modules; $(MAKE) $@)
+
 utils:
 	(cd tools; $(MAKE) $@)
 
@@ -60,7 +52,7 @@ buildversion:
 	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
 
 neostats: buildversion $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) @sqlsrvbuild@ $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a @LIBDB@ $(EXTRA_LDFLAGS) -o $@
+	$(CC) $(LDFLAGS) $(OBJS) $(PROTOCOL_OBJS) @sqlsrvbuild@ $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a @LIBDB@ $(EXTRA_LDFLAGS) -o $@
 
 # include dependency info 
 @MAKEDEPENDENCIES@
@@ -92,7 +84,6 @@ distclean:
 install: neostats
 	$(INSTALL_DATA) $(INCLUDES) @prefix@/include
 	$(INSTALL_DATA) version.h @prefix@/include
-	$(INSTALL_DATA) @IRCD_FILES_INC@ @prefix@/include
 	(cd adns; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
 	(cd modules; $(MAKE) $@)

@@ -1,0 +1,35 @@
+include ../Makefile.inc
+
+INCLUDES = -I.. -I../adns
+
+IRCDSRC = ultimate.c unreal.c hybrid7.c neoircd.c bahamut.c ircu.c mystic.c \
+			quantum.c liquid.c viagra.c
+IRCDINC = ${IRCDSRC:.c=.h}
+SRCS = @PROTOCOL@.c
+OBJS = ${SRCS:.c=.o}
+
+DISTFILES = $(IRCDSRC) $(IRCDINC) $(BUILDFILES) 
+
+all: $(OBJS)
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDES) -c $<
+
+clean:
+	$(RM) *.o *.lo *.so *.a  *.exe config.h
+
+distclean:
+	$(RM) *.o *.lo *.so *.a  *.exe config.h
+
+depend:
+	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SRCS) > .depend
+
+install:
+	$(INSTALL_DATA) @PROTOCOL@.h $(INCDIRECTORY)
+
+dist:
+	@for file in $(DISTFILES); do \
+		cp -pr $$file $(DISTDIR)/$$file; \
+	done
+
+$(OBJS): Makefile ../Makefile.inc
