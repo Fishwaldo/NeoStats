@@ -616,7 +616,11 @@ m_nick (char *origin, char **argv, int argc, int srv)
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	do_topic (argv[0], origin, NULL, argv[argc-1]);
+	if(base64tonick(origin)) {
+		do_topic (argv[0], base64tonick(origin), NULL, argv[argc-1]);
+	} else if(base64toserver (origin)) {
+		do_topic (argv[0], base64toserver(origin), NULL, argv[argc-1]);
+	}
 }
 
 static void

@@ -550,54 +550,57 @@ init_user_hash ()
 	return NS_SUCCESS;
 }
 
+static void
+dumpuser (User* u)
+{
+	lnode_t *cm;
+	int i = 0;
+					          
+#ifdef BASE64NICKNAME
+	debugtochannel("User:     %s!%s@%s (%s)", u->nick, u->username, u->hostname, u->nick64);
+#else
+	debugtochannel("User:     %s!%s@%s", u->nick, u->username, u->hostname);
+#endif
+	debugtochannel("IP:       %lu.%lu.%lu.%lu", (unsigned long)((u->ipaddr.s_addr >> 24) & 255), (unsigned long)((u->ipaddr.s_addr >> 16) & 255), (unsigned long)((u->ipaddr.s_addr >> 8) & 255), (unsigned long)(u->ipaddr.s_addr & 255) );
+	debugtochannel("Vhost:    %s", u->vhost);
+#ifdef GOTUSERSMODES
+	debugtochannel("Flags:    0x%lx Modes: %s (0x%lx) Smodes: %lx", u->flags, u->modes, u->Umode, u->Smode);
+#else
+	debugtochannel("Flags:    0x%lx Modes: %s (0x%lx)", u->flags, u->modes, u->Umode);
+#endif
+
+	cm = list_first (u->chans);
+	while (cm) {
+		if(i==0) {
+			debugtochannel("Channels: %s", (char *) lnode_get (cm));
+		} else {
+			debugtochannel("          %s", (char *) lnode_get (cm));
+		}
+		cm = list_next (u->chans, cm);
+		i++;
+	}
+	debugtochannel("========================================");
+}
+
 void
 UserDump (const char *nick)
 {
 	User *u;
 	hnode_t *un;
-	lnode_t *cm;
 	hscan_t us;
 	SET_SEGV_LOCATION();
+	debugtochannel("================USERDUMP================");
 	if (!nick) {
-		debugtochannel("Users======================");
 		hash_scan_begin (&us, uh);
 		while ((un = hash_scan_next (&us)) != NULL) {
 			u = hnode_get (un);
-#ifdef GOTUSERSMODES
-			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx) Smodes %lx", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode, u->Smode);
-#else
-			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx)", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode);
-#endif
-#ifdef BASE64NICKNAME
-			debugtochannel("Base64: %s", u->nick64);
-#endif
-			debugtochannel("IP Address: %lu.%lu.%lu.%lu", (unsigned long)((u->ipaddr.s_addr >> 24) & 255), (unsigned long)((u->ipaddr.s_addr >> 16) & 255), (unsigned long)((u->ipaddr.s_addr >> 8) & 255), (unsigned long)(u->ipaddr.s_addr & 255) );
-
-			cm = list_first (u->chans);
-			while (cm) {
-				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
-				cm = list_next (u->chans, cm);
-			}
+			dumpuser (u);
 		}
 	} else {
 		un = hash_lookup (uh, nick);
 		if (un) {
 			u = hnode_get (un);
-#ifdef GOTUSERSMODES
-			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx) Smodes %lx", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode, u->Smode);
-#else
-			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx)", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode);
-#endif
-#ifdef BASE64NICKNAME
-			debugtochannel("Base64: %s", u->nick64);
-#endif
-			debugtochannel("IP Address: %lu.%lu.%lu.%lu", (unsigned long)((u->ipaddr.s_addr >> 24) & 255), (unsigned long)((u->ipaddr.s_addr >> 16) & 255), (unsigned long)((u->ipaddr.s_addr >> 8) & 255), (unsigned long)(u->ipaddr.s_addr & 255) );
-
-			cm = list_first (u->chans);
-			while (cm) {
-				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
-				cm = list_next (u->chans, cm);
-			}
+			dumpuser (u);
 		} else {
 			debugtochannel("UserDump: can't find user %s", nick);
 		}

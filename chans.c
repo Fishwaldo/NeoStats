@@ -743,13 +743,65 @@ join_chan (const char* nick, const char *chan)
  * @returns Nothing
 */
 
+static void 
+dumpchan (Chans* c)
+{
+	lnode_t *cmn;
+ 	Chanmem *cm;
+	char mode[10];
+	int i;
+	int j = 0;
+	int k = 0;
+	ModesParm *m;
+
+	bzero (mode, 10);
+	mode[0] = '+';
+	for (i = 0; i < ircd_cmodecount; i++) {
+		if (c->modes & chan_modes[i].mode) {
+			mode[++j] = chan_modes[i].flag;
+		}
+	}
+	debugtochannel("Channel:    %s", c->name);
+	debugtochannel("Mode:       %s tstime %ld", mode, (long)c->tstime);
+	debugtochannel("TopicOwner: %s TopicTime: %ld Topic: %s", c->topicowner, (long)c->topictime, c->topic);
+	debugtochannel("PubChan?:   %d", is_pub_chan (c));
+	debugtochannel("Flags:      %lx", c->flags);
+	cmn = list_first (c->modeparms);
+	while (cmn) {
+		m = lnode_get (cmn);
+		for (i = 0; i < ircd_cmodecount; i++) {
+			if (m->mode & chan_modes[i].mode) {
+				debugtochannel("Modes:      %c Parms %s", chan_modes[i].flag, m->param);
+			}
+		}
+		cmn = list_next (c->modeparms, cmn);
+	}
+	debugtochannel("Members:    %ld (List %d)", c->cur_users, (int)list_count (c->chanmembers));
+	cmn = list_first (c->chanmembers);
+	while (cmn) {
+		cm = lnode_get (cmn);
+		bzero (mode, 10);
+		j = 0;
+		mode[0] = '+';
+		for (i = 0; i < ircd_cmodecount; i++) {
+			if (cm->flags & chan_modes[i].mode) {
+				mode[++j] = chan_modes[i].flag;
+			}
+		}
+		debugtochannel("            %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->jointime);
+		cmn = list_next (c->chanmembers, cmn);
+	}
+	debugtochannel("========================================");
+}
+
 void
 ChanDump (const char *chan)
 {
 	hnode_t *cn;
-	lnode_t *cmn;
 	hscan_t sc;
 	Chans *c;
+
+	lnode_t *cmn;
  	Chanmem *cm;
 	char mode[10];
 	int i;
@@ -757,90 +809,20 @@ ChanDump (const char *chan)
 	ModesParm *m;
 
 	SET_SEGV_LOCATION();
+	debugtochannel("================CHANDUMP================");
 	if (!chan) {
 		debugtochannel("Channels %d", (int)hash_count (ch));
 		hash_scan_begin (&sc, ch);
 		while ((cn = hash_scan_next (&sc)) != NULL) {
 			c = hnode_get (cn);
-			debugtochannel("====================");
-			bzero (mode, 10);
-			mode[0] = '+';
-			for (i = 0; i < ircd_cmodecount; i++) {
-				if (c->modes & chan_modes[i].mode) {
-					mode[++j] = chan_modes[i].flag;
-				}
-			}
-			debugtochannel("Channel: %s Members: %ld (List %d) Flags %s tstime %ld", c->name, c->cur_users, (int)list_count (c->chanmembers), mode, (long)c->tstime);
-			debugtochannel("       Topic Owner %s, TopicTime: %ld, Topic %s", c->topicowner, (long)c->topictime, c->topic);
-			debugtochannel("PubChan?: %d", is_pub_chan (c));
-			debugtochannel("Channel Flags %lx", c->flags);
-			cmn = list_first (c->modeparms);
-			while (cmn) {
-				m = lnode_get (cmn);
-				for (i = 0; i < ircd_cmodecount; i++) {
-					if (m->mode & chan_modes[i].mode) {
-						debugtochannel("        Modes: %c Parms %s", chan_modes[i].flag, m->param);
-					}
-				}
-
-				cmn = list_next (c->modeparms, cmn);
-			}
-			cmn = list_first (c->chanmembers);
-			while (cmn) {
-				cm = lnode_get (cmn);
-				bzero (mode, 10);
-				j = 0;
-				mode[0] = '+';
-				for (i = 0; i < ircd_cmodecount; i++) {
-					if (cm->flags & chan_modes[i].mode) {
-						mode[++j] = chan_modes[i].flag;
-					}
-				}
-				debugtochannel("Members: %s Modes %s Joined %ld", cm->nick, mode, (long)cm->jointime);
-				cmn = list_next (c->chanmembers, cmn);
-			}
+			dumpchan(c);
 		}
 	} else {
 		c = findchan (chan);
-		if (!c) {
-			debugtochannel("ChanDump: can't find channel %s", chan);
+		if (c) {
+			dumpchan(c);
 		} else {
-			bzero (mode, 10);
-			j = 0;
-			mode[0] = '+';
-			for (i = 0; i < ircd_cmodecount; i++) {
-				if (c->modes & chan_modes[i].mode) {
-					mode[++j] = chan_modes[i].flag;
-				}
-			}
-			debugtochannel("Channel: %s Members: %ld (List %d) Flags %s tstime %ld", c->name, c->cur_users, (int)list_count (c->chanmembers), mode, (long)c->tstime);
-			debugtochannel("       Topic Owner %s, TopicTime: %ld Topic %s", c->topicowner, (long)c->topictime, c->topic);
-			debugtochannel("PubChan?: %d", is_pub_chan (c));
-			debugtochannel("Channel Flags %lx", c->flags);
-			cmn = list_first (c->modeparms);
-			while (cmn) {
-				m = lnode_get (cmn);
-				for (i = 0; i < ircd_cmodecount; i++) {
-					if (m->mode & chan_modes[i].mode) {
-						debugtochannel("        Modes: %c Parms %s", chan_modes[i].flag, m->param);
-					}
-				}
-				cmn = list_next (c->modeparms, cmn);
-			}
-			cmn = list_first (c->chanmembers);
-			while (cmn) {
-				cm = lnode_get (cmn);
-				bzero (mode, 10);
-				mode[0] = '+';
-				j = 0;
-				for (i = 0; i < ircd_cmodecount; i++) {
-					if (cm->flags & chan_modes[i].mode) {
-						mode[++j] = chan_modes[i].flag;
-					}
-				}
-				debugtochannel("Members: %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->jointime);
-				cmn = list_next (c->chanmembers, cmn);
-			}
+			debugtochannel("ChanDump: can't find channel %s", chan);
 		}
 	}
 }

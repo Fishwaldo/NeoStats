@@ -174,14 +174,19 @@ ServerDump (void)
 	hscan_t ss;
 	hnode_t *sn;
 
-	debugtochannel("Server Listing:");
+	debugtochannel("================SERVDUMP================");
 	hash_scan_begin (&ss, sh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		debugtochannel("Server Entry: %s Flags: %lx", s->name, s->flags);
-		debugtochannel("uplink: %s", s->uplink);
+#ifdef BASE64SERVERNAME
+		debugtochannel("Server: %s (%s)", s->name, s->name64);
+#else
+		debugtochannel("Server: %s", s->name);
+#endif
+		debugtochannel("Flags:  %lx", s->flags);
+		debugtochannel("Uplink: %s", s->uplink);
+		debugtochannel("========================================");
 	}
-	debugtochannel("End of Listing.");
 }
 
 #ifdef SQLSRV
