@@ -601,6 +601,8 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 	}
 	if(av[0][0] == '#') {
 		bot_chan_message (origin, argv, argc);
+		/* we need this to fool the check below */
+		ret = NS_FAILURE;
 	} else {
 		ret = bot_message (origin, argv, argc);
 	}
