@@ -29,8 +29,6 @@
 #include "log.h"
 #include "ms_help.c"
 
-const char msversion_date[] = __DATE__;
-const char msversion_time[] = __TIME__;
 char *s_MoraleServ;
 static void ms_hail(User * u, char *cmd, char *m);
 static void ms_ode(User * u, char *cmd, char *m);
@@ -43,24 +41,24 @@ static void ms_behappy(User * u, char *cmd);
 static void ms_wonderful(User * u, char *cmd);
 static int new_m_version(char *origin, char **av, int ac);
 
-
-Module_Info my_info[] = { {
-			   "MoraleServ",
-			   "A Network Morale Service",
-			   "2.21"}
+ModuleInfo __module_info = {
+   "MoraleServ",
+   "A Network Morale Service",
+   "2.21",
+	__DATE__,
+	__TIME__
 };
-
 
 int new_m_version(char *origin, char **av, int ac)
 {
 	snumeric_cmd(351, origin,
 		     "Module MoraleServ Loaded, Version: %s %s %s",
-		     my_info[0].module_version, msversion_date,
-		     msversion_time);
+			 __module_info.module_version, __module_info.module_build_date,
+			 __module_info.module_build_time);
 	return 0;
 }
 
-Functions my_fn_list[] = {
+Functions __module_functions[] = {
 	{MSG_VERSION, new_m_version, 1}
 	,
 #ifdef HAVE_TOKEN_SUP
@@ -237,39 +235,23 @@ int Online(char **av, int ac)
 {
 	if (init_bot
 	    (s_MoraleServ, "MS", me.name, "A Network Morale Service",
-	     "+oS", my_info[0].module_name) == -1) {
+	     "+oS", __module_info.module_name) == -1) {
 		/* Nick was in use */
 		s_MoraleServ = strcat(s_MoraleServ, "_");
 		init_bot(s_MoraleServ, "MS", me.name,
 			 "A Network Morale Service", "+oS",
-			 my_info[0].module_name);
+			 __module_info.module_name);
 	}
 	return 1;
 };
 
 
-EventFnList my_event_list[] = {
+EventFnList __module_events[] = {
 	{"ONLINE", Online}
 	,
 	{NULL, NULL}
 };
 
-
-
-Module_Info *__module_get_info()
-{
-	return my_info;
-};
-
-Functions *__module_get_functions()
-{
-	return my_fn_list;
-};
-
-EventFnList *__module_get_events()
-{
-	return my_event_list;
-};
 
 int __ModInit(int modnum, int apiver)
 {
@@ -405,7 +387,7 @@ static void ms_version(User * u)
 	prefmsg(u->nick, s_MoraleServ, "\2%s Version Information\2",
 		s_MoraleServ);
 	prefmsg(u->nick, s_MoraleServ, "%s Version: %s - running on: %s",
-		s_MoraleServ, my_info[0].module_version, me.name);
+		s_MoraleServ, __module_info.module_version, me.name);
 	prefmsg(u->nick, s_MoraleServ,
 		"%s Author: ^Enigma^ <enigma@neostats.net>", s_MoraleServ);
 	prefmsg(u->nick, s_MoraleServ,

@@ -3,6 +3,7 @@ MoraleServ ChangeLog - Anything we add/remove/fix/change is in here (even our ra
 * MoraleServ * M * Version 2.21
  - Help text cleanup (M)
  - Added ABOUT command (M)
+ - Changed to use new module export API (M)
 
 * MoraleServ * Fish * Version 2.20
  - Moved to new Logging Functions
