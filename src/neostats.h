@@ -498,11 +498,11 @@ typedef struct User {
 	time_t TS;
 	time_t servicestamp;
 	char modes[MODESIZE];
-	long Umode;
-	long Smode;
+	unsigned int Umode;
+	unsigned int Smode;
 	int ulevel;
 	list_t *chans;
-	long flags;
+	unsigned int flags;
 	void *moddata[NUM_MODULES];
 } User;
 
@@ -513,7 +513,7 @@ typedef struct Channel {
 	char name[MAXCHANLEN];
 	char name64[B64SIZE];
 	long users;
-	long modes;
+	unsigned int modes;
 	list_t *chanmembers;
 	char topic[BUFSIZE];
 	char topicowner[MAXHOST];	/* because a "server" can be a topic owner */
@@ -522,7 +522,7 @@ typedef struct Channel {
 	char key[KEYLEN];
 	list_t *modeparms;
 	time_t creationtime;
-	long flags;
+	unsigned int flags;
 	void *moddata[NUM_MODULES];
 } Channel;
 
