@@ -532,3 +532,9 @@
 /* Define to empty if the keyword `volatile' does not work. Warning: valid
    code using `volatile' can become incorrect without. Disable with care. */
 #undef volatile
+
+/* Define if we have va_copy. */
+#undef HAVE_VA_COPY
+
+/* Define if we have __va_copy. */
+#undef HAVE___VA_COPY

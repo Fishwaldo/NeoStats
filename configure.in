@@ -12,7 +12,7 @@ AC_CACHE_LOAD
 #Standard Defines for autoconf here
 x_maj=3
 x_min='0'
-x_rev="a1"
+x_rev="a2-dev"
 x_package='NeoStats'
 MODULES="connectserv hostserv loveserv moraleserv statserv ircdauth extauth"
 #dont edit anything after this line!
@@ -226,6 +226,23 @@ dnl check for berkeley db support
 AC_CHECK_HEADER(db.h, AC_DEFINE(HAVE_DB_H, 1, [Define to 1 if you have the <db.h> header file.])
 				AC_CHECK_LIB(db, db_create, LIBDB="-ldb"))
 
+
+dnl How to copy one va_list to another?
+AC_CACHE_CHECK([for va_copy], unet_cv_c_va_copy, [AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);])],
+  [unet_cv_c_va_copy="yes"],
+  [unet_cv_c_va_copy="no"]
+)])
+if test "$unet_cv_c_va_copy" = "yes" ; then
+  AC_DEFINE(HAVE_VA_COPY, 1, [Define if we have va_copy]) fi
+
+AC_CACHE_CHECK([for __va_copy], unet_cv_c___va_copy, [AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([#include <stdarg.h>], [va_list ap1, ap2; __va_copy(ap1, ap2);])],
+  [unet_cv_c___va_copy="yes"],
+  [unet_cv_c___va_copy="no"]
+)])
+if test "$unet_cv_c___va_copy" = "yes" ; then
+  AC_DEFINE(HAVE___VA_COPY, 1, [Define if we have __va_copy]) fi
 
 dnl check if we are running with Debug....
 AC_MSG_CHECKING(Whether to Enable Debuging...)

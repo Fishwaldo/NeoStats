@@ -421,7 +421,7 @@
 #define RETSIGTYPE void
 
 /* "Revision Version Number" */
-#define REV "a1"
+#define REV "a2-dev"
 
 /* Define to the type of arg 1 for `select'. */
 #define SELECT_TYPE_ARG1 int
@@ -459,7 +459,7 @@
 /* #undef USE_RAW */
 
 /* "Full Version" */
-#define VERSION "3.0.a1"
+#define VERSION "3.0.a2-dev"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */
@@ -506,6 +506,12 @@
 /* Define to empty if the keyword `volatile' does not work. Warning: valid
    code using `volatile' can become incorrect without. Disable with care. */
 /* #undef volatile */
+
+/* Define if we have va_copy. */
+/* #undef HAVE_VA_COPY */
+
+/* Define if we have __va_copy. */
+/* #undef HAVE___VA_COPY */
 
 /* Additional Win32 specifics */
 #define strcasecmp stricmp 

@@ -142,6 +142,15 @@ char *LANGgettext( const char *string, int mylang );
 #define __attribute__(x)  /* NOTHING */
 #endif /* __GNUC__ */
 
+/* va_copy handling*/
+#ifndef HAVE_VA_COPY
+#if HAVE___VA_COPY 
+#define va_copy(dest, src) __va_copy(dest, src) 
+#else /* HAVE___VA_COPY */
+#define va_copy(dest, src) memcpy(&(dest), &(src), sizeof(dest)) 
+#endif /* HAVE___VA_COPY */ 
+#endif /* HAVE_VA_COPY */
+
 #include "pcre.h"
 #include "adns.h"
 #include "list.h"
