@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.8 2002/03/11 08:02:40 fishwaldo Exp $
+** $Id: chans.c,v 1.9 2002/03/12 07:56:02 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -182,6 +182,7 @@ void part_chan(User *u, char *chan) {
 
 void change_user_nick(Chans *c, char *newnick, char *oldnick) {
 	lnode_t *cm;
+	Chanmem *cml;
 	strcpy(segv_location, "change_user_nick");
 	cm = list_find(c->chanmembers, oldnick, comparef);
 	if (!cm) {
@@ -193,8 +194,12 @@ void change_user_nick(Chans *c, char *newnick, char *oldnick) {
 		}
 		return;
 	} else {
-		lnode_destroy(list_delete(c->chanmembers, cm));
-		list_append(c->chanmembers, lnode_create(newnick));
+#ifdef DEBUG
+		log("Change_User_Nick(): NewNick %s, OldNick %s", newnick, oldnick);
+#endif
+		cml = lnode_get(cm);
+		strcpy(cml->nick, newnick);
+		chandump(c->name);
 	}		
 }
 
@@ -203,7 +208,7 @@ void change_user_nick(Chans *c, char *newnick, char *oldnick) {
 
 void join_chan(User *u, char *chan) {
 	Chans *c;
-	lnode_t *un;
+	lnode_t *un, *cn;
 	Chanmem *cm;
 	strcpy(segv_location, "join_chan");
 	if (!u) {
@@ -225,7 +230,7 @@ void join_chan(User *u, char *chan) {
 	strcpy(cm->nick, u->nick);
 	cm->joint = time(NULL);
 	cm->flags = 0;
-	un = lnode_create(cm);	
+	cn = lnode_create(cm);	
 #ifdef DEBUG
 	log("adding usernode %s to Channel %s", u->nick, chan);
 #endif
@@ -241,7 +246,7 @@ void join_chan(User *u, char *chan) {
 	if (list_isfull(c->chanmembers)) {
 		log("ekk, Channel %s Members list is full", c->name);
 	} else {
-		list_append(c->chanmembers, un);
+		list_append(c->chanmembers, cn);
 	}
 	c->cur_users++;
 	un = lnode_create(c->name);

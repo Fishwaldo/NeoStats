@@ -1,9 +1,9 @@
-/* NeoStats - IRC Statistical Services Copryight (c) 1999-2001 NeoStats Group.
+/* NeoStats - IRC Statistical Services Copryight (c) 1999-2002 NeoStats Group.
 *
 ** Module: NeoServ
 ** Description: Network Village Idiot Help System
-** Version: 1.2
-** Date:    23/12/2001
+** Version: 1.3
+** Date:    08/03/2002
 ** Author: ^Enigma^
 */
 
@@ -131,7 +131,8 @@ const char *neoserv_help_topic7[] = {
 "",
 "Personally, we use the Unreal IRCD and Epona Services.",
 "NeoStats will work on some other IRCDs and will get on well",
-"with other services such as DaylightII.",
+"with other services such as DaylightII. NeoStats-2.5 is",
+"planned to support the Ultimate, Hybrid and Bahmut IRCDs.",
 "",
 NULL
 };
@@ -140,11 +141,12 @@ const char *neoserv_help_topic8[] = {
 "\2TOPIC8\2 - What OS Will NeoStats Run on?",
 "",
 "NeoStats runs best under any Linux/Unix Based Enivornment.",
-"NeoStats does not run under some BDS... email the NeoStats",
-"team for more information if you fall into this category.",
-"Our email address is: support@neostats.net",
+"NeoStats-2.0.13 does not run under some BSDs, however a patch",
+"for this was created and the NeoStats forums should be looked",
+"at for more information on this. NeoStats-2.5 will support",
+"BSDs.",
 "",
-"NeoStats will not run under the MAC environment",
+"NeoStats will not run under the MAC or Windows environment",
 "",
 NULL
 };
@@ -171,7 +173,7 @@ const char *neoserv_help_topic10[] = {
 "be op'ed in the Services channel to function properly.",
 "",
 "The second senario is a NeoStats/Services flood to a",
-"much greater extent than a simple op/deop 'war'."
+"much greater extent than a simple op/deop 'war'.",
 "If your conflict is more serious than this occurance,",
 "your problem is that you do not have U: lines in your",
 "network IRCDS. Please add U: lines for the stats servers",
@@ -185,14 +187,17 @@ const char *neoserv_help_topic11[] = {
 "\2TOPIC11\2 - Whats New in NeoStats?",
 "",
 "The current development version of NeoStats is",
-"NeoStats Version 2.1. The new version which is currently",
+"NeoStats Version 2.5. The new version which is currently",
 "in beta development fixes a number of issues that have",
 "come to our attention such as statserv crashing NeoStats",
 "when NeoStats is loaded. The new code has undergone some",
 "major developments such as the complete re-coding of some",
 "'questionable' routines in terms of stability. The team is",
 "also proud to announce the releasing of a number of new",
-"modules as well as updates to some of our older ones",
+"modules as well as updates to some of our older ones.",
+"One of the noteable differences is a new core in the",
+"NeoStats-2.5. Older modules will not work for the new",
+"version of NeoStats.",
 "",
 "An improved StatServ is now avaliable which combines all",
 "the requests that users have given us for feautres. We are",
@@ -203,19 +208,26 @@ const char *neoserv_help_topic11[] = {
 "MoraleServ and greater accuracy and stability in terms of",
 "Statserv.",
 "",
-"The Team's main target at the moment is monitoring NeoStats'",
-"stability as well as doing the things on our 'TODO' list.",
-"These include things such as fixing RESTART and implementing",
-"RELOAD. We are busier than ever on version 2.1 and we are",
-"working hard at it... as well as maintaing some sort of a life",
+"The Team's main target at the moment is completeing many",
+"items on the 'TODO' list as well as 'overhauling' and",
+"cleaning up large amounts of code. The second target",
+"that we are working on at present is the stability",
+"issues to make the NeoStats-2.5 release the most stable",
+"release yet.",
+"",
+"Some things on our 'TODO' list. include trivial things such",
+"as fixing RESTART and implementing RELOAD. Other items include",
+"a new type of 'access' system similar to services 'operator' and",
+"and 'roots' lists. We are busier than ever on version 2.5 and we",
+"are working hard at it... as well as maintaing some sort of a life",
 "away from our crackhead code :P j/k.",
 "",
-"We anticipate version 2.1 to be our most stable and best in",
+"We anticipate version 2.5 to be our most stable and best in",
 "terms of features. We have no idea when it will be ready at",
 "this stage, but if your on our mailing list we'll let you know",
 ":P",
 "",
-"The NeoStats Group Inc."
+"The NeoStats Group Inc.",
 "",
 "Don't smoke crack. We really mean it this time :P",
 "",
@@ -282,9 +294,9 @@ const char *neoserv_help_topic13[] = {
 "to replace the Epona services currently used and be fully",
 "intergrated with NeoStats. During this design a module with",
 "multiple nick's was deisgned and so was a patch to the API",
-"which enabled this feature. As of now, this patch has not",
-"been released... but the team is looking at releasing it",
-"once the Channel Services have been released.",
+"which enabled this feature. At this stage there are no plans",
+"to release the multiple nicks API, but rather intergate it",
+"into the NeoStats-2.5 release.",
 "",
 NULL
 };
@@ -347,6 +359,12 @@ const char *neoserv_help_topic17[] = {
 "We have heard of a case where the flags were correct for the",
 "irc-operator and the NeoStats were correct... but the network",
 "had recently upgraded from Unreal-3.1.1 to Unreal3.2",
+"",
+"The development of NeoStats-2.5 will fix this problem as we are",
+"now working on a new system independent of flags. The new system",
+"is based around the idea of services 'operator' and 'root' lists.",
+"We belive this will reduce the number of problems encountered",
+"when changes are made to the various ircds.",
 "",
 NULL
 };
@@ -413,7 +431,7 @@ const char *neoserv_help_topic22[] = {
 "The NeoStats team has considered porting a windows platform",
 "of NeoStats on many occasions. At this stage we feel that",
 "we will create a windows version from the release that is",
-"due out shortly (NeoStats-2.1). We are currently in the",
+"due out shortly (NeoStats-2.5). We are currently in the",
 "process of fine-tuning and debugging the new and old code",
 "of NeoStats. However, don't be surprised if no windows",
 "version is available until a few releases later. Once we",
@@ -445,6 +463,16 @@ const char *neoserv_help_topic23[] = {
 "that you first upgrade to version 2.0.13 then install the new",
 "modules which you have downloaded.",
 "",
+"However, recently the team decided to make a large number of",
+"changes to NeoStats, causing the development version",
+"NeoStats-2.1 to be incremented to NeoStats-2.5. In doing this,",
+"code used for the modules was slightly modified and therefore",
+"the older modules will not work on the new version of NeoStats.",
+"A few of the modules on the web site at present are intended for",
+"use with the older development version NeoStats-2.1, but may",
+"work with NeoStats-2.0.13. If errors are incured with the new",
+"versions from the website it is probably due to this fact.",
+"",
 "If you get an '-LDL' error, see 'TOPIC1' for help on this matter.",
 "",
 NULL
@@ -453,15 +481,15 @@ NULL
 const char *neoserv_help_topic24[] = {
 "\2TOPIC24 - NeoStats Beta Testers Note",
 "",
-"Welcome to the Beta preview of NeoStats-2.1, the next",
+"Welcome to the Beta preview of NeoStats-2.5, the next",
 "generation of statistical software from the NeoStats Group Inc.",
 "",
 "Here's what you should expect when downloading this beta:",
 "",
-"NeoStats-2.1 is a beta which may contain bugs, we recommend",
-"that you install NeoStats-2.1 in it's own folder rather than",
+"NeoStats-2.5 is a beta which may contain bugs, we recommend",
+"that you install NeoStats-2.5 in it's own folder rather than",
 "overwrite the NeoStats 2.x installation that you currently",
-"have. If you have a previous version of NeoStats-2.1 you",
+"have. If you have a previous version of NeoStats-2.5 you",
 "should delete it and do a fresh install of the next Beta release.",
 "The software has several, major known issues, which prevent",
 "certain features from being fully usable by NeoStats users.",
@@ -480,7 +508,7 @@ const char *neoserv_help_topic24[] = {
 "by email in a report fashion:",
 "http://www.neostats.net/cgi-bin/Forum.cgi or support@neostats.net",
 "",
-"With that said, we hope you enjoy using NeoStats-2.1!",
+"With that said, we hope you enjoy using NeoStats-2.5!",
 "",
 NULL
 };

@@ -1,8 +1,8 @@
-/* NeoStats - IRC Statistical Services Copryight (c) 1999-2001 NeoStats Group.
+/* NeoStats - IRC Statistical Services Copryight (c) 1999-2002 NeoStats Group.
 *
 ** Module:  MoraleServ
 ** Description:  Network Morale Service
-** Version: 2.1
+** Version: 2.17
 ** Author: ^Enigma^
 */
 

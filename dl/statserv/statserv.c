@@ -1,12 +1,12 @@
-/* NeoStats - IRC Statistical Services Copyright (c) 1999-2001 NeoStats Group Inc.
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
 ** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
 *
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NeoStats Identification:
 ** ID:      statserv.c, 
-** Version: 3.0
-** Date:    21/12/2001
+** Version: 3.1
+** Date:    08/03/2002
 */
 
 #include <stdio.h>
@@ -103,7 +103,7 @@ static config_option options[] = {
 
 
 int new_m_version(char *av, char *tmp) {
-    segv_location = sstrdup("StatServ-new_m_version");
+    strcpy(segv_location, "StatServ-new_m_version");
     snumeric_cmd(351, av, "Module StatServ Loaded, Version: %s %s %s",Statserv_Info[0].module_version,version_date,version_time);
     return 0;
 }
@@ -113,7 +113,7 @@ void _init() {
    User *u;
    hnode_t *node;
    hscan_t scan;
-   segv_location = sstrdup("StatServ-_init");
+   strcpy(segv_location, "StatServ-_init");
 
     synced = 0;
     globops(me.name, "StatServ Module Loaded");    
@@ -146,7 +146,7 @@ void _fini() {
 }
 
 int s_new_server(Server *s) {
-    segv_location = sstrdup("StatServ-s_new_server");
+    strcpy(segv_location, "StatServ-s_new_server");
 
     AddStats(s);
     IncreaseServers();
@@ -167,7 +167,7 @@ int s_new_server(Server *s) {
 static int s_del_server(Server *s) {
     SStats *ss;
 
-    segv_location = sstrdup("StatServ-s_del_server");
+    strcpy(segv_location, "StatServ-s_del_server");
 
     DecreaseServers();
     if (synced) notice(s_StatServ, "\2SERVER\2 %s has left the Network at %s", s->name, s->uplink);
@@ -187,7 +187,7 @@ static int s_user_kill(User *u) {
     log(" Server %s", u->server->name);
 #endif
 
-    segv_location = sstrdup("StatServ-s_user_kill");
+    strcpy(segv_location, "StatServ-s_user_kill");
 
     s=findstats(u->server->name);
     if (UserLevel(u) >= 40) {
@@ -220,7 +220,7 @@ static int s_user_modes(User *u) {
     char *modes;
     SStats *s;
 
-    segv_location = sstrdup("StatServ-s_user_modes");
+    strcpy(segv_location, "StatServ-s_user_modes");
 
 
     if (!u) {
@@ -298,7 +298,7 @@ static int s_user_modes(User *u) {
 }
 
 void re_init_bot() {
-    segv_location = sstrdup("StatServ-re_init_bot");
+    strcpy(segv_location, "StatServ-re_init_bot");
 
     notice(s_Services, "Re-Initilizing %s Bot", s_StatServ);
     init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oikSdwgle", Statserv_Info[0].module_name);
@@ -325,7 +325,7 @@ static int s_del_user(User *u) {
 
 
 static int s_user_away(User *u) {
-    segv_location = sstrdup("StatServ-s_user_away");
+    strcpy(segv_location, "StatServ-s_user_away");
 
 
     if (u->is_away) {
@@ -346,7 +346,7 @@ static int s_new_user(User *u) {
     
 if (u->server->name == me.name) return 0;
 
-    segv_location = sstrdup("StatServ-s_new_user");
+    strcpy(segv_location, "StatServ-s_new_user");
 
     s = findstats(u->server->name);
 
@@ -381,7 +381,7 @@ if (u->server->name == me.name) return 0;
 int pong(Server *s) {
     SStats *ss;
 
-    segv_location = sstrdup("StatServ-pong");
+    strcpy(segv_location, "StatServ-pong");
 
 
     /* we don't want negative pings! */
@@ -418,7 +418,7 @@ int pong(Server *s) {
 
 int Online(Server *s) {
 
-    segv_location = sstrdup("StatServ-Online");
+    strcpy(segv_location, "StatServ-Online");
 
 
    memcpy(StatServ.user, Servbot.user, 8);
@@ -449,7 +449,7 @@ int Online(Server *s) {
 
 void ss_cb_Config(char *arg, int configtype) {
 
-    segv_location = sstrdup("StatServ-ss_cb_Config");
+    strcpy(segv_location, "StatServ-ss_cb_Config");
 
 
     if (configtype == 0) {
@@ -472,7 +472,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 {
     User *u;
 
-    segv_location = sstrdup("StatServ-__Bot_Message");
+    strcpy(segv_location, "StatServ-__Bot_Message");
 
 
     u = finduser(origin);
@@ -603,7 +603,7 @@ void Is_Midnight() {
     struct tm *ltm = localtime(&current);
     TLD *t;
 
-    segv_location = sstrdup("StatServ-Is_Midnight");
+    strcpy(segv_location, "StatServ-Is_Midnight");
 
 
     if (ltm->tm_hour == 0) {
@@ -626,7 +626,7 @@ void Is_Midnight() {
 static void ss_tld_map(User *u) {
     TLD *t;
     
-    segv_location = sstrdup("StatServ-ss_tld_map");
+    strcpy(segv_location, "StatServ-ss_tld_map");
 
 
     privmsg(u->nick, s_StatServ, "Top Level Domain Statistics:");
@@ -639,7 +639,7 @@ static void ss_tld_map(User *u) {
 
 static void ss_version(User *u)
 {
-    segv_location = sstrdup("StatServ-ss_version");
+    strcpy(segv_location, "StatServ-ss_version");
 
         privmsg(u->nick, s_StatServ, "\2StatServ Version Information\2");
         privmsg(u->nick, s_StatServ, "-------------------------------------");
@@ -649,7 +649,7 @@ static void ss_version(User *u)
 }
 static void ss_netstats(User *u) {
 
-    segv_location = sstrdup("StatServ-ss_netstats");
+    strcpy(segv_location, "StatServ-ss_netstats");
 
     privmsg(u->nick, s_StatServ, "Network Statistics:-----");
     privmsg(u->nick, s_StatServ, "Current Users: %ld", stats_network.users);
@@ -663,7 +663,7 @@ static void ss_netstats(User *u) {
 }
 static void ss_daily(User *u) {
 
-    segv_location = sstrdup("StatServ-ss_daily");
+    strcpy(segv_location, "StatServ-ss_daily");
 
     privmsg(u->nick, s_StatServ, "Daily Network Statistics:");
     privmsg(u->nick, s_StatServ, "Maximum Servers: %-2d %s", daily.servers, sftime(daily.t_servers));
@@ -677,7 +677,7 @@ static void ss_map(User *u) {
     SStats *ss;
     Server *s;
 
-    segv_location = sstrdup("StatServ-ss_map");
+    strcpy(segv_location, "StatServ-ss_map");
 
 
     privmsg(u->nick, s_StatServ, "%-23s %-10s %-10s %-10s", "\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2",  "\2[LAG/MAX]\2");
@@ -693,7 +693,7 @@ static void ss_server(User *u, char *server) {
     SStats *ss;
     Server *s;
 
-    segv_location = sstrdup("StatServ-ss_server");
+    strcpy(segv_location, "StatServ-ss_server");
 
 
     if (!server) {
@@ -740,7 +740,7 @@ static void ss_tld(User *u, char *tld)
 {
     TLD *tmp;
 
-    segv_location = sstrdup("StatServ-ss_tld");
+    strcpy(segv_location, "StatServ-ss_tld");
 
 
     if (!tld) {
@@ -773,7 +773,7 @@ static void ss_operlist(User *origuser, char *flags, char *server)
     hscan_t scan;
     hnode_t *node;
 
-    segv_location = sstrdup("StatServ-ss_operlist");
+    strcpy(segv_location, "StatServ-ss_operlist");
 
 
     if (!flags) {
@@ -827,7 +827,7 @@ static void ss_botlist(User *origuser)
         register User *u;
 	hscan_t scan;
 	hnode_t *node;
-        segv_location = sstrdup("StatServ-ss_botlist");
+        strcpy(segv_location, "StatServ-ss_botlist");
 
 
         privmsg(origuser->nick, s_StatServ, "On-Line Bots:");
@@ -852,7 +852,7 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 {
     SStats *st;
 
-    segv_location = sstrdup("StatServ-ss_stats");
+    strcpy(segv_location, "StatServ-ss_stats");
 
 
     if (UserLevel(u) < 190) {
@@ -941,7 +941,7 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 static void ss_reset(User *u)
 {
 
-    segv_location = sstrdup("StatServ-ss_reset");
+    strcpy(segv_location, "StatServ-ss_reset");
 
 
         if (UserLevel(u) < 190) {
@@ -960,7 +960,7 @@ static void ss_reset(User *u)
 static void ss_JOIN(User *u, char *chan)
 {
 
-    segv_location = sstrdup("StatServ-ss_JOIN");
+    strcpy(segv_location, "StatServ-ss_JOIN");
 
 
     if (UserLevel(u) < 190) {
@@ -985,7 +985,7 @@ void DelTLD(User *u) {
     TLD *t = NULL;
     char *m;
 
-    segv_location = sstrdup("StatServ-DelTLD");
+    strcpy(segv_location, "StatServ-DelTLD");
     
 
     m = strrchr(u->hostname, '.');
@@ -1014,7 +1014,7 @@ TLD *findtld(char *tld)
 {
     TLD *t;
 
-    segv_location = sstrdup("StatServ-findtld");
+    strcpy(segv_location, "StatServ-findtld");
 
 
     for (t = tldhead; t; t = t->next) {
@@ -1030,7 +1030,7 @@ TLD *AddTLD(User *u)
     TLD *t = NULL;
     char *m;
 
-    segv_location = sstrdup("StatServ-AddTLD");
+    strcpy(segv_location, "StatServ-AddTLD");
 
     m = strrchr(u->hostname, '.');
 
@@ -1064,7 +1064,7 @@ void LoadTLD()
     char *tmp = NULL, *tmp2 = NULL;
     TLD *t;
 
-    segv_location = sstrdup("StatServ-LoadTLD");
+    strcpy(segv_location, "StatServ-LoadTLD");
 
 
     if ((fp = fopen("data/tlds.nfo", "r")) == NULL) {
@@ -1103,7 +1103,7 @@ void init_tld()
 {
     TLD *t;
 
-    segv_location = sstrdup("StatServ-init_tld");
+    strcpy(segv_location, "StatServ-init_tld");
 
 
     for (t = tldhead; t; t = t->next) {
@@ -1119,7 +1119,7 @@ static SStats *new_stats(const char *name)
     log("new_stats(%s)", name);
 #endif
 
-    segv_location = sstrdup("StatServ-SStats");
+    strcpy(segv_location, "StatServ-SStats");
 
 
     if (!s) {
@@ -1163,7 +1163,7 @@ void AddStats(Server *s)
 {
     SStats *st = findstats(s->name);
     log("add stats 1");
-    segv_location = sstrdup("StatServ-AddStats");
+    strcpy(segv_location, "StatServ-AddStats");
 
 
 #ifdef DEBUG
@@ -1183,7 +1183,7 @@ SStats *findstats(char *name)
 #ifdef DEBUG
     log("findstats(%s)", name);
 #endif
-    segv_location = sstrdup("StatServ-findstats");
+    strcpy(segv_location, "StatServ-findstats");
 
     for (t = Shead; t; t = t->next) {
 
@@ -1201,7 +1201,7 @@ void SaveStats()
     FILE *fp = fopen("data/stats.db", "w");
     SStats *s;
 
-    segv_location = sstrdup("StatServ-SaveStats");
+    strcpy(segv_location, "StatServ-SaveStats");
 
 
     if (!fp) {
@@ -1237,7 +1237,7 @@ void LoadStats()
         *maxopers, *t_maxopers, *lastseen, *starttime,
         *operkills, *serverkills, *totusers;
 
-    segv_location = sstrdup("StatServ-LoadStats");
+    strcpy(segv_location, "StatServ-LoadStats");
 
 
     if (fp) {
@@ -1318,7 +1318,7 @@ static void ss_htmlsettings(User *u, char *cmd, char *m) {
     FILE *ht;
 
     /* Approximate Segfault Location */
-    segv_location = sstrdup("ss_htmlsettings");
+    strcpy(segv_location, "ss_htmlsettings");
 
 
     if ((!strcasecmp(cmd, "ON")) && (m != NULL)) {
@@ -1361,7 +1361,7 @@ void ss_chkhtml()
 FILE *fp = fopen("data/html.conf", "r");
 char buf[BUFSIZE];
 char *tmp;
-segv_location = sstrdup("ss_html_conf");
+strcpy(segv_location, "ss_html_conf");
 
 if (fp) {
    while (fgets(buf, BUFSIZE, fp)) {
@@ -1395,7 +1395,7 @@ void ss_html()
     FILE *op;
 
     /* Approximate Segfault Location */
-    segv_location = sstrdup("ss_html_output");
+    strcpy(segv_location, "ss_html_output");
 
     /* Save Path to HTML File into htmdat var */
     fp = fopen("data/html.path", "r");
@@ -1490,7 +1490,7 @@ void     TimerWeb()
 {
     /* Run HTMLSTATS Routine */
 
-    segv_location = sstrdup("StatServ-TimerWeb");
+    strcpy(segv_location, "StatServ-TimerWeb");
 
 
     ss_chkhtml();
@@ -1502,7 +1502,7 @@ return;
 static void ss_notices(User *u) {
 
     /* Approximate Segfault Location */
-    segv_location = sstrdup("ss_notices");
+    strcpy(segv_location, "ss_notices");
 
     if (!notify_msgs) {
         notify_msgs = 1;

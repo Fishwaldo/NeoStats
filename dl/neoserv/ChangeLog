@@ -1,6 +1,9 @@
 Program: NeoServ Module for NeoStats 2.x ChangeLog
 Author:  ^Enigma^ <enigma@neostats.net>
 
+* Version 1.3 * February 8th, 2002
+- Code overhaul for NeoStats-2.5 core.
+
 * Version 1.2 * December 22nd, 2001
 - More topics Added (now 22 topics)
 - Logging Function added to monitor usage

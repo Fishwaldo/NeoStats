@@ -1,9 +1,9 @@
-/* NeoStats - IRC Statistical Services Copryight (c) 1999-2001 NeoStats Group.
+/* NeoStats - IRC Statistical Services Copryight (c) 1999-2002 NeoStats Group.
 *
 ** Module: NeoServ
 ** Description: Network Village Idiot Help System
-** Version: 1.2
-** Date:    28/12/2001
+** Version: 1.3
+** Date:    08/03/2002
 ** Author: ^Enigma^
 */
 
@@ -25,14 +25,15 @@ static void neoserv_logbackup(User *u);
 Module_Info my_info[] = { {
     "NeoServ",
     "Network NeoStats Help Service",
-    "1.2"
+    "1.3"
 } };
 
 
 int new_m_version(char *av, char *tmp) {
-    sts(":%s 351 %s :Module NeoServ Loaded, Version %s %s %s",me.name, av,my_info[0].module_version,neoservversion_date,neoservversion_time);
+    snumeric_cmd(351, av, "Module NeoServ Loaded, Version: %s %s %s",my_info[0].module_version,neoservversion_date,neoservversion_time);
     return 0;
 }
+
 
 Functions my_fn_list[] = {
     { "VERSION",    new_m_version,    1 },
@@ -40,196 +41,180 @@ Functions my_fn_list[] = {
 };
 
 
-int __Bot_Message(char *origin, char *coreLine, int type)
+int __Bot_Message(char *origin, char **av, int ac)
 {
     User *u;
-    char *cmd;
-/*    char *tmp; */
+    u = finduser(origin);
 
-	u = finduser(origin);
-
-    if (coreLine == NULL) return -1;
-    cmd = strtok(coreLine, " ");
-/*    strcpy(cmd, tmp); */
-/*    neoservlog("%s %s", cmd, tmp); */
-
-    if (!strcasecmp(cmd, "HELP")) {
-        coreLine = strtok(NULL, " ");
-
-        if (coreLine) {
-        neoservlog("%s requested: %s", u->nick, coreLine);
-        }
-
-        if (!coreLine) {
+    if (!strcasecmp(av[1], "HELP")) {
+        if (ac <= 2) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC1")) {
+        } else if (!strcasecmp(av[2], "TOPIC1")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic1);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC2")) {
+        } else if (!strcasecmp(av[2], "TOPIC2")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic2);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC3")) {
+        } else if (!strcasecmp(av[2], "TOPIC3")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic3);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC4")) {
+        } else if (!strcasecmp(av[2], "TOPIC4")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic4);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC5")) {
+        } else if (!strcasecmp(av[2], "TOPIC5")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic5);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC6")) {
+        } else if (!strcasecmp(av[2], "TOPIC6")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic6);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC7")) {
+        } else if (!strcasecmp(av[2], "TOPIC7")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic7);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC8")) {
+        } else if (!strcasecmp(av[2], "TOPIC8")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic8);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC9")) {
+        } else if (!strcasecmp(av[2], "TOPIC9")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic9);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC10")) {
+        } else if (!strcasecmp(av[2], "TOPIC10")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic10);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC11")) {
+        } else if (!strcasecmp(av[2], "TOPIC11")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic11);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC12")) {
+        } else if (!strcasecmp(av[2], "TOPIC12")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic12);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC13")) {
+        } else if (!strcasecmp(av[2], "TOPIC13")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic13);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC14")) {
+        } else if (!strcasecmp(av[2], "TOPIC14")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic14);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC15")) {
+        } else if (!strcasecmp(av[2], "TOPIC15")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic15);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC16")) {
+        } else if (!strcasecmp(av[2], "TOPIC16")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic16);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC17")) {
+        } else if (!strcasecmp(av[2], "TOPIC17")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic17);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC18")) {
+        } else if (!strcasecmp(av[2], "TOPIC18")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic18);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC19")) {
+        } else if (!strcasecmp(av[2], "TOPIC19")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic19);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC20")) {
+        } else if (!strcasecmp(av[2], "TOPIC20")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic20);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC21")) {
+        } else if (!strcasecmp(av[2], "TOPIC21")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic21);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC22")) {
+        } else if (!strcasecmp(av[2], "TOPIC22")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic22);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC23")) {
+        } else if (!strcasecmp(av[2], "TOPIC23")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic23);
             return 1;
-        } else if (!strcasecmp(coreLine, "TOPIC24")) {
+        } else if (!strcasecmp(av[2], "TOPIC24")) {
             privmsg_list(u->nick, s_NeoServ, neoserv_help_topic24);
             return 1;
-		} else 
-            privmsg(u->nick, s_NeoServ, "\2%s\2 is An Unknown Help Topic. Please  /msg %s HELP", coreLine, s_NeoServ);
+        } else 
+            privmsg(u->nick, s_NeoServ, "Unknown Help Topic: \2%s\2", av[2]);
         }
 
-/*	if ((strlower(tmp) != strlower("VIEWLOG")) || (strlower(tmp) != strlower("SEND")) || (strlower(tmp) != strlower("LOGBACKUP"))) { */
-/*	if ((strlower(cmd) != strlower("VIEWLOG")) || (strlower(cmd) != strlower("SEND")) || (strlower(cmd) != strlower("LOGBACKUP"))) { */
-/*  if ((strcasecmp(cmd, "VIEWLOG")) || (strcasecmp(cmd, "SEND")) || (strcasecmp(cmd, "LOGBACKUP"))) { */
-	if ((fnmatch(strlower(cmd), "viewlog", 0) != 0) || (fnmatch(strlower(cmd), "send", 0) != 0) || (fnmatch(strlower(cmd), "logbackup", 0) != 0)) {
-		neoservlog("%s requested: %s", u->nick, cmd);
+	if ((fnmatch(strlower(av[2]), "viewlog", 0) != 0) || (fnmatch(strlower(av[2]), "send", 0) != 0) || (fnmatch(strlower(av[2]), "logbackup", 0) != 0)) {
+		neoservlog("%s requested: %s", u->nick, av[2]);
     }
-	
 
-    if (!strcasecmp(cmd, "TOPIC1")) {
+    if (!strcasecmp(av[2], "TOPIC1")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic1);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC2")) {
+    } else if (!strcasecmp(av[2], "TOPIC2")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic2);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC3")) {
+    } else if (!strcasecmp(av[2], "TOPIC3")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic3);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC4")) {
+    } else if (!strcasecmp(av[2], "TOPIC4")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic4);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC5")) {
+    } else if (!strcasecmp(av[2], "TOPIC5")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic5);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC6")) {
+    } else if (!strcasecmp(av[2], "TOPIC6")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic6);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC7")) {
+    } else if (!strcasecmp(av[2], "TOPIC7")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic7);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC8")) {
+    } else if (!strcasecmp(av[2], "TOPIC8")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic8);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC9")) {
+    } else if (!strcasecmp(av[2], "TOPIC9")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic9);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC10")) {
+    } else if (!strcasecmp(av[2], "TOPIC10")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic10);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC11")) {
+    } else if (!strcasecmp(av[2], "TOPIC11")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic11);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC12")) {
+    } else if (!strcasecmp(av[2], "TOPIC12")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic12);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC13")) {
+    } else if (!strcasecmp(av[2], "TOPIC13")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic13);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC14")) {
+    } else if (!strcasecmp(av[2], "TOPIC14")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic14);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC15")) {
+    } else if (!strcasecmp(av[2], "TOPIC15")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic15);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC16")) {
+    } else if (!strcasecmp(av[2], "TOPIC16")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic16);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC17")) {
+    } else if (!strcasecmp(av[2], "TOPIC17")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic17);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC18")) {
+    } else if (!strcasecmp(av[2], "TOPIC18")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic18);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC19")) {
+    } else if (!strcasecmp(av[2], "TOPIC19")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic19);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC20")) {
+    } else if (!strcasecmp(av[2], "TOPIC20")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic20);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC21")) {
+    } else if (!strcasecmp(av[2], "TOPIC21")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic21);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC22")) {
+    } else if (!strcasecmp(av[2], "TOPIC22")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic22);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC23")) {
+    } else if (!strcasecmp(av[2], "TOPIC23")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic23);
         return 1;
-    } else if (!strcasecmp(cmd, "TOPIC24")) {
+    } else if (!strcasecmp(av[2], "TOPIC24")) {
         privmsg_list(u->nick, s_NeoServ, neoserv_help_topic24);
         return 1;
-    } else if (!strcasecmp(cmd, "VIEWLOG") && (UserLevel(u) >= 185)) {
+    } else if (!strcasecmp(av[2], "VIEWLOG") && (UserLevel(u) >= 185)) {
                neoserv_viewlog(u);
-    } else if (!strcasecmp(cmd, "LOGBACKUP") && (UserLevel(u) >= 185)) {
+    } else if (!strcasecmp(av[2], "LOGBACKUP") && (UserLevel(u) >= 185)) {
                neoserv_logbackup(u);
-    } else if (!strcasecmp(cmd, "SEND") && (UserLevel(u) >= 185)) {
-               char *m;
-               cmd = strtok(NULL, " ");
-               m = strtok(NULL, " ");
-               neoserv_send(u, cmd, m);
+    } else if (!strcasecmp(av[2], "SEND") && (UserLevel(u) >= 185)) {
+               if (ac < 4) {
+                   privmsg(u->nick, s_NeoServ, "Syntax: /msg %s SEND <NICK> <TOPIC#>", s_NeoServ);
+                   privmsg(u->nick, s_NeoServ, "For addtional help: /msg %s HELP", s_NeoServ);
+                   return -1;
+               }
+               neoserv_send(u, av[2], av[3]);
     } else {
-        privmsg(u->nick, s_NeoServ, "%s Unknown To The NeoStats Help System... please /msg %s HELP", cmd, s_NeoServ);
+		privmsg(u->nick, s_NeoServ, "%s Unknown To The NeoStats Help System... please /msg %s HELP", av[1], s_NeoServ);
     }
     return 1;
 }
@@ -243,8 +228,7 @@ int Online(Server *data) {
         init_bot(s_NeoServ,"NeoServ",me.name,"Network NeoStats Help Service", "+Sqd-x", my_info[0].module_name);
     }
 
-    sts(":%s JOIN #NeoStats",s_NeoServ);
-    sts(":%s MODE #NeoStats +o %s",me.name, s_NeoServ);
+    sjoin_cmd(s_NeoServ, "#NeoStats");
     return 1;
 };
 
@@ -269,16 +253,14 @@ EventFnList *__module_get_events() {
     return my_event_list;
 };
 
-
 void _init() {
     s_NeoServ = "NeoServ";
-    sts(":%s GLOBOPS :NeoServ Help System Module Loaded", me.name);
+    globops(me.name, "NeoServ Help System Module Loaded",me.name);
 }
 
 
 void _fini() {
-    sts(":%sGLOBOPS :NeoServ Help System Module Unloaded", me.name);
-
+    globops(me.name, "NeoServ Help System Module Unloaded",me.name);
 };
 
 
@@ -309,20 +291,7 @@ void neoservlog(char *fmt, ...)
 
 /* Routine for SEND */
 static void neoserv_send(User *u, char *cmd, char *m) {
-
-    if (!cmd) {
-       privmsg(u->nick, s_NeoServ, "Syntax: /msg %s SEND <NICK> <TOPIC#>", s_NeoServ);
-       privmsg(u->nick, s_NeoServ, "For addtional help: /msg %s HELP", s_NeoServ);
-       return;
-   }
-   if (!m) {
-      privmsg(u->nick, s_NeoServ, "Syntax: Syntax: /msg %s SEND <NICK> <TOPIC#>", s_NeoServ);
-      privmsg(u->nick, s_NeoServ, "For addtional help: /msg %s HELP", s_NeoServ);
-      return;
-   }
-   /* The user has passed the minimum requirements for input */
-    
-   segv_location = sstrdup("neoserv_send");
+   strcpy(segv_location, "neoserv_send");
 
     /* If The User Is Online Send The Correct Topic*/        
     if (finduser(cmd)) {
@@ -419,7 +388,7 @@ static void neoserv_viewlog(User *u)
     FILE *fp;
     char buf[512];
 
-    segv_location = sstrdup("neoserv_viewlog");
+    strcpy(segv_location, "neoserv_viewlog");
     if (!(UserLevel(u) >= 185)) {
         neoservlog("Access Denied (VIEWLOG) to %s", u->nick);
         privmsg(u->nick, s_NeoServ, "Access Denied.");
@@ -448,7 +417,7 @@ static void neoserv_logbackup(User *u)
 	char tmp[27];
 	time_t t = time(NULL);
 	
-	segv_location = sstrdup("neoserv_logbackup");
+	strcpy(segv_location, "neoserv_logbackup");
 	if (!(UserLevel(u) >= 185)) {
 		neoservlog("Access Denied (LOGBACKUP) from %s", u->nick);
 		privmsg(u->nick, s_NeoServ, "Access Denied.");

@@ -1,5 +1,7 @@
 MoraleServ ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
+* MoraleServ * ^Enigma^ * Version Increment -> 2.17
+  - Code overhaul for NeoStats-2.5 core.
 
 * MoraleServ * Shmad * Version Increment -> 2.16
   - Fixed retarded crash..
