@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - StatServ: add option to configure html update interval. (M)
  - Add support for persistent bots which do not auto leave channel when it is 
    empty. (M)
  - Remove NETINFO event. Not available on all ircds and useless since the 

@@ -70,6 +70,7 @@ struct StatServ {
 	int recordalert; 
 	int html; 
 	char htmlpath[MAXPATH]; 
+	int htmlupdatetime; 
 	int msginterval; 
 	int msglimit; 
 	int shutdown; 
@@ -215,6 +216,7 @@ extern const char *ss_help_set_exclusions[];
 extern const char *ss_help_set_msginterval[];
 extern const char *ss_help_set_msglimit[];
 extern const char *ss_help_set_lagtime[];
+extern const char *ss_help_set_htmlupdatetime[];
 extern const char *ss_help_set_lagalert[];
 extern const char *ss_help_set_recordalert[];
 extern const char *ss_help_clientversions[];

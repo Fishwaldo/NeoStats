@@ -9,12 +9,167 @@
 How to add a new IRCd protocol to NeoStats
 ------------------------------------------
 
-This document explains how to add a new IRCd protocol to NeoStats. 
+The easiest way to add a new IRCd protocol to NeoStats is to find one
+that is close to the IRCd you wish to support and modify it for your
+IRCd (e.g. if your IRCd is based on bahamut, start with the bahamut 
+module). 
+
+This document offers a number of guidance notes about the required 
+areas of a protocol modules.
+
+-----------------------------------<>-----------------------------------
+Required includes
+
+A protocol module must include the following files:
+
+#include "neostats.h"
+#include "ircd.h"
+
+If you use a protocol specific header file, this should also be 
+included.
+
+-----------------------------------<>-----------------------------------
+Messages and Tokens
+
+IRC messages are specifically formatted with the command embedded in the
+string in the form of a specific message or token. Many of these are 
+specific to a particular IRCd so must be provided by the module. You can
+usually find the messages in the IRCd source code in the file msg.h or 
+similar.
+
+An example is:
+#define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
+#define TOK_PRIVATE	"!"	/* 33 */
+
+These are usually placed in a protocol specific header file.
+
+-----------------------------------<>-----------------------------------
+Modes
+
+NeoStats provides a set of defines for common user and channel modes 
+supported by NeoStats. Those not supported must be provided by the 
+module. 
+
+An example user mode is:
+#define UMODE_FAILOP		0x00200000
+
+An example channel mode is:
+#define CMODE_NOCTCP		0x10000000
+
+These are usually placed in a protocol specific header file.
+
+-----------------------------------<>-----------------------------------
+ProtocolInfo definition
+
+This is required to instruct NeoStats how to use certain elements of the
+protocol module. An example follows:
+
+ProtocolInfo protocol_info = {
+	/* Protocol options required by this IRCd */
+	PROTOCOL_SJOIN,
+	/* Protocol options negotiated at link by this IRCd */
+	PROTOCOL_TOKEN,
+	/* Features supported by this IRCd */
+	FEATURE_UMODECLOAK,
+	"+oSq",
+	"+o",
+};
+
+-----------------------------------<>-----------------------------------
+Command list
+
+This is parsed by NeoStats when we recieve a message from an IRCd server
+in order to handle the message and is formatted as follows.
+
+ircd_cmd cmd_list[] = {
+	/*Message	Token	Function	usage */
+	{MSG_PRIVATE, TOK_PRIVATE, _m_private, 0},
+	{0, 0, 0, 0},
+};
+
+-----------------------------------<>-----------------------------------
+Mode tables
+
+The protocol module must provide a list of mode definitions for use by
+NeoStats. There are four types of mode:
+
+Channel modes - e.g. key
+Channel user modes - e.g. voice
+User modes - e.g. registered
+User smodes - a secondary form of user mode used on some ircds. Only 
+required if the IRCd supports it.
+
+Mode tables are defined as follows:
+
+mode_init chan_umodes[] = {
+	{'v', CUMODE_VOICE, 0, '+'},
+	{0, 0, 0},
+};
+
+mode_init chan_modes[] = {
+	{'p', CMODE_PRIVATE, 0},
+	{0, 0, 0},
+};
+
+mode_init user_umodes[] = {
+	{'r', UMODE_REGNICK},
+	{0, 0, 0},
+};
+
+mode_init user_smodes[] = {
+	{'s', SMODE_SSL},
+	{0, 0, 0},
+};
+
+-----------------------------------<>-----------------------------------
+Command processing functions
+
+These will be called when NeoStats receives a message listed in the 
+cmd_list table. The module will then format parameters for NeoStats and 
+call the appropriate function. 
+
+We recommend that module functions use the naming convention of 
+m_command. This closely follows similar functions in IRCd source code
+making it easier to relate the module version to the IRCd original. 
+
+The core function called will be named do_command so that it is simple
+to find.
+
+An example follows.
+
+static void m_sethost (char *origin, char **argv, int argc, int srv)
+{
+	do_sethost(origin, argv[0]);
+}
+
+-----------------------------------<>-----------------------------------
+Outgoing command functions
+
+These will take a list of NeoStats parameters and format them for 
+sending to the IRCd. 
+
+These functions must be named send_command and are prototyped by 
+NeoStats.
+
+An example follows:
+
+void 
+send_part (const char *source, const char *chan)
+{
+	send_cmd (":%s %s %s", source, MSG_PART, chan);
+}
+
+If your IRCd supports tokens, we provide a helper macro to choose
+the message or token when appropriate which is used as follows:
+
+void 
+send_part (const char *source, const char *chan)
+{
+	send_cmd (":%s %s %s", source, MSGTOK(PART), chan);
+}
 
 -----------------------------------<>-----------------------------------
 
-TBA
-
 ************************************************************************
-** This document was last updated on March 17th, 2004 by M            **
+** This document was last updated on August 27th, 2004 by M           **
 ************************************************************************

@@ -56,6 +56,7 @@ static int ss_event_join(CmdParams* cmdparams);
 static int ss_event_part(CmdParams* cmdparams);
 static int ss_event_topic(CmdParams* cmdparams);
 static int ss_event_kick(CmdParams* cmdparams);
+static int ss_set_htmlupdatetime_cb (CmdParams* cmdparams, SET_REASON reason);
 
 static Client * listu;
 static int listindex = 0;
@@ -132,6 +133,7 @@ static bot_setting ss_settings[]=
 {
 	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, "HTML_Enabled",NULL,		ss_help_set_html},
 	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,		NS_ULEVEL_ADMIN, "HTML_Path",	NULL,		ss_help_set_htmlpath },
+	{"HTMLUPDATETIME",&StatServ.htmlupdatetime,	SET_TYPE_INT,		600, 3600,			NS_ULEVEL_ADMIN, "htmlupdatetime",		"seconds",	ss_help_set_htmlupdatetime, ss_set_htmlupdatetime_cb, (void*)3600},
 	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, "MsgInterval",	"seconds",	ss_help_set_msginterval },
 	{"MSGLIMIT",	&StatServ.msglimit,		SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, "MsgLimit",	NULL,		ss_help_set_msglimit },
 	{"LAGTIME",		&StatServ.lagtime,		SET_TYPE_INT,		1, 256,			NS_ULEVEL_ADMIN, "LagTime",		"seconds",	ss_help_set_lagtime },
@@ -213,7 +215,7 @@ int ModSynch (void)
 	}
 	/* now that we are online, setup the timer to save the Stats database every so often */
 	add_timer (TIMER_TYPE_INTERVAL, SaveStats, "SaveStats", DBSAVETIME);
-	add_timer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", 3600);
+	add_timer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmlupdatetime);
 	/* also add a timer to check if its midnight (to reset the daily stats */
 	add_timer (TIMER_TYPE_MIDNIGHT, StatsMidnight, "StatsMidnight", 60);
 	add_timer (TIMER_TYPE_INTERVAL, DelOldChan, "DelOldChan", 3600);
@@ -952,5 +954,15 @@ static int ss_forcehtml(CmdParams* cmdparams)
 	nlog(LOG_NOTICE, "%s!%s@%s forced an update of the HTML file.",
 		    cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname);
 	ss_html();
+	return NS_SUCCESS;
+}
+
+static int ss_set_htmlupdatetime_cb (CmdParams* cmdparams, SET_REASON reason)
+{
+	/* Ignore bootup callback */
+	if (reason == SET_LOAD) {
+		return NS_SUCCESS;
+	}
+	set_timer_interval ("ss_html", StatServ.htmlupdatetime);
 	return NS_SUCCESS;
 }

@@ -94,6 +94,13 @@ const char *ss_help_set_lagtime[] = {
 	NULL
 };
 
+const char *ss_help_set_htmlupdatetime[] = {
+	"\2HTMLUPDATETIME <seconds>\2",
+	"<seconds> is the time in seconds at which statserv",
+	"updates the HTML file.",
+	NULL
+};
+
 const char *ss_help_set_lagalert[] = {
 	"\2LAGALERT <alerttype>\2",
 	"Announce when a server on the network is lagged",
