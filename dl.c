@@ -106,6 +106,7 @@ int del_mod_timer(char *timer_name) {
 				(list->prev)->next = NULL;
 			}
 			free(list);
+			log("Done Timer Unload");
 			return 0;
 		}
 		list = list->next;
@@ -374,17 +375,21 @@ int unload_module(char *module_name, User *u) {
 	/* Check to see if this Module has any timers registered....  */
 	mod_tmr = module_timer_lists->next;
 	while(mod_tmr != NULL) {
+		log("searching %s for %s", mod_tmr->modname, module_name);
 		if (!strcasecmp(mod_tmr->modname, module_name)) {
 			del_mod_timer(mod_tmr->timername);
+			log("while timer");			
 			break;
 		}
 		mod_tmr=mod_tmr->next;
 	}			
 
-	
+
+	log("about to botlist");	
 	/* now, see if this Module has any bots with it */
-	mod_ptr = module_bot_lists->next;
+	mod_ptr = module_bot_lists;
 	while(mod_ptr != NULL) {
+		log("searching bots %s for %s", mod_ptr->modname, module_name);
 		if (!strcasecmp(mod_ptr->modname, module_name)) {
 			notice(s_Services,"Module %s had bot %s Registered. Deleting..",module_name,mod_ptr->nick);
 			del_bot(mod_ptr->nick, "Module Unloaded");
@@ -393,8 +398,9 @@ int unload_module(char *module_name, User *u) {
 		mod_ptr=mod_ptr->next;		
 	}
 	list = module_list->next;
-
+		log("Finished Botlist");
 	while (list != NULL) {
+		log("Searching Modlist %s for %s", list->info->module_name, module_name);
 		if (!strcasecmp(list->info->module_name, module_name)) {
 			dlclose(list->dl_handle);
 			if (list->next != NULL) {
@@ -403,9 +409,14 @@ int unload_module(char *module_name, User *u) {
 			} else {
 				(list->prev)->next = NULL;
 			}
-			free(list);
-			privmsg(u->nick,s_Services,"Module %s Unloaded",module_name);
+			log("Done");
+			free(list); 
+
+/*			privmsg(u->nick,s_Services,"Module %s Unloaded",module_name);
+				log("Done");
+
 			notice(s_Services,"Module %s Unloaded by %s",module_name,u->nick);
+*/			log("Done");
 			return 0;
 		}
 		list = list->next;

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: services.c,v 1.1 2000/02/03 23:45:55 fishwaldo Exp $
+** $Id: services.c,v 1.2 2000/02/04 02:54:12 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -99,6 +99,7 @@ void servicesbot(char *nick, char *line) {
 		rval = load_module(cmd,u);
 		if (!rval) {
 			notice(s_Services,"%s Loaded Module %s",u->nick,cmd);
+
 		} else {
 			notice(s_Services,"%s Tried to Load Module %s, but Failed",u->nick,cmd);
 		}
@@ -112,6 +113,11 @@ void servicesbot(char *nick, char *line) {
 		}
 		cmd = strtok(NULL, " ");
 		rval = unload_module(cmd,u);
+		if (!rval) { 
+			notice(s_Services,"%s Unloaded Module %s", u->nick, cmd);
+		} else {
+			notice(s_Services,"%s Tried to Unload the Module %s, but that does not exist", u->nick, cmd);
+		}
 	} else if (!strcasecmp(cmd, "MODBOTLIST")) {
 		list_module_bots(u);
 	} else if (!strcasecmp(cmd, "MODTIMERLIST")) {
@@ -176,20 +182,28 @@ char *uptime(time_t when)
 {
 	char *buf = NULL;
 	time_t u = time(NULL) - when;
-
-	if (u > 86400)
+	log("time %d",u);
+	if (u > 86400) {
+		log("first");
 		sprintf(buf, "Statistics up \2%ld\2 day%s, \2%02ld:%02ld\2",
 			u/86400, (u/86400 == 1) ? "" : "s",
 			(u/3600) % 24, (u/60) % 60);
-	else if (u > 3600)
+	} else if (u > 3600) {
+		log("second");
 		sprintf(buf, "Statistics up \2%ld hour%s, %ld minute%s\2",
 			u/3600, u/3600==1 ? "" : "s",
 			(u/60) % 60, (u/60)%60 == 1 ? "" : "s");
-	else
+	} else if (u > 60) {
+		log("third");
 		sprintf(buf, "Statistics up \2%ld minute%s, %ld second%s\2",
 			u/60, u/60 == 1 ? "" : "s",
 			u%60, u%60 == 1 ? "" : "s");
-
+	} else {
+		log("forth");
+		sprintf(buf, "Statistics up \2%ld second%s\2",
+			u, u == 1 ? "" : "s");
+	}
+	log("buf: %s", buf);
 	return buf;
 }
 
@@ -207,9 +221,9 @@ extern void ns_shutdown(User *u, char *reason)
 	/* Unload the Modules */
 	mod_ptr = module_list->next;
 	while(mod_ptr != NULL) {
-		mod_ptr = module_list->next;
+		notice(s_Services,"Module %s Unloaded by %s",mod_ptr->info->module_name,u->nick);
 		unload_module(mod_ptr->info->module_name, u);
-		mod_ptr = mod_ptr->next;
+		mod_ptr = module_list->next;
 	}
 	free(mod_ptr);
 
@@ -395,6 +409,7 @@ static void ns_chan_dump(User *u)
 static void ns_uptime(User *u)
 {
 	segv_location = "ns_uptime";
+	log("time %d", me.t_start);
 	privmsg(u->nick, s_Services, "Statistics Information:");
 	privmsg(u->nick, s_Services, "%s", uptime(me.t_start));
 	privmsg(u->nick, s_Services, "Reconnect Time: %d", me.r_time);
