@@ -27,6 +27,7 @@
 
 /* IRCu modification support */
 /* #define NEFARIOUS */
+/* #define ASUKA */
 
 /* we support server names as base 64 numerics */
 #define BASE64SERVERNAME
@@ -283,11 +284,11 @@
 #define CMODE_BAN		0x0200
 #define CMODE_LIMIT		0x0400
 #define CMODE_SENDTS	0x0800	
+#ifdef ASUKA
 #define CMODE_DELAYJOINS 0x1000
-#define CMODE_LISTED	0x10000
-#ifdef NEFARIOUS
-#define CMODE_REGONLY	0x20000
 #endif
+#define CMODE_LISTED	0x10000
+#define CMODE_REGONLY	0x20000
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))

@@ -108,7 +108,9 @@ ChanModes chan_modes[] = {
 	{CMODE_KEY, 'k', 0, 1, 0},
 	{CMODE_BAN, 'b', 0, 1, 0},
 	/*{CMODE_SENDTS, 'b', 0, 1, 0},*/
+#ifdef ASUKA
 	{CMODE_DELAYJOINS, 'D', 0, 1, 0},
+#endif
 	/*{CMODE_LISTED, 'b', 0, 1, 0},*/
 	{CMODE_REGONLY, 'r', 0, 0, 0},
 };
