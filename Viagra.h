@@ -175,11 +175,11 @@
 /* Umode chars */
 #define UMODE_CH_LOCOP 'O'
 #define UMODE_CH_OPER 'o'
-#define UMODE_CH_ADMIN 'a'
+#define UMODE_CH_ADMIN 'A'
 #define UMODE_CH_COADMIN 'C'
 #define UMODE_CH_NETADMIN 'N'
 #define UMODE_CH_TECHADMIN 'T'
-#define UMODE_CH_SADMIN 'A'
+#define UMODE_CH_SADMIN 'a'
 #define UMODE_CH_SERVICES 'S'
 #define UMODE_CH_BOT 'B'
 
@@ -206,7 +206,7 @@
 #define CMODE_CH_CHANOP 'o'
 #define CMODE_CH_VOICE	'v'
 #define CMODE_CH_HALFOP	'h'
-#define CMODE_CH_CHANOWNER	'a'
+#define CMODE_CH_CHANOWNER	'q'
 #define CMODE_CH_CHANADMIN	'a'
 
 /* Cmode sjoin flags */
@@ -237,12 +237,6 @@
 #define CMODE_LINK	0x20000
 #define CMODE_NOCOLOR	0x40000
 #define CMODE_CHANADMIN  0x800000
-
-/* Smodes */
-#define SMODE_COADMIN		0x2	/* co admin on a server */
-#define SMODE_SERVADMIN		0x4	/* server admin */
-#define SMODE_TECHADMIN		0x10	/* tech administrator */
-#define SMODE_NETADMIN		0x40	/* Network Admin */
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))
