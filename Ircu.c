@@ -259,11 +259,10 @@ void send_wallops (char *who, char *buf)
 	sts (":%s %s :%s", who, MSG_WALLOPS, buf);
 }
 
-int
-ssvinfo_cmd ()
+void
+send_svinfo (void)
 {
 	sts ("SVINFO 5 3 0 :%d", (int) me.now);
-	return 1;
 }
 
 int
@@ -577,7 +576,7 @@ Srv_Ping (char *origin, char **argv, int argc)
 static void
 Srv_Svinfo (char *origin, char **argv, int argc)
 {
-	ssvinfo_cmd ();
+	send_svinfo ();
 }
 
 static void

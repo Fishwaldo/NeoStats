@@ -439,11 +439,10 @@ send_rakill (const char *host, const char *ident)
 }
 
 
-int
-ssvinfo_cmd ()
+void
+send_svinfo (void)
 {
 	sts ("SVINFO 5 3 0 :%ld", (long)me.now);
-	return 1;
 }
 
 int
@@ -763,7 +762,7 @@ Srv_Vctrl (char *origin, char **argv, int argc)
 static void
 Srv_Svinfo (char *origin, char **argv, int argc)
 {
-	ssvinfo_cmd ();
+	send_svinfo ();
 }
 #endif
 
@@ -775,7 +774,7 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 	strlcpy (ircd_srv.cloak, argv[3], 10);
 	strlcpy (me.netname, argv[7], MAXPASS);
 
-	snetinfo_cmd ();
+	send_netinfo ();
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 #ifdef DEBUG

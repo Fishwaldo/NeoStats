@@ -130,8 +130,8 @@ void send_nick (const char *nick, const char *ident, const char *host, const cha
 int sserver_cmd (const char *name, const int numeric, const char *infoline);
 int slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass);
 int ssquit_cmd (const char *server, const char *quitmsg);
-int snetinfo_cmd (void);
-int ssvinfo_cmd (void);
+/*int snetinfo_cmd (void);*/
+/*int ssvinfo_cmd (void);*/
 int sburst_cmd (int b);
 int seob_cmd (const char *server);
 int ssmo_cmd (const char *from, const char *umodetarget, const char *msg);

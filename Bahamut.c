@@ -269,12 +269,10 @@ send_rakill (const char *host, const char *ident)
 	sts (":%s %s %s %s", me.name, MSG_RAKILL, host, ident);
 }
 
-
-int
-ssvinfo_cmd ()
+void
+send_svinfo (void)
 {
 	sts ("SVINFO 3 3 0 :%d", (int)me.now);
-	return 1;
 }
 
 int
@@ -560,7 +558,7 @@ Srv_Ping (char *origin, char **argv, int argc)
 static void
 Srv_Svinfo (char *origin, char **argv, int argc)
 {
-	ssvinfo_cmd ();
+	send_svinfo ();
 }
 
 
