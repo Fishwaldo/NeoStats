@@ -349,7 +349,7 @@
 
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
-
+#define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
 
 
 struct ircd_srv_ {
