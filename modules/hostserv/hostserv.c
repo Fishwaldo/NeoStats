@@ -179,11 +179,11 @@ int findnick (const void *key1, const void *key2)
 void save_vhost (vhostentry *vhe) 
 {
 	vhe->tslastused = me.now;
-	SetData((void *)vhe->host, CFGSTR, "Vhosts", vhe->nick, "Host");
-	SetData((void *)vhe->vhost, CFGSTR, "Vhosts", vhe->nick , "Vhost");
-	SetData((void *)vhe->passwd, CFGSTR, "Vhosts", vhe->nick , "Passwd");
-	SetData((void *)vhe->added, CFGSTR, "Vhosts", vhe->nick , "Added");
-	SetData((void *)vhe->tslastused, CFGINT, "Vhosts", vhe->nick , "LastUsed");
+	SetData ((void *)vhe->host, CFGSTR, "Vhosts", vhe->nick, "Host");
+	SetData ((void *)vhe->vhost, CFGSTR, "Vhosts", vhe->nick , "Vhost");
+	SetData ((void *)vhe->passwd, CFGSTR, "Vhosts", vhe->nick , "Passwd");
+	SetData ((void *)vhe->added, CFGSTR, "Vhosts", vhe->nick , "Added");
+	SetData ((void *)vhe->tslastused, CFGINT, "Vhosts", vhe->nick , "LastUsed");
 	list_sort (vhosts, findnick);
 }
 
@@ -403,7 +403,6 @@ static int hs_cmd_bans_add (CmdParams *cmdparams)
 
 static int hs_cmd_bans_del (CmdParams *cmdparams)
 {
-	static char ban_buf[CONFBUFSIZE];
 	banentry *ban;
 	hnode_t *hn;
 	hscan_t hs;
@@ -420,8 +419,7 @@ static int hs_cmd_bans_del (CmdParams *cmdparams)
 			nlog (LOG_NOTICE, "%s deleted %s from the banned vhost list",
 				cmdparams->source->name, cmdparams->av[1]);
 			hnode_destroy (hn);
-			ircsnprintf (ban_buf, CONFBUFSIZE, "Ban/%s", ban->host);
-			DelConf (ban_buf);
+			DelRow ("Ban", ban->host);
 			ns_free (ban);
 			SaveBans ();
 			return NS_SUCCESS;
@@ -530,9 +528,7 @@ static int hs_cmd_list (CmdParams *cmdparams)
 	int vhostcount;
 
 	SET_SEGV_LOCATION();
-	if (cmdparams->ac == 0) {
-		start = 0;
-	} else if (cmdparams->ac == 1) {
+	if (cmdparams->ac == 1) {
 		start = atoi(cmdparams->av[0]);
 	}
 	vhostcount = list_count(vhosts);
@@ -723,10 +719,8 @@ static void SaveBans (void)
 	hash_scan_begin (&hs, bannedvhosts);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
 		ban = (banentry *) hnode_get (hn);
-		ircsnprintf(ban_buf, CONFBUFSIZE, "Ban/%s/Who", ban->host);
-		SetConf((void *)ban->who, CFGSTR, ban_buf);
-		ircsnprintf(ban_buf, CONFBUFSIZE, "Ban/%s/Reason", ban->host);
-		SetConf((void *)ban->reason, CFGSTR, ban_buf);
+		SetData ((void *)ban->who, CFGSTR, "Ban", ban->host, "Who");
+		SetData ((void *)ban->reason, CFGSTR, "Ban", ban->host, "Reason");
 	}
 }
 
@@ -741,21 +735,19 @@ static void LoadBans (void)
 	int i;
 	char **data;
 
-	if (GetDir ("Ban", &data) > 0) {
+	if (GetTableData ("Ban", &data) > 0) {
 		for (i = 0; data[i] != NULL; i++) {
 			ban = ns_malloc (sizeof (banentry));
 			strlcpy (ban->host, data[i], MAXHOST);
 
-			ircsnprintf (ban_buf, CONFBUFSIZE, "Ban/%s/Who", ban->host);
-			if (GetConf ((void *)&tmp, CFGSTR, ban_buf) <= 0) {
+			if (GetData ((void *)&tmp, CFGSTR, "Ban", ban->host, "Who") <= 0) {
 				ns_free (ban);
 				continue;
 			} else {
 				strlcpy (ban->who, tmp, MAXNICK);
 				ns_free (tmp);
 			}
-			ircsnprintf (ban_buf, CONFBUFSIZE, "Ban/%s/Reason", data[i]);
-			if (GetConf ((void *)&tmp, CFGSTR, ban_buf) <= 0) {
+			if (GetData ((void *)&tmp, CFGSTR, "Ban", ban->host, "Reason") <= 0) {
 				ns_free (ban);
 				continue;
 			} else {
