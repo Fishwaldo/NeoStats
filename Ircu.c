@@ -601,12 +601,13 @@ m_nick (char *origin, char **argv, int argc, int srv)
 			(IP >> 24) & 255, (IP >> 16) & 255, (IP >> 8) & 255, IP & 255 );
 
 		realname = joinbuf (argv, argc, (argc - 1));
-		/*       nick,    hopcount, TS,     user,    host, */
-        do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
+		/* Note realname + 1 is temp to dump colon - remove when parser fixed */
+		/*       nick,    hopcount, TS,     user,    host, */       
+		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
 			/* server, ip, servicestamp, modes*/
 			origin, IPAddress, NULL, (argv[5][0] == '+' ? argv[5]: NULL),
 			/*, vhost, realname, numeric*/ 
-			NULL, realname, argv[argc-2]);
+			NULL, (realname + 1), argv[argc-2]);
 		free (realname);
 	} else {
 		do_nickchange (origin, argv[0], NULL);

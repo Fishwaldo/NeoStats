@@ -602,14 +602,14 @@ UserDump (const char *nick)
 		while ((un = hash_scan_next (&us)) != NULL) {
 			u = hnode_get (un);
 #ifdef GOTUSERSMODES
-			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx) Smodes %s (%lx)", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode, u->Smode);
+			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx) Smodes %lx", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode, u->Smode);
 #else
 			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx)", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode);
 #endif
 #ifdef BASE64NICKNAME
 			debugtochannel("Base64: %s", u->nick64);
 #endif
-			debugtochannel("IP Address: %lu.%lu.%lu.%lu", (u->ipaddr.s_addr  >> 24) & 255, (u->ipaddr.s_addr  >> 16) & 255, (u->ipaddr.s_addr  >> 8) & 255, u->ipaddr.s_addr  & 255 );
+			debugtochannel("IP Address: %lu.%lu.%lu.%lu", (unsigned long)((u->ipaddr.s_addr >> 24) & 255), (unsigned long)((u->ipaddr.s_addr >> 16) & 255), (unsigned long)((u->ipaddr.s_addr >> 8) & 255), (unsigned long)(u->ipaddr.s_addr & 255) );
 
 			cm = list_first (u->chans);
 			while (cm) {
@@ -622,14 +622,15 @@ UserDump (const char *nick)
 		if (un) {
 			u = hnode_get (un);
 #ifdef GOTUSERSMODES
-			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx) Smodes %s (%lx)", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode, u->Smode);
+			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx) Smodes %lx", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode, u->Smode);
 #else
 			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx)", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode);
 #endif
 #ifdef BASE64NICKNAME
 			debugtochannel("Base64: %s", u->nick64);
 #endif
-			debugtochannel("IP Address: %lu.%lu.%lu.%lu", (u->ipaddr.s_addr  >> 24) & 255, (u->ipaddr.s_addr  >> 16) & 255, (u->ipaddr.s_addr  >> 8) & 255, u->ipaddr.s_addr   & 255 );
+			debugtochannel("IP Address: %lu.%lu.%lu.%lu", (unsigned long)((u->ipaddr.s_addr >> 24) & 255), (unsigned long)((u->ipaddr.s_addr >> 16) & 255), (unsigned long)((u->ipaddr.s_addr >> 8) & 255), (unsigned long)(u->ipaddr.s_addr & 255) );
+
 			cm = list_first (u->chans);
 			while (cm) {
 				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
