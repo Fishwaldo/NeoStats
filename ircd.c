@@ -1010,3 +1010,12 @@ ssvskill_cmd (const char *target, const char *reason, ...)
 #endif
 	return 1;
 }
+
+int
+skick_cmd (const char *who, const char *target, const char *chan, const char *reason)
+{
+	send_kick (who, target, chan, reason);
+	part_chan (finduser (target), (char *) chan);
+	return 1;
+}
+

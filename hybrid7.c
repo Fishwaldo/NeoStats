@@ -292,12 +292,10 @@ ssvspart_cmd (const char *target, const char *chan)
 	return 1;
 }
 
-int
-skick_cmd (const char *who, const char *target, const char *chan, const char *reason)
+void 
+send_kick (const char *who, const char *target, const char *chan, const char *reason)
 {
 	sts (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
-	part_chan (finduser (target), (char *) chan);
-	return 1;
 }
 
 void send_wallops (char *who, char *buf)
