@@ -32,9 +32,10 @@
 #include "version.h"
 #include "tld.h"
 
-static char announce_buf[BUFSIZE];
-
 #define STATNAMESIZE 64
+#define WEEKNUM(t) (((t)->tm_yday + 7 - ((t)->tm_wday)) / 7)
+
+static char announce_buf[BUFSIZE];
 
 void SaveStatisticEntry (statisticentry *stat, char *tablename, char *entryname, char *statname, char* entrytype)
 {
@@ -52,6 +53,15 @@ void SaveStatisticEntry (statisticentry *stat, char *tablename, char *entryname,
 
 void SaveStatistic (statistic *stat, char *tablename, char *entryname, char *statname)
 {
+	struct tm *ltm;
+
+	ltm = localtime (&me.now);
+	stat->month = ltm->tm_mon;
+	stat->week = WEEKNUM(ltm);
+	stat->day = ltm->tm_yday;	
+	SetData ((void *)stat->day, CFGINT, tablename, entryname, "day");
+	SetData ((void *)stat->week, CFGINT, tablename, entryname, "week");
+	SetData ((void *)stat->month, CFGINT, tablename, entryname, "month");
 	SaveStatisticEntry (&stat->daily, tablename, entryname, statname, "daily");
 	SaveStatisticEntry (&stat->weekly, tablename, entryname, statname, "weekly");
 	SaveStatisticEntry (&stat->monthly, tablename, entryname, statname, "monthly");
@@ -74,9 +84,25 @@ void LoadStatisticEntry (statisticentry *stat, char *tablename, char *entryname,
 
 void LoadStatistic (statistic *stat, char *tablename, char *entryname, char *statname)
 {
-	LoadStatisticEntry (&stat->daily, tablename, entryname, statname, "daily");
-	LoadStatisticEntry (&stat->weekly, tablename, entryname, statname, "weekly");
-	LoadStatisticEntry (&stat->monthly, tablename, entryname, statname, "monthly");
+	struct tm *ltm;
+	int day, week, month;
+
+	ltm = localtime (&me.now);
+	GetData ((void *)&day, CFGINT, tablename, entryname, "day");
+	GetData ((void *)&week, CFGINT, tablename, entryname, "week");
+	GetData ((void *)&month, CFGINT, tablename, entryname, "month");
+	/* Only load daily stats if day not changed */
+	if (day == ltm->tm_yday) {
+		LoadStatisticEntry (&stat->daily, tablename, entryname, statname, "daily");
+	}
+	/* Only load weekly stats if week not changed */
+	if (week == WEEKNUM(ltm)) {
+		LoadStatisticEntry (&stat->weekly, tablename, entryname, statname, "weekly");
+	}
+	/* Only load monthly stats if month not changed */
+	if (month == ltm->tm_mon) {
+		LoadStatisticEntry (&stat->monthly, tablename, entryname, statname, "monthly");
+	}
 	LoadStatisticEntry (&stat->alltime, tablename, entryname, statname, "alltime");
 }
 

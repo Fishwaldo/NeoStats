@@ -32,6 +32,9 @@ typedef struct statisticentry {
 } statisticentry;
 
 typedef struct statistic {
+	unsigned int day;
+	unsigned int week;
+	unsigned int month;
 	unsigned int current;
 	statisticentry alltime;
 	statisticentry daily;

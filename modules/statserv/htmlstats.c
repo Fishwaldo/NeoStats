@@ -63,7 +63,7 @@ void get_srvlist()
 	hash_scan_begin(&hs, serverstathash);
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
-		fprintf (opf, "<tr><td height=\"4\">Server: </td>\n");
+		fprintf (opf, "<tr><td height=\"4\"></td>\n");
 		fprintf (opf, "<td height=\"4\"><a href=#%s> %s (%s) </a></td></tr>\n",
 			s->name, s->name, (s->s) ? "ONLINE" : "OFFLINE");
 	}
@@ -123,28 +123,28 @@ void get_netstats()
 		GetAllTimePercent (&networkstats.users));
 	fprintf (opf, "<td>%ld</td>\n", networkstats.users.alltime.average);
 	fprintf (opf, "<td>%ld</td>\n", networkstats.users.alltime.max);
-	fprintf (opf, "<td>[%s]</td></tr>\n", sftime(networkstats.users.alltime.ts_max));
+	fprintf (opf, "<td>%s</td></tr>\n", sftime(networkstats.users.alltime.ts_max));
 	fprintf (opf, "<tr><td>Channels:</td>\n");
 	fprintf (opf, "<td>%ld</td>\n", networkstats.channels.alltime.runningtotal);
 	fprintf (opf, "<td>%i (%d%%)</td>\n", networkstats.channels.current,
 		GetAllTimePercent (&networkstats.channels));
 	fprintf (opf, "<td>%i</td>\n", networkstats.channels.alltime.average);
 	fprintf (opf, "<td>%ld</td>\n", networkstats.channels.alltime.max);
-	fprintf (opf, "<td>[%s]</td></tr>\n", sftime(networkstats.channels.alltime.ts_max));
+	fprintf (opf, "<td>%s</td></tr>\n", sftime(networkstats.channels.alltime.ts_max));
 	fprintf (opf, "<tr><td>Opers:</td>\n");
 	fprintf (opf, "<td>%ld</td>\n", networkstats.opers.alltime.runningtotal);
 	fprintf (opf, "<td>%i (%d%%)</td>\n", networkstats.opers.current,
 		GetAllTimePercent (&networkstats.opers));
 	fprintf (opf, "<td>%i</td>\n", networkstats.opers.alltime.average);
 	fprintf (opf, "<td>%i</td>\n", networkstats.opers.alltime.max);
-	fprintf (opf, "<td>[%s]</td></tr>\n", sftime(networkstats.opers.alltime.ts_max));
+	fprintf (opf, "<td>%s</td></tr>\n", sftime(networkstats.opers.alltime.ts_max));
 	fprintf (opf, "<td>Servers:</td>\n");
 	fprintf (opf, "<td>%ld</td>\n", networkstats.servers.alltime.runningtotal);
 	fprintf (opf, "<td>%d (%d%%)</td>\n", networkstats.servers.current,
 		GetAllTimePercent (&networkstats.servers));
 	fprintf (opf, "<td>%d</td>\n", networkstats.servers.alltime.average);
 	fprintf (opf, "<td>%d</td>\n", networkstats.servers.alltime.max);
-	fprintf (opf, "<td>[%s] </td>\n", sftime(networkstats.servers.alltime.ts_max));
+	fprintf (opf, "<td>%s </td>\n", sftime(networkstats.servers.alltime.ts_max));
 	fprintf (opf, "<tr><td colspan=\"3\">Users Set Away: </td>\n");
 	fprintf (opf, "<td colspan=\"3\"> %ld </td></tr></table>\n", me.awaycount);
 }
