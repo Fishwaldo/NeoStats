@@ -5,5 +5,6 @@ NeoStats - TODO Log:
 Shmad:
 ------
 
-- Test SSJ5 support (ShadowMaster is doing this)
-- Just Bug fixes right now.
+- Fix crash on split rejoin some people experience 
+- Fix netname not being passed correctly fx: Chaos-Networks gets passed to Ultimate2 as Chaos for some reason. 
+- Fix neo segfaulting if a moron kills it with /kill
