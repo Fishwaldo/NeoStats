@@ -246,7 +246,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 #endif
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
-	schmode_cmd(me.name, me.chan, "+oa", cmd);
+	schmode_cmd(nick, me.chan, "+oa", cmd);
 	AddStringToList(&av, nick, &ac);
 	Module_Event("SIGNON", av, ac);
 	FreeList(av, ac);
@@ -545,13 +545,13 @@ void init_ServBot()
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
 	sjoin_cmd(s_Services, me.chan);
 	sprintf(rname, "%s %s", s_Services, s_Services);
-	schmode_cmd(me.name, me.chan, "+oa", rname);
+	schmode_cmd(s_Services, me.chan, "+oa", rname);
 #elif !ULTIMATE
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif
 	sjoin_cmd(s_Services, me.chan);
 	sprintf(rname, "%s %s", s_Services, s_Services);
-	schmode_cmd(me.name, me.chan, "+oa", rname);
+	schmode_cmd(s_Services, me.chan, "+oa", rname);
 	me.onchan = 1;
 	AddStringToList(&av, s_Services, &ac);
 	Module_Event("SIGNON", av, ac);

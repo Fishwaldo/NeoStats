@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.26 2002/07/04 11:02:27 fishwaldo Exp $
+** $Id: chans.c,v 1.27 2002/07/11 13:59:29 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -101,6 +101,7 @@ int ChanMode(char *origin, char **av, int ac) {
 											m = lnode_get(mn);
 											lnode_destroy(mn);
 											free(m);
+										j++;
 										}
 									} else {
 										c->modes &= ~cFlagTab[i].mode;
