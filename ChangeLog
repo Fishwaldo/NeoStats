@@ -48,6 +48,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Bots now unload after ModFini is called so they can still report messages (M)
  - All log filenames are now lower case for consistency across modules (M)
  - Changed Umode/SmodeStringtoMask function to accept current Umode, so we can do progressive mode changes (F) 
+ - StatServ data is now exported via SQL emulation as well. (F) 
 
 * NeoStats * Fish (F) * Version 2.5.10
  - Fix a problem with Umode +T being reintroduced on Unreal Beta19 as a normal usermode. 
