@@ -533,7 +533,9 @@ ModuleConfig(bot_setting* set_ptr)
 			switch(set_ptr->type) {
 				case SET_TYPE_BOOLEAN:
 					if (DBAFetchConfigBool (set_ptr->confitem, set_ptr->varptr) != NS_SUCCESS) {
-						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
+						if( set_ptr->defaultval ) {
+							*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
+						}
 						DBAStoreConfigBool (set_ptr->confitem, set_ptr->varptr);
 					}
 					if(set_ptr->handler) {
@@ -542,7 +544,9 @@ ModuleConfig(bot_setting* set_ptr)
 					break;
 				case SET_TYPE_INT:
 					if (DBAFetchConfigInt (set_ptr->confitem, set_ptr->varptr) != NS_SUCCESS) {
-						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
+						if( set_ptr->defaultval ) {
+							*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
+						}
 						DBAStoreConfigInt(set_ptr->confitem, set_ptr->varptr);
 					}
 					if(set_ptr->handler) {
@@ -558,7 +562,9 @@ ModuleConfig(bot_setting* set_ptr)
 				case SET_TYPE_REALNAME:
 				case SET_TYPE_IPV4:
 					if(	DBAFetchConfigStr (set_ptr->confitem, set_ptr->varptr, set_ptr->max) != NS_SUCCESS) {
-						strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
+						if( set_ptr->defaultval ) {
+							strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
+						}
 						DBAStoreConfigStr (set_ptr->confitem, set_ptr->varptr, set_ptr->max);
 					}
 					if(set_ptr->handler) {
