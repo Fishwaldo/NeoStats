@@ -837,10 +837,24 @@ Usr_Topic (char *origin, char **argv, int argc)
 {
 	char *buf;
 	Chans *c;
+	/*
+	** Hybrid uses two different formats for the topic change protocol... 
+	** :user TOPIC channel :topic 
+	** and 
+	** :server TOPIC channel author topicts :topic 
+	** Both forms must be accepted.
+	** - Hwy
+	*/	
 	c = findchan (argv[0]);
 	if (c) {
-		buf = joinbuf (argv, argc, 1);
-		ChangeTopic (origin, c, me.now, buf);
+		if (finduser(origin)) {
+			buf = joinbuf (argv, argc, 1);
+			ChangeTopic (origin, c, me.now, buf);
+		} else if (findserver(origin)) {
+			buf = joinbuf (argv, argc, 3);
+			ChangeTopic (argv[1], c, atoi(argv[2]), buf);
+		} else {
+			nlog(LOG_WARNING, LOG_CORE, "Ehhh, Can't find Topic Setter %s/%s", origin, argv[1]); 
 		free (buf);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);
