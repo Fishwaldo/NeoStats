@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dns.c,v 1.10 2003/04/11 09:26:30 fishwaldo Exp $
+** $Id: dns.c,v 1.11 2003/05/20 05:15:45 fishwaldo Exp $
 */
 
 
@@ -45,6 +45,7 @@ struct dnslookup_struct {
 	adns_answer *a; /**< the ADNS result if we have completed */
 	char data[255]; /**< the User data based to the callback */
 	void (*callback)(char *data, adns_answer *a); /**< a function pointer to call when we have a result */
+	char mod_name[MAXHOST];
 };
 
 /** @brief DNS structures
@@ -87,6 +88,8 @@ int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_a
 		nlog(LOG_CRITICAL, LOG_CORE, "DNS: Out of Memory");
 		return 0;
 	}
+	/* set the module name */
+	strncpy(dnsdata->mod_name, segvinmodule, MAXHOST);
 	strncpy(dnsdata->data, data, 254);
 	dnsdata->callback = callback;
 	if (type == adns_r_ptr) {
@@ -176,9 +179,12 @@ void do_dns() {
 			nlog(LOG_CRITICAL, LOG_CORE, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror(status));
 			chanalert(s_Services, "Bad Error on DNS lookup. Please check logfile");
 
+			/* set this so nlog works good */
+			strncpy(segvinmodule, dnsdata->mod_name, MAXHOST);
+
 			/* call the callback function with answer set to NULL */
 			dnsdata->callback(dnsdata->data, NULL);
-
+			strcpy(seginmodule, "");
 			/* delete from list */
 			dnsnode1 = list_delete(dnslist, dnsnode); 
 			dnsnode = list_next(dnslist, dnsnode1);
@@ -188,9 +194,10 @@ void do_dns() {
 			break;
 		}
 		nlog(LOG_DEBUG2, LOG_CORE, "DNS: Calling callback function with data %s", dnsdata->data);
+		strncpy(segvinmodule, dns->data->mod_name, MAXHOST);
 		/* call the callback function */
 		dnsdata->callback(dnsdata->data, dnsdata->a);
-
+		strcpy(segvinmodule, "");
 		/* delete from list */
 		dnsnode1 = list_delete(dnslist, dnsnode);
 		dnsnode = list_next(dnslist, dnsnode1);

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.119 2003/05/14 14:00:04 fishwaldo Exp $
+** $Id: ircd.c,v 1.120 2003/05/20 05:15:45 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -385,7 +385,7 @@ int del_bot(char *nick, char *reason)
 	int ac = 0;
 	strcpy(segv_location, "del_bot");
 	u = finduser(nick);
-	nlog(LOG_NOTICE, LOG_CORE, "Killing %s for %s",nick,reason);
+	nlog(LOG_DEBUG1, LOG_CORE, "Killing %s for %s",nick,reason);
 	if (!u) {
 		nlog(LOG_WARNING, LOG_CORE, "Attempting to Logoff with a Nickname that does not Exists: %s",nick);
 		return -1;

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.89 2003/04/15 14:03:35 fishwaldo Exp $
+** $Id: main.c,v 1.90 2003/05/20 05:15:45 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -82,21 +82,6 @@ int forked = 0;
 int main(int argc, char *argv[])
 {
 	FILE *fp;
-#if 0
-	char *test;
-	int i;
-/* testing of keeper database */	
-	SetConf("test", 1, "testconf");
-	SetConf((void *)12, 2, "this");
-	SetConf((void *)10, 4, "bool");
-	GetConf((void *)&test, 1, "testconf");
-	GetConf((void *)&i, 2, "this");
-	printf("%s\n", test);
-	printf("%d\n", i);
-	GetConf((void *)&i, 4, "bool");
-	printf("%d\n", i);
-	free(test);
-#endif
 	/* get our commandline options */
 	get_options(argc, argv);
 	
@@ -234,6 +219,7 @@ void get_options(int argc, char **argv) {
 				printf("	  -d 1-10 (Enable Debuging output 1= lowest, 10 = highest)\n");
 				printf("	  -n (Do not load any modules on startup)\n");
 				printf("	  -q (Quiet Start - For Cron Scripts)\n");
+				printf("          -f (Do NOt fork into BackGround\n");
 				exit(1);
 			case 'v':
 				printf("NeoStats Version %d.%d.%d%s\n", MAJOR, MINOR, REV, version);

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.47 2003/05/14 14:00:04 fishwaldo Exp $
+** $Id: users.c,v 1.48 2003/05/20 05:15:45 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -217,7 +217,7 @@ void UserDump(char *nick)
 				sendcoders("     Chans: %s", (char *)lnode_get(cm));
 				cm = list_next(u->chans, cm);
 			}
-		}
+		} 
 	} else {
 		un = hash_lookup(uh, nick);
 		if (un) {
