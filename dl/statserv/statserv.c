@@ -652,7 +652,6 @@ static void makemap(char *uplink, User * u, int level)
 		ss = findstats(s->name);
 		if ((level == 0) && (s->uplink[0] == 0)) {
 			/* its the root server */
-printf("locallevel %s\n", s->name);
 			if (StatServ.exclusions && IsExcluded(s)) {
 				makemap(s->name, u, level);
 			}
@@ -663,7 +662,6 @@ printf("locallevel %s\n", s->name);
 				ss->highest_ping);
 			makemap(s->name, u, level + 1);
 		} else if ((level > 0) && !ircstrcasecmp(uplink, s->uplink)) {
-printf("highlevel %s\n", s->name);
 			if (StatServ.exclusions && IsExcluded(s)) {
 				makemap(s->name, u, level);
 			}
