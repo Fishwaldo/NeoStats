@@ -1,7 +1,10 @@
 pkglib_LTLIBRARIES	= statserv.la
-statserv_la_SOURCES	= database.c stats.c statserv.c htmlstats.c \
-			statsrta.c statsrta.h statserv.h ss_help.c tld.c \
-			channel.c user.c network.c server.c version.c \
+statserv_la_SOURCES	= ss_help.c database.c database.h \
+			stats.c stats.h statserv.c statserv.h \
+			htmlstats.c htmlstats.h statsrta.c statsrta.h \
+			tld.c tld.h channel.c channel.h \
+			user.c user.h network.c network.h \
+			server.c server.h version.c version.h \
 			geoip/GeoIPCity.c geoip/GeoIPCity.h \
 			geoip/GeoIPBitReader.c geoip/GeoIPBitReader.h \
 			geoip/GeoIP.c geoip/GeoIP.h \

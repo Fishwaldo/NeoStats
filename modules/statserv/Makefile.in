@@ -154,9 +154,12 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 pkglib_LTLIBRARIES = statserv.la
-statserv_la_SOURCES = database.c stats.c statserv.c htmlstats.c \
-			statsrta.c statsrta.h statserv.h ss_help.c tld.c \
-			channel.c user.c network.c server.c version.c \
+statserv_la_SOURCES = ss_help.c database.c database.h \
+			stats.c stats.h statserv.c statserv.h \
+			htmlstats.c htmlstats.h statsrta.c statsrta.h \
+			tld.c tld.h channel.c channel.h \
+			user.c user.h network.c network.h \
+			server.c server.h version.c version.h \
 			geoip/GeoIPCity.c geoip/GeoIPCity.h \
 			geoip/GeoIPBitReader.c geoip/GeoIPBitReader.h \
 			geoip/GeoIP.c geoip/GeoIP.h \
@@ -178,8 +181,8 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 
 statserv_la_LIBADD =
-am_statserv_la_OBJECTS = database.lo stats.lo statserv.lo htmlstats.lo \
-	statsrta.lo ss_help.lo tld.lo channel.lo user.lo network.lo \
+am_statserv_la_OBJECTS = ss_help.lo database.lo stats.lo statserv.lo \
+	htmlstats.lo statsrta.lo tld.lo channel.lo user.lo network.lo \
 	server.lo version.lo GeoIPCity.lo GeoIPBitReader.lo GeoIP.lo \
 	md5.lo
 statserv_la_OBJECTS = $(am_statserv_la_OBJECTS)
