@@ -1,11 +1,11 @@
 #PCRE Makefile
 CC=@CC@
-CFLAGS=-I.. @CFLAGS@ -fPIC -DPIC -DNEO_PREFIX=\"@prefix@\" 
-LDFLAGS= @LDFLAGS@
+CFLAGS=@CFLAGS@
+LDFLAGS=@LDFLAGS@
 INCLUDES=-I.. -I.
 
-SOURCES= get.c pcre.c  study.c
-OBJECTS= get.o pcre.o  study.o
+SOURCES= get.c pcre.c study.c
+OBJECTS= get.o pcre.o study.o
 DOCS=README.pcre COPYING
 
 all:	 ${OBJECTS}
