@@ -569,11 +569,11 @@ modules/statserv/version.c -text
 modules/statserv/version.h -text
 modules/template/Makefile.am -text
 modules/template/Makefile.in -text
-modules/template/template.c -text
+modules/template/main.c -text
 modules/template/template.vcproj -text
 modules/templateauth/Makefile.am -text
 modules/templateauth/Makefile.in -text
-modules/templateauth/templateauth.c -text
+modules/templateauth/main.c -text
 modules/templateauth/templateauth.vcproj -text
 modules/textserv/Makefile.am -text
 modules/textserv/Makefile.in -text
