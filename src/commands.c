@@ -1260,7 +1260,6 @@ static bot_setting bot_info_settings[]=
 
 int add_bot_info_settings (Bot *bot_ptr, BotInfo* botinfo)
 {
-	SET_RUN_LEVEL(GET_CUR_MODULE());
 	bot_ptr->bot_info_settings = ns_calloc (sizeof(bot_info_settings));
 	if (bot_ptr->bot_info_settings) {
 		memcpy(bot_ptr->bot_info_settings, bot_info_settings, sizeof(bot_info_settings));
@@ -1272,7 +1271,6 @@ int add_bot_info_settings (Bot *bot_ptr, BotInfo* botinfo)
 		ModuleConfig (bot_ptr->bot_info_settings);
 		add_bot_setting_list (bot_ptr, bot_ptr->bot_info_settings);
 	}
-	RESET_RUN_LEVEL();
 	return NS_SUCCESS;
 }
 
