@@ -45,6 +45,12 @@ const char *cs_help_set_exclusions[] = {
 	NULL
 };
 
+const char *cs_help_set_logging[] = {
+	"LOGGING <ON/OFF> whether to log the events",
+	"reported by connectserv",
+	NULL
+};
+
 const char *cs_help_set_killwatch[] = {
 	"KILLWATCH <ON/OFF> whether to echo kill",
 	"events to the services channel.",

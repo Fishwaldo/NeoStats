@@ -39,6 +39,7 @@ struct cs_cfg {
 	int nick_watch;
 	int serv_watch;
 	int use_exc;
+	int logging;
 } cs_cfg;
 
 typedef struct ModeDef {
@@ -88,9 +89,6 @@ static int cs_set_serv_watch_cb (CmdParams* cmdparams, SET_REASON reason);
 /** Bot pointer */
 static Bot *cs_bot;
 
-/** Module pointer */
-static Module* cs_module;
-
 /** Copyright info */
 const char *cs_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
@@ -121,6 +119,7 @@ static bot_setting cs_settings[]=
 	{"NICKWATCH",	&cs_cfg.nick_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "NickWatch",	NULL,	cs_help_set_nickwatch, cs_set_nick_watch_cb, (void*)1 },
 	{"SERVWATCH",	&cs_cfg.serv_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ServWatch",	NULL,	cs_help_set_servwatch, cs_set_serv_watch_cb, (void*)1 },
 	{"EXCLUSIONS",	&cs_cfg.use_exc,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "Exclusions",	NULL,	cs_help_set_exclusions, cs_set_exclusions_cb, (void*)1 },
+	{"LOGGING",		&cs_cfg.logging,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "logging",		NULL,	cs_help_set_logging, NULL, (void*)1 },
 	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
 
@@ -186,7 +185,6 @@ ModeDef OperSmodes[]=
 
 int ModInit (Module *mod_ptr)
 {
-	cs_module = mod_ptr;
 	ModuleConfig (cs_settings);
 	return NS_SUCCESS;
 }
@@ -233,6 +231,12 @@ static int cs_event_signon (CmdParams* cmdparams)
 		cmdparams->source->name, cmdparams->source->user->username, 
 		cmdparams->source->user->hostname, cmdparams->source->info,
 		cmdparams->source->uplink->name);
+	if (cs_cfg.logging) {
+		nlog (LOG_NORMAL, msg_signon,
+			cmdparams->source->name, cmdparams->source->user->username, 
+			cmdparams->source->user->hostname, cmdparams->source->info,
+			cmdparams->source->uplink->name);
+	}
 	return NS_SUCCESS;
 }
 
@@ -259,9 +263,15 @@ static int cs_event_quit (CmdParams* cmdparams)
 			LocalCount = split_buf(lcl, &Local, 0);
 			KillMsg = joinbuf(Local, LocalCount, 7);
 			irc_chanalert(cs_bot, msg_localkill,
-				  cmdparams->source->name, cmdparams->source->user->username, 
-				  cmdparams->source->user->hostname,
-				  Local[6], KillMsg);
+				cmdparams->source->name, cmdparams->source->user->username, 
+				cmdparams->source->user->hostname,
+				Local[6], KillMsg);
+			if (cs_cfg.logging) {
+				nlog (LOG_NORMAL, msg_localkill,
+					cmdparams->source->name, cmdparams->source->user->username, 
+					cmdparams->source->user->hostname,
+					Local[6], KillMsg);
+			}
 			ns_free(KillMsg);
 			ns_free(QuitMsg);
 			ns_free(cmd);
@@ -272,9 +282,15 @@ static int cs_event_quit (CmdParams* cmdparams)
 	/* Print Disconnection Notice */
 	if (cs_cfg.sign_watch) {
 		irc_chanalert(cs_bot, msg_signoff,
-			  cmdparams->source->name, cmdparams->source->user->username, 
-			  cmdparams->source->user->hostname, cmdparams->source->info,
-			  cmdparams->source->uplink->name, QuitMsg);
+			cmdparams->source->name, cmdparams->source->user->username, 
+			cmdparams->source->user->hostname, cmdparams->source->info,
+			cmdparams->source->uplink->name, QuitMsg);
+		if (cs_cfg.logging) {
+			nlog (LOG_NORMAL, msg_signoff,
+				cmdparams->source->name, cmdparams->source->user->username, 
+				cmdparams->source->user->hostname, cmdparams->source->info,
+				cmdparams->source->uplink->name, QuitMsg);
+		}
 	}
 	ns_free(QuitMsg);
 	ns_free(cmd);
@@ -295,12 +311,26 @@ static int cs_report_mode (const char* modedesc, int serverflag, Client * u, int
 			modedesc,
 			add?'+':'-',
 			mode, u->uplink->name);
+		if (cs_cfg.logging) {
+			nlog (LOG_NORMAL, msg_mode_serv, u->name, 
+				add?"now":"no longer", 
+				modedesc,
+				add?'+':'-',
+				mode, u->uplink->name);
+		}
 	} else {
 		irc_chanalert(cs_bot, msg_mode, u->name, 
 			add?"now":"no longer", 
 			modedesc,
 			add?'+':'-',
 			mode);
+		if (cs_cfg.logging) {
+			nlog (LOG_NORMAL, msg_mode, u->name, 
+				add?"now":"no longer", 
+				modedesc,
+				add?'+':'-',
+				mode);
+		}
 	}
 	return NS_SUCCESS;
 }
@@ -330,6 +360,10 @@ static int cs_event_umode (CmdParams* cmdparams)
 			if (mask == UMODE_BOT) {
 				irc_chanalert (cs_bot, msg_bot, cmdparams->source->name, 
 					add?"now":"no longer", add?'+':'-', *modes);			
+				if (cs_cfg.logging) {
+					nlog (LOG_NORMAL, msg_bot, cmdparams->source->name, 
+							add?"now":"no longer", add?'+':'-', *modes);			
+				}
 			} else {
 				def = OperUmodes;
 				while(def->mask) {
@@ -404,11 +438,23 @@ static int cs_event_kill (CmdParams* cmdparams)
 			cmdparams->source->name, cmdparams->source->user->username, 
 			cmdparams->source->user->hostname,
 			Kill[0], GlobalMsg);
+		if (cs_cfg.logging) {
+			nlog (LOG_NORMAL, msg_globalkill,
+			cmdparams->source->name, cmdparams->source->user->username, 
+			cmdparams->source->user->hostname,
+			Kill[0], GlobalMsg);
+		}
 	} else if (find_server(Kill[2])) {
 		irc_chanalert(cs_bot, msg_serverkill,
 			cmdparams->source->name, cmdparams->source->user->username, 
 			cmdparams->source->user->hostname,
 			Kill[0], GlobalMsg);
+		if (cs_cfg.logging) {
+			nlog (LOG_NORMAL, msg_serverkill,
+			cmdparams->source->name, cmdparams->source->user->username, 
+			cmdparams->source->user->hostname,
+			Kill[0], GlobalMsg);
+		}
 	}
 	ns_free(cmd);
 	ns_free(GlobalMsg);
@@ -424,6 +470,11 @@ static int cs_event_nick (CmdParams* cmdparams)
 	irc_chanalert(cs_bot, msg_nickchange, cmdparams->param, 
 		cmdparams->source->user->username, cmdparams->source->user->hostname, 
 		cmdparams->source->name);
+	if (cs_cfg.logging) {
+		nlog (LOG_NORMAL, msg_nickchange, cmdparams->param, 
+		cmdparams->source->user->username, cmdparams->source->user->hostname, 
+		cmdparams->source->name);
+	}
 	return NS_SUCCESS;
 }
 
@@ -432,6 +483,10 @@ static int cs_event_server (CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	irc_chanalert (cs_bot, "\2SERVER\2 %s has joined the network at %s",
 		cmdparams->source->name, cmdparams->source->uplink->name);
+	if (cs_cfg.logging) {
+		nlog (LOG_NORMAL, "\2SERVER\2 %s has joined the network at %s",
+		cmdparams->source->name, cmdparams->source->uplink->name);
+	}
 	return NS_SUCCESS;
 }
 
@@ -441,6 +496,11 @@ static int cs_event_squit (CmdParams* cmdparams)
 	irc_chanalert (cs_bot, "\2SERVER\2 %s has left the network at %s for %s",
 		cmdparams->source->name, cmdparams->source->uplink->name, 
 		cmdparams->param ? cmdparams->param : "reason unknown");
+	if (cs_cfg.logging) {
+		nlog (LOG_NORMAL, "\2SERVER\2 %s has left the network at %s for %s",
+		cmdparams->source->name, cmdparams->source->uplink->name, 
+		cmdparams->param ? cmdparams->param : "reason unknown");
+	}
 	return NS_SUCCESS;
 }
 

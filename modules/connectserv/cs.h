@@ -26,6 +26,7 @@
 extern const char *cs_about[];
 extern const char *cs_help_set_signwatch[];
 extern const char *cs_help_set_exclusions[];
+extern const char *cs_help_set_logging[];
 extern const char *cs_help_set_killwatch[];
 extern const char *cs_help_set_modewatch[];
 extern const char *cs_help_set_nickwatch[];

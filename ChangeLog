@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - ConnectServ: add logging facility to log events. (M)
  - Channel alerts for command use is now optional. (M)
  - Automatically remove NeoStats bots from channels when there are no longer
    any real users in the channel. The services channel is excluded. (M)
