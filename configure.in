@@ -493,6 +493,8 @@ echo "(*----------------------------------------------------------*)"
 echo "(| Now that Configure is complete, just type 'make' to      |)"
 echo "(| compile the program                                      |)"
 echo "(*----------------------------------------------------------*)"
-read -p "Press Enter Key to Read the Release Notes"
-clear
-more ./RELNOTES
+if test "$shush" != yes; then
+	read -p "Press Enter Key to Read the Release Notes"
+	clear
+	more ./RELNOTES
+fi
