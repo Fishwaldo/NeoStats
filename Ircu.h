@@ -268,7 +268,7 @@
 #define UMODE_SETHOST			0x4000	/* */
 #define UMODE_BOT				0x8000	/* */
 #endif
-#if defined( NEFARIOUS ) || ( ASUKA )
+#if ( defined NEFARIOUS ) || (defined ASUKA )
 #define UMODE_ACCOUNTONLY		0x10000	/* */
 #define UMODE_XTRAOP			0x20000	/* */
 #define UMODE_NOCHAN			0x40000	/* */
