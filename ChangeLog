@@ -4,6 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Fix Win32 text output for log files. (M)
+ - ADNS now uses neostats memory management. (M)
+ - Merge gdbm lib and gdbm DBM module. (M)
  - StatServ: Merge GEOIP and GEOIPWIN32 libs. (M)
  - Merge ADNS and ADNSWIN32 libs. (M)
  - Module command setup is now more strict. Commands will not be added if the
