@@ -68,6 +68,9 @@ struct hs_cfg {
 	char vhostdom[MAXHOST];
 #endif
 	int modnum;
+	char user[MAXUSER];
+	char host[MAXHOST];
+	char rname[MAXREALNAME];
 } hs_cfg;
 
 #ifdef UMODE_REGNICK
@@ -79,8 +82,9 @@ typedef struct hs_user {
 
 extern const char *hs_help[];
 static int hs_sign_on(char **av, int ac);
+#if UMODE_REGNICK
 static int hs_mode(char **av, int ac);
-
+#endif
 static int hs_about(User * u, char **av, int ac);
 static int hs_levels(User * u, char **av, int ac);
 static int hs_bans(User * u, char **av, int ac);
@@ -97,10 +101,11 @@ static void hs_addban(User * u, char *ban);
 static void hs_delban(User * u, char *ban);
 
 static int new_m_version(char *origin, char **av, int ac);
-static void SaveBans();
-void hsdat(char *nick, char *host, char *vhost, char *pass, char *who);
-void CleanupHosts();
-void Loadhosts();
+static void SaveBans(void);
+static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who);
+static void CleanupHosts(void);
+static void LoadHosts(void);
+static void LoadConfig(void);
 
 int data_synch;
 int load_synch;
@@ -164,63 +169,6 @@ int del_moddata(char **av, int ac) {
 	return 1;
 }
 	
-
-void hs_Config()
-{
-	char *ban;
-	char *host;
-	char *host2;
-	hnode_t *hn;
-	char *ban2;
-	int hostlen;
-
-	SET_SEGV_LOCATION();
-	hs_cfg.old = 60;
-	GetConf((void *) &hs_cfg.view, CFGINT, "ViewLevel");
-	if ((hs_cfg.view > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
-		hs_cfg.view = 100;
-	GetConf((void *) &hs_cfg.add, CFGINT, "AddLevel");
-	if ((hs_cfg.add > NS_ULEVEL_ROOT) || (hs_cfg.view <= 0))
-		hs_cfg.add = 40;
-	GetConf((void *) &hs_cfg.del, CFGINT, "DelLevel");
-	if ((hs_cfg.del > NS_ULEVEL_ROOT) || (hs_cfg.del <= 0))
-		hs_cfg.del = 40;
-	GetConf((void *) &hs_cfg.list, CFGINT, "ListLevel");
-	if ((hs_cfg.list > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
-		hs_cfg.list = 40;
-	GetConf((void *) &hs_cfg.old, CFGINT, "ExpireDays");
-	if (GetConf((void *) &hs_cfg.regnick, CFGINT, "UnetVhosts") > 0) {
-		if (GetConf((void *) &ban, CFGSTR, "UnetDomain") > 0) {
-			strlcpy(hs_cfg.vhostdom, ban, MAXHOST);
-		} else {
-			hs_cfg.vhostdom[0] = '\0';
-		}
-	} else {
-		hs_cfg.regnick = 0;
-		hs_cfg.vhostdom[0] = '\0';
-	}
-		
-	/* banned vhosts */
-	ban = NULL;
-	GetConf((void *) &ban, CFGSTR, "BannedVhosts");
-	ban2 = ban;
-	if (ban) {
-		host = strtok(ban, ";");
-		while (host != NULL) {
-			/* limit host to MAXHOST and avoid unterminated/huge strings */
-			hostlen = strnlen(host, MAXHOST);
-			/* If less than MAXHOST allocate an extra byte for NULL */
-			if(hostlen < MAXHOST)
-				hostlen++;
-			host2 = malloc(hostlen);
-			strlcpy(host2, host, hostlen);
-			hn = hnode_create(host2);
-			hash_insert(bannedvhosts, hn, host2);
-			host = strtok(NULL, ";");
-		}
-	}
-	free(ban2);
-}
 
 int new_m_version(char *origin, char **av, int ac)
 {
@@ -298,106 +246,25 @@ static bot_cmd hs_commands[]=
 	{"VIEW",	hs_view,	1, 	(int)&hs_cfg.view,	hs_help_view,	hs_help_view_oneline },
 	{"LOGIN",	hs_login,	2, 	0,					hs_help_login,	hs_help_login_oneline },
 	{"CHPASS",	hs_chpass,	3, 	0,					hs_help_chpass,	hs_help_chpass_oneline },
-	{"SET",		hs_set,		1, 	NS_ULEVEL_ADMIN,	hs_help_set,	hs_help_set_oneline },
 	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
 };
 
-static int hs_set(User * u, char **av, int ac)
+static bot_setting hs_settings[]=
 {
-	int i;
-	if (UserLevel(u) < NS_ULEVEL_ADMIN) {
-		prefmsg(u->nick, s_HostServ, "Permission Denied");
-		chanalert(s_HostServ, "%s tried set, but permission was denied", u->nick);
-		return 1;
-	}
-	if (!strcasecmp(av[2], "LIST")) {
-		prefmsg(u->nick, s_HostServ, "Current Settings:");
-		prefmsg(u->nick, s_HostServ, "Expire Time: %d (Days)", hs_cfg.old);
-		prefmsg(u->nick, s_HostServ, "Undernet Style Hidden Hosts: %s", hs_cfg.regnick ? hs_cfg.vhostdom : "Disabled");
-		prefmsg(u->nick, s_HostServ, "End of List.");
-		return 1;
-	}
-	if (ac < 4) {
-		prefmsg(u->nick, s_HostServ,
-			"Syntax: /msg %s SET <option> <value>",
-			s_HostServ);
-		prefmsg(u->nick, s_HostServ,
-			"For additional help: /msg %s HELP SET",
-			s_HostServ);
-		return 1;
-	}
-	if (!strcasecmp(av[2], "EXPIRE")) {
-		i = atoi(av[3]);	
-		if ((i <= 0) || (i > 100)) {
-			prefmsg(u->nick, s_HostServ, "Value out of Range.");
-			return 1;
-		}
-		/* if we get here, all is ok */
-		hs_cfg.old = i;
-		prefmsg(u->nick, s_HostServ, "Expire Time is is set to %d (days)", i);
-		chanalert(s_HostServ, "%s Set Expire Time to %d", u->nick, i);
-		SetConf((void *)i, CFGINT, "ExpireDays");
-		return 1;
-	} else if (!strcasecmp(av[2], "HIDDENHOST")) {
-		if (!strcasecmp(av[3], "off")) {
-			hs_cfg.regnick = 0;
-			SetConf((void *)0, CFGINT, "UnetVhosts");
-			prefmsg(u->nick, s_HostServ, "Undernet Style Hidden Hosts disabled for Registered Users");
-			chanalert(s_HostServ, "%s disabled Undernet Style Hidden Hosts", u->nick);
-			return 1;
-		} else {
-			hs_cfg.regnick = 1;
-			strlcpy(hs_cfg.vhostdom, av[3], MAXHOST);
-			SetConf((void *)1, CFGINT, "UnetVhosts");
-			SetConf((void *)av[3], CFGSTR, "UnetDomain");
-			prefmsg(u->nick, s_HostServ, "Undernet Style Hidden Hosts enabled for Registered Users");
-			chanalert(s_HostServ, "%s enabled Undernet Style Hidden Hosts with domain %s", u->nick, av[3]);
-			return 1;
-		}
-	} else {
-		prefmsg(u->nick, s_HostServ, "Unknown Option %s. Prehaps you need help?", av[2]);
-		return 1;
-	}			
-}
+	{"EXPIRE",		&hs_cfg.old,		SET_TYPE_INT,		0, 99,	"ExpireDays",	"days",	hs_help_set	},
+	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0,	"UnetVhosts",	NULL,	NULL	},
+	{"HOSTNAME",	&hs_cfg.vhostdom,	SET_TYPE_STRING,	0, 0,	"UnetDomain",	NULL,	NULL	},
+	{NULL,			NULL,				0,					0, 0,	NULL,			NULL,	NULL	},
+};
+
 int Online(char **av, int ac)
 {
-	char *user = NULL;
-	char *host = NULL;
-	char *rname = NULL;
-
-	if (GetConf((void *) &s_HostServ, CFGSTR, "Nick") < 0) {
-/*		s_HostServ = malloc(MAXNICK); */
-		strlcpy(s_HostServ, "HostServ", MAXNICK);
-	}
-	if (GetConf((void *) &user, CFGSTR, "User") < 0) {
-		user = malloc(MAXUSER);
-		strlcpy(user, "HS", MAXUSER);
-	}
-	if (GetConf((void *) &host, CFGSTR, "Host") < 0) {
-		host = malloc(MAXHOST);
-		strlcpy(host, me.name, MAXHOST);
-	}
-	if (GetConf((void *) &rname, CFGSTR, "RealName") < 0) {
-		rname = malloc(MAXREALNAME);
-		strlcpy(rname, "Network Virtual Host Service", MAXREALNAME);
-	}
-
-	hs_bot = init_mod_bot(s_HostServ, user, host, rname, 
-		services_bot_modes, 0, hs_commands, NULL, __module_info.module_name);
-
-	if(user)
-		 free(user);
-	if(host)
-		free(host);
-	if(rname)
-		free(rname);
-	chanalert(s_HostServ,
-		  "Configured Levels: Add: %d, Del: %d, List: %d, View: %d",
-		  hs_cfg.add, hs_cfg.del, hs_cfg.list, hs_cfg.view);
+	hs_bot = init_mod_bot(s_HostServ, hs_cfg.user, hs_cfg.host, hs_cfg.rname, 
+		services_bot_modes, 0, hs_commands, hs_settings, __module_info.module_name);
 
 	add_mod_timer("CleanupHosts", "Cleanup_Old_Vhosts",
 		      __module_info.module_name, 7200);
-	Loadhosts();
+	LoadHosts();
 
 	return 1;
 };
@@ -429,7 +296,7 @@ int __ModInit(int modnum, int apiver)
 		return -1;
 	}
 	hs_cfg.modnum = modnum;
-	hs_Config();
+	LoadConfig();
 	return 1;
 }
 
@@ -444,8 +311,8 @@ void __ModFini()
 	list_destroy_nodes(vhosts);
 
 };
-int hs_mode(char **av, int ac) {
 #if UMODE_REGNICK
+int hs_mode(char **av, int ac) {
 	int add = 0;
 	char *modes;
 	User *u;
@@ -493,12 +360,12 @@ int hs_mode(char **av, int ac) {
 		}
 		modes++;
 	}
-#endif
 	return 1;
 }
+#endif
 
 /* Routine for registrations with the 'vhosts.db' file */
-void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
+static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 {
 	lnode_t *hn;
 	hs_map *map;
@@ -635,22 +502,14 @@ static void hs_addban(User * u, char *ban)
 {
 	hnode_t *hn;
 	char *host;
-	int hostlen;
 
-	/* limit host to MAXHOST and avoid unterminated/huge strings */
-	hostlen = strnlen(ban, MAXHOST);
-	/* If less than MAXHOST allocate an extra byte for NULL */
-	if(hostlen < MAXHOST)
-		hostlen++;
-
-	host = malloc(hostlen);
-	strlcpy(host, ban, hostlen);
-	if (hash_lookup(bannedvhosts, host) != NULL) {
+	if (hash_lookup(bannedvhosts, ban) != NULL) {
 		prefmsg(u->nick, s_HostServ,
 			"%s already exists in the banned vhost list", ban);
-		free(host);
 		return;
 	}
+	host = malloc(MAXHOST);
+	strlcpy(host, ban, MAXHOST);
 	hn = hnode_create(host);
 	hash_insert(bannedvhosts, hn, host);
 	prefmsg(u->nick, s_HostServ,
@@ -681,7 +540,7 @@ static void hs_delban(User * u, char *ban)
 		if (i == j) {
 			hash_scan_delete(bannedvhosts, hn);
 			prefmsg(u->nick, s_HostServ,
-				"Deleted the Folling Banned Vhosts: %s",
+				"Deleted %s from the banned vhost list",
 				(char *) hnode_get(hn));
 			chanalert(s_HostServ,
 				  "%s deleted %s from the banned vhost list",
@@ -695,8 +554,7 @@ static void hs_delban(User * u, char *ban)
 			return;
 		}
 	}
-	prefmsg(u->nick, s_HostServ, "Entry %d was not found (Weird?!?)",
-		i);
+	prefmsg(u->nick, s_HostServ, "Entry %d was not found (Weird?!?)", i);
 }
 
 static void SaveBans()
@@ -938,7 +796,7 @@ static int hs_view(User * u, char **av, int ac)
 
 
 /* Routine For Loading The Hosts into Array */
-void Loadhosts()
+static void LoadHosts()
 {
 	hs_map *map;
 	lnode_t *hn;
@@ -1102,13 +960,15 @@ static int hs_login(User * u, char **av, int ac)
 	return 1;
 }
 
-void CleanupHosts()
+static void CleanupHosts()
 {
 	lnode_t *hn, *hn2;
 	hs_map *map;
 
 	SET_SEGV_LOCATION();
-
+	/* Use zero value to disable this feature */
+	if(hs_cfg.old == 0)
+		return;
 	hn = list_first(vhosts);
 	while (hn != NULL) {
 		map = lnode_get(hn);
@@ -1127,3 +987,88 @@ void CleanupHosts()
 	}
 }
 
+/* 
+ * Load HostServ Configuration file and set defaults if does not exist
+ */
+static void LoadConfig(void)
+{
+	char *temp = NULL;
+	char *ban;
+	char *host;
+	char *host2;
+	hnode_t *hn;
+
+	SET_SEGV_LOCATION();
+
+	if (GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
+		strlcpy(s_HostServ, "HostServ", MAXNICK);
+	}
+	else {
+		strlcpy(s_HostServ, temp, MAXNICK);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "User") < 0) {
+		strlcpy(hs_cfg.user, "HS", MAXUSER);
+	}
+	else {
+		strlcpy(hs_cfg.user, temp, MAXUSER);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "Host") < 0) {
+		strlcpy(hs_cfg.host, me.name, MAXHOST);
+	}
+	else {
+		strlcpy(hs_cfg.host, temp, MAXHOST);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "RealName") < 0) {
+		strlcpy(hs_cfg.rname, "Network Virtual Host Service", MAXREALNAME);
+	}
+	else {
+		strlcpy(hs_cfg.rname, temp, MAXREALNAME);
+		free(temp);
+	}
+
+	GetConf((void *) &hs_cfg.view, CFGINT, "ViewLevel");
+	if ((hs_cfg.view > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
+		hs_cfg.view = 100;
+	GetConf((void *) &hs_cfg.add, CFGINT, "AddLevel");
+	if ((hs_cfg.add > NS_ULEVEL_ROOT) || (hs_cfg.view <= 0))
+		hs_cfg.add = 40;
+	GetConf((void *) &hs_cfg.del, CFGINT, "DelLevel");
+	if ((hs_cfg.del > NS_ULEVEL_ROOT) || (hs_cfg.del <= 0))
+		hs_cfg.del = 40;
+	GetConf((void *) &hs_cfg.list, CFGINT, "ListLevel");
+	if ((hs_cfg.list > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
+		hs_cfg.list = 40;
+	GetConf((void *) &hs_cfg.old, CFGINT, "ExpireDays");
+	if ((hs_cfg.old > 99) || (hs_cfg.old < 0))
+		hs_cfg.old = 60;
+	GetConf((void *) &hs_cfg.regnick, CFGINT, "UnetVhosts");
+	if (hs_cfg.regnick < 0) {
+		 hs_cfg.regnick = 0;
+	}
+	if (GetConf((void *) &ban, CFGSTR, "UnetDomain") > 0) {
+		strlcpy(hs_cfg.vhostdom, ban, MAXHOST);
+		free(ban);
+	} else {
+		hs_cfg.vhostdom[0] = '\0';
+	}
+		
+	/* banned vhosts */
+	ban = NULL;
+	GetConf((void *) &ban, CFGSTR, "BannedVhosts");
+	if (ban) {
+		temp = ban;
+		host = strtok(ban, ";");
+		while (host != NULL) {
+			/* limit host to MAXHOST and avoid unterminated/huge strings */
+			host2 = malloc(MAXHOST);
+			strlcpy(host2, host, MAXHOST);
+			hn = hnode_create(host2);
+			hash_insert(bannedvhosts, hn, host2);
+			host = strtok(NULL, ";");
+		}
+		free(temp);
+	}
+}

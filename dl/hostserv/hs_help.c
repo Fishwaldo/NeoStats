@@ -33,7 +33,6 @@ const char hs_help_add_oneline[] ="Add a vhost";
 const char hs_help_del_oneline[] ="Delete a vhost";
 const char hs_help_list_oneline[] ="List vhosts";
 const char hs_help_view_oneline[] ="Detailed vhost list";
-const char hs_help_set_oneline[] ="HostServ configuration";
 const char hs_help_levels_oneline[] ="Levels to manage HostServ";
 
 const char *hs_help_about[] = {
@@ -49,22 +48,23 @@ const char *hs_help_about[] = {
 };
 
 const char *hs_help_add[] = {
-	"Syntax: \2ADD <NICK> <HOSTNAME> <VHOST NAME> <PASSWORD>\2",
+	"Syntax: \2ADD <NICK> <HOSTNAME> <VHOST> <PASSWORD>\2",
 	"",
-	"Register a host name. e.g. my-host.com DO NOT INCLUDE AN @.",
-	"HOSTNAME must be where the user is connecting from WITHOUT",
-	"THE @. HOSTNAME can include wildcards e.g. *.myhost.com",
-	"Users can also get their VHOST by typing the command:",
+	"Register a vhost with hostserv. e.g. my-host.com.",
+	"HOSTNAME must be where the user is connecting from",
+	"\2without the @\2",
+	"HOSTNAME can include wildcards e.g. *.myhost.com",
+	"Users can also get their vhost by typing the command:",
 	"    \2/msg HostServ LOGIN nick password\2",
-	"This allows them to use the VHOST from any host and for",
-	"multiple users to share one VHOST",
+	"This allows them to use the vhost from any host and for",
+	"multiple users to share one vhost",
 	NULL
 };
 
 const char *hs_help_del[] = {
 	"Syntax: \2DEL <ACCESS LIST #>\2",
 	"",
-	"Delete a VHOST.",
+	"Delete a vhost.",
 	"Use \2LIST\2 to find the number to use in this command",
 	NULL
 };
@@ -72,7 +72,7 @@ const char *hs_help_del[] = {
 const char *hs_help_view[] = {
 	"Syntax: \2VIEW <ACCESS LIST #>\2",
 	"",
-	"View Detailed information about a VHOST.",
+	"View Detailed information about a vhost.",
 	"Use \2LIST\2 to find the number to use in this command",
 	NULL
 };
@@ -142,18 +142,23 @@ const char *hs_help_levels[] = {
 const char *hs_help_set[] = {
 	"Syntax: \2SET LIST\2",
 	"        \2SET EXPIRE <TIME>\2",
-	"        \2SET HIDDENHOST <OFF/host>\2",
+	"        \2SET HIDDENHOST <ON/OFF>\2",
+	"        \2SET HOSTNAME <hostname>\2",
 	"",
 	"\2SET LIST\2",
 	"Lists the current settings for HostServ.",
 	"",
 	"\2SET EXPIRE <TIME>\2",
 	"How long before unused HostServ entries should be",
-	"automatically deleted.",
+	"automatically deleted. A value of 0 makes all vhosts",
+	"permanent",
 	"",
-	"\2SET HIDDENHOST <OFF/host>\2",
+	"\2SET HIDDENHOST <ON/OFF>\2",
 	"Turns on undernet style hidden hosts when users identify to nickserv.",
-	"The hidden host is set to <user>.<host>.",
-	"by specifing \2OFF\2 you can disable this functionality",
+	"You will also need to set HOSTNAME to the host you want to use",
+	"",
+	"\2SET HOSTNAME <hostname>\2",
+	"The hidden host you want to set on users.",
+	"Users will then be set to <user>.<hostname>.",
 	NULL
 };

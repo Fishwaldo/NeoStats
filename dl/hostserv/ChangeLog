@@ -7,6 +7,11 @@ Shmad <shmad@neostats.net>
  - Use core bot message handler to process commands (M)
  - Fix for hidden host bug id 92 (M)
  - Fix for disable message not passing enough parameters (M)
+ - Fixes to config load to validate expiry times and memory leak with hidden host (M)
+ - New string functions means we no longer need to allocate MAXHOST+1 when reading bans. (M)
+ - Use core bot set handler (M)
+ - Cleaned up config system (M)
+ - Allow EXPIRE to accept a value of 0 to disable expiry processing (M)
 
 * Version 3.1 * Fish (F) & Mark (M) * Oct 17th, 2003
  - Fixed incorrect buffer size for password field (M)
