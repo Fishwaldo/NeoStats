@@ -45,14 +45,18 @@
 #include "ircd.h"
 #include "rtaserv.h"
 #include "dcc.h"
+#include "sock.h"
 
 /* @brief Module Socket List hash */
 static hash_t *sockethash;
-/* @brief server socket */
-static int servsock;
+
 char recbuf[BUFSIZE];
 static struct timeval *TimeOut;
 static struct pollfd *ufds;
+
+
+void write_from_ircd_socket (struct bufferevent *bufferevent, void *arg);
+
 
 /** @brief Connect to a server
  *
@@ -114,6 +118,17 @@ ConnectTo (char *host, int port)
 	return s;
 }
 
+/** @brief update the me.now struct 
+ * @param none
+ * @return none
+ */
+static void 
+update_time() {
+	me.now = time(NULL);
+	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
+}
+
+
 /** @brief main recv loop
  *
  * @param none
@@ -127,6 +142,18 @@ void
 #endif
 read_loop ()
 {
+	printf("readloop called\n");
+	me.lastmsg = me.now;
+	while (1) { /* loop till we get a error */
+		SET_SEGV_LOCATION();
+		update_time();
+		event_dispatch();
+		printf("loop1\n");
+		SET_SEGV_LOCATION();
+	}
+
+
+#if 0
 	register int i, j, SelectResult;
 	struct timeval tvbuf;
 	fd_set readfds, writefds, errfds;
@@ -311,6 +338,7 @@ read_loop ()
 			}
 		}
 	}
+#endif /* new sock code */
 }
 
 /** @brief Connects to IRC and starts the main loop
@@ -326,12 +354,15 @@ read_loop ()
 void
 Connect (void)
 {
+	int mysock;
 	SET_SEGV_LOCATION();
 	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, me.port);
-	servsock = ConnectTo (me.uplink, me.port);
-	if (servsock <= 0) {
-		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
+	mysock = ConnectTo (me.uplink, me.port);
+	if (mysock <= 0) {
+		nlog (LOG_WARNING, "Unable to connect to %s: %s", me.uplink, strerror(errno));
 	} else {
+		me.servsock=add_linemode_socket("IRCd", mysock, irc_parse, write_from_ircd_socket, error_from_ircd_socket);
+
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
 		irc_connect (me.name, me.numeric, me.infoline, nsconfig.pass, (unsigned long)me.ts_boot, (unsigned long)me.now);
 #ifndef WIN32
@@ -473,26 +504,127 @@ sock_disconnect (const char *name)
  * @return none
  */
 void
-send_to_socket (const char *buf, const int buflen)
+send_to_ircd_socket (const char *buf, const int buflen)
 {
 	int sent;
 
-	if (servsock == -1) {
+	if (!me.servsock) {
 		nlog(LOG_WARNING, "Not sending to server as we have a invalid socket");
 		return;
 	}
-	sent = os_sock_write (servsock, buf, buflen);
+	/* the ircd socket is a buffered socket */
+	sent = bufferevent_write(me.servsock->event.buffered, (void *)buf, buflen);
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
 		/* Try to close socket then reset the servsock value to avoid cyclic calls */
-		os_sock_close (servsock);
-		servsock = -1;
+		bufferevent_free(me.servsock->event.buffered);
+		del_sock(me.servsock->name);
+		os_sock_close (me.servsock->sock_no);
+		me.servsock = NULL;
+		/* XXX really exit? */
 		do_exit (NS_EXIT_ERROR, NULL);
 	}
-	me.SendM++;
-	me.SendBytes = me.SendBytes + sent;
+	me.servsock->smsgs++;
+	me.servsock->sbytes += buflen;
 }
 
+#undef SOCKDEBUG 
+
+void
+linemode_read(struct bufferevent *bufferevent, void *arg) {
+	Sock *thisock = (Sock*)arg;
+
+	char buf[512];
+	size_t len;
+	int bufpos;
+#ifdef SOCKDEBUG
+	printf("Start Reading\n");
+#endif
+
+	while ((len = bufferevent_read(bufferevent, buf, 512)) > 0) {
+#ifdef SOCKDEBUG
+		printf("Buffer: %d |%s|\n\n", thisock->linemode->readbufsize, thisock->linemode->readbuf);
+		printf("RecievedSize %d |%s|\n\n", len, buf);
+#endif
+		if (len > 0) {
+			/* firstly, if what we have read plus our existing buffer size exceeds our recvq
+			 * we should drop the connection
+			 */
+			if ((len + thisock->linemode->readbufsize) > thisock->linemode->recvq) {
+				nlog(LOG_ERROR, "RecvQ for %s(%s) exceeded. Dropping Connection", thisock->name, thisock->moduleptr?thisock->moduleptr->info->name:"N/A");
+				bufferevent_free(bufferevent);
+				del_sock(thisock->name);
+				os_sock_close (thisock->sock_no);
+				/* XXX really exit? */
+				do_exit (NS_EXIT_ERROR, NULL);
+			}
+			thisock->rbytes += len;
+
+			for (bufpos = 0; bufpos < len; bufpos++) {
+				/* if the static buffer now contains newline chars,
+				 * we are ready to parse the line 
+				 * else we just keep putting the recieved charactors onto the buffer
+				 */
+				if ((buf[bufpos] == '\n') || (buf[bufpos] == '\r')) {
+					/* only process if we have something to do. This might be a trailing NL or CR char*/
+					if (thisock->linemode->readbufsize > 0) {
+						/* update some stats */
+						thisock->rmsgs++;
+#if 0
+						me.lastmsg = me.now;
+#endif
+						/* make sure its null terminated */
+						thisock->linemode->readbuf[thisock->linemode->readbufsize++] = '\0';
+						/* copy it to our recbuf for debugging */
+						strlcpy(recbuf, thisock->linemode->readbuf, BUFSIZE);
+						/* parse the buffer */
+#ifdef SOCKDEBUG
+						printf("line:|%s| %d %d\n", thisock->linemode->readbuf, thisock->linemode->readbufsize, bufpos);
+#endif
+						thisock->linemode->funccb(thisock->linemode->readbuf);
+						/* ok, reset the recbuf */
+						thisock->linemode->readbufsize = 0;
+					}
+				} else {
+					/* add it to our static buffer */
+					thisock->linemode->readbuf[thisock->linemode->readbufsize] = buf[bufpos];
+					thisock->linemode->readbufsize++;
+				}
+			}
+			thisock->linemode->readbuf[thisock->linemode->readbufsize] = '\0';
+		}
+	}
+}
+
+void
+write_from_ircd_socket (struct bufferevent *bufferevent, void *arg) {
+printf("wrote\n");
+}
+void 
+error_from_ircd_socket(struct bufferevent *bufferevent, short what, void *arg) {
+#if 0
+	Sock *sock = (Sock*)arg;
+#endif	
+	switch (what) {
+		case EVBUFFER_READ:
+		case EVBUFFER_WRITE:
+		case EVBUFFER_EOF:
+		case EVBUFFER_ERROR:
+		case EVBUFFER_TIMEOUT:
+			nlog(LOG_ERROR, "error_from_ircd_socket: Error: %d", what);
+			break;
+		default:
+			nlog(LOG_ERROR, "Unknown Error from IRCd Socket: %d", what);
+			break;
+	}
+	bufferevent_free(bufferevent);
+	del_sock(me.servsock->name);
+	os_sock_close (me.servsock->sock_no);
+	me.servsock = NULL;
+	/* XXX really exit? */
+	do_exit (NS_EXIT_ERROR, NULL);
+}	
+	
 
 int InitSocks (void)
 {
@@ -511,8 +643,12 @@ void FiniSocks (void)
 {
 	ns_free(TimeOut);
 	ns_free(ufds);
-	if (servsock > 0)
-		os_sock_close (servsock);
+	if (me.servsock) {
+		bufferevent_free(me.servsock->event.buffered);
+		del_sock(me.servsock->name);
+		os_sock_close (me.servsock->sock_no);
+		me.servsock = NULL;
+	}
 	hash_destroy(sockethash);
 }
 
@@ -554,10 +690,66 @@ find_sock (const char *sock_name)
 {
 	Sock *sock;
 
+	/* XXX shouldn't hnode_get be here? */
 	sock = (Sock *)hnode_find (sockethash, sock_name);
 	if (!sock) {
 		dlog (DEBUG3, "find_sock: %s not found!", sock_name);		
 	}
+	return sock;
+}
+
+Sock *
+add_linemode_socket(const char *sock_name, int socknum, linemodecb readcb, evbuffercb writecb, everrorcb errcb) {
+	Sock *sock;
+	sock = add_buffered_socket(sock_name, socknum, linemode_read, writecb, errcb);
+	if (sock) {
+		if (nsconfig.recvq < 1024) {
+			nsconfig.recvq = 1024;
+		}
+		sock->linemode = os_malloc(sizeof(struct linemode));
+		sock->linemode->readbuf = os_malloc(nsconfig.recvq);
+		sock->linemode->recvq = nsconfig.recvq;
+		sock->linemode->funccb = readcb;
+		sock->linemode->readbufsize = 0;
+		sock->socktype = SOCK_LINEMODE;
+		dlog(DEBUG3, "add_linemode_socket: Added a new Linemode Socket called %s (%s)", sock_name, sock->moduleptr?sock->moduleptr->info->name:"N/A");
+	}
+	return sock;
+}
+
+
+Sock *
+add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuffercb writecb, everrorcb errcb) {
+	Sock *sock;
+	Module *moduleptr;
+
+	SET_SEGV_LOCATION();
+	moduleptr = GET_CUR_MODULE();
+	if (!readcb) {
+		nlog(LOG_WARNING, "add_buffered_socket: read buffer function doesn't exist = %s (%s)", sock_name, moduleptr?moduleptr->info->name:"N/A");
+		return NULL;
+	}
+	if (!errcb) {
+		nlog(LOG_WARNING, "add_buffered_socket: error function doesn't exist = %s (%s)", sock_name, moduleptr?moduleptr->info->name:"N/A");
+		return NULL;
+	}
+	/* write callback is not mandatory */
+	
+	sock = new_sock(sock_name);
+	sock->sock_no = socknum;
+	sock->moduleptr = moduleptr;
+	sock->socktype = SOCK_BUFFERED;
+	
+	/* add the buffered socket to the core event subsystem */
+	sock->event.buffered = bufferevent_new(sock->sock_no, readcb, writecb, errcb, sock);
+	if (!sock->event.buffered) {
+		nlog(LOG_WARNING, "bufferevent_new() failed");
+		del_sock(sock_name);
+		return NULL;
+	}	
+	bufferevent_enable(sock->event.buffered, EV_READ|EV_WRITE);	
+	bufferevent_setwatermark(sock->event.buffered, EV_READ|EV_WRITE, 0, 0);
+	dlog(DEBUG3, "add_sock: Registered Module %s with Standard Socket functions %s", moduleptr?moduleptr->info->name:"core", sock->name);
 	return sock;
 }
 
@@ -718,11 +910,26 @@ ns_cmd_socklist (CmdParams* cmdparams)
 		sock = hnode_get (sn);
 		irc_prefmsg (ns_botptr, cmdparams->source, "%s:--------------------------------", sock->moduleptr->info->name);
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Socket Name: %s", cmdparams->source), sock->name);
-		if (sock->socktype == SOCK_STANDARD) {
-			irc_prefmsg (ns_botptr, cmdparams->source, __("Socket Number: %d", cmdparams->source), sock->sock_no);
-		} else {
-			irc_prefmsg (ns_botptr, cmdparams->source, __("Poll Interface", cmdparams->source));
+		switch (sock->socktype) {
+			case SOCK_STANDARD:
+				irc_prefmsg (ns_botptr, cmdparams->source, __("Standard Socket - fd: %d", cmdparams->source), sock->sock_no);
+				break;
+			case SOCK_POLL:
+				irc_prefmsg (ns_botptr, cmdparams->source, __("Poll Interface", cmdparams->source));
+				break;
+			case SOCK_BUFFERED:
+				irc_prefmsg (ns_botptr, cmdparams->source, __("Buffered Socket - fd: %d", cmdparams->source), sock->sock_no);
+				break;
+			case SOCK_LINEMODE:
+				irc_prefmsg (ns_botptr, cmdparams->source, __("LineMode Socket - fd: %d", cmdparams->source), sock->sock_no);
+				irc_prefmsg (ns_botptr, cmdparams->source, __("RecieveQ Set: %d Current: %d", cmdparams->source), sock->linemode->recvq, sock->linemode->readbufsize);	
+				break;
+			default:
+				irc_prefmsg (ns_botptr, cmdparams->source, __("Uknown (Error!)", cmdparams->source));
+				break;
 		}
+		irc_prefmsg (ns_botptr, cmdparams->source, __("Recieved Bytes: %ld, Recieved Messages: %ld", cmdparams->source), sock->rbytes, sock->rmsgs);
+		irc_prefmsg (ns_botptr, cmdparams->source, __("Sent Bytes: %ld, Sent Messages: %ld", cmdparams->source), sock->sbytes, sock->smsgs);
 	}
 	irc_prefmsg (ns_botptr, cmdparams->source, __("End of Socket List", cmdparams->source));
 	return 0;

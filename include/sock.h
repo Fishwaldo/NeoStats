@@ -26,13 +26,21 @@
 #ifndef SOCK_H
 #define SOCK_H
 
+#include "event.h"
+
 int InitSocks( void );
 void FiniSocks( void );
 int ns_cmd_socklist( CmdParams* cmdparams );
 int del_sockets( Module *mod_ptr );
 void Connect( void );
-void send_to_socket( const char *buf, const int buflen );
 int check_sql_sock( void );
+
+Sock *add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuffercb writecb, everrorcb errcb);
+Sock *add_linemode_socket(const char *sock_name, int socknum, linemodecb readcb, evbuffercb writecb, everrorcb errcb);
+void error_from_ircd_socket(struct bufferevent *bufferevent, short what, void *arg);
+void read_from_ircd_socket(struct bufferevent *bufferevent, void *arg);
+void send_to_ircd_socket (const char *buf, const int buflen);
+
 
 extern char recbuf[BUFSIZE];
 

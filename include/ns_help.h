@@ -86,6 +86,7 @@ extern const char *ns_help_set_debuglevel[];
 extern const char *ns_help_set_debugchan[];
 extern const char *ns_help_set_debugtochan[];
 extern const char *ns_help_set_debugmodule[];
+extern const char *ns_help_set_recvq[];
 
 extern const char cmd_help_oneline[];
 extern const char cmd_help_about_oneline[];

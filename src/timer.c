@@ -28,6 +28,8 @@
 #include "services.h"
 #include "modules.h"
 #include "log.h"
+#include "timer.h"
+#include "event.h"
 
 #define TIMER_TABLE_SIZE	300	/* Number of Timers */
 
@@ -40,25 +42,45 @@ static time_t lastservertimesync = 0;
 static int is_midnight (void);
 static void run_mod_timers (int ismidnight);
 
+static struct event *timers;
+
+
 int InitTimers (void)
 {
+	struct timeval tv;
+
 	timerhash = hash_create (TIMER_TABLE_SIZE, 0, 0);
 	if(!timerhash) {
 		nlog (LOG_CRITICAL, "Unable to create timer hash");
 		return NS_FAILURE;
 	}
+	timers = os_malloc(sizeof(struct event));
+
+	timerclear(&tv);
+	tv.tv_sec = 1;
+
+	event_set(timers, 0, EV_TIMEOUT|EV_PERSIST, CheckTimers_cb, NULL);
+	event_add(timers, &tv);
+
 	return NS_SUCCESS;
 }
 
 void FiniTimers (void)
 {
+	event_del(timers);
+	os_free(timers);
 	hash_destroy (timerhash);
 }
 
 void
-CheckTimers (void)
+CheckTimers_cb (int notused, short event, void *arg)
 {
+	struct timeval tv;
+
+
 	SET_SEGV_LOCATION();
+	timerclear(&tv);
+	tv.tv_sec = 1;
 	if (me.now - me.tslastping > nsconfig.pingtime) {
 		PingServers ();
 		me.tslastping = me.now;
@@ -84,6 +106,9 @@ CheckTimers (void)
 		if (midnight == 1 && is_midnight () == 0)
 			midnight = 0;
 	}
+	
+	/* re-add this timeout */
+	event_add(timers, &tv);
 }
 
 static int

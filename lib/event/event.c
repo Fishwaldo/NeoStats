@@ -55,7 +55,7 @@
 #ifdef USE_LOG
 #include "log.h"
 #else
-#define LOG_DBG(x)
+#define LOG_DBG(x)	
 #define log_error(x)	perror(x)
 #endif
 

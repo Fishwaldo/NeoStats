@@ -2493,7 +2493,7 @@ void send_cmd( char *fmt, ... )
 		buf[BUFSIZE - 2] = '\n';
 	}
 	buflen = strnlen( buf, BUFSIZE );
-	send_to_socket( buf, buflen );
+	send_to_ircd_socket( buf, buflen );
 }
 
 /** @brief HaveFeature

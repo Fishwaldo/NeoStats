@@ -348,6 +348,9 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 
 #define BUFSIZE			512
 
+/* this is like a recvq setting. Going over this, we are getting flooded */
+#define LINEBUFSIZE		2048 
+
 #define MAXHOST			(128 + 1)
 #define MAXPASS			(32 + 1)
 #define MAXNICK			(32 + 1)
@@ -551,6 +554,9 @@ typedef struct Client {
 	int port;
 } Client; 
 
+/* to avoid warnings for Sock */
+struct Sock;
+
 /** @brief me structure
  *  structure containing information about the neostats core
  */
@@ -581,6 +587,7 @@ typedef struct tme {
 	char serviceschan[MAXCHANLEN];
 	unsigned int synched:1;
 	Client *s;
+	struct Sock *servsock;
 	int requests;
 	long SendM;
 	long SendBytes;
@@ -793,6 +800,8 @@ typedef void (*after_poll_func) ( void *data, struct pollfd *, unsigned int );
 /* socket interface type */
 #define SOCK_POLL 1
 #define SOCK_STANDARD 2
+#define SOCK_BUFFERED 3
+#define SOCK_LINEMODE 4
 
 /* Event system flags */
 #define	EVENT_FLAG_DISABLED			0x00000001	/* Event is disabled */
@@ -910,6 +919,9 @@ EXPORTVAR extern int RunLevel;
 #define GET_CUR_MODNAME() RunModule[RunLevel]->info->name
 #define GET_CUR_MODVERSION() RunModule[RunLevel]->info->version
 
+typedef void (*linemodecb)(char *);
+
+
 /** @brief Module socket list structure
  * 
  */
@@ -940,6 +952,20 @@ typedef struct Sock {
 	long rmsgs;
 	/** rbytes */
 	long rbytes;
+	/** smsgs */
+	long smsgs;
+	/** sbytes */
+	long sbytes;
+	union {
+		struct bufferevent *buffered;
+		struct event *event;
+	} event;
+	struct linemode {
+		char *readbuf;
+		size_t readbufsize;
+		linemodecb funccb;
+		size_t recvq;
+	} *linemode;
 } Sock;
 
 typedef enum TIMER_TYPE {

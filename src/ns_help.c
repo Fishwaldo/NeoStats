@@ -356,6 +356,12 @@ const char *ns_help_set_serviceumode[] = {
 	NULL
 };
 
+const char *ns_help_set_recvq[] = {
+	"\2RECVQ <size>\2",
+	"Set the Default RecieveQ size for socket based actions",
+	NULL
+};
+
 const char *cmd_help_help[] = {
 	"Syntax: \2HELP [command]\2",
 	"",
