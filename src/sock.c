@@ -330,7 +330,7 @@ restartsql:
 								recvlog (buf);
 							strip (buf);
 							strlcpy (recbuf, buf, BUFSIZE);
-							parse (buf);
+							irc_parse (buf);
 							break;
 						}
 					} else {

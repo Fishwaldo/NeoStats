@@ -32,10 +32,6 @@
 /* #define NEFARIOUS */
 /* #define ASUKA */
 
-
-/* Override NeoStats core parse function */
-#define IRCD_PARSE
-
 #define BASE64SERVERSIZE	2
 #define BASE64NICKSIZE		5
 

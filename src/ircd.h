@@ -279,7 +279,9 @@ EXPORTFUNC void setnickbase64 (const char *nick, const char* num);
 EXPORTFUNC char* nicktobase64 (const char* nick);
 EXPORTFUNC char* base64tonick (const char* num);
 
-void parse (char* line);
+MODULEFUNC void parse (char* line);
 int flood (User * u);
+
+void (*irc_parse) (char* line);
 
 #endif

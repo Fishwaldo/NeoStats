@@ -124,6 +124,10 @@ InitIrcdCalls (void)
 	strcpy(me.servicescmode,protocol_info->services_cmode);
 	strcpy(me.servicesumode,protocol_info->services_umode);
 
+	irc_parse = ns_dlsym( protocol_module_handle, "parse");
+	if(irc_parse == NULL)
+		irc_parse = parse;
+
 	cmd_list    = ns_dlsym( protocol_module_handle, "cmd_list");
 	chan_umodes = ns_dlsym( protocol_module_handle, "chan_umodes");
 	chan_modes  = ns_dlsym( protocol_module_handle, "chan_modes");
@@ -702,7 +706,6 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
  *
  * @return none
  */
-#ifndef IRCD_PARSE
 void
 parse (char *line)
 {
@@ -747,7 +750,6 @@ parse (char *line)
 	sfree (av);
 	dlog(DEBUG1, "-------------------------END PARSE--------------------------");
 }
-#endif
 
 /** @brief do_ping
  *
