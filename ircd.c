@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.132 2003/07/15 10:34:23 fishwaldo Exp $
+** $Id: ircd.c,v 1.133 2003/07/15 11:21:45 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -581,6 +581,10 @@ void Showcredits(char *nick)
 		     ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
 	snumeric_cmd(351, nick,
 		     ":- M - Updating lots of Doco and code and providing lots of great feedback");
+	snumeric_cmd(351, nick,
+		     ":- J Michael Jones - Giving us Patches to support QuantumIRCd");
+	snumeric_cmd(351, nick,
+		     ":- Blud - Giving us patches for Mystic IRCd");
 }
 
 void ShowStats(char *what, User * u)

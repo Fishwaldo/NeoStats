@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.86 2003/07/08 05:35:37 fishwaldo Exp $
+** $Id: stats.h,v 1.87 2003/07/15 11:21:45 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -163,7 +163,7 @@ struct me {
 	unsigned int coder_debug:1;
 	unsigned int noticelag:1;
 	unsigned int token:1;
-#ifdef ULTIMATE3
+#if defined(ULTIMATE3) || defined(QUANTUM)
 	unsigned int client:1;
 #endif
 	int action;

@@ -22,6 +22,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Unreal works (it seems)
  - Ultimate2/3 Works
  - Fixed the wrong oper counts with StatServ. ConnectServ was the culprit
+ - Commited J. Michael Jones (mj12@afnetinc.com) QuantumIRCd support
 
 * NeoStats * Fish * Version 2.5.3
  - Added ability to turn off StatServ wallops. "/msg statserv set msgthrottle off" - BugID#6
