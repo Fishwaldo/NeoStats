@@ -17,6 +17,11 @@ static time_t last_lag_check;
 static time_t last_cache_save;
 static int midnight = 0;
 
+void init_timer() {
+	if (usr_mds);
+}
+
+
 void chk()
 {
 	Mod_Timer *mod_ptr = NULL;

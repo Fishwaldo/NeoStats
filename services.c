@@ -516,3 +516,6 @@ static void ns_roots(User *u)
 	privmsg(u->nick, s_Services, "These are setable in stats.cfg now");
 }
 
+void init_services() {
+	if (usr_mds);
+}

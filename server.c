@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: server.c,v 1.4 2002/03/05 08:13:45 fishwaldo Exp $
+** $Id: server.c,v 1.5 2002/03/05 12:59:58 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -18,7 +18,9 @@ Server *new_server(char *);
 
 hash_t *sh;
 
-
+void init_server() {
+	if (usr_mds);
+}
 
 Server *new_server(char *name)
 {
@@ -87,7 +89,7 @@ Server *findserver(const char *name)
 	Server *s;
 	hnode_t *sn;
 
-	name = strlower(name);
+	name = strlower((char *)name);
 	sn = hash_lookup(sh, name);
 	if (sn) {
 		s = hnode_get(sn);

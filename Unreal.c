@@ -15,6 +15,7 @@
 void sts(char *fmt,...);
 
 void init_ircd() {
+	if (usr_mds);
 };
 
 
@@ -82,12 +83,39 @@ int sumode_cmd(const char *who, const char *target, long mode) {
 		}
 	}
 	sts(":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, newmode);
-/* TODO usermode is broken (expects mode to start with :) fix it! */
 	UserMode(target, newmode);
 	return 1;
 }
 
+int snumeric_cmd(const int numeric, const char *target, const char *data,...) {
+	va_list ap;
+	char buf[512];
+	va_start(ap, data);
+	vsnprintf(buf, 512, data, ap);
+	sts(":%s %d %s :%s", me.name, numeric, target, buf);
+	va_end(ap);
+	return 1;	
+}
 
+int  spong_cmd(const char *reply) {
+	sts("%s %s", (me.token ? TOK_PONG : MSG_PONG), reply);
+	return 1;
+}
+
+int snetinfo_cmd() {
+	sts(":%s %s 0 %d %d %s 0 0 0 %s",me.name,(me.token ? TOK_NETINFO : MSG_NETINFO), time(NULL),ircd_srv.uprot, ircd_srv.cloak,me.netname);
+	return 1;
+}
+
+int skill_cmd(const char *from, const char *target, const char *reason,...) {
+	va_list ap;
+	char buf[512];
+	va_start(ap, reason);
+	vsnprintf(buf, 512, reason, ap);
+	sts(":%s %s %s :%s", from, (me.token ? TOK_KILL : MSG_KILL), target, buf);
+	va_end(ap);
+	return 1;
+}
 
 void sts(char *fmt,...)
 {
@@ -137,4 +165,50 @@ void notice(char *who, char *buf,...)
 		me.SendBytes = me.SendBytes + sent;
 	}
 	va_end (ap);
+}
+void privmsg(char *to, const char *from, char *fmt, ...)
+{
+	va_list ap;
+	char buf[512], buf2[512];
+
+	va_start(ap, fmt);
+	vsnprintf(buf2, sizeof(buf2), fmt, ap);
+	if (me.want_privmsg)
+		sprintf(buf, ":%s PRIVMSG %s :%s", from, to, buf2);
+	else
+		sprintf(buf, ":%s NOTICE %s :%s", from, to, buf2);
+	sts("%s", buf);
+	va_end(ap);
+}
+
+void privmsg_list(char *to, char *from, const char **text)
+{
+	while (*text) {
+		if (**text)
+			privmsg(to, from, "%s", *text);
+		else
+			privmsg(to, from, " ");
+		text++;
+	}	
+}
+
+
+void globops(char *from, char *fmt, ...)
+{
+	va_list ap;
+	char buf[512], buf2[512];
+
+	va_start(ap, fmt);
+	vsnprintf(buf2, sizeof(buf2), fmt, ap);
+
+/* Shmad - have to get rid of nasty term echos :-) */
+
+/* Fish - now that was crackhead coding! */
+	if (me.onchan) { 
+		sprintf(buf, ":%s GLOBOPS :%s", from, buf2);
+		sts("%s", buf);
+	} else {
+		log("%s", buf2);
+	}
+	va_end(ap);
 }

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.15 2002/03/05 11:57:03 fishwaldo Exp $
+** $Id: users.c,v 1.16 2002/03/05 12:59:58 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -195,7 +195,7 @@ int UserLevel(User *u) {
 
 
 
-void UserMode(char *nick, char *modes)
+void UserMode(const char *nick, const char *modes)
 {
 	/* I don't know why, but I spent like 3 hours trying to make this function work and 
 	   I finally got it... what a waste of time... gah, oh well... basically, it sets both the User Flags, and also the User Levels.. 

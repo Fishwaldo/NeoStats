@@ -193,6 +193,11 @@ IntCommands cmd_list[] = {
 };
 #endif
 
+void init_main() {
+	if (usr_mds);
+}
+
+
 int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char *mod_name)
 {
 	User *u;
@@ -401,7 +406,6 @@ void init_ServBot()
 {
 	char rname[63];
 	segv_location = sstrdup("init_ServBot");
-
 	sprintf(rname, "/msg %s \2HELP\2", s_Services);
 	snick_cmd(s_Services, Servbot.user, Servbot.host, rname);
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
@@ -410,6 +414,7 @@ void init_ServBot()
 	schmode_cmd(me.name, me.chan, "+oa", rname);
 	me.onchan = 1;
 	Module_Event("SIGNON", finduser(s_Services));
+	
 }
 
 
@@ -437,29 +442,28 @@ void Usr_Stats(char *origin, char *coreLine) {
 	if (!strcasecmp(stats, "u")) {
 		/* server uptime - Shmad */ 
                 int uptime = time (NULL) - me.t_start;
-                sts(":%s 242 %s :Statistical Server Up %d days, %d:%02d:%02d", me.name,
-                u->nick, uptime/86400, (uptime/3600) % 24, (uptime/60) % 60,
+                snumeric_cmd(242, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime/86400, (uptime/3600) % 24, (uptime/60) % 60,
                 uptime % 60);
 	} else if (!strcasecmp(stats, "c")) {
 		/* Connections */
-		sts(":%s 214 %s N *@%s * * %d 50", me.name, u->nick, me.uplink, me.port);
-		sts(":%s 213 %s C *@%s * * %d 50", me.name, u->nick, me.uplink, me.port);
+		snumeric_cmd(214, u->nick, "N *@%s * * %d 50", me.uplink, me.port);
+		snumeric_cmd(213, u->nick, "C *@%s * * %d 50", me.uplink, me.port);
 	} else if (!strcasecmp(stats, "o")) {
 		/* Operators */
-		sts(":%s 243 %s %s :Operators think they are God, but you and I know they are not!", me.name, u->nick, stats);
+		snumeric_cmd(243, u->nick, "Operators think they are God, but you and I know they are not!");
 	} else if (!strcasecmp(stats, "l")) {
 		/* Port Lists */
 		tmp = time(NULL) - me.lastmsg; 
 		tmp2 = time(NULL) - me.t_start;
-		sts(":%s 211 %s l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE", me.name, u->nick);
-		sts(":%s 241 %s %s 0 %d %d %d %d %d 0 :%d", me.name, u->nick, me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
+		snumeric_cmd(211, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
+		snumeric_cmd(241, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
 	}
-	sts(":%s 219 %s %s :End of /STATS report", me.name, u->nick, stats);
+	snumeric_cmd(219, u->nick, "%s :End of /STATS report", stats);
 	notice(s_Services,"%s Requested Stats %s", u->nick, stats);
 }
 
 void Usr_Version(char *origin, char *coreLine) {
-	sts(":%s 351 %s %s :%s -> %s %s", me.name, origin, version, me.name, version_date, version_time);
+	snumeric_cmd(351, origin, "%s :%s -> %s %s", version, me.name, version_date, version_time); 
 }
 void Usr_ShowMOTD(char *origin, char *coreLine) {
 	ShowMOTD(origin);
@@ -621,8 +625,7 @@ void Usr_Join(char *origin, char *coreLine) {
 void Usr_Part(char *origin, char *coreLine) {
 }
 void Srv_Ping(char *origin, char *coreLine) {
-
-			sts("PONG %s", coreLine);
+			spong_cmd(coreLine);
 }
 void Srv_Netinfo(char *origin, char *coreLine) {
 			char *cmd;
@@ -639,7 +642,7 @@ void Srv_Netinfo(char *origin, char *coreLine) {
 			strcpy(me.netname, strtok(NULL, " "));
 #endif
 
-			sts(":%s NETINFO 0 %d %d %s 0 0 0 %s",me.name,time(NULL),ircd_srv.uprot, ircd_srv.cloak,me.netname);
+			snetinfo_cmd();
 			globops(me.name,"Link with Network \2Complete!\2");
 			#ifdef DEBUG
         			ns_debug_to_coders("");
@@ -699,51 +702,6 @@ void Srv_Kill(char *origin, char *coreLine) {
 
 }
 
-void privmsg(char *to, const char *from, char *fmt, ...)
-{
-	va_list ap;
-	char buf[512], buf2[512];
-
-	va_start(ap, fmt);
-	vsnprintf(buf2, sizeof(buf2), fmt, ap);
-	if (me.want_privmsg)
-		sprintf(buf, ":%s PRIVMSG %s :%s", from, to, buf2);
-	else
-		sprintf(buf, ":%s NOTICE %s :%s", from, to, buf2);
-	sts("%s", buf);
-	va_end(ap);
-}
-
-void privmsg_list(char *to, char *from, const char **text)
-{
-	while (*text) {
-		if (**text)
-			privmsg(to, from, "%s", *text);
-		else
-			privmsg(to, from, " ");
-		text++;
-	}	
-}
-
-void globops(char *from, char *fmt, ...)
-{
-	va_list ap;
-	char buf[512], buf2[512];
-
-	va_start(ap, fmt);
-	vsnprintf(buf2, sizeof(buf2), fmt, ap);
-
-/* Shmad - have to get rid of nasty term echos :-) */
-
-/* Fish - now that was crackhead coding! */
-	if (me.onchan) { 
-		sprintf(buf, ":%s GLOBOPS :%s", from, buf2);
-		sts("%s", buf);
-	} else {
-		log("%s", buf2);
-	}
-	va_end(ap);
-}
 
 int flood(User *u)
 {
@@ -757,8 +715,7 @@ int flood(User *u)
 		return 0;
 	}
 	if (u->flood >= 5) {
-		sts(":%s KILL %s :%s!%s (Flooding Services.)", s_Services,
-			u->nick, Servbot.host, s_Services);
+		skill_cmd(s_Services, u->nick, "%s!%s (Flooding Services.)", Servbot.host, s_Services);
 		log("FLOODING: %s!%s@%s", u->nick, u->username, u->hostname);
 		DelUser(u->nick);
 		return 1;
@@ -774,9 +731,9 @@ static void ShowMOTD(char *nick)
     FILE *fp;
     char buf[BUFSIZE];
 
-    sts(":%s 375 %s :- %s Message of the Day -", me.name, nick, me.name);
-    sts(":%s 372 %s :- %s.  Copyright (c) 1999 - 2002 The NeoStats Group", me.name, nick, version);
-    sts(":%s 372 %s :-", me.name, nick);
+    snumeric_cmd(375, nick, ":- %s Message of the Day -", me.name);
+    snumeric_cmd(372, nick, ":- %s. Copyright (c) 1999 - 2002 The NeoStats Group", version);
+    snumeric_cmd(372, nick, ":-");
 
     fp = fopen ("stats.motd", "r");
 
@@ -785,11 +742,11 @@ static void ShowMOTD(char *nick)
 	while (fgets (buf, sizeof (buf), fp))
 	{
 	    buf[strlen (buf) - 1] = 0;
-	    sts(":%s 372 %s :- %s", me.name, nick, buf);
+	    snumeric_cmd(372, nick, ":- %s", buf);
 	}
 	fclose (fp);
     }
-	sts(":%s 376 %s :End of /MOTD command.", me.name, nick);
+	snumeric_cmd(376, nick, ":End of /MOTD command.");
 }
 
 
@@ -799,9 +756,8 @@ static void ShowADMIN(char *nick)
     FILE *fp;
     char buf[BUFSIZE];
 
-    sts(":%s 375 %s :- %s NeoStats Admins -", me.name, nick, me.name);
-    sts(":%s 372 %s :- %s.  Copyright (c) 1999 - 2002 The NeoStats Group", me.name, nick, version);
-    sts(":%s 372 %s :-", me.name, nick);
+    snumeric_cmd(256, nick, ":- %s NeoStats Admins -", me.name);
+    snumeric_cmd(256, nick, ":- %s.  Copyright (c) 1999 - 2002 The NeoStats Group", version);
 
     fp = fopen ("stats.admin", "r");
 
@@ -810,27 +766,28 @@ static void ShowADMIN(char *nick)
 	while (fgets (buf, sizeof (buf), fp))
 	{
 	    buf[strlen (buf) - 1] = 0;
-	    sts(":%s 372 %s :- %s", me.name, nick, buf);
+	    snumeric_cmd(257, nick, ":- %s", buf);
 	}
 	fclose (fp);
     }
-	sts(":%s 376 %s :End of /ADMIN command.", me.name, nick);
+	snumeric_cmd(258, nick, ":End of /ADMIN command.");
 }
 
 
 static void Showcredits(char *nick)
 {
-	sts(":%s 351 %s :- %s Credits ", me.name, nick, version);
-	sts(":%s 351 %s :- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)", me.name,  nick);
-	sts(":%s 351 %s :- For Support, you can find ^Enigma^ or Shmad at", me.name, nick);
-	sts(":%s 351 %s :- irc.irc-chat.net #NeoStats", me.name, nick);
-	sts(":%s 351 %s :- Thanks to:", me.name, nick);
-	sts(":%s 351 %s :- \2Fish\2 still part of the team with patch submissions.", me.name, nick);
-	sts(":%s 351 %s :- Stskeeps for Writting the best IRCD ever!", me.name, nick);
-	sts(":%s 351 %s :- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)",me.name,nick);
-	sts(":%s 351 %s :- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!", me.name, nick);
-	sts(":%s 351 %s :- Andy For Ideas",me.name,nick);
-	sts(":%s 351 %s :- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies",me.name,nick);
-	sts(":%s 351 %s :- sre and Jacob for development systems and access",me.name, nick);
+	snumeric_cmd(351, nick, ":- %s Credits ",version);
+	snumeric_cmd(351, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
+	snumeric_cmd(351, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
+	snumeric_cmd(351, nick, ":- irc.irc-chat.net #NeoStats");
+	snumeric_cmd(351, nick, ":- Thanks to:");
+	snumeric_cmd(351, nick, ":- \2Fish\2 still part of the team with patch submissions.");
+	snumeric_cmd(351, nick, ":- Stskeeps for Writting the best IRCD ever!");
+	snumeric_cmd(351, nick, ":- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)");
+	snumeric_cmd(351, nick, ":- monkeyIRCD for the Module Segv Catching code");
+	snumeric_cmd(351, nick, ":- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!");
+	snumeric_cmd(351, nick, ":- Andy For Ideas");
+	snumeric_cmd(351, nick, ":- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies");
+	snumeric_cmd(351, nick, ":- sre and Jacob for development systems and access");
 }
 

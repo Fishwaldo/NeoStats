@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.8 2002/03/05 11:57:03 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.9 2002/03/05 12:59:58 fishwaldo Exp $
  */
 
 
@@ -390,8 +390,7 @@ static Oper_Modes usr_mds[] = {
                                  {UMODE_CHATOP, 'b',0},
 				 {UMODE_WHOIS, 'W',0},
                                  {0, 0, 0 }
-	};;
-
+};
 
 
 
@@ -411,7 +410,12 @@ extern int sjoin_cmd(const char *, const char *);
 extern int schmode_cmd(const char *, const char *, const char *, const char *);
 extern int snick_cmd(const char *, const char *, const char *, const char *);
 extern int sping_cmd(const char *from, const char *reply, const char *to);
-/* extern int sumode_cmd(const char *who, const char *target, unsigned long mode); */
+extern int sumode_cmd(const char *who, const char *target, long mode);
+extern int snumeric_cmd(const int numeric, const char *target, const char *data,...);
+extern int spong_cmd(const char *reply);
+extern int snetinfo_cmd();
+extern int skill_cmd(const char *from, const char *target, const char *reason,...);
+
 
 
 #endif  /* UNREAL_H Define */

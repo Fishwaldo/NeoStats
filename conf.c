@@ -38,7 +38,9 @@ static config_option options[] =
 };
 
 
-
+void init_conf() {
+	if (usr_mds);
+}
 
 void strip(char *line)
 {

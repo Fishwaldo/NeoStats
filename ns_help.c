@@ -5,10 +5,15 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ns_help.c,v 1.2 2002/02/27 11:15:16 fishwaldo Exp $
+** $Id: ns_help.c,v 1.3 2002/03/05 12:59:58 fishwaldo Exp $
 */
 
 #include "stats.h"
+
+void init_ns_help() {
+	if (usr_mds);
+}
+
 
 const char *ns_help[] = {
 "*** NeoStats Help ***",

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.12 2002/03/05 06:59:06 fishwaldo Exp $
+** $Id: sock.c,v 1.13 2002/03/05 12:59:58 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -13,6 +13,9 @@
 
 fd_set readfds, nullfds;
 
+void init_sock() {
+	if (usr_mds);
+}
 int ConnectTo(char *host, int port)
 {
 	struct hostent *hp;

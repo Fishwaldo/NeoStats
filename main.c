@@ -41,6 +41,7 @@ int main()
 	segv_location = sstrdup("main");
 	strcpy(segvinmodule, "");
 	me.onchan = 0;
+	if (usr_mds)
 	printf("\n\n");
 	printf("%s Loading...\n", version);
 	printf("-----------------------------------------------\n");
@@ -289,12 +290,8 @@ unsigned long HASH(const unsigned char *name, int size_of_table)
 	return h % size_of_table;
 }
 
-char *strlower(const char *s)
+char *strlower(char *s)
 {
-/*	char *t = s;
-	while ((*t++ = tolower(*t)))
-		;  */ 
-
 	char *t = s; 
 	while (*t)
 	*t++ = tolower (*t);

@@ -202,7 +202,7 @@ extern void init_ServBot();
 extern void *smalloc(long);
 extern char *sstrdup(const char *);
 extern unsigned long HASH(const unsigned char *, int);
-extern char *strlower(const char *);
+extern char *strlower(char *);
 
 /* ircd.c */
 extern void parse();
@@ -238,7 +238,7 @@ extern void Change_User(User *, char *);
 extern void sendcoders(char *message,...);
 extern User *finduser(const char *);
 extern void UserDump();
-extern void UserMode(char *, char *);
+extern void UserMode(const char *, const char *);
 extern void init_user_hash();
 extern void init_chan_hash();
 extern void AddServer(char *, char *,int);

@@ -19,6 +19,9 @@
 #include "config.h"
 
 
+void init_dl() {
+	if (usr_mds);
+};
 void __init_mod_list() {
 	segv_location = sstrdup("__init_mod_list");
 
