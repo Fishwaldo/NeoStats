@@ -92,6 +92,7 @@
    NeoStats core will truncate to this length for use internally. 
 */
 #define MAX_MOD_NAME	32
+
 /* doesn't have to be so big atm */
 #define NUM_MODULES		20
 #define S_TABLE_SIZE	-1
