@@ -249,7 +249,10 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
 	schmode_cmd(nick, me.chan, "+oa", cmd);
-//	Module_Event("SIGNON", EM);
+	EM = malloc(sizeof(EvntMsg));
+	EM->fndata[0] = finduser(nick);
+	EM->fc = 1;
+	Module_Event("SIGNON", EM);
 	return 1;
 }
 
@@ -266,7 +269,10 @@ int del_bot(char *nick, char *reason)
 		log("Attempting to Logoff with a Nickname that does not Exists: %s",nick);
 		return -1;
 	}
-//	Module_Event("SIGNOFF", EM);
+	EM = malloc(sizeof(EvntMsg));
+	EM->fndata[0] = finduser(nick);
+	EM->fc = 1;
+	Module_Event("SIGNOFF", EM);
 	squit_cmd(nick, reason);
 	del_mod_user(nick);
 	return 1;
@@ -332,12 +338,9 @@ EvntMsg *split_buf(char *buf, int colon_special)
     int flag = 0;
     EvntMsg *EM;
 
-    	
     EM = malloc(sizeof(EvntMsg));
     EM->ac = 0;
     EM->fc = 0;
-    if (!buf) 
-    	return EM;
     argc = 0;
     if (*buf == ':') buf++;
     while (*buf) {
@@ -345,12 +348,12 @@ EvntMsg *split_buf(char *buf, int colon_special)
 	    argvsize += 8;
 	}
 	if ((colon_special ==1) && (*buf==':')) {
-		strncpy(EM->data,buf, 512);
+		strncpy(EM->data, buf, 512);
 		buf = "";
 		flag = 1;
 	} else if (*buf == ':') {
 		buf++;
-		strncpy(EM->data,buf, 512);
+		strncpy(EM->data, buf, 512);
 	}
 	s = strpbrk(buf, " ");
 	if (s) {
@@ -384,7 +387,7 @@ extern char *joinbuf(char **av, int ac, int from) {
 
 void parse(char *line)
 {
-	char *origin, *cmd, *coreLine;
+	char origin[64], cmd[64], *coreLine;
 	int cmdptr = 0;
 	int I = 0;
 	char *tonick;
@@ -396,41 +399,49 @@ void parse(char *line)
 	EvntMsg *EM;
 		
 	strcpy(segv_location, "parse");
+	memset(origin, 0, 64);
+	memset(cmd, 0, 64);
 	strip(line);
-	strncpy(recbuf, line, strlen(recbuf));
+	strcpy(recbuf, line);
 	if (!(*line))
 		return;
 #ifdef DEBUG
 	log("R: %s", line);
 #endif
 	
-	origin = malloc(64);
-	cmd = malloc(64);
-	coreLine = malloc(512);
-	memset(origin, 0, 64);
-	memset(cmd, 0, 64);
-	memset(coreLine, 0, 512);
     	if (*line == ':') {
+		coreLine = strpbrk(line, " ");
+		if (!coreLine)
+	    		return;
+		*coreLine = 0;
+		while (isspace(*++coreLine))
+	    	;
+		strncpy(origin, line+1, sizeof(origin));
+		memmove(line, coreLine, strlen(coreLine)+1);
 		cmdptr = 1;
-		line++;
-    		strncpy(coreLine, line, 512);
-    		origin = strtok(coreLine, " ");
-    		cmd = strtok(NULL, " ");
     	} else {
     		cmdptr = 0;
-    		strncpy(coreLine, line, 512);
-    		origin = NULL;
-		cmd = strtok(coreLine, " ");    		
+		*origin = 0;
     	}
-	EM = split_buf(strtok(NULL, ""), 0);
-    	if (origin) strncpy(EM->origin, origin, 64);
-    	if (cmd) strncpy(EM->cmd, cmd, 64);
-    	printf("origin %s cmd %s core %s\n", EM->origin, EM->cmd, coreLine);
-	if (findserver(EM->origin)) {
-		EM->s = findserver(EM->origin);
+    	if (!*line)
+		return;
+    	coreLine = strpbrk(line, " ");
+    	if (coreLine) {
+		*coreLine = 0;
+		while (isspace(*++coreLine))
+	    	;
+    	} else
+		coreLine = line + strlen(line);
+    	strncpy(cmd, line, sizeof(cmd));
+
+	EM = split_buf(coreLine, 0);
+	strncpy(EM->origin, origin, sizeof(EM->origin));
+	strncpy(EM->cmd, cmd, sizeof(EM->cmd));
+	if (findserver(origin)) {
+		EM->s = findserver(origin);
 		EM->isserv = 1;
-	} else if (finduser(EM->origin)) {
-		EM->u = finduser(EM->origin);
+	} else if (finduser(origin)) {
+		EM->u = finduser(origin);
 		EM->u->ulevel = _UserLevel(EM->u);
 		EM->isserv = 0;
 	} else  {
@@ -443,16 +454,23 @@ void parse(char *line)
 		}
 	}
 
+
         /* First, check if its a privmsg, and if so, handle it in the correct Function */
  	if (!strcasecmp("PRIVMSG",EM->cmd) || (!strcasecmp("!",EM->cmd))) {
  		/* its a privmsg, now lets see who too... */       
 		/* if its a message from our own internal bots, silently drop it */
-                if (findbot(EM->origin)) {
+                if (findbot(origin)) {
 			goto parend;
 		}
 
 		tonick = strtok(EM->av[0], "@");
 		/* this handles PRIVMSG neostats@stats.neostat.net messages, and ordinary messages */
+// TODO: still channel support for bots here
+
+		if (*tonick == '#') {
+			log("Channel Message to one of our Bots, on TODO list");
+			goto parend;
+		}
 		if (!strcasecmp(s_Services,tonick)) {
 			/* its to the Internal Services Bot */
 			strcpy(segv_location, "servicesbot");
@@ -469,8 +487,8 @@ void parse(char *line)
 
 				/* Check to make sure there are no blank spaces so we dont crash */
 			        if (strlen(EM->av[1]) >= 350) {
-			                privmsg(EM->origin, s_Services, "command line too long!");
-			                notice (s_Services,"%s tried to send a very LARGE command, we told them to shove it!", EM->origin);
+			                privmsg(origin, s_Services, "command line too long!");
+			                notice (s_Services,"%s tried to send a very LARGE command, we told them to shove it!", origin);
 					goto parend;
 			        }
 
@@ -481,12 +499,6 @@ void parse(char *line)
 				}
 				strcpy(segvinmodule, "");
 				strcpy(segv_location, "Return from Module Message");
-				goto parend;
-			}
-// TODO: still channel support for bots here
-
-			if (*tonick == '#') {
-				log("Channel Message to one of our Bots, on TODO list");
 				goto parend;
 			}
 			log("Recieved a Message for %s, but that user is not registered with us!!! buf: %s", EM->av[0], EM->av[1]);
@@ -533,17 +545,13 @@ void parse(char *line)
 		}	
 	}
 	parend:
-	free(cmd);
-	free(coreLine);
-	if (origin) free(origin);	
 	FreeList(EM->av, EM->ac);
+/* its upto the calling function of EM->fndata to free it, as we don't know if we are allowed to free some function data */
 	for (I = 0; I< EM->fc; I++) {
 		if (EM->canfree[I] == 1) {
-			printf("Freeing fndata (fc count%d)\n", EM->fc);
 			free(EM->fndata[I]);
 			EM->canfree[I] = 0;
 		}
-		EM->canfree[I] = 0;
 	}
 	EM->fc = 0;
 	free(EM);
@@ -584,7 +592,10 @@ void init_ServBot()
 	sprintf(rname, "%s %s", s_Services, s_Services);
 	schmode_cmd(s_Services, me.chan, "+oa", rname);
 	me.onchan = 1;
-//	Module_Event("SIGNON", EM);
+	EM = malloc(sizeof(EvntMsg));
+	EM->fndata[0] = finduser(s_Services);
+	EM->fc = 1;
+	Module_Event("SIGNON", EM);
 }
 
 #ifdef ULTIMATE3
@@ -649,16 +660,19 @@ void Srv_Sjoin(EvntMsg *EM) {
 				mode |= MODE_VOICE;
 				modes++;
 			} else {
+				EM->fndata[0] = finduser(modes);
+				EM->fc = 1;
 				ok = 0;
 			}
 		}
-		join_chan(finduser(modes), EM->av[1]);
-		ChangeChanUserMode(findchan(EM->av[1]), finduser(modes), 1, mode);
+		join_chan(EM->fndata[0], EM->av[1]);
+		EM->fndata[1] = findchan(EM->av[1]);
+		EM->fc = 2;
+		ChangeChanUserMode(EM->fndata[1], EM->fndata[0], 1, mode);
 		j++;
 		ok = 1;
-	printf("j is %d\n", j);
 	}
-	c = findchan(EM->av[1]);
+	c = EM->fndata[1];
 	c->modes = mode1;
 	if (!list_isempty(tl)) {
 		if (!list_isfull(c->modeparms)) {
