@@ -365,6 +365,8 @@ lib/event/event.c -text
 lib/event/event.h -text
 lib/event/evsignal.h -text
 lib/event/kqueue.c -text
+lib/event/log.c -text
+lib/event/log.h -text
 lib/event/poll.c -text
 lib/event/rtsig.c -text
 lib/event/select.c -text
