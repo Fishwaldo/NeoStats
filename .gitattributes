@@ -31,6 +31,7 @@ data/niconfig.db -text
 data/nstats.db -text
 data/stats.db -text
 data/tlds.nfo -text
+/depcomp -text
 /dl.c -text
 /dl.h -text
 dl/Makefile.am -text
@@ -93,7 +94,6 @@ dl/services/Makefile.am -text
 dl/services/Makefile.in -text
 dl/services/build -text
 dl/services/services.c -text
-dl/services/services.lo -text svneol=unset#unset
 dl/spam/Makefile.am -text
 dl/spam/Makefile.in -text
 dl/spam/spam.c -text
