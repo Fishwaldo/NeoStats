@@ -371,7 +371,7 @@ int os_sock_read( OS_SOCKET s, char* buf, int len )
  *  Wrapper function for recvfrom
  */
 
-int os_sock_recvfrom( SOCKET s, char* buf, int len, int flags, struct sockaddr* from, int* fromlen )
+	int os_sock_recvfrom( OS_SOCKET s, char* buf, int len, int flags, struct sockaddr* from, int* fromlen )
 {
 	int ret;
 
