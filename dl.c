@@ -845,9 +845,10 @@ bot_chan_message (char *origin, char **av, int ac)
  * 
  * @return none
  */
-void
+int
 bot_message (char *origin, char **av, int ac)
 {
+	int ret = NS_SUCCESS;
 	User *u;
 	User *bot_user;
 	ModUser *mod_usr;
@@ -859,17 +860,17 @@ bot_message (char *origin, char **av, int ac)
 	if (strnlen (av[1], MAX_CMD_LINE_LENGTH) >= MAX_CMD_LINE_LENGTH) {
 		prefmsg (origin, s_Services, "command line too long!");
 		notice (s_Services, "%s tried to send a very LARGE command, we told them to shove it!", origin);
-		return;
+		return NS_SUCCESS;
 	}
 
 	u = finduser (origin);
 
 	if(!u) {
-		return;
+		return NS_SUCCESS;
 	}
 
 	if (flood (u)) {
-		return;
+		return NS_SUCCESS;
 	}
 
 	bot_user = finduser(av[0]);
@@ -878,18 +879,18 @@ bot_message (char *origin, char **av, int ac)
 		bot_user = finduser(base64tonick(av[0]));
 		if (!bot_user) {
 			nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", av[0]);
-			return;
+			return NS_SUCCESS;
 		}
 #else
 		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", av[0]);
-		return;
+		return NS_SUCCESS;
 #endif
 	}
 	mod_usr = findbot (bot_user->nick);
 	/* Check to see if any of the Modules have this nick Registered */
 	if (!mod_usr) {
 		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", bot_user->nick);
-		return;
+		return NS_SUCCESS;
 	}
 	nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s", mod_usr->nick);
 
@@ -915,7 +916,7 @@ bot_message (char *origin, char **av, int ac)
 				buf = joinbuf(av, ac, 1);
 				nlog (LOG_NORMAL, LOG_MOD, "%s requested CTCP %s", u->nick, buf);
 				free(buf);
-				return;
+				return NS_SUCCESS;
 			}
 			if (!u) {
 				nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", u->nick, mod_usr->nick);
@@ -924,13 +925,13 @@ bot_message (char *origin, char **av, int ac)
 				for(i = 1; i < ac; i++) {
 					AddStringToList (&argv, av[i], &argc);
 				}
-				run_bot_cmd(mod_usr, u, argv, argc);
+				ret = run_bot_cmd(mod_usr, u, argv, argc);
 				free(argv);
 			}
 		}
 		CLEAR_SEGV_INMODULE();
 	}
-	return;
+	return ret;
 }
 
 /** @brief dump list of module bots and channels

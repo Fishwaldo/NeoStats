@@ -239,7 +239,7 @@ int get_dl_handle (char *mod_name);
 void add_bot_to_chan (char *bot, char *chan);
 void del_bot_from_chan (char *bot, char *chan);
 void bot_chan_message (char *origin, char **av, int ac);
-void bot_message (char *origin, char **av, int ac);
+int bot_message (char *origin, char **av, int ac);
 
 int list_bot_chans (User * u, char **av, int ac);
 int get_mod_num (char *mod_name);

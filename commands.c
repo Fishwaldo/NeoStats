@@ -99,6 +99,53 @@ static bot_cmd intrinsic_commands[]=
 	{NULL,		NULL,	0, 	0,	NULL, 				NULL}
 };
 
+/* Some validation routines */
+int
+validate_nick (char* nick)
+{
+	char* ptr;
+
+	ptr = nick;
+	while(*ptr) {
+		if(!IsNickChar(*ptr)) {
+			return NS_FAILURE;
+		}
+		ptr++;
+	}
+	return NS_SUCCESS;
+}
+
+int
+validate_user (char* user)
+{
+	char* ptr;
+
+	ptr = user;
+	while(*ptr) {
+		if(!IsUserChar(*ptr)) {
+			return NS_FAILURE;
+		}
+		ptr++;
+	}
+	return NS_SUCCESS;
+}
+
+int
+validate_host (char* host)
+{
+	char* ptr;
+
+	ptr = host;
+	while(*ptr) {
+		if(!IsHostChar(*ptr)) {
+			return NS_FAILURE;
+		}
+		ptr++;
+	}
+	return NS_SUCCESS;
+}
+
+
 
 /** @brief calc_cmd_ulevel calculate cmd ulevel
  *  done as a function so we can support potentially complex  
@@ -346,7 +393,7 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	/* We have run out of commands so report failure */
 	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[1]);
 	chanalert (bot_ptr->nick, "%s requested %s, but that is an unknown command", u->nick, av[1]);
-	return NS_SUCCESS;
+	return NS_FAILURE;
 }
 
 /** @brief bot_cmd_help process bot help command
@@ -674,9 +721,51 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				"%s set to %d", set_ptr->option, intval);
 			break;
 		case SET_TYPE_STRING:
+			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
+			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
+			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
+				set_ptr->option, av[3], u->nick);
+			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
+			prefmsg(u->nick, bot_ptr->nick,
+				"%s set to %s", set_ptr->option, av[3]);
+			break;
 		case SET_TYPE_NICK:
+			if(validate_nick (av[3]) == NS_FAILURE) {
+				prefmsg(u->nick, bot_ptr->nick,
+					"%s contains invalid characters", av[3]);
+				break;
+			}
+			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
+			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
+			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
+				set_ptr->option, av[3], u->nick);
+			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
+			prefmsg(u->nick, bot_ptr->nick,
+				"%s set to %s", set_ptr->option, av[3]);
+			break;
 		case SET_TYPE_USER:
+			if(validate_user (av[3]) == NS_FAILURE) {
+				prefmsg(u->nick, bot_ptr->nick,
+					"%s contains invalid characters", av[3]);
+				break;
+			}
+			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
+			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
+			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
+				set_ptr->option, av[3], u->nick);
+			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
+			prefmsg(u->nick, bot_ptr->nick,
+				"%s set to %s", set_ptr->option, av[3]);
+			break;
 		case SET_TYPE_HOST:
+			if(validate_host (av[3]) == NS_FAILURE) {
+				prefmsg(u->nick, bot_ptr->nick,
+					"%s contains invalid characters", av[3]);
+				break;
+			}
 			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
 			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 

@@ -550,6 +550,7 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 void
 m_private (char* origin, char **av, int ac, int cmdptr)
 {
+	int ret = NS_SUCCESS;
 	int argc;
 	char **argv;
 	char target[64];
@@ -569,19 +570,21 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 	if(av[0][0] == '#') {
 		bot_chan_message (origin, argv, argc);
 	} else {
-		bot_message (origin, argv, argc);
+		ret = bot_message (origin, argv, argc);
 	}
 	free (argv);
-	argc = 0;
-	AddStringToList (&argv, origin, &argc);
-	AddStringToList (&argv, av[0], &argc);
-	AddStringToList (&argv, privmsgbuffer, &argc);
-	if(av[0][0] == '#') {
-		ModuleEvent (EVENT_CPRIVATE, argv, argc);
-	} else {
-		ModuleEvent (EVENT_PRIVATE, argv, argc);
+	if(ret == NS_FAILURE) {
+		argc = 0;
+		AddStringToList (&argv, origin, &argc);
+		AddStringToList (&argv, av[0], &argc);
+		AddStringToList (&argv, privmsgbuffer, &argc);
+		if(av[0][0] == '#') {
+			ModuleEvent (EVENT_CPRIVATE, argv, argc);
+		} else {
+			ModuleEvent (EVENT_PRIVATE, argv, argc);
+		}
+		free (argv);
 	}
-	free (argv);
 	return;
 }
 
@@ -1933,3 +1936,4 @@ base64tonick (const char* num)
 }
 
 #endif
+

@@ -673,5 +673,9 @@ extern const char *ns_help_set_user[];
 extern const char *ns_help_set_host[];
 extern const char *ns_help_set_realname[];
 
+int validate_nick (char* nick);
+int validate_user (char* user);
+int validate_host (char* host);
+
 #endif
 
