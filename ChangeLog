@@ -3,6 +3,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Module API version number
  - When modules load, __ModInit is called if exported.
  - When Modules unload, __ModFini is called if exported.
+ - Added IsChanMember Function
 
 * NeoStats * Fish * Version 2.5.4
  - Fixed a core with using strcasecmp instead of strcmp in the parse function.

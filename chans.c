@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.49 2003/08/05 13:14:43 fishwaldo Exp $
+** $Id: chans.c,v 1.50 2003/08/07 15:08:55 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -816,5 +816,31 @@ findchan (char *chan)
 	} else {
 		nlog (LOG_DEBUG3, LOG_CORE, "FindChan(%s) -> Not Found", chan);
 		return NULL;
+	}
+}
+
+/** @brief Returns if the nick is a member of the channel
+ *
+ * Returns 1 if nick is part of the channel, 0 if they are not
+ *
+ * @param chan the channel to check
+ * @param u the user to check 
+ *
+ * @returns 1 if they are, 0 if they are not 
+*/
+
+int 
+IsChanMember(Chans *c, User *u) {
+
+	if (!u) {
+		return 0;
+	}
+	if (!c) {
+		return 0;
+	}
+	if (list_find (c->chanmembers, u->nick, comparef)) {
+		return 1;
+	} else {
+		return 0;
 	}
 }
