@@ -81,7 +81,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curl.lib pcre.lib adns.lib libdb42s.lib rta.lib"
+				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curl.lib pcre.lib adns.lib rta.lib"
 				OutputFile="$(OutDir)/neostats.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\lib"
