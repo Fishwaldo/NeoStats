@@ -249,7 +249,12 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
 	schmode_cmd(nick, me.chan, "+oa", cmd);
-//	Module_Event("SIGNON", EM);
+	EM = malloc(sizeof(EvntMsg));
+	EM->fndata[0] = finduser(nick);
+	EM->fc = 1;
+	EM->canfree[0] = 0;
+	Module_Event("SIGNON", EM);
+	free(EM);
 	return 1;
 }
 
@@ -266,7 +271,12 @@ int del_bot(char *nick, char *reason)
 		log("Attempting to Logoff with a Nickname that does not Exists: %s",nick);
 		return -1;
 	}
-//	Module_Event("SIGNOFF", EM);
+	EM = malloc(sizeof(EvntMsg));
+	EM->fndata[0] = finduser(nick);
+	EM->fc = 1;
+	EM->canfree[0] = 0;
+	Module_Event("SIGNOFF", EM);
+	free(EM);
 	squit_cmd(nick, reason);
 	del_mod_user(nick);
 	return 1;
@@ -541,17 +551,24 @@ void init_ServBot()
 #endif
 #ifdef UNREAL
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
-	sjoin_cmd(s_Services, me.chan);
-	sprintf(rname, "%s %s", s_Services, s_Services);
-	schmode_cmd(me.name, me.chan, "+oa", rname);
 #elif !ULTIMATE
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif
+	EM = malloc(sizeof(EvntMsg));
+	EM->fndata[0] = finduser(s_Services);
+	EM->fc = 1;
+	EM->canfree[0] = 0;
+	Module_Event("SIGNON", EM);
 	sjoin_cmd(s_Services, me.chan);
+	EM->fndata[1] = findchan(me.chan);
+	EM->fc = 1;
+	EM->canfree[1] = 0;
+	Module_Event("JOINCHAN", EM);
 	sprintf(rname, "%s %s", s_Services, s_Services);
 	schmode_cmd(s_Services, me.chan, "+oa", rname);
+	Module_Event("CMODE", EM);
 	me.onchan = 1;
-//	Module_Event("SIGNON", EM);
+	free(EM);
 }
 
 #ifdef ULTIMATE3
@@ -618,13 +635,17 @@ void Srv_Sjoin(EvntMsg *EM) {
 			} else {
 				EM->fndata[0] = finduser(modes);
 				EM->fc = 1;
+				EM->canfree[0] = 0;
 				ok = 0;
 			}
 		}
 		join_chan(EM->fndata[0], EM->av[1]);
 		EM->fndata[1] = findchan(EM->av[1]);
 		EM->fc = 2;
+		EM->canfree[1] = 1;
+		Module_Event("JOINCHAN", EM);
 		ChangeChanUserMode(EM->fndata[1], EM->fndata[0], 1, mode);
+		Module_Event("CMODE", EM);
 		j++;
 		ok = 1;
 	}
@@ -744,11 +765,18 @@ void Usr_DelUser(EvntMsg *EM) {
 	DelUser(EM->u->nick);
 }
 void Usr_Smode(EvntMsg *EM) {
+	EM->fndata[0] = finduser(EM->av[0]);
+	EM->fc = 1;
+	EM->canfree[0] = 0;
 #ifdef ULTIMATE3
 	UserMode(EM->av[0], EM->av[2]);
+	EM->fndata[1] = EM->av[2];
 #else
 	UserMode(EM->av[0], EM->av[1]);
+	EM->fndata[1] = EM->av[1];
 #endif
+	EM->fc = 2;
+	EM->canfree[1] = 0;
 	Module_Event("UMODE", EM);
 }
 void Usr_Mode(EvntMsg *EM) {
@@ -757,9 +785,15 @@ void Usr_Mode(EvntMsg *EM) {
 				log("Mode: UserMode: %s",EM->av[0]);
 #endif
 				UserMode(EM->av[0], EM->av[1]);
+				EM->fndata[0] = EM->av[0];
+				EM->canfree[0] = 0;
+				EM->fndata[1] = EM->av[1];
+				EM->fc = 2;
+				EM->canfree[1] = 0;
 				Module_Event("UMODE", EM);
 			} else {
 				ChanMode(EM->u->nick, EM->av, EM->ac);
+				Module_Event("CMODE", EM);
 			}	
 }	
 void Usr_Kill(EvntMsg *EM) {
@@ -855,11 +889,7 @@ void Usr_Join(EvntMsg *EM) {
                 if (*t)
                 	*t++ = 0;
 		join_chan(EM->u, s);
-//		EM->fndata[0] = malloc(strlen(s));
-//		strncpy(EM->fndata[0], s, strlen(s));
-//		EM->fc = 1;
 		Module_Event("JOINCHAN", EM);
-//		free(EM->fndata[0]);
 	}
 }
 void Usr_Part(EvntMsg *EM) {
@@ -938,6 +968,7 @@ void Srv_Nick(EvntMsg *EM) {
 			AddUser(EM->av[0], EM->av[3], EM->av[4], EM->av[5]);
 			EM->fndata[0] = finduser(EM->av[0]);
 			EM->fc = 1;
+			EM->canfree[0] = 0;
 			Module_Event("SIGNON", EM);
 #else
 			AddUser(EM->av[0], EM->av[4], EM->av[5], EM->av[6]);
@@ -947,8 +978,12 @@ void Srv_Nick(EvntMsg *EM) {
 			UserMode(EM->av[0], EM->av[3]);
 			EM->fndata[0] = finduser(EM->av[0]);
 			EM->fc = 1;
+		 	EM->canfree[0] = 0;
+			EM->fndata[1] = EM->av[3];
+			EM->fc = 2;
+			EM->canfree[1] = 0;
 			Module_Event("SIGNON", EM);
-			Module_Event("UMODE", EM);
+		 	Module_Event("UMODE", EM);
 			
 #endif
 }
