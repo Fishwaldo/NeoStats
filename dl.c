@@ -925,7 +925,11 @@ bot_message (char *origin, char **av, int ac)
 				for(i = 1; i < ac; i++) {
 					AddStringToList (&argv, av[i], &argc);
 				}
-				ret = run_bot_cmd(mod_usr, u, argv, argc);
+				if(mod_usr->botcmds) {
+					ret = run_bot_cmd(mod_usr, u, argv, argc);
+				} else {
+					ret = NS_FAILURE;
+				}
 				free(argv);
 			}
 		}
