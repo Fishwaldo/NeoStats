@@ -33,6 +33,8 @@
 
 /* we support tokens */
 #define GOTTOKENSUPPORT
+/* we support CLIENT */
+#define GOTCLIENTSUPPORT
 /* we have vhost support */
 #define GOTSVSHOST 
 /* we have svsjoin from a30 onwards */
@@ -52,6 +54,8 @@
 
 /* we support tokens */
 #define GOTTOKENSUPPORT
+/* we don't support CLIENT */
+#undef GOTCLIENTSUPPORT
 /* we have vhost support */
 #define GOTSVSHOST 
 /* old Ultimate2 doesn't have svsjoin */

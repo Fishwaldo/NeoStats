@@ -176,7 +176,7 @@ int __list_auth(User * u)
 	un = list_first(srconf.ul);
 	while (un) {
 		sru = lnode_get(un);
-		snumeric_cmd(RPL_STATSOLINE, u->nick, "O %s@%s %s %d", sru->ident,
+		numeric(RPL_STATSOLINE, u->nick, "O %s@%s %s %d", sru->ident,
 			     sru->host, sru->nick, sru->lvl);
 		un = list_next(srconf.ul, un);
 	}

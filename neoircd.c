@@ -380,39 +380,35 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 	} else {
 		modes = argv[2];
 	}
-
 	if (*modes == '#') {
 		join_chan (argv[4], modes);
 		return;
 	}
-	tl = list_create (10);
-
-	if (*modes != '+') {
-		goto nomodes;
-	}
-	while (*modes) {
-		for (i = 0; i < ircd_cmodecount; i++) {
-			if (*modes == chan_modes[i].flag) {
-				if (chan_modes[i].parameters) {
-					m = smalloc (sizeof (ModesParm));
-					m->mode = chan_modes[i].mode;
-					strlcpy (m->param, argv[j], PARAMSIZE);
-					mn = lnode_create (m);
-					if (!list_isfull (tl)) {
-						list_append (tl, mn);
+	tl = list_create (10); 
+	if (*modes == '+') {
+		while (*modes) {
+			for (i = 0; i < ircd_cmodecount; i++) {
+				if (*modes == chan_modes[i].flag) {
+					if (chan_modes[i].parameters) {
+						m = smalloc (sizeof (ModesParm));
+						m->mode = chan_modes[i].mode;
+						strlcpy (m->param, argv[j], PARAMSIZE);
+						mn = lnode_create (m);
+						if (!list_isfull (tl)) {
+							list_append (tl, mn);
+						} else {
+							nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
+							do_exit (NS_EXIT_ERROR, "List full - see log file");
+						}
+						j++;
 					} else {
-						nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
-						do_exit (NS_EXIT_ERROR, "List full - see log file");
+						mode1 |= chan_modes[i].mode;
 					}
-					j++;
-				} else {
-					mode1 |= chan_modes[i].mode;
 				}
 			}
+			modes++;
 		}
-		modes++;
 	}
-      nomodes:
 	while (argc > j) {
 		modes = argv[j];
 		mode = 0;
@@ -425,16 +421,21 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 					}
 				}
 			}
-			strlcpy (nick, modes, MAXNICK);
+			
 			ok = 0;
+			strlcpy (nick, modes, MAXNICK);
 			break;
-		}
+		}	
+		
+		
 		join_chan (nick, argv[1]);
-		ChangeChanUserMode (findchan (argv[1]), finduser (nick), 1, mode);
+		ChangeChanUserMode (argv[1], nick, 1, mode);
 		j++;
 		ok = 1;
 	}
 	c = findchan (argv[1]);
+
+
 	c->modes |= mode1;
 	if (!list_isempty (tl)) {
 		if (!list_isfull (c->modeparms)) {
@@ -649,7 +650,6 @@ Srv_Kill (char *origin, char **argv, int argc)
 	nlog (LOG_WARNING, LOG_CORE, "Got Srv_Kill, but its un-handled (%s)", recbuf);
 }
 
-
 /* Topic Bursting for NeoIRCD */
 /* R: :fish.dynam.ac TBURST 1034639893 #ircop 1034652780 ChanServ!services@neostats.net :NeoIRCd Test Oper Channel */
 
@@ -670,10 +670,9 @@ Srv_Tburst (char *origin, char **argv, int argc)
 
 }
 
-extern int
+int
 SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
 {
-
 	snewnick_cmd (nick, user, host, rname, Umode);
 
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {

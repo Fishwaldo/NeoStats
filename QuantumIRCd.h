@@ -31,6 +31,8 @@
 
 /* we support tokens */
 #define GOTTOKENSUPPORT
+/* we support CLIENT */
+#define GOTCLIENTSUPPORT
 /* we have vhost support */
 #define GOTSVSHOST 
 /* we dont have svsjoin */

@@ -60,7 +60,7 @@ static void Srv_Squit (char *origin, char **argv, int argc);
 static void Srv_Nick (char *origin, char **argv, int argc);
 static void Srv_Svsnick (char *origin, char **argv, int argc);
 static void Srv_Kill (char *origin, char **argv, int argc);
-static void Srv_Connect (char *origin, char **argv, int argc);
+static void Srv_Protocol (char *origin, char **argv, int argc);
 static void Srv_Vctrl (char *origin, char **argv, int argc);
 
 static int vctrl_cmd ();
@@ -99,7 +99,7 @@ IntCommands cmd_list[] = {
 	{MSG_NICK, TOK_NICK, Srv_Nick, 0, 0},
 	{MSG_SVSNICK, TOK_SVSNICK, Srv_Svsnick, 0, 0},
 	{MSG_KILL, TOK_KILL, Srv_Kill, 0, 0},
-	{MSG_PROTOCTL, TOK_PROTOCTL, Srv_Connect, 0, 0},
+	{MSG_PROTOCTL, TOK_PROTOCTL, Srv_Protocol, 0, 0},
 };
 
 ChanModes chan_modes[] = {
@@ -378,15 +378,9 @@ send_globops (char *from, char *buf)
 
 
 static void
-Srv_Connect (char *origin, char **argv, int argc)
+Srv_Protocol (char *origin, char **argv, int argc)
 {
-	int i;
-
-	for (i = 0; i < argc; i++) {
-		if (!strcasecmp ("TOKEN", argv[i])) {
-			me.token = 1;
-		}
-	}
+	ns_srv_protocol(origin, argv, argc);
 }
 
 
@@ -604,22 +598,21 @@ Srv_Svsnick (char *origin, char **argv, int argc)
 		nlog (LOG_WARNING, LOG_CORE, "Warning, SVSNICK for %s failed", argv[0]);
 	}
 }
+
 static void
 Srv_Kill (char *origin, char **argv, int argc)
 {
+	nlog (LOG_WARNING, LOG_CORE, "Got Srv_Kill, but its un-handled (%s)", recbuf);
 }
 
-
-
 int
-SignOn_NewBot (const char *nick, const char *ident, const char *host, const char *rname, long Umode)
+SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
 {
-	snewnick_cmd (nick, ident, host, rname, Umode);
+	snewnick_cmd (nick, user, host, rname, Umode);
 	sumode_cmd (nick, nick, Umode);
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
 		sjoin_cmd (nick, me.chan);
 		schmode_cmd (nick, me.chan, "+o", nick);
-		/* all bots join */
 	}
 	return 1;
 }

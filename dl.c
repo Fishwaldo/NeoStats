@@ -981,7 +981,7 @@ ModulesVersion (char* origin, char **av, int ac)
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
 		if(module_ptr->isnewstyle && module_ptr->function_list == NULL) {
-			snumeric_cmd(RPL_VERSION, origin,
+			numeric(RPL_VERSION, origin,
 				"Module %s version: %s %s %s",
 				module_ptr->info->module_name, module_ptr->info->module_version, 
 				module_ptr->info->module_build_date, module_ptr->info->module_build_time);

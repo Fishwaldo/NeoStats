@@ -24,14 +24,14 @@
 #ifndef _CHANS_H_
 #define _CHANS_H_
 
-void ChanDump (char *chan);
-void part_chan (User * u, char *chan);
+void ChanDump (const char *chan);
+void part_chan (User * u, const char *chan);
 void join_chan (const char* nick, const char *chan);
-void change_user_nick (Chans * c, char *newnick, char *oldnick);
+void change_user_nick (Chans * c, const char *newnick, const char *oldnick);
 int ChanMode (char *origin, char **av, int ac);
-void ChanTopic (char *, char* chan, time_t t, char *);
-void ChangeChanUserMode (Chans * c, User * u, int add, long mode);
-void kick_chan (char *chan, char *kicked, char *kickby);
+void ChanTopic (const char *owner, const char* chan, time_t time, const char *topic);
+void ChangeChanUserMode (const char* chan, const char* nick, int add, long mode);
+void kick_chan (const char *chan, const char *kicked, const char *kickby);
 void ChangeChanTS (Chans * c, time_t tstime);
 int init_chan_hash (void);
 

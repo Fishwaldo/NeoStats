@@ -57,7 +57,7 @@ ModuleInfo __module_info = {
  */
 int new_m_version(char *origin, char **av, int ac)
 {
-	snumeric_cmd(351, origin, "Module Template Loaded, Version: %s %s %s",
+	numeric(351, origin, "Module Template Loaded, Version: %s %s %s",
 		__module_info.module_version, __module_info.module_build_date,
 		__module_info.module_build_time);
 	return 0;

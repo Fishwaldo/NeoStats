@@ -49,6 +49,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - All log filenames are now lower case for consistency across modules (M)
  - Changed Umode/SmodeStringtoMask function to accept current Umode, so we can do progressive mode changes (F) 
  - StatServ data is now exported via SQL emulation as well. (F) 
+ - Created join_bot_to_chan function to allow modules to easily join their bot(s) to a given channel (M)
+ - Lots of cleanups in the IRCd code. Should be much easier to maintain existing and create new IRCd support (M)
 
 * NeoStats * Fish (F) * Version 2.5.10
  - Fix a problem with Umode +T being reintroduced on Unreal Beta19 as a normal usermode. 

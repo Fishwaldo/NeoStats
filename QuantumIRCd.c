@@ -59,7 +59,7 @@ static void Srv_Squit (char *origin, char **argv, int argc);
 static void Srv_Nick (char *origin, char **argv, int argc);
 static void Srv_Svsnick (char *origin, char **argv, int argc);
 static void Srv_Kill (char *origin, char **argv, int argc);
-static void Srv_Connect (char *origin, char **argv, int argc);
+static void Srv_Protocol (char *origin, char **argv, int argc);
 static void Srv_Svinfo (char *origin, char **argv, int argc);
 static void Srv_Burst (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
@@ -98,7 +98,7 @@ IntCommands cmd_list[] = {
 	{MSG_PART, TOK_PART, Usr_Part, 1, 0},
 	{MSG_PING, TOK_PING, Srv_Ping, 0, 0},
 	{MSG_SVINFO, NULL, Srv_Svinfo, 0, 0},
-	{MSG_CAPAB, NULL, Srv_Connect, 0, 0},
+	{MSG_CAPAB, NULL, Srv_Protocol, 0, 0},
 	{MSG_BURST, NULL, Srv_Burst, 0, 0},
 	{MSG_SJOIN, NULL, Srv_Sjoin, 1, 0},
 	{MSG_CLIENT, NULL, Srv_Client, 0, 0},
@@ -110,7 +110,7 @@ IntCommands cmd_list[] = {
 	{MSG_NICK, TOK_NICK, Srv_Nick, 0, 0},
 	{MSG_SVSNICK, TOK_SVSNICK, Srv_Svsnick, 0, 0},
 	{MSG_KILL, TOK_KILL, Srv_Kill, 0, 0},
-	{MSG_PROTOCTL, TOK_PROTOCTL, Srv_Connect, 0, 0},
+	{MSG_PROTOCTL, TOK_PROTOCTL, Srv_Protocol, 0, 0},
 };
 
 ChanModes chan_modes[] = {
@@ -469,40 +469,36 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 		modes = argv[1];
 	} else {
 		modes = argv[2];
-	}
-
+	}     
 	if (*modes == '#') {
 		join_chan (origin, modes);
 		return;
 	}
-	tl = list_create (10);
-
-	if (*modes != '+') {
-		goto nomodes;
-	}
-	while (*modes) {
-		for (i = 0; i < ircd_cmodecount; i++) {
-			if (*modes == chan_modes[i].flag) {
-				if (chan_modes[i].parameters) {
-					m = smalloc (sizeof (ModesParm));
-					m->mode = chan_modes[i].mode;
-					strlcpy (m->param, argv[j], PARAMSIZE);
-					mn = lnode_create (m);
-					if (!list_isfull (tl)) {
-						list_append (tl, mn);
+	tl = list_create (10);  
+	if (*modes == '+') {
+		while (*modes) {
+			for (i = 0; i < ircd_cmodecount; i++) {
+				if (*modes == chan_modes[i].flag) {
+					if (chan_modes[i].parameters) {
+						m = smalloc (sizeof (ModesParm));
+						m->mode = chan_modes[i].mode;
+						strlcpy (m->param, argv[j], PARAMSIZE);
+						mn = lnode_create (m);
+						if (!list_isfull (tl)) {
+							list_append (tl, mn);
+						} else {
+							nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
+							do_exit (NS_EXIT_ERROR, "List full - see log file");
+						}
+						j++;
 					} else {
-						nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
-						do_exit (NS_EXIT_ERROR, "List full - see log file");
+						mode1 |= chan_modes[i].mode;
 					}
-					j++;
-				} else {
-					mode1 |= chan_modes[i].mode;
 				}
 			}
+			modes++;
 		}
-		modes++;
 	}
-      nomodes:
 	while (argc > j) {
 		modes = argv[j];
 		mode = 0;
@@ -523,11 +519,13 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 			}
 		}
 		join_chan (nick, argv[1]);
-		ChangeChanUserMode (findchan (argv[1]), finduser (nick), 1, mode);
+		ChangeChanUserMode (argv[1], nick, 1, mode);
 		j++;
 		ok = 1;
 	}
 	c = findchan (argv[1]);
+
+
 	c->modes |= mode1;
 	if (!list_isempty (tl)) {
 		if (!list_isfull (c->modeparms)) {
@@ -557,18 +555,9 @@ Srv_Burst (char *origin, char **argv, int argc)
 }
 
 static void
-Srv_Connect (char *origin, char **argv, int argc)
+Srv_Protocol (char *origin, char **argv, int argc)
 {
-	int i;
-
-	for (i = 0; i < argc; i++) {
-		if (!strcasecmp ("TOKEN", argv[i])) {
-			me.token = 1;
-		}
-		if (!strcasecmp ("CLIENT", argv[i])) {
-			me.client = 1;
-		}
-	}
+	ns_srv_protocol(origin, argv, argc);
 }
 
 
@@ -802,24 +791,22 @@ Srv_Svsnick (char *origin, char **argv, int argc)
 	if(UserNick (argv[0], argv[1]) == NS_FAILURE) {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, SVSNICK for %s failed", argv[0]);
 	}
-
 }
+
 static void
 Srv_Kill (char *origin, char **argv, int argc)
 {
+	nlog (LOG_WARNING, LOG_CORE, "Got Srv_Kill, but its un-handled (%s)", recbuf);
 }
-
-
 
 int
 SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
 {
-
 	snewnick_cmd (nick, user, host, rname, Umode);
+
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
 		sjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
 		schmode_cmd (nick, me.chan, "+a", nick);
-		/* all bots join */
 	}
 	return 1;
 }

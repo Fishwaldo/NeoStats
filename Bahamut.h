@@ -31,6 +31,8 @@
 
 /* we don't support tokens */
 #undef GOTTOKENSUPPORT
+/* we don't support CLIENT */
+#undef GOTCLIENTSUPPORT
 /* we don't have svshost support */
 #undef GOTSVSHOST 
 /* we don't have svsjoin support */

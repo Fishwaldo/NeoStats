@@ -82,7 +82,7 @@ ChangeChanTS (Chans * c, time_t tstime)
 */
 
 void
-ChanTopic (char *owner, char* chan, time_t time, char *topic)
+ChanTopic (const char *owner, const char* chan, time_t time, const char *topic)
 {
 	char **av;
 	int ac = 0;
@@ -101,9 +101,9 @@ ChanTopic (char *owner, char* chan, time_t time, char *topic)
 	strlcpy (c->topicowner, owner, MAXHOST);
 	c->topictime = time;
 	AddStringToList (&av, c->name, &ac);
-	AddStringToList (&av, owner, &ac);
+	AddStringToList (&av, (char*)owner, &ac);
 	if(topic) {
-		AddStringToList (&av, topic, &ac);
+		AddStringToList (&av, (char*)topic, &ac);
 	} else {
 		nlog (LOG_DEBUG1, LOG_CORE, "ChanTopic: NULL topic");
 	}
@@ -210,7 +210,7 @@ ChanMode (char *origin, char **av, int ac)
 				if (*modes == chan_modes[i].flag) {
 					if (add) {
 						if (chan_modes[i].nickparam) {
-							ChangeChanUserMode (c, finduser (av[j]), 1, chan_modes[i].mode);
+							ChangeChanUserMode (av[0], av[j], 1, chan_modes[i].mode);
 							j++;
 						} else {
 							if (chan_modes[i].parameters) {
@@ -256,7 +256,7 @@ ChanMode (char *origin, char **av, int ac)
 						}
 					} else {
 						if (chan_modes[i].nickparam) {
-							ChangeChanUserMode (c, finduser (av[j]), 0, chan_modes[i].mode);
+							ChangeChanUserMode (av[0], av[j], 0, chan_modes[i].mode);
 							j++;
 						} else {
 							if (chan_modes[i].parameters) {
@@ -299,14 +299,19 @@ ChanMode (char *origin, char **av, int ac)
 */
 
 void
-ChangeChanUserMode (Chans * c, User * u, int add, long mode)
+ChangeChanUserMode (const char* chan, const char* nick, int add, long mode)
 {
 	lnode_t *cmn;
 	Chanmem *cm;
+	Chans * c;
+	User * u;
+
+	u = finduser(nick);
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "Can't find user for ChangeChanUserMode");
 		return;
 	}
+	c = findchan(chan);
 	if (!c) {
 		nlog (LOG_WARNING, LOG_CORE, "Can't find channel for ChangeChanUserMode");
 		return;
@@ -405,7 +410,7 @@ del_chan (Chans * c)
  */
 
 void
-kick_chan (char *chan, char *kicked, char *kickby)		
+kick_chan (const char *chan, const char *kicked, const char *kickby)		
 {
 	char **av;
 	int ac = 0;
@@ -499,7 +504,7 @@ kick_chan (char *chan, char *kicked, char *kickby)
 
 
 void
-part_chan (User * u, char *chan)
+part_chan (User * u, const char *chan)
 {
 	Chans *c;
 	lnode_t *un;
@@ -585,7 +590,7 @@ part_chan (User * u, char *chan)
 */
 
 void
-change_user_nick (Chans * c, char *newnick, char *oldnick)
+change_user_nick (Chans * c, const char *newnick, const char *oldnick)
 {
 	lnode_t *cm;
 	Chanmem *cml;
@@ -715,7 +720,7 @@ join_chan (const char* nick, const char *chan)
 
 
 void
-ChanDump (char *chan)
+ChanDump (const char *chan)
 {
 	hnode_t *cn;
 	lnode_t *cmn;
@@ -1076,3 +1081,42 @@ init_chan_hash ()
 
 	return NS_SUCCESS;
 }
+
+/* Begin moving sjoin code out of IRCd 
+ * work in progress
+ */
+#if 0
+long 
+sjoin_add_modes_to_list(list_t *tl, char* modes, char **argv)
+{
+	int i;
+	int j = 3;
+	long mode1 = 0;
+	ModesParm *m;
+	lnode_t *mn = NULL;
+
+	while (*modes) {
+		for (i = 0; i < ircd_cmodecount; i++) {
+			if (*modes == chan_modes[i].flag) {
+				if (chan_modes[i].parameters) {
+					m = smalloc (sizeof (ModesParm));
+					m->mode = chan_modes[i].mode;
+					strlcpy (m->param, argv[j], PARAMSIZE);
+					mn = lnode_create (m);
+					if (!list_isfull (tl)) {
+						list_append (tl, mn);
+					} else {
+						nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
+						do_exit (NS_EXIT_ERROR, "List full - see log file");
+					}
+					j++;
+				} else {
+					mode1 |= chan_modes[i].mode;
+				}
+			}
+		}
+		modes++;
+	}
+	return mode1;
+}
+#endif

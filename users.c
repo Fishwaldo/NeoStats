@@ -429,7 +429,7 @@ init_user_hash ()
 }
 
 void
-UserDump (char *nick)
+UserDump (const char *nick)
 {
 	User *u;
 	hnode_t *un;
