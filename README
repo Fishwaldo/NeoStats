@@ -512,12 +512,13 @@ Module Configuration Options
 ----------------------------
     
 LOAD_MODULE <module name> [OPTIONAL]
-    what module to load at start-up. Multiple instances of LOAD_MODULE 
-    may be specified e.g. 
+    what module to load at start-up. e.g. 
         
         LOAD_MODULE statserv
     
     Will load up StatServ at boot
+    
+    Multiple instances of LOAD_MODULE may be specified 
 
 ExtAuth Configuration Options
 -----------------------------
