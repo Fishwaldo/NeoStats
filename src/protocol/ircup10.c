@@ -51,6 +51,8 @@ static void m_stats (char *origin, char **argv, int argc, int srv);
 static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_end_of_burst (char *origin, char **argv, int argc, int srv);
+static void m_wallusers( char* origin, char **av, int ac, int cmdptr );
+static void m_wallops( char* origin, char **av, int ac, int cmdptr );
 
 void send_end_of_burst_ack(void);
 void send_end_of_burst(void);
@@ -103,7 +105,8 @@ ircd_cmd cmd_list[] = {
 	{MSG_PASS, TOK_PASS, _m_pass, 0},
 	{MSG_BURST, TOK_BURST, m_burst, 0},
 	{MSG_END_OF_BURST, TOK_END_OF_BURST, m_end_of_burst, 0},
-	{MSG_WALLOPS, TOK_WALLOPS, _m_wallops, 0},
+	{MSG_WALLOPS, TOK_WALLOPS, m_wallops, 0},
+	{MSG_WALLUSERS, TOK_WALLUSERS, m_wallusers, 0},
 	{0, 0, 0, 0},
 };
 
@@ -815,6 +818,44 @@ m_end_of_burst (char *origin, char **argv, int argc, int srv)
 	if( ircstrcasecmp( base64_to_server( origin ), me.uplink ) == 0 ) {
 		send_end_of_burst_ack ();
 	}
+}
+
+/** @brief m_wallusers
+ *
+ *  process WALLUSERS command
+ *  RX:
+ *  numeric WA :message here
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+static void m_wallusers( char* origin, char **av, int ac, int cmdptr )
+{
+	do_wallops( base64_to_nick(origin), av[0] );	
+}
+
+/** @brief _m_wallops
+ *
+ *  process WALLOPS command
+ *  RX:
+ *  numeric WA :message here
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+static void m_wallops( char* origin, char **av, int ac, int cmdptr )
+{
+	do_globops( base64_to_nick(origin), av[0] );	
 }
 
 /* :<source> <command> <param1> <paramN> :<last parameter> */
