@@ -48,13 +48,23 @@ void get_clientstats();
 void get_title();
 void get_tldmap();
 FILE *tpl, *opf;
-void ss_html()
+void ss_html(User * u, char **av, int ac)
 {
 	char *buf;
 	char *buf1;
 	char *bufold;
 	char startstr = 0;
 	int gothtml = 0;
+	
+	if(UserLevel(u) < NS_ULEVEL_ADMIN)
+		return;
+	
+	nlog(LOG_NOTICE, LOG_MOD,
+		    "%s!%s@%s Forced an update of the NeoStats Statistics HTML file with the most current statistics",
+		    u->nick, u->username, u->hostname);
+	chanalert(s_StatServ,
+			"%s Forced the NeoStats Statistics HTML file to be updated with the most current statistics",
+			u->nick);
 	if (StatServ.html) {
 		if (StatServ.htmlpath[0] == 0) {
 			nlog(LOG_WARNING, LOG_MOD,
