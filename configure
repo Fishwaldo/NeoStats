@@ -1862,7 +1862,10 @@ host_vendor=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
 host_os=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 
 
-MYHOST=$host_os
+cat >>confdefs.h <<_ACEOF
+#define NS_HOST "$host_os"
+_ACEOF
+
 case "$host_os" in
 *cygwin)
 	CFLAGS="$CFLAGS -O2 -g"

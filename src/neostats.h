@@ -99,9 +99,9 @@
 #endif
 
 #ifdef NEOSTATS_REVISION
-#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION " (" NEOSTATS_REVISION ") " NS_PROTOCOL
+#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION " (" NEOSTATS_REVISION ") " NS_PROTOCOL " " NS_HOST
 #else
-#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION NS_PROTOCOL
+#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION NS_PROTOCOL " " NS_HOST
 #endif
 #define CORE_MODULE_VERSION NEOSTATS_VERSION
 
@@ -109,9 +109,9 @@
 #define TS5
 
 #ifdef TS5
-#define	TS_CURRENT	5	/* current TS protocol version */
+#define TS_CURRENT	5	/* current TS protocol version */
 #else
-#define	TS_CURRENT	3	/* current TS protocol version */
+#define TS_CURRENT	3	/* current TS protocol version */
 #endif
 
 #endif /* TS_CURRENT */
@@ -126,13 +126,6 @@
 #endif
 
 #endif /* TS_MIN */
-
-/* SecureServ wants CHANADMIN but only a few ircds support it so we have to "fake" it */
-#ifndef CMODE_CHANADMIN
-#define CMODE_CHANADMIN CMODE_CHANOP
-/* Flag for new sjoin call to avoid duplicate case value */
-#define FAKE_CMODE_CHANADMIN
-#endif
 
 #include "numeric.h"
 
@@ -171,7 +164,7 @@
 #define MAXINFO			128
 #define B64SIZE			16
 
-#define	KEYLEN		32
+#define KEYLEN		32
 
 /* MAXCHANLIST
  * the max length a string can be that holds channel lists 
@@ -203,7 +196,7 @@
 #define MAX_MOD_NAME	32
 
 /* Buffer size for version string */
-#define VERSIONSIZE		64
+#define VERSIONSIZE		128
 
 /* doesn't have to be so big atm */
 #define NUM_MODULES		20

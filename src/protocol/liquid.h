@@ -234,44 +234,28 @@
 /* Smodes */
 #define SMODE_SSL              0x1  /* */
 
-/* Cmode chars */
-#define CMODE_CH_CHANOP 'o'
-#define CMODE_CH_VOICE	'v'
-#define CMODE_CH_HALFOP	'h'
-#define CMODE_CH_CHANOWNER	'q'
-#define CMODE_CH_CHANPROT	'a'
-#define CMODE_CH_UOP	'u'
-
-/* Cmode sjoin flags */
-#define CMODE_FL_CHANOP '@'
-#define CMODE_FL_VOICE	'+'
-#define CMODE_FL_HALFOP	'%'
-#define CMODE_FL_CHANOWNER	'!'
-#define CMODE_FL_CHANPROT	'*'
-#define CMODE_FL_UOP	'-'
-
 /* Cmodes */
-#define	CHFL_BAN		0x0200 /* ban channel flag */
+#define CHFL_BAN		0x0200 /* ban channel flag */
 #define CMODE_CHANOWNER	0x0080
 #define CMODE_DECHANOWNER 0x0100
 #define CMODE_CHANPROT	0x0020
 #define CMODE_DECHANPROT	0x0040
-#define	CMODE_CHANOP	0x0001
-#define	CMODE_VOICE	0x0002
-#define	CMODE_DEOPPED  	0x0004
+#define CMODE_CHANOP	0x0001
+#define CMODE_VOICE	0x0002
+#define CMODE_DEOPPED  	0x0004
 #define CMODE_HALFOP	0x0008
 #define CMODE_DEHALFOPPED 0x0010
 #define CMODE_UOP	0x0400
 #define CMODE_DEUOP	0x0800
-#define	CMODE_PRIVATE  	0x00008
-#define	CMODE_SECRET   	0x00010
-#define	CMODE_MODERATED  0x00020
-#define	CMODE_TOPICLIMIT 0x00040
-#define	CMODE_INVITEONLY 0x00080
-#define	CMODE_NOPRIVMSGS 0x00100
-#define	CMODE_KEY	0x00200
-#define	CMODE_BAN	0x00400
-#define	CMODE_LIMIT	0x00800
+#define CMODE_PRIVATE  	0x00008
+#define CMODE_SECRET   	0x00010
+#define CMODE_MODERATED  0x00020
+#define CMODE_TOPICLIMIT 0x00040
+#define CMODE_INVITEONLY 0x00080
+#define CMODE_NOPRIVMSGS 0x00100
+#define CMODE_KEY	0x00200
+#define CMODE_BAN	0x00400
+#define CMODE_LIMIT	0x00800
 #define CMODE_RGSTR	0x01000
 #define CMODE_RGSTRONLY	0x02000
 #define CMODE_NOCOLOR	0x04000
@@ -285,7 +269,7 @@
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))
-#define is_pub_chan(x)  ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
 #define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
 
 /* Umode macros */

@@ -193,51 +193,37 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define	UMODE_INVISIBLE  	0x0001	/* makes user invisible */
-#define	UMODE_OPER       	0x0002	/* Operator */
+#define UMODE_INVISIBLE  	0x0001	/* makes user invisible */
+#define UMODE_OPER       	0x0002	/* Operator */
 #define UMODE_REGONLY		0x0010	/* only registered nicks may PM */
 #define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
 #define UMODE_ADMIN		0x0040	/* server admin */
 #define UMODE_SADMIN	0x0080	/* Marks the client as a Services Administrator */
 #define UMODE_HIDE              0x8000  /* cloak host*/
-#define	UMODE_WALLOP     	0x0004	/* send wallops to them */
+#define UMODE_WALLOP     	0x0004	/* send wallops to them */
 #define UMODE_HELPOP	 	0x0010	/* Help system operator */
 #define UMODE_ADMIN	 	0x0080	/* Admin */
 #define UMODE_NETADMIN  	0x10000	/* Network Admin */
 #define UMODE_TECHADMIN		0x80000000	/* Marks the client as a Technical Admin */
 #define UMODE_DEAF			0x10000000	/* client is deaf on channels */
-#define	UMODE_LOCOP      	0x0200	/* Local operator -- SRB */
+#define UMODE_LOCOP      	0x0200	/* Local operator -- SRB */
 #define UMODE_WHOIS    		0x200000	/* Lets Opers see when people do a /WhoIs on them */
 #define UMODE_CLIENT	 	0x0800	/* Show client information */
 #define UMODE_GLOBCON		0x800000	/* Global Connect notices */
 
-/* Cmode chars */
-#define CMODE_CH_CHANOP 'o'
-#define CMODE_CH_VOICE	'v'
-#define CMODE_CH_HALFOP	'h'
-#define CMODE_CH_CHANOWNER	'q'
-#define CMODE_CH_CHANADMIN	'a'
-
-/* Cmode sjoin flags */
-#define CMODE_FL_CHANOP '@'
-#define CMODE_FL_VOICE	'+'
-#define CMODE_FL_HALFOP	'%'
-#define CMODE_FL_CHANOWNER	'!'
-#define CMODE_FL_CHANADMIN	'*'
-
 /* Cmodes */
 #define CMODE_CHANOP	0x0001
 #define CMODE_HALFOP	0x0002
-#define	CMODE_VOICE	0x0004
-#define	CMODE_PRIVATE	0x0008
-#define	CMODE_SECRET	0x0010
-#define	CMODE_MODERATED  0x0020
-#define	CMODE_TOPICLIMIT 0x0040
-#define	CMODE_INVITEONLY 0x0080
-#define	CMODE_NOPRIVMSGS 0x0100
-#define	CMODE_KEY	0x0200
+#define CMODE_VOICE	0x0004
+#define CMODE_PRIVATE	0x0008
+#define CMODE_SECRET	0x0010
+#define CMODE_MODERATED  0x0020
+#define CMODE_TOPICLIMIT 0x0040
+#define CMODE_INVITEONLY 0x0080
+#define CMODE_NOPRIVMSGS 0x0100
+#define CMODE_KEY	0x0200
 #define CMODE_CHANOWNER 0x0400
-#define	CMODE_BAN	0x0800
+#define CMODE_BAN	0x0800
 #define CMODE_LIMIT	0x1000
 #define CMODE_RGSTR	0x2000
 #define CMODE_RGSTRONLY  0x4000
@@ -249,7 +235,7 @@
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))
-#define is_pub_chan(x)  ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
 #define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
 
 /* Umode macros */

@@ -557,7 +557,7 @@ Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd
 		return NULL;
 	}
 	Umode = UmodeStringToMask(modes, 0);
-	signon_newbot (nick, botinfo->user, (*botinfo->host==NULL?me.name:botinfo->host), botinfo->realname, Umode);
+	signon_newbot (nick, botinfo->user, ((*botinfo->host)==0?me.name:botinfo->host), botinfo->realname, Umode);
 	u = finduser (nick);
 	/* set our link back to user struct for bot */
 	botptr->u = u;

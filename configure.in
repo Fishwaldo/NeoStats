@@ -269,7 +269,7 @@ dnl fi
 
 dnl Get system type
 AC_CANONICAL_HOST
-MYHOST=$host_os
+AC_DEFINE_UNQUOTED(NS_HOST, "$host_os")
 case "$host_os" in
 *cygwin)
 	CFLAGS="$CFLAGS -O2 -g"

@@ -28,6 +28,7 @@
 #include "ircd.h"
 #include "exclude.h"
 #include "modules.h"
+#include "servers.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -91,6 +92,23 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	return(s);
 }
 
+static void del_server_leaves(Server* hub)
+{
+	Server *s;
+	hscan_t ss;
+	hnode_t *sn;
+
+	dlog(DEBUG1, "del_server_leaves: %s", hub->name);
+	hash_scan_begin (&ss, serverhash);
+	while ((sn = hash_scan_next (&ss)) != NULL) {
+		s = hnode_get (sn);
+		if(ircstrcasecmp(hub->name, s->uplink) == 0) {
+			dlog(DEBUG1, "del_server_leaves: del child %s", s->name);
+			DelServer(s->name, hub->name);
+		}
+	}
+}
+
 void 
 DelServer (const char *name, const char* reason)
 {
@@ -105,6 +123,10 @@ DelServer (const char *name, const char* reason)
 		return;
 	}
 	s = hnode_get (sn);
+	del_server_leaves(s);
+	if(ircd_srv.noquit) {
+		QuitServerUsers (s);
+	}
 	/* run the event for delete server */
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.server = s;

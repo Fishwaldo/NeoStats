@@ -122,12 +122,12 @@
 #define MSG_SQUERY	"SQUERY"	/* SQUE */
 #define MSG_SERVLIST	"SERVLIST"	/* SERV -> SLIS */
 #define MSG_SERVSET	"SERVSET"	/* SERV -> SSET */
-#define	MSG_REHASH	"REHASH"	/* REHA */
-#define	MSG_RESTART	"RESTART"	/* REST */
-#define	MSG_CLOSE	"CLOSE"	/* CLOS */
-#define	MSG_DIE		"DIE"	/* DIE */
-#define	MSG_HASH	"HASH"	/* HASH */
-#define	MSG_DNS		"DNS"	/* DNS  -> DNSS */
+#define MSG_REHASH	"REHASH"	/* REHA */
+#define MSG_RESTART	"RESTART"	/* REST */
+#define MSG_CLOSE	"CLOSE"	/* CLOS */
+#define MSG_DIE		"DIE"	/* DIE */
+#define MSG_HASH	"HASH"	/* HASH */
+#define MSG_DNS		"DNS"	/* DNS  -> DNSS */
 #define MSG_SILENCE	"SILENCE"	/* SILE */
 #define MSG_AKILL	"AKILL"	/* AKILL */
 #define MSG_KLINE	"KLINE"	/* KLINE */
@@ -271,7 +271,7 @@
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))
-#define is_pub_chan(x)  ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_INVITEONLY)))
+#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_INVITEONLY)))
 #define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_INVITEONLY)))
 
 /* Umode macros */

@@ -68,7 +68,7 @@
 #endif
 
 #ifdef	VMS
-#define	IOCTL_3_ARGS
+#define IOCTL_3_ARGS
 #include <inet.h>
 #endif
 

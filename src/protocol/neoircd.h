@@ -122,12 +122,12 @@
 #define MSG_SQUERY	"SQUERY"	/* SQUE */
 #define MSG_SERVLIST	"SERVLIST"	/* SERV -> SLIS */
 #define MSG_SERVSET	"SERVSET"	/* SERV -> SSET */
-#define	MSG_REHASH	"REHASH"	/* REHA */
-#define	MSG_RESTART	"RESTART"	/* REST */
-#define	MSG_CLOSE	"CLOSE"	/* CLOS */
-#define	MSG_DIE		"DIE"	/* DIE */
-#define	MSG_HASH	"HASH"	/* HASH */
-#define	MSG_DNS		"DNS"	/* DNS  -> DNSS */
+#define MSG_REHASH	"REHASH"	/* REHA */
+#define MSG_RESTART	"RESTART"	/* REST */
+#define MSG_CLOSE	"CLOSE"	/* CLOS */
+#define MSG_DIE		"DIE"	/* DIE */
+#define MSG_HASH	"HASH"	/* HASH */
+#define MSG_DNS		"DNS"	/* DNS  -> DNSS */
 #define MSG_SILENCE	"SILENCE"	/* SILE */
 #define MSG_AKILL	"AKILL"	/* AKILL */
 #define MSG_KLINE	"KLINE"	/* KLINE */
@@ -253,19 +253,19 @@
 #define UMODE_REGNICK	0x80000	/* registered nickname */
 
 /* Cmodes */
-#define	CMODE_CHANOP	0x0001
+#define CMODE_CHANOP	0x0001
 #define CMODE_HALFOP	0x0002
-#define	CMODE_VOICE	0x0004
-#define	CMODE_PRIVATE	0x0008
-#define	CMODE_SECRET	0x0010
-#define	CMODE_MODERATED  0x0020
-#define	CMODE_TOPICLIMIT 0x0040
-#define	CMODE_INVITEONLY 0x0080
-#define	CMODE_NOPRIVMSGS 0x0100
-#define	CMODE_KEY	0x0200
+#define CMODE_VOICE	0x0004
+#define CMODE_PRIVATE	0x0008
+#define CMODE_SECRET	0x0010
+#define CMODE_MODERATED  0x0020
+#define CMODE_TOPICLIMIT 0x0040
+#define CMODE_INVITEONLY 0x0080
+#define CMODE_NOPRIVMSGS 0x0100
+#define CMODE_KEY	0x0200
 #define CMODE_EXCEPT	0x0400
-#define	CMODE_BAN	0x0800
-#define	CMODE_LIMIT	0x1000
+#define CMODE_BAN	0x0800
+#define CMODE_LIMIT	0x1000
 #define CMODE_HIDEOPS	0x2000
 #define CMODE_INVEX	0x4000
 #define CMODE_CHANADMIN  0x8000
@@ -274,7 +274,7 @@
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))
-#define is_pub_chan(x)  ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_INVITEONLY|CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY) ))
+#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_INVITEONLY|CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY) ))
 #define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_INVITEONLY|CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY) ))
 
 /* Umode macros */

@@ -60,10 +60,13 @@ int scmode_op (const char *who, const char *chan, const char *mode, const char *
 void
 InitIrcd ()
 {
+	/* Clear IRCD info */
+	memset(&ircd_srv, 0, sizeof(ircd_srv));
 	InitServices();
 #ifdef IRCU
 	/* Temp: force tokens for IRCU */
 	ircd_srv.token = 1;
+	ircd_srv.noquit = 1;
 #endif
 	service_umode_mask = UmodeStringToMask(me.servicesumode, 0);
 };
@@ -234,7 +237,7 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 {
 	snewnick_cmd (nick, user, host, realname, Umode);
 	if ((config.allbots > 0) || (Umode & service_umode_mask)) {
-		join_bot_to_chan(nick, me.serviceschan, me.servicescmode);
+		//join_bot_to_chan(nick, me.serviceschan, me.servicescmode);
 	}
 	return NS_SUCCESS;
 }
@@ -501,8 +504,8 @@ parse (char *line)
 	SET_SEGV_LOCATION();
 	if (!(*line))
 		return;
-	dlog(DEBUG1, "--------------------------BEGIN PARSE---------------------------");
-	dlog(DEBUG1, "R: %s", line);
+	dlog(DEBUG1, "------------------------BEGIN PARSE-------------------------");
+	dlog(DEBUG1, "RX: %s", line);
 	if (*line == ':') {
 		coreLine = strpbrk (line, " ");
 		if (!coreLine)
@@ -532,7 +535,7 @@ parse (char *line)
 	ac = splitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	sfree (av);
-	dlog(DEBUG1, "---------------------------END PARSE----------------------------");
+	dlog(DEBUG1, "-------------------------END PARSE--------------------------");
 }
 #endif
 
@@ -776,7 +779,6 @@ do_protocol (char *origin, char **argv, int argc)
 {
 	int i;
 
-	ircd_srv.unkline = 0;
 	for (i = 0; i < argc; i++) {
 #ifdef GOTTOKENSUPPORT
 		if (!ircstrcasecmp ("TOKEN", argv[i])) {
@@ -791,6 +793,11 @@ do_protocol (char *origin, char **argv, int argc)
 #if defined(HYBRID7)
 		if (!ircstrcasecmp ("UNKLN", argv[i])) {
 			ircd_srv.unkline = 1;
+		}
+#endif
+#ifdef GOTNOQUITSUPPORT
+		if (!ircstrcasecmp ("NOQUIT", argv[i])) {
+			ircd_srv.noquit = 1;
 		}
 #endif
 	}
@@ -1663,7 +1670,7 @@ send_cmd (char *fmt, ...)
 	ircvsnprintf (buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 
-	dlog(DEBUG2, "SENT: %s", buf);
+	dlog(DEBUG2, "TX: %s", buf);
 	if(strnlen (buf, BUFSIZE) < BUFSIZE - 2) {
 		strlcat (buf, "\n", BUFSIZE);
 	} else {

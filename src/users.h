@@ -41,5 +41,6 @@ void UserAway (const char *nick, const char *awaymsg);
 User *finduserbase64 (const char *num);
 #endif
 void UserDump (const char *nick);
+void QuitServerUsers (Server* s);
 
 #endif /* _USERS_H_ */

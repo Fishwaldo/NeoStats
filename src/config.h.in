@@ -85,9 +85,6 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Use IRCD Authentication */
-#undef IRCDAUTH
-
 /* Name of package */
 #undef PACKAGE
 
@@ -117,6 +114,9 @@
 
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 #undef TM_IN_SYS_TIME
+
+/* Host OS */
+#undef NS_HOST
 
 /* IRCd protocol */
 #undef NS_PROTOCOL

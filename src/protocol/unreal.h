@@ -161,17 +161,17 @@
 #define TOK_USERHOST	"J"	/* 74 */
 #define MSG_ISON	"ISON"	/* ISON */
 #define TOK_ISON	"K"	/* 75 */
-#define	MSG_REHASH	"REHASH"	/* REHA */
+#define MSG_REHASH	"REHASH"	/* REHA */
 #define TOK_REHASH	"O"	/* 79 */
-#define	MSG_RESTART	"RESTART"	/* REST */
+#define MSG_RESTART	"RESTART"	/* REST */
 #define TOK_RESTART	"P"	/* 80 */
-#define	MSG_CLOSE	"CLOSE"	/* CLOS */
+#define MSG_CLOSE	"CLOSE"	/* CLOS */
 #define TOK_CLOSE	"Q"	/* 81 */
-#define	MSG_DIE		"DIE"	/* DIE */
+#define MSG_DIE		"DIE"	/* DIE */
 #define TOK_DIE		"R"	/* 82 */
-#define	MSG_HASH	"HASH"	/* HASH */
+#define MSG_HASH	"HASH"	/* HASH */
 #define TOK_HASH	"S"	/* 83 */
-#define	MSG_DNS		"DNS"	/* DNS  -> DNSS */
+#define MSG_DNS		"DNS"	/* DNS  -> DNSS */
 #define TOK_DNS		"T"	/* 84 */
 #define MSG_SILENCE	"SILENCE"	/* SILE */
 #define TOK_SILENCE	"U"	/* 85 */
@@ -438,17 +438,17 @@
 #define TOK_USERHOST	"J"	/* 74 */
 #define MSG_ISON	"ISON"	/* ISON */
 #define TOK_ISON	"K"	/* 75 */
-#define	MSG_REHASH	"REHASH"	/* REHA */
+#define MSG_REHASH	"REHASH"	/* REHA */
 #define TOK_REHASH	"O"	/* 79 */
-#define	MSG_RESTART	"RESTART"	/* REST */
+#define MSG_RESTART	"RESTART"	/* REST */
 #define TOK_RESTART	"P"	/* 80 */
-#define	MSG_CLOSE	"CLOSE"	/* CLOS */
+#define MSG_CLOSE	"CLOSE"	/* CLOS */
 #define TOK_CLOSE	"Q"	/* 81 */
-#define	MSG_DIE		"DIE"	/* DIE */
+#define MSG_DIE		"DIE"	/* DIE */
 #define TOK_DIE		"R"	/* 82 */
-#define	MSG_HASH	"HASH"	/* HASH */
+#define MSG_HASH	"HASH"	/* HASH */
 #define TOK_HASH	"S"	/* 83 */
-#define	MSG_DNS		"DNS"	/* DNS  -> DNSS */
+#define MSG_DNS		"DNS"	/* DNS  -> DNSS */
 #define TOK_DNS		"T"	/* 84 */
 #define MSG_SILENCE	"SILENCE"	/* SILE */
 #define TOK_SILENCE	"U"	/* 85 */
@@ -538,7 +538,7 @@
 #define MSG_NACHAT  	"NACHAT"	/* netadmin chat */
 #define TOK_NACHAT  	"AC"	/* *beep* */
 #define MSG_SETIDENT 	"SETIDENT"	/* set ident */
-#define	TOK_SETIDENT	"AD"	/* good old BASIC ;P */
+#define TOK_SETIDENT	"AD"	/* good old BASIC ;P */
 #define MSG_SETNAME	"SETNAME"	/* set GECOS */
 #define TOK_SETNAME	"AE"	/* its almost unreeaaall... */
 #define MSG_LAG		"LAG"	/* Lag detect */
@@ -637,16 +637,16 @@
 
 /* Umodes */
 #ifdef UNREAL32
-#define	UMODE_INVISIBLE		0x0001	
-#define	UMODE_OPER			0x0002	
-#define	UMODE_WALLOP		0x0004	
+#define UMODE_INVISIBLE		0x0001	
+#define UMODE_OPER			0x0002	
+#define UMODE_WALLOP		0x0004	
 #define UMODE_FAILOP		0x0008	
 #define UMODE_HELPOP		0x0010	
 #define UMODE_REGNICK		0x0020	
 #define UMODE_SADMIN		0x0040	
 #define UMODE_ADMIN			0x0080	
-#define	UMODE_SERVNOTICE	0x0100	
-#define	UMODE_LOCOP			0x0200	
+#define UMODE_SERVNOTICE	0x0100	
+#define UMODE_LOCOP			0x0200	
 #define UMODE_RGSTRONLY		0x0400	
 #define UMODE_NOCTCP		0x0800	
 #define UMODE_WEBTV			0x1000	
@@ -665,16 +665,16 @@
 #define UMODE_STRIPBADWORDS	0x2000000
 #define UMODE_HIDEWHOIS		0x4000000
 #else  /* UNREAL32 */		
-#define	UMODE_INVISIBLE		0x0001	/* makes user invisible */
-#define	UMODE_OPER			0x0002	/* Operator */
-#define	UMODE_WALLOP		0x0004	/* send wallops to them */
+#define UMODE_INVISIBLE		0x0001	/* makes user invisible */
+#define UMODE_OPER			0x0002	/* Operator */
+#define UMODE_WALLOP		0x0004	/* send wallops to them */
 #define UMODE_FAILOP		0x0008	/* Shows some global messages */
 #define UMODE_HELPOP		0x0010	/* Help system operator */
 #define UMODE_REGNICK		0x0020	/* Nick set by services as registered */
 #define UMODE_SADMIN		0x0040	/* Services Admin */
 #define UMODE_ADMIN			0x0080	/* Admin */
-#define	UMODE_SERVNOTICE	0x0100	/* server notices such as kill */
-#define	UMODE_LOCOP			0x0200	/* Local operator -- SRB */
+#define UMODE_SERVNOTICE	0x0100	/* server notices such as kill */
+#define UMODE_LOCOP			0x0200	/* Local operator -- SRB */
 #define UMODE_KILLS			0x0400	/* Show server-kills... */
 #define UMODE_CLIENT		0x0800	/* Show client information */
 #define UMODE_FLOOD			0x1000	/* Receive flood warnings */
@@ -692,43 +692,29 @@
 #define UMODE_SECURE		0x800000	/* User is a secure connect */
 #define UMODE_FCLIENT		0x1000000	/* recieve client on far connects.. */
 
-#define	UMODE_VICTIM		0x8000000	/* Intentional Victim */
+#define UMODE_VICTIM		0x8000000	/* Intentional Victim */
 #define UMODE_DEAF			0x10000000
 #define UMODE_HIDEOPER		0x20000000	/* Hide oper mode */
 #define UMODE_SETHOST		0x40000000	/* used sethost */
 #define UMODE_STRIPBADWORDS 0x80000000	/* */
 #endif /* UNREAL32 */
 
-/* Cmode chars */
-#define CMODE_CH_CHANOP 'o'
-#define CMODE_CH_VOICE	'v'
-#define CMODE_CH_HALFOP	'h'
-#define CMODE_CH_CHANOWNER	'q'
-#define CMODE_CH_CHANPROT	'a'
-
-/* Cmode sjoin flags */
-#define CMODE_FL_CHANOP '@'
-#define CMODE_FL_VOICE	'+'
-#define CMODE_FL_HALFOP	'%'
-#define CMODE_FL_CHANOWNER	'*'
-#define CMODE_FL_CHANPROT	'~'
-
 /* Cmodes */
-#define	CMODE_CHANOP		0x0001
-#define	CMODE_VOICE		0x0002
-#define	CMODE_PRIVATE		0x0004
-#define	CMODE_SECRET			0x0008
-#define	CMODE_MODERATED  	0x0010
-#define	CMODE_TOPICLIMIT 	0x0020
+#define CMODE_CHANOP		0x0001
+#define CMODE_VOICE		0x0002
+#define CMODE_PRIVATE		0x0004
+#define CMODE_SECRET			0x0008
+#define CMODE_MODERATED  	0x0010
+#define CMODE_TOPICLIMIT 	0x0020
 #define CMODE_CHANOWNER		0x0040
 #define CMODE_CHANPROT		0x0080
-#define	CMODE_HALFOP			0x0100
+#define CMODE_HALFOP			0x0100
 #define CMODE_EXCEPT			0x0200
-#define	CMODE_BAN			0x0400
-#define	CMODE_INVITEONLY 	0x0800
-#define	CMODE_NOPRIVMSGS 	0x1000
-#define	CMODE_KEY			0x2000
-#define	CMODE_LIMIT			0x4000
+#define CMODE_BAN			0x0400
+#define CMODE_INVITEONLY 	0x0800
+#define CMODE_NOPRIVMSGS 	0x1000
+#define CMODE_KEY			0x2000
+#define CMODE_LIMIT			0x4000
 #define CMODE_RGSTR			0x8000
 #define CMODE_RGSTRONLY 		 	0x10000
 #define CMODE_LINK			0x20000
@@ -749,7 +735,7 @@
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY)))
-#define is_pub_chan(x)  ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY|CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_KEY) ))
+#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY|CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_KEY) ))
 #define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY|CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_KEY) ))
 
 /* Umode macros */

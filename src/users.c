@@ -765,6 +765,24 @@ void FiniUsers (void)
 	hash_destroy(userhash);
 }
 
+void QuitServerUsers (Server* s)
+{
+	User *u;
+	hnode_t *un;
+	hscan_t hs;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin(&hs, userhash);
+	while ((un = hash_scan_next(&hs)) != NULL) {
+		u = hnode_get (un);
+		if(u->server == s) 
+		{
+			dlog (DEBUG1, "QuitServerUsers: deleting %s for %s", u->nick, s->name);
+			QuitUser(u->nick, s->name);
+		}
+	}
+}
+
 void GetUserList(UserListHandler handler)
 {
 	User *u;

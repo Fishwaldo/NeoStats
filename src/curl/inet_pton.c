@@ -38,9 +38,9 @@
 #include <string.h>
 #include <errno.h>
 
-#define	IN6ADDRSZ	16
-#define	INADDRSZ	 4
-#define	INT16SZ		 2
+#define IN6ADDRSZ	16
+#define INADDRSZ	 4
+#define INT16SZ		 2
 
 #ifdef WIN32
 #define EAFNOSUPPORT    WSAEAFNOSUPPORT
@@ -78,7 +78,7 @@ Curl_inet_pton(af, src, dst)
 		return (inet_pton4(src, dst));
 #ifdef ENABLE_IPV6
 #ifndef	AF_INET6
-#define	AF_INET6	AF_MAX+1	/* just to let this compile */
+#define AF_INET6	AF_MAX+1	/* just to let this compile */
 #endif
 	case AF_INET6:
 		return (inet_pton6(src, dst));

@@ -203,26 +203,18 @@
 #define UMODE_REJ	    0x2000000   /* umode +j - client rejection notices */
 #define UMODE_ULINEKILL     0x4000000   /* umode +K - U: lined server kill messages */
 
-/* Cmode chars */
-#define CMODE_CH_CHANOP 'o'
-#define CMODE_CH_VOICE	'v'
-
-/* Cmode sjoin flags */
-#define CMODE_FL_CHANOP '@'
-#define CMODE_FL_VOICE	'+'
-
 /* Cmodes */
 #define CMODE_CHANOP	 0x0001
-#define	CMODE_VOICE		 0x0002
-#define	CMODE_DEOPPED	 0x0004
-#define	CMODE_PRIVATE	 0x0008
-#define	CMODE_SECRET	 0x0010
-#define	CMODE_MODERATED  0x0020
-#define	CMODE_TOPICLIMIT 0x0040
-#define	CMODE_INVITEONLY 0x0080
-#define	CMODE_NOPRIVMSGS 0x0100
-#define	CMODE_KEY		 0x0200
-#define	CMODE_BAN		 0x0400
+#define CMODE_VOICE		 0x0002
+#define CMODE_DEOPPED	 0x0004
+#define CMODE_PRIVATE	 0x0008
+#define CMODE_SECRET	 0x0010
+#define CMODE_MODERATED  0x0020
+#define CMODE_TOPICLIMIT 0x0040
+#define CMODE_INVITEONLY 0x0080
+#define CMODE_NOPRIVMSGS 0x0100
+#define CMODE_KEY		 0x0200
+#define CMODE_BAN		 0x0400
 #define CMODE_LIMIT		 0x0800
 #define CMODE_RGSTR		 0x1000
 #define CMODE_RGSTRONLY  0x2000
@@ -233,7 +225,7 @@
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))
-#define is_pub_chan(x)  ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
 #define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
 
 /* Umode macros */

@@ -69,7 +69,7 @@ static config_option options[] = {
 	{"LOGFILENAMEFORMAT", ARG_STR, cb_Server, 14},
 	{"SERVER_NUMERIC", ARG_STR, cb_Server, 15},
 	{"SETSERVERTIMES", ARG_STR, cb_Server, 16},
-	{"SERVICEROOT", ARG_STR, cb_Server, 18}
+	{"SERVICEROOT", ARG_STR, cb_Server, 18},
 #ifdef SQLSRV
 	{"SQLSRV_AUTH", ARG_STR, cb_SqlConf, 0},
 	{"SQLSRV_PORT", ARG_STR, cb_SqlConf, 1},

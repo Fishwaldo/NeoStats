@@ -829,8 +829,8 @@ parse (char *line)
 	SET_SEGV_LOCATION();
 	if (!(*line))
 		return;
-	dlog(DEBUG1, "--------------------------BEGIN PARSE---------------------------");
-	dlog(DEBUG1, "R: %s", line);
+	dlog(DEBUG1, "------------------------BEGIN PARSE-------------------------");
+	dlog(DEBUG1, "RX: %s", line);
 	coreLine = strpbrk (line, " ");
 	if (coreLine) {
 		*coreLine = 0;
@@ -871,7 +871,7 @@ parse (char *line)
 	}
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	if(av) sfree (av);
-	dlog(DEBUG1, "---------------------------END PARSE----------------------------");
+	dlog(DEBUG1, "-------------------------END PARSE--------------------------");
 }
 
 static void 

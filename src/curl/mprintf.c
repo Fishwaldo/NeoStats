@@ -71,7 +71,7 @@ static const char lower_digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 /* Upper-case digits.  */
 static const char upper_digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-#define	OUTCHAR(x) done+=(stream(x, (FILE *)data)==-1?0:1)
+#define OUTCHAR(x) done+=(stream(x, (FILE *)data)==-1?0:1)
 
 /* Data type to read from the arglist */
 typedef enum  {

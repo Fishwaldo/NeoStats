@@ -59,6 +59,7 @@ typedef struct ircd_server {
 	int tsendsync;
 	unsigned int token;
 	unsigned int client;
+	unsigned int noquit;
 } ircd_server;
 
 extern UserModes user_umodes[];

@@ -4,6 +4,16 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Change is_pub_chan so it returns TRUE for a public channel. (M)
+ - Begin IRCD "soft" protocol/feature design. (M)
+ - Remove old CMODE_CH_xxx and CMODE_FL_xxx defines that new sjoin system makes
+   redundant. (M)
+ - Host OS value now saved by configure for use in version reporting and for 
+   bug reporting. (M)
+ - Add support for NOQUIT so that NeoStats can delete users from disconnected
+   servers without requiring individual QUITs (M)
+ - Add support to recurse server list for SQUIT so that NeoStats can delete 
+   leaves of hubs which SQUIT (M)
  - Tidy exported include files (via make install) to the currently required 
    minimum. (M)
  - Added DEBUGMOD option which allows selective debugging of a module so we can
