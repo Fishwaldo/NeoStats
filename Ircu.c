@@ -370,6 +370,7 @@ send_nickchange (const char *oldnick, const char *newnick, const unsigned long t
 void
 send_invite (const char *from, const char *to, const char *chan) 
 {
+	send_cmd ("%s %s %s %s", getnumfromnick(from), TOK_INVITE, to, chan);
 }
 
 void 
