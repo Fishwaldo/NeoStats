@@ -142,7 +142,7 @@ typedef struct
 } EpgConn;
 
 /* the connections list */
-hash_t  *pgconn;
+list_t  *pgconn;
 
 
 /* this is a struct that stores the RTA runtime config */

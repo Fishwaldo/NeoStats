@@ -347,19 +347,12 @@ serv_die ()
 RETSIGTYPE
 conf_rehash ()
 {
-/*	struct sigaction act; */
 	chanalert (s_Services, "SIGHUP received, attempting to rehash");
 	globops (me.name, "SIGHUP received, attempted to rehash");
-/*	act.sa_handler = conf_rehash;
-	act.sa_flags=0;
-	(void)sigemptyset(&act.sa_mask);
-	(void)sigaddset(&act.sa_mask, SIGHUP);
-	(void)sigaction(SIGHUP, &act, NULL);
-*/
-	globops (me.name, "REHASH not completed in this version!");
-
-
-	/* gotta do the rehash code dun I? */
+	/* at the moment, the reshash just checks for a the SQL port is opened, if enabled */
+#ifdef SQLSRV
+	check_sql_sock();
+#endif
 }
 
 

@@ -68,10 +68,9 @@ typedef struct Sql_Conn {
 	int responsefree;
 	int cmdpos;
 	int cmd[1000];
-	int connid;
 } Sql_Conn;
 
-int sqlListenSock;
+int sqlListenSock = -1;
 
 list_t *sqlconnections;
 
@@ -80,6 +79,8 @@ static void sql_accept_conn(int srvfd);
 static int sqllisten_on_port(int port);
 static int sql_handle_ui_request(lnode_t *sqlnode);
 static int sql_handle_ui_output(lnode_t *sqlnode);
+int check_sql_sock();
+
 
 #endif 
 
@@ -561,7 +562,19 @@ sts (char *fmt, ...)
  * information
  */
 
-
+/* rehash handler */
+int check_sql_sock() {
+	if (sqlListenSock < 1) {
+		nlog(LOG_DEBUG1, LOG_CORE, "Rehashing SQL sock");
+        	sqlListenSock = sqllisten_on_port(me.sqlport);
+		if (sqlListenSock == -1) {
+			nlog(LOG_CRITICAL, LOG_CORE, "Failed to Setup Sql Port. SQL not available");
+                	return NS_FAILURE;
+                }
+        }
+	return NS_SUCCESS;
+}
+		                                        
 
 
 
@@ -603,12 +616,12 @@ sqllisten_on_port(int port)
   (void) fcntl(srvfd, F_SETFL, flags);
   if (bind(srvfd, (struct sockaddr *) &srvskt, adrlen) < 0)
   {
-    nlog(LOG_CRITICAL, LOG_CORE, "Unable to bind to port %d\n", port);
+    nlog(LOG_CRITICAL, LOG_CORE, "Unable to bind to port %d", port);
     return -1;
   }
   if (listen(srvfd, 1) < 0)
   {
-    nlog(LOG_CRITICAL, LOG_CORE, "Unable to listen on port %d\n", port);
+    nlog(LOG_CRITICAL, LOG_CORE, "Unable to listen on port %d", port);
     return -1;
   }
   return (srvfd);
@@ -654,7 +667,7 @@ sql_accept_conn(int srvfd)
 
   if (newui->fd < 0)
   {
-    nlog(LOG_NOTICE, LOG_CORE, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
+    nlog(LOG_WARNING, LOG_CORE, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
     free(newui);
     close(srvfd);
     return;
@@ -677,11 +690,10 @@ sql_accept_conn(int srvfd)
     newui->responsefree = 50000; /* max response packetsize if 50000 */
     newui->nbytein = 0;
     newui->nbyteout = 0;
-    newui->connid = 0;
     newuinode = lnode_create(newui);
     list_append(sqlconnections, newuinode);
     inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
-    nlog(LOG_NOTICE, LOG_CORE, "New SqlConnection from %s", tmp);
+    nlog(LOG_DEBUG1, LOG_CORE, "New SqlConnection from %s", tmp);
   }
 }
 
@@ -726,7 +738,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
     /* log this since a normal close is with an 'X' command from the
        client program? */
     nlog(LOG_DEBUG1, LOG_CORE, "Disconnecting SqlClient for failed read");
-    deldbconnection(sqlconn->connid);
+    deldbconnection(sqlconn->fd);
     close(sqlconn->fd);
     list_delete(sqlconnections, sqlnode);
     lnode_destroy(sqlnode);
@@ -743,13 +755,13 @@ sql_handle_ui_request(lnode_t *sqlnode)
     t = sqlconn->cmdpos,       /* packet in length */
       dbstat = dbcommand((char *)sqlconn->cmd, /* packet in */
       &sqlconn->cmdpos,        /* packet in length */
-      &sqlconn->response[50000 - sqlconn->responsefree], &sqlconn->responsefree, &sqlconn->connid);
+      &sqlconn->response[50000 - sqlconn->responsefree], &sqlconn->responsefree, sqlconn->fd);
     t -= sqlconn->cmdpos,      /* t = # bytes consumed */
       /* move any trailing SQL cmd text up in the buffer */
       (void) memmove(sqlconn->cmd, &sqlconn->cmd[t], t);
   } while (dbstat == RTA_SUCCESS);
   if (dbstat == RTA_ERROR) {
-    deldbconnection(sqlconn->connid);
+    deldbconnection(sqlconn->fd);
   }
   /* the command is done (including side effects).  Send any reply back 
      to the UI */
@@ -784,7 +796,7 @@ sql_handle_ui_output(lnode_t *sqlnode)
     if (ret < 0)
     {
     	nlog(LOG_WARNING, LOG_CORE, "Got a write error when attempting to return data to the SQL Server");
-	deldbconnection(sqlconn->connid);
+	deldbconnection(sqlconn->fd);
       	close(sqlconn->fd);
 	list_delete(sqlconnections, sqlnode);
 	lnode_destroy(sqlnode);

@@ -507,6 +507,8 @@ do_select(char *buf, int *nbuf)
 
   nr = cmd.ptbl->nrows;
   sr = cmd.ptbl->rowlen;
+  node = NULL;
+  hnode = NULL;
   if (cmd.ptbl->tabletype == TBL_LIST)
   {
     node = list_first((list_t *) cmd.ptbl->address);

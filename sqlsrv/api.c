@@ -40,12 +40,17 @@ EpgConn *getconndata(int id);
 EpgConn *
 getconndata(int id)
 {
-  char     tmpstr[33];
-  hnode_t *hnode;
+  lnode_t *lnode;
+  EpgConn *conn;
 
-  snprintf((char *) tmpstr, 32, "%d", id);
-  hnode = hash_lookup(pgconn, tmpstr);
-  return hnode_get(hnode);
+  lnode = list_first(pgconn);
+  while (lnode) {
+	conn = lnode_get(lnode);
+  	if (conn->id == id)
+  		return conn;
+  	lnode = list_next(pgconn, lnode);
+  }
+  return NULL;
 }
 
 /***************************************************************
@@ -79,7 +84,7 @@ rta_init(logcb logfunc)
   Ntbl = 0;
 
   /* init the pgconn structure */
-  pgconn = hash_create(-1, 0, 0);
+  pgconn = list_create(-1);
   pg_connTable.address = pgconn;
 
   /* add system and internal tables here */
@@ -285,17 +290,17 @@ rta_add_table(TBLDEF *ptbl)
  *         RTA_CLOSE     - client requests a orderly close
  **************************************************************/
 int
-dbcommand(char *buf, int *nin, char *out, int *nout, int *connid)
+dbcommand(char *buf, int *nin, char *out, int *nout, int connid)
 {
   extern struct EpgStat rtastat;
   int      length;     /* lenght of the packet if old protocol */
   int      i;          /* a temp integer */
-  hnode_t *hnode;
-  static int newid = 0;
+  lnode_t *lnode;
   EpgConn *conn;
   char     line[MX_LN_SZ]; /* input line from file */
   char     reply[MX_LN_SZ]; /* response from SQL process */
   int      nreply;     /* number of free bytes in reply */
+
 
   /* old style packet if first byte is zero */
   if ((int) buf[0] == 0)
@@ -330,16 +335,12 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int *connid)
       else
       {
         /* first thing we do is find the hash for this struct? */
-        if (*connid > 0)
+        conn = getconndata(connid);
+        if (conn)
         {
-          conn = getconndata(*connid);
-          if (conn)
-          {
             snprintf(conn->cmd, 1000, "Re-Authenticating");
             snprintf((char *) conn->username, 32, "%s", &buf[72]);
             conn->rsp[0] = '\0';
-          }
-
         }
         else
         {
@@ -347,13 +348,10 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int *connid)
           bzero(conn, sizeof(EpgConn));
           snprintf(conn->cmd, 1000, "Authenticating");
           snprintf((char *) conn->username, 32, "%s", &buf[72]);
-          newid++;
-          conn->id = newid;
+          conn->id = connid;
           conn->ctm = time(NULL);
-          hnode = hnode_create(conn);
-          snprintf(conn->strid, 32, "%d", conn->id);
-          hash_insert(pgconn, hnode, conn->strid);
-          *connid = conn->id;
+          lnode = lnode_create(conn);
+          list_append(pgconn, lnode);
         }
         *nin -= length;
         out[0] = 'R';
@@ -372,7 +370,7 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int *connid)
     else if (length == 16)      /* a cancel request */
     {
       /* ignore the request for now */
-      conn = getconndata(*connid);
+      conn = getconndata(connid);
       if (conn)
       {
         snprintf((char *) conn->cmd, 1000, "Cancel Call");
@@ -383,7 +381,7 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int *connid)
     }
     else                        /* should be a password */
     {
-      conn = getconndata(*connid);
+      conn = getconndata(connid);
       if (!conn)
       {
         /* pass before username (and thus conn?) Bah */
@@ -436,7 +434,7 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int *connid)
   }
   else if (buf[0] == 'Q')       /* a query request */
   {
-    conn = getconndata(*connid);
+    conn = getconndata(connid);
     /* check for a complete command */
     for (i = 0; i < *nin; i++)
     {
@@ -464,20 +462,20 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int *connid)
   }
   else if (buf[0] == 'X')       /* a terminate request */
   {
-    conn = getconndata(*connid);
+    conn = getconndata(connid);
     if (conn)
       snprintf(conn->cmd, 1000, "Disconnecting");
     return (RTA_CLOSE);
   }
   else if (buf[0] == 'F')       /* a function request */
   {
-    conn = getconndata(*connid);
+    conn = getconndata(connid);
     if (conn)
       snprintf(conn->cmd, 1000,
         "Unsupported Function Call. Disconnecting");
     return (RTA_CLOSE);
   }
-  conn = getconndata(*connid);
+  conn = getconndata(connid);
   if (conn)
     snprintf(conn->cmd, 1000, "Unsupported Call. Disconnecting");
 
@@ -488,15 +486,20 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int *connid)
 void
 deldbconnection(int connid)
 {
-  char     tmpstr[33];
-  hnode_t *hnode;
+  lnode_t *lnode;
+  EpgConn *conn;
 
-  snprintf((char *) tmpstr, 32, "%d", connid);
-  hnode = hash_lookup(pgconn, tmpstr);
-  if (hnode)
+  lnode = list_first(pgconn);
+  while (lnode)
   {
-    hash_delete(pgconn, hnode);
-    free(hnode_get(hnode));
+ 	conn = lnode_get(lnode);
+ 	if (conn->id == connid) {
+ 		list_delete(pgconn, lnode);
+ 		lnode_destroy(lnode);
+ 		free(conn);
+ 		return;
+ 	}
+ 	lnode = list_next(pgconn, lnode);	
   }
 }
 

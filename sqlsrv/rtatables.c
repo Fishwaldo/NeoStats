@@ -337,7 +337,7 @@ TBLDEF   pg_connTable = {
   0,                            /* address of table */
   0,                            /* length of each row */
   0,                            /* # rows in table */
-  TBL_HASH,
+  TBL_LIST,
   PG_ConnCols,                  /* Column definitions */
   sizeof(PG_ConnCols) / sizeof(COLDEF), /* # columns */
   "",                           /* save file name */

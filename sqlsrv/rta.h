@@ -393,7 +393,7 @@ TBLDEF;
  *         RTA_NOCMD     - input did not have a full cmd
  *         RTA_CLOSE     - client requests an orderly close
  **************************************************************/
-int      dbcommand(char *, int *, char *, int *, int *);
+int      dbcommand(char *, int *, char *, int *, int );
 void     deldbconnection(int connid);
 
 /** ************************************************************
