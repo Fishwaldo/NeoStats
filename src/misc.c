@@ -24,6 +24,7 @@
 */
 
 #include "neostats.h"
+#include "main.h"
 #include "services.h"
 #include "ircstring.h"
 

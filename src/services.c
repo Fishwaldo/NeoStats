@@ -24,6 +24,7 @@
 */
 
 #include "neostats.h"
+#include "main.h"
 #include "modules.h"
 #include "bots.h"
 #include "timer.h"

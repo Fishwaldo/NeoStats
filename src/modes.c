@@ -22,6 +22,7 @@
 */
 
 #include "neostats.h"
+#include "main.h"
 #include "ircd.h"
 #include "modes.h"
 #include "services.h"

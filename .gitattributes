@@ -81,6 +81,7 @@ include/ircstring.h eol=lf
 include/lang.h -text
 include/list.h eol=lf
 include/log.h eol=lf
+include/main.h -text
 include/modes.h -text
 include/modules.h -text
 include/neostats.h -text

@@ -22,6 +22,7 @@
 */
 
 #include "neostats.h"
+#include "main.h"
 #include <signal.h>
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>

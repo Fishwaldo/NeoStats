@@ -26,6 +26,7 @@
 */
 
 #include "neostats.h"
+#include "main.h"
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
@@ -310,7 +311,6 @@ read_loop ()
 			}
 		}
 	}
-	nlog (LOG_NORMAL, "hu, how did we get here");
 }
 
 /** @brief Connects to IRC and starts the main loop
@@ -339,7 +339,7 @@ Connect (void)
 #endif
 	}
 #ifndef WIN32
-	do_exit (NS_EXIT_RECONNECT, NULL);
+	do_reconnect();
 #endif
 }
 

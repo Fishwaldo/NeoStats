@@ -21,7 +21,13 @@
 ** $Id$
 */
 
+/*  TODO:
+ *  - Improve exit code
+ *  - Improve reconnect system 
+ */
+
 #include "neostats.h"
+#include "main.h"
 #include "ircd.h"
 #include "conf.h"
 #include "log.h"
@@ -51,6 +57,26 @@
 void *( *old_malloc )( size_t );
 void( *old_free )( void * );
 #endif /* WIN32 */
+
+typedef struct exit_report
+{
+	int exit_code;
+	char *exit_message;
+}exit_report;
+
+exit_report exit_reports[]=
+{
+	/* NS_EXIT_NORMAL */
+	{ EXIT_SUCCESS, "Normal shut down subsystems" },
+	/* NS_EXIT_RELOAD */
+	{ EXIT_SUCCESS, "Reloading NeoStats" },
+	/* NS_EXIT_RECONNECT */
+	{ EXIT_SUCCESS, "Restarting NeoStats subsystems" },
+	/* NS_EXIT_ERROR */
+	{ EXIT_FAILURE, "Exiting due to error" },
+	/* NS_EXIT_SEGFAULT */
+	{ EXIT_FAILURE, "Shutting down subsystems without saving data due to core" },
+};
 
 char segv_location[SEGV_LOCATION_BUFSIZE];
 
@@ -387,6 +413,27 @@ int main( int argc, char *argv[] )
 #endif /* WIN32 */
 }
 
+/** @brief do_reconnect
+ *
+ *  Reconnect routine. Cleans up systems and flushes data files
+ *  then exits and reconnects.
+ *  NeoStats core use only.
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+void do_reconnect( void )
+{
+	if( nsconfig.r_time > 0 ) {
+		nlog( LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", nsconfig.r_time, attempts );
+	}
+	else {
+		nlog( LOG_NOTICE, "Reconnect time is zero, shutting down" );
+	}
+	do_reconnect (NS_EXIT_RECONNECT, NULL);
+}
+
 /** @brief do_exit
  *
  *  Exit routine. Cleans up systems and flushes data files
@@ -401,28 +448,10 @@ int main( int argc, char *argv[] )
 
 void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg )
 {
-	/* Initialise exit code to OK */
-	int return_code=EXIT_SUCCESS;
+	int return_code;
 
-	switch( exitcode ) {
-		case NS_EXIT_NORMAL:
-			nlog( LOG_CRITICAL, "Normal shut down subsystems" );
-			break;
-		case NS_EXIT_RELOAD:
-			nlog( LOG_CRITICAL, "Reloading NeoStats" );
-			break;
-		case NS_EXIT_RECONNECT:
-			nlog( LOG_CRITICAL, "Restarting NeoStats subsystems" );
-			break;
-		case NS_EXIT_ERROR:
-			nlog( LOG_CRITICAL, "Exiting due to error" );
-			return_code=EXIT_FAILURE;	/* exit code to error */
-			break;		
-		case NS_EXIT_SEGFAULT:
-			nlog( LOG_CRITICAL, "Shutting down subsystems without saving data due to core" );
-			return_code=EXIT_FAILURE;	/* exit code to error */
-			break;
-	}
+	return_code = exit_reports[exitcode].exit_code;
+	nlog( LOG_CRITICAL, exit_reports[exitcode].exit_message );
 
 	if( exitcode != NS_EXIT_SEGFAULT ) {
 		rtaserv_fini();
@@ -436,15 +465,6 @@ void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg )
 		sleep( 1 );
 		/* cleanup up core subsystems */
 		FiniCore();
-		if( exitcode == NS_EXIT_RECONNECT ) {
-			if( nsconfig.r_time > 0 ) {
-				nlog( LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", nsconfig.r_time, attempts );
-				sleep( nsconfig.r_time );
-			}
-			else {
-				nlog( LOG_NOTICE, "Reconnect time is zero, shutting down" );
-			}
-		}
 	}
 	FiniDBA();
 	FiniLogs();
@@ -455,6 +475,7 @@ void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg )
 	pcre_free = old_free;
 #endif /* WIN32 */
 	if( ( exitcode == NS_EXIT_RECONNECT && nsconfig.r_time > 0 ) || exitcode == NS_EXIT_RELOAD ) {
+		sleep( nsconfig.r_time );
 		execve( "./neostats", NULL, NULL );
 		return_code = EXIT_FAILURE;	/* exit code to error */
 	}

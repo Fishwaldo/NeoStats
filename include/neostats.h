@@ -432,15 +432,6 @@ typedef enum NS_ERR {
 	NS_ERR_PARAM_OUT_OF_RANGE= 0x8000009,
 }NS_ERR ;
 
-/* do_exit call exit type definitions */
-typedef enum {
-	NS_EXIT_NORMAL=0,
-	NS_EXIT_RELOAD,
-	NS_EXIT_RECONNECT,
-	NS_EXIT_ERROR,
-	NS_EXIT_SEGFAULT,
-}NS_EXIT_TYPE;
-
 /* General flags for for clients (users and servers) and channels */
 #define NS_FLAG_EXCLUDED	0x00000001 /* matches a exclusion */
 
@@ -661,14 +652,14 @@ typedef struct Channel {
 } Channel;
 
 typedef struct CmdParams {
-	Client *source;
-	Client *target;
-	Bot *bot;
-	char *param;
-	char *cmd;
-	Channel* channel;
-	char **av;
-	int ac;
+	Client *source;		/* pointer to client triggering command */
+	Client *target;		/* pointer to client command acts on */
+	Bot *bot;			/* pointer to associated bot where appropriate */
+	char *param;		/* command parameter */
+	char *cmd;			/* command */
+	Channel* channel;	/* pointer to channel struct where appropriate */
+	char **av;			/* command parameter list */
+	int ac;				/* count of command parameter list */
 } CmdParams; 
 
 /* Comand list handling */
@@ -676,7 +667,9 @@ typedef struct CmdParams {
 /** @brief bot_cmd_handler type
  *  defines handler function definition
  */
-
+/* SET_REASON is passed to SET command callback funtions 
+ * so the callback knows why it triggered
+ */
 typedef enum SET_REASON {
 	SET_LOAD = 0,
 	SET_LIST,
@@ -1022,11 +1015,16 @@ typedef struct _Bot {
 	Client *u;
 }_Bot;
 
+/* load configuration associated with this bot_setting list */
 EXPORTFUNC int ModuleConfig( bot_setting *bot_settings );
 
+/* Add a new timer callback to NeoStats */
 EXPORTFUNC int AddTimer( TIMER_TYPE type, timer_function func, const char *name, int interval );
+/* Delete a timer callback from NeoStats */
 EXPORTFUNC int DelTimer( const char *timer_name );
+/* Change timer callback interval counter */
 EXPORTFUNC int SetTimerInterval( const char *timer_name, int interval );
+/* Find timer from name */
 EXPORTFUNC Timer *FindTimer( const char *timer_name );
 
 EXPORTFUNC int add_sock( const char *sock_name, int socknum, sock_func readfunc, sock_func writefunc, sock_func errfunc );
@@ -1036,11 +1034,12 @@ EXPORTFUNC Sock *find_sock( const char *sock_name );
 EXPORTFUNC int sock_connect( int socktype, unsigned long ipaddr, int port, const char *name, sock_func func_read, sock_func func_write, sock_func func_error );
 EXPORTFUNC int sock_disconnect( const char *name );
 
+/* Add a new bot to NeoStats */
 EXPORTFUNC Bot *AddBot( BotInfo *botinfo );
+/* Find bot from name */
 EXPORTFUNC Bot *FindBot( const char *bot_name );
 
 /* main.c */
-void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg) __attribute__((noreturn));
 EXPORTFUNC void fatal_error( char *file, int line, char *func, char *error_text) __attribute__((noreturn));;
 #define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__,(error_text) ); 
 
@@ -1183,14 +1182,14 @@ EXPORTFUNC int del_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list );
 EXPORTFUNC int add_bot_setting_list( Bot *bot_ptr, bot_setting *bot_setting_list );
 EXPORTFUNC int del_bot_setting_list( Bot *bot_ptr, bot_setting *bot_setting_list );
 
-EXPORTFUNC Client *find_valid_user( Bot *botptr, Client *u, const char *target_nick );
+EXPORTFUNC Client *FindValidUser( Bot *botptr, Client *u, const char *target_nick );
 
 /* transfer.c stuff */
 typedef void (transfer_callback) ( void *data, int returncode, char *body, int bodysize );
 EXPORTFUNC void transfer_status( void );
 EXPORTFUNC int new_transfer( char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback );
 
-/* exclude */
+/* Is the client excluded */
 #define IsExcluded(x) ((x) && ((x)->flags & NS_FLAG_EXCLUDED))
 
 /* Is the client a NeoStats one? */
@@ -1227,15 +1226,14 @@ EXPORTFUNC int DBAStore( char *table, char *key, void *data, int size );
 EXPORTFUNC int DBAFetch( char *table, char *key, void *data, int size );
 EXPORTFUNC int DBADelete( char *table, char * key );
 EXPORTFUNC int DBAFetchRows( char * table, DBRowHandler handler );
-
-/* DB API Macros to wrap certain types */
+/* DB API Macros to wrap common types */
 #define DBAStoreBool( table, key, data ) DBAStore( table, key, ( void* )data, sizeof ( int ) )
 #define DBAStoreInt( table, key, data ) DBAStore( table, key, ( void* )data, sizeof ( int ) )
 #define DBAStoreStr( table, key, data, size ) DBAStore( table, key, ( void* )data, size)
 #define DBAFetchBool( table, key, data ) DBAFetch( table, key, ( void* )data, sizeof ( int ) )
 #define DBAFetchInt( table, key, data ) DBAFetch( table, key, ( void* )data, sizeof ( int ) )
 #define DBAFetchStr( table, key, data, size ) DBAFetch( table, key, ( void* )data, size)
-
+/* DB API Macros to wrap common config types */
 #define DBAStoreConfigBool( key, data ) DBAStoreBool(CONFIG_TABLE_NAME, key, data)
 #define DBAStoreConfigInt( key, data ) DBAStoreInt(CONFIG_TABLE_NAME, key, data)
 #define DBAStoreConfigStr( key, data, size ) DBAStoreStr(CONFIG_TABLE_NAME, key, data, size)
@@ -1342,18 +1340,14 @@ EXPORTFUNC int ircsnprintf( char *buf, size_t size, const char *fmt, ...) __attr
 EXPORTFUNC int ircstrcasecmp( const char *s1, const char *s2 );
 EXPORTFUNC int ircstrncasecmp( const char *s1, const char *s2, size_t size );
 
-EXPORTFUNC extern int match( const char *mask, const char *name );
+EXPORTFUNC int match( const char *mask, const char *name );
 
 /* 
  *  Portability wrapper functions
  */
 
-/* File system functions */
 EXPORTVAR int os_errno;
-
-EXPORTFUNC void *os_malloc( size_t size );
-EXPORTFUNC void os_free( void *ptr );
-
+/* File system functions */
 EXPORTFUNC int os_mkdir( const char *filename, mode_t mode );
 EXPORTFUNC int os_check_create_dir( const char *dirname );
 EXPORTFUNC FILE *os_fopen( const char *filename, const char *filemode );
@@ -1369,12 +1363,9 @@ EXPORTFUNC int os_rename( const char *oldname, const char *newname );
 EXPORTFUNC int os_stat( const char *path, struct stat *buffer );
 EXPORTFUNC int os_access( const char *path, int mode );
 EXPORTFUNC char *os_strerror( void );
+EXPORTFUNC int os_file_get_size( const char *filename );
 EXPORTFUNC size_t os_strftime( char *strDest, size_t maxsize, const char *format, const struct tm *timeptr );
 EXPORTFUNC struct tm* os_localtime( const time_t *timer );
-EXPORTFUNC int os_file_get_size( const char *filename );
-EXPORTFUNC void *os_memset( void *dest, int c, size_t count );
-EXPORTFUNC void *os_memcpy( void *dest, const void *src, size_t count );
-
 /* Socket functions */
 #ifdef WIN32
 typedef SOCKET OS_SOCKET;
@@ -1385,6 +1376,11 @@ EXPORTFUNC int os_sock_close( OS_SOCKET sock );
 EXPORTFUNC int os_sock_write( OS_SOCKET s, const char *buf, int len );
 EXPORTFUNC int os_sock_read( OS_SOCKET s, char *buf, int len );
 EXPORTFUNC int os_sock_set_nonblocking( OS_SOCKET s );
+/* Memory functions */
+EXPORTFUNC void *os_memset( void *dest, int c, size_t count );
+EXPORTFUNC void *os_memcpy( void *dest, const void *src, size_t count );
+EXPORTFUNC void *os_malloc( size_t size );
+EXPORTFUNC void os_free( void *ptr );
 
 /* 
  * Module Interface 
@@ -1403,26 +1399,29 @@ EXPORTFUNC int ModIsServerExcluded( Client *s );
 EXPORTFUNC int ModIsUserExcluded( Client *u );
 EXPORTFUNC int ModIsChannelExcluded( Channel *c );
 
+/* Module Data Pointer Interface */
+/* Module Data Pointer Interface Channel */
 EXPORTFUNC void *AllocChannelModPtr( Channel* c, int size );
 EXPORTFUNC void FreeChannelModPtr( Channel *c );
 EXPORTFUNC void *GetChannelModPtr( Channel* c );
-
+/* Module Data Pointer Interface User */
 EXPORTFUNC void *AllocUserModPtr( Client *u, int size );
 EXPORTFUNC void FreeUserModPtr( Client *u );
 EXPORTFUNC void *GetUserModPtr( Client *u );
-
+/* Module Data Pointer Interface Server */
 EXPORTFUNC void *AllocServerModPtr( Client *s, int size );
 EXPORTFUNC void FreeServerModPtr( Client *s );
 EXPORTFUNC void *GetServerModPtr( Client *s );
-
+/* Module Data Value Interface */
+/* Module Data Value Interface Channel */
 EXPORTFUNC void ClearChannelModValue( Channel* c );
 EXPORTFUNC void SetChannelModValue( Channel* c, void *data );
 EXPORTFUNC void *GetChannelModValue( Channel* c );
-
+/* Module Data Value Interface User */
 EXPORTFUNC void ClearUserModValue( Client *u );
 EXPORTFUNC void SetUserModValue( Client *u, void *data );
 EXPORTFUNC void *GetUserModValue( Client *u );
-
+/* Module Data Value Interface Server */
 EXPORTFUNC void ClearServerModValue( Client *s );
 EXPORTFUNC void SetServerModValue( Client *s, void *data );
 EXPORTFUNC void *GetServerModValue( Client *s );

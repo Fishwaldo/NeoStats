@@ -141,7 +141,7 @@ static int ls_rose(CmdParams* cmdparams)
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -158,7 +158,7 @@ static int ls_kiss(CmdParams* cmdparams)
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -173,7 +173,7 @@ static int ls_tonsil(CmdParams* cmdparams)
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -190,7 +190,7 @@ static int ls_hug(CmdParams* cmdparams)
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -205,7 +205,7 @@ static int ls_admirer(CmdParams* cmdparams)
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -220,7 +220,7 @@ static int ls_chocolate(CmdParams* cmdparams)
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -237,7 +237,7 @@ static int ls_candy(CmdParams* cmdparams)
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -255,7 +255,7 @@ static int ls_lovenote(CmdParams* cmdparams)
 	char *message;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -275,7 +275,7 @@ static int ls_apology(CmdParams* cmdparams)
 	char *message;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -295,7 +295,7 @@ static int ls_thankyou(CmdParams* cmdparams)
 	char *message;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}

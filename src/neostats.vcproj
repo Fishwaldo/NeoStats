@@ -323,6 +323,9 @@
 				RelativePath="..\include\log.h">
 			</File>
 			<File
+				RelativePath="..\include\main.h">
+			</File>
+			<File
 				RelativePath="..\include\modes.h">
 			</File>
 			<File

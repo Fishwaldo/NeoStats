@@ -139,7 +139,7 @@ static int ms_hail(CmdParams* cmdparams)
 
 	SET_SEGV_LOCATION();
 	about_nick = cmdparams->av[0];
-	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[1]);
+	target = FindValidUser(ms_bot, cmdparams->source, cmdparams->av[1]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -158,7 +158,7 @@ static int ms_lapdance(CmdParams* cmdparams)
 	Client *target;
 	
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ms_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -183,7 +183,7 @@ static int ms_ode(CmdParams* cmdparams)
 
 	SET_SEGV_LOCATION();
 	about_nick = cmdparams->av[0];
-	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[1]);
+	target = FindValidUser(ms_bot, cmdparams->source, cmdparams->av[1]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -207,7 +207,7 @@ static int ms_poem(CmdParams* cmdparams)
 
 	SET_SEGV_LOCATION();
 	about_nick = cmdparams->av[0];
-	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[1]);
+	target = FindValidUser(ms_bot, cmdparams->source, cmdparams->av[1]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -229,7 +229,7 @@ static int ms_redneck(CmdParams* cmdparams)
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ms_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -248,7 +248,7 @@ static int ms_cheerup(CmdParams* cmdparams)
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ms_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -266,7 +266,7 @@ static int ms_behappy(CmdParams* cmdparams)
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ms_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
@@ -322,7 +322,7 @@ static int ms_wonderful(CmdParams* cmdparams)
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[0]);
+	target = FindValidUser(ms_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return NS_FAILURE;
 	}
