@@ -789,21 +789,17 @@ do_motd (const char* nick, const char *remoteserver)
 	SET_SEGV_LOCATION();
 	fp = fopen (MOTD_FILENAME, "r");
 	if(!fp) {
-		numeric (ERR_NOMOTD, nick, "MOTD File is missing");
+		numeric (ERR_NOMOTD, nick, ":- MOTD file Missing");
 	} else {
 		numeric (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
 		numeric (RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2004 The NeoStats Group", me.versionfull);
 		numeric (RPL_MOTD, nick, ":-");
 
-		if (fp) {
-			while (fgets (buf, sizeof (buf), fp)) {
-				buf[strnlen (buf, BUFSIZE) - 1] = 0;
-				numeric (RPL_MOTD, nick, ":- %s", buf);
-			}
-			fclose (fp);
-		} else {
-			numeric (RPL_MOTD, nick, ":- MOTD file Missing");
+		while (fgets (buf, sizeof (buf), fp)) {
+			buf[strnlen (buf, BUFSIZE) - 1] = 0;
+			numeric (RPL_MOTD, nick, ":- %s", buf);
 		}
+		fclose (fp);
 		numeric (RPL_ENDOFMOTD, nick, ":End of MOTD command.");
 	}
 }
@@ -827,13 +823,11 @@ do_admin (const char* nick, const char *remoteserver)
 	} else {
 		numeric (RPL_ADMINME, nick, ":%s :Administrative info", me.name);
 		numeric (RPL_ADMINME, nick, ":%s.  Copyright (c) 1999 - 2004 The NeoStats Group", me.versionfull);
-		if (fp) {
-			while (fgets (buf, sizeof (buf), fp)) {
-				buf[strnlen (buf, BUFSIZE) - 1] = 0;
-				numeric (RPL_ADMINLOC1, nick, ":- %s", buf);
-			}
-			fclose (fp);
+		while (fgets (buf, sizeof (buf), fp)) {
+			buf[strnlen (buf, BUFSIZE) - 1] = 0;
+			numeric (RPL_ADMINLOC1, nick, ":- %s", buf);
 		}
+		fclose (fp);
 		numeric (RPL_ADMINLOC2, nick, "End of /ADMIN command.");
 	}
 }
