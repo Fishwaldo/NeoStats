@@ -15,6 +15,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - We now moved to SubVersion and moved the repository to http://svn.neostats.net/ Check the homepage out for more details
  - Removed OperMe from svn repository
  - Updated Keeper to make sure it only writes files out that are readable by us
+ - Fix BugID 52, ServiceRoots enabled twice for Hybrid7 compiles
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number

@@ -5187,36 +5187,7 @@ else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi;
-
-echo "$as_me:$LINENO: checking What type of Authentication to use..." >&5
-echo $ECHO_N "checking What type of Authentication to use...... $ECHO_C" >&6
-# Check whether --enable-auth or --disable-auth was given.
-if test "${enable_auth+set}" = set; then
-  enableval="$enable_auth"
-   case "$enableval" in
-  sr)
-
-cat >>confdefs.h <<\_ACEOF
-#define EXTAUTH 1
-_ACEOF
-
-	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
-	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
-	echo "$as_me:$LINENO: result: External" >&5
-echo "${ECHO_T}External" >&6
-	MODULES="$MODULES extauth"
-	;;
-  *)
-	echo "$as_me:$LINENO: result: IRCD" >&5
-echo "${ECHO_T}IRCD" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: IRCD" >&5
-echo "${ECHO_T}IRCD" >&6
-
-fi;
-
+do_serviceroots=no
 echo "$as_me:$LINENO: checking A compatible IRCD is specified" >&5
 echo $ECHO_N "checking A compatible IRCD is specified... $ECHO_C" >&6
 case "$IRCD_FILES_SRC" in
@@ -5233,6 +5204,7 @@ echo "${ECHO_T}yes" >&6
 echo "${ECHO_T}yes" >&6
 	echo "$as_me:$LINENO: checking Auto-Enabling ServiceRoots Authentication Module" >&5
 echo $ECHO_N "checking Auto-Enabling ServiceRoots Authentication Module... $ECHO_C" >&6
+	do_serviceroots=yes
 
 cat >>confdefs.h <<\_ACEOF
 #define EXTAUTH 1
@@ -5272,7 +5244,36 @@ echo "$as_me: error: 'You must define a IRCD to use. See ./configure --help for 
    { (exit 1); exit 1; }; }
 	;;
 esac
+if test "$do_serviceroots" = no; then
+		echo "$as_me:$LINENO: checking What type of Authentication to use..." >&5
+echo $ECHO_N "checking What type of Authentication to use...... $ECHO_C" >&6
+	# Check whether --enable-auth or --disable-auth was given.
+if test "${enable_auth+set}" = set; then
+  enableval="$enable_auth"
+   case "$enableval" in
+	  sr)
 
+cat >>confdefs.h <<\_ACEOF
+#define EXTAUTH 1
+_ACEOF
+
+		EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
+		EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
+		echo "$as_me:$LINENO: result: External" >&5
+echo "${ECHO_T}External" >&6
+		MODULES="$MODULES extauth"
+		;;
+	  *)
+		echo "$as_me:$LINENO: result: IRCD" >&5
+echo "${ECHO_T}IRCD" >&6
+		;;
+	esac
+else
+  echo "$as_me:$LINENO: result: IRCD" >&5
+echo "${ECHO_T}IRCD" >&6
+
+fi;
+fi
 
 
 echo "$as_me:$LINENO: checking To Enable Raw command?" >&5
