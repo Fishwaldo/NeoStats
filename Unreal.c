@@ -537,7 +537,7 @@ chanalert (char *who, char *fmt, ...)
 }
 
 void
-notice (char *to, const char *from, char *fmt, ...)
+prefmsg (char *to, const char *from, char *fmt, ...)
 {
 	va_list ap;
 
@@ -549,7 +549,11 @@ notice (char *to, const char *from, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	sts (":%s NOTICE %s :%s", from, to, ircd_buf);
+	if (me.want_privmsg) {
+		sts (":%s PRIVMSG %s :%s", from, to, ircd_buf);
+	} else {
+		sts (":%s NOTICE %s :%s", from, to, ircd_buf);
+	}
 }
 
 void
@@ -569,7 +573,7 @@ privmsg (char *to, const char *from, char *fmt, ...)
 }
 
 void
-prefmsg (char *to, const char *from, char *fmt, ...)
+notice (char *to, const char *from, char *fmt, ...)
 {
 	va_list ap;
 
@@ -581,11 +585,7 @@ prefmsg (char *to, const char *from, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	if (me.want_privmsg) {
-		sts (":%s PRIVMSG %s :%s", from, to, ircd_buf);
-	} else {
-		sts (":%s NOTICE %s :%s", from, to, ircd_buf);
-	}
+	sts (":%s NOTICE %s :%s", from, to, ircd_buf);
 }
 
 void
