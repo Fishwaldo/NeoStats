@@ -51,4 +51,27 @@ extern const char *ns_timerlist_help[];
 extern const char *ns_botchanlist_help[];
 extern const char *ns_info_help[];
 
+extern const char ns_help_help_oneline[];
+extern const char ns_level_help_oneline[];
+extern const char ns_info_help_oneline[];
+extern const char ns_version_help_oneline[];
+extern const char ns_shutdown_help_oneline[];
+extern const char ns_reload_help_oneline[];
+extern const char ns_logs_help_oneline[];
+extern const char ns_load_help_oneline[];
+extern const char ns_unload_help_oneline[];
+extern const char ns_jupe_help_oneline[];
+#ifdef USE_RAW
+extern const char ns_raw_help_oneline[];
+#endif
+extern const char ns_debug_help_oneline[];
+extern const char ns_botlist_help_oneline[];
+extern const char ns_socklist_help_oneline[];
+extern const char ns_timerlist_help_oneline[];
+extern const char ns_botchanlist_help_oneline[];
+extern const char ns_modlist_help_oneline[];
+extern const char ns_userdump_help_oneline[];
+extern const char ns_chandump_help_oneline[];
+extern const char ns_serverdump_help_oneline[];
+
 #endif /* _NS_HELP_H_ */

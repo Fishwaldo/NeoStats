@@ -26,8 +26,6 @@
 #ifndef STATS_H
 #define STATS_H
 
-
-
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -345,6 +343,24 @@ struct ping {
 	int ulag;
 } ping;
 
+/** @brief bot_cmd_handler type
+ *  defines handler function definition
+ */
+typedef void (*bot_cmd_handler) (User * u, char **av, int ac);
+
+/** @brief bot_cmd structure
+ *  defines command lists for bots
+ */
+typedef struct bot_cmd {
+	const char		*cmd;		/* command string */
+	bot_cmd_handler	handler;	/* handler */
+	int				minparams;	/* min num params */
+	unsigned int	ulevel;		/* min user level */
+	const char**	helptext;	/* pointer to help text */
+	int 			internal;	/* is this a internal function? */
+	const char* 	onelinehelp;	/* single line help for generic help function */
+}bot_cmd;
+
 /* sock.c */
 int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);
 int sock_disconnect (char *sockname);
@@ -401,10 +417,11 @@ int IsChanMember(Chans *c, User *u);
 int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);
 
 /* services.c */
-typedef void (*bot_cmd_handler) (User * u, char **av, int ac);
-int add_services_cmd(const char cmd[MAXCMDSIZE], bot_cmd_handler handler, int minparams, int ulevel, const char** helptext, const char onelinehelp[255]);
 int init_services();
-int del_services_cmd(const char cmd[MAXCMDSIZE]);
+int add_services_cmd(const char *cmd, bot_cmd_handler handler, int minparams, int ulevel, const char** helptext, const char* onelinehelp);
+int del_services_cmd(const char *cmd);
+int add_services_cmd_list(bot_cmd* cmd_list);
+int del_services_cmd_list(bot_cmd* cmd_list);
 
 
 #endif

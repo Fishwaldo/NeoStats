@@ -27,47 +27,28 @@
 
 #include "stats.h"
 
-const char *ns_help[] = {
-	"The following commands can be used with NeoStats",
-	"",
-	"    INFO           Stats info on NeoStats.",
-	"    VERSION        Show NeoStats version information.",
-	"    LEVEL          Show your permission level for NeoStats.",
-	NULL
-};
-
-const char *ns_sa_help[] = {
-	"",
-	"Additional commands for Service Admins",
-	"",
-	"    SHUTDOWN       Shutdown NeoStats",
-	"    RELOAD         Force NeoStats to reload",
-	"    LOAD           Load a module",
-	"    UNLOAD         Unload a module",
-	"    MODLIST        List loaded modules",
-	"    LOGS           View logfiles",
+const char ns_help_help_oneline[]="Provides Help on Commands";
+const char ns_level_help_oneline[]="Show your permission level for NeoStats.";
+const char ns_info_help_oneline[]="Stats info on NeoStats.";
+const char ns_version_help_oneline[]="Show NeoStats version information.";
+const char ns_shutdown_help_oneline[]="Shutdown NeoStats";
+const char ns_reload_help_oneline[]="Force NeoStats to reload";
+const char ns_logs_help_oneline[]="View logfiles";
+const char ns_load_help_oneline[]="Load a module";
+const char ns_unload_help_oneline[]="Unload a module";
+const char ns_jupe_help_oneline[]="Jupiter a Server";
 #ifdef USE_RAW
-	"    RAW            Send a raw command from this Server",
+const char ns_raw_help_oneline[]="Send a raw command from this Server";
 #endif
-	"    JUPE           Jupiter a Server",
-	NULL
-};
-
-const char *ns_sr_help[] = {
-	"",
-	"Additional commands for Service Roots",
-	"",
-	"    JUPE           Jupiter a Server",
-	"    DEBUG          Toggles debug mode",
-	"    USERDUMP       Debug user table",
-	"    CHANDUMP       Debug channel table",
-	"    SERVERDUMP     Debug server table",
-	"    BOTLIST        List current module bots",
-	"    SOCKLIST       List current module sockets",
-	"    TIMERLIST      List current module timers",
-	"    BOTCHANLIST    List current module bot channels",
-	NULL
-};
+const char ns_debug_help_oneline[]="Toggles debug mode";
+const char ns_botlist_help_oneline[]="List current module bots";
+const char ns_socklist_help_oneline[]="List current module sockets";
+const char ns_timerlist_help_oneline[]="List current module timers";
+const char ns_botchanlist_help_oneline[]="List current module bot channels";
+const char ns_modlist_help_oneline[]="List loaded modules";
+const char ns_userdump_help_oneline[]="Debug user table";
+const char ns_chandump_help_oneline[]="Debug channel table";
+const char ns_serverdump_help_oneline[]="Debug server table";
 
 const char *ns_help_on_help[] = {
 	"",
@@ -77,6 +58,7 @@ const char *ns_help_on_help[] = {
 	"    \2/msg NeoStats HELP command\2.",
 	NULL
 };
+
 
 const char *ns_level_help[] = {
 	"Syntax: \2LEVEL\2",

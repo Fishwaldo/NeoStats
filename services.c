@@ -35,19 +35,8 @@
 #include "chans.h"
 #include "hash.h"
 
-typedef struct bot_cmd {
-	char			cmd[MAXCMDSIZE];		/* command string */
-	bot_cmd_handler	handler;	/* handler */
-	int				minparams;	/* min num params */
-	unsigned int	ulevel;		/* min user level */
-	const char**	helptext;	/* pointer to help text */
-	int 		internal;	/* is this a internal function? */
-	char 	onelinehelp[255];	/* single line help for generic help function */
-}bot_cmd;
-
 /* hash for command list */
 hash_t *botcmds;
-
 
 static char quitmsg[BUFSIZE];
 static char no_reason[]="no reason given";
@@ -72,29 +61,28 @@ static void ns_unload_module (User * u, char **av, int ac);
 
 bot_cmd ns_commands[]=
 {
-
-	{"HELP",		ns_do_help,		0, 	0,			ns_help_on_help, 	1, 	"Provides Help on Commands"},
-	{"LEVEL",		ns_show_level,		0, 	0,			ns_level_help, 		1, 	"Show your permission level for NeoStats."},
-	{"INFO",		ns_info,		0, 	0,			ns_info_help, 		1, 	"Stats info on NeoStats."},
-	{"VERSION",		ns_version,		0, 	0,			ns_version_help, 	1, 	"Show NeoStats version information."},
-	{"SHUTDOWN",		ns_shutdown,		0, 	NS_ULEVEL_ADMIN, 	ns_shutdown_help, 	1, 	"Shutdown NeoStats"},
-	{"RELOAD",		ns_reload,		0, 	NS_ULEVEL_ADMIN, 	ns_reload_help,		1, 	"Force NeoStats to reload"},
-	{"LOGS",		ns_logs,		0, 	NS_ULEVEL_OPER, 	ns_logs_help,		1, 	"View logfiles"},
-	{"LOAD",		ns_load_module,		1, 	NS_ULEVEL_ADMIN, 	ns_load_help, 		1, 	"Load a module"},
-	{"UNLOAD",		ns_unload_module,	1, 	NS_ULEVEL_ADMIN, 	ns_unload_help, 	1, 	"Unload a module"},
-	{"JUPE",		ns_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_jupe_help,		1, 	"Jupiter a Server"},
-#ifdef USE_RAW
-	{"RAW",			ns_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_raw_help, 		1, 	"Send a raw command from this Server"},
-#endif
-	{"DEBUG",		ns_set_debug,		1, 	NS_ULEVEL_ROOT,  	ns_debug_help,		1,	"Toggles debug mode"},
-	{"BOTLIST",		list_bots,		0, 	NS_ULEVEL_ROOT,  	ns_botlist_help,	1,	"List current module bots"},
-	{"SOCKLIST",		list_sockets,		0, 	NS_ULEVEL_ROOT,  	ns_socklist_help, 	1,	"List current module sockets"},
-	{"TIMERLIST",		list_timers,		0, 	NS_ULEVEL_ROOT,  	ns_timerlist_help, 	1,	"List current module timers"},
-	{"BOTCHANLIST",		list_bot_chans,		0, 	NS_ULEVEL_ROOT,  	ns_botchanlist_help, 	1,	"List current module bot channels"},
-	{"MODLIST",		list_modules,		0, 	NS_ULEVEL_ROOT,  	ns_modlist_help, 	1,	"List loaded modules"},
-	{"USERDUMP",		ns_user_dump,		0, 	NS_ULEVEL_ROOT,  	ns_userdump_help, 	1,	"Debug user table"},
-	{"CHANDUMP",		ns_chan_dump,		0, 	NS_ULEVEL_ROOT,  	ns_chandump_help, 	1,	"Debug channel table"},
-	{"SERVERDUMP",		ns_server_dump,		0, 	NS_ULEVEL_ROOT,  	ns_serverdump_help, 	1,	"Debug server table"},
+	{"HELP",		ns_do_help,		0, 	0,					ns_help_on_help, 	1, 	ns_help_help_oneline},
+	{"LEVEL",		ns_show_level,	0, 	0,					ns_level_help, 		1, 	ns_level_help_oneline},
+	{"INFO",		ns_info,		0, 	0,					ns_info_help, 		1, 	ns_info_help_oneline},
+	{"VERSION",		ns_version,		0, 	0,					ns_version_help, 	1, 	ns_version_help_oneline},
+	{"SHUTDOWN",	ns_shutdown,	0, 	NS_ULEVEL_ADMIN, 	ns_shutdown_help, 	1, 	ns_shutdown_help_oneline},
+	{"RELOAD",		ns_reload,		0, 	NS_ULEVEL_ADMIN, 	ns_reload_help,		1, 	ns_reload_help_oneline},
+	{"LOGS",		ns_logs,		0, 	NS_ULEVEL_OPER, 	ns_logs_help,		1, 	ns_logs_help_oneline},
+	{"LOAD",		ns_load_module,	1, 	NS_ULEVEL_ADMIN, 	ns_load_help, 		1, 	ns_load_help_oneline},
+	{"UNLOAD",		ns_unload_module,1, NS_ULEVEL_ADMIN, 	ns_unload_help, 	1, 	ns_unload_help_oneline},
+	{"JUPE",		ns_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_jupe_help,		1, 	ns_jupe_help_oneline},
+#ifdef USE_RAW																		
+	{"RAW",			ns_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_raw_help, 		1, 	ns_raw_help_oneline},
+#endif																				
+	{"DEBUG",		ns_set_debug,	1, 	NS_ULEVEL_ROOT,  	ns_debug_help,		1,	ns_debug_help_oneline},
+	{"BOTLIST",		list_bots,		0, 	NS_ULEVEL_ROOT,  	ns_botlist_help,	1,	ns_botlist_help_oneline},
+	{"SOCKLIST",	list_sockets,	0, 	NS_ULEVEL_ROOT,  	ns_socklist_help, 	1,	ns_socklist_help_oneline},
+	{"TIMERLIST",	list_timers,	0, 	NS_ULEVEL_ROOT,  	ns_timerlist_help, 	1,	ns_timerlist_help_oneline},
+	{"BOTCHANLIST",	list_bot_chans,	0, 	NS_ULEVEL_ROOT,  	ns_botchanlist_help,1,	ns_botchanlist_help_oneline},
+	{"MODLIST",		list_modules,	0, 	NS_ULEVEL_ROOT,  	ns_modlist_help, 	1,	ns_modlist_help_oneline},
+	{"USERDUMP",	ns_user_dump,	0, 	NS_ULEVEL_ROOT,  	ns_userdump_help, 	1,	ns_userdump_help_oneline},
+	{"CHANDUMP",	ns_chan_dump,	0, 	NS_ULEVEL_ROOT,  	ns_chandump_help, 	1,	ns_chandump_help_oneline},
+	{"SERVERDUMP",	ns_server_dump,	0, 	NS_ULEVEL_ROOT,  	ns_serverdump_help, 1,	ns_serverdump_help_oneline},
 	{"\0",			NULL,			0, 	0,			NULL, 			0,	"\0"}
 };
 
@@ -119,19 +107,19 @@ init_services()
 }
 	
 int 
-add_services_cmd(const char cmd[MAXCMDSIZE], bot_cmd_handler handler, int minparams, int ulevel, const char** helptext, const char onelinehelp[255]) 
+add_services_cmd(const char *cmd, bot_cmd_handler handler, int minparams, int ulevel, const char** helptext, const char* onelinehelp) 
 {
 	bot_cmd *cmd_ptr;
 	hnode_t *cmdnode;
 	
 	cmd_ptr = malloc(sizeof(bot_cmd));
-	strlcpy(cmd_ptr->cmd, cmd, MAXCMDSIZE);
+	cmd_ptr->cmd = cmd;
 	cmd_ptr->handler = handler;
 	cmd_ptr->minparams = minparams;
 	cmd_ptr->ulevel = ulevel;
 	cmd_ptr->helptext = helptext;
 	cmd_ptr->internal = 0;
-	strlcpy(cmd_ptr->onelinehelp, onelinehelp, 255);
+	cmd_ptr->onelinehelp = onelinehelp;
 	
 	cmdnode = hnode_create(cmd_ptr);
 	hash_insert(botcmds, cmdnode, cmd_ptr->cmd);
@@ -140,7 +128,31 @@ add_services_cmd(const char cmd[MAXCMDSIZE], bot_cmd_handler handler, int minpar
 }
 
 int 
-del_services_cmd(const char cmd[MAXCMDSIZE]) 
+add_services_cmd_list(bot_cmd* cmd_list) 
+{
+	bot_cmd *cmd_ptr;
+	hnode_t *cmdnode;
+	
+	while(cmd_list->cmd) {
+		cmd_ptr = malloc(sizeof(bot_cmd));
+		cmd_ptr->cmd = cmd_list->cmd;
+		cmd_ptr->handler = cmd_list->handler;
+		cmd_ptr->minparams = cmd_list->minparams;
+		cmd_ptr->ulevel = cmd_list->ulevel;
+		cmd_ptr->helptext = cmd_list->helptext;
+		cmd_ptr->internal = 0;
+		cmd_ptr->onelinehelp = cmd_list->onelinehelp;
+		
+		cmdnode = hnode_create(cmd_ptr);
+		hash_insert(botcmds, cmdnode, cmd_ptr->cmd);
+		nlog(LOG_DEBUG2, LOG_CORE, "Added a new command %s to Services Bot", cmd_list->cmd);
+		cmd_list++;
+	}
+	return 1;
+}
+
+int 
+del_services_cmd(const char *cmd) 
 {
 	bot_cmd *cmd_ptr;
 	hnode_t *cmdnode;
@@ -157,6 +169,27 @@ del_services_cmd(const char cmd[MAXCMDSIZE])
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
+}
+
+int 
+del_services_cmd_list(bot_cmd* cmd_list) 
+{
+	bot_cmd *cmd_ptr;
+	hnode_t *cmdnode;
+	
+	while(cmd_list->cmd) {
+		cmdnode = hash_lookup(botcmds, cmd_list->cmd);
+		if (cmdnode) {
+			hash_delete(botcmds, cmdnode);
+			cmd_ptr = hnode_get(cmdnode);
+			hnode_destroy(cmdnode);
+			/* free if its a external (malloc'd) command */
+			if (cmd_ptr->internal == 0) {
+				free(cmd_ptr);
+			}
+		}
+		cmd_list++;
+	}
 }
 
 void
