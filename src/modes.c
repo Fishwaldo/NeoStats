@@ -284,8 +284,7 @@ char *CmodeMaskToPrefixString (const unsigned int mask)
 {
 	int i, j;
 
-	ModeStringBuf[0] = '+';
-	j = 1;
+	j = 0;
 	for (i = 0; i < MODE_TABLE_SIZE; i++) {
 		if (mask & ircd_cmodes[i].mask) {
 			ModeStringBuf[j] = ircd_cmodes[i].sjoin;
