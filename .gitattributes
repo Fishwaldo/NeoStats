@@ -85,11 +85,11 @@ include/modules.h -text
 include/neostats.h -text
 include/ns_help.h eol=lf
 include/numeric.h -text
+include/rtaserv.h -text
 include/servers.h eol=lf
 include/services.h eol=lf
 include/signals.h -text
 include/sock.h eol=lf
-include/sqlsrv.h -text
 include/support.h eol=lf
 include/timer.h eol=lf
 include/transfer.h -text
@@ -466,13 +466,13 @@ src/protocol/viagra.vcproj -text
 src/rtabans.c -text
 src/rtachannels.c -text
 src/rtamodules.c -text
+src/rtaserv.c -text
 src/rtaservers.c -text
 src/rtausers.c -text
 src/servers.c eol=lf
 src/services.c eol=lf
 src/signals.c -text
 src/sock.c eol=lf
-src/sqlsrv.c -text
 src/support.c eol=lf
 src/timer.c eol=lf
 src/transfer.c -text
