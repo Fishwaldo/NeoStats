@@ -57,7 +57,7 @@
 /* we have token support */
 #define GOTTOKENSUPPORT
 /* we have vhost support */
-#define GOTSVSVHOST
+#define GOTSVSHOST 
 /* we have svsjoin */
 #define GOTSVSJOIN
 /* we have svsmode */

@@ -32,7 +32,7 @@
 /* we don't support tokens */
 #undef GOTTOKENSUPPORT
 /* we have vhost support */
-#define GOTSVSVHOST
+#define GOTSVSHOST 
 /* we have svsjoin */
 #define GOTSVSJOIN
 /* we don't have svsmode */

@@ -34,7 +34,7 @@
 /* we don't support tokens */
 #undef GOTTOKENSUPPORT
 /* we don't have vhost support */
-#undef GOTSVSVHOST
+#undef GOTSVSHOST 
 /* we don't have svsjoin */
 #undef GOTSVSJOIN
 /* we don't have svsmode */

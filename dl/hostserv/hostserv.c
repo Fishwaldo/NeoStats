@@ -33,7 +33,7 @@
 #include "conf.h"
 
 /* hostserv doesn't work on Hybrid, Echo an error and exit the compile */
-#ifndef GOTSVSVHOST
+#ifndef GOTSVSHOST 
 #error "Error: This IRCd doesn't support changing a users host. This module will not compile"
 #endif
 
