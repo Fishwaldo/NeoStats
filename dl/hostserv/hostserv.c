@@ -135,10 +135,11 @@ void del_vhost(hs_map *vhost) {
 
 void set_moddata(User *u) {
 	hs_user *hs;
-
-	hs = malloc(sizeof(hs_user));
-	hs->vhostset = 1;
-	u->moddata[hs_cfg.modnum] = hs;
+	if (!u->moddata[hs_cfg.modnum]) {
+		hs = malloc(sizeof(hs_user));
+		hs->vhostset = 1;
+		u->moddata[hs_cfg.modnum] = hs;
+	}
 }
 
 int del_moddata(char **av, int ac) {
