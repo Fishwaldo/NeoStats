@@ -59,6 +59,9 @@ include/Makefile.am -text
 include/Makefile.in -text
 include/config.h.in -text
 include/version.sh -text
+lang/Makefile -text
+lang/en.l -text
+lang/langcomp.c -text
 logs/.keepme -text
 /makeconf -text
 /neostats.motd -text
@@ -228,6 +231,8 @@ src/keeper/kp_set.c -text
 src/keeper/kp_sort.c -text
 src/keeper/kp_util.c -text
 src/keeper/kp_util.h -text
+src/language.c -text
+src/language.h -text
 src/libltdl/COPYING.LIB -text
 src/libltdl/Makefile.am -text
 src/libltdl/Makefile.in -text

@@ -76,6 +76,8 @@
 #include "ircstring.h"
 #include "events.h"
 
+#define arraylen(a)	(sizeof(a) / sizeof(*(a)))
+
 #define PROTOCOL_NOQUIT		0x00000001	/* NOQUIT */
 #define PROTOCOL_TOKEN		0x00000002	/* TOKEN */
 #define PROTOCOL_SJOIN		0x00000004	/* SJOIN */

@@ -176,11 +176,11 @@ bin_PROGRAMS = neostats
 
 neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 		dl.c dns.c dotconf.c exclude.c hash.c ircd.c ircstring.c \
-		keeper.c list.c log.c main.c match.c misc.c modules.c \
+		keeper.c language.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c
 
-AM_CFLAGS = @PCRE_CFLAGS@ -Iadns -Ikeeper @INCLTDL@ @CURL_CFLAGS@
+AM_CFLAGS = @PCRE_CFLAGS@ -I$(top_srcdir)/lang -Iadns -Ikeeper @INCLTDL@ @CURL_CFLAGS@
 neostats_LDADD = protocol/libprotocol.a keeper/libkeeper.a \
 		adns/libadns.la libltdl/libltdlc.la @PCRE_LIBS@ @CURL_LIBS@
 
@@ -197,12 +197,12 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	channels.$(OBJEXT) commands.$(OBJEXT) conf.$(OBJEXT) \
 	db.$(OBJEXT) dl.$(OBJEXT) dns.$(OBJEXT) dotconf.$(OBJEXT) \
 	exclude.$(OBJEXT) hash.$(OBJEXT) ircd.$(OBJEXT) \
-	ircstring.$(OBJEXT) keeper.$(OBJEXT) list.$(OBJEXT) \
-	log.$(OBJEXT) main.$(OBJEXT) match.$(OBJEXT) misc.$(OBJEXT) \
-	modules.$(OBJEXT) ns_help.$(OBJEXT) servers.$(OBJEXT) \
-	services.$(OBJEXT) signals.$(OBJEXT) sock.$(OBJEXT) \
-	support.$(OBJEXT) timer.$(OBJEXT) transfer.$(OBJEXT) \
-	users.$(OBJEXT)
+	ircstring.$(OBJEXT) keeper.$(OBJEXT) language.$(OBJEXT) \
+	list.$(OBJEXT) log.$(OBJEXT) main.$(OBJEXT) match.$(OBJEXT) \
+	misc.$(OBJEXT) modules.$(OBJEXT) ns_help.$(OBJEXT) \
+	servers.$(OBJEXT) services.$(OBJEXT) signals.$(OBJEXT) \
+	sock.$(OBJEXT) support.$(OBJEXT) timer.$(OBJEXT) \
+	transfer.$(OBJEXT) users.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = protocol/libprotocol.a keeper/libkeeper.a \
 	adns/libadns.la libltdl/libltdlc.la
@@ -217,14 +217,15 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/dns.Po ./$(DEPDIR)/dotconf.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/exclude.Po ./$(DEPDIR)/hash.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/ircd.Po ./$(DEPDIR)/ircstring.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/keeper.Po ./$(DEPDIR)/list.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/log.Po ./$(DEPDIR)/main.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/match.Po ./$(DEPDIR)/misc.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/modules.Po ./$(DEPDIR)/ns_help.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/servers.Po ./$(DEPDIR)/services.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/signals.Po ./$(DEPDIR)/sock.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/support.Po ./$(DEPDIR)/timer.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/transfer.Po ./$(DEPDIR)/users.Po
+@AMDEP_TRUE@	./$(DEPDIR)/keeper.Po ./$(DEPDIR)/language.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/list.Po ./$(DEPDIR)/log.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/main.Po ./$(DEPDIR)/match.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/misc.Po ./$(DEPDIR)/modules.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/ns_help.Po ./$(DEPDIR)/servers.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/services.Po ./$(DEPDIR)/signals.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sock.Po ./$(DEPDIR)/support.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/timer.Po ./$(DEPDIR)/transfer.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/users.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -307,6 +308,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircstring.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/keeper.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/language.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
