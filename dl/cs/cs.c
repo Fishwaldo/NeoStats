@@ -197,7 +197,7 @@ int cs_new_user(char **av, int ac) {
     u = finduser(av[0]);
     /* Print Connection Notice */
     if (sign_watch) {
-    notice(s_ConnectServ, "\2SIGNON\2 %s (%s@%s) has Signed on at %s", u->nick, u->username, u->hostname, u->server->name);
+    if (is_synced) notice(s_ConnectServ, "\2SIGNON\2 %s (%s@%s) has Signed on at %s", u->nick, u->username, u->hostname, u->server->name);
     }
     if (findbot(u->nick)) return 1;
   return 1;
@@ -224,7 +224,7 @@ int cs_del_user(char **av, int ac) {
 		  LocalCount = split_buf(lcl, &Local, 0);
           KillMsg = joinbuf (Local, LocalCount, 7);
 
-		  notice(s_ConnectServ, "\2LOCAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Local[6], KillMsg);
+		  if (is_synced) notice(s_ConnectServ, "\2LOCAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Local[6], KillMsg);
           free(KillMsg);
 		  return 1;
 
@@ -233,7 +233,7 @@ int cs_del_user(char **av, int ac) {
 
     /* Print Disconnection Notice */
     if (sign_watch) {
-        notice(s_ConnectServ, "\2SIGNOFF\2 %s (%s@%s) has Signed off at %s - %s", u->nick, u->username, u->hostname, u->server->name, QuitMsg);
+        if (is_synced) notice(s_ConnectServ, "\2SIGNOFF\2 %s (%s@%s) has Signed off at %s - %s", u->nick, u->username, u->hostname, u->server->name, QuitMsg);
 	}
 	free(QuitMsg);
 
@@ -271,51 +271,51 @@ int cs_user_modes(char **av, int ac) {
             case '-': add = 0;    break;
             case 'N':
                 if (add) {
-                    notice(s_ConnectServ, "\2NetAdmin\2 %s is Now a Network Administrator (+N)", u->nick);
+                    if (is_synced) notice(s_ConnectServ, "\2NetAdmin\2 %s is Now a Network Administrator (+N)", u->nick);
                 } else {
-                    notice(s_ConnectServ, "\2NetAdmin\2 %s is No Longer a Network Administrator (-N)", u->nick);
+                    if (is_synced) notice(s_ConnectServ, "\2NetAdmin\2 %s is No Longer a Network Administrator (-N)", u->nick);
                 }
                 break;
             case 'S':
                 if (add) {
-                    notice(s_ConnectServ, "\2Services\2 %s is Now a Network Service (+S)", u->nick);
+                    if (is_synced) notice(s_ConnectServ, "\2Services\2 %s is Now a Network Service (+S)", u->nick);
                 } else {
-                    notice(s_ConnectServ, "\2Services\2 %s is No Longer a Network Service (-S)", u->nick);
+                    if (is_synced) notice(s_ConnectServ, "\2Services\2 %s is No Longer a Network Service (-S)", u->nick);
                 }
                 break;
             case 'T':
                 if (add) {
-                    notice(s_ConnectServ, "\2TechAdmin\2 %s is Now a Network Technical Administrator (+T)", u->nick);
+                    if (is_synced) notice(s_ConnectServ, "\2TechAdmin\2 %s is Now a Network Technical Administrator (+T)", u->nick);
                 } else {
-                    notice(s_ConnectServ, "\2TechAdmin\2 %s is No Longer a Network Technical Administrator (-T)", u->nick);
+                    if (is_synced) notice(s_ConnectServ, "\2TechAdmin\2 %s is No Longer a Network Technical Administrator (-T)", u->nick);
                 }
                 break;
             case 'A':
                 if (add) {
-                    notice(s_ConnectServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s (+A)", u->nick, u->server->name);
+                    if (is_synced) notice(s_ConnectServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s (+A)", u->nick, u->server->name);
                 } else {
-                    notice(s_ConnectServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s (-A)", u->nick, u->server->name);
+                    if (is_synced) notice(s_ConnectServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s (-A)", u->nick, u->server->name);
                 }
                 break;
             case 'a':
                 if (add) {
-                    notice(s_ConnectServ, "\2ServicesAdmin\2 %s is Now a Services Administrator (+a)", u->nick);
+                    if (is_synced) notice(s_ConnectServ, "\2ServicesAdmin\2 %s is Now a Services Administrator (+a)", u->nick);
                 } else {
-                    notice(s_ConnectServ, "\2ServicesAdmin\2 %s is No Longer a Services Administrator (-a)", u->nick);
+                    if (is_synced) notice(s_ConnectServ, "\2ServicesAdmin\2 %s is No Longer a Services Administrator (-a)", u->nick);
                 }
                 break;
             case 'C':
                 if (add) {
-                    notice(s_ConnectServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s (+C)", u->nick, u->server->name);
+                    if (is_synced) notice(s_ConnectServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s (+C)", u->nick, u->server->name);
                 } else {
-                    notice(s_ConnectServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s (-C)", u->nick, u->server->name);
+                    if (is_synced) notice(s_ConnectServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s (-C)", u->nick, u->server->name);
                 }
                 break;
             case 'B':
                 if (add) {
-                    notice(s_ConnectServ, "\2Bot\2 %s is Now a Bot (+B)", u->nick);
+                    if (is_synced) notice(s_ConnectServ, "\2Bot\2 %s is Now a Bot (+B)", u->nick);
                 } else {
-                    notice(s_ConnectServ, "\2Bot\2 %s is No Longer a Bot (-B)", u->nick);
+                    if (is_synced) notice(s_ConnectServ, "\2Bot\2 %s is No Longer a Bot (-B)", u->nick);
                 }
                 break;
             case 'I':
@@ -327,16 +327,16 @@ int cs_user_modes(char **av, int ac) {
                 break;
             case 'o':
                 if (add) {
-                    notice(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
+                    if (is_synced) notice(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
                 } else {
-                    notice(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
+                    if (is_synced) notice(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
                 }
                 break;
             case 'O':
                 if (add) {
-                    notice(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
+                    if (is_synced) notice(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
                 } else {
-                    notice(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
+                    if (is_synced) notice(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
                 }
                 break;
             default: 
@@ -360,9 +360,9 @@ int cs_user_kill(char **av, int ac) {
 
     if (finduser(Kill[2])) {
     /* it was a User who was killed */
-        if (kill_watch) notice(s_ConnectServ, "\2GLOBAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Kill[0], GlobalMsg);
+        if (kill_watch) if (is_synced) notice(s_ConnectServ, "\2GLOBAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Kill[0], GlobalMsg);
 	} else if (findserver(Kill[2])) {
-        if (kill_watch) notice(s_ConnectServ, "\2SERVER KILL\2 %s was Killed by the Server %s - Reason sighted: %s", u->nick, Kill[0], GlobalMsg);
+        if (kill_watch) if (is_synced) notice(s_ConnectServ, "\2SERVER KILL\2 %s was Killed by the Server %s - Reason sighted: %s", u->nick, Kill[0], GlobalMsg);
     }
     free(GlobalMsg);
 	return 1;
@@ -382,13 +382,13 @@ static void cs_signwatch(User *u)
 
     if (!sign_watch) {
         sign_watch = 1;
-        notice(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated by %s",u->nick);
+        if (is_synced) notice(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated by %s",u->nick);
         cslog("%s!%s@%s Activated SIGNON/SIGNOFF WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         privmsg(u->nick, s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated");
    } else {
         sign_watch = 0;
-        notice(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated by %s",u->nick);
+        if (is_synced) notice(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated by %s",u->nick);
         cslog("%s!%s@%s Deactivated SIGNON/SIGNOFF WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         privmsg(u->nick, s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated");
@@ -410,13 +410,13 @@ static void cs_killwatch(User *u)
 
     if (!kill_watch) {
         kill_watch = 1;
-        notice(s_ConnectServ, "\2KILL WATCH\2 Activated by %s",u->nick);
+        if (is_synced) notice(s_ConnectServ, "\2KILL WATCH\2 Activated by %s",u->nick);
         cslog("%s!%s@%s Activated KILL WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         privmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 Activated");
    } else {
         kill_watch = 0;
-        notice(s_ConnectServ, "\2KILL WATCH\2 Deactivated by %s",u->nick);
+        if (is_synced) notice(s_ConnectServ, "\2KILL WATCH\2 Deactivated by %s",u->nick);
         cslog("%s!%s@%s Deactivated KILL WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         privmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 Deactivated");
@@ -438,13 +438,13 @@ static void cs_modewatch(User *u)
 
     if (!mode_watch) {
         mode_watch = 1;
-        notice(s_ConnectServ, "\2MODE WATCH\2 Activated by %s",u->nick);
+        if (is_synced) notice(s_ConnectServ, "\2MODE WATCH\2 Activated by %s",u->nick);
         cslog("%s!%s@%s Activated MODE WATCH", u->nick, u->username, u->hostname);
         SaveSettings();    
         privmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 Activated");
    } else {
         mode_watch = 0;
-        notice(s_ConnectServ, "\2MODE WATCH\2 Deactivated by %s",u->nick);
+        if (is_synced) notice(s_ConnectServ, "\2MODE WATCH\2 Deactivated by %s",u->nick);
         cslog("%s!%s@%s Deactivated MODE WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         privmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 Deactivated");
@@ -507,12 +507,12 @@ void Loadconfig()
                                 mode_watch = atoi(Config[1]);
             } else {
                 cslog("%s is not a valid connect.db option!", Config[0]);
-                notice(s_Services, "%s is not a valid connect.db option! Please check your data/connect.db file!", Config[0]);
+                if (is_synced) notice(s_Services, "%s is not a valid connect.db option! Please check your data/connect.db file!", Config[0]);
             }
     }
         fclose(fp);
     } else {
-        notice(s_Services, "No Database Found! Creating one with Defaults!");
+        if (is_synced) notice(s_Services, "No Database Found! Creating one with Defaults!");
         sign_watch=1;
         kill_watch=1;
         mode_watch=1; 
