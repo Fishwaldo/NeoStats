@@ -128,4 +128,9 @@
 /* Define to `unsigned' if <sys/types.h> does not define. */
 #undef size_t
 
+/* define if you have Backtrace */
 #undef HAVE_BACKTRACE
+
+/* define if you want to enable Raw */
+#undef USE_RAW
+

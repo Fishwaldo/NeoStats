@@ -224,6 +224,20 @@ AC_DEFINE(IRCDAUTH)
 AC_MSG_RESULT(IRCD)
 )
 
+AC_MSG_CHECKING(To Enable Raw command?)
+AC_ARG_ENABLE(raw, [ --enable-raw - Enable Raw command],
+[ case "$enableval" in
+  yes)
+	AC_DEFINE(USE_RAW, 1, 'Use Raw command')
+	AC_MSG_RESULT(yes)
+	;;
+  *)
+	AC_MSG_RESULT(no)
+	;;
+esac],
+AC_MSG_RESULT(no)
+)
+
 dnl Lets see what Modules to Compile
 AC_MSG_CHECKING(Any other modules to compile?)
 AC_ARG_ENABLE(modules, [ --enable-modules="MODULES" - space seperated list of modules to compile],
