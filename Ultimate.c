@@ -541,7 +541,7 @@ schmode_cmd (const char *who, const char *chan, const char *mode, const char *ar
 
 #ifndef ULTIMATE3
 int
-snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname)
+snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
 {
 	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, me.now, ident, host, me.name, realname);
 	AddUser (nick, ident, host, realname, me.name, 0, me.now);
@@ -1311,10 +1311,8 @@ int
 SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
 {
 
-#ifdef ULTIMATE3
 	snewnick_cmd (nick, user, host, rname, Umode);
-#else
-	snewnick_cmd (nick, user, host, rname);
+#ifndef ULTIMATE3
 	sumode_cmd (nick, nick, Umode);
 #endif
 	if ((me.allbots > 0) || (Umode & UMODE_SERVICES)) {
