@@ -20,14 +20,14 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs_help.c,v 1.6 2002/09/12 15:42:37 shmad Exp $
+** $Id: cs_help.c,v 1.7 2002/09/13 22:49:22 shmad Exp $
 */
 
 const char *cs_help[] = {
 "\2ConnectServ HELP\2",
 "",
 "COMMANDS:",
-"     SIGNWATCH     KILLWATCH     MODEWATCH	NICKWATCH",
+"     SIGNWATCH     KILLWATCH     MODEWATCH      NICKWATCH",
 "",
 "     STATUS     ABOUT",
 "",
