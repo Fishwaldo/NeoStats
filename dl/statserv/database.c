@@ -330,7 +330,7 @@ void LoadOldStats()
 			   topics, totmem, kicks, lastseen, maxmems,
 			   t_maxmems, maxkicks, t_maxkicks, maxjoins,
 			   t_maxjoins);
-		strcpy(c->name, name);
+		strncpy(c->name, name, CHANLEN);
 		c->topics = atol(topics);
 		c->totmem = atol(totmem);
 		c->kicks = atol(kicks);

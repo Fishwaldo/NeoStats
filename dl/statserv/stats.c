@@ -223,7 +223,7 @@ CStats *AddChanStats(char *name)
 	lnode_t *cn;
 
 	cs = malloc(sizeof(CStats));
-	strcpy(cs->name, name);
+	strncpy(cs->name, name, CHANLEN);
 	cs->members = 0;
 	cs->topics = 0;
 	cs->totmem = 0;
@@ -669,7 +669,7 @@ void Is_Midnight()
 			/* its Midnight! */
 			chanalert(s_StatServ,
 				  "Reseting Daily Statistics - Its Midnight here!");
-			nlog(LOG_NORMAL, LOG_MOD,
+			nlog(LOG_DEBUG1, LOG_MOD,
 			     "Resetting Daily Statistics");
 			daily.servers = stats_network.servers;
 			daily.t_servers = time(NULL);

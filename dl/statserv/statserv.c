@@ -24,7 +24,6 @@
 */
 
 #include <stdio.h>
-#include <fnmatch.h>
 #include "dl.h"
 #include "stats.h"
 #include "statserv.h"
@@ -297,6 +296,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 			if (UserLevel(u) >= 150)
 				privmsg_list(u->nick, s_StatServ,
 					     ss_myuser_help);
+			privmsg_list(u->nick, s_StatServ, ss_help_on_help);
 		} else if (!strcasecmp(av[2], "SERVER"))
 			privmsg_list(u->nick, s_StatServ, ss_server_help);
 		else if (!strcasecmp(av[2], "CHAN"))
@@ -327,6 +327,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 #endif
 		else if (!strcasecmp(av[2], "VERSION"))
 			privmsg_list(u->nick, s_StatServ, ss_version_help);
+		else if (!strcasecmp(av[2], "ABOUT"))
+			privmsg_list(u->nick, s_StatServ, ss_about_help);
 		else if (!strcasecmp(av[2], "STATS")
 			 && UserLevel(u) >= 185)
 			privmsg_list(u->nick, s_StatServ, ss_stats_help);
@@ -372,6 +374,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 		chanalert(s_StatServ,
 			  "%s Wanted to know our version number ",
 			  u->nick);
+	} else if (!strcasecmp(av[1], "ABOUT")) {
+		privmsg_list(u->nick, s_StatServ, ss_about_help);
 	} else if (!strcasecmp(av[1], "NETSTATS")) {
 		ss_netstats(u);
 		chanalert(s_StatServ, "%s Wanted to see the NetStats ",
@@ -909,9 +913,9 @@ static void makemap(char *uplink, User * u, int level)
 			makemap(s->name, u, level + 1);
 		} else if ((level > 0) && !strcasecmp(uplink, s->uplink)) {
 			/* its not the root server */
-			sprintf(buf, " ");
+			buf[0]='\0';
 			for (i = 1; i < level; i++) {
-				sprintf(buf, "%s     |", buf);
+				snprintf(buf, 256, "%s     |", buf);
 			}
 			prefmsg(u->nick, s_StatServ,
 				"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",

@@ -192,7 +192,9 @@ int ok_to_wallop();
 
 /* ss_help.c */
 extern const char *ss_help[];
+extern const char *ss_help_on_help[];
 extern const char *ss_myuser_help[];
+extern const char *ss_about_help[];
 extern const char *ss_server_help[];
 extern const char *ss_map_help[];
 extern const char *ss_netstats_help[];

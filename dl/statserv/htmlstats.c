@@ -580,9 +580,9 @@ void get_map(char *uplink, int level)
 			get_map(s->name, level + 1);
 		} else if ((level > 0) && !strcasecmp(uplink, s->uplink)) {
 			/* its not the root server */
-			sprintf(buf, " ");
+			buf[0]='\0';
 			for (i = 1; i < level; i++) {
-				sprintf(buf,
+				snprintf(buf,256,
 					"%s&nbsp&nbsp&nbsp&nbsp&nbsp|",
 					buf);
 			}
