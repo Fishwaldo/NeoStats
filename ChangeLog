@@ -45,6 +45,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - __module_get_functions/__module_functions is now optional rather than required (M)
  - /VERSION will now provide module information from the core if possible (M)
  - Channel modes now use CMODE_ prefix rather than MODE_ (M)
+ - Bots now unload after ModFini is called so they can still report messages (M)
+ - All log filenames are now lower case for consistency across modules (M)
 
 * NeoStats * Fish (F) * Version 2.5.10
  - Fix a problem with Umode +T being reintroduced on Unreal Beta19 as a normal usermode. 
