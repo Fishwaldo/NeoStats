@@ -235,7 +235,7 @@ AC_MSG_CHECKING(Whether to Enable IRCu IRCD Support...)
 AC_ARG_ENABLE(ircu, [ --enable-ircu - enable IRCu IRCD Support],
 [ case "$enableval" in
   yes)  
-	AC_MSG_ERROR('Sorry IRCu support isnt complete yet')
+dnl	AC_MSG_ERROR('Sorry IRCu support isnt complete yet')
 	AC_DEFINE(IRCU, 1, 'Enable IRCu Support')
 	IRCD_FILES_SRC="Ircu.c"
 	IRCD_FILES_OBJS="Ircu.o"

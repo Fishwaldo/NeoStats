@@ -24,7 +24,7 @@
 #include "stats.h"
 #include "ircd.h"
 #include "sock.h"
-#include "hybrid7.h"
+#include "Ircu.h"
 #include "dl.h"
 #include "log.h"
 
@@ -846,10 +846,11 @@ Usr_Topic (char *origin, char **argv, int argc)
 void
 Usr_Kick (char *origin, char **argv, int argc)
 {
-	User *u;
+	User *u, *k;
 	u = finduser (argv[1]);
+	k = finduser(argv[0]);
 	if (u) {
-		kick_chan (u, argv[0]);
+		kick_chan (u, argv[0], k);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, Can't find user %s for kick %s", argv[1], argv[0]);
 	}

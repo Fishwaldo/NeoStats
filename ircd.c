@@ -163,22 +163,27 @@ split_buf (char *buf, char ***argv, int colon_special)
 	int argc;
 	char *s;
 	int flag = 0;
+#ifndef IRCU
 	int colcount = 0;
-
+#endif
 	SET_SEGV_LOCATION();
 	*argv = calloc (sizeof (char *) * argvsize, 1);
 	argc = 0;
+#ifndef IRCU
 	if (*buf == ':')
 		buf++;
+#endif
 	while (*buf) {
 		if (argc == argvsize) {
 			argvsize += 8;
 			*argv = realloc (*argv, sizeof (char *) * argvsize);
 		}
+#ifndef IRCU
 		if ((*buf == ':') && (colcount < 1)) {
 			buf++;
 			colcount++;
 		}
+#endif
 		s = strpbrk (buf, " ");
 		if (s) {
 			*s++ = 0;
@@ -233,7 +238,7 @@ parse (char *line)
 	if (!(*line))
 		return;
 	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
-
+#ifndef IRCU
 	if (*line == ':') {
 		coreLine = strpbrk (line, " ");
 		if (!coreLine)
@@ -247,6 +252,7 @@ parse (char *line)
 		cmdptr = 0;
 		*origin = 0;
 	}
+#endif
 	if (!*line)
 		return;
 	coreLine = strpbrk (line, " ");
@@ -255,16 +261,35 @@ parse (char *line)
 		while (isspace (*++coreLine));
 	} else
 		coreLine = line + strlen (line);
+#ifdef IRCU
+	if ((!strcasecmp(line, "SERVER")) || (!strcasecmp(line, "PASS"))) {
+		strncpy(cmd, line, sizeof(cmd));
+		ac = split_buf(coreLine, &av, 1);
+		cmdptr = 0;
+	} else {
+		strncpy(origin, line, sizeof(origin));	
+		cmdptr = 1;
+		line = strpbrk (coreLine, " ");
+		if (line) {
+			*line = 0;
+			while (isspace (*++line));
+		} else
+			coreLine = line + strlen (line);
+		ac = split_buf(line, &av, 0);
+	}
+
+#else 
 	strncpy (cmd, line, sizeof (cmd));
 
 	ac = split_buf (coreLine, &av, 1);
-
-
+#endif
 
 	/* First, check if its a privmsg, and if so, handle it in the correct Function */
+#ifndef IRCU
 	if (!strcmp ("PRIVMSG", cmd) || (!strcmp ("!", cmd))) {
-
-
+#else 
+	if (!strcmp("PRIVMSG", cmd) || !strcmp("P", cmd) || !strcmp("CPRIVMSG", cmd) || !strcmp("CP", cmd)) {
+#endif
 
 		/* its a privmsg, now lets see who too... */
 		if (strstr (av[0], "!")) {

@@ -22,8 +22,8 @@
 */
 
 
-#ifndef HYBRID7_H
-#define HYBRID7_H
+#ifndef IRCU_H
+#define IRCU_H
 
 
 
@@ -219,6 +219,7 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & MODE_SECRET))
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_KEY)))
 #undef HAVE_BOT_MODE
 #define is_bot(x) (0)
 
