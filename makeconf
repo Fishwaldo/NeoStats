@@ -16,6 +16,7 @@ NEOCHAN="#services"
 NEOCONN="10"
 NEOREC="10"
 BINDIP="127.0.0.1"
+LOGFNAMEFORMAT="-%m-%d"
 
 # these are so I can use stuff like $1 without it replacing it...like by
 # using $dlrsgn$uno for $1
@@ -239,84 +240,219 @@ cat > $CONF << __EOF__
 ## Created:  $DATE - $TIME
 ## NeoStats (c) 1999-2003 The NeoStats Group.
 ## Web: http://www.NeoStats.Net
-## File Revision: 2.5.0-25
+## File Revision: 2.5.6-1
+##################################################
+
+##################################################
+#Each of the options has an indicator as follows:
+#    [REQUIRED]    - must be set or NeoStats will not run.
+#    [RECOMMENDED] - optional but may cause problems if not set.
+#    [OPTIONAL]    - optional and the feature will be disabled if not set.
+#    [DISCOURAGED] - may cause undesirable side effects if enabled.
+#Although we have included instructions for each setting in this file
+#you can refer to the README file for more information
 ##################################################
 
 ##############################
 # IRCd Linking Configuration #
 ##############################
 
-# The server name that we appear as.
+# SERVER_NAME <hostname> [REQUIRED]
+#    Specifies the name of the NeoStats Server as it will appear on 
+#    the network. e.g. 
+#      
+#          SERVER_NAME stats.neostats.net        
+#      
+#    When NeoStats links, it will appear as stats.neostats.net.
+
 SERVER_NAME $SERVNAME
 
-# The port to connect to.
+# SERVER_PORT <port number> [REQUIRED]
+#    Specifies the port to connect to on the IRC Server e.g.
+#    
+#        SERVER_PORT 6667        
+#    
+#    When connecting, NeoStats will connect to port 6667
+
 SERVER_PORT $LINKPORT
 
-# Hostname we are connecting to
+# CONNECT_TO <ip address> [REQUIRED]
+#    Specifies the IP address to connect to. e.g.
+#        
+#        CONNECT_TO 127.0.0.1    
+#    
+#    This will force stats to connect to 127.0.0.1
+
 CONNECT_TO $LINKSERVER
 
-# Password we send in order to connect.
+# CONNECT_PASS <link password> [REQUIRED]
+#    Specifies the password used to connect. This must match your C/N 
+#    lines in your IRCD configuration e.g.
+#  
+#      CONNECT_PASS linkpass    
+#      
+#    Send "linkpass" as the password to connect
+
 CONNECT_PASS $LINKPASS
 
-# Infoline Displayed in /links for this server
+# SERVER_INFOLINE <info line> [REQUIRED]
+#    Specify the description of the server that
+#    appears when you do /links e.g.
+#    
+#        SERVER_INFOLINE Network Auxiliary Services    
+
 SERVER_INFOLINE "$COMMENT"
 
-# Your network name (fx: irc.irc-chat.net put irc-chat, if unknown refer to your network file)
+# STATSERV_NETNAME <network name> [REQUIRED]
+#    Your network name, if unknown refer to your network file. Does not 
+#    apply to all IRCDs e.g. 
+#    
+#        STATSERV_NETNAME neostats
+#        
+#    For irc.neostats.net
+
 STATSERV_NETNAME $NETNAME
-
-
 
 ##########################
 # NeoStats Configuration #
 ##########################
 
-# This is the Apparent Host that NeoStats is connecting from.. Some people
-# like to make it the same as your Services host (eg, services.irc-chat.net) 
+# NEOSTAT_HOST <host> [REQUIRED]
+#    Specifies the Hostname that NeoStats comes from. Some people like to 
+#    make it the same as the Services host (e.g., services.neostats.net) 
+#    or one just for NeoStats (e.g., stats.neostats.net) e.g.
+#    
+#        NEOSTATS_HOST stats.neostats.net    
+#    
+#    The bot will appear as NeoStats!user@stats.neostats.net
+
 NEOSTAT_HOST $NEOHOST
 
-# This is the User that NeoStats uses (the part before the @host)
+# NEOSTAT_USER <user> [REQUIRED]
+#    Specifies the User/ident of the NeoStats Bot (the part before the 
+#    @host) e.g.
+#    
+#        NEOSTATS_USER neo    
+#            
+#    The bot will apear as NeoStats!neo@Host
+
 NEOSTAT_USER $NEOUSER
 
-#The Services Channel to Join Initially
+# SERVICES_CHAN #<channel name> [REQUIRED]
+#    Specify the channel that all bots on NeoStats
+#    will automatically join, and echo out any
+#    important information e.g.
+#    
+#        SERVICES_CHAN #services    
+#        
+#    Makes NeoStats, and all the other bots join #services channel on 
+#    start-up/load.
+
 SERVICES_CHAN $NEOCHAN
 
-#We should load right?
-#Comment out this line to allow your NeoStats to load RTFM!
+# NO_LOAD [YOU MUST REMOVE THIS]
+#    If this is in the neostats.cfg your NeoStats WILL NOT START UP. To 
+#    disable this simply comment this line out. e.g.
+#        
+#        NO_LOAD  <- NeoStats will not load.
+#        
+#        #NO_LOAD <- NeoStats will load.
+
 NO_LOAD
 
-# Should we send privmsg's or notice's?
-# Comment this out for NOTICE's, otherwise
-# leave it alone.
+# WANT_PRIVMSG [DISCOURAGED]
+#    Specify if the bots should send all messages as privmsgs or as 
+#    notices (Most Services use notice) e.g.
+#     
+#        WANT_PRIVMSG    
+#    
+#    If present, will send all messages as privmsgs (if commented out, 
+#    it will send as Notices) *NOTE:* This option Violates IRC RFC, and 
+#    can cause flooding problems on your network. Its NOT recommended. 
+
 #WANT_PRIVMSG
 
-# Time in seconds that we wait before attempting
-# to reconnect to the server.
+# RECONNECT_TIME <seconds> [RECOMMENDED]
+#    If NeoStats server gets split from the network, how long to wait 
+#    before attempting to reconnect to the network. A value of 0 will 
+#    cause NeoStats to shutdown and not attempt to reconnect. e.g.
+#    
+#        RECONNECT_TIME 10    
+#    
+#    Specifies wait 10 seconds before trying to reconnect
+#        
+#        RECONNECT_TIME 0
+#    
+#    Tells NeoStats to never reconnect to the network
+#    
+#    If not specified, NeoStats will default to 10 seconds.
+
 RECONNECT_TIME $NEOCONN
 
-# Should we restrict NeoStats and StatServ to opers use only?
-# Comment this out to allow users to use StatServ functions
+# ONLY_OPERS [OPTIONAL]
+#    Restrict NeoStats and StatServ to opers use only.
+#    If not specified, users will have some access to NeoStats
+#    and StatServ commands. e.g.
+#    
+#        ONLY_OPERS 
+#        
+#    Only opers may use NeoStats and StatServ.
+
 #ONLY_OPERS
 
-# IP address to Bind to. 
-# This IP address should not be localhost (127.0.0.1)
-# Do we want NeoStats to bind to a particular IP Address?
-# Comment out if you do not want this
+# BINDTO [OPTIONAL]
+#    Make NeoStats bind to a particular IP Address. If not
+#    specified NeoStats will attempt to find this address
+#    itself. e.g. 
+#    
+#        BINDTO 203.203.123.12
+#    
+#    All outgoing connections from NeoStats will originate from this 
+#    IP address
+#    This IP address should not be localhost (127.0.0.1)
+
 #BINDTO $BINDIP
 
+# LOGFILENAMEFORMAT <format> [OPTIONAL]
+#    Defines the format for dated log files. This allows you to choose 
+#    what date format is used for log file names when they are rotated at 
+#    midnight. The option uses the parameters passed to strftime so you 
+#    can use any options valid for that function. Common ones are:
+#        %a  Abbreviated weekday name 
+#        %A  Full weekday name 
+#        %b  Abbreviated month name 
+#        %B  Full month name 
+#        %d  Day of month as decimal number (01 – 31) 
+#        %m  Month as decimal number (01 – 12) 
+#        %y  Year without century, as decimal number (00 – 99) 
+#        %Y  Year with century, as decimal number 
+#
+#    Examples using 30 September 2003 as the date:
+#    For NeoStats0930.log:
+#        
+#        LOGFILENAMEFORMAT %m%d
+#    
+#    For NeoStats20030930.log:
+#    
+#        LOGFILENAMEFORMAT %Y%m%d      
+#    
+#    If not defined, the default is the original NeoStats log format of
+#    "-%m-%d" i.e. NeoStats-09-30.log
 
-########################
-# HTML OUTPUT SETTINGS #
-########################
-
-#This section has been moved into the backend Database. Load up Statserv,
-#and type /msg statserv help set
-
+#LOGFILENAMEFORMAT $LOGFNAMEFORMAT
 
 #####################################
 # Module Configurations and Loading #
 #####################################
 
-# Now for each Module we want to load at boot time, we specify the following
+# LOAD_MODULE <module name> [OPTIONAL]
+#    what module to load at start-up. Multiple instances of LOAD_MODULE 
+#    may be specified e.g. 
+#        
+#        LOAD_MODULE statserv
+#    
+#    Will load up StatServ at boot
+
 # this loads the Spam Module
 #LOAD_MODULE spam
 
@@ -340,29 +476,26 @@ RECONNECT_TIME $NEOCONN
 # For all other modules, just add them above in the format:
 #LOAD_MODULE modulename
 
+########################################
+# NeoStats ROOT users (ExtAuth module) #
+########################################
 
-
-############################
-# STATSERV CONFIG FOLLOWS: #
-############################
-
-#This section has been moved into the Backend Database. Load up Statserv and
-#type /msg statserv help set.
-
-
-#######################
-# NeoStats ROOT users #
-#######################
-
-# If you configured and compiled with --enable-auth=sr please edit
-# This section and add your nicks Remove the #'s as well.
-# Accepts two formats. A Nickname, or a Full <nick>!<ident>@<host> format.
+#SERVICE_ROOTS <nick!user@host> [OPTIONAL]
+#    Who should get access to NeoStats regardless of their O line flags. 
+#    You can specify this option up to 10 times to specify different 
+#    nicks who will be allowed this privilege. e.g.
+#    
+#        SERVICE_ROOTS fish!?Fish@*.neostats.net
+#        
+#    Will give "fish" access to NeoStats Privileged commands if fish has 
+#    Umode +r and comes from the specified hostname and ident. 
 
 #SERVICE_ROOTS Shmad!?Shmad@Coder.NeoStats.net
 #SERVICE_ROOTS ^Enigma^!*@*.au
 #SERVICE_ROOTS Fish!?Fish@*.dynam.ac
 
-
+# Options for configuring StatServ are set on IRC. Load StatServ and type
+# /msg statserv help set.
 
 ###############################################################################
 ## End of Configuration                                                      ##
@@ -377,11 +510,11 @@ __EOF__
 chmod 700 $STATSCONF
 
 
-                echo ""
-                echo "*------------------------------------------------*"
+		echo ""
+		echo "*------------------------------------------------*"
 		echo "| Thanks for choosing NeoStats. Have a nice day. |"
 		echo "| Please check neostats.cfg for any errors.      |"
-                echo "*------------------------------------------------*"
+		echo "*------------------------------------------------*"
 		echo "| Also make sure modules are compiled and in the |"
 		echo "| neostats.cfg properly for them to work :)      |"
 		echo "*------------------------------------------------*"
@@ -394,5 +527,5 @@ chmod 700 $STATSCONF
 		echo "*------------------------------------------------*"
 		echo "| This file was updated by M (mark@ctcp.net)     |"
 		echo "*------------------------------------------------*"
-                echo 
+		echo 
 		exit 1

@@ -30,6 +30,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - (M) Module unloading cleanup. We now have a common function unload_modules() to do this.
  - (M) Paranoid buffer overflow checking - all strcpy and sprintf changed to strncpy and snprintf
  - (M) Changed all instances of "neostats.cfg" to CONFIG_NAME
+ - (M) Changed "not Tech Admin" type errors to "not authorised"
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number
