@@ -677,7 +677,8 @@ AC_CONFIG_FILES([Makefile include/Makefile src/Makefile
 		src/modules/moraleserv/Makefile
 		src/modules/statserv/Makefile
 		src/modules/template/Makefile
-		src/modules/templateauth/Makefile])
+		src/modules/templateauth/Makefile
+		cronchk])
 
 AC_CACHE_SAVE
 AC_OUTPUT
