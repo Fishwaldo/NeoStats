@@ -52,6 +52,7 @@ static void m_pass (char *origin, char **argv, int argc, int srv);
 static void m_svsnick (char *origin, char **argv, int argc, int srv);
 static void m_protoctl (char *origin, char **argv, int argc, int srv);
 static void m_svinfo (char *origin, char **argv, int argc, int srv);
+static void m_netinfo (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 static void m_client (char *origin, char **argv, int argc, int srv);
@@ -78,45 +79,40 @@ ProtocolInfo protocol_info = {
 	"+a",
 };
 
-/* Ultimate 2 does support these 5 tokens so may need to add them back 
- * in at some point
- * TOK_MODE, TOK_JOIN, TOK_NICK, TOK_AWAY, TOK_TOPIC
- */
-
 ircd_cmd cmd_list[] = {
 	/* Command Token Function usage */
-	{MSG_PRIVATE,	0,   m_private,	0},
-	{MSG_NOTICE,	0,	   m_notice,	0},
-	{MSG_STATS,     0,     m_stats,     0},
-	{MSG_SETHOST,   0,   m_vhost,     0},
-	{MSG_VERSION,   0,   m_version,   0},
-	{MSG_MOTD,      0,      m_motd,      0},
-	{MSG_ADMIN,     0,     m_admin,     0},
-	{MSG_CREDITS,   0,   m_credits,   0},
-	{MSG_SERVER,    0,    m_server,	0},
-	{MSG_SQUIT,     0,     m_squit,		0},
-	{MSG_QUIT,      0,      m_quit,		0},
-	{MSG_MODE,      TOK_MODE,      m_mode,		0},
-	{MSG_SVSMODE,   0,   m_svsmode,   0},
-	{MSG_KILL,      0,      m_kill,      0},
-	{MSG_PONG,      0,      m_pong,      0},
-	{MSG_AWAY,      TOK_AWAY,      m_away,      0},
-	{MSG_NICK,      TOK_NICK,      m_nick,      0},
-	{MSG_TOPIC,     TOK_TOPIC,     m_topic,     0},
-	{MSG_KICK,      0,      m_kick,      0},
-	{MSG_JOIN,      TOK_JOIN,      m_join,      0},
-	{MSG_PART,      0,      m_part,      0},
-	{MSG_PING,      0,      m_ping,      0},
-	{MSG_SVINFO,    NULL,          m_svinfo,    0},
-	{MSG_CAPAB,     NULL,          m_protoctl,  0},
-	{MSG_BURST,     NULL,          m_burst,     0},
-	{MSG_SJOIN,     NULL,          m_sjoin,     0},
-	{MSG_CLIENT,    NULL,          m_client,    0},
-	{MSG_SMODE,     NULL,          m_smode,     0},
-	{MSG_VCTRL,     0,     m_vctrl,     0},
-	{MSG_PASS,      0,      m_pass,      0},
-	{MSG_SVSNICK,   0,   m_svsnick,   0},
-	{MSG_PROTOCTL,  0,  m_protoctl,  0},
+	{MSG_PRIVATE,	0, m_private,	0},
+	{MSG_NOTICE,	0, m_notice,	0},
+	{MSG_STATS,     0, m_stats,     0},
+	{MSG_SETHOST,   0, m_vhost,     0},
+	{MSG_VERSION,   0, m_version,   0},
+	{MSG_MOTD,      0, m_motd,      0},
+	{MSG_ADMIN,     0, m_admin,     0},
+	{MSG_CREDITS,   0, m_credits,   0},
+	{MSG_SERVER,    0, m_server,	0},
+	{MSG_SQUIT,     0, m_squit,		0},
+	{MSG_QUIT,      0, m_quit,		0},
+	{MSG_MODE,      0, m_mode,		0},
+	{MSG_SVSMODE,   0, m_svsmode,   0},
+	{MSG_KILL,      0, m_kill,      0},
+	{MSG_PONG,      0, m_pong,      0},
+	{MSG_AWAY,      0, m_away,      0},
+	{MSG_NICK,      0, m_nick,      0},
+	{MSG_TOPIC,     0, m_topic,     0},
+	{MSG_KICK,      0, m_kick,      0},
+	{MSG_JOIN,      0, m_join,      0},
+	{MSG_PART,      0, m_part,      0},
+	{MSG_PING,      0, m_ping,      0},
+	{MSG_SVINFO,    0, m_svinfo,    0},
+	{MSG_CAPAB,     0, m_protoctl,  0},
+	{MSG_BURST,     0, m_burst,     0},
+	{MSG_SJOIN,     0, m_sjoin,     0},
+	{MSG_CLIENT,    0, m_client,    0},
+	{MSG_SMODE,     0, m_smode,     0},
+	{MSG_NETINFO,   0, m_netinfo,   0},
+	{MSG_VCTRL,     0, m_vctrl,     0},
+	{MSG_PASS,      0, m_pass,      0},
+	{MSG_SVSNICK,   0, m_svsnick,   0},
 	{0, 0, 0, 0},
 };
 
@@ -245,7 +241,7 @@ send_join (const char *who, const char *chan, const unsigned long ts)
 void 
 send_cmode (const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %s %s %lu", who, MSGTOK(MODE), chan, mode, args, ts);
+	send_cmd (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, ts);
 }
 
 void
@@ -263,7 +259,7 @@ send_ping (const char *from, const char *reply, const char *to)
 void 
 send_umode (const char *who, const char *target, const char *mode)
 {
-	send_cmd (":%s %s %s :%s", who, MSGTOK(MODE), target, mode);
+	send_cmd (":%s %s %s :%s", who, MSG_MODE, target, mode);
 }
 
 void 
@@ -276,12 +272,6 @@ void
 send_pong (const char *reply)
 {
 	send_cmd ("%s %s", MSG_PONG, reply);
-}
-
-void
-send_snetinfo (const char* from, const int prot, const char* cloak, const char* netname, const unsigned long ts)
-{
-	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", from, MSG_SNETINFO, ts, prot, cloak, netname);
 }
 
 void
@@ -311,7 +301,7 @@ send_svskill (const char *source, const char *target, const char *reason)
 void 
 send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %lu", oldnick, MSGTOK(NICK), newnick, ts);
+	send_cmd (":%s %s %s %lu", oldnick, MSG_NICK, newnick, ts);
 }
 
 void 
@@ -561,6 +551,12 @@ static void
 m_svinfo (char *origin, char **argv, int argc, int srv)
 {
 	do_svinfo ();
+}
+
+static void
+m_netinfo (char *origin, char **argv, int argc, int srv)
+{
+	do_netinfo(argv[0], argv[1], argv[2], argv[3], argv[7]);
 }
 
 static void
