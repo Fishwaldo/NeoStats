@@ -350,8 +350,6 @@ m_burst (char *origin, char **argv, int argc, int srv)
 		ircd_srv.burst = 1;
 	}
 	send_eob (me.name);
-	init_services_bot ();
-
 }
 
 static void
