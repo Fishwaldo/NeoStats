@@ -31,35 +31,23 @@
 #include "log.h"
 #include "conf.h"
 
-const char eaversion_date[] = __DATE__;
-const char eaversion_time[] = __TIME__;
-
 static int new_m_version(char *origin, char **av, int ac);
 void sr_cb_config(char *arg, int configtype);
 
-Module_Info extauth_Info[] = { {
-				"extauth",
-				"ServiceRoots Authentication Module",
-				"1.1"}
+ModuleInfo __module_info = {
+	"extauth",
+	"ServiceRoots Authentication Module",
+	"1.1",
+	__DATE__,
+	__TIME__
 };
 
-Functions ServiceRoots_fn_list[] = {
+Functions __module_functions[] = {
 	{MSG_VERSION, new_m_version, 1},
 #ifdef HAVE_TOKEN_SUP
 	{TOK_VERSION, new_m_version, 1},
 #endif
 	{NULL, NULL, 0}
-};
-
-
-Module_Info *__module_get_info()
-{
-	return extauth_Info;
-};
-
-Functions *__module_get_functions()
-{
-	return ServiceRoots_fn_list;
 };
 
 static config_option options[] = {
@@ -86,8 +74,8 @@ int new_m_version(char *origin, char **av, int ac)
 	SET_SEGV_LOCATION();
 	snumeric_cmd(351, origin,
 		     "Module ServiceRoots Loaded, Version: %s %s %s",
-		     extauth_Info[0].module_version, eaversion_date,
-		     eaversion_time);
+			 __module_info.module_version, __module_info.module_build_date,
+			 __module_info.module_build_time);
 	return 0;
 }
 
