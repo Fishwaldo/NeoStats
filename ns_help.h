@@ -28,6 +28,7 @@
 extern const char *ns_help_shutdown[];
 extern const char *ns_help_reload[];
 extern const char *ns_help_logs[];
+extern const char *ns_help_exclude[];
 #ifdef USE_RAW
 extern const char *ns_help_raw[];
 #endif
@@ -57,6 +58,7 @@ extern const char ns_help_logs_oneline[];
 extern const char ns_help_load_oneline[];
 extern const char ns_help_unload_oneline[];
 extern const char ns_help_jupe_oneline[];
+extern const char ns_help_exclude_oneline[];
 #ifdef USE_RAW
 extern const char ns_help_raw_oneline[];
 #endif

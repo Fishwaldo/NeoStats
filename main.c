@@ -43,6 +43,7 @@
 #include "chans.h"
 #include "dns.h"
 #include "transfer.h"
+#include "exclude.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -165,6 +166,8 @@ main (int argc, char *argv[])
 
 	/* initialize the rest of the subsystems */
 	if(init_dns () != NS_SUCCESS)
+		return EXIT_FAILURE;
+	if (init_exclude_list() != NS_SUCCESS)
 		return EXIT_FAILURE;
 	if(init_server_hash () != NS_SUCCESS)
 		return EXIT_FAILURE;

@@ -42,6 +42,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
    show up in bot channel lists (M)
  - Optimise core CTCP checks to avoid unnecessary processing (M)
  - Add numeric support to server structures (M)
+ - Added a "Global" exclusion list to NeoStats so we can maintain a single exclusion list, instead of multiple ones like we have now with opsb, and SecureServ.
+
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database

@@ -32,6 +32,7 @@
 #include "log.h"
 #include "users.h"
 #include "chans.h"
+#include "exclude.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -123,6 +124,9 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	for (i = 0; i < NUM_MODULES; i++) {
 		u->moddata[i] = NULL;
 	}
+	/* check if the user is excluded */
+	ns_do_exclude_user(u);
+
 
 	AddStringToList (&av, u->nick, &ac);
 	ModuleEvent (EVENT_SIGNON, av, ac);
@@ -523,7 +527,7 @@ UserDump (const char *nick)
 		hash_scan_begin (&us, uh);
 		while ((un = hash_scan_next (&us)) != NULL) {
 			u = hnode_get (un);
-			debugtochannel("User: %s!%s@%s (%s)", u->nick, u->username, u->hostname, u->vhost);
+			debugtochannel("User: %s!%s@%s (%s) Flags %x", u->nick, u->username, u->hostname, u->vhost, u->flags);
 			cm = list_first (u->chans);
 			while (cm) {
 				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
@@ -534,7 +538,7 @@ UserDump (const char *nick)
 		un = hash_lookup (uh, nick);
 		if (un) {
 			u = hnode_get (un);
-			debugtochannel("User: %s!%s@%s (%s)", u->nick, u->username, u->hostname, u->vhost);
+			debugtochannel("User: %s!%s@%s (%s) Flags %x", u->nick, u->username, u->hostname, u->vhost, u->flags);
 			cm = list_first (u->chans);
 			while (cm) {
 				debugtochannel("     Chans: %s", (char *) lnode_get (cm));

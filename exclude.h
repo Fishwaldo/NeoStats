@@ -24,5 +24,15 @@
 #ifndef _EXCLUDE_H_
 #define _EXCLUDE_H_
 
+int init_exclude_list();
+void ns_do_exclude_add(User *u, char *type, char *pattern);
+void ns_do_exclude_del(User *u, char *position);
+void ns_do_exclude_list(User *u, char *from);
+void ns_do_exclude_chan(Chans *c);
+void ns_do_exclude_server(Server *s);
+void ns_do_exclude_user(User *u);
+
+#define Is_Excluded(x) ((x) && (x->flags && NS_FLAGS_EXCLUDED))
+
 
 #endif /* _EXCLUDE_H_ */

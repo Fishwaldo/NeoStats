@@ -29,6 +29,7 @@
 #include "log.h"
 #include "users.h"
 #include "chans.h"
+#include "exclude.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -381,6 +382,8 @@ new_chan (const char *chan)
 	c->modes = 0;
 	c->tstime = me.now;
 	c->flags = 0;
+	/* check exclusions */
+	ns_do_exclude_chan(c);
 	AddStringToList (&av, c->name, &ac);
 	ModuleEvent (EVENT_NEWCHAN, av, ac);
 	free (av);
@@ -776,6 +779,7 @@ ChanDump (const char *chan)
 			debugtochannel("Channel: %s Members: %ld (List %d) Flags %s tstime %ld", c->name, c->cur_users, (int)list_count (c->chanmembers), mode, (long)c->tstime);
 			debugtochannel("       Topic Owner %s, TopicTime: %ld, Topic %s", c->topicowner, (long)c->topictime, c->topic);
 			debugtochannel("PubChan?: %d", is_pub_chan (c));
+			debugtochannel("Channel Flags %x", c->flags);
 			cmn = list_first (c->modeparms);
 			while (cmn) {
 				m = lnode_get (cmn);
@@ -818,6 +822,7 @@ ChanDump (const char *chan)
 			debugtochannel("Channel: %s Members: %ld (List %d) Flags %s tstime %ld", c->name, c->cur_users, (int)list_count (c->chanmembers), mode, (long)c->tstime);
 			debugtochannel("       Topic Owner %s, TopicTime: %ld Topic %s", c->topicowner, (long)c->topictime, c->topic);
 			debugtochannel("PubChan?: %d", is_pub_chan (c));
+			debugtochannel("Channel Flags %x", c->flags);
 			cmn = list_first (c->modeparms);
 			while (cmn) {
 				m = lnode_get (cmn);

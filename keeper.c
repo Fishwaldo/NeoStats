@@ -245,7 +245,6 @@ SetData (void *data, int type, char *table, char *row, char *field)
 	} else {
 		ircsnprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
 	}
-
 	switch (type) {
 	case CFGSTR:
 		i = kp_set_string (keypath, (char *) data);

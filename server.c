@@ -30,6 +30,7 @@
 #include "hash.h"
 #include "log.h"
 #include "ircd.h"
+#include "exclude.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -80,10 +81,13 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	}
 	s->connected_since = me.now;
 
+	/* check exclusions */
+	ns_do_exclude_server(s);
+
 	/* run the module event for a new server. */
 	AddStringToList (&av, s->name, &ac);
 	AddStringToList (&av, (char*)uplink, &ac);
-    AddStringToList (&av, (char*)hops, &ac);
+	AddStringToList (&av, (char*)hops, &ac);
 	AddStringToList (&av, s->infoline, &ac);
 	ModuleEvent (EVENT_SERVER, av, ac);
 	free (av);
@@ -147,7 +151,7 @@ ServerDump (void)
 	hash_scan_begin (&ss, sh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		debugtochannel("Server Entry: %s", s->name);
+		debugtochannel("Server Entry: %s Flags: %x", s->name, s->flags);
 	}
 	debugtochannel("End of Listing.");
 }

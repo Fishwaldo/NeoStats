@@ -37,6 +37,7 @@ const char ns_help_logs_oneline[]="View logfiles";
 const char ns_help_load_oneline[]="Load a module";
 const char ns_help_unload_oneline[]="Unload a module";
 const char ns_help_jupe_oneline[]="Jupiter a Server";
+const char ns_help_exclude_oneline[]="Maintain Global Exclusion lists";
 #ifdef USE_RAW
 const char ns_help_raw_oneline[]="Send a raw command from this Server";
 #endif
@@ -67,6 +68,31 @@ const char *ns_help_jupe[] = {
 	"\"server\" connected to the NeoStats host which prevents",
 	"any real server of that name from connecting.",
 	"To remove the jupe use the IRCD \2/SQUIT\2 command.",
+	NULL
+};
+
+const char *ns_help_exclude[] = {
+	"Syntax: \2EXCLUDE \37<ADD> <HOST/SERVER/CHAN> <pattern>\37\2",
+	"        \2EXCLUDE \37<DEL> <position>\37\2",
+	"        \2EXCLUDE \37<LIST>\37\2",
+	"",
+	"This command is to maintain the global exclusion lists, which the NeoStats",
+	"modules can take advantage of, and means you only have to maintain",
+	"one exclusion list, rather than many exclusion lists",
+	"The Syntax is:",
+	"\2EXCLUDE ADD <HOST/SERVER/CHAN> <pattern>\2",
+	"Add a new exclusion to the list, matching either a hostname of a client",
+	"or a servername, or a channel name",
+	"\2EXCLUDE DEL <position>\2",
+	"Delete a entry from the exclusion list.",
+	"Deleting a entry will only take effect for newly connected clients or created channels",
+	"\2EXCLUDE LIST\2",
+	"List the current Exclusions that are active",
+	"",
+	"\2Please Note:\2",
+	"Not all modules may take advantage of the global exclusion lists. Currently, all core",
+	"modules do, but you should consult the documentation of any 3rd party module you use",
+	"to see if it supports the global exlusions",
 	NULL
 };
 

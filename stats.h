@@ -228,6 +228,10 @@
 #define NS_SUCCESS			 1
 #define NS_FAILURE			-1
 
+/* these defines are for the flags for users, channels and servers */
+#define NS_FLAGS_EXCLUDED 0x1 /* this entry matched a exclusion */
+
+
 /* Specific errors beyond SUCCESS/FAILURE so that functions can handle errors 
  * Treat as unsigned with top bit set to give us a clear distinction from 
  * other values and use a typedef ENUM so that we can indicate return type */

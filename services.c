@@ -35,12 +35,14 @@
 #include "chans.h"
 #include "ircd.h"
 #include "hash.h"
+#include "exclude.h"
 
 static int ns_set_debug (User * u, char **av, int ac);
 static int ns_shutdown (User * u, char **av, int ac);
 static int ns_reload (User * u, char **av, int ac);
 static int ns_logs (User * u, char **av, int ac);
 static int ns_jupe (User * u, char **av, int ac);
+static int ns_exclude (User * u, char **av, int ac);
 #ifdef USE_RAW
 static int ns_raw (User * u, char **av, int ac);
 #endif
@@ -68,6 +70,7 @@ static bot_cmd ns_commands[]=
 	{"LOAD",		ns_load,		1, 	NS_ULEVEL_ADMIN, 	ns_help_load, 		ns_help_load_oneline},
 	{"UNLOAD",		ns_unload,		1,	NS_ULEVEL_ADMIN, 	ns_help_unload, 	ns_help_unload_oneline},
 	{"JUPE",		ns_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_help_jupe,		ns_help_jupe_oneline},
+	{"EXCLUDE",		ns_exclude,		0,	NS_ULEVEL_ADMIN,	ns_help_exclude,	ns_help_exclude_oneline},
 #ifdef USE_RAW																
 	{"RAW",			ns_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_help_raw, 		ns_help_raw_oneline},
 #endif																	
@@ -103,6 +106,38 @@ init_services(void)
 	return NS_SUCCESS;
 }
 
+/** @brief EXCLUDE command handler
+ *
+ *  maintain global exclusion list, which modules can take advantage off
+ *   
+ *  @param u user
+ *  @param av list of arguments
+ *  @param ac number of arguments
+ *  @returns none
+ */
+
+static int
+ns_exclude (User *u, char **av, int ac) 
+{
+	if (!strcasecmp(av[2], "ADD")) {
+		if (ac < 5) {
+			prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
+			return NS_FAILURE;
+		}
+		ns_do_exclude_add(u, av[3], av[4]);
+	} else if (!strcasecmp(av[2], "DEL")) {
+		if (ac < 4) {
+			prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
+			return NS_FAILURE;
+		}
+		ns_do_exclude_del(u, av[3]);
+	} else if (!strcasecmp(av[2], "LIST")) {
+		ns_do_exclude_list(u, s_Services);
+	} else {
+		prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
+	}
+	return 1;
+}
 /** @brief SHUTDOWN command handler
  *
  *  Shutdown NeoStats

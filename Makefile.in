@@ -166,3 +166,4 @@ keeper.o: keeper.c stats.h adns/adns.h list.h hash.h config.h neoircd.h keeper/k
 log.o: log.c stats.h adns/adns.h list.h hash.h config.h neoircd.h conf.h log.h
 neoircd.o: neoircd.c stats.h adns/adns.h list.h hash.h config.h neoircd.h hybrid7.h dl.h log.h
 transfer.o: transfer.c transfer.h stats.h list.h
+exclude.o: exclude.c exclude.h

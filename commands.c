@@ -181,8 +181,7 @@ add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list)
 		return NS_FAILURE;
 	}
 	/* set the module */
-	SET_SEGV_INMODULE(bot_ptr->modname);
-
+	
 	/* Cycle through command list and add them */
 	while(bot_cmd_list->cmd) {
 		add_bot_cmd(bot_ptr->botcmds, bot_cmd_list);
@@ -204,7 +203,12 @@ del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list)
 		return NS_FAILURE;
 	}
 	/* set the module */
-	SET_SEGV_INMODULE(bot_ptr->modname);
+	/* this is a hack, so we can load out of core, not NeoStats */
+	if (!strcasecmp(bot_ptr->modname, s_Services)) {
+		CLEAR_SEGV_INMODULE();
+	} else {
+		SET_SEGV_INMODULE(bot_ptr->modname);
+	}
 
 	/* Cycle through command list and delete them */
 	while(bot_cmd_list->cmd) {
@@ -230,7 +234,12 @@ del_all_bot_cmds(ModUser* bot_ptr)
 		return NS_FAILURE;
 	}
 	/* set the module */
-	SET_SEGV_INMODULE(bot_ptr->modname);
+	/* this is a hack, so we can load out of core, not NeoStats */
+	if (!strcasecmp(bot_ptr->modname, s_Services)) {
+		CLEAR_SEGV_INMODULE();
+	} else {
+		SET_SEGV_INMODULE(bot_ptr->modname);
+	}
 	/* Cycle through command hash and delete each command */
 	hash_scan_begin(&hs, bot_ptr->botcmds);
 	while ((cmdnode = hash_scan_next(&hs)) != NULL) {
@@ -284,7 +293,12 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	char* parambuf; 
 
 	SET_SEGV_LOCATION();
-	SET_SEGV_INMODULE(bot_ptr->modname);
+	/* this is a hack, so we can load out of core, not NeoStats */
+	if (!strcasecmp(bot_ptr->modname, s_Services)) {
+		CLEAR_SEGV_INMODULE();
+	} else {
+		SET_SEGV_INMODULE(bot_ptr->modname);
+	}
 	userlevel = UserLevel (u);
 	/* Check user authority to use this command set */
 	if (( (bot_ptr->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
