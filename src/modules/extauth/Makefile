@@ -1,4 +1,4 @@
-SRCS = $(extauth_src) 
+SRCS = serviceroots.c
 TARGET = extauth.so
 DISTFILES = serviceroots.c Makefile
 
