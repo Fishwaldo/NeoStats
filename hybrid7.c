@@ -57,7 +57,7 @@ static void Srv_Kill (char *origin, char **argv, int argc);
 static void Srv_Svinfo (char *origin, char **argv, int argc);
 static void Srv_Burst (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
-static void Srv_Connect (char *origin, char **argv, int argc);
+static void Srv_Protocol (char *origin, char **argv, int argc);
 
 static struct ircd_srv_ {
 	int uprot;
@@ -102,7 +102,7 @@ IntCommands cmd_list[] = {
 	{MSG_KILL, Srv_Kill, 0, 0},
 	{MSG_EOB, Srv_Burst, 1, 0},
 	{MSG_SJOIN, Srv_Sjoin, 1, 0},
-	{MSG_CAPAB, Srv_Connect, 1, 0},
+	{MSG_CAPAB, Srv_Protocol, 1, 0},
 };
 
 ChanModes chan_modes[] = {
