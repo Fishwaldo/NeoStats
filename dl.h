@@ -223,6 +223,7 @@ int unload_module (char *module_name, User * u);
 int list_modules (User * u, char **av, int ac);
 int list_bots (User * u, char **av, int ac);
 ModUser* add_mod_user (char *nick, char *mod_name);
+ModUser* add_neostats_mod_user (char *nick);
 int del_mod_user (char *nick);
 int add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval);
 int del_mod_timer (char *timer_name);
@@ -240,6 +241,8 @@ int get_dl_handle (char *mod_name);
 void add_bot_to_chan (char *bot, char *chan);
 void del_bot_from_chan (char *bot, char *chan);
 void bot_chan_message (char *origin, char **av, int ac);
+void bot_message (char *origin, char **av, int ac);
+
 int list_bot_chans (User * u, char **av, int ac);
 int get_mod_num (char *mod_name);
 void unload_modules(void);

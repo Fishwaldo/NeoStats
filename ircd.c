@@ -46,6 +46,8 @@ static long services_bot_umode= 0;
 #ifdef NEW_STYLE_SPLITBUF
 static char privmsgbuffer[BUFSIZE];
 #endif
+/* Temp flag for backward compatibility in new splitbuf system */
+static int SkipModuleFunction = 0;
 
 static int signon_newbot (const char *nick, const char *user, const char *host, const char *rname, long Umode);
 
@@ -519,16 +521,35 @@ joinbuf (char **av, int ac, int from)
  *
  * @return none
  */
-static void
-m_privmsg (int cmdptr, char* origin, char **av, int ac)
+void 
+m_notice (char* origin, char **av, int ac, int cmdptr)
+{
+#ifdef NEW_STYLE_SPLITBUF
+	int argc;
+	char **argv;
+	argc = split_buf (privmsgbuffer, &argv, 1);
+	ModuleFunction (cmdptr, MSG_NOTICE, origin, argv, argc);
+	free (argv);
+#else
+	ModuleFunction (cmdptr, MSG_NOTICE, origin, av, ac);
+#endif
+	SkipModuleFunction = 1;
+}
+
+/** @brief process privmsg
+ *
+ * 
+ *
+ * @return none
+ */
+void
+m_privmsg (char* origin, char **av, int ac, int cmdptr)
 {
 #ifdef NEW_STYLE_SPLITBUF
 	int argc;
 	char **argv;
 #endif
 	char target[64];
-	User *u;
-	ModUser *mod_usr;
 
 	/* its a privmsg, now lets see who too... */
 	if (strstr (av[0], "!")) {
@@ -539,75 +560,21 @@ m_privmsg (int cmdptr, char* origin, char **av, int ac)
 		av[0] = strtok (target, "@");
 	}
 
-	if (!strcasecmp (s_Services, av[0])) {
-		if (flood (finduser (origin))) {
-			return;
-		}
-		/* its to the Internal Services Bot */
 #ifdef NEW_STYLE_SPLITBUF
-		argc = split_buf (privmsgbuffer, &argv, 1);
-		servicesbot (origin, argv, argc);
-		free (argv);
-#else
-		servicesbot (origin, av, ac);
-#endif
-		return;
+	argc = split_buf (privmsgbuffer, &argv, 1);
+	if(av[0][0] == '#') {
+		bot_chan_message (origin, argv, argc);
 	} else {
-		mod_usr = findbot (av[0]);
-		/* Check to see if any of the Modules have this nick Registered */
-		if (mod_usr) {
-			nlog (LOG_DEBUG1, LOG_CORE, "nicks: %s", mod_usr->nick);
-			if (flood (finduser (origin))) {
-				return;
-			}
-
-			/* Check command length */
-			if (strnlen (av[1], MAX_CMD_LINE_LENGTH) >= MAX_CMD_LINE_LENGTH) {
-				prefmsg (origin, s_Services, "command line too long!");
-				notice (s_Services, "%s tried to send a very LARGE command, we told them to shove it!", origin);
-				return;
-			}
-
-			SET_SEGV_LOCATION();
-			SET_SEGV_INMODULE(mod_usr->modname);
-			if (setjmp (sigvbuf) == 0) {
-				if(mod_usr->function) {
-#ifdef NEW_STYLE_SPLITBUF
-					argc = split_buf (privmsgbuffer, &argv, 1);
-					mod_usr->function (origin, argv, argc);
-					free (argv);
-#else
-					mod_usr->function (origin, av, ac);
-#endif
-				}
-				else {
-					u = finduser (origin);
-					if (!u) {
-						nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", origin, mod_usr->nick);
-					} else {
-#ifdef NEW_STYLE_SPLITBUF
-						argc = split_buf (privmsgbuffer, &argv, 1);
-						run_bot_cmd(mod_usr, u, argv, argc);
-						free (argv);
-#else
-						run_bot_cmd(mod_usr, u, av, ac);
-#endif
-					}
-				}
-			}
-			CLEAR_SEGV_INMODULE();
-			return;
-		} else {
-#ifdef NEW_STYLE_SPLITBUF
-			argc = split_buf (privmsgbuffer, &argv, 1);
-			bot_chan_message (origin, argv, argc);
-			free (argv);
-#else
-			bot_chan_message (origin, av, ac);
-#endif
-			return;
-		}
+		bot_message (origin, argv, argc);
 	}
+	free (argv);
+#else
+	if(av[0][0] == '#') {
+		bot_chan_message (origin, av, ac);
+	} else {
+		bot_message (origin, av, ac);
+	}
+#endif
 	return;
 }
 
@@ -624,12 +591,7 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 
-	/* If a privmsg, handle it internally */
-	if( is_privmsg(cmd) ) {
-		m_privmsg (cmdptr, origin, av, ac);
-		return;
-	}
-
+	printf("%s\n",cmd);
 	for (i = 0; i < ircd_cmdcount; i++) {
 		if (!strcmp (cmd_list[i].name, cmd)
 #ifdef GOTTOKENSUPPORT
@@ -651,7 +613,10 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 	}
 #endif
 	/* Send to modules */
-	ModuleFunction (cmdptr, cmd, origin, av, ac);
+	if(!SkipModuleFunction) {
+		ModuleFunction (cmdptr, cmd, origin, av, ac);
+	}
+	SkipModuleFunction = 0;
 }
 
 /** @brief parse
@@ -670,6 +635,7 @@ parse (char *line)
 	char **av;
 
 	SET_SEGV_LOCATION();
+
 	strip (line);
 	strlcpy (recbuf, line, BUFSIZE);
 	if (!(*line))
@@ -700,13 +666,8 @@ parse (char *line)
 	strlcpy (cmd, line, sizeof (cmd)); 
 #ifdef NEW_STYLE_SPLITBUF
 	strlcpy (privmsgbuffer, coreLine, BUFSIZE);
-	if(strcmp(cmd,"NOTICE")==0||strcmp(cmd,"B")==0)
-		ac = split_buf (coreLine, &av, 1);
-	else
-		ac = splitbuf (coreLine, &av, 1);
-#else
-	ac = splitbuf (coreLine, &av, 1);
 #endif
+	ac = splitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	free (av);
 }

@@ -78,6 +78,8 @@ const char services_bot_modes[]= "+oS";
 
 ircd_cmd cmd_list[] = {
 	/* Command      Token          Function       srvmsg */
+	{MSG_PRIVATE,	/*TOK_PRIVATE,	 */m_privmsg,	0},
+	{MSG_NOTICE,	/*TOK_NOTICE,	 */m_notice,	0},
 	{MSG_STATS,     /*TOK_STATS,     */m_stats,     0},
 	{MSG_SETHOST,   /*TOK_SETHOST,   */m_vhost,     0},
 	{MSG_VERSION,   /*TOK_VERSION,   */m_version,   0},

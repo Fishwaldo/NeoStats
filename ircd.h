@@ -23,8 +23,6 @@
 #ifndef IRCD_H
 #define IRCD_H
 
-#define MAX_CMD_LINE_LENGTH		350
-
 typedef void (*ircd_cmd_handler) (char *origin, char **argv, int argc, int srv);
 
 typedef struct ircd_cmd{
@@ -87,6 +85,8 @@ void ns_usr_pong (char *origin, char **argv, int argc);
 void ns_usr_version (char *origin, char **argv, int argc);
 void ns_srv_protocol(char *origin, char **argv, int argc);
 void handle_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc);
+void m_privmsg (char* origin, char **av, int ac, int cmdptr);
+void m_notice (char* origin, char **av, int ac, int cmdptr);
 
 /* Defined in ircd specific files but common to all */
 void init_ircd (void);

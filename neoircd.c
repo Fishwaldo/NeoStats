@@ -61,6 +61,8 @@ const char services_bot_modes[]= "+oS";
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
+	{MSG_PRIVATE, m_privmsg, 0},
+	{MSG_NOTICE, m_notice, 0},
 	{MSG_STATS, m_stats, 0},
 	{MSG_VERSION, m_version, 0},
 	{MSG_MOTD, m_motd, 0},

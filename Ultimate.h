@@ -378,9 +378,6 @@
 #define MSG_CLIENT	"CLIENT"
 #define MSG_SMODE	"SMODE"
 
-/* message macros */
-#define is_privmsg(msg) ( !strcmp (MSG_PRIVATE, (msg)) || !strcmp ("!", (msg)) )
-
 /* IRCD Specific mode chars */
 #ifdef ULTIMATE3
 #define UMODE_CH_LOCOP 'O'

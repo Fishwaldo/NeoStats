@@ -56,6 +56,9 @@ static int ns_unload (User * u, char **av, int ac);
 static char quitmsg[BUFSIZE];
 static char no_reason[]="no reason given";
 
+#undef NS_ULEVEL_ROOT
+#define NS_ULEVEL_ROOT 0
+
 static bot_cmd ns_commands[]=
 {
 	{"LEVEL",		ns_level,		0, 	0,					ns_help_level, 		ns_help_level_oneline},
@@ -92,8 +95,13 @@ static bot_cmd ns_commands[]=
 int  
 init_services(void) 
 {
+	ModUser* bot_ptr;
+
 	SET_SEGV_LOCATION();
 	/* Add command list to services bot */
+	bot_ptr = add_neostats_mod_user (s_Services);
+	bot_ptr->flags = me.onlyopers ? BOT_FLAG_ONLY_OPERS : 0;
+	bot_ptr->botcmds = hash_create(-1, 0, 0);
 	add_services_cmd_list(ns_commands);
 	return NS_SUCCESS;
 }

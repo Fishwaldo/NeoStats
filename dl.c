@@ -39,6 +39,8 @@
 #include "sqlsrv/rta.h"
 #endif
 
+#define MAX_CMD_LINE_LENGTH		350
+
 /** @brief Module list
  * 
  */
@@ -798,6 +800,73 @@ bot_chan_message (char *origin, char **av, int ac)
 	}
 }
 
+/** @brief send a message to a channel bot
+ *
+ * @param origin 
+ * @param av (note chan string in av[0])
+ * @param ac
+ * 
+ * @return none
+ */
+void
+bot_message (char *origin, char **av, int ac)
+{
+	User *u;
+	ModUser *mod_usr;
+
+	/* Check command length */
+	if (strnlen (av[1], MAX_CMD_LINE_LENGTH) >= MAX_CMD_LINE_LENGTH) {
+		prefmsg (origin, s_Services, "command line too long!");
+		notice (s_Services, "%s tried to send a very LARGE command, we told them to shove it!", origin);
+		return;
+	}
+
+	/* Trap CTCP commands and silently drop them to avoid unknown command errors 
+	 * Why bother? Well we might be able to use some of them in the future
+	 * so this is mainly a test and we may want to pass some of this onto
+	 * SecureServ for a quick trojan check so log attempts to give an indication 
+	 * of usage.
+	 */
+	if (av[1][0] == '\1') {
+		char* buf;
+		buf = joinbuf(av, ac, 1);
+		nlog (LOG_NORMAL, LOG_MOD, "%s requested CTCP %s", origin, buf);
+		free(buf);
+		return;
+	}
+
+	u = finduser (origin);
+
+	if (flood (u)) {
+		return;
+	}
+
+	mod_usr = findbot (av[0]);
+	/* Check to see if any of the Modules have this nick Registered */
+	if (!mod_usr) {
+		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found: %s", mod_usr->nick);
+		return;
+	}
+	nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s", mod_usr->nick);
+
+	SET_SEGV_LOCATION();
+	SET_SEGV_INMODULE(mod_usr->modname);
+	if (setjmp (sigvbuf) == 0) {
+		if(mod_usr->function) {
+			mod_usr->function (origin, av, ac);
+		}
+		else {
+			if (!u) {
+				nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", origin, mod_usr->nick);
+			} else {
+				run_bot_cmd(mod_usr, u, av, ac);
+			}
+		}
+	}
+	CLEAR_SEGV_INMODULE();
+	return;
+}
+
 /** @brief dump list of module bots and channels
  *
  * @param u
@@ -881,6 +950,31 @@ add_mod_user (char *nick, char *mod_name)
 		}
 	}
 	nlog (LOG_WARNING, LOG_CORE, "add_mod_user: Couldn't Add ModuleBot to List");
+	return NULL;
+}
+
+/** @brief 
+ *
+ * @param 
+ * 
+ * @return
+ */
+ModUser *
+add_neostats_mod_user (char *nick)
+{
+	ModUser *mod_usr;
+
+	SET_SEGV_LOCATION();
+	/* add a brand new user */
+	mod_usr = new_bot (nick);
+	if(mod_usr) {
+		strlcpy (mod_usr->modname, "NeoStats", MAX_MOD_NAME);
+		mod_usr->function = NULL;
+		mod_usr->chanfunc = NULL;
+		mod_usr->botcmds = hash_create(-1, 0, 0);
+		return mod_usr;
+	}
+	nlog (LOG_WARNING, LOG_CORE, "add_neostats_mod_user: Couldn't Add ModuleBot to List");
 	return NULL;
 }
 

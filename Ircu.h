@@ -209,9 +209,6 @@
 #define MSG_POST                "POST"          /* POS */
 #define TOK_POST                "POST"
 
-/* message macros */
-#define is_privmsg(msg) ( !strcmp(MSG_PRIVATE, (msg)) || !strcmp("P", (msg)) || !strcmp("CPRIVMSG", (msg)) || !strcmp("CP", (msg)))
-
 /* Umode chars */
 #define UMODE_CH_LOCOP 'O'
 #define UMODE_CH_OPER 'o'

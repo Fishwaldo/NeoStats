@@ -183,15 +183,15 @@ add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list)
 	if(bot_ptr->botcmds == NULL) {
 		return NS_FAILURE;
 	}
-	
 	/* set the module */
 	SET_SEGV_INMODULE(bot_ptr->modname);
-	
+
 	/* Cycle through command list and add them */
 	while(bot_cmd_list->cmd) {
 		add_bot_cmd(bot_ptr->botcmds, bot_cmd_list);
 		bot_cmd_list++;
 	}
+	CLEAR_SEGV_INMODULE();
 	return NS_SUCCESS;
 }
 
@@ -206,7 +206,6 @@ del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list)
 	if(bot_ptr->botcmds == NULL) {
 		return NS_FAILURE;
 	}
-
 	/* set the module */
 	SET_SEGV_INMODULE(bot_ptr->modname);
 
@@ -233,12 +232,8 @@ del_all_bot_cmds(ModUser* bot_ptr)
 	if(bot_ptr->botcmds == NULL) {
 		return NS_FAILURE;
 	}
-	
-	
 	/* set the module */
 	SET_SEGV_INMODULE(bot_ptr->modname);
-
-	
 	/* Cycle through command hash and delete each command */
 	hash_scan_begin(&hs, bot_ptr->botcmds);
 	while ((cmdnode = hash_scan_next(&hs)) != NULL) {
@@ -259,20 +254,10 @@ del_all_bot_cmds(ModUser* bot_ptr)
 int 
 add_services_cmd_list(bot_cmd* bot_cmd_list) 
 {
-	/* init bot hash if not created */
-	if(botcmds == NULL) {
-		botcmds = hash_create(-1, 0, 0);
-	}
-	/* If unable to create hash return failure */
-	if(botcmds == NULL) {
-		return NS_FAILURE;
-	}
-	/* Cycle through command list and add them */
-	while(bot_cmd_list->cmd) {
-		add_bot_cmd(botcmds, bot_cmd_list);
-		bot_cmd_list++;
-	}
-	return NS_SUCCESS;
+	ModUser* bot_ptr;
+
+	bot_ptr = findbot(s_Services);
+	return(add_bot_cmd_list(bot_ptr, bot_cmd_list));
 }
 
 /** @brief del_services_cmd_list delete a list of commands from the services bot
@@ -282,40 +267,10 @@ add_services_cmd_list(bot_cmd* bot_cmd_list)
 int 
 del_services_cmd_list(bot_cmd* bot_cmd_list) 
 {
-	/* If no hash return failure */
-	if(botcmds == NULL) {
-		return NS_FAILURE;
-	}
-	/* Cycle through command list and delete them */
-	while(bot_cmd_list->cmd) {
-		del_bot_cmd(botcmds, bot_cmd_list);
-		bot_cmd_list++;
-	}
-	return NS_SUCCESS;
-}
+	ModUser* bot_ptr;
 
-/** @brief servicesbot process services bot command list
- *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
- */
-void
-servicesbot (char *nick, char **av, int ac)
-{
-	User *u;
-	
-
-	SET_SEGV_LOCATION();
-	u = finduser (nick);
-	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "servicesbot: unable to find user %s (%s)", nick, s_Services);
-		return;
-	}
-	me.requests++;
-	/* Use fake bot structure so we can use the main command routine */
-	strlcpy(fake_bot.nick, s_Services, MAXNICK);
-	fake_bot.botcmds = botcmds;
-	fake_bot.flags = me.onlyopers ? BOT_FLAG_ONLY_OPERS : 0;
-	run_bot_cmd (&fake_bot, u, av, ac);
+	bot_ptr = findbot(s_Services);
+	return(del_bot_cmd_list(bot_ptr, bot_cmd_list));
 }
 
 /** @brief run_bot_cmd process bot command list
@@ -411,20 +366,6 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	}
 #endif
 
-	/* Trap CTCP commands and silently drop them to avoid unknown command errors 
-	 * Why bother? Well we might be able to use some of them in the future
-	 * so this is mainly a test and we may want to pass some of this onto
-	 * SecureServ for a quick trojan check so log attempts to give an indication 
-	 * of usage.
-	 */
-	if (av[1][0] == '\1') {
-		char* buf;
-		buf = joinbuf(av, ac, 1);
-		nlog (LOG_NORMAL, LOG_MOD, "%s requested CTCP %s", u->nick, buf);
-		free(buf);
-		CLEAR_SEGV_INMODULE();
-		return NS_SUCCESS;
-	}
 	/* We have run out of commands so report failure */
 	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[1]);
 	chanalert (bot_ptr->nick, "%s requested %s, but that is an unknown command", u->nick, av[1]);

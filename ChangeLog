@@ -35,6 +35,12 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Added system to overide the core parse and splitbuf functions for IRCu; will merge 
    back into core when IRCu support complete (M)
  - Bug fix in NICKV2 for Unreal; realname was not parsed properly (M)
+ - Privmsg checks moved to ircd command lists and core function provided for processing (M)
+ - Add notice check to ircd command lists (M)
+ - Cleaned up bot message and bot chan message handling (M)
+ - Main services bot is not a mod_usr which tidies up command processing and let's NeoStats 
+   show up in bot channel lists (M)
+ - Optimise core CTCP checks to avoid unnecessary processing (M)
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database
