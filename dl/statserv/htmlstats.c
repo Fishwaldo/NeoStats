@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: htmlstats.c,v 1.21 2002/09/04 08:40:29 fishwaldo Exp $
+** $Id: htmlstats.c,v 1.22 2002/12/13 10:50:09 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -262,6 +262,7 @@ void get_srvlistdet() {
 		if (!ss) fprintf(opf,  "<tr><td>Last Seen:</td><td colspan = 2>%s</td></tr>\n", sftime(s->lastseen));
 		if (ss) fprintf(opf,  "<tr><td>Current Users:</td><td>%d (%2.0f%%)</td><td>Max %ld at %s</td></tr>\n", s->users, (float)s->users / (float)stats_network.users * 100, s->maxusers, sftime(s->t_maxusers));
 		if (ss) fprintf(opf,  "<tr><td>Current Opers:</td><td>%d (%2.0f%%)</td><td>Max %d at %s</td></tr>\n", s->opers, (float)s->opers / (float)stats_network.opers *100, s->maxopers, sftime(s->t_maxopers));
+		fprintf(opf,  "<tr><td>Total Users Connected:</td><td colspan = 2>%ld</td></tr>", s->totusers);
 		fprintf(opf,  "<tr><td>IrcOp Kills</td><td colspan = 2>%d</td></tr>", s->operkills);
 		fprintf(opf,  "<tr><td>Server Kills</td><td colspan = 2>%d</td></tr>", s->serverkills);
 		fprintf(opf,  "<tr><td>Highest Ping</td><td>%d</td><td>at %s</td></tr>", s->highest_ping, sftime(s->t_highest_ping));
@@ -279,7 +280,8 @@ void get_netstats() {
 	fprintf(opf,  "<td>Current Users: </td>\n");
 	fprintf(opf,  "<td> %ld </td>\n", stats_network.users);
 	fprintf(opf,  "<td>Maximum Users: </td>\n");
-	fprintf(opf,  "<td> %ld [%s] </td>\n", stats_network.maxusers, sftime(stats_network.t_maxusers));
+	fprintf(opf,  "<td> %ld [%s] </td></tr>\n", stats_network.maxusers, sftime(stats_network.t_maxusers));
+	fprintf(opf,  "<tr><td colspan=2>Total Users Ever Connected</td><td colspan=2>%ld</td></tr>", stats_network.totusers);
 	fprintf(opf,  "<tr><td>Current Opers: </td>\n");
 	fprintf(opf,  "<td> %i </td>\n", stats_network.opers);
 	fprintf(opf,  "<td>Maximum Opers: </td>\n");
@@ -299,6 +301,8 @@ void get_dailystats() {
 	fprintf(opf,  "<tr><th colspan=\"4\"><b>Daily Network Statistics:</b></th></tr>\n");
 	fprintf(opf,  "<tr><td colspan=\"2\">Max Daily Users: </td>\n");
 	fprintf(opf,  "<td colspan=\"2\"> %-2d %s </td></tr>\n", daily.users, sftime(daily.t_users));
+	fprintf(opf,  "<tr><td colspan=\"2\">Total Users Connected:</td>\n");
+	fprintf(opf,  "<td colspan=\"2\"> %-2d</td></tr>\n", daily.tot_users);
 	fprintf(opf,  "<tr><td colspan=\"2\">Max Daily Opers: </td>\n");
 	fprintf(opf,  "<td colspan=\"2\"> %-2d %s </td></tr>\n", daily.opers, sftime(daily.t_opers));
 	fprintf(opf,  "<tr><td colspan=\"2\">Max Daily Servers: </td>\n");

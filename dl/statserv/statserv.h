@@ -33,8 +33,6 @@ list_t *Chead;
 TLD *tldhead;
 
 
-#define ok_to_wallop	!StatServ.newdb && StatServ.onchan && me.synced
-
 
 extern const char version_date[], version_time[];
 
@@ -66,6 +64,7 @@ struct StatServ {
 	char htmlpath[BUFSIZE];
 	int onchan;
 	int newdb;
+	int interval;
 } StatServ;
 
 
@@ -167,6 +166,7 @@ CStats *AddChanStats(char *);
 void DelOldChan();
  int s_topic_change(char **av, int ac);
  int s_chan_kick(char **av, int ac);
+ int ok_to_wallop();
 
 
 /* ss_help.c */

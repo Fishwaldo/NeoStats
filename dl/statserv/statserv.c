@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.53 2002/10/16 03:13:59 fishwaldo Exp $
+** $Id: statserv.c,v 1.54 2002/12/13 10:50:09 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -54,7 +54,7 @@ char s_StatServ[MAXNICK] = "StatServ";
 Module_Info Statserv_Info[] = { {
 	SSMNAME,
 	"Statistical Bot For NeoStats",
-	"3.42"
+	"3.5"
 } };
 
 
@@ -106,14 +106,14 @@ static config_option options[] = {
 { "STATSERV_HOST", ARG_STR, ss_cb_Config, 2},
 { "STATSERV_LAG", ARG_STR, ss_cb_Config, 3},
 { "HTML_STATS", ARG_STR, ss_cb_Config, 4},
-{ "HTML_PATH", ARG_STR, ss_cb_Config, 5}
+{ "HTML_PATH", ARG_STR, ss_cb_Config, 5},
+{ "WALLOP_INTERVAL", ARG_STR, ss_cb_Config, 6} 
 };
 
 
 void ss_cb_Config(char *arg, int configtype) {
 
 	strcpy(segv_location, "StatServ-ss_cb_Config");
-
 
 	if (configtype == 0) {
 		/* Nick */
@@ -134,7 +134,10 @@ void ss_cb_Config(char *arg, int configtype) {
 	} else if (configtype == 5) {
 		/* htmlpath */
 		strcpy(StatServ.htmlpath, arg);
+	} else if (configtype == 6) {
+		StatServ.interval = atoi(arg);
 	}
+	
 }
 
 
@@ -165,6 +168,7 @@ void _init() {
 	memcpy(StatServ.host, Servbot.host, MAXHOST);
 	StatServ.lag = 0;
 	StatServ.html = 0;
+	StatServ.interval = 0;
 	if (!config_read("neostats.cfg", options) == 0) {
 		log("Error, Statserv could not be configured");
 		chanalert(s_Services, "Error, Statserv could not be configured");
@@ -569,6 +573,7 @@ static void ss_netstats(User *u) {
 	prefmsg(u->nick, s_StatServ, "Network Statistics:-----");
 	prefmsg(u->nick, s_StatServ, "Current Users: %ld", stats_network.users);
 	prefmsg(u->nick, s_StatServ, "Maximum Users: %ld [%s]", stats_network.maxusers, sftime(stats_network.t_maxusers));
+	prefmsg(u->nick, s_StatServ, "Total Users Connected: %ld", stats_network.totusers);
 	prefmsg(u->nick, s_StatServ, "Current Channels %ld", stats_network.chans);
 	prefmsg(u->nick, s_StatServ, "Maximum Channels %ld [%s]", stats_network.maxchans, sftime(stats_network.t_chans));
 	prefmsg(u->nick, s_StatServ, "Current Opers: %ld", stats_network.opers);
@@ -587,6 +592,7 @@ static void ss_daily(User *u) {
 	prefmsg(u->nick, s_StatServ, "Maximum Users: %-2d %s", daily.users, sftime(daily.t_users));
 	prefmsg(u->nick, s_StatServ, "Maximum Chans: %-2d %s", daily.chans, sftime(daily.t_chans));
 	prefmsg(u->nick, s_StatServ, "Maximum Opers: %-2d %s", daily.opers, sftime(daily.t_opers));
+	prefmsg(u->nick, s_StatServ, "Total Users Connected: %-2d", daily.tot_users);
 	prefmsg(u->nick, s_StatServ, "All Daily Statistics are reset at Midnight");
 	prefmsg(u->nick, s_StatServ, "End of Information.");
 }
@@ -665,6 +671,7 @@ static void ss_server(User *u, char *server) {
 	if (!s) prefmsg(u->nick, s_StatServ, "Server Last Seen: %s", sftime(ss->lastseen));
 	if (s) prefmsg(u->nick, s_StatServ, "Current Users: %-3ld (%2.0f%%)", ss->users, (float)ss->users / (float)stats_network.users * 100);
 	prefmsg(u->nick, s_StatServ, "Maximum Users: %-3ld at %s", ss->maxusers, sftime(ss->t_maxusers));
+	prefmsg(u->nick, s_StatServ, "Total Users Connected: %-3ld", ss->totusers);
 	if (s) prefmsg(u->nick, s_StatServ, "Current Opers: %-3ld", ss->opers);
 	prefmsg(u->nick, s_StatServ, "Maximum Opers: %-3ld at %s", ss->maxopers, sftime(ss->t_maxopers));
 	prefmsg(u->nick, s_StatServ, "IRCop Kills: %d", ss->operkills);

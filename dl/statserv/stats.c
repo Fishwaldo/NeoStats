@@ -20,10 +20,30 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.25 2002/10/14 01:06:23 shmad Exp $
+** $Id: stats.c,v 1.26 2002/12/13 10:50:09 fishwaldo Exp $
 */
 
 #include "statserv.h"
+
+int ok_to_wallop() {
+	static int lasttime;
+	static int count;
+	
+	if (!StatServ.newdb && StatServ.onchan && me.synced) {
+		return 0;
+	}
+	if (time(NULL) - lasttime < StatServ.interval) {
+		if (++count > 5)
+			return 0;
+	} else {
+		lasttime = time(NULL);
+		count = 0;
+	}
+	return 1;
+
+}
+
+
 
 int s_chan_new(char **av, int ac) {
 	long count;
@@ -32,7 +52,7 @@ int s_chan_new(char **av, int ac) {
 	if (count > stats_network.maxchans) {
 		stats_network.maxchans = count;
 		stats_network.t_chans = time(NULL);
-		if (ok_to_wallop) swallops_cmd(s_StatServ, "\2NEW CHANNEL RECORD\2 Wow, there is now %d Channels on the Network", stats_network.maxchans);
+		if (ok_to_wallop()) swallops_cmd(s_StatServ, "\2NEW CHANNEL RECORD\2 Wow, there is now %d Channels on the Network", stats_network.maxchans);
 	}
 	if (count > daily.chans) {
 		daily.chans = count;
@@ -182,13 +202,13 @@ int s_new_server(char **av, int ac) {
 	if (stats_network.maxservers < stats_network.servers) {
 		stats_network.maxservers = stats_network.servers;
 		stats_network.t_maxservers = time(NULL);
-		if (ok_to_wallop) swallops_cmd(s_StatServ, "\2NEW SERVER RECORD\2 Wow, there are now %d Servers on the Network", stats_network.servers); 
+		if (ok_to_wallop()) swallops_cmd(s_StatServ, "\2NEW SERVER RECORD\2 Wow, there are now %d Servers on the Network", stats_network.servers); 
 	}
 	if (stats_network.servers > daily.servers) {
 	daily.servers = stats_network.servers;
 	daily.t_servers = time(NULL);
 	}
-	if (ok_to_wallop) chanalert(s_StatServ, "\2SERVER\2 %s has joined the Network at %s", s->name, s->uplink);
+	if (ok_to_wallop()) chanalert(s_StatServ, "\2SERVER\2 %s has joined the Network at %s", s->name, s->uplink);
 	return 1;
 
 }
@@ -200,7 +220,7 @@ int s_del_server(char **av, int ac) {
 	s = findserver(av[0]);
 	if (!s) return 0;
 	DecreaseServers();
-	if (ok_to_wallop) chanalert(s_StatServ, "\2SERVER\2 %s has left the Network at %s", s->name, s->uplink);
+	if (ok_to_wallop()) chanalert(s_StatServ, "\2SERVER\2 %s has left the Network at %s", s->name, s->uplink);
 	ss = findstats(s->name);
 	if (s->name != me.uplink)
 	ss->numsplits = ss->numsplits +1;
@@ -273,12 +293,12 @@ int s_user_modes(char **av, int ac) {
 					if (stats_network.maxopers < stats_network.opers) {
 						stats_network.maxopers = stats_network.opers;
 						stats_network.t_maxopers = time(NULL);
-						if (ok_to_wallop) swallops_cmd(s_StatServ, "\2Oper Record\2 The Network has reached a New Record for Opers at %d", stats_network.opers);
+						if (ok_to_wallop()) swallops_cmd(s_StatServ, "\2Oper Record\2 The Network has reached a New Record for Opers at %d", stats_network.opers);
 					}
 					if (s->maxopers < s->opers) {
 						s->maxopers = s->opers;
 						s->t_maxopers = time(NULL);
-						if (ok_to_wallop) swallops_cmd(s_StatServ, "\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s->name, s->opers);
+						if (ok_to_wallop()) swallops_cmd(s_StatServ, "\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s->name, s->opers);
 					}
 					if (s->opers > daily.opers) {
 						daily.opers = s->opers;
@@ -360,19 +380,20 @@ int s_new_user(char **av, int ac) {
 		/* New User Record */
 		s->maxusers = s->users;
 		s->t_maxusers = time(NULL);
-		if (ok_to_wallop) swallops_cmd(s_StatServ, "\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!", s->name, s->users);	
+		if (ok_to_wallop()) swallops_cmd(s_StatServ, "\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!", s->name, s->users);	
 	}
 
 	if (stats_network.maxusers < stats_network.users) {
 		stats_network.maxusers = stats_network.users;
 		stats_network.t_maxusers = time(NULL);
-		if (ok_to_wallop) swallops_cmd(s_StatServ, "\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %d users!", stats_network.users);
+		if (ok_to_wallop()) swallops_cmd(s_StatServ, "\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %d users!", stats_network.users);
 	}
 
 	if (stats_network.users > daily.users) {
 	daily.users = stats_network.users;
  	daily.t_users = time(NULL);
 	}
+
 
 	AddTLD(u);
 	return 1;
@@ -412,7 +433,7 @@ int pong(char **av, int ac) {
 	/* ok, updated the statistics, now lets see if this server is "lagged out" */
 	if (StatServ.lag > 0) {
 		if (s->ping > StatServ.lag) {
-			if (ok_to_wallop) globops(s_StatServ, "\2%s\2 is Lagged out with a ping of %d", s->name, s->ping);
+			if (ok_to_wallop()) globops(s_StatServ, "\2%s\2 is Lagged out with a ping of %d", s->name, s->ping);
 		}
 	}
 	return 1;
@@ -439,6 +460,7 @@ int Online(char **av, int ac) {
    /* also add a timer to check if its midnight (to reset the daily stats */
    add_mod_timer("Is_Midnight", "Daily_Stats_Reset", SSMNAME, 60);
    add_mod_timer("DelOldChan", "DelOldStatServChans", SSMNAME, 3600);
+
 
    return 1;
    

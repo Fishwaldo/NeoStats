@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.74 2002/11/18 14:04:19 fishwaldo Exp $
+** $Id: main.c,v 1.75 2002/12/13 10:50:08 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -37,15 +37,15 @@
 char s_Services[MAXNICK] = "NeoStats";
 
 #ifdef UNREAL
-const char version[] = "NeoStats-2.5-RC2(U)";
+const char version[] = "NeoStats-2.5-RC3(U)";
 #elif ULTIMATE3
-const char version[] = "NeoStats-2.5-RC2(UL3)";
+const char version[] = "NeoStats-2.5-RC3(UL3)";
 #elif ULTIMATE
-const char version[] = "NeoStats-2.5-RC2(UL)";
+const char version[] = "NeoStats-2.5-RC3(UL)";
 #elif HYBRID7
-const char version[] = "NeoStats-2.5-RC2(H)";
+const char version[] = "NeoStats-2.5-RC3(H)";
 #elif NEOIRCD
-const char version[] = "NeoStats-2.5-RC2(N)";
+const char version[] = "NeoStats-2.5-RC3(N)";
 #endif
 
 

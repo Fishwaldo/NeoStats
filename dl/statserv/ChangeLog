@@ -2,6 +2,11 @@ StatServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish
+* Version 3.5 * December 13th, 2002 (F)
+ - StatServ now has the option to only wallop 5 records broken in a particular timeframe.
+	eg, 5 wallops per 5 minutes, any more, and statserv doesn't say a thing.
+	set WALLOP_INTERVAL in neostats.cfg to the interval time
+ - Some Stats that we were collecting was never displayed, added it to the output and html display
 
 * Version 3.42 * September 3rd, 2002 (S)
  - Fixed make insall now copies the template too 
