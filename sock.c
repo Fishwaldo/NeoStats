@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.26 2002/09/04 08:40:27 fishwaldo Exp $
+** $Id: sock.c,v 1.27 2003/01/21 14:50:18 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -176,8 +176,11 @@ void read_loop()
 				execve("./neostats", NULL, NULL);
 			}
 		} else if (SelectResult == -1) {
-				log("Lost connection to server."); 
-				return; 
+			if (errno != EINTR) 
+				{
+					log("Lost connection to server."); 
+					return; 
+				}
 		}
 	}
  log("hu, how did we get here");
