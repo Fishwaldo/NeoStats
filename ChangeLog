@@ -14,6 +14,13 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - early version of bot set handler introduced (M)
  - libcurl integration into NeoStats to handle FTP/HTTP (and future XML-RPC) transfers (F)
  - log handling changed to fix some problems with it. Logs are now always in full dated format (M)
+ - all ircd feature defines changed to common naming convention GOTxxxx where xxxx is the feature
+   to make it easier to remember and use them:
+       HAVE_TOKEN_SUP -> GOTTOKENSUPPORT
+       HAVE_BOT_MODE -> GOTBOTMODE (M)
+ - MODE char defines used by connect serv renamed from xxx_MODE to UMODE_CH_xxx to make them 
+   obviously distinct from channel modes, easier to grep for and encourage support in other 
+   parts of the code. (M)
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.9
  - import of libpcre into core (M)

@@ -47,59 +47,32 @@
  *   $Id$
  */
 
-
 #ifndef UNREAL_H
-
 #define UNREAL_H
 
-
+/* Feature support for use by modules to determine whether
+ * certain functionality is available
+ */
 
 /* we have token support */
-#define HAVE_TOKEN_SUP 1
-
+#define GOTTOKENSUPPORT
 /* we have vhost support */
 #define GOTSVSVHOST
-
 /* we have svsjoin */
 #define GOTSVSJOIN
+/* we have bot mode support */
+#define GOTBOTMODE
 
-/* Moved from connectserv so we can use elsewhere */
-#define LOCOP_MODE 'O'
-#define OPER_MODE 'o'
-#define COSERVERADMIN_MODE 'C'
-#define SERVERADMIN_MODE 'A'
-#define NETADMIN_MODE 'N'
-#define SERVICESADMIN_MODE 'a'
-#define NETSERVICE_MODE 'S'
-#define BOT_MODE 'B'
+/* IRCD Specific mode chars */
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_COADMIN 'C'
+#define UMODE_CH_ADMIN 'A'
+#define UMODE_CH_NETADMIN 'N'
+#define UMODE_CH_SADMIN 'a'
+#define UMODE_CH_SERVICES 'S'
+#define UMODE_CH_BOT 'B'
 
-/*
- * The tokens are in the ascii character range of 33-127, and we start
- * from 33 and just move up.  It would be nice to match then up so they
- * are slightly related to their string counterpart, but that makes it
- * too confusing when we want to add another one and need to make sure
- * we're not using one already used. -Cabal95
- *
- * As long as the #defines are kept statically placed, it will be fine.
- * We don't care/worry about the msgtab[] since it can be dynamic, but
- * the tokens it uses will still be static according to the messages
- * they represent.  In other words leave the #defines in order, if you're
- * going to add something, PUT IT AT THE END.  Do not even look for an
- * open spot somewhere, as that may lead to one type of message being
- * sent by server A to server B, but server B thinks its something else.
- * Remember, skip the : since its got a special use, and I skip the \ too
- * since it _may_ cause problems, but not sure.  -Cabal95
- * I'm skipping A and a as well, because some clients and scripts use
- * these to test if the server has already processed whole queue.
- * Since the client could request this protocol withhout the script
- * knowing it, I'm considering that reserved, and TRACE/A is now 'b'.
- * The normal msgtab should probably process this as special. -Donwulff
- */
-
-/*	12/05/1999 - I was wrong - I didnt see the token[2] in struct Message
-	okie 60*60 commands more :P - Sowwy!!! -sts
-	
- */
 
 #ifdef UNREAL32
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
@@ -743,7 +716,6 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-#define HAVE_BOT_MODE
 #define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
 #define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_ADMONLY) || CheckChanMode(x, MODE_OPERONLY) || CheckChanMode(x, MODE_KEY) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_RGSTRONLY)))
 

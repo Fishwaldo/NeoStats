@@ -25,24 +25,28 @@
 #ifndef LIQUIDIRCD_H
 #define LIQUIDIRCD_H
 
-/* we support tokens */
-#undef HAVE_TOKEN_SUP
+/* Feature support for use by modules to determine whether
+ * certain functionality is available
+ */
 
+/* we don't support tokens */
+#undef GOTTOKENSUPPORT
 /* we have vhost support */
 #define GOTSVSVHOST
-
 /* we don't have svsjoin support */
 #undef GOTSVSJOIN 
+/* we don't have bot mode support */
+#undef GOTBOTMODE
 
-/* Moved from connectserv so we can use elsewhere */
-#define LOCOP_MODE 'O'
-#define OPER_MODE 'o'
-#define SERVERADMIN_MODE 'A'
-#define NETADMIN_MODE 'N'
-#define TECHADMIN_MODE 'T'
-#define SERVICESADMIN_MODE 'a'
-#define NETSERVICE_MODE 'S'
-#define BOT_MODE 'B'
+/* IRCD Specific mode chars */
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_ADMIN 'A'
+#define UMODE_CH_NETADMIN 'N'
+#define UMODE_CH_TECHADMIN 'T'
+#define UMODE_CH_SADMIN 'a'
+#define UMODE_CH_SERVICES 'S'
+#define UMODE_CH_BOT 'B'
 
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define MSG_WHO		"WHO"	/* WHO  -> WHOC */
@@ -238,7 +242,6 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_OPERONLY)))
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-#undef HAVE_BOT_MODE
 #define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
 #define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_RGSTRONLY) || CheckChanMode(x, MODE_OPERONLY) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_KEY)))
 

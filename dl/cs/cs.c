@@ -152,7 +152,7 @@ static int new_m_version(char *origin, char **av, int ac)
 
 Functions __module_functions[] = {
 	{MSG_VERSION, new_m_version, 1}	,
-#ifdef HAVE_TOKEN_SUP
+#ifdef GOTTOKENSUPPORT
 	{TOK_VERSION, new_m_version, 1}	,
 #endif
 	{NULL, NULL, 0}
@@ -360,159 +360,148 @@ static int cs_user_modes(char **av, int ac)
 			break;
 #ifndef ULTIMATE3
 /* these modes in Ultimate3 are Smodes */
-#ifdef NETADMIN_MODE
-		case NETADMIN_MODE:
+#ifdef UMODE_CH_NETADMIN
+		case UMODE_CH_NETADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_netadmin,
-					  u->nick, NETADMIN_MODE);
+					  u->nick, UMODE_CH_NETADMIN);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_netadminoff,
-					  u->nick, NETADMIN_MODE);
+					  u->nick, UMODE_CH_NETADMIN);
 			}
 			break;
 #endif
-#ifdef CONETADMIN_MODE
-		case CONETADMIN_MODE:
+#ifdef UMODE_CH_CONETADMIN
+		case UMODE_CH_CONETADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_conetadmin,
-					  u->nick, CONETADMIN_MODE);
+					  u->nick, UMODE_CH_CONETADMIN);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_conetadminoff,
-					  u->nick, CONETADMIN_MODE);
+					  u->nick, UMODE_CH_CONETADMIN);
 			}
 			break;
 #endif
-#ifdef TECHADMIN_MODE
-		case TECHADMIN_MODE:
+#ifdef UMODE_CH_TECHADMIN
+		case UMODE_CH_TECHADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_techadmin,
-					  u->nick, TECHADMIN_MODE);
+					  u->nick, UMODE_CH_TECHADMIN);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_techadminoff,
-					  u->nick, TECHADMIN_MODE);
+					  u->nick, UMODE_CH_TECHADMIN);
 			}
 			break;
 #endif
-#ifdef SERVERADMIN_MODE
-		case SERVERADMIN_MODE:
+#ifdef UMODE_CH_ADMIN
+		case UMODE_CH_ADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_serveradmin,
-					  u->nick, SERVERADMIN_MODE, u->server->name);
+					  u->nick, UMODE_CH_ADMIN, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_serveradminoff,
-					  u->nick, SERVERADMIN_MODE, u->server->name);
+					  u->nick, UMODE_CH_ADMIN, u->server->name);
 			}
 			break;
 #endif
-#ifdef COSERVERADMIN_MODE
-		case COSERVERADMIN_MODE:
+#ifdef UMODE_CH_COADMIN
+		case UMODE_CH_COADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_coserveradmin,
-					  u->nick, COSERVERADMIN_MODE, u->server->name);
+					  u->nick, UMODE_CH_COADMIN, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_coserveradminoff,
-					  u->nick, COSERVERADMIN_MODE, u->server->name);
+					  u->nick, UMODE_CH_COADMIN, u->server->name);
 			}
 			break;
 #endif
-#ifdef GUESTADMIN_MODE
-		case GUESTADMIN_MODE:
+#ifdef UMODE_CH_GUESTADMIN
+		case UMODE_CH_GUESTADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_guestadmin,
-					  u->nick, GUESTADMIN_MODE, u->server->name);
+					  u->nick, UMODE_CH_GUESTADMIN, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_guestadminoff,
-					  u->nick, GUESTADMIN_MODE, u->server->name);
+					  u->nick, UMODE_CH_GUESTADMIN, u->server->name);
 			}
 			break;
 /* these modes are not used in Ultimate3 */
 #endif
-#ifdef BOT_MODE
-		case BOT_MODE:
+#ifdef UMODE_CH_BOT
+		case UMODE_CH_BOT:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_bot,
-					  u->nick, BOT_MODE);
+					  u->nick, UMODE_CH_BOT);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_botoff,
-					  u->nick, BOT_MODE);
-			}
-			break;
-#endif
-#ifdef INVISIBLE_MODE
-		case INVISIBLE_MODE:
-			if (add) {
-				globops(s_ConnectServ,msg_invisible,
-					u->nick, INVISIBLE_MODE);
-			} else {
-				globops(s_ConnectServ,msg_invisibleoff,
-					u->nick, INVISIBLE_MODE);
+					  u->nick, UMODE_CH_BOT);
 			}
 			break;
 #endif
 #endif
-#ifdef SERVICESADMIN_MODE
-		case SERVICESADMIN_MODE:
+#ifdef UMODE_CH_SADMIN
+		case UMODE_CH_SADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_servicesadmin,
-					  u->nick, SERVICESADMIN_MODE);
+					  u->nick, UMODE_CH_SADMIN);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_servicesadminoff,
-					  u->nick, SERVICESADMIN_MODE);
+					  u->nick, UMODE_CH_SADMIN);
 			}
 			break;
 #endif
-#ifdef OPER_MODE
-		case OPER_MODE:
+#ifdef UMODE_CH_OPER
+		case UMODE_CH_OPER:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_globop,
-					  u->nick, OPER_MODE, u->server->name);
+					  u->nick, UMODE_CH_OPER, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_globopoff,
-					  u->nick, OPER_MODE, u->server->name);
+					  u->nick, UMODE_CH_OPER, u->server->name);
 			}
 			break;
 #endif
-#ifdef LOCOP_MODE
-		case LOCOP_MODE:
+#ifdef UMODE_CH_LOCOP
+		case UMODE_CH_LOCOP:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_locop,
-					  u->nick, LOCOP_MODE, u->server->name);
+					  u->nick, UMODE_CH_LOCOP, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_locopoff,
-					  u->nick, LOCOP_MODE, u->server->name);
+					  u->nick, UMODE_CH_LOCOP, u->server->name);
 			}
 			break;
 #endif
-#ifdef NETSERVICE_MODE
-		case NETSERVICE_MODE:
+#ifdef UMODE_CH_SERVICES
+		case UMODE_CH_SERVICES:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_netservice,
-					  u->nick, NETSERVICE_MODE);
+					  u->nick, UMODE_CH_SERVICES);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_netserviceoff,
-					  u->nick, NETSERVICE_MODE);
+					  u->nick, UMODE_CH_SERVICES);
 			}
 			break;
 #endif
@@ -558,94 +547,94 @@ static int cs_user_smodes(char **av, int ac)
 		case '-':
 			add = 0;
 			break;
-#ifdef NETADMIN_MODE
-		case NETADMIN_MODE:
+#ifdef UMODE_CH_NETADMIN
+		case UMODE_CH_NETADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_netadmin,
-					  u->nick, NETADMIN_MODE);
+					  u->nick, UMODE_CH_NETADMIN);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_netadminoff,
-					  u->nick, NETADMIN_MODE);
+					  u->nick, UMODE_CH_NETADMIN);
 			}
 			break;
 #endif
-#ifdef CONETADMIN_MODE
-		case CONETADMIN_MODE:
+#ifdef UMODE_CH_CONETADMIN
+		case UMODE_CH_CONETADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_conetadmin,
-					  u->nick, CONETADMIN_MODE);
+					  u->nick, UMODE_CH_CONETADMIN);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_conetadminoff,
-					  u->nick, CONETADMIN_MODE);
+					  u->nick, UMODE_CH_CONETADMIN);
 			}
 			break;
 #endif
-#ifdef TECHADMIN_MODE
-		case TECHADMIN_MODE:
+#ifdef UMODE_CH_TECHADMIN
+		case UMODE_CH_TECHADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_techadmin,
-					  u->nick, TECHADMIN_MODE);
+					  u->nick, UMODE_CH_TECHADMIN);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_techadminoff,
-					  u->nick, TECHADMIN_MODE);
+					  u->nick, UMODE_CH_TECHADMIN);
 			}
 			break;
 #endif
-#ifdef COTECHADMIN_MODE
-		case COTECHADMIN_MODE:
+#ifdef UMODE_CH_COTECHADMIN
+		case UMODE_CH_COTECHADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_cotechadmin,
-					  u->nick, COTECHADMIN_MODE);
+					  u->nick, UMODE_CH_COTECHADMIN);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_cotechadminoff,
-					  u->nick, COTECHADMIN_MODE);
+					  u->nick, UMODE_CH_COTECHADMIN);
 			}
 			break;
 #endif
-#ifdef SERVERADMIN_MODE
-		case SERVERADMIN_MODE:
+#ifdef UMODE_CH_ADMIN
+		case UMODE_CH_ADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_serveradmin,
-					  u->nick, SERVERADMIN_MODE, u->server->name);
+					  u->nick, UMODE_CH_ADMIN, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_serveradminoff,
-					  u->nick, SERVERADMIN_MODE, u->server->name);
+					  u->nick, UMODE_CH_ADMIN, u->server->name);
 			}
 			break;
 #endif
-#ifdef COSERVERADMIN_MODE
-		case COSERVERADMIN_MODE:
+#ifdef UMODE_CH_COADMIN
+		case UMODE_CH_COADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_coserveradmin,
-					  u->nick,COSERVERADMIN_MODE,  u->server->name);
+					  u->nick,UMODE_CH_COADMIN,  u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_coserveradminoff,
-					  u->nick, COSERVERADMIN_MODE, u->server->name);
+					  u->nick, UMODE_CH_COADMIN, u->server->name);
 			}
 			break;
 #endif
-#ifdef GUESTADMIN_MODE
-		case GUESTADMIN_MODE:
+#ifdef UMODE_CH_GUESTADMIN
+		case UMODE_CH_GUESTADMIN:
 			if (add) {
 				chanalert(s_ConnectServ,
 					msg_guestadmin,
-					  u->nick, GUESTADMIN_MODE, u->server->name);
+					  u->nick, UMODE_CH_GUESTADMIN, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
 					msg_guestadminoff,
-					  u->nick, GUESTADMIN_MODE, u->server->name);
+					  u->nick, UMODE_CH_GUESTADMIN, u->server->name);
 			}
 			break;
 #endif

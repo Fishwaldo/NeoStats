@@ -82,6 +82,16 @@
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
 
+/* Temp for backwards compatibility 
+ * HAVE_TOKEN_SUP renamed to GOTTOKENSUPPORT so it matches other
+ * feature set defines.
+ */
+#ifdef GOTTOKENSUPPORT
+#define HAVE_TOKEN_SUP
+#else
+#undef HAVE_TOKEN_SUP
+#endif
+
 #include "numeric.h"
 
 /**  this is a security hack to give the coders the right levels to debug NeoStats. 

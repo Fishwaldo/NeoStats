@@ -36,7 +36,7 @@ static int ss_stats(User * u, char **av, int ac);
 static int ss_tld(User * u, char **av, int ac);
 static int ss_tld_map(User * u, char **av, int ac);
 static int ss_operlist(User * u, char **av, int ac);
-#ifdef HAVE_BOT_MODE
+#ifdef GOTBOTMODE
 static int ss_botlist(User * u, char **av, int ac);
 #endif
 static int ss_version(User * u, char **av, int ac);
@@ -65,7 +65,7 @@ ModuleInfo __module_info = {
 
 Functions __module_functions[] = {
 	{MSG_VERSION, new_m_version, 1},
-#ifdef HAVE_TOKEN_SUP
+#ifdef GOTTOKENSUPPORT
 	{TOK_VERSION, new_m_version, 1},
 #endif
 	{NULL, NULL, 0}
@@ -258,7 +258,7 @@ bot_cmd ss_commands[]=
 	{"TLD",				ss_tld,			1, 	NS_ULEVEL_OPER,		ss_help_tld, 		 	ss_help_tld_oneline},
 	{"TLDMAP",			ss_tld_map,		0, 	NS_ULEVEL_OPER,		ss_help_tldmap, 	 	ss_help_tldmap_oneline},
 	{"OPERLIST",		ss_operlist,	0, 	NS_ULEVEL_OPER,		ss_help_operlist, 	 	ss_help_operlist_oneline},
-#ifdef HAVE_BOT_MODE																	
+#ifdef GOTBOTMODE																	
 	{"BOTLIST",			ss_botlist,		0, 	NS_ULEVEL_OPER,		ss_help_botlist, 	 	ss_help_botlist_oneline},
 #endif																						
 	{"CLIENTVERSIONS",	ss_clientversions,0,NS_ULEVEL_OPER,		ss_help_clientversions, ss_help_clientversions_oneline},
@@ -966,7 +966,7 @@ static int ss_operlist(User * u, char **av, int ac)
 }
 
 
-#ifdef HAVE_BOT_MODE
+#ifdef GOTBOTMODE
 static int ss_botlist(User * u, char **av, int ac)
 {
 	register int j = 0;

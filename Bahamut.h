@@ -25,20 +25,23 @@
 #ifndef BAHAMUT_H
 #define BAHAMUT_H
 
-/* we support tokens */
-#undef HAVE_TOKEN_SUP
+/* Feature support for use by modules to determine whether
+ * certain functionality is available
+ */
 
-/* we dont have svshost support */
+/* we don't support tokens */
+#undef GOTTOKENSUPPORT
+/* we don't have svshost support */
 #undef GOTSVSHOST 
-
 /* we don't have svsjoin support */
 #undef GOTSVSJOIN 
+/* we don't have bot mode support */
+#undef GOTBOTMODE
 
-
-/* Moved from connectserv so we can use elsewhere */
-#define LOCOP_MODE 'O'
-#define OPER_MODE 'o'
-#define SERVERADMIN_MODE 'a'
+/* IRCD Specific mode chars */
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_ADMIN 'a'
 
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define MSG_WHO		"WHO"	/* WHO  -> WHOC */
@@ -214,7 +217,6 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_OPERONLY)))
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
-#undef HAVE_BOT_MODE
 #define is_bot(x) (0)
 #define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_RGSTRONLY) || CheckChanMode(x, MODE_OPERONLY) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_KEY)))
 

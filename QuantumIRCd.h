@@ -25,27 +25,31 @@
 #ifndef QUANTUM_H
 #define QUANTUM_H
 
-/* we support tokens */
-#define HAVE_TOKEN_SUP
+/* Feature support for use by modules to determine whether
+ * certain functionality is available
+ */
 
+/* we support tokens */
+#define GOTTOKENSUPPORT
 /* we have vhost support */
 #define GOTSVSVHOST
-
 /* we dont have svsjoin */
 #undef GOTSVSJOIN
+/* we don't have bot mode support */
+#undef GOTBOTMODE
 
-/* Moved from connectserv so we can use elsewhere */
-#define LOCOP_MODE 'O'
-#define OPER_MODE 'o'
-#define GUESTADMIN_MODE 'G'
-#define COSERVERADMIN_MODE 'J'
-#define SERVERADMIN_MODE 'A'
-#define CONETADMIN_MODE 'n'
-#define NETADMIN_MODE 'N'
-#define COTECHADMIN_MODE 't'
-#define TECHADMIN_MODE 'T'		/* Set to a number as we dont use */
-#define SERVICESADMIN_MODE 'a'
-#define NETSERVICE_MODE 'S'
+/* IRCD Specific mode chars */
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_GUESTADMIN 'G'
+#define UMODE_CH_COADMIN 'J'
+#define UMODE_CH_ADMIN 'A'
+#define UMODE_CH_CONETADMIN 'n'
+#define UMODE_CH_NETADMIN 'N'
+#define UMODE_CH_COTECHADMIN 't'
+#define UMODE_CH_TECHADMIN 'T'		
+#define UMODE_CH_SADMIN 'a'
+#define UMODE_CH_SERVICES 'S'
 
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"	/* 33 */
@@ -410,7 +414,6 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-#undef HAVE_BOT_MODE
 #define is_bot(x) (0)
 #define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_ADMONLY) || CheckChanMode(x, MODE_OPERONLY) || CheckChanMode(x, MODE_KEY)))
 

@@ -25,43 +25,59 @@
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
 
-/* we support tokens */
-#define HAVE_TOKEN_SUP
-
-/* we have vhost support */
-#define GOTSVSVHOST
+/* Feature support for use by modules to determine whether
+ * certain functionality is available
+ */
 
 #ifdef ULTIMATE3
 
+/* we support tokens */
+#define GOTTOKENSUPPORT
+/* we have vhost support */
+#define GOTSVSVHOST
 /* we have svsjoin from a30 onwards */
 #define GOTSVSJOIN
+/* we don't have bot mode support */
+#undef GOTBOTMODE
 
-/* Moved from connectserv so we can use elsewhere */
-#define LOCOP_MODE 'O'
-#define OPER_MODE 'o'
-#define GUESTADMIN_MODE 'G'
-#define COSERVERADMIN_MODE 'J'
-#define SERVERADMIN_MODE 'A'
-#define CONETADMIN_MODE 'n'
-#define NETADMIN_MODE 'N'
-#define COTECHADMIN_MODE 't'
-#define TECHADMIN_MODE 'T'		/* Set to a number as we dont use */
-#define SERVICESADMIN_MODE 'a'
-#define NETSERVICE_MODE 'S'
-#else
+#else /* !ULTIMATE3 */
+
+/* we support tokens */
+#define GOTTOKENSUPPORT
+/* we have vhost support */
+#define GOTSVSVHOST
 /* old Ultimate2 doesn't have svsjoin */
 #undef SVSJOIN
-/* Moved from connectserv so we can use elsewhere */
-#define LOCOP_MODE 'O'
-#define OPER_MODE 'o'
-#define COSERVERADMIN_MODE 'J'
-#define SERVERADMIN_MODE 'A'
-#define CONETADMIN_MODE 't'
-#define NETADMIN_MODE 'N'
-#define TECHADMIN_MODE 'T'
-#define SERVICESADMIN_MODE 'P'
-#define NETSERVICE_MODE 'S'
-#define BOT_MODE 'B'
+/* we have bot mode support */
+#define GOTBOTMODE
+
+#endif /* ULTIMATE3 */
+
+/* IRCD Specific mode chars */
+#ifdef ULTIMATE3
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_GUESTADMIN 'G'
+#define UMODE_CH_COADMIN 'J'
+#define UMODE_CH_ADMIN 'A'
+#define UMODE_CH_CONETADMIN 'n'
+#define UMODE_CH_NETADMIN 'N'
+#define UMODE_CH_COTECHADMIN 't'
+#define UMODE_CH_TECHADMIN 'T'		/* Set to a number as we dont use */
+#define UMODE_CH_SADMIN 'a'
+#define UMODE_CH_SERVICES 'S'
+#else
+/* IRCD Specific mode chars */
+#define UMODE_CH_LOCOP 'O'
+#define UMODE_CH_OPER 'o'
+#define UMODE_CH_COADMIN 'J'
+#define UMODE_CH_ADMIN 'A'
+#define UMODE_CH_CONETADMIN 't'
+#define UMODE_CH_NETADMIN 'N'
+#define UMODE_CH_TECHADMIN 'T'
+#define UMODE_CH_SADMIN 'P'
+#define UMODE_CH_SERVICES 'S'
+#define UMODE_CH_BOT 'B'
 #endif
 
 
@@ -441,10 +457,8 @@
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
 #ifdef ULTIMATE3
-#undef HAVE_BOT_MODE
 #define is_bot(x) (0)
 #else /* !ULTIMATE3 */
-#define HAVE_BOT_MODE
 #define is_bot(x) ((x) && ((x->Umode & UMODE_RBOT) || (x->Umode & UMODE_SBOT)))
 #endif /* ULTIMATE3 */
 #define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_KEY) || CheckChanMode(x, MODE_RGSTRONLY) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_ADMONLY) || CheckChanMode(x, MODE_OPERONLY) ))
