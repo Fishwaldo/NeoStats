@@ -249,6 +249,7 @@ int s_user_modes(char **av, int ac) {
 		switch(*modes) {
 			case '+': add = 1;	break;
 			case '-': add = 0;	break;
+			case 'O':
 			case 'o':
 				if (add) {
 					IncreaseOpers(findstats(u->server->name));
