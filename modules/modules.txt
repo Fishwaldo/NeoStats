@@ -145,12 +145,11 @@ configuration and starting databases.
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
+
 int ModInit( void )
 {
 	return NS_SUCCESS;
 }
-
-The function is passed a pointer to the module structure.
 
 ModSynch is called when your module is able to send over IRC so is
 where you would init a bot if you wanted one.
