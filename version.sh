@@ -7,7 +7,7 @@ if test -r version.h
 then
 	idold=`sed -n 's/^#define NEOSTATS_REVISION \"\(.*\)\"/\1/p' < version.h`
 #	echo "$idold"
-	if [ "$idold" = "$id" ]; 
+	if [ "$idold" = "$id" ] 
 	then 
 		echo "version.h up to date"
 	else
