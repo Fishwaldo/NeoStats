@@ -12,7 +12,7 @@ all:	 ${OBJS}
 .c.o:	
 	 $(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-dftables.o: dftables.c maketables.c internal.h ../pcre.h config.h Makefile
+dftables.o: dftables.c maketables.c internal.h ../pcre.h ../config.h Makefile
 	$(CC) $(CFLAGS) $(INCLUDES) -c dftables.c
 
 dftables:       dftables.o
@@ -22,10 +22,10 @@ chartables.c:   dftables
 	./dftables >./chartables.c
 
 clean:
-	 $(RM) *.o Makefile dftables ../pcre.h chartables.c config.h *.exe
+	 $(RM) *.o dftables ../pcre.h chartables.c *.exe
 
 distclean:
-	 $(RM) *.o Makefile dftables ../pcre.h chartables.c config.h *.exe
+	 $(RM) *.o dftables ../pcre.h chartables.c *.exe
 
 install: 
 
