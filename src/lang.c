@@ -80,7 +80,7 @@ static void LANGDebug(char *file, int line, char *func, int err, char *fmt, ...)
 		return;
 	}
 	va_start(ap, fmt);
-	vircsnprintf(buf, 800, fmt, ap);
+	ircsnprintf(buf, 800, fmt, ap);
 	va_end(ap);
 	ircsnprintf(buf2, 1024, "%s:%d(%s): %s", file, line, func, buf);
 	if (lang_info.debugfunc) {
