@@ -343,12 +343,8 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 #define MOD_PATH		"modules"
 #define RECV_LOG		"logs/recv.log"
 
-#ifndef BASE64SERVERSIZE
 #define BASE64SERVERSIZE	2
-#endif
-#ifndef BASE64NICKSIZE
 #define BASE64NICKSIZE		5
-#endif
 
 #define BUFSIZE			512
 

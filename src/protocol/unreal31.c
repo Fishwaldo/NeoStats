@@ -50,7 +50,6 @@ static void m_vhost (char *origin, char **argv, int argc, int srv);
 static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_netinfo (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
-static void m_pass (char *origin, char **argv, int argc, int srv);
 static void m_svsnick (char *origin, char **argv, int argc, int srv);
 static void m_protocol (char *origin, char **argv, int argc, int srv);
 static void m_whois (char *origin, char **argv, int argc, int srv);
@@ -718,14 +717,6 @@ static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
 	do_sjoin (argv[0], argv[1], ((argc >= 4) ? argv[2] : ""), origin, argv, argc);
-}
-
-/* m_pass
- *	argv[0] = password
- */
-static void
-m_pass (char *origin, char **argv, int argc, int srv)
-{
 }
 
 /* m_svsnick

@@ -43,7 +43,6 @@ static void m_join (char *origin, char **argv, int argc, int srv);
 static void m_part (char *origin, char **argv, int argc, int srv);
 static void m_stats (char *origin, char **argv, int argc, int srv);
 static void m_ping (char *origin, char **argv, int argc, int srv);
-static void m_pass (char *origin, char **argv, int argc, int srv);
 static void m_svinfo (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
@@ -475,11 +474,6 @@ static void
 m_svinfo (char *origin, char **argv, int argc, int srv)
 {
 	do_svinfo ();
-}
-
-static void
-m_pass (char *origin, char **argv, int argc, int srv)
-{
 }
 
 /* Topic Bursting for NeoIRCD */

@@ -45,6 +45,11 @@ typedef struct ircd_sym {
 	unsigned int feature;
 } ircd_sym;
 
+typedef struct protocol_entry {
+	char *token;
+	unsigned int flag;
+} protocol_entry;
+
 #define MOTD_FILENAME	"neostats.motd"
 #define ADMIN_FILENAME	"neostats.admin"
 
@@ -99,6 +104,17 @@ static void (*irc_send_svstime) (const char *source, const unsigned long ts);
 static void (*irc_send_setname) (const char* nick, const char* realname);
 static void (*irc_send_sethost) (const char* nick, const char* host);
 static void (*irc_send_setident) (const char* nick, const char* ident);
+
+protocol_entry protocol_list[] =
+{
+	{"TOKEN",	PROTOCOL_TOKEN},
+	{"CLIENT",	PROTOCOL_CLIENT},
+	{"UNKLN",	PROTOCOL_UNKLN},
+	{"NOQUIT",	PROTOCOL_NOQUIT},
+	{"NICKIP",	PROTOCOL_NICKIP},
+	{"NICKv2",	PROTOCOL_NICKv2},
+	{NULL, 0}
+};
 
 static ircd_sym ircd_sym_table[] = 
 {
@@ -286,6 +302,19 @@ InitIrcd (void)
 	return NS_SUCCESS;
 }
 
+/** @brief process PASS
+ *
+ * m_pass
+ *	argv[0] = password
+ *
+ * @return none
+ */
+void 
+m_pass (char* origin, char **av, int ac, int cmdptr)
+{
+	
+}
+
 /** @brief process notice
  *
  * 
@@ -453,8 +482,7 @@ parse (char *line)
  *
  * @return none
  */
-static void
-unsupported_cmd (const char* cmd)
+static void unsupported_cmd (const char* cmd)
 {
 	irc_chanalert (ns_botptr, _("Warning, %s tried to %s which is not supported"), GET_CUR_MODNAME(), cmd);
 	nlog (LOG_NOTICE, "Warning, %s tried to %s, which is not supported", GET_CUR_MODNAME(), cmd);
@@ -1455,41 +1483,21 @@ do_stats (const char* nick, const char *what)
 	irc_chanalert (ns_botptr, _("%s Requested Stats %s"), u->name, what);
 };
 
-void
-do_protocol (char *origin, char **argv, int argc)
+void do_protocol (char *origin, char **argv, int argc)
 {
+	protocol_entry *protocol_ptr;
 	int i;
 
 	for (i = 0; i < argc; i++) {
-		if (!ircstrcasecmp ("TOKEN", argv[i])) {
-			if (protocol_info->optprotocol&PROTOCOL_TOKEN) {
-				ircd_srv.protocol |= PROTOCOL_TOKEN;
+		protocol_ptr = protocol_list;
+		while (protocol_ptr->token)
+		{
+			if (!ircstrcasecmp (protocol_ptr->token, argv[i])) {
+				if (protocol_info->optprotocol&protocol_ptr->flag) {
+					ircd_srv.protocol |= protocol_ptr->flag;
+					break;
+				}
 			}
-		}
-		else if (!ircstrcasecmp ("CLIENT", argv[i])) {
-			if (protocol_info->optprotocol&PROTOCOL_CLIENT) {
-				ircd_srv.protocol |= PROTOCOL_CLIENT;
-			}
-		}
-		else if (!ircstrcasecmp ("UNKLN", argv[i])) {
-			if (protocol_info->optprotocol&PROTOCOL_UNKLN) {
-				ircd_srv.protocol |= PROTOCOL_UNKLN;
-			}
-		}
-		else if (!ircstrcasecmp ("NOQUIT", argv[i])) {
-			if (protocol_info->optprotocol&PROTOCOL_NOQUIT) {
-				ircd_srv.protocol |= PROTOCOL_NOQUIT;
-			}			
-		}
-		else if (!ircstrcasecmp ("NICKIP", argv[i])) {
-			if (protocol_info->optprotocol&PROTOCOL_NICKIP) {
-				ircd_srv.protocol |= PROTOCOL_NICKIP;
-			}			
-		}
-		else if (!ircstrcasecmp ("NICKv2", argv[i])) {
-			if (protocol_info->optprotocol&PROTOCOL_NICKv2) {
-				ircd_srv.protocol |= PROTOCOL_NICKv2;
-			}			
 		}
 	}
 }
@@ -1736,7 +1744,7 @@ do_away (const char* nick, const char *reason)
 void 
 do_vhost (const char* nick, const char *vhost)
 {
-	SetUserVhost(nick, vhost);
+	SetUserVhost (nick, vhost);
 }
 
 void

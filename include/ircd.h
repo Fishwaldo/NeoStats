@@ -97,8 +97,11 @@ EXPORTFUNC void process_ircd_cmd (int cmdptr, char *cmd, char *origin, char **av
 
 /* IRCD protocol module API */
 EXPORTFUNC int init_services_bot (void);
+
 EXPORTFUNC void m_private (char *origin, char **av, int ac, int cmdptr);
 EXPORTFUNC void m_notice (char *origin, char **av, int ac, int cmdptr);
+EXPORTFUNC void m_pass (char *origin, char **av, int ac, int cmdptr);
+
 EXPORTFUNC void do_motd (const char *nick, const char *remoteserver);
 EXPORTFUNC void do_admin (const char *nick, const char *remoteserver);
 EXPORTFUNC void do_credits (const char *nick, const char *remoteserver);

@@ -32,9 +32,6 @@
 /* #define NEFARIOUS */
 /* #define ASUKA */
 
-#define BASE64SERVERSIZE	2
-#define BASE64NICKSIZE		5
-
 /* Messages/Tokens */
 
 #define MSG_PRIVATE             "PRIVMSG"       /* PRIV */

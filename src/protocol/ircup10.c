@@ -53,7 +53,6 @@ static void m_create (char *origin, char **argv, int argc, int srv);
 static void m_part (char *origin, char **argv, int argc, int srv);
 static void m_stats (char *origin, char **argv, int argc, int srv);
 static void m_ping (char *origin, char **argv, int argc, int srv);
-static void m_pass (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_end_of_burst (char *origin, char **argv, int argc, int srv);
 
@@ -691,11 +690,6 @@ static void
 m_ping (char *origin, char **argv, int argc, int srv)
 {
 	do_ping (base64toserver(origin), argv[1]);
-}
-
-static void
-m_pass (char *origin, char **argv, int argc, int srv)
-{
 }
 
 /*

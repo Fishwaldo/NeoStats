@@ -35,9 +35,7 @@
 #include "users.h"
 #include "ctcp.h"
 
-
-#define BOT_TABLE_SIZE	100	/* Number of Bots */
-#define MAX_CMD_LINE_LENGTH		350
+#define BOT_TABLE_SIZE		100		/* Max number of bots */
 
 /* @brief Module Bot hash list */
 static hash_t *bothash;
@@ -51,7 +49,7 @@ static hash_t *bothash;
 int InitBots (void)
 {
 	bothash = hash_create (BOT_TABLE_SIZE, 0, 0);
-	if(!bothash) {
+	if (!bothash) {
 		nlog (LOG_CRITICAL, "Unable to create bot hash");
 		return NS_FAILURE;
 	}
@@ -66,7 +64,7 @@ int InitBots (void)
  */
 int FiniBots (void)
 {
-	hash_destroy(bothash);
+	hash_destroy (bothash);
 	return NS_SUCCESS;
 }
 
@@ -113,17 +111,17 @@ flood_test (Client * u)
  *
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
-int process_origin(CmdParams * cmdparams, char *origin)
+int process_origin (CmdParams * cmdparams, char *origin)
 {
 	cmdparams->source = find_user (origin);
-	if(cmdparams->source) {
+	if (cmdparams->source) {
 		if (flood_test (cmdparams->source)) {
 			return NS_FALSE;
 		}
 		return NS_TRUE;
 	}
 	cmdparams->source = find_server (origin);
-	if(cmdparams->source) {
+	if (cmdparams->source) {
 		return NS_TRUE;
 	}
 	return NS_FALSE;
@@ -138,12 +136,12 @@ int process_origin(CmdParams * cmdparams, char *origin)
  *
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
-int process_target_user(CmdParams * cmdparams, char *target)
+int process_target_user (CmdParams * cmdparams, char *target)
 {
 	cmdparams->target = find_user (target);
-	if(cmdparams->target) {
+	if (cmdparams->target) {
 		cmdparams->bot = cmdparams->target->user->bot;
-		if(cmdparams->bot) {
+		if (cmdparams->bot) {
 			return NS_TRUE;
 		}
 	}
@@ -160,10 +158,10 @@ int process_target_user(CmdParams * cmdparams, char *target)
  *
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
-int process_target_chan(CmdParams * cmdparams, char *target)
+int process_target_chan (CmdParams * cmdparams, char *target)
 {
 	cmdparams->channel = find_chan(target);
-	if(cmdparams->channel) {
+	if (cmdparams->channel) {
 		return NS_TRUE;
 	}
 	dlog(DEBUG1, "cmdparams->channel: chan %s not found", target);
@@ -197,7 +195,7 @@ bot_chan_event (Event event, CmdParams* cmdparams)
 
 				chan = (char *) lnode_get (cm);
 				cmdparams->bot = botptr;
-				if (ircstrcasecmp(cmdparams->channel->name, chan) == 0) {
+				if (ircstrcasecmp (cmdparams->channel->name, chan) == 0) {
 					if (cmdparams->param[0] == config.cmdchar[0]) {
 						/* skip over command char */
 						cmdparams->param ++;
@@ -229,7 +227,7 @@ void bot_notice (char *origin, char **av, int ac)
 	SET_SEGV_LOCATION();
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	/* Check origin validity */
-	if(process_origin(cmdparams, origin)) {
+	if (process_origin(cmdparams, origin)) {
 		/* Find target bot */
 		if (process_target_user(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
@@ -241,7 +239,6 @@ void bot_notice (char *origin, char **av, int ac)
 		}		
 	}
 	ns_free (cmdparams);
-
 }
 
 /** @brief send a message to a bot
@@ -258,8 +255,8 @@ void bot_chan_notice (char *origin, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	if(process_origin(cmdparams, origin)) {
-		if(process_target_chan(cmdparams, av[0])) {
+	if (process_origin(cmdparams, origin)) {
+		if (process_target_chan(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
 			if (av[ac - 1][0] == '\1') {
 				ctcp_cnotice (cmdparams);
@@ -285,7 +282,7 @@ void bot_private (char *origin, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	if(process_origin(cmdparams, origin)) {
+	if (process_origin(cmdparams, origin)) {
 		/* Find target bot */
 		if (process_target_user(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
@@ -295,7 +292,7 @@ void bot_private (char *origin, char **av, int ac)
 				return;
 			} 			
 			if ((cmdparams->bot->flags & BOT_FLAG_SERVICEBOT)) {
-				if(run_bot_cmd (cmdparams) != NS_FAILURE) {
+				if (run_bot_cmd (cmdparams) != NS_FAILURE) {
 					ns_free (cmdparams);
 					return;
 				}
@@ -320,8 +317,8 @@ void bot_chan_private (char *origin, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	if(process_origin(cmdparams, origin)) {
-		if(process_target_chan(cmdparams, av[0])) {
+	if (process_origin(cmdparams, origin)) {
+		if (process_target_chan(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
 			if (av[ac - 1][0] == '\1') {
 				ctcp_cprivate (cmdparams);
@@ -339,8 +336,7 @@ void bot_chan_private (char *origin, char **av, int ac)
  * 
  * @return none
  */
-static Bot *
-new_bot (const char *bot_name)
+static Bot *new_bot (const char *bot_name)
 {
 	Bot *botptr;
 
@@ -365,15 +361,14 @@ new_bot (const char *bot_name)
  *
  *  @return pointer to bot or NULL if not found
  */
-Bot *
-add_bot (Module* modptr, const char *nick)
+Bot *add_bot (Module* modptr, const char *nick)
 {
 	Bot *botptr;
 
 	SET_SEGV_LOCATION();
 	/* add a brand new user */
 	botptr = new_bot (nick);
-	if(botptr) {
+	if (botptr) {
 		botptr->moduleptr = modptr;
 		botptr->set_ulevel = NS_ULEVEL_ROOT;
 		return botptr;
@@ -390,8 +385,7 @@ add_bot (Module* modptr, const char *nick)
  *
  *  @return pointer to bot or NULL if not found
  */
-Bot *
-find_bot (const char *bot_name)
+Bot *find_bot (const char *bot_name)
 {
 	Bot* bot;
 
@@ -411,8 +405,7 @@ find_bot (const char *bot_name)
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int
-del_bot (const char *bot_name)
+int del_bot (const char *bot_name)
 {
 	Bot *botptr;
 	hnode_t *bn;
@@ -441,8 +434,7 @@ del_bot (const char *bot_name)
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int
-bot_nick_change (const Bot *botptr, const char *newnick)
+int bot_nick_change (const Bot *botptr, const char *newnick)
 {
 	hnode_t *bn;
 
@@ -469,8 +461,7 @@ bot_nick_change (const Bot *botptr, const char *newnick)
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int
-ns_cmd_botlist (CmdParams* cmdparams)
+int ns_cmd_botlist (CmdParams* cmdparams)
 {
 	int i;
 	lnode_t *cm;
@@ -483,7 +474,7 @@ ns_cmd_botlist (CmdParams* cmdparams)
 	hash_scan_begin (&bs, bothash);
 	while ((bn = hash_scan_next (&bs)) != NULL) {
 		botptr = hnode_get (bn);
-		if((botptr->flags & 0x80000000)) {
+		if ((botptr->flags & 0x80000000)) {
 			irc_prefmsg (ns_botptr, cmdparams->source, __("NeoStats", cmdparams->source));
 			irc_prefmsg (ns_botptr, cmdparams->source, __("Bot: %s", cmdparams->source), botptr->name);
 		} else {
@@ -493,7 +484,7 @@ ns_cmd_botlist (CmdParams* cmdparams)
 		cm = list_first (botptr->u->user->chans);
 		i = 0;
 		while (cm) {
-			if(i==0) {
+			if (i==0) {
 				irc_chanalert (ns_botptr, _("Channels: %s"), (char *) lnode_get (cm));
 			} else {
 				irc_chanalert (ns_botptr, "          %s", (char *) lnode_get (cm));
@@ -548,7 +539,7 @@ Bot *init_bot (BotInfo* botinfo)
 
 	SET_SEGV_LOCATION();
 	modptr = GET_CUR_MODULE();
-	if(!modptr->insynch) {
+	if (!modptr->insynch) {
 		nlog (LOG_WARNING, "Module %s attempted to init a bot %s but is not yet synched", modptr->info->name, botinfo->nick);
 		modptr->error = 1;
 		return NULL;
@@ -557,7 +548,7 @@ Bot *init_bot (BotInfo* botinfo)
 	 * can only use one bot, if we have initialised the main bot just add all 
 	 * commands and settings to it 
 	 */
-	if(config.singlebotmode && ns_botptr) {
+	if (config.singlebotmode && ns_botptr) {
 		if (botinfo->bot_cmd_list) {
 			SET_RUN_LEVEL(modptr);
 			add_bot_cmd_list (ns_botptr, botinfo->bot_cmd_list);
@@ -573,9 +564,9 @@ Bot *init_bot (BotInfo* botinfo)
 	nick = botinfo->nick;
 	if (find_user (nick)) {
 		nlog (LOG_WARNING, "Bot nick %s already in use", botinfo->nick);
-		if(botinfo->altnick) {
+		if (botinfo->altnick) {
 			nick = botinfo->altnick;
-			if(find_user (nick)) {
+			if (find_user (nick)) {
 				nlog (LOG_WARNING, "Bot alt nick %s already in use", botinfo->altnick);
 				/* TODO: try and find a free nick */
 				nlog (LOG_WARNING, "Unable to init bot");
@@ -592,12 +583,12 @@ Bot *init_bot (BotInfo* botinfo)
 		nlog (LOG_WARNING, "add_bot failed for module %s bot %s", modptr->info->name, nick);
 		return NULL;
 	}
-	host = ((*botinfo->host)==0?me.name:botinfo->host);
+	host = ((*botinfo->host) == 0 ? me.name : botinfo->host);
 	/* For more efficient transversal of bot/user lists, link 
 	 * associated user struct to bot and link bot into user struct */
 	botptr->u = AddUser (nick, botinfo->user, host, botinfo->realname, me.name, NULL, NULL, NULL);
 	botptr->u->user->bot = botptr;
-	if(botinfo->flags&BOT_FLAG_SERVICEBOT) {
+	if (botinfo->flags&BOT_FLAG_SERVICEBOT) {
 		irc_nick (nick, botinfo->user, host, botinfo->realname, me.servicesumode);
 		UserMode (nick, me.servicesumode);
 		if (config.joinserviceschan) {
@@ -635,6 +626,12 @@ Bot *init_bot (BotInfo* botinfo)
 	return botptr;
 }
 
+/** @brief handle_dead_channel
+ *
+ *  remove bots from dead channel
+ *
+ *  @return none
+ */
 void handle_dead_channel (Channel *c)
 {
 	CmdParams* cmdparams;
@@ -645,12 +642,13 @@ void handle_dead_channel (Channel *c)
 	char *chan;
 
 	SET_SEGV_LOCATION();
-	if (ircstrcasecmp(c->name, me.serviceschan) == 0) {
+	if (ircstrcasecmp (c->name, me.serviceschan) == 0) {
 		/* Services channel so ignore */
 		return;
 	}
 	if (c->persistentusers) {
 		/* Channel has persistent bot(s) so ignore */
+		return;
 	}
 	hash_scan_begin (&bs, bothash);
 	cmdparams = ns_calloc (sizeof (CmdParams));

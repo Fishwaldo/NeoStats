@@ -38,8 +38,7 @@
 static hash_t *channelhash;
 static char quitreason[BUFSIZE];
 
-static void
-ChanPartHandler (list_t * list, lnode_t * node, void *v)
+static void ChanPartHandler (list_t * list, lnode_t * node, void *v)
 {
 	part_chan ((Client *)v, lnode_get (node), quitreason[0] != 0 ? quitreason : NULL);
 }
@@ -172,7 +171,7 @@ del_chan (Channel * c)
 		nlog (LOG_WARNING, "del_chan: channel %s not found.", c->name);
 		return;
 	} else {
-		dlog(DEBUG2, "del_chan: deleting channel %s", c->name);
+		dlog (DEBUG2, "del_chan: deleting channel %s", c->name);
 		cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 		cmdparams->channel = c;
 		SendAllModuleEvent (EVENT_DELCHAN, cmdparams);
@@ -198,16 +197,40 @@ void del_chan_user (Channel *c, Client *u)
 {
 	lnode_t *un;
 
+	c->users--;
 	un = list_find (u->user->chans, c->name, comparef);
 	if (!un) {
 		nlog (LOG_WARNING, "del_chan_user: %s not found in channel %s", u->name, c->name);
 	} else {
 		lnode_destroy (list_delete (u->user->chans, un));
 	}
-	dlog(DEBUG3, "del_chan_user: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
+	dlog (DEBUG3, "del_chan_user: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 	if (c->users <= 0) {
 		del_chan (c);
+	} else if (c->neousers > 0 && c->neousers == c->users) {
+		/* all real users have left the channel */
+		handle_dead_channel (c);
 	}
+}
+
+/** @brief Remove chanmember
+ *
+ *
+ */
+int del_chanmember (Channel *c, Client *user)
+{
+	Chanmem *cm;
+	lnode_t *un;
+	
+	un = list_find (c->chanmembers, user->name, comparef);
+	if (!un) {
+		nlog (LOG_WARNING, "%s isn't a member of channel %s", user->name, c->name);
+		return NS_FAILURE;
+	}
+	cm = lnode_get (un);
+	lnode_destroy (list_delete (c->chanmembers, un));
+	ns_free (cm);
+	return NS_SUCCESS;
 }
 
 /** @brief Process a kick from a channel. 
@@ -225,30 +248,22 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 {
 	CmdParams * cmdparams;
 	Channel *c;
-	Chanmem *cm;
-	lnode_t *un;
 	Client *u;
 
 	SET_SEGV_LOCATION();
+	dlog (DEBUG2, "kick_chan: %s kicked %s from %s for %s", kickby, kicked, chan, kickreason ? kickreason : "no reason");
 	u = find_user (kicked);
 	if (!u) {
-		nlog (LOG_WARNING, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
+		nlog (LOG_WARNING, "kick_chan: user %s not found", kicked);
 		return;
 	}
-	dlog(DEBUG2, "kick_chan: %s kicking %s from %s for %s", kickby, u->name, chan, kickreason ? kickreason : "no reason");
 	c = find_chan (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "kick_chan: channel %s not found", chan);
 		return;
 	} 
-	un = list_find (c->chanmembers, u->name, comparef);
-	if (!un) {
-		nlog (LOG_WARNING, "kick_chan: %s isn't a member of channel %s", u->name, chan);
+	if (del_chanmember (c, u) != NS_SUCCESS)
 		return;
-	}
-	cm = lnode_get (un);
-	lnode_destroy (list_delete (c->chanmembers, un));
-	ns_free (cm);
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->target = u;
 	cmdparams->channel = c;
@@ -256,23 +271,15 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 	if (!cmdparams->source) {
 		cmdparams->source = find_server (kickby);
 	}
-	if (kickreason != NULL) {
-		cmdparams->param = (char*)kickreason;
-	}
+	cmdparams->param = (char*)kickreason;
 	SendAllModuleEvent (EVENT_KICK, cmdparams);
 	if (IsMe (u)) {
 		/* its one of our bots */
 		SendModuleEvent (EVENT_KICKBOT, cmdparams, u->user->bot->moduleptr);
 	}
-	/* If PROTOCOL_KICKPART then we will get a part aswell so 
-		* DO NOT REMOVE USER */
+	/* If PROTOCOL_KICKPART then we will also get part so DO NOT REMOVE USER */
 	if (!(ircd_srv.protocol & PROTOCOL_KICKPART)) {
-		c->users--;
 		del_chan_user (c, u);
-		if (c->neousers > 0 && c->neousers == c->users) {
-			/* all real users have left the channel */
-			handle_dead_channel (c);
-		}
 	}
 	ns_free (cmdparams);
 }
@@ -295,46 +302,31 @@ part_chan (Client * u, const char *chan, const char *reason)
 {
 	CmdParams * cmdparams;
 	Channel *c;
-	lnode_t *un;
-	Chanmem *cm;
 
 	SET_SEGV_LOCATION();
+	dlog (DEBUG2, "part_chan: parting %s from %s", u->name, chan);
 	if (!u) {
 		nlog (LOG_WARNING, "part_chan: trying to part NULL user from %s", chan);
 		return;
 	}
-	dlog(DEBUG2, "part_chan: parting %s from %s", u->name, chan);
 	c = find_chan (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "part_chan: channel %s not found", chan);
 		return;
 	}
-	un = list_find (c->chanmembers, u->name, comparef);
-	if (!un) {
-		nlog (LOG_WARNING, "part_chan: user %s isn't a member of channel %s", u->name, chan);
+	if (del_chanmember (c, u) != NS_SUCCESS)
 		return;
-	}
-	cm = lnode_get (un);
-	lnode_destroy (list_delete (c->chanmembers, un));
-	ns_free (cm);
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
 	cmdparams->source = u;
-	if (reason != NULL) {
-		cmdparams->param = (char*)reason;
-	}
+	cmdparams->param = (char*)reason;
 	SendAllModuleEvent (EVENT_PART, cmdparams);
 	if (IsMe (u)) {
 		/* its one of our bots */
 		SendModuleEvent (EVENT_PARTBOT, cmdparams, u->user->bot->moduleptr);
 		c->neousers --;
 	}
-	c->users--;
-	del_chan_user(c, u);
-	if (c->neousers > 0 && c->neousers == c->users) {
-		/* all real users have left the channel */
-		handle_dead_channel (c);
-	}
+	del_chan_user (c, u);
 	ns_free (cmdparams);
 }
 
@@ -361,7 +353,7 @@ ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 		nlog (LOG_WARNING, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
 		return;
 	}
-    dlog(DEBUG3, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
+    dlog (DEBUG3, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
 	strlcpy (cml->nick, newnick, MAXNICK);
 }
 
@@ -394,14 +386,14 @@ join_chan (const char* nick, const char *chan)
 	}
 	if (!ircstrcasecmp ("0", chan)) {
 		/* join 0 is actually part all chans */
-		dlog(DEBUG2, "join_chan: parting %s from all channels", u->name);
+		dlog (DEBUG2, "join_chan: parting %s from all channels", u->name);
 		PartAllChannels (u, NULL);
 		return;
 	}
 	c = find_chan (chan);
 	if (!c) {
 		/* its a new Channel */
-		dlog(DEBUG2, "join_chan: new channel %s", chan);
+		dlog (DEBUG2, "join_chan: new channel %s", chan);
 		c = new_chan (chan);
 	}
 	/* add this users details to the channel members hash */
@@ -409,7 +401,7 @@ join_chan (const char* nick, const char *chan)
 	strlcpy (cm->nick, u->name, MAXNICK);
 	cm->tsjoin = me.now;
 	cm->flags = 0;
-	dlog(DEBUG2, "join_chan: adding usernode %s to channel %s", u->name, chan);
+	dlog (DEBUG2, "join_chan: adding usernode %s to channel %s", u->name, chan);
 	if (list_find (c->chanmembers, u->name, comparef)) {
 		nlog (LOG_WARNING, "join_chan: tried to add %s to channel %s but they are already a member", u->name, chan);
 		return;
@@ -435,7 +427,7 @@ join_chan (const char* nick, const char *chan)
 	}
 	SendAllModuleEvent (EVENT_JOIN, cmdparams);
 	ns_free (cmdparams);
-	dlog(DEBUG3, "join_chan: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
+	dlog (DEBUG3, "join_chan: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 }
 
 /** @brief Dump Channel information
@@ -523,7 +515,7 @@ find_chan (const char *chan)
 
 	c = (Channel *)hnode_find (channelhash, chan);
 	if (!c) {
-		dlog(DEBUG3, "find_chan: %s not found", chan);
+		dlog (DEBUG3, "find_chan: %s not found", chan);
 	}
 	return c;
 }

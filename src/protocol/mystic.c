@@ -49,7 +49,6 @@ static void m_stats (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
 static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_snetinfo (char *origin, char **argv, int argc, int srv);
-static void m_pass (char *origin, char **argv, int argc, int srv);
 static void m_svsnick (char *origin, char **argv, int argc, int srv);
 static void m_protoctl (char *origin, char **argv, int argc, int srv);
 static void m_vctrl (char *origin, char **argv, int argc, int srv);
@@ -506,11 +505,6 @@ static void
 m_snetinfo (char *origin, char **argv, int argc, int srv)
 {
 	do_snetinfo(argv[0], argv[1], argv[2], argv[3], argv[7]);
-}
-
-static void
-m_pass (char *origin, char **argv, int argc, int srv)
-{
 }
 
 static void

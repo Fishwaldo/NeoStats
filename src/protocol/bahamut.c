@@ -45,7 +45,6 @@ static void m_join (char *origin, char **argv, int argc, int srv);
 static void m_part (char *origin, char **argv, int argc, int srv);
 static void m_stats (char *origin, char **argv, int argc, int srv);
 static void m_ping (char *origin, char **argv, int argc, int srv);
-static void m_pass (char *origin, char **argv, int argc, int srv);
 static void m_svsnick (char *origin, char **argv, int argc, int srv);
 static void m_protoctl (char *origin, char **argv, int argc, int srv);
 static void m_svinfo (char *origin, char **argv, int argc, int srv);
@@ -496,11 +495,6 @@ static void
 m_svinfo (char *origin, char **argv, int argc, int srv)
 {
 	do_svinfo ();
-}
-
-static void
-m_pass (char *origin, char **argv, int argc, int srv)
-{
 }
 
 static void
