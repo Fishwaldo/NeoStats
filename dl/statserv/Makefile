@@ -9,7 +9,7 @@ TARGET= statserv.so
 all:	statserv
 
 .c.o:
-	$(CC) -c $< $(CFLAGS) $(INCLUDES) 2>> make.log
+	$(CC) -c $< $(CFLAGS) $(INCLUDES)
 
 statserv: $(OBJECTS)
 	$(CC) -nostdlib -shared -o $(TARGET) $(LIBS) $(OBJECTS)
