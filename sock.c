@@ -32,11 +32,18 @@
 #include "conf.h"
 #include "log.h"
 
-void recvlog (char *line);
+static void recvlog (char *line);
 
-struct sockaddr_in lsa;
-int dobind;
+static struct sockaddr_in lsa;
+static int dobind;
 
+/** @brief Connect to a server
+ *
+ * @param host to connect to
+ * @param port on remote host to connect to
+ * 
+ * @return the socket connected to on success, or -1 on failure 
+ */
 int
 ConnectTo (char *host, int port)
 {
@@ -85,6 +92,12 @@ ConnectTo (char *host, int port)
 	return s;
 }
 
+/** @brief main recv loop
+ *
+ * @param none
+ * 
+ * @return none
+ */
 void
 read_loop ()
 {
@@ -197,7 +210,13 @@ read_loop ()
 	nlog (LOG_NORMAL, LOG_CORE, "hu, how did we get here");
 }
 
-extern int
+/** @brief get max available sockets
+ *
+ * @param none
+ * 
+ * @return returns the max available socket 
+ */
+int
 getmaxsock ()
 {
 	struct rlimit *lim;
@@ -209,7 +228,13 @@ getmaxsock ()
 	return ret;
 }
 
-void
+/** @brief recv logging for all data received by us
+ *
+ * @param line of text received
+ * 
+ * @return none
+ */
+static void
 recvlog (char *line)
 {
 	FILE *logfile;
@@ -220,6 +245,19 @@ recvlog (char *line)
 	fclose (logfile);
 }
 
+/** @brief connect to a socket
+ *
+ * @param socktype type of socket
+ * @param ipaddr ip address of target
+ * @param port to connect to
+ * @param sockname name of this socket
+ * @param module name of the module
+ * @param func_read read socket function
+ * @param func_write write socket function
+ * @param func_error socket error function
+ * 
+ * @return socket number if connect successful, -1 if unsuccessful
+ */
 int
 sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error)
 {
@@ -266,6 +304,12 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
 	return s;
 }
 
+/** @brief disconnect socket
+ *
+ * @param name of socket to disconnect
+ * 
+ * @return 1 if disconnect successful, -1 if unsuccessful
+ */
 int
 sock_disconnect (char *sockname)
 {
@@ -297,7 +341,12 @@ sock_disconnect (char *sockname)
 	return (1);
 }
 
-
+/** @brief send to socket
+ *
+ * @param fmt printf style vaarg list of text to send
+ * 
+ * @return none
+ */
 void
 sts (char *fmt, ...)
 {
