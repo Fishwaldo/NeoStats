@@ -669,7 +669,7 @@ new_bot (char *bot_name)
  * 
  * @return
  */
-int
+ModUser *
 add_mod_user (char *nick, char *mod_name)
 {
 	ModUser *mod_usr;
@@ -683,15 +683,17 @@ add_mod_user (char *nick, char *mod_name)
 		if(mod_ptr) {
 			/* add a brand new user */
 			mod_usr = new_bot (nick);
-			strlcpy (mod_usr->modname, mod_name, MAX_MOD_NAME);
-			mod_usr->function = dlsym (mod_ptr->dl_handle, "__BotMessage");
-			mod_usr->chanfunc = dlsym (mod_ptr->dl_handle, "__ChanMessage");
-			mod_usr->botcmds = hash_create(-1, 0, 0);
-			return NS_SUCCESS;
+			if(mod_usr) {
+				strlcpy (mod_usr->modname, mod_name, MAX_MOD_NAME);
+				mod_usr->function = dlsym (mod_ptr->dl_handle, "__BotMessage");
+				mod_usr->chanfunc = dlsym (mod_ptr->dl_handle, "__ChanMessage");
+				mod_usr->botcmds = hash_create(-1, 0, 0);
+				return mod_usr;
+			}
 		}
 	}
 	nlog (LOG_WARNING, LOG_CORE, "add_mod_user(): Couldn't Add ModuleBot to List");
-	return NS_FAILURE;
+	return NULL;
 }
 
 /** @brief 

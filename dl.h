@@ -214,7 +214,7 @@ int load_module (char *path, User * u);
 int unload_module (char *module_name, User * u);
 int list_modules (User * u, char **av, int ac);
 int list_bots (User * u, char **av, int ac);
-int add_mod_user (char *nick, char *mod_name);
+ModUser* add_mod_user (char *nick, char *mod_name);
 int del_mod_user (char *nick);
 int add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval);
 int del_mod_timer (char *timer_name);

@@ -31,34 +31,21 @@
 #include "log.h"
 #include "services.h"
 
-/** @brief init_bot
+/** @brief init_bot_modes
  *
- * 
+ *  Translate a mode string to the bitwise mode
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-int
-init_bot (char *nick, char *user, char *host, char *rname, const char *modes, char *mod_name)
+static int
+init_bot_modes (const char *modes)
 {
-	User *u;
-	char **av;
-	int ac = 0;
 	int add = 0;
-	int i;
-	long Umode;
+	long Umode = 0;
 	char tmpmode;
+	int i;
 
-	SET_SEGV_LOCATION();
-	u = finduser (nick);
-	if (u) {
-		nlog (LOG_WARNING, LOG_CORE, "Attempting to Login with a Nickname that already Exists: %s", nick);
-		return NS_FAILURE;
-	}
-	if (strnlen (user, MAXUSER) > MAXUSERWARN) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, %s bot %s has an username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
-	}
-	add_mod_user (nick, mod_name);
-	Umode = 0;
+	/* Walk through mode string and convert to umode */
 	tmpmode = *(modes);
 	while (tmpmode) {
 		switch (tmpmode) {
@@ -83,6 +70,35 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
 		}
 		tmpmode = *modes++;
 	}
+	return(Umode);
+}
+
+
+/** @brief init_bot
+ *
+ * 
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+int
+init_bot (char *nick, char *user, char *host, char *rname, const char *modes, char *mod_name)
+{
+	User *u;
+	char **av;
+	int ac = 0;
+	long Umode;
+
+	SET_SEGV_LOCATION();
+	u = finduser (nick);
+	if (u) {
+		nlog (LOG_WARNING, LOG_CORE, "Attempting to Login with a Nickname that already Exists: %s", nick);
+		return NS_FAILURE;
+	}
+	if (strnlen (user, MAXUSER) > MAXUSERWARN) {
+		nlog (LOG_WARNING, LOG_CORE, "Warning, %s bot %s has an username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
+	}
+	add_mod_user (nick, mod_name);
+	Umode = init_bot_modes(modes);
 	SignOn_NewBot (nick, user, host, rname, Umode);
 	AddStringToList (&av, nick, &ac);
 	ModuleEvent (EVENT_SIGNON, av, ac);
@@ -106,10 +122,7 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 	User *u;
 	char **av;
 	int ac = 0;
-	int add = 0;
-	int i;
 	long Umode;
-	char tmpmode;
 
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
@@ -121,31 +134,7 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 		nlog (LOG_WARNING, LOG_CORE, "Warning, %s bot %s has an username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
 	}
 	add_mod_user (nick, mod_name);
-	Umode = 0;
-	tmpmode = *(modes);
-	while (tmpmode) {
-		switch (tmpmode) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
-				if (usr_mds[i].mode == tmpmode) {
-					if (add) {
-						Umode |= usr_mds[i].umodes;
-						break;
-					} else {
-						Umode &= ~usr_mds[i].umodes;
-						break;
-					}
-				}
-			}
-		}
-		tmpmode = *modes++;
-	}
+	Umode = init_bot_modes(modes);
 	SignOn_NewBot (nick, user, host, rname, Umode);
 	AddStringToList (&av, nick, &ac);
 	ModuleEvent (EVENT_SIGNON, av, ac);
@@ -170,11 +159,11 @@ del_bot (char *nick, char *reason)
 
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
-	nlog (LOG_DEBUG1, LOG_CORE, "Killing %s for %s", nick, reason);
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "Attempting to Logoff with a Nickname that does not Exists: %s", nick);
 		return NS_FAILURE;
 	}
+	nlog (LOG_DEBUG1, LOG_CORE, "Killing %s for %s", nick, reason);
 	//XXXX TODO: need to free the channel list hash. We dont according to valgrind
 	squit_cmd (nick, reason);
 	del_mod_user (nick);
