@@ -25,6 +25,9 @@
  */
 
 #include "neostats.h"
+#ifdef HAVE_SYS_POLL_H 
+#include <poll.h>
+#endif
 
 int sys_mkdir (const char *filename, mode_t mode)
 {
@@ -72,6 +75,6 @@ int sys_set_nonblocking_sock (SYS_SOCKET s)
 #else
 	flags = fcntl(s, F_GETFL, 0);
 	flags |= O_NONBLOCK;
-	return fcntl (s, F_SETFL, flags));
+	return fcntl (s, F_SETFL, flags);
 #endif
 }

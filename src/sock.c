@@ -25,13 +25,13 @@
 ** $Id$
 */
 
+#include "neostats.h"
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 #ifdef HAVE_SYS_POLL_H 
 #include <poll.h>
 #endif
-#include "neostats.h"
 #include <fcntl.h>                   
 #include "adns.h"
 #include "timer.h"
