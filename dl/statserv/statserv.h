@@ -205,6 +205,8 @@ int s_chan_kick(char **av, int ac);
 /* database.c */
 void save_chan(CStats *c);
 CStats *load_chan(char *name);
+void OpenDatabase(void);
+void CloseDatabase(void);
 
 /* ss_help.c */
 extern const char *ss_help_about[];

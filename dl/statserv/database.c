@@ -26,12 +26,51 @@
 */
 
 #include "statserv.h"
+#ifdef HAVE_DB_H
+#include <db.h>
+/*#define USE_BERKELEY*/
+#endif
+
+#ifdef USE_BERKELEY
+#define	DATABASE "data/statserv.db"
+static DB *dbp;
+static DBT dbkey;
+static DBT dbdata;
+static int dbret;
+#endif
 
 /* define this if you want the old database format.... but beware, its slow */
 #undef OLDDATABASE
 
 
 void LoadOldStats();
+
+void OpenDatabase(void)
+{
+#ifdef USE_BERKELEY
+	if ((dbret = db_create(&dbp, NULL, 0)) == 0) {
+		nlog(LOG_DEBUG1, LOG_MOD, "db_create");
+	} else {
+		nlog(LOG_DEBUG1, LOG_MOD, "db_create: %s", db_strerror(dbret));
+		return;
+	}
+	if ((dbret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664)) == 0) {
+		nlog(LOG_DEBUG1, LOG_MOD, "dbp->open");
+	} else {
+		nlog(LOG_DEBUG1, LOG_MOD, "dbp->open: %s", db_strerror(dbret));
+		return;
+	}
+#endif
+}
+
+void CloseDatabase(void)
+{
+#ifdef USE_BERKELEY
+	dbp->close(dbp, 0); 
+	nlog(LOG_DEBUG1, LOG_MOD, "dbp->close");
+#endif
+}
+
 
 void SaveStats()
 {
@@ -259,6 +298,16 @@ CStats *load_chan(char *name) {
 	SET_SEGV_LOCATION();
 	c = malloc(sizeof(CStats));
 	strlcpy(c->name, name, CHANLEN);	
+#ifdef USE_BERKELEY
+	memset(&dbkey, 0, sizeof(dbkey));
+	memset(&dbdata, 0, sizeof(dbdata));
+	strcpy(dbkey.data, c->name);
+	dbkey.size = strlen(dbkey.data);
+	if ((dbret = dbp->get(dbp, NULL, &dbkey, &dbdata, 0)) == 0)
+	{
+		nlog(LOG_DEBUG1, LOG_MOD, "dbp->get");
+		sscanf(dbdata.data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins, &c->lastseen);
+#else
 	if (GetData((void *)&data, CFGSTR, "ChanStats", c->name, "ChanData") > 0) {
 		/* its the new database format... Good */
 		sscanf(data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins);
@@ -276,7 +325,11 @@ CStats *load_chan(char *name) {
 		GetData((void *)&c->t_maxjoins, CFGINT, "ChanStats", c->name, "MaxJoinsTime");
 		/* delete so when we save, we only save relevent information */
 		DelRow("ChanStats", c->name);
+#endif
 	} else {
+#ifdef USE_BERKELEY
+		nlog(LOG_DEBUG1, LOG_MOD, "dbp->get: %s", db_strerror(dbret));
+#endif
 		c->totmem = 0;
 		c->topics = 0;
 		c->kicks = 0;
@@ -349,6 +402,19 @@ void save_chan(CStats *c) {
 #else 
 	SET_SEGV_LOCATION();
 	
+#ifdef USE_BERKELEY
+	memset(&dbkey, 0, sizeof(dbkey));
+	memset(&dbdata, 0, sizeof(dbdata));
+	strcpy(dbkey.data, c->name);
+	dbkey.size = strlen(dbkey.data);
+	sprintf(dbdata.data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins, &c->lastseen);
+	dbdata.size = strlen(dbdata.data);
+	if ((dbret = dbp->put(dbp, NULL, &dbkey, &dbdata, 0)) == 0) {
+		nlog(LOG_DEBUG1, LOG_MOD, "dbp->put");
+	} else {
+		nlog(LOG_DEBUG1, LOG_MOD, "dbp->put: %s", db_strerror(dbret));
+	}
+#else
 	SetData((void *)c->topics, CFGINT, "ChanStats", c->name, "Topics");
 	SetData((void *)c->totmem, CFGINT, "ChanStats", c->name, "TotalMems");
 	SetData((void *)c->kicks, CFGINT, "ChanStats", c->name, "Kicks");
@@ -359,6 +425,7 @@ void save_chan(CStats *c) {
 	SetData((void *)c->t_maxkicks, CFGINT, "ChanStats", c->name, "MaxKicksTime");
 	SetData((void *)c->maxjoins, CFGINT, "ChanStats", c->name, "MaxJoins");
 	SetData((void *)c->t_maxjoins, CFGINT, "ChanStats", c->name, "MaxJoinsTime");
+#endif
 #endif
 	c->lastsave = me.now;
 }

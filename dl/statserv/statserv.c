@@ -255,6 +255,7 @@ int __ModInit(int modnum, int apiver)
 	rta_add_table(&statserv_daily);
 
 #endif
+	OpenDatabase();
 	return 1;
 }
 
@@ -268,6 +269,7 @@ void __ModFini()
 	list_destroy_nodes(fakedaily);
 	list_destroy_nodes(fakenetwork);
 #endif
+	CloseDatabase();
 
 }
 
