@@ -340,7 +340,7 @@ debugtochannel(char *message, ...)
 
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
-	if (!me.debug_mode)
+	if (!config.debug)
 		return;
 #endif
 	va_start (ap, message);

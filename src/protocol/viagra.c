@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -52,7 +52,8 @@ static void m_svinfo (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 
-const char services_bot_modes[]= "+oS";
+const char services_umode[]= "+oS";
+const char services_cmode[]= "+a";
 
 ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -106,18 +107,18 @@ ChanModes chan_modes[] = {
 };
 
 UserModes user_umodes[] = {
-	{UMODE_SADMIN, 'a', NS_ULEVEL_ROOT},
-	{UMODE_ADMIN, 'A', NS_ULEVEL_ADMIN},
-	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
-	{UMODE_REGNICK, 'r', NS_ULEVEL_REG},
-	{UMODE_INVISIBLE, 'i', 0},
-	{UMODE_REGONLY, 'R', 0},
-	{UMODE_HIDE, 'x', 0},
-	{UMODE_WALLOP, 'w', 0},
-	{UMODE_CLIENT, 'c', 0},
-	{UMODE_HELPOP, 'h', 0},
-	{UMODE_GLOBCON, 'e', 0},
-	{UMODE_WHOIS, 'W', 0},
+	{UMODE_SADMIN, 'a'},
+	{UMODE_ADMIN, 'A'},
+	{UMODE_OPER, 'o'},
+	{UMODE_REGNICK, 'r'},
+	{UMODE_INVISIBLE, 'i'},
+	{UMODE_REGONLY, 'R'},
+	{UMODE_HIDE, 'x'},
+	{UMODE_WALLOP, 'w'},
+	{UMODE_CLIENT, 'c'},
+	{UMODE_HELPOP, 'h'},
+	{UMODE_GLOBCON, 'e'},
+	{UMODE_WHOIS, 'W'},
 
 };
 

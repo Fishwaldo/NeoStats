@@ -727,7 +727,7 @@ void     do_rtafs();
  *              4:  LOG_WARNING
  *              5:  LOG_NOTICE
  *              6:  LOG_INFO
- *              7:  LOG_DEBUG
+ *              7:  DEBUG
  *              Default is 3.
  *     facility - integer.  Syslog() requires a facility as
  *              part of all log messages.  This specifies

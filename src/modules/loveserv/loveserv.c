@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -87,7 +87,7 @@ static bot_setting ls_settings[]=
 
 static int ls_event_online(CmdParams* cmdparams)
 {
-	ls_bot = init_bot(&ls_botinfo, services_bot_modes, 
+	ls_bot = init_bot(&ls_botinfo, me.servicesumode, 
 		BOT_FLAG_DEAF, ls_commands, ls_settings);
 	return 1;
 };

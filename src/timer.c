@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -60,7 +60,7 @@ CheckTimers (void)
 {
 	run_mod_timers();
 	SET_SEGV_LOCATION();
-	if (me.now - ping.last_sent > me.pingtime) {
+	if (me.now - ping.last_sent > config.pingtime) {
 		PingServers ();
 		flush_keeper();
 		ping.last_sent = me.now;
@@ -68,8 +68,8 @@ CheckTimers (void)
 		fflush (NULL);
 	}
 #ifdef GOTSVSTIME
-	if (me.synced && me.setservertimes) {
-		if((me.now - lastservertimesync) > me.setservertimes) {
+	if (me.synced && config.setservertimes) {
+		if((me.now - lastservertimesync) > config.setservertimes) {
 			/* The above check does not need to be exact, but 
 			   setting times ought to be so reset me.now */
 			me.now = time(NULL);
@@ -90,7 +90,7 @@ CheckTimers (void)
 static void
 TimerMidnight (void)
 {
-	nlog (LOG_DEBUG1, "Its midnight!!! -> %s", sctime (me.now));
+	dlog(DEBUG1, "Its midnight!!! -> %s", sctime (me.now));
 	ResetLogs ();
 }
 
@@ -124,7 +124,7 @@ new_timer (const char *name)
 		nlog (LOG_WARNING, "new_timer: timer hash is full");
 		return NULL;
 	}
-	nlog (LOG_DEBUG2, "new_timer: %s", name);
+	dlog(DEBUG2, "new_timer: %s", name);
 	timer = smalloc (sizeof (Timer));
 	strlcpy (timer->name, name, MAX_MOD_NAME);
 	tn = hnode_create (timer);
@@ -149,7 +149,7 @@ findtimer (const char *name)
 	if (tn) {
 		return (Timer *) hnode_get (tn);
 	}
-	nlog (LOG_DEBUG3, "findtimer: %s not found", name);
+	dlog(DEBUG3, "findtimer: %s not found", name);
 	return NULL;
 }
 
@@ -182,7 +182,7 @@ add_timer (timer_function func_name, const char *name, int interval)
 		timer->lastrun = me.now;
 		timer->moduleptr = moduleptr;
 		timer->function = func_name;
-		nlog (LOG_DEBUG2, "add_timer: Module %s added timer %s", moduleptr->info->name, name);
+		dlog(DEBUG2, "add_timer: Module %s added timer %s", moduleptr->info->name, name);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -206,7 +206,7 @@ del_timer (const char *name)
 	tn = hash_lookup (timerhash, name);
 	if (tn) {
 		timer = hnode_get (tn);
-		nlog (LOG_DEBUG2, "del_timer: removed timer %s for module %s", name, timer->moduleptr->info->name);
+		dlog(DEBUG2, "del_timer: removed timer %s for module %s", name, timer->moduleptr->info->name);
 		hash_delete (timerhash, tn);
 		hnode_destroy (tn);
 		sfree (timer);
@@ -234,7 +234,7 @@ del_timers (Module *mod_ptr)
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		timer = hnode_get (modnode);
 		if (timer->moduleptr == mod_ptr) {
-			nlog (LOG_DEBUG1, "del_timers: deleting timer %s from module %s.", timer->name, mod_ptr->info->name);
+			dlog(DEBUG1, "del_timers: deleting timer %s from module %s.", timer->name, mod_ptr->info->name);
 			del_timer (timer->name);
 		}
 	}
@@ -260,7 +260,7 @@ set_timer_interval (const char *name, int interval)
 	if (tn) {
 		timer = hnode_get (tn);
 		timer->interval = interval;
-		nlog (LOG_DEBUG2, "set_timer_interval: timer interval for %s (%s) set to %d", name, timer->moduleptr->info->name, interval);
+		dlog(DEBUG2, "set_timer_interval: timer interval for %s (%s) set to %d", name, timer->moduleptr->info->name, interval);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -318,9 +318,9 @@ run_mod_timers (void)
 		if (me.now - timer->lastrun > timer->interval) {
 			if (setjmp (sigvbuf) == 0) {
 				SET_RUN_LEVEL(timer->moduleptr);
-				nlog(LOG_DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name);
+				dlog(DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name);
 				if (timer->function () < 0) {
-					nlog(LOG_DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name);
+					dlog(DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name);
 					hash_scan_delete(timerhash, tn);
 					hnode_destroy(tn);
 					sfree(timer);

@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,8 @@ static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 static void m_protoctl (char *origin, char **argv, int argc, int srv);
 
-const char services_bot_modes[]= "+o";
+const char services_umode[]= "+o";
+const char services_cmode[]= "+o";
 
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
@@ -102,24 +103,24 @@ ChanModes chan_modes[] = {
 };
 
 UserModes user_umodes[] = {
-	{UMODE_DEBUG, 'd', NS_ULEVEL_ROOT},
-	{UMODE_ADMIN, 'a', NS_ULEVEL_ADMIN},
-	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
-	{UMODE_LOCOP, 'l', NS_ULEVEL_OPER},
-	{UMODE_BOTS, 'b', 0},
-	{UMODE_CCONN, 'c', 0},
-	{UMODE_FULL, 'f', 0},
-	{UMODE_CALLERID, 'g', 0},
-	{UMODE_INVISIBLE, 'i', 0},
-	{UMODE_SKILL, 'k', 0},
-	{UMODE_NCHANGE, 'n', 0},
-	{UMODE_REJ, 'r', 0},
-	{UMODE_SERVNOTICE, 's', 0},
-	{UMODE_UNAUTH, 'u', 0},
-	{UMODE_WALLOP, 'w', 0},
-	{UMODE_EXTERNAL, 'x', 0},
-	{UMODE_SPY, 'y', 0},
-	{UMODE_OPERWALL, 'z', 0},
+	{UMODE_DEBUG, 'd'},
+	{UMODE_ADMIN, 'a'},
+	{UMODE_OPER, 'o'},
+	{UMODE_LOCOP, 'l'},
+	{UMODE_BOTS, 'b'},
+	{UMODE_CCONN, 'c'},
+	{UMODE_FULL, 'f'},
+	{UMODE_CALLERID, 'g'},
+	{UMODE_INVISIBLE, 'i'},
+	{UMODE_SKILL, 'k'},
+	{UMODE_NCHANGE, 'n'},
+	{UMODE_REJ, 'r'},
+	{UMODE_SERVNOTICE, 's'},
+	{UMODE_UNAUTH, 'u'},
+	{UMODE_WALLOP, 'w'},
+	{UMODE_EXTERNAL, 'x'},
+	{UMODE_SPY, 'y'},
+	{UMODE_OPERWALL, 'z'},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));

@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -69,6 +69,7 @@ static config_option options[] = {
 	{"LOGFILENAMEFORMAT", ARG_STR, cb_Server, 14},
 	{"SERVER_NUMERIC", ARG_STR, cb_Server, 15},
 	{"SETSERVERTIMES", ARG_STR, cb_Server, 16},
+	{"SERVICEROOT", ARG_STR, cb_Server, 18}
 #ifdef SQLSRV
 	{"SQLSRV_AUTH", ARG_STR, cb_SqlConf, 0},
 	{"SQLSRV_PORT", ARG_STR, cb_SqlConf, 1},
@@ -87,20 +88,25 @@ ConfLoad ()
 {
 	/* Read in the Config File */
 	printf ("Reading the Config File. Please wait.....\n");
-	if (!config_read (CONFIG_NAME, options) == 0) {
+	if (config_read (CONFIG_NAME, options) != 0) {
 		printf ("***************************************************\n");
 		printf ("*                  Error!                         *\n");
 		printf ("*                                                 *\n");
-		printf ("* Config File not found, or Unable to Open        *\n");
-		printf ("* Please check its Location, and try again        *\n");
+		printf ("* Config file not found, or unable to open. Check *\n");
+		printf ("* its location and permissions and try again.     *\n");
 		printf ("*                                                 *\n");
 		printf ("*             NeoStats NOT Started                *\n");
 		printf ("***************************************************\n");
 		return NS_FAILURE;
 	}
-	if (me.die) {
+	if (config.die) {
 		printf ("\n-----> ERROR: Read the README file then edit %s <-----\n\n",CONFIG_NAME);
 		nlog (LOG_CRITICAL, "Read the README file then edit %s",CONFIG_NAME);
+		return NS_FAILURE;
+	}
+	if (config.error) {
+		printf ("\n-----> CONFIG ERROR: Check log file for more information then edit %s <-----\n\n",CONFIG_NAME);
+		nlog (LOG_CRITICAL, "CONFIG ERROR: Check log file for more information then edit %s",CONFIG_NAME);
 		return NS_FAILURE;
 	}
 	printf ("Sucessfully loaded config file, booting NeoStats\n");
@@ -129,7 +135,7 @@ cb_Module (char *arg, int configtype)
 			}
 		}
 		load_mods[i] = sstrdup (arg);
-		nlog (LOG_DEBUG1, "Added Module %d :%s", i, (char *)load_mods[i]);
+		dlog(DEBUG1, "Added Module %d :%s", i, (char *)load_mods[i]);
 	}
 }
 
@@ -154,7 +160,7 @@ cb_AuthModule (char *arg, int configtype)
 		}
 	}
 	load_auth_mods[i] = sstrdup (arg);
-	nlog (LOG_DEBUG1, "Added Auth Module %d :%s", i, (char *)load_auth_mods[i]);
+	dlog(DEBUG1, "Added Auth Module %d :%s", i, (char *)load_auth_mods[i]);
 }
 
 
@@ -186,7 +192,7 @@ cb_SqlConf (char *arg, int configtype)
 			nlog(LOG_WARNING, "Invalid SQLSRV_AUTH syntax in config file (Host)");
 			return;
 		}
-		nlog(LOG_DEBUG1, "SqlSrv Uname %s Pass %s Host %s", uname, pass, host);
+		dlog(DEBUG1, "SqlSrv Uname %s Pass %s Host %s", uname, pass, host);
 		rta_change_auth(uname, pass);
 		strncpy(me.sqlhost, host, MAXHOST);
 	} else if (configtype == 1) {
@@ -218,7 +224,7 @@ ConfLoadModules ()
 	} else {
 		nlog (LOG_NORMAL, "Loading configured modules"); 
 		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
-			nlog (LOG_DEBUG1, "ConfLoadModules: Loading Module %s", (char *)load_mods[i]);
+			dlog(DEBUG1, "ConfLoadModules: Loading Module %s", (char *)load_mods[i]);
 			if (load_module (load_mods[i], NULL)) {
 				nlog (LOG_NORMAL, "Successfully Loaded Module %s", (char *)load_mods[i]);
 			} else {
@@ -249,13 +255,13 @@ cb_Server (char *arg, int configtype)
 		strlcpy (me.name, arg, sizeof (me.name));
 	} else if (configtype == 1) {
 		/* Server Port */
-		me.port = atoi (arg);
+		config.port = atoi (arg);
 	} else if (configtype == 2) {
 		/* Connect To */
 		strlcpy (me.uplink, arg, sizeof (me.uplink));
 	} else if (configtype == 3) {
 		/* Connect Pass */
-		strlcpy (me.pass, arg, sizeof (me.pass));
+		strlcpy (config.pass, arg, sizeof (config.pass));
 	} else if (configtype == 4) {
 		/* Server InfoLine */
 		strlcpy (me.infoline, arg, sizeof (me.infoline));
@@ -264,7 +270,7 @@ cb_Server (char *arg, int configtype)
 		strlcpy (me.netname, arg, sizeof (me.netname));
 	} else if (configtype == 6) {
 		/* Reconnect time */
-		me.r_time = atoi (arg);
+		config.r_time = atoi (arg);
 	} else if (configtype == 7) {
 		/* NeoStat Host */
 		strlcpy (ns_botinfo.host, arg, MAXHOST);
@@ -272,13 +278,13 @@ cb_Server (char *arg, int configtype)
 		/* NeoStat User */
 		strlcpy (ns_botinfo.user, arg, MAXUSER);
 	} else if (configtype == 9) {
-		me.want_privmsg = 1;
+		config.want_privmsg = 1;
 	} else if (configtype == 10) {
-		strlcpy (me.chan, arg, sizeof (me.chan));
+		strlcpy (me.serviceschan, arg, sizeof (me.serviceschan));
 	} else if (configtype == 11) {
-		me.onlyopers = 1;
+		config.onlyopers = 1;
 	} else if (configtype == 12) {
-		me.die = 1;
+		config.die = 1;
 	} else if (configtype == 13) {
 		strlcpy (me.local, arg, sizeof (me.local));
 	} else if (configtype == 14) {
@@ -291,15 +297,33 @@ cb_Server (char *arg, int configtype)
 		if(me.numeric>254)
 			me.numeric=254;
 	} else if (configtype == 16) {
-		me.setservertimes = atoi (arg);
+		config.setservertimes = atoi (arg);
 		/* Convert hours input to seconds */
-		me.setservertimes = me.setservertimes * 60 * 60;
+		config.setservertimes = config.setservertimes * 60 * 60;
 		/* limit value - really need to print error and quit */
-		if(me.setservertimes <= 0) {
-			me.setservertimes = (24 * 60 * 60);
+		if(config.setservertimes <= 0) {
+			config.setservertimes = (24 * 60 * 60);
+		}
+	} else if (configtype == 18) {
+		char *nick;
+		char *user;
+		char *host;
+
+		if (strstr(arg, "!")&& !strstr(arg, "@")) {
+			nlog(LOG_WARNING, 
+				"Invalid SERVICEROOT. Must be of the form nick!user@host, was %s",
+				arg);
+			config.error = 1;
+		} else {
+			nick = strtok(arg, "!");
+			user = strtok(NULL, "@");
+			host = strtok(NULL, "");
+			strlcpy(config.rootuser.nick, nick, MAXNICK);
+			strlcpy(config.rootuser.user, user, MAXUSER);
+			strlcpy(config.rootuser.host, host, MAXHOST);
+			config.rootuser.level = NS_ULEVEL_ROOT;
 		}
 	}
-
 }
 
 /** @brief Rehash Function

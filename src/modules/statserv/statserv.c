@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
-** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -149,7 +149,7 @@ static bot_setting ss_settings[]=
 static int ss_event_online(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	ss_bot = init_bot (&ss_botinfo, services_bot_modes, 
+	ss_bot = init_bot (&ss_botinfo, me.servicesumode, 
 		BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, ss_commands, ss_settings);
 	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */

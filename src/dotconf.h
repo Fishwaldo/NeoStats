@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -55,22 +55,6 @@ typedef struct _cfgoption {
 	void (*callback) ();	/* callback function */
 	int userdata;		/* userdefinable value/flag */
 } config_option;
-
-/* general configuration items */
-struct config {
-	/* log level */
-	unsigned int loglevel;
-	/* debug level */
-	unsigned int debuglevel;
-	/* enable recv.log */
-	unsigned int recvlog:1;
-	/* dont load modules on startup */
-	unsigned int modnoload:1;
-	/* dont output anything on start */
-	unsigned int quiet:1;
-	/* dont detach into background */
-	unsigned int foreground:1;
-} config;
 
 /* config_read takes the following arguments:
  * 1. the filename of the configuration file to read

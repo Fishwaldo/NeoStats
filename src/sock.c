@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -31,7 +31,6 @@
                      
 #include "dl.h"
 #include "adns.h"
-#include "conf.h"
 #include "timer.h"
 #include "dns.h"
 #include "transfer.h"
@@ -325,17 +324,17 @@ restartsql:
 					SET_RUN_LEVEL(sock->moduleptr);
 					if (sock->socktype == SOCK_STANDARD) {
 						if (FD_ISSET (sock->sock_no, &readfds)) {
-							nlog (LOG_DEBUG3, "Running module %s readsock function for %s", sock->moduleptr->info->name, sock->name);
+							dlog(DEBUG3, "Running module %s readsock function for %s", sock->moduleptr->info->name, sock->name);
 							if (sock->readfnc (sock->sock_no, sock->name) < 0)
 								continue;
 						}
 						if (FD_ISSET (sock->sock_no, &writefds)) {
-							nlog (LOG_DEBUG3, "Running module %s writesock function for %s", sock->moduleptr->info->name, sock->name);
+							dlog(DEBUG3, "Running module %s writesock function for %s", sock->moduleptr->info->name, sock->name);
 							if (sock->writefnc (sock->sock_no, sock->name) < 0)
 								continue;
 						}
 						if (FD_ISSET (sock->sock_no, &errfds)) {
-							nlog (LOG_DEBUG3, "Running module %s errorsock function for %s", sock->moduleptr->info->name, sock->name);
+							dlog(DEBUG3, "Running module %s errorsock function for %s", sock->moduleptr->info->name, sock->name);
 							if (sock->errfnc (sock->sock_no, sock->name) < 0)
 								continue;
 						}
@@ -395,13 +394,13 @@ void
 Connect (void)
 {
 	SET_SEGV_LOCATION();
-	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, me.port);
-	servsock = ConnectTo (me.uplink, me.port);
+	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, config.port);
+	servsock = ConnectTo (me.uplink, config.port);
 	if (servsock <= 0) {
 		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
 	} else {
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
-		send_server_connect (me.name, me.numeric, me.infoline, me.pass, (unsigned long)me.t_start, (unsigned long)me.now);
+		send_server_connect (me.name, me.numeric, me.infoline, config.pass, (unsigned long)me.t_start, (unsigned long)me.now);
 		read_loop ();
 	}
 	do_exit (NS_EXIT_RECONNECT, NULL);
@@ -538,7 +537,7 @@ sock_disconnect (const char *name)
 		nlog (LOG_WARNING, "Warning, Bad File Descriptor %s in list", name);
 		return NS_FAILURE;
 	}
-	nlog (LOG_DEBUG3, "Closing Socket %s with Number %d", name, sock->sock_no);
+	dlog(DEBUG3, "Closing Socket %s with Number %d", name, sock->sock_no);
 	close (sock->sock_no);
 	del_socket (name);
 	return NS_SUCCESS;
@@ -579,7 +578,7 @@ sts (const char *buf, const int buflen)
 /* rehash handler */
 int check_sql_sock() {
 	if (sqlListenSock < 1) {
-		nlog(LOG_DEBUG1, "Rehashing SQL sock");
+		dlog(DEBUG1, "Rehashing SQL sock");
         	sqlListenSock = sqllisten_on_port(me.sqlport);
 		if (sqlListenSock == -1) {
 			nlog(LOG_CRITICAL, "Failed to Setup Sql Port. SQL not available");
@@ -707,7 +706,7 @@ sql_accept_conn(int srvfd)
     newuinode = lnode_create(newui);
     list_append(sqlconnections, newuinode);
     inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
-    nlog(LOG_DEBUG1, "New SqlConnection from %s", tmp);
+    dlog(DEBUG1, "New SqlConnection from %s", tmp);
   }
 }
 
@@ -751,7 +750,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
   {
     /* log this since a normal close is with an 'X' command from the
        client program? */
-    nlog(LOG_DEBUG1, "Disconnecting SqlClient for failed read");
+    dlog(DEBUG1, "Disconnecting SqlClient for failed read");
     deldbconnection(sqlconn->fd);
     close(sqlconn->fd);
     list_delete(sqlconnections, sqlnode);
@@ -875,7 +874,7 @@ new_sock (const char *sock_name)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, "new_sock: %s", sock_name);
+	dlog(DEBUG2, "new_sock: %s", sock_name);
 	if (hash_isfull (sockethash)) {
 		nlog (LOG_CRITICAL, "new_sock: socket hash is full");
 		return NULL;
@@ -947,7 +946,7 @@ add_socket (socket_function readfunc, socket_function writefunc, socket_function
 	sock->errfnc = errfunc;
 	sock->socktype = SOCK_STANDARD;
 	
-	nlog (LOG_DEBUG2, "add_socket: Registered Module %s with Standard Socket functions %s", moduleptr->info->name, sock->name);
+	dlog(DEBUG2, "add_socket: Registered Module %s with Standard Socket functions %s", moduleptr->info->name, sock->name);
 	return NS_SUCCESS;
 }
 
@@ -984,7 +983,7 @@ add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, co
 	sock->beforepoll = beforepoll;
 	sock->afterpoll = afterpoll;
 	sock->data = data;
-	nlog (LOG_DEBUG2, "add_sockpoll: Registered Module %s with Poll Socket functions %s", moduleptr->info->name, sock->name);
+	dlog(DEBUG2, "add_sockpoll: Registered Module %s with Poll Socket functions %s", moduleptr->info->name, sock->name);
 	return NS_SUCCESS;
 }
 
@@ -1006,7 +1005,7 @@ del_socket (const char *sock_name)
 	sn = hash_lookup (sockethash, sock_name);
 	if (sn) {
 		sock = hnode_get (sn);
-		nlog (LOG_DEBUG2, "del_socket: Unregistered Socket function %s from Module %s", sock_name, sock->moduleptr->info->name);
+		dlog(DEBUG2, "del_socket: Unregistered Socket function %s from Module %s", sock_name, sock->moduleptr->info->name);
 		hash_scan_delete (sockethash, sn);
 		hnode_destroy (sn);
 		sfree (sock);
@@ -1034,7 +1033,7 @@ del_sockets (Module *mod_ptr)
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		sock = hnode_get (modnode);
 		if (sock->moduleptr == mod_ptr) {
-			nlog (LOG_DEBUG1, "del_sockets: deleting socket %s from module %s.", sock->name, mod_ptr->info->name);
+			dlog(DEBUG1, "del_sockets: deleting socket %s from module %s.", sock->name, mod_ptr->info->name);
 			del_socket (sock->name);
 		}
 	}

@@ -1,6 +1,6 @@
-SRCS = serviceroots.c
+SRCS = extauth.c
 TARGET = extauth.so
-DISTFILES = serviceroots.c Makefile
+DISTFILES = extauth.c Makefile
 
 include ../Makefile.inc
 

@@ -199,7 +199,7 @@ int process_target_user(CmdParams * cmdparams, char* target)
 			return 1;
 		}
 	}
-	nlog (LOG_DEBUG1, "process_target_user: user %s not found", target);
+	dlog(DEBUG1, "process_target_user: user %s not found", target);
 	return 0;
 }
 
@@ -209,7 +209,7 @@ int process_target_chan(CmdParams * cmdparams, char* target)
 	if(cmdparams->channel) {
 		return 1;
 	}
-	nlog (LOG_DEBUG1, "cmdparams->channel: chan %s not found", target);
+	dlog(DEBUG1, "cmdparams->channel: chan %s not found", target);
 	return 0;
 }
 
@@ -342,7 +342,7 @@ new_bot (const char *bot_name)
 	hnode_t *bn;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, "new_bot: %s", bot_name);
+	dlog(DEBUG2, "new_bot: %s", bot_name);
 	botptr = smalloc (sizeof (Bot));
 	strlcpy (botptr->nick, bot_name, MAXNICK);
 	bn = hnode_create (botptr);
@@ -456,7 +456,7 @@ bot_nick_change (const char *oldnick, const char *newnick)
 	botptr = hnode_get (bn);
 	/* remove old hash entry */
 	hash_delete (bothash, bn);
-	nlog (LOG_DEBUG3, "Bot %s changed nick to %s", oldnick, newnick);
+	dlog(DEBUG3, "Bot %s changed nick to %s", oldnick, newnick);
 	strlcpy (botptr->nick, newnick, MAXNICK);
 	/* insert new hash entry */
 	hash_insert (bothash, bn, botptr->nick);
@@ -511,7 +511,7 @@ int	del_bots (Module *mod_ptr)
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		botptr = hnode_get (modnode);
 		if (botptr->moduleptr == mod_ptr) {
-			nlog (LOG_DEBUG1, "Module %s had bot %s Registered. Deleting..", mod_ptr->info->name, botptr->nick);
+			dlog(DEBUG1, "Module %s had bot %s Registered. Deleting..", mod_ptr->info->name, botptr->nick);
 			del_bot (botptr, "Module Unloaded");
 		}
 	}
@@ -558,8 +558,11 @@ Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd
 	}
 	Umode = UmodeStringToMask(modes, 0);
 	signon_newbot (nick, botinfo->user, botinfo->host, botinfo->realname, Umode);
+	u = finduser (nick);
+	/* set our link back to user struct for bot */
+	botptr->u = u;
 	/* Mark bot as services bot if needed */
-	if ((Umode & services_bot_umode)) {
+	if ((Umode & service_umode_mask)) {
 		flags |= BOT_FLAG_SERVICEBOT;
 	}
 #ifdef UMODE_DEAF
@@ -595,7 +598,7 @@ del_bot (Bot *botptr, const char *reason)
 		nlog (LOG_WARNING, "Attempting to delete a bot with a nick that does not exist: %s", botptr->nick);
 		return NS_FAILURE;
 	}
-	nlog (LOG_DEBUG1, "Deleting bot %s for %s", botptr->nick, reason);
+	dlog(DEBUG1, "Deleting bot %s for %s", botptr->nick, reason);
 	//XXXX TODO: need to free the channel list hash. We dont according to valgrind
 	squit_cmd (botptr->nick, reason);
 	del_ns_bot (botptr->nick);

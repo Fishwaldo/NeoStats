@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -53,7 +53,8 @@ static void m_svinfo (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 
-const char services_bot_modes[]= "+oS";
+const char services_umode[]= "+oS";
+const char services_cmode[]= "+o";
 
 ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -119,42 +120,42 @@ ChanModes chan_modes[] = {
 };
 
 UserModes user_umodes[] = {
-	{UMODE_SADMIN, 'a', NS_ULEVEL_ROOT},
-	{UMODE_TECHADMIN, 'T', NS_ULEVEL_ADMIN},
-	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN},
-	{UMODE_ADMIN, 'A', NS_ULEVEL_OPER},
-	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
-	{UMODE_LOCOP, 'O', NS_ULEVEL_OPER},
-	{UMODE_REGNICK, 'r', NS_ULEVEL_REG},
-	{UMODE_INVISIBLE, 'i', 0},
-	{UMODE_WALLOP, 'w', 0},
-	{UMODE_GLOBOPS, 'g', 0},
-	{UMODE_HELPOP, 'h', 0},
-	{UMODE_SERVNOTICE, 's', 0},
-	{UMODE_KILLS, 'k', 0},
-	{UMODE_CLIENT, 'c', 0},
-	{UMODE_FLOOD, 'f', 0},
-	{UMODE_RGSTRONLY, 'R', 0},
-	{UMODE_KIX, 'q', 0},
-	{UMODE_BOT, 'B', 0},
-	{UMODE_HIDE, 'z', 0},
-	{UMODE_WHOIS, 'W', 0},
-	{UMODE_SPY, 'y', 0},
-	{UMODE_DEBUG, 'd', 0},
-	{UMODE_CHATOPS, 'b', 0},
-	{UMODE_ROUTE, 'n', 0},
-	{UMODE_SPAM, 'm', 0},
-	{UMODE_OPERNOTICE, 'e', 0},
-	{UMODE_SQUELCH, 'x', 0},
-	{UMODE_HIDDENDCC, 'D', 0},
-	{UMODE_THROTTLE, 'F', 0},
-	{UMODE_REJ, 'j', 0},
-	{UMODE_ULINEKILL, 'K', 0},
-	{UMODE_CODER, 'C', 0},
+	{UMODE_SADMIN, 'a'},
+	{UMODE_TECHADMIN, 'T'},
+	{UMODE_NETADMIN, 'N'},
+	{UMODE_ADMIN, 'A'},
+	{UMODE_OPER, 'o'},
+	{UMODE_LOCOP, 'O'},
+	{UMODE_REGNICK, 'r'},
+	{UMODE_INVISIBLE, 'i'},
+	{UMODE_WALLOP, 'w'},
+	{UMODE_GLOBOPS, 'g'},
+	{UMODE_HELPOP, 'h'},
+	{UMODE_SERVNOTICE, 's'},
+	{UMODE_KILLS, 'k'},
+	{UMODE_CLIENT, 'c'},
+	{UMODE_FLOOD, 'f'},
+	{UMODE_RGSTRONLY, 'R'},
+	{UMODE_KIX, 'q'},
+	{UMODE_BOT, 'B'},
+	{UMODE_HIDE, 'z'},
+	{UMODE_WHOIS, 'W'},
+	{UMODE_SPY, 'y'},
+	{UMODE_DEBUG, 'd'},
+	{UMODE_CHATOPS, 'b'},
+	{UMODE_ROUTE, 'n'},
+	{UMODE_SPAM, 'm'},
+	{UMODE_OPERNOTICE, 'e'},
+	{UMODE_SQUELCH, 'x'},
+	{UMODE_HIDDENDCC, 'D'},
+	{UMODE_THROTTLE, 'F'},
+	{UMODE_REJ, 'j'},
+	{UMODE_ULINEKILL, 'K'},
+	{UMODE_CODER, 'C'},
 };
 
 UserModes user_smodes[] = {
-	{SMODE_SSL, 's', 0},
+	{SMODE_SSL, 's'},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));

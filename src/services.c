@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -36,8 +36,8 @@
 #include "ircd.h"
 #include "hash.h"
 #include "exclude.h"
+#include "services.h"
 
-static int ns_set_debug (CmdParams* cmdparams);
 static int ns_shutdown (CmdParams* cmdparams);
 static int ns_reload (CmdParams* cmdparams);
 static int ns_jupe (CmdParams* cmdparams);
@@ -91,7 +91,6 @@ static bot_cmd ns_commands[]=
 #ifdef USE_RAW																
 	{"RAW",			ns_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_help_raw, 		ns_help_raw_oneline},
 #endif																	
-	{"DEBUG",		ns_set_debug,	1, 	NS_ULEVEL_ROOT,  	ns_help_debug,		ns_help_debug_oneline},
 	{"BOTLIST",		list_bots,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist,	ns_help_botlist_oneline},
 	{"SOCKLIST",	list_sockets,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist, 	ns_help_socklist_oneline},
 	{"TIMERLIST",	list_timers,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist, 	ns_help_timerlist_oneline},
@@ -104,8 +103,17 @@ static bot_cmd ns_commands[]=
 
 static bot_setting ns_settings[]=
 {
-	{"VERSIONSCAN",	&me.versionscan,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL, (void*)1 },
-	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
+	{"PINGTIME",		&config.pingtime,	SET_TYPE_INT,		0, 0, 	NS_ULEVEL_ADMIN, "pingtime",	NULL,	ns_help_set_pingtime, NULL, (void*)120 },
+	{"VERSIONSCAN",		&config.versionscan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL, (void*)1 },
+	{"SERVICECMODE",	&me.servicescmode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicescmode",	NULL,	ns_help_set_servicecmode, NULL, (void*)services_cmode },
+	{"SERVICEUMODE",	&me.servicesumode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicesumode",	NULL,	ns_help_set_serviceumode, NULL, (void*)services_umode },
+	{"LOGLEVEL",		&config.loglevel,	SET_TYPE_INT,		1, 6, 	NS_ULEVEL_ADMIN, "loglevel",	NULL,	ns_help_set_loglevel, NULL, (void*)5 },
+	{"DEBUG",			&config.debug,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debug, NULL, (void*)0 },
+	{"DEBUGLEVEL",		&config.debuglevel,	SET_TYPE_INT,		1, 10, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debuglevel, NULL, (void*)0 },
+	{"DEBUGCHAN",		&config.debugchan,	SET_TYPE_STRING,	0, CHANLEN, 	NS_ULEVEL_ADMIN, "debugchan",	NULL,	ns_help_set_debugchan, NULL, (void*)"#debug" },
+	{"DEBUGTOCHAN",		&config.debugtochan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugtochan, NULL, (void*)0 },
+	{"DEBUGMODULE",		&config.debugmodule,SET_TYPE_STRING,	0, MAX_MOD_NAME, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugmodule, NULL, (void*)"all" },
+	{NULL,				NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
 
 Bot* ns_botptr;
@@ -116,6 +124,22 @@ BotInfo ns_botinfo = {
 	"",
 	"",
 };
+
+/** @brief InitServices
+ *
+ *  init NeoStats core
+ *
+ * @return none
+ */
+void InitServices(void)
+{
+	/* if all bots should join the chan */
+	if (GetConf ((void *) &config.allbots, CFGINT, "AllBotsJoinChan") <= 0) {
+		config.allbots = 0;
+	}
+	/* */
+	ModuleConfig(ns_settings);
+}
 
 /** @brief init_services_bot
  *
@@ -129,18 +153,10 @@ init_services_bot (void)
 	unsigned int flags;
 
 	SET_SEGV_LOCATION();
-	/* if all bots should join the chan */
-	if (GetConf ((void *) &me.allbots, CFGINT, "AllBotsJoinChan") <= 0) {
-		me.allbots = 0;
-	}
-	if (GetConf ((void *) &me.pingtime, CFGINT, "PingServerTime") <= 0) {
-		me.pingtime = 120;
-	}
-	ModuleConfig(ns_settings);
 	ircsnprintf (ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick);
-	flags = me.onlyopers ? BOT_FLAG_ONLY_OPERS : 0;
+	flags = config.onlyopers ? BOT_FLAG_ONLY_OPERS : 0;
 	flags |= BOT_FLAG_DEAF;
-	ns_botptr = init_bot (&ns_botinfo, services_bot_modes, flags, ns_commands, ns_settings);
+	ns_botptr = init_bot (&ns_botinfo, me.servicesumode, flags, ns_commands, ns_settings);
 	me.onchan = 1;
 	SendAllModuleEvent (EVENT_ONLINE, NULL);
 	return NS_SUCCESS;
@@ -235,31 +251,6 @@ ns_jupe (CmdParams* cmdparams)
    	return NS_SUCCESS;
 }
 
-/** @brief DEBUG command handler
- *
- *  Set debug mode on/off 
- *   
- *  @param cmdparams structure with command information
- *  @returns none
- */
-static int
-ns_set_debug (CmdParams* cmdparams)
-{
-	SET_SEGV_LOCATION();
-	if (!ircstrcasecmp(cmdparams->av[0], "ON")) {
-		me.debug_mode = 1;
-		globops (me.name, "\2DEBUG MODE\2 enabled by %s", cmdparams->source.user->nick);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Debug mode enabled!");
-	} else if (!ircstrcasecmp(cmdparams->av[0], "OFF")) {
-		me.debug_mode = 0;
-		globops (me.name, "\2DEBUG MODE\2 disabled by %s", cmdparams->source.user->nick);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Debug mode disabled");
-	} else {
-	   	return NS_ERR_SYNTAX_ERROR;
-	}
-   	return NS_SUCCESS;
-}
-
 /** @brief USERDUMP command handler
  *
  *  Dump user list
@@ -271,7 +262,7 @@ static int
 ns_userdump (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!me.debug_mode) {
+	if (!config.debug) {
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
@@ -290,7 +281,7 @@ static int
 ns_serverdump (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!me.debug_mode) {
+	if (!config.debug) {
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
@@ -309,7 +300,7 @@ static int
 ns_chandump (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!me.debug_mode) {
+	if (!config.debug) {
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
@@ -342,10 +333,10 @@ ns_status (CmdParams* cmdparams)
 	}
 	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Sent %ld messages, %ld bytes", me.SendM, me.SendBytes);
 	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Received %ld messages, %ld Bytes", me.RcveM, me.RcveBytes);
-	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Reconnect time: %d", me.r_time);
+	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Reconnect time: %d", config.r_time);
 	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Requests: %d", me.requests);
 	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Max sockets: %d (in use: %d)", me.maxsocks, me.cursocks);
-	if (me.debug_mode)
+	if (config.debug)
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Debugging mode enabled");
 	else
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Debugging mode disabled");
@@ -429,7 +420,7 @@ ns_raw (CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	message = joinbuf (cmdparams->av, cmdparams->ac, 1);
 	chanalert (ns_botptr->nick, "\2RAW COMMAND\2 \2%s\2 issued a raw command!(%s)", cmdparams->source.user->nick, message);
-	nlog (LOG_INFO, "RAW COMMAND %s issued a raw command!(%s)", cmdparams->source.user->nick, message);
+	nlog (LOG_NORMAL, "RAW COMMAND %s issued a raw command!(%s)", cmdparams->source.user->nick, message);
 	send_cmd ("%s", message);
 	sfree (message);
    	return NS_SUCCESS;

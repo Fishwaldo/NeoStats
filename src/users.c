@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -114,7 +114,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 		}		
 #endif
 	}
-	nlog (LOG_DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, (int)htonl (ipaddress), server, TS);
+	dlog(DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, (int)htonl (ipaddress), server, TS);
 	u = new_user (nick);
 	if (!u) {
 		return;
@@ -151,7 +151,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	}
 	sfree (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
-	if(me.versionscan && !IsExcluded(u) && !IsMe(u)) {
+	if(is_synced && config.versionscan && !IsExcluded(u) && !IsMe(u)) {
 		privmsg(u->nick, ns_botptr->nick, "\1VERSION\1");
 	}
 }
@@ -182,7 +182,7 @@ KillUser (const char *nick, const char *reason)
 	User *u;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, "KillUser: %s", nick);
+	dlog(DEBUG2, "KillUser: %s", nick);
 	u = finduser(nick);
 	if(!u) {
 		nlog (LOG_WARNING, "KillUser: %s failed!", nick);
@@ -212,7 +212,7 @@ QuitUser (const char *nick, const char *reason)
 	User *u;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, "QuitUser: %s", nick);
+	dlog(DEBUG2, "QuitUser: %s", nick);
 	u = finduser(nick);
 	if(!u) {
 		nlog (LOG_WARNING, "QuitUser: %s failed!", nick);
@@ -266,7 +266,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	User * u;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, "UserNick: %s -> %s", oldnick, newnick);
+	dlog(DEBUG2, "UserNick: %s -> %s", oldnick, newnick);
 	un = hash_lookup (userhash, oldnick);
 	if (!un) {
 		nlog (LOG_WARNING, "UserNick: can't find user %s", oldnick);
@@ -306,12 +306,12 @@ finduserbase64 (const char *num)
 	hash_scan_begin (&us, userhash);
 	while ((un = hash_scan_next (&us)) != NULL) {
 		u = hnode_get (un);
-		if(strncmp(u->nick64, num, BASE64NICKSIZE) == 0) {
-			nlog (LOG_DEBUG1, "finduserbase64: %s -> %s", num, u->nick);
+		if(strncmp(u->name64, num, BASE64NICKSIZE) == 0) {
+			dlog(DEBUG1, "finduserbase64: %s -> %s", num, u->nick);
 			return u;
 		}
 	}
-	nlog (LOG_DEBUG3, "finduserbase64: %s not found", num);
+	dlog(DEBUG3, "finduserbase64: %s not found", num);
 	return NULL;
 }
 #endif
@@ -325,7 +325,7 @@ finduser (const char *nick)
 	if (un != NULL) {
 		return (User *) hnode_get (un);
 	}
-	nlog (LOG_DEBUG3, "finduser: %s not found", nick);
+	dlog(DEBUG3, "finduser: %s not found", nick);
 	return NULL;
 }
 
@@ -581,7 +581,7 @@ dumpuser (User* u)
 	int i = 0;
 					          
 #ifdef BASE64NICKNAME
-	debugtochannel("User:     %s!%s@%s (%s)", u->nick, u->username, u->hostname, u->nick64);
+	debugtochannel("User:     %s!%s@%s (%s)", u->nick, u->username, u->hostname, u->name64);
 #else
 	debugtochannel("User:     %s!%s@%s", u->nick, u->username, u->hostname);
 #endif
@@ -652,7 +652,7 @@ UserLevel (User * u)
 		ulevel = NS_ULEVEL_ROOT;
 #endif
 #endif
-	nlog (LOG_DEBUG1, "UserLevel for %s is %d", u->nick, ulevel);
+	dlog(DEBUG1, "UserLevel for %s is %d", u->nick, ulevel);
 	return ulevel;
 }
 
@@ -662,7 +662,7 @@ SetUserVhost(const char* nick, const char* vhost)
 	User *u;
 
 	u = finduser (nick);
-	nlog(LOG_DEBUG1, "Vhost %s", vhost);
+	dlog(DEBUG1, "Vhost %s", vhost);
 	if (u) {
 		strlcpy (u->vhost, vhost, MAXHOST);
 	/* sethost on Unreal doesn't send +xt, but /umode +x sends +x 
@@ -682,7 +682,7 @@ UserMode (const char *nick, const char *modes)
 	long oldmode;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG1, "UserMode: user %s modes %s", nick, modes);
+	dlog(DEBUG1, "UserMode: user %s modes %s", nick, modes);
 	u = finduser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "UserMode: mode change for unknown user %s %s", nick, modes);
@@ -697,7 +697,7 @@ UserMode (const char *nick, const char *modes)
 		strlcpy(u->vhost, u->hostname, MAXHOST);
 	}
 #endif
-	nlog (LOG_DEBUG1, "UserMode: modes for %s is now %p", u->nick, (int *)u->Umode);
+	dlog(DEBUG1, "UserMode: modes for %s is now %p", u->nick, (int *)u->Umode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.user = u;	
 	cmdparams->param = (char*)modes;
@@ -713,14 +713,14 @@ UserSMode (const char *nick, const char *modes)
 	User *u;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG1, "UserSMode: user %s smodes %s", nick, modes);
+	dlog(DEBUG1, "UserSMode: user %s smodes %s", nick, modes);
 	u = finduser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "UserSMode: smode change for unknown user %s %s", nick, modes);
 		return;
 	}
 	u->Smode = SmodeStringToMask(modes, u->Smode);
-	nlog (LOG_DEBUG1, "UserSMode: smode for %s is now %p", u->nick, (int *)u->Smode);
+	dlog(DEBUG1, "UserSMode: smode for %s is now %p", u->nick, (int *)u->Smode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.user = u;	
 	cmdparams->param = modes;
@@ -777,4 +777,14 @@ void GetUserList(UserListHandler handler)
 		u = hnode_get(node);
 		handler(u);
 	}
+}
+
+int IsServiceRoot(User* u)
+{
+	if ((match(config.rootuser.nick, u->nick))
+	&& (match(config.rootuser.user, u->username))
+	&& (match(config.rootuser.host, u->hostname))) {
+		return (1);
+	}
+	return (0);
 }

@@ -24,7 +24,6 @@
 #include <arpa/inet.h> 
 #include "neostats.h"
 #include "modules.h"
-#include "conf.h"
 #include "services.h"
 
 static int bot_cmd_help (CmdParams * cmdparams);
@@ -273,7 +272,7 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 	cmdnode = hnode_create(cmd_ptr);
 	if (cmdnode) {
 		hash_insert(cmd_hash, cmdnode, cmd_ptr->cmd);
-		nlog(LOG_DEBUG3, "add_bot_cmd: added a new command %s to services bot", cmd_ptr->cmd);
+		dlog(DEBUG3, "add_bot_cmd: added a new command %s to services bot", cmd_ptr->cmd);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -444,7 +443,7 @@ run_bot_cmd (CmdParams * cmdparams)
 	}
 	/* Check user authority to use this command set */
 	if (( (cmdparams->dest.bot->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
-		( (cmdparams->dest.bot->flags & BOT_FLAG_ONLY_OPERS) && me.onlyopers && (userlevel < NS_ULEVEL_OPER) )){
+		( (cmdparams->dest.bot->flags & BOT_FLAG_ONLY_OPERS) && config.onlyopers && (userlevel < NS_ULEVEL_OPER) )){
 		msg_only_opers (cmdparams);
 		sfree (av);
 		sfree (cmdparams->av);
@@ -759,12 +758,16 @@ bot_cmd_set_boolean (CmdParams * cmdparams, bot_setting* set_ptr)
 {
 	if (!ircstrcasecmp(cmdparams->av[1], "ON")) {
 		*(int*)set_ptr->varptr = 1;
-		SetConf((void *) 1, CFGBOOL, set_ptr->confitem);
+		if(set_ptr->confitem) {
+			SetConf((void *) 1, CFGBOOL, set_ptr->confitem);
+		}
 		bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 		return NS_SUCCESS;
 	} else if (!ircstrcasecmp(cmdparams->av[1], "OFF")) {
 		*(int*)set_ptr->varptr = 0;
-		SetConf(0, CFGBOOL, set_ptr->confitem);
+		if(set_ptr->confitem) {
+			SetConf(0, CFGBOOL, set_ptr->confitem);
+		}
 		bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 		return NS_SUCCESS;
 	}
@@ -796,7 +799,9 @@ bot_cmd_set_int (CmdParams * cmdparams, bot_setting* set_ptr)
 	}
 	/* Set the new value */
 	*(int*)set_ptr->varptr = intval;
-	SetConf((void *)intval, CFGINT, set_ptr->confitem);
+	if(set_ptr->confitem) {
+		SetConf((void *)intval, CFGINT, set_ptr->confitem);
+	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
 }
@@ -805,7 +810,9 @@ static int
 bot_cmd_set_string (CmdParams * cmdparams, bot_setting* set_ptr)
 {
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	if(set_ptr->confitem) {
+		SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
 }
@@ -819,7 +826,9 @@ bot_cmd_set_channel (CmdParams * cmdparams, bot_setting* set_ptr)
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	if(set_ptr->confitem) {
+		SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
 }
@@ -831,7 +840,9 @@ bot_cmd_set_msg (CmdParams * cmdparams, bot_setting* set_ptr)
 
 	buf = joinbuf(cmdparams->av, cmdparams->ac, 1);
 	strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
-	SetConf((void *)buf, CFGSTR, set_ptr->confitem);
+	if(set_ptr->confitem) {
+		SetConf((void *)buf, CFGSTR, set_ptr->confitem);
+	}
 	bot_cmd_set_report (cmdparams, set_ptr, buf);
 	sfree(buf);
 	return NS_SUCCESS;
@@ -846,7 +857,9 @@ bot_cmd_set_nick (CmdParams * cmdparams, bot_setting* set_ptr)
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	if(set_ptr->confitem) {
+		SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
 }
@@ -860,7 +873,9 @@ bot_cmd_set_user (CmdParams * cmdparams, bot_setting* set_ptr)
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	if(set_ptr->confitem) {
+		SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
 }
@@ -879,7 +894,9 @@ bot_cmd_set_host (CmdParams * cmdparams, bot_setting* set_ptr)
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	if(set_ptr->confitem) {
+		SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
 }
@@ -891,7 +908,9 @@ bot_cmd_set_realname (CmdParams * cmdparams, bot_setting* set_ptr)
 
 	buf = joinbuf(cmdparams->av, cmdparams->ac, 1);
 	strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
-	SetConf((void *)buf, CFGSTR, set_ptr->confitem);
+	if(set_ptr->confitem) {
+		SetConf((void *)buf, CFGSTR, set_ptr->confitem);
+	}
 	bot_cmd_set_report (cmdparams, set_ptr, buf);
 	sfree(buf);
 	return NS_SUCCESS;
@@ -906,7 +925,9 @@ bot_cmd_set_ipv4 (CmdParams * cmdparams, bot_setting* set_ptr)
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	if(set_ptr->confitem) {
+		SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
 }

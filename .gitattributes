@@ -233,7 +233,7 @@ src/modules/connectserv/cs.h -text
 src/modules/connectserv/cs_help.c -text
 src/modules/extauth/.indent.pro -text
 src/modules/extauth/Makefile -text
-src/modules/extauth/serviceroots.c -text
+src/modules/extauth/extauth.c -text
 src/modules/hostserv/.indent.pro -text
 src/modules/hostserv/Makefile -text
 src/modules/hostserv/README -text

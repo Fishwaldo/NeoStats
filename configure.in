@@ -259,13 +259,13 @@ if test "$do_extauth" = no; then
 	)
 fi
 
-AC_MSG_CHECKING(An authentication module is specified)
-if test "$AUTH" = no; then
-	AC_MSG_RESULT(no)
-	AC_MSG_ERROR('You must define an authentication module to use. See ./configure --help for more information')
-else
-	AC_MSG_RESULT(yes)
-fi
+dnl AC_MSG_CHECKING(An authentication module is specified)
+dnl if test "$AUTH" = no; then
+dnl 	AC_MSG_RESULT(no)
+dnl 	AC_MSG_ERROR('You must define an authentication module to use. See ./configure --help for more information')
+dnl else
+dnl 	AC_MSG_RESULT(yes)
+dnl fi
 
 dnl Get system type
 AC_CANONICAL_HOST

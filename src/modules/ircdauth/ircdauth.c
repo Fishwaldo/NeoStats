@@ -155,8 +155,14 @@ static int auth_event_online(CmdParams* cmdparams)
 	return 1;
 };
 
+static int auth_event_mode(CmdParams* cmdparams) 
+{
+	return 1;
+}
+
 ModuleEvent module_events[] = {
 	{EVENT_ONLINE,	auth_event_online},
+	{EVENT_UMODE,	auth_event_mode}, 
 	{EVENT_NULL,	NULL}
 };
 
@@ -184,7 +190,7 @@ int ModAuthUser(User * u, int curlvl)
 			break;
 		}
 	}
-	nlog (LOG_DEBUG1, "UmodeAuth: umode level for %s is %d", u->nick, tmplvl);
+	dlog(DEBUG1, "UmodeAuth: umode level for %s is %d", u->nick, tmplvl);
 	if(tmplvl > curlvl)
 		curlvl = tmplvl;
 #ifdef GOTUSERSMODES
@@ -198,15 +204,10 @@ int ModAuthUser(User * u, int curlvl)
 			break;
 		}
 	}
-	nlog (LOG_DEBUG1, "UmodeAuth: smode level for %s is %d", u->nick, tmplvl);
+	dlog(DEBUG1, "UmodeAuth: smode level for %s is %d", u->nick, tmplvl);
 	if(tmplvl > curlvl)
 		curlvl = tmplvl;
 #endif
 	/* Return new level */
 	return curlvl;
-}
-
-int ModAuthList(User * u)
-{
-	return 1;
 }

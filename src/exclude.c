@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include "neostats.h"
 #include "exclude.h"
-#include "conf.h"
 #include "services.h"
 
 list_t *exclude_list;
@@ -71,7 +70,7 @@ int InitExcludes(void)
 			}
 			e->addedon = atoi(row[i]);
 			GetData((void *)&e->type, CFGINT, "Exclusions", row[i], "Type");
-			nlog(LOG_DEBUG2, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
+			dlog(DEBUG2, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
 			en = lnode_create(e);
 			list_append(exclude_list, en);
 		}

@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -60,7 +60,8 @@ static void m_end_of_burst (char *origin, char **argv, int argc, int srv);
 void send_end_of_burst_ack(void);
 void send_end_of_burst(void);
 
-const char services_bot_modes[]= "+iok";
+const char services_umode[]= "+iok";
+const char services_cmode[]= "+o";
 
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
@@ -128,25 +129,25 @@ ChanModes chan_modes[] = {
 };
 
 UserModes user_umodes[] = {
-	{UMODE_OPER,		'o', NS_ULEVEL_ADMIN},
-	{UMODE_LOCOP,		'O', NS_ULEVEL_OPER},
-	{UMODE_DEBUG,       'g', 0},
-	{UMODE_INVISIBLE,	'i', 0},
-	{UMODE_WALLOP,		'w', 0},
-	{UMODE_SERVNOTICE,	's', 0},
-	{UMODE_DEAF,		'd', 0},
-	{UMODE_CHSERV,		'k', 0},
-	{UMODE_ACCOUNT,     'r', 0},
-	{UMODE_HIDE,		'x', 0},
+	{UMODE_OPER,		'o'},
+	{UMODE_LOCOP,		'O'},
+	{UMODE_DEBUG,       'g'},
+	{UMODE_INVISIBLE,	'i'},
+	{UMODE_WALLOP,		'w'},
+	{UMODE_SERVNOTICE,	's'},
+	{UMODE_DEAF,		'd'},
+	{UMODE_CHSERV,		'k'},
+	{UMODE_ACCOUNT,     'r'},
+	{UMODE_HIDE,		'x'},
 #ifdef NEFARIOUS
-	{UMODE_BOT,         'B', 0},
+	{UMODE_BOT,         'B'},
 #endif
 #if ( defined NEFARIOUS ) || (defined ASUKA )
-	{UMODE_SETHOST,		'h', 0},
-	{UMODE_ACCOUNTONLY, 'R', 0},
-	{UMODE_XTRAOP,      'X', 0},
-	{UMODE_NOCHAN,      'n', 0},
-	{UMODE_NOIDLE,      'I', 0},
+	{UMODE_SETHOST,		'h'},
+	{UMODE_ACCOUNTONLY, 'R'},
+	{UMODE_XTRAOP,      'X'},
+	{UMODE_NOCHAN,      'n'},
+	{UMODE_NOIDLE,      'I'},
 #endif
 };
 
@@ -828,8 +829,8 @@ parse (char *line)
 	SET_SEGV_LOCATION();
 	if (!(*line))
 		return;
-	nlog (LOG_DEBUG1, "--------------------------BEGIN PARSE---------------------------");
-	nlog (LOG_DEBUG1, "R: %s", line);
+	dlog(DEBUG1, "--------------------------BEGIN PARSE---------------------------");
+	dlog(DEBUG1, "R: %s", line);
 	coreLine = strpbrk (line, " ");
 	if (coreLine) {
 		*coreLine = 0;
@@ -838,11 +839,11 @@ parse (char *line)
 		coreLine = line + strlen (line);
 	if ((!ircstrcasecmp(line, "SERVER")) || (!ircstrcasecmp(line, "PASS"))) {
 		strlcpy(cmd, line, sizeof(cmd));
-		nlog (LOG_DEBUG1, "cmd   : %s", cmd);
-		nlog (LOG_DEBUG1, "args  : %s", coreLine);
+		dlog(DEBUG1, "cmd   : %s", cmd);
+		dlog(DEBUG1, "args  : %s", coreLine);
 		ac = splitbuf(coreLine, &av, 1);
 		cmdptr = 2;
-		nlog (LOG_DEBUG1, "0 %d", ac);
+		dlog(DEBUG1, "0 %d", ac);
 		/* really needs to be in AddServer since this is a NeoStats wide bug
 		 if config uplink name does not match our uplinks server name we can
 		 never find the uplink!
@@ -860,17 +861,17 @@ parse (char *line)
 		} /*else
 			coreLine = line + strlen (line);*/
 		strlcpy(cmd, coreLine, sizeof(cmd));
-		nlog (LOG_DEBUG1, "origin: %s", origin);
-		nlog (LOG_DEBUG1, "cmd   : %s", cmd);
-		nlog (LOG_DEBUG1, "args  : %s", line);
+		dlog(DEBUG1, "origin: %s", origin);
+		dlog(DEBUG1, "cmd   : %s", cmd);
+		dlog(DEBUG1, "args  : %s", line);
 		if(line) {
 			ac = splitbuf(line, &av, 1);
 		}
-		nlog (LOG_DEBUG1, "0 %d", ac);
+		dlog(DEBUG1, "0 %d", ac);
 	}
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	if(av) sfree (av);
-	nlog (LOG_DEBUG1, "---------------------------END PARSE----------------------------");
+	dlog(DEBUG1, "---------------------------END PARSE----------------------------");
 }
 
 static void 

@@ -99,7 +99,7 @@
 #endif
 
 #ifdef NEOSTATS_REVISION
-#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION " (" NEOSTATS_REVISION ")" NS_PROTOCOL
+#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION " (" NEOSTATS_REVISION ") " NS_PROTOCOL
 #else
 #define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION NS_PROTOCOL
 #endif
@@ -254,6 +254,7 @@ typedef enum NS_ERR {
 	NS_ERR_NO_PERMISSION	= 0x8000006,
 	NS_ERR_UNKNOWN_COMMAND	= 0x8000007,
 	NS_ERR_UNKNOWN_OPTION	= 0x8000008,
+	NS_ERR_PARAM_OUT_OF_RANGE= 0x8000009,
 }NS_ERR ;
 
 /* do_exit call exit type definitions */
@@ -290,7 +291,8 @@ typedef enum NS_TRANSFER {
 #endif
 
 extern char recbuf[BUFSIZE];
-extern const char services_bot_modes[];
+extern const char services_umode[];
+extern const char services_cmode[];
 extern char segv_location[SEGV_LOCATION_BUFSIZE];
 
 /* this is the dns structure */
@@ -321,31 +323,18 @@ typedef struct Server {
  */
 struct me {
 	char name[MAXHOST];
-	char nameb64[B64SIZE];
-	int port;
-	int r_time;
 	int numeric; /* For Unreal and any other server that needs a numeric */
 	char uplink[MAXHOST];
-	char pass[MAXPASS];
-	char services_name[MAXHOST];
 	char infoline[MAXHOST];
 	char netname[MAXPASS];
 	char local[MAXHOST];
 	time_t t_start;
-	unsigned int allbots;
 	unsigned int maxsocks;
 	unsigned int cursocks;
-	unsigned int want_privmsg:1;
-	unsigned int onlyopers:1;
-	unsigned int die:1;
-	unsigned int debug_mode:1;
 	unsigned int want_nickip:1;
-#if defined(ULTIMATE3) || defined(QUANTUM)
-	unsigned int client:1;
-#endif
-	unsigned int setservertimes;
-	unsigned int versionscan;
-	char chan[BUFSIZE];
+	char servicescmode[64];
+	char servicesumode[64];
+	char serviceschan[CHANLEN];
 	unsigned int onchan:1;
 	unsigned int synced:1;
 	Server *s;
@@ -355,7 +344,6 @@ struct me {
 	long RcveM;
 	long RcveBytes;
 	time_t lastmsg;
-	int pingtime;
 	time_t now;
 	char strnow[STR_TIME_T_SIZE];
 #ifdef SQLSRV
@@ -386,7 +374,7 @@ typedef struct Ban {
  */
 typedef struct User {
 	char nick[MAXNICK];
-	char nick64[B64SIZE];
+	char name64[B64SIZE];
 	char hostname[MAXHOST];
 	char username[MAXUSER];
 	char realname[MAXREALNAME];
@@ -436,19 +424,45 @@ typedef struct Channel {
  */
 /*
 typedef struct Client {
-do we use:
-	User* user;
-	Server* server;
-or:
-	source sptr;
-	dest dptr;
-	int command;
-	int flags;
-	int sock;
-	char **av;
-	int ac;
-	char param[BUFSIZE];
-	void *moddata[NUMMODS];
+		User* user;
+	char nick[MAXNICK];
+	char name64[B64SIZE];
+	char hostname[MAXHOST];
+	char username[MAXUSER];
+	char realname[MAXREALNAME];
+	char vhost[MAXHOST];
+	char awaymsg[MAXHOST];
+	char swhois[MAXHOST];
+	struct in_addr ipaddr;
+	Server *server;
+	int flood;
+	int is_away;
+	time_t tslastmsg;
+	time_t tslastnick;
+	time_t tslastaway;
+	time_t TS;
+	time_t servicestamp;
+	char modes[MODESIZE];
+	long Umode;
+	long Smode;
+	int ulevel;
+	list_t *chans;
+	long flags;
+	void *moddata[NUM_MODULES];
+
+		Server* server;
+	char name[MAXHOST];
+	char name64[B64SIZE];
+	int hops;
+	int numeric;
+	time_t connected_since;
+	int ping;
+	char uplink[MAXHOST];
+	char version[MAXHOST];
+	char infoline[MAXINFO];
+	long flags;
+	void *moddata[NUM_MODULES];
+			
 } Client; */
 
 typedef struct _Bot Bot;
@@ -668,6 +682,7 @@ typedef struct Module {
 	mod_auth mod_auth_cb;
 	void *dl_handle;
 	unsigned int modnum;
+	unsigned int debuglevel;
 }Module;
 
 extern Module* RunModule[10];
@@ -768,6 +783,8 @@ typedef struct _Bot {
 	bot_setting *bot_settings;
 	/* min ulevel for settings */
 	unsigned int set_ulevel;
+	/* Link back to user struct associated with this bot*/
+	User* u;
 }_Bot;
 
 int ModuleConfig(bot_setting* bot_settings);
@@ -791,10 +808,25 @@ int bot_nick_change (const char * oldnick, const char *newnick);
 int sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, socket_function func_read, socket_function func_write, socket_function func_error);
 int sock_disconnect (const char *name);
 
-/* conf.c */
-int ConfLoad (void);
-void rehash (void);
-int ConfLoadModules (void);
+/* keeper interface */
+
+#define CFGSTR   1
+#define CFGINT   2
+#define CFGFLOAT 3
+#define CFGBOOL  4
+
+#define CONFBUFSIZE 256
+
+int GetConf (void **data, int type, const char *item);
+int SetConf (void *data, int type, char *item);
+int GetDir (char *item, char ***data);
+int DelConf (char *item);
+int DelRow (char *table, char *row);
+int DelTable(char *table);
+int SetData (void *data, int type, char *table, char *row, char *field);
+int GetTableData (char *table, char ***data);
+int GetData (void **data, int type, const char *table, const char *row, const char *field);
+void flush_keeper();
 
 /* main.c */
 void do_exit (NS_EXIT_TYPE exitcode, char* quitmsg) __attribute__((noreturn));
@@ -820,7 +852,7 @@ void parse (char* line);
 char *joinbuf (char **av, int ac, int from);
 int split_buf (char *buf, char ***argv, int colon_special);
 int flood (User * u);
-int join_bot_to_chan (const char *who, const char *chan, unsigned long chflag);
+int join_bot_to_chan (const char *who, const char *chan, const char *modes);
 
 void privmsg_list (char *to, char *from, const char **text);
 void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
@@ -833,7 +865,7 @@ void numeric (const int numeric, const char *target, const char *data, ...) __at
 
 /* function declarations */
 #ifdef GOTSJOIN
-int ssjoin_cmd (const char *who, const char *chan, unsigned long chflag);
+int ssjoin_cmd (const char *who, const char *chan, const char *mode);
 #endif
 int sjoin_cmd (const char *who, const char *chan);
 int spart_cmd (const char *who, const char *chan);
@@ -945,20 +977,16 @@ typedef enum LOG_LEVEL {
 	LOG_NOTICE,		/* did you know messages */
 	LOG_NORMAL,		/* our normal logging level? */
 	LOG_INFO,		/* lots of info about what we are doing */
-	LOG_DEBUG1,		/* debug notices about important functions that are going on */
-	LOG_DEBUG2,		/* more debug notices that are usefull */
-	LOG_DEBUG3,		/* even more stuff, that would be useless to most normal people */
-	LOG_DEBUG4,		/* are you insane? */
-	LOG_LEVELMAX,		/* are you insane? */
+	LOG_LEVELMAX,		
 } LOG_LEVEL;
 
 /* define debug levels */
 
 typedef enum DEBUG_LEVEL {
-	DEBUG1=1,
-	DEBUG2,
-	DEBUG3,
-	DEBUG4,
+	DEBUG1=1,	/* debug notices about important functions that are going on */
+	DEBUG2,		/* more debug notices that are usefull */
+	DEBUG3,		/* even more stuff, that would be useless to most normal people */
+	DEBUG4,		/* are you insane? */
 	DEBUG5,
 	DEBUG6,
 	DEBUG7,
@@ -996,8 +1024,7 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 #endif
 
 void nlog (LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-
-#include "conf.h"
+void dlog (DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
 int CloakHost (Bot *bot_ptr);
 

@@ -40,15 +40,15 @@ db_entry db_list[NUM_MODULES];
 int DBOpenDatabase(void)
 {
 	int index;
-	nlog(LOG_DEBUG1, "DBOpenDatabase");
+	dlog(DEBUG1, "DBOpenDatabase");
 	index = GET_CUR_MODNUM();
 	ircsnprintf(db_list[index].dbname, MAXPATH, "data/%s.db", GET_CUR_MODNAME());
 	if ((dbret = db_create(&db_list[index].dbp, NULL, 0)) != 0) {
-		nlog(LOG_DEBUG1, "db_create: %s", db_strerror(dbret));
+		dlog(DEBUG1, "db_create: %s", db_strerror(dbret));
 		return -1;
 	}
 	if ((dbret = db_list[index].dbp->open(db_list[index].dbp, NULL, db_list[index].dbname, NULL, DB_BTREE, DB_CREATE, 0664)) != 0) {
-		nlog(LOG_DEBUG1, "dbp->open: %s", db_strerror(dbret));
+		dlog(DEBUG1, "dbp->open: %s", db_strerror(dbret));
 		return -1;
 	}
 	return 1;
@@ -58,7 +58,7 @@ void DBCloseDatabase(void)
 {
 	int index;
 
-	nlog(LOG_DEBUG1, "DBCloseDatabase");
+	dlog(DEBUG1, "DBCloseDatabase");
 	index = GET_CUR_MODNUM();
 	db_list[index].dbp->close(db_list[index].dbp, 0); 
 }
@@ -67,7 +67,7 @@ void* DBGetData(char* key)
 {
 	int index;
 
-	nlog(LOG_DEBUG1, "DBGetData %s", key);
+	dlog(DEBUG1, "DBGetData %s", key);
 	index = GET_CUR_MODNUM();
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
@@ -75,10 +75,10 @@ void* DBGetData(char* key)
 	dbkey.size = strlen(key);
 	if ((dbret = db_list[index].dbp->get(db_list[index].dbp, NULL, &dbkey, &dbdata, 0)) == 0)
 	{
-/*		nlog(LOG_DEBUG1, "DBGetData %s", dbdata.data);*/
+/*		dlog(DEBUG1, "DBGetData %s", dbdata.data);*/
 		return dbdata.data;
 	}
-	nlog(LOG_DEBUG1, "dbp->get: fail");
+	dlog(DEBUG1, "dbp->get: fail");
 	return NULL;
 }
 
@@ -86,7 +86,7 @@ void DBSetData(char* key, void* data, int size)
 {
 	int index;
 
-	nlog(LOG_DEBUG1, "DBSetData %s %s", key, data);
+	dlog(DEBUG1, "DBSetData %s %s", key, data);
 	index = GET_CUR_MODNUM();
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
@@ -95,7 +95,7 @@ void DBSetData(char* key, void* data, int size)
 	dbdata.data = data;
 	dbdata.size = size;
 	if ((dbret = db_list[index].dbp->put(db_list[index].dbp, NULL, &dbkey, &dbdata, 0)) != 0) {
-		nlog(LOG_DEBUG1, "dbp->put: %s", db_strerror(dbret));
+		dlog(DEBUG1, "dbp->put: %s", db_strerror(dbret));
 	}
 }
 

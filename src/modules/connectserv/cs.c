@@ -171,7 +171,7 @@ void ModFini()
 
 static int cs_event_online(CmdParams* cmdparams)
 {
-	cs_bot = init_bot (&cs_botinfo, services_bot_modes, 
+	cs_bot = init_bot (&cs_botinfo, me.servicesumode, 
 		BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, cs_commands, cs_settings);
 	cs_online = 1;
 	return 1;

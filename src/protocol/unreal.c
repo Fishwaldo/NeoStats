@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -63,7 +63,8 @@ static void m_tkl (char *origin, char **argv, int argc, int srv);
 
 #define NICKV2	
 
-const char services_bot_modes[]= "+oSq";
+const char services_umode[]= "+oSq";
+const char services_cmode[]= "+o";
 
 ircd_cmd cmd_list[] = {
 	/*Message	Token	Function	usage */
@@ -141,44 +142,44 @@ ChanModes chan_modes[] = {
 };
 
 UserModes user_umodes[] = {
-	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT},
-	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN},
-	{UMODE_SADMIN, 'a', NS_ULEVEL_ADMIN},
-	{UMODE_ADMIN, 'A', NS_ULEVEL_OPER},
-	{UMODE_COADMIN, 'C', NS_ULEVEL_OPER},
-	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
-	{UMODE_LOCOP, 'O', NS_ULEVEL_LOCOPER},
-	{UMODE_REGNICK, 'r', NS_ULEVEL_REG},
-	{UMODE_INVISIBLE, 'i', 0},
-	{UMODE_WALLOP, 'w', 0},
-	{UMODE_FAILOP, 'g', 0},
-	{UMODE_HELPOP, 'h', 0},
-	{UMODE_SERVNOTICE, 's', 0},
-	{UMODE_KIX, 'q', 0},
-	{UMODE_BOT, 'B', 0},
+	{UMODE_SERVICES, 'S'},
+	{UMODE_NETADMIN, 'N'},
+	{UMODE_SADMIN, 'a'},
+	{UMODE_ADMIN, 'A'},
+	{UMODE_COADMIN, 'C'},
+	{UMODE_OPER, 'o'},
+	{UMODE_LOCOP, 'O'},
+	{UMODE_REGNICK, 'r'},
+	{UMODE_INVISIBLE, 'i'},
+	{UMODE_WALLOP, 'w'},
+	{UMODE_FAILOP, 'g'},
+	{UMODE_HELPOP, 'h'},
+	{UMODE_SERVNOTICE, 's'},
+	{UMODE_KIX, 'q'},
+	{UMODE_BOT, 'B'},
 /* temp removal of deaf for SVSMODE Services Stamp */
-/* 	{UMODE_DEAF, 'd', 0},*/
+/* 	{UMODE_DEAF, 'd'},*/
 #ifdef UNREAL32
-	{UMODE_RGSTRONLY, 'R', 0},
- 	{UMODE_NOCTCP, 'T', 0},
-	{UMODE_WEBTV, 'V', 0},
-	{UMODE_HIDEWHOIS, 'p', 0},
-	{UMODE_HIDEOPER, 'H', 0},
+	{UMODE_RGSTRONLY, 'R'},
+ 	{UMODE_NOCTCP, 'T'},
+	{UMODE_WEBTV, 'V'},
+	{UMODE_HIDEWHOIS, 'p'},
+	{UMODE_HIDEOPER, 'H'},
 #else 
-	{UMODE_KILLS, 'k', 0},
-	{UMODE_EYES, 'e', 0},
-	{UMODE_FCLIENT, 'F', 0},
-	{UMODE_CLIENT, 'c', 0},
-	{UMODE_FLOOD, 'f', 0},
-	{UMODE_JUNK, 'j', 0},
+	{UMODE_KILLS, 'k'},
+	{UMODE_EYES, 'e'},
+	{UMODE_FCLIENT, 'F'},
+	{UMODE_CLIENT, 'c'},
+	{UMODE_FLOOD, 'f'},
+	{UMODE_JUNK, 'j'},
 #endif
-	{UMODE_STRIPBADWORDS, 'G', 0},
-	{UMODE_SETHOST, 't', 0},
-	{UMODE_HIDE, 'x', 0},
-	/*{UMODE_CHATOP, 'b', 0},*/
-	{UMODE_WHOIS, 'W', 0},
-	{UMODE_SECURE, 'z', 0},
-	{UMODE_VICTIM, 'v', 0},	
+	{UMODE_STRIPBADWORDS, 'G'},
+	{UMODE_SETHOST, 't'},
+	{UMODE_HIDE, 'x'},
+	/*{UMODE_CHATOP, 'b'},*/
+	{UMODE_WHOIS, 'W'},
+	{UMODE_SECURE, 'z'},
+	{UMODE_VICTIM, 'v'},	
 };
 
 

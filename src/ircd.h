@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,6 @@ typedef struct ChanModes {
 typedef struct {
 	unsigned long umode;
 	char mode;
-	int level;
 } UserModes;
 
 typedef struct ircd_server {
@@ -58,7 +57,8 @@ typedef struct ircd_server {
 	char cloak[25];
 	int maxglobalcnt;
 	int tsendsync;
-	unsigned int token:1;
+	unsigned int token;
+	unsigned int client;
 } ircd_server;
 
 extern UserModes user_umodes[];
@@ -73,7 +73,7 @@ extern const int ircd_cmdcount;
 extern const int ircd_umodecount;
 extern const int ircd_smodecount;
 extern const int ircd_cmodecount;
-extern long services_bot_umode;
+extern long service_umode_mask;
 
 char* UmodeMaskToString(const long Umode);
 long UmodeStringToMask(const char* UmodeString, long Umode);

@@ -52,7 +52,7 @@ int InitCurl(void)
 	}
 	/* init the internal list to track downloads */
 	activetransfers = list_create(MAX_TRANSFERS);
-	nlog(LOG_DEBUG1, "LibCurl Initialized successfully");
+	dlog(DEBUG1, "LibCurl Initialized successfully");
 	return NS_SUCCESS;
 }
 
@@ -68,7 +68,7 @@ static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, vo
 		case NS_FILE:
 			/* we are saving to a file... :) */
 			writesize = fwrite(transferptr, size, nmemb, neotrans->savefile);
-			nlog(LOG_DEBUG1, "Write %d to file from transfer from URL %s", (int)size*nmemb, neotrans->url);
+			dlog(DEBUG1, "Write %d to file from transfer from URL %s", (int)size*nmemb, neotrans->url);
 			break;
 		case NS_MEMORY:
 			size *= nmemb;
@@ -129,7 +129,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 			}
 			newtrans->savefileormem = NS_FILE;
 			strlcpy(newtrans->filename, filename, MAXPATH);			
-			nlog(LOG_DEBUG1, "Saving new download to %s from %s", filename, url);	
+			dlog(DEBUG1, "Saving new download to %s from %s", filename, url);	
 			break;
 		case NS_MEMORY:
 			newtrans->savefileormem = NS_MEMORY;
@@ -274,7 +274,7 @@ void transfer_status(void)
 				case NS_FILE:
 					/* we are saving to a file... :) */
 					fclose(neotrans->savefile);
-					nlog(LOG_DEBUG1, "Write Finished to file from transfer from URL %s",  neotrans->url);
+					dlog(DEBUG1, "Write Finished to file from transfer from URL %s",  neotrans->url);
 					break;
 				case NS_MEMORY:
 					break;
@@ -286,7 +286,7 @@ void transfer_status(void)
 				nlog(LOG_NOTICE, "Transfer %s Failed. Error was: %s", neotrans->url, neotrans->curlerror);
 				neotrans->callback(neotrans->data, NS_FAILURE, neotrans->curlerror, strlen(neotrans->curlerror));
 			} else {
-				nlog(LOG_DEBUG1, "Transfer %s succeded.", neotrans->url);
+				dlog(DEBUG1, "Transfer %s succeded.", neotrans->url);
 				/* success, so we must callback with success */
 				neotrans->callback(neotrans->data, NS_SUCCESS, neotrans->savefileormem == NS_MEMORY ? neotrans->savemem : NULL, neotrans->savememsize);
 			}

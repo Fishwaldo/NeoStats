@@ -1,10 +1,8 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
-**
-**  Portions Copyright (c) 1999 Johnathan George net@lite.net
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -38,7 +36,6 @@ const char ns_help_exclude_oneline[]="Maintain global exclusions";
 #ifdef USE_RAW
 const char ns_help_raw_oneline[]="Send a raw command";
 #endif
-const char ns_help_debug_oneline[]="Configure debug mode";
 const char ns_help_botlist_oneline[]="List module bots";
 const char ns_help_socklist_oneline[]="List module sockets";
 const char ns_help_timerlist_oneline[]="List module timers";
@@ -131,24 +128,12 @@ const char *ns_help_modlist[] = {
 	NULL
 };
 
-const char *ns_help_debug[] = {
-	"Syntax: \2DEBUG <ON|OFF>\2",
-	"",
-	"Set debug mode. When enabled, debugging information is",
-	"sent to the services channel.",
-	"",
-	"On a large network, this command will generate a",
-	"large amount of information.",
-	NULL
-};
-
 const char *ns_help_shutdown[] = {
 	"Syntax: \2SHUTDOWN <reason>\2",
 	"",
-	"Cause NeoStats to save data files and exit immediately.",
+	"Cause NeoStats to save data files and exit.",
 	"The reason provided will be broadcast to the services",
 	"channel and other operators on the network.",
-	"This command should be used wisely.",
 	NULL
 };
 
@@ -159,7 +144,6 @@ const char *ns_help_reload[] = {
 	"then reconnect to the network.",
 	"The reason provided will be broadcast to the services",
 	"channel and other operators on the network.",
-	"This command SHOULD be used wisely.",
 	NULL
 };
 
@@ -235,6 +219,51 @@ const char *ns_help_status[] = {
 	NULL
 };
 
+const char *ns_help_set_pingtime[] = {
+	"\2PINGTIME <seconds>\2",
+	"Set ping interval at which NeoStats pings servers",
+	NULL
+};
+
+const char *ns_help_set_loglevel[] = {
+	"\2LOGLEVEL <level>\2",
+	"Controls the level of logging information recorded",
+	"<level> is a value in the range 1 - 6",
+	NULL
+};
+
+const char *ns_help_set_debug[] = {
+	"\2DEBUG <ON|OFF>\2",
+	"When enabled, debugging information is sent to debug.log",
+	"and to DEBUGCHAN if DEBUGTOCHAN is enabled.",
+	NULL
+};
+
+const char *ns_help_set_debuglevel[] = {
+	"\2DEBUG <level>\2",
+	"Controls the level of debug information reported",
+	"<level> is a value in the range 1 - 10",
+	NULL
+};
+
+const char *ns_help_set_debugchan[] = {
+	"\2DEBUGCHAN <#channel>\2",
+	"Channel name for debug output when DEBUGTOCHAN is ON",
+	NULL
+};
+
+const char *ns_help_set_debugmodule[] = {
+	"\2DEBUGMODULE <modulename|all>\2",
+	"Whether to debug a single module or all",
+	NULL
+};
+
+const char *ns_help_set_debugtochan[] = {
+	"\2DEBUGTOCHAN <ON|OFF>\2",
+	"Enable debug output to channel DEBUGCHAN",
+	NULL
+};
+
 const char *ns_help_set_nick[] = {
 	"\2NICK <newnick>\2 Change bot nickname",
 	"(requires restart to take effect).",
@@ -268,6 +297,24 @@ const char *ns_help_set_versionscan[] = {
 	"\2VERSIONSCAN <ON|OFF>\2",
 	"Whether NeoStats performs a CTCP version scan",
 	"when users connect to the network.",
+	NULL
+};
+
+const char *ns_help_set_servicecmode[] = {
+	"\2SERVICEBOTCMODE <mode>\2",
+	"Set the channel modes assigned to service bots when",
+	"they join the services channel. You must prefix with",
+	"a + sign e.g. +o or +a or +v etc",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_serviceumode[] = {
+	"\2SERVICEBOTUMODE <mode>\2",
+	"Set the user modes assigned to service bots when",
+	"they join the network. You must prefix with",
+	"a + sign e.g. +S or +So etc",
+	"(requires restart to take effect).",
 	NULL
 };
 

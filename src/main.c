@@ -71,9 +71,9 @@ void InitMe(void)
 	me.now = time(NULL);
 	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
 #ifdef DEBUG
-	me.debug_mode = 1;
+	config.debug = 1;
 #endif
-	me.r_time = 10;
+	config.r_time = 10;
 	me.numeric = 1;
 #ifdef SQLSRV
 	me.sqlport = 8888;
@@ -125,7 +125,7 @@ static int InitCore(void)
 	if (InitCurl () != NS_SUCCESS)
 		return NS_FAILURE;
 	InitIrcd ();
-	nlog (LOG_DEBUG1, "Core init successful");
+	dlog(DEBUG1, "Core init successful");
 	return NS_SUCCESS;
 }
 
@@ -239,18 +239,16 @@ get_options (int argc, char **argv)
 	int c;
 	int level;
 
-	/* set some defaults first */
+	/* Clear config */
+	memset(&config, 0 , sizeof(config));
+	/* Debug mode overrides */
 #ifdef DEBUG
 	config.loglevel = LOG_INFO;
 	config.debuglevel = DEBUG10;
 	config.foreground = 1;
-#else
-	config.loglevel = LOG_NORMAL;
-	config.debuglevel = 0;
-	config.foreground = 0;
 #endif
 
-	while ((c = getopt (argc, argv, "hvrd:l:nqf")) != -1) {
+	while ((c = getopt (argc, argv, "hvrd:nqf")) != -1) {
 		switch (c) {
 		case 'h':
 			printf ("NeoStats: Usage: \"neostats [options]\"\n");
@@ -258,27 +256,14 @@ get_options (int argc, char **argv)
 			printf ("	  -v (Show version number)\n");
 			printf ("	  -r (Enable recv.log)\n");
 			printf ("	  -d 1-10 (Debug log output level 1= lowest, 10 = highest)\n");
-			printf ("	  -l 1-10 (Log output level 1= lowest, 6 = highest)\n");
 			printf ("	  -n (Do not load any modules on startup)\n");
 			printf ("	  -q (Quiet start - for cron scripts)\n");
 			printf ("     -f (Do not fork into background\n");
 			return NS_FAILURE;
 		case 'v':
-			printf ("NeoStats Version %s\n", me.version);
+			printf ("NeoStats: http://www.neostats.net\n");
+			printf ("Version:  %s\n", me.version);
 			printf ("Compiled: %s at %s\n", ns_module_info.build_date, ns_module_info.build_time);
-			printf ("Flag after version number indicates what IRCd NeoStats is compiled for:\n");
-			printf ("(U31)- Unreal 3.1.x IRCd\n");
-			printf ("(U32)- Unreal 3.2.x IRCd\n");
-			printf ("(UL3)- Ultimate 3.x.x IRCd\n");
-			printf ("(UL) - Ultimate 2.x.x IRCd (Depreciated)\n");
-			printf ("(H)  - Hybrid 7.x IRCd\n");
-			printf ("(N)  - NeoIRCd IRCd\n");
-			printf ("(M)  - Mystic IRCd\n");
-			printf ("(Q)  - Quantum IRCd\n");
-			printf ("(B)  - Bahamut IRCd\n");
-			printf ("(IRCu) - IRCu (P10) IRCd\n");
-			printf ("(V)  - Viagra IRCd\n");
-			printf ("\nNeoStats: http://www.neostats.net\n");
 			return NS_FAILURE;
 		case 'r':
 			printf ("recv.log enabled. Watch your disk space\n");
@@ -287,7 +272,7 @@ get_options (int argc, char **argv)
 		case 'd':
 			printf ("debug.log enabled. Watch your disk space\n");
 			level = atoi (optarg);
-			if ((level > DEBUGMAX - 1) || (level < 1)) {
+			if ((level >= DEBUGMAX) || (level < 1)) {
 				printf ("Invalid debug level %d\n", level);
 				return NS_FAILURE;
 			}
@@ -298,14 +283,6 @@ get_options (int argc, char **argv)
 			break;
 		case 'q':
 			config.quiet = 1;
-			break;
-		case 'l':
-			level = atoi (optarg);
-			if ((level > LOG_LEVELMAX - 1) || (level < 1)) {
-				printf ("Invalid level %d\n", level);
-				return NS_FAILURE;
-			}
-			config.loglevel = level;
 			break;
 		case 'f':
 			config.foreground = 1;
@@ -368,9 +345,9 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		FiniBots();
 		FiniTimers();
 		if (exitcode == NS_EXIT_RECONNECT) {
-			if(me.r_time>0) {
-				nlog (LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
-				sleep (me.r_time);
+			if(config.r_time>0) {
+				nlog (LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", config.r_time, attempts);
+				sleep (config.r_time);
 			}
 			else {
 				nlog (LOG_NOTICE, "Reconnect time is zero, shutting down");
@@ -382,7 +359,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 	kp_exit();
 	FiniLogs ();
 
-	if ((exitcode == NS_EXIT_RECONNECT && me.r_time > 0) || exitcode == NS_EXIT_RELOAD) {
+	if ((exitcode == NS_EXIT_RECONNECT && config.r_time > 0) || exitcode == NS_EXIT_RELOAD) {
 		execve ("./neostats", NULL, NULL);
 		return_code=EXIT_FAILURE;	/* exit code to error */
 	}

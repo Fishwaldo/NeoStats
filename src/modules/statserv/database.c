@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -37,7 +37,7 @@ void SaveServerStats(void)
 	hash_scan_begin(&ss, Shead);
 	while ((sn = hash_scan_next(&ss))) {
 		s = hnode_get(sn);
-		nlog(LOG_DEBUG1, "Writing statistics to database for %s", s->name);
+		dlog(DEBUG1, "Writing statistics to database for %s", s->name);
 		SetData((void *)s->numsplits, CFGINT, "ServerStats", s->name, "Splits");
 		SetData((void *)s->maxusers, CFGINT, "ServerStats", s->name, "MaxUsers");
 		SetData((void *)s->t_maxusers, CFGINT, "ServerStats", s->name, "MaxUsersTime");
@@ -145,7 +145,7 @@ void LoadServerStats(void)
 			s->opers = 0;
 			s->daily_totusers = 0;
 			s->lowest_ping = s->highest_ping = s->daily_totusers = 0;
-			nlog(LOG_DEBUG1, "Loaded statistics for %s", s->name);
+			dlog(DEBUG1, "Loaded statistics for %s", s->name);
 			if (hash_isfull(Shead)) {
 				nlog(LOG_CRITICAL, "StatServ server hash full");
 				break;
@@ -215,9 +215,9 @@ CStats *load_chan(char *name)
 	if (list_isfull(Chead)) {
 		nlog(LOG_CRITICAL, "StatServ channel hash full");
 	} else {
-		nlog(LOG_DEBUG2, "Loading channel %s", c->name);
+		dlog(DEBUG2, "Loading channel %s", c->name);
 		if ((me.now - c->lastseen) > 604800) {
-			nlog(LOG_DEBUG1, "Reset old channel %s", c->name);
+			dlog(DEBUG1, "Reset old channel %s", c->name);
 			c->totmem = 0;
 			c->topics = 0;
 			c->kicks = 0;
@@ -285,7 +285,7 @@ int DelOldChan(void)
 	time_t start;
 	
 	start = time(NULL);
-	nlog(LOG_DEBUG1, "Deleting old channels");
+	dlog(DEBUG1, "Deleting old channels");
 	if (GetTableData("ChanStats", &row) > 0) {
 		for (count = 0; row[count] != NULL; count++) {
 			if (GetData((void *)&lastseen, CFGINT, "ChanStats", row[count], "LastSeen") > 0) {
@@ -293,7 +293,7 @@ int DelOldChan(void)
 				 * use findchan, instead of findchanstats, and findchan is based on hashes, so its faster 
 				 */
 				if (((me.now - lastseen) > 604800) && (!findchan(row[count]))) {
-					nlog(LOG_DEBUG1, "Deleting Channel %s", row[count]);
+					dlog(DEBUG1, "Deleting Channel %s", row[count]);
 					DelRow("ChanStats", row[count]);
 				}
 			} else {
@@ -304,6 +304,6 @@ int DelOldChan(void)
 		}
 	}
 	sfree(row);
-	nlog(LOG_INFO, "DelOldChan: %d seconds %d channels", (int)(time(NULL) - start), count);
+	dlog(DEBUG1, "DelOldChan: %d seconds %d channels", (int)(time(NULL) - start), count);
 	return 1;
 }

@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -112,7 +112,7 @@ static CVersions *findctcpversion(char *name)
 		cv = lnode_get(cn);
 		return cv;
 	}
-	nlog(LOG_DEBUG2, "findctcpversion(%s) -> NOT FOUND", name);
+	dlog(DEBUG2, "findctcpversion(%s) -> NOT FOUND", name);
 	return NULL;
 }
 
@@ -128,7 +128,7 @@ int save_client_versions(void)
 		while (cn != NULL) {
 			cv = lnode_get(cn);
 			fwrite(cv, sizeof(CVersions), 1, output);	
-			nlog(LOG_DEBUG2, "Save version %s", cv->name);
+			dlog(DEBUG2, "Save version %s", cv->name);
 			cn = list_next(Vhead, cn);
 		}
 		fclose(output);
@@ -149,7 +149,7 @@ int load_client_versions(void)
 		while(!feof(input)) {
 			node = lnode_create(clientv);
 			list_append(Vhead, node);
-			nlog(LOG_DEBUG2, "Loaded version %s", clientv->name);
+			dlog(DEBUG2, "Loaded version %s", clientv->name);
 			clientv = smalloc(sizeof(CVersions));
 			fread(clientv, sizeof(CVersions), 1, input);	
 		}
@@ -212,7 +212,7 @@ void StatsAddCTCPVersion(char* version)
 	strip_mirc_codes(nocols);
 	clientv = findctcpversion(nocols);
 	if (clientv) {
-		nlog(LOG_DEBUG2, "Found version: %s", nocols);
+		dlog(DEBUG2, "Found version: %s", nocols);
 		clientv->count++;
 		return;
 	}
@@ -221,7 +221,7 @@ void StatsAddCTCPVersion(char* version)
 	clientv->count = 1;
 	node = lnode_create(clientv);
 	list_append(Vhead, node);
-	nlog(LOG_DEBUG2, "Added version: %s", clientv->name);
+	dlog(DEBUG2, "Added version: %s", clientv->name);
 }
 
 void StatsDelChan(Channel* c)
@@ -317,7 +317,7 @@ CStats *findchanstats(char *name)
 		cs = lnode_get(cn);
 		return cs;
 	}
-	nlog(LOG_DEBUG2, "findchanstats: %s not found", name);
+	dlog(DEBUG2, "findchanstats: %s not found", name);
 	return NULL;
 }
 
@@ -327,7 +327,7 @@ SStats *newserverstats(const char *name)
 	SStats *s;
 
 	SET_SEGV_LOCATION();
-	nlog(LOG_DEBUG2, "newserverstats(%s)", name);
+	dlog(DEBUG2, "newserverstats(%s)", name);
 	if (hash_isfull(Shead)) {
 		nlog(LOG_CRITICAL, "StatServ Server hash is full!");
 		return NULL;
@@ -352,10 +352,10 @@ SStats *findserverstats(char *name)
 	SET_SEGV_LOCATION();
 	sn = hash_lookup(Shead, name);
 	if (sn) {
-		nlog(LOG_DEBUG2, "findserverstats(%s) - found", name);
+		dlog(DEBUG2, "findserverstats(%s) - found", name);
 		return hnode_get(sn);
 	} 
-	nlog(LOG_DEBUG2, "findserverstats(%s) - not found", name);
+	dlog(DEBUG2, "findserverstats(%s) - not found", name);
 	return NULL;
 }
 
@@ -364,7 +364,7 @@ void StatsAddServer(Server* s)
 	SStats *st;
 
 	SET_SEGV_LOCATION();
-	nlog(LOG_DEBUG2, "StatsAddServer(%s)", s->name);
+	dlog(DEBUG2, "StatsAddServer(%s)", s->name);
 	st = findserverstats(s->name);
 	if (!st) {
 		st = newserverstats(s->name);
@@ -439,7 +439,7 @@ void StatsKillUser(User* u)
 	SET_SEGV_LOCATION();
 	s = findserverstats(u->server->name);
 	if (is_oper(u)) {
-		nlog(LOG_DEBUG2, "Decreasing OperCount on %s due to kill", u->server->name);
+		dlog(DEBUG2, "Decreasing OperCount on %s due to kill", u->server->name);
 		DecreaseOpers(s);
 	}
 	if (u->is_away == 1) {
@@ -488,7 +488,7 @@ void StatsUserMode(User* u, char *modes)
 		case 'O':
 		case 'o':
 			if (add) {
-				nlog(LOG_DEBUG1, "Increasing OperCount for %s (%d)", u->server->name, s->opers);
+				dlog(DEBUG1, "Increasing OperCount for %s (%d)", u->server->name, s->opers);
 				IncreaseOpers(s);
 				if (stats_network.maxopers <
 				    stats_network.opers) {
@@ -509,7 +509,7 @@ void StatsUserMode(User* u, char *modes)
 				}
 			} else {
 				if (is_oper(u)) {
-					nlog(LOG_DEBUG1, "Decreasing OperCount for %s", u->server->name);
+					dlog(DEBUG1, "Decreasing OperCount for %s", u->server->name);
 					DecreaseOpers(s);
 				}
 			}
@@ -538,7 +538,7 @@ void StatsAddUser(User* u)
 	SET_SEGV_LOCATION();
 	s = findserverstats(u->server->name);
 	IncreaseUsers(s);
-	nlog(LOG_DEBUG2, "added %s to stats, now at %d", u->nick, s->users);
+	dlog(DEBUG2, "added %s to stats, now at %d", u->nick, s->users);
 	if (s->maxusers < s->users) {
 		/* New User Record */
 		s->maxusers = s->users;
@@ -564,7 +564,7 @@ void StatsDelUser(User* u)
 
 	s = findserverstats(u->server->name);
 	if (is_oper(u)) {
-		nlog(LOG_DEBUG2, "Decreasing OperCount on %s due to signoff", u->server->name);
+		dlog(DEBUG2, "Decreasing OperCount on %s due to signoff", u->server->name);
 		DecreaseOpers(s);
 	}
 	if (u->is_away == 1) {
@@ -584,7 +584,7 @@ int StatsMidnight(void)
 	if (ltm->tm_hour == 0 && ltm->tm_min == 0) {
 		/* its Midnight! */
 		chanalert(ss_bot->nick, "Reset Daily Statistics - Its Midnight here!");
-		nlog(LOG_DEBUG1, "Reset Daily Statistics");
+		dlog(DEBUG1, "Reset Daily Statistics");
 		daily.servers = stats_network.servers;
 		daily.t_servers = me.now;
 		daily.users = stats_network.users;

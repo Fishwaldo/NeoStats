@@ -25,6 +25,7 @@
 #include "modules.h"
 #include "dl.h"
 #include "ircd.h"
+#include "services.h"
 
 typedef int (*getauthfunc) (User *, int curlvl);
 typedef int (*listauthfunc) (User * u);
@@ -45,52 +46,14 @@ static int AuthModuleCount = 0;
  *
  */
 
-int UmodeAuth(User * u)
-{
-	int i, tmplvl = 0;
-	/* Note, tables have been reordered highest to lowest so the 
-	 * first hit will give the highest level for a given umode
-	 * combination so we can just set it without checking against
-	 * the current level 
-	 * we can also quit on the first occurrence of 0
-	 * should be a lot faster!
-	 */
-	for (i = 0; i < ircd_umodecount; i++) {
-		if(user_umodes[i].level == 0)
-			break;
-		if (u->Umode & user_umodes[i].umode) {
-			tmplvl = user_umodes[i].level;
-			break;
-		}
-	}
-	nlog (LOG_DEBUG1, "UmodeAuth: umode level for %s is %d", u->nick, tmplvl);
-
-/* I hate SMODEs damn it */
-#ifdef GOTUSERSMODES
-	/* hey, smode can equal 0 as well you know */
-	/* see umode comments above */
-	for (i = 0; i < ircd_smodecount; i++) {
-		if(user_smodes[i].level == 0)
-			break;
-		if (u->Smode & user_smodes[i].umode) {
-			/* only if the smode level is higher than standard, do we alter tmplvl */
-			if (user_smodes[i].level > tmplvl) 
-				tmplvl = user_smodes[i].level;
-			break;
-		}
-	}
-	nlog (LOG_DEBUG1, "UmodeAuth: smode level for %s is %d", u->nick, tmplvl);
-#endif
-	return tmplvl;
-}
-
 int UserAuth(User * u)
 {
 	int tmplvl = 0;
 	int authlvl = 0;
 	int i;
 	
-	/* tmplvl = UmodeAuth(u); */
+	if(IsServiceRoot(u))
+		return(NS_ULEVEL_ROOT);
 	for(i = 0; i < AuthModuleCount; i ++)
 	{
 		if (AuthModList[i].getauth) {

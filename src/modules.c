@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -209,7 +209,7 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 		while (ev_list->event != EVENT_NULL) {
 			/* This goes through each Command */
 			if (ev_list->event == event) {
-				nlog (LOG_DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
+				dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
 				SET_SEGV_LOCATION();
 				if (setjmp (sigvbuf) == 0) {
 					SET_RUN_LEVEL(module_ptr);
@@ -251,7 +251,7 @@ SendAllModuleEvent (Event event, CmdParams* cmdparams)
 			while (ev_list->event != EVENT_NULL) {
 				/* This goes through each Command */
 				if (ev_list->event == event) {
-					nlog (LOG_DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
+					dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
 					SET_SEGV_LOCATION();
 					if (setjmp (sigvbuf) == 0) {
 						SET_RUN_LEVEL(module_ptr);
@@ -391,8 +391,8 @@ load_module (const char *modfilename, User * u)
 	mod_ptr = (Module *) smalloc (sizeof (Module));
 	mn = hnode_create (mod_ptr);
 	hash_insert (modulehash, mn, info_ptr->name);
-	nlog (LOG_DEBUG1, "Module Internal name: %s", info_ptr->name);
-	nlog (LOG_DEBUG1, "Module description: %s", info_ptr->description);
+	dlog(DEBUG1, "Module Internal name: %s", info_ptr->name);
+	dlog(DEBUG1, "Module description: %s", info_ptr->description);
 	mod_ptr->info = info_ptr;
 	mod_ptr->dl_handle = dl_handle;
 	mod_ptr->event_list = event_ptr;
@@ -403,7 +403,7 @@ load_module (const char *modfilename, User * u)
 		moduleindex++;
 	ModList[moduleindex] = mod_ptr;
 	mod_ptr->modnum = moduleindex;
-	nlog (LOG_DEBUG1, "Assigned %d to module %s for modulenum", moduleindex, mod_ptr->info->name);
+	dlog(DEBUG1, "Assigned %d to module %s for modulenum", moduleindex, mod_ptr->info->name);
 
 	SET_SEGV_LOCATION();
 	SET_RUN_LEVEL(mod_ptr);
@@ -484,7 +484,7 @@ unload_module (const char *modname, User * u)
 	del_timers (mod_ptr);
 	/* Delete any sockets used by this module */
 	del_sockets (mod_ptr);
-	nlog (LOG_DEBUG1, "Deleting Module %s from Hash", modname);
+	dlog(DEBUG1, "Deleting Module %s from Hash", modname);
 	globops (me.name, "%s Module Unloaded", modname);
 	/* Remove from the module hash so we dont call events for this module 
 	 * during signoff 
@@ -510,7 +510,7 @@ unload_module (const char *modname, User * u)
 	RESET_RUN_LEVEL();
 	/* free the module number */
 	if (moduleindex >= 0) {
-		nlog (LOG_DEBUG1, "Free %d from Module Numbers", moduleindex);
+		dlog(DEBUG1, "Free %d from Module Numbers", moduleindex);
 		ModList[moduleindex] = NULL;
 	}
 	sfree (mod_ptr);
@@ -553,42 +553,44 @@ ModuleConfig(bot_setting* set_ptr)
 	SET_SEGV_LOCATION();
 	while(set_ptr->option)
 	{
-		switch(set_ptr->type) {
-			case SET_TYPE_BOOLEAN:
-				if (GetConf((void *)set_ptr->varptr, CFGBOOL, set_ptr->confitem) <= 0) {
-					*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
-				}
-				break;
-			case SET_TYPE_INT:
-				if (GetConf((void *)set_ptr->varptr, CFGINT, set_ptr->confitem) <= 0) {
-					*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
-				}
-				break;
-			case SET_TYPE_STRING:
-			case SET_TYPE_CHANNEL:							
-			case SET_TYPE_MSG:
-			case SET_TYPE_NICK:
-			case SET_TYPE_USER:
-			case SET_TYPE_HOST:
-			case SET_TYPE_REALNAME:
-			case SET_TYPE_IPV4:
-				if(GetConf((void *) &temp, CFGSTR, set_ptr->confitem) > 0) {
-					strlcpy(set_ptr->varptr, temp, MAXNICK);
-					sfree(temp);
-				} else {
-					strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
-					
-				}
-				break;			
-			case SET_TYPE_CUSTOM:
-				if(set_ptr->handler) {
-					set_ptr->handler(NULL);
-				}
-				break;
-			default:
-				nlog(LOG_WARNING, "Unsupported SET type %d in ModuleConfig %s", 
-					set_ptr->type, set_ptr->option);
-				break;
+		if(set_ptr->confitem) {
+			switch(set_ptr->type) {
+				case SET_TYPE_BOOLEAN:
+					if (GetConf((void *)set_ptr->varptr, CFGBOOL, set_ptr->confitem) <= 0) {
+						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
+					}
+					break;
+				case SET_TYPE_INT:
+					if (GetConf((void *)set_ptr->varptr, CFGINT, set_ptr->confitem) <= 0) {
+						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
+					}
+					break;
+				case SET_TYPE_STRING:
+				case SET_TYPE_CHANNEL:							
+				case SET_TYPE_MSG:
+				case SET_TYPE_NICK:
+				case SET_TYPE_USER:
+				case SET_TYPE_HOST:
+				case SET_TYPE_REALNAME:
+				case SET_TYPE_IPV4:
+					if(GetConf((void *) &temp, CFGSTR, set_ptr->confitem) > 0) {
+						strlcpy(set_ptr->varptr, temp, MAXNICK);
+						sfree(temp);
+					} else {
+						strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
+						
+					}
+					break;			
+				case SET_TYPE_CUSTOM:
+					if(set_ptr->handler) {
+						set_ptr->handler(NULL);
+					}
+					break;
+				default:
+					nlog(LOG_WARNING, "Unsupported SET type %d in ModuleConfig %s", 
+						set_ptr->type, set_ptr->option);
+					break;
+			}
 		}
 		set_ptr++;
 	}

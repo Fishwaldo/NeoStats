@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -25,7 +25,6 @@
 
 #include "neostats.h"
 #include "keeper.h"
-#include "conf.h"
 
 /** @brief Gets Config Data of Type
  */
@@ -56,7 +55,7 @@ GetConf (void **data, int type, const char *item)
 	}
 	/* check for errors */
 	if (i != 0) {
-		nlog (LOG_DEBUG1, "GetConf: %s - Path: %s", kp_strerror (i), keypath);
+		dlog(DEBUG1, "GetConf: %s - Path: %s", kp_strerror (i), keypath);
 		return -1;
 	}
 	return 1;
@@ -78,7 +77,7 @@ GetDir (char *item, char ***data)
 		return 1;
 	}
 	*data = NULL;
-	nlog (LOG_DEBUG1, "GetDir: %s - Path: %s", kp_strerror (i), keypath);
+	dlog(DEBUG1, "GetDir: %s - Path: %s", kp_strerror (i), keypath);
 	return -1;
 
 }
@@ -173,7 +172,7 @@ GetData (void **data, int type, const char *table, const char *row, const char *
 	}
 	/* check for errors */
 	if (i != 0) {
-		nlog (LOG_DEBUG1, "GetData: %s - Path: %s", kp_strerror (i), keypath);
+		dlog(DEBUG1, "GetData: %s - Path: %s", kp_strerror (i), keypath);
 		return -1;
 	}
 	return 1;
@@ -196,7 +195,7 @@ GetTableData (char *table, char ***data)
 		return 1;
 	}
 	*data = NULL;
-	nlog (LOG_DEBUG1, "GetTableData: %s - Path: %s", kp_strerror (i), keypath);
+	dlog(DEBUG1, "GetTableData: %s - Path: %s", kp_strerror (i), keypath);
 	return -1;
 
 }

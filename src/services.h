@@ -24,9 +24,51 @@
 #ifndef _SERVICES_H_
 #define _SERVICES_H_
 
+typedef struct neoroot {
+	char nick[MAXNICK];
+	char user[MAXUSER];
+	char host[MAXHOST];
+	int level;
+} neoroot;
+
+/* general configuration items */
+struct config {
+	/* log level */
+	unsigned int loglevel;
+	/* debug level */
+	unsigned int debuglevel;
+	/* enable recv.log */
+	unsigned int recvlog:1;
+	/* dont load modules on startup */
+	unsigned int modnoload:1;
+	/* dont output anything on start */
+	unsigned int quiet:1;
+	/* dont detach into background */
+	unsigned int foreground:1;
+	unsigned int allbots;
+	unsigned int want_privmsg:1;
+	unsigned int die:1;
+	unsigned int error:1;
+	unsigned int onlyopers:1;
+	unsigned int setservertimes;
+	unsigned int versionscan;
+	int r_time;
+	int port;
+	char pass[MAXPASS];
+	unsigned int debug;
+	int debugtochan;
+	char debugchan[CHANLEN];
+	int pingtime;
+	neoroot rootuser;
+	char debugmodule[MAX_MOD_NAME];
+} config;
+
 extern ModuleInfo ns_module_info;
 extern Module ns_module;
 extern BotInfo ns_botinfo;
 extern Bot* ns_botptr;
+
+void InitServices(void);
+int IsServiceRoot(User* u);
 
 #endif /* _SERVICES_H_ */

@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -24,31 +24,33 @@
 */
 
 #include "neostats.h"
-#include "conf.h"
 #include "hash.h"
 #include "log.h"
-#include "dotconf.h"
+#include "services.h"
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #endif
 
+typedef struct LogEntry {
+	FILE *logfile;
+	char name[MAX_MOD_NAME];
+	char logname[MAXPATH];
+	unsigned int flush;
+} LogEntry;
+
 const char* CoreLogFileName="NeoStats";
 char LogFileNameFormat[MAX_LOGFILENAME]="-%m-%d";
 
-const char *loglevels[10] = {
+const char *loglevels[LOG_LEVELMAX] = {
 	"CRITICAL",
 	"ERROR",
 	"WARNING",
 	"NOTICE",
 	"NORMAL",
 	"INFO",
-	"DEBUG1",
-	"DEBUG2",
-	"DEBUG3",
-	"INSANE"
 };
 
-const char *dloglevels[10] = {
+const char *dloglevels[DEBUGMAX] = {
 	"DEBUG1",
 	"DEBUG2",
 	"DEBUG3",
@@ -63,15 +65,7 @@ const char *dloglevels[10] = {
 
 static char log_buf[BUFSIZE];
 static char log_fmttime[TIMEBUFSIZE];
-
-struct logs_ {
-	FILE *logfile;
-	char name[MAX_MOD_NAME];
-	char logname[MAXPATH];
-	unsigned int flush;
-} logs_;
-
-hash_t *logs;
+static hash_t *logs;
 
 /** @brief initialize the logging functions 
  */
@@ -94,7 +88,7 @@ CloseLogs (void)
 {
 	hscan_t hs;
 	hnode_t *hn;
-	struct logs_ *logentry;
+	LogEntry *logentry;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin (&hs, logs);
@@ -119,29 +113,7 @@ CloseLogs (void)
 void 
 FiniLogs (void) 
 {
-	hscan_t hs;
-	hnode_t *hn;
-	struct logs_ *logentry;
-
-	SET_SEGV_LOCATION();
-	hash_scan_begin (&hs, logs);
-	while ((hn = hash_scan_next (&hs)) != NULL) {
-		logentry = hnode_get (hn);
-		logentry->flush = 0;
-#ifdef DEBUG
-		printf ("Closing Logfile %s (%s)\n", logentry->name, (char *) hnode_getkey (hn));
-#endif
-		if(logentry->logfile)
-		{
-			fflush (logentry->logfile);
-			fclose (logentry->logfile);
-			logentry->logfile = NULL;
-		}
-		hash_scan_delete (logs, hn);
-		hnode_destroy (hn);
-		sfree (logentry);
-	}
-	/* for some reason, the logs are not getting flushed correctly */
+	CloseLogs();
 	hash_destroy(logs);
 }
 
@@ -156,13 +128,18 @@ void make_log_filename(char* modname, char *logname)
 static void
 debuglog (const char* time, const char* level, const char *line)
 {
+	static int chanflag = 0;
 	FILE *logfile;
 
-	if ((logfile = fopen ("logs/debug.log", "a")) == NULL)
-		return;
+	logfile = fopen ("logs/debug.log", "a");
 	if (logfile) {
-		fprintf (logfile, "%s %s %s\n", time, level, line);
+		fprintf (logfile, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line);
 		fclose (logfile);
+	}
+	if(config.debugtochan&&!chanflag) {
+		chanflag = 1;
+		privmsg(config.debugchan, ns_botptr->nick, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line);
+		chanflag = 0;
 	}
 }
 
@@ -174,18 +151,21 @@ dlog (DEBUG_LEVEL level, char *fmt, ...)
 	va_list ap;
 	
 	if (level <= config.debuglevel) {
-		/* we update me.now here, because some functions might be busy and not call the loop a lot */
-		me.now = time(NULL);
-		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", me.now);
-		strftime (log_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime (&me.now));
-		va_start (ap, fmt);
-		ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
-		va_end (ap);
-#ifndef DEBUG
-		if (config.foreground)
-#endif
-			printf ("%s %s - %s\n", dloglevels[level - 1], GET_CUR_MODNAME(), log_buf);
-		debuglog (log_fmttime, dloglevels[level - 1], log_buf);
+		/* Support for module specific only debug info */
+		if(ircstrcasecmp(config.debugmodule, "all")== 0 || ircstrcasecmp(config.debugmodule, GET_CUR_MODNAME()) ==0)
+		{
+			/* we update me.now here, because some functions might be busy and not call the loop a lot */
+			me.now = time(NULL);
+			ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", me.now);
+			strftime (log_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime (&me.now));
+			va_start (ap, fmt);
+			ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
+			va_end (ap);
+			if (config.foreground) {
+				printf ("%s %s - %s\n", dloglevels[level - 1], GET_CUR_MODNAME(), log_buf);
+			}
+			debuglog (log_fmttime, dloglevels[level - 1], log_buf);
+		}
 	}
 }
 
@@ -196,7 +176,7 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 {
 	va_list ap;
 	hnode_t *hn;
-	struct logs_ *logentry;
+	LogEntry *logentry;
 	
 	if (level <= config.loglevel) {
 		hn = hash_lookup (logs, GET_CUR_MODNAME());
@@ -206,7 +186,7 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 			if(!logentry->logfile)
 				logentry->logfile = fopen (logentry->logname, "a");
 		} else {
-			logentry = smalloc (sizeof (struct logs_));
+			logentry = smalloc (sizeof (LogEntry));
 			strlcpy (logentry->name, GET_CUR_MODNAME() , MAX_MOD_NAME);
 			make_log_filename(logentry->name, logentry->logname);
 			logentry->logfile = fopen (logentry->logname, "a");
@@ -228,14 +208,11 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 		va_start (ap, fmt);
 		ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
 		va_end (ap);
-		if(level <= LOG_INFO) {
-			fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
-			logentry->flush = 1;
-		}
-#ifndef DEBUG
-		if (config.foreground)
-#endif
+		fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
+		logentry->flush = 1;
+		if (config.foreground) {
 			printf ("%s %s - %s\n", loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
+		}
 	}
 	if (config.debuglevel) {
 		debuglog (log_fmttime, loglevels[level - 1], log_buf);
@@ -249,7 +226,7 @@ ResetLogs (void)
 {
 	hscan_t hs;
 	hnode_t *hn;
-	struct logs_ *logentry;
+	LogEntry *logentry;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin (&hs, logs);
@@ -302,6 +279,6 @@ nassert_fail (const char *expr, const char *file, const int line, const char *in
 /* this is for sqlserver logging callback */
 void sqlsrvlog(char *logline) 
 {
-	nlog(LOG_DEBUG1, "SqlSrv: %s", logline);
+	dlog(DEBUG1, "SqlSrv: %s", logline);
 }
 #endif

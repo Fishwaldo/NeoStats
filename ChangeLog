@@ -4,6 +4,44 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Tidy exported include files (via make install) to the currently required 
+   minimum. (M)
+ - Added DEBUGMOD option which allows selective debugging of a module so we can
+   limit debug output to a single module when required. (M)
+ - Command line option -v now reports a full IRCd string in the version so we
+   no longer need the flag "help" text. (M)
+   this is now handled by IRCdAuth. (M)
+ - Removed -l (log level) command line option. This is now an inline "SET" 
+   option which saved and restored via config system. (M)
+   this is now handled by IRCdAuth. (M)
+ - Removed umode levels from IRCd protocol files and associated core code since 
+   this is now handled by IRCdAuth. (M)
+ - ExtAuth: Added support for an access list system such that the master 
+   service root can manage users who have access to NeoStats and their 
+   individual levels. This removes the need for the older SERVICE_ROOTS options
+   which have been superseded with the new SERVICEROOT option for master root
+   and the access list maintained via IRC (M)
+ - Authentication modules are now optional again. A single service root is 
+   required in the config file using a new SERVICEROOT option which follows the 
+   format of the old SERVICE_ROOTS option but is singlular and renamed to 
+   prevent upgraders relying on this working. This is used by the core to 
+   provide at least one user with NeoStats access regardless of authentication 
+   systems. (M)
+ - Add dlog function to handle debug messages. nlog is now purely for normal 
+   logging purposes (M)
+ - Add DEBUGCHAN setting for sending debug messages to channel and DEBUGTOCHAN
+   setting to enable/disable it's use. (M)
+ - Reorganised me and config structures. (M)
+ - Debug mode is now a SET option rather than a command. (M)
+ - Add set command to NeoStats to set user mode for service bots. 
+   /msg neostats set SERVICEBOTUMODE <mode>. default is defined in the IRCd 
+   specific services_umode string. (M)
+ - Add set command to NeoStats to set channel mode for service bots. 
+   /msg neostats set SERVICEBOTCMODE <mode>. default is defined in the IRCd 
+   specific services_cmode string. (M)
+ - Add services_cmode string to IRCd protocol files to set default channel
+   modes for service bot that reflect IRCd capabilities to simplify sjoin 
+   code and module code for joins. (M)
  - New module auth system to support auth systems other than the 2.5 extauth.
    The core is now unable to provide any authentication and an auth module must 
    be loaded. The old IRCd umode based auth is now a loadable module so is 

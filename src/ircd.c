@@ -1,10 +1,8 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
-**
-**  Portions Copyright (c) 1999 Johnathan George net@lite.net
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -38,6 +36,7 @@
 #include "servers.h"
 #include "bans.h"
 #include "auth.h"
+#include "dns.h"
 
 ircd_server ircd_srv;
 
@@ -46,7 +45,7 @@ static char UmodeStringBuf[64];
 #ifdef GOTUSERSMODES
 static char SmodeStringBuf[64];
 #endif
-long services_bot_umode= 0;
+long service_umode_mask= 0;
 
 #ifdef IRCU
 int scmode_op (const char *who, const char *chan, const char *mode, const char *bot);
@@ -61,11 +60,12 @@ int scmode_op (const char *who, const char *chan, const char *mode, const char *
 void
 InitIrcd ()
 {
+	InitServices();
 #ifdef IRCU
 	/* Temp: force tokens for IRCU */
 	ircd_srv.token = 1;
 #endif
-	services_bot_umode = UmodeStringToMask(services_bot_modes, 0);
+	service_umode_mask = UmodeStringToMask(me.servicesumode, 0);
 };
 
 /** @brief UmodeMaskToString
@@ -205,19 +205,19 @@ SmodeStringToMask(const char* SmodeString, long Smode)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int 
-join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
+join_bot_to_chan (const char *who, const char *chan, const char *mode)
 {
 #ifdef GOTSJOIN
-	ssjoin_cmd(who, chan, chflag);
+	ssjoin_cmd(who, chan, mode);
 #else
 	sjoin_cmd(who, chan);
-	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN)
+	if(mode) {
 #if defined(IRCU)
-		scmode_op(who, chan, "+o", who);
+		scmode_op(who, chan, me.servicescmode, who);
 #else
-		schmode_cmd(who, chan, "+o", who);
+		schmode_cmd(who, chan, me.servicescmode, who);
 #endif
-
+	}
 #endif
 	return NS_SUCCESS;
 }
@@ -233,8 +233,8 @@ int
 signon_newbot (const char *nick, const char *user, const char *host, const char *realname, long Umode)
 {
 	snewnick_cmd (nick, user, host, realname, Umode);
-	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-		join_bot_to_chan(nick, me.chan, CMODE_CHANADMIN);
+	if ((config.allbots > 0) || (Umode & service_umode_mask)) {
+		join_bot_to_chan(nick, me.serviceschan, me.servicescmode);
 	}
 	return NS_SUCCESS;
 }
@@ -374,7 +374,7 @@ joinbuf (char **av, int ac, int from)
 	 * the caller handle that case. 
 	 */
 	if(from >= ac) {
-		nlog (LOG_DEBUG1, "joinbuf: from (%d) >= ac (%d)", from, ac);
+		dlog(DEBUG1, "joinbuf: from (%d) >= ac (%d)", from, ac);
 		strlcpy (buf, "(null)", BUFSIZE);
 	}
 	else {
@@ -398,10 +398,10 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 {
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
-		nlog (LOG_DEBUG1, "m_notice: dropping notice from %s to NULL: %s", origin, av[ac-1]);
+		dlog(DEBUG1, "m_notice: dropping notice from %s to NULL: %s", origin, av[ac-1]);
 		return;
 	}
-	nlog (LOG_DEBUG1, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
+	dlog(DEBUG1, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
 	/* who to */
 	if(av[0][0] == '#') {
 		bot_chan_notice (origin, av, ac);
@@ -409,7 +409,7 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 	}
 #if 0
 	if( ircstrcasecmp(av[0], "AUTH")) {
-		nlog (LOG_DEBUG1, "m_notice: dropping server notice from %s, to %s : %s", origin, av[0], av[ac-1]);
+		dlog(DEBUG1, "m_notice: dropping server notice from %s, to %s : %s", origin, av[0], av[ac-1]);
 		return;
 	}
 #endif
@@ -429,10 +429,10 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
-		nlog (LOG_DEBUG1, "m_private: dropping privmsg from %s to NULL: %s", origin, av[ac-1]);
+		dlog(DEBUG1, "m_private: dropping privmsg from %s to NULL: %s", origin, av[ac-1]);
 		return;
 	}
-	nlog (LOG_DEBUG1, "m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
+	dlog(DEBUG1, "m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
 	/* who to */
 	if(av[0][0] == '#') {
 		bot_chan_private (origin, av, ac);
@@ -471,10 +471,10 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 #endif
 			) {
 			if(cmd_list[i].function) {
-				nlog (LOG_DEBUG3, "process_ircd_cmd: running command %s", cmd_list[i].name);
+				dlog(DEBUG3, "process_ircd_cmd: running command %s", cmd_list[i].name);
 				cmd_list[i].function (origin, av, ac, cmdptr);
 			} else {
-				nlog (LOG_DEBUG3, "process_ircd_cmd: ignoring command %s", cmd);
+				dlog(DEBUG3, "process_ircd_cmd: ignoring command %s", cmd);
 			}
 			cmd_list[i].usage++;
 			return;
@@ -501,8 +501,8 @@ parse (char *line)
 	SET_SEGV_LOCATION();
 	if (!(*line))
 		return;
-	nlog (LOG_DEBUG1, "--------------------------BEGIN PARSE---------------------------");
-	nlog (LOG_DEBUG1, "R: %s", line);
+	dlog(DEBUG1, "--------------------------BEGIN PARSE---------------------------");
+	dlog(DEBUG1, "R: %s", line);
 	if (*line == ':') {
 		coreLine = strpbrk (line, " ");
 		if (!coreLine)
@@ -526,13 +526,13 @@ parse (char *line)
 		coreLine = line + strlen (line);
 	}
 	strlcpy (cmd, line, sizeof (cmd)); 
-	nlog (LOG_DEBUG1, "origin: %s", origin);
-	nlog (LOG_DEBUG1, "cmd   : %s", cmd);
-	nlog (LOG_DEBUG1, "args  : %s", coreLine);
+	dlog(DEBUG1, "origin: %s", origin);
+	dlog(DEBUG1, "cmd   : %s", cmd);
+	dlog(DEBUG1, "args  : %s", coreLine);
 	ac = splitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	sfree (av);
-	nlog (LOG_DEBUG1, "---------------------------END PARSE----------------------------");
+	dlog(DEBUG1, "---------------------------END PARSE----------------------------");
 }
 #endif
 
@@ -746,8 +746,8 @@ do_stats (const char* nick, const char *what)
 		numeric (RPL_STATSUPTIME, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 	} else if (!ircstrcasecmp (what, "c")) {
 		/* Connections */
-		numeric (RPL_STATSNLINE, u->nick, "N *@%s * * %d 50", me.uplink, me.port);
-		numeric (RPL_STATSCLINE, u->nick, "C *@%s * * %d 50", me.uplink, me.port);
+		numeric (RPL_STATSNLINE, u->nick, "N *@%s * * %d 50", me.uplink, config.port);
+		numeric (RPL_STATSCLINE, u->nick, "C *@%s * * %d 50", me.uplink, config.port);
 	} else if (!ircstrcasecmp (what, "o")) {
 		/* Operators */
 		ListAuth(u);
@@ -785,7 +785,7 @@ do_protocol (char *origin, char **argv, int argc)
 #endif
 #ifdef GOTCLIENTSUPPORT
 		if (!ircstrcasecmp ("CLIENT", argv[i])) {
-			me.client = 1;
+			ircd_srv.client = 1;
 		}
 #endif
 #if defined(HYBRID7)
@@ -820,7 +820,7 @@ chanalert (char *from, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	send_privmsg (from, me.chan, ircd_buf);
+	send_privmsg (from, me.serviceschan, ircd_buf);
 }
 
 void
@@ -836,7 +836,7 @@ prefmsg (char *to, const char *from, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	if (me.want_privmsg) {
+	if (config.want_privmsg) {
 		send_privmsg (from, to, ircd_buf);
 	} else {
 		send_notice (from, to, ircd_buf);
@@ -1153,13 +1153,23 @@ srakill_cmd (const char *host, const char *ident)
 	return NS_SUCCESS;
 }
 
-int
-ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
+static char get_sjoin_char(const char* mode)
 {
-	char flag;
-	char mode;
-	char **av;
-	int ac;
+	char c = 0;
+	int i;
+
+	for (i = 0; i < ircd_cmodecount; i++) {
+		if (chan_modes[i].sjoin == 0 || mode[1] == chan_modes[i].flag) {
+			c = chan_modes[i].sjoin;
+			break;
+		}
+	}
+	return(c);
+}
+
+int
+ssjoin_cmd (const char *who, const char *chan, const char *mode)
+{
 	time_t ts;
 	Channel *c;
 
@@ -1169,78 +1179,22 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 	} else {
 		ts = c->creationtime;
 	}
-	switch (chflag) {
-#ifdef CMODE_FL_CHANOP
-	case CMODE_CHANOP:
-		flag = CMODE_FL_CHANOP;
-		mode= CMODE_CH_CHANOP;
-		break;
-#endif
-#ifdef CMODE_FL_VOICE
-	case CMODE_VOICE:
-		flag = CMODE_FL_VOICE;
-		mode= CMODE_CH_VOICE;
-		break;
-#endif
-#ifdef CMODE_FL_CHANOWNER
-    case CMODE_CHANOWNER:
-        flag = CMODE_FL_CHANOWNER;
-        mode= CMODE_CH_CHANOWNER;
-        break;
-#endif
-#ifdef CMODE_FL_CHANPROT
-    case CMODE_CHANPROT:
-        flag = CMODE_FL_CHANPROT;
-        mode= CMODE_CH_CHANPROT;
-        break;
-#endif
-#ifdef CMODE_FL_VIP
-    case CMODE_VIP:
-		flag = CMODE_FL_VIP;
-		mode= CMODE_CH_VIP;
-		break;
-#endif
-#ifdef CMODE_FL_HALFOP
-    case CMODE_HALFOP:
-        flag = CMODE_FL_HALFOP;
-        mode= CMODE_CH_HALFOP;
-        break;
-#endif
-#ifdef CMODE_FL_UOP
-    case CMODE_UOP:
-        flag = CMODE_FL_UOP;
-        mode= CMODE_CH_UOP;
-        break;
-#endif
-#ifndef FAKE_CMODE_CHANADMIN
-#ifdef CMODE_FL_CHANADMIN
-	case CMODE_CHANADMIN:
-		flag = CMODE_FL_CHANADMIN;
-		mode= CMODE_CH_CHANADMIN;
-		break;
-#endif
-#endif
-#ifdef CMODE_SILENCE
-	case CMODE_FL_SILENCE:
-		flag = CMODE_FL_SILENCE;
-		mode= CMODE_CH_SILENCE;
-		break;
-#endif
-	default:
-		flag = ' ';
-		mode= '\0';
-	}
-	if (mode == 0) {
+	if (mode == NULL) {
 		ircsnprintf (ircd_buf, BUFSIZE, "%s", who);
 	} else {
-		ircsnprintf (ircd_buf, BUFSIZE, "%c%s", flag, who);
+		ircsnprintf (ircd_buf, BUFSIZE, "%c%s", get_sjoin_char(mode), who);
 	}
 	send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
 	join_chan (who, chan);
-	ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", chan, mode, who);
-	ac = split_buf (ircd_buf, &av, 0);
-	ChanMode (me.name, av, ac);
-	sfree (av);
+	if (mode) {
+		char **av;
+		int ac;
+
+		ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, who);
+		ac = split_buf (ircd_buf, &av, 0);
+		ChanMode (me.name, av, ac);
+		sfree (av);
+	}
 	return NS_SUCCESS;
 }
 
@@ -1320,7 +1274,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 #ifdef UNREAL
 		/* Unreal passes +b(&) and +e(") via SJ3 so skip them for now */	
 		if(*nicklist == '&' || *nicklist == '"') {
-			nlog (LOG_DEBUG1, "Skipping %s", nicklist);
+			dlog(DEBUG1, "Skipping %s", nicklist);
 			paramidx++;
 			continue;
 		}
@@ -1372,7 +1326,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 									modeexists = 1;
 									break;
 								} else if (((int *) m->mode == (int *) chan_modes[i].mode) && !ircstrcasecmp (m->param, argv[j])) {
-									nlog (LOG_INFO, "ChanMode: Mode %c (%s) already exists, not adding again", chan_modes[i].flag, argv[j]);
+									dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", chan_modes[i].flag, argv[j]);
 									j++;
 									modeexists = 1;
 									break;
@@ -1571,7 +1525,7 @@ do_svsmode_user (const char* nick, const char* modes, const char* ts)
 		SetUserServicesTS (nick, ts);
 		/* If only setting TS, we do not need further mode processing */
 		if(strcasecmp(modes, "+d") == 0) {
-			nlog (LOG_DEBUG3, "dropping modes since this is a services TS %s", modes);
+			dlog(DEBUG3, "dropping modes since this is a services TS %s", modes);
 			return;
 		}
 		/* We need to strip the d from the mode string */
@@ -1691,7 +1645,7 @@ do_eos (const char *name)
 	s = findserver (name);
 	if(s) {
 		SynchServer(s);
-		nlog (LOG_DEBUG1, "do_eos: server %s is now synched", name);
+		dlog(DEBUG1, "do_eos: server %s is now synched", name);
 	} else {
 		nlog (LOG_WARNING, "do_eos: server %s not found", name);
 	}
@@ -1709,7 +1663,7 @@ send_cmd (char *fmt, ...)
 	ircvsnprintf (buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 
-	nlog (LOG_DEBUG2, "SENT: %s", buf);
+	dlog(DEBUG2, "SENT: %s", buf);
 	if(strnlen (buf, BUFSIZE) < BUFSIZE - 2) {
 		strlcat (buf, "\n", BUFSIZE);
 	} else {
@@ -1729,10 +1683,10 @@ setserverbase64 (const char *name, const char* num)
 
 	s = findserver(name);
 	if(s) {
-		nlog (LOG_DEBUG1, "setserverbase64: setting %s to %s", name, num);
+		dlog(DEBUG1, "setserverbase64: setting %s to %s", name, num);
 		strlcpy(s->name64, num, 6);
 	} else {
-		nlog (LOG_DEBUG1, "setserverbase64: cannot find %s for %s", name, num);
+		dlog(DEBUG1, "setserverbase64: cannot find %s for %s", name, num);
 	}
 }
 
@@ -1741,12 +1695,12 @@ servertobase64 (const char* name)
 {
 	Server *s;
 
-	nlog (LOG_DEBUG1, "servertobase64: scanning for %s", name);
+	dlog(DEBUG1, "servertobase64: scanning for %s", name);
 	s = findserver(name);
 	if(s) {
 		return s->name64;
 	} else {
-		nlog (LOG_DEBUG1, "servertobase64: cannot find %s", name);
+		dlog(DEBUG1, "servertobase64: cannot find %s", name);
 	}
 	return NULL;
 }
@@ -1756,12 +1710,12 @@ base64toserver (const char* num)
 {
 	Server *s;
 
-	nlog (LOG_DEBUG1, "base64toserver: scanning for %s", num);
+	dlog(DEBUG1, "base64toserver: scanning for %s", num);
 	s = findserverbase64(num);
 	if(s) {
 		return s->name;
 	} else {
-		nlog (LOG_DEBUG1, "base64toserver: cannot find %s", num);
+		dlog(DEBUG1, "base64toserver: cannot find %s", num);
 	}
 	return NULL;
 }
@@ -1776,10 +1730,10 @@ setnickbase64 (const char *nick, const char* num)
 
 	u = finduser(nick);
 	if(u) {
-		nlog (LOG_DEBUG1, "setnickbase64: setting %s to %s", nick, num);
-		strlcpy(u->nick64, num, B64SIZE);
+		dlog(DEBUG1, "setnickbase64: setting %s to %s", nick, num);
+		strlcpy(u->name64, num, B64SIZE);
 	} else {
-		nlog (LOG_DEBUG1, "setnickbase64: cannot find %s for %s", nick, num);
+		dlog(DEBUG1, "setnickbase64: cannot find %s for %s", nick, num);
 	}
 }
 
@@ -1788,12 +1742,12 @@ nicktobase64 (const char* nick)
 {
 	User *u;
 
-	nlog (LOG_DEBUG1, "nicktobase64: scanning for %s", nick);
+	dlog(DEBUG1, "nicktobase64: scanning for %s", nick);
 	u = finduser(nick);
 	if(u) {
-		return u->nick64;
+		return u->name64;
 	} else {
-		nlog (LOG_DEBUG1, "nicktobase64: cannot find %s", nick);
+		dlog(DEBUG1, "nicktobase64: cannot find %s", nick);
 	}
 	return NULL;
 }
@@ -1803,12 +1757,12 @@ base64tonick (const char* num)
 {
 	User *u;
 
-	nlog (LOG_DEBUG1, "base64tonick: scanning for %s", num);
+	dlog(DEBUG1, "base64tonick: scanning for %s", num);
 	u = finduserbase64(num);
 	if(u) {
 		return u->nick;
 	} else {
-		nlog (LOG_DEBUG1, "base64tonick: cannot find %s", num);
+		dlog(DEBUG1, "base64tonick: cannot find %s", num);
 	}
 	return NULL;
 }

@@ -190,7 +190,7 @@ void set_moddata(User* u)
 static int hs_event_quit(CmdParams* cmdparams) 
 {
 	if (cmdparams->source.user->moddata[hs_module->modnum]) {
-		nlog(LOG_DEBUG2, "hs_event_quit: free module data");
+		dlog(DEBUG2, "hs_event_quit: free module data");
 		sfree(cmdparams->source.user->moddata[hs_module->modnum]);
 		cmdparams->source.user->moddata[hs_module->modnum] = NULL;
 	}
@@ -223,7 +223,7 @@ static int hs_event_signon(CmdParams* cmdparams)
 	hn = list_find(vhosts, cmdparams->source.user->nick, findnick);
 	if (hn) {
 		map = lnode_get(hn);
-		nlog(LOG_DEBUG1, "Checking %s against %s", map->host, cmdparams->source.user->hostname);
+		dlog(DEBUG1, "Checking %s against %s", map->host, cmdparams->source.user->hostname);
 		if (fnmatch(map->host, cmdparams->source.user->hostname, 0) == 0) {
 			ssvshost_cmd(cmdparams->source.user->nick, map->vhost);
 			prefmsg(cmdparams->source.user->nick, hs_bot->nick,
@@ -242,7 +242,7 @@ static int hs_event_signon(CmdParams* cmdparams)
 
 static int hs_event_online(CmdParams* cmdparams)
 {
-	hs_bot = init_bot(&hs_botinfo, services_bot_modes, BOT_FLAG_DEAF, 
+	hs_bot = init_bot(&hs_botinfo, me.servicesumode, BOT_FLAG_DEAF, 
 		hs_commands, hs_settings);
 	add_timer (CleanupHosts, "CleanupHosts", 7200);
 	LoadHosts();
@@ -320,10 +320,10 @@ int hs_event_mode(CmdParams* cmdparams)
 		case 'r':
 			if (add) {
 				if (cmdparams->source.user->moddata[hs_module->modnum] != NULL) {
-					nlog(LOG_DEBUG2, "not setting hidden host on %s", cmdparams->av[0]);
+					dlog(DEBUG2, "not setting hidden host on %s", cmdparams->av[0]);
 					return -1;
 				}
-				nlog(LOG_DEBUG2, "Regnick Mode on %s", cmdparams->av[0]);
+				dlog(DEBUG2, "Regnick Mode on %s", cmdparams->av[0]);
 				ircsnprintf(vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom);
 				ssvshost_cmd(cmdparams->av[0], vhost);
 				prefmsg(cmdparams->av[0], hs_bot->nick,
@@ -779,7 +779,7 @@ static void LoadHosts()
 			GetData((void *)&map->lused, CFGINT, "Vhosts", map->nnick, "LastUsed");
 			hn = lnode_create(map);
 			list_append(vhosts, hn);
-			nlog(LOG_DEBUG1, "Loaded %s (%s) into Vhosts",
+			dlog(DEBUG1, "Loaded %s (%s) into Vhosts",
 			     map->nnick, map->vhost);
 		}
 	}			

@@ -31,7 +31,6 @@ extern const char *ns_help_exclude[];
 #ifdef USE_RAW
 extern const char *ns_help_raw[];
 #endif
-extern const char *ns_help_debug[];
 extern const char *ns_help_userdump[];
 extern const char *ns_help_chandump[];
 extern const char *ns_help_serverdump[];
@@ -46,8 +45,6 @@ extern const char *ns_help_timerlist[];
 extern const char *ns_help_botchanlist[];
 extern const char *ns_help_status[];
 
-extern const char *ns_help_set_versionscan[];
-
 extern const char ns_help_level_oneline[];
 extern const char ns_help_status_oneline[];
 extern const char ns_help_shutdown_oneline[];
@@ -59,7 +56,6 @@ extern const char ns_help_exclude_oneline[];
 #ifdef USE_RAW
 extern const char ns_help_raw_oneline[];
 #endif
-extern const char ns_help_debug_oneline[];
 extern const char ns_help_botlist_oneline[];
 extern const char ns_help_socklist_oneline[];
 extern const char ns_help_timerlist_oneline[];
@@ -68,5 +64,16 @@ extern const char ns_help_modlist_oneline[];
 extern const char ns_help_userdump_oneline[];
 extern const char ns_help_chandump_oneline[];
 extern const char ns_help_serverdump_oneline[];
+
+extern const char *ns_help_set_pingtime[];
+extern const char *ns_help_set_versionscan[];
+extern const char *ns_help_set_servicecmode[];
+extern const char *ns_help_set_serviceumode[];
+extern const char *ns_help_set_loglevel[];
+extern const char *ns_help_set_debug[];
+extern const char *ns_help_set_debuglevel[];
+extern const char *ns_help_set_debugchan[];
+extern const char *ns_help_set_debugtochan[];
+extern const char *ns_help_set_debugmodule[];
 
 #endif /* _NS_HELP_H_ */

@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -62,10 +62,11 @@ static void m_snetinfo (char *origin, char **argv, int argc, int srv);
 static void m_vctrl (char *origin, char **argv, int argc, int srv);
 
 #ifdef ULTIMATE3
-const char services_bot_modes[]= "+oS";
+const char services_umode[]= "+oS";
 #else
-const char services_bot_modes[]= "+oS";
+const char services_umode[]= "+oS";
 #endif
+const char services_cmode[]= "+a";
 
 /* Ultimate 2 does support these 5 tokens so may need to add them back 
  * in at some point
@@ -141,74 +142,74 @@ ChanModes chan_modes[] = {
 
 #ifdef ULTIMATE3
 UserModes user_umodes[] = {
-	{UMODE_SRA, 'Z', NS_ULEVEL_ROOT},
-	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT},
-	{UMODE_SADMIN, 'P', NS_ULEVEL_ADMIN},
-	{UMODE_SERVICESOPER, 'a', NS_ULEVEL_OPER},
-	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
-	{UMODE_LOCOP, 'O', NS_ULEVEL_OPER},
-	{UMODE_REGNICK, 'r', NS_ULEVEL_REG},
-	{UMODE_INVISIBLE, 'i', 0},
-	{UMODE_WALLOP, 'w', 0},
-	{UMODE_SERVNOTICE, 's', 0},
-	{UMODE_CLIENT, 'c', 0},
-	{UMODE_KILLS, 'k', 0},
-	{UMODE_HELPOP, 'h', 0},
-	{UMODE_FLOOD, 'f', 0},
-	{UMODE_SPY, 'y', 0},
-	{UMODE_DCC, 'D', 0},
-	{UMODE_GLOBOPS, 'g', 0},
-	{UMODE_CHATOPS, 'c', 0},
-	{UMODE_REJ, 'j', 0},
-	{UMODE_ROUTE, 'n', 0},
-	{UMODE_SPAM, 'm', 0},
-	{UMODE_HIDE, 'x', 0},
-	{UMODE_KIX, 'p', 0},
-	{UMODE_FCLIENT, 'F', 0},
+	{UMODE_SRA, 'Z'},
+	{UMODE_SERVICES, 'S'},
+	{UMODE_SADMIN, 'P'},
+	{UMODE_SERVICESOPER, 'a'},
+	{UMODE_OPER, 'o'},
+	{UMODE_LOCOP, 'O'},
+	{UMODE_REGNICK, 'r'},
+	{UMODE_INVISIBLE, 'i'},
+	{UMODE_WALLOP, 'w'},
+	{UMODE_SERVNOTICE, 's'},
+	{UMODE_CLIENT, 'c'},
+	{UMODE_KILLS, 'k'},
+	{UMODE_HELPOP, 'h'},
+	{UMODE_FLOOD, 'f'},
+	{UMODE_SPY, 'y'},
+	{UMODE_DCC, 'D'},
+	{UMODE_GLOBOPS, 'g'},
+	{UMODE_CHATOPS, 'c'},
+	{UMODE_REJ, 'j'},
+	{UMODE_ROUTE, 'n'},
+	{UMODE_SPAM, 'm'},
+	{UMODE_HIDE, 'x'},
+	{UMODE_KIX, 'p'},
+	{UMODE_FCLIENT, 'F'},
 #if 0
 	/* useless modes, ignore them as services use these modes for services ID */
-	{UMODE_DEBUG, 'd', 0},
+	{UMODE_DEBUG, 'd'},
 #endif
-	{UMODE_DCCWARN, 'e', 0},
-	{UMODE_WHOIS, 'W', 0},
+	{UMODE_DCCWARN, 'e'},
+	{UMODE_WHOIS, 'W'},
 };
 
 UserModes user_smodes[] = {
-	{SMODE_NETADMIN, 'N', 190},
-	{SMODE_CONET, 'n', 175},
-	{SMODE_TECHADMIN, 'T', 150},
-	{SMODE_COTECH, 't', 125},
-	{SMODE_SERVADMIN, 'A', 100},
-	{SMODE_GUEST, 'G', 100},
-	{SMODE_COADMIN, 'a', 75},
-	{SMODE_SSL, 's', 0},
+	{SMODE_NETADMIN, 'N'},
+	{SMODE_CONET, 'n'},
+	{SMODE_TECHADMIN, 'T'},
+	{SMODE_COTECH, 't'},
+	{SMODE_SERVADMIN, 'A'},
+	{SMODE_GUEST, 'G'},
+	{SMODE_COADMIN, 'a'},
+	{SMODE_SSL, 's'},
 };
 
 #else
 UserModes user_umodes[] = {
-	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT},
-	{UMODE_SADMIN, 'P', NS_ULEVEL_ROOT},
-	{UMODE_TECHADMIN, 'T', 190},
-	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN},
-	{UMODE_SERVICESOPER, 'a', 100},
-	{UMODE_IRCADMIN, 'Z', 100},
-	{UMODE_ADMIN, 'z', 70},
-	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
-	{UMODE_SUPER, 'p', NS_ULEVEL_LOCOPER},
-	{UMODE_LOCOP, 'O', NS_ULEVEL_LOCOPER},
-	{UMODE_REGNICK, 'r', NS_ULEVEL_REG},
-	{UMODE_INVISIBLE, 'i', 0},
-	{UMODE_WALLOP, 'w', 0},
-	{UMODE_FAILOP, 'g', 0},
-	{UMODE_HELPOP, 'h', 0},
-	{UMODE_SERVNOTICE, 's', 0},
-	{UMODE_KILLS, 'k', 0},
-	{UMODE_RBOT, 'B', 0},
-	{UMODE_SBOT, 'b', 0},
-	{UMODE_CLIENT, 'c', 0},
-	{UMODE_FLOOD, 'f', 0},
-	{UMODE_HIDE, 'x', 0},
-	{UMODE_WATCHER, 'W', 0},
+	{UMODE_SERVICES, 'S'},
+	{UMODE_SADMIN, 'P'},
+	{UMODE_TECHADMIN, 'T'},
+	{UMODE_NETADMIN, 'N'},
+	{UMODE_SERVICESOPER, 'a'},
+	{UMODE_IRCADMIN, 'Z'},
+	{UMODE_ADMIN, 'z'},
+	{UMODE_OPER, 'o'},
+	{UMODE_SUPER, 'p'},
+	{UMODE_LOCOP, 'O'},
+	{UMODE_REGNICK, 'r'},
+	{UMODE_INVISIBLE, 'i'},
+	{UMODE_WALLOP, 'w'},
+	{UMODE_FAILOP, 'g'},
+	{UMODE_HELPOP, 'h'},
+	{UMODE_SERVNOTICE, 's'},
+	{UMODE_KILLS, 'k'},
+	{UMODE_RBOT, 'B'},
+	{UMODE_SBOT, 'b'},
+	{UMODE_CLIENT, 'c'},
+	{UMODE_FLOOD, 'f'},
+	{UMODE_HIDE, 'x'},
+	{UMODE_WATCHER, 'W'},
 };
 #endif
 

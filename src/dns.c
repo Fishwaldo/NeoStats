@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -101,7 +101,7 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 	dnsdata->type = type;
 	
 	if (list_isfull (dnslist)) {
-		nlog (LOG_DEBUG1, "DNS: Lookup list is full, adding to queue");
+		dlog(DEBUG1, "DNS: Lookup list is full, adding to queue");
 		strlcpy(dnsdata->lookupdata, str, 254);
 		dnsnode = lnode_create (dnsdata);
 		list_append (dnsqueue, dnsnode);
@@ -127,7 +127,7 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 		return 0;
 	}
 
-	nlog (LOG_DEBUG1, "DNS: Added dns query %s to list", data);
+	dlog(DEBUG1, "DNS: Added dns query %s to list", data);
 	/* if we get here, then the submit was successful. Add it to the list of queryies */
 	dnsnode = lnode_create (dnsdata);
 	list_append (dnslist, dnsnode);
@@ -260,7 +260,7 @@ void do_dns (void)
 		status = adns_check (ads, &dnsdata->q, &dnsdata->a, NULL);
 		/* if status == eagain, the lookup hasn't completed yet */
 		if (status == EAGAIN) {
-			nlog (LOG_DEBUG2, "DNS: Lookup hasn't completed for %s",(char *) &dnsdata->data);
+			dlog(DEBUG2, "DNS: Lookup hasn't completed for %s",(char *) &dnsdata->data);
 			dnsnode = list_next (dnslist, dnsnode);
 			break;
 		}
@@ -281,7 +281,7 @@ void do_dns (void)
 			lnode_destroy (dnsnode1);
 			break;
 		}
-		nlog (LOG_DEBUG1, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->modptr->info->name);
+		dlog(DEBUG1, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->modptr->info->name);
 		DNSStats.success++;
 		SET_RUN_LEVEL(dnsdata->modptr);
 		/* call the callback function */
@@ -307,7 +307,7 @@ void dns_check_queue() {
 	
 	/* first, if the DNSLIST is full, just exit straight away */
 	if (list_isfull(dnslist)) {
-		nlog(LOG_DEBUG2, "DNS list is still full. Can't work on queue");
+		dlog(DEBUG2, "DNS list is still full. Can't work on queue");
 		return;
 	}
 	/* if the dnsqueue isn't empty, then lets process some more till we are full again */
@@ -315,7 +315,7 @@ void dns_check_queue() {
 		dnsnode = list_first(dnsqueue);
 		while ((dnsnode) && (!list_isfull(dnslist))) {
 			dnsdata = lnode_get(dnsnode);	
-			nlog(LOG_DEBUG2, "Moving DNS query %s from queue to active", dnsdata->data);
+			dlog(DEBUG2, "Moving DNS query %s from queue to active", dnsdata->data);
 			if (dnsdata->type == adns_r_ptr) {
 				sa.sin_family = AF_INET;
 				sa.sin_addr.s_addr = inet_addr (dnsdata->lookupdata);
@@ -338,7 +338,7 @@ void dns_check_queue() {
 			dnsnode = list_next(dnsqueue, dnsnode);
 			list_delete(dnsqueue, dnsnode2);
 			list_append(dnslist, dnsnode2);
-			nlog (LOG_DEBUG1, "DNS: Added dns query %s to list", dnsdata->data);
+			dlog(DEBUG1, "DNS: Added dns query %s to list", dnsdata->data);
 		/* while loop */
 		}
 	/* isempty */

@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -63,7 +63,7 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	CmdParams * cmdparams;
 	Server *s;
 
-	nlog (LOG_DEBUG1, "AddServer: %s", name);
+	dlog(DEBUG1, "AddServer: %s", name);
 	s = new_server (name);
 	if(hops) {
 		s->hops = atoi (hops);
@@ -98,7 +98,7 @@ DelServer (const char *name, const char* reason)
 	Server *s;
 	hnode_t *sn;
 
-	nlog (LOG_DEBUG1, "DelServer: %s", name);
+	dlog(DEBUG1, "DelServer: %s", name);
 	sn = hash_lookup (serverhash, name);
 	if (!sn) {
 		nlog (LOG_WARNING, "DelServer: squit from unknown server %s", name);
@@ -130,11 +130,11 @@ findserverbase64 (const char *num)
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
 		if(strncmp(s->name64, num, BASE64SERVERSIZE) == 0) {
-			nlog (LOG_DEBUG1, "findserverbase64: %s -> %s", num, s->name);
+			dlog(DEBUG1, "findserverbase64: %s -> %s", num, s->name);
 			return s;
 		}
 	}
-	nlog (LOG_DEBUG3, "findserverbase64: %s not found!", num);
+	dlog(DEBUG3, "findserverbase64: %s not found!", num);
 	return NULL;
 }
 #endif
@@ -148,7 +148,7 @@ findserver (const char *name)
 	if (sn) {
 		return (Server *) hnode_get (sn);
 	}
-	nlog (LOG_DEBUG3, "findserver: %s not found!", name);
+	dlog(DEBUG3, "findserver: %s not found!", name);
 	return NULL;
 }
 
@@ -311,7 +311,7 @@ PingServers (void)
 
 	if(!me.synced)
 		return;
-	nlog (LOG_DEBUG3, "Sending pings...");
+	dlog(DEBUG3, "Sending pings...");
 	ping.ulag = 0;
 	hash_scan_begin (&ss, serverhash);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
