@@ -112,7 +112,7 @@ const char *hs_help_bans[] = {
 	"\2ADD\2 add a banned vhost.",
 	"Wildcards, like *host* are permitted.",
 	"",
-	"\DEL\2 delete a banned vhost.",
+	"\2DEL\2 delete a banned vhost.",
 	"hostname must match the one used to add the vhost.",
 	NULL
 };
