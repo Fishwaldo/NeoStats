@@ -16,11 +16,10 @@ extauth: $(OBJS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:
-	/bin/rm -rf ../$(TARGET)
-	/bin/rm -rf *.o *.lo *.so
+	$(RM) *.o *.lo *.so
 
 install: extauth
-	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
+	$(INSTALLMOD) $(TARGET) $(DIRECTORY)/dl
 
 dist:	$(DISTFILES)
 	@for files in $(DISTFILES); do \

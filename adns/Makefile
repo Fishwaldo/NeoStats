@@ -2,21 +2,22 @@ include ../Makefile.inc
 
 INCLUDES = -I..
 
-SRCS= check.c  event.c  general.c  parse.c  query.c  reply.c  setup.c  transmit.c  types.c
-OBJS= ${SRCS:.c=.o}
-all:	$(OBJS)
+SRCS = check.c event.c general.c parse.c query.c reply.c setup.c transmit.c types.c
+OBJS = ${SRCS:.c=.o}
+
+all: $(OBJS)
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 clean:
-	/bin/rm -rf *.o *.lo *.so *.a
+	$(RM) *.o *.lo *.so *.a
 
 depend:
 	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SRCS) > .depend
 
 install:
-	$(INSTALL) -m 644 adns.h $(DIRECTORY)/include
+	$(INSTALL_DATA) adns.h $(DIRECTORY)/include
 
 DISTFILES =*.c adns.h dlist.h internal.h tvarith.h Makefile *.in
 

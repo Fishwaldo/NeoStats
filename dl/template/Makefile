@@ -1,33 +1,29 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../.. -I../../adns
+SRCS = template.c
+OBJS = ${SRCS:.c=.o}
+TARGET = template.so
+DISTFILES = $(SRCS) Makefile
 
-SRCS= template.c
-OBJS= ${SRCS:.c=.o}
-TARGET= template.so
-DISTFILES= $(SRCS) Makefile
-
-all:	template
+all: $(TARGET)
 
 .c.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<
+	$(CC) $(CFLAGS) $(MODINCLUDES) -c $<
 
-template: $(OBJS)
+$(TARGET): $(OBJS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:
-	/bin/rm -rf ../$(TARGET)
-	/bin/rm -rf *.o *.lo *.so
+	$(RM) *.o *.lo *.so
 
-install: template
-	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
+install: $(TARGET)
+	$(INSTALLMOD) $(TARGET) $(DIRECTORY)/dl
 
 dist:	$(DISTFILES)
 	@for files in $(DISTFILES); do \
 		cp $$files $(DISTDIR)/$$files; \
 	done
 
-
-
 $(OBJS): Makefile
+
 template.o:		template.c	

@@ -1,33 +1,30 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../.. -I../../adns -I.
-
-SRCS= statserv.c ss_help.c database.c tld.c stats.c htmlstats.c 
-OBJS= ${SRCS:.c=.o}
-TARGET= statserv.so
+SRCS = statserv.c ss_help.c database.c tld.c stats.c htmlstats.c 
+OBJS = ${SRCS:.c=.o}
+TARGET = statserv.so
 GEOCFLAGS = $(CFLAGS) -DGEOIPDATADIR=\"$(DIRECTORY)/data\" -DSYSCONFDIR=\"$(DIRECTORY)/data/\"
 GEOSRCS = GeoIPBitReader.c GeoIP.c GeoIPCity.c md5.c
 GEOOBJS = GeoIPBitReader.o GeoIP.o GeoIPCity.o md5.o
-HTML= html/index.tpl
-DATA= GeoIP.dat
-DISTFILES= $(SRCS) $(DATA) $(GEOSRCS) $(HTML) ChangeLog statserv.h m_stats.h Makefile sqlstats.h GeoIPBitReader.h GeoIP.h global.h GeoIPCity.h md5.h   
+HTML = html/index.tpl
+DATA = GeoIP.dat
+DISTFILES= $(SRCS) $(DATA) $(GEOSRCS) $(HTML) ChangeLog statserv.h m_stats.h Makefile sqlstats.h GeoIPBitReader.h GeoIP.h global.h GeoIPCity.h md5.h
 
-all:	statserv
+all: $(TARGET)
 
 .c.o:
-	$(CC) -c $< $(GEOCFLAGS) $(INCLUDES) 
+	$(CC) -c $< $(GEOCFLAGS) $(MODINCLUDES) 
 
-statserv: $(OBJS) $(GEOOBJS)
+$(TARGET): $(OBJS) $(GEOOBJS)
 	ld $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS) $(GEOOBJS)
 
 clean:
-	/bin/rm -rf ../$(TARGET)
-	/bin/rm -rf *.o *.lo *.so
+	$(RM) *.o *.lo *.so
 
-install: statserv
-	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
-	$(INSTALL) -m 644 $(HTML) $(DIRECTORY)/data
-	$(INSTALL) -m 644 $(DATA) $(DIRECTORY)/data
+install: $(TARGET)
+	$(INSTALLMOD) $(TARGET) $(DIRECTORY)/dl
+	$(INSTALL_DATA) $(HTML) $(DIRECTORY)/data
+	$(INSTALL_DATA) $(DATA) $(DIRECTORY)/data
 
 dist:	$(DISTFILES)
 	@mkdir $(DISTDIR)/html

@@ -23,6 +23,8 @@
 ** $Id$
 */
 
+#include <stdio.h>
+
 const char hs_help_about_oneline[] ="About HostServ";
 const char hs_help_login_oneline[] ="Login to HostServ";
 const char hs_help_chpass_oneline[] ="Change password for a vhost";

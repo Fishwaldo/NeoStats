@@ -23,13 +23,24 @@
 ** $Id$
 */
 
-extern const char cs_help_about_oneline[];
-extern const char cs_help_version_oneline[];
-extern const char *cs_help_about[];
-extern const char *cs_help_version[];
-extern const char *cs_help_set_signwatch[];
-extern const char *cs_help_set_exclusions[];
-extern const char *cs_help_set_killwatch[];
-extern const char *cs_help_set_modewatch[];
-extern const char *cs_help_set_nickwatch[];
-extern const char *cs_help_set_servwatch[];
+extern const char hs_help_about_oneline[];
+extern const char hs_help_login_oneline[];
+extern const char hs_help_chpass_oneline[];
+extern const char hs_help_bans_oneline[];
+extern const char hs_help_add_oneline[];
+extern const char hs_help_del_oneline[];
+extern const char hs_help_list_oneline[];
+extern const char hs_help_view_oneline[];
+extern const char hs_help_levels_oneline[];
+extern const char *hs_help_about[];
+extern const char *hs_help_add[];
+extern const char *hs_help_del[];
+extern const char *hs_help_view[];
+extern const char *hs_help_list[];
+extern const char *hs_help_login[];
+extern const char *hs_help_chpass[];
+extern const char *hs_help_bans[];
+extern const char *hs_help_levels[];
+extern const char *hs_help_set_expire[];
+extern const char *hs_help_set_hiddenhost[];
+extern const char *hs_help_set_hostname[];

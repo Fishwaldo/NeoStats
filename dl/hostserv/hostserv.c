@@ -26,8 +26,7 @@
 #include <stdio.h>
 #include <fnmatch.h>
 #include "neostats.h"
-#include "hs_help.c"
-
+#include "hostserv.h"
 
 /* hostserv doesn't work on Hybrid, Echo an error and exit the compile */
 #ifndef GOTSVSHOST 

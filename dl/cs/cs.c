@@ -23,9 +23,7 @@
 ** $Id$
 */
 
-#include <stdio.h>
 #include "neostats.h"
-#include "cs_help.c"
 #include "cs.h"
 
 /* Uncomment this line to disable colours in ConnectServ 

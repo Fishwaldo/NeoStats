@@ -1,20 +1,21 @@
 include ../Makefile.inc
 
-INCLUDES = -I.. -DHAVE_CONFIG_H
+INCLUDES = -I.. 
+KEEPERCFLAGS = $(CFLAGS) -DHAVE_CONFIG_H
 
-SRCS= kp_cache.c kp_dir.c kp_enum.c kp_get.c kp_iface.c kp_recur.c kp_set.c kp_sort.c kp_util.c
-OBJS= ${SRCS:.c=.o}
+SRCS = kp_cache.c kp_dir.c kp_enum.c kp_get.c kp_iface.c kp_recur.c kp_set.c kp_sort.c kp_util.c
+OBJS = ${SRCS:.c=.o}
 
 all:	$(OBJS)
 
 .c.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<
+	$(CC) $(KEEPERCFLAGS) $(INCLUDES) -c $<
 
 clean:
-	/bin/rm -rf *.o *.lo *.so *.a
+	$(RM) *.o *.lo *.so *.a
 
 depend:
-	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SRCS) > .depend
+	$(CC) -MM $(INCLUDES) $(KEEPERCFLAGS) $(SRCS) > .depend
 
 install:
 

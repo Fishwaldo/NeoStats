@@ -23,9 +23,8 @@
 ** $Id$
 */
 
-#include <stdio.h>
 #include "neostats.h"
-#include "ms_help.c"
+#include "ms.h"
 
 static char s_MoraleServ[MAXNICK];
 static ModUser *ms_bot;

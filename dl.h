@@ -215,8 +215,6 @@ extern hash_t *sockh;
  */
 int InitModuleHash (void);
 void ModuleEvent (char * event, char **av, int ac);
-/* Temp define for secureserv */
-#define Module_Event ModuleEvent	
 void ModuleFunction (int cmdptr, char *cmd, char* origin, char **av, int ac);
 int load_module (char *path, User * u);
 int unload_module (char *module_name, User * u);

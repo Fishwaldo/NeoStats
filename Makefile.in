@@ -14,17 +14,17 @@ DATA = data/tlds.nfo
 PCRE_OBJS = pcre/pcre.o pcre/get.o pcre/study.o
 ADNS_OBJS =	adns/check.o adns/event.o adns/general.o adns/parse.o adns/query.o \
 		adns/reply.o adns/setup.o adns/transmit.o adns/types.o
-KEEPER_OBJS= keeper/kp_cache.o keeper/kp_dir.o keeper/kp_enum.o keeper/kp_get.o \
+KEEPER_OBJS = keeper/kp_cache.o keeper/kp_dir.o keeper/kp_enum.o keeper/kp_get.o \
 		keeper/kp_iface.o keeper/kp_recur.o keeper/kp_set.o keeper/kp_sort.o \
 		keeper/kp_util.o
-OBJS= ${SRCS:.c=.o} @sqlsrvbuild@
+OBJS = ${SRCS:.c=.o} @sqlsrvbuild@
 SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
 		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
 		support.c ircstring.c commands.c transfer.c exclude.c match.c \
 		@IRCD_FILES_SRC@
-IRCDSRC=Ultimate.c Unreal.c hybrid7.c neoircd.c Bahamut.c \
+IRCDSRC = Ultimate.c Unreal.c hybrid7.c neoircd.c Bahamut.c \
 		Ircu.c mystic.c QuantumIRCd.c liquidircd.c Viagra.c
-IRCDINC=${IRCDSRC:.c=.h}
+IRCDINC = ${IRCDSRC:.c=.h}
 
 INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h \
 		conf.h log.h support.h ircstring.h events.h numeric.h pcre.h \
@@ -75,17 +75,17 @@ clean:
 	(cd pcre; $(MAKE) $@)
 	(cd curl; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
-	/bin/rm -rf *.o neostats *.cache Makefile config.h  Makefile.inc *.log *.a
+	$(RM) *.o neostats *.cache Makefile config.h  Makefile.inc *.log *.a
 
 neostats: $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(EXTRA_LDFLAGS) -o $@
 
 install: neostats modules
 	@echo "Installing ..."
-	@rm -rf @prefix@/dl/cs.so
-	@rm -rf @prefix@/dl/ms.so
-	@rm -rf @prefix@/dl/SecureServ.so
-	@rm -rf @prefix@/include/*.h
+	@$(RM) @prefix@/dl/cs.so
+	@$(RM) @prefix@/dl/ms.so
+	@$(RM) @prefix@/dl/SecureServ.so
+	@$(RM) @prefix@/include/*.h
 	$(INSTALL) -m 755 -d @prefix@
 	$(INSTALL) -m 755 -d @prefix@/dl
 	$(INSTALL) -m 755 -d @prefix@/include
@@ -93,12 +93,12 @@ install: neostats modules
 	$(INSTALL) -m 755 -d @prefix@/data
 	$(INSTALL) -m 750 -d @prefix@/logs
 	$(INSTALL) -m 755 $(PROGS) @prefix@
-	$(INSTALL) -m 644 $(CONF) @prefix@
-	$(INSTALL) -m 644 $(DOCS) @prefix@/doc
+	$(INSTALL_DATA) $(CONF) @prefix@
+	$(INSTALL_DATA) $(DOCS) @prefix@/doc
 	$(INSTALL) -m 755 $(DOCS_PROGS) @prefix@/doc
-	$(INSTALL) -m 644 $(DATA) @prefix@/data
-	$(INSTALL) -m 644 $(INCLUDES) @prefix@/include
-	$(INSTALL) -m 644 @IRCD_FILES_INC@ @prefix@/include
+	$(INSTALL_DATA) $(DATA) @prefix@/data
+	$(INSTALL_DATA) $(INCLUDES) @prefix@/include
+	$(INSTALL_DATA) @IRCD_FILES_INC@ @prefix@/include
 	(cd adns; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
 	(cd dl; $(MAKE) $@)
@@ -107,7 +107,7 @@ install: neostats modules
 
 dist: 	
 	@echo -n "Creating Directories"
-	@-rm -rf $(DISTDIR)
+	@$(RM) $(DISTDIR)
 	@echo -n "."
 	@mkdir $(DISTDIR)
 	@echo -n "."
@@ -124,8 +124,8 @@ dist:
 		echo -n "."; \
 		cp -pr $$file $(DISTDIR)/$$file; \
 	done
-	@rm -rf $(DISTDIR)/config.h
-	@rm -rf $(DISTDIR)/configure.in
+	@$(RM) $(DISTDIR)/config.h
+	@$(RM) $(DISTDIR)/configure.in
 	@echo "Done"
 	@echo "Copying Library Distribution files"
 	@for subdir in $(DISTLIBS); do \
@@ -144,11 +144,11 @@ dist:
 	done
 	@echo "Done"
 	@tar -czf $(DISTDIR).tar.gz $(DISTDIR)/*
-#	@rm -rf $(DISTDIR)
+#	@$(RM) $(DISTDIR)
 	@echo "Tar file $(DISTDIR).tar.gz created. Freshmeat time!"
 
 # Catch any changes in compilation options at the top of this file
-$(OBJS): Makefile
+$(OBJS): Makefile Makefile.inc
 
 dns.o: dns.c stats.h adns/adns.h list.h hash.h config.h log.h
 chans.o: chans.c stats.h adns/adns.h list.h hash.h config.h dl.h log.h

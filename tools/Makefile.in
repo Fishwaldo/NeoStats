@@ -22,16 +22,16 @@ configtool:
 
 clean:
 	(cd cfgtool; $(MAKE) $@)
-	/bin/rm -rf *.o *.lo *.so *.a kptool Makefile
+	$(RM) *.o *.lo *.so *.a kptool Makefile
 
 
 install: 
-	$(INSTALL) -m 755 kptool @prefix@
-	$(INSTALL) -m 644 README.kptool @prefix@
+	$(INSTALL_PROGRAM) kptool @prefix@
+	$(INSTALL_DATA) README.kptool @prefix@
 	@if test "X@build_configtool@" = "Xconfigtool"; then \
 		echo "Installing ConfigTool"; \
 		$(INSTALL) -m 755 cfgtool/configtool @prefix@; \
-		$(INSTALL) -m 644 cfgtool/README.configtool @prefix@; \
+		$(INSTALL_DATA) cfgtool/README.configtool @prefix@; \
 	fi
 
 DISTFILES = *.c *.h Makefile.in \

@@ -23,9 +23,8 @@
 ** $Id$
 */
 
-#include <stdio.h>
 #include "neostats.h"
-#include "ls_help.c"
+#include "loveserv.h"
 
 static char s_LoveServ[MAXNICK];
 static ModUser *ls_bot;

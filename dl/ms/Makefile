@@ -1,26 +1,23 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../.. -I../../adns
-
-SRCS= ms.c
+SRCS= ms.c ms_help.c
 OBJS= ${SRCS:.c=.o}
 TARGET= moraleserv.so
-DISTFILES = $(SRCS) Makefile ChangeLog ms_help.c
+DISTFILES = $(SRCS) ms.h Makefile ChangeLog
 
 all:	ms
 
 .c.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<
+	$(CC) $(CFLAGS) $(MODINCLUDES) -c $<
 
 ms: $(OBJS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:
-	/bin/rm -rf ../$(TARGET)
-	/bin/rm -rf *.o *.lo *.so
+	$(RM) *.o *.lo *.so
 
 install: ms
-	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
+	$(INSTALLMOD) $(TARGET) $(DIRECTORY)/dl
 
 dist:	$(DISTFILES)
 	@for files in $(DISTFILES); do \

@@ -5,8 +5,8 @@ TOOLSCFLAGS = $(CFLAGS) $(INSTALLDIR) -DHAVE_CONFIG_H
 INCLUDES = -I../.. -I../../keeper/ -Ipixmaps
 GCFLAGS = `gtk-config --cflags`
 GLDFLAGS = `gtk-config --libs`
-KP_SRCS= gkeeper.c tree.c edit.c menu.c dialog.c
-KP_OBJS= gkeeper.o tree.o edit.o menu.o dialog.o
+SRCS = gkeeper.c tree.c edit.c menu.c dialog.c
+OBJS = ${SRCS:.c=.o}
 KEEPER_OBJS= ../../keeper/kp_cache.o ../../keeper/kp_dir.o ../../keeper/kp_enum.o ../../keeper/kp_get.o \
 			../../keeper/kp_iface.o ../../keeper/kp_recur.o ../../keeper/kp_set.o ../../keeper/kp_sort.o \
 			../../keeper/kp_util.o
@@ -16,18 +16,16 @@ all: 	configtool
 	$(CC) $(TOOLSCFLAGS) $(GCFLAGS) $(INCLUDES) -c $<
 
 
-configtool:	$(KP_OBJS)
-	$(CC) $(GLDFLAGS) $(KP_OBJS) $(KEEPER_OBJS) -o $@
+configtool:	$(OBJS)
+	$(CC) $(GLDFLAGS) $(OBJS) $(KEEPER_OBJS) -o $@
 
 clean:
-	/bin/rm -rf *.o *.lo *.so *.a configtool
+	$(RM) *.o *.lo *.so *.a configtool
 
 install: 
 
 depend:
-	$(CC) -MM $(INCLUDES) $(CFLAGS) $(KP_SRCS) > .depend
-
-
+	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SRCS) > .depend
 
 $(OBJS): Makefile ../Makefile.inc
 

@@ -23,6 +23,8 @@
 ** $Id$
 */
 
+#include <stdio.h>
+
 const char ms_help_about_oneline[]="About MoraleServ";
 const char ms_help_version_oneline[]="Display version info";
 const char ms_help_hail_oneline[]="Hail someone on IRC";

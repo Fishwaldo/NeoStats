@@ -23,13 +23,23 @@
 ** $Id$
 */
 
-extern const char cs_help_about_oneline[];
-extern const char cs_help_version_oneline[];
-extern const char *cs_help_about[];
-extern const char *cs_help_version[];
-extern const char *cs_help_set_signwatch[];
-extern const char *cs_help_set_exclusions[];
-extern const char *cs_help_set_killwatch[];
-extern const char *cs_help_set_modewatch[];
-extern const char *cs_help_set_nickwatch[];
-extern const char *cs_help_set_servwatch[];
+extern const char ms_help_about_oneline[];
+extern const char ms_help_version_oneline[];
+extern const char ms_help_hail_oneline[];
+extern const char ms_help_ode_oneline[];
+extern const char ms_help_poem_oneline[];
+extern const char ms_help_lapdance_oneline[];
+extern const char ms_help_redneck_oneline[];
+extern const char ms_help_cheerup_oneline[];
+extern const char ms_help_behappy_oneline[];
+extern const char ms_help_wonderful_oneline[];
+extern const char *ms_help_about[];
+extern const char *ms_help_hail[];
+extern const char *ms_help_ode[];
+extern const char *ms_help_lapdance[];
+extern const char *ms_help_version[];
+extern const char *ms_help_poem[];
+extern const char *ms_help_redneck[];
+extern const char *ms_help_cheerup[];
+extern const char *ms_help_behappy[];
+extern const char *ms_help_wonderful[];
