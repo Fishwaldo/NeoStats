@@ -692,6 +692,10 @@ int hs_mode(char **av, int ac) {
 		u = finduser(av[0]);
 		if (!u) /* User not found */
 			return 1;
+		if (is_oper(u)) 
+			/* don't set a opers vhost. Most likely already done */
+			return 1;
+			
 		if (u->moddata[hs_cfg.modnum] != NULL) {
 			nlog(LOG_DEBUG2, LOG_MOD, "not setting hidden host on %s", av[0]);
 			return -1;

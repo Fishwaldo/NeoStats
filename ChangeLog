@@ -42,6 +42,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fixed a bug with Non-Zero counts with StatServ when loading up. (F)
  - Tidy up Jupe Command. Now echo's a message back to the user when the jupe is done (F)
  - Fix up a Segv_inmodule error in the dns stuff. Its a hack, but works (F)
+ - Don't set hidden hosts for opers (F)
+ - Statserv HTML fix for clientversions when its empty 
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number

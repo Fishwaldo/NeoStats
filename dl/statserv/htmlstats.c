@@ -441,21 +441,23 @@ void get_clientstats()
 		list_sort(Vhead, topversions);
 	}
 	cn = list_first(Vhead);
-	cv = lnode_get(cn);
-	fprintf(opf,
-		"<table border = 0><tr><th>Version</th><th align=right>Count</th></tr>");
-	for (i = 0; i <= 10; i++) {
+	if (cn) {
+		cv = lnode_get(cn);
 		fprintf(opf,
-			"<tr><td>%s</td><td align=right>%d</td></tr>\n",
-			cv->name, cv->count);
-		cn = list_next(Vhead, cn);
-		if (cn) {
-			cv = lnode_get(cn);
-		} else {
-			break;
+			"<table border = 0><tr><th>Version</th><th align=right>Count</th></tr>");
+		for (i = 0; i <= 10; i++) {
+			fprintf(opf,
+				"<tr><td>%s</td><td align=right>%d</td></tr>\n",
+				cv->name, cv->count);
+			cn = list_next(Vhead, cn);
+			if (cn) {
+				cv = lnode_get(cn);
+			} else {
+				break;
+			}
 		}
+		fprintf(opf, "</table>");
 	}
-	fprintf(opf, "</table>");
 }
 
 void get_tldmap()
