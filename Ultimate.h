@@ -32,7 +32,7 @@
 #ifdef ULTIMATE3
 
 /* we support tokens */
-#define GOTTOKENSUPPORT
+#undef GOTTOKENSUPPORT
 /* we support CLIENT */
 #define GOTCLIENTSUPPORT
 /* we have vhost support */
@@ -55,7 +55,7 @@
 #else /* !ULTIMATE3 */
 
 /* we support tokens */
-#define GOTTOKENSUPPORT
+#undef GOTTOKENSUPPORT
 /* we don't support CLIENT */
 #undef GOTCLIENTSUPPORT
 /* we have vhost support */
