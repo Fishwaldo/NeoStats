@@ -98,7 +98,9 @@ static bot_cmd ns_commands[]=
 	{"LEVEL",		ns_cmd_level,		0, 	0,					ns_help_level, 		ns_help_level_oneline},
 	{"STATUS",		ns_cmd_status,		0, 	0,					ns_help_status, 	ns_help_status_oneline},
 	{"SHUTDOWN",	ns_cmd_shutdown,	1, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown, 	ns_help_shutdown_oneline},
+#ifndef WIN32
 	{"RELOAD",		ns_cmd_reload,		1, 	NS_ULEVEL_ADMIN, 	ns_help_reload,		ns_help_reload_oneline},
+#endif /* !WIN32 */
 	{"MODLIST",		ns_cmd_modlist,		0, 	NS_ULEVEL_ADMIN,  	ns_help_modlist, 	ns_help_modlist_oneline},
 	{"LOAD",		ns_cmd_load,		1, 	NS_ULEVEL_ADMIN, 	ns_help_load, 		ns_help_load_oneline},
 	{"UNLOAD",		ns_cmd_unload,		1,	NS_ULEVEL_ADMIN, 	ns_help_unload, 	ns_help_unload_oneline},
