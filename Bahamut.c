@@ -56,7 +56,6 @@ static void Srv_Server (char *origin, char **argv, int argc);
 static void Srv_Squit (char *origin, char **argv, int argc);
 static void Srv_Nick (char *origin, char **argv, int argc);
 static void Srv_Svsnick (char *origin, char **argv, int argc);
-static void Srv_Kill (char *origin, char **argv, int argc);
 static void Srv_Protocol (char *origin, char **argv, int argc);
 static void Srv_Svinfo (char *origin, char **argv, int argc);
 static void Srv_Burst (char *origin, char **argv, int argc);
@@ -99,7 +98,6 @@ IntCommands cmd_list[] = {
 	{MSG_SQUIT, Srv_Squit, 0, 0},
 	{MSG_NICK, Srv_Nick, 0, 0},
 	{MSG_SVSNICK, Srv_Svsnick, 0, 0},
-	{MSG_KILL, Srv_Kill, 0, 0},
 };
 
 ChanModes chan_modes[] = {
@@ -528,13 +526,6 @@ Srv_Nick (char *origin, char **argv, int argc)
 static void
 Srv_Svsnick (char *origin, char **argv, int argc)
 {
-	if(UserNick (argv[0], argv[1]) == NS_FAILURE) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, SVSNICK for %s failed", argv[0]);
-	}
+	UserNick (argv[0], argv[1]);
 }
 
-static void
-Srv_Kill (char *origin, char **argv, int argc)
-{
-	nlog (LOG_WARNING, LOG_CORE, "Got Srv_Kill, but its un-handled (%s)", recbuf);
-}

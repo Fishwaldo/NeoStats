@@ -53,7 +53,6 @@ static void Srv_Pass (char *origin, char **argv, int argc);
 static void Srv_Server (char *origin, char **argv, int argc);
 static void Srv_Squit (char *origin, char **argv, int argc);
 static void Srv_Nick (char *origin, char **argv, int argc);
-static void Srv_Kill (char *origin, char **argv, int argc);
 static void Srv_Svinfo (char *origin, char **argv, int argc);
 static void Srv_Burst (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
@@ -94,7 +93,6 @@ IntCommands cmd_list[] = {
 	{MSG_SERVER, Srv_Server, 0, 0},
 	{MSG_SQUIT, Srv_Squit, 0, 0},
 	{MSG_NICK, Srv_Nick, 0, 0},
-	{MSG_KILL, Srv_Kill, 0, 0},
 	{MSG_EOB, Srv_Burst, 1, 0},
 	{MSG_SJOIN, Srv_Sjoin, 1, 0},
 	{MSG_TBURST, Srv_Tburst, 1, 0},
@@ -425,7 +423,6 @@ static void
 Usr_Mode (char *origin, char **argv, int argc)
 {
 	if (!strchr (argv[0], '#')) {
-		nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[0]);
 		UserMode (argv[0], argv[1]);
 	} else {
 		ChanMode (origin, argv, argc);
@@ -543,14 +540,7 @@ Srv_Nick (char *origin, char **argv, int argc)
 	if (u) {
 		strlcpy (u->vhost, argv[6], MAXHOST);
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[3]);
 	UserMode (argv[0], argv[3]);
-}
-
-static void
-Srv_Kill (char *origin, char **argv, int argc)
-{
-	nlog (LOG_WARNING, LOG_CORE, "Got Srv_Kill, but its un-handled (%s)", recbuf);
 }
 
 /* Topic Bursting for NeoIRCD */
@@ -560,16 +550,9 @@ static void
 Srv_Tburst (char *origin, char **argv, int argc)
 {
 	char *buf;
-	Chans *c;
-	c = findchan (argv[1]);
-	if (c) {
-		buf = joinbuf (argv, argc, 4);
-		ChanTopic (argv[3], c->name, atoi (argv[2]), buf);
-		free (buf);
-	} else {
-		nlog (LOG_WARNING, LOG_CORE, "Srv_Tburst: can't find channel %s", argv[1]);
-	}
 
-
+	buf = joinbuf (argv, argc, 4);
+	ChanTopic (argv[3], argv[1], atoi (argv[2]), buf);
+	free (buf);
 }
 

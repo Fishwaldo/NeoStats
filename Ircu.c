@@ -52,7 +52,6 @@ static void Srv_Pass (char *origin, char **argv, int argc);
 static void Srv_Server (char *origin, char **argv, int argc);
 static void Srv_Squit (char *origin, char **argv, int argc);
 static void Srv_Nick (char *origin, char **argv, int argc);
-static void Srv_Kill (char *origin, char **argv, int argc);
 static void Srv_Burst (char *origin, char **argv, int argc);
 
 /*
@@ -91,7 +90,6 @@ IntCommands cmd_list[] = {
 	{MSG_SERVER, Srv_Server, 0, 0},
 	{MSG_SQUIT, Srv_Squit, 0, 0},
 	{MSG_NICK, Srv_Nick, 0, 0},
-	{MSG_KILL, Srv_Kill, 0, 0},
 	{MSG_END_OF_BURST, Srv_Burst, 1, 0},
 };
 
@@ -337,7 +335,6 @@ static void
 Usr_Mode (char *origin, char **argv, int argc)
 {
 	if (!strchr (argv[0], '#')) {
-		nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[0]);
 		UserMode (argv[0], argv[1]);
 	} else {
 		ChanMode (origin, argv, argc);
@@ -443,14 +440,7 @@ Srv_Nick (char *origin, char **argv, int argc)
 	realname = joinbuf (argv, argc, 7);
 	AddUser (argv[0], argv[4], argv[5], realname, argv[6], 0, strtoul (argv[2], NULL, 10));
 	free (realname);
-	nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[3]);
 	UserMode (argv[0], argv[3]);
-}
-
-static void
-Srv_Kill (char *origin, char **argv, int argc)
-{
-	nlog (LOG_WARNING, LOG_CORE, "Got Srv_Kill, but its un-handled (%s)", recbuf);
 }
 
 static void
