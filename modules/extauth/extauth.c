@@ -216,7 +216,7 @@ static int AccessList(CmdParams* cmdparams)
 		access = hnode_get(node);
 		irc_prefmsg(NULL, cmdparams->source, "%s %s (%d)", access->nick, access->mask, access->level);
 	}
-	irc_prefmsg(NULL, cmdparams->source, "End of List.");	
+	irc_prefmsg(NULL, cmdparams->source, "End of list.");	
 	return NS_SUCCESS;
 }
 

@@ -441,7 +441,7 @@ static void hs_listban(Client * u)
 		irc_prefmsg(hs_bot, u,  "%d - %s", i, (char *)hnode_get(hn));
 		i++;
 	}
-	irc_prefmsg(hs_bot, u, "End of List.");
+	irc_prefmsg(hs_bot, u, "End of list.");
 
 }
 static void hs_addban(Client * u, char *ban)
@@ -685,7 +685,7 @@ static int hs_list(CmdParams* cmdparams)
 	irc_prefmsg(hs_bot, cmdparams->source, 
 		"For more information on someone use /msg %s VIEW #",
 		hs_bot->name);
-	irc_prefmsg(hs_bot, cmdparams->source,  "--- End of List ---");
+	irc_prefmsg(hs_bot, cmdparams->source,  "End of list.");
 	if (vhostcount >= i) 
 		irc_prefmsg(hs_bot, cmdparams->source,  "Type \2/msg %s list %d\2 to see next page", hs_bot->name, i-1);
 	return 1;

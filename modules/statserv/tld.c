@@ -87,7 +87,7 @@ void DisplayTLDmap(Client *u)
 			t->country, t->daily_users);
 		tn = list_next(Thead, tn);
 	}
-	irc_prefmsg(ss_bot, u, "End of List");
+	irc_prefmsg(ss_bot, u, "End of list.");
 }
 
 /** @brief DelTLD

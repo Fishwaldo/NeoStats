@@ -250,124 +250,124 @@ static int ss_event_server(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	StatsAddServer(cmdparams->source);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_squit(CmdParams* cmdparams)
 {
 	StatsDelServer(cmdparams->source);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_newchan(CmdParams* cmdparams)
 {
 	StatsAddChan(cmdparams->channel);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_delchan(CmdParams* cmdparams)
 {
 	StatsDelChan(cmdparams->channel);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_join(CmdParams* cmdparams)
 {										   
 	if (StatServ.exclusions && (IsExcluded(cmdparams->channel) || IsExcluded(cmdparams->source))) {
-		return 0;
+		return NS_SUCCESS;
 	}
 	StatsJoinChan(cmdparams->source, cmdparams->channel);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_part(CmdParams* cmdparams)
 {
 	if (StatServ.exclusions && (IsExcluded(cmdparams->channel) || IsExcluded(cmdparams->source))) {
-		return 0;
+		return NS_SUCCESS;
 	}
 	StatsPartChan(cmdparams->source, cmdparams->channel);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_topic(CmdParams* cmdparams)
 {
 	if (StatServ.exclusions && IsExcluded(cmdparams->channel)) {
-		return 1;
+		return NS_SUCCESS;
 	}
 	StatsChanTopic(cmdparams->channel);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_kick(CmdParams* cmdparams)
 {
 	if (StatServ.exclusions && IsExcluded(cmdparams->channel)) {
-		return 1;
+		return NS_SUCCESS;
 	}
 	StatsChanKick(cmdparams->channel);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int ss_event_ctcpversion(CmdParams* cmdparams)
 {
 	StatsAddCTCPVersion(cmdparams->param);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_kill(CmdParams* cmdparams)
 {
 	if (StatServ.exclusions && IsExcluded(cmdparams->source)) {
-		return 0;
+		return NS_SUCCESS;
 	}
 	StatsKillUser(cmdparams->source);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_mode(CmdParams* cmdparams)
 {
 	if (StatServ.exclusions && IsExcluded(cmdparams->source)) {
-		return 0;
+		return NS_SUCCESS;
 	}
 	StatsUserMode(cmdparams->source, cmdparams->param);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_quit(CmdParams* cmdparams)
 {
 	if (StatServ.exclusions && IsExcluded(cmdparams->source)) {
-		return 0;
+		return NS_SUCCESS;
 	}
 	StatsQuitUser(cmdparams->source);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_away(CmdParams* cmdparams)
 {
 	if (StatServ.exclusions && IsExcluded(cmdparams->source)) {
-		return 0;
+		return NS_SUCCESS;
 	}
 	StatsUserAway(cmdparams->source);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_nickip(CmdParams* cmdparams)
 {
 	AddTLD(cmdparams->source);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_signon(CmdParams* cmdparams)
 {
 	if (StatServ.exclusions && IsExcluded(cmdparams->source)) {
-		return 0;
+		return NS_SUCCESS;
 	}
 	StatsAddUser(cmdparams->source);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_event_pong(CmdParams* cmdparams)
 {
 	StatsServerPong(cmdparams->source);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int topchan(const void *key1, const void *key2)
@@ -414,7 +414,7 @@ static int ss_clientversions(CmdParams* cmdparams)
 		num = 10;
 	}
 	list_client_versions(cmdparams->source, num);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_chans(CmdParams* cmdparams)
@@ -455,7 +455,7 @@ static int ss_chans(CmdParams* cmdparams)
 				break;
 			}
 		}
-		irc_prefmsg(ss_bot, cmdparams->source, "End of List.");
+		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "POP")) {
 		/* they want the top10 Popular Channels (based on joins) */
 		if (!list_is_sorted(Chead, topjoin)) {
@@ -487,7 +487,7 @@ static int ss_chans(CmdParams* cmdparams)
 				break;
 			}
 		}
-		irc_prefmsg(ss_bot, cmdparams->source, "End of List.");
+		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "KICKS")) {
 		/* they want the top10 most unwelcome channels (based on kicks) */
 		if (!list_is_sorted(Chead, topkick)) {
@@ -521,7 +521,7 @@ static int ss_chans(CmdParams* cmdparams)
 				break;
 			}
 		}
-		irc_prefmsg(ss_bot, cmdparams->source, "End of List.");
+		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "TOPICS")) {
 		/* they want the top10 most undecisive channels (based on topics) */
 		if (!list_is_sorted(Chead, toptopics)) {
@@ -553,13 +553,13 @@ static int ss_chans(CmdParams* cmdparams)
 				break;
 			}
 		}
-		irc_prefmsg(ss_bot, cmdparams->source, "End of List.");
+		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else {
 		cs = findchanstats(cmdparams->av[0]);
 		if (!cs) {
 			irc_prefmsg(ss_bot,cmdparams->source, 
 				"Error, Can't find any information about Channel %s", cmdparams->av[0]);
-			return 0;
+			return NS_SUCCESS;
 		}
 		irc_prefmsg(ss_bot, cmdparams->source, "\2Channel Information for %s (%s)\2", 
 			cmdparams->av[0], (find_chan(cmdparams->av[0]) ? "Online" : "Offline"));
@@ -582,14 +582,14 @@ static int ss_chans(CmdParams* cmdparams)
 			irc_prefmsg(ss_bot, cmdparams->source, "Channel was last seen at %s",
 				sftime(cs->t_lastseen));
 	}
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_tld_map(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	DisplayTLDmap(cmdparams->source);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ss_netstats(CmdParams* cmdparams)
@@ -611,8 +611,8 @@ static int ss_netstats(CmdParams* cmdparams)
 	irc_prefmsg(ss_bot, cmdparams->source, "Current Servers: %ld", stats_network.servers);
 	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Servers: %ld [%s]",
 		stats_network.maxservers, sftime(stats_network.t_maxservers));
-	irc_prefmsg(ss_bot, cmdparams->source, "--- End of List ---");
-	return 1;
+	irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
+	return NS_SUCCESS;
 }
 
 static int ss_daily(CmdParams* cmdparams)
@@ -631,7 +631,7 @@ static int ss_daily(CmdParams* cmdparams)
 		daily.tot_users);
 	irc_prefmsg(ss_bot, cmdparams->source, "Daily statistics are reset at midnight");
 	irc_prefmsg(ss_bot, cmdparams->source, "End of Information.");
-	return 1;
+	return NS_SUCCESS;
 }
 
 static void makemap(char *uplink, Client * u, int level)
@@ -681,8 +681,8 @@ static int ss_map(CmdParams* cmdparams)
 	irc_prefmsg(ss_bot, cmdparams->source, "%-40s      %-10s %-10s %-10s",
 		"\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2", "\2[LAG/MAX]\2");
 	makemap("", cmdparams->source, 0);
-	irc_prefmsg(ss_bot, cmdparams->source, "--- End of Listing ---");
-	return 1;
+	irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
+	return NS_SUCCESS;
 }
 
 static int ss_server(CmdParams* cmdparams)
@@ -700,28 +700,29 @@ static int ss_server(CmdParams* cmdparams)
 		while ((sn = hash_scan_next(&hs))) {
 			ss = hnode_get(sn);
 			if (find_server(ss->name)) {
-				irc_prefmsg(ss_bot, cmdparams->source, "Server: %s (*)", ss->name);
+				irc_prefmsg(ss_bot, cmdparams->source, "%s (*)", ss->name);
 			} else {
-				irc_prefmsg(ss_bot, cmdparams->source, "Server: %s", ss->name);
+				irc_prefmsg(ss_bot, cmdparams->source, "%s", ss->name);
 			}
 		}
-		irc_prefmsg(ss_bot,cmdparams->source, 
-			"***** End of list (* indicates server is online) *****");
-		return 0;
+		irc_prefmsg(ss_bot,cmdparams->source, "(* indicates server is online)");
+		irc_prefmsg(ss_bot,cmdparams->source, "End of list.");
+
+		return NS_SUCCESS;
 	}
 
 	server = cmdparams->av[0];
 	/* ok, found the Server, lets do some Statistics work now ! */
 	ss = findserverstats(server);
-	s = find_server(server);
 	if (!ss) {
 		nlog(LOG_CRITICAL, "Unable to find server statistics for %s", server);
 		irc_prefmsg(ss_bot,cmdparams->source, 
 			"Internal Error! Please Consult the Log file");
-		return 0;
+		return NS_SUCCESS;
 	}
 	irc_prefmsg(ss_bot, cmdparams->source, "Statistics for \2%s\2 since %s",
 		ss->name, sftime(ss->t_start));
+	s = find_server(server);
 	if (!s) {
 		irc_prefmsg(ss_bot, cmdparams->source, "Server Last Seen: %s", 
 			sftime(ss->t_lastseen));
@@ -756,7 +757,7 @@ static int ss_server(CmdParams* cmdparams)
 			ss->name);
 	}
 	irc_prefmsg(ss_bot, cmdparams->source, "***** End of Statistics *****");
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int operlistaway = 0;
@@ -809,8 +810,8 @@ static int ss_operlist(CmdParams* cmdparams)
 	}
 	listu = cmdparams->source;
 	GetUserList(operlist);
-	irc_prefmsg(ss_bot, cmdparams->source, "End of Listing.");
-	return 1;
+	irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
+	return NS_SUCCESS;
 }
 
 static void botlist(Client * u)
@@ -826,98 +827,113 @@ static int ss_botlist(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	listindex = 0;
-	irc_prefmsg(ss_bot, cmdparams->source, "On-Line Bots:");
+	irc_prefmsg(ss_bot, cmdparams->source, "Online bots:");
 	listu = cmdparams->source;
 	GetUserList(botlist);
-	irc_prefmsg(ss_bot, cmdparams->source, "End of Listing.");
-	return 1;
+	irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
+	return NS_SUCCESS;
 }
 
-static int ss_stats(CmdParams* cmdparams)
+static int ss_stats_list (CmdParams* cmdparams)
 {
 	SStats *st;
 	hnode_t *node;
 	hscan_t scan;
 
+	irc_prefmsg(ss_bot, cmdparams->source, "Statistics Database:");
+	hash_scan_begin(&scan, Shead);
+	while ((node = hash_scan_next(&scan))) {
+		st = hnode_get(node);
+		irc_prefmsg(ss_bot, cmdparams->source, "  %s", st->name);
+	}
+	irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
+	nlog(LOG_NOTICE, "%s requested STATS LIST.", cmdparams->source->name);
+	return NS_SUCCESS;
+}
+
+static int ss_stats_del (CmdParams* cmdparams)
+{
+	SStats *st;
+	hnode_t *node;
+
+	st = findserverstats(cmdparams->av[1]);
+	if (!st) {
+		irc_prefmsg(ss_bot, cmdparams->source, "%s is not in the database", cmdparams->av[1]);
+		return NS_SUCCESS;
+	}
+	if (!find_server(cmdparams->av[1])) {
+		node = hash_lookup(Shead, cmdparams->av[1]);
+		if (node) {
+			ns_free (hnode_get(node));
+			hash_delete(Shead, node);
+			hnode_destroy(node);
+			irc_prefmsg(ss_bot, cmdparams->source, "Removed %s from the database.",
+				cmdparams->av[1]);
+			nlog(LOG_NOTICE, "%s requested STATS DEL %s", cmdparams->source->name, cmdparams->av[1]);
+			return NS_SUCCESS;
+		}
+	} else {
+		irc_prefmsg(ss_bot, cmdparams->source, 
+			"Cannot remove %s from the database, it is online!!", cmdparams->av[1]);
+		nlog(LOG_WARNING,
+			    "%s requested STATS DEL %s, but that server is online!!",
+			    cmdparams->source->name, cmdparams->av[1]);
+			return NS_SUCCESS;
+	}
+	return NS_SUCCESS;
+}
+
+static int ss_stats_copy (CmdParams* cmdparams)
+{
+	SStats *st;
+	Client *s;
+
+	if (!cmdparams->av[1] || !cmdparams->av[2]) {
+		irc_prefmsg(ss_bot, cmdparams->source, "Syntax: /msg %s STATS COPY <name> "
+			" <newname>", ss_bot->name);
+		return NS_SUCCESS;
+	}
+	st = findserverstats(cmdparams->av[2]);
+	if (st)
+		ns_free(st);
+
+	st = findserverstats(cmdparams->av[1]);
+	if (!st) {
+		irc_prefmsg(ss_bot, cmdparams->source, "%s is not in the database", 
+			cmdparams->av[1]);
+		return NS_SUCCESS;
+	}
+	s = find_server(cmdparams->av[1]);
+	if (s) {
+		irc_prefmsg(ss_bot, cmdparams->source, "Server %s is online!", cmdparams->av[1]);
+		return NS_SUCCESS;
+	}
+	s = NULL;
+	memcpy(st->name, cmdparams->av[2], sizeof(st->name));
+	irc_prefmsg(ss_bot, cmdparams->source, "Moved database entry for %s to %s", 
+		cmdparams->av[1], cmdparams->av[1]);
+	nlog(LOG_NOTICE, "%s requested STATS COPY %s -> %s", cmdparams->source->name, 
+		cmdparams->av[1], cmdparams->av[2]);
+	return NS_SUCCESS;
+}
+
+static int ss_stats (CmdParams* cmdparams)
+{
 	SET_SEGV_LOCATION();
 	if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
-		int i = 1;
-		irc_prefmsg(ss_bot, cmdparams->source, "Statistics Database:");
-		hash_scan_begin(&scan, Shead);
-		while ((node = hash_scan_next(&scan))) {
-			st = hnode_get(node);
-			irc_prefmsg(ss_bot, cmdparams->source, "[%-2d] %s", i, st->name);
-			i++;
-		}
-		irc_prefmsg(ss_bot, cmdparams->source, "End of List.");
-		nlog(LOG_NOTICE, "%s requested STATS LIST.", cmdparams->source->name);
+		return ss_stats_list (cmdparams);
 	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
-		if (!cmdparams->av[1]) {
-			irc_prefmsg(ss_bot, cmdparams->source, "Syntax: /msg %s STATS DEL <name>",
-				ss_bot->name);
-			irc_prefmsg(ss_bot, cmdparams->source, "For additonal help, /msg %s HELP", 
-				ss_bot->name);
-			return 0;
+		if (cmdparams->ac < 2) {
+			return NS_ERR_NEED_MORE_PARAMS;
 		}
-		st = findserverstats(cmdparams->av[1]);
-		if (!st) {
-			irc_prefmsg(ss_bot, cmdparams->source, "%s is not in the database", cmdparams->av[1]);
-			return 0;
-		}
-		if (!find_server(cmdparams->av[1])) {
-			node = hash_lookup(Shead, cmdparams->av[1]);
-			if (node) {
-				ns_free (hnode_get(node));
-				hash_delete(Shead, node);
-				hnode_destroy(node);
-				irc_prefmsg(ss_bot, cmdparams->source, "Removed %s from the database.",
-					cmdparams->av[1]);
-				nlog(LOG_NOTICE, "%s requested STATS DEL %s", cmdparams->source->name, cmdparams->av[1]);
-				return 0;
-			}
-		} else {
-			irc_prefmsg(ss_bot, cmdparams->source, 
-				"Cannot remove %s from the database, it is online!!", cmdparams->av[1]);
-			nlog(LOG_WARNING,
-			     "%s requested STATS DEL %s, but that server is online!!",
-			     cmdparams->source->name, cmdparams->av[1]);
-				return 0;
-		}
-
+		return ss_stats_del (cmdparams);
 	} else if (!ircstrcasecmp(cmdparams->av[0], "COPY")) {
-		Client *s;
-
-		if (!cmdparams->av[1] || !cmdparams->av[2]) {
-			irc_prefmsg(ss_bot, cmdparams->source, "Syntax: /msg %s STATS COPY <name> "
-				" <newname>", ss_bot->name);
-			return 0;
+		if (cmdparams->ac < 3) {
+			return NS_ERR_NEED_MORE_PARAMS;
 		}
-		st = findserverstats(cmdparams->av[2]);
-		if (st)
-			ns_free(st);
-
-		st = findserverstats(cmdparams->av[1]);
-		if (!st) {
-			irc_prefmsg(ss_bot, cmdparams->source, "%s is not in the database", 
-				cmdparams->av[1]);
-			return 0;
-		}
-		s = find_server(cmdparams->av[1]);
-		if (s) {
-			irc_prefmsg(ss_bot, cmdparams->source, "Server %s is online!", cmdparams->av[1]);
-			return 0;
-		}
-		s = NULL;
-		memcpy(st->name, cmdparams->av[2], sizeof(st->name));
-		irc_prefmsg(ss_bot, cmdparams->source, "Moved database entry for %s to %s", 
-			cmdparams->av[1], cmdparams->av[1]);
-		nlog(LOG_NOTICE, "%s requested STATS COPY %s -> %s", cmdparams->source->name, 
-			cmdparams->av[1], cmdparams->av[2]);
-	} else {
-		irc_prefmsg(ss_bot, cmdparams->source, "Invalid Argument.");
-		irc_prefmsg(ss_bot, cmdparams->source, "For help, /msg %s HELP", ss_bot->name);
+		return ss_stats_copy (cmdparams);	
 	}
-	return 1;
+	return NS_ERR_SYNTAX_ERROR;
 }
 
 static int ss_forcehtml(CmdParams* cmdparams)
@@ -925,5 +941,5 @@ static int ss_forcehtml(CmdParams* cmdparams)
 	nlog(LOG_NOTICE, "%s!%s@%s forced an update of the HTML file.",
 		    cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname);
 	ss_html();
-	return 1;
+	return NS_SUCCESS;
 }

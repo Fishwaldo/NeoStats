@@ -616,6 +616,7 @@ typedef struct CmdParams {
 	Client *target;
 	Bot * bot;
 	char* param;
+	char* cmd;
 	Channel* channel;
 	char **av;
 	int ac;

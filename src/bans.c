@@ -128,7 +128,7 @@ BanDump (void)
 		ban = hnode_get (bansnode);
 		irc_chanalert (ns_botptr, _("Ban: %s "), ban->mask);
 	}
-	irc_chanalert (ns_botptr, _("End of Listing."));
+	irc_chanalert (ns_botptr, _("End of list."));
 }
 
 void FiniBans (void)

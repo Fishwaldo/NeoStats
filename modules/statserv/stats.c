@@ -179,7 +179,7 @@ void list_client_versions(Client * u, int num)
 			break;
 		}
 	}
-	irc_prefmsg (ss_bot, u, "End of List.");
+	irc_prefmsg (ss_bot, u, "End of list.");
 }
 
 void StatsAddChan(Channel* c)

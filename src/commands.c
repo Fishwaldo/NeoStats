@@ -192,21 +192,21 @@ void msg_error_need_more_params (CmdParams * cmdparams)
 {
 	irc_prefmsg (cmdparams->bot, cmdparams->source, __("Syntax error: insufficient parameters", cmdparams->source));
 	irc_prefmsg (cmdparams->bot, cmdparams->source, __("/msg %s HELP %s for more information", cmdparams->source), 
-		cmdparams->bot->name, cmdparams->param);
+		cmdparams->bot->name, cmdparams->cmd);
 }
 
 void msg_error_param_out_of_range (CmdParams * cmdparams)
 {
 	irc_prefmsg (cmdparams->bot, cmdparams->source, __("Parameter out of range.", cmdparams->source));
 	irc_prefmsg (cmdparams->bot, cmdparams->source, __("/msg %s HELP %s for more information", cmdparams->source), 
-		cmdparams->bot->name, cmdparams->param);
+		cmdparams->bot->name, cmdparams->cmd);
 }
 
 void msg_syntax_error (CmdParams * cmdparams)
 {
 	irc_prefmsg (cmdparams->bot, cmdparams->source, __("Syntax error", cmdparams->source));
 	irc_prefmsg (cmdparams->bot, cmdparams->source, __("/msg %s HELP %s for more information", cmdparams->source), 
-		cmdparams->bot->name, cmdparams->param);
+		cmdparams->bot->name, cmdparams->cmd);
 }
 
 void msg_unknown_command (CmdParams * cmdparams)
@@ -222,9 +222,9 @@ void msg_only_opers (CmdParams * cmdparams)
 	irc_prefmsg (cmdparams->bot, cmdparams->source, 
 		__("This service is only available to IRC operators.", cmdparams->source));
 	irc_chanalert (cmdparams->bot, _("%s requested %s, but is not an operator."), 
-		cmdparams->source->name, cmdparams->param);
+		cmdparams->source->name, cmdparams->cmd);
 	nlog (LOG_NORMAL, "%s requested %s, but is not an operator.", 
-		cmdparams->source->name, cmdparams->param);
+		cmdparams->source->name, cmdparams->cmd);
 }
 
 void check_cmd_result(CmdParams * cmdparams, int cmdret, char* extra)
@@ -394,7 +394,7 @@ del_services_cmd_list(bot_cmd* bot_cmd_list)
 	return(del_bot_cmd_list(ns_botptr, bot_cmd_list));
 }
 
-/** @brief run_bot_cmd process bot command list
+/** @brief run_intrinsic_cmds process bot intrinsic command list
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
@@ -466,6 +466,7 @@ run_bot_cmd (CmdParams * cmdparams)
 	userlevel = getuserlevel (cmdparams); 
 	strlcpy (privmsgbuffer, cmdparams->param, BUFSIZE);
 	ac = split_buf (privmsgbuffer, &av, 0);
+	cmdparams->cmd = av[0];
 	for(i = 1; i < ac; i++) {
 		AddStringToList (&cmdparams->av, av[i], &cmdparams->ac);
 	}

@@ -282,7 +282,7 @@ list_timers (CmdParams* cmdparams)
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Interval: %d", cmdparams->source), timer->interval);
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Next run in: %ld", cmdparams->source), (long)(timer->interval - (me.now - timer->lastrun)));
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source, __("End of list", cmdparams->source));
+	irc_prefmsg (ns_botptr, cmdparams->source, __("End of list.", cmdparams->source));
 	return 0;
 }
 
