@@ -3,7 +3,8 @@ NeoStats 3.x ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
-* NeoStats * Version 3.0.genesis
+* NeoStats * Version 3.0.prealpha1
+ - First recommened release to devlist only as prealpha1. (M)
  - New moddata API. We now have two values for use by modules, one being an 
    allocated address and one a value. This allows the core to clean up after
    modules in the event that they fail to. (M)

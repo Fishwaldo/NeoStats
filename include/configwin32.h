@@ -417,7 +417,7 @@
 #define RETSIGTYPE void
 
 /* "Revision Version Number" */
-#define REV genesis
+#define REV "prealpha1"
 
 /* Define to the type of arg 1 for `select'. */
 #define SELECT_TYPE_ARG1 int

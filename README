@@ -127,7 +127,7 @@ uncompressed NeoStats. e.g.
 
 Your prompt should look something like:
     
-        [user@host NeoStats3.0.50]
+        [user@host NeoStats3.0.0]
 
 Now type:
     

@@ -382,11 +382,39 @@
 				RelativePath=".\win32\neostats.rc">
 			</File>
 		</Filter>
+		<Filter
+			Name="docs"
+			Filter="">
+			<File
+				RelativePath="..\doc\Faq">
+			</File>
+			<File
+				RelativePath="..\Instnotes">
+			</File>
+			<File
+				RelativePath="..\INSTNOTES.svn">
+			</File>
+			<File
+				RelativePath="..\Readme">
+			</File>
+			<File
+				RelativePath="..\doc\README.dev">
+			</File>
+			<File
+				RelativePath="..\Relnotes">
+			</File>
+			<File
+				RelativePath="..\doc\Userman">
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\ChangeLog">
 		</File>
 		<File
 			RelativePath="..\configure.in">
+		</File>
+		<File
+			RelativePath="..\makeconf">
 		</File>
 		<File
 			RelativePath="..\modules\modules.txt">
