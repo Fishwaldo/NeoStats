@@ -187,11 +187,11 @@ static bot_cmd cs_commands[]=
 
 static bot_setting cs_settings[]=
 {
-	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, "SignWatch"	},
-	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, "KillWatch"	},
-	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, "ModeWatch"	},
-	{"NICKWATCH",	&cs_cfg.nick_watch,	SET_TYPE_BOOLEAN,	0, 0, "NickWatch"	},
-	{NULL,			NULL,				0,					0, 0, NULL,			},
+	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, "SignWatch",	cs_help_set	},
+	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, "KillWatch",	NULL	},
+	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, "ModeWatch",	NULL	},
+	{"NICKWATCH",	&cs_cfg.nick_watch,	SET_TYPE_BOOLEAN,	0, 0, "NickWatch",	NULL	},
+	{NULL,			NULL,				0,					0, 0, NULL,			NULL	},
 };
 
 static int cs_about(User * u, char **av, int ac)

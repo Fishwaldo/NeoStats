@@ -455,6 +455,17 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 		}
 		cmd_ptr++;
 	}
+	/* Handle SET if we have it */
+	if (bot_ptr->bot_settings && !strcasecmp(av[2], "SET") ) {
+		set_ptr = bot_ptr->bot_settings;
+		while(set_ptr->option)
+		{
+			if(set_ptr->helptext)
+				privmsg_list (u->nick, bot_ptr->nick, set_ptr->helptext);
+			set_ptr++;
+		}
+		return 1;
+	}
 
 	/* Command not found so report as unknown */
 	prefmsg (u->nick, bot_ptr->nick, "No help available or unknown help topic: \2%s\2", av[2]);

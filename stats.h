@@ -405,10 +405,10 @@ typedef struct bot_setting {
 	unsigned int	min;		/* min value */
 	unsigned int	max;		/* max value */
 	char			*confitem;	/* config string for kptool */
+	const char**	helptext;	/* pointer to help text */
 #if 0   /* Work in progress */
 	const char		*desc;		/* description of setting for messages */
 	bot_cmd_handler	handler;	/* handler for custom/post-set processing */
-	const char**	helptext;	/* pointer to help text */
 #endif
 }bot_setting;
 
