@@ -314,8 +314,6 @@ AC_CONFIG_FILES([Makefile
 		modules/loveserv/Makefile
 		modules/moraleserv/Makefile
 		modules/statserv/Makefile
-		modules/template/Makefile
-		modules/templateauth/Makefile
 		tools/Makefile
 		cronchk])
 

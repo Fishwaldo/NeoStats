@@ -30352,7 +30352,7 @@ _ACEOF
 
 
 
-                                                                                                                                                                                                                            ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile lib/Makefile lib/curl/Makefile lib/keeper/Makefile lib/adns/Makefile lib/pcre/Makefile lib/rta/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/loveserv/Makefile modules/moraleserv/Makefile modules/statserv/Makefile modules/template/Makefile modules/templateauth/Makefile tools/Makefile cronchk"
+                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile lib/Makefile lib/curl/Makefile lib/keeper/Makefile lib/adns/Makefile lib/pcre/Makefile lib/rta/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/loveserv/Makefile modules/moraleserv/Makefile modules/statserv/Makefile tools/Makefile cronchk"
 
 
 cat >confcache <<\_ACEOF
@@ -31049,8 +31049,6 @@ do
   "modules/loveserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/loveserv/Makefile" ;;
   "modules/moraleserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/moraleserv/Makefile" ;;
   "modules/statserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/statserv/Makefile" ;;
-  "modules/template/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/template/Makefile" ;;
-  "modules/templateauth/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/templateauth/Makefile" ;;
   "tools/Makefile" ) CONFIG_FILES="$CONFIG_FILES tools/Makefile" ;;
   "cronchk" ) CONFIG_FILES="$CONFIG_FILES cronchk" ;;
   "$ac_config_libobj_dir/fnmatch.h" ) CONFIG_LINKS="$CONFIG_LINKS $ac_config_libobj_dir/fnmatch.h:$ac_config_libobj_dir/fnmatch_.h" ;;
