@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.30 2002/09/04 08:40:26 fishwaldo Exp $
+** $Id: chans.c,v 1.31 2002/10/14 05:44:39 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -87,9 +87,21 @@ int ChanMode(char *origin, char **av, int ac) {
 									j++;
 								} else {	
 									if (cFlagTab[i].parameters) {
+										mn = list_first(c->modeparms);
+										while (mn) {
+											m = lnode_get(mn);
+											if (((int *)m->mode == (int *)cFlagTab[i].mode) && !strcasecmp(m->param, av[j])) {
+#ifdef DEBUG
+						 						log("Mode %c (%s) already exists, not adding again");
+#endif
+												j++;
+												continue;
+											}
+											mn = list_next(c->modeparms, mn);
+										}
 										m = smalloc(sizeof(ModesParm));
 										m->mode = cFlagTab[i].mode;
-										strcpy(m->param, av[j]);										
+										strcpy(m->param, av[j]);
 										mn = lnode_create(m);
 										if (list_isfull(c->modeparms)) {
 											log("Eeek, Can't add additional Modes to Channel %s. Modelist is full", c->name);

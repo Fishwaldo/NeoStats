@@ -130,6 +130,8 @@ doc/read-userman -text
 logs/.keepme -text
 /main.c -text
 /makeconf -text
+/neoircd.c -text
+/neoircd.h -text
 /neostats.cfg.dist -text
 /ns_help.c -text
 /server.c -text
