@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.6 2002/03/06 15:37:56 fishwaldo Exp $
+** $Id: spam.c,v 1.7 2002/03/07 08:42:17 fishwaldo Exp $
 */
 
 
@@ -60,10 +60,10 @@ void TimerSpam()
 return;
 }
 
-int __Bot_Message(char *origin, char *coreLine, int type)
+int __Bot_Message(char *origin, char **argv, int argc)
 {
 	User *u;
-/*	u = finduser(origin); */
+	u = finduser(origin); 
 	if (!u) { 
 		log("Unable to find user %s (spam)", origin); 
 		return -1; 
@@ -71,12 +71,11 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 /* 	if (u->is_oper)
 		return -1;
 */	
-	strtok(coreLine, " ");
 	globops(me.name, "Possible Mass Message -\2(%s!%s@%s)\2- %s", u->nick,
-		u->username, u->hostname, coreLine);
-	notice(s_Spam,"WooHoo, A Spammer has Spammed! -\2(%s!%s@%s)\2- Sent me this: %s",u->nick,u->username,u->hostname,coreLine);
+		u->username, u->hostname, argv[1]);
+	notice(s_Spam,"WooHoo, A Spammer has Spammed! -\2(%s!%s@%s)\2- Sent me this: %s",u->nick,u->username,u->hostname,argv[1]);
 	log("Possible Mass Message -(%s!%s@%s)- %s", u->nick, u->username,
-		u->hostname, coreLine);
+		u->hostname, argv[1]);
 	return 1;
 }
 

@@ -103,7 +103,7 @@ int  spong_cmd(const char *reply) {
 }
 
 int snetinfo_cmd() {
-	sts(":%s %s 0 %d %d %s 0 0 0 %s",me.name,(me.token ? TOK_NETINFO : MSG_NETINFO), time(NULL),ircd_srv.uprot, ircd_srv.cloak,me.netname);
+	sts(":%s %s 0 %d %d %s 0 0 0 :%s",me.name,(me.token ? TOK_NETINFO : MSG_NETINFO), time(NULL),ircd_srv.uprot, ircd_srv.cloak,me.netname);
 	return 1;
 }
 

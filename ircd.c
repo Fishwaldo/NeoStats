@@ -17,45 +17,46 @@
 extern const char version_date[], version_time[];
 extern const char protocol_version[];
 
-void Usr_Version(char *, char *);
-void Usr_ShowMOTD(char *, char *);
-void Usr_ShowADMIN(char *, char *);
-void Usr_Showcredits(char *, char *);
-void Usr_AddServer(char *, char *);
-void Usr_DelServer(char *, char *);
-void Usr_DelUser(char *, char *);
-void Usr_Mode(char *, char *);
-void Usr_Smode(char *, char *);
-void Usr_Kill(char *, char *);
-void Usr_Pong(char *, char *);
-void Usr_Away(char *, char *);
-void Usr_Nick(char *, char *);
-void Usr_Topic(char *, char *);
-void Usr_Kick(char *, char *);
-void Usr_Join(char *, char *);
-void Usr_Part(char *, char *);
-void Usr_Stats(char *, char *);
-void Usr_Vhost(char *, char *);
-void Srv_Ping(char *, char *);
-void Srv_Netinfo(char *, char *);
-void Srv_Pass(char *, char *);
-void Srv_Server(char *, char *);
-void Srv_Squit(char *, char *);
-void Srv_Nick(char *, char *);
-void Srv_Svsnick(char *, char *);
-void Srv_Kill(char *, char *);
-void Srv_Connect(char *, char *);
+void Usr_Version(char *, char **, int argc);
+void Usr_ShowMOTD(char *, char **, int argc);
+void Usr_ShowADMIN(char *, char **, int argc);
+void Usr_Showcredits(char *, char **, int argc);
+void Usr_AddServer(char *, char **, int argc);
+void Usr_DelServer(char *, char **, int argc);
+void Usr_DelUser(char *, char **, int argc);
+void Usr_Mode(char *, char **, int argc);
+void Usr_Smode(char *, char **, int argc);
+void Usr_Kill(char *, char **, int argc);
+void Usr_Pong(char *, char **, int argc);
+void Usr_Away(char *, char **, int argc);
+void Usr_Nick(char *, char **, int argc);
+void Usr_Topic(char *, char **, int argc);
+void Usr_Kick(char *, char **, int argc);
+void Usr_Join(char *, char **, int argc);
+void Usr_Part(char *, char **, int argc);
+void Usr_Stats(char *, char **, int argc);
+void Usr_Vhost(char *, char **, int argc);
+void Srv_Ping(char *, char **, int argc);
+void Srv_Netinfo(char *, char **, int argc);
+void Srv_Pass(char *, char **, int argc);
+void Srv_Server(char *, char **, int argc);
+void Srv_Squit(char *, char **, int argc);
+void Srv_Nick(char *, char **, int argc);
+void Srv_Svsnick(char *, char **, int argc);
+void Srv_Kill(char *, char **, int argc);
+void Srv_Connect(char *, char **, int argc);
 
 
 static void ShowMOTD(char *);
 static void ShowADMIN(char *);
 static void Showcredits(char *);
 
+char *coreLine;
 
 
 struct int_commands {
 	char *name;
-	void (*function)(char *origin, char *coreLine);
+	void (*function)(char *origin, char **argv, int argc);
 	int srvmsg; /* Should this be a Server Message(1), or a User Message?(0) */
 };
 
@@ -272,11 +273,66 @@ void Module_Event(char *event, void *data) {
 	}
 
 }
+
+
+/* Taken from Epona - Thanks! */
+
+/*************************************************************************/
+
+/* split_buf:  Split a buffer into arguments and store the arguments in an
+ *             argument vector pointed to by argv (which will be malloc'd
+ *             as necessary); return the argument count.  If colon_special
+ *             is non-zero, then treat a parameter with a leading ':' as
+ *             the last parameter of the line, per the IRC RFC.  Destroys
+ *             the buffer by side effect.
+ */
+
+int split_buf(char *buf, char ***argv, int colon_special)
+{
+    int argvsize = 8;
+    int argc;
+    char *s;
+    int flag = 0;
+
+    *argv = calloc(sizeof(char *) * argvsize, 1);
+    argc = 0;
+    if (*buf == ':') buf++;
+    while (*buf) {
+	if (argc == argvsize) {
+	    argvsize += 8;
+	    *argv = realloc(*argv, sizeof(char *) * argvsize);
+	}
+	if ((colon_special ==1) && (*buf==':')) {
+		(*argv)[argc++] = buf+1;
+		buf = "";
+		flag = 1;
+	} else if (*buf == ':') {
+		buf++;
+	}
+	s = strpbrk(buf, " ");
+	if (s) {
+		*s++ = 0;
+		while (isspace(*s))
+		    s++;
+	} else {
+		s = buf + strlen(buf);
+	}
+	(*argv)[argc++] = buf;
+	buf = s;
+    }
+    return argc - flag;
+}
+
+
+
+
 void parse(char *line)
 {
-	char *origin, *cmd, *coreLine, *corelen;
+	char origin[64], cmd[64], *coreLine;
 	int cmdptr = 0;
 	int I = 0;
+	int ac;
+	char **av;
 	Module *module_ptr;
 	Functions *fn_list;
 	Mod_User *list;
@@ -288,69 +344,92 @@ void parse(char *line)
 	strcpy(recbuf, line);
 	if (!(*line))
 		return;
-
 #ifdef DEBUG
 	log("R: %s", line);
 #endif
-	origin = strtok(line, " ");
-	if (*origin == ':') {
+	
+    	if (*line == ':') {
+		coreLine = strpbrk(line, " ");
+		if (!coreLine)
+	    		return;
+		*coreLine = 0;
+		while (isspace(*++coreLine))
+	    	;
+		strncpy(origin, line+1, sizeof(origin));
+		memmove(line, coreLine, strlen(coreLine)+1);
 		cmdptr = 1;
-		origin++;
-		cmd = strtok(NULL, " ");
+    	} else {
+    		cmdptr = 0;
+		*origin = 0;
+    	}
+    	if (!*line)
+		return;
+    	coreLine = strpbrk(line, " ");
+    	if (coreLine) {
+		*coreLine = 0;
+		while (isspace(*++coreLine))
+	    	;
+    	} else
+		coreLine = line + strlen(line);
+    	strncpy(cmd, line, sizeof(cmd));
+
+	ac = split_buf(coreLine, &av, 1);
+#ifdef DEBUG
+	if (cmdptr) {
+		printf("origin %s - cmd %s\n", origin, cmd);
 	} else {
-		cmd = origin;
+		printf("cmd %s\n", cmd);
 	}
-	coreLine = strtok(NULL, "");
+	for (I = 0; I < ac; I++) {
+		printf("args %d - %s\n", I, av[I]);
+	}
+#endif
+	
+
+
         /* First, check if its a privmsg, and if so, handle it in the correct Function */
  	if (!strcasecmp("PRIVMSG",cmd) || (!strcasecmp("!",cmd))) {
  		/* its a privmsg, now lets see who too... */       
-        	cmd = strtok(coreLine, " ");
-		coreLine = strtok(NULL, "");
-		coreLine++;
-		/* coreLine contains the Actual Message now, cmd, is who its too */
-                if (findbot(origin))
-                return;
 
-		if (!strcasecmp(s_Services,cmd)) {
+		/* if its a message from our own internal bots, silently drop it */
+                if (findbot(origin)) {
+			free(av);
+	                return;
+		}
+		if (!strcasecmp(s_Services,av[0])) {
 			/* its to the Internal Services Bot */
 			segv_location = sstrdup("servicesbot");
-			servicesbot(origin,coreLine);
+			servicesbot(origin,av[1]);
 			segv_location = sstrdup("ServicesBot_return");
+			free(av);
 			return;
 		} else {
-			list = findbot(cmd);
+			list = findbot(av[0]);
 			/* Check to see if any of the Modules have this nick Registered */
 			if (list) {
 #ifdef DEBUG
 				log("nicks: %s", list->nick);
 #endif
-				/* if the message is from one of our bots, silently drop it, to stop floods */
-				if (findbot(origin)) return;
-
 
 				/* Check to make sure there are no blank spaces so we dont crash */
-				corelen = smalloc(strlen(coreLine));
-			        if (strlen(coreLine) >= 350) {
+			        if (strlen(av[1]) >= 350) {
 			                privmsg(origin, s_Services, "command line too long!");
 			                notice (s_Services,"%s tried to send a very LARGE command, we told them to shove it!", origin);
+					free(av);
 			                return;
 			        }
 
-				strcpy(corelen, coreLine);
-				if ((strtok(corelen, " ")) == NULL) {
-					return;
-				}
                                 segv_location = sstrdup(list->modname);
 				strcpy(segvinmodule, list->modname);
 				if (setjmp(sigvbuf) == 0) {
-					list->function(origin, coreLine);
+					list->function(origin, av, ac);
 				}
 				strcpy(segvinmodule, "");
 				segv_location = sstrdup("Return from Module Message");
-				free(corelen);
+				free(av);
 				return;
 			}
-			log("Recieved a Message for %s, but that user is not registered with us!!! buf: %s", cmd, coreLine);
+			log("Recieved a Message for %s, but that user is not registered with us!!! buf: %s", av[0], av[1]);
 		}
         }	
         	
@@ -360,7 +439,7 @@ void parse(char *line)
 		if (!strcasecmp(cmd_list[I].name, cmd)) {
 			if (cmd_list[I].srvmsg == cmdptr) {
 				segv_location = sstrdup(cmd_list[I].name);
-				cmd_list[I].function(origin, coreLine);
+				cmd_list[I].function(origin, av, ac);
 				break; log("should never get here-Parse");
 			}	
 		}
@@ -381,7 +460,7 @@ void parse(char *line)
 					segv_location = sstrdup(module_ptr->info->module_name);
 					strcpy(segvinmodule, module_ptr->info->module_name);
 					if (setjmp(sigvbuf) == 0) {
-						fn_list->function(origin, coreLine);			
+						fn_list->function(origin, av, ac);			
 					}
 					strcpy(segvinmodule, "");
 					segv_location = sstrdup("Parse_Return_Module");
@@ -392,9 +471,13 @@ void parse(char *line)
 		fn_list++;
 		}	
 	}
-        	
-
+        free(av);
 }
+
+
+
+
+
 
 
 
@@ -420,22 +503,20 @@ void init_ServBot()
 
 
 
-void Srv_Connect(char *origin, char *coreLine) {
-	char *cmd;
-	cmd = strtok(coreLine, " ");
-	while (cmd) {
-		if (!strcasecmp("TOKEN", cmd)) {
+void Srv_Connect(char *origin, char **argv, int argc) {
+	int i;
+
+	for (i = 0; i < argc; i++) {
+		if (!strcasecmp("TOKEN", argv[i])) {
 			me.token = 1;
 		}
-		cmd = strtok(NULL, " ");
 	}
 	init_ServBot();
 }
 
 
-void Usr_Stats(char *origin, char *coreLine) {
+void Usr_Stats(char *origin, char **argv, int argc) {
 	User *u;
-	char *stats;
 	time_t tmp;
 	time_t tmp2;
 		
@@ -443,121 +524,92 @@ void Usr_Stats(char *origin, char *coreLine) {
 	if (!u) {
 		log("Recieved a Message from a Unknown User! (%s)", origin);
 	}
-	stats = strtok(coreLine, " ");
-	if (!strcasecmp(stats, "u")) {
+	if (!strcasecmp(argv[0], "u")) {
 		/* server uptime - Shmad */ 
                 int uptime = time (NULL) - me.t_start;
                 snumeric_cmd(242, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime/86400, (uptime/3600) % 24, (uptime/60) % 60,
                 uptime % 60);
-	} else if (!strcasecmp(stats, "c")) {
+	} else if (!strcasecmp(argv[0], "c")) {
 		/* Connections */
 		snumeric_cmd(214, u->nick, "N *@%s * * %d 50", me.uplink, me.port);
 		snumeric_cmd(213, u->nick, "C *@%s * * %d 50", me.uplink, me.port);
-	} else if (!strcasecmp(stats, "o")) {
+	} else if (!strcasecmp(argv[0], "o")) {
 		/* Operators */
 		snumeric_cmd(243, u->nick, "Operators think they are God, but you and I know they are not!");
-	} else if (!strcasecmp(stats, "l")) {
+	} else if (!strcasecmp(argv[0], "l")) {
 		/* Port Lists */
 		tmp = time(NULL) - me.lastmsg; 
 		tmp2 = time(NULL) - me.t_start;
 		snumeric_cmd(211, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
 		snumeric_cmd(241, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
 	}
-	snumeric_cmd(219, u->nick, "%s :End of /STATS report", stats);
-	notice(s_Services,"%s Requested Stats %s", u->nick, stats);
+	snumeric_cmd(219, u->nick, "%s :End of /STATS report", argv[0]);
+	notice(s_Services,"%s Requested Stats %s", u->nick, argv[0]);
 }
 
-void Usr_Version(char *origin, char *coreLine) {
+void Usr_Version(char *origin, char **argv, int argc) {
 	snumeric_cmd(351, origin, "%s :%s -> %s %s", version, me.name, version_date, version_time); 
 }
-void Usr_ShowMOTD(char *origin, char *coreLine) {
+void Usr_ShowMOTD(char *origin, char **argv, int argc) {
 	ShowMOTD(origin);
 }
-void Usr_ShowADMIN(char *origin, char *coreLine) {
+void Usr_ShowADMIN(char *origin, char **argv, int argc) {
 	ShowADMIN(origin);
 }
-void Usr_Showcredits(char *origin, char *coreLine) {
+void Usr_Showcredits(char *origin, char **argv, int argc) {
 	Showcredits(origin);
 }
-void Usr_AddServer(char *origin, char *coreLine){
-	char *cmd;
-	cmd = strtok(coreLine, " ");
-	AddServer(cmd,origin,1);
-	Module_Event("NEWSERVER", findserver(cmd));
+void Usr_AddServer(char *origin, char **argv, int argc){
+	AddServer(argv[0],origin,atoi(argv[1]));
+	Module_Event("NEWSERVER", findserver(argv[0]));
 }
-void Usr_DelServer(char *origin, char *coreLine){
-	char *cmd;
-	cmd = strtok(coreLine, " ");
-	Module_Event("DELSERVER", coreLine);
-	DelServer(cmd);
+void Usr_DelServer(char *origin, char **argv, int argc){
+	Module_Event("DELSERVER", argv[0]);
+	DelServer(argv[0]);
 }
-void Usr_DelUser(char *origin, char *coreLine) {
+void Usr_DelUser(char *origin, char **argv, int argc) {
 	Module_Event("SIGNOFF", finduser(origin));
 	DelUser(origin);
 }
-void Usr_Smode(char *origin, char *coreLine) {
-	char *cmd, *mode, tmp[25];
-	cmd = strtok(coreLine, " ");
-	mode = strtok(NULL, "");
-	/* this is a hack */
-	sprintf(tmp, ":%s", mode); 
-	UserMode(cmd, tmp);
-	Module_Event("UMODE", finduser(cmd));
-
+void Usr_Smode(char *origin, char **argv, int argc) {
+	log("Please send this line to fish@neostats.net: Usr_Smode %s", recbuf);
 }
-void Usr_Mode(char *origin, char *coreLine) {
-			char *cmd;
-			cmd = strtok(coreLine, " ");
-			if (!strchr(cmd, '#')) {
+void Usr_Mode(char *origin, char **argv, int argc) {
+			if (!strchr(argv[0], '#')) {
 #ifdef DEBUG
-				log("Mode: UserMode: %s",cmd);
+				log("Mode: UserMode: %s",argv[0]);
 #endif
-				cmd = strtok(NULL, "");
-				UserMode(origin, cmd);
-				Module_Event("UMODE", finduser(origin));
+				UserMode(argv[0], argv[1]);
+				Module_Event("UMODE", finduser(argv[0]));
 			} else {
-/* Shmad */
-/*
-				log("Mode: ChanMode: %s",cmd);
-				rest = strtok(NULL, "");
-				ChanMode(cmd, rest);
-				Module_Event("CMODE", coreLine);
-*/
 			}	
 }	
-void Usr_Kill(char *origin, char *coreLine) {
-	char *cmd;
+void Usr_Kill(char *origin, char **argv, int argc) {
 	User *u;
 	Mod_User *mod_ptr;
 	
-	cmd = strtok(coreLine, " ");
-	mod_ptr = findbot(cmd);
+	mod_ptr = findbot(argv[0]);
 	if (mod_ptr) { /* Oh Oh, one of our Bots has been Killed off! */
-		Module_Event("BOTKILL", cmd);
-		DelUser(cmd);
+		Module_Event("BOTKILL", argv[0]);
+		DelUser(argv[0]);
 		return;
 	}
-	u = finduser(cmd);
+	u = finduser(argv[0]);
 	if (u) {
 		Module_Event("KILL", u);
-		DelUser(cmd);
+		DelUser(argv[0]);
 	}
 }
-void Usr_Vhost(char *origin, char *coreLine) {
-	char *cmd;
+void Usr_Vhost(char *origin, char **argv, int argc) {
 	User *u;
-	cmd = strtok(coreLine, " ");
 	u = finduser(origin);
 	if (u) {
-		cmd = strtok(coreLine, " ");
-		strcpy(u->vhost, cmd);
+		strcpy(u->vhost, argv[0]);
 	}
 }
-void Usr_Pong(char *origin, char *coreLine) {
+void Usr_Pong(char *origin, char **argv, int argc) {
 			Server *s;
-			char *cmd;
-			cmd = strtok(coreLine, " ");
-			s = findserver(cmd);
+			s = findserver(argv[0]);
 			if (s) {
 				s->ping = time(NULL) - ping.last_sent;
 				if (ping.ulag > 1)
@@ -567,10 +619,10 @@ void Usr_Pong(char *origin, char *coreLine) {
 				Module_Event("PONG", s);
 
 			} else {
-				log("Received PONG from unknown server: %s", cmd);
+				log("Received PONG from unknown server: %s", argv[0]);
 			}
 }
-void Usr_Away(char *origin, char *coreLine) {
+void Usr_Away(char *origin, char **argv, int argc) {
 			User *u = finduser(origin);
 			if (u) {
 				if (u->is_away) {
@@ -583,68 +635,31 @@ void Usr_Away(char *origin, char *coreLine) {
 				log("Warning, Unable to find User %s for Away", origin);
 			}
 }	
-void Usr_Nick(char *origin, char *coreLine) {
-			char *cmd, *cmd2;
+void Usr_Nick(char *origin, char **argv, int argc) {
 			User *u = finduser(origin);
 			if (u) {
-				cmd = smalloc(255);
-				snprintf(cmd, 255, "%s %s", u->nick, coreLine);
-				cmd2 = strtok(coreLine, " ");
-				Change_User(u, cmd2);
-				Module_Event("NICK_CHANGE",cmd);
-				free(cmd);
+				Change_User(u, argv[0]);
+				Module_Event("NICK_CHANGE",argv[0]);
 
 			}
 }
-void Usr_Topic(char *origin, char *coreLine) {
+void Usr_Topic(char *origin, char **argv, int argc) {
 }
-void Usr_Kick(char *origin, char *coreLine) {
+void Usr_Kick(char *origin, char **argv, int argc) {
 }
-void Usr_Join(char *origin, char *coreLine) {
-/*	char *cmd, *temp = NULL;
-			User *u = finduser(origin);
-			cmd = strtok(coreLine, " ");
-			if (*cmd == ':')
-				cmd++;
-			if (strcasecmp(",",cmd)) {
-				log("double chan");
-				temp = strtok(cmd,",");
-			}
-			if (u) {
-				while (1) {
-					Addchan(temp);
-					temp = strtok(NULL,",");
-					if (temp == NULL) { 
-						log("Null: %s, %s",temp,cmd);
-						temp = cmd;
-						cmd = NULL;
-					}
-					if (temp == NULL) {
-						log("break: %s",temp);
-						break;
-					}
-				}
-			}
-*/
+void Usr_Join(char *origin, char **argv, int argc) {
 }
-void Usr_Part(char *origin, char *coreLine) {
+void Usr_Part(char *origin, char **argv, int argc) {
 }
-void Srv_Ping(char *origin, char *coreLine) {
-			spong_cmd(coreLine);
+void Srv_Ping(char *origin, char **argv, int argc) {
+			spong_cmd(origin);
 }
-void Srv_Netinfo(char *origin, char *coreLine) {
-			char *cmd;
-			cmd = strtok(coreLine, " ");
-			cmd = strtok(NULL, " ");
-			cmd = strtok(NULL, " ");
+void Srv_Netinfo(char *origin, char **argv, int argc) {
 		        me.onchan = 1;
 #ifdef UNREAL
-			ircd_srv.uprot = atoi(cmd);
-			strcpy(ircd_srv.cloak, strtok(NULL, " "));
-			cmd = strtok(NULL, " ");
-			cmd = strtok(NULL, " ");
-			cmd = strtok(NULL, " ");
-			strcpy(me.netname, strtok(NULL, " "));
+			ircd_srv.uprot = atoi(argv[2]);
+			strcpy(ircd_srv.cloak, argv[3]);
+			strcpy(me.netname, argv[7]);
 #endif
 
 			snetinfo_cmd();
@@ -657,54 +672,44 @@ void Srv_Netinfo(char *origin, char *coreLine) {
 			} 
 			Module_Event("NETINFO", coreLine); 
 }
-void Srv_Pass(char *origin, char *coreLine) {
+void Srv_Pass(char *origin, char **argv, int argc) {
 }
-void Srv_Server(char *origin, char *coreLine) {
+void Srv_Server(char *origin, char **argv, int argc) {
 			Server *s;
-			AddServer(strtok(coreLine, " "),origin, 1);
-			s = findserver(coreLine);
+			if (*origin == 0) {
+				AddServer(argv[0],me.name, atoi(argv[1]));
+			} else {
+				AddServer(argv[0],origin, atoi(argv[1]));
+			}
+			s = findserver(argv[0]);
 			me.s = s;
 			Module_Event("ONLINE", s);
 			Module_Event("NEWSERVER", s);
 }
-void Srv_Squit(char *origin, char *coreLine) {
+void Srv_Squit(char *origin, char **argv, int argc) {
 			Server *s;
-			s = findserver(strtok(coreLine, " "));
+			s = findserver(argv[0]);
 			if (s) {
 				Module_Event("SQUIT", s);
-				DelServer(strtok(coreLine, " "));
+				DelServer(argv[0]);
 			} else {
-				log("Waring, Squit from Unknown Server %s", strtok(coreLine, " "));
+				log("Waring, Squit from Unknown Server %s", argv[0]);
 			}
 						
 }
-void Srv_Nick(char *origin, char *coreLine) {
-			char *user, *host, *server, *cmd;
-			cmd = strtok(coreLine, " ");
-			user = strtok(NULL, " ");
-			user = strtok(NULL, " ");
-			user = strtok(NULL, " ");
-			host = strtok(NULL, " ");
-			server = strtok(NULL, " ");
-			AddUser(cmd, user, host, server);
-			Module_Event("SIGNON", finduser(cmd));
+void Srv_Nick(char *origin, char **argv, int argc) {
+			AddUser(argv[0], argv[3], argv[4], argv[5]);
+			Module_Event("SIGNON", finduser(argv[0]));
 }
-void Srv_Svsnick(char *origin, char *coreLine) {
-			char *nnick;
+void Srv_Svsnick(char *origin, char **argv, int argc) {
 			User *u;
 
-			nnick = strtok(coreLine, " ");
-			u = finduser(nnick);
-			nnick = strtok(NULL, " ");
-			Change_User(u, nnick);
+			u = finduser(argv[0]);
+			Change_User(u, argv[1]);
 			Module_Event("NICK_CHANGE",coreLine);
 
 }		
-void Srv_Kill(char *origin, char *coreLine) {
-			char *user, *rest;
-			user = strtok(coreLine, " ");
-			rest = strtok(NULL, " ");
-
+void Srv_Kill(char *origin, char **argv, int argc) {
 }
 
 

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.17 2002/03/05 13:48:09 fishwaldo Exp $
+** $Id: users.c,v 1.18 2002/03/07 08:42:16 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -106,10 +106,13 @@ void Change_User(User *u, const char *newnick)
 	log("Change_User(%s, %s)", u->nick, newnick);
 #endif
 
-	DelUser(u->nick);
-	u->nick[1] = '\0';
+	un = hash_lookup(uh, u->nick);
+	if (!un) {
+		log("ChangeUser(%s) Failed!", u->nick);
+		return;
+	}
+	hash_delete(uh, un);
 	strcpy(u->nick, newnick);
-	un = hnode_create(u);
 	hash_insert(uh, un, u->nick);
 }
 void sendcoders(char *message,...)
