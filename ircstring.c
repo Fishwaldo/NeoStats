@@ -66,12 +66,14 @@ int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 #if 0
 	return vsnprintf(buf, size, fmt, args);
 #else
-	va_list saveargs=args;
+	va_list saveargs;
 	size_t len=0;
 	unsigned int i;
     char *str;
     char c;
 	const char *format=fmt;
+
+	saveargs=args;
 
 	while((c = *format++)!=0 && (len<size) ) {
 		/* Is it a format string character? */
