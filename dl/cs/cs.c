@@ -506,6 +506,9 @@ static int cs_user_smodes(char **av, int ac)
 
 	SET_SEGV_LOCATION();
 
+	if (!cs_online)
+		return 1;
+
 	if (cs_cfg.mode_watch != 1)
 		return -1;
 
@@ -642,7 +645,7 @@ static int cs_user_kill(char **av, int ac)
 
 	SET_SEGV_LOCATION();
 
-	if (!cs_online)
+	if (!cs_online || !cs_cfg.kill_watch)
 		return 1;
 
 	u = finduser(av[0]);
@@ -660,16 +663,12 @@ static int cs_user_kill(char **av, int ac)
 
 	if (finduser(Kill[2])) {
 		/* it was a User who was killed */
-		if (cs_cfg.kill_watch)
-			chanalert(s_ConnectServ,
-			      msg_globalkill,
-				  u->nick, u->username, u->hostname,
-				  Kill[0], GlobalMsg);
+		chanalert(s_ConnectServ, msg_globalkill,
+			u->nick, u->username, u->hostname,
+			Kill[0], GlobalMsg);
 	} else if (findserver(Kill[2])) {
-		if (cs_cfg.kill_watch)
-			chanalert(s_ConnectServ,
-				msg_serverkill,
-				  u->nick, Kill[0], GlobalMsg);
+		chanalert(s_ConnectServ, msg_serverkill,
+		u->nick, Kill[0], GlobalMsg);
 	}
 	free(GlobalMsg);
 	return 1;
@@ -684,21 +683,18 @@ static int cs_user_nick(char **av, int ac)
 
 	SET_SEGV_LOCATION();
 
-	if (!cs_online)
+	if (!cs_online ||!cs_cfg.nick_watch)
 		return 1;
 
-	if (cs_cfg.nick_watch) {
-		u = finduser(av[1]);
-		if (!u)
-			return -1;
-		if (!strcasecmp(u->server->name, me.name)) {
-			/* its me, forget it */
-			return 1;
-		}
-		chanalert(s_ConnectServ,
-			msg_nickchange,
-			  av[0], u->username, u->hostname, av[1]);
+	u = finduser(av[1]);
+	if (!u)
+		return -1;
+	if (!strcasecmp(u->server->name, me.name)) {
+		/* its me, forget it */
+		return 1;
 	}
+	chanalert(s_ConnectServ, msg_nickchange,
+		av[0], u->username, u->hostname, av[1]);
 	return 1;
 }
 
