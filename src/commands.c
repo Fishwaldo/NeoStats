@@ -24,6 +24,7 @@
 /*  TODO:
  *  - More error processing
  *  - /msg BOTNAME HELP vs /msg BOTNAME HELP COMMAND frees NULL ptr???
+ *  - Fix LEVELS command for SET and other intrinsics
  */
 
 #include "neostats.h"
@@ -1055,6 +1056,11 @@ static int bot_cmd_levels (CmdParams *cmdparams)
 
 	if (cmdparams->ac < 1) {
 		return NS_ERR_NEED_MORE_PARAMS;
+	}
+	if( !cmdparams->bot->botcmds )
+	{
+		irc_prefmsg (cmdparams->bot, cmdparams->source, "No commands found.");
+		return NS_SUCCESS;
 	}
 	if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
 		hnode_t *cmdnode;
