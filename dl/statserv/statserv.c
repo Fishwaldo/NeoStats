@@ -264,11 +264,11 @@ int __Bot_Message(char *origin, char **av, int ac)
 			privmsg_list(u->nick, s_StatServ, ss_server_help);
 		else if (!strcasecmp(av[2], "CHAN")) 
 			privmsg_list(u->nick, s_StatServ, ss_chan_help);
-		else if (!strcasecmp(av[2], "RESET") && UserLevel(u) >= 190)
+		else if (!strcasecmp(av[2], "RESET") && UserLevel(u) >= 185)
 			privmsg_list(u->nick, s_StatServ, ss_reset_help);
 		else if (!strcasecmp(av[2], "MAP"))
 			privmsg_list(u->nick, s_StatServ, ss_map_help);
-		else if (!strcasecmp(av[2], "JOIN") && UserLevel(u) >= 190)
+		else if (!strcasecmp(av[2], "JOIN") && UserLevel(u) >= 185)
 			privmsg_list(u->nick, s_StatServ, ss_join_help);
 		else if (!strcasecmp(av[2], "NETSTATS"))
 			privmsg_list(u->nick, s_StatServ, ss_netstats_help);
@@ -286,7 +286,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 			privmsg_list(u->nick, s_StatServ, ss_botlist_help);
 		else if (!strcasecmp(av[2], "VERSION"))
 			privmsg_list(u->nick, s_StatServ, ss_version_help);
-		else if (!strcasecmp(av[2], "STATS") && UserLevel(u) >= 190)
+		else if (!strcasecmp(av[2], "STATS") && UserLevel(u) >= 185)
 			privmsg_list(u->nick, s_StatServ, ss_stats_help);
 		else
 			prefmsg(u->nick, s_StatServ, "Unknown Help Topic: \2%s\2", av[2]);
@@ -785,7 +785,7 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 	strcpy(segv_location, "StatServ-ss_stats");
 
 
-	if (UserLevel(u) < 190) {
+	if (UserLevel(u) < 185) {
 		log("Access Denied (STATS) to %s", u->nick);
 		prefmsg(u->nick, s_StatServ, "Access Denied.");
 		return;
@@ -877,7 +877,7 @@ static void ss_reset(User *u)
 	strcpy(segv_location, "StatServ-ss_reset");
 
 
-		if (UserLevel(u) < 190) {
+		if (UserLevel(u) < 185) {
 				log("Access Denied (RELOAD) to %s", u->nick);
 				prefmsg(u->nick, s_StatServ, "Access Denied.");
 				return;
@@ -896,7 +896,7 @@ static void ss_JOIN(User *u, char *chan)
 	strcpy(segv_location, "StatServ-ss_JOIN");
 
 
-	if (UserLevel(u) < 190) {
+	if (UserLevel(u) < 185) {
 		log("Access Denied (JOIN) to %s", u->nick);
 		prefmsg(u->nick, s_StatServ, "Access Denied.");
 		chanalert(s_StatServ,"%s Requested JOIN, but is not a god!",u->nick);
