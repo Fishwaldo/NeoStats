@@ -603,7 +603,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		char IPAddress[32];
 		unsigned long IP;
 
-		IP = base64toIP(argv[argc-3]);
+		IP = htonl(base64toIP(argv[argc-3]));
 		ircsnprintf( IPAddress, 32, "%lu", IP);
 
 		/*       nick,    hopcount, TS,     user,    host, */       
