@@ -107,6 +107,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_END_OF_BURST, TOK_END_OF_BURST, m_end_of_burst, 0},
 	{MSG_WALLOPS, TOK_WALLOPS, m_wallops, 0},
 	{MSG_WALLUSERS, TOK_WALLUSERS, m_wallusers, 0},
+	{MSG_ERROR, TOK_ERROR, _m_error, 0},
 	{0, 0, 0, 0},
 };
 

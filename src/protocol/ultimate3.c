@@ -99,6 +99,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_GLOBOPS,	0, _m_globops, 0},
 	{MSG_WALLOPS,	0, _m_wallops, 0},
 	{MSG_CHATOPS,	0, _m_chatops, 0},
+	{MSG_ERROR,		0, _m_error, 0},
 	{0, 0, 0, 0},
 };
 

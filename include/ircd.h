@@ -119,6 +119,7 @@ EXPORTFUNC void _m_squit( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_globops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_wallops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_chatops( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_error( char *origin, char **argv, int argc, int srv );
 
 EXPORTFUNC void do_synch_neostats( void );
 EXPORTFUNC void do_motd( const char *nick, const char *remoteserver );

@@ -45,6 +45,7 @@
 #include "dns.h"
 #include "base64.h"
 #include "dcc.h"
+#include "main.h"
 
 #define MOTD_FILENAME	"neostats.motd"
 #define ADMIN_FILENAME	"neostats.admin"
@@ -397,6 +398,28 @@ void _m_wallops( char* origin, char **av, int ac, int cmdptr )
 void _m_chatops( char* origin, char **av, int ac, int cmdptr )
 {
 	do_chatops( origin, av[0] );	
+}
+
+/** @brief _m_error
+ *
+ *  process ERROR command
+ *  RX: :Mark ERROR :message
+ *  ERROR :message
+ *	argv[0] = message
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_error( char* origin, char **av, int ac, int cmdptr )
+{
+	fprintf(stderr, "IRCD reported error: %s", av[0] );
+	nlog (LOG_ERROR, "IRCD reported error: %s", av[0] );
+	do_exit (NS_EXIT_ERROR, av[0] );
 }
 
 /** @brief _m_pass
