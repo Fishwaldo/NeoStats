@@ -18,22 +18,11 @@ network, other modules are developed for fun, and to make your IRC
 network more attractive to users (that's what it all about right?, 
 IRC users?)
 
-With the release of 2.5 series of NeoStats, several changes have taken 
-place compared to the old version of NeoStats 2.0 series (don't ask me 
-what happened to versions 2.1, 2.2, 2.3 or 2.4, I don't know!)
+The 3.0 series of NeoStats [blurb]
 
 A detailed list of changes can be found in the ChangeLog file, but a 
 brief summary is:
-    -ServiceRoots support
-    -External MOTD files
-    -Module segfault protection
-    -Cross IRCD support. Support for more IRCDs than just Unreal
-    -StatServ supports dumping Statistics to a HTML file for output 
-    (the output of the HTML file is based on a template)
-    -Changes to the module API that make it nicer
-    -Channel Support!
-    -StatServ supports Channel Statistics now!
-    -Many bug fixes and changes to the internal NeoStats core
+    -
     -Many updates to the various Modules
 
 Visit http://www.neostats.net for the latest news and NeoStats updates.
@@ -44,7 +33,7 @@ on your network. These documents include README, and all the documents
 in the doc directory. 
 
 -----------------------------------<>-----------------------------------
-All documentation applies to version 2.5.6 and higher. For older 
+All documentation applies to version 3.0 and higher. For older 
 versions consult the documentation with that version or consider 
 upgrading. New versions of NeoStats have many new features and bug 
 fixes. We are not able to provide support for older versions of
@@ -116,144 +105,44 @@ file or things will not work correctly.
 
 First, you need to uncompress NeoStats. To do this type the following:
 
-        tar xvfz NeoStats2.5.x.tar.gz 
+        tar xvfz NeoStats3.0.x.tar.gz 
 
 This will vary depending on the version you run of NeoStats. Change the 
-x in NeoStats2.5.x.tar.gz to match your filename e.g. 
+x in NeoStats3.0.x.tar.gz to match your filename e.g. 
 
-        NeoStats2.5.6.tar.gz
+        NeoStats3.0.0.tar.gz
 
 For systems that don't run a new version of tar you need to do this:
 
-        gzip -d NeoStats2.5.x.tar.gz
-        tar xvf NeoStats2.5.x.tar
+        gzip -d NeoStats3.0.x.tar.gz
+        tar xvf NeoStats3.0.x.tar
 
 1.3 Running configure
 ---------------------
 
-We have two methods to configure NeoStats. Our Config script is the 
-quickest and easiest way to configure NeoStats. 
+You must first run the configure script so that NeoStats can determine
+your build environment.
 
-To run Config, you must first change to the directory where you 
+To run configure, you must first change to the directory where you 
 uncompressed NeoStats. e.g.
 
-        cd ~/NeoStats2.5.5
+        cd ~/NeoStats3.0.0
 
 Your prompt should look something like:
     
-        [user@host NeoStats2.5.5]
+        [user@host NeoStats3.0.50]
 
 Now type:
     
-        ./Config
+        ./configure
         
-Answer the questions and let the script configure everything for you.
-If you choose to use Config, you can now skip to section 1.4 Compiling 
-NeoStats. If you require more control over the configuration, you should 
-run configure directly as detailed below.
-
-The configure script has been changed compared to older releases and you 
-must now make sure you supply the right arguments to configure.
-
-To run configure this, you must first change to the directory where you 
-uncompressed NeoStats. e.g.
-
-        cd ~/NeoStats2.5.5
-
-Your prompt should look something like:
-    
-        [user@host NeoStats2.5.5]
-
-Now type:
-    
-        ./configure [options]
-
-You should read below for the options you need to pass to configure.
-
-Required settings:
-------------------
-
-IRCD Support:
-    To specify the IRCD you are compiling for. e.g.:
-
-        --enable-unreal31  - enable Unreal 3.1.x IRCD Support
-
-        --enable-unreal32  - enable Unreal 3.2.x IRCD Support
-
-        --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support
-
-        --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support
-
-        --enable-hybrid7   - enable Hybrid7 IRCD Support
-
-        --enable-neoircd   - enable NeoIRCd IRCD Support
-
-        --enable-bahamut   - enable Bahamut IRCD Support
-
-        --enable-mystic    - enable Mystic IRCD support
-
-        --enable-quantum   - enable Quantum IRCD support
-
-        --enable-viagra    - enable Viagra IRCD support
-        
-        --enable-ircu      - enable Ircu support
-                             IRCu support is experimental and may
-                             not work correctly. If you run the 
-                             Nefarious or Asuka versions of IRCu,
-                             you need to read and edit Ircu.h.
-
-Note: at the time of release of this version of NeoStats Ultimate 
-3.x.x was still in alpha, it is possible that Ultimate3 compatibility 
-might break in future releases of Ultimate as it matures.
+The configure script will then check to see if all necessary programs to 
+run NeoStats are installed on your system. 
 
 Optional settings:
 ------------------
 
-Privilege System:
-
-Originally, NeoStats was based on Operator Flags on a network. If you 
-had TechAdmin on Unreal, you were basically allowed full control of 
-Neostats. Now though, you can enable what is called External 
-Authentication. This allows different ways of the NeoStats Privilege 
-system. The currently available options are:
-
-        --enable-auth=sr     
-        
-This enables a ServiceRoots option, which a user must be identified to 
-services (with the +r flag) and they will have full access to NeoStats.
-
-If you do not specify --enable-auth then NeoStats reverts back to the 
-old NeoStats privilege system, where authentication is based on the 
-user's flags (+oOANs etc).
-
-Modules Support:
-
-NeoStats has an expanding set of modules. Some modules have their own 
---enable options, while other modules do not. By default, no modules are 
-compiled. To enable a module at compile time (or multiple modules) use 
-the following option:
-
-        --enable-modules="module names"
-
-NeoStats ships with the following modules:
-
-        ConnectServ     --enable-modules="cs"
-        HostServ        --enable-modules="hostserv"
-        LoveServ        --enable-modules="loveserv"
-        MoraleServ      --enable-modules="ms"
-        StatServ        --enable-modules="statserv"
-
-To compile multiple modules combine the enable-modules options together 
-as follows:
-
-        --enable-modules="statserv hostserv"
-        (this would enable the statserv and hostserv modules).
-
-If you have downloaded additional modules from the NeoStats website, 
-DO NOT specify them in the enable-modules option. Each module has its 
-own configure script, and must be configured and installed after 
-NeoStats is installed. (See section 6 and the documentation with the 
-module).
+There are some options you can pass to configure if you wish. 
 
 Debugging:
 
@@ -279,10 +168,6 @@ us for support of the RAW command.
 
         --enable-raw 
 
-The configure script will then check to see if all necessary programs to 
-run NeoStats are installed on your system. A small note here, for those 
-of you who have emailed me paranoid, NeoStats DOES NOT actually check 
-your bank account balance, nor can it.
 
 1.4 Compiling NeoStats
 ----------------------
@@ -302,11 +187,10 @@ working on the warnings.
 If you are upgrading a working version of NeoStats. Please read section 
 1.9 Notes for Upgraders now.
 
-With version 2.5.0 and higher, NeoStats needs to be "installed" into 
-its own directory. By default NeoStats will install into ~/NeoStats/ 
-i.e. in your home directory e.g.
+NeoStats must be "installed" into its own directory. By default NeoStats 
+will install into ~/NeoStats3.0/ i.e. in your home directory e.g.
 
-        /home/fish/NeoStats/
+        /home/fish/NeoStats3.0/
     
 If you wish to change the install location, please type 
 
@@ -328,11 +212,11 @@ installation directory.
 Now you should change to the installation directory (~/NeoStats/, or 
 whatever you specified in ./configure) e.g.
 
-        cd ~/NeoStats
+        cd ~/NeoStats3.0
 
 Your prompt should look something like:
     
-        [user@host NeoStats]
+        [user@host NeoStats3.0]
 
 Once in this directory, you need to create a configuration file. You
 should now run the makeconf script and answer the questions:
@@ -365,6 +249,17 @@ Each of the options has an indicator as follows:
 
 IRCD Linking Configuration Options
 ----------------------------------
+
+PROTOCOL <protocol> [REQUIRED]
+    Specifies the protocol module to use.
+    Valid protocol options are:
+          bahamut client hybrid7 ircup10 
+          liquid mystic neoircd quantum 
+          ultimate2 ultimate3 unreal31 unreal32 
+          viagra
+    e.g.
+          PROTOCOL "unreal32"
+      
 
 SERVER_NAME <hostname> [REQUIRED]
     Specifies the name of the NeoStats Server as it will appear on 
@@ -552,21 +447,33 @@ LOAD_MODULE <module name> [OPTIONAL]
     
     Multiple instances of LOAD_MODULE may be specified 
 
-ExtAuth Configuration Options
------------------------------
+Authentication Module Configuration Options
+-------------------------------------------
     
-If you have enabled the ServiceRoots authentication module, then these 
-additional configuration options are available:
-
-SERVICE_ROOTS <nick!user@host> [OPTIONAL]
-    Who should get access to NeoStats regardless of their O line flags. 
-    You can specify this option up to 10 times to specify different 
-    nicks who will be allowed this privilege. e.g.
+LOAD_AUTH_MODULE <auth_module_name> [OPTIONAL]
+    what authentication modules to load at startup.
     
-        SERVICE_ROOTS fish!?Fish@*.neostats.net
+        LOAD_AUTH_MODULE ircdauth
         
-    Will give "fish" access to NeoStats Privileged commands if fish has 
-    Umode +r and comes from the specified hostname and ident. 
+    will load IRCd umode based authentication
+
+    Multiple instances of LOAD_AUTH_MODULE may be specified.
+    NeoStats is distributed with two authentication modules,
+    ircdauth which validates users against their usermodes
+    and extauth which uses a list of nick!user@host masks to
+    authenticate against.
+
+NeoStats Root user
+------------------
+    
+SERVICEROOT <nick!user@host> [REQUIRED]
+    Set who should get master access to manage NeoStats regardless of 
+    authentication systems. Only one entry allowed. e.g.
+    
+        SERVICEROOT fish!?Fish@*.neostats.net
+        
+    Will give "fish" complete access to NeoStats if fish has 
+    umode +r and comes from the specified hostname and ident. 
 
 1.7 Compiling additional modules
 --------------------------------
@@ -575,7 +482,9 @@ If you have downloaded other NeoStats modules e.g. OPSB, you should now
 install them. If you are upgrading NeoStats, you must rebuild all other 
 separate modules to work with the new version of NeoStats. See the 
 documentation with these modules for instructions on building and 
-installing them. 
+installing them. Modules written for previous series of NeoStats will
+not work with the 3.0 series. You must contact the module author for an
+updated version of the module.
 
 1.8 Running NeoStats
 --------------------
@@ -591,7 +500,7 @@ IT!!! DO NOT CONTACT US ABOUT C: N: and U: Lines
 Once your C/N/U lines are setup, you need to start NeoStats. You should 
 change to the directory where NeoStats in installed e.g.
 
-        cd ~/NeoStats
+        cd ~/NeoStats3.0
 
 Then to run NeoStats type:
 
@@ -783,7 +692,7 @@ NeoStats:
 
 When it crashes, or the bug has been reproduced, send us:
         
-        logs/NeoStats.log
+        logs/debug.log
         logs/recv.log (if it exists, You may wish to edit the first few 
         lines of the file to remove the link password)
 
