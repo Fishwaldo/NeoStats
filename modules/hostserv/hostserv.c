@@ -292,10 +292,13 @@ static void LoadBans (void)
 
 static int hs_set_regnick_cb (CmdParams* cmdparams, SET_REASON reason)
 {
-	if (hs_cfg.regnick) {
-		EnableEvent (EVENT_UMODE);
-	} else {
-		DisableEvent (EVENT_UMODE);
+	if( reason == SET_LOAD || reason == SET_CHANGE )
+	{
+		if (hs_cfg.regnick) {
+			EnableEvent (EVENT_UMODE);
+		} else {
+			DisableEvent (EVENT_UMODE);
+		}
 	}
 	return NS_SUCCESS;
 }
@@ -312,14 +315,13 @@ static int hs_set_regnick_cb (CmdParams* cmdparams, SET_REASON reason)
 
 static int hs_set_expire_cb (CmdParams* cmdparams, SET_REASON reason)
 {
-	/* Ignore bootup and list callback */
-	if (reason != SET_CHANGE) {
-		return NS_SUCCESS;
-	}
-	if (hs_cfg.expire) {
-		AddTimer (TIMER_TYPE_INTERVAL, ExpireOldHosts, "ExpireOldHosts", 7200);
-	} else {
-		DelTimer ("ExpireOldHosts");
+	if( reason == SET_CHANGE )
+	{
+		if (hs_cfg.expire) {
+			AddTimer (TIMER_TYPE_INTERVAL, ExpireOldHosts, "ExpireOldHosts", 7200);
+		} else {
+			DelTimer ("ExpireOldHosts");
+		}
 	}
 	return NS_SUCCESS;
 }

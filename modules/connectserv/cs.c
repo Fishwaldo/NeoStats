@@ -603,7 +603,10 @@ static int cs_event_squit( CmdParams *cmdparams )
 
 static int cs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason )
 {
-	SetAllEventFlags( EVENT_FLAG_USE_EXCLUDE, cs_cfg.exclusions );
+	if( reason == SET_LOAD || reason == SET_CHANGE )
+	{
+		SetAllEventFlags( EVENT_FLAG_USE_EXCLUDE, cs_cfg.exclusions );
+	}
 	return NS_SUCCESS;
 }
 
@@ -620,7 +623,7 @@ static int cs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason )
 
 static int cs_set_sign_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
-	if( cs_cfg.sign_watch ) 
+	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
 		EnableEvent( EVENT_SIGNON );
 		EnableEvent( EVENT_QUIT );
@@ -646,15 +649,18 @@ static int cs_set_sign_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 
 static int cs_set_kill_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
-	if( cs_cfg.kill_watch ) 
+	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
-		EnableEvent( EVENT_GLOBALKILL );
-		EnableEvent( EVENT_SERVERKILL );
-	} 
-	else 
-	{
-		DisableEvent( EVENT_GLOBALKILL );
-		DisableEvent( EVENT_SERVERKILL );
+		if( cs_cfg.kill_watch ) 
+		{
+			EnableEvent( EVENT_GLOBALKILL );
+			EnableEvent( EVENT_SERVERKILL );
+		} 
+		else 
+		{
+			DisableEvent( EVENT_GLOBALKILL );
+			DisableEvent( EVENT_SERVERKILL );
+		}
 	}
 	return NS_SUCCESS;
 }
@@ -672,15 +678,18 @@ static int cs_set_kill_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 
 static int cs_set_mode_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
-	if( cs_cfg.mode_watch ) 
+	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
-		EnableEvent( EVENT_UMODE );
-		EnableEvent( EVENT_SMODE );
-	} 
-	else 
-	{
-		DisableEvent( EVENT_UMODE );
-		DisableEvent( EVENT_SMODE );
+		if( cs_cfg.mode_watch ) 
+		{
+			EnableEvent( EVENT_UMODE );
+			EnableEvent( EVENT_SMODE );
+		} 
+		else 
+		{
+			DisableEvent( EVENT_UMODE );
+			DisableEvent( EVENT_SMODE );
+		}
 	}
 	return NS_SUCCESS;
 }
@@ -698,13 +707,16 @@ static int cs_set_mode_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 
 static int cs_set_nick_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
-	if( cs_cfg.nick_watch )
+	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
-		EnableEvent( EVENT_NICK );
-	}
-	else
-	{
-		DisableEvent( EVENT_NICK );
+		if( cs_cfg.nick_watch )
+		{
+			EnableEvent( EVENT_NICK );
+		}
+		else
+		{
+			DisableEvent( EVENT_NICK );
+		}
 	}
 	return NS_SUCCESS;
 }
@@ -722,13 +734,16 @@ static int cs_set_nick_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 
 static int cs_set_away_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
-	if( cs_cfg.away_watch ) 
+	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
-		EnableEvent( EVENT_AWAY );
-	} 
-	else 
-	{
-		DisableEvent( EVENT_AWAY );
+		if( cs_cfg.away_watch ) 
+		{
+			EnableEvent( EVENT_AWAY );
+		} 
+		else 
+		{
+			DisableEvent( EVENT_AWAY );
+		}
 	}
 	return NS_SUCCESS;
 }
@@ -746,15 +761,18 @@ static int cs_set_away_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 
 static int cs_set_serv_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
-	if( cs_cfg.serv_watch )
+	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
-		EnableEvent( EVENT_SERVER );
-		EnableEvent( EVENT_SQUIT );
-	}
-	else 
-	{
-		DisableEvent( EVENT_SERVER );
-		DisableEvent( EVENT_SQUIT );
+		if( cs_cfg.serv_watch )
+		{
+			EnableEvent( EVENT_SERVER );
+			EnableEvent( EVENT_SQUIT );
+		}
+		else 
+		{
+			DisableEvent( EVENT_SERVER );
+			DisableEvent( EVENT_SQUIT );
+		}
 	}
 	return NS_SUCCESS;
 }

@@ -279,15 +279,6 @@ int os_close( int fd )
 }
 
 /*
- *  Wrapper function for tempnam
- */
-
-char *os_tempnam( const char *dir, const char *prefix )
-{
-	return tempnam( dir, prefix );
-}
-
-/*
  *  Wrapper function for mkstemp
  */
 

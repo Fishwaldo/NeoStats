@@ -239,20 +239,19 @@ void ModFini (void)
 
 static int ss_set_html_cb (CmdParams *cmdparams, SET_REASON reason)
 {
-	/* Ignore bootup and list callback */
-	if (reason != SET_CHANGE) {
-		return NS_SUCCESS;
-	}
-	if (StatServ.html && StatServ.htmlpath[0] == 0) {
-		irc_prefmsg  (ss_bot, cmdparams->source, 
-			"You need to SET HTMLPATH. HTML output disabled.");
-		StatServ.html = 0;
-		return NS_SUCCESS;
-	}
-	if (StatServ.html) {
-		AddTimer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime);
-	} else {
-		DelTimer ("ss_html");
+	if( reason == SET_CHANGE )
+	{
+		if (StatServ.html && StatServ.htmlpath[0] == 0) {
+			irc_prefmsg  (ss_bot, cmdparams->source, 
+				"You need to SET HTMLPATH. HTML output disabled.");
+			StatServ.html = 0;
+			return NS_SUCCESS;
+		}
+		if (StatServ.html) {
+			AddTimer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime);
+		} else {
+			DelTimer ("ss_html");
+		}
 	}
 	return NS_SUCCESS;
 }
@@ -261,33 +260,34 @@ static int ss_set_htmlpath_cb (CmdParams *cmdparams, SET_REASON reason)
 {
 	FILE *opf;
 
-	/* Ignore bootup and list callback */
-	if (reason != SET_CHANGE) {
-		return NS_SUCCESS;
+	if( reason == SET_CHANGE )
+	{
+		opf = fopen (StatServ.htmlpath, "w");
+		if (!opf) {
+			irc_prefmsg (ss_bot, cmdparams->source, 
+				"Failed to open HTML output file %s. Check file permissions. HTML output disabled.", StatServ.htmlpath);
+			return NS_SUCCESS;
+		}
+		fclose (opf);
+		ss_html ();
 	}
-	opf = fopen (StatServ.htmlpath, "w");
-	if (!opf) {
-		irc_prefmsg (ss_bot, cmdparams->source, 
-			"Failed to open HTML output file %s. Check file permissions. HTML output disabled.", StatServ.htmlpath);
-		return NS_SUCCESS;
-	}
-	fclose (opf);
-	ss_html ();
 	return NS_SUCCESS;
 }
 
 static int ss_set_htmltime_cb (CmdParams *cmdparams, SET_REASON reason)
 {
-	/* Ignore bootup and list callback */
-	if (reason != SET_CHANGE) {
-		return NS_SUCCESS;
+	if( reason == SET_CHANGE )
+	{
+		SetTimerInterval ("ss_html", StatServ.htmltime);
 	}
-	SetTimerInterval ("ss_html", StatServ.htmltime);
 	return NS_SUCCESS;
 }
 
 static int ss_set_exclusions_cb (CmdParams *cmdparams, SET_REASON reason)
 {
-	SetAllEventFlags (EVENT_FLAG_USE_EXCLUDE, StatServ.exclusions);
+	if( reason == SET_LOAD || reason == SET_CHANGE )
+	{
+		SetAllEventFlags (EVENT_FLAG_USE_EXCLUDE, StatServ.exclusions);
+	}
 	return NS_SUCCESS;
 }
