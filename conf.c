@@ -71,7 +71,7 @@ done_mods = 0;
 
 void cb_Module(char *arg, int configtype) {
 	int i;
-		segv_location= sstrdup("cb_Module");
+		strcpy(segv_location, "cb_Module");
 		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) { 
 			if (!strcasecmp(load_mods[i], arg)) {
 				return;
@@ -85,7 +85,7 @@ int init_modules() {
 	int i;
 	int rval;
 	
-	segv_location=sstrdup("init_modules");
+	strcpy(segv_location,"init_modules");
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] !=0); i++) {
 #ifdef DEBUG
 		log("Loading Module %s", load_mods[i]);

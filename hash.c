@@ -14,7 +14,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: hash.c,v 1.2 2002/02/28 10:33:10 fishwaldo Exp $
+ * $Id: hash.c,v 1.3 2002/03/08 11:46:07 fishwaldo Exp $
  * $Name:  $
  */
 
@@ -22,11 +22,12 @@
 #include <stddef.h>
 #include <assert.h>
 #include <string.h>
+#include <ctype.h>
 #define HASH_IMPLEMENTATION
 #include "hash.h"
 
 #ifdef KAZLIB_RCSID
-static const char rcsid[] = "$Id: hash.c,v 1.2 2002/02/28 10:33:10 fishwaldo Exp $";
+static const char rcsid[] = "$Id: hash.c,v 1.3 2002/03/08 11:46:07 fishwaldo Exp $";
 #endif
 
 #define INIT_BITS	6
@@ -827,10 +828,10 @@ static hash_val_t hash_fun_default(const void *key)
     hash_val_t acc = 0;
 
     while (*str) {
-	acc ^= randbox[(*str + acc) & 0xf];
+	acc ^= randbox[(tolower(*str) + acc) & 0xf];
 	acc = (acc << 1) | (acc >> 31);
 	acc &= 0xffffffffU;
-	acc ^= randbox[((*str++ >> 4) + acc) & 0xf];
+	acc ^= randbox[((tolower(*str++) >> 4) + acc) & 0xf];
 	acc = (acc << 2) | (acc >> 30);
 	acc &= 0xffffffffU;
     }

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.4 2002/03/08 09:01:00 fishwaldo Exp $
+** $Id: chans.c,v 1.5 2002/03/08 11:46:07 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -26,6 +26,7 @@ Chans *new_chan(char *chan) {
 	Chans *c;
 	hnode_t *cn;
 
+	strcpy(segv_location, "new_chan");
 	c = malloc(sizeof(Chans));
 	strcpy(c->name, chan);
 	cn = hnode_create(c);
@@ -38,6 +39,7 @@ Chans *new_chan(char *chan) {
 }
 void del_chan(Chans *c) {
 	hnode_t *cn;
+	strcpy(segv_location, "del_chan");
 	cn = hash_lookup(ch, c->name);
 	if (!cn) {
 		log("Hu, Deleting a Non Existand Channel?");
@@ -53,7 +55,7 @@ void del_chan(Chans *c) {
 void part_chan(User *u, char *chan) {
 	Chans *c;
 	hnode_t *un;
-
+	strcpy(segv_location, "part_chan");
 	if (!u) {
 		log("Ehh, Parting a Unknown User from Chan %s: %s", chan, recbuf);
 		return;
@@ -84,7 +86,7 @@ void part_chan(User *u, char *chan) {
 
 void change_user_nick(Chans *c, char *newnick, char *oldnick) {
 	hnode_t *cm;
-
+	strcpy(segv_location, "change_user_nick");
 	cm = hash_lookup(c->chanmembers, oldnick);
 	if (!cm) {
 		log("change_user_nick() %s isn't a member of %s", oldnick, c->name);
@@ -102,7 +104,7 @@ void join_chan(User *u, char *chan) {
 	Chans *c;
 	hnode_t *un;
 	Chanmem *cm;
-
+	strcpy(segv_location, "join_chan");
 	if (!u) {
 		log("ehhh, Joining a Unknown user to %s: %s", chan, recbuf);
 		return;
@@ -141,7 +143,7 @@ void chandump(User *u, char *chan) {
 	hscan_t sc, scm;
 	Chans *c;
 	Chanmem *cm;
-
+	strcpy(segv_location, "chandump");
 	if (!chan) {
 		sendcoders("Channels %d", hash_count(ch));
 		hash_scan_begin(&sc, ch);
@@ -173,7 +175,7 @@ void chandump(User *u, char *chan) {
 Chans *findchan(char *chan) {
 	Chans *c;
 	hnode_t *cn;
-
+	strcpy(segv_location, "findchan");
 	cn = hash_lookup(ch, chan);
 	if (cn) {
 		c = hnode_get(cn);

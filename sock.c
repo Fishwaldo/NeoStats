@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.13 2002/03/05 12:59:58 fishwaldo Exp $
+** $Id: sock.c,v 1.14 2002/03/08 11:46:08 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -53,10 +53,10 @@ void read_loop()
 	hnode_t *sn;
 
 	while (1) {
-		segv_location = sstrdup("Read_Loop");
+		strcpy(segv_location, "Read_Loop");
 		memset(buf, '\0', BUFSIZE);
 		chk();
-		segv_location = sstrdup("Read_Loop2");
+		strcpy(segv_location, "Read_Loop2");
 		FD_ZERO(&readfds);
 		TimeOut.tv_sec = 1;
 		TimeOut.tv_usec = 0;
@@ -137,7 +137,7 @@ void ResetLogs()
 	char tmp[25];
 	time_t t = time(NULL);
 	
-	segv_location = sstrdup("ResetLogs");
+	strcpy(segv_location, "ResetLogs");
 	strftime(tmp, 25, "logs/stats-%m-%d.log", localtime(&t));
 	rename("stats.log", tmp);
 	log("Started fresh logfile.");

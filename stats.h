@@ -30,7 +30,6 @@
 #include <setjmp.h>
 #include "list.h"
 #include "hash.h"
-
 #include "config.h"
 
 #if UNREAL == 1
@@ -68,7 +67,7 @@ int servsock;
 int times;
 extern char s_Debug[MAXNICK], s_Services[MAXNICK];
 extern const char version[];
-char recbuf[BUFSIZE], *segv_location;
+char recbuf[BUFSIZE], segv_location[255];
 char segvinmodule[30];
 jmp_buf sigvbuf;
 
@@ -289,4 +288,13 @@ extern void servicesbot(char *nick, char **av, int ac);
 extern void ns_debug_to_coders(char *);
 extern void ns_shutdown(User *, char *);
 
+
+/* chans.c */
+extern void chandump(User *u, char *chan);
+extern void part_chan(User *u, char *chan);
+extern void join_chan(User *u, char *chan);
+extern void change_user_nick(Chans *c, char *newnick, char *oldnick);
+
+
 #endif
+

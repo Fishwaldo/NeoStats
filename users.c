@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.20 2002/03/08 09:00:31 fishwaldo Exp $
+** $Id: users.c,v 1.21 2002/03/08 11:46:08 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -33,6 +33,7 @@ User *new_user(const char *nick)
 	User *u;
 	hnode_t *un;
 
+	strcpy(segv_location, "new_user");
 	/* before we add a new user, we check the table */
 	if (!hash_verify(uh)) {
 		globops(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
@@ -59,6 +60,7 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 #ifdef DEBUG
 	log("AddUser(): %s (%s@%s) -> %s", nick, user, host, server);
 #endif
+	strcpy(segv_location, "AddUser");
 	u = finduser(nick);
 	if (u) {
 		log("trying to add a user that already exists? (%s)", nick);
@@ -85,6 +87,7 @@ void DelUser(const char *nick)
 	hnode_t *un, *cn;
 	hscan_t sc;
 
+	strcpy(segv_location, "DelUser");
 #ifdef DEBUG
 	log("DelUser(%s)", nick);
 #endif
@@ -108,10 +111,10 @@ void Change_User(User *u, const char *newnick)
 {
 	hnode_t *un, *cm;
 	hscan_t cs;
+	strcpy(segv_location, "Change_User");
 #ifdef DEBUG
 	log("Change_User(%s, %s)", u->nick, newnick);
 #endif
-
 	un = hash_lookup(uh, u->nick);
 	if (!un) {
 		log("ChangeUser(%s) Failed!", u->nick);
@@ -119,9 +122,9 @@ void Change_User(User *u, const char *newnick)
 	}
 	hash_scan_begin(&cs, u->chans);
 	while ((cm = hash_scan_next(&cs)) != NULL) {
-		change_user_nick(findchan(hnode_get(cm)), newnick, u->nick);
+		change_user_nick(findchan(hnode_get(cm)), (char *)newnick, u->nick);
 	}
-
+	strcpy(segv_location, "Change_User_Return");
 	hash_delete(uh, un);
 	strcpy(u->nick, newnick);
 	hash_insert(uh, un, u->nick);
@@ -130,11 +133,7 @@ void sendcoders(char *message,...)
 {
 	va_list ap;
 	char tmp[512];
-#ifdef UNREAL
-	User *u;
-	hscan_t us;
-	hnode_t *un;
-#endif
+	strcpy(segv_location, "sendcoders");
 	va_start(ap, message);
 	vsnprintf (tmp, 512, message, ap);
 	if (!me.coder_debug) 
@@ -155,14 +154,15 @@ User *finduser(const char *nick)
 {
 	User *u;
 	hnode_t *un;
-	char *tmp;	
-	
+	strcpy(segv_location, "finduser");
 	un = hash_lookup(uh, nick);
 	if (un != NULL) {
 		u = hnode_get(un);
 		return u;
 	} else  {
+#ifdef DEBUG
 		log("FindUser(%s) -> NOTFOUND", nick); 
+#endif
 		return NULL;
 	}
 
@@ -180,6 +180,7 @@ void UserDump()
 	User *u;
 	hnode_t *un, *cm;
 	hscan_t us, cs;
+	strcpy(segv_location, "UserDump");
 	sendcoders("Users======================");
 	hash_scan_begin(&us, uh);
 	while ((un = hash_scan_next(&us)) != NULL) {
@@ -194,7 +195,7 @@ void UserDump()
 
 int UserLevel(User *u) {
 	int i, tmplvl = 0;
-	
+	strcpy(segv_location, "UserLevel");	
 	for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 	
 		if (u->Umode & usr_mds[i].umodes) {
 			if (usr_mds[i].level > tmplvl) tmplvl = usr_mds[i].level;
@@ -221,6 +222,7 @@ void UserMode(const char *nick, const char *modes)
 	int i;
 	char tmpmode;
 	
+	strcpy(segv_location, "UserMode");	
 	u = finduser(nick);
 	if (!u) {
 		log("Warning, Changing Modes for a Unknown User %s!", nick);

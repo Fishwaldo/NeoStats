@@ -23,7 +23,7 @@ void init_dl() {
 	if (usr_mds);
 };
 void __init_mod_list() {
-	segv_location = sstrdup("__init_mod_list");
+	strcpy(segv_location, "__init_mod_list");
 
 	mh = hash_create(NUM_MODULES, 0, 0);
 	bh = hash_create(B_TABLE_SIZE, 0, 0);
@@ -35,7 +35,7 @@ static Mod_Timer *new_timer(char *timer_name)
 {
 	Mod_Timer *t;
 	hnode_t *tn;
-	segv_location = sstrdup("Mod_Timer");
+	strcpy(segv_location, "Mod_Timer");
 #ifdef DEBUG
 	log("New Timer: %s", timer_name);
 #endif
@@ -56,7 +56,7 @@ static Mod_Timer *new_timer(char *timer_name)
 Mod_Timer *findtimer(char *timer_name) {
 	hnode_t *tn;
 	
-	segv_location = sstrdup("findtimer");
+	strcpy(segv_location, "findtimer");
 	tn = hash_lookup(th, timer_name);
 	if (tn) return (Mod_Timer *)hnode_get(tn);
 	return NULL;
@@ -64,7 +64,7 @@ Mod_Timer *findtimer(char *timer_name) {
 int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interval) {
 	Mod_Timer *Mod_timer_list;
 
-	segv_location = sstrdup("add_mod_timer");
+	strcpy(segv_location, "add_mod_timer");
 
 
 	if (dlsym((int *)get_dl_handle(mod_name), func_name) == NULL) {
@@ -83,7 +83,7 @@ int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interva
 int del_mod_timer(char *timer_name) {
 	Mod_Timer *list;
 	hnode_t *tn;
-	segv_location = sstrdup("del_mod_timer");
+	strcpy(segv_location, "del_mod_timer");
 	
 	tn = hash_lookup(th, timer_name);
 	if (tn) {
@@ -104,7 +104,7 @@ void list_module_timer(User *u) {
 	hscan_t ts;
 	hnode_t *tn;
 
-	segv_location = sstrdup("list_module_timer");
+	strcpy(segv_location, "list_module_timer");
 	privmsg(u->nick,s_Services,"Module timer List:");
 	hash_scan_begin(&ts, th);
 	while ((tn = hash_scan_next(&ts)) != NULL) {
@@ -122,7 +122,7 @@ static Sock_List *new_sock(char *sock_name)
 	Sock_List *s;
 	hnode_t *sn;
 
-	segv_location = sstrdup("Sock_List");
+	strcpy(segv_location, "Sock_List");
 #ifdef DEBUG	
 	log("New Socket: %s", sock_name);
 #endif	
@@ -142,7 +142,7 @@ static Sock_List *new_sock(char *sock_name)
 
 Sock_List *findsock(char *sock_name) {
 	hnode_t *sn;
-	segv_location = sstrdup("findsock");
+	strcpy(segv_location, "findsock");
 	sn = hash_lookup(sockh, sock_name);
 	if (sn) return hnode_get(sn);
 	return NULL;
@@ -151,7 +151,7 @@ Sock_List *findsock(char *sock_name) {
 int add_socket(char *func_name, char *sock_name, int socknum, char *mod_name) {
 	Sock_List *Sockets_mod_list;
 
-	segv_location = sstrdup("add_Socket");
+	strcpy(segv_location, "add_Socket");
 
 	if (dlsym((int *)get_dl_handle(mod_name), func_name) == NULL) {
 		log("oh oh, the socket function doesn't exist");
@@ -170,7 +170,7 @@ int add_socket(char *func_name, char *sock_name, int socknum, char *mod_name) {
 int del_socket(char *sock_name) {
 	Sock_List *list;
 	hnode_t *sn;
-	segv_location = sstrdup("del_mod_timer");
+	strcpy(segv_location, "del_mod_timer");
 	
 	sn = hash_lookup(sockh, sock_name);
 	if (sn) {
@@ -191,7 +191,7 @@ void list_sockets(User *u) {
 	hscan_t ss;
 	hnode_t *sn;
 
-	segv_location = sstrdup("list_sockets");
+	strcpy(segv_location, "list_sockets");
 	privmsg(u->nick,s_Services,"Sockets List: (%d)", hash_count(sockh));
 	hash_scan_begin(&ss, sockh);
 	while ((sn = hash_scan_next(&ss)) != NULL) {
@@ -208,7 +208,7 @@ static Mod_User *new_bot(char *bot_name)
 {
 	Mod_User *u;
 	hnode_t *bn;
-	segv_location = sstrdup("Mod_User");
+	strcpy(segv_location, "Mod_User");
 #ifdef DEBUG	
 	log("New Bot: %s", bot_name);
 #endif
@@ -231,7 +231,7 @@ int add_mod_user(char *nick, char *mod_name) {
 	Module *list_ptr;
 	hnode_t *mn;	
 
-	segv_location = sstrdup("add_mod_user");
+	strcpy(segv_location, "add_mod_user");
 
 
 	Mod_Usr_list = new_bot(nick);
@@ -253,7 +253,7 @@ int add_mod_user(char *nick, char *mod_name) {
 Mod_User *findbot(char *bot_name) {
 	hnode_t *bn;
 	
-	segv_location = sstrdup("findbot");
+	strcpy(segv_location, "findbot");
 	bn = hash_lookup(bh, bot_name);
 	if (bn) {
 		return (Mod_User *)hnode_get(bn);
@@ -265,7 +265,7 @@ int del_mod_user(char *bot_name) {
 	Mod_User *list;
 	hnode_t *bn;
 	
-	segv_location = sstrdup("del_mod_user");
+	strcpy(segv_location, "del_mod_user");
 		
 	bn = hash_lookup(bh, bot_name);
 	if (bn) {
@@ -287,7 +287,7 @@ int bot_nick_change(char *oldnick, char *newnick)
 	User *u;
 	Mod_User *mod_tmp, *mod_ptr = NULL;
 
-	segv_location = sstrdup("bot_nick_change");
+	strcpy(segv_location, "bot_nick_change");
 
 	/* First, try to find out if the newnick is unique! */
 #ifdef DEBUG
@@ -330,7 +330,7 @@ void list_module_bots(User *u) {
 	Mod_User *mod_ptr = NULL;
 	hnode_t *bn;
 	hscan_t bs;
-	segv_location = sstrdup("list_module_bots");
+	strcpy(segv_location, "list_module_bots");
 
 	privmsg(u->nick,s_Services,"Module Bot List:");
 	hash_scan_begin(&bs, bh);
@@ -372,7 +372,7 @@ int load_module(char *path1, User *u) {
 	Module *mod_ptr = NULL;
 	hnode_t *mn;
 
-	segv_location = sstrdup("load_module");
+	strcpy(segv_location, "load_module");
 
 	if (u == NULL) {
 		do_msg = 0;
@@ -509,7 +509,7 @@ int load_module(char *path1, User *u) {
 extern int get_dl_handle(char *mod_name) {
 	Module *list_ptr;
 	hnode_t *mn;
-	segv_location = sstrdup("get_dl_handle");
+	strcpy(segv_location, "get_dl_handle");
 
 
 	mn = hash_lookup(mh, mod_name);
@@ -528,7 +528,7 @@ void list_module(User *u) {
 	hnode_t *mn;
 	hscan_t hs;
 	
-	segv_location = sstrdup("list_module");
+	strcpy(segv_location, "list_module");
 	hash_scan_begin(&hs, mh);
 	while ((mn = hash_scan_next(&hs)) != NULL) {
 		mod_ptr=hnode_get(mn);
@@ -558,7 +558,7 @@ int unload_module(char *module_name, User *u) {
 
 	int fmode;
 
-	segv_location = sstrdup("unload_module");
+	strcpy(segv_location, "unload_module");
 	/* Check to see if this Module has any timers registered....  */
 	notice(s_Services, "Unloading Module %s", module_name);
 
@@ -589,7 +589,7 @@ int unload_module(char *module_name, User *u) {
 			del_bot(mod_ptr->nick, "Module Unloaded");
 		}
 	}
-	segv_location = sstrdup("unload_unlock");
+	strcpy(segv_location, "unload_unlock");
 	/* Unlock .so Module File to 755 Permissions */
 	/* Shmad Perscribes 666 */
 	modnme = fopen("Mod-Name.tmp","w");

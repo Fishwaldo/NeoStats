@@ -48,13 +48,13 @@ int squit_cmd(const char *who, const char *quitmsg) {
 
 int spart_cmd(const char *who, const char *chan) {
 	sts("%s %s %s", who, (me.token ? TOK_PART : MSG_PART), chan);
-	part_chan(finduser(who), chan);
+	part_chan(finduser(who), (char *)chan);
 	return 1;
 }
 
 int sjoin_cmd(const char *who, const char *chan) {
 	sts(":%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
-	join_chan(finduser(who), chan);
+	join_chan(finduser(who), (char *)chan);
 	return 1;
 }
 
@@ -151,7 +151,7 @@ int ssvspart_cmd(const char *target, const char *chan) {
 
 int skick_cmd(const char *who, const char *target, const char *chan, const char *reason) {
 	sts(":%s %s %s %s :%s", who, (me.token ? TOK_KICK : MSG_KICK), chan, target, (reason ? reason : "No Reason Given"));
-	part_chan(finduser(target), chan); 
+	part_chan(finduser(target), (char *)chan); 
 	return 1;
 }
 int swallops_cmd(const char *who, const char *msg,...) {

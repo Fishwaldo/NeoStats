@@ -38,7 +38,7 @@ int forked = 0;
 int main()
 {
 	FILE *fp;
-	segv_location = sstrdup("main");
+	strcpy(segv_location, "main");
 	strcpy(segvinmodule, "");
 	me.onchan = 0;
 	if (usr_mds)
@@ -121,9 +121,11 @@ RETSIGTYPE serv_segv() {
 
 	if (strlen(segvinmodule) > 1) {
 		log("Uh Oh, Segmentation Fault in Modules Code %s", segvinmodule);
+		log("Location could be %s", segv_location);
 		log("Unloading Module and restoring stacks");
 		globops(me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
 		notice(s_Services, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
+		notice(s_Services, "Location *could* be %s", segv_location);
 		strcpy(name, segvinmodule);
 		strcpy(segvinmodule, "");
 		unload_module(name, NULL);
@@ -187,7 +189,7 @@ void RemoveLock()
 	char buf[512];
 	int fmode;
 
-	segv_location = sstrdup("main_RemoveLock");
+	strcpy(segv_location, "main_RemoveLock");
 
 	lckfile = fopen("data/Lock.db", "r");
 
@@ -207,7 +209,7 @@ void start()
 {
 	static int attempts = 0;
 	
-	segv_location = sstrdup("start");
+	strcpy(segv_location, "start");
 	TimerReset();
 	init_server_hash();
 	init_user_hash();
@@ -244,7 +246,7 @@ void start()
 
 void login()
 	{
-	segv_location = sstrdup("login");
+	strcpy(segv_location, "login");
 	slogin_cmd(me.name, 1, me.infoline, me.pass);
 	sprotocol_cmd("TOKEN");
 }
@@ -254,7 +256,7 @@ void *smalloc(long size)
 {
 	void *buf;
 	
-	segv_location = sstrdup("smalloc");
+	strcpy(segv_location, "smalloc");
 	if (!size) {
 		log("smalloc(): illegal attempt to allocate 0 bytes!");
 		size = 1;

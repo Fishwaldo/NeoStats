@@ -29,7 +29,7 @@ void chk()
 	hscan_t ts;
 	hnode_t *tn;
 
-	segv_location = sstrdup("chk");
+	strcpy(segv_location, "chk");
 /* First, lets see if any modules have a function that is due to run..... */
 	hash_scan_begin(&ts, th);
 	while ((tn = hash_scan_next(&ts)) != NULL) {

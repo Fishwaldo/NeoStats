@@ -203,7 +203,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 {
 	User *u;
 	char cmd[63];
-	segv_location = sstrdup("init_bot");
+	strcpy(segv_location, "init_bot");
 	u = finduser(nick);
 	if (u) {
 		log("Attempting to Login with a Nickname that already Exists: %s",nick);
@@ -222,7 +222,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 int del_bot(char *nick, char *reason)
 {
 	User *u;
-	segv_location = sstrdup("del_bot");
+	strcpy(segv_location, "del_bot");
 	u = finduser(nick);
 #ifdef DEBUG
 	log("Killing %s for %s",nick,reason);
@@ -246,7 +246,7 @@ void Module_Event(char *event, void *data) {
 	hscan_t ms;
 	hnode_t *mn;
 
-	segv_location = sstrdup("Module_Event");
+	strcpy(segv_location, "Module_Event");
 	hash_scan_begin(&ms, mh);
 	while ((mn = hash_scan_next(&ms)) != NULL) {
 		module_ptr = hnode_get(mn);
@@ -257,7 +257,7 @@ void Module_Event(char *event, void *data) {
 #ifdef DEBUG
 					log("Running Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
 #endif
-					segv_location = sstrdup(module_ptr->info->module_name);
+					strcpy(segv_location, module_ptr->info->module_name);
 					strcpy(segvinmodule, module_ptr->info->module_name);
 					if (setjmp(sigvbuf) == 0) {
 						ev_list->function(data);			
@@ -265,7 +265,7 @@ void Module_Event(char *event, void *data) {
 						log("setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
 					}
 					strcpy(segvinmodule, "");
-					segv_location = sstrdup("Module_Event_Return");
+					strcpy(segv_location, "Module_Event_Return");
 					break;
 			}
 		ev_list++;
@@ -352,7 +352,7 @@ void parse(char *line)
 	hscan_t ms;
 	hnode_t *mn;
 		
-	segv_location = sstrdup("parse");
+	strcpy(segv_location, "parse");
 	strip(line);
 	strcpy(recbuf, line);
 	if (!(*line))
@@ -401,9 +401,9 @@ void parse(char *line)
 		}
 		if (!strcasecmp(s_Services,av[0])) {
 			/* its to the Internal Services Bot */
-			segv_location = sstrdup("servicesbot");
+			strcpy(segv_location, "servicesbot");
 			servicesbot(origin,av, ac);
-			segv_location = sstrdup("ServicesBot_return");
+			strcpy(segv_location, "ServicesBot_return");
 			free(av);
 			return;
 		} else {
@@ -422,13 +422,13 @@ void parse(char *line)
 			                return;
 			        }
 
-                                segv_location = sstrdup(list->modname);
+                                strcpy(segv_location, list->modname);
 				strcpy(segvinmodule, list->modname);
 				if (setjmp(sigvbuf) == 0) {
 					list->function(origin, av, ac);
 				}
 				strcpy(segvinmodule, "");
-				segv_location = sstrdup("Return from Module Message");
+				strcpy(segv_location, "Return from Module Message");
 				free(av);
 				return;
 			}
@@ -437,18 +437,18 @@ void parse(char *line)
         }	
         	
         /* now, Parse the Command to the Internal Functions... */
-	segv_location = sstrdup("Parse - Internal Functions");
+	strcpy(segv_location, "Parse - Internal Functions");
 	for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
 		if (!strcasecmp(cmd_list[I].name, cmd)) {
 			if (cmd_list[I].srvmsg == cmdptr) {
-				segv_location = sstrdup(cmd_list[I].name);
+				strcpy(segv_location, cmd_list[I].name);
 				cmd_list[I].function(origin, av, ac);
 				break; log("should never get here-Parse");
 			}	
 		}
 	}
 	/* K, now Parse it to the Module functions */
-	segv_location = sstrdup("Parse - Module Functions");
+	strcpy(segv_location, "Parse - Module Functions");
 	hash_scan_begin(&ms, mh);
 	while ((mn = hash_scan_next(&ms)) != NULL) {
 		module_ptr = hnode_get(mn);
@@ -460,13 +460,13 @@ void parse(char *line)
 #ifdef DEBUG
 					log("Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
 #endif
-					segv_location = sstrdup(module_ptr->info->module_name);
+					strcpy(segv_location, module_ptr->info->module_name);
 					strcpy(segvinmodule, module_ptr->info->module_name);
 					if (setjmp(sigvbuf) == 0) {
 						fn_list->function(origin, av, ac);			
 					}
 					strcpy(segvinmodule, "");
-					segv_location = sstrdup("Parse_Return_Module");
+					strcpy(segv_location, "Parse_Return_Module");
 					break;
 					log("Should never get here-Parse");
 				}	
@@ -491,7 +491,7 @@ they should update the internal Structures */
 void init_ServBot()
 {
 	char rname[63];
-	segv_location = sstrdup("init_ServBot");
+	strcpy(segv_location, "init_ServBot");
 	sprintf(rname, "/msg %s \2HELP\2", s_Services);
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname);
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);

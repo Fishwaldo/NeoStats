@@ -259,7 +259,7 @@ extern void ns_shutdown(User *u, char *reason)
 	hnode_t *mn;
 	char quitmsg[255];
 
-	segv_location = sstrdup("ns_shutdown");
+	strcpy(segv_location, "ns_shutdown");
 	/* Unload the Modules */
 	hash_scan_begin(&ms, mh);
 	while ((mn = hash_scan_next(&ms)) != NULL) {
@@ -284,7 +284,7 @@ extern void ns_shutdown(User *u, char *reason)
 static void ns_reload(User *u, char *reason)
 {
 	char quitmsg[255];
-	segv_location = sstrdup("ns_reload");
+	strcpy(segv_location, "ns_reload");
 	globops(s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
 	log("%s requested RELOAD.", u->nick);
 	sprintf(quitmsg, "%s Sent RELOAD: %s", u->nick, (reason ? reason : "No reason"));
@@ -321,7 +321,7 @@ static void ns_logs(User *u)
 	FILE *fp;
 	char buf[512];
 
-	segv_location = sstrdup("ns_logs");
+	strcpy(segv_location, "ns_logs");
 
 	fp = fopen("logs/stats.log", "r");
 	if (!fp) {
@@ -339,7 +339,7 @@ static void ns_logs(User *u)
 static void ns_jupe(User *u, char *server)
 {
 	char infoline[255];
-	segv_location = sstrdup("ns_jupe");
+	strcpy(segv_location, "ns_jupe");
 	sprintf(infoline, "[Jupitered by %s]", u->nick);
 	sserver_cmd(server, 1, infoline);
 	log("%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, server);
@@ -347,7 +347,7 @@ static void ns_jupe(User *u, char *server)
 
 static void ns_JOIN(User *u, char *chan)
 {
-	segv_location = sstrdup("ns_JOIN");
+	strcpy(segv_location, "ns_JOIN");
 	globops(s_Services, "JOINING CHANNEL -\2(%s)\2- Thanks to %s!%s@%s)", chan, u->nick, u->username, u->hostname);
 	privmsg(me.chan, s_Services, "%s Asked me to Join %s, So, I'm Leaving %s", u->nick, chan, me.chan);
 	spart_cmd(s_Services, me.chan);
@@ -359,7 +359,7 @@ static void ns_JOIN(User *u, char *chan)
 void ns_debug_to_coders(char *u)
 {
 	char realname[63];
-	segv_location = sstrdup("ns_debug_to_coders");
+	strcpy(segv_location, "ns_debug_to_coders");
 	if (!me.coder_debug) {
 		me.coder_debug = 1;
 		if (!u) { 
@@ -389,7 +389,7 @@ void ns_debug_to_coders(char *u)
 static void ns_raw(User *u, char *message)
 {
 	int sent;
-	segv_location = sstrdup("ns_raw");
+	strcpy(segv_location, "ns_raw");
 	notice(s_Services,"\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)",u->nick, message);
 #ifdef DEBUG
         log("SENT: %s", message);
@@ -405,7 +405,7 @@ static void ns_raw(User *u, char *message)
 }	
 static void ns_user_dump(User *u)
 {
-	segv_location = sstrdup("ns_user_dump");
+	strcpy(segv_location, "ns_user_dump");
 	if (!(UserLevel(u) >= 180)) {
 		privmsg(u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
 		return;
@@ -415,7 +415,7 @@ static void ns_user_dump(User *u)
 }
 static void ns_server_dump(User *u)
 {
-	segv_location = sstrdup("ns_server_dump");
+	strcpy(segv_location, "ns_server_dump");
 	if (!(UserLevel(u) >= 180)) {
 		privmsg(u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
 		return;
@@ -425,7 +425,7 @@ static void ns_server_dump(User *u)
 }
 static void ns_chan_dump(User *u, char *chan)
 {
-	segv_location = sstrdup("ns_chan_dump");
+	strcpy(segv_location, "ns_chan_dump");
 	if (!(UserLevel(u) >= 180)) {
 	
 		privmsg(u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
@@ -437,7 +437,7 @@ static void ns_chan_dump(User *u, char *chan)
 static void ns_uptime(User *u)
 {
 	int uptime = time (NULL) - me.t_start;
-	segv_location = sstrdup("ns_uptime");
+	strcpy(segv_location, "ns_uptime");
 
 	log("Time Difference %d", uptime);
 	log("Statistical Server Up %d days, %d:%02d:%02d", uptime/86400, (uptime/3600) % 24, (uptime/60) % 60, uptime % 60);
@@ -465,7 +465,7 @@ static void ns_uptime(User *u)
 }
 static void ns_version(User *u)
 {
-	segv_location = sstrdup("ns_version");
+	strcpy(segv_location, "ns_version");
 		privmsg(u->nick, s_Services, "\2NeoStats Version Information\2");
 		privmsg(u->nick, s_Services, "NeoStats Version: %s", version);
 		privmsg(u->nick, s_Services, "http://www.neostats.net");
@@ -474,7 +474,7 @@ static void ns_version(User *u)
 
 static void ns_roots(User *u)
 {
-	segv_location = sstrdup("ns_roots");
+	strcpy(segv_location, "ns_roots");
 		privmsg(u->nick, s_Services, "\2NeoStats ROOT users\2");
 		privmsg(u->nick, s_Services, "%s",me.roots);
 	privmsg(u->nick, s_Services, "These are setable in stats.cfg now");
