@@ -649,8 +649,7 @@ SStats *findstats(char *name)
 
 void Is_Midnight()
 {
-	time_t current = me.now;
-	struct tm *ltm = localtime(&current);
+	struct tm *ltm = localtime(&me.now);
 	TLD *t;
 	lnode_t *cn;
 	CStats *c;
