@@ -503,8 +503,6 @@ void unload_modules(void)
 int
 ModuleConfig(bot_setting* set_ptr)
 {
-	char *temp = NULL;
-
 	SET_SEGV_LOCATION();
 	while(set_ptr->option)
 	{

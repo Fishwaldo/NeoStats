@@ -210,7 +210,6 @@ static int add_bot_cmd (hash_t *cmd_hash, bot_cmd *cmd_ptr)
 {
 	bot_cmd *hashentry;
 	char confcmd[32];
-	char *temp = NULL;
 	int ulevel = 0;
 
 	/* Verify the command is OK before we add it so we do not have to 
@@ -233,13 +232,11 @@ static int add_bot_cmd (hash_t *cmd_hash, bot_cmd *cmd_ptr)
 	}
 	/* Seems OK, add the command */
 	hnode_create_insert (cmd_hash, cmd_ptr, cmd_ptr->cmd);
-
 	snprintf (confcmd, 32, "command%s", cmd_ptr->cmd);
 	if (DBAFetchConfigInt (confcmd, &ulevel) == NS_SUCCESS) {
 		hashentry = (bot_cmd *) hnode_find (cmd_hash, cmd_ptr->cmd);
 		hashentry->ulevel = ulevel;
 	}
-
 	dlog (DEBUG3, "add_bot_cmd: added a new command %s to services bot", cmd_ptr->cmd);
 	return NS_SUCCESS;
 }

@@ -194,7 +194,7 @@ send_quit (const char *source, const char *quitmsg)
 void 
 send_part (const char *source, const char *chan, const char *reason)
 {
-	send_cmd (":%s %s %s :%s", source, MSG_PART, chan, reason, reason);
+	send_cmd (":%s %s %s :%s", source, MSG_PART, chan, reason);
 }
 
 void 
