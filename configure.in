@@ -327,7 +327,7 @@ AC_CONFIG_FILES([Makefile
 		modules/loveserv/Makefile
 		modules/moraleserv/Makefile
 		modules/statserv/Makefile
-		cronchk])
+		neostats])
 
 AC_CACHE_SAVE
 AC_OUTPUT

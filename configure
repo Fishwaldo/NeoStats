@@ -30878,7 +30878,7 @@ fi
 
 
 
-                                                                                                                                                                                              ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile lib/Makefile lib/curl/Makefile lib/adns/Makefile lib/pcre/Makefile lib/rta/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/loveserv/Makefile modules/moraleserv/Makefile modules/statserv/Makefile cronchk"
+                                                                                                                                                                                              ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile lib/Makefile lib/curl/Makefile lib/adns/Makefile lib/pcre/Makefile lib/rta/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/loveserv/Makefile modules/moraleserv/Makefile modules/statserv/Makefile neostats"
 
 
 cat >confcache <<\_ACEOF
@@ -31575,7 +31575,7 @@ do
   "modules/loveserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/loveserv/Makefile" ;;
   "modules/moraleserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/moraleserv/Makefile" ;;
   "modules/statserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/statserv/Makefile" ;;
-  "cronchk" ) CONFIG_FILES="$CONFIG_FILES cronchk" ;;
+  "neostats" ) CONFIG_FILES="$CONFIG_FILES neostats" ;;
   "$ac_config_libobj_dir/fnmatch.h" ) CONFIG_LINKS="$CONFIG_LINKS $ac_config_libobj_dir/fnmatch.h:$ac_config_libobj_dir/fnmatch_.h" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "include/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config.h" ;;

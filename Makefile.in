@@ -38,7 +38,7 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) $(dist_bin_SCRIPTS) \
 	$(dist_data_DATA) $(dist_doc_DATA) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/cronchk.in \
+	$(srcdir)/Makefile.in $(srcdir)/neostats.in \
 	$(top_srcdir)/autotools/rules.mk $(top_srcdir)/configure \
 	$(top_srcdir)/lib/gdbm/autoconf.h.in AUTHORS COPYING ChangeLog \
 	INSTALL NEWS TODO autotools/compile autotools/config.guess \
@@ -58,12 +58,11 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/config.h \
 	$(top_builddir)/lib/gdbm/autoconf.h
-CONFIG_CLEAN_FILES = cronchk
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(datadir)" "$(DESTDIR)$(docdir)"
-binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
+CONFIG_CLEAN_FILES = neostats
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(datadir)" \
+	"$(DESTDIR)$(docdir)"
 dist_binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
-SCRIPTS = $(bin_SCRIPTS) $(dist_bin_SCRIPTS)
+SCRIPTS = $(dist_bin_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -222,7 +221,6 @@ SUBDIRS = include lib src modules
 ACLOCAL_AMFLAGS = -I autotools
 AM_MAKEFLAGS = -s
 dist_bin_SCRIPTS = makeconf
-bin_SCRIPTS = cronchk
 dist_data_DATA = neostats.motd
 docdir = @prefix@/doc
 dist_doc_DATA = doc/old/* doc/*
@@ -287,16 +285,8 @@ $(top_srcdir)/lib/gdbm/autoconf.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_dep
 
 distclean-hdr:
 	-rm -f lib/gdbm/autoconf.h lib/gdbm/stamp-h2
-cronchk: $(top_builddir)/config.status $(srcdir)/cronchk.in
+neostats: $(top_builddir)/config.status $(srcdir)/neostats.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-
-uninstall-binSCRIPTS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(bin_SCRIPTS)'; for p in $$list; do \
-	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
-	  echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(bindir)/$$f"; \
-	done
 
 uninstall-dist_binSCRIPTS:
 	@$(NORMAL_UNINSTALL)
@@ -599,7 +589,7 @@ check: check-recursive
 all-am: Makefile $(SCRIPTS) $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(datadir)" "$(DESTDIR)$(docdir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(datadir)" "$(DESTDIR)$(docdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -649,7 +639,9 @@ info-am:
 
 install-data-am: install-dist_dataDATA install-dist_docDATA
 
-install-exec-am: install-binSCRIPTS install-dist_binSCRIPTS
+install-exec-am: install-dist_binSCRIPTS
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 
 install-info: install-info-recursive
 
@@ -675,9 +667,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binSCRIPTS uninstall-dist_binSCRIPTS \
-	uninstall-dist_dataDATA uninstall-dist_docDATA \
-	uninstall-info-am
+uninstall-am: uninstall-dist_binSCRIPTS uninstall-dist_dataDATA \
+	uninstall-dist_docDATA uninstall-info-am
 
 uninstall-info: uninstall-info-recursive
 
@@ -688,18 +679,22 @@ uninstall-info: uninstall-info-recursive
 	distclean-generic distclean-hdr distclean-libtool \
 	distclean-recursive distclean-tags distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-binSCRIPTS install-data \
-	install-data-am install-dist_binSCRIPTS install-dist_dataDATA \
-	install-dist_docDATA install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-generic mostlyclean-libtool \
-	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-binSCRIPTS \
+	install install-am install-data install-data-am \
+	install-dist_binSCRIPTS install-dist_dataDATA \
+	install-dist_docDATA install-exec install-exec-am \
+	install-exec-hook install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am \
 	uninstall-dist_binSCRIPTS uninstall-dist_dataDATA \
 	uninstall-dist_docDATA uninstall-info-am
 
+
+install-exec-hook:
+		$(CCDV) $(dist_binSCRIPT_INSTALL) "neostats" "@prefix@/neostats";
+		test -z "@prefix@/logs" || $(mkdir_p) "@prefix@/logs";
 
 .c.o:
 @USECCDV@		@echo "Building $@"

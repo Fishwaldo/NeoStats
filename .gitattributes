@@ -36,7 +36,6 @@ autotools/rules.mk -text
 /ccdv.c -text
 /configure -text
 /configure.in -text
-/cronchk.in -text
 data/niconfig.db -text
 data/tlds.nfo -text
 doc/FAQ -text
@@ -476,6 +475,7 @@ modules/templateauth/Makefile.am -text
 modules/templateauth/Makefile.in -text
 modules/templateauth/templateauth.c -text
 modules/templateauth/templateauth.vcproj -text
+/neostats.in -text
 /neostats.motd -text
 /neostats.sln -text
 /neostatslibs.sln -text

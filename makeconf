@@ -44,7 +44,6 @@ __EOF__
 # mark repl_str as an executable
 chmod +x repl_str
 rm -f repl_str
-exit 0
 # Checking out how to specify not to make a new line with the current OS
 c=''
 n=''
