@@ -625,7 +625,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 			/* server, ip, servicestamp, modes*/
 			base64toserver(origin), IPAddress, NULL, (argv[5][0] == '+' ? argv[5]: NULL),
 			/*, vhost, realname, numeric*/ 
-			NULL, argv[argc-1], argv[argc-2]);
+			NULL, argv[argc-1], argv[argc-2], NULL);
 	} else {
 		do_nickchange (base64tonick(origin), argv[0], argv[1]);
 	}

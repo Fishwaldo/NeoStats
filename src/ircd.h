@@ -112,11 +112,8 @@ void do_part (const char* nick, const char* chan, const char* reason);
 void do_nick (const char *nick, const char *hopcount, const char *TS, 
 		const char *user, const char *host, const char *server, 
 		const char *ip, const char *servicestamp, const char *modes, 
-		const char *vhost, const char *realname, const char *numeric
-#if (FEATURES&FEATURE_USERSMODES)
-		, const char *smodes
-#endif
-		 );
+		const char *vhost, const char *realname, const char *numeric, 
+		const char *smodes);
 void do_client (const char *nick, const char *arg1, const char *TS, 
 		const char *modes, const char *smodes, 
 		const char *user, const char *host, const char *vhost, 

@@ -451,8 +451,8 @@ static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
-		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
-			argv[5], NULL, NULL, NULL, NULL, argv[7], NULL);
+		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+			NULL, NULL, NULL, NULL, argv[7], NULL, NULL);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}

@@ -590,11 +590,11 @@ m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 #ifdef ULTIMATE3
-		do_nick (argv[0], argv[1], argv[2], argv[4], argv[5], 
-			argv[6], argv[8], NULL, argv[3], NULL, argv[9], NULL, NULL);
+		do_nick (argv[0], argv[1], argv[2], argv[4], argv[5], argv[6], 
+			argv[8], NULL, argv[3], NULL, argv[9], NULL, NULL);
 #elif ULTIMATE
-		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4],
-			argv[5], NULL, NULL, NULL, NULL, argv[7], NULL);
+		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+			NULL, NULL, NULL, NULL, argv[7], NULL, NULL);
 #endif
 	} else {
 		do_nickchange (origin, argv[0], NULL);
