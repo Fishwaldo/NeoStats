@@ -276,6 +276,8 @@ int ssvsmode_cmd(const char *target, const char *modes) {
 
 int ssvskill_cmd(const char *target, const char *reason, ...) {
 	User *u;
+	char **av;
+	int ac = 0;
 	va_list ap;
 	char buf[512];
 	u = finduser(target);
@@ -286,9 +288,12 @@ int ssvskill_cmd(const char *target, const char *reason, ...) {
 		va_start(ap, reason);
 		vsnprintf(buf, 512, reason, ap);
 		sts(":%s %s %s :%s", me.name, (me.token ? TOK_SVSKILL : MSG_SVSKILL), target, buf);
-		Module_Event("KILL", u);
+		AddStringToList(&av, u->nick, &ac);
+		Module_Event("KILL", av, ac);
+		FreeList(av, ac);
 		DelUser(target);
 		va_end(ap);
+		return 1;
 	}
 }
 

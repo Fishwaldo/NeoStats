@@ -43,10 +43,21 @@ struct mod_user_list {
 	char *nick;
 	char *modname;
 	int (*function)(char *origin, char **av, int ac);
+	int (*chanfunc)(char *chan, char **av, int ac);
+	hash_t *chanlist;
 };
 
 typedef struct mod_user_list Mod_User;
 hash_t *bh;
+
+struct _chan_bot_list {
+	char *chan;
+	list_t *bots;
+};
+
+typedef struct _chan_bot_list Chan_Bot;
+hash_t *bch;
+
 
 struct functions {
 	char *cmd_name;
@@ -101,5 +112,6 @@ extern int del_socket(char *sockname);
 extern void list_sockets(User *);
 extern Mod_User *findbot(char *);
 extern int get_dl_handle(char *mod_name);
-
+extern void add_bot_to_chan(char *, char *);
+extern void del_bot_from_chan(char *, char *);
 #endif /* !_dl_h_ */

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.9 2002/03/12 08:19:06 fishwaldo Exp $
+** $Id: spam.c,v 1.10 2002/07/12 09:11:31 fishwaldo Exp $
 */
 
 
@@ -34,6 +34,15 @@ Functions my_fn_list[] = {
 	{ NULL,		NULL,		0 }
 };
 
+int __Chan_Message(char *chan, char **argv, int argc)
+{
+	/* we don't handle channel messages */
+	privmsg(chan, s_Spam, "Say what Nigger? your speaking gibberish in %s", chan);
+	return 1;
+}
+
+
+
 int __Bot_Message(char *origin, char **argv, int argc)
 {
 	User *u;
@@ -53,7 +62,7 @@ int __Bot_Message(char *origin, char **argv, int argc)
 	return 1;
 }
 
-int Online(Server *data) {
+int Online(char **av, int ac) {
 
 	if (init_bot(s_Spam,"please",me.name,"Chat to me", "+xd", my_info[0].module_name) == -1 ) {
 		/* Nick was in use!!!! */

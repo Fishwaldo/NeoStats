@@ -69,7 +69,13 @@
 #define T_TABLE_SIZE	100 /* Number of Timers */
 #define B_TABLE_SIZE	100 /* Number of Bots */
 #define MAXMODES	CHAN_MEM_SIZE
+
+
+
 #define bzero(x, y)		memset(x, '\0', y);
+#define is_synced	me.synced
+
+
 
 int servsock;
 int times;
@@ -118,6 +124,7 @@ struct me {
 	char chan[BUFSIZE];
 	unsigned int onchan : 1;
 	unsigned int usesmo : 1;
+	unsigned int synced : 1;
 	Server *s;
 	int requests;
 	long SendM;

@@ -28,6 +28,7 @@ void __init_mod_list() {
 	mh = hash_create(NUM_MODULES, 0, 0);
 	bh = hash_create(B_TABLE_SIZE, 0, 0);
 	th = hash_create(T_TABLE_SIZE, 0, 0);
+	bch = hash_create(C_TABLE_SIZE, 0, 0);
 	sockh = hash_create(MAX_SOCKS, 0, 0);
 }
 
@@ -203,6 +204,108 @@ void list_sockets(User *u) {
 	privmsg(u->nick,s_Services,"End of Socket List");
 }		
 
+extern void add_bot_to_chan(char *bot, char *chan) {
+	hnode_t *cbn;
+	Chan_Bot *bc;
+	lnode_t *bmn;	
+	char *botname;
+	printf("addbot\n");
+	cbn = hash_lookup(bch, chan);
+	if (!cbn) {
+		bc = malloc(sizeof(Chan_Bot));
+		bc->chan = sstrdup(chan);
+		bc->bots = list_create(B_TABLE_SIZE);
+		cbn = hnode_create(bc);
+	} else {
+		bc = hnode_get(cbn);
+	}
+	if (list_isfull(bc->bots)) {
+		log("Eeek, Bot Channel List is full for Chan %s", chan);
+		return;
+	}
+	botname = sstrdup(bot);
+	bmn = lnode_create(botname);
+	list_append(bc->bots, bmn);
+	if (hash_isfull(bch)) {
+		log("eek, bot channel hash is full");
+		return;
+	}
+	hash_insert(bch, cbn, bc->chan);
+	return;
+}
+
+extern void del_bot_from_chan(char *bot, char *chan) {
+	hnode_t *cbn;
+	Chan_Bot *bc;
+	lnode_t *bmn;
+	cbn = hash_lookup(bch, chan);
+	if (!cbn) {
+		log("Hu? Can't Find Channel %s for botchanhash", chan);
+		return;
+	}
+	bc = hnode_get(cbn);
+	bmn = list_find(bc->bots, bot, comparef);
+	if (!bmn) {
+		log("Hu? Can't find bot %s in %s in botchanhash", bot, chan);
+		return;
+	}
+	list_delete(bc->bots, bmn);
+	
+	if (list_isempty(bc->bots)) {
+	/* delete the hash and list because its all over */
+		hash_delete(bch, cbn);
+		list_destroy(bc->bots);
+		free(lnode_get(bmn));
+		lnode_destroy(bmn);
+		free(bc->chan);
+		hnode_destroy(cbn);
+	}
+}	
+
+extern void bot_chan_message(char *chan, char **av, int ac) {
+	hnode_t *cbn;
+	Chan_Bot *bc;
+	lnode_t *bmn;
+	Mod_User *u;
+	cbn = hash_lookup(bch, chan);
+	if (!cbn) {
+		log("eeeh, Can't find channel %s for BotChanMessage", chan);
+		return;
+	}
+	bc = hnode_get(cbn);
+	bmn = list_first(bc->bots);
+	while (bmn) {
+		u = findbot(lnode_get(bmn));
+		if (u->chanfunc) {
+#ifdef DEBUG
+				log("Running Module for Chanmessage %s", chan);
+#endif
+				u->chanfunc(chan, av, ac);
+		}
+		bmn = list_next(bc->bots, bmn);
+	}
+
+
+
+}
+
+extern void botchandump(User *u) {
+	hscan_t hs;
+	hnode_t *hn;
+	lnode_t *ln;
+	Chan_Bot *bc;
+	privmsg(u->nick, s_Services, "BotChanDump:");
+        hash_scan_begin(&hs, bch);
+        while ((hn = hash_scan_next(&hs)) != NULL) {
+	        bc = hnode_get(hn);
+	        privmsg(u->nick,s_Services,"%s:--------------------------------",bc->chan);
+		ln = list_first(bc->bots);
+		while (ln) {
+	        	privmsg(u->nick,s_Services,"Bot Name: %s",lnode_get(ln));
+			ln = list_next(bc->bots, ln);
+		}
+	}
+}
 
 static Mod_User *new_bot(char *bot_name)
 {
@@ -216,6 +319,7 @@ static Mod_User *new_bot(char *bot_name)
 	if (!bot_name)
 		bot_name="";
 	u->nick = sstrdup(bot_name);	
+	u->chanlist = hash_create(C_TABLE_SIZE, 0, 0);
 	bn = hnode_create(u);
 	if (hash_isfull(bh)) {
 		notice(s_Services, "Warning ModuleBotlist is full");
@@ -225,7 +329,6 @@ static Mod_User *new_bot(char *bot_name)
 	}
 	return u;
 }
-
 int add_mod_user(char *nick, char *mod_name) {
 	Mod_User *Mod_Usr_list;
 	Module *list_ptr;
@@ -243,9 +346,10 @@ int add_mod_user(char *nick, char *mod_name) {
 	if (mn) {
 		list_ptr = hnode_get(mn);
 		Mod_Usr_list->function = dlsym(list_ptr->dl_handle, "__Bot_Message");
+		Mod_Usr_list->chanfunc = dlsym(list_ptr->dl_handle, "__Chan_Message");
 		return 1;
 	}
-	log("add_mod_user(): Tried to add a bot, bot Module does not support bots!");
+	log("add_mod_user(): Couldn't Add ModuleBot to List");
 	return 0;
 }
 

@@ -5,12 +5,13 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.27 2002/07/11 13:59:29 fishwaldo Exp $
+** $Id: chans.c,v 1.28 2002/07/12 09:11:31 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
  
 #include "stats.h"
+#include "dl.h"
 #include "hash.h"
 
 
@@ -242,6 +243,10 @@ void part_chan(User *u, char *chan) {
 			}
 			return;
 		}
+		if (findbot(u->nick)) {
+			/* its one of our bots, so add it to the botchan list */
+			del_bot_from_chan(u->nick, c->name);
+		}
 		lnode_destroy(list_delete(u->chans, un));
 	}
 }			
@@ -336,6 +341,9 @@ void join_chan(User *u, char *chan) {
 #ifdef DEBUG
 	log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
 #endif
+	if (findbot(u->nick)) {
+		add_bot_to_chan(u->nick, c->name);
+	}
 }
 
 void chandump(char *chan) {

@@ -153,6 +153,13 @@ void servicesbot(char *nick, char **av, int ac) {
 			return;
 		}
 		list_module_timer(u);
+	} else if (!strcasecmp(av[1], "MODBOTCHANLIST")) {
+		if (!(UserLevel(u) >= 180)) {
+			privmsg(nick, s_Services, "Permission Denied");
+			notice(s_Services, "%s tried to MODBOTCHANLIST, but is not a techadmin", nick);
+			return;
+		}
+		botchandump(u);
 	} else if (!strcasecmp(av[1], "INFO")) {
 		ns_uptime(u);
 		notice(s_Services,"%s Wanted to see %s's info",u->nick,me.name);

@@ -393,6 +393,7 @@ void parse(char *line)
 	hnode_t *mn;
 		
 	strcpy(segv_location, "parse");
+
 	strip(line);
 	strcpy(recbuf, line);
 	if (!(*line))
@@ -436,6 +437,7 @@ void parse(char *line)
 
 		/* if its a message from our own internal bots, silently drop it */
                 if (findbot(origin)) {
+			notice(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", origin, av[0]);
 			free(av);
 	                return;
 		}
@@ -471,8 +473,9 @@ void parse(char *line)
 				strcpy(segv_location, "Return from Module Message");
 				free(av);
 				return;
+			} else {
+				bot_chan_message(av[0], av, ac);
 			}
-			log("Recieved a Message for %s, but that user is not registered with us!!! buf: %s", av[0], av[1]);
 		}
         }	
         	
@@ -649,6 +652,7 @@ void Srv_Burst(char *origin, char **argv, int argc) {
 		if (ircd_srv.burst == 1) {
 			sburst_cmd(0);
 			ircd_srv.burst = 0;
+			me.synced = 1;
 		}
 	} else {
 		ircd_srv.burst = 1;
@@ -942,6 +946,7 @@ void Srv_Netinfo(char *origin, char **argv, int argc) {
 				me.usesmo = 1;
 			} 
 			Module_Event("NETINFO", NULL, 0); 
+			me.synced = 1;
 }
 #endif
 

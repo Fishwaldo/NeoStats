@@ -59,6 +59,8 @@ int main()
 	me.r_time=10;
 	me.lastmsg = time(NULL);
 	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
+	me.synced = 0;
+	me.onchan = 0;
 	strcpy(me.modpath,"dl");
 	RemoveLock();
 #ifdef RECVLOG
