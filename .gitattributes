@@ -9,6 +9,7 @@
 /Makefile.inc.in -text
 /NEWS -text
 /README -text
+/README.pt -text
 /TODO -text
 /Ultimate.c -text
 /Ultimate.h -text

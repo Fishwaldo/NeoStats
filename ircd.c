@@ -1104,5 +1104,7 @@ static void Showcredits(char *nick)
 	snumeric_cmd(351, nick, ":- Andy For Ideas");
 	snumeric_cmd(351, nick, ":- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies");
 	snumeric_cmd(351, nick, ":- sre and Jacob for development systems and access");
+	snumeric_cmd(351, nick, ":- Error51 for Translating our FAQ and README files");
+	snumeric_cmd(351, nick, ":- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!");
 }
 
