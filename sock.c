@@ -200,6 +200,7 @@ read_loop ()
 						}
 					} else {
 						nlog (LOG_WARNING, LOG_CORE, "read returned an Error");
+						servsock = -1;
 						return;
 					}
 				}
@@ -414,6 +415,11 @@ sts (char *fmt, ...)
 	char buf[BUFSIZE];
 	int sent;
 	int buflen;
+	
+	if (servsock == -1) {
+		nlog(LOG_WARNING, LOG_CORE, "Not Sending to Server as we have a invaild Socket");
+		return;
+	}
 
 	va_start (ap, fmt);
 	ircvsnprintf (buf, BUFSIZE, fmt, ap);
