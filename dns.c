@@ -178,7 +178,7 @@ fini_adns() {
  */
 void 
 canx_dns(const char *modname) {
-	lnode_t *dnsnode;
+	lnode_t *dnsnode, *lnode2;
 	DnsLookup *dnsdata;
 
 	SET_SEGV_LOCATION();
@@ -190,6 +190,10 @@ canx_dns(const char *modname) {
 			adns_cancel(dnsdata->q);
 			free (dnsdata->a);
 			free (dnsdata);
+			lnode2 = list_next(dnslist, dnsnode);
+			list_delete(dnslist, dnsnode);
+			lnode_destroy(dnsnode);
+			dnsnode = lnode2;
 		}
 	}
 }
