@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <fnmatch.h>
 #include "dl.h"
-#include "dotconf.h"
 #include "stats.h"
 #include "hs_help.c"
 #include "log.h"

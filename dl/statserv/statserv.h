@@ -29,7 +29,6 @@
 #include "dl.h"
 #include "m_stats.h"
 #include "stats.h"
-#include "dotconf.h"
 
 /* this is the max number of statserv channels our database can hold... */
 #define SS_CHAN_SIZE -1
