@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Unreal.c,v 1.39 2003/05/09 13:17:15 fishwaldo Exp $
+** $Id: Unreal.c,v 1.40 2003/05/09 14:19:08 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -178,11 +178,13 @@ int sping_cmd(const char *from, const char *reply, const char *to) {
 int sumode_cmd(const char *who, const char *target, long mode) {
 	int i;
 	char newmode[20];
+	char newmode2[20];
 	newmode[0] = '+';
 	newmode[1] = '\0';
 	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1); i++) {
 		if (mode & usr_mds[i].umodes) {
-			snprintf(newmode, 20, "%s%c", newmode, usr_mds[i].mode);
+			snprintf(newmode2, 20, "%s%c", newmode, usr_mds[i].mode);
+			snprintf(newmode, 20, "%s", newmode2);
 		}
 	}
 	sts(":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, newmode);
@@ -339,7 +341,7 @@ void sts(char *fmt,...)
 	va_start (ap, fmt);
 	vsnprintf (buf, 512, fmt, ap);
 
-	nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", buf);
+	nlog(LOG_DEBUG2, LOG_CORE, "SENT: %s", buf);
 	strcat (buf, "\n");
 	sent = write (servsock, buf, strlen (buf));
 	if (sent == -1) {

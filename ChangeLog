@@ -3,6 +3,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Added ability to turn off StatServ wallops. "/msg statserv set msgthrottle off" - BugID#6
  - NLOG called from a Module Socket Function was Fubar. Fixed
  - Fixed a Hybrid7 Compile problem
+ - Fixed a problem with sumodes_cmd for Ultimate/Unreal
 
 * NeoStats * Fish * Version 2.5.2
  - Added Keeper Library for storing configuration and optionally data, and reserved space for language file storage
