@@ -310,7 +310,8 @@ parse (char *line)
 				SET_SEGV_LOCATION();
 				SET_SEGV_INMODULE(mod_usr->modname);
 				if (setjmp (sigvbuf) == 0) {
-					mod_usr->function (origin, av, ac);
+					if(mod_usr->function)
+						mod_usr->function (origin, av, ac);
 				}
 				CLEAR_SEGV_INMODULE();
 				SET_SEGV_LOCATION();
