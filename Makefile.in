@@ -7,7 +7,7 @@ EXTRA_LDFLAGS = `curl/mycurl-config --libs`
 PROGS = neostats cronchk makeconf
 CONF = neostats.motd
 DOCS = doc/FAQ doc/USERMAN README BUGS AUTHORS COPYING CREDITS TODO \
-		ChangeLog doc/README.* dl/modules.txt RELNOTES doc/old/*
+		ChangeLog doc/README.* dl/modules.txt RELNOTES INSTNOTES doc/old/*
 DOCS_PROGS = doc/read-faq doc/read-userman
 DATA = data/tlds.nfo
 
