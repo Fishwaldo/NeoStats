@@ -569,6 +569,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 			squit_cmd (s_Services, quitmsg);
 			ssquit_cmd (me.name);
 		}
+		sleep(5);
 		if (servsock > 0)
 			close (servsock);
 		if (exitcode == NS_EXIT_RECONNECT) {
