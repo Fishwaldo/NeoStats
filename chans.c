@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.45 2003/06/30 14:56:25 fishwaldo Exp $
+** $Id: chans.c,v 1.46 2003/07/08 05:35:37 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -374,20 +374,98 @@ void del_chan(Chans * c)
  * In fact, this does nothing special apart from call part_chan, and processing a channel kick
  * @param User u, user structure of user getting kicked
  * @param channel name user being kicked from
+ * @param User k, the user doing the kick
  * 
- * @TODO XXX part_chan will also generate a event, which we don't want
  *
  */
 
-void kick_chan(User * u, char *chan)
+void kick_chan(User * u, char *chan, User * k)
 {
 	char **av;
 	int ac = 0;
-	AddStringToList(&av, chan, &ac);
-	AddStringToList(&av, u->nick, &ac);
-	Module_Event("KICK", av, ac);
-	free(av);
-	part_chan(u, chan);
+	Chans *c;
+	Chanmem *cm;
+	lnode_t *un;
+	strcpy(segv_location, "part_chan");
+	nlog(LOG_DEBUG2, LOG_CORE, "%s Kicking %s from %s", k->nick, u->nick, chan);
+	if (!u) {
+		nlog(LOG_WARNING, LOG_CORE,
+		     "Ehh, KIcking a Unknown User %s from Chan %s: %s",
+		     u->nick, chan, recbuf);
+		if (me.coder_debug) {
+			chanalert(s_Services,
+				  "Ehh, Kicking a Unknown User %s from Chan %s: %s",
+				  u->nick, chan, recbuf);
+			chandump(chan);
+			UserDump(u->nick);
+		}
+		return;
+	}
+	c = findchan(chan);
+	if (!c) {
+		nlog(LOG_WARNING, LOG_CORE,
+		     "Hu, Kicking a Non existant Channel? %s", chan);
+		return;
+	} else {
+		un = list_find(c->chanmembers, u->nick, comparef);
+		if (!un) {
+			nlog(LOG_WARNING, LOG_CORE,
+			     "Kick: hu, User %s isn't a member of this channel %s",
+			     u->nick, chan);
+			if (me.coder_debug) {
+				chanalert(s_Services,
+					  "Kick: hu, User %s isn't a member of this channel %s",
+					  u->nick, chan);
+				chandump(c->name);
+				UserDump(u->nick);
+			}
+		} else {
+			cm = lnode_get(un);
+			lnode_destroy(list_delete(c->chanmembers, un));
+			free(cm);
+			AddStringToList(&av, c->name, &ac);
+			AddStringToList(&av, u->nick, &ac);
+			Module_Event("KICK", av, ac);
+			free(av);
+			ac = 0;
+			c->cur_users--;
+		}
+		nlog(LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)",
+		     c->name, c->cur_users, list_count(c->chanmembers));
+		if (c->cur_users <= 0) {
+			AddStringToList(&av, c->name, &ac);
+			Module_Event("DELCHAN", av, ac);
+			free(av);
+			ac = 0;
+			del_chan(c);
+		}
+		un = list_find(u->chans, c->name, comparef);
+		if (!un) {
+			nlog(LOG_WARNING, LOG_CORE,
+			     "Kick:Hu, User %s claims not to be part of Chan %s",
+			     u->nick, chan);
+			if (me.coder_debug) {
+				chanalert(s_Services,
+					  "Kick: Hu, User %s claims not to be part of Chan %s",
+					  u->nick, chan);
+				chandump(c->name);
+				UserDump(u->nick);
+			}
+			return;
+		}
+		if (findbot(u->nick)) {
+			/* its one of our bots, so add it to the botchan list */
+			del_bot_from_chan(u->nick, c->name);
+			AddStringToList(&av, c->name, &ac);
+			AddStringToList(&av, u->nick, &ac);
+			Module_Event("KICKBOT", av, ac);
+			free(av);
+			ac = 0;
+
+		}
+		lnode_destroy(list_delete(u->chans, un));
+	}
+
 }
 
 /** @brief Parts a user from a channel
@@ -482,6 +560,11 @@ void part_chan(User * u, char *chan)
 		if (findbot(u->nick)) {
 			/* its one of our bots, so add it to the botchan list */
 			del_bot_from_chan(u->nick, c->name);
+			AddStringToList(&av, c->name, &ac);
+			AddStringToList(&av, u->nick, &ac);
+			Module_Event("KICKBOT", av, ac);
+			free(av);
+			ac = 0;
 		}
 		lnode_destroy(list_delete(u->chans, un));
 	}

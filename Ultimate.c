@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.55 2003/07/01 12:54:32 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.56 2003/07/08 05:35:37 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -1006,7 +1006,11 @@ void Usr_Smode(char *origin, char **argv, int argc)
 {
 	if (!strchr(argv[0], '#')) {
 		/* its user svsmode change */
+#ifdef ULTIMATE3
 		UserMode(argv[0], argv[2], 0);
+#else
+		UserMode(argv[0], argv[1], 0);
+#endif
 	} else {
 		/* its a channel svsmode change */
 		ChanMode(origin, argv, argc);
@@ -1103,10 +1107,11 @@ void Usr_Topic(char *origin, char **argv, int argc)
 
 void Usr_Kick(char *origin, char **argv, int argc)
 {
-	User *u;
+	User *u, *k;
 	u = finduser(argv[1]);
-	if (u) {
-		kick_chan(u, argv[0]);
+	k = finduser(origin);
+	if ((u) && (k)) {
+		kick_chan(u, argv[0], k);
 	} else {
 		nlog(LOG_WARNING, LOG_CORE,
 		     "Warning, Can't find user %s for kick %s", argv[1],

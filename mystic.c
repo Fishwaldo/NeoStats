@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: mystic.c,v 1.5 2003/07/02 10:05:11 fishwaldo Exp $
+** $Id: mystic.c,v 1.6 2003/07/08 05:35:37 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -810,7 +810,7 @@ void Usr_Smode(char *origin, char **argv, int argc)
 {
 	if (!strchr(argv[0], '#')) {
 		/* its user svsmode change */
-		UserMode(argv[0], argv[2], 0);
+		UserMode(argv[0], argv[1], 0);
 	} else {
 		/* its a channel svsmode change */
 		ChanMode(origin, argv, argc);
@@ -899,10 +899,11 @@ void Usr_Topic(char *origin, char **argv, int argc)
 
 void Usr_Kick(char *origin, char **argv, int argc)
 {
-	User *u;
+	User *u, *k;
 	u = finduser(argv[1]);
-	if (u) {
-		kick_chan(u, argv[0]);
+	k = finduser(origin);
+	if ((u) && (k)) {
+		kick_chan(u, argv[0],k);
 	} else {
 		nlog(LOG_WARNING, LOG_CORE,
 		     "Warning, Can't find user %s for kick %s", argv[1],

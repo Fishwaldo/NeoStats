@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.85 2003/06/30 15:18:24 fishwaldo Exp $
+** $Id: stats.h,v 1.86 2003/07/08 05:35:37 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -374,7 +374,7 @@ extern Chans *findchan(char *chan);
 extern int ChanMode(char *origin, char **av, int ac);
 extern void Change_Topic(char *, Chans *, time_t t, char *);
 extern void ChangeChanUserMode(Chans * c, User * u, int add, long mode);
-void kick_chan(User *, char *);
+void kick_chan(User *, char *, User *);
 
 
 /* dns.c */
