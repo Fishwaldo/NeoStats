@@ -289,7 +289,6 @@ src/numeric.h -text
 src/pcre/COPYING -text
 src/pcre/Makefile -text
 src/pcre/README -text
-src/pcre/config.h.in eol=lf
 src/pcre/dftables.c eol=lf
 src/pcre/get.c eol=lf
 src/pcre/internal.h eol=lf
