@@ -45,7 +45,7 @@ static int check_interval()
 	static int lasttime;
 	static int count;
 
-	if (!ss_module->synched || !me.synched) {
+	if (!ss_module->synched) {
 		return -1;
 	}
 	if ((me.now - lasttime) < StatServ.msginterval ) {

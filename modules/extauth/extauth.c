@@ -219,47 +219,8 @@ static int ea_event_online(CmdParams* cmdparams)
 	return 1;
 };
 
-static int ea_event_mode(CmdParams* cmdparams) 
-{
-	int add = 0;
-	char *modes;
-
-	/* bail if we are not synched */
-	if (!is_synched)
-		return 0;
-		
-	if(!HaveUmodeRegNick()) 
-		return -1;
-
-	/* first, find if its a regnick mode */
-	modes = cmdparams->param;
-	while (*modes) {
-		switch (*modes) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			if(*modes == UmodeChRegNick) {
-				if (add) {
-					cmdparams->source->user->ulevel = GetAccessLevel(cmdparams->source);
-					dlog(DEBUG2, "SetAccessLevel for %s to %d", cmdparams->source->name, cmdparams->source->user->ulevel);
-					irc_chanalert (NULL, "%s granted access level %d", cmdparams->source->name, cmdparams->source->user->ulevel);
-					nlog (LOG_NORMAL, "%s granted access level %d", cmdparams->source->name, cmdparams->source->user->ulevel);
-				}
-			}
-			break;
-		}
-		modes++;
-	}
-	return 1;
-}
-
 ModuleEvent module_events[] = {
 	{EVENT_ONLINE,	ea_event_online},
-	{EVENT_UMODE,	ea_event_mode}, 
 	{EVENT_NULL,	NULL}
 };
 

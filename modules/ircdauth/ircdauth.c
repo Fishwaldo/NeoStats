@@ -131,14 +131,8 @@ static int auth_event_online(CmdParams* cmdparams)
 	return NS_SUCCESS;
 };
 
-static int auth_event_mode(CmdParams* cmdparams) 
-{
-	return NS_SUCCESS;
-}
-
 ModuleEvent module_events[] = {
 	{EVENT_ONLINE,	auth_event_online},
-	{EVENT_UMODE,	auth_event_mode}, 
 	{EVENT_NULL,	NULL}
 };
 

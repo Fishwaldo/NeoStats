@@ -185,7 +185,7 @@ static int cs_event_online(CmdParams* cmdparams)
 static int cs_event_signon(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_module->synched || !cs_cfg.sign_watch) {
+	if (!cs_cfg.sign_watch) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
@@ -215,9 +215,6 @@ static int cs_event_quit(CmdParams* cmdparams)
 	int LocalCount = 0;
 
 	SET_SEGV_LOCATION();
-	if (!cs_module->synched) {
-		return 1;
-	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
 		return 1;
 	}
@@ -293,7 +290,7 @@ static int cs_event_umode(CmdParams* cmdparams)
 	ModeDef* def;
 
 	SET_SEGV_LOCATION();
-	if (!cs_module->synched || !cs_cfg.mode_watch) {
+	if (!cs_cfg.mode_watch) {
 		return -1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
@@ -344,7 +341,7 @@ static int cs_event_smode(CmdParams* cmdparams)
 	ModeDef* def;
 
 	SET_SEGV_LOCATION();
-	if (!cs_module->synched || !cs_cfg.mode_watch) {
+	if (!cs_cfg.mode_watch) {
 		return -1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
@@ -392,7 +389,7 @@ static int cs_event_kill(CmdParams* cmdparams)
 	int KillCount = 0;
 
 	SET_SEGV_LOCATION();
-	if (!cs_module->synched || !cs_cfg.kill_watch) {
+	if (!cs_cfg.kill_watch) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
@@ -428,7 +425,7 @@ static int cs_event_kill(CmdParams* cmdparams)
 static int cs_event_nick(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_module->synched || !cs_cfg.nick_watch) {
+	if (!cs_cfg.nick_watch) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
@@ -447,7 +444,7 @@ static int cs_event_nick(CmdParams* cmdparams)
 static int cs_event_server(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_module->synched || !cs_cfg.serv_watch) {
+	if (!cs_cfg.serv_watch) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
@@ -461,7 +458,7 @@ static int cs_event_server(CmdParams* cmdparams)
 static int cs_event_squit(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_module->synched || !cs_cfg.serv_watch) {
+	if (!cs_cfg.serv_watch) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {

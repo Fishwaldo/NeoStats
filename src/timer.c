@@ -67,7 +67,7 @@ CheckTimers (void)
 		/* flush log files */
 		fflush (NULL);
 	}
-	if (me.synched && config.setservertimes) {
+	if (is_synched && config.setservertimes) {
 		if((me.now - lastservertimesync) > config.setservertimes) {
 			/* The above check does not need to be exact, but 
 			   setting times ought to be so reset me.now */

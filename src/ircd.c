@@ -1361,8 +1361,7 @@ do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, co
 	irc_send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
 	irc_globops (NULL, "Link with Network \2Complete!\2");
-	SendAllModuleEvent (EVENT_NETINFO, NULL);
-	me.synched = 1;
+	SendAllModuleEvent (EVENT_NETINFO, NULL);	
 }
 
 void 
@@ -1375,7 +1374,6 @@ do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, c
 	init_services_bot ();
 	irc_globops (NULL, "Link with Network \2Complete!\2");
 	SendAllModuleEvent (EVENT_NETINFO, NULL);
-	me.synched = 1;
 }
 
 void
@@ -1583,7 +1581,6 @@ do_burst (char *origin, char **argv, int argc)
 		if (ircd_srv.burst == 1) {
 			irc_send_burst (0);
 			ircd_srv.burst = 0;
-			me.synched = 1;
 			init_services_bot ();
 		}
 	} else {

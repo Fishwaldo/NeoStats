@@ -194,9 +194,6 @@ static int hs_event_signon(CmdParams* cmdparams)
 
 	SET_SEGV_LOCATION();
 
-	if (!is_synched)
-		return 0;
-
 	if (IsMe(cmdparams->source)) 
 		return 1;
 
@@ -264,10 +261,6 @@ int hs_event_mode(CmdParams* cmdparams)
 	char *modes;
 	char vhost[MAXHOST];
 
-	/* bail if we are not synched */
-	if (!is_synched)
-		return 0;
-		
 	if(!HaveUmodeRegNick()) 
 		return -1;
 

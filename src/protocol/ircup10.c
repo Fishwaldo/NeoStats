@@ -453,12 +453,11 @@ send_wallops (const char *who, const char *buf)
 void
 send_end_of_burst_ack(void)
 {
-	if (!me.synched) {
+	if (!is_synched) {
 		init_services_bot ();
 		send_end_of_burst ();
 	}
 	send_cmd ("%s %s", neostatsbase64, TOK_END_OF_BURST_ACK);
-	me.synched = 1;
 }
 
 void

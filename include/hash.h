@@ -255,7 +255,7 @@ EXPORTFUNC 	extern void hnode_destroy (hnode_t *);
 #define hnode_put(N, V) ((N)->hash_data = (V))
 #endif
 
-EXPORTFUNC 	void hnode_create_insert (hash_t *, const void *, void *);
+EXPORTFUNC 	void hnode_create_insert (hash_t *, void *, const void *);
 EXPORTFUNC 	hnode_t *hnode_find (hash_t * hash, const void *key);
 
 

@@ -213,15 +213,12 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 		while (ev_list->event != EVENT_NULL) {
 			/* This goes through each Command */
 			if (ev_list->event == event) {
-#if 0 
-				/* work in progress */
 				/* If we are not yet synched, check that the module supports 
 				 * the event before we are synched. */
 				if (!module_ptr->synched && !(ev_list->flags & EVENT_FLAG_IGNORE_SYNCH)) {
 					dlog(DEBUG1, "Skipping module %s for event %d since module is not yet synched", module_ptr->info->name, event);
 					break;
 				}
-#endif
 				dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
 				SET_SEGV_LOCATION();
 				if (setjmp (sigvbuf) == 0) {

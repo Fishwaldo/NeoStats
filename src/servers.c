@@ -333,7 +333,7 @@ PingServers (void)
 	hscan_t ss;
 	hnode_t *sn;
 
-	if(!me.synched)
+	if(!is_synched)
 		return;
 	dlog(DEBUG3, "Sending pings...");
 	ping.ulag = 0;
