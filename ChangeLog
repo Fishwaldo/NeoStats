@@ -3,7 +3,7 @@ NeoStats 3.x ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
-* NeoStats * Version 3.0.a2-dev
+* NeoStats * Version 3.0.a2
  - Fix bug with module excludes when there are multiple modules loaded using
    module excludes. (M)
  - Remove fieldname from settings structure since option already provides a 

@@ -1556,7 +1556,7 @@ fi
 #Standard Defines for autoconf here
 x_maj=3
 x_min='0'
-x_rev="a2-dev"
+x_rev="a2"
 x_package='NeoStats'
 MODULES="connectserv hostserv loveserv moraleserv statserv ircdauth extauth"
 #dont edit anything after this line!
@@ -28771,6 +28771,8 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 
 fi;
+
+CFLAGS="$CFLAGS -fno-strict-aliasing"
 
 echo "$as_me:$LINENO: checking To Enable AutoTools Debug Mode?" >&5
 echo $ECHO_N "checking To Enable AutoTools Debug Mode?... $ECHO_C" >&6
