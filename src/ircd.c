@@ -1559,7 +1559,7 @@ do_motd( const char* nick, const char *remoteserver )
 		irc_numeric( ERR_NOMOTD, nick, _( ":- MOTD file Missing" ) );
 	} else {
 		irc_numeric( RPL_MOTDSTART, nick, _( ":- %s Message of the Day -" ), me.name );
-		irc_numeric( RPL_MOTD, nick, _( ":- %s. Copyright (c) 1999 - 2004 The NeoStats Group" ), me.version );
+		irc_numeric( RPL_MOTD, nick, _( ":- %s. Copyright (c) 1999 - 2005 The NeoStats Group" ), me.version );
 		irc_numeric( RPL_MOTD, nick, ":-" );
 
 		while( fgets( buf, sizeof( buf ), fp ) ) {
@@ -1589,7 +1589,7 @@ do_admin( const char* nick, const char *remoteserver )
 		irc_numeric( ERR_NOADMININFO, nick, _( "%s :No administrative info available" ), me.name );
 	} else {
 		irc_numeric( RPL_ADMINME, nick, _( ":%s :Administrative info" ), me.name );
-		irc_numeric( RPL_ADMINME, nick, _( ":%s.  Copyright (c) 1999 - 2004 The NeoStats Group" ), me.version );
+		irc_numeric( RPL_ADMINME, nick, _( ":%s.  Copyright (c) 1999 - 2005 The NeoStats Group" ), me.version );
 		while( fgets( buf, sizeof( buf ), fp ) ) {
 			buf[strnlen( buf, BUFSIZE ) - 1] = 0;
 			irc_numeric( RPL_ADMINLOC1, nick, ":- %s", buf );
@@ -1633,6 +1633,7 @@ do_credits( const char* nick, const char *remoteserver )
 	irc_numeric( RPL_VERSION, nick, ":- herrohr - Giving us patches for Liquid IRCd support" );
 	irc_numeric( RPL_VERSION, nick, ":- OvErRiTe - Giving us patches for Viagra IRCd support" );
 	irc_numeric( RPL_VERSION, nick, ":- Reed Loden - Contributions to IRCu support" );
+	irc_numeric( RPL_VERSION, nick, ":- Adam Rutter (Shmad) - Developer from the 1.0 days to 2.0 Days");
 }
 
 /** @brief 

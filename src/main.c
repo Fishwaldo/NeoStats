@@ -96,6 +96,11 @@ static int get_options( int argc, char **argv )
 			printf( "NeoStats: http://www.neostats.net\n" );
 			printf( "Version:  %s\n", me.version );
 			printf( "Compiled: %s at %s\n", ns_module_info.build_date, ns_module_info.build_time );
+			printf( "-----------------------------------------------\n" );
+			printf( "Copyright: NeoStats Group. 2000-2005\n" );
+			printf( "Justin Hammond( fish@neostats.net )\n" );
+			printf( "Mark Hetherington( m@neostats.net )\n" );
+			printf( "-----------------------------------------------\n\n" );
 			return NS_FAILURE;
 		case 'd':
 			level = atoi( optarg );
@@ -260,9 +265,8 @@ static void print_copyright( void )
 {
 	printf( "NeoStats %s Loading...\n", me.version );
 	printf( "-----------------------------------------------\n" );
-	printf( "Copyright: NeoStats Group. 2000-2004\n" );
+	printf( "Copyright: NeoStats Group. 2000-2005\n" );
 	printf( "Justin Hammond( fish@neostats.net )\n" );
-	printf( "Adam Rutter( shmad@neostats.net )\n" );
 	printf( "Mark Hetherington( m@neostats.net )\n" );
 	printf( "-----------------------------------------------\n\n" );
 }
