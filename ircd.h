@@ -25,14 +25,23 @@
 
 #define MAX_CMD_LINE_LENGTH		350
 
-typedef struct {
+typedef struct IntCommands{
 	char *name;
 	void (*function) (char *origin, char **argv, int argc);
 	int srvmsg;		/* Should this be a Server Message(1), or a User Message?(0) */
 	int usage;
 }IntCommands;
 
+typedef struct aCtab{
+	long mode;
+	char flag;
+	unsigned nickparam:1;	/* 1 = yes 0 = no */
+	unsigned parameters:1;
+	char sjoin;
+} aCtab;
+
 extern IntCommands cmd_list[];
+extern aCtab cFlagTab[33];
 
 void init_ServBot (void);
 void ShowMOTD (char *nick);

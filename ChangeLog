@@ -22,6 +22,12 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
    obviously distinct from channel modes, easier to grep for and encourage support in other 
    parts of the code. (M)
  - bug 86 fix - joinbuf was not validating input (M)
+ - Ultimate 3 defines for smodes have move to a feature define of GOTUSERSMODES since Quantum 
+   and Liquid appear to need them and we want to avoid IRCd specific defines. (M)
+ - moved all smode support into an appropriate #if block and removed susr_mds for ircds that 
+   do not need them. Only need if GOTUSERSMODES (M)
+ - UserMode split into two, UserMode and UserSMode to handle smodes. Makes IRCds with no smode
+   support more efficient
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.9
  - import of libpcre into core (M)

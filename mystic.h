@@ -37,6 +37,8 @@
 #define GOTSVSJOIN
 /* we don't have bot mode support */
 #undef GOTBOTMODE
+/* we don't have user smode support */
+#undef GOTUSERSMODES
 
 /* IRCD Specific mode chars */
 #define UMODE_CH_LOCOP 'O'
@@ -413,29 +415,12 @@ struct ircd_srv_ {
 } ircd_srv;
 
 typedef struct {
-	long mode;
-	char flag;
-	unsigned nickparam:1;	/* 1 = yes 0 = no */
-	unsigned parameters:1;
-	char sjoin;
-} aCtab;
-
-
-
-
-
-typedef struct {
 	unsigned long umodes;
 	char mode;
 	int level;
 } Oper_Modes;
 
-
-aCtab cFlagTab[33];
 Oper_Modes usr_mds[29];
-Oper_Modes susr_mds[9];
-
-
 
 /* function declarations */
 extern void init_ircd ();
@@ -473,42 +458,6 @@ extern int srakill_cmd (const char *host, const char *ident);
 extern int ssvshost_cmd (const char *who, const char *vhost);
 extern int sinvite_cmd (const char *from, const char *to, const char *chan);
 
-void Usr_Version (char *, char **, int argc);
-void Usr_ShowMOTD (char *, char **, int argc);
-void Usr_ShowADMIN (char *, char **, int argc);
-void Usr_Showcredits (char *, char **, int argc);
-void Usr_AddServer (char *, char **, int argc);
-void Usr_DelServer (char *, char **, int argc);
-void Usr_DelUser (char *, char **, int argc);
-void Usr_Mode (char *, char **, int argc);
-void Usr_Smode (char *, char **, int argc);
-void Usr_Kill (char *, char **, int argc);
-void Usr_Pong (char *, char **, int argc);
-void Usr_Away (char *, char **, int argc);
-void Usr_Nick (char *, char **, int argc);
-void Usr_Topic (char *, char **, int argc);
-void Usr_Kick (char *, char **, int argc);
-void Usr_Join (char *, char **, int argc);
-void Usr_Part (char *, char **, int argc);
-void Usr_Stats (char *, char **, int argc);
-void Usr_Vhost (char *, char **, int argc);
-void Srv_Topic (char *, char **, int argc);
-void Srv_Ping (char *, char **, int argc);
-void Srv_Netinfo (char *, char **, int argc);
-void Srv_Pass (char *, char **, int argc);
-void Srv_Server (char *, char **, int argc);
-void Srv_Squit (char *, char **, int argc);
-void Srv_Nick (char *, char **, int argc);
-void Srv_Svsnick (char *, char **, int argc);
-void Srv_Kill (char *, char **, int argc);
-void Srv_Connect (char *, char **, int argc);
-void Srv_Svinfo (char *, char **, int argc);
-void Srv_Burst (char *origin, char **argv, int argc);
-void Srv_Sjoin (char *origin, char **argv, int argc);
-void Srv_Tburst (char *origin, char **argv, int argc);
-void Srv_Vctrl (char *origin, char **argv, int argc);
-void Srv_Client (char *origin, char **argv, int argc);
-void Srv_Smode (char *origin, char **argv, int argc);
 
 
 #endif

@@ -30,7 +30,10 @@ void AddRealName (const char *nick, const char *realname);
 void Change_User (User *u, const char * newnick);
 void UserDump (char *nick);
 void part_u_chan (list_t *list, lnode_t *node, void *v);
-void UserMode (const char *nick, const char *modes, int smode);
+void UserMode (const char *nick, const char *modes);
+#ifdef GOTUSERSMODES
+void UserSMode (const char *nick, const char *modes);
+#endif
 int init_user_hash (void);
 void UserAway (User *u, const char *awaymsg);
 void KillUser (const char *nick);

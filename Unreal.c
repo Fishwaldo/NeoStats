@@ -33,6 +33,37 @@
 #include "server.h"
 #include "chans.h"
 
+static void Usr_Version (char *origin, char **argv, int argc);
+static void Usr_ShowMOTD (char *origin, char **argv, int argc);
+static void Usr_ShowADMIN (char *origin, char **argv, int argc);
+static void Usr_Showcredits (char *origin, char **argv, int argc);
+static void Usr_AddServer (char *origin, char **argv, int argc);
+static void Usr_DelServer (char *origin, char **argv, int argc);
+static void Usr_DelUser (char *origin, char **argv, int argc);
+static void Usr_Mode (char *origin, char **argv, int argc);
+static void Usr_Smode (char *origin, char **argv, int argc);
+static void Usr_Kill (char *origin, char **argv, int argc);
+static void Usr_Pong (char *origin, char **argv, int argc);
+static void Usr_Away (char *origin, char **argv, int argc);
+static void Usr_Nick (char *origin, char **argv, int argc);
+static void Usr_Topic (char *origin, char **argv, int argc);
+static void Usr_Kick (char *origin, char **argv, int argc);
+static void Usr_Join (char *origin, char **argv, int argc);
+static void Usr_Part (char *origin, char **argv, int argc);
+static void Usr_Stats (char *origin, char **argv, int argc);
+static void Usr_Vhost (char *origin, char **argv, int argc);
+static void Srv_Ping (char *origin, char **argv, int argc);
+static void Srv_Netinfo (char *origin, char **argv, int argc);
+static void Srv_Sjoin (char *origin, char **argv, int argc);
+static void Srv_Pass (char *origin, char **argv, int argc);
+static void Srv_Server (char *origin, char **argv, int argc);
+static void Srv_Squit (char *origin, char **argv, int argc);
+static void Srv_Nick (char *origin, char **argv, int argc);
+static void Srv_Svsnick (char *origin, char **argv, int argc);
+static void Srv_Kill (char *origin, char **argv, int argc);
+static void Srv_Connect (char *origin, char **argv, int argc);
+static void Srv_Sjoin (char *origin, char **argv, int argc);
+
 static char ircd_buf[BUFSIZE];
 
 #ifdef UNREAL32
@@ -409,7 +440,7 @@ sumode_cmd (const char *who, const char *target, long mode)
 	}
 	newmode[j] = '\0';
 	sts (":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, newmode);
-	UserMode (target, newmode, 0);
+	UserMode (target, newmode);
 	return 1;
 }
 
@@ -549,7 +580,7 @@ ssvsmode_cmd (const char *target, const char *modes)
 	}
     
 	sts (":%s %s %s %s", me.name, (me.token ? TOK_SVSMODE : MSG_SVSMODE), target, modes);
-	UserMode (target, modes, 0);
+	UserMode (target, modes);
 	return 1;
 }
 
@@ -760,7 +791,7 @@ Usr_Smode (char *origin, char **argv, int argc)
 {
 	if (!strchr (argv[0], '#')) {
 		/* its user svsmode change */
-		UserMode (argv[0], argv[1], 0);
+		UserMode (argv[0], argv[1]);
 	} else {
 		/* its a channel svsmode change */
 		ChanMode (origin, argv, argc);
@@ -770,7 +801,7 @@ void
 Usr_Mode (char *origin, char **argv, int argc)
 {
 	if (!strchr (argv[0], '#')) {
-		UserMode (argv[0], argv[1], 0);
+		UserMode (argv[0], argv[1]);
 	} else {
 		ChanMode (origin, argv, argc);
 	}

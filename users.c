@@ -82,7 +82,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *serve
 	u->flood = 0;
 	u->is_away = 0;
 	u->Umode = 0;
-#ifdef ULTIMATE3
+#ifdef GOTUSERSMODES
 	u->Smode = 0;
 #endif
 	u->chans = list_create (MAXJOINCHANS);
@@ -310,7 +310,7 @@ UserLevel (User * u)
 	nlog (LOG_DEBUG1, LOG_CORE, "Umode Level for %s is %d", u->nick, tmplvl);
 
 /* I hate SMODEs damn it */
-#ifdef ULTIMATE3
+#ifdef GOTUSERSMODES
 	for (i = 0; i < ((sizeof (susr_mds) / sizeof (susr_mds[0])) - 1); i++) {
 		if (u->Smode & susr_mds[i].umodes) {
 			if (susr_mds[i].level > tmplvl)
@@ -349,7 +349,7 @@ UserLevel (User * u)
 
 
 void
-UserMode (const char *nick, const char *modes, int smode)
+UserMode (const char *nick, const char *modes)
 {
 	/* I don't know why, but I spent like 3 hours trying to make this function work and 
 	   I finally got it... what a waste of time... gah, oh well... basically, it sets both the User Flags, and also the User Levels.. 
@@ -369,24 +369,11 @@ UserMode (const char *nick, const char *modes, int smode)
 		nlog (LOG_DEBUG1, LOG_CORE, "Recbuf: %s", recbuf);
 		return;
 	}
-	/* support for Smodes */
-	if (smode > 0)
-		nlog (LOG_DEBUG1, LOG_CORE, "Smodes: %s", modes);
-	else
-		nlog (LOG_DEBUG1, LOG_CORE, "Modes: %s", modes);
-
-	if (smode == 0)
-		strlcpy (u->modes, modes, MODESIZE);
-
+	nlog (LOG_DEBUG1, LOG_CORE, "Modes: %s", modes);
+	strlcpy (u->modes, modes, MODESIZE);
 	AddStringToList (&av, u->nick, &ac);
 	AddStringToList (&av, (char *) modes, &ac);
-
-	if (smode > 0) {
-		ModuleEvent (EVENT_SMODE, av, ac);
-	} else {
-		ModuleEvent (EVENT_UMODE, av, ac);
-	}
-
+	ModuleEvent (EVENT_UMODE, av, ac);
 
 	tmpmode = *(modes);
 	while (tmpmode) {
@@ -398,38 +385,78 @@ UserMode (const char *nick, const char *modes, int smode)
 			add = 0;
 			break;
 		default:
-			if (smode > 0) {
-				for (i = 0; i < ((sizeof (susr_mds) / sizeof (susr_mds[0])) - 1); i++) {
-					if (susr_mds[i].mode == tmpmode) {
-						if (add) {
-							u->Smode |= susr_mds[i].umodes;
-							break;
-						} else {
-							u->Smode &= ~susr_mds[i].umodes;
-							break;
-						}
-					}
-				}
-			} else {
-				for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
-					if (usr_mds[i].mode == tmpmode) {
-						if (add) {
-							u->Umode |= usr_mds[i].umodes;
-							break;
-						} else {
-							u->Umode &= ~usr_mds[i].umodes;
-							break;
-						}
+			for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
+				if (usr_mds[i].mode == tmpmode) {
+					if (add) {
+						u->Umode |= usr_mds[i].umodes;
+						break;
+					} else {
+						u->Umode &= ~usr_mds[i].umodes;
+						break;
 					}
 				}
 			}
 		}
 		tmpmode = *modes++;
 	}
-	if (smode > 0) {
-		nlog (LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p", u->nick, (int *)u->Smode);
-	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, (int *)u->Umode);
-	}
+	nlog (LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, (int *)u->Umode);
 	free (av);
 }
+
+#ifdef GOTUSERSMODES
+void
+UserSMode (const char *nick, const char *modes)
+{
+	/* I don't know why, but I spent like 3 hours trying to make this function work and 
+	   I finally got it... what a waste of time... gah, oh well... basically, it sets both the User Flags, and also the User Levels.. 
+	   if a user is losing modes (ie -o) then its a real pain in the butt, but tough... */
+
+	User *u;
+	int add = 0;
+	int i;
+	char tmpmode;
+	char **av;
+	int ac = 0;
+
+	SET_SEGV_LOCATION();
+	u = finduser (nick);
+	if (!u) {
+		nlog (LOG_WARNING, LOG_CORE, "Warning, Changing Modes for an Unknown User %s!", nick);
+		nlog (LOG_DEBUG1, LOG_CORE, "Recbuf: %s", recbuf);
+		return;
+	}
+	nlog (LOG_DEBUG1, LOG_CORE, "Smodes: %s", modes);
+
+	AddStringToList (&av, u->nick, &ac);
+	AddStringToList (&av, (char *) modes, &ac);
+
+	ModuleEvent (EVENT_SMODE, av, ac);
+
+	tmpmode = *(modes);
+	while (tmpmode) {
+		switch (tmpmode) {
+		case '+':
+			add = 1;
+			break;
+		case '-':
+			add = 0;
+			break;
+		default:
+			for (i = 0; i < ((sizeof (susr_mds) / sizeof (susr_mds[0])) - 1); i++) {
+				if (susr_mds[i].mode == tmpmode) {
+					if (add) {
+						u->Smode |= susr_mds[i].umodes;
+						break;
+					} else {
+						u->Smode &= ~susr_mds[i].umodes;
+						break;
+					}
+				}
+			}
+		}
+		tmpmode = *modes++;
+	}
+	nlog (LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p", u->nick, (int *)u->Smode);
+	free (av);
+}
+#endif

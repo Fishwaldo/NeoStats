@@ -106,7 +106,7 @@ char msg_invisibleoff[]="\2%s\2 Is no longer using \2Invisible Mode\2 (-%c)";
 
 static int cs_new_user(char **av, int ac);
 static int cs_user_modes(char **av, int ac);
-#ifdef ULTIMATE3
+#ifdef GOTUSERSMODES
 static int cs_user_smodes(char **av, int ac);
 #endif
 static int cs_del_user(char **av, int ac);
@@ -193,7 +193,7 @@ EventFnList __module_events[] = {
 	{EVENT_ONLINE,		Online},
 	{EVENT_SIGNON,		cs_new_user},
 	{EVENT_UMODE,		cs_user_modes},
-#ifdef ULTIMATE3
+#ifdef GOTUSERSMODES
 	{EVENT_SMODE,		cs_user_smodes},
 #endif
 	{EVENT_SIGNOFF,		cs_del_user},
@@ -358,7 +358,7 @@ static int cs_user_modes(char **av, int ac)
 		case '-':
 			add = 0;
 			break;
-#ifndef ULTIMATE3
+#ifdef GOTUSERSMODES
 /* these modes in Ultimate3 are Smodes */
 #ifdef UMODE_CH_NETADMIN
 		case UMODE_CH_NETADMIN:
@@ -513,7 +513,7 @@ static int cs_user_modes(char **av, int ac)
 	return 1;
 }
 
-#ifdef ULTIMATE3
+#ifdef GOTUSERSMODES
 /* smode support for Ultimate3 */
 static int cs_user_smodes(char **av, int ac)
 {

@@ -23,6 +23,7 @@
 */
 
 #include "stats.h"
+#include "ircd.h"
 #include "dl.h"
 #include "hash.h"
 #include "log.h"
