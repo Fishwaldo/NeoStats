@@ -31,6 +31,8 @@ dnl AC_LIBLTDL_CONVENIENCE
 
 # Checks for programs.
 AC_PROG_CC
+wi_ARG_DISABLE_CCDV
+wi_PROG_CCDV
 AC_PROG_LIBTOOL
 AC_PROG_YACC 
 AC_PROG_LEX
@@ -284,7 +286,6 @@ AC_ARG_WITH(modules, [  --with-modules - Additional Modules to compile],
 MODULES="$MODULES $withval"
 AC_MSG_RESULT($withval),
 AC_MSG_RESULT("None"))
-
 
 dnl Set NEO_PREFIX in config.h.
 if test "x${prefix}" = "xNONE"; then

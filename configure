@@ -464,7 +464,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL YACC LEX LEXLIB LEX_OUTPUT_ROOT SED LIBOBJS ALLOCA POW_LIB PCRE_LIBS PCRE_CFLAGS BUILD_PCRE_TRUE BUILD_PCRE_FALSE CURL_LIBS CURL_CFLAGS BUILD_CURL_TRUE BUILD_CURL_FALSE build_configtool PROTOCOL LIBTOOL_DEPS MODULES LIBDB LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE wi_PWD build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL YACC LEX LEXLIB LEX_OUTPUT_ROOT SED LIBOBJS ALLOCA POW_LIB PCRE_LIBS PCRE_CFLAGS BUILD_PCRE_TRUE BUILD_PCRE_FALSE CURL_LIBS CURL_CFLAGS BUILD_CURL_TRUE BUILD_CURL_FALSE build_configtool PROTOCOL LIBTOOL_DEPS MODULES LIBDB LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1024,10 +1024,11 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-maintainer-mode enable make rules and dependencies not useful
-                          (and sometimes confusing) to the casual installer
-  --disable-dependency-tracking Speeds up one-time builds
-  --enable-dependency-tracking  Do not reject slow dependency extractors
+  --enable-maintainer-mode  enable make rules and dependencies not useful
+			  (and sometimes confusing) to the casual installer
+  --disable-dependency-tracking  speeds up one-time build
+  --enable-dependency-tracking   do not reject slow dependency extractors
+  --disable-ccdv          disable use of ccdv program in Makefiles
   --enable-shared[=PKGS]
                           build shared libraries [default=yes]
   --enable-static[=PKGS]
@@ -1562,7 +1563,7 @@ MODULES="connectserv hostserv loveserv moraleserv statserv ircdauth extauth"
 #dont edit anything after this line!
 
 x_version=$x_maj.$x_min.$x_rev
-am__api_version="1.7"
+am__api_version="1.9"
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
 # incompatible versions:
@@ -1700,7 +1701,6 @@ _ACEOF
 program_transform_name=`echo $program_transform_name | sed -f conftest.sed`
 rm conftest.sed
 
-
 # expand $ac_aux_dir to an absolute path
 am_aux_dir=`cd $ac_aux_dir && pwd`
 
@@ -1712,6 +1712,39 @@ else
   am_missing_run=
   { echo "$as_me:$LINENO: WARNING: \`missing' script is too old or missing" >&5
 echo "$as_me: WARNING: \`missing' script is too old or missing" >&2;}
+fi
+
+if mkdir -p --version . >/dev/null 2>&1 && test ! -d ./--version; then
+  # We used to keeping the `.' as first argument, in order to
+  # allow $(mkdir_p) to be used without argument.  As in
+  #   $(mkdir_p) $(somedir)
+  # where $(somedir) is conditionally defined.  However this is wrong
+  # for two reasons:
+  #  1. if the package is installed by a user who cannot write `.'
+  #     make install will fail,
+  #  2. the above comment should most certainly read
+  #     $(mkdir_p) $(DESTDIR)$(somedir)
+  #     so it does not work when $(somedir) is undefined and
+  #     $(DESTDIR) is not.
+  #  To support the latter case, we have to write
+  #     test -z "$(somedir)" || $(mkdir_p) $(DESTDIR)$(somedir),
+  #  so the `.' trick is pointless.
+  mkdir_p='mkdir -p --'
+else
+  # On NextStep and OpenStep, the `mkdir' command does not
+  # recognize any option.  It will interpret all options as
+  # directories to create, and then abort because `.' already
+  # exists.
+  for d in ./-p ./--version;
+  do
+    test -d $d && rmdir $d
+  done
+  # $(mkinstalldirs) is defined by Automake if mkinstalldirs exists.
+  if test -f "$ac_aux_dir/mkinstalldirs"; then
+    mkdir_p='$(mkinstalldirs)'
+  else
+    mkdir_p='$(install_sh) -d'
+  fi
 fi
 
 for ac_prog in gawk mawk nawk awk
@@ -1792,7 +1825,7 @@ else
 fi
 rmdir .tst 2>/dev/null
 
- # test to see if srcdir already configured
+# test to see if srcdir already configured
 if test "`cd $srcdir && pwd`" != "`pwd`" &&
    test -f $srcdir/config.status; then
   { { echo "$as_me:$LINENO: error: source directory already configured; run \"make distclean\" there first" >&5
@@ -1839,9 +1872,6 @@ AUTOHEADER=${AUTOHEADER-"${am_missing_run}autoheader"}
 
 
 MAKEINFO=${MAKEINFO-"${am_missing_run}makeinfo"}
-
-
-AMTAR=${AMTAR-"${am_missing_run}tar"}
 
 install_sh=${install_sh-"$am_aux_dir/install-sh"}
 
@@ -1935,6 +1965,13 @@ INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 
 # We need awk for the "check" target.  The system "awk" is bad on
 # some platforms.
+# Always define AMTAR for backward compatibility.
+
+AMTAR=${AMTAR-"${am_missing_run}tar"}
+
+am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
+
+
 
 
 
@@ -3022,7 +3059,9 @@ else
     : > sub/conftest.c
     for i in 1 2 3 4 5 6; do
       echo '#include "conftst'$i'.h"' >> sub/conftest.c
-      : > sub/conftst$i.h
+      # Using `: > sub/conftst$i.h' creates only sub/conftst1.h with
+      # Solaris 8's {/usr,}/bin/sh.
+      touch sub/conftst$i.h
     done
     echo "${am__include} ${am__quote}sub/conftest.Po${am__quote}" > confmf
 
@@ -3050,9 +3089,14 @@ else
        grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
       # icc doesn't choke on unknown options, it will just issue warnings
-      # (even with -Werror).  So we grep stderr for any message
-      # that says an option was ignored.
-      if grep 'ignoring option' conftest.err >/dev/null 2>&1; then :; else
+      # or remarks (even with -Werror).  So we grep stderr for any message
+      # that says an option was ignored or not supported.
+      # When given -MP, icc 7.0 and 7.1 complain thusly:
+      #   icc: Command line warning: ignoring option '-M'; no argument required
+      # The diagnosis changed in icc 8.0:
+      #   icc: Command line remark: option '-MP' not supported
+      if (grep 'ignoring option' conftest.err ||
+          grep 'not supported' conftest.err) >/dev/null 2>&1; then :; else
         am_cv_CC_dependencies_compiler_type=$depmode
         break
       fi
@@ -3082,6 +3126,558 @@ else
   am__fastdepCC_FALSE=
 fi
 
+
+
+# Check whether --enable-ccdv or --disable-ccdv was given.
+if test "${enable_ccdv+set}" = set; then
+  enableval="$enable_ccdv"
+  use_ccdv="$enableval"
+else
+  use_ccdv=yes
+fi;
+
+
+# Extract the first word of ""pwd"", so it can be a program name with args.
+set dummy "pwd"; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_wi_PWD+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $wi_PWD in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_wi_PWD="$wi_PWD" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_wi_PWD="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_wi_PWD" && ac_cv_path_wi_PWD=""pwd""
+  ;;
+esac
+fi
+wi_PWD=$ac_cv_path_wi_PWD
+
+if test -n "$wi_PWD"; then
+  echo "$as_me:$LINENO: result: $wi_PWD" >&5
+echo "${ECHO_T}$wi_PWD" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+
+
+if test "x$use_ccdv" = "xno" ; then
+	echo "$as_me:$LINENO: checking for ccdv" >&5
+echo $ECHO_N "checking for ccdv... $ECHO_C" >&6
+	echo "$as_me:$LINENO: result: (disabled)" >&5
+echo "${ECHO_T}(disabled)" >&6
+else
+unset wi_cv_path_ccdv	# can't use cache if it was a temp prog last time
+wi_used_cache_path_ccdv="yes"
+echo "$as_me:$LINENO: checking for ccdv" >&5
+echo $ECHO_N "checking for ccdv... $ECHO_C" >&6
+if test "${wi_cv_path_ccdv+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+wi_used_cache_path_ccdv="no"
+for CCDV in /usr/bin/ccdv /usr/local/bin/ccdv /usr/ccs/bin/ccdv NONE
+do
+	if test "$CCDV" = NONE ; then CCDV="" ; break ; fi
+	$CCDV >/dev/null 2>&1
+	if test $? -eq 96 ; then
+		break
+	fi
+done
+if test "x$CCDV" = "x" ; then
+		cat > ccdv.c << 'EOF'
+/* ccdv.c
+ *
+ * Copyright (C) 2002-2003, by Mike Gleason, NcFTP Software.
+ * All Rights Reserved.
+ *
+ * Licensed under the GNU Public License.
+ */
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <errno.h>
+
+#define SETCOLOR_SUCCESS	(gANSIEscapes ? "\033\1331;32m" : "")
+#define SETCOLOR_FAILURE	(gANSIEscapes ? "\033\1331;31m" : "")
+#define SETCOLOR_WARNING	(gANSIEscapes ? "\033\1331;33m" : "")
+#define SETCOLOR_NORMAL		(gANSIEscapes ? "\033\1330;39m" : "")
+
+#define TEXT_BLOCK_SIZE 8192
+#define INDENT 2
+
+#define TERMS "vt100:vt102:vt220:vt320:xterm:xterm-color:ansi:linux:scoterm:scoansi:dtterm:cons25:cygwin"
+
+size_t gNBufUsed = 0, gNBufAllocated = 0;
+char *gBuf = NULL;
+int gCCPID;
+char gAction[64] = "";
+char gTarget[64] = "";
+char gAr[32] = "";
+char gArLibraryTarget[64] = "";
+int gDumpCmdArgs = 0;
+char gArgsStr[800];
+int gColumns = 80;
+int gANSIEscapes = 0;
+int gExitStatus = 95;
+
+static void
+DumpFormattedOutput(void)
+{
+	char *cp;
+	char spaces[8 + 1] = "        ";
+	char *saved;
+	int curcol;
+	int i;
+
+	curcol = 0;
+	saved = NULL;
+	for (cp = gBuf + ((gDumpCmdArgs == 0) ? strlen(gArgsStr) : 0); ; cp++) {
+		if (*cp == '\0') {
+			if (saved != NULL) {
+				cp = saved;
+				saved = NULL;
+			} else break;
+		}
+		if (*cp == '\r')
+			continue;
+		if (*cp == '\t') {
+			saved = cp + 1;
+			cp = spaces + 8 - (8 - ((curcol - INDENT - 1) % 8));
+		}
+		if (curcol == 0) {
+			for (i = INDENT; --i >= 0; )
+				putchar(' ');
+			curcol = INDENT;
+		}
+		putchar(*cp);
+		if (++curcol == (gColumns - 1)) {
+			putchar('\n');
+			curcol = 0;
+		} else if (*cp == '\n')
+			curcol = 0;
+	}
+	free(gBuf);
+}	/* DumpFormattedOutput */
+
+
+
+/* Difftime(), only for timeval structures.  */
+static void TimeValSubtract(struct timeval *tdiff, struct timeval *t1, struct timeval *t0)
+{
+	tdiff->tv_sec = t1->tv_sec - t0->tv_sec;
+	tdiff->tv_usec = t1->tv_usec - t0->tv_usec;
+	if (tdiff->tv_usec < 0) {
+		tdiff->tv_sec--;
+		tdiff->tv_usec += 1000000;
+	}
+}	/* TimeValSubtract */
+
+
+
+static void
+Wait(void)
+{
+	int pid2, status;
+
+	do {
+		status = 0;
+		pid2 = (int) waitpid(gCCPID, &status, 0);
+	} while (((pid2 >= 0) && (! WIFEXITED(status))) || ((pid2 < 0) && (errno == EINTR)));
+	if (WIFEXITED(status))
+		gExitStatus = WEXITSTATUS(status);
+}	/* Wait */
+
+
+
+static int
+SlurpProgress(int fd)
+{
+	char s1[71];
+	char *newbuf;
+	int nready;
+	size_t ntoread;
+	ssize_t nread;
+	struct timeval now, tnext, tleft;
+	fd_set ss;
+	fd_set ss2;
+	const char *trail = "/-\\|", *trailcp;
+
+	trailcp = trail;
+	snprintf(s1, sizeof(s1), "%s%s%s... ", gAction, gTarget[0] ? " " : "", gTarget);
+	printf("\r%-70s%-9s", s1, "");
+	fflush(stdout);
+
+	gettimeofday(&now, NULL);
+	tnext = now;
+	tnext.tv_sec++;
+	tleft.tv_sec = 1;
+	tleft.tv_usec = 0;
+	FD_ZERO(&ss2);
+	FD_SET(fd, &ss2);
+	for(;;) {
+		if (gNBufUsed == (gNBufAllocated - 1)) {
+			if ((newbuf = (char *) realloc(gBuf, gNBufAllocated + TEXT_BLOCK_SIZE)) == NULL) {
+				perror("ccdv: realloc");
+				return (-1);
+			}
+			gNBufAllocated += TEXT_BLOCK_SIZE;
+			gBuf = newbuf;
+		}
+		for (;;) {
+			ss = ss2;
+			nready = select(fd + 1, &ss, NULL, NULL, &tleft);
+			if (nready == 1)
+				break;
+			if (nready < 0) {
+				if (errno != EINTR) {
+					perror("ccdv: select");
+					return (-1);
+				}
+				continue;
+			}
+			gettimeofday(&now, NULL);
+			if ((now.tv_sec > tnext.tv_sec) || ((now.tv_sec == tnext.tv_sec) && (now.tv_usec >= tnext.tv_usec))) {
+				tnext = now;
+				tnext.tv_sec++;
+				tleft.tv_sec = 1;
+				tleft.tv_usec = 0;
+				printf("\r%-71s%c%-7s", s1, *trailcp, "");
+				fflush(stdout);
+				if (*++trailcp == '\0')
+					trailcp = trail;
+			} else {
+				TimeValSubtract(&tleft, &tnext, &now);
+			}
+		}
+		ntoread = (gNBufAllocated - gNBufUsed - 1);
+		nread = read(fd, gBuf + gNBufUsed, ntoread);
+		if (nread < 0) {
+			if (errno == EINTR)
+				continue;
+			perror("ccdv: read");
+			return (-1);
+		} else if (nread == 0) {
+			break;
+		}
+		gNBufUsed += nread;
+		gBuf[gNBufUsed] = '\0';
+	}
+	snprintf(s1, sizeof(s1), "%s%s%s: ", gAction, gTarget[0] ? " " : "", gTarget);
+	Wait();
+	if (gExitStatus == 0) {
+		printf("\r%-70s", s1);
+		printf("[%s%s%s]", ((gNBufUsed - strlen(gArgsStr)) < 4) ? SETCOLOR_SUCCESS : SETCOLOR_WARNING, "OK", SETCOLOR_NORMAL);
+		printf("%-5s\n", " ");
+	} else {
+		printf("\r%-70s", s1);
+		printf("[%s%s%s]", SETCOLOR_FAILURE, "ERROR", SETCOLOR_NORMAL);
+		printf("%-2s\n", " ");
+		gDumpCmdArgs = 1;	/* print cmd when there are errors */
+	}
+	fflush(stdout);
+	return (0);
+}	/* SlurpProgress */
+
+
+
+static int
+SlurpAll(int fd)
+{
+	char *newbuf;
+	size_t ntoread;
+	ssize_t nread;
+
+	printf("%s%s%s.\n", gAction, gTarget[0] ? " " : "", gTarget);
+	fflush(stdout);
+
+	for(;;) {
+		if (gNBufUsed == (gNBufAllocated - 1)) {
+			if ((newbuf = (char *) realloc(gBuf, gNBufAllocated + TEXT_BLOCK_SIZE)) == NULL) {
+				perror("ccdv: realloc");
+				return (-1);
+			}
+			gNBufAllocated += TEXT_BLOCK_SIZE;
+			gBuf = newbuf;
+		}
+		ntoread = (gNBufAllocated - gNBufUsed - 1);
+		nread = read(fd, gBuf + gNBufUsed, ntoread);
+		if (nread < 0) {
+			if (errno == EINTR)
+				continue;
+			perror("ccdv: read");
+			return (-1);
+		} else if (nread == 0) {
+			break;
+		}
+		gNBufUsed += nread;
+		gBuf[gNBufUsed] = '\0';
+	}
+	Wait();
+	gDumpCmdArgs = (gExitStatus != 0);	/* print cmd when there are errors */
+	return (0);
+}	/* SlurpAll */
+
+
+
+static const char *
+Basename(const char *path)
+{
+	const char *cp;
+	cp = strrchr(path, '/');
+	if (cp == NULL)
+		return (path);
+	return (cp + 1);
+}	/* Basename */
+
+
+
+static const char *
+Extension(const char *path)
+{
+	const char *cp = path;
+	cp = strrchr(path, '.');
+	if (cp == NULL)
+		return ("");
+	return (cp);
+}	/* Extension */
+
+
+
+static void
+Usage(void)
+{
+	fprintf(stderr, "Usage: ccdv /path/to/cc CFLAGS...\n\n");
+	fprintf(stderr, "I wrote this to reduce the deluge Make output to make finding actual problems\n");
+	fprintf(stderr, "easier.  It is intended to be invoked from Makefiles, like this.  Instead of:\n\n");
+	fprintf(stderr, "\t.c.o:\n");
+	fprintf(stderr, "\t\t$(CC) $(CFLAGS) $(DEFS) $(CPPFLAGS) $< -c\n");
+	fprintf(stderr, "\nRewrite your rule so it looks like:\n\n");
+	fprintf(stderr, "\t.c.o:\n");
+	fprintf(stderr, "\t\t@ccdv $(CC) $(CFLAGS) $(DEFS) $(CPPFLAGS) $< -c\n\n");
+	fprintf(stderr, "ccdv 1.1.0 is Free under the GNU Public License.  Enjoy!\n");
+	fprintf(stderr, "  -- Mike Gleason, NcFTP Software <http://www.ncftp.com>\n");
+	exit(96);
+}	/* Usage */
+
+
+
+int
+main(int argc, char **argv)
+{
+	int pipe1[2];
+	int devnull;
+	char emerg[256];
+	int fd;
+	int nread;
+	int i;
+	int cc = 0, pch = 0;
+	const char *quote;
+
+	if (argc < 2)
+		Usage();
+
+	snprintf(gAction, sizeof(gAction), "Running %s", Basename(argv[1]));
+	memset(gArgsStr, 0, sizeof(gArgsStr));
+	for (i = 1; i < argc; i++) {
+		quote = (strchr(argv[i], ' ') != NULL) ? "\"" : "";
+		snprintf(gArgsStr + strlen(gArgsStr), sizeof(gArgsStr) - strlen(gArgsStr), "%s%s%s%s%s", (i == 1) ? "" : " ", quote, argv[i], quote, (i == (argc - 1)) ? "\n" : "");
+		if ((strcmp(argv[i], "-o") == 0) && ((i + 1) < argc)) {
+			if (strcasecmp(Extension(argv[i + 1]), ".o") != 0) {
+				strcpy(gAction, "Linking");
+				snprintf(gTarget, sizeof(gTarget), "%s", Basename(argv[i + 1]));
+			}
+		} else if (strchr("-+/", (int) argv[i][0]) != NULL) {
+			continue;
+		} else if (strncasecmp(Extension(argv[i]), ".c", 2) == 0) {
+			cc++;
+			snprintf(gTarget, sizeof(gTarget), "%s", Basename(argv[i]));
+		} else if ((strncasecmp(Extension(argv[i]), ".h", 2) == 0) && (cc == 0)) {
+			pch++;
+			snprintf(gTarget, sizeof(gTarget), "%s", Basename(argv[i]));
+		} else if ((i == 1) && (strcmp(Basename(argv[i]), "ar") == 0)) {
+			snprintf(gAr, sizeof(gAr), "%s", Basename(argv[i]));
+		} else if ((gArLibraryTarget[0] == '\0') && (strcasecmp(Extension(argv[i]), ".a") == 0)) {
+			snprintf(gArLibraryTarget, sizeof(gArLibraryTarget), "%s", Basename(argv[i]));
+		}
+	}
+	if ((gAr[0] != '\0') && (gArLibraryTarget[0] != '\0')) {
+		strcpy(gAction, "Creating library");
+		snprintf(gTarget, sizeof(gTarget), "%s", gArLibraryTarget);
+	} else if (pch > 0) {
+		strcpy(gAction, "Precompiling");
+	} else if (cc > 0) {
+		strcpy(gAction, "Compiling");
+	}
+
+	if (pipe(pipe1) < 0) {
+		perror("ccdv: pipe");
+		exit(97);
+	}
+
+	(void) close(0);
+	devnull = open("/dev/null", O_RDWR, 00666);
+	if ((devnull != 0) && (dup2(devnull, 0) == 0))
+		close(devnull);
+
+	gCCPID = (int) fork();
+	if (gCCPID < 0) {
+		(void) close(pipe1[0]);
+		(void) close(pipe1[1]);
+		perror("ccdv: fork");
+		exit(98);
+	} else if (gCCPID == 0) {
+		/* Child */
+		(void) close(pipe1[0]);		/* close read end */
+		if (pipe1[1] != 1) {		/* use write end on stdout */
+			(void) dup2(pipe1[1], 1);
+			(void) close(pipe1[1]);
+		}
+		(void) dup2(1, 2);		/* use write end on stderr */
+		execvp(argv[1], argv + 1);
+		perror(argv[1]);
+		exit(99);
+	}
+
+	/* parent */
+	(void) close(pipe1[1]);		/* close write end */
+	fd = pipe1[0];			/* use read end */
+
+	gColumns = (getenv("COLUMNS") != NULL) ? atoi(getenv("COLUMNS")) : 80;
+	gANSIEscapes = (getenv("TERM") != NULL) && (strstr(TERMS, getenv("TERM")) != NULL);
+	gBuf = (char *) malloc(TEXT_BLOCK_SIZE);
+	if (gBuf == NULL)
+		goto panic;
+	gNBufUsed = 0;
+	gNBufAllocated = TEXT_BLOCK_SIZE;
+	if (strlen(gArgsStr) < (gNBufAllocated - 1)) {
+		strcpy(gBuf, gArgsStr);
+		gNBufUsed = strlen(gArgsStr);
+	}
+
+	if (isatty(1)) {
+		if (SlurpProgress(fd) < 0)
+			goto panic;
+	} else {
+		if (SlurpAll(fd) < 0)
+			goto panic;
+	}
+	DumpFormattedOutput();
+	exit(gExitStatus);
+
+panic:
+	gDumpCmdArgs = 1;	/* print cmd when there are errors */
+	DumpFormattedOutput();
+	while ((nread = read(fd, emerg, (size_t) sizeof(emerg))) > 0)
+		(void) write(2, emerg, (size_t) nread);
+	Wait();
+	exit(gExitStatus);
+}	/* main */
+/* eof ccdv.c */
+EOF
+		${CC-cc} $DEFS $CPPFLAGS $CFLAGS "ccdv.c" -o "ccdv" >/dev/null 2>&1
+	/bin/rm -f ccdv.c ccdv.o ccdv.c.gz.uu ccdv.c.gz
+	strip ./ccdv >/dev/null 2>&1
+	./ccdv >/dev/null 2>&1
+	if test $? -eq 96 ; then
+		CCDV="./ccdv"
+	else
+		/bin/rm -f ccdv
+	fi
+fi
+if test "x$CCDV" != x ; then
+
+
+wi_path="$CCDV"
+if test -d "$wi_path" ; then
+	wi_resolved_path=`cd "$wi_path" ; $wi_PWD 2>/dev/null`
+elif test ! -f "$wi_path" ; then
+	wi_resolved_path="$wi_path"
+else
+	wi_parent_dir="$wi_path"
+	wi_file_name="$wi_path"
+
+wi_parent_dir=`echo "$wi_parent_dir" | sed -n '
+s-//*-/-g
+s-/*$--
+/^\/\/*[^/]*$/{
+	c\\
+/
+	p
+	q
+}
+/^[^/]*$/{
+	c\\
+.
+	p
+	q
+}
+/./{
+	s-/[^/]*$--
+	p
+	q
+}'`
+
+wi_file_name=`echo "$wi_file_name" | sed -n '
+s-//*-/-g
+s-/*$--
+s-^/$--
+s-^.*/--
+p
+q'`
+	wi_resolved_path=`cd "$wi_parent_dir" ; $wi_PWD 2>/dev/null`
+	if test "x$wi_resolved_path" != x ; then
+		wi_resolved_path="$wi_resolved_path/$wi_file_name"
+	fi
+	unset wi_parent_dir wi_file_name
+fi
+if test "x$wi_resolved_path" = x ; then
+	CCDV="$$CCDV"
+else
+	CCDV="$wi_resolved_path"
+fi
+unset wi_resolved_path wi_path
+
+	wi_cv_path_ccdv="$CCDV"
+	CC="$CCDV $CC"	# trailing space needed
+else
+	wi_cv_path_ccdv=""
+fi
+
+fi
+echo "$as_me:$LINENO: result: $wi_cv_path_ccdv" >&5
+echo "${ECHO_T}$wi_cv_path_ccdv" >&6
+if test "$wi_used_cache_path_ccdv" = yes ; then
+	CCDV="$wi_cv_path_ccdv"
+	if test "x$CCDV" != x ; then
+		CC="$CCDV $CC"	# trailing space needed
+	fi
+fi
+
+fi
 
 # Check whether --enable-shared or --disable-shared was given.
 if test "${enable_shared+set}" = set; then
@@ -3708,7 +4304,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 3711 "configure"' > conftest.$ac_ext
+  echo '#line 4307 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -4889,7 +5485,9 @@ else
     : > sub/conftest.c
     for i in 1 2 3 4 5 6; do
       echo '#include "conftst'$i'.h"' >> sub/conftest.c
-      : > sub/conftst$i.h
+      # Using `: > sub/conftst$i.h' creates only sub/conftst1.h with
+      # Solaris 8's {/usr,}/bin/sh.
+      touch sub/conftst$i.h
     done
     echo "${am__include} ${am__quote}sub/conftest.Po${am__quote}" > confmf
 
@@ -4917,9 +5515,14 @@ else
        grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
       # icc doesn't choke on unknown options, it will just issue warnings
-      # (even with -Werror).  So we grep stderr for any message
-      # that says an option was ignored.
-      if grep 'ignoring option' conftest.err >/dev/null 2>&1; then :; else
+      # or remarks (even with -Werror).  So we grep stderr for any message
+      # that says an option was ignored or not supported.
+      # When given -MP, icc 7.0 and 7.1 complain thusly:
+      #   icc: Command line warning: ignoring option '-M'; no argument required
+      # The diagnosis changed in icc 8.0:
+      #   icc: Command line remark: option '-MP' not supported
+      if (grep 'ignoring option' conftest.err ||
+          grep 'not supported' conftest.err) >/dev/null 2>&1; then :; else
         am_cv_CXX_dependencies_compiler_type=$depmode
         break
       fi
@@ -5273,7 +5876,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5276:" \
+echo "$as_me:5879:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6300,11 +6903,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6303: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6906: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6307: \$? = $ac_status" >&5
+   echo "$as_me:6910: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6532,11 +7135,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6535: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7138: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6539: \$? = $ac_status" >&5
+   echo "$as_me:7142: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6599,11 +7202,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6602: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7205: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6606: \$? = $ac_status" >&5
+   echo "$as_me:7209: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -7983,8 +8586,8 @@ linux*)
   # Find out which ABI we are using (multilib Linux x86_64 hack).
   libsuff=
   case "$host_cpu" in
-  x86_64*|s390x*)
-    echo '#line 7987 "configure"' > conftest.$ac_ext
+  x86_64*|s390x*|powerpc64*)
+    echo '#line 8590 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8766,7 +9369,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8769 "configure"
+#line 9372 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -8864,7 +9467,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8867 "configure"
+#line 9470 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11016,11 +11619,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11019: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11622: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11023: \$? = $ac_status" >&5
+   echo "$as_me:11626: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -11083,11 +11686,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11086: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11689: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11090: \$? = $ac_status" >&5
+   echo "$as_me:11693: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11653,8 +12256,8 @@ linux*)
   # Find out which ABI we are using (multilib Linux x86_64 hack).
   libsuff=
   case "$host_cpu" in
-  x86_64*|s390x*)
-    echo '#line 11657 "configure"' > conftest.$ac_ext
+  x86_64*|s390x*|powerpc64*)
+    echo '#line 12260 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -12436,7 +13039,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12439 "configure"
+#line 13042 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12534,7 +13137,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12537 "configure"
+#line 13140 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13356,11 +13959,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13359: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13962: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13363: \$? = $ac_status" >&5
+   echo "$as_me:13966: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -13423,11 +14026,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13426: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14029: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13430: \$? = $ac_status" >&5
+   echo "$as_me:14033: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14787,8 +15390,8 @@ linux*)
   # Find out which ABI we are using (multilib Linux x86_64 hack).
   libsuff=
   case "$host_cpu" in
-  x86_64*|s390x*)
-    echo '#line 14791 "configure"' > conftest.$ac_ext
+  x86_64*|s390x*|powerpc64*)
+    echo '#line 15394 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -15434,11 +16037,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15437: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16040: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15441: \$? = $ac_status" >&5
+   echo "$as_me:16044: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15666,11 +16269,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15669: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16272: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15673: \$? = $ac_status" >&5
+   echo "$as_me:16276: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15733,11 +16336,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15736: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16339: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15740: \$? = $ac_status" >&5
+   echo "$as_me:16343: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17117,8 +17720,8 @@ linux*)
   # Find out which ABI we are using (multilib Linux x86_64 hack).
   libsuff=
   case "$host_cpu" in
-  x86_64*|s390x*)
-    echo '#line 17121 "configure"' > conftest.$ac_ext
+  x86_64*|s390x*|powerpc64*)
+    echo '#line 17724 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -17900,7 +18503,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 17903 "configure"
+#line 18506 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -17998,7 +18601,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18001 "configure"
+#line 18604 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -25303,7 +25906,6 @@ else
 echo "${ECHO_T}\"None\"" >&6
 fi;
 
-
 if test "x${prefix}" = "xNONE"; then
 
 cat >>confdefs.h <<_ACEOF
@@ -31466,14 +32068,17 @@ s,@AUTOCONF@,$AUTOCONF,;t t
 s,@AUTOMAKE@,$AUTOMAKE,;t t
 s,@AUTOHEADER@,$AUTOHEADER,;t t
 s,@MAKEINFO@,$MAKEINFO,;t t
-s,@AMTAR@,$AMTAR,;t t
 s,@install_sh@,$install_sh,;t t
 s,@STRIP@,$STRIP,;t t
 s,@ac_ct_STRIP@,$ac_ct_STRIP,;t t
 s,@INSTALL_STRIP_PROGRAM@,$INSTALL_STRIP_PROGRAM,;t t
+s,@mkdir_p@,$mkdir_p,;t t
 s,@AWK@,$AWK,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t
 s,@am__leading_dot@,$am__leading_dot,;t t
+s,@AMTAR@,$AMTAR,;t t
+s,@am__tar@,$am__tar,;t t
+s,@am__untar@,$am__untar,;t t
 s,@MAINTAINER_MODE_TRUE@,$MAINTAINER_MODE_TRUE,;t t
 s,@MAINTAINER_MODE_FALSE@,$MAINTAINER_MODE_FALSE,;t t
 s,@MAINT@,$MAINT,;t t
@@ -31493,6 +32098,7 @@ s,@AMDEPBACKSLASH@,$AMDEPBACKSLASH,;t t
 s,@CCDEPMODE@,$CCDEPMODE,;t t
 s,@am__fastdepCC_TRUE@,$am__fastdepCC_TRUE,;t t
 s,@am__fastdepCC_FALSE@,$am__fastdepCC_FALSE,;t t
+s,@wi_PWD@,$wi_PWD,;t t
 s,@build@,$build,;t t
 s,@build_cpu@,$build_cpu,;t t
 s,@build_vendor@,$build_vendor,;t t
@@ -32302,27 +32908,21 @@ echo X"$mf" |
   else
     continue
   fi
-  grep '^DEP_FILES *= *[^ #]' < "$mf" > /dev/null || continue
-  # Extract the definition of DEP_FILES from the Makefile without
-  # running `make'.
-  DEPDIR=`sed -n -e '/^DEPDIR = / s///p' < "$mf"`
+  # Extract the definition of DEPDIR, am__include, and am__quote
+  # from the Makefile without running `make'.
+  DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
   test -z "$DEPDIR" && continue
+  am__include=`sed -n 's/^am__include = //p' < "$mf"`
+  test -z "am__include" && continue
+  am__quote=`sed -n 's/^am__quote = //p' < "$mf"`
   # When using ansi2knr, U may be empty or an underscore; expand it
-  U=`sed -n -e '/^U = / s///p' < "$mf"`
-  test -d "$dirpart/$DEPDIR" || mkdir "$dirpart/$DEPDIR"
-  # We invoke sed twice because it is the simplest approach to
-  # changing $(DEPDIR) to its actual value in the expansion.
-  for file in `sed -n -e '
-    /^DEP_FILES = .*\\\\$/ {
-      s/^DEP_FILES = //
-      :loop
-	s/\\\\$//
-	p
-	n
-	/\\\\$/ b loop
-      p
-    }
-    /^DEP_FILES = / s/^DEP_FILES = //p' < "$mf" | \
+  U=`sed -n 's/^U = //p' < "$mf"`
+  # Find all dependency output files, they are included files with
+  # $(DEPDIR) in their names.  We invoke sed twice because it is the
+  # simplest approach to changing $(DEPDIR) to its actual value in the
+  # expansion.
+  for file in `sed -n "
+    s/^$am__include $am__quote\(.*(DEPDIR).*\)$am__quote"'$/\1/p' <"$mf" | \
        sed -e 's/\$(DEPDIR)/'"$DEPDIR"'/g' -e 's/\$U/'"$U"'/g'`; do
     # Make sure the directory exists.
     test -f "$dirpart/$file" && continue
