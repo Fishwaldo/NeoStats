@@ -213,23 +213,15 @@ del_chan (Channel *c)
  *
  * @returns Nothing
 */
-void del_channel_user (Channel *c, Client *u)
+void del_user_channel (Channel *c, Client *u)
 {
 	lnode_t *un;
 
-	c->users--;
 	un = list_find (u->user->chans, c->name, comparef);
 	if (!un) {
-		nlog (LOG_WARNING, "del_channel_user: %s not found in channel %s", u->name, c->name);
+		nlog (LOG_WARNING, "del_user_channel: %s not found in channel %s", u->name, c->name);
 	} else {
 		lnode_destroy (list_delete (u->user->chans, un));
-	}
-	dlog (DEBUG3, "del_channel_user: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->members));
-	if (c->users <= 0) {
-		del_chan (c);
-	} else if (c->neousers > 0 && c->neousers == c->users) {
-		/* all real users have left the channel */
-		handle_dead_channel (c);
 	}
 }
 
@@ -250,6 +242,15 @@ int del_channel_member (Channel *c, Client *u)
 	cm = lnode_get (un);
 	lnode_destroy (list_delete (c->members, un));
 	ns_free (cm);
+	dlog (DEBUG3, "del_channel_member: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->members));
+	c->users--;
+	if (c->users <= 0) {
+		del_chan (c);
+	} else if (c->neousers > 0 && c->neousers == c->users) {
+		/* all real users have left the channel */
+		handle_dead_channel (c);
+	}
+
 	return NS_SUCCESS;
 }
 
@@ -282,8 +283,10 @@ KickChannel (const char *kickby, const char *chan, const char *kicked, const cha
 		nlog (LOG_WARNING, "KickChannel: channel %s not found", chan);
 		return;
 	} 
-	if (del_channel_member (c, u) != NS_SUCCESS) {
-		return;
+	/* If PROTOCOL_KICKPART then we will also get part so DO NOT REMOVE USER */
+	if (!(ircd_srv.protocol & PROTOCOL_KICKPART)) {
+		del_channel_member (c, u);
+		del_user_channel (c, u);
 	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->target = u;
@@ -298,10 +301,6 @@ KickChannel (const char *kickby, const char *chan, const char *kicked, const cha
 		/* its one of our bots */
 		cmdparams->bot = u->user->bot;
 		SendModuleEvent (EVENT_KICKBOT, cmdparams, u->user->bot->moduleptr);
-	}
-	/* If PROTOCOL_KICKPART then we will also get part so DO NOT REMOVE USER */
-	if (!(ircd_srv.protocol & PROTOCOL_KICKPART)) {
-		del_channel_user (c, u);
 	}
 	ns_free (cmdparams);
 }
@@ -335,9 +334,6 @@ void PartChannel (Client * u, const char *chan, const char *reason)
 		nlog (LOG_WARNING, "PartChannel: channel %s not found", chan);
 		return;
 	}
-	if (del_channel_member (c, u) != NS_SUCCESS) {
-		return;
-	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
 	cmdparams->source = u;
@@ -348,7 +344,8 @@ void PartChannel (Client * u, const char *chan, const char *reason)
 		SendModuleEvent (EVENT_PARTBOT, cmdparams, u->user->bot->moduleptr);
 		c->neousers --;
 	}
-	del_channel_user (c, u);
+	del_channel_member (c, u);
+	del_user_channel (c, u);
 	ns_free (cmdparams);
 }
 
