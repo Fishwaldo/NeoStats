@@ -799,13 +799,10 @@ static void
 Usr_Part (char *origin, char **argv, int argc)
 {
 	char *tmpbuf;
-	if (argc > 1)
-		tmpbuf = joinbuf(argv, argc, 1);
-	else 
-		tmpbuf = NULL;
+	tmpbuf = joinbuf(argv, argc, 1);
 	
 	part_chan (finduser (origin), argv[0], tmpbuf);
-	if (tmpbuf[0] != 0) free(tmpbuf);
+	free(tmpbuf);
 }
 
 static void
