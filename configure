@@ -6122,9 +6122,9 @@ cat >>confdefs.h <<\_ACEOF
 #define UNREAL 1
 _ACEOF
 
-	IRCD_FILES_INC="Unreal.h"
-	IRCD_FILES_SRC="Unreal.c"
-	IRCD_FILES_OBJS="Unreal.o"
+	IRCD_FILES_INC="protocol/unreal.h"
+	IRCD_FILES_SRC="protocol/unreal.c"
+	IRCD_FILES_OBJS="unreal.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6154,9 +6154,9 @@ cat >>confdefs.h <<\_ACEOF
 #define UNREAL32 1
 _ACEOF
 
-	IRCD_FILES_INC="Unreal.h"
-	IRCD_FILES_SRC="Unreal.c"
-	IRCD_FILES_OBJS="Unreal.o"
+	IRCD_FILES_INC="protocol/unreal.h"
+	IRCD_FILES_SRC="protocol/unreal.c"
+	IRCD_FILES_OBJS="unreal.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6182,9 +6182,9 @@ cat >>confdefs.h <<\_ACEOF
 #define ULTIMATE 1
 _ACEOF
 
-	IRCD_FILES_INC="Ultimate.h"
-	IRCD_FILES_SRC="Ultimate.c"
-	IRCD_FILES_OBJS="Ultimate.o"
+	IRCD_FILES_INC="protocol/ultimate.h"
+	IRCD_FILES_SRC="protocol/ultimate.c"
+	IRCD_FILES_OBJS="ultimate.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6215,9 +6215,9 @@ cat >>confdefs.h <<\_ACEOF
 #define ULTIMATE3 1
 _ACEOF
 
-	IRCD_FILES_INC="Ultimate.h"
-	IRCD_FILES_SRC="Ultimate.c"
-	IRCD_FILES_OBJS="Ultimate.o"
+	IRCD_FILES_INC="protocol/ultimate.h"
+	IRCD_FILES_SRC="protocol/ultimate.c"
+	IRCD_FILES_OBJS="ultimate.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6244,8 +6244,8 @@ cat >>confdefs.h <<\_ACEOF
 #define HYBRID7 1
 _ACEOF
 
-	IRCD_FILES_INC="hybrid7.h"
-	IRCD_FILES_SRC="hybrid7.c"
+	IRCD_FILES_INC="protocol/hybrid7.h"
+	IRCD_FILES_SRC="protocol/hybrid7.c"
 	IRCD_FILES_OBJS="hybrid7.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
@@ -6273,8 +6273,8 @@ cat >>confdefs.h <<\_ACEOF
 #define NEOIRCD 1
 _ACEOF
 
-	IRCD_FILES_INC="neoircd.h"
-	IRCD_FILES_SRC="neoircd.c"
+	IRCD_FILES_INC="protocol/neoircd.h"
+	IRCD_FILES_SRC="protocol/neoircd.c"
 	IRCD_FILES_OBJS="neoircd.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
@@ -6302,9 +6302,9 @@ cat >>confdefs.h <<\_ACEOF
 #define QUANTUM 1
 _ACEOF
 
-	IRCD_FILES_INC="QuantumIRCd.h"
-	IRCD_FILES_SRC="QuantumIRCd.c"
-	IRCD_FILES_OBJS="QuantumIRCd.o"
+	IRCD_FILES_INC="protocol/quantum.h"
+	IRCD_FILES_SRC="protocol/quantum.c"
+	IRCD_FILES_OBJS="quantum.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6330,8 +6330,8 @@ cat >>confdefs.h <<\_ACEOF
 #define MYSTIC 1
 _ACEOF
 
-	IRCD_FILES_INC="mystic.h"
-	IRCD_FILES_SRC="mystic.c"
+	IRCD_FILES_INC="protocol/mystic.h"
+	IRCD_FILES_SRC="protocol/mystic.c"
 	IRCD_FILES_OBJS="mystic.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
@@ -6358,9 +6358,9 @@ cat >>confdefs.h <<\_ACEOF
 #define BAHAMUT 1
 _ACEOF
 
-	IRCD_FILES_INC="Bahamut.h"
-	IRCD_FILES_SRC="Bahamut.c"
-	IRCD_FILES_OBJS="Bahamut.o"
+	IRCD_FILES_INC="protocol/bahamut.h"
+	IRCD_FILES_SRC="protocol/bahamut.c"
+	IRCD_FILES_OBJS="bahamut.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6386,9 +6386,9 @@ cat >>confdefs.h <<\_ACEOF
 #define IRCU 1
 _ACEOF
 
-	IRCD_FILES_INC="Ircu.h"
-	IRCD_FILES_SRC="Ircu.c"
-	IRCD_FILES_OBJS="Ircu.o"
+	IRCD_FILES_INC="protocol/ircu.h"
+	IRCD_FILES_SRC="protocol/ircu.c"
+	IRCD_FILES_OBJS="ircu.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6414,9 +6414,9 @@ cat >>confdefs.h <<\_ACEOF
 #define LIQUID 1
 _ACEOF
 
-	IRCD_FILES_INC="liquidircd.h"
-	IRCD_FILES_SRC="liquidircd.c"
-	IRCD_FILES_OBJS="liquidircd.o"
+	IRCD_FILES_INC="protocol/liquid.h"
+	IRCD_FILES_SRC="protocol/liquid.c"
+	IRCD_FILES_OBJS="liquid.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6443,9 +6443,9 @@ cat >>confdefs.h <<\_ACEOF
 #define VIAGRA 1
 _ACEOF
 
-	IRCD_FILES_INC="Viagra.h"
-	IRCD_FILES_SRC="Viagra.c"
-	IRCD_FILES_OBJS="Viagra.o"
+	IRCD_FILES_INC="protocol/viagra.h"
+	IRCD_FILES_SRC="protocol/viagra.c"
+	IRCD_FILES_OBJS="viagra.o"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6464,15 +6464,7 @@ do_serviceroots=no
 echo "$as_me:$LINENO: checking A compatible IRCD is specified" >&5
 echo $ECHO_N "checking A compatible IRCD is specified... $ECHO_C" >&6
 case "$IRCD_FILES_SRC" in
-   "Ultimate.c")
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-   "Unreal.c")
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-   "hybrid7.c")
+   "protocol/hybrid7.c")
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	echo "$as_me:$LINENO: checking Auto-Enabling ServiceRoots Authentication Module" >&5
@@ -6489,31 +6481,7 @@ _ACEOF
 	echo "$as_me:$LINENO: result: OK" >&5
 echo "${ECHO_T}OK" >&6
 	;;
-   "mystic.c")
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-   "QuantumIRCd.c")
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-   "Bahamut.c")
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-   "Ircu.c")
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-   "neoircd.c")
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-   "liquidircd.c")
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-   "Viagra.c")
+   protocol*)
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -6749,7 +6717,6 @@ fi
 cat >>confdefs.h <<\_ACEOF
 #define POSIX_MALLOC_THRESHOLD 10
 _ACEOF
-
 
 
 

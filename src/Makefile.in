@@ -4,13 +4,6 @@ include Makefile.inc
 NEOCFLAGS = $(CFLAGS)
 EXTRA_LDFLAGS = `curl/mycurl-config --libs`
 
-PROGS = neostats cronchk makeconf
-CONF = neostats.motd
-DOCS = doc/FAQ doc/USERMAN README BUGS AUTHORS COPYING CREDITS TODO \
-		ChangeLog doc/README.* dl/modules.txt RELNOTES INSTNOTES doc/old/*
-DOCS_PROGS = doc/read-faq doc/read-userman
-DATA = data/tlds.nfo
-
 PCRE_OBJS = pcre/pcre.o pcre/get.o pcre/study.o
 ADNS_OBJS =	adns/check.o adns/event.o adns/general.o adns/parse.o adns/query.o \
 		adns/reply.o adns/setup.o adns/transmit.o adns/types.o
@@ -22,8 +15,9 @@ SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
 		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
 		support.c ircstring.c commands.c transfer.c exclude.c match.c bans.c \
 		@IRCD_FILES_SRC@
-IRCDSRC = Ultimate.c Unreal.c hybrid7.c neoircd.c Bahamut.c \
-		Ircu.c mystic.c QuantumIRCd.c liquidircd.c Viagra.c
+IRCDSRC = protocol/ultimate.c protocol/unreal.c protocol/hybrid7.c protocol/neoircd.c \
+		protocol/bahamut.c protocol/ircu.c protocol/mystic.c protocol/quantum.c \
+		protocol/liquid.c protocol/viagra.c
 IRCDINC = ${IRCDSRC:.c=.h}
 
 INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h neostats.h \
@@ -31,20 +25,18 @@ INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h neostats.h \
 		transfer.h
 COREINCS = dns.h services.h sock.h ircd.h exclude.h \
 		ns_help.h timer.h users.h chans.h server.h bans.h
-BUILDFILES = configure config.sub config.guess *.in \
-		dl/Makefile dl/Makefile.inc.in install-sh Config makeconf cronchk
+BUILDFILES = *.in modules/Makefile modules/Makefile.inc.in
 
 DISTFILES = $(INCLUDES) $(COREINCS) $(SRCS) $(IRCDSRC) $(IRCDINC) \
-		$(BUILDFILES) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF)	
+		$(BUILDFILES) 
  
-SUBDIRS = doc doc/old data logs tools 
 DISTLIBS = adns pcre curl sqlsrv keeper
-DISTMOD = cs extauth hostserv loveserv ms statserv template
+DISTMOD = connectserv extauth hostserv loveserv moraleserv statserv template
 
 all: @buildsqlsrv@ libadns libkeeper libpcre libcurl.a neostats modules utils 
 
 modules:
-	(cd dl; $(MAKE) $@)
+	(cd modules; $(MAKE) $@)
 
 libadns:
 	(cd adns; $(MAKE))
@@ -78,94 +70,56 @@ neostats: buildversion $(OBJS)
 	$(CC) -MM $(NEOINCLUDES) -c $< > $*.d
 
 clean:
-	(cd dl; $(MAKE) $@)
+	(cd modules; $(MAKE) $@)
 	(cd adns; $(MAKE) $@)
 	(cd keeper; $(MAKE) $@)
 	(cd tools; $(MAKE) $@)
 	(cd pcre; $(MAKE) $@)
 	(cd curl; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
-	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc dl/Makefile.inc *.log *.a *.d *.exe version.h
+	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc modules/Makefile.inc *.log *.a *.d *.exe version.h
 
 distclean:
-	(cd dl; $(MAKE) $@)
+	(cd modules; $(MAKE) $@)
 	(cd adns; $(MAKE) $@)
 	(cd keeper; $(MAKE) $@)
 	(cd tools; $(MAKE) $@)
 	(cd pcre; $(MAKE) $@)
 	(cd curl; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
-	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc dl/Makefile.inc *.log *.a *.d *.exe config.status version.h
+	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc modules/Makefile.inc *.log *.a *.d *.exe config.status version.h
 
 install: neostats
-	@echo "Installing ..."
-	@$(RM) @prefix@/dl/cs.so
-	@$(RM) @prefix@/dl/ms.so
-	@$(RM) @prefix@/dl/SecureServ.so
-	@$(RM) @prefix@/include/*.h
-	$(INSTALL) -m 755 -d @prefix@
-	$(INSTALL) -m 755 -d @prefix@/dl
-	$(INSTALL) -m 755 -d @prefix@/include
-	$(INSTALL) -m 755 -d @prefix@/doc
-	$(INSTALL) -m 755 -d @prefix@/data
-	$(INSTALL) -m 750 -d @prefix@/logs
-	$(INSTALL) -m 755 $(PROGS) @prefix@
-	$(INSTALL_DATA) $(CONF) @prefix@
-	$(INSTALL_DATA) $(DOCS) @prefix@/doc
-	$(INSTALL) -m 755 $(DOCS_PROGS) @prefix@/doc
-	$(INSTALL_DATA) $(DATA) @prefix@/data
 	$(INSTALL_DATA) $(INCLUDES) @prefix@/include
 	$(INSTALL_DATA) version.h @prefix@/include
 	$(INSTALL_DATA) @IRCD_FILES_INC@ @prefix@/include
 	(cd adns; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
-	(cd dl; $(MAKE) $@)
+	(cd modules; $(MAKE) $@)
 	(cd tools; $(MAKE) $@)
-	@echo "Done."
-	@cat INSTNOTES 
-	@if test -f INSTNOTES.svn ; then cat INSTNOTES.svn ; fi 
 
 dist: 	
-	@echo -n "Creating Directories"
-	@$(RM) $(DISTDIR)
-	@echo -n "."
-	@mkdir $(DISTDIR)
-	@echo -n "."
-	@mkdir $(DISTDIR)/dl
-	@echo -n "."
-	@for subdir in $(SUBDIRS); do \
-		echo -n "."; \
-		mkdir $(DISTDIR)/$$subdir; \
-		chmod 777 $(DISTDIR)/$$subdir; \
-	done
-	@echo "Done"
-	@echo -n "Copying Core Distribution files"
 	@for file in $(DISTFILES); do \
 		echo -n "."; \
-		cp -pr $$file $(DISTDIR)/$$file; \
+		cp -pr $$file ../$(DISTDIR)/src/$$file; \
 	done
-	@$(RM) $(DISTDIR)/config.h
-	@$(RM) $(DISTDIR)/configure.in
 	@echo "Done"
 	@echo "Copying Library Distribution files"
 	@for subdir in $(DISTLIBS); do \
-		mkdir $(DISTDIR)/$$subdir; \
-		chmod 777 $(DISTDIR)/$$subdir; \
-		(cd $$subdir && $(MAKE) dist DISTDIR=../$(DISTDIR)/$$subdir && cd ..) || exit 1; \
+		mkdir ../$(DISTDIR)/src/$$subdir; \
+		chmod 777 ../$(DISTDIR)/src/$$subdir; \
+		(cd $$subdir && $(MAKE) dist DISTDIR=../../$(DISTDIR)/src/$$subdir && cd ..) || exit 1; \
 	done
 	@echo "Done"
 	@echo "Copying Tools Distribution files"
-	@(cd tools && $(MAKE) dist DISTDIR=../$(DISTDIR)/tools && cd ..) || exit 1;
+	@(cd tools && $(MAKE) dist DISTDIR=../../$(DISTDIR)/src/tools && cd ..) || exit 1;
 	@echo "Done"
 	@echo "Copying Module Distribution files"
 	@for mod in $(DISTMOD); do \
-		mkdir $(DISTDIR)/dl/$$mod; \
-		(cd dl/$$mod && $(MAKE) dist DISTDIR=../../$(DISTDIR)/dl/$$mod && cd ../..) || exit 1; \
+		mkdir ../$(DISTDIR)/src/modules/$$mod; \
+		(cd modules/$$mod && $(MAKE) dist DISTDIR=../../../$(DISTDIR)/src/modules/$$mod && cd ../..) || exit 1; \
 	done
 	@echo "Done"
-	@tar -czf $(DISTDIR).tar.gz $(DISTDIR)/*
-#	@$(RM) $(DISTDIR)
-	@echo "Tar file $(DISTDIR).tar.gz created. Freshmeat time!"
 
 # Catch any changes in compilation options at the top of this file
 $(OBJS): Makefile Makefile.inc

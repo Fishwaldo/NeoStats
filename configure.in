@@ -181,9 +181,9 @@ AC_ARG_ENABLE(unreal31, [ --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
-	IRCD_FILES_INC="Unreal.h"
-	IRCD_FILES_SRC="Unreal.c"
-	IRCD_FILES_OBJS="Unreal.o"
+	IRCD_FILES_INC="protocol/unreal.h"
+	IRCD_FILES_SRC="protocol/unreal.c"
+	IRCD_FILES_OBJS="unreal.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -197,9 +197,9 @@ AC_ARG_ENABLE(unreal32, [ --enable-unreal32 - enable Unreal 3.2.x IRCD Support],
   yes)  
 	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
 	AC_DEFINE(UNREAL32, 1, 'Enable Unreal 3.2.x Support')
-	IRCD_FILES_INC="Unreal.h"
-	IRCD_FILES_SRC="Unreal.c"
-	IRCD_FILES_OBJS="Unreal.o"
+	IRCD_FILES_INC="protocol/unreal.h"
+	IRCD_FILES_SRC="protocol/unreal.c"
+	IRCD_FILES_OBJS="unreal.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -214,9 +214,9 @@ AC_ARG_ENABLE(ultimate2, [ --enable-ultimate2 - enable Ultimate 2.x.x IRCD Suppo
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate Support')
-	IRCD_FILES_INC="Ultimate.h"
-	IRCD_FILES_SRC="Ultimate.c"
-	IRCD_FILES_OBJS="Ultimate.o"
+	IRCD_FILES_INC="protocol/ultimate.h"
+	IRCD_FILES_SRC="protocol/ultimate.c"
+	IRCD_FILES_OBJS="ultimate.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -231,9 +231,9 @@ AC_ARG_ENABLE(ultimate3, [ --enable-ultimate3 - enable Ultimate 3.x.x IRCD Suppo
   yes)  
 	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate 2.x.x Support')
 	AC_DEFINE(ULTIMATE3, 1, "Enable Ultimate 3.x.x Support')
-	IRCD_FILES_INC="Ultimate.h"
-	IRCD_FILES_SRC="Ultimate.c"
-	IRCD_FILES_OBJS="Ultimate.o"
+	IRCD_FILES_INC="protocol/ultimate.h"
+	IRCD_FILES_SRC="protocol/ultimate.c"
+	IRCD_FILES_OBJS="ultimate.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -248,8 +248,8 @@ AC_ARG_ENABLE(hybrid7, [ --enable-hybrid7 - enable Hybrid7 IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(HYBRID7, 1, 'Enable hybrid7 IRCD support')
-	IRCD_FILES_INC="hybrid7.h"
-	IRCD_FILES_SRC="hybrid7.c"
+	IRCD_FILES_INC="protocol/hybrid7.h"
+	IRCD_FILES_SRC="protocol/hybrid7.c"
 	IRCD_FILES_OBJS="hybrid7.o"
 	AC_MSG_RESULT(yes)
 	;;
@@ -265,8 +265,8 @@ AC_ARG_ENABLE(neoircd, [ --enable-neoircd - enable NeoIRCd IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(NEOIRCD, 1, 'Enable NeoIRCd IRCD support')
-	IRCD_FILES_INC="neoircd.h"
-	IRCD_FILES_SRC="neoircd.c"
+	IRCD_FILES_INC="protocol/neoircd.h"
+	IRCD_FILES_SRC="protocol/neoircd.c"
 	IRCD_FILES_OBJS="neoircd.o"
 	AC_MSG_RESULT(yes)
 	;;
@@ -283,9 +283,9 @@ AC_ARG_ENABLE(quantum, [ --enable-quantum - enable Quantum IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(QUANTUM, 1, 'Enable Quantum Support')
-	IRCD_FILES_INC="QuantumIRCd.h"
-	IRCD_FILES_SRC="QuantumIRCd.c"
-	IRCD_FILES_OBJS="QuantumIRCd.o"
+	IRCD_FILES_INC="protocol/quantum.h"
+	IRCD_FILES_SRC="protocol/quantum.c"
+	IRCD_FILES_OBJS="quantum.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -300,8 +300,8 @@ AC_ARG_ENABLE(mystic, [ --enable-mystic - enable Mystic IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(MYSTIC, 1, 'Enable Mystic Support')
-	IRCD_FILES_INC="mystic.h"
-	IRCD_FILES_SRC="mystic.c"
+	IRCD_FILES_INC="protocol/mystic.h"
+	IRCD_FILES_SRC="protocol/mystic.c"
 	IRCD_FILES_OBJS="mystic.o"
 	AC_MSG_RESULT(yes)
 	;;
@@ -317,9 +317,9 @@ AC_ARG_ENABLE(bahamut, [ --enable-bahamut - enable Bahamut IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(BAHAMUT, 1, 'Enable Bahamut Support')
-	IRCD_FILES_INC="Bahamut.h"
-	IRCD_FILES_SRC="Bahamut.c"
-	IRCD_FILES_OBJS="Bahamut.o"
+	IRCD_FILES_INC="protocol/bahamut.h"
+	IRCD_FILES_SRC="protocol/bahamut.c"
+	IRCD_FILES_OBJS="bahamut.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -335,9 +335,9 @@ AC_ARG_ENABLE(ircu, [ --enable-ircu - enable IRCu IRCD Support],
   yes)  
 dnl	AC_MSG_ERROR('Sorry IRCu support isnt complete yet')
 	AC_DEFINE(IRCU, 1, 'Enable IRCu Support')
-	IRCD_FILES_INC="Ircu.h"
-	IRCD_FILES_SRC="Ircu.c"
-	IRCD_FILES_OBJS="Ircu.o"
+	IRCD_FILES_INC="protocol/ircu.h"
+	IRCD_FILES_SRC="protocol/ircu.c"
+	IRCD_FILES_OBJS="ircu.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -352,9 +352,9 @@ AC_ARG_ENABLE(liquid, [ --enable-liquid - enable Liquid IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(LIQUID, 1, 'Enable Liquid IRCd Support')
-	IRCD_FILES_INC="liquidircd.h"
-	IRCD_FILES_SRC="liquidircd.c"
-	IRCD_FILES_OBJS="liquidircd.o"
+	IRCD_FILES_INC="protocol/liquid.h"
+	IRCD_FILES_SRC="protocol/liquid.c"
+	IRCD_FILES_OBJS="liquid.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -370,9 +370,9 @@ AC_ARG_ENABLE(viagra, [ --enable-viagra - enable Viagra IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(VIAGRA, 1, 'Enable Viagra IRCd Support')
-	IRCD_FILES_INC="Viagra.h"
-	IRCD_FILES_SRC="Viagra.c"
-	IRCD_FILES_OBJS="Viagra.o"
+	IRCD_FILES_INC="protocol/viagra.h"
+	IRCD_FILES_SRC="protocol/viagra.c"
+	IRCD_FILES_OBJS="viagra.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -385,13 +385,7 @@ AC_MSG_RESULT(no)
 do_serviceroots=no
 AC_MSG_CHECKING(A compatible IRCD is specified)
 case "$IRCD_FILES_SRC" in 
-   "Ultimate.c")
-	AC_MSG_RESULT(yes)
-	;;
-   "Unreal.c")
-	AC_MSG_RESULT(yes)
-	;;
-   "hybrid7.c")
+   "protocol/hybrid7.c")
 	AC_MSG_RESULT(yes)
 	AC_MSG_CHECKING(Auto-Enabling ServiceRoots Authentication Module)
 	do_serviceroots=yes
@@ -401,25 +395,7 @@ case "$IRCD_FILES_SRC" in
 	MODULES="$MODULES extauth"
 	AC_MSG_RESULT(OK)
 	;;
-   "mystic.c")
-	AC_MSG_RESULT(yes)
-	;;
-   "QuantumIRCd.c")
-	AC_MSG_RESULT(yes)
-	;;
-   "Bahamut.c")
-	AC_MSG_RESULT(yes)
-	;;
-   "Ircu.c")
-	AC_MSG_RESULT(yes)
-	;;
-   "neoircd.c")
-	AC_MSG_RESULT(yes)
-	;;
-   "liquidircd.c")
-	AC_MSG_RESULT(yes)
-	;;
-   "Viagra.c")
+   protocol*)
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -556,7 +532,6 @@ AC_DEFINE(POSIX_MALLOC_THRESHOLD,10)
 AC_SUBST(POSIX_MALLOC_THRESHOLD)
 AC_SUBST(UTF8)
 
-AC_SUBST(IRCD_FILES_SRC)
 AC_SUBST(IRCD_FILES_SRC)
 AC_SUBST(IRCD_FILES_OBJS)
 AC_SUBST(IRCD_FILES_INC)

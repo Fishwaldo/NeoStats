@@ -1,6 +1,6 @@
 SRCS = hostserv.c hs_help.c
 TARGET = hostserv.so
-DISTFILES = $(SRCS) hostserv.h Makefile ChangeLog
+DISTFILES = $(SRCS) hostserv.h Makefile
 
 include ../Makefile.inc
 
