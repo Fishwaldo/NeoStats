@@ -885,3 +885,21 @@ FreeUsers ()
 	hash_destroy(uh);
 	hash_destroy(ch);
 }
+
+void QuitServerUsers (Server* s)
+{
+	User *u;
+	hnode_t *un;
+	hscan_t hs;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin(&hs, uh);
+	while ((un = hash_scan_next(&hs)) != NULL) {
+		u = hnode_get (un);
+		if(u->server == s) 
+		{
+			nlog (LOG_DEBUG1, LOG_CORE, "QuitServerUsers: deleting %s for %s", u->nick, s->name);
+			DelUser(u->nick, 0, s->name);
+		}
+	}
+}

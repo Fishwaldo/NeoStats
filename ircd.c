@@ -1028,6 +1028,11 @@ do_protocol (char *origin, char **argv, int argc)
 			ircd_srv.unkline = 1;
 		}
 #endif
+#ifdef GOTNOQUITSUPPORT
+		if (!ircstrcasecmp ("NOQUIT", argv[i])) {
+			ircd_srv.noquit = 1;
+		}
+#endif
 	}
 }
 

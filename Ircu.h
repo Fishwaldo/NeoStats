@@ -43,6 +43,7 @@
 /* The following defines might not be correct for IRCu but are used to 
  * ensure NeoStats compiles correctly until we get updated files */
 
+#define GOTNOQUITSUPPORT
 /* we support tokens */
 #define GOTTOKENSUPPORT
 /* we don't have sjoin */

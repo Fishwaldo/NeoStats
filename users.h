@@ -42,5 +42,6 @@ void FreeUsers();
 #ifdef BASE64NICKNAME
 User *finduserbase64 (const char *num);
 #endif
+void QuitServerUsers (Server* s);
 
 #endif /* _USERS_H_ */
