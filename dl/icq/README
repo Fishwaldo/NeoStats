@@ -1,0 +1,70 @@
+ICQServ 1.0 Beta 1 
+------------------
+
+Welcome to the first Public Beta of ICQServ. Its still work in progress, but
+it does have some basic functionality built into it. 
+
+This Module is now being distributed with the core NeoStats software.
+
+Installation!
+-------------
+
+You have to enable it at build time, so you should use the following
+configure option --enable-icq.
+
+Currently, you have to use a already existing ICQ UIN number. If you want
+a ICQ user specifically for your network, then register a new User using
+your normal ICQ client. Make sure you take note of the UIN and password. You
+should also setup any details (like Descriptions, etc) now as well.
+
+Once you have created a new UIN, edit stats.cfg and place your UIN and
+password in the required fields. you may also want to find a ICQ server that
+is closer to you than the one that is listed. If you want ICQServ to load
+when you run NeoStats at boot time, then make sure you also uncomment the
+"LOAD_MODULE icqserv" line.
+
+Operation
+---------
+
+Currently, there are only 2 commands supported from IRC (the help isn't done
+yet, so just ignore the Help messages!)
+
+for Normal Users:
+/msg icqserv send <uin> <message>
+send a message from Irc to the ICQ UIN. No Comfirmation is given to you that
+the message was successfully delievered.
+
+for Coders (+1):
+/msg icqserv debug
+Changes the ammount of Information sent to the Services Channel.
+
+When ICQServ starts, no bot will join the Services Channel until it has
+successfully joined the ICQ network. if its not joining the Channel, check
+your uin and password. More debuging information is planned for future
+versions to help you out here :)
+
+You can also Send messages to IRC users from ICQ. its simple :)
+just in your message type "send <nick> <message>"
+Currently the nick is Case sensitive, that will be fixed in future versions
+as well
+
+TODO:
+-----
+A lot!
+- Have a database of nicks to UIN's, so you can /msg icqserv send fish
+hello would look up my UIN and then send it over.... this would require
+users to register there UIN with icqserv.
+- Ignore Support.... have a Ignore List of UIN's that particular users on
+IRC don't want to recieve messages for. 
+- Ban Support - A list of UINs that messages are not  allowed to be sent to.
+- Self Registration. Unconfigured ICQServ can automatically register a new
+UIN on the icq network. (maybe)
+- Flood Support. Stop users flooding ICQ users (or Visa Versa) with
+messages.
+
+CONTACT:
+--------
+Do you like ICQServ? got a question? Just want to say "Hi". I can be reached
+at fish@dynam.ac, or UIN 556010. I also hang out on irc.global-irc.net or
+irc.dynam.ac when I'm not in foriegn countries :)
+

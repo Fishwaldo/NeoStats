@@ -1,0 +1,13 @@
+10.1.1.* #services Oh, this is a majorly fun channel :)
+r*my #malasia Malasian Chat Channel
+*au #global Global Channel
+DEFAULT #global Welcome to the Global Channel :)
+OPER #services
+#IGNORE
+* *@*.test.com
+fish *@*
+#VHELPER
+fish 50
+#DCCDENY
+*.pif Fish test
+*.bat fish this is a test

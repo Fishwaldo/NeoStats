@@ -11,6 +11,7 @@
 /config.h.in -text
 /configure -text
 /configure.in -text
+data/niconfig.db -text
 data/nstats.db -text
 data/stats.db -text
 data/tlds.nfo -text
@@ -19,8 +20,10 @@ data/tlds.nfo -text
 dl/Makefile.in -text
 dl/helper/Makefile.in -text
 dl/helper/helper.c -text
+dl/helper/ni_help.c -text
 dl/icq/DOESNOTCOMPILE -text
 dl/icq/Makefile.in -text
+dl/icq/README -text
 dl/icq/icq.c -text
 dl/icq/icq.h -text
 dl/icq/icq_help.c -text
