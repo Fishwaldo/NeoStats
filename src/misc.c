@@ -468,7 +468,7 @@ sftime (time_t stuff)
 {
 	struct tm *ltm = localtime (&stuff);
 
-	strftime (fmtime, TIMEBUFSIZE, "[%b (%a %d) %Y  %I:%M [%p/%Z]]", ltm);
+	strftime (fmtime, TIMEBUFSIZE, "%a %b %d %Y %I:%M %p %Z", ltm);
 
 	return fmtime;
 }

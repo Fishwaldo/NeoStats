@@ -70,7 +70,15 @@ int sys_check_create_dir (const char* dirname)
 
 FILE_HANDLE sys_file_open (const char * filename, int filemode)
 {
-	return fopen (filename, "a");
+	switch (filemode) 
+	{ 
+		case FILE_MODE_APPEND:
+			return fopen (filename, "a");
+			break;
+		default:
+			break;
+	}
+	return fopen (filename, "r");
 }
 
 int sys_file_close (FILE_HANDLE handle)
@@ -103,6 +111,47 @@ int sys_file_write (const void *buffer, size_t size, size_t count, FILE_HANDLE h
 int sys_file_flush (FILE_HANDLE handle)
 {
 	return fflush (handle);
+}
+
+int sys_file_rename (const char* oldname, const char* newname)
+{
+	/*  WIN32 does not allow rename if the file exists 
+	 *  Behaviour is undefined on various systems so maybe
+	 *  we should remove on all platforms?
+	 */
+#ifdef WIN32
+	remove (newname);
+#endif
+	return rename (oldname, newname);
+}
+
+char* sys_file_get_last_error_string (void)
+{
+	return strerror (errno);
+}
+
+int sys_file_get_last_error (void)
+{
+	return errno;
+}
+
+int sys_file_get_size (const char* filename)
+{
+	struct stat st;
+	int res;
+
+	res = stat(filename, &st);
+	if (res != 0) {
+		if (sys_file_get_last_error () == ENOENT) {
+			/* wtf, this is bad */
+			nlog (LOG_CRITICAL, "No such file: %s", filename);
+			return -1;
+		} else {
+			nlog (LOG_CRITICAL, "File error: %s", sys_file_get_last_error ());
+			return -1;
+		}
+	}
+	return st.st_size;
 }
 
 int sys_sock_close (SYS_SOCKET sock)
@@ -146,3 +195,12 @@ int sys_sock_set_nonblocking (SYS_SOCKET s)
 #endif
 }
 
+size_t sys_strftime (char *strDest, size_t maxsize, const char *format, const struct tm *timeptr)
+{
+	return strftime (strDest, maxsize, format, timeptr);
+}
+
+struct tm* sys_localtime (const time_t *timer)
+{
+	return localtime (timer);
+}

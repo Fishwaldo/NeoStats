@@ -224,6 +224,12 @@ const char *ns_help_status[] = {
 	NULL
 };
 
+const char *ns_help_set_joinserviceschan[] = {
+	"\2JOINSERVICECHAN <on/off>\2",
+	"Set ping interval at which NeoStats pings servers",
+	NULL
+};
+
 const char *ns_help_set_pingtime[] = {
 	"\2PINGTIME <seconds>\2",
 	"Set ping interval at which NeoStats pings servers",

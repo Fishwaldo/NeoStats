@@ -1262,6 +1262,13 @@ EXPORTFUNC int sys_file_printf (FILE_HANDLE handle, char *fmt, ...) __attribute_
 EXPORTFUNC int sys_file_read (const void *buffer, size_t size, size_t count, FILE_HANDLE handle);
 EXPORTFUNC int sys_file_write (const void *buffer, size_t size, size_t count, FILE_HANDLE handle);
 EXPORTFUNC int sys_file_flush (FILE_HANDLE handle);
+EXPORTFUNC int sys_file_rename (const char* oldname, const char* newname);
+EXPORTFUNC char* sys_file_get_last_error_string (void);
+EXPORTFUNC int sys_file_get_last_error (void);
+EXPORTFUNC size_t sys_strftime (char *strDest, size_t maxsize, const char *format, const struct tm *timeptr);
+EXPORTFUNC struct tm* sys_localtime (const time_t *timer);
+EXPORTFUNC int sys_file_get_size (const char* filename);
+
 
 /* Socket functions */
 #ifdef WIN32

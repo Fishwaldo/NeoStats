@@ -272,16 +272,16 @@ list_timers (CmdParams* cmdparams)
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source, "Module timer List:");
+	irc_prefmsg (ns_botptr, cmdparams->source, "Timer List:");
 	hash_scan_begin (&ts, timerhash);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
 		timer = hnode_get (tn);
-		irc_prefmsg (ns_botptr, cmdparams->source, "%s:--------------------------------", timer->moduleptr->info->name);
-		irc_prefmsg (ns_botptr, cmdparams->source, "Module Timer Name: %s", timer->name);
-		irc_prefmsg (ns_botptr, cmdparams->source, "Module Interval: %d", timer->interval);
-		irc_prefmsg (ns_botptr, cmdparams->source, "Time till next Run: %ld", (long)(timer->interval - (me.now - timer->lastrun)));
+		irc_prefmsg (ns_botptr, cmdparams->source, "%s:", timer->moduleptr->info->name);
+		irc_prefmsg (ns_botptr, cmdparams->source, "Timer: %s", timer->name);
+		irc_prefmsg (ns_botptr, cmdparams->source, "Interval: %d", timer->interval);
+		irc_prefmsg (ns_botptr, cmdparams->source, "Next run in: %ld", (long)(timer->interval - (me.now - timer->lastrun)));
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source, "End of Module timer List");
+	irc_prefmsg (ns_botptr, cmdparams->source, "End of list");
 	return 0;
 }
 

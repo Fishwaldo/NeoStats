@@ -143,14 +143,14 @@ static int ls_rose(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
-		return 0;
+		return NS_FAILURE;
 	}
 	irc_prefmsg(ls_bot, cmdparams->source,  
 		"Rose has been sent to %s", target->name);
 	irc_prefmsg(ls_bot, target, 
 		"%s has sent you this beautiful rose! 3--<--<--<{4@",
 		cmdparams->source->name);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ls_kiss(CmdParams* cmdparams)
@@ -160,12 +160,12 @@ static int ls_kiss(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
-		return 0;
+		return NS_FAILURE;
 	}
 	irc_prefmsg(ls_bot, cmdparams->source,  
 		"You have virtually kissed %s", target->name);
 	irc_prefmsg(ls_bot, target,  "%s has virtually kissed you!", cmdparams->source->name);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ls_tonsil(CmdParams* cmdparams)
@@ -175,14 +175,14 @@ static int ls_tonsil(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
-		return 0;
+		return NS_FAILURE;
 	}
 	irc_prefmsg(ls_bot, cmdparams->source, 
 		"You have virtually tonsil kissed %s", target->name);
 	irc_prefmsg(ls_bot, target, 
 		"%s would like to send a SLoW..LoNG..DeeP..PeNeTRaTiNG..ToNSiL-TiCKLiNG.. HaiR STRaiGHTeNiNG..Toe-CuRLiNG..NeRVe-JaNGLiNG..LiFe-aLTeRiNG.. FaNTaSY-CauSiNG..i JuST SaW GoD!..GoSH, DiD MY CLoTHeS FaLL oFF?.. YeS, i'M GLaD i CaMe oN iRC..KiSS oN Da LiPS!!!",
 		cmdparams->source->name);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ls_hug(CmdParams* cmdparams)
@@ -192,12 +192,12 @@ static int ls_hug(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
-		return 0;
+		return NS_FAILURE;
 	}
 	irc_prefmsg(ls_bot, cmdparams->source,  
 		"You have hugged %s", target->name);
 	irc_prefmsg(ls_bot, target,  "%s has sent you a *BIG WARM HUG*!", cmdparams->source->name);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ls_admirer(CmdParams* cmdparams)
@@ -207,12 +207,12 @@ static int ls_admirer(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
-		return 0;
+		return NS_FAILURE;
 	}
 	irc_prefmsg(ls_bot, cmdparams->source,  
 		"Secret admirer sent to %s", target->name);
 	irc_prefmsg(ls_bot, target,  "You have a secret admirer! ;)");
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ls_chocolate(CmdParams* cmdparams)
@@ -222,14 +222,14 @@ static int ls_chocolate(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
-		return 0;
+		return NS_FAILURE;
 	}
 	irc_prefmsg(ls_bot, cmdparams->source, 
 		"Cholocates sent to %s", target->name);
 	irc_prefmsg(ls_bot, target, 
 		"%s would like you to have this YUMMY box of chocolates!",
 		cmdparams->source->name);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ls_candy(CmdParams* cmdparams)
@@ -239,14 +239,14 @@ static int ls_candy(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
-		return 0;
+		return NS_FAILURE;
 	}
 	irc_prefmsg(ls_bot, cmdparams->source, 
 		"Candy sent to %s", target->name);
 	irc_prefmsg(ls_bot, target, 
 		"%s would like you to have this big YUMMY bag of heart shaped candies!",
 		cmdparams->source->name);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ls_lovenote(CmdParams* cmdparams)
@@ -257,7 +257,7 @@ static int ls_lovenote(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
-		return 0;
+		return NS_FAILURE;
 	}
 	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
 	irc_prefmsg(ls_bot, cmdparams->source,  
@@ -266,7 +266,7 @@ static int ls_lovenote(CmdParams* cmdparams)
 		"%s has sent you a love note which reads: \2%s\2", 
 		cmdparams->source->name, message);
 	ns_free(message);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ls_apology(CmdParams* cmdparams)
@@ -277,7 +277,7 @@ static int ls_apology(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
-		return 0;
+		return NS_FAILURE;
 	}
 	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
 	irc_prefmsg(ls_bot, cmdparams->source,  
@@ -286,7 +286,7 @@ static int ls_apology(CmdParams* cmdparams)
 		"%s is sorry, and would like to apologise for \2%s\2",
 		cmdparams->source->name, message);
 	ns_free(message);
-	return 1;
+	return NS_SUCCESS;
 }
 
 static int ls_thankyou(CmdParams* cmdparams)
@@ -297,7 +297,7 @@ static int ls_thankyou(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	target = find_valid_user(ls_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
-		return 0;
+		return NS_FAILURE;
 	}
 	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
 	irc_prefmsg(ls_bot, cmdparams->source,  
@@ -305,5 +305,5 @@ static int ls_thankyou(CmdParams* cmdparams)
 	irc_prefmsg(ls_bot, target,  "%s wishes to thank you for \2%s\2",
 		cmdparams->source->name, message);
 	ns_free(message);
-	return 1;
+	return NS_SUCCESS;
 }
