@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.22 2002/06/10 05:02:41 fishwaldo Exp $
+** $Id: chans.c,v 1.23 2002/06/10 06:03:13 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -197,7 +197,7 @@ void del_chan(Chans *c) {
 void part_chan(User *u, char *chan) {
 	Chans *c;
 	lnode_t *un;
-	EvntMsg EM;
+	EvntMsg *EM;
 	strcpy(segv_location, "part_chan");
 #ifdef DEBUG
 	log("Parting %s from %s", u->nick, chan);
@@ -232,9 +232,11 @@ void part_chan(User *u, char *chan) {
 		log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
 #endif
 		if (c->cur_users <= 0) {
-			EM.fndata[0] = c;
-			EM.fc = 1;
+			EM = malloc(sizeof(EvntMsg));
+			EM->fndata[0] = c;
+			EM->fc = 1;
 			Module_Event("DELCHAN", EM);
+			free(EM);
 			del_chan(c);
 		}
 		un = list_find(u->chans, c->name, comparef);
@@ -280,7 +282,7 @@ void join_chan(User *u, char *chan) {
 	Chans *c;
 	lnode_t *un, *cn;
 	Chanmem *cm;
-	EvntMsg EM;
+	EvntMsg *EM;
 	strcpy(segv_location, "join_chan");
 	if (!u) {
 		log("ehhh, Joining a Unknown user to %s: %s", chan, recbuf);
@@ -298,9 +300,11 @@ void join_chan(User *u, char *chan) {
 		c->modeparms = list_create(MAXMODES);
 		c->cur_users =0;
 		c->topictime = 0;
-		EM.fndata[0] = c;
-		EM.fc = 1;
+		EM = malloc(sizeof(EvntMsg));
+		EM->fndata[0] = c;
+		EM->fc = 1;
 		Module_Event("NEWCHAN", EM);
+		free(EM);
 	} 
 	/* add this users details to the channel members hash */	
 	cm = malloc(sizeof(Chanmem));

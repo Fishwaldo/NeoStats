@@ -143,10 +143,12 @@ struct EvntMsg_ {
 	char *origin;
 	int  isserv;
 	char *cmd;
+	char *data;
 	char **av;
 	int  ac;
-	void **fndata;
+	void *fndata[10];
 	int  fc;
+	int  canfree[10];
 };
 
 
@@ -255,9 +257,9 @@ extern void globops(char *, char *, ...);
 extern int flood(User *);
 extern int init_bot(char *, char *, char *, char *, char *,char *);
 extern int del_bot(char *, char *);
-extern void Module_Event(char *, EvntMsg EM);
+extern void Module_Event(char *, EvntMsg *EM);
 extern int bot_nick_change(char *, char *);
-extern EvntMsg split_buf(char *buf, int colon_special);
+extern EvntMsg *split_buf(char *buf, int colon_special);
 extern void FreeList(char **List,int C);
 
 

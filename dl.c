@@ -357,7 +357,7 @@ int load_module(char *path1, User *u) {
 	int do_msg;
 	char *path = NULL;
 	char p[255];
-	EvntMsg EM;
+	EvntMsg *EM;
 #ifndef DEBUG
 	char buf[512];
 	int fmode;
@@ -471,7 +471,9 @@ int load_module(char *path1, User *u) {
 	if (me.onchan == 1) {
 		while (event_fn_ptr->cmd_name != NULL ) {
 			if (!strcasecmp(event_fn_ptr->cmd_name, "ONLINE")) {
+				EM = malloc(sizeof(EvntMsg));
 				event_fn_ptr->function(EM);
+				free(EM);
 				break;
 			}
 			event_fn_ptr++;
