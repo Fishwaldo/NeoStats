@@ -1,6 +1,5 @@
-/* NetStats - IRC Statistical Services
-** Copyright (c) 1999 Adam Rutter, Justin Hammond
-** http://codeworks.kamserve.com
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
+** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
 *
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
@@ -26,9 +25,11 @@
 
 char s_Debug[MAXNICK] = "Stats_Debug";
 char s_Services[MAXNICK] = "NeoStats";
-const char version[] = "NeoStats-2.0.13";
+const char version[] = "NeoStats-2.5_Alpha1";
 const char version_date[] = __DATE__;
 const char version_time[] = __TIME__;
+
+void RemoveLock();
 
 static void start();
 static void setup_signals();
@@ -40,12 +41,14 @@ int main()
 	segv_location = sstrdup("main");
 	strcpy(segvinmodule, "");
 	me.onchan = 0;
+	printf("\n\n");
 	printf("%s Loading...\n", version);
 	printf("-----------------------------------------------\n");
-	printf("Copyright: NeoStats Group. 2000-2001\n");
+	printf("Copyright: NeoStats Group. 2000-2002\n");
 	printf("Justin Hammond (Fish@dynam.ac)\n");
-	printf("Adam Rutter (shmad@neostats.net)\n\n");
-	printf("-----------------------------------------------\n");
+	printf("Adam Rutter (shmad@neostats.net)\n");
+	printf("^Enigma^ (enigma@neostats.net)\n");
+	printf("-----------------------------------------------\n\n");
 	me.t_start = time(NULL);
 	me.want_privmsg = 0;
 	me.enable_spam = 0;
@@ -54,6 +57,8 @@ int main()
 	me.usesmo=0;
 	me.r_time=10;
 	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
+	RemoveLock();
+
 	__init_mod_list();
 	setup_signals();
 	ConfLoad();
@@ -95,15 +100,16 @@ RETSIGTYPE serv_die() {
 
 
 RETSIGTYPE conf_rehash() {
-	struct sigaction act;
+/*	struct sigaction act; */
 	notice(s_Services, "Recieved SIGHUP, Attempting to Rehash");
 	globops(me.name, "Received SIGHUP, Attempted to Rehash");
-	act.sa_handler = conf_rehash;
+/*	act.sa_handler = conf_rehash;
 	act.sa_flags=0;
 	(void)sigemptyset(&act.sa_mask);
 	(void)sigaddset(&act.sa_mask, SIGHUP);
 	(void)sigaction(SIGHUP, &act, NULL);
-
+*/
+	globops(me.name, "REHASH not completed in this version!");
 
 
 	/* gotta do the rehash code dun I? */
@@ -168,6 +174,29 @@ static	void	setup_signals()
 	(void)signal(SIGHUP, conf_rehash);
 	(void)signal(SIGTERM, serv_die); 
 	(void)signal(SIGSEGV, serv_segv);
+}
+
+
+/* Routine For Removing Chmod Lock On Modules */
+void RemoveLock()
+{
+	FILE *lckfile;
+	char buf[512];
+	int fmode;
+
+	segv_location = sstrdup("main_RemoveLock");
+
+	lckfile = fopen("data/Lock.db", "r");
+
+	if (lckfile) {
+	   while (fgets(buf, sizeof(buf), lckfile)) {
+		   buf[strlen(buf)] = '\0';
+	   fmode = 0755;
+	   chmod(buf, fmode);
+	   }
+	fclose(lckfile);
+	remove("data/Lock.db");
+	}
 }
 
 
@@ -261,8 +290,13 @@ unsigned long HASH(const unsigned char *name, int size_of_table)
 
 char *strlower(char *s)
 {
-	char *t = s;
+/*	char *t = s;
 	while ((*t++ = tolower(*t)))
-		;
-	return s;
+		;  */ 
+
+	char *t = s; 
+	while (*t)
+	*t++ = tolower (*t);
+return s;
 }
+

@@ -1,11 +1,12 @@
-/* NetStats - IRC Statistical Services
-** Copyright (c) 1999 Adam Rutter, Justin Hammond
-** http://codeworks.kamserve.com
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2001 NeoStats Group Inc.
+** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
 *
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
-** NetStats CVS Identification
-** $Id: stats.h,v 1.16 2002/02/27 16:36:40 fishwaldo Exp $
+** NeoStats Identification:
+** ID:      stats.h, 
+** Version: 1.11
+** Date:    17/11/2001
 */
 
 #ifndef STATS_H
@@ -97,6 +98,7 @@ struct me {
 	int action;
 	char message[BUFSIZE];
 	char chan[BUFSIZE];
+	char roots[BUFSIZE];
 	unsigned int onchan : 1;
 	unsigned int usesmo : 1;
 	Server *s;

@@ -1,7 +1,13 @@
-/*
- * dl.c
- * dynamic runtime library loading routines
- */
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
+** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
+*
+** Dynamic Runtime Library Loading Routines
+*
+** NeoStats Identification:
+** ID:      dl.c, 
+** Version: 2.1
+** Date:    13/1/2002
+*/
 
 #include <dlfcn.h>
 #include <stdio.h>
@@ -10,6 +16,7 @@
 #include "dl.h"
 #include "stats.h"
 #include "config.h"
+
 
 Module *module_list;
 LD_Path *ld_path_list;
@@ -60,9 +67,9 @@ void __init_mod_list() {
 	}
 	bzero((char *)Socket_lists, sizeof(Socket_lists));
 /* Shmad */
-        free(u);
-        free(t);
-        free(s);
+		free(u);
+		free(t);
+		free(s);
 };
 
 int add_ld_path(char *path) {
@@ -84,6 +91,7 @@ int add_ld_path(char *path) {
 	return 0;
 }
 static void add_timer_to_hash_table(char *timer_name, Mod_Timer *t) {
+	segv_location = sstrdup("add_timer_to_hash_table");
 	t->hash = HASH(timer_name, T_TABLE_SIZE);
 	t->next = module_timer_lists[t->hash];
 	module_timer_lists[t->hash] = (void *)t;
@@ -91,7 +99,8 @@ static void add_timer_to_hash_table(char *timer_name, Mod_Timer *t) {
 
 static void del_timer_from_hash_table(char *timer_name, Mod_Timer *t) {
 	Mod_Timer *tmp, *prev = NULL;
-	
+
+	segv_location = sstrdup("del_timer_from_hash_table");
 	for (tmp = module_timer_lists[t->hash]; tmp; tmp = tmp->next) {
 		if (tmp == t) {
 			if (prev)
@@ -108,7 +117,8 @@ static void del_timer_from_hash_table(char *timer_name, Mod_Timer *t) {
 static Mod_Timer *new_timer(char *timer_name)
 {
 	Mod_Timer *t;
-	
+
+	segv_location = sstrdup("Mod_Timer");
 #ifdef DEBUG
 	log("New Timer: %s", timer_name);
 #endif
@@ -123,6 +133,7 @@ static Mod_Timer *new_timer(char *timer_name)
 Mod_Timer *findtimer(char *timer_name) {
 	Mod_Timer *t;
 	
+	segv_location = sstrdup("findtimer");
 	t = module_timer_lists[HASH(timer_name, T_TABLE_SIZE)];
 	while (t && strcasecmp(t->timername, timer_name) != 0)
 		t = t->next;
@@ -196,6 +207,7 @@ void list_module_timer(User *u) {
 }		
 
 static void add_sock_to_hash_table(char *sockname, Sock_List *s) {
+	segv_location = sstrdup("add_sock_to_hash_table");
 	s->hash = HASH(sockname, MAX_SOCKS);
 	s->next = Socket_lists[s->hash];
 	Socket_lists[s->hash] = (void *)s;
@@ -204,6 +216,7 @@ static void add_sock_to_hash_table(char *sockname, Sock_List *s) {
 static void del_sock_from_hash_table(char *sockname, Sock_List *s) {
 	Sock_List *tmp = NULL, *prev = NULL;
 	
+	segv_location = sstrdup("del_sock_from_hash_table");
 	for (tmp = Socket_lists[s->hash]; tmp; tmp = tmp->next) {
 		if (tmp == s) {
 			if (prev)
@@ -220,6 +233,8 @@ static void del_sock_from_hash_table(char *sockname, Sock_List *s) {
 static Sock_List *new_sock(char *sock_name)
 {
 	Sock_List *s;
+
+	segv_location = sstrdup("Sock_List");
 #ifdef DEBUG	
 	log("New Socket: %s", sock_name);
 #endif	
@@ -233,7 +248,8 @@ static Sock_List *new_sock(char *sock_name)
 
 Sock_List *findsock(char *sock_name) {
 	Sock_List *s;
-	
+
+	segv_location = sstrdup("findsock");
 	s = Socket_lists[HASH(sock_name, MAX_SOCKS)];
 	while (s && strcmp(s->sockname, sock_name) != 0)
 		s = s->next;
@@ -309,6 +325,7 @@ void list_sockets(User *u) {
 
 
 static void add_bot_to_hash_table(char *bot_name, Mod_User *u) {
+	segv_location = sstrdup("add_bot_to_hash_table");
 	u->hash = HASH(bot_name, B_TABLE_SIZE);
 	u->next = module_bot_lists[u->hash];
 	module_bot_lists[u->hash] = (void *)u;
@@ -317,6 +334,7 @@ static void add_bot_to_hash_table(char *bot_name, Mod_User *u) {
 static void del_bot_from_hash_table(char *bot_name, Mod_User *u) {
 	Mod_User *tmp, *prev = NULL;
 	
+	segv_location = sstrdup("del_bot_from_hash_table");
 	for (tmp = module_bot_lists[u->hash]; tmp; tmp = tmp->next) {
 		if (tmp == u) {
 			if (prev)
@@ -334,6 +352,7 @@ static void del_bot_from_hash_table(char *bot_name, Mod_User *u) {
 static Mod_User *new_bot(char *bot_name)
 {
 	Mod_User *u;
+	segv_location = sstrdup("Mod_User");
 #ifdef DEBUG	
 	log("New Bot: %s", bot_name);
 #endif
@@ -349,6 +368,7 @@ Mod_User *findbot(char *bot_name) {
 	Mod_User *u;
 	int i;
 	
+	segv_location = sstrdup("findbot");
 	for (i = 0; i < B_TABLE_SIZE; i++) {
 		for (u = module_bot_lists[i]; u; u = u->next) {
 			if (!strcasecmp(u->nick, bot_name))
@@ -458,10 +478,18 @@ void list_module_bots(User *u) {
 
 
 int load_module(char *path1, User *u) {
+	char buf[512];
 	char *dl_error = NULL;
 	void *dl_handle = NULL;
 	int do_msg;
 	char *path = NULL;
+
+	int fmode;
+	char *lock= NULL;
+	FILE *lockmod;
+	FILE *lmfile;
+	FILE *lockdbfile;
+
 	Module_Info * (*mod_get_info)() = NULL;
 	Functions * (*mod_get_funcs)() = NULL;
 	EventFnList * (*mod_get_events)() = NULL;
@@ -471,6 +499,7 @@ int load_module(char *path1, User *u) {
 	Module *mod_ptr = NULL, *list_ptr = NULL;
 
 	segv_location = sstrdup("load_module");
+
 	if (u == NULL) {
 		do_msg = 0;
 	} else {
@@ -478,6 +507,7 @@ int load_module(char *path1, User *u) {
 	}
 	path = sstrdup(path1);
 	path = strcat(path,".so");
+
 	dl_handle = dlopen(path, RTLD_NOW || RTLD_GLOBAL); 
 	if (!dl_handle) {
 		LD_Path *list;
@@ -576,6 +606,31 @@ int load_module(char *path1, User *u) {
 			event_fn_ptr++;
 		}
 	}
+
+/* Lock .so Module File With 555 Permissions */
+	/* Shmad Perscribes 444 Perms */
+	lockmod = fopen("Neo-Lock.tmp","w");
+	fprintf(lockmod, "%s/%s", me.modpath, path);
+	fclose(lockmod);
+
+	lmfile = fopen("Neo-Lock.tmp", "r");
+	while (fgets(buf, sizeof(buf), lmfile)) {
+		buf[strlen(buf)] = '\0';
+		lock = buf;
+	}
+	fclose(lmfile);
+	fmode = 0555;
+
+	remove("Neo-Lock.tmp");
+	chmod(lock, fmode);
+/* End .so Module 555 Permission Setting */
+
+/* Create List Of Loaded Modules */
+lockdbfile = fopen("data/Lock.db", "a");
+fprintf(lockdbfile, "%s\n", lock);
+fclose(lockdbfile);
+/* End List Creation Process */
+
 	if (do_msg) privmsg(u->nick,s_Services,"Module %s Loaded, Description: %s",mod_info_ptr->module_name,mod_info_ptr->module_description);
 	return 0;
 
@@ -615,9 +670,21 @@ void list_module(User *u) {
 }		
 
 int unload_module(char *module_name, User *u) {
+	char buf[512];
+	char fname[512];
 	Module *list;
 	Mod_User *mod_ptr = NULL;
 	Mod_Timer *mod_tmr = NULL;
+
+	char *lock= NULL;
+	char *moduname= NULL;
+	FILE *lockmod;
+	FILE *lmfile;
+
+	FILE *modnme;
+	FILE *getmname;
+
+	int fmode;
 	register int j;
 
 	segv_location = sstrdup("unload_module");
@@ -633,7 +700,7 @@ int unload_module(char *module_name, User *u) {
 				break;
 			}
 		}
-	}			
+	}
 
 
 	/* now, see if this Module has any bots with it */
@@ -642,6 +709,43 @@ int unload_module(char *module_name, User *u) {
 			if (!strcasecmp(mod_ptr->modname, module_name)) {
 				notice(s_Services,"Module %s had bot %s Registered. Deleting..",module_name,mod_ptr->nick);
 				del_bot(mod_ptr->nick, "Module Unloaded");
+
+					segv_location = sstrdup("unload_unlock");
+					/* Unlock .so Module File to 755 Permissions */
+					/* Shmad Perscribes 666 */
+
+					modnme = fopen("Mod-Name.tmp","w");
+					fprintf(modnme, "%s", mod_ptr->modname);
+					fclose(modnme);
+
+					getmname = fopen("Mod-Name.tmp", "r");
+					while (fgets(fname, sizeof(fname), getmname)) {
+						fname[strlen(fname)] = '\0';
+						moduname = fname;
+					}
+					fclose(getmname);
+					remove("Mod-Name.tmp");
+
+					/* moduname = module_name; */
+					strlower(moduname);
+
+					lockmod = fopen("Neo-Lock.tmp","w");
+					fprintf(lockmod, "%s/%s.so", me.modpath, moduname);
+					fclose(lockmod); 
+
+					lmfile = fopen("Neo-Lock.tmp", "r");
+					while (fgets(buf, sizeof(buf), lmfile)) {
+						buf[strlen(buf)] = '\0';
+						lock = buf;
+					}
+					fclose(lmfile);
+					remove("Neo-Lock.tmp");
+
+				   /* Set octal perms to 0755 so modules can be read, and wrote to. */
+					fmode = 0755;
+					chmod(lock, fmode);
+				   /* End .so Module 755 Permission Setting */
+
 				break;
 			}	
 		}
@@ -656,11 +760,11 @@ int unload_module(char *module_name, User *u) {
 			} else {
 				(list->prev)->next = NULL;
 			}
-/* Shmad */
+			/* Shmad */
 			free(mod_ptr);
 			free(mod_tmr);
 			free(list);
-/* Shmad */
+			/* Shmad */
 
 			return 0;
 		}

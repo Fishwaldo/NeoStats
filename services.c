@@ -1,10 +1,12 @@
-/* NetStats - IRC Statistical Services Copyright (c) 1999 Adam Rutter,
-** Justin Hammond http://codeworks.kamserve.com
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
+** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
 *
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
-** NetStats CVS Identification
-** $Id: services.c,v 1.14 2002/02/27 16:36:40 fishwaldo Exp $
+** NeoStats Identification:
+** ID:      services.c, 
+** Version: 2.0
+** Date:    5/1/2002
 */
  
 #include "stats.h"
@@ -26,8 +28,7 @@ static void ns_server_dump(User *);
 static void ns_chan_dump(User *);
 static void ns_uptime(User *);
 static void ns_version(User *); 
-
-
+static void ns_roots(User *);
 
 void servicesbot(char *nick, char *line) {
 	char *cmd ;
@@ -52,7 +53,7 @@ void servicesbot(char *nick, char *line) {
 	if (me.onlyopers && (UserLevel(u) < 40)) {
 		privmsg(u->nick, s_Services,
 			"This service is only available to IRCops.");
-		notice(s_Services,"%s Requested %s, but he is Not a Operator!", u->nick, cmd);
+		notice (s_Services,"%s Requested %s, but he is Not a Operator!", u->nick, cmd);
 		return;
 	}
 	if (strlen(cmd) >= 350) {
@@ -64,20 +65,20 @@ void servicesbot(char *nick, char *line) {
 	if (!strcasecmp(cmd, "HELP")) {
 		cmd = strtok(NULL, " ");
 		if (cmd) {
-			notice(s_Services,"%s is a Dummy and wanted help on %s",u->nick, cmd);
+			notice(s_Services,"%s Requested %s Help on %s",u->nick, s_Services, cmd);
 		} else {
-			notice(s_Services, "%s is a Dummy and wanted Help... I refered him to God!", u->nick);
+			notice(s_Services, "%s Requested %s Help",u->nick, s_Services);
 		}
 		if (!cmd) {
 			privmsg_list(nick, s_Services, ns_help);
 			if (UserLevel(u) >= 180)
 				privmsg_list(nick, s_Services, ns_myuser_help);
-                } else if (!strcasecmp(cmd, "VERSION"))
-                        privmsg_list(nick, s_Services, ns_version_help);
+		} else if (!strcasecmp(cmd, "VERSION"))
+			 privmsg_list(nick, s_Services, ns_version_help);
 		else if (!strcasecmp(cmd, "SHUTDOWN") && (UserLevel(u) >= 180))
 			privmsg_list(nick, s_Services, ns_shutdown_help);
-                else if (!strcasecmp(cmd, "RELOAD") && (UserLevel(u) >= 180))
-                        privmsg_list(nick, s_Services, ns_reload_help);
+		else if (!strcasecmp(cmd, "RELOAD") && (UserLevel(u) >= 180))
+			privmsg_list(nick, s_Services, ns_reload_help);
 		else if (!strcasecmp(cmd, "LOGS") && (UserLevel(u) >= 180))
 			privmsg_list(nick, s_Services, ns_logs_help);
 		else if (!strcasecmp(cmd, "LOAD") && (UserLevel(u) >= 180))
@@ -99,7 +100,7 @@ void servicesbot(char *nick, char *line) {
 	} else if (!strcasecmp(cmd, "LOAD")) {
 		if (!(UserLevel(u) >= 180)) {
 			privmsg(nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to LOAD, but is not a Techadmin",nick);
+			notice(s_Services,"%s Tried to LOAD, but is not at least a NetAdmin",nick);
 			return;
 		}
 		cmd = strtok(NULL, " ");
@@ -163,48 +164,51 @@ void servicesbot(char *nick, char *line) {
 		ns_uptime(u);
 		notice(s_Services,"%s Wanted to see %s's info",u->nick,me.name);
 	} else if (!strcasecmp(cmd, "SHUTDOWN")) {
-                if (!(UserLevel(u) >= 180)) {
-                        privmsg(nick,s_Services,"Permission Denied");
-                        notice(s_Services,"%s Tried to SHUTDOWN, but is not a Techadmin",nick);
-                        return;
-                }
-                reason=strtok(NULL,"");
+				if (!(UserLevel(u) >= 180)) {
+						privmsg(nick,s_Services,"Permission Denied");
+						notice(s_Services,"%s Tried to SHUTDOWN, but is not a Techadmin",nick);
+						return;
+				}
+				reason=strtok(NULL,"");
 		notice(s_Services,"%s Wants me to Go to BED!!! Good Night!",u->nick);
 		ns_shutdown(u,reason);
-        } else if (!strcasecmp(cmd, "VERSION")) {
-                ns_version(u);
-                notice(s_Services,"%s Wanted to know our version number ",u->nick);
-        } else if (!strcasecmp(cmd, "RELOAD")) {
-                if (!(UserLevel(u) >= 180)) {
-                        privmsg(nick,s_Services,"Permission Denied");
-                        notice(s_Services,"%s Tried to RELOAD, but is not a Techadmin",nick);
-                        return;
-                }
-                reason=strtok(NULL,"");
-                notice(s_Services,"%s Wants me to RELOAD! Be back in a few!",u->nick);
-                ns_reload(u,reason);
+		} else if (!strcasecmp(cmd, "VERSION")) {
+				ns_version(u);
+				notice(s_Services,"%s Wanted to know our version number ",u->nick);
+	} else if (!strcasecmp(cmd, "ROOTS")) {
+	 	ns_roots(u);
+		notice(s_Services,"%s wanted to see our ROOTS",u->nick);
+		} else if (!strcasecmp(cmd, "RELOAD")) {
+				if (!(UserLevel(u) >= 180)) {
+						privmsg(nick,s_Services,"Permission Denied");
+						notice(s_Services,"%s Tried to RELOAD, but is not a Techadmin",nick);
+						return;
+				}
+				reason=strtok(NULL,"");
+				notice(s_Services,"%s Wants me to RELOAD! Be back in a few!",u->nick);
+				ns_reload(u,reason);
 	} else if (!strcasecmp(cmd, "LOGS")) {
-                if (!(UserLevel(u) >= 180)) {
-                        privmsg(nick,s_Services,"Permission Denied");
-                        notice(s_Services,"%s Tried to view LOGS, but is not a Techadmin",nick);
-                        return;
-                }
+				if (!(UserLevel(u) >= 180)) {
+						privmsg(nick,s_Services,"Permission Denied");
+						notice(s_Services,"%s Tried to view LOGS, but is not a Techadmin",nick);
+						return;
+				}
 		ns_logs(u);
 		notice(s_Services,"%s Wants to Look at my Logs!!",u->nick);
 	} else if (!strcasecmp(cmd, "JUPE")) {
-                if (!(UserLevel(u) >= 180)) {
-                        privmsg(nick,s_Services,"Permission Denied");
-                        notice(s_Services,"%s Tried to JUPE, but is not a Techadmin",nick);
-                        return;
-                }
+				if (!(UserLevel(u) >= 180)) {
+						privmsg(nick,s_Services,"Permission Denied");
+						notice(s_Services,"%s Tried to JUPE, but is not a Techadmin",nick);
+						return;
+				}
 		ns_jupe(u, cmd);
 		notice(s_Services,"%s Wants to JUPE this Server %s",u->nick,cmd);
 	} else if (!strcasecmp(cmd, "JOIN")) {
-                if (!(UserLevel(u) >= 180)) {
-                        privmsg(nick,s_Services,"Permission Denied");
-                        notice(s_Services,"%s Tried to use JOIN, but is not a Techadmin",nick);
-                        return;
-                }
+				if (!(UserLevel(u) >= 180)) {
+						privmsg(nick,s_Services,"Permission Denied");
+						notice(s_Services,"%s Tried to use JOIN, but is not a Techadmin",nick);
+						return;
+				}
 		cmd = strtok(NULL, " ");
 		ns_JOIN(u, cmd);
 	} else if (!strcasecmp(cmd, "DEBUG")) {
@@ -232,11 +236,11 @@ void servicesbot(char *nick, char *line) {
 		}
 		ns_server_dump(u);
 	} else if (!strcasecmp(cmd, "RAW")) {
-                if (!(UserLevel(u) >= 180)) {
-                        privmsg(nick,s_Services,"Permission Denied");
-                        notice(s_Services,"%s Tried to use RAW, but is not a Techadmin",nick);
-                        return;
-                }
+				if (!(UserLevel(u) >= 180)) {
+						privmsg(nick,s_Services,"Permission Denied");
+						notice(s_Services,"%s Tried to use RAW, but is not a Techadmin",nick);
+						return;
+				}
 		cmd = strtok(NULL, "");
 		ns_raw(u,cmd);
 	} else {
@@ -244,57 +248,6 @@ void servicesbot(char *nick, char *line) {
 		notice(s_Services,"%s Reqested %s, but that is a Unknown Command",u->nick,cmd);
 
 	}
-}
-
-char *uptime(time_t when)
-{
-	char *buf = NULL;
-/*	int u = time (NULL) - when;
-	time_t u = time(NULL) - when; */
-	int uptime = time (NULL) - me.t_start;
-#ifdef DEBUG
-/*	log("time %d",u); */
-#endif
-
-                sprintf(buf, "Statistics up %d days. %d:%02d:%02d", uptime/86400,
-		(uptime/3600) % 24, (uptime/60) % 60, uptime % 60);
-
-log("new new new %s",buf);
-
-/*
-":%s 242 %s :Statistical Server Up %d days, %d:%02d:%02d",
-me.name,
-                u->nick, uptime/86400, (uptime/3600) % 24, (uptime/60) % 60,
-                uptime % 60);
-
-
-	sprintf(buf, "Statistics up %d days, %d:%02d:%02d",
-               u/86400, (u/3600) % 24, (u/60) % 60,
-               u % 60); 
-sprintf(buf, "Statistics up %d seconds",u);
-log("Our uptime is %s",buf);
-            send_cmd (me.name, "242 %s :Server Up %d days, %d:%02d:%02d",
-                source, uptime/86400, (uptime/3600) % 24, (uptime/60) % 60,
-                uptime % 60);
-*/
-/*	if (u > 86400) {
-		sprintf(buf, "Statistics up \2%ld\2 day%s, \2%02ld:%02ld\2",
-			u/86400, (u/86400 == 1) ? "" : "s",
-			(u/3600) % 24, (u/60) % 60);
-	} else if (u > 3600) {
-		sprintf(buf, "Statistics up \2%ld hour%s, %ld minute%s\2",
-			u/3600, u/3600==1 ? "" : "s",
-			(u/60) % 60, (u/60)%60 == 1 ? "" : "s");
-	} else if (u > 60) {
-		sprintf(buf, "Statistics up \2%ld minute%s, %ld second%s\2",
-			u/60, u/60 == 1 ? "" : "s",
-			u%60, u%60 == 1 ? "" : "s");
-	} else { 
-		sprintf(buf, "Statistics up \2%ld second%s\2",
-			u, u == 1 ? "" : "s");
- 	} 
-*/
-	return buf; 
 }
 
 
@@ -319,11 +272,12 @@ extern void ns_shutdown(User *u, char *reason)
 	free(mod_ptr);
 
 
-        globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
+		globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
 	sts(":%s QUIT :%s Sent SHUTDOWN: %s",s_Services,u->nick,reason);
 	sts("SQUIT %s",me.name);
 	sleep(1);
 	close(servsock);
+	remove("stats.pid");
 	log("%s [%s](%s) requested SHUTDOWN.", u->nick, u->username,
 		u->hostname);
 	exit(0);
@@ -332,48 +286,51 @@ extern void ns_shutdown(User *u, char *reason)
 static void ns_reload(User *u, char *reason)
 {
 	segv_location = sstrdup("ns_reload");
-        if (!(UserLevel(u) >= 190)) {
-                log("Access Denied (RELOAD) to %s", u->nick);
-                privmsg(u->nick, s_Services, "Access Denied.");
-                return;
-        }
-        if (reason != NULL) {
-      	  	globops(s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
-	        log("%s requested RELOAD.", u->nick);
+		if (!(UserLevel(u) >= 190)) {
+				log("Access Denied (RELOAD) to %s", u->nick);
+				privmsg(u->nick, s_Services, "Access Denied.");
+				return;
+		}
+		if (reason != NULL) {
+				globops(s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
+			log("%s requested RELOAD.", u->nick);
 
 		sts("SQUIT %s :Reload", me.name);
 
 		sts(":%s QUIT :%s Sent RELOAD: %s",s_Services,u->nick,reason);
 	} else {
-        	globops(s_Services, "%s requested \2RELOAD\2 for no Reason!", u->nick, reason);
-        	log("%s requested RELOAD.", u->nick);
+			globops(s_Services, "%s requested \2RELOAD\2 for no Reason!", u->nick, reason);
+			log("%s requested RELOAD.", u->nick);
 
 		sts("SQUIT %s :Reload", me.name);
 
 		sts(":%s QUIT :%s Sent RELOAD",s_Services,u->nick,reason);
 	}
 	sleep(1);
-        close(servsock);
-        init_server_hash(); 
-        init_user_hash();  
-/*        init_tld();
+		close(servsock);
+		init_server_hash(); 
+		init_user_hash();  
+/*		init_tld();
 */
-        me.onchan = 0;
-        log("Connecting to %s:%d", me.uplink, me.port);
-        if (servsock > 0)
-                close(servsock);
-        
-        servsock = ConnectTo(me.uplink, me.port);
-        
-        if (servsock <= 0) {
-                log("Unable to connect to %s", me.uplink);
-        } else {
-	                login();
-                read_loop();
-        }
-        log("Reconnecting to the server in %d seconds", me.r_time);
-        sleep(me.r_time);  
+
+		me.onchan = 0;
+		log("Connecting to %s:%d", me.uplink, me.port);
+		if (servsock > 0)
+				close(servsock);
+		
+		servsock = ConnectTo(me.uplink, me.port);
+		
+		if (servsock <= 0) {
+				log("Unable to connect to %s", me.uplink);
+		} else {
+					login();
+				read_loop();
+		}
+		log("Reconnecting to the server in %d seconds", me.r_time);
+		sleep(me.r_time);
+
 }
+
 
 static void ns_logs(User *u)
 {
@@ -468,7 +425,7 @@ void ns_debug_to_coders(char *u)
 			DelUser(s_Debug);
 		}
 	}
-}                                          
+}										  
 static void ns_raw(User *u, char *message)
 {
 	segv_location = sstrdup("ns_raw");
@@ -478,8 +435,8 @@ static void ns_raw(User *u, char *message)
 static void ns_user_dump(User *u)
 {
 	segv_location = sstrdup("ns_user_dump");
-	if (!(UserLevel(u) >= 200)) {
-		privmsg(u->nick, s_Services, "Permission Denied, you need to be a Coder to Enable Debug Mode!");
+	if (!(UserLevel(u) >= 180)) {
+		privmsg(u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
 		return;
 	}		
 	notice(s_Services,"\2DEBUG\2 \2%s\2 Requested a UserDump!",u->nick);
@@ -488,8 +445,8 @@ static void ns_user_dump(User *u)
 static void ns_server_dump(User *u)
 {
 	segv_location = sstrdup("ns_server_dump");
-	if (!(UserLevel(u) >= 200)) {
-		privmsg(u->nick, s_Services, "Permission Denied, you need to be a Coder to Enable Debug Mode!");
+	if (!(UserLevel(u) >= 180)) {
+		privmsg(u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
 		return;
 	}		
 	notice(s_Services,"\2DEBUG\2 \2%s\2 Requested a ServerDump!",u->nick);
@@ -498,9 +455,9 @@ static void ns_server_dump(User *u)
 static void ns_chan_dump(User *u)
 {
 	segv_location = sstrdup("ns_chan_dump");
-	if (!(UserLevel(u) >= 200)) {
+	if (!(UserLevel(u) >= 180)) {
 	
-		privmsg(u->nick, s_Services, "Permission Denied, you need to be a Coder to Enable Debug Mode!");
+		privmsg(u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
 		return;
 	}		
 	notice(s_Services,"\2DEBUG\2 \2%s\2 Requested a ChannelDump!",u->nick);
@@ -508,15 +465,24 @@ static void ns_chan_dump(User *u)
 }
 static void ns_uptime(User *u)
 {
+	int uptime = time (NULL) - me.t_start;
 	segv_location = sstrdup("ns_uptime");
 
-	log("time %d", me.t_start);
+	log("Time Difference %d", uptime);
+	log("Statistical Server Up %d days, %d:%02d:%02d", uptime/86400, (uptime/3600) % 24, (uptime/60) % 60, uptime % 60);
+
 	privmsg(u->nick, s_Services, "Statistics Information:");
-	/* Broken atm */
-	privmsg(u->nick, s_Services, "To view UPTIME use /stats u %s",me.name);
+	if (uptime > 86400) {
+	privmsg(u->nick, s_Services, "Statistics up \2%ld\2 day%s, \2%02ld:%02ld\2", uptime/86400, (uptime/86400 == 1) ? "" : "s", (uptime/3600) % 24, (uptime/60) % 60);
+	} else if (uptime > 3600) {
+	privmsg(u->nick, s_Services, "Statistics up \2%ld hour%s, %ld minute%s\2",	 uptime/3600, uptime/3600==1 ? "" : "s", (uptime/60) % 60, (uptime/60)%60 == 1 ? "" : "s");
+	} else if (uptime > 60) {
+	privmsg(u->nick, s_Services, "Statistics up \2%ld minute%s, %ld second%s\2", uptime/60, uptime/60 == 1 ? "" : "s", uptime%60, uptime%60 == 1 ? "" : "s");
+	} else { 
+	privmsg(u->nick, s_Services, "Statistics up \2%ld second%s\2", uptime, uptime == 1 ? "" : "s");
+	 }
 	privmsg(u->nick, s_Services, "Sent %ld Messages Totaling %ld Bytes", me.SendM, me.SendBytes);
 	privmsg(u->nick, s_Services, "Recieved %ld Messages, Totaling %ld Bytes", me.RcveM, me.RcveBytes);
-/*	privmsg(u->nick, s_Services, "%s", uptime(me.t_start));  */
 	privmsg(u->nick, s_Services, "Reconnect Time: %d", me.r_time);
 	privmsg(u->nick, s_Services, "Statistic Requests: %d", me.requests);
 	privmsg(u->nick, s_Services, "Use SMO for Debug?: %s", (me.usesmo) ? "Enabled" : "Disabled"); 
@@ -529,8 +495,17 @@ static void ns_uptime(User *u)
 static void ns_version(User *u)
 {
 	segv_location = sstrdup("ns_version");
-        privmsg(u->nick, s_Services, "\2StatServ Version Information\2");
-        privmsg(u->nick, s_Services, "%s - %s", me.name, version,
-                                me.name, version_date, version_time);
-        privmsg(u->nick, s_Services, "http://www.neostats.net");
+		privmsg(u->nick, s_Services, "\2NeoStats Version Information\2");
+		privmsg(u->nick, s_Services, "NeoStats Version: %s", version);
+		privmsg(u->nick, s_Services, "http://www.neostats.net");
+	privmsg(u->nick, s_Services, "Services roots: %s", me.roots);
 }
+
+static void ns_roots(User *u)
+{
+	segv_location = sstrdup("ns_roots");
+		privmsg(u->nick, s_Services, "\2NeoStats ROOT users\2");
+		privmsg(u->nick, s_Services, "%s",me.roots);
+	privmsg(u->nick, s_Services, "These are setable in stats.cfg now");
+}
+

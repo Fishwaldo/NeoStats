@@ -1,11 +1,12 @@
-/* NetStats - IRC Statistical Services
-** Copyright (c) 1999 Adam Rutter, Justin Hammond
-** http://codeworks.kamserve.com
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2001 NeoStats Group Inc.
+** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
 *
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
-** NetStats CVS Identification
-** $Id: ircd.c,v 1.18 2002/02/27 16:36:40 fishwaldo Exp $
+** NeoStats Identification:
+** ID:      ircd.c, 
+** Version: 1.11
+** Date:    17/11/2001
 */
  
 #include <setjmp.h>
@@ -17,6 +18,7 @@ extern const char protocol_version[];
 
 void Usr_Version(char *, char *);
 void Usr_ShowMOTD(char *, char *);
+void Usr_ShowADMIN(char *, char *);
 void Usr_Showcredits(char *, char *);
 void Usr_AddServer(char *, char *);
 void Usr_DelServer(char *, char *);
@@ -45,6 +47,7 @@ void Srv_Connect();
 
 
 static void ShowMOTD(char *);
+static void ShowADMIN(char *);
 static void Showcredits(char *);
 
 
@@ -75,6 +78,8 @@ IntCommands cmd_list[] = {
 	{TOK_VERSION,	Usr_Version,		1},
 	{MSG_MOTD,	Usr_ShowMOTD,		1},
 	{TOK_MOTD,	Usr_ShowMOTD,		1},
+	{MSG_ADMIN,	Usr_ShowADMIN,		1},
+	{TOK_ADMIN,	Usr_ShowADMIN,		1},
 	{MSG_CREDITS,	Usr_Showcredits,	1},
 	{TOK_CREDITS,	Usr_Showcredits,	1},
 	{MSG_SERVER,	Usr_AddServer,		1},
@@ -300,10 +305,12 @@ void parse(char *line)
 		coreLine = strtok(NULL, "");
 		coreLine++;
 		/* coreLine contains the Actual Message now, cmd, is who its too */
+                if (findbot(origin))
+                return;
+
 		if (!strcasecmp(s_Services,cmd)) {
 			/* its to the Internal Services Bot */
 			segv_location = sstrdup("servicesbot");
-			log("We received this: %s - %s", origin, coreLine); 			
 			servicesbot(origin,coreLine);
 			segv_location = sstrdup("ServicesBot_return");
 			return;
@@ -314,6 +321,10 @@ void parse(char *line)
 #ifdef DEBUG
 				log("nicks: %s", list->nick);
 #endif
+				/* if the message is from one of our bots, silently drop it, to stop floods */
+				if (findbot(origin)) return;
+
+
 				/* Check to make sure there are no blank spaces so we dont crash */
 				corelen = smalloc(strlen(coreLine));
 			        if (strlen(coreLine) >= 350) {
@@ -336,7 +347,7 @@ void parse(char *line)
 				free(corelen);
 				return;
 			}
-			log("Recieved a Message for %s, but that user is not registered with us!!!", cmd);
+			log("Recieved a Message for %s, but that user is not registered with us!!! buf: %s", cmd, coreLine);
 		}
         }	
         	
@@ -455,6 +466,9 @@ void Usr_Version(char *origin, char *coreLine) {
 void Usr_ShowMOTD(char *origin, char *coreLine) {
 	ShowMOTD(origin);
 }
+void Usr_ShowADMIN(char *origin, char *coreLine) {
+	ShowADMIN(origin);
+}
 void Usr_Showcredits(char *origin, char *coreLine) {
 	Showcredits(origin);
 }
@@ -509,9 +523,7 @@ void Usr_Kill(char *origin, char *coreLine) {
 	User *u;
 	Mod_User *mod_ptr;
 	
-	log("core %s", coreLine);
 	cmd = strtok(coreLine, " ");
-	log("%s", cmd);
 	mod_ptr = findbot(cmd);
 	if (mod_ptr) { /* Oh Oh, one of our Bots has been Killed off! */
 		Module_Event("BOTKILL", cmd);
@@ -642,10 +654,12 @@ void Srv_Server(char *origin, char *coreLine) {
 }
 void Srv_Squit(char *origin, char *coreLine) {
 			Server *s;
-			s = findserver(coreLine);
+			s = findserver(strtok(coreLine, " "));
 			if (s) {
 				Module_Event("SQUIT", s);
-				DelServer(coreLine);
+				DelServer(strtok(coreLine, " "));
+			} else {
+				log("Waring, Squit from Unknown Server %s", strtok(coreLine, " "));
 			}
 						
 }
@@ -714,7 +728,7 @@ void globops(char *from, char *fmt, ...)
 
 /* Shmad - have to get rid of nasty term echos :-) */
 
-	sprintf(buf, ":%s GLOBOPS :%s", from, buf2);
+	if (me.onchan) sprintf(buf, ":%s GLOBOPS :%s", from, buf2);
 	sts("%s", buf);
 	va_end(ap);
 }
@@ -742,32 +756,69 @@ int flood(User *u)
 	return 0;
 }
 
+/* Display our MOTD Message of the Day from the external stats.motd file */
 static void ShowMOTD(char *nick)
 {
-	/* Removal or modification of this function is against the law.
-	** Be nice, and don't remove it or modify it.
-	** -Jonathan 'netgod' George (net@lite.net) */
+    FILE *fp;
+    char buf[BUFSIZE];
 
-	sts(":%s 375 %s :- %s Message of the Day", me.name, nick, me.name);
-	sts(":%s 372 %s :- ", me.name, nick);
-	sts(":%s 372 %s :- NeoStats Version Copyright: 1999-2001", me.name, nick);
-        sts(":%s 372 %s :-  (based on GeoStats 1.1.0 by Jonathan George (net@lite.net))", me.name, nick);
-	sts(":%s 372 %s :- Grab your copy at www.neostats.net", me.name, nick);
+    sts(":%s 375 %s :- %s Message of the Day -", me.name, nick, me.name);
+/*    sts(":%s 372 %s :- ", me.name, nick); */
+    sts(":%s 372 %s :- %s.  Copyright (c) 1999 - 2002 The NeoStats Group", me.name, nick, version);
+    sts(":%s 372 %s :-", me.name, nick);
+
+    fp = fopen ("stats.motd", "r");
+
+    if (fp)
+    {
+	while (fgets (buf, sizeof (buf), fp))
+	{
+	    buf[strlen (buf) - 1] = 0;
+	    sts(":%s 372 %s :- %s", me.name, nick, buf);
+	}
+	fclose (fp);
+    }
 	sts(":%s 376 %s :End of /MOTD command.", me.name, nick);
 }
+
+
+/* Display the ADMIN Message from the external stats.admin file */
+static void ShowADMIN(char *nick)
+{
+    FILE *fp;
+    char buf[BUFSIZE];
+
+    sts(":%s 375 %s :- %s NeoStats Admins -", me.name, nick, me.name);
+    sts(":%s 372 %s :- %s.  Copyright (c) 1999 - 2002 The NeoStats Group", me.name, nick, version);
+    sts(":%s 372 %s :-", me.name, nick);
+
+    fp = fopen ("stats.admin", "r");
+
+    if (fp)
+    {
+	while (fgets (buf, sizeof (buf), fp))
+	{
+	    buf[strlen (buf) - 1] = 0;
+	    sts(":%s 372 %s :- %s", me.name, nick, buf);
+	}
+	fclose (fp);
+    }
+	sts(":%s 376 %s :End of /ADMIN command.", me.name, nick);
+}
+
+
 static void Showcredits(char *nick)
 {
-
 	sts(":%s 351 %s :- %s Credits ", me.name, nick, version);
-	sts(":%s 351 %s :- This Version of %s was based on GeoStats-1.1.0", me.name, nick, version);
-	sts(":%s 351 %s :- Originally Written by Jonathan 'netgod' George (net@lite.net)", me.name, nick);
-	sts(":%s 351 %s :- Now Maintained by Fish (fish@dynam.ac) and Shmad (Shmad@neostats.net)", me.name, nick);
-	sts(":%s 351 %s :- For Support, you can find Fish or Shmad at", me.name, nick);
-	sts(":%s 351 %s :- irc.neostats.net", me.name, nick);
+	sts(":%s 351 %s :- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)", me.name,  nick);
+	sts(":%s 351 %s :- For Support, you can find ^Enigma^ or Shmad at", me.name, nick);
+	sts(":%s 351 %s :- irc.irc-chat.net #NeoStats", me.name, nick);
 	sts(":%s 351 %s :- Thanks to:", me.name, nick);
+	sts(":%s 351 %s :- \2Fish\2 still part of the team with patch submissions.", me.name, nick);
 	sts(":%s 351 %s :- Stskeeps for Writting the best IRCD ever!", me.name, nick);
 	sts(":%s 351 %s :- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)",me.name,nick);
 	sts(":%s 351 %s :- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!", me.name, nick);
 	sts(":%s 351 %s :- Andy For Ideas",me.name,nick);
 	sts(":%s 351 %s :- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies",me.name,nick);
+	sts(":%s 351 %s :- sre and Jacob for development systems and access",me.name, nick);
 }

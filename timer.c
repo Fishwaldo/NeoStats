@@ -1,11 +1,12 @@
-/* NetStats - IRC Statistical Services
-** Copyright (c) 1999 Adam Rutter, Justin Hammond
-** http://codeworks.kamserve.com
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2001 NeoStats Group Inc.
+** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
 *
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
-** NetStats CVS Identification
-** $Id: timer.c,v 1.9 2002/02/27 13:09:39 fishwaldo Exp $
+** NeoStats Identification:
+** ID:      timer.c, 
+** Version: 1.5
+** Date:    17/11/2001
 */
  
 #include "stats.h"
@@ -23,6 +24,7 @@ void chk()
 	register int j;
 	segv_location = sstrdup("chk");
 /* First, lets see if any modules have a function that is due to run..... */
+
 	for (j = 0; j < T_TABLE_SIZE; j++) {
 		for (mod_ptr = module_timer_lists[j]; mod_ptr; mod_ptr = mod_ptr->next) {
 			if (current - mod_ptr->lastrun > mod_ptr->interval) {
@@ -31,7 +33,7 @@ void chk()
 			}
 		}
 	}
-	free(mod_ptr);
+	free(mod_ptr); 
 
 	if (current - ping.last_sent > 60) {
 		TimerPings();

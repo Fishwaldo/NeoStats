@@ -1,11 +1,12 @@
-/* NetStats - IRC Statistical Services
-** Copyright (c) 1999 Adam Rutter, Justin Hammond
-** http://codeworks.kamserve.com
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
+** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
 *
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
-** NetStats CVS Identification
-** $Id: conf.c,v 1.6 2002/02/27 11:15:16 fishwaldo Exp $
+** NeoStats Identification:
+** ID:      conf.c, 
+** Version: 1.5
+** Date:    5/1/2002
 */
 
 #include "stats.h"
@@ -30,9 +31,10 @@ static config_option options[] =
 { "NEOSTAT_USER", ARG_STR, cb_Server, 8},
 { "WANT_PRIVMSG", ARG_STR, cb_Server, 9},
 { "SERVICES_CHAN", ARG_STR, cb_Server, 10},
-{ "MODULE_PATH", ARG_STR, cb_Server, 11},
+{ "SERVICES_ROOT", ARG_STR, cb_Server, 11},
+{ "MODULE_PATH", ARG_STR, cb_Server, 12},
 { "LOAD_MODULE", ARG_STR, cb_Module, 0},
-{ "ONLY_OPERS", ARG_STR, cb_Server, 12}
+{ "ONLY_OPERS", ARG_STR, cb_Server, 13}
 };
 
 
@@ -60,8 +62,11 @@ if (!config_read("stats.cfg", options) == 0 ) {
 	exit(0);
 }
 printf("Sucessfully Loaded Config File, Now Booting NeoStats\n");
+
 done_mods = 0;
 }
+
+
 void cb_Module(char *arg, int configtype) {
 	int i;
 		segv_location= sstrdup("cb_Module");
@@ -127,9 +132,11 @@ void cb_Server(char *arg, int configtype) {
 		} else if (configtype == 10) {
 			memcpy(me.chan,arg, sizeof(me.chan));
 		} else if (configtype == 11) {
-			memcpy(me.modpath, arg, sizeof(me.chan));
-			add_ld_path(me.modpath);
+			memcpy(me.roots,arg, sizeof(me.roots));
 		} else if (configtype == 12) {
+			memcpy(me.modpath, arg, sizeof(me.modpath));
+			add_ld_path(me.modpath);
+		} else if (configtype == 13) {
 			me.onlyopers = 1;
 		}
 
