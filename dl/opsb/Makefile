@@ -19,7 +19,7 @@ clean:
 	/bin/rm -rf ../$(TARGET)
 	/bin/rm -rf *.o *.lo *.so *.a
 
-install: spam
+install: opsb
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
 
 
