@@ -1791,12 +1791,11 @@ do_svsmode_user (const char* nick, const char* modes, const char* ts)
 	if (ts && isdigit(*ts)) {
 		char* pModes;	
 		char* pNewModes;	
-		int cnt = 0;
 
 		SetUserServicesTS (nick, ts);
 		/* If only setting TS, we do not need further mode processing */
 		if(strcasecmp(modes, "+d") == 0) {
-			nlog (LOG_DEBUG3, LOG_CORE, "dropping modes since this is a services TS", modes);
+			nlog (LOG_DEBUG3, LOG_CORE, "dropping modes since this is a services TS %s", modes);
 			return;
 		}
 		/* We need to strip the d from the mode string */
