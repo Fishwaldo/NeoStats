@@ -57,8 +57,6 @@ int DBMCloseTable( void *handle )
 	{
 		return NS_FAILURE;
 	}
-	dlog( DEBUG1, "Syncing DB");
-	gdbm_sync( ( gdbm_file_info *)handle);
 	gdbm_close( ( gdbm_file_info * )handle ); 
 	return NS_SUCCESS;
 }
