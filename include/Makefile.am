@@ -1,4 +1,3 @@
-noinst_SCRIPTS=version.sh
 BUILT_SOURCES=version.h
 CLEANFILES = version.h
 

@@ -152,7 +152,6 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-noinst_SCRIPTS = version.sh
 BUILT_SOURCES = version.h
 CLEANFILES = version.h
 
@@ -172,8 +171,6 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
-SCRIPTS = $(noinst_SCRIPTS)
-
 DIST_SOURCES =
 HEADERS = $(include_HEADERS) $(noinst_HEADERS)
 
@@ -322,7 +319,7 @@ distdir: $(DISTFILES)
 check-am: all-am
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(SCRIPTS) $(HEADERS) config.h
+all-am: Makefile $(HEADERS) config.h
 
 installdirs:
 	$(mkinstalldirs) $(DESTDIR)$(includedir)

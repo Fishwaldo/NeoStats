@@ -314,6 +314,7 @@ AC_CONFIG_FILES([Makefile
 		modules/loveserv/Makefile
 		modules/moraleserv/Makefile
 		modules/statserv/Makefile
+		tools/Makefile
 		cronchk])
 
 AC_CACHE_SAVE

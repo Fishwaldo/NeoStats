@@ -154,11 +154,12 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = include lib src modules
+SUBDIRS = include lib src modules tools
 ACLOCAL_AMFLAGS = -I autotools
 AM_MAKEFLAGS = -s
-bin_SCRIPTS = makeconf cronchk
-data_DATA = neostats.motd makeconf
+dist_bin_SCRIPTS = makeconf
+bin_SCRIPTS = cronchk
+data_DATA = neostats.motd
 
 docdir = @prefix@/doc
 doc_DATA = doc/* doc/old/*
@@ -169,8 +170,8 @@ subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/config.h
-CONFIG_CLEAN_FILES = cronchk
-SCRIPTS = $(bin_SCRIPTS)
+CONFIG_CLEAN_FILES = tools/Makefile cronchk
+SCRIPTS = $(bin_SCRIPTS) $(dist_bin_SCRIPTS)
 
 DIST_SOURCES =
 DATA = $(data_DATA) $(doc_DATA)
@@ -181,13 +182,13 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	all-recursive install-data-recursive install-exec-recursive \
 	installdirs-recursive install-recursive uninstall-recursive \
 	check-recursive installcheck-recursive
-DIST_COMMON = README $(srcdir)/Makefile.in $(srcdir)/configure \
-	$(top_srcdir)/autotools/rules.mk AUTHORS COPYING ChangeLog \
-	INSTALL Makefile.am NEWS TODO aclocal.m4 autotools/acinclude.m4 \
-	autotools/compile autotools/config.guess autotools/config.sub \
-	autotools/depcomp autotools/install-sh autotools/ltmain.sh \
-	autotools/missing autotools/mkinstalldirs configure \
-	configure.in cronchk.in
+DIST_COMMON = README $(dist_bin_SCRIPTS) $(srcdir)/Makefile.in \
+	$(srcdir)/configure $(top_srcdir)/autotools/rules.mk AUTHORS \
+	COPYING ChangeLog INSTALL Makefile.am NEWS TODO aclocal.m4 \
+	autotools/acinclude.m4 autotools/compile autotools/config.guess \
+	autotools/config.sub autotools/depcomp autotools/install-sh \
+	autotools/ltmain.sh autotools/missing autotools/mkinstalldirs \
+	configure configure.in cronchk.in
 DIST_SUBDIRS = $(SUBDIRS)
 all: all-recursive
 
@@ -209,6 +210,8 @@ $(srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(srcdir)/configure.in $(ACLOCAL_M4)
 
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in autotools/acinclude.m4 autotools/aclocal.m4 autotools/ax_maintainer_mode_auto_silent.m4 autotools/ax_path_lib_curl.m4 autotools/ax_path_lib_pcre.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+tools/Makefile: $(top_builddir)/config.status $(top_srcdir)/tools/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 cronchk: $(top_builddir)/config.status cronchk.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
@@ -227,6 +230,26 @@ install-binSCRIPTS: $(bin_SCRIPTS)
 uninstall-binSCRIPTS:
 	@$(NORMAL_UNINSTALL)
 	@list='$(bin_SCRIPTS)'; for p in $$list; do \
+	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
+	  rm -f $(DESTDIR)$(bindir)/$$f; \
+	done
+dist_binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
+install-dist_binSCRIPTS: $(dist_bin_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(dist_bin_SCRIPTS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f $$d$$p; then \
+	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	    echo " $(dist_binSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(bindir)/$$f"; \
+	    $(dist_binSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(bindir)/$$f; \
+	  else :; fi; \
+	done
+
+uninstall-dist_binSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_bin_SCRIPTS)'; for p in $$list; do \
 	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
 	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
 	  rm -f $(DESTDIR)$(bindir)/$$f; \
@@ -418,7 +441,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/. $(distdir)/./autotools $(distdir)/autotools
+	$(mkinstalldirs) $(distdir)/. $(distdir)/./autotools $(distdir)/autotools $(distdir)/tools
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -529,10 +552,10 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(SCRIPTS) $(DATA) all-local
+all-am: Makefile $(SCRIPTS) $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
-	$(mkinstalldirs) $(DESTDIR)$(bindir) $(DESTDIR)$(datadir) $(DESTDIR)$(docdir)
+	$(mkinstalldirs) $(DESTDIR)$(bindir) $(DESTDIR)$(bindir) $(DESTDIR)$(datadir) $(DESTDIR)$(docdir)
 
 install: install-recursive
 install-exec: install-exec-recursive
@@ -578,7 +601,7 @@ info-am:
 
 install-data-am: install-dataDATA install-docDATA
 
-install-exec-am: install-binSCRIPTS
+install-exec-am: install-binSCRIPTS install-dist_binSCRIPTS
 
 install-info: install-info-recursive
 
@@ -604,20 +627,20 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binSCRIPTS uninstall-dataDATA uninstall-docDATA \
-	uninstall-info-am
+uninstall-am: uninstall-binSCRIPTS uninstall-dataDATA \
+	uninstall-dist_binSCRIPTS uninstall-docDATA uninstall-info-am
 
 uninstall-info: uninstall-info-recursive
 
-.PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am all-local check \
-	check-am clean clean-generic clean-libtool clean-recursive \
-	ctags ctags-recursive dist dist-all dist-gzip distcheck \
-	distclean distclean-generic distclean-libtool \
-	distclean-recursive distclean-tags distcleancheck distdir \
-	distuninstallcheck dvi dvi-am dvi-recursive info info-am \
-	info-recursive install install-am install-binSCRIPTS \
-	install-data install-data-am install-data-recursive \
-	install-dataDATA install-docDATA install-exec install-exec-am \
+.PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am check check-am clean \
+	clean-generic clean-libtool clean-recursive ctags \
+	ctags-recursive dist dist-all dist-gzip distcheck distclean \
+	distclean-generic distclean-libtool distclean-recursive \
+	distclean-tags distcleancheck distdir distuninstallcheck dvi \
+	dvi-am dvi-recursive info info-am info-recursive install \
+	install-am install-binSCRIPTS install-data install-data-am \
+	install-data-recursive install-dataDATA install-dist_binSCRIPTS \
+	install-docDATA install-exec install-exec-am \
 	install-exec-recursive install-info install-info-am \
 	install-info-recursive install-man install-recursive \
 	install-strip installcheck installcheck-am installdirs \
@@ -626,12 +649,9 @@ uninstall-info: uninstall-info-recursive
 	mostlyclean-generic mostlyclean-libtool mostlyclean-recursive \
 	pdf pdf-am pdf-recursive ps ps-am ps-recursive tags \
 	tags-recursive uninstall uninstall-am uninstall-binSCRIPTS \
-	uninstall-dataDATA uninstall-docDATA uninstall-info-am \
-	uninstall-info-recursive uninstall-recursive
+	uninstall-dataDATA uninstall-dist_binSCRIPTS uninstall-docDATA \
+	uninstall-info-am uninstall-info-recursive uninstall-recursive
 
-
-all-local:
-	@touch include/version.sh
 
 .c.o:
 			@echo "Building $@"
