@@ -553,7 +553,7 @@ static void makemap(char *uplink, User *u, int level) {
 
 		if ((level == 0) && (strlen(s->uplink) <= 0)) { 
 			/* its the root server */
-			privmsg(u->nick, s_StatServ, "\2%-45s	[ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]", ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
+			privmsg(u->nick, s_StatServ, "\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]", ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
 			makemap(s->name, u, level+1);
 		} else if ((level > 0) && !strcasecmp(uplink, s->uplink)) {
 			/* its not the root server */
@@ -561,7 +561,7 @@ static void makemap(char *uplink, User *u, int level) {
 			for (i = 1; i < level; i++) {
 				sprintf(buf, "%s     |", buf);
 			}	
-			privmsg(u->nick, s_StatServ, "%s \\_\2%-40s	[ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]", buf, ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
+			privmsg(u->nick, s_StatServ, "%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]", buf, ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
 			makemap(s->name, u, level+1);
 		}
 	}
@@ -570,7 +570,7 @@ static void makemap(char *uplink, User *u, int level) {
 
 static void ss_map(User *u) {
 	strcpy(segv_location, "StatServ-ss_map");
-	privmsg(u->nick, s_StatServ, "%-40s	%-10s %-10s %-10s", "\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2",  "\2[LAG/MAX]\2");
+	privmsg(u->nick, s_StatServ, "%-40s      %-10s %-10s %-10s", "\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2",  "\2[LAG/MAX]\2");
 	makemap("", u, 0);
 	privmsg(u->nick, s_StatServ, "--- End of Listing ---");
 }
