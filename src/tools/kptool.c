@@ -494,9 +494,5 @@ int main(int argc, char *argv[])
         break;
     }
 
-#ifdef ALLOC_CHECK
-    _kp_exit();
-#endif
-
     return 0;
 }

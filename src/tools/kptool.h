@@ -42,20 +42,7 @@
  * MA 02111-1307, USA
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
-
-#ifdef ALLOC_CHECK
-#include <sys/types.h>
-extern void *_iamalloc(size_t size, int id);
-extern void *_iarealloc(void *ptr, size_t size, int id);
-extern void  _iafree(void *ptr, int id);
-#define malloc(size)        _iamalloc(size, 4)
-#define free(ptr)           _iafree(ptr, 4)
-#define realloc(ptr, size)  _iarealloc(ptr, size, 4)
-#endif
-
 
 /* Import, export utils */
 

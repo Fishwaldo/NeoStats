@@ -1,10 +1,10 @@
 include ../Makefile.inc
 
-TOOLSCFLAGS = $(CFLAGS) -DHAVE_CONFIG_H
+TOOLSCFLAGS = $(CFLAGS)
 INCLUDES = -I.. -I../keeper/ -I../adns/
 
-KP_SOURCES= kp_exp.c kp_imp.c kptool.c
-KP_OBJECTS= kp_exp.o kp_imp.o kptool.o
+KP_SOURCES= kp_exp.c kp_imp.c kptool.c misc.c
+KP_OBJECTS= kp_exp.o kp_imp.o kptool.o misc.o
 KEEPER_OBJS= ../keeper/kp_cache.o ../keeper/kp_dir.o ../keeper/kp_enum.o ../keeper/kp_get.o \
 			../keeper/kp_iface.o ../keeper/kp_recur.o ../keeper/kp_set.o ../keeper/kp_sort.o \
 			../keeper/kp_util.o

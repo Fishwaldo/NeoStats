@@ -367,6 +367,7 @@ src/tools/kp_exp.c -text
 src/tools/kp_imp.c -text
 src/tools/kptool.c -text
 src/tools/kptool.h -text
+src/tools/misc.c -text
 src/tools/sqlphp/README -text
 src/tools/sqlphp/rta_tables.php -text
 src/tools/sqlphp/rta_view.php -text

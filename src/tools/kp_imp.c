@@ -101,7 +101,7 @@ static void add_char(int cval, Token *tok)
 {
     if(tok->l + 1 >= tok->_size) {
         tok->_size += 16;
-        tok->s = (char *) realloc(tok->s, tok->_size);
+        tok->s = (char *) srealloc(tok->s, tok->_size);
         assert(tok->s != NULL);
     }
 
@@ -398,7 +398,7 @@ static int get_line(File *file, Token **tokens)
 
         if(n >= ts_size) {
             ts_size += 16;
-            ts = (Token *) realloc(ts, ts_size * sizeof(Token));
+            ts = (Token *) srealloc(ts, ts_size * sizeof(Token));
             assert(ts != NULL);
         }
         ts[n++] = tok;
@@ -437,7 +437,7 @@ static int set_value(File *file, const char *key,  kpval_t type, char *val)
             }
             if(datalen >= datasize) {
                 datasize += 16;
-                data = (unsigned char *) realloc(data, datasize);
+                data = (unsigned char *) srealloc(data, datasize);
                 assert(data != NULL);
             }
             data[datalen++] = (unsigned char) sd;

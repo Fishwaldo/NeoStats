@@ -1,7 +1,7 @@
 include ../Makefile.inc
 
 INCLUDES = -I.. -I../adns
-KEEPERCFLAGS = $(CFLAGS) -DHAVE_CONFIG_H
+KEEPERCFLAGS = $(CFLAGS)
 
 SRCS = kp_cache.c kp_dir.c kp_enum.c kp_get.c kp_iface.c \
 		kp_recur.c kp_set.c kp_sort.c kp_util.c
