@@ -457,6 +457,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	}
 	/* Handle SET if we have it */
 	if (bot_ptr->bot_settings && !strcasecmp(av[2], "SET") ) {
+		bot_setting* set_ptr;
 		set_ptr = bot_ptr->bot_settings;
 		while(set_ptr->option)
 		{
