@@ -673,7 +673,11 @@ m_burst (char *origin, char **argv, int argc, int srv)
 	char *s, *t;
 	char modechar = 0;
 	if(argv[2][0] == '+') {
-		t = (char*)argv[3];
+		if(strchr(argv[2],'l') || strchr(argv[2],'k')) {
+			t = (char*)argv[4];
+		} else {
+			t = (char*)argv[3];
+		}
 	} else {
 		t = (char*)argv[2];
 	}
