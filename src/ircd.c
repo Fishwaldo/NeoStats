@@ -1155,14 +1155,15 @@ int irc_join( const Bot *botptr, const char *chan, const char *mode )
 		if( mode == NULL ) 
 		{
 			irc_send_sjoin( me.name, botptr->u->name, chan,( unsigned long )ts );
+			JoinChannel( botptr->u->name, chan );
 		} 
 		else 
 		{
 			ircsnprintf( ircd_buf, BUFSIZE, "%c%s", CmodeCharToPrefix( mode[1] ), botptr->u->name );
 			irc_send_sjoin( me.name, ircd_buf, chan,( unsigned long )ts );
+			JoinChannel( botptr->u->name, chan );
 			ChanUserMode( chan, botptr->u->name, 1, CmodeStringToMask( mode ) );
 		}
-		JoinChannel( botptr->u->name, chan );
 	}
 	else
 	{
