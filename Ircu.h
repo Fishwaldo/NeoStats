@@ -254,8 +254,8 @@
 #define UMODE_CH_OPER 'o'
 
  /* User modes: */
-#define UMODE_OPER		0x0001	/* Operator */
-#define UMODE_LOCOP		0x0002	/* Local oper */
+#define UMODE_OPER				0x0001	/* Operator */
+#define UMODE_LOCOP				0x0002	/* Local oper */
 #define UMODE_INVISIBLE         0x0004	/* Invisible */
 #define UMODE_WALLOP            0x0008	/* see wallops */
 #define UMODE_SERVNOTICE        0x0010	/* See server notices */
@@ -266,6 +266,13 @@
 #define UMODE_HIDE				0x2000	/* */
 #ifdef NEFARIOUS
 #define UMODE_SETHOST			0x4000	/* */
+#define UMODE_BOT				0x8000	/* */
+#endif
+#if defined( NEFARIOUS ) || ( ASUKA )
+#define UMODE_ACCOUNTONLY		0x10000	/* */
+#define UMODE_XTRAOP			0x20000	/* */
+#define UMODE_NOCHAN			0x40000	/* */
+#define UMODE_NOIDLE			0x80000	/* */
 #endif
 
 /* Cmodes */

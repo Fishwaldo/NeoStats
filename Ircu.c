@@ -128,6 +128,13 @@ UserModes user_umodes[] = {
 	{UMODE_HIDE,		'x', 0},
 #ifdef NEFARIOUS
 	{UMODE_SETHOST,		'h', 0},
+	{UMODE_BOT,         'B', 0},
+#endif
+#if defined( NEFARIOUS ) || ( ASUKA )
+	{UMODE_ACCOUNTONLY, 'R', 0},
+	{UMODE_XTRAOP,      'X', 0},
+	{UMODE_NOCHAN,      'n', 0},
+	{UMODE_NOIDLE,      'I', 0},
 #endif
 };
 
