@@ -402,14 +402,11 @@ static int ls_thankyou(User * u, char **av, int ac)
 static int ls_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	prefmsg(u->nick, s_LoveServ, "\2%s Version Information\2",
-		s_LoveServ);
-	prefmsg(u->nick, s_LoveServ, "%s Version: %s - running on: %s",
-		s_LoveServ, __module_info.module_version, me.name);
-	prefmsg(u->nick, s_LoveServ,
-		"%s Author: Shmad <shmad@neostats.net>", s_LoveServ);
-	prefmsg(u->nick, s_LoveServ,
-		"Neostats Statistical Software: http://www.neostats.net");
+	prefmsg(u->nick, s_LoveServ, "\2%s Version Information\2", s_LoveServ);
+	prefmsg(u->nick, s_LoveServ, "%s Version: %s Compiled %s at %s", s_LoveServ, 
+		__module_info.module_version, __module_info.module_build_date, __module_info.module_build_time);
+	prefmsg(u->nick, s_LoveServ, "%s Author: Shmad <shmad@neostats.net>", s_LoveServ);
+	prefmsg(u->nick, s_LoveServ, "http://www.neostats.net");
 	return 1;
 
 }

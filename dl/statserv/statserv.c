@@ -670,19 +670,10 @@ static int ss_tld_map(User * u, char **av, int ac)
 static int ss_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	chanalert(s_StatServ, "%s Wanted to know our version number ", u->nick);
-	prefmsg(u->nick, s_StatServ, "\2StatServ Version Information\2");
-	prefmsg(u->nick, s_StatServ,
-		"-------------------------------------");
-	prefmsg(u->nick, s_StatServ,
-		"StatServ Version: %s Compiled %s at %s",
-		__module_info.module_version, __module_info.module_build_date,
-		__module_info.module_build_time);
+	prefmsg(u->nick, s_StatServ, "\2%s Version Information\2", s_StatServ);
+	prefmsg(u->nick, s_StatServ, "%s Version: %s Compiled %s at %s", s_StatServ,
+		__module_info.module_version, __module_info.module_build_date, __module_info.module_build_time);
 	prefmsg(u->nick, s_StatServ, "http://www.neostats.net");
-	prefmsg(u->nick, s_StatServ,
-		"-------------------------------------");
-	prefmsg(u->nick, s_StatServ, "HTML Stats is: %s",
-		(StatServ.html ? StatServ.htmlpath : "Disabled"));
 	return 1;
 }
 

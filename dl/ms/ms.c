@@ -248,17 +248,11 @@ static int ms_ode(User * u, char **av, int ac)
 static int ms_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	chanalert(s_MoraleServ,
-		"%s Wanted to know the current version information for %s",
-		u->nick, s_MoraleServ);
-	prefmsg(u->nick, s_MoraleServ, "\2%s Version Information\2",
-		s_MoraleServ);
-	prefmsg(u->nick, s_MoraleServ, "%s Version: %s - running on: %s",
-		s_MoraleServ, __module_info.module_version, me.name);
-	prefmsg(u->nick, s_MoraleServ,
-		"%s Author: ^Enigma^ <enigma@neostats.net>", s_MoraleServ);
-	prefmsg(u->nick, s_MoraleServ,
-		"Neostats Statistical Software: http://www.neostats.net");
+	prefmsg(u->nick, s_MoraleServ, "\2%s Version Information\2", s_MoraleServ);
+	prefmsg(u->nick, s_MoraleServ, "%s Version: %s Compiled %s at %s", s_MoraleServ, 
+		__module_info.module_version, __module_info.module_build_date, __module_info.module_build_time);
+	prefmsg(u->nick, s_MoraleServ, "%s Author: ^Enigma^ <enigma@neostats.net>", s_MoraleServ);
+	prefmsg(u->nick, s_MoraleServ, "http://www.neostats.net");
 	return 1;
 }
 

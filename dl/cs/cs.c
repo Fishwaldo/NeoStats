@@ -269,16 +269,10 @@ void __ModFini()
 static int cs_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	prefmsg(u->nick, s_ConnectServ,
-		"\2ConnectServ Version Information\2");
-	prefmsg(u->nick, s_ConnectServ,
-		"-------------------------------------");
-	prefmsg(u->nick, s_ConnectServ,
-		"ConnectServ Version: %s Compiled %s at %s",
+	prefmsg(u->nick, s_ConnectServ, "\2%s Version Information\2", s_ConnectServ);
+	prefmsg(u->nick, s_ConnectServ, "%s Version: %s Compiled %s at %s", s_ConnectServ,
 		__module_info.module_version, __module_info.module_build_date, __module_info.module_build_time);
 	prefmsg(u->nick, s_ConnectServ, "http://www.neostats.net");
-	prefmsg(u->nick, s_ConnectServ,
-		"-------------------------------------");
 	return 1;
 }
 
