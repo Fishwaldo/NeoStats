@@ -26,8 +26,6 @@
 #include "statserv.h"
 #include "log.h"
 
-extern ModuleInfo __module_info;
-
 int ok_to_wallop()
 {
 	static int lasttime;
