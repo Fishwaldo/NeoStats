@@ -611,6 +611,11 @@ static int hs_add(CmdParams* cmdparams)
 		}
 	}
 
+	if(validate_host (h) == NS_FAILURE) {
+		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+			"%s is an invalid host", h);
+		return 1;
+	}
 
 	if (!list_find(vhosts, cmd, findnick)) {
 		hsdat(cmd, m, h, p, cmdparams->source.user->nick);
