@@ -78,7 +78,8 @@ static bot_setting ls_settings[]=
 	{"NICK",		&s_LoveServ,		SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
 	{"USER",		&ls_cfg.user,		SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
 	{"HOST",		&ls_cfg.host,		SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
-	{"REALNAME",	&ls_cfg.realname,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
+	{"REALNAME",		&ls_cfg.realname,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",	NULL,	ns_help_set_realname },
+	{NULL,			NULL,			0,			0, 0,		0,		 NULL,		NULL,	NULL}									
 };
 
 static int Online(char **av, int ac)
