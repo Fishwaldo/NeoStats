@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.27 2002/10/20 17:14:00 shmad Exp $
+# $Id: Makefile.in,v 1.28 2002/10/24 14:35:11 fishwaldo Exp $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
@@ -10,8 +10,8 @@ OBJS =	dns.o chans.o dotconf.o services.o main.o sock.o conf.o ircd.o timer.o us
 SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c users.c \
 		ns_help.c dl.c list.c hash.c server.c @IRCD_FILES_SRC@
 
-PROGS = neostats chkstats makeconf
-CONF = neostats.cfg.dist neostats.motd
+PROGS = neostats cronchk makeconf
+CONF = neostats.motd
 DOCS = doc/FAQ doc/USERMAN README BUGS AUTHORS COPYING INSTALL LICENCE NEWS TODO
 DOCS_PROGS = doc/read-faq doc/read-userman
 DATA = data/tlds.nfo
