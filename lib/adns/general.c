@@ -30,8 +30,12 @@
  * - vbuf handling
  */
 
-#include "internal.h"
+#ifdef WIN32
+#else
 #include <arpa/inet.h>
+#endif
+
+#include "internal.h"
 
 /* Core diagnostic functions */
 
@@ -270,24 +274,20 @@ static const struct sinfo {
 	    SINFO(unknownformat, "Nameserver used unknown format"),
 	    SINFO(rcodeservfail, "Nameserver reports failure"),
 	    SINFO(rcodeformaterror, "Query not understood by nameserver"),
-	    SINFO(rcodenotimplemented,
-		  "Query not implemented by nameserver"),
+  SINFO(  rcodenotimplemented, "Query not implemented by nameserver"           ),
 	    SINFO(rcoderefused, "Query refused by nameserver"),
 	    SINFO(rcodeunknown, "Nameserver sent unknown response code"),
 	    SINFO(inconsistent, "Inconsistent resource records in DNS"),
-	    SINFO(prohibitedcname,
-		  "DNS alias found where canonical name wanted"),
-	    SINFO(answerdomaininvalid,
-		  "Found syntactically invalid domain name"),
+  SINFO(  prohibitedcname,     "DNS alias found where canonical name wanted"   ),
+  SINFO(  answerdomaininvalid, "Found syntactically invalid domain name"       ),
 	    SINFO(answerdomaintoolong, "Found overly-long domain name"),
 	    SINFO(invaliddata, "Found invalid DNS data"),
-	    SINFO(querydomainwrong,
-		  "Domain invalid for particular DNS query type"),
-	    SINFO(querydomaininvalid,
-		  "Domain name is syntactically invalid"),
-	    SINFO(querydomaintoolong,
-		  "Domain name or component is too long"), SINFO(nxdomain,
-								 "No such domain"),
+
+  SINFO(  querydomainwrong,    "Domain invalid for particular DNS query type"  ),
+  SINFO(  querydomaininvalid,  "Domain name is syntactically invalid"          ),
+  SINFO(  querydomaintoolong,  "Domain name or component is too long"          ),
+
+  SINFO(  nxdomain,            "No such domain"                                ),
 	    SINFO(nodata, "No such data")
 };
 
@@ -328,12 +328,13 @@ static const struct stinfo {
 	adns_status stmax;
 	const char *abbrev;
 } stinfos[] = {
-	{
-	adns_s_ok, "ok"},
+  { adns_s_ok, "ok" },
 	    STINFO(localfail),
 	    STINFO(remotefail),
 	    STINFO(tempfail),
-	    STINFO(misconfig), STINFO(misquery), STINFO(permfail)
+  STINFO(  misconfig   ),
+  STINFO(  misquery    ),
+  STINFO(  permfail    )
 };
 
 static int sti_compar(const void *key, const void *elem)
@@ -383,9 +384,10 @@ void adns__isort(void *array, int nobjs, int sz, void *tempbuf,
 }
 
 /* SIGPIPE protection. */
+/* Not required under Win32 with MSVC */
 
-void adns__sigpipe_protect(adns_state ads)
-{
+void adns__sigpipe_protect(adns_state ads) {
+#ifndef WIN32
 	sigset_t toblock;
 	struct sigaction sa;
 	int r;
@@ -404,10 +406,12 @@ void adns__sigpipe_protect(adns_state ads)
 	assert(!r);
 	r = sigaction(SIGPIPE, &sa, &ads->stdsigpipe);
 	assert(!r);
+#endif
 }
 
 void adns__sigpipe_unprotect(adns_state ads)
 {
+#ifndef WIN32
 	int r;
 
 	if (ads->iflags & adns_if_nosigpipe)
@@ -417,4 +421,5 @@ void adns__sigpipe_unprotect(adns_state ads)
 	assert(!r);
 	r = sigprocmask(SIG_SETMASK, &ads->stdsigmask, 0);
 	assert(!r);
+#endif
 }

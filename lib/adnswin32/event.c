@@ -39,15 +39,17 @@
 #include "internal.h"
 #include "tvarith.h"
 
-/* TCP connection management. */
-
 /* socket monitoring managemnet */
 void set_fdupdate(adns_state ads, fd_update myfdfunc) {
     ads->fdfunc = myfdfunc;
 }
 
 
-static void tcp_close(adns_state ads) {
+
+/* TCP connection management. */
+
+static void tcp_close(adns_state ads)
+{
   int serv;
   
   serv= ads->tcpserver;

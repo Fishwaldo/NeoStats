@@ -40,16 +40,19 @@
 /* Core diagnostic functions */
 
 void adns__vdiag(adns_state ads, const char *pfx, adns_initflags prevent,
-		 int serv, adns_query qu, const char *fmt, va_list al) {
+		 int serv, adns_query qu, const char *fmt, va_list al)
+{
   const char *bef, *aft;
   vbuf vb;
   
   if (!ads->diagfile ||
-      (!(ads->iflags & adns_if_debug) && (!prevent || (ads->iflags & prevent))))
+	    (!(ads->iflags & adns_if_debug)
+	     && (!prevent || (ads->iflags & prevent))))
     return;
 
   if (ads->iflags & adns_if_logpid) {
-    fprintf(ads->diagfile,"adns%s [%ld]: ",pfx,(long)getpid());
+		fprintf(ads->diagfile, "adns%s [%ld]: ", pfx,
+			(long) getpid());
   } else {
     fprintf(ads->diagfile,"adns%s: ",pfx);
   }
@@ -64,23 +67,29 @@ void adns__vdiag(adns_state ads, const char *pfx, adns_initflags prevent,
     fprintf(ads->diagfile,"%sQNAME=%s, QTYPE=%s",
 	    bef,
 	    adns__diag_domain(qu->ads,-1,0, &vb,
-			      qu->query_dgram,qu->query_dglen,DNS_HDRSIZE),
+					  qu->query_dgram, qu->query_dglen,
+					  DNS_HDRSIZE),
 	    qu->typei ? qu->typei->rrtname : "<unknown>");
     if (qu->typei && qu->typei->fmtname)
       fprintf(ads->diagfile,"(%s)",qu->typei->fmtname);
-    bef=", "; aft=")\n";
+		bef = ", ";
+		aft = ")\n";
     adns__vbuf_free(&vb);
   }
   
   if (serv>=0) {
-    fprintf(ads->diagfile,"%sNS=%s",bef,inet_ntoa(ads->servers[serv].addr));
-    bef=", "; aft=")\n";
+		fprintf(ads->diagfile, "%sNS=%s", bef,
+			inet_ntoa(ads->servers[serv].addr));
+		bef = ", ";
+		aft = ")\n";
   }
 
   fputs(aft,ads->diagfile);
 }
 
-void adns__debug(adns_state ads, int serv, adns_query qu, const char *fmt, ...) {
+void adns__debug(adns_state ads, int serv, adns_query qu, const char *fmt,
+		 ...)
+{
   va_list al;
 
   va_start(al,fmt);
@@ -88,15 +97,21 @@ void adns__debug(adns_state ads, int serv, adns_query qu, const char *fmt, ...) 
   va_end(al);
 }
 
-void adns__warn(adns_state ads, int serv, adns_query qu, const char *fmt, ...) {
+void adns__warn(adns_state ads, int serv, adns_query qu, const char *fmt,
+		...)
+{
   va_list al;
 
   va_start(al,fmt);
-  adns__vdiag(ads," warning",adns_if_noerrprint|adns_if_noserverwarn,serv,qu,fmt,al);
+	adns__vdiag(ads, " warning",
+		    adns_if_noerrprint | adns_if_noserverwarn, serv, qu,
+		    fmt, al);
   va_end(al);
 }
 
-void adns__diag(adns_state ads, int serv, adns_query qu, const char *fmt, ...) {
+void adns__diag(adns_state ads, int serv, adns_query qu, const char *fmt,
+		...)
+{
   va_list al;
 
   va_start(al,fmt);
@@ -106,36 +121,49 @@ void adns__diag(adns_state ads, int serv, adns_query qu, const char *fmt, ...) {
 
 /* vbuf functions */
 
-void adns__vbuf_init(vbuf *vb) {
-  vb->used= vb->avail= 0; vb->buf= 0;
+void adns__vbuf_init(vbuf * vb)
+{
+	vb->used = vb->avail = 0;
+	vb->buf = 0;
 }
 
-int adns__vbuf_ensure(vbuf *vb, int want) {
+int adns__vbuf_ensure(vbuf * vb, int want)
+{
   void *nb;
   
-  if (vb->avail >= want) return 1;
-  nb= adns_realloc(vb->buf,want); if (!nb) return 0;
+	if (vb->avail >= want)
+		return 1;
+	nb = realloc(vb->buf, want);
+	if (!nb)
+		return 0;
   vb->buf= nb;
   vb->avail= want;
   return 1;
 }
   
-void adns__vbuf_appendq(vbuf *vb, const byte *data, int len) {
+void adns__vbuf_appendq(vbuf * vb, const byte * data, int len)
+{
   memcpy(vb->buf+vb->used,data,len);
   vb->used+= len;
 }
 
-int adns__vbuf_append(vbuf *vb, const byte *data, int len) {
+int adns__vbuf_append(vbuf * vb, const byte * data, int len)
+{
   int newlen;
   void *nb;
 
   newlen= vb->used+len;
   if (vb->avail < newlen) {
-    if (newlen<20) newlen= 20;
+		if (newlen < 20)
+			newlen = 20;
     newlen <<= 1;
-    nb= adns_realloc(vb->buf,newlen);
-    if (!nb) { newlen= vb->used+len; nb= adns_realloc(vb->buf,newlen); }
-    if (!nb) return 0;
+		nb = realloc(vb->buf, newlen);
+		if (!nb) {
+			newlen = vb->used + len;
+			nb = realloc(vb->buf, newlen);
+		}
+		if (!nb)
+			return 0;
     vb->buf= nb;
     vb->avail= newlen;
   }
@@ -143,24 +171,29 @@ int adns__vbuf_append(vbuf *vb, const byte *data, int len) {
   return 1;
 }
 
-int adns__vbuf_appendstr(vbuf *vb, const char *data) {
+int adns__vbuf_appendstr(vbuf * vb, const char *data)
+{
   int l;
   l= strlen(data);
   return adns__vbuf_append(vb,data,l);
 }
 
-void adns__vbuf_free(vbuf *vb) {
-  adns_free(vb->buf);
+void adns__vbuf_free(vbuf * vb)
+{
+	free(vb->buf);
   adns__vbuf_init(vb);
 }
 
 /* Additional diagnostic functions */
 
 const char *adns__diag_domain(adns_state ads, int serv, adns_query qu,
-			      vbuf *vb, const byte *dgram, int dglen, int cbyte) {
+			      vbuf * vb, const byte * dgram, int dglen,
+			      int cbyte)
+{
   adns_status st;
 
-  st= adns__parse_domain(ads,serv,qu,vb, pdf_quoteok, dgram,dglen,&cbyte,dglen);
+	st = adns__parse_domain(ads, serv, qu, vb, pdf_quoteok, dgram,
+				dglen, &cbyte, dglen);
   if (st == adns_s_nomemory) {
     return "<cannot report domain... out of memory>";
   }
@@ -170,7 +203,8 @@ const char *adns__diag_domain(adns_state ads, int serv, adns_query qu,
 	  adns__vbuf_appendstr(vb,adns_strerror(st)) &&
 	  adns__vbuf_appendstr(vb,">") &&
 	  adns__vbuf_append(vb,"",1))) {
-      return "<cannot report bad format... out of memory>";
+			return
+			    "<cannot report bad format... out of memory>";
     }
   }
   if (!vb->used) {
@@ -182,28 +216,38 @@ const char *adns__diag_domain(adns_state ads, int serv, adns_query qu,
 
 adns_status adns_rr_info(adns_rrtype type,
 			 const char **rrtname_r, const char **fmtname_r,
-			 int *len_r,
-			 const void *datap, char **data_r) {
+			 int *len_r, const void *datap, char **data_r)
+{
   const typeinfo *typei;
   vbuf vb;
   adns_status st;
 
   typei= adns__findtype(type);
-  if (!typei) return adns_s_unknownrrtype;
+	if (!typei)
+		return adns_s_unknownrrtype;
 
-  if (rrtname_r) *rrtname_r= typei->rrtname;
-  if (fmtname_r) *fmtname_r= typei->fmtname;
-  if (len_r) *len_r= typei->rrsz;
+	if (rrtname_r)
+		*rrtname_r = typei->rrtname;
+	if (fmtname_r)
+		*fmtname_r = typei->fmtname;
+	if (len_r)
+		*len_r = typei->rrsz;
 
-  if (!datap) return adns_s_ok;
+	if (!datap)
+		return adns_s_ok;
   
   adns__vbuf_init(&vb);
   st= typei->convstring(&vb,datap);
-  if (st) goto x_freevb;
-  if (!adns__vbuf_append(&vb,"",1)) { st= adns_s_nomemory; goto x_freevb; }
-  assert((int)strlen(vb.buf) == vb.used-1);
-  *data_r= adns_realloc(vb.buf,vb.used);
-  if (!*data_r) *data_r= vb.buf;
+	if (st)
+		goto x_freevb;
+	if (!adns__vbuf_append(&vb, "", 1)) {
+		st = adns_s_nomemory;
+		goto x_freevb;
+	}
+	assert(strlen(vb.buf) == vb.used - 1);
+	*data_r = realloc(vb.buf, vb.used);
+	if (!*data_r)
+		*data_r = vb.buf;
   return adns_s_ok;
 
  x_freevb:
@@ -220,23 +264,19 @@ static const struct sinfo {
   const char *string;
 } sinfos[]= {
   SINFO(  ok,                  "OK"                                            ),
-
   SINFO(  nomemory,            "Out of memory"                                 ),
   SINFO(  unknownrrtype,       "Query not implemented in DNS library"          ),
   SINFO(  systemfail,          "General resolver or system failure"            ),
-
   SINFO(  timeout,             "DNS query timed out"                           ),
   SINFO(  allservfail,         "All nameservers failed"                        ),
   SINFO(  norecurse,           "Recursion denied by nameserver"                ),
   SINFO(  invalidresponse,     "Nameserver sent bad response"                  ),
   SINFO(  unknownformat,       "Nameserver used unknown format"                ),
-
   SINFO(  rcodeservfail,       "Nameserver reports failure"                    ),
   SINFO(  rcodeformaterror,    "Query not understood by nameserver"            ),
   SINFO(  rcodenotimplemented, "Query not implemented by nameserver"           ),
   SINFO(  rcoderefused,        "Query refused by nameserver"                   ),
   SINFO(  rcodeunknown,        "Nameserver sent unknown response code"         ),
-  
   SINFO(  inconsistent,        "Inconsistent resource records in DNS"          ),
   SINFO(  prohibitedcname,     "DNS alias found where canonical name wanted"   ),
   SINFO(  answerdomaininvalid, "Found syntactically invalid domain name"       ),
@@ -251,25 +291,30 @@ static const struct sinfo {
   SINFO(  nodata,              "No such data"                                  )
 };
 
-static int si_compar(const void *key, const void *elem) {
+static int si_compar(const void *key, const void *elem)
+{
   const adns_status *st= key;
   const struct sinfo *si= elem;
 
   return *st < si->st ? -1 : *st > si->st ? 1 : 0;
 }
 
-static const struct sinfo *findsinfo(adns_status st) {
-  return bsearch(&st,sinfos,sizeof(sinfos)/sizeof(*sinfos),sizeof(*sinfos),si_compar);
+static const struct sinfo *findsinfo(adns_status st)
+{
+	return bsearch(&st, sinfos, sizeof(sinfos) / sizeof(*sinfos),
+		       sizeof(*sinfos), si_compar);
 }
 
-const char *adns_strerror(adns_status st) {
+const char *adns_strerror(adns_status st)
+{
   const struct sinfo *si;
 
   si= findsinfo(st);
   return si->string;
 }
 
-const char *adns_errabbrev(adns_status st) {
+const char *adns_errabbrev(adns_status st)
+{
   const struct sinfo *si;
 
   si= findsinfo(st);
@@ -292,7 +337,8 @@ static const struct stinfo {
   STINFO(  permfail    )
 };
 
-static int sti_compar(const void *key, const void *elem) {
+static int sti_compar(const void *key, const void *elem)
+{
   const adns_status *st= key;
   const struct stinfo *sti= elem;
 
@@ -305,27 +351,33 @@ static int sti_compar(const void *key, const void *elem) {
   return here < min  ? -1 : here > max ? 1 : 0;
 }
 
-const char *adns_errtypeabbrev(adns_status st) {
+const char *adns_errtypeabbrev(adns_status st)
+{
   const struct stinfo *sti;
 
-  sti= bsearch(&st,stinfos,sizeof(stinfos)/sizeof(*stinfos),sizeof(*stinfos),sti_compar);
+	sti =
+	    bsearch(&st, stinfos, sizeof(stinfos) / sizeof(*stinfos),
+		    sizeof(*stinfos), sti_compar);
   return sti->abbrev;
 }
 
 
 void adns__isort(void *array, int nobjs, int sz, void *tempbuf,
-		 int (*needswap)(void *context, const void *a, const void *b),
-		 void *context) {
+		 int (*needswap) (void *context, const void *a,
+				  const void *b), void *context)
+{
   byte *data= array;
   int i, place;
 
   for (i=0; i<nobjs; i++) {
     for (place= i;
-	 place>0 && needswap(context, data + (place-1)*sz, data + i*sz);
-	 place--);
+		     place > 0
+		     && needswap(context, data + (place - 1) * sz,
+				 data + i * sz); place--);
     if (place != i) {
       memcpy(tempbuf, data + i*sz, sz);
-      memmove(data + (place+1)*sz, data + place*sz, (i-place)*sz);
+			memmove(data + (place + 1) * sz, data + place * sz,
+				(i - place) * sz);
       memcpy(data + place*sz, tempbuf, sz);
     }
   }
@@ -340,7 +392,8 @@ void adns__sigpipe_protect(adns_state ads) {
   struct sigaction sa;
   int r;
 
-  if (ads->iflags & adns_if_nosigpipe) return;
+	if (ads->iflags & adns_if_nosigpipe)
+		return;
 
   sigfillset(&toblock);
   sigdelset(&toblock,SIGPIPE);
@@ -349,18 +402,24 @@ void adns__sigpipe_protect(adns_state ads) {
   sigfillset(&sa.sa_mask);
   sa.sa_flags= 0;
   
-  r= sigprocmask(SIG_SETMASK,&toblock,&ads->stdsigmask); assert(!r);
-  r= sigaction(SIGPIPE,&sa,&ads->stdsigpipe); assert(!r);
+	r = sigprocmask(SIG_SETMASK, &toblock, &ads->stdsigmask);
+	assert(!r);
+	r = sigaction(SIGPIPE, &sa, &ads->stdsigpipe);
+	assert(!r);
 #endif
 }
 
-void adns__sigpipe_unprotect(adns_state ads) {
+void adns__sigpipe_unprotect(adns_state ads)
+{
 #ifndef WIN32
   int r;
 
-  if (ads->iflags & adns_if_nosigpipe) return;
+	if (ads->iflags & adns_if_nosigpipe)
+		return;
 
-  r= sigaction(SIGPIPE,&ads->stdsigpipe,0); assert(!r);
-  r= sigprocmask(SIG_SETMASK,&ads->stdsigmask,0); assert(!r);
+	r = sigaction(SIGPIPE, &ads->stdsigpipe, 0);
+	assert(!r);
+	r = sigprocmask(SIG_SETMASK, &ads->stdsigmask, 0);
+	assert(!r);
 #endif
 }
