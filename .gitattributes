@@ -115,7 +115,6 @@ curl/krb4.c -text
 curl/krb4.h -text
 curl/ldap.c -text
 curl/ldap.h -text
-curl/libtool -text
 curl/llist.c -text
 curl/llist.h -text
 curl/md5.c -text
