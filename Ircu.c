@@ -585,9 +585,12 @@ m_nick (char *origin, char **argv, int argc, int srv)
 	if(argc > 2) {
 		char *realname;
 		realname = joinbuf (argv, argc, (argc - 1));
-		/*       nick,    hopcount, TS,     user,    host, server, ip, servicestamp, modes, vhost, realname, numeric*/
+		/*       nick,    hopcount, TS,     user,    host, */
         do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
-			origin, NULL, NULL, NULL, NULL, realname, argv[argc-2]);
+			/* server, ip, servicestamp, modes*/
+			origin, NULL, NULL, (argv[5][0] == '+' : argv[5]: NULL),
+			/*, vhost, realname, numeric*/ 
+			NULL, realname, argv[argc-2]);
 		free (realname);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
