@@ -84,7 +84,7 @@ void (*irc_send_svspart) (const char *sender, const char *target, const char *ch
 void (*irc_send_svsnick) (const char *sender, const char *target, const char *newnick, const unsigned long ts);
 void (*irc_send_swhois) (const char *sender, const char *target, const char *swhois);
 void (*irc_send_smo) (const char *from, const char *umodetarget, const char *msg);
-void (*irc_send_akill) (const char *sender, const char *host, const char *ident, const char *setby, const unsigned int length, const char *reason, unsigned long ts);
+void (*irc_send_akill) (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, unsigned long ts);
 void (*irc_send_rakill) (const char *sender, const char *host, const char *ident);
 void (*irc_send_ping) (const char *from, const char *reply, const char *to);
 void (*irc_send_pong) (const char *reply);
@@ -1352,7 +1352,7 @@ ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
 }
 
 int
-sakill_cmd (const char *host, const char *ident, const char *setby, const unsigned int length, const char *reason, ...)
+sakill_cmd (const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, ...)
 {
 	va_list ap;
 

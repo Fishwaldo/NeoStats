@@ -480,7 +480,7 @@ send_end_of_burst(void)
 }
 
 void 
-send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned int length, const char *reason, const unsigned long ts)
+send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
 {
 	send_cmd ("%s %s * +%s@%s %lu :%s", neostatsbase64, TOK_GLINE, ident, host, length, reason);
 }

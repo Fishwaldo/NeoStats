@@ -990,7 +990,7 @@ int ssvspart_cmd (const char *target, const char *chan);
 EXPORTFUNC int ssvshost_cmd (const char *target, const char *vhost);
 int ssvsmode_cmd (const char *target, const char *modes);
 int ssvskill_cmd (const char *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-int sakill_cmd (const char *host, const char *ident, const char *setby, const unsigned int length, const char *reason, ...);
+int sakill_cmd (const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, ...);
 int srakill_cmd (const char *host, const char *ident);
 int ssvstime_cmd (const time_t ts);
 int schanusermode_cmd (const char *who, const char *chan, const char *mode, const char *bot);

@@ -315,7 +315,7 @@ send_invite (const char *from, const char *to, const char *chan)
 }
 
 void 
-send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned int length, const char *reason, const unsigned long ts)
+send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
 {
 #if 0
 	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, MSG_AKILL, host, ident, length, setby, ts, reason);
