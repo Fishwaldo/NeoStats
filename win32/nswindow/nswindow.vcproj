@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\src;..\src\adnswin32;..\src\keeper;..\src\curl;..\src\pcre"
+				AdditionalIncludeDirectories="..\..\src;..\..\src\adnswin32;..\..\src\keeper;..\..\src\curl;..\..\src\pcre"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ADNS_MAP_UNIXAPI"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -35,7 +35,7 @@
 				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curl.lib pcre.lib adns.lib"
 				OutputFile="$(OutDir)/nswindow.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=".\adns\Debug;.\pcre\Debug;.\curl\Debug"
+				AdditionalLibraryDirectories="..\adns\Debug;..\pcre\Debug;..\curl\Debug"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/nswindow.pdb"
 				SubSystem="2"
@@ -69,7 +69,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\src;..\src\adnswin32;..\src\keeper;..\src\curl;..\src\pcre"
+				AdditionalIncludeDirectories="..\..\src;..\..\src\adnswin32;..\..\src\keeper;..\..\src\curl;..\..\src\pcre"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;ADNS_MAP_UNIXAPI"
 				RuntimeLibrary="4"
 				UsePrecompiledHeader="0"
@@ -123,7 +123,7 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\src\win32\resource.h">
+				RelativePath="..\..\src\win32\resource.h">
 			</File>
 		</Filter>
 		<Filter
@@ -131,267 +131,267 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 			<File
-				RelativePath="..\src\win32\neostats.bmp">
+				RelativePath="..\..\src\win32\neostats.bmp">
 			</File>
 			<File
-				RelativePath="..\src\win32\neostats.rc">
+				RelativePath="..\..\src\win32\neostats.rc">
 			</File>
 		</Filter>
 		<Filter
 			Name="src">
 			<File
-				RelativePath="..\src\auth.c">
+				RelativePath="..\..\src\auth.c">
 			</File>
 			<File
-				RelativePath="..\src\auth.h">
+				RelativePath="..\..\src\auth.h">
 			</File>
 			<File
-				RelativePath="..\src\bans.c">
+				RelativePath="..\..\src\bans.c">
 			</File>
 			<File
-				RelativePath="..\src\bans.h">
+				RelativePath="..\..\src\bans.h">
 			</File>
 			<File
-				RelativePath="..\src\bots.c">
+				RelativePath="..\..\src\bots.c">
 			</File>
 			<File
-				RelativePath="..\src\bots.h">
+				RelativePath="..\..\src\bots.h">
 			</File>
 			<File
-				RelativePath="..\src\channels.c">
+				RelativePath="..\..\src\channels.c">
 			</File>
 			<File
-				RelativePath="..\src\channels.h">
+				RelativePath="..\..\src\channels.h">
 			</File>
 			<File
-				RelativePath="..\src\commands.c">
+				RelativePath="..\..\src\commands.c">
 			</File>
 			<File
-				RelativePath="..\src\commands.h">
+				RelativePath="..\..\src\commands.h">
 			</File>
 			<File
-				RelativePath="..\src\conf.c">
+				RelativePath="..\..\src\conf.c">
 			</File>
 			<File
-				RelativePath="..\src\conf.h">
+				RelativePath="..\..\src\conf.h">
 			</File>
 			<File
-				RelativePath="..\src\config.h">
+				RelativePath="..\..\src\config.h">
 			</File>
 			<File
-				RelativePath="..\src\config.h.in">
+				RelativePath="..\..\src\config.h.in">
 			</File>
 			<File
-				RelativePath="..\src\configwin32.h">
+				RelativePath="..\..\src\configwin32.h">
 			</File>
 			<File
-				RelativePath="..\src\db.c">
+				RelativePath="..\..\src\db.c">
 			</File>
 			<File
-				RelativePath="..\src\dl.c">
+				RelativePath="..\..\src\dl.c">
 			</File>
 			<File
-				RelativePath="..\src\dl.h">
+				RelativePath="..\..\src\dl.h">
 			</File>
 			<File
-				RelativePath="..\src\dns.c">
+				RelativePath="..\..\src\dns.c">
 			</File>
 			<File
-				RelativePath="..\src\dns.h">
+				RelativePath="..\..\src\dns.h">
 			</File>
 			<File
-				RelativePath="..\src\dotconf.c">
+				RelativePath="..\..\src\dotconf.c">
 			</File>
 			<File
-				RelativePath="..\src\dotconf.h">
+				RelativePath="..\..\src\dotconf.h">
 			</File>
 			<File
-				RelativePath="..\src\events.h">
+				RelativePath="..\..\src\events.h">
 			</File>
 			<File
-				RelativePath="..\src\exclude.c">
+				RelativePath="..\..\src\exclude.c">
 			</File>
 			<File
-				RelativePath="..\src\exclude.h">
+				RelativePath="..\..\src\exclude.h">
 			</File>
 			<File
-				RelativePath="..\src\hash.c">
+				RelativePath="..\..\src\hash.c">
 			</File>
 			<File
-				RelativePath="..\src\hash.h">
+				RelativePath="..\..\src\hash.h">
 			</File>
 			<File
-				RelativePath="..\src\ircd.c">
+				RelativePath="..\..\src\ircd.c">
 			</File>
 			<File
-				RelativePath="..\src\ircd.h">
+				RelativePath="..\..\src\ircd.h">
 			</File>
 			<File
-				RelativePath="..\src\ircstring.c">
+				RelativePath="..\..\src\ircstring.c">
 			</File>
 			<File
-				RelativePath="..\src\ircstring.h">
+				RelativePath="..\..\src\ircstring.h">
 			</File>
 			<File
-				RelativePath="..\src\keeper.c">
+				RelativePath="..\..\src\keeper.c">
 			</File>
 			<File
-				RelativePath="..\src\list.c">
+				RelativePath="..\..\src\list.c">
 			</File>
 			<File
-				RelativePath="..\src\list.h">
+				RelativePath="..\..\src\list.h">
 			</File>
 			<File
-				RelativePath="..\src\log.c">
+				RelativePath="..\..\src\log.c">
 			</File>
 			<File
-				RelativePath="..\src\log.h">
+				RelativePath="..\..\src\log.h">
 			</File>
 			<File
-				RelativePath="..\src\main.c">
+				RelativePath="..\..\src\main.c">
 			</File>
 			<File
-				RelativePath="..\src\Makefile.in">
+				RelativePath="..\..\src\Makefile.in">
 			</File>
 			<File
-				RelativePath="..\src\Makefile.inc">
+				RelativePath="..\..\src\Makefile.inc">
 			</File>
 			<File
-				RelativePath="..\src\Makefile.inc.in">
+				RelativePath="..\..\src\Makefile.inc.in">
 			</File>
 			<File
-				RelativePath="..\src\match.c">
+				RelativePath="..\..\src\match.c">
 			</File>
 			<File
-				RelativePath="..\src\misc.c">
+				RelativePath="..\..\src\misc.c">
 			</File>
 			<File
-				RelativePath="..\src\modules.c">
+				RelativePath="..\..\src\modules.c">
 			</File>
 			<File
-				RelativePath="..\src\modules.h">
+				RelativePath="..\..\src\modules.h">
 			</File>
 			<File
-				RelativePath="..\src\neostats.h">
+				RelativePath="..\..\src\neostats.h">
 			</File>
 			<File
-				RelativePath="..\src\ns_help.c">
+				RelativePath="..\..\src\ns_help.c">
 			</File>
 			<File
-				RelativePath="..\src\ns_help.h">
+				RelativePath="..\..\src\ns_help.h">
 			</File>
 			<File
-				RelativePath="..\src\numeric.h">
+				RelativePath="..\..\src\numeric.h">
 			</File>
 			<File
-				RelativePath="..\src\servers.c">
+				RelativePath="..\..\src\servers.c">
 			</File>
 			<File
-				RelativePath="..\src\servers.h">
+				RelativePath="..\..\src\servers.h">
 			</File>
 			<File
-				RelativePath="..\src\services.c">
+				RelativePath="..\..\src\services.c">
 			</File>
 			<File
-				RelativePath="..\src\services.h">
+				RelativePath="..\..\src\services.h">
 			</File>
 			<File
-				RelativePath="..\src\signals.c">
+				RelativePath="..\..\src\signals.c">
 			</File>
 			<File
-				RelativePath="..\src\signals.h">
+				RelativePath="..\..\src\signals.h">
 			</File>
 			<File
-				RelativePath="..\src\sock.c">
+				RelativePath="..\..\src\sock.c">
 			</File>
 			<File
-				RelativePath="..\src\sock.h">
+				RelativePath="..\..\src\sock.h">
 			</File>
 			<File
-				RelativePath="..\src\support.c">
+				RelativePath="..\..\src\support.c">
 			</File>
 			<File
-				RelativePath="..\src\support.h">
+				RelativePath="..\..\src\support.h">
 			</File>
 			<File
-				RelativePath="..\src\timer.c">
+				RelativePath="..\..\src\timer.c">
 			</File>
 			<File
-				RelativePath="..\src\timer.h">
+				RelativePath="..\..\src\timer.h">
 			</File>
 			<File
-				RelativePath="..\src\transfer.c">
+				RelativePath="..\..\src\transfer.c">
 			</File>
 			<File
-				RelativePath="..\src\transfer.h">
+				RelativePath="..\..\src\transfer.h">
 			</File>
 			<File
-				RelativePath="..\src\users.c">
+				RelativePath="..\..\src\users.c">
 			</File>
 			<File
-				RelativePath="..\src\users.h">
+				RelativePath="..\..\src\users.h">
 			</File>
 			<File
-				RelativePath="..\src\version.h">
+				RelativePath="..\..\src\version.h">
 			</File>
 			<Filter
 				Name="win32">
 				<File
-					RelativePath="..\src\win32\getopt.c">
+					RelativePath="..\..\src\win32\getopt.c">
 				</File>
 				<File
-					RelativePath="..\src\win32\getopt.h">
+					RelativePath="..\..\src\win32\getopt.h">
 				</File>
 				<File
-					RelativePath="..\src\win32\winmain.c">
+					RelativePath="..\..\src\win32\winmain.c">
 				</File>
 			</Filter>
 			<Filter
 				Name="keeper">
 				<File
-					RelativePath="..\src\keeper\keeper.h">
+					RelativePath="..\..\src\keeper\keeper.h">
 				</File>
 				<File
-					RelativePath="..\src\keeper\kp_cache.c">
+					RelativePath="..\..\src\keeper\kp_cache.c">
 				</File>
 				<File
-					RelativePath="..\src\keeper\kp_dir.c">
+					RelativePath="..\..\src\keeper\kp_dir.c">
 				</File>
 				<File
-					RelativePath="..\src\keeper\kp_enum.c">
+					RelativePath="..\..\src\keeper\kp_enum.c">
 				</File>
 				<File
-					RelativePath="..\src\keeper\kp_get.c">
+					RelativePath="..\..\src\keeper\kp_get.c">
 				</File>
 				<File
-					RelativePath="..\src\keeper\kp_iface.c">
+					RelativePath="..\..\src\keeper\kp_iface.c">
 				</File>
 				<File
-					RelativePath="..\src\keeper\kp_recur.c">
+					RelativePath="..\..\src\keeper\kp_recur.c">
 				</File>
 				<File
-					RelativePath="..\src\keeper\kp_set.c">
+					RelativePath="..\..\src\keeper\kp_set.c">
 				</File>
 				<File
-					RelativePath="..\src\keeper\kp_sort.c">
+					RelativePath="..\..\src\keeper\kp_sort.c">
 				</File>
 				<File
-					RelativePath="..\src\keeper\kp_util.c">
+					RelativePath="..\..\src\keeper\kp_util.c">
 				</File>
 				<File
-					RelativePath="..\src\keeper\kp_util.h">
+					RelativePath="..\..\src\keeper\kp_util.h">
 				</File>
 				<File
-					RelativePath="..\src\keeper\Makefile">
+					RelativePath="..\..\src\keeper\Makefile">
 				</File>
 			</Filter>
 			<Filter
 				Name="protocol">
 				<File
-					RelativePath="..\src\protocol\unreal32.c">
+					RelativePath="..\..\src\protocol\unreal32.c">
 				</File>
 				<File
-					RelativePath="..\src\protocol\unreal32.h">
+					RelativePath="..\..\src\protocol\unreal32.h">
 				</File>
 			</Filter>
 		</Filter>

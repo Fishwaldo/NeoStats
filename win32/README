@@ -8,8 +8,8 @@ solution from tghe Build menu.
 
 Main build files:
 nswin32.sln			- Main solution. 
-nscon.vcproj		- Project to build a Win32 console based app.
-nswindow.vcproj		- Project to build a Win32 GUI based app.
+nscon/nscon.vcproj		- Project to build a Win32 console based app.
+nswindow/nswindow.vcproj		- Project to build a Win32 GUI based app.
 
 Both the GUI and console apps depend on the following.
 
