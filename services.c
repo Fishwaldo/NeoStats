@@ -180,7 +180,7 @@ ns_logs (User * u, char **av, int ac)
 	fp = fopen ("logs/NeoStats.log", "r");
 	if (!fp) {
 		prefmsg (u->nick, s_Services, "Unable to open neostats.log");
-		return;
+		return 1;
 	}
 	while (fgets (buf, BUFSIZE, fp)) {
 		buf[strlen (buf)] = '\0';

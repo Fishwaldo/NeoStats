@@ -49,8 +49,6 @@ const char *loglevels[10] = {
 
 static char log_buf[BUFSIZE];
 static char log_fmttime[TIMEBUFSIZE];
-static char oldname[MAXPATH];
-static char logname[MAXPATH];
 
 struct logs_ {
 	FILE *logfile;

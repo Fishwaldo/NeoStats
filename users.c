@@ -64,7 +64,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *serve
 	User *u;
 	int i;
 
-	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): %s (%s@%s)(%d) -> %s at %lu", nick, user, host, htonl (ipaddr), server, TS);
+	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): %s (%s@%s)(%d) -> %s at %lu", nick, user, host, htonl (ipaddr), server, (unsigned long)TS);
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (u) {
