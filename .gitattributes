@@ -506,8 +506,6 @@ modules/statserv/Makefile.am -text
 modules/statserv/Makefile.in -text
 modules/statserv/channel.c -text
 modules/statserv/channel.h -text
-modules/statserv/database.c -text
-modules/statserv/database.h -text
 modules/statserv/geoip/GeoIP.c -text
 modules/statserv/geoip/GeoIP.h -text
 modules/statserv/geoip/GeoIPBitReader.c -text

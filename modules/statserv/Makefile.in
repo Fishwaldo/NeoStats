@@ -64,10 +64,9 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(datadir)"
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 statserv_la_LIBADD =
-am_statserv_la_OBJECTS = ss_help.lo database.lo stats.lo statserv.lo \
-	htmlstats.lo statsrta.lo tld.lo channel.lo user.lo network.lo \
-	server.lo version.lo GeoIPCity.lo GeoIPBitReader.lo GeoIP.lo \
-	md5.lo
+am_statserv_la_OBJECTS = ss_help.lo stats.lo statserv.lo htmlstats.lo \
+	statsrta.lo tld.lo channel.lo user.lo network.lo server.lo \
+	version.lo GeoIPCity.lo GeoIPBitReader.lo GeoIP.lo md5.lo
 statserv_la_OBJECTS = $(am_statserv_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include -I$(top_builddir)/lib/gdbm
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
@@ -209,7 +208,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 wi_PWD = @wi_PWD@
 pkglib_LTLIBRARIES = statserv.la
-statserv_la_SOURCES = ss_help.c database.c database.h \
+statserv_la_SOURCES = ss_help.c \
 			stats.c stats.h statserv.c statserv.h \
 			htmlstats.c htmlstats.h statsrta.c statsrta.h \
 			tld.c tld.h channel.c channel.h \
@@ -291,7 +290,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GeoIPBitReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GeoIPCity.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/channel.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/database.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/htmlstats.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md5.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/network.Plo@am__quote@

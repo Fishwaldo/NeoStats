@@ -124,9 +124,6 @@
 				RelativePath=".\channel.c">
 			</File>
 			<File
-				RelativePath=".\database.c">
-			</File>
-			<File
 				RelativePath=".\htmlstats.c">
 			</File>
 			<File
@@ -163,9 +160,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath=".\channel.h">
-			</File>
-			<File
-				RelativePath=".\database.h">
 			</File>
 			<File
 				RelativePath=".\htmlstats.h">

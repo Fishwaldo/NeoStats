@@ -1,5 +1,5 @@
 pkglib_LTLIBRARIES	= statserv.la
-statserv_la_SOURCES	= ss_help.c database.c database.h \
+statserv_la_SOURCES	= ss_help.c \
 			stats.c stats.h statserv.c statserv.h \
 			htmlstats.c htmlstats.h statsrta.c statsrta.h \
 			tld.c tld.h channel.c channel.h \
