@@ -152,7 +152,7 @@ getnumfromserver(const char* server)
 	Server *s;
 
 	nlog (LOG_DEBUG1, LOG_CORE, "getnumfromserver: scanning for %s", server);
-	s = finduser(server);
+	s = findserver(server);
 	if(s) {
 		return s->name64;
 	} else {
