@@ -26,7 +26,7 @@
 
 int InitUsers (void);
 void FiniUsers (void);
-void AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric);
+Client *AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric);
 void KillUser (const char *nick, const char *reason);
 void QuitUser (const char *nick, const char *reason);
 void SetUserVhost (const char* nick, const char* vhost);

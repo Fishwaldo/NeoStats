@@ -449,9 +449,6 @@ void del_chan_user(Channel *c, Client *u)
 {
 	lnode_t *un;
 
-	if ( IsMe (u) ) {
-		del_chan_bot (u->name, c->name);
-	}
 	un = list_find (u->user->chans, c->name, comparef);
 	if (!un) {
 		nlog (LOG_WARNING, "del_chan_user: %s not found in channel %s", u->name, c->name);
@@ -526,7 +523,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 			SendAllModuleEvent (EVENT_KICK, cmdparams);
 			if ( IsMe (u) ) {
 				/* its one of our bots */
-				SendModuleEvent (EVENT_KICKBOT, cmdparams, find_bot(u->name)->moduleptr);
+				SendModuleEvent (EVENT_KICKBOT, cmdparams, u->user->bot->moduleptr);
 			}
 			sfree (cmdparams);
 			c->users--;
@@ -592,7 +589,7 @@ part_chan (Client * u, const char *chan, const char *reason)
 			SendAllModuleEvent (EVENT_PART, cmdparams);
 			if ( IsMe (u) ) {
 				/* its one of our bots */
-				SendModuleEvent (EVENT_PARTBOT, cmdparams, find_bot(u->name)->moduleptr);
+				SendModuleEvent (EVENT_PARTBOT, cmdparams, u->user->bot->moduleptr);
 			}
 			sfree (cmdparams);
 			c->users--;
@@ -714,10 +711,6 @@ join_chan (const char* nick, const char *chan)
 	SendAllModuleEvent (EVENT_JOIN, cmdparams);
 	sfree (cmdparams);
 	dlog(DEBUG3, "join_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
-	if ( IsMe (u) ) {
-		dlog(DEBUG3, "join_chan: joining bot %s to channel %s", u->name, c->name);
-		add_chan_bot (u->name, c->name);
-	}
 }
 
 /** @brief Dump Channel information

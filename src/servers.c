@@ -351,7 +351,7 @@ PingServers (void)
 			s->server->ping = 0;
 			continue;
 		}
-		irc_send_ping (me.name, me.name, s->name);
+		irc_ping (me.name, me.name, s->name);
 	}
 }
 

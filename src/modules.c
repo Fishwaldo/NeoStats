@@ -503,7 +503,7 @@ unload_module (const char *modname, Client * u)
 	/* Delete any bots used by this module. Done after ModFini, so the bot 
 	 * can still send messages during ModFini 
 	 */
-	del_bots (mod_ptr);
+	del_module_bots (mod_ptr);
 	hnode_destroy (modnode);
 	/* Close module */
 	SET_RUN_LEVEL(mod_ptr);

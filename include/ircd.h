@@ -217,13 +217,9 @@ MODULEFUNC void send_vctrl (const int uprot, const int nicklen, const int modex,
 MODULEFUNC void send_burst (int b);
 MODULEFUNC void send_svstime (const char *source, const unsigned long ts);
 
-/* Pointers to the IRCd defined functions */
-extern void (*irc_send_ping) (const char *source, const char *reply, const char *to);
-extern void (*irc_send_server_connect) (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink);
-
 int InitIrcd (void);
+int irc_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink);
 int irc_nick (const char *nick, const char *user, const char *host, const char *realname, const char *modes);
-int irc_nickchange (const char *oldnick, const char *newnick);
 int irc_server (const char *name, const int numeric, const char *infoline);
 int irc_squit (const char *server, const char *quitmsg);
 

@@ -43,7 +43,6 @@ extern const char *ns_help_level[];
 extern const char *ns_help_botlist[];
 extern const char *ns_help_socklist[];
 extern const char *ns_help_timerlist[];
-extern const char *ns_help_botchanlist[];
 extern const char *ns_help_status[];
 
 extern const char ns_help_level_oneline[];
@@ -60,7 +59,6 @@ extern const char ns_help_raw_oneline[];
 extern const char ns_help_botlist_oneline[];
 extern const char ns_help_socklist_oneline[];
 extern const char ns_help_timerlist_oneline[];
-extern const char ns_help_botchanlist_oneline[];
 extern const char ns_help_modlist_oneline[];
 extern const char ns_help_userdump_oneline[];
 extern const char ns_help_chandump_oneline[];

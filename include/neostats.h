@@ -415,6 +415,8 @@ extern adns_state ads;
 EXPORTVAR extern const char version_date[];
 EXPORTVAR extern const char version_time[];
 
+typedef struct _Bot Bot;
+
 /** @brief Server structure
  *  structure containing all details of a server
  */
@@ -449,6 +451,7 @@ typedef struct User {
 	int ulevel;
 	list_t *chans;
 	Client *server;
+	Bot * bot;
 } User;
 
 /** @brief Client structure
@@ -542,8 +545,6 @@ typedef struct Channel {
 	unsigned int flags;
 	void *moddata[NUM_MODULES];
 } Channel;
-
-typedef struct _Bot Bot;
 
 typedef struct CmdParams {
 	Client *source;
@@ -890,10 +891,8 @@ EXPORTFUNC int add_sockpoll (before_poll_func beforepoll, after_poll_func afterp
 EXPORTFUNC int del_sock (const char *name);
 EXPORTFUNC Sock *find_sock (const char *sock_name);
 
-EXPORTFUNC Bot * init_bot (BotInfo* botinfo);
-EXPORTFUNC int del_bot (Bot *botptr, const char * reason);
-EXPORTFUNC Bot *find_bot (const char * bot_name);
-EXPORTFUNC int bot_nick_change (const char * oldnick, const char *newnick);
+EXPORTFUNC Bot * init_bot (BotInfo *botinfo);
+EXPORTFUNC Bot *find_bot (const char *bot_name);
 
 /* sock.c */
 EXPORTFUNC int sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, sock_func func_read, sock_func func_write, sock_func func_error);
@@ -957,6 +956,7 @@ EXPORTFUNC void irc_wallops (const Bot *botptr, const char *fmt, ...) __attribut
 /*  General irc actions for join/part channels etc
  *  Require a bot to operate
  */
+EXPORTFUNC int irc_nickchange (const Bot *botptr, const char *newnick);
 EXPORTFUNC int irc_quit (const Bot *botptr, const char *quitmsg);
 EXPORTFUNC int irc_join (const Bot *botptr, const char *chan, const char *chanmodes);
 EXPORTFUNC int irc_part (const Bot *botptr, const char *chan);

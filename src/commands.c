@@ -252,7 +252,7 @@ void check_cmd_result(CmdParams * cmdparams, int cmdret, char* extra)
 
 /** @brief add_bot_cmd adds a single command to the command hash
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int 
 add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr) 
@@ -285,7 +285,7 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 
 /** @brief del_bot_cmd deltes a single command to the command hash
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int 
 del_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr) 
@@ -304,7 +304,7 @@ del_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 
 /** @brief add_bot_cmd_list adds a list of commands to the command hash
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int 
 add_bot_cmd_list(Bot* bot_ptr, bot_cmd* bot_cmd_list) 
@@ -323,7 +323,7 @@ add_bot_cmd_list(Bot* bot_ptr, bot_cmd* bot_cmd_list)
 
 /** @brief del_bot_cmd_list delete a list of commands to the command hash
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int 
 del_bot_cmd_list(Bot* bot_ptr, bot_cmd* bot_cmd_list) 
@@ -342,7 +342,7 @@ del_bot_cmd_list(Bot* bot_ptr, bot_cmd* bot_cmd_list)
 
 /** @brief del_all_bot_cmds delete all commands from the bot
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int 
 del_all_bot_cmds(Bot* bot_ptr) 
@@ -368,7 +368,7 @@ del_all_bot_cmds(Bot* bot_ptr)
 
 /** @brief add_services_cmd_list adds a list of commands to the services bot
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int 
 add_services_cmd_list(bot_cmd* bot_cmd_list) 
@@ -378,7 +378,7 @@ add_services_cmd_list(bot_cmd* bot_cmd_list)
 
 /** @brief del_services_cmd_list delete a list of commands from the services bot
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int 
 del_services_cmd_list(bot_cmd* bot_cmd_list) 
@@ -388,7 +388,7 @@ del_services_cmd_list(bot_cmd* bot_cmd_list)
 
 /** @brief run_bot_cmd process bot command list
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int
 run_intrinsic_cmds (const char* cmd, CmdParams * cmdparams)
@@ -430,7 +430,7 @@ run_intrinsic_cmds (const char* cmd, CmdParams * cmdparams)
 
 /** @brief run_bot_cmd process bot command list
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int
 run_bot_cmd (CmdParams * cmdparams)
@@ -511,7 +511,7 @@ run_bot_cmd (CmdParams * cmdparams)
 
 /** @brief bot_cmd_help_set process bot help command
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int 
 bot_cmd_help_set (CmdParams * cmdparams, int userlevel)
@@ -537,7 +537,7 @@ bot_cmd_help_set (CmdParams * cmdparams, int userlevel)
 	
 /** @brief bot_cmd_help process bot help command
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int 
 bot_cmd_help (CmdParams * cmdparams)
@@ -701,7 +701,7 @@ Client * find_valid_user(Bot* botptr, Client * sourceuser, const char* target_ni
 }
 
 /** @brief bot_cmd_set_list process bot set list command
- *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int 
 bot_cmd_set_list (CmdParams * cmdparams)
@@ -774,7 +774,7 @@ bot_cmd_set_report (CmdParams * cmdparams, bot_setting* set_ptr, char* new_setti
 
 /** @brief bot_cmd_set helper functions
  *  validate the pamater based on type and perform appropriate action
- *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int 
 bot_cmd_set_boolean (CmdParams * cmdparams, bot_setting* set_ptr)
@@ -982,7 +982,7 @@ static bot_cmd_set_handler bot_cmd_set_handlers[] =
 };
 
 /** @brief bot_cmd_set process bot set command
- *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int 
 bot_cmd_set (CmdParams * cmdparams)
@@ -1036,7 +1036,7 @@ bot_cmd_set (CmdParams * cmdparams)
 }
 
 /** @brief bot_cmd_about process bot about command
- *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int bot_cmd_about (CmdParams * cmdparams)
 {
@@ -1045,7 +1045,7 @@ static int bot_cmd_about (CmdParams * cmdparams)
 }
 
 /** @brief bot_cmd_version process bot version command
- *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int bot_cmd_version (CmdParams * cmdparams)
 {
@@ -1059,7 +1059,7 @@ static int bot_cmd_version (CmdParams * cmdparams)
 }
 
 /** @brief bot_cmd_credits process bot credits command
- *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int bot_cmd_credits (CmdParams * cmdparams)
 {
@@ -1070,7 +1070,7 @@ static int bot_cmd_credits (CmdParams * cmdparams)
 
 /** @brief add_bot_setting adds a single set option 
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int 
 add_bot_setting (hash_t* set_hash, bot_setting* set_ptr) 
@@ -1088,7 +1088,7 @@ add_bot_setting (hash_t* set_hash, bot_setting* set_ptr)
 
 /** @brief del_bot_setting delete a single set option 
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 static int 
 del_bot_setting (hash_t* set_hash, bot_setting* set_ptr) 
@@ -1106,7 +1106,7 @@ del_bot_setting (hash_t* set_hash, bot_setting* set_ptr)
 
 /** @brief add_bot_setting_list adds a list of set options
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int 
 add_bot_setting_list (Bot* bot_ptr, bot_setting* set_ptr) 
@@ -1130,7 +1130,7 @@ add_bot_setting_list (Bot* bot_ptr, bot_setting* set_ptr)
 
 /** @brief del_bot_setting_list delete a list of set options
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int 
 del_bot_setting_list (Bot* bot_ptr, bot_setting* set_ptr) 
@@ -1168,13 +1168,39 @@ int del_all_bot_settings (Bot *bot_ptr)
 	return NS_SUCCESS;
 }
 
+int bot_set_nick_cb(CmdParams* cmdparams)
+{
+	irc_nickchange(cmdparams->bot, cmdparams->av[1]);
+	return NS_SUCCESS;
+}
+
+int bot_set_altnick_cb(CmdParams* cmdparams)
+{
+	return NS_SUCCESS;
+}
+
+int bot_set_user_cb(CmdParams* cmdparams)
+{
+	return NS_SUCCESS;
+}
+
+int bot_set_host_cb(CmdParams* cmdparams)
+{
+	return NS_SUCCESS;
+}
+
+int bot_set_realname_cb(CmdParams* cmdparams)
+{
+	return NS_SUCCESS;
+}
+
 static bot_setting bot_info_settings[]=
 {
-	{"NICK",	NULL,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, NULL },
-	{"ALTNICK",	NULL,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, NULL },
-	{"USER",	NULL,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, NULL },
-	{"HOST",	NULL,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, NULL },
-	{"REALNAME",NULL,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, NULL },
+	{"NICK",	NULL,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, bot_set_nick_cb, NULL },
+	{"ALTNICK",	NULL,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, bot_set_altnick_cb, NULL },
+	{"USER",	NULL,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, bot_set_user_cb, NULL },
+	{"HOST",	NULL,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, bot_set_host_cb, NULL },
+	{"REALNAME",NULL,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, bot_set_realname_cb, NULL },
 	{NULL,		NULL,	0,					0, 0, 			0,				 NULL,		NULL,	NULL,				NULL,	NULL },
 };
 

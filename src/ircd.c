@@ -658,6 +658,13 @@ do_protocol (char *origin, char **argv, int argc)
 	}
 }
 
+int 
+irc_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
+{
+	irc_send_server_connect (name, numeric, infoline, pass, tsboot, tslink);
+	return NS_SUCCESS;
+}
+
 void
 irc_privmsg_list (const Bot *botptr, const Client * target, const char **text)
 {
@@ -820,7 +827,7 @@ unsupported_cmd(const char* cmd)
 
 /** @brief irc_nick
  *
- *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int
 irc_nick (const char *nick, const char *user, const char *host, const char *realname, const char *modes)
@@ -840,7 +847,7 @@ irc_nick (const char *nick, const char *user, const char *host, const char *real
  *  but function created for future use and propogation to
  *  external modules to avoid a future joint release.
  *
- *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int 
 irc_cloakhost (const Bot *botptr)
@@ -865,7 +872,7 @@ irc_usermode (const Bot *botptr, const char *target, long mode)
 
 /** @brief irc_join
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int 
 irc_join (const Bot *botptr, const char *chan, const char *mode)
@@ -910,10 +917,20 @@ irc_part (const Bot *botptr, const char *chan)
 }
 
 int
-irc_nickchange (const char *oldnick, const char *newnick)
+irc_nickchange (const Bot *botptr, const char *newnick)
 {
-	UserNick (oldnick, newnick, NULL);
-	irc_send_nickchange (oldnick, newnick, me.now);
+	if (!botptr) {
+		nlog (LOG_WARNING, "Unknown bot tried to change nick to %s", newnick);
+		return NS_FAILURE;
+	}
+	/* Check newnick is not in use */
+	if (find_user (newnick)) {
+		nlog (LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", botptr->name, newnick);
+		return NS_FAILURE;
+	}
+	UserNick (botptr->name, newnick, NULL);
+	irc_send_nickchange (botptr->name, newnick, me.now);
+	bot_nick_change(botptr, newnick);
 	return NS_SUCCESS;
 }
 
@@ -1337,10 +1354,8 @@ do_nick (const char *nick, const char *hopcount, const char* TS,
 	if(vhost) {
 		SetUserVhost(nick, vhost);
 	}
-	if (ircd_srv.features&FEATURE_USERSMODES) {
-		if(smodes) {
-			UserSMode (nick, smodes);
-		}
+	if(smodes) {
+		UserSMode (nick, smodes);
 	}
 }
 

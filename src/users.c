@@ -77,7 +77,7 @@ static void lookupnickip(char *data, adns_answer *a)
 	}
 }
 
-void
+Client *
 AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric)
 {
 	CmdParams * cmdparams;
@@ -88,7 +88,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	u = find_user (nick);
 	if (u) {
 		nlog (LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick);
-		return;
+		return NULL;
 	}
 	if(ip) {
 		ipaddress = strtoul (ip, NULL, 10);
@@ -112,7 +112,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	dlog(DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, (int)htonl (ipaddress), server, TS);
 	u = new_user (nick);
 	if (!u) {
-		return;
+		return NULL;
 	}
 	if(TS) {
 		u->tsconnect = strtoul (TS, NULL, 10);
@@ -148,6 +148,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	if(is_synched && config.versionscan && !IsExcluded(u) && !IsMe(u)) {
 		irc_privmsg(ns_botptr, u, "\1VERSION\1");
 	}
+	return u;
 }
 
 static void deluser(Client * u)
@@ -161,7 +162,7 @@ static void deluser(Client * u)
 	}
 	/* if its one of our bots, remove it from the modlist */
 	if ( IsMe(u) ) {
-		del_ns_bot (u->name);
+		del_bot (u->name);
 	}
 	hash_delete (userhash, un);
 	hnode_destroy (un);

@@ -35,22 +35,10 @@
 #include "bots.h"
 #include "users.h"
 
-/** @brief Channel bot structure
- * 
- */
-typedef struct ChanBot {
-	/** channel name */
-	char chan[MAXCHANLEN];
-	/** bot list */
-	list_t *bots;
-}ChanBot;
-
 #define MAX_CMD_LINE_LENGTH		350
 
 /* @brief Module Bot hash list */
 static hash_t *bothash;
-/* @brief Module Chan Bot hash list */
-static hash_t *botchanhash;
 
 int InitBots (void)
 {
@@ -59,125 +47,13 @@ int InitBots (void)
 		nlog (LOG_CRITICAL, "Unable to create bot hash");
 		return NS_FAILURE;
 	}
-	botchanhash = hash_create (C_TABLE_SIZE, 0, 0);
-	if(!botchanhash) {
-		nlog (LOG_CRITICAL, "Unable to create bot channel hash");
-		return NS_FAILURE;
-	}
 	return NS_SUCCESS;
 }
 
 int FiniBots (void)
 {
 	hash_destroy(bothash);
-	hash_destroy(botchanhash);
 	return NS_SUCCESS;
-}
-
-/** @brief Add a bot to a channel
- *
- * @param bot string containing bot name
- * @param chan string containing channel name
- * 
- * @return none
- */
-void
-add_chan_bot (const char *bot, const char *chan)
-{
-	hnode_t *cbn;
-	ChanBot *chanbot;
-	lnode_t *bmn;
-	char *botname;
-
-	cbn = hash_lookup (botchanhash, chan);
-	if (!cbn) {
-		if (hash_isfull (botchanhash)) {
-			nlog (LOG_CRITICAL, "add_chan_bot: bot channel hash is full");
-			return;
-		}
-		chanbot = smalloc (sizeof (ChanBot));
-		strlcpy (chanbot->chan, chan, MAXCHANLEN);
-		chanbot->bots = list_create (B_TABLE_SIZE);
-		cbn = hnode_create (chanbot);
-		hash_insert (botchanhash, cbn, chanbot->chan);
-	} else {
-		chanbot = hnode_get (cbn);
-	}
-	if (list_isfull (chanbot->bots)) {
-		nlog (LOG_CRITICAL, "add_chan_bot: bot channel list is full adding channel %s", chan);
-		return;
-	}
-	botname = sstrdup (bot);
-	bmn = lnode_create (botname);
-	list_append (chanbot->bots, bmn);
-	return;
-}
-
-/** @brief delete a bot from a channel
- *
- * @param bot string containing bot name
- * @param chan string containing channel name
- * 
- * @return none
- */
-void
-del_chan_bot (const char *bot, const char *chan)
-{
-	hnode_t *cbn;
-	ChanBot *chanbot;
-	lnode_t *bmn;
-	char *botname;
-
-	cbn = hash_lookup (botchanhash, chan);
-	if (!cbn) {
-		nlog (LOG_WARNING, "del_chan_bot: can't find channel %s for botchanhash", chan);
-		return;
-	}
-	chanbot = hnode_get (cbn);
-	bmn = list_find (chanbot->bots, bot, comparef);
-	if (!bmn) {
-		nlog (LOG_WARNING, "del_chan_bot: can't find bot %s in %s in botchanhash", bot, chan);
-		return;
-	}
-	list_delete (chanbot->bots, bmn);
-	botname = lnode_get(bmn);
-	free (botname);
-	lnode_destroy (bmn);
-	if (list_isempty (chanbot->bots)) {
-		/* delete the hash and list because its all over */
-		hash_delete (botchanhash, cbn);
-		list_destroy (chanbot->bots);
-		sfree (chanbot->chan);
-		hnode_destroy (cbn);
-	}
-}
-
-/** @brief dump list of module bots and channels
- *
- * @param u
- * 
- * @return none
- */
-int
-list_bot_chans (CmdParams* cmdparams)
-{
-	hscan_t hs;
-	hnode_t *hn;
-	lnode_t *ln;
-	ChanBot *chanbot;
-
-	irc_prefmsg (ns_botptr, cmdparams->source, "BotChanDump:");
-	hash_scan_begin (&hs, botchanhash);
-	while ((hn = hash_scan_next (&hs)) != NULL) {
-		chanbot = hnode_get (hn);
-		irc_prefmsg (ns_botptr, cmdparams->source, "%s:--------------------------------", chanbot->chan);
-		ln = list_first (chanbot->bots);
-		while (ln) {
-			irc_prefmsg (ns_botptr, cmdparams->source, "Bot Name: %s", (char *)lnode_get (ln));
-			ln = list_next (chanbot->bots, ln);
-		}
-	}
-	return 0;
 }
 
 /** @brief flood
@@ -231,7 +107,7 @@ int process_target_user(CmdParams * cmdparams, char* target)
 {
 	cmdparams->target = find_user (target);
 	if(cmdparams->target) {
-		cmdparams->bot = find_bot (target);
+		cmdparams->bot = cmdparams->target->user->bot;
 		if(cmdparams->bot) {
 			return 1;
 		}
@@ -270,13 +146,13 @@ void bot_notice (char *origin, char **av, int ac)
 		if (process_target_user(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
 			SendModuleEvent (EVENT_NOTICE, cmdparams, cmdparams->bot->moduleptr);
+			if (!strncasecmp(av[ac - 1], "\1version", 8)) {
+				/* skip "\1version " */
+				cmdparams->param += 9;
+				strlcpy(cmdparams->source->version, cmdparams->param, MAXHOST);
+ 				SendModuleEvent (EVENT_CTCPVERSION, cmdparams, cmdparams->bot->moduleptr);
+			}
 		}		
-		if (!strncasecmp(av[ac - 1], "\1version", 8)) {
-			/* skip "\1version " */
-			cmdparams->param += 9;
-			strlcpy(cmdparams->source->version, cmdparams->param, MAXHOST);
- 			SendModuleEvent (EVENT_CTCPVERSION, cmdparams, cmdparams->bot->moduleptr);
-		}
 	}
 	sfree (cmdparams);
 
@@ -358,7 +234,7 @@ void bot_chan_private (char *origin, char **av, int ac)
 	if(process_origin(cmdparams, origin)) {
 		if(process_target_chan(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
-			SendModuleEvent (EVENT_CPRIVATE, cmdparams, cmdparams->bot->moduleptr);
+			/* TEMP SendModuleEvent (EVENT_CPRIVATE, cmdparams, cmdparams->bot->moduleptr); */
 			if (av[ac - 1][0] == '\1') {
 				/* TODO CTCP handler */
 			}
@@ -392,14 +268,17 @@ new_bot (const char *bot_name)
 	return botptr;
 }
 
-/** @brief 
+/** @brief add_bot
  *
- * @param 
- * 
- * @return
+ *  allocate bot
+ *
+ *  @param modptr pointer to module requesting bot
+ *  @param nick name of new bot
+ *
+ *  @return pointer to bot or NULL if not found
  */
 Bot *
-add_ns_bot (Module* modptr, const char *nick)
+add_bot (Module* modptr, const char *nick)
 {
 	Bot *botptr;
 
@@ -411,15 +290,17 @@ add_ns_bot (Module* modptr, const char *nick)
 		botptr->set_ulevel = NS_ULEVEL_ROOT;
 		return botptr;
 	}
-	nlog (LOG_WARNING, "add_ns_bot: Couldn't Add Bot to List");
+	nlog (LOG_WARNING, "add_bot: Couldn't Add Bot to List");
 	return NULL;
 }
 
-/** @brief 
+/** @brief find_bot
  *
- * @param 
- * 
- * @return
+ *  find bot
+ *
+ *  @param bot_name name of bot to find
+ *
+ *  @return pointer to bot or NULL if not found
  */
 Bot *
 find_bot (const char *bot_name)
@@ -434,14 +315,16 @@ find_bot (const char *bot_name)
 	return NULL;
 }
 
-/** @brief 
+/** @brief del_bot
  *
- * @param 
- * 
- * @return
+ *  delete bot
+ *
+ *  @param bot_name name of bot to delete
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int
-del_ns_bot (const char *bot_name)
+del_bot (const char *bot_name)
 {
 	Bot *botptr;
 	hnode_t *bn;
@@ -449,11 +332,11 @@ del_ns_bot (const char *bot_name)
 	SET_SEGV_LOCATION();
 	bn = hash_lookup (bothash, bot_name);
 	if (bn) {
-		hash_delete (bothash, bn);
 		botptr = hnode_get (bn);
 		del_all_bot_cmds(botptr);
 		del_bot_info_settings(botptr);
 		del_all_bot_settings(botptr);
+		hash_delete (bothash, bn);
 		hnode_destroy (bn);
 		sfree (botptr);
 		return NS_SUCCESS;
@@ -461,54 +344,48 @@ del_ns_bot (const char *bot_name)
 	return NS_FAILURE;
 }
 
-/** @brief 
+/** @brief bot_nick_change
  *
- * @param 
- * 
- * @return
+ *  change bot nick
+ *
+ *  @param botptr pointer to bot
+ *  @param newnick new nick
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int
-bot_nick_change (const char *oldnick, const char *newnick)
+bot_nick_change (const Bot *botptr, const char *newnick)
 {
-	Bot *botptr;
 	hnode_t *bn;
 
 	SET_SEGV_LOCATION();
-	/* First, try to find out if the newnick is unique! */
-	if (!find_user (oldnick)) {
-		nlog (LOG_WARNING, "Unknown bot %s tried to change nick to %s", oldnick, newnick);
-		return NS_FAILURE;
-	}
-	if (find_user (newnick)) {
-		nlog (LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", oldnick, newnick);
-		return NS_FAILURE;
-	}
-	bn = hash_lookup (bothash, oldnick);
+	bn = hash_lookup (bothash, botptr->name);
 	if (!bn) {
-		nlog (LOG_NOTICE, "Couldn't find bot %s in bot list", oldnick);
+		nlog (LOG_NOTICE, "Couldn't find bot %s in bot list", botptr->name);
 		return NS_FAILURE;
 	}
-	botptr = hnode_get (bn);
 	/* remove old hash entry */
 	hash_delete (bothash, bn);
-	dlog(DEBUG3, "Bot %s changed nick to %s", oldnick, newnick);
+	dlog(DEBUG3, "Bot %s changed nick to %s", botptr->name, newnick);
 	strlcpy (botptr->name, newnick, MAXNICK);
 	/* insert new hash entry */
 	hash_insert (bothash, bn, botptr->name);
-	/* send bot nick change */   
-	irc_nickchange (oldnick, newnick);
 	return NS_SUCCESS;
 }
 
-/** @brief 
+/** @brief list_bots
  *
- * @param 
- * 
- * @return
+ *  list all neostats bots
+ *
+ *  @param cmdparams pointer to command parameters
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int
 list_bots (CmdParams* cmdparams)
 {
+	int i;
+	lnode_t *cm;
 	Bot *botptr;
 	hnode_t *bn;
 	hscan_t bs;
@@ -520,23 +397,36 @@ list_bots (CmdParams* cmdparams)
 		botptr = hnode_get (bn);
 		if((botptr->flags & 0x80000000)) {
 			irc_prefmsg (ns_botptr, cmdparams->source, "NeoStats");
-			irc_prefmsg (ns_botptr, cmdparams->source, "Bots: %s", botptr->name);
+			irc_prefmsg (ns_botptr, cmdparams->source, "Bot: %s", botptr->name);
 		} else {
 			irc_prefmsg (ns_botptr, cmdparams->source, "Module: %s", botptr->moduleptr->info->name);
-			irc_prefmsg (ns_botptr, cmdparams->source, "Module Bots: %s", botptr->name);
+			irc_prefmsg (ns_botptr, cmdparams->source, "Bot: %s", botptr->name);
+		}
+		cm = list_first (botptr->u->user->chans);
+		i = 0;
+		while (cm) {
+			if(i==0) {
+				irc_chanalert (ns_botptr, "Channels: %s", (char *) lnode_get (cm));
+			} else {
+				irc_chanalert (ns_botptr, "          %s", (char *) lnode_get (cm));
+			}
+			cm = list_next (botptr->u->user->chans, cm);
+			i++;
 		}
 	}
 	irc_prefmsg (ns_botptr, cmdparams->source, "End of Module Bot List");
-	return 0;
+	return NS_SUCCESS;
 }
 
-/** @brief del_bots
+/** @brief del_module_bots
  *
- * 
+ *  delete all bots associated with a given module
  *
- * @return none
+ *  @param mod_ptr pointer to module
+ *
+ *  @return none
  */
-int	del_bots (Module *mod_ptr)
+void del_module_bots (Module *mod_ptr)
 {
 	Bot *botptr;
 	hnode_t *modnode;
@@ -546,22 +436,24 @@ int	del_bots (Module *mod_ptr)
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		botptr = hnode_get (modnode);
 		if (botptr->moduleptr == mod_ptr) {
-			dlog(DEBUG1, "Module %s had bot %s Registered. Deleting..", mod_ptr->info->name, botptr->name);
-			del_bot (botptr, "Module Unloaded");
+			dlog(DEBUG1, "Deleting module %s bot %s", mod_ptr->info->name, botptr->name);
+			irc_quit (botptr, "Module Unloaded");
 		}
 	}
-	return NS_SUCCESS;
+	return;
 }
 
 /** @brief init_bot
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ *  initialise a new bot
+ *
+ *  @param botinfo pointer to bot description
+ *
+ *  @return pointer to bot or NULL if failed
  */
 Bot *init_bot (BotInfo* botinfo)
 {
 	Bot * botptr; 
-	Client *u;
-	long Umode = 0;
 	char* nick;
 	Module* modptr;
 	char* host;
@@ -578,13 +470,11 @@ Bot *init_bot (BotInfo* botinfo)
 	}
 	modptr = GET_CUR_MODULE();
 	nick = botinfo->nick;
-	u = find_user (nick);
-	if (u) {
+	if (find_user (nick)) {
 		nlog (LOG_WARNING, "Bot nick %s already in use", botinfo->nick);
 		if(botinfo->altnick) {
 			nick = botinfo->altnick;
-			u = find_user (nick);
-			if(u) {
+			if(find_user (nick)) {
 				nlog (LOG_WARNING, "Bot alt nick %s already in use", botinfo->altnick);
 				/* TODO: try and find a free nick */
 				nlog (LOG_WARNING, "Unable to init bot");
@@ -596,18 +486,17 @@ Bot *init_bot (BotInfo* botinfo)
 			return NULL;
 		}
 	} 
-	botptr = add_ns_bot (modptr, nick);
+	botptr = add_bot (modptr, nick);
 	if (!botptr) {
-		nlog (LOG_WARNING, "add_ns_bot failed for module %s bot %s", modptr->info->name, nick);
+		nlog (LOG_WARNING, "add_bot failed for module %s bot %s", modptr->info->name, nick);
 		return NULL;
 	}
 	host = ((*botinfo->host)==0?me.name:botinfo->host);
-	AddUser (nick, botinfo->user, host, botinfo->realname, me.name, NULL, NULL, NULL);
-	u = find_user (nick);
-	/* set our link back to user struct for bot */
-	botptr->u = u;
+	/* For more efficient transversal of bot/user lists, link 
+	 * associated user struct to bot and link bot into user struct */
+	botptr->u = AddUser (nick, botinfo->user, host, botinfo->realname, me.name, NULL, NULL, NULL);
+	botptr->u->user->bot = botptr;
 	if(botinfo->flags&BOT_FLAG_SERVICEBOT) {
-		Umode = UmodeStringToMask(me.servicesumode, 0);
 		irc_nick (nick, botinfo->user, host, botinfo->realname, me.servicesumode);
 		UserMode (nick, me.servicesumode);
 		irc_join(botptr, me.serviceschan, me.servicescmode);
@@ -633,28 +522,3 @@ Bot *init_bot (BotInfo* botinfo)
 	RESET_RUN_LEVEL();
 	return botptr;
 }
-
-/** @brief del_bot
- *
- * 
- *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
- */
-int
-del_bot (Bot *botptr, const char *reason)
-{
-	Client *u;
-
-	SET_SEGV_LOCATION();
-	u = find_user (botptr->name);
-	if (!u) {
-		nlog (LOG_WARNING, "Attempting to delete a bot with a nick that does not exist: %s", botptr->name);
-		return NS_FAILURE;
-	}
-	dlog(DEBUG1, "Deleting bot %s for %s", botptr->name, reason);
-	//XXXX TODO: need to free the channel list hash. We dont according to valgrind
-	irc_quit (botptr, reason);
-	del_ns_bot (botptr->name);
-	return NS_SUCCESS;
-}
-

@@ -39,7 +39,6 @@ const char ns_help_raw_oneline[]="Send a raw command";
 const char ns_help_botlist_oneline[]="List module bots";
 const char ns_help_socklist_oneline[]="List module sockets";
 const char ns_help_timerlist_oneline[]="List module timers";
-const char ns_help_botchanlist_oneline[]="List module bot channels";
 const char ns_help_modlist_oneline[]="List loaded modules";
 const char ns_help_userdump_oneline[]="Dump user table";
 const char ns_help_chandump_oneline[]="Dump channel table";
@@ -197,7 +196,8 @@ const char *ns_help_botlist[] = {
 	"Syntax: \2BOTLIST\2",
 	"",
 	"NeoStats will send you by notice a list of the current bots",
-	"being used on the network for each module.",
+	"being used on the network for each module and what channels",
+	"they are using.",
 	NULL
 };
 
@@ -214,14 +214,6 @@ const char *ns_help_timerlist[] = {
 	"",
 	"NeoStats will send you by notice a list of the current",
 	"timer functions being used on the network by each module.",	
-	NULL
-};
-
-const char *ns_help_botchanlist[] = {
-	"Syntax: \2BOTCHANLIST\2",
-	"",
-	"NeoStats will send you by notice a list of the current bots",
-	"and the channels they are using for each module.",
 	NULL
 };
 
@@ -279,7 +271,6 @@ const char *ns_help_set_debugtochan[] = {
 
 const char *ns_help_set_nick[] = {
 	"\2NICK <newnick>\2 Change bot nickname",
-	"(requires restart to take effect).",
 	NULL
 };
 
