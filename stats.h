@@ -369,7 +369,11 @@ typedef struct bot_cmd {
 /* Restrict module bot to only respond to oper requests
  * when ONLY_OPERS is set in the config file
  */
-#define BOT_FLAG_ONLYOPERS	0x00000001
+#define BOT_FLAG_ONLY_OPERS		0x00000001
+/* Restrict module bot to only respond to oper requests
+ * regardless of ONLY_OPERS setting in the config file
+ */
+#define BOT_FLAG_RESTRICT_OPERS	0x00000002
 
 /* SET Comand handling */
 /* (Work in progress) */

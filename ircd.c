@@ -92,6 +92,69 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
 	return NS_SUCCESS;
 }
 
+/** @brief init_mod_bot
+ *
+ *  replacement for init_bot - work in progress
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname, const char *modes, unsigned int flags, char * mod_name)
+{
+	ModUser * bot_ptr;
+	User *u;
+	char **av;
+	int ac = 0;
+	int add = 0;
+	int i;
+	long Umode;
+	char tmpmode;
+
+	SET_SEGV_LOCATION();
+	u = finduser (nick);
+	if (u) {
+		nlog (LOG_WARNING, LOG_CORE, "Attempting to Login with a Nickname that already Exists: %s", nick);
+		return NULL;
+	}
+	if (strnlen (user, MAXUSER) > MAXUSERWARN) {
+		nlog (LOG_WARNING, LOG_CORE, "Warning, %s bot %s has an username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
+	}
+	add_mod_user (nick, mod_name);
+	Umode = 0;
+	tmpmode = *(modes);
+	while (tmpmode) {
+		switch (tmpmode) {
+		case '+':
+			add = 1;
+			break;
+		case '-':
+			add = 0;
+			break;
+		default:
+			for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
+				if (usr_mds[i].mode == tmpmode) {
+					if (add) {
+						Umode |= usr_mds[i].umodes;
+						break;
+					} else {
+						Umode &= ~usr_mds[i].umodes;
+						break;
+					}
+				}
+			}
+		}
+		tmpmode = *modes++;
+	}
+	SignOn_NewBot (nick, user, host, rname, Umode);
+	AddStringToList (&av, nick, &ac);
+	ModuleEvent (EVENT_SIGNON, av, ac);
+	free (av);
+	/* restore segv_inmodule from SIGNON */
+	SET_SEGV_INMODULE(mod_name);
+	bot_ptr = findbot(nick);
+	bot_ptr->flags = flags;
+	return bot_ptr;
+}
+
 /** @brief del_bot
  *
  * 

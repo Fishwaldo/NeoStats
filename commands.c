@@ -192,6 +192,7 @@ servicesbot (char *nick, char **av, int ac)
 	/* Use fake bot structure so we can use the main command routine */
 	strlcpy(fake_bot.nick, s_Services, MAXNICK);
 	fake_bot.botcmds = botcmds;
+	fake_bot.flags = me.onlyopers ? BOT_FLAG_ONLY_OPERS : 0;
 	run_bot_cmd (&fake_bot, u, av, ac);
 }
 
@@ -202,13 +203,17 @@ servicesbot (char *nick, char **av, int ac)
 void
 run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 {
+	int userlevel;
 	bot_cmd* cmd_ptr;
 	hnode_t *cmdnode;
 
 	SET_SEGV_LOCATION();
-	
+	userlevel = UserLevel (u);
 	/* Check user authority to use this command set */
-	if (me.onlyopers && (UserLevel (u) < NS_ULEVEL_OPER)) {
+	if (
+		( (bot_ptr->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
+		( (bot_ptr->flags & BOT_FLAG_ONLY_OPERS) && me.onlyopers && (userlevel < NS_ULEVEL_OPER) )
+	){
 		prefmsg (u->nick, bot_ptr->nick, "This service is only available to IRCops.");
 		chanalert (bot_ptr->nick, "%s Requested %s, but he is Not an Operator!", u->nick, av[1]);
 		return;
@@ -221,7 +226,7 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 		cmd_ptr = hnode_get(cmdnode);
 	
 		/* Is user authorised to issue this command? */
-		if (UserLevel (u) < cmd_ptr->ulevel) {
+		if (userlevel < cmd_ptr->ulevel) {
 			prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
 			chanalert (bot_ptr->nick, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
 			return;
