@@ -453,13 +453,13 @@ static void hs_del(User *u, int tmpint)
 		prefmsg(u->nick, s_HostServ, "The following line was removed from the Vhosts Database");
 	        prefmsg(u->nick, s_HostServ, "\2%s\2", buf);
 		hslog("%s removed the VHOST: %s", u->nick, buf);
-		Loadhosts();
 	    }
 	i++;
     }
      fclose(fp);
     remove("data/vhosts.db");
     rename("data/vhosts.new", "data/vhosts.db");    
+    Loadhosts();
     } 
 
     if (tmpint > i) prefmsg(u->nick, s_HostServ, "ERROR: There is no vhost on list number \2%d\2",tmpint);
