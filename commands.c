@@ -310,9 +310,13 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 		/* Seems OK so report the command call so modules do not have to */
 		chanalert (bot_ptr->nick, "%s used %s", u->nick, cmd_ptr->cmd);
 		/* Grab the parameters for the log so modules do not have to log */
-		parambuf = joinbuf(av, ac, 2);
-		nlog (LOG_NORMAL, LOG_MOD, "%s used %s %s", u->nick, cmd_ptr->cmd, parambuf);
-		free(parambuf);
+		if(ac > 2) {
+			parambuf = joinbuf(av, ac, 2);
+			nlog (LOG_NORMAL, LOG_MOD, "%s used %s %s", u->nick, cmd_ptr->cmd, parambuf);
+			free(parambuf);
+		} else {
+			nlog (LOG_NORMAL, LOG_MOD, "%s used %s", u->nick, cmd_ptr->cmd);
+		}
 		/* call handler */
 		cmd_ptr->handler(u, av, ac);
 		return 1;
