@@ -192,12 +192,10 @@ send_part (const char *who, const char *chan)
 	sts (":%s %s %s", who, MSG_PART, chan);
 }
 
-int
-sjoin_cmd (const char *who, const char *chan)
+void
+send_join (const char *who, const char *chan)
 {
 	sts (":%s %s 0 %s + :%s", me.name, MSG_SJOIN, chan, who);
-	join_chan (who, chan);
-	return 1;
 }
 
 void 
@@ -246,6 +244,16 @@ void
 send_nickchange (const char *oldnick, const char *newnick)
 {
 	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int) me.now);
+}
+
+void
+send_invite (const char *from, const char *to, const char *chan) 
+{
+}
+
+void 
+send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
+{
 }
 
 void 
