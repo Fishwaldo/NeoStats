@@ -1,7 +1,6 @@
 #PCRE Makefile
-CC=@CC@
-CFLAGS=@CFLAGS@
-LDFLAGS=@LDFLAGS@
+include ../Makefile.inc
+
 INCLUDES=-I.. -I.
 
 SOURCES= get.c pcre.c study.c
@@ -34,4 +33,3 @@ pcre.o:	chartables.c ../pcre.h internal.h ../config.h
 get.o: ../pcre.h internal.h ../config.h
 study.o: ../pcre.h internal.h ../config.h
 dftables.o: ../pcre.h internal.h ../config.h
-
