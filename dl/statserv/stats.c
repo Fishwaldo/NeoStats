@@ -28,7 +28,7 @@
 
 static char announce_buf[BUFSIZE];
 
-static int ok_to_wallop()
+static int check_interval()
 {
 	static int lasttime;
 	static int count;
@@ -36,9 +36,6 @@ static int ok_to_wallop()
 	if (StatServ.newdb || !StatServ.onchan || !me.synced) {
 		return -1;
 	}
-	/* 0 means all wallops disabled */
-	if (StatServ.msginterval == 0)
-		return -1;
 	if (me.now - lasttime < StatServ.msginterval ) {
 		if (++count > StatServ.msglimit)
 			return -1;
@@ -58,7 +55,7 @@ announce_record(const char *msg, ...)
 		return 1;
 	}
 
-	if (ok_to_wallop() > 0) {
+	if (check_interval() > 0) {
 		va_start (ap, msg);
 		ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
 		va_end (ap);
@@ -87,7 +84,7 @@ announce_lag(const char *msg, ...)
 		return 1;
 	}
 
-	if (ok_to_wallop() > 0) {
+	if (check_interval() > 0) {
 		va_start (ap, msg);
 		ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
 		va_end (ap);
