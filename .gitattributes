@@ -488,6 +488,7 @@ src/commands.c -text
 src/conf.c eol=lf
 src/ctcp.c -text
 src/dbm/Makefile.am -text
+src/dbm/Makefile.in -text
 src/dbm/bdb.c -text
 src/dbm/bdb.vcproj -text
 src/dbm/gdbm.c -text
