@@ -1,7 +1,7 @@
 /* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
 ** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
 *
-** Dynamic Runtime Library Loading Routines
+** Dynamic Runtime Library Loading Routines.
 *
 ** NeoStats Identification:
 ** ID:      dl.c, 
