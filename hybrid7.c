@@ -18,12 +18,14 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hybrid7.c,v 1.11 2003/04/10 15:26:57 fishwaldo Exp $
+** $Id: hybrid7.c,v 1.12 2003/04/11 09:26:30 fishwaldo Exp $
 */
  
 #include "stats.h"
 #include "hybrid7.h"
 #include "dl.h"
+#include "log.h"
+
 void sts(char *fmt,...);
 
 aCtab cFlagTab[] = {
@@ -195,7 +197,7 @@ int skill_cmd(const char *from, const char *target, const char *reason,...) {
 
 int ssmo_cmd(const char *from, const char *umodetarget, const char *msg) {
 	notice(s_Services, "Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
-	log("Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
+	nlog(LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 
@@ -206,24 +208,24 @@ int snick_cmd(const char *oldnick, const char *newnick) {
 }
 int sswhois_cmd(const char *target, const char *swhois) {
 	notice(s_Services, "Warning Module %s tried to SWHOIS, which is not supported in Hybrid", segvinmodule);
-	log("Warning. Module %s tried to SWHOIS, which is not supported in Hybrid", segvinmodule);
+	nlog(LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SWHOIS, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 int ssvsnick_cmd(const char *target, const char *newnick) {
 	notice(s_Services, "Warning Module %s tried to SVSNICK, which is not supported in Hybrid", segvinmodule);
-	log("Warning. Module %s tried to SVSNICK, which is not supported in Hybrid", segvinmodule);
+	nlog(LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSNICK, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 
 int ssvsjoin_cmd(const char *target, const char *chan) {
 	notice(s_Services, "Warning Module %s tried to SJOIN, which is not supported in Hybrid", segvinmodule);
-	log("Warning. Module %s tried to SJOIN, which is not supported in Hybrid", segvinmodule);
+	nlog(LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SJOIN, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 
 int ssvspart_cmd(const char *target, const char *chan) {
 	notice(s_Services, "Warning Module %s tried to SVSPART, which is not supported in Hybrid", segvinmodule);
-	log("Warning. Module %s tried to SVSPART, which is not supported in Hybrid", segvinmodule);
+	nlog(LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSPART, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 
@@ -244,7 +246,7 @@ int swallops_cmd(const char *who, const char *msg,...) {
 
 int ssvshost_cmd(const char *who, const char *vhost) {
 	notice(s_Services, "Warning Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
-	log("Warning. Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
+	nlog(LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 int ssvinfo_cmd() {
@@ -293,13 +295,11 @@ void sts(char *fmt,...)
 	va_start (ap, fmt);
 	vsnprintf (buf, 512, fmt, ap);
 
-#ifdef DEBUG
-	log("SENT: %s", buf);
-#endif
+	nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", buf);
 	strcat (buf, "\n");
 	sent = write (servsock, buf, strlen (buf));
 	if (sent == -1) {
-		log("Write error.");
+		nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
 		do_exit(0);
 	}
 	me.SendM++;
@@ -318,15 +318,13 @@ void chanalert(char *who, char *buf,...)
 
 	if (me.onchan) {
 		snprintf(out,512, ":%s PRIVMSG %s :%s",who, me.chan, tmp);
-#ifdef DEBUG
-		log("SENT: %s", out);
-#endif
+		nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", out);
 
 		strcat (out, "\n");
 		sent = write(servsock, out, strlen (out));
 		if (sent == -1) {
 			me.onchan = 0;
-			log("Write error.");
+			nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
 			do_exit(0);
 		}
 		me.SendM++;
@@ -415,7 +413,7 @@ void globops(char *from, char *fmt, ...)
 		snprintf(buf, 512, ":%s GLOBOPS :%s", from, buf2);
 		sts("%s", buf);
 	} else {
-		log("%s", buf2);
+		nlog(LOG_NORMAL, LOG_CORE, "%s", buf2);
 	}
 	va_end(ap);
 }

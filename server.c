@@ -22,13 +22,14 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: server.c,v 1.14 2003/04/10 15:26:57 fishwaldo Exp $
+** $Id: server.c,v 1.15 2003/04/11 09:26:30 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
  
 #include "stats.h"
 #include "hash.h"
+#include "log.h"
 
 int fnmatch(const char *, const char *, int flags);
 Server *new_server(char *);
@@ -43,21 +44,16 @@ Server *new_server(char *name)
 	Server *s;
 	hnode_t *sn;
 
-	if (!hash_verify(sh)) {
-		globops(me.name, "Eeek, Server Table is corrupted! Continuing, but expect a crash");
-		chanalert(me.name, "Eeek, Server Table is corrupted! Continuing, but expect a crash");
-		log("Eeek, Server table is corrupted");
-	}	
 	s = calloc(sizeof(Server), 1);
 	if (!name)
 		name = "";
 	memcpy(s->name, name, MAXHOST);
 	sn = hnode_create(s);
 	if (!sn) {
-		log("Eeek, Hash is broken\n");
+		nlog(LOG_WARNING, LOG_CORE, "Eeek, Hash is broken\n");
 	}
 	if (hash_isfull(sh)) {
-		log("Eeek, Server Hash is full!\n");
+		nlog(LOG_WARNING, LOG_CORE, "Eeek, Server Hash is full!\n");
 	} else {
 		hash_insert(sh, sn, s->name);
 	}
@@ -68,9 +64,7 @@ void AddServer(char *name,char *uplink, int hops)
 {
 	Server *s;
 
-#ifdef DEBUG
-	log("New Server: %s", name);
-#endif
+	nlog(LOG_DEBUG1, LOG_CORE, "New Server: %s", name);
 	s = new_server(name);
 	s->hops = hops;
 	s->connected_since = time(NULL);
@@ -89,12 +83,11 @@ void DelServer(char *name)
 	hnode_t *sn;
 
 	if (!name) {
-		log("DelServer(): %s failed!", name);
 		return;
 	}
 	sn = hash_lookup(sh, name);
 	if (!sn) {
-		log("DelServer(): %s not found!", name);
+		nlog(LOG_DEBUG1, LOG_CORE, "DelServer(): %s not found!", name);
 		return;
 	}
 	hash_delete(sh, sn);
@@ -113,9 +106,7 @@ Server *findserver(const char *name)
 		s = hnode_get(sn);
 		return s;
 	} else {
-#ifdef DEBUG
-		log("FindServer(): %s not found!", name);
-#endif
+		nlog(LOG_DEBUG2, LOG_CORE, "FindServer(): %s not found!", name);
 		return NULL;
 	}	
 }
@@ -140,7 +131,7 @@ void init_server_hash()
 {
 	sh = hash_create(S_TABLE_SIZE, 0, 0);	
 	if (!sh) {
-		log("Create Server Hash Failed\n");
+		nlog(LOG_CRITICAL, LOG_CORE, "Create Server Hash Failed\n");
 		do_exit(1);
 	}
 	AddServer(me.name,NULL, 0);
@@ -152,9 +143,7 @@ void TimerPings()
 	hscan_t ss;
 	hnode_t *sn;
 
-#ifdef DEBUG
-	log("Sendings pings...");
-#endif
+	nlog(LOG_DEBUG3, LOG_CORE, "Sendings pings...");
 	ping.ulag = 0;
 
 	hash_scan_begin(&ss, sh);

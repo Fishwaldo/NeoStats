@@ -18,12 +18,15 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.6 2003/04/10 15:26:57 fishwaldo Exp $
+** $Id: neoircd.c,v 1.7 2003/04/11 09:26:30 fishwaldo Exp $
 */
  
 #include "stats.h"
 #include "hybrid7.h"
 #include "dl.h"
+#include "log.h"
+
+
 void sts(char *fmt,...);
 
 aCtab cFlagTab[] = {
@@ -202,7 +205,7 @@ int skill_cmd(const char *from, const char *target, const char *reason,...) {
 
 int ssmo_cmd(const char *from, const char *umodetarget, const char *msg) {
 	notice(s_Services, "Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
-	log("Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
+	nlog(LOG_NORMAL, LOG_CORE, "Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 
@@ -253,7 +256,7 @@ int ssvshost_cmd(const char *who, const char *vhost) {
 		sts(":%s SVSHOST %s :%s", me.name, who, vhost);
 		return 1;
 	} else {
-                log("Can't Find user %s for ssvshost_cmd", who);
+                nlog(LOG_WARNING, LOG_CORE, "Can't Find user %s for ssvshost_cmd", who);
                 return 0;
 	}		                                
 	return 0;
@@ -273,9 +276,11 @@ int sburst_cmd(int b) {
 
 int sakill_cmd(const char *host, const char *ident, const char *setby, const int length, const char *reason,...) {
 	/* there isn't a akill on Hybrid, so we send a kline to all servers! */
+#if 0
 	hscan_t ss;
 	hnode_t *sn;
 	Server *s;
+#endif
 
 	va_list ap;
 	char buf[512];
@@ -300,13 +305,11 @@ void sts(char *fmt,...)
 	va_start (ap, fmt);
 	vsnprintf (buf, 512, fmt, ap);
 
-#ifdef DEBUG
-	log("SENT: %s", buf);
-#endif
+	nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", buf);
 	strcat (buf, "\n");
 	sent = write (servsock, buf, strlen (buf));
 	if (sent == -1) {
-		log("Write error.");
+		nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
 		do_exit(0);
 	}
 	me.SendM++;
@@ -325,15 +328,12 @@ void chanalert(char *who, char *buf,...)
 
 	if (me.onchan) {
 		snprintf(out,512, ":%s PRIVMSG %s :%s",who, me.chan, tmp);
-#ifdef DEBUG
-		log("SENT: %s", out);
-#endif
-
+		nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", out);
 		strcat (out, "\n");
 		sent = write(servsock, out, strlen (out));
 		if (sent == -1) {
 			me.onchan = 0;
-			log("Write error.");
+			nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
 			do_exit(0);
 		}
 		me.SendM++;
@@ -422,7 +422,7 @@ void globops(char *from, char *fmt, ...)
 		snprintf(buf, 512, ":%s GLOBOPS :%s", from, buf2);
 		sts("%s", buf);
 	} else {
-		log("%s", buf2);
+		nlog(LOG_NORMAL, LOG_CORE, "%s", buf2);
 	}
 	va_end(ap);
 }

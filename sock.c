@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.32 2003/04/10 15:26:57 fishwaldo Exp $
+** $Id: sock.c,v 1.33 2003/04/11 09:26:31 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -30,15 +30,13 @@
 #include "dl.h"
 #include <adns.h>
 #include "conf.h"
+#include "log.h"
 
 void recvlog(char *line);
 
 struct sockaddr_in lsa;
 int dobind;
 
-void init_sock() {
-	if (usr_mds);
-}
 int ConnectTo(char *host, int port)
 {
 	struct hostent *hp;
@@ -50,7 +48,7 @@ int ConnectTo(char *host, int port)
 	memset(&lsa, 0, sizeof(lsa));
 	if (strlen(me.local) > 1) {
 		if ((hp = gethostbyname(me.local)) == NULL) {
-			log("Warning, Couldn't bind to IP address %s", me.local);
+			nlog(LOG_WARNING, LOG_CORE, "Warning, Couldn't bind to IP address %s", me.local);
 		} else {
 			memcpy((char *)&lsa.sin_addr, hp->h_addr, hp->h_length);
 			lsa.sin_family = hp->h_addrtype;
@@ -68,7 +66,7 @@ int ConnectTo(char *host, int port)
 		return (-1);
 	if (dobind > 0) {
 		if (bind(s,(struct sockaddr *)&lsa, sizeof(lsa)) < 0) {
-			log("bind(): Warning, Couldn't bind to IP address %s", strerror(errno));
+			nlog(LOG_WARNING, LOG_CORE, "bind(): Warning, Couldn't bind to IP address %s", strerror(errno));
 		}
 	}
 	
@@ -146,7 +144,7 @@ void read_loop()
 							break;
 						}
 					} else {
-						log("read returned a Error");
+						nlog(LOG_WARNING, LOG_CORE, "read returned a Error");
 						return;
 					}
 				} else {
@@ -155,25 +153,17 @@ void read_loop()
 					while ((sn = hash_scan_next(&ss)) != NULL) {
 						mod_sock = hnode_get(sn);
 						if (FD_ISSET(mod_sock->sock_no, &readfds)) {
-#ifdef DEBUG
-/* this is a real pain in the arse for loggin, so we don't do it */
-//							log("Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
-#endif
+							nlog(LOG_DEBUG3, LOG_CORE, "Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
 							if (mod_sock->readfnc(mod_sock->sock_no, mod_sock->sockname) < 0)
 							break;
 						}
 						if (FD_ISSET(mod_sock->sock_no, &writefds)) {
-#ifdef DEBUG
-/* this is a real pain in the arse for logging so we don't print it */
-//							log("Running module %s writesock function for %s", mod_sock->modname, mod_sock->sockname);
-#endif
+							nlog(LOG_DEBUG3, LOG_CORE, "Running module %s writesock function for %s", mod_sock->modname, mod_sock->sockname);
 							if (mod_sock->writefnc(mod_sock->sock_no, mod_sock->sockname) < 0)
 							break;
 						}
 						if (FD_ISSET(mod_sock->sock_no, &errfds)) {
-#ifdef DEBUG
-							log("Running module %s errorsock function for %s", mod_sock->modname, mod_sock->sockname);
-#endif
+							nlog(LOG_DEBUG3, LOG_CORE, "Running module %s errorsock function for %s", mod_sock->modname, mod_sock->sockname);
 							if (mod_sock->errfnc(mod_sock->sock_no, mod_sock->sockname) < 0)
 							break;
 						}
@@ -193,18 +183,18 @@ void read_loop()
 				}
 				close(servsock);
 				sleep(5);
-				log("Eeek, Zombie Server, Reconnecting");
+				nlog(LOG_WARNING, LOG_CORE, "Eeek, Zombie Server, Reconnecting");
 				do_exit(2);
 			}
 		} else if (SelectResult == -1) {
 			if (errno != EINTR) 
 				{
-					log("Lost connection to server."); 
+					nlog(LOG_WARNING, LOG_CORE, "Lost connection to server."); 
 					return; 
 				}
 		}
 	}
- log("hu, how did we get here");
+ nlog(LOG_NORMAL, LOG_CORE, "hu, how did we get here");
 }
 
 extern int getmaxsock() {
@@ -225,6 +215,7 @@ void recvlog(char *line)
 		fprintf(logfile, "%s", line);
 	fclose(logfile);
 }
+#if 0
 
 void log(char *fmt, ...)
 {
@@ -253,6 +244,8 @@ void log(char *fmt, ...)
 	va_end(ap);
 }
 
+#endif
+
 void ResetLogs()
 {
 	char tmp[25];
@@ -261,7 +254,7 @@ void ResetLogs()
 	strcpy(segv_location, "ResetLogs");
 	strftime(tmp, 25, "logs/neostats-%m-%d.log", localtime(&t));
 	rename("logs/neostats.log", tmp);
-	log("Started fresh logfile.");
+	nlog(LOG_NORMAL, LOG_CORE, "Started fresh logfile.");
 }
 
 char *sctime(time_t stuff)
@@ -299,7 +292,7 @@ int sock_connect(int socktype, unsigned long ipaddr, int port, char *sockname, c
 	/* bind to a IP address */
 	if (dobind > 0) {
 		if (bind(s,(struct sockaddr *)&lsa, sizeof(lsa)) < 0) {
-			log("sock_connect(): Warning, Couldn't bind to IP address %s", strerror(errno));
+			nlog(LOG_WARNING, LOG_CORE, "sock_connect(): Warning, Couldn't bind to IP address %s", strerror(errno));
 		}
 	}
 
@@ -311,7 +304,7 @@ int sock_connect(int socktype, unsigned long ipaddr, int port, char *sockname, c
 	/* set non blocking */
 	
 	if ((i = fcntl(s, F_SETFL, O_NONBLOCK)) < 0) {
-		log("can't set socket %s(%s) non-blocking: %s", sockname, module, strerror(i));
+		nlog(LOG_CRITICAL, LOG_CORE, "can't set socket %s(%s) non-blocking: %s", sockname, module, strerror(i));
 		return (-1);
 	}
 
@@ -320,7 +313,7 @@ int sock_connect(int socktype, unsigned long ipaddr, int port, char *sockname, c
 			case EINPROGRESS:
 					break;
 			default:
-					log("Socket %s(%s) cant connect %s", sockname, module, strerror(errno), i);
+					nlog(LOG_WARNING, LOG_CORE, "Socket %s(%s) cant connect %s", sockname, module, strerror(errno), i);
 					close (s);
 					return (-1);
 		}
@@ -338,9 +331,7 @@ int sock_disconnect(char *sockname) {
 
 	sock = findsock(sockname);
 	if (!sock) {
-#ifdef DEBUG
-		log("Warning, Can not find Socket %s in list", sockname);
-#endif
+		nlog(LOG_WARNING, LOG_CORE, "Warning, Can not find Socket %s in list", sockname);
 		return(-1);
 	}
 	
@@ -352,14 +343,10 @@ int sock_disconnect(char *sockname) {
 	tv.tv_usec = 0;
 	i = select(1, &fds, NULL, NULL, &tv);
 	if (!i && errno == EBADF) {
-#ifdef DEBUG
-		log("Warning, Bad File Descriptor %s in list", sockname);
-#endif
+		nlog(LOG_WARNING, LOG_CORE, "Warning, Bad File Descriptor %s in list", sockname);
 		return(-1);
 	}
-#ifdef DEBUG
-	log("Closing Socket %s with Number %d", sockname, sock->sock_no);
-#endif
+	nlog(LOG_DEBUG3, LOG_CORE, "Closing Socket %s with Number %d", sockname, sock->sock_no);
 	close(sock->sock_no);
 	del_socket(sockname);
 	return(1);

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dns.c,v 1.9 2002/12/26 15:15:04 fishwaldo Exp $
+** $Id: dns.c,v 1.10 2003/04/11 09:26:30 fishwaldo Exp $
 */
 
 
@@ -32,6 +32,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "stats.h"
+#include "log.h"
 #include <adns.h>
 
 
@@ -78,14 +79,12 @@ int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_a
 	strcpy(segv_location, "dns_lookup");
 
 	if (list_isfull(dnslist)) {
-#ifdef DEBUG
-		log("DNS: Lookup list is full");
-#endif	
+		nlog(LOG_ERROR, LOG_CORE, "DNS: Lookup list is full");
 		return 0;
 	}
 	dnsdata = malloc(sizeof(DnsLookup));
 	if (!dnsdata) {
-		log("DNS: Out of Memory");
+		nlog(LOG_CRITICAL, LOG_CORE, "DNS: Out of Memory");
 		return 0;
 	}
 	strncpy(dnsdata->data, data, 254);
@@ -98,14 +97,12 @@ int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_a
 		status = adns_submit(ads, str, type, adns_qf_owner|adns_qf_cname_loose, NULL, &dnsdata->q);
 	}
 	if (status) {
-		log("DNS: adns_submit error: %s", strerror(status));
+		nlog(LOG_WARNING, LOG_CORE, "DNS: adns_submit error: %s", strerror(status));
 		free(dnsdata);
 		return 0;
 	}
 	
-#ifdef DEBUG
-	log("DNS: Added dns query %s to list", data);
-#endif
+	nlog(LOG_DEBUG1, LOG_CORE, "DNS: Added dns query %s to list", data);
 	/* if we get here, then the submit was successfull. Add it to the list of queryies */
 	dnsnode = lnode_create(dnsdata);
 	list_append(dnslist, dnsnode);
@@ -136,6 +133,7 @@ int init_dns() {
 #endif
         if (adnsstart) {
 	        printf("ADNS init failed: %s\n", strerror(adnsstart));
+	        nlog(LOG_CRITICAL, LOG_CORE, "ADNS init failed: %s", strerror(adnsstart));
 		return 0;
 	}
 	return 1;
@@ -169,15 +167,13 @@ void do_dns() {
 		status = adns_check(ads, &dnsdata->q, &dnsdata->a, NULL);
 		/* if status == eagain, the lookup hasn't completed yet */
 		if (status == EAGAIN) {
-#ifdef DEBUG
-			log("DNS: Lookup hasn't completed for %s", &dnsdata->data);
-#endif
+			nlog(LOG_DEBUG2, LOG_CORE, "DNS: Lookup hasn't completed for %s", &dnsdata->data);
 			dnsnode = list_next(dnslist, dnsnode);
 			break;
 		}
 		/* there was a error */
 		if (status) {
-			log("DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror(status));
+			nlog(LOG_CRITICAL, LOG_CORE, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror(status));
 			chanalert(s_Services, "Bad Error on DNS lookup. Please check logfile");
 
 			/* call the callback function with answer set to NULL */
@@ -191,9 +187,7 @@ void do_dns() {
 			lnode_destroy(dnsnode1);
 			break;
 		}
-#ifdef DEBUG
-		log("DNS: Calling callback function with data %s", dnsdata->data);
-#endif		
+		nlog(LOG_DEBUG2, LOG_CORE, "DNS: Calling callback function with data %s", dnsdata->data);
 		/* call the callback function */
 		dnsdata->callback(dnsdata->data, dnsdata->a);
 

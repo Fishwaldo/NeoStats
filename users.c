@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.45 2003/02/11 00:11:55 fishwaldo Exp $
+** $Id: users.c,v 1.46 2003/04/11 09:26:31 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -30,6 +30,10 @@
 #include "stats.h"
 #include "hash.h"
 #include "dl.h"
+#include "log.h"
+
+
+
 int fnmatch(const char *, const char *, int flags);
 
 
@@ -51,19 +55,13 @@ User *new_user(const char *nick)
 	hnode_t *un;
 
 	strcpy(segv_location, "new_user");
-	/* before we add a new user, we check the table */
-	if (!hash_verify(uh)) {
-		globops(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
-		chanalert(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
-		log("Eeek, Users table is corrupted!");
-	}
 	u = smalloc(sizeof(User));
 	if (!nick)
 		nick = "";
 	memcpy(u->nick, nick, MAXNICK);
 	un = hnode_create(u);
 	if (hash_isfull(uh)) {
-		log("Eeeek, Hash is full");
+		nlog(LOG_CRITICAL, LOG_CORE, "Eeeek, Hash is full");
 	} else {
 		hash_insert(uh, un, u->nick);
 	}
@@ -74,13 +72,11 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 {
 	User *u;
 
-#ifdef DEBUG
-	log("AddUser(): %s (%s@%s)(%lu) -> %s at %lu", nick, user, host, htonl(ipaddr), server, TS);
-#endif
+	nlog(LOG_DEBUG2, LOG_CORE, "AddUser(): %s (%s@%s)(%lu) -> %s at %lu", nick, user, host, htonl(ipaddr), server, TS);
 	strcpy(segv_location, "AddUser");
 	u = finduser(nick);
 	if (u) {
-		log("trying to add a user that already exists? (%s)", nick);
+		nlog(LOG_WARNING, LOG_CORE, "trying to add a user that already exists? (%s)", nick);
 		return;
 	}
 
@@ -113,13 +109,11 @@ void DelUser(const char *nick)
 	hnode_t *un;
 
 	strcpy(segv_location, "DelUser");
-#ifdef DEBUG
-	log("DelUser(%s)", nick);
-#endif
+	nlog(LOG_DEBUG2, LOG_CORE, "DelUser(%s)", nick);
 
 	un = hash_lookup(uh, nick);
 	if (!un) {
-		log("DelUser(%s) failed!", nick);
+		nlog(LOG_WARNING, LOG_CORE, "DelUser(%s) failed!", nick);
 		return;
 	}
 	u = hnode_get(un);
@@ -138,12 +132,10 @@ void Change_User(User *u, const char *newnick)
 	hnode_t *un;
 	lnode_t *cm;
 	strcpy(segv_location, "Change_User");
-#ifdef DEBUG
-	log("Change_User(%s, %s)", u->nick, newnick);
-#endif
+	nlog(LOG_DEBUG2, LOG_CORE, "Change_User(%s, %s)", u->nick, newnick);
 	un = hash_lookup(uh, u->nick);
 	if (!un) {
-		log("ChangeUser(%s) Failed!", u->nick);
+		nlog(LOG_WARNING, LOG_CORE, "ChangeUser(%s) Failed!", u->nick);
 		return;
 	}
 	cm = list_first(u->chans);
@@ -182,9 +174,7 @@ User *finduser(const char *nick)
 		u = hnode_get(un);
 		return u;
 	} else  {
-#ifdef DEBUG
-		log("FindUser(%s) -> NOTFOUND", nick); 
-#endif
+		nlog(LOG_DEBUG2, LOG_CORE, "FindUser(%s) -> NOTFOUND", nick); 
 		return NULL;
 	}
 
@@ -244,9 +234,8 @@ int UserLevel(User *u) {
 			if (usr_mds[i].level > tmplvl) 	tmplvl = usr_mds[i].level;
 		}
 	}
-#ifdef DEBUG
-	log("Umode Level for %s is %d", u->nick, tmplvl);
-#endif
+	nlog(LOG_DEBUG1, LOG_CORE, "Umode Level for %s is %d", u->nick, tmplvl);
+
 /* I hate SMODEs damn it */
 #ifdef ULTIMATE3
 	for (i=0; i < ((sizeof(susr_mds) / sizeof(susr_mds[0])) -1); i++) {
@@ -255,9 +244,7 @@ int UserLevel(User *u) {
 		}
 	}
 #endif
-#ifdef DEBUG
-	log("Smode Level for %s is %d", u->nick, tmplvl);
-#endif
+	nlog(LOG_DEBUG1, LOG_CORE, "Smode Level for %s is %d", u->nick, tmplvl);
 #ifdef DEBUG
 #ifdef CODERHACK
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
@@ -280,9 +267,7 @@ int UserLevel(User *u) {
 
 
 
-#ifdef DEBUG
-	log("UserLevel for %s is %d (%d)", u->nick, tmplvl, i);
-#endif
+	nlog(LOG_DEBUG1, LOG_CORE, "UserLevel for %s is %d (%d)", u->nick, tmplvl, i);
 	return tmplvl;
 }
 
@@ -305,18 +290,17 @@ void UserMode(const char *nick, const char *modes)
 	strcpy(segv_location, "UserMode");	
 	u = finduser(nick);
 	if (!u) {
-		log("Warning, Changing Modes for a Unknown User %s!", nick);
-		log("Recbuf: %s", recbuf);
+		nlog(LOG_WARNING, LOG_CORE, "Warning, Changing Modes for a Unknown User %s!", nick);
+		nlog(LOG_DEBUG1, LOG_CORE, "Recbuf: %s", recbuf);
 		return;
 	}
-#ifdef DEBUG
 #ifdef ULTIMATE3
 	if (smode > 0)
-		log("Smodes: %s", modes);
+		nlog(LOG_DEBUG1, LOG_CORE, "Smodes: %s", modes);
 	else 
 #endif
-	log("Modes: %s", modes);
-#endif
+	nlog(LOG_DEBUG1, LOG_CORE, "Modes: %s", modes);
+
 #ifdef ULTIMATE3
 	if (smode == 0) 
 #endif
@@ -359,12 +343,10 @@ void UserMode(const char *nick, const char *modes)
 		}
 	tmpmode = *modes++;
 	}
-#ifdef DEBUG
 #ifdef ULTIMATE3
 	if (smode > 0)
-		log("SMODE for %s is are now %p", u->nick, u->Smode);
+		nlog(LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p", u->nick, u->Smode);
 	else 
 #endif
-	log("Modes for %s are now %p", u->nick, u->Umode);
-#endif
+	nlog(LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, u->Umode);
 }

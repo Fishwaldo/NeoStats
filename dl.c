@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.48 2003/01/22 16:37:38 fishwaldo Exp $
+** $Id: dl.c,v 1.49 2003/04/11 09:26:30 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -31,11 +31,11 @@
 #include "hash.h"
 #include "stats.h"
 #include "config.h"
+#include "log.h"
 
 
-void init_dl() {
-	if (usr_mds);
-}
+
+
 void __init_mod_list() {
 	strcpy(segv_location, "__init_mod_list");
 
@@ -51,16 +51,14 @@ static Mod_Timer *new_timer(char *timer_name)
 	Mod_Timer *t;
 	hnode_t *tn;
 	strcpy(segv_location, "Mod_Timer");
-#ifdef DEBUG
-	log("New Timer: %s", timer_name);
-#endif
+	nlog(LOG_DEBUG2, LOG_CORE, "New Timer: %s", timer_name);
 	t = smalloc(sizeof(Mod_Timer));
 	if (!timer_name)
 		timer_name="";
 	strncpy(t->timername, timer_name, MAXHOST);	
 	tn = hnode_create(t);
 	if (hash_isfull(th)) {
-		log("new_timer(): Couldn't add new Timer, Hash is Full!");
+		nlog(LOG_WARNING, LOG_CORE, "new_timer(): Couldn't add new Timer, Hash is Full!");
 		return NULL;
 	} else {
 		hash_insert(th, tn, timer_name);
@@ -83,7 +81,7 @@ int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interva
 
 
 	if (dlsym((int *)get_dl_handle(mod_name), func_name) == NULL) {
-		log("Oh Oh, The Timer Function doesn't exist");
+		nlog(LOG_WARNING, LOG_CORE, "Oh Oh, The Timer Function doesn't exist");
 		return -1;
 	}
 	Mod_timer_list = new_timer(timer_name);
@@ -91,7 +89,7 @@ int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interva
 	Mod_timer_list->lastrun = time(NULL);
 	strncpy(Mod_timer_list->modname, mod_name, MAXHOST);
 	Mod_timer_list->function = dlsym((int *)get_dl_handle(mod_name), func_name);
-	log("Registered Module %s with timer for Function %s", mod_name, func_name);
+	nlog(LOG_DEBUG2, LOG_CORE, "Registered Module %s with timer for Function %s", mod_name, func_name);
 	return 1;
 }
 
@@ -103,9 +101,7 @@ int del_mod_timer(char *timer_name) {
 	tn = hash_lookup(th, timer_name);
 	if (tn) {
 		list = hnode_get(tn);
-#ifdef DEBUG
-		log("Unregistered Timer function %s from Module %s", timer_name, list->modname);
-#endif
+		nlog(LOG_DEBUG2, LOG_CORE, "Unregistered Timer function %s from Module %s", timer_name, list->modname);
 		hash_delete(th, tn);
 		hnode_destroy(tn);	
 		free(list);
@@ -138,16 +134,14 @@ static Sock_List *new_sock(char *sock_name)
 	hnode_t *sn;
 
 	strcpy(segv_location, "Sock_List");
-#ifdef DEBUG	
-	log("New Socket: %s", sock_name);
-#endif	
+	nlog(LOG_DEBUG2, LOG_CORE, "New Socket: %s", sock_name);
 	s = smalloc(sizeof(Sock_List));
 	if (!sock_name)
 		sock_name="";
 	strncpy(s->sockname, sock_name, MAXHOST);
 	sn = hnode_create(s);
 	if (hash_isfull(sockh)) {
-		log("Eeek, SocketHash is full, can not add a new socket");
+		nlog(LOG_CRITICAL, LOG_CORE, "Eeek, SocketHash is full, can not add a new socket");
 		return NULL;
 	} else {
 		hash_insert(sockh, sn, s->sockname);
@@ -170,19 +164,19 @@ int add_socket(char *readfunc, char *writefunc, char *errfunc, char *sock_name, 
 
 	if (readfunc) {
 		if (dlsym((int *)get_dl_handle(mod_name), readfunc) == NULL) {
-			log("oh oh, the socket function doesn't exist");
+			nlog(LOG_WARNING, LOG_CORE, "oh oh, the socket function doesn't exist");
 			return -1;
 		}
 	}
 	if (writefunc) {
 		if (dlsym((int *)get_dl_handle(mod_name), writefunc) == NULL) {
-			log("oh oh, the socket function doesn't exist");
+			nlog(LOG_WARNING, LOG_CORE, "oh oh, the socket function doesn't exist");
 			return -1;
 		}
 	}
 	if (errfunc) {
 		if (dlsym((int *)get_dl_handle(mod_name), errfunc) == NULL) {
-			log("oh oh, the socket function doesn't exist");
+			nlog(LOG_WARNING, LOG_CORE, "oh oh, the socket function doesn't exist");
 			return -1;
 		}
 	}	
@@ -192,9 +186,7 @@ int add_socket(char *readfunc, char *writefunc, char *errfunc, char *sock_name, 
 	Sockets_mod_list->readfnc = dlsym((int *)get_dl_handle(mod_name), readfunc);
 	Sockets_mod_list->writefnc = dlsym((int *)get_dl_handle(mod_name), writefunc);
 	Sockets_mod_list->errfnc = dlsym((int *)get_dl_handle(mod_name), errfunc);
-#ifdef DEBUG
-			log("Registered Module %s with Socket functions %s", mod_name, Sockets_mod_list->sockname);
-#endif
+	nlog(LOG_DEBUG2, LOG_CORE, "Registered Module %s with Socket functions %s", mod_name, Sockets_mod_list->sockname);
 	return 1;
 }
 
@@ -206,9 +198,7 @@ int del_socket(char *sock_name) {
 	sn = hash_lookup(sockh, sock_name);
 	if (sn) {
 		list = hnode_get(sn);
-#ifdef DEBUG
-		log("Unregistered Socket function %s from Module %s", sock_name, list->modname);
-#endif
+		nlog(LOG_DEBUG2, LOG_CORE, "Unregistered Socket function %s from Module %s", sock_name, list->modname);
 		hash_scan_delete(sockh, sn);
 		hnode_destroy(sn);
 //		free(list->sockname);
@@ -247,7 +237,7 @@ extern void add_bot_to_chan(char *bot, char *chan) {
 		bc->bots = list_create(B_TABLE_SIZE);
 		cbn = hnode_create(bc);
 		if (hash_isfull(bch)) {
-			log("eek, bot channel hash is full");
+			nlog(LOG_CRITICAL, LOG_CORE, "eek, bot channel hash is full");
 			return;
 		}
 		hash_insert(bch, cbn, bc->chan);
@@ -255,7 +245,7 @@ extern void add_bot_to_chan(char *bot, char *chan) {
 		bc = hnode_get(cbn);
 	}
 	if (list_isfull(bc->bots)) {
-		log("Eeek, Bot Channel List is full for Chan %s", chan);
+		nlog(LOG_CRITICAL, LOG_CORE, "Eeek, Bot Channel List is full for Chan %s", chan);
 		return;
 	}
 	botname = sstrdup(bot);
@@ -270,13 +260,13 @@ extern void del_bot_from_chan(char *bot, char *chan) {
 	lnode_t *bmn;
 	cbn = hash_lookup(bch, chan);
 	if (!cbn) {
-		log("Hu? Can't Find Channel %s for botchanhash", chan);
+		nlog(LOG_WARNING, LOG_CORE, "Hu? Can't Find Channel %s for botchanhash", chan);
 		return;
 	}
 	bc = hnode_get(cbn);
 	bmn = list_find(bc->bots, bot, comparef);
 	if (!bmn) {
-		log("Hu? Can't find bot %s in %s in botchanhash", bot, chan);
+		nlog(LOG_WARNING, LOG_CORE, "Hu? Can't find bot %s in %s in botchanhash", bot, chan);
 		return;
 	}
 	list_delete(bc->bots, bmn);
@@ -298,7 +288,7 @@ extern void bot_chan_message(char *origin, char *chan, char **av, int ac) {
 	Mod_User *u;
 	cbn = hash_lookup(bch, chan);
 	if (!cbn) {
-		log("eeeh, Can't find channel %s for BotChanMessage", chan);
+		nlog(LOG_WARNING, LOG_CORE, "eeeh, Can't find channel %s for BotChanMessage", chan);
 		return;
 	}
 	bc = hnode_get(cbn);
@@ -306,9 +296,7 @@ extern void bot_chan_message(char *origin, char *chan, char **av, int ac) {
 	while (bmn) {
 		u = findbot(lnode_get(bmn));
 		if (u->chanfunc) {
-#ifdef DEBUG
-				log("Running Module for Chanmessage %s", chan);
-#endif
+				nlog(LOG_DEBUG2, LOG_CORE, "Running Module for Chanmessage %s", chan);
 				u->chanfunc(origin, chan, av, ac);
 		}
 		bmn = list_next(bc->bots, bmn);
@@ -341,9 +329,7 @@ static Mod_User *new_bot(char *bot_name)
 	Mod_User *u;
 	hnode_t *bn;
 	strcpy(segv_location, "Mod_User");
-#ifdef DEBUG	
-	log("New Bot: %s", bot_name);
-#endif
+	nlog(LOG_DEBUG2, LOG_CORE, "New Bot: %s", bot_name);
 	u = smalloc(sizeof(Mod_User));
 	if (!bot_name)
 		bot_name="";
@@ -378,7 +364,7 @@ int add_mod_user(char *nick, char *mod_name) {
 		Mod_Usr_list->chanfunc = dlsym(list_ptr->dl_handle, "__Chan_Message");
 		return 1;
 	}
-	log("add_mod_user(): Couldn't Add ModuleBot to List");
+	nlog(LOG_WARNING, LOG_CORE, "add_mod_user(): Couldn't Add ModuleBot to List");
 	return 0;
 }
 
@@ -423,20 +409,15 @@ int bot_nick_change(char *oldnick, char *newnick)
 	strcpy(segv_location, "bot_nick_change");
 
 	/* First, try to find out if the newnick is unique! */
-#ifdef DEBUG
-	log("oldnick %s newnick %s",oldnick,newnick);
-#endif	
 	u = finduser(oldnick);
 	if (!u) {
-		log("A non-registered bot(%s) attempted to change its nick to %s",oldnick, newnick);
+		nlog(LOG_WARNING, LOG_CORE, "A non-registered bot(%s) attempted to change its nick to %s",oldnick, newnick);
 		return -1;
 		}
 	u = finduser(newnick);
 	if (!u) { 
 		if ((mod_ptr = findbot(oldnick)) != NULL) {
-#ifdef DEBUG
-			log("Bot %s Changed its nick to %s", oldnick, newnick);
-#endif
+			nlog(LOG_DEBUG3, LOG_CORE, "Bot %s Changed its nick to %s", oldnick, newnick);
 			mod_tmp = new_bot(newnick);
 		
 			/* add a brand new user */
@@ -452,7 +433,7 @@ int bot_nick_change(char *oldnick, char *newnick)
 			return 1;
 		}
 		}
-	log("Couldn't find Bot Nick %s in Bot list", oldnick);
+	nlog(LOG_NOTICE, LOG_CORE, "Couldn't find Bot Nick %s in Bot list", oldnick);
 	return -1;
 }
 
@@ -517,7 +498,7 @@ int load_module(char *path1, User *u) {
 	if (!dl_handle) {
 		if (do_msg) prefmsg(u->nick, s_Services, "Error, Couldn't Load Module");
 		if (do_msg) prefmsg(u->nick, s_Services, "%s",dlerror());
-		log("Couldn't Load Module: %s", dlerror());
+		nlog(LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dlerror());
 		return -1;
 	}
 
@@ -530,7 +511,7 @@ int load_module(char *path1, User *u) {
 #endif
 		if (do_msg) prefmsg(u->nick, s_Services, "Error, Couldn't Load Module");
 		if (do_msg) prefmsg(u->nick, s_Services, "%s",dl_error);
-		log("Couldn't Load Module: %s", dl_error);
+		nlog(LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dl_error);
 		dlclose(dl_handle);
 		return -1;
 	}
@@ -544,7 +525,7 @@ int load_module(char *path1, User *u) {
 #endif
 		if (do_msg) prefmsg(u->nick, s_Services, "Error, Couldn't Load Module");
 		if (do_msg) prefmsg(u->nick, s_Services, "%s",dl_error);
-		log("Couldn't Load Module: %s", dl_error);
+		nlog(LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dl_error);
 		dlclose(dl_handle);
 		return -1;
 	}
@@ -558,8 +539,8 @@ int load_module(char *path1, User *u) {
 
 	if (mod_info_ptr == NULL || mod_funcs_ptr == NULL) {
 		dlclose(dl_handle);
-		log("%s: Could not load dynamic library %s!\n", __PRETTY_FUNCTION__, path);
-		log("Couldn't Load Module: %s", dlerror());
+		nlog(LOG_WARNING, LOG_CORE, "%s: Could not load dynamic library %s!\n", __PRETTY_FUNCTION__, path);
+		nlog(LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dlerror());
 		return -1;
 	}
 	
@@ -584,8 +565,8 @@ int load_module(char *path1, User *u) {
 	} else {
 		hash_insert(mh, mn, mod_info_ptr->module_name);
 	}
-	log("internal module name: %s", mod_info_ptr->module_name);
-	log("module description: %s", mod_info_ptr->module_description);
+	nlog(LOG_NORMAL, LOG_CORE, "Module Internal name: %s", mod_info_ptr->module_name);
+	nlog(LOG_NORMAL, LOG_CORE, "Module description: %s", mod_info_ptr->module_description);
 
 	mod_ptr->info = mod_info_ptr;
 	mod_ptr->function_list = mod_funcs_ptr;
@@ -659,7 +640,7 @@ int unload_module(char *module_name, User *u) {
 	while ((modnode = hash_scan_next(&hscan)) != NULL) {
 		mod_tmr = hnode_get(modnode);
 		if (!strcasecmp(mod_tmr->modname, module_name)) {
-			chanalert(s_Services, "Module %s has timer %s Registered. Deleting..", module_name, mod_tmr->timername);
+			nlog(LOG_DEBUG1, LOG_CORE, "Module %s has timer %s Registered. Deleting..", module_name, mod_tmr->timername);
 			del_mod_timer(mod_tmr->timername);
 		}
 	}
@@ -668,7 +649,7 @@ int unload_module(char *module_name, User *u) {
 	while ((modnode = hash_scan_next(&hscan)) != NULL) {
 		mod_sock = hnode_get(modnode);
 		if (!strcasecmp(mod_sock->modname, module_name)) {
-			notice (s_Services, "Module %s had Socket %s Registered. Deleting..", module_name, mod_sock->sockname);
+			nlog(LOG_DEBUG1, LOG_CORE, "Module %s had Socket %s Registered. Deleting..", module_name, mod_sock->sockname);
 			del_socket(mod_sock->sockname);
 		}
 	}
@@ -678,16 +659,14 @@ int unload_module(char *module_name, User *u) {
 	while ((modnode = hash_scan_next(&hscan)) != NULL) {
 		mod_ptr = hnode_get(modnode);
 		if (!strcasecmp(mod_ptr->modname, module_name)) {
-			chanalert(s_Services,"Module %s had bot %s Registered. Deleting..",module_name,mod_ptr->nick);
+			nlog(LOG_DEBUG1, LOG_CORE, "Module %s had bot %s Registered. Deleting..",module_name,mod_ptr->nick);
 			del_bot(mod_ptr->nick, "Module Unloaded");
 		}
 	}
 
 	modnode = hash_lookup(mh, module_name);
 	if (modnode) {
-#ifdef DEBUG
-		log("Deleting Module %s from ModHash", module_name);
-#endif
+		nlog(LOG_DEBUG1, LOG_CORE, "Deleting Module %s from ModHash", module_name);
 		globops(me.name, "%s Module Unloaded", module_name);
 		list = hnode_get(modnode);
 		hash_delete(mh, modnode);

@@ -20,20 +20,17 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: timer.c,v 1.20 2003/04/10 15:26:58 fishwaldo Exp $
+** $Id: timer.c,v 1.21 2003/04/11 09:26:31 fishwaldo Exp $
 */
  
 #include "stats.h"
 #include "dl.h"
+#include "log.h"
 
 static time_t last_stats_save;
 static time_t last_lag_check;
 static time_t last_cache_save;
 static int midnight = 0;
-
-void init_timer() {
-	if (usr_mds);
-}
 
 
 void chk()
@@ -55,7 +52,7 @@ void chk()
 				mod_ptr->function();
 				mod_ptr->lastrun = time(NULL);
 			} else {
-				log("setjmp() Failed, Can't call Module %s\n", mod_ptr->modname);
+				nlog(LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", mod_ptr->modname);
 			}
 			strcpy(segvinmodule, "");
 			strcpy(segv_location, "Module_Event_Return");
@@ -66,16 +63,16 @@ void chk()
 		TimerPings();
 		ping.last_sent = time(NULL);
 		if (hash_verify(sockh) == 0) {
-			log("Eeeek, Corruption of the socket hash");
+			nlog(LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the socket hash");
 		}
 		if (hash_verify(mh) == 0) {
-			log("Eeeek, Corruption of the Module hash");
+			nlog(LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Module hash");
 		}
 		if (hash_verify(bh) == 0) {
-			log("Eeeek, Corruption of the Bot hash");
+			nlog(LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Bot hash");
 		}
 		if (hash_verify(th) == 0) {
-			log("Eeeek, Corruption of the Timer hash");
+			nlog(LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Timer hash");
 		}
 		/* flush log files */
 		fflush(NULL);	
@@ -103,9 +100,7 @@ void TimerReset()
 
 void TimerMidnight()
 {
-#ifdef DEBUG
-	log("Its midnight!!! -> %s", sctime(time(NULL)));
-#endif
+	nlog(LOG_DEBUG1, LOG_CORE, "Its midnight!!! -> %s", sctime(time(NULL)));
 	ResetLogs();
 }
 

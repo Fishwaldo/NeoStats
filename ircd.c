@@ -22,12 +22,13 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.114 2003/04/03 14:36:36 fishwaldo Exp $
+** $Id: ircd.c,v 1.115 2003/04/11 09:26:30 fishwaldo Exp $
 */
  
 #include <setjmp.h>
 #include "stats.h"
 #include "dl.h"
+#include "log.h"
 
 
 extern const char version_date[], version_time[];
@@ -290,11 +291,11 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	strcpy(segv_location, "init_bot");
 	u = finduser(nick);
 	if (u) {
-		log("Attempting to Login with a Nickname that already Exists: %s",nick);
+		nlog(LOG_WARNING, LOG_CORE, "Attempting to Login with a Nickname that already Exists: %s",nick);
 		return -1;
 	}
 	if (strlen(user) > 8) {
-		log("Warning, %s bot %s has a username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
+		nlog(LOG_WARNING, LOG_CORE, "Warning, %s bot %s has a username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
 	}		
 	add_mod_user(nick, mod_name);
 
@@ -343,11 +344,9 @@ int del_bot(char *nick, char *reason)
 	int ac = 0;
 	strcpy(segv_location, "del_bot");
 	u = finduser(nick);
-#ifdef DEBUG
-	log("Killing %s for %s",nick,reason);
-#endif
+	nlog(LOG_NOTICE, LOG_CORE, "Killing %s for %s",nick,reason);
 	if (!u) {
-		log("Attempting to Logoff with a Nickname that does not Exists: %s",nick);
+		nlog(LOG_WARNING, LOG_CORE, "Attempting to Logoff with a Nickname that does not Exists: %s",nick);
 		return -1;
 	}
 	AddStringToList(&av, nick, &ac);
@@ -377,15 +376,13 @@ void Module_Event(char *event, char **av, int ac) {
 			while (ev_list->cmd_name != NULL) {
 				/* This goes through each Command */
 				if (!strcasecmp(ev_list->cmd_name, event)) {
-#ifdef DEBUG	
-						log("Running Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
-#endif	
+						nlog(LOG_DEBUG1, LOG_CORE, "Running Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
 						strcpy(segv_location, module_ptr->info->module_name);
 						strcpy(segvinmodule, module_ptr->info->module_name);
 						if (setjmp(sigvbuf) == 0) {
 							ev_list->function(av, ac);			
 						} else {
-							log("setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
+							nlog(LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
 						}
 						strcpy(segvinmodule, "");
 						strcpy(segv_location, "Module_Event_Return");
@@ -485,9 +482,7 @@ void parse(char *line)
 	strncpy(recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
-#ifdef DEBUG
-	log("R: %s", line);
-#endif
+	nlog(LOG_DEBUG1, LOG_CORE, "R: %s", line);
 	
     	if (*line == ':') {
 		coreLine = strpbrk(line, " ");
@@ -553,9 +548,7 @@ void parse(char *line)
 			list = findbot(nick);
 			/* Check to see if any of the Modules have this nick Registered */
 			if (list) {
-#ifdef DEBUG
-				log("nicks: %s", list->nick);
-#endif
+				nlog(LOG_DEBUG1, LOG_CORE, "nicks: %s", list->nick);
 				if (flood(finduser(origin))) {
 					free(av);
 					return;
@@ -596,7 +589,7 @@ void parse(char *line)
 				strcpy(segv_location, cmd_list[I].name);
 				cmd_list[I].function(origin, av, ac);
 				cmd_list[I].usage++;
-				break; log("should never get here-Parse");
+				break; 
 			}	
 		}
 	}
@@ -610,9 +603,7 @@ void parse(char *line)
 			/* This goes through each Command */
 			if (!strcasecmp(fn_list->cmd_name, cmd)) {
 				if (fn_list->srvmsg == cmdptr) {
-#ifdef DEBUG
-					log("Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
-#endif
+					nlog(LOG_DEBUG1, LOG_CORE, "Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
 					strcpy(segv_location, module_ptr->info->module_name);
 					strcpy(segvinmodule, module_ptr->info->module_name);
 					if (setjmp(sigvbuf) == 0) {
@@ -621,7 +612,6 @@ void parse(char *line)
 					strcpy(segvinmodule, "");
 					strcpy(segv_location, "Parse_Return_Module");
 					break;
-					log("Should never get here-Parse");
 				}	
 			}
 		fn_list++;
@@ -738,8 +728,8 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 					if (!list_isfull(tl)) {
 						list_append(tl, mn);
 					} else {
-						log("Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
-						assert(0);
+						nlog(LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
+						do_exit(0);
 					}
 					j++;
 				} else {
@@ -797,8 +787,8 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 			list_transfer(c->modeparms, tl, list_first(tl));
 		} else {
 			/* eeeeeeek, list is full! */
-			log("Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
-			assert(0);
+			nlog(LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
+			do_exit(0);
 		}
 	}
 	list_destroy(tl);
@@ -850,7 +840,7 @@ void Usr_Stats(char *origin, char **argv, int argc) {
 		
 	u=finduser(origin);
 	if (!u) {
-		log("Recieved a Message from a Unknown User! (%s)", origin);
+		nlog(LOG_WARNING, LOG_CORE, "Recieved a Message from a Unknown User! (%s)", origin);
 	}
 	if (!strcasecmp(argv[0], "u")) {
 		/* server uptime - Shmad */ 
@@ -952,9 +942,7 @@ void Usr_Mode(char *origin, char **argv, int argc) {
 	char **av;
 	int ac = 0;
 	if (!strchr(argv[0], '#')) {
-#ifdef DEBUG
-		log("Mode: UserMode: %s",argv[0]);
-#endif
+		nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s",argv[0]);
 #ifdef ULTIMATE3
 		UserMode(argv[0], argv[1], 0);
 #else
@@ -1024,7 +1012,7 @@ void Usr_Pong(char *origin, char **argv, int argc) {
 		free(av);
 //		FreeList(av, ac);
 	} else {
-		log("Received PONG from unknown server: %s", argv[0]);
+		nlog(LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", argv[0]);
 	}
 }
 void Usr_Away(char *origin, char **argv, int argc) {
@@ -1043,7 +1031,7 @@ void Usr_Away(char *origin, char **argv, int argc) {
 		free(av);
 //		FreeList(av, ac);
 	} else {
-		log("Warning, Unable to find User %s for Away", origin);
+		nlog(LOG_NOTICE, LOG_CORE, "Warning, Unable to find User %s for Away", origin);
 	}
 }	
 void Usr_Nick(char *origin, char **argv, int argc) {
@@ -1073,7 +1061,7 @@ void Usr_Topic(char *origin, char **argv, int argc) {
 #endif
 		free(buf);
 	} else {
-		log("Ehhh, Can't find Channel %s", argv[0]);
+		nlog(LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);
 	}
 
 }
@@ -1178,7 +1166,7 @@ void Srv_Squit(char *origin, char **argv, int argc) {
 //				FreeList(av, ac);
 				DelServer(argv[0]);
 			} else {
-				log("Waring, Squit from Unknown Server %s", argv[0]);
+				nlog(LOG_WARNING, LOG_CORE, "Waring, Squit from Unknown Server %s", argv[0]);
 			}
 						
 }
@@ -1198,9 +1186,7 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 #elif ULTIMATE3
 			AddUser(argv[0], argv[4], argv[5], argv[6], strtoul(argv[8], NULL, 10), strtoul(argv[2], NULL, 10));
 			Module_Event("SIGNON", av, ac);
-#ifdef DEBUG
-			log("Mode: UserMode: %s",argv[3]);
-#endif
+			nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s",argv[3]);
 			UserMode(argv[0], argv[3], 0);
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
@@ -1210,9 +1196,7 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 #elif HYBRID7
 			AddUser(argv[0], argv[4], argv[5], argv[6], 0, strtoul(argv[2], NULL, 10));
 			Module_Event("SIGNON", av, ac);
-#ifdef DEBUG
-			log("Mode: UserMode: %s",argv[3]);
-#endif
+			nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s",argv[3]);
 			UserMode(argv[0], argv[3]);
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
@@ -1223,9 +1207,7 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			if (u) {
 				strncpy(u->vhost, argv[6], MAXHOST);
 			}
-#ifdef DEBUG
-			log("Mode: UserMode: %s",argv[3]);
-#endif
+			nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s",argv[3]);
 			UserMode(argv[0], argv[3]);
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
@@ -1242,9 +1224,7 @@ void Srv_Client(char *origin, char **argv, int argc) {
 			AddStringToList(&av, argv[0], &ac);
 			AddUser(argv[0], argv[5], argv[6], argv[8], strtoul(argv[10], NULL, 10), strtoul(argv[2], NULL, 10));
 			Module_Event("SIGNON", av, ac);
-#ifdef DEBUG
-			log("Mode: UserMode: %s",argv[3]);
-#endif
+			nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s",argv[3]);
 			UserMode(argv[0], argv[3], 0);
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
@@ -1253,9 +1233,7 @@ void Srv_Client(char *origin, char **argv, int argc) {
 			ac = 0;
 #ifdef ULTIMATE3
 			AddStringToList(&av, argv[0], &ac);
-#ifdef DEBUG
-			log("Smode: SMode: %s", argv[4]);
-#endif
+			nlog(LOG_DEBUG1, LOG_CORE, "Smode: SMode: %s", argv[4]);
 			UserMode(argv[0], argv[4], 1);
 			AddStringToList(&av, argv[4], &ac);
 			Module_Event("SMODE", av, ac);
@@ -1307,7 +1285,7 @@ void Srv_Tburst(char *origin, char **argv, int argc) {
 		Change_Topic(argv[3], c, atoi(argv[2]), buf);
 		free(buf);
 	} else {
-		log("TopicBurst: Ehhh, Can't find Channel %s", argv[1]);
+		nlog(LOG_WARNING, LOG_CORE, "TopicBurst: Ehhh, Can't find Channel %s", argv[1]);
 	}
 
 
@@ -1326,7 +1304,7 @@ int flood(User *u)
 	}
 	if (u->flood >= 5) {
 		skill_cmd(s_Services, u->nick, "%s!%s (Flooding Services.)", Servbot.host, s_Services);
-		log("FLOODING: %s!%s@%s", u->nick, u->username, u->hostname);
+		nlog(LOG_NORMAL, LOG_CORE, "FLOODING: %s!%s@%s", u->nick, u->username, u->hostname);
 		DelUser(u->nick);
 		return 1;
 	} else {

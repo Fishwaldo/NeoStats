@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.85 2003/04/10 15:26:57 fishwaldo Exp $
+** $Id: main.c,v 1.86 2003/04/11 09:26:30 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
 	ConfLoad();
         if (me.die) {
 		printf("\n-----> ERROR: Read the README file then edit neostats.cfg! <-----\n\n");
-                log("Read the README file and edit your neostats.cfg");
+                nlog(LOG_CRITICAL, LOG_CORE, "Read the README file and edit your neostats.cfg");
                 sleep(1);
                 close(servsock);
                 remove("neostats.pid");
@@ -194,11 +194,11 @@ int main(int argc, char *argv[])
 #ifndef DEBUG
 		/* detach from parent process */
 		if (setpgid(0, 0) < 0) {
-			log("setpgid() failed");
+			nlog(LOG_WARNING, LOG_CORE, "setpgid() failed");
 		}
 	}	
 #endif
-	log("Statistics Started (NeoStats %d.%d.%d%s).", MAJOR, MINOR, REV, version);
+	nlog(LOG_NOTICE, LOG_CORE, "Statistics Started (NeoStats %d.%d.%d%s).", MAJOR, MINOR, REV, version);
 
 	/* we are ready to start now Duh! */
 	start();
@@ -279,7 +279,7 @@ void get_options(int argc, char **argv) {
 RETSIGTYPE serv_die() {
 	User *u;
 	u = finduser(s_Services);
-	log("Sigterm Recieved, Shuting Down Server!!!!");
+	nlog(LOG_CRITICAL, LOG_CORE, "Sigterm Recieved, Shuting Down Server!!!!");
 	ns_shutdown(u,"SigTerm Recieved");
 	ssquit_cmd(me.name);
 
@@ -343,18 +343,18 @@ RETSIGTYPE serv_segv() {
 	if (strlen(segvinmodule) > 1) {
 		globops(me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
 		chanalert(s_Services, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
-		log("Uh Oh, Segmentation Fault in Modules Code %s", segvinmodule);
-		log("Location could be %s", segv_location);
-		log("Unloading Module and restoring stacks. Doing Backtrace:");
+		nlog(LOG_CRITICAL, LOG_CORE, "Uh Oh, Segmentation Fault in Modules Code %s", segvinmodule);
+		nlog(LOG_CRITICAL, LOG_CORE, "Location could be %s", segv_location);
+		nlog(LOG_CRITICAL, LOG_CORE, "Unloading Module and restoring stacks. Doing Backtrace:");
 		chanalert(s_Services, "Location *could* be %s. Doing Backtrace:", segv_location);
 #ifdef HAVE_BACKTRACE
 		for (i = 1; i < size; i++) {
 			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
-			log("BackTrace(%d): %s", i-1, strings[i]);
+			nlog(LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s", i-1, strings[i]);
 		}
 #else 
 		chanalert(s_Services, "Backtrace not available on this platform");
-		log("Backtrace not available on this platform");
+		nlog(LOG_CRITICAL, LOG_CORE, "Backtrace not available on this platform");
 #endif
 		strcpy(name, segvinmodule);
 		strcpy(segvinmodule, "");
@@ -368,20 +368,20 @@ RETSIGTYPE serv_segv() {
 	} else {	
 		/** The segv happened in our core, damn it */
 		/* Thanks to Stskeeps and Unreal for this stuff :) */
-		log("Uh Oh, Segmentation Fault.. Server Terminating");
-		log("Details: Buffer: %s", recbuf);
-		log("Approx Location: %s Backtrace:", segv_location);
+		nlog(LOG_CRITICAL, LOG_CORE, "Uh Oh, Segmentation Fault.. Server Terminating");
+		nlog(LOG_CRITICAL, LOG_CORE, "Details: Buffer: %s", recbuf);
+		nlog(LOG_CRITICAL, LOG_CORE, "Approx Location: %s Backtrace:", segv_location);
 		/* Broadcast it out! */
 		globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 		chanalert(s_Services, "Damn IT, Server Terminating (%d%d%d%s), Segmentation Fault. Buffer: %s, Approx Location: %s Backtrace:", MAJOR, MINOR, REV, version, recbuf, segv_location);
 #ifdef HAVE_BACKTRACE
 		for (i = 1; i < size; i++) {
 			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
-			log("BackTrace(%d): %s", i-1, strings[i]);
+			nlog(LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s", i-1, strings[i]);
 		}
 #else 
 		chanalert(s_Services, "Backtrace not available on this platform");
-		log("Backtrace not available on this platform");
+		nlog(LOG_CRITICAL, LOG_CORE, "Backtrace not available on this platform");
 #endif
 		sleep(2);
 		kill(forked, 3);
@@ -450,20 +450,20 @@ void start()
 	strcpy(segv_location, "start");
 
 	
-	log("Connecting to %s:%d", me.uplink, me.port);
+	nlog(LOG_NOTICE, LOG_CORE, "Connecting to %s:%d", me.uplink, me.port);
 	if (servsock > 0)
 		close(servsock);
 
 	servsock = ConnectTo(me.uplink, me.port);
 	
 	if (servsock <= 0) {
-		log("Unable to connect to %s", me.uplink);
+		nlog(LOG_WARNING, LOG_CORE, "Unable to connect to %s", me.uplink);
 	} else {
 		attempts=0;
 		login();
 		read_loop();
 	}
-	log("Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
+	nlog(LOG_NOTICE, LOG_CORE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
 	close(servsock);
 
 	/* Unload the Modules */
@@ -508,12 +508,12 @@ void *smalloc(long size)
 	
 	strcpy(segv_location, "smalloc");
 	if (!size) {
-		log("smalloc(): illegal attempt to allocate 0 bytes!");
+		nlog(LOG_WARNING, LOG_CORE, "smalloc(): illegal attempt to allocate 0 bytes!");
 		size = 1;
 	}
 	buf = malloc(size);
 	if (!buf) {
-		log("smalloc(): out of memory.");
+		nlog(LOG_CRITICAL, LOG_CORE, "smalloc(): out of memory.");
 		do_exit(1);
 	}
 	return buf;
@@ -534,7 +534,7 @@ char *sstrdup(const char *s)
 {
 	char *t = strdup(s);
 	if (!t) {
-		log("sstrdup(): out of memory.");
+		nlog(LOG_CRITICAL, LOG_CORE, "sstrdup(): out of memory.");
 		do_exit(1);
 	}
 	return t;
@@ -631,13 +631,13 @@ C = 0;
 void do_exit(int segv) {
 	switch (segv) {
 	case 0:
-		nlog(LOG_NORMAL, LOG_CORE, "Normal shut down SubSystems");
+		nlog(LOG_CRITICAL, LOG_CORE, "Normal shut down SubSystems");
 		break;
 	case 2:
-		nlog(LOG_NORMAL, LOG_CORE, "Restarting NeoStats SubSystems");
+		nlog(LOG_CRITICAL, LOG_CORE, "Restarting NeoStats SubSystems");
 		break;
 	case 1:
-		nlog(LOG_NORMAL, LOG_CORE, "Shutting Down SubSystems without saving data due to core");
+		nlog(LOG_CRITICAL, LOG_CORE, "Shutting Down SubSystems without saving data due to core");
 		break;
 	}
 	close_logs();

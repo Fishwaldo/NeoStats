@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.72 2003/04/10 15:26:57 fishwaldo Exp $
+** $Id: stats.h,v 1.73 2003/04/11 09:26:31 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -241,7 +241,14 @@ struct ping {
 /* sock.c */
 extern int ConnectTo(char *, int);
 extern void read_loop();
-extern void log(char *, ...);
+// extern void log(char *, ...); //
+
+#if 0
+/* this will go away one day! */
+#define log(x, rest...) \
+nlog(5,0,x, ## rest); 
+#endif
+
 extern void ResetLogs();
 extern char *sctime(time_t);
 extern char *sftime(time_t);

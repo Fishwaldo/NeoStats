@@ -20,13 +20,14 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.c,v 1.21 2003/04/10 15:26:56 fishwaldo Exp $
+** $Id: conf.c,v 1.22 2003/04/11 09:26:30 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "dotconf.h"
 #include "conf.h"
 #include "dl.h"
+#include "log.h"
 
 static void cb_Server(char *, int);
 static void cb_Module(char *, int);
@@ -137,7 +138,7 @@ void cb_Module(char *arg, int configtype) {
 				}
 			}
 			load_mods[i] = sstrdup(arg);
-			log("Added Module %d :%s", i, load_mods[i]);
+			nlog(LOG_NORMAL, LOG_CORE, "Added Module %d :%s", i, load_mods[i]);
 		}
 }
 
@@ -156,14 +157,12 @@ int init_modules() {
 	strcpy(segv_location,"init_modules");
 	
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] !=0); i++) {
-#ifdef DEBUG
-		log("Loading Module %s", load_mods[i]);
-#endif
+		nlog(LOG_DEBUG1, LOG_CORE, "Loading Module %s", load_mods[i]);
 		rval = load_module(load_mods[i], NULL);
 		if (!rval) {
-			log("Successfully Loaded Module %s", load_mods[i]);
+			nlog(LOG_NORMAL, LOG_CORE, "Successfully Loaded Module %s", load_mods[i]);
 		} else {
-			log("Could Not Load Module %s, Please check above error Messages", load_mods[i]);
+			nlog(LOG_WARNING, LOG_CORE, "Could Not Load Module %s, Please check above error Messages", load_mods[i]);
 		}
 	}
 	return 1;

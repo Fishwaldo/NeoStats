@@ -20,13 +20,13 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: keeper.c,v 1.1 2003/04/09 14:29:51 fishwaldo Exp $
+** $Id: keeper.c,v 1.2 2003/04/11 09:26:30 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "keeper.h"
 #include "conf.h"
-
+#include "log.h"
 
 /** @brief Gets Config Data of Type
  */
@@ -55,13 +55,13 @@ int i = 0;
 			i = kp_get_bool(keypath, (int *)*&data);
 			break;		
 		default:
-			log("Keeper: Called GetConf with invalid datatype %d", type);
+			nlog(LOG_WARNING, LOG_CORE, "Keeper: Called GetConf with invalid datatype %d", type);
 			return -1;
 	}
 	/* check for errors */
 	if (i != 0) {
 		data = malloc(255);
-		log("GetConf: %s", kp_strerror(i));
+		nlog(LOG_WARNING, LOG_CORE, "GetConf: %s", kp_strerror(i));
 		return -1;
 	} 
 	return 1;
@@ -96,12 +96,12 @@ int i = 0;
 			i = kp_set_bool(keypath, (int)data);
 			break;		
 		default:
-			log("Keeper: Called SetConf with invalid datatype %d", type);
+			nlog(LOG_WARNING, LOG_CORE, "Keeper: Called SetConf with invalid datatype %d", type);
 			return -1;
 	}
 	/* check for errors */
 	if (i != 0) {
-		log("SetConf: %s", kp_strerror(i));
+		nlog(LOG_WARNING, LOG_CORE, "SetConf: %s", kp_strerror(i));
 		return -1;
 	} 
 	kp_flush();

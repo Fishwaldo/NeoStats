@@ -22,12 +22,12 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: services.c,v 1.51 2003/04/10 15:26:57 fishwaldo Exp $
+** $Id: services.c,v 1.52 2003/04/11 09:26:30 fishwaldo Exp $
 */
  
 #include "stats.h"
 #include "dl.h"
-
+#include "log.h"
 
 
 extern const char version_date[], version_time[];
@@ -54,7 +54,7 @@ void servicesbot(char *nick, char **av, int ac) {
 			
 	u = finduser(nick);
 	if (!u) {
-		log("Unable to finduser %s (%s)", nick,s_Services);
+		nlog(LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", nick,s_Services);
 		return;
 	}
 
@@ -305,7 +305,7 @@ extern void ns_shutdown(User *u, char *reason)
 	sleep(1);
 	close(servsock);
 	remove("neostats.pid");
-	log("%s [%s](%s) requested SHUTDOWN.", u->nick, u->username,
+	nlog(LOG_NOTICE, LOG_CORE, "%s [%s](%s) requested SHUTDOWN.", u->nick, u->username,
 		u->hostname);
 	do_exit(0);
 }
@@ -318,7 +318,7 @@ static void ns_reload(User *u, char *reason)
 	char quitmsg[255];
 	strcpy(segv_location, "ns_reload");
 	globops(s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
-	log("%s requested RELOAD. -> reason", u->nick);
+	nlog(LOG_NOTICE, LOG_CORE, "%s requested RELOAD. -> reason", u->nick);
 	snprintf(quitmsg, 255, "%s Sent RELOAD: %s", u->nick, reason);
 	hash_scan_begin(&ms, mh);
 	while ((mn = hash_scan_next(&ms)) != NULL) {
@@ -343,7 +343,7 @@ static void ns_logs(User *u)
 
 	strcpy(segv_location, "ns_logs");
 
-	fp = fopen("logs/neostats.log", "r");
+	fp = fopen("logs/NeoStats.log", "r");
 	if (!fp) {
 		prefmsg(u->nick, s_Services, "Unable to open neostats.log");
 		return;
@@ -362,7 +362,7 @@ static void ns_jupe(User *u, char *server)
 	strcpy(segv_location, "ns_jupe");
 	snprintf(infoline, 255, "[Jupitered by %s]", u->nick);
 	sserver_cmd(server, 1, infoline);
-	log("%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, server);
+	nlog(LOG_NOTICE, LOG_CORE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, server);
 }
 
 void ns_debug_to_coders(char *u)
@@ -392,9 +392,7 @@ static void ns_raw(User *u, char *message)
 	int sent;
 	strcpy(segv_location, "ns_raw");
 	chanalert(s_Services,"\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)",u->nick, message);
-#ifdef DEBUG
-        log("SENT: %s", message);
-#endif
+	nlog(LOG_INFO, LOG_CORE, "RAW COMMAND %sIssued a Raw Command!(%s)", u->nick, message);
 	strcat (message, "\n");
         sent = write (servsock, message, strlen (message));
         if (sent == -1) {
@@ -440,9 +438,6 @@ static void ns_uptime(User *u)
 {
 	int uptime = time (NULL) - me.t_start;
 	strcpy(segv_location, "ns_uptime");
-
-	log("Time Difference %d", uptime);
-	log("Statistical Server Up %d days, %d:%02d:%02d", uptime/86400, (uptime/3600) % 24, (uptime/60) % 60, uptime % 60);
 
 	prefmsg(u->nick, s_Services, "Statistics Information:");
 	if (uptime > 86400) {

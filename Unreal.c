@@ -20,12 +20,13 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Unreal.c,v 1.37 2003/04/10 15:26:55 fishwaldo Exp $
+** $Id: Unreal.c,v 1.38 2003/04/11 09:26:30 fishwaldo Exp $
 */
  
 #include "stats.h"
 #include "Unreal.h"
 #include "dl.h"
+#include "log.h"
 void sts(char *fmt,...);
 
 
@@ -268,7 +269,7 @@ int ssvshost_cmd(const char *who, const char *vhost) {
 	User *u;
 	u = finduser(who);
 	if (!u) {
-		log("Can't Find user %s for ssvshost_cmd", who);
+		nlog(LOG_WARNING, LOG_CORE, "Can't Find user %s for ssvshost_cmd", who);
 		return 0;
 	} else {
 		strcpy(u->vhost, vhost);
@@ -281,7 +282,7 @@ int ssvsmode_cmd(const char *target, const char *modes) {
 	User *u;
 	u = finduser(target);
 	if (!u) {
-		log("Can't find user %s for ssvsmode_cmd", target);
+		nlog(LOG_WARNING, LOG_CORE, "Can't find user %s for ssvsmode_cmd", target);
 		return 0;
 	} else {
 		sts(":%s %s %s %s", me.name, (me.token ? TOK_SVSMODE : MSG_SVSMODE), target, modes);
@@ -298,7 +299,7 @@ int ssvskill_cmd(const char *target, const char *reason, ...) {
 	char buf[512];
 	u = finduser(target);
 	if (!u) {
-		log("Cant find user %s for ssvskill_cmd", target);
+		nlog(LOG_WARNING, LOG_CORE, "Cant find user %s for ssvskill_cmd", target);
 		return 0;
 	} else {
 		va_start(ap, reason);
@@ -338,13 +339,11 @@ void sts(char *fmt,...)
 	va_start (ap, fmt);
 	vsnprintf (buf, 512, fmt, ap);
 
-#ifdef DEBUG
-	log("SENT: %s", buf);
-#endif
+	nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", buf);
 	strcat (buf, "\n");
 	sent = write (servsock, buf, strlen (buf));
 	if (sent == -1) {
-		log("Write error.");
+		nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
 		do_exit(0);
 	}
 	me.SendM++;
@@ -363,15 +362,12 @@ void chanalert(char *who, char *buf,...)
 
 	if (me.onchan) {
 		snprintf(out,512, ":%s PRIVMSG %s :%s",who, me.chan, tmp);
-#ifdef DEBUG
-		log("SENT: %s", out);
-#endif
-
+		nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", out);
 		strcat (out, "\n");
 		sent = write(servsock, out, strlen (out));
 		if (sent == -1) {
 			me.onchan = 0;
-			log("Write error.");
+			nlog(LOG_DEBUG3, LOG_CORE, "Write error.");
 			do_exit(0);
 		}
 		me.SendM++;
@@ -459,7 +455,7 @@ void globops(char *from, char *fmt, ...)
 		snprintf(buf, 512, ":%s GLOBOPS :%s", from, buf2);
 		sts("%s", buf);
 	} else {
-		log("%s", buf2);
+		nlog(LOG_NORMAL, LOG_CORE, "%s", buf2);
 	}
 	va_end(ap);
 }
