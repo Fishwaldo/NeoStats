@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.99 2002/12/13 09:23:55 fishwaldo Exp $
+** $Id: ircd.c,v 1.100 2002/12/13 11:24:49 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -503,10 +503,14 @@ void parse(char *line)
 
         /* First, check if its a privmsg, and if so, handle it in the correct Function */
  	if (!strcasecmp("PRIVMSG",cmd) || (!strcasecmp("!",cmd))) {
+
+		if (flood(finduser(origin))) {
+			free(av);
+			return;
+		}
+
+
  		/* its a privmsg, now lets see who too... */       
-
-
-	
 		if (strstr(av[0], "!")) {
 			strncpy(cmd, av[0], 64);
 			nick = strtok(cmd, "!");
