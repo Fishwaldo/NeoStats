@@ -891,14 +891,11 @@ Srv_Pass (char *origin, char **argv, int argc)
 void
 Srv_Server (char *origin, char **argv, int argc)
 {
-	Server *s;
 	if (*origin == 0) {
-		AddServer (argv[0], me.name, atoi (argv[1]));
+		me.s = AddServer (argv[0], me.name, atoi (argv[1]));
 	} else {
-		AddServer (argv[0], origin, atoi (argv[1]));
+		me.s = AddServer (argv[0], origin, atoi (argv[1]));
 	}
-	s = findserver (argv[0]);
-	me.s = s;
 }
 
 void

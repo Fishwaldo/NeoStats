@@ -24,7 +24,7 @@
 #ifndef _SERVER_H_
 #define _SERVER_H_
 
-void AddServer (char *name, char *uplink, int hops);
+Server *AddServer (char *name, char *uplink, int hops);
 void DelServer (char *name);
 void ServerDump (void);
 int init_server_hash (void);

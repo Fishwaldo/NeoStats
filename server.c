@@ -57,7 +57,7 @@ new_server (char *name)
 	return s;
 }
 
-void
+Server *
 AddServer (char *name, char *uplink, int hops)
 {
 	Server *s;
@@ -68,8 +68,6 @@ AddServer (char *name, char *uplink, int hops)
 	s = new_server (name);
 	s->hops = hops;
 	s->connected_since = me.now;
-	/* this is kinda useless right ? */
-/*	s->last_announce = me.now; */
 	if (uplink) {
 		strlcpy (s->uplink, uplink, MAXHOST);
 	} else {
@@ -81,7 +79,7 @@ AddServer (char *name, char *uplink, int hops)
 	AddStringToList (&av, s->name, &ac);
 	ModuleEvent (EVENT_NEWSERVER, av, ac);
 	free (av);
-
+	return(s);
 }
 
 void
