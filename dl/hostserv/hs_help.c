@@ -11,7 +11,7 @@ const char *hs_help[] = {
 "\2HostServ HELP\2",
 "",
 "COMMANDS:",
-"     ABOUT     ADD     DEL     LIST",
+"     ABOUT     ADD     DEL     LIST     VIEW",
 "",
 "Only Network Admins can use the ADD, DEL & LIST functions",
 "",
@@ -45,9 +45,19 @@ NULL
 
 const char *hs_help_del[] = {
 "\2HostServ Help : DEL\2",
-"\2Usage:\2 DEL <NICK> <HOST NAME> <VIRTUAL HOST NAME>",
+"\2Usage:\2 DEL <ACCESS LIST #>",
 "",
-"The information needed for this is best copied out directly from the 'LIST' command",
+"The information needed for this is in the LIST command.  To delete Number 3",
+"use DEL 3 ... its that easy!",
+"",
+NULL
+};
+
+const char *hs_help_view[] = {
+"\2HostServ Help : VIEW",
+"\2Usage:\2 VIEW <ACCESS LIST #>",
+"",
+"View Detailed information about the user on the access list # you selected",
 "",
 NULL
 };
@@ -56,7 +66,8 @@ const char *hs_help_list[] = {
 "\2HostServ Help : LIST",
 "\2Usage:\2 LIST",
 "",
-"Lists the people and hosts in the Database in db format",
+"Lists the people and vhosts in the Database",
+"For more descriptive info on a SINGLE vhost see HELP VIEW",
 "",
 NULL
 };

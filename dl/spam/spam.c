@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.12 2002/07/17 05:25:38 fishwaldo Exp $
+** $Id: spam.c,v 1.13 2002/07/25 13:38:32 shmad Exp $
 */
 
 
@@ -41,7 +41,7 @@ int __Chan_Message(char *origin, char *chan, char **argv, int argc)
 	char *fortune;
 	fortune = malloc(255);
 	if (!strcasecmp(argv[1], s_Spam)) {
-		fort = popen("/usr/games/fortune", "r");
+		fort = popen("/usr/local/games/fortune", "r");
 		if (fort) {
 			while ((fortune = fgets(fortune, 255, fort))) {
 				privmsg(chan, s_Spam, "%s", fortune);

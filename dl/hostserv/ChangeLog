@@ -2,6 +2,23 @@ HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
 
+* Version 2.0 * Shmad * July 24, 2002
++ Updated all HELPFILES.
++ Added an ERRORmsg to VIEW/DEL if the access # doesnt exist.
++ Fixed a segfault bug if av[2] was null (cant convert to int obviously)
++ Added new VIEW command, to view access #'s from VIEW, gives detailed information.
+- Overhauls to "LIST" routine:
+  + LIST is now numbered. 1, 2, 3, etc, etc, etc..
+  + Changing to tabulated displays so hosts all line up nicely.
+  + LIST now ONLY displays NICK & VHOST use VIEW # to get full info.
+- Overhauls to "DEL" routine:
+  + Can ONLY delete data by Line #
+    - Example:  /msg HoStServ DEL 1
+  (Thanks for JH for finding the annoying deletion bug (which is why we are
+   using list numbering now))
+- Changed over to new event handlers
+
+
 * Version 1.7 * March 30th, 2002
 - Possible signon crash fixed
 - "Can't Find db" message only appears once now

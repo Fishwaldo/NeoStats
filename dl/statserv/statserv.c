@@ -332,9 +332,15 @@ int __Bot_Message(char *origin, char **av, int ac)
 		ss_botlist(u);
 		chanalert(s_StatServ,"%s Wanted to see the Bot List",u->nick);
 	} else if (!strcasecmp(av[1], "STATS") && (UserLevel(u) >= 185)) {
+/*
+
+FISH: We do use less than 5 sometimes, I commented this out.. each section does checking.
+- Shmad
+
 		if (ac < 5) {
 			prefmsg(u->nick, s_StatServ, "Incorrect Syntax: /msg %s HELP STATS", s_StatServ);
 		}
+*/
 		ss_stats(u, av[2], av[3], av[4]);
 		chanalert(s_StatServ,"%s Wants to Look at my Stats!! 34/24/34",u->nick);
 	} else if (!strcasecmp(av[1], "RESET") && (UserLevel(u) >= 185)) {

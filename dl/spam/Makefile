@@ -12,7 +12,7 @@ all:	spam
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 spam: $(OBJECTS)
-	$(LD) $(LDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
 	/bin/cp $(TARGET) ../
 
 clean:
