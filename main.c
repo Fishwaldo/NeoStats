@@ -209,30 +209,24 @@ void start()
 /* 
 	init_tld();
 */
-	if (attempts < 10) {
-		attempts++;
-		log("Connecting to %s:%d", me.uplink, me.port);
-		if (servsock > 0)
-			close(servsock);
+
 	
-		servsock = ConnectTo(me.uplink, me.port);
+	log("Connecting to %s:%d", me.uplink, me.port);
+	if (servsock > 0)
+		close(servsock);
+
+	servsock = ConnectTo(me.uplink, me.port);
 	
-		if (servsock <= 0) {
-			log("Unable to connect to %s", me.uplink);
-		} else {
-			attempts=0;
-			login();
-			read_loop();
-		}
-		log("Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
-		sleep(me.r_time);
-		start();
+	if (servsock <= 0) {
+		log("Unable to connect to %s", me.uplink);
 	} else {
-		log("Could Not Connect to Server %s after 10 Attempts",me.uplink);
-		log("Exiting NeoStats");
-		printf("\n%s Terminating..... Could not connect to Server\n", version);
-		printf("%s Terminated\n", version);
-	}	
+		attempts=0;
+		login();
+		read_loop();
+	}
+	log("Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
+	close(servsock);
+	execve("./stats", NULL, NULL);
 }
 
 void login()
