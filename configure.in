@@ -11,7 +11,7 @@ AC_CACHE_LOAD
 #Standard Defines for autoconf here
 x_maj=3
 x_min='0'
-x_rev="prealpha1"
+x_rev="prealpha2"
 x_package='NeoStats'
 MODULES="connectserv hostserv loveserv moraleserv statserv ircdauth extauth"
 #dont edit anything after this line!

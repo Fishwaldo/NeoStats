@@ -23,6 +23,9 @@
 
 #include "neostats.h"
 #include "nsdbm.h"
+
+/*#ifdef HAVE_DB_H*/
+#if 0
 #include <db.h>
 
 static DBT dbkey;
@@ -108,3 +111,35 @@ int DBMDelData (void *handle, char * key)
 	/* TODO */
 	return NS_SUCCESS;
 }
+
+#else
+void *DBMOpenTable (const char *name)
+{
+	return NULL;
+}
+
+int DBMCloseTable (void *handle)
+{
+	return NS_FAILURE;
+}
+
+void* DBMGetData (void *handle, char *key)
+{
+	return NULL;
+}
+
+int DBMSetData (void *handle, char *key, void *data, int size)
+{
+	return NS_FAILURE;
+}
+
+int DBMGetTableRows (void *handle, DBRowHandler handler)
+{
+	return NS_FAILURE;
+}
+
+int DBMDelData (void *handle, char * key)
+{
+	return NS_FAILURE;
+}
+#endif
