@@ -544,7 +544,7 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 		for(i = 1; i < ac; i++) {
 			AddStringToList (&argv, av[i], &argc);
 		}
-		ModuleFunction (cmdptr, MSG_NOTICE, u->nick, argv, argc);
+		ModuleFunction (1, MSG_NOTICE, u->nick, argv, argc);
 		free(argv);
 	} else {
 		nlog (LOG_DEBUG1, LOG_CORE, "m_notice: skipping %s %s", origin, av[0]);
