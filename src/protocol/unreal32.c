@@ -311,9 +311,9 @@ void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
 {
 /* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 TKLEXT NICKIP CHANMODES=be,kfL,l,psmntirRcOAQKVGCuzNSMT */
-	send_cmd ("%s TOKEN NICKv2 VHP SJOIN SJOIN2 SJ3 UMODE2 NICKIP", MSGTOK(PROTOCTL));
+	send_cmd ("%s TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NICKIP VHP", MSGTOK(PROTOCTL));
 	send_cmd ("%s %s", MSGTOK(PASS), pass);
-	send_cmd ("%s %s %d :%s", MSGTOK(SERVER), name, numeric, infoline);
+	send_cmd ("%s %s %d :U0-*-%d %s", MSGTOK(SERVER), name, 1, numeric, infoline);
 }
 
 void
