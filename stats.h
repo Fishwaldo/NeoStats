@@ -100,7 +100,8 @@
 #define bzero(x, y)		memset(x, '\0', y);
 #define is_synced		me.synced
 
-/* 	Buffer overrun protection */
+/* 	Buffer overrun protection (Work in progress) */
+/* DO NOT ENABLE THIS, OR NEOSTATS MAY NOT RUN CORRECTLY */
 /*#define BUFFER_OVERRUN_PROTECTION*/
 #ifdef BUFFER_OVERRUN_PROTECTION
 /*  Note, this is considered a short term solution for 2.5.6 to avoid
