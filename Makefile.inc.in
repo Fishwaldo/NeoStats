@@ -1,0 +1,8 @@
+CC=@CC@
+CFLAGS=@CFLAGS@
+LDFLAGS= -rdynamic @LIBS@
+INSTALL = @INSTALL@                                                                                                                 
+INSTALL_PROGRAM = @INSTALL_PROGRAM@                                                                                                 
+INSTALL_DATA = @INSTALL_DATA@
+MODULES=@MODULES@
+DIRECTORY=@prefix@

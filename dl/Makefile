@@ -3,6 +3,7 @@ include ../Makefile.inc
 
 default: all
 modules: all
+install: all
 
 all clean :: 
 	@for i in $(MODULES) ""; do \

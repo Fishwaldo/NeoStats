@@ -6,7 +6,7 @@
 /INSTALL -text
 /LICENCE -text
 /Makefile.in -text
-/Makefile.inc -text
+/Makefile.inc.in -text
 /NEWS -text
 /README -text
 /TODO -text
