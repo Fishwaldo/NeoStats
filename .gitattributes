@@ -90,6 +90,8 @@ include/timer.h eol=lf
 include/transfer.h -text
 include/users.h eol=lf
 include/version.sh -text
+lib/Makefile.am -text
+lib/Makefile.in -text
 lib/adns/.indent.pro -text
 lib/adns/Makefile.am -text
 lib/adns/Makefile.in -text
