@@ -557,7 +557,7 @@ AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_CONFIG_HEADER(adns/config.h)
 AC_CONFIG_HEADER(pcre/config.h)
-AC_OUTPUT(Makefile.inc Makefile sqlsrv/Makefile tools/Makefile pcre/Makefile pcre.h:pcre/pcre.in)
+AC_OUTPUT(Makefile.inc Makefile dl/Makefile.inc sqlsrv/Makefile tools/Makefile pcre/Makefile pcre.h:pcre/pcre.in)
 NEO_SUBDIR_CONFIG(curl, [--disable-thread --disable-ipv6 --enable-nonblocking --without-ssl])
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"

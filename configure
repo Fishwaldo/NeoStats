@@ -6560,7 +6560,7 @@ _ACEOF
 
           ac_config_headers="$ac_config_headers pcre/config.h"
 
-                                                            ac_config_files="$ac_config_files Makefile.inc Makefile sqlsrv/Makefile tools/Makefile pcre/Makefile pcre.h:pcre/pcre.in"
+                                                                      ac_config_files="$ac_config_files Makefile.inc Makefile dl/Makefile.inc sqlsrv/Makefile tools/Makefile pcre/Makefile pcre.h:pcre/pcre.in"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -7087,6 +7087,7 @@ do
   # Handling of arguments.
   "Makefile.inc" ) CONFIG_FILES="$CONFIG_FILES Makefile.inc" ;;
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+  "dl/Makefile.inc" ) CONFIG_FILES="$CONFIG_FILES dl/Makefile.inc" ;;
   "sqlsrv/Makefile" ) CONFIG_FILES="$CONFIG_FILES sqlsrv/Makefile" ;;
   "tools/Makefile" ) CONFIG_FILES="$CONFIG_FILES tools/Makefile" ;;
   "pcre/Makefile" ) CONFIG_FILES="$CONFIG_FILES pcre/Makefile" ;;
