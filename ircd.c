@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.139 2003/09/17 14:49:55 fishwaldo Exp $
+** $Id: ircd.c,v 1.140 2003/09/17 14:57:29 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -501,7 +501,7 @@ Showcredits (char *nick)
 	snumeric_cmd (351, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
 	snumeric_cmd (351, nick, ":- irc.irc-chat.net #NeoStats");
 	snumeric_cmd (351, nick, ":- Thanks to:");
-	snumeric_cmd (351, nick, ":- \2Fish\2 still part of the team with patch submissions.");
+	snumeric_cmd (351, nick, ":- Enigma for being part of the dev team");
 	snumeric_cmd (351, nick, ":- Stskeeps for Writting the best IRCD ever!");
 	snumeric_cmd (351, nick, ":- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)");
 	snumeric_cmd (351, nick, ":- monkeyIRCD for the Module Segv Catching code");

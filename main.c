@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.101 2003/09/15 10:39:39 fishwaldo Exp $
+** $Id: main.c,v 1.102 2003/09/17 14:57:29 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -118,7 +118,6 @@ main (int argc, char *argv[])
 		printf ("Copyright: NeoStats Group. 2000-2003\n");
 		printf ("Justin Hammond (fish@neostats.net)\n");
 		printf ("Adam Rutter (shmad@neostats.net)\n");
-		printf ("^Enigma^ (enigma@neostats.net)\n");
 		printf ("-----------------------------------------------\n\n");
 	}
 	/* set some defaults before we parse the config file */
