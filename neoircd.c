@@ -82,7 +82,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_PART, m_part, 0},
 	{MSG_PING, m_ping, 0},
 	{MSG_SVINFO, m_svinfo, 0},
-	{MSG_PASS, NULL, 0},
+	{MSG_PASS, m_pass, 0},
 	{MSG_EOB, m_burst, 0},
 	{MSG_SJOIN, m_sjoin, 0},
 	{MSG_TBURST, m_tburst, 0},

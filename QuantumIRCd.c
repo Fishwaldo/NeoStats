@@ -98,7 +98,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_CLIENT, NULL, m_client, 0},
 	{MSG_SMODE, NULL, m_smode, 0},
 	{MSG_VCTRL, TOK_VCTRL, m_vctrl, 0},
-	{MSG_PASS, TOK_PASS, NULL, 0},
+	{MSG_PASS, TOK_PASS, m_pass, 0},
 	{MSG_SVSNICK, TOK_SVSNICK, m_svsnick, 0},
 	{MSG_PROTOCTL, TOK_PROTOCTL, m_protoctl, 0},
 };
