@@ -29,16 +29,9 @@
 #include "hash.h"
 #include "log.h"
 
-Server *new_server (char *);
+static Server *new_server (char * name);
 
-
-void
-init_server ()
-{
-	if (usr_mds);
-}
-
-Server *
+static Server *
 new_server (char *name)
 {
 	Server *s;

@@ -332,10 +332,7 @@ void globops (char * from, char * fmt, ...);
 int bot_nick_change (char * oldnick, char *newnick);
 
 /* timer.c */
-void chk (void);
-void TimerPings (void);
-void TimerMidnight (void);
-int is_midnight (void);
+void CheckTimers (void);
 
 /* users.c */
 void AddUser (const char *nick, const char *user, const char *host, const char *server, const unsigned long ip, const unsigned long TS);
@@ -358,6 +355,7 @@ void DelServer (char *name);
 Server *findserver (const char *name);
 void ServerDump (void);
 int init_server_hash (void);
+void TimerPings (void);
 
 /* ns_help.c */
 extern const char *ns_help[];

@@ -30,8 +30,11 @@
 
 static int midnight = 0;
 
+static int is_midnight (void);
+static void TimerMidnight (void);
+
 void
-chk ()
+CheckTimers (void)
 {
 	Mod_Timer *mod_ptr = NULL;
 	time_t current = time (NULL);
@@ -91,14 +94,14 @@ chk ()
 }
 
 void
-TimerMidnight ()
+TimerMidnight (void)
 {
 	nlog (LOG_DEBUG1, LOG_CORE, "Its midnight!!! -> %s", sctime (time (NULL)));
 	reset_logs ();
 }
 
-int
-is_midnight ()
+static int
+is_midnight (void)
 {
 	time_t current = time (NULL);
 	struct tm *ltm = localtime (&current);

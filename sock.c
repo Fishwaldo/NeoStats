@@ -115,7 +115,7 @@ read_loop ()
 	while (1) {
 		SET_SEGV_LOCATION();
 		memset (buf, '\0', BUFSIZE);
-		chk ();
+		CheckTimers ();
 		SET_SEGV_LOCATION();
 		FD_ZERO (&readfds);
 		FD_ZERO (&writefds);
