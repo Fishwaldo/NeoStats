@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hs_help.c,v 1.5 2002/09/04 08:40:28 fishwaldo Exp $
+** $Id: hs_help.c,v 1.6 2002/10/15 18:43:48 shmad Exp $
 */
 
 #include "stats.h"
@@ -29,7 +29,8 @@ const char *hs_help[] = {
 "\2HostServ HELP\2",
 "",
 "COMMANDS:",
-"     ABOUT     ADD     DEL     LIST     VIEW",
+"     ABOUT     LOGIN     ADD",
+"     DEL       LIST      VIEW",
 "",
 "Only Network Admins can use the ADD, DEL & LIST functions",
 "",
@@ -52,11 +53,13 @@ NULL
 
 const char *hs_help_add[] = {
 "\2HostServ Help : ADD\2",
-"\2Usage:\2 ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME>",
+"\2Usage:\2 ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>",
 "",
 "Register a host name to be set. eg: my-host.com 4DO NOT INCLUDE AN @",
 "The <HOST NAME> must be where the user is connecting from 4WITHOUT THE @",
 "HostServ supports wildcards such as *.myhost.com in the <HOST NAME> setting", 
+"The <PASSWORD> field is new.  If a user connects with a different host",
+"They can now /msg HostServ LOGIN nick password",
 "",
 NULL
 };
@@ -86,6 +89,16 @@ const char *hs_help_list[] = {
 "",
 "Lists the people and vhosts in the Database",
 "For more descriptive info on a SINGLE vhost see HELP VIEW",
+"",
+NULL
+};
+
+const char *hs_help_login[] = {
+"\2HostServ Help : LOGIN",
+"\2Usage:\2 LOGIN <NICK> <PASSWORD>",
+"",
+"Login to HostServ with your NICK and PASSWORD and your vhost",
+"will be assigned to your nick on successful login.",
 "",
 NULL
 };

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.14 2002/10/14 01:06:20 shmad Exp $
+** $Id: hostserv.c,v 1.15 2002/10/15 18:43:48 shmad Exp $
 */
 
 #include <stdio.h>
@@ -47,6 +47,7 @@ struct hs_map_ {
     char nnick[30];
     char host[MAXHOST];
     char vhost[MAXHOST];
+    char passwd[30];
 };
 HS_Map *nnickmap;
 
@@ -55,10 +56,12 @@ char nnick[255];
 extern const char *hs_help[];
 static int hs_sign_on(char **av, int ac);
 
-static void hs_add(User *u, char *cmd, char *m, char *h);
+static void hs_add(User *u, char *cmd, char *m, char *h, char *p);
 static void hs_list(User *u);
 static void hs_view(User *u, int tmpint);
 static void hs_del(User *u, int tmpint);
+static void hs_login(User *u, char *login, char *pass);
+/* static void hs_chpass(User *u, char *login, char *pass, char *newpass); */
 static int new_m_version(char *origin, char **av, int ac);
 
 void hslog(char *, ...);
@@ -79,7 +82,7 @@ int ListArryCount = 0;
 Module_Info HostServ_info[] = { {
     "HostServ",
     "Network User Virtual Host Service",
-    "2.0"
+    "2.1"
 } };
 
 
@@ -102,11 +105,11 @@ static int hs_sign_on(char **av, int ac) {
 
         strcpy(segv_location, "HostServ-hs_signon");
 
-/*    Loadhosts(); */
-
     if (findbot(u->nick)) return 1;
     if (!load_synch) return 1;
+
     /* Check HostName Against Data Contained in vhosts.data */        
+
       for (map = nnickmap; map; map = map->next) {
 	   if (!strcasecmp(map->nnick, u->nick)) {
           tmp = map->host;
@@ -152,6 +155,9 @@ int __Bot_Message(char *origin, char **av, int ac)
 	} else if (!strcasecmp(av[2], "VIEW") && (UserLevel(u) >= 40)) {
 	    privmsg_list(u->nick, s_HostServ, hs_help_view);
 	    return 1;
+	} else if (!strcasecmp(av[2], "LOGIN")) {
+	    privmsg_list(u->nick, s_HostServ, hs_help_login);
+	    return 1;
         } else if (!strcasecmp(av[2], "ABOUT") && (UserLevel(u) >= 40)) {
             privmsg_list(u->nick, s_HostServ, hs_help_about);
             return 1;
@@ -162,12 +168,12 @@ int __Bot_Message(char *origin, char **av, int ac)
     if (!strcasecmp(av[1], "ABOUT")) {
                 privmsg_list(u->nick, s_HostServ, hs_help_about);
     } else if (!strcasecmp(av[1], "ADD") && (UserLevel(u) >= 40)) {
-                if (ac < 5) {
-                    prefmsg(u->nick, s_HostServ, "Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME>", s_HostServ);
+                if (ac < 6) {
+                    prefmsg(u->nick, s_HostServ, "Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>", s_HostServ);
                     prefmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
                     return -1;
                 }
-                hs_add(u, av[2], av[3], av[4]);
+                hs_add(u, av[2], av[3], av[4], av[5]);
     } else if (!strcasecmp(av[1], "DEL") && (UserLevel(u) >= 60)) {
                 if (!av[2]) {
                     prefmsg(u->nick, s_HostServ, "Syntax: /msg %s DEL #", s_HostServ);
@@ -196,6 +202,13 @@ int __Bot_Message(char *origin, char **av, int ac)
                     return -1;
                 }
 		hs_view(u, t);
+    } else if (!strcasecmp(av[1], "LOGIN")) {
+                if (ac < 3) {
+                    prefmsg(u->nick, s_HostServ, "Syntax: /msg %s LOGIN <NICK> <PASSWORD>", s_HostServ);
+                    prefmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP LOGIN", s_HostServ);
+                    return -1;
+                }
+                hs_login(u, av[2], av[3]);
     } else {
         prefmsg(u->nick, s_HostServ, "Unknown Command: \2%s\2, perhaps you need some HELP?", av[1]);
     }
@@ -307,7 +320,7 @@ void hsamend(char *fmt, ...)
         strftime(fmtime, 80, "%H:%M[%m/%d/%Y]", localtime(&tmp));
 
         if (!hsamend) {
-        log("Unable to open data/vhosts.new for writing.");
+        hslog("Unable to open data/vhosts.new for writing.");
         return;
         }
 
@@ -319,11 +332,12 @@ void hsamend(char *fmt, ...)
 
 
 /* Routine for ADD */
-static void hs_add(User *u, char *cmd, char *m, char *h) {
+static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
 
     strcpy(segv_location, "hs_add");
-    hsdat(":%s %s %s", cmd, m, h);
-    prefmsg(u->nick, s_HostServ, "%s has sucessfuly been registered under realhost: %s and vhost: %s",cmd, m, h);
+    hsdat(":%s %s %s %s", cmd, m, h, p);
+    hslog("%s added a vhost for %s with realhost %s vhost %s and password %s",u->nick, cmd, m, h, p);
+    prefmsg(u->nick, s_HostServ, "%s has sucessfuly been registered under realhost: %s vhost: %s and password: %s",cmd, m, h, p);
     /* Apply The New Hostname If The User Is Online */        
     if (finduser(cmd)) {
           u = finduser(cmd);
@@ -401,7 +415,7 @@ static void hs_view(User *u, int tmpint)
             prefmsg(u->nick, s_HostServ, "Nick:     %s", ListArry[0]);
 	    prefmsg(u->nick, s_HostServ, "RealHost: %s", ListArry[1]);
 	    prefmsg(u->nick, s_HostServ, "V-host:   %s", ListArry[2]);
-	    prefmsg(u->nick, s_HostServ, "Password: Not used yet");
+	    prefmsg(u->nick, s_HostServ, "Password: %s", ListArry[3]);
 	    prefmsg(u->nick, s_HostServ, "--- End of information for %s ---",ListArry[0]);
         }
 	i++;
@@ -430,6 +444,7 @@ void Loadhosts()
             strcpy(map->nnick, LoadArry[0]);
             strcpy(map->host, LoadArry[1]);
             strcpy(map->vhost, LoadArry[2]);
+	    strcpy(map->passwd, LoadArry[3]);
             if (!nnickmap) {
                 nnickmap = map;
                 nnickmap->next = NULL;
@@ -493,3 +508,29 @@ static void hs_del(User *u, int tmpint)
     if (tmpint > i) prefmsg(u->nick, s_HostServ, "ERROR: There is no vhost on list number \2%d\2",tmpint);
         return;
 }
+
+
+/* Routine to allow users to login and get their vhosts */
+static void hs_login(User *u, char *login, char *pass)
+{
+    char *tmp = NULL;
+        HS_Map *map;
+
+        strcpy(segv_location, "HostServ-hs_login");
+
+    /* Check HostName Against Data Contained in vhosts.data */
+      for (map = nnickmap; map; map = map->next) {
+           if (!strcasecmp(map->nnick, login)) {
+          tmp = map->passwd;
+                  if (fnmatch(strlower(tmp), strlower(pass), 0) == 0) {
+              ssvshost_cmd(u->nick, map->vhost);
+	      prefmsg(u->nick, s_HostServ, "Your VHOST %s has been set.", map->vhost);
+	      hslog("%s used LOGIN to obtain userhost of %s",u->nick, map->vhost);
+              return;
+           }
+       }
+    }
+	prefmsg(u->nick, s_HostServ, "Incorrect Login or Password.  Do you have a vhost added?");
+        return;
+}
+

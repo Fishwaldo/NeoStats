@@ -2,6 +2,14 @@ HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
 
+* Version 2.1 * Shmad * October 15, 2002
++ Added LOGIN support for vhosts.
++ Updated Helpfiles.
++ Updated ADD procedure to use PASSWORD field.
++ Fixed a small problem with segfaulting with older databases.
++ Adding ability for users to change their vhost passwords.
+
+
 * Version 2.0 * Shmad * July 24, 2002
 + Fixed misc. bug with hs_signon (slaps himself)
 + Updated all HELPFILES.
