@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.26 2003/07/15 10:34:23 fishwaldo Exp $
+** $Id: cs.c,v 1.27 2003/07/15 10:53:18 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -71,7 +71,7 @@ int cs_online = 0;
 Module_Info my_info[] = { {
 			   "ConnectServ",
 			   "Network Connection & Mode Monitoring Service",
-			   "1.6"}
+			   "1.7"}
 };
 
 int new_m_version(char *origin, char **av, int ac)
@@ -529,7 +529,7 @@ int cs_user_modes(char **av, int ac)
 
 #ifdef ULTIMATE3
 /* smode support for Ultimate3 */
-int cs_user_smodes(const char **av, const int ac)
+int cs_user_smodes(char **av, int ac)
 {
 	int add = 1;
 	char *modes, *modes1;
