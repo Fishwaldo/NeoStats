@@ -579,7 +579,11 @@ m_privmsg (char* origin, char **av, int ac, int cmdptr)
  *
  * @return none
  */
+#ifdef IRCU
+void 
+#else
 static void 
+#endif
 process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 {
 	int i;
@@ -1166,6 +1170,7 @@ ssvskill_cmd (const char *target, const char *reason, ...)
 	return NS_SUCCESS;
 }
 
+#ifdef GOTSVSTIME
 int 
 ssvstime_cmd (const time_t ts)
 {
@@ -1173,6 +1178,7 @@ ssvstime_cmd (const time_t ts)
 	nlog (LOG_NOTICE, LOG_CORE, "ssvstime_cmd: synching server times to %ld", (int)ts);
 	return NS_SUCCESS;
 }
+#endif
 
 int
 skick_cmd (const char *who, const char *chan, const char *target, const char *reason)
