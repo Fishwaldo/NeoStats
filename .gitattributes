@@ -35,7 +35,6 @@ adns/transmit.c -text
 adns/tvarith.h -text
 adns/types.c -text
 /chans.c -text
-/chkstats -text
 /conf.c -text
 /config.guess -text
 /config.h.in -text
