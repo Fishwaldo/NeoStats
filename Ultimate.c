@@ -180,7 +180,7 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 #ifndef ULTIMATE3
 int snewnick_cmd(const char *nick, const char *ident, const char *host, const char *realname) {
 	sts("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), ident, host, me.name, realname);
-	AddUser(nick,ident, host, me.name, 0);
+	AddUser(nick,ident, host, me.name, 0, time(NULL));
 #else 
 int snewnick_cmd(const char *nick, const char *ident, const char *host, const char *realname, long mode) {
 	int i;
@@ -193,7 +193,7 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host, const ch
 		}
 	}
 	sts("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), newmode, ident, host, me.name, time(NULL), realname);
-	AddUser(nick,ident, host, me.name, 0);
+	AddUser(nick,ident, host, me.name, 0, time(NULL));
 	UserMode(nick, newmode);
 #endif
 	return 1;

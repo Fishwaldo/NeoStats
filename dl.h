@@ -27,9 +27,9 @@ struct sock_list_struct {
 	long hash;
 	int sock_no;
 	char *sockname;
-	int (*readfnc)(int sock_no);
-	int (*writefnc)(int sock_no);
-	int (*errfnc)(int sock_no);
+	int (*readfnc)(int sock_no, char *sockname);
+	int (*writefnc)(int sock_no, char *sockname);
+	int (*errfnc)(int sock_no, char *sockname);
 	char *modname;
 	long rmsgs;
 	long rbytes;

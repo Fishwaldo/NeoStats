@@ -57,7 +57,7 @@
 #define CHANLEN			50
 #define BUFSIZE			512
 #define CONFIG_NAME		"neostats.cfg"
-#define MAXHOST			63
+#define MAXHOST			128
 #define MAXPASS			32
 #define MAXNICK			32
 #define MAXUSER			10
@@ -178,6 +178,7 @@ struct user_ {
 	long Umode;
 	list_t *chans;
 	struct in_addr ipaddr;
+	time_t TS;
 };
 
 struct chans_ {
@@ -265,7 +266,7 @@ extern int is_midnight();
 extern Server *serverlist[S_TABLE_SIZE];
 extern User *userlist[U_TABLE_SIZE];
 extern MyUser *myuhead;
-extern void AddUser(const char *, const char *, const char *, const char *, const unsigned long ip);
+extern void AddUser(const char *, const char *, const char *, const char *, const unsigned long ip, const unsigned long TS);
 extern void DelUser(const char *);
 extern void Change_User(User *, const char *);
 extern void sendcoders(char *message,...);
@@ -325,5 +326,12 @@ extern Chans *findchan(char *chan);
 extern int ChanMode(char *origin, char **av, int ac);
 extern void Change_Topic(char *, Chans *, time_t t, char *);
 extern void ChangeChanUserMode(Chans *c, User *u, int add, long mode);
+
+
+/* dns.c */
+extern int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_answer *a), char *data);
+extern int init_dns();
+extern void do_dns();
+
 #endif
 

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.22 2002/08/20 09:30:37 fishwaldo Exp $
+** $Id: sock.c,v 1.23 2002/08/24 02:51:40 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -80,7 +80,7 @@ void read_loop()
 			if (mod_sock->readfnc) FD_SET(mod_sock->sock_no, &readfds);
 			if (mod_sock->writefnc) FD_SET(mod_sock->sock_no, &writefds);
 			if (mod_sock->errfnc) FD_SET(mod_sock->sock_no, &errfds);
-			me.cursocks++;
+			++me.cursocks;
 		}
 		/* adns stuff... whats its interested in */
 		adns_beforeselect(ads, &me.maxsocks, &readfds, &writefds, &errfds, &TimeOut, &tvbuf, 0);
@@ -117,21 +117,26 @@ void read_loop()
 						mod_sock = hnode_get(sn);
 						if (FD_ISSET(mod_sock->sock_no, &readfds)) {
 #ifdef DEBUG
-							log("Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
+/* this is a real pain in the arse for loggin, so we don't do it */
+//							log("Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
 #endif
-							mod_sock->readfnc(mod_sock->sock_no);
+							if (mod_sock->readfnc(mod_sock->sock_no, mod_sock->sockname) < 0)
+							break;
 						}
 						if (FD_ISSET(mod_sock->sock_no, &writefds)) {
 #ifdef DEBUG
-							log("Running module %s writesock function for %s", mod_sock->modname, mod_sock->sockname);
+/* this is a real pain in the arse for logging so we don't print it */
+//							log("Running module %s writesock function for %s", mod_sock->modname, mod_sock->sockname);
 #endif
-							mod_sock->writefnc(mod_sock->sock_no);
+							if (mod_sock->writefnc(mod_sock->sock_no, mod_sock->sockname) < 0)
+							break;
 						}
 						if (FD_ISSET(mod_sock->sock_no, &errfds)) {
 #ifdef DEBUG
 							log("Running module %s errorsock function for %s", mod_sock->modname, mod_sock->sockname);
 #endif
-							mod_sock->errfnc(mod_sock->sock_no);
+							if (mod_sock->errfnc(mod_sock->sock_no, mod_sock->sockname) < 0)
+							break;
 						}
 					}
 					break;

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: proxy.c,v 1.3 2002/08/22 13:53:08 fishwaldo Exp $
+** $Id: proxy.c,v 1.4 2002/08/24 02:51:41 fishwaldo Exp $
 */
 
 
@@ -18,20 +18,13 @@
 #include "stats.h"
 #include "opsb.h"
 
+int proxy_connect(unsigned long ipaddr, int port, char *who);
 int http_proxy(int sock);
 int sock4_proxy(int sock);
 int sock5_proxy(int sock);
 int cisco_proxy(int sock);
 int wingate_proxy(int sock);
-int proxy_connect(unsigned long ipaddr, int port, char *who);
 
-typedef struct proxy_types {
-	char *type;
-	int port;
-	int (*scan)(int sock);
-	int nofound;
-	int noopen;
-} proxy_types;
 
 proxy_types proxy_list[] = {
 	{"http", 	80, 	http_proxy, 	0,	0},
@@ -80,7 +73,7 @@ void send_status(User *u) {
 		if (scandata->u) 
 			prefmsg(u->nick, s_opsb, "Scanning %s by request of %s", scandata->lookup, scandata->u->nick);
 		else 
-			prefmsg(u->nick, s_opsb, "Scanning %s", scandata->lookup);
+			prefmsg(u->nick, s_opsb, "Scanning %s (%s)", scandata->lookup, inet_ntoa(scandata->ipaddr));
 		
 		switch(scandata->state) {
 			case REPORT_DNS:
@@ -138,6 +131,9 @@ void start_proxy_scan(lnode_t *scannode) {
 	if (scandata->u) chanalert(s_opsb, "Starting proxy scan on %s (%s) by Request of %s", scandata->who, scandata->lookup, scandata->u->nick);
 	scandata->socks = list_create(NUM_PROXIES);
 	for (i = 0; i <  NUM_PROXIES; i++) {
+#ifdef DEBUG	
+		log("OPSB proxy_connect(): host %ul (%s), port %d", scandata->ipaddr,inet_ntoa(scandata->ipaddr), proxy_list[i].port);
+#endif
 		j = proxy_connect(scandata->ipaddr.s_addr, proxy_list[i].port, scandata->who);
 		if (j > 0) {
 			/* its ok */
@@ -294,7 +290,8 @@ int proxy_read(int socknum, char *sockname) {
 		log("OPSB proxy_read(): %d has the following error: %s", socknum, strerror(errno));
 #endif
 		if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
-		close(socknum);
+		if (socknum != servsock)
+			close(socknum);
 		del_socket(sockname);
 		sockdata->flags = UNCONNECTED;
 		free(buf);
@@ -311,7 +308,8 @@ int proxy_read(int socknum, char *sockname) {
 #endif
 				if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No Open %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
 				sockdata->flags = UNCONNECTED;
-				close(socknum);
+				if (socknum != servsock)
+					close(socknum);
 				del_socket(sockname);
 				free(buf);
 				return -1;
@@ -324,7 +322,8 @@ int proxy_read(int socknum, char *sockname) {
 				scandata->state = GOTOPENPROXY;
 				sockdata->flags = OPENPROXY;
 				do_ban(scandata);
-				close(socknum);
+				if (socknum != servsock) 
+					close(socknum);
 				del_socket(sockname);
 				free(buf);
 				return -1;
@@ -336,7 +335,8 @@ int proxy_read(int socknum, char *sockname) {
 				log("OPSB proxy_read(): Closing %d due to too much data", socknum);
 #endif
 				if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No Open %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
-				close(socknum);
+				if (socknum != servsock)
+					close(socknum);
 				del_socket(sockname);
 				sockdata->flags = UNCONNECTED;
 				free(buf);
@@ -386,7 +386,8 @@ int proxy_write(int socknum, char *sockname) {
 			log("OPSB proxy_write(): %d has the following error: %s", socknum, strerror(errno));
 #endif
 			if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
-			close(socknum);
+			if (socknum != servsock)
+				close(socknum);
 			del_socket(sockname);
 			sockdata->flags = UNCONNECTED;
 			return -1;
@@ -420,7 +421,6 @@ int proxy_connect(unsigned long ipaddr, int port, char *who)
 
 	if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		return (-1);
-log("host %d, port %d", ipaddr, port);
 	bzero(&sa, sizeof(sa));
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons (port);
@@ -436,10 +436,11 @@ log("host %d, port %d", ipaddr, port);
 	if ((i = connect (s, (struct sockaddr *) &sa, sizeof (sa))) < 0) {
 		switch (errno) {
 			case EINPROGRESS:
-					log("in progress");
 					break;
 			default:
+#ifdef DEBUG
 					log("cant connect %s", strerror(errno), i);
+#endif
 					close (s);
 					return (-1);
 		}

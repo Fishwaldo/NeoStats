@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: opsb.c,v 1.9 2002/08/22 13:53:08 fishwaldo Exp $
+** $Id: opsb.c,v 1.10 2002/08/24 02:51:41 fishwaldo Exp $
 */
 
 
@@ -45,7 +45,7 @@ extern const char *opsb_help_set[];
 Module_Info my_info[] = { {
 	"OPSB",
 	"A Open Proxy Scanning Bot",
-	"$Revision: 1.9 $"
+	"$Revision: 1.10 $"
 } };
 
 
@@ -178,13 +178,16 @@ int __Bot_Message(char *origin, char **argv, int argc)
 			strncpy(scandata->lookup, u2->hostname, MAXHOST);
 			strncpy(scandata->server, u2->server->name, MAXHOST);
 			scandata->ipaddr.s_addr = u2->ipaddr.s_addr;
-			if (scandata->ipaddr.s_addr == 0)
+			if (scandata->ipaddr.s_addr > 0) {
+				scandata->state = DO_OPM_LOOKUP;
+			} else {
 				if (inet_aton(u2->hostname, &scandata->ipaddr) > 0)
 					scandata->state = DO_OPM_LOOKUP;
-				else 
+				else {
 					scandata->state = GET_NICK_IP;
-			else
-				scandata->state = DO_OPM_LOOKUP;
+					scandata->ipaddr.s_addr = 0;
+				}
+			}
 		} else {
 			strncpy(scandata->who, argv[2], MAXHOST);
 			strncpy(scandata->lookup, argv[2], MAXHOST);
@@ -215,7 +218,7 @@ int Online(char **av, int ac) {
 	}
 	loadcache();
 	add_mod_timer("cleanlist", "CleanProxyList", "opsb", 1);
-	add_mod_timer("savecache", "SaveProxyCache", "opsb", 1);
+	add_mod_timer("savecache", "SaveProxyCache", "opsb", 600);
 	chanalert(s_opsb, "Open Proxy Scanning bot has started (Concurrent Scans: %d Sockets %d)", opsb.socks, opsb.socks *7);
 	return 1;
 };
@@ -227,41 +230,51 @@ void cleanlist() {
 	lnode_t *socknode, *scannode2;
 	socklist *sockdata;
 	char sockname[64];
-	int savescan;
+	int savescan, timedout = 0, finished;
 
 	scannode = list_first(opsbl);
 	while (scannode) {
+		timedout = 0;
 		scandata = lnode_get(scannode);
 		/* check if this scan has timed out */
-		if (time(NULL) - scandata->started > opsb.timeout) {
+		if (time(NULL) - scandata->started > opsb.timeout) timedout = 1;
 
-			/* savescan is a flag if we should save this entry into the cache file */
-			savescan = 1;	
+		/* savescan is a flag if we should save this entry into the cache file */
+		savescan = 1;	
 		
-			/* check for open sockets */
-			socknode = list_first(scandata->socks);	
-#ifdef DEBUG
-			log("Deleting Old Scannode %s out of active list", scandata->who);
-#endif
-			while (socknode) {
-				sockdata = lnode_get(socknode);
-				if ((sockdata->flags != UNCONNECTED) && (sockdata->flags != OPENPROXY)) {
-					/* it still has open socks */
-					snprintf(sockname, 64, "%s %d", scandata->who, sockdata->sock);
+		/* if this is not valid, exit */
+		if (!scandata->socks) break;
+		/* check for open sockets */
+		socknode = list_first(scandata->socks);	
+		finished = 1;
+		while (socknode) {
+			sockdata = lnode_get(socknode);
+			/* if it was a open proxy, don't save the cache */
+			if (sockdata->flags == OPENPROXY) savescan = 0;
+			if (((sockdata->flags != UNCONNECTED) && (sockdata->flags != OPENPROXY)) && (timedout == 1))  {
+				/* it still has open socks */
+				snprintf(sockname, 64, "%s %d", scandata->who, sockdata->sock);
+				if (sockdata->sock != servsock)
 					close(sockdata->sock);
-					sockdata->flags = UNCONNECTED;
+				sockdata->flags = UNCONNECTED;
 #ifdef DEBUG
-					log("Closing Socket %s in cleanlist function for timeout()", sockname);
+				log("Closing Socket %s in cleanlist function for timeout()", sockname);
 #endif
-					del_socket(sockname);
-					free(sockdata);
-				} 
-				if (sockdata->flags == OPENPROXY) savescan = 0;
-				socknode = list_next(scandata->socks, socknode);
-			}
+				del_socket(sockname);
+				free(sockdata);
+			}  else
+				finished = 0;
+			
+			socknode = list_next(scandata->socks, socknode);
+		}
+
+		if (timedout == 1 || finished == 1) {
+#ifdef DEBUG
+			if (timedout == 1) log("Deleting Old Scannode %s out of active list (Timeout)", scandata->who );
+			if (finished == 1) log("Deleting Old Scannode %s out of active list (Finished)", scandata->who );
+#endif
 			if (savescan == 1) 
 				addtocache(scandata->ipaddr.s_addr);
-
 			/* destory all the nodes in the sock list */
 			list_destroy_nodes(scandata->socks);
 			scannode2 = list_next(opsbl, scannode);
@@ -328,6 +341,7 @@ int checkcache(scaninfo *scandata) {
 	node = list_first(exempt);
 	while (node) {
 		exempts = lnode_get(node);
+printf("%s(%d) -> %s\n", exempts->host,exempts->server,  scandata->server);
 		if ((exempts->server == 1) && (scandata->server)) {
 			/* match a server */
 			if (fnmatch(exempts->host, scandata->server, 0) == 0) {
@@ -415,7 +429,7 @@ void loadcache() {
 				break;
 			exempts = malloc(sizeof(exemptinfo));
 			sprintf(exempts->host, "%s", strtok(buf, " "));
-			exempts->server = atoi(strtok(buf, " "));
+			exempts->server = atoi(strtok(NULL, " "));
 			node = lnode_create(exempts);
 			list_prepend(exempt, node);			
 		} else {
@@ -466,6 +480,7 @@ static int ScanNick(char **av, int ac) {
 	if (!strcasecmp(u->server->name, me.name)) {
 		return -1;
 	}
+
 	if (time(NULL) - u->TS > opsb.timedif) {
 #ifdef DEBUG
 		log("Netsplit Nick %s, Not Scanning", av[0]);
@@ -481,14 +496,16 @@ static int ScanNick(char **av, int ac) {
 	strncpy(scandata->lookup, u->hostname, MAXHOST);
 	strncpy(scandata->server, u->server->name, MAXHOST);
 	scandata->ipaddr.s_addr = u->ipaddr.s_addr;
-	if (scandata->ipaddr.s_addr == 0)
+	if (scandata->ipaddr.s_addr > 0) {
+		scandata->state = DO_OPM_LOOKUP;
+	} else {
 		if (inet_aton(u->hostname, &scandata->ipaddr) > 0)
 			scandata->state = DO_OPM_LOOKUP;
-		else 
+		else {
 			scandata->state = GET_NICK_IP;
-	else
-		scandata->state = DO_OPM_LOOKUP;
-
+			scandata->ipaddr.s_addr = 0;
+		}
+	}
 	if (!startscan(scandata)) 
 		chanalert(s_opsb, "Warning Can't scan %s", u->nick);
 
@@ -508,6 +525,11 @@ int startscan(scaninfo *scandata) {
 	char *buf;
 	int buflen;
 	int i;
+	i = checkcache(scandata);
+	if ((i > 0) && (!scandata->u)) {
+		free(scandata);
+		return 1;
+	}
 
 	switch(scandata->state) {
 		case GET_NICK_IP:
@@ -532,6 +554,7 @@ int startscan(scaninfo *scandata) {
 					checkqueue();
 					return 0;
 				}
+
 				scannode = lnode_create(scandata);
 				list_append(opsbl, scannode);
 #ifdef DEBUG
@@ -540,9 +563,6 @@ int startscan(scaninfo *scandata) {
 				return 1;		
 				break;
 		case DO_OPM_LOOKUP:
-				i = checkcache(scandata);
-				if ((i > 0) && (!scandata->u)) return 1;
-
 				if (list_isfull(opsbl)) {
 					if(list_isfull(opsbq)) {
 						chanalert(s_opsb, "Warning, Both Current and Queue lists are full, Not adding Scan");
@@ -627,6 +647,9 @@ void dnsblscan(char *data, adns_answer *a) {
 							if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "Warning, More than one IP address for %s. Using %s only", scandata->lookup, show);
 						}
 						if (inet_aton(show, &scandata->ipaddr) > 0) {
+printf("%s\n", inet_ntoa(scandata->ipaddr));
+scandata->ipaddr.s_addr = htonl(scandata->ipaddr.s_addr);
+printf("%s\n", inet_ntoa(scandata->ipaddr));
 							scandata->state = DO_OPM_LOOKUP;
 							list_delete(opsbl, scannode);
 							lnode_destroy(scannode);

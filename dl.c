@@ -130,13 +130,13 @@ static Sock_List *new_sock(char *sock_name)
 	s = smalloc(sizeof(Sock_List));
 	if (!sock_name)
 		sock_name="";
-	s->sockname = sock_name;	
+	s->sockname = sstrdup(sock_name);
 	sn = hnode_create(s);
 	if (hash_isfull(sockh)) {
 		log("Eeek, SocketHash is full, can not add a new socket");
 		return NULL;
 	} else {
-		hash_insert(sockh, sn, sock_name);
+		hash_insert(sockh, sn, s->sockname);
 	}
 	return s;
 }
@@ -179,7 +179,7 @@ int add_socket(char *readfunc, char *writefunc, char *errfunc, char *sock_name, 
 	Sockets_mod_list->writefnc = dlsym((int *)get_dl_handle(mod_name), writefunc);
 	Sockets_mod_list->errfnc = dlsym((int *)get_dl_handle(mod_name), errfunc);
 #ifdef DEBUG
-			log("Registered Module %s with Socket functions", mod_name);
+			log("Registered Module %s with Socket functions %s", mod_name, Sockets_mod_list->sockname);
 #endif
 	return 1;
 }
@@ -195,8 +195,9 @@ int del_socket(char *sock_name) {
 #ifdef DEBUG
 		log("Unregistered Socket function %s from Module %s", sock_name, list->modname);
 #endif
-		hash_delete(sockh, sn);
+		hash_scan_delete(sockh, sn);
 		hnode_destroy(sn);
+		free(list->sockname);
 		free(list);
 		return 1;
 	}		

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.35 2002/08/10 06:30:44 fishwaldo Exp $
+** $Id: users.c,v 1.36 2002/08/24 02:51:40 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -53,12 +53,12 @@ User *new_user(const char *nick)
 	return(u);
 }
 
-void AddUser(const char *nick, const char *user, const char *host, const char *server, const unsigned long ipaddr)
+void AddUser(const char *nick, const char *user, const char *host, const char *server, const unsigned long ipaddr, const unsigned long TS)
 {
 	User *u;
 
 #ifdef DEBUG
-	log("AddUser(): %s (%s@%s) -> %s", nick, user, host, server);
+	log("AddUser(): %s (%s@%s)(%lu) -> %s at %lu", nick, user, host, htonl(ipaddr), server, TS);
 #endif
 	strcpy(segv_location, "AddUser");
 	u = finduser(nick);
@@ -78,8 +78,8 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 	u->Umode = 0;
 	u->chans = list_create(MAXJOINCHANS);
 	strcpy(u->modes,"");
-	u->ipaddr.s_addr = ipaddr;
-
+	u->ipaddr.s_addr = htonl(ipaddr);
+	u->TS = TS;
 }
 
 void part_u_chan(list_t *list, lnode_t *node, void *v) {

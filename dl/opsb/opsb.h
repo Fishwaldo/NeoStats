@@ -4,12 +4,22 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: opsb.h,v 1.3 2002/08/22 13:53:08 fishwaldo Exp $
+** $Id: opsb.h,v 1.4 2002/08/24 02:51:41 fishwaldo Exp $
 */
 
 
 #ifndef OPSB_H
 #define OPSB_H
+
+typedef struct proxy_types {
+	char *type;
+	int port;
+	int (*scan)(int sock);
+	int nofound;
+	int noopen;
+} proxy_types;
+
+
 
 char *s_opsb;
 
