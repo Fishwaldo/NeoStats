@@ -5,6 +5,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fixed a username overflow?
  - Fixed a username length problem with MoralServ
  - Fixed a problem with opercounts in statserv
+ - Hardcoded select timeout at 1 second, as I think it was fubared with adns and opsb
 
 * NeoStats * Fish * Version 2.5.0
  - Fixed up UserLevels with SMODE support on Ultimate3 (sigh)

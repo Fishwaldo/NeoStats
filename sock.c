@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.27 2003/01/21 14:50:18 fishwaldo Exp $
+** $Id: sock.c,v 1.28 2003/03/31 08:50:43 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -88,8 +88,6 @@ void read_loop()
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds);
 		FD_ZERO(&errfds);
-		TimeOut->tv_sec = 1;
-		TimeOut->tv_usec = 0;
 		FD_SET(servsock, &readfds);
 		hash_scan_begin(&ss, sockh);
 		me.cursocks = 1; /* always one socket for ircd */
@@ -102,6 +100,9 @@ void read_loop()
 		}
 		/* adns stuff... whats its interested in */
 		adns_beforeselect(ads, &me.maxsocks, &readfds, &writefds, &errfds, &TimeOut, &tvbuf, 0);
+		/* adns may change this, but we tell it to go away!!! */
+		TimeOut->tv_sec = 1;
+		TimeOut->tv_usec = 0;
 		SelectResult = select(FD_SETSIZE, &readfds, &writefds, &errfds, TimeOut);
 		if (SelectResult > 0) {
 			adns_afterselect(ads, me.maxsocks, &readfds, &writefds, &errfds, 0);
