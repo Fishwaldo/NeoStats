@@ -155,6 +155,10 @@ read_loop ()
 				SET_SEGV_INMODULE(mod_sock->modname);
 				j = mod_sock->beforepoll (mod_sock->data, ufds);
 				CLEAR_SEGV_INMODULE();
+				/* if we don't have any socks, just continue */
+				if (j == -1)
+					continue;
+					
 				if (j > pollsize) pollsize = j;
 				/* run through the ufds set and translate to select FDSET's */
 				for (i = 0; i < j; i++) {
@@ -179,7 +183,7 @@ read_loop ()
 
 		/* add the fds for the curl library as well */
 		/* XXX Should this be a pollsize or maxfdsunused... not sure yet */ 
-		curl_multi_fdset(curlmultihandle, &readfds, &writefds, &errfds, &pollsize);
+		curl_multi_fdset(curlmultihandle, &readfds, &writefds, &errfds, &maxfdsunused);
 
 		SelectResult = select (FD_SETSIZE, &readfds, &writefds, &errfds, TimeOut);
 		me.now = time(NULL);
@@ -218,8 +222,8 @@ read_loop ()
 			} else {
 				/* this checks if there is any data waiting on a socket for a module */
 				hash_scan_begin (&ss, sockh);
-				pollflag = 0;
 				while ((sn = hash_scan_next (&ss)) != NULL) {
+					pollflag = 0;
 					mod_sock = hnode_get (sn);
 					SET_SEGV_INMODULE(mod_sock->modname);
 					if (mod_sock->socktype == SOCK_STANDARD) {
