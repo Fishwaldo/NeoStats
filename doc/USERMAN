@@ -541,9 +541,6 @@ Description:
 	Shows a listing of IRCops.
 	Flags:
 		NOAWAY   Don't show opers that are set away.
-		TECH     Only Show Tech Admins on the Network.
-		NET      Only Show Net Admins on the Network.
-		BOTS     Show Online Bots.
 		SERVER   Only show opers on that server.
 Example:
 	/msg statserv operlist

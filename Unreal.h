@@ -416,6 +416,8 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
+#define HAVE_BOT_MODE
+#define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
 #define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_ADMONLY) || CheckChanMode(x, MODE_OPERONLY) || CheckChanMode(x, MODE_KEY) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_RGSTRONLY)))
 
 

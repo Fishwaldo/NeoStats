@@ -45,6 +45,15 @@ const char *cs_help_about[] = {
 	NULL
 };
 
+const char *cs_help_version[] = {
+	"\2ConnectServ Help : VERSION \2",
+	"\2Usage:\2 VERSION",
+	"",
+	"Show ConnectServ version information",
+	"",
+	NULL
+};
+
 const char *cs_help_status[] = {
 	"\2ConnectServ Help : SET \2",
 	"\2Usage:\2 SET <OPTION>",

@@ -39,7 +39,9 @@ static void ss_stats(User * u, char *cmd, char *arg, char *arg2);
 static void ss_tld(User * u, char *tld);
 static void ss_tld_map(User * u);
 static void ss_operlist(User * origuser, char *flags, char *server);
+#ifdef HAVE_BOT_MODE
 static void ss_botlist(User * origuser);
+#endif
 static void ss_version(User * u);
 static void ss_server(User * u, char *server);
 static void ss_map(User *);
@@ -319,8 +321,10 @@ int __Bot_Message(char *origin, char **av, int ac)
 		else if (!strcasecmp(av[2], "OPERLIST"))
 			privmsg_list(u->nick, s_StatServ,
 				     ss_operlist_help);
+#ifdef HAVE_BOT_MODE
 		else if (!strcasecmp(av[2], "BOTLIST"))
 			privmsg_list(u->nick, s_StatServ, ss_botlist_help);
+#endif
 		else if (!strcasecmp(av[2], "VERSION"))
 			privmsg_list(u->nick, s_StatServ, ss_version_help);
 		else if (!strcasecmp(av[2], "STATS")
@@ -403,10 +407,12 @@ int __Bot_Message(char *origin, char **av, int ac)
 				s_StatServ);
 		}
 		ss_operlist(u, av[2], av[3]);
+#ifdef HAVE_BOT_MODE
 	} else if (!strcasecmp(av[1], "BOTLIST")) {
 		ss_botlist(u);
 		chanalert(s_StatServ, "%s Wanted to see the Bot List",
 			  u->nick);
+#endif
 	} else if (!strcasecmp(av[1], "STATS") && (UserLevel(u) >= 185)) {
 		ss_stats(u, av[2], av[3], av[4]);
 		if (ac < 3) {
@@ -1075,11 +1081,11 @@ static void ss_operlist(User * origuser, char *flags, char *server)
 		if (!is_oper(u))
 			continue;
 		tech = UserLevel(u);
+		if (tech < 40)
+			continue;
 		if (away && u->is_away)
 			continue;
 		if (!strcasecmp(u->server->name, me.services_name))
-			continue;
-		if (tech < 40)
 			continue;
 		if (!server) {
 			j++;
@@ -1101,6 +1107,7 @@ static void ss_operlist(User * origuser, char *flags, char *server)
 }
 
 
+#ifdef HAVE_BOT_MODE
 static void ss_botlist(User * origuser)
 {
 	register int j = 0;
@@ -1113,15 +1120,7 @@ static void ss_botlist(User * origuser)
 	hash_scan_begin(&scan, uh);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		u = hnode_get(node);
-#ifdef UNREAL
-		if (u->Umode & UMODE_BOT) {
-#elif ULTIMATE3
-		if (0) {
-#elif ULTIMATE
-		if ((u->Umode & UMODE_RBOT) || (u->Umode & UMODE_SBOT)) {
-#else
-		if (0) {
-#endif
+		if is_bot(u) { 
 			j++;
 			prefmsg(origuser->nick, s_StatServ,
 				"[%2d] %-15s %s", j, u->nick,
@@ -1130,7 +1129,7 @@ static void ss_botlist(User * origuser)
 	}
 	prefmsg(origuser->nick, s_StatServ, "End of Listing.");
 }
-
+#endif
 
 static void ss_stats(User * u, char *cmd, char *arg, char *arg2)
 {

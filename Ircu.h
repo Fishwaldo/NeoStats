@@ -219,6 +219,8 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & MODE_SECRET))
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
+#undef HAVE_BOT_MODE
+#define is_bot(x) (0)
 
 
 struct ircd_srv_ {

@@ -35,7 +35,6 @@ const char *ns_help[] = {
 	"\2VERSION\2    Shows you the current StatServ Version.",
 	"\2LEVEL\2      Show you your Permission Level for NeoStats.",
 	"",
-	"End of Help.",
 	NULL
 };
 
@@ -53,92 +52,79 @@ const char *ns_myuser_help[] = {
 	"\2RAW\2        Send a Raw Command from this Server!",
 #endif
 	"\2JUPE\2       Jupiter a Server",
-	"End of Help",
+	"",
 	NULL
 };
 
 const char *ns_level_help[] = {
 	"*** NeoStats: \2LEVEL\2 Help ***",
-	"",
 	"Usage: \2LEVEL\2",
 	"",
 	"Allows you to see your Permissions level with regards",
 	"NeoStats. 0 is lowest, 200 is highest, you could be anywhere in between!",
 	"",
-	"End of Help.",
 	NULL
 };
 
 const char *ns_jupe_help[] = {
 	"*** NeoStats: \2JUPE\2 Help ***",
-	"",
 	"Usage: \2JUPE \37Server\37\2",
 	"",
 	"Allows you to Jupe a server on the network",
 	"",
-	"End of Help.",
 	NULL
 };
 
 #ifdef USE_RAW
 const char *ns_raw_help[] = {
 	"*** NeoStats: \2RAW\2 Help ***",
-	"",
 	"Usage: \2RAW \37Command\37\2",
 	"",
 	"Allow you to send Raw IRC commands from this Server",
 	"Nothing is Returned to the User after a Raw Command",
 	"",
-	"End of Help.",
 	NULL
 };
 #endif
 
 const char *ns_load_help[] = {
 	"*** NeoStats: \2LOAD\2 Help ***",
-	"",
 	"Usage: \2LOAD \37module file name\37\2",
 	"",
 	"Allows you to Load a Module while NeoStats is running",
 	"Some Modules can Not be loaded at Runtime, and will return a error",
 	"",
-	"End of Help.",
 	NULL
 };
 
 const char *ns_unload_help[] = {
 	"*** NeoStats: \2UNLOAD\2 Help ***",
-	"",
 	"Usage: \2UNLOAD \37module name\37\2",
 	"",
 	"Allows you to UnLoad a Module while NeoStats is running",
 	"Some Modules can Not be Unloaded at Runtime, and will return a error",
 	"",
-	"End of Help.",
 	NULL
 };
 
 const char *ns_modlist_help[] = {
 	"*** NeoStats: \2MODLIST\2 Help ***",
-	"",
 	"Usage: \2MODLIST\2",
 	"",
 	"Will Display Module Names and Descriptions of Loaded Modules",
 	"",
-	"End of Help.",
 	NULL
 };
 
 const char *ns_debug_help[] = {
 	"*** NeoStats: \2DEBUG\2 Help ***",
-	"",
 	"Usage: \2DEBUG\2",
 	"",
 	"This Toggles the Debug Command, Introducing a New User on the Server called",
 	"stats_debug. Any User that has their Coder Flag set will Recieve Debuging Information",
 	"",
 	"On a Large Network, this Command should be used considered Dangerous as a Large amount of Information may be sent to you.",
-	"End of Help.",
+	"",
 	NULL
 };
 
@@ -148,7 +134,6 @@ const char *ns_version_help[] = {
 	"",
 	"Shows the current StatServ Version.",
 	"",
-	"End of Help.",
 	NULL
 };
 
@@ -160,7 +145,6 @@ const char *ns_shutdown_help[] = {
 	"This command should be used wisely.",
 	"<REASON> is optional.",
 	"",
-	"End of Help.",
 	NULL
 };
 
@@ -174,7 +158,6 @@ const char *ns_reload_help[] = {
 	"This command SHOULD be used wisely.",
 	"<REASON> is optional.",
 	"",
-	"End of Help.",
 	NULL
 };
 
@@ -185,7 +168,6 @@ const char *ns_userdump_help[] = {
 	"When in Debug Mode, Neostats will send Coders its Entire User table",
 	"Only really usefull when you are debuging Neostats",
 	"",
-	"End of Help.",
 	NULL
 };
 
@@ -196,7 +178,6 @@ const char *ns_serverdump_help[] = {
 	"When in Debug Mode, Neostats will send Coders its Entire SERVER table",
 	"Only really usefull when you are debuging Neostats",
 	"",
-	"End of Help.",
 	NULL
 };
 
@@ -207,7 +188,6 @@ const char *ns_chandump_help[] = {
 	"When in Debug Mode, Neostats will send Coders its Entire CHANNEL table",
 	"Only really usefull when you are debuging Neostats",
 	"",
-	"End of Help.",
 	NULL
 };
 
@@ -217,7 +197,6 @@ const char *ns_logs_help[] = {
 	"",
 	"Sends today's logfile via PRIVMSG/NOTICE",
 	"",
-	"End of Help.",
 	NULL
 };
 
