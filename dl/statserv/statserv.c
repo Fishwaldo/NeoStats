@@ -382,7 +382,7 @@ static int ss_clientversions(User * u, char **av, int ac)
 	prefmsg(u->nick, s_StatServ, "Top%d Client Versions:", num);
 	prefmsg(u->nick, s_StatServ, "======================");
 	for (i = 0; i <= num; i++) {
-		prefmsg(u->nick, s_StatServ, "%d) %d ->  %s", i, cv->count, cv->name);
+		prefmsg(u->nick, s_StatServ, "%d) %d ->  %s", i + 1, cv->count, cv->name);
 		cn = list_next(Vhead, cn);
 		if (cn) {
 			cv = lnode_get(cn);

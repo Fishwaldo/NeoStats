@@ -65,6 +65,15 @@
 #endif
 #endif
 
+/* va_copy handling*/
+#ifndef HAVE_VA_COPY
+#if HAVE___VA_COPY 
+#define va_copy(dest, src) __va_copy(dest, src) 
+#else /* HAVE___VA_COPY */
+#define va_copy(dest, src) memcpy(&(dest), &(src), sizeof(dest)) 
+#endif /* HAVE___VA_COPY */ 
+#endif /* HAVE_VA_COPY */
+
 #include "version.h"
 
 #include "adns.h"

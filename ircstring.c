@@ -63,9 +63,6 @@ static char nullstring[]="(null)";
  */
 int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args) 
 {
-#if 0
-	return vsnprintf(buf, size, fmt, args);
-#else
 	va_list saveargs;
 	size_t len=0;
 	unsigned int i;
@@ -73,8 +70,8 @@ int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args)
     char c;
 	const char *format=fmt;
 
-	saveargs=args;
-
+	/* save args in case we need to call vsnprintf */
+	va_copy( saveargs, args );
 	while((c = *format++)!=0 && (len<size) ) {
 		/* Is it a format string character? */
 	    if(c == '%') {
@@ -140,7 +137,6 @@ int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 	}
 	/* return count chars written */
 	return len;
-#endif
 }
 
 /* @brief optimised vsprintf replacement

@@ -1,5 +1,9 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 =====================================================================================
+* NeoStats * Mark (M) * Version 2.5.21
+ - va_copy handling courtesy of Reed. (M)
+ - Fix client top 10 counts. (M)
+
 * NeoStats * Mark (M) * Version 2.5.20
  - Fix memory leak in exclude load (M)
  - Fix memory leak in statserv (M)

@@ -191,3 +191,9 @@
 
 /* if we are compiling with SQL support */
 #undef SQLSRV
+
+/* Define if we have va_copy. */
+#undef HAVE_VA_COPY
+
+/* Define if we have __va_copy. */
+#undef HAVE___VA_COPY
