@@ -383,7 +383,7 @@ int Online(char **av, int ac)
 	}
 
 	hs_bot = init_mod_bot(s_HostServ, user, host, rname, 
-		services_bot_modes,BOT_FLAG_RESTRICT_OPERS,__module_info.module_name);
+		services_bot_modes,0,__module_info.module_name);
 	add_bot_cmd_list(hs_bot, hs_commands);
 
 	if(user)
