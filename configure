@@ -1401,9 +1401,9 @@ esac
 
 case "$host_os" in
 *openbsd*)
-	MAKEDEPENDENCIES=" ";;
+	MAKEDEPENDENCIES="";;
 *freebsd*)
-	MAKEDEPENDENCIES=" ";;
+	MAKEDEPENDENCIES="";;
 *)
 	MAKEDEPENDENCIES="-include \$(OBJS:.o=.d)";;
 esac
