@@ -181,7 +181,7 @@ int __Bot_Message(char *origin, char **av, int ac)
     } else if (!strcasecmp(av[1], "VERSION")) {
                 ls_version(u);
     } else if (!strcasecmp(av[1], "VIEWLOGS") && (UserLevel(u) >= 180)) {
-                notice(s_LoveServ,"%s Requested to Look at Loveserv's Logs", u->nick);
+                chanalert(s_LoveServ,"%s Requested to Look at Loveserv's Logs", u->nick);
                ls_viewlogs(u);
     } else {
         prefmsg(u->nick, s_LoveServ, "Unknown Command: \2%s\2, maybe you love me?", av[1]);

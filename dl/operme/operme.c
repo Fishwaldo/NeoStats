@@ -339,7 +339,7 @@ void Loadopers()
     }
       fclose(fp);
     } else {
-        notice(s_Services, "data/operme.db Database Not Found! Either Add a User or Disable This Function");
+        chanalert(s_Services, "data/operme.db Database Not Found! Either Add a User or Disable This Function");
     }
 }
 

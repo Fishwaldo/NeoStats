@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.13 2002/07/25 13:38:32 shmad Exp $
+** $Id: spam.c,v 1.14 2002/07/29 17:10:19 shmad Exp $
 */
 
 
@@ -67,7 +67,7 @@ int __Bot_Message(char *origin, char **argv, int argc)
 */	
 	globops(me.name, "Possible Mass Message -\2(%s!%s@%s)\2- %s", u->nick,
 		u->username, u->hostname, argv[1]);
-	notice(s_Spam,"WooHoo, A Spammer has Spammed! -\2(%s!%s@%s)\2- Sent me this: %s",u->nick,u->username,u->hostname,argv[1]);
+	chanalert(s_Spam,"WooHoo, A Spammer has Spammed! -\2(%s!%s@%s)\2- Sent me this: %s",u->nick,u->username,u->hostname,argv[1]);
 	log("Possible Mass Message -(%s!%s@%s)- %s", u->nick, u->username,
 		u->hostname, argv[1]);
 	return 1;

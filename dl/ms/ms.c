@@ -170,10 +170,10 @@ int __Bot_Message(char *origin, char **av, int ac)
                 }
                 ms_join(u, av[2]);
     } else if (!strcasecmp(av[1], "VIEWLOG") && (UserLevel(u) >= 185)) {
-                notice(s_Services,"%s Requested to Look at today's %s Log",u->nick,s_MoraleServ);
+                chanalert(s_Services,"%s Requested to Look at today's %s Log",u->nick,s_MoraleServ);
                 ms_viewlog(u);
     } else if (!strcasecmp(av[1], "VERSION")) {
-                notice(s_Services,"%s Wanted to know the current version information for %s",u->nick,s_MoraleServ);
+                chanalert(s_Services,"%s Wanted to know the current version information for %s",u->nick,s_MoraleServ);
                 ms_version(u);
     } else if (!strcasecmp(av[1], "POEM")) {
                 if (ac < 4) {
@@ -221,7 +221,7 @@ int __Bot_Message(char *origin, char **av, int ac)
                 ms_msg(u, av[2], cmd);
                 free(cmd);
     } else if (!strcasecmp(av[1], "LOVESERVLOGS") && (UserLevel(u) >= 185)) {
-                notice(s_Services,"%s Requested to Look at Loveserv's Logs",u->nick);
+                chanalert(s_Services,"%s Requested to Look at Loveserv's Logs",u->nick);
                 ms_loveservlogs(u);
     } else if (!strcasecmp(av[1], "CHEERUP")) {
                 if (ac < 3) {
@@ -266,13 +266,13 @@ int __Bot_Message(char *origin, char **av, int ac)
                 }
 				ms_wonderful(u, av[2]);
     } else if (!strcasecmp(av[1], "RESET") && (UserLevel(u) >= 185)) {
-                notice(s_Services,"%s Requested %s to be RESET!",u->nick,s_MoraleServ);
+                chanalert(s_Services,"%s Requested %s to be RESET!",u->nick,s_MoraleServ);
                 ms_reset(u);
     } else if (!strcasecmp(av[1], "LOGBACKUP") && (UserLevel(u) >= 185)) {
-                notice(s_Services,"%s Requested %s to conduct a LOGBACKUP!",u->nick,s_MoraleServ);
+                chanalert(s_Services,"%s Requested %s to conduct a LOGBACKUP!",u->nick,s_MoraleServ);
                 ms_logbackup(u);
     } else if (!strcasecmp(av[1], "PRINTFILE") && (UserLevel(u) >= 185)) {
-				notice(s_Services,"%s Requested the use of the PRINTFILE facility from %s",u->nick,s_MoraleServ);
+				chanalert(s_Services,"%s Requested the use of the PRINTFILE facility from %s",u->nick,s_MoraleServ);
                 if (ac < 3) {
                     prefmsg(u->nick, s_MoraleServ, "Syntax: /msg %s PRINTFILE <PATH TO FILE>", s_MoraleServ);
                     prefmsg(u->nick, s_MoraleServ, "For addtional help: /msg %s HELP", s_MoraleServ);
@@ -280,7 +280,7 @@ int __Bot_Message(char *origin, char **av, int ac)
                 }
 				ms_printfile(u, av[2]);
     } else {
-        notice(s_Services, "%s requested the unknown command of: %s", u->nick, av[1]);
+        chanalert(s_Services, "%s requested the unknown command of: %s", u->nick, av[1]);
         prefmsg(u->nick, s_MoraleServ, "Unknown Command: \2%s\2, perhaps you need some HELP?", av[1]);
     }
     return 1;
@@ -359,7 +359,7 @@ static void ms_hail(User *u, char *cmd, char *m) {
         strcpy(segv_location, "ms_hail");
         if (!strcasecmp(m, s_MoraleServ)) {
             prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service message itself?");
-            notice(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
+            chanalert(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
             return;
         }
         if (!finduser(m)) {
@@ -369,7 +369,7 @@ static void ms_hail(User *u, char *cmd, char *m) {
         /* The user has passed the minimum requirements for input */
 
     prefmsg(u->nick, s_MoraleServ, "Your \"HAIL\" song greeting has been sent to %s!",m);
-    notice(s_Services, "%s Wanted %s to be hailed by sending the song to %s", u->nick,cmd,m);
+    chanalert(s_Services, "%s Wanted %s to be hailed by sending the song to %s", u->nick,cmd,m);
     prefmsg(m, s_MoraleServ, "Courtesy of your friend %s:",u->nick);
     prefmsg(m, s_MoraleServ, "*sings* Hail to the %s, they're the %s and they need hailing, hail to the %s so you better all hail like crazy...",cmd,cmd,cmd);
     mslog("%s sent a HAIL to the %s song to %s",u->nick,cmd,m);
@@ -382,7 +382,7 @@ static void ms_lapdance(User *u, char *cmd) {
         strcpy(segv_location, "ms_lapdance");
         if (!strcasecmp(cmd, s_MoraleServ)) {
             prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service message itself?");
-            notice(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
+            chanalert(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
             return;
         }
         if (!finduser(cmd)) {
@@ -394,7 +394,7 @@ static void ms_lapdance(User *u, char *cmd) {
     prefmsg(cmd, s_MoraleServ, "*%s Seductively walks up to %s and gives %s a sly look*",s_MoraleServ,cmd,cmd);
     prefmsg(cmd, s_MoraleServ, "*%s Sits across %s's legs and gives %s the best Lap Dance of their life*",s_MoraleServ,cmd,cmd);
     prefmsg(cmd, s_MoraleServ, "*I Think we both need a cold shower now*... *wink*",s_MoraleServ,cmd);
-    notice(s_Services, "%s Wanted a LAPDANCE to be preformed on %s", u->nick,cmd);
+    chanalert(s_Services, "%s Wanted a LAPDANCE to be preformed on %s", u->nick,cmd);
     mslog("%s Wanted a LAPDANCE to be preformed on %s",u->nick,cmd);
 
 }
@@ -410,7 +410,7 @@ static void ms_ode(User *u, char *cmd, char *m) {
         }
         if (!strcasecmp(m, s_MoraleServ)) {
             prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service message itself?");
-            notice(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
+            chanalert(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
             return;
         }
         if (!finduser(m)) {
@@ -420,7 +420,7 @@ static void ms_ode(User *u, char *cmd, char *m) {
         /* The user has passed the minimum requirements for input */
 
     prefmsg(u->nick, s_MoraleServ, "Your ODE to %s has been sent to %s!",cmd,m);
-    notice(s_Services, "%s Wanted an ODE to %s to be recited to %s", u->nick,cmd,m);
+    chanalert(s_Services, "%s Wanted an ODE to %s to be recited to %s", u->nick,cmd,m);
     prefmsg(m, s_MoraleServ, "Courtesy of your friend %s:",u->nick);
     prefmsg(m, s_MoraleServ, "*recites*",u->nick);
     prefmsg(m, s_MoraleServ, "How I wish to be a %s,",cmd);
@@ -440,7 +440,7 @@ static void ms_join(User *u, char *chan)
     if (!(UserLevel(u) >= 185)) {
         mslog("Access Denied (JOIN) to %s", u->nick);
         prefmsg(u->nick, s_MoraleServ, "Access Denied.");
-        notice(s_MoraleServ,"%s Requested JOIN, but is not a TechAdmin!",u->nick);
+        chanalert(s_MoraleServ,"%s Requested JOIN, but is not a TechAdmin!",u->nick);
         return;
     }
      /* The user has passed the minimum requirements for input */
@@ -502,7 +502,7 @@ static void ms_poem(User *u, char *cmd, char *m) {
         }
         if (!strcasecmp(m, s_MoraleServ)) {
             prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service message itself?");
-            notice(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
+            chanalert(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
             return;
         }
         if (!finduser(m)) {
@@ -512,7 +512,7 @@ static void ms_poem(User *u, char *cmd, char *m) {
         /* The user has passed the minimum requirements for input */
 
     prefmsg(u->nick, s_MoraleServ, "Your POEM about %s has been sent to %s!",cmd,m);
-    notice(s_Services, "%s Wanted a POEM about %s to be recited to %s", u->nick,cmd,m);
+    chanalert(s_Services, "%s Wanted a POEM about %s to be recited to %s", u->nick,cmd,m);
     prefmsg(m, s_MoraleServ, "Courtesy of your friend %s:",u->nick);
     prefmsg(m, s_MoraleServ, "*recites*");
     prefmsg(m, s_MoraleServ, "I wish I was a %s,",cmd);
@@ -539,7 +539,7 @@ static void ms_swhois(User *u, char *cmd, char *m) {
         /* The user has passed the minimum requirements for input */
     
     mslog("%s!%s@%s Issued a SWHOIS command - SWHOIS %s :%s", u->nick, u->username, u->hostname, cmd, m);
-    notice(s_Services, "%s Just used thier TechAdmin-ship to preform a SWHOIS on %s (%s)", u->nick, cmd, m);
+    chanalert(s_Services, "%s Just used thier TechAdmin-ship to preform a SWHOIS on %s (%s)", u->nick, cmd, m);
     sswhois_cmd(cmd, m);
 
 }
@@ -550,7 +550,7 @@ static void ms_redneck(User *u, char *cmd) {
         strcpy(segv_location, "ms_redneck");
         if (!strcasecmp(cmd, s_MoraleServ)) {
             prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service message itself?");
-            notice(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
+            chanalert(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
             return;
         }
         if (!finduser(cmd)) {
@@ -560,7 +560,7 @@ static void ms_redneck(User *u, char *cmd) {
         /* The user has passed the minimum requirements for input */
 
     prefmsg(u->nick, s_MoraleServ, "Your redneck message has been sent to %s!",cmd);
-    notice(s_Services, "%s Wanted a REDNECK \"dubbing\" to be preformed on %s", u->nick,cmd);
+    chanalert(s_Services, "%s Wanted a REDNECK \"dubbing\" to be preformed on %s", u->nick,cmd);
     prefmsg(cmd, s_MoraleServ, "Courtesy of your friend %s:",u->nick);
     prefmsg(cmd, s_MoraleServ, "*recites*",u->nick);
     prefmsg(cmd, s_MoraleServ, "I dub thee \"Redneck\", May you enjoy your coons and over sexation and many hours of wierd contemplation. If its dead you eat it, ifs living kill it than eat it. This is the redneck way. Country Music all the time no rap no jive no rock no hop this is the redneck way, now go forth into a redneck world and don't forget your boots.",u->nick);
@@ -579,7 +579,7 @@ static void ms_svsnick(User *u, char *cmd, char *m) {
         }
         if (!strcasecmp(cmd, s_MoraleServ)) {
             prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service change its nick?");
-            notice(s_Services,"Prevented %s from making %s change its own nick",u->nick,s_MoraleServ);
+            chanalert(s_Services,"Prevented %s from making %s change its own nick",u->nick,s_MoraleServ);
             return;
         }
         if (!finduser(cmd)) {
@@ -590,7 +590,7 @@ static void ms_svsnick(User *u, char *cmd, char *m) {
 
 
     mslog("%s!%s@%s Issued a SVSNICK command - SVSNICK %s %s :0", u->nick, u->username, u->hostname, cmd, m);
-    notice(s_Services, "%s Just used thier TechAdmin-ship to preform a SVSNICK on %s (modified to %s)", u->nick, cmd, m);
+    chanalert(s_Services, "%s Just used thier TechAdmin-ship to preform a SVSNICK on %s (modified to %s)", u->nick, cmd, m);
     ssvsnick_cmd(cmd, m);
 
 }
@@ -603,7 +603,7 @@ static void ms_part(User *u, char *chan)
     if (!(UserLevel(u) >= 185)) {
         mslog("Access Denied (PART) to %s", u->nick);
         prefmsg(u->nick, s_MoraleServ, "Access Denied.");
-        notice(s_MoraleServ,"%s Requested PART, but is not a TechAdmin!",u->nick);
+        chanalert(s_MoraleServ,"%s Requested PART, but is not a TechAdmin!",u->nick);
         return;
     }
     /* The user has passed the minimum requirements for input */
@@ -620,7 +620,7 @@ static void ms_msg(User *u, char *cmd, char *m) {
         strcpy(segv_location, "ms_msg");
         if (!strcasecmp(cmd, s_MoraleServ)) {
             prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service message itself?");
-            notice(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
+            chanalert(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
             return;
         }
 /*
@@ -636,7 +636,7 @@ static void ms_msg(User *u, char *cmd, char *m) {
         /* The user has passed the minimum requirements for input */
     
     mslog("%s made %s MSG '%s' to %s",u->nick, s_MoraleServ, m, cmd);
-    notice(s_MoraleServ, "%s made %s MSG '%s' to %s", u->nick, s_MoraleServ, m, cmd);
+    chanalert(s_MoraleServ, "%s made %s MSG '%s' to %s", u->nick, s_MoraleServ, m, cmd);
 
     if (UserLevel(u) >= 185) {
         prefmsg(cmd, s_MoraleServ, "%s", m);
@@ -682,7 +682,7 @@ static void ms_cheerup(User *u, char *cmd) {
         strcpy(segv_location, "ms_cheerup");
         if (!strcasecmp(cmd, s_MoraleServ)) {
             prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service message itself?");
-            notice(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
+            chanalert(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
             return;
         }
         if (!finduser(cmd)) {
@@ -693,7 +693,7 @@ static void ms_cheerup(User *u, char *cmd) {
 
     prefmsg(cmd, s_MoraleServ, "Cheer up %s .....",cmd);
     prefmsg(cmd, s_MoraleServ, "All of us on the network love you! 3--<--<--<{4@",u->nick);
-    notice(s_Services, "%s Wanted %s to CHEERUP", u->nick,cmd);
+    chanalert(s_Services, "%s Wanted %s to CHEERUP", u->nick,cmd);
     mslog("%s Wanted %s to CHEERUP",u->nick,cmd);
 
 }
@@ -713,7 +713,7 @@ static void ms_svsjoin(User *u, char *cmd, char *m) {
         /* The user has passed the minimum requirements for input */
 
     mslog("%s!%s@%s Issued a SVSJOIN command - SVSJOIN %s %s", u->nick, u->username, u->hostname, cmd, m);
-    notice(s_Services, "%s Just used thier TechAdmin-ship to preform a SVSJOIN on %s to %s", u->nick, cmd, m);
+    chanalert(s_Services, "%s Just used thier TechAdmin-ship to preform a SVSJOIN on %s to %s", u->nick, cmd, m);
     ssvsjoin_cmd(cmd, m);
 
 }
@@ -733,7 +733,7 @@ static void ms_svspart(User *u, char *cmd, char *m) {
         /* The user has passed the minimum requirements for input */
 
     mslog("%s!%s@%s Issued a SVSPART command - SVSPART %s %s", u->nick, u->username, u->hostname, cmd, m);
-    notice(s_Services, "%s Just used thier TechAdmin-ship to preform a SVSPART on %s to %s", u->nick, cmd, m);
+    chanalert(s_Services, "%s Just used thier TechAdmin-ship to preform a SVSPART on %s to %s", u->nick, cmd, m);
     ssvspart_cmd(cmd, m);
 
 }
@@ -748,7 +748,7 @@ static void ms_kick(User *u, char *cmd, char *m) {
         }
         if (!strcasecmp(m, s_MoraleServ)) {
             prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service kick itself from a channel?");
-            notice(s_Services,"Prevented %s from making %s kick itself from %s",u->nick,s_MoraleServ,cmd);
+            chanalert(s_Services,"Prevented %s from making %s kick itself from %s",u->nick,s_MoraleServ,cmd);
             return;
         }
         if (!finduser(m)) {
@@ -762,7 +762,7 @@ static void ms_kick(User *u, char *cmd, char *m) {
         /* The user has passed the minimum requirements for input */
 
     mslog("%s Issued a KICK command - KICK %s %s", u->nick, cmd, m);
-    notice(s_Services, "%s Just used thier TechAdmin-ship to preform a KICK on %s from %s", u->nick, m, cmd);
+    chanalert(s_Services, "%s Just used thier TechAdmin-ship to preform a KICK on %s from %s", u->nick, m, cmd);
     skick_cmd(s_MoraleServ, cmd, m, "");
 
 }
@@ -773,7 +773,7 @@ static void ms_behappy(User *u, char *cmd) {
         strcpy(segv_location, "ms_behappy");
         if (!strcasecmp(cmd, s_MoraleServ)) {
             prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service message itself?");
-            notice(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
+            chanalert(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
             return;
         }
         if (!finduser(cmd)) {
@@ -809,7 +809,7 @@ static void ms_behappy(User *u, char *cmd) {
     prefmsg(cmd, s_MoraleServ, "Don't Worry, it will soon pass, whatever it is",u->nick);
     prefmsg(cmd, s_MoraleServ, "Don't Worry - Be Happy, I'm not worried, I'm happy . . . .",u->nick);
 
-    notice(s_Services, "%s Wanted %s to BEHAPPY", u->nick,cmd);
+    chanalert(s_Services, "%s Wanted %s to BEHAPPY", u->nick,cmd);
     mslog("%s Wanted %s to BEHAPPY",u->nick,cmd);
 
 }
@@ -820,7 +820,7 @@ static void ms_wonderful(User *u, char *cmd) {
         strcpy(segv_location, "ms_wonderful");
         if (!strcasecmp(cmd, s_MoraleServ)) {
             prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service message itself?");
-            notice(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
+            chanalert(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
             return;
         }
         if (!finduser(cmd)) {
@@ -840,7 +840,7 @@ static void ms_wonderful(User *u, char *cmd) {
     prefmsg(cmd, s_MoraleServ, "I hope you don't mind, I hope you don't mind that I put down in words",u->nick);
     prefmsg(cmd, s_MoraleServ, "How wonderful life is while %s is in the world",cmd);
 
-    notice(s_Services, "%s Wanted to express how WONDERFUL %s is", u->nick,cmd);
+    chanalert(s_Services, "%s Wanted to express how WONDERFUL %s is", u->nick,cmd);
     mslog("%s Wanted to express how WONDERFUL %s is",u->nick,cmd);
 
 }

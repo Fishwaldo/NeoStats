@@ -282,7 +282,7 @@ int s_user_modes(char **av, int ac) {
 void re_init_bot() {
 	strcpy(segv_location, "StatServ-re_init_bot");
 
-	notice(s_Services, "Re-Initilizing %s Bot", s_StatServ);
+	chanalert(s_Services, "Re-Initilizing %s Bot", s_StatServ);
 	init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oikSdwgle", SSMNAME);
 }
 int s_del_user(char **av, int ac) {

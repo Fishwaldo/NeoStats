@@ -287,7 +287,7 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 		} 
 	} 			
 				
-	notice(s_Netinfo, "%s Sent me this: %s", u->nick, coreLine);
+	chanalert(s_Netinfo, "%s Sent me this: %s", u->nick, coreLine);
 	return 1;
 }
 int checktld(char *data) {
@@ -431,6 +431,6 @@ void Loadconfig()
 		}
 		fclose(fp);
 	} else {
-		notice(s_Services, "No Database Found! AutoJoin is Disabled!");
+		chanalert(s_Services, "No Database Found! AutoJoin is Disabled!");
 	}
 }

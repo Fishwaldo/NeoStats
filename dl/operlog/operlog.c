@@ -605,12 +605,12 @@ void Loadconfig()
                                 mode_watch = atoi(strtok(NULL, " "));
             } else {
                 ollog("%s is not a valid OperLog.db option!",tmp);
-                notice(s_Services, "%s is not a valid OperLog.db option! Please check your data/OperLog.db file!",tmp);
+                chanalert(s_Services, "%s is not a valid OperLog.db option! Please check your data/OperLog.db file!",tmp);
             }
     }
         fclose(fp);
     } else {
-        notice(s_Services, "No Database For %s Found! Creating one with Defaults!", s_OperLog);
+        chanalert(s_Services, "No Database For %s Found! Creating one with Defaults!", s_OperLog);
         chat_watch=1;
         kill_watch=1;
         mode_watch=1; 
