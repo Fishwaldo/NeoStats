@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.35 2003/01/27 02:33:59 fishwaldo Exp $
+** $Id: hostserv.c,v 1.36 2003/01/29 10:06:51 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -92,7 +92,7 @@ int ListArryCount = 0;
 Module_Info HostServ_info[] = { {
     "HostServ",
     "Network User Virtual Host Service",
-    "2.3"
+    "2.4"
 } };
 
 
@@ -154,11 +154,14 @@ int new_m_version(char *origin, char **av, int ac) {
 
 /* Routine For Setting the Virtual Host */
 static int hs_sign_on(char **av, int ac) {
-    char *tmp = NULL;
-    char *tmp2 = NULL;
+    char *tmp;
+    char *tmp2;
     hnode_t *hn;
     hs_map *map;
     User *u;
+
+	if (!is_synced)
+		return 0;
 
         u = finduser(av[0]);
         if (!u) return 1;
@@ -428,15 +431,25 @@ static void hs_listban(User *u) {
 static void hs_chpass(User *u, char *nick, char *oldpass, char *newpass) {
 	hnode_t *hn;
 	hs_map *map;
+	char *tmp, *tmp2;
 
 	hn = hash_lookup(vhosts, nick);
 	if (hn) {
 		map = hnode_get(hn);
-		if (!strcasecmp(map->passwd, oldpass)) {
-			strncpy(map->passwd, newpass, 30);
-			prefmsg(u->nick, s_HostServ, "Password Successfully changed");
-			chanalert(s_HostServ, "%s changed the password for %s", u->nick, map->nnick);
-			write_database();
+          	tmp = strlower(map->host);
+	  	tmp2 = strlower(u->hostname);
+	  	if ((fnmatch(tmp, tmp2, 0) == 0) || (UserLevel(u) >= 100)) {
+			if (!strcasecmp(map->passwd, oldpass)) {
+				strncpy(map->passwd, newpass, 30);
+				prefmsg(u->nick, s_HostServ, "Password Successfully changed");
+				chanalert(s_HostServ, "%s changed the password for %s", u->nick, map->nnick);
+				write_database();
+				return;
+			}
+		} else {
+			prefmsg(u->nick, s_HostServ, "Error, Hostname Mis-Match");
+			chanalert(s_HostServ, "%s tried to change the password for %s, but the hosts do not match (%s->%s)", u->nick, map->nnick, u->hostname, map->host);
+			hslog("%s tried to change the password for %s but the hosts do not match (%s -> %s)", u->nick, map->nnick, u->hostname, map->host);
 			return;
 		}
 	} 
