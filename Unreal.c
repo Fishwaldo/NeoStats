@@ -1054,10 +1054,7 @@ Srv_Squit (char *origin, char **argv, int argc)
 void
 Srv_Nick (char *origin, char **argv, int argc)
 {
-	char **av;
-	int ac = 0;
 	char *realname;
-	AddStringToList (&av, argv[0], &ac);
 	AddUser (argv[0], argv[3], argv[4], argv[5], 0, strtol (argv[2], NULL, 10));
 	realname = joinbuf (argv, argc, 7);
 	AddRealName (argv[0], realname);
