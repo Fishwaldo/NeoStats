@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.h,v 1.6 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: conf.h,v 1.7 2003/08/01 14:32:12 fishwaldo Exp $
 */
 
 
@@ -57,5 +57,6 @@ struct config {
 int GetConf (void **data, int type, const char *item);
 int SetConf (void *data, int type, char *item);
 int GetDir (char *item, char ***data);
+int DelConf (char *item);
 
 #endif

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: keeper.c,v 1.11 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: keeper.c,v 1.12 2003/08/01 14:32:12 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -142,3 +142,28 @@ SetConf (void *data, int type, char *item)
 	return 1;
 
 }
+
+
+/** @brief removes Config Data
+*/
+int
+DelConf (char *item)
+{
+	char keypath[255];
+	int i = 0;
+
+	/* determine if its a module setting */
+	if (strlen (segvinmodule) > 0) {
+		snprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
+	} else {
+		snprintf (keypath, 255, "g/core:/%s", item);
+	}
+	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
+	/* check for errors */
+	if (i != 0) {
+		nlog (LOG_WARNING, LOG_CORE, "DelConf: %s (%s)", kp_strerror (i), keypath);
+		return -1;
+	}
+	kp_flush ();
+	return 1;
+}	
