@@ -86,6 +86,7 @@ int InitSqlSrv (void)
 		nlog(LOG_CRITICAL, "Failed to Setup Sql Port. SQL not available");
 		return NS_FAILURE;
 	}
+   	dlog (DEBUG1, "Init OK");
 	return NS_SUCCESS;
 }
 
@@ -157,20 +158,18 @@ static bot_setting sql_settings[]=
  */
 
 /* rehash handler */
-int check_sql_sock() {
+int check_sql_sock() 
+{
 	if (sqlListenSock < 1) {
 		dlog(DEBUG1, "Rehashing SQL sock");
-        	sqlListenSock = sqllisten_on_port(sqlsrvport);
+		sqlListenSock = sqllisten_on_port(sqlsrvport);
 		if (sqlListenSock == -1) {
 			nlog(LOG_CRITICAL, "Failed to Setup Sql Port. SQL not available");
-                	return NS_FAILURE;
-                }
-        }
+			return NS_FAILURE;
+		}
+	}
 	return NS_SUCCESS;
-}
-		                                        
-
-
+}                                       
 
 /***************************************************************
  * listen_on_port(int port): -  Open a socket to listen for
@@ -185,45 +184,45 @@ int check_sql_sock() {
 int
 sqllisten_on_port(int port)
 {
-  int      srvfd;      /* FD for our listen server socket */
-  struct sockaddr_in srvskt;
-  int      adrlen;
-  int      flags;
+	int      srvfd;      /* FD for our listen server socket */
+	struct sockaddr_in srvskt;
+	int      adrlen;
+	int      flags;
 
-  adrlen = sizeof(struct sockaddr_in);
-  (void) memset((void *) &srvskt, 0, (size_t) adrlen);
-  srvskt.sin_family = AF_INET;
-  /* bind to the local IP */
-  if (me.dobind) {
-	srvskt.sin_addr = me.lsa.sin_addr;
-  } else {
-  	srvskt.sin_addr.s_addr = INADDR_ANY;
-  }
-  srvskt.sin_port = htons(sqlsrvport);
-  if ((srvfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-  {
-    nlog(LOG_CRITICAL, "SqlSrv: Unable to get socket for port %d.", port);
-    return -1;
-  }
+	adrlen = sizeof(struct sockaddr_in);
+	(void) memset((void *) &srvskt, 0, (size_t) adrlen);
+	srvskt.sin_family = AF_INET;
+	/* bind to the local IP */
+	if (me.dobind) {
+		srvskt.sin_addr = me.lsa.sin_addr;
+	} else {
+		srvskt.sin_addr.s_addr = INADDR_ANY;
+	}
+	srvskt.sin_port = htons(sqlsrvport);
+	if ((srvfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	{
+		nlog(LOG_CRITICAL, "SqlSrv: Unable to get socket for port %d.", port);
+		return -1;
+	}
 #ifdef WIN32
 	flags = 1;
 	ioctlsocket(srvfd, FIONBIO, &flags);
 #else
-  flags = fcntl(srvfd, F_GETFL, 0);
-  flags |= O_NONBLOCK;
-  (void) fcntl(srvfd, F_SETFL, flags);
+	flags = fcntl(srvfd, F_GETFL, 0);
+	flags |= O_NONBLOCK;
+	(void) fcntl(srvfd, F_SETFL, flags);
 #endif
-  if (bind(srvfd, (struct sockaddr *) &srvskt, adrlen) < 0)
-  {
-    nlog(LOG_CRITICAL, "Unable to bind to port %d", port);
-    return -1;
-  }
-  if (listen(srvfd, 1) < 0)
-  {
-    nlog(LOG_CRITICAL, "Unable to listen on port %d", port);
-    return -1;
-  }
-  return (srvfd);
+	if (bind(srvfd, (struct sockaddr *) &srvskt, adrlen) < 0)
+	{
+		nlog(LOG_CRITICAL, "Unable to bind to port %d", port);
+		return -1;
+	}
+	if (listen(srvfd, 1) < 0)
+	{
+		nlog(LOG_CRITICAL, "Unable to listen on port %d", port);
+		return -1;
+	}
+	return (srvfd);
 }
 
 /***************************************************************
@@ -242,89 +241,87 @@ sqllisten_on_port(int port)
 void
 sql_accept_conn(int srvfd)
 {
-  int      adrlen;     /* length of an inet socket address */
-  int      flags;      /* helps set non-blocking IO */
-  Sql_Conn *newui;
-  char     tmp[16];
+	int      adrlen;     /* length of an inet socket address */
+	int      flags;      /* helps set non-blocking IO */
+	Sql_Conn *newui;
+	char     tmp[16];
 
-  /* if we reached our max connection, just exit */
-  if (list_count(sqlconnections) > 5) {
-  	nlog(LOG_NOTICE, "Can not accept new SQL connection. Full");
+	/* if we reached our max connection, just exit */
+	if (list_count(sqlconnections) > 5) {
+		nlog(LOG_NOTICE, "Can not accept new SQL connection. Full");
 #ifdef WIN32
-	closesocket (srvfd);
+		closesocket (srvfd);
 #else
-	close (srvfd);
+		close (srvfd);
 #endif      			
-  	return;
-  }
-  
-  /* We have a new UI/DB/manager connection request.  So make a free
-     slot and allocate it */
-  newui = smalloc(sizeof(Sql_Conn));
-  
+		return;
+	}
 
-  /* OK, we've got the ui slot, now accept the conn */
-  adrlen = sizeof(struct sockaddr_in);
-  newui->fd = accept(srvfd, (struct sockaddr *) &newui->cliskt, &adrlen);
+	/* We have a new UI/DB/manager connection request.  So make a free
+	   slot and allocate it */
+	newui = smalloc(sizeof(Sql_Conn)); 
 
-  if (newui->fd < 0)
-  {
-    nlog(LOG_WARNING, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
-    sfree(newui);
+	/* OK, we've got the ui slot, now accept the conn */
+	adrlen = sizeof(struct sockaddr_in);
+	newui->fd = accept(srvfd, (struct sockaddr *) &newui->cliskt, &adrlen);
+
+	if (newui->fd < 0)
+	{
+		nlog(LOG_WARNING, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
+		sfree(newui);
 #ifdef WIN32
-	closesocket (srvfd);
+		closesocket (srvfd);
 #else
-	close (srvfd);
+		close (srvfd);
 #endif      			
-    return;
-  }
-  else
-  {
+		return;
+	}
+	else
+	{
 #ifdef WIN32
 	{
 		unsigned char* src = &(newui->cliskt.sin_addr.s_addr);
 		sprintf(tmp, "%u.%u.%u.%u", src[0], src[1], src[2], src[3]);
 	}
 #else
-    inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
+		inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
 #endif
-    if (!match(sqlsrvhost, tmp)) {
+		if (!match(sqlsrvhost, tmp)) {
     	/* we didnt get a match, bye bye */
-	nlog(LOG_NOTICE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
+			nlog(LOG_NOTICE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
 #ifdef WIN32
-	closesocket (newui->fd);
+			closesocket (newui->fd);
 #else
-	close (newui->fd);
+			close (newui->fd);
 #endif      			
-	sfree(newui);
-        return;
-    }
-    /* inc number ui, then init new ui */
+			sfree(newui);
+			return;
+		}
+		/* inc number ui, then init new ui */
 #ifdef WIN32
-	flags = 1;
-	ioctlsocket(srvfd, FIONBIO, &flags);
+		flags = 1;
+		ioctlsocket(srvfd, FIONBIO, &flags);
 #else
-    flags = fcntl(newui->fd, F_GETFL, 0);
-    flags |= O_NONBLOCK;
-    (void) fcntl(newui->fd, F_SETFL, flags);
+		flags = fcntl(newui->fd, F_GETFL, 0);
+		flags |= O_NONBLOCK;
+		(void) fcntl(newui->fd, F_SETFL, flags);
 #endif
-    newui->cmdpos = 0;
-    newui->responsefree = 50000; /* max response packetsize if 50000 */
-    newui->nbytein = 0;
-    newui->nbyteout = 0;
-	lnode_create_append (sqlconnections, newui);
+		newui->cmdpos = 0;
+		newui->responsefree = 50000; /* max response packetsize if 50000 */
+		newui->nbytein = 0;
+		newui->nbyteout = 0;
+		lnode_create_append (sqlconnections, newui);
 #ifdef WIN32
-	{
-		unsigned char* src = &newui->cliskt.sin_addr.s_addr;
-		sprintf(tmp, "%u.%u.%u.%u", src[0], src[1], src[2], src[3]);
+		{
+			unsigned char* src = &newui->cliskt.sin_addr.s_addr;
+			sprintf(tmp, "%u.%u.%u.%u", src[0], src[1], src[2], src[3]);
+		}
+#else
+	    inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
+#endif
+		dlog(DEBUG1, "New SqlConnection from %s", tmp);
 	}
-#else
-    inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
-#endif
-    dlog(DEBUG1, "New SqlConnection from %s", tmp);
-  }
 }
-
 
 /***************************************************************
  * handle_ui_request(): - This routine is called to read data
@@ -343,68 +340,69 @@ sql_accept_conn(int srvfd)
 int 
 sql_handle_ui_request(lnode_t *sqlnode)
 {
-  int      ret;        /* a return value */
-  int      dbstat;     /* a return value */
-  int      t;          /* a temp int */
-  Sql_Conn *sqlconn;
+	int      ret;        /* a return value */
+	int      dbstat;     /* a return value */
+	int      t;          /* a temp int */
+	Sql_Conn *sqlconn;
 
-  if ((sqlconn = lnode_get(sqlnode)) == NULL) {
-  	nlog(LOG_WARNING, "Got a Sql Handle without a valid node");
-  	return NS_SUCCESS;
-  }
+   	dlog (DEBUG1, "sql_handle_ui_request");
+	if ((sqlconn = lnode_get(sqlnode)) == NULL) {
+		nlog(LOG_WARNING, "Got a Sql Handle without a valid node");
+		return NS_SUCCESS;
+	}
 
-  /* We read data from the connection into the buffer in the ui struct. 
-     Once we've read all of the data we can, we call the DB routine to
-     parse out the SQL command and to execute it. */
+	/* We read data from the connection into the buffer in the ui struct. 
+       Once we've read all of the data we can, we call the DB routine to
+       parse out the SQL command and to execute it. */
 #ifdef WIN32
-  ret = recv(sqlconn->fd,
-    &(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos), 0);
+	ret = recv(sqlconn->fd,
+		&(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos), 0);
 #else
-  ret = read(sqlconn->fd,
-    &(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos));
+	ret = read(sqlconn->fd,
+		&(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos));
 #endif
 
-  /* shutdown manager conn on error or on zero bytes read */
-  if (ret <= 0)
-  {
-    /* log this since a normal close is with an 'X' command from the
-       client program? */
-    dlog(DEBUG1, "Disconnecting SqlClient for failed read");
-    deldbconnection(sqlconn->fd);
+	/* shutdown manager conn on error or on zero bytes read */
+	if (ret <= 0)
+	{
+		/* log this since a normal close is with an 'X' command from the
+		   client program? */
+		dlog(DEBUG1, "Disconnecting SqlClient for failed read");
+		deldbconnection(sqlconn->fd);
 #ifdef WIN32
-	closesocket (sqlconn->fd);
+		closesocket (sqlconn->fd);
 #else
-    close(sqlconn->fd);
+		close(sqlconn->fd);
 #endif      			
-    list_delete(sqlconnections, sqlnode);
-    lnode_destroy(sqlnode);
-    sfree(sqlconn);
-    return NS_FAILURE;
-  }
-  sqlconn->cmdpos += ret;
-  sqlconn->nbytein += ret;
+		list_delete(sqlconnections, sqlnode);
+		lnode_destroy(sqlnode);
+		sfree(sqlconn);
+		return NS_FAILURE;
+	}
+	sqlconn->cmdpos += ret;
+	sqlconn->nbytein += ret;
 
-  /* The commands are in the buffer. Call the DB to parse and execute
-     them */
-  do
-  {
-    t = sqlconn->cmdpos,       /* packet in length */
-      dbstat = dbcommand((char *)sqlconn->cmd, /* packet in */
-      &sqlconn->cmdpos,        /* packet in length */
-      &sqlconn->response[50000 - sqlconn->responsefree], &sqlconn->responsefree, sqlconn->fd);
-    t -= sqlconn->cmdpos,      /* t = # bytes consumed */
-      /* move any trailing SQL cmd text up in the buffer */
-      (void) memmove(sqlconn->cmd, &sqlconn->cmd[t], t);
-  } while (dbstat == RTA_SUCCESS);
-  if (dbstat == RTA_ERROR) {
-    deldbconnection(sqlconn->fd);
-  }
-  /* the command is done (including side effects).  Send any reply back 
-     to the UI */
-  sql_handle_ui_output(sqlnode);
-  return NS_SUCCESS;
+	/* The commands are in the buffer. Call the DB to parse and execute
+	   them */
+	do
+	{
+		t = sqlconn->cmdpos,       /* packet in length */
+		dbstat = dbcommand((char *)sqlconn->cmd, /* packet in */
+			&sqlconn->cmdpos,        /* packet in length */
+			&sqlconn->response[50000 - sqlconn->responsefree], &sqlconn->responsefree, sqlconn->fd);
+		t -= sqlconn->cmdpos,      /* t = # bytes consumed */
+		/* move any trailing SQL cmd text up in the buffer */
+		(void) memmove(sqlconn->cmd, &sqlconn->cmd[t], t);
+	} while (dbstat == RTA_SUCCESS);
+	if (dbstat == RTA_ERROR) {
+		deldbconnection(sqlconn->fd);
+	}
+	/* the command is done (including side effects).  Send any reply back 
+       to the UI */
+	if (sql_handle_ui_output(sqlnode) == NS_FAILURE)
+		return NS_FAILURE;
+	return NS_SUCCESS;
 }
-
 
 /***************************************************************
  * handle_ui_output() - This routine is called to write data
@@ -418,46 +416,51 @@ sql_handle_ui_request(lnode_t *sqlnode)
 int 
 sql_handle_ui_output(lnode_t *sqlnode)
 {
-  int      ret;        /* write() return value */
-  Sql_Conn *sqlconn;
+	int      ret;        /* write() return value */
+	Sql_Conn *sqlconn;
  
-  if ((sqlconn = lnode_get(sqlnode)) == NULL) {
-  	nlog(LOG_WARNING, "Got a Sql write Handle without a valid node");
-  	return NS_SUCCESS;
-  }
+   	dlog (DEBUG1, "sql_handle_ui_output");
+	if ((sqlconn = lnode_get(sqlnode)) == NULL) {
+		nlog(LOG_WARNING, "Got a Sql write Handle without a valid node");
+		return NS_SUCCESS;
+	}
   
-  if (sqlconn->responsefree < 50000)
-  {
-    ret = write(sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree));
-    if (ret < 0)
-    {
-    	nlog(LOG_WARNING, "Got a write error when attempting to return data to the SQL Server");
-	deldbconnection(sqlconn->fd);
+	if (sqlconn->responsefree < 50000)
+	{
 #ifdef WIN32
-		closesocket (sqlconn->fd);
+		ret = send (sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree), 0);
 #else
-	    close(sqlconn->fd);
+		ret = write(sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree));
+#endif
+		if (ret < 0)
+		{
+			nlog(LOG_WARNING, "Got a write error when attempting to return data to the SQL Server");
+			deldbconnection(sqlconn->fd);
+#ifdef WIN32
+			closesocket (sqlconn->fd);
+#else
+			close(sqlconn->fd);
 #endif      			
-	list_delete(sqlconnections, sqlnode);
-	lnode_destroy(sqlnode);
-	sfree(sqlconn);
-      	return NS_FAILURE;
-    }
-    else if (ret == (50000 - sqlconn->responsefree))
-    {
-      sqlconn->responsefree = 50000;
-      sqlconn->nbyteout += ret;
-    }
-    else
-    {
-      /* we had a partial write.  Adjust the buffer */
-      (void) memmove(sqlconn->response, &sqlconn->response[ret],
-        (50000 - sqlconn->responsefree - ret));
-      sqlconn->responsefree += ret;
-      sqlconn->nbyteout += ret;  /* # bytes sent on conn */
-    }
-  }
-  return NS_SUCCESS;
+			list_delete(sqlconnections, sqlnode);
+			lnode_destroy(sqlnode);
+			sfree(sqlconn);
+			return NS_FAILURE;
+		}
+		else if (ret == (50000 - sqlconn->responsefree))
+		{
+			sqlconn->responsefree = 50000;
+			sqlconn->nbyteout += ret;
+		}
+		else
+		{
+			/* we had a partial write.  Adjust the buffer */
+			(void) memmove(sqlconn->response, &sqlconn->response[ret],
+			(50000 - sqlconn->responsefree - ret));
+			sqlconn->responsefree += ret;
+			sqlconn->nbyteout += ret;  /* # bytes sent on conn */
+		}
+	}
+	return NS_SUCCESS;
 }
 
 //from read_loop
