@@ -23,18 +23,13 @@
 */
 
 #include "neostats.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
-#include <string.h>
 #ifdef HAVE_DB_H
 #include <db.h>
 #endif
 #include "lang.h"
-#include "hash.h"
 
 #ifndef HAVE_DB_H
 void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc) 

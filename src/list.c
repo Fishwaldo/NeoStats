@@ -41,10 +41,6 @@
  * $Name:  $
  */
 
-
-#include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
 #define LIST_IMPLEMENTATION
 #include "neostats.h"
 #include "list.h"

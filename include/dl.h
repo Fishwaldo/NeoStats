@@ -34,8 +34,6 @@
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #endif
-#include <stdio.h>
-#include <time.h>
 
 /* 
  *   Ensure RTLD flags correctly defined

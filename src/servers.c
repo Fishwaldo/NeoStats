@@ -24,7 +24,6 @@
 */
 
 #include "neostats.h"
-#include "hash.h"
 #include "ircd.h"
 #include "exclude.h"
 #include "modules.h"

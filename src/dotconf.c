@@ -30,14 +30,9 @@
 ** $Id$
 */
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <ctype.h>
 #include "neostats.h"
 #include "dotconf.h"
-#include "support.h"
+
 static int word_count;		/* no. of option arguments */
 static char name[CFG_MAX_OPTION + 1];	/* option name */
 static char values[CFG_VALUES][CFG_MAX_VALUE + 1];	/* holds the arguments */

@@ -24,7 +24,6 @@
 /* @file global exclusion handling functions
  */
 
-#include <stdio.h>
 #include "neostats.h"
 #include "exclude.h"
 #include "services.h"

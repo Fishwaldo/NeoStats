@@ -25,7 +25,6 @@
 #include "ircd.h"
 #include "modes.h"
 #include "bots.h"
-#include "hash.h"
 #include "users.h"
 #include "channels.h"
 #include "exclude.h"

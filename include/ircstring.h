@@ -24,9 +24,6 @@
 #ifndef _IRCSTRING_H_
 #define _IRCSTRING_H_
 
-#include <stdarg.h>
-#include <stdio.h>
-
 /* [v]s[n]printf replacements */
 EXPORTFUNC int ircvsprintf(char *buf, const char *fmt, va_list args);
 EXPORTFUNC int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args);

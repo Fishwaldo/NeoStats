@@ -26,33 +26,73 @@
 #ifndef NEOSTATS_H
 #define NEOSTATS_H
 
+#ifdef WIN32
+#include "configwin32.h"
+#else
+#include "config.h"
+#endif
+
+#if 1
 #include <stddef.h>
+#endif
+#ifdef HAVE_STDIO_H
 #include <stdio.h>
+#endif
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
+#endif
+#ifdef HAVE_ERRNO_H
 #include <errno.h>
+#endif
 #ifdef WIN32
 #include <winsock2.h>
-#else
+#endif
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
+#ifdef HAVE_NETDB_H
 #include <netdb.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
+#endif
+#if 1
 #include <sys/resource.h>
 #endif
+#ifdef HAVE_TIME_H
 #include <time.h>
+#endif
+#ifdef HAVE_STRING_H
 #define __USE_GNU
 #include <string.h>
 #undef __USE_GNU
+#endif
+#if 1
 #include <stdarg.h>
+#endif
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+#ifdef HAVE_CTYPE_H
 #include <ctype.h>
+#endif
+#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
+#endif
+#ifdef HAVE_SETJMP_H
 #include <setjmp.h>
+#endif
+#ifdef HAVE_ASSERT_H
 #include <assert.h>
+#endif
 
 #ifdef WIN32
-#include "configwin32.h"
 #ifdef NEOSTATSCORE
 #define EXPORTFUNC __declspec(dllexport)
 #define EXPORTVAR __declspec(dllexport)
@@ -65,7 +105,6 @@
 #define MODULEVAR __declspec(dllexport)
 #endif
 #else
-#include "config.h"
 #define MODULEFUNC 
 #define MODULEVAR 
 #define EXPORTVAR

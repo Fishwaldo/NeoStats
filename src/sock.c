@@ -32,8 +32,9 @@
 #ifdef HAVE_SYS_POLL_H 
 #include <poll.h>
 #endif
-#include <fcntl.h>                   
-#include "adns.h"
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h> 
+#endif
 #include "timer.h"
 #include "dns.h"
 #include "transfer.h"

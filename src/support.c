@@ -24,7 +24,6 @@
 /* @file potentially missing C library functions
  */
 
-#include <stdio.h>
 #include "neostats.h"
 
 #ifndef HAVE_STRNLEN

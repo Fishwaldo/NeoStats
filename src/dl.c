@@ -27,8 +27,6 @@
  *  @brief module functions
  */ 
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "neostats.h"
 #include "dl.h"
 

@@ -25,7 +25,6 @@
 #define _TRANSFER_H_
 #include "neostats.h"
 #include "curl.h"
-#include "list.h"
 
 /* max URL size */
 #define MAXURL 64

@@ -43,10 +43,6 @@
  * $Name:  $
  */
 
-#include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
-#include <ctype.h>
 #define HASH_IMPLEMENTATION
 #include "neostats.h"
 #include "hash.h"

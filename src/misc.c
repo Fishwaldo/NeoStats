@@ -23,7 +23,6 @@
 ** $Id$
 */
 
-#include <stdio.h>
 #include "neostats.h"
 #include "services.h"
 

@@ -34,7 +34,6 @@
 #include "servers.h"
 #include "channels.h"
 #include "ircd.h"
-#include "hash.h"
 #include "exclude.h"
 #include "services.h"
 #include "bans.h"

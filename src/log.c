@@ -24,7 +24,6 @@
 */
 
 #include "neostats.h"
-#include "hash.h"
 #include "log.h"
 #include "services.h"
 #ifdef HAVE_BACKTRACE

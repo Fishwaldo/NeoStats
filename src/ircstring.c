@@ -28,12 +28,7 @@
  * than lib functions
  */
 
-/* If we're not using GNU C, elide __attribute__ */
-#ifndef __GNUC__
-#define __attribute__(x)  /* NOTHING */
-#endif
 #include "neostats.h"
-#include "ircstring.h"
 
 /* buffer for itoa conversion 
  * int ranges from 

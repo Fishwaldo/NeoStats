@@ -8,7 +8,7 @@
 #define HAVE_CTYPE_H 1
 
 /* Define to 1 if you have the <db.h> header file. */
-#define HAVE_DB_H 1
+/* #define HAVE_DB_H 1 */
 
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 /* #undef HAVE_DOPRNT */
@@ -96,9 +96,6 @@
 
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 /* #undef HAVE_NDIR_H */
-
-/* Define to 1 if you have the <netdb.h> header file. */
-#define HAVE_NETDB_H 1
 
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #define HAVE_NETINET_IN_H 1
@@ -198,7 +195,7 @@
 /* #undef HAVE_STRICMP */
 
 /* Define to 1 if you have the <strings.h> header file. */
-#define HAVE_STRINGS_H 1
+/*#define HAVE_STRINGS_H 1*/
 
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
@@ -223,32 +220,6 @@
 
 /* Define to 1 if you have the `strtok_r' function. */
 #define HAVE_STRTOK_R 1
-
-/* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
-   */
-/* #undef HAVE_SYS_DIR_H */
-
-/* Define to 1 if you have the <sys/dl.h> header file. */
-/* #undef HAVE_SYS_DL_H */
-
-/* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
-   */
-/* #undef HAVE_SYS_NDIR_H */
-
-/* Define to 1 if you have the <sys/param.h> header file. */
-#define HAVE_SYS_PARAM_H 1
-
-/* Define to 1 if you have the <sys/poll.h> header file. */
-/* #define HAVE_SYS_POLL_H 1 */
-
-/* Define to 1 if you have the <sys/select.h> header file. */
-#define HAVE_SYS_SELECT_H 1
-
-/* Define to 1 if you have the <sys/socket.h> header file. */
-#define HAVE_SYS_SOCKET_H 1
-
-/* Define to 1 if you have the <sys/sockio.h> header file. */
-/* #undef HAVE_SYS_SOCKIO_H */
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
@@ -391,9 +362,6 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
-
-/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
-#define TIME_WITH_SYS_TIME 1
 
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 /* #undef TM_IN_SYS_TIME */

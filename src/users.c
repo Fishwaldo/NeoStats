@@ -26,7 +26,6 @@
 #include "neostats.h"
 #include "ircd.h"
 #include "modes.h"
-#include "hash.h"
 #include "users.h"
 #include "channels.h"
 #include "exclude.h"

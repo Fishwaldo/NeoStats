@@ -28,7 +28,9 @@
 #ifdef HAVE_SYS_POLL_H 
 #include <poll.h>
 #endif
-#include <fcntl.h>                   
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h> 
+#endif
 
 static char tempbuf[BUFSIZE*2];
 

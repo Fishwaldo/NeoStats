@@ -24,7 +24,6 @@
 /* @file NeoStats interface to the curl library... 
  */
 
-#include <stdio.h>
 #include "neostats.h"
 #include "transfer.h"
 #include "curl.h"
