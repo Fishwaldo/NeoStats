@@ -24,6 +24,7 @@
 #include "neostats.h"
 #include "rta.h"
 #include "sqlsrv.h"
+#include <fcntl.h>
 
 #define MAXSQLCON 5
 
