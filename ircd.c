@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.11 2000/03/29 13:05:56 fishwaldo Exp $
+** $Id: ircd.c,v 1.12 2000/04/08 12:40:07 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -132,8 +132,8 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	AddUser(nick, user, host, me.name);
 	sts(":%s MODE %s :%s", nick, nick,modes);
 	sts(":%s JOIN %s",nick ,me.chan);
-	sts(":%s MODE %s +o %s",me.name,me.chan,nick);
-	sts(":%s MODE %s +a %s",nick,me.chan,nick);
+	sts(":%s MODE %s +o %s",s_Services,me.chan,nick);
+	sts(":%s MODE %s +a %s",s_Services,me.chan,nick);
 	sprintf(tmp, ":%s", modes);
 	UserMode(nick, tmp);
 	Module_Event("SIGNON", finduser(nick));

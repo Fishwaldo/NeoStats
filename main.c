@@ -163,9 +163,6 @@ void start()
 	init_server_hash();
 	init_user_hash();
 	init_chan_hash();
-/*
-	init_tld();
-*/
 	if (attempts < 10) {
 		attempts++;
 		log("Connecting to %s:%d", me.uplink, me.port);
@@ -210,6 +207,7 @@ void init_ServBot()
 	AddUser(s_Services, Servbot.user, Servbot.host, me.name);
 	sts(":%s MODE %s +Sqd", s_Services, s_Services);
 	sts(":%s JOIN %s",s_Services ,me.chan);
+	sts(":%s MODE %s +q %s",me.name, me.chan, s_Services);
 	sts(":%s MODE %s +o %s",me.name,me.chan,s_Services);
 	sts(":%s MODE %s +a %s",s_Services,me.chan,s_Services);
 	UserMode(s_Services, ":+Sqd"); 
