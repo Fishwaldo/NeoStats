@@ -23,11 +23,11 @@
 ** $Id$
 */
 
+#include "stats.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "stats.h"
 
 #include "statserv.h"
 #include "log.h"
