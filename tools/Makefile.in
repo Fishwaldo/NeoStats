@@ -4,6 +4,9 @@ INCLUDES = -I.. -I../keeper/ -I../adns/ -DHAVE_CONFIG_H
 
 KP_SOURCES= kp_exp.c kp_imp.c kptool.c
 KP_OBJECTS= kp_exp.o kp_imp.o kptool.o
+KEEPER_OBJS= ../keeper/kp_cache.o ../keeper/kp_dir.o ../keeper/kp_enum.o ../keeper/kp_get.o \
+			../keeper/kp_iface.o ../keeper/kp_recur.o ../keeper/kp_set.o ../keeper/kp_sort.o \
+			../keeper/kp_util.o
 all:	kptool @build_configtool@
 
 utils:  kptool @build_configtool@
@@ -11,7 +14,7 @@ utils:  kptool @build_configtool@
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 kptool:	$(KP_OBJECTS)
-	$(CC) $(KP_OBJECTS) ../adns/libadns.a ../keeper/libkeeper.a -o $@
+	$(CC) $(KP_OBJECTS) $(KEEPER_OBJS) -o $@
 
 configtool:
 	(cd cfgtool; $(MAKE) $@)

@@ -1,18 +1,13 @@
 include ../Makefile.inc
 
 INCLUDES = -I..
-RANLIB=ranlib
 
 SOURCES= check.c  event.c  general.c  parse.c  query.c  reply.c  setup.c  transmit.c  types.c
 OBJECTS= check.o  event.o  general.o  parse.o  query.o  reply.o  setup.o  transmit.o  types.o
-all:	libadns.a
+all:	$(OBJECTS)
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
-
-libadns.a: $(OBJECTS)
-	ar cru $@ ${OBJECTS}
-	${RANLIB} $@
 
 clean:
 	/bin/rm -rf *.o *.lo *.so *.a
@@ -20,11 +15,7 @@ clean:
 depend:
 	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SOURCES) > .depend
 
-
 install: 
-
-
-
 
 $(OBJECTS): Makefile ../Makefile.inc
 

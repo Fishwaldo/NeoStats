@@ -5,6 +5,9 @@ GCFLAGS = `gtk-config --cflags`
 GLDFLAGS = `gtk-config --libs`
 KP_SOURCES= gkeeper.c tree.c edit.c menu.c dialog.c
 KP_OBJECTS= gkeeper.o tree.o edit.o menu.o dialog.o
+KEEPER_OBJS= ../../keeper/kp_cache.o ../../keeper/kp_dir.o ../../keeper/kp_enum.o ../../keeper/kp_get.o \
+			../../keeper/kp_iface.o ../../keeper/kp_recur.o ../../keeper/kp_set.o ../../keeper/kp_sort.o \
+			../../keeper/kp_util.o
 all: 	configtool
 
 .c.o:
@@ -12,7 +15,7 @@ all: 	configtool
 
 
 configtool:	$(KP_OBJECTS)
-	$(CC) $(GLDFLAGS) $(KP_OBJECTS) ../../keeper/libkeeper.a -o $@
+	$(CC) $(GLDFLAGS) $(KP_OBJECTS) $(KEEPER_OBJS) -o $@
 
 clean:
 	/bin/rm -rf *.o *.lo *.so *.a configtool
