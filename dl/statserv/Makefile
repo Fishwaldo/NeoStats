@@ -2,23 +2,23 @@ include ../../Makefile.inc
 
 INCLUDES = -I../.. -I../../adns -I.
 
-SOURCES= statserv.c ss_help.c database.c tld.c stats.c htmlstats.c 
-OBJECTS= statserv.o ss_help.o database.o tld.o stats.o htmlstats.o 
+SRCS= statserv.c ss_help.c database.c tld.c stats.c htmlstats.c 
+OBJS= ${SRCS:.c=.o}
 TARGET= statserv.so
 GEOCFLAGS = $(CFLAGS) -DGEOIPDATADIR=\"$(DIRECTORY)/data\" -DSYSCONFDIR=\"$(DIRECTORY)/data/\"
 GEOSRCS = GeoIPBitReader.c GeoIP.c GeoIPCity.c md5.c
 GEOOBJS = GeoIPBitReader.o GeoIP.o GeoIPCity.o md5.o
 HTML= html/index.tpl
 DATA= GeoIP.dat
-DISTFILES= $(SOURCES) $(DATA) $(GEOSRCS) $(HTML) ChangeLog statserv.h m_stats.h Makefile sqlstats.h GeoIPBitReader.h GeoIP.h global.h GeoIPCity.h md5.h   
+DISTFILES= $(SRCS) $(DATA) $(GEOSRCS) $(HTML) ChangeLog statserv.h m_stats.h Makefile sqlstats.h GeoIPBitReader.h GeoIP.h global.h GeoIPCity.h md5.h   
 
 all:	statserv
 
 .c.o:
 	$(CC) -c $< $(GEOCFLAGS) $(INCLUDES) 
 
-statserv: $(OBJECTS) $(GEOOBJS)
-	ld $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS) $(GEOOBJS)
+statserv: $(OBJS) $(GEOOBJS)
+	ld $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS) $(GEOOBJS)
 
 clean:
 	/bin/rm -rf ../$(TARGET)
@@ -30,14 +30,14 @@ install: statserv
 	$(INSTALL) -m 644 $(DATA) $(DIRECTORY)/data
 
 dist:	$(DISTFILES)
-	@mkdir $(distdir)/html
-	@chmod 777 $(distdir)/html
+	@mkdir $(DISTDIR)/html
+	@chmod 777 $(DISTDIR)/html
 	@for files in $(DISTFILES); do \
-		cp $$files $(distdir)/$$files; \
+		cp $$files $(DISTDIR)/$$files; \
 	done
 
 
-$(OBJECTS): Makefile
+$(OBJS): Makefile
 statserv.o:		statserv.c	ss_help.c	statserv.h  sqlstats.h
 ss_help.o:	ss_help.c	statserv.h
 database.o:	database.c	statserv.h

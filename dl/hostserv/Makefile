@@ -2,18 +2,18 @@ include ../../Makefile.inc
 
 INCLUDES = -I../.. -I../../adns
 
-SOURCES= hostserv.c
-OBJECTS= hostserv.o
+SRCS= hostserv.c
+OBJS= ${SRCS:.c=.o}
 TARGET= hostserv.so
-DISTFILES = $(SOURCES) hs_help.c Makefile README ChangeLog
+DISTFILES = $(SRCS) hs_help.c Makefile README ChangeLog
 
 all:	hostserv 
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-hostserv: $(OBJECTS)
-	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
+hostserv: $(OBJS)
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:
 	/bin/rm -rf ../$(TARGET) 
@@ -24,10 +24,10 @@ install: hostserv
 
 dist:	$(DISTFILES)
 	@for files in $(DISTFILES); do \
-		cp $$files $(distdir)/$$files; \
+		cp $$files $(DISTDIR)/$$files; \
 	done
 
 
 
-$(OBJECTS): Makefile
+$(OBJS): Makefile
 hostserv.o:		hostserv.c	hs_help.c	

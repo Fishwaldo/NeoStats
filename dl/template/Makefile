@@ -2,18 +2,18 @@ include ../../Makefile.inc
 
 INCLUDES = -I../.. -I../../adns
 
-SOURCES= template.c
-OBJECTS= template.o
+SRCS= template.c
+OBJS= ${SRCS:.c=.o}
 TARGET= template.so
-DISTFILES= $(SOURCES) Makefile
+DISTFILES= $(SRCS) Makefile
 
 all:	template
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-template: $(OBJECTS)
-	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
+template: $(OBJS)
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:
 	/bin/rm -rf ../$(TARGET)
@@ -24,10 +24,10 @@ install: template
 
 dist:	$(DISTFILES)
 	@for files in $(DISTFILES); do \
-		cp $$files $(distdir)/$$files; \
+		cp $$files $(DISTDIR)/$$files; \
 	done
 
 
 
-$(OBJECTS): Makefile
+$(OBJS): Makefile
 template.o:		template.c	

@@ -2,18 +2,18 @@ include ../../Makefile.inc
 
 INCLUDES = -I../.. -I../../adns
 
-SOURCES= loveserv.c
-OBJECTS= loveserv.o
+SRCS= loveserv.c
+OBJS= ${SRCS:.c=.o}
 TARGET= loveserv.so
-DISTFILES = $(SOURCES) ls_help.c Makefile ChangeLog 
+DISTFILES = $(SRCS) ls_help.c Makefile ChangeLog 
 
 all:	loveserv
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-loveserv: $(OBJECTS)
-	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
+loveserv: $(OBJS)
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:
 	/bin/rm -rf ../$(TARGET)
@@ -24,10 +24,10 @@ install: loveserv
 
 dist:	$(DISTFILES)
 	@for files in $(DISTFILES); do \
-		cp $$files $(distdir)/$$files; \
+		cp $$files $(DISTDIR)/$$files; \
 	done
 
 
 
-$(OBJECTS): Makefile
+$(OBJS): Makefile
 loveserv.o:		loveserv.c	ls_help.c

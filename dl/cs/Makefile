@@ -2,18 +2,18 @@ include ../../Makefile.inc
 
 INCLUDES = -I../.. -I../../adns
 
-SOURCES= cs.c
-OBJECTS= cs.o
+SRCS= cs.c
+OBJS= ${SRCS:.c=.o}
 TARGET= connectserv.so
-DISTFILES = $(SOURCES) cs.h Makefile ChangeLog cs_help.c
+DISTFILES = $(SRCS) cs.h Makefile ChangeLog cs_help.c
 
 all:	cs
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-cs: $(OBJECTS)
-	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
+cs: $(OBJS)
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:
 	/bin/rm -rf ../$(TARGET)
@@ -24,10 +24,10 @@ install: cs
 
 dist: 	$(DISTFILES)
 	@for files in $(DISTFILES); do \
-		cp $$files $(distdir)/$$files; \
+		cp $$files $(DISTDIR)/$$files; \
 	done
 
 
 
-$(OBJECTS): Makefile
+$(OBJS): Makefile
 cs.o:		cs.c	cs_help.c

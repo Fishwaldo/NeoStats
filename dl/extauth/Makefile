@@ -2,8 +2,8 @@ include ../../Makefile.inc
 
 INCLUDES = -I../.. -I../../adns
 
-SOURCES= $(extauth_src) 
-OBJECTS= $(extauth_objs)
+SRCS= $(extauth_src) 
+OBJS= $(extauth_objs)
 TARGET= extauth.so
 DISTFILES = serviceroots.c Makefile
 
@@ -12,8 +12,8 @@ all:	extauth
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-extauth: $(OBJECTS)
-	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
+extauth: $(OBJS)
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:
 	/bin/rm -rf ../$(TARGET)
@@ -24,10 +24,10 @@ install: extauth
 
 dist:	$(DISTFILES)
 	@for files in $(DISTFILES); do \
-		cp $$files $(distdir)/$$files; \
+		cp $$files $(DISTDIR)/$$files; \
 	done
 
 
 
-$(OBJECTS): Makefile
+$(OBJS): Makefile
 serviceroots.o:		serviceroots.c
