@@ -472,8 +472,7 @@ int ns_cmd_botlist( CmdParams *cmdparams )
 		cm = list_first( botptr->u->user->chans );
 		irc_chanalert( ns_botptr, _( "Channels:" ) );
 		while( cm ) {
-				irc_chanalert( ns_botptr, "    %s", ( char * ) lnode_get( cm ) );
-			}
+			irc_chanalert( ns_botptr, "    %s", ( char * ) lnode_get( cm ) );
 			cm = list_next( botptr->u->user->chans, cm );
 		}
 	}
