@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.42 2003/09/11 13:08:15 fishwaldo Exp $
+** $Id: stats.c,v 1.43 2003/09/11 13:37:34 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -64,6 +64,7 @@ CVersions *findversions(char *name)
 	return cv;
 }
 
+#define ATTR_CTCP '\001'
 #define ATTR_BOLD '\002'
 #define ATTR_COLOR '\003'
 #define ATTR_BEEP '\007'
@@ -113,13 +114,16 @@ Strip_Colors (unsigned char *text, int len, unsigned char *outbuf, int *newlen)
 			case ATTR_UNDERLINE:
 			case ATTR_STAR:
 			case ATTR_QUESTION:
+			case ATTR_CTCP:
 				break;
 			default:
-				if ((int)*text > 127) 
-					break;
 				new_str[i] = *text;
-					i++;
+				i++;
+				text++;
+				len--;
+				continue;
 			}
+			
 		}
 		text++;
 		len--;
@@ -138,16 +142,20 @@ int s_client_version(char **av, int ac)
 {
 	lnode_t *node;
 	CVersions *clientv;
-	char *nocols;
-	
+	char *nocols = av[1];
+#if 0
+/* doesn't work to well atm */	
 	nocols = Strip_Colors(av[1], strlen(av[1]), NULL, NULL);
-
+#endif
+	
 	clientv = findversions(nocols);
 	if (clientv) {
 		nlog(LOG_DEBUG2, LOG_MOD, "Found Client Version Node %s",
 		     nocols);
 		clientv->count++;
+#if 0
 		free(nocols);
+#endif
 		return 1;
 	}
 	clientv = malloc(sizeof(CVersions));
@@ -157,7 +165,9 @@ int s_client_version(char **av, int ac)
 	list_append(Vhead, node);
 	nlog(LOG_DEBUG2, LOG_MOD, "Added Version to List %s",
 	     clientv->name);
+#if 0
 	free(nocols);
+#endif
 	return 1;
 }
 
