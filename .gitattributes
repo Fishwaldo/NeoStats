@@ -375,7 +375,6 @@ modules/statserv/geoipwin32/md5.c -text
 modules/statserv/geoipwin32/md5.h -text
 modules/statserv/html/index.tpl -text
 modules/statserv/htmlstats.c -text
-modules/statserv/sqlstats.h -text
 modules/statserv/ss_help.c -text
 modules/statserv/stats.c -text
 modules/statserv/statserv.c -text

@@ -182,7 +182,9 @@ int ModInit (Module *mod_ptr)
 	GetChannelList(StatsAddChan);
 	/* TODO get member counts */
 
+#ifdef RTA_SUPPORT
 	statserv_rta_init ();
+#endif
 
 #ifdef USE_BERKELEY
 	DBOpenDatabase();
@@ -235,7 +237,9 @@ void ModFini (void)
 	FiniTLD ();
 	save_client_versions ();
 
+#ifdef RTA_SUPPORT
 	statserv_rta_fini();
+#endif      
 
 #ifdef USE_BERKELEY
 	DBCloseDatabase();

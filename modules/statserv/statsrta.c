@@ -25,6 +25,7 @@
 
 #include "neostats.h"
 #include "statserv.h"
+#ifdef RTA_SUPPORT
 #include "rta.h"
 
 COLDEF statserv_chanscols[] = {
@@ -851,3 +852,4 @@ void statserv_rta_fini (void)
 	list_destroy (fakenetwork);
 }
 
+#endif
