@@ -154,7 +154,7 @@ struct daily_ {
 
 struct tld_ {
 	char tld[5];
-	char *country;
+	char country[32];
 	int users;
 	int daily_users;
 	/* for region/isp edition of GeoIP */

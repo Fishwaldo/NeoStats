@@ -477,6 +477,65 @@ TBLDEF statserv_versions = {
 	"The stats of IRC client versions on the IRC network"
 };
 
+COLDEF statserv_tldcols[] = {
+	{
+		"statserv_tld",
+		"tld",
+		RTA_STR,
+		5,
+		offsetof(TLD, tld),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"The tld name"
+	},
+	{
+		"statserv_tld",
+		"country",
+		RTA_STR,
+		32,
+		offsetof(TLD, country),
+		RTA_READONLY,
+		NULL, 
+		NULL,
+		"The Country name"
+	},
+	{
+		"statserv_tld",
+		"users",
+		RTA_INT,
+		sizeof(int),
+		offsetof(TLD, users),
+		RTA_READONLY,
+		NULL, 
+		NULL,
+		"The No of Online Users"
+	},
+	{
+		"statserv_tld",
+		"daily_users",
+		RTA_INT,
+		sizeof(int),
+		offsetof(TLD, daily_users),
+		RTA_READONLY,
+		NULL, 
+		NULL,
+		"The No of Users connected today"
+	},
+};
+
+TBLDEF statserv_tld = {
+	"statserv_tld",
+	NULL, 	/* for now */
+	sizeof(TLD),
+	0,
+	TBL_LIST,
+	statserv_tldcols,
+	sizeof(statserv_tldcols) / sizeof(COLDEF),
+	"",
+	"The TLD stats of the IRC network"
+};
+
 COLDEF statserv_networkcols[] = {
 	{
 		"statserv_network",

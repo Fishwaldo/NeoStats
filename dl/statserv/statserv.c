@@ -243,6 +243,8 @@ int __ModInit(int modnum, int apiver)
 	 
 	statserv_chans.address = Chead;
 	rta_add_table(&statserv_chans);
+	statserv_tld.address = Thead;
+	rta_add_table(&statserv_tld);
 	statserv_servers.address = Shead;
 	rta_add_table(&statserv_servers);
 	statserv_versions.address = Vhead;

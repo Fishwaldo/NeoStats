@@ -143,8 +143,7 @@ void AddTLD(User * u)
 		country_name = GeoIP_country_name_by_addr(gi, ipaddr);
 		t = malloc(sizeof(TLD));
 		strlcpy(t->tld, country_code, 5);
-		t->country = malloc(strlen(country_name)+1);
-		strlcpy(t->country, country_name, strlen(country_name)+1);
+		strlcpy(t->country, country_name, 32);
 		t->users = 1;
 		t->daily_users = 1;
 		tn = lnode_create(t);
@@ -179,7 +178,6 @@ void init_tld()
 	t = malloc(sizeof(TLD));
 	bzero(t, sizeof(TLD));
 	ircsnprintf(t->tld, 5, "???");
-	t->country = malloc(8);
 	strlcpy(t->country, "Unknown", 8);
 	tn = lnode_create(t);
 	list_append(Thead, tn);
