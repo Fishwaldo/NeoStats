@@ -20,7 +20,8 @@ Frequently Asked Questions (FAQ)
 	2.1 When I type compile nothing happens, whats wrong?
 	2.2 Typing stats says no file/directory, how do I load it?
 	2.3 Typing neostats says no file/directory, how do I load it?
-	2.4 When NeoStats tries to connect it says "No N Line!" How do I add one?
+	2.4 When NeoStats tries to connect it says "No N Line!" How do I 
+	    add one?
 3 Module questions
 	3.1 I upgraded NeoStats and now it crashes when it loads modules 
 	    like OPSB.
@@ -61,10 +62,10 @@ Frequently Asked Questions (FAQ)
 	NeoStats on many occasions. At this stage the code needs a number 
 	of changes so although we one day hope to provide a Windows version,
 	don't be surprised if this is some time away. Once we have the 
-	remaining bugs ironed out, a windows version has a 50% chance of 
+	remaining bugs ironed out, a Windows version has a 50% chance of 
 	happening. Don't ask us when, we don't know. 
 	
-	The main NeoStats core will now compiler and run on Windows using 
+	The main NeoStats core will now compile and run on Windows using 
 	cygwin but modules currently do not work. 
 
 -----------------------------------<>-----------------------------------
@@ -81,17 +82,19 @@ Frequently Asked Questions (FAQ)
 
 1.4 What Services package does the team recommend?
 
-	NeoStats has been testing with most major Services Packages, such as
+	NeoStats has been tested with most major Services packages, such as
 	Epona, Anope, Daylight II, Magik, IRC Services. 
 	Other Services packages may also work with NeoStats. 
 
 -----------------------------------<>-----------------------------------
 
-1.5 What Operating System does NeoStats Run on?
+1.5 What Operating System does NeoStats run on?
 
-	NeoStats runs best under any Linux/Unix Based Environment.
-	NeoStats now runs fine on BSD system.
-	NeoStats DOES NOT RUN UNDER MACINTOSH OR WINDOWS!!!
+	NeoStats runs under any Linux/Unix based environment and BSD.
+	The main NeoStats core will compile and run on Windows using cygwin 
+	but modules currently do not work. See 1.2 for more information on
+	Windows.
+	NeoStats DOES NOT RUN ON MACINTOSH!!!
 
 -----------------------------------<>-----------------------------------
 
@@ -260,6 +263,6 @@ Frequently Asked Questions (FAQ)
 -----------------------------------<>-----------------------------------
 
 ************************************************************************
-** This document was last updated on October 6th, 2004 by M and is    **
+** This document was last updated on February 9th, 2004 by M and is   **
 ** based on documents originally created by Shmad and Fish.           **
 ************************************************************************
