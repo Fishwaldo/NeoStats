@@ -201,7 +201,7 @@ do_dns ()
 			lnode_destroy (dnsnode1);
 			break;
 		}
-		nlog (LOG_NORMAL, LOG_CORE, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->mod_name);
+		nlog (LOG_DEBUG1, LOG_CORE, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->mod_name);
 		SET_SEGV_INMODULE(dnsdata->mod_name);
 		/* call the callback function */
 		dnsdata->callback (dnsdata->data, dnsdata->a);
