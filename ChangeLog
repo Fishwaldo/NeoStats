@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - HostServ: Improved ban handling. (M)
  - HostServ: LEVELS command removed since core now handles this. (M)
  - All commands now have a configurable minimum user level using the command
    /msg botname LEVELS. (M)
