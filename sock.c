@@ -663,6 +663,7 @@ sql_accept_conn(int srvfd)
   }
   else
   {
+#if 0 //def HAVE_INET_NTOP
     inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
     if (!match(me.sqlhost, tmp)) {
     	/* we didnt get a match, bye bye */
@@ -671,6 +672,7 @@ sql_accept_conn(int srvfd)
 	free(newui);
         return;
     }
+#endif
     /* inc number ui, then init new ui */
     flags = fcntl(newui->fd, F_GETFL, 0);
     flags |= O_NONBLOCK;
@@ -681,7 +683,9 @@ sql_accept_conn(int srvfd)
     newui->nbyteout = 0;
     newuinode = lnode_create(newui);
     list_append(sqlconnections, newuinode);
+#if 0 //def HAVE_INET_NTOP
     inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
+#endif
     nlog(LOG_DEBUG1, LOG_CORE, "New SqlConnection from %s", tmp);
   }
 }

@@ -119,7 +119,7 @@ UserModes user_umodes[] = {
 	{UMODE_DEAF,		'd', 0},
 	{UMODE_CHSERV,		'k', 0},
 	{UMODE_ACCOUNT,     'r', 0},
-	{UMODE_HIDDENHOST,  'x', 0},
+	{UMODE_HIDE,		'x', 0},
 	/* Afternet extension */
 	{UMODE_HELPER,		'h', 0},
 };
