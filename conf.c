@@ -201,6 +201,10 @@ ConfLoadModules ()
 	int rval;
 
 	SET_SEGV_LOCATION();
+	if(load_mods[1] == 0) {
+		nlog (LOG_NORMAL, LOG_CORE, "No modules configured  for loading"); 
+		return NS_SUCCESS;
+	}
 	nlog (LOG_NORMAL, LOG_CORE, "Loading configured modules"); 
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
 		nlog (LOG_DEBUG1, LOG_CORE, "Loading Module %s", (char *)load_mods[i]);
@@ -212,7 +216,7 @@ ConfLoadModules ()
 		}
 	}
 	nlog (LOG_NORMAL, LOG_CORE, "Completed loading configured modules"); 
-	return 1;
+	return NS_SUCCESS;
 }
 
 
