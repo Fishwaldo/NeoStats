@@ -23,26 +23,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ircup10", "src\protocol\irc
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "liquid", "src\protocol\liquid.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
-	ProjectSection(ProjectDependencies) = postProject
-		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mystic", "src\protocol\mystic.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
-	ProjectSection(ProjectDependencies) = postProject
-		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "neoircd", "src\protocol\neoircd.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
-	ProjectSection(ProjectDependencies) = postProject
-		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "quantum", "src\protocol\quantum.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
-	ProjectSection(ProjectDependencies) = postProject
-		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ultimate2", "src\protocol\ultimate2.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
@@ -59,11 +39,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unreal31", "src\protocol\un
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unreal32", "src\protocol\unreal32.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
-	ProjectSection(ProjectDependencies) = postProject
-		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viagra", "src\protocol\viagra.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
@@ -134,26 +109,6 @@ Global
 		{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}.Debug.Build.0 = Debug|Win32
 		{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}.Release.ActiveCfg = Release|Win32
 		{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}.Release.Build.0 = Release|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.ActiveCfg = Debug|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.Build.0 = Debug|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.ActiveCfg = Release|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.Build.0 = Release|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.ActiveCfg = Debug|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.Build.0 = Debug|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.ActiveCfg = Release|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.Build.0 = Release|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.ActiveCfg = Debug|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.Build.0 = Debug|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.ActiveCfg = Release|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.Build.0 = Release|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.ActiveCfg = Debug|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.Build.0 = Debug|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.ActiveCfg = Release|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.Build.0 = Release|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.ActiveCfg = Debug|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.Build.0 = Debug|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.ActiveCfg = Release|Win32
-		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.Build.0 = Release|Win32
 		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.ActiveCfg = Debug|Win32
 		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.Build.0 = Debug|Win32
 		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.ActiveCfg = Release|Win32
