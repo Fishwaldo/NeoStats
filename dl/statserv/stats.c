@@ -379,16 +379,8 @@ int s_user_modes(char **av, int ac)
 	SET_SEGV_LOCATION();
 	u = finduser(av[0]);
 	if (!u) {
-		nlog(LOG_WARNING, LOG_MOD,
-			"s_user_modes: mode change for unknown user %s", u->nick);
 		return -1;
 	}
-#if 0
-/* old code, lets try the new code */
-	if (!u->modes)
-		return -1;
-	modes = u->modes;
-#endif
 	s = findstats(u->server->name);
 	if (!s) {
 		nlog(LOG_WARNING, LOG_MOD,
