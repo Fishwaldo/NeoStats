@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(dl.c)
-AC_CONFIG_HEADER(config.h)
+AC_INIT(src/main.c)
+AC_CONFIG_HEADER(src/config.h)
 PACKAGE=NeoStats
 MAJOR=3
 MINOR=0
@@ -527,9 +527,6 @@ fi
 
 AC_SUBST(build_configtool)
 
-
-AC_MSG_CHECKING(Your Current Bank Balance)
-AC_MSG_RESULT(Thats Impressive!!!)
 AC_MSG_CHECKING(The Modules that will be compiled)
 AC_MSG_RESULT($MODULES)
 
@@ -569,10 +566,10 @@ AC_SUBST(EXTAUTH_SRC)
 AC_SUBST(EXTAUTH_OBJS)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
-AC_CONFIG_HEADER(adns/config.h)
-AC_CONFIG_HEADER(pcre/config.h)
-AC_OUTPUT(Makefile.inc Makefile dl/Makefile.inc sqlsrv/Makefile tools/Makefile pcre/Makefile pcre.h:pcre/pcre.in)
-NEO_SUBDIR_CONFIG(curl, [--disable-thread --disable-ipv6 --enable-nonblocking --without-ssl])
+AC_CONFIG_HEADER(src/adns/config.h)
+AC_CONFIG_HEADER(src/pcre/config.h)
+AC_OUTPUT(src/Makefile.inc src/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile src/pcre/Makefile src/pcre.h:src/pcre/pcre.in)
+NEO_SUBDIR_CONFIG(src/curl, [--disable-thread --disable-ipv6 --enable-nonblocking --without-ssl])
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"
 echo "(*----------------------------------------------------------*)"

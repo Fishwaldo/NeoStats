@@ -270,7 +270,7 @@ PACKAGE_VERSION=
 PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
-ac_unique_file="dl.c"
+ac_unique_file="src/main.c"
 ac_default_prefix=~/NeoStats
 # Factoring default headers for most tests.
 ac_includes_default="\
@@ -1278,7 +1278,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-          ac_config_headers="$ac_config_headers config.h"
+          ac_config_headers="$ac_config_headers src/config.h"
 
 PACKAGE=NeoStats
 MAJOR=3
@@ -6714,11 +6714,6 @@ fi
 
 
 
-
-echo "$as_me:$LINENO: checking Your Current Bank Balance" >&5
-echo $ECHO_N "checking Your Current Bank Balance... $ECHO_C" >&6
-echo "$as_me:$LINENO: result: Thats Impressive!!!" >&5
-echo "${ECHO_T}Thats Impressive!!!" >&6
 echo "$as_me:$LINENO: checking The Modules that will be compiled" >&5
 echo $ECHO_N "checking The Modules that will be compiled... $ECHO_C" >&6
 echo "$as_me:$LINENO: result: $MODULES" >&5
@@ -6768,11 +6763,11 @@ _ACEOF
 
 
 
-          ac_config_headers="$ac_config_headers adns/config.h"
+          ac_config_headers="$ac_config_headers src/adns/config.h"
 
-          ac_config_headers="$ac_config_headers pcre/config.h"
+          ac_config_headers="$ac_config_headers src/pcre/config.h"
 
-                                                                      ac_config_files="$ac_config_files Makefile.inc Makefile dl/Makefile.inc sqlsrv/Makefile tools/Makefile pcre/Makefile pcre.h:pcre/pcre.in"
+                                                                      ac_config_files="$ac_config_files src/Makefile.inc src/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile src/pcre/Makefile src/pcre.h:src/pcre/pcre.in"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -7297,16 +7292,16 @@ for ac_config_target in $ac_config_targets
 do
   case "$ac_config_target" in
   # Handling of arguments.
-  "Makefile.inc" ) CONFIG_FILES="$CONFIG_FILES Makefile.inc" ;;
-  "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-  "dl/Makefile.inc" ) CONFIG_FILES="$CONFIG_FILES dl/Makefile.inc" ;;
-  "sqlsrv/Makefile" ) CONFIG_FILES="$CONFIG_FILES sqlsrv/Makefile" ;;
-  "tools/Makefile" ) CONFIG_FILES="$CONFIG_FILES tools/Makefile" ;;
-  "pcre/Makefile" ) CONFIG_FILES="$CONFIG_FILES pcre/Makefile" ;;
-  "pcre.h" ) CONFIG_FILES="$CONFIG_FILES pcre.h:pcre/pcre.in" ;;
-  "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-  "adns/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS adns/config.h" ;;
-  "pcre/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS pcre/config.h" ;;
+  "src/Makefile.inc" ) CONFIG_FILES="$CONFIG_FILES src/Makefile.inc" ;;
+  "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+  "src/modules/Makefile.inc" ) CONFIG_FILES="$CONFIG_FILES src/modules/Makefile.inc" ;;
+  "src/sqlsrv/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/sqlsrv/Makefile" ;;
+  "src/tools/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/tools/Makefile" ;;
+  "src/pcre/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/pcre/Makefile" ;;
+  "src/pcre.h" ) CONFIG_FILES="$CONFIG_FILES src/pcre.h:src/pcre/pcre.in" ;;
+  "src/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/config.h" ;;
+  "src/adns/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/adns/config.h" ;;
+  "src/pcre/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/pcre/config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
@@ -7962,13 +7957,13 @@ rm -f confcache
 
     echo
     echo "----------------------------------------------------------------"
-    echo "configuring package in curl now"
+    echo "configuring package in src/curl now"
     echo "----------------------------------------------------------------"
     ac_popdir=`pwd`
-    ac_abs_srcdir=`(cd $srcdir/curl && pwd)`
-    apr_config_subdirs="curl"
-    test -d curl || $MKDIR curl
-    cd curl
+    ac_abs_srcdir=`(cd $srcdir/src/curl && pwd)`
+    apr_config_subdirs="src/curl"
+    test -d src/curl || $MKDIR src/curl
+    cd src/curl
 
     #changequote(, )dnl
     # A "../" for each directory in /$config_subdirs.
@@ -7985,9 +7980,9 @@ rm -f confcache
     # The eval makes quoting arguments work.
     if eval $ac_abs_srcdir/configure $ac_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_abs_srcdir --disable-thread --disable-ipv6 --enable-nonblocking --without-ssl
     then :
-      echo "curl configured properly"
+      echo "src/curl configured properly"
     else
-      echo "configure failed for curl"
+      echo "configure failed for src/curl"
       exit 1
     fi
     cd $ac_popdir
