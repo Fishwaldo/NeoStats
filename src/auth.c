@@ -32,7 +32,7 @@
  */
 
 /** This will hard code root access to a nick agreed with the 
- *  development team and is should only ever be enabled on 
+ *  development team and should only ever be enabled on 
  *  request by us on the networks of our testers to help 
  *  fix bugs in NeoStats where there is no other way to provide
  *  the necessary access.

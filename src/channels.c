@@ -132,16 +132,15 @@ void ChannelTopic( const char *chan, const char *owner, const char *ts, const ch
 	ns_free( cmdparams );
 }
 
-/** @brief Create a new channel record
+/** @brief new_chan
  *
- * And insert it into the hash, mallocing required memory for it and so on
- * also check that the channel hash is not full
+ *  Create new channel record and insert it into the hash.
  *
- * @param chan name of the channel to create
+ *  @param chan name of channel to create
  *
- * @returns c the newly created channel record
- * @todo Dynamically resizable channel hashes
-*/
+ *  @return c pointer to created channel record
+ */
+
 static Channel *new_chan( const char *chan )
 {
 	CmdParams *cmdparams;
@@ -173,17 +172,16 @@ static Channel *new_chan( const char *chan )
 	return c;
 }
 
-/** @brief Deletes a channel record
+/** @brief del_chan
  *
- * frees any memory associated with the record and removes it from the channel hash
+ *  frees memory associated with channel and removes it from the channel hash
  *
- * @param c the corrosponding channel structure you wish to delete
+ *  @param c pointer to channel structure to delete
  *
- * @returns Nothing
-*/
+ *  @return none
+ */
 
-void
-del_chan( Channel *c )
+void del_chan( Channel *c )
 {
 	CmdParams *cmdparams;
 	hnode_t *cn;
@@ -207,15 +205,18 @@ del_chan( Channel *c )
 	ns_free( c );
 }
 
-/** @brief Deletes a channel user record
+/** @brief del_user_channel
  *
- * frees any memory associated with the record and removes it from the hash
+ *  Deletes channel user record and remove it from the hash
+ *  Channel subsystem use only.
  *
- * @param c the corrosponding channel structure you wish to delete
+ *  @param c pointer to channel structure to delete
+ *  @param u pointer to user client to delete
  *
- * @returns Nothing
-*/
-void del_user_channel( Channel *c, Client *u )
+ *  @return none
+ */
+
+static void del_user_channel( Channel *c, Client *u )
 {
 	lnode_t *un;
 
@@ -227,11 +228,18 @@ void del_user_channel( Channel *c, Client *u )
 	}
 }
 
-/** @brief Remove Channel Member
+/** @brief del_user_channel
  *
+ *  Deletes channel member record
+ *  Channel subsystem use only.
  *
+ *  @param c pointer to channel structure to delete
+ *  @param u pointer to user client to delete
+ *
+ *  @return none
  */
-int del_channel_member( Channel *c, Client *u )
+
+static void del_channel_member( Channel *c, Client *u )
 {
 	ChannelMember *cm;
 	lnode_t *un;
@@ -239,21 +247,26 @@ int del_channel_member( Channel *c, Client *u )
 	un = list_find( c->members, u->name, comparechanmember );
 	if( !un ) {
 		nlog( LOG_WARNING, "%s isn't a member of channel %s", u->name, c->name );
-		return NS_FAILURE;
+		return;
 	}
 	cm = lnode_get( un );
 	lnode_destroy( list_delete( c->members, un ) );
 	ns_free( cm );
 	dlog( DEBUG3, "del_channel_member: cur users %s %d (list %d)", c->name, c->users,( int )list_count( c->members ) );
 	c->users--;
-	return NS_SUCCESS;
 }
 
-/** @brief Delete empty channels and raise appropriate events
+/** @brief CheckEmptyChannel
  *
+ *  Delete empty channels and raise appropriate events
+ *  Channel subsystem use only.
  *
+ *  @param c pointer to channel structure to delete
+ *
+ *  @return none
  */
-void CheckEmptyChannel( Channel *c )
+
+static void CheckEmptyChannel( Channel *c )
 {
 	if( c->users <= 0 ) {
 		del_chan( c );
@@ -263,18 +276,20 @@ void CheckEmptyChannel( Channel *c )
 	}
 }
 
-/** @brief Process a kick from a channel. 
+/** @brief KickChannel
  *
- * In fact, this does nothing special apart from call PartChannel, and processing a channel kick
- * @param kickby, the user nick or servername doing the kick
- * @param chan, channel name user being kicked from
- * @param kicked, the user nick getting kicked
- * @param kickreason the reason the user was kicked
+ *  Process a kick from a channel. 
+ *  NeoStats core use only.
  *
+ *  @param kickby, the user nick or servername doing the kick
+ *  @param chan, channel name user being kicked from
+ *  @param kicked, the user nick getting kicked
+ *  @param kickreason the reason the user was kicked
+ *
+ *  @return none
  */
 
-void
-KickChannel( const char *kickby, const char *chan, const char *kicked, const char *kickreason )		
+void KickChannel( const char *kickby, const char *chan, const char *kicked, const char *kickreason )		
 {
 	CmdParams *cmdparams;
 	Channel *c;
@@ -322,17 +337,18 @@ KickChannel( const char *kickby, const char *chan, const char *kicked, const cha
 	}
 }
 
-/** @brief Parts a user from a channel
+/** @brief PartChannel
  *
- * Parts a user from a channel and raises events if required
- * Events raised are PARTCHAN and DELCHAN
- * if its one of our bots, also update bot channel lists
+ *  Parts a user from a channel and raises events if required
+ *  Events raised are PARTCHAN and DELCHAN
+ *  if its one of our bots, also update bot channel lists
+ *  NeoStats core use only.
  *
- * @param u the User structure corrosponding to the user that left the channel
- * @param chan the channel to part them from
- * @param reason the reason the user parted, if any
+ *  @param u the User structure corrosponding to the user that left the channel
+ *  @param chan the channel to part them from
+ *  @param reason the reason the user parted, if any
  *
- * @returns Nothing
+ *  @return none
 */
 
 void PartChannel( Client *u, const char *chan, const char *reason )

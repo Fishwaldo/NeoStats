@@ -185,7 +185,7 @@ int dcc_read(Client *dcc)
 	return NS_SUCCESS;
 }
 
-int dcc_write(Client *dcc, char *buf)
+int dcc_write(const Client *dcc, char *buf)
 {
 	static char dcc_buf[BUFSIZE];
 	int      ret;        /* write() return value */
@@ -204,7 +204,7 @@ int dcc_write(Client *dcc, char *buf)
 	return NS_SUCCESS;
 }
 
-void dcc_send_msg(Client* dcc, char * buf)
+void dcc_send_msg(const Client* dcc, char * buf)
 {
 	dcc_write(dcc, buf);
 }

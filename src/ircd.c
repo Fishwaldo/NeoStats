@@ -713,13 +713,8 @@ static void unsupported_cmd( const char* cmd )
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int 
-irc_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
+int irc_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
 {
-	if( !irc_send_server_connect ) {
-		unsupported_cmd( "SERVER CONNECT" );
-		return NS_FAILURE;
-	}
 	irc_send_server_connect( name, numeric, infoline, pass, tsboot, tslink );
 	return NS_SUCCESS;
 }
@@ -1054,7 +1049,7 @@ irc_part( const Bot *botptr, const char *chan, const char *quitmsg )
 		c->persistentusers --;
 	}
 	irc_send_part( botptr->u->name, chan, quitmsg ? quitmsg : "" );
-	PartChannel( botptr->u,( char * ) chan, quitmsg );
+	PartChannel( botptr->u, ( char * ) chan, quitmsg );
 	return NS_SUCCESS;
 }
 
@@ -1209,7 +1204,7 @@ irc_kick( const Bot *botptr, const char *chan, const char *target, const char *r
 		return NS_FAILURE;
 	}
 	irc_send_kick( botptr->u->name, chan, target, reason );
-	PartChannel( FindUser( target ),( char * ) chan, reason[0] != 0 ?( char * )reason : NULL );
+	PartChannel( FindUser( target ), ( char * ) chan, reason[0] != 0 ?( char * )reason : NULL );
 	return NS_SUCCESS;
 }
 
