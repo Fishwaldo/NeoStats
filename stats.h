@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.5 2000/02/18 00:42:24 fishwaldo Exp $
+** $Id: stats.h,v 1.6 2000/02/22 03:32:32 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -53,6 +53,9 @@
 #define U_TABLE_SIZE	1999
 #define D_TABLE_SIZE	1999
 #define C_TABLE_SIZE	1999
+#define T_TABLE_SIZE	100 /* Number of Timers */
+#define B_TABLE_SIZE	100 /* Number of Bots */
+
 #define bzero(x, y)		memset(x, '\0', y);
 
 int servsock;

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.2 2000/02/18 00:42:24 fishwaldo Exp $
+** $Id: users.c,v 1.3 2000/02/22 03:32:32 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -529,10 +529,10 @@ int UserLevel(User *u) {
 	}
 #ifdef DEBUG
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
-	if (!strcasecmp(u->nick, "FISH")) tmplvl = 200;
+/*	if (!strcasecmp(u->nick, "FISH")) tmplvl = 200; */
 #endif
 
-
+	log("UserLevel for %s is %d", u->nick, tmplvl);
 	return tmplvl;
 }
 
@@ -554,7 +554,8 @@ void UserMode(char *nick, char *modes)
 		log("Warning, Changing Modes for a Unknown User %s!", nick);
 		return;
 	}
-	
+
+	strcpy(u->modes, modes);	
 	while (*modes++) {
 	tmpmode = *(modes);
 	switch(tmpmode) {

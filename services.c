@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: services.c,v 1.5 2000/02/18 00:42:24 fishwaldo Exp $
+** $Id: services.c,v 1.6 2000/02/22 03:32:32 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -50,16 +50,20 @@ void servicesbot(char *nick, char *line) {
 		return;
 
 	log("%s received message from %s: %s", s_Services, nick, cmd);
-	if (me.onlyopers && (UserLevel(u) >= 50)) {
+	if (me.onlyopers && (UserLevel(u) < 40)) {
 		privmsg(u->nick, s_Services,
 			"This service is only available to IRCops.");
-		notice ("%s Requested %s, but he is Not a Operator!", u->nick, cmd);
+		notice (s_Services,"%s Requested %s, but he is Not a Operator!", u->nick, cmd);
 		return;
 	}
 
 	if (!strcasecmp(cmd, "HELP")) {
 		cmd = strtok(NULL, " ");
-		notice(s_Services,"%s is a Dummy and wanted help on %s",u->nick, cmd);
+		if (cmd) {
+			notice(s_Services,"%s is a Dummy and wanted help on %s",u->nick, cmd);
+		} else {
+			notice(s_Services, "%s is a Dummy and wanted Help... I refered him to God!", u->nick);
+		}
 		if (!cmd) {
 			privmsg_list(nick, s_Services, ns_help);
 			if (u->Umode & (UserLevel(u) >= 190))

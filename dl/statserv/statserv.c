@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.c,v 1.7 2000/02/18 02:10:29 fishwaldo Exp $
+** $Id: statserv.c,v 1.8 2000/02/22 03:32:32 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -107,17 +107,14 @@ static int s_new_server(Server *s) {
 static int s_user_modes(User *u) {
 	int add = 0;
 	char *modes;
+	SStats *s;
 
 	if (!u) {
 		log("Changing modes for unknown user: %s", u->nick);
 		return -1;
 	}
-#ifdef DEBUG
-	log("Modes for %s are: %s",u->nick,u->modes);
-#endif
 	modes = u->modes;
 	while (*modes++) {
-
 		switch(*modes) {
 			case '+': add = 1;	break;
 			case '-': add = 0;	break;
@@ -194,25 +191,49 @@ static int s_user_modes(User *u) {
 			case 'o':
 				if (add) {
 					notice(s_StatServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
+					IncreaseOpers(findstats(u->server->name));
+					s = findstats(u->server->name);
+					if (stats_network.maxopers < stats_network.opers) {
+						stats_network.maxopers = stats_network.opers;
+						stats_network.t_maxopers = time(NULL);
+						sts("%s WALLOPS :\2Oper Record\2 The Network has reached a New Record for Opers at %d", s_StatServ, stats_network.opers);
+					}
+					if (s->maxopers < s->opers) {
+						s->maxopers = s->opers;
+						s->t_maxopers = time(NULL);
+						sts("%s WALLOPS :\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s_StatServ, s->name, s->opers);
+					}						
 				} else {
-					notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (+o)", u->nick, u->server->name);
+					notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
+					DecreaseOpers(findstats(u->server->name));
 				}
 				break;
 			case 'O':
 				if (add) {
 					notice(s_StatServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
+					IncreaseOpers(findstats(u->server->name));
+					s = findstats(u->server->name);
+					if (stats_network.maxopers < stats_network.opers) {
+						stats_network.maxopers = stats_network.opers;
+						stats_network.t_maxopers = time(NULL);
+						sts("%s WALLOPS :\2Oper Record\2 The Network has reached a New Record for Opers at %d", s_StatServ, stats_network.opers);
+					}
+					if (s->maxopers < s->opers) {
+						s->maxopers = s->opers;
+						s->t_maxopers = time(NULL);
+						sts("%s WALLOPS :\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s_StatServ, s->name, s->opers);
+					}						
 				} else {
-					notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (+o)", u->nick, u->server->name);
+					notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
+					DecreaseOpers(findstats(u->server->name));
 				}
 				break;
 			default:
 				break;
 		}
-		return 1;
 	}
 	return 1;
 }
-
 
 static int s_new_user(User *u) {
 	SStats *s;
@@ -352,10 +373,11 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 
 	log("%s received message from %s: %s", s_StatServ, u->nick, coreLine);
  
-	if (me.onlyopers && UserLevel(u) >= 50) {
+ 	log("OnlyOpers %d", me.onlyopers);
+	if (me.onlyopers && UserLevel(u) < 40) {
 		privmsg(u->nick, s_StatServ,
 			"This service is only available to IRCops.");
-		notice ("%s Requested %s, but he is Not a Operator!", u->nick, coreLine);
+		notice(s_StatServ, "%s Requested %s but he is not Authorized", u->nick, coreLine);
 		return -1;
 	}
 	cmd = strtok(coreLine, " ");
@@ -486,7 +508,7 @@ static void ss_server(User *u, char *server) {
 	}
 	privmsg(u->nick, s_StatServ, "Statistics for %s since %s", ss->name, sftime(ss->starttime));
 	if (!s) privmsg(u->nick, s_StatServ, "Server Last Seen: %s", sftime(ss->lastseen));
-	if (s) privmsg(u->nick, s_StatServ, "Current Users %-3ld (%s.0f%%)", ss->users, (float)ss->users / (float)stats_network.users * 100);
+	if (s) privmsg(u->nick, s_StatServ, "Current Users %-3ld (%d.0f%%)", ss->users, (float)ss->users / (float)stats_network.users * 100);
 	privmsg(u->nick, s_StatServ, "Maximum Users: %-3ld at %s", ss->maxusers, sftime(ss->t_maxusers));
 	if (s) privmsg(u->nick, s_StatServ, "Current Opers: %-3ld", ss->opers);
 	privmsg(u->nick, s_StatServ, "Maximum Opers: %-3ld at %s", ss->maxopers, sftime(ss->t_maxopers));

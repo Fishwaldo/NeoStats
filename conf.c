@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: conf.c,v 1.2 2000/02/04 04:52:45 fishwaldo Exp $
+** $Id: conf.c,v 1.3 2000/02/22 03:32:32 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -30,7 +30,8 @@ static config_option options[] =
 { "WANT_PRIVMSG", ARG_STR, cb_Server, 9},
 { "SERVICES_CHAN", ARG_STR, cb_Server, 10},
 { "MODULE_PATH", ARG_STR, cb_Server, 11},
-{ "LOAD_MODULE", ARG_STR, cb_Module, 0}
+{ "LOAD_MODULE", ARG_STR, cb_Module, 0},
+{ "ONLY_OPERS", ARG_STR, cb_Server, 12}
 };
 
 
@@ -125,7 +126,10 @@ void cb_Server(char *arg, int configtype) {
 		} else if (configtype == 11) {
 			me.modpath = sstrdup(arg);
 			add_ld_path(me.modpath);
+		} else if (configtype == 12) {
+			me.onlyopers = 1;
 		}
+
 }
 
 /*		old Config stuff, that will have to be moved to Modules

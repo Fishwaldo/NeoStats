@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include "stats.h"
 
 extern char *sftime(time_t);
 
@@ -18,6 +19,7 @@ extern char *sftime(time_t);
 struct mod_timer_list {
 	struct mod_timer_list *prev;
 	struct mod_timer_list *next;
+	long hash;
 	char *modname;
 	char *timername;
 	int interval;
@@ -25,18 +27,20 @@ struct mod_timer_list {
 	int (*function)();
 };
 typedef struct mod_timer_list Mod_Timer;
-extern Mod_Timer *module_timer_lists;
+Mod_Timer *module_timer_lists[T_TABLE_SIZE];
+
 
 struct mod_user_list {
 	struct mod_user_list *prev;
 	struct mod_user_list *next;
+	long hash;
 	char *nick;
 	char *modname;
 	int (*function)(char *origin, char *av);
 };
 
 typedef struct mod_user_list Mod_User;
-extern Mod_User *module_bot_lists;
+Mod_User *module_bot_lists[B_TABLE_SIZE];
 
 struct functions {
 	char *cmd_name;

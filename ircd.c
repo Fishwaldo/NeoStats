@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.6 2000/02/18 02:10:29 fishwaldo Exp $
+** $Id: ircd.c,v 1.7 2000/02/22 03:32:32 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -169,6 +169,7 @@ void Module_Event(char *event, void *data) {
 			if (!strcasecmp(ev_list->cmd_name, event)) {
 					segv_location = module_ptr->info->module_name;
 					ev_list->function(data);			
+					break;
 			}
 		ev_list++;
 		}	

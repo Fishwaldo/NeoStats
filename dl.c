@@ -12,17 +12,13 @@
 
 Module *module_list;
 LD_Path *ld_path_list;
-Mod_User *module_bot_lists;
-Mod_Timer *module_timer_lists;
 
 void __init_mod_list() {
-	Mod_User *Mod_Usr_list;
+	int i;
+	Mod_Timer *t, *Tprev;
+	Mod_User *u, *Uprev;
 	
 	segv_location = "__init_mod_list";
-	Mod_Usr_list = (Mod_User *)malloc(sizeof(Mod_User));
-	bzero(Mod_Usr_list, sizeof(Mod_User));
-	Mod_Usr_list->prev = NULL;
-	Mod_Usr_list->next = NULL;
 	module_list = (Module *)malloc(sizeof(Module));
 	bzero(module_list, sizeof(Module));
 	module_list->prev = NULL;
@@ -31,14 +27,26 @@ void __init_mod_list() {
 	bzero(ld_path_list, sizeof(LD_Path));
 	ld_path_list->prev = NULL;
 	ld_path_list->next = NULL;
-	module_bot_lists = (Mod_User *)malloc(sizeof(Mod_User));
-	bzero(module_bot_lists, sizeof(Mod_User));
-	module_bot_lists->next = NULL;
-	module_bot_lists->prev = NULL;
-	module_timer_lists = (Mod_Timer *)malloc(sizeof(Mod_Timer));
-	bzero(module_timer_lists, sizeof(Mod_Timer));
-	module_timer_lists->next = NULL;
-	module_timer_lists->prev = NULL;	
+	for (i = 0; i < B_TABLE_SIZE; i++) {
+		u = module_bot_lists[i];
+		while (u) {
+			Uprev = u->next;
+			free(u);
+			u = Uprev;
+		}
+		module_bot_lists[i] = NULL;
+	}
+	bzero((char *)module_bot_lists, sizeof(module_bot_lists));	
+	for (i = 0; i < T_TABLE_SIZE; i++) {
+		t = module_timer_lists[i];
+		while (t) {
+			Tprev = t->next;
+			free(t);
+			t = Tprev;
+		}
+		module_timer_lists[i] = NULL;
+	}
+	bzero((char *)module_timer_lists, sizeof(module_timer_lists));
 };
 
 int add_ld_path(char *path) {
@@ -59,35 +67,61 @@ int add_ld_path(char *path) {
 	path_ent->prev = list;
 	return 0;
 }
+static void add_timer_to_hash_table(char *timer_name, Mod_Timer *t) {
+	t->hash = HASH(timer_name, T_TABLE_SIZE);
+	t->next = module_timer_lists[t->hash];
+	module_timer_lists[t->hash] = (void *)t;
+}
 
+static void del_timer_from_hash_table(char *timer_name, Mod_Timer *t) {
+	Mod_Timer *tmp, *prev = NULL;
+	
+	for (tmp = module_timer_lists[t->hash]; tmp; tmp = tmp->next) {
+		if (tmp == t) {
+			if (prev)
+				prev->next = tmp->next;
+			else
+				module_timer_lists[t->hash] = tmp->next;
+			tmp->next = NULL;
+			return;
+		}
+		prev = tmp;
+	}
+}
+
+static Mod_Timer *new_timer(char *timer_name)
+{
+	Mod_Timer *t;
+	
+	log("New Timer: %s", timer_name);
+	t = smalloc(sizeof(Mod_Timer));
+	if (!timer_name)
+		timer_name="";
+	t->timername = timer_name;	
+	add_timer_to_hash_table(timer_name, t);
+	return t;
+}
+
+Mod_Timer *findtimer(char *timer_name) {
+	Mod_Timer *t;
+	
+	t = module_timer_lists[HASH(timer_name, T_TABLE_SIZE)];
+	while (t && strcasecmp(t->timername, timer_name) != 0)
+		t = t->next;
+	return t;
+}
 int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interval) {
 	Mod_Timer *Mod_timer_list;
 	Module *list_ptr;
 
 	segv_location = "add_mod_timer";
-	Mod_timer_list = (Mod_Timer *)malloc(sizeof(Mod_Timer));
-	
-	bzero(Mod_timer_list, sizeof(Mod_Timer));
 
-	if(module_timer_lists->timername == NULL ) {
-		log("addnew");
-		module_timer_lists->interval = interval;
-		module_timer_lists->lastrun = time(NULL);
-		module_timer_lists->modname = sstrdup(mod_name);
-		module_timer_lists->timername = sstrdup(timer_name);
-	} else {
-		while (module_timer_lists->next != NULL) {
-			log("modstimer: %s", module_timer_lists->timername);
-			module_timer_lists = module_timer_lists->next;
-		}
 
-		module_timer_lists->next = Mod_timer_list;
-		Mod_timer_list->prev = module_timer_lists;
-		Mod_timer_list->interval = interval;
-		Mod_timer_list->lastrun = time(NULL);
-		Mod_timer_list->modname = sstrdup(mod_name);
-		Mod_timer_list->timername = sstrdup(timer_name);
-	}		
+	Mod_timer_list = new_timer(timer_name);
+	Mod_timer_list->interval = interval;
+	Mod_timer_list->lastrun = time(NULL);
+	Mod_timer_list->modname = sstrdup(mod_name);
+
 	list_ptr = module_list->next;
 	while (list_ptr != NULL) {
 		if (!strcasecmp(list_ptr->info->module_name, mod_name)) {
@@ -110,50 +144,110 @@ int del_mod_timer(char *timer_name) {
 	Mod_Timer *list;
 
 	segv_location = "del_mod_timer";
-	list = module_timer_lists;
-	while (list != NULL) {
-		if (!strcasecmp(list->timername, timer_name)) {
-			log("Unregistered Timer function %s from Module %s", timer_name, list->modname);
-			if (list->next != NULL) {
-				(list->prev)->next = list->next;
-				(list->next)->prev = list->prev;
-			} else {
-				(list->prev)->next = NULL;
-			}
-			free(list);
-			log("Done Timer Unload");
-			return 0;
-		}
-		list = list->next;
-	}
+	log("unloadtimer");
+	
+	list = findtimer(timer_name);
+		
+	if (list) {
+#ifdef DEBUG
+		log("Unregistered Timer function %s from Module %s", timer_name, list->modname);
+#endif
+		del_timer_from_hash_table(timer_name, list);
+		free(list);
+		return 1;
+	}		
 	return -1;
 }
 
 void list_module_timer(User *u) {
 	Mod_Timer *mod_ptr = NULL;
+	register int j;
 	segv_location = "list_module_timer";
-	mod_ptr = module_timer_lists;
 	privmsg(u->nick,s_Services,"Module timer List:");
-	while(mod_ptr != NULL) {
-		privmsg(u->nick,s_Services,"%s:--------------------------------",mod_ptr->modname);
-		privmsg(u->nick,s_Services,"Module Timer Name: %s",mod_ptr->timername);
-		privmsg(u->nick,s_Services,"Module Interval: %d",mod_ptr->interval);
-		privmsg(u->nick,s_Services,"Time till next Run: %d", mod_ptr->interval - (time(NULL) - mod_ptr->lastrun));
-		mod_ptr = mod_ptr->next;
+	for (j = 0; j < T_TABLE_SIZE; j++) {
+		for (mod_ptr = module_timer_lists[j]; mod_ptr; mod_ptr = mod_ptr->next) { 
+			privmsg(u->nick,s_Services,"%s:--------------------------------",mod_ptr->modname);
+			privmsg(u->nick,s_Services,"Module Timer Name: %s",mod_ptr->timername);
+			privmsg(u->nick,s_Services,"Module Interval: %d",mod_ptr->interval);
+			privmsg(u->nick,s_Services,"Time till next Run: %d", mod_ptr->interval - (time(NULL) - mod_ptr->lastrun));
+		}
 	}
 	privmsg(u->nick,s_Services,"End of Module timer List");
 	free(mod_ptr);
 }		
+static void add_bot_to_hash_table(char *bot_name, Mod_User *u) {
+	u->hash = HASH(bot_name, B_TABLE_SIZE);
+	u->next = module_bot_lists[u->hash];
+	module_bot_lists[u->hash] = (void *)u;
+}
+
+static void del_bot_from_hash_table(char *bot_name, Mod_User *u) {
+	Mod_User *tmp, *prev = NULL;
+	
+	for (tmp = module_bot_lists[u->hash]; tmp; tmp = tmp->next) {
+		if (tmp == u) {
+			if (prev)
+				prev->next = tmp->next;
+			else
+				module_bot_lists[u->hash] = tmp->next;
+			tmp->next = NULL;
+			return;
+		}
+		
+		prev = tmp;
+	}
+}
+
+static Mod_User *new_bot(char *bot_name)
+{
+	Mod_User *u;
+	
+	log("New Bot: %s", bot_name);
+	u = smalloc(sizeof(Mod_User));
+	if (!bot_name)
+		bot_name="";
+	u->nick = sstrdup(bot_name);	
+	add_bot_to_hash_table(bot_name, u);
+	return u;
+}
+
+Mod_User *findbot(char *bot_name) {
+	Mod_User *u;
+	
+	u = module_bot_lists[HASH(bot_name, B_TABLE_SIZE)];
+	while (u && strcasecmp(u->nick, bot_name) != 0)
+		u = u->next;
+	return u;
+}
+
+int del_mod_user(char *bot_name) {
+	Mod_User *list;
+	segv_location = "del_mod_user";
+	
+	list = findbot(bot_name);
+		
+	if (list) {
+		del_bot_from_hash_table(bot_name, list);
+		free(list);
+		return 1;
+	}		
+	return -1;
+
+
+
+}
 
 
 int bot_nick_change(char *oldnick, char *newnick)
 {
 	User *u;
-	Mod_User *mod_ptr = NULL;
+	Mod_User *mod_tmp, *mod_ptr = NULL;
 	segv_location = "bot_nick_change";
 
 	/* First, try to find out if the newnick is unique! */
+#ifdef DEBUG
 	log("oldnick %s newnick %s",oldnick,newnick);
+#endif	
 	u = finduser(oldnick);
 	if (!u) {
 		log("A non-registered bot(%s) attempted to change its nick to %s",oldnick, newnick);
@@ -161,23 +255,26 @@ int bot_nick_change(char *oldnick, char *newnick)
 		}
 	u = finduser(newnick);
 	if (!u) { 
-		mod_ptr = module_bot_lists;
-		while(mod_ptr != NULL ) {
-			if (!strcasecmp(mod_ptr->nick, oldnick)) {
-				/* Ok, found the nick, change it */
-				log("Bot %s Changed its nick to %s", oldnick, newnick);
-				mod_ptr->nick = sstrdup(newnick);
-				Change_User(finduser(oldnick), newnick);
-				sts(":%s NICK %s", oldnick, newnick);
-				return 1;
+		mod_ptr = findbot(oldnick);
+		if (!u) {
+#ifdef DEBUG
+			log("Bot %s Changed its nick to %s", oldnick, newnick);
+#endif
+			mod_tmp = new_bot(newnick);
+			/* add a brand new user */
+			mod_tmp->nick = sstrdup(newnick);
+			mod_tmp->modname = sstrdup(mod_ptr->modname);
+			mod_tmp->function = mod_ptr->function;
+			/* Now Delete the Old bot nick */
+			del_mod_user(oldnick);
+			Change_User(finduser(oldnick), newnick);
+			sts(":%s NICK %s", oldnick, newnick);
+			return 1;
 			}
-			mod_ptr = mod_ptr->next;
 		}
-		log("Couldn't find Bot Nick %s in Bot list", oldnick);
-		return -1;
-	}
-	return -1; 
-}	
+	log("Couldn't find Bot Nick %s in Bot list", oldnick);
+	return -1;
+}
 
 
 int add_mod_user(char *nick, char *mod_name) {
@@ -185,23 +282,12 @@ int add_mod_user(char *nick, char *mod_name) {
 	Module *list_ptr;
 	
 	segv_location = "add_mod_user";
-	Mod_Usr_list = (Mod_User *)malloc(sizeof(Mod_User));
-	bzero(Mod_Usr_list, sizeof(Mod_User));
 
-	if (module_bot_lists->nick == NULL) {
-		/* add a brand new user */
-		Mod_Usr_list->nick = sstrdup(nick);
-		Mod_Usr_list->modname = sstrdup(mod_name);
-		module_bot_lists = Mod_Usr_list;		
-	} else {
-		while (module_bot_lists->next != NULL) {
-			module_bot_lists = module_bot_lists->next;
-		}
-		module_bot_lists->next = Mod_Usr_list;	
-		Mod_Usr_list->prev = module_bot_lists;
-		Mod_Usr_list->nick = sstrdup(nick);
-		Mod_Usr_list->modname = sstrdup(mod_name);
-	}		
+
+	Mod_Usr_list = new_bot(nick);
+	/* add a brand new user */
+	Mod_Usr_list->nick = sstrdup(nick);
+	Mod_Usr_list->modname = sstrdup(mod_name);
 	list_ptr = module_list->next;
 	while (list_ptr != NULL) {
 		if (!strcasecmp(list_ptr->info->module_name, mod_name)) {
@@ -213,36 +299,19 @@ int add_mod_user(char *nick, char *mod_name) {
 	return 0;
 }
 
-int del_mod_user(char *nick) {
-	Mod_User *list;
-
-	segv_location = "del_mod_user";
-	list = module_bot_lists->next;
-	while (list != NULL) {
-		if (!strcasecmp(list->nick, nick)) {
-			if (list->next != NULL) {
-				(list->prev)->next = list->next;
-				(list->next)->prev = list->prev;
-			} else {
-				(list->prev)->next = NULL;
-			}
-			free(list);
-			return 0;
-		}
-		list = list->next;
-	}
-	return -1;
-}
 
 void list_module_bots(User *u) {
 	Mod_User *mod_ptr = NULL;
+	register int j;
 	segv_location = "list_module_bots";
-	mod_ptr = module_bot_lists;
+
 	privmsg(u->nick,s_Services,"Module Bot List:");
-	while(mod_ptr != NULL) {
-		privmsg(u->nick,s_Services,"Module: %s",mod_ptr->modname);
-		privmsg(u->nick,s_Services,"Module Bots: %s",mod_ptr->nick);
-		mod_ptr = mod_ptr->next;
+
+	for (j = 0; j < B_TABLE_SIZE; j++) {
+		for (mod_ptr = module_bot_lists[j]; mod_ptr; mod_ptr = mod_ptr->next) { 
+			privmsg(u->nick,s_Services,"Module: %s",mod_ptr->modname);
+			privmsg(u->nick,s_Services,"Module Bots: %s",mod_ptr->nick);
+		}
 	}
 	privmsg(u->nick,s_Services,"End of Module Bot List");
 }		
@@ -345,8 +414,8 @@ int load_module(char *path1, User *u) {
 
 	bzero(mod_ptr, sizeof(Module));
 
-	log("%s: internal module name: %s\n", __PRETTY_FUNCTION__, mod_info_ptr->module_name);
-	log("%s: module description: %s\n", __PRETTY_FUNCTION__, mod_info_ptr->module_description);
+	log("internal module name: %s", mod_info_ptr->module_name);
+	log("module description: %s", mod_info_ptr->module_description);
 
 	mod_ptr->prev = list_ptr;
 	list_ptr->next = mod_ptr;
@@ -389,28 +458,32 @@ int unload_module(char *module_name, User *u) {
 	Module *list;
 	Mod_User *mod_ptr = NULL;
 	Mod_Timer *mod_tmr = NULL;
+	register int j;
 
 	segv_location = "unload_module";
 	/* Check to see if this Module has any timers registered....  */
-	mod_tmr = module_timer_lists->next;
-	while(mod_tmr != NULL) {
-		if (!strcasecmp(mod_tmr->modname, module_name)) {
-			del_mod_timer(mod_tmr->timername);
-			break;
+	for (j = 0; j < T_TABLE_SIZE; j++ ) {
+		for (mod_tmr = module_timer_lists[j]; mod_tmr; mod_tmr = mod_tmr->next) {
+#ifdef DEBUG
+			log("Timers %s", mod_tmr->timername);
+#endif
+			if (!strcasecmp(mod_tmr->modname, module_name)) {
+				del_mod_timer(mod_tmr->timername);
+				break;
+			}
 		}
-		mod_tmr=mod_tmr->next;
 	}			
 
 
 	/* now, see if this Module has any bots with it */
-	mod_ptr = module_bot_lists;
-	while(mod_ptr != NULL) {
-		if (!strcasecmp(mod_ptr->modname, module_name)) {
-			notice(s_Services,"Module %s had bot %s Registered. Deleting..",module_name,mod_ptr->nick);
-			del_bot(mod_ptr->nick, "Module Unloaded");
-			break;
-		}	
-		mod_ptr=mod_ptr->next;		
+	for (j = 0; j < B_TABLE_SIZE; j++) {
+		for (mod_ptr = module_bot_lists[j]; mod_ptr; mod_ptr = mod_ptr->next) { 
+			if (!strcasecmp(mod_ptr->modname, module_name)) {
+				notice(s_Services,"Module %s had bot %s Registered. Deleting..",module_name,mod_ptr->nick);
+				del_bot(mod_ptr->nick, "Module Unloaded");
+				break;
+			}	
+		}
 	}
 	list = module_list->next;
 	while (list != NULL) {
