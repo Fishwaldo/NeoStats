@@ -541,7 +541,9 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 	ud = finduser(av[0]);
 	if(u && ud) {
 		AddStringToList (&argv, ud->nick, &argc);
-		for(i = 1; i < ac; i++) {
+		/* strip colon */
+		AddStringToList (&argv, &av[1][1], &argc);
+		for(i = 2; i < ac; i++) {
 			AddStringToList (&argv, av[i], &argc);
 		}
 		ModuleFunction (1, MSG_NOTICE, u->nick, argv, argc);
