@@ -17,6 +17,7 @@ NEOCONN="10"
 NEOWRITE="HTML_STATS"
 NEOHTML="/home/shmad/public_html/stats.html"
 NEOLAG="60"
+NEOREC="10"
 
 # these are so I can use stuff like $1 without it replacing it...like by
 # using $dlrsgn$uno for $1
@@ -249,6 +250,14 @@ if [ ! -z "$cc" ]; then
         NEOLAG="$cc"
 fi
 
+echo " "
+echo "The interval in seconds to send out new record notices"
+echo $n " [$NEOREC] -> $c"
+read cc
+if [ ! -z "$cc" ]; then
+	NEOREC="$cc"
+fi
+
 
 cat > $CONF << __EOF__
 ##################################################
@@ -382,6 +391,11 @@ HTML_PATH $NEOHTML
 # Notifications
 LAG_NOTICE $NEOLAG
 
+
+# The Interval in seconds to send out new Records from StatServ.
+# For example 5 would send a record notice at an interval of every 5 seconds
+# when a record is broken, to prevent record floods.
+WALLOP_INTERVAL $NEOREC
 
 
 ############################
