@@ -1371,7 +1371,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 #if defined(ULTIMATE3) || defined(BAHAMUT) || defined(HYBRID7) || defined(IRCU) || defined(NEOIRCD) || defined(QUANTUM) || defined(LIQUID)
 	UserMode (nick, newmode);
 #else
-	sumode_cmd (nick, nick, Umode);
+	sumode_cmd (nick, nick, mode);
 #endif
 	return 1;
 }

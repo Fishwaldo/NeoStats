@@ -614,7 +614,7 @@ Usr_Eos (char *origin, char **argv, int argc)
 static void
 Srv_Sjoin (char *origin, char **argv, int argc)
 {
-	handle_sjoin (argv[1], argv[0], ((argc >= 3) ? argv[2] : argv[1]), 4, origin, argv, argc);
+	handle_sjoin (argv[1], argv[0], argv[2], 4, origin, argv, argc);
 }
 
 static void
