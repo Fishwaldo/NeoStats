@@ -5,9 +5,10 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.23 2002/08/24 02:51:40 fishwaldo Exp $
+** $Id: sock.c,v 1.24 2002/08/28 09:11:47 fishwaldo Exp $
 */
 
+#include <fcntl.h>
 #include "stats.h"
 #include "dl.h"
 #include <adns.h>
@@ -243,4 +244,75 @@ char *sftime(time_t stuff)
 	strftime(fmtime, 80, "[%b (%a %d) %Y  %I:%M [%p/%Z]]", ltm);
 
 	return fmtime;
+}
+
+
+int sock_connect(int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error) {
+	struct sockaddr_in sa;
+	int s;
+	int i;
+/* socktype = SOCK_STREAM */
+
+	if ((s = socket(AF_INET, socktype, 0)) < 0)
+		return (-1);
+	bzero(&sa, sizeof(sa));
+	sa.sin_family = AF_INET;
+	sa.sin_port = htons (port);
+	sa.sin_addr.s_addr = ipaddr;
+
+	/* set non blocking */
+	
+	if ((i = fcntl(s, F_SETFL, O_NONBLOCK)) < 0) {
+		log("can't set socket %s(%s) non-blocking: %s", sockname, module, strerror(i));
+		return (-1);
+	}
+
+	if ((i = connect (s, (struct sockaddr *) &sa, sizeof (sa))) < 0) {
+		switch (errno) {
+			case EINPROGRESS:
+					break;
+			default:
+					log("Socket %s(%s) cant connect %s", sockname, module, strerror(errno), i);
+					close (s);
+					return (-1);
+		}
+	}
+
+	add_socket(func_read, func_write, func_error, sockname, s, module);
+	return s;
+}
+
+int sock_disconnect(char *sockname) {
+	Sock_List *sock;
+	fd_set fds;
+	struct timeval tv;	
+	int i;
+
+	sock = findsock(sockname);
+	if (!sock) {
+#ifdef DEBUG
+		log("Warning, Can not find Socket %s in list", sockname);
+#endif
+		return(-1);
+	}
+	
+	/* the following code makes sure its a valid file descriptor */
+
+	FD_ZERO(&fds);
+	FD_SET(sock->sock_no, &fds);
+	tv.tv_sec = 0;
+	tv.tv_usec = 0;
+	i = select(1, &fds, NULL, NULL, &tv);
+	if (!i && errno == EBADF) {
+#ifdef DEBUG
+		log("Warning, Bad File Descriptor %s in list", sockname);
+#endif
+		return(-1);
+	}
+#ifdef DEBUG
+	log("Closing Socket %s with Number %d", sockname, sock->sock_no);
+#endif
+	close(sock->sock_no);
+	del_socket(sockname);
+	return(1);
 }

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: proxy.c,v 1.4 2002/08/24 02:51:41 fishwaldo Exp $
+** $Id: proxy.c,v 1.5 2002/08/28 09:11:47 fishwaldo Exp $
 */
 
 
@@ -53,6 +53,69 @@ scaninfo *find_scandata(char *sockname) {
 		return lnode_get(scannode);
 	else 
 		return NULL;
+}
+void cleanlist() {
+	lnode_t *scannode;
+	scaninfo *scandata;
+	lnode_t *socknode, *scannode2;
+	socklist *sockdata;
+	char sockname[64];
+	int savescan, timedout = 0, finished;
+
+	scannode = list_first(opsbl);
+	while (scannode) {
+		timedout = 0;
+		scandata = lnode_get(scannode);
+		/* check if this scan has timed out */
+		if (time(NULL) - scandata->started > opsb.timeout) timedout = 1;
+
+		/* savescan is a flag if we should save this entry into the cache file */
+		savescan = 1;	
+		
+		/* if this is not valid, exit */
+		if (!scandata->socks) break;
+		/* check for open sockets */
+		socknode = list_first(scandata->socks);	
+		finished = 1;
+		while (socknode) {
+			sockdata = lnode_get(socknode);
+			/* if it was a open proxy, don't save the cache */
+			if (sockdata->flags == OPENPROXY) savescan = 0;
+			if (((sockdata->flags != UNCONNECTED) && (sockdata->flags != OPENPROXY)) && (timedout == 1))  {
+				/* it still has open socks */
+				snprintf(sockname, 64, "%s %d", scandata->who, sockdata->type);
+				sockdata->flags = UNCONNECTED;
+#ifdef DEBUG
+				log("Closing Socket %s in cleanlist function for timeout()", sockname);
+#endif
+				sock_disconnect(sockname);
+				free(sockdata);
+			}  else
+				finished = 0;
+			
+			socknode = list_next(scandata->socks, socknode);
+		}
+
+		if (timedout == 1 || finished == 1) {
+#ifdef DEBUG
+			if (timedout == 1) log("Deleting Old Scannode %s out of active list (Timeout)", scandata->who );
+			if (finished == 1) log("Deleting Old Scannode %s out of active list (Finished)", scandata->who );
+#endif
+			if (savescan == 1) 
+				addtocache(scandata->ipaddr.s_addr);
+			/* destory all the nodes in the sock list */
+			list_destroy_nodes(scandata->socks);
+			scannode2 = list_next(opsbl, scannode);
+			list_delete(opsbl, scannode);
+			lnode_destroy(scannode);
+			scandata->u = NULL;
+			free(scandata);
+			scannode = scannode2;							
+		} else {
+			scannode = list_next(opsbl, scannode);					
+		}
+	}
+	checkqueue();
 }
 
 
@@ -124,17 +187,22 @@ void start_proxy_scan(lnode_t *scannode) {
 	scaninfo *scandata;
 	socklist *sockdata;
 	lnode_t *socknode;
+	char *sockname;
 	int i, j;
 
 
 	scandata = lnode_get(scannode);
 	if (scandata->u) chanalert(s_opsb, "Starting proxy scan on %s (%s) by Request of %s", scandata->who, scandata->lookup, scandata->u->nick);
 	scandata->socks = list_create(NUM_PROXIES);
+	scandata->state = DOING_SCAN;
 	for (i = 0; i <  NUM_PROXIES; i++) {
 #ifdef DEBUG	
 		log("OPSB proxy_connect(): host %ul (%s), port %d", scandata->ipaddr,inet_ntoa(scandata->ipaddr), proxy_list[i].port);
 #endif
-		j = proxy_connect(scandata->ipaddr.s_addr, proxy_list[i].port, scandata->who);
+		sockname = malloc(64);
+		sprintf(sockname, "%s %d", scandata->who, i);
+		j = proxy_connect(scandata->ipaddr.s_addr, proxy_list[i].port, sockname);
+		free(sockname);
 		if (j > 0) {
 			/* its ok */
 			sockdata = malloc(sizeof(socklist));
@@ -290,9 +358,7 @@ int proxy_read(int socknum, char *sockname) {
 		log("OPSB proxy_read(): %d has the following error: %s", socknum, strerror(errno));
 #endif
 		if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
-		if (socknum != servsock)
-			close(socknum);
-		del_socket(sockname);
+		sock_disconnect(sockname);
 		sockdata->flags = UNCONNECTED;
 		free(buf);
 		return -1;
@@ -308,9 +374,7 @@ int proxy_read(int socknum, char *sockname) {
 #endif
 				if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No Open %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
 				sockdata->flags = UNCONNECTED;
-				if (socknum != servsock)
-					close(socknum);
-				del_socket(sockname);
+				sock_disconnect(sockname);
 				free(buf);
 				return -1;
 			}
@@ -322,9 +386,7 @@ int proxy_read(int socknum, char *sockname) {
 				scandata->state = GOTOPENPROXY;
 				sockdata->flags = OPENPROXY;
 				do_ban(scandata);
-				if (socknum != servsock) 
-					close(socknum);
-				del_socket(sockname);
+				sock_disconnect(sockname);
 				free(buf);
 				return -1;
 			}
@@ -335,9 +397,7 @@ int proxy_read(int socknum, char *sockname) {
 				log("OPSB proxy_read(): Closing %d due to too much data", socknum);
 #endif
 				if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No Open %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
-				if (socknum != servsock)
-					close(socknum);
-				del_socket(sockname);
+				sock_disconnect(sockname);
 				sockdata->flags = UNCONNECTED;
 				free(buf);
 				return -1;
@@ -386,9 +446,7 @@ int proxy_write(int socknum, char *sockname) {
 			log("OPSB proxy_write(): %d has the following error: %s", socknum, strerror(errno));
 #endif
 			if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
-			if (socknum != servsock)
-				close(socknum);
-			del_socket(sockname);
+			sock_disconnect(sockname);
 			sockdata->flags = UNCONNECTED;
 			return -1;
 		} else {
@@ -414,43 +472,8 @@ return 1;
 
 int proxy_connect(unsigned long ipaddr, int port, char *who)
 {
-	struct sockaddr_in sa;
-	char *sockname;
 	int s;
-	int i;
-
-	if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-		return (-1);
-	bzero(&sa, sizeof(sa));
-	sa.sin_family = AF_INET;
-	sa.sin_port = htons (port);
-	sa.sin_addr.s_addr = ipaddr;
-
-	/* set non blocking */
-	
-	if ((i = fcntl(s, F_SETFL, O_NONBLOCK)) < 0) {
-		log("can't fcntl %s", strerror(i));
-		return (-1);
-	}
-
-	if ((i = connect (s, (struct sockaddr *) &sa, sizeof (sa))) < 0) {
-		switch (errno) {
-			case EINPROGRESS:
-					break;
-			default:
-#ifdef DEBUG
-					log("cant connect %s", strerror(errno), i);
-#endif
-					close (s);
-					return (-1);
-		}
-	}
-
-	sockname = malloc(64);
-	snprintf(sockname, 63, "%s %d", who, s);
-
-	add_socket("proxy_read", "proxy_write", "proxy_err", sockname, s, "opsb");
-
-	free(sockname);
+	s = sock_connect(SOCK_STREAM, ipaddr, port, who, "opsb", "proxy_read", "proxy_write", "proxy_err");
 	return s;
+	
 }

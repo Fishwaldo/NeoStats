@@ -1,7 +1,11 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
-* NeoStats * Fish * Version 2.5.0-Beta4.1
+* NeoStats * Fish * Version 2.5.0-Beta5
  - Fixed a problem with prefmsg in Unreal only.
  - Fixed more bsd related bugs 
+ - socket support updates in prep for opsb
+ - User structure now contains TS 
+ - User structure now contains ipaddr if server supports NICKIP
+ - Sockets must now be created with new socket functions. 
 
 * NeoStats * Fish * Version 2.5.0-Beta4
  - Fixed Bsd support and a few Hybrid weirdiness

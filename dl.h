@@ -120,6 +120,7 @@ extern void list_module_timer(User *);
 extern int add_socket(char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name);
 extern int del_socket(char *sockname);
 extern void list_sockets(User *);
+extern Sock_List *findsock(char *sock_name);
 extern Mod_User *findbot(char *);
 extern int get_dl_handle(char *mod_name);
 extern void add_bot_to_chan(char *, char *);

@@ -219,8 +219,8 @@ extern void ResetLogs();
 extern char *sctime(time_t);
 extern char *sftime(time_t);
 extern int getmaxsock();
-
-
+extern int sock_connect(int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);
+extern int sock_disconnect(char *sockname);
 /* conf.c */
 extern void strip(char *);
 extern void ConfLoad();
