@@ -1862,7 +1862,7 @@ void
 do_server (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline, int srv)
 {
 	if(!srv) {
-		if (*uplink == 0) {
+		if (uplink == NULL) {
 			me.s = AddServer (name, me.name, hops, numeric, infoline);
 		} else {
 			me.s = AddServer (name, uplink, hops, numeric, infoline);
