@@ -58,7 +58,9 @@ static char msg_globalkill[]="\2GLOBAL KILL\2 %s (%s@%s) was killed by %s - Reas
 static char msg_serverkill[]="\2SERVER KILL\2 %s (%s@%s) was killed by the server %s - Reason sighted: \2%s\2";  
 static char msg_mode[]="\2MODE\2 %s is %s a %s (%c%c)";
 static char msg_mode_serv[]="\2MODE\2 %s is %s a %s (%c%c) on %s";
+#ifdef UMODE_CH_BOT
 static char msg_bot[]="\2BOT\2 %s is %s a Bot (%c%c)";
+#endif
 #else
 static char msg_nickchange[]="\2\0037Nick Change\2 user: \2%s\2 (%s@%s) Changed their nick to \2%s\2\003"; 
 static char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s) at: \2%s\2\003";
@@ -68,7 +70,9 @@ static char msg_globalkill[]="\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Kil
 static char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 (%s@%s) was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
 static char msg_mode[]="\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c)\003";
 static char msg_mode_serv[]="\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c) on \2%s\2\003";
+#ifdef UMODE_CH_BOT
 static char msg_bot[]="\2\00313%s\2 is \2%s\2 a \2Bot\2 (%c%c)\003";
+#endif
 #endif
 
 static int cs_new_user(char **av, int ac);
