@@ -55,6 +55,7 @@ static void m_end_of_burst (char *origin, char **argv, int argc, int srv);
 void send_end_of_burst_ack(void);
 void send_end_of_burst(void);
 
+void ircu_m_private (char* origin, char **av, int ac, int cmdptr);
 
 const char ircd_version[] = "(IRCU)";
 const char services_bot_modes[]= "+oS";
@@ -62,7 +63,7 @@ const char services_bot_modes[]= "+oS";
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
-	{MSG_PRIVATE, TOK_PRIVATE, m_private, 0},
+	{MSG_PRIVATE, TOK_PRIVATE, ircu_m_private, 0},
 	{MSG_CPRIVMSG, TOK_CPRIVMSG, m_private, 0},
 	{MSG_NOTICE, TOK_NOTICE, m_notice, 0},
 	{MSG_CNOTICE, TOK_CNOTICE, m_notice, 0},
@@ -124,10 +125,42 @@ const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 /* Temporary buffers for numeric conversion */
 char servlist[4096][MAXHOST];
+
+struct {
+	char nick [MAXNICK];
+	char numeric [32];
+}nicknum[4096];
+
+int numnicks = 0;
+
 char nicklist[262144][MAXNICK];
 int neonumeric;
 char neonumericbuf[3];
 int neonickcount = 0;
+
+char* getnickfromnum(const char* num)
+{
+	int i;
+	nlog (LOG_DEBUG1, LOG_CORE, "getnickfromnum %s", num);
+	for(i = 0; i < numnicks; i++) {
+		if(strncmp(nicknum[i].numeric, num, 5) == 0)
+			return nicknum[i].nick;
+	}
+	nlog (LOG_DEBUG1, LOG_CORE, "%s not found", num);
+	return NULL;
+}
+
+char* getnumfromnick(const char* nick)
+{
+	int i;
+	nlog (LOG_DEBUG1, LOG_CORE, "getnickfromnum %s", nick);
+	for(i = 0; i < numnicks; i++) {
+		if(strcmp(nicknum[i].nick, nick) == 0)
+			return nicknum[i].numeric;
+	}
+	nlog (LOG_DEBUG1, LOG_CORE, "%s not found", nick);
+	return NULL;
+}
 
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
@@ -206,10 +239,15 @@ static const unsigned int convert2n[] = {
 
 unsigned int base64toint(const char* s)
 {
+	int max = 0;
 	unsigned int i = convert2n[(unsigned char) *s++];
+	max++;
 	while (*s) {
 		i <<= NUMNICKLOG;
 		i += convert2n[(unsigned char) *s++];
+		max++;
+		if(max>=5) 
+			break;
 	}
 	return i;
 }
@@ -246,6 +284,23 @@ DEBUG1 CORE - R: AB SQ mark.local.org 0 :Ping timeout
 DEBUG3 CORE - Sendings pings...
 DEBUG2 CORE - SENT: :stats.mark.net PING stats.mark.net :mark.local.org
 */
+
+void ircu_m_private (char* origin, char **av, int ac, int cmdptr)
+{
+	char** argv;
+	int argc = 0;
+	int i;
+
+	AddStringToList (&argv, getnickfromnum(av[0]), &argc);
+	/* strip colon */
+	AddStringToList (&argv, &av[1][1], &argc);
+	for(i = 2; i < ac; i++) {
+		AddStringToList (&argv, av[i], &argc);
+	}
+
+	m_private (getnickfromnum(origin), argv, argc, cmdptr);
+	free(argv);
+}
 
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
@@ -297,6 +352,9 @@ void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
 	send_cmd ("%s %s %s 1 %lu %s %s %sAA%c :%s", neonumericbuf, TOK_NICK, nick, ts, ident, host, neonumericbuf, (neonickcount+'A'), realname);
+	strlcpy(nicknum[numnicks].nick, nick, MAXNICK);
+	snprintf(nicknum[numnicks].numeric, 6, "%sAA%c", neonumericbuf, (neonickcount+'A'));
+	numnicks ++;
 	neonickcount ++;
 }
 
@@ -407,13 +465,17 @@ send_rakill (const char *sender, const char *host, const char *ident)
 void
 send_privmsg (const char *from, const char *to, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, TOK_PRIVATE, to, buf);
+	if(to[0] == '#') {
+		send_cmd (":%s %s %s :%s", from, TOK_PRIVATE, to, buf);
+	} else {
+		send_cmd ("%s %s %s :%s", getnumfromnick(from), TOK_PRIVATE, getnumfromnick(to), buf);
+	}
 }
 
 void
 send_notice (const char *from, const char *to, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, TOK_NOTICE, to, buf);
+	send_cmd ("%s %s %s :%s", getnumfromnick(from), TOK_NOTICE, getnumfromnick(to), buf);
 }
 
 void
@@ -491,14 +553,8 @@ static void
 m_quit (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
-	char buf[4];
-	buf[0] = origin[2];
-	buf[1] = origin[3];
-	buf[2] = origin[4];
-	buf[3] = '\0';
-
 	tmpbuf = joinbuf(argv, argc, 0);
-	do_quit (nicklist[base64toint(buf)], tmpbuf);
+	do_quit (getnickfromnum(origin), tmpbuf);
 	free(tmpbuf);
 }
 
@@ -569,11 +625,10 @@ m_nick (char *origin, char **argv, int argc, int srv)
         do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
 			servlist[base64toint(buf)], NULL, NULL, NULL, NULL, realname);
 		free (realname);
-		buf[0] = argv[argc-2][2];
-		buf[1] = argv[argc-2][3];
-		buf[2] = argv[argc-2][4];
-		buf[3] = '\0';
-		strlcpy(nicklist[base64toint(buf)], argv[0], MAXHOST);
+		strlcpy(nicknum[numnicks].nick, argv[0], MAXNICK);
+		strlcpy(nicknum[numnicks].numeric, argv[argc-2], 6);
+		nlog (LOG_DEBUG1, LOG_CORE, "adding %s %s", nicknum[numnicks].nick, nicknum[numnicks].numeric);
+		numnicks++;
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}
@@ -582,14 +637,8 @@ static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
-	char buf[4];
-	buf[0] = origin[2];
-	buf[1] = origin[3];
-	buf[2] = origin[4];
-	buf[3] = '\0';
-
 	tmpbuf = joinbuf (argv, argc, 2);
-	do_topic (argv[0], nicklist[base64toint(buf)], NULL, tmpbuf);
+	do_topic (argv[0], getnickfromnum(origin), NULL, tmpbuf);
 	free (tmpbuf);
 }
 
@@ -606,36 +655,21 @@ m_kick (char *origin, char **argv, int argc, int srv)
 static void
 m_create (char *origin, char **argv, int argc, int srv)
 {
-	char buf[4];
-	buf[0] = origin[2];
-	buf[1] = origin[3];
-	buf[2] = origin[4];
-	buf[3] = '\0';
-	do_join (nicklist[base64toint(buf)], argv[0], argv[1]);
+	do_join (getnickfromnum(origin), argv[0], argv[1]);
 }
 
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
-	char buf[4];
-	buf[0] = origin[2];
-	buf[1] = origin[3];
-	buf[2] = origin[4];
-	buf[3] = '\0';
-	do_join (nicklist[base64toint(buf)], argv[0], argv[1]);
+	do_join (getnickfromnum(origin), argv[0], argv[1]);
 }
 
 static void
 m_part (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
-	char buf[4];
-	buf[0] = origin[2];
-	buf[1] = origin[3];
-	buf[2] = origin[4];
-	buf[3] = '\0';
 	tmpbuf = joinbuf(argv, argc, 1);
-	do_part (nicklist[base64toint(buf)], argv[0], tmpbuf);
+	do_part (getnickfromnum(origin), argv[0], tmpbuf);
 	free(tmpbuf);
 }
 
@@ -660,7 +694,6 @@ m_pass (char *origin, char **argv, int argc, int srv)
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
-	char buf[4];
 
 	char *s, *t;
 	t = (char*)argv[2];
@@ -668,11 +701,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 		t = s + strcspn (s, ",");
 		if (*t)
 			*t++ = 0;
-		buf[0] = s[2];
-		buf[1] = s[3];
-		buf[2] = s[4];
-		buf[3] = '\0';
-		do_join (nicklist[base64toint(buf)], argv[0], argv[1]);
+		do_join (getnickfromnum(s), argv[0], argv[1]);
 	}
 
 }
