@@ -783,7 +783,7 @@ ircu_m_private (char *origin, char **argv, int argc, int srv)
 	int i;
 	char* av0;
 	
-	if(av[0][0] == '#') {
+	if(argv[0][0] == '#') {
 		av0 = argv[0];
 	} else {
 		av0 = base64tonick(argv[0]);
