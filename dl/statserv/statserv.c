@@ -51,7 +51,7 @@ Functions StatServ_fn_list[] = {
 
 
 EventFnList StatServ_Event_List[] = {
-	{ "ONLINE",	 *Online},
+	{ "ONLINE",	 Online},
 	{ "PONG",	 pong},
 	{ "NEWSERVER",	s_new_server},
 	{ "SQUIT",	s_del_server},
@@ -322,24 +322,24 @@ int __Bot_Message(char *origin, char **av, int ac)
 	return 1;
 }
 int topchan(const void *key1, const void *key2) {
-	CStats *chan1 = key1;
-	CStats *chan2 = key2;
+	const CStats *chan1 = key1;
+	const CStats *chan2 = key2;
 	return (chan2->members - chan1->members);
 
 }
 int topjoin(const void *key1, const void *key2) {
-	CStats *chan1 = key1;
-	CStats *chan2 = key2;
+	const CStats *chan1 = key1;
+	const CStats *chan2 = key2;
 	return (chan2->totmem - chan1->totmem);
 }
 int topkick(const void *key1, const void *key2) {
-	CStats *chan1 = key1;
-	CStats *chan2 = key2;
+	const CStats *chan1 = key1;
+	const CStats *chan2 = key2;
 	return (chan2->kicks - chan1->kicks);
 }
 int toptopics(const void *key1, const void *key2) {
-	CStats *chan1 = key1;
-	CStats *chan2 = key2;
+	const CStats *chan1 = key1;
+	const CStats *chan2 = key2;
 	return (chan2->topics - chan1->topics);
 }
 

@@ -263,7 +263,6 @@ void *smalloc(long size)
 		log("smalloc(): out of memory.");
 		exit(0);
 	}
-/*	free(segv_location); */
 	return buf;
 }
 
@@ -310,6 +309,8 @@ void AddStringToList(char ***List,char S[],int *C)
                             
 void FreeList(char **List,int C)
 {
-//free(List);
+int i;
+for (i = 0; i == C; i++) 
+	free(List[i]);
 }
                                           

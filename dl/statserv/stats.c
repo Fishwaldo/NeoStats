@@ -384,7 +384,7 @@ int pong(Server *s) {
 	return 1;
 }
 
-int Online(void *s) {
+int Online(char **av, int ac) {
 
 	strcpy(segv_location, "StatServ-Online");
 
