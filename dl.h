@@ -214,7 +214,7 @@ void del_bot_from_chan (char *bot, char *chan);
 void bot_chan_message (char *origin, char *chan, char **av, int ac);
 void botchandump (User * u);
 int get_mod_num (char *mod_name);
-
+void unload_modules(User * u);
 /* 
  * Module Interface 
  */

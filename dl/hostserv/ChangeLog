@@ -6,6 +6,7 @@ Shmad <shmad@neostats.net>
 + Moved to lists to allow sorting and displaying
 + (M) Help text cleanup
 + (M) Added ABOUT command
++ Undernet Style Hidden Hosts for registered nicknames is now supported!
  
 * Version 2.7.1 * Shmad * May 11th, 2003
 + Fixed a nasty seg bug *smacks fish* we don't free(s_HostServ);

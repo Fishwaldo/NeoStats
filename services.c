@@ -214,8 +214,8 @@ servicesbot (char *nick, char **av, int ac)
 			tmp = joinbuf (av, ac, 2);
 			chanalert (s_Services, "%s Requested SHUTDOWN for: ", u->nick, tmp);
 			ns_shutdown (u, tmp);
+			free (tmp);
 		}
-		free (tmp);
 	} else if (!strcasecmp (av[1], "VERSION")) {
 		ns_version (u);
 		chanalert (s_Services, "%s Wanted to know our version number ", u->nick);
@@ -306,24 +306,6 @@ servicesbot (char *nick, char **av, int ac)
 	}
 }
 
-void unload_modules(User * u)
-{
-	Module *mod_ptr = NULL;
-	hscan_t ms;
-	hnode_t *mn;
-	/* Unload the Modules */
-	hash_scan_begin (&ms, mh);
-	while ((mn = hash_scan_next (&ms)) != NULL) {
-		mod_ptr = hnode_get (mn);
-		if(u) {
-			chanalert (s_Services, "Module %s Unloaded by %s", mod_ptr->info->module_name, u->nick);
-			unload_module (mod_ptr->info->module_name, u);
-		}
-		else {
-			unload_module (mod_ptr->info->module_name, finduser (s_Services));
-		}
-	}
-}
 
 void
 ns_shutdown (User * u, char *reason)
@@ -489,7 +471,6 @@ ns_uptime (User * u)
 	prefmsg (u->nick, s_Services, "Reconnect Time: %d", me.r_time);
 	prefmsg (u->nick, s_Services, "Statistic Requests: %d", me.requests);
 	prefmsg (u->nick, s_Services, "Max Sockets: %d (in use: %d)", me.maxsocks, me.cursocks);
-	prefmsg (u->nick, s_Services, "Use SMO for Debug?: %s", (me.usesmo) ? "Enabled" : "Disabled");
 	if (me.coder_debug)
 		prefmsg (u->nick, s_Services, "Debugging Mode is \2ON!\2");
 	else

@@ -63,12 +63,24 @@ struct hs_cfg {
 	int add;
 	int old;
 	int expire;
+#ifdef UMODE_REGNICK
+	int regnick;
+	char vhostdom[MAXHOST];
+#endif
+	int modnum;
 } hs_cfg;
 
+#ifdef UMODE_REGNICK
+typedef struct hs_user {
+	int vhostset;
+	hs_map *vhe;
+} hs_user;
+#endif
 char nnick[255];
 
 extern const char *hs_help[];
 static int hs_sign_on(char **av, int ac);
+static int hs_mode(char **av, int ac);
 
 static void hs_add(User * u, char *cmd, char *m, char *h, char *p);
 static void hs_list(User * u, int count);
@@ -121,6 +133,27 @@ void del_vhost(hs_map *vhost) {
 	/* no need to list sort here, because its already sorted */
 }
 
+void set_moddata(User *u) {
+	hs_user *hs;
+
+	hs = malloc(sizeof(hs_user));
+	hs->vhostset = 1;
+	u->moddata[hs_cfg.modnum] = hs;
+}
+
+int del_moddata(char **av, int ac) {
+
+	User *u;
+	u = finduser(av[0]);
+	if (u->moddata[hs_cfg.modnum]) {
+		nlog(LOG_DEBUG2, LOG_MOD, "Freeing Module data");
+		free(u->moddata[hs_cfg.modnum]);
+		u->moddata[hs_cfg.modnum] = NULL;
+	}
+	return 1;
+}
+	
+
 void hs_Config()
 {
 	char *ban;
@@ -135,6 +168,18 @@ void hs_Config()
 	GetConf((void *) &hs_cfg.del, CFGINT, "DelLevel");
 	GetConf((void *) &hs_cfg.list, CFGINT, "ListLevel");
 	GetConf((void *) &hs_cfg.old, CFGINT, "ExpireDays");
+	if (GetConf((void *) &hs_cfg.regnick, CFGINT, "UnetVhosts") > 0) {
+		if (GetConf((void *) &ban, CFGSTR, "UnetDomain") > 0) {
+			strncpy(hs_cfg.vhostdom, ban, MAXHOST);
+		} else {
+			hs_cfg.vhostdom[0] = '\0';
+		}
+	} else {
+		hs_cfg.regnick = 0;
+		hs_cfg.vhostdom[0] = '\0';
+	}
+		
+		
 	if ((hs_cfg.list > 200) || (hs_cfg.list <= 0))
 		hs_cfg.list = 40;
 	if ((hs_cfg.add > 200) || (hs_cfg.view <= 0))
@@ -189,7 +234,6 @@ static int hs_sign_on(char **av, int ac)
 
 	if (!is_synced)
 		return 0;
-
 	u = finduser(av[0]);
 	if (!u)
 		return 1;
@@ -215,6 +259,9 @@ static int hs_sign_on(char **av, int ac)
 				map->vhost);
 			map->lused = time(NULL);
 			save_vhost(map);
+#ifdef UMODE_REGNICK
+			set_moddata(u);
+#endif
 			return 1;
 		}
 	}
@@ -485,6 +532,7 @@ static void hs_set(User * u, char **av, int ac)
 	if (ac <= 2) {
 		prefmsg(u->nick, s_HostServ, "Current Settings:");
 		prefmsg(u->nick, s_HostServ, "Expire Time: %d (Days)", hs_cfg.old);
+		prefmsg(u->nick, s_HostServ, "Undernet Style Hidden Hosts: %s", hs_cfg.regnick ? hs_cfg.vhostdom : "Disabled");
 		prefmsg(u->nick, s_HostServ, "End of List.");
 		return;
 	}
@@ -509,8 +557,26 @@ static void hs_set(User * u, char **av, int ac)
 		chanalert(s_HostServ, "%s Set Expire Time to %d", u->nick, i);
 		SetConf((void *)i, CFGINT, "ExpireDays");
 		return;
-	}
-
+	} else if (!strcasecmp(av[2], "HIDDENHOST")) {
+		if (!strcasecmp(av[3], "off")) {
+			hs_cfg.regnick = 0;
+			SetConf((void *)0, CFGINT, "UnetVhosts");
+			prefmsg(u->nick, s_HostServ, "Undernet Style Hidden Hosts disabled for Registered Users");
+			chanalert(s_HostServ, "%s disabled Undernet Style Hidden Hosts");
+			return;
+		} else {
+			hs_cfg.regnick = 1;
+			strncpy(hs_cfg.vhostdom, av[3], MAXHOST);
+			SetConf((void *)1, CFGINT, "UnetVhosts");
+			SetConf((void *)av[3], CFGSTR, "UnetDomain");
+			prefmsg(u->nick, s_HostServ, "Undernet Style Hidden Hosts enabled for Registered Users");
+			chanalert(s_HostServ, "%s enabled Undernet Style Hidden Hosts with domain %s", u->nick, av[3]);
+			return;
+		}
+	} else {
+		prefmsg(u->nick, s_HostServ, "Unknown Option %s. Prehaps you need help?", av[2]);
+		return;
+	}			
 }
 int Online(char **av, int ac)
 {
@@ -563,6 +629,14 @@ EventFnList HostServ_Event_list[] = {
 	,
 	{"SIGNON", hs_sign_on}
 	,
+#ifdef UMODE_REGNICK
+	{"UMODE", hs_mode}
+	, 
+	{"SIGNOFF", del_moddata}
+	,
+	{"KILL", del_moddata}
+	,
+#endif
 	{NULL, NULL}
 };
 
@@ -591,6 +665,7 @@ int __ModInit(int modnum, int apiver)
 		     "Error, Can't create vhosts hash");
 		chanalert(s_Services, "Error, Can't create Vhosts Hash");
 	}
+	hs_cfg.modnum = modnum;
 	hs_cfg.add = 40;
 	hs_cfg.del = 40;
 	hs_cfg.list = 40;
@@ -611,7 +686,35 @@ void __ModFini()
 	list_destroy_nodes(vhosts);
 
 };
+int hs_mode(char **av, int ac) {
+#if UMODE_REGNICK
+	User *u;
+	char vhost[MAXHOST];
+	/* bail out if its not enabled */
+	if (hs_cfg.regnick != 1) 
+		return -1;
 
+	/* bail if we are not synced */
+	if (!is_synced || !load_synch)
+		return 0;
+		
+	/* first, find if its a regnick mode */
+	if (index(av[1], 'r')) {
+		u = finduser(av[0]);
+		if (u->moddata[hs_cfg.modnum] != NULL) {
+			nlog(LOG_DEBUG2, LOG_MOD, "not setting hidden host on %s", av[0]);
+			return -1;
+		}
+		nlog(LOG_DEBUG2, LOG_MOD, "Regnick Mode on %s", av[0]);
+		snprintf(vhost, MAXHOST, "%s.%s", av[0], hs_cfg.vhostdom);
+		ssvshost_cmd(av[0], vhost);
+		prefmsg(av[0], s_HostServ,
+			"Automatically setting your Hidden Host to %s", vhost);
+		set_moddata(u);
+	}
+#endif
+	return 1;
+}
 
 /* Routine for registrations with the 'vhosts.db' file */
 void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
@@ -815,6 +918,9 @@ static void hs_add(User * u, char *cmd, char *m, char *h, char *p)
 				prefmsg(cmd, s_HostServ,
 					"For security, you should change your vhost password. See /msg %s help chpass",
 					s_HostServ);
+#ifdef UMODE_REGNICK
+				set_moddata(nu);
+#endif
 				return;
 			}
 		}
@@ -970,6 +1076,7 @@ void Loadhosts()
 		fclose(fp);
 		unlink("data/vhosts.db");
 	} else if (GetTableData("Vhosts", &LoadArry) > 0) {
+		load_synch = 1;
 		for (count = 0; LoadArry[count] != NULL; count++) {
 			map = malloc(sizeof(hs_map));
 			strncpy(map->nnick, LoadArry[count], MAXNICK);
@@ -1056,6 +1163,9 @@ static void hs_login(User * u, char *login, char *pass)
 			chanalert(s_HostServ,
 				  "%s used login to get Vhost %s", u->nick,
 				  map->vhost);
+#ifdef UMODE_REGNICK
+			set_moddata(u);
+#endif
 			save_vhost(map);
 			return;
 		}

@@ -1,37 +1,38 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
-* NeoStats * Fish * Version 2.5.6
- - Added MrAllThats Colourisation of ConnectServ Messages 
- - Fixed ConnectServ to not show notices for local events (BugID: 44)
- - Fixed a compile problem with StatServ (BugID: 47)
- - Strip Colors from clientversions in StatServ
- - Output clientversions in the HTML output (ReqID: 40)
- - First go and implementing Data API. SLOOOOW (DON'T USE THIS FOR PRODUCTION)
- - update doco slightly
- - Keeper wasn't doing so good at caching files. Fixed that
- - StatServ now stores and retrives all data from the Keeper Database. old data/*.db code kept to help upgrade to the new database backend
- - Some Cleanups suggested by Mark
- - Update Config script
- - Fixed ConnectServ nickwatch being Fubar (BugID 49)
- - We now moved to SubVersion and moved the repository to http://svn.neostats.net/ Check the homepage out for more details
- - Removed OperMe from svn repository
- - Updated Keeper to make sure it only writes files out that are readable by us
- - Fix BugID 52, ServiceRoots enabled twice for Hybrid7 compiles
- - Mark send a few patches for logging issues and dl.c issues as well as a updated Config script
- - Fix a printf statement that shouldn't be there
- - more patches from mark fixing up segvinmodules and the module init code standard
- - updates from mark on Log formatting
- - HostServ upgraded to use lists, keeper for datastorage. list output is sorted and a max of 20 entries are displayed per /msg hostserv list
- - More cleanups and IRCd portability updates from Mark. 
- - (M) Changes to help files to use a common format, fix typos etc
- - (M) Added missing help text for MODBOTLIST etc
- - (M) Overhaul of module system to improve error checks and minor bug fixes
- - (M) Minor cleanups throughout the code
- - (M) Completion of log filename format system. Filename format is now user configurable
- - (M) Module unloading cleanup. We now have a common function unload_modules() to do this.
- - (M) Paranoid buffer overflow checking - all strcpy and sprintf changed to strncpy and snprintf
- - (M) Changed all instances of "neostats.cfg" to CONFIG_NAME
- - (M) Changed "not Tech Admin" type errors to "not authorised"
- - (M) Improved comments in makeconf and added support for custom log filenames
+* NeoStats * Fish (F) & Mark (M)* Version 2.5.6
+ - Added MrAllThats Colourisation of ConnectServ Messages (F)
+ - Fixed ConnectServ to not show notices for local events (BugID: 44) (F)
+ - Fixed a compile problem with StatServ (BugID: 47) (F)
+ - Strip Colors from clientversions in StatServ (F)
+ - Output clientversions in the HTML output (ReqID: 40) (F)
+ - First go and implementing Data API. SLOOOOW (DON'T USE THIS FOR PRODUCTION) (F)
+ - update doco slightly (F)
+ - Keeper wasn't doing so good at caching files. Fixed that (F)
+ - StatServ now stores and retrives all data from the Keeper Database. old data/*.db code kept to help upgrade to the new database backend (F)
+ - Some Cleanups suggested by Mark (M)
+ - Update Config script (F)
+ - Fixed ConnectServ nickwatch being Fubar (BugID 49) (F)
+ - We now moved to SubVersion and moved the repository to http://svn.neostats.net/ Check the homepage out for more details (F)
+ - Removed OperMe from svn repository (F)
+ - Updated Keeper to make sure it only writes files out that are readable by us (M)
+ - Fix BugID 52, ServiceRoots enabled twice for Hybrid7 compiles (M)
+ - Mark send a few patches for logging issues and dl.c issues as well as a updated Config script (M)
+ - Fix a printf statement that shouldn't be there (M)
+ - more patches from mark fixing up segvinmodules and the module init code standard (M/F)
+ - updates from mark on Log formatting (M)
+ - HostServ upgraded to use lists, keeper for datastorage. list output is sorted and a max of 20 entries are displayed per /msg hostserv list (M)
+ - More cleanups and IRCd portability updates from Mark. (M)
+ - Changes to help files to use a common format, fix typos etc (M)
+ - Added missing help text for MODBOTLIST etc (M)
+ - Overhaul of module system to improve error checks and minor bug fixes (M)
+ - Minor cleanups throughout the code (M)
+ - Completion of log filename format system. Filename format is now user configurable (M)
+ - Module unloading cleanup. We now have a common function unload_modules() to do this. (M)
+ - Paranoid buffer overflow checking - all strcpy and sprintf changed to strncpy and snprintf (M)
+ - Changed all instances of "neostats.cfg" to CONFIG_NAME (M)
+ - Changed "not Tech Admin" type errors to "not authorised" (M)
+ - Improved comments in makeconf and added support for custom log filenames (M)
+ - HostServ supports Undernet style hidden hosts for Registered users now. (F)
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number

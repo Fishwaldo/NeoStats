@@ -128,7 +128,6 @@ main (int argc, char *argv[])
 	me.local[0] = '\0';
 	me.coder_debug = 0;
 	me.noticelag = 0;
-	me.usesmo = 0;
 	me.r_time = 10;
 	me.lastmsg = time (NULL);
 	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
@@ -488,9 +487,6 @@ static void
 start ()
 {
 	static int attempts = 0;
-	Module *mod_ptr = NULL;
-	hscan_t ms;
-	hnode_t *mn;
 
 	SET_SEGV_LOCATION();
 	nlog (LOG_NOTICE, LOG_CORE, "Connecting to %s:%d", me.uplink, me.port);

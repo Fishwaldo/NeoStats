@@ -186,7 +186,6 @@ struct me {
 	char message[BUFSIZE];
 	char chan[BUFSIZE];
 	unsigned int onchan:1;
-	unsigned int usesmo:1;
 	unsigned int synced:1;
 	Server *s;
 	int requests;

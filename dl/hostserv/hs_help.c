@@ -161,8 +161,9 @@ const char *hs_help_levels[] = {
 };
 
 const char *hs_help_set[] = {
-	"Syntax: \2SET LIST\2",
+	"Syntax: \2SET\2",
 	"        \2SET EXPIRE <TIME>\2",
+	"        \2SET HIDDENHOST <OFF/host>\2",
 	"",
 	"\2SET LIST\2",
 	"This lists the current settings for HostServ.",
@@ -170,5 +171,10 @@ const char *hs_help_set[] = {
 	"\2SET EXPIRE <TIME>\2",
 	"How long before unused HostServ entries should be",
 	"automatically deleted.",
+	"",
+	"\2SET HIDDENHOST <OFF/host>\2",
+	"Turns on undernet style hidden hosts when users identify to nickserv.",
+	"The hidden host is set to <user>.<host>.",
+	"by specifing \2OFF\2 you can disable this functionality",
 	NULL
 };

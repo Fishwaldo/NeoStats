@@ -96,9 +96,6 @@ read_loop ()
 	Sock_List *mod_sock;
 	hscan_t ss;
 	hnode_t *sn;
-	Module *mod_ptr = NULL;
-	hscan_t ms;
-	hnode_t *mn;
 
 	TimeOut = malloc (sizeof (struct timeval));
 

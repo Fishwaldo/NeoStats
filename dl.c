@@ -867,3 +867,21 @@ unload_module (char *module_name, User * u)
 	return -1;
 }
 
+void unload_modules(User * u)
+{
+	Module *mod_ptr = NULL;
+	hscan_t ms;
+	hnode_t *mn;
+	/* Unload the Modules */
+	hash_scan_begin (&ms, mh);
+	while ((mn = hash_scan_next (&ms)) != NULL) {
+		mod_ptr = hnode_get (mn);
+		if(u) {
+			chanalert (s_Services, "Module %s Unloaded by %s", mod_ptr->info->module_name, u->nick);
+			unload_module (mod_ptr->info->module_name, u);
+		}
+		else {
+			unload_module (mod_ptr->info->module_name, finduser (s_Services));
+		}
+	}
+}
