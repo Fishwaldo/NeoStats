@@ -136,10 +136,10 @@ static int ms_lapdance(CmdParams* cmdparams)
 		"Lap dance sent to %s!", target->name);
 	irc_prefmsg(ms_bot, target, 
 		"*%s Seductively walks up to %s and gives %s a sly look*",
-		ms_bot->name, target, target);
+		ms_bot->name, target->name, target->name);
 	irc_prefmsg(ms_bot, target, 
 		"*%s Sits across %s's legs and gives %s the best Lap Dance of their life*",
-		ms_bot->name, target, target);
+		ms_bot->name, target->name, target->name);
 	irc_prefmsg(ms_bot, target, 
 		"*I Think we both need a cold shower now*... *wink*");
 	return 1;
@@ -224,7 +224,7 @@ static int ms_cheerup(CmdParams* cmdparams)
 	}
 	irc_prefmsg(ms_bot, cmdparams->source, 
 		"Cheerup sent to %s!", target->name);
-	irc_prefmsg(ms_bot, target,  "Cheer up %s .....", target);
+	irc_prefmsg(ms_bot, target,  "Cheer up %s .....", target->name);
 	irc_prefmsg(ms_bot, target, 
 		"All of us on the network love you! 3--<--<--<{4@");
 	return 1;
@@ -316,6 +316,6 @@ static int ms_wonderful(CmdParams* cmdparams)
 	irc_prefmsg(ms_bot, target, 
 		"I hope you don't mind, I hope you don't mind that I put down in words");
 	irc_prefmsg(ms_bot, target, 
-		"How wonderful life is while %s is in the world", target);
+		"How wonderful life is while %s is in the world", target->name);
 	return 1;
 }
