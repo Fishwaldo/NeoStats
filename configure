@@ -24825,7 +24825,7 @@ cat >>confdefs.h <<\_ACEOF
 #define PCRE_VERSION NPCRE_VERSION
 _ACEOF
 
-PCRE_LIBS='${top_srcdir}/'src/pcre/libpcre.la
+PCRE_LIBS='${top_srcdir}/'lib/pcre/libpcre.la
 PCRE_CFLAGS='-I${top_srcdir}/'lib/pcre
 
 
@@ -25085,7 +25085,7 @@ cat >>confdefs.h <<\_ACEOF
 #define PCRE_VERSION NPCRE_VERSION
 _ACEOF
 
-PCRE_LIBS='${top_srcdir}/'src/pcre/libpcre.la
+PCRE_LIBS='${top_srcdir}/'lib/pcre/libpcre.la
 PCRE_CFLAGS='-I${top_srcdir}/'lib/pcre
 
 

@@ -7102,7 +7102,7 @@ AC_DEFINE(MATCH_LIMIT, 10000000, "PCRE Match limit")
 AC_DEFINE(PCRE_MAJOR_VERSION, $NPCRE_MAJOR_VERSION, "PCRE Version")
 AC_DEFINE(PCRE_MINOR_VERSION, NPCRE_MINOR_VERSION, "PCRE Version")
 AC_DEFINE(PCRE_VERSION, NPCRE_VERSION, "Pcre full version")
-PCRE_LIBS='${top_srcdir}/'src/pcre/libpcre.la
+PCRE_LIBS='${top_srcdir}/'lib/pcre/libpcre.la
 PCRE_CFLAGS='-I${top_srcdir}/'lib/pcre
 AC_SUBST([PCRE_LIBS])
 AC_SUBST([PCRE_CFLAGS])
