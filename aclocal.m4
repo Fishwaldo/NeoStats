@@ -30,7 +30,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-AC_PREREQ([2.52])
+AC_PREREQ([2.13])
 
 # serial 6
 
@@ -121,7 +121,7 @@ AC_DEFUN([AM_CONFIG_HEADER],
 # CC etc. in the Makefile, will ask for an AC_PROG_CC use...
 
 
-AC_PREREQ([2.52])
+AC_PREREQ([2.13])
 
 # Autoconf 2.50 wants to disallow AM_ names.  We explicitly allow
 # the ones we care about.
@@ -430,7 +430,7 @@ fi
 # configured tree to be moved without reconfiguration.
 
 # Rely on autoconf to set up CDPATH properly.
-AC_PREREQ([2.50])
+AC_PREREQ([2.13])
 
 AC_DEFUN([AM_AUX_DIR_EXPAND], [
 # expand $ac_aux_dir to an absolute path
@@ -805,7 +805,7 @@ rm -f confinc confmf
 
 # serial 5
 
-AC_PREREQ(2.52)
+AC_PREREQ(2.13)
 
 # AM_CONDITIONAL(NAME, SHELL-CONDITION)
 # -------------------------------------
