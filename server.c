@@ -25,7 +25,6 @@
 ** $Id$
 */
 
-
 #include "stats.h"
 #include "dl.h"
 #include "hash.h"
@@ -36,19 +35,14 @@
 
 hash_t *sh;
 
-static Server *new_server (char * name);
-
 static Server *
-new_server (char *name)
+new_server (const char *name)
 {
 	Server *s;
 	hnode_t *sn;
 
 	s = calloc (sizeof (Server), 1);
-	if (!name)
-		strsetnull (s->name);
-	else
-		strlcpy (s->name, name, MAXHOST);
+	strlcpy (s->name, name, MAXHOST);
 	sn = hnode_create (s);
 	if (!sn) {
 		nlog (LOG_WARNING, LOG_CORE, "Eeek, Hash is broken\n");
@@ -62,7 +56,7 @@ new_server (char *name)
 }
 
 Server *
-AddServer (char *name, char *uplink, int hops)
+AddServer (const char *name, const char *uplink, const int hops)
 {
 	Server *s;
 	char **av;
@@ -82,13 +76,14 @@ AddServer (char *name, char *uplink, int hops)
 	
 	/* run the module event for a new server. */
 	AddStringToList (&av, s->name, &ac);
-	ModuleEvent (EVENT_NEWSERVER, av, ac);
+	AddStringToList (&av, (char*)uplink, &ac);
+	ModuleEvent (EVENT_SERVER, av, ac);
 	free (av);
 	return(s);
 }
 
-void
-DelServer (char *name)
+void 
+SquitServer (const char *name, const char* reason)
 {
 	Server *s;
 	hnode_t *sn;
@@ -100,31 +95,22 @@ DelServer (char *name)
 	}
 	sn = hash_lookup (sh, name);
 	if (!sn) {
-		nlog (LOG_DEBUG1, LOG_CORE, "DelServer(): %s not found!", name);
+		nlog (LOG_WARNING, LOG_CORE, "SquitServer: squit from unknown server %s", name);
 		return;
 	}
 	s = hnode_get (sn);
 
 	/* run the event for delete server */
 	AddStringToList (&av, s->name, &ac);
+	if(reason) {
+		AddStringToList (&av, (char*)reason, &ac);
+	}
 	ModuleEvent (EVENT_SQUIT, av, ac);
 	free (av);
 
 	hash_delete (sh, sn);
 	hnode_destroy (sn);
 	free (s);
-}
-
-void 
-SquitServer(char* name)
-{
-	Server *s;
-	s = findserver (name);
-	if (s) {
-		DelServer (name);
-	} else {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Squit from Unknown Server %s", name);
-	}
 }
 
 Server *
@@ -138,13 +124,13 @@ findserver (const char *name)
 		s = hnode_get (sn);
 		return s;
 	} else {
-		nlog (LOG_DEBUG2, LOG_CORE, "FindServer(): %s not found!", name);
+		nlog (LOG_DEBUG2, LOG_CORE, "FindServer: %s not found!", name);
 		return NULL;
 	}
 }
 
 void
-ServerDump ()
+ServerDump (void)
 {
 	Server *s;
 	hscan_t ss;
@@ -245,10 +231,8 @@ TBLDEF neo_servers = {
 
 
 int 
-init_server_hash ()
+init_server_hash (void)
 {
-
-
 	sh = hash_create (S_TABLE_SIZE, 0, 0);
 	if (!sh) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Create Server Hash Failed\n");
@@ -260,8 +244,6 @@ init_server_hash ()
 	neo_servers.address = sh;
 	rta_add_table(&neo_servers);
 #endif
-
-
 	return NS_SUCCESS;
 }
 

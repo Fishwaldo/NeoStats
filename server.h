@@ -24,11 +24,10 @@
 #ifndef _SERVER_H_
 #define _SERVER_H_
 
-Server *AddServer (char *name, char *uplink, int hops);
-void DelServer (char *name);
+Server *AddServer (const char *name, const char *uplink, const int hops);
+void SquitServer(const char *name, const char* reason);
 void ServerDump (void);
 int init_server_hash (void);
 void PingServers (void);
-void SquitServer(char* name);
 
 #endif /* _SERVER_H_ */

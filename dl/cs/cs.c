@@ -186,7 +186,7 @@ EventFnList __module_events[] = {
 	{EVENT_SIGNOFF,		cs_del_user},
 	{EVENT_KILL,		cs_user_kill},
 	{EVENT_NICKCHANGE,	cs_user_nick},
-	{EVENT_NEWSERVER,	cs_server_join},
+	{EVENT_SERVER,		cs_server_join},
 	{EVENT_SQUIT,		cs_server_quit},
 	{NULL, NULL}
 };

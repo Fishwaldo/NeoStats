@@ -65,7 +65,7 @@ ModuleInfo __module_info = {
 EventFnList __module_events[] = {
 	{EVENT_ONLINE, Online},
 	{EVENT_PONG, pong},
-	{EVENT_NEWSERVER, s_new_server},
+	{EVENT_SERVER, s_new_server},
 	{EVENT_SQUIT, s_del_server},
 	{EVENT_SIGNON, s_new_user},
 	{EVENT_UMODE, s_user_modes},

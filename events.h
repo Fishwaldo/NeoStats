@@ -60,17 +60,18 @@
  *	
  */
 #define EVENT_BOTKILL		"BOTKILL"
-/*  NEWSERVER is called when a server connects to the network. the server 
+/*  SERVER is called when a server connects to the network. the server 
  *  structure Server is passed as a parameter so you can see 
  *  details about the new server
- *  NEWSERVER parameters are:
+ *  SERVER parameters are:
  *	server name
+ *	uplink
  */
-#define EVENT_NEWSERVER		"NEWSERVER"
+#define EVENT_SERVER		"SERVER"
 /*  SQUIT is called when a server squits the network 
- *           (ED: what's the diff with above?)
  *  SQUIT parameters are:
  *	server name
+ *	reason
  */
 #define EVENT_SQUIT			"SQUIT"
 /*  NETINFO	is called when the connection to the network is synced. 

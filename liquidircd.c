@@ -549,7 +549,10 @@ Usr_Server (char *origin, char **argv, int argc)
 static void
 Usr_Squit (char *origin, char **argv, int argc)
 {
-	DelServer (argv[0]);
+	char *tmpbuf;
+	tmpbuf = joinbuf(argv, argc, 1);
+	SquitServer (argv[0], tmpbuf);
+	free(tmpbuf);
 }
 
 static void
@@ -680,7 +683,10 @@ Srv_Server (char *origin, char **argv, int argc)
 static void
 Srv_Squit (char *origin, char **argv, int argc)
 {
-	SquitServer(argv[0]);
+	char *tmpbuf;
+	tmpbuf = joinbuf(argv, argc, 1);
+	SquitServer (argv[0], tmpbuf);
+	free(tmpbuf);
 }
 
 static void
