@@ -59,6 +59,8 @@ EventFnList StatServ_Event_List[] = {
 	{ "SIGNOFF",	 s_del_user},
 	{ "AWAY",	s_user_away},
 	{ "KILL",	s_user_kill},
+	{ "NEWCHAN", 	s_chan_new},
+	{ "DELCHAN",	s_chan_del},
 	{ NULL,	 NULL}
 };
 
@@ -320,6 +322,8 @@ static void ss_netstats(User *u) {
 	privmsg(u->nick, s_StatServ, "Network Statistics:-----");
 	privmsg(u->nick, s_StatServ, "Current Users: %ld", stats_network.users);
 	privmsg(u->nick, s_StatServ, "Maximum Users: %ld [%s]", stats_network.maxusers, sftime(stats_network.t_maxusers));
+	privmsg(u->nick, s_StatServ, "Current Channels %ld", stats_network.chans);
+	privmsg(u->nick, s_StatServ, "Maximum Channels %ld [%s]", stats_network.maxchans, sftime(stats_network.t_chans));
 	privmsg(u->nick, s_StatServ, "Current Opers: %ld", stats_network.opers);
 	privmsg(u->nick, s_StatServ, "Maximum Opers: %ld [%s]", stats_network.maxopers, sftime(stats_network.t_maxopers));
 	privmsg(u->nick, s_StatServ, "Users Set Away: %d", stats_network.away);
@@ -334,23 +338,45 @@ static void ss_daily(User *u) {
 	privmsg(u->nick, s_StatServ, "Daily Network Statistics:");
 	privmsg(u->nick, s_StatServ, "Maximum Servers: %-2d %s", daily.servers, sftime(daily.t_servers));
 	privmsg(u->nick, s_StatServ, "Maximum Users: %-2d %s", daily.users, sftime(daily.t_users));
+	privmsg(u->nick, s_StatServ, "Maximum Chans: %-2d %s", daily.chans, sftime(daily.t_chans));
 	privmsg(u->nick, s_StatServ, "Maximum Opers: %-2d %s", daily.opers, sftime(daily.t_opers));
 	privmsg(u->nick, s_StatServ, "All Daily Statistics are reset at Midnight");
 	privmsg(u->nick, s_StatServ, "End of Information.");
 }
 
-static void ss_map(User *u) {
-	SStats *ss;
+static void makemap(char *uplink, User *u, int level) {
+	hscan_t hs;
+	hnode_t *sn;
 	Server *s;
+	SStats *ss;
+	char buf[256];
+	int i;
+	hash_scan_begin(&hs, sh);
+	while ((sn = hash_scan_next(&hs))) {
+		s = hnode_get(sn);
+		ss = findstats(s->name);
 
-	strcpy(segv_location, "StatServ-ss_map");
-
-
-	privmsg(u->nick, s_StatServ, "%-23s %-10s %-10s %-10s", "\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2",  "\2[LAG/MAX]\2");
-	for (ss = Shead; ss; ss=ss->next) {
-		s=findserver(ss->name);	
-		if (s) privmsg(u->nick, s_StatServ, "\2%-23s [ %d/%d ]	[ %d/%d ]	[ %ld/%ld ]", ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
+		if ((level == 0) && (strlen(s->uplink) <= 0)) { 
+			/* its the root server */
+			privmsg(u->nick, s_StatServ, "\2%-45s	[ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]", ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
+			makemap(s->name, u, level+1);
+		} else if ((level > 0) && !strcasecmp(uplink, s->uplink)) {
+			/* its not the root server */
+			sprintf(buf, " ");
+			for (i = 1; i < level; i++) {
+				sprintf(buf, "%s     |", buf);
+			}	
+			privmsg(u->nick, s_StatServ, "%s \\_\2%-40s	[ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]", buf, ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
+			makemap(s->name, u, level+1);
+		}
 	}
+	return;
+}
+
+static void ss_map(User *u) {
+	strcpy(segv_location, "StatServ-ss_map");
+	privmsg(u->nick, s_StatServ, "%-40s	%-10s %-10s %-10s", "\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2",  "\2[LAG/MAX]\2");
+	makemap("", u, 0);
 	privmsg(u->nick, s_StatServ, "--- End of Listing ---");
 }
 
@@ -358,6 +384,8 @@ static void ss_server(User *u, char *server) {
 
 	SStats *ss;
 	Server *s;
+	hscan_t hs;
+	hnode_t *sn;
 
 	strcpy(segv_location, "StatServ-ss_server");
 
@@ -365,7 +393,9 @@ static void ss_server(User *u, char *server) {
 	if (!server) {
 		privmsg(u->nick, s_StatServ, "Error, the Syntax is Incorrect. Please Specify a Server");
 		privmsg(u->nick, s_StatServ, "Server Listing:");
-		for (ss = Shead; ss; ss = ss->next) {
+		hash_scan_begin(&hs, Shead);
+		while ((sn = hash_scan_next(&hs))) {
+			ss = hnode_get(sn);
 			if (findserver(ss->name)) {
 				privmsg(u->nick, s_StatServ, "Server: %s (*)", ss->name);
 			} else {
@@ -517,6 +547,8 @@ static void ss_botlist(User *origuser)
 static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 {
 	SStats *st;
+	hscan_t hs;
+	hnode_t *sn;
 
 	strcpy(segv_location, "StatServ-ss_stats");
 
@@ -537,14 +569,15 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 	if (!strcasecmp(cmd, "LIST")) {
 		int i = 1;
 		privmsg(u->nick, s_StatServ, "Statistics Database:");
-		for (st = Shead; st; st = st->next) {
+		hash_scan_begin(&hs, Shead);
+		while ((sn = hash_scan_next(&hs))) {
+			st = hnode_get(sn);
 			privmsg(u->nick, s_StatServ, "[%-2d] %s", i, st->name);
 			i++;
 		}
 		privmsg(u->nick, s_StatServ, "End of List.");
 		log("%s requested STATS LIST.", u->nick);
 	} else if (!strcasecmp(cmd, "DEL")) {
-		SStats *m = NULL;
 		if (!arg) {
 			privmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS DEL <name>",
 				s_StatServ);
@@ -558,16 +591,13 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 				arg);
 			return;
 		}
-		for (st = Shead; st; st = st->next) {
-			if (!strcasecmp(arg, st->name))
-				break;
-			m = st;
+		sn = hash_lookup(Shead, arg);
+		if (sn) {
+			hash_delete(Shead, sn);
+			st = hnode_get(sn);
+			hnode_destroy(sn);
+			free(st);
 		}
-		if (m)
-			m->next = st->next;
-		else
-			Shead = st->next;
-		free(st);
 		privmsg(u->nick, s_StatServ, "Removed %s from the database.", arg);
 		log("%s requested STATS DEL %s", u->nick, arg);
 	} else if (!strcasecmp(cmd, "COPY")) {

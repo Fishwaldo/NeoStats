@@ -53,6 +53,8 @@ void ss_html()
 {
     SStats *s;
     FILE *fp;
+    hscan_t hs;
+    hnode_t *sn;
 
     /* Approximate Segfault Location */
     strcpy(segv_location, "ss_html_output");
@@ -68,8 +70,9 @@ void ss_html()
 
     /* Output of Online/Offline Servers */
     fprintf(fp, "</tr><tr>\n");
-
-    for (s = Shead; s; s = s->next) {
+    hash_scan_begin(&hs, Shead);
+    while ((sn = hash_scan_next(&hs))) {
+    	s = hnode_get(sn);
         if (findserver(s->name)) {
             fprintf(fp, "<tr><td height=\"4\">Server: </td>\n");
             fprintf(fp, "<td height=\"4\"> %s (*) </td></tr>\n", s->name);

@@ -18,7 +18,8 @@ void SaveStats()
 {
     FILE *fp = fopen("data/stats.db", "w");
     SStats *s;
-
+    hscan_t ss;
+    hnode_t *sn;
     strcpy(segv_location, "StatServ-SaveStats");
 
 
@@ -27,7 +28,9 @@ void SaveStats()
         return;
     }
 
-    for (s = Shead; s; s = s->next) {
+    hash_scan_begin(&ss, Shead);
+    while ((sn = hash_scan_next(&ss))) {
+    	s=hnode_get(sn);
 #ifdef DEBUG
     log("Writing statistics to database for %s", s->name);
 #endif
@@ -54,6 +57,7 @@ void LoadStats()
     char *name, *numsplits, *maxusers, *t_maxusers,
         *maxopers, *t_maxopers, *lastseen, *starttime,
         *operkills, *serverkills, *totusers;
+    hnode_t *sn;
 
     strcpy(segv_location, "StatServ-LoadStats");
 
@@ -76,7 +80,7 @@ void LoadStats()
     }
     fclose(fp);
     }
-
+    Shead = hash_create(S_TABLE_SIZE,0,0);
     if ((fp = fopen("data/stats.db", "r")) == NULL)
         return;
 
@@ -118,14 +122,24 @@ void LoadStats()
 #ifdef DEBUG
     log("LoadStats(): Loaded statistics for %s", s->name);
 #endif
-        if (!Shead) {
-            Shead = s;
-            Shead->next = NULL;
-        } else {
-            s->next = Shead;
-            Shead = s;
-        }
+	sn = hnode_create(s);
+	if (hash_isfull(Shead)) {
+		log("Eeek, StatServ Server Hash is Full!");
+	} else {
+		hash_insert(Shead, sn, s->name);
+	}
     }
     fclose(fp);
+    Chead = hash_create(C_TABLE_SIZE);
+    if ((fp = fopen("data/cstats.db", "r")) == NULL)
+    	return;
+    memset(buf, '\0', BUFSIZE);
+    while (fgets(buf, BUFSIZE, fp)) {
+        s = smalloc(sizeof(SStats));
+	    
+    
+
+
+
 }
 

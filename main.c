@@ -66,6 +66,12 @@ int main()
 	__init_mod_list();
 	setup_signals();
 	ConfLoad();
+	TimerReset();
+	init_server_hash();
+	init_user_hash();
+	init_chan_hash();
+	init_ircd();
+
 /* Shmad */
 /* This section ALWAYS craps out so we ignore it-- for now */
 	if (init_modules()) {
@@ -200,11 +206,6 @@ void start()
 	static int attempts = 0;
 	
 	strcpy(segv_location, "start");
-	TimerReset();
-	init_server_hash();
-	init_user_hash();
-	init_chan_hash();
-	init_ircd();
 /* 
 	init_tld();
 */

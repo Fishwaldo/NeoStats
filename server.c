@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: server.c,v 1.7 2002/03/07 12:41:12 fishwaldo Exp $
+** $Id: server.c,v 1.8 2002/03/22 10:44:47 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -58,7 +58,11 @@ void AddServer(char *name,char *uplink, int hops)
 	s->hops = hops;
 	s->connected_since = time(NULL);
 	s->last_announce = time(NULL);
-	memcpy(s->uplink,uplink, MAXHOST);
+	if (uplink) {
+		memcpy(s->uplink,uplink, MAXHOST);
+	} else {
+		strcpy(s->uplink, "\0");
+	}
 	s->ping = 0;
 }
 
@@ -120,7 +124,7 @@ void init_server_hash()
 		log("Create Server Hash Failed\n");
 		exit(-1);
 	}
-	AddServer(me.name,me.name, 0);
+	AddServer(me.name,NULL, 0);
 }
 
 void TimerPings()

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.16 2002/03/21 04:12:04 fishwaldo Exp $
+** $Id: chans.c,v 1.17 2002/03/22 10:44:47 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -29,6 +29,7 @@ extern void Change_Topic(char *owner, Chans *c, time_t time, char *topic) {
 	strncpy(c->topic, topic, BUFSIZE);
 	strncpy(c->topicowner, owner, BUFSIZE);
 	c->topictime = time;
+	Module_Event("TOPICCHANGE", c);
 }
 
 int comparemode(const void *v, const void *mode) {
@@ -209,12 +210,14 @@ void part_chan(User *u, char *chan) {
 			}
 		} else {
 			lnode_destroy(list_delete(c->chanmembers, un));
+			Module_Event("PARTCHAN", c);
 			c->cur_users--;
 		}
 #ifdef DEBUG
 		log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
 #endif
 		if (c->cur_users <= 0) {
+			Module_Event("DELCHAN", c);
 			del_chan(c);
 		}
 		un = list_find(u->chans, c->name, comparef);
@@ -277,6 +280,7 @@ void join_chan(User *u, char *chan) {
 		c->modeparms = list_create(MAXMODES);
 		c->cur_users =0;
 		c->topictime = 0;
+		Module_Event("NEWCHAN", c);
 	} 
 	/* add this users details to the channel members hash */	
 	cm = smalloc(sizeof(Chanmem));
@@ -307,9 +311,11 @@ void join_chan(User *u, char *chan) {
 		log("eek, User %s members list is full", u->nick);
 	} else {
 		list_append(u->chans, un); 
+	Module_Event("JOINCHAN", c);
 	}
-		log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
-
+#ifdef DEBUG
+	log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
+#endif
 }
 
 void chandump(char *chan) {

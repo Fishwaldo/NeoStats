@@ -11,6 +11,26 @@
 
 #include "statserv.h"
 
+void s_chan_new(Chans *c) {
+	long count;
+	
+	IncreaseChans();
+	count = hash_count(ch);
+	if (count > stats_network.maxchans) {
+		stats_network.maxchans = count;
+		stats_network.t_chans = time(NULL);
+		if (StatServ.onchan) swallops_cmd(s_StatServ, "\2NEW CHANNEL RECORD\2 Wow, there is now %d Channels on the Network", stats_network.maxchans);
+	}
+	if (count > daily.chans) {
+		daily.chans = count;
+		daily.t_chans = time(NULL);
+	}
+}
+
+void s_chan_del(Chans *c) {
+	DecreaseChans();
+}
+
 int s_new_server(Server *s) {
 	strcpy(segv_location, "StatServ-s_new_server");
 
@@ -95,16 +115,11 @@ extern int s_user_modes(User *u) {
 	}
 	 if (!u->modes) return -1; 
 	modes = u->modes;
-	/* Don't bother if we are not StatServ.onchaned yet */
 	while (*modes++) {
-#ifdef DEBUG
-	log("s_modes %c", *modes); 
-#endif
 
 		switch(*modes) {
 			case '+': add = 1;	break;
 			case '-': add = 0;	break;
-			case 'N':
 			case 'o':
 				if (add) {
 					IncreaseOpers(findstats(u->server->name));
@@ -119,41 +134,12 @@ extern int s_user_modes(User *u) {
 						s->t_maxopers = time(NULL);
 						if (StatServ.onchan) swallops_cmd(s_StatServ, "\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s->name, s->opers);
 					}
-			if (s->opers > daily.opers) {
-			daily.opers = s->opers;
-			daily.t_opers = time(NULL);
-					}	
-				} else {
-					 DecreaseOpers(findstats(u->server->name));
-#ifdef DEBUG
-					 log("Decrease Opers");
-#endif
-				}
-				break;
-			case 'O':
-				if (add) {
-					IncreaseOpers(findstats(u->server->name));
-					s = findstats(u->server->name);
-					if (stats_network.maxopers < stats_network.opers) {
-						stats_network.maxopers = stats_network.opers;
-						stats_network.t_maxopers = time(NULL);
-						if (StatServ.onchan) swallops_cmd(s_StatServ, "\2Oper Record\2 The Network has reached a New Record for Opers at %d", stats_network.opers);
-					}
-					if (s->maxopers < s->opers) {
-						s->maxopers = s->opers;
-						s->t_maxopers = time(NULL);
-						if (StatServ.onchan) swallops_cmd(s_StatServ, "\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s->name, s->opers);
-					}						
 					if (s->opers > daily.opers) {
 						daily.opers = s->opers;
 						daily.t_opers = time(NULL);
-					}
-
+					}	
 				} else {
-					DecreaseOpers(findstats(u->server->name));
-#ifdef DEBUG
-					log("Decrease Opers");
-#endif
+					 DecreaseOpers(findstats(u->server->name));
 				}
 				break;
 			default: 
@@ -171,7 +157,6 @@ void re_init_bot() {
 }
 extern int s_del_user(User *u) {
 	SStats *s;
-	char *cmd;
 #ifdef DEBUG
 	log(" Server %s", u->server->name);
 #endif
@@ -181,18 +166,12 @@ extern int s_del_user(User *u) {
 	}
 	DecreaseUsers(s);
 	DelTLD(u);
-	cmd = sstrdup(recbuf);
-	cmd = strtok(cmd, " ");
-	cmd = strtok(NULL, " ");
-	cmd = strtok(NULL, "");
-	cmd++;
 	return 1;
 }
 
 
 extern int s_user_away(User *u) {
 	strcpy(segv_location, "StatServ-s_user_away");
-
 
 	if (u->is_away) {
 	u->is_away = 1;
@@ -307,6 +286,7 @@ int Online(void *s) {
 
 extern SStats *new_stats(const char *name)
 {
+	hnode_t *sn;
 	SStats *s = calloc(sizeof(SStats), 1);
 
 #ifdef DEBUG
@@ -339,16 +319,11 @@ extern SStats *new_stats(const char *name)
 	s->opers = 0;
 	s->operkills = 0;
 	s->serverkills = 0;
-	
-
-
-
-	if (!Shead) {
-		Shead = s;
-		Shead->next = NULL;
+	sn = hnode_create(s);
+	if (hash_isfull(Shead)) {
+		log("Eeek, StatServ Server hash is full!");
 	} else {
-		s->next = Shead;
-		Shead = s;
+		hash_insert(Shead, sn, s->name);
 	}
 	return s;
 }
@@ -356,7 +331,6 @@ extern SStats *new_stats(const char *name)
 void AddStats(Server *s)
 {
 	SStats *st = findstats(s->name);
-	log("add stats 1");
 	strcpy(segv_location, "StatServ-AddStats");
 
 
@@ -373,19 +347,18 @@ void AddStats(Server *s)
 
 SStats *findstats(char *name)
 {
-	SStats *t;
+	hnode_t *sn;
 #ifdef DEBUG
 	log("findstats(%s)", name);
 #endif
 	strcpy(segv_location, "StatServ-findstats");
 
-	for (t = Shead; t; t = t->next) {
-
-		if (!strcasecmp(name, t->name))
-			return t; 
-	} 
-
-	return NULL;
+	sn = hash_lookup(Shead, name);
+	if (sn) {
+		return hnode_get(sn);
+	} else {
+		return NULL;
+	}
 }
 
 

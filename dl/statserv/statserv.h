@@ -24,8 +24,8 @@ extern char s_StatServ[MAXNICK];
 
 typedef struct tld_ TLD;
 typedef struct server_stats SStats;
-
-SStats *Shead;
+typedef struct chan_stats CStats;
+hash_t *Shead;
 TLD *tldhead;
 
 
@@ -45,6 +45,8 @@ struct stats_network_ {
 	time_t t_maxusers;
 	time_t t_maxservers;
 	int requests;
+	long maxchans;
+	time_t t_chans;
 } stats_network;
 
 
@@ -81,6 +83,15 @@ struct server_stats {
 	long daily_totusers;
 };
 
+struct chan_stats {
+	char name[CHANLEN];
+	long members;
+	long topics;
+	long totmem;
+	long kicks;
+	long joins;
+}
+
 struct daily {
 	int servers;
 	time_t t_servers;
@@ -89,6 +100,8 @@ struct daily {
 	int opers;
 	time_t t_opers;
 	int tot_users;
+	long chans;
+	time_t t_chans;
 } daily;
 
 struct tld_ {
@@ -122,6 +135,8 @@ extern int s_new_user(User *);
 extern int s_del_user(User *);
 extern int s_user_modes(User *);
 extern int s_user_kill(User *);
+extern void s_chan_new(Chans *);
+extern void s_chan_del(Chans *);
 
 /* ss_help.c */
 extern const char *ss_help[];
