@@ -22,10 +22,13 @@
 
 #include "gkeeper.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-
+#include <unistd.h>
+#include <string.h>
+                                                                                        
 #define MENUPATH "ug/SerSoft/gkeeper:/menus"
 
 static void about(void);
@@ -152,6 +155,14 @@ static void setup_window(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+   /* Change to the working Directory */
+   if (chdir(NEO_PREFIX) < 0) {
+	   printf("configtool Could not change to %s\n", NEO_PREFIX);
+           printf("Did you 'make install' after compiling?\n");
+           printf("Error Was: %s\n", strerror(errno));
+           exit(-1);
+   }
+                                                                                        
     setup_window(argc, argv);
     gtk_main();
 

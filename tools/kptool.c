@@ -29,6 +29,7 @@
 #include <ctype.h>
 #include <assert.h>
 #include <errno.h>
+#include <unistd.h>
 
 static const char *usagestr =
 "Usage: %s [options] [key]\n"
@@ -298,12 +299,20 @@ int main(int argc, char *argv[])
         IMP
     } cmd;
 
+    /* change to the working directory */
+    if (chdir(NEO_PREFIX) < 0) {
+    	printf("kptool Could not change to %s\n", NEO_PREFIX);
+    	printf("Did you 'make install' after compiling?\n");
+    	printf("Error Was: %s\n", strerror(errno));
+        exit(-1);
+    }
+                                                                                
     if(argc < 2 || strcmp(argv[1], "-h") == 0 ||
        strcmp(argv[1], "--help") == 0) {
         fprintf(stderr, usagestr, argv[0]);
         exit(1);
     }
-
+    
     argctr = 1;
     arg = argv[argctr];
     if(arg[0] != '-') {
