@@ -449,7 +449,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	/* Handle intrinsic commands */
 	cmd_ptr = intrinsic_commands;
 	while(cmd_ptr->cmd) {
-		if (!strcasecmp(av[1], cmd_ptr->cmd)) {
+		if (!strcasecmp(av[2], cmd_ptr->cmd)) {
 			privmsg_list (u->nick, bot_ptr->nick, cmd_ptr->helptext);
 			return 1;
 		}
