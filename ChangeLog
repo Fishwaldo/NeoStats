@@ -4,6 +4,12 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Ability to enable/disable events so that a module can "optimise" it's event
+   table based on options e.g. disabling ConnectServ sign watch can disable
+   the SIGNON event core side. (M)
+ - More flags added to event system to allow the core to automatically handle
+   exclusions of NeoStats clients and global exclusion entries. The module can
+   manipulate the current settings based on local options. (M)
  - Add error field to Module structure so the core can flag a module as being
    in an erroneous state and unload it at an opportune time. E.g. if a module
    calls init_bot from ModInit, the call will fail gracefully and the module 

@@ -23,6 +23,7 @@
 
 #include "neostats.h"
 #include "services.h"
+#include "dl.h"
 
 /** Auth SubSystem
  *
@@ -73,11 +74,13 @@ int UserAuth (Client * u)
 	} 
 	for (i = 0; i < NUM_MODULES; i++)
 	{
-		authlvl = AuthModList[i]->userauth (u);
-		/* if authlvl is greater than newauthlvl, then 
-		 * authentication is authoritive */
-		if (authlvl > newauthlvl) {
-			newauthlvl = authlvl;
+		if (AuthModList[i]) {
+			authlvl = AuthModList[i]->userauth (u);
+			/* if authlvl is greater than newauthlvl, then 
+			* authentication is authoritive */
+			if (authlvl > newauthlvl) {
+				newauthlvl = authlvl;
+			}
 		}
 	}
 	return newauthlvl;

@@ -199,7 +199,7 @@ ns_exclude (CmdParams* cmdparams)
 		if (cmdparams->ac < 3) {
 			return NS_ERR_NEED_MORE_PARAMS;
 		}
-		ns_do_exclude_add(cmdparams->source, cmdparams->av[0], cmdparams->av[1]);
+		ns_do_exclude_add(cmdparams->source, cmdparams->av[1], cmdparams->av[2]);
 	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
 		if (cmdparams->ac < 2) {
 			return NS_ERR_NEED_MORE_PARAMS;

@@ -433,8 +433,8 @@ typedef enum NS_TRANSFER {
 #define CLEAR_SEGV_LOCATION() segv_location[0]='\0';
 #endif
 
-extern EXPORTVAR char recbuf[BUFSIZE];
-extern EXPORTVAR char segv_location[SEGV_LOCATION_BUFSIZE];
+EXPORTVAR extern char recbuf[BUFSIZE];
+EXPORTVAR extern char segv_location[SEGV_LOCATION_BUFSIZE];
 
 /* this is the dns structure */
 extern adns_state ads;
@@ -537,7 +537,7 @@ typedef struct tme {
 	char version[VERSIONSIZE];
 } tme;
 
-extern EXPORTVAR tme me;
+EXPORTVAR extern tme me;
 
 /** @brief Bans structure
  *  
@@ -721,7 +721,10 @@ typedef void (*after_poll_func) (void *data, struct pollfd *, unsigned int);
  * 
  */
 
-#define	EVENT_FLAG_IGNORE_SYNCH 0x00000001
+#define	EVENT_FLAG_DISABLED		0x00000001
+#define	EVENT_FLAG_IGNORE_SYNCH 0x00000002
+#define	EVENT_FLAG_EXCLUDE_ME	0x00000004
+#define	EVENT_FLAG_USE_EXCLUDE	0x00000008
 
 typedef int (*event_function) (CmdParams *cmdparams);
 
@@ -799,7 +802,7 @@ typedef int (*userauthfunc) (Client *u);
  */
 typedef struct Module {
 	ModuleInfo *info;
-	ModuleEvent *event_list;
+	ModuleEvent **event_list;
 	mod_auth mod_auth_cb;
 	mod_auth userauth;
 	void *dl_handle;
@@ -1194,20 +1197,26 @@ EXPORTFUNC hash_t * GetServerHash(void);
 
 EXPORTFUNC int HaveFeature (int mask);
 
-EXPORTFUNC void RegisterEvent (Event event, event_function function, unsigned int flags);
+EXPORTFUNC void RegisterEvent (ModuleEvent* event);
+EXPORTFUNC void RegisterEventList (ModuleEvent* event);
 EXPORTFUNC void DeleteEvent (Event event);
+EXPORTFUNC void DeleteEventList (ModuleEvent* event);
+EXPORTFUNC void SetAllEventFlags (unsigned int flag, unsigned int enable);
+EXPORTFUNC void SetEventFlags (Event event, unsigned int flag, unsigned int enable);
+EXPORTFUNC void EnableEvent (Event event);
+EXPORTFUNC void DisableEvent (Event event);
 
 /* 
  * Module Interface 
  */
 /* Module Basic Interface */
-extern MODULEVAR ModuleInfo module_info;   
-int MODULEFUNC ModInit (Module *mod_ptr);
-int MODULEFUNC ModSynch (void);
-void MODULEFUNC ModFini (void);
+MODULEVAR extern ModuleInfo module_info;   
+MODULEFUNC int ModInit (Module *mod_ptr);
+MODULEFUNC int ModSynch (void);
+MODULEFUNC void ModFini (void);
 /* Module Event Interface */
-extern MODULEVAR ModuleEvent module_events[];  
+MODULEVAR extern ModuleEvent module_events[];  
 /* Module Auth Interface */
-int MODULEFUNC ModAuthUser (Client * u);
+MODULEFUNC int ModAuthUser (Client * u);
 
 #endif /* NEOSTATS_H */

@@ -250,18 +250,30 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 {
 	SET_SEGV_LOCATION();
 	if (module_ptr->event_list) {
-		if (module_ptr->event_list[event].function) {
+		if (module_ptr->event_list[event] && module_ptr->event_list[event]->function) {
 			/* If we are not yet synched, check that the module supports 
 				* the event before we are synched. */
-			if (!module_ptr->synched && !(module_ptr->event_list[event].flags & EVENT_FLAG_IGNORE_SYNCH)) {
+			if (!module_ptr->synched && !(module_ptr->event_list[event]->flags & EVENT_FLAG_IGNORE_SYNCH)) {
 				dlog(DEBUG1, "Skipping module %s for event %d since module is not yet synched", module_ptr->info->name, event);
 				return;
 			}
+			if ((module_ptr->event_list[event]->flags & EVENT_FLAG_DISABLED)) {
+				dlog(DEBUG1, "Skipping module %s for event %d since it is disabled", module_ptr->info->name, event);
+				return;
+			}
+			if ((module_ptr->event_list[event]->flags & EVENT_FLAG_EXCLUDE_ME) && IsMe (cmdparams->source) ) {
+				dlog(DEBUG1, "Skipping module %s for event %d since %s is excluded as a NeoStats client", module_ptr->info->name, event, cmdparams->source->name);
+				return;
+			}
+			if ((module_ptr->event_list[event]->flags & EVENT_FLAG_USE_EXCLUDE) && IsExcluded (cmdparams->source)) {
+				dlog(DEBUG1, "Skipping module %s for event %d since %s is excluded", module_ptr->info->name, event, cmdparams->source->name);
+				return;
+			}			
 			dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
 			SET_SEGV_LOCATION();
 			if (setjmp (sigvbuf) == 0) {
 				SET_RUN_LEVEL(module_ptr);
-				module_ptr->event_list[event].function (cmdparams);
+				module_ptr->event_list[event]->function (cmdparams);
 				RESET_RUN_LEVEL();
 			} else {
 				nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->name);
@@ -315,56 +327,6 @@ ModulesVersion (const char* nick, const char *remoteserver)
 			"Module %s version: %s %s %s",
 			module_ptr->info->name, module_ptr->info->version, 
 			module_ptr->info->build_date, module_ptr->info->build_time);
-	}
-}
-
-/** @brief 
- *
- * 
- *
- * @return none
- */
-void RegisterEventList (Module* mod_ptr, ModuleEvent *event_ptr)
-{
-	mod_ptr->event_list = scalloc ( sizeof(ModuleEvent) * EVENT_COUNT );
-	while (event_ptr->event != EVENT_NULL) {
-		memcpy (&mod_ptr->event_list[event_ptr->event], event_ptr, sizeof(ModuleEvent));
-		event_ptr ++;
-	}
-}
-
-/** @brief 
- *
- * 
- *
- * @return none
- */
-void RegisterEvent (Event event, event_function function, unsigned int flags)
-{
-	Module* mod_ptr;
-
-	mod_ptr = GET_CUR_MODULE();
-	if (!mod_ptr->event_list) {
-		mod_ptr->event_list = scalloc ( sizeof(ModuleEvent) * EVENT_COUNT );
-	}
-	mod_ptr->event_list[event].function = function;
-	mod_ptr->event_list[event].flags = flags;
-}
-
-/** @brief 
- *
- * 
- *
- * @return none
- */
-void DeleteEvent (Event event)
-{
-	Module* mod_ptr;
-
-	mod_ptr = GET_CUR_MODULE();
-	if (mod_ptr->event_list) {
-		mod_ptr->event_list[event].function = NULL;
-		mod_ptr->event_list[event].flags = 0;
 	}
 }
 
@@ -462,7 +424,9 @@ load_module (const char *modfilename, Client * u)
 	/* Extract pointer to event list */
 	event_ptr = ns_dlsym (dl_handle, "module_events");
 	if(event_ptr) {
-		RegisterEventList (mod_ptr, event_ptr);
+		SET_RUN_LEVEL(mod_ptr);
+		RegisterEventList (event_ptr);
+		RESET_RUN_LEVEL();
 	}
     /* For Auth modules, register auth function */
 	if (info_ptr->flags & MODULE_FLAG_AUTH) {
@@ -688,4 +652,143 @@ ModuleConfig(bot_setting* set_ptr)
 		set_ptr++;
 	}
 	return NS_SUCCESS;
+}
+
+/** @brief 
+ *
+ * 
+ *
+ * @return none
+ */
+void RegisterEvent (ModuleEvent* event)
+{
+	Module* mod_ptr;
+
+	mod_ptr = GET_CUR_MODULE();
+	if (!mod_ptr->event_list) {
+		mod_ptr->event_list = scalloc ( sizeof(ModuleEvent) * EVENT_COUNT );
+	}
+	mod_ptr->event_list[event->event] = event;
+}
+
+/** @brief 
+ *
+ * 
+ *
+ * @return none
+ */
+void RegisterEventList (ModuleEvent *event_ptr)
+{
+	Module* mod_ptr;
+
+	mod_ptr = GET_CUR_MODULE();
+	if (!mod_ptr->event_list) {
+		mod_ptr->event_list = scalloc ( sizeof(ModuleEvent*) * EVENT_COUNT );
+	}
+	while (event_ptr->event != EVENT_NULL) {
+		mod_ptr->event_list[event_ptr->event] = event_ptr;
+		event_ptr ++;
+	}
+}
+
+/** @brief 
+ *
+ * 
+ *
+ * @return none
+ */
+void DeleteEvent (Event event)
+{
+	Module* mod_ptr;
+
+	mod_ptr = GET_CUR_MODULE();
+	if (mod_ptr->event_list) {
+		mod_ptr->event_list[event] = NULL;
+	}
+}
+
+/** @brief 
+ *
+ * 
+ *
+ * @return none
+ */
+void DeleteEventList (ModuleEvent *event_ptr)
+{
+	Module* mod_ptr;
+
+	mod_ptr = GET_CUR_MODULE();
+	while (event_ptr->event) {
+		if (mod_ptr->event_list[event_ptr->event]) {
+			mod_ptr->event_list[event_ptr->event] = NULL;
+		}
+		event_ptr++;
+	}
+}
+
+/** @brief 
+ *
+ * @param 
+ * 
+ * @return
+ */
+void SetAllEventFlags (unsigned int flag, unsigned int enable)
+{
+	int i;
+	ModuleEvent** eventptr;
+
+	eventptr = GET_CUR_MODULE()->event_list;
+	if (eventptr) {
+		for (i = 0; i < EVENT_COUNT; i++) {
+			if (eventptr[i]) {
+				if (enable) {
+					eventptr[i]->flags |= flag;
+				} else {
+					eventptr[i]->flags &= ~flag;
+				}
+			}
+		}
+	}
+}
+
+/** @brief 
+ *
+ * @param 
+ * 
+ * @return
+ */
+void SetEventFlags (Event event, unsigned int flag, unsigned int enable)
+{
+	ModuleEvent** eventptr;
+
+	eventptr = GET_CUR_MODULE()->event_list;
+	if (eventptr) {
+		if (enable) {
+			eventptr[event]->flags |= flag;
+		} else {
+			eventptr[event]->flags &= ~flag;
+		}
+	}
+}
+
+/** @brief 
+ *
+ * @param 
+ * 
+ * @return
+ */
+void EnableEvent (Event event)
+{
+	GET_CUR_MODULE()->event_list[event]->flags &= ~EVENT_FLAG_DISABLED;
+}
+
+/** @brief 
+ *
+ * @param 
+ * 
+ * @return
+ */
+void DisableEvent (Event event)
+{
+	GET_CUR_MODULE()->event_list[event]->flags |= EVENT_FLAG_DISABLED;
 }

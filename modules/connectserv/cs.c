@@ -52,7 +52,7 @@ static char msg_signon[]="\2SIGNON\2 %s (%s@%s - %s) has signed on at %s";
 static char msg_signoff[]="\2SIGNOFF\2 %s (%s@%s - %s) has signed off at %s - %s";
 static char msg_localkill[]="\2LOCAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";
 static char msg_globalkill[]="\2GLOBAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";
-static char msg_serverkill[]="\2SERVER KILL\2 %s (%s@%s) was killed by the server %s - Reason sighted: \2%s\2";  
+static char msg_serverkill[]="\2SERVER KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";  
 static char msg_mode[]="\2MODE\2 %s is %s a %s (%c%c)";
 static char msg_mode_serv[]="\2MODE\2 %s is %s a %s (%c%c) on %s";
 static char msg_bot[]="\2BOT\2 %s is %s a Bot (%c%c)";
@@ -62,21 +62,28 @@ static char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s - %s) at: \2%s\
 static char msg_signoff[]="\2\0033SIGNED OFF\2 user: %s (%s@%s - %s) at: %s - %s\003";
 static char msg_localkill[]="\2LOCAL KILL\2 user: \2%s\2 (%s@%s) was Killed by: \2%s\2 - Reason sighted: \2%s\2";
 static char msg_globalkill[]="\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2\003";
-static char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 (%s@%s) was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
+static char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2";
 static char msg_mode[]="\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c)\003";
 static char msg_mode_serv[]="\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c) on \2%s\2\003";
 static char msg_bot[]="\2\00313%s\2 is \2%s\2 a \2Bot\2 (%c%c)\003";
 #endif
 
 /** Bot command function prototypes */
-static int cs_event_signon(CmdParams* cmdparams);
-static int cs_event_umode(CmdParams* cmdparams);
-static int cs_event_smode(CmdParams* cmdparams);
-static int cs_event_quit(CmdParams* cmdparams);
-static int cs_event_kill(CmdParams* cmdparams);
-static int cs_event_nick(CmdParams* cmdparams);
-static int cs_event_server(CmdParams* cmdparams);
-static int cs_event_squit(CmdParams* cmdparams);
+static int cs_event_signon (CmdParams* cmdparams);
+static int cs_event_umode (CmdParams* cmdparams);
+static int cs_event_smode (CmdParams* cmdparams);
+static int cs_event_quit (CmdParams* cmdparams);
+static int cs_event_kill (CmdParams* cmdparams);
+static int cs_event_nick (CmdParams* cmdparams);
+static int cs_event_server (CmdParams* cmdparams);
+static int cs_event_squit (CmdParams* cmdparams);
+
+static int cs_set_exclusions_cb (CmdParams* cmdparams);
+static int cs_set_sign_watch_cb (CmdParams* cmdparams);
+static int cs_set_kill_watch_cb (CmdParams* cmdparams);
+static int cs_set_mode_watch_cb (CmdParams* cmdparams);
+static int cs_set_nick_watch_cb (CmdParams* cmdparams);
+static int cs_set_serv_watch_cb (CmdParams* cmdparams);
 
 /** Bot pointer */
 static Bot *cs_bot;
@@ -108,12 +115,12 @@ ModuleInfo module_info = {
 /** Bot setting table */
 static bot_setting cs_settings[]=
 {
-	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "SignWatch",	NULL,	cs_help_set_signwatch, NULL, (void*)1 },
-	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "KillWatch",	NULL,	cs_help_set_killwatch, NULL, (void*)1 },
-	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ModeWatch",	NULL,	cs_help_set_modewatch, NULL, (void*)1 },
-	{"NICKWATCH",	&cs_cfg.nick_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "NickWatch",	NULL,	cs_help_set_nickwatch, NULL, (void*)1 },
-	{"SERVWATCH",	&cs_cfg.serv_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ServWatch",	NULL,	cs_help_set_servwatch, NULL, (void*)1 },
-	{"EXCLUSIONS",	&cs_cfg.use_exc,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "Exclusions",	NULL,	cs_help_set_exclusions, NULL, (void*)1 },
+	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "SignWatch",	NULL,	cs_help_set_signwatch, cs_set_sign_watch_cb, (void*)1 },
+	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "KillWatch",	NULL,	cs_help_set_killwatch, cs_set_kill_watch_cb, (void*)1 },
+	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ModeWatch",	NULL,	cs_help_set_modewatch, cs_set_mode_watch_cb, (void*)1 },
+	{"NICKWATCH",	&cs_cfg.nick_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "NickWatch",	NULL,	cs_help_set_nickwatch, cs_set_nick_watch_cb, (void*)1 },
+	{"SERVWATCH",	&cs_cfg.serv_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ServWatch",	NULL,	cs_help_set_servwatch, cs_set_serv_watch_cb, (void*)1 },
+	{"EXCLUSIONS",	&cs_cfg.use_exc,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "Exclusions",	NULL,	cs_help_set_exclusions, cs_set_exclusions_cb, (void*)1 },
 	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
 
@@ -132,14 +139,14 @@ static BotInfo cs_botinfo =
 
 /** Module Events */
 ModuleEvent module_events[] = {
-	{EVENT_SIGNON,	cs_event_signon},
-	{EVENT_UMODE,	cs_event_umode},
-	{EVENT_SMODE,	cs_event_smode},
-	{EVENT_QUIT,	cs_event_quit},
-	{EVENT_KILL,	cs_event_kill},
-	{EVENT_NICK,	cs_event_nick},
-	{EVENT_SERVER,	cs_event_server},
-	{EVENT_SQUIT,	cs_event_squit},
+	{EVENT_SIGNON,	cs_event_signon,	EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_UMODE,	cs_event_umode,		EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_SMODE,	cs_event_smode,		EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_QUIT,	cs_event_quit,		EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_KILL,	cs_event_kill,		EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_NICK,	cs_event_nick,		EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_SERVER,	cs_event_server,	EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_SQUIT,	cs_event_squit,		EVENT_FLAG_EXCLUDE_ME},
 	{EVENT_NULL,	NULL}
 };
 
@@ -180,7 +187,7 @@ ModeDef OperSmodes[]=
 int ModInit (Module *mod_ptr)
 {
 	cs_module = mod_ptr;
-	ModuleConfig(cs_settings);
+	ModuleConfig (cs_settings);
 	return NS_SUCCESS;
 }
 
@@ -218,31 +225,24 @@ void ModFini (void)
 /* 
  * Echo signon
  */
-static int cs_event_signon(CmdParams* cmdparams)
+static int cs_event_signon (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	if (!cs_cfg.sign_watch) {
-		return 1;
-	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
-		return 1;
-	}
-	if (IsMe(cmdparams->source)) {
-		/* its me, forget it */
-		return 1;
+		return NS_SUCCESS;
 	}
 	/* Print Connection Notice */
 	irc_chanalert(cs_bot, msg_signon,
 		cmdparams->source->name, cmdparams->source->user->username, 
 		cmdparams->source->user->hostname, cmdparams->source->info,
 		cmdparams->source->user->server->name);
-	return 1;
+	return NS_SUCCESS;
 }
 
 /* 
  * Echo signoff
  */
-static int cs_event_quit(CmdParams* cmdparams)
+static int cs_event_quit (CmdParams* cmdparams)
 {
 	char *cmd, *lcl, *QuitMsg, *KillMsg;
 	char **Quit;
@@ -251,13 +251,6 @@ static int cs_event_quit(CmdParams* cmdparams)
 	int LocalCount = 0;
 
 	SET_SEGV_LOCATION();
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
-		return 1;
-	}
-	if (IsMe(cmdparams->source)) {
-		/* its me, forget it */
-		return 1;
-	}
 	cmd = sstrdup(recbuf);
 	lcl = sstrdup(recbuf);
 	QuitCount = split_buf(cmd, &Quit, 0);
@@ -276,7 +269,7 @@ static int cs_event_quit(CmdParams* cmdparams)
 			sfree(QuitMsg);
 			sfree(cmd);
 			sfree(lcl);
-			return 1;
+			return NS_SUCCESS;
 		}
 	}
 	/* Print Disconnection Notice */
@@ -290,7 +283,7 @@ static int cs_event_quit(CmdParams* cmdparams)
 	sfree(cmd);
 	sfree(lcl);
 	sfree(Quit);
-	return 1;
+	return NS_SUCCESS;
 }
 
 /* 
@@ -312,13 +305,13 @@ static int cs_report_mode (const char* modedesc, int serverflag, Client * u, int
 			add?'+':'-',
 			mode);
 	}
-	return 1;
+	return NS_SUCCESS;
 }
 
 /* 
  * Echo oper mode changes
  */
-static int cs_event_umode(CmdParams* cmdparams)
+static int cs_event_umode (CmdParams* cmdparams)
 {
 	int mask;
 	int add = 1;
@@ -328,13 +321,6 @@ static int cs_event_umode(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	if (!cs_cfg.mode_watch) {
 		return -1;
-	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
-		return 1;
-	}
-	if (IsMe(cmdparams->source)) {
-		/* its me, forget it */
-		return 1;
 	}
 	modes = cmdparams->param;
 	while (*modes) {
@@ -365,11 +351,11 @@ static int cs_event_umode(CmdParams* cmdparams)
 		}
 		modes++;
 	}
-	return 1;
+	return NS_SUCCESS;
 }
 
 /* smode support */
-static int cs_event_smode(CmdParams* cmdparams)
+static int cs_event_smode (CmdParams* cmdparams)
 {
 	int mask;
 	int add = 1;
@@ -379,13 +365,6 @@ static int cs_event_smode(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	if (!cs_cfg.mode_watch) {
 		return -1;
-	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
-		return 1;
-	}
-	if (IsMe(cmdparams->source)) {
-		/* its me, forget it */
-		return 1;
 	}
 	modes = cmdparams->param;
 	while (*modes) {
@@ -412,13 +391,13 @@ static int cs_event_smode(CmdParams* cmdparams)
 		}
 		modes++;
 	}
-	return 1;
+	return NS_SUCCESS;
 }
 
 /* 
  * Echo kills
  */
-static int cs_event_kill(CmdParams* cmdparams)
+static int cs_event_kill (CmdParams* cmdparams)
 {
 	char *cmd, *GlobalMsg;
 	char **Kill;
@@ -426,14 +405,7 @@ static int cs_event_kill(CmdParams* cmdparams)
 
 	SET_SEGV_LOCATION();
 	if (!cs_cfg.kill_watch) {
-		return 1;
-	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
-		return 1;
-	}
-	if (IsMe(cmdparams->source)) {
-		/* its me, forget it */
-		return 1;
+		return NS_SUCCESS;
 	}
 	cmd = sstrdup(recbuf);
 	KillCount = split_buf(cmd, &Kill, 0);
@@ -452,56 +424,105 @@ static int cs_event_kill(CmdParams* cmdparams)
 	}
 	sfree(cmd);
 	sfree(GlobalMsg);
-	return 1;
+	return NS_SUCCESS;
 }
 
 /* 
  * Echo nick changes
  */
-static int cs_event_nick(CmdParams* cmdparams)
+static int cs_event_nick (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	if (!cs_cfg.nick_watch) {
-		return 1;
-	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
-		return 1;
-	}
-	if (IsMe(cmdparams->source)) {
-		/* its me, forget it */
-		return 1;
+		return NS_SUCCESS;
 	}
 	irc_chanalert(cs_bot, msg_nickchange, cmdparams->param, 
 		cmdparams->source->user->username, cmdparams->source->user->hostname, 
 		cmdparams->source->name);
-	return 1;
+	return NS_SUCCESS;
 }
 
-static int cs_event_server(CmdParams* cmdparams)
+static int cs_event_server (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	if (!cs_cfg.serv_watch) {
-		return 1;
-	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
-		return 1;
+		return NS_SUCCESS;
 	}
 	irc_chanalert (cs_bot, "\2SERVER\2 %s has joined the network at %s",
 		cmdparams->source->name, cmdparams->source->uplink);
-	return 1;
+	return NS_SUCCESS;
 }
 
-static int cs_event_squit(CmdParams* cmdparams)
+static int cs_event_squit (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	if (!cs_cfg.serv_watch) {
-		return 1;
-	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
-		return 1;
+		return NS_SUCCESS;
 	}
 	irc_chanalert (cs_bot, "\2SERVER\2 %s has left the network at %s for %s",
 		cmdparams->source->name, cmdparams->source->uplink, 
 		cmdparams->param ? cmdparams->param : "");
-	return 1;
+	return NS_SUCCESS;
+}
+
+static int cs_set_exclusions_cb (CmdParams* cmdparams)
+{
+	SetAllEventFlags (EVENT_FLAG_USE_EXCLUDE, cs_cfg.use_exc);
+	return NS_SUCCESS;
+}
+
+static int cs_set_sign_watch_cb (CmdParams* cmdparams)
+{
+	if (cs_cfg.sign_watch) {
+		EnableEvent (EVENT_SIGNON);
+		EnableEvent (EVENT_QUIT);
+	} else {
+		DisableEvent (EVENT_SIGNON);
+		DisableEvent (EVENT_QUIT);
+	}
+	return NS_SUCCESS;
+}
+
+static int cs_set_kill_watch_cb (CmdParams* cmdparams)
+{
+	if (cs_cfg.kill_watch) {
+		EnableEvent (EVENT_KILL);
+	} else {
+		DisableEvent (EVENT_KILL);
+	}
+	return NS_SUCCESS;
+}
+
+static int cs_set_mode_watch_cb (CmdParams* cmdparams)
+{
+	if (cs_cfg.mode_watch) {
+		EnableEvent (EVENT_UMODE);
+		EnableEvent (EVENT_SMODE);
+	} else {
+		DisableEvent (EVENT_UMODE);
+		DisableEvent (EVENT_SMODE);
+	}
+	return NS_SUCCESS;
+}
+
+static int cs_set_nick_watch_cb (CmdParams* cmdparams)
+{
+	if (cs_cfg.nick_watch) {
+		EnableEvent (EVENT_NICK);
+	} else {
+		DisableEvent (EVENT_NICK);
+	}
+	return NS_SUCCESS;
+}
+
+static int cs_set_serv_watch_cb (CmdParams* cmdparams)
+{
+	if (cs_cfg.serv_watch) {
+		EnableEvent (EVENT_SERVER);
+		EnableEvent (EVENT_SQUIT);
+	} else {
+		DisableEvent (EVENT_SERVER);
+		DisableEvent (EVENT_SQUIT);
+	}
+	return NS_SUCCESS;
 }

@@ -62,16 +62,18 @@ typedef struct hs_user {
 	hs_map *vhe;
 } hs_user;
 
-static int hs_event_signon(CmdParams* cmdparams);
-static int hs_event_mode(CmdParams* cmdparams);
-static int hs_levels(CmdParams* cmdparams);
-static int hs_bans(CmdParams* cmdparams);
-static int hs_login(CmdParams* cmdparams);
-static int hs_chpass(CmdParams* cmdparams);
-static int hs_add(CmdParams* cmdparams);
-static int hs_list(CmdParams* cmdparams);
-static int hs_view(CmdParams* cmdparams);
-static int hs_del(CmdParams* cmdparams);
+static int hs_event_signon (CmdParams* cmdparams);
+static int hs_event_mode (CmdParams* cmdparams);
+static int hs_event_quit (CmdParams* cmdparams);
+
+static int hs_levels (CmdParams* cmdparams);
+static int hs_bans (CmdParams* cmdparams);
+static int hs_login (CmdParams* cmdparams);
+static int hs_chpass (CmdParams* cmdparams);
+static int hs_add (CmdParams* cmdparams);
+static int hs_list (CmdParams* cmdparams);
+static int hs_view (CmdParams* cmdparams);
+static int hs_del (CmdParams* cmdparams);
 
 static void hs_listban(Client * u);
 static void hs_addban(Client * u, char *ban);
@@ -147,6 +149,15 @@ static BotInfo hs_botinfo =
 	hs_settings,
 };
 
+/** Module Events */
+ModuleEvent module_events[] = {
+	{EVENT_SIGNON,	hs_event_signon,	EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE},
+	{EVENT_UMODE,	hs_event_mode,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE}, 
+	{EVENT_QUIT,	hs_event_quit,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE},
+	{EVENT_KILL,	hs_event_quit,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE},
+	{EVENT_NULL,	NULL}
+};
+
 int findnick(const void *key1, const void *key2)
 {
 	const hs_map *vhost = key1;
@@ -195,19 +206,11 @@ static int hs_event_quit(CmdParams* cmdparams)
 }
 	
 /* Routine For Setting the Virtual Host */
-static int hs_event_signon(CmdParams* cmdparams)
+static int hs_event_signon (CmdParams* cmdparams)
 {
 	hs_map *map;
 
 	SET_SEGV_LOCATION();
-
-	if (IsMe(cmdparams->source)) 
-		return 1;
-
-	/* is this user excluded via a global exclusion? */
-	if (IsExcluded(cmdparams->source)) 
-		return 1;
-
 	/* Check HostName Against Data Contained in vhosts.data */
 	map = lnode_find (vhosts, cmdparams->source->name, findnick);
 	if (map) {
@@ -225,15 +228,6 @@ static int hs_event_signon(CmdParams* cmdparams)
 	}
 	return 1;
 }
-
-/** Module Events */
-ModuleEvent module_events[] = {
-	{EVENT_SIGNON,	hs_event_signon},
-	{EVENT_UMODE,	hs_event_mode}, 
-	{EVENT_QUIT,	hs_event_quit},
-	{EVENT_KILL,	hs_event_quit},
-	{EVENT_NULL,	NULL}
-};
 
 /** @brief ModInit
  *
@@ -292,7 +286,7 @@ void ModFini (void)
 	list_destroy_auto (vhosts);
 }
 
-int hs_event_mode(CmdParams* cmdparams) 
+int hs_event_mode (CmdParams* cmdparams) 
 {
 	int add = 0;
 	char *modes;
@@ -306,9 +300,6 @@ int hs_event_mode(CmdParams* cmdparams)
 		return -1;
 
 	if (is_oper(cmdparams->source) && hs_cfg.operhosts == 0) 
-		return 1;
-		
-	if (IsExcluded(cmdparams->source)) 
 		return 1;
 		
 	/* first, find if its a regnick mode */
