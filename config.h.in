@@ -103,8 +103,13 @@
 /* 'Enable Ultimate Support' */
 #undef ULTIMATE
 
+/* 'Enable Ultimate Support' */
+#undef ULTIMATE3
+
+
 /* 'Enable Unreal Support' */
 #undef UNREAL
+
 
 /* Version number of package */
 #undef VERSION

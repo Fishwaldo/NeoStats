@@ -282,6 +282,11 @@
 #define MSG_ROOTSERV	"ROOTSERV"	/* ROOTSERV */
 #define MSG_RS		"RS"
 #define TOK_ROOTSERV	"!U"		/* 33 + 85 */
+#define MSG_SVINFO	"SVINFO"	
+#define MSG_CAPAB	"CAPAB"
+#define MSG_BURST	"BURST"
+#define MSG_SJOIN	"SJOIN"
+
 
 
 #define	UMODE_INVISIBLE  	0x0001 /* makes user invisible */
@@ -332,7 +337,6 @@
 #define	MODE_LIMIT	0x1000
 #define MODE_RGSTR	0x2000
 #define MODE_RGSTRONLY  0x4000
-
 #define MODE_OPERONLY   0x8000
 #define MODE_ADMONLY   	0x10000
 #define MODE_LINK	0x20000
@@ -341,7 +345,7 @@
 #define MODE_NOKNOCK	0x100000
 #define MODE_NOINVITE  	0x200000
 #define MODE_FLOODLIMIT 0x400000
-
+#define MODE_CHANADMIN  0x800000
 
 
 
@@ -349,7 +353,11 @@
 
 struct ircd_srv_ {
 	int uprot;
-	char cloak[10];
+	int modex;
+	int nicklg;
+	int gc;	
+	char cloak[25];
+	int burst;
 } ircd_srv;
 
 typedef struct {
@@ -387,7 +395,11 @@ extern int squit_cmd(const char *, const char *);
 extern int spart_cmd(const char *, const char *);
 extern int sjoin_cmd(const char *, const char *);
 extern int schmode_cmd(const char *, const char *, const char *, const char *);
+#ifndef ULTIMATE3
 extern int snewnick_cmd(const char *, const char *, const char *, const char *);
+#else
+extern int snewnick_cmd(const char *, const char *, const char *, const char *, long mode);
+#endif
 extern int sping_cmd(const char *from, const char *reply, const char *to);
 extern int sumode_cmd(const char *who, const char *target, long mode);
 extern int snumeric_cmd(const int numeric, const char *target, const char *data,...);
@@ -402,6 +414,7 @@ extern int ssvsjoin_cmd(const char *target, const char *chan);
 extern int ssvspart_cmd(const char *target, const char *chan);
 extern int skick_cmd(const char *who, const char *target, const char *chan, const char *reason);
 extern int swallops_cmd(const char *who, const char *msg,...);
-extern int vctrl_cmd(int nl);
-
+extern int vctrl_cmd();
+extern int ssvinfo_cmd();
+extern int sburst_cmd(int b);
 #endif

@@ -65,11 +65,27 @@ esac],
 AC_MSG_RESULT(no))
 
 dnl check to see if we should enable Ultimate IRCD Support
-AC_MSG_CHECKING(Whether to Enable Ultimate IRCD Support...)
-AC_ARG_ENABLE(ultimate, [ --enable-ultimate - enable Ultimate IRCD Support],
+AC_MSG_CHECKING(Whether to Enable Ultimate 2.x.x IRCD Support...)
+AC_ARG_ENABLE(ultimate2, [ --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate Support')
+	IRCD_FILES_SRC="Ultimate.c"
+	IRCD_FILES_OBJS="Ultimate.o"
+	AC_MSG_RESULT(yes)
+	;;
+  *)
+	AC_MSG_RESULT(no)
+	;;
+esac],
+AC_MSG_RESULT(no)
+)
+AC_MSG_CHECKING(Whether to Enable Ultimate 3.x.x IRCD Support...)
+AC_ARG_ENABLE(ultimate3, [ --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support],
+[ case "$enableval" in
+  yes)  
+	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate 2.x.x Support')
+	AC_DEFINE(ULTIMATE3, 1, "Enable Ultimate 3.x.x Support')
 	IRCD_FILES_SRC="Ultimate.c"
 	IRCD_FILES_OBJS="Ultimate.o"
 	AC_MSG_RESULT(yes)

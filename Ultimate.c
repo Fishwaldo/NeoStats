@@ -18,6 +18,7 @@ aCtab cFlagTab[] = {
 		{MODE_EXCEPT,		'e', 0, 1},
 		{MODE_FLOODLIMIT,	'f', 0, 1}, /* Flood limiter */
 		{MODE_HALFOP,		'h', 1, 0},
+		{MODE_CHANADMIN, 	'a', 1, 0},
 		{MODE_INVITEONLY,	'i', 0, 0},
 		{MODE_KEY,		'k', 0, 1},
 		{MODE_LIMIT,		'l', 0, 1},
@@ -91,7 +92,12 @@ int sserver_cmd(const char *name, const int numeric, const char *infoline) {
 }
 
 int slogin_cmd(const char *name, const int numeric, const char *infoline, const char *pass) {
+#ifndef ULTIMATE3
 	sts("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
+#else
+	sts("%s %s :TS", (me.token ? TOK_PASS : MSG_PASS), pass);
+	sts("CAPAB TS5 BURST SSJ3");
+#endif
 	sts("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 	return 1;
 }
@@ -135,10 +141,25 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 	ChanMode("", av, ac);
 	return 1;
 }
-
+#ifndef ULTIMATE3
 int snewnick_cmd(const char *nick, const char *ident, const char *host, const char *realname) {
 	sts("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), ident, host, me.name, realname);
 	AddUser(nick,ident, host, me.name);
+#else 
+int snewnick_cmd(const char *nick, const char *ident, const char *host, const char *realname, long mode) {
+	int i;
+	char newmode[20];
+	newmode[0] = '+';
+	newmode[1] = '\0';
+	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1); i++) {
+		if (mode & usr_mds[i].umodes) {
+			sprintf(newmode, "%s%c", newmode, usr_mds[i].mode);
+		}
+	}
+	sts("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), newmode, ident, host, me.name, time(NULL), realname);
+	AddUser(nick,ident, host, me.name);
+	UserMode(nick, newmode);
+#endif
 	return 1;
 }  
 
@@ -182,8 +203,8 @@ int snetinfo_cmd() {
 	return 1;
 }
 
-int vctrl_cmd(int nl) {
-	sts("%s %d %d 0 0 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, nl, me.netname);
+int vctrl_cmd() {
+	sts("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, ircd_srv.nicklg, ircd_srv.modex, ircd_srv.gc, me.netname);
 	return 1;
 }
 int skill_cmd(const char *from, const char *target, const char *reason,...) {
@@ -255,8 +276,18 @@ int ssvshost_cmd(const char *who, const char *vhost) {
 		return 1;
 	}
 }
-
-
+int ssvinfo_cmd() {
+	sts("SVINFO 5 3 0 :%d", time(NULL));
+	return 1;
+}
+int sburst_cmd(int b) {
+	if (b == 0) {
+		sts("BURST 0");
+	} else {
+		sts("BURST");
+	}
+	return 1;
+}
 
 
 

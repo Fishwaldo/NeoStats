@@ -49,6 +49,11 @@ void Srv_Connect(char *, char **, int argc);
 #ifdef ULTIMATE
 void Srv_Vctrl(char *, char **, int argc);
 #endif
+#ifdef ULTIMATE3
+void Srv_Svinfo(char *, char **, int argc);
+void Srv_Burst(char *origin, char **argv, int argc);
+void Srv_Sjoin(char *origin, char **argv, int argc);
+#endif
 
 
 
@@ -180,8 +185,16 @@ IntCommands cmd_list[] = {
 	{TOK_PART,	Usr_Part,		1},
 	{MSG_PING,	Srv_Ping,		0},
 	{TOK_PING,	Srv_Ping,		0},
+#ifndef ULTIMATE3
 	{MSG_SNETINFO,	Srv_Netinfo,		0},
 	{TOK_SNETINFO,	Srv_Netinfo,		0},
+#endif
+#ifdef ULTIMATE3
+	{MSG_SVINFO,	Srv_Svinfo,		0},
+	{MSG_CAPAB,	Srv_Connect, 		0},
+	{MSG_BURST,	Srv_Burst, 		0},
+	{MSG_SJOIN,	Srv_Sjoin,		1},
+#endif
 	{MSG_VCTRL,	Srv_Vctrl, 		0},
 	{TOK_VCTRL,	Srv_Vctrl, 		0},
 	{MSG_PASS,	Srv_Pass,		0},
@@ -218,11 +231,16 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 		return -1;
 	}
 	add_mod_user(nick, mod_name);
-	snewnick_cmd(nick, user, host, rname);
 #ifdef UNREAL
+	snewnick_cmd(nick, user, host, rname);
 	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
 #elif ULTIMATE
+#ifdef ULTIMATE3
+	snewnick_cmd(nick, user, host, rname, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+#elif
+	snewnick_cmd(nick, user, host, rname);
 	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+#endif
 #endif
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
@@ -507,12 +525,21 @@ void init_ServBot()
 	char rname[63];
 	strcpy(segv_location, "init_ServBot");
 	sprintf(rname, "/msg %s \2HELP\2", s_Services);
+#ifdef ULTIMATE3
+	sburst_cmd(1);
+	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+#else 
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname);
+#endif
 #ifdef UNREAL
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
-#elif ULTIMATE
+	sjoin_cmd(s_Services, me.chan);
+	sprintf(rname, "%s %s", s_Services, s_Services);
+	schmode_cmd(me.name, me.chan, "+oa", rname);
+#elif !ULTIMATE
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif
+//	ssjoin_cmd(s_Services, me.chan, 
 	sjoin_cmd(s_Services, me.chan);
 	sprintf(rname, "%s %s", s_Services, s_Services);
 	schmode_cmd(me.name, me.chan, "+oa", rname);
@@ -522,8 +549,49 @@ void init_ServBot()
 }
 
 
+void Srv_Sjoin(char *origin, char **argv, int argc) {
+	char nick[MAXNICK];
+	long mode = 0;
+	char *modes;
+	int ok = 1;
+	
+	modes = argv[3];
+	while (ok == 1) {
+		if (*modes == '@') {
+			mode |= MODE_CHANOP;
+			modes++;
+		} else if (*modes == '*') {
+			mode |= MODE_CHANADMIN;
+			modes++;
+		} else if (*modes == '%') {
+			mode |= MODE_HALFOP;
+			modes++;
+		} else if (*modes == '+') {
+			mode |= MODE_VOICE;
+			modes++;
+		} else {
+			strcpy(nick, modes);
+			ok = 0;
+		}
+	}
+	join_chan(finduser(nick), argv[1]);
+	ChangeChanUserMode(findchan(argv[1]), finduser(nick), 1, mode);
 
 
+
+}
+void Srv_Burst(char *origin, char **argv, int argc) {
+	if (argc > 0) {
+		if (ircd_srv.burst == 1) {
+			sburst_cmd(0);
+			ircd_srv.burst = 0;
+		}
+	} else {
+		ircd_srv.burst = 1;
+		init_ServBot();
+	}
+	
+}
 void Srv_Connect(char *origin, char **argv, int argc) {
 	int i;
 
@@ -532,7 +600,9 @@ void Srv_Connect(char *origin, char **argv, int argc) {
 			me.token = 1;
 		}
 	}
+#ifndef ULTIMATE3
 	init_ServBot();
+#endif
 }
 
 
@@ -637,9 +707,17 @@ void Usr_Kill(char *origin, char **argv, int argc) {
 }
 void Usr_Vhost(char *origin, char **argv, int argc) {
 	User *u;
+#ifndef ULTIMATE3
 	u = finduser(origin);
+#else 
+	u = finduser(argv[0]);
+#endif
 	if (u) {
+#ifndef ULTIMATE3
 		strcpy(u->vhost, argv[0]);
+#else
+		strcpy(u->vhost, argv[1]);
+#endif
 	}
 }
 void Usr_Pong(char *origin, char **argv, int argc) {
@@ -704,19 +782,30 @@ void Usr_Part(char *origin, char **argv, int argc) {
 	part_chan(finduser(origin), argv[0]);
 }
 void Srv_Ping(char *origin, char **argv, int argc) {
-			spong_cmd(origin);
+			spong_cmd(argv[0]);
+#ifdef ULTIMATE3
+			if (ircd_srv.burst) {
+				sping_cmd(me.name, argv[0], argv[0]);
+			}
+#endif
 }
 #ifdef ULTIMATE
 void Srv_Vctrl(char *origin, char **argv, int argc) {
 		ircd_srv.uprot = atoi(argv[0]);
+		ircd_srv.nicklg = atoi(argv[1]);
+		ircd_srv.modex = atoi(argv[2]);
+		ircd_srv.gc = atoi(argv[3]);
 		strcpy(me.netname, argv[14]);
-		vctrl_cmd(atoi(argv[1]));
+		vctrl_cmd();
 
 }
 #endif
-
-
-
+#ifdef ULTIMATE3
+void Srv_Svinfo(char *origin, char **argv, int argc) {
+	ssvinfo_cmd();
+}
+#endif
+#ifndef ULTIMATE3
 void Srv_Netinfo(char *origin, char **argv, int argc) {
 		        me.onchan = 1;
 			ircd_srv.uprot = atoi(argv[2]);
@@ -733,6 +822,8 @@ void Srv_Netinfo(char *origin, char **argv, int argc) {
 			} 
 			Module_Event("NETINFO", NULL); 
 }
+#endif
+
 void Srv_Pass(char *origin, char **argv, int argc) {
 }
 void Srv_Server(char *origin, char **argv, int argc) {
@@ -759,7 +850,11 @@ void Srv_Squit(char *origin, char **argv, int argc) {
 						
 }
 void Srv_Nick(char *origin, char **argv, int argc) {
+#ifndef ULTIMATE3
 			AddUser(argv[0], argv[3], argv[4], argv[5]);
+#else
+			AddUser(argv[0], argv[4], argv[5], argv[6]);
+#endif
 			Module_Event("SIGNON", finduser(argv[0]));
 }
 void Srv_Svsnick(char *origin, char **argv, int argc) {
