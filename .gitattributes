@@ -1,9 +1,13 @@
 * text=auto !eol
+/AUTHORS -text
+/BUGS -text
+/COPYING -text
 /ChangeLog -text
 /INSTALL -text
 /LICENCE -text
 /Makefile.am -text
 /Makefile.in -text
+/NEWS -text
 /README -text
 /TODO -text
 /Ultimate.c -text
@@ -11,10 +15,14 @@
 /Unreal.c -text
 /Unreal.h -text
 /UnrealModes.h -text
+/acconfig.h -text
+/aclocal.m4 -text
 /chans.c -text
 /chkstats -text
 /conf.c -text
+/config.guess -text
 /config.h.in -text
+/config.sub -text
 /configure -text
 /configure.in -text
 data/Makefile.am -text
@@ -40,6 +48,7 @@ dl/helper/ni_help.c -text
 dl/hostserv/ChangeLog -text
 dl/hostserv/Makefile.am -text
 dl/hostserv/Makefile.in -text
+dl/hostserv/README -text
 dl/hostserv/hostserv.c -text
 dl/hostserv/hs_help.c -text
 dl/icq/DOESNOTCOMPILE -text
@@ -56,6 +65,7 @@ dl/loveserv/ChangeLog -text
 dl/loveserv/Makefile -text
 dl/loveserv/Makefile.am -text
 dl/loveserv/Makefile.in -text
+dl/loveserv/TODO -text
 dl/loveserv/loveserv.c -text
 dl/loveserv/ls_help.c -text
 dl/modules.txt -text
@@ -87,6 +97,7 @@ dl/services/services.lo -text svneol=unset#unset
 dl/spam/Makefile.am -text
 dl/spam/Makefile.in -text
 dl/spam/spam.c -text
+dl/statserv/ChangeLog -text
 dl/statserv/Makefile.am -text
 dl/statserv/Makefile.in -text
 dl/statserv/m_stats.h -text
@@ -110,18 +121,23 @@ doc/read-userman -text
 /dotconf.h -text
 /hash.c -text
 /hash.h -text
+/install-sh -text
 /ircd.c -text
 /ircdchk -text
 /list.c -text
 /list.h -text
 logs/.keepme -text
+/ltmain.sh -text
 /main.c -text
 /makeconf -text
+/missing -text
+/mkinstalldirs -text
 /ns_help.c -text
 /server.c -text
 /services.c -text
 /sock.c -text
 /ss_help.c -text
+/stamp-h.in -text
 /stats.cfg.dist -text
 /stats.h -text
 /timer.c -text

@@ -1,0 +1,30 @@
+StatServ Module for NeoStats 2.x ChangeLog
+Shmad & ^Enigma^
+(S) denotes Shmad  (E) denotes ^Enigma^
+
+* Version 3.1 * February 8th, 2002
+ - Code overhauls for NeoStats-2.5 Core
+
+
+* Version 3.0 * January 2nd, 2001
+ - Removed Echos to the shell when starting Neo with SS loaded.. now the rest of the modules.. ugh (S)
+ - Fixed an annoying crash bug caused by strlower (S)
+ - Fixed crash bug in ss_new_user (S)
+ - Fixed bug in findstats()
+ - Overhauled a lot of the older code (S)
+ - Noticed something odd.. looked into it.. just my eyes wiggin out. (S)
+
+
+* Version 2.1 * December 11th, 2001
+ - Fixed a small DAILY bug where at midnight it would reset to 0
+   we should reset to CURRENT stats at midnight.  Now fixed. (S)
+ - Fixed DAILY STATS.. now reports correctly 110% of the time. (S)
+ - This aint too shabby for 3 hours work :)
+ - ServerKills in SERVER info accurate (S)
+ - OperKills in SERVER info accurate (S)
+ - Fixed split counting..works now (S)
+ - added s_user_away();  StatServ now keeps track of users set away. (S)
+ - added s_del_server(); StatServ now decreases Servers when one splits/goes down (S)
+ - Fixed StatServ Crash bug. (S)
+ - Added HTML Stats writeouts. (E)
+ - Started ChangeLog
