@@ -1,5 +1,5 @@
-/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
-** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond, Mark Hetherington
+/* NeoStats - IRC Statistical Services 
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -422,7 +422,7 @@ COLDEF statserv_serverscols[] = {
 };
 
 TBLDEF statserv_servers = {
-	"SStats",
+	"statserv_servers",
 	NULL, 	/* for now */
 	sizeof(struct SStats),
 	0,
@@ -850,4 +850,3 @@ void statserv_rta_fini (void)
 	list_destroy_nodes (fakenetwork);
 	list_destroy (fakenetwork);
 }
-
