@@ -20,13 +20,16 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.c,v 1.10 2003/06/26 06:00:43 fishwaldo Exp $
+** $Id: log.c,v 1.11 2003/07/17 10:13:51 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "conf.h"
 #include "hash.h"
 #include "log.h"
+#ifdef HAVE_BACKTRACE
+#include <execinfo.h>
+#endif
 
 const char *loglevels[10] = {
 	"CRITICAL",
@@ -75,10 +78,8 @@ void *close_logs()
 	hash_scan_begin(&hs, logs);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
 		logentry = hnode_get(hn);
-		if (logentry->flush > 0) {
-			fflush(logentry->logfile);
-			logentry->flush = 0;
-		}
+		fflush(logentry->logfile);
+		logentry->flush = 0;
 #ifdef DEBUG
 		printf("Closing Logfile %s (%s)\n", logentry->name,
 		       (char *) hnode_getkey(hn));
@@ -204,4 +205,31 @@ void ResetLogs()
 			}
 		}
 	}
+}
+
+
+
+/* this is for printing out details during a assertion failure */
+extern void nassert_fail(const char *expr, const char *file, const int line, const char *infunk) {
+#ifdef HAVE_BACKTRACE
+	void *array[50];
+	size_t size;
+	char **strings;
+	size_t i;
+/* thanks to gnulibc libary for letting me find this usefull function */
+	size = backtrace(array, 10);
+	strings = backtrace_symbols(array, size);
+#endif
+
+	nlog(LOG_CRITICAL, LOG_CORE, "Assertion Failure!!!!!!!!!!!");
+	nlog(LOG_CRITICAL, LOG_CORE, "Function: %s (%s:%d)", infunk, file, line);
+	nlog(LOG_CRITICAL, LOG_CORE, "Expression: %s", expr);
+#ifdef HAVE_BACKTRACE
+		for (i = 1; i < size; i++) {
+			nlog(LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s",
+			     i - 1, strings[i]);
+		}
+#endif
+	nlog(LOG_CRITICAL, LOG_CORE, "Shutting Down!");
+	exit(-1);
 }

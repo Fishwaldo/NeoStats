@@ -39,7 +39,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: hash.c,v 1.9 2003/06/13 13:11:48 fishwaldo Exp $
+ * $Id: hash.c,v 1.10 2003/07/17 10:13:51 fishwaldo Exp $
  * $Name:  $
  */
 
@@ -50,12 +50,12 @@
 #include <ctype.h>
 #define HASH_IMPLEMENTATION
 #include "hash.h"
-
+#include "log.h"
 
 
 #ifdef KAZLIB_RCSID
 static const char rcsid[] =
-    "$Id: hash.c,v 1.9 2003/06/13 13:11:48 fishwaldo Exp $";
+    "$Id: hash.c,v 1.10 2003/07/17 10:13:51 fishwaldo Exp $";
 #endif
 
 #define INIT_BITS	6
@@ -136,8 +136,8 @@ static int is_power_of_two(hash_val_t arg)
 
 static hash_val_t compute_mask(hashcount_t size)
 {
-	assert(is_power_of_two(size));
-	assert(size >= 2);
+	nassert(is_power_of_two(size));
+	nassert(size >= 2);
 
 	return size - 1;
 }
@@ -186,7 +186,7 @@ static void grow_table(hash_t * hash)
 {
 	hnode_t **newtable;
 
-	assert(2 * hash->nchains > hash->nchains);	/* 1 */
+	nassert(2 * hash->nchains > hash->nchains);	/* 1 */
 
 	newtable = realloc(hash->table, sizeof *newtable * hash->nchains * 2);	/* 4 */
 
@@ -195,7 +195,7 @@ static void grow_table(hash_t * hash)
 		hash_val_t exposed_bit = mask ^ hash->mask;	/* 6 */
 		hash_val_t chain;
 
-		assert(mask != hash->mask);
+		nassert(mask != hash->mask);
 
 		for (chain = 0; chain < hash->nchains; chain++) {	/* 7 */
 			hnode_t *low_chain = 0, *high_chain =
@@ -224,7 +224,7 @@ static void grow_table(hash_t * hash)
 		hash->lowmark *= 2;
 		hash->highmark *= 2;
 	}
-	assert(hash_verify(hash));
+	nassert(hash_verify(hash));
 }
 
 /*
@@ -262,7 +262,7 @@ static void shrink_table(hash_t * hash)
 	hash_val_t chain, nchains;
 	hnode_t **newtable, *low_tail, *low_chain, *high_chain;
 
-	assert(hash->nchains >= 2);	/* 1 */
+	nassert(hash->nchains >= 2);	/* 1 */
 	nchains = hash->nchains / 2;
 
 	for (chain = 0; chain < nchains; chain++) {
@@ -274,7 +274,7 @@ static void shrink_table(hash_t * hash)
 		else if (high_chain != 0)	/* 5 */
 			hash->table[chain] = high_chain;
 		else
-			assert(hash->table[chain] == NULL);	/* 6 */
+			nassert(hash->table[chain] == NULL);	/* 6 */
 	}
 	newtable = realloc(hash->table, sizeof *newtable * nchains);	/* 7 */
 	if (newtable)		/* 8 */
@@ -283,7 +283,7 @@ static void shrink_table(hash_t * hash)
 	hash->nchains = nchains;
 	hash->lowmark /= 2;
 	hash->highmark /= 2;
-	assert(hash_verify(hash));
+	nassert(hash_verify(hash));
 }
 
 
@@ -344,7 +344,7 @@ hash_t *hash_create(hashcount_t maxcount, hash_comp_t compfun,
 			hash->mask = INIT_MASK;
 			hash->dynamic = 1;	/* 7 */
 			clear_table(hash);	/* 8 */
-			assert(hash_verify(hash));
+			nassert(hash_verify(hash));
 			return hash;
 		}
 		free(hash);
@@ -360,8 +360,8 @@ hash_t *hash_create(hashcount_t maxcount, hash_comp_t compfun,
 void hash_set_allocator(hash_t * hash, hnode_alloc_t al,
 			hnode_free_t fr, void *context)
 {
-	assert(hash_count(hash) == 0);
-	assert((al == 0 && fr == 0) || (al != 0 && fr != 0));
+	nassert(hash_count(hash) == 0);
+	nassert((al == 0 && fr == 0) || (al != 0 && fr != 0));
 
 	hash->allocnode = al ? al : hnode_alloc;
 	hash->freenode = fr ? fr : hnode_free;
@@ -394,7 +394,7 @@ void hash_free_nodes(hash_t * hash)
 void hash_free(hash_t * hash)
 {
 #ifdef KAZLIB_OBSOLESCENT_DEBUG
-	assert("call to obsolescent function hash_free()" && 0);
+	nassert("call to obsolescent function hash_free()" && 0);
 #endif
 	hash_free_nodes(hash);
 	hash_destroy(hash);
@@ -406,8 +406,8 @@ void hash_free(hash_t * hash)
 
 void hash_destroy(hash_t * hash)
 {
-	assert(hash_val_t_bit != 0);
-	assert(hash_isempty(hash));
+	nassert(hash_val_t_bit != 0);
+	nassert(hash_isempty(hash));
 	free(hash->table);
 	free(hash);
 }
@@ -432,7 +432,7 @@ hash_t *hash_init(hash_t * hash, hashcount_t maxcount,
 	if (hash_val_t_bit == 0)	/* 1 */
 		compute_bits();
 
-	assert(is_power_of_two(nchains));
+	nassert(is_power_of_two(nchains));
 
 	hash->table = table;	/* 2 */
 	hash->nchains = nchains;
@@ -444,7 +444,7 @@ hash_t *hash_init(hash_t * hash, hashcount_t maxcount,
 	hash->mask = compute_mask(nchains);	/* 4 */
 	clear_table(hash);	/* 5 */
 
-	assert(hash_verify(hash));
+	nassert(hash_verify(hash));
 
 	return hash;
 }
@@ -486,7 +486,7 @@ void hash_scan_begin(hscan_t * scan, hash_t * hash)
  * Notes:
  * 1. Remember the next pointer in a temporary value so that it can be
  *    returned.
- * 2. This assertion essentially checks whether the module has been properly
+ * 2. This nassertion essentially checks whether the module has been properly
  *    initialized. The first point of interaction with the module should be
  *    either hash_create() or hash_init(), both of which set hash_val_t_bit to
  *    a non zero value.
@@ -513,7 +513,7 @@ hnode_t *hash_scan_next(hscan_t * scan)
 	hash_val_t chain = scan->chain + 1;
 	hash_val_t nchains = hash->nchains;
 
-	assert(hash_val_t_bit != 0);	/* 2 */
+	nassert(hash_val_t_bit != 0);	/* 2 */
 
 	if (next) {		/* 3 */
 		if (next->next) {	/* 4 */
@@ -549,10 +549,10 @@ void hash_insert(hash_t * hash, hnode_t * node, const void *key)
 {
 	hash_val_t hkey, chain;
 
-	assert(hash_val_t_bit != 0);
-	assert(node->next == NULL);
-	assert(hash->nodecount < hash->maxcount);	/* 1 */
-	assert(hash_lookup(hash, key) == NULL);	/* 2 */
+	nassert(hash_val_t_bit != 0);
+	nassert(node->next == NULL);
+	nassert(hash->nodecount < hash->maxcount);	/* 1 */
+	nassert(hash_lookup(hash, key) == NULL);	/* 2 */
 
 	if (hash->dynamic && hash->nodecount >= hash->highmark)	/* 3 */
 		grow_table(hash);
@@ -566,7 +566,7 @@ void hash_insert(hash_t * hash, hnode_t * node, const void *key)
 	hash->table[chain] = node;
 	hash->nodecount++;
 
-	assert(hash_verify(hash));
+	nassert(hash_verify(hash));
 }
 
 /*
@@ -623,8 +623,8 @@ hnode_t *hash_delete(hash_t * hash, hnode_t * node)
 	hash_val_t chain;
 	hnode_t *hptr;
 
-	assert(hash_lookup(hash, node->key) == node);	/* 1 */
-	assert(hash_val_t_bit != 0);
+	nassert(hash_lookup(hash, node->key) == node);	/* 1 */
+	nassert(hash_val_t_bit != 0);
 
 	if (hash->dynamic && hash->nodecount <= hash->lowmark
 	    && hash->nodecount > INIT_SIZE)
@@ -637,15 +637,15 @@ hnode_t *hash_delete(hash_t * hash, hnode_t * node)
 		hash->table[chain] = node->next;
 	} else {
 		while (hptr->next != node) {	/* 5 */
-			assert(hptr != 0);
+			nassert(hptr != 0);
 			hptr = hptr->next;
 		}
-		assert(hptr->next == node);
+		nassert(hptr->next == node);
 		hptr->next = node->next;
 	}
 
 	hash->nodecount--;
-	assert(hash_verify(hash));
+	nassert(hash_verify(hash));
 
 	node->next = NULL;	/* 6 */
 	return node;
@@ -679,8 +679,8 @@ hnode_t *hash_scan_delete(hash_t * hash, hnode_t * node)
 	hash_val_t chain;
 	hnode_t *hptr;
 
-	assert(hash_lookup(hash, node->key) == node);
-	assert(hash_val_t_bit != 0);
+	nassert(hash_lookup(hash, node->key) == node);
+	nassert(hash_val_t_bit != 0);
 
 	chain = node->hkey & hash->mask;
 	hptr = hash->table[chain];
@@ -694,7 +694,7 @@ hnode_t *hash_scan_delete(hash_t * hash, hnode_t * node)
 	}
 
 	hash->nodecount--;
-	assert(hash_verify(hash));
+	nassert(hash_verify(hash));
 	node->next = NULL;
 
 	return node;

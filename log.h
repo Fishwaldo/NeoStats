@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.h,v 1.3 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: log.h,v 1.4 2003/07/17 10:13:51 fishwaldo Exp $
 */
 
 
@@ -60,6 +60,32 @@
 
 #define LOG_CORE	0
 #define LOG_MOD		1
+
+
+/* this is for the neostats assert replacement. */
+/* Version 2.4 and later of GCC define a magical variable _PRETTY_FUNCTION__'
+   which contains the name of the function currently being defined.
+   This is broken in G++ before version 2.6.
+   C9x has a similar variable called __func__, but prefer the GCC one since
+   it demangles C++ function names.  */
+
+# if defined __cplusplus ? __GNUC_PREREQ (2, 6) : __GNUC_PREREQ (2, 4)
+#   define __NASSERT_FUNCTION    __PRETTY_FUNCTION__
+# else
+#  if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+#   define __NASSERT_FUNCTION    __func__
+#  else
+#   define __NASSERT_FUNCTION    ((__const char *) 0)
+#  endif
+# endif
+
+extern void nassert_fail(const char *expr, const char *file, const int line, const char *infunk);
+
+#define nassert(expr) \
+  (__ASSERT_VOID_CAST ((expr) ? 0 :                                           \
+	(nassert_fail(__STRING(expr), __FILE__, __LINE__, __NASSERT_FUNCTION), 0)))
+            
+
 
 
 extern void nlog(int level, int scope, char *fmt, ...);

@@ -1,4 +1,9 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Version 2.5.4 Pre2
+ - Fixed a problem with statserv and the HTML settings
+ - Fixed a problem with statserv and channel member counts (didn't decrease for kicks)
+ - Implemented our own Assertion function to show backtraces and log it. Changed all asserts to nassert
+
 * NeoStats * Fish & Shmad * Version 2.5.4 (or 2.6.0)
  - Initial import for Mystic 1.1.x IRCd support
  - Updated all copyright notices.

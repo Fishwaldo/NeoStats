@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.68 2003/07/15 10:53:19 fishwaldo Exp $
+** $Id: statserv.c,v 1.69 2003/07/17 10:13:51 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -141,7 +141,9 @@ void ss_Config()
 	} else {
 		/* assume that html is enabled if we don't have a setting for it */
 		StatServ.html = 1;
-		GetConf((void *) StatServ.html, CFGINT, "HTML_Enabled");
+		if (GetConf((void *) &StatServ.html, CFGINT, "HTML_Enabled") < 0) {
+			StatServ.html = 1;
+		}
 		snprintf(StatServ.htmlpath, 255, "%s", tmp);
 		free(tmp);
 	}
