@@ -1,7 +1,8 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
-* NeoStats * Fish * Version ????
- - Ported NeoStats to NeoIRCD, but still needs a lot of work (It links, modules not tested/ported yet)
+* NeoStats * Shmad & Fish * Version ????
+ - Ultimate 2 uses CHGHOST not SETHOST, updated internals to reflect this. (S)
+ - Ported NeoStats to NeoIRCD, but still needs a lot of work (It links, modules not tested/ported yet) (F)
 
 * NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 1
  - Fixed problem where NeoStats (Or the bots) were not signing onto the network with Hyrbid7 IRCD (F)

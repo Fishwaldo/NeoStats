@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.28 2002/09/24 10:56:22 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.29 2002/10/13 23:37:59 shmad Exp $
 */
  
 #include "stats.h"
@@ -317,7 +317,11 @@ int ssvshost_cmd(const char *who, const char *vhost) {
 		return 0;
 	} else {
 		strcpy(u->vhost, vhost);
+#ifdef ULTIMATE3
 		sts(":%s %s %s %s", me.name, (me.token ? TOK_SETHOST : MSG_SETHOST), who, vhost);
+#elif ULTIMATE
+		sts(":%s %s %s %s", me.name, (me.token ? TOK_CHGHOST : MSG_CHGHOST), who, vhost);
+#endif
 		return 1;
 	}
 }
