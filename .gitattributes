@@ -345,7 +345,6 @@ modules/operlog/ChangeLog -text
 modules/operlog/Makefile -text
 modules/operlog/ol_help.c -text
 modules/operlog/operlog.c -text
-modules/sqlsrv/sqlsrv.vcproj -text
 modules/statserv/.indent.pro -text
 modules/statserv/GeoIP.dat -text
 modules/statserv/Makefile.am -text
