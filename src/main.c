@@ -36,7 +36,6 @@
 #include "servers.h"
 #include "channels.h"
 #include "dns.h"
-#include "dotconf.h"
 #include "transfer.h"
 #include "exclude.h"
 #include "bans.h"
@@ -49,7 +48,6 @@
 #include "lang.h"
 #include "nsdba.h"
 #include "dcc.h"
-#include "event.h"
 
 #define PID_FILENAME	"neostats.pid"
 
@@ -219,8 +217,9 @@ static int InitCore( void )
 	/* initialize Lang Subsystem */
 	ircsnprintf( dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX );
 	LANGinit( 1, dbpath, NULL );
-	event_init();
 	/* initialize Module subsystem */
+	if( InitSocks() != NS_SUCCESS )
+		return NS_FAILURE;
 	if( InitDBA() != NS_SUCCESS )
 		return NS_FAILURE;
 	if( InitModules() != NS_SUCCESS )
@@ -230,8 +229,6 @@ static int InitCore( void )
 	if( InitTimers() != NS_SUCCESS )
 		return NS_FAILURE;
 	if( InitBots() != NS_SUCCESS )
-		return NS_FAILURE;
-	if( InitSocks() != NS_SUCCESS )
 		return NS_FAILURE;
 	if( InitDns() != NS_SUCCESS )
 		return NS_FAILURE;

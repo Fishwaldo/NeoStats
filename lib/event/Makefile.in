@@ -61,7 +61,8 @@ libevent_a_LIBADD =
 am_libevent_a_OBJECTS = buffer.$(OBJEXT) devpoll.$(OBJEXT) \
 	epoll.$(OBJEXT) epoll_sub.$(OBJEXT) evbuffer.$(OBJEXT) \
 	event.$(OBJEXT) kqueue.$(OBJEXT) poll.$(OBJEXT) \
-	rtsig.$(OBJEXT) select.$(OBJEXT) signal.$(OBJEXT)
+	rtsig.$(OBJEXT) select.$(OBJEXT) signal.$(OBJEXT) \
+	log.$(OBJEXT)
 libevent_a_OBJECTS = $(am_libevent_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include -I$(top_builddir)/lib/gdbm
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
@@ -210,12 +211,12 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 wi_PWD = @wi_PWD@
 noinst_LIBRARIES = libevent.a
-libevent_a_SOURCES = buffer.c devpoll.c epoll.c epoll_sub.c evbuffer.c event.c kqueue.c poll.c rtsig.c select.c signal.c
+libevent_a_SOURCES = buffer.c devpoll.c epoll.c epoll_sub.c evbuffer.c event.c kqueue.c poll.c rtsig.c select.c signal.c log.c
 include_HEADERS = event.h
 INCLUDES = -Icompat
 EXTRA_DIST = err.c event.h event-internal.h evsignal.h \
 	kqueue.c epoll_sub.c epoll.c select.c rtsig.c poll.c signal.c \
-	devpoll.c \
+	devpoll.c log.c log.h\
 	compat/err.h compat/sys/queue.h compat/sys/tree.h compat/sys/_time.h \
 	WIN32-Code/config.h WIN32-Code/misc.c \
 	WIN32-Code/win32.c WIN32-Code/misc.h \
@@ -279,6 +280,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/evbuffer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kqueue.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/poll.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rtsig.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/select.Po@am__quote@

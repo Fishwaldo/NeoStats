@@ -145,9 +145,19 @@ void report_segfault( const char* modulename )
 RETSIGTYPE sigsegv_handler( int signum )
 {
 	static char name[MAX_MOD_NAME];
+    static int running = 0;
+	/* stop a segv bomb happening */
+	if (running == 1) {
+	    exit(NS_FAILURE);
+    } else {
+        running = 1;
+    }
+
 	/** segv happened inside a module, so unload and try to restore the stack 
 	 *  to location before we jumped into the module and continue
 	 */
+
+
 	if( RunLevel > 0 ) {
 		report_segfault( GET_CUR_MODNAME() );
 		strlcpy( name, GET_CUR_MODNAME(), MAX_MOD_NAME );

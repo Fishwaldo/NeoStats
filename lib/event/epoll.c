@@ -47,20 +47,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
-#include <err.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 
-#ifdef USE_LOG
-#include "log.h"
-#else
-#define LOG_DBG(x)
-#define log_error	warn
-#endif
-
 #include "event.h"
 #include "evsignal.h"
+#include "log.h"
 
 
 extern volatile sig_atomic_t evsignal_caught;
@@ -100,7 +93,7 @@ struct eventop epollops = {
 #ifdef HAVE_SETFD
 #define FD_CLOSEONEXEC(x) do { \
         if (fcntl(x, F_SETFD, 1) == -1) \
-                warn("fcntl(%d, F_SETFD)", x); \
+                event_warn("fcntl(%d, F_SETFD)", x); \
 } while (0)
 #else
 #define FD_CLOSEONEXEC(x)
@@ -126,7 +119,7 @@ epoll_init(void)
 	/* Initalize the kernel queue */
 
 	if ((epfd = epoll_create(nfiles)) == -1) {
-		log_error("epoll_create");
+                event_warn("%s: epoll_create", __func__);
 		return (NULL);
 	}
 
@@ -173,7 +166,7 @@ epoll_recalc(struct event_base *base, void *arg, int max)
 
 		fds = realloc(epollop->fds, nfds * sizeof(struct evepoll));
 		if (fds == NULL) {
-			log_error("realloc");
+			event_warn("%s: realloc", __func__);
 			return (-1);
 		}
 		epollop->fds = fds;
@@ -204,7 +197,7 @@ epoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 
 	if (res == -1) {
 		if (errno != EINTR) {
-			log_error("epoll_wait");
+			event_warn("%s: epoll_wait", __func__);
 			return (-1);
 		}
 
@@ -213,7 +206,7 @@ epoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 	} else if (evsignal_caught)
 		evsignal_process();
 
-	LOG_DBG((LOG_MISC, 80, "%s: epoll_wait reports %d", __func__, res));
+	event_debug(("%s: epoll_wait reports %d", __func__, res));
 
 	for (i = 0; i < res; i++) {
 		int which = 0;

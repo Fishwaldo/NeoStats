@@ -37,7 +37,6 @@
 #include "dns.h"
 #include "transfer.h"
 #include "curl.h"
-#include "dotconf.h"
 #include "services.h"
 #include "ircd.h"
 #include "dcc.h"
@@ -47,6 +46,29 @@
 static hash_t *sockethash;
 
 char recbuf[BUFSIZE];
+
+/** @breif Event Subsystem Callback
+ */
+void libevent_log(int severity, const char *msg) {
+      switch (severity) {
+            case _EVENT_LOG_DEBUG:
+                    dlog(DEBUG1, "LibEvent: %s", msg);
+                    break;
+            case _EVENT_LOG_MSG:
+                    nlog(LOG_INFO, "LibEvent: %s", msg);
+                    break;
+            case _EVENT_LOG_WARN:
+                    nlog(LOG_WARNING, "LibEvent: %s", msg);
+                    break;
+            case _EVENT_LOG_ERR:
+                    nlog(LOG_ERROR, "LibEvent: %s", msg);
+                    break;
+            default:
+                    nlog(LOG_WARNING, "LibEvent(%d): %s", severity, msg);
+                    break;
+      }
+}      
+
 
 
 static int error_from_ircd_socket(int what, void *data);
@@ -141,13 +163,14 @@ read_loop ()
 	fd_set readfds, writefds, errfds;
 	int maxfdsunused;
 #endif
+
 	printf("readloop called\n");
 	me.lastmsg = me.now;
 	while (1) { /* loop till we get a error */
 		SET_SEGV_LOCATION();
 		update_time();
 #if CURLHACK
-        event_loop(EVLOOP_ONCE|EVLOOP_NONBLOCK);
+        event_loop(EVLOOP_ONCE);
 #else
 		event_dispatch();
 #endif
@@ -512,6 +535,8 @@ int InitSocks (void)
 		nlog (LOG_CRITICAL, "Unable to create socks hash");
 		return NS_FAILURE;
 	}
+    event_set_log_callback(libevent_log);
+	event_init();
 	return NS_SUCCESS;
 }
 

@@ -47,18 +47,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <err.h>
 #include <assert.h>
-
-#ifdef USE_LOG
-#include "log.h"
-#else
-#define LOG_DBG(x)
-#define log_error	warn
-#endif
 
 #include "event.h"
 #include "evsignal.h"
+#include "log.h"
 
 
 
@@ -119,7 +112,7 @@ devpoll_init(void)
 
 	/* Initialize the kernel queue */
 	if ((dpfd = open("/dev/poll", O_RDWR)) == -1) {
-		log_error("open: /dev/poll");
+                event_warn("%s: open: /dev/poll", __func__);
 		free(devpollop);
 		return (NULL);
 	}
@@ -164,7 +157,7 @@ devpoll_recalc(struct event_base *base, void *arg, int max)
 
 		fds = realloc(devpollop->fds, nfds * sizeof(struct evdevpoll));
 		if (fds == NULL) {
-			log_error("realloc");
+			event_warn("%s: realloc", __func__);
 			return (-1);
 		}
 		devpollop->fds = fds;
@@ -201,7 +194,7 @@ devpoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 
 	if (res == -1) {
 		if (errno != EINTR) {
-			log_error("ioctl: DP_POLL");
+			event_warn("%s: ioctl: DP_POLL", __func__);
 			return (-1);
 		}
 
@@ -210,7 +203,7 @@ devpoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 	} else if (evsignal_caught)
 		evsignal_process();
 
-	LOG_DBG((LOG_MISC, 80, "%s: devpoll_wait reports %d", __func__, res));
+	event_debug(("%s: devpoll_wait reports %d", __func__, res));
 
 	for (i = 0; i < res; i++) {
 		int which = 0;

@@ -24,7 +24,11 @@
 */
 
 #include "neostats.h"
+#if 0
+#include "confuse.h"
+#else
 #include "dotconf.h"
+#endif
 #include "conf.h"
 #include "log.h"
 #include "services.h"
@@ -34,15 +38,315 @@
 
 static void cb_Server( char *arg, int configtype );
 static void cb_Module( char *arg, int configtype );
-
+ 
 /** @brief The list of modules to load
  */
 static void *load_mods[NUM_MODULES];
+
+#if 0
+int cb_verify_chan(cfg_t *cfg, cfg_opt_t *opt);
+int cb_verify_numeric(cfg_t *cfg, cfg_opt_t *opt);
+int cb_verify_bind(cfg_t *cfg, cfg_opt_t *opt);
+int cb_verify_file(cfg_t *cfg, cfg_opt_t *opt);
+int cb_verify_log(cfg_t *cfg, cfg_opt_t *opt);
+int cb_verify_mask(cfg_t *cfg, cfg_opt_t *opt);
+int cb_noload(cfg_t *cfg, cfg_opt_t *opt);
+int cb_verify_host(cfg_t *cfg, cfg_opt_t *opt);
+int cb_verify_settime(cfg_t *cfg, cfg_opt_t *opt);
+
+typedef struct validate_args {
+    char name[BUFSIZE];
+    cfg_validate_callback_t cb;
+} validate_args;
 
 /** @brief Core Configuration Items
  * 
  * Contains Configuration Items for the Core NeoStats service
  */
+
+cfg_opt_t server_details[] = {
+    CFG_STR("Name", "neostats.nonetwork.org", CFGF_NONE),
+    CFG_STR("Info", "NeoStats 3.0 Services", CFGF_NONE),
+    CFG_STR("ServiceChannel", "#services", CFGF_NONE),
+    CFG_INT("UnrealNumeric", 123, CFGF_NONE),
+    CFG_STR("BindTo", 0, CFGF_NONE),
+    CFG_STR("Protocol", "unreal32", CFGF_NONE)
+};
+
+cfg_opt_t options[] = {
+    CFG_INT("ReconnectTime", 10, CFGF_NONE),
+    CFG_BOOL("UsePrivmsg", cfg_false, CFGF_NONE),
+    CFG_BOOL("OperOnly", cfg_false, CFGF_NONE),
+    CFG_INT("UnrealSettime", 1, CFGF_NONE),
+    CFG_STR("DatabaseType", "gdbm", CFGF_NONE),
+    CFG_STR("LogFileNameFormat", "-%m-%d", CFGF_NONE),
+    CFG_STR("RootNick", "NeoStats", CFGF_NONE),
+    CFG_STR("ServicesHost", "services.neostats.net", CFGF_NONE),
+    CFG_BOOL("NOLOAD", cfg_true, CFGF_NONE)
+};
+
+cfg_opt_t servers[] = {
+    CFG_STR("IpAddress", 0, CFGF_NONE),
+    CFG_INT("Port", 6667, CFGF_NONE),
+    CFG_STR("Password", 0, CFGF_NONE)
+};
+
+cfg_opt_t serviceroots[] = {
+    CFG_STR("Mask", 0, CFGF_NONE)
+};
+
+cfg_opt_t modules[] = {
+    CFG_STR("Name", 0, CFGF_MULTI)
+};
+
+cfg_opt_t fileconfig[] = {
+    CFG_SEC("ServerConfig", server_details, CFGF_NONE),
+    CFG_SEC("Options", options, CFGF_NONE),
+#if 0
+    CFG_SEC("Servers", servers, CFGF_MULTI | CFGF_TITLE),
+    CFG_SEC("ServiceRoots", serviceroots, CFGF_MULTI | CFGF_TITLE),
+#endif
+    CFG_SEC("Servers", servers, CFGF_NONE),
+    CFG_SEC("ServiceRoots", serviceroots, CFGF_NONE),
+    CFG_SEC("Modules", modules, CFGF_NONE)
+};
+
+validate_args arg_validate[] = {
+    {"ServerConfig|ServiceChannel", &cb_verify_chan },
+    {"ServerConfig|UnrealNumeric", &cb_verify_numeric },
+    {"ServerConfig|BindTo", &cb_verify_bind },
+    {"ServerConfig|Protocol", &cb_verify_file },
+    {"Options|UnrealSettime", &cb_verify_settime },
+    {"Options|DataBaseType", &cb_verify_file },
+    {"Options|LogFileNameFormat", &cb_verify_log },
+    {"Options|RootNick", &cb_verify_mask },
+    {"Options|NOLOAD", &cb_noload },
+    {"Servers|IpAddress", &cb_verify_host },
+    {"ServiceRoots|Mask", &cb_verify_mask },
+    {"Modules|Name", &cb_verify_file}
+};
+
+/** @brief Load configuration file
+ *
+ * Parses the configuration file
+ *
+ * @returns nothing
+ */
+
+int ConfLoad( void )
+{
+    cfg_t *cfg;
+    int i, ret;
+	/* Read in the Config File */
+	printf( "Reading the Config File. Please wait.....\n" );
+    cfg = cfg_init(fileconfig, CFGF_NOCASE);
+    for ( i = 0; i < arraylen(arg_validate); i++) {
+printf("%d %s\n", i, arg_validate[i].name);
+        cfg_set_validate_func(cfg, arg_validate[i].name, arg_validate[i].cb);
+    } 
+    FILE *fp = fopen("neostats.conf.out", "w");
+    cfg_print(cfg, fp);
+    fclose(fp);
+	if((ret =  cfg_parse(cfg, CONFIG_NAME)) != 0 ) {
+		printf( "***************************************************\n" );
+		printf( "*                  Error!                         *\n" );
+		printf( "*                                                 *\n" );
+    	switch (ret) {
+	        case CFG_FILE_ERROR:
+	                printf( "* Config file not found                           *\n" );
+                    break;
+            case CFG_PARSE_ERROR:
+                    printf( "* Config Parse Error                              *\n" );
+                    break;
+            default:
+                    printf( "* Uknown Error                                    *\n" );
+                    break;
+        }  
+		printf( "*                                                 *\n" );
+		printf( "*             NeoStats NOT Started                *\n" );
+		printf( "***************************************************\n" );
+        cfg_free(cfg);
+		return NS_FAILURE;
+	}
+	if( nsconfig.die ) {
+		printf( "\n-----> ERROR: Read the README file then edit %s <-----\n\n",CONFIG_NAME );
+		nlog( LOG_CRITICAL, "Read the README file then edit %s",CONFIG_NAME );
+        cfg_free(cfg);
+		return NS_FAILURE;
+	}
+	if( nsconfig.error ) {
+		printf( "\n-----> CONFIG ERROR: Check log file for more information then edit %s <-----\n\n",CONFIG_NAME );
+		nlog( LOG_CRITICAL, "CONFIG ERROR: Check log file for more information then edit %s",CONFIG_NAME );
+		cfg_free(cfg);
+		return NS_FAILURE;
+	}
+	printf( "Sucessfully loaded config file, booting NeoStats\n" );
+	set_config_values(cfg);
+	cfg_free(cfg);
+	return NS_SUCCESS;
+}
+
+int set_config_values(cfg_t *cfg) {
+		/* Server name has a default*/
+printf("hello\n");
+		strlcpy( me.name, cfg_getstr(cfg, "ServerConfig|Name"), sizeof( me.name ) );
+printf("ehh\n");
+		/* Server Port has a default*/
+		me.port = cfg_getint(cfg, "Servers|Port");
+		/* Connect To */
+        if (cfg_size(cfg, "Servers|IpAddress") > 0) {
+    		strlcpy( me.uplink, cfg_getstr(cfg,"Servers|IpAddress"), sizeof( me.uplink ) );
+        } else {
+            printf("no server\n");
+            exit(-1);
+        }
+		if (cfg_size(cfg, "Servers|Password")> 0) {
+    		/* Connect Pass */
+	    	strlcpy( nsconfig.pass, cfg_getstr(cfg,"Servers|Password"), sizeof( nsconfig.pass ) );
+        } else {
+            exit(-1);
+        }
+		/* Server InfoLine has a default*/
+		strlcpy( me.infoline, cfg_getstr(cfg,"ServerConfig|Info"), sizeof( me.infoline ) );
+		/* Service host has a default*/
+		strlcpy( me.servicehost, cfg_getstr(cfg,"Options|ServicesHost"), sizeof( me.servicehost ) );
+		/* Reconnect time has a default*/
+		nsconfig.r_time = cfg_getint(cfg, "Options|ReconnectTime");
+        /* want privmsg  has a default */
+		nsconfig.want_privmsg =  cfg_getbool(cfg, "Options|UsePrivMsg");
+        /* service chan has a default */
+		strlcpy( me.serviceschan, cfg_getstr(cfg, "ServerConfig|ServiceChannel"), sizeof( me.serviceschan ) );
+		/* only opers has a default */
+		nsconfig.onlyopers = cfg_getbool(cfg, "Options|OperOnly");
+        /* vhost has no default, nor is it required */
+        if (cfg_size(cfg, "ServerConfig|BindTo") > 0) {
+    		strlcpy( me.local, cfg_getstr(cfg, "ServerConfig|BindTo"), sizeof( me.local ) );
+        }
+        /* LogFile Format has a default */
+		strlcpy(LogFileNameFormat,cfg_getstr(cfg, "Options|LogFileNameFormat"),MAX_LOGFILENAME );
+		/* numeric has a default */
+		me.numeric = cfg_getint(cfg, "ServerConfig|UnrealNumeric");
+		/* has a default */
+		nsconfig.setservertimes = cfg_getint(cfg, "Options|UnrealSettime") * 60 * 60;
+		if (cfg_size(cfg, "ServiceRoots|Mask") > 0) {
+    		char *nick;
+	    	char *user;
+            char *host;
+            char *arg;
+            /* already validate */
+            arg = cfg_getstr(cfg, "ServiceRoots|Mask");
+			nick = strtok(arg, "!" );
+			user = strtok(NULL, "@" );
+			host = strtok(NULL, "" );
+			strlcpy(nsconfig.rootuser.nick, nick, MAXNICK );
+			strlcpy(nsconfig.rootuser.user, user, MAXUSER );
+			strlcpy(nsconfig.rootuser.host, host, MAXHOST );
+			nsconfig.rootuser.level = NS_ULEVEL_ROOT;
+		}
+		/* protocol is required */
+		strlcpy(me.protocol,cfg_getstr(cfg, "ServerConfig|Protocol"),MAXHOST );
+        /* dbm has a default */
+		strlcpy(me.dbm,cfg_getstr(cfg, "Options|DataBaseType"),MAXHOST );
+        /* has a default */
+		strlcpy(me.rootnick,cfg_getstr(cfg, "Options|RootNick"),MAXNICK );
+}
+
+
+
+/** @brief Load the modules 
+ *
+ * Actually load the modules that were found in the config file
+ *
+ * @returns 1 on success, -1 when a module failed to load
+ * @bugs if a single module fails to load, it stops trying to load any other modules
+ */
+
+int ConfLoadModules( void )
+{
+	int i;
+
+	SET_SEGV_LOCATION( );
+#if 0
+	if(load_mods[0] == 0 ) {
+		nlog( LOG_NORMAL, "No modules configured for loading" ); 
+	} else {
+		nlog( LOG_NORMAL, "Loading configured modules" ); 
+		for( i = 0;( i < NUM_MODULES ) &&( load_mods[i] != 0 ); i++ ) {
+			dlog(DEBUG1, "ConfLoadModules: Loading Module %s",( char * )load_mods[i] );
+			if( load_module( load_mods[i], NULL ) ) {
+				nlog( LOG_NORMAL, "Loaded module %s",( char * )load_mods[i] );
+			} else {
+				nlog( LOG_WARNING, "Failed to load module %s. Please check above error messages",( char * )load_mods[i] );
+			}
+			ns_free(load_mods[i] );
+		}
+		nlog( LOG_NORMAL, "Completed loading configured modules" ); 
+	}
+#endif
+	return NS_SUCCESS;
+}
+
+
+
+int cb_verify_chan(cfg_t *cfg, cfg_opt_t *opt) {
+
+      if (ValidateChannel(opt->values[0]->string) == NS_FAILURE) {
+          cfg_error(cfg, "Invalid Channel Name %s for Option %s", opt->values[0]->string, opt->name);
+          return CFG_PARSE_ERROR;
+      }
+      return CFG_SUCCESS;
+}
+int cb_verify_numeric(cfg_t *cfg, cfg_opt_t *opt) {
+        long int num = opt->values[0]->number;
+		/* limit value - really need to print error and quit */
+		if((num<=0) || (num>254)) {
+            cfg_error(cfg, "Numeric Value %d is out of Range for %s", num, opt->name);
+            return CFG_PARSE_ERROR;
+        }
+      return CFG_SUCCESS;
+}
+int cb_verify_bind(cfg_t *cfg, cfg_opt_t *opt) {
+      return CFG_SUCCESS;
+}
+int cb_verify_file(cfg_t *cfg, cfg_opt_t *opt) {
+      return CFG_SUCCESS;
+}
+int cb_verify_log(cfg_t *cfg, cfg_opt_t *opt) {
+      return CFG_SUCCESS;
+}
+int cb_verify_mask(cfg_t *cfg, cfg_opt_t *opt) {
+      char *value = opt->values[0]->string;
+      if( strstr(value, "!" )&& !strstr(value, "@" ) ) {
+	      cfg_error(cfg, "Invalid HostMask %s for %s", value, opt->name);
+	      return CFG_PARSE_ERROR;
+      }
+      return CFG_SUCCESS;
+}
+int cb_noload(cfg_t *cfg, cfg_opt_t *opt) {
+      if (opt->values[0]->boolean == cfg_true) {
+          cfg_error(cfg, "Error. You didn't edit NeoStats.conf");
+          return CFG_PARSE_ERROR;
+      }
+      return CFG_SUCCESS;
+}
+int cb_verify_host(cfg_t *cfg, cfg_opt_t *opt) {
+      return CFG_SUCCESS;
+}
+int cb_verify_settime(cfg_t *cfg, cfg_opt_t *opt) {
+      long int time = opt->values[0]->number;
+        
+      if (time <= 0) {
+          cfg_error(cfg, "SetTime Value of %d is out of range for %s", time, opt->name);
+          return CFG_PARSE_ERROR;
+      }
+      return CFG_SUCCESS;
+}
+#endif
+
+
+
+
+#if 1
 static config_option options[] = {
 	{"SERVER_NAME", ARG_STR, cb_Server, 0},
 	{"SERVER_PORT", ARG_STR, cb_Server, 1},
@@ -76,7 +380,7 @@ static config_option options[] = {
 int ConfLoad( void )
 {
 	/* Read in the Config File */
-	printf( "Reading the Config File. Please wait.....\n" );
+	printf( "Reading the Config File %s. Please wait.....\n", CONFIG_NAME);
 	if( config_read( CONFIG_NAME, options ) != 0 ) {
 		printf( "***************************************************\n" );
 		printf( "*                  Error!                         *\n" );
@@ -247,3 +551,4 @@ cb_Server( char *arg, int configtype )
 		strlcpy(me.rootnick,arg,MAXNICK );
 	}
 }
+#endif

@@ -41,7 +41,6 @@
 #include <sys/ioctl.h>
 #endif
 
-#include <err.h>
 #include <errno.h>
 #define _GNU_SOURCE
 #include <stdio.h>

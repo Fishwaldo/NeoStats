@@ -39,7 +39,7 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = neostats$(EXEEXT)
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/autotools/rules.mk
+	$(top_srcdir)/autotools/rules.mk confuselexer.c
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
@@ -58,17 +58,18 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
-	channels.$(OBJEXT) commands.$(OBJEXT) conf.$(OBJEXT) \
-	nsdba.$(OBJEXT) dl.$(OBJEXT) dns.$(OBJEXT) dotconf.$(OBJEXT) \
-	exclude.$(OBJEXT) hash.$(OBJEXT) ircd.$(OBJEXT) \
-	ircstring.$(OBJEXT) lang.$(OBJEXT) list.$(OBJEXT) \
-	log.$(OBJEXT) main.$(OBJEXT) match.$(OBJEXT) misc.$(OBJEXT) \
-	modules.$(OBJEXT) ns_help.$(OBJEXT) servers.$(OBJEXT) \
-	services.$(OBJEXT) signals.$(OBJEXT) sock.$(OBJEXT) \
-	support.$(OBJEXT) timer.$(OBJEXT) transfer.$(OBJEXT) \
-	users.$(OBJEXT) modes.$(OBJEXT) ctcp.$(OBJEXT) dcc.$(OBJEXT) \
-	oscalls.$(OBJEXT) nsmemory.$(OBJEXT) base64.$(OBJEXT) \
-	numerics.$(OBJEXT) settings.$(OBJEXT) botinfo.$(OBJEXT)
+	channels.$(OBJEXT) commands.$(OBJEXT) confuse.$(OBJEXT) \
+	confuselexer.$(OBJEXT) nsdba.$(OBJEXT) dotconf.$(OBJEXT) \
+	conf.$(OBJEXT) dl.$(OBJEXT) dns.$(OBJEXT) exclude.$(OBJEXT) \
+	hash.$(OBJEXT) ircd.$(OBJEXT) ircstring.$(OBJEXT) \
+	lang.$(OBJEXT) list.$(OBJEXT) log.$(OBJEXT) main.$(OBJEXT) \
+	match.$(OBJEXT) misc.$(OBJEXT) modules.$(OBJEXT) \
+	ns_help.$(OBJEXT) servers.$(OBJEXT) services.$(OBJEXT) \
+	signals.$(OBJEXT) sock.$(OBJEXT) support.$(OBJEXT) \
+	timer.$(OBJEXT) transfer.$(OBJEXT) users.$(OBJEXT) \
+	modes.$(OBJEXT) ctcp.$(OBJEXT) dcc.$(OBJEXT) oscalls.$(OBJEXT) \
+	nsmemory.$(OBJEXT) base64.$(OBJEXT) numerics.$(OBJEXT) \
+	settings.$(OBJEXT) botinfo.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/adns/libadns.la \
 	$(top_srcdir)/lib/event/libevent.a
@@ -81,6 +82,8 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
+LEXCOMPILE = $(LEX) $(LFLAGS) $(AM_LFLAGS)
+LTLEXCOMPILE = $(LIBTOOL) --mode=compile $(LEX) $(LFLAGS) $(AM_LFLAGS)
 SOURCES = $(neostats_SOURCES)
 DIST_SOURCES = $(neostats_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -217,8 +220,8 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 wi_PWD = @wi_PWD@
 SUBDIRS = dbm protocol
-neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c nsdba.c \
-		dl.c dns.c dotconf.c exclude.c hash.c ircd.c ircstring.c \
+neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.l nsdba.c \
+		dotconf.c conf.c dl.c dns.c exclude.c hash.c ircd.c ircstring.c \
 		lang.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c modes.c ctcp.c dcc.c oscalls.c nsmemory.c \
@@ -239,7 +242,7 @@ LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .l .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/autotools/rules.mk $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -302,6 +305,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/channels.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/commands.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/confuse.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/confuselexer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ctcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dcc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dl.Po@am__quote@
@@ -333,6 +338,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transfer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/users.Po@am__quote@
+
+.l.c:
+	$(LEXCOMPILE) $<
+	sed '/^#/ s|$(LEX_OUTPUT_ROOT)\.c|$@|' $(LEX_OUTPUT_ROOT).c >$@
+	rm -f $(LEX_OUTPUT_ROOT).c
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -539,6 +549,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-rm -f confuselexer.c
 clean: clean-recursive
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
