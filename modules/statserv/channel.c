@@ -195,7 +195,7 @@ int ss_cmd_channel (CmdParams *cmdparams)
 		for (i = 0; i <= 10, cn; i++) {
 			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
-			if (is_hidden_chan(find_chan(cs->name))
+			if (is_hidden_chan(cs->c)
 			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(channelstatlist, cn);
@@ -218,7 +218,7 @@ int ss_cmd_channel (CmdParams *cmdparams)
 		for (i = 0; i <= 10, cn; i++) {
 			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
-			if (is_hidden_chan(find_chan(cs->name))
+			if (is_hidden_chan(cs->c)
 			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(channelstatlist, cn);
@@ -240,14 +240,14 @@ int ss_cmd_channel (CmdParams *cmdparams)
 		for (i = 0; i <= 10, cn; i++) {
 			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
-			if (is_hidden_chan(find_chan(cs->name))
+			if (is_hidden_chan(cs->c)
 			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(channelstatlist, cn);
 				continue;
 			}
 			irc_prefmsg(ss_bot, cmdparams->source, "Channel %s -> %ld Kicks", 
-				cs->name, cs->kicks);
+				cs->name, cs->kicks.alltime.runningtotal);
 			cn = list_next(channelstatlist, cn);
 		}
 		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
@@ -262,14 +262,14 @@ int ss_cmd_channel (CmdParams *cmdparams)
 		for (i = 0; i <= 10, cn; i++) {
 			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
-			if (is_hidden_chan(find_chan(cs->name))
+			if (is_hidden_chan(cs->c)
 			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(channelstatlist, cn);
 				continue;
 			}
 			irc_prefmsg(ss_bot, cmdparams->source, "Channel %s -> %ld Topics", 
-				cs->name, cs->topics);
+				cs->name, cs->topics.alltime.runningtotal);
 			cn = list_next(channelstatlist, cn);
 		}
 		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");

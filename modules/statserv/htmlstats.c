@@ -63,15 +63,9 @@ void get_srvlist()
 	hash_scan_begin(&hs, serverstathash);
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
-		if (s->s) {
-			fprintf (opf, "<tr><td height=\"4\">Server: </td>\n");
-			fprintf (opf, "<td height=\"4\"><a href=#%s> %s (*) </a></td></tr>\n",
-				s->name, s->name);
-		} else {
-			fprintf (opf, "<tr><td height=\"4\">Server: </td>\n");
-			fprintf (opf, "<td height=\"4\"><a href=#%s> %s </a></td></tr>\n",
-				s->name, s->name);
-		}
+		fprintf (opf, "<tr><td height=\"4\">Server: </td>\n");
+		fprintf (opf, "<td height=\"4\"><a href=#%s> %s (%s) </a></td></tr>\n",
+			s->name, s->name, (s->s) ? "ONLINE" : "OFFLINE");
 	}
 	fprintf (opf, "</table>");
 }
@@ -93,11 +87,11 @@ void get_srvlistdet()
 			fprintf (opf, "<tr><td>Last Seen:</td><td colspan = 2>%s</td></tr>\n",
 				sftime(s->ts_lastseen));
 		} else {
-			fprintf (opf,"<tr><td>Current Users:</td><td>%d (%2.0f%%)</td><td>Max %ld at %s</td></tr>\n",
-				ss->server->users, (int)(((float) ss->server->users / (float) networkstats.users.current) * 100),
+			fprintf (opf,"<tr><td>Current Users:</td><td>%d (%d%%)</td><td>Max %ld at %s</td></tr>\n",
+				s->users.current, (int)(((float) s->users.current / (float) networkstats.users.current) * 100),
 				s->users.alltime.max, sftime(s->users.alltime.ts_max));
 			fprintf (opf,
-				"<tr><td>Current Opers:</td><td>%d (%2.0f%%)</td><td>Max %d at %s</td></tr>\n",
+				"<tr><td>Current Opers:</td><td>%d (%d%%)</td><td>Max %d at %s</td></tr>\n",
 				s->opers.current, (int)(((float) s->opers.current / (float) networkstats.opers.current) * 100),
 				s->opers.alltime.max, sftime(s->opers.alltime.ts_max));
 		}
@@ -273,7 +267,7 @@ void get_chantop10()
 	for (i = 0; i <= 10, cn; i++) {
 		cs = lnode_get(cn);
 		/* only show hidden chans to operators */
-		if (is_hidden_chan(find_chan(cs->name))) {
+		if (is_hidden_chan(cs->c)) {
 			i--;
 			cn = list_next(channelstatlist, cn);
 			continue;
@@ -299,13 +293,13 @@ void get_chantop10eva()
 	for (i = 0; i <= 10, cn; i++) {
 		cs = lnode_get(cn);
 		/* only show hidden chans to operators */
-		if (is_hidden_chan(find_chan(cs->name))) {
+		if (is_hidden_chan(cs->c)) {
 			i--;
 			cn = list_next(channelstatlist, cn);
 			continue;
 		}
-		fprintf (opf, "<tr><td>%s %s</td><td align=right>%ld</td></tr>\n",
-			cs->name, (find_chan(cs->name) ? "(*)" : ""), cs->users.alltime.runningtotal);
+		fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+			cs->name, cs->users.alltime.runningtotal);
 		cn = list_next(channelstatlist, cn);
 	}
 	fprintf (opf, "</table>");
@@ -357,13 +351,13 @@ void get_unwelcomechan()
 	for (i = 0; i <= 10, cn; i++) {
 		cs = lnode_get(cn);
 		/* only show hidden chans to operators */
-		if (is_hidden_chan(find_chan(cs->name))) {
+		if (is_hidden_chan(cs->c)) {
 			i--;
 			cn = list_next(channelstatlist, cn);
 			continue;
 		}
-		fprintf (opf, "<tr><td>%s %s</td><td align=right>%ld</td></tr>\n",
-			cs->name, (find_chan(cs->name) ? "(*)" : ""), cs->kicks);
+		fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+			cs->name, cs->kicks);
 		cn = list_next(channelstatlist, cn);
 	}
 	fprintf (opf, "</table>");
@@ -383,13 +377,13 @@ void get_chantops()
 	for (i = 0; i <= 10, cn; i++) {
 		cs = lnode_get(cn);
 		/* only show hidden chans to operators */
-		if (is_hidden_chan(find_chan(cs->name))) {
+		if (is_hidden_chan(cs->c)) {
 			i--;
 			cn = list_next(channelstatlist, cn);
 			continue;
 		}
-		fprintf (opf, "<tr><td>%s %s</td><td align=right>%ld</td></tr>\n",
-			cs->name, (find_chan(cs->name) ? "(*)" : ""), cs->topics);
+		fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+			cs->name, cs->topics);
 		cn = list_next(channelstatlist, cn);
 	}
 	fprintf (opf, "</table>");

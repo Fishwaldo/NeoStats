@@ -172,7 +172,6 @@ cellspacing="0" border="1">
 			<tr>
 				<td class="row1" align="center">
 				<a name=kickchan>!TOP10KICKS!
-				(*) indicates channel is active at the moment
 			</td>
 			</tr>
 			<tr>
@@ -181,7 +180,6 @@ cellspacing="0" border="1">
 			<tr>
 				<td class="row1" align="center">
 				<a name=topicchan>!TOP10TOPICS!
-				(*) indicates channel is active at the moment
 			</td>
 			</tr>
 			<tr>
@@ -190,7 +188,6 @@ cellspacing="0" border="1">
 			<tr>
 				<td class="row1" align="center">
 				<a name=srvlist>!SRVLIST!
-				(*) indicates server is online at the moment<br>
 				(Click on a Server name for more information)
 			</td>
 			</tr>

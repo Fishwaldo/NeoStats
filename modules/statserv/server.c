@@ -249,13 +249,9 @@ int ss_cmd_server_list (CmdParams *cmdparams)
 	hash_scan_begin (&hs, serverstathash);
 	while ((sn = hash_scan_next (&hs))) {
 		ss = hnode_get (sn);
-		if (find_server(ss->name)) {
-			irc_prefmsg (ss_bot, cmdparams->source, "%s (*)", ss->name);
-		} else {
-			irc_prefmsg (ss_bot, cmdparams->source, "%s", ss->name);
-		}
+		irc_prefmsg (ss_bot, cmdparams->source, "%s (%s)", ss->name, 
+			(ss->s) ? "ONLINE" : "OFFLINE");
 	}
-	irc_prefmsg (ss_bot,cmdparams->source, "(* indicates server is online)");
 	irc_prefmsg (ss_bot,cmdparams->source, "End of list.");
 	return NS_SUCCESS;
 }
