@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ms.c,v 1.11 2003/02/17 09:03:37 fishwaldo Exp $
+** $Id: ms.c,v 1.12 2003/03/28 10:05:54 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -180,10 +180,10 @@ int __Bot_Message(char *origin, char **av, int ac)
 }
 
 int Online(char **av, int ac) {
-    if (init_bot(s_MoraleServ,"MoraleServ",me.name,"A Network Morale Service", "+Sqd-x", my_info[0].module_name) == -1 ) {
+    if (init_bot(s_MoraleServ,"MS",me.name,"A Network Morale Service", "+Sqd-x", my_info[0].module_name) == -1 ) {
         /* Nick was in use */
         s_MoraleServ = strcat(s_MoraleServ, "_");
-        init_bot(s_MoraleServ,"MoraleServ",me.name,"A Network Morale Service", "+Sqd-x", my_info[0].module_name);
+        init_bot(s_MoraleServ,"MS",me.name,"A Network Morale Service", "+Sqd-x", my_info[0].module_name);
     }
     return 1;
 };

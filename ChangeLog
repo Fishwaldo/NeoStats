@@ -3,6 +3,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - ConnectServ's username was too long for NeoIRCd, fixed
  - Fixed a usermode bug with NeoIRCd and the bots
  - Fixed a username overflow?
+ - Fixed a username length problem with MoralServ
 
 * NeoStats * Fish * Version 2.5.0
  - Fixed up UserLevels with SMODE support on Ultimate3 (sigh)
