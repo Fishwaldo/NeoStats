@@ -146,8 +146,8 @@ esac
 
 
 
-CURL_LIBS='${top_srcdir}/'src/curl/libcurl.la
-CURL_CFLAGS='-I${top_srcdir}/'src/curl
+CURL_LIBS='${top_srcdir}/'lib/curl/libcurl.la
+CURL_CFLAGS='-I${top_srcdir}/'lib/curl
 AC_SUBST([CURL_LIBS])
 AC_SUBST([CURL_CFLAGS])
 AM_CONDITIONAL(BUILD_CURL, true)

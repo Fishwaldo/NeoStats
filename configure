@@ -24920,7 +24920,7 @@ fi
 
   if test "$ac_cv_lib_pcre_pcre_study" = "yes" ; then
      PCRE_LIBS="-lpcre"
-     PCRE_CFLAGS="-I$(top_srcdir)/lib/pcre"
+     PCRE_CFLAGS='-I$(top_srcdir)'/lib/pcre
      LIBS="$OLDLIBS"
      echo "$as_me:$LINENO: checking lib pcre" >&5
 echo $ECHO_N "checking lib pcre... $ECHO_C" >&6
@@ -26749,8 +26749,8 @@ esac
 
 
 
-CURL_LIBS='${top_srcdir}/'src/curl/libcurl.la
-CURL_CFLAGS='-I${top_srcdir}/'src/curl
+CURL_LIBS='${top_srcdir}/'lib/curl/libcurl.la
+CURL_CFLAGS='-I${top_srcdir}/'lib/curl
 
 
 
@@ -28433,8 +28433,8 @@ esac
 
 
 
-CURL_LIBS='${top_srcdir}/'src/curl/libcurl.la
-CURL_CFLAGS='-I${top_srcdir}/'src/curl
+CURL_LIBS='${top_srcdir}/'lib/curl/libcurl.la
+CURL_CFLAGS='-I${top_srcdir}/'lib/curl
 
 
 
@@ -30083,8 +30083,8 @@ esac
 
 
 
-CURL_LIBS='${top_srcdir}/'src/curl/libcurl.la
-CURL_CFLAGS='-I${top_srcdir}/'src/curl
+CURL_LIBS='${top_srcdir}/'lib/curl/libcurl.la
+CURL_CFLAGS='-I${top_srcdir}/'lib/curl
 
 
 
@@ -30120,7 +30120,7 @@ _ACEOF
 
 
 
-                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile lib/Makefile lib/curl/Makefile lib/keeper/Makefile lib/adns/Makefile lib/pcre/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/loveserv/Makefile modules/moraleserv/Makefile modules/statserv/Makefile modules/template/Makefile modules/templateauth/Makefile cronchk"
+                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile lib/Makefile lib/curl/Makefile lib/keeper/Makefile lib/adns/Makefile lib/pcre/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/loveserv/Makefile modules/moraleserv/Makefile modules/statserv/Makefile modules/template/Makefile modules/templateauth/Makefile tools/Makefile cronchk"
 
 
 cat >confcache <<\_ACEOF
@@ -30839,6 +30839,7 @@ do
   "modules/statserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/statserv/Makefile" ;;
   "modules/template/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/template/Makefile" ;;
   "modules/templateauth/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/templateauth/Makefile" ;;
+  "tools/Makefile" ) CONFIG_FILES="$CONFIG_FILES tools/Makefile" ;;
   "cronchk" ) CONFIG_FILES="$CONFIG_FILES cronchk" ;;
   "$ac_config_libobj_dir/fnmatch.h" ) CONFIG_LINKS="$CONFIG_LINKS $ac_config_libobj_dir/fnmatch.h:$ac_config_libobj_dir/fnmatch_.h" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;

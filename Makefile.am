@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS 	= foreign
-SUBDIRS 		= include lib modules tools src
+SUBDIRS 		= include lib modules src
 ACLOCAL_AMFLAGS 	= -I autotools
-
+AM_MAKEFLAGS		= -s
 bin_SCRIPTS		= makeconf cronchk
 data_DATA		= neostats.motd
 

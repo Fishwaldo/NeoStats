@@ -7050,7 +7050,7 @@ else
   AC_CHECK_LIB(pcre, pcre_study)
   if test "$ac_cv_lib_pcre_pcre_study" = "yes" ; then
      PCRE_LIBS="-lpcre"
-     PCRE_CFLAGS="-I$(top_srcdir)/lib/pcre"
+     PCRE_CFLAGS='-I$(top_srcdir)'/lib/pcre
      LIBS="$OLDLIBS"
      AC_MSG_CHECKING([lib pcre])
      AC_MSG_RESULT([$PCRE_LIBS])
@@ -7257,8 +7257,8 @@ esac
 
 
 
-CURL_LIBS='${top_srcdir}/'src/curl/libcurl.la
-CURL_CFLAGS='-I${top_srcdir}/'src/curl
+CURL_LIBS='${top_srcdir}/'lib/curl/libcurl.la
+CURL_CFLAGS='-I${top_srcdir}/'lib/curl
 AC_SUBST([CURL_LIBS])
 AC_SUBST([CURL_CFLAGS])
 AM_CONDITIONAL(BUILD_CURL, true)

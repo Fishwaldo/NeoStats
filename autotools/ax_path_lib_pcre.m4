@@ -27,7 +27,7 @@ else
   AC_CHECK_LIB(pcre, pcre_study)
   if test "$ac_cv_lib_pcre_pcre_study" = "yes" ; then
      PCRE_LIBS="-lpcre"
-     PCRE_CFLAGS="-I$(top_srcdir)/lib/pcre"
+     PCRE_CFLAGS='-I$(top_srcdir)'/lib/pcre
      LIBS="$OLDLIBS"
      AC_MSG_CHECKING([lib pcre])
      AC_MSG_RESULT([$PCRE_LIBS])

@@ -1,4 +1,4 @@
-SUBDIRS		= protocol keeper 
+SUBDIRS		= protocol
 
 bin_PROGRAMS = neostats
 
