@@ -25,37 +25,16 @@
 
 #include "stats.h"
 
-const char *hs_help[] = {
-	"The following commands can be used with HostServ",
-	"",
-	"    ABOUT       About HostServ",
-	"    LOGIN       Login to HostServ",
-	"    CHPASS      Change password for a vhost",
-	"    BANS        List banned vhosts",
-	NULL
-};
-
-const char *hs_user_help[] = {
-	"",
-	"Additional commands for Service Roots",
-	"",
-	"    ADD         Add a vhost",
-	"    DEL         Delete a vhost",
-	"    LIST        List vhosts",
-	"    VIEW        Detailed vhost list",
-	"    SET         HostServ configuration",
-	"    LEVELS      Levels to manage HostServ",
-	NULL
-};
-
-const char *hs_help_on_help[] = {
-	"",
-	"To use a command, type:",
-	"    \2/msg HostServ command\2",
-	"For more information on a command, type:", 
-	"    \2/msg HostServ HELP command\2.",
-	NULL
-};
+const char hs_help_about_oneline[] ="About HostServ";
+const char hs_help_login_oneline[] ="Login to HostServ";
+const char hs_help_chpass_oneline[] ="Change password for a vhost";
+const char hs_help_bans_oneline[] ="List banned vhosts";
+const char hs_help_add_oneline[] ="Add a vhost";
+const char hs_help_del_oneline[] ="Delete a vhost";
+const char hs_help_list_oneline[] ="List vhosts";
+const char hs_help_view_oneline[] ="Detailed vhost list";
+const char hs_help_set_oneline[] ="HostServ configuration";
+const char hs_help_levels_oneline[] ="Levels to manage HostServ";
 
 const char *hs_help_about[] = {
 	"\2HostServ\2 allows users to use their own unique host",
@@ -126,7 +105,7 @@ const char *hs_help_chpass[] = {
 	NULL
 };
 
-const char *hs_help_listban[] = {
+const char *hs_help_bans[] = {
 	"Syntax: \2BANS\2",
 	"        \2BANS ADD <hostname>\2",
 	"        \2BANS DEL <index>\2",

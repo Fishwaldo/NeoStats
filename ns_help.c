@@ -27,30 +27,30 @@
 
 #include "stats.h"
 
-const char ns_help_help_oneline[]="Provides Help on Commands";
-const char ns_level_help_oneline[]="Show permission level for NeoStats.";
-const char ns_info_help_oneline[]="Stats info on NeoStats.";
-const char ns_version_help_oneline[]="Show NeoStats version information.";
-const char ns_shutdown_help_oneline[]="Shutdown NeoStats";
-const char ns_reload_help_oneline[]="Force NeoStats to reload";
-const char ns_logs_help_oneline[]="View logfiles";
-const char ns_load_help_oneline[]="Load a module";
-const char ns_unload_help_oneline[]="Unload a module";
-const char ns_jupe_help_oneline[]="Jupiter a Server";
+const char ns_help_oneline[]="Provides Help on Commands";
+const char ns_help_level_oneline[]="Show permission level for NeoStats.";
+const char ns_help_info_oneline[]="Stats info on NeoStats.";
+const char ns_help_version_oneline[]="Show NeoStats version information.";
+const char ns_help_shutdown_oneline[]="Shutdown NeoStats";
+const char ns_help_reload_oneline[]="Force NeoStats to reload";
+const char ns_help_logs_oneline[]="View logfiles";
+const char ns_help_load_oneline[]="Load a module";
+const char ns_help_unload_oneline[]="Unload a module";
+const char ns_help_jupe_oneline[]="Jupiter a Server";
 #ifdef USE_RAW
-const char ns_raw_help_oneline[]="Send a raw command from this Server";
+const char ns_help_raw_oneline[]="Send a raw command from this Server";
 #endif
-const char ns_debug_help_oneline[]="Toggles debug mode";
-const char ns_botlist_help_oneline[]="List current module bots";
-const char ns_socklist_help_oneline[]="List current module sockets";
-const char ns_timerlist_help_oneline[]="List current module timers";
-const char ns_botchanlist_help_oneline[]="List current module bot channels";
-const char ns_modlist_help_oneline[]="List loaded modules";
-const char ns_userdump_help_oneline[]="Debug user table";
-const char ns_chandump_help_oneline[]="Debug channel table";
-const char ns_serverdump_help_oneline[]="Debug server table";
+const char ns_help_debug_oneline[]="Toggles debug mode";
+const char ns_help_botlist_oneline[]="List current module bots";
+const char ns_help_socklist_oneline[]="List current module sockets";
+const char ns_help_timerlist_oneline[]="List current module timers";
+const char ns_help_botchanlist_oneline[]="List current module bot channels";
+const char ns_help_modlist_oneline[]="List loaded modules";
+const char ns_help_userdump_oneline[]="Debug user table";
+const char ns_help_chandump_oneline[]="Debug channel table";
+const char ns_help_serverdump_oneline[]="Debug server table";
 
-const char *ns_level_help[] = {
+const char *ns_help_level[] = {
 	"Syntax: \2LEVEL [nick]\2",
 	"",
 	"Show your permission level for NeoStats.",
@@ -60,7 +60,7 @@ const char *ns_level_help[] = {
 	NULL
 };
 
-const char *ns_jupe_help[] = {
+const char *ns_help_jupe[] = {
 	"Syntax: \2JUPE \37Server\37\2",
 	"",
 	"Cause NeoStats to jupiter a server; i.e. create a fake",
@@ -71,7 +71,7 @@ const char *ns_jupe_help[] = {
 };
 
 #ifdef USE_RAW
-const char *ns_raw_help[] = {
+const char *ns_help_raw[] = {
 	"Syntax: \2RAW \37Command\37\2",
 	"",
 	"Sends a string of raw text directly to the server to which",
@@ -84,7 +84,7 @@ const char *ns_raw_help[] = {
 };
 #endif
 
-const char *ns_load_help[] = {
+const char *ns_help_load[] = {
 	"Syntax: \2LOAD \37module file name\37\2",
 	"",
 	"Load a module while NeoStats is running. Some modules",
@@ -92,7 +92,7 @@ const char *ns_load_help[] = {
 	NULL
 };
 
-const char *ns_unload_help[] = {
+const char *ns_help_unload[] = {
 	"Syntax: \2UNLOAD \37module name\37\2",
 	"",
 	"Unload a module while NeoStats is running. Some modules",
@@ -100,7 +100,7 @@ const char *ns_unload_help[] = {
 	NULL
 };
 
-const char *ns_modlist_help[] = {
+const char *ns_help_modlist[] = {
 	"Syntax: \2MODLIST\2",
 	"",
 	"Display module names and descriptions of all loaded",
@@ -108,7 +108,7 @@ const char *ns_modlist_help[] = {
 	NULL
 };
 
-const char *ns_debug_help[] = {
+const char *ns_help_debug[] = {
 	"Syntax: \2DEBUG <ON|OFF>\2",
 	"",
 	"Toggles debug mode. When enabled, debugging information is",
@@ -119,14 +119,14 @@ const char *ns_debug_help[] = {
 	NULL
 };
 
-const char *ns_version_help[] = {
+const char *ns_help_version[] = {
 	"Syntax: \2VERSION\2",
 	"",
 	"Shows the current NeoStats version.",
 	NULL
 };
 
-const char *ns_shutdown_help[] = {
+const char *ns_help_shutdown[] = {
 	"Syntax: \2SHUTDOWN <reason>\2",
 	"",
 	"Cause NeoStats to save data files and exit immediately.",
@@ -136,7 +136,7 @@ const char *ns_shutdown_help[] = {
 	NULL
 };
 
-const char *ns_reload_help[] = {
+const char *ns_help_reload[] = {
 	"Syntax: \2RELOAD <reason>\2",
 	"",
 	"Cause NeoStats to leave the network, reload datafiles,",
@@ -147,7 +147,7 @@ const char *ns_reload_help[] = {
 	NULL
 };
 
-const char *ns_userdump_help[] = {
+const char *ns_help_userdump[] = {
 	"Syntax: \2USERDUMP\2",
 	"Syntax: \2USERDUMP <nick>\2",
 	"",
@@ -158,7 +158,7 @@ const char *ns_userdump_help[] = {
 	NULL
 };
 
-const char *ns_serverdump_help[] = {
+const char *ns_help_serverdump[] = {
 	"Syntax: \2SERVERDUMP\2",
 	"",
 	"When in debug mode, Neostats will echo its server table to",
@@ -166,7 +166,7 @@ const char *ns_serverdump_help[] = {
 	NULL
 };
 
-const char *ns_chandump_help[] = {
+const char *ns_help_chandump[] = {
 	"Syntax: \2CHANDUMP\2",
 	"Syntax: \2CHANDUMP <channel>\2",
 	"",
@@ -177,14 +177,14 @@ const char *ns_chandump_help[] = {
 	NULL
 };
 
-const char *ns_logs_help[] = {
+const char *ns_help_logs[] = {
 	"Syntax: \2LOGS\2",
 	"",
 	"Sends today's logfile via PRIVMSG/NOTICE",
 	NULL
 };
 
-const char *ns_botlist_help[] = {
+const char *ns_help_botlist[] = {
 	"Syntax: \2BOTLIST\2",
 	"",
 	"NeoStats will send you by notice a list of the current bots",
@@ -192,7 +192,7 @@ const char *ns_botlist_help[] = {
 	NULL
 };
 
-const char *ns_socklist_help[] = {
+const char *ns_help_socklist[] = {
 	"Syntax: \2SOCKLIST\2",
 	"",
 	"NeoStats will send you by notice a list of the current",
@@ -200,7 +200,7 @@ const char *ns_socklist_help[] = {
 	NULL
 };
 
-const char *ns_timerlist_help[] = {
+const char *ns_help_timerlist[] = {
 	"Syntax: \2TIMERLIST\2",
 	"",
 	"NeoStats will send you by notice a list of the current",
@@ -208,7 +208,7 @@ const char *ns_timerlist_help[] = {
 	NULL
 };
 
-const char *ns_botchanlist_help[] = {
+const char *ns_help_botchanlist[] = {
 	"Syntax: \2BOTCHANLIST\2",
 	"",
 	"NeoStats will send you by notice a list of the current bots",
@@ -216,7 +216,7 @@ const char *ns_botchanlist_help[] = {
 	NULL
 };
 
-const char *ns_info_help[] = {
+const char *ns_help_info[] = {
 	"Syntax: \2INFO\2",
 	"",
 	"Display info about NeoStats uptime and other stats.",

@@ -346,7 +346,7 @@ struct ping {
 /** @brief bot_cmd_handler type
  *  defines handler function definition
  */
-typedef void (*bot_cmd_handler) (User * u, char **av, int ac);
+typedef int (*bot_cmd_handler) (User * u, char **av, int ac);
 
 /** @brief bot_cmd structure
  *  defines command lists for bots

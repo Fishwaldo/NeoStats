@@ -243,7 +243,7 @@ change_mod_timer_interval (char *timer_name, int interval)
  * 
  * @return none
 */
-void
+int
 list_timers (User * u, char **av, int ac)
 {
 	ModTimer *mod_tmr = NULL;
@@ -261,6 +261,7 @@ list_timers (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "Time till next Run: %d", mod_tmr->interval - (me.now - mod_tmr->lastrun));
 	}
 	prefmsg (u->nick, s_Services, "End of Module timer List");
+	return 0;
 }
 
 /** @brief run pending module timer functions
@@ -472,7 +473,7 @@ del_socket (char *sock_name)
  * 
  * @return none
 */
-void
+int
 list_sockets (User * u, char **av, int ac)
 {
 	ModSock *mod_sock = NULL;
@@ -493,6 +494,7 @@ list_sockets (User * u, char **av, int ac)
 		}
 	}
 	prefmsg (u->nick, s_Services, "End of Socket List");
+	return 0;
 }
 
 /** @brief Add a bot to a channel
@@ -613,7 +615,7 @@ bot_chan_message (char *origin, char **av, int ac)
  * 
  * @return none
  */
-void
+int
 list_bot_chans (User * u, char **av, int ac)
 {
 	hscan_t hs;
@@ -632,6 +634,7 @@ list_bot_chans (User * u, char **av, int ac)
 			ln = list_next (mod_chan_bot->bots, ln);
 		}
 	}
+	return 0;
 }
 
 /** @brief create a new bot
@@ -779,7 +782,7 @@ bot_nick_change (char *oldnick, char *newnick)
  * 
  * @return
  */
-void
+int
 list_bots (User * u, char **av, int ac)
 {
 	ModUser *mod_usr;
@@ -795,6 +798,7 @@ list_bots (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "Module Bots: %s", mod_usr->nick);
 	}
 	prefmsg (u->nick, s_Services, "End of Module Bot List");
+	return 0;
 }
 
 /** @brief ModuleEvent
@@ -1153,7 +1157,7 @@ get_mod_num (char *mod_name)
  * 
  * @return
  */
-void
+int
 list_modules (User * u, char **av, int ac)
 {
 	Module *mod_ptr = NULL;
@@ -1169,6 +1173,7 @@ list_modules (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "Module Number: %d", get_mod_num (mod_ptr->info->module_name));
 	}
 	prefmsg (u->nick, s_Services, "End of Module List");
+	return 0;
 }
 
 /** @brief 

@@ -35,49 +35,49 @@
 #include "chans.h"
 #include "hash.h"
 
-static void ns_set_debug (User * u, char **av, int ac);
-static void ns_shutdown (User * u, char **av, int ac);
-static void ns_reload (User * u, char **av, int ac);
-static void ns_logs (User * u, char **av, int ac);
-static void ns_jupe (User * u, char **av, int ac);
+static int ns_set_debug (User * u, char **av, int ac);
+static int ns_shutdown (User * u, char **av, int ac);
+static int ns_reload (User * u, char **av, int ac);
+static int ns_logs (User * u, char **av, int ac);
+static int ns_jupe (User * u, char **av, int ac);
 #ifdef USE_RAW
-static void ns_raw (User * u, char **av, int ac);
+static int ns_raw (User * u, char **av, int ac);
 #endif
-static void ns_user_dump (User * u, char **av, int ac);
-static void ns_server_dump (User * u, char **av, int ac);
-static void ns_chan_dump (User * u, char **av, int ac);
-static void ns_info (User * u, char **av, int ac);
-static void ns_version (User * u, char **av, int ac);
-static void ns_show_level (User * u, char **av, int ac);
-static void ns_load_module (User * u, char **av, int ac);
-static void ns_unload_module (User * u, char **av, int ac);
+static int ns_userdump (User * u, char **av, int ac);
+static int ns_serverdump (User * u, char **av, int ac);
+static int ns_chandump (User * u, char **av, int ac);
+static int ns_info (User * u, char **av, int ac);
+static int ns_version (User * u, char **av, int ac);
+static int ns_level (User * u, char **av, int ac);
+static int ns_load (User * u, char **av, int ac);
+static int ns_unload (User * u, char **av, int ac);
 
 static char quitmsg[BUFSIZE];
 static char no_reason[]="no reason given";
 
 static bot_cmd ns_commands[]=
 {
-	{"LEVEL",		ns_show_level,	0, 	0,					ns_level_help, 		1, 	ns_level_help_oneline},
-	{"INFO",		ns_info,		0, 	0,					ns_info_help, 		1, 	ns_info_help_oneline},
-	{"VERSION",		ns_version,		0, 	0,					ns_version_help, 	1, 	ns_version_help_oneline},
-	{"SHUTDOWN",	ns_shutdown,	0, 	NS_ULEVEL_ADMIN, 	ns_shutdown_help, 	1, 	ns_shutdown_help_oneline},
-	{"RELOAD",		ns_reload,		0, 	NS_ULEVEL_ADMIN, 	ns_reload_help,		1, 	ns_reload_help_oneline},
-	{"LOGS",		ns_logs,		0, 	NS_ULEVEL_OPER, 	ns_logs_help,		1, 	ns_logs_help_oneline},
-	{"MODLIST",		list_modules,	0, 	NS_ULEVEL_ADMIN,  	ns_modlist_help, 	1,	ns_modlist_help_oneline},
-	{"LOAD",		ns_load_module,	1, 	NS_ULEVEL_ADMIN, 	ns_load_help, 		1, 	ns_load_help_oneline},
-	{"UNLOAD",		ns_unload_module,1, NS_ULEVEL_ADMIN, 	ns_unload_help, 	1, 	ns_unload_help_oneline},
-	{"JUPE",		ns_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_jupe_help,		1, 	ns_jupe_help_oneline},
-#ifdef USE_RAW																		
-	{"RAW",			ns_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_raw_help, 		1, 	ns_raw_help_oneline},
-#endif																				
-	{"DEBUG",		ns_set_debug,	1, 	NS_ULEVEL_ROOT,  	ns_debug_help,		1,	ns_debug_help_oneline},
-	{"BOTLIST",		list_bots,		0, 	NS_ULEVEL_ROOT,  	ns_botlist_help,	1,	ns_botlist_help_oneline},
-	{"SOCKLIST",	list_sockets,	0, 	NS_ULEVEL_ROOT,  	ns_socklist_help, 	1,	ns_socklist_help_oneline},
-	{"TIMERLIST",	list_timers,	0, 	NS_ULEVEL_ROOT,  	ns_timerlist_help, 	1,	ns_timerlist_help_oneline},
-	{"BOTCHANLIST",	list_bot_chans,	0, 	NS_ULEVEL_ROOT,  	ns_botchanlist_help,1,	ns_botchanlist_help_oneline},
-	{"USERDUMP",	ns_user_dump,	0, 	NS_ULEVEL_ROOT,  	ns_userdump_help, 	1,	ns_userdump_help_oneline},
-	{"CHANDUMP",	ns_chan_dump,	0, 	NS_ULEVEL_ROOT,  	ns_chandump_help, 	1,	ns_chandump_help_oneline},
-	{"SERVERDUMP",	ns_server_dump,	0, 	NS_ULEVEL_ROOT,  	ns_serverdump_help, 1,	ns_serverdump_help_oneline},
+	{"LEVEL",		ns_level,		0, 	0,					ns_help_level, 		1, 	ns_help_level_oneline},
+	{"INFO",		ns_info,		0, 	0,					ns_help_info, 		1, 	ns_help_info_oneline},
+	{"VERSION",		ns_version,		0, 	0,					ns_help_version, 	1, 	ns_help_version_oneline},
+	{"SHUTDOWN",	ns_shutdown,	0, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown, 	1, 	ns_help_shutdown_oneline},
+	{"RELOAD",		ns_reload,		0, 	NS_ULEVEL_ADMIN, 	ns_help_reload,		1, 	ns_help_reload_oneline},
+	{"LOGS",		ns_logs,		0, 	NS_ULEVEL_OPER, 	ns_help_logs,		1, 	ns_help_logs_oneline},
+	{"MODLIST",		list_modules,	0, 	NS_ULEVEL_ADMIN,  	ns_help_modlist, 	1,	ns_help_modlist_oneline},
+	{"LOAD",		ns_load,	1, 	NS_ULEVEL_ADMIN, 	ns_help_load, 		1, 	ns_help_load_oneline},
+	{"UNLOAD",		ns_unload,1, NS_ULEVEL_ADMIN, 	ns_help_unload, 	1, 	ns_help_unload_oneline},
+	{"JUPE",		ns_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_help_jupe,		1, 	ns_help_jupe_oneline},
+#ifdef USE_RAW																
+	{"RAW",			ns_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_help_raw, 		1, 	ns_help_raw_oneline},
+#endif																		
+	{"DEBUG",		ns_set_debug,	1, 	NS_ULEVEL_ROOT,  	ns_help_debug,		1,	ns_help_debug_oneline},
+	{"BOTLIST",		list_bots,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist,	1,	ns_help_botlist_oneline},
+	{"SOCKLIST",	list_sockets,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist, 	1,	ns_help_socklist_oneline},
+	{"TIMERLIST",	list_timers,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist, 	1,	ns_help_timerlist_oneline},
+	{"BOTCHANLIST",	list_bot_chans,	0, 	NS_ULEVEL_ROOT,  	ns_help_botchanlist,1,	ns_help_botchanlist_oneline},
+	{"USERDUMP",	ns_userdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_userdump, 	1,	ns_help_userdump_oneline},
+	{"CHANDUMP",	ns_chandump,	0, 	NS_ULEVEL_ROOT,  	ns_help_chandump, 	1,	ns_help_chandump_oneline},
+	{"SERVERDUMP",	ns_serverdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverdump, 1,	ns_help_serverdump_oneline},
 	{NULL,			NULL,			0, 	0,			NULL, 			0,	NULL}
 };
 
@@ -106,7 +106,7 @@ init_services(void)
  *  @param number of arguments
  *  @returns none
  */
-static void
+static int
 ns_shutdown (User * u, char **av, int ac)
 {
 	char *tmp;
@@ -125,6 +125,7 @@ ns_shutdown (User * u, char **av, int ac)
 	globops (s_Services, quitmsg);
 	nlog (LOG_NOTICE, LOG_CORE, quitmsg);
 	do_exit (NS_EXIT_NORMAL, quitmsg);
+   	return 1;
 }
 
 /** @brief RELOAD command handler
@@ -136,7 +137,7 @@ ns_shutdown (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void
+static int
 ns_reload (User * u, char **av, int ac)
 {
 	char *tmp;
@@ -144,7 +145,7 @@ ns_reload (User * u, char **av, int ac)
 	SET_SEGV_LOCATION();
 	if (ac <= 2) {
 		prefmsg (u->nick, s_Services, "You must supply a Reason to Reload");
-		return;
+		return 0;
 	}
 	tmp = joinbuf (av, ac, 2);
 	chanalert (s_Services, "%s Wants me to RELOAD! for %s", u->nick, tmp);
@@ -154,6 +155,7 @@ ns_reload (User * u, char **av, int ac)
 	globops (s_Services, quitmsg);
 	nlog (LOG_NOTICE, LOG_CORE, quitmsg);
 	do_exit (NS_EXIT_RELOAD, quitmsg);
+   	return 1;
 }
 
 /** @brief LOGS command handler
@@ -165,7 +167,7 @@ ns_reload (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void
+static int
 ns_logs (User * u, char **av, int ac)
 {
 #ifdef DEBUG
@@ -186,6 +188,7 @@ ns_logs (User * u, char **av, int ac)
 	}
 	fclose (fp);
 #endif
+   	return 1;
 }
 
 /** @brief JUPE command handler
@@ -197,7 +200,7 @@ ns_logs (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void
+static int
 ns_jupe (User * u, char **av, int ac)
 {
 	char infoline[255];
@@ -208,6 +211,7 @@ ns_jupe (User * u, char **av, int ac)
 	nlog (LOG_NOTICE, LOG_CORE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, av[2]);
 	chanalert (s_Services, "%s Wants to JUPE this Server %s", u->nick, av[2]);
 	prefmsg(u->nick, s_Services, "%s has been Jupitered", av[2]);
+   	return 1;
 }
 
 /** @brief DEBUG command handler
@@ -219,7 +223,7 @@ ns_jupe (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void
+static int
 ns_set_debug (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
@@ -235,8 +239,9 @@ ns_set_debug (User * u, char **av, int ac)
 		prefmsg(u->nick, s_Services,
 			"Syntax Error: /msg %s HELP DEBUG for more info",
 			s_Services);
-		return;
+		   	return 0;
 	}
+   	return 1;
 }
 
 /** @brief USERDUMP command handler
@@ -248,16 +253,17 @@ ns_set_debug (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void
-ns_user_dump (User * u, char **av, int ac)
+static int
+ns_userdump (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	if (!me.debug_mode) {
 		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
-		return;
+	   	return 0;
 	}
 	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump!", u->nick);
 	UserDump (((ac < 3) ? NULL : av[2]));
+   	return 1;
 }
 
 /** @brief SERVERDUMP command handler
@@ -269,16 +275,17 @@ ns_user_dump (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void
-ns_server_dump (User * u, char **av, int ac)
+static int
+ns_serverdump (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	if (!me.debug_mode) {
 		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
-		return;
+	   	return 0;
 	}
 	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump!", u->nick);
 	ServerDump ();
+   	return 1;
 }
 
 /** @brief CHANDUMP command handler
@@ -290,16 +297,17 @@ ns_server_dump (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void
-ns_chan_dump (User * u, char **av, int ac)
+static int
+ns_chandump (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	if (!me.debug_mode) {
 		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
-		return;
+	   	return 0;
 	}
 	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ChannelDump!", u->nick);
 	ChanDump (((ac < 3) ? NULL : av[2]));
+   	return 1;
 }
 
 /** @brief INFO command handler
@@ -311,7 +319,7 @@ ns_chan_dump (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void 
+static int 
 ns_info (User * u, char **av, int ac)
 {
 	int uptime = me.now - me.t_start;
@@ -337,6 +345,7 @@ ns_info (User * u, char **av, int ac)
 	else
 		prefmsg (u->nick, s_Services, "Debugging Mode is Disabled!");
 	prefmsg (u->nick, s_Services, "End of Information.");
+	return 0;
 }
 
 /** @brief VERSION command handler
@@ -348,13 +357,14 @@ ns_info (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void
+static int
 ns_version (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	prefmsg (u->nick, s_Services, "\2NeoStats Version Information\2");
 	prefmsg (u->nick, s_Services, "NeoStats Version: %d.%d.%d%s", MAJOR, MINOR, REV, ircd_version);
 	prefmsg (u->nick, s_Services, "http://www.neostats.net");
+   	return 1;
 }
 
 /** @brief LEVEL command handler
@@ -366,8 +376,8 @@ ns_version (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void 
-ns_show_level (User * u, char **av, int ac)
+static int 
+ns_level (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	if(ac > 2) {
@@ -379,6 +389,7 @@ ns_show_level (User * u, char **av, int ac)
 	} else {
 		prefmsg (u->nick, s_Services, "Your Level is %d", UserLevel (u));
 	}
+	return 1;
 }
 
 /** @brief LOAD command handler
@@ -390,8 +401,8 @@ ns_show_level (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void 
-ns_load_module (User * u, char **av, int ac)
+static int 
+ns_load (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	if (load_module (av[2], u) == NS_SUCCESS) {
@@ -399,6 +410,7 @@ ns_load_module (User * u, char **av, int ac)
 	} else {
 		chanalert (s_Services, "%s Tried to Load Module %s, but Failed", u->nick, av[2]);
 	}
+   	return 1;
 }
 
 /** @brief UNLOAD command handler
@@ -410,13 +422,14 @@ ns_load_module (User * u, char **av, int ac)
  *  @param number of arguments
  *  @returns none
  */
-static void 
-ns_unload_module (User * u, char **av, int ac)
+static int 
+ns_unload (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	if (unload_module (av[2], u) > 0) {
 		chanalert (s_Services, "%s Unloaded Module %s", u->nick, av[2]);
 	}
+   	return 1;
 }
 
 /** @brief RAW command handler
@@ -429,7 +442,7 @@ ns_unload_module (User * u, char **av, int ac)
  *  @returns none
  */
 #ifdef USE_RAW
-static void
+static int
 ns_raw (User * u, char **av, int ac)
 {
 	char *message;
@@ -440,5 +453,6 @@ ns_raw (User * u, char **av, int ac)
 	nlog (LOG_INFO, LOG_CORE, "RAW COMMAND %sIssued a Raw Command!(%s)", u->nick, message);
 	sts(message);
 	free (message);
+   	return 1;
 }
 #endif

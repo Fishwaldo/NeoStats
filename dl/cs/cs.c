@@ -114,11 +114,13 @@ static int cs_user_smodes(char **av, int ac);
 static int cs_del_user(char **av, int ac);
 static int cs_user_kill(char **av, int ac);
 static int cs_user_nick(char **av, int ac);
-static void do_set(User * u, char **av, int ac);
-static void do_about(User * u, char **av, int ac);
+
 static void LoadConfig(void);
 
-static void cs_version(User * u, char **av, int ac);
+static int cs_set(User * u, char **av, int ac);
+static int cs_about(User * u, char **av, int ac);
+static int cs_version(User * u, char **av, int ac);
+
 static void cs_set_list(User * u, char **av, int ac);
 static void cs_set_signwatch(User * u, char **av, int ac);
 static void cs_set_killwatch(User * u, char **av, int ac);
@@ -177,24 +179,25 @@ Functions __module_functions[] = {
 
 static bot_cmd cs_commands[]=
 {
-	{"SET",			do_set,			0, 	NS_ULEVEL_ADMIN,	cs_help_set, 	1, 	cs_help_set_oneline },
-	{"ABOUT",		do_about,		0, 	NS_ULEVEL_ADMIN,	cs_help_about, 	1, 	cs_help_about_oneline },
+	{"SET",			cs_set,			0, 	NS_ULEVEL_ADMIN,	cs_help_set, 	1, 	cs_help_set_oneline },
+	{"ABOUT",		cs_about,		0, 	NS_ULEVEL_ADMIN,	cs_help_about, 	1, 	cs_help_about_oneline },
 	{"VERSION",		cs_version,		0, 	NS_ULEVEL_ADMIN,	cs_help_version,1, 	cs_help_version_oneline },
 	{NULL,			NULL,			0, 	0,			NULL, 			0,	NULL}
 };
 
-static void do_about(User * u, char **av, int ac)
+static int cs_about(User * u, char **av, int ac)
 {
 	privmsg_list(u->nick, s_ConnectServ, cs_help_about);
+	return 1;
 }
 
-static void do_set(User * u, char **av, int ac)
+static int cs_set(User * u, char **av, int ac)
 {
 	if (ac < 3) {
 		prefmsg(u->nick, s_ConnectServ,
 			"Invalid Syntax. /msg %s help set for more info",
 			s_ConnectServ);
-		return;
+		return 0;
 #if 0
 /* work in progress */
 	} else if (!strcasecmp(av[2], "NICK")) {
@@ -220,8 +223,9 @@ static void do_set(User * u, char **av, int ac)
 		prefmsg(u->nick, s_ConnectServ,
 			"Unknown Set option %s. try /msg %s help set",
 			av[2], s_ConnectServ);
-		return;
+		return 0;
 	}
+	return 1;
 }
 
 static int Online(char **av, int ac)
@@ -267,7 +271,7 @@ void __ModFini()
 /* 
  * VERSION
  */
-static void cs_version(User * u, char **av, int ac)
+static int cs_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_ConnectServ,
@@ -280,6 +284,7 @@ static void cs_version(User * u, char **av, int ac)
 	prefmsg(u->nick, s_ConnectServ, "http://www.neostats.net");
 	prefmsg(u->nick, s_ConnectServ,
 		"-------------------------------------");
+	return 1;
 }
 
 /* 

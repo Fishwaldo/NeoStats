@@ -29,22 +29,26 @@
 #include "log.h"
 #include "ms_help.c"
 
-char *s_MoraleServ;
-static void ms_hail(User * u, char *cmd, char *m);
-static void ms_ode(User * u, char *cmd, char *m);
-static void ms_lapdance(User * u, char *cmd);
-static void ms_version(User * u);
-static void ms_poem(User * u, char *cmd, char *m);
-static void ms_redneck(User * u, char *cmd);
-static void ms_cheerup(User * u, char *cmd);
-static void ms_behappy(User * u, char *cmd);
-static void ms_wonderful(User * u, char *cmd);
+char s_MoraleServ[MAXNICK];
+
+ModUser *ms_bot;
+
+static int ms_hail(User * u, char **av, int ac);
+static int ms_ode(User * u, char **av, int ac);
+static int ms_lapdance(User * u, char **av, int ac);
+static int ms_version(User * u, char **av, int ac);
+static int ms_about(User * u, char **av, int ac);
+static int ms_poem(User * u, char **av, int ac);
+static int ms_redneck(User * u, char **av, int ac);
+static int ms_cheerup(User * u, char **av, int ac);
+static int ms_behappy(User * u, char **av, int ac);
+static int ms_wonderful(User * u, char **av, int ac);
 static int new_m_version(char *origin, char **av, int ac);
 
 ModuleInfo __module_info = {
    "MoraleServ",
    "A Network Morale Service",
-   "2.21",
+   "2.22",
 	__DATE__,
 	__TIME__
 };
@@ -68,182 +72,26 @@ Functions __module_functions[] = {
 	{NULL, NULL, 0}
 };
 
-
-int __BotMessage(char *origin, char **av, int ac)
+static bot_cmd ms_commands[]=
 {
-	User *u;
-	u = finduser(origin);
-	if (!u) /* User not found */
-		return 1;
-
-	if (!strcasecmp(av[1], "HELP")) {
-		if (ac <= 2) {
-			privmsg_list(u->nick, s_MoraleServ, ms_help);
-			privmsg_list(u->nick, s_MoraleServ, ms_help_on_help);
-			return 1;
-		} else if (!strcasecmp(av[2], "HAIL")) {
-			privmsg_list(u->nick, s_MoraleServ, ms_help_hail);
-			return 1;
-		} else if (!strcasecmp(av[2], "ODE")) {
-			privmsg_list(u->nick, s_MoraleServ, ms_help_ode);
-			return 1;
-		} else if (!strcasecmp(av[2], "LAPDANCE")) {
-			privmsg_list(u->nick, s_MoraleServ,
-				     ms_help_lapdance);
-			return 1;
-		} else if (!strcasecmp(av[2], "VERSION")) {
-			privmsg_list(u->nick, s_MoraleServ,
-				     ms_help_version);
-			return 1;
-		} else if (!strcasecmp(av[2], "ABOUT")) {
-			privmsg_list(u->nick, s_MoraleServ,
-				     ms_help_about);
-			return 1;
-		} else if (!strcasecmp(av[2], "POEM")) {
-			privmsg_list(u->nick, s_MoraleServ, ms_help_poem);
-			return 1;
-		} else if (!strcasecmp(av[2], "REDNECK")) {
-			privmsg_list(u->nick, s_MoraleServ,
-				     ms_help_redneck);
-			return 1;
-		} else if (!strcasecmp(av[2], "CHEERUP")) {
-			privmsg_list(u->nick, s_MoraleServ,
-				     ms_help_cheerup);
-			return 1;
-		} else if (!strcasecmp(av[2], "BEHAPPY")) {
-			privmsg_list(u->nick, s_MoraleServ,
-				     ms_help_behappy);
-			return 1;
-		} else if (!strcasecmp(av[2], "WONDERFUL")) {
-			privmsg_list(u->nick, s_MoraleServ,
-				     ms_help_wonderful);
-			return 1;
-		} else
-			prefmsg(u->nick, s_MoraleServ,
-				"Unknown Help Topic: \2%s\2", av[2]);
-	}
-
-	if (!strcasecmp(av[1], "HAIL")) {
-		if (ac < 4) {
-			prefmsg(u->nick, s_MoraleServ,
-				"Syntax: /msg %s HAIL <WHO TO HAIL> <NICK TO SEND HAIL TO>",
-				s_MoraleServ);
-			prefmsg(u->nick, s_MoraleServ,
-				"For additional help: /msg %s HELP",
-				s_MoraleServ);
-			return -1;
-		}
-		ms_hail(u, av[2], av[3]);
-	} else if (!strcasecmp(av[1], "ODE")) {
-		if (ac < 4) {
-			prefmsg(u->nick, s_MoraleServ,
-				"Syntax: /msg %s ODE <WHO THE ODE ODE IS ABOUT> <NICK TO SEND ODE TO>",
-				s_MoraleServ);
-			prefmsg(u->nick, s_MoraleServ,
-				"For additional help: /msg %s HELP",
-				s_MoraleServ);
-			return -1;
-		}
-		ms_ode(u, av[2], av[3]);
-	} else if (!strcasecmp(av[1], "LAPDANCE")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_MoraleServ,
-				"Syntax: /msg %s LAPDANCE <NICK>",
-				s_MoraleServ);
-			prefmsg(u->nick, s_MoraleServ,
-				"For additional help: /msg %s HELP",
-				s_MoraleServ);
-			return -1;
-		}
-		ms_lapdance(u, av[2]);
-	} else if (!strcasecmp(av[1], "VERSION")) {
-		chanalert(s_Services,
-			  "%s Wanted to know the current version information for %s",
-			  u->nick, s_MoraleServ);
-		ms_version(u);
-	} else if (!strcasecmp(av[1], "ABOUT")) {
-		privmsg_list(u->nick, s_MoraleServ,
-			     ms_help_about);
-		return 1;
-	} else if (!strcasecmp(av[1], "POEM")) {
-		if (ac < 4) {
-			prefmsg(u->nick, s_MoraleServ,
-				"Syntax: /msg %s POEM <WHO THE POEM IS ABOUT> <NICK TO SEND TO>",
-				s_MoraleServ);
-			prefmsg(u->nick, s_MoraleServ,
-				"For additional help: /msg %s HELP",
-				s_MoraleServ);
-			return -1;
-		}
-		ms_poem(u, av[2], av[3]);
-	} else if (!strcasecmp(av[1], "REDNECK")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_MoraleServ,
-				"Syntax: /msg %s REDNECK <NICK>",
-				s_MoraleServ);
-			prefmsg(u->nick, s_MoraleServ,
-				"For additional help: /msg %s HELP",
-				s_MoraleServ);
-			return -1;
-		}
-		ms_redneck(u, av[2]);
-	} else if (!strcasecmp(av[1], "CHEERUP")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_MoraleServ,
-				"Syntax: /msg %s CHEERUP <NICK>",
-				s_MoraleServ);
-			prefmsg(u->nick, s_MoraleServ,
-				"For additional help: /msg %s HELP",
-				s_MoraleServ);
-			return -1;
-		}
-		ms_cheerup(u, av[2]);
-	} else if (!strcasecmp(av[1], "BEHAPPY")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_MoraleServ,
-				"Syntax: /msg %s BEHAPPY <NICK>",
-				s_MoraleServ);
-			prefmsg(u->nick, s_MoraleServ,
-				"For additional help: /msg %s HELP",
-				s_MoraleServ);
-			return -1;
-		}
-		ms_behappy(u, av[2]);
-	} else if (!strcasecmp(av[1], "WONDERFUL")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_MoraleServ,
-				"Syntax: /msg %s WONDERFUL <NICK>",
-				s_MoraleServ);
-			prefmsg(u->nick, s_MoraleServ,
-				"For additional help: /msg %s HELP",
-				s_MoraleServ);
-			return -1;
-		}
-		ms_wonderful(u, av[2]);
-	} else {
-		chanalert(s_Services,
-			  "%s requested the unknown command of: %s",
-			  u->nick, av[1]);
-		prefmsg(u->nick, s_MoraleServ,
-			"Unknown Command: \2%s\2, perhaps you need some HELP?",
-			av[1]);
-	}
-	return 1;
-
-
-}
+	{"HAIL",		ms_hail,		0, 	0,	ms_help_hail,		1,	ms_help_hail_oneline },
+	{"ODE",			ms_ode,			0, 	0,	ms_help_ode,		1,	ms_help_ode_oneline },
+	{"LAPDANCE",	ms_lapdance,	0, 	0,	ms_help_lapdance,	1,	ms_help_lapdance_oneline },
+	{"VERSION",		ms_version,		0, 	0,	ms_help_version,	1,	ms_help_version_oneline },
+	{"ABOUT",		ms_about,		0, 	0,	ms_help_about,		1,	ms_help_about_oneline },
+	{"POEM",		ms_poem,		0, 	0,	ms_help_poem,		1,	ms_help_poem_oneline },
+	{"REDNECK",		ms_redneck,		0, 	0,	ms_help_redneck,	1,	ms_help_redneck_oneline },
+	{"CHEERUP",		ms_cheerup,		0, 	0,	ms_help_cheerup,	1,	ms_help_cheerup_oneline },
+	{"BEHAPPY",		ms_behappy,		0, 	0,	ms_help_behappy,	1,	ms_help_behappy_oneline },
+	{"WONDERFUL",	ms_wonderful,	0, 	0,	ms_help_wonderful,	1,	ms_help_wonderful_oneline },
+	{NULL,			NULL,			0, 	0,			NULL, 		0,	NULL}
+};
 
 int Online(char **av, int ac)
 {
-	if (init_bot
-	    (s_MoraleServ, "MS", me.name, "A Network Morale Service",
-	     services_bot_modes, __module_info.module_name) == -1) {
-		/* Nick was in use */
-		s_MoraleServ = strcat(s_MoraleServ, "_");
-		init_bot(s_MoraleServ, "MS", me.name,
-			 "A Network Morale Service", services_bot_modes,
-			 __module_info.module_name);
-	}
+	ms_bot = init_mod_bot(s_MoraleServ, "MS", me.name, "A Network Morale Service",
+		services_bot_modes,BOT_FLAG_RESTRICT_OPERS,__module_info.module_name);
+	add_bot_cmd_list(ms_bot, ms_commands);
 	return 1;
 };
 
@@ -257,7 +105,7 @@ EventFnList __module_events[] = {
 
 int __ModInit(int modnum, int apiver)
 {
-	s_MoraleServ = "MoraleServ";
+	strlcpy(s_MoraleServ, "MoraleServ", MAXNICK);
 	return 1;
 }
 
@@ -268,27 +116,41 @@ void __ModFini()
 
 
 /* Routine for HAIL */
-static void ms_hail(User * u, char *cmd, char *m)
+static int ms_hail(User * u, char **av, int ac)
 {
+	char *cmd;
+	char *m;
+
 	SET_SEGV_LOCATION();
+	if (ac < 4) {
+		prefmsg(u->nick, s_MoraleServ,
+			"Syntax: /msg %s HAIL <WHO TO HAIL> <NICK TO SEND HAIL TO>",
+			s_MoraleServ);
+		prefmsg(u->nick, s_MoraleServ,
+			"For additional help: /msg %s HELP",
+			s_MoraleServ);
+		return 1;
+	}
+	cmd = av[2];
+	m = av[3];
 	if (!strcasecmp(m, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_Services,
+		chanalert(s_MoraleServ,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
-		return;
+		return 1;
 	}
 	if (!finduser(m)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 	/* The user has passed the minimum requirements for input */
 
-	prefmsg(u->nick, s_MoraleServ,
+	prefmsg(u->nick, s_MoraleServ, 
 		"Your \"HAIL\" song greeting has been sent to %s!", m);
-	chanalert(s_Services,
+	chanalert(s_MoraleServ,
 		  "%s Wanted %s to be hailed by sending the song to %s",
 		  u->nick, cmd, m);
 	prefmsg(m, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
@@ -297,26 +159,39 @@ static void ms_hail(User * u, char *cmd, char *m)
 		cmd, cmd, cmd);
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent a HAIL to the %s song to %s",
 	     u->nick, cmd, m);
+	return 1;
 
 }
 
 
 /* Routine for LAPDANCE */
-static void ms_lapdance(User * u, char *cmd)
+static int ms_lapdance(User * u, char **av, int ac)
 {
+	char *cmd;
+	
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_MoraleServ,
+			"Syntax: /msg %s LAPDANCE <NICK>",
+			s_MoraleServ);
+		prefmsg(u->nick, s_MoraleServ,
+			"For additional help: /msg %s HELP",
+			s_MoraleServ);
+		return 1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_Services,
+		chanalert(s_MoraleServ,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 	/* The user has passed the minimum requirements for input */
 
@@ -329,44 +204,59 @@ static void ms_lapdance(User * u, char *cmd)
 	prefmsg(cmd, s_MoraleServ,
 		"*I Think we both need a cold shower now*... *wink*",
 		s_MoraleServ, cmd);
-	chanalert(s_Services, "%s Wanted a LAPDANCE to be preformed on %s",
+	chanalert(s_MoraleServ, "%s Wanted a LAPDANCE to be preformed on %s",
 		  u->nick, cmd);
 	nlog(LOG_NORMAL, LOG_MOD,
 	     "%s Wanted a LAPDANCE to be preformed on %s", u->nick, cmd);
 
+	return 1;
 }
 
 
 /* Routine for ODE */
-static void ms_ode(User * u, char *cmd, char *m)
+static int ms_ode(User * u, char **av, int ac)
 {
+	char *cmd;
+	char *m;
 	SET_SEGV_LOCATION();
+
+	if (ac < 4) {
+		prefmsg(u->nick, s_MoraleServ,
+			"Syntax: /msg %s ODE <WHO THE ODE ODE IS ABOUT> <NICK TO SEND ODE TO>",
+			s_MoraleServ);
+		prefmsg(u->nick, s_MoraleServ,
+			"For additional help: /msg %s HELP",
+			s_MoraleServ);
+		return 1;
+	}
+	cmd = av[2];
+	m = av[3];
 	if (!m) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Syntax: /msg %s ODE <WHO THE ODE ODE IS ABOUT> <NICK TO SEND ODE TO>",
 			s_MoraleServ);
 		prefmsg(u->nick, s_MoraleServ,
 			"For additional help: /msg %s HELP", s_MoraleServ);
-		return;
+		return 1;
 	}
 	if (!strcasecmp(m, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_Services,
+		chanalert(s_MoraleServ,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
-		return;
+		return 1;
 	}
 	if (!finduser(m)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 	/* The user has passed the minimum requirements for input */
 
 	prefmsg(u->nick, s_MoraleServ,
 		"Your ODE to %s has been sent to %s!", cmd, m);
-	chanalert(s_Services, "%s Wanted an ODE to %s to be recited to %s",
+	chanalert(s_MoraleServ, "%s Wanted an ODE to %s to be recited to %s",
 		  u->nick, cmd, m);
 	prefmsg(m, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
 	prefmsg(m, s_MoraleServ, "*recites*", u->nick);
@@ -377,15 +267,19 @@ static void ms_ode(User * u, char *cmd, char *m)
 	prefmsg(m, s_MoraleServ, "*bows*", u->nick);
 	nlog(LOG_NORMAL, LOG_MOD,
 	     "%s sent an ODE to %s to be recited to %s", u->nick, cmd, m);
+	return 1;
 
 }
 
 
 
 /* Routine for VERSION */
-static void ms_version(User * u)
+static int ms_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
+	chanalert(s_MoraleServ,
+		"%s Wanted to know the current version information for %s",
+		u->nick, s_MoraleServ);
 	prefmsg(u->nick, s_MoraleServ, "\2%s Version Information\2",
 		s_MoraleServ);
 	prefmsg(u->nick, s_MoraleServ, "%s Version: %s - running on: %s",
@@ -394,39 +288,61 @@ static void ms_version(User * u)
 		"%s Author: ^Enigma^ <enigma@neostats.net>", s_MoraleServ);
 	prefmsg(u->nick, s_MoraleServ,
 		"Neostats Statistical Software: http://www.neostats.net");
+	return 1;
+}
+
+/* Routine for ABOUT */
+static int ms_about(User * u, char **av, int ac)
+{
+	SET_SEGV_LOCATION();
+	privmsg_list(u->nick, s_MoraleServ, ms_help_about);
+	return 1;
 }
 
 
 /* Routine for POEM */
-static void ms_poem(User * u, char *cmd, char *m)
+static int ms_poem(User * u, char **av, int ac)
 {
+	char *cmd;
+	char *m;
 	SET_SEGV_LOCATION();
+	if (ac < 4) {
+		prefmsg(u->nick, s_MoraleServ,
+			"Syntax: /msg %s POEM <WHO THE POEM IS ABOUT> <NICK TO SEND TO>",
+			s_MoraleServ);
+		prefmsg(u->nick, s_MoraleServ,
+			"For additional help: /msg %s HELP",
+			s_MoraleServ);
+		return 1;
+	}
+	cmd = av[2];
+	m = av[3];
 	if (!m) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Syntax: /msg %s POEM <WHO THE POEM IS ABOUT> <NICK TO SEND TO>",
 			s_MoraleServ);
 		prefmsg(u->nick, s_MoraleServ,
 			"For additional help: /msg %s HELP", s_MoraleServ);
-		return;
+		return 1;
 	}
 	if (!strcasecmp(m, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_Services,
+		chanalert(s_MoraleServ,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
-		return;
+		return 1;
 	}
 	if (!finduser(m)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 	/* The user has passed the minimum requirements for input */
 
 	prefmsg(u->nick, s_MoraleServ,
 		"Your POEM about %s has been sent to %s!", cmd, m);
-	chanalert(s_Services,
+	chanalert(s_MoraleServ,
 		  "%s Wanted a POEM about %s to be recited to %s", u->nick,
 		  cmd, m);
 	prefmsg(m, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
@@ -439,31 +355,43 @@ static void ms_poem(User * u, char *cmd, char *m)
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent a POEM about %s to %s", u->nick,
 	     cmd, m);
 
+	return 1;
 }
 
 
 /* Routine for REDNECK */
-static void ms_redneck(User * u, char *cmd)
+static int ms_redneck(User * u, char **av, int ac)
 {
+	char *cmd;
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_MoraleServ,
+			"Syntax: /msg %s REDNECK <NICK>",
+			s_MoraleServ);
+		prefmsg(u->nick, s_MoraleServ,
+			"For additional help: /msg %s HELP",
+			s_MoraleServ);
+		return 1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_Services,
+		chanalert(s_MoraleServ,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 	/* The user has passed the minimum requirements for input */
 
 	prefmsg(u->nick, s_MoraleServ,
 		"Your redneck message has been sent to %s!", cmd);
-	chanalert(s_Services,
+	chanalert(s_MoraleServ,
 		  "%s Wanted a REDNECK \"dubbing\" to be preformed on %s",
 		  u->nick, cmd);
 	prefmsg(cmd, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
@@ -475,25 +403,37 @@ static void ms_redneck(User * u, char *cmd)
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent a REDNECK \"dubbing\" to %s",
 	     u->nick, cmd);
 
+	return 1;
 }
 
 
 
-static void ms_cheerup(User * u, char *cmd)
+static int ms_cheerup(User * u, char **av, int ac)
 {
+	char *cmd;
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_MoraleServ,
+			"Syntax: /msg %s CHEERUP <NICK>",
+			s_MoraleServ);
+		prefmsg(u->nick, s_MoraleServ,
+			"For additional help: /msg %s HELP",
+			s_MoraleServ);
+		return 1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_Services,
+		chanalert(s_MoraleServ,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 	/* The user has passed the minimum requirements for input */
 
@@ -501,28 +441,40 @@ static void ms_cheerup(User * u, char *cmd)
 	prefmsg(cmd, s_MoraleServ,
 		"All of us on the network love you! 3--<--<--<{4@",
 		u->nick);
-	chanalert(s_Services, "%s Wanted %s to CHEERUP", u->nick, cmd);
+	chanalert(s_MoraleServ, "%s Wanted %s to CHEERUP", u->nick, cmd);
 	nlog(LOG_NORMAL, LOG_MOD, "%s Wanted %s to CHEERUP", u->nick, cmd);
+	return 1;
 
 }
 
 
 /* Routine for BEHAPPY */
-static void ms_behappy(User * u, char *cmd)
+static int ms_behappy(User * u, char **av, int ac)
 {
+	char *cmd;
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_MoraleServ,
+			"Syntax: /msg %s BEHAPPY <NICK>",
+			s_MoraleServ);
+		prefmsg(u->nick, s_MoraleServ,
+			"For additional help: /msg %s HELP",
+			s_MoraleServ);
+		return 1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_Services,
+		chanalert(s_MoraleServ,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 	/* The user has passed the minimum requirements for input */
 
@@ -579,28 +531,40 @@ static void ms_behappy(User * u, char *cmd)
 		"Don't Worry - Be Happy, I'm not worried, I'm happy . . . .",
 		u->nick);
 
-	chanalert(s_Services, "%s Wanted %s to BEHAPPY", u->nick, cmd);
+	chanalert(s_MoraleServ, "%s Wanted %s to BEHAPPY", u->nick, cmd);
 	nlog(LOG_NORMAL, LOG_MOD, "%s Wanted %s to BEHAPPY", u->nick, cmd);
+	return 1;
 
 }
 
 
 /* Routine for WONDERFUL */
-static void ms_wonderful(User * u, char *cmd)
+static int ms_wonderful(User * u, char **av, int ac)
 {
+	char *cmd;
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_MoraleServ,
+			"Syntax: /msg %s WONDERFUL <NICK>",
+			s_MoraleServ);
+		prefmsg(u->nick, s_MoraleServ,
+			"For additional help: /msg %s HELP",
+			s_MoraleServ);
+		return 1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_Services,
+		chanalert(s_MoraleServ,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 	/* The user has passed the minimum requirements for input */
 
@@ -625,9 +589,9 @@ static void ms_wonderful(User * u, char *cmd)
 	prefmsg(cmd, s_MoraleServ,
 		"How wonderful life is while %s is in the world", cmd);
 
-	chanalert(s_Services, "%s Wanted to express how WONDERFUL %s is",
+	chanalert(s_MoraleServ, "%s Wanted to express how WONDERFUL %s is",
 		  u->nick, cmd);
 	nlog(LOG_NORMAL, LOG_MOD,
 	     "%s Wanted to express how WONDERFUL %s is", u->nick, cmd);
-
+	return 1;
 }

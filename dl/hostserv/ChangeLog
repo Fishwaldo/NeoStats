@@ -3,6 +3,9 @@ Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
 ==============================================================================
 
+* Version 3.2 * Mark (M) * November 27, 2003
+ - Use core bot message handler to process commands (M)
+
 * Version 3.1 * Fish (F) & Mark (M) * Oct 17th, 2003
  - Fixed incorrect buffer size for password field (M)
  - Improved buffer size calculations in hs_addban and hs_config and replaced strlen calls (M)

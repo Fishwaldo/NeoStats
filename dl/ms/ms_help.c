@@ -23,33 +23,16 @@
 ** $Id$
 */
 
-const char *ms_help[] = {
-	"\2MoraleServ\2 is a fun module to send cheery",
-	"messages to friends on IRC.",
-	"",
-	"The following commands can be used with MoraleServ",
-	"",
-	"    ABOUT      About MoraleServ",
-	"    VERSION    Display version info",
-	"    HAIL       Hail someone on IRC",
-	"    ODE        Send an ODE to someone on IRC",
-	"    POEM       Send a poem to someone on IRC",
-	"    LAPDANCE   Give someone on IRC a lapdance",
-	"    REDNECK    Send a Redneck message.",
-	"    CHEERUP    Send an cheer up message to someone on IRC",
-	"    BEHAPPY    Send an be happy song to someone on IRC",
-	"    WONDERFUL  Send an song to someone on IRC",
-	NULL
-};
-
-const char *ms_help_on_help[] = {
-	"",
-	"To use a command, type",
-	"    \2/msg MoraleServ command\2",
-	"For for more information on a command, type", 
-	"    \2/msg MoraleServ HELP command\2.",
-	NULL
-};
+const char ms_help_about_oneline[]="About MoraleServ";
+const char ms_help_version_oneline[]="Display version info";
+const char ms_help_hail_oneline[]="Hail someone on IRC";
+const char ms_help_ode_oneline[]="Send an ODE to someone on IRC";
+const char ms_help_poem_oneline[]="Send a poem to someone on IRC";
+const char ms_help_lapdance_oneline[]="Give someone on IRC a lapdance";
+const char ms_help_redneck_oneline[]="Send a Redneck message.";
+const char ms_help_cheerup_oneline[]="Send an cheer up message to someone on IRC";
+const char ms_help_behappy_oneline[]="Send an be happy song to someone on IRC";
+const char ms_help_wonderful_oneline[]="Send an song to someone on IRC";
 
 const char *ms_help_about[] = {
 	"\2MoraleServ\2 is a fun module to send cheery",

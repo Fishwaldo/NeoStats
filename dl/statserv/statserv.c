@@ -30,23 +30,23 @@
 #include "log.h"
 #include "conf.h"
 
-static void ss_chans(User * u, char **av, int ac);
-static void ss_daily(User * u, char **av, int ac);
-static void ss_stats(User * u, char **av, int ac);
-static void ss_tld(User * u, char **av, int ac);
-static void ss_tld_map(User * u, char **av, int ac);
-static void ss_operlist(User * u, char **av, int ac);
+static int ss_chans(User * u, char **av, int ac);
+static int ss_daily(User * u, char **av, int ac);
+static int ss_stats(User * u, char **av, int ac);
+static int ss_tld(User * u, char **av, int ac);
+static int ss_tld_map(User * u, char **av, int ac);
+static int ss_operlist(User * u, char **av, int ac);
 #ifdef HAVE_BOT_MODE
-static void ss_botlist(User * u, char **av, int ac);
+static int ss_botlist(User * u, char **av, int ac);
 #endif
-static void ss_version(User * u, char **av, int ac);
-static void ss_about(User * u, char **av, int ac);
-static void ss_server(User * u, char **av, int ac);
-static void ss_map(User *u, char **av, int ac);
-static void ss_netstats(User *u, char **av, int ac);
-static void ss_set(User *u, char **av, int ac);
-static void ss_clientversions(User * u, char **av, int ac);
-static void ss_forcehtml(User * u, char **av, int ac);
+static int ss_version(User * u, char **av, int ac);
+static int ss_about(User * u, char **av, int ac);
+static int ss_server(User * u, char **av, int ac);
+static int ss_map(User *u, char **av, int ac);
+static int ss_netstats(User *u, char **av, int ac);
+static int ss_set(User *u, char **av, int ac);
+static int ss_clientversions(User * u, char **av, int ac);
+static int ss_forcehtml(User * u, char **av, int ac);
 
 void ss_html(void);
 
@@ -268,7 +268,7 @@ bot_cmd ss_commands[]=
 	{NULL,				NULL,			0, 	0,					NULL, 				0,		NULL}
 };
 
-static void ss_set(User * u, char **av, int ac)
+static int ss_set(User * u, char **av, int ac)
 {
 	if (!strcasecmp(av[2], "LIST")) {
 		prefmsg(u->nick, s_StatServ, "Current Settings are:");
@@ -282,7 +282,7 @@ static void ss_set(User * u, char **av, int ac)
 			StatServ.interval);
 		prefmsg(u->nick, s_StatServ,
 			"Lag Warnings: %d (0 = Disabled)", StatServ.lag);
-		return;
+		return 0;
 	} else if (!strcasecmp(av[2], "HTML")) {
 		if (StatServ.html == 0) {
 			/* its disabled, enable it */
@@ -308,14 +308,14 @@ static void ss_set(User * u, char **av, int ac)
 			prefmsg(u->nick, s_StatServ, "HTML output is now disabled");
 			SetConf((void *) 0, CFGINT, "HTML_Enabled");
 		}
-		return;
+		return 0;
 	} else if (!strcasecmp(av[2], "MSGTHROTTLE")) {
 		if (ac != 4) {
 			/* wrong number of arguments */
 			prefmsg(u->nick, s_StatServ,
 				"Invalid Syntax. /msg %s help set for more info",
 				s_StatServ);
-			return;
+			return 0;
 		}
 		if (!strcasecmp(av[3], "off")) {
 			prefmsg(u->nick, s_StatServ, "Record Yelling is Now Disabled. ");
@@ -339,14 +339,14 @@ static void ss_set(User * u, char **av, int ac)
 			}
 		}
 		SetConf((void *) StatServ.interval, CFGINT, "Wallop_Throttle");
-		return;
+		return 0;
 	} else if (!strcasecmp(av[2], "HTMLPATH")) {
 		if (ac != 4) {
 			/* wrong number of params */
 			prefmsg(u->nick, s_StatServ,
 				"Invalid Syntax. /msg %s help set for more info",
 				s_StatServ);
-			return;
+			return 0;
 		}
 		strlcpy(StatServ.htmlpath, av[3], 255);
 		prefmsg(u->nick, s_StatServ, "HTML path now set to %s",
@@ -354,14 +354,14 @@ static void ss_set(User * u, char **av, int ac)
 		chanalert(s_StatServ, "%s changed the HTML path to %s",
 			  u->nick, StatServ.htmlpath);
 		SetConf((void *) StatServ.htmlpath, CFGSTR, "HTML_Path");
-		return;
+		return 0;
 	} else if (!strcasecmp(av[2], "LAGWALLOP")) {
 		if (ac != 4) {
 			/* wrong number of params */
 			prefmsg(u->nick, s_StatServ,
 				"Invalid Syntax. /msg %s help set for more info",
 				s_StatServ);
-			return;
+			return 0;
 		}
 		StatServ.lag = atoi(av[3]);
 		if (StatServ.lag <= 0) {
@@ -378,13 +378,14 @@ static void ss_set(User * u, char **av, int ac)
 				  u->nick, StatServ.lag);
 		}
 		SetConf((void *) StatServ.lag, CFGINT, "Lag");
-		return;
+		return 0;
 	} else {
 		prefmsg(u->nick, s_StatServ,
 			"Invalid Syntax. /msg %s help set for more info",
 			s_StatServ);
-		return;
+		return 0;
 	}
+	return 1;
 }
 
 
@@ -420,7 +421,7 @@ int topversions(const void *key1, const void *key2)
 	return (ver2->count - ver1->count);
 }
 
-static void ss_clientversions(User * u, char **av, int ac)
+static int ss_clientversions(User * u, char **av, int ac)
 {
 	CVersions *cv;
 	lnode_t *cn;
@@ -434,7 +435,7 @@ static void ss_clientversions(User * u, char **av, int ac)
 	}
 	if (list_count(Vhead) == 0) {
 		prefmsg(u->nick, s_StatServ, "No Stats Available.");
-		return;
+		return 0;
 	}
 	if (!list_is_sorted(Vhead, topversions)) {
 		list_sort(Vhead, topversions);
@@ -454,9 +455,10 @@ static void ss_clientversions(User * u, char **av, int ac)
 		}
 	}
 	prefmsg(u->nick, s_StatServ, "End of List.");
+	return 1;
 }
 
-static void ss_chans(User * u, char **av, int ac)
+static int ss_chans(User * u, char **av, int ac)
 {
 	CStats *cs;
 	lnode_t *cn;
@@ -611,7 +613,7 @@ static void ss_chans(User * u, char **av, int ac)
 			prefmsg(u->nick, s_StatServ,
 				"Error, Can't find any information about Channel %s",
 				chan);
-			return;
+			return 0;
 		}
 		prefmsg(u->nick, s_StatServ,
 			"\2Channel Information for %s (%s)\2", chan,
@@ -642,9 +644,10 @@ static void ss_chans(User * u, char **av, int ac)
 				"Channel was last seen at %s",
 				sftime(cs->lastseen));
 	}
+	return 1;
 }
 
-static void ss_tld_map(User * u, char **av, int ac)
+static int ss_tld_map(User * u, char **av, int ac)
 {
 	TLD *t;
 
@@ -661,9 +664,10 @@ static void ss_tld_map(User * u, char **av, int ac)
 				t->country, t->daily_users);
 	}
 	prefmsg(u->nick, s_StatServ, "End of List");
+	return 1;
 }
 
-static void ss_version(User * u, char **av, int ac)
+static int ss_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	chanalert(s_StatServ, "%s Wanted to know our version number ", u->nick);
@@ -679,14 +683,16 @@ static void ss_version(User * u, char **av, int ac)
 		"-------------------------------------");
 	prefmsg(u->nick, s_StatServ, "HTML Stats is: %s",
 		(StatServ.html ? StatServ.htmlpath : "Disabled"));
+	return 1;
 }
 
-static void ss_about(User * u, char **av, int ac)
+static int ss_about(User * u, char **av, int ac)
 {
 	privmsg_list(u->nick, s_StatServ, ss_help_about);
+	return 1;
 }
 
-static void ss_netstats(User * u, char **av, int ac)
+static int ss_netstats(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	chanalert(s_StatServ, "%s Wanted to see the NetStats ", u->nick);
@@ -713,8 +719,9 @@ static void ss_netstats(User * u, char **av, int ac)
 		stats_network.maxservers,
 		sftime(stats_network.t_maxservers));
 	prefmsg(u->nick, s_StatServ, "--- End of List ---");
+	return 1;
 }
-static void ss_daily(User * u, char **av, int ac)
+static int ss_daily(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	chanalert(s_StatServ, "%s Wanted to see the Daily NetStats ", u->nick);
@@ -732,6 +739,7 @@ static void ss_daily(User * u, char **av, int ac)
 	prefmsg(u->nick, s_StatServ,
 		"All Daily Statistics are reset at Midnight");
 	prefmsg(u->nick, s_StatServ, "End of Information.");
+	return 1;
 }
 
 static void makemap(char *uplink, User * u, int level)
@@ -768,10 +776,9 @@ static void makemap(char *uplink, User * u, int level)
 			makemap(s->name, u, level + 1);
 		}
 	}
-	return;
 }
 
-static void ss_map(User * u, char **av, int ac)
+static int ss_map(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	chanalert(s_StatServ, "%s Wanted to see the Current Network MAP", u->nick);
@@ -780,9 +787,10 @@ static void ss_map(User * u, char **av, int ac)
 		"\2[LAG/MAX]\2");
 	makemap("", u, 0);
 	prefmsg(u->nick, s_StatServ, "--- End of Listing ---");
+	return 1;
 }
 
-static void ss_server(User * u, char **av, int ac)
+static int ss_server(User * u, char **av, int ac)
 {
 	SStats *ss;
 	Server *s;
@@ -808,7 +816,7 @@ static void ss_server(User * u, char **av, int ac)
 		}
 		prefmsg(u->nick, s_StatServ,
 			"***** End of List (* indicates Server is online at the moment) *****");
-		return;
+		return 0;
 	}
 
 	/* ok, found the Server, lets do some Statistics work now ! */
@@ -820,7 +828,7 @@ static void ss_server(User * u, char **av, int ac)
 		     server);
 		prefmsg(u->nick, s_StatServ,
 			"Internal Error! Please Consult the Log file");
-		return;
+		return 0;
 	}
 	prefmsg(u->nick, s_StatServ, "Statistics for \2%s\2 since %s",
 		ss->name, sftime(ss->starttime));
@@ -859,9 +867,10 @@ static void ss_server(User * u, char **av, int ac)
 		prefmsg(u->nick, s_StatServ,
 			"%s has never split from the Network.", ss->name);
 	prefmsg(u->nick, s_StatServ, "***** End of Statistics *****");
+	return 1;
 }
 
-static void ss_tld(User * u, char **av, int ac)
+static int ss_tld(User * u, char **av, int ac)
 {
 	TLD *tmp;
 	char *tld;
@@ -874,7 +883,7 @@ static void ss_tld(User * u, char **av, int ac)
 			s_StatServ);
 		prefmsg(u->nick, s_StatServ,
 			"For additional help, /msg %s HELP", s_StatServ);
-		return;
+		return 0;
 	}
 
 	if (*tld == '*')
@@ -889,9 +898,10 @@ static void ss_tld(User * u, char **av, int ac)
 			"Top Level Domain \2%s\2 does not exist.", tld);
 	else
 		prefmsg(u->nick, s_StatServ, tmp->country);
+	return 1;
 }
 
-static void ss_operlist(User * u, char **av, int ac)
+static int ss_operlist(User * u, char **av, int ac)
 {
 	register int j = 0;
 	int away = 0;
@@ -906,7 +916,7 @@ static void ss_operlist(User * u, char **av, int ac)
 	if (ac < 2) {
 		prefmsg(u->nick, s_StatServ, "OperList Syntax Not Valid");
 		prefmsg(u->nick, s_StatServ, "For Help: /msg %s HELP OPERLIST", s_StatServ);
-		return;
+		return 0;
 	}
 	flags = av[2];
 	server = av[3];
@@ -961,11 +971,12 @@ static void ss_operlist(User * u, char **av, int ac)
 		}
 	}
 	prefmsg(u->nick, s_StatServ, "End of Listing.");
+	return 1;
 }
 
 
 #ifdef HAVE_BOT_MODE
-static void ss_botlist(User * u, char **av, int ac)
+static int ss_botlist(User * u, char **av, int ac)
 {
 	register int j = 0;
 	register User *testuser;
@@ -986,10 +997,11 @@ static void ss_botlist(User * u, char **av, int ac)
 		}
 	}
 	prefmsg(u->nick, s_StatServ, "End of Listing.");
+	return 1;
 }
 #endif
 
-static void ss_stats(User * u, char **av, int ac)
+static int ss_stats(User * u, char **av, int ac)
 {
 	SStats *st;
 	hnode_t *node;
@@ -1005,7 +1017,7 @@ static void ss_stats(User * u, char **av, int ac)
 	if (!cmd) {
 		prefmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS [DEL|LIST|COPY]", s_StatServ);
 		prefmsg(u->nick, s_StatServ, "For additional help, /msg %s HELP", s_StatServ);
-		return;
+		return 0;
 	}
 	if (!strcasecmp(cmd, "LIST")) {
 		int i = 1;
@@ -1022,12 +1034,12 @@ static void ss_stats(User * u, char **av, int ac)
 		if (!arg) {
 			prefmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS DEL <name>", s_StatServ);
 			prefmsg(u->nick, s_StatServ, "For additonal help, /msg %s HELP", s_StatServ);
-			return;
+			return 0;
 		}
 		st = findstats(arg);
 		if (!st) {
 			prefmsg(u->nick, s_StatServ, "%s is not in the database!", arg);
-			return;
+			return 0;
 		}
 		if (!findserver(arg)) {
 			node = hash_lookup(Shead, arg);
@@ -1038,7 +1050,7 @@ static void ss_stats(User * u, char **av, int ac)
 				free(st);
 				prefmsg(u->nick, s_StatServ, "Removed %s from the database.", arg);
 				nlog(LOG_NOTICE, LOG_MOD, "%s requested STATS DEL %s", u->nick, arg);
-				return;
+				return 0;
 			}
 		} else {
 			prefmsg(u->nick, s_StatServ, 
@@ -1047,7 +1059,7 @@ static void ss_stats(User * u, char **av, int ac)
 			nlog(LOG_WARNING, LOG_MOD,
 			     "%s requested STATS DEL %s, but that server is online!!",
 			     u->nick, arg);
-			return;
+				return 0;
 		}
 
 	} else if (!strcasecmp(cmd, "COPY")) {
@@ -1057,7 +1069,7 @@ static void ss_stats(User * u, char **av, int ac)
 			prefmsg(u->nick, s_StatServ,
 				"Syntax: /msg %s STATS COPY <name> "
 				" <newname>", s_StatServ);
-			return;
+			return 0;
 		}
 		st = findstats(arg2);
 		if (st)
@@ -1067,13 +1079,13 @@ static void ss_stats(User * u, char **av, int ac)
 		if (!st) {
 			prefmsg(u->nick, s_StatServ,
 				"No entry in the database for %s", arg);
-			return;
+			return 0;
 		}
 		s = findserver(arg);
 		if (s) {
 			prefmsg(u->nick, s_StatServ,
 				"Server %s is online!", arg);
-			return;
+			return 0;
 		}
 		s = NULL;
 		memcpy(st->name, arg2, sizeof(st->name));
@@ -1087,9 +1099,10 @@ static void ss_stats(User * u, char **av, int ac)
 		prefmsg(u->nick, s_StatServ, "For help, /msg %s HELP",
 			s_StatServ);
 	}
+	return 1;
 }
 
-static void ss_forcehtml(User * u, char **av, int ac)
+static int ss_forcehtml(User * u, char **av, int ac)
 {
 	nlog(LOG_NOTICE, LOG_MOD,
 		    "%s!%s@%s Forced an update of the NeoStats Statistics HTML file with the most current statistics",
@@ -1098,5 +1111,6 @@ static void ss_forcehtml(User * u, char **av, int ac)
 			"%s Forced the NeoStats Statistics HTML file to be updated with the most current statistics",
 			u->nick);
 	ss_html();
+	return 1;
 }
 

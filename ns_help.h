@@ -24,50 +24,50 @@
 #ifndef _NS_HELP_H_
 #define _NS_HELP_H_
 
-/* ns_help.c */
-extern const char *ns_shutdown_help[];
-extern const char *ns_reload_help[];
-extern const char *ns_logs_help[];
+/* ns.c */
+extern const char *ns_help_shutdown[];
+extern const char *ns_help_reload[];
+extern const char *ns_help_logs[];
 #ifdef USE_RAW
-extern const char *ns_raw_help[];
+extern const char *ns_help_raw[];
 #endif
-extern const char *ns_debug_help[];
-extern const char *ns_userdump_help[];
-extern const char *ns_chandump_help[];
-extern const char *ns_serverdump_help[];
-extern const char *ns_version_help[];
-extern const char *ns_load_help[];
-extern const char *ns_unload_help[];
-extern const char *ns_modlist_help[];
-extern const char *ns_jupe_help[];
-extern const char *ns_level_help[];
-extern const char *ns_botlist_help[];
-extern const char *ns_socklist_help[];
-extern const char *ns_timerlist_help[];
-extern const char *ns_botchanlist_help[];
-extern const char *ns_info_help[];
+extern const char *ns_help_debug[];
+extern const char *ns_help_userdump[];
+extern const char *ns_help_chandump[];
+extern const char *ns_help_serverdump[];
+extern const char *ns_help_version[];
+extern const char *ns_help_load[];
+extern const char *ns_help_unload[];
+extern const char *ns_help_modlist[];
+extern const char *ns_help_jupe[];
+extern const char *ns_help_level[];
+extern const char *ns_help_botlist[];
+extern const char *ns_help_socklist[];
+extern const char *ns_help_timerlist[];
+extern const char *ns_help_botchanlist[];
+extern const char *ns_help_info[];
 
-extern const char ns_help_help_oneline[];
-extern const char ns_level_help_oneline[];
-extern const char ns_info_help_oneline[];
-extern const char ns_version_help_oneline[];
-extern const char ns_shutdown_help_oneline[];
-extern const char ns_reload_help_oneline[];
-extern const char ns_logs_help_oneline[];
-extern const char ns_load_help_oneline[];
-extern const char ns_unload_help_oneline[];
-extern const char ns_jupe_help_oneline[];
+extern const char ns_help_oneline[];
+extern const char ns_help_level_oneline[];
+extern const char ns_help_info_oneline[];
+extern const char ns_help_version_oneline[];
+extern const char ns_help_shutdown_oneline[];
+extern const char ns_help_reload_oneline[];
+extern const char ns_help_logs_oneline[];
+extern const char ns_help_load_oneline[];
+extern const char ns_help_unload_oneline[];
+extern const char ns_help_jupe_oneline[];
 #ifdef USE_RAW
-extern const char ns_raw_help_oneline[];
+extern const char ns_help_raw_oneline[];
 #endif
-extern const char ns_debug_help_oneline[];
-extern const char ns_botlist_help_oneline[];
-extern const char ns_socklist_help_oneline[];
-extern const char ns_timerlist_help_oneline[];
-extern const char ns_botchanlist_help_oneline[];
-extern const char ns_modlist_help_oneline[];
-extern const char ns_userdump_help_oneline[];
-extern const char ns_chandump_help_oneline[];
-extern const char ns_serverdump_help_oneline[];
+extern const char ns_help_debug_oneline[];
+extern const char ns_help_botlist_oneline[];
+extern const char ns_help_socklist_oneline[];
+extern const char ns_help_timerlist_oneline[];
+extern const char ns_help_botchanlist_oneline[];
+extern const char ns_help_modlist_oneline[];
+extern const char ns_help_userdump_oneline[];
+extern const char ns_help_chandump_oneline[];
+extern const char ns_help_serverdump_oneline[];
 
 #endif /* _NS_HELP_H_ */

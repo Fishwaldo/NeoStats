@@ -23,32 +23,18 @@
 ** $Id$
 */
 
-const char *ls_help[] = {
-	"The following commands can be used with LoveServ",
-	"",
-	"    ABOUT       About LoveServ",
-	"    ROSE        Give someone a rose",
-	"    KISS        Give someone a kiss",
-	"    TONSIL      Give someone a tonsil kiss",
-	"    HUG         Give someone a hug",
-	"    ADMIRER     Tell someone they have a secret admirer",
-	"    CHOCOLATE   Give someone chocolate",
-	"    CANDY       Give someone candy",
-	"    LOVENOTE    Give someone a lovenote",
-	"    APOLOGY     Give someone an apology",
-	"    THANKYOU    Give someone a thank you",
-	"    VERSION     Display version info",
-	NULL
-};
-
-const char *ls_help_on_help[] = {
-	"",
-	"To use a command, type",
-	"    \2/msg LoveServ command\2",
-	"For for more information on a command, type", 
-	"    \2/msg LoveServ HELP command\2.",
-	NULL
-};
+const char ls_help_about_oneline[]="About LoveServ";
+const char ls_help_rose_oneline[]="Give someone a rose";
+const char ls_help_kiss_oneline[]="Give someone a kiss";
+const char ls_help_tonsil_oneline[]="Give someone a tonsil kiss";
+const char ls_help_hug_oneline[]="Give someone a hug";
+const char ls_help_admirer_oneline[]="Tell someone they have a secret admirer";
+const char ls_help_chocolate_oneline[]="Give someone chocolate";
+const char ls_help_candy_oneline[]="Give someone candy";
+const char ls_help_lovenote_oneline[]="Give someone a lovenote";
+const char ls_help_apology_oneline[]="Give someone an apology";
+const char ls_help_thankyou_oneline[]="Give someone a thank you";
+const char ls_help_version_oneline[]="Display version info";
 
 const char *ls_help_about[] = {
 	"\2LoveServ\2 is a fun module to send presents and ",

@@ -30,25 +30,29 @@
 #include "ls_help.c"
 #include "log.h"
 
-char *s_LoveServ;
+char s_LoveServ[MAXNICK];
 
-static void ls_rose(User * u, char *cmd);
-static void ls_kiss(User * u, char *cmd);
-static void ls_tonsil(User * u, char *cmd);
-static void ls_hug(User * u, char *cmd);
-static void ls_admirer(User * u, char *cmd);
-static void ls_choco(User * u, char *cmd);
-static void ls_candy(User * u, char *cmd);
-static void ls_lovenote(User * u, char *cmd, char *m);
-static void ls_apology(User * u, char *cmd, char *m);
-static void ls_thankyou(User * u, char *cmd, char *m);
-static void ls_version(User * u);
+ModUser *ls_bot;
+
+static int ls_rose(User * u, char **av, int ac);
+static int ls_kiss(User * u, char **av, int ac);
+static int ls_tonsil(User * u, char **av, int ac);
+static int ls_hug(User * u, char **av, int ac);
+static int ls_admirer(User * u, char **av, int ac);
+static int ls_choco(User * u, char **av, int ac);
+static int ls_candy(User * u, char **av, int ac);
+static int ls_lovenote(User * u, char **av, int ac);
+static int ls_apology(User * u, char **av, int ac);
+static int ls_thankyou(User * u, char **av, int ac);
+static int ls_version(User * u, char **av, int ac);
+static int ls_about(User * u, char **av, int ac);
+
 static int new_m_version(char *origin, char **av, int ac);
 
 ModuleInfo __module_info = {
    "LoveServ",
    "A Network Love Service",
-   "1.7",
+   "1.9",
 	__DATE__,
 	__TIME__
 };
@@ -72,213 +76,39 @@ Functions __module_functions[] = {
 	{NULL, NULL, 0}
 };
 
-
-int __BotMessage(char *origin, char **av, int ac)
+static bot_cmd ls_commands[]=
 {
-	User *u;
-	char *cmd;
-	u = finduser(origin);
-	if (!u) /* User not found */
-		return 1;
-
-	if (!strcasecmp(av[1], "HELP")) {
-		if (ac <= 2) {
-			privmsg_list(u->nick, s_LoveServ, ls_help);
-			privmsg_list(u->nick, s_LoveServ, ls_help_on_help);
-			return 1;
-		} else if (!strcasecmp(av[2], "ABOUT")) {
-			privmsg_list(u->nick, s_LoveServ, ls_help_about);
-			return 1;
-		} else if (!strcasecmp(av[2], "ROSE")) {
-			privmsg_list(u->nick, s_LoveServ, ls_help_rose);
-			return 1;
-		} else if (!strcasecmp(av[2], "KISS")) {
-			privmsg_list(u->nick, s_LoveServ, ls_help_kiss);
-			return 1;
-		} else if (!strcasecmp(av[2], "TONSIL")) {
-			privmsg_list(u->nick, s_LoveServ, ls_help_tonsil);
-			return 1;
-		} else if (!strcasecmp(av[2], "HUG")) {
-			privmsg_list(u->nick, s_LoveServ, ls_help_hug);
-			return 1;
-		} else if (!strcasecmp(av[2], "ADMIRER")) {
-			privmsg_list(u->nick, s_LoveServ, ls_help_admirer);
-			return 1;
-		} else if (!strcasecmp(av[2], "CHOCOLATE")) {
-			privmsg_list(u->nick, s_LoveServ,
-				     ls_help_chocolate);
-			return 1;
-		} else if (!strcasecmp(av[2], "CANDY")) {
-			privmsg_list(u->nick, s_LoveServ, ls_help_candy);
-			return 1;
-		} else if (!strcasecmp(av[2], "LOVENOTE")) {
-			privmsg_list(u->nick, s_LoveServ,
-				     ls_help_lovenote);
-			return 1;
-		} else if (!strcasecmp(av[2], "APOLOGY")) {
-			privmsg_list(u->nick, s_LoveServ, ls_help_apology);
-			return 1;
-		} else if (!strcasecmp(av[2], "THANKYOU")) {
-			privmsg_list(u->nick, s_LoveServ,
-				     ls_help_thankyou);
-			return 1;
-		} else if (!strcasecmp(av[2], "VERSION")) {
-			privmsg_list(u->nick, s_LoveServ, ls_help_version);
-			return 1;
-		} else
-			prefmsg(u->nick, s_LoveServ,
-				"Unknown Help Topic: \2%s\2", av[2]);
-	}
-
-	if (!strcasecmp(av[1], "ABOUT")) {
-		privmsg_list(u->nick, s_LoveServ, ls_help_about);
-		return 1;
-	} else if (!strcasecmp(av[1], "ROSE")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_LoveServ,
-				"Syntax: /msg %s ROSE NICK", s_LoveServ);
-			prefmsg(u->nick, s_LoveServ,
-				"For additional help: /msg %s HELP",
-				s_LoveServ);
-			return -1;
-		}
-		ls_rose(u, av[2]);
-	} else if (!strcasecmp(av[1], "KISS")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_LoveServ,
-				"Syntax: /msg %s KISS NICK", s_LoveServ);
-			prefmsg(u->nick, s_LoveServ,
-				"For additional help: /msg %s HELP",
-				s_LoveServ);
-			return -1;
-		}
-		ls_kiss(u, av[2]);
-	} else if (!strcasecmp(av[1], "TONSIL")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_LoveServ,
-				"Syntax: /msg %s TONSIL NICK", s_LoveServ);
-			prefmsg(u->nick, s_LoveServ,
-				"For additional help: /msg %s HELP",
-				s_LoveServ);
-			return -1;
-		}
-		ls_tonsil(u, av[2]);
-	} else if (!strcasecmp(av[1], "HUG")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_LoveServ,
-				"Syntax: /msg %s HUG NICK", s_LoveServ);
-			prefmsg(u->nick, s_LoveServ,
-				"For additional help: /msg %s HELP",
-				s_LoveServ);
-			return -1;
-		}
-		ls_hug(u, av[2]);
-	} else if (!strcasecmp(av[1], "ADMIRER")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_LoveServ,
-				"Syntax: /msg %s ADMIRER NICK",
-				s_LoveServ);
-			prefmsg(u->nick, s_LoveServ,
-				"For additional help: /msg %s HELP",
-				s_LoveServ);
-			return -1;
-		}
-		ls_admirer(u, av[2]);
-	} else if (!strcasecmp(av[1], "CHOCOLATE")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_LoveServ,
-				"Syntax: /msg %s CHOCOLATE NICK",
-				s_LoveServ);
-			prefmsg(u->nick, s_LoveServ,
-				"For additional help: /msg %s HELP",
-				s_LoveServ);
-			return -1;
-		}
-		ls_choco(u, av[2]);
-	} else if (!strcasecmp(av[1], "CANDY")) {
-		if (ac < 3) {
-			prefmsg(u->nick, s_LoveServ,
-				"Syntax: /msg %s CANDY NICK", s_LoveServ);
-			prefmsg(u->nick, s_LoveServ,
-				"For additional help: /msg %s HELP",
-				s_LoveServ);
-			return -1;
-		}
-		ls_candy(u, av[2]);
-	} else if (!strcasecmp(av[1], "LOVENOTE")) {
-		if (ac < 4) {
-			prefmsg(u->nick, s_LoveServ,
-				"Syntax: /msg %s LOVENOTE NICK NOTE",
-				s_LoveServ);
-			prefmsg(u->nick, s_LoveServ,
-				"For additional help: /msg %s HELP",
-				s_LoveServ);
-			return -1;
-		}
-		cmd = joinbuf(av, ac, 3);
-		ls_lovenote(u, av[2], cmd);
-		free(cmd);
-	} else if (!strcasecmp(av[1], "APOLOGY")) {
-		if (ac < 4) {
-			prefmsg(u->nick, s_LoveServ,
-				"Syntax: /msg %s APOLOGY NICK APOLOGY-REASON",
-				s_LoveServ);
-			prefmsg(u->nick, s_LoveServ,
-				"For additional help: /msg %s HELP",
-				s_LoveServ);
-			return -1;
-		}
-		cmd = joinbuf(av, ac, 3);
-		ls_apology(u, av[2], cmd);
-		free(cmd);
-	} else if (!strcasecmp(av[1], "THANKYOU")) {
-		if (ac < 4) {
-			prefmsg(u->nick, s_LoveServ,
-				"Syntax: /msg %s THANKYOU NICK THANKYOU-REASON",
-				s_LoveServ);
-			prefmsg(u->nick, s_LoveServ,
-				"For additional help: /msg %s HELP",
-				s_LoveServ);
-			return -1;
-		}
-		cmd = joinbuf(av, ac, 3);
-		ls_thankyou(u, av[2], cmd);
-		free(cmd);
-	} else if (!strcasecmp(av[1], "VERSION")) {
-		ls_version(u);
-	} else {
-		prefmsg(u->nick, s_LoveServ,
-			"Unknown Command: \2%s\2, maybe you love me?",
-			av[1]);
-	}
-	return 1;
-}
-
+	{"ABOUT",		ls_about,		0, 	0,	ls_help_about,		1,	ls_help_about_oneline },
+	{"ROSE",		ls_rose,		0, 	0,	ls_help_rose,		1,	ls_help_rose_oneline },
+	{"KISS",		ls_kiss,		0, 	0,	ls_help_kiss,		1,	ls_help_kiss_oneline },
+	{"TONSIL",		ls_tonsil,		0, 	0,	ls_help_tonsil,		1,	ls_help_tonsil_oneline },
+	{"HUG",			ls_hug,			0, 	0,	ls_help_hug,		1,	ls_help_hug_oneline },
+	{"ADMIRER",		ls_admirer,		0, 	0,	ls_help_admirer,	1,	ls_help_admirer_oneline },
+	{"CHOCOLATE",	ls_choco,		0, 	0,	ls_help_chocolate,	1,	ls_help_chocolate_oneline },
+	{"CANDY",		ls_candy,		0, 	0,	ls_help_candy,		1,	ls_help_candy_oneline },
+	{"LOVENOTE",	ls_lovenote,	0, 	0,	ls_help_lovenote,	1,	ls_help_lovenote_oneline },
+	{"APOLOGY",		ls_apology,		0, 	0,	ls_help_apology,	1,	ls_help_apology_oneline },
+	{"THANKYOU",	ls_thankyou,	0, 	0,	ls_help_thankyou,	1,	ls_help_thankyou_oneline },
+	{"VERSION",		ls_version,		0, 	0,	ls_help_version,	1,	ls_help_version_oneline },
+	{NULL,			NULL,			0, 	0,	NULL, 				0,	NULL}
+};
 
 int Online(char **av, int ac)
 {
-	if (init_bot
-	    (s_LoveServ, "love", me.name, "Network Love Service", services_bot_modes,
-	     __module_info.module_name) == -1) {
-		/* Nick was in use!!!! */
-		s_LoveServ = strcat(s_LoveServ, "_");
-		init_bot(s_LoveServ, "love", me.name,
-			 "Network Love Service", services_bot_modes,
-			 __module_info.module_name);
-	}
+	ls_bot = init_mod_bot(s_LoveServ, "love", me.name, "Network Love Service",
+		services_bot_modes,BOT_FLAG_RESTRICT_OPERS,__module_info.module_name);
+	add_bot_cmd_list(ls_bot, ls_commands);
 	return 1;
 };
 
-
 EventFnList __module_events[] = {
-	{EVENT_ONLINE, Online}
-	,
+	{EVENT_ONLINE, Online},
 	{NULL, NULL}
 };
 
 int __ModInit(int modnum, int apiver)
 {
-	s_LoveServ = "LoveServ";
+	strlcpy (s_LoveServ, "LoveServ", MAXNICK);
 	return 1;
 }
 
@@ -286,19 +116,28 @@ void __ModFini()
 {
 };
 
-
-static void ls_rose(User * u, char *cmd)
+static int ls_rose(User * u, char **av, int ac)
 {
+	char *cmd;
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_LoveServ,
+			"Syntax: /msg %s ROSE NICK", s_LoveServ);
+		prefmsg(u->nick, s_LoveServ,
+			"For additional help: /msg %s HELP",
+			s_LoveServ);
+		return -1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_LoveServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 
 	prefmsg(u->nick, s_LoveServ, "Your rose has been sent to %s!",
@@ -307,41 +146,63 @@ static void ls_rose(User * u, char *cmd)
 		"%s has sent you this beautiful rose! 3--<--<--<{4@",
 		u->nick);
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent a ROSE to %s", u->nick, cmd);
+	return 1;
 }
 
 
-static void ls_kiss(User * u, char *cmd)
+static int ls_kiss(User * u, char **av, int ac)
 {
+	char *cmd;
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_LoveServ,
+			"Syntax: /msg %s KISS NICK", s_LoveServ);
+		prefmsg(u->nick, s_LoveServ,
+			"For additional help: /msg %s HELP",
+			s_LoveServ);
+		return -1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_LoveServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 
 	prefmsg(u->nick, s_LoveServ, "You have virtually kissed %s!", cmd);
 	prefmsg(cmd, s_LoveServ, "%s has virtually kissed you!", u->nick);
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent a KISS to %s", u->nick, cmd);
+	return 1;
 }
 
 
-static void ls_tonsil(User * u, char *cmd)
+static int ls_tonsil(User * u, char **av, int ac)
 {
+	char *cmd;
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_LoveServ,
+			"Syntax: /msg %s TONSIL NICK", s_LoveServ);
+		prefmsg(u->nick, s_LoveServ,
+			"For additional help: /msg %s HELP",
+			s_LoveServ);
+		return -1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_LoveServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 
 	prefmsg(u->nick, s_LoveServ,
@@ -351,63 +212,98 @@ static void ls_tonsil(User * u, char *cmd)
 		u->nick);
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent a TONSIL KISS to %s", u->nick,
 	     cmd);
+	return 1;
 }
 
 
-static void ls_hug(User * u, char *cmd)
+static int ls_hug(User * u, char **av, int ac)
 {
+	char *cmd;
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_LoveServ,
+			"Syntax: /msg %s HUG NICK", s_LoveServ);
+		prefmsg(u->nick, s_LoveServ,
+			"For additional help: /msg %s HELP",
+			s_LoveServ);
+		return -1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_LoveServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 
 	prefmsg(u->nick, s_LoveServ, "%s has received your hug! :)", cmd);
 	prefmsg(cmd, s_LoveServ, "%s has sent you a *BIG WARM HUG*!",
 		u->nick);
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent a HUG to %s", u->nick, cmd);
+	return 1;
 }
 
 
-static void ls_admirer(User * u, char *cmd)
+static int ls_admirer(User * u, char **av, int ac)
 {
+	char *cmd;
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_LoveServ,
+			"Syntax: /msg %s ADMIRER NICK",
+			s_LoveServ);
+		prefmsg(u->nick, s_LoveServ,
+			"For additional help: /msg %s HELP",
+			s_LoveServ);
+		return -1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_LoveServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 
 	prefmsg(u->nick, s_LoveServ, "Anonymous admire sent to %s :)",
 		cmd);
 	prefmsg(cmd, s_LoveServ, "You have a secret admirer! ;)");
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent an ADMIRER to %s", u->nick, cmd);
+	return 1;
 }
 
 
-static void ls_choco(User * u, char *cmd)
+static int ls_choco(User * u, char **av, int ac)
 {
+	char *cmd;
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_LoveServ,
+			"Syntax: /msg %s CHOCOLATE NICK",
+			s_LoveServ);
+		prefmsg(u->nick, s_LoveServ,
+			"For additional help: /msg %s HELP",
+			s_LoveServ);
+		return -1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_LoveServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 
 	prefmsg(u->nick, s_LoveServ,
@@ -417,21 +313,32 @@ static void ls_choco(User * u, char *cmd)
 		u->nick);
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent a Box of Chocolates to %s",
 	     u->nick, cmd);
+	return 1;
 }
 
 
-static void ls_candy(User * u, char *cmd)
+static int ls_candy(User * u, char **av, int ac)
 {
+	char *cmd;
 	SET_SEGV_LOCATION();
+	if (ac < 3) {
+		prefmsg(u->nick, s_LoveServ,
+			"Syntax: /msg %s CANDY NICK", s_LoveServ);
+		prefmsg(u->nick, s_LoveServ,
+			"For additional help: /msg %s HELP",
+			s_LoveServ);
+		return -1;
+	}
+	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		return;
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_LoveServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		return 1;
 	}
 
 	prefmsg(u->nick, s_LoveServ,
@@ -442,21 +349,37 @@ static void ls_candy(User * u, char *cmd)
 		u->nick);
 	nlog(LOG_NORMAL, LOG_MOD,
 	     "%s sent a BAG OF HEART SHAPED CANDIES to %s", u->nick, cmd);
+	return 1;
 }
 
 
-static void ls_lovenote(User * u, char *cmd, char *m)
+static int ls_lovenote(User * u, char **av, int ac)
 {
+	char *cmd;
+	char *m;
 	SET_SEGV_LOCATION();
+	if (ac < 4) {
+		prefmsg(u->nick, s_LoveServ,
+			"Syntax: /msg %s LOVENOTE NICK NOTE",
+			s_LoveServ);
+		prefmsg(u->nick, s_LoveServ,
+			"For additional help: /msg %s HELP",
+			s_LoveServ);
+		return -1;
+	}
+	m = av[2];
+	cmd = joinbuf(av, ac, 3);
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		return;
+		free(cmd);
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_LoveServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		free(cmd);
+		return 1;
 	}
 
 	prefmsg(u->nick, s_LoveServ,
@@ -466,21 +389,38 @@ static void ls_lovenote(User * u, char *cmd, char *m)
 		m);
 	nlog(LOG_NORMAL, LOG_MOD,
 	     "%s sent a LOVE NOTE to %s which reads %s", u->nick, cmd, m);
+	free(cmd);
+	return 1;
 }
 
 
-static void ls_apology(User * u, char *cmd, char *m)
+static int ls_apology(User * u, char **av, int ac)
 {
+	char *cmd;
+	char *m;
 	SET_SEGV_LOCATION();
+	if (ac < 4) {
+		prefmsg(u->nick, s_LoveServ,
+			"Syntax: /msg %s APOLOGY NICK APOLOGY-REASON",
+			s_LoveServ);
+		prefmsg(u->nick, s_LoveServ,
+			"For additional help: /msg %s HELP",
+			s_LoveServ);
+		return -1;
+	}
+	m = av[2];
+	cmd = joinbuf(av, ac, 3);
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		return;
+		free(cmd);
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_LoveServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		free(cmd);
+		return 1;
 	}
 
 	prefmsg(u->nick, s_LoveServ, "Your apology has been sent to %s",
@@ -490,21 +430,38 @@ static void ls_apology(User * u, char *cmd, char *m)
 		u->nick, m);
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent an APOLOGY to %s for %s",
 	     u->nick, cmd, m);
+	free(cmd);
+	return 1;
 }
 
 
-static void ls_thankyou(User * u, char *cmd, char *m)
+static int ls_thankyou(User * u, char **av, int ac)
 {
+	char *cmd;
+	char *m;
 	SET_SEGV_LOCATION();
+	if (ac < 4) {
+		prefmsg(u->nick, s_LoveServ,
+			"Syntax: /msg %s THANKYOU NICK THANKYOU-REASON",
+			s_LoveServ);
+		prefmsg(u->nick, s_LoveServ,
+			"For additional help: /msg %s HELP",
+			s_LoveServ);
+		return -1;
+	}
+	m = av[2];
+	cmd = joinbuf(av, ac, 3);
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surely we have better things to do with our time than make a service message itself?");
-		return;
+		free(cmd);
+		return 1;
 	}
 	if (!finduser(cmd)) {
 		prefmsg(u->nick, s_LoveServ,
 			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return;
+		free(cmd);
+		return 1;
 	}
 
 	prefmsg(u->nick, s_LoveServ, "Your Thank You has been sent to %s",
@@ -513,10 +470,12 @@ static void ls_thankyou(User * u, char *cmd, char *m)
 		u->nick, m);
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent a THANKYOU to %s for %s",
 	     u->nick, cmd, m);
+	free(cmd);
+	return 1;
 }
 
 
-static void ls_version(User * u)
+static int ls_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_LoveServ, "\2%s Version Information\2",
@@ -527,5 +486,13 @@ static void ls_version(User * u)
 		"%s Author: Shmad <shmad@neostats.net>", s_LoveServ);
 	prefmsg(u->nick, s_LoveServ,
 		"Neostats Statistical Software: http://www.neostats.net");
+	return 1;
 
+}
+
+static int ls_about(User * u, char **av, int ac)
+{
+	SET_SEGV_LOCATION();
+	privmsg_list(u->nick, s_LoveServ, ls_help_about);
+	return 1;
 }
