@@ -41,7 +41,7 @@ DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) \
 		pcre/*.in pcre/README pcre/COPYING curl/*.in curl/*.h \
 		curl/*.c curl/*.m4 curl/configure curl/config.sub curl/COPYING \
 		curl/depcomp curl/*.y curl/README curl/RELEASE-NOTES sqlsrv/*.c \
-                sqlsrv/*.h sqlsrv/*.y sqlsrv/*.l sqlsrv/README sqlsrv/Makefile
+                sqlsrv/*.h sqlsrv/*.y sqlsrv/*.l sqlsrv/README sqlsrv/Makefile.in
  
 distdir = @PACKAGE@-@VERSION@
 SUBDIRS = doc doc/old data adns logs keeper tools tools/cfgtool \

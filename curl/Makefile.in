@@ -17,7 +17,7 @@ all:	 ${OBJECTS}
 .c.o:	
 	 $(CC) -c $(CFLAGS) $<
 
-getdate.c:
+redoparser:
 	 @YACC@  getdate.y
 	 mv -f y.tab.c getdate.c
 
