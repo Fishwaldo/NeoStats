@@ -88,7 +88,7 @@ clean:
 
 
 neostats: $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) adns/libadns.a keeper/libkeeper.a $(PCRE_OBJS) $(CURL_LDFLAGS) curl/libcurl.a -o $@
+	$(CC) $(LDFLAGS) $(OBJS) adns/libadns.a keeper/libkeeper.a $(PCRE_OBJS) curl/libcurl.a $(CURL_LDFLAGS) -o $@
 
 install: neostats modules
 	@rm -rf @prefix@/dl/cs.so
