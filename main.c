@@ -45,6 +45,7 @@
 #include "dotconf.h"
 #include "transfer.h"
 #include "exclude.h"
+#include "bans.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif

@@ -23,6 +23,7 @@
 
 #include "stats.h"
 #include "log.h"
+#include "dl.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif

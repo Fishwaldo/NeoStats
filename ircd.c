@@ -34,6 +34,7 @@
 #include "chans.h"
 #include "services.h"
 #include "server.h"
+#include "bans.h"
 
 ircd_server ircd_srv;
 
