@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.135 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: ircd.c,v 1.136 2003/08/14 13:14:35 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -279,17 +279,12 @@ parse (char *line)
 		/* its a privmsg, now lets see who too... */
 		if (strstr (av[0], "!")) {
 			strncpy (cmd, av[0], 64);
-			nick = strtok (cmd, "!");
+			av[0] = strtok (cmd, "!");
 		} else if (strstr (av[0], "@")) {
 			strncpy (cmd, av[0], 64);
-			nick = strtok (cmd, "@");
-		} else {
-			nick = malloc (64);
-			strncpy (nick, av[0], 64);
-			I = 1;
+			av[0] = strtok (cmd, "@");
 		}
-
-		if (!strcasecmp (s_Services, nick)) {
+		if (!strcasecmp (s_Services, av[0])) {
 			if (flood (finduser (origin))) {
 				free (av);
 				return;
@@ -298,13 +293,10 @@ parse (char *line)
 			strcpy (segv_location, "servicesbot");
 			servicesbot (origin, av, ac);
 			strcpy (segv_location, "ServicesBot_return");
-			if (I == 1)
-				free (nick);
-
 			free (av);
 			return;
 		} else {
-			list = findbot (nick);
+			list = findbot (av[0]);
 			/* Check to see if any of the Modules have this nick Registered */
 			if (list) {
 				nlog (LOG_DEBUG1, LOG_CORE, "nicks: %s", list->nick);
@@ -329,13 +321,9 @@ parse (char *line)
 				strcpy (segvinmodule, "");
 				strcpy (segv_location, "Return from Module Message");
 				free (av);
-				if (I == 1)
-					free (nick);
 				return;
 			} else {
 				bot_chan_message (origin, av[0], av, ac);
-				if (I == 1)
-					free (nick);
 				free (av);
 				return;
 			}
