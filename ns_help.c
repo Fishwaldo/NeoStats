@@ -64,9 +64,9 @@ const char *ns_myuser_help[] = {
 const char *ns_help_on_help[] = {
 	"",
 	"To use a command, type",
-	"    \2/msg ConnectServ command\2",
+	"    \2/msg NeoStats command\2",
 	"For for more information on a command, type", 
-	"    \2/msg ConnectServ HELP command\2.",
+	"    \2/msg NeoStats HELP command\2.",
 	NULL
 };
 
