@@ -28,7 +28,6 @@ typedef struct neoroot {
 	char nick[MAXNICK];
 	char user[MAXUSER];
 	char host[MAXHOST];
-	int level;
 } neoroot;
 
 /* general configuration items */
@@ -47,18 +46,18 @@ typedef struct config {
 	unsigned int die:1;
 	unsigned int error:1;
 	unsigned int onlyopers:1;
-	int setservertimes;
-	int splittime;
-	int msgsampletime;
-	int msgthreshold;
+	unsigned int setservertimes;
+	unsigned int splittime;
+	unsigned int msgsampletime;
+	unsigned int msgthreshold;
 	unsigned int versionscan;
-	int r_time;
+	unsigned int r_time;
 	char pass[MAXPASS];
 	unsigned int debug;
-	int debugtochan;
+	unsigned int debugtochan;
 	char debugchan[MAXCHANLEN];
-	int pingtime;
-	int joinserviceschan;
+	unsigned int pingtime;
+	unsigned int joinserviceschan;
 	neoroot rootuser;
 	char debugmodule[MAX_MOD_NAME];
 	unsigned int singlebotmode;

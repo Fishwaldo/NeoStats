@@ -477,7 +477,7 @@ int InitSocks (void)
 	memset (&me.lsa, 0, sizeof (me.lsa));
 	if (me.local[0] != 0) {
 		if ((hp = gethostbyname (me.local)) == NULL) {
-			nlog (LOG_WARNING, "Warning, Couldn't bind to IP address %s", me.local);
+			nlog (LOG_WARNING, "Couldn't bind to IP address %s", me.local);
 		} else {
 			memcpy ((char *) &me.lsa.sin_addr, hp->h_addr, hp->h_length);
 			me.lsa.sin_family = hp->h_addrtype;
@@ -745,17 +745,8 @@ read_sock_activity(int fd, short what, void *data) {
 	size_t howmuch = READBUFSIZE;
 
 	if (what & EV_READ) { 	
-#ifdef WIN32
-		if( ioctlsocket (sock->sock_no, FIONREAD, &howmuch) == SOCKET_ERROR )
+		if( os_sock_ioctl( sock->sock_no, FIONREAD, &howmuch ) == -1 )
 			howmuch = READBUFSIZE;
-#else
-#ifdef FIONREAD
-		if (ioctl(sock->sock_no, FIONREAD, &howmuch) == -1)
-			howmuch = READBUFSIZE;
-#else 
-#warning FIONREAD not available
-#endif	
-#endif	
 #if SOCKDEBUG
 		printf("read called with %d bytes %d\n", howmuch, what);
 #endif

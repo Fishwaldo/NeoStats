@@ -544,7 +544,6 @@ cb_Server( char *arg, int configtype )
 			strlcpy(nsconfig.rootuser.nick, nick, MAXNICK );
 			strlcpy(nsconfig.rootuser.user, user, MAXUSER );
 			strlcpy(nsconfig.rootuser.host, host, MAXHOST );
-			nsconfig.rootuser.level = NS_ULEVEL_ROOT;
 		}
 	} else if( configtype == 18 ) {
 		strlcpy(me.protocol,arg,MAXHOST );

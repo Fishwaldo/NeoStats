@@ -1467,6 +1467,7 @@ OS_SOCKET os_sock_socket(int socket_family, int socket_type, int protocol );
 int os_sock_bind(OS_SOCKET s, const struct sockaddr* name, int namelen );
 int os_sock_listen( OS_SOCKET s, int backlog );
 int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char* optval, int optlen );
+int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp );
 
 /* Memory functions */
 EXPORTFUNC void *os_memset( void *dest, int c, size_t count );
