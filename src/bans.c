@@ -125,7 +125,7 @@ BanDump (void)
 	hscan_t ss;
 	hnode_t *bansnode;
 
-	irc_chanalert (ns_botptr, "Server Listing:");
+	irc_chanalert (ns_botptr, "Ban Listing:");
 	hash_scan_begin (&ss, banshash);
 	while ((bansnode = hash_scan_next (&ss)) != NULL) {
 		ban = hnode_get (bansnode);

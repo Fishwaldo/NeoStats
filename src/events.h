@@ -43,7 +43,7 @@ typedef enum Event {
  *    Called when a new user signs onto the network. the user 
  *    nickname is passed as a parameter, so you can see who signed on.
  *    parameters:
- *      user in cmdparams->source.user
+ *      user in cmdparams->source
  */
 	EVENT_SIGNON,
 
@@ -51,7 +51,7 @@ typedef enum Event {
  *    Called when a user quits the network. The user 
  *    nickname is passed as a parameter, so you can see who signed off.
  *    parameters:
- *      user in cmdparams->source.user
+ *      user in cmdparams->source
  *      reason in cmdparams->message
  */
 	EVENT_QUIT,

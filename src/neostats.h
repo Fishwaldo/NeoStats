@@ -200,17 +200,24 @@ EXPORTVAR extern unsigned int ircd_supported_smodes;
 
 /* Umode macros */
 /* ifdef checks for macros until umodes updated */
-#define is_oper(x) ((x) && ((x->Umode & (UMODE_OPER|UMODE_LOCOP))))
+#define is_oper(x) ((x) && ((x->user->Umode & (UMODE_OPER|UMODE_LOCOP))))
 #ifdef UMODE_BOT
-#define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
+#define is_bot(x) ((x) && (x->user->Umode & UMODE_BOT))
 #else
 /* Hack for Ultimate 2 while umodes are updated */
 #ifdef UMODE_RBOT
-#define is_bot(x) ((x) && ((x->Umode & (UMODE_RBOT|UMODE_SBOT))))
+#define is_bot(x) ((x) && ((x->user->Umode & (UMODE_RBOT|UMODE_SBOT))))
 #else
 #define is_bot(x) (0)
 #endif
 #endif
+
+#define BOTMODE		0x00000001
+#define OPERMODE	0x00000002
+
+EXPORTFUNC int IsOperMode(const char mode);
+EXPORTFUNC int IsOperSMode(const char mode);
+EXPORTFUNC int IsBotMode(const char mode);
 
 #ifndef NEOSTATS_PACKAGE_VERSION
 #define NEOSTATS_PACKAGE_VERSION PACKAGE
@@ -405,25 +412,61 @@ extern EXPORTVAR char segv_location[SEGV_LOCATION_BUFSIZE];
 extern adns_state ads;
 
 /* version info */
-extern const char version_date[], version_time[];
+EXPORTVAR extern const char version_date[];
+EXPORTVAR extern const char version_time[];
 
 /** @brief Server structure
  *  structure containing all details of a server
  */
 typedef struct Server {
-	char name[MAXHOST];
-	char name64[B64SIZE];
 	int hops;
 	int numeric;
-	time_t connected_since;
 	int ping;
-	char uplink[MAXHOST];
-	char version[MAXHOST];
 	time_t uptime;
-	char infoline[MAXINFO];
-	long flags;
-	void *moddata[NUM_MODULES];
 } Server;
+
+typedef struct _Client Client;
+
+/** @brief User structure
+ *  
+ */
+typedef struct User {
+	char hostname[MAXHOST];
+	char username[MAXUSER];
+	char vhost[MAXHOST];
+	char awaymsg[MAXHOST];
+	char swhois[MAXHOST];
+	int flood;
+	int is_away;
+	time_t tslastmsg;
+	time_t tslastnick;
+	time_t tslastaway;
+	time_t servicestamp;
+	char modes[MODESIZE];
+	unsigned int Umode;
+	char smodes[MODESIZE];
+	unsigned int Smode;
+	int ulevel;
+	list_t *chans;
+	Client *server;
+} User;
+
+/** @brief Client structure
+ *  
+ */
+typedef struct _Client {
+	User *user;
+	Server *server;
+	char name[MAXNICK];
+	char name64[B64SIZE];
+	char uplink[MAXHOST];
+	char info[MAXREALNAME];
+	char version[MAXHOST];
+	unsigned int flags;
+	void *moddata[NUM_MODULES];
+	time_t tsconnect;
+	struct in_addr ipaddr;
+} _Client; 
 
 /** @brief me structure
  *  structure containing information about the neostats core
@@ -447,7 +490,7 @@ typedef struct tme {
 	char serviceschan[MAXCHANLEN];
 	unsigned int onchan:1;
 	unsigned int synched:1;
-	Server *s;
+	Client *s;
 	int requests;
 	long SendM;
 	long SendBytes;
@@ -480,38 +523,6 @@ typedef struct Ban {
 } Ban;
 
 
-
-/** @brief User structure
- *  
- */
-typedef struct User {
-	char nick[MAXNICK];
-	char name64[B64SIZE];
-	char hostname[MAXHOST];
-	char username[MAXUSER];
-	char realname[MAXREALNAME];
-	char vhost[MAXHOST];
-	char awaymsg[MAXHOST];
-	char swhois[MAXHOST];
-	char version[MAXHOST];
-	struct in_addr ipaddr;
-	Server *server;
-	int flood;
-	int is_away;
-	time_t tslastmsg;
-	time_t tslastnick;
-	time_t tslastaway;
-	time_t TS;
-	time_t servicestamp;
-	char modes[MODESIZE];
-	unsigned int Umode;
-	unsigned int Smode;
-	int ulevel;
-	list_t *chans;
-	unsigned int flags;
-	void *moddata[NUM_MODULES];
-} User;
-
 /** @brief Channel structure
  *  
  */
@@ -532,64 +543,12 @@ typedef struct Channel {
 	void *moddata[NUM_MODULES];
 } Channel;
 
-/** @brief Client structure
- *  work in progress
- */
-/*
-typedef struct Client {
-		User* user;
-	char nick[MAXNICK];
-	char name64[B64SIZE];
-	char hostname[MAXHOST];
-	char username[MAXUSER];
-	char realname[MAXREALNAME];
-	char vhost[MAXHOST];
-	char awaymsg[MAXHOST];
-	char swhois[MAXHOST];
-	struct in_addr ipaddr;
-	Server *server;
-	int flood;
-	int is_away;
-	time_t tslastmsg;
-	time_t tslastnick;
-	time_t tslastaway;
-	time_t TS;
-	time_t servicestamp;
-	char modes[MODESIZE];
-	long Umode;
-	long Smode;
-	int ulevel;
-	list_t *chans;
-	long flags;
-	void *moddata[NUM_MODULES];
-
-		Server* server;
-	char name[MAXHOST];
-	char name64[B64SIZE];
-	int hops;
-	int numeric;
-	time_t connected_since;
-	int ping;
-	char uplink[MAXHOST];
-	char version[MAXHOST];
-	char infoline[MAXINFO];
-	long flags;
-	void *moddata[NUM_MODULES];
-			
-} Client; */
-
 typedef struct _Bot Bot;
 
 typedef struct CmdParams {
-	struct {
-		User* user;
-		Server* server;
-	}source;
-	struct {
-		User* user;
-		Server* server;
-		Bot * bot;
-	}dest;
+	Client *source;
+	Client *target;
+	Bot * bot;
 	char* param;
 	Channel* channel;
 	char **av;
@@ -720,9 +679,9 @@ typedef int (*timer_function) (void);
 /** @brief Socket function types
  * 
  */
-typedef int (*socket_function) (int sock_no, char *name);
-typedef int (*before_poll_function) (void *data, struct pollfd *);
-typedef void (*after_poll_function) (void *data, struct pollfd *, unsigned int);
+typedef int (*sock_func) (int sock_no, char *name);
+typedef int (*before_poll_func) (void *data, struct pollfd *);
+typedef void (*after_poll_func) (void *data, struct pollfd *, unsigned int);
 
 
 /* socket interface type */
@@ -795,7 +754,7 @@ typedef struct ModuleInfo {
 	const int padding[5];	
 }ModuleInfo;
 
-typedef int (*mod_auth) (User * u);
+typedef int (*mod_auth) (Client * u);
 
 /** @brief Module structure
  * 
@@ -838,18 +797,18 @@ typedef struct Sock {
 	int socktype;
 	/** if socktype = SOCK_POLL, before poll function */
 	/** Socket before poll function */
-	before_poll_function beforepoll;
+	before_poll_func beforepoll;
 	/** Socket after poll function */
-	after_poll_function afterpoll;
+	after_poll_func afterpoll;
 	/** data */
 	void *data;
 	/* if socktype = SOCK_STANDARD, function calls */
 	/** Socket read function */
-	socket_function readfnc;
+	sock_func readfnc;
 	/** Socket write function */
-	socket_function writefnc;
+	sock_func writefnc;
 	/** Socket error function */
-	socket_function errfnc;
+	sock_func errfnc;
 	/** rmsgs */
 	long rmsgs;
 	/** rbytes */
@@ -904,7 +863,7 @@ typedef struct _Bot {
 	/** Owner module ptr */
 	Module* moduleptr;
 	/** Nick */
-	char nick[MAXNICK];
+	char name[MAXNICK];
 	/* bot flags */
 	unsigned int flags;
 	/* hash for command list */
@@ -916,7 +875,7 @@ typedef struct _Bot {
 	/* min ulevel for settings */
 	int set_ulevel;
 	/* Link back to user struct associated with this bot*/
-	User* u;
+	Client * u;
 }_Bot;
 
 EXPORTFUNC int ModuleConfig(bot_setting* bot_settings);
@@ -924,20 +883,20 @@ EXPORTFUNC int ModuleConfig(bot_setting* bot_settings);
 EXPORTFUNC int add_timer (timer_function func, const char* name, int interval);
 EXPORTFUNC int del_timer (const char *timer_name);
 EXPORTFUNC int set_timer_interval (const char *timer_name, int interval);
-EXPORTFUNC Timer *findtimer(const char *timer_name);
+EXPORTFUNC Timer *find_timer(const char *timer_name);
 
-EXPORTFUNC int add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, const char *sock_name, int socknum);
-EXPORTFUNC int add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, const char *sock_name, void *data);
-EXPORTFUNC int del_socket (const char *name);
-EXPORTFUNC Sock *findsock (const char *sock_name);
+EXPORTFUNC int add_sock (sock_func readfunc, sock_func writefunc, sock_func errfunc, const char *sock_name, int socknum);
+EXPORTFUNC int add_sockpoll (before_poll_func beforepoll, after_poll_func afterpoll, const char *sock_name, void *data);
+EXPORTFUNC int del_sock (const char *name);
+EXPORTFUNC Sock *find_sock (const char *sock_name);
 
 EXPORTFUNC Bot * init_bot (BotInfo* botinfo);
 EXPORTFUNC int del_bot (Bot *botptr, const char * reason);
-EXPORTFUNC Bot *findbot (const char * bot_name);
+EXPORTFUNC Bot *find_bot (const char * bot_name);
 EXPORTFUNC int bot_nick_change (const char * oldnick, const char *newnick);
 
 /* sock.c */
-EXPORTFUNC int sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, socket_function func_read, socket_function func_write, socket_function func_error);
+EXPORTFUNC int sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, sock_func func_read, sock_func func_write, sock_func func_error);
 EXPORTFUNC int sock_disconnect (const char *name);
 
 /* keeper interface */
@@ -984,10 +943,10 @@ EXPORTFUNC int split_buf (char *buf, char ***argv, int colon_special);
 
 /*  Messaging functions to send messages to users and channels
  */
-EXPORTFUNC void irc_privmsg_list (const Bot *botptr, const User *target, const char **text);
-EXPORTFUNC void irc_prefmsg (const Bot *botptr, const User *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC void irc_privmsg (const Bot *botptr, const User *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC void irc_notice (const Bot *botptr, const User *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void irc_privmsg_list (const Bot *botptr, const Client *target, const char **text);
+EXPORTFUNC void irc_prefmsg (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void irc_privmsg (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void irc_notice (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 EXPORTFUNC void irc_chanprivmsg (const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 EXPORTFUNC void irc_channotice (const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 EXPORTFUNC void irc_chanalert (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
@@ -1026,33 +985,33 @@ int irc_pong (const char *reply);
 /*  SVS functions 
  *  these operate from the server rather than a bot 
  */
-EXPORTFUNC int irc_svsnick (User *target, const char *newnick);
-EXPORTFUNC int irc_svsjoin (User *target, const char *chan);
-EXPORTFUNC int irc_svspart (User *target, const char *chan);
-EXPORTFUNC int irc_svshost (User *target, const char *vhost);
-EXPORTFUNC int irc_svsmode (User *target, const char *modes);
-EXPORTFUNC int irc_svskill (User *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC int irc_svsnick (Client *target, const char *newnick);
+EXPORTFUNC int irc_svsjoin (Client *target, const char *chan);
+EXPORTFUNC int irc_svspart (Client *target, const char *chan);
+EXPORTFUNC int irc_svshost (Client *target, const char *vhost);
+EXPORTFUNC int irc_svsmode (Client *target, const char *modes);
+EXPORTFUNC int irc_svskill (Client *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC int irc_svstime (const time_t ts);
 
 /* users.c */
-EXPORTFUNC User *finduser (const char *nick);
-EXPORTFUNC int UserLevel (User *u);
+EXPORTFUNC Client *find_user (const char *nick);
+EXPORTFUNC int UserLevel (Client *u);
 
 /* server.c */
-EXPORTFUNC Server *findserver (const char *name);
+EXPORTFUNC Client *find_server (const char *name);
 
 /* chans.c */
-EXPORTFUNC Channel *findchan (const char *chan);
+EXPORTFUNC Channel *find_chan (const char *chan);
 EXPORTFUNC int CheckChanMode (Channel * c, long mode);
-EXPORTFUNC int IsChanMember(Channel *c, User *u);
-EXPORTFUNC int test_chan_user_mode(char* chan, char* nick, int flag);
+EXPORTFUNC int IsChanMember(Channel *c, Client *u);
+EXPORTFUNC int test_cumode(char* chan, char* nick, int flag);
 
-#define is_chanop(chan, nick)		test_chan_user_mode(chan, nick, CUMODE_CHANOP)
-#define is_chanhalfop(chan, nick)	test_chan_user_mode(chan, nick, CUMODE_HALFOP)
-#define is_chanvoice(chan, nick)	test_chan_user_mode(chan, nick, CUMODE_VOICE)
-#define is_chanowner(chan, nick)	test_chan_user_mode(chan, nick, CUMODE_CHANOWNER)
-#define is_chanprot(chan, nick)		test_chan_user_mode(chan, nick, CUMODE_CHANPROT)
-#define is_chanadmin(chan, nick)	test_chan_user_mode(chan, nick, CUMODE_CHANADMIN)
+#define is_chanop(chan, nick)		test_cumode(chan, nick, CUMODE_CHANOP)
+#define is_chanhalfop(chan, nick)	test_cumode(chan, nick, CUMODE_HALFOP)
+#define is_chanvoice(chan, nick)	test_cumode(chan, nick, CUMODE_VOICE)
+#define is_chanowner(chan, nick)	test_cumode(chan, nick, CUMODE_CHANOWNER)
+#define is_chanprot(chan, nick)		test_cumode(chan, nick, CUMODE_CHANPROT)
+#define is_chanadmin(chan, nick)	test_cumode(chan, nick, CUMODE_CHANADMIN)
 
 EXPORTVAR unsigned char UmodeChRegNick;
 
@@ -1062,7 +1021,7 @@ EXPORTFUNC int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *
 /* services.c */
 EXPORTFUNC int add_services_cmd_list(bot_cmd* bot_cmd_list);
 EXPORTFUNC int del_services_cmd_list(bot_cmd* bot_cmd_list);
-EXPORTFUNC User* findvaliduser(Bot* botptr, User* u, const char* target_nick);
+EXPORTFUNC Client * find_valid_user(Bot* botptr, Client * u, const char* target_nick);
 
 /* transfer.c stuff */
 typedef void (transfer_callback) (void *data, int returncode, char *body, int bodysize);
@@ -1154,11 +1113,11 @@ EXPORTFUNC void nlog (LOG_LEVEL level, char *fmt, ...) __attribute__((format(pri
 EXPORTFUNC void dlog (DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
 typedef void (*ChannelListHandler) (Channel * c);
-void GetChannelList(ChannelListHandler handler);
-typedef void (*UserListHandler) (User * u);
-void GetUserList(UserListHandler handler);
-typedef void (*ServerListHandler) (Server * s);
-void GetServerList(ServerListHandler handler);
+EXPORTFUNC void GetChannelList(ChannelListHandler handler);
+typedef void (*UserListHandler) (Client * u);
+EXPORTFUNC void GetUserList(UserListHandler handler);
+typedef void (*ServerListHandler) (Client * s);
+EXPORTFUNC void GetServerList(ServerListHandler handler);
 
 EXPORTFUNC int HaveFeature (int mask);
 
@@ -1167,9 +1126,9 @@ EXPORTFUNC int HaveFeature (int mask);
  */
 int MODULEFUNC ModInit(Module* mod_ptr);
 void MODULEFUNC ModFini(void);
-int MODULEFUNC ModAuth (User * u);
-int MODULEFUNC ModAuthUser(User * u);
-int MODULEFUNC ModAuthList(User * u);
+int MODULEFUNC ModAuth (Client * u);
+int MODULEFUNC ModAuthUser(Client * u);
+int MODULEFUNC ModAuthList(Client * u);
 extern MODULEVAR ModuleInfo module_info;   
 extern MODULEVAR ModuleEvent module_events[];  
 

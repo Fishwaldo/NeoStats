@@ -139,7 +139,7 @@ new_timer (const char *name)
  * @return pointer to timer if found, NULL if not found
 */
 Timer *
-findtimer (const char *name)
+find_timer (const char *name)
 {
 	hnode_t *tn;
 
@@ -147,7 +147,7 @@ findtimer (const char *name)
 	if (tn) {
 		return (Timer *) hnode_get (tn);
 	}
-	dlog(DEBUG3, "findtimer: %s not found", name);
+	dlog(DEBUG3, "find_timer: %s not found", name);
 	return NULL;
 }
 
@@ -280,16 +280,16 @@ list_timers (CmdParams* cmdparams)
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "Module timer List:");
+	irc_prefmsg (ns_botptr, cmdparams->source, "Module timer List:");
 	hash_scan_begin (&ts, timerhash);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
 		timer = hnode_get (tn);
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "%s:--------------------------------", timer->moduleptr->info->name);
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "Module Timer Name: %s", timer->name);
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "Module Interval: %d", timer->interval);
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "Time till next Run: %ld", (long)(timer->interval - (me.now - timer->lastrun)));
+		irc_prefmsg (ns_botptr, cmdparams->source, "%s:--------------------------------", timer->moduleptr->info->name);
+		irc_prefmsg (ns_botptr, cmdparams->source, "Module Timer Name: %s", timer->name);
+		irc_prefmsg (ns_botptr, cmdparams->source, "Module Interval: %d", timer->interval);
+		irc_prefmsg (ns_botptr, cmdparams->source, "Time till next Run: %ld", (long)(timer->interval - (me.now - timer->lastrun)));
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "End of Module timer List");
+	irc_prefmsg (ns_botptr, cmdparams->source, "End of Module timer List");
 	return 0;
 }
 

@@ -187,14 +187,14 @@ ns_exclude (CmdParams* cmdparams)
 		if (cmdparams->ac < 3) {
 			return NS_ERR_NEED_MORE_PARAMS;
 		}
-		ns_do_exclude_add(cmdparams->source.user, cmdparams->av[0], cmdparams->av[1]);
+		ns_do_exclude_add(cmdparams->source, cmdparams->av[0], cmdparams->av[1]);
 	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
 		if (cmdparams->ac < 2) {
 			return NS_ERR_NEED_MORE_PARAMS;
 		}
-		ns_do_exclude_del(cmdparams->source.user, cmdparams->av[1]);
+		ns_do_exclude_del(cmdparams->source, cmdparams->av[1]);
 	} else if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
-		ns_do_exclude_list(cmdparams->source.user, ns_botptr->nick);
+		ns_do_exclude_list(cmdparams->source, ns_botptr->name);
 	} else {
 		return NS_ERR_SYNTAX_ERROR;
 	}
@@ -211,9 +211,9 @@ static int
 ns_shutdown (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	irc_chanalert (ns_botptr, "%s requested SHUTDOWN for %s", cmdparams->source.user->nick, cmdparams->av[cmdparams->ac-1]);
+	irc_chanalert (ns_botptr, "%s requested SHUTDOWN for %s", cmdparams->source->name, cmdparams->av[cmdparams->ac-1]);
 	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
-		cmdparams->source.user->nick, cmdparams->source.user->username, cmdparams->source.user->hostname, cmdparams->av[cmdparams->ac-1]);
+		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, cmdparams->av[cmdparams->ac-1]);
 	irc_globops (ns_botptr, "%s", quitmsg);
 	nlog (LOG_NOTICE, "%s", quitmsg);
 	do_exit (NS_EXIT_NORMAL, quitmsg);
@@ -231,9 +231,9 @@ static int
 ns_reload (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	irc_chanalert (ns_botptr, "%s requested RELOAD for %s", cmdparams->source.user->nick, cmdparams->av[cmdparams->ac - 1]);
+	irc_chanalert (ns_botptr, "%s requested RELOAD for %s", cmdparams->source->name, cmdparams->av[cmdparams->ac - 1]);
 	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested RELOAD for %s.", 
-		cmdparams->source.user->nick, cmdparams->source.user->username, cmdparams->source.user->hostname, cmdparams->av[cmdparams->ac - 1]);
+		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, cmdparams->av[cmdparams->ac - 1]);
 	irc_globops (ns_botptr, "%s", quitmsg);
 	nlog (LOG_NOTICE, "%s", quitmsg);
 	do_exit (NS_EXIT_RELOAD, quitmsg);
@@ -253,11 +253,11 @@ ns_jupe (CmdParams* cmdparams)
 	static char infoline[255];
 
 	SET_SEGV_LOCATION();
-	ircsnprintf (infoline, 255, "[jupitered by %s]", cmdparams->source.user->nick);
+	ircsnprintf (infoline, 255, "[jupitered by %s]", cmdparams->source->name);
 	irc_server (cmdparams->av[0], 1, infoline);
-	nlog (LOG_NOTICE, "%s!%s@%s jupitered %s", cmdparams->source.user->nick, cmdparams->source.user->username, cmdparams->source.user->hostname, cmdparams->av[0]);
-	irc_chanalert (ns_botptr, "%s jupitered %s", cmdparams->source.user->nick, cmdparams->av[0]);
-	irc_prefmsg(ns_botptr, cmdparams->source.user, "%s has been jupitered", cmdparams->av[0]);
+	nlog (LOG_NOTICE, "%s!%s@%s jupitered %s", cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, cmdparams->av[0]);
+	irc_chanalert (ns_botptr, "%s jupitered %s", cmdparams->source->name, cmdparams->av[0]);
+	irc_prefmsg(ns_botptr, cmdparams->source, "%s has been jupitered", cmdparams->av[0]);
    	return NS_SUCCESS;
 }
 
@@ -274,7 +274,7 @@ ns_userdump (CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
 	if (!config.debug) {
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "\2Error:\2 debug mode disabled");
+		irc_prefmsg (ns_botptr, cmdparams->source, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
 #endif
@@ -295,7 +295,7 @@ ns_serverdump (CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
 	if (!config.debug) {
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "\2Error:\2 debug mode disabled");
+		irc_prefmsg (ns_botptr, cmdparams->source, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
 #endif
@@ -316,7 +316,7 @@ ns_chandump (CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
 	if (!config.debug) {
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "\2Error:\2 debug mode disabled");
+		irc_prefmsg (ns_botptr, cmdparams->source, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
 #endif
@@ -337,7 +337,7 @@ ns_bandump (CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
 	if (!config.debug) {
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "\2Error:\2 debug mode disabled");
+		irc_prefmsg (ns_botptr, cmdparams->source, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
 #endif
@@ -358,25 +358,25 @@ ns_status (CmdParams* cmdparams)
 	int uptime = me.now - me.t_start;
 
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "%s status:", ns_botptr->nick);
+	irc_prefmsg (ns_botptr, cmdparams->source, "%s status:", ns_botptr->name);
 	if (uptime > 86400) {
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "%s up \2%d\2 day%s, \2%02d:%02d\2", ns_botptr->nick, uptime / 86400, (uptime / 86400 == 1) ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60);
+		irc_prefmsg (ns_botptr, cmdparams->source, "%s up \2%d\2 day%s, \2%02d:%02d\2", ns_botptr->name, uptime / 86400, (uptime / 86400 == 1) ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60);
 	} else if (uptime > 3600) {
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "%s up \2%d hour%s, %d minute%s\2", ns_botptr->nick, uptime / 3600, uptime / 3600 == 1 ? "" : "s", (uptime / 60) % 60, (uptime / 60) % 60 == 1 ? "" : "s");
+		irc_prefmsg (ns_botptr, cmdparams->source, "%s up \2%d hour%s, %d minute%s\2", ns_botptr->name, uptime / 3600, uptime / 3600 == 1 ? "" : "s", (uptime / 60) % 60, (uptime / 60) % 60 == 1 ? "" : "s");
 	} else if (uptime > 60) {
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "%s up \2%d minute%s, %d second%s\2", ns_botptr->nick, uptime / 60, uptime / 60 == 1 ? "" : "s", uptime % 60, uptime % 60 == 1 ? "" : "s");
+		irc_prefmsg (ns_botptr, cmdparams->source, "%s up \2%d minute%s, %d second%s\2", ns_botptr->name, uptime / 60, uptime / 60 == 1 ? "" : "s", uptime % 60, uptime % 60 == 1 ? "" : "s");
 	} else {
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "%s up \2%d second%s\2", ns_botptr->nick, uptime, uptime == 1 ? "" : "s");
+		irc_prefmsg (ns_botptr, cmdparams->source, "%s up \2%d second%s\2", ns_botptr->name, uptime, uptime == 1 ? "" : "s");
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "Sent %ld messages, %ld bytes", me.SendM, me.SendBytes);
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "Received %ld messages, %ld Bytes", me.RcveM, me.RcveBytes);
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "Reconnect time: %d", config.r_time);
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "Requests: %d", me.requests);
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "Max sockets: %d (in use: %d)", me.maxsocks, me.cursocks);
+	irc_prefmsg (ns_botptr, cmdparams->source, "Sent %ld messages, %ld bytes", me.SendM, me.SendBytes);
+	irc_prefmsg (ns_botptr, cmdparams->source, "Received %ld messages, %ld Bytes", me.RcveM, me.RcveBytes);
+	irc_prefmsg (ns_botptr, cmdparams->source, "Reconnect time: %d", config.r_time);
+	irc_prefmsg (ns_botptr, cmdparams->source, "Requests: %d", me.requests);
+	irc_prefmsg (ns_botptr, cmdparams->source, "Max sockets: %d (in use: %d)", me.maxsocks, me.cursocks);
 	if (config.debug)
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "Debugging mode enabled");
+		irc_prefmsg (ns_botptr, cmdparams->source, "Debugging mode enabled");
 	else
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "Debugging mode disabled");
+		irc_prefmsg (ns_botptr, cmdparams->source, "Debugging mode disabled");
 	return NS_SUCCESS;
 }
 
@@ -392,15 +392,15 @@ ns_level (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	if(cmdparams->ac < 1) {
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "Your level is %d", UserLevel (cmdparams->source.user));
+		irc_prefmsg (ns_botptr, cmdparams->source, "Your level is %d", UserLevel (cmdparams->source));
 	} else {
-		User * otheruser;
-		otheruser = finduser(cmdparams->av[0]);
+		Client * otheruser;
+		otheruser = find_user(cmdparams->av[0]);
 		if(!otheruser) {
-			irc_prefmsg (ns_botptr, cmdparams->source.user, "User %s not found", cmdparams->av[0]);
+			irc_prefmsg (ns_botptr, cmdparams->source, "User %s not found", cmdparams->av[0]);
 			return NS_FAILURE;
 		}
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "User level for %s is %d", otheruser->nick, UserLevel (otheruser));
+		irc_prefmsg (ns_botptr, cmdparams->source, "User level for %s is %d", otheruser->name, UserLevel (otheruser));
 	}
 	return NS_SUCCESS;
 }
@@ -416,10 +416,10 @@ static int
 ns_load (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (load_module (cmdparams->av[0], cmdparams->source.user)) {
-		irc_chanalert (ns_botptr, "%s loaded module %s", cmdparams->source.user->nick, cmdparams->av[0]);
+	if (load_module (cmdparams->av[0], cmdparams->source)) {
+		irc_chanalert (ns_botptr, "%s loaded module %s", cmdparams->source->name, cmdparams->av[0]);
 	} else {
-		irc_chanalert (ns_botptr, "%s tried to load module %s, but load failed", cmdparams->source.user->nick, cmdparams->av[0]);
+		irc_chanalert (ns_botptr, "%s tried to load module %s, but load failed", cmdparams->source->name, cmdparams->av[0]);
 	}
    	return NS_SUCCESS;
 }
@@ -435,8 +435,8 @@ static int
 ns_unload (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (unload_module (cmdparams->av[0], cmdparams->source.user) > 0) {
-		irc_chanalert (ns_botptr, "%s unloaded module %s", cmdparams->source.user->nick, cmdparams->av[0]);
+	if (unload_module (cmdparams->av[0], cmdparams->source) > 0) {
+		irc_chanalert (ns_botptr, "%s unloaded module %s", cmdparams->source->name, cmdparams->av[0]);
 	}
    	return NS_SUCCESS;
 }
@@ -456,8 +456,8 @@ ns_raw (CmdParams* cmdparams)
 
 	SET_SEGV_LOCATION();
 	message = joinbuf (cmdparams->av, cmdparams->ac, 1);
-	irc_chanalert (ns_botptr, "\2RAW COMMAND\2 \2%s\2 issued a raw command!(%s)", cmdparams->source.user->nick, message);
-	nlog (LOG_NORMAL, "RAW COMMAND %s issued a raw command!(%s)", cmdparams->source.user->nick, message);
+	irc_chanalert (ns_botptr, "\2RAW COMMAND\2 \2%s\2 issued a raw command!(%s)", cmdparams->source->name, message);
+	nlog (LOG_NORMAL, "RAW COMMAND %s issued a raw command!(%s)", cmdparams->source->name, message);
 	send_cmd ("%s", message);
 	sfree (message);
    	return NS_SUCCESS;

@@ -35,9 +35,9 @@ int UserNick (const char * oldnick, const char * newnick, const char * ts);
 void UserMode (const char *nick, const char *modes);
 void UserSMode (const char *nick, const char *modes);
 void UserAway (const char *nick, const char *awaymsg);
-User *finduserbase64 (const char *num);
+Client *finduserbase64 (const char *num);
 void UserDump (const char *nick);
-void QuitServerUsers (Server* s);
+void QuitServerUsers (Client *s);
 EXPORTFUNC void AddFakeUser(const char *mask);
 EXPORTFUNC void DelFakeUser(const char *mask);
 

@@ -61,10 +61,12 @@ typedef struct cumode_init {
 typedef struct umode_init {
 	unsigned char modechar;
 	unsigned int umode;
+	unsigned int flags;
 } umode_init;
 
 typedef struct UserModes {
 	unsigned int umode;
+	unsigned int flags;
 } UserModes;
 
 typedef struct ircd_server {
@@ -242,7 +244,7 @@ EXPORTFUNC char* nicktobase64 (const char* nick);
 EXPORTFUNC char* base64tonick (const char* num);
 
 MODULEFUNC void parse (char* line);
-int flood (User * u);
+int flood (Client * u);
 
 void (*irc_parse) (char* line);
 

@@ -306,7 +306,7 @@ ModulesVersion (const char* nick, const char *remoteserver)
  * @return
  */
 Module *
-load_module (const char *modfilename, User * u)
+load_module (const char *modfilename, Client * u)
 {
 	void *dl_handle;
 	int do_msg = 0;
@@ -446,11 +446,11 @@ list_modules (CmdParams* cmdparams)
 	hash_scan_begin (&hs, modulehash);
 	while ((mn = hash_scan_next (&hs)) != NULL) {
 		mod_ptr = hnode_get (mn);
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "Module: %s (%s)", mod_ptr->info->name, mod_ptr->info->version);
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "Module Description: %s", mod_ptr->info->description);
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "Module Number: %d", mod_ptr->modnum);
+		irc_prefmsg (ns_botptr, cmdparams->source, "Module: %s (%s)", mod_ptr->info->name, mod_ptr->info->version);
+		irc_prefmsg (ns_botptr, cmdparams->source, "Module Description: %s", mod_ptr->info->description);
+		irc_prefmsg (ns_botptr, cmdparams->source, "Module Number: %d", mod_ptr->modnum);
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "End of Module List");
+	irc_prefmsg (ns_botptr, cmdparams->source, "End of Module List");
 	return 0;
 }
 
@@ -461,7 +461,7 @@ list_modules (CmdParams* cmdparams)
  * @return
  */
 int
-unload_module (const char *modname, User * u)
+unload_module (const char *modname, Client * u)
 {
 	Module *mod_ptr;
 	hnode_t *modnode;
@@ -473,8 +473,8 @@ unload_module (const char *modname, User * u)
 	modnode = hash_lookup (modulehash, modname);
 	if (!modnode) {
 		if (u) {
-			irc_prefmsg (ns_botptr, u, "Module %s not loaded, try /msg %s modlist", modname, ns_botptr->nick);
-			irc_chanalert (ns_botptr, "%s tried to unload %s but its not loaded", u->nick, modname);
+			irc_prefmsg (ns_botptr, u, "Module %s not loaded, try /msg %s modlist", modname, ns_botptr->name);
+			irc_chanalert (ns_botptr, "%s tried to unload %s but its not loaded", u->name, modname);
 		}
 		return NS_FAILURE;
 	}

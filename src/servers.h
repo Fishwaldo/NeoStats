@@ -24,13 +24,13 @@
 #ifndef _SERVER_H_
 #define _SERVER_H_
 
-Server *AddServer (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline);
+Client *AddServer (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline);
 void DelServer(const char *name, const char* reason);
 void ServerDump (const char *name);
 int InitServers (void);
 void PingServers (void);
 void FiniServers (void);
-Server *findserverbase64 (const char *num);
+Client *findserverbase64 (const char *num);
 void RequestServerUptimes (void);
 
 #endif /* _SERVER_H_ */

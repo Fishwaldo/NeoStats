@@ -51,17 +51,17 @@ static char quitreason[BUFSIZE];
 static void
 ChanPartHandler (list_t * list, lnode_t * node, void *v)
 {
-	part_chan ((User *)v, lnode_get (node), quitreason[0] != 0 ? quitreason : NULL);
+	part_chan ((Client *)v, lnode_get (node), quitreason[0] != 0 ? quitreason : NULL);
 }
 
-void PartAllChannels (User* u, const char* reason)
+void PartAllChannels (Client * u, const char* reason)
 {
 	bzero(quitreason, BUFSIZE);
 	if(reason) {
 		strlcpy(quitreason, reason, BUFSIZE);
 		strip_mirc_codes(quitreason);
 	}
-	list_process (u->chans, u, ChanPartHandler);
+	list_process (u->user->chans, u, ChanPartHandler);
 }
 
 /** @brief Process the Channel TS Time 
@@ -100,7 +100,7 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
 	Channel *c;
 	time_t time;
 
-	c = findchan (chan);
+	c = find_chan (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "ChanTopic: can't find channel %s", chan);
 		return;
@@ -214,7 +214,7 @@ ChanMode (char *origin, char **av, int ac)
 	ModesParm *m;
 	lnode_t *mn;
 
-	c = findchan (av[0]);
+	c = find_chan (av[0]);
 	if (!c) {
 		return 0;
 	}
@@ -327,33 +327,33 @@ ChanUserMode (const char* chan, const char* nick, int add, long mode)
 	lnode_t *cmn;
 	Chanmem *cm;
 	Channel * c;
-	User * u;
+	Client * u;
 
-	u = finduser(nick);
+	u = find_user(nick);
 	if (!u) {
 		nlog (LOG_WARNING, "ChanUserMode: can't find user %s", nick);
 		return;
 	}
-	c = findchan(chan);
+	c = find_chan(chan);
 	if (!c) {
 		nlog (LOG_WARNING, "ChanUserMode: can't find channel %s", chan);
 		return;
 	}
-	cmn = list_find (c->chanmembers, u->nick, comparef);
+	cmn = list_find (c->chanmembers, u->name, comparef);
 	if (!cmn) {
 		if (config.debug) {
-			irc_chanalert (ns_botptr, "ChanUserMode: %s is not a member of channel %s", u->nick, c->name);
+			irc_chanalert (ns_botptr, "ChanUserMode: %s is not a member of channel %s", u->name, c->name);
 			ChanDump (c->name);
-			UserDump (u->nick);
+			UserDump (u->name);
 		}
 		return;
 	}
 	cm = lnode_get (cmn);
 	if (add) {
-		dlog(DEBUG2, "ChanUserMode: Adding mode %ld to Channel %s User %s", mode, c->name, u->nick);
+		dlog(DEBUG2, "ChanUserMode: Adding mode %ld to Channel %s User %s", mode, c->name, u->name);
 		cm->flags |= mode;
 	} else {
-		dlog(DEBUG2, "ChanUserMode: Deleting Mode %ld to Channel %s User %s", mode, c->name, u->nick);
+		dlog(DEBUG2, "ChanUserMode: Deleting Mode %ld to Channel %s User %s", mode, c->name, u->name);
 		cm->flags &= ~mode;
 	}
 }
@@ -445,20 +445,23 @@ del_chan (Channel * c)
  *
  * @returns Nothing
 */
-void del_chan_user(Channel *c, User *u)
+void del_chan_user(Channel *c, Client *u)
 {
 	lnode_t *un;
 
-	un = list_find (u->chans, c->name, comparef);
+	if ( IsMe (u) ) {
+		del_chan_bot (u->name, c->name);
+	}
+	un = list_find (u->user->chans, c->name, comparef);
 	if (!un) {
-		nlog (LOG_WARNING, "del_chan_user: %s not found in channel %s", u->nick, c->name);
+		nlog (LOG_WARNING, "del_chan_user: %s not found in channel %s", u->name, c->name);
 		if (config.debug) {
-			irc_chanalert (ns_botptr, "del_chan_user: %s not found in channel %s", u->nick, c->name);
+			irc_chanalert (ns_botptr, "del_chan_user: %s not found in channel %s", u->name, c->name);
 			ChanDump (c->name);
-			UserDump (u->nick);
+			UserDump (u->name);
 		}
 	} else {
-		lnode_destroy (list_delete (u->chans, un));
+		lnode_destroy (list_delete (u->user->chans, un));
 	}
 	dlog(DEBUG3, "del_chan_user: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 	if (c->users <= 0) {
@@ -482,10 +485,10 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 	Channel *c;
 	Chanmem *cm;
 	lnode_t *un;
-	User *u;
+	Client *u;
 
 	SET_SEGV_LOCATION();
-	u = finduser (kicked);
+	u = find_user (kicked);
 	if (!u) {
 		nlog (LOG_WARNING, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
 		if (config.debug) {
@@ -494,19 +497,19 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 		}
 		return;
 	}
-	dlog(DEBUG2, "kick_chan: %s kicking %s from %s for %s", kickby, u->nick, chan, kickreason ? kickreason : "no reason");
-	c = findchan (chan);
+	dlog(DEBUG2, "kick_chan: %s kicking %s from %s for %s", kickby, u->name, chan, kickreason ? kickreason : "no reason");
+	c = find_chan (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "kick_chan: channel %s not found", chan);
 		return;
 	} else {
-		un = list_find (c->chanmembers, u->nick, comparef);
+		un = list_find (c->chanmembers, u->name, comparef);
 		if (!un) {
-			nlog (LOG_WARNING, "kick_chan: %s isn't a member of channel %s", u->nick, chan);
+			nlog (LOG_WARNING, "kick_chan: %s isn't a member of channel %s", u->name, chan);
 			if (config.debug) {
-				irc_chanalert (ns_botptr, "kick_chan: %s isn't a member of channel %s", u->nick, chan);
+				irc_chanalert (ns_botptr, "kick_chan: %s isn't a member of channel %s", u->name, chan);
 				ChanDump (c->name);
-				UserDump (u->nick);
+				UserDump (u->name);
 			}
 		} else {
 			CmdParams * cmdparams;
@@ -514,7 +517,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 			lnode_destroy (list_delete (c->chanmembers, un));
 			sfree (cm);
 			cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
-			cmdparams->dest.user = u;
+			cmdparams->target = u;
 			cmdparams->channel = c;
 			//AddStringToList (&av, (char *)kickby, &ac);
 			if (kickreason != NULL) {
@@ -523,8 +526,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 			SendAllModuleEvent (EVENT_KICK, cmdparams);
 			if ( IsMe (u) ) {
 				/* its one of our bots */
-				del_chan_bot (u->nick, c->name);
-				SendModuleEvent (EVENT_KICKBOT, cmdparams, findbot(u->nick)->moduleptr);
+				SendModuleEvent (EVENT_KICKBOT, cmdparams, find_bot(u->name)->moduleptr);
 			}
 			sfree (cmdparams);
 			c->users--;
@@ -547,7 +549,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 */
 
 void
-part_chan (User * u, const char *chan, const char *reason)
+part_chan (Client * u, const char *chan, const char *reason)
 {
 	Channel *c;
 	lnode_t *un;
@@ -562,19 +564,19 @@ part_chan (User * u, const char *chan, const char *reason)
 		}
 		return;
 	}
-	dlog(DEBUG2, "part_chan: parting %s from %s", u->nick, chan);
-	c = findchan (chan);
+	dlog(DEBUG2, "part_chan: parting %s from %s", u->name, chan);
+	c = find_chan (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "part_chan: channel %s not found", chan);
 		return;
 	} else {
-		un = list_find (c->chanmembers, u->nick, comparef);
+		un = list_find (c->chanmembers, u->name, comparef);
 		if (!un) {
-			nlog (LOG_WARNING, "part_chan: user %s isn't a member of channel %s", u->nick, chan);
+			nlog (LOG_WARNING, "part_chan: user %s isn't a member of channel %s", u->name, chan);
 			if (config.debug) {
-				irc_chanalert (ns_botptr, "part_chan: user %s isn't a member of channel %s", u->nick, chan);
+				irc_chanalert (ns_botptr, "part_chan: user %s isn't a member of channel %s", u->name, chan);
 				ChanDump (c->name);
-				UserDump (u->nick);
+				UserDump (u->name);
 			}
 		} else {
 			CmdParams * cmdparams;
@@ -583,15 +585,14 @@ part_chan (User * u, const char *chan, const char *reason)
 			sfree (cm);
 			cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 			cmdparams->channel = c;
-			cmdparams->source.user = u;
+			cmdparams->source = u;
 			if (reason != NULL) {
 				cmdparams->param = (char*)reason;
 			}
 			SendAllModuleEvent (EVENT_PART, cmdparams);
 			if ( IsMe (u) ) {
 				/* its one of our bots */
-				del_chan_bot (u->nick, c->name);
-				SendModuleEvent (EVENT_PARTBOT, cmdparams, findbot(u->nick)->moduleptr);
+				SendModuleEvent (EVENT_PARTBOT, cmdparams, find_bot(u->name)->moduleptr);
 			}
 			sfree (cmdparams);
 			c->users--;
@@ -653,24 +654,24 @@ void
 join_chan (const char* nick, const char *chan)
 {
 	CmdParams * cmdparams;
-	User* u;
+	Client * u;
 	Channel *c;
 	lnode_t *un, *cn;
 	Chanmem *cm;
 	
 	SET_SEGV_LOCATION();
-	u = finduser (nick);
+	u = find_user (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "join_chan: tried to join unknown user %s to channel %s", nick, chan);
 		return;
 	}
 	if (!ircstrcasecmp ("0", chan)) {
 		/* join 0 is actually part all chans */
-		dlog(DEBUG2, "join_chan: parting %s from all channels", u->nick);
+		dlog(DEBUG2, "join_chan: parting %s from all channels", u->name);
 		PartAllChannels (u, NULL);
 		return;
 	}
-	c = findchan (chan);
+	c = find_chan (chan);
 	if (!c) {
 		/* its a new Channel */
 		dlog(DEBUG2, "join_chan: new channel %s", chan);
@@ -678,17 +679,17 @@ join_chan (const char* nick, const char *chan)
 	}
 	/* add this users details to the channel members hash */
 	cm = smalloc (sizeof (Chanmem));
-	strlcpy (cm->nick, u->nick, MAXNICK);
+	strlcpy (cm->nick, u->name, MAXNICK);
 	cm->tsjoin = me.now;
 	cm->flags = 0;
 	cn = lnode_create (cm);
-	dlog(DEBUG2, "join_chan: adding usernode %s to channel %s", u->nick, chan);
-	if (list_find (c->chanmembers, u->nick, comparef)) {
-		nlog (LOG_WARNING, "join_chan: tried to add %s to channel %s but they are already a member", u->nick, chan);
+	dlog(DEBUG2, "join_chan: adding usernode %s to channel %s", u->name, chan);
+	if (list_find (c->chanmembers, u->name, comparef)) {
+		nlog (LOG_WARNING, "join_chan: tried to add %s to channel %s but they are already a member", u->name, chan);
 		if (config.debug) {
-			irc_chanalert (ns_botptr, "join_chan: tried to add %s to channel %s but they are already a member", u->nick, chan);
+			irc_chanalert (ns_botptr, "join_chan: tried to add %s to channel %s but they are already a member", u->name, chan);
 			ChanDump (c->name);
-			UserDump (u->nick);
+			UserDump (u->name);
 		}
 		return;
 	}
@@ -701,21 +702,21 @@ join_chan (const char* nick, const char *chan)
 	list_append (c->chanmembers, cn);
 	c->users++;
 	un = lnode_create (c->name);
-	if (list_isfull (u->chans)) {
-		nlog (LOG_CRITICAL, "join_chan: user %s member list is full", u->nick);
+	if (list_isfull (u->user->chans)) {
+		nlog (LOG_CRITICAL, "join_chan: user %s member list is full", u->name);
 		lnode_destroy (un);
 	} else {
-		list_append (u->chans, un);
+		list_append (u->user->chans, un);
 	}
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
-	cmdparams->source.user = u;
+	cmdparams->source = u;
 	cmdparams->channel = c;
 	SendAllModuleEvent (EVENT_JOIN, cmdparams);
 	sfree (cmdparams);
 	dlog(DEBUG3, "join_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 	if ( IsMe (u) ) {
-		dlog(DEBUG3, "join_chan: joining bot %s to channel %s", u->nick, c->name);
-		add_chan_bot (u->nick, c->name);
+		dlog(DEBUG3, "join_chan: joining bot %s to channel %s", u->name, c->name);
+		add_chan_bot (u->name, c->name);
 	}
 }
 
@@ -801,7 +802,7 @@ void ChanDump (const char *chan)
 			dumpchan(c);
 		}
 	} else {
-		c = findchan (chan);
+		c = find_chan (chan);
 		if (c) {
 			dumpchan(c);
 		} else {
@@ -822,7 +823,7 @@ void ChanDump (const char *chan)
 
 
 Channel *
-findchan (const char *chan)
+find_chan (const char *chan)
 {
 	hnode_t *cn;
 
@@ -830,7 +831,7 @@ findchan (const char *chan)
 	if (cn) {
 		return (Channel *) hnode_get (cn);
 	}
-	dlog(DEBUG3, "findchan: %s not found", chan);
+	dlog(DEBUG3, "find_chan: %s not found", chan);
 	return NULL;
 }
 
@@ -845,12 +846,12 @@ findchan (const char *chan)
 */
 
 int 
-IsChanMember (Channel *c, User *u) 
+IsChanMember (Channel *c, Client *u) 
 {
 	if (!u || !c) {
 		return 0;
 	}
-	if (list_find (c->chanmembers, u->nick, comparef)) {
+	if (list_find (c->chanmembers, u->name, comparef)) {
 		return 1;
 	}
 	return 0;
@@ -864,15 +865,15 @@ IsChanMember (Channel *c, User *u)
  * @returns 1 if they are, 0 if they are not 
 */
 
-int test_chan_user_mode(char* chan, char* nick, int flag)
+int test_cumode(char* chan, char* nick, int flag)
 {
-	User* u;
+	Client * u;
 	Channel* c;
 	lnode_t *cmn;
  	Chanmem *cm;
 
-	u = finduser(nick);
-	c = findchan(chan);
+	u = find_user(nick);
+	c = find_chan(chan);
 	if (!u || !c) {
 		return 0;
 	}
@@ -956,9 +957,9 @@ void *display_chanusers (void *tbl, char *col, char *sql, void *row)
 		mode[k++] = '\0';
 		sjoin[j++] = '\0';
 		if (k > 2) 
-			ircsnprintf(final, BUFSIZE*2, "%s %s%s,", mode, sjoin, cm->nick);
+			ircsnprintf(final, BUFSIZE*2, "%s %s%s,", mode, sjoin, cm->name);
 		else 
-			ircsnprintf(final, BUFSIZE*2, "%s%s,", sjoin, cm->nick);
+			ircsnprintf(final, BUFSIZE*2, "%s%s,", sjoin, cm->name);
 		strlcat(chanusers, final, BUFSIZE*10);
 		cmn = list_next (c->chanmembers, cmn);
 	}

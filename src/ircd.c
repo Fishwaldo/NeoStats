@@ -444,18 +444,18 @@ do_ping (const char* origin, const char* destination)
 void
 do_pong (const char* origin, const char* destination)
 {
-	Server *s;
+	Client *s;
 	CmdParams * cmdparams;
 
-	s = findserver (origin);
+	s = find_server (origin);
 	if (s) {
-		s->ping = me.now - ping.last_sent;
+		s->server->ping = me.now - ping.last_sent;
 		if (ping.ulag > 1)
-			s->ping -= ping.ulag;
+			s->server->ping -= ping.ulag;
 		if (!strcmp (me.s->name, s->name))
-			ping.ulag = me.s->ping;
+			ping.ulag = me.s->server->ping;
 		cmdparams = (CmdParams*)scalloc (sizeof(CmdParams));
-		cmdparams->source.server = s;
+		cmdparams->source = s;
 		SendAllModuleEvent (EVENT_PONG, cmdparams);
 		sfree (cmdparams);
 		return;
@@ -582,10 +582,10 @@ do_stats (const char* nick, const char *what)
 	ircd_cmd* ircd_cmd_ptr;
 	time_t tmp;
 	time_t tmp2;
-	User *u;
+	Client *u;
 
 	SET_SEGV_LOCATION();
-	u = finduser (nick);
+	u = find_user (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "do_stats: message from unknown user %s", nick);
 		return;
@@ -593,11 +593,11 @@ do_stats (const char* nick, const char *what)
 	if (!ircstrcasecmp (what, "u")) {
 		/* server uptime - Shmad */
 		int uptime = me.now - me.t_start;
-		irc_numeric (RPL_STATSUPTIME, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
+		irc_numeric (RPL_STATSUPTIME, u->name, "Statistical Server up %d days, %d:%02d:%02d", uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 	} else if (!ircstrcasecmp (what, "c")) {
 		/* Connections */
-		irc_numeric (RPL_STATSNLINE, u->nick, "N *@%s * * %d 50", me.uplink, config.port);
-		irc_numeric (RPL_STATSCLINE, u->nick, "C *@%s * * %d 50", me.uplink, config.port);
+		irc_numeric (RPL_STATSNLINE, u->name, "N *@%s * * %d 50", me.uplink, config.port);
+		irc_numeric (RPL_STATSCLINE, u->name, "C *@%s * * %d 50", me.uplink, config.port);
 	} else if (!ircstrcasecmp (what, "o")) {
 		/* Operators */
 		ListAuth(u);
@@ -605,8 +605,8 @@ do_stats (const char* nick, const char *what)
 		/* Port Lists */
 		tmp = me.now - me.lastmsg;
 		tmp2 = me.now - me.t_start;
-		irc_numeric (RPL_STATSLINKINFO, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
-		irc_numeric (RPL_STATSLLINE, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, (int)me.SendM, (int)me.SendBytes, (int)me.RcveM, (int)me.RcveBytes, (int)tmp2, (int)tmp);
+		irc_numeric (RPL_STATSLINKINFO, u->name, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
+		irc_numeric (RPL_STATSLLINE, u->name, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, (int)me.SendM, (int)me.SendBytes, (int)me.RcveM, (int)me.RcveBytes, (int)tmp2, (int)tmp);
         } else if (!ircstrcasecmp(what, "Z")) {
                 if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
                         do_dns_stats_Z(u);
@@ -615,13 +615,13 @@ do_stats (const char* nick, const char *what)
 		ircd_cmd_ptr = cmd_list;
 		while(ircd_cmd_ptr->name) {
 			if (ircd_cmd_ptr->usage > 0) {
-				irc_numeric (RPL_STATSCOMMANDS, u->nick, "Command %s Usage %d", ircd_cmd_ptr->name, ircd_cmd_ptr->usage);
+				irc_numeric (RPL_STATSCOMMANDS, u->name, "Command %s Usage %d", ircd_cmd_ptr->name, ircd_cmd_ptr->usage);
 			}
 			ircd_cmd_ptr ++;
 		}
 	}
-	irc_numeric (RPL_ENDOFSTATS, u->nick, "%s :End of /STATS report", what);
-	irc_chanalert (ns_botptr, "%s Requested Stats %s", u->nick, what);
+	irc_numeric (RPL_ENDOFSTATS, u->name, "%s :End of /STATS report", what);
+	irc_chanalert (ns_botptr, "%s Requested Stats %s", u->name, what);
 };
 
 void
@@ -659,10 +659,10 @@ do_protocol (char *origin, char **argv, int argc)
 }
 
 void
-irc_privmsg_list (const Bot *botptr, const User* target, const char **text)
+irc_privmsg_list (const Bot *botptr, const Client * target, const char **text)
 {
 	if (IsMe(target)) {
-		nlog (LOG_NOTICE, "Dropping irc_privmsg_list from bot (%s) to bot (%s)", botptr->u->nick, target->nick);
+		nlog (LOG_NOTICE, "Dropping irc_privmsg_list from bot (%s) to bot (%s)", botptr->u->name, target->name);
 		return;
 	}
 	while (*text) {
@@ -685,56 +685,56 @@ irc_chanalert (const Bot *botptr, const char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_privmsg (botptr->nick, me.serviceschan, ircd_buf);
+	irc_send_privmsg (botptr->name, me.serviceschan, ircd_buf);
 }
 
 void
-irc_prefmsg (const Bot *botptr, const User *target, const char *fmt, ...)
+irc_prefmsg (const Bot *botptr, const Client *target, const char *fmt, ...)
 {
 	va_list ap;
 
 	if (IsMe (target)) {
-		nlog (LOG_NOTICE, "Dropping irc_prefmsg from bot (%s) to bot (%s)", botptr->u->nick, target->nick);
+		nlog (LOG_NOTICE, "Dropping irc_prefmsg from bot (%s) to bot (%s)", botptr->u->name, target->name);
 		return;
 	}
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 	if (config.want_privmsg) {
-		irc_send_privmsg (botptr->u->nick, target->nick, ircd_buf);
+		irc_send_privmsg (botptr->u->name, target->name, ircd_buf);
 	} else {
-		irc_send_notice (botptr->u->nick, target->nick, ircd_buf);
+		irc_send_notice (botptr->u->name, target->name, ircd_buf);
 	}
 }
 
 void
-irc_privmsg (const Bot *botptr, const User *target, const char *fmt, ...)
+irc_privmsg (const Bot *botptr, const Client *target, const char *fmt, ...)
 {
 	va_list ap;
 
 	if (IsMe(target)) {
-		nlog (LOG_NOTICE, "Dropping privmsg from bot (%s) to bot (%s)", botptr->u->nick, target->nick);
+		nlog (LOG_NOTICE, "Dropping privmsg from bot (%s) to bot (%s)", botptr->u->name, target->name);
 		return;
 	}
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_privmsg (botptr->u->nick, target->nick, ircd_buf);
+	irc_send_privmsg (botptr->u->name, target->name, ircd_buf);
 }
 
 void
-irc_notice (const Bot *botptr, const User *target, const char *fmt, ...)
+irc_notice (const Bot *botptr, const Client *target, const char *fmt, ...)
 {
 	va_list ap;
 
 	if (IsMe(target)) {
-		nlog (LOG_NOTICE, "Dropping notice from bot (%s) to bot (%s)", botptr->u->nick, target->nick);
+		nlog (LOG_NOTICE, "Dropping notice from bot (%s) to bot (%s)", botptr->u->name, target->name);
 		return;
 	}
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_notice (botptr->u->nick, target->nick, ircd_buf);
+	irc_send_notice (botptr->u->name, target->name, ircd_buf);
 }
 
 void
@@ -745,7 +745,7 @@ irc_chanprivmsg (const Bot *botptr, const char *chan, const char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_privmsg (botptr->u->nick, chan, ircd_buf);
+	irc_send_privmsg (botptr->u->name, chan, ircd_buf);
 }
 
 void
@@ -756,7 +756,7 @@ irc_channotice (const Bot *botptr, const char *chan, const char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_notice (botptr->u->nick, chan, ircd_buf);
+	irc_send_notice (botptr->u->name, chan, ircd_buf);
 }
 
 void
@@ -770,7 +770,7 @@ irc_globops (const Bot *botptr, const char *fmt, ...)
 
 	if (me.onchan) {
 		if(irc_send_globops) {
-			irc_send_globops((botptr?botptr->u->nick:me.name), ircd_buf);
+			irc_send_globops((botptr?botptr->u->name:me.name), ircd_buf);
 		} else {
 			nlog (LOG_NOTICE, "Dropping unhandled globops: %s", ircd_buf);
 		}
@@ -788,7 +788,7 @@ irc_wallops (const Bot *botptr, const char *fmt, ...)
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 	if(irc_send_wallops) {
-		irc_send_wallops ((botptr?botptr->nick:me.name), ircd_buf);
+		irc_send_wallops ((botptr?botptr->name:me.name), ircd_buf);
 	} else {
 		nlog (LOG_NOTICE, "Dropping unhandled wallops: %s", ircd_buf);
 	}
@@ -846,7 +846,7 @@ int
 irc_cloakhost (const Bot *botptr)
 {
 	if (ircd_srv.features&FEATURE_UMODECLOAK) {
-		irc_usermode (botptr, botptr->nick, UMODE_HIDE);
+		irc_usermode (botptr, botptr->name, UMODE_HIDE);
 		return NS_SUCCESS;	
 	}
 	return NS_FAILURE;	
@@ -858,7 +858,7 @@ irc_usermode (const Bot *botptr, const char *target, long mode)
 	char* newmode;
 	
 	newmode = UmodeMaskToString(mode);
-	irc_send_umode (botptr->u->nick, target, newmode);
+	irc_send_umode (botptr->u->name, target, newmode);
 	UserMode (target, newmode);
 	return NS_SUCCESS;
 }
@@ -873,26 +873,26 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
 	time_t ts;
 	Channel *c;
 
-	c = findchan (chan);
+	c = find_chan (chan);
 	ts = (!c) ? me.now : c->creationtime;
 	/* Use sjoin if available */
 	if((ircd_srv.protocol & PROTOCOL_SJOIN) && irc_send_sjoin) {
 		if (mode == NULL) {
-			irc_send_sjoin (me.name, botptr->u->nick, chan, (unsigned long)ts);
+			irc_send_sjoin (me.name, botptr->u->name, chan, (unsigned long)ts);
 		} else {
-			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", ircd_cmodes[(int)mode[1]].sjoin, botptr->u->nick);
+			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", ircd_cmodes[(int)mode[1]].sjoin, botptr->u->name);
 			irc_send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
 		}
-		join_chan (botptr->u->nick, chan);
+		join_chan (botptr->u->name, chan);
 		if (mode) {
-			ChanUserMode(chan, botptr->u->nick, 1, CUmodeStringToMask(mode,0));
+			ChanUserMode(chan, botptr->u->name, 1, CUmodeStringToMask(mode,0));
 		}
 	/* sjoin not available so use normal join */	
 	} else if(irc_send_join) {
-		irc_send_join (botptr->u->nick, chan, me.now);
-		join_chan (botptr->u->nick, chan);
+		irc_send_join (botptr->u->name, chan, me.now);
+		join_chan (botptr->u->name, chan);
 		if(mode) {
-			irc_chanusermode(botptr, chan, mode, botptr->u->nick);
+			irc_chanusermode(botptr, chan, mode, botptr->u->name);
 		}
 	/* Error */
 	} else {
@@ -904,7 +904,7 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
 int
 irc_part (const Bot *botptr, const char *chan)
 {
-	irc_send_part(botptr->u->nick, chan);
+	irc_send_part(botptr->u->name, chan);
 	part_chan (botptr->u, (char *) chan, NULL);
 	return NS_SUCCESS;
 }
@@ -923,7 +923,7 @@ irc_chanmode (const Bot *botptr, const char *chan, const char *mode, const char 
 	char **av;
 	int ac;
 
-	irc_send_cmode (me.name, botptr->u->nick, chan, mode, args, me.now);
+	irc_send_cmode (me.name, botptr->u->name, chan, mode, args, me.now);
 	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
@@ -935,9 +935,9 @@ int
 irc_chanusermode (const Bot *botptr, const char *chan, const char *mode, const char *target)
 {
 	if((ircd_srv.protocol & PROTOCOL_B64NICK)) {
-		irc_send_cmode (me.name, botptr->u->nick, chan, mode, nicktobase64 (target), me.now);
+		irc_send_cmode (me.name, botptr->u->name, chan, mode, nicktobase64 (target), me.now);
 	} else {
-		irc_send_cmode (me.name, botptr->u->nick, chan, mode, target, me.now);
+		irc_send_cmode (me.name, botptr->u->name, chan, mode, target, me.now);
 	}
 	ChanUserMode (chan, target, 1, CUmodeStringToMask(mode,0));
 	return NS_SUCCESS;
@@ -946,8 +946,8 @@ irc_chanusermode (const Bot *botptr, const char *chan, const char *mode, const c
 int
 irc_quit (const Bot * botptr, const char *quitmsg)
 {
-	irc_send_quit (botptr->u->nick, quitmsg);
-	do_quit (botptr->u->nick, quitmsg);
+	irc_send_quit (botptr->u->name, quitmsg);
+	do_quit (botptr->u->name, quitmsg);
 	return NS_SUCCESS;
 }
 
@@ -959,7 +959,7 @@ irc_kill (const Bot *botptr, const char *target, const char *reason, ...)
 	va_start (ap, reason);
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
-	irc_send_kill (botptr->u->nick, target, ircd_buf);
+	irc_send_kill (botptr->u->name, target, ircd_buf);
 	do_quit (target, ircd_buf);
 	return NS_SUCCESS;
 }
@@ -968,8 +968,8 @@ int
 irc_kick (const Bot *botptr, const char *chan, const char *target, const char *reason)
 {
 	if(irc_send_kick) {
-		irc_send_kick (botptr->u->nick, chan, target, reason);
-		part_chan (finduser (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
+		irc_send_kick (botptr->u->name, chan, target, reason);
+		part_chan (find_user (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
 	} else {
 		unsupported_cmd("KICK");
 	}
@@ -980,7 +980,7 @@ int
 irc_invite (const Bot *botptr, const char *to, const char *chan) 
 {
 	if(irc_send_invite) {
-		irc_send_invite(botptr->u->nick, to, chan);
+		irc_send_invite(botptr->u->name, to, chan);
 	} else {
 		unsupported_cmd("KICK");
 	}
@@ -1000,7 +1000,7 @@ irc_svstime (const time_t ts)
 }
 
 int
-irc_svskill (User *target, const char *reason, ...)
+irc_svskill (Client *target, const char *reason, ...)
 {
 	va_list ap;
 
@@ -1008,10 +1008,10 @@ irc_svskill (User *target, const char *reason, ...)
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
 	if (irc_send_svskill) {
-		irc_send_svskill (me.name, target->nick, ircd_buf);
+		irc_send_svskill (me.name, target->name, ircd_buf);
 	} else if(irc_send_kill) {
-		irc_send_kill (me.name, target->nick, ircd_buf);
-		do_quit (target->nick, ircd_buf);
+		irc_send_kill (me.name, target->name, ircd_buf);
+		do_quit (target->name, ircd_buf);
 	} else {
 		unsupported_cmd("SVSKILL");
 	}
@@ -1019,11 +1019,11 @@ irc_svskill (User *target, const char *reason, ...)
 }
 
 int
-irc_svsmode (User *target, const char *modes)
+irc_svsmode (Client *target, const char *modes)
 {
 	if (irc_send_svsmode) {
-		irc_send_svsmode(me.name, target->nick, modes);
-		UserMode (target->nick, modes);
+		irc_send_svsmode(me.name, target->name, modes);
+		UserMode (target->name, modes);
 	} else {
 		unsupported_cmd("SVSMODE");
 	}
@@ -1031,11 +1031,11 @@ irc_svsmode (User *target, const char *modes)
 }
 
 int
-irc_svshost (User *target, const char *vhost)
+irc_svshost (Client *target, const char *vhost)
 {
 	if (irc_send_svshost) {
-		strlcpy (target->vhost, vhost, MAXHOST);
-		irc_send_svshost(me.name, target->nick, vhost);
+		strlcpy (target->user->vhost, vhost, MAXHOST);
+		irc_send_svshost(me.name, target->name, vhost);
 	} else {
 		unsupported_cmd("SVSHOST");
 	}
@@ -1043,10 +1043,10 @@ irc_svshost (User *target, const char *vhost)
 }
 
 int
-irc_svsjoin (User *target, const char *chan)
+irc_svsjoin (Client *target, const char *chan)
 {
 	if (irc_send_svsjoin) {
-		irc_send_svsjoin (me.name, target->nick, chan);
+		irc_send_svsjoin (me.name, target->name, chan);
 	} else {
 		unsupported_cmd("SVSJOIN");
 	}
@@ -1054,10 +1054,10 @@ irc_svsjoin (User *target, const char *chan)
 }
 
 int
-irc_svspart (User *target, const char *chan)
+irc_svspart (Client *target, const char *chan)
 {
 	if (irc_send_svspart) {
-		irc_send_svspart (me.name, target->nick, chan);
+		irc_send_svspart (me.name, target->name, chan);
 	} else {
 		unsupported_cmd("SVSPART");
 	}
@@ -1076,10 +1076,10 @@ irc_swhois (const char *target, const char *swhois)
 }
 
 int
-irc_svsnick (User *target, const char *newnick)
+irc_svsnick (Client *target, const char *newnick)
 {
 	if (irc_send_svsnick) {
-		irc_send_svsnick (me.name, target->nick, newnick, me.now);
+		irc_send_svsnick (me.name, target->name, newnick, me.now);
 	} else {
 		unsupported_cmd("SVSNICK");
 	}
@@ -1217,7 +1217,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		paramidx++;
 		ok = 1;
 	}
-	c = findchan (channame);
+	c = find_chan (channame);
 	if(c) {
 		/* update the TS time */
 		SetChanTS (c, atoi (tstime)); 
@@ -1316,7 +1316,7 @@ do_join (const char* nick, const char* chanlist, const char* keys)
 void 
 do_part (const char* nick, const char* chan, const char* reason)
 {
-	part_chan (finduser (nick), chan, reason);
+	part_chan (find_user (nick), chan, reason);
 }
 
 void 
@@ -1518,10 +1518,10 @@ do_burst (char *origin, char **argv, int argc)
 void 
 do_swhois (char *who, char *swhois)
 {
-	User* u;
-	u = finduser(who);
+	Client * u;
+	u = find_user(who);
 	if(u) {
-		strlcpy(u->swhois, swhois, MAXHOST);
+		strlcpy(u->user->swhois, swhois, MAXHOST);
 	}
 }
 
@@ -1540,9 +1540,9 @@ do_tkl(const char *add, const char *type, const char *user, const char *host, co
 void 
 do_eos (const char *name)
 {
-	Server *s;
+	Client *s;
 
-	s = findserver (name);
+	s = find_server (name);
 	if(s) {
 		SynchServer(s);
 		dlog(DEBUG1, "do_eos: server %s is now synched", name);
@@ -1576,9 +1576,9 @@ send_cmd (char *fmt, ...)
 void
 setserverbase64 (const char *name, const char* num)
 {
-	Server *s;
+	Client *s;
 
-	s = findserver(name);
+	s = find_server(name);
 	if(s) {
 		dlog(DEBUG1, "setserverbase64: setting %s to %s", name, num);
 		strlcpy(s->name64, num, 6);
@@ -1590,10 +1590,10 @@ setserverbase64 (const char *name, const char* num)
 char* 
 servertobase64 (const char* name)
 {
-	Server *s;
+	Client *s;
 
 	dlog(DEBUG1, "servertobase64: scanning for %s", name);
-	s = findserver(name);
+	s = find_server(name);
 	if(s) {
 		return s->name64;
 	} else {
@@ -1605,7 +1605,7 @@ servertobase64 (const char* name)
 char* 
 base64toserver (const char* num)
 {
-	Server *s;
+	Client *s;
 
 	dlog(DEBUG1, "base64toserver: scanning for %s", num);
 	s = findserverbase64(num);
@@ -1620,9 +1620,9 @@ base64toserver (const char* num)
 void
 setnickbase64 (const char *nick, const char* num)
 {
-	User *u;
+	Client *u;
 
-	u = finduser(nick);
+	u = find_user(nick);
 	if(u) {
 		dlog(DEBUG1, "setnickbase64: setting %s to %s", nick, num);
 		strlcpy(u->name64, num, B64SIZE);
@@ -1634,10 +1634,10 @@ setnickbase64 (const char *nick, const char* num)
 char* 
 nicktobase64 (const char* nick)
 {
-	User *u;
+	Client *u;
 
 	dlog(DEBUG1, "nicktobase64: scanning for %s", nick);
-	u = finduser(nick);
+	u = find_user(nick);
 	if(u) {
 		return u->name64;
 	} else {
@@ -1649,12 +1649,12 @@ nicktobase64 (const char* nick)
 char* 
 base64tonick (const char* num)
 {
-	User *u;
+	Client *u;
 
 	dlog(DEBUG1, "base64tonick: scanning for %s", num);
 	u = finduserbase64(num);
 	if(u) {
-		return u->nick;
+		return u->name;
 	} else {
 		dlog(DEBUG1, "base64tonick: cannot find %s", num);
 	}
@@ -1666,9 +1666,9 @@ RX: :irc.foo.com 351 stats.mark.net Unreal3.2. irc.foo.com :FinWXOoZ [*=2303]
 */
 static void m_numeric351 (char *origin, char **argv, int argc, int srv)
 {
-	Server* s;
+	Client *s;
 
-	s = findserver(origin);
+	s = find_server(origin);
 	if(s) {
 		strlcpy(s->version, argv[1], MAXHOST);
 	}
@@ -1681,9 +1681,9 @@ RX: :irc.foo.com 219 NeoStats u :End of /STATS report
 */
 static void m_numeric242 (char *origin, char **argv, int argc, int srv)
 {
-	Server* s;
+	Client *s;
 
-	s = findserver(origin);
+	s = find_server(origin);
 	if(s) {
 		/* Convert "Server Up 6 days, 23:52:55" to seconds*/
 		char *ptr;
@@ -1710,7 +1710,7 @@ static void m_numeric242 (char *origin, char **argv, int argc, int srv)
 		ptr = strtok(NULL, "");
 		secs += atoi(ptr);
 
-		s->uptime = secs;
+		s->server->uptime = secs;
 	}
 }
 

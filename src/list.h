@@ -114,7 +114,7 @@ EXPORTFUNC	void lnode_destroy (lnode_t *);
 	int lnode_pool_isempty (lnodepool_t *);
 	int lnode_pool_isfrom (lnodepool_t *, lnode_t *);
 
-	int comparef (const void *, const void *);
+EXPORTFUNC	int comparef (const void *, const void *);
 
 
 	list_t *list_init (list_t *, listcount_t);
@@ -171,7 +171,7 @@ EXPORTFUNC	lnode_t *list_delete (list_t *, lnode_t *);
 	void list_merge (list_t *, list_t *, int (const void *, const void *));
 EXPORTFUNC	void list_sort (list_t *, int (const void *, const void *));
 EXPORTFUNC	lnode_t *list_find (list_t *, const void *, int (const void *, const void *));
-	int list_is_sorted (list_t *, int (const void *, const void *));
+EXPORTFUNC	int list_is_sorted (list_t *, int (const void *, const void *));
 
 #ifdef __cplusplus
 }

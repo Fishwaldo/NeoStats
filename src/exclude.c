@@ -88,14 +88,14 @@ int InitExcludes(void)
  * @param pattern the actual pattern to use 
  * @returns nothing
  */
-void ns_do_exclude_add(User *u, char *type, char *pattern) {
+void ns_do_exclude_add(Client *u, char *type, char *pattern) {
 	lnode_t *en;
 	excludes *e;
 	char tmp[BUFSIZE];
 	
 	/* we dont do any checking to see if a similar entry already exists... oh well, thats upto the user */
 	e = smalloc(sizeof(excludes));
-	strlcpy(e->addedby, u->nick, MAXNICK);
+	strlcpy(e->addedby, u->name, MAXNICK);
 	e->addedon = me.now;
 	if (!ircstrcasecmp("HOST", type)) {
 		if (!index(pattern, '.')) {
@@ -130,7 +130,7 @@ void ns_do_exclude_add(User *u, char *type, char *pattern) {
 	en = lnode_create(e);
 	list_append(exclude_list, en);
 	irc_prefmsg(ns_botptr, u, "Successfully added %s (%s) to Exclusion List", e->pattern, type);
-	irc_chanalert(ns_botptr, "%s added %s (%s) to the Exclusion List", u->nick, e->pattern, type);
+	irc_chanalert(ns_botptr, "%s added %s (%s) to the Exclusion List", u->name, e->pattern, type);
 
 	/* now save the exclusion list */
 	ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
@@ -145,7 +145,7 @@ void ns_do_exclude_add(User *u, char *type, char *pattern) {
  * @param postition the position in the list that we are excluding
  * @returns nothing
  */
-void ns_do_exclude_del(User *u, char *position) {
+void ns_do_exclude_del(Client *u, char *position) {
 	lnode_t *en;
 	excludes *e;
 	int i, pos;
@@ -183,13 +183,13 @@ void ns_do_exclude_del(User *u, char *position) {
  * @param from the "user" that this message should come from, so we can call from modules
  * @returns nothing
  */
-void ns_do_exclude_list(User *u, char *from) {
+void ns_do_exclude_list(Client *u, char *from) {
 	lnode_t *en;
 	excludes *e;
 	int i = 0;
 	char tmp[BUFSIZE];
 	
-	irc_prefmsg(findbot(from), u, "Global Exclusion List:");
+	irc_prefmsg(find_bot(from), u, "Global Exclusion List:");
 	en = list_first(exclude_list);
 	i = 1;
 	while (en != NULL) {
@@ -209,11 +209,11 @@ void ns_do_exclude_list(User *u, char *from) {
 				break;
 		}
 				
-		irc_prefmsg(findbot(from), u, "%d) %s (%s) Added by %s on %s", i, e->pattern, tmp, e->addedby, sftime(e->addedon));
+		irc_prefmsg(find_bot(from), u, "%d) %s (%s) Added by %s on %s", i, e->pattern, tmp, e->addedby, sftime(e->addedon));
 		i++;
 		en = list_next(exclude_list, en);
 	}
-	irc_prefmsg(findbot(from), u, "End of Global Exclude List.");
+	irc_prefmsg(find_bot(from), u, "End of Global Exclude List.");
 } 
 
 /* @brief check if a user is matched against a exclusion
@@ -225,14 +225,14 @@ void ns_do_exclude_list(User *u, char *from) {
  * @returns nothing
  */
 
-void ns_do_exclude_user(User *u) {
+void ns_do_exclude_user(Client *u) {
 	lnode_t *en;
 	excludes *e;
 	
 	/* first thing we check is the server flag. if the server
 	 * is excluded, then the user is excluded as well
 	 */
-	 if (u->server->flags && NS_FLAGS_EXCLUDED) {
+	 if (u->user->server->flags && NS_FLAGS_EXCLUDED) {
 	 	u->flags |= NS_FLAGS_EXCLUDED;
 	 	return;
 	 }
@@ -241,7 +241,7 @@ void ns_do_exclude_user(User *u) {
 	while (en != NULL) {
 		e = lnode_get(en);
 		if (e->type == NS_EXCLUDE_HOST) {
-			if (match(e->pattern, u->hostname)) {
+			if (match(e->pattern, u->user->hostname)) {
 				u->flags |= NS_FLAGS_EXCLUDED;
 				return;
 			}
@@ -261,7 +261,7 @@ void ns_do_exclude_user(User *u) {
  * @returns nothing
  */
 
-void ns_do_exclude_server(Server *s) {
+void ns_do_exclude_server(Client *s) {
 	lnode_t *en;
 	excludes *e;
 	

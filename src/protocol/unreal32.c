@@ -162,13 +162,13 @@ cmode_init chan_modes[] = {
 };
 
 umode_init user_umodes[] = {
-	{'S', UMODE_SERVICES},
-	{'N', UMODE_NETADMIN},
-	{'a', UMODE_SADMIN},
-	{'A', UMODE_ADMIN},
-	{'C', UMODE_COADMIN},
-	{'o', UMODE_OPER},
-	{'O', UMODE_LOCOP},
+	{'S', UMODE_SERVICES,	OPERMODE},
+	{'N', UMODE_NETADMIN,	OPERMODE},
+	{'a', UMODE_SADMIN,		OPERMODE},
+	{'A', UMODE_ADMIN,		OPERMODE},
+	{'C', UMODE_COADMIN,	OPERMODE},
+	{'o', UMODE_OPER,		OPERMODE},
+	{'O', UMODE_LOCOP,		OPERMODE},
 	{'r', UMODE_REGNICK},
 	{'i', UMODE_INVISIBLE},
 	{'w', UMODE_WALLOP},
@@ -176,7 +176,7 @@ umode_init user_umodes[] = {
 	{'h', UMODE_HELPOP},
 	{'s', UMODE_SERVNOTICE},
 	{'q', UMODE_KIX},
-	{'B', UMODE_BOT},
+	{'B', UMODE_BOT,		BOTMODE},
 /* temp removal of deaf for SVSMODE Services Stamp */
 /* 	{'d', UMODE_DEAF},*/
 	{'R', UMODE_RGSTRONLY},

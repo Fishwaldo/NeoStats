@@ -25,7 +25,7 @@
 #define _AUTH_H_
 
 int InitAuth(void);
-int UserAuth(User *u);
-int ListAuth(User *u);
+int UserAuth(Client *u);
+int ListAuth(Client *u);
 
 #endif /* _AUTH_H_ */

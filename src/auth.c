@@ -26,8 +26,8 @@
 #include "dl.h"
 #include "services.h"
 
-typedef int (*userauthfunc) (User *u);
-typedef int (*listauthfunc) (User * u);
+typedef int (*userauthfunc) (Client *u);
+typedef int (*listauthfunc) (Client * u);
 
 typedef struct AuthModule {
 	Module* module_ptr;
@@ -40,7 +40,7 @@ extern void *load_auth_mods[NUM_MODULES];
 static AuthModule AuthModList[NUM_MODULES];
 static int AuthModuleCount = 0;
 
-int UserAuth(User * u)
+int UserAuth(Client * u)
 {
 	int newauthlvl = 0;
 	int authlvl = 0;
@@ -85,7 +85,7 @@ int InitAuth(void)
 	return NS_SUCCESS;
 }
 
-int ListAuth(User *u)
+int ListAuth(Client *u)
 {
 	int i;
 	

@@ -4,6 +4,11 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - New Client struct introduced which contains common elememts of Server and
+   User structs. Server and User specifics remain as substructs of Client. This
+   makes for simpler coding for the more common elements and allows us to 
+   add additional clients without major changes to the core and API with new
+   substructs in the Client struct. (M)
  - IRCD feature support is now self configuring based on whether a function 
    exists to handle a feature. This means less work for IRCd coders and allows
    a protocol module to "emulate" a feature locally that would normally require

@@ -38,10 +38,10 @@
 tconfig config;
 static hash_t *serverhash;
 
-static Server *
+static Client *
 new_server (const char *name)
 {
-	Server *s;
+	Client *s;
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
@@ -49,11 +49,13 @@ new_server (const char *name)
 		nlog (LOG_CRITICAL, "new_ban: server hash is full");
 		return NULL;
 	}
-	s = scalloc (sizeof (Server));
+	s = scalloc (sizeof (Client));
 	strlcpy (s->name, name, MAXHOST);
+	s->server = scalloc (sizeof (Server));
 	sn = hnode_create (s);
 	if (!sn) {
 		nlog (LOG_WARNING, "Server hash broken");
+		sfree (s->server);
 		sfree (s);
 		return NULL;
 	}
@@ -61,27 +63,27 @@ new_server (const char *name)
 	return s;
 }
 
-Server *
+Client *
 AddServer (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline)
 {
 	CmdParams * cmdparams;
-	Server *s;
+	Client *s;
 
 	dlog(DEBUG1, "AddServer: %s", name);
 	s = new_server (name);
 	if(hops) {
-		s->hops = atoi (hops);
+		s->server->hops = atoi (hops);
 	}
 	if (uplink) {
 		strlcpy (s->uplink, uplink, MAXHOST);
 	}
 	if (infoline) {
-		strlcpy (s->infoline, infoline, MAXINFO);
+		strlcpy (s->info, infoline, MAXINFO);
 	}
 	if (numeric) {
-		s->numeric =  atoi(numeric);
+		s->server->numeric =  atoi(numeric);
 	}
-	s->connected_since = me.now;
+	s->tsconnect = me.now;
 	if (!ircstrcasecmp(name, me.name)) {
 		s->flags |= NS_FLAGS_ME;
 	}
@@ -89,15 +91,15 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	ns_do_exclude_server(s);
 	/* run the module event for a new server. */
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
-	cmdparams->source.server = s;
+	cmdparams->source = s;
 	SendAllModuleEvent (EVENT_SERVER, cmdparams);
 	sfree (cmdparams);
 	return(s);
 }
 
-static void del_server_leaves(Server* hub)
+static void del_server_leaves(Client * hub)
 {
-	Server *s;
+	Client *s;
 	hscan_t ss;
 	hnode_t *sn;
 
@@ -116,7 +118,7 @@ void
 DelServer (const char *name, const char* reason)
 {
 	CmdParams * cmdparams;
-	Server *s;
+	Client *s;
 	hnode_t *sn;
 
 	dlog(DEBUG1, "DelServer: %s", name);
@@ -132,7 +134,7 @@ DelServer (const char *name, const char* reason)
 	}
 	/* run the event for delete server */
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
-	cmdparams->source.server = s;
+	cmdparams->source = s;
 	if(reason) {
 		cmdparams->param = (char*)reason;
 	}
@@ -140,13 +142,14 @@ DelServer (const char *name, const char* reason)
 	sfree (cmdparams);
 	hash_delete (serverhash, sn);
 	hnode_destroy (sn);
+	sfree (s->server);
 	sfree (s);
 }
 
-Server *
+Client *
 findserverbase64 (const char *num)
 {
-	Server *s;
+	Client *s;
 	hscan_t ss;
 	hnode_t *sn;
 
@@ -162,24 +165,24 @@ findserverbase64 (const char *num)
 	return NULL;
 }
 
-Server *
-findserver (const char *name)
+Client *
+find_server (const char *name)
 {
 	hnode_t *sn;
 
 	sn = hash_lookup (serverhash, name);
 	if (sn) {
-		return (Server *) hnode_get (sn);
+		return (Client *) hnode_get (sn);
 	}
-	dlog(DEBUG3, "findserver: %s not found!", name);
+	dlog(DEBUG3, "find_server: %s not found!", name);
 	return NULL;
 }
 
 static void 
-dumpserver (Server *s)
+dumpserver (Client *s)
 {
 	/* Calculate uptime as uptime from server plus uptime of NeoStats */
-	int uptime = s->uptime  + (me.now - me.t_start);
+	int uptime = s->server->uptime  + (me.now - me.t_start);
 
 	if(ircd_srv.protocol & PROTOCOL_B64SERVER) {
 		irc_chanalert (ns_botptr, "Server: %s (%s)", s->name, s->name64);
@@ -196,7 +199,7 @@ dumpserver (Server *s)
 void
 ServerDump (const char *name)
 {
-	Server *s;
+	Client *s;
 	hscan_t ss;
 	hnode_t *sn;
 
@@ -208,7 +211,7 @@ ServerDump (const char *name)
 			dumpserver (s);
 		}
 	} else {
-		s = findserver (name);
+		s = find_server (name);
 		if (s) {
 			dumpserver (s);
 		} else {
@@ -246,7 +249,7 @@ COLDEF neo_serverscols[] = {
 		"connected",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct Server, connected_since),
+		offsetof(struct Server, tsconnect),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -333,7 +336,7 @@ InitServers (void)
 void
 PingServers (void)
 {
-	Server *s;
+	Client *s;
 	hscan_t ss;
 	hnode_t *sn;
 
@@ -345,7 +348,7 @@ PingServers (void)
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
 		if (!strcmp (me.name, s->name)) {
-			s->ping = 0;
+			s->server->ping = 0;
 			continue;
 		}
 		irc_send_ping (me.name, me.name, s->name);
@@ -355,7 +358,7 @@ PingServers (void)
 void 
 FiniServers (void)
 {
-	Server *s;
+	Client *s;
 	hnode_t *sn;
 	hscan_t hs;
 
@@ -364,6 +367,7 @@ FiniServers (void)
 		s = hnode_get (sn);
 		hash_delete (serverhash, sn);
 		hnode_destroy (sn);
+		sfree (s->server);
 		sfree (s);
 	}
 	hash_destroy(serverhash);
@@ -373,7 +377,7 @@ void GetServerList(ServerListHandler handler)
 {
 	hnode_t *node;
 	hscan_t scan;
-	Server *ss;
+	Client *ss;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin(&scan, serverhash);
@@ -385,7 +389,7 @@ void GetServerList(ServerListHandler handler)
 
 void RequestServerUptimes (void)
 {
-	Server *s;
+	Client *s;
 	hscan_t ss;
 	hnode_t *sn;
 
@@ -393,7 +397,7 @@ void RequestServerUptimes (void)
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
 		if (strcmp (me.name, s->name)) {
-			send_cmd(":%s STATS u %s", ns_botptr->u->nick, s->name);
+			send_cmd(":%s STATS u %s", ns_botptr->u->name, s->name);
 		}
 	}
 }

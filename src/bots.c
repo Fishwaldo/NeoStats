@@ -166,14 +166,14 @@ list_bot_chans (CmdParams* cmdparams)
 	lnode_t *ln;
 	ChanBot *chanbot;
 
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "BotChanDump:");
+	irc_prefmsg (ns_botptr, cmdparams->source, "BotChanDump:");
 	hash_scan_begin (&hs, botchanhash);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
 		chanbot = hnode_get (hn);
-		irc_prefmsg (ns_botptr, cmdparams->source.user, "%s:--------------------------------", chanbot->chan);
+		irc_prefmsg (ns_botptr, cmdparams->source, "%s:--------------------------------", chanbot->chan);
 		ln = list_first (chanbot->bots);
 		while (ln) {
-			irc_prefmsg (ns_botptr, cmdparams->source.user, "Bot Name: %s", (char *)lnode_get (ln));
+			irc_prefmsg (ns_botptr, cmdparams->source, "Bot Name: %s", (char *)lnode_get (ln));
 			ln = list_next (chanbot->bots, ln);
 		}
 	}
@@ -187,7 +187,7 @@ list_bot_chans (CmdParams* cmdparams)
  * @return 
  */
 int
-flood (User * u)
+flood (Client * u)
 {
 	if (!u) {
 		nlog (LOG_WARNING, "flood: can't find user");
@@ -195,33 +195,33 @@ flood (User * u)
 	}
 	if (UserLevel (u) >= NS_ULEVEL_OPER)	/* locop or higher */
 		return 0;
-	if ((me.now - u->tslastmsg) > 10) {
-		u->tslastmsg = me.now;
-		u->flood = 0;
+	if ((me.now - u->user->tslastmsg) > 10) {
+		u->user->tslastmsg = me.now;
+		u->user->flood = 0;
 		return 0;
 	}
-	if (u->flood >= 5) {
-		nlog (LOG_NORMAL, "FLOODING: %s!%s@%s", u->nick, u->username, u->hostname);
-		irc_svskill (u, "%s!%s (Flooding Services.)", me.name, ns_botptr->nick);
+	if (u->user->flood >= 5) {
+		nlog (LOG_NORMAL, "FLOODING: %s!%s@%s", u->name, u->user->username, u->user->hostname);
+		irc_svskill (u, "%s!%s (Flooding Services.)", me.name, ns_botptr->name);
 		return 1;
 	}
-	u->flood++;
+	u->user->flood++;
 	return 0;
 }
 
 int process_origin(CmdParams * cmdparams, char* origin)
 {
-	cmdparams->source.user = finduser (origin);
-	if(cmdparams->source.user) {
-		if (flood (cmdparams->source.user)) {
+	cmdparams->source = find_user (origin);
+	if(cmdparams->source) {
+		if (flood (cmdparams->source)) {
 			return 0;
 		}
 		else {
 			return 1;
 		}
 	}
-	cmdparams->source.server = findserver (origin);
-	if(cmdparams->source.server) {
+	cmdparams->source = find_server (origin);
+	if(cmdparams->source) {
 		return 1;
 	}
 	return 0;
@@ -229,10 +229,10 @@ int process_origin(CmdParams * cmdparams, char* origin)
 
 int process_target_user(CmdParams * cmdparams, char* target)
 {
-	cmdparams->dest.user = finduser (target);
-	if(cmdparams->dest.user) {
-		cmdparams->dest.bot = findbot (target);
-		if(cmdparams->dest.bot) {
+	cmdparams->target = find_user (target);
+	if(cmdparams->target) {
+		cmdparams->bot = find_bot (target);
+		if(cmdparams->bot) {
 			return 1;
 		}
 	}
@@ -242,7 +242,7 @@ int process_target_user(CmdParams * cmdparams, char* target)
 
 int process_target_chan(CmdParams * cmdparams, char* target)
 {
-	cmdparams->channel = findchan(target);
+	cmdparams->channel = find_chan(target);
 	if(cmdparams->channel) {
 		return 1;
 	}
@@ -269,13 +269,13 @@ void bot_notice (char *origin, char **av, int ac)
 		/* Find target bot */
 		if (process_target_user(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
-			SendModuleEvent (EVENT_NOTICE, cmdparams, cmdparams->dest.bot->moduleptr);
+			SendModuleEvent (EVENT_NOTICE, cmdparams, cmdparams->bot->moduleptr);
 		}		
 		if (!strncasecmp(av[ac - 1], "\1version", 8)) {
 			/* skip "\1version " */
 			cmdparams->param += 9;
-			strlcpy(cmdparams->source.user->version, cmdparams->param, MAXHOST);
- 			SendModuleEvent (EVENT_CTCPVERSION, cmdparams, cmdparams->dest.bot->moduleptr);
+			strlcpy(cmdparams->source->version, cmdparams->param, MAXHOST);
+ 			SendModuleEvent (EVENT_CTCPVERSION, cmdparams, cmdparams->bot->moduleptr);
 		}
 	}
 	sfree (cmdparams);
@@ -299,7 +299,7 @@ void bot_chan_notice (char *origin, char **av, int ac)
 	if(process_origin(cmdparams, origin)) {
 		if(process_target_chan(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
-			SendModuleEvent (EVENT_CNOTICE, cmdparams, cmdparams->dest.bot->moduleptr);
+			SendModuleEvent (EVENT_CNOTICE, cmdparams, cmdparams->bot->moduleptr);
 			if (av[ac - 1][0] == '\1') {
 				/* TODO CTCP handler */
 			}
@@ -326,13 +326,13 @@ void bot_private (char *origin, char **av, int ac)
 		/* Find target bot */
 		if (process_target_user(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
-			if ((cmdparams->dest.bot->flags & BOT_FLAG_SERVICEBOT)) {
+			if ((cmdparams->bot->flags & BOT_FLAG_SERVICEBOT)) {
 				if(run_bot_cmd (cmdparams) != NS_FAILURE) {
 					sfree (cmdparams);
 					return;
 				}
 			}
-			SendModuleEvent (EVENT_PRIVATE, cmdparams, cmdparams->dest.bot->moduleptr);
+			SendModuleEvent (EVENT_PRIVATE, cmdparams, cmdparams->bot->moduleptr);
 			if (av[ac - 1][0] == '\1') {
 				/* TODO CTCP handler */
 			}
@@ -358,7 +358,7 @@ void bot_chan_private (char *origin, char **av, int ac)
 	if(process_origin(cmdparams, origin)) {
 		if(process_target_chan(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
-			SendModuleEvent (EVENT_CPRIVATE, cmdparams, cmdparams->dest.bot->moduleptr);
+			SendModuleEvent (EVENT_CPRIVATE, cmdparams, cmdparams->bot->moduleptr);
 			if (av[ac - 1][0] == '\1') {
 				/* TODO CTCP handler */
 			}
@@ -382,13 +382,13 @@ new_bot (const char *bot_name)
 	SET_SEGV_LOCATION();
 	dlog(DEBUG2, "new_bot: %s", bot_name);
 	botptr = scalloc (sizeof (Bot));
-	strlcpy (botptr->nick, bot_name, MAXNICK);
+	strlcpy (botptr->name, bot_name, MAXNICK);
 	bn = hnode_create (botptr);
 	if (hash_isfull (bothash)) {
 		nlog (LOG_CRITICAL, "new_bot: bot list is full");
 		return NULL;
 	}
-	hash_insert (bothash, bn, botptr->nick);
+	hash_insert (bothash, bn, botptr->name);
 	return botptr;
 }
 
@@ -422,7 +422,7 @@ add_ns_bot (Module* modptr, const char *nick)
  * @return
  */
 Bot *
-findbot (const char *bot_name)
+find_bot (const char *bot_name)
 {
 	hnode_t *bn;
 
@@ -452,8 +452,8 @@ del_ns_bot (const char *bot_name)
 		hash_delete (bothash, bn);
 		botptr = hnode_get (bn);
 		del_all_bot_cmds(botptr);
-		del_all_bot_settings(botptr);
 		del_bot_info_settings(botptr);
+		del_all_bot_settings(botptr);
 		hnode_destroy (bn);
 		sfree (botptr);
 		return NS_SUCCESS;
@@ -475,11 +475,11 @@ bot_nick_change (const char *oldnick, const char *newnick)
 
 	SET_SEGV_LOCATION();
 	/* First, try to find out if the newnick is unique! */
-	if (!finduser (oldnick)) {
+	if (!find_user (oldnick)) {
 		nlog (LOG_WARNING, "Unknown bot %s tried to change nick to %s", oldnick, newnick);
 		return NS_FAILURE;
 	}
-	if (finduser (newnick)) {
+	if (find_user (newnick)) {
 		nlog (LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", oldnick, newnick);
 		return NS_FAILURE;
 	}
@@ -492,9 +492,9 @@ bot_nick_change (const char *oldnick, const char *newnick)
 	/* remove old hash entry */
 	hash_delete (bothash, bn);
 	dlog(DEBUG3, "Bot %s changed nick to %s", oldnick, newnick);
-	strlcpy (botptr->nick, newnick, MAXNICK);
+	strlcpy (botptr->name, newnick, MAXNICK);
 	/* insert new hash entry */
-	hash_insert (bothash, bn, botptr->nick);
+	hash_insert (bothash, bn, botptr->name);
 	/* send bot nick change */   
 	irc_nickchange (oldnick, newnick);
 	return NS_SUCCESS;
@@ -514,19 +514,19 @@ list_bots (CmdParams* cmdparams)
 	hscan_t bs;
 
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "Module Bot List:");
+	irc_prefmsg (ns_botptr, cmdparams->source, "Module Bot List:");
 	hash_scan_begin (&bs, bothash);
 	while ((bn = hash_scan_next (&bs)) != NULL) {
 		botptr = hnode_get (bn);
 		if((botptr->flags & 0x80000000)) {
-			irc_prefmsg (ns_botptr, cmdparams->source.user, "NeoStats");
-			irc_prefmsg (ns_botptr, cmdparams->source.user, "Bots: %s", botptr->nick);
+			irc_prefmsg (ns_botptr, cmdparams->source, "NeoStats");
+			irc_prefmsg (ns_botptr, cmdparams->source, "Bots: %s", botptr->name);
 		} else {
-			irc_prefmsg (ns_botptr, cmdparams->source.user, "Module: %s", botptr->moduleptr->info->name);
-			irc_prefmsg (ns_botptr, cmdparams->source.user, "Module Bots: %s", botptr->nick);
+			irc_prefmsg (ns_botptr, cmdparams->source, "Module: %s", botptr->moduleptr->info->name);
+			irc_prefmsg (ns_botptr, cmdparams->source, "Module Bots: %s", botptr->name);
 		}
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source.user, "End of Module Bot List");
+	irc_prefmsg (ns_botptr, cmdparams->source, "End of Module Bot List");
 	return 0;
 }
 
@@ -546,7 +546,7 @@ int	del_bots (Module *mod_ptr)
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		botptr = hnode_get (modnode);
 		if (botptr->moduleptr == mod_ptr) {
-			dlog(DEBUG1, "Module %s had bot %s Registered. Deleting..", mod_ptr->info->name, botptr->nick);
+			dlog(DEBUG1, "Module %s had bot %s Registered. Deleting..", mod_ptr->info->name, botptr->name);
 			del_bot (botptr, "Module Unloaded");
 		}
 	}
@@ -560,7 +560,7 @@ int	del_bots (Module *mod_ptr)
 Bot *init_bot (BotInfo* botinfo)
 {
 	Bot * botptr; 
-	User *u;
+	Client *u;
 	long Umode = 0;
 	char* nick;
 	Module* modptr;
@@ -578,12 +578,12 @@ Bot *init_bot (BotInfo* botinfo)
 	}
 	modptr = GET_CUR_MODULE();
 	nick = botinfo->nick;
-	u = finduser (nick);
+	u = find_user (nick);
 	if (u) {
 		nlog (LOG_WARNING, "Bot nick %s already in use", botinfo->nick);
 		if(botinfo->altnick) {
 			nick = botinfo->altnick;
-			u = finduser (nick);
+			u = find_user (nick);
 			if(u) {
 				nlog (LOG_WARNING, "Bot alt nick %s already in use", botinfo->altnick);
 				/* TODO: try and find a free nick */
@@ -603,6 +603,9 @@ Bot *init_bot (BotInfo* botinfo)
 	}
 	host = ((*botinfo->host)==0?me.name:botinfo->host);
 	AddUser (nick, botinfo->user, host, botinfo->realname, me.name, NULL, NULL, NULL);
+	u = find_user (nick);
+	/* set our link back to user struct for bot */
+	botptr->u = u;
 	if(botinfo->flags&BOT_FLAG_SERVICEBOT) {
 		Umode = UmodeStringToMask(me.servicesumode, 0);
 		irc_nick (nick, botinfo->user, host, botinfo->realname, me.servicesumode);
@@ -614,9 +617,7 @@ Bot *init_bot (BotInfo* botinfo)
 			irc_join(botptr, me.serviceschan, me.servicescmode);
 		}
 	}
-	u = finduser (nick);
-	/* set our link back to user struct for bot */
-	botptr->u = u;
+
 	if (HaveUmodeDeaf()&&(botinfo->flags&BOT_FLAG_DEAF)) {
 		irc_usermode (botptr, nick, UMODE_DEAF);
 	}
@@ -642,18 +643,18 @@ Bot *init_bot (BotInfo* botinfo)
 int
 del_bot (Bot *botptr, const char *reason)
 {
-	User *u;
+	Client *u;
 
 	SET_SEGV_LOCATION();
-	u = finduser (botptr->nick);
+	u = find_user (botptr->name);
 	if (!u) {
-		nlog (LOG_WARNING, "Attempting to delete a bot with a nick that does not exist: %s", botptr->nick);
+		nlog (LOG_WARNING, "Attempting to delete a bot with a nick that does not exist: %s", botptr->name);
 		return NS_FAILURE;
 	}
-	dlog(DEBUG1, "Deleting bot %s for %s", botptr->nick, reason);
+	dlog(DEBUG1, "Deleting bot %s for %s", botptr->name, reason);
 	//XXXX TODO: need to free the channel list hash. We dont according to valgrind
 	irc_quit (botptr, reason);
-	del_ns_bot (botptr->nick);
+	del_ns_bot (botptr->name);
 	return NS_SUCCESS;
 }
 

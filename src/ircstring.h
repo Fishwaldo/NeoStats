@@ -28,8 +28,8 @@
 #include <stdio.h>
 
 /* [v]s[n]printf replacements */
-int ircvsprintf(char *buf, const char *fmt, va_list args);
-int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args);
+EXPORTFUNC int ircvsprintf(char *buf, const char *fmt, va_list args);
+EXPORTFUNC int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args);
 EXPORTFUNC int ircsprintf(char *buf, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC int ircsnprintf(char *buf, size_t size, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 

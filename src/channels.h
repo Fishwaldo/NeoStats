@@ -25,8 +25,8 @@
 #define _CHANS_H_
 
 void ChanDump (const char *chan);
-void part_chan (User * u, const char *chan, const char* reason);
-void PartAllChannels (User* u, const char* reason);
+void part_chan (Client * u, const char *chan, const char* reason);
+void PartAllChannels (Client * u, const char* reason);
 void join_chan (const char* nick, const char *chan);
 void ChanNickChange (Channel * c, const char *newnick, const char *oldnick);
 EXPORTFUNC int ChanMode (char *origin, char **av, int ac);

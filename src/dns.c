@@ -347,11 +347,11 @@ void dns_check_queue() {
 	}
 }
 
-void do_dns_stats_Z(User *u) {
-	irc_numeric (RPL_MEMSTATS, u->nick, "Active DNS queries: %d", (int) list_count(dnslist));
-	irc_numeric (RPL_MEMSTATS, u->nick, "Queued DNS Queries: %d", (int) list_count(dnsqueue));
-	irc_numeric (RPL_MEMSTATS, u->nick, "Max Queued Queries: %d", DNSStats.maxqueued);
-	irc_numeric (RPL_MEMSTATS, u->nick, "Total DNS Questions: %d", DNSStats.totalq);
-	irc_numeric (RPL_MEMSTATS, u->nick, "SuccessFull Lookups: %d", DNSStats.success);
-	irc_numeric (RPL_MEMSTATS, u->nick, "Un-Successfull Lookups: %d", DNSStats.failure);
+void do_dns_stats_Z(Client *u) {
+	irc_numeric (RPL_MEMSTATS, u->name, "Active DNS queries: %d", (int) list_count(dnslist));
+	irc_numeric (RPL_MEMSTATS, u->name, "Queued DNS Queries: %d", (int) list_count(dnsqueue));
+	irc_numeric (RPL_MEMSTATS, u->name, "Max Queued Queries: %d", DNSStats.maxqueued);
+	irc_numeric (RPL_MEMSTATS, u->name, "Total DNS Questions: %d", DNSStats.totalq);
+	irc_numeric (RPL_MEMSTATS, u->name, "SuccessFull Lookups: %d", DNSStats.success);
+	irc_numeric (RPL_MEMSTATS, u->name, "Un-Successfull Lookups: %d", DNSStats.failure);
 }

@@ -28,8 +28,8 @@ extern jmp_buf sigvbuf;
 
 int InitModules (void);
 int FiniModules (void);
-Module *load_module (const char *path, User * u);
-int unload_module (const char *module_name, User * u);
+Module *load_module (const char *path, Client * u);
+int unload_module (const char *module_name, Client * u);
 void unload_modules(void);
 int list_modules (CmdParams* cmdparams);
 void ModulesVersion (const char* nick, const char *remoteserver);

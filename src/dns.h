@@ -28,5 +28,5 @@ int InitDns (void);
 void do_dns (void);
 void FiniDns ();
 void  canx_dns(Module* modptr);
-void do_dns_stats_Z(User *);
+void do_dns_stats_Z(Client *);
 #endif /* _DNS_H_ */
