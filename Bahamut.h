@@ -20,13 +20,13 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Bahamut.h,v 1.1 2003/06/30 15:18:23 fishwaldo Exp $
+** $Id: Bahamut.h,v 1.2 2003/07/22 15:01:49 fishwaldo Exp $
 */
-#ifndef ULTIMATE_H
-#define ULTIMATE_H
+#ifndef BAHAMUT_H
+#define BAHAMUT_H
 
 /* we support tokens */
-#define HAVE_TOKEN_SUP
+#undef HAVE_TOKEN_SUP
 
 
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
@@ -320,26 +320,14 @@
 
 #define	UMODE_INVISIBLE  	0x0001 /* makes user invisible */
 #define	UMODE_OPER       	0x0002	/* Operator */
+/* UMODE_SERVICES is actually UMODE_OPER on Bahamut !*/
+#define UMODE_SERVICES UMODE_OPER
+
 #define	UMODE_WALLOP     	0x0004 /* send wallops to them */
 #define UMODE_FAILOP	 	0x0008 /* Shows some global messages */
 #define UMODE_HELPOP	 	0x0010 /* Help system operator */
 #define UMODE_REGNICK	 	0x0020 /* Nick set by services as registered */
-#define UMODE_SERVICESOPER	0x0040 /* Services Oper */
-#ifndef ULTIMATE3
-#define UMODE_ADMIN	 	0x0080 /* Admin */
-#define UMODE_NETADMIN  	0x10000 /* Network Admin */
-#define	UMODE_SUPER		0x20000 /* Oper Is Protected from Kick's and Kill's */
-#define UMODE_RBOT      	0x40000 /* Marks the client as a Registered Bot */
-#define UMODE_SBOT      	0x80000 /* Marks the client as a Server Bot */
-#define UMODE_NGLOBAL  		0x100000 /* See Network Globals */
-#define UMODE_NETINFO  		0x400000 /* Server link, Delink Notces etc. */
-#define UMODE_MAGICK   		0x800000 /* Allows Opers To See +s and +p Channels */
-#define UMODE_WATCHER		0x4000000 /* Recive Monitor Globals */
-#define UMODE_NETMON		0x8000000 /* Marks the client as an Network Monitor */
-#define UMODE_SERVADMIN		0x40000000 /* Marks the client as a Server Admin */
-#define UMODE_TECHADMIN		0x80000000 /* Marks the client as a Technical Admin */
-#define UMODE_DEAF		0x100000000 /* client is deaf on channels */
-#else
+#define UMODE_SERVADMIN		0x0040 /* server admin */
 #define UMODE_SPY		0x0080 /* Oper Spy */
 #define UMODE_DCC		0x10000 /* Oper DCC Notices */
 #define UMODE_GLOBOPS		0x20000 /* send/recv global notices */
@@ -350,15 +338,12 @@
 #define UMODE_GLOBCON		0x800000 /* Global Connect notices */
 #define UMODE_DEBUG		0x4000000 /* see debug notices */
 #define UMODE_DCCWARN		0x8000000 /* see DCC warnings */
-#endif
-
 #define	UMODE_SERVNOTICE 	0x0100 /* server notices such as kill */
 #define	UMODE_LOCOP      	0x0200 /* Local operator -- SRB */
 #define UMODE_KILLS	 	0x0400 /* Show server-kills... */
 #define UMODE_CLIENT	 	0x0800 /* Show client information */
 #define UMODE_FLOOD	 	0x1000 /* Receive flood warnings */
 #define UMODE_CHATOP	 	0x2000 /* can receive chatops */
-#define UMODE_SERVICES   	0x4000 /* services */
 #define UMODE_HIDE	 	0x8000 /* Hide from Nukes */
 #define UMODE_WHOIS    		0x200000 /* Lets Opers see when people do a /WhoIs on them */
 #define UMODE_IRCADMIN 		0x1000000 /* Marks the client as an IRC Administrator */
@@ -366,18 +351,8 @@
 
 
 
-#define SMODE_SSL		0x1 /* ssl client */
-#define SMODE_COADMIN		0x2 /* co admin on a server */
-#define SMODE_SERVADMIN		0x4 /* server admin */
-#define SMODE_COTECH		0x8 /* co-tech admin */
-#define SMODE_TECHADMIN		0x10 /* tech administrator */
-#define SMODE_CONET		0x20 /* Co-Network Admin */
-#define SMODE_NETADMIN		0x40 /* Network Admin */
-#define SMODE_GUEST		0x80 /* Guest Admin */
-
 
 #define MODE_CHANOP	0x0001
-#define MODE_HALFOP	0x0002
 #define	MODE_VOICE	0x0004
 #define	MODE_PRIVATE	0x0008
 #define	MODE_SECRET	0x0010
@@ -386,23 +361,16 @@
 #define	MODE_INVITEONLY 0x0080
 #define	MODE_NOPRIVMSGS 0x0100
 #define	MODE_KEY	0x0200
-#define MODE_EXCEPT	0x0400
 #define	MODE_BAN	0x0800
-#define	MODE_LIMIT	0x1000
+#define MODE_LIMIT	0x1000
 #define MODE_RGSTR	0x2000
 #define MODE_RGSTRONLY  0x4000
 #define MODE_OPERONLY   0x8000
-#define MODE_ADMONLY   	0x10000
 #define MODE_LINK	0x20000
 #define MODE_NOCOLOR	0x40000
-#define MODE_STRIP	0x80000
-#define MODE_NOKNOCK	0x100000
-#define MODE_NOINVITE  	0x200000
-#define MODE_FLOODLIMIT 0x400000
-#define MODE_CHANADMIN  0x800000
 
 
-#define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
+#define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_OPERONLY)))
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
 
 
@@ -450,17 +418,9 @@ extern int ssquit_cmd(const char *);
 extern int sprotocol_cmd(const char *);
 extern int squit_cmd(const char *, const char *);
 extern int spart_cmd(const char *, const char *);
-#ifdef ULTIMATE3
 extern int sjoin_cmd(const char *, const char *, unsigned long flag);
-#else
-extern int sjoin_cmd(const char *, const char *);
-#endif
 extern int schmode_cmd(const char *, const char *, const char *, const char *);
-#ifndef ULTIMATE3
-extern int snewnick_cmd(const char *, const char *, const char *, const char *);
-#else
-extern int snewnick_cmd(const char *, const char *, const char *, const char *, long mode);
-#endif
+extern int snewnick_cmd(const char *, const char *, const char *, const char *, long);
 extern int sping_cmd(const char *from, const char *reply, const char *to);
 extern int sumode_cmd(const char *who, const char *target, long mode);
 extern int snumeric_cmd(const int numeric, const char *target, const char *data,...);
