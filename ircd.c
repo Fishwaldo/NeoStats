@@ -744,7 +744,7 @@ void Usr_Stats(EvntMsg *EM) {
 		tmp2 = time(NULL) - me.t_start;
 		snumeric_cmd(211, EM->u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
 		snumeric_cmd(241, EM->u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
-	} else if (!strcasecmp(EM->av[0], "z")) {
+	} else if (!strcasecmp(EM->av[0], "m")) {
 		for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
 			if (cmd_list[I].exec > 0) {
 			snumeric_cmd(212, EM->u->nick, "%s - %d", cmd_list[I].name, cmd_list[I].exec);
