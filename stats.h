@@ -242,8 +242,8 @@
 #define NS_FAILURE			-1
 
 /* these defines are for the flags for users, channels and servers */
-#define NS_FLAGS_EXCLUDED	00000000x1 /* this entry matched a exclusion */
-#define NS_FLAGS_ME			00000000x2 /* indicates the server/user is a NeoStats one */
+#define NS_FLAGS_EXCLUDED	0x00000001 /* this entry matched a exclusion */
+#define NS_FLAGS_ME			0x00000002 /* indicates the server/user is a NeoStats one */
 
 
 /* Specific errors beyond SUCCESS/FAILURE so that functions can handle errors 
