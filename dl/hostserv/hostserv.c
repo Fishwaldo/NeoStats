@@ -343,7 +343,7 @@ static int hs_set(User * u, char **av, int ac)
 			hs_cfg.regnick = 0;
 			SetConf((void *)0, CFGINT, "UnetVhosts");
 			prefmsg(u->nick, s_HostServ, "Undernet Style Hidden Hosts disabled for Registered Users");
-			chanalert(s_HostServ, "%s disabled Undernet Style Hidden Hosts");
+			chanalert(s_HostServ, "%s disabled Undernet Style Hidden Hosts", u->nick);
 			return 1;
 		} else {
 			hs_cfg.regnick = 1;
@@ -446,6 +446,8 @@ void __ModFini()
 };
 int hs_mode(char **av, int ac) {
 #if UMODE_REGNICK
+	int add = 0;
+	char *modes;
 	User *u;
 	char vhost[MAXHOST];
 	/* bail out if its not enabled */
@@ -456,25 +458,40 @@ int hs_mode(char **av, int ac) {
 	if (!is_synced || !load_synch)
 		return 0;
 		
+	u = finduser(av[0]);
+	if (!u) /* User not found */
+		return 1;
+	if (is_oper(u)) 
+		/* don't set a opers vhost. Most likely already done */
+		return 1;
 	/* first, find if its a regnick mode */
-	if (index(av[1], 'r')) {
-		u = finduser(av[0]);
-		if (!u) /* User not found */
-			return 1;
-		if (is_oper(u)) 
-			/* don't set a opers vhost. Most likely already done */
-			return 1;
-			
-		if (u->moddata[hs_cfg.modnum] != NULL) {
-			nlog(LOG_DEBUG2, LOG_MOD, "not setting hidden host on %s", av[0]);
-			return -1;
+	modes = av[1];
+	while (*modes) {
+		switch (*modes) {
+		case '+':
+			add = 1;
+			break;
+		case '-':
+			add = 0;
+			break;
+		case 'r':
+			if (add) {
+				if (u->moddata[hs_cfg.modnum] != NULL) {
+					nlog(LOG_DEBUG2, LOG_MOD, "not setting hidden host on %s", av[0]);
+					return -1;
+				}
+				nlog(LOG_DEBUG2, LOG_MOD, "Regnick Mode on %s", av[0]);
+				ircsnprintf(vhost, MAXHOST, "%s.%s", av[0], hs_cfg.vhostdom);
+				ssvshost_cmd(av[0], vhost);
+				prefmsg(av[0], s_HostServ,
+					"Automatically setting your Hidden Host to %s", vhost);
+				set_moddata(u);
+			}
+			break;
+		default:
+			break;
 		}
-		nlog(LOG_DEBUG2, LOG_MOD, "Regnick Mode on %s", av[0]);
-		ircsnprintf(vhost, MAXHOST, "%s.%s", av[0], hs_cfg.vhostdom);
-		ssvshost_cmd(av[0], vhost);
-		prefmsg(av[0], s_HostServ,
-			"Automatically setting your Hidden Host to %s", vhost);
-		set_moddata(u);
+		modes++;
 	}
 #endif
 	return 1;
@@ -837,13 +854,13 @@ static int hs_list(User * u, char **av, int ac)
 	}
 
 	if (start >= list_count(vhosts)) {
-		prefmsg(u->nick, s_HostServ,  "Value out of Range. There are only %d entries", list_count(vhosts));
+		prefmsg(u->nick, s_HostServ,  "Value out of Range. There are only %d entries", (int)list_count(vhosts));
 		return 1;
 	}
 		
 	i = 1;
 	prefmsg(u->nick, s_HostServ, "Current HostServ VHOST list: ");
-	prefmsg(u->nick, s_HostServ, "Showing %d to %d entries of %d total Vhosts", start+1, start+20, list_count(vhosts));
+	prefmsg(u->nick, s_HostServ, "Showing %d to %d entries of %d total Vhosts", start+1, start+20, (int)list_count(vhosts));
 	prefmsg(u->nick, s_HostServ, "%-5s %-12s %-30s", "Num", "Nick",
 		"Vhost");
 	hn = list_first(vhosts);

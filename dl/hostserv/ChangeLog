@@ -5,6 +5,8 @@ Shmad <shmad@neostats.net>
 
 * Version 3.2 * Mark (M) * November 27, 2003
  - Use core bot message handler to process commands (M)
+ - Fix for hidden host bug id 92 (M)
+ - Fix for disable message not passing enough parameters (M)
 
 * Version 3.1 * Fish (F) & Mark (M) * Oct 17th, 2003
  - Fixed incorrect buffer size for password field (M)
