@@ -442,6 +442,7 @@ static void ns_uptime(User *u)
 	prefmsg(u->nick, s_Services, "Recieved %ld Messages, Totaling %ld Bytes", me.RcveM, me.RcveBytes);
 	prefmsg(u->nick, s_Services, "Reconnect Time: %d", me.r_time);
 	prefmsg(u->nick, s_Services, "Statistic Requests: %d", me.requests);
+	prefmsg(u->nick, s_Services, "Max Sockets: %d (in use: %d)", me.maxsocks, me.cursocks);
 	prefmsg(u->nick, s_Services, "Use SMO for Debug?: %s", (me.usesmo) ? "Enabled" : "Disabled"); 
 	if (me.coder_debug)
 		prefmsg(u->nick, s_Services, "Debugging Mode is \2ON!\2");

@@ -13,7 +13,7 @@
  * without express or implied warranty.
  */
 
-static const char rcsid[] = "$Id: ares_process.c,v 1.1 2002/07/18 06:44:19 fishwaldo Exp $";
+static const char rcsid[] = "$Id: ares_process.c,v 1.2 2002/07/30 04:26:28 fishwaldo Exp $";
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -30,7 +30,7 @@ static const char rcsid[] = "$Id: ares_process.c,v 1.1 2002/07/18 06:44:19 fishw
 #include "ares_dns.h"
 #include "ares_private.h"
 
-static void write_tcp_data(ares_channel channel, fd_set *write_fds,
+void write_tcp_data(ares_channel channel, int sock,
 			   time_t now);
 static void read_tcp_data(ares_channel channel, fd_set *read_fds, time_t now);
 static void read_udp_packets(ares_channel channel, fd_set *read_fds,
@@ -55,7 +55,7 @@ void ares_process(ares_channel channel, fd_set *read_fds, fd_set *write_fds)
   time_t now;
 
   time(&now);
-  write_tcp_data(channel, write_fds, now);
+//  ares_write_tcp_data(channel, write_fds, now);
   read_tcp_data(channel, read_fds, now);
   read_udp_packets(channel, read_fds, now);
   process_timeouts(channel, now);
@@ -64,7 +64,7 @@ void ares_process(ares_channel channel, fd_set *read_fds, fd_set *write_fds)
 /* If any TCP sockets select true for writing, write out queued data
  * we have for them.
  */
-static void write_tcp_data(ares_channel channel, fd_set *write_fds, time_t now)
+void ares_write_tcp_data(ares_channel channel, int sock, time_t now)
 {
   struct server_state *server;
   struct send_request *sendreq;
@@ -76,7 +76,7 @@ static void write_tcp_data(ares_channel channel, fd_set *write_fds, time_t now)
       /* Make sure server has data to send and is selected in write_fds. */
       server = &channel->servers[i];
       if (!server->qhead || server->tcp_socket == -1
-	  || !FD_ISSET(server->tcp_socket, write_fds))
+	  || (server->tcp_socket != sock))
 	continue;
 
       /* Count the number of send queue items. */

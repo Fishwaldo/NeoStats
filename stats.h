@@ -29,6 +29,7 @@
 #include <sys/resource.h>
 #include <setjmp.h>
 #include <assert.h>
+#include <adns.h>
 #include "list.h"
 #include "hash.h"
 #include "config.h"
@@ -59,7 +60,6 @@
 #define MAXNICK			32
 #define MAXUSER			10
 #define NUM_MODULES		255
-#define MAX_SOCKS		10
 #define S_TABLE_SIZE	97
 #define U_TABLE_SIZE	1999
 #define D_TABLE_SIZE	1999
@@ -90,6 +90,12 @@ hash_t *uh;
 hash_t *ch;
 
 
+/* this is the dns structure */
+adns_state ads;
+
+
+
+
 typedef struct server_ Server;
 typedef struct user_ User;
 typedef struct myuser_ MyUser;
@@ -110,6 +116,8 @@ struct me {
         char infoline[MAXHOST];
         char netname[MAXPASS];
 	time_t t_start;
+	unsigned int maxsocks;
+	unsigned int cursocks;
 	unsigned int enable_spam : 1;
 	unsigned int want_privmsg : 1;
 	unsigned int send_extreme_lag_notices : 1;
@@ -207,7 +215,7 @@ extern void log(char *, ...);
 extern void ResetLogs();
 extern char *sctime(time_t);
 extern char *sftime(time_t);
-
+extern int getmaxsock();
 
 
 /* conf.c */

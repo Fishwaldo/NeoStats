@@ -11,6 +11,7 @@
  
 #include "stats.h"
 #include "Unreal.h"
+#include "dl.h"
 void sts(char *fmt,...);
 
 
@@ -150,7 +151,7 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 
 int snewnick_cmd(const char *nick, const char *ident, const char *host, const char *realname) {
 	sts("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), ident, host, me.name, realname);
-	AddUser(nick,ident, host, me.name);
+	AddUser(nick,ident, host, me.name, 0);
 	return 1;
 }  
 

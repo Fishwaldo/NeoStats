@@ -29,7 +29,7 @@ void __init_mod_list() {
 	bh = hash_create(B_TABLE_SIZE, 0, 0);
 	th = hash_create(T_TABLE_SIZE, 0, 0);
 	bch = hash_create(C_TABLE_SIZE, 0, 0);
-	sockh = hash_create(MAX_SOCKS, 0, 0);
+	sockh = hash_create(me.maxsocks, 0, 0);
 }
 
 static Mod_Timer *new_timer(char *timer_name)
@@ -149,21 +149,37 @@ Sock_List *findsock(char *sock_name) {
 	return NULL;
 }
 
-int add_socket(char *func_name, char *sock_name, int socknum, char *mod_name) {
+int add_socket(char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name) {
 	Sock_List *Sockets_mod_list;
 
 	strcpy(segv_location, "add_Socket");
 
-	if (dlsym((int *)get_dl_handle(mod_name), func_name) == NULL) {
-		log("oh oh, the socket function doesn't exist");
-		return -1;
+	if (readfunc) {
+		if (dlsym((int *)get_dl_handle(mod_name), readfunc) == NULL) {
+			log("oh oh, the socket function doesn't exist");
+			return -1;
+		}
 	}
+	if (writefunc) {
+		if (dlsym((int *)get_dl_handle(mod_name), writefunc) == NULL) {
+			log("oh oh, the socket function doesn't exist");
+			return -1;
+		}
+	}
+	if (errfunc) {
+		if (dlsym((int *)get_dl_handle(mod_name), errfunc) == NULL) {
+			log("oh oh, the socket function doesn't exist");
+			return -1;
+		}
+	}	
 	Sockets_mod_list = new_sock(sock_name);
 	Sockets_mod_list->sock_no = socknum;
 	Sockets_mod_list->modname = sstrdup(mod_name);
-	Sockets_mod_list->function = dlsym((int *)get_dl_handle(mod_name), func_name);
+	Sockets_mod_list->readfnc = dlsym((int *)get_dl_handle(mod_name), readfunc);
+	Sockets_mod_list->writefnc = dlsym((int *)get_dl_handle(mod_name), writefunc);
+	Sockets_mod_list->errfnc = dlsym((int *)get_dl_handle(mod_name), errfunc);
 #ifdef DEBUG
-			log("Registered Module %s with Socket for Function %s", mod_name, func_name);
+			log("Registered Module %s with Socket functions", mod_name);
 #endif
 	return 1;
 }

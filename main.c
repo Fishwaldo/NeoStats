@@ -36,6 +36,8 @@ int forked = 0;
 int main()
 {
 	FILE *fp;
+	int adnsstart;
+
 	strcpy(segv_location, "main");
 	strcpy(segvinmodule, "");
 	me.onchan = 0;
@@ -59,6 +61,7 @@ int main()
 	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
 	me.synced = 0;
 	me.onchan = 0;
+	me.maxsocks = getmaxsock();
 	strcpy(me.modpath,"dl");
 #ifdef RECVLOG
 	remove("logs/recv.log");
@@ -67,6 +70,11 @@ int main()
 	setup_signals();
 	ConfLoad();
 	TimerReset();
+	adnsstart = adns_init(&ads, adns_if_noerrprint|adns_if_noautosys, 0);
+	if (adnsstart) {
+		printf("ADNS init failed: %s\n", strerror(adnsstart));
+		exit(-1);
+	}	
 	init_server_hash();
 	init_user_hash();
 	init_chan_hash();
@@ -92,7 +100,9 @@ int main()
 
 		return 0;
 	}
-
+#ifndef DEBUG
+	fcloseall();
+#endif
 	log("Statistics Started (%s).", version);
 	start();
 
@@ -198,9 +208,6 @@ void start()
 	hnode_t *mn;
 	
 	strcpy(segv_location, "start");
-/* 
-	init_tld();
-*/
 
 	
 	log("Connecting to %s:%d", me.uplink, me.port);

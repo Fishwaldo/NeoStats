@@ -11,6 +11,7 @@
  
 #include "stats.h"
 #include "Ultimate.h"
+#include "dl.h"
 void sts(char *fmt,...);
 
 aCtab cFlagTab[] = {

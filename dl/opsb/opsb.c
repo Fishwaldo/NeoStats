@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: opsb.c,v 1.1 2002/07/18 06:44:18 fishwaldo Exp $
+** $Id: opsb.c,v 1.2 2002/07/30 04:26:28 fishwaldo Exp $
 */
 
 
@@ -120,7 +120,7 @@ void checkares() {
 
 	FD_ZERO(&read_fds);
 	FD_ZERO(&write_fds);
-	nfsd = ares_fds(opsb.channel, &read_fds, &write_fds);
+//	nfsd = ares_fds(opsb.channel, &read_fds, &write_fds);
 	if (nfsd == 0)
 		/* nothing to check! */
 		return;

@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.21 2002/07/27 04:38:35 shmad Exp $
+# $Id: Makefile.in,v 1.22 2002/07/30 04:26:28 fishwaldo Exp $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
@@ -18,22 +18,26 @@ DATA = data/tlds.nfo
 INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h Unreal.h
 
 .c.o:
-	$(CC) $(CFLAGS) -c $< 2>> make.log
+	$(CC) $(NEOINCLUDES) $(CFLAGS) -c $< 2>> make.log
 
 
-all: 	neostats modules
+all: 	libadns.a neostats modules
 
 modules:
 	(cd dl; $(MAKE) $@)
 
+libadns.a:
+	(cd adns; $(MAKE) $@)
+
 
 clean:
 	(cd dl; $(MAKE) $@)
-	/bin/rm -rf *.o neostats *.cache Makefile config.status config.h Makefile.inc *.log
+	(cd adns; $(MAKE) $@)
+	/bin/rm -rf *.o neostats *.cache Makefile config.status config.h  Makefile.inc *.log *.a
 
 
 neostats: $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS)  -o $@
+	$(CC) $(LDFLAGS) $(OBJS) adns/libadns.a -o $@
 
 install: neostats modules
 	$(INSTALL) -m 755 -d @prefix@

@@ -5,13 +5,13 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.19 2002/06/21 07:06:13 fishwaldo Exp $
+** $Id: sock.c,v 1.20 2002/07/30 04:26:28 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "dl.h"
+#include <adns.h>
 
-fd_set readfds, nullfds;
 
 #ifdef RECVLOG
 void recvlog(char *line);
@@ -49,7 +49,8 @@ int ConnectTo(char *host, int port)
 void read_loop()
 {
 	register int i, j, SelectResult;
-	struct timeval TimeOut;
+	struct timeval *TimeOut, tvbuf;
+	fd_set readfds, writefds, errfds;
 	char c;
 	char buf[BUFSIZE];
 	Sock_List *mod_sock;
@@ -65,16 +66,26 @@ void read_loop()
 		chk();
 		strcpy(segv_location, "Read_Loop2");
 		FD_ZERO(&readfds);
-		TimeOut.tv_sec = 1;
-		TimeOut.tv_usec = 0;
+		FD_ZERO(&writefds);
+		FD_ZERO(&errfds);
+		//TimeOut->tv_sec = 1;
+		//TimeOut->tv_usec = 0;
+		TimeOut = 0;
 		FD_SET(servsock, &readfds);
 		hash_scan_begin(&ss, sockh);
+		me.cursocks = 1; /* always one socket for ircd */
 		while ((sn = hash_scan_next(&ss)) != NULL) {
 			mod_sock = hnode_get(sn);
-			FD_SET(mod_sock->sock_no, &readfds);
+			if (mod_sock->readfnc) FD_SET(mod_sock->sock_no, &readfds);
+			if (mod_sock->writefnc) FD_SET(mod_sock->sock_no, &writefds);
+			if (mod_sock->errfnc) FD_SET(mod_sock->sock_no, &errfds);
+			me.cursocks++;
 		}
-		SelectResult = select(FD_SETSIZE, &readfds, &nullfds, &nullfds, &TimeOut);
+		/* adns stuff... whats its interested in */
+		adns_beforeselect(ads, &me.maxsocks, &readfds, &writefds, &errfds, &TimeOut, &tvbuf, 0);
+		SelectResult = select(FD_SETSIZE, &readfds, &writefds, &errfds, TimeOut);
 		if (SelectResult > 0) {
+			adns_afterselect(ads, me.maxsocks, &readfds, &writefds, &errfds, 0);
 			for (j = 0; j < BUFSIZE; j++) {
 				if (FD_ISSET(servsock, &readfds)) {
 					i = read(servsock, &c, 1);
@@ -100,7 +111,22 @@ void read_loop()
 					while ((sn = hash_scan_next(&ss)) != NULL) {
 						mod_sock = hnode_get(sn);
 						if (FD_ISSET(mod_sock->sock_no, &readfds)) {
-							mod_sock->function();
+#ifdef DEBUG
+							log("Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
+#endif
+							mod_sock->readfnc(mod_sock->sock_no);
+						}
+						if (FD_ISSET(mod_sock->sock_no, &writefds)) {
+#ifdef DEBUG
+							log("Running module %s writesock function for %s", mod_sock->modname, mod_sock->sockname);
+#endif
+							mod_sock->writefnc(mod_sock->sock_no);
+						}
+						if (FD_ISSET(mod_sock->sock_no, &errfds)) {
+#ifdef DEBUG
+							log("Running module %s errorsock function for %s", mod_sock->modname, mod_sock->sockname);
+#endif
+							mod_sock->errfnc(mod_sock->sock_no);
 						}
 					}
 					break;
@@ -128,6 +154,17 @@ void read_loop()
 	}
  log("hu, how did we get here");
 }
+
+extern int getmaxsock() {
+	struct rlimit *lim;
+	int ret;
+	lim = malloc(sizeof(struct rlimit));
+        getrlimit(RLIMIT_NOFILE, lim);
+        ret = lim->rlim_max;
+        free(lim);
+	return ret;
+}
+
 #ifdef RECVLOG
 void recvlog(char *line)
 {
