@@ -564,9 +564,9 @@ do_select(char *buf, int *nbuf)
         if (cmd.itbl > RTA_COLUMNS)
           pd = (int)cmd.ptbl->address + (rx * sr) + cmd.pwhr[wx]->offset;
         else if (cmd.itbl == RTA_TABLES)
-          pd = Tbl[rx] + cmd.pwhr[wx]->offset;
+          pd = (int)Tbl[rx] + cmd.pwhr[wx]->offset;
         else
-          pd = Col[rx] + cmd.pwhr[wx]->offset;
+          pd = (int)Col[rx] + cmd.pwhr[wx]->offset;
       }
       /* do comparison based on column data type */
       switch (cmd.pwhr[wx]->type)
@@ -689,9 +689,9 @@ do_select(char *buf, int *nbuf)
           if (cmd.itbl > RTA_COLUMNS)
             pd = (int)cmd.ptbl->address + (rx * sr) + cmd.pcol[cx]->offset;
           else if (cmd.itbl == RTA_TABLES)
-            pd = Tbl[rx] + cmd.pcol[cx]->offset;
+            pd = (int)Tbl[rx] + cmd.pcol[cx]->offset;
           else
-            pd = Col[rx] + cmd.pcol[cx]->offset;
+            pd = (int)Col[rx] + cmd.pcol[cx]->offset;
         }
         switch ((cmd.pcol[cx])->type)
         {
@@ -935,9 +935,9 @@ sqldo_update(char *buf, int *nbuf)
       if (cmd.itbl > RTA_COLUMNS)
         pd = (int)cmd.ptbl->address + (rx * sr) + cmd.pwhr[wx]->offset;
       else if (cmd.itbl == RTA_TABLES)
-        pd = Tbl[rx] + cmd.pwhr[wx]->offset;
+        pd = (int)Tbl[rx] + cmd.pwhr[wx]->offset;
       else
-        pd = Col[rx] + cmd.pwhr[wx]->offset;
+        pd = (int)Col[rx] + cmd.pwhr[wx]->offset;
 
       /* do comparison based on column data type */
       switch (cmd.pwhr[wx]->type)
@@ -1009,9 +1009,9 @@ sqldo_update(char *buf, int *nbuf)
         if (cmd.itbl > RTA_COLUMNS)
           pd = (int)cmd.ptbl->address + (rx * sr) + cmd.pcol[cx]->offset;
         else if (cmd.itbl == RTA_TABLES)
-          pd = Tbl[rx] + cmd.pcol[cx]->offset;
+          pd = (int)Tbl[rx] + cmd.pcol[cx]->offset;
         else
-          pd = Col[rx] + cmd.pcol[cx]->offset;
+          pd = (int)Col[rx] + cmd.pcol[cx]->offset;
         switch ((cmd.pcol[cx])->type)
         {
           case RTA_STR:
