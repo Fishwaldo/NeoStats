@@ -132,7 +132,7 @@ servicesbot (char *nick, char **av, int ac)
 	} else if (!strcasecmp (av[1], "LOAD")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to LOAD, but is not at least a NetAdmin", nick);
+			chanalert (s_Services, "%s tried to LOAD, but is not authorised", nick);
 			return;
 		}
 		if (ac <= 2) {
@@ -418,7 +418,7 @@ ns_user_dump (User * u, char *nick)
 {
 	SET_SEGV_LOCATION();
 	if (!(UserLevel (u) >= 180)) {
-		prefmsg (u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
+		prefmsg (u->nick, s_Services, "Permission Denied, you do not have sufficient access rights for this command!");
 		return;
 	}
 	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump!", u->nick);
@@ -429,7 +429,7 @@ ns_server_dump (User * u)
 {
 	SET_SEGV_LOCATION();
 	if (!(UserLevel (u) >= 180)) {
-		prefmsg (u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
+		prefmsg (u->nick, s_Services, "Permission Denied, you do not have sufficient access rights for this command!");
 		return;
 	}
 	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump!", u->nick);
@@ -440,8 +440,7 @@ ns_chan_dump (User * u, char *chan)
 {
 	SET_SEGV_LOCATION();
 	if (!(UserLevel (u) >= 180)) {
-
-		prefmsg (u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
+		prefmsg (u->nick, s_Services, "Permission Denied, you do not have sufficient access rights for this command!");
 		return;
 	}
 	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ChannelDump!", u->nick);
