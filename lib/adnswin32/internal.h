@@ -42,25 +42,43 @@
 
 typedef unsigned char byte;
 
+#include <stddef.h>
+#include <stdio.h>
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#include <errno.h>
+#include <stdlib.h>
+#ifndef WIN32
+#include <unistd.h>
+#endif
+
 #include <stdarg.h>
 #include <assert.h>
-
-#ifndef WIN32
-# include <unistd.h>
-#endif
 #include <signal.h>
-#include <errno.h>
 #include <string.h>
-
 #ifndef WIN32
-#  include <sys/time.h>
+#include <poll.h>
+#include <sys/time.h>
+#endif
+#ifdef HAVE_TIME_H
+#include <time.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif                                                                                                            
+#ifdef HAVE_NETDB_H
+#include <netdb.h>
 #endif
 
 #include "adns.h"
 #include "dlist.h"
 
 #ifdef ADNS_REGRESS_TEST
-# include "hredirect.h"
+#include "hredirect.h"
 #endif
 
 /* GNU C attributes. */

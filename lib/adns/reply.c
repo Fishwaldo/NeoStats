@@ -29,8 +29,6 @@
  * - main handling and parsing routine for received datagrams
  */
 
-#include <stdlib.h>
-
 #include "internal.h"
 
 void adns__procdgram(adns_state ads, const byte * dgram, int dglen,

@@ -34,14 +34,13 @@
 #define ADNS_H_INCLUDED
 
 #ifdef WIN32
-# include "adns_win32.h"
+#include "adns_win32.h"
 #else
-# include <stdio.h>
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <sys/types.h>
-# include <sys/time.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 # define ADNS_API
 # define ADNS_SOCKET int

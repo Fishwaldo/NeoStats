@@ -30,13 +30,8 @@
  */
 
 #ifdef WIN32
-# include "adns_win32.h"
 #else
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
+#include <arpa/inet.h>
 #endif
 
 #include "internal.h"

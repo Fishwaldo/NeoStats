@@ -31,19 +31,9 @@
  * - user-visible check/wait and event-loop-related functions
  */
 
-#include <errno.h>
-# include "adns_win32.h"
-#include <stdlib.h>
-
 #ifdef WIN32
 #else
-# include <unistd.h>
-# include <sys/types.h>
-# include <sys/time.h>
-# include <netdb.h>
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
+#include <arpa/inet.h>
 #endif
 
 #include "internal.h"
