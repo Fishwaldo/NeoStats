@@ -16,6 +16,7 @@
 
 
 extern const char version_date[], version_time[];
+static void ss_chans(User *u, char *chan);
 static void ss_daily(User *u);
 static void ss_reset(User *u);
 static void ss_stats(User *u, char *cmd, char *arg, char *arg2);
@@ -61,6 +62,9 @@ EventFnList StatServ_Event_List[] = {
 	{ "KILL",	s_user_kill},
 	{ "NEWCHAN", 	s_chan_new},
 	{ "DELCHAN",	s_chan_del},
+	{ "JOINCHAN",	s_chan_join},
+	{ "PARTCHAN", 	s_chan_part},
+	{ "KICK", 	s_chan_kick},
 	{ NULL,	 NULL}
 };
 
@@ -139,7 +143,13 @@ void _init() {
 	if (!config_read("stats.cfg", options) == 0) {
 		log("Error, Statserv could not be configured");
 		notice(s_Services, "Error, Statserv could not be configured");
-	return;
+		return;
+	}
+	if (StatServ.html) {
+		if (strlen(StatServ.htmlpath) < 1) {
+			log("StatServ HTML stats is disabled, as HTML_PATH is not set in the config file");
+			StatServ.html = 0;
+		}
 	}
 	LoadTLD();
 	init_tld();
@@ -240,6 +250,13 @@ int __Bot_Message(char *origin, char **av, int ac)
 			privmsg_list(u->nick, s_StatServ, ss_stats_help);
 		else
 			privmsg(u->nick, s_StatServ, "Unknown Help Topic: \2%s\2", av[2]);
+	} else if (!strcasecmp(av[1], "CHAN")) {
+		if (ac < 2) {
+			ss_chans(u, NULL);
+		} else {
+			ss_chans(u, av[2]);
+		}
+		notice(s_StatServ, "%s Wanted to see Channel Statistics", u->nick);
 	} else if (!strcasecmp(av[1], "SERVER")) {
 		ss_server(u, av[2]);
 		notice(s_StatServ,"%s Wanted Server Information on %s",u->nick, av[2]);
@@ -291,6 +308,29 @@ int __Bot_Message(char *origin, char **av, int ac)
 	}
 	return 1;
 }
+static void ss_chans(User *u, char *chan) {
+	CStats *cs;
+	if (!chan) {
+		privmsg(u->nick, s_StatServ, "TODO");
+	} else {
+		cs = findchanstats(chan);
+		if (!cs) {
+			privmsg(u->nick, s_StatServ, "Error, Can't find any information about Channel %s", chan);
+			return;
+		}
+		privmsg(u->nick, s_StatServ, "\2Channel Information for %s (%s)\2", chan, (findchan(chan) ? "Online" : "Offline"));
+		privmsg(u->nick, s_StatServ, "Current Members: %ld (Max %ld on %s)", cs->members, cs->maxmems, sftime(cs->t_maxmems));
+		privmsg(u->nick, s_StatServ, "Max Members today: %ld at %s", cs->maxmemtoday, sftime(cs->t_maxmemtoday));
+		privmsg(u->nick, s_StatServ, "Total Number of Channel Joins: %ld", cs->totmem);	
+		privmsg(u->nick, s_StatServ, "Total Member Joins today: %ld (Max %ld on %s)", cs->joinstoday, cs->maxjoins, sftime(cs->t_maxjoins));
+		privmsg(u->nick, s_StatServ, "Total Topic Changes %ld (Today %ld)", cs->topics, cs->topicstoday);
+		privmsg(u->nick, s_StatServ, "Total Kicks: %ld", cs->kicks);
+		privmsg(u->nick, s_StatServ, "Total Kicks today %ld (Max %ld on %s)", cs->maxkickstoday, cs->maxkicks, sftime(cs->t_maxkicks));
+		if (!findchan(chan)) 
+			privmsg(u->nick, s_StatServ, "Channel was last seen at %s", sftime(cs->lastseen));
+	}
+}
+
 static void ss_tld_map(User *u) {
 	TLD *t;
 	
@@ -314,6 +354,7 @@ static void ss_version(User *u)
 		privmsg(u->nick, s_StatServ, "StatServ Version: %s Compiled %s at %s", Statserv_Info[0].module_version, version_date, version_time);
 		privmsg(u->nick, s_StatServ, "http://www.neostats.net");
 		privmsg(u->nick, s_StatServ, "-------------------------------------");
+		privmsg(u->nick, s_StatServ, "HTML Stats is: %s", (StatServ.html ? StatServ.htmlpath : "Disabled"));
 }
 static void ss_netstats(User *u) {
 

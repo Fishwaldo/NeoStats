@@ -27,9 +27,9 @@ install: statserv
 
 
 $(OBJECTS): Makefile
-statserv.o:		statserv.c	ss_help.c
-ss_help.o:	ss_help.c
-database.o:	database.c
-tld.o:		tld.c
-stats.o:	stats.c
-htmlstats.o:	htmlstats.c
+statserv.o:		statserv.c	ss_help.c	statserv.h
+ss_help.o:	ss_help.c	statserv.h
+database.o:	database.c	statserv.h
+tld.o:		tld.c	statserv.h
+stats.o:	stats.c	statserv.h	m_stats.h
+htmlstats.o:	htmlstats.c	statserv.h

@@ -26,6 +26,7 @@ typedef struct tld_ TLD;
 typedef struct server_stats SStats;
 typedef struct chan_stats CStats;
 hash_t *Shead;
+hash_t *Chead;
 TLD *tldhead;
 
 
@@ -89,10 +90,21 @@ struct chan_stats {
 	long topics;
 	long totmem;
 	long kicks;
-	long joins;
-}
+	long topicstoday;
+	long joinstoday;
+	long maxkickstoday;
+	long maxmemtoday;
+	time_t t_maxmemtoday;
+	time_t lastseen;
+	long maxmems;
+	time_t t_maxmems;
+	long maxkicks;
+	time_t t_maxkicks;
+	long maxjoins;
+	time_t t_maxjoins;
+};
 
-struct daily {
+struct daily_ {
 	int servers;
 	time_t t_servers;
 	int users;
@@ -137,6 +149,14 @@ extern int s_user_modes(User *);
 extern int s_user_kill(User *);
 extern void s_chan_new(Chans *);
 extern void s_chan_del(Chans *);
+void s_chan_join(Chans *);
+void s_chan_part(Chans *);
+CStats *findchanstats(char *);
+CStats *AddChanStats(char *);
+void DelOldChan();
+void s_topic_change(Chans *);
+void s_chan_kick(Chans *c);
+
 
 /* ss_help.c */
 extern const char *ss_help[];

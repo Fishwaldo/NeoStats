@@ -18,6 +18,7 @@ void SaveStats()
 {
     FILE *fp = fopen("data/stats.db", "w");
     SStats *s;
+    CStats *c;
     hscan_t ss;
     hnode_t *sn;
     strcpy(segv_location, "StatServ-SaveStats");
@@ -40,11 +41,24 @@ void SaveStats()
             s->serverkills, s->totusers);
     }
     fclose(fp);
+    if ((fp = fopen("data/cstats.db", "w")) == NULL) {
+    	log("Unable to open cstats.db for writting.");
+    	return;
+    }
+    hash_scan_begin(&ss, Chead);
+    while ((sn = hash_scan_next(&ss))) {
+    	c = hnode_get(sn);
+#ifdef DEBUG
+	log("Writting Statistics to database for %s", c->name);
+#endif
+	fprintf(fp, "%s %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld\n", c->name, c->topics, c->totmem, c->kicks, (long)c->lastseen, c->maxmems, (long)c->t_maxmems, c->maxkicks, (long)c->t_maxkicks, c->maxjoins, (long)c->t_maxjoins);
+    }
+    fclose(fp);
     if ((fp = fopen("data/nstats.db", "w")) == NULL) {
         log("Unable to open nstats.db for writing.");
         return;
     }
-    fprintf(fp, "%d %ld %d %ld %ld %ld %ld\n", stats_network.maxopers, stats_network.maxusers, stats_network.maxservers, stats_network.t_maxopers, stats_network.t_maxusers, stats_network.t_maxservers, stats_network.totusers);
+    fprintf(fp, "%d %ld %d %ld %ld %ld %ld %ld %ld\n", stats_network.maxopers, stats_network.maxusers, stats_network.maxservers, stats_network.t_maxopers, stats_network.t_maxusers, stats_network.t_maxservers, stats_network.totusers, stats_network.maxchans, stats_network.t_chans);
     fclose(fp);
 }
 
@@ -52,13 +66,17 @@ void LoadStats()
 {
     FILE *fp = fopen("data/nstats.db", "r");
     SStats *s;
+    CStats *c;
     char buf[BUFSIZE];
     char *tmp;
     char *name, *numsplits, *maxusers, *t_maxusers,
         *maxopers, *t_maxopers, *lastseen, *starttime,
         *operkills, *serverkills, *totusers;
-    hnode_t *sn;
+    char *topics, *totmem, *kicks, *joins, *maxmems, *t_maxmems, *maxkicks, *t_maxkicks, *maxjoins, *t_maxjoins; 
 
+
+    hnode_t *sn;
+    int count;
     strcpy(segv_location, "StatServ-LoadStats");
 
 
@@ -70,13 +88,25 @@ void LoadStats()
         stats_network.t_maxopers = atoi(strtok(NULL, " "));
         stats_network.t_maxusers = atol(strtok(NULL, " "));
         stats_network.t_maxservers = atoi(strtok(NULL, " "));
-        tmp = strtok(NULL, "");
+        tmp = strtok(NULL, " ");
         if (tmp==NULL) {
-            fprintf(stderr, "Detected Old Version of Network Database, Upgrading\n");
+            fprintf(stderr, "Detected Old Version(1.0) of Network Database, Upgrading\n");
             stats_network.totusers = stats_network.maxusers;
         } else {
             stats_network.totusers = atoi(tmp);
         }
+        tmp = strtok(NULL, " ");
+        if (tmp == NULL) {
+           log("Detected Old version (3.0) of Network Database, Upgrading");
+           stats_network.maxchans = 0;
+	   stats_network.t_chans = time(NULL);
+        } else {
+           stats_network.maxchans = atol(tmp);
+	   tmp = strtok(NULL, "");
+           stats_network.t_chans = atol(tmp);
+
+        }
+        
     }
     fclose(fp);
     }
@@ -130,13 +160,66 @@ void LoadStats()
 	}
     }
     fclose(fp);
-    Chead = hash_create(C_TABLE_SIZE);
+    Chead = hash_create(C_TABLE_SIZE,0,0);
     if ((fp = fopen("data/cstats.db", "r")) == NULL)
     	return;
     memset(buf, '\0', BUFSIZE);
+    name = smalloc(CHANLEN);
+    topics = smalloc(BUFSIZE);
+    totmem = smalloc(BUFSIZE);
+    kicks = smalloc(BUFSIZE);
+    joins = smalloc(BUFSIZE);
+    lastseen = smalloc(BUFSIZE);
+    maxmems = smalloc(BUFSIZE);
+    t_maxmems = smalloc(BUFSIZE);
+    maxkicks = smalloc(BUFSIZE);
+    t_maxkicks = smalloc(BUFSIZE);
+    maxjoins = smalloc(BUFSIZE);
+    t_maxjoins = smalloc(BUFSIZE);
     while (fgets(buf, BUFSIZE, fp)) {
-        s = smalloc(sizeof(SStats));
-	    
+        c = smalloc(sizeof(CStats));
+        count = sscanf(buf, "%s %s %s %s %s %s %s %s %s %s %s\n", name, topics, totmem, kicks, lastseen, maxmems, t_maxmems, maxkicks, t_maxkicks, maxjoins, t_maxjoins);
+        strcpy(c->name, name);
+        c->topics = atol(topics);
+	c->totmem = atol(totmem);
+	c->kicks = atol(kicks);
+	c->lastseen = (time_t)atol(lastseen);
+	c->maxmems = atol(maxmems);
+	c->t_maxmems = (time_t)atol(t_maxmems);
+	c->maxkicks = atol(maxkicks);
+	c->t_maxkicks = (time_t)atol(t_maxkicks);
+	c->maxjoins = atol(maxjoins);
+	c->t_maxjoins = (time_t)atol(t_maxjoins);
+	c->topicstoday = 0;
+	c->joinstoday = 0;
+	c->members = 0;
+	sn = hnode_create(c);
+	if (hash_isfull(Chead)) {
+		log("Eeek, StatServ Channel Hash is Full!");
+	} else {
+#ifdef DEBUG
+		log("Loading %s Channel Data", c->name);
+#endif
+		if ((time(NULL) - c->lastseen) <  604800) {
+			hash_insert(Chead, sn, c->name);
+		} else {
+			log("Deleting Old Channel %s", c->name);
+		}
+	}
+    }    
+   fclose(fp);    
+   free(name);
+   free(topics);
+   free(totmem);
+   free(kicks);
+   free(joins);
+   free(lastseen);
+   free(maxmems);
+   free(t_maxmems);
+   free(maxkicks);
+   free(t_maxkicks);
+   free(maxjoins);
+   free(t_maxjoins);
     
 
 

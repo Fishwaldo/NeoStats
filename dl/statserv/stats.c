@@ -25,10 +25,131 @@ void s_chan_new(Chans *c) {
 		daily.chans = count;
 		daily.t_chans = time(NULL);
 	}
+
 }
 
 void s_chan_del(Chans *c) {
 	DecreaseChans();
+}
+
+void s_chan_join(Chans *c) {
+	CStats *cs;
+	
+	cs = findchanstats(c->name);
+	if (cs) {
+		Increasemems(cs);
+		if (cs->maxmemtoday < cs->members) {
+			cs->maxmemtoday = cs->members;
+			cs->t_maxmemtoday = time(NULL);
+		}
+		if (cs->maxmems < cs->maxmemtoday) {
+			cs->maxmems = cs->members;
+			cs->t_maxmems = time(NULL);
+		}
+		if (cs->maxjoins < cs->joinstoday) {
+			cs->maxjoins = cs->joinstoday;
+			cs->t_maxjoins = time(NULL);
+		}
+	} else {
+		cs = AddChanStats(c->name);		
+		Increasemems(cs);
+		cs->maxmemtoday++;
+		cs->t_maxmemtoday = time(NULL);
+		cs->maxmems++;
+		cs->t_maxmems = time(NULL);
+	}
+}			
+void s_chan_part(Chans *c) {
+	CStats *cs;
+	cs = findchanstats(c->name);
+	if (cs) {
+		Decreasemems(cs);
+	}
+}
+
+void s_topic_change(Chans *c) {
+	CStats *cs;
+	cs = findchanstats(c->name);
+	if (cs) {
+		IncreaseTops(cs);
+	}
+}
+void s_chan_kick(Chans *c) {
+	CStats *cs;
+	cs = findchanstats(c->name);
+	if (cs) {
+		IncreaseKicks(cs);
+		if (cs->maxkicks < cs->maxkickstoday) {
+			cs->maxkicks = cs->maxkickstoday;
+			cs->t_maxkicks = time(NULL);
+		}
+	}		
+
+}
+
+CStats *findchanstats(char *name) {
+	CStats *cs;
+	hnode_t *cn;
+	cn = hash_lookup(Chead, name);
+	if (cn) {
+		cs = hnode_get(cn);
+	} else {
+#ifdef DEBUG
+		log("findchanstats(%s) -> NOT FOUND", name);
+#endif
+		return NULL;
+	}
+	return cs;
+}
+void DelOldChan() {
+	hnode_t *cn;
+	hscan_t cs;
+	CStats *c;
+	hash_scan_begin(&cs, Chead);
+	while ((cn = hash_scan_next(&cs))) {
+		c = hnode_get(cn);
+		if ((time(NULL) - c->lastseen) < 604800) {
+			if (!findchan(c->name)) {
+#ifdef DEBUG
+				log("Deleting Old Channel %s", c->name);
+#endif
+				hash_delete(Chead, cn);
+				hnode_destroy(cn);
+				free(c);
+			}
+		}
+	}
+}
+
+CStats *AddChanStats(char *name) {
+	CStats *cs;
+	hnode_t *cn;
+
+	cs = smalloc(sizeof(CStats));
+	strcpy(cs->name, name);
+	cs->members = 0;
+	cs->topics = 0;
+	cs->totmem = 0;
+	cs->kicks = 0;
+	cs->topicstoday = 0;
+	cs->joinstoday = 0;
+	cs->maxkickstoday = 0;
+	cs->maxmemtoday = 0;
+	cs->t_maxmemtoday = 0;
+	cs->maxmems  = 0;
+	cs->t_maxmems = 0;
+	cs->maxkicks = 0;
+	cs->t_maxkicks = 0;
+	cs->maxjoins = 0;
+	cs->t_maxjoins = 0;
+	cs->lastseen = time(NULL);
+	cn = hnode_create(cs);
+	if (hash_isfull(Chead)) {
+		log("Eeek, Can't add Channel to Statserv Channel Hash. Has is full");
+	} else {
+		hash_insert(Chead, cn, name);
+	}	
+	return cs;
 }
 
 int s_new_server(Server *s) {
@@ -273,11 +394,12 @@ int Online(void *s) {
 
    /* Add a timer for HTML writeouts */
    if (StatServ.html) {
-	   add_mod_timer("TimerWeb", "ss_html", SSMNAME, 3600);
+	   add_mod_timer("ss_html", "TimerWeb", SSMNAME, 3600);
    }
 
    /* also add a timer to check if its midnight (to reset the daily stats */
    add_mod_timer("Is_Midnight", "Daily_Stats_Reset", SSMNAME, 60);
+   add_mod_timer("DelOldChan", "DelOldStatServChans", SSMNAME, 86400);
 
    return 1;
    
@@ -367,6 +489,9 @@ void Is_Midnight() {
 	time_t current = time(NULL);
 	struct tm *ltm = localtime(&current);
 	TLD *t;
+	hscan_t cs;
+	hnode_t *cn;
+	CStats *c;
 
 	strcpy(segv_location, "StatServ-Is_Midnight");
 
@@ -382,9 +507,20 @@ void Is_Midnight() {
 			daily.t_users = time(NULL);
 			daily.opers = stats_network.opers;
 			daily.t_opers = time(NULL);
+			daily.chans = stats_network.chans;
+			daily.t_chans = time(NULL);
 			for (t = tldhead; t; t = t->next) 
-				t->daily_users = stats_network.users;
-				
+				t->daily_users = 0;
+			hash_scan_begin(&cs, Chead);
+			while ((cn = hash_scan_next(&cs))) {
+				c = hnode_get(cn);
+				c->maxmemtoday = c->members;;
+				c->joinstoday = 0;
+				c->maxkickstoday = 0;
+				c->topicstoday = 0;
+				c->t_maxmemtoday = time(NULL);
+			}	
+			
 		}
 	}	
 }

@@ -20,10 +20,10 @@
 #define IncreaseUsers(x)	x->users++;		stats_network.users++;	x->totusers++;	stats_network.totusers++;
 #define IncreaseServers()	stats_network.servers++;
 
-#define IncreaseKicks(x)	x->kicks++;	daily.kicks++;	x->members--;
-#define IncreaseTops(x)		x->topics++;	daily.tops++;
-#define Increasemems(x)		x->joins++;	x->members++;	x->totmem++;
-#define Decreasemems(x)		x->members--;
+#define IncreaseKicks(x)	x->kicks++;	x->members--;	x->maxkickstoday++;
+#define IncreaseTops(x)		x->topics++;	x->topicstoday++;
+#define Increasemems(x)		x->members++;	x->totmem++;	x->lastseen = time(NULL); 	x->joinstoday++;
+#define Decreasemems(x)		x->members--;	x->lastseen = time(NULL);
 #define IncreaseChans()		stats_network.chans++;
 #define DecreaseChans()		stats_network.chans--;
 #endif
