@@ -823,6 +823,10 @@ bot_message (char *origin, char **av, int ac)
 
 	u = finduser (origin);
 
+	if(!u) {
+		return;
+	}
+
 	if (flood (u)) {
 		return;
 	}
@@ -830,7 +834,7 @@ bot_message (char *origin, char **av, int ac)
 	mod_usr = findbot (av[0]);
 	/* Check to see if any of the Modules have this nick Registered */
 	if (!mod_usr) {
-		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found: %s", mod_usr->nick);
+		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", av[0]);
 		return;
 	}
 	nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s", mod_usr->nick);
