@@ -114,7 +114,7 @@ IntCommands cmd_list[] = {
 
 ChanModes chan_modes[] = {
 	{CMODE_VOICE, 'v', 1, 0, '+'},
-	{CMODE_HALFOP, 'h', 1, 0, '+'},
+	{CMODE_HALFOP, 'h', 1, 0, '%'},
 	{CMODE_CHANOP, 'o', 1, 0, '@'},
 	{CMODE_LIMIT, 'l', 0, 1},
 	{CMODE_PRIVATE, 'p', 0, 0},
