@@ -1,0 +1,12 @@
+#!/bin/sh
+
+CC=gcc
+CFLAGS=-O2 -Wall -ggdb
+
+echo $CC -o statserv.lo -c statserv.c -Wall -fPIC -I../ -I../../
+$CC -o statserv.lo -c statserv.c -Wall -fPIC -I../ -I../../
+
+echo ld -shared -o statserv.so statserv.lo
+ld -shared -o statserv.so statserv.lo
+
+cp statserv.so ../

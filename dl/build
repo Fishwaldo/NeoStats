@@ -1,0 +1,15 @@
+#!/bin/sh
+
+CC=gcc
+CFLAGS=-O2 -Wall -ggdb
+
+echo $CC -o version.lo -c version.c -Wall -fPIC -I../
+$CC -o version.lo -c version.c -Wall -fPIC -I../
+echo $CC -o spam.lo -c spam.c -Wall -fPIC -I../
+$CC -o spam.lo -c spam.c -Wall -fPIC -I../
+
+echo ld -shared -o version.so version.lo
+ld -shared -o version.so version.lo
+echo ld -shared -o spam.so spam.lo
+ld -shared -o spam.so spam.lo
+

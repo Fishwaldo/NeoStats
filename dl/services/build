@@ -1,0 +1,12 @@
+#!/bin/sh
+
+FILES="nickserv.c"
+
+. ../../Makefile.conf
+
+echo $CC -o services.lo -c services.c -Wall -fPIC -I../..
+$CC -o services.lo -c services.c -Wall -fPIC -I../..
+
+echo ld -shared -o services.so services.lo
+ld -shared -o services.so services.lo
+

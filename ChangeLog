@@ -1,0 +1,187 @@
+NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Version 1.2.Alpha 4
+ - The Beginnings of a Decent Module API - See dl/modules.txt for more info
+ - added a BOT api for the Modules. Any Module that puts a bot on the network must use this API
+ - Added a Timer API for Modules.. So Modules can register a function to be triggered a specific intervals with NeoStats
+ - Wrote dl/modules.txt - A pretty lame guide to writting your own Modules. Eventaully the Modules API will be Documented in here
+ - Cleaned up a lot of bugs with the Dynamic Loading of Modules
+ - Spam Module is now its own Self Contained Module
+ - Re-done the Config file Reading in Preparation for Module Config items
+ - Made a *nice* boot up screen cause I was bored with Pointers for a while!!!
+ - Signal Handling... We now Die on SIGTERM, SIGHUP should rehash, but its also doing something strange I can't figure out, and best of all... SIGSEV, handling our Coredumps and so one now (Yeah, I stole the Code from Unreal!)
+ - Back in a Hotel Room in Singapore, wondering when a Wircd version of Unreal 2.1.7 will be released?
+
+
+* NeoStats * Fish * Version 1.2.Alpha 3
+ - Total Re-Write of Intenals, Namely, ircd.c
+ - Now Support Dynamically Loading and Unloading Modules
+ - Moved Spam User to a Module
+ - Moving StatServ to a Module
+ - New Default User, with no Modules Loaded, called, of Course, "NeoStats"
+ - Fixed up Socket Code
+ - Fixed up Server Info line, so it isn't corruped in /links
+ - Started work on IcqServ, a new Module, providing ICQ services to irc users
+ - wrote 2 Test Modules, version and version2 to test Loading and Unloading of Modules
+ - smoked a few Ciggies while trying to work out bugs!
+
+* NeoStats * Fish * Version 1.2.Alpha 2
+ - if Unreal Protocol is 2109 or higher, uses SMO 1 for Debuging stuff
+ - Automatically Upgrades Old Databases from NeoStats 1.1.2 and lower
+ - Worked some more on Channel Hashes, Still a long way to go
+ - Added SVS2MODE support.. Again Untested, but same code as SVSMODE, so it should work
+ - Sweated in the heat.. 
+
+* NeoStats * Fish * Version 1.2 Alpha 1
+ - Gah, Flying to Canada this time!!!
+ - Started to add the Beginings of Channel Hashes.
+ - Started to Improve debuging output
+ - Added/Fixed User/Server/Channels Dump to Coders
+ - Updated Statistics Information, adding Total Number of connect to the
+   Network/Servers with Dailystats as well...
+
+
+* NeoStats * Shmad * Version 1.1.2 Beta 3
+ - Thought we should up the version number, been Beta 2 here for quite a while.
+ - Fixed cosmetic problem in HELP
+ - Fixed a RESET bug. ooops :/
+ - Fixed OPERLIST dupe logging channel msg bug
+ - Made OPERLIST BOTS into BOTLIST works great, Fish shouldn't put non-oper related stuff
+   in the OPERLIST functions. :P  had to do some minor code tweaks, but works great.
+ - Apparently fixed problem where occasionally new records would make the server "peer out"
+* NeoStats * Fish * Version 1.1.2 Beta 3
+ - Flying back to aussie. ;)
+
+
+
+* NeoStats * Fish * Version 1.1.2 Beta 2
+ - Removed all the Proxy Scanning Stuff, it was Broken, and useless anyway
+ - Added /credits option to the server, and updated Credits information
+ - Added Bots list to operlist
+ - fixed a few Typos with operlist, and got noaway working again
+ - Changed the UserModes of the statistics user to be +Sq and +a in the Services Channel
+ - Changed the version to be Geostats-1.1.2-beta
+ - Added a New Option to config file. If Defined, will occasionally broadcast the  lag of
+   each server in the services channel
+ - Fixed up a bug with operlists being -1 (found the little sucker too)
+ - Fixed a Problem with Shutdown CoreDumping the Server.. Grrrr, Shmad, Just cause we are
+   shutting down doesn't mean u have to CoreDump the Server!
+ - Added Support for SVSMODE, Untested though!!!
+ - Change the New User record to be Walloped Instead of Globops, so normal users can see it
+   as well (Thanks to EvilAndy for the Suggestion!) 
+ - Hrm, seems the Kick and Rejoin was Broken. Fixed it up again... (Why is Kick giving me 
+   sooo many problems?)
+ - Fixed up messages when a Non-Oper joins the Services Channel. Now askes them to leave
+   (I'd prefer to kick them out, but some other Services are not always Opered Up... Still
+   thinking of a workaround for this
+ - Wrote a Email to Shmad Kicking him up the Butt to update this File!!!
+ - Again, watched Boring Television the whole time!!
+* NeoStats * Shmad * Version 1.1.2 Beta 2
+ - Cleaned up a few messy/unused routines in the code.
+ - Base for HTML writeups started, will be completed in next full release.
+ - Wrote Documentation.  see doc/  run read-faq or read-userman you can also print up FAQ or USERMAN. :P
+ - Cursed at the car for the clutch popping today..
+ - Went through every line of code looking for mis-spellings.. email me if you would like to do that. :-]
+ - Harassed Fish some more about fixing his bugs. :P
+ - Started a base for SUSPEND command, will be finished in next release.
+ - Cleaned up this ChangeLog a bit, you can actually read it now! And that Fish guy better not
+   mess it up! :P
+ - Oh my god, I left like a huge section of code in there all commented out. Removed it (old buggy code)
+
+
+
+
+* NeoStats * Fish * Version 1.1.2 Beta 1
+ - Fixed problem with not reading netinfo, or Server info lines from Config Files
+ - Added LAG_TIME to Config file. If a server is Lagged out over this amount from statserv, then
+   a Globops Message is sent (Should be changed to use RPONG
+ - Added 2 new Options to Operlist, NET and TECH, to List only netadmins and Techadmins
+ - Fixed a Problem when StatServer kicked a User for Flooding, it didn't Delete that User from its
+   Database
+ - Watched a really fucked up Moving on HBO about Man Size Killer Rats!
+* NeoStats * Shmad * Version 1.1.2 Beta 1
+ - Renamed to NeoStats. :P
+ - Fixed Kick problem where if you kick a person from your chan Stats would complain about being kicked
+ - Added VERSION command
+ - Added SHUTDOWN <reason>
+ - Added RELOAD <reason> Stats Terminate and reload.
+ - Fixed some minor cosmetic things in HELP
+ - Added STATSERV_NETNAME to the stats.cfg (no more editting the ircd.c :P )
+ - Added SERVER_INFOLINE to the stats.cfg (set statservs server info line in there now)
+ - Sat around and watched TV for a few hours, space has some weird shows. ;)
+ - Added RESET command wipes the .db clean. :P (It will temp flood in globops with new stats when done)
+
+
+
+GeoStats - Fish -  version 1.1.1
+ - Removed the User Database, now uses IRCD Umodes
+ - Umodes T (technical Admin) now is equivilent to god in the old stats
+ - Umodes 1 (IRCD Coder) is used for Debuging Information
+ - Supports Unreal IRCD 2.1.5-Tabby and higher only atm
+ - Now joins a PreDefined Channel, and reports information such as connects and quits to the Channel
+ - Reports via Globops when a User/Oper/Server Record is broken!
+ - Reports via Globops when a User is set +q or +I
+ - Prints channels that a User Joins and Parts when +I in the Services Channel
+ - added JOIN Commmand
+	- Allows you to select what Channels you want the Reporting software
+ - added RAW Command
+	- Allows you to send Raw Commands from the Server, only Tech Admins have this ability
+ - Added Debug Command
+	- At the Moment, only unhandled Commands are sent to +1 users
+	- Next release a lot more information (such as what is sent to the Log files) will be sent to users +1
+ - A lame attempt at getting statserv to slow down when sending you the log files, as it floods you of
+   the server
+ - added notice subrotine, used to send messages to the Services Channel
+ - When a Oper Joins the Services Channel, statserv ops him, when a Normal User joins, statserv askes him
+   to leave... TODO: setup a Ignore list, so Bots and Services can join without having to have a Umode +o
+ - Proxy doesn't work on my machine due to lack of Threads, and no need for them, so I might have broken
+   it. Can someone let me know?
+
+
+
+GeoStats - version 1.1.0
+ - Fixed hashing problem.
+ - Added configuration option - OPERSONLY
+ - Included patch from Ax0n (ax0n@starchat.net).
+ - Implemented insecure proxy checking.
+
+GeoStats - version 1.0.4
+ - Added support for SVSNICK.
+ - Small memory leak fixed.
+ - Added 'STATS' command.
+	-LIST statistic entries.
+	-DEL statistic entries.
+	-COPY statistic entries.
+ - Added 'LOGS' command.
+	-Allows you to view today's logfile via PRIVMSG or NOTICE's.
+ - Fixed -major- problem with the SHUTDOWN command ;-)
+ - Logging Changes
+
+netgod - version 1.0.3
+ - Final Release (possibly?).
+ - Fixed the initial core dump if no user file ;-)
+ - Added close() call when reconnecting to a server. (in start())
+ - -StatServ- Statistics up 8 days, 01:12
+
+netgod - version 1.0.2
+ - Fixed bug in 'AWAY' netstats.
+ - Added a new part to 'HELP TLD'.
+ - Modified 'server has split from '...
+  
+netgod - Fri Mar 12 18:43:21 CST 1999
+ - Found/fixed small problem in 'SERVER' output.
+ 
+netgod - Thu Mar 11 21:47:13 CST 1999
+ - Servers with lag time of > 45 are now sent via privmsg to either a channel or user.
+ 
+netgod - Sun Mar  7 17:59:47 CST 1999
+ - Ok, found the fscking problem with not keeping track of IRCops right...
+ 
+netgod - Sun Mar  7 13:51:26 CST 1999
+ - Fixed small memory leak.
+ - Corrected users-that-are-away %
+ - Corrected Current Opers (NETSTATS)
+ - Logfiles are now kept in logs/ changed every night..
+ - Modified 'server has split from the network N times'
+   
+netgod - Sun Mar  7 09:55:48 CST 1999
+ - Started ChangeLog

@@ -1,0 +1,100 @@
+###############################################################################
+## Configuration file for NeoStats
+## NeoStats (c) 1999 Codeworks.
+## codework@kamserve.com
+###############################################################################
+
+# The server name that we appear as.
+SERVER_NAME stats.yournetwork.net
+
+# The port to connect to.
+SERVER_PORT 6667
+
+# Hostname we are connecting to.
+CONNECT_TO 127.0.0.1
+
+# Password that we send in order to connect.
+CONNECT_PASS yourpass
+
+# Infoline Displayed in /links for this server
+SERVER_INFOLINE Network Statistical Server
+
+# Your network name (fx: irc.dreaming.org put Dreaming, etc refer to your Unreal network file)
+STATSERV_NETNAME Dreaming
+
+# Seconds lagged for servers before Statserv starts bitching in globops
+LAG_NOTICE 50
+
+#Should we Echo the Lag of Each Server in the Services Channel? (Uncomment to Enable, but on a large Network, very Annoying..)
+#PUBLISH_LAG
+
+# Nickname of statistical client.
+STATSERV_NICK StatServ
+
+# USER@ part of userhost for statistical client.
+STATSERV_USER Network
+
+# @HOST part of userhost for statistical client.
+STATSERV_HOST services.dreaming.org
+
+# Enable or Disable spam detection routines.
+ENABLE_SPAM
+
+# Enable or Disable insecure proxy detection algorithm.
+#ENABLE_PROXY
+
+#The Services Channel to Join Initially
+SERVICES_CHAN #services
+
+# The action we take against the user.
+# Note: You can select more than one!
+# Warn IRCops via GLOBOPS about the insecure proxy.
+#ACTION 0
+# KILL the user.
+#ACTION 1
+# Warn the USER that he is using an insecure proxy.
+#ACTION 2
+# Ban the user from the network.
+#ACTION 3
+
+# The message we ban the user with, or the
+# one we NOTICE it with, or the message we
+# use in a KILL comment.
+#ACTION_MESSAGE Your running an insecure proxy, for help in securing it please email opers@global-irc.net
+
+# This specifies whether to have GServ
+# privmsg OperServ and add the akill that
+# way...  or comment this out and we can
+# add it ourself, however it will never
+# expire until a /rehash is done on the server.
+# Not good.
+
+#USE_SERVICES
+
+# Notice: the above switch uses the standard
+# EsperNet services syntax of adding akills.
+# If you have modified your services, please
+# open up proxy.c and edit the function
+# named " take_action(User *user) "
+
+# Uncomment this if you want only IRCop's to
+# access StatServ.
+
+ONLYOPERS
+
+# Should we send privmsg's or notice's?
+# Comment this out for NOTICE's, otherwise
+# leave it alone.
+WANT_PRIVMSG
+
+# Time in seconds that we wait before attempting
+# to reconnect to the server.
+RECONNECT_TIME 10
+
+# This is used in OPERLIST.  It should be the name
+# of your IRC services server.
+SERVICES_NAME services.dreaming.org
+
+###############################################################################
+## End of Configuration                                                      ##
+###############################################################################

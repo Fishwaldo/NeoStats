@@ -1,0 +1,218 @@
+/* NetStats - IRC Statistical Services
+** Copyright (c) 1999 Adam Rutter, Justin Hammond
+** http://codeworks.kamserve.com
+*
+** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
+*
+** NetStats CVS Identification
+** $Id: ns_help.c,v 1.1 2000/02/03 23:45:54 fishwaldo Exp $
+*/
+
+#include "stats.h"
+
+const char *ns_help[] = {
+"*** NeoStats Help ***",
+"",
+"Commands:",
+"\2UPTIME\2     NeoStats on NeoStats.",
+"\2VERSION\2    Shows you the current StatServ Version.",
+"",
+"End of Help.",
+NULL
+};
+
+const char *ns_myuser_help[] = {
+"",
+"*** Additional Commands For Tech Admins!***",
+"",
+"\2SHUTDOWN\2   Shutdown NeoStats.",
+"\2RELOAD\2     Force NeoStats to Reload Itself.",
+"\2LOAD\2       Load a Module.",
+"\2UNLOAD\2     Unload a Module.",
+"\2MODLIST\2    List Loaded Modules.",
+"\2JOIN\2       Join a Channel.",
+"\2LOGS\2       View logfiles.",
+"\2RAW\2        Send a Raw Command from this Server!",
+"End of Help",
+NULL
+};
+
+const char *ns_coder_help[] = {
+"",
+"*** Additional Commands For Coders!!***",
+"",
+"\2Debug\2      Toggle Debuging Mode!",
+"               Warning. Running this Command on a Popular Network",
+"               Can Flood you of the Server.",
+"               \2Use With Caution\2",
+"\2UserDump\2   When in Debug Mode, Request statserv to send a UserDump",
+"               To \2ALL\2 Coders on the Network. Again this Command can Flood you off the Server",
+"               \2Use With Caution\2",
+"\2ServerDump\2 When in Debug Mode, Request statserv to send a ServerDump",
+"               To \2ALL\2 Coders on the Network. Again this Command can Flood you off the Server",
+"               \2Use With Caution\2",
+"\2ChanDump\2   When in Debug Mode, Request statserv to send a ChannelDump",
+"               To \2ALL\2 Coders on the Network. Again this Command can Flood you off the Server",
+"               \2Use With Caution\2",
+"End of Help",
+NULL
+};
+
+const char *ns_raw_help[] = {
+"*** NeoStats: \2RAW\2 Help ***",
+"",
+"Usage: \2RAW \37Command\37\2",
+"",
+"Allow you to send Raw IRC commands from this Server",
+"Nothing is Returned to the User after a Raw Command",
+"",
+"End of Help.",
+NULL
+};
+
+const char *ns_load_help[] = {
+"*** NeoStats: \2LOAD\2 Help ***",
+"",
+"Usage: \2LOAD \37module file name\37\2",
+"",
+"Allows you to Load a Module while NeoStats is running",
+"Some Modules can Not be loaded at Runtime, and will return a error",
+"",
+"End of Help.",
+NULL
+};
+
+
+const char *ns_unload_help[] = {
+"*** NeoStats: \2UNLOAD\2 Help ***",
+"",
+"Usage: \2UNLOAD \37module name\37\2",
+"",
+"Allows you to UnLoad a Module while NeoStats is running",
+"Some Modules can Not be Unloaded at Runtime, and will return a error",
+"",
+"End of Help.",
+NULL
+};
+
+const char *ns_modlist_help[] = {
+"*** NeoStats: \2MODLIST\2 Help ***",
+"",
+"Usage: \2MODLIST\2",
+"",
+"Will Display Module Names and Descriptions of Loaded Modules",
+"",
+"End of Help.",
+NULL
+};
+
+
+const char *ns_debug_help[] = {
+"*** NeoStats: \2DEBUG\2 Help ***",
+"",
+"Usage: \2DEBUG\2",
+"",
+"This Toggles the Debug Command, Introducing a New User on the Server called",
+"stats_debug. Any User that has their Coder Flag set will Recieve Debuging Information",
+"",
+"On a Large Network, this Command should be used considered Dangerous as a Large amount of Information may be sent to you.",
+"End of Help.",
+NULL
+};
+
+const char *ns_version_help[] = {
+"*** NeoStats: \2VERSION\2 Help ***",
+"Usage: \2VERSION\2",
+"",
+"Shows the current StatServ Version.",
+"",
+"End of Help.",
+NULL
+};
+
+const char *ns_shutdown_help[] = {
+"*** NeoStats: \2SHUTDOWN\2 Help ***",
+"Usage: \2SHUTDOWN\2 <REASON>",
+"",
+"Force NeoStats to exit immediately.",
+"This command should be used wisely.",
+"<REASON> is optional.",
+"",
+"End of Help.",
+NULL
+};
+
+const char *ns_reload_help[] = {
+"*** NeoStats: \2RELOAD\2 Help ***",
+"Usage: \2RELOAD\2 <REASON>",
+"",
+"Force NeoStats to Reload Itself.",
+"This command will cause StatServ to split from",
+"the network and reload datafiles and connect.",
+"This command SHOULD be used wisely.",
+"<REASON> is optional.",
+"",
+"End of Help.",
+NULL
+};
+
+
+const char *ns_userdump_help[] = {
+"*** NeoStats: \2UserDump\2 Help ***",
+"Usage: \2USERDUMP\2",
+"",
+"When in Debug Mode, Neostats will send Coders its Entire User table",
+"Only really usefull when you are debuging Neostats",
+"",
+"End of Help.",
+NULL
+};
+
+
+const char *ns_serverdump_help[] = {
+"*** NeoStats: \2ServerDump\2 Help ***",
+"Usage: \2SERVERDUMP\2",
+"",
+"When in Debug Mode, Neostats will send Coders its Entire SERVER table",
+"Only really usefull when you are debuging Neostats",
+"",
+"End of Help.",
+NULL
+};
+
+
+const char *ns_chandump_help[] = {
+"*** NeoStats: \2ChanDump\2 Help ***",
+"Usage: \2CHANDUMP\2",
+"",
+"When in Debug Mode, Neostats will send Coders its Entire CHANNEL table",
+"Only really usefull when you are debuging Neostats",
+"",
+"End of Help.",
+NULL
+};
+
+const char *ns_logs_help[] = {
+"*** NeoStats: \2LOGS\2 Help ***",
+"Usage: \2LOGS\2",
+"",
+"Sends today's logfile via PRIVMSG/NOTICE",
+"",
+"End of Help.",
+NULL
+};
+
+const char *ns_join_help[] = {
+"*** NeoStats: \2JOIN\2 Help ***",
+"Usage: \2JOIN <Channel>\2",
+"",
+"Get StatServ to Join a Channel",
+"It will then Echo Events as they happen to that Channel, So it Shouldn't Join Public Channels",
+"",
+"End of Help.",
+NULL
+};
+
+
+
+
