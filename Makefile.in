@@ -17,7 +17,7 @@ ADNS_OBJS =	adns/check.o adns/event.o adns/general.o adns/parse.o adns/query.o \
 KEEPER_OBJS = keeper/kp_cache.o keeper/kp_dir.o keeper/kp_enum.o keeper/kp_get.o \
 		keeper/kp_iface.o keeper/kp_recur.o keeper/kp_set.o keeper/kp_sort.o \
 		keeper/kp_util.o
-NEOOBJS = ${SRCS:.c=.o} @sqlsrvbuild@
+OBJS = ${SRCS:.c=.o}
 SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
 		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
 		support.c ircstring.c commands.c transfer.c exclude.c match.c bans.c \
@@ -64,11 +64,11 @@ sqlsrvlib:
 utils:
 	(cd tools; $(MAKE) $@)
 
-neostats: $(NEOOBJS)
-	$(CC) $(LDFLAGS) $(NEOOBJS) $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(EXTRA_LDFLAGS) -o $@
+neostats: $(OBJS)
+	$(CC) $(LDFLAGS) $(OBJS) @sqlsrvbuild@ $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(EXTRA_LDFLAGS) -o $@
 
 # include dependency info 
--include $(NEOOBJS:.o=.d)
+-include $(OBJS:.o=.d)
 
 .c.o:
 	$(CC) $(NEOCFLAGS) $(NEOINCLUDES) -c $< 
@@ -164,4 +164,4 @@ dist:
 	@echo "Tar file $(DISTDIR).tar.gz created. Freshmeat time!"
 
 # Catch any changes in compilation options at the top of this file
-$(NEOOBJS): Makefile Makefile.inc
+$(OBJS): Makefile Makefile.inc
