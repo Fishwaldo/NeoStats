@@ -54,21 +54,21 @@ Table of Contents:
 	[2.12]	JUPE
 	[2.13]	RAW
 [3] StatServ Bot Help
-	[2.1] neostats.cfg options
-	[2.2] Available Commands
-	[2.3]		SERVER
-	[2.4]	 	MAP
-	[2.5]	 	NETSTATS
-	[2.6]	 	DAILY
-	[2.7]	 	TLD
-	[2.8]	 	TLDMAP
-	[2.9]	 	OPERLIST
-	[2.10]	BOTLIST
-	[2.11]	VERSION
-	[2.12]	FORCEHTML
-	[2.13]	RESET
-	[2.14]	STATS
-	[2.15] HTML Template Syntax
+	[3.1] neostats.cfg options
+	[3.2] Available Commands
+	[3.3]		SERVER
+	[3.4]	 	MAP
+	[3.5]	 	NETSTATS
+	[3.6]	 	DAILY
+	[3.7]	 	TLD
+	[3.8]	 	TLDMAP
+	[3.9]	 	OPERLIST
+	[3.10]	BOTLIST
+	[3.11]	VERSION
+	[3.12]	FORCEHTML
+	[3.13]	RESET
+	[3.14]	STATS
+	[3.15] HTML Template Syntax
 [4] Support Information
 	[4.1] Where to get support
 	[4.2] What information you should provide for support
@@ -176,6 +176,8 @@ Table of Contents:
 			eg: SERVICES_CHAN #services	-Makes NeoStats, and all the other bots join #services channel on startup/load
 		WANT_PRIVMSG		-Specify if the bots should send all messages as privmsg's or as notices (Most Services use notice)
 			eg: WANT_PRIVMSG	- if present, will send all messages as Privmsg's (if commented out, it will send as Notices)
+		NO_LOAD	- If this is in the neostats.cfg your NeoStats WILL NOT START UP.  To disable this simply comment this line out.  
+			eg: NO_LOAD  <- NeoStats will not load.   eg2: #NO_LOAD <- NeoStats will load.
 		RECONNECT_TIME	-If NeoStats server gets split from the network, how long to wait before attempting to reconnect
 			eg RECONNECT_TIME 10	-Specifies wait 10 seconds before trying to reconnect
 		LOAD_MODULE	-what module to load at startup. Multiple instances of LOAD_MODULE may be specified
@@ -311,7 +313,7 @@ Table of Contents:
 				 <NeoStats> RAW COMMAND Fish Issued a Raw Command!(:neostats invite fish #blah)
 				*** NeoStats (Neo@NeoStats.net) invites you to #blah
 [3]	StatServ Help
-	[2.1] neoStats.cfg config options
+	[3.1] neoStats.cfg config options
 		STATSERV_NICK	-Sets the nickname of the StatServ bot. If not specified, defaults to statserv
 			eg: STATSERV_NICK stats	-Set statserv bot to appear as 'stats'
 		STATSERV_USER	-Sets the username portion of the statserv bot
@@ -324,7 +326,7 @@ Table of Contents:
 			eg HTML_STATS	-If define, enables this option
 		HTML_PATH		-Where to write the HTML file to. Include path and filename. Make sure you have permissions to write to this directory/file
 			eg: HTML_PATH /var/www/html/stats/index.html	-Write the statistics file to this location.
-	[2.2] Available Commands
+	[3.2] Available Commands
 		SERVER	-Display a list of all servers that statserv has ever known about, or individual server information
 		MAP		-Display a Network map of all connect servers
 		NETSTATS	-Display Statistics about the network
@@ -339,7 +341,7 @@ Table of Contents:
 		FORCEHTML	-Force a update of the HTML file
 		RESET			-Delete all stats, and start from scratch
 		STATS			-Delete/copy server information
-	[2.3] Server Command
+	[3.3] Server Command
 		/msg statserv server
 			Returns:
 			 =StatServ= Error, the Syntax is Incorrect. Please Specify a Server
@@ -364,7 +366,7 @@ Table of Contents:
 			 =StatServ= Current Ping: 0
 			 =StatServ= services.dynam.ac has never split from the Network.
 			 =StatServ= ***** End of Statistics *****
-	[2.4] Map Command
+	[3.4] Map Command
 		/msg statserv map
 			Returns:
 			 =StatServ= [NAME]					[USERS/MAX] [OPERS/MAX] [LAG/MAX]
@@ -374,7 +376,7 @@ Table of Contents:
 			 =StatServ=       |     | \_blha.com				[ 0/0 ]   [ 0/0 ]   [ 0/1 ]
 			 =StatServ=       | \_Server2.IRC.net                          [ 0/0 ]   [ 0/0 ]   [ 0/1 ]
 			 =StatServ= --- End of Listing ---
-	[2.5] Netstats Command
+	[3.5] Netstats Command
 		/msg statserv netstats
 			 Returns:
 			 =StatServ= Network Statistics:-----
@@ -388,7 +390,7 @@ Table of Contents:
 			 =StatServ= Current Servers: 5
 			 =StatServ= Maximum Servers: 5 [[Mar (Thu 21) 2002  08:47 [PM/SGT]]]
 			 =StatServ= --- End of List ---
-	[2.6] Daily Command
+	[3.6] Daily Command
 		/msg statserv daily
 			Returns:
 			 =StatServ= Daily Network Statistics:
@@ -398,19 +400,19 @@ Table of Contents:
 			 =StatServ= Maximum Opers: 5  [Mar (Wed 27) 2002  12:31 [PM/SGT]]
 			 =StatServ= All Daily Statistics are reset at Midnight
 			 =StatServ= End of Information.
-	[2.7] Tld Command
+	[3.7] Tld Command
 		/msg statserv tld <domain>
 			Returns:
 			 ->  *statserv* tld sg
 			 =StatServ= Singapore (sg)
-	[2.8]  Tldmap Command
+	[3.8]  Tldmap Command
 		/msg statserv tldmap
 			Returns:
 			 =StatServ= Top Level Domain Statistics:
 			 =StatServ= net   9 (90%) -> Generic Top Level Domain (net) ---> Daily Total: 33
 			 =StatServ= num   1 (10%) -> UnResolved (num) ---> Daily Total: 25
 			 =StatServ= End of List
-	[2.9] OperList Command
+	[3.9] OperList Command
 		/msg statserv operlist
 			Returns:
 			 =StatServ= For Help: /msg StatServ HELP OPERLIST
@@ -445,13 +447,13 @@ Table of Contents:
 			 =StatServ= [ 1] Fish            -a              Server.IRC.net  185
 			 =StatServ= End of Listing.
 
-	[2.10] BotList Command
+	[3.10] BotList Command
 		/msg statserv botlist
 			Returns:
 				=StatServ= On-Line Bots:
 				=StatServ= End of Listing.
 
-	[2.11] Version Command
+	[3.11] Version Command
 		/msg statserv version
 			Returns:
 				=StatServ= StatServ Version Information
@@ -460,15 +462,15 @@ Table of Contents:
 				=StatServ= http://www.neostats.net
 				=StatServ= -------------------------------------
 				=StatServ= HTML Stats is: /var/www/html/stats/index.html
-	[2.12] Forcehtml Command
+	[3.12] Forcehtml Command
 		/msg statserv forcehtml
 			Returns:
 				<StatServ> Fish Forced the NeoStats Statistics HTML file to be updated with the most current statistics
-	[2.13] Reset Command
+	[3.13] Reset Command
 		/msg statserv reset
 			Returns:
 				<StatServ> Fish Wants me to RESET the databases.. here goes..
-	[2.14] Stats Command
+	[3.14] Stats Command
 		/msg statserv stats list
 			Returns:
 				=StatServ= Statistics Database:
@@ -483,7 +485,7 @@ Table of Contents:
 				=StatServ= Removed blha.com from the database.
 		/msg statserv stats copy <name> <newname>
 				=StatServ= Copied Server data from <name> to <newname>
-	[2.15] HTML Syntax
+	[3.15] HTML Syntax
 		By Default, StatServ uses a file called index.tpl in your data directory as the template for your output.
 		Currently, the template system is very basic, and will output tables containing the information requested.
 		All Template variables are enclosed by "!"
