@@ -332,7 +332,7 @@ send_squit (const char *server, const char *quitmsg)
 void 
 send_quit (const char *who, const char *quitmsg)
 {
-	int i;
+	char* num;
 
 	/* Clear numeric */
 	num = nicktobase64 (who);
