@@ -26,8 +26,11 @@
 */
 
 #include "stats.h"
+#include "dl.h"
 #include "hash.h"
 #include "log.h"
+
+hash_t *sh;
 
 static Server *new_server (char * name);
 
@@ -76,7 +79,7 @@ AddServer (char *name, char *uplink, int hops)
 
 	/* run the module event for a new server. */
 	AddStringToList (&av, s->name, &ac);
-	Module_Event (EVENT_NEWSERVER, av, ac);
+	ModuleEvent (EVENT_NEWSERVER, av, ac);
 	free (av);
 
 }
@@ -101,7 +104,7 @@ DelServer (char *name)
 
 	/* run the event for delete server */
 	AddStringToList (&av, s->name, &ac);
-	Module_Event (EVENT_SQUIT, av, ac);
+	ModuleEvent (EVENT_SQUIT, av, ac);
 	free (av);
 
 	hash_delete (sh, sn);
@@ -155,7 +158,7 @@ init_server_hash ()
 }
 
 void
-TimerPings ()
+PingServers (void)
 {
 	Server *s;
 	hscan_t ss;

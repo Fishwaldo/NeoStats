@@ -22,14 +22,18 @@
 */
 
 
-#ifndef HYBRID7_H
-#define HYBRID7_H
+#ifndef NEOIRCD_H
+#define NEOIRCD_H
 
 /* we have vhost support */
 #define GOTSVSVHOST
 
+#define GOTSVSJOIN
 
-
+/* Moved from connectserv so we can use elsewhere */
+#define LOCOP_MODE 'O'
+#define OPER_MODE 'o'
+#define SERVERADMIN_MODE 'a'
 
 #define MSG_EOB		"EOB"	/* end of burst */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
@@ -300,6 +304,7 @@ extern int seob_cmd (const char *server);
 extern int sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...);
 extern int srakill_cmd (const char *host, const char *ident);
 extern int SignOn_NewBot (const char *, const char *, const char *, const char *, long);
+extern int sinvite_cmd (const char *from, const char *to, const char *chan);
 
 
 void Usr_Version (char *, char **, int argc);

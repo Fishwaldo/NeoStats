@@ -231,14 +231,13 @@ NeoStats ships with the following modules:
         HostServ        --enable-modules="hostserv"
         LoveServ        --enable-modules="loveserv"
         MoraleServ      --enable-modules="ms"
-        spam            --enable-modules="spam"
         StatServ        --enable-modules="statserv"
 
 To compile multiple modules combine the enable-modules options together 
 as follows:
 
-        --enable-modules="statserv spam"
-        (this would enable the statserv and spam modules).
+        --enable-modules="statserv hostserv"
+        (this would enable the statserv and hostserv modules).
 
 If you have downloaded additional modules from the NeoStats website, 
 DO NOT specify them in the enable-modules option. Each module has its 

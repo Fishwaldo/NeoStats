@@ -4,6 +4,7 @@
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
+PCRE_OBJS = pcre/pcre.o pcre/get.o pcre/study.o
 
 OBJS =	dns.o chans.o dotconf.o services.o main.o sock.o conf.o ircd.o timer.o \
 		 users.o ns_help.o dl.o list.o hash.o server.o keeper.o log.o misc.o \
@@ -23,30 +24,31 @@ DATA = data/tlds.nfo
 INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h Unreal.h \
 		adns/adns.h hybrid7.h neoircd.h conf.h log.h Bahamut.h \
 		Ircu.h mystic.h QuantumIRCd.h sock.h ircd.h \
-		support.h ircstring.h events.h
+		support.h ircstring.h events.h liquidircd.h numeric.h pcre.h
 BUILDFILES = configure *.in adns/Makefile adns/config.h.in dl/Makefile \
 		dl/modules.txt RELNOTES install-sh neoircd.c neoircd.h \
 		hybrid7.c hybrid7.h Ultimate.c Ultimate.h Unreal.c Unreal.h \
 		makeconf cronchk tools/Makefile.in tools/cfgtool/Makefile \
 		keeper/Makefile doc/old/* Bahamut.c Ircu.c mystic.c \
-		QuantumIRCd.c Config
+		QuantumIRCd.c Config liquidircd.c
 TOOLFILES = tools/*.c tools/*.h tools/cfgtool/*.h tools/cfgtool/*.c \
 		tools/cfgtool/pixmaps/*.xpm
 DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) \
 		$(BUILDFILES) $(TOOLFILES) keeper/*.c keeper/*.h adns/*.c \
-		adns/adns.h adns/dlist.h  adns/internal.h  adns/tvarith.h
+		adns/adns.h adns/dlist.h  adns/internal.h  adns/tvarith.h \
+		ns_help.h timer.h users.h chans.h server.h
 
  
 distdir = @PACKAGE@-@VERSION@
 SUBDIRS = doc doc/old data adns logs keeper tools tools/cfgtool \
-		tools/cfgtool/pixmaps
+		tools/cfgtool/pixmaps pcre
 DISTMOD = cs extauth hostserv loveserv ms spam statserv version template
 
 .c.o:
 	$(CC) $(NEOINCLUDES) $(CFLAGS) -c $< 
 
 
-all: 	libadns.a libkeeper.a neostats modules utils
+all: 	libadns.a libkeeper.a libpcre neostats modules utils
 
 modules:
 	(cd dl; $(MAKE) $@)
@@ -57,6 +59,9 @@ libadns.a:
 libkeeper.a:
 	(cd keeper; $(MAKE) $@)
 
+libpcre:
+	(cd pcre; $(MAKE))
+
 utils:
 	(cd tools; $(MAKE) $@)
 
@@ -66,11 +71,12 @@ clean:
 	(cd adns; $(MAKE) $@)
 	(cd keeper; $(MAKE) $@)
 	(cd tools; $(MAKE) $@)
+	(cd pcre; $(MAKE) $@)
 	/bin/rm -rf *.o neostats *.cache Makefile config.h  Makefile.inc *.log *.a
 
 
 neostats: $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) adns/libadns.a keeper/libkeeper.a -o $@
+	$(CC) $(LDFLAGS) $(OBJS) adns/libadns.a keeper/libkeeper.a $(PCRE_OBJS) -o $@
 
 install: neostats modules
 	@rm -rf @prefix@/dl/cs.so

@@ -69,7 +69,7 @@ Functions __module_functions[] = {
 };
 
 
-int __Bot_Message(char *origin, char **av, int ac)
+int __BotMessage(char *origin, char **av, int ac)
 {
 	User *u;
 	u = finduser(origin);
@@ -237,11 +237,11 @@ int Online(char **av, int ac)
 {
 	if (init_bot
 	    (s_MoraleServ, "MS", me.name, "A Network Morale Service",
-	     "+oS", __module_info.module_name) == -1) {
+	     services_bot_modes, __module_info.module_name) == -1) {
 		/* Nick was in use */
 		s_MoraleServ = strcat(s_MoraleServ, "_");
 		init_bot(s_MoraleServ, "MS", me.name,
-			 "A Network Morale Service", "+oS",
+			 "A Network Morale Service", services_bot_modes,
 			 __module_info.module_name);
 	}
 	return 1;

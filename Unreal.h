@@ -60,6 +60,20 @@
 /* we have vhost support */
 #define GOTSVSVHOST
 
+/* we have svsjoin */
+#define GOTSVSJOIN
+
+/* Moved from connectserv so we can use elsewhere */
+#define LOCOP_MODE 'O'
+#define OPER_MODE 'o'
+#define COSERVERADMIN_MODE 'C'
+#define SERVERADMIN_MODE 'A'
+#define NETADMIN_MODE 'N'
+#define TECHADMIN_MODE 'T'
+#define SERVICESADMIN_MODE 'a'
+#define NETSERVICE_MODE 'S'
+#define INVISIBLE_MODE 'I'
+#define BOT_MODE 'B'
 
 /*
  * The tokens are in the ascii character range of 33-127, and we start
@@ -486,6 +500,7 @@ extern int ssvskill_cmd (const char *target, const char *reason, ...);
 extern int sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...);
 extern int srakill_cmd (const char *host, const char *ident);
 extern int SignOn_NewBot (const char *, const char *, const char *, const char *, long);
+extern int sinvite_cmd (const char *from, const char *to, const char *chan);
 
 void Usr_Version (char *, char **, int argc);
 void Usr_ShowMOTD (char *, char **, int argc);

@@ -127,10 +127,8 @@ Contents
         7.3.8  BEHAPPY    
         7.3.9  WONDERFUL   
         7.3.10 VERSION
-8.  spam
-    8.1 About spam
-9.  ExtAuth
-    9.1 About ExtAuth
+8.  ExtAuth
+    8.1 About ExtAuth
 
 -----------------------------------<>-----------------------------------
 
@@ -348,7 +346,7 @@ Example:
 2.3.13 DEBUG
 ------------
 Syntax: 
-    /msg NeoStats DEBUG
+    /msg NeoStats DEBUG <ON|OFF>
 Description: 
     This toggles the debug command, On a large network, this command 
     should be used considered dangerous as a large amount of information 
@@ -1205,25 +1203,9 @@ Example:
 
 -----------------------------------<>-----------------------------------
 
-8. spam
--------
-
-8.1 About spam
---------------
-
-Spam provides a bot to try and catch spammers and mass messagers. It 
-will sit on the network and echo to the services channel and by wallops
-when someone sends it a message and what message they sent. 
-
-Currently the spam bot has a fixed name of "sumyungguy".
-
-Send it a message, and watch what happens. 
-
------------------------------------<>-----------------------------------
-
-9. ExtAuth
+8. ExtAuth
 ----------
-9.1 About ExtAuth
+8.1 About ExtAuth
 -----------------
 
 ExtAuth may be listed as a loaded module, but its not a true module as

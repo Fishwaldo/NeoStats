@@ -28,6 +28,17 @@
 /* we support tokens */
 #undef HAVE_TOKEN_SUP
 
+/* we dont have svshost support */
+#undef GOTSVSHOST 
+
+/* we don't have svsjoin support */
+#undef GOTSVSJOIN 
+
+
+/* Moved from connectserv so we can use elsewhere */
+#define LOCOP_MODE 'O'
+#define OPER_MODE 'o'
+#define SERVERADMIN_MODE 'a'
 
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define MSG_WHO		"WHO"	/* WHO  -> WHOC */
@@ -277,6 +288,7 @@ extern int sakill_cmd (const char *host, const char *ident, const char *setby, c
 extern int srakill_cmd (const char *host, const char *ident);
 extern int ssvshost_cmd (const char *who, const char *vhost);
 extern int ssvskill_cmd (const char *who, const char *reason, ...);
+extern int sinvite_cmd (const char *from, const char *to, const char *chan);
 
 void Usr_Version (char *, char **, int argc);
 void Usr_ShowMOTD (char *, char **, int argc);

@@ -48,6 +48,7 @@
 #include <setjmp.h>
 #include <assert.h>
 #include <adns.h>
+#include "pcre.h"
 #include "list.h"
 #include "hash.h"
 #include "config.h"
@@ -71,36 +72,13 @@
 #include "Bahamut.h"
 #elif QUANTUM == 1
 #include "QuantumIRCd.h"
+#elif LIQUID == 1
+#include "liquidircd.h"
 #else
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
 
-/* Numeric used by NeoStats. Need to be in ircd code eventually
- *
- */
-
-#define RPL_STATSLINKINFO    211
-#define RPL_STATSCOMMANDS    212
-#define RPL_STATSCLINE       213
-#define RPL_STATSOLDNLINE    214
-#define RPL_STATSNLINE		RPL_STATSOLDNLINE
-
-#define RPL_ENDOFSTATS       219
-
-#define	RPL_STATSLLINE       241
-#define	RPL_STATSUPTIME      242
-#define	RPL_STATSOLINE       243
-
-#define	RPL_ADMINME          256
-#define	RPL_ADMINLOC1        257
-#define	RPL_ADMINLOC2        258
-
-#define RPL_VERSION          351
-
-#define	RPL_MOTD             372
-
-#define	RPL_MOTDSTART        375
-#define	RPL_ENDOFMOTD        376
+#include "numeric.h"
 
 /**  this is a security hack to give the coders the right levels to debug NeoStats. 
   *  Don't define unless we ask you to 
@@ -111,7 +89,7 @@
 #define MOD_PATH		"dl"
 #define RECV_LOG		"logs/recv.log"
 #define MOTD_FILENAME	"neostats.motd"
-#define ADMIN_FILENAME	"stats.admin"
+#define ADMIN_FILENAME	"neostats.admin"
 #define PID_FILENAME	"neostats.pid"
 
 #define CHANLEN			50
@@ -124,6 +102,7 @@
 #define MAXREALNAME		50
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
+#define MAXCMDSIZE		15
 
 /* MAXPATH 
  * used to determine buffer sizes for file system operations
@@ -172,7 +151,13 @@
 #define NS_SUCCESS			 1
 #define NS_FAILURE			-1
 
-#define NS_ERROR_xxx		-2
+/* Specific errors beyond SUCCESS/FAILURE so that functions can handle errors 
+ * Treat as unsigned with top bit set to give us a clear distinction from 
+ * other values and use a typedef ENUM so that we can indicate return type */
+typedef enum NS_ERR {
+	NS_ERR_NICK_IN_USE		= 0x8000001,
+	NS_ERR_OUT_OF_MEMORY	= 0x8000002,
+}NS_ERR ;
 
 /* do_exit call exit type definitions */
 typedef enum {
@@ -182,6 +167,11 @@ typedef enum {
 	NS_EXIT_ERROR,
 	NS_EXIT_SEGFAULT,
 }NS_EXIT_TYPE;
+
+/* NeoStats levels */
+#define NS_ULEVEL_ROOT	200
+#define NS_ULEVEL_ADMIN	185
+#define NS_ULEVEL_OPER	40
 
 #define SEGV_LOCATION_BUFSIZE	255
 #ifdef LEAN_AND_MEAN
@@ -211,20 +201,21 @@ typedef enum {
 
 #define ARRAY_COUNT (a) ((sizeof ((a)) / sizeof ((a)[0]))
 
-int servsock;
+extern int servsock;
+extern char recbuf[BUFSIZE];
 extern char s_Services[MAXNICK];
 extern const char ircd_version[];
-char recbuf[BUFSIZE];
-char segv_location[SEGV_LOCATION_BUFSIZE];
-char segv_inmodule[SEGV_INMODULE_BUFSIZE];
-jmp_buf sigvbuf;
+extern const char services_bot_modes[];
+extern char segv_location[SEGV_LOCATION_BUFSIZE];
+extern char segv_inmodule[SEGV_INMODULE_BUFSIZE];
+extern jmp_buf sigvbuf;
 
-hash_t *sh;
-hash_t *uh;
-hash_t *ch;
+extern hash_t *sh;
+extern hash_t *uh;
+extern hash_t *ch;
 
 /* this is the dns structure */
-adns_state ads;
+extern adns_state ads;
 
 /* version info */
 extern const char version_date[], version_time[];
@@ -355,9 +346,6 @@ struct ping {
 } ping;
 
 /* sock.c */
-int ConnectTo (char * host, int port);
-void read_loop (void);
-int getmaxsock (void);
 int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);
 int sock_disconnect (char *sockname);
 
@@ -371,15 +359,12 @@ void do_exit (NS_EXIT_TYPE exitcode, char* quitmsg);
 void fatal_error(char* file, int line, char* func, char* error_text);
 #define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__,(error_text)); 
 
-
 /* misc.c */
 void strip (char * line);
 void *smalloc (long size);
 char *sstrdup (const char * s);
-char *strlower (char * s);
 char *strlwr (char * s);
 void AddStringToList (char ***List, char S[], int *C);
-void FreeList (char **List, int C);
 void strip_mirc_codes(char *text);
 char *sctime (time_t t);
 char *sftime (time_t t);
@@ -390,9 +375,8 @@ void parse (char* line);
 char *joinbuf (char **av, int ac, int from);
 int split_buf (char *buf, char ***argv, int colon_special);
 int flood (User * u);
-int init_bot (char * nick, char * user, char * host, char * rname, char *modes, char * modname);
+int init_bot (char * nick, char * user, char * host, char * rname, const char *modes, char * modname);
 int del_bot (char * nick, char * reason);
-void Module_Event (char * event, char **av, int ac);
 
 /* ircd specific files */
 void prefmsg (char * to, const char * from, char * fmt, ...);
@@ -401,83 +385,26 @@ void notice (char *to, const char *from, char *fmt, ...);
 void privmsg_list (char *to, char *from, const char **text);
 void globops (char * from, char * fmt, ...);
 
-/* dl.c */
-int bot_nick_change (char * oldnick, char *newnick);
-
-/* timer.c */
-void CheckTimers (void);
-
 /* users.c */
-void AddUser (const char *nick, const char *user, const char *host, const char *server, const unsigned long ip, const unsigned long TS);
-void DelUser (const char *nick);
-void AddRealName (const char *nick, const char *realname);
-void Change_User (User *u, const char * newnick);
 User *finduser (const char *nick);
-void UserDump (char *nick);
-void part_u_chan (list_t *list, lnode_t *node, void *v);
-void UserMode (const char *nick, const char *modes, int smode);
-int init_user_hash (void);
 int UserLevel (User *u);
-void Do_Away (User *u, const char *awaymsg);
-void KillUser (const char *nick);
 
 /* server.c */
-void AddServer (char *name, char *uplink, int hops);
-void DelServer (char *name);
 Server *findserver (const char *name);
-void ServerDump (void);
-int init_server_hash (void);
-void TimerPings (void);
-
-/* ns_help.c */
-extern const char *ns_help[];
-extern const char *ns_help_on_help[];
-extern const char *ns_myuser_help[];
-extern const char *ns_shutdown_help[];
-extern const char *ns_reload_help[];
-extern const char *ns_logs_help[];
-#ifdef USE_RAW
-extern const char *ns_raw_help[];
-#endif
-extern const char *ns_debug_help[];
-extern const char *ns_userdump_help[];
-extern const char *ns_chandump_help[];
-extern const char *ns_serverdump_help[];
-extern const char *ns_version_help[];
-extern const char *ns_load_help[];
-extern const char *ns_unload_help[];
-extern const char *ns_modlist_help[];
-extern const char *ns_jupe_help[];
-extern const char *ns_level_help[];
-extern const char *ns_modbotlist_help[];
-extern const char *ns_modsocklist_help[];
-extern const char *ns_modtimerlist_help[];
-extern const char *ns_modbotchanlist_help[];
-extern const char *ns_info_help[];
-
-/* services.c */
-void servicesbot (char *nick, char **av, int ac);
-void ns_set_debug (char *u);
-void ns_shutdown (User * u, char *reason);
 
 /* chans.c */
-void chandump (char *chan);
-void part_chan (User * u, char *chan);
-void join_chan (User * u, char *chan);
-void change_user_nick (Chans * c, char *newnick, char *oldnick);
 Chans *findchan (char *chan);
-int ChanMode (char *origin, char **av, int ac);
-void Change_Topic (char *, Chans *, time_t t, char *);
-void ChangeChanUserMode (Chans * c, User * u, int add, long mode);
-void kick_chan (User *, char *, User *);
-void Change_Chan_Ts (Chans * c, time_t tstime);
 int CheckChanMode (Chans * c, long mode);
 int IsChanMember(Chans *c, User *u);
-int init_chan_hash (void);
 
 /* dns.c */
 int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);
-int init_dns (void);
-void do_dns (void);
+
+/* services.c */
+typedef void (*bot_cmd_handler) (User * u, char **av, int ac);
+int add_services_cmd(const char cmd[MAXCMDSIZE], bot_cmd_handler handler, int minparams, int ulevel, const char** helptext, const char onelinehelp[255]);
+int init_services();
+int del_services_cmd(const char cmd[MAXCMDSIZE]);
+
 
 #endif

@@ -62,7 +62,6 @@
  * 
  */
 typedef int (*message_function) (char *origin, char **av, int ac);
-typedef int (*chan_message_function) (char *origin, char *chan, char **av, int ac);
 
 /** @brief Socket function types
  * 
@@ -74,7 +73,7 @@ typedef void (*after_poll_function) (void *data, struct pollfd *, unsigned int);
 /** @brief Module socket list structure
  * 
  */
-typedef struct Sock_List {
+typedef struct ModSock {
 	/** Hash code */
 	long hash;					
 	/** Socket number */
@@ -103,17 +102,12 @@ typedef struct Sock_List {
 	long rmsgs;
 	/** rbytes */
 	long rbytes;
-}Sock_List;
-
-/* @brief Module Socket List hash
- * 
- */
-hash_t *sockh;
+}ModSock;
 
 /** @brief Module Timer structure
  * 
  */
-typedef struct Mod_Timer {
+typedef struct ModTimer {
 	/** Hash code */
 	long hash;
 	/** Module name */
@@ -126,14 +120,12 @@ typedef struct Mod_Timer {
 	time_t lastrun;
 	/** Timer function */
 	int (*function) ();
-}Mod_Timer;
-
-hash_t *th;
+}ModTimer;
 
 /** @brief Module User structure
  * 
  */
-typedef struct {
+typedef struct ModUser {
 	/** Hash code */
 	long hash;
 	/** Nick */
@@ -143,27 +135,23 @@ typedef struct {
 	/** function */
 	message_function function;
 	/** function */
-	chan_message_function chanfunc;
-}Mod_User;
-
-hash_t *bh;
+	message_function chanfunc;
+}ModUser;
 
 /** @brief Channel bot structure
  * 
  */
-typedef struct {
+typedef struct ModChanBot {
 	/** channel name */
 	char chan[CHANLEN];
 	/** bot list */
 	list_t *bots;
-}Chan_Bot;
-
-hash_t *bch;
+}ModChanBot;
 
 /** @brief Module functions structure
  * 
  */
-typedef struct {
+typedef struct Functions {
 	char *cmd_name;
 	message_function function;
 	int srvmsg;
@@ -172,15 +160,17 @@ typedef struct {
 /** @brief Module Event functions structure
  * 
  */
-typedef struct {
+typedef int (*event_function) (char **av, int ac);
+
+typedef struct EventFnList {
 	char *cmd_name;
-	int (*function) (char **av, int ac);
+	event_function function;
 }EventFnList;
 
 /** @brief Module Info structure (old style)
  * 
  */
-typedef struct {
+typedef struct Module_Info {
 	char *module_name;
 	char *module_description;
 	char *module_version;
@@ -189,7 +179,7 @@ typedef struct {
 /** @brief Module Info structure (new style)
  * 
  */
-typedef struct {
+typedef struct ModuleInfo {
 	char *module_name;
 	char *module_description;
 	char *module_version;
@@ -200,50 +190,63 @@ typedef struct {
 /** @brief Module structure
  * 
  */
-typedef struct {
-	Module_Info *info;
+typedef struct Module {
+	ModuleInfo *info;
 	Functions *function_list;
-	EventFnList *other_funcs;
+	EventFnList *event_list;
 	void *dl_handle;
-}Module ;
+}Module;
 
-hash_t *mh;
+/* @brief Module Socket List hash
+ * 
+ */
+extern hash_t *sockh;
 
 /* 
  * Prototypes
  */
-int __init_mod_list (void);
+int InitModuleHash (void);
+void ModuleEvent (char * event, char **av, int ac);
+/* Temp define for secureserv */
+#define Module_Event ModuleEvent	
+void ModuleFunction (int cmdptr, char *cmd, char* origin, char **av, int ac);
 int load_module (char *path, User * u);
 int unload_module (char *module_name, User * u);
 int add_ld_path (char *path);
-void list_module (User * u);
-void list_module_bots (User * u);
+void list_modules (User * u, char **av, int ac);
+void list_bots (User * u, char **av, int ac);
 int add_mod_user (char *nick, char *mod_name);
 int del_mod_user (char *nick);
 int add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval);
 int del_mod_timer (char *timer_name);
-Mod_Timer *findtimer(char *timer_name);
-void list_module_timer (User * u);
+ModTimer *findtimer(char *timer_name);
+void list_timers (User * u, char **av, int ac);
+void run_mod_timers (void);
 int add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name);
 int add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name, void *data);
 int del_socket (char *sockname);
-void list_sockets (User * u);
-Sock_List *findsock (char *sock_name);
-Mod_User *findbot (char * bot_name);
+void list_sockets (User * u, char **av, int ac);
+ModSock *findsock (char *sock_name);
+ModUser *findbot (char * bot_name);
 int get_dl_handle (char *mod_name);
 void add_bot_to_chan (char *bot, char *chan);
 void del_bot_from_chan (char *bot, char *chan);
-void bot_chan_message (char *origin, char *chan, char **av, int ac);
-void botchandump (User * u);
+void bot_chan_message (char *origin, char **av, int ac);
+void list_bot_chans (User * u, char **av, int ac);
 int get_mod_num (char *mod_name);
 void unload_modules(void);
+int bot_nick_change (char * oldnick, char *newnick);
+void verify_hashes(void);
+
 /* 
  * Module Interface 
  */
 int __ModInit(int modnum, int apiver);
 void __ModFini(void);
-int __Bot_Message(char *origin, char **av, int ac);
-int __Chan_Message(char *origin, char *chan, char **argv, int argc);
+int __BotMessage(char *origin, char **av, int ac);
+/* temp define while rename propogates */
+#define __Bot_Message __BotMessage
+int __ChanMessage(char *origin, char **argv, int argc);
 
 /* temporary define to support for module API backwards compatibility 
  * old system used function addresses to call into a module to get data addresses

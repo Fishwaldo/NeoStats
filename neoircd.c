@@ -27,10 +27,14 @@
 #include "neoircd.h"
 #include "dl.h"
 #include "log.h"
+#include "users.h"
+#include "server.h"
+#include "chans.h"
 
 static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(N)";
+const char services_bot_modes[]= "+oS";
 
 /* this is the command list and associated functions to run */
 IntCommands cmd_list[] = {
@@ -146,7 +150,7 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_CCONN, 'c', 0}
 	,
-	{UMODE_DEBUG, 'd', 200}
+	{UMODE_DEBUG, 'd', NS_ULEVEL_ROOT}
 	,
 	{UMODE_FULL, 'f', 0}
 	,
@@ -174,7 +178,7 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_OPERWALL, 'z', 0}
 	,
-	{UMODE_SERVICES, 'S', 200}
+	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT}
 	,
 	{0, 0, 0}
 };
@@ -436,6 +440,12 @@ ssvshost_cmd (const char *who, const char *vhost)
 		return 0;
 	}
 	return 0;
+}
+
+int 
+sinvite_cmd (const char *from, const char *to, const char *chan) {
+	sts (":%s INVITE %s %s", from, to, chan);
+	return 1;
 }
 
 int
@@ -814,7 +824,7 @@ Usr_Away (char *origin, char **argv, int argc)
 		} else {
 			buf = NULL;
 		}
-		Do_Away (u, buf);
+		UserAway (u, buf);
 		if (argc > 0) {
 			free (buf);
 		}
@@ -838,7 +848,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 	c = findchan (argv[0]);
 	if (c) {
 		buf = joinbuf (argv, argc, 2);
-		Change_Topic (argv[1], c, atoi (argv[2]), buf);
+		ChangeTopic (argv[1], c, atoi (argv[2]), buf);
 		free (buf);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);
@@ -898,7 +908,7 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 	strlcpy (me.netname, argv[7], MAXPASS);
 	init_ServBot ();
 	globops (me.name, "Link with Network \2Complete!\2");
-	Module_Event (EVENT_NETINFO, NULL, 0);
+	ModuleEvent (EVENT_NETINFO, NULL, 0);
 	me.synced = 1;
 }
 
@@ -979,7 +989,7 @@ Srv_Tburst (char *origin, char **argv, int argc)
 	c = findchan (argv[1]);
 	if (c) {
 		buf = joinbuf (argv, argc, 4);
-		Change_Topic (argv[3], c, atoi (argv[2]), buf);
+		ChangeTopic (argv[3], c, atoi (argv[2]), buf);
 		free (buf);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "TopicBurst: Ehhh, Can't find Channel %s", argv[1]);

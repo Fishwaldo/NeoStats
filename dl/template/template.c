@@ -30,8 +30,9 @@
  */
 
 #include <stdio.h>
-#include "dl.h"
-#include "stats.h"
+#include "dl.h"       /* Required for module */
+#include "stats.h"    /* Required for bot support */
+#include "log.h"      /* Log systems support */
 
 /** 
  * A string to hold the name of our bot
@@ -80,8 +81,9 @@ Functions __module_functions[] = {
  * What do we do with messages in channels
  * This is required if you want your module to respond to channel messages
  */
-int __Chan_Message(char *origin, char *chan, char **argv, int argc)
+int __ChanMessage(char *origin, char **argv, int argc)
 {
+	char *chan = av[0];
 	return 1;
 }
 
@@ -89,18 +91,34 @@ int __Chan_Message(char *origin, char *chan, char **argv, int argc)
  * What do we do with messages sent to our bot with /mag
  * This is required if you want your module to respond to /msg
  */
-int __Bot_Message(char *origin, char **argv, int argc)
+int __BotMessage(char *origin, char **argv, int argc)
 {
+	User *u;
+	char *buf;
+	u = finduser(origin);
+	if (!u) {
+		nlog(LOG_WARNING, LOG_CORE, "Unable to find user %s ", origin);
+		return -1;
+	}
+	buf = joinbuf(argv, argc, 1);
+	globops(me.name, "Bot recieved %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
+	chanalert(s_module_bot_name, "Bot recieved %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
+	nlog(LOG_NORMAL, LOG_MOD, "Bot recieved %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
+	free(buf);
 	return 1;
 }
 
 /** Online event processing
  * What we do when we first come online
- * This is required if you want your module to respond to an event on IRC
- * see modules.txt for a list of all events available
  */
 int Online(char **av, int ac)
 {
+	/* Introduce a bot onto the network */
+	if (init_bot(s_module_bot_name, "user", me.name, "Real Name", "-x",
+		__module_info.module_name) == -1) {
+			/* Nick was in use */
+			return 0;
+	}
 	return 1;
 };
 
@@ -120,7 +138,7 @@ EventFnList __module_events[] = {
  */
 int __ModInit(int modnum, int apiver)
 {
-	s_module_bot_name = "NeoBot";
+	s_module_bot_name = "TemplateBot";
 	return 1;
 }
 

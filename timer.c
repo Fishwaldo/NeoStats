@@ -27,6 +27,7 @@
 #include "dl.h"
 #include "log.h"
 #include "conf.h"
+#include "server.h"
 
 static int midnight = 0;
 
@@ -36,52 +37,14 @@ static void TimerMidnight (void);
 void
 CheckTimers (void)
 {
-	Mod_Timer *mod_ptr = NULL;
-	time_t current = me.now;
-	hscan_t ts;
-	hnode_t *tn;
-
-/* First, lets see if any modules have a function that is due to run..... */
-	hash_scan_begin (&ts, th);
-	while ((tn = hash_scan_next (&ts)) != NULL) {
-		SET_SEGV_LOCATION();
-		mod_ptr = hnode_get (tn);
-		if (current - mod_ptr->lastrun > mod_ptr->interval) {
-			strlcpy (segv_location, mod_ptr->modname, SEGV_LOCATION_BUFSIZE);
-			SET_SEGV_INMODULE(mod_ptr->modname);
-			if (setjmp (sigvbuf) == 0) {
-				if (mod_ptr->function () < 0) {
-					nlog(LOG_DEBUG2, LOG_CORE, "Deleting Timer %s for Module %s as requested", mod_ptr->timername, mod_ptr->modname);
-					hash_scan_delete(th, tn);
-					hnode_destroy(tn);
-					free(mod_ptr);
-				} else {
-					mod_ptr->lastrun = (int) me.now;
-				}
-			} else {
-				nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", mod_ptr->modname);
-			}
-			CLEAR_SEGV_INMODULE();
-		}
-	}
+	run_mod_timers();
 	SET_SEGV_LOCATION();
-	if (current - ping.last_sent > me.pingtime) {
-		TimerPings ();
+	if (me.now - ping.last_sent > me.pingtime) {
+		PingServers ();
 		flush_keeper();
 		ping.last_sent = me.now;
 #ifdef DEBUG
-		if (hash_verify (sockh) == 0) {
-			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the socket hash");
-		}
-		if (hash_verify (mh) == 0) {
-			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Module hash");
-		}
-		if (hash_verify (bh) == 0) {
-			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Bot hash");
-		}
-		if (hash_verify (th) == 0) {
-			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Timer hash");
-		}
+		verify_hashes();
 #endif
 		/* flush log files */
 		fflush (NULL);
@@ -95,7 +58,7 @@ CheckTimers (void)
 	}
 }
 
-void
+static void
 TimerMidnight (void)
 {
 	nlog (LOG_DEBUG1, LOG_CORE, "Its midnight!!! -> %s", sctime (me.now));
@@ -105,8 +68,7 @@ TimerMidnight (void)
 static int
 is_midnight (void)
 {
-	time_t current = me.now;
-	struct tm *ltm = localtime (&current);
+	struct tm *ltm = localtime (&me.now);
 
 	if (ltm->tm_hour == 0)
 		return 1;

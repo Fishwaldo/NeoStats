@@ -300,7 +300,7 @@ To delete a timer:
 
 -----------------------------------<>-----------------------------------
 TODO:
-int __Chan_Message(char *origin, char *chan, char **argv, int argc)
+int __Chan_Message(char *origin, char **argv, int argc)
 
 -----------------------------------<>-----------------------------------
 TODO:

@@ -29,10 +29,13 @@
 #include "Bahamut.h"
 #include "dl.h"
 #include "log.h"
+#include "server.h"
+#include "chans.h"
 
 static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(B)";
+const char services_bot_modes[]= "+oS";
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -141,14 +144,14 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_REGNICK, 'r', 10}
 	,
-	{UMODE_SERVICESADMIN, 'a', 200}
+	{UMODE_SERVICESADMIN, 'a', NS_ULEVEL_ROOT}
 	,
 	{UMODE_SERVADMIN, 'A', 100}
 	,
 	{UMODE_REGONLY, 'R', 0}
 	,
 	/* this is needed for bot support */
-	{UMODE_SERVICES, 'S', 200}
+	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT}
 	,
 	{0, 0, 0}
 };
@@ -441,6 +444,13 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 	return 1;
 }
 
+int 
+sinvite_cmd (const char *from, const char *to, const char *chan) {
+	sts (":%s INVITE %s %s", from, to, chan);
+	return 1;
+}
+
+
 int
 srakill_cmd (const char *host, const char *ident)
 {
@@ -637,7 +647,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 	}
 	c = findchan (argv[1]);
 	/* update the TS time */
-	Change_Chan_Ts (c, atoi (argv[0]));
+	ChangeChanTS (c, atoi (argv[0]));
 	c->modes |= mode1;
 	if (!list_isempty (tl)) {
 		if (!list_isfull (c->modeparms)) {
@@ -779,7 +789,7 @@ Usr_Away (char *origin, char **argv, int argc)
 		} else {
 			Buf = NULL;
 		}
-		Do_Away (u, Buf);
+		UserAway (u, Buf);
 		if (argc > 0) {
 			free (Buf);
 		}
@@ -803,7 +813,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 	c = findchan (argv[0]);
 	if (c) {
 		buf = joinbuf (argv, argc, 3);
-		Change_Topic (argv[1], c, atoi (argv[2]), buf);
+		ChangeTopic (argv[1], c, atoi (argv[2]), buf);
 		free (buf);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);

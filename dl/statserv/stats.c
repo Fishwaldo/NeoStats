@@ -416,7 +416,7 @@ void re_init_bot()
 	SET_SEGV_LOCATION();
 	chanalert(s_Services, "Re-Initilizing %s Bot", s_StatServ);
 	init_bot(s_StatServ, StatServ.user, StatServ.host,
-		 "/msg Statserv HELP", "+oS", SSMNAME);
+		 "/msg Statserv HELP", services_bot_modes, SSMNAME);
 }
 int s_del_user(char **av, int ac)
 {
@@ -559,7 +559,7 @@ int Online(char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	init_bot(s_StatServ, StatServ.user, StatServ.host, StatServ.rname,
-		 "+oS", SSMNAME);
+		 services_bot_modes, SSMNAME);
 	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */
 	add_mod_timer("SaveStats", "Save_Stats_DB", SSMNAME, DBSAVETIME);

@@ -1,5 +1,24 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 =====================================================================================
+* NeoStats * Fish (F) & Mark (M)* Version 2.5.9
+ - import of libpcre into core (M)
+ - added some defines for common user levels (M)
+ - added some defines for common errors so functions can better handle failure conditions (M)
+ - cleanup of default settings and configs - defaults were often set twice! (M)
+ - fixed debug mode messages given to users under certain conditions (M)
+ - main command list now in a table to make it easy to add new commands (M)
+ - shorted some command text by stripping superfluous prefixes (M)
+ - ns_set_debug disable bug fixed (M)
+ - ns_set_debug function parameters changed to support command table (M)
+ - ns_set_debug now requires explicit ON/OFF to make consistent with other commands (M)
+ - removed chan from __Chan_Message parameters since it is in av[0] anyway (M)
+ - cleanups of core functions and module API including cleanup of module types and references (M)
+ - Updated command user levels and associated help text (M)
+ - Made M's bot message handling and help functions dynamic.. so modules can add/remove commands to the services bot... should make these functions a bit more generic so they could be called from any modules to handle messages. (F)
+ - imported LiquidIRCd support from ???? (F)
+ - Admin text filename changed from "stats.admin" to "neostats.admin" (M)
+ - Added services_bot_modes to each IRCd. This should contain the required ircd specific modes for a services bot (M)
+
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.8
  - strncpy replaced by strlcpy - faster and safer (M)
  - Replaced redundant strlen calls with faster and safer alternatives (M)

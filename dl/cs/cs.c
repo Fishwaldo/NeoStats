@@ -34,7 +34,7 @@
 /* Uncomment this line to disable colours in ConnectServ 
    channel messages
 */
-/*#define DISABLE_COLOUR_SUPPORT*/
+/* #define DISABLE_COLOUR_SUPPORT */
 
 #ifdef DISABLE_COLOUR_SUPPORT
 char msg_nickchange[]="\2NICK\2 %s (%s@%s) Changed their nick to %s";
@@ -104,19 +104,18 @@ char msg_invisible[]="\2%s\2 Is Using \2Invisible Mode\2 (+%c)";
 char msg_invisibleoff[]="\2%s\2 Is no longer using \2Invisible Mode\2 (-%c)";
 #endif
 
+char s_ConnectServ[MAXNICK];
 
-
-char *s_ConnectServ;
-
-int cs_new_user(char **av, int ac);
-int cs_user_modes(char **av, int ac);
-int cs_user_smodes(char **av, int ac);
-int cs_del_user(char **av, int ac);
-int cs_user_kill(char **av, int ac);
-int cs_user_nick(char **av, int ac);
-void do_set(User * u, char **av, int ac);
-void SaveSettings();
-void Loadconfig();
+static int cs_new_user(char **av, int ac);
+static int cs_user_modes(char **av, int ac);
+#ifdef ULTIMATE3
+static int cs_user_smodes(char **av, int ac);
+#endif
+static int cs_del_user(char **av, int ac);
+static int cs_user_kill(char **av, int ac);
+static int cs_user_nick(char **av, int ac);
+static void do_set(User * u, char **av, int ac);
+static void LoadConfig(void);
 
 static void cs_version(User * u);
 static void cs_set_list(User * u, char **av, int ac);
@@ -124,17 +123,31 @@ static void cs_set_signwatch(User * u, char **av, int ac);
 static void cs_set_killwatch(User * u, char **av, int ac);
 static void cs_set_modewatch(User * u, char **av, int ac);
 static void cs_set_nickwatch(User * u, char **av, int ac);
+#if 0
+/* work in progress */
+static void cs_set_nick(User * u, char **av, int ac);
+static void cs_set_user(User * u, char **av, int ac);
+static void cs_set_host(User * u, char **av, int ac);
+static void cs_set_rname(User * u, char **av, int ac);
+#endif
 
-static int sign_watch;
-static int kill_watch;
-static int mode_watch;
-static int nick_watch;
+struct cs_cfg { 
+	int sign_watch;
+	int kill_watch;
+	int mode_watch;
+	int nick_watch;
+	int modnum;
+	char user[MAXUSER];
+	char host[MAXHOST];
+	char rname[MAXREALNAME];
+} cs_cfg;
+
 static int cs_online = 0;
 
 ModuleInfo __module_info = {
 	"ConnectServ",
 	"Network Connection & Mode Monitoring Service",
-	"1.9",
+	"1.10",
 	__DATE__,
 	__TIME__
 };
@@ -158,7 +171,7 @@ Functions __module_functions[] = {
 	{NULL, NULL, 0}
 };
 
-int __Bot_Message(char *origin, char **av, int ac)
+int __BotMessage(char *origin, char **av, int ac)
 {
 	User *u;
 	u = finduser(origin);
@@ -168,7 +181,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 	if (!cs_online)
 		return 1;
 
-	if ((UserLevel(u) < 185)) {
+	if ((UserLevel(u) < NS_ULEVEL_ADMIN)) {
 		prefmsg(u->nick, s_ConnectServ, "Permission Denied!");
 		return 1;
 	}
@@ -217,6 +230,17 @@ void do_set(User * u, char **av, int ac)
 			"Invalid Syntax. /msg %s help set for more info",
 			s_ConnectServ);
 		return;
+#if 0
+/* work in progress */
+	} else if (!strcasecmp(av[2], "NICK")) {
+		cs_set_nick(u, av, ac);
+	} else if (!strcasecmp(av[2], "USER")) {
+		cs_set_user(u, av, ac);
+	} else if (!strcasecmp(av[2], "HOST")) {
+		cs_set_host(u, av, ac);
+	} else if (!strcasecmp(av[2], "REALNAME")) {
+		cs_set_rname(u, av, ac);
+#endif
 	} else if (!strcasecmp(av[2], "NICKWATCH")) {
 		cs_set_nickwatch(u, av, ac);
 	} else if (!strcasecmp(av[2], "SIGNWATCH")) {
@@ -237,42 +261,15 @@ void do_set(User * u, char **av, int ac)
 
 int Online(char **av, int ac)
 {
-	char *user = NULL;
-	char *host = NULL;
-	char *rname = NULL;
-
-	if (GetConf((void *) &s_ConnectServ, CFGSTR, "Nick") < 0) {
-		s_ConnectServ = "ConnectServ";
-	}
-	if (GetConf((void *) &user, CFGSTR, "User") < 0) {
-		user = malloc(MAXUSER);
-		strlcpy(user, "CS", MAXUSER);
-	}
-	if (GetConf((void *) &host, CFGSTR, "Host") < 0) {
-		host = malloc(MAXHOST);
-		strlcpy(host, me.name, MAXHOST);
-	}
-	if (GetConf((void *) &rname, CFGSTR, "RealName") < 0) {
-		rname = malloc(MAXREALNAME);
-		strlcpy(rname, "Connection Monitoring Service", MAXREALNAME);
-	}
-
-
 	if (init_bot
-	    (s_ConnectServ, user, host, rname, "+oS",
+	    (s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.rname, services_bot_modes,
 	     __module_info.module_name) == -1) {
 		/* Nick was in use */
 		strlcat(s_ConnectServ, "_", MAXREALNAME);
-		init_bot(s_ConnectServ, user, host, rname, "+oS",
+		init_bot(s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.rname, services_bot_modes,
 			 __module_info.module_name);
 	}
 	cs_online = 1;
-	if(user)
-	free(user);
-	if(host)
-	free(host);
-	if(rname)
-	free(rname);
 	return 1;
 };
 
@@ -298,7 +295,7 @@ EventFnList __module_events[] = {
 
 int __ModInit(int modnum, int apiver)
 {
-	Loadconfig();
+	LoadConfig();
 	return 1;
 }
 
@@ -346,7 +343,7 @@ int cs_new_user(char **av, int ac)
 	}
 
 	/* Print Connection Notice */
-	if (u && sign_watch) {
+	if (u && cs_cfg.sign_watch) {
 		chanalert(s_ConnectServ, msg_signon,
 			  u->nick, u->username, u->hostname,
 			  u->server->name);
@@ -387,7 +384,7 @@ int cs_del_user(char **av, int ac)
 	QuitMsg = joinbuf(Quit, QuitCount, 2);
 
 	/* Local Kill Watch For Signoff */
-	if (kill_watch) {
+	if (cs_cfg.kill_watch) {
 		if (strstr(cmd, "Local kill by") && strstr(cmd, "[")
 		    && strstr(cmd, "]")) {
 
@@ -407,7 +404,7 @@ int cs_del_user(char **av, int ac)
 	}
 
 	/* Print Disconnection Notice */
-	if (sign_watch) {
+	if (cs_cfg.sign_watch) {
 		chanalert(s_ConnectServ,
 			msg_signoff,
 			  u->nick, u->username, u->hostname,
@@ -434,7 +431,7 @@ int cs_user_modes(char **av, int ac)
 	if (!cs_online)
 		return 1;
 
-	if (mode_watch != 1)
+	if (cs_cfg.mode_watch != 1)
 		return -1;
 
 	u = finduser(av[0]);
@@ -633,7 +630,7 @@ int cs_user_smodes(char **av, int ac)
 
 	SET_SEGV_LOCATION();
 
-	if (mode_watch != 1)
+	if (cs_cfg.mode_watch != 1)
 		return -1;
 
 	u = finduser(av[0]);
@@ -787,13 +784,13 @@ int cs_user_kill(char **av, int ac)
 
 	if (finduser(Kill[2])) {
 		/* it was a User who was killed */
-		if (kill_watch)
+		if (cs_cfg.kill_watch)
 			chanalert(s_ConnectServ,
 			      msg_globalkill,
 				  u->nick, u->username, u->hostname,
 				  Kill[0], GlobalMsg);
 	} else if (findserver(Kill[2])) {
-		if (kill_watch)
+		if (cs_cfg.kill_watch)
 			chanalert(s_ConnectServ,
 				msg_serverkill,
 				  u->nick, Kill[0], GlobalMsg);
@@ -814,7 +811,7 @@ int cs_user_nick(char **av, int ac)
 	if (!cs_online)
 		return 1;
 
-	if (nick_watch) {
+	if (cs_cfg.nick_watch) {
 		u = finduser(av[1]);
 		if (!u)
 			return -1;
@@ -842,7 +839,7 @@ static void cs_set_nickwatch(User * u, char **av, int ac)
 		return;
 	}
 	if ((!strcasecmp(av[3], "YES")) || (!strcasecmp(av[3], "ON"))) {
-		nick_watch = 1;
+		cs_cfg.nick_watch = 1;
 		chanalert(s_ConnectServ, "\2NICK WATCH\2 Activated by \2%s\2",
 			  u->nick);
 		nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Activated NICK WATCH",
@@ -852,7 +849,7 @@ static void cs_set_nickwatch(User * u, char **av, int ac)
 			"\2NICK WATCH\2 Activated");
 	} else if ((!strcasecmp(av[3], "NO"))
 		   || (!strcasecmp(av[3], "OFF"))) {
-		nick_watch = 0;
+		cs_cfg.nick_watch = 0;
 		chanalert(s_ConnectServ,
 			  "\2NICK WATCH\2 Deactivated by \2%s\2", u->nick);
 		nlog(LOG_NORMAL, LOG_MOD,
@@ -883,7 +880,7 @@ static void cs_set_signwatch(User * u, char **av, int ac)
 		return;
 	}
 	if ((!strcasecmp(av[3], "YES")) || (!strcasecmp(av[3], "ON"))) {
-		sign_watch = 1;
+		cs_cfg.sign_watch = 1;
 		chanalert(s_ConnectServ,
 			  "\2SIGNON/SIGNOFF WATCH\2 Activated by \2%s\2",
 			  u->nick);
@@ -895,7 +892,7 @@ static void cs_set_signwatch(User * u, char **av, int ac)
 			"\2SIGNON/SIGNOFF WATCH\2 Activated");
 	} else if ((!strcasecmp(av[3], "NO"))
 		   || (!strcasecmp(av[3], "OFF"))) {
-		sign_watch = 0;
+		cs_cfg.sign_watch = 0;
 		chanalert(s_ConnectServ,
 			  "\2SIGNON/SIGNOFF WATCH\2 Deactivated by \2%s\2",
 			  u->nick);
@@ -926,7 +923,7 @@ static void cs_set_killwatch(User * u, char **av, int ac)
 		return;
 	}
 	if ((!strcasecmp(av[3], "YES")) || (!strcasecmp(av[3], "ON"))) {
-		kill_watch = 1;
+		cs_cfg.kill_watch = 1;
 		chanalert(s_ConnectServ, "\2KILL WATCH\2 Activated by \2%s\2",
 			  u->nick);
 		nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Activated KILL WATCH",
@@ -936,7 +933,7 @@ static void cs_set_killwatch(User * u, char **av, int ac)
 			"\2KILL WATCH\2 Activated");
 	} else if ((!strcasecmp(av[3], "NO"))
 		   || (!strcasecmp(av[3], "OFF"))) {
-		kill_watch = 0;
+		cs_cfg.kill_watch = 0;
 		chanalert(s_ConnectServ,
 			  "\2KILL WATCH\2 Deactivated by \2%s\2", u->nick);
 		nlog(LOG_NORMAL, LOG_MOD,
@@ -966,7 +963,7 @@ static void cs_set_modewatch(User * u, char **av, int ac)
 		return;
 	}
 	if ((!strcasecmp(av[3], "YES")) || (!strcasecmp(av[3], "ON"))) {
-		mode_watch = 1;
+		cs_cfg.mode_watch = 1;
 		chanalert(s_ConnectServ, "\2MODE WATCH\2 Activated by \2%s\2",
 			  u->nick);
 		nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Activated MODE WATCH",
@@ -976,7 +973,7 @@ static void cs_set_modewatch(User * u, char **av, int ac)
 			"\2MODE WATCH\2 Activated");
 	} else if ((!strcasecmp(av[3], "NO"))
 		   || (!strcasecmp(av[3], "OFF"))) {
-		mode_watch = 0;
+		cs_cfg.mode_watch = 0;
 		chanalert(s_ConnectServ,
 			  "\2MODE WATCH\2 Deactivated by \2%s\2", u->nick);
 		nlog(LOG_NORMAL, LOG_MOD,
@@ -993,6 +990,78 @@ static void cs_set_modewatch(User * u, char **av, int ac)
 	}
 }
 
+#if 0
+/* work in progress */
+/* 
+ * Set ConnectServ Nick
+ */
+static void cs_set_nick(User * u, char **av, int ac)
+{
+	char old_nick[MAXNICK];
+
+	SET_SEGV_LOCATION();
+	if (ac < 4) {
+		prefmsg(u->nick, s_ConnectServ,
+			"Invalid Syntax. /msg %s help set for more info",
+			s_ConnectServ);
+		return;
+	}
+	strlcpy(old_nick, s_ConnectServ, MAXNICK);
+	strlcpy(s_ConnectServ, av[3], MAXNICK);
+	SetConf((void *) s_ConnectServ, CFGSTR, "Nick");
+	if( bot_nick_change(old_nick, s_ConnectServ) == NS_FAILURE)
+		prefmsg(u->nick, s_ConnectServ, "bot_nick_change failed %s %s", old_nick, s_ConnectServ);
+}
+
+/* 
+ * Set ConnectServ User
+ */
+static void cs_set_user(User * u, char **av, int ac)
+{
+	SET_SEGV_LOCATION();
+	if (ac < 4) {
+		prefmsg(u->nick, s_ConnectServ,
+			"Invalid Syntax. /msg %s help set for more info",
+			s_ConnectServ);
+		return;
+	}
+	strlcpy(cs_cfg.user, av[3], MAXUSER);
+	SetConf((void *) cs_cfg.user, CFGSTR, "User");
+}
+
+/* 
+ * Set ConnectServ Host
+ */
+static void cs_set_host(User * u, char **av, int ac)
+{
+	SET_SEGV_LOCATION();
+	if (ac < 4) {
+		prefmsg(u->nick, s_ConnectServ,
+			"Invalid Syntax. /msg %s help set for more info",
+			s_ConnectServ);
+		return;
+	}
+	strlcpy(cs_cfg.host, av[3], MAXHOST);
+	SetConf((void *) cs_cfg.host, CFGSTR, "Host");
+}
+
+/* 
+ * Set ConnectServ Real Name
+ */
+static void cs_set_rname(User * u, char **av, int ac)
+{
+	SET_SEGV_LOCATION();
+	if (ac < 4) {
+		prefmsg(u->nick, s_ConnectServ,
+			"Invalid Syntax. /msg %s help set for more info",
+			s_ConnectServ);
+		return;
+	}
+	strlcpy(cs_cfg.rname, av[3], MAXREALNAME);
+	SetConf((void *) cs_cfg.rname, CFGSTR, "RealName");
+}
+#endif
+
 /* 
  * SET LIST - List current settings
  */
@@ -1002,30 +1071,60 @@ static void cs_set_list(User * u, char **av, int ac)
 	prefmsg(u->nick, s_ConnectServ, "Current %s Settings:",
 		s_ConnectServ);
 	prefmsg(u->nick, s_ConnectServ, "SIGNWATCH: %s",
-		sign_watch ? "Enabled" : "Disabled");
+		cs_cfg.sign_watch ? "Enabled" : "Disabled");
 	prefmsg(u->nick, s_ConnectServ, "KILLWATCH: %s",
-		kill_watch ? "Enabled" : "Disabled");
+		cs_cfg.kill_watch ? "Enabled" : "Disabled");
 	prefmsg(u->nick, s_ConnectServ, "MODEWATCH: %s",
-		mode_watch ? "Enabled" : "Disabled");
+		cs_cfg.mode_watch ? "Enabled" : "Disabled");
 	prefmsg(u->nick, s_ConnectServ, "NICKWATCH: %s",
-		nick_watch ? "Enabled" : "Disabled");
+		cs_cfg.nick_watch ? "Enabled" : "Disabled");
 }
 
 /* 
  * Load ConnectServ Configuration file and set defaults if does not exist
  */
-void Loadconfig()
+static void LoadConfig(void)
 {
+	char *temp = NULL;
 	SET_SEGV_LOCATION();
-
-	/* some defaults */
-	sign_watch = 1;
-	kill_watch = 1;
-	mode_watch = 1;
-	nick_watch = 1;
-
-	GetConf((void *) &sign_watch, CFGBOOL, "SignWatch");
-	GetConf((void *) &kill_watch, CFGBOOL, "KillWatch");
-	GetConf((void *) &mode_watch, CFGBOOL, "ModeWatch");
-	GetConf((void *) &nick_watch, CFGBOOL, "NickWatch");
+	if(GetConf((void *) &cs_cfg.sign_watch, CFGBOOL, "SignWatch")<= 0) {
+		cs_cfg.sign_watch = 1;
+	}
+	if(GetConf((void *) &cs_cfg.kill_watch, CFGBOOL, "KillWatch")<= 0) {
+		cs_cfg.kill_watch = 1;
+	}
+	if(GetConf((void *) &cs_cfg.mode_watch, CFGBOOL, "ModeWatch")<= 0) {
+		cs_cfg.mode_watch = 1;
+	}
+	if(GetConf((void *) &cs_cfg.nick_watch, CFGBOOL, "NickWatch")<= 0) {
+		cs_cfg.nick_watch = 1;
+	}
+	if(GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
+		strlcpy(s_ConnectServ , "ConnectServ", MAXNICK);
+	}
+	else {
+		strlcpy(s_ConnectServ, temp, MAXNICK);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "User") < 0) {
+		strlcpy(cs_cfg.user, "CS", MAXUSER);
+	}
+	else {
+		strlcpy(cs_cfg.user, temp, MAXUSER);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "Host") < 0) {
+		strlcpy(cs_cfg.host, me.name, MAXHOST);
+	}
+	else {
+		strlcpy(cs_cfg.host, temp, MAXHOST);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "RealName") < 0) {
+		strlcpy(cs_cfg.rname, "Connection Monitoring Service", MAXREALNAME);
+	}
+	else {
+		strlcpy(cs_cfg.rname, temp, MAXREALNAME);
+		free(temp);
+	}
 }

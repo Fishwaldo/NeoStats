@@ -31,6 +31,21 @@
 /* we have vhost support */
 #define GOTSVSVHOST
 
+/* we dont have svsjoin */
+#undef GOTSVSJOIN
+
+/* Moved from connectserv so we can use elsewhere */
+#define LOCOP_MODE 'O'
+#define OPER_MODE 'o'
+#define GUESTADMIN_MODE 'G'
+#define COSERVERADMIN_MODE 'J'
+#define SERVERADMIN_MODE 'A'
+#define CONETADMIN_MODE 'n'
+#define NETADMIN_MODE 'N'
+#define COTECHADMIN_MODE 't'
+#define TECHADMIN_MODE 'T'		/* Set to a number as we dont use */
+#define SERVICESADMIN_MODE 'a'
+#define NETSERVICE_MODE 'S'
 
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"	/* 33 */
@@ -468,6 +483,7 @@ extern int sakill_cmd (const char *host, const char *ident, const char *setby, c
 extern int srakill_cmd (const char *host, const char *ident);
 extern int ssvshost_cmd (const char *who, const char *vhost);
 extern int ssvskill_cmd (const char *who, const char *reason, ...);
+extern int sinvite_cmd (const char *from, const char *to, const char *chan);
 
 void Usr_Version (char *, char **, int argc);
 void Usr_ShowMOTD (char *, char **, int argc);

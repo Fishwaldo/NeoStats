@@ -25,7 +25,9 @@
 #ifndef IRCU_H
 #define IRCU_H
 
-
+#define LOCOP_MODE 'O'
+#define OPER_MODE 'o'
+#define SERVERADMIN_MODE 'a'
 
 
 #define MSG_EOB		"EOB"	/* end of burst */

@@ -41,6 +41,21 @@
  */
 Module *ModList[NUM_MODULES];
 
+char segv_location[SEGV_LOCATION_BUFSIZE];
+char segv_inmodule[SEGV_INMODULE_BUFSIZE];
+
+
+/* @brief Module hash list */
+static hash_t *mh;
+/* @brief Module Socket List hash */
+hash_t *sockh;
+/* @brief Module Timer hash list */
+static hash_t *th;
+/* @brief Module Bot hash list */
+static hash_t *bh;
+/* @brief Module Chan Bot hash list */
+static hash_t *bch;
+
 /** @brief Initialise module list hashes
  *
  * For core use only, initialises module list hashes
@@ -50,7 +65,7 @@ Module *ModList[NUM_MODULES];
  * @return none
 */
 int 
-__init_mod_list ()
+InitModuleHash ()
 {
 	SET_SEGV_LOCATION();
 	mh = hash_create (NUM_MODULES, 0, 0);
@@ -71,6 +86,24 @@ __init_mod_list ()
 	return NS_SUCCESS;
 }
 
+#ifdef DEBUG
+void verify_hashes(void)
+{
+	if (hash_verify (sockh) == 0) {
+		nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the socket hash");
+	}
+	if (hash_verify (mh) == 0) {
+		nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Module hash");
+	}
+	if (hash_verify (bh) == 0) {
+		nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Bot hash");
+	}
+	if (hash_verify (th) == 0) {
+		nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Timer hash");
+	}
+}
+#endif /* DEBUG */
+
 /** @brief create new timer
  *
  * For core use only, creates a timer
@@ -79,26 +112,26 @@ __init_mod_list ()
  * 
  * @return pointer to new timer on success, NULL on error
 */
-static Mod_Timer *
+static ModTimer *
 new_timer (char *timer_name)
 {
-	Mod_Timer *t;
+	ModTimer *mod_tmr;
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "New Timer: %s", timer_name);
-	t = malloc (sizeof (Mod_Timer));
+	mod_tmr = malloc (sizeof (ModTimer));
 	if (!timer_name)
-		strsetnull (t->timername);
+		strsetnull (mod_tmr->timername);
 	else
-		strlcpy (t->timername, timer_name, MAX_MOD_NAME);
-	tn = hnode_create (t);
+		strlcpy (mod_tmr->timername, timer_name, MAX_MOD_NAME);
+	tn = hnode_create (mod_tmr);
 	if (hash_isfull (th)) {
 		nlog (LOG_WARNING, LOG_CORE, "new_timer(): Couldn't add new Timer, Hash is Full!");
 		return NULL;
 	}
 	hash_insert (th, tn, timer_name);
-	return t;
+	return mod_tmr;
 }
 
 /** @brief find timer
@@ -109,14 +142,14 @@ new_timer (char *timer_name)
  * 
  * @return pointer to timer if found, NULL if not found
 */
-Mod_Timer *
+ModTimer *
 findtimer (char *timer_name)
 {
 	hnode_t *tn;
 
 	tn = hash_lookup (th, timer_name);
 	if (tn)
-		return (Mod_Timer *) hnode_get (tn);
+		return (ModTimer *) hnode_get (tn);
 	return NULL;
 }
 
@@ -134,19 +167,19 @@ findtimer (char *timer_name)
 int
 add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 {
-	Mod_Timer *Mod_timer_list;
+	ModTimer *mod_tmr;
 
 	SET_SEGV_LOCATION();
 	if (dlsym ((int *) get_dl_handle (mod_name), func_name) == NULL) {
 		nlog (LOG_WARNING, LOG_CORE, "Oh Oh, The Timer Function doesn't exist");
 		return NS_FAILURE;
 	}
-	Mod_timer_list = new_timer (timer_name);
-	if (Mod_timer_list) {
-		Mod_timer_list->interval = interval;
-		Mod_timer_list->lastrun = me.now;
-		strlcpy (Mod_timer_list->modname, mod_name, MAX_MOD_NAME);
-		Mod_timer_list->function = dlsym ((int *) get_dl_handle (mod_name), func_name);
+	mod_tmr = new_timer (timer_name);
+	if (mod_tmr) {
+		mod_tmr->interval = interval;
+		mod_tmr->lastrun = me.now;
+		strlcpy (mod_tmr->modname, mod_name, MAX_MOD_NAME);
+		mod_tmr->function = dlsym ((int *) get_dl_handle (mod_name), func_name);
 		nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with timer for Function %s", mod_name, func_name);
 		return NS_SUCCESS;
 	}
@@ -164,17 +197,17 @@ add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 int
 del_mod_timer (char *timer_name)
 {
-	Mod_Timer *list;
+	ModTimer *mod_tmr;
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
 	tn = hash_lookup (th, timer_name);
 	if (tn) {
-		list = hnode_get (tn);
-		nlog (LOG_DEBUG2, LOG_CORE, "Unregistered Timer function %s from Module %s", timer_name, list->modname);
+		mod_tmr = hnode_get (tn);
+		nlog (LOG_DEBUG2, LOG_CORE, "Unregistered Timer function %s from Module %s", timer_name, mod_tmr->modname);
 		hash_delete (th, tn);
 		hnode_destroy (tn);
-		free (list);
+		free (mod_tmr);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -189,9 +222,9 @@ del_mod_timer (char *timer_name)
  * @return none
 */
 void
-list_module_timer (User * u)
+list_timers (User * u, char **av, int ac)
 {
-	Mod_Timer *mod_ptr = NULL;
+	ModTimer *mod_tmr = NULL;
 	hscan_t ts;
 	hnode_t *tn;
 
@@ -199,13 +232,53 @@ list_module_timer (User * u)
 	prefmsg (u->nick, s_Services, "Module timer List:");
 	hash_scan_begin (&ts, th);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
-		mod_ptr = hnode_get (tn);
-		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_ptr->modname);
-		prefmsg (u->nick, s_Services, "Module Timer Name: %s", mod_ptr->timername);
-		prefmsg (u->nick, s_Services, "Module Interval: %d", mod_ptr->interval);
-		prefmsg (u->nick, s_Services, "Time till next Run: %d", mod_ptr->interval - (me.now - mod_ptr->lastrun));
+		mod_tmr = hnode_get (tn);
+		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_tmr->modname);
+		prefmsg (u->nick, s_Services, "Module Timer Name: %s", mod_tmr->timername);
+		prefmsg (u->nick, s_Services, "Module Interval: %d", mod_tmr->interval);
+		prefmsg (u->nick, s_Services, "Time till next Run: %d", mod_tmr->interval - (me.now - mod_tmr->lastrun));
 	}
 	prefmsg (u->nick, s_Services, "End of Module timer List");
+}
+
+/** @brief run pending module timer functions
+ *
+ * NeoStats command to run pending timer functions
+ *
+ * @param none
+ * 
+ * @return none
+*/
+void
+run_mod_timers (void)
+{
+	ModTimer *mod_tmr = NULL;
+	hscan_t ts;
+	hnode_t *tn;
+
+/* First, lets see if any modules have a function that is due to run..... */
+	hash_scan_begin (&ts, th);
+	while ((tn = hash_scan_next (&ts)) != NULL) {
+		SET_SEGV_LOCATION();
+		mod_tmr = hnode_get (tn);
+		if (me.now - mod_tmr->lastrun > mod_tmr->interval) {
+			strlcpy (segv_location, mod_tmr->modname, SEGV_LOCATION_BUFSIZE);
+			SET_SEGV_INMODULE(mod_tmr->modname);
+			if (setjmp (sigvbuf) == 0) {
+				if (mod_tmr->function () < 0) {
+					nlog(LOG_DEBUG2, LOG_CORE, "Deleting Timer %s for Module %s as requested", mod_tmr->timername, mod_tmr->modname);
+					hash_scan_delete(th, tn);
+					hnode_destroy(tn);
+					free(mod_tmr);
+				} else {
+					mod_tmr->lastrun = (int) me.now;
+				}
+			} else {
+				nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", mod_tmr->modname);
+			}
+			CLEAR_SEGV_INMODULE();
+		}
+	}
 }
 
 /** @brief create a new socket
@@ -216,26 +289,26 @@ list_module_timer (User * u)
  * 
  * @return pointer to created socket on success, NULL on error
 */
-static Sock_List *
+static ModSock *
 new_sock (char *sock_name)
 {
-	Sock_List *s;
+	ModSock *mod_sock;
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "New Socket: %s", sock_name);
-	s = smalloc (sizeof (Sock_List));
+	nlog (LOG_DEBUG2, LOG_CORE, "New Socket: %mod_sock", sock_name);
+	mod_sock = smalloc (sizeof (ModSock));
 	if (!sock_name)
-		strsetnull (s->sockname);
+		strsetnull (mod_sock->sockname);
 	else
-		strlcpy (s->sockname, sock_name, MAX_MOD_NAME);
-	sn = hnode_create (s);
+		strlcpy (mod_sock->sockname, sock_name, MAX_MOD_NAME);
+	sn = hnode_create (mod_sock);
 	if (hash_isfull (sockh)) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Eeek, SocketHash is full, can not add a new socket");
 		return NULL;
 	}
-	hash_insert (sockh, sn, s->sockname);
-	return s;
+	hash_insert (sockh, sn, mod_sock->sockname);
+	return mod_sock;
 }
 
 /** \fn @brief find socket
@@ -246,7 +319,7 @@ new_sock (char *sock_name)
  * 
  * @return pointer to socket if found, NULL if not found
  */
-Sock_List *
+ModSock *
 findsock (char *sock_name)
 {
 	hnode_t *sn;
@@ -273,7 +346,7 @@ findsock (char *sock_name)
 int
 add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name)
 {
-	Sock_List *Sockets_mod_list;
+	ModSock *mod_sock;
 
 	SET_SEGV_LOCATION();
 	if (readfunc) {
@@ -294,15 +367,15 @@ add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int
 			return NS_FAILURE;
 		}
 	}
-	Sockets_mod_list = new_sock (sock_name);
-	Sockets_mod_list->sock_no = socknum;
-	strlcpy (Sockets_mod_list->modname, mod_name, MAX_MOD_NAME);
-	Sockets_mod_list->readfnc = dlsym ((int *) get_dl_handle (mod_name), readfunc);
-	Sockets_mod_list->writefnc = dlsym ((int *) get_dl_handle (mod_name), writefunc);
-	Sockets_mod_list->errfnc = dlsym ((int *) get_dl_handle (mod_name), errfunc);
-	Sockets_mod_list->socktype = SOCK_STANDARD;
+	mod_sock = new_sock (sock_name);
+	mod_sock->sock_no = socknum;
+	strlcpy (mod_sock->modname, mod_name, MAX_MOD_NAME);
+	mod_sock->readfnc = dlsym ((int *) get_dl_handle (mod_name), readfunc);
+	mod_sock->writefnc = dlsym ((int *) get_dl_handle (mod_name), writefunc);
+	mod_sock->errfnc = dlsym ((int *) get_dl_handle (mod_name), errfunc);
+	mod_sock->socktype = SOCK_STANDARD;
 	
-	nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with Standard Socket functions %s", mod_name, Sockets_mod_list->sockname);
+	nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with Standard Socket functions %s", mod_name, mod_sock->sockname);
 	return NS_SUCCESS;
 }
 
@@ -320,7 +393,7 @@ add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int
 int
 add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name, void *data)
 {
-	Sock_List *Sockets_mod_list;
+	ModSock *mod_sock;
 
 	SET_SEGV_LOCATION();
 	if (beforepoll) {
@@ -335,13 +408,13 @@ add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name
 			return NS_FAILURE;
 		}
 	}
-	Sockets_mod_list = new_sock (sock_name);
-	strlcpy (Sockets_mod_list->modname, mod_name, MAX_MOD_NAME);
-	Sockets_mod_list->socktype = SOCK_POLL;
-	Sockets_mod_list->beforepoll = dlsym ((int *) get_dl_handle (mod_name), beforepoll);
-	Sockets_mod_list->afterpoll = dlsym ((int *) get_dl_handle (mod_name), afterpoll);
-	Sockets_mod_list->data = data;
-	nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with Poll Socket functions %s", mod_name, Sockets_mod_list->sockname);
+	mod_sock = new_sock (sock_name);
+	strlcpy (mod_sock->modname, mod_name, MAX_MOD_NAME);
+	mod_sock->socktype = SOCK_POLL;
+	mod_sock->beforepoll = dlsym ((int *) get_dl_handle (mod_name), beforepoll);
+	mod_sock->afterpoll = dlsym ((int *) get_dl_handle (mod_name), afterpoll);
+	mod_sock->data = data;
+	nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with Poll Socket functions %s", mod_name, mod_sock->sockname);
 	return NS_SUCCESS;
 }
 
@@ -356,17 +429,17 @@ add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name
 int
 del_socket (char *sock_name)
 {
-	Sock_List *list;
+	ModSock *mod_sock;
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
 	sn = hash_lookup (sockh, sock_name);
 	if (sn) {
-		list = hnode_get (sn);
-		nlog (LOG_DEBUG2, LOG_CORE, "Unregistered Socket function %s from Module %s", sock_name, list->modname);
+		mod_sock = hnode_get (sn);
+		nlog (LOG_DEBUG2, LOG_CORE, "Unregistered Socket function %s from Module %s", sock_name, mod_sock->modname);
 		hash_scan_delete (sockh, sn);
 		hnode_destroy (sn);
-		free (list);
+		free (mod_sock);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -381,9 +454,9 @@ del_socket (char *sock_name)
  * @return none
 */
 void
-list_sockets (User * u)
+list_sockets (User * u, char **av, int ac)
 {
-	Sock_List *mod_ptr = NULL;
+	ModSock *mod_sock = NULL;
 	hscan_t ss;
 	hnode_t *sn;
 
@@ -391,11 +464,11 @@ list_sockets (User * u)
 	prefmsg (u->nick, s_Services, "Sockets List: (%d)", hash_count (sockh));
 	hash_scan_begin (&ss, sockh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
-		mod_ptr = hnode_get (sn);
-		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_ptr->modname);
-		prefmsg (u->nick, s_Services, "Socket Name: %s", mod_ptr->sockname);
-		if (mod_ptr->socktype == SOCK_STANDARD) {
-			prefmsg (u->nick, s_Services, "Socket Number: %d", mod_ptr->sock_no);
+		mod_sock = hnode_get (sn);
+		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_sock->modname);
+		prefmsg (u->nick, s_Services, "Socket Name: %s", mod_sock->sockname);
+		if (mod_sock->socktype == SOCK_STANDARD) {
+			prefmsg (u->nick, s_Services, "Socket Number: %d", mod_sock->sock_no);
 		} else {
 			prefmsg (u->nick, s_Services, "Poll Interface");
 		}
@@ -414,31 +487,31 @@ void
 add_bot_to_chan (char *bot, char *chan)
 {
 	hnode_t *cbn;
-	Chan_Bot *bc;
+	ModChanBot *mod_chan_bot;
 	lnode_t *bmn;
 	char *botname;
 
 	cbn = hash_lookup (bch, chan);
 	if (!cbn) {
-		bc = malloc (sizeof (Chan_Bot));
-		strlcpy (bc->chan, chan, CHANLEN);
-		bc->bots = list_create (B_TABLE_SIZE);
-		cbn = hnode_create (bc);
+		mod_chan_bot = malloc (sizeof (ModChanBot));
+		strlcpy (mod_chan_bot->chan, chan, CHANLEN);
+		mod_chan_bot->bots = list_create (B_TABLE_SIZE);
+		cbn = hnode_create (mod_chan_bot);
 		if (hash_isfull (bch)) {
 			nlog (LOG_CRITICAL, LOG_CORE, "eek, bot channel hash is full");
 			return;
 		}
-		hash_insert (bch, cbn, bc->chan);
+		hash_insert (bch, cbn, mod_chan_bot->chan);
 	} else {
-		bc = hnode_get (cbn);
+		mod_chan_bot = hnode_get (cbn);
 	}
-	if (list_isfull (bc->bots)) {
+	if (list_isfull (mod_chan_bot->bots)) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Eeek, Bot Channel List is full for Chan %s", chan);
 		return;
 	}
 	botname = sstrdup (bot);
 	bmn = lnode_create (botname);
-	list_append (bc->bots, bmn);
+	list_append (mod_chan_bot->bots, bmn);
 	return;
 }
 
@@ -453,7 +526,7 @@ void
 del_bot_from_chan (char *bot, char *chan)
 {
 	hnode_t *cbn;
-	Chan_Bot *bc;
+	ModChanBot *mod_chan_bot;
 	lnode_t *bmn;
 	char *botname;
 
@@ -462,21 +535,21 @@ del_bot_from_chan (char *bot, char *chan)
 		nlog (LOG_WARNING, LOG_CORE, "Hu? Can't Find Channel %s for botchanhash", chan);
 		return;
 	}
-	bc = hnode_get (cbn);
-	bmn = list_find (bc->bots, bot, comparef);
+	mod_chan_bot = hnode_get (cbn);
+	bmn = list_find (mod_chan_bot->bots, bot, comparef);
 	if (!bmn) {
 		nlog (LOG_WARNING, LOG_CORE, "Hu? Can't find bot %s in %s in botchanhash", bot, chan);
 		return;
 	}
-	list_delete (bc->bots, bmn);
+	list_delete (mod_chan_bot->bots, bmn);
 	botname = lnode_get(bmn);
 	free (botname);
 	lnode_destroy (bmn);
-	if (list_isempty (bc->bots)) {
+	if (list_isempty (mod_chan_bot->bots)) {
 		/* delete the hash and list because its all over */
 		hash_delete (bch, cbn);
-		list_destroy (bc->bots);
-		free (bc->chan);
+		list_destroy (mod_chan_bot->bots);
+		free (mod_chan_bot->chan);
 		hnode_destroy (cbn);
 	}
 }
@@ -484,35 +557,34 @@ del_bot_from_chan (char *bot, char *chan)
 /** @brief send a message to a channel bot
  *
  * @param origin 
- * @param chan string containing channel name
- * @param av
+ * @param av (note chan string in av[0])
  * @param ac
  * 
  * @return none
  */
 void
-bot_chan_message (char *origin, char *chan, char **av, int ac)
+bot_chan_message (char *origin, char **av, int ac)
 {
 	hnode_t *cbn;
-	Chan_Bot *bc;
+	ModChanBot *mod_chan_bot;
 	lnode_t *bmn;
-	Mod_User *u;
+	ModUser *mod_usr;
 
-	cbn = hash_lookup (bch, chan);
+	cbn = hash_lookup (bch, av[0]);
 	if (!cbn) {
 		/* this isn't bad, just means our bot parted the channel? */
-		nlog (LOG_DEBUG1, LOG_CORE, "eeeh, Can't find channel %s for BotChanMessage", chan);
+		nlog (LOG_DEBUG1, LOG_CORE, "eeeh, Can't find channel %s for BotChanMessage", av[0]);
 		return;
 	}
-	bc = hnode_get (cbn);
-	bmn = list_first (bc->bots);
+	mod_chan_bot = hnode_get (cbn);
+	bmn = list_first (mod_chan_bot->bots);
 	while (bmn) {
-		u = findbot (lnode_get (bmn));
-		if (u->chanfunc) {
-			nlog (LOG_DEBUG2, LOG_CORE, "Running Module for Chanmessage %s", chan);
-			u->chanfunc (origin, chan, av, ac);
+		mod_usr = findbot (lnode_get (bmn));
+		if (mod_usr->chanfunc) {
+			nlog (LOG_DEBUG2, LOG_CORE, "Running Module for Chanmessage %s", av[0]);
+			mod_usr->chanfunc (origin, av, ac);
 		}
-		bmn = list_next (bc->bots, bmn);
+		bmn = list_next (mod_chan_bot->bots, bmn);
 	}
 }
 
@@ -523,22 +595,22 @@ bot_chan_message (char *origin, char *chan, char **av, int ac)
  * @return none
  */
 void
-botchandump (User * u)
+list_bot_chans (User * u, char **av, int ac)
 {
 	hscan_t hs;
 	hnode_t *hn;
 	lnode_t *ln;
-	Chan_Bot *bc;
+	ModChanBot *mod_chan_bot;
 
 	prefmsg (u->nick, s_Services, "BotChanDump:");
 	hash_scan_begin (&hs, bch);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
-		bc = hnode_get (hn);
-		prefmsg (u->nick, s_Services, "%s:--------------------------------", bc->chan);
-		ln = list_first (bc->bots);
+		mod_chan_bot = hnode_get (hn);
+		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_chan_bot->chan);
+		ln = list_first (mod_chan_bot->bots);
 		while (ln) {
 			prefmsg (u->nick, s_Services, "Bot Name: %s", lnode_get (ln));
-			ln = list_next (bc->bots, ln);
+			ln = list_next (mod_chan_bot->bots, ln);
 		}
 	}
 }
@@ -549,26 +621,27 @@ botchandump (User * u)
  * 
  * @return none
  */
-static Mod_User *
+static ModUser *
 new_bot (char *bot_name)
 {
-	Mod_User *u;
+	ModUser *mod_usr;
 	hnode_t *bn;
 
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "New Bot: %s", bot_name);
-	u = malloc (sizeof (Mod_User));
+	mod_usr = malloc (sizeof (ModUser));
+	
 	if (!bot_name)
-		strsetnull (u->nick);
+		strsetnull (mod_usr->nick);
 	else
-		strlcpy (u->nick, bot_name, MAXNICK);
-	bn = hnode_create (u);
+		strlcpy (mod_usr->nick, bot_name, MAXNICK);
+	bn = hnode_create (mod_usr);
 	if (hash_isfull (bh)) {
 		chanalert (s_Services, "Warning ModuleBotlist is full");
 		return NULL;
 	}
-	hash_insert (bh, bn, bot_name);
-	return u;
+	hash_insert (bh, bn, mod_usr->nick);
+	return mod_usr;
 }
 
 /** @brief 
@@ -580,21 +653,21 @@ new_bot (char *bot_name)
 int
 add_mod_user (char *nick, char *mod_name)
 {
-	Mod_User *Mod_Usr_list;
-	Module *list_ptr;
+	ModUser *mod_usr;
+	Module *mod_ptr;
 	hnode_t *mn;
 
 	SET_SEGV_LOCATION();
-	Mod_Usr_list = new_bot (nick);
+	mod_usr = new_bot (nick);
 	/* add a brand new user */
-	strlcpy (Mod_Usr_list->nick, nick, MAXNICK);
-	strlcpy (Mod_Usr_list->modname, mod_name, MAX_MOD_NAME);
+	strlcpy (mod_usr->nick, nick, MAXNICK);
+	strlcpy (mod_usr->modname, mod_name, MAX_MOD_NAME);
 
 	mn = hash_lookup (mh, mod_name);
 	if (mn) {
-		list_ptr = hnode_get (mn);
-		Mod_Usr_list->function = dlsym (list_ptr->dl_handle, "__Bot_Message");
-		Mod_Usr_list->chanfunc = dlsym (list_ptr->dl_handle, "__Chan_Message");
+		mod_ptr = hnode_get (mn);
+		mod_usr->function = dlsym (mod_ptr->dl_handle, "__BotMessage");
+		mod_usr->chanfunc = dlsym (mod_ptr->dl_handle, "__ChanMessage");
 		return NS_SUCCESS;
 	}
 	nlog (LOG_WARNING, LOG_CORE, "add_mod_user(): Couldn't Add ModuleBot to List");
@@ -607,7 +680,7 @@ add_mod_user (char *nick, char *mod_name)
  * 
  * @return
  */
-Mod_User *
+ModUser *
 findbot (char *bot_name)
 {
 	hnode_t *bn;
@@ -615,7 +688,7 @@ findbot (char *bot_name)
 	SET_SEGV_LOCATION();
 	bn = hash_lookup (bh, bot_name);
 	if (bn) {
-		return (Mod_User *) hnode_get (bn);
+		return (ModUser *) hnode_get (bn);
 	}
 	return NULL;
 }
@@ -629,16 +702,16 @@ findbot (char *bot_name)
 int
 del_mod_user (char *bot_name)
 {
-	Mod_User *list;
+	ModUser *mod_usr;
 	hnode_t *bn;
 
 	SET_SEGV_LOCATION();
 	bn = hash_lookup (bh, bot_name);
 	if (bn) {
 		hash_delete (bh, bn);
-		list = hnode_get (bn);
+		mod_usr = hnode_get (bn);
 		hnode_destroy (bn);
-		free (list);
+		free (mod_usr);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -654,7 +727,7 @@ int
 bot_nick_change (char *oldnick, char *newnick)
 {
 	User *u;
-	Mod_User *mod_tmp, *mod_ptr;
+	ModUser *mod_usr_new, *mod_usr;
 
 	SET_SEGV_LOCATION();
 	/* First, try to find out if the newnick is unique! */
@@ -665,14 +738,14 @@ bot_nick_change (char *oldnick, char *newnick)
 	}
 	u = finduser (newnick);
 	if (!u) {
-		if ((mod_ptr = findbot (oldnick)) != NULL) {
+		if ((mod_usr = findbot (oldnick)) != NULL) {
 			nlog (LOG_DEBUG3, LOG_CORE, "Bot %s Changed its nick to %s", oldnick, newnick);
-			mod_tmp = new_bot (newnick);
+			mod_usr_new = new_bot (newnick);
 
 			/* add a brand new user */ 
-			strlcpy (mod_tmp->nick, newnick, MAXNICK);
-			strlcpy (mod_tmp->modname, mod_ptr->modname, MAX_MOD_NAME);
-			mod_tmp->function = mod_ptr->function;
+			strlcpy (mod_usr_new->nick, newnick, MAXNICK);
+			strlcpy (mod_usr_new->modname, mod_usr->modname, MAX_MOD_NAME);
+			mod_usr_new->function = mod_usr->function;
 
 			/* Now Delete the Old bot nick */   
 			del_mod_user (oldnick);
@@ -691,9 +764,9 @@ bot_nick_change (char *oldnick, char *newnick)
  * @return
  */
 void
-list_module_bots (User * u)
+list_bots (User * u, char **av, int ac)
 {
-	Mod_User *mod_ptr;
+	ModUser *mod_usr;
 	hnode_t *bn;
 	hscan_t bs;
 
@@ -701,11 +774,92 @@ list_module_bots (User * u)
 	prefmsg (u->nick, s_Services, "Module Bot List:");
 	hash_scan_begin (&bs, bh);
 	while ((bn = hash_scan_next (&bs)) != NULL) {
-		mod_ptr = hnode_get (bn);
-		prefmsg (u->nick, s_Services, "Module: %s", mod_ptr->modname);
-		prefmsg (u->nick, s_Services, "Module Bots: %s", mod_ptr->nick);
+		mod_usr = hnode_get (bn);
+		prefmsg (u->nick, s_Services, "Module: %s", mod_usr->modname);
+		prefmsg (u->nick, s_Services, "Module Bots: %s", mod_usr->nick);
 	}
 	prefmsg (u->nick, s_Services, "End of Module Bot List");
+}
+
+/** @brief ModuleEvent
+ *
+ * 
+ *
+ * @return none
+ */
+void
+ModuleEvent (char *event, char **av, int ac)
+{
+	Module *module_ptr;
+	EventFnList *ev_list;
+	hscan_t ms;
+	hnode_t *mn;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin (&ms, mh);
+	while ((mn = hash_scan_next (&ms)) != NULL) {
+		module_ptr = hnode_get (mn);
+		ev_list = module_ptr->event_list;
+		if (ev_list) {
+			while (ev_list->cmd_name != NULL) {
+				/* This goes through each Command */
+				if (!strcasecmp (ev_list->cmd_name, event)) {
+					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Comamnd %s -> %s", module_ptr->info->module_name, event, ev_list->cmd_name);
+					SET_SEGV_LOCATION();
+					SET_SEGV_INMODULE(module_ptr->info->module_name);
+					if (setjmp (sigvbuf) == 0) {
+						if (ev_list->function) ev_list->function (av, ac);
+					} else {
+						nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
+					}
+					CLEAR_SEGV_INMODULE();
+					SET_SEGV_LOCATION();
+#ifndef VALGRIND
+					break;
+#endif
+				}
+				ev_list++;
+			}
+		}
+	}
+}
+
+/** @brief 
+ *
+ * 
+ *
+ * @return none
+ */
+void
+ModuleFunction (int cmdptr, char *cmd, char* origin, char **av, int ac)
+{
+	Module *module_ptr;
+	Functions *fn_list;
+	hscan_t ms;
+	hnode_t *mn;
+
+	hash_scan_begin (&ms, mh);
+	while ((mn = hash_scan_next (&ms)) != NULL) {
+		module_ptr = hnode_get (mn);
+		fn_list = module_ptr->function_list;
+		while (fn_list->cmd_name != NULL) {
+			/* This goes through each Command */
+			if (!strcmp (fn_list->cmd_name, cmd)) {
+				if (fn_list->srvmsg == cmdptr) {
+					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
+					SET_SEGV_LOCATION();
+					SET_SEGV_INMODULE(module_ptr->info->module_name);
+					if (setjmp (sigvbuf) == 0) {
+						fn_list->function (origin, av, ac);
+					}
+					CLEAR_SEGV_INMODULE();
+					SET_SEGV_LOCATION();
+					break;
+				}
+			}
+			fn_list++;
+		}
+	}
 }
 
 /** @brief 
@@ -730,11 +884,11 @@ load_module (char *modfilename, User * u)
 	int ac = 0;
 	int i = 0;
 #ifdef OLD_MODULE_EXPORT_SUPPORT
-	Module_Info *(*mod_get_info) () = NULL;
+	ModuleInfo *(*mod_get_info) () = NULL;
 	Functions *(*mod_get_funcs) () = NULL;
 	EventFnList *(*mod_get_events) () = NULL;
 #endif /* OLD_MODULE_EXPORT_SUPPORT */
-	Module_Info *mod_info_ptr = NULL;
+	ModuleInfo *mod_info_ptr = NULL;
 	Functions *mod_funcs_ptr = NULL;
 	EventFnList *event_fn_ptr = NULL;
 	Module *mod_ptr = NULL;
@@ -886,7 +1040,7 @@ load_module (char *modfilename, User * u)
 	mod_ptr->info = mod_info_ptr;
 	mod_ptr->function_list = mod_funcs_ptr;
 	mod_ptr->dl_handle = dl_handle;
-	mod_ptr->other_funcs = event_fn_ptr;
+	mod_ptr->event_list = event_fn_ptr;
 
 	/* assign a module number to this module */
 	i = 0;
@@ -943,13 +1097,13 @@ load_module (char *modfilename, User * u)
 int
 get_dl_handle (char *mod_name)
 {
-	Module *list_ptr;
+	Module *mod_ptr;
 	hnode_t *mn;
 
 	mn = hash_lookup (mh, mod_name);
 	if (mn) {
-		list_ptr = hnode_get (mn);
-		return (int) list_ptr->dl_handle;
+		mod_ptr = hnode_get (mn);
+		return (int) mod_ptr->dl_handle;
 	}
 	return 0;
 }
@@ -984,7 +1138,7 @@ get_mod_num (char *mod_name)
  * @return
  */
 void
-list_module (User * u)
+list_modules (User * u, char **av, int ac)
 {
 	Module *mod_ptr = NULL;
 	hnode_t *mn;
@@ -1010,10 +1164,10 @@ list_module (User * u)
 int
 unload_module (char *module_name, User * u)
 {
-	Module *list;
-	Mod_User *mod_ptr = NULL;
-	Mod_Timer *mod_tmr = NULL;
-	Sock_List *mod_sock = NULL;
+	Module *mod_ptr;
+	ModUser *mod_usr;
+	ModTimer *mod_tmr;
+	ModSock *mod_sock;
 	hnode_t *modnode;
 	hscan_t hscan;
 	int i;
@@ -1056,10 +1210,10 @@ unload_module (char *module_name, User * u)
 		/* now, see if this Module has any bots with it */
 		hash_scan_begin (&hscan, bh);
 		while ((modnode = hash_scan_next (&hscan)) != NULL) {
-			mod_ptr = hnode_get (modnode);
-			if (!strcasecmp (mod_ptr->modname, module_name)) {
-				nlog (LOG_DEBUG1, LOG_CORE, "Module %s had bot %s Registered. Deleting..", module_name, mod_ptr->nick);
-				del_bot (mod_ptr->nick, "Module Unloaded");
+			mod_usr = hnode_get (modnode);
+			if (!strcasecmp (mod_usr->modname, module_name)) {
+				nlog (LOG_DEBUG1, LOG_CORE, "Module %s had bot %s Registered. Deleting..", module_name, mod_usr->nick);
+				del_bot (mod_usr->nick, "Module Unloaded");
 			}
 		}
 
@@ -1071,11 +1225,11 @@ unload_module (char *module_name, User * u)
 
 		i = get_mod_num (module_name);
 
-		list = hnode_get (modnode);
+		mod_ptr = hnode_get (modnode);
 		SET_SEGV_INMODULE(module_name);
 		
 		/* call __ModFini (replacement for library __fini() call */
-		dofini = dlsym ((int *) list->dl_handle, "__ModFini");
+		dofini = dlsym ((int *) mod_ptr->dl_handle, "__ModFini");
 		if (dofini) {
 			(*dofini) ();
 		}
@@ -1087,7 +1241,7 @@ unload_module (char *module_name, User * u)
 		/* Close module */
 		SET_SEGV_INMODULE(module_name);
 #ifndef VALGRIND
-		dlclose (list->dl_handle);
+		dlclose (mod_ptr->dl_handle);
 #endif
 		CLEAR_SEGV_INMODULE();
 
@@ -1096,7 +1250,7 @@ unload_module (char *module_name, User * u)
 			/* free the module number */
 			ModList[i] = NULL;
 		}
-		free (list);
+		free (mod_ptr);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;

@@ -132,28 +132,6 @@ HASH (const unsigned char *name, int size_of_table)
 
 /** @brief convert a string to lowercase
  *
- * makes a string lowercase (DO NOT USE
- *
- * @param s the string to convert to lowercase. WARNING: the result overwrites this variable
- *
- * @returns pointer to the lowercase version of s
- *
- */
-
-char *
-strlower (char *s)
-{
-	char *t;
-	t = malloc (strlen (s));
-	strlcpy (t, s, strlen (s));
-	while (*t) {
-		*t++ = tolower (*t);
-	}
-	return t;
-}
-
-/** @brief convert a string to lowercase
- *
  * makes a string lowercase
  *
  * @param s the string to convert to lowercase. WARNING: the result overwrites this variable
@@ -194,25 +172,6 @@ AddStringToList (char ***List, char S[], int *C)
 	}
 	++*C;
 	(*List)[*C - 1] = S;
-}
-
-/** @brief Frees a list created with AddStringToList
- *
- * Frees the memory used for a string array used with AddStringToList
- *
- * @param List the array you wish to delete
- * @param C the current size of the array as returned by AddStringToList
- * 
- * @returns Nothing
- *
- */
-void
-FreeList (char **List, int C)
-{
-	int i;
-	for (i = 0; i == C; i++)
-		free (List[i]);
-	C = 0;
 }
 
 /** @brief 

@@ -29,6 +29,7 @@
 #include "ircd.h"
 #include "dl.h"
 #include "log.h"
+#include "services.h"
 
 /** @brief init_bot
  *
@@ -37,7 +38,7 @@
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int
-init_bot (char *nick, char *user, char *host, char *rname, char *modes, char *mod_name)
+init_bot (char *nick, char *user, char *host, char *rname, const char *modes, char *mod_name)
 {
 	User *u;
 	char **av;
@@ -84,7 +85,7 @@ init_bot (char *nick, char *user, char *host, char *rname, char *modes, char *mo
 	}
 	SignOn_NewBot (nick, user, host, rname, Umode);
 	AddStringToList (&av, nick, &ac);
-	Module_Event (EVENT_SIGNON, av, ac);
+	ModuleEvent (EVENT_SIGNON, av, ac);
 	free (av);
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
@@ -113,49 +114,6 @@ del_bot (char *nick, char *reason)
 	squit_cmd (nick, reason);
 	del_mod_user (nick);
 	return NS_SUCCESS;
-}
-
-/** @brief Module_Event
- *
- * 
- *
- * @return none
- */
-void
-Module_Event (char *event, char **av, int ac)
-{
-	Module *module_ptr;
-	EventFnList *ev_list;
-	hscan_t ms;
-	hnode_t *mn;
-
-	SET_SEGV_LOCATION();
-	hash_scan_begin (&ms, mh);
-	while ((mn = hash_scan_next (&ms)) != NULL) {
-		module_ptr = hnode_get (mn);
-		ev_list = module_ptr->other_funcs;
-		if (ev_list) {
-			while (ev_list->cmd_name != NULL) {
-				/* This goes through each Command */
-				if (!strcasecmp (ev_list->cmd_name, event)) {
-					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Comamnd %s -> %s", module_ptr->info->module_name, event, ev_list->cmd_name);
-					SET_SEGV_LOCATION();
-					SET_SEGV_INMODULE(module_ptr->info->module_name);
-					if (setjmp (sigvbuf) == 0) {
-						if (ev_list->function) ev_list->function (av, ac);
-					} else {
-						nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
-					}
-					CLEAR_SEGV_INMODULE();
-					SET_SEGV_LOCATION();
-#ifndef VALGRIND
-					break;
-#endif
-				}
-				ev_list++;
-			}
-		}
-	}
 }
 
 /** @brief split_buf
@@ -249,11 +207,7 @@ parse (char *line)
 	int I = 0;
 	int ac;
 	char **av;
-	Module *module_ptr;
-	Functions *fn_list;
-	Mod_User *list;
-	hscan_t ms;
-	hnode_t *mn;
+	ModUser *mod_usr;
 
 	SET_SEGV_LOCATION();
 	strip (line);
@@ -286,11 +240,11 @@ parse (char *line)
 		coreLine = line + strlen (line);
 #ifdef IRCU
 	if ((!strcasecmp(line, "SERVER")) || (!strcasecmp(line, "PASS"))) {
-		strncpy(cmd, line, sizeof(cmd));
+		strlcpy(cmd, line, sizeof(cmd));
 		ac = split_buf(coreLine, &av, 1);
 		cmdptr = 0;
 	} else {
-		strncpy(origin, line, sizeof(origin));	
+		strlcpy(origin, line, sizeof(origin));	
 		cmdptr = 1;
 		line = strpbrk (coreLine, " ");
 		if (line) {
@@ -302,7 +256,7 @@ parse (char *line)
 	}
 
 #else 
-	strncpy (cmd, line, sizeof (cmd));
+	strlcpy (cmd, line, sizeof (cmd));
 
 	ac = split_buf (coreLine, &av, 1);
 #endif
@@ -334,10 +288,10 @@ parse (char *line)
 			free (av);
 			return;
 		} else {
-			list = findbot (av[0]);
+			mod_usr = findbot (av[0]);
 			/* Check to see if any of the Modules have this nick Registered */
-			if (list) {
-				nlog (LOG_DEBUG1, LOG_CORE, "nicks: %s", list->nick);
+			if (mod_usr) {
+				nlog (LOG_DEBUG1, LOG_CORE, "nicks: %s", mod_usr->nick);
 				if (flood (finduser (origin))) {
 					free (av);
 					return;
@@ -354,16 +308,16 @@ parse (char *line)
 				}
 
 				SET_SEGV_LOCATION();
-				SET_SEGV_INMODULE(list->modname);
+				SET_SEGV_INMODULE(mod_usr->modname);
 				if (setjmp (sigvbuf) == 0) {
-					list->function (origin, av, ac);
+					mod_usr->function (origin, av, ac);
 				}
 				CLEAR_SEGV_INMODULE();
 				SET_SEGV_LOCATION();
 				free (av);
 				return;
 			} else {
-				bot_chan_message (origin, av[0], av, ac);
+				bot_chan_message (origin, av, ac);
 				free (av);
 				return;
 			}
@@ -383,28 +337,7 @@ parse (char *line)
 	}
 	/* K, now Parse it to the Module functions */
 	SET_SEGV_LOCATION();
-	hash_scan_begin (&ms, mh);
-	while ((mn = hash_scan_next (&ms)) != NULL) {
-		module_ptr = hnode_get (mn);
-		fn_list = module_ptr->function_list;
-		while (fn_list->cmd_name != NULL) {
-			/* This goes through each Command */
-			if (!strcmp (fn_list->cmd_name, cmd)) {
-				if (fn_list->srvmsg == cmdptr) {
-					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
-					SET_SEGV_LOCATION();
-					SET_SEGV_INMODULE(module_ptr->info->module_name);
-					if (setjmp (sigvbuf) == 0) {
-						fn_list->function (origin, av, ac);
-					}
-					CLEAR_SEGV_INMODULE();
-					SET_SEGV_LOCATION();
-					break;
-				}
-			}
-			fn_list++;
-		}
-	}
+	ModuleFunction (cmdptr, cmd, origin, av, ac);
 	free (av);
 }
 
@@ -430,11 +363,11 @@ init_ServBot (void)
 	SignOn_NewBot (s_Services, Servbot.user, Servbot.host, rname, UMODE_SERVICES);
 	me.onchan = 1;
 	AddStringToList (&av, me.uplink, &ac);
-	Module_Event (EVENT_ONLINE, av, ac);
+	ModuleEvent (EVENT_ONLINE, av, ac);
 	free (av);
 	ac = 0;
 	AddStringToList (&av, s_Services, &ac);
-	Module_Event (EVENT_SIGNON, av, ac);
+	ModuleEvent (EVENT_SIGNON, av, ac);
 	free (av);
 }
 
@@ -457,7 +390,7 @@ dopong (Server * s)
 		if (!strcmp (me.s->name, s->name))
 			ping.ulag = me.s->ping;
 		AddStringToList (&av, s->name, &ac);
-		Module_Event (EVENT_PONG, av, ac);
+		ModuleEvent (EVENT_PONG, av, ac);
 		free (av);
 	} else {
 		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", recbuf);
@@ -479,7 +412,7 @@ flood (User * u)
 		nlog (LOG_WARNING, LOG_CORE, "Warning, Can't find user for FLOODcheck");
 		return 0;
 	}
-	if (UserLevel (u) >= 40)	/* locop or higher */
+	if (UserLevel (u) >= NS_ULEVEL_OPER)	/* locop or higher */
 		return 0;
 	if (current - u->t_flood > 10) {
 		u->t_flood = me.now;

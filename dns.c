@@ -34,8 +34,9 @@
 #include "stats.h"
 #include "log.h"
 #include <adns.h>
+#include "dns.h"
 
-
+adns_state ads;
 
 /** @brief DNS lookup Struct
  * structure containing all pending DNS lookups and the callback functions 

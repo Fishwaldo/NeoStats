@@ -465,9 +465,6 @@ RECONNECT_TIME $NEOCONN
 #    
 #    Multiple instances of LOAD_MODULE may be specified 
 
-# this loads the Spam Module
-#LOAD_MODULE spam
-
 # this is the StatServ Module
 #LOAD_MODULE statserv
 

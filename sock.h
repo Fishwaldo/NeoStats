@@ -26,8 +26,9 @@
 #ifndef SOCK_H
 #define SOCK_H
 
-
+int ConnectTo (char * host, int port);
+void read_loop (void);
+int getmaxsock (void);
 void sts (char *fmt, ...);
-
 
 #endif

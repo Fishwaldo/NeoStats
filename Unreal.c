@@ -29,10 +29,14 @@
 #include "Unreal.h"
 #include "dl.h"
 #include "log.h"
+#include "users.h"
+#include "server.h"
+#include "chans.h"
 
 static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(U)";
+const char services_bot_modes[]= "+oS";
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -247,7 +251,7 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_KILLS, 'k', 0}
 	,
-	{UMODE_SERVICES, 'S', 200}
+	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT}
 	,
 	{UMODE_SADMIN, 'a', 100}
 	,
@@ -267,7 +271,7 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_ADMIN, 'A', 70}
 	,
-	{UMODE_NETADMIN, 'N', 185}
+	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN}
 	,
 	{UMODE_TECHADMIN, 'T', 190}
 	,
@@ -512,6 +516,13 @@ ssvshost_cmd (const char *who, const char *vhost)
 	sts (":%s %s %s %s", me.name, (me.token ? TOK_CHGHOST : MSG_CHGHOST), who, vhost);
 	return 1;
 }
+
+int 
+sinvite_cmd (const char *from, const char *to, const char *chan) {
+	sts (":%s INVITE %s %s", from, to, chan);
+	return 1;
+}
+
 
 int
 ssvsmode_cmd (const char *target, const char *modes)
@@ -792,7 +803,7 @@ Usr_Away (char *origin, char **argv, int argc)
 		} else {
 			buf = NULL;
 		}
-		Do_Away (u, buf);
+		UserAway (u, buf);
 		if (argc > 0) {
 			free (buf);
 		}
@@ -818,7 +829,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 	c = findchan (argv[0]);
 	if (c) {
 		buf = joinbuf (argv, argc, 3);
-		Change_Topic (argv[1], c, atoi (argv[2]), buf);
+		ChangeTopic (argv[1], c, atoi (argv[2]), buf);
 		free (buf);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);
@@ -873,7 +884,7 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 	snetinfo_cmd ();
 	init_ServBot ();
 	globops (me.name, "Link with Network \2Complete!\2");
-	Module_Event (EVENT_NETINFO, NULL, 0);
+	ModuleEvent (EVENT_NETINFO, NULL, 0);
 	me.synced = 1;
 }
 

@@ -33,11 +33,19 @@
 
 static int new_m_version(char *origin, char **av, int ac);
 void sr_cb_config(char *arg, int configtype);
+extern void ext_auth_list(User *u, char **av, int ac);
+
+const char *sr_help_list[] = {
+	"Syntax: \2SRLIST\2",
+	"",
+	"This command lists the ServiceRoots defined in the configuration file",
+	NULL
+};
 
 ModuleInfo __module_info = {
 	"extauth",
 	"ServiceRoots Authentication Module",
-	"1.1",
+	"1.2",
 	__DATE__,
 	__TIME__
 };
@@ -89,6 +97,7 @@ int __ModInit(int modnum, int apiver)
 		     "ServiceRoots: ehh, config failed");
 		/* we can't unload the extauth module so don't return -1 */
 	}
+	add_services_cmd("SRLIST", ext_auth_list, 0, NS_ULEVEL_OPER, sr_help_list, "ServiceRoots List");
 	return 1;
 }
 
@@ -101,6 +110,7 @@ void __ModFini()
 		un = list_next(srconf.ul, un);
 	}
 	list_destroy_nodes(srconf.ul);
+	del_services_cmd("SRLIST");
 }
 
 void sr_cb_config(char *arg, int configtype)
@@ -133,14 +143,14 @@ void sr_cb_config(char *arg, int configtype)
 				strlcpy(sru->nick, nick, MAXNICK);
 				strlcpy(sru->ident, user, MAXUSER);
 				strlcpy(sru->host, host, MAXHOST);
-				sru->lvl = 200;
+				sru->lvl = NS_ULEVEL_ROOT;
 			} else {
 				/* old format... Warn, but keep going */
 				sru = malloc(sizeof(users));
 				strlcpy(sru->nick, arg, MAXNICK);
 				strlcpy(sru->ident, "*", MAXUSER);
 				strlcpy(sru->host, "*", MAXHOST);
-				sru->lvl = 200;
+				sru->lvl = NS_ULEVEL_ROOT;
 				nlog(LOG_WARNING, LOG_CORE,
 				     "Old ServiceRoots Entry Detected. Suggest you upgrade ASAP to <nick>!<ident>@<host> (WildCards are allowed)");
 			}
@@ -181,3 +191,19 @@ extern int __list_auth(User * u)
 	}
 	return 1;
 }
+
+extern void ext_auth_list(User *u, char **av, int ac) {
+	lnode_t *un;
+	struct users *sru;
+	
+	SET_SEGV_LOCATION();
+	un = list_first(srconf.ul);
+		prefmsg(u->nick, s_Services, "ServiceRoots:");
+	while (un) {
+		sru = lnode_get(un);
+		prefmsg(u->nick, s_Services, "%s!%s@%s %d", sru->nick, sru->ident,
+			     sru->host, sru->lvl);
+		un = list_next(srconf.ul, un);
+	}
+	return;
+}	

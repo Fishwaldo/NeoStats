@@ -25,8 +25,20 @@
 #ifndef HYBRID7_H
 #define HYBRID7_H
 
+/* we dont support tokens */
+#undef HAVE_TOKEN_SUP
+
+/* we dont have svshost support */
+#undef GOTSVSHOST 
+
+/* we don't have svsjoin support */
+#undef GOTSVSJOIN 
 
 
+/* Moved from connectserv so we can use elsewhere */
+#define LOCOP_MODE 'O'
+#define OPER_MODE 'o'
+#define SERVERADMIN_MODE 'a'
 
 #define MSG_EOB		"EOB"	/* end of burst */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */

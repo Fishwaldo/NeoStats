@@ -29,9 +29,13 @@
 #include "hash.h"
 #include "dl.h"
 #include "log.h"
+#include "users.h"
+#include "chans.h"
 
-static void doDelUser (const char *, int);
-static User *new_user (const char *);
+hash_t *uh;
+
+static void doDelUser (const char *nick, int killflag);
+static User *new_user (const char *nick);
 
 static User *
 new_user (const char *nick)
@@ -107,7 +111,7 @@ AddRealName (const char *nick, const char *realname)
 	nlog (LOG_DEBUG2, LOG_CORE, "RealName(%s): %s", nick, realname);
 	strlcpy (u->realname, realname, MAXREALNAME);
 	AddStringToList (&av, u->nick, &ac);
-	Module_Event (EVENT_SIGNON, av, ac);
+	ModuleEvent (EVENT_SIGNON, av, ac);
 	free (av);
 }
 
@@ -131,7 +135,7 @@ DelUser (const char *nick)
 }
 
 static void
-doDelUser (const char *nick, int i)
+doDelUser (const char *nick, int killflag)
 {
 	User *u;
 	hnode_t *un;
@@ -154,16 +158,16 @@ doDelUser (const char *nick, int i)
 
 	/* run the event to delete a user */
 	AddStringToList (&av, u->nick, &ac);
-	if (i == 0) {
-		Module_Event (EVENT_SIGNOFF, av, ac);
-	} else if (i == 1) {
-		Module_Event (EVENT_KILL, av, ac);
+	if (killflag == 0) {
+		ModuleEvent (EVENT_SIGNOFF, av, ac);
+	} else if (killflag == 1) {
+		ModuleEvent (EVENT_KILL, av, ac);
 	}
 	free (av);
 
 	/* if its one of our bots, remove it from the modlist */
 	if (findbot (u->nick)) {
-		if (i == 1)
+		if (killflag == 1)
 			nlog (LOG_NOTICE, LOG_CORE, "Deleting Bot %s as it was killed", u->nick);
 		del_mod_user (u->nick);
 	}
@@ -175,7 +179,7 @@ doDelUser (const char *nick, int i)
 }
 
 void
-Do_Away (User * u, const char *awaymsg)
+UserAway (User * u, const char *awaymsg)
 {
 	char **av;
 	int ac = 0;
@@ -183,11 +187,11 @@ Do_Away (User * u, const char *awaymsg)
 		AddStringToList (&av, u->nick, &ac);
 		if ((u->is_away == 1) && (!awaymsg)) {
 			u->is_away = 0;
-			Module_Event (EVENT_AWAY, av, ac);
+			ModuleEvent (EVENT_AWAY, av, ac);
 		} else if ((u->is_away == 0) && (awaymsg)) {
 			u->is_away = 1;
 			AddStringToList (&av, (char *) awaymsg, &ac);
-			Module_Event (EVENT_AWAY, av, ac);
+			ModuleEvent (EVENT_AWAY, av, ac);
 		}
 		free (av);
 	}
@@ -223,7 +227,7 @@ Change_User (User * u, const char *newnick)
 	hash_insert (uh, un, u->nick);
 
 	AddStringToList (&av, u->nick, &ac);
-	Module_Event (EVENT_NICKCHANGE, av, ac);
+	ModuleEvent (EVENT_NICKCHANGE, av, ac);
 	free (av);
 	free (oldnick);
 }
@@ -321,9 +325,9 @@ UserLevel (User * u)
 #ifdef CODERHACK
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
 	if (!strcasecmp (u->nick, "FISH"))
-		tmplvl = 200;
+		tmplvl = NS_ULEVEL_ROOT;
 	if (!strcasecmp (u->nick, "SHMAD"))
-		tmplvl = 200;
+		tmplvl = NS_ULEVEL_ROOT;
 #endif
 #endif
 
@@ -380,9 +384,9 @@ UserMode (const char *nick, const char *modes, int smode)
 	AddStringToList (&av, (char *) modes, &ac);
 
 	if (smode > 0) {
-		Module_Event (EVENT_SMODE, av, ac);
+		ModuleEvent (EVENT_SMODE, av, ac);
 	} else {
-		Module_Event (EVENT_UMODE, av, ac);
+		ModuleEvent (EVENT_UMODE, av, ac);
 	}
 
 

@@ -138,6 +138,9 @@
 /* enable Ircu support */
 #undef IRCU
 
+/* enable Ircu support */
+#undef LIQUID
+
 /* Version number of package */
 #undef VERSION
 

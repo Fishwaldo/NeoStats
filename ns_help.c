@@ -36,9 +36,9 @@ const char *ns_help[] = {
 	NULL
 };
 
-const char *ns_myuser_help[] = {
+const char *ns_sa_help[] = {
 	"",
-	"Additional commands for Service Roots",
+	"Additional commands for Service Admins",
 	"",
 	"    SHUTDOWN       Shutdown NeoStats",
 	"    RELOAD         Force NeoStats to reload",
@@ -50,14 +50,22 @@ const char *ns_myuser_help[] = {
 	"    RAW            Send a raw command from this Server",
 #endif
 	"    JUPE           Jupiter a Server",
+	NULL
+};
+
+const char *ns_sr_help[] = {
+	"",
+	"Additional commands for Service Roots",
+	"",
+	"    JUPE           Jupiter a Server",
 	"    DEBUG          Toggles debug mode",
 	"    USERDUMP       Debug user table",
 	"    CHANDUMP       Debug channel table",
 	"    SERVERDUMP     Debug server table",
-	"    MODBOTLIST     List of current module bots",
-	"    MODSOCKLIST    List of current module sockets",
-	"    MODTIMERLIST   List of current module timers",
-	"    MODBOTCHANLIST List of current module bot channels",
+	"    BOTLIST        List current module bots",
+	"    SOCKLIST       List current module sockets",
+	"    TIMERLIST      List current module timers",
+	"    BOTCHANLIST    List current module bot channels",
 	NULL
 };
 
@@ -127,7 +135,7 @@ const char *ns_modlist_help[] = {
 };
 
 const char *ns_debug_help[] = {
-	"Syntax: \2DEBUG\2",
+	"Syntax: \2DEBUG <ON|OFF>\2",
 	"",
 	"Toggles debug mode. When enabled, debugging information is",
 	"sent to the services channel.",
@@ -185,6 +193,7 @@ const char *ns_serverdump_help[] = {
 };
 
 const char *ns_chandump_help[] = {
+	"Syntax: \2CHANDUMP\2",
 	"Syntax: \2CHANDUMP <channel>\2",
 	"",
 	"When in debug mode, Neostats will echo its channel table to",
@@ -201,32 +210,32 @@ const char *ns_logs_help[] = {
 	NULL
 };
 
-const char *ns_modbotlist_help[] = {
-	"Syntax: \2MODBOTLIST\2",
+const char *ns_botlist_help[] = {
+	"Syntax: \2BOTLIST\2",
 	"",
 	"NeoStats will send you by notice a list of the current bots",
 	"being used on the network for each module.",
 	NULL
 };
 
-const char *ns_modsocklist_help[] = {
-	"Syntax: \2MODSOCKLIST\2",
+const char *ns_socklist_help[] = {
+	"Syntax: \2SOCKLIST\2",
 	"",
 	"NeoStats will send you by notice a list of the current",
 	"sockets being used on the network for each module.",	
 	NULL
 };
 
-const char *ns_modtimerlist_help[] = {
-	"Syntax: \2MODTIMERLIST\2",
+const char *ns_timerlist_help[] = {
+	"Syntax: \2TIMERLIST\2",
 	"",
 	"NeoStats will send you by notice a list of the current",
 	"timer functions being used on the network by each module.",	
 	NULL
 };
 
-const char *ns_modbotchanlist_help[] = {
-	"Syntax: \2MODBOTCHANLIST\2",
+const char *ns_botchanlist_help[] = {
+	"Syntax: \2BOTCHANLIST\2",
 	"",
 	"NeoStats will send you by notice a list of the current bots",
 	"and the channels they are using for each module.",

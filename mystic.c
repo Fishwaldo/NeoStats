@@ -29,10 +29,14 @@
 #include "mystic.h"
 #include "dl.h"
 #include "log.h"
+#include "users.h"
+#include "server.h"
+#include "chans.h"
 
 static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(M)";
+const char services_bot_modes[]= "+oS";
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -223,9 +227,9 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_KILLS, 'k', 0}
 	,
-	{UMODE_SERVICES, 'S', 200}
+	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT}
 	,
-	{UMODE_SERVICESADMIN, 'P', 200}
+	{UMODE_SERVICESADMIN, 'P', NS_ULEVEL_ROOT}
 	,
 	{UMODE_RBOT, 'B', 0}
 	,
@@ -233,7 +237,7 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_COADMIN, 'z', 70}
 	,
-	{UMODE_NETADMIN, 'N', 185}
+	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN}
 	,
 	{UMODE_TECHADMIN, 'T', 190}
 	,
@@ -503,6 +507,12 @@ ssvshost_cmd (const char *who, const char *vhost)
 	sts (":%s CHGHOST %s %s", me.name, who, vhost);
 	return 1;
 }
+int 
+sinvite_cmd (const char *from, const char *to, const char *chan) {
+	sts (":%s INVITE %s %s", from, to, chan);
+	return 1;
+}
+
 int
 sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
 {
@@ -866,7 +876,7 @@ Usr_Away (char *origin, char **argv, int argc)
 		} else {
 			Buf = NULL;
 		}
-		Do_Away (u, Buf);
+		UserAway (u, Buf);
 		if (argc > 0) {
 			free (Buf);
 		}
@@ -890,7 +900,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 	c = findchan (argv[0]);
 	if (c) {
 		buf = joinbuf (argv, argc, 3);
-		Change_Topic (argv[1], c, atoi (argv[2]), buf);
+		ChangeTopic (argv[1], c, atoi (argv[2]), buf);
 		free (buf);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);
@@ -963,9 +973,9 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 	init_ServBot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 #ifdef DEBUG
-	ns_set_debug (me.chan);
+	me.debug_mode = 1;
 #endif
-	Module_Event (EVENT_NETINFO, NULL, 0);
+	ModuleEvent (EVENT_NETINFO, NULL, 0);
 	me.synced = 1;
 }
 

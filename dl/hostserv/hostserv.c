@@ -168,10 +168,19 @@ void hs_Config()
 	int hostlen;
 
 	SET_SEGV_LOCATION();
+	hs_cfg.old = 60;
 	GetConf((void *) &hs_cfg.view, CFGINT, "ViewLevel");
+	if ((hs_cfg.view > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
+		hs_cfg.view = 100;
 	GetConf((void *) &hs_cfg.add, CFGINT, "AddLevel");
+	if ((hs_cfg.add > NS_ULEVEL_ROOT) || (hs_cfg.view <= 0))
+		hs_cfg.add = 40;
 	GetConf((void *) &hs_cfg.del, CFGINT, "DelLevel");
+	if ((hs_cfg.del > NS_ULEVEL_ROOT) || (hs_cfg.del <= 0))
+		hs_cfg.del = 40;
 	GetConf((void *) &hs_cfg.list, CFGINT, "ListLevel");
+	if ((hs_cfg.list > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
+		hs_cfg.list = 40;
 	GetConf((void *) &hs_cfg.old, CFGINT, "ExpireDays");
 	if (GetConf((void *) &hs_cfg.regnick, CFGINT, "UnetVhosts") > 0) {
 		if (GetConf((void *) &ban, CFGSTR, "UnetDomain") > 0) {
@@ -184,16 +193,6 @@ void hs_Config()
 		hs_cfg.vhostdom[0] = '\0';
 	}
 		
-		
-	if ((hs_cfg.list > 200) || (hs_cfg.list <= 0))
-		hs_cfg.list = 40;
-	if ((hs_cfg.add > 200) || (hs_cfg.view <= 0))
-		hs_cfg.add = 40;
-	if ((hs_cfg.del > 200) || (hs_cfg.del <= 0))
-		hs_cfg.del = 40;
-	if ((hs_cfg.view > 200) || (hs_cfg.list <= 0))
-		hs_cfg.view = 100;
-
 	/* banned vhosts */
 	ban = NULL;
 	GetConf((void *) &ban, CFGSTR, "BannedVhosts");
@@ -281,7 +280,7 @@ Functions __module_functions[] = {
 	{NULL, NULL, 0}
 };
 
-int __Bot_Message(char *origin, char **av, int ac)
+int __BotMessage(char *origin, char **av, int ac)
 {
 	int t = 0;
 	User *u;
@@ -328,7 +327,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 		} else if (!strcasecmp(av[2], "ABOUT")) {
 			privmsg_list(u->nick, s_HostServ, hs_help_about);
 			return 1;
-		} else if (!strcasecmp(av[2], "SET") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "SET") && (UserLevel(u) >= NS_ULEVEL_ADMIN)) {
 			privmsg_list(u->nick, s_HostServ, hs_help_set);
 			return 1;
 		} else
@@ -385,7 +384,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 			hs_listban(u);
 			return 1;
 		} else if (ac == 4) {
-			if (UserLevel(u) >= 185) {
+			if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
 				if (!strcasecmp(av[2], "ADD")) {
 					hs_addban(u, av[3]);
 					return 1;
@@ -417,7 +416,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				hs_cfg.view);
 			return 1;
 		} else if (ac == 3) {
-			if (UserLevel(u) >= 185) {
+			if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
 				if (!strcasecmp(av[2], "RESET")) {
 					hs_cfg.add = 40;
 					SetConf((void *) t, CFGINT, "AddLevel");
@@ -431,11 +430,11 @@ int __Bot_Message(char *origin, char **av, int ac)
 			}
 			prefmsg(u->nick, s_HostServ, "Permission Denied");
 		} else if (ac == 4) {
-			if (UserLevel(u) >= 185) {
+			if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
 				t = atoi(av[3]);
-				if ((t <= 0) || (t > 200)) {
+				if ((t <= 0) || (t > NS_ULEVEL_ROOT)) {
 					prefmsg(u->nick, s_HostServ,
-						"Invalid Level. Must be between 1 and 200");
+						"Invalid Level. Must be between 1 and %d", NS_ULEVEL_ROOT);
 					return -1;
 				}
 				if (!strcasecmp(av[2], "ADD")) {
@@ -513,7 +512,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 		}
 		hs_chpass(u, av[2], av[3], av[4]);
 	} else if (!strcasecmp(av[1], "SET")) {
-		if (UserLevel(u) < 185) {
+		if (UserLevel(u) < NS_ULEVEL_ADMIN) {
 			prefmsg(u->nick, s_HostServ, "Permission Denied");
 			chanalert(s_HostServ, "%s tried set, but permission was denied", u->nick);
 			return -1;
@@ -607,11 +606,11 @@ int Online(char **av, int ac)
 
 
 	if (init_bot
-	    (s_HostServ, user, host, rname, "+oS",
+	    (s_HostServ, user, host, rname, services_bot_modes,
 	     __module_info.module_name) == -1) {
 		/* Nick was in use */
 		strlcat(s_HostServ, "_", MAXNICK);
-		init_bot(s_HostServ, user, host, rname, "+oS",
+		init_bot(s_HostServ, user, host, rname, services_bot_modes,
 			 __module_info.module_name);
 	}
 	if(user)
@@ -658,11 +657,6 @@ int __ModInit(int modnum, int apiver)
 		return -1;
 	}
 	hs_cfg.modnum = modnum;
-	hs_cfg.add = 40;
-	hs_cfg.del = 40;
-	hs_cfg.list = 40;
-	hs_cfg.view = 100;
-	hs_cfg.old = 60;
 	hs_Config();
 	return 1;
 }

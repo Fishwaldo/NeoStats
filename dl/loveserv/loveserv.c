@@ -73,7 +73,7 @@ Functions __module_functions[] = {
 };
 
 
-int __Bot_Message(char *origin, char **av, int ac)
+int __BotMessage(char *origin, char **av, int ac)
 {
 	User *u;
 	char *cmd;
@@ -258,12 +258,12 @@ int __Bot_Message(char *origin, char **av, int ac)
 int Online(char **av, int ac)
 {
 	if (init_bot
-	    (s_LoveServ, "love", me.name, "Network Love Service", "+oS",
+	    (s_LoveServ, "love", me.name, "Network Love Service", services_bot_modes,
 	     __module_info.module_name) == -1) {
 		/* Nick was in use!!!! */
 		s_LoveServ = strcat(s_LoveServ, "_");
 		init_bot(s_LoveServ, "love", me.name,
-			 "Network Love Service", "+oS",
+			 "Network Love Service", services_bot_modes,
 			 __module_info.module_name);
 	}
 	return 1;

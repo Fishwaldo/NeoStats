@@ -36,6 +36,11 @@
 #include "conf.h"
 #include "keeper.h"
 #include "log.h"
+#include "sock.h"
+#include "users.h"
+#include "server.h"
+#include "chans.h"
+#include "dns.h"
 
 /* this is the name of the services bot */
 char s_Services[MAXNICK] = "NeoStats";
@@ -51,6 +56,7 @@ static int get_options (int argc, char **argv);
 /*! have we forked */
 int forked = 0;
 static int attempts = 0;
+jmp_buf sigvbuf;
 
 /** @brief Main Entry point into program
  *
@@ -93,7 +99,7 @@ main (int argc, char *argv[])
 		printf ("Copyright: NeoStats Group. 2000-2003\n");
 		printf ("Justin Hammond (fish@neostats.net)\n");
 		printf ("Adam Rutter (shmad@neostats.net)\n");
-		printf ("Mark (m@neostats.net\n");
+		printf ("Mark (m@neostats.net)\n");
 		printf ("-----------------------------------------------\n\n");
 	}
 	/* set some defaults before we parse the config file */
@@ -119,11 +125,15 @@ main (int argc, char *argv[])
 		remove (RECV_LOG);
 
 	/* initilze our Module subsystem */
-	if(__init_mod_list () != NS_SUCCESS)
+	if(InitModuleHash () != NS_SUCCESS)
 		return EXIT_FAILURE;
 
 	/* prepare to catch errors */
 	setup_signals ();
+
+	/* this has to be done before we load modules */
+	if(init_services () != NS_SUCCESS)
+		return EXIT_FAILURE;
 
 	/* load the config files */
 	if(ConfLoad () != NS_SUCCESS)
@@ -285,6 +295,8 @@ get_options (int argc, char **argv)
  *
  * @todo Do a nice shutdown, no thtis crap :)
  */
+char msg_sigterm[]="SIGTERM received, shutting down server.";
+
 RETSIGTYPE
 serv_die ()
 {
@@ -292,9 +304,11 @@ serv_die ()
 	exit(NS_SUCCESS);
 #else /* VALGRIND */
 	User *u;
+
 	u = finduser (s_Services);
-	nlog (LOG_CRITICAL, LOG_CORE, "SIGTERM received, shutting down server.");
-	ns_shutdown (u, "SIGTERM received");
+	nlog (LOG_CRITICAL, LOG_CORE, msg_sigterm);
+	globops (s_Services, msg_sigterm);
+	do_exit (NS_EXIT_NORMAL, msg_sigterm);
 #endif /* VALGRIND */
 }
 

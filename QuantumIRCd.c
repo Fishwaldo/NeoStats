@@ -29,10 +29,14 @@
 #include "QuantumIRCd.h"
 #include "dl.h"
 #include "log.h"
+#include "users.h"
+#include "server.h"
+#include "chans.h"
 
 static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(Q)";
+const char services_bot_modes[]= "+oS";
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -261,11 +265,11 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_HIDE, 'x', 0}
 	,
-	{UMODE_IRCADMIN, 'Z', 200}
+	{UMODE_IRCADMIN, 'Z', NS_ULEVEL_ROOT}
 	,
-	{UMODE_SERVICESADMIN, 'P', 185}
+	{UMODE_SERVICESADMIN, 'P', NS_ULEVEL_ADMIN}
 	,
-	{UMODE_SERVICES, 'S', 200}
+	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT}
 	,
 	{UMODE_PROT, 'p', 0}
 	,
@@ -599,6 +603,12 @@ ssvshost_cmd (const char *who, const char *vhost)
 		return 1;
 	}
 }
+int 
+sinvite_cmd (const char *from, const char *to, const char *chan) {
+	sts (":%s INVITE %s %s", from, to, chan);
+	return 1;
+}
+
 int
 sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
 {
@@ -973,7 +983,7 @@ Usr_Away (char *origin, char **argv, int argc)
 		} else {
 			Buf = NULL;
 		}
-		Do_Away (u, Buf);
+		UserAway (u, Buf);
 		if (argc > 0) {
 			free (Buf);
 		}
@@ -997,7 +1007,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 	c = findchan (argv[0]);
 	if (c) {
 		buf = joinbuf (argv, argc, 3);
-		Change_Topic (argv[1], c, atoi (argv[2]), buf);
+		ChangeTopic (argv[1], c, atoi (argv[2]), buf);
 		free (buf);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);

@@ -27,10 +27,14 @@
 #include "hybrid7.h"
 #include "dl.h"
 #include "log.h"
+#include "users.h"
+#include "server.h"
+#include "chans.h"
 
 static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(H)";
+const char services_bot_modes[]= "+oS";
 
 /* this is the command list and associated functions to run */
 IntCommands cmd_list[] = {
@@ -136,7 +140,7 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_CCONN, 'c', 0}
 	,
-	{UMODE_DEBUG, 'd', 200}
+	{UMODE_DEBUG, 'd', NS_ULEVEL_ROOT}
 	,
 	{UMODE_FULL, 'f', 0}
 	,
@@ -419,6 +423,11 @@ ssvshost_cmd (const char *who, const char *vhost)
 {
 	notice (s_Services, "Warning Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
+	return 1;
+}
+int 
+sinvite_cmd (const char *from, const char *to, const char *chan) {
+	sts (":%s INVITE %s %s", from, to, chan);
 	return 1;
 }
 
@@ -778,7 +787,7 @@ Usr_Away (char *origin, char **argv, int argc)
 		} else {
 			buf = NULL;
 		}
-		Do_Away (u, buf);
+		UserAway (u, buf);
 		if (argc > 0) {
 			free (buf);
 		}
@@ -805,7 +814,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 	c = findchan (argv[0]);
 	if (c) {
 		buf = joinbuf (argv, argc, 2);
-		Change_Topic (origin, c, me.now, buf);
+		ChangeTopic (origin, c, me.now, buf);
 		free (buf);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);

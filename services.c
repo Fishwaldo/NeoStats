@@ -29,29 +29,142 @@
 #include "dl.h"
 #include "log.h"
 #include "sock.h"
+#include "ns_help.h"
+#include "users.h"
+#include "server.h"
+#include "chans.h"
+#include "hash.h"
+
+typedef struct bot_cmd {
+	char			cmd[MAXCMDSIZE];		/* command string */
+	bot_cmd_handler	handler;	/* handler */
+	int				minparams;	/* min num params */
+	unsigned int	ulevel;		/* min user level */
+	const char**	helptext;	/* pointer to help text */
+	int 		internal;	/* is this a internal function? */
+	char 	onelinehelp[255];	/* single line help for generic help function */
+}bot_cmd;
+
+/* hash for command list */
+hash_t *botcmds;
+
 
 static char quitmsg[BUFSIZE];
 static char no_reason[]="no reason given";
 
-static void ns_reload (User * u, char *reason);
-static void ns_logs (User * u);
-static void ns_jupe (User * u, char * server);
-void ns_set_debug (char * u);
+static void ns_set_debug (User * u, char **av, int ac);
+static void ns_shutdown (User * u, char **av, int ac);
+static void ns_reload (User * u, char **av, int ac);
+static void ns_logs (User * u, char **av, int ac);
+static void ns_jupe (User * u, char **av, int ac);
 #ifdef USE_RAW
-static void ns_raw (User * u, char * message);
+static void ns_raw (User * u, char **av, int ac);
 #endif
-static void ns_user_dump (User * u, char * nick);
-static void ns_server_dump (User * u);
-static void ns_chan_dump (User * u, char * channel);
-static void ns_uptime (User * u);
-static void ns_version (User * u);
+static void ns_user_dump (User * u, char **av, int ac);
+static void ns_server_dump (User * u, char **av, int ac);
+static void ns_chan_dump (User * u, char **av, int ac);
+static void ns_info (User * u, char **av, int ac);
+static void ns_version (User * u, char **av, int ac);
+static void ns_show_level (User * u, char **av, int ac);
+static void ns_do_help (User * u, char **av, int ac);
+static void ns_load_module (User * u, char **av, int ac);
+static void ns_unload_module (User * u, char **av, int ac);
+
+bot_cmd ns_commands[]=
+{
+
+	{"HELP",		ns_do_help,		0, 	0,			ns_help_on_help, 	1, 	"Provides Help on Commands"},
+	{"LEVEL",		ns_show_level,		0, 	0,			ns_level_help, 		1, 	"Show your permission level for NeoStats."},
+	{"INFO",		ns_info,		0, 	0,			ns_info_help, 		1, 	"Stats info on NeoStats."},
+	{"VERSION",		ns_version,		0, 	0,			ns_version_help, 	1, 	"Show NeoStats version information."},
+	{"SHUTDOWN",		ns_shutdown,		0, 	NS_ULEVEL_ADMIN, 	ns_shutdown_help, 	1, 	"Shutdown NeoStats"},
+	{"RELOAD",		ns_reload,		0, 	NS_ULEVEL_ADMIN, 	ns_reload_help,		1, 	"Force NeoStats to reload"},
+	{"LOGS",		ns_logs,		0, 	NS_ULEVEL_OPER, 	ns_logs_help,		1, 	"View logfiles"},
+	{"LOAD",		ns_load_module,		1, 	NS_ULEVEL_ADMIN, 	ns_load_help, 		1, 	"Load a module"},
+	{"UNLOAD",		ns_unload_module,	1, 	NS_ULEVEL_ADMIN, 	ns_unload_help, 	1, 	"Unload a module"},
+	{"JUPE",		ns_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_jupe_help,		1, 	"Jupiter a Server"},
+#ifdef USE_RAW
+	{"RAW",			ns_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_raw_help, 		1, 	"Send a raw command from this Server"},
+#endif
+	{"DEBUG",		ns_set_debug,		1, 	NS_ULEVEL_ROOT,  	ns_debug_help,		1,	"Toggles debug mode"},
+	{"BOTLIST",		list_bots,		0, 	NS_ULEVEL_ROOT,  	ns_botlist_help,	1,	"List current module bots"},
+	{"SOCKLIST",		list_sockets,		0, 	NS_ULEVEL_ROOT,  	ns_socklist_help, 	1,	"List current module sockets"},
+	{"TIMERLIST",		list_timers,		0, 	NS_ULEVEL_ROOT,  	ns_timerlist_help, 	1,	"List current module timers"},
+	{"BOTCHANLIST",		list_bot_chans,		0, 	NS_ULEVEL_ROOT,  	ns_botchanlist_help, 	1,	"List current module bot channels"},
+	{"MODLIST",		list_modules,		0, 	NS_ULEVEL_ROOT,  	ns_modlist_help, 	1,	"List loaded modules"},
+	{"USERDUMP",		ns_user_dump,		0, 	NS_ULEVEL_ROOT,  	ns_userdump_help, 	1,	"Debug user table"},
+	{"CHANDUMP",		ns_chan_dump,		0, 	NS_ULEVEL_ROOT,  	ns_chandump_help, 	1,	"Debug channel table"},
+	{"SERVERDUMP",		ns_server_dump,		0, 	NS_ULEVEL_ROOT,  	ns_serverdump_help, 	1,	"Debug server table"},
+	{"\0",			NULL,			0, 	0,			NULL, 			0,	"\0"}
+};
+
+int 
+init_services() 
+{
+	bot_cmd *cmd_ptr;
+	hnode_t *cmdnode;
+	
+	/* init bot hash first */
+	
+	botcmds = hash_create(-1, 0, 0);
+
+	/* Process command list */
+	cmd_ptr = ns_commands;
+	while(cmd_ptr->handler) {
+		cmdnode = hnode_create(cmd_ptr);
+		hash_insert(botcmds, cmdnode, cmd_ptr->cmd);
+		cmd_ptr++;
+	}
+	return NS_SUCCESS;
+}
+	
+int 
+add_services_cmd(const char cmd[MAXCMDSIZE], bot_cmd_handler handler, int minparams, int ulevel, const char** helptext, const char onelinehelp[255]) 
+{
+	bot_cmd *cmd_ptr;
+	hnode_t *cmdnode;
+	
+	cmd_ptr = malloc(sizeof(bot_cmd));
+	strlcpy(cmd_ptr->cmd, cmd, MAXCMDSIZE);
+	cmd_ptr->handler = handler;
+	cmd_ptr->minparams = minparams;
+	cmd_ptr->ulevel = ulevel;
+	cmd_ptr->helptext = helptext;
+	cmd_ptr->internal = 0;
+	strlcpy(cmd_ptr->onelinehelp, onelinehelp, 255);
+	
+	cmdnode = hnode_create(cmd_ptr);
+	hash_insert(botcmds, cmdnode, cmd_ptr->cmd);
+	nlog(LOG_DEBUG2, LOG_CORE, "Added a new command %s to Services Bot", cmd);
+	return 1;
+}
+
+int 
+del_services_cmd(const char cmd[MAXCMDSIZE]) 
+{
+	bot_cmd *cmd_ptr;
+	hnode_t *cmdnode;
+	
+	cmdnode = hash_lookup(botcmds, cmd);
+	if (cmdnode) {
+		hash_delete(botcmds, cmdnode);
+		cmd_ptr = hnode_get(cmdnode);
+		hnode_destroy(cmdnode);
+		/* free if its a external (malloc'd) command */
+		if (cmd_ptr->internal == 0) {
+			free(cmd_ptr);
+		}
+		return NS_SUCCESS;
+	}
+	return NS_FAILURE;
+}
 
 void
 servicesbot (char *nick, char **av, int ac)
 {
 	User *u;
-	int rval;
-	char *tmp;
+	bot_cmd* cmd_ptr;
+	hnode_t *cmdnode;
 
 	u = finduser (nick);
 	if (!u) {
@@ -59,270 +172,86 @@ servicesbot (char *nick, char **av, int ac)
 		return;
 	}
 	SET_SEGV_LOCATION();
+	
 	me.requests++;
 
-	if (me.onlyopers && (UserLevel (u) < 40)) {
+	/* Check user authority to use this command set */
+	if (me.onlyopers && (UserLevel (u) < NS_ULEVEL_OPER)) {
 		prefmsg (u->nick, s_Services, "This service is only available to IRCops.");
 		chanalert (s_Services, "%s Requested %s, but he is Not an Operator!", u->nick, av[1]);
 		return;
 	}
-	if (!strcasecmp (av[1], "HELP")) {
-		if (ac > 2) {
-			chanalert (s_Services, "%s Requested %s Help on %s", u->nick, s_Services, av[2]);
-		} else {
-			chanalert (s_Services, "%s Requested %s Help", u->nick, s_Services);
-		}
-		if (ac < 3) {
-			privmsg_list (nick, s_Services, ns_help);
-			if (UserLevel (u) >= 180)
-				privmsg_list (nick, s_Services, ns_myuser_help);
-			privmsg_list (nick, s_Services, ns_help_on_help);			
-		} else if (!strcasecmp (av[2], "VERSION"))
-			privmsg_list (nick, s_Services, ns_version_help);
-		else if (!strcasecmp (av[2], "SHUTDOWN")
-			 && (UserLevel (u) >= 180))
-			privmsg_list (nick, s_Services, ns_shutdown_help);
-		else if (!strcasecmp (av[2], "RELOAD")
-			 && (UserLevel (u) >= 180))
-			privmsg_list (nick, s_Services, ns_reload_help);
-		else if (!strcasecmp (av[2], "LOGS")
-			 && (UserLevel (u) >= 180))
-			privmsg_list (nick, s_Services, ns_logs_help);
-		else if (!strcasecmp (av[2], "LOAD")
-			 && (UserLevel (u) >= 180))
-			privmsg_list (nick, s_Services, ns_load_help);
-		else if (!strcasecmp (av[2], "UNLOAD")
-			 && (UserLevel (u) >= 180))
-			privmsg_list (nick, s_Services, ns_unload_help);
-		else if (!strcasecmp (av[2], "MODLIST")
-			 && (UserLevel (u) >= 180))
-			privmsg_list (nick, s_Services, ns_modlist_help);
-		else if (!strcasecmp (av[2], "USERDUMP")
-			 && (UserLevel (u) >= 180) && (me.debug_mode))
-			privmsg_list (nick, s_Services, ns_userdump_help);
-		else if (!strcasecmp (av[2], "CHANDUMP")
-			 && (UserLevel (u) >= 180) && (me.debug_mode))
-			privmsg_list (nick, s_Services, ns_chandump_help);
-		else if (!strcasecmp (av[2], "SERVERDUMP")
-			 && (UserLevel (u) >= 180) && (me.debug_mode))
-			privmsg_list (nick, s_Services, ns_serverdump_help);
-		else if (!strcasecmp (av[2], "JUPE")
-			 && (UserLevel (u) >= 180))
-			privmsg_list (nick, s_Services, ns_jupe_help);
-#ifdef USE_RAW
-		else if (!strcasecmp (av[2], "RAW")
-			 && (UserLevel (u) >= 180))
-			privmsg_list (nick, s_Services, ns_raw_help);
-#endif
-		else if (!strcasecmp (av[2], "LEVEL"))
-			privmsg_list (nick, s_Services, ns_level_help);
-		else if (!strcasecmp (av[2], "DEBUG"))
-			privmsg_list (nick, s_Services, ns_debug_help);
-		else if (!strcasecmp (av[2], "MODBOTLIST"))
-			privmsg_list (nick, s_Services, ns_modbotlist_help);
-		else if (!strcasecmp (av[2], "MODSOCKLIST"))
-			privmsg_list (nick, s_Services, ns_modsocklist_help);
-		else if (!strcasecmp (av[2], "MODTIMERLIST"))
-			privmsg_list (nick, s_Services, ns_modtimerlist_help);
-		else if (!strcasecmp (av[2], "MODBOTCHANLIST"))
-			privmsg_list (nick, s_Services, ns_modbotchanlist_help);
-		else if (!strcasecmp (av[2], "INFO"))
-			privmsg_list (nick, s_Services, ns_info_help);
-		else
-			prefmsg (nick, s_Services, "Unknown Help Topic: \2%s\2", av[2]);
-	} else if (!strcasecmp (av[1], "LEVEL")) {
-		prefmsg (nick, s_Services, "Your Level is %d", UserLevel (u));
-	} else if (!strcasecmp (av[1], "LOAD")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s tried to LOAD, but is not authorised", nick);
+	/* Process command list */
+	cmdnode = hash_lookup(botcmds, av[1]);
+
+	if (cmdnode) {
+		cmd_ptr = hnode_get(cmdnode);
+	
+		/* Is user authorised to issue this command? */
+		if (UserLevel (u) < cmd_ptr->ulevel) {
+			prefmsg (u->nick, s_Services, "Permission Denied");
+			chanalert (s_Services, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
 			return;
 		}
-		if (ac <= 2) {
-			prefmsg (nick, s_Services, "Please Specify a Module");
+		/* First two parameters are bot name and command name so 
+		 * subtract 2 to get parameter count */
+		if((ac - 2) < cmd_ptr->minparams ) {
+			prefmsg (u->nick, s_Services, "Syntax error: insufficient parameters");
+			prefmsg (u->nick, s_Services, "/msg %s HELP %s for more information", s_Services, cmd_ptr->cmd);
 			return;
 		}
-		rval = load_module (av[2], u);
-		if (rval == NS_SUCCESS) {
-			chanalert (s_Services, "%s Loaded Module %s", u->nick, av[2]);
-		} else {
-			chanalert (s_Services, "%s Tried to Load Module %s, but Failed", u->nick, av[2]);
-		}
-	} else if (!strcasecmp (av[1], "MODLIST")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to MODLIST, but is not authorised", nick);
+		/* Missing handler?! */
+		if(!cmd_ptr->handler) {
 			return;
 		}
-		list_module (u);
-	} else if (!strcasecmp (av[1], "UNLOAD")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to UNLOAD, but is not authorised", nick);
-			return;
-		}
-		if (ac <= 2) {
-			prefmsg (nick, s_Services, " Please Specify a Module Name");
-			return;
-		}
-		rval = unload_module (av[2], u);
-		if (rval > 0) {
-			chanalert (s_Services, "%s Unloaded Module %s", u->nick, av[2]);
-		}
+		/* Seems OK so report the command call then call appropriate handler */
+		chanalert (s_Services, "%s used %s", u->nick, cmd_ptr->cmd);
+		cmd_ptr->handler(u, av, ac);
 		return;
-	} else if (!strcasecmp (av[1], "MODBOTLIST")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to MODBOTLIST, but is not authorised", nick);
-			return;
-		}
-		list_module_bots (u);
-	} else if (!strcasecmp (av[1], "MODSOCKLIST")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to MODSOCKLIST, but is not authorised", nick);
-			return;
-		}
-		list_sockets (u);
-	} else if (!strcasecmp (av[1], "MODTIMERLIST")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to MODTIMERLIST, but is not authorised", nick);
-			return;
-		}
-		list_module_timer (u);
-	} else if (!strcasecmp (av[1], "MODBOTCHANLIST")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s tried to MODBOTCHANLIST, but is not authorised", nick);
-			return;
-		}
-		botchandump (u);
-	} else if (!strcasecmp (av[1], "INFO")) {
-		ns_uptime (u);
-		chanalert (s_Services, "%s Wanted to see %s's info", u->nick, me.name);
-	} else if (!strcasecmp (av[1], "SHUTDOWN")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to SHUTDOWN, but is not authorised", nick);
-			return;
-		}
-		if (ac <= 2) {
-			chanalert (s_Services, "%s Requested SHUTDOWN", u->nick);
-			ns_shutdown (u, NULL);
-		} else {
-			tmp = joinbuf (av, ac, 2);
-			chanalert (s_Services, "%s Requested SHUTDOWN for: ", u->nick, tmp);
-			ns_shutdown (u, tmp);
-			free (tmp);
-		}
-	} else if (!strcasecmp (av[1], "VERSION")) {
-		ns_version (u);
-		chanalert (s_Services, "%s Wanted to know our version number ", u->nick);
-	} else if (!strcasecmp (av[1], "RELOAD")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to RELOAD, but is not authorised", nick);
-			return;
-		}
-		if (ac <= 2) {
-			prefmsg (nick, s_Services, "You must supply a Reason to Reload");
-			return;
-		}
-		tmp = joinbuf (av, ac, 2);
-		chanalert (s_Services, "%s Wants me to RELOAD! for %s", u->nick, tmp);
-		ns_reload (u, tmp);
-		free (tmp);
-	} else if (!strcasecmp (av[1], "LOGS")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to view LOGS, but is not authorised", nick);
-			return;
-		}
-		ns_logs (u);
-		chanalert (s_Services, "%s Wants to Look at my Logs!!", u->nick);
-	} else if (!strcasecmp (av[1], "JUPE")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to JUPE, but is not authorised", nick);
-			return;
-		}
-		if (ac <= 2) {
-			prefmsg (nick, s_Services, "You must supply a ServerName to Jupe");
-			return;
-		}
-		ns_jupe (u, av[2]);
-	} else if (!strcasecmp (av[1], "DEBUG")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (u->nick, s_Services, "Permission Denied, you need to be authorised to Enable Debug Mode!");
-			return;
-		}
-		ns_set_debug (u->nick);
-	} else if (!strcasecmp (av[1], "USERDUMP")) {
-		if (!me.debug_mode) {
-			prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
-			return;
-		}
-		if (ac <= 2) {
-			ns_user_dump (u, NULL);
-		} else {
-			ns_user_dump (u, av[2]);
-		}
-	} else if (!strcasecmp (av[1], "CHANDUMP")) {
-		if (!me.debug_mode) {
-			prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
-			return;
-		}
-		if (ac < 3) {
-			ns_chan_dump (u, NULL);
-		} else {
-			ns_chan_dump (u, av[2]);
-		}
-	} else if (!strcasecmp (av[1], "SERVERDUMP")) {
-		if (!me.debug_mode) {
-			prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
-			return;
-		}
-		ns_server_dump (u);
-	} else if (!strcasecmp (av[1], "RAW")) {
-		if (!(UserLevel (u) >= 180)) {
-			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to use RAW, but is not authorised", nick);
-			return;
-		}
-#ifdef USE_RAW
-		tmp = joinbuf (av, ac, 2);
-		ns_raw (u, tmp);
-		free (tmp);
-		return;
-#else
-		prefmsg (nick, s_Services, "Raw is disabled");
-		return;
-#endif
-	} else {
-		prefmsg (nick, s_Services, "Unknown Command: \2%s\2", av[1]);
-		chanalert (s_Services, "%s Reqested %s, but that is an Unknown Command", u->nick, av[1]);
 	}
+
+	/* We have run out of commands so report failure */
+	prefmsg (u->nick, s_Services, "Syntax error: unknown command: \2%s\2", av[1]);
+	chanalert (s_Services, "%s requested %s, but that is an unknown command", u->nick, av[1]);
 }
 
-void
-ns_shutdown (User * u, char *reason)
+static void
+ns_shutdown (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
-		u->nick, u->username, u->hostname,(reason ? reason : no_reason));
+
+	char *tmp;
+	if (ac <= 2) {
+		ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
+			u->nick, u->username, u->hostname, no_reason);
+	} else {
+		tmp = joinbuf (av, ac, 2);
+		chanalert (s_Services, "%s Wants me to SHUTDOWN for %s", u->nick, tmp);
+		ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
+			u->nick, u->username, u->hostname, tmp);
+		free (tmp);
+	}
 	globops (s_Services, quitmsg);
 	nlog (LOG_NOTICE, LOG_CORE, quitmsg);
-
 	do_exit (NS_EXIT_NORMAL, quitmsg);
 }
 
 static void
-ns_reload (User * u, char *reason)
+ns_reload (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
+
+	char *tmp;
+	if (ac <= 2) {
+		prefmsg (u->nick, s_Services, "You must supply a Reason to Reload");
+		return;
+	}
+	tmp = joinbuf (av, ac, 2);
+	chanalert (s_Services, "%s Wants me to RELOAD! for %s", u->nick, tmp);
 	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested RELOAD for %s.", 
-		u->nick, u->username, u->hostname, (reason ? reason : no_reason));
+		u->nick, u->username, u->hostname, tmp);
+	free (tmp);
+
 	globops (s_Services, quitmsg);
 	nlog (LOG_NOTICE, LOG_CORE, quitmsg);
 
@@ -330,7 +259,7 @@ ns_reload (User * u, char *reason)
 }
 
 static void
-ns_logs (User * u)
+ns_logs (User * u, char **av, int ac)
 {
 #ifdef DEBUG
 	prefmsg (u->nick, s_Services, "This command is disabled while in DEBUG.");
@@ -353,85 +282,73 @@ ns_logs (User * u)
 }
 
 static void
-ns_jupe (User * u, char *server)
+ns_jupe (User * u, char **av, int ac)
 {
 	char infoline[255];
+
 	SET_SEGV_LOCATION();
 	ircsnprintf (infoline, 255, "[Jupitered by %s]", u->nick);
-	sserver_cmd (server, 1, infoline);
-	nlog (LOG_NOTICE, LOG_CORE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, server);
-	chanalert (s_Services, "%s Wants to JUPE this Server %s", u->nick, server);
-	prefmsg(u->nick, s_Services, "%s has been Jupitered", server);
+	sserver_cmd (av[2], 1, infoline);
+	nlog (LOG_NOTICE, LOG_CORE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, av[2]);
+	chanalert (s_Services, "%s Wants to JUPE this Server %s", u->nick, av[2]);
+	prefmsg(u->nick, s_Services, "%s has been Jupitered", av[2]);
 }
 
-void
-ns_set_debug (char *u)
+static void
+ns_set_debug (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	if (!me.debug_mode) {
+	if ((!strcasecmp(av[2], "YES")) || (!strcasecmp(av[2], "ON"))) {
 		me.debug_mode = 1;
-		if (u) {
-			globops (me.name, "\2DEBUG MODE\2 Activated by %s", u);
-			prefmsg (u, s_Services, "Debuging Mode Enabled!");
-		} else {
-			globops (me.name, "\2DEBUG MODE\3 Active");
-		}
-	} else {
+		globops (me.name, "\2DEBUG MODE\2 Activated by %s", u->nick);
+		prefmsg (u->nick, s_Services, "Debuging Mode Enabled!");
+	} else if ((!strcasecmp(av[2], "NO")) || (!strcasecmp(av[2], "OFF"))) {
 		me.debug_mode = 0;
-		if (!u) {
-			globops (me.name, "\2DEBUG MODE\2 Deactivated by %s", u);
-			prefmsg (u, s_Services, "Debuging Mode Disabled");
-		} else {
-			globops (me.name, "\2DEBUG MODE\2 Deactivated");
-		}
+		globops (me.name, "\2DEBUG MODE\2 Deactivated by %s", u->nick);
+		prefmsg (u->nick, s_Services, "Debuging Mode Disabled");
+	} else {
+		prefmsg(u->nick, s_Services,
+			"Syntax Error: /msg %s HELP DEBUG for more info",
+			s_Services);
+		return;
 	}
 }
 
-#ifdef USE_RAW
 static void
-ns_raw (User * u, char *message)
+ns_user_dump (User * u, char **av, int ac)
 {
-	SET_SEGV_LOCATION();
-	chanalert (s_Services, "\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)", u->nick, message);
-	nlog (LOG_INFO, LOG_CORE, "RAW COMMAND %sIssued a Raw Command!(%s)", u->nick, message);
-	sts(message);
-}
-#endif
-static void
-ns_user_dump (User * u, char *nick)
-{
-	SET_SEGV_LOCATION();
-	if (!(UserLevel (u) >= 180)) {
-		prefmsg (u->nick, s_Services, "Permission Denied, you do not have sufficient access rights for this command!");
+	if (!me.debug_mode) {
+		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 		return;
 	}
 	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump!", u->nick);
-	UserDump (nick);
+	UserDump (((ac < 3) ? NULL : av[2]));
 }
 static void
-ns_server_dump (User * u)
+ns_server_dump (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	if (!(UserLevel (u) >= 180)) {
-		prefmsg (u->nick, s_Services, "Permission Denied, you do not have sufficient access rights for this command!");
+	if (!me.debug_mode) {
+		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 		return;
 	}
 	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump!", u->nick);
 	ServerDump ();
 }
 static void
-ns_chan_dump (User * u, char *chan)
+ns_chan_dump (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	if (!(UserLevel (u) >= 180)) {
-		prefmsg (u->nick, s_Services, "Permission Denied, you do not have sufficient access rights for this command!");
+	if (!me.debug_mode) {
+		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 		return;
 	}
 	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ChannelDump!", u->nick);
-	chandump (chan);
+	ChanDump (((ac < 3) ? NULL : av[2]));
 }
-static void
-ns_uptime (User * u)
+
+static void 
+ns_info (User * u, char **av, int ac)
 {
 	int uptime = me.now - me.t_start;
 
@@ -458,10 +375,114 @@ ns_uptime (User * u)
 	prefmsg (u->nick, s_Services, "End of Information.");
 }
 static void
-ns_version (User * u)
+ns_version (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	prefmsg (u->nick, s_Services, "\2NeoStats Version Information\2");
 	prefmsg (u->nick, s_Services, "NeoStats Version: %d.%d.%d%s", MAJOR, MINOR, REV, ircd_version);
 	prefmsg (u->nick, s_Services, "http://www.neostats.net");
 }
+
+static void 
+ns_show_level (User * u, char **av, int ac)
+{
+	prefmsg (u->nick, s_Services, "Your Level is %d", UserLevel (u));
+}
+
+static void 
+ns_do_help (User * u, char **av, int ac)
+{
+	bot_cmd* cmd_ptr;
+	int curlevel, lowlevel;
+	hnode_t *cmdnode;
+	hscan_t hs;
+
+	if (ac < 3) {
+		lowlevel = 0;
+		curlevel = NS_ULEVEL_OPER;
+		chanalert (s_Services, "%s Requested %s Help", u->nick, s_Services);
+		prefmsg(u->nick, s_Services, "The following commands can be used with NeoStats:");
+
+		restartlevel:
+		hash_scan_begin(&hs, botcmds);
+		while ((cmdnode = hash_scan_next(&hs)) != NULL) {
+			cmd_ptr = hnode_get(cmdnode);
+			if ((cmd_ptr->ulevel < curlevel) && (cmd_ptr->ulevel >= lowlevel)) {
+				prefmsg(u->nick, s_Services, "%-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
+			}
+		}
+		if (UserLevel(u) >= curlevel) {
+			switch (curlevel) {
+				case NS_ULEVEL_OPER:
+						curlevel = NS_ULEVEL_ADMIN;
+						lowlevel = NS_ULEVEL_OPER;
+						prefmsg(u->nick, s_Services, "\2Commands Available to Opers and Above:\2");
+						goto restartlevel;
+				case NS_ULEVEL_ADMIN:
+						curlevel = NS_ULEVEL_ROOT;
+						lowlevel = NS_ULEVEL_ADMIN;
+						prefmsg(u->nick, s_Services, "\2Commands Available to Service Admins and Above:\2");
+						goto restartlevel;
+				case NS_ULEVEL_ROOT:
+						curlevel = 201;
+						lowlevel = 200;
+						prefmsg(u->nick, s_Services, "\2Commands Available to Service Roots:\2");
+						goto restartlevel;
+				default:	
+						break;
+			}
+		}						
+		privmsg_list (u->nick, s_Services, ns_help_on_help);
+		return;
+	}
+	chanalert (s_Services, "%s Requested %s Help on %s", u->nick, s_Services, av[2]);
+
+	cmdnode = hash_lookup(botcmds, av[2]);
+	if (cmdnode) {
+		cmd_ptr = hnode_get(cmdnode);
+		if (UserLevel (u) < cmd_ptr->ulevel) {
+			prefmsg (u->nick, s_Services, "Permission Denied");
+			return;
+		}		
+		if(!cmd_ptr->helptext) {
+			/* Missing help text!!! */
+			return;
+		}
+		privmsg_list (u->nick, s_Services, cmd_ptr->helptext);
+		return;
+	}
+	prefmsg (u->nick, s_Services, "Unknown Help Topic: \2%s\2", av[2]);
+}
+
+static void 
+ns_load_module (User * u, char **av, int ac)
+{
+	if (load_module (av[2], u) == NS_SUCCESS) {
+		chanalert (s_Services, "%s Loaded Module %s", u->nick, av[2]);
+	} else {
+		chanalert (s_Services, "%s Tried to Load Module %s, but Failed", u->nick, av[2]);
+	}
+}
+
+static void 
+ns_unload_module (User * u, char **av, int ac)
+{
+	if (unload_module (av[2], u) > 0) {
+		chanalert (s_Services, "%s Unloaded Module %s", u->nick, av[2]);
+	}
+}
+
+#ifdef USE_RAW
+static void
+ns_raw (User * u, char **av, int ac)
+{
+	char *message;
+
+	message = joinbuf (av, ac, 2);
+	SET_SEGV_LOCATION();
+	chanalert (s_Services, "\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)", u->nick, message);
+	nlog (LOG_INFO, LOG_CORE, "RAW COMMAND %sIssued a Raw Command!(%s)", u->nick, message);
+	sts(message);
+	free (message);
+}
+#endif

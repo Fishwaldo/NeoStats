@@ -26,6 +26,8 @@
 #include "dl.h"
 #include "hash.h"
 #include "log.h"
+#include "users.h"
+#include "chans.h"
 
 /** @brief Chanmem structure
  *  
@@ -36,6 +38,8 @@ typedef struct Chanmem {
 	long flags;
 	void *moddata[NUM_MODULES];
 } Chanmem;
+
+hash_t *ch;
 
 /** @brief initialize the channel data
  *
@@ -65,7 +69,7 @@ init_chan_hash ()
  *
  */
 void
-Change_Chan_Ts (Chans * c, time_t tstime)
+ChangeChanTS (Chans * c, time_t tstime)
 {
 	if (!c) {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, Called Change_Change_Ts with null channel");
@@ -90,7 +94,7 @@ Change_Chan_Ts (Chans * c, time_t tstime)
 */
 
 extern void
-Change_Topic (char *owner, Chans * c, time_t time, char *topic)
+ChangeTopic (char *owner, Chans * c, time_t time, char *topic)
 {
 	char **av;
 	int ac = 0;
@@ -100,9 +104,8 @@ Change_Topic (char *owner, Chans * c, time_t time, char *topic)
 	AddStringToList (&av, c->name, &ac);
 	AddStringToList (&av, owner, &ac);
 	AddStringToList (&av, topic, &ac);
-	Module_Event (EVENT_TOPICCHANGE, av, ac);
+	ModuleEvent (EVENT_TOPICCHANGE, av, ac);
 	free (av);
-//      FreeList(av, ac);
 }
 
 /** @brief Check if a mode is set on a Channel
@@ -309,7 +312,7 @@ ChangeChanUserMode (Chans * c, User * u, int add, long mode)
 	if (!cmn) {
 		if (me.debug_mode) {
 			chanalert (s_Services, "ChangeChanUserMode() %s doesn't seem to be in the Chan %s", u->nick, c->name);
-			chandump (c->name);
+			ChanDump (c->name);
 			UserDump (u->nick);
 		}
 		return;
@@ -412,7 +415,7 @@ kick_chan (User * u, char *chan, User * k)
 		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to kick_chan u=NULL, chan=%s: %s", chan, recbuf);
 		if (me.debug_mode) {
 			chanalert (s_Services, "NULL user passed to kick_chan u=NULL, chan=%s: %s", chan, recbuf);
-			chandump (chan);
+			ChanDump (chan);
 		}
 		return;
 	}
@@ -420,7 +423,7 @@ kick_chan (User * u, char *chan, User * k)
 		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to kick_chan k=NULL, chan=%s: %s", chan, recbuf);
 		if (me.debug_mode) {
 			chanalert (s_Services, "NULL user passed to kick_chan k=NULL, chan=%s: %s", chan, recbuf);
-			chandump (chan);
+			ChanDump (chan);
 		}
 		return;
 	}
@@ -435,7 +438,7 @@ kick_chan (User * u, char *chan, User * k)
 			nlog (LOG_WARNING, LOG_CORE, "Kick: hu, User %s isn't a member of this channel %s", u->nick, chan);
 			if (me.debug_mode) {
 				chanalert (s_Services, "Kick: hu, User %s isn't a member of this channel %s", u->nick, chan);
-				chandump (c->name);
+				ChanDump (c->name);
 				UserDump (u->nick);
 			}
 		} else {
@@ -444,7 +447,8 @@ kick_chan (User * u, char *chan, User * k)
 			free (cm);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			Module_Event (EVENT_KICK, av, ac);
+			AddStringToList (&av, k->nick, &ac);
+			ModuleEvent (EVENT_KICK, av, ac);
 			free (av);
 			ac = 0;
 			c->cur_users--;
@@ -454,7 +458,8 @@ kick_chan (User * u, char *chan, User * k)
 			del_bot_from_chan (u->nick, c->name);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			Module_Event (EVENT_KICKBOT, av, ac);
+			AddStringToList (&av, k->nick, &ac);
+			ModuleEvent (EVENT_KICKBOT, av, ac);
 			free (av);
 			ac = 0;
 
@@ -464,7 +469,7 @@ kick_chan (User * u, char *chan, User * k)
 			nlog (LOG_WARNING, LOG_CORE, "Kick:Hu, User %s claims not to be part of Chan %s", u->nick, chan);
 			if (me.debug_mode) {
 				chanalert (s_Services, "Kick: Hu, User %s claims not to be part of Chan %s", u->nick, chan);
-				chandump (c->name);
+				ChanDump (c->name);
 				UserDump (u->nick);
 			}
 		} else {
@@ -473,7 +478,7 @@ kick_chan (User * u, char *chan, User * k)
 		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
 		if (c->cur_users <= 0) {
 			AddStringToList (&av, c->name, &ac);
-			Module_Event (EVENT_DELCHAN, av, ac);
+			ModuleEvent (EVENT_DELCHAN, av, ac);
 			free (av);
 			ac = 0;
 			del_chan (c);
@@ -508,7 +513,7 @@ part_chan (User * u, char *chan)
 		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to part_chan u=NULL, chan=%s: %s", chan, recbuf);
 		if (me.debug_mode) {
 			chanalert (s_Services, "NULL user passed to part_chan u=NULL, chan=%s: %s", chan, recbuf);
-			chandump (chan);
+			ChanDump (chan);
 		}
 		return;
 	}
@@ -523,7 +528,7 @@ part_chan (User * u, char *chan)
 			nlog (LOG_WARNING, LOG_CORE, "hu, User %s isn't a member of this channel %s", u->nick, chan);
 			if (me.debug_mode) {
 				chanalert (s_Services, "hu, User %s isn't a member of this channel %s", u->nick, chan);
-				chandump (c->name);
+				ChanDump (c->name);
 				UserDump (u->nick);
 			}
 		} else {
@@ -532,10 +537,9 @@ part_chan (User * u, char *chan)
 			free (cm);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			Module_Event (EVENT_PARTCHAN, av, ac);
+			ModuleEvent (EVENT_PARTCHAN, av, ac);
 			free (av);
 			ac = 0;
-//                      FreeList(av, ac);
 			c->cur_users--;
 		}
 		if (findbot (u->nick)) {
@@ -543,7 +547,7 @@ part_chan (User * u, char *chan)
 			del_bot_from_chan (u->nick, c->name);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			Module_Event (EVENT_PARTBOT, av, ac);
+			ModuleEvent (EVENT_PARTBOT, av, ac);
 			free (av);
 			ac = 0;
 		}
@@ -552,7 +556,7 @@ part_chan (User * u, char *chan)
 			nlog (LOG_WARNING, LOG_CORE, "Hu, User %s claims not to be part of Chan %s", u->nick, chan);
 			if (me.debug_mode) {
 				chanalert (s_Services, "Hu, User %s claims not to be part of Chan %s", u->nick, chan);
-				chandump (c->name);
+				ChanDump (c->name);
 				UserDump (u->nick);
 			}
 			return;
@@ -562,10 +566,9 @@ part_chan (User * u, char *chan)
 		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
 		if (c->cur_users <= 0) {
 			AddStringToList (&av, c->name, &ac);
-			Module_Event (EVENT_DELCHAN, av, ac);
+			ModuleEvent (EVENT_DELCHAN, av, ac);
 			free (av);
 			ac = 0;
-//                      FreeList(av, ac);
 			del_chan (c);
 		}
 	}
@@ -594,7 +597,7 @@ change_user_nick (Chans * c, char *newnick, char *oldnick)
 		nlog (LOG_WARNING, LOG_CORE, "change_user_nick() %s isn't a member of %s", oldnick, c->name);
 		if (me.debug_mode) {
 			chanalert (s_Services, "change_user_nick() %s isn't a member of %s", oldnick, c->name);
-			chandump (c->name);
+			ChanDump (c->name);
 			UserDump (oldnick);
 		}
 		return;
@@ -651,7 +654,7 @@ join_chan (User * u, char *chan)
 		c->modes = 0;
 		c->tstime = 0;
 		AddStringToList (&av, c->name, &ac);
-		Module_Event (EVENT_NEWCHAN, av, ac);
+		ModuleEvent (EVENT_NEWCHAN, av, ac);
 		free (av);
 		ac = 0;
 	}
@@ -666,7 +669,7 @@ join_chan (User * u, char *chan)
 		nlog (LOG_WARNING, LOG_CORE, "Adding %s to Chan %s when he is already a member?", u->nick, chan);
 		if (me.debug_mode) {
 			chanalert (s_Services, "Adding %s to Chan %s when he is already a member?", u->nick, chan);
-			chandump (c->name);
+			ChanDump (c->name);
 			UserDump (u->nick);
 		}
 		return;
@@ -689,7 +692,7 @@ join_chan (User * u, char *chan)
 	}
 	AddStringToList (&av, c->name, &ac);
 	AddStringToList (&av, u->nick, &ac);
-	Module_Event (EVENT_JOINCHAN, av, ac);
+	ModuleEvent (EVENT_JOINCHAN, av, ac);
 	free (av);
 	nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
 	if (findbot (u->nick)) {
@@ -711,7 +714,7 @@ join_chan (User * u, char *chan)
 
 
 void
-chandump (char *chan)
+ChanDump (char *chan)
 {
 	hnode_t *cn;
 	lnode_t *cmn;

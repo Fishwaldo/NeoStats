@@ -1,0 +1,37 @@
+#PCRE Makefile
+CC=@CC@
+CFLAGS=-I.. @CFLAGS@
+LDFLAGS= @LDFLAGS@
+INCLUDES=-I.. -I.
+
+SOURCES= get.c pcre.c  study.c
+OBJECTS= get.o pcre.o  study.o
+DOCS=README.pcre COPYING
+
+all:	 ${OBJECTS}
+
+.c.o:	
+	 $(CC) -c $(CFLAGS) $(INCLUDES) $<
+
+dftables.o: dftables.c maketables.c internal.h ../pcre.h config.h Makefile
+	$(CC) -c $(CFLAGS) $(INCLUDES) dftables.c
+
+dftables:       dftables.o
+	$(CC) $(LDFLAGS) dftables.o -o dftables
+
+chartables.c:   dftables
+	./dftables >./chartables.c
+
+clean:
+	 /bin/rm -rf *.o Makefile dftables ../pcre.h chartables.c config.h
+
+install: 
+
+dist:	
+
+$(OBJECTS): Makefile
+pcre.o:	chartables.c ../pcre.h internal.h ../config.h
+get.o: ../pcre.h internal.h ../config.h
+study.o: ../pcre.h internal.h ../config.h
+dftables.o: ../pcre.h internal.h ../config.h
+

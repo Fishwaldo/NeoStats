@@ -62,10 +62,11 @@ Functions __module_functions[] = {
 
 	/* an easter egg for all the Neo users */
 
-int __Chan_Message(char *origin, char *chan, char **argv, int argc)
+int __ChanMessage(char *origin, char **argv, int argc)
 {
 	FILE *fort;
 	char *fortune;
+	char *chan = argv[0];
 	if (!strcasecmp(argv[1], s_Spam)) {
 		fort = popen("/usr/games/fortune", "r");
 		if (fort) {
@@ -82,7 +83,7 @@ int __Chan_Message(char *origin, char *chan, char **argv, int argc)
 
 
 
-int __Bot_Message(char *origin, char **argv, int argc)
+int __BotMessage(char *origin, char **argv, int argc)
 {
 	User *u;
 	char *buf;

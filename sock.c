@@ -32,11 +32,16 @@
 #include <adns.h>
 #include "conf.h"
 #include "log.h"
+#include "timer.h"
+#include "dns.h"
 
 static void recvlog (char *line);
 
 static struct sockaddr_in lsa;
 static int dobind;
+
+int servsock;
+char recbuf[BUFSIZE];
 
 /** @brief Connect to a server
  *
@@ -49,6 +54,7 @@ static int dobind;
 int
 ConnectTo (char *host, int port)
 {
+	int ret;
 	struct hostent *hp;
 	struct sockaddr_in sa;
 	int s;
@@ -67,11 +73,14 @@ ConnectTo (char *host, int port)
 	}
 
 	if ((hp = gethostbyname (host)) == NULL) {
+		printf("1\n");
 		return NS_FAILURE;
 	}
 
-	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0)
+	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0) {
 		return NS_FAILURE;
+		printf("2\n");
+	}
 	if (dobind > 0) {
 		if (bind (s, (struct sockaddr *) &lsa, sizeof (lsa)) < 0) {
 			nlog (LOG_WARNING, LOG_CORE, "bind(): Warning, Couldn't bind to IP address %s", strerror (errno));
@@ -83,7 +92,9 @@ ConnectTo (char *host, int port)
 	sa.sin_port = htons (port);
 	bcopy (hp->h_addr, (char *) &sa.sin_addr, hp->h_length);
 
-	if (connect (s, (struct sockaddr *) &sa, sizeof (sa)) < 0) {
+	ret=connect (s, (struct sockaddr *) &sa, sizeof (sa));
+	if (ret< 0) {
+		printf("%d %x\n",errno,ret);
 		close (s);
 		return NS_FAILURE;
 	}
@@ -105,14 +116,14 @@ read_loop ()
 	fd_set readfds, writefds, errfds;
 	char c;
 	char buf[BUFSIZE];
-	Sock_List *mod_sock;
+	ModSock *mod_sock;
 	struct pollfd *ufds;
 	int pollsize, pollflag;
 	hscan_t ss;
 	hnode_t *sn;
 
 	TimeOut = malloc (sizeof (struct timeval));
-	ufds = malloc((sizeof *ufds) *  getmaxsock());
+	ufds = malloc((sizeof *ufds) *  me.maxsocks);
 
 	while (1) {
 		SET_SEGV_LOCATION();
@@ -124,7 +135,7 @@ read_loop ()
 		FD_ZERO (&readfds);
 		FD_ZERO (&writefds);
 		FD_ZERO (&errfds);
-		memset(ufds, 0, (sizeof *ufds) * me.maxsocks);
+//		memset(ufds, 0, (sizeof *ufds) * me.maxsocks);
 		pollsize = 0;
 		FD_SET (servsock, &readfds);
 		hash_scan_begin (&ss, sockh);
@@ -363,20 +374,20 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
 int
 sock_disconnect (char *sockname)
 {
-	Sock_List *sock;
+	ModSock *mod_sock;
 	fd_set fds;
 	struct timeval tv;
 	int i;
 
-	sock = findsock (sockname);
-	if (!sock) {
+	mod_sock = findsock (sockname);
+	if (!mod_sock) {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, Can not find Socket %s in list", sockname);
 		return NS_FAILURE;
 	}
 
 	/* the following code makes sure its a valid file descriptor */
 	FD_ZERO (&fds);
-	FD_SET (sock->sock_no, &fds);
+	FD_SET (mod_sock->sock_no, &fds);
 	tv.tv_sec = 0;
 	tv.tv_usec = 0;
 	i = select (1, &fds, NULL, NULL, &tv);
@@ -384,8 +395,8 @@ sock_disconnect (char *sockname)
 		nlog (LOG_WARNING, LOG_CORE, "Warning, Bad File Descriptor %s in list", sockname);
 		return NS_FAILURE;
 	}
-	nlog (LOG_DEBUG3, LOG_CORE, "Closing Socket %s with Number %d", sockname, sock->sock_no);
-	close (sock->sock_no);
+	nlog (LOG_DEBUG3, LOG_CORE, "Closing Socket %s with Number %d", sockname, mod_sock->sock_no);
+	close (mod_sock->sock_no);
 	del_socket (sockname);
 	return NS_SUCCESS;
 }

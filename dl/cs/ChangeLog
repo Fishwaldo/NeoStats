@@ -1,6 +1,9 @@
 ConnectServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma^
 ==============================================================================
+* Version 1.10 * Mark (M) * November 13, 2003
+ - Moved mode defines to ircd header files (M)
+
 * Version 1.9 * Mark (M) * November 1, 2003
  - Message system cleanup (M)
  - Nick change messages now include user@host for spotting nick flooders (M)

@@ -239,7 +239,7 @@ void __ModFini()
 
 }
 
-int __Bot_Message(char *origin, char **av, int ac)
+int __BotMessage(char *origin, char **av, int ac)
 {
 	User *u;
 
@@ -313,9 +313,9 @@ int __Bot_Message(char *origin, char **av, int ac)
 		else if (!strcasecmp(av[2], "ABOUT"))
 			privmsg_list(u->nick, s_StatServ, ss_about_help);
 		else if (!strcasecmp(av[2], "STATS")
-			 && UserLevel(u) >= 185)
+			 && UserLevel(u) >= NS_ULEVEL_ADMIN)
 			privmsg_list(u->nick, s_StatServ, ss_stats_help);
-		else if (!strcasecmp(av[2], "SET") && UserLevel(u) >= 185)
+		else if (!strcasecmp(av[2], "SET") && UserLevel(u) >= NS_ULEVEL_ADMIN)
 			privmsg_list(u->nick, s_StatServ, ss_set_help);
 		else
 			prefmsg(u->nick, s_StatServ,
@@ -329,7 +329,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 		chanalert(s_StatServ,
 			  "%s Wanted to see Channel Statistics", u->nick);
 	} else if (!strcasecmp(av[1], "SET")) {
-		if (UserLevel(u) >= 185) {
+		if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
 			ss_set(u, av, ac);
 		} else {
 			prefmsg(u->nick, s_StatServ, "Permission Denied");
@@ -368,7 +368,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 		chanalert(s_StatServ,
 			  "%s Wanted to see the Daily NetStats ", u->nick);
 	} else if (!strcasecmp(av[1], "FORCEHTML")
-		   && (UserLevel(u) >= 185)) {
+		   && (UserLevel(u) >= NS_ULEVEL_ADMIN)) {
 		nlog(LOG_NOTICE, LOG_MOD,
 		     "%s!%s@%s Forced an update of the NeoStats Statistics HTML file with the most current statistics",
 		     u->nick, u->username, u->hostname);
@@ -400,7 +400,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 		chanalert(s_StatServ, "%s Wanted to see the Bot List",
 			  u->nick);
 #endif
-	} else if (!strcasecmp(av[1], "STATS") && (UserLevel(u) >= 185)) {
+	} else if (!strcasecmp(av[1], "STATS") && (UserLevel(u) >= NS_ULEVEL_ADMIN)) {
 		ss_stats(u, av[2], av[3], av[4]);
 		if (ac < 3) {
 			chanalert(s_StatServ,
@@ -886,7 +886,7 @@ static void makemap(char *uplink, User * u, int level)
 		s = hnode_get(sn);
 		ss = findstats(s->name);
 
-		if ((level == 0) && (strlen(s->uplink) <= 0)) {
+		if ((level == 0) && (s->uplink[0] != 0)) {
 			/* its the root server */
 			prefmsg(u->nick, s_StatServ,
 				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
@@ -1125,7 +1125,7 @@ static void ss_stats(User * u, char *cmd, char *arg, char *arg2)
 	hscan_t scan;
 
 	SET_SEGV_LOCATION();
-	if (UserLevel(u) < 185) {
+	if (UserLevel(u) < NS_ULEVEL_ADMIN) {
 		nlog(LOG_NORMAL, LOG_MOD, "Access Denied (STATS) to %s",
 		     u->nick);
 		prefmsg(u->nick, s_StatServ, "Access Denied.");
