@@ -856,6 +856,11 @@ bot_message (char *origin, char **av, int ac)
 	int argc = 0;
 	int i;
 
+	if (ac < 2) {
+		nlog(LOG_WARNING, LOG_CORE, "Invalid String passed to Bot_message");
+		return NS_FAILURE;
+	}
+
 	/* Check command length */
 	if (strnlen (av[1], MAX_CMD_LINE_LENGTH) >= MAX_CMD_LINE_LENGTH) {
 		prefmsg (origin, s_Services, "command line too long!");

@@ -1,5 +1,8 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 =====================================================================================
+* NeoStats * Fish (F) * Version 2.5.18
+ - Fix a crash in message parsing functions (F)
+
 * NeoStats * Mark (M) * Version 2.5.17
  - Fix Unreal smodes (M)
  - Fix Unreal ban type field in sqlserv (M)

@@ -1,4 +1,4 @@
-* NeoStats * M & Fish * Version 2.5.17
+* NeoStats * M & Fish * Version 2.5.18
 ==============================================================================
 Important Changes you should know: (READ THIS!)
 ==============================================================================
@@ -9,7 +9,7 @@ RedHat 9.0 / Fedora / Slakware 9.0 Users:
 	http://www.neostats.net/boards/viewtopic.php?t=391
 
 Experimental IRCu support:
-	NeoStats 2.5.17 includes experimental support for IRCu. It may not work
+	NeoStats 2.5.18 includes experimental support for IRCu. It may not work
 	correctly on your network especially if you run a modified version of
 	IRCu. Currently we only aim to support the main IRCu branch but do have
 	some support for Nefarious and Asuka modifications. You will need to
