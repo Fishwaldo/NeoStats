@@ -5,14 +5,13 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.h,v 1.7 2000/12/10 06:25:51 fishwaldo Exp $
+** $Id: statserv.h,v 1.8 2002/02/27 11:15:16 fishwaldo Exp $
 */
 
 #ifndef STATSERV_H
 #define STATSERV_H
 
 #include "dl.h"
-#include "linklist.h"
 #include "m_stats.h"
 #include "stats.h"
 #include "dotconf.h"
@@ -90,6 +89,7 @@ struct tld_ {
 
 /* statserv.c */
 extern void statserv(char *);
+extern void re_init_bot();
 
 /* stats.c */
 extern TLD *tldhead;

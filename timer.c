@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: timer.c,v 1.7 2000/06/10 08:48:53 fishwaldo Exp $
+** $Id: timer.c,v 1.8 2002/02/27 11:15:16 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -21,7 +21,7 @@ void chk()
 	Mod_Timer *mod_ptr = NULL;
 	time_t current = time(NULL);
 	register int j;
-	segv_loc("chk");
+	segv_location = sstrdup("chk");
 /* First, lets see if any modules have a function that is due to run..... */
 	for (j = 0; j < T_TABLE_SIZE; j++) {
 		for (mod_ptr = module_timer_lists[j]; mod_ptr; mod_ptr = mod_ptr->next) {
@@ -31,7 +31,7 @@ void chk()
 			}
 		}
 	}
-	if (mod_ptr) free(mod_ptr);
+	free(mod_ptr);
 
 	if (current - ping.last_sent > 60) {
 		TimerPings();
@@ -57,28 +57,25 @@ void TimerReset()
 
 void TimerPings()
 {
+	register int i;
 	Server *s;
-	DLL_Return ExitCode;
 
 #ifdef DEBUG
 	log("Sendings pings...");
 #endif
 	ping.ulag = 0;
 
-	s = smalloc(sizeof(Server));
-	ExitCode = DLL_CurrentPointerToHead(LL_Servers);
-	if (ExitCode == DLL_NORMAL) {
-		while (ExitCode == DLL_NORMAL) {
-			ExitCode = DLL_GetCurrentRecord(LL_Servers, s);
+	for (i = 0; i < S_TABLE_SIZE; i++) {
+		for (s = serverlist[i]; s; s = s->next) {
 			if (!strcmp(me.name, s->name)) {
 				s->ping = 0;
-			} else {
-				sts(":%s PING %s :%s", me.name, me.name, s->name);
+				continue;
 			}
-			if ((ExitCode = DLL_IncrementCurrentPointer(LL_Servers)) == DLL_NOT_FOUND) break;
+			sts(":%s PING %s :%s", me.name, me.name, s->name);
 		}
 	}
-	if (s) free(s);
+/* Shmad */
+	free(s);
 }
 
 

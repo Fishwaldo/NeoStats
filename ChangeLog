@@ -1,10 +1,89 @@
-- Fixed up StatServ some more, now it displays all the information that
-previous versions of NeoStats did, although, it might not be accurate yet
-(still working on it)
-- Fixed up Module Bots not working if the recieved Nick case was different
-to what was in the hash table!
-
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+
+
+
+* NeoStats * Fish & Shmad * Version 2.0.13 
+ - Fixed a massive problem with crashing and flooding off the entire network!!! (Shmad)
+    -> Reported by |clown|
+ - Fixed Slackware support. (Shmad)
+ - Added Vhost Support to Neostats... Now reads in a users Vhost, and stores it in u->vhost (Fish)
+ - Minor fixes (Fish)
+ - Added begining of Services to Neostats... see dl/services/ChangeLog for more info on whats going on there (Fish)
+ - fixed a segfault in ircd.c - parse... corelen was un-ititilized (Fish)
+
+
+* NeoStats * Shmad * Version 2.0.12
+ - Fixed problems with access levels
+ - Fixed bugs allowing some "normal" users to issue evil raw commands.
+ - Just a security update.
+
+
+* NeoStats * Shmad * Version 2.0.11
+ - STATS u now works on NeoStats. :)
+ - Fixed log(); notice when a TLD wasnt found. Sorry John :P~
+ - Added new TLDs
+ - Fixed misc. stats.
+ - Incremented version #
+ - Better memory management. We dont eat as much. Still a few leaks
+   Working on the remaining few.
+ - Minor update to module loading code.
+ - Fixed multiple arguements not being passed (previous fix caused this)
+ - Fixed SEGFAULT when msg'ing Module services with blank lines. (Reported by: JK)
+ - Upgraded NeoStats HELP.. all commands are now available to NetAdmin and Techadmin.
+ - For all those of you who run 2.0.6 THIS is the recommended _STABLE_ build.
+ - Fixed timer segfault.. Aiiee!
+ - Fixed Segfault some people were having when StatServ was loaded manually.. whoopsies.
+ - Why.. Oh Why was StatServ setting people +v?  No idea where that code came from.. removed.
+ - Fixed Modules not loading 100% now.  100% meaning it worked on all systems tested on.  This
+   should help those of you who experienced these problems. (Reported by: xXTasty)
+ - StatServ echoing all commands to the channel it was in was pissing me (and others off), it
+   is now removed.. Might make this a config option at a later date. (Requested by: anonymous)
+ - Fixed cosmetic bugs in SERVER command.
+ - Fixed % stats in SERVER command in StatServ.
+ - Damn I hate my job..
+ - Fixed Layout of MAP.. man was it messy fish..
+ - Fixed last? memory leak.
+ - Fixed the bugs in the makeconf script.. woops. :-) (Reported by: A lot of people :P)
+ - Pondered moving NeoStats motd to its own file rather than hard coded.. look for it in next ver.
+ - Fixed remaining mem leaks in MODULES.
+ - Got a job..
+ - Fixed modules not loading on NeoStats boot.
+ - Fixed StatServ MODULE sefaulting NeoStats... redundent code fishy. :-)
+ - Fixed MOTD -- Might move this to an external stats.motd file later.
+ - Fixed logging error where on SEGFAULT it would flood stats.log with about 40,000 lines. :-)
+ - Finished Remaining Modules we ship off with NeoStats.
+ - Job hunting -- loads of fun :-)
+ - Major Update was needed.. so here we start. :)
+ 
+
+* NeoStats * Shmad * Version 2.0.6
+ - Module NetInfo cleaned up a bit - looks purdy now
+ - 2.0 HAS DOCS!! Check them out in doc/ they are still roughish, more to add as time comes.
+ - stats.cfg cleaned up a bit.
+ - A few more mem leaks fixed.. not all of them yet.. working on it.
+ - Lazy people can now ./makeconf -- be sure to check stats.cfg to make sure everything
+   is right tho :)
+ - Fixed PRIVMSG bug, well not really a bug Unreal needs a check. (F)
+ - Added FreeBSD support (Thanks to TheRock (acestar) and madness.tmok.com for test shells).
+ - Added OpenBSD support (Thanks to bball for test shell).
+ - Added NetBSD support  (Thanks to Anoninimity for test shell).
+ - Started documenting the modules.
+ - We need people to staff our support channel #NeoStats on irc.cyberchat-irc.net
+ - Upgraded to version 2.0.6 flying along now :)
+
+
+* NeoStats * Shmad * Version 2.0 Beta 5
+ - Fixed up StatServ some more, now it displays all the information that previous
+   versions of NeoStats did, although, it might not be accurate yet (still working on it)
+ - Fixed up Module Bots not working if the recieved Nick case was different to what was
+   in the hash table!
+ - Fixed a whole crapload of Segfault bugs ;)
+ - Added NetInfo, this module SAJOINs users to channels based on their TLD.
+ - Added better module control.
+ - Still working on the Memory Leaks, its a pain, you may have to restart NeoStats every 4 to 6 days so
+   it doesn't eat up all your ram.  It ate up 256 MB of Ram on the coding system in 2 weeks.
+
+
 * NeoStats * Fish * Its Under CVS Control now... Still a Beta/Alpha Version though!
  - Implemented Levels for Users, and finally fixed it all up.. if your
    Coding a module, and need some sort of Security, use "UserLevel(u)" which
@@ -172,6 +251,8 @@ GeoStats - Fish -  version 1.1.1
    it. Can someone let me know?
 
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 GeoStats - version 1.1.0
  - Fixed hashing problem.
@@ -185,7 +266,7 @@ GeoStats - version 1.0.4
  - Added 'STATS' command.
 	-LIST statistic entries.
 	-DEL statistic entries.
-	-COPY statistic entries.
+v	-COPY statistic entries.
  - Added 'LOGS' command.
 	-Allows you to view today's logfile via PRIVMSG or NOTICE's.
  - Fixed -major- problem with the SHUTDOWN command ;-)

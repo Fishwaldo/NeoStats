@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.3 2000/12/10 06:25:51 fishwaldo Exp $
+** $Id: spam.c,v 1.4 2002/02/27 11:15:16 fishwaldo Exp $
 */
 
 
@@ -16,7 +16,7 @@ const char spamversion_date[] = __DATE__;
 const char spamversion_time[] = __TIME__;
 char *s_Spam;
 
-Module my_info[] = { {
+Module_Info my_info[] = { {
 	"Spam",
 	"A User to Help Catch Spammers on the IRC network",
 	"1.0"
@@ -48,16 +48,16 @@ void TimerSpam()
 		temp[i] = c;
 
 	}
-	if (servsock > 0) {
+/*	if (servsock > 0) {
 		if (bot_nick_change(s_Spam, temp) == 1) {
 			s_Spam = sstrdup(temp);
 			notice(s_Spam, "Spam Users Nick is now: %s",temp);
-		} else {
+		} else { */
 /* ToDo: Add routine if nick is in use, to find another nick */
-			return;
+/*			return;
 		}		
-	}
-
+	} */
+return;
 }
 
 int __Bot_Message(char *origin, char *coreLine, int type)
@@ -75,7 +75,6 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 	globops(me.name, "Possible Mass Message -\2(%s!%s@%s)\2- %s", u->nick,
 		u->username, u->hostname, coreLine);
 	notice(s_Spam,"WooHoo, A Spammer has Spammed! -\2(%s!%s@%s)\2- Sent me this: %s",u->nick,u->username,u->hostname,coreLine);
-
 	log("Possible Mass Message -(%s!%s@%s)- %s", u->nick, u->username,
 		u->hostname, coreLine);
 	return 1;
@@ -94,13 +93,13 @@ int Online(Server *data) {
 
 
 EventFnList my_event_list[] = {
-	{ "ONLINE", 	Online, "Spam"},
- 	{ NULL, 	NULL, 	NULL}
+	{ "ONLINE", 	Online},
+	{ NULL, 	NULL}
 };
 
 
 
-Module *__module_get_info() {
+Module_Info *__module_get_info() {
 	return my_info;
 };
 
@@ -113,7 +112,7 @@ EventFnList *__module_get_events() {
 };
 
 void _init() {
-	s_Spam = "Spam";
+	s_Spam = "sumyungguy";
 	sts(":%s GLOBOPS :Spam Module Loaded",me.name);
 }
 

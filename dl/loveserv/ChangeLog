@@ -1,0 +1,20 @@
+LoveServ Module for NeoStats 2.x ChangeLog
+Shmad <shmad@neostats.net>
+
+
+* Version 1.1 * October 25, 2001 ---- Fish
+- Removed Hardcoded servernames, and replaced with me.name
+
+* Version 1.0 * September 1st, 2001 ---- Shmad
+
+- Send someone a customized LOVENOTE
+- Send someone some CANDY yummy!
+- Send someone some CHOCOLATE mmmm
+- Added ADMIRER - tell someone they have a secret admirer
+- HUG someone
+- TONSIL kiss someone very deeply LOL
+- KISS to kiss someone
+- ROSE to send a rose to someone
+- Added new command KISS to send a virtual kiss to someone
+- Started the module, not much here yet.
+

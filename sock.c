@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.8 2000/06/10 08:48:53 fishwaldo Exp $
+** $Id: sock.c,v 1.9 2002/02/27 11:15:16 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -49,12 +49,10 @@ void read_loop()
 	Sock_List *mod_sock;
 
 	while (1) {
-		segv_loc("Read_Loop");
-		/* free any pointers (Cur*) */
+		segv_location = sstrdup("Read_Loop");
 		memset(buf, '\0', BUFSIZE);
 		chk();
-		/* do it again, as our Timers might have Malloc'd them :) */
-		segv_loc("Read_Loop2");
+		segv_location = sstrdup("Read_Loop2");
 		FD_ZERO(&readfds);
 		TimeOut.tv_sec = 1;
 		TimeOut.tv_usec = 0;
@@ -128,7 +126,6 @@ void notice(char *who, char *buf,...)
 		me.SendBytes = me.SendBytes + sent;
 	}
 	va_end (ap);
-
 }
 
 void sts(char *fmt,...)
@@ -166,7 +163,7 @@ void log(char *fmt, ...)
 	strftime(fmtime, 80, "%H:%M[%m/%d/%Y]", localtime(&tmp));
 
 
-	if ((logfile = fopen("stats.log", "a")) == NULL) return;
+	if ((logfile = fopen("logs/stats.log", "a")) == NULL) return;
 
 	if (logfile)
 		fprintf(logfile, "(%s) %s\n", fmtime, buf);
@@ -185,7 +182,7 @@ void ResetLogs()
 	char tmp[25];
 	time_t t = time(NULL);
 	
-	segv_loc("ResetLogs");
+	segv_location = sstrdup("ResetLogs");
 	strftime(tmp, 25, "logs/stats-%m-%d.log", localtime(&t));
 	rename("stats.log", tmp);
 	log("Started fresh logfile.");

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ns_help.c,v 1.1 2000/02/03 23:45:54 fishwaldo Exp $
+** $Id: ns_help.c,v 1.2 2002/02/27 11:15:16 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -14,7 +14,7 @@ const char *ns_help[] = {
 "*** NeoStats Help ***",
 "",
 "Commands:",
-"\2UPTIME\2     NeoStats on NeoStats.",
+"\2INFO\2       Stats Info on NeoStats.",
 "\2VERSION\2    Shows you the current StatServ Version.",
 "",
 "End of Help.",
@@ -33,27 +33,15 @@ const char *ns_myuser_help[] = {
 "\2JOIN\2       Join a Channel.",
 "\2LOGS\2       View logfiles.",
 "\2RAW\2        Send a Raw Command from this Server!",
-"End of Help",
-NULL
-};
-
-const char *ns_coder_help[] = {
-"",
-"*** Additional Commands For Coders!!***",
-"",
 "\2Debug\2      Toggle Debuging Mode!",
-"               Warning. Running this Command on a Popular Network",
-"               Can Flood you of the Server.",
-"               \2Use With Caution\2",
-"\2UserDump\2   When in Debug Mode, Request statserv to send a UserDump",
-"               To \2ALL\2 Coders on the Network. Again this Command can Flood you off the Server",
-"               \2Use With Caution\2",
-"\2ServerDump\2 When in Debug Mode, Request statserv to send a ServerDump",
-"               To \2ALL\2 Coders on the Network. Again this Command can Flood you off the Server",
-"               \2Use With Caution\2",
-"\2ChanDump\2   When in Debug Mode, Request statserv to send a ChannelDump",
-"               To \2ALL\2 Coders on the Network. Again this Command can Flood you off the Server",
-"               \2Use With Caution\2",
+"               Running this can flood you offline.",
+"\2UserDump\2   In Debug Mode, Request statserv to send a ",
+"               UserDump to all TechAdmins, this can flood",
+"               you off the server!",
+"\2ServerDump\2 In Debug Mode, ServerDump sent to all",
+"               Techadmins.",
+"\2ChanDump\2   In Debug Mode, ChanDump sent to all",
+"               Techadmins.",
 "End of Help",
 NULL
 };

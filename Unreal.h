@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.3 2000/04/04 10:29:38 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.4 2002/02/27 11:15:16 fishwaldo Exp $
  */
 
 

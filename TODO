@@ -1,13 +1,17 @@
 NeoStats - TODO Log:
 --------------------
 
-* Once we do these they are removed from the list, RIGHT FISH!? :P
+* Once we do these they are removed from the list
 
-
- - Support HTML writeouts for the "networks" website. (Shmad)
- - Support SUSPEND - suspends an oper's access from Stats (Shmad)
- - New Module API to register for Events and Server Commands _ due to
-	changes with LinkedList Support :(
- - Move Modules over to new API
- - More Doco
+ - Support HTML writeouts for the "networks" website. 
+ - Support SUSPEND - suspends an oper's access from Stats 
+ - FIX some RAWs segfaulting the server.. they really shouldnt
+ - FIX /msg NeoStats UPTIME segfaulting the server. Use /stats u stats.*
+   istead for the time being
+ - FIX SIGHUP segfaulting *sigh*
+ - Add rehash(); code.. theres nothing in it
+ - fix mem consumption, it still does it but not as bad!
+ - Updated Documentation. It should be current, but not quite idiot proof
+   yet... this has been proven unfortunately.
+ - Finish HostServ and LogServ.
 

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.c,v 1.3 2000/02/06 07:12:46 fishwaldo Exp $
+** $Id: stats.c,v 1.4 2002/02/27 11:15:16 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -50,8 +50,8 @@ TLD *AddTLD(User *u)
 
 	if (!t) {
 		log("Unable to find TLD entry for %s (%s)", u->nick, m);
-		log("*** NOTICE *** Please send a copy of this logfile to "
-			"net@lite.net");
+		log("*** NOTICE *** Please email a copy of this logfile to "
+			"support@neostats.net");
 		return NULL;
 	}
 	t->users++;

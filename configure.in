@@ -3,7 +3,7 @@ AC_INIT(dl/icq/icq.c)
 AC_CONFIG_HEADER(config.h)
 
 PACKAGE=NeoStats
-VERSION=2.0
+VERSION=2.0.12
 AC_PREFIX_DEFAULT(~/NeoStats/)
 CFLAGS="$CFLAGS -O2 -Wall"
 
@@ -13,11 +13,12 @@ AC_PROG_CC
 dnl Checks for libraries.
 dnl Replace `main' with a function in -ldl:
 AC_CHECK_LIB(dl, main)
+AC_CHECK_LIB(db, db_create)
 
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(sys/time.h unistd.h)
+AC_CHECK_HEADERS(sys/time.h unistd.h db.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -145,12 +146,27 @@ esac],
 [AC_MSG_RESULT(no)]
 )
 
-AC_MSG_CHECKING(Whether to Enable Helper Module?)
-AC_ARG_ENABLE(helper,
-[ --enable-helper - Do Compile Helper Module],
+AC_MSG_CHECKING(Whether to Enable Services Module?)
+AC_ARG_ENABLE(services,
+[ --enable-services - Do Compile Services Module],
 [ case "$enableval" in
   yes)
-	MODULES="$MODULES helper"
+	MODULES="$MODULES services"
+	AC_MSG_RESULT(yes)
+	;;
+  *)
+	AC_MSG_RESULT(no)
+	;;
+esac],
+[AC_MSG_RESULT(no)]
+)
+
+AC_MSG_CHECKING(Whether to Enable LoveServ Module?)
+AC_ARG_ENABLE(loveserv,
+[ --enable-loveserv - Do Compile LoveServ Module],
+[ case "$enableval" in
+  yes)
+	MODULES="$MODULES loveserv"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -168,4 +184,4 @@ AC_MSG_RESULT(Thats Impressive!!!)
 
 AC_SUBST(IRCD_FILES)
 AC_SUBST(MODULES)
-AC_OUTPUT(dl/statserv/Makefile dl/services/Makefile dl/icq/Makefile dl/version/Makefile dl/Makefile dl/spam/Makefile dl/netinfo/Makefile dl/helper/Makefile Makefile)
+AC_OUTPUT(dl/statserv/Makefile dl/services/Makefile dl/icq/Makefile dl/version/Makefile dl/Makefile dl/spam/Makefile dl/netinfo/Makefile Makefile dl/services/Makefile dl/loveserv/Makefile)

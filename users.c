@@ -5,12 +5,13 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.9 2000/12/10 06:25:51 fishwaldo Exp $
+** $Id: users.c,v 1.10 2002/02/27 11:15:16 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
  
 #include "stats.h"
+#include "hash.h"
 
 int fnmatch(const char *, const char *, int flags);
 
@@ -26,22 +27,22 @@ struct Oper_Modes usr_mds[]      = {
                                  {UMODE_SERVICES, 'S',200},
                                  {UMODE_SADMIN, 'a',100},
                                  {UMODE_ADMIN, 'A',70},
-                                 {UMODE_NETADMIN, 'N',150},
+                                 {UMODE_NETADMIN, 'N',185},
 				 {UMODE_TECHADMIN, 'T',190},
                                  {UMODE_CLIENT, 'c',0},
 				 {UMODE_COADMIN, 'C',60},
                                  {UMODE_FLOOD, 'f',0},
-                                 {UMODE_REGNICK, 'r',10},
+                                 {UMODE_REGNICK, 'r',0},
                                  {UMODE_HIDE,    'x',0},
 				 {UMODE_EYES,	'e',0},
                                  {UMODE_CHATOP, 'b',0},
 				 {UMODE_WHOIS, 'W',0},
 				 {UMODE_KIX, 'q',0},
-				 {UMODE_BOT, 'B',10},
+				 {UMODE_BOT, 'B',0},
 				 {UMODE_FCLIENT, 'F',0},
    				 {UMODE_HIDING,  'I',0},
-             			 {UMODE_AGENT,   'Z',200},
-				 {UMODE_CODER, '1',200},
+/*             			 {UMODE_AGENT,   'Z',200},
+				 {UMODE_CODER, '1',200}, */
 	   			 {UMODE_DEAF,    'd',0},
                                  {0, 0, 0 }
 };
@@ -50,11 +51,71 @@ struct Oper_Modes usr_mds[]      = {
 
 
 
+static Server *new_server(char *);
+Server *serverlist[S_TABLE_SIZE];
+Chans *chanlist[C_TABLE_SIZE];
+
+MyUser *myuhead;
+
+static User *new_user(char *);
+static void add_server_to_hash_table(char *, Server *);
+static void del_server_from_hash_table(char *, Server *);
+
+
+hash_t *uh;
+
+
+static void add_server_to_hash_table(char *name, Server *s)
+{
+	s->hash = HASH(name, S_TABLE_SIZE);
+	s->next = serverlist[s->hash];
+	serverlist[s->hash] = (void *)s;
+}
+
+static void del_server_from_hash_table(char *name, Server *s)
+{
+	Server *tmp, *prev = NULL;
+
+	for (tmp = serverlist[s->hash]; tmp; tmp = tmp->next) {
+		if (tmp == s) {
+			if (prev)
+				prev->next = tmp->next;
+			else
+				serverlist[s->hash] = tmp->next;
+			tmp->next = NULL;
+			return;
+		}
+		prev = tmp;
+	}
+}
+
+User *new_user(char *nick)
+{
+	User *u;
+	hnode_t *un;
+
+	/* before we add a new user, we check the table */
+	if (hash_verify(uh)) {
+		globops(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
+		notice(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
+		log("Eeek, Users table is corrupted!");
+	}
+	u = smalloc(sizeof(User));
+	if (!nick)
+		nick = "";
+	memcpy(u->nick, nick, MAXNICK);
+	un = hnode_create(u);
+	if (hash_isfull(uh)) {
+		log("Eeeek, Hash is full");
+	} else {
+		hash_insert(uh, un, u->nick);
+	}
+	return(u);
+}
 
 void AddUser(char *nick, char *user, char *host, char *server)
 {
 	User *u;
-	DLL_Return ExitCode;
 
 #ifdef DEBUG
 	log("AddUser(): %s (%s@%s) -> %s", nick, user, host, server);
@@ -64,199 +125,111 @@ void AddUser(char *nick, char *user, char *host, char *server)
 		log("trying to add a user that already exists? (%s)", nick);
 		return;
 	}
-	u = smalloc(sizeof(User));
-	strcpy(u->nick, nick);
+
+	u = new_user(nick);
 	strcpy(u->hostname,host);
 	strcpy(u->username, user);
-	strcpy(u->server, server);
+	u->server = findserver(server);
 	u->t_flood = time(NULL);
 	u->flood = 0;
 	u->is_away = 0;
-	strcpy(u->awaymsg,"");
 	u->myuser = NULL;
 	u->Umode = 0;
 	strcpy(u->modes,"");
-	/* create the channel list */
-	if (DLL_CreateList(&u->chans) == NULL) {
-		log("Error, could not create UserChans list for User %s", nick);
-		exit(-1);
-	}
-	if ((ExitCode = DLL_InitializeList(u->chans, sizeof(User_Chans))) != DLL_NORMAL) {
-		if (ExitCode == DLL_ZERO_INFO) log("Error, Users Chans Structure was 0");
-		if (ExitCode == DLL_NULL_LIST) log("Error, Users Chans Structure was NULL");
-		exit(-1);
-	}
-	if(DLL_AddRecord(LL_Users, u, NULL) == DLL_MEM_ERROR) {
-		log("Error, Couldn't AddUser, Out Of Memory");
-		exit(-1);
-	}
-#ifdef DEBUGLL
-	log("DEBUGLL: Number of User Records %ld", DLL_GetNumberOfRecords(LL_Users));
-	log("DEBUGLL: Current User Index %ld", DLL_GetCurrentIndex(LL_Users));
-#endif
-	if (u) free(u);
+
 }
 
 void DelUser(char *nick)
 {
-	DLL_Return ExitCode;
-	User *u = finduser(nick);
+	User *u;
+	hnode_t *un;
 
 #ifdef DEBUG
 	log("DelUser(%s)", nick);
 #endif
 
-	if (!u) {
+	un = hash_lookup(uh, nick);
+	if (!un) {
 		log("DelUser(%s) failed!", nick);
 		return;
 	}
-
-	ExitCode = DLL_DeleteCurrentRecord(LL_Users);
-	if (ExitCode != DLL_NORMAL) {
-		log("Error, Couldn't Delete Current User %s", nick);
-	}
-	if (u) free(u);
-}
-
-void cleanmem() {
-/*
-	User *u;
-	int i;
-	Server *s;
-	register int j;
-	test:
-	for (i = 0; i < U_TABLE_SIZE; i++) {
-		for (u = userlist[i]; u; u = u->next)
-			DelUser(u->nick);
-			goto test;
-	}
-	for (j = 0; j < S_TABLE_SIZE; j++) {
-		for (s = serverlist[j]; s; s = s->next) {
-			DelServer(s->name);
-			j = 0;
-		}
-	}
-*/
+	hash_delete(uh, un);
+	u = hnode_get(un);
+	hnode_destroy(un);
+	free(u);
 }
 
 void Change_User(User *u, char *newnick)
 {
-	DLL_Return ExitCode;
-
+	hnode_t *un;
 #ifdef DEBUG
 	log("Change_User(%s, %s)", u->nick, newnick);
 #endif
+
+	DelUser(u->nick);
+	u->nick[1] = '\0';
 	memcpy(u->nick, newnick, MAXNICK);
-	ExitCode = DLL_UpdateCurrentRecord(LL_Users, u);
-	if (ExitCode != DLL_NORMAL) {
-		log("Error, Couldn't Update Record for %s", u->nick);
-	}
-	if (u) free(u);
+	un = hnode_create(u);
+	hash_insert(uh, un, u->nick);
 }
 void sendcoders(char *message,...)
 {
 	va_list ap;
 	char tmp[512];
 	User *u;
-	DLL_Return ExitCode;
+	hscan_t us;
+	hnode_t *un;
 
 	va_start(ap, message);
 	vsnprintf (tmp, 512, message, ap);
 	if (!me.coder_debug) 
 		return;
-	u = smalloc(sizeof(User));
 	if (!me.usesmo) {
-		ExitCode = DLL_CurrentPointerToHead(LL_Users);
-		if (ExitCode == DLL_NORMAL) {
-			while (ExitCode == DLL_NORMAL) {
-				ExitCode = DLL_GetCurrentRecord(LL_Users, u);
+		hash_scan_begin(&us, uh);
+		while ((un = hash_scan_next(&us)) != NULL) {
+			u = hnode_get(un);
 				if (u->Umode & UMODE_CODER)	
-					privmsg(u->nick, s_Debug, "Debug: %s",tmp);
-				if ((ExitCode = DLL_IncrementCurrentPointer(LL_Users)) == DLL_NOT_FOUND) break;
-			}
-		} else {
-			sendcoders("Ehhh, Something is Wrong, UserList is Empty");
+				privmsg(u->nick, s_Debug, "Debug: %s",tmp);
 		}
-
 	} else {		
 		sts(":%s SMO 1 :%s Debuging: %s ",me.name,s_Services, tmp);
 	}
-	va_end (ap);
-	if (u) free(u);
-		
-}
-int match_nick(User *u, char *s) {
-
-#ifdef DEBUGLL
-	log("DEBUGLL: MatchNick: %s -> %s", u->nick, s);
-#endif
-	return(strcasecmp(u->nick, s));
+	va_end (ap);	
 }
 
 User *finduser(char *nick)
 {
-	
-#ifdef DEBUGLL
-	log("DEBUGLL: FindUser %s", nick);
-#endif
-	DLL_SetSearchModes(LL_Users, DLL_HEAD, DLL_DOWN);
-	switch(DLL_FindRecord(LL_Users, CurU, nick, (int (*)()) match_nick)) {
-		case DLL_NORMAL:
-#ifdef DEBUGLL
-			log("DEBUGLL: FindUser Found %s", CurU->nick);
-#endif
-			return CurU;
-			break;
-		default:
-			return NULL;
+	User *u;
+	hnode_t *un;
+		
+	un = hash_lookup(uh, nick);
+	if (un != NULL) {
+		u = hnode_get(un);
+		return u;
+	} else  {
+		log("FindUser(%s) -> NOTFOUND", nick); 
+		return NULL;
 	}
+
 }
+
 
 void init_user_hash()
 {
-	DLL_Return ExitCode;
+	uh = hash_create(U_TABLE_SIZE, 0, 0);
 	
-	if (DLL_CreateList(&LL_Users) == NULL) {
-		log("Error, Could not Create UserList");
-		exit(-1);
-	}
-	if ((ExitCode = DLL_InitializeList(LL_Users, sizeof(User))) != DLL_NORMAL) {
-		if (ExitCode == DLL_ZERO_INFO) log("Error, Users Structure is 0");
-		if (ExitCode == DLL_NULL_LIST) log("Error, Users Structure is Null");
-		exit(-1);
-	}
-	CurU = smalloc(sizeof(User));
 }
 
 void UserDump()
 {
 	User *u;
-	User_Chans *uc;
-	DLL_Return ExitCode, ExitCode1;
-	
-	u = smalloc(sizeof(User));
-	uc = smalloc(sizeof(User_Chans));
-	sendcoders("\2UserDump:\2");
-	ExitCode = DLL_CurrentPointerToHead(LL_Users);
-	if (ExitCode == DLL_NORMAL) {
-		while (ExitCode == DLL_NORMAL) {
-			ExitCode = DLL_GetCurrentRecord(LL_Users, u);
-			sendcoders("\2User: %s!%s@%s \2Modes: %s Server %s", u->nick, u->username, u->hostname, u->modes, u->server);
-			ExitCode1 = DLL_CurrentPointerToHead(u->chans);
-			if (ExitCode1 == DLL_NORMAL) {
-				while (ExitCode1 == DLL_NORMAL) {
-					ExitCode1 = DLL_GetCurrentRecord(u->chans, uc);
-					sendcoders("Channel MemberShip: %s", uc->chan);
-					if ((ExitCode1 = DLL_IncrementCurrentPointer(u->chans)) == DLL_NOT_FOUND) break;
-				}
-			}
-			if ((ExitCode = DLL_IncrementCurrentPointer(LL_Users)) == DLL_NOT_FOUND) break;
-		}
-	} else {
-		sendcoders("Ehhh, Something is Wrong, UserList is Empty");
+	hnode_t *un;
+	hscan_t us;
+	hash_scan_begin(&us, uh);
+	while ((un = hash_scan_next(&us)) != NULL) {
+		u = hnode_get(un);
+		sendcoders("User: %s", u->nick);
 	}
-	sendcoders("\2End of List...\2");
-	if (u) free(u);
 }
 
 int UserLevel(User *u) {
@@ -269,7 +242,7 @@ int UserLevel(User *u) {
 	}
 #ifdef DEBUG
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
-	if (!strcasecmp(u->nick, "FISH")) tmplvl = 200; 
+/*	if (!strcasecmp(u->nick, "FISH")) tmplvl = 200; */
 	log("UserLevel for %s is %d", u->nick, tmplvl);
 #endif
 	return tmplvl;
@@ -287,8 +260,6 @@ void UserMode(char *nick, char *modes)
 	int add = 0;
 	int i;
 	char tmpmode;
-	DLL_Return ExitCode;
-	
 	
 	u = finduser(nick);
 	if (!u) {
@@ -320,31 +291,102 @@ void UserMode(char *nick, char *modes)
 #ifdef DEBUG
 	log("Modes for %s are now %p", u->nick, u->Umode);
 #endif
-	ExitCode = DLL_UpdateCurrentRecord(LL_Users, u);
-	if (ExitCode != DLL_NORMAL) {
-		log("Error Updating User Record for %s", u->nick);
-	}
-
 }
 
-int User_Away(User *u, char *message) {
-	DLL_Return ExitCode;
-	if (u) {
-		if (message) {
-			message++;
-			u->is_away = 1;
-			strcpy(u->awaymsg, message);
-		} else {
-			u->is_away = 0;
-			strcpy(u->awaymsg,"");
-		}
-		
-		ExitCode = DLL_UpdateCurrentRecord(LL_Users, u);
-		if (ExitCode != DLL_NORMAL) {
-			log("Error Updating User Record for %s", u->nick);
-			return -1;
-		}
-		return 1;
-	}
-	return -1;
+static Server *new_server(char *name)
+{
+	Server *s;
+
+	s = calloc(sizeof(Server), 1);
+	if (!name)
+		name = "";
+	memcpy(s->name, name, MAXHOST);
+	add_server_to_hash_table(name, s);
+
+	return s;
 }
+
+void AddServer(char *name,char *uplink, int hops)
+{
+	Server *s;
+
+#ifdef DEBUG
+	log("New Server: %s", name);
+#endif
+	strlower(name);
+	s = new_server(name);
+	s->hops = hops;
+	s->connected_since = time(NULL);
+	s->last_announce = time(NULL);
+	memcpy(s->uplink,uplink, MAXHOST);
+	s->ping = 0;
+}
+
+void DelServer(char *name)
+{
+	Server *s = findserver(name);
+
+	if (!s || !name) {
+		log("DelServer(): %s failed!", name);
+		return;
+	}
+
+	del_server_from_hash_table(name, s);
+	free(s);
+}
+
+Server *findserver(char *name)
+{
+	Server *s;
+
+	strlower(name);
+	s = serverlist[HASH(name, S_TABLE_SIZE)];
+	while (s && strcmp(s->name, name) != 0)
+		s = s->next;
+	if (s)
+		return s;
+
+	s = serverlist[HASH(name, S_TABLE_SIZE)];
+	while (s && fnmatch(name, s->name, 0) != 0)
+		s = s->next;
+
+#ifdef DEBUG
+	log("findserver(%s) -> %s", name, (s) ? s->name : "NOT FOUND");
+#endif
+
+	return s;
+}
+
+void ServerDump()
+{
+	Server *s;
+	register int j;
+
+	sendcoders("Server Listing:");
+	for (j = 0; j < S_TABLE_SIZE; j++) {
+		for (s = serverlist[j]; s; s = s->next) {
+			sendcoders("Server Entry: %s", 
+				s->name);
+		}
+	}
+	sendcoders("End of Listing.");
+}
+
+void init_server_hash()
+{
+	int i;
+	Server *s, *b;
+
+	for (i = 0; i < S_TABLE_SIZE; i++) {
+		s = serverlist[i];
+		while (s) {
+			b = s->next;
+			free(s);
+			s = b;
+		}
+		serverlist[i] = NULL;
+	}
+	bzero((char *)serverlist, sizeof(serverlist));
+	AddServer(me.name,me.name, 0);
+}
+

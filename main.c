@@ -25,7 +25,7 @@
 
 char s_Debug[MAXNICK] = "Stats_Debug";
 char s_Services[MAXNICK] = "NeoStats";
-const char version[] = "NeoStats-2.0b2";
+const char version[] = "NeoStats-2.0.13";
 const char version_date[] = __DATE__;
 const char version_time[] = __TIME__;
 
@@ -36,13 +36,14 @@ int forked = 0;
 int main()
 {
 	FILE *fp;
-	segv_loc("Main");
+	segv_location = sstrdup("main");
 	me.onchan = 0;
 	printf("%s Loading...\n", version);
 	printf("-----------------------------------------------\n");
-	printf("CopyRight: CodeBase 2000\n");
+	printf("Copyright: NeoStats Group. 2000-2001\n");
 	printf("Justin Hammond (Fish@dynam.ac)\n");
-	printf("Adam Rutter (shmad@kamserve.com)\n\n");
+	printf("Adam Rutter (shmad@neostats.net)\n\n");
+	printf("-----------------------------------------------\n");
 	me.t_start = time(NULL);
 	me.want_privmsg = 0;
 	me.enable_spam = 0;
@@ -54,8 +55,10 @@ int main()
 	__init_mod_list();
 	setup_signals();
 	ConfLoad();
+/* Shmad */
+/* This section ALWAYS craps out so we ignore it-- for now */
 	if (init_modules()) {
-		printf("WARNING: Some Modules Failed to Load");
+/*		printf("WARNING: Some Modules Failed to Load"); */
 	}
 
 
@@ -68,7 +71,7 @@ int main()
 		fclose(fp);
 		printf("\n");
 		printf("%s Successfully Launched into Background\n", version);
-		printf("PID: %i (Written to stats.pid)\n",forked);
+		printf("PID: %i - Wrote to stats.pid\n",forked);
 
 		return 0;
 	}
@@ -114,9 +117,13 @@ RETSIGTYPE serv_segv() {
 	globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 	notice(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 	globops(me.name,"Dumped Core to netstats.debug, Please Read the Readme file to find out what to do with it!");
-	sts("SQUIT %s",me.name);
+/*	sts("SQUIT %s",me.name); */
 	
 	sleep(2);
+	kill(forked, 3);
+	kill(forked, 9);
+	exit(-1);
+        sts("SQUIT %s",me.name);
 }
 
 
@@ -141,11 +148,13 @@ static	void	setup_signals()
 	(void)sigaction(SIGTERM, &act, NULL);
 /* handling of SIGSEGV as well -sts */
 	act.sa_handler = serv_segv;
-	act.sa_flags = SA_ONESHOT;
 	(void)sigaddset(&act.sa_mask, SIGSEGV);
 	(void)sigaction(SIGSEGV, &act, NULL);
 
 
+	(void)signal(SIGHUP, conf_rehash);
+	(void)signal(SIGTERM, serv_die); 
+	(void)signal(SIGSEGV, serv_segv);
 }
 
 
@@ -153,11 +162,13 @@ void start()
 {
 	static int attempts = 0;
 	
-	segv_loc("start");
+	segv_location = sstrdup("start");
 	TimerReset();
 	init_server_hash();
 	init_user_hash();
-	init_chan_hash();
+/* 
+	init_tld();
+*/
 	if (attempts < 10) {
 		attempts++;
 		log("Connecting to %s:%d", me.uplink, me.port);
@@ -186,7 +197,7 @@ void start()
 
 void login()
 	{
-	segv_loc("login");
+	segv_location = sstrdup("login");
 	sts("PASS %s", me.pass);
 	sts("SERVER %s 1 :%s", me.name,me.infoline);
 	sts("PROTOCTL TOKEN");
@@ -196,13 +207,12 @@ void login()
 
 void init_ServBot()
 {
-	segv_loc("init_ServBot");
+	segv_location = sstrdup("init_ServBot");
 	sts("NICK %s 1 %d %s %s %s 0 :/msg %s \2HELP\2", s_Services, time(NULL),
 		Servbot.user, Servbot.host, me.name, s_Services);
 	AddUser(s_Services, Servbot.user, Servbot.host, me.name);
 	sts(":%s MODE %s +Sqd", s_Services, s_Services);
 	sts(":%s JOIN %s",s_Services ,me.chan);
-	sts(":%s MODE %s +q %s",me.name, me.chan, s_Services);
 	sts(":%s MODE %s +o %s",me.name,me.chan,s_Services);
 	sts(":%s MODE %s +a %s",s_Services,me.chan,s_Services);
 	UserMode(s_Services, ":+Sqd"); 
@@ -213,17 +223,17 @@ void *smalloc(long size)
 {
 	void *buf;
 	
-	segv_loc("smalloc");
+	segv_location = sstrdup("smalloc");
 	if (!size) {
 		log("smalloc(): illegal attempt to allocate 0 bytes!");
 		size = 1;
 	}
-
 	buf = malloc(size);
 	if (!buf) {
 		log("smalloc(): out of memory.");
 		exit(0);
 	}
+/*	free(segv_location); */
 	return buf;
 }
 
@@ -236,10 +246,6 @@ char *sstrdup(const char *s)
 	}
 	return t;
 }
-
-void segv_loc(const char *s) {
-	strncpy(segv_location, s, 255);	
-}	
 
 unsigned long HASH(const unsigned char *name, int size_of_table)
 {

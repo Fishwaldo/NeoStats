@@ -130,6 +130,9 @@ void config_register_options(config_option *options)
 int config_parse(FILE *config)
 {
 	static char buffer[CFG_BUFSIZE];
+        static char *here_string;  /* Damn FreeBSD */
+        static char *here_limit; 
+        static char *here_doc;
 
 	while ( (fgets(buffer, CFG_BUFSIZE, config)) != NULL ) /* for each line */
 		{
@@ -194,9 +197,11 @@ int config_parse(FILE *config)
 				{
 					/* check if it's a here-document and act accordingly */
 					char *cp3 = cp1;
-					ulong here_string = 0;
-					char here_limit[9];           /* max length for here-documents: 8 */
-					char *here_doc;
+/* Shmad */
+				/*	ulong here_string = 0; */
+/*                                        char *here_string = 0;
+					char *here_limit[9];   
+					char *here_doc;       FreeBSD will die */
 					
 					bzero(&here_limit, 9);
 
@@ -214,33 +219,35 @@ int config_parse(FILE *config)
 							 * allocate a buffer of filesize bytes; should be enough to
 							 * prevent buffer overflows
 							 */
-							here_doc = malloc(finfo.st_size+1); /* allocate buffer memory */
-							bzero(here_doc, finfo.st_size+1);
+/* Shmad */
+							here_doc = malloc(finfo.st_size+1); /* allocate  buffer memory */
+							bzero(here_doc, finfo.st_size+1); 
 							
-							here_string = 1;
-							strncpy(here_limit, cp3+2, 8);      /* copy here-delimiter */
+			/*				here_string = 1; */
+							strncpy(here_limit, cp3+2, 8); /*   copy here-delimiter */
 							while ( fgets(buffer, CFG_BUFSIZE, config) )
 								{
 									if (!strncmp(here_limit,buffer,strlen(here_limit)))
 										{
-											here_string = 0;            /* legally terminated */
+											here_string = 0;           
 											break;
-										}
-									strcat(here_doc, buffer);       /* append to buffer */
+										} 
+									strcat(here_doc, buffer);   /*     append to  buffer */
 								}
 							if (here_string)
 								fprintf(stderr, "Line %d: Unterminated here-document!\n",
 												dotconf_line);
-							here_doc[strlen(here_doc)-1] = '\0';       /* strip newline */
+							here_doc[strlen(here_doc)-1] = '\0';    /*    strip newline */
 							opt.callback(here_doc, opt.userdata);      /* call back */
 							
-							free(here_doc);                     /* free buffer memory */
+							free(here_doc);                    /*  free buffer memory */
 							
 							continue;
 						}
 						
 				}
 			
+			free(here_doc); 
 			/* skip whitespace */ 
 			while ( (cp1 < eob) && (*cp1 != '\0') && (isspace(*cp1)) )
 				cp1++;
