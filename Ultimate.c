@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.38 2003/01/30 11:49:55 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.39 2003/01/31 10:09:54 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -246,7 +246,7 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host, const ch
 			snprintf(newmode, 20, "%s%c", newmode, usr_mds[i].mode);
 		}
 	}
-	sts("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), newmode, ident, host, me.name, time(NULL), realname);
+	sts("%s %s 1 %lu +%s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), newmode, ident, host, me.name, time(NULL), realname);
 	AddUser(nick,ident, host, me.name, 0, time(NULL));
 #ifdef ULTIMATE3
 	UserMode(nick, newmode, 0);

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.17 2003/01/23 10:53:38 fishwaldo Exp $
+** $Id: cs.c,v 1.18 2003/01/31 10:09:55 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -64,6 +64,8 @@ int QuitCount = 0;
 int LocalCount = 0;
 int KillCount = 0;
 int ConfigCount = 0;
+int cs_online = 0;
+
 
 Module_Info my_info[] = { {
     "ConnectServ",
@@ -141,6 +143,7 @@ int Online(char **av, int ac) {
         s_ConnectServ = strcat(s_ConnectServ, "_");
         init_bot(s_ConnectServ,"ConnectServ",me.name,"Network Connection & Mode Monitoring Service", "+oikSwgleq-x", my_info[0].module_name);
     }
+    cs_online = 1;
     return 1;
 };
 
@@ -227,7 +230,7 @@ int cs_new_user(char **av, int ac) {
     u = finduser(av[0]);
     /* Print Connection Notice */
     if (u && sign_watch) {
-    if (is_synced) chanalert(s_ConnectServ, "\2SIGNON\2 %s (%s@%s) has Signed on at %s", u->nick, u->username, u->hostname, u->server->name);
+    if (cs_online) chanalert(s_ConnectServ, "\2SIGNON\2 %s (%s@%s) has Signed on at %s", u->nick, u->username, u->hostname, u->server->name);
     }
   return 1;
 }
@@ -253,7 +256,7 @@ int cs_del_user(char **av, int ac) {
 
 		  LocalCount = split_buf(lcl, &Local, 0);
           	  KillMsg = joinbuf (Local, LocalCount, 7);
-		  if (is_synced) chanalert(s_ConnectServ, "\2LOCAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Local[6], KillMsg);
+		  if (cs_online) chanalert(s_ConnectServ, "\2LOCAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Local[6], KillMsg);
           	  free(KillMsg);
 		  free(QuitMsg);
 	  	  free(cmd);
@@ -265,7 +268,7 @@ int cs_del_user(char **av, int ac) {
 
     /* Print Disconnection Notice */
     if (sign_watch) {
-        if (is_synced) chanalert(s_ConnectServ, "\2SIGNOFF\2 %s (%s@%s) has Signed off at %s - %s", u->nick, u->username, u->hostname, u->server->name, QuitMsg);
+        if (cs_online) chanalert(s_ConnectServ, "\2SIGNOFF\2 %s (%s@%s) has Signed off at %s - %s", u->nick, u->username, u->hostname, u->server->name, QuitMsg);
     }
     free(QuitMsg);
     free(cmd);
@@ -308,52 +311,52 @@ int cs_user_modes(char **av, int ac) {
 /* these modes in Ultimate3 are Smodes */
             case NETADMIN_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is Now a Network Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is Now a Network Administrator", u->nick);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is No Longer a Network Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is No Longer a Network Administrator", u->nick);
                 }
                 break;
 	    case CONETADMIN_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Co-NetAdmin\2 %s is Now a Co-Network Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Co-NetAdmin\2 %s is Now a Co-Network Administrator", u->nick);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Co-NetAdmin\2 %s is No Longer a Co-Network Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Co-NetAdmin\2 %s is No Longer a Co-Network Administrator", u->nick);
                 }
                 break;
             case TECHADMIN_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is Now a Network Technical Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is Now a Network Technical Administrator", u->nick);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is No Longer a Network Technical Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is No Longer a Network Technical Administrator", u->nick);
                 }
                 break;
             case SERVERADMIN_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s", u->nick, u->server->name);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s", u->nick, u->server->name);
                 }
                 break;
             case COSERVERADMIN_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s", u->nick, u->server->name);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s", u->nick, u->server->name);
                 }
                 break;
 	    case GUESTADMIN_MODE:
 		if (add) {
-		    if (is_synced) chanalert(s_ConnectServ, "\2GuestAdmin\2 %s is Now a Guest Administrator on %s", u->nick, u->server->name);
+		    if (cs_online) chanalert(s_ConnectServ, "\2GuestAdmin\2 %s is Now a Guest Administrator on %s", u->nick, u->server->name);
 		} else {
-		    if (is_synced) chanalert(s_ConnectServ, "\2GuestAdmin\2 %s is No Longer a Guest Administrator on %s", u->nick, u->server->name);
+		    if (cs_online) chanalert(s_ConnectServ, "\2GuestAdmin\2 %s is No Longer a Guest Administrator on %s", u->nick, u->server->name);
 		}
 		break;
 /* these modes are not used in Ultimate3 */
             case BOT_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Bot\2 %s is Now a Bot", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Bot\2 %s is Now a Bot", u->nick);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Bot\2 %s is No Longer a Bot", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Bot\2 %s is No Longer a Bot", u->nick);
                 }
                 break;
             case INVISIBLE_MODE:
@@ -366,30 +369,30 @@ int cs_user_modes(char **av, int ac) {
 #endif
             case SERVICESADMIN_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2ServicesAdmin\2 %s is Now a Services Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2ServicesAdmin\2 %s is Now a Services Administrator", u->nick);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2ServicesAdmin\2 %s is No Longer a Services Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2ServicesAdmin\2 %s is No Longer a Services Administrator", u->nick);
                 }
                 break;
             case OPER_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s", u->nick, u->server->name);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s", u->nick, u->server->name);
                 }
                 break;
             case LOCOP_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2LocalOper\2 %s is Now a Local Oper on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2LocalOper\2 %s is Now a Local Oper on %s", u->nick, u->server->name);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2LocalOper\2 %s is No Longer a Local Oper on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2LocalOper\2 %s is No Longer a Local Oper on %s", u->nick, u->server->name);
                 }
                 break;
             case NETSERVICE_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Services\2 %s is Now a Network Service", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Services\2 %s is Now a Network Service", u->nick);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Services\2 %s is No Longer a Network Service", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Services\2 %s is No Longer a Network Service", u->nick);
                 }
                 break;
             default: 
@@ -430,51 +433,51 @@ int cs_user_smodes(char **av, int ac) {
             case '-': add = 0;    break;
             case NETADMIN_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is Now a Network Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is Now a Network Administrator", u->nick);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is No Longer a Network Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is No Longer a Network Administrator", u->nick);
                 }
                 break;
 	    case CONETADMIN_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Co-NetAdmin\2 %s is Now a Co-Network Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Co-NetAdmin\2 %s is Now a Co-Network Administrator", u->nick);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Co-NetAdmin\2 %s is No Longer a Co-Network Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Co-NetAdmin\2 %s is No Longer a Co-Network Administrator", u->nick);
                 }
                 break;
             case TECHADMIN_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is Now a Network Technical Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is Now a Network Technical Administrator", u->nick);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is No Longer a Network Technical Administrator", u->nick);
+                    if (cs_online) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is No Longer a Network Technical Administrator", u->nick);
                 }
                 break;
 	    case COTECHADMIN_MODE:
 		if (add) {
-			if (is_synced) chanalert(s_ConnectServ, "\2Co-TechAdmin\2 %s is Now a Network Co-Technical Administrator", u->nick);
+			if (cs_online) chanalert(s_ConnectServ, "\2Co-TechAdmin\2 %s is Now a Network Co-Technical Administrator", u->nick);
 		} else {
-		 	if (is_synced) chanalert(s_ConnectServ, "\2Co-TechAdmin\2 %s is No Longer a Network Co-Technical Administrator", u->nick);
+		 	if (cs_online) chanalert(s_ConnectServ, "\2Co-TechAdmin\2 %s is No Longer a Network Co-Technical Administrator", u->nick);
 	 	}
 		break;
             case SERVERADMIN_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s", u->nick, u->server->name);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s", u->nick, u->server->name);
                 }
                 break;
             case COSERVERADMIN_MODE:
                 if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s", u->nick, u->server->name);
                 } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s", u->nick, u->server->name);
+                    if (cs_online) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s", u->nick, u->server->name);
                 }
                 break;
 	    case GUESTADMIN_MODE:
 		if (add) {
-		    if (is_synced) chanalert(s_ConnectServ, "\2GuestAdmin\2 %s is Now a Guest Administrator on %s", u->nick, u->server->name);
+		    if (cs_online) chanalert(s_ConnectServ, "\2GuestAdmin\2 %s is Now a Guest Administrator on %s", u->nick, u->server->name);
 		} else {
-		    if (is_synced) chanalert(s_ConnectServ, "\2GuestAdmin\2 %s is No Longer a Guest Administrator on %s", u->nick, u->server->name);
+		    if (cs_online) chanalert(s_ConnectServ, "\2GuestAdmin\2 %s is No Longer a Guest Administrator on %s", u->nick, u->server->name);
 		}
 		break;
             default: 
@@ -498,9 +501,9 @@ int cs_user_kill(char **av, int ac) {
 
     if (finduser(Kill[2])) {
     /* it was a User who was killed */
-        if (kill_watch) if (is_synced) chanalert(s_ConnectServ, "\2GLOBAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Kill[0], GlobalMsg);
+        if (kill_watch) if (cs_online) chanalert(s_ConnectServ, "\2GLOBAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Kill[0], GlobalMsg);
 	} else if (findserver(Kill[2])) {
-        if (kill_watch) if (is_synced) chanalert(s_ConnectServ, "\2SERVER KILL\2 %s was Killed by the Server %s - Reason sighted: %s", u->nick, Kill[0], GlobalMsg);
+        if (kill_watch) if (cs_online) chanalert(s_ConnectServ, "\2SERVER KILL\2 %s was Killed by the Server %s - Reason sighted: %s", u->nick, Kill[0], GlobalMsg);
     }
     free(GlobalMsg);
 	return 1;
@@ -511,7 +514,7 @@ int cs_user_nick(char **av, int ac) {
     /* Approximate Segfault Location */
     strcpy(segv_location, "cs_user_nick");
 
-    if (nick_watch) if (is_synced) chanalert(s_ConnectServ, "\2NICK\2 %s Changed their nick to %s", av[0], av[1]);
+    if (nick_watch) if (cs_online) chanalert(s_ConnectServ, "\2NICK\2 %s Changed their nick to %s", av[0], av[1]);
     return 1;
 }
 
@@ -528,13 +531,13 @@ static void cs_nickwatch(User *u)
 
     if (!nick_watch) {
         nick_watch = 1;
-        if (is_synced) chanalert(s_ConnectServ, "\2NICK WATCH\2 Activated by %s",u->nick);
+        if (cs_online) chanalert(s_ConnectServ, "\2NICK WATCH\2 Activated by %s",u->nick);
         cslog("%s!%s@%s Activated NICK WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         prefmsg(u->nick, s_ConnectServ, "\2NICK WATCH\2 Activated");
    } else {
         nick_watch = 0;
-        if (is_synced) chanalert(s_ConnectServ, "\2NICK WATCH\2 Deactivated by %s",u->nick);
+        if (cs_online) chanalert(s_ConnectServ, "\2NICK WATCH\2 Deactivated by %s",u->nick);
         cslog("%s!%s@%s Deactivated NICK WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         prefmsg(u->nick, s_ConnectServ, "\2NICK WATCH\2 Deactivated");
@@ -557,13 +560,13 @@ static void cs_signwatch(User *u)
 
     if (!sign_watch) {
         sign_watch = 1;
-        if (is_synced) chanalert(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated by %s",u->nick);
+        if (cs_online) chanalert(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated by %s",u->nick);
         cslog("%s!%s@%s Activated SIGNON/SIGNOFF WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         prefmsg(u->nick, s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated");
    } else {
         sign_watch = 0;
-        if (is_synced) chanalert(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated by %s",u->nick);
+        if (cs_online) chanalert(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated by %s",u->nick);
         cslog("%s!%s@%s Deactivated SIGNON/SIGNOFF WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         prefmsg(u->nick, s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated");
@@ -585,13 +588,13 @@ static void cs_killwatch(User *u)
 
     if (!kill_watch) {
         kill_watch = 1;
-        if (is_synced) chanalert(s_ConnectServ, "\2KILL WATCH\2 Activated by %s",u->nick);
+        if (cs_online) chanalert(s_ConnectServ, "\2KILL WATCH\2 Activated by %s",u->nick);
         cslog("%s!%s@%s Activated KILL WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         prefmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 Activated");
    } else {
         kill_watch = 0;
-        if (is_synced) chanalert(s_ConnectServ, "\2KILL WATCH\2 Deactivated by %s",u->nick);
+        if (cs_online) chanalert(s_ConnectServ, "\2KILL WATCH\2 Deactivated by %s",u->nick);
         cslog("%s!%s@%s Deactivated KILL WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         prefmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 Deactivated");
@@ -613,13 +616,13 @@ static void cs_modewatch(User *u)
 
     if (!mode_watch) {
         mode_watch = 1;
-        if (is_synced) chanalert(s_ConnectServ, "\2MODE WATCH\2 Activated by %s",u->nick);
+        if (cs_online) chanalert(s_ConnectServ, "\2MODE WATCH\2 Activated by %s",u->nick);
         cslog("%s!%s@%s Activated MODE WATCH", u->nick, u->username, u->hostname);
         SaveSettings();    
         prefmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 Activated");
    } else {
         mode_watch = 0;
-        if (is_synced) chanalert(s_ConnectServ, "\2MODE WATCH\2 Deactivated by %s",u->nick);
+        if (cs_online) chanalert(s_ConnectServ, "\2MODE WATCH\2 Deactivated by %s",u->nick);
         cslog("%s!%s@%s Deactivated MODE WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
         prefmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 Deactivated");
@@ -692,12 +695,12 @@ void Loadconfig()
 				nick_watch = atoi(Config[1]);
             } else {
                 cslog("%s is not a valid connect.db option!", Config[0]);
-                if (is_synced) chanalert(s_Services, "%s is not a valid connect.db option! Please check your data/connect.db file!", Config[0]);
+                if (cs_online) chanalert(s_Services, "%s is not a valid connect.db option! Please check your data/connect.db file!", Config[0]);
             }
     }
         fclose(fp);
     } else {
-        if (is_synced) chanalert(s_Services, "No Database Found! Creating one with Defaults!");
+        if (cs_online) chanalert(s_Services, "No Database Found! Creating one with Defaults!");
         sign_watch=1;
         kill_watch=1;
         mode_watch=1; 
