@@ -22,65 +22,15 @@ SERVER_INFOLINE Network Statistical Server
 # Your network name (fx: irc.dreaming.org put Dreaming, etc refer to your Unreal network file)
 STATSERV_NETNAME Dreaming
 
-# Seconds lagged for servers before Statserv starts bitching in globops
-LAG_NOTICE 50
+# This is the Apparent Host that NeoStats is connecting from.. Some people
+# like to make it the same as your Services host (eg, services.global-irc.net)
+NEOSTAT_HOST NeoStats.net
 
-#Should we Echo the Lag of Each Server in the Services Channel? (Uncomment to Enable, but on a large Network, very Annoying..)
-#PUBLISH_LAG
-
-# Nickname of statistical client.
-STATSERV_NICK StatServ
-
-# USER@ part of userhost for statistical client.
-STATSERV_USER Network
-
-# @HOST part of userhost for statistical client.
-STATSERV_HOST services.dreaming.org
-
-# Enable or Disable spam detection routines.
-ENABLE_SPAM
-
-# Enable or Disable insecure proxy detection algorithm.
-#ENABLE_PROXY
+# This is the User that NeoStats uses (the part before the @host)
+NEOSTAT_USER Neo
 
 #The Services Channel to Join Initially
 SERVICES_CHAN #services
-
-# The action we take against the user.
-# Note: You can select more than one!
-# Warn IRCops via GLOBOPS about the insecure proxy.
-#ACTION 0
-# KILL the user.
-#ACTION 1
-# Warn the USER that he is using an insecure proxy.
-#ACTION 2
-# Ban the user from the network.
-#ACTION 3
-
-# The message we ban the user with, or the
-# one we NOTICE it with, or the message we
-# use in a KILL comment.
-#ACTION_MESSAGE Your running an insecure proxy, for help in securing it please email opers@global-irc.net
-
-# This specifies whether to have GServ
-# privmsg OperServ and add the akill that
-# way...  or comment this out and we can
-# add it ourself, however it will never
-# expire until a /rehash is done on the server.
-# Not good.
-
-#USE_SERVICES
-
-# Notice: the above switch uses the standard
-# EsperNet services syntax of adding akills.
-# If you have modified your services, please
-# open up proxy.c and edit the function
-# named " take_action(User *user) "
-
-# Uncomment this if you want only IRCop's to
-# access StatServ.
-
-ONLYOPERS
 
 # Should we send privmsg's or notice's?
 # Comment this out for NOTICE's, otherwise
@@ -91,9 +41,42 @@ WANT_PRIVMSG
 # to reconnect to the server.
 RECONNECT_TIME 10
 
-# This is used in OPERLIST.  It should be the name
-# of your IRC services server.
-SERVICES_NAME services.dreaming.org
+################
+# NEW OPTIONS: #
+################
+# Ok, Here are some new options with regards to the Modules
+# Please read carefully here, as you can stuff everything up
+#
+# First, The Path that we try to find the Modules in
+MODULE_PATH /home/directory/NeoStats/Modules/
+
+# Now for each Module we want to load at boot time, we specify the following
+# this loads the Spam Module
+LOAD_MODULE spam
+# This is a demo Module, called Version.. All it does is append a reply to /version <NeoStats server name>
+LOAD_MODULE version
+# this is the StatServ Module
+LOAD_MODULE statserv
+
+# Some Modules require there own configuration information.. Here are some 
+# Configuration options that are usefull for the Modules that come with
+# NeoStats
+
+############################
+# STATSERV CONFIG FOLLOWS: #
+############################
+# This is the nickname that StatServ uses, if not specified, defaults to
+# Statserv
+#STATSERV_NICK StatServ
+
+# This is the User portion that StatServ uses, if not specified, it uses
+# whatever NeoStats is configured to use
+#STATSERV_USER Stats
+
+# This is the Host that StatServ appears to come from, if not specified, it
+# uses whatever NeoStats is configured to use
+#STATSERV_HOST my.stats.irc.net
+
 
 ###############################################################################
 ## End of Configuration                                                      ##
