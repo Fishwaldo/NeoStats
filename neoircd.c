@@ -539,20 +539,13 @@ static void
 Usr_Away (char *origin, char **argv, int argc)
 {
 	char *buf;
-	User *u;
-	u = finduser (origin);
-	if (u) {
-		if (argc > 0) {
-			buf = joinbuf (argv, argc, 0);
-		} else {
-			buf = NULL;
-		}
-		UserAway (u, buf);
-		if (argc > 0) {
-			free (buf);
-		}
+
+	if (argc > 0) {
+		buf = joinbuf (argv, argc, 0);
+		UserAway (origin, buf);
+		free (buf);
 	} else {
-		nlog (LOG_NOTICE, LOG_CORE, "Warning, Unable to find User %s for Away", origin);
+		UserAway (origin, NULL);
 	}
 }
 static void

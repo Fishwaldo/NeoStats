@@ -175,10 +175,13 @@ doDelUser (const char *nick, int killflag, const char *reason)
 }
 
 void
-UserAway (User * u, const char *awaymsg)
+UserAway (const char *nick, const char *awaymsg)
 {
 	char **av;
 	int ac = 0;
+	User *u;
+
+	u = finduser (nick);
 	if (u) {
 		AddStringToList (&av, u->nick, &ac);
 		if ((u->is_away == 1) && (!awaymsg)) {
@@ -191,6 +194,8 @@ UserAway (User * u, const char *awaymsg)
 			ModuleEvent (EVENT_AWAY, av, ac);
 			free (av);
 		}
+	} else {
+		nlog (LOG_NOTICE, LOG_CORE, "Warning, Unable to find User %s for Away", nick);
 	}
 }
 

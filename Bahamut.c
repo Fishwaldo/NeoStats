@@ -545,20 +545,14 @@ Usr_Pong (char *origin, char **argv, int argc)
 static void
 Usr_Away (char *origin, char **argv, int argc)
 {
-	char *Buf;
-	User *u = finduser (origin);
-	if (u) {
-		if (argc > 0) {
-			Buf = joinbuf (argv, argc, 0);
-		} else {
-			Buf = NULL;
-		}
-		UserAway (u, Buf);
-		if (argc > 0) {
-			free (Buf);
-		}
+	char *buf;
+
+	if (argc > 0) {
+		buf = joinbuf (argv, argc, 0);
+		UserAway (origin, buf);
+		free (buf);
 	} else {
-		nlog (LOG_NOTICE, LOG_CORE, "Warning, Unable to find User %s for Away", origin);
+		UserAway (origin, NULL);
 	}
 }
 static void
