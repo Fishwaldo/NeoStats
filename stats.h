@@ -303,5 +303,11 @@ extern Chans *findchan(char *chan);
 extern int ChanMode(char *origin, char **av, int ac);
 extern void Change_Topic(char *, Chans *, time_t t, char *);
 extern void ChangeChanUserMode(Chans *c, User *u, int add, long mode);
+
+/* servers.c */
+extern void fini_server_hash();
+extern void fini_user_hash();
+extern void fini_chan_hash();
+extern void shutdown_neo();
 #endif
 

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.29 2002/06/04 13:16:57 fishwaldo Exp $
+** $Id: users.c,v 1.30 2002/06/05 11:26:03 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -176,6 +176,20 @@ User *finduser(const char *nick)
 
 }
 
+void fini_user_hash() 
+{
+	hscan_t us;
+	hnode_t *un;
+	User *u;
+	log("Deleting User hash");
+	hash_scan_begin(&us, uh);
+	while ((un = hash_scan_next(&us)) != NULL) {
+		u = hnode_get(un);
+		list_destroy_nodes(u->chans);
+	}
+	hash_free(uh);
+
+}
 
 void init_user_hash()
 {

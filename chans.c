@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.20 2002/06/04 13:16:57 fishwaldo Exp $
+** $Id: chans.c,v 1.21 2002/06/05 11:26:03 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -14,13 +14,26 @@
 #include "hash.h"
 
 
+void fini_chan_hash()
+{
+	hscan_t us;
+	hnode_t *cn;
+	Chans *c;
+	
+	log("Deleting Channel Hash");
+	hash_scan_begin(&us, ch);
+	while ((cn = hash_scan_next(&us)) != NULL) {
+		c = hnode_get(cn);
+		list_destroy_nodes(c->chanmembers);
+		list_destroy_nodes(c->modeparms);
+	}
+	hash_free(ch);
+}	
+
 
 void init_chan_hash()
 {
 	ch = hash_create(C_TABLE_SIZE, 0, 0);
-	if (usr_mds);	
-
-	
 }
 
 extern void Change_Topic(char *owner, Chans *c, time_t time, char *topic) {

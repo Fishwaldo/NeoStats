@@ -309,6 +309,7 @@ void sts(char *fmt,...)
 	sent = write (servsock, buf, strlen (buf));
 	if (sent == -1) {
 		log("Write error.");
+		shutdown_neo();
 		exit(0);
 	}
 	me.SendM++;
@@ -336,6 +337,7 @@ void notice(char *who, char *buf,...)
 		if (sent == -1) {
 			me.onchan = 0;
 			log("Write error.");
+			shutdown_neo();
 			exit(0);
 		}
 		me.SendM++;

@@ -64,20 +64,7 @@ int main()
 #ifdef RECVLOG
 	remove("logs/recv.log");
 #endif
-	__init_mod_list();
 	setup_signals();
-	ConfLoad();
-	TimerReset();
-	init_server_hash();
-	init_user_hash();
-	init_chan_hash();
-	init_ircd();
-
-/* Shmad */
-/* This section ALWAYS craps out so we ignore it-- for now */
-	if (init_modules()) {
-/*		printf("WARNING: Some Modules Failed to Load"); */
-	}
 
 
 #ifndef DEBUG
@@ -91,13 +78,39 @@ int main()
 		printf("%s Successfully Launched into Background\n", version);
 		printf("PID: %i - Wrote to stats.pid\n",forked);
 
-		return 0;
+		_exit(0);
 	}
+
+	init_server_hash();
+	init_user_hash();
+	init_chan_hash();
+	__init_mod_list();
+	ConfLoad();
+	init_ircd();
+	TimerReset();
+
+/* Shmad */
+/* This section ALWAYS craps out so we ignore it-- for now */
+	if (init_modules()) {
+/*		printf("WARNING: Some Modules Failed to Load"); */
+	}
+
 
 	log("Statistics Started (%s).", version);
 	start();
 
 	return 1;
+}
+
+/* this function is called when we shutdown, so make sure that anyclean up stuff is in here */
+void shutdown_neo() {
+	/* delete the server hash */
+	fini_server_hash();
+	/* delete the user hash */
+	fini_user_hash();
+	/* delete the chan hash */
+	fini_chan_hash();
+
 }
 
 RETSIGTYPE serv_die() {
@@ -152,11 +165,11 @@ RETSIGTYPE serv_segv() {
 		notice(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 		globops(me.name,"Dumped Core to netstats.debug, Please Read the Readme file to find out what to do with it!");
 		RemoveLock();		
+		shutdown_neo();
 		sleep(2);
 		kill(forked, 3);
 		kill(forked, 9);
 		exit(-1);
-		ssquit_cmd(me.name);
 	}
 }
 
@@ -237,6 +250,7 @@ void start()
 		mod_ptr = hnode_get(mn);
 		unload_module(mod_ptr->info->module_name, finduser(s_Services));
 	}
+	shutdown_neo();
 	sleep(5);
 	execve("./stats", NULL, NULL);
 }
@@ -254,6 +268,7 @@ char *sstrdup(const char *s)
 	char *t = strdup(s);
 	if (!t) {
 		log("sstrdup(): out of memory.");
+		shutdown_neo();
 		exit(0);
 	}
 	return t;

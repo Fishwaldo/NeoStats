@@ -264,8 +264,8 @@ extern void ns_shutdown(User *u, char *reason)
 	}
 
 
-	globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
-	sprintf(quitmsg, "%s Set SHUTDOWN: %s", u->nick, (reason ? reason : "No Reason"));
+	globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, (reason ? "No Reason" : reason));
+	sprintf(quitmsg, "%s Set SHUTDOWN: %s", u->nick, (reason ? "No Reason" : reason));
 	squit_cmd(s_Services, quitmsg);
 	ssquit_cmd(me.name);
 	sleep(1);
@@ -273,6 +273,7 @@ extern void ns_shutdown(User *u, char *reason)
 	remove("stats.pid");
 	log("%s [%s](%s) requested SHUTDOWN.", u->nick, u->username,
 		u->hostname);
+	shutdown_neo();
 	exit(0);
 }
 
@@ -295,6 +296,7 @@ static void ns_reload(User *u, char *reason)
 	squit_cmd(s_Services, quitmsg);
 	ssquit_cmd(me.name);
 	sleep(5);
+   	shutdown_neo();
 	execve("./stats", NULL, NULL);
 }
 
@@ -377,6 +379,7 @@ static void ns_raw(User *u, char *message)
         sent = write (servsock, message, strlen (message));
         if (sent == -1) {
         	log("Write error.");
+        	shutdown_neo();
                 exit(0);
         }
         me.SendM++;
