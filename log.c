@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.c,v 1.7 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: log.c,v 1.8 2003/06/13 13:11:49 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -44,7 +44,7 @@ struct logs_ {
 	FILE *logfile;
 	char name[30];
 	unsigned int flush;
-} logs_ ;
+} logs_;
 
 hash_t *logs;
 
@@ -52,7 +52,8 @@ void *close_logs();
 
 /** @brief Initilize the logging functions 
  */
-void init_logs() {
+void init_logs()
+{
 	logs = hash_create(-1, 0, 0);
 	if (!logs) {
 		printf("ERROR: Can't Initilize Log SubSystem. Exiting!");
@@ -60,11 +61,13 @@ void init_logs() {
 		exit(-1);
 	}
 }
+
 /** @brief Occasionally flush log files out 
  */
- 
 
-void *close_logs() {
+
+void *close_logs()
+{
 	hscan_t hs;
 	hnode_t *hn;
 	struct logs_ *logentry;
@@ -77,20 +80,22 @@ void *close_logs() {
 			logentry->flush = 0;
 		}
 #ifdef DEBUG
-		printf("Closing Logfile %s (%s)\n", logentry->name, (char *)hnode_getkey(hn));
+		printf("Closing Logfile %s (%s)\n", logentry->name,
+		       (char *) hnode_getkey(hn));
 #endif
 		fclose(logentry->logfile);
 		hash_scan_delete(logs, hn);
 		hnode_destroy(hn);
 		free(logentry);
-	}		
+	}
 	return NULL;
 }
 
 
 /** @Configurable logging function
  */
-void nlog(int level, int scope, char *fmt, ...) {
+void nlog(int level, int scope, char *fmt, ...)
+{
 	va_list ap;
 	char buf[512], fmttime[80];
 	int gotlog;
@@ -98,34 +103,38 @@ void nlog(int level, int scope, char *fmt, ...) {
 	struct logs_ *logentry;
 	time_t ts = time(NULL);
 
-	if (level <= config.debug) {	
+	if (level <= config.debug) {
 		/* if scope is > 0, then log to a diff file */
 		if (scope > 0) {
 			if (strlen(segvinmodule) > 1) {
 				hn = hash_lookup(logs, segvinmodule);
 			} else {
-				nlog(LOG_ERROR, LOG_CORE, "Warning, nlog called with LOG_MOD, but segvinmodule is blank! Logging to Core");
+				nlog(LOG_ERROR, LOG_CORE,
+				     "Warning, nlog called with LOG_MOD, but segvinmodule is blank! Logging to Core");
 				hn = hash_lookup(logs, "core");
 			}
 		} else {
 			hn = hash_lookup(logs, "core");
 		}
 		if (hn) {
-		/* we found our log entry */
+			/* we found our log entry */
 			logentry = hnode_get(hn);
 			gotlog = 1;
 		} else {
-		/* log file not found */
+			/* log file not found */
 			if ((strlen(segvinmodule) <= 1) && (scope > 0)) {
 #ifdef DEBUG
-				printf("segvinmodule is blank, but scope is for Modules!\n");
+				printf
+				    ("segvinmodule is blank, but scope is for Modules!\n");
 #endif
-				/* bad, but hey !*/
+				/* bad, but hey ! */
 				scope = 0;
 			}
 			logentry = malloc(sizeof(struct logs_));
-			strncpy(logentry->name, scope > 0 ? segvinmodule : "core", 30);
-			snprintf(buf, 40, "logs/%s.log", scope > 0 ? segvinmodule : "NeoStats");
+			strncpy(logentry->name,
+				scope > 0 ? segvinmodule : "core", 30);
+			snprintf(buf, 40, "logs/%s.log",
+				 scope > 0 ? segvinmodule : "NeoStats");
 			logentry->logfile = fopen(buf, "a");
 			logentry->flush = 0;
 			hn = hnode_create(logentry);
@@ -142,16 +151,19 @@ void nlog(int level, int scope, char *fmt, ...) {
 		strftime(fmttime, 80, "%d/%m/%Y[%H:%M]", localtime(&ts));
 		va_start(ap, fmt);
 		vsnprintf(buf, 512, fmt, ap);
-	
-		fprintf(logentry->logfile, "(%s) %s %s - %s\n", fmttime, loglevels[level-1], scope > 0 ? segvinmodule : "CORE" , buf);
+
+		fprintf(logentry->logfile, "(%s) %s %s - %s\n", fmttime,
+			loglevels[level - 1],
+			scope > 0 ? segvinmodule : "CORE", buf);
 		logentry->flush = 1;
-#ifndef DEBUG	
+#ifndef DEBUG
 		if (config.foreground)
 #endif
-			printf("%s %s - %s\n", loglevels[level-1], scope > 0 ? segvinmodule : "CORE", buf);
+			printf("%s %s - %s\n", loglevels[level - 1],
+			       scope > 0 ? segvinmodule : "CORE", buf);
 		va_end(ap);
 	}
-}		
+}
 void ResetLogs()
 {
 	char tmp[255], tmp2[255];
@@ -159,7 +171,7 @@ void ResetLogs()
 	hscan_t hs;
 	hnode_t *hn;
 	struct logs_ *logentry;
-	
+
 
 	strcpy(segv_location, "ResetLogs");
 	hash_scan_begin(&hs, logs);
@@ -170,16 +182,20 @@ void ResetLogs()
 			logentry->flush = 0;
 		}
 #ifdef DEBUG
-		printf("Closing Logfile %s (%s)\n", logentry->name, (char *)hnode_getkey(hn));
+		printf("Closing Logfile %s (%s)\n", logentry->name,
+		       (char *) hnode_getkey(hn));
 #endif
 		fclose(logentry->logfile);
 		if (!strcasecmp(logentry->name, "core")) {
-			strftime(tmp, 255, "logs/NeoStats-%m-%d.log", localtime(&t));
+			strftime(tmp, 255, "logs/NeoStats-%m-%d.log",
+				 localtime(&t));
 			rename("logs/NeoStats.log", tmp);
-			logentry->logfile = fopen("logs/NeoStats.log", "a");
+			logentry->logfile =
+			    fopen("logs/NeoStats.log", "a");
 		} else {
 			strftime(tmp2, 255, "%m-%d.log", localtime(&t));
-			snprintf(tmp, 255, "logs/%s-%s", logentry->name, tmp2);
+			snprintf(tmp, 255, "logs/%s-%s", logentry->name,
+				 tmp2);
 			snprintf(tmp2, 255, "logs/%s.log", logentry->name);
 			rename(tmp2, tmp);
 			logentry->logfile = fopen(tmp2, "a");

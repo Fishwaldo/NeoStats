@@ -207,7 +207,6 @@ please see the Support section for how to contact us for help.
 			MoraleServ		--enable-modules="ms"
 			spam			--enable-modules="spam"
 			StatServ		--enable-modules="statserv"
-			Version 		--enable-modules="version"
 
 		To compile multiple modules combine the enable-modules 
 		options together as follows:
@@ -215,9 +214,6 @@ please see the Support section for how to contact us for help.
 			--enable-modules="statserv spam"
 			(this would enable the statserv and spam modules).
 		
-		The version module is really an example of the API 
-		for module coders to use.
-
 		If you have downloaded additional modules from the 
 		NeoStats website, DO NOT specify them in the 
 		enable-modules option. Each module has its own 
@@ -619,6 +615,6 @@ details on how to contact us.
 -----------------------------------<>-----------------------------------
 
 ************************************************************************
-** This document was last updated on May 27, 2003 by M and is         **
+** This document was last updated on June 11, 2003 by M and is        **
 ** based on documents originally created by Shmad and Fish.           **
 ************************************************************************

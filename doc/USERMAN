@@ -13,8 +13,8 @@ This document explains how to use NeoStats and the commands available
 for the various components. If you are looking for help configuring or 
 installing NeoStats or for support information please refer to the 
 README file. For help on downloaded modules, refer to the documentation
-that comes with the module. Typically, after installation, the documentation
-for the downloaded modules in named "README.<modulename>"
+that comes with the module. Typically, after installation, the 
+documentation for the downloaded modules in named "README.<modulename>"
 
 Most NeoStats components include online help so you can find out 
 how to use a command while on IRC.
@@ -69,70 +69,62 @@ Contents
 		3.3.13 FORCEUPDATE	
 		3.3.14 STATS		
 	3.4 HTML Syntax
-4.  spam
-	4.1 About spam
+4.  ConnectServ
+	4.1 About ConnectServ
 	4.2 Available Commands
 	4.3 Command Reference
-
-5.  ConnectServ
-	5.1 About ConnectServ
+		4.3.1  HELP
+		4.3.2  ABOUT		
+		4.3.3  SET 
+		4.3.4  VERSION
+5.  HostServ
+	5.1 About HostServ
 	5.2 Available Commands
 	5.3 Command Reference
 		5.3.1  HELP
-		5.3.2  ABOUT		
-		5.3.3  STATUS		
-		5.3.4  SIGNWATCH     
-		5.3.5  KILLWATCH  
-		5.3.6  MODEWATCH   
-		5.3.7  NICKWATCH  				
-6.  HostServ
-	6.1 About HostServ
+		5.3.2  ABOUT     
+		5.3.3  LOGIN     
+		5.3.4  ADD
+		5.3.5  DEL       
+		5.3.6  LIST      
+		5.3.7  VIEW
+		5.3.8  CHPASS    
+		5.3.9  LISTBAN   
+		5.3.10 LEVELS
+6.  LoveServ
+	6.1 About LoveServ
 	6.2 Available Commands
 	6.3 Command Reference
 		6.3.1  HELP
-		6.3.2  ABOUT     
-		6.3.3  LOGIN     
-		6.3.4  ADD
-		6.3.5  DEL       
-		6.3.6  LIST      
-		6.3.7  VIEW
-		6.3.8  CHPASS    
-		6.3.9  LISTBAN   
-		6.3.10 LEVELS
-7.  LoveServ
-	7.1 About LoveServ
+		6.3.2  ROSE       
+		6.3.3  KISS		  
+		6.3.4  TONSIL     
+		6.3.5  HUG       
+		6.3.6  ADMIRER    
+		6.3.7  CHOCOLATE  
+		6.3.8  CANDY      
+		6.3.9  LOVENOTE   
+		6.3.10 APOLOGY    
+		6.3.11 THANKYOU   
+		6.3.12 VERSION
+7.  MoraleServ
+	7.1 About MoraleServ
 	7.2 Available Commands
 	7.3 Command Reference
 		7.3.1  HELP
-		7.3.2  ROSE       
-		7.3.3  KISS		  
-		7.3.4  TONSIL     
-		7.3.5  HUG       
-		7.3.6  ADMIRER    
-		7.3.7  CHOCOLATE  
-		7.3.8  CANDY      
-		7.3.9  LOVENOTE   
-		7.3.10 APOLOGY    
-		7.3.11 THANKYOU   
-		7.3.12 VERSION
-8.  MoraleServ
-	8.1 About MoraleServ
-	8.2 Available Commands
-	8.3 Command Reference
-		8.3.1  HELP
-		8.3.2  HAIL	   
-		8.3.3  ODE		   
-		8.3.4  POEM     
-		8.3.5  LAPDANCE   
-		8.3.6  REDNECK	   
-		8.3.7  CHEERUP    
-		8.3.8  BEHAPPY    
-		8.3.9  WONDERFUL   
-		8.3.10 VERSION
-9.  Version
-	9.1 About Version
-10. ExtAuth
-	10.1 About ExtAuth
+		7.3.2  HAIL	   
+		7.3.3  ODE		   
+		7.3.4  POEM     
+		7.3.5  LAPDANCE   
+		7.3.6  REDNECK	   
+		7.3.7  CHEERUP    
+		7.3.8  BEHAPPY    
+		7.3.9  WONDERFUL   
+		7.3.10 VERSION
+8.  spam
+	8.1 About spam
+9.  ExtAuth
+	9.1 About ExtAuth
 
 -----------------------------------<>-----------------------------------
 
@@ -654,54 +646,29 @@ Example:
 
 -----------------------------------<>-----------------------------------
 
-4.	spam
---------
+4.	ConnectServ
+---------------
 
-4.1 About spam
---------------
+4.1 About ConnectServ
+---------------------
 
-Spam provides a bot to try and catch spammers and mass messagers. It 
-will sit on the network and echo to the services channel and by wallops
-when some sends it a message and what message they sent. 
-
-Currently the spam bot has a fixed name of "sumyungguy".
+ConnectServ is designed to echo the signing on/off of users
+killing of users, modes that the operators are using and
+nickname changes. These echo types can be customised to be
+echoed to the services channel or NOT to be echoed at all.
 
 4.2 Available Commands
 ----------------------
-
-No commands are available for spam.
-Just send it a message, and watch what happens. 
-
------------------------------------<>-----------------------------------
-
-5.	ConnectServ
----------------
-
-5.1 About ConnectServ
----------------------
-
-ConnectServ is designed to echo the signing on/off of users,
-killing of users and the modes that the operators are using.
-These three echo types can be customised to be echoed to the
-services channel or NOT to be echoed at all. Technical Admins
-and Network Admins can turn these three settings on and off.
-
-5.2 Available Commands
-----------------------
 	
 HELP        	Online command help
-ABOUT		Return description of ConnectServ
-STATUS		This will tell you the current status of 
-			the settings. 
-SIGNWATCH   	Will enable or disable SIGNWATCH. 
-KILLWATCH   	Will enable or disable KILLWATCH.
-MODEWATCH   	Will enable or disable MODEWATCH.
-NICKWATCH  	Will enable or disable NICKWATCH.
+ABOUT			Return description of ConnectServ
+SET 			Adjust settings for ConnectServ
+VERSION         Shows you the current ConnectServ Version.
 
-5.3 Command Reference
+4.3 Command Reference
 ---------------------
 
-5.3.1 HELP
+4.3.1 HELP
 ----------
 Syntax: 
 	/msg ConnectServ HELP [command]
@@ -712,7 +679,7 @@ Example:
 	/msg ConnectServ HELP 
 	/msg ConnectServ HELP STATUS
 
-5.3.2 ABOUT
+4.3.2 ABOUT
 -----------
 Syntax: 
 	/msg ConnectServ ABOUT
@@ -722,90 +689,70 @@ Description:
 Example: 
 	/msg ConnectServ ABOUT
 
-5.3.3 STATUS
-------------
+4.3.3 SET
+---------
 Syntax:
-	/msg ConnectServ STATUS
-Description:
+	/msg ConnectServ SET <option> [<value>]
+Description: 
+	Available Options are:
+	
+	LIST 
 	This will tell you the current status of the settings. 
-	eg: MODEWATCH is enabled ot disabled
+	eg: MODEWATCH is enabled.
+	
+	SIGNWATCH <ON|OFF> 
+	echo signon/signoff events. 
+	
+	KILLWATCH <ON|OFF> 
+	echo kill events.
+	
+	MODEWATCH <ON|OFF> 
+	echo operator mode changes.
+	
+	NICKWATCH <ON|OFF> 
+	echo nickname changes.
 Example:
-	/msg ConnectServ STATUS
+	/msg ConnectServ SET NICKWATCH ON
 
-5.3.4 SIGNWATCH
----------------
-Syntax:
-	/msg ConnectServ SIGNWATCH
-Description:
-	Will enable or disable SIGNWATCH. It is reccomended you use the STATUS
-	command to check if this setting is enabled or disabled before you use
-	this command.
+4.3.4 VERSION
+-------------
+Syntax: 
+	/msg ConnectServ VERSION
+Description: 
+	Shows the current ConnectServ version.
 Example:
-	/msg ConnectServ SIGNWATCH
-
-5.3.5 KILLWATCH
----------------
-Syntax:
-	/msg ConnectServ KILLWATCH
-Description:
-	Will enable or disable KILLWATCH. It is reccomended you use the STATUS
-	command to check if this setting is enabled or disabled before you use
-	this command.
-Example:
-	/msg ConnectServ KILLWATCH
-
-5.3.6 MODEWATCH
----------------
-Syntax:
-	/msg ConnectServ MODEWATCH
-Description:
-	Will enable or disable MODEWATCH. It is reccomended you use the STATUS
-	command to check if this setting is enabled or disabled before you use
-	this command.
-Example:
-	/msg ConnectServ MODEWATCH
-
-5.3.7 NICKWATCH
----------------
-Syntax:
-	/msg ConnectServ NICKWATCH
-Description:
-	Will enable or disable NICKWATCH. It is recommended you use the STATUS
-	command to check if this setting is enabled or disabled before you use
-	this command.
-Example:
-	/msg ConnectServ NICKWATCH
+	/msg ConnectServ VERSION
     	
 -----------------------------------<>-----------------------------------
 
-6.	HostServ
+5.	HostServ
 ------------
 
-6.1 About HostServ
+5.1 About HostServ
 ------------------
 
 HostServ is designed to let users use their own unique host
 while on the Network. IRC Operators add them to the database
 and upon connection the user gets their unique host.
 
-6.2 Available Commands
+5.2 Available Commands
 ----------------------
 
-HELP        	Online command help
-ABOUT		Return description of ConnectServ
+HELP        Online command help
+ABOUT		Return description of HostServ
 LOGIN		Login to HostServ
-ADD		Add a vhost
-DEL		Delete a vhost
+ADD			Add a vhost
+DEL			Delete a vhost
 LIST		List vhosts
-VIEW        	Detailed vhost list
+VIEW        Detailed vhost list
 CHPASS		Change password
 LISTBAN		List banned vhosts
 LEVELS		Levels to manage HostServ
 
-6.3 Command Reference
+5.3 Command Reference
 ---------------------
 
-6.3.1 HELP
+5.3.1 HELP
 ----------
 Syntax: 
 	/msg HostServ HELP [command]
@@ -816,7 +763,7 @@ Example:
 	/msg HostServ HELP 
 	/msg HostServ HELP ADD
 
-6.3.2 ABOUT
+5.3.2 ABOUT
 -----------
 Syntax: 
 	/msg HostServ ABOUT
@@ -826,7 +773,7 @@ Description:
 Example: 
 	/msg HostServ ABOUT
 
-6.3.3 ADD
+5.3.3 ADD
 ---------
 
 Syntax: 
@@ -840,7 +787,7 @@ Description:
 Example:
 	/msg HostServ ADD neo aol.com coolhost.com mypassword
 
-6.3.4 DEL
+5.3.4 DEL
 ---------
 Syntax: 
 	/msg HostServ DEL <ACCESS LIST #>
@@ -850,7 +797,7 @@ Description:
 Example: 
 	/msg HostServ DEL 1
 
-6.3.5 VIEW
+5.3.5 VIEW
 ----------
 Syntax: 
 	/msg HostServ VIEW <ACCESS LIST #>
@@ -860,7 +807,7 @@ Description:
 Example: 
 	/msg HostServ VIEW 1
 
-6.3.6 LIST
+5.3.6 LIST
 ----------
 Syntax: 
 	/msg HostServ LIST
@@ -870,7 +817,7 @@ Description:
 Example: 
 	/msg HostServ LIST
 
-6.3.7 LOGIN
+5.3.7 LOGIN
 -----------
 Syntax: 
 	/msg HostServ LOGIN <NICK> <PASSWORD>
@@ -880,7 +827,7 @@ Description:
 Example: 
 	/msg HostServ LOGIN Angel Password
 
-6.3.8 CHPASS
+5.3.8 CHPASS
 ------------
 Syntax: 
 	/msg HostServ CHPASS <NICK> <OLDPASS> <NEWPASS>
@@ -891,7 +838,7 @@ Description:
 Example: 
 	/msg HostServ CHPASS Angel oldpass newpass
 
-6.3.9 BANS
+5.3.9 BANS
 ----------
 Syntax: 
 	/msg HostServ BANS [[add/del] <option>]
@@ -909,7 +856,7 @@ Description:
 Example: 
 	/msg HostServ BANS add microsoft.com
 	
-6.3.10 LEVELS
+5.3.10 LEVELS
 -------------
 
 Syntax: 
@@ -925,34 +872,34 @@ Example:
 
 -----------------------------------<>-----------------------------------
 
-7. LoveServ
+6. LoveServ
 -----------
 
-7.1 About LoveServ
+6.1 About LoveServ
 ------------------
 
 LoveServ is a fun module to send presents and messages to loved ones
 on IRC.
 
-7.2 Available Commands
+6.2 Available Commands
 ----------------------
-HELP        	Online command help
-ROSE        	Give someone on IRC a rose
+HELP        Online command help
+ROSE        Give someone on IRC a rose
 KISS		Give someone on IRC a kiss
 TONSIL		Give someone on IRC a tonsil kiss
-HUG		Give someone on IRC a hug
+HUG			Give someone on IRC a hug
 ADMIRER		Tell someone on IRC they have a secret admirer
 CHOCOLATE	Give someone on chocolate
-CANDY       	Give someone on IRC candy
+CANDY       Give someone on IRC candy
 LOVENOTE	Give someone on IRC a lovenote
 APOLOGY		Give someone on IRC an apology
 THANKYOU	Give someone on IRC a thank you
 VERSION		Display version info
 
-7.3 Command Reference
+6.3 Command Reference
 ---------------------
 
-7.3.1 HELP
+6.3.1 HELP
 ----------
 Syntax: 
 	/msg LoveServ HELP [command]
@@ -963,7 +910,7 @@ Example:
 	/msg LoveServ HELP 
 	/msg LoveServ HELP ROSE
 
-7.3.2 ROSE
+6.3.2 ROSE
 ----------
 Syntax: 
 	/msg LoveServ ROSE <nick>
@@ -972,7 +919,7 @@ Description:
 Example: 
 	/msg LoveServ ROSE Angel
 
-7.3.3 KISS
+6.3.3 KISS
 ----------
 Syntax: 
 	/msg LoveServ KISS <nick>
@@ -981,7 +928,7 @@ Send a kiss to that special someone on IRC.
 Example: 
 	/msg LoveServ KISS Angel
 
-7.3.4 TONSIL
+6.3.4 TONSIL
 ------------
 Syntax: 
 	/msg LoveServ TONSIL <nick>
@@ -990,7 +937,7 @@ Description:
 Example: 
 	/msg LoveServ TONSIL Angel
 
-7.3.5 HUG
+6.3.5 HUG
 ---------
 Syntax: 
 	/msg LoveServ HUG <nick>
@@ -999,7 +946,7 @@ Description:
 Example: 
 	/msg LoveServ HUG Angel
 
-7.3.6 ADMIRER
+6.3.6 ADMIRER
 -------------
 Syntax: 
 	/msg LoveServ ADMIRER <nick>
@@ -1008,7 +955,7 @@ Description:
 Example: 
 	/msg LoveServ ADMIRER Angel
 
-7.3.7 CHOCOLATE
+6.3.7 CHOCOLATE
 ---------------
 Syntax: 
 	/msg LoveServ CHOCOLATE <nick>
@@ -1017,7 +964,7 @@ Description:
 Example: 
 	/msg LoveServ CHOCOLATE Angel
 
-7.3.8 CANDY
+6.3.8 CANDY
 -----------
 Syntax: 
 	/msg LoveServ CANDY NICK
@@ -1026,7 +973,7 @@ Description:
 Example: 
 	/msg LoveServ CANDY Angel
 
-7.3.9 LOVENOTE
+6.3.9 LOVENOTE
 --------------
 Syntax: 
 	/msg LoveServ LOVENOTE NICK <message>
@@ -1035,7 +982,7 @@ Description:
 Example: 
 	/msg LoveServ LOVENOTE Angel I love you dearly.
 
-7.3.10 APOLOGY
+6.3.10 APOLOGY
 --------------
 Syntax: 
 	/msg LoveServ APOLOGY NICK <message>
@@ -1044,7 +991,7 @@ Description:
 Example: 
 	/msg LoveServ APOLOGY Angel deleting all those songs
 
-7.3.11 THANKYOU
+6.3.11 THANKYOU
 ---------------
 Syntax: 
 	/msg LoveServ THANKYOU NICK <message>
@@ -1053,7 +1000,7 @@ Description:
 Example: 
 	/msg LoveServ THANKYOU Angel uploading those songs
 
-7.3.12 VERSION
+6.3.12 VERSION
 --------------
 Syntax: 
 	/msg LoveServ VERSION
@@ -1064,15 +1011,15 @@ Example:
 
 -----------------------------------<>-----------------------------------
 
-8. MoraleServ
+7. MoraleServ
 -------------
 
-8.1 About MoraleServ
+7.1 About MoraleServ
 --------------------
 
-MoraleServ is a fun module to send sheery messages to friends on IRC.
+MoraleServ is a fun module to send cheery messages to friends on IRC.
 
-8.2 Available Commands
+7.2 Available Commands
 ----------------------
 HELP        	Online command help
 HAIL		Hail someone on IRC
@@ -1085,10 +1032,10 @@ BEHAPPY     	Send an be happy song to someone on IRC
 WONDERFUL   	Send an song to someone on IRC
 VERSION		Display version info
 
-8.3 Command Reference
+7.3 Command Reference
 ---------------------
 
-8.3.1 HELP
+7.3.1 HELP
 ----------
 Syntax: 
 	/msg MoraleServ HELP [command]
@@ -1099,7 +1046,7 @@ Example:
 	/msg MoraleServ HELP
 	/msg MoraleServ HELP HAIL
 
-8.3.2 HAIL
+7.3.2 HAIL
 ----------
 Syntax: 
 	/msg MoraleServ HAIL <hail nick> <send to nick>
@@ -1108,7 +1055,7 @@ Description:
 Example:
 	/msg MoraleServ HAIL Angel Devil
 
-8.3.3 ODE
+7.3.3 ODE
 ---------
 Syntax: 
 	/msg MoraleServ ODE <about nick> <send to nick>
@@ -1117,7 +1064,7 @@ Description:
 Example:
 	/msg MoraleServ ODE Angel Devil
 
-8.3.4 POEM
+7.3.4 POEM
 ----------
 Syntax: 
 	/msg MoraleServ POEM <about nick> <send to nick>
@@ -1126,7 +1073,7 @@ Description:
 Example:
 	/msg MoraleServ POEM Angel Devil
 
-8.3.5 LAPDANCE
+7.3.5 LAPDANCE
 --------------
 Syntax: 
 	/msg MoraleServ LAPDANCE <NICK>
@@ -1136,7 +1083,7 @@ Description:
 Example:
 	/msg MoraleServ LAPDANCE YoungGuy
 
-8.3.6 REDNECK
+7.3.6 REDNECK
 -------------
 Syntax: 
 	/msg MoraleServ REDNECK <NICK>
@@ -1145,7 +1092,7 @@ Description:
 Example:
 	/msg MoraleServ REDNECK Yankee
 
-8.3.7 CHEERUP
+7.3.7 CHEERUP
 -------------
 Syntax: 
 	/msg MoraleServ CHEERUP <NICK>
@@ -1154,7 +1101,7 @@ Description:
 Example:
 	/msg MoraleServ CHEERUP Morbid
 
-8.3.8 BEHAPPY
+7.3.8 BEHAPPY
 -------------
 Syntax: 
 	/msg MoraleServ BEHAPPY <NICK>
@@ -1166,7 +1113,7 @@ Description:
 Example:
 	/msg MoraleServ BEHAPPY SadUser
 
-8.3.9 WONDERFUL
+7.3.9 WONDERFUL
 ---------------
 Syntax: 
 	/msg MoraleServ WONDERFUL <NICK>
@@ -1177,7 +1124,7 @@ Description:
 Example:
 	/msg MoraleServ WONDERFUL Angel
 
-8.3.10 VERSION
+7.3.10 VERSION
 --------------
 Syntax: 
 	/msg MoraleServ VERSION
@@ -1188,21 +1135,26 @@ Example:
 
 -----------------------------------<>-----------------------------------
 
-9. Version
-----------
+8.	spam
+--------
 
-9.1 About Version
------------------
+8.1 About spam
+--------------
 
-Version is a dummy module designed to show module programmers
-how to setup a module. It does absolutly nothing usefull at all. 
-	
+Spam provides a bot to try and catch spammers and mass messagers. It 
+will sit on the network and echo to the services channel and by wallops
+when someone sends it a message and what message they sent. 
+
+Currently the spam bot has a fixed name of "sumyungguy".
+
+Send it a message, and watch what happens. 
+
 -----------------------------------<>-----------------------------------
 
-10. ExtAuth
+9. ExtAuth
 ----------
-10.1 About ExtAuth
-------------------
+9.1 About ExtAuth
+-----------------
 
 ExtAuth may be listed as a loaded module, but its not a true module as
 described above. It allows you to provide a alternative Authentication
@@ -1213,6 +1165,6 @@ configuration.
 -----------------------------------<>-----------------------------------
 
 ************************************************************************
-** This document was last updated on May 27, 2003 by M and is         **
+** This document was last updated on June 12, 2003 by M and is        **
 ** based on documents originally created by Shmad and Fish.           **
 ************************************************************************

@@ -1,4 +1,5 @@
 * text=auto !eol
+/.indent.pro -text
 /AUTHORS -text
 /BUGS -text
 /COPYING -text
@@ -45,6 +46,7 @@ data/niconfig.db -text
 data/tlds.nfo -text
 /dl.c -text
 /dl.h -text
+dl/.indent.pro -text
 dl/Makefile -text
 dl/README -text
 dl/cs/.indent.pro -text

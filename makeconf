@@ -320,9 +320,6 @@ RECONNECT_TIME $NEOCONN
 # this loads the Spam Module
 #LOAD_MODULE spam
 
-# This is a demo Module, called Version.. All it does is append a reply to /version <NeoStats server name>
-#LOAD_MODULE version
-
 # this is the StatServ Module
 #LOAD_MODULE statserv
 

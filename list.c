@@ -37,7 +37,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: list.c,v 1.7 2003/05/26 09:18:28 fishwaldo Exp $
+ * $Id: list.c,v 1.8 2003/06/13 13:11:49 fishwaldo Exp $
  * $Name:  $
  */
 
@@ -68,7 +68,8 @@
 #define lnode_prev(N)		((N)->prev)
 
 #ifdef KAZLIB_RCSID
-static const char rcsid[] = "$Id: list.c,v 1.7 2003/05/26 09:18:28 fishwaldo Exp $";
+static const char rcsid[] =
+    "$Id: list.c,v 1.8 2003/06/13 13:11:49 fishwaldo Exp $";
 #endif
 
 /*
@@ -78,14 +79,14 @@ static const char rcsid[] = "$Id: list.c,v 1.7 2003/05/26 09:18:28 fishwaldo Exp
  * is not permitted.
  */
 
-list_t *list_init(list_t *list, listcount_t maxcount)
+list_t *list_init(list_t * list, listcount_t maxcount)
 {
-    assert (maxcount != 0);
-    list->nilnode.next = &list->nilnode;
-    list->nilnode.prev = &list->nilnode;
-    list->nodecount = 0;
-    list->maxcount = maxcount;
-    return list;
+	assert(maxcount != 0);
+	list->nilnode.next = &list->nilnode;
+	list->nilnode.prev = &list->nilnode;
+	list->nodecount = 0;
+	list->maxcount = maxcount;
+	return list;
 }
 
 /*
@@ -96,15 +97,15 @@ list_t *list_init(list_t *list, listcount_t maxcount)
 
 list_t *list_create(listcount_t maxcount)
 {
-    list_t *new = malloc(sizeof *new);
-    if (new) {
-	assert (maxcount != 0);
-	new->nilnode.next = &new->nilnode;
-	new->nilnode.prev = &new->nilnode;
-	new->nodecount = 0;
-	new->maxcount = maxcount;
-    }
-    return new;
+	list_t *new = malloc(sizeof *new);
+	if (new) {
+		assert(maxcount != 0);
+		new->nilnode.next = &new->nilnode;
+		new->nilnode.prev = &new->nilnode;
+		new->nodecount = 0;
+		new->maxcount = maxcount;
+	}
+	return new;
 }
 
 /*
@@ -112,10 +113,10 @@ list_t *list_create(listcount_t maxcount)
  * The client must remove the nodes first.
  */
 
-void list_destroy(list_t *list)
+void list_destroy(list_t * list)
 {
-    assert (list_isempty(list));
-    free(list);
+	assert(list_isempty(list));
+	free(list);
 }
 
 /*
@@ -124,19 +125,20 @@ void list_destroy(list_t *list)
  * is empty.
  */
 
-void list_destroy_nodes(list_t *list)
+void list_destroy_nodes(list_t * list)
 {
-    lnode_t *lnode = list_first_priv(list), *nil = list_nil(list), *tmp;
+	lnode_t *lnode = list_first_priv(list), *nil =
+	    list_nil(list), *tmp;
 
-    while (lnode != nil) {
-	tmp = lnode->next;
-	lnode->next = NULL;
-	lnode->prev = NULL;
-	lnode_destroy(lnode);
-	lnode = tmp;
-    }
+	while (lnode != nil) {
+		tmp = lnode->next;
+		lnode->next = NULL;
+		lnode->prev = NULL;
+		lnode_destroy(lnode);
+		lnode = tmp;
+	}
 
-    list_init(list, list->maxcount);
+	list_init(list, list->maxcount);
 }
 
 /*
@@ -144,85 +146,86 @@ void list_destroy_nodes(list_t *list)
  * the list must all have come from the same pool.
  */
 
-void list_return_nodes(list_t *list, lnodepool_t *pool)
+void list_return_nodes(list_t * list, lnodepool_t * pool)
 {
-    lnode_t *lnode = list_first_priv(list), *tmp, *nil = list_nil(list);
+	lnode_t *lnode = list_first_priv(list), *tmp, *nil =
+	    list_nil(list);
 
-    while (lnode != nil) {
-	tmp = lnode->next;
-	lnode->next = NULL;
-	lnode->prev = NULL;
-	lnode_return(pool, lnode);
-	lnode = tmp;
-    }
+	while (lnode != nil) {
+		tmp = lnode->next;
+		lnode->next = NULL;
+		lnode->prev = NULL;
+		lnode_return(pool, lnode);
+		lnode = tmp;
+	}
 
-    list_init(list, list->maxcount);
+	list_init(list, list->maxcount);
 }
 
 /*
  * Insert the node ``new'' into the list immediately after ``this'' node.
  */
 
-void list_ins_after(list_t *list, lnode_t *new, lnode_t *this)
+void list_ins_after(list_t * list, lnode_t * new, lnode_t * this)
 {
-    lnode_t *that = this->next;
+	lnode_t *that = this->next;
 
-    assert (new != NULL);
-    assert (!list_contains(list, new));
-    assert (!lnode_is_in_a_list(new));
-    assert (this == list_nil(list) || list_contains(list, this));
-    assert (list->nodecount + 1 > list->nodecount);
+	assert(new != NULL);
+	assert(!list_contains(list, new));
+	assert(!lnode_is_in_a_list(new));
+	assert(this == list_nil(list) || list_contains(list, this));
+	assert(list->nodecount + 1 > list->nodecount);
 
-    new->prev = this;
-    new->next = that;
-    that->prev = new;
-    this->next = new;
-    list->nodecount++;
+	new->prev = this;
+	new->next = that;
+	that->prev = new;
+	this->next = new;
+	list->nodecount++;
 
-    assert (list->nodecount <= list->maxcount);
+	assert(list->nodecount <= list->maxcount);
 }
 
 /*
  * Insert the node ``new'' into the list immediately before ``this'' node.
  */
 
-void list_ins_before(list_t *list, lnode_t *new, lnode_t *this)
+void list_ins_before(list_t * list, lnode_t * new, lnode_t * this)
 {
-    lnode_t *that = this->prev;
+	lnode_t *that = this->prev;
 
-    assert (new != NULL);
-    assert (!list_contains(list, new));
-    assert (!lnode_is_in_a_list(new));
-    assert (this == list_nil(list) || list_contains(list, this));
-    assert (list->nodecount + 1 > list->nodecount);
+	assert(new != NULL);
+	assert(!list_contains(list, new));
+	assert(!lnode_is_in_a_list(new));
+	assert(this == list_nil(list) || list_contains(list, this));
+	assert(list->nodecount + 1 > list->nodecount);
 
-    new->next = this;
-    new->prev = that;
-    that->next = new;
-    this->prev = new;
-    list->nodecount++;
+	new->next = this;
+	new->prev = that;
+	that->next = new;
+	this->prev = new;
+	list->nodecount++;
 
-    assert (list->nodecount <= list->maxcount);
+	assert(list->nodecount <= list->maxcount);
 }
 
 /*
  * Delete the given node from the list.
  */
 
-lnode_t *list_delete(list_t *list, lnode_t *del)
+lnode_t *list_delete(list_t * list, lnode_t * del)
 {
-    lnode_t *next = del->next;
-    lnode_t *prev = del->prev;
+	lnode_t *next = del->next;
+	lnode_t *prev = del->prev;
 
-    assert (list_contains(list, del));
+	assert(list_contains(list, del));
 
-    prev->next = next;
-    next->prev = prev;
-    list->nodecount--;
+	prev->next = next;
+	next->prev = prev;
+	list->nodecount--;
 
-    del->next = del->prev = NULL;
+	del->next = del->prev = NULL;
 
-    return del;
+	return del;
 }
 
 /*
@@ -231,19 +234,21 @@ lnode_t *list_delete(list_t *list, lnode_t *del)
  * call to the function.
  */
 
-void list_process(list_t *list, void *context,
-	void (* function)(list_t *list, lnode_t *lnode, void *context))
+void list_process(list_t * list, void *context,
+		  void (*function) (list_t * list, lnode_t * lnode,
+				    void *context))
 {
-    lnode_t *node = list_first_priv(list), *next, *nil = list_nil(list);
+	lnode_t *node = list_first_priv(list), *next, *nil =
+	    list_nil(list);
 
-    while (node != nil) {
-	/* check for callback function deleting	*/
-	/* the next node from under us		*/
-	assert (list_contains(list, node));
-	next = node->next;
-	function(list, node, context);
-	node = next;
-    }
+	while (node != nil) {
+		/* check for callback function deleting */
+		/* the next node from under us          */
+		assert(list_contains(list, node));
+		next = node->next;
+		function(list, node, context);
+		node = next;
+	}
 }
 
 /*
@@ -252,35 +257,35 @@ void list_process(list_t *list, void *context,
 
 lnode_t *lnode_create(void *data)
 {
-    lnode_t *new = malloc(sizeof *new);
-    if (new) {
-	new->data = data;
-	new->next = NULL;
-	new->prev = NULL;
-    }
-    return new;
+	lnode_t *new = malloc(sizeof *new);
+	if (new) {
+		new->data = data;
+		new->next = NULL;
+		new->prev = NULL;
+	}
+	return new;
 }
 
 /*
  * Initialize a user-supplied lnode.
  */
 
-lnode_t *lnode_init(lnode_t *lnode, void *data)
+lnode_t *lnode_init(lnode_t * lnode, void *data)
 {
-    lnode->data = data;
-    lnode->next = NULL;
-    lnode->prev = NULL;
-    return lnode;
+	lnode->data = data;
+	lnode->next = NULL;
+	lnode->prev = NULL;
+	return lnode;
 }
 
 /*
  * Destroy a dynamically allocated node.
  */
 
-void lnode_destroy(lnode_t *lnode)
+void lnode_destroy(lnode_t * lnode)
 {
-    assert (!lnode_is_in_a_list(lnode));
-    free(lnode);
+	assert(!lnode_is_in_a_list(lnode));
+	free(lnode);
 }
 
 /*
@@ -289,21 +294,22 @@ void lnode_destroy(lnode_t *lnode)
  * ``n'' elements.
  */
 
-lnodepool_t *lnode_pool_init(lnodepool_t *pool, lnode_t *nodes, listcount_t n)
+lnodepool_t *lnode_pool_init(lnodepool_t * pool, lnode_t * nodes,
+			     listcount_t n)
 {
-    listcount_t i;
+	listcount_t i;
 
-    assert (n != 0);
+	assert(n != 0);
 
-    pool->pool = nodes;
-    pool->fre = nodes;
-    pool->size = n;
-    for (i = 0; i < n - 1; i++) {
-	nodes[i].next = nodes + i + 1;
-    }
-    nodes[i].next = NULL;
-    nodes[i].prev = nodes;	/* to make sure node is marked ``on list'' */
-    return pool;
+	pool->pool = nodes;
+	pool->fre = nodes;
+	pool->size = n;
+	for (i = 0; i < n - 1; i++) {
+		nodes[i].next = nodes + i + 1;
+	}
+	nodes[i].next = NULL;
+	nodes[i].prev = nodes;	/* to make sure node is marked ``on list'' */
+	return pool;
 }
 
 /*
@@ -312,50 +318,50 @@ lnodepool_t *lnode_pool_init(lnodepool_t *pool, lnode_t *nodes, listcount_t n)
 
 lnodepool_t *lnode_pool_create(listcount_t n)
 {
-    lnodepool_t *pool;
-    lnode_t *nodes;
+	lnodepool_t *pool;
+	lnode_t *nodes;
 
-    assert (n != 0);
+	assert(n != 0);
 
-    pool = malloc(sizeof *pool);
-    if (!pool)
-	return NULL;
-    nodes = malloc(n * sizeof *nodes);
-    if (!nodes) {
-	free(pool);
-	return NULL;
-    }
-    lnode_pool_init(pool, nodes, n);
-    return pool;
+	pool = malloc(sizeof *pool);
+	if (!pool)
+		return NULL;
+	nodes = malloc(n * sizeof *nodes);
+	if (!nodes) {
+		free(pool);
+		return NULL;
+	}
+	lnode_pool_init(pool, nodes, n);
+	return pool;
 }
 
 /*
  * Determine whether the given pool is from this pool.
  */
 
-int lnode_pool_isfrom(lnodepool_t *pool, lnode_t *node)
+int lnode_pool_isfrom(lnodepool_t * pool, lnode_t * node)
 {
-    listcount_t i;
+	listcount_t i;
 
-    /* this is carefully coded this way because ANSI C forbids pointers
-       to different objects from being subtracted or compared other
-       than for exact equality */
+	/* this is carefully coded this way because ANSI C forbids pointers
+	   to different objects from being subtracted or compared other
+	   than for exact equality */
 
-    for (i = 0; i < pool->size; i++) {
-	if (pool->pool + i == node)
-	    return 1;
-    }
-    return 0;
+	for (i = 0; i < pool->size; i++) {
+		if (pool->pool + i == node)
+			return 1;
+	}
+	return 0;
 }
 
 /*
  * Destroy a dynamically allocated pool of nodes.
  */
 
-void lnode_pool_destroy(lnodepool_t *p)
+void lnode_pool_destroy(lnodepool_t * p)
 {
-    free(p->pool);
-    free(p);
+	free(p->pool);
+	free(p);
 }
 
 /*
@@ -363,16 +369,16 @@ void lnode_pool_destroy(lnodepool_t *p)
  * is exhausted. 
  */
 
-lnode_t *lnode_borrow(lnodepool_t *pool, void *data)
+lnode_t *lnode_borrow(lnodepool_t * pool, void *data)
 {
-    lnode_t *new = pool->fre;
-    if (new) {
-	pool->fre = new->next;
-	new->data = data;
-	new->next = NULL;
-	new->prev = NULL;
-    }
-    return new;
+	lnode_t *new = pool->fre;
+	if (new) {
+		pool->fre = new->next;
+		new->data = data;
+		new->next = NULL;
+		new->prev = NULL;
+	}
+	return new;
 }
 
 /*
@@ -380,14 +386,14 @@ lnode_t *lnode_borrow(lnodepool_t *pool, void *data)
  * from which it came.
  */
 
-void lnode_return(lnodepool_t *pool, lnode_t *node)
+void lnode_return(lnodepool_t * pool, lnode_t * node)
 {
-    assert (lnode_pool_isfrom(pool, node));
-    assert (!lnode_is_in_a_list(node));
+	assert(lnode_pool_isfrom(pool, node));
+	assert(!lnode_is_in_a_list(node));
 
-    node->next = pool->fre;
-    node->prev = node;
-    pool->fre = node;
+	node->next = pool->fre;
+	node->prev = node;
+	pool->fre = node;
 }
 
 /*
@@ -395,16 +401,16 @@ void lnode_return(lnodepool_t *pool, lnode_t *node)
  * According to this function, a list does not contain its nilnode.
  */
 
-int list_contains(list_t *list, lnode_t *node)
+int list_contains(list_t * list, lnode_t * node)
 {
-    lnode_t *n, *nil = list_nil(list);
+	lnode_t *n, *nil = list_nil(list);
 
-    for (n = list_first_priv(list); n != nil; n = lnode_next(n)) {
-	if (node == n)
-	    return 1;
-    }
+	for (n = list_first_priv(list); n != nil; n = lnode_next(n)) {
+		if (node == n)
+			return 1;
+	}
 
-    return 0;
+	return 0;
 }
 
 /*
@@ -413,47 +419,48 @@ int list_contains(list_t *list, lnode_t *node)
  * list.
  */
 
-void list_extract(list_t *dest, list_t *source, lnode_t *first, lnode_t *last)
+void list_extract(list_t * dest, list_t * source, lnode_t * first,
+		  lnode_t * last)
 {
-    listcount_t moved = 1;
+	listcount_t moved = 1;
 
-    assert (first == NULL || list_contains(source, first));
-    assert (last == NULL || list_contains(source, last));
+	assert(first == NULL || list_contains(source, first));
+	assert(last == NULL || list_contains(source, last));
 
-    if (first == NULL || last == NULL)
-	return;
+	if (first == NULL || last == NULL)
+		return;
 
-    /* adjust the destination list so that the slice is spliced out */
+	/* adjust the destination list so that the slice is spliced out */
 
-    first->prev->next = last->next;
-    last->next->prev = first->prev;
+	first->prev->next = last->next;
+	last->next->prev = first->prev;
 
-    /* graft the splice at the end of the dest list */
+	/* graft the splice at the end of the dest list */
 
-    last->next = &dest->nilnode;
-    first->prev = dest->nilnode.prev;
-    dest->nilnode.prev->next = first;
-    dest->nilnode.prev = last;
+	last->next = &dest->nilnode;
+	first->prev = dest->nilnode.prev;
+	dest->nilnode.prev->next = first;
+	dest->nilnode.prev = last;
 
-    while (first != last) {
-	first = first->next;
-	assert (first != list_nil(source));	/* oops, last before first! */
-	moved++;
-    }
-    
-    /* assert no overflows */
-    assert (source->nodecount - moved <= source->nodecount);
-    assert (dest->nodecount + moved >= dest->nodecount);
+	while (first != last) {
+		first = first->next;
+		assert(first != list_nil(source));	/* oops, last before first! */
+		moved++;
+	}
 
-    /* assert no weirdness */
-    assert (moved <= source->nodecount);
+	/* assert no overflows */
+	assert(source->nodecount - moved <= source->nodecount);
+	assert(dest->nodecount + moved >= dest->nodecount);
 
-    source->nodecount -= moved;
-    dest->nodecount += moved;
+	/* assert no weirdness */
+	assert(moved <= source->nodecount);
 
-    /* assert list sanity */
-    assert (list_verify(source));
-    assert (list_verify(dest));
+	source->nodecount -= moved;
+	dest->nodecount += moved;
+
+	/* assert list sanity */
+	assert(list_verify(source));
+	assert(list_verify(dest));
 }
 
 
@@ -465,117 +472,119 @@ void list_extract(list_t *dest, list_t *source, lnode_t *first, lnode_t *last)
  * order.
  */
 
-void list_transfer(list_t *dest, list_t *source, lnode_t *first)
+void list_transfer(list_t * dest, list_t * source, lnode_t * first)
 {
-    listcount_t moved = 1;
-    lnode_t *last;
+	listcount_t moved = 1;
+	lnode_t *last;
 
-    assert (first == NULL || list_contains(source, first));
+	assert(first == NULL || list_contains(source, first));
 
-    if (first == NULL)
-	return;
+	if (first == NULL)
+		return;
 
-    last = source->nilnode.prev;
+	last = source->nilnode.prev;
 
-    source->nilnode.prev = first->prev;
-    first->prev->next = &source->nilnode;
+	source->nilnode.prev = first->prev;
+	first->prev->next = &source->nilnode;
 
-    last->next = &dest->nilnode;
-    first->prev = dest->nilnode.prev;
-    dest->nilnode.prev->next = first;
-    dest->nilnode.prev = last;
+	last->next = &dest->nilnode;
+	first->prev = dest->nilnode.prev;
+	dest->nilnode.prev->next = first;
+	dest->nilnode.prev = last;
 
-    while (first != last) {
-	first = first->next;
-	moved++;
-    }
-    
-    /* assert no overflows */
-    assert (source->nodecount - moved <= source->nodecount);
-    assert (dest->nodecount + moved >= dest->nodecount);
-
-    /* assert no weirdness */
-    assert (moved <= source->nodecount);
-
-    source->nodecount -= moved;
-    dest->nodecount += moved;
-
-    /* assert list sanity */
-    assert (list_verify(source));
-    assert (list_verify(dest));
-}
-
-void list_merge(list_t *dest, list_t *sour,
-	int compare (const void *, const void *))
-{
-    lnode_t *dn, *sn, *tn;
-    lnode_t *d_nil = list_nil(dest), *s_nil = list_nil(sour);
-
-    /* Nothing to do if source and destination list are the same. */
-    if (dest == sour)
-	return;
-
-    /* overflow check */
-    assert (list_count(sour) + list_count(dest) >= list_count(sour));
-
-    /* lists must be sorted */
-    assert (list_is_sorted(sour, compare));
-    assert (list_is_sorted(dest, compare));
-
-    dn = list_first_priv(dest);
-    sn = list_first_priv(sour);
-
-    while (dn != d_nil && sn != s_nil) {
-	if (compare(lnode_get(dn), lnode_get(sn)) >= 0) {
-	    tn = lnode_next(sn);
-	    list_delete(sour, sn);
-	    list_ins_before(dest, sn, dn);
-	    sn = tn;
-	} else {
-	    dn = lnode_next(dn);
+	while (first != last) {
+		first = first->next;
+		moved++;
 	}
-    }
 
-    if (dn != d_nil)
-	return;
+	/* assert no overflows */
+	assert(source->nodecount - moved <= source->nodecount);
+	assert(dest->nodecount + moved >= dest->nodecount);
 
-    if (sn != s_nil)
-	list_transfer(dest, sour, sn);
+	/* assert no weirdness */
+	assert(moved <= source->nodecount);
+
+	source->nodecount -= moved;
+	dest->nodecount += moved;
+
+	/* assert list sanity */
+	assert(list_verify(source));
+	assert(list_verify(dest));
 }
 
-void list_sort(list_t *list, int compare(const void *, const void *))
+void list_merge(list_t * dest, list_t * sour,
+		int compare(const void *, const void *))
 {
-    list_t extra;
-    listcount_t middle;
-    lnode_t *node;
+	lnode_t *dn, *sn, *tn;
+	lnode_t *d_nil = list_nil(dest), *s_nil = list_nil(sour);
 
-    if (list_count(list) > 1) {
-	middle = list_count(list) / 2;
-	node = list_first_priv(list);
+	/* Nothing to do if source and destination list are the same. */
+	if (dest == sour)
+		return;
 
-	list_init(&extra, list_count(list) - middle);
+	/* overflow check */
+	assert(list_count(sour) + list_count(dest) >= list_count(sour));
 
-	while (middle--)
-	    node = lnode_next(node);
-	
-	list_transfer(&extra, list, node);
-	list_sort(list, compare);
-	list_sort(&extra, compare);
-	list_merge(list, &extra, compare);
-    } 
-    assert (list_is_sorted(list, compare));
+	/* lists must be sorted */
+	assert(list_is_sorted(sour, compare));
+	assert(list_is_sorted(dest, compare));
+
+	dn = list_first_priv(dest);
+	sn = list_first_priv(sour);
+
+	while (dn != d_nil && sn != s_nil) {
+		if (compare(lnode_get(dn), lnode_get(sn)) >= 0) {
+			tn = lnode_next(sn);
+			list_delete(sour, sn);
+			list_ins_before(dest, sn, dn);
+			sn = tn;
+		} else {
+			dn = lnode_next(dn);
+		}
+	}
+
+	if (dn != d_nil)
+		return;
+
+	if (sn != s_nil)
+		list_transfer(dest, sour, sn);
 }
 
-lnode_t *list_find(list_t *list, const void *key, int compare(const void *, const void *))
+void list_sort(list_t * list, int compare(const void *, const void *))
 {
-    lnode_t *node;
+	list_t extra;
+	listcount_t middle;
+	lnode_t *node;
 
-    for (node = list_first_priv(list); node != list_nil(list); node = node->next) {
-	if (compare(lnode_get(node), key) == 0)
-	    return node;
-    }
-    
-    return 0;
+	if (list_count(list) > 1) {
+		middle = list_count(list) / 2;
+		node = list_first_priv(list);
+
+		list_init(&extra, list_count(list) - middle);
+
+		while (middle--)
+			node = lnode_next(node);
+
+		list_transfer(&extra, list, node);
+		list_sort(list, compare);
+		list_sort(&extra, compare);
+		list_merge(list, &extra, compare);
+	}
+	assert(list_is_sorted(list, compare));
+}
+
+lnode_t *list_find(list_t * list, const void *key,
+		   int compare(const void *, const void *))
+{
+	lnode_t *node;
+
+	for (node = list_first_priv(list); node != list_nil(list);
+	     node = node->next) {
+		if (compare(lnode_get(node), key) == 0)
+			return node;
+	}
+
+	return 0;
 }
 
 
@@ -583,22 +592,22 @@ lnode_t *list_find(list_t *list, const void *key, int compare(const void *, cons
  * Return 1 if the list is in sorted order, 0 otherwise
  */
 
-int list_is_sorted(list_t *list, int compare(const void *, const void *))
+int list_is_sorted(list_t * list, int compare(const void *, const void *))
 {
-    lnode_t *node, *next, *nil;
+	lnode_t *node, *next, *nil;
 
-    next = nil = list_nil(list);
-    node = list_first_priv(list);
+	next = nil = list_nil(list);
+	node = list_first_priv(list);
 
-    if (node != nil)
-	next = lnode_next(node);
+	if (node != nil)
+		next = lnode_next(node);
 
-    for (; next != nil; node = next, next = lnode_next(next)) {
-	if (compare(lnode_get(node), lnode_get(next)) > 0)
-	    return 0;
-    }
+	for (; next != nil; node = next, next = lnode_next(next)) {
+		if (compare(lnode_get(node), lnode_get(next)) > 0)
+			return 0;
+	}
 
-    return 1;
+	return 1;
 }
 
 /*
@@ -625,9 +634,9 @@ int list_is_sorted(list_t *list, int compare(const void *, const void *))
  * Return 1 if the list is empty, 0 otherwise
  */
 
-int list_isempty(list_t *list)
+int list_isempty(list_t * list)
 {
-    return list->nodecount == 0;
+	return list->nodecount == 0;
 }
 
 /*
@@ -635,85 +644,85 @@ int list_isempty(list_t *list)
  * Permitted only on bounded lists. 
  */
 
-int list_isfull(list_t *list)
+int list_isfull(list_t * list)
 {
-    return list->nodecount == list->maxcount;
+	return list->nodecount == list->maxcount;
 }
 
 /*
  * Check if the node pool is empty.
  */
 
-int lnode_pool_isempty(lnodepool_t *pool)
+int lnode_pool_isempty(lnodepool_t * pool)
 {
-    return (pool->fre == NULL);
+	return (pool->fre == NULL);
 }
 
 /*
  * Add the given node at the end of the list
  */
 
-void list_append(list_t *list, lnode_t *node)
+void list_append(list_t * list, lnode_t * node)
 {
-    list_ins_before(list, node, &list->nilnode);
+	list_ins_before(list, node, &list->nilnode);
 }
 
 /*
  * Add the given node at the beginning of the list.
  */
 
-void list_prepend(list_t *list, lnode_t *node)
+void list_prepend(list_t * list, lnode_t * node)
 {
-    list_ins_after(list, node, &list->nilnode);
+	list_ins_after(list, node, &list->nilnode);
 }
 
 /*
  * Retrieve the first node of the list
  */
 
-lnode_t *list_first(list_t *list)
+lnode_t *list_first(list_t * list)
 {
-    if (list->nilnode.next == &list->nilnode)
-	return NULL;
-    return list->nilnode.next;
+	if (list->nilnode.next == &list->nilnode)
+		return NULL;
+	return list->nilnode.next;
 }
 
 /*
  * Retrieve the last node of the list
  */
 
-lnode_t *list_last(list_t *list)
+lnode_t *list_last(list_t * list)
 {
-    if (list->nilnode.prev == &list->nilnode)
-	return NULL;
-    return list->nilnode.prev;
+	if (list->nilnode.prev == &list->nilnode)
+		return NULL;
+	return list->nilnode.prev;
 }
 
 /*
  * Retrieve the count of nodes in the list
  */
 
-listcount_t list_count(list_t *list)
+listcount_t list_count(list_t * list)
 {
-    return list->nodecount;
+	return list->nodecount;
 }
 
 /*
  * Remove the first node from the list and return it.
  */
 
-lnode_t *list_del_first(list_t *list)
+lnode_t *list_del_first(list_t * list)
 {
-    return list_delete(list, list->nilnode.next);
+	return list_delete(list, list->nilnode.next);
 }
 
 /*
  * Remove the last node from the list and return it.
  */
 
-lnode_t *list_del_last(list_t *list)
+lnode_t *list_del_last(list_t * list)
 {
-    return list_delete(list, list->nilnode.prev);
+	return list_delete(list, list->nilnode.prev);
 }
 
 
@@ -721,18 +730,18 @@ lnode_t *list_del_last(list_t *list)
  * Associate a data item with the given node.
  */
 
-void lnode_put(lnode_t *lnode, void *data)
+void lnode_put(lnode_t * lnode, void *data)
 {
-    lnode->data = data;
+	lnode->data = data;
 }
 
 /*
  * Retrieve the data item associated with the node.
  */
 
-void *lnode_get(lnode_t *lnode)
+void *lnode_get(lnode_t * lnode)
 {
-    return lnode->data;
+	return lnode->data;
 }
 
 /*
@@ -740,67 +749,67 @@ void *lnode_get(lnode_t *lnode)
  * NULL is returned.
  */
 
-lnode_t *list_next(list_t *list, lnode_t *lnode)
+lnode_t *list_next(list_t * list, lnode_t * lnode)
 {
-    assert (list_contains(list, lnode));
+	assert(list_contains(list, lnode));
 
-    if (lnode->next == list_nil(list))
-	return NULL;
-    return lnode->next;
+	if (lnode->next == list_nil(list))
+		return NULL;
+	return lnode->next;
 }
 
 /*
  * Retrieve the node's predecessor. See comment for lnode_next().
  */
 
-lnode_t *list_prev(list_t *list, lnode_t *lnode)
+lnode_t *list_prev(list_t * list, lnode_t * lnode)
 {
-    assert (list_contains(list, lnode));
+	assert(list_contains(list, lnode));
 
-    if (lnode->prev == list_nil(list))
-	return NULL;
-    return lnode->prev;
+	if (lnode->prev == list_nil(list))
+		return NULL;
+	return lnode->prev;
 }
 
 /*
  * Return 1 if the lnode is in some list, otherwise return 0.
  */
 
-int lnode_is_in_a_list(lnode_t *lnode)
+int lnode_is_in_a_list(lnode_t * lnode)
 {
-    return (lnode->next != NULL || lnode->prev != NULL);
+	return (lnode->next != NULL || lnode->prev != NULL);
 }
 
 
-int list_verify(list_t *list)
+int list_verify(list_t * list)
 {
-    lnode_t *node = list_first_priv(list), *nil = list_nil(list);
-    listcount_t count = list_count(list);
+	lnode_t *node = list_first_priv(list), *nil = list_nil(list);
+	listcount_t count = list_count(list);
 
-    if (node->prev != nil) {
-	return 0;
-    }
-    if (count > list->maxcount) {
-	return 0;
-    }
+	if (node->prev != nil) {
+		return 0;
+	}
+	if (count > list->maxcount) {
+		return 0;
+	}
 
-    while (node != nil && count--) {
-	if (node->next->prev != node) {
-	    return 0;
-        }
-	node = node->next;
-    }
+	while (node != nil && count--) {
+		if (node->next->prev != node) {
+			return 0;
+		}
+		node = node->next;
+	}
 
-    if (count != 0 || node != nil) {
-	return 0;
-    }
-    
-    return 1;
+	if (count != 0 || node != nil) {
+		return 0;
+	}
+
+	return 1;
 }
 
 int comparef(const void *key1, const void *key2)
 {
-    return strcasecmp(key1, key2);
+	return strcasecmp(key1, key2);
 }
 
 
@@ -816,144 +825,145 @@ typedef char input_t[256];
 
 static int tokenize(char *string, ...)
 {
-    char **tokptr; 
-    va_list arglist;
-    int tokcount = 0;
+	char **tokptr;
+	va_list arglist;
+	int tokcount = 0;
 
-    va_start(arglist, string);
-    tokptr = va_arg(arglist, char **);
-    while (tokptr) {
-	while (*string && isspace((unsigned char) *string))
-	    string++;
-	if (!*string)
-	    break;
-	*tokptr = string;
-	while (*string && !isspace((unsigned char) *string))
-	    string++;
+	va_start(arglist, string);
 	tokptr = va_arg(arglist, char **);
-	tokcount++;
-	if (!*string)
-	    break;
-	*string++ = 0;
-    }
-    va_end(arglist);
+	while (tokptr) {
+		while (*string && isspace((unsigned char) *string))
+			string++;
+		if (!*string)
+			break;
+		*tokptr = string;
+		while (*string && !isspace((unsigned char) *string))
+			string++;
+		tokptr = va_arg(arglist, char **);
+		tokcount++;
+		if (!*string)
+			break;
+		*string++ = 0;
+	}
+	va_end(arglist);
 
-    return tokcount;
+	return tokcount;
 }
 
 
 static char *dupstring(char *str)
 {
-    int sz = strlen(str) + 1;
-    char *new = malloc(sz);
-    if (new)
-	memcpy(new, str, sz);
-    return new;
+	int sz = strlen(str) + 1;
+	char *new = malloc(sz);
+	if (new)
+		memcpy(new, str, sz);
+	return new;
 }
 
 int main(void)
 {
-    input_t in;
-    list_t *l = list_create(LISTCOUNT_T_MAX);
-    lnode_t *ln;
-    char *tok1, *val;
-    int prompt = 0;
+	input_t in;
+	list_t *l = list_create(LISTCOUNT_T_MAX);
+	lnode_t *ln;
+	char *tok1, *val;
+	int prompt = 0;
 
-    char *help =
-	"a <val>                append value to list\n"
-	"d <val>                delete value from list\n"
-	"l <val>                lookup value in list\n"
-	"s                      sort list\n"
-	"c                      show number of entries\n"
-	"t                      dump whole list\n"
-	"p                      turn prompt on\n"
-	"q                      quit";
+	char *help =
+	    "a <val>                append value to list\n"
+	    "d <val>                delete value from list\n"
+	    "l <val>                lookup value in list\n"
+	    "s                      sort list\n"
+	    "c                      show number of entries\n"
+	    "t                      dump whole list\n"
+	    "p                      turn prompt on\n"
+	    "q                      quit";
 
-    if (!l)
-	puts("list_create failed");
+	if (!l)
+		puts("list_create failed");
 
-    for (;;) {
-	if (prompt)
-	    putchar('>');
-	fflush(stdout);
+	for (;;) {
+		if (prompt)
+			putchar('>');
+		fflush(stdout);
 
-	if (!fgets(in, sizeof(input_t), stdin))
-	    break;
+		if (!fgets(in, sizeof(input_t), stdin))
+			break;
 
-	switch(in[0]) {
-	    case '?':
-		puts(help);
-		break;
-	    case 'a':
-		if (tokenize(in+1, &tok1, (char **) 0) != 1) {
-		    puts("what?");
-		    break;
-		}
-		val = dupstring(tok1);
-		ln = lnode_create(val);
-	
-		if (!val || !ln) {
-		    puts("allocation failure");
-		    if (ln)
+		switch (in[0]) {
+		case '?':
+			puts(help);
+			break;
+		case 'a':
+			if (tokenize(in + 1, &tok1, (char **) 0) != 1) {
+				puts("what?");
+				break;
+			}
+			val = dupstring(tok1);
+			ln = lnode_create(val);
+
+			if (!val || !ln) {
+				puts("allocation failure");
+				if (ln)
+					lnode_destroy(ln);
+				free(val);
+				break;
+			}
+
+			list_append(l, ln);
+			break;
+		case 'd':
+			if (tokenize(in + 1, &tok1, (char **) 0) != 1) {
+				puts("what?");
+				break;
+			}
+			ln = list_find(l, tok1, comparef);
+			if (!ln) {
+				puts("list_find failed");
+				break;
+			}
+			list_delete(l, ln);
+			val = lnode_get(ln);
 			lnode_destroy(ln);
-		    free(val);
-		    break;
+			free(val);
+			break;
+		case 'l':
+			if (tokenize(in + 1, &tok1, (char **) 0) != 1) {
+				puts("what?");
+				break;
+			}
+			ln = list_find(l, tok1, comparef);
+			if (!ln)
+				puts("list_find failed");
+			else
+				puts("found");
+			break;
+		case 's':
+			list_sort(l, comparef);
+			break;
+		case 'c':
+			printf("%lu\n", (unsigned long) list_count(l));
+			break;
+		case 't':
+			for (ln = list_first(l); ln != 0;
+			     ln = list_next(l, ln))
+				puts(lnode_get(ln));
+			break;
+		case 'q':
+			exit(0);
+			break;
+		case '\0':
+			break;
+		case 'p':
+			prompt = 1;
+			break;
+		default:
+			putchar('?');
+			putchar('\n');
+			break;
 		}
-    
-		list_append(l, ln);
-		break;
-	    case 'd':
-		if (tokenize(in+1, &tok1, (char **) 0) != 1) {
-		    puts("what?");
-		    break;
-		}
-		ln = list_find(l, tok1, comparef);
-		if (!ln) {
-		    puts("list_find failed");
-		    break;
-		}
-		list_delete(l, ln);
-		val = lnode_get(ln);
-		lnode_destroy(ln);
-		free(val);
-		break;
-	    case 'l':
-		if (tokenize(in+1, &tok1, (char **) 0) != 1) {
-		    puts("what?");
-		    break;
-		}
-		ln = list_find(l, tok1, comparef);
-		if (!ln)
-		    puts("list_find failed");
-		else
-		    puts("found");
-		break;
-	    case 's':
-		list_sort(l, comparef);
-		break;
-	    case 'c':
-		printf("%lu\n", (unsigned long) list_count(l));
-		break;
-	    case 't':
-		for (ln = list_first(l); ln != 0; ln = list_next(l, ln))
-		    puts(lnode_get(ln));
-		break;
-	    case 'q':
-		exit(0);
-		break;
-	    case '\0':
-		break;
-	    case 'p':
-		prompt = 1;
-		break;
-	    default:
-		putchar('?');
-		putchar('\n');
-		break;
 	}
-    }
 
-    return 0;
+	return 0;
 }
 
-#endif	/* defined TEST_MAIN */
+#endif				/* defined TEST_MAIN */

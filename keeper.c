@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: keeper.c,v 1.9 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: keeper.c,v 1.10 2003/06/13 13:11:49 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -30,10 +30,11 @@
 
 /** @brief Gets Config Data of Type
  */
-int GetConf(void **data, int type, const char *item) {
+int GetConf(void **data, int type, const char *item)
+{
 	char keypath[255];
 	int i = 0;
-	
+
 	/* determine if its a module setting */
 	if (strlen(segvinmodule) > 0) {
 		snprintf(keypath, 255, "g/%s:/%s", segvinmodule, item);
@@ -42,36 +43,40 @@ int GetConf(void **data, int type, const char *item) {
 	}
 
 	switch (type) {
-		case CFGSTR:
-			i = kp_get_string(keypath, (char **)*&data);
-			break;
-		case CFGINT:
-			i = kp_get_int(keypath, (int *)*&data);
-			break;
-		case CFGFLOAT:
-			i = kp_get_float(keypath, (double *)*&data);
-			break;
-		case CFGBOOL:
-			i = kp_get_bool(keypath, (int *)*&data);
-			break;		
-		default:
-			nlog(LOG_WARNING, LOG_CORE, "Keeper: Called GetConf with invalid datatype %d", type);
-			return -1;
+	case CFGSTR:
+		i = kp_get_string(keypath, (char **) *&data);
+		break;
+	case CFGINT:
+		i = kp_get_int(keypath, (int *) *&data);
+		break;
+	case CFGFLOAT:
+		i = kp_get_float(keypath, (double *) *&data);
+		break;
+	case CFGBOOL:
+		i = kp_get_bool(keypath, (int *) *&data);
+		break;
+	default:
+		nlog(LOG_WARNING, LOG_CORE,
+		     "Keeper: Called GetConf with invalid datatype %d",
+		     type);
+		return -1;
 	}
 	/* check for errors */
 	if (i != 0) {
 /*
 		data = malloc(255);
 */
-		nlog(LOG_DEBUG1, LOG_CORE, "GetConf: %s - Path: %s", kp_strerror(i), keypath);
+		nlog(LOG_DEBUG1, LOG_CORE, "GetConf: %s - Path: %s",
+		     kp_strerror(i), keypath);
 		return -1;
-	} 
+	}
 	return 1;
 }
 
 /* @brief return a array of strings containing all subkeys in a directory */
 
-int GetDir(char *item, char ***data) {
+int GetDir(char *item, char ***data)
+{
 	int i;
 	char keypath[255];
 	char **data1;
@@ -86,20 +91,22 @@ int GetDir(char *item, char ***data) {
 	if (i == 0) {
 		*data = data1;
 		return 1;
-	} 
+	}
 	*data = NULL;
-	nlog(LOG_DEBUG1, LOG_CORE, "GetDir: %s - Path: %s", kp_strerror(i), keypath);
+	nlog(LOG_DEBUG1, LOG_CORE, "GetDir: %s - Path: %s", kp_strerror(i),
+	     keypath);
 	return -1;
-		
-}	
+
+}
 
 
 
 /** @brief Sets Config Data of Type
 */
-int SetConf(void *data, int type, char *item) {
-char keypath[255];
-int i = 0;
+int SetConf(void *data, int type, char *item)
+{
+	char keypath[255];
+	int i = 0;
 
 	/* determine if its a module setting */
 	if (strlen(segvinmodule) > 0) {
@@ -109,30 +116,32 @@ int i = 0;
 	}
 
 	switch (type) {
-		case CFGSTR:
-			i = kp_set_string(keypath, (char *)data);
-			break;
-		case CFGINT:
-			i = kp_set_int(keypath, (int)data);
-			break;
-		case CFGFLOAT:
+	case CFGSTR:
+		i = kp_set_string(keypath, (char *) data);
+		break;
+	case CFGINT:
+		i = kp_set_int(keypath, (int) data);
+		break;
+	case CFGFLOAT:
 /*
 			i = kp_set_float(keypath, (double *)data);
 */
-			break;
-		case CFGBOOL:
-			i = kp_set_bool(keypath, (int)data);
-			break;		
-		default:
-			nlog(LOG_WARNING, LOG_CORE, "Keeper: Called SetConf with invalid datatype %d", type);
-			return -1;
+		break;
+	case CFGBOOL:
+		i = kp_set_bool(keypath, (int) data);
+		break;
+	default:
+		nlog(LOG_WARNING, LOG_CORE,
+		     "Keeper: Called SetConf with invalid datatype %d",
+		     type);
+		return -1;
 	}
 	/* check for errors */
 	if (i != 0) {
 		nlog(LOG_WARNING, LOG_CORE, "SetConf: %s", kp_strerror(i));
 		return -1;
-	} 
+	}
 	kp_flush();
 	return 1;
-	
+
 }

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.94 2003/06/08 05:59:25 fishwaldo Exp $
+** $Id: main.c,v 1.95 2003/06/13 13:11:49 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 	FILE *fp;
 	/* get our commandline options */
 	get_options(argc, argv);
-	
+
 	/* Change to the working Directory */
 	if (chdir(NEO_PREFIX) < 0) {
 		printf("NeoStats Could not change to %s\n", NEO_PREFIX);
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 		printf("Error Was: %s\n", strerror(errno));
 		exit(-1);
 	}
-	
+
 	/* before we do anything, make sure logging is setup */
 	init_logs();
 
@@ -104,13 +104,16 @@ int main(int argc, char *argv[])
 	me.onchan = 0;
 	/* keep quiet if we are told to :) */
 	if (!config.quiet) {
-		printf("NeoStats %d.%d.%d%s Loading...\n", MAJOR, MINOR, REV, version);
-		printf("-----------------------------------------------\n");
+		printf("NeoStats %d.%d.%d%s Loading...\n", MAJOR, MINOR,
+		       REV, version);
+		printf
+		    ("-----------------------------------------------\n");
 		printf("Copyright: NeoStats Group. 2000-2003\n");
 		printf("Justin Hammond (fish@neostats.net)\n");
 		printf("Adam Rutter (shmad@neostats.net)\n");
 		printf("^Enigma^ (enigma@neostats.net)\n");
-		printf("-----------------------------------------------\n\n");
+		printf
+		    ("-----------------------------------------------\n\n");
 	}
 	/* set some defaults before we parse the config file */
 	me.t_start = time(NULL);
@@ -118,10 +121,10 @@ int main(int argc, char *argv[])
 	me.enable_spam = 0;
 	me.die = 0;
 	me.local[0] = '\0';
-	me.coder_debug=0;
-	me.noticelag=0;
-	me.usesmo=0;
-	me.r_time=10;
+	me.coder_debug = 0;
+	me.noticelag = 0;
+	me.usesmo = 0;
+	me.r_time = 10;
 	me.lastmsg = time(NULL);
 	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
 	me.synced = 0;
@@ -130,43 +133,45 @@ int main(int argc, char *argv[])
 #ifdef ULTIMATE3
 	me.client = 0;
 #endif
-	strcpy(me.modpath,"dl");
+	strcpy(me.modpath, "dl");
 
 	/* if we are doing recv.log, remove the previous version */
 	if (config.recvlog)
 		remove("logs/recv.log");
-		
+
 	/* initilze our Module subsystem */
 	__init_mod_list();
-	
+
 	/* prepare to catch errors */
 	setup_signals();
-	
+
 	/* load the config files */
 	ConfLoad();
-        if (me.die) {
-		printf("\n-----> ERROR: Read the README file then edit neostats.cfg! <-----\n\n");
-                nlog(LOG_CRITICAL, LOG_CORE, "Read the README file and edit your neostats.cfg");
-                sleep(1);
-                close(servsock);
-                remove("neostats.pid");
-                /* we are exiting the parent, not the program, don't call do_exit() */
-                exit(0);
-        }
-        
-        /* initilize the rest of the subsystems */
+	if (me.die) {
+		printf
+		    ("\n-----> ERROR: Read the README file then edit neostats.cfg! <-----\n\n");
+		nlog(LOG_CRITICAL, LOG_CORE,
+		     "Read the README file and edit your neostats.cfg");
+		sleep(1);
+		close(servsock);
+		remove("neostats.pid");
+		/* we are exiting the parent, not the program, don't call do_exit() */
+		exit(0);
+	}
+
+	/* initilize the rest of the subsystems */
 	TimerReset();
 	init_dns();
 	init_server_hash();
 	init_user_hash();
 	init_chan_hash();
-	init_ircd();	
+	init_ircd();
 
 
 #ifndef DEBUG
 	/* if we are compiled with debug, or forground switch was specified, DONT FORK */
 	if (!config.foreground) {
-		forked=fork();
+		forked = fork();
 #endif
 		if (forked) {
 			/* write out our PID */
@@ -175,8 +180,11 @@ int main(int argc, char *argv[])
 			fclose(fp);
 			if (!config.quiet) {
 				printf("\n");
-				printf("NeoStats %d.%d.%d%s Successfully Launched into Background\n", MAJOR, MINOR, REV, version);
-				printf("PID: %i - Wrote to neostats.pid\n",forked);
+				printf
+				    ("NeoStats %d.%d.%d%s Successfully Launched into Background\n",
+				     MAJOR, MINOR, REV, version);
+				printf("PID: %i - Wrote to neostats.pid\n",
+				       forked);
 			}
 			return 0;
 		}
@@ -185,9 +193,11 @@ int main(int argc, char *argv[])
 		if (setpgid(0, 0) < 0) {
 			nlog(LOG_WARNING, LOG_CORE, "setpgid() failed");
 		}
-	}	
+	}
 #endif
-	nlog(LOG_NOTICE, LOG_CORE, "Statistics Started (NeoStats %d.%d.%d%s).", MAJOR, MINOR, REV, version);
+	nlog(LOG_NOTICE, LOG_CORE,
+	     "Statistics Started (NeoStats %d.%d.%d%s).", MAJOR, MINOR,
+	     REV, version);
 
 	/* don't init_modules till after we fork. This fixes the load->fork-exit->call _fini problems when we fork */
 	init_modules();
@@ -202,10 +212,11 @@ int main(int argc, char *argv[])
  *
  * Processes commandline options
 */
-void get_options(int argc, char **argv) {
+void get_options(int argc, char **argv)
+{
 	int c;
 	int dbg;
-	
+
 	/* set some defaults first */
 #ifdef DEBUG
 	config.debug = 10;
@@ -216,55 +227,64 @@ void get_options(int argc, char **argv) {
 #endif
 
 
-	while ((c=getopt(argc,argv, "hvrd:nqf")) != -1) {
-		switch(c) {
-			case 'h':
-				printf("NeoStats: Usage: \"neostats [options]\"\n");
-				printf("          -h (Show this screen)\n");
-				printf("	  -v (Show Version Number)\n");
-				printf("	  -r (Enable Recv.log)\n");
-				printf("	  -d 1-10 (Enable Debuging output 1= lowest, 10 = highest)\n");
-				printf("	  -n (Do not load any modules on startup)\n");
-				printf("	  -q (Quiet Start - For Cron Scripts)\n");
-				printf("          -f (Do NOt fork into BackGround\n");
+	while ((c = getopt(argc, argv, "hvrd:nqf")) != -1) {
+		switch (c) {
+		case 'h':
+			printf
+			    ("NeoStats: Usage: \"neostats [options]\"\n");
+			printf("          -h (Show this screen)\n");
+			printf("	  -v (Show Version Number)\n");
+			printf("	  -r (Enable Recv.log)\n");
+			printf
+			    ("	  -d 1-10 (Enable Debuging output 1= lowest, 10 = highest)\n");
+			printf
+			    ("	  -n (Do not load any modules on startup)\n");
+			printf
+			    ("	  -q (Quiet Start - For Cron Scripts)\n");
+			printf
+			    ("          -f (Do NOt fork into BackGround\n");
+			exit(1);
+		case 'v':
+			printf("NeoStats Version %d.%d.%d%s\n", MAJOR,
+			       MINOR, REV, version);
+			printf("Compiled: %s at %s\n", version_date,
+			       version_time);
+			printf
+			    ("Flag after version number indicates what IRCd NeoStats is compiled for:\n");
+			printf("(U)  - Unreal IRCd\n");
+			printf("(UL3)- Ultimate 3.x.x IRCd\n");
+			printf
+			    ("(UL) - Ultimate 2.x.x IRCd (Depriciated)\n");
+			printf("(H)  - Hybrid 7.x IRCd\n");
+			printf("(N)  - NeoIRCd IRCd\n");
+			printf("\nNeoStats: http://www.neostats.net\n");
+			exit(1);
+		case 'r':
+			printf("Recv.log enabled. Watch your DiskSpace\n");
+			config.recvlog = 1;
+			break;
+		case 'n':
+			config.modnoload = 1;
+			break;
+		case 'q':
+			config.quiet = 1;
+			break;
+		case 'd':
+			dbg = atoi(optarg);
+			if ((dbg > 10) || (dbg < 1)) {
+				printf("Invalid Debug Level %d\n", dbg);
 				exit(1);
-			case 'v':
-				printf("NeoStats Version %d.%d.%d%s\n", MAJOR, MINOR, REV, version);
-				printf("Compiled: %s at %s\n", version_date, version_time);
-				printf("Flag after version number indicates what IRCd NeoStats is compiled for:\n");
-				printf("(U)  - Unreal IRCd\n");
-				printf("(UL3)- Ultimate 3.x.x IRCd\n");
-				printf("(UL) - Ultimate 2.x.x IRCd (Depriciated)\n");
-				printf("(H)  - Hybrid 7.x IRCd\n");
-				printf("(N)  - NeoIRCd IRCd\n");
-				printf("\nNeoStats: http://www.neostats.net\n");
-				exit(1);
-			case 'r':
-				printf("Recv.log enabled. Watch your DiskSpace\n");
-				config.recvlog = 1;
-				break;
-			case 'n':
-				config.modnoload = 1;
-				break;
-			case 'q':
-				config.quiet = 1;
-				break;
-			case 'd':
-				dbg = atoi(optarg);
-				if ((dbg > 10) || (dbg < 1)) {
-					printf("Invalid Debug Level %d\n", dbg);
-					exit(1);
-				}
-				config.debug = dbg;
-				break;
-			case 'f':
-				config.foreground = 1;
-				break;
-			default:
-				printf("Unknown Commandline switch %c\n", optopt);
+			}
+			config.debug = dbg;
+			break;
+		case 'f':
+			config.foreground = 1;
+			break;
+		default:
+			printf("Unknown Commandline switch %c\n", optopt);
 		}
-	}  
-	
+	}
+
 
 }
 
@@ -279,11 +299,13 @@ void get_options(int argc, char **argv) {
  *
  * @todo Do a nice shutdown, no thtis crap :)
  */
-RETSIGTYPE serv_die() {
+RETSIGTYPE serv_die()
+{
 	User *u;
 	u = finduser(s_Services);
-	nlog(LOG_CRITICAL, LOG_CORE, "Sigterm Recieved, Shuting Down Server!!!!");
-	ns_shutdown(u,"SigTerm Recieved");
+	nlog(LOG_CRITICAL, LOG_CORE,
+	     "Sigterm Recieved, Shuting Down Server!!!!");
+	ns_shutdown(u, "SigTerm Recieved");
 	ssquit_cmd(me.name);
 
 }
@@ -297,7 +319,8 @@ RETSIGTYPE serv_die() {
  *
  * @todo Implement a Rehash function. What can we actually rehash?
  */
-RETSIGTYPE conf_rehash() {
+RETSIGTYPE conf_rehash()
+{
 /*	struct sigaction act; */
 	chanalert(s_Services, "Recieved SIGHUP, Attempting to Rehash");
 	globops(me.name, "Received SIGHUP, Attempted to Rehash");
@@ -328,36 +351,51 @@ RETSIGTYPE conf_rehash() {
  *
  */
 
-RETSIGTYPE serv_segv() {
+RETSIGTYPE serv_segv()
+{
 	char name[30];
 #ifdef HAVE_BACKTRACE
- 	void *array[50];
-     	size_t size;
-        char **strings;
-        size_t i;
+	void *array[50];
+	size_t size;
+	char **strings;
+	size_t i;
 /* thanks to gnulibc libary for letting me find this usefull function */
-	size = backtrace (array, 10);
-	strings = backtrace_symbols (array, size);
+	size = backtrace(array, 10);
+	strings = backtrace_symbols(array, size);
 #endif
 	/** if the segv happened while we were inside a module, unload and try to restore 
 	 *  the stack to where we were before we jumped into the module
 	 *  and continue on
 	 */
 	if (strlen(segvinmodule) > 1) {
-		globops(me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
-		chanalert(s_Services, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
-		nlog(LOG_CRITICAL, LOG_CORE, "Uh Oh, Segmentation Fault in Modules Code %s", segvinmodule);
-		nlog(LOG_CRITICAL, LOG_CORE, "Location could be %s", segv_location);
-		nlog(LOG_CRITICAL, LOG_CORE, "Unloading Module and restoring stacks. Doing Backtrace:");
-		chanalert(s_Services, "Location *could* be %s. Doing Backtrace:", segv_location);
+		globops(me.name,
+			"Oh Damn, Module %s Segv'd, Unloading Module",
+			segvinmodule);
+		chanalert(s_Services,
+			  "Oh Damn, Module %s Segv'd, Unloading Module",
+			  segvinmodule);
+		nlog(LOG_CRITICAL, LOG_CORE,
+		     "Uh Oh, Segmentation Fault in Modules Code %s",
+		     segvinmodule);
+		nlog(LOG_CRITICAL, LOG_CORE, "Location could be %s",
+		     segv_location);
+		nlog(LOG_CRITICAL, LOG_CORE,
+		     "Unloading Module and restoring stacks. Doing Backtrace:");
+		chanalert(s_Services,
+			  "Location *could* be %s. Doing Backtrace:",
+			  segv_location);
 #ifdef HAVE_BACKTRACE
 		for (i = 1; i < size; i++) {
-			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
-			nlog(LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s", i-1, strings[i]);
+			chanalert(s_Services, "Backtrace(%d): %s", i,
+				  strings[i]);
+			nlog(LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s",
+			     i - 1, strings[i]);
 		}
-#else 
-		chanalert(s_Services, "Backtrace not available on this platform");
-		nlog(LOG_CRITICAL, LOG_CORE, "Backtrace not available on this platform");
+#else
+		chanalert(s_Services,
+			  "Backtrace not available on this platform");
+		nlog(LOG_CRITICAL, LOG_CORE,
+		     "Backtrace not available on this platform");
 #endif
 		strcpy(name, segvinmodule);
 		strcpy(segvinmodule, "");
@@ -368,23 +406,35 @@ RETSIGTYPE serv_segv() {
 #ifdef HAVE_BACKTRACE
 		free(strings);
 #endif
-	} else {	
+	} else {
 		/** The segv happened in our core, damn it */
 		/* Thanks to Stskeeps and Unreal for this stuff :) */
-		nlog(LOG_CRITICAL, LOG_CORE, "Uh Oh, Segmentation Fault.. Server Terminating");
-		nlog(LOG_CRITICAL, LOG_CORE, "Details: Buffer: %s", recbuf);
-		nlog(LOG_CRITICAL, LOG_CORE, "Approx Location: %s Backtrace:", segv_location);
+		nlog(LOG_CRITICAL, LOG_CORE,
+		     "Uh Oh, Segmentation Fault.. Server Terminating");
+		nlog(LOG_CRITICAL, LOG_CORE, "Details: Buffer: %s",
+		     recbuf);
+		nlog(LOG_CRITICAL, LOG_CORE,
+		     "Approx Location: %s Backtrace:", segv_location);
 		/* Broadcast it out! */
-		globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
-		chanalert(s_Services, "Damn IT, Server Terminating (%d%d%d%s), Segmentation Fault. Buffer: %s, Approx Location: %s Backtrace:", MAJOR, MINOR, REV, version, recbuf, segv_location);
+		globops(me.name,
+			"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s",
+			recbuf, segv_location);
+		chanalert(s_Services,
+			  "Damn IT, Server Terminating (%d%d%d%s), Segmentation Fault. Buffer: %s, Approx Location: %s Backtrace:",
+			  MAJOR, MINOR, REV, version, recbuf,
+			  segv_location);
 #ifdef HAVE_BACKTRACE
 		for (i = 1; i < size; i++) {
-			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
-			nlog(LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s", i-1, strings[i]);
+			chanalert(s_Services, "Backtrace(%d): %s", i,
+				  strings[i]);
+			nlog(LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s",
+			     i - 1, strings[i]);
 		}
-#else 
-		chanalert(s_Services, "Backtrace not available on this platform");
-		nlog(LOG_CRITICAL, LOG_CORE, "Backtrace not available on this platform");
+#else
+		chanalert(s_Services,
+			  "Backtrace not available on this platform");
+		nlog(LOG_CRITICAL, LOG_CORE,
+		     "Backtrace not available on this platform");
 #endif
 		sleep(2);
 		kill(forked, 3);
@@ -403,38 +453,38 @@ RETSIGTYPE serv_segv() {
  * @return Nothing
  *
  */
-static	void	setup_signals()
+static void setup_signals()
 {
-	struct	sigaction act;
+	struct sigaction act;
 	act.sa_handler = SIG_IGN;
 	act.sa_flags = 0;
-	(void)sigemptyset(&act.sa_mask);
-	(void)sigaddset(&act.sa_mask, SIGPIPE);
-	(void)sigaddset(&act.sa_mask, SIGALRM);
-	(void)sigaction(SIGPIPE, &act, NULL);
-	(void)sigaction(SIGALRM, &act, NULL);
+	(void) sigemptyset(&act.sa_mask);
+	(void) sigaddset(&act.sa_mask, SIGPIPE);
+	(void) sigaddset(&act.sa_mask, SIGALRM);
+	(void) sigaction(SIGPIPE, &act, NULL);
+	(void) sigaction(SIGALRM, &act, NULL);
 
 	act.sa_handler = conf_rehash;
-	(void)sigemptyset(&act.sa_mask);
-	(void)sigaddset(&act.sa_mask, SIGHUP);
-	(void)sigaction(SIGHUP, &act, NULL);
+	(void) sigemptyset(&act.sa_mask);
+	(void) sigaddset(&act.sa_mask, SIGHUP);
+	(void) sigaction(SIGHUP, &act, NULL);
 
 	act.sa_handler = serv_die;
-	(void)sigaddset(&act.sa_mask, SIGTERM);
-	(void)sigaction(SIGTERM, &act, NULL);
-	(void)sigaddset(&act.sa_mask, SIGINT);
-	(void)sigaction(SIGINT, &act, NULL);
-	
+	(void) sigaddset(&act.sa_mask, SIGTERM);
+	(void) sigaction(SIGTERM, &act, NULL);
+	(void) sigaddset(&act.sa_mask, SIGINT);
+	(void) sigaction(SIGINT, &act, NULL);
+
 /* handling of SIGSEGV as well -sts */
 	act.sa_handler = serv_segv;
-	(void)sigaddset(&act.sa_mask, SIGSEGV);
-	(void)sigaction(SIGSEGV, &act, NULL);
+	(void) sigaddset(&act.sa_mask, SIGSEGV);
+	(void) sigaction(SIGSEGV, &act, NULL);
 
 
-	(void)signal(SIGHUP, conf_rehash);
-	(void)signal(SIGTERM, serv_die); 
-	(void)signal(SIGSEGV, serv_segv);
-	(void)signal(SIGINT, serv_die);
+	(void) signal(SIGHUP, conf_rehash);
+	(void) signal(SIGTERM, serv_die);
+	(void) signal(SIGSEGV, serv_segv);
+	(void) signal(SIGINT, serv_die);
 }
 
 /** @brief Connects to IRC and starts the main loop
@@ -453,35 +503,41 @@ void start()
 	Module *mod_ptr = NULL;
 	hscan_t ms;
 	hnode_t *mn;
-	
+
 	strcpy(segv_location, "start");
 
-	
-	nlog(LOG_NOTICE, LOG_CORE, "Connecting to %s:%d", me.uplink, me.port);
+
+	nlog(LOG_NOTICE, LOG_CORE, "Connecting to %s:%d", me.uplink,
+	     me.port);
 	if (servsock > 0)
 		close(servsock);
 
 	servsock = ConnectTo(me.uplink, me.port);
-	
+
 	if (servsock <= 0) {
-		nlog(LOG_WARNING, LOG_CORE, "Unable to connect to %s", me.uplink);
+		nlog(LOG_WARNING, LOG_CORE, "Unable to connect to %s",
+		     me.uplink);
 	} else {
-		attempts=0;
+		attempts = 0;
 		login();
 		read_loop();
 	}
-	nlog(LOG_NOTICE, LOG_CORE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
+	nlog(LOG_NOTICE, LOG_CORE,
+	     "Reconnecting to the server in %d seconds (Attempt %i)",
+	     me.r_time, attempts);
 	close(servsock);
 
 	/* Unload the Modules */
 	hash_scan_begin(&ms, mh);
 	while ((mn = hash_scan_next(&ms)) != NULL) {
 		mod_ptr = hnode_get(mn);
-		unload_module(mod_ptr->info->module_name, finduser(s_Services));
+		unload_module(mod_ptr->info->module_name,
+			      finduser(s_Services));
 	}
 	sleep(5);
 	do_exit(2);
 }
+
 /** @brief Login to IRC
  *
  * Calls the IRC specific function slogin_cmd to login as a server to IRC
@@ -491,7 +547,7 @@ void start()
  */
 
 void login()
-	{
+{
 	strcpy(segv_location, "login");
 	slogin_cmd(me.name, 1, me.infoline, me.pass);
 	sprotocol_cmd("TOKEN CLIENT");
@@ -512,10 +568,11 @@ void login()
 void *smalloc(long size)
 {
 	void *buf;
-	
+
 	strcpy(segv_location, "smalloc");
 	if (!size) {
-		nlog(LOG_WARNING, LOG_CORE, "smalloc(): illegal attempt to allocate 0 bytes!");
+		nlog(LOG_WARNING, LOG_CORE,
+		     "smalloc(): illegal attempt to allocate 0 bytes!");
 		size = 1;
 	}
 	buf = malloc(size);
@@ -525,6 +582,7 @@ void *smalloc(long size)
 	}
 	return buf;
 }
+
 /** @brief Duplicate a string
  *
  * make a copy of a string, with memory allocated for the new string
@@ -546,6 +604,7 @@ char *sstrdup(const char *s)
 	}
 	return t;
 }
+
 /** @brief Create a HASH from a string
  *
  * Makes a hash of a string for a table
@@ -563,12 +622,12 @@ char *sstrdup(const char *s)
 unsigned long HASH(const unsigned char *name, int size_of_table)
 {
 	unsigned long h = 0, g;
-	
+
 	while (*name) {
 		h = (h << 4) + *name++;
-			if ((g = h & 0xF0000000))
-				h ^= g >> 24;
-			h &= ~g;
+		if ((g = h & 0xF0000000))
+			h ^= g >> 24;
+		h &= ~g;
 	}
 	return h % size_of_table;
 }
@@ -589,10 +648,11 @@ char *strlower(char *s)
 	t = malloc(strlen(s));
 	strncpy(t, s, strlen(s));
 	while (*t) {
-		*t++ = tolower (*t);
+		*t++ = tolower(*t);
 	}
-return t;
+	return t;
 }
+
 /** @brief Adds a string to a array of strings
  *
  * used for the event functions, adds a string to a array of string pointers to pass to modules
@@ -605,14 +665,15 @@ return t;
  *
  */
 
-void AddStringToList(char ***List,char S[],int *C)
+void AddStringToList(char ***List, char S[], int *C)
 {
 	if (*C == 0) {
-		*List = calloc(sizeof(char *)*8, 1);
-	} 
+		*List = calloc(sizeof(char *) * 8, 1);
+	}
 	++*C;
-	(*List)[*C-1] = S;
+	(*List)[*C - 1] = S;
 }
+
 /** @brief Frees a list created with AddStringToList
  *
  * Frees the memory used for a string array used with AddStringToList
@@ -623,12 +684,12 @@ void AddStringToList(char ***List,char S[],int *C)
  * @returns Nothing
  *
  */
-void FreeList(char **List,int C)
+void FreeList(char **List, int C)
 {
-int i;
-for (i = 0; i== C; i++) 
-	free(List[i]); 
-C = 0; 
+	int i;
+	for (i = 0; i == C; i++)
+		free(List[i]);
+	C = 0;
 }
 
 /** @brief before exiting call this function. It flushes log files and tidy's up.
@@ -637,20 +698,24 @@ C = 0;
  *  @parm segv 1 = we are exiting because of a segv fault, 0, we are not.
  *  if 1, we don't prompt to save data
  */
-void do_exit(int segv) {
+void do_exit(int segv)
+{
 	switch (segv) {
 	case 0:
-		nlog(LOG_CRITICAL, LOG_CORE, "Normal shut down SubSystems");
+		nlog(LOG_CRITICAL, LOG_CORE,
+		     "Normal shut down SubSystems");
 		break;
 	case 2:
-		nlog(LOG_CRITICAL, LOG_CORE, "Restarting NeoStats SubSystems");
+		nlog(LOG_CRITICAL, LOG_CORE,
+		     "Restarting NeoStats SubSystems");
 		break;
 	case 1:
-		nlog(LOG_CRITICAL, LOG_CORE, "Shutting Down SubSystems without saving data due to core");
+		nlog(LOG_CRITICAL, LOG_CORE,
+		     "Shutting Down SubSystems without saving data due to core");
 		break;
 	}
 	close_logs();
-	
+
 	if (segv == 1) {
 		exit(-1);
 	} else if (segv == 2) {

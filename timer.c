@@ -20,9 +20,9 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: timer.c,v 1.23 2003/05/26 09:18:29 fishwaldo Exp $
+** $Id: timer.c,v 1.24 2003/06/13 13:11:49 fishwaldo Exp $
 */
- 
+
 #include "stats.h"
 #include "dl.h"
 #include "log.h"
@@ -44,15 +44,17 @@ void chk()
 /* First, lets see if any modules have a function that is due to run..... */
 	hash_scan_begin(&ts, th);
 	while ((tn = hash_scan_next(&ts)) != NULL) {
-		mod_ptr = hnode_get(tn); 
+		mod_ptr = hnode_get(tn);
 		if (current - mod_ptr->lastrun > mod_ptr->interval) {
 			strcpy(segv_location, mod_ptr->modname);
 			strcpy(segvinmodule, mod_ptr->modname);
 			if (setjmp(sigvbuf) == 0) {
 				mod_ptr->function();
-				mod_ptr->lastrun = (int)time(NULL);
+				mod_ptr->lastrun = (int) time(NULL);
 			} else {
-				nlog(LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", mod_ptr->modname);
+				nlog(LOG_CRITICAL, LOG_CORE,
+				     "setjmp() Failed, Can't call Module %s\n",
+				     mod_ptr->modname);
 			}
 			strcpy(segvinmodule, "");
 			strcpy(segv_location, "Module_Event_Return");
@@ -63,19 +65,23 @@ void chk()
 		TimerPings();
 		ping.last_sent = time(NULL);
 		if (hash_verify(sockh) == 0) {
-			nlog(LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the socket hash");
+			nlog(LOG_CRITICAL, LOG_CORE,
+			     "Eeeek, Corruption of the socket hash");
 		}
 		if (hash_verify(mh) == 0) {
-			nlog(LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Module hash");
+			nlog(LOG_CRITICAL, LOG_CORE,
+			     "Eeeek, Corruption of the Module hash");
 		}
 		if (hash_verify(bh) == 0) {
-			nlog(LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Bot hash");
+			nlog(LOG_CRITICAL, LOG_CORE,
+			     "Eeeek, Corruption of the Bot hash");
 		}
 		if (hash_verify(th) == 0) {
-			nlog(LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Timer hash");
+			nlog(LOG_CRITICAL, LOG_CORE,
+			     "Eeeek, Corruption of the Timer hash");
 		}
 		/* flush log files */
-		fflush(NULL);	
+		fflush(NULL);
 	}
 	if (is_midnight() == 1 && midnight == 0) {
 		TimerMidnight();
@@ -83,7 +89,7 @@ void chk()
 	} else {
 		if (midnight == 1 && is_midnight() == 0)
 			midnight = 0;
-	} 
+	}
 }
 
 void TimerReset()
@@ -100,7 +106,8 @@ void TimerReset()
 
 void TimerMidnight()
 {
-	nlog(LOG_DEBUG1, LOG_CORE, "Its midnight!!! -> %s", sctime(time(NULL)));
+	nlog(LOG_DEBUG1, LOG_CORE, "Its midnight!!! -> %s",
+	     sctime(time(NULL)));
 	ResetLogs();
 }
 
@@ -112,5 +119,5 @@ int is_midnight()
 	if (ltm->tm_hour == 0)
 		return 1;
 
-	return 0;	
+	return 0;
 }

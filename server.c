@@ -22,11 +22,11 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: server.c,v 1.18 2003/06/08 05:59:25 fishwaldo Exp $
+** $Id: server.c,v 1.19 2003/06/13 13:11:49 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
- 
+
 #include "stats.h"
 #include "hash.h"
 #include "log.h"
@@ -35,7 +35,8 @@ int fnmatch(const char *, const char *, int flags);
 Server *new_server(char *);
 
 
-void init_server() {
+void init_server()
+{
 	if (usr_mds);
 }
 
@@ -53,14 +54,15 @@ Server *new_server(char *name)
 		nlog(LOG_WARNING, LOG_CORE, "Eeek, Hash is broken\n");
 	}
 	if (hash_isfull(sh)) {
-		nlog(LOG_WARNING, LOG_CORE, "Eeek, Server Hash is full!\n");
+		nlog(LOG_WARNING, LOG_CORE,
+		     "Eeek, Server Hash is full!\n");
 	} else {
 		hash_insert(sh, sn, s->name);
 	}
 	return s;
 }
 
-void AddServer(char *name,char *uplink, int hops)
+void AddServer(char *name, char *uplink, int hops)
 {
 	Server *s;
 	char **av;
@@ -73,12 +75,12 @@ void AddServer(char *name,char *uplink, int hops)
 	/* this is kionda useless right ? */
 /*	s->last_announce = time(NULL); */
 	if (uplink) {
-		memcpy(s->uplink,uplink, MAXHOST);
+		memcpy(s->uplink, uplink, MAXHOST);
 	} else {
 		strcpy(s->uplink, "\0");
 	}
 	s->ping = 0;
-	
+
 	/* run the module event for a new server. */
 	AddStringToList(&av, s->name, &ac);
 	Module_Event("NEWSERVER", av, ac);
@@ -98,7 +100,8 @@ void DelServer(char *name)
 	}
 	sn = hash_lookup(sh, name);
 	if (!sn) {
-		nlog(LOG_DEBUG1, LOG_CORE, "DelServer(): %s not found!", name);
+		nlog(LOG_DEBUG1, LOG_CORE, "DelServer(): %s not found!",
+		     name);
 		return;
 	}
 	s = hnode_get(sn);
@@ -107,7 +110,7 @@ void DelServer(char *name)
 	AddStringToList(&av, s->name, &ac);
 	Module_Event("DELSERVER", av, ac);
 	free(av);
-	
+
 	hash_delete(sh, sn);
 	hnode_destroy(sn);
 	free(s);
@@ -123,9 +126,10 @@ Server *findserver(const char *name)
 		s = hnode_get(sn);
 		return s;
 	} else {
-		nlog(LOG_DEBUG2, LOG_CORE, "FindServer(): %s not found!", name);
+		nlog(LOG_DEBUG2, LOG_CORE, "FindServer(): %s not found!",
+		     name);
 		return NULL;
-	}	
+	}
 }
 
 void ServerDump()
@@ -146,12 +150,13 @@ void ServerDump()
 
 void init_server_hash()
 {
-	sh = hash_create(S_TABLE_SIZE, 0, 0);	
+	sh = hash_create(S_TABLE_SIZE, 0, 0);
 	if (!sh) {
-		nlog(LOG_CRITICAL, LOG_CORE, "Create Server Hash Failed\n");
+		nlog(LOG_CRITICAL, LOG_CORE,
+		     "Create Server Hash Failed\n");
 		do_exit(1);
 	}
-	AddServer(me.name,NULL, 0);
+	AddServer(me.name, NULL, 0);
 }
 
 void TimerPings()
