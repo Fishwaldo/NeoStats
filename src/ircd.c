@@ -25,11 +25,10 @@
 ** $Id$
 */
 #include <setjmp.h>
-#include "stats.h"
+#include "neostats.h"
 #include "ircd.h"
 #include "dl.h"
 #include "sock.h"
-#include "log.h"
 #include "users.h"
 #include "chans.h"
 #include "services.h"
@@ -47,9 +46,6 @@ static long services_bot_umode= 0;
 
 /* Fully split buffer */
 static char privmsgbuffer[BUFSIZE];
-
-/* Temp flag for backward compatibility in new splitbuf system */
-static int SkipModuleFunction = 0;
 
 static int signon_newbot (const char *nick, const char *user, const char *host, const char *realname, long Umode);
 #ifdef IRCU
@@ -539,13 +535,6 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 #endif
 	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
 	strlcpy (privmsgbuffer, av[ac-1], BUFSIZE);
-	splitargc = split_buf (av[ac-1], &splitargv, 0);
-	argc = 0;
-	AddStringToList (&argv, av[0], &argc);
-	for( i = 0 ; i < splitargc ; i++ ) {
-		AddStringToList (&argv, splitargv[i], &argc);
-	}
-	ModuleFunction (cmdptr, MSG_NOTICE, origin, argv, argc);
 	free (argv);
 	argc = 0;
 	AddStringToList (&argv, origin, &argc);
@@ -557,7 +546,6 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 		ModuleEvent (EVENT_NOTICE, argv, argc);
 	}
 	free (argv);
-	SkipModuleFunction = 1;
 }
 
 /** @brief process privmsg
@@ -658,11 +646,6 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 		nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);
 	}
 #endif
-	/* Send to modules */
-	if(!SkipModuleFunction) {
-		ModuleFunction (cmdptr, cmd, origin, av, ac);
-	}
-	SkipModuleFunction = 0;
 }
 
 /** @brief parse

@@ -25,9 +25,8 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 #include "dl.h"
-#include "log.h"
 #include "sock.h"
 #include "ns_help.h"
 #include "users.h"

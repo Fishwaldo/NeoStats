@@ -29,7 +29,6 @@
 #include <arpa/inet.h>
 
 #include "statserv.h"
-#include "log.h"
 #include "GeoIP.h"
 #include "GeoIPCity.h"
 

@@ -21,12 +21,10 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 #include "ircd.h"
 #include "sock.h"
-#include "Ircu.h"
-#include "dl.h"
-#include "log.h"
+#include "ircu.h"
 #include "users.h"
 #include "server.h"
 #include "chans.h"

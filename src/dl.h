@@ -35,14 +35,14 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/poll.h>
-#include "stats.h"
+#include "neostats.h"
 #include "hash.h"
 
 /* 
  * NeoStats core API version.
  * A module should check this when loaded to ensure compatibility
  */
-#define API_VER 2
+#define API_VER 3
 
 /* 
  *   Ensure RTLD flags correctly defined
@@ -198,14 +198,9 @@ typedef int (*mod_auth) (User * u);
  */
 typedef struct Module {
 	ModuleInfo *info;
-	Functions *function_list;
 	EventFnList *event_list;
 	mod_auth mod_auth_cb;
 	void *dl_handle;
-	/* temp flag to distinguish new style module API which allows 
-	 * us access to additional information from the core.
-	 */
-	int	isnewstyle;
 }Module;
 
 /* @brief Module Socket List hash
@@ -218,7 +213,6 @@ extern hash_t *sockh;
  */
 int InitModuleHash (void);
 void ModuleEvent (char * event, char **av, int ac);
-void ModuleFunction (int cmdptr, char *cmd, char* origin, char **av, int ac);
 int load_module (char *path, User * u);
 int unload_module (char *module_name, User * u);
 int list_modules (User * u, char **av, int ac);
@@ -267,12 +261,9 @@ int __ModInit(int modnum, int apiver);
 void __ModFini(void);
 int ModuleAuth (User * u);
 int __BotMessage(char *origin, char **av, int ac);
-/* temp define while rename propogates */
-#define __Bot_Message __BotMessage
 int __ChanMessage(char *origin, char **argv, int argc);
 
 extern ModuleInfo		__module_info;   
-extern Functions		__module_functions[];
 extern EventFnList		__module_events[];  
 
 void *ns_dlsym (void *handle, const char *name);

@@ -21,8 +21,7 @@
 ** $Id$
 */
 
-#include "stats.h"
-#include "log.h"
+#include "neostats.h"
 
 #ifdef USE_BERKELEY
 #include <db.h>

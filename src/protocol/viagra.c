@@ -23,15 +23,9 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 #include "ircd.h"
-#include "sock.h"
-#include "Viagra.h"
-#include "dl.h"
-#include "log.h"
-#include "server.h"
-#include "chans.h"
-#include "users.h"
+#include "viagra.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);

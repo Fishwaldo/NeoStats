@@ -25,7 +25,7 @@
  */
 
 #include <stdio.h>
-#include "stats.h"
+#include "neostats.h"
 
 #ifndef HAVE_STRNLEN
 /* @brief find length of string up to count max

@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 #include "ircd.h"
 #include "Bahamut.h"
 

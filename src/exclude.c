@@ -25,10 +25,9 @@
  */
 
 #include <stdio.h>
-#include "stats.h"
+#include "neostats.h"
 #include "exclude.h"
 #include "conf.h"
-#include "log.h"
 #include "ircstring.h"
 
 list_t *exclude_list;

@@ -31,8 +31,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "stats.h"
-#include "log.h"
+#include "neostats.h"
 #include "adns.h"
 #include "dns.h"
 

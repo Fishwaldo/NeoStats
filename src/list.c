@@ -47,8 +47,8 @@
 #include <string.h>
 #include <assert.h>
 #define LIST_IMPLEMENTATION
+#include "neostats.h"
 #include "list.h"
-#include "log.h"
 
 #define next list_next
 #define prev list_prev

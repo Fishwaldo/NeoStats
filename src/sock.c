@@ -31,11 +31,10 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
                      
-#include "stats.h"
+#include "neostats.h"
 #include "dl.h"
 #include "adns.h"
 #include "conf.h"
-#include "log.h"
 #include "timer.h"
 #include "dns.h"
 #include "transfer.h"

@@ -23,9 +23,8 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 #include "dl.h"
-#include "log.h"
 #include "conf.h"
 #include "server.h"
 

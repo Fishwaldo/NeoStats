@@ -25,10 +25,9 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 #include "dl.h"
 #include "hash.h"
-#include "log.h"
 #include "ircd.h"
 #include "exclude.h"
 #ifdef SQLSRV

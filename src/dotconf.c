@@ -51,7 +51,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "stats.h"
+#include "neostats.h"
 #include "dotconf.h"
 #include "support.h"
 #include "ircstring.h"

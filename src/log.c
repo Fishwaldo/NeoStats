@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 #include "conf.h"
 #include "hash.h"
 #include "log.h"

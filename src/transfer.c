@@ -25,8 +25,7 @@
  */
 
 #include <stdio.h>
-#include "stats.h"
-#include "log.h"
+#include "neostats.h"
 #include "transfer.h"
 #include "curl.h"
 

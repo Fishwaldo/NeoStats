@@ -25,7 +25,7 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 
 const char ns_help_oneline[]="Provides Help on Commands";
 const char ns_help_level_oneline[]="Show permission level for NeoStats.";

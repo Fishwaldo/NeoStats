@@ -50,7 +50,7 @@
 #include <ctype.h>
 #define HASH_IMPLEMENTATION
 #include "hash.h"
-#include "log.h"
+#include "neostats.h"
 #include "ircstring.h"
 
 #ifdef KAZLIB_RCSID

@@ -23,7 +23,7 @@
 
 #ifndef _TRANSFER_H_
 #define _TRANSFER_H_
-#include "stats.h"
+#include "neostats.h"
 #include "curl.h"
 #include "list.h"
 

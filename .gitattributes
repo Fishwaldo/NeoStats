@@ -329,7 +329,6 @@ src/sqlsrv/rta.h -text
 src/sqlsrv/rtatables.c -text
 src/sqlsrv/token.c -text
 src/sqlsrv/token.l -text
-src/stats.h eol=lf
 src/support.c eol=lf
 src/support.h eol=lf
 src/timer.c eol=lf

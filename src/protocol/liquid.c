@@ -23,10 +23,9 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 #include "ircd.h"
-#include "liquidircd.h"
-#include "log.h"
+#include "liquid.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);

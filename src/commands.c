@@ -22,9 +22,8 @@
 */
 
 #include <arpa/inet.h> 
-#include "stats.h"
+#include "neostats.h"
 #include "dl.h"
-#include "log.h"
 #include "conf.h"
 
 static int bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac);

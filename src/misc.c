@@ -26,8 +26,7 @@
 */
 
 #include <stdio.h>
-#include "stats.h"
-#include "log.h"
+#include "neostats.h"
 
 static char misc_buf[BUFSIZE];
 

@@ -21,9 +21,7 @@
 ** $Id$
 */
 
-#include "stats.h"
-#include "log.h"
-#include "dl.h"
+#include "neostats.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif

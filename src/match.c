@@ -20,7 +20,7 @@
  *
  */
 
-#include "stats.h"
+#include "neostats.h"
 #include "ircstring.h"
 
 /* match()

@@ -23,10 +23,9 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 #include "keeper.h"
 #include "conf.h"
-#include "log.h"
 
 /** @brief Gets Config Data of Type
  */

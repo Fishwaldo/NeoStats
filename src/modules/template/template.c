@@ -46,20 +46,6 @@ ModuleInfo __module_info = {
 	__TIME__
 };
 
-/** Module function list
- *  A list of IRCd (server) commands that we will respond to
-******************************** WARNING ********************************
-This table is optional but depreciated. You should respond to module 
-events to be portable across all ircds and only use this table as a
-last resort if a module event is not available. This table will be 
-removed from operation in a future release. If you need to use this 
-table for anything, tell us so we can add an appropiate event handler.
-******************************** WARNING ********************************
- */
-Functions __module_functions[] = {
-	{NULL, NULL, 0}
-};
-
 /** Channel message processing
  *  What do we do with messages in channels
  *  This is required if you want your module to respond to channel messages

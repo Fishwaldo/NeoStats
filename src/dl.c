@@ -30,11 +30,10 @@
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "stats.h"
+#include "neostats.h"
 #include "dl.h"
 #include "hash.h"
 #include "config.h"
-#include "log.h"
 #include "dns.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
@@ -85,25 +84,15 @@ void *display_module_desc (void *tbl, char *col, char *sql, void *row) {
 void *display_module_version (void *tbl, char *col, char *sql, void *row) {
 	Module *mod_ptr = row;
 	
-	if (mod_ptr->isnewstyle == 1) {
-		strlcpy(sqlbuf, mod_ptr->info->module_version, BUFSIZE);
-		return sqlbuf;
-	} else {
-		bzero(sqlbuf, BUFSIZE);
-		return sqlbuf;
-	}
+	strlcpy(sqlbuf, mod_ptr->info->module_version, BUFSIZE);
+	return sqlbuf;
 }
 
 void *display_module_builddate (void *tbl, char *col, char *sql, void *row) {
 	Module *mod_ptr = row;
 	
-	if (mod_ptr->isnewstyle == 1) {
-		ircsnprintf(sqlbuf, BUFSIZE, "%s - %s", mod_ptr->info->module_build_date, mod_ptr->info->module_build_time);
-		return sqlbuf;
-	} else {
-		bzero(sqlbuf, BUFSIZE);
-		return sqlbuf;
-	}
+	ircsnprintf(sqlbuf, BUFSIZE, "%s - %s", mod_ptr->info->module_build_date, mod_ptr->info->module_build_time);
+	return sqlbuf;
 }
 
 void *display_core_info (void *tbl, char *col, char *sql, void *row) {
@@ -1234,47 +1223,6 @@ ModuleEvent (char *event, char **av, int ac)
  * @return none
  */
 void
-ModuleFunction (int cmdptr, char *cmd, char* origin, char **av, int ac)
-{
-	Module *module_ptr;
-	Functions *fn_list;
-	hscan_t ms;
-	hnode_t *mn;
-
-	SET_SEGV_LOCATION();
-	hash_scan_begin (&ms, mh);
-	while ((mn = hash_scan_next (&ms)) != NULL) {
-		module_ptr = hnode_get (mn);
-		fn_list = module_ptr->function_list;
-		if(fn_list) {
-			while (fn_list->cmd_name != NULL) {
-				/* This goes through each Command */
-				if (fn_list->srvmsg == cmdptr) {
-					if (!strcmp (fn_list->cmd_name, cmd)) {
-						nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
-						SET_SEGV_LOCATION();
-						if (setjmp (sigvbuf) == 0) {
-							SET_SEGV_INMODULE(module_ptr->info->module_name);
-							fn_list->function (origin, av, ac);
-							CLEAR_SEGV_INMODULE();
-						}
-						SET_SEGV_LOCATION();
-						break;
-					}
-				}
-				fn_list++;
-			}
-		}
-	}
-}
-
-/** @brief 
- *
- * 
- *
- * @return none
- */
-void
 ModulesVersion (const char* nick, const char *remoteserver)
 {
 	Module *module_ptr;
@@ -1285,12 +1233,10 @@ ModulesVersion (const char* nick, const char *remoteserver)
 	hash_scan_begin (&ms, mh);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
-		if(module_ptr->isnewstyle && module_ptr->function_list == NULL) {
-			numeric(RPL_VERSION, nick,
-				"Module %s version: %s %s %s",
-				module_ptr->info->module_name, module_ptr->info->module_version, 
-				module_ptr->info->module_build_date, module_ptr->info->module_build_time);
-		}
+		numeric(RPL_VERSION, nick,
+			"Module %s version: %s %s %s",
+			module_ptr->info->module_name, module_ptr->info->module_version, 
+			module_ptr->info->module_build_date, module_ptr->info->module_build_time);
 	}
 }
 
@@ -1315,9 +1261,7 @@ load_module (char *modfilename, User * u)
 	char **av;
 	int ac = 0;
 	int i = 0;
-	int isnewstyle = 1;
 	ModuleInfo *mod_info_ptr = NULL;
-	Functions *mod_funcs_ptr = NULL;
 	EventFnList *event_fn_ptr = NULL;
 	Module *mod_ptr = NULL;
 	hnode_t *mn;
@@ -1357,7 +1301,6 @@ load_module (char *modfilename, User * u)
 		return NS_FAILURE;
 	}
 
-	mod_funcs_ptr = ns_dlsym (dl_handle, "__module_functions");
 	event_fn_ptr = ns_dlsym (dl_handle, "__module_events");
 
 	/* Check that the Module hasn't already been loaded */
@@ -1386,10 +1329,8 @@ load_module (char *modfilename, User * u)
 	nlog (LOG_DEBUG1, LOG_CORE, "Module description: %s", mod_info_ptr->module_description);
 
 	mod_ptr->info = mod_info_ptr;
-	mod_ptr->function_list = mod_funcs_ptr;
 	mod_ptr->dl_handle = dl_handle;
 	mod_ptr->event_list = event_fn_ptr;
-	mod_ptr->isnewstyle = isnewstyle;
 
 	/* assign a module number to this module */
 	i = 0;

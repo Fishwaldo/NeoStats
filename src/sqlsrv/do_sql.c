@@ -18,7 +18,6 @@
 #if 0
 #include <syslog.h>
 #endif
-#include "log.h"
 #include "do_sql.h"
 #include "list.h"
 #include "hash.h"

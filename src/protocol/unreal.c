@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 #include "Unreal.h"
 #include "ircd.h"
 

@@ -22,11 +22,10 @@
 ** $Id$
 */
 
-#include "stats.h"
+#include "neostats.h"
 #include "ircd.h"
 #include "dl.h"
 #include "hash.h"
-#include "log.h"
 #include "users.h"
 #include "chans.h"
 #include "exclude.h"
