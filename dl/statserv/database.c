@@ -246,12 +246,12 @@ void LoadStats() {
  
 CStats *load_chan(char *name) {
 	lnode_t *cn;
-	SET_SEGV_LOCATION();
 	char *data;
 
 	CStats *c;
 
 
+	SET_SEGV_LOCATION();
 	c = malloc(sizeof(CStats));
 	strlcpy(c->name, name, CHANLEN);	
 	if (GetData((void *)&data, CFGSTR, "ChanStats", c->name, "ChanData") > 0) {
