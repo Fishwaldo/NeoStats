@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.17 2002/10/15 20:45:25 shmad Exp $
+** $Id: hostserv.c,v 1.18 2002/10/20 16:13:22 shmad Exp $
 */
 
 #include <stdio.h>
@@ -95,6 +95,7 @@ int new_m_version(char *origin, char **av, int ac) {
 /* Routine For Setting the Virtual Host */
 static int hs_sign_on(char **av, int ac) {
     char *tmp = NULL;
+    char *tmp2 = NULL;
         HS_Map *map;
 
         User *u;
@@ -112,9 +113,10 @@ static int hs_sign_on(char **av, int ac) {
 
       for (map = nnickmap; map; map = map->next) {
 	   if (!strcasecmp(map->nnick, u->nick)) {
-          tmp = map->host;
-		  if (fnmatch(strlower(tmp), strlower(u->hostname), 0) == 0) {
-              ssvshost_cmd(u->nick, map->vhost);
+          tmp = strlower(map->host);
+	  tmp2 = strlower(u->hostname);
+		  if (fnmatch(tmp, tmp2, 0) == 0) {
+              ssvshost_cmd(u->nick, map->host);
               return 1;
            }
        }
@@ -334,6 +336,7 @@ void hsamend(char *fmt, ...)
 /* Routine for ADD */
 static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
 
+    char *tmp;
     strcpy(segv_location, "hs_add");
     hsdat(":%s %s %s %s", cmd, m, h, p);
     hslog("%s added a vhost for %s with realhost %s vhost %s and password %s",u->nick, cmd, m, h, p);
@@ -342,7 +345,8 @@ static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
     if (finduser(cmd)) {
           u = finduser(cmd);
           if (findbot(u->nick)) return;
-          if (fnmatch(m, strlower(u->hostname), 0) == 0) {
+          tmp = strlower(u->hostname);
+	  if (fnmatch(m, tmp, 0) == 0) {
               ssvshost_cmd(u->nick, h);
 	    Loadhosts();
               return;

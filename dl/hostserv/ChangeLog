@@ -2,7 +2,8 @@ HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
 
-* Version 2.1 * Shmad * October 15, 2002
+* Version 2.1 * Shmad * October 20, 2002
++ Fixed an issue with fnmatch being a hoe.
 + Added LOGIN support for vhosts.
 + Updated Helpfiles.
 + Updated ADD procedure to use PASSWORD field.
