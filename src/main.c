@@ -410,48 +410,52 @@ void do_backtrace(void)
 	int i;
 
 	fprintf (segfault, "Backtrace:\n");
-	chanalert (ns_botptr->nick, "Backtrace: %s", segv_location);
 	size = backtrace (array, 10);
 	strings = backtrace_symbols (array, size);
 	for (i = 1; i < size; i++) {
-		chanalert (ns_botptr->nick, "Backtrace(%d): %s", i, strings[i]);
 		fprintf (segfault, "BackTrace(%d): %s\n", i - 1, strings[i]);
 	}
 	free (strings);
 #else
-	chanalert (ns_botptr->nick, backtrace_unavailable);
 	fprintf (segfault, backtrace_unavailable);
 #endif
+}
+
+void report_segfault(char* modulename)
+{
+	segfault = fopen ("segfault.log", "a");
+	if(modulename) {
+		globops (me.name, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
+		nlog (LOG_CRITICAL, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
+	} else {
+		globops (me.name, "Segmentation fault. Server terminating. Refer to segfault.log.");
+		nlog (LOG_CRITICAL, "Segmentation fault. Server terminating. Refer to segfault.log.");
+	}
+	fprintf (segfault, "------------------------SEGFAULT REPORT-------------------------\n");
+	fprintf (segfault, "Please view the README for how to submit a bug report\n");
+	fprintf (segfault, "and include this segfault report in your submission.\n");
+	fprintf (segfault, "Version:  %s\n", me.versionfull);
+	if (modulename) {
+		fprintf (segfault, "Module:   %s\n", segv_inmodule);
+	}
+	fprintf (segfault, "Location: %s\n", segv_location);
+	fprintf (segfault, "recbuf:   %s\n", recbuf);
+	chanalert (ns_botptr->nick, "Location *could* be %s.", segv_location);
+	do_backtrace();
+	fprintf (segfault, "-------------------------END OF REPORT--------------------------\n");
+	fflush (segfault);
+	fclose (segfault);		
 }
 
 RETSIGTYPE
 serv_segv ()
 {
-	va_list ap;
 	char name[MAX_MOD_NAME];
-	/** if the segv happened while we were inside a module, unload and try to restore 
-	 *  the stack to where we were before we jumped into the module
-	 *  and continue on
+	/** segv happened inside a module, so unload and try to restore the stack 
+	 *  to location before we jumped into the module and continue
 	 */
-
-	segfault = fopen ("segfault.log", "a");
 	if (segv_inmodule[0] != 0) {
-		globops (me.name, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
-		chanalert (ns_botptr->nick, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
-		nlog (LOG_CRITICAL, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
-		fprintf (segfault, "------------------------SEGFAULT REPORT-------------------------\n");
-		fprintf (segfault, "Please view the README for how to submit a bug report\n");
-		fprintf (segfault, "and include this segfault report in your submission.\n");
-		fprintf (segfault, "Version:  %s\n", me.versionfull);
-		fprintf (segfault, "Module:   %s\n", segv_inmodule);
-		fprintf (segfault, "Location: %s\n", segv_location);
-		fprintf (segfault, "recbuf:   %s\n", recbuf);
-		fprintf (segfault, "Unloading Module and restoring stacks. Backtrace:\n");
-		chanalert (ns_botptr->nick, "Location *could* be %s.", segv_location);
-		do_backtrace();
-		fprintf (segfault, "-------------------------END OF REPORT--------------------------\n");
-		fflush (segfault);
-		fclose (segfault);		
+		report_segfault (segv_inmodule);
 		strlcpy (name, segv_inmodule, MAX_MOD_NAME);
 		CLEAR_SEGV_INMODULE();
 		unload_module (name, NULL);
@@ -462,24 +466,9 @@ serv_segv ()
 		chanalert (ns_botptr->nick, "Done");
 		return;
 	}
-	/** The segv happened in our core, damn it */
-	/* Thanks to Stskeeps and Unreal for this stuff :) */
-	/* Broadcast it out! */
-	globops (me.name, "Segmentation fault. Server terminating. Refer to segfault.log.");
-	chanalert (ns_botptr->nick, "Segmentation fault. Server terminating. Refer to segfault.log.");
-	nlog (LOG_CRITICAL, "Segmentation fault. Server terminating. Refer to segfault.log.");
-	fprintf (segfault, "------------------------SEGFAULT REPORT-------------------------\n");
-	fprintf (segfault, "Please view the README for how to submit a bug report\n");
-	fprintf (segfault, "and include this segfault report in your submission.\n");
-	fprintf (segfault, "Version:  %s\n", me.versionfull);
-	fprintf (segfault, "Location: %s\n", segv_location);
-	fprintf (segfault, "recbuf:   %s\n", recbuf);
-	do_backtrace();
-	fprintf (segfault, "-------------------------END OF REPORT--------------------------\n");
-	fflush (segfault);
-	fclose (segfault);		
+	/** segv happened in our core */
+	report_segfault (NULL);
 	CloseLogs ();
-	/* clean up */
 	do_exit (NS_EXIT_SEGFAULT, NULL);
 }
 
