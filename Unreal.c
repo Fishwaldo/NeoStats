@@ -232,7 +232,7 @@ send_join (const char *who, const char *chan)
 void 
 send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
 {
-	sts (":%s %s %ld %s + :%c%s", me.name, (me.token ? TOK_SJOIN : MSG_SJOIN), (int)tstime, chan, flag, who);
+	sts (":%s %s %ld %s + :%c%s", me.name, (me.token ? TOK_SJOIN : MSG_SJOIN), (long)tstime, chan, flag, who);
 }
 
 void 

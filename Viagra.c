@@ -58,7 +58,6 @@ static void m_svinfo (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 
-static char ircd_buf[BUFSIZE];
 const char ircd_version[] = "(V)";
 const char services_bot_modes[]= "+oS";
 

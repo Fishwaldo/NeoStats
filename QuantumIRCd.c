@@ -212,7 +212,7 @@ send_part (const char *who, const char *chan)
 void 
 send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
 {
-	sts (":%s %s %d %s + :%c%s", me.name, MSG_SJOIN, chan, tstime, flag, who);
+	sts (":%s %s %ld %s + :%c%s", me.name, MSG_SJOIN, chan, (long)tstime, flag, who);
 }
 
 void 
