@@ -231,9 +231,9 @@ send_join (const char *sender, const char *who, const char *chan, const unsigned
 }
 
 void 
-send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
+send_sjoin (const char *sender, const char *who, const char *chan, const unsigned long ts)
 {
-	send_cmd (":%s %s %lu %s + :%c%s", sender, (ircd_srv.token ? TOK_SJOIN : MSG_SJOIN), ts, chan, flag, who);
+	send_cmd (":%s %s %lu %s + :%s", sender, (ircd_srv.token ? TOK_SJOIN : MSG_SJOIN), ts, chan, who);
 }
 
 void 

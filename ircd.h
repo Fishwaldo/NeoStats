@@ -155,7 +155,7 @@ void send_wallops (const char *who, const char *buf);
 void send_numeric (const char *from, const int numeric, const char *target, const char *buf);
 void send_umode (const char *who, const char *target, const char *mode);
 void send_join (const char *sender, const char *who, const char *chan, const unsigned long ts);
-void send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts);
+void send_sjoin (const char *sender, const char *who, const char *chan, const unsigned long ts);
 void send_part (const char *who, const char *chan);
 void send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts);
 void send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts);
