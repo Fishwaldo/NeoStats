@@ -393,6 +393,9 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 */
 #define MAX_MOD_NAME	32
 
+/* Buffer size for reason string */
+#define MAXREASON		128
+
 /* Buffer size for version string */
 #define VERSIONSIZE		128
 

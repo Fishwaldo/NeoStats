@@ -24,8 +24,6 @@
 #ifndef _EXCLUDE_H_
 #define _EXCLUDE_H_
 
-#define MAXREASON		128
-
 typedef struct Exclude {
 	NS_EXCLUDE type;
 	char pattern[MAXHOST];

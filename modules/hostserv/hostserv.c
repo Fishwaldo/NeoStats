@@ -27,7 +27,6 @@
 #include "hostserv.h"
 
 #define PAGESIZE	20
-#define MAXREASON	128
 
 typedef struct vhostentry {
 	char nick[MAXNICK];
