@@ -233,7 +233,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				privmsg_list(u->nick, s_StatServ, ss_myuser_help);
 		} else if (!strcasecmp(av[2], "SERVER"))
 			privmsg_list(u->nick, s_StatServ, ss_server_help);
-		else if (!strcasecmp(av[2], "CHAN") 
+		else if (!strcasecmp(av[2], "CHAN")) 
 			privmsg_list(u->nick, s_StatServ, ss_chan_help);
 		else if (!strcasecmp(av[2], "RESET") && UserLevel(u) >= 190)
 			privmsg_list(u->nick, s_StatServ, ss_reset_help);
