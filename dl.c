@@ -106,7 +106,7 @@ void *display_module_builddate (void *tbl, char *col, char *sql, void *row) {
 }
 
 void *display_core_info (void *tbl, char *col, char *sql, void *row) {
-	ircsnprintf(sqlbuf, BUFSIZE, "%d.%d.%d - %s", MAJOR, MINOR, REV, ircd_version);
+	ircsnprintf(sqlbuf, BUFSIZE, "%s - %s", NEOSTATS_VERSION, ircd_version);
 	return sqlbuf;	
 }
 

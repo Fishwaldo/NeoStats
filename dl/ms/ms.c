@@ -47,9 +47,9 @@ static int ms_behappy(User * u, char **av, int ac);
 static int ms_wonderful(User * u, char **av, int ac);
 
 ModuleInfo __module_info = {
-   "MoraleServ",
-   "A Network Morale Service",
-   "2.22",
+	"MoraleServ",
+	"A Network Morale Service",
+	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__
 };

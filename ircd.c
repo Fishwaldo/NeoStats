@@ -800,7 +800,7 @@ void
 do_version (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
-	numeric (RPL_VERSION, nick, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, ircd_version, me.name, version_date, version_time);
+	numeric (RPL_VERSION, nick, "%s%s :%s -> %s %s", NEOSTATS_VERSION, ircd_version, me.name, version_date, version_time);
 	ModulesVersion (nick, remoteserver);
 }
 
@@ -822,7 +822,7 @@ do_motd (const char* nick, const char *remoteserver)
 		numeric (ERR_NOMOTD, nick, "MOTD File is missing");
 	} else {
 		numeric (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
-		numeric (RPL_MOTD, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
+		numeric (RPL_MOTD, nick, ":- %s%s. Copyright (c) 1999 - 2004 The NeoStats Group", NEOSTATS_VERSION, ircd_version);
 		numeric (RPL_MOTD, nick, ":-");
 
 		if (fp) {
@@ -856,7 +856,7 @@ do_admin (const char* nick, const char *remoteserver)
 		numeric (ERR_NOADMININFO, nick, "%s :No administrative info available", me.name);
 	} else {
 		numeric (RPL_ADMINME, nick, ":%s :Administrative info", me.name);
-		numeric (RPL_ADMINME, nick, ":%d.%d.%d%s.  Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
+		numeric (RPL_ADMINME, nick, ":%s%s.  Copyright (c) 1999 - 2004 The NeoStats Group", NEOSTATS_VERSION, ircd_version);
 		if (fp) {
 			while (fgets (buf, sizeof (buf), fp)) {
 				buf[strnlen (buf, BUFSIZE) - 1] = 0;
@@ -878,7 +878,7 @@ void
 do_credits (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
-	numeric (RPL_VERSION, nick, ":- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, ircd_version);
+	numeric (RPL_VERSION, nick, ":- NeoStats %s%s Credits ", NEOSTATS_VERSION, ircd_version);
 	numeric (RPL_VERSION, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
 	numeric (RPL_VERSION, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
 	numeric (RPL_VERSION, nick, ":- irc.irc-chat.net #NeoStats");

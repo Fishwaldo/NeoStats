@@ -115,9 +115,9 @@ int ListArryCount = 0;
 ModUser *hs_bot;
 
 ModuleInfo __module_info = {
-	 "HostServ",
-	 "Network User Virtual Host Service",
-	 "3.3",
+	"HostServ",
+	"Network User Virtual Host Service",
+	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__
 };

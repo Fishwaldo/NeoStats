@@ -49,9 +49,9 @@ static int ls_version(User * u, char **av, int ac);
 static int ls_about(User * u, char **av, int ac);
 
 ModuleInfo __module_info = {
-   "LoveServ",
-   "A Network Love Service",
-   "1.9",
+	"LoveServ",
+	"A Network Love Service",
+	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__
 };
