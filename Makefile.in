@@ -41,16 +41,6 @@ SUBDIRS = doc doc/old data logs tools
 DISTLIBS = adns pcre curl sqlsrv keeper
 DISTMOD = cs extauth hostserv loveserv ms statserv template
 
-neostats: $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(EXTRA_LDFLAGS) -o $@
-
-# include dependency info 
--include $(OBJS:.o=.d)
-
-.c.o:
-	$(CC) $(NEOCFLAGS) $(NEOINCLUDES) -c $< 
-	$(CC) -MM $(NEOINCLUDES) -c $< > $*.d
-
 all: @buildsqlsrv@ libadns libkeeper libpcre libcurl.a neostats modules utils 
 
 modules:
@@ -73,6 +63,16 @@ sqlsrvlib:
 
 utils:
 	(cd tools; $(MAKE) $@)
+
+neostats: $(OBJS)
+	$(CC) $(LDFLAGS) $(OBJS) $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(EXTRA_LDFLAGS) -o $@
+
+# include dependency info 
+-include $(OBJS:.o=.d)
+
+.c.o:
+	$(CC) $(NEOCFLAGS) $(NEOINCLUDES) -c $< 
+	$(CC) -MM $(NEOINCLUDES) -c $< > $*.d
 
 clean:
 	(cd dl; $(MAKE) $@)
