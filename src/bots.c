@@ -217,11 +217,14 @@ static int bot_chan_event( Event event, CmdParams *cmdparams )
 				chan = ( char * ) lnode_get( cm );
 				cmdparams->bot = botptr;
 				if( ircstrcasecmp( cmdparams->channel->name, chan ) == 0 ) {
-					if( !cmdflag || run_bot_cmd( cmdparams, cmdflag ) != NS_SUCCESS ) {
+					if( !cmdflag || !( botptr->flags & BOT_FLAG_SERVICEBOT ) || run_bot_cmd( cmdparams, cmdflag ) != NS_SUCCESS ) {
 						/* Reset message if we have stripped cmdchar */
 						if( cmdflag )
 							cmdparams->param --;
 						SendModuleEvent( event, cmdparams, botptr->moduleptr );
+						/* Reset message if we have unstripped cmdchar */
+						if( cmdflag )
+							cmdparams->param ++;
 					}
 				}
 				cm = list_next( botptr->u->user->chans, cm );
