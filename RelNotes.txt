@@ -1,28 +1,20 @@
-* NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 2 
-
+* NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 3
 ==============================================================================
-Important Changes you should know:
+Important Changes you should know: (READ THIS!)
 ==============================================================================
 HostServ: 
-	HostServ uses a new Database format to support the login option. 
-	This means that your old HostServ database (data/hostserv.db) is not 
-	Compatible with this version. Please delete hostserv.db before you run 
-	this version
+	HostServ now records the Oper that added the entry. Old DB's are
+	backwards compatible and the oper entry wont be shown for users created
+	with older copies HostServ
 
+	HostServ now can have a list of "Banned" vhosts, and
+	wont let any opers add a vhost that matches the banned string.
+	Read the HostServ ChangeLog for more details
 Core:
-	You must uncomment the NO_LOAD option after running makeconf. This is 
-	to Ensure that people read their config file before running!
-	UltimateIRCD Version 3.0.0.a26 (Current at release time) is the only 
-	version of Ultimate thats supported)
+	UltimateIRCD Version 3.0.0.a28 (Current at release time) is the only 
+	version of Ultimate3 thats supported
 
-	If you use the Raw command (Bad IRCOP, Bad!) then you have to 
-	explicitly enable it via the configure interface
-	recv.log is no longer enabled on production builds. No more eating up 
-	Disk Space!
-
-	If you are on a large network (usercount goes over 2000 users)
-	then you should configure with --enable-bignet (this
-	brings the limit upto 4000 users, if you need more contact us on 
-	the boards).
+	NeoStats now dynamically allocates memory for users, and has
+	no hard limit. (apart from available memory on your host)
 
 Read the ChangeLog for a complete description of what has changed

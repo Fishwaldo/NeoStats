@@ -15,8 +15,17 @@ Shmad <shmad@neostats.net>
   More efficient and nicer than righting and reading and 
   moving files around... 
 + Added Banned Vhost support to HostServ...
+  Add HOSTSERV_BANNED_VHOSTS *badhost* to neostats.cfg (Can add Multiple
+  times)
 + Added ChangePassword Ability to HostServ
- 
++ HostServ Permissions are configurable (put in neostats.cfg):
+  HOSTSERV_LVL_VIEW <- what level ppl can /msg hostserv view
+  HOSTSERV_LVL_ADD <- what level ppl can /msg hostserv add
+  HOSTSERV_LVL_DEL <- what level ppl can /msg hostserv del 
+  HOSTSERV_LVL_LIST <- what level ppl can /msg hostserv list
+  eg:
+  HOSTSERV_LVL_LIST 100 (ServerAdmins and higher)
+
 * Version 2.2 * Fish * December 26th, 2002
 + Due to massive bitching by people who use HostServ opers can
   ADD/LIST/VIEW now and only admins and higher can DEL
