@@ -137,34 +137,37 @@ dcc_parse(void *arg, void *rline, size_t len)
 	CmdParams *cmdparams;
 
 	strcpy(buf, line);
+	dlog(DEBUG1, "DCCRX: %s", line);
 	if(buf[0] == '.')
 	{
 		cmd = strchr(buf, ' ');
-		if(!cmd)
-			return NS_FAILURE;
-		*cmd = 0;
-		cmd++;
+		if (!cmd) {
+            dcc_write(dcc, "Error, You must specify a command to execute");
+            return NS_SUCCESS;
+        }
+   		*cmd = 0;
+        cmd++;
 		cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 		cmdparams->source = dcc;
 		if (cmdparams->source) {
 			cmdparams->target = FindUser (buf+1);
 			if (cmdparams->target) {
 				cmdparams->bot = cmdparams->target->user->bot;
-				if (!cmdparams->bot) {
+			} else {
 					dcc_write(dcc, "Use .<botname> to send a command to a NeoStats Bot");
 					dcc_write(dcc, "Otherwise, jsut type test without a leading . to send to the DCC");
 					dcc_write(dcc, "partyline");
-					return NS_FAILURE;
-				}
-			}
+					return NS_SUCCESS;
+            }
 			if (cmdparams->bot->flags & BOT_FLAG_SERVICEBOT) 
 			{
 				cmdparams->param = cmd;
 				run_bot_cmd (cmdparams, 0);
 				return NS_SUCCESS;
-			}
+			} 
 		}
 		ns_free (cmdparams);
+		return NS_SUCCESS;
 	}
 	dcc_partyline(dcc, line);
 	return NS_SUCCESS;
