@@ -26,14 +26,6 @@
        
 *************************************************************************/
 
-
-/* include system configuration before all else. */
-#ifdef WIN32
-#include "autoconfwin32.h"
-#else
-#include "autoconf.h"
-#endif
-
 #include "gdbmdefs.h"
 
 static void write_header __P((gdbm_file_info *));

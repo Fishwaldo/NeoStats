@@ -61,7 +61,7 @@
 
 /* Do we have flock?  (BSD...) */
 
-#if HAVE_NOTHING
+#ifdef WIN32
 
 #define UNLOCK_FILE(dbf) { }
 #define READLOCK_FILE(dbf) {lock_val = 0; }
@@ -131,7 +131,7 @@
 #endif
 
 /* Do we have fsync? */
-#if HAVE_NOTHING
+#ifdef WIN32
 #define fsync(f) {}
 #else
 

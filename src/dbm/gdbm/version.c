@@ -26,12 +26,6 @@
        
 *************************************************************************/
 
-#ifdef WIN32
-#include "autoconfwin32.h"
-#else
-#include "autoconf.h"
-#endif
-
 /* Keep a string with the version number in it! */
 const char * gdbm_version = "GDBM version 1.8.3. 10/15/2002"
 #if defined(__STDC__) && defined(__DATE__) && defined(__TIME__)

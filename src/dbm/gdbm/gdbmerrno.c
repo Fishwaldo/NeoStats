@@ -29,14 +29,6 @@
 
 *************************************************************************/
 
-
-/* include system configuration before all else. */
-#ifdef WIN32
-#include "autoconfwin32.h"
-#else
-#include "autoconf.h"
-#endif
-
 #include "gdbmerrno.h"
 
 /* this is not static so that applications may access the array if they

@@ -25,6 +25,7 @@
                 Bellingham, WA 98226
 *************************************************************************/
 
+#include "neostats.h"
 #include "systems.h"
 #include "gdbmconst.h"
 

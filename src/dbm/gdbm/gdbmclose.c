@@ -26,14 +26,6 @@
        
 *************************************************************************/
 
-
-/* include system configuration before all else. */
-#ifdef WIN32
-#include "autoconfwin32.h"
-#else
-#include "autoconf.h"
-#endif
-
 #include "gdbmdefs.h"
 
 /* Close the dbm file and free all memory associated with the file DBF.

@@ -487,8 +487,6 @@ src/dbm/bdb/bdb.c -text
 src/dbm/bdb/bdb.vcproj -text
 src/dbm/gdbm/Makefile.am -text
 src/dbm/gdbm/Makefile.in -text
-src/dbm/gdbm/autoconf.h.in -text
-src/dbm/gdbm/autoconfwin32.h -text
 src/dbm/gdbm/bucket.c -text
 src/dbm/gdbm/extern.h -text
 src/dbm/gdbm/falloc.c -text
