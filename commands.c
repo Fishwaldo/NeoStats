@@ -210,10 +210,8 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	SET_SEGV_LOCATION();
 	userlevel = UserLevel (u);
 	/* Check user authority to use this command set */
-	if (
-		( (bot_ptr->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
-		( (bot_ptr->flags & BOT_FLAG_ONLY_OPERS) && me.onlyopers && (userlevel < NS_ULEVEL_OPER) )
-	){
+	if (( (bot_ptr->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
+		( (bot_ptr->flags & BOT_FLAG_ONLY_OPERS) && me.onlyopers && (userlevel < NS_ULEVEL_OPER) )){
 		prefmsg (u->nick, bot_ptr->nick, "This service is only available to IRCops.");
 		chanalert (bot_ptr->nick, "%s Requested %s, but he is Not an Operator!", u->nick, av[1]);
 		return;
