@@ -14,9 +14,6 @@ NEOHOST="NeoStats.Net"
 NEOUSER="Neo"
 NEOCHAN="#services"
 NEOCONN="10"
-NEOWRITE="HTML_STATS"
-NEOHTML="/home/shmad/public_html/stats.html"
-NEOLAG="60"
 NEOREC="10"
 
 # these are so I can use stuff like $1 without it replacing it...like by
@@ -61,7 +58,7 @@ else
 	echo "You probably should read the README file too"
 	echo ""
 	echo "Type ./configure (If you need help read the README before asking us)"
-        echo "To enable Service Roots run configure with --enable-auth==sr"
+        echo "To enable Service Roots run configure with --enable-auth=sr"
 	echo ""
 	exit 1
 fi
@@ -226,39 +223,6 @@ if [ ! -z "$cc" ]; then
         NEOCONN="$cc"
 fi
 
-echo " "
-echo "Should NeoStats write HTML stats?  Put: HTML_STATS to enable or #HTML_STATS to disable"
-echo $n " [$NEOWRITE] -> $c"
-read cc
-if [ ! -z "$cc" ]; then
-	NEOWRITE="$cc"
-fi
-
-echo " "
-echo "Please put the path & Filename to output HTML Statistics to"
-echo $n " [$NEOHTML] -> $c"
-read cc
-if [ ! -z "$cc" ]; then
-	NEOHTML="$cc"
-fi
-
-echo " "
-echo "The number of seconds a server can be lagged before NeoStats considers it to be lagged"
-echo $n " [$NEOLAG] -> $c"
-read cc
-if [ ! -z "$cc" ]; then
-        NEOLAG="$cc"
-fi
-
-echo " "
-echo "The interval in seconds to send out new record notices"
-echo $n " [$NEOREC] -> $c"
-read cc
-if [ ! -z "$cc" ]; then
-	NEOREC="$cc"
-fi
-
-
 cat > $CONF << __EOF__
 ##################################################
 ## Configuration file for NeoStats
@@ -326,14 +290,8 @@ RECONNECT_TIME $NEOCONN
 # HTML OUTPUT SETTINGS #
 ########################
 
-# Should NeoStats write out HTML statistics?  Comment this out to disable
-# HTML_STATS to enable or #HTML_STATS to disable.
-$NEOWRITE
-
-# Path to NeoStats HTML Output file.  INCLUDE FILENAME!! This is required.
-# Example: HTML_PATH /home/shmad/public_html/stats.html
-HTML_PATH $NEOHTML
-
+#This section has been moved into the backend Database. Load up Statserv,
+#and type /msg statserv help set
 
 
 #####################################
@@ -353,11 +311,6 @@ HTML_PATH $NEOHTML
 #LOAD_MODULE statserv
 
 
-#This is the NetInfo Module, All it does is join users based on TLDs to specific channels.
-# IF you use this make sure to edit data/niconfig.db
-#LOAD_MODULE netinfo
-
-
 #This is a new module.  LoveServ, send a rose, hug, kiss, chocolate, etc to that
 # Special IRC Somebody. :D
 #LOAD_MODULE loveserv
@@ -372,67 +325,21 @@ HTML_PATH $NEOHTML
 # STATSERV CONFIG FOLLOWS: #
 ############################
 
-# This is the nickname that StatServ uses, if not specified, defaults to StatServ
-#STATSERV_NICK StatServ
-
-
-# This is the User portion that StatServ uses, if not specified, it uses
-# whatever NeoStats is configured to use
-#STATSERV_USER Stats
-
-
-# This is the Host that StatServ appears to come from, if not specified, it 
-# uses whatever NeoStats is configured to use
-#STATSERV_HOST stats.irc-chat.net
-
-
-# This is used to specified the number of seconds a Server is tolerated
-# before it is considered Laged. A non value, or value of 0, disables Lag
-# Notifications
-LAG_NOTICE $NEOLAG
-
-
-# The Interval in seconds to send out new Records from StatServ.
-# For example 5 would send a record notice at an interval of every 5 seconds
-# when a record is broken, to prevent record floods.
-WALLOP_INTERVAL $NEOREC
-
-
-############################
-# ICQSERV CONFIG FOLLOWS:  #
-############################
-
-###### NOTICE: ICQSERV IS NOT FUNCTIONAL AT THIS TIME ######
-
-# This is the nickname that IcqServ uses, if not specified, defaults to
-# ICQserv
-#ICQSERV_NICK IcqServ
-
-# This is the User portion that IcqServ uses, if not specified, it uses
-# whatever NeoStats is configured to use
-#ICQSERV_USER Stats
-
-# This is the Host that IcqServ appears to come from, if not specified, it
-# uses whatever NeoStats is configured to use
-#ICQSERV_HOST my.stats.irc.net
-
-#ICQSERV_UIN 000000001
-#ICQSERV_PASSWORD blahblah
-#ICQSERV_SERVER 205.188.179.42
-
+#This section has been moved into the Backend Database. Load up Statserv and
+#type /msg statserv help set.
 
 
 #######################
 # NeoStats ROOT users #
 #######################
 
-# If you configured and compiled with --enable-auth==sr please edit
+# If you configured and compiled with --enable-auth=sr please edit
 # This section and add your nicks Remove the #'s as well.
+# Accepts two formats. A Nickname, or a Full <nick>!<ident>@<host> format.
 
-#SERVICE_ROOTS Shmad
-#SERVICE_ROOTS ^Enigma^
-#SERVICE_ROOTS Fish
-#SERVICE_ROOTS_AUTH 1
+#SERVICE_ROOTS Shmad!?Shmad@Coder.NeoStats.net
+#SERVICE_ROOTS ^Enigma^!*@*.au
+#SERVICE_ROOTS Fish!?Fish@*.dynam.ac
 
 
 
@@ -457,7 +364,7 @@ chmod 700 $STATSCONF
 		echo "| Also make sure modules are compiled and in the |"
 		echo "| neostats.cfg properly for them to work :)      |"
 		echo "*------------------------------------------------*"
-		echo "| If you configured with --enable-auth==sr       |"
+		echo "| If you configured with --enable-auth=sr        |"
 		echo "| Edit neostats.cfg and edit the proper section  |"
 		echo "| to enable Service ROOTS.                       |"
 		echo "*------------------------------------------------*"

@@ -22,8 +22,13 @@ clean:
 
 
 install: 
-
-
+	$(INSTALL) -m 755 kptool @prefix@
+	$(INSTALL) -m 644 README.kptool @prefix@
+	@for blah in @build_configtool@; do \
+		echo "Installing ConfigTool"; \
+		$(INSTALL) -m 755 cfgtool/configtool @prefix@; \
+		$(INSTALL) -m 644 cfgtool/README.configtool @prefix@; \
+	done
 
 
 $(OBJECTS): Makefile ../Makefile.inc

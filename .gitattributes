@@ -156,7 +156,9 @@ logs/.keepme -text
 /stats.h -text
 /timer.c -text
 tools/Makefile.in -text
+tools/README.kptool -text
 tools/cfgtool/Makefile -text
+tools/cfgtool/README.configtool -text
 tools/cfgtool/dialog.c -text
 tools/cfgtool/edit.c -text
 tools/cfgtool/gkeeper.c -text

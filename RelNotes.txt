@@ -1,9 +1,44 @@
-* NeoStats * Shmad & Fish * Version 2.5.0
+* NeoStats * Shmad & Fish * Version 2.5.2
 ==============================================================================
 Important Changes you should know: (READ THIS!)
 ==============================================================================
-Core:
-	UltimateIRCD Version 3.0.0.a28 or Higher are the only 
-	version of Ultimate3 thats supported
+RedHat 9.0 Users:
+	There have been some changes to the RedHat 9 Kernel that affects
+	NeoStats. If you are running RedHat 9.0 please read
+	http://www.neostats.net/boards/viewtopic.php?t=391
+
+Configuration File:
+	A lot of the options in the configuration file neostats.cfg are no
+	longer used. Most of the configuration information for modules has 
+	moved into a new Config Backend. Look at the help screens for Modules 
+	like StatServ, HostServ, ConnectServ etc. You might also want to read
+	README.kptool in the tools directory
+
+Config Tools:
+	Two new tools are provided to help you manage your Configuration
+	files. kptool and configtool. kptool is a command line tool, Read
+	README.kptool. ConfigTool is a GTK program, if you have Xwindows,
+	configure with --enable-configtool and read 
+	tools/cfgtool/README.configtool
+
+Logging Changes:
+	We have implemented a new Logging backend that should be quicker for
+	busy networks. One feature of this new logging, is that you now have 
+	some control over what type of information gets logged. There are 10 
+	levels of logging, with 10 being for the insane, and 1 being for only 
+	very critical errors, and 5 being the standard level of logging. You 
+	can change the level of logging when you start up NeoStats by typing 
+	"./neostats -d <1-10>" This means you don't have to recompile to
+	enable debug support if we request it.
+
+recv.log support:
+	recv.log is a debugging option that enables the developers to get a
+	copy of exactly what communications took place between the IRCd and 
+	NeoStats when we are debuging problems. You can now enable recv.log 
+	on the command line by specifying "./neostats -r"
+
+CommandLine options:
+	Several Commandline options are now available to help you control
+	the way that NeoStats starts up. Type "./neostats -h" for a list.
 
 Read the ChangeLog for a complete description of what has changed

@@ -50,7 +50,7 @@ static char *kp_basedirs[KPDB_NUMDBS];
 
 #define GLOBALDIR "kpconf"   /* Default global database path */
 #define LOCALDIR  "kpdata"    /* Local database path */
-#define USERSUBDIR "kphelp"       /* Default user database dir */
+#define USERSUBDIR "kplang"       /* Default user database dir */
 #define LOCKFILE ":lock:"          /* Lock file name */
 
 /* ------------------------------------------------------------------------- 
@@ -113,7 +113,7 @@ static char *kp_init_userdb(void)
 
     return basedir;
 #endif
-    return "";
+    return USERSUBDIR;
 }
 
 /* ------------------------------------------------------------------------- 
