@@ -322,7 +322,7 @@ send_kill (const char *from, const char *target, const char *reason)
 void 
 send_svskill (const char *target, const char *reason)
 {
-	sts (":%s %s %s :%s", me.name, MSG_SVSKILL, who, reason);
+	sts (":%s %s %s :%s", me.name, MSG_SVSKILL, target, reason);
 }
 
 void 

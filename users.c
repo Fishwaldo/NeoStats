@@ -250,11 +250,12 @@ void *display_umode(void *tbl, char *col, char *sql, void *row) {
 	User *data = row;
 	return UmodeMaskToString(data->Umode);
 }
-
+#ifdef GOTUSERSMODES
 void *display_smode(void *tbl, char *col, char *sql, void *row) {
 	User *data = row;
 	return SmodeMaskToString(data->Smode);
 }
+#endif
 
 static char userschannellist[MAXCHANLIST];
 
@@ -349,6 +350,7 @@ COLDEF neo_userscols[] = {
 		NULL,
 		"the users umodes. Does not include SMODES."
 	},
+#ifdef GOTUSERSMODES
 	{	
 		"users",
 		"smodes",
@@ -360,6 +362,7 @@ COLDEF neo_userscols[] = {
 		NULL,
 		"the users Smodes, if the IRCd supports it.  Does not include UMODES."
 	},
+#endif
 	{	
 		"users",
 		"connected",

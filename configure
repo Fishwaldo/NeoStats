@@ -5129,9 +5129,9 @@ fi;
 
 echo "$as_me:$LINENO: checking Whether to Enable Unreal 3.1.x IRCD Support..." >&5
 echo $ECHO_N "checking Whether to Enable Unreal 3.1.x IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-unreal or --disable-unreal was given.
-if test "${enable_unreal+set}" = set; then
-  enableval="$enable_unreal"
+# Check whether --enable-unreal31 or --disable-unreal31 was given.
+if test "${enable_unreal31+set}" = set; then
+  enableval="$enable_unreal31"
    case "$enableval" in
   yes)
 
@@ -6925,7 +6925,7 @@ rm -f confcache
     esac
 
     # The eval makes quoting arguments work.
-    if eval $ac_abs_srcdir/configure $ac_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_abs_srcdir --disable-thread --disable-ipv6 --enable-nonblocking
+    if eval $ac_abs_srcdir/configure $ac_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_abs_srcdir --disable-thread --disable-ipv6 --enable-nonblocking --without-ssl
     then :
       echo "curl configured properly"
     else

@@ -23,6 +23,9 @@ extern int yylval;
 extern int yydebug;
 extern struct Sql_Cmd cmd;
 extern char *parsestr[];
+
+#define YY_NO_UNPUT
+
 %}
 
 %%

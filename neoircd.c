@@ -670,7 +670,7 @@ Srv_Tburst (char *origin, char **argv, int argc)
 	c = findchan (argv[1]);
 	if (c) {
 		buf = joinbuf (argv, argc, 4);
-		ChanTopic (argv[3], c, atoi (argv[2]), buf);
+		ChanTopic (argv[3], c->name, atoi (argv[2]), buf);
 		free (buf);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "TopicBurst: Ehhh, Can't find Channel %s", argv[1]);

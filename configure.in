@@ -120,7 +120,7 @@ AC_MSG_RESULT(no)
 
 dnl check to see if we should enable Unreal IRCD Support
 AC_MSG_CHECKING(Whether to Enable Unreal 3.1.x IRCD Support...)
-AC_ARG_ENABLE(unreal, [ --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
+AC_ARG_ENABLE(unreal31, [ --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
@@ -475,7 +475,7 @@ AC_SUBST(VERSION)
 AC_CONFIG_HEADER(adns/config.h)
 AC_CONFIG_HEADER(pcre/config.h)
 AC_OUTPUT(Makefile.inc Makefile tools/Makefile pcre/Makefile pcre.h:pcre/pcre.in)
-NEO_SUBDIR_CONFIG(curl, [--disable-thread --disable-ipv6 --enable-nonblocking])
+NEO_SUBDIR_CONFIG(curl, [--disable-thread --disable-ipv6 --enable-nonblocking --without-ssl])
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"
 echo "(*----------------------------------------------------------*)"
