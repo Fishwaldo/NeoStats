@@ -595,7 +595,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 	if(argc > 2) {
 		char IPAddress[32]; /* argv[argc-3] */
 		char *realname;
-		unsigned long IP = base64toint(argv[argc-3], 6);
+		unsigned long IP = base64toint(argv[argc-3]);
 		
 		ircsnprintf( IPAddress, 32, "%lu.%lu.%lu.%lu", 
 			(IP >> 24) & 255, (IP >> 16) & 255, (IP >> 8) & 255, IP & 255 );
