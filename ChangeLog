@@ -1,7 +1,10 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 * NeoStats * Fish * Version 2.5.0-Alpha6
  - Removed the config option ModulePath, as its always dl/, so its hardcoded in.
-
+ - Fixed up Ultimate IRCD support (beta only. Shmad/Enigma to test
+ - External Authentication updated and implemented
+ - ./configure interface updated, and all --enable-<module> removed. Now use --enable-module="statserv spam hostserv" etc etc etc
+ 
 * NeoStats * Shmad & Enigma * Version 2.5.0-Alpha5c
  - Module Unlocking on segfaults now (Shmad)
  - Moved modules to new core dir (damn you fish) (Shmad)
