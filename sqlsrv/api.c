@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>             /* for mkstemp() */
+#include <libgen.h>             /* for dirname() */
 #include <string.h>             /* for strlen() */
 #include <limits.h>             /* for PATH_MAX */
 #ifdef SYSLOG
@@ -531,8 +532,7 @@ rta_save(TBLDEF *ptbl, char *fname)
 
   /* Open a temp file in the same directory as the users target file */
   (void) strncpy(path, fname, PATH_MAX);
-//  (void) strncpy(tfile, dirname(path), PATH_MAX);
-  (void) strncpy(tfile, path, PATH_MAX);
+  (void) strncpy(tfile, dirname(path), PATH_MAX);
   (void) strcat(tfile, "/tmpXXXXXX");
   fd = mkstemp(tfile);
   if (fd < 0)
