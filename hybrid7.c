@@ -129,7 +129,7 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host, const ch
 		}
 	}
 	sts("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, time(NULL), newmode, ident, host, me.name, realname);
-	AddUser(nick,ident, host, me.name, 0);
+	AddUser(nick,ident, host, me.name, 0, time(NULL));
 	UserMode(nick, newmode);
 	return 1;
 }  
@@ -244,6 +244,26 @@ int sburst_cmd(int b) {
 	} else {
 		sts("BURST");
 	}
+	return 1;
+}
+
+int sakill_cmd(const char *host, const char *ident, const char *setby, const int length, const char *reason,...) {
+	/* there isn't a akill on Hybrid, so we send a kline to all servers! */
+	hscan_t ss;
+	hnode_t *sn;
+	Server *s;
+
+	va_list ap;
+	char buf[512];
+	va_start(ap, reason);
+	vsnprintf(buf, 512, reason, ap);
+	
+        hash_scan_begin(&ss, sh);
+        while ((sn = hash_scan_next(&ss)) != NULL) {
+        	s = hnode_get(sn);
+		sts(":%s %s %s %lu %s %s :%s", setby, MSG_KLINE, s->name, length, ident, host, buf);
+        }	
+	va_end(ap);
 	return 1;
 }
 

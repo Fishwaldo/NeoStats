@@ -6,6 +6,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - User structure now contains TS 
  - User structure now contains ipaddr if server supports NICKIP
  - Sockets must now be created with new socket functions. 
+ - added akill to Ultimate/Unreal, and a Akill hack (send kline to all servers) for Hybrid.
 
 * NeoStats * Fish * Version 2.5.0-Beta4
  - Fixed Bsd support and a few Hybrid weirdiness

@@ -278,7 +278,7 @@ void start()
 		unload_module(mod_ptr->info->module_name, finduser(s_Services));
 	}
 	sleep(5);
-	execve("./stats", NULL, NULL);
+	execve("./neostats", NULL, NULL);
 }
 
 void login()

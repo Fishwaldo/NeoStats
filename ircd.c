@@ -1084,7 +1084,7 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			AddUser(argv[0], argv[3], argv[4], argv[5], 0);
 			Module_Event("SIGNON", av, ac);
 #elif HYBRID7
-			AddUser(argv[0], argv[4], argv[5], argv[6], strtoul(argv[3], NULL, 10));
+			AddUser(argv[0], argv[4], argv[5], argv[6], strtoul(argv[8], NULL, 10), strtoul(argv[2], NULL, 10));
 			Module_Event("SIGNON", av, ac);
 #ifdef DEBUG
 			log("Mode: UserMode: %s",argv[3]);

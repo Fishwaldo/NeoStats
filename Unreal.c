@@ -297,6 +297,15 @@ int ssvskill_cmd(const char *target, const char *reason, ...) {
 		return 1;
 	}
 }
+int sakill_cmd(const char *host, const char *ident, const char *setby, const int length, const char *reason,...) {
+	va_list ap;
+	char buf[512];
+	va_start(ap, reason);
+	vsnprintf(buf, 512, reason, ap);
+	sts(":%s %s %s %s %d %s %d :%s", me.name, (me.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, time(NULL), buf);
+	va_end(ap);
+	return 1;
+}
 
 
 

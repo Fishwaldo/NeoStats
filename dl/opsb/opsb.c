@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: opsb.c,v 1.14 2002/08/29 11:58:52 fishwaldo Exp $
+** $Id: opsb.c,v 1.15 2002/08/31 07:40:35 fishwaldo Exp $
 */
 
 
@@ -28,6 +28,7 @@ void reportdns(char *data, adns_answer *a);
 void dnsblscan(char *data, adns_answer *a);
 static int ScanNick(char **av, int ac);
 int startscan(scaninfo *scandata);
+int do_set(User *u, char **av, int ac);
 void savecache();
 void loadcache();
 void unconf();
@@ -44,7 +45,7 @@ extern const char *opsb_help_exclude[];
 Module_Info my_info[] = { {
 	"OPSB",
 	"A Open Proxy Scanning Bot",
-	"$Revision: 1.14 $"
+	"$Revision: 1.15 $"
 } };
 
 
@@ -391,6 +392,16 @@ int do_set(User *u, char **av, int ac) {
 		chanalert(s_opsb, "%s changed ban time to %d", u->nick, opsb.bantime);
 		opsb.confed = 1;
 		return 0;
+	} else if (!strcasecmp(av[2], "CACHETIME")) {
+		if (!atoi(av[3])) {
+			prefmsg(u->nick, s_opsb, "Error, CacheTime must be numeric (in Seconds)");
+			return 0;
+		}
+		opsb.cachetime = atoi(av[3]);
+		prefmsg(u->nick, s_opsb, "CacheTime set to %d", opsb.cachetime);
+		chanalert(s_opsb, "%s changed cachetime to %d", u->nick, opsb.cachetime);
+		opsb.confed = 1;
+		return 0;
 	} else {
 		prefmsg(u->nick, s_opsb, "TargetIP: %s", opsb.targethost);
 		prefmsg(u->nick, s_opsb, "TargetPort: %d", opsb.targetport);
@@ -454,35 +465,39 @@ void checkqueue() {
 
 void addtocache(unsigned long ipaddr) {
 	lnode_t *cachenode;
-	unsigned long *ip;
+	C_entry *ce;
 	/* pop off the oldest entry */
 	if (list_isfull(cache)) {
+#ifdef DEBUG
+		log("OPSB: Deleting Tail of Cache: %d", list_count(cache));
+#endif
 		cachenode = list_del_last(cache);
-		ip = lnode_get(cachenode);
+		ce = lnode_get(cachenode);
 		lnode_destroy(cachenode);
-		free(ip);
+		free(ce);
 	}
 	cachenode = list_first(cache);
 	while (cachenode) {
-		ip = lnode_get(cachenode);
-		if (*ip == ipaddr) {
+		ce = lnode_get(cachenode);
+		if (ce->ip == ipaddr) {
 #ifdef DEBUG
 			log("OPSB: Not adding %ld to cache as it already exists", ipaddr);
 #endif
-			return;
+//			return;
 		}
 		cachenode = list_next(cache, cachenode);
 	}
 	
-	ip = malloc(sizeof(unsigned long));
-	*ip = ipaddr;
-	cachenode = lnode_create(ip);
+	ce = malloc(sizeof(C_entry));
+	ce->ip = ipaddr;
+	ce->when = time(NULL);
+	cachenode = lnode_create(ce);
 	list_prepend(cache, cachenode);
 }
 
 int checkcache(scaninfo *scandata) {
-	lnode_t *node;
-	unsigned long *ip;
+	lnode_t *node, *node2;
+	C_entry *ce;
 	exemptinfo *exempts;
 	node = list_first(exempt);
 	while (node) {
@@ -509,8 +524,22 @@ int checkcache(scaninfo *scandata) {
 	}
 	node = list_first(cache);
 	while (node) {
-		ip = lnode_get(node);
-		if (*ip == scandata->ipaddr.s_addr) {
+		ce = lnode_get(node);
+		
+		/* delete any old cache entries */
+	
+		if ((time(NULL) - ce->when) > opsb.cachetime) {
+#ifdef DEBUG
+			log("OPSB: Deleting old cache entry %ld", ce->ip);
+#endif
+			node2 = list_next(cache, node);			
+			list_delete(cache, node);
+			lnode_destroy(node);
+			free(ce);
+			node = node2;
+			break;
+		}
+		if (ce->ip == scandata->ipaddr.s_addr) {
 #ifdef DEBUG
 			log("OPSB: user %s is already in Cache", scandata->who);
 #endif
@@ -543,6 +572,7 @@ void savecache() {
 	fprintf(fp, "%s\n", opsb.scanmsg);
 	fprintf(fp, "%d\n", opsb.bantime);
 	fprintf(fp, "%d\n", opsb.confed);
+	fprintf(fp, "%d\n", opsb.cachetime);
 	/* exempts next */
 	node = list_first(exempt);
 	while (node) {
@@ -595,6 +625,8 @@ void loadcache() {
 	opsb.bantime = atoi(buf);
 	fgets(buf, 512, fp);
 	opsb.confed = atoi(buf);
+	fgets(buf, 512, fp);
+	opsb.cachetime = atoi(buf);
 	while (fgets(buf, 512, fp)) {
 		if (!strcasecmp("#CACHE\n", buf)) {
 			gotcache = 1;	
@@ -926,7 +958,7 @@ void _init() {
 
 	
 	/* scan cache is MAX_QUEUE size (why not?) */
-	cache = list_create(MAX_QUEUE);
+	cache = list_create(2);
 
 	exempt = list_create(MAX_EXEMPTS);
 
@@ -940,6 +972,8 @@ void _init() {
 	opsb.open = 0;
 	opsb.scanned = 0;
 	opsb.confed = 0;
+	opsb.cachetime = 3600;
+	opsb.bantime = 86400;
 	snprintf(opsb.lookforstring, 512, "*** Looking up your hostname...");
 	snprintf(opsb.scanmsg, 512, "Your Host is being Scanned for Open Proxies");
 }
@@ -950,7 +984,3 @@ void _fini() {
 };
 
 
-void do_ban(scaninfo *scandata) {
-	++opsb.open;
-	chanalert(s_opsb, "Banning %s", scandata->who);
-}

@@ -421,4 +421,5 @@ extern int swallops_cmd(const char *who, const char *msg,...);
 extern int vctrl_cmd();
 extern int ssvinfo_cmd();
 extern int sburst_cmd(int b);
+extern int sakill_cmd(const char *host, const char *ident, const char *setby, const int length, const char *reason,...);
 #endif

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: opsb.h,v 1.6 2002/08/28 16:11:03 fishwaldo Exp $
+** $Id: opsb.h,v 1.7 2002/08/31 07:40:35 fishwaldo Exp $
 */
 
 
@@ -62,6 +62,7 @@ struct opsb {
 	char scanmsg[512];
 	int bantime;
 	int confed;
+	int cachetime;
 } opsb;
 
 struct sockinfo {
@@ -79,6 +80,14 @@ typedef struct sockinfo socklist;
 list_t *opsbq;
 /* this is the list of currently active scans */
 list_t *opsbl;
+
+
+struct cache_entry {
+	unsigned long ip;
+	time_t when;
+};
+
+typedef struct cache_entry C_entry;
 
 
 /* this is a list of cached scans */

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: proxy.c,v 1.6 2002/08/28 16:11:03 fishwaldo Exp $
+** $Id: proxy.c,v 1.7 2002/08/31 07:40:35 fishwaldo Exp $
 */
 
 
@@ -38,6 +38,54 @@ proxy_types proxy_list[] = {
 };
 
 #define NUM_PROXIES 7
+
+
+void do_ban(scaninfo *scandata) {
+	lnode_t *socknode;
+	socklist *sockdata;
+	int doneban = 0;
+	FILE *fp;
+
+	++opsb.open;
+
+	
+	/* ban based on proxy detection first */
+	socknode = list_first(scandata->socks);
+	while (socknode) {
+		sockdata = lnode_get(socknode);
+		if ((sockdata->flags !=	OPENPROXY) || (doneban == 1)) {
+			socknode = list_next(scandata->socks, socknode);
+			break;
+		}
+		log("OPSB: Banning %s (%s) for Open Proxy - %s(%d)", scandata->who, inet_ntoa(scandata->ipaddr), proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
+		chanalert(s_opsb, "Banning %s (%s) for Open Proxy - %s(%d)", scandata->who, inet_ntoa(scandata->ipaddr), proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
+		globops(s_opsb, "Banning %s (%s) for Open Proxy - %s(%d)", scandata->who, inet_ntoa(scandata->ipaddr), proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
+		if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "Banning %s (%s) for Open Proxy - %s(%d)", scandata->who, inet_ntoa(scandata->ipaddr), proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
+		sakill_cmd(inet_ntoa(scandata->ipaddr), "*", s_opsb, opsb.bantime, "Open Proxy found on your host. Please visit the following website for more info: www.blitzed.org/proxy?ip=%s", inet_ntoa(scandata->ipaddr));
+		if (doneban != 1) {
+			if ((fp = fopen("logs/opsb.log", "a")) == NULL) return;
+               		fprintf(fp, "%s: %s\n", proxy_list[sockdata->type].type, inet_ntoa(scandata->ipaddr));
+                        fclose(fp);
+		} else {
+			doneban = 1;
+		}		
+		socknode = list_next(scandata->socks, socknode);
+	}
+	if (doneban == 1)
+		return;
+	
+	if (scandata->dnsstate == OPMLIST) {
+		log("OPSB: Banning %s (%s) as its listed in %s", scandata->who, inet_ntoa(scandata->ipaddr), opsb.opmdomain);
+		chanalert(s_opsb, "Banning %s (%s) as its listed in %s", scandata->who, inet_ntoa(scandata->ipaddr), opsb.opmdomain);
+		globops(s_opsb, "Banning %s (%s) as its listed in %s", scandata->who, inet_ntoa(scandata->ipaddr), opsb.opmdomain);
+		if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "Banning %s (%s) as its listed in %s", scandata->who, inet_ntoa(scandata->ipaddr), opsb.opmdomain);
+		sakill_cmd(inet_ntoa(scandata->ipaddr), "*", s_opsb, opsb.bantime, "Your host is listed as a Open Proxy. Please visit the following website for more info: www.blitzed.org/proxy?ip=%s", inet_ntoa(scandata->ipaddr));
+	}	
+
+}
+
+
+
 
 
 
@@ -133,6 +181,7 @@ void send_status(User *u) {
 	socklist *sockinfo;
 	prefmsg(u->nick, s_opsb, "Proxy Results:");
 	prefmsg(u->nick, s_opsb, "Hosts Scanned: %d Hosts found Open: %d Exceptions %d", opsb.scanned, opsb.open, list_count(exempt));
+	prefmsg(u->nick, s_opsb, "Cache Entries: %d", list_count(cache));
 	for (i = 0; i < NUM_PROXIES; i++) {
 		prefmsg(u->nick, s_opsb, "Proxy %s (%d) Found %d Open %d", proxy_list[i].type, proxy_list[i].port, proxy_list[i].nofound, proxy_list[i].noopen);
 	}
@@ -379,6 +428,8 @@ int proxy_read(int socknum, char *sockname) {
 			log("OPSB proxy_read(): Got this: %s (%d)",buf, i);
 #endif
 			/* we check if this might be a normal http server */
+				do_ban(scandata);
+
 			if (strstr(buf, "Method Not Allowed")) {
 #ifdef DEBUG
 				log("closing socket %d due to ok HTTP server", socknum);
