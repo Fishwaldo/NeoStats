@@ -245,6 +245,8 @@ doc/read-userman -text
 /dotconf.c eol=lf
 /dotconf.h eol=lf
 /events.h eol=lf
+/exclude.c -text
+/exclude.h -text
 /hash.c eol=lf
 /hash.h eol=lf
 /hybrid7.c eol=lf
