@@ -49,7 +49,6 @@ void ResetTLD() {
 			/* don't delete the tld entry ??? as its our "unknown" entry */
 			if (ircstrcasecmp(t->tld, "???")) {
 				tn2 = list_next(Thead, tn);
-				free(t->country);
 				free(t);
 				list_delete(Thead, tn);
 				lnode_destroy(tn);
@@ -194,7 +193,6 @@ void fini_tld() {
 	tn = list_first(Thead);
 	while (tn != NULL) {
 		t = lnode_get(tn);
-		free(t->country);
 		free(t);
 		tn = list_next(Thead, tn);
 	}
