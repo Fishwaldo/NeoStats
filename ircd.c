@@ -214,8 +214,8 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 	char savemod[SEGV_INMODULE_BUFSIZE];
 
 	strlcpy(savemod, segv_inmodule, SEGV_INMODULE_BUFSIZE);
-#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID) || defined(VIAGRA)
-	sjoin_cmd(who, chan, chflag);
+#ifdef GOTSJOIN
+	ssjoin_cmd(who, chan, chflag);
 #else
 	sjoin_cmd(who, chan);
 	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN)
@@ -242,11 +242,8 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 {
 	snewnick_cmd (nick, user, host, rname, Umode);
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-#if defined(BAHAMUT) || defined(LIQUID) || defined(VIAGRA)
-		sjoin_cmd (nick, me.chan, CMODE_CHANOP);	
-#elif defined(ULTIMATE3) || defined(QUANTUM)
-		sjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
-		schmode_cmd (nick, me.chan, "+a", nick);
+#ifdef GOTSJOIN
+		ssjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
 #elif defined(HYBRID7) 
 		sjoin_cmd (nick, me.chan);
 		schmode_cmd (me.name, me.chan, "+o", nick);
@@ -259,13 +256,6 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 #elif defined(NEOIRCD)
 		sjoin_cmd (nick, me.chan);
 		schmode_cmd (me.name, me.chan, "+a", nick);
-#elif defined(UNREAL)
-#ifdef SJOIN
-		ssjoin_cmd(nick, me.chan, CMODE_CHANOP);
-#else
-		sjoin_cmd (nick, me.chan);
-		schmode_cmd (me.name, me.chan, "+o", nick);
-#endif
 #endif
 	}
 	return NS_SUCCESS;
@@ -1433,9 +1423,6 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 	return NS_SUCCESS;
 }
 
-/* temp until SecureServ 1.1 */
-#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID) || defined(VIAGRA)
-#else
 int
 sjoin_cmd (const char *who, const char *chan)
 {
@@ -1443,7 +1430,6 @@ sjoin_cmd (const char *who, const char *chan)
 	join_chan (who, chan);
 	return NS_SUCCESS;
 }
-#endif
 
 int
 sping_cmd (const char *from, const char *reply, const char *to)

@@ -38,6 +38,8 @@
 
 /* we support tokens */
 #undef GOTTOKENSUPPORT
+/* we have sjoin */
+#define GOTSJOIN
 /* we support CLIENT */
 #define GOTCLIENTSUPPORT
 /* we don't support svstime */
@@ -63,6 +65,8 @@
 
 /* we support tokens */
 #undef GOTTOKENSUPPORT
+/* we don't have sjoin */
+#define GOTSJOIN
 /* we don't support CLIENT */
 #undef GOTCLIENTSUPPORT
 /* we don't support svstime */

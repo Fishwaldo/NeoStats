@@ -214,6 +214,16 @@ send_sjoin (const char *sender, const char *who, const char *chan, const char fl
 }
 
 void 
+send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
+{
+void 
+send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
+{
+	send_cmd (":%s %s %s", who, MSG_JOIN, chan);
+}
+}
+
+void 
 send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
 	send_cmd (":%s %s %s %s %s %lu", sender, (ircd_srv.token ? TOK_MODE : MSG_MODE), chan, mode, args, ts);
