@@ -23,25 +23,6 @@
 #ifndef MODES_H
 #define MODES_H
 
-unsigned int UmodeStringToMask (const char *UmodeString);
-char *UmodeMaskToString (const unsigned int mask);
-char UmodeMaskToChar (const unsigned int mask);
-
-unsigned int SmodeStringToMask (const char *UmodeString);
-char *SmodeMaskToString (const unsigned int mask);
-char SmodeMaskToChar (const unsigned int mask);
-
-unsigned int CmodeStringToMask (const char *UmodeString);
-char *CmodeMaskToString (const unsigned int mask);
-char *CmodeMaskToPrefixString (const unsigned int mask);
-int CmodeCharToMask (const char mode);
-char CmodeMaskToChar (const unsigned int mask);
-EXPORTFUNC int CmodeCharToFlags (const char mode);
-unsigned int CmodePrefixToMask (const char prefix);
-char CmodePrefixToChar (const char prefix);
-char CmodeMaskToPrefix (const unsigned int mask);
-char CmodeCharToPrefix (const char mode);
-
 int InitIrcdModes (void);
 
 EXPORTFUNC int ChanMode (char *origin, char **av, int ac);

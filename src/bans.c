@@ -24,9 +24,6 @@
 #include "neostats.h"
 #include "modules.h"
 #include "services.h"
-#ifdef SQLSRV
-#include "sqlsrv/rta.h"
-#endif
 
 static hash_t *banshash;
 
@@ -150,111 +147,6 @@ void FiniBans (void)
 }
 
 
-#ifdef SQLSRV
-COLDEF neo_banscols[] = {
-	{
-		"bans",
-		"type",
-		RTA_STR,
-		8,
-		offsetof(struct Ban, type),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"type"
-	},
-	{
-		"bans",
-		"user",
-		RTA_STR,
-		MAXUSER,
-		offsetof(struct Ban, user),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"user"
-	},
-	{
-		"bans",
-		"host",
-		RTA_STR,
-		MAXHOST,
-		offsetof(struct Ban, host),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"host"
-	},
-	{
-		"bans",
-		"mask",
-		RTA_STR,
-		MAXHOST,
-		offsetof(struct Ban, mask),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"mask"
-	},
-	{
-		"bans",
-		"reason",
-		RTA_STR,
-		BUFSIZE,
-		offsetof(struct Ban, reason),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"reason"
-	},
-	{
-		"bans",
-		"setby",
-		RTA_STR,
-		MAXHOST,
-		offsetof(struct Ban, setby),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"setby"
-	},
-	{
-		"bans",
-		"tsset",
-		RTA_INT,
-		sizeof(int),
-		offsetof(struct Ban, tsset),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"tsset"
-	},
-	{
-		"bans",
-		"tsexpire",
-		RTA_INT,
-		sizeof(int),
-		offsetof(struct Ban, tsexpires),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"tsexpire"
-	},
-};
-
-TBLDEF neo_bans = {
-	"bans",
-	NULL, 	/* for now */
-	sizeof(struct Ban),
-	0,
-	TBL_HASH,
-	neo_banscols,
-	sizeof(neo_banscols) / sizeof(COLDEF),
-	"",
-	"The list of bans on the IRC network"
-};
-#endif /* SQLSRV */
-
 int 
 InitBans (void)
 {
@@ -263,11 +155,6 @@ InitBans (void)
 		nlog (LOG_CRITICAL, "Unable to create bans hash");
 		return NS_FAILURE;
 	}
-#ifdef SQLSRV
-	/* add the server hash to the sql library */
-	neo_bans.address = banshash;
-	rta_add_table(&neo_bans);
-#endif
 	return NS_SUCCESS;
 }
 

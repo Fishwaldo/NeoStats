@@ -29,9 +29,6 @@
 #include "users.h"
 #include "channels.h"
 #include "exclude.h"
-#ifdef SQLSRV
-#include "sqlsrv/rta.h"
-#endif
 #include "services.h"
 #include "modules.h"
 
@@ -560,143 +557,6 @@ int test_cumode(char* chan, char* nick, int flag)
 	return 0;
 }
 
-#ifdef SQLSRV
-/* its huge, because we can have a *LOT* of users in a channel */
-
-static char chanusers[BUFSIZE*10];
-void *display_chanusers (void *tbl, char *col, char *sql, void *row) 
-{
-	Channel *c = row;
-	lnode_t *cmn;
-	char final[BUFSIZE*2];
- 	Chanmem *cm;
-	
-	chanusers[0] = '\0';
-	cmn = list_first (c->chanmembers);
-	while (cmn) {
-		cm = lnode_get (cmn);
-		ircsnprintf(final, BUFSIZE*2, "+%s %s%s,", CmodeMaskToString (cm->flags), CmodeMaskToPrefixString (cm->flags), cm->name);
-		strlcat(chanusers, final, BUFSIZE*10);
-		cmn = list_next (c->chanmembers, cmn);
-	}
-	return chanusers;
-}
-
-COLDEF neo_chanscols[] = {
-	{
-		"chans",
-		"name",
-		RTA_STR,
-		MAXCHANLEN,
-		offsetof(struct Channel, name),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"The name of the channel"
-	},
-	{
-		"chans",
-		"nomems",
-		RTA_INT,
-		sizeof(int),
-		offsetof(struct Channel, users),
-		RTA_READONLY,
-		NULL, 
-		NULL,
-		"The no of users in the channel"
-	},
-	{
-		"chans",
-		"modes",
-		RTA_STR,
-		BUFSIZE,
-		offsetof(struct Channel, modes),
-		RTA_READONLY,
-		display_chanmodes,
-		NULL,
-		"The modes of the channel"
-	},
-	{
-		"chans",
-		"users",
-		RTA_STR,
-		BUFSIZE*10,
-		offsetof(struct Channel, chanmembers),
-		RTA_READONLY,
-		display_chanusers,
-		NULL,
-		"The users of the channel"
-	},
-	{
-		"chans",
-		"topic",
-		RTA_STR,
-		BUFSIZE,
-		offsetof(struct Channel, topic),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"The topic of the channel"
-	},
-	{	
-		"chans",
-		"topicowner",
-		RTA_STR,
-		MAXHOST,
-		offsetof(struct Channel, topicowner),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"Who set the topic"
-	},
-	{	
-		"chans",
-		"topictime",
-		RTA_INT,
-		sizeof(int),
-		offsetof(struct Channel, topictime),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"When the topic was set"
-	},
-	{	
-		"chans",
-		"created",
-		RTA_INT,
-		sizeof(int),
-		offsetof(struct Channel, creationtime),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"when the channel was created"
-	},
-	{	
-		"chans",
-		"flags",
-		RTA_INT,
-		sizeof(int),
-		offsetof(struct Channel, flags),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"Flags for this channel"
-	},
-
-};
-
-TBLDEF neo_chans = {
-	"chans",
-	NULL, 	/* for now */
-	sizeof(struct Channel),
-	0,
-	TBL_HASH,
-	neo_chanscols,
-	sizeof(neo_chanscols) / sizeof(COLDEF),
-	"",
-	"The list of Channels on the IRC network"
-};
-#endif /* SQLSRV */
 
 /** @brief initialize the channel data
  *
@@ -713,11 +573,6 @@ InitChannels ()
 		nlog (LOG_CRITICAL, "Unable to create channel hash");
 		return NS_FAILURE;
 	}
-#ifdef SQLSRV
-	/* add the server hash to the sql library */
-	neo_chans.address = channelhash;
-	rta_add_table(&neo_chans);
-#endif
 	return NS_SUCCESS;
 }
 

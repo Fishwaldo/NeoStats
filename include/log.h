@@ -42,8 +42,4 @@ void FiniLogs (void);
 /* Configurable log filename format string */
 extern char LogFileNameFormat[MAX_LOGFILENAME];
 
-#if SQLSRV
-void sqlsrvlog(char *logline);
-#endif
-
 #endif

@@ -29,15 +29,9 @@
 #include "log.h"
 #include "services.h"
 #include "modules.h"
-#ifdef SQLSRV
-#include "sqlsrv/rta.h"
-#endif
 
 static void cb_Server (char *arg, int configtype);
 static void cb_Module (char *arg, int configtype);
-#ifdef SQLSRV
-static void cb_SqlConf (char *arg, int configtype);
-#endif
 
 /** @brief The list of modules to load
  */
@@ -66,10 +60,6 @@ static config_option options[] = {
 	{"SET_SERVER_TIMES", ARG_STR, cb_Server, 16},
 	{"SERVICE_ROOT", ARG_STR, cb_Server, 17},
 	{"PROTOCOL", ARG_STR, cb_Server, 18},
-#ifdef SQLSRV
-	{"SQLSRV_AUTH", ARG_STR, cb_SqlConf, 0},
-	{"SQLSRV_PORT", ARG_STR, cb_SqlConf, 1},
-#endif
 };
 
 /** @brief Load configuration file
@@ -135,47 +125,6 @@ cb_Module (char *arg, int configtype)
 	}
 }
 
-#ifdef SQLSRV
-/** @brief prepare SqlAuthentication defined in the config file
- *
- * load the Sql UserName/Password and Host if we are using SQL Server option
- *
- * @param arg the module name in this case
- * @param configtype an index of what config item is currently being processed. Ignored
- * @returns Nothing
- */
-
-void
-cb_SqlConf (char *arg, int configtype)
-{
-	char *uname, *pass, *host;
-	SET_SEGV_LOCATION();
-	if (configtype == 0) {
-		if ((uname = strtok(arg, "!")) == NULL) {
-			nlog(LOG_WARNING, "Invalid SQLSRV_AUTH syntax in config file (Username)");
-			return;
-		}
-		if ((pass = strtok(NULL, "@")) == NULL) {
-			nlog(LOG_WARNING, "Invalid SQLSRV_AUTH syntax in config file (Pass)");
-			return;
-		}
-		if ((host = strtok(NULL, "")) == NULL) {
-			nlog(LOG_WARNING, "Invalid SQLSRV_AUTH syntax in config file (Host)");
-			return;
-		}
-		dlog(DEBUG1, "SqlSrv Uname %s Pass %s Host %s", uname, pass, host);
-		rta_change_auth(uname, pass);
-		strncpy(me.sqlhost, host, MAXHOST);
-	} else if (configtype == 1) {
-		me.sqlport = atoi(arg);
-		if (me.sqlport == 0) {
-			nlog(LOG_WARNING, "Invalid Port Specified for SQLSRV_PORT, Using Default");
-			me.sqlport = 8888;
-		}
-	}
-	
-}
-#endif
 /** @brief Load the modules 
  *
  * Actually load the modules that were found in the config file

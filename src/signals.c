@@ -26,9 +26,6 @@
 #include "services.h"
 #include "log.h"
 #include "modules.h"
-#ifdef SQLSRV
-#include "sqlsrv/rta.h"
-#endif
 /* this needs to come after neostats.h as we need the config.h define */
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>

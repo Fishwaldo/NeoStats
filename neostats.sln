@@ -111,6 +111,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "templateauth", "modules\tem
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlsrv", "modules\sqlsrv\sqlsrv.vcproj", "{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -209,6 +213,10 @@ Global
 		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Debug.Build.0 = Debug|Win32
 		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Release.ActiveCfg = Release|Win32
 		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Release.Build.0 = Release|Win32
+		{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}.Debug.ActiveCfg = Debug|Win32
+		{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}.Debug.Build.0 = Debug|Win32
+		{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}.Release.ActiveCfg = Release|Win32
+		{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

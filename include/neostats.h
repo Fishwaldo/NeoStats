@@ -243,6 +243,23 @@ EXPORTFUNC int UmodeCharToMask(const char mode);
 EXPORTFUNC const char * GetUmodeDesc (const unsigned int mask);
 EXPORTFUNC int SmodeCharToMask(const char mode);
 EXPORTFUNC const char * GetSmodeDesc (const unsigned int mask);
+EXPORTFUNC unsigned int UmodeStringToMask (const char *UmodeString);
+EXPORTFUNC char *UmodeMaskToString (const unsigned int mask);
+EXPORTFUNC char UmodeMaskToChar (const unsigned int mask);
+EXPORTFUNC unsigned int SmodeStringToMask (const char *UmodeString);
+EXPORTFUNC char *SmodeMaskToString (const unsigned int mask);
+EXPORTFUNC char SmodeMaskToChar (const unsigned int mask);
+EXPORTFUNC unsigned int CmodeStringToMask (const char *UmodeString);
+EXPORTFUNC char *CmodeMaskToString (const unsigned int mask);
+EXPORTFUNC char *CmodeMaskToPrefixString (const unsigned int mask);
+EXPORTFUNC int CmodeCharToMask (const char mode);
+EXPORTFUNC char CmodeMaskToChar (const unsigned int mask);
+EXPORTFUNC int CmodeCharToFlags (const char mode);
+EXPORTFUNC unsigned int CmodePrefixToMask (const char prefix);
+EXPORTFUNC char CmodePrefixToChar (const char prefix);
+EXPORTFUNC char CmodeMaskToPrefix (const unsigned int mask);
+EXPORTFUNC char CmodeCharToPrefix (const char mode);
+
 
 #ifndef NEOSTATS_PACKAGE_VERSION
 #define NEOSTATS_PACKAGE_VERSION PACKAGE
@@ -532,10 +549,6 @@ typedef struct tme {
 	time_t lastmsg;
 	time_t now;
 	char strnow[STR_TIME_T_SIZE];
-#ifdef SQLSRV
-	char sqlhost[MAXHOST];
-	int sqlport;
-#endif
 	char version[VERSIONSIZE];
 } tme;
 
@@ -555,6 +568,14 @@ typedef struct Ban {
 	time_t tsexpires;
 } Ban;
 
+
+/** @brief ModesParm structure
+ *  
+ */
+typedef struct ModesParm {
+	unsigned int mask;
+	char param[PARAMSIZE];
+} ModesParm;
 
 /** @brief Chanmem structure
  *  

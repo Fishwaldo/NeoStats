@@ -286,10 +286,3 @@ nassert_fail (const char *expr, const char *file, const int line, const char *in
 	exit (EXIT_FAILURE);
 }
 
-#if SQLSRV
-/* this is for sqlserver logging callback */
-void sqlsrvlog(char *logline) 
-{
-	dlog(DEBUG1, "SqlSrv: %s", logline);
-}
-#endif

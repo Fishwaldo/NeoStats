@@ -48,14 +48,6 @@ static char ircd_cmode_char_map[32];
 static char ircd_umode_char_map[32];
 static char ircd_smode_char_map[32];
 
-/** @brief ModesParm structure
- *  
- */
-typedef struct ModesParm {
-	unsigned int mask;
-	char param[PARAMSIZE];
-} ModesParm;
-
 typedef struct ModeDesc {
 	unsigned int mask;
 	const char *desc;
@@ -669,29 +661,3 @@ dumpchanmodes (CmdParams* cmdparams, Channel* c)
 	}
 
 }
-
-#ifdef SQLSRV
-
-/* display the channel modes */
-/* BUFSIZE is probably too small.. oh well */
-static char chanmodes[BUFSIZE];
-
-void *display_chanmodes (void *tbl, char *col, char *sql, void *row) 
-{
-	Channel *c = row;
-	lnode_t *cmn;
-	char tmp[BUFSIZE];
-	ModesParm *m;
-	
-	strlcpy (chanmodes, CmodeMaskToString (c->modes), BUFSIZE);
-	cmn = list_first (c->modeparms);
-	while (cmn) {
-		m = lnode_get (cmn);	
-		ircsnprintf(tmp, BUFSIZE, " +%c %s", CmodeMaskToChar (m->mask), m->param);
-		strlcat(chanmodes, tmp, BUFSIZE);
-		cmn = list_next (c->modeparms, cmn);
-	}
-	return chanmodes;
-}
-
-#endif

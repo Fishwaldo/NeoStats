@@ -31,9 +31,6 @@
 #include "servers.h"
 #include "services.h"
 #include "users.h"
-#ifdef SQLSRV
-#include "sqlsrv/rta.h"
-#endif
 
 tconfig config;
 static hash_t *serverhash;
@@ -213,99 +210,6 @@ ServerDump (const char *name)
 	}
 }
 
-#ifdef SQLSRV
-COLDEF neo_serverscols[] = {
-	{
-		"servers",
-		"name",
-		RTA_STR,
-		MAXHOST,
-		offsetof(struct Server, name),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"The name of the server linked to the IRC network"
-	},
-	{
-		"servers",
-		"hops",
-		RTA_INT,
-		sizeof(int),
-		offsetof(struct Server, hops),
-		RTA_READONLY,
-		NULL, 
-		NULL,
-		"The Number of hops away from the NeoStats Server"
-	},
-	{
-		"servers",
-		"connected",
-		RTA_INT,
-		sizeof(int),
-		offsetof(struct Server, tsconnect),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"The time the server connected to the IRC network"
-	},
-	{
-		"servers",
-		"last_ping",
-		RTA_INT,
-		sizeof(int),
-		offsetof(struct Server, ping),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"The last ping time to this server from the NeoStats Server"
-	},
-	{
-		"servers",
-		"flags",
-		RTA_INT,
-		sizeof(int),
-		offsetof(struct Server, flags),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"Flags that specify special functions for this Server"
-	},
-	{	
-		"servers",
-		"uplink",
-		RTA_STR,
-		MAXHOST,
-		offsetof(struct Server, uplink),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"The uplink Server this server is connected to. if it = self, means the NeoStats Server"
-	},
-	{	
-		"servers",
-		"infoline",
-		RTA_STR,
-		MAXINFO,
-		offsetof(struct Server, infoline),
-		RTA_READONLY,
-		NULL,
-		NULL,
-		"The description of this server"
-	},
-};
-
-TBLDEF neo_servers = {
-	"servers",
-	NULL, 	/* for now */
-	sizeof(struct Server),
-	0,
-	TBL_HASH,
-	neo_serverscols,
-	sizeof(neo_serverscols) / sizeof(COLDEF),
-	"",
-	"The list of Servers connected to the IRC network"
-};
-#endif /* SQLSRV */
 
 
 int 
@@ -317,11 +221,6 @@ InitServers (void)
 		return NS_FAILURE;
 	}
 	AddServer (me.name, NULL, 0, NULL, me.infoline);
-#ifdef SQLSRV
-	/* add the server hash to the sql library */
-	neo_servers.address = serverhash;
-	rta_add_table(&neo_servers);
-#endif
 	return NS_SUCCESS;
 }
 

@@ -41,9 +41,6 @@
 #include "bots.h"
 #include "timer.h"
 #include "signals.h"
-#ifdef SQLSRV
-#include "sqlsrv/rta.h"
-#endif
 
 char segv_location[SEGV_LOCATION_BUFSIZE];
 
@@ -75,9 +72,6 @@ void InitMe(void)
 #endif
 	config.r_time = 10;
 	me.numeric = 1;
-#ifdef SQLSRV
-	me.sqlport = 8888;
-#endif
 }
 
 /** @brief init core sub systems
@@ -95,10 +89,6 @@ static int InitCore(void)
 	/* load the config files */
 	if (ConfLoad () != NS_SUCCESS)
 		return NS_FAILURE;
-	/* init the sql subsystem if used */
-#ifdef SQLSRV
-	rta_init(sqlsrvlog);
-#endif	
 	/* initialize Module subsystem */
 	if (InitModules () != NS_SUCCESS)
 		return NS_FAILURE;
