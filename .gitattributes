@@ -65,9 +65,12 @@ src/adns/tvarith.h -text
 src/adns/types.c -text
 src/bans.c -text
 src/bans.h -text
+src/bots.c -text
+src/bots.h -text
 src/chans.c eol=lf
 src/chans.h eol=lf
 src/commands.c -text
+src/commands.h -text
 src/conf.c eol=lf
 src/conf.h eol=lf
 src/config.h.in -text

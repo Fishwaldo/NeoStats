@@ -21,13 +21,11 @@
 ** $Id$
 */
 
-#ifndef _TIMER_H_
-#define _TIMER_H_
+#ifndef _COMMANDS_H_
+#define _COMMANDS_H_
 
-int InitTimers (void);
-int FiniTimers (void);
-int list_timers (User * u, char **av, int ac);
-void run_mod_timers (void);
-void CheckTimers (void);
+int add_bot_cmd_list(ModUser *bot_ptr, bot_cmd *bot_cmd_list);
+int del_bot_cmd_list(ModUser *bot_ptr, bot_cmd *bot_cmd_list);
+int run_bot_cmd (ModUser *bot_ptr, User *u, char **av, int ac);
 
-#endif /* _TIMER_H_ */
+#endif /* _COMMANDS_H_ */

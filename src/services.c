@@ -27,6 +27,9 @@
 
 #include "neostats.h"
 #include "dl.h"
+#include "bots.h"
+#include "timer.h"
+#include "commands.h"
 #include "sock.h"
 #include "ns_help.h"
 #include "users.h"

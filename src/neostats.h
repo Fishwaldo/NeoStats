@@ -563,8 +563,23 @@ typedef struct bot_setting {
 	bot_cmd_handler	handler;	/* handler for custom/post-set processing */
 }bot_setting;
 
+
+/** @brief Message function types
+ * 
+ */
+typedef int (*message_function) (char *origin, char **av, int ac);
+typedef int (*timer_function) (void);
+
+/** @brief Socket function types
+ * 
+ */
+typedef int (*socket_function) (int sock_no, char *sockname);
+typedef int (*before_poll_function) (void *data, struct pollfd *);
+typedef void (*after_poll_function) (void *data, struct pollfd *, unsigned int);
+
+
 /* sock.c */
-int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);
+int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, socket_function func_read, socket_function func_write, socket_function func_error);
 int sock_disconnect (char *sockname);
 
 /* conf.c */
@@ -716,19 +731,6 @@ void DBSetData(char* key, void * data, int size);
 #define SOCK_POLL 1
 #define SOCK_STANDARD 2
 
-/** @brief Message function types
- * 
- */
-typedef int (*message_function) (char *origin, char **av, int ac);
-typedef int (*timer_function) (void);
-
-/** @brief Socket function types
- * 
- */
-typedef int (*socket_function) (int sock_no, char *sockname);
-typedef int (*before_poll_function) (void *data, struct pollfd *);
-typedef void (*after_poll_function) (void *data, struct pollfd *, unsigned int);
-
 /** @brief Module socket list structure
  * 
  */
@@ -846,14 +848,15 @@ typedef struct Module {
 	void *dl_handle;
 }Module;
 
-int add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval);
+int add_mod_timer (timer_function func_name, char *timer_name, char *mod_name, int interval);
 int del_mod_timer (char *timer_name);
 int change_mod_timer_interval (char *timer_name, int interval);
 ModTimer *findtimer(char *timer_name);
-int add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name);
-int add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name, void *data);
+int add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum, char *mod_name);
+int add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, char *mod_name, void *data);
 int del_socket (char *sockname);
 ModSock *findsock (char *sock_name);
+ModUser * init_mod_bot (char * nick, char * user, char * host, char * realname, const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list, char * modname);
 void add_bot_to_chan (char *bot, char *chan);
 void del_bot_from_chan (char *bot, char *chan);
 void bot_chan_message (char *origin, char **av, int ac);
@@ -915,6 +918,8 @@ void nlog (int level, int scope, char *fmt, ...) __attribute__((format(printf,3,
 
 
 #include "conf.h"
+
+int CloakHost (ModUser *bot_ptr);
 
 /* 
  * Module Interface 

@@ -21,13 +21,16 @@
 ** $Id$
 */
 
-#ifndef _TIMER_H_
-#define _TIMER_H_
+#ifndef _BOTS_H_
+#define _BOTS_H_
 
-int InitTimers (void);
-int FiniTimers (void);
-int list_timers (User * u, char **av, int ac);
-void run_mod_timers (void);
-void CheckTimers (void);
+int list_bots (User * u, char **av, int ac);
+ModUser* add_mod_user (char *nick, char *mod_name);
+ModUser* add_neostats_mod_user (char *nick);
+int del_mod_user (char *nick);
+int list_bot_chans (User * u, char **av, int ac);
+int del_mod_bot (ModUser *bot_ptr, char * reason);
+int InitBots(void);
+int FiniBots(void);
 
-#endif /* _TIMER_H_ */
+#endif /* _BOTS_H_ */

@@ -155,7 +155,11 @@ main (int argc, char *argv[])
 #endif
 		
 	/* initilze our Module subsystem */
-	if(InitModuleHash () != NS_SUCCESS)
+	if(InitModules () != NS_SUCCESS)
+		return EXIT_FAILURE;
+	if(InitTimers() != NS_SUCCESS)
+		return EXIT_FAILURE;
+	if(InitBots() != NS_SUCCESS)
 		return EXIT_FAILURE;
 
 	/* load the config files */
@@ -598,7 +602,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		FreeServers();
 		FreeBans();
 		fini_adns();
-		finiModuleHash();
+		FiniModules();
 	}
 
 	kp_flush();

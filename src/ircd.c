@@ -28,6 +28,8 @@
 #include "neostats.h"
 #include "ircd.h"
 #include "dl.h"
+#include "bots.h"
+#include "commands.h"
 #include "sock.h"
 #include "users.h"
 #include "chans.h"

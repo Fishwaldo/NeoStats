@@ -437,7 +437,7 @@ recvlog (char *line)
  *         NS_FAILURE if unsuccessful
  */
 int
-sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error)
+sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, socket_function func_read, socket_function func_write, socket_function func_error)
 {
 	struct sockaddr_in sa;
 	int s;
@@ -810,3 +810,226 @@ sql_handle_ui_output(lnode_t *sqlnode)
 
 
 #endif
+
+int InitSocks (void)
+{
+	sockh = hash_create (me.maxsocks, 0, 0);
+	if(!sockh)
+		return NS_FAILURE;
+	return NS_SUCCESS;
+}
+
+int FiniSocks (void) 
+{
+	hash_destroy(sockh);
+}
+
+/** @brief create a new socket
+ *
+ * For core use only, creates a new socket for a module
+ *
+ * @param sock_name the name of the socket to create
+ * 
+ * @return pointer to created socket on success, NULL on error
+*/
+static ModSock *
+new_sock (char *sock_name)
+{
+	ModSock *mod_sock;
+	hnode_t *sn;
+
+	SET_SEGV_LOCATION();
+	nlog (LOG_DEBUG2, LOG_CORE, "new_sock: %s", sock_name);
+	mod_sock = smalloc (sizeof (ModSock));
+	strlcpy (mod_sock->sockname, sock_name, MAX_MOD_NAME);
+	sn = hnode_create (mod_sock);
+	if (hash_isfull (sockh)) {
+		nlog (LOG_CRITICAL, LOG_CORE, "new_sock: socket hash is full, can't add a new socket");
+		return NULL;
+	}
+	hash_insert (sockh, sn, mod_sock->sockname);
+	return mod_sock;
+}
+
+/** \fn @brief find socket
+ *
+ * For core use only, finds a socket in the current list of socket
+ *
+ * @param sock_name the name of socket to find
+ * 
+ * @return pointer to socket if found, NULL if not found
+ */
+ModSock *
+findsock (char *sock_name)
+{
+	hnode_t *sn;
+
+	sn = hash_lookup (sockh, sock_name);
+	if (sn)
+		return hnode_get (sn);
+	return NULL;
+}
+
+/** @brief add a socket to the socket list
+ *
+ * For core use. Adds a socket with the given functions to the socket list
+ *
+ * @param readfunc the name of read function to register with this socket
+ * @param writefunc the name of write function to register with this socket
+ * @param errfunc the name of error function to register with this socket
+ * @param sock_name the name of socket to register
+ * @param socknum the socket number to register with this socket
+ * @param mod_name the name of module registering the socket
+ * 
+ * @return pointer to socket if found, NULL if not found
+*/
+int
+add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum, char *mod_name)
+{
+	ModSock *mod_sock;
+
+	SET_SEGV_LOCATION();
+	if (!readfunc) {
+		nlog (LOG_WARNING, LOG_CORE, "add_socket: read socket function doesn't exist = %s (%s)", readfunc, mod_name);
+		return NS_FAILURE;
+	}
+	if (!writefunc) {
+		nlog (LOG_WARNING, LOG_CORE, "add_socket: write socket function doesn't exist = %s (%s)", writefunc, mod_name);
+		return NS_FAILURE;
+	}
+	if (!errfunc) {
+		nlog (LOG_WARNING, LOG_CORE, "add_socket: error socket function doesn't exist = %s (%s)", errfunc, mod_name);
+		return NS_FAILURE;
+	}
+	mod_sock = new_sock (sock_name);
+	mod_sock->sock_no = socknum;
+	strlcpy (mod_sock->modname, mod_name, MAX_MOD_NAME);
+	mod_sock->readfnc = readfunc;
+	mod_sock->writefnc = writefunc;
+	mod_sock->errfnc = errfunc;
+	mod_sock->socktype = SOCK_STANDARD;
+	
+	nlog (LOG_DEBUG2, LOG_CORE, "add_socket: Registered Module %s with Standard Socket functions %s", mod_name, mod_sock->sockname);
+	return NS_SUCCESS;
+}
+
+/** @brief add a poll interface to the socket list
+ *
+ * For core use. Adds a socket with the given functions to the socket list
+ *
+ * @param beforepoll the name of function to call before we select
+ * @param afterpoll the name of the function to call after we select
+ * @param sock_name the name of socket to register
+ * @param mod_name the name of module registering the socket
+ * 
+ * @return pointer to socket if found, NULL if not found
+*/
+int
+add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, char *mod_name, void *data)
+{
+	ModSock *mod_sock;
+
+	SET_SEGV_LOCATION();
+	if (!beforepoll) {
+		nlog (LOG_WARNING, LOG_CORE, "add_sockpoll: read socket function doesn't exist = %s (%s)", beforepoll, mod_name);
+		return NS_FAILURE;
+	}
+	if (!afterpoll) {
+		nlog (LOG_WARNING, LOG_CORE, "add_sockpoll: write socket function doesn't exist = %s (%s)", afterpoll, mod_name);
+		return NS_FAILURE;
+	}
+	mod_sock = new_sock (sock_name);
+	strlcpy (mod_sock->modname, mod_name, MAX_MOD_NAME);
+	mod_sock->socktype = SOCK_POLL;
+	mod_sock->beforepoll = beforepoll;
+	mod_sock->afterpoll = afterpoll;
+	mod_sock->data = data;
+	nlog (LOG_DEBUG2, LOG_CORE, "add_sockpoll: Registered Module %s with Poll Socket functions %s", mod_name, mod_sock->sockname);
+	return NS_SUCCESS;
+}
+
+/** @brief delete a socket from the socket list
+ *
+ * For module use. Deletes a socket with the given name from the socket list
+ *
+ * @param socket_name the name of socket to delete
+ * 
+ * @return NS_SUCCESS if deleted, NS_FAILURE if not found
+*/
+int
+del_socket (char *sock_name)
+{
+	ModSock *mod_sock;
+	hnode_t *sn;
+
+	SET_SEGV_LOCATION();
+	sn = hash_lookup (sockh, sock_name);
+	if (sn) {
+		mod_sock = hnode_get (sn);
+		nlog (LOG_DEBUG2, LOG_CORE, "del_socket: Unregistered Socket function %s from Module %s", sock_name, mod_sock->modname);
+		hash_scan_delete (sockh, sn);
+		hnode_destroy (sn);
+		free (mod_sock);
+		return NS_SUCCESS;
+	}
+	return NS_FAILURE;
+}
+
+/** @brief delete a socket from the socket list
+ *
+ * For module use. Deletes a socket with the given name from the socket list
+ *
+ * @param socket_name the name of socket to delete
+ * 
+ * @return NS_SUCCESS if deleted, NS_FAILURE if not found
+*/
+int
+del_sockets (char *module_name)
+{
+	ModSock *mod_sock;
+	hnode_t *modnode;
+	hscan_t hscan;
+
+	hash_scan_begin (&hscan, sockh);
+	while ((modnode = hash_scan_next (&hscan)) != NULL) {
+		mod_sock = hnode_get (modnode);
+		if (!ircstrcasecmp (mod_sock->modname, module_name)) {
+			nlog (LOG_DEBUG1, LOG_CORE, "del_sockets: Module %s had Socket %s Registered. Deleting..", module_name, mod_sock->sockname);
+			del_socket (mod_sock->sockname);
+		}
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief list sockets in use
+ *
+ * NeoStats command to list the current sockets from IRC
+ *
+ * @param u pointer to user structure of the user issuing the request
+ * 
+ * @return none
+*/
+int
+list_sockets (User * u, char **av, int ac)
+{
+	ModSock *mod_sock = NULL;
+	hscan_t ss;
+	hnode_t *sn;
+
+	SET_SEGV_LOCATION();
+	prefmsg (u->nick, s_Services, "Sockets List: (%d)", (int)hash_count (sockh));
+	hash_scan_begin (&ss, sockh);
+	while ((sn = hash_scan_next (&ss)) != NULL) {
+		mod_sock = hnode_get (sn);
+		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_sock->modname);
+		prefmsg (u->nick, s_Services, "Socket Name: %s", mod_sock->sockname);
+		if (mod_sock->socktype == SOCK_STANDARD) {
+			prefmsg (u->nick, s_Services, "Socket Number: %d", mod_sock->sock_no);
+		} else {
+			prefmsg (u->nick, s_Services, "Poll Interface");
+		}
+	}
+	prefmsg (u->nick, s_Services, "End of Socket List");
+	return 0;
+}
+
