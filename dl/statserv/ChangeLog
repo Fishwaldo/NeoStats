@@ -5,6 +5,8 @@ Shmad & ^Enigma & Fish^
 
 * Version 3.42 * September 1st, 2002 (S)
  - Fixed a crash bug if you tried to Delete STATS for statserv itself.  We dont allow this!!!
+ - Changed all levels from 190 to 185 since Unreal users just cant seem to install SR in any
+   event Net/Tech are same level essentially. So internals for SS use 185 as highest level.
 
 * Version 3.41 * July 29th, 2002 (S)
  - Fixed a bug where channel alerts would get dropped notice changed to chanalert()
