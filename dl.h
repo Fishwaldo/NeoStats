@@ -241,6 +241,7 @@ int bot_nick_change (char * oldnick, char *newnick);
 void verify_hashes(void);
 int add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* cmd_list);
 int del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* cmd_list);
+void run_bot_cmd (ModUser* bot_ptr, char *nick, char **av, int ac);
 
 /* 
  * Module Interface 

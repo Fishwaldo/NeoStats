@@ -32,6 +32,11 @@ const char *cs_help[] = {
 	NULL
 };
 
+const char cs_help_about_oneline[] = "About ConnectServ";
+const char cs_help_version_oneline[] = "Display version info";
+const char cs_help_status_oneline[] = "Configure ConnectServ";
+
+
 const char *cs_help_on_help[] = {
 	"",
 	"To use a command, type",

@@ -30,6 +30,9 @@ hash_t *botcmds;
 
 extern const char *ns_help_on_help[];
 extern bot_cmd ns_commands[];
+
+void bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac);
+
 int 
 init_services() 
 {
@@ -171,8 +174,71 @@ servicesbot (char *nick, char **av, int ac)
 	chanalert (s_Services, "%s requested %s, but that is an unknown command", u->nick, av[1]);
 }
 
+void
+run_bot_cmd (ModUser* bot_ptr, char *nick, char **av, int ac)
+{
+	User *u;
+	bot_cmd* cmd_ptr;
+	hnode_t *cmdnode;
+
+	u = finduser (nick);
+	if (!u) {
+		nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", nick, bot_ptr->nick);
+		return;
+	}
+	SET_SEGV_LOCATION();
+	
+	me.requests++;
+
+	/* Check user authority to use this command set */
+	if (me.onlyopers && (UserLevel (u) < NS_ULEVEL_OPER)) {
+		prefmsg (u->nick, bot_ptr->nick, "This service is only available to IRCops.");
+		chanalert (bot_ptr->nick, "%s Requested %s, but he is Not an Operator!", u->nick, av[1]);
+		return;
+	}
+
+	/* force support for help command */
+	if (!strcasecmp(av[1], "HELP")) {
+		bot_cmd_help(bot_ptr, u, av, ac);
+		return;
+	}
+	/* Process command list */
+	cmdnode = hash_lookup(bot_ptr->botcmds, av[1]);
+
+	if (cmdnode) {
+		cmd_ptr = hnode_get(cmdnode);
+	
+		/* Is user authorised to issue this command? */
+		if (UserLevel (u) < cmd_ptr->ulevel) {
+			prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
+			chanalert (bot_ptr->nick, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
+			return;
+		}
+		/* First two parameters are bot name and command name so 
+		 * subtract 2 to get parameter count */
+		if((ac - 2) < cmd_ptr->minparams ) {
+			prefmsg (u->nick, bot_ptr->nick, "Syntax error: insufficient parameters");
+			prefmsg (u->nick, bot_ptr->nick, "/msg %s HELP %s for more information", bot_ptr->nick, cmd_ptr->cmd);
+			return;
+		}
+		/* Missing handler?! */
+		if(!cmd_ptr->handler) {
+			return;
+		}
+		/* Seems OK so report the command call then call appropriate handler */
+		chanalert (bot_ptr->nick, "%s used %s", u->nick, cmd_ptr->cmd);
+		cmd_ptr->handler(u, av, ac);
+		return;
+	}
+
+	/* We have run out of commands so report failure */
+	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[1]);
+	chanalert (bot_ptr->nick, "%s requested %s, but that is an unknown command", u->nick, av[1]);
+}
+
+
 void 
-bot_cmd_help (User * u, char **av, int ac)
+services_cmd_help (User * u, char **av, int ac)
 {
 	bot_cmd* cmd_ptr;
 	int curlevel, lowlevel;
@@ -234,5 +300,91 @@ bot_cmd_help (User * u, char **av, int ac)
 		return;
 	}
 	prefmsg (u->nick, s_Services, "Unknown Help Topic: \2%s\2", av[2]);
+}
+
+const char * help_level_title[]=
+{
+	"\2Commands Available to Opers and Above:\2",
+	"\2Commands Available to Service Admins and Above:\2",
+	"\2Commands Available to Service Roots:\2",
+};
+
+void 
+bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
+{
+	char* curmsg=NULL;
+	int donemsg=0;
+	bot_cmd* cmd_ptr;
+	int curlevel, lowlevel;
+	hnode_t *cmdnode;
+	hscan_t hs;
+
+	if (ac < 3) {
+		lowlevel = 0;
+		curlevel = NS_ULEVEL_OPER;
+		chanalert (bot_ptr->nick, "%s Requested %s Help", u->nick, bot_ptr->nick);
+		prefmsg(u->nick, bot_ptr->nick, "The following commands can be used with %s:", bot_ptr->nick);
+
+		restartlevel:
+		hash_scan_begin(&hs, bot_ptr->botcmds);
+		while ((cmdnode = hash_scan_next(&hs)) != NULL) {
+			cmd_ptr = hnode_get(cmdnode);
+			if ((cmd_ptr->ulevel < curlevel) && (cmd_ptr->ulevel >= lowlevel)) {
+				if(curmsg && !donemsg) {
+					prefmsg(u->nick, bot_ptr->nick, curmsg);
+					donemsg = 1;
+				}
+				prefmsg(u->nick, bot_ptr->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
+			}
+		}
+		if (UserLevel(u) >= curlevel) {
+			switch (curlevel) {
+				case NS_ULEVEL_OPER:
+						curlevel = NS_ULEVEL_ADMIN;
+						lowlevel = NS_ULEVEL_OPER;
+						curmsg=help_level_title[0];
+						donemsg=0;
+						goto restartlevel;
+				case NS_ULEVEL_ADMIN:
+						curlevel = NS_ULEVEL_ROOT;
+						lowlevel = NS_ULEVEL_ADMIN;
+						curmsg=help_level_title[1];
+						donemsg=0;
+						goto restartlevel;
+				case NS_ULEVEL_ROOT:
+						curlevel = 201;
+						lowlevel = 200;
+						curmsg=help_level_title[2];
+						donemsg=0;
+						goto restartlevel;
+				default:	
+						break;
+			}
+		}						
+		prefmsg(u->nick, bot_ptr->nick, " ");
+		prefmsg(u->nick, bot_ptr->nick, "To use a command, type");
+		prefmsg(u->nick, bot_ptr->nick, "    \2/msg %s command\2", bot_ptr->nick);
+		prefmsg(u->nick, bot_ptr->nick, "For for more information on a command, type");
+		prefmsg(u->nick, bot_ptr->nick, "    \2/msg %s HELP command\2.", bot_ptr->nick);
+		return;
+	}
+	chanalert (bot_ptr->nick, "%s Requested %s Help on %s", u->nick, bot_ptr->nick, av[2]);
+
+	/* Process command list */
+	cmdnode = hash_lookup(bot_ptr->botcmds, av[2]);
+	if (cmdnode) {
+		cmd_ptr = hnode_get(cmdnode);
+		if (UserLevel (u) < cmd_ptr->ulevel) {
+			prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
+			return;
+		}		
+		if(!cmd_ptr->helptext) {
+			/* Missing help text!!! */
+			return;
+		}
+		privmsg_list (u->nick, bot_ptr->nick, cmd_ptr->helptext);
+		return;
+	}
+	prefmsg (u->nick, bot_ptr->nick, "Unknown Help Topic: \2%s\2", av[2]);
 }
 

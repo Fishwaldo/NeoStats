@@ -34,7 +34,7 @@
 /* Uncomment this line to disable colours in ConnectServ 
    channel messages
 */
-/* #define DISABLE_COLOUR_SUPPORT */
+/*#define DISABLE_COLOUR_SUPPORT */
 
 #ifdef DISABLE_COLOUR_SUPPORT
 char msg_nickchange[]="\2NICK\2 %s (%s@%s) Changed their nick to %s";
@@ -117,7 +117,7 @@ static int cs_user_nick(char **av, int ac);
 static void do_set(User * u, char **av, int ac);
 static void LoadConfig(void);
 
-static void cs_version(User * u);
+static void cs_version(User * u, char **av, int ac);
 static void cs_set_list(User * u, char **av, int ac);
 static void cs_set_signwatch(User * u, char **av, int ac);
 static void cs_set_killwatch(User * u, char **av, int ac);
@@ -147,7 +147,7 @@ static int cs_online = 0;
 ModuleInfo __module_info = {
 	"ConnectServ",
 	"Network Connection & Mode Monitoring Service",
-	"1.10",
+	"1.11",
 	__DATE__,
 	__TIME__
 };
@@ -171,7 +171,15 @@ Functions __module_functions[] = {
 	{NULL, NULL, 0}
 };
 
-int __BotMessage(char *origin, char **av, int ac)
+bot_cmd cs_commands[]=
+{
+/*	{"HELP",		ns_do_help,		0, 	NS_ULEVEL_ADMIN,	cs_help_on_help, 	1, 	ns_help_help_oneline},*/
+	{"SET",			do_set,			0, 	NS_ULEVEL_ADMIN,	cs_help_status, 	1, 	cs_help_status_oneline },
+	{"ABOUT",		NULL,			0, 	NS_ULEVEL_ADMIN,	cs_help_about, 		1, 	cs_help_about_oneline },
+	{"VERSION",		cs_version,		0, 	NS_ULEVEL_ADMIN,	cs_help_version, 	1, 	cs_help_version_oneline },
+};
+
+int __BotMessageOff(char *origin, char **av, int ac)
 {
 	User *u;
 	u = finduser(origin);
@@ -214,7 +222,7 @@ int __BotMessage(char *origin, char **av, int ac)
 		chanalert(s_Services,
 			  "%s Wanted to know the current version information for %s",
 			  u->nick, s_ConnectServ);
-		cs_version(u);
+		cs_version(u, av, ac);
 	} else {
 		prefmsg(u->nick, s_ConnectServ,
 			"Unknown Command: \2%s\2, perhaps you need some HELP?",
@@ -261,6 +269,7 @@ void do_set(User * u, char **av, int ac)
 
 int Online(char **av, int ac)
 {
+	ModUser *mybot;
 	if (init_bot
 	    (s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.rname, services_bot_modes,
 	     __module_info.module_name) == -1) {
@@ -269,6 +278,8 @@ int Online(char **av, int ac)
 		init_bot(s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.rname, services_bot_modes,
 			 __module_info.module_name);
 	}
+	mybot = findbot(s_ConnectServ);
+	add_bot_cmd_list(mybot, cs_commands);
 	cs_online = 1;
 	return 1;
 };
@@ -307,7 +318,7 @@ void __ModFini()
 /* 
  * VERSION
  */
-static void cs_version(User * u)
+static void cs_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_ConnectServ,

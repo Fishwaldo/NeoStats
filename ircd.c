@@ -312,6 +312,8 @@ parse (char *line)
 				if (setjmp (sigvbuf) == 0) {
 					if(mod_usr->function)
 						mod_usr->function (origin, av, ac);
+					else
+						run_bot_cmd(mod_usr, origin, av, ac);
 				}
 				CLEAR_SEGV_INMODULE();
 				SET_SEGV_LOCATION();
