@@ -601,7 +601,6 @@ UserDump (const char *nick)
 		hash_scan_begin (&us, uh);
 		while ((un = hash_scan_next (&us)) != NULL) {
 			u = hnode_get (un);
-			debugtochannel("User: %s!%s@%s (%s) Flags %lx", u->nick, u->username, u->hostname, u->vhost, u->flags);
 #ifdef GOTUSERSMODES
 			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx) Smodes %s (%lx)", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode, u->Smode);
 #else
