@@ -122,6 +122,15 @@
 /* enable Mystic support */
 #undef MYSTIC
 
+/* enable Bahamut support */
+#undef BAHAMUT
+
+/* enable Quantum support */
+#undef QUANTUM
+
+/* enable Ircu support */
+#undef IRCU
+
 /* Version number of package */
 #undef VERSION
 

@@ -15,6 +15,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - users/servers/channels/modes now have a module data pointer
  - Fixed (again) FloodControl Code: BugID 18. Now uses svskill. Should be more robust. 
  - Tested long and hard the Ultimate3 IRCd port. Should be good. :)
+ - Added Quantum/Bahamut/IRCu framework
 
 * NeoStats * Fish * Version 2.5.3
  - Added ability to turn off StatServ wallops. "/msg statserv set msgthrottle off" - BugID#6

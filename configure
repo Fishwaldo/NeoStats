@@ -846,7 +846,10 @@ Optional Features:
  --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support
  --enable-hybrid7 - enable Hybrid7 IRCD Support
  --enable-neoircd - enable NeoIRCd IRCD Support
- --enable-mystic - enabled Mystic IRCd 1.1.x Support
+ --enable-quantum - enable Quantum IRCD Support
+ --enable-mystic - enable Mystic IRCD Support
+ --enable-bahamut - enable Bahamut IRCD Support
+ --enable-ircu - enable IRCu IRCD Support
  --enable-auth=TYPE - what type of Authentication to use. See Readme File
  --enable-raw - Enable Raw command
  --enable-modules="MODULES" - space seperated list of modules to compile
@@ -1279,10 +1282,10 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 cat >>confdefs.h <<\_ACEOF
-#define REV 3
+#define REV 4
 _ACEOF
 
-VERSION=2.5.3
+VERSION=2.5.4
 
 CFLAGS="$CFLAGS -O2"
 
@@ -5268,36 +5271,6 @@ echo "${ECHO_T}no" >&6
 
 fi;
 
-echo "$as_me:$LINENO: checking Whether to Enable Mystic 1.1.x IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Mystic 1.1.x IRCD Support...... $ECHO_C" >&6
-
-# Check whether --enable-mystic or --disable-mystic was given.
-if test "${enable_mystic+set}" = set; then
-  enableval="$enable_mystic"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define MYSTIC 1
-_ACEOF
-
-        IRCD_FILES_SRC="mystic.c"
-        IRCD_FILES_OBJS="mystic.o"
-        echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-        ;;
-  *)
-        echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-        ;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi;
-
-
-
 echo "$as_me:$LINENO: checking Whether to Enable NeoIRCd IRCD Support..." >&5
 echo $ECHO_N "checking Whether to Enable NeoIRCd IRCD Support...... $ECHO_C" >&6
 # Check whether --enable-neoircd or --disable-neoircd was given.
@@ -5326,6 +5299,114 @@ echo "${ECHO_T}no" >&6
 
 fi;
 
+echo "$as_me:$LINENO: checking Whether to Enable Quantum IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Quantum IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-quantum or --disable-quantum was given.
+if test "${enable_quantum+set}" = set; then
+  enableval="$enable_quantum"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define QUANTUM 1
+_ACEOF
+
+	IRCD_FILES_SRC="QuantumIRCd.c"
+	IRCD_FILES_OBJS="QuantumIRCd.o"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable Mystic IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Mystic IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-mystic or --disable-mystic was given.
+if test "${enable_mystic+set}" = set; then
+  enableval="$enable_mystic"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define MYSTIC 1
+_ACEOF
+
+	IRCD_FILES_SRC="Mystic.c"
+	IRCD_FILES_OBJS="Mystic.o"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable Bahamut IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Bahamut IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-bahamut or --disable-bahamut was given.
+if test "${enable_bahamut+set}" = set; then
+  enableval="$enable_bahamut"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define BAHAMUT 1
+_ACEOF
+
+	IRCD_FILES_SRC="Bahamut.c"
+	IRCD_FILES_OBJS="Bahamut.o"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable IRCu IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable IRCu IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-ircu or --disable-ircu was given.
+if test "${enable_ircu+set}" = set; then
+  enableval="$enable_ircu"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define IRCU 1
+_ACEOF
+
+	IRCD_FILES_SRC="Ircu.c"
+	IRCD_FILES_OBJS="Ircu.o"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi;
+
 echo "$as_me:$LINENO: checking A compatible IRCD is specified" >&5
 echo $ECHO_N "checking A compatible IRCD is specified... $ECHO_C" >&6
 case "$IRCD_FILES_SRC" in
@@ -5340,16 +5421,23 @@ echo "${ECHO_T}yes" >&6
    "hybrid7.c")
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	echo "*******************************************************"
-	echo "Hybrid7 Support is very very experimental at the moment"
-	echo "Please report any bugs, or Desyncs to:"
-	echo "http://www.neostats.net/boards"
-	echo "*******************************************************"
 	;;
-   "mystic.c")
-        echo "$as_me:$LINENO: result: yes" >&5
+   "Mystic.c")
+	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-        ;;
+	;;
+   "QuantumIRCd.c")
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+   "Bahamut.c")
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+   "Ircu.c")
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
    "neoircd.c")
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6

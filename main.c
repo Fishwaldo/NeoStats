@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.95 2003/06/13 13:11:49 fishwaldo Exp $
+** $Id: main.c,v 1.96 2003/06/30 15:18:24 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -51,6 +51,14 @@ const char version[] = "(UL)";
 const char version[] = "(H)";
 #elif NEOIRCD
 const char version[] = "(N)";
+#elif MYSTIC
+const char version[] = "(M)";
+#elif QUANTUM
+const char version[] = "(Q)";
+#elif IRCU
+const char version[] = "(IRCU)";
+#elif BAHAMUT
+const char version[] = "(B)";
 #endif
 
 

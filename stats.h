@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.84 2003/06/26 05:49:45 fishwaldo Exp $
+** $Id: stats.h,v 1.85 2003/06/30 15:18:24 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -58,6 +58,12 @@
 #include "neoircd.h"
 #elif MYSTIC == 1
 #include "mystic.h"
+#elif IRCU == 1
+#include "Ircu.h"
+#elif BAHAMUT == 1
+#include "Bahamut.h"
+#elif QUANTUM == 1
+#include "QuantumIRCd.h"
 #else
 #error Error, you must select a IRCD to use. See ./configure --help for more information
 #endif
