@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.15 2002/10/15 18:43:48 shmad Exp $
+** $Id: hostserv.c,v 1.16 2002/10/15 20:44:43 shmad Exp $
 */
 
 #include <stdio.h>
@@ -513,7 +513,6 @@ static void hs_del(User *u, int tmpint)
 /* Routine to allow users to login and get their vhosts */
 static void hs_login(User *u, char *login, char *pass)
 {
-    char *tmp = NULL;
         HS_Map *map;
 
         strcpy(segv_location, "HostServ-hs_login");
@@ -521,12 +520,13 @@ static void hs_login(User *u, char *login, char *pass)
     /* Check HostName Against Data Contained in vhosts.data */
       for (map = nnickmap; map; map = map->next) {
            if (!strcasecmp(map->nnick, login)) {
-          tmp = map->passwd;
-                  if (fnmatch(strlower(tmp), strlower(pass), 0) == 0) {
-              ssvshost_cmd(u->nick, map->vhost);
-	      prefmsg(u->nick, s_HostServ, "Your VHOST %s has been set.", map->vhost);
-	      hslog("%s used LOGIN to obtain userhost of %s",u->nick, map->vhost);
-              return;
+	  
+	hslog("Client sent: %s We have in DB: %s", strlower(pass), map->passwd);
+	      if (!strcasecmp(map->passwd, pass)) {
+	              ssvshost_cmd(u->nick, map->vhost);
+		      prefmsg(u->nick, s_HostServ, "Your VHOST %s has been set.", map->vhost);
+		      hslog("%s used LOGIN to obtain userhost of %s",u->nick, map->vhost);
+	              return;
            }
        }
     }
