@@ -40,8 +40,6 @@ dl/cs/ChangeLog -text
 dl/cs/Makefile -text
 dl/cs/cs.c -text
 dl/cs/cs_help.c -text
-dl/helper/helper.c -text
-dl/helper/ni_help.c -text
 dl/hostserv/ChangeLog -text
 dl/hostserv/Makefile -text
 dl/hostserv/README -text
@@ -77,11 +75,6 @@ dl/operlog/ChangeLog -text
 dl/operlog/Makefile -text
 dl/operlog/ol_help.c -text
 dl/operlog/operlog.c -text
-dl/services/DOESNOTCOMPILE -text
-dl/services/Makefile.am -text
-dl/services/Makefile.in -text
-dl/services/build -text
-dl/services/services.c -text
 dl/spam/Makefile -text
 dl/spam/spam.c -text
 dl/statserv/ChangeLog -text
@@ -90,10 +83,6 @@ dl/statserv/m_stats.h -text
 dl/statserv/ss_help.c -text
 dl/statserv/statserv.c -text
 dl/statserv/statserv.h -text
-dl/tstats/m_stats.h -text
-dl/tstats/ss_help.c -text
-dl/tstats/statserv.c -text
-dl/tstats/statserv.h -text
 dl/version/Makefile -text
 dl/version/version.c -text
 doc/FAQ -text
