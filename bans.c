@@ -26,27 +26,105 @@
 
 static hash_t *banshash;
 
-void 
-AddBan()
+static Ban *
+new_ban (const char *mask)
 {
-#if 0
-	AddBan(const char* type, const char* user, const char* host, const char* mask,
+	Ban *ban;
+	hnode_t *bansnode;
+
+	SET_SEGV_LOCATION();
+	ban = calloc (sizeof (Ban), 1);
+	bzero(ban, sizeof(Ban));
+	strlcpy (ban->mask, mask, MAXHOST);
+	bansnode = hnode_create (ban);
+	if (!bansnode) {
+		nlog (LOG_WARNING, LOG_CORE, "bans hash is broken\n");
+	}
+	if (hash_isfull (banshash)) {
+		nlog (LOG_WARNING, LOG_CORE, "bans hash is full!\n");
+	} else {
+		hash_insert (banshash, bansnode, ban->mask);
+	}
+	return ban;
+}
+
+void AddBan(const char* type, const char* user, const char* host, const char* mask,
 	const char* reason, const char* setby, const char* tsset, const char* tsexpires)
+{
+	char **av;
+	int ac = 0;
 	Ban* ban;
-	ban->type = type;
+
+	ban = new_ban (mask);
+	ban->type = type[0];
 	strlcpy(ban->user, user, MAXUSER);
 	strlcpy(ban->host, host, MAXHOST);
 	strlcpy(ban->mask, mask, MAXHOST);
-	strlcpy(ban->reason, reason,,BUFSIZE);
+	strlcpy(ban->reason, reason,BUFSIZE);
 	strlcpy(ban->setby ,setby, MAXHOST);
 	ban->tsset = atol(tsset);
 	ban->tsexpires = atol(tsexpires);
-#endif
+
+	/* run the module event for a new server. */
+	AddStringToList (&av, (char*)type, &ac);
+	AddStringToList (&av, (char*)user, &ac);
+	AddStringToList (&av, (char*)host, &ac);
+	AddStringToList (&av, (char*)mask, &ac);
+	AddStringToList (&av, (char*)reason, &ac);
+	AddStringToList (&av, (char*)setby, &ac);
+	AddStringToList (&av, (char*)tsset, &ac);
+	AddStringToList (&av, (char*)tsexpires, &ac);
+	ModuleEvent (EVENT_ADDBAN, av, ac);
+	free (av);
 }
 
 void 
-DelBan()
+DelBan(const char* type, const char* user, const char* host, const char* mask,
+	const char* reason, const char* setby, const char* tsset, const char* tsexpires)
 {
+	Ban *ban;
+	hnode_t *bansnode;
+	char **av;
+	int ac = 0;
+
+	bansnode = hash_lookup (banshash, mask);
+	if (!bansnode) {
+		nlog (LOG_WARNING, LOG_CORE, "DelBan: unknown ban %s", mask);
+		return;
+	}
+	ban = hnode_get (bansnode);
+
+	/* run the module event for a new server. */
+	AddStringToList (&av, (char*)type, &ac);
+	AddStringToList (&av, (char*)user, &ac);
+	AddStringToList (&av, (char*)host, &ac);
+	AddStringToList (&av, (char*)mask, &ac);
+	AddStringToList (&av, (char*)reason, &ac);
+	AddStringToList (&av, (char*)setby, &ac);
+	AddStringToList (&av, (char*)tsset, &ac);
+	AddStringToList (&av, (char*)tsexpires, &ac);
+	ModuleEvent (EVENT_DELBAN, av, ac);
+	free (av);
+
+	hash_delete (banshash, bansnode);
+	hnode_destroy (bansnode);
+	free (ban);
+}
+
+void
+BanDump (void)
+{
+	Ban *ban;
+	hscan_t ss;
+	hnode_t *bansnode;
+
+	debugtochannel("Server Listing:");
+	hash_scan_begin (&ss, banshash);
+	while ((bansnode = hash_scan_next (&ss)) != NULL) {
+		ban = hnode_get (bansnode);
+		debugtochannel("Ban: %s ", ban->mask);
+	}
+	debugtochannel("End of Listing.");
 }
 
 int 

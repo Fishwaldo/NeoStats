@@ -219,3 +219,11 @@
  */
 #define EVENT_CNOTICE		"CNOTICE"
 
+/* ADDBAN params are:
+ */
+#define EVENT_ADDBAN		"ADDBAN"
+
+/* DELBAN params are:
+ */
+#define EVENT_DELBAN		"DELBAN"
+

@@ -1830,10 +1830,12 @@ do_swhois (char *who, char *swhois)
 void 
 do_tkl(const char *add, const char *type, const char *user, const char *host, const char *setby, const char *tsexpire, const char *tsset, const char *reason)
 {
+	char mask[MAXHOST];
+	ircsnprintf(mask, MAXHOST, "%s@%s", user, host);
 	if(add[0] == '+') {
-		AddBan();
+		AddBan(type, user, host, mask, reason, setby, tsset, tsexpire);
 	} else {
-		DelBan();
+		DelBan(type, user, host, mask, reason, setby, tsset, tsexpire);
 	}
 }
 #endif
