@@ -71,7 +71,7 @@ static void kp_init_tmpname()
 
 	pid = getpid();
 
-	kp_tmpname = (char *) smalloc(strlen(hostname) + 64);
+	kp_tmpname = (char *) ns_malloc(strlen(hostname) + 64);
 #ifdef WIN32
 	sprintf(kp_tmpname, "tmp.%s.%u", hostname, pid);
 #else
@@ -86,7 +86,7 @@ static char *kp_init_localdb(void)
 {
 	char *basedir;
 
-	basedir = (char *) smalloc(strlen(LOCALDIR) + 2);
+	basedir = (char *) ns_malloc(strlen(LOCALDIR) + 2);
 	sprintf(basedir, "%s/", LOCALDIR);
 #ifdef WIN32
 	mkdir(basedir);
@@ -108,7 +108,7 @@ static char *kp_init_userdb(void)
 	char *basedir;
 	userdir = getenv("KEEPER_USERDIR");
 	if (userdir != 0) {
-		basedir = (char *) smalloc(strlen(userdir) + 2);
+		basedir = (char *) ns_malloc(strlen(userdir) + 2);
 		sprintf(basedir, "%s/", userdir);
 	} else {
 		homeval = getenv("HOME");
@@ -116,7 +116,7 @@ static char *kp_init_userdb(void)
 			homeval = "";
 		/* FIXME: where to find home, if $HOME is not set? */
 
-		basedir = (char *) smalloc(strlen(homeval) + 1 +
+		basedir = (char *) ns_malloc(strlen(homeval) + 1 +
 						strlen(USERSUBDIR) + 2);
 		sprintf(basedir, "%s/%s/", homeval, USERSUBDIR);
 	}
@@ -147,7 +147,7 @@ static char *kp_init_globaldb(void)
 #endif
 		globaldir = sstrdup(GLOBALDIR);
 
-	basedir = (char *) smalloc(strlen(globaldir) + 2);
+	basedir = (char *) ns_malloc(strlen(globaldir) + 2);
 	sprintf(basedir, "%s/", globaldir);
 	free(globaldir);
 
@@ -219,7 +219,7 @@ static char *kp_read_line(FILE * fp)
 			eol = 1;
 		}
 
-		line = (char *) srealloc(line, linelen + buflen + 1);
+		line = (char *) ns_realloc(line, linelen + buflen + 1);
 
 		strcpy(line + linelen, buf);
 		linelen += buflen;
@@ -302,7 +302,7 @@ int _kp_get_path(const char *keypath, kp_path * kpp, char **keynamep,
 
 	ibeg = strlen(basedir);
 
-	path = (char *) smalloc(ibeg + strlen(keypath) + 1);
+	path = (char *) ns_malloc(ibeg + strlen(keypath) + 1);
 	sprintf(path, "%s%s", basedir, keypath);
 
 	i = ibeg;
@@ -346,7 +346,7 @@ int _kp_lock_file(int dbindex, int iswrite)
 
 	basedir = kp_basedirs[dbindex];
 	lockfile =
-	    (char *) smalloc(strlen(basedir) + strlen(LOCKFILE) + 1);
+	    (char *) ns_malloc(strlen(basedir) + strlen(LOCKFILE) + 1);
 	sprintf(lockfile, "%s%s", basedir, LOCKFILE);
 
 	if (iswrite)
@@ -426,7 +426,7 @@ char *_kp_get_tmpfile(int dbindex)
 
 	basedir = kp_basedirs[dbindex];
 	filename =
-	    (char *) smalloc(strlen(basedir) + strlen(kp_tmpname) +
+	    (char *) ns_malloc(strlen(basedir) + strlen(kp_tmpname) +
 				  1);
 	sprintf(filename, "%s%s", basedir, kp_tmpname);
 
@@ -485,7 +485,7 @@ static void kp_add_subkey(struct key_array *keys, char *name)
 
 	keys->num++;
 	keys->array = (char **)
-	    srealloc(keys->array,
+	    ns_realloc(keys->array,
 			      (keys->num + 1) * sizeof(char *) +
 			      keys->strsize);
 

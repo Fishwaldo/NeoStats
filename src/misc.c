@@ -55,19 +55,19 @@ strip (char *line)
  * @returns pointer to allocated buffer
  */
 
-void * smalloc ( const int size )
+void * ns_malloc ( const int size )
 {
 	unsigned int allocsize;
 	void *buf;
 
 	allocsize = size;
 	if (!allocsize) {
-		nlog (LOG_WARNING, "smalloc: illegal attempt to allocate 0 bytes!");
+		nlog (LOG_WARNING, "ns_malloc: illegal attempt to allocate 0 bytes!");
 		allocsize = 1;
 	}
 	buf = malloc (allocsize);
 	if (!buf) {
-		nlog (LOG_CRITICAL, "smalloc: out of memory.");
+		nlog (LOG_CRITICAL, "ns_malloc: out of memory.");
 		do_exit (NS_EXIT_ERROR, "Out of memory");
 	}
 	return buf;
@@ -83,19 +83,19 @@ void * smalloc ( const int size )
  * @returns pointer to allocated buffer
  */
 
-void * scalloc ( const int size )
+void * ns_calloc ( const int size )
 {
 	void *buf;
 	unsigned int allocsize;
 
 	allocsize = size;
 	if (!allocsize) {
-		nlog (LOG_WARNING, "scalloc: illegal attempt to allocate 0 bytes!");
+		nlog (LOG_WARNING, "ns_calloc: illegal attempt to allocate 0 bytes!");
 		allocsize = 1;
 	}
 	buf = calloc (1, allocsize);
 	if (!buf) {
-		nlog (LOG_CRITICAL, "scalloc: out of memory.");
+		nlog (LOG_CRITICAL, "ns_calloc: out of memory.");
 		do_exit (NS_EXIT_ERROR, "Out of memory");
 	}
 	return buf;
@@ -111,13 +111,13 @@ void * scalloc ( const int size )
  * @returns pointer to allocated buffer
  */
 
-void * srealloc ( void* ptr, const int size )
+void * ns_realloc ( void* ptr, const int size )
 {
 	void* newptr;
 
 	newptr = realloc (ptr, size);
 	if (!newptr) {
-		nlog (LOG_CRITICAL, "srealloc: out of memory.");
+		nlog (LOG_CRITICAL, "ns_realloc: out of memory.");
 		do_exit (NS_EXIT_ERROR, "Out of memory");
 	}
 	return newptr;
@@ -133,14 +133,14 @@ void * srealloc ( void* ptr, const int size )
  * @returns none
  */
 
-void sfree ( void *buf )
+void ns_realfree ( void **buf )
 {
-	if (!buf) {
-		nlog (LOG_WARNING, "sfree: illegal attempt to free NULL pointer");
+	if (!*buf) {
+		nlog (LOG_WARNING, "ns_free: illegal attempt to free NULL pointer");
 		return;
 	}
-	free (buf);
-	buf = 0;
+	free (*buf);
+	*buf = 0;
 }
 
 /** @brief Duplicate a string
@@ -201,14 +201,14 @@ ircsplitbuf (char *buf, char ***argv, int colon_special)
 	char *s;
 	int colcount = 0;
 	SET_SEGV_LOCATION();
-	*argv = scalloc (sizeof (char *) * argvsize);
+	*argv = ns_calloc (sizeof (char *) * argvsize);
 	argc = 0;
 	/*if (*buf == ':')
 		buf++;*/
 	while (*buf) {
 		if (argc == argvsize) {
 			argvsize += 8;
-			*argv = srealloc (*argv, sizeof (char *) * argvsize);
+			*argv = ns_realloc (*argv, sizeof (char *) * argvsize);
 		}
 		if ((*buf == ':') && (colcount < 1)) {
 			buf++;
@@ -243,14 +243,14 @@ split_buf (char *buf, char ***argv, int colon_special)
 	char *s;
 	int colcount = 0;
 	SET_SEGV_LOCATION();
-	*argv = scalloc (sizeof (char *) * argvsize);
+	*argv = ns_calloc (sizeof (char *) * argvsize);
 	argc = 0;
 	if (*buf == ':')
 		buf++;
 	while (*buf) {
 		if (argc == argvsize) {
 			argvsize += 8;
-			*argv = srealloc (*argv, sizeof (char *) * argvsize);
+			*argv = ns_realloc (*argv, sizeof (char *) * argvsize);
 		}
 		if ((*buf == ':') && (colcount < 1)) {
 			buf++;
@@ -285,7 +285,7 @@ joinbuf (char **av, int ac, int from)
 	int i;
 	char *buf;
 
-	buf = smalloc (BUFSIZE);
+	buf = ns_malloc (BUFSIZE);
 	if(from >= ac) {
 		dlog(DEBUG1, "joinbuf: from (%d) >= ac (%d)", from, ac);
 		strlcpy (buf, "(null)", BUFSIZE);
@@ -320,10 +320,10 @@ AddStringToList (char ***List, char S[], int *C)
 
 	if (*C == 0) {
 		numargs = 8;
-		*List = scalloc (sizeof (char *) * numargs);
+		*List = ns_calloc (sizeof (char *) * numargs);
 	} else if (*C  == numargs) {
 		numargs += 8;
-		*List = srealloc (*List, sizeof (char *) * numargs);
+		*List = ns_realloc (*List, sizeof (char *) * numargs);
 	}
 	++*C;
 	(*List)[*C - 1] = S;

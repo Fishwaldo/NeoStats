@@ -98,7 +98,7 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
 	}
 	strlcpy (c->topicowner, owner, MAXHOST);
 	c->topictime = (ts) ? atoi (ts) : me.now;
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
 	AddStringToList (&cmdparams->av, (char*)owner, &cmdparams->ac);
 	if(topic) {
@@ -107,8 +107,8 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
 		AddStringToList (&cmdparams->av, "", &cmdparams->ac);
 	}
 	SendAllModuleEvent (EVENT_TOPIC, cmdparams);
-	sfree (cmdparams->av);
-	sfree (cmdparams);
+	ns_free (cmdparams->av);
+	ns_free (cmdparams);
 }
 
 /** @brief Create a new channel record
@@ -131,7 +131,7 @@ new_chan (const char *chan)
 		nlog (LOG_CRITICAL, "new_chan: channel hash is full");
 		return NULL;
 	}
-	c = scalloc (sizeof (Channel));
+	c = ns_calloc (sizeof (Channel));
 	strlcpy (c->name, chan, MAXCHANLEN);
 	hnode_create_insert (channelhash, c, c->name);
 	c->chanmembers = list_create (CHAN_MEM_SIZE);
@@ -139,10 +139,10 @@ new_chan (const char *chan)
 	c->creationtime = me.now;
 	/* check exclusions */
 	ns_do_exclude_chan(c);
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
 	SendAllModuleEvent (EVENT_NEWCHAN, cmdparams);
-	sfree (cmdparams);
+	ns_free (cmdparams);
 	return c;
 }
 
@@ -168,16 +168,16 @@ del_chan (Channel * c)
 		return;
 	} else {
 		dlog(DEBUG2, "del_chan: deleting channel %s", c->name);
-		cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+		cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 		cmdparams->channel = c;
 		SendAllModuleEvent (EVENT_DELCHAN, cmdparams);
-		sfree (cmdparams);
+		ns_free (cmdparams);
 
 		list_destroy_auto (c->modeparms);
 		list_destroy (c->chanmembers);
 		hash_delete (channelhash, cn);
 		hnode_destroy (cn);
-		sfree (c);
+		ns_free (c);
 	}
 }
 
@@ -242,8 +242,8 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 			CmdParams * cmdparams;
 			cm = lnode_get (un);
 			lnode_destroy (list_delete (c->chanmembers, un));
-			sfree (cm);
-			cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+			ns_free (cm);
+			cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 			cmdparams->target = u;
 			cmdparams->channel = c;
 			//AddStringToList (&av, (char *)kickby, &ac);
@@ -255,7 +255,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 				/* its one of our bots */
 				SendModuleEvent (EVENT_KICKBOT, cmdparams, u->user->bot->moduleptr);
 			}
-			sfree (cmdparams);
+			ns_free (cmdparams);
 			c->users--;
 		}
 		del_chan_user(c, u);
@@ -300,8 +300,8 @@ part_chan (Client * u, const char *chan, const char *reason)
 			CmdParams * cmdparams;
 			cm = lnode_get (un);
 			lnode_destroy (list_delete (c->chanmembers, un));
-			sfree (cm);
-			cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+			ns_free (cm);
+			cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 			cmdparams->channel = c;
 			cmdparams->source = u;
 			if (reason != NULL) {
@@ -312,7 +312,7 @@ part_chan (Client * u, const char *chan, const char *reason)
 				/* its one of our bots */
 				SendModuleEvent (EVENT_PARTBOT, cmdparams, u->user->bot->moduleptr);
 			}
-			sfree (cmdparams);
+			ns_free (cmdparams);
 			c->users--;
 		}
 		del_chan_user(c, u);
@@ -388,7 +388,7 @@ join_chan (const char* nick, const char *chan)
 		c = new_chan (chan);
 	}
 	/* add this users details to the channel members hash */
-	cm = smalloc (sizeof (Chanmem));
+	cm = ns_malloc (sizeof (Chanmem));
 	strlcpy (cm->nick, u->name, MAXNICK);
 	cm->tsjoin = me.now;
 	cm->flags = 0;
@@ -399,7 +399,7 @@ join_chan (const char* nick, const char *chan)
 	}
 	if (list_isfull (c->chanmembers)) {
 		nlog (LOG_CRITICAL, "join_chan: channel %s member list is full", c->name);
-		sfree (cm);
+		ns_free (cm);
 		return;
 	}
 	lnode_create_append (c->chanmembers, cm);
@@ -409,11 +409,11 @@ join_chan (const char* nick, const char *chan)
 		return;
 	}
 	lnode_create_append (u->user->chans, c->name);
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;
 	cmdparams->channel = c;
 	SendAllModuleEvent (EVENT_JOIN, cmdparams);
-	sfree (cmdparams);
+	ns_free (cmdparams);
 	dlog(DEBUG3, "join_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 }
 

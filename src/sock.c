@@ -90,7 +90,7 @@ ConnectTo (char *host, int port)
 	}
 
 	if ((s = (int)socket (AF_INET, SOCK_STREAM, 0)) < 0) {
-		sfree(hp);
+		ns_free(hp);
 		return NS_FAILURE;
 	}
 	if (me.dobind > 0) {
@@ -364,10 +364,10 @@ getmaxsock (void)
 	struct rlimit *lim;
 	int ret;
 
-	lim = smalloc (sizeof (struct rlimit));
+	lim = ns_malloc (sizeof (struct rlimit));
 	getrlimit (RLIMIT_NOFILE, lim);
 	ret = lim->rlim_max;
-	sfree (lim);
+	ns_free (lim);
 	if(ret<0)
 		ret = 0xffff;
 	return ret;
@@ -526,15 +526,15 @@ int InitSocks (void)
 		nlog (LOG_CRITICAL, "Unable to create socks hash");
 		return NS_FAILURE;
 	}
-	TimeOut = smalloc (sizeof (struct timeval));
-	ufds = smalloc((sizeof *ufds) *  me.maxsocks);
+	TimeOut = ns_malloc (sizeof (struct timeval));
+	ufds = ns_malloc((sizeof *ufds) *  me.maxsocks);
 	return NS_SUCCESS;
 }
 
 int FiniSocks (void) 
 {
-	sfree(TimeOut);
-	sfree(ufds);
+	ns_free(TimeOut);
+	ns_free(ufds);
 	if (servsock > 0)
 		sys_close_sock (servsock);
 	hash_destroy(sockethash);
@@ -560,7 +560,7 @@ new_sock (const char *sock_name)
 		return NULL;
 	}
 	dlog(DEBUG2, "new_sock: %s", sock_name);
-	sock = smalloc (sizeof (Sock));
+	sock = ns_malloc (sizeof (Sock));
 	strlcpy (sock->name, sock_name, MAX_MOD_NAME);
 	hnode_create_insert (sockethash, sock, sock->name);
 	return sock;
@@ -689,7 +689,7 @@ del_sock (const char *sock_name)
 		dlog(DEBUG2, "del_sock: Unregistered Socket function %s from Module %s", sock_name, sock->moduleptr->info->name);
 		hash_scan_delete (sockethash, sn);
 		hnode_destroy (sn);
-		sfree (sock);
+		ns_free (sock);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;

@@ -309,7 +309,7 @@ int _kp_read_file(char *path, kp_key ** ksp)
 				ck.flags |= KPFL_BADDB;
 			}
 
-			newkey = (kp_key *) smalloc(sizeof(kp_key));
+			newkey = (kp_key *) ns_malloc(sizeof(kp_key));
 			*newkey = ck;
 			newkey->name = sstrdup(buf);
 			newkey->next = keys;
@@ -379,7 +379,7 @@ int _kp_get_subkeys_dir(char *path, struct key_array *keys)
 		    strcmp(dirent->d_name, "..") != 0 &&
 		    dirent->d_name[0] != ':') {
 
-			fullpath = (char *) smalloc(strlen(path) + 1 +
+			fullpath = (char *) ns_malloc(strlen(path) + 1 +
 							 strlen(dirent->
 								d_name) +
 							 1);
@@ -399,7 +399,7 @@ int _kp_get_subkeys_dir(char *path, struct key_array *keys)
 				else {
 					char *realname;
 					realname = (char *)
-					    smalloc(strlen
+					    ns_malloc(strlen
 							 (dirent->d_name) +
 							 2);
 					sprintf(realname, "%s:",

@@ -84,7 +84,7 @@ static kp_fil *kp_new_cached_file(kp_path * kpp)
 {
 	kp_fil *fil;
 
-	fil = (kp_fil *) smalloc(sizeof(kp_fil));
+	fil = (kp_fil *) ns_malloc(sizeof(kp_fil));
 	fil->kpp.path = sstrdup(kpp->path);
 	fil->kpp.dbindex = kpp->dbindex;
 	fil->keys = NULL;
@@ -364,7 +364,7 @@ int _kp_cache_set(kp_path * kpp, kp_key * ck)
 #ifdef KPDEBUG
 		printf("kp_cache_set: create new %s\n", kpp->path);
 #endif
-		key = (kp_key *) smalloc(sizeof(kp_key));
+		key = (kp_key *) ns_malloc(sizeof(kp_key));
 		key->next = fil->keys;
 		fil->keys = key;
 	}

@@ -607,7 +607,7 @@ m_away (char *origin, char **argv, int argc, int srv)
 	if (argc > 0) {
 		buf = joinbuf (argv, argc, 0);
 		do_away (base64tonick(origin), buf);
-		sfree (buf);
+		ns_free (buf);
 	} else {
 		do_away (base64tonick(origin), NULL);
 	}
@@ -777,7 +777,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 						ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], modechar, base64tonick(s));
 						ac = split_buf (ircd_buf, &av, 0);
 						ChanMode (me.name, av, ac);
-						sfree (av);
+						ns_free (av);
 					}
 				}
 				param++;
@@ -808,7 +808,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 					}
 					ac = split_buf (ircd_buf, &av, 0);
 					ChanMode (me.name, av, ac);
-					sfree (av);
+					ns_free (av);
 					modes++;
 				}
 				break;
@@ -888,7 +888,7 @@ parse (char *line)
 		dlog(DEBUG1, "0 %d", ac);
 	}
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	sfree (av);
+	ns_free (av);
 	dlog(DEBUG1, "-------------------------END PARSE--------------------------");
 }
 
@@ -915,7 +915,7 @@ ircu_m_private (char *origin, char **argv, int argc, int srv)
 		AddStringToList (&av, argv[i], &ac);
 	}
 	m_private (base64tonick(origin), av, ac, srv);
-	sfree (av);
+	ns_free (av);
 }
 
 static void 
@@ -941,6 +941,6 @@ ircu_m_notice (char *origin, char **argv, int argc, int srv)
 		AddStringToList (&av, argv[i], &ac);
 	}
 	m_notice (base64tonick(origin), av, ac, srv);
-	sfree (av);
+	ns_free (av);
 }
 

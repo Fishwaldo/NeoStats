@@ -291,6 +291,7 @@ del_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 	/* Delete the command */
 	cmdnode = hash_lookup(cmd_hash, cmd_ptr->cmd);
 	if (cmdnode) {
+		dlog(DEBUG3, "deleting command %s from services bot", ((bot_cmd*)hnode_get(cmdnode))->cmd);
 		hash_delete(cmd_hash, cmdnode);
 		hnode_destroy(cmdnode);
 		return NS_SUCCESS;
@@ -329,7 +330,7 @@ del_bot_cmd_list(Bot* bot_ptr, bot_cmd* bot_cmd_list)
 		return NS_FAILURE;
 	}
 	/* If no hash return failure */
-	if(bot_ptr->botcmds) {
+	if(!bot_ptr->botcmds) {
 		return NS_FAILURE;
 	}
 	/* Cycle through command list and delete them */
@@ -357,6 +358,7 @@ del_all_bot_cmds(Bot* bot_ptr)
 	/* Cycle through command hash and delete each command */
 	hash_scan_begin(&hs, bot_ptr->botcmds);
 	while ((cmdnode = hash_scan_next(&hs)) != NULL) {
+		dlog(DEBUG3, "deleting command %s from services bot", ((bot_cmd*)hnode_get(cmdnode))->cmd);
 		hash_delete(bot_ptr->botcmds, cmdnode);
 		hnode_destroy(cmdnode);
 	}
@@ -470,8 +472,8 @@ run_bot_cmd (CmdParams * cmdparams)
 	if (( (cmdparams->bot->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
 		( (cmdparams->bot->flags & BOT_FLAG_ONLY_OPERS) && config.onlyopers && (userlevel < NS_ULEVEL_OPER) )){
 		msg_only_opers (cmdparams);
-		sfree (av);
-		sfree (cmdparams->av);
+		ns_free (av);
+		ns_free (cmdparams->av);
 		return NS_SUCCESS;
 	}	
 	if(cmdparams->bot->botcmds) {
@@ -482,15 +484,15 @@ run_bot_cmd (CmdParams * cmdparams)
 			/* Is user authorised to issue this command? */
 			if (userlevel < cmdlevel) {
 				msg_permission_denied(cmdparams, NULL);
-				sfree (av);
-				sfree (cmdparams->av);
+				ns_free (av);
+				ns_free (cmdparams->av);
 				return NS_SUCCESS;
 			}
 			/* Check parameter count */
 			if(cmdparams->ac < cmd_ptr->minparams ) {
 				msg_error_need_more_params(cmdparams);
-				sfree (av);
-				sfree (cmdparams->av);
+				ns_free (av);
+				ns_free (cmdparams->av);
 				return NS_SUCCESS;
 			}
 			/* Seems OK so report the command call so modules do not have to */
@@ -504,21 +506,21 @@ run_bot_cmd (CmdParams * cmdparams)
 				RESET_RUN_LEVEL();
 			}
 			check_cmd_result(cmdparams, cmdret, NULL);
-			sfree (av);
-			sfree (cmdparams->av);
+			ns_free (av);
+			ns_free (cmdparams->av);
 			return NS_SUCCESS;
 		}
 	}
 	cmdret = run_intrinsic_cmds (av[0], cmdparams);
 	if(cmdret == NS_SUCCESS) {
-		sfree (av);
-		sfree (cmdparams->av);
+		ns_free (av);
+		ns_free (cmdparams->av);
 		return NS_SUCCESS;
 	}
 	/* We have run out of commands so report failure */
 	msg_unknown_command (cmdparams);
-	sfree (av);
-	sfree (cmdparams->av);
+	ns_free (av);
+	ns_free (cmdparams->av);
 	return NS_FAILURE;
 }
 
@@ -880,7 +882,7 @@ bot_cmd_set_msg (CmdParams * cmdparams, bot_setting* set_ptr)
 		SetConf((void *)buf, CFGSTR, set_ptr->confitem);
 	}
 	bot_cmd_set_report (cmdparams, set_ptr, buf);
-	sfree(buf);
+	ns_free(buf);
 	return NS_SUCCESS;
 }
 
@@ -948,7 +950,7 @@ bot_cmd_set_realname (CmdParams * cmdparams, bot_setting* set_ptr)
 		SetConf((void *)buf, CFGSTR, set_ptr->confitem);
 	}
 	bot_cmd_set_report (cmdparams, set_ptr, buf);
-	sfree(buf);
+	ns_free(buf);
 	return NS_SUCCESS;
 }
 
@@ -1236,7 +1238,7 @@ int bot_set_realname_cb(CmdParams* cmdparams, SET_REASON reason)
 	}
 	buf = joinbuf(cmdparams->av, cmdparams->ac, 1);
 	irc_setname(cmdparams->bot, buf);
-	sfree(buf);
+	ns_free(buf);
 	return NS_SUCCESS;
 }
 
@@ -1252,7 +1254,7 @@ static bot_setting bot_info_settings[]=
 
 int add_bot_info_settings (Bot *bot_ptr, BotInfo* botinfo)
 {
-	bot_ptr->bot_info_settings = smalloc(sizeof(bot_info_settings));
+	bot_ptr->bot_info_settings = ns_malloc(sizeof(bot_info_settings));
 	if(bot_ptr->bot_info_settings) {
 		memcpy(bot_ptr->bot_info_settings, bot_info_settings, sizeof(bot_info_settings));
 		bot_ptr->bot_info_settings[0].varptr = &botinfo->nick;
@@ -1270,7 +1272,7 @@ int del_bot_info_settings (Bot *bot_ptr)
 {
 	if(bot_ptr->bot_info_settings) {
 		del_bot_setting_list(bot_ptr, bot_ptr->bot_info_settings);
-		sfree(bot_ptr->bot_info_settings);
+		ns_free(bot_ptr->bot_info_settings);
 	}
 	return NS_SUCCESS;
 }

@@ -479,9 +479,7 @@ char *yytext;
 #include <string.h>
 #include "do_sql.h"
 #include "parse.tab.h"
-#ifdef WIN32
-#include "configwin32.h"
-#else
+#ifndef WIN32
 #include "config.h"
 #endif
 #ifndef HAVE_STRNDUP

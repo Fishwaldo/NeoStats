@@ -182,7 +182,7 @@ static int AccessDel(CmdParams* cmdparams)
 	}
 	node = hash_lookup(accesshash, cmdparams->av[1]);
 	if (node) {
-		sfree(hnode_get(node));
+		ns_free(hnode_get(node));
 		hash_delete(accesshash, node);
 		hnode_destroy(node);
 		ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s", cmdparams->av[1]);

@@ -262,10 +262,10 @@ static int cs_event_quit (CmdParams* cmdparams)
 				  cmdparams->source->name, cmdparams->source->user->username, 
 				  cmdparams->source->user->hostname,
 				  Local[6], KillMsg);
-			sfree(KillMsg);
-			sfree(QuitMsg);
-			sfree(cmd);
-			sfree(lcl);
+			ns_free(KillMsg);
+			ns_free(QuitMsg);
+			ns_free(cmd);
+			ns_free(lcl);
 			return NS_SUCCESS;
 		}
 	}
@@ -276,10 +276,10 @@ static int cs_event_quit (CmdParams* cmdparams)
 			  cmdparams->source->user->hostname, cmdparams->source->info,
 			  cmdparams->source->uplink->name, QuitMsg);
 	}
-	sfree(QuitMsg);
-	sfree(cmd);
-	sfree(lcl);
-	sfree(Quit);
+	ns_free(QuitMsg);
+	ns_free(cmd);
+	ns_free(lcl);
+	ns_free(Quit);
 	return NS_SUCCESS;
 }
 
@@ -410,8 +410,8 @@ static int cs_event_kill (CmdParams* cmdparams)
 			cmdparams->source->user->hostname,
 			Kill[0], GlobalMsg);
 	}
-	sfree(cmd);
-	sfree(GlobalMsg);
+	ns_free(cmd);
+	ns_free(GlobalMsg);
 	return NS_SUCCESS;
 }
 

@@ -83,9 +83,9 @@ int ss_html()
 			"Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath);
 		return 1;
 	}
-	buf = smalloc(STARTBUFSIZE * 2);
+	buf = ns_malloc(STARTBUFSIZE * 2);
 	bufold = buf;
-	buf1 = smalloc(STARTBUFSIZE * 2);
+	buf1 = ns_malloc(STARTBUFSIZE * 2);
 	while (fgets(buf, STARTBUFSIZE, tpl)) {
 
 		buf1 = strstr(buf, "!MAP!");
@@ -193,8 +193,8 @@ int ss_html()
 
 		fputs(buf, opf);
 	}
-	sfree(buf1);
-	sfree(bufold);
+	ns_free(buf1);
+	ns_free(bufold);
 	if (!gothtml) {
 		put_copyright();
 	}

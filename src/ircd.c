@@ -427,7 +427,7 @@ parse (char *line)
 	dlog(DEBUG1, "args  : %s", coreLine);
 	ac = ircsplitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	sfree (av);
+	ns_free (av);
 	dlog(DEBUG1, "-------------------------END PARSE--------------------------");
 }
 
@@ -465,10 +465,10 @@ do_pong (const char* origin, const char* destination)
 			s->server->ping -= ping.ulag;
 		if (!strcmp (me.s->name, s->name))
 			ping.ulag = me.s->server->ping;
-		cmdparams = (CmdParams*)scalloc (sizeof(CmdParams));
+		cmdparams = (CmdParams*)ns_calloc (sizeof(CmdParams));
 		cmdparams->source = s;
 		SendAllModuleEvent (EVENT_PONG, cmdparams);
-		sfree (cmdparams);
+		ns_free (cmdparams);
 		return;
 	}
 	nlog (LOG_NOTICE, "Received PONG from unknown server: %s", origin);
@@ -1006,7 +1006,7 @@ irc_chanmode (const Bot *botptr, const char *chan, const char *mode, const char 
 	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
-	sfree (av);
+	ns_free (av);
 	return NS_SUCCESS;
 }
 
@@ -1294,7 +1294,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		SetChanTS (c, atoi (tstime)); 
 		j = ChanModeHandler (c, modes, j, argv, argc);
 	}
-	sfree(param);
+	ns_free(param);
 }
 
 void 

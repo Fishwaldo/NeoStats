@@ -471,7 +471,7 @@ ns_raw (CmdParams* cmdparams)
 	irc_chanalert (ns_botptr, "\2RAW COMMAND\2 \2%s\2 issued a raw command!(%s)", cmdparams->source->name, message);
 	nlog (LOG_NORMAL, "RAW COMMAND %s issued a raw command!(%s)", cmdparams->source->name, message);
 	send_cmd ("%s", message);
-	sfree (message);
+	ns_free (message);
    	return NS_SUCCESS;
 }
 #endif

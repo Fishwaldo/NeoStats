@@ -134,7 +134,7 @@ void LoadServerStats(void)
 				nlog (LOG_CRITICAL, "StatServ server hash full");
 				break;
 			}
-			s = scalloc(sizeof(SStats));
+			s = ns_calloc(sizeof(SStats));
 			strlcpy(s->name, row[count], MAXHOST);
 			GetData((void *)&s->numsplits, CFGINT, "ServerStats", s->name, "Splits");
 			GetData((void *)&s->maxusers, CFGINT, "ServerStats", s->name, "MaxUsers");
@@ -153,7 +153,7 @@ void LoadServerStats(void)
 			hnode_create_insert (Shead, s, s->name);
 		}
 	}       
-	sfree(row);                                 
+	ns_free(row);                                 
 }
 
 void LoadStats(void) 
@@ -182,7 +182,7 @@ CStats *load_chan(char *name)
 		nlog (LOG_CRITICAL, "StatServ channel hash full");
 		return NULL;
 	}
-	c = smalloc (sizeof (CStats));
+	c = ns_malloc (sizeof (CStats));
 #ifdef USE_BERKELEY
 	if ((data = DBGetData(name)) != NULL) {
 		memcpy (c, data, sizeof(CStats));
@@ -193,7 +193,7 @@ CStats *load_chan(char *name)
 		dlog(DEBUG2, "Loading channel %s", c->name);
 		sscanf (data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins);
 		GetData ((void *)&c->t_lastseen, CFGINT, "ChanStats", c->name, "t_lastseen");
-		sfree (data);
+		ns_free (data);
 #endif
 	} else {
 		dlog(DEBUG2, "Creating channel %s", c->name);
@@ -287,7 +287,7 @@ int DelOldChan(void)
 			}
 		}
 	}
-	sfree(row);
+	ns_free(row);
 	dlog(DEBUG1, "DelOldChan: %d seconds %d channels", (int)(time(NULL) - start), count);
 	return 1;
 }

@@ -57,7 +57,7 @@ int InitExcludes(void)
 	exclude_list = list_create(-1);
 	if (GetTableData("Exclusions", &row) > 0) {
 		for (i = 0; row[i] != NULL; i++) {
-			e = scalloc(sizeof(excludes));
+			e = ns_calloc(sizeof(excludes));
 			if (GetData((void *)&tmp, CFGSTR, "Exclusions", row[i], "Pattern") > 0) {
 				strlcpy(e->pattern, tmp, MAXHOST);
 			} else {
@@ -90,13 +90,13 @@ void ns_do_exclude_add(Client *u, char *type, char *pattern)
 	static char tmp[BUFSIZE];
 	
 	/* we dont do any checking to see if a similar entry already exists... oh well, thats upto the user */
-	e = smalloc(sizeof(excludes));
+	e = ns_malloc(sizeof(excludes));
 	strlcpy(e->addedby, u->name, MAXNICK);
 	e->addedon = me.now;
 	if (!ircstrcasecmp("HOST", type)) {
 		if (!index(pattern, '.')) {
 			irc_prefmsg(ns_botptr, u, "Error, Pattern must contain at least one \2.\2");
-			sfree(e);
+			ns_free(e);
 			return;
 		}
 		e->type = NS_EXCLUDE_HOST;
@@ -104,7 +104,7 @@ void ns_do_exclude_add(Client *u, char *type, char *pattern)
 	} else if (!ircstrcasecmp("CHAN", type)) {
 		if (pattern[0] != '#') {
 			irc_prefmsg(ns_botptr, u, "Error, Pattern must begin with a \2#\2");
-			sfree(e);
+			ns_free(e);
 			return;
 		}
 		e->type = NS_EXCLUDE_CHAN;
@@ -112,14 +112,14 @@ void ns_do_exclude_add(Client *u, char *type, char *pattern)
 	} else if (!ircstrcasecmp("SERVER", type)) {
 		if (!index(pattern, '.')) {
 			irc_prefmsg(ns_botptr, u, "Error, Pattern must contain at least one \2.\2");
-			sfree(e);
+			ns_free(e);
 			return;
 		}
 		e->type = NS_EXCLUDE_SERVER;
 		strlcpy(e->pattern, collapse(pattern), MAXHOST);
 	} else {
 		irc_prefmsg(ns_botptr, u, "Error, Unknown type %s", type);
-		sfree(e);
+		ns_free(e);
 		return;
 	}
 	/* if we get here, then e is valid */
@@ -160,7 +160,7 @@ void ns_do_exclude_del(Client *u, char *position)
 			ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
 			DelRow("Exclusions", tmp);
 			irc_prefmsg(ns_botptr, u, "Deleted %s out of Exclusion List", e->pattern);
-			sfree(e);
+			ns_free(e);
 			list_delete(exclude_list, en);
 			lnode_destroy(en);
 			return;

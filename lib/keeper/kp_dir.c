@@ -43,7 +43,7 @@ KPDIR *kp_dir_open(const char *keypath)
 {
 	KPDIR *kpdir;
 
-	kpdir = (KPDIR *) smalloc(sizeof(KPDIR));
+	kpdir = (KPDIR *) ns_malloc(sizeof(KPDIR));
 	kpdir->basepath = sstrdup(keypath);
 	kpdir->retpath = NULL;
 
@@ -59,7 +59,7 @@ const char *kp_dir_getpath(KPDIR * kpdir, const char *subkey)
 	if (kpdir != NULL) {
 		free(kpdir->retpath);
 		kpdir->retpath =
-		    (char *) smalloc(strlen(kpdir->basepath) + 1 +
+		    (char *) ns_malloc(strlen(kpdir->basepath) + 1 +
 					  strlen(subkey) + 1);
 		sprintf(kpdir->retpath, "%s/%s", kpdir->basepath, subkey);
 

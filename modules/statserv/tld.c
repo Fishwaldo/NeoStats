@@ -48,7 +48,7 @@ void ResetTLD()
 			/* don't delete the tld entry ??? as its our "unknown" entry */
 			if (ircstrcasecmp(t->tld, UNKNOWN_COUNTRY_CODE)) {
 				tn2 = list_next(Thead, tn);
-				sfree(t);
+				ns_free(t);
 				list_delete(Thead, tn);
 				lnode_destroy(tn);
 				tn = tn2;
@@ -147,7 +147,7 @@ void AddTLD(Client * u)
 		t->daily_users++;
 	} else {
 		country_name = GeoIP_country_name_by_addr(gi, u->hostip);
-		t = smalloc(sizeof(TLD));
+		t = ns_malloc(sizeof(TLD));
 		strlcpy(t->tld, country_code, 5);
 		strlcpy(t->country, country_name, 32);
 		t->users = 1;
@@ -186,7 +186,7 @@ void InitTLD(void)
 	} else {
 		nlog(LOG_WARNING, "GeoIP Database is not available. TLD stats will not be available");
 	}
-	t = scalloc(sizeof(TLD));
+	t = ns_calloc(sizeof(TLD));
 	ircsnprintf(t->tld, 5, UNKNOWN_COUNTRY_CODE);
 	strlcpy(t->country, "Unknown", 8);
 	lnode_create_append (Thead, t);

@@ -108,7 +108,7 @@ CloseLogs (void)
 		}
 		hash_scan_delete (logs, hn);
 		hnode_destroy (hn);
-		sfree (logentry);
+		ns_free (logentry);
 	}
 }
 
@@ -194,7 +194,7 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 			if(!logentry->logfile)
 				logentry->logfile = fopen (logentry->logname, "a");
 		} else {
-			logentry = smalloc (sizeof (LogEntry));
+			logentry = ns_malloc (sizeof (LogEntry));
 			strlcpy (logentry->name, GET_CUR_MODNAME() , MAX_MOD_NAME);
 			make_log_filename(logentry->name, logentry->logname);
 			logentry->logfile = fopen (logentry->logname, "a");

@@ -41,7 +41,7 @@ static char *kp_code_data(kp_key * ck)
 	int i;
 	int val;
 
-	buf = (char *) smalloc(ck->len * 3 + 64);
+	buf = (char *) ns_malloc(ck->len * 3 + 64);
 	ds = buf;
 
 	*ds++ = 'D';
@@ -67,7 +67,7 @@ static char *kp_code_string(kp_key * ck)
 	unsigned char *os;
 	int i;
 
-	buf = (char *) smalloc(ck->len * 4 + 64);
+	buf = (char *) ns_malloc(ck->len * 4 + 64);
 	ds = buf;
 	*ds++ = 'S';
 	*ds++ = SEP2;
@@ -141,7 +141,7 @@ static char *kp_code_int(kp_key * ck)
 	char *buf, *ds;
 	int val;
 
-	buf = (char *) smalloc(64);
+	buf = (char *) ns_malloc(64);
 	ds = buf;
 	*ds++ = 'I';
 	*ds++ = SEP2;
@@ -160,7 +160,7 @@ static char *kp_code_float(kp_key * ck)
 	char *buf, *ds;
 	double val;
 
-	buf = (char *) smalloc(64);
+	buf = (char *) ns_malloc(64);
 	ds = buf;
 	*ds++ = 'F';
 	*ds++ = SEP2;

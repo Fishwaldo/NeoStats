@@ -116,7 +116,7 @@ new_timer (const char *name)
 		return NULL;
 	}
 	dlog (DEBUG2, "new_timer: %s", name);
-	timer = smalloc (sizeof (Timer));
+	timer = ns_malloc (sizeof (Timer));
 	strlcpy (timer->name, name, MAX_MOD_NAME);
 	hnode_create_insert (timerhash, timer, name);
 	return timer;
@@ -199,7 +199,7 @@ del_timer (const char *name)
 		dlog(DEBUG2, "del_timer: removed timer %s for module %s", name, timer->moduleptr->info->name);
 		hash_delete (timerhash, tn);
 		hnode_destroy (tn);
-		sfree (timer);
+		ns_free (timer);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -227,7 +227,7 @@ del_timers (Module *mod_ptr)
 			dlog(DEBUG1, "del_timers: deleting timer %s from module %s.", timer->name, mod_ptr->info->name);
 			hash_delete (timerhash, tn);
 			hnode_destroy (tn);
-			sfree (timer);
+			ns_free (timer);
 		}
 	}
 	return NS_SUCCESS;
@@ -326,7 +326,7 @@ run_mod_timers (int ismidnight)
 					dlog (DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name);
 					hash_scan_delete (timerhash, tn);
 					hnode_destroy (tn);
-					sfree (timer);
+					ns_free (timer);
 				} else {
 					timer->lastrun = (int) me.now;
 				}

@@ -108,7 +108,7 @@ void do_backtrace(void)
 	for (i = 1; i < size; i++) {
 		fprintf (segfault, "BackTrace(%d): %s\n", i - 1, strings[i]);
 	}
-	sfree (strings);
+	ns_free (strings);
 #else
 	fprintf (segfault, backtrace_unavailable);
 #endif

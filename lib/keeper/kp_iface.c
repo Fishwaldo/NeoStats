@@ -129,7 +129,7 @@ int kp_get_string(const char *keypath, char **stringp)
 	if (res != 0)
 		return res;
 
-	*stringp = (char *) smalloc(ck.len + 1);
+	*stringp = (char *) ns_malloc(ck.len + 1);
 	memcpy(*stringp, ck.data, ck.len);
 	(*stringp)[ck.len] = '\0';
 	kp_value_destroy(&ck);
@@ -185,7 +185,7 @@ int kp_get_data(const char *keypath, void **datap, unsigned int *lenp)
 	if (res != 0)
 		return res;
 
-	*datap = smalloc(ck.len);
+	*datap = ns_malloc(ck.len);
 	memcpy(*datap, ck.data, ck.len);
 	*lenp = ck.len;
 	kp_value_destroy(&ck);
@@ -264,7 +264,7 @@ int kp_get_dir(const char *keypath, char ***keysp, unsigned int *nump)
 	int res;
 	struct key_array keys;
 
-	keys.array = (char **) smalloc(sizeof(char *));
+	keys.array = (char **) ns_malloc(sizeof(char *));
 	keys.array[0] = NULL;
 	keys.num = 0;
 	keys.strsize = 0;

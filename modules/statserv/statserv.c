@@ -890,7 +890,7 @@ static int ss_stats(CmdParams* cmdparams)
 		if (!find_server(cmdparams->av[1])) {
 			node = hash_lookup(Shead, cmdparams->av[1]);
 			if (node) {
-				sfree (hnode_get(node));
+				ns_free (hnode_get(node));
 				hash_delete(Shead, node);
 				hnode_destroy(node);
 				irc_prefmsg(ss_bot, cmdparams->source, "Removed %s from the database.",
@@ -917,7 +917,7 @@ static int ss_stats(CmdParams* cmdparams)
 		}
 		st = findserverstats(cmdparams->av[2]);
 		if (st)
-			sfree(st);
+			ns_free(st);
 
 		st = findserverstats(cmdparams->av[1]);
 		if (!st) {

@@ -52,9 +52,9 @@ new_user (const char *nick)
 		return NULL;
 	}
 	dlog(DEBUG2, "new_user: %s", nick);
-	u = scalloc (sizeof (Client));
+	u = ns_calloc (sizeof (Client));
 	strlcpy (u->name, nick, MAXNICK);
-	u->user = scalloc (sizeof (User));
+	u->user = ns_calloc (sizeof (User));
 	hnode_create_insert (userhash, u, u->name);
 	return u;
 }
@@ -67,10 +67,10 @@ static void lookupnickip(char *data, adns_answer *a)
 	u = find_user((char *)data);
 	if (a && a->nrrs > 0 && u && a->status == adns_s_ok) {
 		u->ip.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
-		cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+		cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 		cmdparams->source = u;	
 		SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
-		sfree (cmdparams);
+		ns_free (cmdparams);
 	}
 }
 
@@ -94,12 +94,12 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 		int res;
 
 		/* first, if the u->host is a ip address, just convert it */
-		ipad = smalloc(sizeof(struct in_addr));
+		ipad = ns_malloc(sizeof(struct in_addr));
 		res = inet_aton(host, ipad);
 		if (res > 0) {
 			/* its valid */
 			ipaddress = htonl(ipad->s_addr);
-			sfree(ipad);
+			ns_free(ipad);
 		} else {		
 			/* kick of a dns reverse lookup for this host */
 			dns_lookup((char *)host, adns_r_addr, lookupnickip, (void *)nick);
@@ -134,14 +134,14 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	if((ircd_srv.protocol & PROTOCOL_B64SERVER) && numeric) {
 		setnickbase64 (u->name, numeric);
 	}
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;	
 	SendAllModuleEvent (EVENT_SIGNON, cmdparams);
 	if (me.want_nickip == 1 && ipaddress != 0) {
 		/* only fire this event if we have the nickip and some module wants it */
 		SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
 	}
-	sfree (cmdparams);
+	ns_free (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
 	if(is_synched && config.versionscan && !IsExcluded(u) && !IsMe(u)) {
 		irc_ctcp_version_req (ns_botptr, u);
@@ -165,8 +165,8 @@ static void deluser(Client * u)
 	hash_delete (userhash, un);
 	hnode_destroy (un);
 	list_destroy (u->user->chans);
-	sfree (u->user);
-	sfree (u);
+	ns_free (u->user);
+	ns_free (u);
 }
 
 void 
@@ -184,7 +184,7 @@ KillUser (const char *nick, const char *reason)
 	}
 	PartAllChannels (u, reason);
 	/* run the event to delete a user */
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;
 	if(reason) {
 		cmdparams->param = (char*)reason;
@@ -196,7 +196,7 @@ KillUser (const char *nick, const char *reason)
 		SendModuleEvent (EVENT_BOTKILL, cmdparams, u->user->bot->moduleptr);
 	}
 	deluser(u);
-	sfree (cmdparams);
+	ns_free (cmdparams);
 }
 
 void 
@@ -214,14 +214,14 @@ QuitUser (const char *nick, const char *reason)
 	}
 	PartAllChannels (u, reason);
 	/* run the event to delete a user */
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;
 	if(reason) {
 		cmdparams->param = (char*)reason;
 	}
 	SendAllModuleEvent (EVENT_QUIT, cmdparams);
 	deluser(u);
-	sfree (cmdparams);
+	ns_free (cmdparams);
 }
 
 void
@@ -240,7 +240,7 @@ UserAway (const char *nick, const char *awaymsg)
 	} else {
 		u->user->awaymsg[0] = 0;
 	}
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;
 	if ((u->user->is_away == 1) && (!awaymsg)) {
 		u->user->is_away = 0;
@@ -248,7 +248,7 @@ UserAway (const char *nick, const char *awaymsg)
 		u->user->is_away = 1;
 	}
 	SendAllModuleEvent (EVENT_AWAY, cmdparams);
-	sfree (cmdparams);
+	ns_free (cmdparams);
 }
 
 int 
@@ -281,11 +281,11 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 		u->tsconnect = me.now;
 	}
 	hash_insert (userhash, un, u->name);
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;
 	cmdparams->param = (char *)oldnick;
 	SendAllModuleEvent (EVENT_NICK, cmdparams);
-	sfree (cmdparams);
+	ns_free (cmdparams);
 	return NS_SUCCESS;
 }
 
@@ -453,11 +453,11 @@ UserMode (const char *nick, const char *modes)
 		}
 	}
 	dlog(DEBUG1, "UserMode: modes for %s now %x", u->name, u->user->Umode);
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;	
 	cmdparams->param = (char*)modes;
 	SendAllModuleEvent (EVENT_UMODE, cmdparams);
-	sfree (cmdparams);
+	ns_free (cmdparams);
 }
 
 void
@@ -477,11 +477,11 @@ UserSMode (const char *nick, const char *modes)
 	u->user->ulevel = -1;
 	u->user->Smode |= SmodeStringToMask(modes);
 	dlog(DEBUG1, "UserSMode: smode for %s is now %x", u->name, u->user->Smode);
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;	
 	cmdparams->param = (char*)modes;
 	SendAllModuleEvent (EVENT_SMODE, cmdparams);
-	sfree (cmdparams);
+	ns_free (cmdparams);
 }
 
 void SetUserServicesTS(const char* nick, const char* ts) 
@@ -515,8 +515,8 @@ void FiniUsers (void)
 		hash_scan_delete (userhash, un);
 		hnode_destroy (un);
 		list_destroy (u->user->chans);
-		sfree (u->user);
-		sfree (u);
+		ns_free (u->user);
+		ns_free (u);
 	}
 	hash_destroy(userhash);
 }

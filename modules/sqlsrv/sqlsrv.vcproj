@@ -36,6 +36,7 @@
 				OutputFile="../sqlsrvd.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\src\Debug;..\..\lib"
+				IgnoreDefaultLibraryNames="LIBCD"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/sqlsrv.pdb"
 				SubSystem="2"

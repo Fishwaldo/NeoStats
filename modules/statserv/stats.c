@@ -142,12 +142,12 @@ int load_client_versions(void)
 	
 	input = fopen("data/ssversions.dat", "rb");
 	if(input) {
-		clientv = smalloc(sizeof(CVersions));
+		clientv = ns_malloc(sizeof(CVersions));
 		fread(clientv, sizeof(CVersions), 1, input);	
 		while(!feof(input)) {
 			lnode_create_append (Vhead, clientv);
 			dlog(DEBUG2, "Loaded version %s", clientv->name);
-			clientv = smalloc(sizeof(CVersions));
+			clientv = ns_malloc(sizeof(CVersions));
 			fread(clientv, sizeof(CVersions), 1, input);	
 		}
 		fclose(input);
@@ -210,7 +210,7 @@ void StatsAddCTCPVersion(char* version)
 		clientv->count++;
 		return;
 	}
-	clientv = smalloc (sizeof (CVersions));
+	clientv = ns_malloc (sizeof (CVersions));
 	strlcpy (clientv->name, nocols, BUFSIZE);
 	clientv->count = 1;
 	lnode_create_append  (Vhead, clientv);
@@ -232,7 +232,7 @@ void StatsDelChan(Channel* c)
 	save_chan (cs);
 	list_delete (Chead, ln);
 	lnode_destroy (ln);
-	sfree (cs);
+	ns_free (cs);
 }
 
 void StatsJoinChan(Client * u, Channel* c)
@@ -322,7 +322,7 @@ SStats *newserverstats(const char *name)
 		nlog (LOG_CRITICAL, "StatServ Server hash is full!");
 		return NULL;
 	}
-	s = scalloc(sizeof(SStats));
+	s = ns_calloc(sizeof(SStats));
 	memcpy(s->name, name, MAXHOST);
 	s->t_maxusers = s->t_maxopers = me.now;
 	s->t_lastseen = s->t_start = me.now;
@@ -454,7 +454,7 @@ void StatsKillUser(Client * u)
 		ss = findserverstats(who);
 		ss->serverkills ++;
 	}
-	sfree(rbuf);
+	ns_free(rbuf);
 }
 
 void StatsUserMode(Client * u, char *modes)
@@ -597,7 +597,7 @@ void FiniStats(void)
 		s = hnode_get(sn);
 		hash_scan_delete(Shead, sn);
 		hnode_destroy(sn);
-		sfree (s);
+		ns_free (s);
 	}
 	hash_destroy(Shead);
 	list_destroy_auto (Chead);

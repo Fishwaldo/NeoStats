@@ -532,7 +532,7 @@ int ChanModeHandler (Channel* c, char *modes, int j, char **av, int ac)
 						mn = list_next (c->modeparms, mn);
 					}
 					if (modeexists != 1) {
-						m = smalloc (sizeof (ModesParm));
+						m = ns_malloc (sizeof (ModesParm));
 						m->mask = mask;
 						strlcpy (m->param, av[j], PARAMSIZE);
 						if (list_isfull (c->modeparms)) {
@@ -559,7 +559,7 @@ int ChanModeHandler (Channel* c, char *modes, int j, char **av, int ac)
 						list_delete (c->modeparms, mn);
 						m = lnode_get (mn);
 						lnode_destroy (mn);
-						sfree (m);
+						ns_free (m);
 					}
 				} else {
 					c->modes &= ~mask;
@@ -584,14 +584,14 @@ ChanMode (char *origin, char **av, int ac)
 		return 0;
 	}
 	
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
 	AddStringToList(&cmdparams->av, origin, &cmdparams->ac);
 	for (i = 0; i < ac; i++) {
 		AddStringToList(&cmdparams->av, av[i], &cmdparams->ac);	
 	}
 	SendAllModuleEvent(EVENT_CHANMODE, cmdparams);
-	sfree(cmdparams);	
+	ns_free(cmdparams);	
 
 	j = ChanModeHandler (c, av[1], j, av, ac);
 

@@ -219,7 +219,7 @@ config_parse (FILE * config)
 				 * allocate a buffer of filesize bytes; should be enough to
 				 * prevent buffer overflows
 				 */
-				here_doc = scalloc (finfo.st_size + 1);	/* allocate  buffer memory */
+				here_doc = ns_calloc (finfo.st_size + 1);	/* allocate  buffer memory */
 
 				strlcpy (here_limit, cp3 + 2, 8);	/*   copy here-delimiter */
 				while (fgets (buffer, CFG_BUFSIZE, config)) {
@@ -234,7 +234,7 @@ config_parse (FILE * config)
 				here_doc[strlen (here_doc) - 1] = '\0';	/*    strip newline */
 				opt.callback (here_doc, opt.userdata);	/* call back */
 
-				sfree (here_doc);	/*  free buffer memory */
+				ns_free (here_doc);	/*  free buffer memory */
 
 				continue;
 			}
@@ -334,7 +334,7 @@ config_parse (FILE * config)
 					opt.callback (data, word_count, USER_DATA);
 
 					for (i = 0; i < word_count; i++)	/* dump list */
-						sfree (data[i]);
+						ns_free (data[i]);
 
 					break;
 				}
@@ -369,7 +369,7 @@ config_read (char *fname, config_option * options)
 		return 1;
 	}
 
-	dotconf_file = scalloc (CFG_MAX_FILENAME + 1);	/* allocate fname buffer */
+	dotconf_file = ns_calloc (CFG_MAX_FILENAME + 1);	/* allocate fname buffer */
 	bzero (dotconf_includepath, CFG_MAX_FILENAME + 1);
 
 	strlcpy (dotconf_file, fname, CFG_MAX_FILENAME);	/* fill fname buffer */
@@ -385,7 +385,7 @@ config_read (char *fname, config_option * options)
 	config_parse (config);	/* fire off parser */
 	fclose (config);
 
-	sfree (dotconf_file);	/* free fname buffer */
+	ns_free (dotconf_file);	/* free fname buffer */
 
 	return 0;
 }

@@ -219,7 +219,7 @@ void bot_notice (char *origin, char **av, int ac)
 	CmdParams * cmdparams;
 
 	SET_SEGV_LOCATION();
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	/* Check origin validity */
 	if(process_origin(cmdparams, origin)) {
 		/* Find target bot */
@@ -232,7 +232,7 @@ void bot_notice (char *origin, char **av, int ac)
 			}
 		}		
 	}
-	sfree (cmdparams);
+	ns_free (cmdparams);
 
 }
 
@@ -249,7 +249,7 @@ void bot_chan_notice (char *origin, char **av, int ac)
 	CmdParams * cmdparams;
 
 	SET_SEGV_LOCATION();
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	if(process_origin(cmdparams, origin)) {
 		if(process_target_chan(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
@@ -260,7 +260,7 @@ void bot_chan_notice (char *origin, char **av, int ac)
 			}
 		}
 	}
-	sfree (cmdparams);
+	ns_free (cmdparams);
 }
 
 /** @brief send a message to a bot
@@ -276,7 +276,7 @@ void bot_private (char *origin, char **av, int ac)
 	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	if(process_origin(cmdparams, origin)) {
 		/* Find target bot */
 		if (process_target_user(cmdparams, av[0])) {
@@ -288,14 +288,14 @@ void bot_private (char *origin, char **av, int ac)
 			} 			
 			if ((cmdparams->bot->flags & BOT_FLAG_SERVICEBOT)) {
 				if(run_bot_cmd (cmdparams) != NS_FAILURE) {
-					sfree (cmdparams);
+					ns_free (cmdparams);
 					return;
 				}
 			}
 			SendModuleEvent (EVENT_PRIVATE, cmdparams, cmdparams->bot->moduleptr);
 		}
 	}
-	sfree (cmdparams);
+	ns_free (cmdparams);
 }
 
 /** @brief send a message to a bot
@@ -311,7 +311,7 @@ void bot_chan_private (char *origin, char **av, int ac)
 	CmdParams * cmdparams;
 
 	SET_SEGV_LOCATION();
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	if(process_origin(cmdparams, origin)) {
 		if(process_target_chan(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
@@ -322,7 +322,7 @@ void bot_chan_private (char *origin, char **av, int ac)
 			}
 		}
 	}
-	sfree (cmdparams);
+	ns_free (cmdparams);
 }
 
 /** @brief create a new bot
@@ -342,7 +342,7 @@ new_bot (const char *bot_name)
 		return NULL;
 	}
 	dlog(DEBUG2, "new_bot: %s", bot_name);
-	botptr = scalloc (sizeof (Bot));
+	botptr = ns_calloc (sizeof (Bot));
 	strlcpy (botptr->name, bot_name, MAXNICK);
 	hnode_create_insert (bothash, botptr, botptr->name);
 	return botptr;
@@ -418,7 +418,7 @@ del_bot (const char *bot_name)
 		del_all_bot_settings(botptr);
 		hash_delete (bothash, bn);
 		hnode_destroy (bn);
-		sfree (botptr);
+		ns_free (botptr);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;

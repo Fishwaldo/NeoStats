@@ -265,7 +265,7 @@ static int ls_lovenote(CmdParams* cmdparams)
 	irc_prefmsg(ls_bot, target, 
 		"%s has sent you a love note which reads: \2%s\2", 
 		cmdparams->source->name, message);
-	sfree(message);
+	ns_free(message);
 	return 1;
 }
 
@@ -285,7 +285,7 @@ static int ls_apology(CmdParams* cmdparams)
 	irc_prefmsg(ls_bot, target, 
 		"%s is sorry, and would like to apologise for \2%s\2",
 		cmdparams->source->name, message);
-	sfree(message);
+	ns_free(message);
 	return 1;
 }
 
@@ -304,6 +304,6 @@ static int ls_thankyou(CmdParams* cmdparams)
 		"Thank you sent to %s", target->name);
 	irc_prefmsg(ls_bot, target,  "%s wishes to thank you for \2%s\2",
 		cmdparams->source->name, message);
-	sfree(message);
+	ns_free(message);
 	return 1;
 }

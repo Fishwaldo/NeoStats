@@ -299,7 +299,7 @@ load_module (const char *modfilename, Client * u)
 		return NULL;
 	}
 	/* Allocate module */
-	mod_ptr = (Module *) scalloc (sizeof (Module));
+	mod_ptr = (Module *) ns_calloc (sizeof (Module));
 	hnode_create_insert (modulehash, mod_ptr, info_ptr->name);
 	dlog(DEBUG1, "Module internal name: %s", info_ptr->name);
 	dlog(DEBUG1, "Module description: %s", info_ptr->description);
@@ -428,7 +428,7 @@ unload_module (const char *modname, Client * u)
 	del_sockets (mod_ptr);
 	/* Delete any associated event list */
 	if (mod_ptr->event_list) {
-		sfree (mod_ptr->event_list);
+		ns_free (mod_ptr->event_list);
 		mod_ptr->event_list = NULL;
 	}
 	/* Remove from the module hash so we dont call events for this module 
@@ -451,10 +451,10 @@ unload_module (const char *modname, Client * u)
 	/* Close module */
 	SET_RUN_LEVEL(mod_ptr);
 	irc_globops (NULL, "%s Module Unloaded", modname);
-	sfree (mod_ptr);
 #ifndef VALGRIND
 	ns_dlclose (mod_ptr->dl_handle);
 #endif
+	ns_free (mod_ptr);
 	RESET_RUN_LEVEL();
 	/* free the module number */
 	if (moduleindex >= 0) {
@@ -528,7 +528,7 @@ ModuleConfig(bot_setting* set_ptr)
 				case SET_TYPE_IPV4:
 					if(GetConf((void *) &temp, CFGSTR, set_ptr->confitem) > 0) {
 						strlcpy(set_ptr->varptr, temp, set_ptr->max);
-						sfree(temp);
+						ns_free(temp);
 					} else {
 						strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
 						
@@ -565,7 +565,7 @@ void RegisterEvent (ModuleEvent* event)
 
 	mod_ptr = GET_CUR_MODULE();
 	if (!mod_ptr->event_list) {
-		mod_ptr->event_list = scalloc ( sizeof(ModuleEvent) * EVENT_COUNT );
+		mod_ptr->event_list = ns_calloc ( sizeof(ModuleEvent) * EVENT_COUNT );
 	}
 	mod_ptr->event_list[event->event] = event;
 }
@@ -582,7 +582,7 @@ void RegisterEventList (ModuleEvent *event_ptr)
 
 	mod_ptr = GET_CUR_MODULE();
 	if (!mod_ptr->event_list) {
-		mod_ptr->event_list = scalloc ( sizeof(ModuleEvent*) * EVENT_COUNT );
+		mod_ptr->event_list = ns_calloc ( sizeof(ModuleEvent*) * EVENT_COUNT );
 	}
 	while (event_ptr->event != EVENT_NULL) {
 		mod_ptr->event_list[event_ptr->event] = event_ptr;

@@ -37,7 +37,7 @@ new_ban (const char *mask)
 		return NULL;
 	}
 	dlog(DEBUG2, "new_ban: %s", mask);
-	ban = scalloc (sizeof (Ban));
+	ban = ns_calloc (sizeof (Ban));
 	strlcpy (ban->mask, mask, MAXHOST);
 	hnode_create_insert (banhash, ban, ban->mask);
 	return ban;
@@ -65,7 +65,7 @@ void AddBan(const char* type, const char* user, const char* host, const char* ma
 	ban->tsexpires = atol(tsexpires);
 
 	/* run the module event */
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	AddStringToList (&cmdparams->av, (char*)type, &cmdparams->ac);
 	AddStringToList (&cmdparams->av, (char*)user, &cmdparams->ac);
 	AddStringToList (&cmdparams->av, (char*)host, &cmdparams->ac);
@@ -75,8 +75,8 @@ void AddBan(const char* type, const char* user, const char* host, const char* ma
 	AddStringToList (&cmdparams->av, (char*)tsset, &cmdparams->ac);
 	AddStringToList (&cmdparams->av, (char*)tsexpires, &cmdparams->ac);
 	SendAllModuleEvent (EVENT_ADDBAN, cmdparams);
-	sfree (cmdparams->av);
-	sfree (cmdparams);
+	ns_free (cmdparams->av);
+	ns_free (cmdparams);
 }
 
 void 
@@ -96,7 +96,7 @@ DelBan(const char* type, const char* user, const char* host, const char* mask,
 	ban = hnode_get (bansnode);
 
 	/* run the module event */
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	AddStringToList (&cmdparams->av, (char*)type, &cmdparams->ac);
 	AddStringToList (&cmdparams->av, (char*)user, &cmdparams->ac);
 	AddStringToList (&cmdparams->av, (char*)host, &cmdparams->ac);
@@ -106,12 +106,12 @@ DelBan(const char* type, const char* user, const char* host, const char* mask,
 	AddStringToList (&cmdparams->av, (char*)tsset, &cmdparams->ac);
 	AddStringToList (&cmdparams->av, (char*)tsexpires, &cmdparams->ac);
 	SendAllModuleEvent (EVENT_DELBAN, cmdparams);
-	sfree (cmdparams->av);
-	sfree (cmdparams);
+	ns_free (cmdparams->av);
+	ns_free (cmdparams);
 
 	hash_delete (banhash, bansnode);
 	hnode_destroy (bansnode);
-	sfree (ban);
+	ns_free (ban);
 }
 
 void
@@ -141,7 +141,7 @@ void FiniBans (void)
 		ban = hnode_get (bansnode);
 		hash_delete (banhash, bansnode);
 		hnode_destroy (bansnode);
-		sfree (ban);
+		ns_free (ban);
 	}
 	hash_destroy(banhash);
 }

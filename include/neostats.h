@@ -1006,10 +1006,11 @@ EXPORTFUNC void fatal_error(char* file, int line, char* func, char* error_text) 
 
 /* misc.c */
 EXPORTFUNC void strip (char * line);
-EXPORTFUNC void *smalloc ( const int size );
-EXPORTFUNC void *scalloc ( const int size );
-EXPORTFUNC void *srealloc ( void* ptr, const int size );
-EXPORTFUNC void sfree ( void *buf );
+EXPORTFUNC void *ns_malloc ( const int size );
+EXPORTFUNC void *ns_calloc ( const int size );
+EXPORTFUNC void *ns_realloc ( void* ptr, const int size );
+EXPORTFUNC void ns_realfree ( void **buf );
+#define ns_free(ptr) ns_realfree ( (void **) &(ptr) );
 EXPORTFUNC char *sstrdup (const char * s);
 char *strlwr (char * s);
 EXPORTFUNC void AddStringToList (char ***List, char S[], int *C);

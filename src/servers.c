@@ -46,9 +46,9 @@ new_server (const char *name)
 		return NULL;
 	}
 	dlog(DEBUG2, "new_server: %s", name);
-	s = scalloc (sizeof (Client));
+	s = ns_calloc (sizeof (Client));
 	strlcpy (s->name, name, MAXHOST);
-	s->server = scalloc (sizeof (Server));
+	s->server = ns_calloc (sizeof (Server));
 	hnode_create_insert (serverhash, s, s->name);
 	return s;
 }
@@ -81,10 +81,10 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	/* check exclusions */
 	ns_do_exclude_server(s);
 	/* run the module event for a new server. */
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = s;
 	SendAllModuleEvent (EVENT_SERVER, cmdparams);
-	sfree (cmdparams);
+	ns_free (cmdparams);
 	return(s);
 }
 
@@ -124,17 +124,17 @@ DelServer (const char *name, const char* reason)
 		QuitServerUsers (s);
 	}
 	/* run the event for delete server */
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = s;
 	if(reason) {
 		cmdparams->param = (char*)reason;
 	}
 	SendAllModuleEvent (EVENT_SQUIT, cmdparams);
-	sfree (cmdparams);
+	ns_free (cmdparams);
 	hash_delete (serverhash, sn);
 	hnode_destroy (sn);
-	sfree (s->server);
-	sfree (s);
+	ns_free (s->server);
+	ns_free (s);
 }
 
 Client *
@@ -260,8 +260,8 @@ FiniServers (void)
 		s = hnode_get (sn);
 		hash_delete (serverhash, sn);
 		hnode_destroy (sn);
-		sfree (s->server);
-		sfree (s);
+		ns_free (s->server);
+		ns_free (s);
 	}
 	hash_destroy(serverhash);
 }

@@ -99,7 +99,7 @@ list_init (list_t * list, listcount_t maxcount)
 list_t *
 list_create (listcount_t maxcount)
 {
-	list_t *new = smalloc (sizeof *new);
+	list_t *new = ns_malloc (sizeof *new);
 	if (new) {
 		nassert (maxcount != 0);
 		new->nilnode.next = &new->nilnode;
@@ -119,7 +119,7 @@ void
 list_destroy (list_t * list)
 {
 	nassert (list_isempty (list));
-	sfree (list);
+	ns_free (list);
 }
 
 /*
@@ -262,7 +262,7 @@ list_process (list_t * list, void *context, void (*function) (list_t * list, lno
 lnode_t *
 lnode_create (void *data)
 {
-	lnode_t *new = smalloc (sizeof *new);
+	lnode_t *new = ns_malloc (sizeof *new);
 	if (new) {
 		new->data = data;
 		new->next = NULL;
@@ -292,7 +292,7 @@ void
 lnode_destroy (lnode_t * lnode)
 {
 	nassert (!lnode_is_in_a_list (lnode));
-	sfree (lnode);
+	ns_free (lnode);
 }
 
 /*
@@ -331,12 +331,12 @@ lnode_pool_create (listcount_t n)
 
 	nassert (n != 0);
 
-	pool = smalloc (sizeof *pool);
+	pool = ns_malloc (sizeof *pool);
 	if (!pool)
 		return NULL;
-	nodes = smalloc (n * sizeof *nodes);
+	nodes = ns_malloc (n * sizeof *nodes);
 	if (!nodes) {
-		sfree (pool);
+		ns_free (pool);
 		return NULL;
 	}
 	lnode_pool_init (pool, nodes, n);
@@ -370,8 +370,8 @@ lnode_pool_isfrom (lnodepool_t * pool, lnode_t * node)
 void
 lnode_pool_destroy (lnodepool_t * p)
 {
-	sfree (p->pool);
-	sfree (p);
+	ns_free (p->pool);
+	ns_free (p);
 }
 
 /*
@@ -854,7 +854,8 @@ list_destroy_auto (list_t * list)
 
 	ln = list_first (list);
 	while (ln) {
-		sfree (lnode_get (ln));
+		void* ptr =	(void*)lnode_get (ln);
+		ns_free (ptr);
 		ln = list_next (list, ln);
 	}
 	list_destroy_nodes (list);

@@ -247,7 +247,7 @@ sql_accept_conn(SYS_SOCKET srvfd)
 
 	/* We have a new UI/DB/manager connection request.  So make a free
 	   slot and allocate it */
-	newui = smalloc(sizeof(Sql_Conn)); 
+	newui = ns_malloc(sizeof(Sql_Conn)); 
 
 	/* OK, we've got the ui slot, now accept the conn */
 	adrlen = sizeof(struct sockaddr_in);
@@ -256,7 +256,7 @@ sql_accept_conn(SYS_SOCKET srvfd)
 	if (newui->fd < 0)
 	{
 		nlog(LOG_WARNING, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
-		sfree(newui);
+		ns_free(newui);
 		sys_close_sock (srvfd);
 		return;
 	}
@@ -267,7 +267,7 @@ sql_accept_conn(SYS_SOCKET srvfd)
     	/* we didnt get a match, bye bye */
 			nlog(LOG_NOTICE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
 			sys_close_sock (newui->fd);
-			sfree(newui);
+			ns_free(newui);
 			return;
 		}
 		/* inc number ui, then init new ui */
@@ -326,7 +326,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
 		sys_close_sock (sqlconn->fd);
 		list_delete(sqlconnections, sqlnode);
 		lnode_destroy(sqlnode);
-		sfree(sqlconn);
+		ns_free(sqlconn);
 		return NS_FAILURE;
 	}
 	sqlconn->cmdpos += ret;
@@ -385,7 +385,7 @@ sql_handle_ui_output(lnode_t *sqlnode)
 			sys_close_sock (sqlconn->fd);
 			list_delete(sqlconnections, sqlnode);
 			lnode_destroy(sqlnode);
-			sfree(sqlconn);
+			ns_free(sqlconn);
 			return NS_FAILURE;
 		}
 		else if (ret == (50000 - sqlconn->responsefree))

@@ -73,7 +73,7 @@ static inline void kp_value_new(kp_key * ck, kpval_t type,
 	ck->type = type;
 	ck->len = len;
 	if (type != KPVAL_UNKNOWN)
-		ck->data = smalloc(ck->len + 1);
+		ck->data = ns_malloc(ck->len + 1);
 	else
 		ck->data = NULL;
 
