@@ -101,7 +101,7 @@ close_logs ()
 		free (logentry);
 	}
 	/* for some reason, the logs are not getting flushed correctly */
-	sleep(5);
+	sleep(1);
 }
 
 void make_log_filename(char* modname, char *logname)
