@@ -795,16 +795,19 @@ read_sock_activity(int fd, short what, void *data) {
 	int n;
 	size_t howmuch = READBUFSIZE;
 #ifdef WIN32
-#error Mark, you need to write the win32 support functions for reading here. if any.
 	DWORD dwBytesRead;
+#else
+#error Mark, you need to write the win32 support functions for reading here. if any. Justin, Erm isn't there already a read function???
 #endif
 
 	if (what & EV_READ) { 	
+#ifndef WIN32
 #ifdef FIONREAD
 			if (ioctl(sock->sock_no, FIONREAD, &howmuch) == -1)
 				howmuch = READBUFSIZE;
 #else 
 #warning FIONREAD not available
+#endif	
 #endif	
 #if SOCKDEBUG
 printf("read called with %d bytes %d\n", howmuch, what);
@@ -1061,14 +1064,18 @@ ns_cmd_socklist (CmdParams* cmdparams)
 		irc_prefmsg (ns_botptr, cmdparams->source, "%s:--------------------------------", sock->moduleptr->info->name);
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Socket Name: %s", cmdparams->source), sock->name);
         size = sizeof(struct sockaddr_in);
-        if(getsockname(sock->sock_no, (struct sockaddr *) &add, (socklen_t *)&size)> -1) {
+#ifndef WIN32
+		if(getsockname(sock->sock_no, (struct sockaddr *) &add, (socklen_t *)&size)> -1) {
             irc_prefmsg (ns_botptr, cmdparams->source, "Local Socket: %s:%d", inet_ntoa(add.sin_addr), ntohs(add.sin_port));
         }
+#endif
         size = sizeof(struct sockaddr_in);
         /* this will not print anything if the socket is not connected */
+#ifndef WIN32
         if (getpeername(sock->sock_no,(struct sockaddr *)&add, (socklen_t *)&size)> -1) {
             irc_prefmsg (ns_botptr, cmdparams->source, "Remote Socket: %s:%hu", inet_ntoa(add.sin_addr), ntohs(add.sin_port));
         }
+#endif
 
 		switch (sock->socktype) {
 			case SOCK_STANDARD:

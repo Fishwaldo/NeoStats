@@ -122,6 +122,9 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
+				RelativePath="..\buffer.c">
+			</File>
+			<File
 				RelativePath="..\err.c">
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -140,6 +143,9 @@
 						AdditionalIncludeDirectories=""
 						PreprocessorDefinitions=""/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\evbuffer.c">
 			</File>
 			<File
 				RelativePath="..\event.c">

@@ -177,7 +177,7 @@ evbuffer_remove(struct evbuffer *buf, void *data, size_t datlen)
 
 /* Adds data to an event buffer */
 
-static inline void
+static void
 evbuffer_align(struct evbuffer *buf)
 {
 	memmove(buf->orig_buffer, buf->buffer, buf->off);
@@ -283,10 +283,12 @@ evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 	DWORD dwBytesRead;
 #endif
 
+#ifndef WIN32
 #ifdef FIONREAD
 	if (ioctl(fd, FIONREAD, &n) == -1)
 		n = EVBUFFER_MAX_READ;
 #endif	
+#endif
 	if (howmuch < 0 || howmuch > n)
 		howmuch = n;
 

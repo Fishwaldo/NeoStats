@@ -137,7 +137,8 @@ bufferevent_readcb(int fd, short event, void *arg)
 
 #ifdef WIN32
 #ifndef EINPROGRESS
-#define EINPROGRESS WSAEWOULDBLOCK
+//#define EINPROGRESS WSAEWOULDBLOCK
+#define EINPROGRESS WSAEINPROGRESS
 #endif
 #endif
 
