@@ -119,6 +119,11 @@
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
 #define MAXCMDSIZE		15
 
+/* MAXCHANLIST
+ * the max length a string can be that holds channel lists 
+ */
+#define MAXCHANLIST		1024 
+
 /* MAXPATH 
  * used to determine buffer sizes for file system operations
  */

@@ -257,6 +257,21 @@ void *display_smode(void *tbl, char *col, char *sql, void *row) {
 	return SmodeMaskToString(data->Smode);
 }
 
+static char userschannellist[MAXCHANLIST];
+
+void *display_chans(void *tbl, char *col, char *sql, void *row) {
+	User *data = row;
+	lnode_t *cn;
+	userschannellist[0] = '\0';
+	cn = list_first(data->chans);
+	while (cn != NULL) {
+		strlcat(userschannellist, lnode_get(cn), MAXCHANLIST);
+		strlcat(userschannellist, " ", MAXCHANLIST);
+		cn = list_next(data->chans, cn);
+	}
+	return userschannellist;
+}
+
 COLDEF neo_userscols[] = {
 	{
 		"users",
@@ -365,6 +380,17 @@ COLDEF neo_userscols[] = {
 		offsetof(struct User, server),
 		0,
 		display_server,
+		NULL,
+		"the users Smodes, if the IRCd supports it.  Does not include UMODES."
+	},
+	{	
+		"users",
+		"channels",
+		RTA_STR,
+		MAXCHANLIST,
+		offsetof(struct User, chans),
+		0,
+		display_chans,
 		NULL,
 		"the users Smodes, if the IRCd supports it.  Does not include UMODES."
 	},

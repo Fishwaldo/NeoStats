@@ -68,9 +68,8 @@ long
 UmodeStringToMask(char* UmodeString)
 {
 	int i;
-	int add = 0;
 	char tmpmode;
-	long Umode;
+	long Umode = 0;
 
 	tmpmode = *(UmodeString);
 	while (tmpmode) {
