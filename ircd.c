@@ -52,6 +52,9 @@ static char privmsgbuffer[BUFSIZE];
 static int SkipModuleFunction = 0;
 
 static int signon_newbot (const char *nick, const char *user, const char *host, const char *realname, long Umode);
+#ifdef IRCU
+int scmode_op (const char *who, const char *chan, const char *mode, const char *bot);
+#endif
 
 /** @brief init_ircd
  *
@@ -215,9 +218,13 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 	ssjoin_cmd(who, chan, chflag);
 #else
 	sjoin_cmd(who, chan);
-	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN) {
+	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN)
+#if defined(IRCU)
+		scmode_op(who, chan, "+o", nicktobase64 (who));
+#else
 		schmode_cmd(who, chan, "+o", who);
-	}
+#endif
+
 #endif
 	SET_SEGV_INMODULE(savemod);
 	return NS_SUCCESS;
@@ -239,7 +246,12 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 		ssjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
 #else
 		sjoin_cmd (nick, me.chan);
+#if defined(IRCU)
+		scmode_op(nick, me.chan, "+o", nicktobase64 (nick));
+#else
 		schmode_cmd(nick, me.chan, "+o", nick);
+#endif
+
 #endif
 	}
 	return NS_SUCCESS;
@@ -1159,17 +1171,29 @@ snick_cmd (const char *oldnick, const char *newnick)
 	return NS_SUCCESS;
 }
 
+#ifdef IRCU
+int 
+scmode_op (const char *who, const char *chan, const char *mode, const char *bot)
+{
+	char **av;
+	int ac;
+
+	send_cmode (me.name, who, chan, mode, args, me.now);
+	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
+	ac = split_buf (ircd_buf, &av, 0);
+	ChanMode (me.name, av, ac);
+	free (av);
+	return NS_SUCCESS;
+}
+#endif
+
 int
 schmode_cmd (const char *who, const char *chan, const char *mode, const char *args)
 {
 	char **av;
 	int ac;
 
-#if defined(IRCU)
-	send_cmode (me.name, nicktobase64 (who), chan, mode, args, me.now);
-#else
 	send_cmode (me.name, who, chan, mode, args, me.now);
-#endif
 	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
