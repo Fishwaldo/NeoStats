@@ -52,12 +52,12 @@ static bot_cmd_set_handler bot_cmd_set_handlers[] =
 	bot_cmd_set_boolean,
 	bot_cmd_set_int,
 	bot_cmd_set_string,
-	bot_cmd_set_channel,
 	bot_cmd_set_msg,
 	bot_cmd_set_nick,
 	bot_cmd_set_user,
 	bot_cmd_set_host,
 	bot_cmd_set_realname,
+	bot_cmd_set_channel,
 	bot_cmd_set_ipv4,
 	bot_cmd_set_custom,
 };
