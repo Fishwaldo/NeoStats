@@ -690,35 +690,62 @@ static char ircd_buf[BUFSIZE];
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
-	char *s, *t;
-	char modechar = 0;
-	if(argv[2][0] == '+') {
-		if(strchr(argv[2],'l') || strchr(argv[2],'k')) {
-			t = (char*)argv[4];
-		} else {
-			t = (char*)argv[3];
-		}
-	} else {
-		t = (char*)argv[2];
-	}
-	while (*(s = t)) {
-		t = s + strcspn (s, ",");
-		if (*t)
-			*t++ = 0;
-		do_join (base64tonick(s), argv[0], NULL);
-		if(argv[0][5] == ':') {
-			modechar = argv[0][6];
-		}
-		if(modechar) {
-			char **av;
-			int ac;
-			ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", base64tonick(s), modechar, argv[0]);
-			ac = split_buf (ircd_buf, &av, 0);
-			ChanMode (me.name, av, ac);
-			free (av);
-		}
-	}
+	int param = 2; 
 
+	while (param < argc) {
+	    switch (argv[param][0]) {
+			case '+': /* mode string */
+			{
+				int count;			
+				char *modes;
+				char **av;
+				int ac;
+
+				modes = argv[param];
+				param++;
+				modes++;
+				while(*modes) {
+					ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], *modes, argv[param]);
+					ac = split_buf (ircd_buf, &av, 0);
+					count = ChanMode (me.name, av, ac);
+					param = param + count - 2;
+					free (av);
+					modes++;
+				}
+				break;
+			}
+		    case '%': /* bans */
+				/* ignored for now */
+				param++;
+				break;
+		    default: /* clients */
+			{
+				char *s, *t;
+				char modechar = 0;
+			
+				t = (char*)argv[param];
+				while (*(s = t)) {
+					t = s + strcspn (s, ",");
+					if (*t)
+						*t++ = 0;
+					do_join (base64tonick(s), argv[0], NULL);
+					if(s[5] == ':') {
+						modechar = s[6];
+					}
+					if(modechar) {
+						char **av;
+						int ac;
+						ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], modechar, base64tonick(s));
+						ac = split_buf (ircd_buf, &av, 0);
+						ChanMode (me.name, av, ac);
+						free (av);
+					}
+				}
+				param++;
+				break;
+			}
+		}
+	}
 }
 
 static void
