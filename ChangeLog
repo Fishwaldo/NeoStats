@@ -5,6 +5,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Committed and updated all of M's Documentation Updates
  - Added M's "Config" script for helping to automate the ./configure options
  - Fixed a bug with StatServ's HTML settings
+ - Fixed a problem with floodcontrol crashing NeoStats
 
 * NeoStats * Fish * Version 2.5.3
  - Added ability to turn off StatServ wallops. "/msg statserv set msgthrottle off" - BugID#6

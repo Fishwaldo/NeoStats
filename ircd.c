@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.121 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: ircd.c,v 1.122 2003/06/03 15:08:50 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -1370,9 +1370,11 @@ int flood(User *u)
 		return 0;
 	}
 	if (u->flood >= 5) {
-		skill_cmd(s_Services, u->nick, "%s!%s (Flooding Services.)", Servbot.host, s_Services);
 		nlog(LOG_NORMAL, LOG_CORE, "FLOODING: %s!%s@%s", u->nick, u->username, u->hostname);
+		skill_cmd(s_Services, u->nick, "%s!%s (Flooding Services.)", Servbot.host, s_Services);
+#if 0
 		DelUser(u->nick);
+#endif
 		return 1;
 	} else {
 		u->flood++;
