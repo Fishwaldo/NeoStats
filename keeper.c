@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: keeper.c,v 1.6 2003/04/17 13:48:13 fishwaldo Exp $
+** $Id: keeper.c,v 1.7 2003/04/18 06:41:34 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -68,6 +68,8 @@ int GetConf(void **data, int type, const char *item) {
 	} 
 	return 1;
 }
+
+
 
 /** @brief Sets Config Data of Type
 */

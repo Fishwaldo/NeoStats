@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.115 2003/04/11 09:26:30 fishwaldo Exp $
+** $Id: ircd.c,v 1.116 2003/04/18 06:41:34 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -333,7 +333,8 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	AddStringToList(&av, nick, &ac);
 	Module_Event("SIGNON", av, ac);
 	free(av);
-//	FreeList(av, ac);
+	/* restore segvinmodule from SIGNON */
+	strcpy(segvinmodule, mod_name);
 	return 1;
 }
 

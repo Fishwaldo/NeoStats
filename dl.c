@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.52 2003/04/17 00:16:26 fishwaldo Exp $
+** $Id: dl.c,v 1.53 2003/04/18 06:41:34 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -586,7 +586,6 @@ int load_module(char *path1, User *u) {
 				strcpy(segv_location, "AfterDLLoadOnline");
 				strcpy(segvinmodule, "");
 				free(av);
-//				FreeList(av, ac);
 				break;
 			}
 			event_fn_ptr++;
