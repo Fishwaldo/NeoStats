@@ -200,5 +200,5 @@ extern int _kp_cache_get_subkeys(kp_path * kpp, const char *keypath,
 				 int iskeyfile, struct key_array *keys);
 extern int _kp_cache_set(kp_path * kpp, kp_key * ck);
 extern int _kp_cache_flush(void);
-
+void _kp_clear_cache(void);
 /* End of kp_util.h */

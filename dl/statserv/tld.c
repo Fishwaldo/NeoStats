@@ -186,3 +186,19 @@ void init_tld()
 	list_append(Thead, tn);
 
 }
+
+void fini_tld() {
+	TLD *t;
+	lnode_t *tn;
+
+	GeoIP_delete(gi);
+	tn = list_first(Thead);
+	while (tn != NULL) {
+		t = lnode_get(tn);
+		free(t->country);
+		free(t);
+		tn = list_next(Thead, tn);
+	}
+	list_destroy_nodes(Thead);
+	gi = NULL;
+}

@@ -29,5 +29,5 @@ void DelServer(const char *name, const char* reason);
 void ServerDump (void);
 int init_server_hash (void);
 void PingServers (void);
-
+void FreeServers();
 #endif /* _SERVER_H_ */

@@ -100,8 +100,34 @@ close_logs ()
 		hnode_destroy (hn);
 		free (logentry);
 	}
+}
+
+void 
+fini_logs() {
+	hscan_t hs;
+	hnode_t *hn;
+	struct logs_ *logentry;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin (&hs, logs);
+	while ((hn = hash_scan_next (&hs)) != NULL) {
+		logentry = hnode_get (hn);
+		logentry->flush = 0;
+#ifdef DEBUG
+		printf ("Closing Logfile %s (%s)\n", logentry->name, (char *) hnode_getkey (hn));
+#endif
+		if(logentry->logfile)
+		{
+			fflush (logentry->logfile);
+			fclose (logentry->logfile);
+			logentry->logfile = NULL;
+		}
+		hash_scan_delete (logs, hn);
+		hnode_destroy (hn);
+		free (logentry);
+	}
 	/* for some reason, the logs are not getting flushed correctly */
-	sleep(1);
+	hash_destroy(logs);
 }
 
 void make_log_filename(char* modname, char *logname)

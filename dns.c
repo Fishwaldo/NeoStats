@@ -151,6 +151,27 @@ init_dns ()
 
 }
 
+/* @brief Clean up ADNS data when we shutdown 
+ *
+ */
+void 
+fini_adns() {
+	lnode_t *dnsnode;
+	DnsLookup *dnsdata;
+
+	SET_SEGV_LOCATION();
+
+	dnsnode = list_first (dnslist);
+	while (dnsnode) {
+		dnsdata = lnode_get(dnsnode);
+		adns_cancel(dnsdata->q);
+		free (dnsdata->a);
+		free (dnsdata);
+	}
+	list_destroy_nodes(dnslist);
+	free(ads);
+}
+
 /** @brief Checks for Completed DNS queries
  *
  *  Goes through the dnslist of pending queries and calls the callback function for each lookup

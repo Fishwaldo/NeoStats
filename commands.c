@@ -231,7 +231,7 @@ del_all_bot_cmds(ModUser* bot_ptr)
 	}
 	/* Destroy command */
 	hash_destroy(bot_ptr->botcmds);
-	bot_ptr->botcmds = NULL;
+//	bot_ptr->botcmds = NULL;
 	return NS_SUCCESS;
 }
 

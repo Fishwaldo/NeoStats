@@ -26,5 +26,5 @@
 
 int init_dns (void);
 void do_dns (void);
-
+void fini_adns();
 #endif /* _DNS_H_ */

@@ -576,10 +576,21 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 				nlog (LOG_NOTICE, LOG_CORE, "Reconnect time is zero, shutting down");
 			}
 		}
+
+		/* now free up the users and servers memory */
+		FreeUsers();
+		FreeServers();
+		fini_adns();
+		finiModuleHash();
 	}
 
 	kp_flush();
-	close_logs ();
+	kp_exit();
+	fini_logs ();
+
+
+
+
 	if ((exitcode == NS_EXIT_RECONNECT && me.r_time > 0) || exitcode == NS_EXIT_RELOAD) {
 		execve ("./neostats", NULL, NULL);
 		return_code=EXIT_FAILURE;	/* exit code to error */

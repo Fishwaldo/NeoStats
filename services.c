@@ -101,7 +101,6 @@ init_services(void)
 	/* Add command list to services bot */
 	bot_ptr = add_neostats_mod_user (s_Services);
 	bot_ptr->flags = me.onlyopers ? BOT_FLAG_ONLY_OPERS : 0;
-	bot_ptr->botcmds = hash_create(-1, 0, 0);
 	add_services_cmd_list(ns_commands);
 	return NS_SUCCESS;
 }

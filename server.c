@@ -274,6 +274,7 @@ init_server_hash (void)
 	return NS_SUCCESS;
 }
 
+
 void
 PingServers (void)
 {
@@ -293,4 +294,22 @@ PingServers (void)
 		}
 		send_ping (me.name, me.name, s->name);
 	}
+}
+
+void 
+FreeServers ()
+{
+	Server *s;
+	hnode_t *sn;
+	hscan_t hs;
+
+	hash_scan_begin(&hs, sh);
+	while ((sn = hash_scan_next(&hs)) != NULL ) {
+		s = hnode_get (sn);
+		hash_delete (sh, sn);
+		hnode_destroy (sn);
+		free (s);
+	}
+	hash_destroy(sh);
+
 }

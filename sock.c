@@ -116,12 +116,12 @@ ConnectTo (char *host, int port)
 			dobind = 1;
 		}
 	}
-
 	if ((hp = gethostbyname (host)) == NULL) {
 		return NS_FAILURE;
 	}
 
 	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0) {
+		free(hp);
 		return NS_FAILURE;
 	}
 	if (dobind > 0) {
@@ -149,7 +149,6 @@ ConnectTo (char *host, int port)
 		nlog(LOG_CRITICAL, LOG_CORE, "Failed to Setup Sql Port. SQL not available");
 	}
 #endif	
-			
 	return s;
 }
 
@@ -178,6 +177,7 @@ read_loop ()
 	Sql_Conn *sqldata;
 #endif
 
+	/* XXX Valgrind reports these two as lost memory, Should clean up before we exit */
 	TimeOut = malloc (sizeof (struct timeval));
 	ufds = malloc((sizeof *ufds) *  me.maxsocks);
 

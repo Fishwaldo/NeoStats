@@ -94,7 +94,7 @@ extern void nlog (int level, int scope, char *fmt, ...) __attribute__((format(pr
 void close_logs ();
 int init_logs ();
 void reset_logs ();
-
+void fini_logs();
 /* Configurable log filename format string */
 extern char LogFileNameFormat[MAX_LOGFILENAME];
 

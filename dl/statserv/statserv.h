@@ -258,7 +258,7 @@ void ResetTLD();
 void DisplayTLDmap(User *u);
 void AddTLD(User *);
 void init_tld();
-
+void fini_tld();
 /* htmlstats.c */
 void ss_html(void);
 

@@ -38,5 +38,5 @@ int init_user_hash (void);
 void UserAway (const char *nick, const char *awaymsg);
 void DelUser (const char *nick, int killflag, const char *reason);
 int InitExtAuth(void);
-
+void FreeUsers();
 #endif /* _USERS_H_ */

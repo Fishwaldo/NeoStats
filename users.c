@@ -699,3 +699,36 @@ void SetUserServicesTS(const char* nick, const char* ts)
 		u->servicesstamp = strtoul(ts, NULL, 10);
 	}
 }
+
+/* @brief Free up all the user structs and free memory. Called when we close down
+ *
+ */
+
+
+void
+FreeUsers ()
+{
+	User *u;
+	hnode_t *un;
+	hscan_t hs;
+
+	SET_SEGV_LOCATION();
+
+
+	hash_scan_begin(&hs, uh);
+	while ((un = hash_scan_next(&hs)) != NULL) {
+		u = hnode_get (un);
+		list_process (u->chans, u, UserPart);
+		
+		/* something is wrong if its our bots */
+		if (findbot (u->nick)) {
+			nlog (LOG_NOTICE, LOG_CORE, "Ehhh. FreeUsers called while we still have bots online. Baaad User: %s", u->nick);
+		}
+		hash_scan_delete (uh, un);
+		hnode_destroy (un);
+		list_destroy (u->chans);
+		free (u);
+	}
+	hash_destroy(uh);
+	hash_destroy(ch);
+}

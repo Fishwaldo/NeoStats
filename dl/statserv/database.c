@@ -76,6 +76,15 @@ void SaveStats()
 		SetData((void *)s->totusers, CFGINT, "ServerStats", s->name, "TotalUsers");
 		SetData((void *)s->maxopers, CFGINT, "ServerStats", s->name, "MaxOpers");
 		SetData((void *)s->t_maxopers, CFGINT, "ServerStats", s->name, "MaxOpersTime");
+		if (StatServ.shutdown == 1) {
+			free(s);
+			hash_scan_delete(Shead, sn);
+			hnode_destroy(sn);
+		}
+
+	}
+	if (StatServ.shutdown == 1) {
+		hash_destroy(Shead);
 	}
 
 	/* ok, Now Channel Stats */

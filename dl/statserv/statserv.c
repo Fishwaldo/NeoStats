@@ -257,6 +257,13 @@ void __ModFini()
 {
 	StatServ.shutdown = 1;
 	SaveStats();
+	fini_tld();
+
+#if SQLSRV
+	list_destroy_nodes(fakedaily);
+	list_destroy_nodes(fakenetwork);
+#endif
+
 }
 
 bot_cmd ss_commands[]=

@@ -94,6 +94,7 @@ extern "C" {
 	int kp_flush(void);
 	int kp_get_type(const char *keypath, kpval_t * typep);
 	char *kp_strerror(int kperr);
+	void kp_exit();
 
 
 /* ==== Utility functions ==== */

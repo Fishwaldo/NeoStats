@@ -185,20 +185,16 @@ static void kp_init(int dbindex)
 	}
 }
 
-#ifdef ALLOC_CHECK
 /* ------------------------------------------------------------------------- 
  * Free everything used by the keeper library
  * ------------------------------------------------------------------------- */
-void _kp_exit()
+void kp_exit()
 {
 	free(kp_tmpname);
 	free(kp_basedirs[KPDB_LOCAL]);
-	free(kp_basedirs[KPDB_USER]);
-	free(kp_basedirs[KPDB_GLOBAL]);
 
 	_kp_clear_cache();
 }
-#endif
 
 #define READ_BUF_SIZE 1024
 

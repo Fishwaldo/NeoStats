@@ -214,6 +214,7 @@ ConfLoadModules ()
 		} else {
 			nlog (LOG_WARNING, LOG_CORE, "Could Not Load Module %s, Please check above error Messages", (char *)load_mods[i]);
 		}
+		free(load_mods[i]);
 	}
 	nlog (LOG_NORMAL, LOG_CORE, "Completed loading configured modules"); 
 	return NS_SUCCESS;

@@ -157,7 +157,6 @@ static void kp_remove_file_from_cache(kp_fil * rfil)
 	abort();
 }
 
-#ifdef ALLOC_CHECK
 /* ------------------------------------------------------------------------- 
  * Remove all files from the cache
  * ------------------------------------------------------------------------- */
@@ -169,7 +168,6 @@ void _kp_clear_cache(void)
 	while (kp_cachef != NULL)
 		kp_remove_file_from_cache(kp_cachef);
 }
-#endif
 
 /* ------------------------------------------------------------------------- 
  * Remove all old, non-dirty files from the cache

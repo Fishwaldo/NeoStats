@@ -77,6 +77,7 @@ int init_exclude_list() {
 			list_append(exclude_list, en);
 		}
 	}
+	free(row);
 	return NS_SUCCESS;
 } 
 

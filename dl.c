@@ -223,6 +223,13 @@ InitModuleHash ()
 	return NS_SUCCESS;
 }
 
+void finiModuleHash() {
+	hash_destroy(mh);
+	hash_destroy(bh);
+	hash_destroy(th);
+	hash_destroy(bch);
+	hash_destroy(sockh);
+}
 #ifdef DEBUG
 void verify_hashes(void)
 {
@@ -1535,6 +1542,10 @@ unload_module (char *module_name, User * u)
 		i = get_mod_num (module_name);
 
 		mod_ptr = hnode_get (modnode);
+
+		/* Remove from the module hash so we dont call events for this module during hte signoff*/
+		hash_delete (mh, modnode);
+
 		
 		/* call __ModFini (replacement for library __fini() call */
 		ModFini = dlsym ((int *) mod_ptr->dl_handle, "__ModFini");
@@ -1543,13 +1554,12 @@ unload_module (char *module_name, User * u)
 			(*ModFini) ();
 			CLEAR_SEGV_INMODULE();
 		}
+
 		/* now, see if this Module has any bots with it 
 		 * we delete the modules *after* we call ModFini, so the bot 
 		 * can still send messages generated from ModFini calls */
 		del_bots(module_name);
 
-		/* Remove hash */
-		hash_delete (mh, modnode);
 		hnode_destroy (modnode);
 		/* Close module */
 		SET_SEGV_INMODULE(module_name);
