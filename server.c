@@ -283,7 +283,9 @@ PingServers (void)
 	hscan_t ss;
 	hnode_t *sn;
 
-	nlog (LOG_DEBUG3, LOG_CORE, "Sendings pings...");
+	if(!me.synced)
+		return;
+	nlog (LOG_DEBUG3, LOG_CORE, "Sending pings...");
 	ping.ulag = 0;
 
 	hash_scan_begin (&ss, sh);

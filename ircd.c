@@ -602,6 +602,7 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 #endif
 			) {
 			if(cmd_list[i].function) {
+				nlog (LOG_DEBUG3, LOG_CORE, "process_ircd_cmd: running command %s", cmd_list[i].name);
 				cmd_list[i].function (origin, av, ac, cmdptr);
 			} else {
 				nlog (LOG_DEBUG3, LOG_CORE, "process_ircd_cmd: ignoring command %s", cmd);

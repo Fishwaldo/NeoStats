@@ -44,11 +44,13 @@ static void m_nick (char *origin, char **argv, int argc, int srv);
 static void m_topic (char *origin, char **argv, int argc, int srv);
 static void m_kick (char *origin, char **argv, int argc, int srv);
 static void m_join (char *origin, char **argv, int argc, int srv);
+static void m_create (char *origin, char **argv, int argc, int srv);
 static void m_part (char *origin, char **argv, int argc, int srv);
 static void m_stats (char *origin, char **argv, int argc, int srv);
 static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_pass (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
+static void m_end_of_burst (char *origin, char **argv, int argc, int srv);
 
 const char ircd_version[] = "(IRCU)";
 const char services_bot_modes[]= "+oS";
@@ -74,11 +76,13 @@ ircd_cmd cmd_list[] = {
 	{MSG_NICK, TOK_NICK, m_nick, 0},
 	{MSG_TOPIC, TOK_TOPIC, m_topic, 0},
 	{MSG_KICK, TOK_KICK, m_kick, 0},
+	{MSG_CREATE, TOK_CREATE, m_create, 0},
 	{MSG_JOIN, TOK_JOIN, m_join, 0},
 	{MSG_PART, TOK_PART, m_part, 0},
 	{MSG_PING, TOK_PING, m_ping, 0},
 	{MSG_PASS, TOK_PASS, m_pass, 0},
-	{MSG_END_OF_BURST, TOK_END_OF_BURST, m_burst, 0},
+	{MSG_BURST, TOK_BURST, m_burst, 0},
+	{MSG_END_OF_BURST, TOK_END_OF_BURST, m_end_of_burst, 0},
 };
 
 ChanModes chan_modes[] = {
@@ -116,8 +120,10 @@ const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 /* Temporary buffers for numeric conversion */
 char servlist[4096][MAXHOST];
-char nicklist[4096][MAXNICK];
+char nicklist[262144][MAXNICK];
 int neonumeric;
+char neonumericbuf[3];
+
 
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
@@ -197,13 +203,10 @@ static const unsigned int convert2n[] = {
 unsigned int base64toint(const char* s)
 {
 	unsigned int i = convert2n[(unsigned char) *s++];
-	nlog (LOG_DEBUG2, LOG_CORE, "base64toint: %s", s);
 	while (*s) {
 		i <<= NUMNICKLOG;
 		i += convert2n[(unsigned char) *s++];
 	}
-	nlog (LOG_DEBUG2, LOG_CORE, "base64toint: %d", i);
-
 	return i;
 }
 
@@ -243,64 +246,64 @@ DEBUG2 CORE - SENT: :stats.mark.net PING stats.mark.net :mark.local.org
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
-	send_cmd (":%s %s %s %d :%s", sender, MSG_SERVER, name, numeric, infoline);
+	send_cmd (":%s %s %s %d :%s", sender, TOK_SERVER, name, numeric, infoline);
 }
 
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
-	send_cmd ("%s %s", MSG_PASS, pass);
-    send_cmd ("%s %s 1 %lu %lu P10 %cD] :[%s] %s\n", MSG_SERVER, name, (unsigned long)time(NULL), (unsigned long)time(NULL), convert2y[numeric], name,  infoline);
 	neonumeric = numeric;
+	inttobase64(neonumericbuf, neonumeric, 2);
+	send_cmd ("%s %s", MSG_PASS, pass);
+    send_cmd ("%s %s 1 %lu %lu P10 %s]]] :[%s] %s\n", MSG_SERVER, name, (unsigned long)time(NULL), (unsigned long)time(NULL), neonumericbuf, name,  infoline);
 }
 
-/* R: AB SQ mark.local.org 0 :Ping timeout */
 void
 send_squit (const char *server, const char *quitmsg)
 {
-	send_cmd ("%s %s :%s", MSG_SQUIT, server, quitmsg);
+	send_cmd ("%s %s 0 :%s", TOK_SQUIT, server, quitmsg);
 }
 
 void 
 send_quit (const char *who, const char *quitmsg)
 {
-	send_cmd (":%s %s :%s", who, MSG_QUIT, quitmsg);
+	send_cmd (":%s %s :%s", who, TOK_QUIT, quitmsg);
 }
 
 void 
 send_part (const char *who, const char *chan)
 {
-	send_cmd (":%s %s %s", who, MSG_PART, chan);
+	send_cmd (":%s %s %s", who, TOK_PART, chan);
 }
 
 void
 send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
 {
-	send_cmd (":%s %s 0 %s + :%s", sender, MSG_JOIN, chan, who);
+	send_cmd (":%s %s 0 %s + :%s", sender, TOK_JOIN, chan, who);
 }
 
 void 
 send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, ts);
+	send_cmd (":%s %s %s %s %s %lu", who, TOK_MODE, chan, mode, args, ts);
 }
 
 void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
-	send_cmd ("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, ts, newmode, ident, host, server, realname);
+	send_cmd ("%s %s 1 %lu %s %s %s %s :%s", TOK_NICK, nick, ts, newmode, ident, host, server, realname);
 }
 
 void
 send_ping (const char *from, const char *reply, const char *to)
 {
-	send_cmd (":%s %s %s :%s", from, MSG_PING, reply, to);
+	send_cmd ("%s %s %s :%s", neonumericbuf, TOK_PING, reply, to);
 }
 
 void 
 send_umode (const char *who, const char *target, const char *mode)
 {
-	send_cmd (":%s %s %s :%s", who, MSG_MODE, target, mode);
+	send_cmd (":%s %s %s :%s", who, TOK_MODE, target, mode);
 }
 
 void 
@@ -312,19 +315,19 @@ send_numeric (const char *from, const int numeric, const char *target, const cha
 void
 send_pong (const char *reply)
 {
-	send_cmd ("%s %s", MSG_PONG, reply);
+	send_cmd ("%s %s %s :%s", neonumericbuf, TOK_PONG, neonumericbuf, reply);
 }
 
 void 
 send_kill (const char *from, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s :%s", from, MSG_KILL, target, reason);
+	send_cmd (":%s %s %s :%s", from, TOK_KILL, target, reason);
 }
 
 void 
 send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %lu", oldnick, MSG_NICK, newnick, ts);
+	send_cmd (":%s %s %s %lu", oldnick, TOK_NICK, newnick, ts);
 }
 
 void
@@ -340,19 +343,19 @@ send_sjoin (const char *sender, const char *who, const char *chan, const char fl
 void 
 send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
+	send_cmd (":%s %s %s %s :%s", who, TOK_KICK, chan, target, (reason ? reason : "No Reason Given"));
 }
 
 void 
 send_wallops (const char *who, const char *buf)
 {
-	send_cmd (":%s %s :%s", who, MSG_WALLOPS, buf);
+	send_cmd (":%s %s :%s", who, TOK_WALLOPS, buf);
 }
 
 void
 send_end_of_burst_ack(void)
 {
-	send_cmd ("%c %s", convert2y[neonumeric], MSG_END_OF_BURST_ACK);
+	send_cmd ("%s %s", neonumericbuf, TOK_END_OF_BURST_ACK);
 }
 
 void
@@ -376,7 +379,7 @@ send_akill (const char *sender, const char *host, const char *ident, const char 
 	hash_scan_begin (&ss, sh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		//send_cmd (":%s %s %s %lu %s %s :%s", setby, MSG_KLINE, s->name, (unsigned long)length, ident, host, reason);
+		//send_cmd (":%s %s %s %lu %s %s :%s", setby, TOK_KLINE, s->name, (unsigned long)length, ident, host, reason);
 	}
 }
 
@@ -389,19 +392,19 @@ send_rakill (const char *sender, const char *host, const char *ident)
 void
 send_privmsg (const char *from, const char *to, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
+	send_cmd (":%s %s %s :%s", from, TOK_PRIVATE, to, buf);
 }
 
 void
 send_notice (const char *from, const char *to, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
+	send_cmd (":%s %s %s :%s", from, TOK_NOTICE, to, buf);
 }
 
 void
 send_globops (const char *from, const char *buf)
 {
-//	send_cmd (":%s %s :%s", from, MSG_GLOBOPS, buf);
+//	send_cmd (":%s %s :%s", from, TOK_GLOBOPS, buf);
 }
 
 
@@ -448,7 +451,6 @@ static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
 	char buf[3];
-	nlog (LOG_DEBUG2, LOG_CORE, "m_server: %s", argv[5]);
 	buf[0] = argv[5][0];
 	buf[1] = argv[5][1];
 	buf[2] = '\0';
@@ -461,8 +463,12 @@ static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 3);
-	do_squit (argv[1], tmpbuf);
+	char buf[3];
+	buf[0] = argv[0][0];
+	buf[1] = argv[0][1];
+	buf[2] = '\0';
+	tmpbuf = joinbuf(argv, argc, 2);
+	do_squit (servlist[base64toint(buf)], tmpbuf);
 	free(tmpbuf);
 }
 
@@ -470,11 +476,18 @@ static void
 m_quit (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
+	char buf[4];
+	buf[0] = origin[2];
+	buf[1] = origin[3];
+	buf[2] = origin[4];
+	buf[3] = '\0';
+
 	tmpbuf = joinbuf(argv, argc, 0);
-	do_quit (origin, tmpbuf);
+	do_quit (nicklist[base64toint(buf)], tmpbuf);
 	free(tmpbuf);
 }
 
+/* R: ABAAE M Mark :+i */
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
@@ -492,11 +505,14 @@ m_kill (char *origin, char **argv, int argc, int srv)
 	do_kill (argv[0], tmpbuf);
 	free(tmpbuf);
 }
+
+/* R: AB G !1076065765.431368 stats.mark.net 1076065765.431368 */
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
 {
-	do_pong (argv[0], argv[1]);
+	do_pong (servlist[base64toint(argv[0])], argv[1]);
 }
+
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
@@ -529,15 +545,20 @@ m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 		char *realname;
-		char buf[3];
-		buf[0] = origin[0];
-		buf[1] = origin[1];
+		char buf[4];
+		buf[0] = argv[6][0];
+		buf[1] = argv[6][1];
 		buf[2] = '\0';
 		realname = joinbuf (argv, argc, (argc - 1));
 		nlog (LOG_DEBUG2, LOG_CORE, "m_nick: %s", buf);
         do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
 			servlist[base64toint(buf)], NULL, NULL, NULL, NULL, realname);
 		free (realname);
+		buf[0] = argv[argc-2][2];
+		buf[1] = argv[argc-2][3];
+		buf[2] = argv[argc-2][4];
+		buf[3] = '\0';
+		strlcpy(nicklist[base64toint(buf)], argv[0], MAXHOST);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}
@@ -545,11 +566,16 @@ m_nick (char *origin, char **argv, int argc, int srv)
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	char *buf;
+	char *tmpbuf;
+	char buf[4];
+	buf[0] = origin[2];
+	buf[1] = origin[3];
+	buf[2] = origin[4];
+	buf[3] = '\0';
 
-	buf = joinbuf (argv, argc, 2);
-	do_topic (argv[0], origin, NULL, buf);
-	free (buf);
+	tmpbuf = joinbuf (argv, argc, 2);
+	do_topic (argv[0], nicklist[base64toint(buf)], NULL, tmpbuf);
+	free (tmpbuf);
 }
 
 static void
@@ -560,17 +586,41 @@ m_kick (char *origin, char **argv, int argc, int srv)
 	do_kick (origin, argv[0], argv[1], tmpbuf);
 	free(tmpbuf);
 }
+
+/* R: ABAAE C #chan 1076069009 */
+static void
+m_create (char *origin, char **argv, int argc, int srv)
+{
+	char buf[4];
+	buf[0] = origin[2];
+	buf[1] = origin[3];
+	buf[2] = origin[4];
+	buf[3] = '\0';
+	do_join (nicklist[base64toint(buf)], argv[0], argv[1]);
+}
+
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
-	do_join (origin, argv[0], NULL);
+	char buf[4];
+	buf[0] = origin[2];
+	buf[1] = origin[3];
+	buf[2] = origin[4];
+	buf[3] = '\0';
+	do_join (nicklist[base64toint(buf)], argv[0], argv[1]);
 }
+
 static void
 m_part (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
+	char buf[4];
+	buf[0] = origin[2];
+	buf[1] = origin[3];
+	buf[2] = origin[4];
+	buf[3] = '\0';
 	tmpbuf = joinbuf(argv, argc, 1);
-	do_part (origin, argv[0], tmpbuf);
+	do_part (nicklist[base64toint(buf)], argv[0], tmpbuf);
 	free(tmpbuf);
 }
 
@@ -578,6 +628,7 @@ static void
 m_ping (char *origin, char **argv, int argc, int srv)
 {
 	do_ping (argv[0], argv[1]);
+//servlist[base64toint(buf)]
 }
 
 static void
@@ -585,8 +636,34 @@ m_pass (char *origin, char **argv, int argc, int srv)
 {
 }
 
+/*
+1 <channel>
+2 <timestamp>
+3+ [<modes> [<mode extra parameters>]] [<users>] [<bans>]
+*/
+/* R: AB B #chan 1076064445 ABAAA:o */
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
+{
+	char buf[4];
+
+	char *s, *t;
+	t = (char*)argv[2];
+	while (*(s = t)) {
+		t = s + strcspn (s, ",");
+		if (*t)
+			*t++ = 0;
+		buf[0] = s[2];
+		buf[1] = s[3];
+		buf[2] = s[4];
+		buf[3] = '\0';
+		do_join (nicklist[base64toint(buf)], argv[0], argv[1]);
+	}
+
+}
+
+static void
+m_end_of_burst (char *origin, char **argv, int argc, int srv)
 {
 	send_end_of_burst_ack();
 }
@@ -634,7 +711,7 @@ parse (char *line)
 {
 	char origin[64], cmd[64], *coreLine;
 	int cmdptr = 0;
-	int ac;
+	int ac = 0;
 	char **av = NULL;
 
 	SET_SEGV_LOCATION();
@@ -642,6 +719,7 @@ parse (char *line)
 	strlcpy (recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
+	nlog (LOG_DEBUG1, LOG_CORE, "================================================================");
 	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
 	coreLine = strpbrk (line, " ");
 	if (coreLine) {
@@ -649,13 +727,13 @@ parse (char *line)
 		while (isspace (*++coreLine));
 	} else
 		coreLine = line + strlen (line);
-	nlog (LOG_DEBUG1, LOG_CORE, "coreLine %s ", coreLine);
-	nlog (LOG_DEBUG1, LOG_CORE, "line %s", line);
-	nlog (LOG_DEBUG1, LOG_CORE, "====================");
+//	nlog (LOG_DEBUG1, LOG_CORE, "coreLine %s ", coreLine);
+//	nlog (LOG_DEBUG1, LOG_CORE, "line %s", line);
+//	nlog (LOG_DEBUG1, LOG_CORE, "================================================================");
 	if ((!ircstrcasecmp(line, "SERVER")) || (!ircstrcasecmp(line, "PASS"))) {
 		strlcpy(cmd, line, sizeof(cmd));
-		nlog (LOG_DEBUG1, LOG_CORE, "cmd %s", cmd);
-		nlog (LOG_DEBUG1, LOG_CORE, "coreLine %s", coreLine);
+		nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
+		nlog (LOG_DEBUG1, LOG_CORE, "args  : %s", coreLine);
 		ac = splitbuf(coreLine, &av, 1);
 		cmdptr = 0;
 		nlog (LOG_DEBUG1, LOG_CORE, "0 %d", ac);
@@ -669,14 +747,14 @@ parse (char *line)
 		} /*else
 			coreLine = line + strlen (line);*/
 		strlcpy(cmd, coreLine, sizeof(cmd));
-		nlog (LOG_DEBUG1, LOG_CORE, "origin %s", origin);
-		nlog (LOG_DEBUG1, LOG_CORE, "cmd %s", cmd);
-		nlog (LOG_DEBUG1, LOG_CORE, "line %s", line);
+		nlog (LOG_DEBUG1, LOG_CORE, "origin: %s", origin);
+		nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
+		nlog (LOG_DEBUG1, LOG_CORE, "args  : %s", line);
 		if(line) ac = splitbuf(line, &av, 0);
 		nlog (LOG_DEBUG1, LOG_CORE, "0 %d", ac);
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "====================");
 
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
+	nlog (LOG_DEBUG1, LOG_CORE, "================================================================");
 	if(av) free (av);
 }
