@@ -390,6 +390,7 @@ void parse(char *line)
 	char origin[64], cmd[64], *coreLine;
 	int cmdptr = 0;
 	int I = 0;
+	char *tonick;
 	Module *module_ptr;
 	Functions *fn_list;
 	Mod_User *list;
@@ -463,14 +464,23 @@ void parse(char *line)
                 if (findbot(origin)) {
 			goto parend;
 		}
-		if (!strcasecmp(s_Services,EM->av[0])) {
+
+		tonick = strtok(EM->av[0], "@");
+		/* this handles PRIVMSG neostats@stats.neostat.net messages, and ordinary messages */
+// TODO: still channel support for bots here
+
+		if (*tonick == '#') {
+			log("Channel Message to one of our Bots, on TODO list");
+			goto parend;
+		}
+		if (!strcasecmp(s_Services,tonick)) {
 			/* its to the Internal Services Bot */
 			strcpy(segv_location, "servicesbot");
 			servicesbot(EM);
 			strcpy(segv_location, "ServicesBot_return");
 			goto parend;
 		} else {
-			list = findbot(EM->av[0]);
+			list = findbot(tonick);
 			/* Check to see if any of the Modules have this nick Registered */
 			if (list) {
 #ifdef DEBUG
