@@ -142,11 +142,11 @@ dcc_parse(void *arg, void *rline, size_t len)
 	{
 		cmd = strchr(buf, ' ');
 		if (!cmd) {
-            dcc_write(dcc, "Error, You must specify a command to execute");
-            return NS_SUCCESS;
-        }
+	         	dcc_write(dcc, "Error, You must specify a command to execute");
+	         	return NS_SUCCESS;
+		}
    		*cmd = 0;
-        cmd++;
+   		cmd++;
 		cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 		cmdparams->source = dcc;
 		if (cmdparams->source) {
@@ -154,11 +154,11 @@ dcc_parse(void *arg, void *rline, size_t len)
 			if (cmdparams->target) {
 				cmdparams->bot = cmdparams->target->user->bot;
 			} else {
-					dcc_write(dcc, "Use .<botname> to send a command to a NeoStats Bot");
-					dcc_write(dcc, "Otherwise, jsut type test without a leading . to send to the DCC");
-					dcc_write(dcc, "partyline");
-					return NS_SUCCESS;
-            }
+				dcc_write(dcc, "Use .<botname> to send a command to a NeoStats Bot");
+				dcc_write(dcc, "Otherwise, jsut type test without a leading . to send to the DCC");
+				dcc_write(dcc, "partyline");
+				return NS_SUCCESS;
+			}
 			if (cmdparams->bot->flags & BOT_FLAG_SERVICEBOT) 
 			{
 				cmdparams->param = cmd;
