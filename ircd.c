@@ -1867,6 +1867,7 @@ do_server (const char *name, const char *uplink, const char* hops, const char *n
 	
 }
 
+#ifndef IRCU
 #ifdef MSG_BURST
 void 
 do_burst (char *origin, char **argv, int argc)
@@ -1882,6 +1883,7 @@ do_burst (char *origin, char **argv, int argc)
 		ircd_srv.burst = 1;
 	}
 }
+#endif
 #endif
 
 #ifdef MSG_SWHOIS

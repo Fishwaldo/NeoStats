@@ -110,6 +110,9 @@ ChanModes chan_modes[] = {
 	/*{CMODE_SENDTS, 'b', 0, 1, 0},*/
 	{CMODE_DELAYJOINS, 'D', 0, 1, 0},
 	/*{CMODE_LISTED, 'b', 0, 1, 0},*/
+#ifdef NEFARIOUS
+	{CMODE_REGONLY, 'r', 0, 0, 0},
+#endif
 };
 
 UserModes user_umodes[] = {
@@ -123,8 +126,12 @@ UserModes user_umodes[] = {
 	{UMODE_CHSERV,		'k', 0},
 	{UMODE_ACCOUNT,     'r', 0},
 	{UMODE_HIDE,		'x', 0},
+#ifdef NEFARIOUS
+	{UMODE_SETHOST,		'h', 0},
+#else
 	/* Afternet extension */
 	{UMODE_HELPER,		'h', 0},
+#endif
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
@@ -297,13 +304,13 @@ send_squit (const char *server, const char *quitmsg)
 void 
 send_quit (const char *who, const char *quitmsg)
 {
-	send_cmd (":%s %s :%s", who, TOK_QUIT, quitmsg);
+	send_cmd ("%s %s :%s", nicktobase64 (who), TOK_QUIT, quitmsg);
 }
 
 void 
 send_part (const char *who, const char *chan)
 {
-	send_cmd (":%s %s %s", who, TOK_PART, chan);
+	send_cmd ("%s %s %s", nicktobase64 (who), TOK_PART, chan);
 }
 
 void 
@@ -315,7 +322,7 @@ send_sjoin (const char *sender, const char *who, const char *chan, const char fl
 void
 send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %lu :%s", who, TOK_JOIN, chan, ts, who);
+	send_cmd ("%s %s %s %lu", nicktobase64 (who), TOK_JOIN, chan, ts);
 }
 
 /* R: ABAAH M #c3 +tn */
@@ -328,12 +335,9 @@ send_cmode (const char *sender, const char *who, const char *chan, const char *m
 void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
-	char IPAddress[32];
 	char nicknumbuf[6];
 
-	inttobase64(IPAddress, htonl (inet_addr (server)), 6);
-
-	send_cmd ("%s %s %s 1 %lu %s %s %s %s %sAA%c :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, IPAddress, neostatsbase64, (neonickcount+'A'), realname);
+	send_cmd ("%s %s %s 1 %lu %s %s %s AAAAAA %sAA%c :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, neostatsbase64, (neonickcount+'A'), realname);
 	snprintf(nicknumbuf, 6, "%sAA%c", neostatsbase64, (neonickcount+'A'));
 	setnickbase64 (nick, nicknumbuf);
 	neonickcount ++;
@@ -348,7 +352,6 @@ send_ping (const char *from, const char *reply, const char *to)
 void 
 send_umode (const char *who, const char *target, const char *mode)
 {
-/*	send_cmd (":%s %s %s :%s", who, TOK_MODE, target, mode);*/
 	send_cmd ("%s %s %s :%s", nicktobase64 (who), TOK_MODE, target, mode);
 }
 
@@ -373,7 +376,7 @@ send_kill (const char *from, const char *target, const char *reason)
 void 
 send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %lu", oldnick, TOK_NICK, newnick, ts);
+	send_cmd ("%s %s %s %s %lu", nicktobase64 (oldnick), TOK_NICK, newnick, newnick, ts);
 }
 
 void
@@ -416,20 +419,10 @@ send_end_of_burst(void)
 	send_cmd ("%s %s", neostatsbase64, TOK_END_OF_BURST);
 }
 
-void
-send_burst (int b)
-{
-	if (b == 0) {
-		send_cmd ("BURST 0");
-	} else {
-		send_cmd ("BURST");
-	}
-}
-
 void 
 send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
-	send_cmd ("%s %s * +%s@%s %lu :%s", neostatsbase64, TOK_GLINE, ident, host, (ts + length), reason);
+	send_cmd ("%s %s * +%s@%s %lu %lu :%s", neostatsbase64, TOK_GLINE, ident, host, (ts + length), ts, reason);
 }
 
 void 
@@ -442,7 +435,7 @@ void
 send_privmsg (const char *from, const char *to, const char *buf)
 {
 	if(to[0] == '#') {
-		send_cmd (":%s %s %s :%s", from, TOK_PRIVATE, to, buf);
+		send_cmd ("%s %s %s :%s", nicktobase64 (from), TOK_PRIVATE, to, buf);
 	} else {
 		send_cmd ("%s %s %s :%s", nicktobase64 (from), TOK_PRIVATE, nicktobase64 (to), buf);
 	}

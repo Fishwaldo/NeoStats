@@ -25,6 +25,9 @@
 #ifndef IRCU_H
 #define IRCU_H
 
+/* IRCu modification support */
+/* #define NEFARIOUS */
+
 /* we support server names as base 64 numerics */
 #define BASE64SERVERNAME
 /* we support nick names as base 64 numerics */
@@ -258,9 +261,14 @@
 #define UMODE_DEAF              0x0020	/* Dont see chan msgs */
 #define UMODE_CHSERV            0x0040	/* Unkickable/-o able */
 #define UMODE_DEBUG             0x0080	/* See hack notices */
+#ifndef NEFARIOUS
 #define UMODE_HELPER            0x0100	/* Afternets +h cs override mode */
+#endif
 #define UMODE_ACCOUNT			0x1000	/* */
 #define UMODE_HIDE				0x2000	/* */
+#ifdef NEFARIOUS
+#define UMODE_SETHOST			0x4000	/* */
+#endif
 
 /* Cmodes */
 #define CMODE_CHANOP	0x0001
@@ -277,6 +285,9 @@
 #define CMODE_SENDTS	0x0800	
 #define CMODE_DELAYJOINS 0x1000
 #define CMODE_LISTED	0x10000
+#ifdef NEFARIOUS
+#define CMODE_REGONLY	0x20000
+#endif
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))
