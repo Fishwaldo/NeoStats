@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.56 2002/12/30 12:09:38 fishwaldo Exp $
+** $Id: statserv.c,v 1.57 2002/12/30 12:12:24 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -938,8 +938,12 @@ static void ss_JOIN(User *u, char *chan)
 	prefmsg(me.chan, s_StatServ, "%s Asked me to Join %s, So, I'm Leaving %s", u->nick, chan, me.chan);
 	spart_cmd(s_StatServ, me.chan);
 	log("%s!%s@%s Asked me to Join %s, I was on %s", u->nick, u->username, u->hostname, chan, me.chan);
+#ifdef ULTIMATE3
+	sjoin_cmd(s_StatServ, chan, MODE_CHANADMIN);
+#else 
 	sjoin_cmd(s_StatServ, chan);
 	schmode_cmd(me.name, chan, "+o", s_StatServ);
+#endif
 }
 
 
