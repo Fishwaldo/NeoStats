@@ -3,6 +3,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
 * NeoStats * Mark (M) * Version 2.5.17
  - Fix Unreal smodes (M)
  - Fix Unreal ban type field in sqlserv (M)
+ - Fix some warnings in ircd.c (M)
 
 * NeoStats * Mark (M) * Version 2.5.16
  - Fix problem with Unreal SVSMODE services TS processing (M)

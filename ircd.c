@@ -35,6 +35,7 @@
 #include "services.h"
 #include "server.h"
 #include "bans.h"
+#include "dns.h"
 
 ircd_server ircd_srv;
 
@@ -1805,7 +1806,7 @@ do_svsmode_user (const char* nick, const char* modes, const char* ts)
 	char modebuf[MODESIZE];
 	
 	if (ts && isdigit(*ts)) {
-		char* pModes;	
+		const char* pModes;	
 		char* pNewModes;	
 
 		SetUserServicesTS (nick, ts);
