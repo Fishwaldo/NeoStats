@@ -1,7 +1,7 @@
 CC=@CC@
 CFLAGS=@CFLAGS@ -fPIC -DPIC -DNEO_PREFIX=\"@prefix@\" 
 LD=ld
-LDFLAGS= -rdynamic @LIBS@
+LDFLAGS= -rdynamic -export-dynamic @LIBS@
 MODLDFLAGS = -shared
 INSTALL = @INSTALL@
 NEOINCLUDES=-I. -Iadns -Ikeeper -Icurl
