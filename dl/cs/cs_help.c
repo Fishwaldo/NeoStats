@@ -25,7 +25,6 @@
 
 const char cs_help_about_oneline[] = "About ConnectServ";
 const char cs_help_version_oneline[] = "Display version info";
-const char cs_help_set_oneline[] = "Configure ConnectServ";
 
 const char *cs_help_about[] = {
 	"\2ConnectServ\2 is designed to track users signing on and",
@@ -42,21 +41,23 @@ const char *cs_help_version[] = {
 	NULL
 };
 
-const char *cs_help_set[] = {
-	"Syntax: \2SET LIST\2",
-	"        \2SET SIGNWATCH <ON|OFF>\2",
-	"        \2SET KILLWATCH <ON|OFF>\2",
-	"        \2SET MODEWATCH <ON|OFF>\2",
-	"        \2SET NICKWATCH <ON|OFF>\2",
-	"",
-	"LIST will show the current settings.",
-	"SIGNWATCH configures whether to echo signon/signoff",
+const char *cs_help_set_signwatch[] = {
+	"SIGNWATCH <ON/OFF> whether to echo signon/signoff",
 	"events to the services channel.",
-	"KILLWATCH configures whether to echo kill",
+	NULL
+};
+const char *cs_help_set_killwatch[] = {
+	"KILLWATCH <ON/OFF> whether to echo kill",
 	"events to the services channel.",
-	"MODEWATCH configures whether to echo operator modes",
+	NULL
+};
+const char *cs_help_set_modewatch[] = {
+	"MODEWATCH <ON/OFF> whether to echo operator modes",
 	"events to the services channel.",
-	"NICKWATCH configures whether to echo nick changes",
+	NULL
+};
+const char *cs_help_set_nickwatch[] = {
+	"NICKWATCH <ON/OFF> whether to echo nick changes",
 	"events to the services channel.",
 	NULL
 };

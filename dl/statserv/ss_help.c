@@ -41,7 +41,6 @@ const char ss_help_operlist_oneline[]="Show a listing of on-line IRCops";
 const char ss_help_botlist_oneline[]="Show a listing of on-line BOTS";
 #endif
 const char ss_help_clientversions_oneline[]="Shows you a list of Client Versions";
-const char ss_help_set_oneline[]="Change StatServ Settings";
 const char ss_help_forcehtml_oneline[]="Force an update of the HTML output file";
 const char ss_help_stats_oneline[]="Modify Statistic Entries.";
 
@@ -62,26 +61,25 @@ const char *ss_help_clientversions[] = {
 	NULL
 };
 
-const char *ss_help_set[] = {
-	"Syntax: \2SET LIST\2",
-	"        \2SET <option> [<value>]\2",
-	"",
-	"LIST will display the current settings",
-	"",
-	"Available Options are:",
+const char *ss_help_set_htmlpath[] = {
 	"\2HTMLPATH <path>\2",
 	"Set the Pathname (including filename) to write HTML",
 	"statistics to if HTML Statistics are enabled",
-	"",
-	"\2HTML\2",
+	NULL
+};
+const char *ss_help_set_html[] = {
+	"\2HTML <ON/OFF>\2",
 	"Toggle HTML Statistics Generation on/off",
-	"",
-	"\2MSGTHROTTLE [<seconds>/off]\2",
+	NULL
+};
+const char *ss_help_set_msgthrottle[] = {
+	"\2MSGTHROTTLE <seconds>\2",
 	"if <seconds> is greater than 0, then set 5 Wallops per",
 	" <seconds> throttle",
 	"if <seconds> is equal to 0, then disable Wallop Throttling",
-	"if \"off\" then all Wallops are disabled",
-	"",
+	NULL
+};
+const char *ss_help_set_lagwallop[] = {
 	"\2LAGWALLOP <seconds>\2",
 	"if <seconds> is greater than 0, then when servers are",
 	"lagged by this many seconds, issue a warning",

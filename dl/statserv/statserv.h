@@ -217,7 +217,10 @@ extern const char *ss_help_stats[];
 extern const char *ss_help_htmlstats[];
 extern const char *ss_help_forcehtml[];
 extern const char *ss_help_chan[];
-extern const char *ss_help_set[];
+extern const char *ss_help_set_htmlpath[];
+extern const char *ss_help_set_html[];
+extern const char *ss_help_set_msgthrottle[];
+extern const char *ss_help_set_lagwallop[];
 extern const char *ss_help_clientversions[];
 
 extern const char ss_help_about_oneline[];
@@ -234,7 +237,6 @@ extern const char ss_help_operlist_oneline[];
 extern const char ss_help_botlist_oneline[];
 #endif
 extern const char ss_help_clientversions_oneline[];
-extern const char ss_help_set_oneline[];
 extern const char ss_help_forcehtml_oneline[];
 extern const char ss_help_stats_oneline[];
 

@@ -55,6 +55,17 @@ static const char *cmd_help_help[] = {
 	NULL
 };
 
+static const char *cmd_help_set[] = {
+	"Syntax: \2SET LIST\2",
+	"        \2SET <option> [<value>]\2",
+	"",
+	"LIST    display the current settings",
+	"",
+	"Available Options are:",
+	"",
+	NULL
+};
+
 /*  Simplified command table for handling intrinsic commands.
  *  We do not require all entries since we only use a few for
  *  intrinsic handling. 
@@ -463,10 +474,16 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	if (bot_ptr->bot_settings && userlevel >= bot_ptr->set_ulevel && !strcasecmp(av[2], "SET") ) {
 		bot_setting* set_ptr;
 		set_ptr = bot_ptr->bot_settings;
+		/* Display HELP SET intro text and LIST command */
+		privmsg_list (u->nick, bot_ptr->nick, cmd_help_set);
+		/* Display option specific text for current user level */
 		while(set_ptr->option)
 		{
 			if(set_ptr->helptext && userlevel >= set_ptr->ulevel)
+			{
 				privmsg_list (u->nick, bot_ptr->nick, set_ptr->helptext);
+				prefmsg(u->nick, bot_ptr->nick, "");
+			}
 			set_ptr++;
 		}
 		return 1;
