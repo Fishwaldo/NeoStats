@@ -49,7 +49,7 @@ static char msg_sigterm[]="SIGTERM received, shutting down server.";
  */
 
 RETSIGTYPE
-serv_die ()
+serv_die (int signum)
 {
 #ifdef VALGRIND
 	exit(NS_SUCCESS);
@@ -70,7 +70,7 @@ serv_die ()
  * @todo Implement a Rehash function. What can we actually rehash?
  */
 RETSIGTYPE
-conf_rehash ()
+conf_rehash (int signum)
 {
 	chanalert (ns_botptr->nick, "SIGHUP received, attempting to rehash");
 	globops (me.name, "SIGHUP received, attempted to rehash");
@@ -144,7 +144,7 @@ void report_segfault(const char* modulename)
 }
 
 RETSIGTYPE
-serv_segv ()
+serv_segv (int signum)
 {
 	char name[MAX_MOD_NAME];
 	/** segv happened inside a module, so unload and try to restore the stack 
