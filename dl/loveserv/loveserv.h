@@ -23,100 +23,27 @@
 ** $Id$
 */
 
-#include <stdio.h>
-
-const char ls_help_about_oneline[]="About LoveServ";
-const char ls_help_rose_oneline[]="Give someone a rose";
-const char ls_help_kiss_oneline[]="Give someone a kiss";
-const char ls_help_tonsil_oneline[]="Give someone a tonsil kiss";
-const char ls_help_hug_oneline[]="Give someone a hug";
-const char ls_help_admirer_oneline[]="Tell someone they have a secret admirer";
-const char ls_help_chocolate_oneline[]="Give someone chocolate";
-const char ls_help_candy_oneline[]="Give someone candy";
-const char ls_help_lovenote_oneline[]="Give someone a lovenote";
-const char ls_help_apology_oneline[]="Give someone an apology";
-const char ls_help_thankyou_oneline[]="Give someone a thank you";
-const char ls_help_version_oneline[]="Display version info";
-
-const char *ls_help_about[] = {
-	"\2LoveServ\2 is a fun module to send presents and ",
-	"messages to loved ones on IRC.",
-	NULL
-};
-
-const char *ls_help_rose[] = {
-	"Syntax: \2ROSE <NICK>\2",
-	"",
-	"Send a rose to a loved one on IRC.",
-	NULL
-};
-
-const char *ls_help_kiss[] = {
-	"Syntax: \2KISS <NICK>\2",
-	"",
-	"Send a kiss to that special someone on IRC.",
-	NULL
-};
-
-const char *ls_help_tonsil[] = {
-	"Syntax: \2TONSIL <NICK>\2",
-	"",
-	"Send a deep tonsil penitrating kiss to someone on IRC.",
-	NULL
-};
-
-const char *ls_help_hug[] = {
-	"Syntax: \2HUG <NICK>\2",
-	"",
-	"Send a hug to someone on IRC.",
-	NULL
-};
-
-const char *ls_help_admirer[] = {
-	"Syntax: \2ADMIRER <NICK>\2",
-	"",
-	"Tell someone on IRC they have a SECRET Admirer!",
-	NULL
-};
-
-const char *ls_help_chocolate[] = {
-	"Syntax: \2CHOCOLATE <NICK>\2",
-	"",
-	"Send a big yummy box of candy to someone on IRC.",
-	NULL
-};
-
-const char *ls_help_candy[] = {
-	"Syntax: \2CANDY <NICK>\2",
-	"",
-	"Send someone a box of yummy heart shaped candies",
-	NULL
-};
-
-const char *ls_help_lovenote[] = {
-	"Syntax: \2LOVENOTE <NICK> I love you dearly.\2",
-	"",
-	"Send that special someone a love note.",
-	NULL
-};
-
-const char *ls_help_apology[] = {
-	"Syntax: \2APOLOGY <NICK> deleting all those songs\2",
-	"",
-	"Send an Apology to someone",
-	NULL
-};
-
-const char *ls_help_thankyou[] = {
-	"Syntax: \2THANKYOU <NICK> uploading those songs\2",
-	"",
-	"Send a THANKYOU message to someone",
-	NULL
-};
-
-const char *ls_help_version[] = {
-	"Syntax: \2VERSION\2",
-	"",
-	"Show LoveServ's current version",
-	NULL
-};
+extern const char ls_help_about_oneline[];
+extern const char ls_help_rose_oneline[];
+extern const char ls_help_kiss_oneline[];
+extern const char ls_help_tonsil_oneline[];
+extern const char ls_help_hug_oneline[];
+extern const char ls_help_admirer_oneline[];
+extern const char ls_help_chocolate_oneline[];
+extern const char ls_help_candy_oneline[];
+extern const char ls_help_lovenote_oneline[];
+extern const char ls_help_apology_oneline[];
+extern const char ls_help_thankyou_oneline[];
+extern const char ls_help_version_oneline[];
+extern const char *ls_help_about[];
+extern const char *ls_help_rose[];
+extern const char *ls_help_kiss[];
+extern const char *ls_help_tonsil[];
+extern const char *ls_help_hug[];
+extern const char *ls_help_admirer[];
+extern const char *ls_help_chocolate[];
+extern const char *ls_help_candy[];
+extern const char *ls_help_lovenote[];
+extern const char *ls_help_apology[];
+extern const char *ls_help_thankyou[];
+extern const char *ls_help_version[];
