@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.43 2003/09/11 13:37:34 fishwaldo Exp $
+** $Id: stats.c,v 1.44 2003/09/11 14:16:01 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -76,7 +76,7 @@ CVersions *findversions(char *name)
 #define ATTR_QUESTION '?'
 
 /* this came form X-Chat if I remember correctly. Credit due where Credit Due */
-
+/* was modified by Unreal Team */
 unsigned char *
 Strip_Colors (unsigned char *text, int len, unsigned char *outbuf, int *newlen)
 {
@@ -90,72 +90,46 @@ Strip_Colors (unsigned char *text, int len, unsigned char *outbuf, int *newlen)
 	else
 		new_str = outbuf;
 
-	while (len > 0)
-	{
-		if ((col && isdigit (*text) && nc < 2) ||
-			 (col && *text == ',' && isdigit (*(text+1)) && nc < 3))
-		{
+	while (len > 0) {
+		if ((col && isdigit(*text) && nc < 2) || (col && *text == ',' && nc < 3)) {
 			nc++;
 			if (*text == ',')
 				nc = 0;
-		} else
-		{
-			col = -1;
-			switch (*text)
-			{
-			case ATTR_COLOR:
+		}
+		else {
+			if (col)
+				col = 0;
+			if (*text == '\003') {
 				col = 1;
 				nc = 0;
-				break;
-			case ATTR_BEEP:
-			case ATTR_RESET:
-			case ATTR_REVERSE:
-			case ATTR_BOLD:
-			case ATTR_UNDERLINE:
-			case ATTR_STAR:
-			case ATTR_QUESTION:
-			case ATTR_CTCP:
-				break;
-			default:
+			}
+			if ((*text != '\007') || (*text != '\017') || (*text != '\026') || (*text != '\037')) {
 				new_str[i] = *text;
 				i++;
-				text++;
-				len--;
-				continue;
 			}
-			
 		}
 		text++;
 		len--;
 	}
-
 	new_str[i] = 0;
-
-	if (newlen != NULL)
-		*newlen = i;
-
 	return new_str;
-}
 
+}
 
 int s_client_version(char **av, int ac)
 {
 	lnode_t *node;
 	CVersions *clientv;
-	char *nocols = av[1];
-#if 0
-/* doesn't work to well atm */	
+	char *nocols;
+
 	nocols = Strip_Colors(av[1], strlen(av[1]), NULL, NULL);
-#endif
 	
 	clientv = findversions(nocols);
 	if (clientv) {
 		nlog(LOG_DEBUG2, LOG_MOD, "Found Client Version Node %s",
 		     nocols);
 		clientv->count++;
-#if 0
 		free(nocols);
-#endif
 		return 1;
 	}
 	clientv = malloc(sizeof(CVersions));
@@ -165,9 +139,7 @@ int s_client_version(char **av, int ac)
 	list_append(Vhead, node);
 	nlog(LOG_DEBUG2, LOG_MOD, "Added Version to List %s",
 	     clientv->name);
-#if 0
 	free(nocols);
-#endif
 	return 1;
 }
 
