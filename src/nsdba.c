@@ -284,25 +284,3 @@ int DBADelete (char *table, char * key)
 	DBMDelData (tbe->handle, key);
 	return NS_SUCCESS;
 }
-
-#if 0
-void DBTest (void)
-{
-	int i = 10;
-	int b = 1;
-	char *s = "test";
-	char *s2;
-	
-	DBAOpenTable ("Test");
-	DBAStoreStr ("Test", "string", s);
-	DBAStoreBool ("Test", "boolean", b);
-	DBAStoreInt ("Test", "integer", i);
-	i = 0;
-	b = 0;
-	DBAFetchInt ("Test", "integer", &i);
-	DBAFetchBool ("Test", "boolean", &b);
-	DBAFetchStr ("Test", "string", &s2);
-	free (s2);
-	DBACloseTable ("Test");
-}
-#endif

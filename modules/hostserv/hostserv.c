@@ -554,17 +554,17 @@ static int hs_cmd_bans_add (CmdParams *cmdparams)
 			"%s already exists in the banned vhost list", cmdparams->av[1]);
 		return NS_SUCCESS;
 	}
-	ban = malloc(sizeof(banentry));
+	ban = ns_calloc(sizeof(banentry));
 	strlcpy(ban->host, cmdparams->av[1], MAXHOST);
 	strlcpy(ban->who, cmdparams->source->name, MAXNICK);
 	buf = joinbuf(cmdparams->av, cmdparams->ac, 2);
 	strlcpy(ban->reason, buf, MAXREASON);
-	free(buf);
+	ns_free(buf);
 
 	hnode_create_insert (banhash, ban, ban->host);
 	irc_prefmsg (hs_bot, cmdparams->source, 
 		"%s added to the banned vhosts list", cmdparams->av[1]);
-	irc_chanalert (hs_bot, "%s added %s to the banned vhosts list",
+	command_report(hs_bot, "%s added %s to the banned vhosts list",
 		  cmdparams->source->name, cmdparams->av[1]);
 	SaveBan (ban);
 	return NS_SUCCESS;
@@ -592,7 +592,7 @@ static int hs_cmd_bans_del (CmdParams *cmdparams)
 			hash_scan_delete (banhash, hn);
 			irc_prefmsg (hs_bot, cmdparams->source, 
 				"Deleted %s from the banned vhost list", cmdparams->av[1]);
-			irc_chanalert (hs_bot, "%s deleted %s from the banned vhost list",
+			command_report(hs_bot, "%s deleted %s from the banned vhost list",
 				cmdparams->source->name, cmdparams->av[1]);
 			nlog (LOG_NOTICE, "%s deleted %s from the banned vhost list",
 				cmdparams->source->name, cmdparams->av[1]);
@@ -658,7 +658,7 @@ static int hs_cmd_chpass (CmdParams *cmdparams)
 		if (!ircstrcasecmp (vhe->passwd, cmdparams->av[1])) {
 			strlcpy (vhe->passwd, cmdparams->av[2], MAXPASS);
 			irc_prefmsg (hs_bot, cmdparams->source, "Password changed");
-			irc_chanalert (hs_bot, "%s changed the password for %s",
+			command_report(hs_bot, "%s changed the password for %s",
 					cmdparams->source->name, vhe->nick);
 			SaveVhost (vhe);
 			return NS_SUCCESS;
@@ -722,7 +722,7 @@ static int hs_cmd_add (CmdParams *cmdparams)
 	irc_prefmsg (hs_bot, cmdparams->source, 
 		"%s has successfully been registered under realhost: %s vhost: %s and password: %s",
 		cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3]);
-	irc_chanalert (hs_bot, "%s added a vhost %s for %s with realhost %s",
+	command_report(hs_bot, "%s added a vhost %s for %s with realhost %s",
 		cmdparams->source->name, cmdparams->av[2], cmdparams->av[0], cmdparams->av[1]);
 	/* Apply The New Hostname If The User Is Online */
 	u = find_user(cmdparams->av[0]);
@@ -847,16 +847,10 @@ static int hs_cmd_view (CmdParams *cmdparams)
 
 static int hs_cmd_del (CmdParams *cmdparams)
 {
-	lnode_t *hn;
 	vhostentry *vhe;
 
 	SET_SEGV_LOCATION();
-	hn = list_find (vhost_list, cmdparams->av[0], findnick);
-	if (!hn) {
-		irc_prefmsg (hs_bot, cmdparams->source, "No vhost for user %s", cmdparams->av[0]);
-		return NS_SUCCESS;
-	}
-	vhe = lnode_get (hn);
+	vhe = (vhostentry *) list_find (vhost_list, cmdparams->av[0], findnick);
 	if (!vhe) {
 		irc_prefmsg (hs_bot, cmdparams->source, "No vhost for user %s", cmdparams->av[0]);
 		return NS_SUCCESS;
@@ -865,7 +859,7 @@ static int hs_cmd_del (CmdParams *cmdparams)
 		vhe->nick, vhe->vhost);
 	nlog (LOG_NOTICE, "%s removed the vhost %s for %s", 
 			cmdparams->source->name, vhe->vhost, vhe->nick);
-	irc_chanalert (hs_bot, "%s removed vhost %s for %s",
+	command_report(hs_bot, "%s removed vhost %s for %s",
 			cmdparams->source->name, vhe->vhost, vhe->nick);
 	del_vhost (vhe);
 	list_delete (vhost_list, hn);

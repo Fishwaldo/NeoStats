@@ -711,5 +711,5 @@ void handle_dead_channel (Channel *c)
 			cm = list_next (cmdparams->bot->u->user->chans, cm);
 		}
 	}
-	free (cmdparams);
+	ns_free (cmdparams);
 }
