@@ -22,7 +22,7 @@ getdate.c:
 	 mv -f y.tab.c getdate.c
 
 clean:
-	 /bin/rm -rf *.o config.h Makefile getdate.c mycurl-config
+	 /bin/rm -rf *.o config.h Makefile mycurl-config
 
 install: 
 

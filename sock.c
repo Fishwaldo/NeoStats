@@ -741,7 +741,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
   do
   {
     t = sqlconn->cmdpos,       /* packet in length */
-      dbstat = dbcommand(sqlconn->cmd, /* packet in */
+      dbstat = dbcommand((char *)sqlconn->cmd, /* packet in */
       &sqlconn->cmdpos,        /* packet in length */
       &sqlconn->response[50000 - sqlconn->responsefree], &sqlconn->responsefree, &sqlconn->connid);
     t -= sqlconn->cmdpos,      /* t = # bytes consumed */

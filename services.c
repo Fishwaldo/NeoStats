@@ -33,6 +33,7 @@
 #include "users.h"
 #include "server.h"
 #include "chans.h"
+#include "ircd.h"
 #include "hash.h"
 
 static int ns_set_debug (User * u, char **av, int ac);

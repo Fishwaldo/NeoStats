@@ -29,6 +29,8 @@
 #include "ircd.h"
 #include "dl.h"
 #include "log.h"
+#include "users.h"
+#include "chans.h"
 #include "services.h"
 
 static char ircd_buf[BUFSIZE];
@@ -1026,6 +1028,7 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN)
 		schmode_cmd(who, chan, "+o", who);
 #endif
+	return 1;
 }
 
 int 

@@ -376,9 +376,9 @@ conf_rehash ()
  * @return Nothing
  *
  */
-
+#ifndef HAVE_BACKTRACE
 static char backtrace_unavailable[]="Backtrace not available on this platform";
-
+#endif
 static 
 void do_backtrace(void)
 {

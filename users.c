@@ -475,7 +475,9 @@ int InitExtAuth(void)
 	i = get_dl_handle ("extauth");
 	if (i > 0) {
 		getauth = dlsym ((int *) i, "__do_auth");
-	}
+		return NS_SUCCESS;
+	} 
+	return NS_FAILURE;
 }
 #endif
 
@@ -518,7 +520,8 @@ int UmodeAuth(User * u)
 int
 UserLevel (User * u)
 {
-	int i, tmplvl = 0;
+	int i = 0;
+	int tmplvl = 0;
 	tmplvl = UmodeAuth(u);
 
 #ifdef EXTAUTH

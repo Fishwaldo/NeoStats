@@ -99,7 +99,7 @@ int s_chan_new(char **av, int ac)
 		stats_network.t_chans = me.now;
 		if (ok_to_wallop() > 0)
 			wallops(s_StatServ,
-				     "\2NEW CHANNEL RECORD\2 Wow, there is now %d Channels on the Network",
+				     "\2NEW CHANNEL RECORD\2 Wow, there is now %ld Channels on the Network",
 				     stats_network.maxchans);
 	}
 	if (count > daily.chans) {
@@ -253,7 +253,7 @@ int s_new_server(char **av, int ac)
 		stats_network.t_maxservers = me.now;
 		if (ok_to_wallop() > 0)
 			wallops(s_StatServ,
-				     "\2NEW SERVER RECORD\2 Wow, there are now %d Servers on the Network",
+				     "\2NEW SERVER RECORD\2 Wow, there are now %ld Servers on the Network",
 				     stats_network.servers);
 	}
 	if (stats_network.servers > daily.servers) {
@@ -379,7 +379,7 @@ int s_user_modes(char **av, int ac)
 					    me.now;
 					if (ok_to_wallop() > 0)
 						wallops(s_StatServ,
-							     "\2Oper Record\2 The Network has reached a New Record for Opers at %d",
+							     "\2Oper Record\2 The Network has reached a New Record for Opers at %ld",
 							     stats_network.
 							     opers);
 				}
@@ -487,7 +487,7 @@ int s_new_user(char **av, int ac)
 		stats_network.t_maxusers = me.now;
 		if (ok_to_wallop() > 0)
 			wallops(s_StatServ,
-				     "\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %d users!",
+				     "\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %ld users!",
 				     stats_network.users);
 	}
 
