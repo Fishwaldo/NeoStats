@@ -23,8 +23,10 @@
 ** $Id$
 */
 
+/* #define USE_CONFUSE */
+
 #include "neostats.h"
-#if 0
+#ifdef USE_CONFUSE
 #include "confuse.h"
 #else
 #include "dotconf.h"
@@ -38,12 +40,13 @@
 
 static void cb_Server( char *arg, int configtype );
 static void cb_Module( char *arg, int configtype );
- 
+
 /** @brief The list of modules to load
  */
 static void *load_mods[NUM_MODULES];
 
-#if 0
+#ifdef USE_CONFUSE
+static void set_config_values(cfg_t *cfg);
 int cb_verify_chan(cfg_t *cfg, cfg_opt_t *opt);
 int cb_verify_numeric(cfg_t *cfg, cfg_opt_t *opt);
 int cb_verify_bind(cfg_t *cfg, cfg_opt_t *opt);
@@ -137,6 +140,8 @@ int ConfLoad( void )
 {
     cfg_t *cfg;
     int i, ret;
+	FILE *fp;
+
 	/* Read in the Config File */
 	printf( "Reading the Config File. Please wait.....\n" );
     cfg = cfg_init(fileconfig, CFGF_NOCASE);
@@ -144,7 +149,7 @@ int ConfLoad( void )
 printf("%d %s\n", i, arg_validate[i].name);
         cfg_set_validate_func(cfg, arg_validate[i].name, arg_validate[i].cb);
     } 
-    FILE *fp = fopen("neostats.conf.out", "w");
+    fp = fopen("neostats.conf.out", "w");
     cfg_print(cfg, fp);
     fclose(fp);
 	if((ret =  cfg_parse(cfg, CONFIG_NAME)) != 0 ) {
@@ -186,7 +191,7 @@ printf("%d %s\n", i, arg_validate[i].name);
 	return NS_SUCCESS;
 }
 
-int set_config_values(cfg_t *cfg) {
+void set_config_values(cfg_t *cfg) {
 		/* Server name has a default*/
 printf("hello\n");
 		strlcpy( me.name, cfg_getstr(cfg, "ServerConfig|Name"), sizeof( me.name ) );
@@ -263,10 +268,10 @@ printf("ehh\n");
 
 int ConfLoadModules( void )
 {
+#if 0
 	int i;
 
 	SET_SEGV_LOCATION( );
-#if 0
 	if(load_mods[0] == 0 ) {
 		nlog( LOG_NORMAL, "No modules configured for loading" ); 
 	} else {
@@ -341,12 +346,10 @@ int cb_verify_settime(cfg_t *cfg, cfg_opt_t *opt) {
       }
       return CFG_SUCCESS;
 }
-#endif
 
 
+#else /* USE_CONFUSE */
 
-
-#if 1
 static config_option options[] = {
 	{"SERVER_NAME", ARG_STR, cb_Server, 0},
 	{"SERVER_PORT", ARG_STR, cb_Server, 1},
@@ -551,4 +554,5 @@ cb_Server( char *arg, int configtype )
 		strlcpy(me.rootnick,arg,MAXNICK );
 	}
 }
-#endif
+
+#endif /* USE_CONFUSE */
