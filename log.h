@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.h,v 1.6 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: log.h,v 1.7 2003/09/18 11:22:03 fishwaldo Exp $
 */
 
 
@@ -70,6 +70,11 @@
    it demangles C++ function names.  */
 
 #define __NASSERT_FUNCTION    __PRETTY_FUNCTION__
+/* Not all compilers provide __STRING so define it here if it is unknown */
+#ifndef __STRING
+#define __STRING(x) #x
+#endif /* __STRING */ 
+
 
 #ifndef __ASSERT_VOID_CAST
 #define __ASSERT_VOID_CAST (void)

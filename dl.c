@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.67 2003/09/17 14:49:55 fishwaldo Exp $
+** $Id: dl.c,v 1.68 2003/09/18 11:22:03 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -535,20 +535,20 @@ load_module (char *path1, User * u)
 
 
 	strcpy (segv_location, "load_module");
-
 	if (u == NULL) {
 		do_msg = 0;
 	} else {
 		do_msg = 1;
 	}
 	snprintf (p, 255, "dl/%s.so", path1);
+printf("trying %s\n", path1);
 	dl_handle = dlopen (p, RTLD_NOW || RTLD_GLOBAL);
 	strcpy (segvinmodule, "");
 	if (!dl_handle) {
-		if (do_msg)
+		if (do_msg) {
 			prefmsg (u->nick, s_Services, "Error, Couldn't Load Module");
-		if (do_msg)
 			prefmsg (u->nick, s_Services, "%s", dlerror ());
+		}
 		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dlerror ());
 		nlog (LOG_WARNING, LOG_CORE, "Module was %s", p);
 		return -1;
@@ -558,13 +558,15 @@ load_module (char *path1, User * u)
 #ifndef HAVE_LIBDL
 	if (mod_get_info == NULL) {
 		dl_error = dlerror ();
+printf("here\n");
 #else
 	if ((dl_error = dlerror ()) != NULL) {
+printf("there\n");
 #endif
-		if (do_msg)
+		if (do_msg) {
 			prefmsg (u->nick, s_Services, "Error, Couldn't Load Module");
-		if (do_msg)
 			prefmsg (u->nick, s_Services, "%s", dl_error);
+		}
 		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dl_error);
 		dlclose (dl_handle);
 		return -1;
@@ -572,15 +574,15 @@ load_module (char *path1, User * u)
 
 	mod_get_funcs = dlsym (dl_handle, "__module_get_functions");
 #ifndef HAVE_LIBDL
-	if (mod_get_info == NULL) {
+	if (mod_get_funcs == NULL) {
 		dl_error = dlerror ();
 #else
 	if ((dl_error = dlerror ()) != NULL) {
 #endif
-		if (do_msg)
+		if (do_msg) {
 			prefmsg (u->nick, s_Services, "Error, Couldn't Load Module");
-		if (do_msg)
 			prefmsg (u->nick, s_Services, "%s", dl_error);
+		}
 		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dl_error);
 		dlclose (dl_handle);
 		return -1;
@@ -615,10 +617,10 @@ load_module (char *path1, User * u)
 
 	mn = hnode_create (mod_ptr);
 	if (hash_isfull (mh)) {
-		if (do_msg)
+		if (do_msg) {
 			chanalert (s_Services, "Module List is Full. Can't Load any more modules");
-		if (do_msg)
 			prefmsg (u->nick, s_Services, "Module List is Full, Can't Load any more Modules");
+		}
 		dlclose (dl_handle);
 		free (mod_ptr);
 		return -1;
@@ -675,10 +677,10 @@ load_module (char *path1, User * u)
 			event_fn_ptr++;
 		}
 	}
-	if (do_msg)
+	if (do_msg) {
 		prefmsg (u->nick, s_Services, "Module %s Loaded, Description: %s", mod_info_ptr->module_name, mod_info_ptr->module_description);
-	if (do_msg)
 		globops (me.name, "%s Module Loaded", mod_info_ptr->module_name);
+	}
 	return 0;
 
 

@@ -9,6 +9,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - update doco slightly
  - Keeper wasn't doing so good at caching files. Fixed that
  - StatServ now stores and retrives all data from the Keeper Database. old data/*.db code kept to help upgrade to the new database backend
+ - Some Cleanups suggested by Mark
+ - Update Config script
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number
