@@ -1,6 +1,8 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 * NeoStats * Fish * Version ????
  - Fixed up --enable-auth==TYPE typo in configure script
+ - Moved to AutoConf2.13 to fix bsd ./configure issues
+ - Fixed Compile warning in adns on BSD systems
 
 * NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 2 
  - Misc. Updates (S)

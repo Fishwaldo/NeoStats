@@ -28,8 +28,8 @@
 #ifndef ADNS_DLIST_H_INCLUDED
 #define ADNS_DLIST_H_INCLUDED
 
-#define LIST_INIT(list) ((list).head= (list).tail= 0)
-#define LINK_INIT(link) ((link).next= (link).back= 0)
+#define ALIST_INIT(list) ((list).head= (list).tail= 0)
+#define ALINK_INIT(link) ((link).next= (link).back= 0)
 
 #define LIST_UNLINK_PART(list,node,part) \
   do { \
