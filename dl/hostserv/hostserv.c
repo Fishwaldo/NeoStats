@@ -2,7 +2,7 @@
 *
 ** Module: HostServ
 ** Description: Network User Virtual Host Service
-** Version: 1.7
+** Version: 1.8
 ** Authors: ^Enigma^ & Shmad
 */
 
@@ -51,7 +51,7 @@ int ListArryCount = 0;
 Module_Info my_info[] = { {
     "HostServ",
     "Network User Virtual Host Service",
-    "1.7"
+    "1.8"
 } };
 
 int new_m_version(char *av, char *tmp) {
@@ -97,7 +97,7 @@ int __Bot_Message(char *origin, char **av, int ac)
     u = finduser(origin);
 
     if (!strcasecmp(av[1], "HELP")) {
-        if (ac <= 2 && (!(UserLevel(u) < 40))) {
+        if (ac <= 2 && (!(UserLevel(u) >= 40))) {
             privmsg(u->nick, s_HostServ, "Permission Denied.");
             return 1;
         } else if (ac <= 2 && (UserLevel(u) >= 40)) {
