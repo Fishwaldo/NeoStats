@@ -43,7 +43,7 @@ typedef struct aCtab{
 extern IntCommands cmd_list[];
 extern aCtab cFlagTab[33];
 
-void init_services_bot (void);
+int init_services_bot (void);
 void ns_motd (char *nick);
 void ns_admin (char *nick);
 void ns_credits (char *nick);

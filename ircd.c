@@ -425,11 +425,12 @@ parse (char *line)
  *
  * @return none
  */
-void
+int 
 init_services_bot (void)
 {
 	char **av;
 	int ac = 0;
+	long Umode;
 
 	SET_SEGV_LOCATION();
 	if (finduser (s_Services)) {
@@ -437,7 +438,8 @@ init_services_bot (void)
 		strlcat (s_Services, "1", MAXNICK);
 	}
 	ircsnprintf (me.rname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
-	SignOn_NewBot (s_Services, me.user, me.host, me.rname, UMODE_SERVICES);
+	Umode = init_bot_modes(services_bot_modes);
+	SignOn_NewBot (s_Services, me.user, me.host, me.rname, Umode);
 	me.onchan = 1;
 	AddStringToList (&av, me.uplink, &ac);
 	ModuleEvent (EVENT_ONLINE, av, ac);
@@ -446,6 +448,7 @@ init_services_bot (void)
 	AddStringToList (&av, s_Services, &ac);
 	ModuleEvent (EVENT_SIGNON, av, ac);
 	free (av);
+	return NS_SUCCESS;
 }
 
 /** @brief dopong
