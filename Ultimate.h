@@ -37,6 +37,8 @@
 #define GOTSVSVHOST
 /* we have svsjoin from a30 onwards */
 #define GOTSVSJOIN
+/* we don't have svsmode */
+#undef GOTSVSMODE
 /* we don't have bot mode support */
 #undef GOTBOTMODE
 /* we do have user smode support */
@@ -51,7 +53,17 @@
 /* we have vhost support */
 #define GOTSVSVHOST
 /* old Ultimate2 doesn't have svsjoin */
-#undef SVSJOIN
+#undef GOTSVSJOIN
+/* we don't have svsmode */
+#undef GOTSVSMODE
+/* we have svspart */
+#define GOTSVSPART
+/* we have svsjoin */
+#define GOTSVSJOIN
+/* we don't have smo */
+#undef GOTSMO
+/* we don't have swhois */
+#undef GOTSWHOIS
 /* we have bot mode support */
 #define GOTBOTMODE
 /* we don't have user smode support */

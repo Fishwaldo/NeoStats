@@ -59,8 +59,6 @@ static void Srv_Burst (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
 static void Srv_Tburst (char *origin, char **argv, int argc);
 
-static char ircd_buf[BUFSIZE];
-
 const char ircd_version[] = "(N)";
 const char services_bot_modes[]= "+oS";
 long services_bot_umode= 0;
@@ -253,46 +251,34 @@ send_kill (const char *from, const char *target, const char *reason)
 	sts (":%s %s %s :%s", from, MSG_KILL, target, reason);
 }
 
-int
-ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
-{
-	notice (s_Services, "Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
-	nlog (LOG_NORMAL, LOG_CORE, "Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
-	return 1;
-}
-
 void 
 send_nick (const char *oldnick, const char *newnick)
 {
 	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int)me.now);
 }
 
-int
-sswhois_cmd (const char *target, const char *swhois)
+void
+send_swhois (const char *target, const char *swhois)
 {
 	sts (":%s SWHOIS %s :%s", me.name, target, swhois);
-	return 1;
 }
 
-int
-ssvsnick_cmd (const char *target, const char *newnick)
+void 
+send_svsnick (const char *target, const char *newnick)
 {
 	sts (":%s %s %s %s :%lu", me.name, MSG_SVSNICK, target, newnick, me.now);
-	return 1;
 }
 
-int
-ssvsjoin_cmd (const char *target, const char *chan)
+void
+send_svsjoin (const char *target, const char *chan)
 {
 	sts (":%s SVSJOIN %s %s", me.name, target, chan);
-	return 1;
 }
 
-int
-ssvspart_cmd (const char *target, const char *chan)
+void
+send_svspart (const char *target, const char *chan)
 {
 	sts (":%s SVSPART %s %s", me.name, target, chan);
-	return 1;
 }
 
 void 
@@ -306,26 +292,16 @@ void send_wallops (char *who, char *buf)
 	sts (":%s %s :%s", who, MSG_WALLOPS, buf);
 }
 
-int
-ssvshost_cmd (const char *who, const char *vhost)
+void
+send_svshost (const char *who, const char *vhost)
 {
-	User *u;
-	u = finduser (who);
-	if (u) {
-		strlcpy (u->vhost, vhost, MAXHOST);
 		sts (":%s SVSHOST %s :%s", me.name, who, vhost);
-		return 1;
-	} else {
-		nlog (LOG_WARNING, LOG_CORE, "Can't Find user %s for ssvshost_cmd", who);
-		return 0;
-	}
-	return 0;
 }
 
-int 
-sinvite_cmd (const char *from, const char *to, const char *chan) {
+void
+send_invite (const char *from, const char *to, const char *chan) 
+{
 	sts (":%s %s %s %s", from, MSG_INVITE, to, chan);
-	return 1;
 }
 
 int
@@ -346,25 +322,17 @@ sburst_cmd (int b)
 	return 1;
 }
 
-int
-sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
+/* there isn't an akill on Hybrid, so we send a kline to all servers! */
+void 
+send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason)
 {
-	/* there isn't an akill on Hybrid, so we send a kline to all servers! */
-
-	va_list ap;
-
-	va_start (ap, reason);
-	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
-	va_end (ap);
-	sts (":%s GLINE %s %s %d :%s", me.name, ident, host, (int)(me.now + length), ircd_buf);
-	return 1;
+	sts (":%s GLINE %s %s %d :%s", me.name, ident, host, (int)(me.now + length), reason);
 }
 
-int
-srakill_cmd (const char *host, const char *ident)
+void 
+send_rakill (const char *host, const char *ident)
 {
 	sts (":%s UNGLINE %s@%s", me.name, ident, host);
-	return 1;
 }
 
 

@@ -91,8 +91,34 @@ void send_nick (const char *oldnick, const char *newnick);
 void send_cmode (const char *who, const char *chan, const char *mode, const char *args);
 void send_quit (const char *who, const char *quitmsg);
 void send_kill (const char *from, const char *target, const char *reason);
-void send_svskill (const char *target, const char *reason);
 void send_kick (const char *who, const char *target, const char *chan, const char *reason);
+void send_invite(const char *from, const char *to, const char *chan);
+#ifdef GOTSVSKILL
+void send_svskill (const char *target, const char *reason);
+#endif
+#ifdef GOTSVSMODE
+void send_svsmode (const char *target, const char *modes);
+#endif
+#ifdef GOTSVSHOST 
+void send_svshost (const char *who, const char *vhost);
+#endif
+#ifdef GOTSVSJOIN 
+void send_svsjoin (const char *target, const char *chan);
+#endif
+#ifdef GOTSVSPART
+void send_svspart (const char *target, const char *chan);
+#endif
+#ifdef GOTSVSNICK
+void send_svsnick (const char *target, const char *newnick);
+#endif
+#ifdef GOTSWHOIS
+void send_swhois (const char *target, const char *swhois);
+#endif
+#ifdef GOTSMO
+void send_smo (const char *from, const char *umodetarget, const char *msg);
+#endif
+void send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason);
+void send_rakill (const char *host, const char *ident);
 
 int sserver_cmd (const char *name, const int numeric, const char *infoline);
 int squit_cmd (const char *who, const char *quitmsg);

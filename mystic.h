@@ -35,6 +35,16 @@
 #define GOTSVSVHOST
 /* we dont have svsjoin */
 #define GOTSVSJOIN
+/* we don't have svsmode */
+#undef GOTSVSMODE
+/* we have svspart */
+#define GOTSVSPART
+/* we have svsjoin */
+#define GOTSVSJOIN
+/* we don't have smo */
+#undef GOTSMO
+/* we don't have swhois */
+#undef GOTSWHOIS
 /* we don't have bot mode support */
 #undef GOTBOTMODE
 /* we don't have user smode support */

@@ -65,8 +65,6 @@ static void Srv_Vctrl (char *origin, char **argv, int argc);
 
 static int vctrl_cmd ();
 
-static char ircd_buf[BUFSIZE];
-
 const char ircd_version[] = "(M)";
 const char services_bot_modes[]= "+oS";
 long services_bot_umode= 0;
@@ -276,47 +274,29 @@ send_svskill (const char *target, const char *reason)
 	sts (":%s %s %s :%s", me.name, MSG_SVSKILL, who, reason);
 }
 
-int
-ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
-{
-	notice (s_Services, "Warning, Module %s tried to SMO, which is not supported in Mystic", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to SMO, which is not supported in Mystic", segvinmodule);
-	return 1;
-}
-
 void 
 send_nick (const char *oldnick, const char *newnick)
 {
 	sts (":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, (int)me.now);
 }
 
-int
-sswhois_cmd (const char *target, const char *swhois)
-{
-	notice (s_Services, "Warning Module %s tried to SWHOIS, which is not supported in Mystic", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SWHOIS, which is not supported in Mystic", segvinmodule);
-	return 1;
-}
-
-int
-ssvsnick_cmd (const char *target, const char *newnick)
+void 
+send_svsnick (const char *target, const char *newnick)
 {
 	sts ("%s %s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, (int)me.now);
-	return 1;
 }
 
-int
-ssvsjoin_cmd (const char *target, const char *chan)
+void
+send_svsjoin (const char *target, const char *chan)
 {
 	sts ("%s %s %s", (me.token ? TOK_SVSJOIN : MSG_SVSJOIN), target, chan);
 	return 1;
 }
 
-int
-ssvspart_cmd (const char *target, const char *chan)
+void
+send_svspart (const char *target, const char *chan)
 {
 	sts ("%s %s %s", (me.token ? TOK_SVSPART : MSG_SVSPART), target, chan);
-	return 1;
 }
 
 void 
@@ -327,47 +307,31 @@ send_kick (const char *who, const char *target, const char *chan, const char *re
 
 void send_wallops (char *who, char *buf)
 {
-	sts (":%s %s :%s", who, (me.token ? TOK_WALLOPS : MSG_WALLOPS), ircd_buf);
+	sts (":%s %s :%s", who, (me.token ? TOK_WALLOPS : MSG_WALLOPS), buf);
 }
 
-int
-ssvshost_cmd (const char *who, const char *vhost)
+void
+send_svshost (const char *who, const char *vhost)
 {
-	User *u;
-
-	u = finduser (who);
-	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Can't Find user %s for ssvshost_cmd", who);
-		return 0;
-	}
-	strlcpy (u->vhost, vhost, MAXHOST);
 	sts (":%s %s %s %s", me.name, MSG_CHGHOST, who, vhost);
-	return 1;
 }
-int 
-sinvite_cmd (const char *from, const char *to, const char *chan) {
+
+void
+send_invite (const char *from, const char *to, const char *chan) 
+{
 	sts (":%s %s %s %s", from, MSG_INVITE, to, chan);
-	return 1;
 }
 
-int
-sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
+void 
+send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason)
 {
-	va_list ap;
-
-	va_start (ap, reason);
-	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
-	va_end (ap);
-	sts (":%s %s %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, (int)(me.now + length), (int)me.now, setby, ircd_buf);
-	return 1;
+	sts (":%s %s %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, (int)(me.now + length), (int)me.now, setby, reason);
 }
 
-int
-srakill_cmd (const char *host, const char *ident)
+void 
+send_rakill (const char *host, const char *ident)
 {
-	/* ultimate2 needs an oper to remove */
 	sts (":%s %s :%s@%s", s_Services, MSG_REMGLINE, host, ident);
-	return 1;
 }
 
 int

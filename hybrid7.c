@@ -58,8 +58,6 @@ static void Srv_Svinfo (char *origin, char **argv, int argc);
 static void Srv_Burst (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
 
-static char ircd_buf[BUFSIZE];
-
 const char ircd_version[] = "(H)";
 const char services_bot_modes[]= "+o";
 long services_bot_umode= 0;
@@ -246,50 +244,10 @@ send_kill (const char *from, const char *target, const char *reason)
 	sts (":%s %s %s :%s", from, MSG_KILL, target, reason);
 }
 
-int
-ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
-{
-	notice (s_Services, "Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
-	return 1;
-}
-
 void 
 send_nick (const char *oldnick, const char *newnick)
 {
 	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int)me.now);
-}
-
-int
-sswhois_cmd (const char *target, const char *swhois)
-{
-	notice (s_Services, "Warning Module %s tried to SWHOIS, which is not supported in Hybrid", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SWHOIS, which is not supported in Hybrid", segvinmodule);
-	return 1;
-}
-
-int
-ssvsnick_cmd (const char *target, const char *newnick)
-{
-	notice (s_Services, "Warning Module %s tried to SVSNICK, which is not supported in Hybrid", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSNICK, which is not supported in Hybrid", segvinmodule);
-	return 1;
-}
-
-int
-ssvsjoin_cmd (const char *target, const char *chan)
-{
-	notice (s_Services, "Warning Module %s tried to SJOIN, which is not supported in Hybrid", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SJOIN, which is not supported in Hybrid", segvinmodule);
-	return 1;
-}
-
-int
-ssvspart_cmd (const char *target, const char *chan)
-{
-	notice (s_Services, "Warning Module %s tried to SVSPART, which is not supported in Hybrid", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSPART, which is not supported in Hybrid", segvinmodule);
-	return 1;
 }
 
 void 
@@ -303,17 +261,10 @@ void send_wallops (char *who, char *buf)
 	sts (":%s %s :%s", who, MSG_WALLOPS, buf);
 }
 
-int
-ssvshost_cmd (const char *who, const char *vhost)
+void
+send_invite (const char *from, const char *to, const char *chan) 
 {
-	notice (s_Services, "Warning Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
-	return 1;
-}
-int 
-sinvite_cmd (const char *from, const char *to, const char *chan) {
 	sts (":%s %s %s %s", from, MSG_INVITE, to, chan);
-	return 1;
 }
 
 int
@@ -329,29 +280,21 @@ sburst_cmd (int b)
 	return 1;
 }
 
-int
-sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
+/* there isn't an akill on Hybrid, so we send a kline to all servers! */
+void 
+send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason)
 {
-	/* there isn't an akill on Hybrid, so we send a kline to all servers! */
-
-	va_list ap;
-
-	va_start (ap, reason);
-	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
-	va_end (ap);
-	sts (":%s %s * %lu %s %s :%s", setby, MSG_KLINE, (unsigned long)length, ident, host, ircd_buf);
-	return 1;
+	sts (":%s %s * %lu %s %s :%s", setby, MSG_KLINE, (unsigned long)length, ident, host, reason);
 }
 
-int
-srakill_cmd (const char *host, const char *ident)
+void 
+send_rakill (const char *host, const char *ident)
 {
 	if (ircd_srv.unkline) {
 		sts(":%s %s %s %s", me.name, MSG_UNKLINE, ident, host);
 	} else {
 		chanalert (s_Services, "Please Manually remove KLINES using /unkline on each server");
 	}
-	return 1;
 }
 
 

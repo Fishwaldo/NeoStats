@@ -35,6 +35,18 @@
 #undef GOTSVSHOST 
 /* we don't have svsjoin support */
 #undef GOTSVSJOIN 
+/* we don't have svsmode */
+#undef GOTSVSMODE
+/* we don't have svspart */
+#undef GOTSVSPART
+/* we don't have svsjoin */
+#undef GOTSVSJOIN
+/* we don't have svsnick */
+#undef GOTSVSNICK
+/* we don't have smo */
+#undef GOTSMO
+/* we don't have swhois */
+#undef GOTSWHOIS
 /* we don't have bot mode support */
 #undef GOTBOTMODE
 /* we don't have user smode support */

@@ -1027,3 +1027,131 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 		schmode_cmd(who, chan, "+o", who);
 #endif
 }
+
+int 
+sinvite_cmd (const char *from, const char *to, const char *chan) 
+{
+	send_invite(from, to, chan);
+	return 1;
+}
+
+int
+ssvsmode_cmd (const char *target, const char *modes)
+{
+#ifdef GOTSVSMODE
+	User *u;
+
+	u = finduser (target);
+	if (!u) {
+		nlog (LOG_WARNING, LOG_CORE, "Can't find user %s for ssvsmode_cmd", target);
+		return 0;
+	}
+	send_svsmode(target, modes);
+	UserMode (target, modes);
+#else
+	chanalert (s_Services, "Warning, Module %s tried to SVSMODE which is not supported", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to SVSMODE, which is not supported", segvinmodule);
+#endif
+	return 1;
+}
+
+int
+ssvshost_cmd (const char *who, const char *vhost)
+{
+#ifdef GOTSVSHOST 
+	User *u;
+
+	u = finduser (who);
+	if (!u) {
+		nlog (LOG_WARNING, LOG_CORE, "Can't Find user %s for ssvshost_cmd", who);
+		return 0;
+	}
+
+	strlcpy (u->vhost, vhost, MAXHOST);
+	send_svshost(who, vhost);
+	return 1;
+#else
+	chanalert (s_Services, "Warning Module %s tried to SVSHOST, which is not supported", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSHOST, which is not supported", segvinmodule);
+#endif
+	return 1;
+}
+
+int
+ssvsjoin_cmd (const char *target, const char *chan)
+{
+#ifdef GOTSVSJOIN 
+	send_svsjoin (target, chan);
+#else
+	chanalert (s_Services, "Warning Module %s tried to SVSJOIN, which is not supported", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSJOIN, which is not supported", segvinmodule);
+#endif
+	return 1;
+}
+
+int
+ssvspart_cmd (const char *target, const char *chan)
+{
+#ifdef GOTSVSPART
+	send_svspart (target, chan);
+#else
+	chanalert (s_Services, "Warning Module %s tried to SVSPART, which is not supported", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSPART, which is not supported", segvinmodule);
+#endif
+	return 1;
+}
+
+int
+sswhois_cmd (const char *target, const char *swhois)
+{
+#ifdef GOTSWHOIS
+	send_swhois (target, swhois);
+#else
+	chanalert (s_Services, "Warning Module %s tried to SWHOIS, which is not supported", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SWHOIS, which is not supported", segvinmodule);
+#endif
+	return 1;
+}
+
+int
+ssvsnick_cmd (const char *target, const char *newnick)
+{
+#ifdef GOTSVSNICK
+	send_svsnick (target, newnick);
+#else
+	notice (s_Services, "Warning Module %s tried to SVSNICK, which is not supported", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSNICK, which is not supported", segvinmodule);
+#endif
+	return 1;
+}
+
+int
+ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
+{
+#ifdef GOTSMO
+	send_smo (from, umodetarget, msg);
+#else
+	chanalert (s_Services, "Warning, Module %s tried to SMO, which is not supported", segvinmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to SMO, which is not supported", segvinmodule);
+#endif
+	return 1;
+}
+
+int
+sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
+{
+	va_list ap;
+
+	va_start (ap, reason);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
+	va_end (ap);
+	send_akill(host, ident, setby, length, ircd_buf);
+	return 1;
+}
+
+int
+srakill_cmd (const char *host, const char *ident)
+{
+	send_rakill(host, ident);
+	return 1;
+}

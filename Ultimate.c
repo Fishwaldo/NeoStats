@@ -413,47 +413,28 @@ send_svskill (const char *target, const char *reason)
 	sts (":%s %s %s :%s", me.name, MSG_SVSKILL, target, reason);
 }
 
-int
-ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
-{
-	chanalert (s_Services, "Warning, Module %s tried to SMO, which is not supported in Ultimate", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to SMO, which is not supported in Ultimate", segvinmodule);
-	return 1;
-}
-
 void 
 send_nick (const char *oldnick, const char *newnick)
 {
 	sts (":%s %s %s %ld", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, (long)me.now);
 }
 
-int
-sswhois_cmd (const char *target, const char *swhois)
-{
-	chanalert (s_Services, "Warning Module %s tried to SWHOIS, which is not supported in Ultimate", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SWHOIS, which is not supported in Ultimate", segvinmodule);
-	return 1;
-}
-
-int
-ssvsnick_cmd (const char *target, const char *newnick)
+void 
+send_svsnick (const char *target, const char *newnick)
 {
 	sts ("%s %s %s :%ld", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, (long)me.now);
-	return 1;
 }
 
-int
-ssvsjoin_cmd (const char *target, const char *chan)
+void
+send_svsjoin (const char *target, const char *chan)
 {
 	sts ("%s %s %s", (me.token ? TOK_SVSJOIN : MSG_SVSJOIN), target, chan);
-	return 1;
 }
 
-int
-ssvspart_cmd (const char *target, const char *chan)
+void
+send_svspart (const char *target, const char *chan)
 {
 	sts ("%s %s %s", (me.token ? TOK_SVSPART : MSG_SVSPART), target, chan);
-	return 1;
 }
 
 void 
@@ -467,52 +448,34 @@ void send_wallops (char *who, char *buf)
 	sts (":%s %s :%s", who, (me.token ? TOK_WALLOPS : MSG_WALLOPS), buf);
 }
 
-int
-ssvshost_cmd (const char *who, const char *vhost)
+void
+send_svshost (const char *who, const char *vhost)
 {
-	User *u;
-	u = finduser (who);
-	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Can't Find user %s for ssvshost_cmd", who);
-		return 0;
-	} else {
-		strlcpy (u->vhost, vhost, MAXHOST);
 #ifdef ULTIMATE3
-		sts (":%s %s %s %s", me.name, (me.token ? TOK_SETHOST : MSG_SETHOST), who, vhost);
+	sts (":%s %s %s %s", me.name, (me.token ? TOK_SETHOST : MSG_SETHOST), who, vhost);
 #elif ULTIMATE
-		sts (":%s %s %s %s", me.name, (me.token ? TOK_CHGHOST : MSG_CHGHOST), who, vhost);
+	sts (":%s %s %s %s", me.name, (me.token ? TOK_CHGHOST : MSG_CHGHOST), who, vhost);
 #endif
-		return 1;
-	}
 }
 
-int 
-sinvite_cmd (const char *from, const char *to, const char *chan) 
+void
+send_invite (const char *from, const char *to, const char *chan) 
 {
 	sts (":%s %s %s %s", from, (me.token ? TOK_INVITE : MSG_INVITE), to, chan);
-	return 1;
 }
 
-
-
-int
-sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
+void 
+send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason)
 {
-	va_list ap;
-
-	va_start (ap, reason);
-	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
-	va_end (ap);
 #ifdef ULTIMATE3
-	sts (":%s %s %s %s %d %s %ld :%s", me.name, (me.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, (long)me.now, ircd_buf);
+	sts (":%s %s %s %s %d %s %ld :%s", me.name, (me.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, (long)me.now, reason);
 #elif ULTIMATE
-	sts (":%s %s %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, (int)(me.now + length), (int)me.now, setby, ircd_buf);
+	sts (":%s %s %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, (int)(me.now + length), (int)me.now, setby, reason);
 #endif
-	return 1;
 }
 
-int
-srakill_cmd (const char *host, const char *ident)
+void 
+send_rakill (const char *host, const char *ident)
 {
 #ifdef ULTIMATE3
 	sts (":%s %s %s %s", me.name, (me.token ? TOK_RAKILL : MSG_RAKILL), host, ident);
@@ -520,7 +483,6 @@ srakill_cmd (const char *host, const char *ident)
 	/* ultimate2 needs an oper to remove */
 	sts (":%s %s :%s@%s", s_Services, MSG_REMGLINE, host, ident);
 #endif
-	return 1;
 }
 
 
