@@ -823,6 +823,11 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 				arg);
 			return;
 		}
+		if (arg == me.name) {
+			prefmsg(u->nick, s_StatServ, "%s is me! You cant delete me!!!",
+				arg);
+			return;
+		}
 		sn = hash_lookup(Shead, arg);
 		if (sn) {
 			hash_delete(Shead, sn);
