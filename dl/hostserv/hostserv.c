@@ -56,13 +56,14 @@ typedef struct hs_map_ {
 list_t *vhosts;
 hash_t *bannedvhosts;
 
-struct hs_lvl {
+struct hs_cfg {
 	int view;
 	int list;
 	int del;
 	int add;
 	int old;
-} hs_lvl;
+	int expire;
+} hs_cfg;
 
 char nnick[255];
 
@@ -79,6 +80,7 @@ static void hs_listban(User * u);
 static void hs_addban(User * u, char *ban);
 static void hs_delban(User * u, char *ban);
 static void SaveBans();
+static void hs_set(User * u, char **av, int ac);
 static int new_m_version(char *origin, char **av, int ac);
 void hsdat(char *nick, char *host, char *vhost, char *pass, char *who);
 void CleanupHosts();
@@ -128,19 +130,19 @@ void hs_Config()
 	char *ban2;
 
 	SET_SEGV_LOCATION();
-	GetConf((void *) &hs_lvl.view, CFGINT, "ViewLevel");
-	GetConf((void *) &hs_lvl.add, CFGINT, "AddLevel");
-	GetConf((void *) &hs_lvl.del, CFGINT, "DelLevel");
-	GetConf((void *) &hs_lvl.list, CFGINT, "ListLevel");
-	GetConf((void *) &hs_lvl.old, CFGINT, "ExpireDays");
-	if ((hs_lvl.list > 200) || (hs_lvl.list <= 0))
-		hs_lvl.list = 40;
-	if ((hs_lvl.add > 200) || (hs_lvl.view <= 0))
-		hs_lvl.add = 40;
-	if ((hs_lvl.del > 200) || (hs_lvl.del <= 0))
-		hs_lvl.del = 40;
-	if ((hs_lvl.view > 200) || (hs_lvl.list <= 0))
-		hs_lvl.view = 100;
+	GetConf((void *) &hs_cfg.view, CFGINT, "ViewLevel");
+	GetConf((void *) &hs_cfg.add, CFGINT, "AddLevel");
+	GetConf((void *) &hs_cfg.del, CFGINT, "DelLevel");
+	GetConf((void *) &hs_cfg.list, CFGINT, "ListLevel");
+	GetConf((void *) &hs_cfg.old, CFGINT, "ExpireDays");
+	if ((hs_cfg.list > 200) || (hs_cfg.list <= 0))
+		hs_cfg.list = 40;
+	if ((hs_cfg.add > 200) || (hs_cfg.view <= 0))
+		hs_cfg.add = 40;
+	if ((hs_cfg.del > 200) || (hs_cfg.del <= 0))
+		hs_cfg.del = 40;
+	if ((hs_cfg.view > 200) || (hs_cfg.list <= 0))
+		hs_cfg.view = 100;
 
 	/* banned vhosts */
 	ban = NULL;
@@ -240,19 +242,19 @@ int __Bot_Message(char *origin, char **av, int ac)
 			privmsg_list(u->nick, s_HostServ, hs_help);
 			return 1;
 		} else if (!strcasecmp(av[2], "ADD")
-			   && (UserLevel(u) >= hs_lvl.add)) {
+			   && (UserLevel(u) >= hs_cfg.add)) {
 			privmsg_list(u->nick, s_HostServ, hs_help_add);
 			return 1;
 		} else if (!strcasecmp(av[2], "DEL")
-			   && (UserLevel(u) >= hs_lvl.del)) {
+			   && (UserLevel(u) >= hs_cfg.del)) {
 			privmsg_list(u->nick, s_HostServ, hs_help_del);
 			return 1;
 		} else if (!strcasecmp(av[2], "LIST")
-			   && (UserLevel(u) >= hs_lvl.list)) {
+			   && (UserLevel(u) >= hs_cfg.list)) {
 			privmsg_list(u->nick, s_HostServ, hs_help_list);
 			return 1;
 		} else if (!strcasecmp(av[2], "VIEW")
-			   && (UserLevel(u) >= hs_lvl.view)) {
+			   && (UserLevel(u) >= hs_cfg.view)) {
 			privmsg_list(u->nick, s_HostServ, hs_help_view);
 			return 1;
 		} else if (!strcasecmp(av[2], "LEVELS")
@@ -271,6 +273,9 @@ int __Bot_Message(char *origin, char **av, int ac)
 		} else if (!strcasecmp(av[2], "ABOUT")) {
 			privmsg_list(u->nick, s_HostServ, hs_help_about);
 			return 1;
+		} else if (!strcasecmp(av[2], "SET") && (UserLevel(u) > 185)) {
+			privmsg_list(u->nick, s_HostServ, hs_help_set);
+			return 1;
 		} else
 			prefmsg(u->nick, s_HostServ,
 				"Unknown Help Topic: \2%s\2", av[2]);
@@ -279,10 +284,10 @@ int __Bot_Message(char *origin, char **av, int ac)
 	if (!strcasecmp(av[1], "ABOUT")) {
 		privmsg_list(u->nick, s_HostServ, hs_help_about);
 		prefmsg(u->nick, s_HostServ,
-			"Un-used Vhosts expire after %d days", hs_lvl.old);
+			"Un-used Vhosts expire after %d days", hs_cfg.old);
 		return 1;
 	} else if (!strcasecmp(av[1], "ADD")
-		   && (UserLevel(u) >= hs_lvl.add)) {
+		   && (UserLevel(u) >= hs_cfg.add)) {
 		if (ac < 6) {
 			prefmsg(u->nick, s_HostServ,
 				"Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>",
@@ -294,7 +299,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 		}
 		hs_add(u, av[2], av[3], av[4], av[5]);
 	} else if (!strcasecmp(av[1], "DEL")
-		   && (UserLevel(u) >= hs_lvl.del)) {
+		   && (UserLevel(u) >= hs_cfg.del)) {
 		if (!av[2]) {
 			prefmsg(u->nick, s_HostServ,
 				"Syntax: /msg %s DEL #", s_HostServ);
@@ -314,7 +319,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 		}
 		hs_del(u, t);
 	} else if (!strcasecmp(av[1], "LIST")
-		   && (UserLevel(u) >= hs_lvl.list)) {
+		   && (UserLevel(u) >= hs_cfg.list)) {
 		if (ac == 2) {
 			hs_list(u, 0);
 		} else if (ac == 3) {
@@ -354,8 +359,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 		if (ac == 2) {
 			prefmsg(u->nick, s_HostServ,
 				"Configured Levels: Add: %d, Del: %d, List: %d, View: %d",
-				hs_lvl.add, hs_lvl.del, hs_lvl.list,
-				hs_lvl.view);
+				hs_cfg.add, hs_cfg.del, hs_cfg.list,
+				hs_cfg.view);
 			return 1;
 		} else if (ac == 4) {
 			if (UserLevel(u) >= 185) {
@@ -366,19 +371,19 @@ int __Bot_Message(char *origin, char **av, int ac)
 					return -1;
 				}
 				if (!strcasecmp(av[2], "ADD")) {
-					hs_lvl.add = t;
+					hs_cfg.add = t;
 					SetConf((void *) t, CFGINT,
 						"AddLevel");
 				} else if (!strcasecmp(av[2], "DEL")) {
-					hs_lvl.del = t;
+					hs_cfg.del = t;
 					SetConf((void *) t, CFGINT,
 						"DelLevel");
 				} else if (!strcasecmp(av[2], "LIST")) {
-					hs_lvl.list = t;
+					hs_cfg.list = t;
 					SetConf((void *) t, CFGINT,
 						"ListLevel");
 				} else if (!strcasecmp(av[2], "VIEW")) {
-					hs_lvl.view = t;
+					hs_cfg.view = t;
 					SetConf((void *) t, CFGINT,
 						"ViewLevel");
 				} else {
@@ -398,7 +403,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 			"Invalid Syntax. /msg %s help levels", s_HostServ);
 		return 1;
 	} else if (!strcasecmp(av[1], "VIEW")
-		   && (UserLevel(u) >= hs_lvl.view)) {
+		   && (UserLevel(u) >= hs_cfg.view)) {
 		if (!av[2]) {
 			prefmsg(u->nick, s_HostServ,
 				"Syntax: /msg %s VIEW #", s_HostServ);
@@ -439,6 +444,13 @@ int __Bot_Message(char *origin, char **av, int ac)
 			return -1;
 		}
 		hs_chpass(u, av[2], av[3], av[4]);
+	} else if (!strcasecmp(av[1], "SET")) {
+		if (UserLevel(u) < 185) {
+			prefmsg(u->nick, s_HostServ, "Permission Denied");
+			chanalert(s_HostServ, "%s tried set, but permission was denied", u->nick);
+			return -1;
+		}
+		hs_set(u, av, ac);
 	} else {
 		prefmsg(u->nick, s_HostServ,
 			"Unknown Command: \2%s\2, perhaps you need some HELP?",
@@ -450,7 +462,39 @@ int __Bot_Message(char *origin, char **av, int ac)
 	return 1;
 
 }
+static void hs_set(User * u, char **av, int ac)
+{
+	int i;
+	if (ac <= 2) {
+		prefmsg(u->nick, s_HostServ, "Current Settings:");
+		prefmsg(u->nick, s_HostServ, "Expire Time: %d (Days)", hs_cfg.old);
+		prefmsg(u->nick, s_HostServ, "End of List.");
+		return;
+	}
+	if (ac < 4) {
+		prefmsg(u->nick, s_HostServ,
+			"Syntax: /msg %s SET <option> <value>",
+			s_HostServ);
+		prefmsg(u->nick, s_HostServ,
+			"For additional help: /msg %s HELP SET",
+			s_HostServ);
+		return;
+	}
+	if (!strcasecmp(av[2], "EXPIRE")) {
+		i = atoi(av[3]);	
+		if ((i <= 0) || (i > 100)) {
+			prefmsg(u->nick, s_HostServ, "Value out of Range.");
+			return;
+		}
+		/* if we get here, all is ok */
+		hs_cfg.old = i;
+		prefmsg(u->nick, s_HostServ, "Expire Time is is set to %d (days)", i);
+		chanalert(s_HostServ, "%s Set Expire Time to %d", u->nick, i);
+		SetConf((void *)i, CFGINT, "ExpireDays");
+		return;
+	}
 
+}
 int Online(char **av, int ac)
 {
 	char *user;
@@ -488,7 +532,7 @@ int Online(char **av, int ac)
 	free(rname);
 	chanalert(s_HostServ,
 		  "Configured Levels: Add: %d, Del: %d, List: %d, View: %d",
-		  hs_lvl.add, hs_lvl.del, hs_lvl.list, hs_lvl.view);
+		  hs_cfg.add, hs_cfg.del, hs_cfg.list, hs_cfg.view);
 
 	add_mod_timer("CleanupHosts", "Cleanup_Old_Vhosts",
 		      HostServ_info[0].module_name, 7200);
@@ -530,11 +574,11 @@ int __ModInit(int modnum, int apiver)
 		     "Error, Can't create vhosts hash");
 		chanalert(s_Services, "Error, Can't create Vhosts Hash");
 	}
-	hs_lvl.add = 40;
-	hs_lvl.del = 40;
-	hs_lvl.list = 40;
-	hs_lvl.view = 100;
-	hs_lvl.old = 60;
+	hs_cfg.add = 40;
+	hs_cfg.del = 40;
+	hs_cfg.list = 40;
+	hs_cfg.view = 100;
+	hs_cfg.old = 60;
 	hs_Config();
 	return 1;
 }
@@ -1014,7 +1058,7 @@ void CleanupHosts()
 	hn = list_first(vhosts);
 	while (hn != NULL) {
 		map = lnode_get(hn);
-		if (map->lused < (time(NULL) - (hs_lvl.old * 86400))) {
+		if (map->lused < (time(NULL) - (hs_cfg.old * 86400))) {
 			nlog(LOG_NOTICE, LOG_MOD,
 			     "Old Vhost Automatically removed: %s for %s",
 			     map->vhost, map->nnick);

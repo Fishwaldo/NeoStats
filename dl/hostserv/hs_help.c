@@ -32,9 +32,9 @@ const char *hs_help[] = {
 	"     ABOUT     LOGIN     ADD",
 	"     DEL       LIST      VIEW",
 	"     CHPASS    BANS      LEVELS",
+	"     SET",
 	"",
-	"Only Network Admins can use the DEL function",
-	"",
+	"Not all commands are available to users",
 	NULL
 };
 
@@ -145,5 +145,17 @@ const char *hs_help_levels[] = {
 	"The Following Options are only available to Network Administration:",
 	"\2LEVELS [add/view/list/del] <level>",
 	"Change the UserLevels required to perform administration functions. Level must be between 1 and 200",
+	NULL
+};
+
+const char *hs_help_set[] = {
+	"\2HostServ Help : SET",
+	"\2Usage:\2 SET [<option>  <value>]",
+	"",
+	"\2SET\2",
+	"This lists the current settings for HostServ.",
+	"",
+	"\2SET EXPIRE <time>",
+	"How long before un-used hostserv entries should be automatically deleted.",
 	NULL
 };
