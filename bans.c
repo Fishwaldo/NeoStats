@@ -244,7 +244,7 @@ COLDEF neo_banscols[] = {
 		"tsexpire",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct Ban, tsexpire),
+		offsetof(struct Ban, tsexpires),
 		RTA_READONLY,
 		NULL,
 		NULL,
