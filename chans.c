@@ -29,6 +29,9 @@
 #include "log.h"
 #include "users.h"
 #include "chans.h"
+#ifdef SQLSRV
+#include "sqlsrv/rta.h"
+#endif
 
 /** @brief Chanmem structure
  *  
@@ -42,22 +45,6 @@ typedef struct Chanmem {
 
 hash_t *ch;
 
-/** @brief initialize the channel data
- *
- * initializes the channel data and channel hash ch.
- *
- * @return Nothing
-*/
-
-
-int 
-init_chan_hash ()
-{
-	ch = hash_create (C_TABLE_SIZE, 0, 0);
-	if(!ch)	
-		return NS_FAILURE;
-	return NS_SUCCESS;
-}
 
 /** @brief Process the Channel TS Time 
  * 
@@ -724,7 +711,7 @@ ChanDump (char *chan)
 	lnode_t *cmn;
 	hscan_t sc;
 	Chans *c;
-	Chanmem *cm;
+ 	Chanmem *cm;
 	char mode[10];
 	int i;
 	int j = 0;
@@ -867,4 +854,214 @@ IsChanMember(Chans *c, User *u)
 		return 1;
 	}
 	return 0;
+}
+
+#ifdef SQLSRV
+
+/* display the channel modes */
+/* BUFSIZE is probably too small.. oh well */
+static char chanmodes[BUFSIZE];
+
+void *display_chanmodes (void *tbl, char *col, char *sql, void *row) {
+        Chans *c = row;
+	lnode_t *cmn;
+	char tmp[BUFSIZE];
+	int i;
+	int j = 1;
+	ModesParm *m;
+	
+	chanmodes[0] = '+';
+	for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
+		if (c->modes & cFlagTab[i].mode) {
+			chanmodes[j++] = cFlagTab[i].flag;
+		}
+	}
+	chanmodes[j++] = '\0';
+
+	cmn = list_first (c->modeparms);
+	while (cmn) {
+		m = lnode_get (cmn);
+		for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
+			if (m->mode & cFlagTab[i].mode) {
+				ircsnprintf(tmp, BUFSIZE, "+%c %s", cFlagTab[i].flag, m->param);
+				strlcat(chanmodes, tmp, BUFSIZE);
+			}
+		}
+		cmn = list_next (c->modeparms, cmn);
+	}
+	return chanmodes;
+}
+/* its huge, because we can have a *LOT* of users in a channel */
+
+static char chanusers[BUFSIZE*10];
+void *display_chanusers (void *tbl, char *col, char *sql, void *row) {
+        Chans *c = row;
+	lnode_t *cmn;
+	char sjoin[BUFSIZE];
+	char mode[BUFSIZE];
+	char final[BUFSIZE*2];
+	int i;
+	int j = 0;
+	int k = 0;
+ 	Chanmem *cm;
+	
+	chanusers[0] = '\0';
+	cmn = list_first (c->chanmembers);
+	while (cmn) {
+		cm = lnode_get (cmn);
+		j = 0;
+		k = 1;
+		mode[0] = '+';
+		for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
+			if (cm->flags & cFlagTab[i].mode) {
+				if (cFlagTab[i].sjoin != 0) 
+					sjoin[j++] = cFlagTab[i].sjoin;
+				else 
+					mode[k++] = cFlagTab[i].flag;
+			}
+		}
+		mode[k++] = '\0';
+		sjoin[j++] = '\0';
+		if (k > 2) 
+			ircsnprintf(final, BUFSIZE*2, "%s %s%s,", mode, sjoin, cm->nick);
+		else 
+			ircsnprintf(final, BUFSIZE*2, "%s%s,", sjoin, cm->nick);
+		strlcat(chanusers, final, BUFSIZE*10);
+		cmn = list_next (c->chanmembers, cmn);
+	}
+
+
+
+	return chanusers;
+}
+
+
+COLDEF neo_chanscols[] = {
+	{
+		"chans",
+		"name",
+		RTA_STR,
+		CHANLEN,
+		offsetof(struct Chans, name),
+		0,
+		NULL,
+		NULL,
+		"The name of the channel"
+	},
+	{
+		"chans",
+		"nomems",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct Chans, cur_users),
+		0,
+		NULL, 
+		NULL,
+		"The no of users in the channel"
+	},
+	{
+		"chans",
+		"modes",
+		RTA_STR,
+		BUFSIZE,
+		offsetof(struct Chans, modes),
+		0,
+		display_chanmodes,
+		NULL,
+		"The modes of the channel"
+	},
+	{
+		"chans",
+		"users",
+		RTA_STR,
+		BUFSIZE*10,
+		offsetof(struct Chans, chanmembers),
+		0,
+		display_chanusers,
+		NULL,
+		"The users of the channel"
+	},
+	{
+		"chans",
+		"topic",
+		RTA_STR,
+		BUFSIZE,
+		offsetof(struct Chans, topic),
+		0,
+		NULL,
+		NULL,
+		"The topic of the channel"
+	},
+	{	
+		"chans",
+		"topicowner",
+		RTA_STR,
+		MAXHOST,
+		offsetof(struct Chans, topicowner),
+		0,
+		NULL,
+		NULL,
+		"Who set the topic"
+	},
+	{	
+		"chans",
+		"topictime",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct Chans, topictime),
+		0,
+		NULL,
+		NULL,
+		"When the topic was set"
+	},
+	{	
+		"chans",
+		"created",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct Chans, tstime),
+		0,
+		NULL,
+		NULL,
+		"when the channel was created"
+	},
+
+};
+
+TBLDEF neo_chans = {
+	"chans",
+	NULL, 	/* for now */
+	sizeof(struct Chans),
+	0,
+	TBL_HASH,
+	neo_chanscols,
+	sizeof(neo_chanscols) / sizeof(COLDEF),
+	"",
+	"The list of Channels on the IRC network"
+};
+#endif /* SQLSRV */
+
+
+
+/** @brief initialize the channel data
+ *
+ * initializes the channel data and channel hash ch.
+ *
+ * @return Nothing
+*/
+
+
+int 
+init_chan_hash ()
+{
+	ch = hash_create (C_TABLE_SIZE, 0, 0);
+	if(!ch)	
+		return NS_FAILURE;
+#ifdef SQLSRV
+	/* add the server hash to the sql library */
+	neo_chans.address = ch;
+	rta_add_table(&neo_chans);
+#endif
+
+	return NS_SUCCESS;
 }
