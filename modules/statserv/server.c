@@ -90,8 +90,8 @@ void AddServerUser (Client *u)
 
 	ss = GetServerModValue (u->uplink);
 	if (IncStatistic (&ss->users)) {
-		announce_record ("\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!",
-			ss->name, ss->s->server->users);
+		announce_record ("\2NEW SERVER RECORD!\2 %d users on server %s",
+			ss->s->server->users, ss->name);
 	}
 }
 
@@ -109,8 +109,8 @@ void AddServerOper (Client *u)
 
 	ss = GetServerModValue (u->uplink);
 	if (IncStatistic (&ss->opers)) {
-		announce_record ("\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d opers!",
-			ss->name, ss->opers.alltime.runningtotal);
+		announce_record ("\2NEW SERVER RECORD!\2 %d opers on %s",
+			ss->opers.alltime.runningtotal, ss->name);
 	}
 }
 

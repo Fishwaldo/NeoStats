@@ -49,7 +49,7 @@ void ResetNetworkStatistics (void)
 void AddNetworkServer (void)
 {
 	if (IncStatistic (&networkstats.servers)) {
-		announce_record ("\2NEW SERVER RECORD\2 Wow, there are now %ld Servers on the Network",
+		announce_record ("\2NEW NETWORK RECORD\2 %ld servers on the network",
 			networkstats.servers.current);
 	}
 }
@@ -62,7 +62,7 @@ void DelNetworkServer (void)
 void AddNetworkChannel (void)
 {
 	if (IncStatistic (&networkstats.channels)) {
-		announce_record ("\2NEW CHANNEL RECORD\2 %ld channels on the network",
+		announce_record ("\2NEW NETWORK RECORD\2 %ld channels on the network",
 		    networkstats.channels.current);
 	}
 }
@@ -75,14 +75,14 @@ void DelNetworkChannel (void)
 void AddNetworkUser (void)
 {
 	if (IncStatistic (&networkstats.users)) {
-		announce_record ("\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %ld users!",
-				     networkstats.users.current);
+		announce_record ("\2NEW NETWORK RECORD!\2 %ld users on the network",
+			networkstats.users.current);
 	}
 }
 
 void DelNetworkUser (void)
 {
-	DecStatistic (&networkstats.servers);
+	DecStatistic (&networkstats.users);
 }
 
 void AddNetworkOper (void)

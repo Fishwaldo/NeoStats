@@ -128,7 +128,7 @@ int ss_event_ctcpversion(CmdParams *cmdparams)
 		IncStatistic (&clientv->users);
 		return NS_SUCCESS;
 	}
-	clientv = ns_malloc (sizeof (ctcpversionstat));
+	clientv = ns_calloc (sizeof (ctcpversionstat));
 	strlcpy (clientv->name, nocols, BUFSIZE);
 	IncStatistic (&clientv->users);
 	lnode_create_append  (versionstatlist, clientv);

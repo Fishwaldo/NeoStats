@@ -55,6 +55,9 @@ static int ns_cmd_level (CmdParams* cmdparams);
 static int ns_cmd_load (CmdParams* cmdparams);
 static int ns_cmd_unload (CmdParams* cmdparams);
 
+static int services_event_ctcpversion (CmdParams *cmdparams);
+
+
 tme me;
 
 static char quitmsg[BUFSIZE];
@@ -149,6 +152,24 @@ BotInfo ns_botinfo = {
 	ns_settings,
 };
 
+ModuleEvent neostats_events[] = {
+	{EVENT_CTCPVERSIONRPL,	services_event_ctcpversion,	EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_NULL,		NULL}
+};
+
+/** @brief services_event_ctcpversion
+ *
+ *  NeoStats CTCP VERSION reply event handler
+ *
+ * @return none
+ */
+static int services_event_ctcpversion (CmdParams *cmdparams)
+{
+	strlcpy (cmdparams->source->version, cmdparams->param, MAXHOST);
+	SendAllModuleEvent (EVENT_CTCPVERSIONRPL, cmdparams);
+	return NS_SUCCESS;
+}
+
 /** @brief InitServices
  *
  *  init NeoStats core
@@ -180,6 +201,8 @@ init_services_bot (void)
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
 	ns_module.insynch = 1;
 	ns_botptr = AddBot (&ns_botinfo);
+	RegisterEventList (neostats_events);
+	/*DeleteEventList (neostats_events);*/
 	ns_module.synched = 1;
 	me.synched = 1;
 	rtaserv_init ();

@@ -126,6 +126,7 @@ int ss_event_delchan (CmdParams *cmdparams)
 	lnode_t *ln;
 	
 	ClearChannelModValue (cmdparams->channel);
+	DelNetworkChannel ();
 	ln = list_find (channelstatlist, cmdparams->channel->name, comparef);
 	if (!ln) {
 		nlog (LOG_WARNING, "Couldn't find channel %s when deleting from stats", cmdparams->channel->name);
@@ -362,14 +363,12 @@ channelstat *load_chan(char *name)
 		LoadStatistic (&c->kicks, "ChanStats", c->name, "kicks");
 		LoadStatistic (&c->topics, "ChanStats", c->name, "topics");
 		LoadStatistic (&c->joins, "ChanStats", c->name, "joins");
+		ns_free (data);
 #endif
 	} else {
 		dlog (DEBUG2, "Creating channel %s", c->name);
 		strlcpy (c->name, name, MAXCHANLEN);	
 	}
-#ifndef USE_BERKELEY
-	ns_free (data);
-#endif
 	c->lastsave = me.now;
 	if ((me.now - c->ts_lastseen) > 604800) {
 		dlog (DEBUG1, "Reset old channel %s", c->name);

@@ -407,7 +407,7 @@ void get_map(char *uplink, int level)
 
 		if ((level == 0) && (s->uplinkname[0] == 0)) {
 			/* its the root server */
-			fprintf (opf, "<table border=0><tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Lag/Max</th></tr>");
+			fprintf (opf, "<table border=0><tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Ping/Max</th></tr>");
 			fprintf (opf, "<tr><td>%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
 				s->server->ping, (int)ss->highest_ping);

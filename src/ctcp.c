@@ -140,8 +140,7 @@ static int ctcp_req_version (CmdParams* cmdparams)
 
 static int ctcp_rpl_version (CmdParams* cmdparams)
 {
-	dlog (DEBUG5, "CTCP VERSION reply from %s to %s", cmdparams->bot->name, cmdparams->source->name);
-	strlcpy (cmdparams->source->version, cmdparams->param, MAXHOST);
+	dlog (DEBUG5, "CTCP VERSION reply from %s to %s", cmdparams->source->name, cmdparams->bot->name);
 	SendModuleEvent (EVENT_CTCPVERSIONRPL, cmdparams, cmdparams->bot->moduleptr);
 	return NS_SUCCESS;
 }
@@ -162,7 +161,7 @@ static int ctcp_req_finger (CmdParams* cmdparams)
 
 static int ctcp_rpl_finger (CmdParams* cmdparams)
 {
-	dlog (DEBUG5, "CTCP FINGER reply from %s to %s", cmdparams->bot->name, cmdparams->source->name);
+	dlog (DEBUG5, "CTCP FINGER reply from %s to %s", cmdparams->source->name, cmdparams->bot->name);
 	SendModuleEvent (EVENT_CTCPFINGERRPL, cmdparams, cmdparams->bot->moduleptr);
 	return NS_SUCCESS;
 }
@@ -197,7 +196,7 @@ static int ctcp_req_dcc (CmdParams* cmdparams)
 
 static int ctcp_rpl_dcc (CmdParams* cmdparams)
 {
-	dlog (DEBUG5, "CTCP DCC reply from %s to %s", cmdparams->bot->name, cmdparams->source->name);
+	dlog (DEBUG5, "CTCP DCC reply from %s to %s", cmdparams->source->name, cmdparams->bot->name);
 	dlog (DEBUG5, "CTCP DCC replies currently not supported");
 	return NS_SUCCESS;
 }
@@ -211,7 +210,7 @@ static int ctcp_req_time (CmdParams* cmdparams)
 
 static int ctcp_rpl_time (CmdParams* cmdparams)
 {
-	dlog (DEBUG5, "CTCP TIME reply from %s to %s", cmdparams->bot->name, cmdparams->source->name);
+	dlog (DEBUG5, "CTCP TIME reply from %s to %s", cmdparams->source->name, cmdparams->bot->name);
 	SendModuleEvent (EVENT_CTCPTIMERPL, cmdparams, cmdparams->bot->moduleptr);
 	return NS_SUCCESS;
 }
@@ -232,7 +231,7 @@ static int ctcp_req_ping (CmdParams* cmdparams)
 
 static int ctcp_rpl_ping (CmdParams* cmdparams)
 {
-	dlog (DEBUG5, "CTCP PING reply from %s to %s", cmdparams->bot->name, cmdparams->source->name);
+	dlog (DEBUG5, "CTCP PING reply from %s to %s", cmdparams->source->name, cmdparams->bot->name);
 	SendModuleEvent (EVENT_CTCPPINGRPL, cmdparams, cmdparams->bot->moduleptr);
 	return NS_SUCCESS;
 }
