@@ -1,5 +1,6 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
-* NeoStats * Fish * Version ????
+* NeoStats * Fish & Shmad * Version ????
+ - Added support to makeconf for WALLOP_INTERVAL (S)
  - Fixed up --enable-auth==TYPE typo in configure script
  - Moved to AutoConf2.13 to fix bsd ./configure issues
  - Fixed Compile warning in adns on BSD systems
