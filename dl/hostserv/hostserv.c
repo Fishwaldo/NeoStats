@@ -869,6 +869,7 @@ static void LoadHosts()
 			     map->nnick, map->vhost);
 		}
 	}			
+	free(LoadArry);
 	list_sort(vhosts, findnick);
 }
 
@@ -1070,5 +1071,6 @@ static void LoadConfig(void)
 			host = strtok(NULL, ";");
 		}
 		free(temp);
+		free(ban);
 	}
 }

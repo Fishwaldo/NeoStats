@@ -300,6 +300,15 @@ pcre/study.c eol=lf
 /services.h eol=lf
 /sock.c eol=lf
 /sock.h eol=lf
+sqlsrv/Makefile -text
+sqlsrv/README -text
+sqlsrv/api.c -text
+sqlsrv/do_sql.c -text
+sqlsrv/do_sql.h -text
+sqlsrv/parse.y -text
+sqlsrv/rta.h -text
+sqlsrv/rtatables.c -text
+sqlsrv/token.l -text
 /stats.h eol=lf
 /support.c eol=lf
 /support.h eol=lf

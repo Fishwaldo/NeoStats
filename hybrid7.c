@@ -792,13 +792,14 @@ Usr_Topic (char *origin, char **argv, int argc)
 		if (finduser(origin)) {
 			buf = joinbuf (argv, argc, 1);
 			ChangeTopic (origin, c, me.now, buf);
+			free (buf);
 		} else if (findserver(origin)) {
 			buf = joinbuf (argv, argc, 3);
 			ChangeTopic (argv[1], c, atoi(argv[2]), buf);
+			free (buf);
 		} else {
 			nlog(LOG_WARNING, LOG_CORE, "Ehhh, Can't find Topic Setter %s/%s", origin, argv[1]); 
 		}
-		free (buf);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);
 	}
