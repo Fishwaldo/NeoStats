@@ -198,7 +198,7 @@ extern int s_user_kill(User *u) {
 	strcpy(segv_location, "StatServ-s_user_kill");
 
 	s=findstats(u->server->name);
-	if (UserLevel(u) >= 40) {
+	if (is_oper(u)) {
 		DecreaseOpers(s);
 	}
 	DecreaseUsers(s);
@@ -277,8 +277,6 @@ void re_init_bot() {
 }
 extern int s_del_user(User *u) {
 	SStats *s;
-	int add = 1;
-	char *modes;
 
 #ifdef DEBUG
 	log(" Server %s", u->server->name);
@@ -286,20 +284,8 @@ extern int s_del_user(User *u) {
 	s=findstats(u->server->name);
 
 	if (!u->modes) return -1; 
-	modes = u->modes;
-	while (*modes) {
-		switch(*modes) {
-			case '+': add = 1;	break;
-			case '-': add = 0;	break;
-			case 'o':
-				if (!add) {
-				DecreaseOpers(s);
-				}
-				break;
-			default: 
-				break;
-		}
-		modes++;
+	if (is_oper(u)) {
+		DecreaseOpers(s);
 	}
 	DecreaseUsers(s);
 	DelTLD(u);
