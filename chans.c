@@ -287,9 +287,11 @@ ChangeChanUserMode (Chans * c, User * u, int add, long mode)
 	Chanmem *cm;
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "Can't find user for ChangeChanUserMode");
-#ifdef DEBUG
 		return;
-#endif
+	}
+	if (!c) {
+		nlog (LOG_WARNING, LOG_CORE, "Can't find channel for ChangeChanUserMode");
+		return;
 	}
 	cmn = list_find (c->chanmembers, u->nick, comparef);
 	if (!cmn) {
@@ -356,7 +358,7 @@ del_chan (Chans * c)
 	SET_SEGV_LOCATION();
 	cn = hash_lookup (ch, c->name);
 	if (!cn) {
-		nlog (LOG_WARNING, LOG_CORE, "Hu, Deleting a Non Existand Channel?");
+		nlog (LOG_WARNING, LOG_CORE, "Hu, Deleting a Non Existant Channel?");
 		return;
 	} else {
 		nlog (LOG_DEBUG2, LOG_CORE, "Deleting Channel %s", c->name);
@@ -392,17 +394,25 @@ kick_chan (User * u, char *chan, User * k)
 	Chans *c;
 	Chanmem *cm;
 	lnode_t *un;
+
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "%s Kicking %s from %s", k->nick, u->nick, chan);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Ehh, KIcking an Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
+		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to kick_chan u=NULL, chan=%s: %s", chan, recbuf);
 		if (me.coder_debug) {
-			chanalert (s_Services, "Ehh, Kicking an Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
+			chanalert (s_Services, "NULL user passed to kick_chan u=NULL, chan=%s: %s", chan, recbuf);
 			chandump (chan);
-			UserDump (u->nick);
 		}
 		return;
 	}
+	if (!k) {
+		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to kick_chan k=NULL, chan=%s: %s", chan, recbuf);
+		if (me.coder_debug) {
+			chanalert (s_Services, "NULL user passed to kick_chan k=NULL, chan=%s: %s", chan, recbuf);
+			chandump (chan);
+		}
+		return;
+	}
+	nlog (LOG_DEBUG2, LOG_CORE, "%s Kicking %s from %s", k->nick, u->nick, chan);
 	c = findchan (chan);
 	if (!c) {
 		nlog (LOG_WARNING, LOG_CORE, "Hu, Kicking a Non existant Channel? %s", chan);
@@ -482,16 +492,15 @@ part_chan (User * u, char *chan)
 	Chanmem *cm;
 	int ac = 0;
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "Parting %s from %s", u->nick, chan);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Ehh, Parting an Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
+		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to part_chan u=NULL, chan=%s: %s", chan, recbuf);
 		if (me.coder_debug) {
-			chanalert (s_Services, "Ehh, Parting an Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
+			chanalert (s_Services, "NULL user passed to part_chan u=NULL, chan=%s: %s", chan, recbuf);
 			chandump (chan);
-			UserDump (u->nick);
 		}
 		return;
 	}
+	nlog (LOG_DEBUG2, LOG_CORE, "Parting %s from %s", u->nick, chan);
 	c = findchan (chan);
 	if (!c) {
 		nlog (LOG_WARNING, LOG_CORE, "Hu, Parting a Non existant Channel? %s", chan);
