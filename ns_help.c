@@ -186,9 +186,12 @@ const char *ns_help_userdump[] = {
 
 const char *ns_help_serverdump[] = {
 	"Syntax: \2SERVERDUMP\2",
+	"Syntax: \2SERVERDUMP <name>\2",
 	"",
 	"When in debug mode, Neostats will echo its server table to",
 	"the services channel. Only useful for debugging Neostats",
+	"If name is passed, only the information for that server is",
+	"returned, otherwise the entire server list is dumped.",
 	NULL
 };
 

@@ -26,7 +26,7 @@
 
 Server *AddServer (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline);
 void DelServer(const char *name, const char* reason);
-void ServerDump (void);
+void ServerDump (const char *name);
 int init_server_hash (void);
 void PingServers (void);
 void FreeServers();

@@ -372,10 +372,12 @@ Example:
 2.3.15 SERVERDUMP
 -----------------
 Syntax: 
-    /msg NeoStats SERVERDUMP
+    /msg NeoStats SERVERDUMP [name]
 Description: 
     When in debug mode, Neostats will echo its server table to
     the services channel. Only useful for debugging Neostats
+	If name is passed, only the information for that server is
+	returned, otherwise the entire server list is dumped.
 Example:
     /msg NeoStats SERVERDUMP
 

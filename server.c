@@ -167,25 +167,40 @@ findserver (const char *name)
 	return NULL;
 }
 
+static void 
+dumpserver (Server *s)
+{
+#ifdef BASE64SERVERNAME
+	debugtochannel("Server: %s (%s)", s->name, s->name64);
+#else
+	debugtochannel("Server: %s", s->name);
+#endif
+	debugtochannel("Flags:  %lx", s->flags);
+	debugtochannel("Uplink: %s", s->uplink);
+	debugtochannel("========================================");
+}
+
 void
-ServerDump (void)
+ServerDump (const char *name)
 {
 	Server *s;
 	hscan_t ss;
 	hnode_t *sn;
 
 	debugtochannel("================SERVDUMP================");
-	hash_scan_begin (&ss, sh);
-	while ((sn = hash_scan_next (&ss)) != NULL) {
-		s = hnode_get (sn);
-#ifdef BASE64SERVERNAME
-		debugtochannel("Server: %s (%s)", s->name, s->name64);
-#else
-		debugtochannel("Server: %s", s->name);
-#endif
-		debugtochannel("Flags:  %lx", s->flags);
-		debugtochannel("Uplink: %s", s->uplink);
-		debugtochannel("========================================");
+	if (!name) {
+		hash_scan_begin (&ss, sh);
+		while ((sn = hash_scan_next (&ss)) != NULL) {
+			s = hnode_get (sn);
+			dumpserver (s);
+		}
+	} else {
+		s = findserver (name);
+		if (s) {
+			dumpserver (s);
+		} else {
+			debugtochannel("ServerDump: can't find server %s", name);
+		}
 	}
 }
 

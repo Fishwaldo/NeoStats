@@ -332,8 +332,13 @@ ns_serverdump (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 	   	return 0;
 	}
-	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump!", u->nick);
-	ServerDump ();
+	if(ac < 3) {
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump!", u->nick);
+		ServerDump (NULL);
+	} else {
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump for %s!", u->nick, av[2]);
+		ServerDump (av[2]);
+	}
    	return 1;
 }
 
