@@ -62,7 +62,7 @@ int kp_recursive_do(const char *key, kp_func func, int stop_on_err,
 		dir = kp_dir_open(key);
 		for (kp = keys; *kp != NULL; kp++) {
 			res =
-			    kp_recursive_do(KP_P(dir, *kp), func,
+			    kp_recursive_do(KP_PATH(dir, *kp), func,
 					    stop_on_err, user_data);
 			if (res != 0) {
 				finalres = res;

@@ -37,7 +37,11 @@ modules, but which are not relevant to the outside. */
 
 /* Get the definitions provided by running "configure" */
 
+#ifdef WIN32
+#include "configwin32.h"
+#else
 #include "config.h"
+#endif
 
 /* When compiling for use with the Virtual Pascal compiler, these functions
 need to have their names changed. PCRE must be compiled with the -DVPCOMPAT

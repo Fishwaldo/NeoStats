@@ -29,25 +29,48 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <errno.h>
+#ifdef WIN32
+#include <winsock2.h>
+#else
+#include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#endif
 #include <time.h>
 #define __USE_GNU
 #include <string.h>
 #undef __USE_GNU
 #include <stdarg.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <ctype.h>
 #include <sys/stat.h>
-#include <sys/resource.h>
 #include <setjmp.h>
 #include <assert.h>
 
+#ifdef WIN32
+#include "configwin32.h"
+#define __PRETTY_FUNCTION__ __FUNCTION__
+#define ssize_t int
+#define RTLD_LAZY  1
+#define inline __inline
+#define sleep(n)
+#define snprintf _snprintf
+#include <io.h>
+#define access _access
+#include <direct.h>
+//#define S_IWUSR _S_IWRITE
+//#define S_IRUSR _S_IREAD
+#define S_ISDIR(mode) ((mode) & _S_IFDIR ? 1 : 0)
+#define S_ISREG(mode) ((mode) & _S_IFREG ? 1 : 0)
+#define R_OK 04
+
+#else
 #include "config.h"
+#endif
 
 #ifdef HAVE_DB_H
 /*#define USE_BERKELEY*/

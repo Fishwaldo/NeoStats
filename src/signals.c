@@ -180,6 +180,7 @@ serv_segv ()
 void
 InitSignals (void)
 {
+#ifndef WIN32
 	struct sigaction act;
 	act.sa_handler = SIG_IGN;
 	act.sa_flags = 0;
@@ -210,6 +211,7 @@ InitSignals (void)
 	(void) sigaction (SIGSEGV, &act, NULL);
 
 	(void) signal (SIGHUP, conf_rehash);
+#endif
 	(void) signal (SIGTERM, serv_die);
 	(void) signal (SIGSEGV, serv_segv);
 	(void) signal (SIGINT, serv_die);

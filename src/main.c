@@ -22,6 +22,9 @@
 */
 
 #include "neostats.h"
+#ifdef WIN32
+#include "win32/getopt.h"
+#endif
 #include "ircd.h"
 #include "conf.h"
 #include "keeper.h"
@@ -182,6 +185,7 @@ main (int argc, char *argv[])
 	if (InitCore () != NS_SUCCESS)
 		return EXIT_FAILURE;
 
+#ifndef WIN32
 #ifndef DEBUG
 	/* if we are compiled with debug, or forground switch was specified, DONT FORK */
 	if (!config.foreground) {
@@ -193,6 +197,7 @@ main (int argc, char *argv[])
 			perror("fork"); 
 			return EXIT_FAILURE; /* fork error */ 
 		} 
+#endif
 #endif
 		/* we are the parent */ 
 		if (forked > 0) { 
@@ -207,6 +212,7 @@ main (int argc, char *argv[])
 			}
 			return EXIT_SUCCESS; /* parent exits */ 
 		}
+#ifndef WIN32
 #ifndef DEBUG
 		/* child (daemon) continues */ 
 		/* reopen logs for child */ 
@@ -217,6 +223,7 @@ main (int argc, char *argv[])
 			nlog (LOG_WARNING, "setpgid() failed");
 		}
 	}
+#endif
 #endif
 	nlog (LOG_NOTICE, "NeoStats \"%s\" started.", VERSION);
 

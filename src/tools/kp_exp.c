@@ -256,7 +256,7 @@ static void get_recursive(FILE *fp, const char *key, const char *name,
                 fprintf(fp, "%s = {\n", name);
 
                 for(kp = keys; *kp != NULL; kp++)
-                    get_recursive(fp, KP_P(dir, *kp), *kp, depth+1);
+                    get_recursive(fp, KP_PATH(dir, *kp), *kp, depth+1);
 
                 print_indent(fp, depth);
                 fprintf(fp, "}\n");

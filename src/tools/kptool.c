@@ -199,7 +199,7 @@ static void del_recursive(const char *key)
                 dir = kp_dir_open(key);
 
                 for(i = 0; keys[i] != NULL; i++)
-                    del_recursive(KP_P(dir, keys[i]));
+                    del_recursive(KP_PATH(dir, keys[i]));
 
                 kp_dir_close(dir);
                 free(keys);

@@ -27,7 +27,9 @@
  *  @brief module functions
  */ 
 
+#ifndef WIN32
 #include <dlfcn.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include "neostats.h"
@@ -35,6 +37,9 @@
 
 void *ns_dlsym (void *handle, const char *name)
 {
+#ifdef WIN32
+	return NULL;
+#else
 #ifdef NEED_UNDERSCORE_PREFIX
 	char sym[128];
 	void* ret;
@@ -47,20 +52,33 @@ void *ns_dlsym (void *handle, const char *name)
 #else
 	return (dlsym ((int *) handle, name));
 #endif
+#endif
 }
 
 void *ns_dlopen (const char *file, int mode)
 {
+#ifdef WIN32
+	return NULL;
+#else
 	return (dlopen (file, mode));
+#endif
 }
 
 int ns_dlclose (void *handle)
 {
+#ifdef WIN32
+	return 0;
+#else
 	return (dlclose (handle));
+#endif
 }
 
 char *ns_dlerror (void)
 {
+#ifdef WIN32
+	return NULL;
+#else
 	return ((char *)dlerror ());
+#endif
 }
 

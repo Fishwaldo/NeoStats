@@ -528,7 +528,7 @@ static int get_term(File *file, KPDIR *base, Token *ts, int n)
         val = ts[5].s;
     }
 
-    res = set_value(file, KP_P(base, key), type, val);
+    res = set_value(file, KP_PATH(base, key), type, val);
 
     return res;
 }
@@ -559,7 +559,7 @@ static int get_entry(File *file, KPDIR *base)
                 break;
             }
             
-            newbase = kp_dir_open(KP_P(base, ts[0].s));
+            newbase = kp_dir_open(KP_PATH(base, ts[0].s));
             ret = get_entry(file, newbase);
             kp_dir_close(newbase);
             

@@ -86,7 +86,7 @@ extern "C" {
 
 /* Directory utils */
 	typedef struct _KPDIR KPDIR;
-#define KP_P(kpdir, subkey) kp_dir_getpath(kpdir, subkey)
+#define KP_PATH(kpdir, subkey) kp_dir_getpath(kpdir, subkey)
 
 	KPDIR *kp_dir_open(const char *keypath);
 	const char *kp_dir_getpath(KPDIR * kpdir, const char *subkey);

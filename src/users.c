@@ -36,7 +36,9 @@
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
+#ifndef WIN32
 #include <arpa/inet.h>
+#endif
 
 static hash_t *userhash;
 

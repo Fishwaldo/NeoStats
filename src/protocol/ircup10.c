@@ -28,7 +28,9 @@
 #include "users.h"
 #include "servers.h"
 #include "channels.h"
-#include <arpa/inet.h> 
+#ifndef WIN32
+#include <arpa/inet.h>
+#endif
 
 void process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac);
 int splitbuf (char *buf, char ***argv, int colon_special);

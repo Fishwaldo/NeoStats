@@ -31,7 +31,9 @@
  * dynamic runtime library loading routines
  */
 
+#ifndef WIN32
 #include <dlfcn.h>
+#endif
 #include <stdio.h>
 #include <time.h>
 

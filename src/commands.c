@@ -21,7 +21,9 @@
 ** $Id$
 */
 
-#include <arpa/inet.h> 
+#ifndef WIN32
+#include <arpa/inet.h>
+#endif
 #include "neostats.h"
 #include "modules.h"
 #include "services.h"

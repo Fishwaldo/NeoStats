@@ -25,12 +25,20 @@
 ** $Id$
 */
 
-#include "neostats.h"
-#include <fcntl.h>
+#ifndef WIN32
 #include <arpa/inet.h>
 #include <poll.h>
+#else
+struct pollfd { int fd; short events; short revents; };
+#define POLLIN  1
+#define POLLPRI 2
+#define POLLOUT 4
+#define POLLERR 8
+#endif
+#include "neostats.h"
+#include <fcntl.h>
+
                      
-#include "dl.h"
 #include "adns.h"
 #include "timer.h"
 #include "dns.h"
@@ -136,6 +144,9 @@ ConnectTo (char *host, int port)
 
 	ret=connect (s, (struct sockaddr *) &sa, sizeof (sa));
 	if (ret< 0) {
+#ifdef WIN32
+		nlog (LOG_ERROR, "Winsock error: %d", WSAGetLastError());
+#endif
 		close (s);
 		return NS_FAILURE;
 	}
@@ -296,7 +307,11 @@ restartsql:
 #endif
 			if (FD_ISSET (servsock, &readfds)) {
 				for (j = 0; j < BUFSIZE; j++) {
+#ifdef WIN32
+					i = recv (servsock, &c, 1, 0);
+#else
 					i = read (servsock, &c, 1);
+#endif
 					me.RcveBytes++;
 					if (i >= 0) {
 						buf[j] = c;
@@ -416,6 +431,9 @@ Connect (void)
 static int
 getmaxsock (void)
 {
+#ifdef WIN32
+	return 0xffff;
+#else
 	struct rlimit *lim;
 	int ret;
 
@@ -426,6 +444,7 @@ getmaxsock (void)
 	if(ret<0)
 		ret = 0xffff;
 	return ret;
+#endif
 }
 
 /** @brief recv logging for all data received by us
@@ -487,10 +506,18 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 
 	/* set non blocking */
 
+#ifdef WIN32
+	{
+		int flags;
+		flags = 1;
+		return ioctlsocket(s, FIONBIO, &flags);
+	}
+#else
 	if ((i = fcntl (s, F_SETFL, O_NONBLOCK)) < 0) {
 		nlog (LOG_CRITICAL, "can't set socket %s(%s) non-blocking: %s", name, moduleptr->info->name, strerror (i));
 		return NS_FAILURE;
 	}
+#endif
 
 	if ((i = connect (s, (struct sockaddr *) &sa, sizeof (sa))) < 0) {
 		switch (errno) {
@@ -559,7 +586,11 @@ sts (const char *buf, const int buflen)
 		nlog(LOG_WARNING, "Not sending to server as we have a invalid socket");
 		return;
 	}
+#ifdef WIN32
+	sent = send (servsock, buf, buflen, 0);
+#else	
 	sent = write (servsock, buf, buflen);
+#endif
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
 		/* Try to close socket then reset the servsock value to avoid cyclic calls */

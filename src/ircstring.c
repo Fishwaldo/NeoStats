@@ -33,6 +33,9 @@
 #define __attribute__(x)  /* NOTHING */
 #endif
 #include "ircstring.h"
+#ifdef WIN32
+#define vsnprintf _vsnprintf
+#endif
 
 /* buffer for itoa conversion 
  * int ranges from 

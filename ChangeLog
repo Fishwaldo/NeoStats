@@ -4,6 +4,17 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Win32: Disable fork. Windows handles processes differently. (M)
+ - Win32: Disable unsupported signal processing. (M)
+ - Win32: ADNS Win32 compatible library import. (M)
+ - Win32: Macros created for *nix function not available. (M)
+ - Win32: dl code disabled for first pass Win32 support. (M)
+ - Win32: Socket code updated to WinSock compatible calls. (M)
+ - Win32: Keeper KP_P reserved in Win32 so renamed to KP_PATH (M)
+ - Win32: #define around header files not available under Win32 (M)
+ - Win32: configwin32.h is a fixed config.h since Windows does not need 
+   different ones. Creates problem of how to choose IRCd. (M)
+ - Win32: Early support for native compilation under MSVC .NET 2003 (M)
  - Change init_bot so that in client mode, module commands and settings are
    just added to the main bot. (M)
  - Begin adding a client protocol so that NeoStats can connect as a normal

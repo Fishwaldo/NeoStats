@@ -319,7 +319,6 @@ static int kp_get_file(kp_path * kpp, kp_fil ** fp, int *isdirp)
 		}
 	}
 	*fp = fil;
-
 	return 0;
 }
 
