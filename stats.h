@@ -384,7 +384,7 @@ typedef enum SET_TYPE {
 
 /* "TESTSTRING", &teststring, TYPE_STRING, 0,string_buffer_size 
    "TESTINT",    &testint, TYPE_INT 0, 200 */ 
-typedef struct bot_set_option {
+typedef struct bot_settings {
 	const char		*option;	/* option string */
 	void*			varptr;		/* pointer to var */
 	SET_TYPE		type;		/* type of var */
@@ -393,7 +393,7 @@ typedef struct bot_set_option {
 	const char		*confitem;	/* config string for kptool */
 	const char		*desc;		/* description of setting for messages */
 	bot_cmd_handler	handler;	/* handler for custom/post-set processing */
-}bot_set_option;
+}bot_settings;
 
 /* sock.c */
 int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);
