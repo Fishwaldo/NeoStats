@@ -46,12 +46,13 @@ extern char s_StatServ[MAXNICK];
 extern ModuleInfo __module_info;
 
 typedef struct tld_ TLD;
+typedef struct region_ Region;
 typedef struct server_stats SStats;
 typedef struct chan_stats CStats;
 typedef struct irc_client_version CVersions;
 hash_t *Shead;
 list_t *Chead;
-TLD *tldhead;
+list_t *Thead;
 list_t *Vhead;
 
 struct stats_network_ {
@@ -72,21 +73,22 @@ struct stats_network_ {
 } stats_network;
 
 
-struct StatServ {
-	char user[MAXUSER];
-	char host[MAXHOST];
-	char rname[MAXREALNAME];
-	int lagtime;
-	int lagalert;
-	int recordalert;
-	int html;
-	char htmlpath[MAXPATH];
-	int onchan;
-	int newdb;
-	int msginterval;
-	int msglimit;
-	int shutdown;
-	int exclusions;
+struct StatServ { 
+	char user[MAXUSER]; 
+	char host[MAXHOST]; 
+	char rname[MAXREALNAME]; 
+	int lagtime; 
+	int lagalert; 
+	int recordalert; 
+	int html; 
+	char htmlpath[MAXPATH]; 
+	int onchan; 
+	int newdb; 
+	int msginterval; 
+	int msglimit; 
+	int shutdown; 
+	int exclusions; 
+	int GeoDBtypes;
 } StatServ;
 
 
@@ -153,9 +155,16 @@ struct daily_ {
 } daily;
 
 struct tld_ {
-	TLD *next;
 	char tld[5];
 	char *country;
+	int users;
+	int daily_users;
+	/* for region/isp edition of GeoIP */
+	list_t *rl;
+};
+
+struct region_ {
+	char *region;
 	int users;
 	int daily_users;
 };
@@ -168,11 +177,6 @@ int topkick(const void *key1, const void *key2);
 int toptopics(const void *key1, const void *key2);
 int topversions(const void *key1, const void *key2);
 /* stats.c */
-TLD *tldhead;
-TLD *findtld(char *);
-TLD *AddTLD(User *);
-void LoadTLD();
-void init_tld();
 int s_client_version(char **av, int ac);
 void AddStats(Server *);
 SStats *findstats(char *);
@@ -249,6 +253,11 @@ extern const char ss_help_stats_oneline[];
 
 /* tld.c */
 void DelTLD(User * u);
+int sortusers(const void *v, const void *v2);
+void ResetTLD();
+void DisplayTLDmap(User *u);
+void AddTLD(User *);
+void init_tld();
 
 /* htmlstats.c */
 void ss_html(void);

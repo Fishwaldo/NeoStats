@@ -474,16 +474,21 @@ void get_clientstats()
 
 void get_tldmap()
 {
+	lnode_t *tn;
 	TLD *t;
 	fprintf(opf,
 		"<table border = 0><tr><th>tld</th><th>Country</th><th>Current Users</th><th>Daily Total</th></tr>");
-	for (t = tldhead; t; t = t->next) {
+	list_sort(Thead, sortusers);
+	tn = list_first(Thead);
+	while (tn) {
+		t = lnode_get(tn);
 		if (t->users > 0) {
 			fprintf(opf,
 				"<tr><td>%s</td><td>%s</td><td>%3d</td><td>%3d</td></tr>",
 				t->tld, t->country, t->users,
 				t->daily_users);
 		}
+		tn = list_next(Thead, tn);
 	}
 	fprintf(opf, "</table>");
 }

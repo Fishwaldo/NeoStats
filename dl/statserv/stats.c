@@ -734,7 +734,6 @@ SStats *findstats(char *name)
 void Is_Midnight()
 {
 	struct tm *ltm = localtime(&me.now);
-	TLD *t;
 	lnode_t *cn;
 	CStats *c;
 
@@ -754,8 +753,7 @@ void Is_Midnight()
 			daily.t_opers = me.now;
 			daily.chans = stats_network.chans;
 			daily.t_chans = me.now;
-			for (t = tldhead; t; t = t->next)
-				t->daily_users = 0;
+			ResetTLD();
 			cn = list_first(Chead);
 			while (cn) {
 				c = lnode_get(cn);

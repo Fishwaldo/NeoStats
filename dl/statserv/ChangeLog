@@ -15,7 +15,9 @@ Shmad & ^Enigma & Fish^
  - Removed MSGTHROTTLE and LAG options. These are superceded by new options
 	MSGINTERVAL, MSGLIMIT, LAGTIME (M)
  - Fix mem leak from strdup (M)
-    
+ - TLDmap is now using GeoIP from Netmax.com. Will add City and Region/ISP code soon (but requires a paid version of the DB) (F)
+ - Most of the commands were limited to opers, changed back so users can view stats (F)
+   
 * Revision 810 * Nov 23rd, 2003 (M)
  - change SSMNAME to __module_info.module_name to be consistent with other modules (M)
  - Use core bot message handler to process commands (M)

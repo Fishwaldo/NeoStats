@@ -38,7 +38,6 @@
 static int ss_chans(User * u, char **av, int ac);
 static int ss_daily(User * u, char **av, int ac);
 static int ss_stats(User * u, char **av, int ac);
-static int ss_tld(User * u, char **av, int ac);
 static int ss_tld_map(User * u, char **av, int ac);
 static int ss_operlist(User * u, char **av, int ac);
 #ifdef GOTBOTMODE
@@ -171,7 +170,6 @@ int __ModInit(int modnum, int apiver)
 		     "StatServ HTML stats is disabled, as HTML_PATH is not set in the config file");
 		StatServ.html = 0;
 	}
-	LoadTLD();
 	init_tld();
 	LoadStats();
 	Vhead = list_create(-1);
@@ -263,20 +261,19 @@ void __ModFini()
 
 bot_cmd ss_commands[]=
 {
-	{"ABOUT",			ss_about,		0, 	NS_ULEVEL_OPER,		ss_help_about, 		 	ss_help_about_oneline},
-	{"VERSION",			ss_version,		0, 	NS_ULEVEL_OPER,		ss_help_version, 	 	ss_help_version_oneline},
-	{"SERVER",			ss_server,		0, 	NS_ULEVEL_OPER,		ss_help_server,		 	ss_help_server_oneline},
-	{"MAP",				ss_map,			0, 	NS_ULEVEL_OPER,		ss_help_map, 		 	ss_help_map_oneline},
-	{"CHAN",			ss_chans,		0, 	NS_ULEVEL_OPER,		ss_help_chan, 		 	ss_help_chan_oneline},
-	{"NETSTATS",		ss_netstats,	0, 	NS_ULEVEL_OPER,		ss_help_netstats, 	 	ss_help_netstats_oneline},
-	{"DAILY",			ss_daily,		0, 	NS_ULEVEL_OPER,		ss_help_daily, 		 	ss_help_daily_oneline},
-	{"TLD",				ss_tld,			1, 	NS_ULEVEL_OPER,		ss_help_tld, 		 	ss_help_tld_oneline},
-	{"TLDMAP",			ss_tld_map,		0, 	NS_ULEVEL_OPER,		ss_help_tldmap, 	 	ss_help_tldmap_oneline},
-	{"OPERLIST",		ss_operlist,	0, 	NS_ULEVEL_OPER,		ss_help_operlist, 	 	ss_help_operlist_oneline},
+	{"ABOUT",			ss_about,		0, 	0,		ss_help_about, 		 	ss_help_about_oneline},
+	{"VERSION",			ss_version,		0, 	0,		ss_help_version, 	 	ss_help_version_oneline},
+	{"SERVER",			ss_server,		0, 	0,		ss_help_server,		 	ss_help_server_oneline},
+	{"MAP",				ss_map,			0, 	0,		ss_help_map, 		 	ss_help_map_oneline},
+	{"CHAN",			ss_chans,		0, 	0,		ss_help_chan, 		 	ss_help_chan_oneline},
+	{"NETSTATS",		ss_netstats,	0, 	0,		ss_help_netstats, 	 	ss_help_netstats_oneline},
+	{"DAILY",			ss_daily,		0, 	0,		ss_help_daily, 		 	ss_help_daily_oneline},
+	{"TLDMAP",			ss_tld_map,		0, 	0,		ss_help_tldmap, 	 	ss_help_tldmap_oneline},
+	{"OPERLIST",		ss_operlist,	0, 	0,		ss_help_operlist, 	 	ss_help_operlist_oneline},
 #ifdef GOTBOTMODE																	
-	{"BOTLIST",			ss_botlist,		0, 	NS_ULEVEL_OPER,		ss_help_botlist, 	 	ss_help_botlist_oneline},
+	{"BOTLIST",			ss_botlist,		0, 	0,		ss_help_botlist, 	 	ss_help_botlist_oneline},
 #endif																						
-	{"CLIENTVERSIONS",	ss_clientversions,0,NS_ULEVEL_OPER,		ss_help_clientversions, ss_help_clientversions_oneline},
+	{"CLIENTVERSIONS",	ss_clientversions,	0,	0,		ss_help_clientversions, ss_help_clientversions_oneline},
 	{"FORCEHTML",		ss_forcehtml,	0, 	NS_ULEVEL_ADMIN,	ss_help_forcehtml, 		ss_help_forcehtml_oneline},
 	{"STATS",			ss_stats,		1, 	NS_ULEVEL_ADMIN,	ss_help_stats, 			ss_help_stats_oneline},
 	{NULL,				NULL,			0, 	0,					NULL, 					NULL}
@@ -284,7 +281,7 @@ bot_cmd ss_commands[]=
 
 bot_setting ss_settings[]=
 {
-	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN,	"HTML_Enabled",		NULL,		ss_help_set_html },
+	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN,	"HTML_Enabled",		NULL,		ss_help_set_html},
 	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,	NS_ULEVEL_ADMIN,	"HTML_Path",		NULL,		ss_help_set_htmlpath },
 	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 		NS_ULEVEL_ADMIN,	"MsgInterval",		"seconds",	ss_help_set_msginterval },
 	{"MSGLIMIT",	&StatServ.msglimit,		SET_TYPE_INT,		1, 99, 		NS_ULEVEL_ADMIN,	"MsgLimit",			NULL,		ss_help_set_msglimit },
@@ -558,20 +555,11 @@ static int ss_chans(User * u, char **av, int ac)
 
 static int ss_tld_map(User * u, char **av, int ac)
 {
-	TLD *t;
 
 	SET_SEGV_LOCATION();
 	chanalert(s_StatServ, "%s Wanted to see a Country Breakdown", u->nick);
 	prefmsg(u->nick, s_StatServ, "Top Level Domain Statistics:");
-	for (t = tldhead; t; t = t->next) {
-		if (t->users != 0)
-			prefmsg(u->nick, s_StatServ,
-				"%3s \2%3d\2 (%2.0f%%) -> %s ---> Daily Total: %d",
-				t->tld, t->users,
-				(float) t->users /
-				(float) stats_network.users * 100,
-				t->country, t->daily_users);
-	}
+	DisplayTLDmap(u);
 	prefmsg(u->nick, s_StatServ, "End of List");
 	return 1;
 }
@@ -771,37 +759,6 @@ static int ss_server(User * u, char **av, int ac)
 		prefmsg(u->nick, s_StatServ,
 			"%s has never split from the Network.", ss->name);
 	prefmsg(u->nick, s_StatServ, "***** End of Statistics *****");
-	return 1;
-}
-
-static int ss_tld(User * u, char **av, int ac)
-{
-	TLD *tmp;
-	char *tld;
-    
-	SET_SEGV_LOCATION();
-	tld = av[2];
-	chanalert(s_StatServ, "%s Wanted to find the Country that is Represented by %s ", u->nick, av[2]);
-	if (!tld) {
-		prefmsg(u->nick, s_StatServ, "Syntax: /msg %s TLD <tld>",
-			s_StatServ);
-		prefmsg(u->nick, s_StatServ,
-			"For additional help, /msg %s HELP", s_StatServ);
-		return 0;
-	}
-
-	if (*tld == '*')
-		tld++;
-	if (*tld == '.')
-		tld++;
-
-	tmp = findtld(tld);
-
-	if (!tmp)
-		prefmsg(u->nick, s_StatServ,
-			"Top Level Domain \2%s\2 does not exist.", tld);
-	else
-		prefmsg(u->nick, s_StatServ, tmp->country);
 	return 1;
 }
 
