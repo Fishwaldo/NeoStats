@@ -485,6 +485,9 @@ int _kp_write_file(kp_path * kpp, kp_key * keys)
 				else
 					delpath = 1;
 			} else {
+#ifdef WIN32
+				remove (kpp->path);
+#endif
 				res = rename(tmppath, kpp->path);
 				if (res != 0)
 					res = _kp_errno_to_kperr(errno);

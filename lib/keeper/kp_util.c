@@ -72,7 +72,11 @@ static void kp_init_tmpname()
 	pid = getpid();
 
 	kp_tmpname = (char *) smalloc(strlen(hostname) + 64);
+#ifdef WIN32
+	sprintf(kp_tmpname, "tmp.%s.%u", hostname, pid);
+#else
 	sprintf(kp_tmpname, ":tmp.%s.%u:", hostname, pid);
+#endif
 }
 
 /* ------------------------------------------------------------------------- 

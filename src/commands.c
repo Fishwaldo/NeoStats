@@ -397,31 +397,41 @@ run_intrinsic_cmds (const char* cmd, CmdParams * cmdparams)
 	/* Handle intrinsic commands */
 	/* Help */
 	if (!ircstrcasecmp(cmd, "HELP")) {
+		SET_RUN_LEVEL(cmdparams->bot->moduleptr);
 		cmdret = bot_cmd_help(cmdparams);
+		RESET_RUN_LEVEL();
 		check_cmd_result(cmdparams, cmdret, NULL);
 		return NS_SUCCESS;
 	}
 	/* Handle SET if we have it */
 	if (cmdparams->bot->botsettings && !ircstrcasecmp(cmd, "SET") ) {
+		SET_RUN_LEVEL(cmdparams->bot->moduleptr);
 		cmdret = bot_cmd_set(cmdparams);
+		RESET_RUN_LEVEL();
 		check_cmd_result(cmdparams, cmdret, NULL);
 		return NS_SUCCESS;
 	}
 	/* About */
 	if (!ircstrcasecmp(cmd, "ABOUT") && cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->about_text ) {
+		SET_RUN_LEVEL(cmdparams->bot->moduleptr);
 		cmdret = bot_cmd_about(cmdparams);
+		RESET_RUN_LEVEL();
 		check_cmd_result(cmdparams, cmdret, NULL);
 		return NS_SUCCESS;
 	}
 	/* Version */
 	if (!ircstrcasecmp(cmd, "VERSION")) {
+		SET_RUN_LEVEL(cmdparams->bot->moduleptr);
 		cmdret = bot_cmd_version(cmdparams);
+		RESET_RUN_LEVEL();
 		check_cmd_result(cmdparams, cmdret, NULL);
 		return NS_SUCCESS;
 	}
 	/* Credits */
 	if (!ircstrcasecmp(cmd, "CREDITS") && cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->copyright ) {
+		SET_RUN_LEVEL(cmdparams->bot->moduleptr);
 		cmdret = bot_cmd_credits(cmdparams);
+		RESET_RUN_LEVEL();
 		check_cmd_result(cmdparams, cmdret, NULL);
 		return NS_SUCCESS;
 	}
