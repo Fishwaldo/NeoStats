@@ -1015,7 +1015,7 @@ add_mod_user (char *nick, char *mod_name)
 				strlcpy (mod_usr->modname, mod_name, MAX_MOD_NAME);
 				mod_usr->function = ns_dlsym (mod_ptr->dl_handle, "__BotMessage");
 				mod_usr->chanfunc = ns_dlsym (mod_ptr->dl_handle, "__ChanMessage");
-				mod_usr->botcmds = hash_create(-1, 0, 0);
+				mod_usr->botcmds = NULL;
 				return mod_usr;
 			}
 		}

@@ -271,9 +271,9 @@ del_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 int 
 add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list) 
 {
-	/* If no hash return failure */
+	/* If no hash create */
 	if(bot_ptr->botcmds == NULL) {
-		return NS_FAILURE;
+		bot_ptr->botcmds = hash_create(-1, 0, 0);
 	}
 	/* Cycle through command list and add them */
 	while(bot_cmd_list->cmd) {
