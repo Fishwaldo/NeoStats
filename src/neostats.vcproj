@@ -201,7 +201,7 @@
 				RelativePath=".\nsmemory.c">
 			</File>
 			<File
-				RelativePath=".\portab.c">
+				RelativePath=".\oscalls.c">
 			</File>
 			<File
 				RelativePath=".\servers.c">

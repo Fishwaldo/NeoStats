@@ -46,6 +46,9 @@ AC_CHECK_HEADERS(
         sys/socket.h \
         unistd.h \
         malloc.h \
+        assert.h \
+        ctype.h \
+        errno.h \
         stdio.h \
         stdlib.h \
         stdarg.h \
