@@ -492,17 +492,11 @@ m_server (char *origin, char **argv, int argc, int srv)
 }
 
 /* R: AB SQ mark.local.org 0 :Ping timeout */
+/* R: ABAAV SQ york.gose.org 1076280461 :relink */
 static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	char buf[3];
-	buf[0] = argv[0][0];
-	buf[1] = argv[0][1];
-	buf[2] = '\0';
-	tmpbuf = joinbuf(argv, argc, 2);
-	do_squit (buf, tmpbuf);
-	free(tmpbuf);
+	do_squit (argv[0], argv[2]);
 }
 
 static void
