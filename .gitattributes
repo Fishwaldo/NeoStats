@@ -44,6 +44,8 @@ dl/statserv/statserv.c -text
 dl/statserv/statserv.h -text
 dl/version/Makefile.in -text
 dl/version/version.c -text
+/dll_main.c -text
+/dll_main.h -text
 doc/FAQ -text
 doc/USERMAN -text
 doc/read-faq -text
@@ -51,6 +53,7 @@ doc/read-userman -text
 /dotconf.c -text
 /dotconf.h -text
 /ircd.c -text
+/linklist.h -text
 /main.c -text
 /ns_help.c -text
 /services.c -text
