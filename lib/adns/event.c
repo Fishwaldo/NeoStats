@@ -405,7 +405,7 @@ int adns__pollfds(adns_state ads, struct pollfd pollfds_buf[MAX_POLLFDS])
 	return 2;
 }
 
-int adns_processreadable(adns_state ads, int fd, const struct timeval *now)
+int adns_processreadable(adns_state ads, ADNS_SOCKET fd, const struct timeval *now)
 {
 	int want, dgramlen, r, udpaddrlen, serv, old_skip;
 	byte udpbuf[DNS_MAXUDP];
@@ -552,7 +552,7 @@ int adns_processreadable(adns_state ads, int fd, const struct timeval *now)
 	return r;
 }
 
-int adns_processwriteable(adns_state ads, int fd,
+int adns_processwriteable(adns_state ads, ADNS_SOCKET fd,
 			  const struct timeval *now)
 {
 	int r;
@@ -641,7 +641,7 @@ int adns_processwriteable(adns_state ads, int fd,
 	return r;
 }
 
-int adns_processexceptional(adns_state ads, int fd,
+int adns_processexceptional(adns_state ads, ADNS_SOCKET fd,
 			    const struct timeval *now)
 {
 	adns__consistency(ads, 0, cc_entex);

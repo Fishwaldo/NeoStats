@@ -37,11 +37,8 @@
 #include "adns_win32.h"
 #else
 #include <stdio.h>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <unistd.h>
 
+#include <sys/types.h>
 # define ADNS_API
 # define ADNS_SOCKET int
 # define adns_socket_close(sck) close(sck)
@@ -117,7 +114,6 @@ typedef enum {
   adns_r_rp=                    adns_r_rp_raw|adns__qtf_mail822,
 
   adns_r_addr=                  adns_r_a|adns__qtf_deref
-  
 } adns_rrtype;
 
 /*
@@ -237,7 +233,6 @@ typedef enum {
   adns_s_nodata,
 
   adns_s_max_permfail= 499
-  
 } adns_status;
 
 typedef struct {
@@ -833,9 +828,6 @@ ADNS_API const char *adns_errtypeabbrev(adns_status st);
  * string XXX.  You MUST NOT call these functions with status values
  * not returned by the same adns library.
  */
-
-
-
 
 #ifdef __cplusplus
 } /* end of extern "C" */

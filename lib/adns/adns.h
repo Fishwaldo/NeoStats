@@ -301,11 +301,6 @@ extern "C" {			/* I really dislike this - iwj. */
 		} rrs;
 	} adns_answer;
 
-
-/* this is called when there is a update for a socket */
-typedef void (*fd_update) (int fd, short what);
-void set_fdupdate(adns_state ads, fd_update func);
-
 /* Memory management:
  *  adns_state and adns_query are actually pointers to malloc'd state;
  *  On submission questions are copied, including the owner domain;
@@ -338,13 +333,18 @@ void set_fdupdate(adns_state ads, fd_update func);
  *  0, otherwise it will be >0.  type will always be the type
  *  requested.
  */
+/* this is called when there is a update for a socket */
+typedef void (*fd_update) (int fd, short what);
+ADNS_API void set_fdupdate(adns_state ads, fd_update func);
 
-	int adns_init(adns_state * newstate_r, adns_initflags flags,
+
+
+
+ADNS_API int adns_init(adns_state *newstate_r, adns_initflags flags,
 		      FILE * diagfile /*0=>stderr */, fd_update func );
 
-	int adns_init_strcfg(adns_state * newstate_r, adns_initflags flags,
-			     FILE * diagfile /*0=>discard */ ,
-			     const char *configtext);
+ADNS_API int adns_init_strcfg(adns_state *newstate_r, adns_initflags flags,
+		     FILE *diagfile /*0=>discard*/, const char *configtext);
 
 /* Configuration:
  *  adns_init reads /etc/resolv.conf, which is expected to be (broadly
@@ -446,7 +446,7 @@ void set_fdupdate(adns_state ads, fd_update func);
  *   line in resolv.conf.
  */
 
-	int adns_synchronous(adns_state ads,
+ADNS_API int adns_synchronous(adns_state ads,
 			     const char *owner,
 			     adns_rrtype type,
 			     adns_queryflags flags,
@@ -457,28 +457,32 @@ void set_fdupdate(adns_state ads, fd_update func);
  * processing functions to actually get things to happen.
  */
 
-	int adns_submit(adns_state ads,
+ADNS_API int adns_submit(adns_state ads,
 			const char *owner,
 			adns_rrtype type,
 			adns_queryflags flags,
-			void *context, adns_query * query_r);
+		void *context,
+		adns_query *query_r);
 
 /* The owner should be quoted in master file format. */
 
-	int adns_check(adns_state ads,
+ADNS_API int adns_check(adns_state ads,
 		       adns_query * query_io,
-		       adns_answer ** answer_r, void **context_r);
+	       adns_answer **answer_r,
+	       void **context_r);
 
-	int adns_wait(adns_state ads,
+ADNS_API int adns_wait(adns_state ads,
 		      adns_query * query_io,
-		      adns_answer ** answer_r, void **context_r);
+	      adns_answer **answer_r,
+	      void **context_r);
 
 /* same as adns_wait but uses poll(2) internally */
-	int adns_wait_poll(adns_state ads,
+ADNS_API int adns_wait_poll(adns_state ads,
 			   adns_query * query_io,
-			   adns_answer ** answer_r, void **context_r);
+		   adns_answer **answer_r,
+		   void **context_r);
 
-	void adns_cancel(adns_query query);
+ADNS_API void adns_cancel(adns_query query);
 
 /* The adns_query you get back from _submit is valid (ie, can be
  * legitimately passed into adns functions) until it is returned by
@@ -492,36 +496,37 @@ void set_fdupdate(adns_state ads, fd_update func);
  * query type.
  */
 
-	int adns_submit_reverse(adns_state ads,
+ADNS_API int adns_submit_reverse(adns_state ads,
 				const struct sockaddr *addr,
 				adns_rrtype type,
 				adns_queryflags flags,
-				void *context, adns_query * query_r);
+			void *context,
+			adns_query *query_r);
 /* type must be _r_ptr or _r_ptr_raw.  _qf_search is ignored.
  * addr->sa_family must be AF_INET or you get ENOSYS.
  */
 
-	int adns_submit_reverse_any(adns_state ads,
+ADNS_API int adns_submit_reverse_any(adns_state ads,
 				    const struct sockaddr *addr,
 				    const char *rzone,
 				    adns_rrtype type,
 				    adns_queryflags flags,
-				    void *context, adns_query * query_r);
+			    void *context,
+			    adns_query *query_r);
 /* For RBL-style reverse `zone's; look up
  *   <reversed-address>.<zone>
  * Any type is allowed.  _qf_search is ignored.
  * addr->sa_family must be AF_INET or you get ENOSYS.
  */
 
-	void adns_finish(adns_state ads);
+ADNS_API void adns_finish(adns_state ads);
 /* You may call this even if you have queries outstanding;
  * they will be cancelled.
  */
 
 
-	void adns_forallqueries_begin(adns_state ads);
-	adns_query adns_forallqueries_next(adns_state ads,
-					   void **context_r);
+ADNS_API void adns_forallqueries_begin(adns_state ads);
+ADNS_API adns_query adns_forallqueries_next(adns_state ads, void **context_r);
 /* Iterator functions, which you can use to loop over the outstanding
  * (submitted but not yet successfuly checked/waited) queries.
  *
@@ -537,7 +542,7 @@ void set_fdupdate(adns_state ads, fd_update func);
  * context_r may be 0.  *context_r may not be set when _next returns 0.
  */
 
-	void adns_checkconsistency(adns_state ads, adns_query qu);
+ADNS_API  void adns_checkconsistency(adns_state ads, adns_query qu);
 /* Checks the consistency of adns's internal data structures.
  * If any error is found, the program will abort().
  * You may pass 0 for qu; if you pass non-null then additional checks
@@ -569,19 +574,16 @@ void set_fdupdate(adns_state ads, fd_update func);
  * blocking, or you may not have an up-to-date list of it's fds.
  */
 
-	int adns_processany(adns_state ads);
+ADNS_API int adns_processany(adns_state ads);
 /* Gives adns flow-of-control for a bit.  This will never block, and
  * can be used with any threading/asynch-io model.  If some error
  * occurred which might cause an event loop to spin then the errno
  * value is returned.
  */
 
-	int adns_processreadable(adns_state ads, int fd,
-				 const struct timeval *now);
-	int adns_processwriteable(adns_state ads, int fd,
-				  const struct timeval *now);
-	int adns_processexceptional(adns_state ads, int fd,
-				    const struct timeval *now);
+ADNS_API int adns_processreadable(adns_state ads, ADNS_SOCKET fd, const struct timeval *now);
+ADNS_API int adns_processwriteable(adns_state ads, ADNS_SOCKET fd, const struct timeval *now);
+ADNS_API int adns_processexceptional(adns_state ads, ADNS_SOCKET fd, const struct timeval *now);
 /* Gives adns flow-of-control so that it can process incoming data
  * from, or send outgoing data via, fd.  Very like _processany.  If it
  * returns zero then fd will no longer be readable or writeable
@@ -600,8 +602,7 @@ void set_fdupdate(adns_state ads, fd_update func);
  * then the errno value is returned.
  */
 
-	void adns_processtimeouts(adns_state ads,
-				  const struct timeval *now);
+ADNS_API void adns_processtimeouts(adns_state ads, const struct timeval *now);
 /* Gives adns flow-of-control so that it can process any timeouts
  * which might have happened.  Very like _processreadable/writeable.
  *
@@ -609,9 +610,9 @@ void set_fdupdate(adns_state ads, fd_update func);
  * obtained from gettimeofday.
  */
 
-	void adns_firsttimeout(adns_state ads,
-			       struct timeval **tv_mod,
-			       struct timeval *tv_buf, struct timeval now);
+ADNS_API void adns_firsttimeout(adns_state ads,
+		       struct timeval **tv_mod, struct timeval *tv_buf,
+		       struct timeval now);
 /* Asks adns when it would first like the opportunity to time
  * something out.  now must be the current time, from gettimeofday.
  * 
@@ -628,7 +629,7 @@ void set_fdupdate(adns_state ads, fd_update func);
  * is using.  It always succeeds and never blocks.
  */
 
-	void adns_globalsystemfailure(adns_state ads);
+ADNS_API void adns_globalsystemfailure(adns_state ads);
 /* If serious problem(s) happen which globally affect your ability to
  * interact properly with adns, or adns's ability to function
  * properly, you or adns can call this function.
@@ -647,10 +648,9 @@ void set_fdupdate(adns_state ads, fd_update func);
  * Entrypoints for select-loop based asynch io:
  */
 
-	void adns_beforeselect(adns_state ads, int *maxfd,
-			       fd_set * readfds, fd_set * writefds,
-			       fd_set * exceptfds, struct timeval **tv_mod,
-			       struct timeval *tv_buf,
+ADNS_API void adns_beforeselect(adns_state ads, int *maxfd, fd_set *readfds,
+		       fd_set *writefds, fd_set *exceptfds,
+		       struct timeval **tv_mod, struct timeval *tv_buf,
 			       const struct timeval *now);
 /* Find out file descriptors adns is interested in, and when it would
  * like the opportunity to time something out.  If you do not plan to
@@ -664,10 +664,8 @@ void set_fdupdate(adns_state ads, fd_update func);
  * finishes in _beforeselect.
  */
 
-	void adns_afterselect(adns_state ads, int maxfd,
-			      const fd_set * readfds,
-			      const fd_set * writefds,
-			      const fd_set * exceptfds,
+ADNS_API void adns_afterselect(adns_state ads, int maxfd, const fd_set *readfds,
+		      const fd_set *writefds, const fd_set *exceptfds,
 			      const struct timeval *now);
 /* Gives adns flow-of-control for a bit; intended for use after
  * select.  This is just a fancy way of calling adns_processreadable/
@@ -700,8 +698,7 @@ void set_fdupdate(adns_state ads, fd_update func);
  * entrypoints will not be defined in libadns.  Sorry !
  */
 
-	int adns_beforepoll(adns_state ads, struct pollfd *fds,
-			    int *nfds_io, int *timeout_io,
+ADNS_API int adns_beforepoll(adns_state ads, struct pollfd *fds, int *nfds_io, int *timeout_io,
 			    const struct timeval *now);
 /* Finds out which fd's adns is interested in, and when it would like
  * to be able to time things out.  This is in a form suitable for use
@@ -753,17 +750,17 @@ void set_fdupdate(adns_state ads, fd_update func);
  * require more space than this.
  */
 
-	void adns_afterpoll(adns_state ads, const struct pollfd *fds,
-			    int nfds, const struct timeval *now);
+ADNS_API void adns_afterpoll(adns_state ads, const struct pollfd *fds, int nfds,
+		    const struct timeval *now);
 /* Gives adns flow-of-control for a bit; intended for use after
  * poll(2).  fds and nfds should be the results from poll().  pollfd
  * structs mentioning fds not belonging to adns will be ignored.
  */
 
 
-	adns_status adns_rr_info(adns_rrtype type,
-				 const char **rrtname_r,
-				 const char **fmtname_r, int *len_r,
+ADNS_API adns_status adns_rr_info(adns_rrtype type,
+			 const char **rrtname_r, const char **fmtname_r,
+			 int *len_r,
 				 const void *datap, char **data_r);
 /*
  * Get information about a query type, or convert reply data to a
@@ -821,9 +818,9 @@ void set_fdupdate(adns_state ads, fd_update func);
  *  dns2.spong.dyn.ml.org timeout "DNS query timed out" ?
  */
 
-	const char *adns_strerror(adns_status st);
-	const char *adns_errabbrev(adns_status st);
-	const char *adns_errtypeabbrev(adns_status st);
+ADNS_API const char *adns_strerror(adns_status st);
+ADNS_API const char *adns_errabbrev(adns_status st);
+ADNS_API const char *adns_errtypeabbrev(adns_status st);
 /* Like strerror but for adns_status values.  adns_errabbrev returns
  * the abbreviation of the error - eg, for adns_s_timeout it returns
  * "timeout".  adns_errtypeabbrev returns the abbreviation of the
