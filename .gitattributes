@@ -218,6 +218,7 @@ dl/statserv/database.c -text
 dl/statserv/html/index.tpl -text
 dl/statserv/htmlstats.c -text
 dl/statserv/m_stats.h -text
+dl/statserv/sqlstats.h -text
 dl/statserv/ss_help.c -text
 dl/statserv/stats.c -text
 dl/statserv/statserv.c -text

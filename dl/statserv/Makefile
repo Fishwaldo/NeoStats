@@ -33,7 +33,7 @@ dist:	$(DISTFILES)
 
 
 $(OBJECTS): Makefile
-statserv.o:		statserv.c	ss_help.c	statserv.h 
+statserv.o:		statserv.c	ss_help.c	statserv.h  sqlstats.h
 ss_help.o:	ss_help.c	statserv.h
 database.o:	database.c	statserv.h
 tld.o:		tld.c	statserv.h

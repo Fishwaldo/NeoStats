@@ -27,6 +27,10 @@
 #include "dl.h"
 #include "stats.h"
 #include "statserv.h"
+#ifdef SQLSRV
+#include "sqlsrv/rta.h"
+#include "sqlstats.h"
+#endif
 #include "log.h"
 #include "conf.h"
 
@@ -138,6 +142,7 @@ int __ModInit(int modnum, int apiver)
 	User *u;
 	hnode_t *node;
 	hscan_t scan;
+	lnode_t *lnode;
 	int count, i;
 	Chans *c;
 	char **av;
@@ -213,6 +218,36 @@ int __ModInit(int modnum, int apiver)
 			}
 		}
 	}
+
+#ifdef SQLSRV
+	/* ok, now export the server and chan data into the sql emulation layers */
+
+	/* for the network and daily stats, we use a fake list, so we can easily import into rta */
+
+	fakedaily = list_create(-1);
+	lnode = lnode_create(&daily);
+	list_append(fakedaily, lnode);
+	fakenetwork = list_create(-1);
+	lnode = lnode_create(&stats_network);
+	list_append(fakenetwork, lnode);
+	
+	/* find the address of each list/hash, and export to rta */
+	 
+	statserv_chans.address = Chead;
+	rta_add_table(&statserv_chans);
+	statserv_servers.address = Shead;
+	rta_add_table(&statserv_servers);
+	statserv_versions.address = Vhead;
+	rta_add_table(&statserv_versions);
+	statserv_network.address = fakenetwork;
+	rta_add_table(&statserv_network);
+	statserv_daily.address = fakedaily;
+	rta_add_table(&statserv_daily);
+	
+
+
+
+#endif
 	return 1;
 }
 
