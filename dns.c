@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dns.c,v 1.5 2002/09/04 08:40:26 fishwaldo Exp $
+** $Id: dns.c,v 1.6 2002/09/04 08:42:06 fishwaldo Exp $
 */
 
 
@@ -62,6 +62,8 @@ int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_a
 	DnsLookup *dnsdata;
 	int status;
 	struct sockaddr_in sa;
+
+	strcpy(segv_location, "dns_lookup");
 
 	if (list_isfull(dnslist)) {
 #ifdef DEBUG
@@ -114,6 +116,8 @@ int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_a
 int init_dns() {
 	int adnsstart;
 
+	strcpy(segv_location, "init_dns");
+
 	dnslist = list_create(DNS_QUEUE_SIZE);
 	if (!dnslist)
 		return 0;
@@ -146,6 +150,8 @@ void do_dns() {
 	lnode_t *dnsnode, *dnsnode1;
 	int status;
 	DnsLookup *dnsdata;
+
+	strcpy(segv_location, "do_dns");
 
 	/* if the list is empty, no use doing anything */
 	if (list_isempty(dnslist))

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: timer.c,v 1.17 2002/09/04 08:40:27 fishwaldo Exp $
+** $Id: timer.c,v 1.18 2002/09/04 08:42:06 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -49,8 +49,16 @@ void chk()
 	while ((tn = hash_scan_next(&ts)) != NULL) {
 		mod_ptr = hnode_get(tn); 
 		if (current - mod_ptr->lastrun > mod_ptr->interval) {
-			mod_ptr->function();
-			mod_ptr->lastrun = time(NULL);
+			strcpy(segv_location, mod_ptr->info->module_name);
+			strcpy(segvinmodule, mod_ptr->info->module_name);
+			if (setjmp(sigvbuf) == 0) {
+				mod_ptr->function();
+				mod_ptr->lastrun = time(NULL);
+			} else {
+				log("setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
+			}
+			strcpy(segvinmodule, "");
+			strcpy(segv_location, "Module_Event_Return");
 		}
 	}
 

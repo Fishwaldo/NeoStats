@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.24 2002/08/20 09:30:37 fishwaldo Exp $
+# $Id: Makefile.in,v 1.25 2002/09/04 08:42:06 fishwaldo Exp $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
@@ -15,7 +15,7 @@ CONF = neostats.cfg.dist
 DOCS = doc/FAQ doc/USERMAN README BUGS AUTHORS COPYING INSTALL LICENCE NEWS TODO
 DOCS_PROGS = doc/read-faq doc/read-userman
 DATA = data/tlds.nfo
-INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h Unreal.h adns/adns.h
+INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h Unreal.h adns/adns.h hybrid7.h
 
 .c.o:
 	$(CC) $(NEOINCLUDES) $(CFLAGS) -c $< 2>> make.log
