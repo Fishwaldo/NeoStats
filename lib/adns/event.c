@@ -456,7 +456,7 @@ int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now
 			r = adns_socket_read(ads->tcpsocket,
 				 ads->tcprecv.buf + ads->tcprecv.used,
 				 ads->tcprecv.avail - ads->tcprecv.used);
-	  ADNS_CAPTURE_ERRNO;
+			ADNS_CAPTURE_ERRNO;
 			if (r > 0) {
 				ads->tcprecv.used += r;
 			} else {
@@ -486,10 +486,10 @@ int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now
 	if (fd == ads->udpsocket) {
 		for (;;) {
 			udpaddrlen = sizeof(udpaddr);
-	  ADNS_CLEAR_ERRNO;
-      r= recvfrom(ads->udpsocket,udpbuf,sizeof(udpbuf),0,
-		  (struct sockaddr*)&udpaddr,&udpaddrlen);
-	  ADNS_CAPTURE_ERRNO;
+			ADNS_CLEAR_ERRNO;
+			r= recvfrom(ads->udpsocket,udpbuf,sizeof(udpbuf),0,
+				(struct sockaddr*)&udpaddr,&udpaddrlen);
+			ADNS_CAPTURE_ERRNO;
 			if (r < 0) {
 				if (errno == EAGAIN
 				    || errno == EWOULDBLOCK) {
@@ -566,11 +566,11 @@ int adns_processwriteable(adns_state ads, OS_SOCKET fd,
 		assert(ads->tcprecv.used == 0);
 		assert(ads->tcprecv_skip == 0);
 		for (;;) {
-      if (!adns__vbuf_ensure(&ads->tcprecv,1)) { r= ENOMEM; goto xit; }
-	  ADNS_CLEAR_ERRNO;
+			if (!adns__vbuf_ensure(&ads->tcprecv,1)) { r= ENOMEM; goto xit; }
+			ADNS_CLEAR_ERRNO;
 			r = adns_socket_read(ads->tcpsocket, &ads->tcprecv.buf, 1);
-	  ADNS_CAPTURE_ERRNO;
-      if (r==0 || (r<0 && (errno==EAGAIN || errno==EWOULDBLOCK))) {
+			ADNS_CAPTURE_ERRNO;
+			if (r==0 || (r<0 && (errno==EAGAIN || errno==EWOULDBLOCK))) {
 				tcp_connected(ads, *now);
 				r = 0;
 				goto xit;
@@ -597,9 +597,9 @@ int adns_processwriteable(adns_state ads, OS_SOCKET fd,
 			break;
 		while (ads->tcpsend.used) {
 			adns__sigpipe_protect(ads);
-	  ADNS_CLEAR_ERRNO;
-      r= adns_socket_write(ads->tcpsocket,ads->tcpsend.buf,ads->tcpsend.used);
-	  ADNS_CAPTURE_ERRNO;
+			ADNS_CLEAR_ERRNO;
+			r= adns_socket_write(ads->tcpsocket,ads->tcpsend.buf,ads->tcpsend.used);
+			ADNS_CAPTURE_ERRNO;
 			adns__sigpipe_unprotect(ads);
 			if (r < 0) {
 				if (errno == EINTR)
@@ -880,9 +880,9 @@ int adns_wait(adns_state ads,
 		adns_beforeselect(ads, &maxfd, &readfds, &writefds,
 				  &exceptfds, &tvp, &tvbuf, 0);
 		assert(tvp);
-	ADNS_CLEAR_ERRNO;
+		ADNS_CLEAR_ERRNO;
 		rsel = select(maxfd, &readfds, &writefds, &exceptfds, tvp);
-	ADNS_CAPTURE_ERRNO;
+		ADNS_CAPTURE_ERRNO;
 		if (rsel == -1) {
 			if (errno == EINTR) {
 				if (ads->iflags & adns_if_eintr) {
