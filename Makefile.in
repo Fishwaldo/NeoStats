@@ -42,7 +42,7 @@ DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) \
 distdir = @PACKAGE@-@VERSION@
 SUBDIRS = doc doc/old data adns logs keeper tools tools/cfgtool \
 		tools/cfgtool/pixmaps pcre
-DISTMOD = cs extauth hostserv loveserv ms spam statserv version template
+DISTMOD = cs extauth hostserv loveserv ms statserv template
 
 .c.o:
 	$(CC) $(NEOINCLUDES) $(CFLAGS) -c $< 
