@@ -9,6 +9,7 @@
 /Config -text
 /INSTNOTES -text
 /INSTNOTES.svn -text
+/Makefile -text
 /README -text
 /RELNOTES -text
 /TODO -text
