@@ -38,7 +38,6 @@ distclean:
 # Module makefile can optionally specify DATA for data files to install
 install: $(TARGET)
 	$(INSTALL_MOD) $(TARGET) $(MODDIRECTORY)
-	$(INSTALL_DATA) $(DATA) $(DATADIRECTORY)
 
 # How to create dist of this module
 # Module makefile must supply DISTFILES with the files to be distributed 

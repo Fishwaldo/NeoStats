@@ -8,3 +8,8 @@ DISTFILES = $(SRCS) $(DATA) ChangeLog statserv.h m_stats.h Makefile sqlstats.h \
 SUBDIRS = html
 
 include ../Makefile.inc
+
+install: $(TARGET)
+	$(INSTALL_MOD) $(TARGET) $(MODDIRECTORY)
+	$(INSTALL_DATA) $(DATA) $(DATADIRECTORY)
+
