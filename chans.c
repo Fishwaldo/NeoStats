@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.23 2002/06/10 06:03:13 fishwaldo Exp $
+** $Id: chans.c,v 1.24 2002/06/19 12:25:47 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -236,7 +236,9 @@ void part_chan(User *u, char *chan) {
 			EM->fndata[0] = c;
 			EM->fc = 1;
 			Module_Event("DELCHAN", EM);
-			free(EM);
+			EM->fndata[0] = NULL;
+			EM->fc = 0;
+//			free(EM);
 			del_chan(c);
 		}
 		un = list_find(u->chans, c->name, comparef);
@@ -304,7 +306,9 @@ void join_chan(User *u, char *chan) {
 		EM->fndata[0] = c;
 		EM->fc = 1;
 		Module_Event("NEWCHAN", EM);
-		free(EM);
+		EM->fndata[0] = NULL;
+		EM->fc = 0;
+//		free(EM);
 	} 
 	/* add this users details to the channel members hash */	
 	cm = malloc(sizeof(Chanmem));
@@ -339,6 +343,7 @@ void join_chan(User *u, char *chan) {
 #ifdef DEBUG
 	log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
 #endif
+	chandump(c->name);
 }
 
 void chandump(char *chan) {

@@ -166,7 +166,7 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 
 	sts(":%s %s %s %s %s %lu", who, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args, time(NULL));
 	tmp = malloc(512);
-	sprintf(tmp, "%s %s %s", chan, mode, args);
+	sprintf(tmp, "MODE %s %s %s", chan, mode, args);
 	EM = split_buf(tmp, 0);
 	ChanMode("", EM->av, EM->ac);
 	FreeList(EM->av, EM->ac);
