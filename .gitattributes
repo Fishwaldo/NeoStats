@@ -60,7 +60,6 @@ dl/hostserv/ChangeLog -text
 dl/hostserv/Makefile -text
 dl/hostserv/README -text
 dl/hostserv/hostserv.c -text
-dl/hostserv/hostserv.h -text
 dl/hostserv/hs_help.c -text
 dl/icq/DOESNOTCOMPILE -text
 dl/icq/Makefile -text
