@@ -73,13 +73,11 @@ ConnectTo (char *host, int port)
 	}
 
 	if ((hp = gethostbyname (host)) == NULL) {
-		printf("1\n");
 		return NS_FAILURE;
 	}
 
 	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0) {
 		return NS_FAILURE;
-		printf("2\n");
 	}
 	if (dobind > 0) {
 		if (bind (s, (struct sockaddr *) &lsa, sizeof (lsa)) < 0) {
@@ -94,7 +92,6 @@ ConnectTo (char *host, int port)
 
 	ret=connect (s, (struct sockaddr *) &sa, sizeof (sa));
 	if (ret< 0) {
-		printf("%d %x\n",errno,ret);
 		close (s);
 		return NS_FAILURE;
 	}
