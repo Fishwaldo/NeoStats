@@ -1,0 +1,368 @@
+#!/bin/sh
+###########################################################################
+
+#IRCD vars
+IRCD_DEFAULT="no default"
+IRCD=
+
+#module vars
+MODULELIST=""
+MSTATSERV=1
+MSPAM=0
+MVERSION=0
+MLOVESERV=1
+MHOSTSERV=1
+MMORALESERV=1
+MCONNECTSERV=1
+HAVEMOD=0
+HAVEMODS=0
+
+###########################################################################
+
+echo_no_lf () 
+{
+	$ECHO_NO_LF "$*$ECHO_NO_LF_SUFFIX"	# these are defined later
+}
+
+ECHO_NO_LF_SUFFIX=''
+if [ "`echo -n a ; echo -n b`" = "ab" ] ; then
+	ECHO_NO_LF='echo -n'
+elif [ "`echo 'a\c' ; echo 'b\c'`" = "ab" ] ; then
+	ECHO_NO_LF='echo' ; ECHO_NO_LF_SUFFIX='\c'
+elif [ "`printf 'a' 2>&1 ; printf 'b' 2>&1`" = "ab" ] ; then
+	ECHO_NO_LF='printf "%s"'
+else
+	# oh well...
+	ECHO_NO_LF='echo'
+fi
+export ECHO_NO_LF ECHO_NO_LF_SUFFIX
+
+###########################################################################
+# select IRCd
+validselection=0
+echo "Which IRC server do you use?"
+echo "     1) Unreal IRCD"
+echo "     2) Ultimate 2.x.x"
+echo "     3) Ultimate 3.x.x"
+echo "     4) Hybrid7 IRCD"
+echo "     5) NeoIRCd IRCD"
+while [ $validselection -eq 0 ] ; do
+	echo_no_lf "[$IRCD_DEFAULT] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$IRCD_DEFAULT
+	fi
+	case $INPUT in
+		no\ default)
+			echo "You must specify your IRC server type in order for NeoStats to function"
+			echo "correctly."
+			;;
+		1)
+ 			IRCD="--enable-unreal"
+			validselection=1
+			;;
+		2)
+			IRCD="--enable-ultimate2"
+			validselection=1
+			;;
+		3)
+			IRCD="--enable-ultimate3"
+			validselection=1
+			;;
+		4)
+			IRCD="--enable-hybrid7 --enable-auth=sr"
+			validselection=1
+			;;
+		5)
+			IRCD="--enable-neoircd"
+			validselection=1
+			;;
+		*)
+			echo "Please enter a valid option number."
+			;;
+	esac
+done
+IRCD_DEFAULT=$INPUT
+echo ""
+
+####
+
+###########################################################################
+#module selection
+validselection=0
+
+if [ "$MSTATSERV" = 1 ] ; then
+	YN_DEFAULT=yes
+else
+	YN_DEFAULT=no
+fi
+
+echo "Do you want to build StatServ?"
+while [ $validselection -eq 0 ] ; do
+	echo_no_lf "[$YN_DEFAULT] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$YN_DEFAULT
+	fi
+	case $INPUT in
+		n*|N*)
+			MSTATSERV=0
+			validselection=1
+			;;
+		y*|Y*)
+			MSTATSERV=1
+			HAVEMODS=1
+			validselection=1
+			;;
+		*)
+			echo 'Please enter "yes" or "no".'
+			;;
+	esac
+done
+echo ""
+
+if [ "$MSPAM" = 1 ] ; then
+	YN_DEFAULT=yes
+else
+	YN_DEFAULT=no
+fi
+
+validselection=0
+echo "Do you want to build spam?"
+while [ $validselection -eq 0 ] ; do
+	echo_no_lf "[$YN_DEFAULT] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$YN_DEFAULT
+	fi
+	case $INPUT in
+		n*|N*)
+			MSPAM=0
+			validselection=1
+			;;
+		y*|Y*)
+			MSPAM=1
+			HAVEMODS=1
+			validselection=1
+			;;
+		*)
+			echo 'Please enter "yes" or "no".'
+			;;
+	esac
+done
+echo ""
+
+if [ "$MVERSION" = 1 ] ; then
+	YN_DEFAULT=yes
+else
+	YN_DEFAULT=no
+fi
+
+validselection=0
+echo "Do you want to build version?"
+while [ $validselection -eq 0 ] ; do
+	echo_no_lf "[$YN_DEFAULT] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$YN_DEFAULT
+	fi
+	case $INPUT in
+		n*|N*)
+			MVERSION=0
+			validselection=1
+			;;
+		y*|Y*)
+			MVERSION=1
+			HAVEMODS=1
+			validselection=1
+			;;
+		*)
+			echo 'Please enter "yes" or "no".'
+			;;
+	esac
+done
+echo ""
+
+if [ "$MLOVESERV" = 1 ] ; then
+	YN_DEFAULT=yes
+else
+	YN_DEFAULT=no
+fi
+
+validselection=0
+echo "Do you want to build LoveServ?"
+while [ $validselection -eq 0 ] ; do
+	echo_no_lf "[$YN_DEFAULT] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$YN_DEFAULT
+	fi
+	case $INPUT in
+		n*|N*)
+			MLOVESERV=0
+			validselection=1
+			;;
+		y*|Y*)
+			MLOVESERV=1
+			HAVEMODS=1
+			validselection=1
+			;;
+		*)
+			echo 'Please enter "yes" or "no".'
+			;;
+	esac
+done
+echo ""
+
+if [ "$MHOSTSERV" = 1 ] ; then
+	YN_DEFAULT=yes
+else
+	YN_DEFAULT=no
+fi
+
+validselection=0
+echo "Do you want to build HostServ?"
+while [ $validselection -eq 0 ] ; do
+	echo_no_lf "[$YN_DEFAULT] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$YN_DEFAULT
+	fi
+	case $INPUT in
+		n*|N*)
+			MHOSTSERV=0
+			validselection=1
+			;;
+		y*|Y*)
+			MHOSTSERV=1
+			HAVEMODS=1
+			validselection=1
+			;;
+		*)
+			echo 'Please enter "yes" or "no".'
+			;;
+	esac
+done
+echo ""
+
+if [ "$MMORALESERV" = 1 ] ; then
+	YN_DEFAULT=yes
+else
+	YN_DEFAULT=no
+fi
+
+validselection=0
+echo "Do you want to build MoraleServ?"
+while [ $validselection -eq 0 ] ; do
+	echo_no_lf "[$YN_DEFAULT] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$YN_DEFAULT
+	fi
+	case $INPUT in
+		n*|N*)
+			MMORALESERV=0
+			validselection=1
+			;;
+		y*|Y*)
+			MMORALESERV=1
+			HAVEMODS=1
+			validselection=1
+			;;
+		*)
+			echo 'Please enter "yes" or "no".'
+			;;
+	esac
+done
+echo ""
+
+if [ "$MCONNECTSERV" = 1 ] ; then
+	YN_DEFAULT=yes
+else
+	YN_DEFAULT=no
+fi
+
+validselection=0
+echo "Do you want to build ConnectServ?"
+while [ $validselection -eq 0 ] ; do
+	echo_no_lf "[$YN_DEFAULT] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$YN_DEFAULT
+	fi
+	case $INPUT in
+		n*|N*)
+			MCONNECTSERV=0
+			validselection=1
+			;;
+		y*|Y*)
+			MCONNECTSERV=1
+			HAVEMODS=1
+			validselection=1
+			;;
+		*)
+			echo 'Please enter "yes" or "no".'
+			;;
+	esac
+done
+echo ""
+
+if [ "$HAVEMODS" = 1 ] ; then
+
+if [ "$MSTATSERV" = 1 ] ; then
+if [ "$HAVEMOD" = 1 ] ; then
+MODULELIST="$MODULELIST "
+fi
+HAVEMOD=1
+MODULELIST=$MODULELIST"statserv"
+fi
+if [ "$MSPAM" = 1 ] ; then
+if [ "$HAVEMOD" = 1 ] ; then
+MODULELIST="$MODULELIST "
+fi
+HAVEMOD=1
+MODULELIST=$MODULELIST"spam"
+fi
+if [ "$MVERSION" = 1 ] ; then
+if [ "$HAVEMOD" = 1 ] ; then
+MODULELIST="$MODULELIST "
+fi
+HAVEMOD=1
+MODULELIST=$MODULELIST"version"
+fi
+if [ "$MLOVESERV" = 1 ] ; then
+if [ "$HAVEMOD" = 1 ] ; then
+MODULELIST="$MODULELIST "
+fi
+HAVEMOD=1
+MODULELIST=$MODULELIST"loveserv"
+fi
+if [ "$MHOSTSERV" = 1 ] ; then
+if [ "$HAVEMOD" = 1 ] ; then
+MODULELIST="$MODULELIST "
+fi
+HAVEMOD=1
+MODULELIST=$MODULELIST"hostserv"
+fi
+if [ "$MMORALESERV" = 1 ] ; then
+if [ "$HAVEMOD" = 1 ] ; then
+MODULELIST="$MODULELIST "
+fi
+HAVEMOD=1
+MODULELIST=$MODULELIST"ms"
+fi
+if [ "$MCONNECTSERV" = 1 ] ; then
+if [ "$HAVEMOD" = 1 ] ; then
+MODULELIST="$MODULELIST "
+fi
+HAVEMOD=1
+MODULELIST=$MODULELIST"cs"
+fi
+
+fi
+###########################################################################
+#print ./configure line
+#echo ./configure $IRCD --enable-modules="$MODULELIST"
+./configure $IRCD --enable-modules="$MODULELIST"
+
+###########################################################################
