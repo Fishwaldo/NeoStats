@@ -648,10 +648,6 @@ int pong(char **av, int ac)
 		return -1;
 
 
-	if (StatServ.exclusions && IsExcluded(s)) {
-		return -1;
-	}
-
 	ss = findstats(s->name);
 	if (!ss)
 		return -1;
