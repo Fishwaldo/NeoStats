@@ -50,6 +50,7 @@ const char ns_help_modlist_oneline[]="List loaded modules";
 const char ns_help_userdump_oneline[]="Debug user table";
 const char ns_help_chandump_oneline[]="Debug channel table";
 const char ns_help_serverdump_oneline[]="Debug server table";
+const char ns_help_bandump_oneline[]="Debug Ban table";
 
 const char *ns_help_level[] = {
 	"Syntax: \2LEVEL [nick]\2",
@@ -192,6 +193,14 @@ const char *ns_help_serverdump[] = {
 	"the services channel. Only useful for debugging Neostats",
 	"If name is passed, only the information for that server is",
 	"returned, otherwise the entire server list is dumped.",
+	NULL
+};
+
+const char *ns_help_bandump[] = {
+	"Syntax: \2BANDUMP\2",
+	"",
+	"When in debug mode, Neostats will echo its ban table to",
+	"the services channel. Only useful for debugging Neostats",
 	NULL
 };
 

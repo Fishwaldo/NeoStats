@@ -36,6 +36,7 @@ extern const char *ns_help_debug[];
 extern const char *ns_help_userdump[];
 extern const char *ns_help_chandump[];
 extern const char *ns_help_serverdump[];
+extern const char *ns_help_bandump[];
 extern const char *ns_help_version[];
 extern const char *ns_help_load[];
 extern const char *ns_help_unload[];
@@ -71,5 +72,6 @@ extern const char ns_help_modlist_oneline[];
 extern const char ns_help_userdump_oneline[];
 extern const char ns_help_chandump_oneline[];
 extern const char ns_help_serverdump_oneline[];
+extern const char ns_help_bandump_oneline[];
 
 #endif /* _NS_HELP_H_ */

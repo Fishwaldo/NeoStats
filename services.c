@@ -36,6 +36,7 @@
 #include "ircd.h"
 #include "hash.h"
 #include "exclude.h"
+#include "bans.h"
 
 static int ns_set_debug (User * u, char **av, int ac);
 static int ns_shutdown (User * u, char **av, int ac);
@@ -48,6 +49,7 @@ static int ns_raw (User * u, char **av, int ac);
 #endif
 static int ns_userdump (User * u, char **av, int ac);
 static int ns_serverdump (User * u, char **av, int ac);
+static int ns_bandump(User * u, char **av, int ac);
 static int ns_chandump (User * u, char **av, int ac);
 static int ns_status (User * u, char **av, int ac);
 static int ns_version (User * u, char **av, int ac);
@@ -82,6 +84,7 @@ static bot_cmd ns_commands[]=
 	{"USERDUMP",	ns_userdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_userdump, 	ns_help_userdump_oneline},
 	{"CHANDUMP",	ns_chandump,	0, 	NS_ULEVEL_ROOT,  	ns_help_chandump, 	ns_help_chandump_oneline},
 	{"SERVERDUMP",	ns_serverdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverdump, ns_help_serverdump_oneline},
+	{"BANDUMP",	ns_bandump, 	0,	NS_ULEVEL_ROOT,		ns_help_bandump, ns_help_bandump_oneline},
 	{NULL,			NULL,			0, 	0,					NULL, 				NULL}
 };
 
@@ -340,6 +343,28 @@ ns_serverdump (User * u, char **av, int ac)
 		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump for %s!", u->nick, av[2]);
 		ServerDump (av[2]);
 	}
+   	return 1;
+}
+
+/** @brief BANDUMP command handler
+ *
+ *  Dump ban list
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
+static int
+ns_bandump (User * u, char **av, int ac)
+{
+	SET_SEGV_LOCATION();
+	if (!me.debug_mode) {
+		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
+	   	return 0;
+	}
+	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a BanDump!", u->nick);
+	BanDump();
    	return 1;
 }
 
