@@ -58,7 +58,7 @@ ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
 	PROTOCOL_SJOIN,
 	/* Protocol options negotiated at link by this IRCd */
-	PROTOCOL_TOKEN | PROTOCOL_NICKIP | PROTOCOL_NICKv2,
+	PROTOCOL_TOKEN | PROTOCOL_NICKIP | PROTOCOL_NICKv2 | PROTOCOL_SJ3,
 	/* Features supported by this IRCd */
 	FEATURE_UMODECLOAK,
 	"+oSq",
