@@ -34,7 +34,7 @@ static void ss_netstats(User *);
 static int Online(Server *);
 static int pong(Server *);
 static int s_user_away(User *);
-int *s_new_server(Server *);
+int s_new_server(Server *);
 static int s_del_server(Server *);
 static int s_new_user(User *);
 static int s_del_user(User *);
@@ -104,54 +104,48 @@ static config_option options[] = {
 
 int new_m_version(char *av, char *tmp) {
     segv_location = sstrdup("StatServ-new_m_version");
-    sts(":%s 351 %s :Module StatServ Loaded, Version: %s %s %s",me.name,av,Statserv_Info[0].module_version,version_date,version_time);
+    snumeric_cmd(351, av, "Module StatServ Loaded, Version: %s %s %s",Statserv_Info[0].module_version,version_date,version_time);
     return 0;
 }
 
 void _init() {
    Server *ss;
    User *u;
-   int i;
-
+   hnode_t *node;
+   hscan_t scan;
    segv_location = sstrdup("StatServ-_init");
 
     synced = 0;
-    if (synced) sts(":%s GLOBOPS :StatServ Module Loaded", me.name);    
+    globops(me.name, "StatServ Module Loaded");    
     LoadTLD();
     init_tld();
     LoadStats();
-       for (i=0; i < S_TABLE_SIZE; i++) {
-           for (ss = serverlist[i]; ss; ss = ss->next) {
-
-               /* do server table stuff */ 
-            s_new_server(ss);
+   hash_scan_begin(&scan, sh);
+   while ((node = hash_scan_next(&scan)) != NULL ) {
+   	ss = hnode_get(node);
+	s_new_server(ss);
 #ifdef DEBUG
             log("Added Server %s to StatServ List", ss->name);
 #endif
-        }
-       } 
-
-       for (i=0; i < U_TABLE_SIZE; i++) {
-           for (u = userlist[i]; u; u = u->next) { 
-               /* Process new user logon and user modes */
-                        s_new_user(u);
-                        s_user_modes(u);
-
+   }
+   hash_scan_begin(&scan, uh);
+   while ((node = hash_scan_next(&scan)) != NULL ) {
+   	u = hnode_get(node);
+	s_new_user(u);
+	s_user_modes(u);
 #ifdef DEBUG
             log("Adduser user %s to StatServ List", u->nick);
 #endif
-        }
-    }       
-
+   }
 }
 
 void _fini() {
     SaveStats();
-    if (synced) sts(":%s GLOBOPS :StatServ Module Unloaded", me.name);
+    if (synced) globops(me.name, "StatServ Module Unloaded");
     
 }
 
-int *s_new_server(Server *s) {
+int s_new_server(Server *s) {
     segv_location = sstrdup("StatServ-s_new_server");
 
     AddStats(s);
@@ -159,7 +153,7 @@ int *s_new_server(Server *s) {
     if (stats_network.maxservers < stats_network.servers) {
         stats_network.maxservers = stats_network.servers;
         stats_network.t_maxservers = time(NULL);
-        if (synced) sts(":%s WALLOPS :\2NEW SERVER RECORD\2 Wow, there are now %d Servers on the Network", s_StatServ, stats_network.servers); 
+        if (synced) swallops_cmd(s_StatServ, "\2NEW SERVER RECORD\2 Wow, there are now %d Servers on the Network", stats_network.servers); 
     }
     if (stats_network.servers > daily.servers) {
 	daily.servers = stats_network.servers;
@@ -222,7 +216,7 @@ static int s_user_kill(User *u) {
 }
 
 static int s_user_modes(User *u) {
-    int add = 0;
+    int add = 1;
     char *modes;
     SStats *s;
 
@@ -252,12 +246,12 @@ static int s_user_modes(User *u) {
                     if (stats_network.maxopers < stats_network.opers) {
                         stats_network.maxopers = stats_network.opers;
                         stats_network.t_maxopers = time(NULL);
-                        if (synced) sts(":%s WALLOPS :\2Oper Record\2 The Network has reached a New Record for Opers at %d", s_StatServ, stats_network.opers);
+                        if (synced) swallops_cmd(s_StatServ, "\2Oper Record\2 The Network has reached a New Record for Opers at %d", stats_network.opers);
                     }
                     if (s->maxopers < s->opers) {
                         s->maxopers = s->opers;
                         s->t_maxopers = time(NULL);
-                        if (synced) sts(":%s WALLOPS :\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s_StatServ, s->name, s->opers);
+                        if (synced) swallops_cmd(s_StatServ, "\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s->name, s->opers);
                     }
 		    if (s->opers > daily.opers) {
 			daily.opers = s->opers;
@@ -277,12 +271,12 @@ static int s_user_modes(User *u) {
                     if (stats_network.maxopers < stats_network.opers) {
                         stats_network.maxopers = stats_network.opers;
                         stats_network.t_maxopers = time(NULL);
-                        if (synced) sts(":%s WALLOPS :\2Oper Record\2 The Network has reached a New Record for Opers at %d", s_StatServ, stats_network.opers);
+                        if (synced) swallops_cmd(s_StatServ, "\2Oper Record\2 The Network has reached a New Record for Opers at %d", stats_network.opers);
                     }
                     if (s->maxopers < s->opers) {
                         s->maxopers = s->opers;
                         s->t_maxopers = time(NULL);
-                        if (synced) sts(":%s WALLOPS :\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s_StatServ, s->name, s->opers);
+                        if (synced) swallops_cmd(s_StatServ, "\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s->name, s->opers);
                     }                        
                     if (s->opers > daily.opers) {
                         daily.opers = s->opers;
@@ -366,13 +360,13 @@ if (u->server->name == me.name) return 0;
         /* New User Record */
         s->maxusers = s->users;
         s->t_maxusers = time(NULL);
-        if (synced) sts(":%s WALLOPS :\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!", s_StatServ, s->name, s->users);    
+        if (synced) swallops_cmd(s_StatServ, "\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!", s->name, s->users);    
     }
 
     if (stats_network.maxusers < stats_network.users) {
         stats_network.maxusers = stats_network.users;
         stats_network.t_maxusers = time(NULL);
-        if (synced) sts(":%s WALLOPS :\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %d users!", s_StatServ, stats_network.users);
+        if (synced) swallops_cmd(s_StatServ, "\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %d users!", stats_network.users);
     }
 
     if (stats_network.users > daily.users) {
@@ -474,10 +468,9 @@ void ss_cb_Config(char *arg, int configtype) {
     }
 }
     
-int __Bot_Message(char *origin, char *coreLine, int type)
+int __Bot_Message(char *origin, char **av, int ac)
 {
     User *u;
-    char *cmd;
 
     segv_location = sstrdup("StatServ-__Bot_Message");
 
@@ -492,7 +485,7 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 
     if (flood(u))
         return -1;
-    log("%s received message from %s: %s", s_StatServ, u->nick, coreLine);
+    log("%s received message from %s: %s", s_StatServ, u->nick, av[1]);
 
     if (me.onlyopers && UserLevel(u) < 40) {
         privmsg(u->nick, s_StatServ,
@@ -500,113 +493,107 @@ int __Bot_Message(char *origin, char *coreLine, int type)
         notice(s_StatServ, "%s tried to use me but is not Authorized", u->nick);
         return -1;
     }
-    if (coreLine == NULL) return -1;
-    cmd = strtok(coreLine, " ");
 
-    if (!strcasecmp(cmd, "HELP")) {
-        coreLine = strtok(NULL, " ");
-        if(!coreLine) {
+    if (!strcasecmp(av[1], "HELP")) {
+        if(ac < 3) {
             notice(s_StatServ, "%s requested %s Help", u->nick, s_StatServ);
         } else {
-          if (notify_msgs) notice(s_StatServ,"%s requested more help from %s on %s",u->nick, s_StatServ, coreLine);
+          if (notify_msgs) notice(s_StatServ,"%s requested more help from %s on %s",u->nick, s_StatServ, av[2]);
         }
-        if (!coreLine) {
+        if (ac < 3) {
             privmsg_list(u->nick, s_StatServ, ss_help);
             if (UserLevel(u) >= 150)
                 privmsg_list(u->nick, s_StatServ, ss_myuser_help);
-        } else if (!strcasecmp(coreLine, "SERVER"))
+        } else if (!strcasecmp(av[2], "SERVER"))
             privmsg_list(u->nick, s_StatServ, ss_server_help);
-        else if (!strcasecmp(coreLine, "RESET") && UserLevel(u) >= 190)
+        else if (!strcasecmp(av[2], "RESET") && UserLevel(u) >= 190)
             privmsg_list(u->nick, s_StatServ, ss_reset_help);
-        else if (!strcasecmp(coreLine, "MAP"))
+        else if (!strcasecmp(av[2], "MAP"))
             privmsg_list(u->nick, s_StatServ, ss_map_help);
-        else if (!strcasecmp(coreLine, "JOIN") && UserLevel(u) >= 190)
+        else if (!strcasecmp(av[2], "JOIN") && UserLevel(u) >= 190)
             privmsg_list(u->nick, s_StatServ, ss_join_help);
-        else if (!strcasecmp(coreLine, "NETSTATS"))
+        else if (!strcasecmp(av[2], "NETSTATS"))
             privmsg_list(u->nick, s_StatServ, ss_netstats_help);
-        else if (!strcasecmp(coreLine, "DAILY"))
+        else if (!strcasecmp(av[2], "DAILY"))
             privmsg_list(u->nick, s_StatServ, ss_daily_help);
-        else if (!strcasecmp(coreLine, "HTMLSTATS"))
+        else if (!strcasecmp(av[2], "HTMLSTATS"))
             privmsg_list(u->nick, s_StatServ, ss_htmlstats_help);
-        else if (!strcasecmp(coreLine, "FORCEHTML"))
+        else if (!strcasecmp(av[2], "FORCEHTML"))
             privmsg_list(u->nick, s_StatServ, ss_forcehtml_help);
-        else if (!strcasecmp(coreLine, "NOTICES"))
+        else if (!strcasecmp(av[2], "NOTICES"))
             privmsg_list(u->nick, s_StatServ, ss_notices_help);
-        else if (!strcasecmp(coreLine, "TLD"))
+        else if (!strcasecmp(av[2], "TLD"))
             privmsg_list(u->nick, s_StatServ, ss_tld_help);
-        else if (!strcasecmp(coreLine, "TLDMAP"))
+        else if (!strcasecmp(av[2], "TLDMAP"))
             privmsg_list(u->nick, s_StatServ, ss_tld_map_help);
-        else if (!strcasecmp(coreLine, "OPERLIST"))
+        else if (!strcasecmp(av[2], "OPERLIST"))
             privmsg_list(u->nick, s_StatServ, ss_operlist_help);
-        else if (!strcasecmp(coreLine, "BOTLIST"))
+        else if (!strcasecmp(av[2], "BOTLIST"))
             privmsg_list(u->nick, s_StatServ, ss_botlist_help);
-        else if (!strcasecmp(coreLine, "VERSION"))
+        else if (!strcasecmp(av[2], "VERSION"))
             privmsg_list(u->nick, s_StatServ, ss_version_help);
-        else if (!strcasecmp(coreLine, "STATS") && UserLevel(u) >= 190)
+        else if (!strcasecmp(av[2], "STATS") && UserLevel(u) >= 190)
             privmsg_list(u->nick, s_StatServ, ss_stats_help);
         else
-            privmsg(u->nick, s_StatServ, "Unknown Help Topic: \2%s\2", coreLine);
-    } else if (!strcasecmp(cmd, "SERVER")) {
-        cmd = strtok(NULL, " ");
-        ss_server(u, cmd);
-        if (notify_msgs) notice(s_StatServ,"%s Wanted Server Information on %s",u->nick, cmd);
-    } else if (!strcasecmp(cmd, "JOIN") && (UserLevel(u) >= 185)) {
-        cmd = strtok(NULL, " ");
-            } else if (!strcasecmp(cmd, "JOIN") && (UserLevel(u) >= 185)) {
-        cmd = strtok(NULL, " ");
-        ss_JOIN(u, cmd);
-ss_JOIN(u, cmd);
-    } else if (!strcasecmp(cmd, "MAP")) {
+            privmsg(u->nick, s_StatServ, "Unknown Help Topic: \2%s\2", av[2]);
+    } else if (!strcasecmp(av[1], "SERVER")) {
+        ss_server(u, av[2]);
+        if (notify_msgs) notice(s_StatServ,"%s Wanted Server Information on %s",u->nick, av[2]);
+    } else if (!strcasecmp(av[1], "JOIN") && (UserLevel(u) >= 185)) {
+        ss_JOIN(u, av[2]);
+    } else if (!strcasecmp(av[1], "MAP")) {
         ss_map(u);
         if (notify_msgs) notice(s_StatServ,"%s Wanted to see the Current Network MAP",u->nick);
-    } else if (!strcasecmp(cmd, "VERSION")) {
+    } else if (!strcasecmp(av[1], "VERSION")) {
         ss_version(u);
         if (notify_msgs) notice(s_StatServ,"%s Wanted to know our version number ",u->nick);
-    } else if (!strcasecmp(cmd, "NETSTATS")) {
+    } else if (!strcasecmp(av[1], "NETSTATS")) {
         ss_netstats(u);
         if (notify_msgs) notice(s_StatServ,"%s Wanted to see the NetStats ",u->nick);
-    } else if (!strcasecmp(cmd, "DAILY")) {
+    } else if (!strcasecmp(av[1], "DAILY")) {
         ss_daily(u);
         if (notify_msgs) notice(s_StatServ,"%s Wanted to see the Daily NetStats ",u->nick);
-    } else if ((!strcasecmp(cmd, "HTMLSTATS")) && (UserLevel(u) >= 185)) {
-        char *m;
-        cmd = strtok(NULL, " ");
-        m = strtok(NULL, " ");
-        ss_htmlsettings(u, cmd, m);
-    } else if (!strcasecmp(cmd, "FORCEHTML") && (UserLevel(u) >= 185)) {
+    } else if ((!strcasecmp(av[1], "HTMLSTATS")) && (UserLevel(u) >= 185)) {
+	    /* Check For Minimum Requirements */
+	    if (ac < 4) {
+	      privmsg(u->nick, s_StatServ, "HTMLSTATS Syntax Not Valid");
+	      privmsg(u->nick, s_StatServ, "For addtional help: /msg %s HELP HTMLSTATS", s_StatServ);
+	      return 1;
+	    }
+        ss_htmlsettings(u, av[2], av[3]);
+    } else if (!strcasecmp(av[1], "FORCEHTML") && (UserLevel(u) >= 185)) {
         log("%s!%s@%s Forced an update of the NeoStats Statistics HTML file with the most current statistics", u->nick, u->username, u->hostname);
         notice(s_StatServ,"%s Forced the NeoStats Statistics HTML file to be updated with the most current statistics",u->nick);
         ss_chkhtml();
-    } else if (!strcasecmp(cmd, "NOTICES") && (UserLevel(u) >= 185)) {
+    } else if (!strcasecmp(av[1], "NOTICES") && (UserLevel(u) >= 185)) {
         ss_notices(u);
-    } else if (!strcasecmp(cmd, "TLD")) {
-        cmd = strtok(NULL, " ");
-        ss_tld(u, cmd);
-        if (notify_msgs) notice(s_StatServ,"%s Wanted to find the Country that is Represented by %s ",u->nick,cmd);
-    } else if (!strcasecmp(cmd, "TLDMAP")) {
+    } else if (!strcasecmp(av[1], "TLD")) {
+        ss_tld(u, av[2]);
+        if (notify_msgs) notice(s_StatServ,"%s Wanted to find the Country that is Represented by %s ",u->nick,av[2]);
+    } else if (!strcasecmp(av[1], "TLDMAP")) {
         ss_tld_map(u);
         if (notify_msgs) notice(s_StatServ,"%s Wanted to see a Country Breakdown",u->nick);
-    } else if (!strcasecmp(cmd, "OPERLIST")) {
-        char *t;
-        cmd = strtok(NULL, " ");
-        t = strtok(NULL, " ");
-        ss_operlist(u, cmd, t);
-    } else if (!strcasecmp(cmd, "BOTLIST")) {
+    } else if (!strcasecmp(av[1], "OPERLIST")) {
+	if (ac < 4) {
+		privmsg(u->nick, s_StatServ, "OperList Syntax Not Valid");
+		privmsg(u->nick, s_StatServ, "For Help: /msg %s HELP OPERLIST", s_StatServ);
+	}
+        ss_operlist(u, av[2], av[3]);
+    } else if (!strcasecmp(av[1], "BOTLIST")) {
         ss_botlist(u);
         if (notify_msgs) notice(s_StatServ,"%s Wanted to see the Bot List",u->nick);
-    } else if (!strcasecmp(cmd, "STATS") && (UserLevel(u) >= 185)) {
-        char *t, *m;
-        m = strtok(NULL, " ");
-        cmd = strtok(NULL, " ");
-        t = strtok(NULL, " ");
-        ss_stats(u, m, cmd, t);
+    } else if (!strcasecmp(av[1], "STATS") && (UserLevel(u) >= 185)) {
+	if (ac < 5) {
+		privmsg(u->nick, s_StatServ, "Incorrect Syntax: /msg %s HELP STATS", s_StatServ);
+	}
+        ss_stats(u, av[2], av[3], av[4]);
         if (notify_msgs) notice(s_StatServ,"%s Wants to Look at my Stats!! 34/24/34",u->nick);
-    } else if (!strcasecmp(cmd, "RESET") && (UserLevel(u) >= 185)) {
+    } else if (!strcasecmp(av[1], "RESET") && (UserLevel(u) >= 185)) {
         if (notify_msgs) notice(s_StatServ,"%s Wants me to RESET the databases.. here goes..",u->nick);
         ss_reset(u);
     } else {
-        privmsg(u->nick, s_StatServ, "Unknown Command: \2%s\2", cmd);
-        if (notify_msgs) notice(s_StatServ,"%s Reqested %s, but that is a Unknown Command",u->nick,cmd);
+        privmsg(u->nick, s_StatServ, "Unknown Command: \2%s\2", av[1]);
+        if (notify_msgs) notice(s_StatServ,"%s Reqested %s, but that is a Unknown Command",u->nick,av[1]);
     }
     return 1;
 }
@@ -779,10 +766,12 @@ static void ss_tld(User *u, char *tld)
 
 static void ss_operlist(User *origuser, char *flags, char *server)
 {
-    register int i, j = 0;
+    register int j = 0;
     int away = 0;
     register User *u;
     int tech = 0;
+    hscan_t scan;
+    hnode_t *node;
 
     segv_location = sstrdup("StatServ-ss_operlist");
 
@@ -803,8 +792,9 @@ static void ss_operlist(User *origuser, char *flags, char *server)
         privmsg(origuser->nick, s_StatServ, "On-Line IRCops on Server %s", server);
         notice(s_StatServ,"%s Reqested Operlist on Server %s",origuser->nick, server);
     }
-    for (i = 0; i < U_TABLE_SIZE; i++) {
-        for (u = userlist[i]; u; u = u->next) {
+    hash_scan_begin(&scan, uh);
+    while ((node = hash_scan_next(&scan)) != NULL) {
+    	    u = hnode_get(node);
             tech = UserLevel(u);
             if (away && u->is_away)
                 continue;
@@ -826,7 +816,6 @@ static void ss_operlist(User *origuser, char *flags, char *server)
                     u->server->name, tech);
                 continue;
             }
-        }
     }
     privmsg(origuser->nick, s_StatServ, "End of Listing.");
 }
@@ -834,25 +823,26 @@ static void ss_operlist(User *origuser, char *flags, char *server)
 
 static void ss_botlist(User *origuser)
 {
-        register int i, j = 0;
+        register int j = 0;
         register User *u;
-
-    segv_location = sstrdup("StatServ-ss_botlist");
+	hscan_t scan;
+	hnode_t *node;
+        segv_location = sstrdup("StatServ-ss_botlist");
 
 
         privmsg(origuser->nick, s_StatServ, "On-Line Bots:");
-        for (i = 0; i < U_TABLE_SIZE; i++) {
-                for (u = userlist[i]; u; u = u->next) {
+	hash_scan_begin(&scan, uh);
+	while ((node = hash_scan_next(&scan)) != NULL) {
+		u = hnode_get(node);
 #ifdef UNREAL
-                        if (u->Umode & UMODE_BOT) {
+                if (u->Umode & UMODE_BOT) {
 #elif ULTIMATE
-			if ((u->Umode & UMODE_RBOT) || (u->Umode & UMODE_SBOT)) {
+		if ((u->Umode & UMODE_RBOT) || (u->Umode & UMODE_SBOT)) {
 #endif
-                                j++;
-                                privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %s",j, u->nick, u->server->name);
-                                continue;
-            }
-                }
+	                j++;
+                        privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %s",j, u->nick, u->server->name);
+                        continue;
+       		}
         }       
         privmsg(origuser->nick, s_StatServ, "End of Listing.");
 }
@@ -985,10 +975,10 @@ static void ss_JOIN(User *u, char *chan)
     }
     globops(s_StatServ, "JOINING CHANNEL -\2(%s)\2- Thanks to %s!%s@%s)", chan, u->nick, u->username, u->hostname);
     privmsg(me.chan, s_StatServ, "%s Asked me to Join %s, So, I'm Leaving %s", u->nick, chan, me.chan);
-    sts(":%s part %s", s_StatServ, me.chan);
+    spart_cmd(s_StatServ, me.chan);
     log("%s!%s@%s Asked me to Join %s, I was on %s", u->nick, u->username, u->hostname, chan, me.chan);
-    sts(":%s JOIN %s",s_StatServ,chan);
-    sts(":%s MODE %s +o %s",me.name,chan,s_StatServ);
+    sjoin_cmd(s_StatServ, chan);
+    schmode_cmd(me.name, chan, "+o", s_StatServ);
 }
 
 void DelTLD(User *u) {
@@ -1330,12 +1320,6 @@ static void ss_htmlsettings(User *u, char *cmd, char *m) {
     /* Approximate Segfault Location */
     segv_location = sstrdup("ss_htmlsettings");
 
-    /* Check For Minimum Requirements */
-    if (!cmd) {
-      privmsg(u->nick, s_StatServ, "HTMLSTATS Syntax Not Valid");
-      privmsg(u->nick, s_StatServ, "For addtional help: /msg %s HELP HTMLSTATS", s_StatServ);
-      return;
-    }
 
     if ((!strcasecmp(cmd, "ON")) && (m != NULL)) {
         fp = fopen("data/html.conf", "w");

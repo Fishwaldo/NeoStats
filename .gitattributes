@@ -72,7 +72,6 @@ dl/spam/spam.c -text
 dl/statserv/Makefile.in -text
 dl/statserv/m_stats.h -text
 dl/statserv/ss_help.c -text
-dl/statserv/stats.c -text
 dl/statserv/statserv.c -text
 dl/statserv/statserv.h -text
 dl/tstats/m_stats.h -text
