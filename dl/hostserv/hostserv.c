@@ -994,7 +994,6 @@ void CleanupHosts()
 static void LoadConfig(void)
 {
 	char *temp = NULL;
-	char *ban;
 	char *host;
 	char *host2;
 	hnode_t *hn;
@@ -1049,19 +1048,16 @@ static void LoadConfig(void)
 	if (hs_cfg.regnick < 0) {
 		 hs_cfg.regnick = 0;
 	}
-	if (GetConf((void *) &ban, CFGSTR, "UnetDomain") > 0) {
-		strlcpy(hs_cfg.vhostdom, ban, MAXHOST);
-		free(ban);
+	if (GetConf((void *) &temp, CFGSTR, "UnetDomain") > 0) {
+		strlcpy(hs_cfg.vhostdom, temp, MAXHOST);
+		free(temp);
 	} else {
 		hs_cfg.vhostdom[0] = '\0';
 	}
 		
 	/* banned vhosts */
-	ban = NULL;
-	GetConf((void *) &ban, CFGSTR, "BannedVhosts");
-	if (ban) {
-		temp = ban;
-		host = strtok(ban, ";");
+	if (GetConf((void *) &temp, CFGSTR, "BannedVhosts") >= 0) {
+		host = strtok(temp, ";");
 		while (host != NULL) {
 			/* limit host to MAXHOST and avoid unterminated/huge strings */
 			host2 = malloc(MAXHOST);
