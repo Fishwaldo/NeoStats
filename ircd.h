@@ -76,7 +76,7 @@ void ns_usr_stats (char *origin, char **argv, int argc);
 void ns_usr_pong (char *origin, char **argv, int argc);
 void ns_usr_version (char *origin, char **argv, int argc);
 void ns_srv_protocol(char *origin, char **argv, int argc);
-void server_sjoin (char* channame, char* tstime, char *modes, int offset, char *origin, char **argv, int argc);
+void handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoinchan, char **argv, int argc);
 
 /* Defined in ircd specific files but common to all */
 void init_ircd (void);

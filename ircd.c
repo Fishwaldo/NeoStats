@@ -1377,8 +1377,9 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 	return 1;
 }
 
+/* SJOIN <TS> #<channel> <modes> :[@][+]<nick_1> ...  [@][+]<nick_n> */
 void 
-server_sjoin (char* channame, char* tstime, char *modes, int offset, char *origin, char **argv, int argc)
+handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoinchan, char **argv, int argc)
 {
 	char nick[MAXNICK];
 	long mode = 0;
@@ -1390,7 +1391,7 @@ server_sjoin (char* channame, char* tstime, char *modes, int offset, char *origi
 	list_t *tl; 
 
 	if (*modes == '#') {
-		join_chan (origin, modes);
+		join_chan (sjoinchan, modes);
 		return;
 	}
 	tl = list_create (10);
