@@ -283,6 +283,7 @@ KickChannel (const char *kickby, const char *chan, const char *kicked, const cha
 	SendAllModuleEvent (EVENT_KICK, cmdparams);
 	if (IsMe (u)) {
 		/* its one of our bots */
+		cmdparams->bot = u->user->bot;
 		SendModuleEvent (EVENT_KICKBOT, cmdparams, u->user->bot->moduleptr);
 	}
 	/* If PROTOCOL_KICKPART then we will also get part so DO NOT REMOVE USER */

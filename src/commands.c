@@ -24,6 +24,7 @@
 /*  TODO:
  *  - More error processing
  *  - Configurable user levels for commands
+ *  - Make SET options use a hash to speed up lookups?
  */
 
 #include "neostats.h"

@@ -210,6 +210,7 @@ typedef enum Event {
  *    by the core
  *    parameters:
  *      user in cmdparams->source
+ *      bot in cmdparams->bot
  *      channel in cmdparams->channel
  *      reason in cmdparams->param
  */
