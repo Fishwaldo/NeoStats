@@ -46,6 +46,13 @@ const char *cs_help_set_signwatch[] = {
 	"events to the services channel.",
 	NULL
 };
+
+const char *cs_help_set_exclusions[] = {
+	"USEEXCLUSIONS <ON/OFF> whether to use the NeoStats",
+	"exclusions before displaying events",
+	NULL
+};
+
 const char *cs_help_set_killwatch[] = {
 	"KILLWATCH <ON/OFF> whether to echo kill",
 	"events to the services channel.",

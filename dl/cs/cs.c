@@ -30,6 +30,7 @@
 #include "cs.h"
 #include "log.h"
 #include "conf.h"
+#include "exclude.h"
 
 /* Uncomment this line to disable colours in ConnectServ 
    channel messages
@@ -97,6 +98,7 @@ struct cs_cfg {
 	int mode_watch;
 	int nick_watch;
 	int serv_watch;
+	int use_exc;
 	int modnum;
 	char user[MAXUSER];
 	char host[MAXHOST];
@@ -110,7 +112,7 @@ static ModUser *cs_bot;
 ModuleInfo __module_info = {
 	"ConnectServ",
 	"Network Connection & Mode Monitoring Service",
-	"1.12",
+	"$Rev$",
 	__DATE__,
 	__TIME__
 };
@@ -129,6 +131,7 @@ static bot_setting cs_settings[]=
 	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ModeWatch",	NULL,	cs_help_set_modewatch },
 	{"NICKWATCH",	&cs_cfg.nick_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "NickWatch",	NULL,	cs_help_set_nickwatch },
 	{"SERVWATCH",	&cs_cfg.serv_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ServWatch",	NULL,	cs_help_set_servwatch },
+	{"USEEXCLUSIONS", &cs_cfg.use_exc,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "Exclusions",	NULL,	cs_help_set_exclusions },
 	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
 
@@ -199,8 +202,14 @@ static int cs_new_user(char **av, int ac)
 		return 1;
 
 	u = finduser(av[0]);
+	
+	
 	if (!u) /* User not found */
 		return 1;
+
+	if (cs_cfg.use_exc && Is_Excluded(u)) 
+		return 1;
+
 	if (!strcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
@@ -236,6 +245,8 @@ static int cs_del_user(char **av, int ac)
 	if (!u) /* User not found */
 		return 1;
 
+	if (cs_cfg.use_exc && Is_Excluded(u)) 
+		return 1;
 	if (!strcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
@@ -321,6 +332,10 @@ static int cs_user_modes(char **av, int ac)
 	if (!u) {
 		return -1;
 	}
+
+	if (cs_cfg.use_exc && Is_Excluded(u)) 
+		return 1;
+
 	if (!strcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
@@ -416,6 +431,10 @@ static int cs_user_smodes(char **av, int ac)
 		return -1;
 	}
 
+
+	if (cs_cfg.use_exc && Is_Excluded(u)) 
+		return 1;
+
 	if (!strcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
@@ -493,6 +512,10 @@ static int cs_user_kill(char **av, int ac)
 	if (!u) /* User not found */
 		return 1;
 	
+
+	if (cs_cfg.use_exc && Is_Excluded(u)) 
+		return 1;
+
 	if (!strcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
@@ -532,6 +555,10 @@ static int cs_user_nick(char **av, int ac)
 	u = finduser(av[1]);
 	if (!u)
 		return -1;
+
+	if (cs_cfg.use_exc && Is_Excluded(u)) 
+		return 1;
+
 	if (!strcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
@@ -562,6 +589,9 @@ static void LoadConfig(void)
 	}
 	if(GetConf((void *) &cs_cfg.serv_watch, CFGBOOL, "ServWatch")<= 0) {
 		cs_cfg.serv_watch = 1;
+	}
+	if(GetConf((void *) &cs_cfg.use_exc, CFGBOOL, "Exclusions")<= 0) {
+		cs_cfg.serv_watch = 0;
 	}
 	if(GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
 #if !defined(HYBRID7)
@@ -609,6 +639,10 @@ static int cs_server_join(char **av, int ac)
 	s = findserver(av[0]);
 	if (!s)
 		return 0;
+
+	if (cs_cfg.use_exc && Is_Excluded(s)) 
+		return 1;
+
 	chanalert (s_ConnectServ, "\2SERVER\2 %s has joined the Network at %s",
 		s->name, s->uplink);
 
@@ -625,6 +659,10 @@ static int cs_server_quit(char **av, int ac)
 	s = findserver(av[0]);
 	if (!s)
 		return 0;
+
+	if (cs_cfg.use_exc && Is_Excluded(s)) 
+		return 1;
+
 	chanalert (s_ConnectServ, "\2SERVER\2 %s has left the Network at %s for %s",
 		s->name, s->uplink, (ac == 2) ? av[1] : "");
 	return 1;
