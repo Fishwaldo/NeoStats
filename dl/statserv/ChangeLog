@@ -1,12 +1,13 @@
 StatServ Module for NeoStats 2.x ChangeLog
+==============================================================================
 Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
-(F) denotes Fish
+(F) denotes Fish (M) denotes Mark
 * Version 3.10 * Sep 11th, 2003 (F)
- - Added clientstats to html output
- - strip colors/underlines etc from client versions
- - (M) Help text cleanup
- - (M) Added ABOUT command
+ - Added clientstats to html output (F)
+ - strip colors/underlines etc from client versions (F)
+ - Help text cleanup (M)
+ - Added ABOUT command (M)
  
 * Version 3.9 * July 15th, 2003 (F)
  - Fixed a minor problem with oper counting. 

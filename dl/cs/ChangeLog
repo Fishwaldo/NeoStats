@@ -1,54 +1,55 @@
 ConnectServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma^
+==============================================================================
 * Version 1.8 * August 29, 2003
-- Colorized Output thanks to MrAllThat
-- Now only compiles for Modes that are relevent
-- (M) Help text cleanup
-- (M) Added ABOUT command
-- (M) Coloured output is now optional - see cs.c for details
+ - Colorized Output thanks to MrAllThat (F)
+ - Now only compiles for Modes that are relevent (F)
+ - Help text cleanup (M)
+ - Added ABOUT command (M)
+ - Coloured output is now optional - see cs.c for details (M)
 
 * Version 1.7 * July 15th, 2003
-- Fixed a problem with connectserv clobering the avlist for modes
+ - Fixed a problem with connectserv clobering the avlist for modes
 
 * Version 1.6 * Mar 11th, 2003
-- Moved ConnectServ to new Logging and Config Interface
+ - Moved ConnectServ to new Logging and Config Interface
 
 * Version 1.5 * September 12th, 2002
-- Fixed cosmetic bug reported by eggy (Shmad)
-- Added NICK watching support for nick changes (Shmad)
-- Fixed other misc bugs.
+ - Fixed cosmetic bug reported by eggy (Shmad)
+ - Added NICK watching support for nick changes (Shmad)
+ - Fixed other misc bugs.
 
 * Version 1.4 * July 17th, 2002
-- Moved to new Event API (Fish)
-- Stopped it flooding the net when neo starts up (Fish)
+ - Moved to new Event API (Fish)
+ - Stopped it flooding the net when neo starts up (Fish)
 
 * Version 1.3 * March 12th, 2002
-- Code overhaul for NeoStats-2.5 core.
+ - Code overhaul for NeoStats-2.5 core.
 
 * Version 1.2 * November 18th, 2001
-- Add u->mode check for Local Kills (^Enigma^)
-- Changed LOCAL KILL format to same as GLOBAL format (much nicer..) (Shmad)
-- Changed KILL code. Local kills prefixed with LOCAL KILL, Globals with GLOBAL KILL (Shmad)
-- Added Local Kill code. (Shmad)
-- Fixed Global Kill reason msg (Shmad)
+ - Add u->mode check for Local Kills (^Enigma^)
+ - Changed LOCAL KILL format to same as GLOBAL format (much nicer..) (Shmad)
+ - Changed KILL code. Local kills prefixed with LOCAL KILL, Globals with GLOBAL KILL (Shmad)
+ - Added Local Kill code. (Shmad)
+ - Fixed Global Kill reason msg (Shmad)
 
 * Version 1.1 * November 16th, 2001
 
-- Version 1.1 is ready to be released in next ver of NeoStats
-- fixed compiler warnings. (Shmad)
-- Fixed cs_user_modes() segfault.  Was in _init() *thwaps niggles* (Shmad)
-- Updated LoadConf(); to parse quicker. :) (Shmad)
-- Updated LoadConf(); to only load valid settings!! (Shmad)
-- Added LoadConfig(); to load connect.db (Shmad)
-- Command Settings in connect.db loaded upon module load (Shmad)
-- Command settings now saved to connect.db (^Enigma^)
+ - Version 1.1 is ready to be released in next ver of NeoStats
+ - fixed compiler warnings. (Shmad)
+ - Fixed cs_user_modes() segfault.  Was in _init() *thwaps niggles* (Shmad)
+ - Updated LoadConf(); to parse quicker. :) (Shmad)
+ - Updated LoadConf(); to only load valid settings!! (Shmad)
+ - Added LoadConfig(); to load connect.db (Shmad)
+ - Command Settings in connect.db loaded upon module load (Shmad)
+ - Command settings now saved to connect.db (^Enigma^)
 
 * Version 1.0 * November 13th, 2001
 
-- Version 1.0 is ready to use in the devel NeoStats
-- ABOUT Added - Little info about service (^Enigma^)
-- STATUS Added - Check if KILLWATCH, MODEWATCH or SIGNWATCH is active or not (^Enigma^)
-- KILLWATCH Added - Watch for server or oper /kill's (^Enigma^)
-- MODEWATCH Added - Watch for users chaning to oper flags or opers changing flags (^Enigma^)
-- SIGNWATCH Added - Watch for signon/signoffs (^Enigma^)
-- Started the module, not much here yet. (^Enigma^)
+ - Version 1.0 is ready to use in the devel NeoStats
+ - ABOUT Added - Little info about service (^Enigma^)
+ - STATUS Added - Check if KILLWATCH, MODEWATCH or SIGNWATCH is active or not (^Enigma^)
+ - KILLWATCH Added - Watch for server or oper /kill's (^Enigma^)
+ - MODEWATCH Added - Watch for users chaning to oper flags or opers changing flags (^Enigma^)
+ - SIGNWATCH Added - Watch for signon/signoffs (^Enigma^)
+ - Started the module, not much here yet. (^Enigma^)

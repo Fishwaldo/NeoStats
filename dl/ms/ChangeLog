@@ -1,7 +1,8 @@
 MoraleServ ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+==============================================================================
 * MoraleServ * M * Version 2.21
- - Help text cleanup
- - Added ABOUT command
+ - Help text cleanup (M)
+ - Added ABOUT command (M)
 
 * MoraleServ * Fish * Version 2.20
  - Moved to new Logging Functions

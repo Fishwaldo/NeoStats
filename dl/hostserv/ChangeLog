@@ -1,130 +1,131 @@
 HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
+==============================================================================
 
 * Version 3.0 * Fish * Oct 6th, 2003
-+ Moved to lists to allow sorting and displaying
-+ (M) Help text cleanup
-+ (M) Added ABOUT command
-+ Undernet Style Hidden Hosts for registered nicknames is now supported!
+ - Moved to lists to allow sorting and displaying (F)
+ - Help text cleanup (M)
+ - Added ABOUT command (M)
+ - Undernet Style Hidden Hosts for registered nicknames is now supported! (F)
  
 * Version 2.7.1 * Shmad * May 11th, 2003
-+ Fixed a nasty seg bug *smacks fish* we don't free(s_HostServ);
+ - Fixed a nasty seg bug *smacks fish* we don't free(s_HostServ);
 
 * Version 2.7 * Fish * Apr 15th, 2003
-+ Moved Hostserv over to new configuration backed
-+ added interface to manipulate the ban list (/msg hostserv help bans for more info)
-+ Added an interface to manipulate default levels (/msg hostserv levels)
-+ added autoexpiry of un-used vhosts. Defaults at 60 days. Add option "ExpireDays" to HostServ config to change default.
+ - Moved Hostserv over to new configuration backed
+ - added interface to manipulate the ban list (/msg hostserv help bans for more info)
+ - Added an interface to manipulate default levels (/msg hostserv levels)
+ - added autoexpiry of un-used vhosts. Defaults at 60 days. Add option "ExpireDays" to HostServ config to change default.
 
 * Version 2.6 * Fish * Mar 11th, 2003
-+ Fixed a bug with adding Vhosts for users online already and sending an online message to the wrong user!
+ - Fixed a bug with adding Vhosts for users online already and sending an online message to the wrong user!
 
 * Version 2.5 * Fish * Feb 3rd, 2003
-+ check for duplicate nicks before adding entries
-+ added a command to show configured levels
+ - check for duplicate nicks before adding entries
+ - added a command to show configured levels
 
 * Version 2.4 * Fish * Jan 29th, 2003
-+ a few typo's in the messages
-+ chpass can only be used if you match the host, or u have level 100 with neostats
+ - a few typo's in the messages
+ - chpass can only be used if you match the host, or u have level 100 with neostats
 
 * Version 2.3 * Shmad & Fish * January 4th, 2003
-+ Write to DB who added the record.
-+ VIEW # now shows also who added the record.
-+ hostserv.h now contains defines for access for each function.
-+ Fixed a segfault when upgrading from earlier versions if a
-  passwd field wasnt present.
-+ Made it possible to configure the levels for each command due
-  to different people wanting different levels... :) removed
-  Shmads old hostserv.h
-+ Moved HostServ to use NeoStats hash system to store data.
-  More efficient and nicer than righting and reading and 
-  moving files around... 
-+ Added Banned Vhost support to HostServ...
-  Add HOSTSERV_BANNED_VHOSTS *badhost* to neostats.cfg (Can add Multiple
-  times)
-+ Added ChangePassword Ability to HostServ
-+ HostServ Permissions are configurable (put in neostats.cfg):
-  HOSTSERV_LVL_VIEW <- what level ppl can /msg hostserv view
-  HOSTSERV_LVL_ADD <- what level ppl can /msg hostserv add
-  HOSTSERV_LVL_DEL <- what level ppl can /msg hostserv del 
-  HOSTSERV_LVL_LIST <- what level ppl can /msg hostserv list
-  eg:
-  HOSTSERV_LVL_LIST 100 (ServerAdmins and higher)
+ - Write to DB who added the record.
+ - VIEW # now shows also who added the record.
+ - hostserv.h now contains defines for access for each function.
+ - Fixed a segfault when upgrading from earlier versions if a
+   passwd field wasnt present.
+ - Made it possible to configure the levels for each command due
+   to different people wanting different levels... :) removed
+   Shmads old hostserv.h
+ - Moved HostServ to use NeoStats hash system to store data.
+   More efficient and nicer than righting and reading and 
+   moving files around... 
+ - Added Banned Vhost support to HostServ...
+   Add HOSTSERV_BANNED_VHOSTS *badhost* to neostats.cfg (Can add Multiple
+   times)
+ - Added ChangePassword Ability to HostServ
+ - HostServ Permissions are configurable (put in neostats.cfg):
+   HOSTSERV_LVL_VIEW <- what level ppl can /msg hostserv view
+   HOSTSERV_LVL_ADD <- what level ppl can /msg hostserv add
+   HOSTSERV_LVL_DEL <- what level ppl can /msg hostserv del 
+   HOSTSERV_LVL_LIST <- what level ppl can /msg hostserv list
+   eg:
+   HOSTSERV_LVL_LIST 100 (ServerAdmins and higher)
 
 * Version 2.2 * Fish * December 26th, 2002
-+ Due to massive bitching by people who use HostServ opers can
+ - Due to massive bitching by people who use HostServ opers can
   ADD/LIST/VIEW now and only admins and higher can DEL
-+ Fixed a problem with Permissions and a typo in the help file
+ - Fixed a problem with Permissions and a typo in the help file
 
 
 * Version 2.1 * Shmad * October 20, 2002
-+ Fixed an issue with fnmatch being a hoe.
-+ Added LOGIN support for vhosts.
-+ Updated Helpfiles.
-+ Updated ADD procedure to use PASSWORD field.
-+ Fixed a small problem with segfaulting with older databases.
-+ Adding ability for users to change their vhost passwords.
+ - Fixed an issue with fnmatch being a hoe.
+ - Added LOGIN support for vhosts.
+ - Updated Helpfiles.
+ - Updated ADD procedure to use PASSWORD field.
+ - Fixed a small problem with segfaulting with older databases.
+ - Adding ability for users to change their vhost passwords.
 
 
 * Version 2.0 * Shmad * July 24, 2002
-+ Fixed misc. bug with hs_signon (slaps himself)
-+ Updated all HELPFILES.
-+ Added an ERRORmsg to VIEW/DEL if the access # doesnt exist.
-+ Fixed a segfault bug if av[2] was null (cant convert to int obviously)
-+ Added new VIEW command, to view access #'s from VIEW, gives detailed information.
-- Overhauls to "LIST" routine:
-  + LIST is now numbered. 1, 2, 3, etc, etc, etc..
-  + Changing to tabulated displays so hosts all line up nicely.
-  + LIST now ONLY displays NICK & VHOST use VIEW # to get full info.
-- Overhauls to "DEL" routine:
-  + Can ONLY delete data by Line #
-    - Example:  /msg HoStServ DEL 1
-  (Thanks for JH for finding the annoying deletion bug (which is why we are
-   using list numbering now))
-- Changed over to new event handlers
+ - Fixed misc. bug with hs_signon (slaps himself)
+ - Updated all HELPFILES.
+ - Added an ERRORmsg to VIEW/DEL if the access # doesnt exist.
+ - Fixed a segfault bug if av[2] was null (cant convert to int obviously)
+ - Added new VIEW command, to view access #'s from VIEW, gives detailed information.
+ - Overhauls to "LIST" routine:
+     LIST is now numbered. 1, 2, 3, etc, etc, etc..
+     Changing to tabulated displays so hosts all line up nicely.
+     LIST now ONLY displays NICK & VHOST use VIEW # to get full info.
+ - Overhauls to "DEL" routine:
+     Can ONLY delete data by Line #
+     - Example:  /msg HoStServ DEL 1
+    (Thanks for JH for finding the annoying deletion bug (which is why we are
+     using list numbering now))
+ - Changed over to new event handlers
 
 
 * Version 1.7 * March 30th, 2002
-- Possible signon crash fixed
-- "Can't Find db" message only appears once now
+ - Possible signon crash fixed
+ - "Can't Find db" message only appears once now
 
 * Version 1.6 * March 15th, 2002
-- Code overhaul for NeoStats-2.5 core.
+ - Code overhaul for NeoStats-2.5 core.
 
 * Version 1.5 * January 14th, 2002
-- Access levels reviewed and changed.
+ - Access levels reviewed and changed.
 
 * Version 1.4 * January 8th, 2002
-- Overhauls to "DEL" routine:
-  + Syntax must be entire and complete
-  + The "xxx Has been deleted" message will only
-    show up when something has actually been deleted
-  + Deletion code cleaned up slightly
-- "/msg HostServ DEL" exploit taken out (Thanks to 
-  JK & Error|51 informing me and then crashing thier
-  NeoStats every 5 minutes with it :P)
+ - Overhauls to "DEL" routine:
+     Syntax must be entire and complete
+     The "xxx Has been deleted" message will only
+     show up when something has actually been deleted
+     Deletion code cleaned up slightly
+ - "/msg HostServ DEL" exploit taken out (Thanks to 
+   JK & Error|51 informing me and then crashing thier
+   NeoStats every 5 minutes with it :P)
 
 * Version 1.3 * January 6th, 2002
-- Access levels changed (JK's Request)
+ - Access levels changed (JK's Request)
 
 * Version 1.2 * December 19th, 2001
-- I feel like chicken tonight, like chicken tonight!
-- fnmatch.h was missing from includes, *thwaps niggles*
-- Wildcards now supported w00t!.... 1-2-3.myisp.com.country can
-  have thier host check set to *.myisp.com.country
-- When vhost is added and user is online... the vhost is 
-  set (no need to disconnect & reconnect)
-- Issued With 'ADD' Fixed
-- 'DEL' Function added
+ - I feel like chicken tonight, like chicken tonight!
+ - fnmatch.h was missing from includes, *thwaps niggles*
+ - Wildcards now supported w00t!.... 1-2-3.myisp.com.country can
+   have thier host check set to *.myisp.com.country
+ - When vhost is added and user is online... the vhost is 
+   set (no need to disconnect & reconnect)
+ - Issued With 'ADD' Fixed
+ - 'DEL' Function added
 
 * Version 1.1 * December 18th, 2001
-- Vhost now works... w00t!
-- small issue with 'ADD'... will possibly fix within the next day or so
+ - Vhost now works... w00t!
+ - small issue with 'ADD'... will possibly fix within the next day or so
 
 * Version 1.0 * November 5th, 2001
-- Entire Code Overhauled
+ - Entire Code Overhauled
 
 * Version 0.1 * September 30th, 2001
-- Started the module, not much here yet.
+ - Started the module, not much here yet.
 
