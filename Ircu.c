@@ -666,6 +666,25 @@ m_pass (char *origin, char **argv, int argc, int srv)
 */
 /* R: AB B #chan 1076064445 ABAAA:o */
 /* R: AB B #c3 1076083205 +tn ABAAH:o */
+/*
+ * parv[0] = channel name
+ * parv[1] = channel timestamp
+ * The meaning of the following parv[]'s depend on their first character:
+ * If parv[n] starts with a '+':
+ * Net burst, additive modes
+ *   parv[n] = <mode>
+ *   parv[n+1] = <param> (optional)
+ *   parv[n+2] = <param> (optional)
+ * If parv[n] starts with a '%', then n will be parc-1:
+ *   parv[n] = %<ban> <ban> <ban> ...
+ * If parv[n] starts with another character:
+ *   parv[n] = <nick>[:<mode>],<nick>[:<mode>],...
+ *   where <mode> is the channel mode (ov) of nick and all following nicks.
+ *
+ * Example:
+ * "S BURST #channel 87654321 +ntkl key 123 AAA,AAB:o,BAA,BAB:ov :%ban1 ban2"
+*/
+
 static char ircd_buf[BUFSIZE];
 
 static void

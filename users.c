@@ -270,7 +270,11 @@ UserAway (const char *nick, const char *awaymsg)
 
 	u = finduser (nick);
 	if (u) {
-		strlcpy(u->awaymsg, awaymsg, MAXHOST);
+		if (awaymsg) {
+			strlcpy(u->awaymsg, awaymsg, MAXHOST);
+		} else {
+			u->awaymsg[0] = 0;
+		}
 		AddStringToList (&av, u->nick, &ac);
 		if ((u->is_away == 1) && (!awaymsg)) {
 			u->is_away = 0;
@@ -622,6 +626,9 @@ dumpuser (User* u)
 #else
 	debugtochannel("Flags:    0x%lx Modes: %s (0x%lx)", u->flags, u->modes, u->Umode);
 #endif
+	if(u->is_away) {
+		debugtochannel("Away:     %s ", u->awaymsg);
+	}
 
 	cm = list_first (u->chans);
 	while (cm) {

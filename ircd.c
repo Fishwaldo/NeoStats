@@ -405,8 +405,8 @@ splitbuf (char *buf, char ***argv, int colon_special)
 	SET_SEGV_LOCATION();
 	*argv = calloc (sizeof (char *) * argvsize, 1);
 	argc = 0;
-	if (*buf == ':')
-		buf++;
+	/*if (*buf == ':')
+		buf++;*/
 	while (*buf) {
 		if (argc == argvsize) {
 			argvsize += 8;
