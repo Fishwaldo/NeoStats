@@ -119,7 +119,7 @@ main (int argc, char *argv[])
 		printf ("Copyright: NeoStats Group. 2000-2003\n");
 		printf ("Justin Hammond (fish@neostats.net)\n");
 		printf ("Adam Rutter (shmad@neostats.net)\n");
-		printf ("Mark (m@neostats.net\n);
+		printf ("Mark (m@neostats.net\n");
 		printf ("-----------------------------------------------\n\n");
 	}
 	/* set some defaults before we parse the config file */
