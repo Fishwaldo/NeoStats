@@ -33,5 +33,8 @@ size_t strlcpy(char *dst, const char *src, size_t size);
 #ifndef HAVE_STRLCAT
 size_t strlcat(char *dst, const char *src, size_t size);
 #endif /* HAVE_STRLCAT */
+#ifndef HAVE_STRNDUP
+char *strndup(const char *src, size_t count);
+#endif /* HAVE_STRNDUP */
 
 #endif /* _SUPPORT_H_ */

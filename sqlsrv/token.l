@@ -17,6 +17,10 @@
 #include <string.h>
 #include "do_sql.h"
 #include "parse.tab.h"
+#include "config.h"
+#ifndef HAVE_STRNDUP
+#include "support.h"
+#endif
 
 void dosql_init();
 extern int yylval;
