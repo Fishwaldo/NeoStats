@@ -42,24 +42,17 @@ static Client *
 new_server (const char *name)
 {
 	Client *s;
-	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
 	if (hash_isfull (serverhash)) {
 		nlog (LOG_CRITICAL, "new_ban: server hash is full");
 		return NULL;
 	}
+	dlog(DEBUG2, "new_server: %s", name);
 	s = scalloc (sizeof (Client));
 	strlcpy (s->name, name, MAXHOST);
 	s->server = scalloc (sizeof (Server));
-	sn = hnode_create (s);
-	if (!sn) {
-		nlog (LOG_WARNING, "Server hash broken");
-		sfree (s->server);
-		sfree (s);
-		return NULL;
-	}
-	hash_insert (serverhash, sn, s->name);
+	hnode_create_insert (serverhash, s, s->name);
 	return s;
 }
 

@@ -82,13 +82,11 @@ void dns_check_queue();
 */
 int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data)
 {
-	lnode_t *dnsnode;
 	DnsLookup *dnsdata;
 	int status;
 	struct sockaddr_in sa;
 
 	SET_SEGV_LOCATION();
-
 	dnsdata = smalloc (sizeof (DnsLookup));
 	DNSStats.totalq++;
 	if (!dnsdata) {
@@ -101,20 +99,16 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 	strlcpy (dnsdata->data, data, DNS_DATA_SIZE);
 	dnsdata->callback = callback;
 	dnsdata->type = type;
-	
 	if (list_isfull (dnslist)) {
 		dlog(DEBUG1, "DNS: Lookup list is full, adding to queue");
 		strlcpy(dnsdata->lookupdata, str, 254);
-		dnsnode = lnode_create (dnsdata);
-		list_append (dnsqueue, dnsnode);
+		lnode_create_append (dnslist, dnsdata);
 		DNSStats.totalqueued++;
 		if (list_count(dnsqueue) > DNSStats.maxqueued) {
 			DNSStats.maxqueued = list_count(dnsqueue);
 		}
 		return NS_SUCCESS;
 	}
-
-
 	if (type == adns_r_ptr) {
 		sa.sin_family = AF_INET;
 		sa.sin_addr.s_addr = inet_addr (str);
@@ -128,12 +122,9 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 		DNSStats.failure++;
 		return 0;
 	}
-
 	dlog(DEBUG1, "DNS: Added dns query %s to list", data);
 	/* if we get here, then the submit was successful. Add it to the list of queryies */
-	dnsnode = lnode_create (dnsdata);
-	list_append (dnslist, dnsnode);
-
+	lnode_create_append (dnslist, dnsdata);
 	return 1;
 }
 
@@ -167,7 +158,6 @@ int InitDns (void)
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
-
 }
 
 /* @brief Clean up ADNS data when we shutdown 
@@ -232,7 +222,6 @@ void canx_dns(Module* modptr)
 			dnsnode = lnode2;
 		}
 	}
-
 	dns_check_queue();
 }
 
@@ -256,7 +245,6 @@ void do_dns (void)
 		dns_check_queue();
 		return;
 	}
-
 	dnsnode = list_first (dnslist);
 	while (dnsnode) {
 		/* loop through the list */
@@ -300,10 +288,12 @@ void do_dns (void)
 	}
 	dns_check_queue();
 }
-/** @breif Checks the DNS queue and if we can
+
+/** @brief Checks the DNS queue and if we can
  * add new queries to the active DNS queries and remove from Queue 
 */
-void dns_check_queue() {
+void dns_check_queue() 
+{
 	lnode_t *dnsnode, *dnsnode2;
 	DnsLookup *dnsdata;
 	struct sockaddr_in sa;
@@ -349,11 +339,12 @@ void dns_check_queue() {
 	}
 }
 
-void do_dns_stats_Z(Client *u) {
+void do_dns_stats_Z(Client *u) 
+{
 	irc_numeric (RPL_MEMSTATS, u->name, "Active DNS queries: %d", (int) list_count(dnslist));
 	irc_numeric (RPL_MEMSTATS, u->name, "Queued DNS Queries: %d", (int) list_count(dnsqueue));
 	irc_numeric (RPL_MEMSTATS, u->name, "Max Queued Queries: %d", DNSStats.maxqueued);
 	irc_numeric (RPL_MEMSTATS, u->name, "Total DNS Questions: %d", DNSStats.totalq);
-	irc_numeric (RPL_MEMSTATS, u->name, "SuccessFull Lookups: %d", DNSStats.success);
-	irc_numeric (RPL_MEMSTATS, u->name, "Un-Successfull Lookups: %d", DNSStats.failure);
+	irc_numeric (RPL_MEMSTATS, u->name, "Successful Lookups: %d", DNSStats.success);
+	irc_numeric (RPL_MEMSTATS, u->name, "Unsuccessful Lookups: %d", DNSStats.failure);
 }

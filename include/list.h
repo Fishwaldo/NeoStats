@@ -173,6 +173,10 @@ EXPORTFUNC	void list_sort (list_t *, int (const void *, const void *));
 EXPORTFUNC	lnode_t *list_find (list_t *, const void *, int (const void *, const void *));
 EXPORTFUNC	int list_is_sorted (list_t *, int (const void *, const void *));
 
+EXPORTFUNC	void list_destroy_auto (list_t * list);
+EXPORTFUNC	void lnode_create_append (list_t *, void *);
+EXPORTFUNC	void *lnode_find (list_t * list, const void *key, int compare (const void *, const void *));
+
 #ifdef __cplusplus
 }
 #endif

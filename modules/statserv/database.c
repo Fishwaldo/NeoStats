@@ -41,8 +41,8 @@ void SaveServerStats(void)
 		SetData((void *)s->numsplits, CFGINT, "ServerStats", s->name, "Splits");
 		SetData((void *)s->maxusers, CFGINT, "ServerStats", s->name, "MaxUsers");
 		SetData((void *)s->t_maxusers, CFGINT, "ServerStats", s->name, "MaxUsersTime");
-		SetData((void *)s->lastseen, CFGINT, "ServerStats", s->name, "LastSeen");
-		SetData((void *)s->starttime, CFGINT, "ServerStats", s->name, "StartTime");
+		SetData((void *)s->t_lastseen, CFGINT, "ServerStats", s->name, "t_lastseen");
+		SetData((void *)s->t_start, CFGINT, "ServerStats", s->name, "t_start");
 		SetData((void *)s->operkills, CFGINT, "ServerStats", s->name, "OperKills");
 		SetData((void *)s->serverkills, CFGINT, "ServerStats", s->name, "ServerKills");
 		SetData((void *)s->totusers, CFGINT, "ServerStats", s->name, "TotalUsers");
@@ -125,34 +125,31 @@ void LoadServerStats(void)
 {
 	SStats *s;
 	char **row;
-	hnode_t *sn;
 	int count;
+
 	if (GetTableData("ServerStats", &row) > 0) {
 		for (count = 0; row[count] != NULL; count++) {
+			if (hash_isfull (Shead)) {
+				nlog (LOG_CRITICAL, "StatServ server hash full");
+				break;
+			}
 			s = scalloc(sizeof(SStats));
 			strlcpy(s->name, row[count], MAXHOST);
 			GetData((void *)&s->numsplits, CFGINT, "ServerStats", s->name, "Splits");
 			GetData((void *)&s->maxusers, CFGINT, "ServerStats", s->name, "MaxUsers");
 			GetData((void *)&s->t_maxusers, CFGINT, "ServerStats", s->name, "MaxUsersTime");
-			GetData((void *)&s->lastseen, CFGINT, "ServerStats", s->name, "LastSeen");
-			GetData((void *)&s->starttime, CFGINT, "ServerStats", s->name, "StartTime");
+			GetData((void *)&s->t_lastseen, CFGINT, "ServerStats", s->name, "t_lastseen");
+			GetData((void *)&s->t_start, CFGINT, "ServerStats", s->name, "t_start");
 			GetData((void *)&s->operkills, CFGINT, "ServerStats", s->name, "OperKills");
 			GetData((void *)&s->serverkills, CFGINT, "ServerStats", s->name, "ServerKills");
 			GetData((void *)&s->totusers, CFGINT, "ServerStats", s->name, "TotalUsers");
 			GetData((void *)&s->maxopers, CFGINT, "ServerStats", s->name, "MaxOpers");
 			GetData((void *)&s->t_maxopers, CFGINT, "ServerStats", s->name, "MaxOpersTime");
-			s->users = 0;
-			s->opers = 0;
+			s->users = s->opers = 0;
 			s->daily_totusers = 0;
-			s->lowest_ping = s->highest_ping = s->daily_totusers = 0;
+			s->lowest_ping = s->highest_ping = 0;
 			dlog(DEBUG1, "Loaded statistics for %s", s->name);
-			if (hash_isfull(Shead)) {
-				nlog(LOG_CRITICAL, "StatServ server hash full");
-				break;
-			} else {
-				sn = hnode_create(s);
-				hash_insert(Shead, sn, s->name);
-			}
+			hnode_create_insert (Shead, s, s->name);
 		}
 	}       
 	sfree(row);                                 
@@ -176,67 +173,53 @@ void LoadStats(void)
  
 CStats *load_chan(char *name) 
 {
-	lnode_t *cn;
 	char *data;
 	CStats *c;
 
 	SET_SEGV_LOCATION();
-	c = smalloc(sizeof(CStats));
+	if (list_isfull (Chead)) {
+		nlog (LOG_CRITICAL, "StatServ channel hash full");
+		return NULL;
+	}
+	c = smalloc (sizeof (CStats));
 #ifdef USE_BERKELEY
 	if ((data = DBGetData(name)) != NULL) {
-		memcpy(c, data, sizeof(CStats));
+		memcpy (c, data, sizeof(CStats));
+		dlog(DEBUG2, "Loading channel %s", c->name);
 #else
-	strlcpy(c->name, name, MAXCHANLEN);	
-	if (GetData((void *)&data, CFGSTR, "ChanStats", c->name, "ChanData") > 0) {
-		sscanf(data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins);
-		GetData((void *)&c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
-		sfree(data);
+	strlcpy (c->name, name, MAXCHANLEN);	
+	if (GetData ((void *)&data, CFGSTR, "ChanStats", c->name, "ChanData") > 0) {
+		dlog(DEBUG2, "Loading channel %s", c->name);
+		sscanf (data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins);
+		GetData ((void *)&c->t_lastseen, CFGINT, "ChanStats", c->name, "t_lastseen");
+		sfree (data);
 #endif
 	} else {
-		strlcpy(c->name, name, MAXCHANLEN);	
-		c->totmem = 0;
+		dlog(DEBUG2, "Creating channel %s", c->name);
+		strlcpy (c->name, name, MAXCHANLEN);	
+		c->t_maxmems = me.now;
+	}
+	c->lastsave = me.now;
+	if ((me.now - c->t_lastseen) > 604800) {
+		dlog(DEBUG1, "Reset old channel %s", c->name);
+		c->members = 0;
 		c->topics = 0;
+		c->totmem = 0;
 		c->kicks = 0;
-		c->lastseen = 0;
+		c->topicstoday = 0;
+		c->joinstoday = 0;
+		c->maxkickstoday = 0;
+		c->maxmemtoday = 0;
+		c->t_lastseen = 0;
 		c->maxmems = 0;
 		c->t_maxmems = me.now;
 		c->maxkicks = 0;
 		c->t_maxkicks = 0;
 		c->maxjoins = 0;
 		c->t_maxjoins = 0;
+		c->lastsave = me.now;
 	}
-	c->maxmemtoday = 0;
-	c->maxkickstoday = 0;
-	c->topicstoday = 0;
-	c->joinstoday = 0;
-	c->members = 0;
-	c->lastsave = me.now;
-	cn = lnode_create(c);
-	if (list_isfull(Chead)) {
-		nlog(LOG_CRITICAL, "StatServ channel hash full");
-	} else {
-		dlog(DEBUG2, "Loading channel %s", c->name);
-		if ((me.now - c->lastseen) > 604800) {
-			dlog(DEBUG1, "Reset old channel %s", c->name);
-			c->totmem = 0;
-			c->topics = 0;
-			c->kicks = 0;
-			c->lastseen = 0;
-			c->maxmems = 0;
-			c->t_maxmems = me.now;
-			c->maxkicks = 0;
-			c->t_maxkicks = 0;
-			c->maxjoins = 0;
-			c->t_maxjoins = 0;
-			c->maxmemtoday = 0;
-			c->maxkickstoday = 0;
-			c->topicstoday = 0;
-			c->joinstoday = 0;
-			c->members = 0;
-			c->lastsave = me.now;
-		}
-	}
-	list_append(Chead, cn);
+	lnode_create_append (Chead, c);
 	return c;
 }
 
@@ -264,7 +247,7 @@ void save_chan(CStats *c)
 		(int)c->t_maxkicks, (int)c->maxjoins, (int)c->t_maxjoins);
 	SetData((void *)data, CFGSTR, "ChanStats", c->name, "ChanData");
 	/* we keep this seperate so we can easily delete old channels */
-	SetData((void *)c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
+	SetData((void *)c->t_lastseen, CFGINT, "ChanStats", c->name, "t_lastseen");
 #endif
 	c->lastsave = me.now;
 }
@@ -281,24 +264,24 @@ int DelOldChan(void)
 {
 	char **row;
 	int count = 0;
-	time_t lastseen;
+	time_t t_lastseen;
 	time_t start;
 	
 	start = time(NULL);
 	dlog(DEBUG1, "Deleting old channels");
 	if (GetTableData("ChanStats", &row) > 0) {
 		for (count = 0; row[count] != NULL; count++) {
-			if (GetData((void *)&lastseen, CFGINT, "ChanStats", row[count], "LastSeen") > 0) {
+			if (GetData((void *)&t_lastseen, CFGINT, "ChanStats", row[count], "t_lastseen") > 0) {
 				/* delete it if its old and not online 
 				 * use find_chan, instead of findchanstats, and find_chan is based on hashes, so its faster 
 				 */
-				if (((me.now - lastseen) > 604800) && (!find_chan(row[count]))) {
+				if (((me.now - t_lastseen) > 604800) && (!find_chan(row[count]))) {
 					dlog(DEBUG1, "Deleting Channel %s", row[count]);
 					DelRow("ChanStats", row[count]);
 				}
 			} else {
 				/* database corruption? */
-				nlog(LOG_WARNING, "Channel %s corrpted: deleting record", row[count]);
+				nlog (LOG_WARNING, "Channel %s corrupted: deleting record", row[count]);
 				DelRow("ChanStats", row[count]);
 			}
 		}

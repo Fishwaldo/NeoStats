@@ -53,7 +53,6 @@ int InitExcludes(void)
 	int i;
 	excludes *e;
 	char *tmp;
-	lnode_t *en;
 	
 	exclude_list = list_create(-1);
 	if (GetTableData("Exclusions", &row) > 0) {
@@ -71,8 +70,7 @@ int InitExcludes(void)
 			e->addedon = atoi(row[i]);
 			GetData((void *)&e->type, CFGINT, "Exclusions", row[i], "Type");
 			dlog(DEBUG2, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
-			en = lnode_create(e);
-			list_append(exclude_list, en);
+			lnode_create_append (exclude_list, e);
 		}
 		free(row);
 	}
@@ -88,7 +86,6 @@ int InitExcludes(void)
  */
 void ns_do_exclude_add(Client *u, char *type, char *pattern) 
 {
-	lnode_t *en;
 	excludes *e;
 	static char tmp[BUFSIZE];
 	
@@ -126,8 +123,7 @@ void ns_do_exclude_add(Client *u, char *type, char *pattern)
 		return;
 	}
 	/* if we get here, then e is valid */
-	en = lnode_create(e);
-	list_append(exclude_list, en);
+	lnode_create_append (exclude_list, e);
 	irc_prefmsg(ns_botptr, u, "Successfully added %s (%s) to Exclusion List", e->pattern, type);
 	irc_chanalert(ns_botptr, "%s added %s (%s) to the Exclusion List", u->name, e->pattern, type);
 

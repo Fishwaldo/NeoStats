@@ -161,10 +161,6 @@ static int ss_event_online(CmdParams* cmdparams)
 
 int ModInit(Module* mod_ptr)
 {
-#ifdef SQLSRV
-	lnode_t *lnode;
-#endif
-
 	SET_SEGV_LOCATION();
 	ss_module = mod_ptr;
 	StatServ.shutdown = 0;
@@ -189,11 +185,9 @@ int ModInit(Module* mod_ptr)
 	/* for the network and daily stats, we use a fake list, so we can easily import into rta */
 
 	fakedaily = list_create(-1);
-	lnode = lnode_create(&daily);
-	list_append(fakedaily, lnode);
+	lnode_create_append (fakedaily, &daily);
 	fakenetwork = list_create(-1);
-	lnode = lnode_create(&stats_network);
-	list_append(fakenetwork, lnode);
+	lnode_create_append (fakenetwork, &stats_network);
 	
 	/* find the address of each list/hash, and export to rta */
 	 
@@ -572,7 +566,7 @@ static int ss_chans(CmdParams* cmdparams)
 			cs->maxkickstoday, cs->maxkicks, sftime(cs->t_maxkicks));
 		if (!find_chan(cmdparams->av[0]))
 			irc_prefmsg(ss_bot, cmdparams->source, "Channel was last seen at %s",
-				sftime(cs->lastseen));
+				sftime(cs->t_lastseen));
 	}
 	return 1;
 }
@@ -713,10 +707,10 @@ static int ss_server(CmdParams* cmdparams)
 		return 0;
 	}
 	irc_prefmsg(ss_bot, cmdparams->source, "Statistics for \2%s\2 since %s",
-		ss->name, sftime(ss->starttime));
+		ss->name, sftime(ss->t_start));
 	if (!s) {
 		irc_prefmsg(ss_bot, cmdparams->source, "Server Last Seen: %s", 
-			sftime(ss->lastseen));
+			sftime(ss->t_lastseen));
 	} else {
 		irc_prefmsg(ss_bot, cmdparams->source, "Current Users: %-3ld (%2.0f%%)", 
 			(long)ss->users, 
@@ -859,10 +853,9 @@ static int ss_stats(CmdParams* cmdparams)
 		if (!find_server(cmdparams->av[1])) {
 			node = hash_lookup(Shead, cmdparams->av[1]);
 			if (node) {
+				sfree (hnode_get(node));
 				hash_delete(Shead, node);
-				st = hnode_get(node);
 				hnode_destroy(node);
-				sfree(st);
 				irc_prefmsg(ss_bot, cmdparams->source, "Removed %s from the database.",
 					cmdparams->av[1]);
 				nlog(LOG_NOTICE, "%s requested STATS DEL %s", cmdparams->source->name, cmdparams->av[1]);

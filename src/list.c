@@ -844,5 +844,45 @@ comparef (const void *key1, const void *key2)
 	return strcasecmp (key1, key2);
 }
 
+/*
+ * Destroy all nodes in list and free associated data pointer.
+ */
+void
+list_destroy_auto (list_t * list)
+{
+	lnode_t *ln;
 
+	ln = list_first (list);
+	while (ln) {
+		sfree (lnode_get (ln));
+		ln = list_next (list, ln);
+	}
+	list_destroy_nodes (list);
+	list_destroy (list);
+}
 
+/*
+ * Create node and append to list
+ */
+void lnode_create_append (list_t *list, void *data)
+{
+	lnode_t *ln;
+	
+	ln = lnode_create(data);
+	list_append(list, ln);
+}
+
+/*
+ * Find list entry and return data pointer
+ */
+void *
+lnode_find (list_t * list, const void *key, int compare (const void *, const void *))
+{
+	lnode_t * ln;
+
+	ln = list_find (list, key, compare);
+	if (ln) {
+		return lnode_get (ln);
+	}
+	return NULL;
+}

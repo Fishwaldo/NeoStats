@@ -115,7 +115,6 @@ static Timer *
 new_timer (const char *name)
 {
 	Timer *timer;
-	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
 	if (hash_isfull (timerhash)) {
@@ -125,8 +124,7 @@ new_timer (const char *name)
 	dlog(DEBUG2, "new_timer: %s", name);
 	timer = smalloc (sizeof (Timer));
 	strlcpy (timer->name, name, MAX_MOD_NAME);
-	tn = hnode_create (timer);
-	hash_insert (timerhash, tn, name);
+	hnode_create_insert (timerhash, timer, name);
 	return timer;
 }
 
@@ -141,14 +139,13 @@ new_timer (const char *name)
 Timer *
 find_timer (const char *name)
 {
-	hnode_t *tn;
+	Timer *t;
 
-	tn = hash_lookup (timerhash, name);
-	if (tn) {
-		return (Timer *) hnode_get (tn);
+	t = (Timer *)hnode_find (timerhash, name);
+	if (!t) {
+		dlog (DEBUG3, "find_timer: %s not found", name);
 	}
-	dlog(DEBUG3, "find_timer: %s not found", name);
-	return NULL;
+	return t;
 }
 
 /** @brief add a timer to the timer list
@@ -253,14 +250,12 @@ int
 set_timer_interval (const char *name, int interval)
 {
 	Timer *timer;
-	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	tn = hash_lookup (timerhash, name);
-	if (tn) {
-		timer = hnode_get (tn);
+	timer = (Timer *)hnode_find (timerhash, name);
+	if (timer) {
 		timer->interval = interval;
-		dlog(DEBUG2, "set_timer_interval: timer interval for %s (%s) set to %d", name, timer->moduleptr->info->name, interval);
+		dlog (DEBUG2, "set_timer_interval: timer interval for %s (%s) set to %d", name, timer->moduleptr->info->name, interval);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;

@@ -1333,13 +1333,11 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 						m = smalloc (sizeof (ModesParm));
 						m->mode = mode;
 						strlcpy (m->param, argv[j], PARAMSIZE);
-						mn = lnode_create (m);
 						if (list_isfull (c->modeparms)) {
 							nlog (LOG_CRITICAL, "ChanMode: modelist is full adding to channel %s", c->name);
 							do_exit (NS_EXIT_ERROR, "List full - see log file");
-						} else {
-							list_append (c->modeparms, mn);
 						}
+						lnode_create_append (c->modeparms, m);
 						j++;
 					}
 				} else {

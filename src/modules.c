@@ -304,13 +304,11 @@ load_module (const char *modfilename, Client * u)
 	ModuleInfo *info_ptr = NULL;
 	ModuleEvent *event_ptr = NULL;
 	Module *mod_ptr = NULL;
-	hnode_t *mn;
 	int (*ModInit) (Module * module_ptr);
 
 	SET_SEGV_LOCATION();
 	if (hash_isfull (modulehash)) {
 		if (do_msg) {
-			irc_chanalert (ns_botptr, "Unable to load module: module list is full");
 			irc_prefmsg (ns_botptr, u, "Unable to load module: module list is full");
 		}
 		nlog (LOG_WARNING, "Unable to load module: module list is full");
@@ -370,7 +368,6 @@ load_module (const char *modfilename, Client * u)
 	ModInit = ns_dlsym ((int *) dl_handle, "ModInit");
 	if (!ModInit) {
 		if (do_msg) {
-			irc_chanalert (ns_botptr, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
 			irc_prefmsg (ns_botptr, u, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
 		}
 		nlog (LOG_WARNING, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
@@ -379,8 +376,7 @@ load_module (const char *modfilename, Client * u)
 	}
 	/* Allocate module */
 	mod_ptr = (Module *) scalloc (sizeof (Module));
-	mn = hnode_create (mod_ptr);
-	hash_insert (modulehash, mn, info_ptr->name);
+	hnode_create_insert (modulehash, mod_ptr, info_ptr->name);
 	dlog(DEBUG1, "Module Internal name: %s", info_ptr->name);
 	dlog(DEBUG1, "Module description: %s", info_ptr->description);
 	mod_ptr->info = info_ptr;

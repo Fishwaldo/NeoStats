@@ -25,14 +25,14 @@
 
 #include "statserv.h"
 
-#define IncreaseOpers(x)	x->opers++;		stats_network.opers++;
-#define DecreaseOpers(x)	x->opers--;		stats_network.opers--;
+#define IncreaseOpers(x)	(x)->opers++;		stats_network.opers++;
+#define DecreaseOpers(x)	(x)->opers--;		stats_network.opers--;
 
-#define IncreaseUsers(x)	x->users++;		stats_network.users++;	x->totusers++;	stats_network.totusers++; daily.tot_users++;
-#define DecreaseUsers(x)	x->users--;		stats_network.users--;
+#define IncreaseUsers(x)	(x)->users++;		stats_network.users++;	(x)->totusers++;	stats_network.totusers++; daily.tot_users++;
+#define DecreaseUsers(x)	(x)->users--;		stats_network.users--;
 
-#define Increasemems(x)		x->members++;	x->totmem++;	x->lastseen = time(NULL); 	x->joinstoday++;
-#define Decreasemems(x)		x->members--;	x->lastseen = time(NULL);
+#define Increasemems(x)	(x)->members++;	(x)->totmem++;	(x)->t_lastseen = time(NULL); 	(x)->joinstoday++;
+#define Decreasemems(x)		(x)->members--;	(x)->t_lastseen = time(NULL);
 
 static char announce_buf[BUFSIZE];
 
@@ -106,14 +106,12 @@ announce_lag(const char *msg, ...)
 static CVersions *findctcpversion(char *name)
 {
 	CVersions *cv;
-	lnode_t *cn;
-	cn = list_find(Vhead, name, comparef);
-	if (cn) {
-		cv = lnode_get(cn);
-		return cv;
+
+	cv = lnode_find (Vhead, name, comparef);
+	if (!cv) {
+		dlog(DEBUG2, "findctcpversion(%s) -> NOT FOUND", name);	
 	}
-	dlog(DEBUG2, "findctcpversion(%s) -> NOT FOUND", name);
-	return NULL;
+	return cv;
 }
 
 int save_client_versions(void)
@@ -138,7 +136,6 @@ int save_client_versions(void)
 
 int load_client_versions(void)
 {
-	lnode_t *node;
 	CVersions *clientv;
 	FILE* input;
 	
@@ -147,8 +144,7 @@ int load_client_versions(void)
 		clientv = smalloc(sizeof(CVersions));
 		fread(clientv, sizeof(CVersions), 1, input);	
 		while(!feof(input)) {
-			node = lnode_create(clientv);
-			list_append(Vhead, node);
+			lnode_create_append (Vhead, clientv);
 			dlog(DEBUG2, "Loaded version %s", clientv->name);
 			clientv = smalloc(sizeof(CVersions));
 			fread(clientv, sizeof(CVersions), 1, input);	
@@ -164,27 +160,25 @@ void list_client_versions(Client * u, int num)
 	lnode_t *cn;
 	int i;
 
-	if (list_count(Vhead) == 0) {
+	if (list_count (Vhead) == 0) {
 		irc_prefmsg(ss_bot, u, "No Stats Available.");
 		return;
 	}
-	if (!list_is_sorted(Vhead, topversions)) {
-		list_sort(Vhead, topversions);
+	if (!list_is_sorted (Vhead, topversions)) {
+		list_sort (Vhead, topversions);
 	}
-	cn = list_first(Vhead);
-	cv = lnode_get(cn);
-	irc_prefmsg(ss_bot, u, "Top%d Client Versions:", num);
-	irc_prefmsg(ss_bot, u, "======================");
+	irc_prefmsg (ss_bot, u, "Top %d Client Versions:", num);
+	irc_prefmsg (ss_bot, u, "======================");
+	cn = list_first (Vhead);
 	for (i = 0; i <= num; i++) {
-		irc_prefmsg(ss_bot, u, "%d) %d ->  %s", i, cv->count, cv->name);
-		cn = list_next(Vhead, cn);
-		if (cn) {
-			cv = lnode_get(cn);
-		} else {
+		cv = lnode_get (cn);
+		irc_prefmsg (ss_bot, u, "%d) %d ->  %s", i, cv->count, cv->name);
+		cn = list_next (Vhead, cn);
+		if (!cn) {
 			break;
 		}
 	}
-	irc_prefmsg(ss_bot, u, "End of List.");
+	irc_prefmsg (ss_bot, u, "End of List.");
 }
 
 void StatsAddChan(Channel* c)
@@ -193,7 +187,7 @@ void StatsAddChan(Channel* c)
 	if (stats_network.chans > stats_network.maxchans) {
 		stats_network.maxchans = stats_network.chans;
 		stats_network.t_chans = me.now;
-		announce_record("\2NEW CHANNEL RECORD\2 %ld channels on the network",
+		announce_record ("\2NEW CHANNEL RECORD\2 %ld channels on the network",
 		    stats_network.maxchans);
 	}
 	if (stats_network.chans > daily.chans) {
@@ -205,23 +199,21 @@ void StatsAddChan(Channel* c)
 void StatsAddCTCPVersion(char* version)
 {
 	static char nocols[BUFSIZE];
-	lnode_t *node;
 	CVersions *clientv;
 
-    strlcpy(nocols, version, BUFSIZE);
-	strip_mirc_codes(nocols);
-	clientv = findctcpversion(nocols);
+    strlcpy (nocols, version, BUFSIZE);
+	strip_mirc_codes (nocols);
+	clientv = findctcpversion (nocols);
 	if (clientv) {
-		dlog(DEBUG2, "Found version: %s", nocols);
+		dlog (DEBUG2, "Found version: %s", nocols);
 		clientv->count++;
 		return;
 	}
-	clientv = smalloc(sizeof(CVersions));
-	strlcpy(clientv->name, nocols, BUFSIZE);
+	clientv = smalloc (sizeof (CVersions));
+	strlcpy (clientv->name, nocols, BUFSIZE);
 	clientv->count = 1;
-	node = lnode_create(clientv);
-	list_append(Vhead, node);
-	dlog(DEBUG2, "Added version: %s", clientv->name);
+	lnode_create_append  (Vhead, clientv);
+	dlog (DEBUG2, "Added version: %s", clientv->name);
 }
 
 void StatsDelChan(Channel* c)
@@ -230,23 +222,23 @@ void StatsDelChan(Channel* c)
 	lnode_t *ln;
 	
 	stats_network.chans --;
-	ln = list_find(Chead, c->name, comparef);
-	if (ln) {
-		cs = lnode_get(ln);
-		save_chan(cs);
-		list_delete(Chead, ln);
-		lnode_destroy(ln);
-		sfree(cs);
-	} else {
-		nlog(LOG_WARNING, "Couldn't find channel %s when deleting from stats", c->name);
+	ln = list_find (Chead, c->name, comparef);
+	if (!ln) {
+		nlog (LOG_WARNING, "Couldn't find channel %s when deleting from stats", c->name);
+		return;
 	}
+	cs = lnode_get (ln);
+	save_chan (cs);
+	list_delete (Chead, ln);
+	lnode_destroy (ln);
+	sfree (cs);
 }
 
 void StatsJoinChan(Client * u, Channel* c)
 {
 	CStats *cs;
 
-	cs = findchanstats(c->name);
+	cs = findchanstats (c->name);
 	if (cs) {
 		Increasemems(cs);
 		if (cs->maxmemtoday < cs->members) {
@@ -262,8 +254,8 @@ void StatsJoinChan(Client * u, Channel* c)
 			cs->t_maxjoins = me.now;
 		}
 	} else {
-		cs = load_chan(c->name);
-		Increasemems(cs);
+		cs = load_chan (c->name);
+		Increasemems (cs);
 		cs->maxmemtoday++;
 		cs->t_maxmemtoday = me.now;
 		cs->maxmems++;
@@ -311,53 +303,43 @@ void StatsChanKick(Channel* c)
 CStats *findchanstats(char *name)
 {
 	CStats *cs;
-	lnode_t *cn;
 
-	cn = list_find(Chead, name, comparef);
-	if (cn) {
-		cs = lnode_get(cn);
-		return cs;
-	}
-	dlog(DEBUG2, "findchanstats: %s not found", name);
-	return NULL;
+	cs = lnode_find (Chead, name, comparef);
+	if (!cs) {
+		dlog(DEBUG2, "findchanstats: %s not found", name);
+	}	
+	return cs;
 }
 
 SStats *newserverstats(const char *name)
 {
-	hnode_t *sn;
 	SStats *s;
 
 	SET_SEGV_LOCATION();
 	dlog(DEBUG2, "newserverstats(%s)", name);
-	if (hash_isfull(Shead)) {
-		nlog(LOG_CRITICAL, "StatServ Server hash is full!");
+	if (hash_isfull (Shead)) {
+		nlog (LOG_CRITICAL, "StatServ Server hash is full!");
 		return NULL;
 	}
 	s = scalloc(sizeof(SStats));
 	memcpy(s->name, name, MAXHOST);
-	s->t_maxusers = me.now;
-	s->t_maxopers = me.now;
-	s->lastseen = me.now;
-	s->starttime = me.now;
-	s->t_highest_ping = me.now;
-	s->t_lowest_ping = me.now;
-	sn = hnode_create(s);
-	hash_insert(Shead, sn, s->name);
+	s->t_maxusers = s->t_maxopers = me.now;
+	s->t_lastseen = s->t_start = me.now;
+	s->t_highest_ping = s->t_lowest_ping = me.now;
+	hnode_create_insert (Shead, s, s->name);
 	return s;
 }
 
 SStats *findserverstats(char *name)
 {
-	hnode_t *sn;
+	SStats *stats;
 
 	SET_SEGV_LOCATION();
-	sn = hash_lookup(Shead, name);
-	if (sn) {
-		dlog(DEBUG2, "findserverstats(%s) - found", name);
-		return hnode_get(sn);
-	} 
-	dlog(DEBUG2, "findserverstats(%s) - not found", name);
-	return NULL;
+	stats = (SStats *)hnode_find (Shead, name);
+	if (!stats) {
+		dlog(DEBUG2, "findserverstats(%s) - not found", name);
+	}
+	return stats;
 }
 
 void StatsAddServer(Client *s)
@@ -370,7 +352,7 @@ void StatsAddServer(Client *s)
 	if (!st) {
 		st = newserverstats(s->name);
 	} else {
-		st->lastseen = me.now;
+		st->t_lastseen = me.now;
 	}
 	stats_network.servers ++;
 	if (stats_network.maxservers < stats_network.servers) {
@@ -482,7 +464,7 @@ void StatsUserMode(Client * u, char *modes)
 	SET_SEGV_LOCATION();
 	s = findserverstats(u->user->server->name);
 	if (!s) {
-		nlog(LOG_WARNING, "Unable to find stats for %s", u->user->server->name);
+		nlog (LOG_WARNING, "Unable to find stats for %s", u->user->server->name);
 		return;
 	}
 	while (*modes) {
@@ -609,26 +591,15 @@ void InitStats(void)
 
 void FiniStats(void)
 {
-	CStats *c;
-	lnode_t *cn;
-	SStats *s;
 	hnode_t *sn;
 	hscan_t ss;
 
 	hash_scan_begin(&ss, Shead);
 	while ((sn = hash_scan_next(&ss))) {
-		s = hnode_get(sn);
+		sfree (hnode_get(sn));
 		hash_scan_delete(Shead, sn);
 		hnode_destroy(sn);
-		sfree(s);
 	}
 	hash_destroy(Shead);
-	cn = list_first(Chead);
-	while (cn) {
-		c = lnode_get(cn);
-		sfree(c);
-		cn = list_next(Chead, cn);
-	}
-	list_destroy_nodes (Chead);
-	list_destroy (Chead);
+	list_destroy_auto (Chead);
 }

@@ -266,13 +266,11 @@ ChanMode (char *origin, char **av, int ac)
 						m = smalloc (sizeof (ModesParm));
 						m->mode = mode;
 						strlcpy (m->param, av[j], PARAMSIZE);
-						mn = lnode_create (m);
 						if (list_isfull (c->modeparms)) {
 							nlog (LOG_CRITICAL, "ChanMode: modelist is full adding to channel %s", c->name);
 							do_exit (NS_EXIT_ERROR, "List full - see log file");
-						} else {
-							list_append (c->modeparms, mn);
 						}
+						lnode_create_append (c->modeparms, m);
 						j++;
 					}
 				} else {
@@ -319,7 +317,6 @@ ChanMode (char *origin, char **av, int ac)
 void
 ChanUserMode (const char* chan, const char* nick, int add, long mode)
 {
-	lnode_t *cmn;
 	Chanmem *cm;
 	Channel * c;
 	Client * u;
@@ -334,8 +331,8 @@ ChanUserMode (const char* chan, const char* nick, int add, long mode)
 		nlog (LOG_WARNING, "ChanUserMode: can't find channel %s", chan);
 		return;
 	}
-	cmn = list_find (c->chanmembers, u->name, comparef);
-	if (!cmn) {
+	cm = lnode_find (c->chanmembers, u->name, comparef);
+	if (!cm) {
 		if (config.debug) {
 			irc_chanalert (ns_botptr, "ChanUserMode: %s is not a member of channel %s", u->name, c->name);
 			ChanDump (c->name);
@@ -343,7 +340,6 @@ ChanUserMode (const char* chan, const char* nick, int add, long mode)
 		}
 		return;
 	}
-	cm = lnode_get (cmn);
 	if (add) {
 		dlog(DEBUG2, "ChanUserMode: Adding mode %ld to Channel %s User %s", mode, c->name, u->name);
 		cm->flags |= mode;
@@ -368,7 +364,6 @@ new_chan (const char *chan)
 {
 	CmdParams * cmdparams;
 	Channel *c;
-	hnode_t *cn;
 
 	if (hash_isfull (channelhash)) {
 		nlog (LOG_CRITICAL, "new_chan: channel hash is full");
@@ -376,8 +371,7 @@ new_chan (const char *chan)
 	}
 	c = scalloc (sizeof (Channel));
 	strlcpy (c->name, chan, MAXCHANLEN);
-	cn = hnode_create (c);
-	hash_insert (channelhash, cn, c->name);
+	hnode_create_insert (channelhash, c, c->name);
 	c->chanmembers = list_create (CHAN_MEM_SIZE);
 	c->modeparms = list_create (MAXMODES);
 	c->creationtime = me.now;
@@ -404,7 +398,6 @@ del_chan (Channel * c)
 {
 	CmdParams * cmdparams;
 	hnode_t *cn;
-	lnode_t *cm;
 
 	SET_SEGV_LOCATION();
 	cn = hash_lookup (channelhash, c->name);
@@ -418,13 +411,7 @@ del_chan (Channel * c)
 		SendAllModuleEvent (EVENT_DELCHAN, cmdparams);
 		sfree (cmdparams);
 
-		cm = list_first (c->modeparms);
-		while (cm) {
-			sfree (lnode_get (cm));
-			cm = list_next (c->modeparms, cm);
-		}
-		list_destroy_nodes (c->modeparms);
-		list_destroy (c->modeparms);
+		list_destroy_auto (c->modeparms);
 		list_destroy (c->chanmembers);
 		hash_delete (channelhash, cn);
 		hnode_destroy (cn);
@@ -440,7 +427,7 @@ del_chan (Channel * c)
  *
  * @returns Nothing
 */
-void del_chan_user(Channel *c, Client *u)
+void del_chan_user (Channel *c, Client *u)
 {
 	lnode_t *un;
 
@@ -608,12 +595,11 @@ part_chan (Client * u, const char *chan, const char *reason)
 void
 ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 {
-	lnode_t *cm;
 	Chanmem *cml;
 
 	SET_SEGV_LOCATION();
-	cm = list_find (c->chanmembers, oldnick, comparef);
-	if (!cm) {
+	cml = lnode_find (c->chanmembers, oldnick, comparef);
+	if (!cml) {
 		nlog (LOG_WARNING, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
 		if (config.debug) {
 			irc_chanalert (ns_botptr, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
@@ -623,7 +609,6 @@ ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 		return;
 	}
     dlog(DEBUG3, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
-	cml = lnode_get (cm);
 	strlcpy (cml->nick, newnick, MAXNICK);
 }
 
@@ -648,7 +633,6 @@ join_chan (const char* nick, const char *chan)
 	CmdParams * cmdparams;
 	Client * u;
 	Channel *c;
-	lnode_t *un, *cn;
 	Chanmem *cm;
 	
 	SET_SEGV_LOCATION();
@@ -674,7 +658,6 @@ join_chan (const char* nick, const char *chan)
 	strlcpy (cm->nick, u->name, MAXNICK);
 	cm->tsjoin = me.now;
 	cm->flags = 0;
-	cn = lnode_create (cm);
 	dlog(DEBUG2, "join_chan: adding usernode %s to channel %s", u->name, chan);
 	if (list_find (c->chanmembers, u->name, comparef)) {
 		nlog (LOG_WARNING, "join_chan: tried to add %s to channel %s but they are already a member", u->name, chan);
@@ -687,19 +670,16 @@ join_chan (const char* nick, const char *chan)
 	}
 	if (list_isfull (c->chanmembers)) {
 		nlog (LOG_CRITICAL, "join_chan: channel %s member list is full", c->name);
-		lnode_destroy (cn);
 		sfree (cm);
 		return;
 	}
-	list_append (c->chanmembers, cn);
+	lnode_create_append (c->chanmembers, cm);
 	c->users++;
-	un = lnode_create (c->name);
 	if (list_isfull (u->user->chans)) {
 		nlog (LOG_CRITICAL, "join_chan: user %s member list is full", u->name);
-		lnode_destroy (un);
-	} else {
-		list_append (u->user->chans, un);
+		return;
 	}
+	lnode_create_append (u->user->chans, c->name);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source = u;
 	cmdparams->channel = c;
@@ -813,14 +793,13 @@ void ChanDump (const char *chan)
 Channel *
 find_chan (const char *chan)
 {
-	hnode_t *cn;
+	Channel* c;
 
-	cn = hash_lookup (channelhash, chan);
-	if (cn) {
-		return (Channel *) hnode_get (cn);
+	c = (Channel *)hnode_find (channelhash, chan);
+	if (!c) {
+		dlog(DEBUG3, "find_chan: %s not found", chan);
 	}
-	dlog(DEBUG3, "find_chan: %s not found", chan);
-	return NULL;
+	return c;
 }
 
 /** @brief Returns if the nick is a member of the channel
@@ -857,7 +836,6 @@ int test_cumode(char* chan, char* nick, int flag)
 {
 	Client * u;
 	Channel* c;
-	lnode_t *cmn;
  	Chanmem *cm;
 
 	u = find_user(nick);
@@ -865,13 +843,11 @@ int test_cumode(char* chan, char* nick, int flag)
 	if (!u || !c) {
 		return 0;
 	}
-	cmn = list_find (c->chanmembers, nick, comparef);
-	if (!cmn) {
-		return 0;
-	}
-	cm = lnode_get (cmn);
-	if (cm->flags & flag) {
-		return 1;
+	cm = lnode_find (c->chanmembers, nick, comparef);
+	if (cm) {
+		if (cm->flags & flag) {
+			return 1;
+		}
 	}	
 	return 0;
 }

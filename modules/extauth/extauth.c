@@ -61,7 +61,6 @@ static int LoadAccessList(void)
 	char **data, *tmp;
 	NeoAccess *access;
 	int i;
-	hnode_t *node;
 	
 	SET_SEGV_LOCATION();
 	accesshash = hash_create(-1, 0, 0);
@@ -79,8 +78,7 @@ static int LoadAccessList(void)
 				if (GetConf((void *)&access->level, CFGINT, confpath) <= 0) {
 					free(access);
 				} else {
-					node = hnode_create(access);
-					hash_insert(accesshash, node, access->nick);
+					hnode_create_insert (accesshash, access, access->nick);
 				}
 			}
 		}
@@ -95,7 +93,6 @@ static int AccessAdd(CmdParams* cmdparams)
 {
 	int level = 0;
 	NeoAccess *access;
-	hnode_t *node;
 	
 	SET_SEGV_LOCATION();
 	if (cmdparams->ac < 3) {
@@ -118,8 +115,7 @@ static int AccessAdd(CmdParams* cmdparams)
 	strlcpy(access->nick, cmdparams->av[1], MAXNICK);
 	strlcpy(access->mask, cmdparams->av[2], MAXHOST);
 	access->level = level;
-	node = hnode_create(access);
- 	hash_insert(accesshash, node, access->nick);
+ 	hnode_create_insert (accesshash, access, access->nick);
 	/* save the entry */
 	ircsnprintf(confpath, CONFBUFSIZE, "AccessList/%s/mask", access->nick);
 	SetConf((void *)access->mask, CFGSTR, confpath);
@@ -139,8 +135,8 @@ static int AccessDel(CmdParams* cmdparams)
 	}
 	node = hash_lookup(accesshash, cmdparams->av[1]);
 	if (node) {
+		sfree(hnode_get(node));
 		hash_delete(accesshash, node);
-		free(hnode_get(node));
 		hnode_destroy(node);
 		ircsnprintf(confpath, CONFBUFSIZE, "AccessList/%s", cmdparams->av[1]);
 		DelConf(confpath);
@@ -185,13 +181,11 @@ static int ea_cmd_access(CmdParams* cmdparams)
 static int GetAccessLevel(Client * u)
 {
 	static char hostmask[MAXHOST];
-	hnode_t *node;
 	NeoAccess *access;
 
 	dlog (DEBUG2, "GetAccessLevel for %s", u->name);
-	node = hash_lookup (accesshash, u->name);
-	if (node) {
-		access = hnode_get(node);
+	access = (NeoAccess *)hnode_find (accesshash, u->name);
+	if (access) {
 		ircsnprintf (hostmask, MAXHOST, "%s@%s", u->user->username, u->user->hostname);
 		if ((match (access->mask, hostmask))) {
 			return(access->level);		

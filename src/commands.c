@@ -257,8 +257,6 @@ void check_cmd_result(CmdParams * cmdparams, int cmdret, char* extra)
 static int 
 add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr) 
 {
-	hnode_t *cmdnode;
-	
 	/* Verify the command is OK before we add it so we do not have to 
 	 * check validity during processing. Only check critical elements.
 	 * For now we verify help during processing since it is not critical. */
@@ -278,13 +276,9 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 		return NS_FAILURE;
 	}
 	/* Seems OK, add the command */
-	cmdnode = hnode_create(cmd_ptr);
-	if (cmdnode) {
-		hash_insert(cmd_hash, cmdnode, cmd_ptr->cmd);
-		dlog(DEBUG3, "add_bot_cmd: added a new command %s to services bot", cmd_ptr->cmd);
-		return NS_SUCCESS;
-	}
-	return NS_FAILURE;
+	hnode_create_insert (cmd_hash, cmd_ptr, cmd_ptr->cmd);
+	dlog(DEBUG3, "add_bot_cmd: added a new command %s to services bot", cmd_ptr->cmd);
+	return NS_SUCCESS;
 }
 
 /** @brief del_bot_cmd deltes a single command to the command hash
@@ -452,7 +446,6 @@ run_bot_cmd (CmdParams * cmdparams)
 	static char privmsgbuffer[BUFSIZE];
 	int userlevel;
 	bot_cmd* cmd_ptr;
-	hnode_t *cmdnode;
 	int cmdret = 0;
 	int cmdlevel;
 	char **av;
@@ -476,9 +469,8 @@ run_bot_cmd (CmdParams * cmdparams)
 	}	
 	if(cmdparams->bot->botcmds) {
 		/* Process command list */
-		cmdnode = hash_lookup(cmdparams->bot->botcmds, av[0]);
-		if (cmdnode) {
-			cmd_ptr = hnode_get(cmdnode);	
+		cmd_ptr = (bot_cmd *)hnode_find (cmdparams->bot->botcmds, av[0]);
+		if (cmd_ptr) {
 			cmdlevel = calc_cmd_ulevel(cmd_ptr);
 			/* Is user authorised to issue this command? */
 			if (userlevel < cmdlevel) {
@@ -560,7 +552,6 @@ bot_cmd_help (CmdParams * cmdparams)
 	int donemsg=0;
 	bot_cmd* cmd_ptr;
 	int curlevel, lowlevel;
-	hnode_t *cmdnode;
 	hscan_t hs;
 	int userlevel;
 	int cmdlevel;
@@ -590,6 +581,8 @@ bot_cmd_help (CmdParams * cmdparams)
 		}
 		if(cmdparams->bot->botcmds) {
 			while(1) {
+				hnode_t* cmdnode;
+
 				hash_scan_begin(&hs, cmdparams->bot->botcmds);
 				while ((cmdnode = hash_scan_next(&hs)) != NULL) {
 					cmd_ptr = hnode_get(cmdnode);
@@ -654,9 +647,8 @@ bot_cmd_help (CmdParams * cmdparams)
 
 	/* Process command list */
 	if(cmdparams->bot->botcmds) {
-		cmdnode = hash_lookup(cmdparams->bot->botcmds, cmdparams->av[0]);
-		if (cmdnode) {
-			cmd_ptr = hnode_get(cmdnode);
+		cmd_ptr = (bot_cmd*)hnode_find (cmdparams->bot->botcmds, cmdparams->av[0]);
+		if (cmd_ptr) {
 			cmdlevel = calc_cmd_ulevel(cmd_ptr);
 			if (userlevel < cmdlevel) {
 				msg_permission_denied(cmdparams, NULL);
@@ -1001,7 +993,6 @@ static bot_cmd_set_handler bot_cmd_set_handlers[] =
 static int 
 bot_cmd_set (CmdParams * cmdparams)
 {
-	hnode_t *setnode;
 	bot_cmd_set_handler set_handler;
 	bot_setting* set_ptr;
 	int userlevel;
@@ -1024,9 +1015,8 @@ bot_cmd_set (CmdParams * cmdparams)
 		msg_syntax_error (cmdparams);
 		return NS_ERR_SYNTAX_ERROR;
 	} 
-	setnode = hash_lookup(cmdparams->bot->botsettings, cmdparams->av[0]);
-	if(setnode) {
-		set_ptr = hnode_get(setnode);
+	set_ptr= (bot_setting*)hnode_find (cmdparams->bot->botsettings, cmdparams->av[0]);
+	if(set_ptr) {
 		if( userlevel < set_ptr->ulevel) {
 			msg_permission_denied(cmdparams, cmdparams->av[0]);
 			return NS_ERR_NO_PERMISSION;
@@ -1089,15 +1079,9 @@ static int bot_cmd_credits (CmdParams * cmdparams)
 static int 
 add_bot_setting (hash_t* set_hash, bot_setting* set_ptr) 
 {
-	hnode_t *setnode;
-	
-	setnode = hnode_create(set_ptr);
-	if (setnode) {
-		hash_insert(set_hash, setnode, set_ptr->option);
-		dlog(DEBUG3, "add_bot_setting: added a new set option %s", set_ptr->option);
-		return NS_SUCCESS;
-	}
-	return NS_FAILURE;
+	hnode_create_insert (set_hash, set_ptr, set_ptr->option);
+	dlog(DEBUG3, "add_bot_setting: added a new set option %s", set_ptr->option);
+	return NS_SUCCESS;
 }
 
 /** @brief del_bot_setting delete a single set option 

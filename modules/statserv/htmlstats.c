@@ -265,7 +265,7 @@ void get_srvlistdet()
 		if (!ss)
 			fprintf(opf,
 				"<tr><td>Last Seen:</td><td colspan = 2>%s</td></tr>\n",
-				sftime(s->lastseen));
+				sftime(s->t_lastseen));
 		if (ss)
 			fprintf(opf,
 				"<tr><td>Current Users:</td><td>%d (%2.0f%%)</td><td>Max %ld at %s</td></tr>\n",

@@ -190,7 +190,6 @@ static int hs_event_quit(CmdParams* cmdparams)
 /* Routine For Setting the Virtual Host */
 static int hs_event_signon(CmdParams* cmdparams)
 {
-	lnode_t *hn;
 	hs_map *map;
 
 	SET_SEGV_LOCATION();
@@ -206,9 +205,8 @@ static int hs_event_signon(CmdParams* cmdparams)
 		return 1;
 
 	/* Check HostName Against Data Contained in vhosts.data */
-	hn = list_find(vhosts, cmdparams->source->name, findnick);
-	if (hn) {
-		map = lnode_get(hn);
+	map = lnode_find (vhosts, cmdparams->source->name, findnick);
+	if (map) {
 		dlog(DEBUG1, "Checking %s against %s", map->host, cmdparams->source->user->hostname);
 		if (match(map->host, cmdparams->source->user->hostname)) {
 			irc_svshost(cmdparams->source, map->vhost);
@@ -257,15 +255,7 @@ int ModInit(Module* mod_ptr)
 
 void ModFini()
 {
-	lnode_t *hn;
-
-	hn = list_first(vhosts);
-	while (hn != NULL) {
-		sfree (lnode_get(hn));
-		hn = list_next (vhosts, hn);
-	}
-	list_destroy_nodes (vhosts);
-	list_destroy (vhosts);
+	list_destroy_auto (vhosts);
 }
 
 int hs_event_mode(CmdParams* cmdparams) 
@@ -326,7 +316,6 @@ int hs_event_mode(CmdParams* cmdparams)
 /* Routine for registrations with the 'vhosts.db' file */
 static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 {
-	lnode_t *hn;
 	hs_map *map;
 
 	map = smalloc(sizeof(hs_map));
@@ -336,8 +325,7 @@ static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 	strlcpy(map->passwd, pass, MAXPASSWORD);
 	strlcpy(map->added, who, MAXNICK);
 	map->lused = me.now;
-	hn = lnode_create(map);
-	list_append(vhosts, hn);
+	lnode_create_append (vhosts, map);
 	save_vhost(map);
 }
 
@@ -437,7 +425,6 @@ static void hs_listban(Client * u)
 }
 static void hs_addban(Client * u, char *ban)
 {
-	hnode_t *hn;
 	char *host;
 
 	if (hash_lookup(bannedvhosts, ban) != NULL) {
@@ -447,8 +434,7 @@ static void hs_addban(Client * u, char *ban)
 	}
 	host = smalloc(MAXHOST);
 	strlcpy(host, ban, MAXHOST);
-	hn = hnode_create(host);
-	hash_insert(bannedvhosts, hn, host);
+	hnode_create_insert (bannedvhosts, host, host);
 	irc_prefmsg(hs_bot, u, 
 		"%s added to the banned vhosts list", ban);
 	irc_chanalert(hs_bot, "%s added %s to the banned vhosts list",
@@ -510,7 +496,6 @@ static void SaveBans()
 
 static int hs_chpass(CmdParams* cmdparams)
 {
-	lnode_t *hn;
 	hs_map *map;
 	char *nick;
 	char *oldpass;
@@ -520,9 +505,8 @@ static int hs_chpass(CmdParams* cmdparams)
 	oldpass = cmdparams->av[1];
 	newpass = cmdparams->av[2];
 
-	hn = list_find(vhosts, nick, findnick);
-	if (hn) {
-		map = lnode_get(hn);
+	map = lnode_find (vhosts, nick, findnick);
+	if (map) {
 		if ((match(map->host, cmdparams->source->user->hostname))
 		    || (UserLevel(cmdparams->source) >= 100)) {
 			if (!ircstrcasecmp(map->passwd, oldpass)) {
@@ -738,7 +722,6 @@ static int hs_view(CmdParams* cmdparams)
 static void LoadHosts()
 {
 	hs_map *map;
-	lnode_t *hn;
 	char *tmp;
 	int count;
 	char **LoadArray;
@@ -756,8 +739,7 @@ static void LoadHosts()
 			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Added") > 0)
 				strlcpy(map->added, tmp, MAXNICK);
 			GetData((void *)&map->lused, CFGINT, "Vhosts", map->nnick, "LastUsed");
-			hn = lnode_create(map);
-			list_append(vhosts, hn);
+			lnode_create_append (vhosts, map);
 			dlog(DEBUG1, "Loaded %s (%s) into Vhosts",
 			     map->nnick, map->vhost);
 		}
@@ -816,7 +798,6 @@ static int hs_del(CmdParams* cmdparams)
 static int hs_login(CmdParams* cmdparams)
 {
 	hs_map *map;
-	lnode_t *hn;
 	char *login;
 	char *pass;
 
@@ -824,9 +805,8 @@ static int hs_login(CmdParams* cmdparams)
 	login = cmdparams->av[0];
 	pass = cmdparams->av[1];
 	/* Check HostName Against Data Contained in vhosts.data */
-	hn = list_find(vhosts, login, findnick);
-	if (hn) {
-		map = lnode_get(hn);
+	map = lnode_find (vhosts, login, findnick);
+	if (map) {
 		if (!ircstrcasecmp(map->passwd, pass)) {
 			irc_svshost(cmdparams->source, map->vhost);
 			map->lused = me.now;
@@ -882,7 +862,6 @@ static void LoadConfig(void)
 	char *temp = NULL;
 	char *host;
 	char *host2;
-	hnode_t *hn;
 
 	SET_SEGV_LOCATION();
 
@@ -905,8 +884,7 @@ static void LoadConfig(void)
 			/* limit host to MAXHOST and avoid unterminated/huge strings */
 			host2 = smalloc(MAXHOST);
 			strlcpy(host2, host, MAXHOST);
-			hn = hnode_create(host2);
-			hash_insert(bannedvhosts, hn, host2);
+			hnode_create_insert (bannedvhosts, host2, host2);
 			host = strtok(NULL, ";");
 		}
 		sfree(temp);

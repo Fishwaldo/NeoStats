@@ -28,6 +28,8 @@
 #include "GeoIP.h"
 #include "GeoIPCity.h"
 
+#define UNKNOWN_COUNTRY_CODE	"???"
+
 list_t *Thead;
 GeoIP *gi;
 
@@ -44,7 +46,7 @@ void ResetTLD()
 		t->daily_users = 0;
 		if (t->users == 0) {
 			/* don't delete the tld entry ??? as its our "unknown" entry */
-			if (ircstrcasecmp(t->tld, "???")) {
+			if (ircstrcasecmp(t->tld, UNKNOWN_COUNTRY_CODE)) {
 				tn2 = list_next(Thead, tn);
 				sfree(t);
 				list_delete(Thead, tn);
@@ -99,7 +101,6 @@ void DisplayTLDmap(Client *u)
 void DelTLD(Client * u)
 {
 	const char *country_code;
-	lnode_t *tn;
 	TLD *t = NULL;
 	
 	SET_SEGV_LOCATION();
@@ -108,12 +109,11 @@ void DelTLD(Client * u)
 	}
 	country_code = GeoIP_country_code_by_addr(gi, u->hostip);
 	if (country_code) {
-		tn = list_find(Thead, country_code, findcc);
+		t = lnode_find (Thead, country_code, findcc);
 	} else {
-		tn = list_find(Thead, "???", findcc);
+		t = lnode_find (Thead, UNKNOWN_COUNTRY_CODE, findcc);
 	}
-	if (tn) {
-		t = lnode_get(tn);
+	if (t) {
 		t->users--;
 	} 
 }
@@ -130,7 +130,6 @@ void AddTLD(Client * u)
 {
 	const char *country_name;
 	const char *country_code;
-	lnode_t *tn;
 	TLD *t = NULL;
 	
 	SET_SEGV_LOCATION();
@@ -139,12 +138,11 @@ void AddTLD(Client * u)
 	}	
 	country_code = GeoIP_country_code_by_addr(gi, u->hostip);
 	if (country_code) {
-		tn = list_find(Thead, country_code, findcc);
+		t = lnode_find (Thead, country_code, findcc);
 	} else {
-		tn = list_find(Thead, "???", findcc);
+		t = lnode_find (Thead, UNKNOWN_COUNTRY_CODE, findcc);
 	}
-	if (tn) {
-		t = lnode_get(tn);
+	if (t) {
 		t->users++;
 		t->daily_users++;
 	} else {
@@ -154,8 +152,7 @@ void AddTLD(Client * u)
 		strlcpy(t->country, country_name, 32);
 		t->users = 1;
 		t->daily_users = 1;
-		tn = lnode_create(t);
-		list_append(Thead, tn);
+		lnode_create_append (Thead, t);
 	}
 	return;
 }
@@ -171,9 +168,8 @@ void AddTLD(Client * u)
 void InitTLD(void)
 {
 	TLD *t;
-	lnode_t *tn;
-	SET_SEGV_LOCATION();
 
+	SET_SEGV_LOCATION();
 	Thead = list_create(-1);
 	gi = NULL;
 	/* setup the GeoIP db filenames */
@@ -191,10 +187,9 @@ void InitTLD(void)
 		nlog(LOG_WARNING, "GeoIP Database is not available. TLD stats will not be available");
 	}
 	t = scalloc(sizeof(TLD));
-	ircsnprintf(t->tld, 5, "???");
+	ircsnprintf(t->tld, 5, UNKNOWN_COUNTRY_CODE);
 	strlcpy(t->country, "Unknown", 8);
-	tn = lnode_create(t);
-	list_append(Thead, tn);
+	lnode_create_append (Thead, t);
 }
 
 /** @brief FiniTLD
@@ -207,17 +202,9 @@ void InitTLD(void)
  */
 void FiniTLD(void) 
 {
-	lnode_t *tn;
-
 	if (gi) {
 		GeoIP_delete (gi);
 		gi = NULL;
 	}
-	tn = list_first (Thead);
-	while (tn != NULL) {
-		sfree (lnode_get (tn));
-		tn = list_next (Thead, tn);
-	}
-	list_destroy_nodes (Thead);	
-	list_destroy (Thead);	
+	list_destroy_auto (Thead);
 }

@@ -785,8 +785,7 @@ sql_accept_conn(int srvfd)
     newui->responsefree = 50000; /* max response packetsize if 50000 */
     newui->nbytein = 0;
     newui->nbyteout = 0;
-    newuinode = lnode_create(newui);
-    list_append(sqlconnections, newuinode);
+	lnode_create_append (sqlconnections, newui);
     inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
     dlog(DEBUG1, "New SqlConnection from %s", tmp);
   }
@@ -970,18 +969,16 @@ static Sock *
 new_sock (const char *sock_name)
 {
 	Sock *sock;
-	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	dlog(DEBUG2, "new_sock: %s", sock_name);
 	if (hash_isfull (sockethash)) {
 		nlog (LOG_CRITICAL, "new_sock: socket hash is full");
 		return NULL;
 	}
+	dlog(DEBUG2, "new_sock: %s", sock_name);
 	sock = smalloc (sizeof (Sock));
 	strlcpy (sock->name, sock_name, MAX_MOD_NAME);
-	sn = hnode_create (sock);
-	hash_insert (sockethash, sn, sock->name);
+	hnode_create_insert (sockethash, sock, sock->name);
 	return sock;
 }
 
@@ -996,12 +993,13 @@ new_sock (const char *sock_name)
 Sock *
 find_sock (const char *sock_name)
 {
-	hnode_t *sn;
+	Sock *sock;
 
-	sn = hash_lookup (sockethash, sock_name);
-	if (sn)
-		return hnode_get (sn);
-	return NULL;
+	sock = (Sock *)hnode_find (sockethash, sock_name);
+	if (!sock) {
+		dlog (DEBUG3, "find_sock: %s not found!", sock_name);		
+	}
+	return sock;
 }
 
 /** @brief add a socket to the socket list

@@ -48,18 +48,17 @@ static Client *
 new_user (const char *nick)
 {
 	Client *u;
-	hnode_t *un;
 
 	SET_SEGV_LOCATION();
 	if (hash_isfull (userhash)) {
 		nlog (LOG_CRITICAL, "new_user: user hash is full");
 		return NULL;
 	}
+	dlog(DEBUG2, "new_user: %s", nick);
 	u = scalloc (sizeof (Client));
 	strlcpy (u->name, nick, MAXNICK);
 	u->user = scalloc (sizeof (User));
-	un = hnode_create (u);
-	hash_insert (userhash, un, u->name);
+	hnode_create_insert (userhash, u, u->name);
 	return u;
 }
 
@@ -181,7 +180,7 @@ KillUser (const char *nick, const char *reason)
 
 	SET_SEGV_LOCATION();
 	dlog(DEBUG2, "KillUser: %s", nick);
-	u = find_user(nick);
+	u = find_user (nick);
 	if(!u) {
 		nlog (LOG_WARNING, "KillUser: %s failed!", nick);
 		return;
@@ -211,7 +210,7 @@ QuitUser (const char *nick, const char *reason)
 
 	SET_SEGV_LOCATION();
 	dlog(DEBUG2, "QuitUser: %s", nick);
-	u = find_user(nick);
+	u = find_user (nick);
 	if(!u) {
 		nlog (LOG_WARNING, "QuitUser: %s failed!", nick);
 		return;
@@ -315,14 +314,13 @@ finduserbase64 (const char *num)
 Client *
 find_user (const char *nick)
 {
-	hnode_t *un;
+	Client *u;
 
-	un = hash_lookup (userhash, nick);
-	if (un != NULL) {
-		return (Client *) hnode_get (un);
+	u = (Client *)hnode_find (userhash, nick);
+	if (!u) {
+		dlog(DEBUG3, "find_user: %s not found", nick);
 	}
-	dlog(DEBUG3, "find_user: %s not found", nick);
-	return NULL;
+	return u;
 }
 
 #ifdef SQLSRV
@@ -604,7 +602,6 @@ void
 UserDump (const char *nick)
 {
 	Client *u;
-	hnode_t *un;
 	hscan_t us;
 
 #ifndef DEBUG
@@ -614,15 +611,16 @@ UserDump (const char *nick)
 	SET_SEGV_LOCATION();
 	irc_chanalert (ns_botptr, "================USERDUMP================");
 	if (!nick) {
+		hnode_t* un;
+
 		hash_scan_begin (&us, userhash);
 		while ((un = hash_scan_next (&us)) != NULL) {
 			u = hnode_get (un);
 			dumpuser (u);
 		}
 	} else {
-		un = hash_lookup (userhash, nick);
-		if (un) {
-			u = hnode_get (un);
+		u = (Client *)hnode_find (userhash, nick);
+		if (u) {
 			dumpuser (u);
 		} else {
 			irc_chanalert (ns_botptr, "UserDump: can't find user %s", nick);
@@ -745,7 +743,7 @@ void SetUserServicesTS(const char* nick, const char* ts)
 {
 	Client * u;
 
-	u = find_user(nick);
+	u = find_user (nick);
 	if(u) {
 		u->user->servicestamp = strtoul(ts, NULL, 10);
 	}

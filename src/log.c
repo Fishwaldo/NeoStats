@@ -185,14 +185,12 @@ void
 nlog (LOG_LEVEL level, char *fmt, ...)
 {
 	va_list ap;
-	hnode_t *hn;
 	LogEntry *logentry;
 	
 	if (level <= config.loglevel) {
-		hn = hash_lookup (logs, GET_CUR_MODNAME());
-		if (hn) {
+		logentry = (LogEntry *)hnode_find (logs, GET_CUR_MODNAME());
+		if (logentry) {
 			/* we found our log entry */
-			logentry = hnode_get (hn);
 			if(!logentry->logfile)
 				logentry->logfile = fopen (logentry->logname, "a");
 		} else {
@@ -201,8 +199,7 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 			make_log_filename(logentry->name, logentry->logname);
 			logentry->logfile = fopen (logentry->logname, "a");
 			logentry->flush = 0;
-			hn = hnode_create (logentry);
-			hash_insert (logs, hn, logentry->name);
+			hnode_create_insert (logs, logentry, logentry->name);
 		}
 
 #ifdef DEBUG

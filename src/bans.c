@@ -34,16 +34,15 @@ static Ban *
 new_ban (const char *mask)
 {
 	Ban *ban;
-	hnode_t *bansnode;
 
 	if (hash_isfull (banshash)) {
 		nlog (LOG_CRITICAL, "new_ban: bans hash is full");
 		return NULL;
 	}
+	dlog(DEBUG2, "new_ban: %s", mask);
 	ban = scalloc (sizeof (Ban));
 	strlcpy (ban->mask, mask, MAXHOST);
-	bansnode = hnode_create (ban);
-	hash_insert (banshash, bansnode, ban->mask);
+	hnode_create_insert (banshash, ban, ban->mask);
 	return ban;
 }
 

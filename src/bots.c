@@ -335,18 +335,16 @@ static Bot *
 new_bot (const char *bot_name)
 {
 	Bot *botptr;
-	hnode_t *bn;
 
 	SET_SEGV_LOCATION();
-	dlog(DEBUG2, "new_bot: %s", bot_name);
-	botptr = scalloc (sizeof (Bot));
-	strlcpy (botptr->name, bot_name, MAXNICK);
-	bn = hnode_create (botptr);
 	if (hash_isfull (bothash)) {
 		nlog (LOG_CRITICAL, "new_bot: bot list is full");
 		return NULL;
 	}
-	hash_insert (bothash, bn, botptr->name);
+	dlog(DEBUG2, "new_bot: %s", bot_name);
+	botptr = scalloc (sizeof (Bot));
+	strlcpy (botptr->name, bot_name, MAXNICK);
+	hnode_create_insert (bothash, botptr, botptr->name);
 	return botptr;
 }
 
@@ -387,14 +385,14 @@ add_bot (Module* modptr, const char *nick)
 Bot *
 find_bot (const char *bot_name)
 {
-	hnode_t *bn;
+	Bot* bot;
 
 	SET_SEGV_LOCATION(); 
-	bn = hash_lookup (bothash, bot_name);
-	if (bn) {
-		return (Bot *) hnode_get (bn);
+	bot = (Bot *)hnode_find (bothash, bot_name);
+	if (!bot) {
+		dlog(DEBUG3, "find_bot: %s not found", bot_name);
 	}
-	return NULL;
+	return bot;
 }
 
 /** @brief del_bot

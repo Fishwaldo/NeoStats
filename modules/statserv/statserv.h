@@ -89,8 +89,8 @@ typedef struct SStats {
 	time_t t_maxusers;
 	int maxopers;
 	time_t t_maxopers;
-	time_t lastseen;
-	time_t starttime;
+	time_t t_lastseen;
+	time_t t_start;
 	unsigned int operkills;
 	unsigned int serverkills;
 	long totusers;
@@ -113,7 +113,7 @@ typedef struct CStats {
 	long maxkickstoday;
 	long maxmemtoday;
 	time_t t_maxmemtoday;
-	time_t lastseen;
+	time_t t_lastseen;
 	long maxmems;
 	time_t t_maxmems;
 	long maxkicks;

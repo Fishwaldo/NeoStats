@@ -896,3 +896,27 @@ hash_comp_default (const void *key1, const void *key2)
 	return ircstrcasecmp (key1, key2);
 }
 
+/*
+ * Create node and insert into to list
+ */
+void hnode_create_insert (hash_t *hash, void *data, const void *key)
+{
+	hnode_t *hn;
+	
+	hn = hnode_create(data);
+	hash_insert (hash, hn, key);
+}
+
+/*
+ * Find hash entry and return data pointer
+ */
+hnode_t *hnode_find (hash_t * hash, const void *key)
+{
+	hnode_t *hn;
+
+	hn = hash_lookup (hash, key);
+	if (!hn) {
+		return NULL;
+	}
+	return hnode_get (hn);
+}
