@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-#include "neostats.h"
+#include "statserv.h"
 #include "hash.h"
 #include <fcntl.h>
 
