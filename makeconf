@@ -302,7 +302,7 @@ $NEOWRITE
 
 # Path to NeoStats HTML Output file.  INCLUDE FILENAME!! This is required.
 # Example: /home/shmad/public_html/stats.html
-HTML_HTML $NEOHTML
+HTML_PATH $NEOHTML
 
 
 #####################################

@@ -244,7 +244,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 #endif
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
-	schmode_cmd(me.name, me.chan, "+oa", cmd);
+	schmode_cmd(nick, me.chan, "+oa", cmd);
 	Module_Event("SIGNON", finduser(nick));
 	return 1;
 }
@@ -542,7 +542,7 @@ void init_ServBot()
 //	ssjoin_cmd(s_Services, me.chan, 
 	sjoin_cmd(s_Services, me.chan);
 	sprintf(rname, "%s %s", s_Services, s_Services);
-	schmode_cmd(me.name, me.chan, "+oa", rname);
+	schmode_cmd(s_Services, me.chan, "+oa", rname);
 	me.onchan = 1;
 	Module_Event("SIGNON", finduser(s_Services));
 	
