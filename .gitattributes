@@ -353,6 +353,8 @@ modules/templateauth/Makefile.am -text
 modules/templateauth/Makefile.in -text
 modules/templateauth/templateauth.c -text
 /neostats.motd -text
+/neostats.sln -text
+/neostatslibs.sln -text
 src/Makefile.am -text
 src/Makefile.in -text
 src/auth.c -text
