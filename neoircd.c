@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.19 2003/06/26 05:49:45 fishwaldo Exp $
+** $Id: neoircd.c,v 1.20 2003/06/26 06:00:43 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -34,81 +34,146 @@
 /* this is the command list and associated functions to run */
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
-	{MSG_STATS, Usr_Stats, 1, 0},
-	{MSG_VERSION, Usr_Version, 1, 0},
-	{MSG_MOTD, Usr_ShowMOTD, 1, 0},
-	{MSG_ADMIN, Usr_ShowADMIN, 1, 0},
-	{MSG_CREDITS, Usr_Showcredits, 1, 0},
-	{MSG_SERVER, Usr_AddServer, 1, 0},
-	{MSG_SQUIT, Usr_DelServer, 1, 0},
-	{MSG_QUIT, Usr_DelUser, 1, 0},
-	{MSG_MODE, Usr_Mode, 1, 0},
-	{MSG_KILL, Usr_Kill, 1, 0},
-	{MSG_PONG, Usr_Pong, 1, 0},
-	{MSG_AWAY, Usr_Away, 1, 0},
-	{MSG_NICK, Usr_Nick, 1, 0},
-	{MSG_TOPIC, Usr_Topic, 1, 0},
-	{MSG_TOPIC, Usr_Topic, 0, 0},
-	{MSG_KICK, Usr_Kick, 1, 0},
-	{MSG_JOIN, Usr_Join, 1, 0},
-	{MSG_PART, Usr_Part, 1, 0},
-	{MSG_PING, Srv_Ping, 0, 0},
-	{MSG_SVINFO, Srv_Svinfo, 0, 0},
-	{MSG_PASS, Srv_Pass, 0, 0},
-	{MSG_SERVER, Srv_Server, 0, 0},
-	{MSG_SQUIT, Srv_Squit, 0, 0},
-	{MSG_NICK, Srv_Nick, 0, 0},
-	{MSG_KILL, Srv_Kill, 0, 0},
-	{MSG_EOB, Srv_Burst, 1, 0},
-	{MSG_SJOIN, Srv_Sjoin, 1, 0},
-	{MSG_TBURST, Srv_Tburst, 1, 0},
+	{MSG_STATS, Usr_Stats, 1, 0}
+	,
+	{MSG_VERSION, Usr_Version, 1, 0}
+	,
+	{MSG_MOTD, Usr_ShowMOTD, 1, 0}
+	,
+	{MSG_ADMIN, Usr_ShowADMIN, 1, 0}
+	,
+	{MSG_CREDITS, Usr_Showcredits, 1, 0}
+	,
+	{MSG_SERVER, Usr_AddServer, 1, 0}
+	,
+	{MSG_SQUIT, Usr_DelServer, 1, 0}
+	,
+	{MSG_QUIT, Usr_DelUser, 1, 0}
+	,
+	{MSG_MODE, Usr_Mode, 1, 0}
+	,
+	{MSG_KILL, Usr_Kill, 1, 0}
+	,
+	{MSG_PONG, Usr_Pong, 1, 0}
+	,
+	{MSG_AWAY, Usr_Away, 1, 0}
+	,
+	{MSG_NICK, Usr_Nick, 1, 0}
+	,
+	{MSG_TOPIC, Usr_Topic, 1, 0}
+	,
+	{MSG_TOPIC, Usr_Topic, 0, 0}
+	,
+	{MSG_KICK, Usr_Kick, 1, 0}
+	,
+	{MSG_JOIN, Usr_Join, 1, 0}
+	,
+	{MSG_PART, Usr_Part, 1, 0}
+	,
+	{MSG_PING, Srv_Ping, 0, 0}
+	,
+	{MSG_SVINFO, Srv_Svinfo, 0, 0}
+	,
+	{MSG_PASS, Srv_Pass, 0, 0}
+	,
+	{MSG_SERVER, Srv_Server, 0, 0}
+	,
+	{MSG_SQUIT, Srv_Squit, 0, 0}
+	,
+	{MSG_NICK, Srv_Nick, 0, 0}
+	,
+	{MSG_KILL, Srv_Kill, 0, 0}
+	,
+	{MSG_EOB, Srv_Burst, 1, 0}
+	,
+	{MSG_SJOIN, Srv_Sjoin, 1, 0}
+	,
+	{MSG_TBURST, Srv_Tburst, 1, 0}
+	,
 	{NULL, NULL, 0, 0}
 };
 
 
 aCtab cFlagTab[] = {
-	{MODE_HALFOP, 'h', 1, 0, '%'},
-	{MODE_CHANOP, 'o', 1, 0, '@'},
-	{MODE_VOICE, 'v', 1, 0, '+'},
-	{MODE_CHANADMIN, 'a', 1, 0, '!'},
-	{MODE_SECRET, 's', 0, 0, 0},
-	{MODE_PRIVATE, 'p', 0, 0, 0},
-	{MODE_MODERATED, 'm', 0, 0, 0},
-	{MODE_TOPICLIMIT, 't', 0, 0, 0},
-	{MODE_INVITEONLY, 'i', 0, 0, 0},
-	{MODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{MODE_HIDEOPS, 'A', 0, 0, 0},
-	{MODE_LIMIT, 'l', 0, 1, 0},
-	{MODE_KEY, 'k', 0, 1, 0},
-	{MODE_BAN, 'b', 0, 1, 0},
-	{MODE_EXCEPT, 'e', 0, 1, 0},
-	{MODE_INVEX, 'I', 0, 1, 0},
-	{MODE_REGCHAN, 'r', 0, 0, 0},
-	{MODE_OPERSONLY, 'O', 0, 0, 0},
+	{MODE_HALFOP, 'h', 1, 0, '%'}
+	,
+	{MODE_CHANOP, 'o', 1, 0, '@'}
+	,
+	{MODE_VOICE, 'v', 1, 0, '+'}
+	,
+	{MODE_CHANADMIN, 'a', 1, 0, '!'}
+	,
+	{MODE_SECRET, 's', 0, 0, 0}
+	,
+	{MODE_PRIVATE, 'p', 0, 0, 0}
+	,
+	{MODE_MODERATED, 'm', 0, 0, 0}
+	,
+	{MODE_TOPICLIMIT, 't', 0, 0, 0}
+	,
+	{MODE_INVITEONLY, 'i', 0, 0, 0}
+	,
+	{MODE_NOPRIVMSGS, 'n', 0, 0, 0}
+	,
+	{MODE_HIDEOPS, 'A', 0, 0, 0}
+	,
+	{MODE_LIMIT, 'l', 0, 1, 0}
+	,
+	{MODE_KEY, 'k', 0, 1, 0}
+	,
+	{MODE_BAN, 'b', 0, 1, 0}
+	,
+	{MODE_EXCEPT, 'e', 0, 1, 0}
+	,
+	{MODE_INVEX, 'I', 0, 1, 0}
+	,
+	{MODE_REGCHAN, 'r', 0, 0, 0}
+	,
+	{MODE_OPERSONLY, 'O', 0, 0, 0}
+	,
 	{0x0, 0x0, 0x0, 0x0, 0x0}
 };
 
 
 Oper_Modes usr_mds[] = {
-	{UMODE_OPER, 'o', 50},
-	{UMODE_ADMIN, 'A', 190},
-	{UMODE_BOTS, 'b', 0},
-	{UMODE_CCONN, 'c', 0},
-	{UMODE_DEBUG, 'd', 200},
-	{UMODE_FULL, 'f', 0},
-	{UMODE_CALLERID, 'g', 0},
-	{UMODE_INVISIBLE, 'i', 0},
-	{UMODE_SKILL, 'k', 0},
-	{UMODE_LOCOPS, 'l', 40},
-	{UMODE_NCHANGE, 'n', 0},
-	{UMODE_REJ, 'R', 0},
-	{UMODE_SERVNOTICE, 's', 0},
-	{UMODE_UNAUTH, 'u', 0},
-	{UMODE_WALLOP, 'w', 0},
-	{UMODE_EXTERNAL, 'x', 0},
-	{UMODE_SPY, 'y', 0},
-	{UMODE_OPERWALL, 'z', 0},
-	{UMODE_SERVICES, 'S', 200},
+	{UMODE_OPER, 'o', 50}
+	,
+	{UMODE_ADMIN, 'A', 190}
+	,
+	{UMODE_BOTS, 'b', 0}
+	,
+	{UMODE_CCONN, 'c', 0}
+	,
+	{UMODE_DEBUG, 'd', 200}
+	,
+	{UMODE_FULL, 'f', 0}
+	,
+	{UMODE_CALLERID, 'g', 0}
+	,
+	{UMODE_INVISIBLE, 'i', 0}
+	,
+	{UMODE_SKILL, 'k', 0}
+	,
+	{UMODE_LOCOPS, 'l', 40}
+	,
+	{UMODE_NCHANGE, 'n', 0}
+	,
+	{UMODE_REJ, 'R', 0}
+	,
+	{UMODE_SERVNOTICE, 's', 0}
+	,
+	{UMODE_UNAUTH, 'u', 0}
+	,
+	{UMODE_WALLOP, 'w', 0}
+	,
+	{UMODE_EXTERNAL, 'x', 0}
+	,
+	{UMODE_SPY, 'y', 0}
+	,
+	{UMODE_OPERWALL, 'z', 0}
+	,
+	{UMODE_SERVICES, 'S', 200}
+	,
 	{0, 0, 0}
 };
 
@@ -526,7 +591,9 @@ void Srv_Sjoin(char *origin, char **argv, int argc)
 		goto nomodes;
 	}
 	while (*modes) {
- 		for (i = 0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1); i++) {
+		for (i = 0;
+		     i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1);
+		     i++) {
 			if (*modes == cFlagTab[i].flag) {
 				if (cFlagTab[i].parameters) {
 					m = smalloc(sizeof(ModesParm));
@@ -555,7 +622,10 @@ void Srv_Sjoin(char *origin, char **argv, int argc)
 		modes = argv[j];
 		mode = 0;
 		while (ok == 1) {
-			for (i = 0;i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -1); i++) {
+			for (i = 0;
+			     i <
+			     ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -
+			      1); i++) {
 				if (cFlagTab[i].sjoin != 0) {
 					if (*modes == cFlagTab[i].sjoin) {
 						mode |= cFlagTab[i].mode;
@@ -684,7 +754,8 @@ void Usr_Kill(char *origin, char **argv, int argc)
 	if (u) {
 		KillUser(argv[0]);
 	} else {
-		nlog(LOG_WARNING, LOG_CORE, "Can't find user %s for Kill", argv[0]);
+		nlog(LOG_WARNING, LOG_CORE, "Can't find user %s for Kill",
+		     argv[0]);
 	}
 }
 void Usr_Vhost(char *origin, char **argv, int argc)

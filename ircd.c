@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.128 2003/06/26 05:49:45 fishwaldo Exp $
+** $Id: ircd.c,v 1.129 2003/06/26 06:00:43 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -583,7 +583,7 @@ void Showcredits(char *nick)
 		     ":- Eggy for proving to use our code still had bugs when we thought it didn't (and all the bug reports!)");
 	snumeric_cmd(351, nick,
 		     ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
-	snumeric_cmd(351, nick, 
+	snumeric_cmd(351, nick,
 		     ":- M - Updating lots of Doco and code and providing lots of great feedback");
 }
 

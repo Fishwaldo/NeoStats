@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.53 2003/06/26 05:49:45 fishwaldo Exp $
+** $Id: users.c,v 1.54 2003/06/26 06:00:43 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -35,7 +35,7 @@
 
 
 int fnmatch(const char *, const char *, int flags);
-void doDelUser(const char *, int );
+void doDelUser(const char *, int);
 
 
 
@@ -129,7 +129,7 @@ void part_u_chan(list_t * list, lnode_t * node, void *v)
 	User *u = v;
 	part_chan(u, lnode_get(node));
 }
-void KillUser (const char *nick)
+void KillUser(const char *nick)
 {
 	doDelUser(nick, 1);
 }

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.52 2003/06/26 05:49:45 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.53 2003/06/26 06:00:43 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -33,73 +33,135 @@
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
-	{MSG_STATS, Usr_Stats, 1, 0},
-	{TOK_STATS, Usr_Stats, 1, 0},
-	{MSG_SETHOST, Usr_Vhost, 1, 0},
-	{TOK_SETHOST, Usr_Vhost, 1, 0},
-	{MSG_VERSION, Usr_Version, 1, 0},
-	{TOK_VERSION, Usr_Version, 1, 0},
-	{MSG_MOTD, Usr_ShowMOTD, 1, 0},
-	{TOK_MOTD, Usr_ShowMOTD, 1, 0},
-	{MSG_CREDITS, Usr_Showcredits, 1, 0},
-	{TOK_CREDITS, Usr_Showcredits, 1, 0},
-	{MSG_SERVER, Usr_AddServer, 1, 0},
-	{TOK_SERVER, Usr_AddServer, 1, 0},
-	{MSG_SQUIT, Usr_DelServer, 1, 0},
-	{TOK_SQUIT, Usr_DelServer, 1, 0},
-	{MSG_QUIT, Usr_DelUser, 1, 0},
-	{TOK_QUIT, Usr_DelUser, 1, 0},
-	{MSG_MODE, Usr_Mode, 1, 0},
-	{TOK_MODE, Usr_Mode, 1, 0},
-	{MSG_SVSMODE, Usr_Smode, 1, 0},
-	{TOK_SVSMODE, Usr_Smode, 1, 0},
-	{MSG_KILL, Usr_Kill, 1, 0},
-	{TOK_KILL, Usr_Kill, 1, 0},
-	{MSG_PONG, Usr_Pong, 1, 0},
-	{TOK_PONG, Usr_Pong, 1, 0},
-	{MSG_AWAY, Usr_Away, 1, 0},
-	{TOK_AWAY, Usr_Away, 1, 0},
-	{MSG_NICK, Usr_Nick, 1, 0},
-	{TOK_NICK, Usr_Nick, 1, 0},
-	{MSG_TOPIC, Usr_Topic, 1, 0},
-	{TOK_TOPIC, Usr_Topic, 1, 0},
-	{MSG_KICK, Usr_Kick, 1, 0},
-	{TOK_KICK, Usr_Kick, 1, 0},
-	{MSG_JOIN, Usr_Join, 1, 0},
-	{TOK_JOIN, Usr_Join, 1, 0},
-	{MSG_PART, Usr_Part, 1, 0},
-	{TOK_PART, Usr_Part, 1, 0},
-	{MSG_PING, Srv_Ping, 0, 0},
-	{TOK_PING, Srv_Ping, 0, 0},
+	{MSG_STATS, Usr_Stats, 1, 0}
+	,
+	{TOK_STATS, Usr_Stats, 1, 0}
+	,
+	{MSG_SETHOST, Usr_Vhost, 1, 0}
+	,
+	{TOK_SETHOST, Usr_Vhost, 1, 0}
+	,
+	{MSG_VERSION, Usr_Version, 1, 0}
+	,
+	{TOK_VERSION, Usr_Version, 1, 0}
+	,
+	{MSG_MOTD, Usr_ShowMOTD, 1, 0}
+	,
+	{TOK_MOTD, Usr_ShowMOTD, 1, 0}
+	,
+	{MSG_CREDITS, Usr_Showcredits, 1, 0}
+	,
+	{TOK_CREDITS, Usr_Showcredits, 1, 0}
+	,
+	{MSG_SERVER, Usr_AddServer, 1, 0}
+	,
+	{TOK_SERVER, Usr_AddServer, 1, 0}
+	,
+	{MSG_SQUIT, Usr_DelServer, 1, 0}
+	,
+	{TOK_SQUIT, Usr_DelServer, 1, 0}
+	,
+	{MSG_QUIT, Usr_DelUser, 1, 0}
+	,
+	{TOK_QUIT, Usr_DelUser, 1, 0}
+	,
+	{MSG_MODE, Usr_Mode, 1, 0}
+	,
+	{TOK_MODE, Usr_Mode, 1, 0}
+	,
+	{MSG_SVSMODE, Usr_Smode, 1, 0}
+	,
+	{TOK_SVSMODE, Usr_Smode, 1, 0}
+	,
+	{MSG_KILL, Usr_Kill, 1, 0}
+	,
+	{TOK_KILL, Usr_Kill, 1, 0}
+	,
+	{MSG_PONG, Usr_Pong, 1, 0}
+	,
+	{TOK_PONG, Usr_Pong, 1, 0}
+	,
+	{MSG_AWAY, Usr_Away, 1, 0}
+	,
+	{TOK_AWAY, Usr_Away, 1, 0}
+	,
+	{MSG_NICK, Usr_Nick, 1, 0}
+	,
+	{TOK_NICK, Usr_Nick, 1, 0}
+	,
+	{MSG_TOPIC, Usr_Topic, 1, 0}
+	,
+	{TOK_TOPIC, Usr_Topic, 1, 0}
+	,
+	{MSG_KICK, Usr_Kick, 1, 0}
+	,
+	{TOK_KICK, Usr_Kick, 1, 0}
+	,
+	{MSG_JOIN, Usr_Join, 1, 0}
+	,
+	{TOK_JOIN, Usr_Join, 1, 0}
+	,
+	{MSG_PART, Usr_Part, 1, 0}
+	,
+	{TOK_PART, Usr_Part, 1, 0}
+	,
+	{MSG_PING, Srv_Ping, 0, 0}
+	,
+	{TOK_PING, Srv_Ping, 0, 0}
+	,
 #ifndef ULTIMATE3
-	{MSG_SNETINFO, Srv_Netinfo, 0, 0},
-	{TOK_SNETINFO, Srv_Netinfo, 0, 0},
+	{MSG_SNETINFO, Srv_Netinfo, 0, 0}
+	,
+	{TOK_SNETINFO, Srv_Netinfo, 0, 0}
+	,
 
 #endif
 #ifdef ULTIMATE3
-	{MSG_SVINFO, Srv_Svinfo, 0, 0},
-	{MSG_CAPAB, Srv_Connect, 0, 0},
-	{MSG_BURST, Srv_Burst, 0, 0},
-	{MSG_SJOIN, Srv_Sjoin, 1, 0},
-	{MSG_CLIENT, Srv_Client, 0, 0},
-	{MSG_SMODE, Srv_Smode, 1, 0},
+	{MSG_SVINFO, Srv_Svinfo, 0, 0}
+	,
+	{MSG_CAPAB, Srv_Connect, 0, 0}
+	,
+	{MSG_BURST, Srv_Burst, 0, 0}
+	,
+	{MSG_SJOIN, Srv_Sjoin, 1, 0}
+	,
+	{MSG_CLIENT, Srv_Client, 0, 0}
+	,
+	{MSG_SMODE, Srv_Smode, 1, 0}
+	,
 #endif
-	{MSG_VCTRL, Srv_Vctrl, 0, 0},
-	{TOK_VCTRL, Srv_Vctrl, 0, 0},
-	{MSG_PASS, Srv_Pass, 0, 0},
-	{TOK_PASS, Srv_Pass, 0, 0},
-	{MSG_SERVER, Srv_Server, 0, 0},
-	{TOK_SERVER, Srv_Server, 0, 0},
-	{MSG_SQUIT, Srv_Squit, 0, 0},
-	{TOK_SQUIT, Srv_Squit, 0, 0},
-	{MSG_NICK, Srv_Nick, 0, 0},
-	{TOK_NICK, Srv_Nick, 0, 0},
-	{MSG_SVSNICK, Srv_Svsnick, 0, 0},
-	{TOK_SVSNICK, Srv_Svsnick, 0, 0},
-	{MSG_KILL, Srv_Kill, 0, 0},
-	{TOK_KILL, Srv_Kill, 0, 0},
-	{MSG_PROTOCTL, Srv_Connect, 0, 0},
-	{TOK_PROTOCTL, Srv_Connect, 0, 0},
+	{MSG_VCTRL, Srv_Vctrl, 0, 0}
+	,
+	{TOK_VCTRL, Srv_Vctrl, 0, 0}
+	,
+	{MSG_PASS, Srv_Pass, 0, 0}
+	,
+	{TOK_PASS, Srv_Pass, 0, 0}
+	,
+	{MSG_SERVER, Srv_Server, 0, 0}
+	,
+	{TOK_SERVER, Srv_Server, 0, 0}
+	,
+	{MSG_SQUIT, Srv_Squit, 0, 0}
+	,
+	{TOK_SQUIT, Srv_Squit, 0, 0}
+	,
+	{MSG_NICK, Srv_Nick, 0, 0}
+	,
+	{TOK_NICK, Srv_Nick, 0, 0}
+	,
+	{MSG_SVSNICK, Srv_Svsnick, 0, 0}
+	,
+	{TOK_SVSNICK, Srv_Svsnick, 0, 0}
+	,
+	{MSG_KILL, Srv_Kill, 0, 0}
+	,
+	{TOK_KILL, Srv_Kill, 0, 0}
+	,
+	{MSG_PROTOCTL, Srv_Connect, 0, 0}
+	,
+	{TOK_PROTOCTL, Srv_Connect, 0, 0}
+	,
 	{NULL, NULL, 0, 0}
 };
 
@@ -107,104 +169,187 @@ IntCommands cmd_list[] = {
 
 
 aCtab cFlagTab[] = {
-	{MODE_CHANOP, 'o', 1, 0, '@'},
-	{MODE_HALFOP, 'h', 1, 0, '%'},
-	{MODE_CHANADMIN, 'a', 1, 0, '!'},
-	{MODE_VOICE, 'v', 1, 0, '+'},
-	{MODE_BAN, 'b', 0, 1, 0},
-	{MODE_EXCEPT, 'e', 0, 1, 0},
-	{MODE_FLOODLIMIT, 'f', 0, 1, 0},	/* Flood limiter */
-	{MODE_INVITEONLY, 'i', 0, 0, 0},
-	{MODE_KEY, 'k', 0, 1, 0},
-	{MODE_LIMIT, 'l', 0, 1, 0},
-	{MODE_MODERATED, 'm', 0, 0, 0},
-	{MODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{MODE_PRIVATE, 'p', 0, 0, 0},
-	{MODE_RGSTR, 'r', 0, 0, 0},
-	{MODE_SECRET, 's', 0, 0, 0},
-	{MODE_TOPICLIMIT, 't', 0, 0, 0},
-	{MODE_NOCOLOR, 'x', 0, 0, 0},
-	{MODE_ADMONLY, 'A', 0, 0, 0},
-	{MODE_NOINVITE, 'I', 0, 0, 0},	/* no invites */
-	{MODE_NOKNOCK, 'K', 0, 0, 0},	/* knock knock (no way!) */
-	{MODE_LINK, 'L', 0, 1, 0},
-	{MODE_OPERONLY, 'O', 0, 0, 0},
-	{MODE_RGSTRONLY, 'R', 0, 0, 0},
-	{MODE_STRIP, 'S', 0, 0, 0},	/* works? */
+	{MODE_CHANOP, 'o', 1, 0, '@'}
+	,
+	{MODE_HALFOP, 'h', 1, 0, '%'}
+	,
+	{MODE_CHANADMIN, 'a', 1, 0, '!'}
+	,
+	{MODE_VOICE, 'v', 1, 0, '+'}
+	,
+	{MODE_BAN, 'b', 0, 1, 0}
+	,
+	{MODE_EXCEPT, 'e', 0, 1, 0}
+	,
+	{MODE_FLOODLIMIT, 'f', 0, 1, 0}
+	,			/* Flood limiter */
+	{MODE_INVITEONLY, 'i', 0, 0, 0}
+	,
+	{MODE_KEY, 'k', 0, 1, 0}
+	,
+	{MODE_LIMIT, 'l', 0, 1, 0}
+	,
+	{MODE_MODERATED, 'm', 0, 0, 0}
+	,
+	{MODE_NOPRIVMSGS, 'n', 0, 0, 0}
+	,
+	{MODE_PRIVATE, 'p', 0, 0, 0}
+	,
+	{MODE_RGSTR, 'r', 0, 0, 0}
+	,
+	{MODE_SECRET, 's', 0, 0, 0}
+	,
+	{MODE_TOPICLIMIT, 't', 0, 0, 0}
+	,
+	{MODE_NOCOLOR, 'x', 0, 0, 0}
+	,
+	{MODE_ADMONLY, 'A', 0, 0, 0}
+	,
+	{MODE_NOINVITE, 'I', 0, 0, 0}
+	,			/* no invites */
+	{MODE_NOKNOCK, 'K', 0, 0, 0}
+	,			/* knock knock (no way!) */
+	{MODE_LINK, 'L', 0, 1, 0}
+	,
+	{MODE_OPERONLY, 'O', 0, 0, 0}
+	,
+	{MODE_RGSTRONLY, 'R', 0, 0, 0}
+	,
+	{MODE_STRIP, 'S', 0, 0, 0}
+	,			/* works? */
 	{0x0, 0x0, 0x0, 0x0, 0x0}
 };
 
 
 #ifdef ULTIMATE3
 Oper_Modes usr_mds[] = {
-	{UMODE_OPER, 'o', 50},
-	{UMODE_LOCOP, 'O', 40},
-	{UMODE_INVISIBLE, 'i', 0},
-	{UMODE_WALLOP, 'w', 0},
-	{UMODE_SERVNOTICE, 's', 0},
-	{UMODE_CLIENT, 'c', 0},
-	{UMODE_REGNICK, 'r', 10},
-	{UMODE_KILLS, 'k', 0},
-	{UMODE_FAILOP, 'g', 0},
-	{UMODE_HELPOP, 'h', 30},
-	{UMODE_FLOOD, 'f', 0},
-	{UMODE_SPY, 'y', 0},
-	{UMODE_DCC, 'D', 0},
-	{UMODE_GLOBOPS, 'g', 0},
-	{UMODE_CHATOP, 'c', 0},
-	{UMODE_SERVICESOPER, 'a', 100},
-	{UMODE_REJ, 'j', 0},
-	{UMODE_ROUTE, 'n', 0},
-	{UMODE_SPAM, 'm', 0},
-	{UMODE_HIDE, 'x', 0},
-	{UMODE_IRCADMIN, 'Z', 200},
-	{UMODE_SERVICESADMIN, 'P', 185},
-	{UMODE_SERVICES, 'S', 200},
-	{UMODE_PROT, 'p', 0},
-	{UMODE_GLOBCON, 'F', 0},
-	{UMODE_DEBUG, 'd', 0},
-	{UMODE_DCCWARN, 'd', 0},
-	{UMODE_WHOIS, 'W', 0},
+	{UMODE_OPER, 'o', 50}
+	,
+	{UMODE_LOCOP, 'O', 40}
+	,
+	{UMODE_INVISIBLE, 'i', 0}
+	,
+	{UMODE_WALLOP, 'w', 0}
+	,
+	{UMODE_SERVNOTICE, 's', 0}
+	,
+	{UMODE_CLIENT, 'c', 0}
+	,
+	{UMODE_REGNICK, 'r', 10}
+	,
+	{UMODE_KILLS, 'k', 0}
+	,
+	{UMODE_FAILOP, 'g', 0}
+	,
+	{UMODE_HELPOP, 'h', 30}
+	,
+	{UMODE_FLOOD, 'f', 0}
+	,
+	{UMODE_SPY, 'y', 0}
+	,
+	{UMODE_DCC, 'D', 0}
+	,
+	{UMODE_GLOBOPS, 'g', 0}
+	,
+	{UMODE_CHATOP, 'c', 0}
+	,
+	{UMODE_SERVICESOPER, 'a', 100}
+	,
+	{UMODE_REJ, 'j', 0}
+	,
+	{UMODE_ROUTE, 'n', 0}
+	,
+	{UMODE_SPAM, 'm', 0}
+	,
+	{UMODE_HIDE, 'x', 0}
+	,
+	{UMODE_IRCADMIN, 'Z', 200}
+	,
+	{UMODE_SERVICESADMIN, 'P', 185}
+	,
+	{UMODE_SERVICES, 'S', 200}
+	,
+	{UMODE_PROT, 'p', 0}
+	,
+	{UMODE_GLOBCON, 'F', 0}
+	,
+	{UMODE_DEBUG, 'd', 0}
+	,
+	{UMODE_DCCWARN, 'd', 0}
+	,
+	{UMODE_WHOIS, 'W', 0}
+	,
 	{0, 0, 0}
 };
 
 Oper_Modes susr_mds[] = {
-	{SMODE_SSL, 's', 0},
-	{SMODE_COADMIN, 'a', 75},
-	{SMODE_SERVADMIN, 'A', 100},
-	{SMODE_COTECH, 't', 125},
-	{SMODE_TECHADMIN, 'T', 150},
-	{SMODE_CONET, 'n', 175},
-	{SMODE_NETADMIN, 'N', 190},
-	{SMODE_GUEST, 'G', 100},
+	{SMODE_SSL, 's', 0}
+	,
+	{SMODE_COADMIN, 'a', 75}
+	,
+	{SMODE_SERVADMIN, 'A', 100}
+	,
+	{SMODE_COTECH, 't', 125}
+	,
+	{SMODE_TECHADMIN, 'T', 150}
+	,
+	{SMODE_CONET, 'n', 175}
+	,
+	{SMODE_NETADMIN, 'N', 190}
+	,
+	{SMODE_GUEST, 'G', 100}
+	,
 	{0, 0, 0}
 };
 
 #elif ULTIMATE
 Oper_Modes usr_mds[] = {
-	{UMODE_OPER, 'o', 50},
-	{UMODE_LOCOP, 'O', 40},
-	{UMODE_INVISIBLE, 'i', 0},
-	{UMODE_WALLOP, 'w', 0},
-	{UMODE_FAILOP, 'g', 0},
-	{UMODE_HELPOP, 'h', 30},
-	{UMODE_SERVNOTICE, 's', 0},
-	{UMODE_KILLS, 'k', 0},
-	{UMODE_SERVICES, 'S', 200},
-	{UMODE_SERVICESADMIN, 'P', 200},
-	{UMODE_RBOT, 'B', 0},
-	{UMODE_SBOT, 'b', 0},
-	{UMODE_ADMIN, 'z', 70},
-	{UMODE_NETADMIN, 'N', 185},
-	{UMODE_TECHADMIN, 'T', 190},
-	{UMODE_CLIENT, 'c', 0},
-	{UMODE_FLOOD, 'f', 0},
-	{UMODE_REGNICK, 'r', 0},
-	{UMODE_HIDE, 'x', 0},
-	{UMODE_WATCHER, 'W', 0},
-	{UMODE_SERVICESOPER, 'a', 100},
-	{UMODE_SUPER, 'p', 40},
-	{UMODE_IRCADMIN, 'Z', 100},
+	{UMODE_OPER, 'o', 50}
+	,
+	{UMODE_LOCOP, 'O', 40}
+	,
+	{UMODE_INVISIBLE, 'i', 0}
+	,
+	{UMODE_WALLOP, 'w', 0}
+	,
+	{UMODE_FAILOP, 'g', 0}
+	,
+	{UMODE_HELPOP, 'h', 30}
+	,
+	{UMODE_SERVNOTICE, 's', 0}
+	,
+	{UMODE_KILLS, 'k', 0}
+	,
+	{UMODE_SERVICES, 'S', 200}
+	,
+	{UMODE_SERVICESADMIN, 'P', 200}
+	,
+	{UMODE_RBOT, 'B', 0}
+	,
+	{UMODE_SBOT, 'b', 0}
+	,
+	{UMODE_ADMIN, 'z', 70}
+	,
+	{UMODE_NETADMIN, 'N', 185}
+	,
+	{UMODE_TECHADMIN, 'T', 190}
+	,
+	{UMODE_CLIENT, 'c', 0}
+	,
+	{UMODE_FLOOD, 'f', 0}
+	,
+	{UMODE_REGNICK, 'r', 0}
+	,
+	{UMODE_HIDE, 'x', 0}
+	,
+	{UMODE_WATCHER, 'W', 0}
+	,
+	{UMODE_SERVICESOPER, 'a', 100}
+	,
+	{UMODE_SUPER, 'p', 40}
+	,
+	{UMODE_IRCADMIN, 'Z', 100}
+	,
 	{0, 0, 0}
 };
 #endif
@@ -212,7 +357,7 @@ Oper_Modes usr_mds[] = {
 void init_ircd()
 {
 	/* count the number of commands */
-	ircd_srv.cmdcount = ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1);
+	ircd_srv.cmdcount = ((sizeof(cmd_list) / sizeof(cmd_list[0])) - 1);
 };
 
 int sserver_cmd(const char *name, const int numeric, const char *infoline)
@@ -725,7 +870,10 @@ void Srv_Sjoin(char *origin, char **argv, int argc)
 		modes = argv[j];
 		mode = 0;
 		while (ok == 1) {
-			for (i = 0;i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -1); i++) {
+			for (i = 0;
+			     i <
+			     ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -
+			      1); i++) {
 				if (cFlagTab[i].sjoin != 0) {
 					if (*modes == cFlagTab[i].sjoin) {
 						mode |= cFlagTab[i].mode;
@@ -797,7 +945,7 @@ void Usr_Stats(char *origin, char **argv, int argc)
 		nlog(LOG_WARNING, LOG_CORE,
 		     "Recieved a Message from a Unknown User! (%s)",
 		     origin);
-		     return;
+		return;
 	}
 	ShowStats(argv[0], u);
 }
@@ -852,11 +1000,13 @@ void Usr_Mode(char *origin, char **argv, int argc)
 }
 void Usr_Kill(char *origin, char **argv, int argc)
 {
+	User *u;
 	u = finduser(argv[0]);
 	if (u) {
 		KillUser(argv[0]);
 	} else {
-		nlog(LOG_WARNING, LOG_CORE, "Can't find user %s for Kill", argv[0]);
+		nlog(LOG_WARNING, LOG_CORE, "Can't find user %s for Kill",
+		     argv[0]);
 	}
 }
 void Usr_Vhost(char *origin, char **argv, int argc)
@@ -935,7 +1085,9 @@ void Usr_Kick(char *origin, char **argv, int argc)
 	if (u) {
 		kick_chan(u, argv[0]);
 	} else {
-		nlog(LOG_WARNING, LOG_CORE, "Warning, Can't find user %s for kick %s", argv[1], argv[0]);
+		nlog(LOG_WARNING, LOG_CORE,
+		     "Warning, Can't find user %s for kick %s", argv[1],
+		     argv[0]);
 	}
 }
 void Usr_Join(char *origin, char **argv, int argc)
@@ -1071,6 +1223,7 @@ void Srv_Smode(char *origin, char **argv, int argc)
 {
 	UserMode(argv[0], argv[1], 1);
 };
+
 /* ultimate 3 */
 #endif
 
@@ -1081,7 +1234,8 @@ void Srv_Svsnick(char *origin, char **argv, int argc)
 	if (u) {
 		Change_User(u, argv[1]);
 	} else {
-		nlog(LOG_WARNING, LOG_CORE, "Warning, Can't find user %s for SVSNICK", argv[0]);
+		nlog(LOG_WARNING, LOG_CORE,
+		     "Warning, Can't find user %s for SVSNICK", argv[0]);
 	}
 
 }
@@ -1092,7 +1246,7 @@ void Srv_Kill(char *origin, char **argv, int argc)
 
 
 int SignOn_NewBot(const char *nick, const char *user,
-			 const char *host, const char *rname, long Umode)
+		  const char *host, const char *rname, long Umode)
 {
 
 #ifdef ULTIMATE3
