@@ -1,6 +1,6 @@
 include ../Makefile.inc
 
-INCLUDES = -I.. -I../adns
+INCLUDES = -I.. -I../adns -I../pcre
 
 SRCS = check.c event.c general.c parse.c query.c reply.c setup.c transmit.c types.c
 OBJS = ${SRCS:.c=.o}
