@@ -161,15 +161,16 @@ int sjoin_cmd(const char *who, const char *chan) {
 }
 
 int schmode_cmd(const char *who, const char *chan, const char *mode, const char *args) {
-	char **av;
-	int ac;	
-	char tmp[512];
+	char *tmp;
+	EvntMsg EM;
 
 	sts(":%s %s %s %s %s %lu", who, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args, time(NULL));
+	tmp = malloc(512);
 	sprintf(tmp, "%s %s %s", chan, mode, args);
-	ac = split_buf(tmp, &av, 0);
-	ChanMode("", av, ac);
-	free(av);
+	EM = split_buf(tmp, 0);
+	ChanMode("", EM.av, EM.ac);
+	FreeList(EM.av, EM.ac);
+	free(tmp);
 	return 1;
 }
 #ifndef ULTIMATE3
@@ -251,7 +252,6 @@ int ssvskill_cmd(const char *target, const char *reason, ...) {
         	va_start(ap, reason);
                 vsnprintf(buf, 512, reason, ap);
                 sts(":%s %s %s :%s", me.name, (me.token ? TOK_SVSKILL : MSG_SVSKILL), target, buf);
-                Module_Event("KILL", u);
                 va_end(ap);
                 return 1;
         }   

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.30 2002/06/05 11:26:03 fishwaldo Exp $
+** $Id: users.c,v 1.31 2002/06/10 05:02:42 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -232,7 +232,7 @@ void UserDump(char *nick)
 	}
 }
 
-int UserLevel(User *u) {
+int _UserLevel(User *u) {
 	int i, tmplvl = 0;
 #ifdef EXTAUTH
 	int (*getauth)(User *, int curlvl);

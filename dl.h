@@ -42,7 +42,7 @@ struct mod_user_list {
 	long hash;
 	char *nick;
 	char *modname;
-	int (*function)(char *origin, char **av, int ac);
+	int (*function)(EvntMsg EM);
 };
 
 typedef struct mod_user_list Mod_User;
@@ -50,13 +50,13 @@ hash_t *bh;
 
 struct functions {
 	char *cmd_name;
-	int (*function)(char *origin, char **av, int ac);
+	int (*function)(EvntMsg EM);
 	int srvmsg;
 };
 
 struct evtfunctions {
 	char *cmd_name;
-	int (*function)(void *);
+	int (*function)(EvntMsg EM);
 };
 
 

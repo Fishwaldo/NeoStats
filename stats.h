@@ -91,6 +91,7 @@ typedef struct chans_ Chans;
 typedef struct config_mod_ Config_Mod;
 typedef struct chanmem_ Chanmem;
 typedef struct modeparms_ ModesParm;
+typedef struct EvntMsg_ EvntMsg;
 
 struct me {
 	char name[MAXHOST];
@@ -126,6 +127,28 @@ struct me {
 	long RcveBytes;
 	time_t lastmsg;
 } me;
+
+
+/* stucture for passing messages between the core and modules */
+/* **av is a array of the message that triggered the call */
+/* ac is the count for that array */
+/* fndata is a array of function data to pass */
+/* fc is the count of that array */
+
+struct EvntMsg_ {
+	union {
+		Server *s;
+		User *u;
+	};
+	char *origin;
+	int  isserv;
+	char *cmd;
+	char **av;
+	int  ac;
+	void **fndata;
+	int  fc;
+};
+
 
 
 struct Servbot {
@@ -192,6 +215,11 @@ struct ping {
 
 
 
+#define UserLevel(u) u->ulevel
+
+
+
+
 /* sock.c */
 extern int ConnectTo(char *, int);
 extern void read_loop();
@@ -221,15 +249,18 @@ extern char *strlower(char *);
 /* ircd.c */
 extern void parse();
 extern char *joinbuf(char **av, int ac, int from);
-extern int split_buf(char *buf, char ***argv, int colon_special);
 extern void privmsg(char *, const char *, char *, ...);
 extern void privmsg_list(char *, char *, const char **);
 extern void globops(char *, char *, ...);
 extern int flood(User *);
 extern int init_bot(char *, char *, char *, char *, char *,char *);
 extern int del_bot(char *, char *);
-extern void Module_Event(char *, void *);
+extern void Module_Event(char *, EvntMsg EM);
 extern int bot_nick_change(char *, char *);
+extern EvntMsg split_buf(char *buf, int colon_special);
+extern void FreeList(char **List,int C);
+
+
 
 /* timer.c */
 extern void chk();
@@ -262,7 +293,7 @@ extern void LoadMyUsers();
 extern void SaveMyUsers();
 extern void DeleteMyUser(char *);
 extern MyUser *findmyuser(char *);
-extern int UserLevel(User *);
+extern int _UserLevel(User *);
 
 
 /* ns_help.c */
@@ -289,7 +320,7 @@ extern const char *ns_level_help[];
 
 
 /* services.c */
-extern void servicesbot(char *nick, char **av, int ac);
+extern void servicesbot();
 extern void ns_debug_to_coders(char *);
 extern void ns_shutdown(User *, char *);
 

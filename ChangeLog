@@ -1,4 +1,13 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Version 2.5.0-Beta2b
+ - Major Reworking internals. Passing Variables now as a struct. Doing a lot of Pre-Processing before Passing Vars to functions or Modules
+ - If message is from a user, assign userlevel in parse function, and made a macro to call a DEFINE that returns u->ulevel;
+ - Improved Services Support
+
+* Neostats * Fish * Version 2.5.0-Beta2a
+ - Fixed a few mem leaks
+ - Removed smalloc, replaced with normal malloc
+ - Fixed a memleak in statserv htmlstats (man, that function is a pain in the arse)
 
 * NeoStats * Everyone * Version 2.5.0-Beta2
  - Working on ZipLink support for Ultimate 3.x.x
