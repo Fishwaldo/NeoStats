@@ -27,6 +27,7 @@ autotools/install-sh -text
 autotools/ltmain.sh -text
 autotools/missing -text
 autotools/mkinstalldirs -text
+autotools/rules.mk -text
 /configure -text
 /configure.in -text
 /cronchk -text
