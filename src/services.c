@@ -194,7 +194,7 @@ ns_exclude (CmdParams* cmdparams)
 		}
 		ns_do_exclude_del(cmdparams->source, cmdparams->av[1]);
 	} else if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
-		ns_do_exclude_list(cmdparams->source, ns_botptr->name);
+		ns_do_exclude_list(cmdparams->source, ns_botptr);
 	} else {
 		return NS_ERR_SYNTAX_ERROR;
 	}
