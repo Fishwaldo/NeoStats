@@ -3,7 +3,7 @@ NeoStats 3.x ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
-* NeoStats * Version 3.0.a1-dev
+* NeoStats * Version 3.0.a1
  - Add more info to segfault.log reports. (M)
  - Add ModFini return value so modules can return errors if required. (M)
  - Remove ModInit parameter since it is now redundant. (M)
