@@ -1,5 +1,9 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 =====================================================================================
+* NeoStats * Mark (M) * Version 2.5.16
+ - Fix problem with Unreal SVSMODE services TS processing (M)
+ - IRCu: enable sethost for ASUKA (M)
+
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.15
  - Remove sprotocol_cmd since it is very ircd specfic (M)
  - Initialize me.now at bootup so we do not get random timestamps (M)
