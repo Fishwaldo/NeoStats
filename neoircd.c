@@ -247,7 +247,7 @@ spart_cmd (const char *who, const char *chan)
 int
 sjoin_cmd (const char *who, const char *chan)
 {
-	sts (":%s %s %d %s + :%s", me.name, MSG_SJOIN, me.now, chan, who);
+	sts (":%s %s %d %s + :%s", me.name, MSG_SJOIN, (int)me.now, chan, who);
 	join_chan (finduser (who), (char *) chan);
 	return 1;
 }
@@ -374,7 +374,7 @@ int
 snick_cmd (const char *oldnick, const char *newnick)
 {
 	Change_User (finduser (oldnick), newnick);
-	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, me.now);
+	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int)me.now);
 	return 1;
 }
 
@@ -451,7 +451,7 @@ sinvite_cmd (const char *from, const char *to, const char *chan) {
 int
 ssvinfo_cmd ()
 {
-	sts ("SVINFO 5 3 0 :%d", me.now);
+	sts ("SVINFO 5 3 0 :%d", (int)me.now);
 	return 1;
 }
 
@@ -476,7 +476,7 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 	va_start (ap, reason);
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
-	sts (":%s GLINE %s %s %d :%s", me.name, ident, host, me.now + length, ircd_buf);
+	sts (":%s GLINE %s %s %d :%s", me.name, ident, host, (int)(me.now + length), ircd_buf);
 	return 1;
 }
 

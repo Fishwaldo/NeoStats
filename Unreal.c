@@ -435,7 +435,7 @@ spong_cmd (const char *reply)
 int
 snetinfo_cmd ()
 {
-	sts (":%s %s 0 %d %d %s 0 0 0 :%s", me.name, (me.token ? TOK_NETINFO : MSG_NETINFO), me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname);
+	sts (":%s %s 0 %d %d %s 0 0 0 :%s", me.name, (me.token ? TOK_NETINFO : MSG_NETINFO), (int)me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname);
 	return 1;
 }
 
@@ -463,7 +463,7 @@ int
 snick_cmd (const char *oldnick, const char *newnick)
 {
 	Change_User (finduser (oldnick), newnick);
-	sts (":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, me.now);
+	sts (":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, (int)me.now);
 	return 1;
 }
 
@@ -477,7 +477,7 @@ sswhois_cmd (const char *target, const char *swhois)
 int
 ssvsnick_cmd (const char *target, const char *newnick)
 {
-	sts ("%s %s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, me.now);
+	sts ("%s %s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, (int)me.now);
 	return 1;
 }
 
@@ -582,7 +582,7 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 	va_start (ap, reason);
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
-	sts (":%s %s + G %s %s %s %d %d :%s", me.name, (me.token ? TOK_TKL : MSG_TKL), ident, host, setby, me.now + length, me.now, ircd_buf);
+	sts (":%s %s + G %s %s %s %d %d :%s", me.name, (me.token ? TOK_TKL : MSG_TKL), ident, host, setby, (int)(me.now + length), (int)me.now, ircd_buf);
 	return 1;
 }
 

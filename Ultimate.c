@@ -705,7 +705,7 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 #ifdef ULTIMATE3
 	sts (":%s %s %s %s %d %s %ld :%s", me.name, (me.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, (long)me.now, ircd_buf);
 #elif ULTIMATE
-	sts (":%s %s %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, me.now + length, me.now, setby, ircd_buf);
+	sts (":%s %s %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, (int)(me.now + length), (int)me.now, setby, ircd_buf);
 #endif
 	return 1;
 }

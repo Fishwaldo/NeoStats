@@ -309,7 +309,7 @@ sjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 		flag = ' ';
 		mode= '\0';
 	}
-	sts (":%s %s %d %s + :%c%s", me.name, MSG_SJOIN, tstime, chan, flag, who);
+	sts (":%s %s %d %s + :%c%s", me.name, MSG_SJOIN, (int)tstime, chan, flag, who);
 	join_chan (finduser (who), (char *) chan);
 	ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", chan, mode, who);
 	ac = split_buf (ircd_buf, &av, 0);
@@ -439,7 +439,7 @@ int
 snick_cmd (const char *oldnick, const char *newnick)
 {
 	Change_User (finduser (oldnick), newnick);
-	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, me.now);
+	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int)me.now);
 	return 1;
 }
 
@@ -454,7 +454,7 @@ sswhois_cmd (const char *target, const char *swhois)
 int
 ssvsnick_cmd (const char *target, const char *newnick)
 {
-	sts ("%s %s %s :%d", MSG_SVSNICK, target, newnick, me.now);
+	sts ("%s %s %s :%d", MSG_SVSNICK, target, newnick, (int)me.now);
 	return 1;
 }
 
@@ -524,7 +524,7 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 	va_start (ap, reason);
 	ircvsnprintf (buf, BUFSIZE, reason, ap);
 	va_end (ap);
-	sts (":%s %s %s %s %d %s %d :%s", me.name, MSG_AKILL, host, ident, length, setby, me.now, buf);
+	sts (":%s %s %s %s %d %s %d :%s", me.name, MSG_AKILL, host, ident, length, setby, (int)me.now, buf);
 	return 1;
 }
 
@@ -539,7 +539,7 @@ srakill_cmd (const char *host, const char *ident)
 int
 ssvinfo_cmd ()
 {
-	sts ("SVINFO 3 3 0 :%d", me.now);
+	sts ("SVINFO 3 3 0 :%d", (int)me.now);
 	return 1;
 }
 
