@@ -134,12 +134,12 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 	 * For now we verify help during processing since it is not critical. */
 	/* No command, we cannot recover from this */
 	if(!cmd_ptr->cmd) {
-		nlog (LOG_ERROR, LOG_MOD, "Missing command, command (unknown) not added");
+		nlog (LOG_ERROR, LOG_MOD, "add_bot_cmd: missing command, command (unknown) not added");
 		return NS_FAILURE;
 	}
 	/* No handler, we cannot recover from this */
 	if(!cmd_ptr->handler) {
-		nlog (LOG_ERROR, LOG_MOD, "Missing command handler, command %s not added", 
+		nlog (LOG_ERROR, LOG_MOD, "add_bot_cmd: missing command handler, command %s not added", 
 			cmd_ptr->cmd);
 		return NS_FAILURE;
 	}
@@ -147,7 +147,7 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 	cmdnode = hnode_create(cmd_ptr);
 	if (cmdnode) {
 		hash_insert(cmd_hash, cmdnode, cmd_ptr->cmd);
-		nlog(LOG_DEBUG2, LOG_MOD, "Added a new command %s to Services Bot", cmd_ptr->cmd);
+		nlog(LOG_DEBUG2, LOG_MOD, "add_bot_cmd: added a new command %s to services bot", cmd_ptr->cmd);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -307,7 +307,7 @@ servicesbot (char *nick, char **av, int ac)
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", nick, s_Services);
+		nlog (LOG_WARNING, LOG_CORE, "servicesbot: unable to find user %s (%s)", nick, s_Services);
 		return;
 	}
 	me.requests++;

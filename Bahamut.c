@@ -395,7 +395,6 @@ static void
 Usr_Mode (char *origin, char **argv, int argc)
 {
 	if (!strchr (argv[0], '#')) {
-		nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[0]);
 		UserMode (argv[0], argv[1]);
 	} else {
 		ChanMode (origin, argv, argc);
@@ -512,7 +511,6 @@ Srv_Nick (char *origin, char **argv, int argc)
 	realname = joinbuf (argv, argc, 9);
 	AddUser (argv[0], argv[4], argv[5], realname, argv[6], strtoul (argv[8], NULL, 10), strtoul (argv[2], NULL, 10));
 	free (realname);
-	nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[3]);
 	UserMode (argv[0], argv[3]);
 }
 

@@ -121,7 +121,7 @@ CheckChanMode (Chans * c, long mode)
 	ModesParm *m;
 	lnode_t *mn;
 	if (!c) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, CheckChanMode Called with empty channel");
+		nlog (LOG_WARNING, LOG_CORE, "CheckChanMode: tied to check modes of empty channel");
 		return -1;
 	}
 	if (c->modes & mode) {
@@ -235,7 +235,7 @@ ChanMode (char *origin, char **av, int ac)
 										modeexists = 1;
 										break;
 									} else if (((int *) m->mode == (int *) chan_modes[i].mode) && !strcasecmp (m->param, av[j])) {
-										nlog (LOG_INFO, LOG_CORE, "Mode %c (%s) already exists, not adding again", chan_modes[i].flag, av[j]);
+										nlog (LOG_INFO, LOG_CORE, "ChanMode: Mode %c (%s) already exists, not adding again", chan_modes[i].flag, av[j]);
 										j++;
 										modeexists = 1;
 										break;
@@ -248,7 +248,7 @@ ChanMode (char *origin, char **av, int ac)
 									strlcpy (m->param, av[j], PARAMSIZE);
 									mn = lnode_create (m);
 									if (list_isfull (c->modeparms)) {
-										nlog (LOG_CRITICAL, LOG_CORE, "Eeek, Can't add additional Modes to Channel %s. Modelist is full", c->name);
+										nlog (LOG_CRITICAL, LOG_CORE, "ChanMode: modelist is full adding to channel %s", c->name);
 										do_exit (NS_EXIT_ERROR, "List full - see log file");
 									} else {
 										list_append (c->modeparms, mn);
@@ -490,7 +490,7 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 		} else {
 			lnode_destroy (list_delete (u->chans, un));
 		}
-		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
+		nlog (LOG_DEBUG3, LOG_CORE, "kick_chan: cur users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
 		if (c->cur_users <= 0) {
 			AddStringToList (&av, c->name, &ac);
 			ModuleEvent (EVENT_DELCHAN, av, ac);

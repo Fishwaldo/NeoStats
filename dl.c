@@ -254,12 +254,12 @@ new_timer (char *timer_name)
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "New Timer: %s", timer_name);
+	nlog (LOG_DEBUG2, LOG_CORE, "new_timer: %s", timer_name);
 	mod_tmr = malloc (sizeof (ModTimer));
 	strlcpy (mod_tmr->timername, timer_name, MAX_MOD_NAME);
 	tn = hnode_create (mod_tmr);
 	if (hash_isfull (th)) {
-		nlog (LOG_WARNING, LOG_CORE, "new_timer(): Couldn't add new Timer, Hash is Full!");
+		nlog (LOG_WARNING, LOG_CORE, "new_timer: couldn't add new timer, hash is full!");
 		return NULL;
 	}
 	hash_insert (th, tn, timer_name);
@@ -312,7 +312,7 @@ add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 		mod_tmr->lastrun = me.now;
 		strlcpy (mod_tmr->modname, mod_name, MAX_MOD_NAME);
 		mod_tmr->function = dlsym ((int *) get_dl_handle (mod_name), func_name);
-		nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with timer for Function %s", mod_name, func_name);
+		nlog (LOG_DEBUG2, LOG_CORE, "add_mod_timer: Registered Module %s with timer for Function %s", mod_name, func_name);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -336,7 +336,7 @@ del_mod_timer (char *timer_name)
 	tn = hash_lookup (th, timer_name);
 	if (tn) {
 		mod_tmr = hnode_get (tn);
-		nlog (LOG_DEBUG2, LOG_CORE, "Unregistered Timer function %s from Module %s", timer_name, mod_tmr->modname);
+		nlog (LOG_DEBUG2, LOG_CORE, "del_mod_timer: Unregistered Timer function %s from Module %s", timer_name, mod_tmr->modname);
 		hash_delete (th, tn);
 		hnode_destroy (tn);
 		free (mod_tmr);
@@ -364,7 +364,7 @@ del_mod_timers (char *module_name)
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		mod_tmr = hnode_get (modnode);
 		if (!strcasecmp (mod_tmr->modname, module_name)) {
-			nlog (LOG_DEBUG1, LOG_CORE, "Module %s has timer %s Registered. Deleting..", module_name, mod_tmr->timername);
+			nlog (LOG_DEBUG1, LOG_CORE, "del_mod_timers: Module %s has timer %s Registered. Deleting..", module_name, mod_tmr->timername);
 			del_mod_timer (mod_tmr->timername);
 		}
 	}
@@ -390,7 +390,7 @@ change_mod_timer_interval (char *timer_name, int interval)
 	if (tn) {
 		mod_tmr = hnode_get (tn);
 		mod_tmr->interval = interval;
-		nlog (LOG_DEBUG2, LOG_CORE, "Changing timer interval for %s from Module %s", timer_name, mod_tmr->modname);
+		nlog (LOG_DEBUG2, LOG_CORE, "change_mod_timer_interval: Changing timer interval for %s from Module %s", timer_name, mod_tmr->modname);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -450,7 +450,7 @@ run_mod_timers (void)
 			SET_SEGV_INMODULE(mod_tmr->modname);
 			if (setjmp (sigvbuf) == 0) {
 				if (mod_tmr->function () < 0) {
-					nlog(LOG_DEBUG2, LOG_CORE, "Deleting Timer %s for Module %s as requested", mod_tmr->timername, mod_tmr->modname);
+					nlog(LOG_DEBUG2, LOG_CORE, "run_mod_timers: Deleting Timer %s for Module %s as requested", mod_tmr->timername, mod_tmr->modname);
 					hash_scan_delete(th, tn);
 					hnode_destroy(tn);
 					free(mod_tmr);
@@ -458,7 +458,7 @@ run_mod_timers (void)
 					mod_tmr->lastrun = (int) me.now;
 				}
 			} else {
-				nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", mod_tmr->modname);
+				nlog (LOG_CRITICAL, LOG_CORE, "run_mod_timers: setjmp() failed, can't call module %s\n", mod_tmr->modname);
 			}
 			CLEAR_SEGV_INMODULE();
 		}
@@ -480,12 +480,12 @@ new_sock (char *sock_name)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "New Socket: %s", sock_name);
+	nlog (LOG_DEBUG2, LOG_CORE, "new_sock: %s", sock_name);
 	mod_sock = smalloc (sizeof (ModSock));
 	strlcpy (mod_sock->sockname, sock_name, MAX_MOD_NAME);
 	sn = hnode_create (mod_sock);
 	if (hash_isfull (sockh)) {
-		nlog (LOG_CRITICAL, LOG_CORE, "Eeek, SocketHash is full, can not add a new socket");
+		nlog (LOG_CRITICAL, LOG_CORE, "new_sock: socket hash is full, can't add a new socket");
 		return NULL;
 	}
 	hash_insert (sockh, sn, mod_sock->sockname);
@@ -532,19 +532,19 @@ add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int
 	SET_SEGV_LOCATION();
 	if (readfunc) {
 		if (dlsym ((int *) get_dl_handle (mod_name), readfunc) == NULL) {
-			nlog (LOG_WARNING, LOG_CORE, "oh oh, the Read socket function doesn't exist = %s (%s)", readfunc, mod_name);
+			nlog (LOG_WARNING, LOG_CORE, "add_socket: read socket function doesn't exist = %s (%s)", readfunc, mod_name);
 			return NS_FAILURE;
 		}
 	}
 	if (writefunc) {
 		if (dlsym ((int *) get_dl_handle (mod_name), writefunc) == NULL) {
-			nlog (LOG_WARNING, LOG_CORE, "oh oh, the Write socket function doesn't exist = %s (%s)", writefunc, mod_name);
+			nlog (LOG_WARNING, LOG_CORE, "add_socket: write socket function doesn't exist = %s (%s)", writefunc, mod_name);
 			return NS_FAILURE;
 		}
 	}
 	if (errfunc) {
 		if (dlsym ((int *) get_dl_handle (mod_name), errfunc) == NULL) {
-			nlog (LOG_WARNING, LOG_CORE, "oh oh, the Error socket function doesn't exist = %s (%s)", errfunc, mod_name);
+			nlog (LOG_WARNING, LOG_CORE, "add_socket: error socket function doesn't exist = %s (%s)", errfunc, mod_name);
 			return NS_FAILURE;
 		}
 	}
@@ -556,7 +556,7 @@ add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int
 	mod_sock->errfnc = dlsym ((int *) get_dl_handle (mod_name), errfunc);
 	mod_sock->socktype = SOCK_STANDARD;
 	
-	nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with Standard Socket functions %s", mod_name, mod_sock->sockname);
+	nlog (LOG_DEBUG2, LOG_CORE, "add_socket: Registered Module %s with Standard Socket functions %s", mod_name, mod_sock->sockname);
 	return NS_SUCCESS;
 }
 
@@ -579,13 +579,13 @@ add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name
 	SET_SEGV_LOCATION();
 	if (beforepoll) {
 		if (dlsym ((int *) get_dl_handle (mod_name), beforepoll) == NULL) {
-			nlog (LOG_WARNING, LOG_CORE, "oh oh, the Read socket function doesn't exist = %s (%s)", beforepoll, mod_name);
+			nlog (LOG_WARNING, LOG_CORE, "add_sockpoll: read socket function doesn't exist = %s (%s)", beforepoll, mod_name);
 			return NS_FAILURE;
 		}
 	}
 	if (afterpoll) {
 		if (dlsym ((int *) get_dl_handle (mod_name), afterpoll) == NULL) {
-			nlog (LOG_WARNING, LOG_CORE, "oh oh, the Write socket function doesn't exist = %s (%s)", afterpoll, mod_name);
+			nlog (LOG_WARNING, LOG_CORE, "add_sockpoll: write socket function doesn't exist = %s (%s)", afterpoll, mod_name);
 			return NS_FAILURE;
 		}
 	}
@@ -595,7 +595,7 @@ add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name
 	mod_sock->beforepoll = dlsym ((int *) get_dl_handle (mod_name), beforepoll);
 	mod_sock->afterpoll = dlsym ((int *) get_dl_handle (mod_name), afterpoll);
 	mod_sock->data = data;
-	nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with Poll Socket functions %s", mod_name, mod_sock->sockname);
+	nlog (LOG_DEBUG2, LOG_CORE, "add_sockpoll: Registered Module %s with Poll Socket functions %s", mod_name, mod_sock->sockname);
 	return NS_SUCCESS;
 }
 
@@ -617,7 +617,7 @@ del_socket (char *sock_name)
 	sn = hash_lookup (sockh, sock_name);
 	if (sn) {
 		mod_sock = hnode_get (sn);
-		nlog (LOG_DEBUG2, LOG_CORE, "Unregistered Socket function %s from Module %s", sock_name, mod_sock->modname);
+		nlog (LOG_DEBUG2, LOG_CORE, "del_socket: Unregistered Socket function %s from Module %s", sock_name, mod_sock->modname);
 		hash_scan_delete (sockh, sn);
 		hnode_destroy (sn);
 		free (mod_sock);
@@ -645,7 +645,7 @@ del_sockets (char *module_name)
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		mod_sock = hnode_get (modnode);
 		if (!strcasecmp (mod_sock->modname, module_name)) {
-			nlog (LOG_DEBUG1, LOG_CORE, "Module %s had Socket %s Registered. Deleting..", module_name, mod_sock->sockname);
+			nlog (LOG_DEBUG1, LOG_CORE, "del_sockets: Module %s had Socket %s Registered. Deleting..", module_name, mod_sock->sockname);
 			del_socket (mod_sock->sockname);
 		}
 	}
@@ -714,7 +714,7 @@ add_bot_to_chan (char *bot, char *chan)
 		mod_chan_bot = hnode_get (cbn);
 	}
 	if (list_isfull (mod_chan_bot->bots)) {
-		nlog (LOG_CRITICAL, LOG_CORE, "Eeek, Bot Channel List is full for Chan %s", chan);
+		nlog (LOG_CRITICAL, LOG_CORE, "add_bot_to_chan: bot channel list is full adding channel %s", chan);
 		return;
 	}
 	botname = sstrdup (bot);
@@ -837,7 +837,7 @@ new_bot (char *bot_name)
 	hnode_t *bn;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "New Bot: %s", bot_name);
+	nlog (LOG_DEBUG2, LOG_CORE, "new_bot: %s", bot_name);
 	mod_usr = malloc (sizeof (ModUser));
 	strlcpy (mod_usr->nick, bot_name, MAXNICK);
 	bn = hnode_create (mod_usr);
@@ -878,7 +878,7 @@ add_mod_user (char *nick, char *mod_name)
 			}
 		}
 	}
-	nlog (LOG_WARNING, LOG_CORE, "add_mod_user(): Couldn't Add ModuleBot to List");
+	nlog (LOG_WARNING, LOG_CORE, "add_mod_user: Couldn't Add ModuleBot to List");
 	return NULL;
 }
 

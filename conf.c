@@ -202,12 +202,12 @@ ConfLoadModules ()
 
 	SET_SEGV_LOCATION();
 	if(load_mods[1] == 0) {
-		nlog (LOG_NORMAL, LOG_CORE, "No modules configured  for loading"); 
+		nlog (LOG_NORMAL, LOG_CORE, "No modules configured for loading"); 
 		return NS_SUCCESS;
 	}
 	nlog (LOG_NORMAL, LOG_CORE, "Loading configured modules"); 
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
-		nlog (LOG_DEBUG1, LOG_CORE, "Loading Module %s", (char *)load_mods[i]);
+		nlog (LOG_DEBUG1, LOG_CORE, "ConfLoadModules: Loading Module %s", (char *)load_mods[i]);
 		rval = load_module (load_mods[i], NULL);
 		if (rval == NS_SUCCESS) {
 			nlog (LOG_NORMAL, LOG_CORE, "Successfully Loaded Module %s", (char *)load_mods[i]);
