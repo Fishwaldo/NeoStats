@@ -212,13 +212,11 @@ extern int s_user_kill(User *u) {
 	who++;
 	if (finduser(who)) {
 	/* it was a User that killed the target */
-		if (StatServ.onchan) notice(s_StatServ, "\2KILL\2 %s was Killed by %s --> %s", u->nick, who, cmd);
 	ss = findstats(u->server->name); 
 	ss->operkills = ss->operkills +1; 
 	} else if (findserver(who)) {
-		if (StatServ.onchan) notice(s_StatServ, "\2SERVER KILL\2 %s was Killed by the Server %s --> %s", u->nick, who, cmd);
-	ss = findstats(who);
-	ss->serverkills = ss->serverkills +1;
+		ss = findstats(who);
+		ss->serverkills = ss->serverkills +1;
 	}
 	return 1;
 }
