@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.29 2003/08/29 11:16:00 fishwaldo Exp $
+** $Id: cs.c,v 1.30 2003/09/09 11:33:08 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -535,7 +535,7 @@ int cs_user_modes(char **av, int ac)
 		case LOCOP_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2\00313%s\2 is \2Now\2 a \2Local Operator\2 (+C) on \2%s\2\003",
+					  "\2\00313%s\2 is \2Now\2 a \2Local Operator\2 (+%c) on \2%s\2\003",
 					  u->nick, LOCOP_MODE, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
