@@ -36,8 +36,10 @@ distclean:
 # How to install this module
 # TARGET will be that defined for building in the Module makefile
 # Module makefile can optionally specify DATA for data files to install
-install: $(TARGET)
-	$(INSTALL_MOD) $(TARGET) $(MODDIRECTORY)
+# temp disable due to warning in statserv make install
+#install: $(TARGET)
+#	$(INSTALL_MOD) $(TARGET) $(MODDIRECTORY)
+#	$(INSTALL_DATA) $(DATA) $(DATADIRECTORY)
 
 # How to create dist of this module
 # Module makefile must supply DISTFILES with the files to be distributed 

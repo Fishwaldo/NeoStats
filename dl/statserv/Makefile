@@ -12,4 +12,3 @@ include ../Makefile.inc
 install: $(TARGET)
 	$(INSTALL_MOD) $(TARGET) $(MODDIRECTORY)
 	$(INSTALL_DATA) $(DATA) $(DATADIRECTORY)
-

@@ -4,3 +4,5 @@ DISTFILES = $(SRCS) ms.h Makefile ChangeLog
 
 include ../Makefile.inc
 
+install: $(TARGET)
+	$(INSTALL_MOD) $(TARGET) $(MODDIRECTORY)
