@@ -187,7 +187,7 @@ extern const char *icq_help[];
 extern const char *ss_htmlstats_help[];
 extern const char *ss_forcehtml_help[];
 extern const char *ss_notices_help[];
-
+extern const char *ss_chan_help[];
 /* tld.c */
  void DelTLD(User *u);
 
