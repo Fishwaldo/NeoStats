@@ -431,7 +431,7 @@ void do_reconnect( void )
 	else {
 		nlog( LOG_NOTICE, "Reconnect time is zero, shutting down" );
 	}
-	do_reconnect (NS_EXIT_RECONNECT, NULL);
+	do_reconnect ();
 }
 
 /** @brief do_exit

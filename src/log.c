@@ -31,6 +31,7 @@
 #include <execinfo.h>
 #endif
 
+/* LogEntry structure */
 typedef struct LogEntry {
 	FILE *logfile;
 	char name[MAX_MOD_NAME];
@@ -38,10 +39,12 @@ typedef struct LogEntry {
 	unsigned int flush;
 } LogEntry;
 
-const char* CoreLogFileName="NeoStats";
-char LogFileNameFormat[MAX_LOGFILENAME]="-%m-%d";
-
-const char *loglevels[LOG_LEVELMAX] = {
+/* Name used for core logs */
+static const char *CoreLogFileName = "NeoStats";
+/* Format string for log file names */
+char LogFileNameFormat[MAX_LOGFILENAME] = "-%m-%d";
+/* Log level strings */
+static const char *loglevels[LOG_LEVELMAX] = {
 	"CRITICAL",
 	"ERROR",
 	"WARNING",
@@ -49,8 +52,8 @@ const char *loglevels[LOG_LEVELMAX] = {
 	"NORMAL",
 	"INFO",
 };
-
-const char *dloglevels[DEBUGMAX] = {
+/* Debug log level strings */
+static const char *dloglevels[DEBUGMAX] = {
 	"DEBUGRX",
 	"DEBUGTX",
 	"DEBUG1",
@@ -64,214 +67,337 @@ const char *dloglevels[DEBUGMAX] = {
 	"DEBUG9",
 	"DEBUG10",
 };
-
+/* log scratchpad buffer */
 static char log_buf[BUFSIZE];
+/* log time string scratchpad buffer */
 static char log_fmttime[TIMEBUFSIZE];
+/* log hash pointer */
 static hash_t *logs;
 
-/** @brief initialize the logging functions 
+/*  @brief InitLogs
+ * 
+ *  initialize the logging functions 
+ *  NeoStats core use only.
+ * 
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int
-InitLogs (void)
+int InitLogs( void )
 {
 	SET_SEGV_LOCATION();
-	logs = hash_create (-1, 0, 0);
-	if (!logs) {
-		printf ("ERROR: Can't initialize log subsystem. Exiting!");
+	logs = hash_create( -1, 0, 0 );
+	if( !logs ) {
+		printf( "ERROR: Can't initialize log subsystem." );
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
 }
 
-/** @brief Occasionally flush log files out 
+/*  @brief make_log_filename
+ * 
+ *  Generate log filename
+ *  NeoStats core use only.
+ * 
+ *  @param modname module name
+ *  @param logname pointer to buffer in which to make logname
+ *
+ *  @return none
  */
-void
-CloseLogs (void)
+
+static void make_log_filename( char *modname, char *logname )
+{
+	static char log_file_fmttime[TIMEBUFSIZE];
+	
+	time_t t = time( NULL );
+	strftime( log_file_fmttime, TIMEBUFSIZE, LogFileNameFormat, localtime( &t ) );
+	strlwr( modname );
+	ircsnprintf( logname, MAXPATH, "logs/%s%s.log", modname, log_file_fmttime );
+}
+
+/*  @brief make_log_timestring
+ * 
+ *  Generate log time string
+ *  NeoStats core use only.
+ * 
+ *  @param modname module name
+ *  @param logname pointer to buffer in which to make logname
+ *
+ *  @return none
+ */
+
+static void make_log_timestring( void )
+{
+	/* we update me.now here, because some functions might be busy and not call the loop a lot */
+	me.now = time( NULL );
+	ircsnprintf( me.strnow, STR_TIME_T_SIZE, "%lu", me.now );
+	strftime( log_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime( &me.now ) );
+}
+
+/** @brief FiniLogs
+ *
+ *  cleanup log subsystem
+ *  NeoStats core use only.
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void FiniLogs( void ) 
+{
+	CloseLogs();
+	hash_destroy( logs );
+}
+
+/*  @brief CloseLogs
+ * 
+ *  Flush log files
+ *  NeoStats core use only.
+ * 
+ *  @param none
+ *
+ *  @return none
+ */
+
+void CloseLogs( void )
 {
 	hscan_t hs;
 	hnode_t *hn;
 	LogEntry *logentry;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin (&hs, logs);
-	while ((hn = hash_scan_next (&hs)) != NULL) {
-		logentry = hnode_get (hn);
+	hash_scan_begin( &hs, logs );
+	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
+		logentry = hnode_get( hn );
 		logentry->flush = 0;
 #ifdef DEBUG
-		printf ("Closing Logfile %s (%s)\n", logentry->name, (char *) hnode_getkey (hn));
+		printf( "Closing Logfile %s (%s)\n", logentry->name,( char * ) hnode_getkey( hn ) );
 #endif
-		if(logentry->logfile)
+		if( logentry->logfile )
 		{
-			fflush (logentry->logfile);
-			fclose (logentry->logfile);
+			fflush( logentry->logfile );
+			fclose( logentry->logfile );
 			logentry->logfile = NULL;
 		}
-		hash_scan_delete (logs, hn);
-		hnode_destroy (hn);
-		ns_free (logentry);
+		hash_scan_delete( logs, hn );
+		hnode_destroy( hn );
+		ns_free( logentry );
 	}
 }
 
-void 
-FiniLogs (void) 
+/*  @brief ResetLogs
+ * 
+ *  rotate logs, called at midnight
+ *  NeoStats core use only.
+ * 
+ *  @param none
+ *
+ *  @return none
+ */
+
+void ResetLogs( void )
 {
-	CloseLogs();
-	hash_destroy(logs);
+	hscan_t hs;
+	hnode_t *hn;
+	LogEntry *logentry;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin( &hs, logs );
+	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
+		logentry = hnode_get( hn );
+		/* If file handle is vald we must have used the log */
+		if( logentry->logfile ) {
+			if( logentry->flush > 0 ) {
+				fflush( logentry->logfile );
+			}
+			fclose( logentry->logfile );		
+			logentry->logfile = NULL;
+		}
+		logentry->flush = 0;
+#ifdef DEBUG
+		printf( "Closing Logfile %s (%s)\n", logentry->name,( char * ) hnode_getkey( hn ) );
+#endif
+		/* make new file name but do not open until needed to avoid 0 length files*/
+		make_log_filename( logentry->name, logentry->logname );
+	}
 }
 
-void make_log_filename(char* modname, char *logname)
+/*  @brief new_logentry
+ * 
+ *  Create log entry
+ *  NeoStats core use only.
+ * 
+ *  @param none
+ *
+ *  @return pointer to newly created log entry
+ */
+
+static LogEntry *new_logentry( void )
 {
-	time_t t = time(NULL);
-	strftime (log_fmttime, TIMEBUFSIZE, LogFileNameFormat, localtime (&t));
-	strlwr(modname);
-	ircsnprintf (logname, MAXPATH, "logs/%s%s.log", modname, log_fmttime);
+	LogEntry *logentry;
+
+	logentry = ns_calloc( sizeof( LogEntry ) );
+	strlcpy( logentry->name, GET_CUR_MODNAME() , MAX_MOD_NAME );
+	make_log_filename( logentry->name, logentry->logname );
+	hnode_create_insert( logs, logentry, logentry->name );
+	return logentry;
 }
 
-static void
-debuglog (const char* time, const char* level, const char *line)
+/*  @brief dlog_write
+ * 
+ *  write debug messages
+ *  NeoStats core use only.
+ * 
+ *  @param time string 
+ *  @param level string
+ *  @param line to log
+ *
+ *  @return none
+ */
+
+static void dlog_write( const char *time, const char *level, const char *line )
 {
 	static int chanflag = 0;
 	FILE *logfile;
 
-	logfile = fopen ("logs/debug.log", "a");
-	if (logfile) {
-		fprintf (logfile, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line);
-		fclose (logfile);
+	logfile = fopen( "logs/debug.log", "a" );
+	if( logfile ) {
+		fprintf( logfile, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line );
+		fclose( logfile );
 	}
-	if(nsconfig.debugtochan&&!chanflag) {
+	/* chanflag is used to avoid endless loop when sending debug messages to channel */
+	if( nsconfig.debugtochan && !chanflag ) {
 		chanflag = 1;
-		irc_chanprivmsg(ns_botptr, nsconfig.debugchan, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line);
+		irc_chanprivmsg( ns_botptr, nsconfig.debugchan, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line );
 		chanflag = 0;
 	}
 }
 
-/** @Configurable logging function
+/*  @brief dlog
+ * 
+ *  debug message handler
+ *  NeoStats core use only.
+ * 
+ *  @param level of debug message
+ *  @param fmt string
+ *  @param ... parameters to format string
+ *
+ *  @return none
  */
-void
-dlog (DEBUG_LEVEL level, char *fmt, ...)
+
+void dlog( DEBUG_LEVEL level, char *fmt, ... )
 {
 	va_list ap;
 	
-	if (level <= nsconfig.debuglevel) {
+	if( level <= nsconfig.debuglevel ) {
 		/* Support for module specific only debug info */
-		if(ircstrcasecmp(nsconfig.debugmodule, "all")== 0 || ircstrcasecmp(nsconfig.debugmodule, GET_CUR_MODNAME()) ==0)
+		if( ircstrcasecmp( nsconfig.debugmodule, "all" ) == 0 || ircstrcasecmp( nsconfig.debugmodule, GET_CUR_MODNAME() ) == 0 )
 		{
-			/* we update me.now here, because some functions might be busy and not call the loop a lot */
-			me.now = time(NULL);
-			ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", me.now);
-			strftime (log_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime (&me.now));
-			va_start (ap, fmt);
-			ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
-			va_end (ap);
-			if (nsconfig.foreground) {
-				printf ("%s %s - %s\n", dloglevels[level - 1], GET_CUR_MODNAME(), log_buf);
-			}
-			debuglog (log_fmttime, dloglevels[level - 1], log_buf);
+			make_log_timestring();
+			va_start( ap, fmt );
+			ircvsnprintf( log_buf, BUFSIZE, fmt, ap );
+			va_end( ap );
+			if( nsconfig.foreground )
+				printf( "%s %s - %s\n", dloglevels[level - 1], GET_CUR_MODNAME(), log_buf );
+			dlog_write( log_fmttime, dloglevels[level - 1], log_buf );
 		}
 	}
 }
 
-/** @Configurable logging function
+/*  @brief nlog_write
+ * 
+ *  write log messages
+ *  NeoStats core use only.
+ * 
+ *  @param time string 
+ *  @param level string
+ *  @param line to log
+ *
+ *  @return none
  */
-void
-nlog (LOG_LEVEL level, char *fmt, ...)
+
+static void nlog_write( const char *time, const char *level, const char *line )
+{
+	LogEntry *logentry;
+
+	logentry = ( LogEntry * ) hnode_find( logs, GET_CUR_MODNAME() );
+	if( !logentry )
+		logentry = new_logentry();
+	if( !logentry->logfile )
+		logentry->logfile = fopen( logentry->logname, "a" );
+	if( !logentry->logfile ) {
+#ifdef DEBUG
+		printf( "%s\n", strerror( errno ) );
+#endif
+		do_exit( NS_EXIT_NORMAL, NULL );
+	}
+	fprintf( logentry->logfile, "(%s) %s %s - %s\n", time, level, GET_CUR_MODNAME(), line );
+	logentry->flush = 1;
+}
+
+/*  @brief nlog
+ * 
+ *  log messages
+ *  NeoStats core use only.
+ * 
+ *  @param level of message
+ *  @param fmt string
+ *  @param ... parameters to format string
+ *
+ *  @return none
+ */
+
+void nlog( LOG_LEVEL level, char *fmt, ... )
 {
 	va_list ap;
-	LogEntry *logentry;
 	
-	if (nsconfig.debuglevel || level <= nsconfig.loglevel) {
-		logentry = (LogEntry *)hnode_find (logs, GET_CUR_MODNAME());
-		if (logentry) {
-			/* we found our log entry */
-			if(!logentry->logfile)
-				logentry->logfile = fopen (logentry->logname, "a");
-		} else {
-			logentry = ns_calloc (sizeof (LogEntry));
-			strlcpy (logentry->name, GET_CUR_MODNAME() , MAX_MOD_NAME);
-			make_log_filename(logentry->name, logentry->logname);
-			logentry->logfile = fopen (logentry->logname, "a");
-			logentry->flush = 0;
-			hnode_create_insert (logs, logentry, logentry->name);
-		}
-
-#ifdef DEBUG
-		if (!logentry->logfile) {
-			printf ("%s\n", strerror (errno));
-			do_exit (NS_EXIT_NORMAL, NULL);
-		}
-#endif
-		/* we update me.now here, because some functions might be busy and not call the loop a lot */
-		me.now = time(NULL);
-		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", me.now);
-		strftime (log_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime (&me.now));
-		va_start (ap, fmt);
-		ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
-		va_end (ap);
-		if (level <= nsconfig.loglevel) 
-			fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
-		logentry->flush = 1;
-		if (nsconfig.foreground) {
-			printf ("%s %s - %s\n", loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
-		}
-	}
-	if (nsconfig.debuglevel) {
-		debuglog (log_fmttime, loglevels[level - 1], log_buf);
+	if( nsconfig.debuglevel || level <= nsconfig.loglevel ) {
+		make_log_timestring();
+		va_start( ap, fmt );
+		ircvsnprintf( log_buf, BUFSIZE, fmt, ap );
+		va_end( ap );
+		if( level <= nsconfig.loglevel ) 
+			nlog_write( log_fmttime, loglevels[level - 1], log_buf );
+		if( nsconfig.foreground )
+			printf( "%s %s - %s\n", loglevels[level - 1], GET_CUR_MODNAME(), log_buf );
+		if( nsconfig.debuglevel )
+			dlog_write( log_fmttime, loglevels[level - 1], log_buf );
 	}
 }
 
-/** rotate logs, called at midnight
+/*  @brief nassert_fail
+ * 
+ *  neostats assertion handler
+ *  NeoStats core use only.
+ * 
+ *  @param expression tested
+ *  @param file name
+ *  @param line number
+ *  @param function name
+ *
+ *  @return none
  */
-void
-ResetLogs (void)
-{
-	hscan_t hs;
-	hnode_t *hn;
-	LogEntry *logentry;
 
-	SET_SEGV_LOCATION();
-	hash_scan_begin (&hs, logs);
-	while ((hn = hash_scan_next (&hs)) != NULL) {
-		logentry = hnode_get (hn);
-		/* If file handle is vald we must have used the log */
-		if(logentry->logfile) {
-			if (logentry->flush > 0) {
-				fflush (logentry->logfile);
-			}
-			fclose (logentry->logfile);		
-			logentry->logfile = NULL;
-		}
-		logentry->flush = 0;
-#ifdef DEBUG
-		printf ("Closing Logfile %s (%s)\n", logentry->name, (char *) hnode_getkey (hn));
-#endif
-		/* make new file name but do not open until needed to avoid 0 length files*/
-		make_log_filename(logentry->name, logentry->logname);
-	}
-}
-
-/* this is for printing out details during an assertion failure */
-void
-nassert_fail (const char *expr, const char *file, const int line, const char *infunk)
+void nassert_fail( const char *expr, const char *file, const int line, const char *func )
 {
 #ifdef HAVE_BACKTRACE
 	void *array[50];
 	size_t size;
 	char **strings;
 	size_t i;
-/* thanks to gnulibc libary for letting me find this usefull function */
-	size = backtrace (array, 10);
-	strings = backtrace_symbols (array, size);
-#endif
 
-	nlog (LOG_CRITICAL, "Assertion Failure!!!!!!!!!!!");
-	nlog (LOG_CRITICAL, "Function: %s (%s:%d)", infunk, file, line);
-	nlog (LOG_CRITICAL, "Expression: %s", expr);
+	size = backtrace( array, 10 );
+	strings = backtrace_symbols( array, size );
+#endif /* HAVE_BACKTRACE */
+	nlog( LOG_CRITICAL, "Assertion Failure!" );
+	nlog( LOG_CRITICAL, "Function: %s %s %d", func, file, line );
+	nlog( LOG_CRITICAL, "Expression: %s", expr );
 #ifdef HAVE_BACKTRACE
-	for (i = 1; i < size; i++) {
-		nlog (LOG_CRITICAL, "BackTrace(%d): %s", i - 1, strings[i]);
+	for( i = 1; i < size; i++ ) {
+		nlog( LOG_CRITICAL, "BackTrace (%d) : %s", i - 1, strings[i] );
 	}
-#endif
-	nlog (LOG_CRITICAL, "Shutting Down!");
-	exit (EXIT_FAILURE);
+#endif /* HAVE_BACKTRACE */
+	nlog( LOG_CRITICAL, "Shutting Down!" );
+	exit( EXIT_FAILURE );
 }
-

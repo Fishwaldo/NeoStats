@@ -400,14 +400,6 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 #define i_am_synched	GET_CUR_MODULE()->synched
 
 /* Unified return values and error system */
-/* These are program exit codes usually defined in stdlib.h but 
-   if not found will be defined here */
-#ifndef EXIT_FAILURE 
-#define EXIT_FAILURE 1
-#endif /* EXIT_FAILURE */
-#ifndef EXIT_SUCCESS
-#define EXIT_SUCCESS 0
-#endif /* EXIT_SUCCESS */
 
 /* NeoStats general success failure return type */
 #define NS_SUCCESS			 1
