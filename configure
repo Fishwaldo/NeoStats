@@ -826,14 +826,7 @@ Optional Features:
  --enable-debug - Enable Debuging
  --enable-unreal - enable Unreal IRCD Support
  --enable-ultimate - enable Ultimate IRCD Support
- --enable-auth==TYPE - what type of Authentication to use. Options are IRCD, or EXT
- --disable-statserv - Do Not Compile StatServ Module
- --disable-spam - Do Not Compile Spam Module
- --enable-icq - Do Compile Icq Module
- --enable-version - Do Compile Version Module (API example)
- --enable-netinfo - Do Compile NetInfo Module
- --enable-services - Do Compile Services Module
- --enable-loveserv - Do Compile LoveServ Module
+ --enable-auth==TYPE - what type of Authentication to use. See Readme File
  --enable-modules="MODULES" - space seperated list of modules to compile
 
 Some influential environment variables:
@@ -3508,22 +3501,17 @@ echo $ECHO_N "checking What type of Authentication to use...... $ECHO_C" >&6
 if test "${enable_auth+set}" = set; then
   enableval="$enable_auth"
    case "$enableval" in
-  IRCD)
+  sr)
 
-cat >>confdefs.h <<\_ACEOF
-#define IRCDAUTH 1
-_ACEOF
-
-	echo "$as_me:$LINENO: result: IRCD" >&5
-echo "${ECHO_T}IRCD" >&6
-	;;
-  EXT)
 cat >>confdefs.h <<\_ACEOF
 #define EXTAUTH 1
 _ACEOF
 
-	echo "$as_me:$LINENO: result: EXT" >&5
-echo "${ECHO_T}EXT" >&6
+	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
+	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
+	echo "$as_me:$LINENO: result: External" >&5
+echo "${ECHO_T}External" >&6
+	MODULES="$MODULES extauth"
 	;;
   *)
 	cat >>confdefs.h <<\_ACEOF
@@ -3544,161 +3532,6 @@ echo "${ECHO_T}IRCD" >&6
 
 fi;
 
-echo "$as_me:$LINENO: checking Whether to Enable StatServ Module?" >&5
-echo $ECHO_N "checking Whether to Enable StatServ Module?... $ECHO_C" >&6
-# Check whether --enable-statserv or --disable-statserv was given.
-if test "${enable_statserv+set}" = set; then
-  enableval="$enable_statserv"
-   case "$enableval" in
-  yes)
-	MODULES="statserv"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  MODULES="statserv"
-echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Spam Module?" >&5
-echo $ECHO_N "checking Whether to Enable Spam Module?... $ECHO_C" >&6
-# Check whether --enable-spam or --disable-spam was given.
-if test "${enable_spam+set}" = set; then
-  enableval="$enable_spam"
-   case "$enableval" in
-  yes)
-	MODULES="$MODULES spam"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-   MODULES="$MODULES spam"
-echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Icq Module?" >&5
-echo $ECHO_N "checking Whether to Enable Icq Module?... $ECHO_C" >&6
-# Check whether --enable-icq or --disable-icq was given.
-if test "${enable_icq+set}" = set; then
-  enableval="$enable_icq"
-   case "$enableval" in
-  yes)
-	MODULES="$MODULES icq"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Version Module?" >&5
-echo $ECHO_N "checking Whether to Enable Version Module?... $ECHO_C" >&6
-# Check whether --enable-version or --disable-version was given.
-if test "${enable_version+set}" = set; then
-  enableval="$enable_version"
-   case "$enableval" in
-  yes)
-	MODULES="$MODULES version"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Netinfo Module?" >&5
-echo $ECHO_N "checking Whether to Enable Netinfo Module?... $ECHO_C" >&6
-# Check whether --enable-netinfo or --disable-netinfo was given.
-if test "${enable_netinfo+set}" = set; then
-  enableval="$enable_netinfo"
-   case "$enableval" in
-  yes)
-	MODULES="$MODULES netinfo"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Services Module?" >&5
-echo $ECHO_N "checking Whether to Enable Services Module?... $ECHO_C" >&6
-# Check whether --enable-services or --disable-services was given.
-if test "${enable_services+set}" = set; then
-  enableval="$enable_services"
-   case "$enableval" in
-  yes)
-	MODULES="$MODULES services"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable LoveServ Module?" >&5
-echo $ECHO_N "checking Whether to Enable LoveServ Module?... $ECHO_C" >&6
-# Check whether --enable-loveserv or --disable-loveserv was given.
-if test "${enable_loveserv+set}" = set; then
-  enableval="$enable_loveserv"
-   case "$enableval" in
-  yes)
-	MODULES="$MODULES loveserv"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
 echo "$as_me:$LINENO: checking Any other modules to compile?" >&5
 echo $ECHO_N "checking Any other modules to compile?... $ECHO_C" >&6
 # Check whether --enable-modules or --disable-modules was given.
@@ -3722,6 +3555,8 @@ echo "$as_me:$LINENO: checking The Modules that will be compiled" >&5
 echo $ECHO_N "checking The Modules that will be compiled... $ECHO_C" >&6
 echo "$as_me:$LINENO: result: $MODULES" >&5
 echo "${ECHO_T}$MODULES" >&6
+
+
 
 
 
@@ -4298,6 +4133,8 @@ s,@CPP@,$CPP,;t t
 s,@IRCD_FILES_SRC@,$IRCD_FILES_SRC,;t t
 s,@IRCD_FILES_OBJS@,$IRCD_FILES_OBJS,;t t
 s,@MODULES@,$MODULES,;t t
+s,@EXTAUTH_SRC@,$EXTAUTH_SRC,;t t
+s,@EXTAUTH_OBJS@,$EXTAUTH_OBJS,;t t
 CEOF
 
 _ACEOF

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ns_help.c,v 1.3 2002/03/05 12:59:58 fishwaldo Exp $
+** $Id: ns_help.c,v 1.4 2002/03/18 05:44:11 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -21,6 +21,9 @@ const char *ns_help[] = {
 "Commands:",
 "\2INFO\2       Stats Info on NeoStats.",
 "\2VERSION\2    Shows you the current StatServ Version.",
+#ifdef EXTAUTH
+"\2ROOTS\2	Show the External Auth info.",
+#endif
 "",
 "End of Help.",
 NULL
@@ -50,6 +53,18 @@ const char *ns_myuser_help[] = {
 "End of Help",
 NULL
 };
+
+const char *ns_roots[] = {
+"*** NeoStats: \2ROOTS\2 Help ***",
+"",
+"Usage: /stats o <NeoStats Server>",
+"",
+"Allow you to view information about external Authentication Mechinisms"
+"",
+"End of Help.",
+NULL
+};
+
 
 const char *ns_raw_help[] = {
 "*** NeoStats: \2RAW\2 Help ***",

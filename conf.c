@@ -31,9 +31,8 @@ static config_option options[] =
 { "NEOSTAT_USER", ARG_STR, cb_Server, 8},
 { "WANT_PRIVMSG", ARG_STR, cb_Server, 9},
 { "SERVICES_CHAN", ARG_STR, cb_Server, 10},
-{ "SERVICES_ROOT", ARG_STR, cb_Server, 11},
 { "LOAD_MODULE", ARG_STR, cb_Module, 0},
-{ "ONLY_OPERS", ARG_STR, cb_Server, 12}
+{ "ONLY_OPERS", ARG_STR, cb_Server, 11}
 };
 
 
@@ -85,6 +84,10 @@ int init_modules() {
 	int rval;
 	
 	strcpy(segv_location,"init_modules");
+#ifdef EXTAUTH
+	load_module("extauth", NULL);
+#endif
+	
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] !=0); i++) {
 #ifdef DEBUG
 		log("Loading Module %s", load_mods[i]);
@@ -133,8 +136,6 @@ void cb_Server(char *arg, int configtype) {
 		} else if (configtype == 10) {
 			memcpy(me.chan,arg, sizeof(me.chan));
 		} else if (configtype == 11) {
-			memcpy(me.roots,arg, sizeof(me.roots));
-		} else if (configtype == 12) {
 			me.onlyopers = 1;
 		}
 

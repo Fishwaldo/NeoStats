@@ -253,7 +253,6 @@ void Module_Event(char *event, void *data) {
 	while ((mn = hash_scan_next(&ms)) != NULL) {
 		module_ptr = hnode_get(mn);
 		ev_list = module_ptr->other_funcs;
-		log("Running Module %s",module_ptr->info->module_name);
 		if (ev_list) {
 			while (ev_list->cmd_name != NULL) {
 				/* This goes through each Command */
@@ -527,6 +526,10 @@ void Usr_Stats(char *origin, char **argv, int argc) {
 	User *u;
 	time_t tmp;
 	time_t tmp2;
+#ifdef EXTAUTH
+	int dl;
+	int (*listauth)(User *u);
+#endif
 		
 	u=finduser(origin);
 	if (!u) {
@@ -543,6 +546,14 @@ void Usr_Stats(char *origin, char **argv, int argc) {
 		snumeric_cmd(213, u->nick, "C *@%s * * %d 50", me.uplink, me.port);
 	} else if (!strcasecmp(argv[0], "o")) {
 		/* Operators */
+#ifdef EXTAUTH
+		dl = get_dl_handle("extauth");
+		if (dl > 0) {
+			listauth = dlsym((int *)dl, "__list_auth");
+			if (listauth)  
+				(*listauth)(u);
+		} else
+#endif
 		snumeric_cmd(243, u->nick, "Operators think they are God, but you and I know they are not!");
 	} else if (!strcasecmp(argv[0], "l")) {
 		/* Port Lists */

@@ -30,10 +30,10 @@ static void ss_version(User *u);
 static void ss_server(User *u, char *server);
 static void ss_map(User *);
 static void ss_netstats(User *);
-static int Online(Server *);
+static int Online(void *);
 static int pong(Server *);
 static int s_user_away(User *);
-int s_new_server(Server *);
+static int s_new_server(Server *);
 static int s_del_server(Server *);
 static int s_new_user(User *);
 static int s_del_user(User *);
@@ -416,7 +416,7 @@ int pong(Server *s) {
     return 1;
 }
 
-int Online(Server *s) {
+int Online(void *s) {
 
     strcpy(segv_location, "StatServ-Online");
 

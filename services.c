@@ -29,7 +29,6 @@ static void ns_server_dump(User *);
 static void ns_chan_dump(User *, char *);
 static void ns_uptime(User *);
 static void ns_version(User *); 
-static void ns_roots(User *);
 
 void servicesbot(char *nick, char **av, int ac) {
 	User *u;
@@ -85,6 +84,10 @@ void servicesbot(char *nick, char **av, int ac) {
 			privmsg_list(nick, s_Services, ns_chandump_help);
 		else if (!strcasecmp(av[2], "SERVERDUMP") && (UserLevel(u) >= 180))
 			privmsg_list(nick, s_Services, ns_serverdump_help);
+#ifdef EXTAUTH
+		else if (!strcasecmp(av[2], "ROOTS"))
+			privmsg_list(nick, s_Services, ns_roots);
+#endif
 		else
 		privmsg(nick, s_Services, "Unknown Help Topic: \2%s\2", av[2]);
 	} else if (!strcasecmp(av[1], "LOAD")) {
@@ -165,9 +168,6 @@ void servicesbot(char *nick, char **av, int ac) {
 	} else if (!strcasecmp(av[1], "VERSION")) {
 		ns_version(u);
 		notice(s_Services,"%s Wanted to know our version number ",u->nick);
-	} else if (!strcasecmp(av[1], "ROOTS")) {
-	 	ns_roots(u);
-		notice(s_Services,"%s wanted to see our ROOTS",u->nick);
 	} else if (!strcasecmp(av[1], "RELOAD")) {
 		if (!(UserLevel(u) >= 180)) {
 			privmsg(nick,s_Services,"Permission Denied");
@@ -474,15 +474,6 @@ static void ns_version(User *u)
 		privmsg(u->nick, s_Services, "\2NeoStats Version Information\2");
 		privmsg(u->nick, s_Services, "NeoStats Version: %s", version);
 		privmsg(u->nick, s_Services, "http://www.neostats.net");
-	privmsg(u->nick, s_Services, "Services roots: %s", me.roots);
-}
-
-static void ns_roots(User *u)
-{
-	strcpy(segv_location, "ns_roots");
-		privmsg(u->nick, s_Services, "\2NeoStats ROOT users\2");
-		privmsg(u->nick, s_Services, "%s",me.roots);
-	privmsg(u->nick, s_Services, "These are setable in stats.cfg now");
 }
 
 void init_services() {

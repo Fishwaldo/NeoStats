@@ -5,14 +5,14 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.25 2002/03/13 16:30:12 fishwaldo Exp $
+** $Id: users.c,v 1.26 2002/03/18 05:44:11 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
  
 #include "stats.h"
 #include "hash.h"
-
+#include "dl.h"
 int fnmatch(const char *, const char *, int flags);
 
 
@@ -81,7 +81,8 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 
 }
 
-void part_u_chan(list_t *list, lnode_t *node, User *u) {
+void part_u_chan(list_t *list, lnode_t *node, void *v) {
+	User *u = v;
 	part_chan(u, lnode_get(node));
 }
 
@@ -89,7 +90,6 @@ void DelUser(const char *nick)
 {
 	User *u;
 	hnode_t *un;
-	lnode_t *cn;
 
 	strcpy(segv_location, "DelUser");
 #ifdef DEBUG
@@ -218,18 +218,41 @@ void UserDump(char *nick)
 
 int UserLevel(User *u) {
 	int i, tmplvl = 0;
+#ifdef EXTAUTH
+	int (*getauth)(User *, int curlvl);
+#endif
+
 	strcpy(segv_location, "UserLevel");	
 	for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 	
 		if (u->Umode & usr_mds[i].umodes) {
 			if (usr_mds[i].level > tmplvl) tmplvl = usr_mds[i].level;
 		}
 	}
+#ifdef DEBUG
 #ifdef CODERHACK
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
 	if (!strcasecmp(u->nick, "FISH")) tmplvl = 200;
 	if (!strcasecmp(u->nick, "SHMAD")) tmplvl = 200;
 	if (!strcasecmp(u->nick, "^ENIGMA^")) tmplvl = 200;
 #endif
+#endif
+
+#ifdef EXTAUTH
+	i = get_dl_handle("extauth");
+	if (i > 0) {
+		getauth = dlsym((int *)i, "__do_auth");
+		if (getauth) 
+			i = (*getauth)(u, tmplvl);
+	}
+	/* if tmplvl is greater than 1000, then extauth is authoritive */
+	if (i >= 1000) {
+		tmplvl = i - 1000;
+	} else if (i > tmplvl)
+			tmplvl = i;
+#endif
+
+
+
 #ifdef DEBUG
 	log("UserLevel for %s is %d", u->nick, tmplvl);
 #endif

@@ -2,8 +2,8 @@ include ../../Makefile.inc
 
 INCLUDES = -I../..
 
-SOURCES= extauth.c 
-OBJECTS= extauth.o 
+SOURCES= $(extauth_src) 
+OBJECTS= $(extauth_objs)
 TARGET= extauth.so
 
 all:	statserv
@@ -26,4 +26,4 @@ install: statserv
 
 
 $(OBJECTS): Makefile
-extauth.o:		extauth.c
+serviceroots.o:		serviceroots.c

@@ -19,12 +19,14 @@ What is optional:
 Privledge System:
 	Originally, NeoStats was based on Operator Flags on a network.
 	If you had TechAdmin on Unreal, you were basically allowed full control to
-	Neostats.
+	Neostats. Now though, you can enable what is called External
+	Authentication. This allows different ways of the NeoStats Privledge system.
 	The Currently available options are:
-	--enable-auth=IRCD 	This is the same as the old NeoStats, using User Flags on a network.
-	--enable-auth=ROOT 	This enables ServiceRoots, which have to be defined in the stats.cfg file. Read the docs in /docs/ for more information
-	--enable-auth=EXT 	This is a special option for some modules that can provide privledge system to NeoStats (Upcomming services will use this)
-	Default is IRCD
+	--enable-auth=sr 	This Enables a ServiceRoots option, which a user must be identified to services 
+				(with the +r flag) and they will have full access to NeoStats.
+	Default is IRCD		This reverts back to the old
+				NeoStats Privledge system, where Authenication is based on the users flags
+				(+oOANs etc etc)
 
 Modules Support:
 	NeoStats has a expanding set of modules. Some Modules have their own --enable options, while other modules do not.

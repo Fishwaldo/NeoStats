@@ -21,7 +21,7 @@
 
 void init_dl() {
 	if (usr_mds);
-};
+}
 void __init_mod_list() {
 	strcpy(segv_location, "__init_mod_list");
 
@@ -29,7 +29,7 @@ void __init_mod_list() {
 	bh = hash_create(B_TABLE_SIZE, 0, 0);
 	th = hash_create(T_TABLE_SIZE, 0, 0);
 	sockh = hash_create(MAX_SOCKS, 0, 0);
-};
+}
 
 static Mod_Timer *new_timer(char *timer_name)
 {
@@ -498,7 +498,7 @@ int load_module(char *path1, User *u) {
 	return 0;
 
 
-};
+}
 extern int get_dl_handle(char *mod_name) {
 	Module *list_ptr;
 	hnode_t *mn;

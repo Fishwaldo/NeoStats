@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.13 2002/03/13 16:30:11 fishwaldo Exp $
+** $Id: chans.c,v 1.14 2002/03/18 05:44:10 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -31,8 +31,9 @@ extern void Change_Topic(char *owner, Chans *c, time_t time, char *topic) {
 	c->topictime = time;
 }
 
-int comparemode(ModesParm *m, long mode) {
-	if (m->mode == mode) {
+int comparemode(const void *v, const void *mode) {
+	ModesParm *m = (void *)v;
+	if (m->mode == (long)mode) {
 		return 0;
 	} else {
 		return 1;

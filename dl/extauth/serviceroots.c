@@ -20,7 +20,7 @@ static int new_m_version(char *origin, char **av, int ac);
 void sr_cb_config(char *arg, int configtype);
 
 Module_Info extauth_Info[] = { {
-    "ServiceRoots",
+    "extauth",
     "ServiceRoots Authentication Module",
     "1.0"
 } };
@@ -74,7 +74,7 @@ void _fini() {
 	lnode_t *un;
 	un = list_first(srconf.ul);
 	while (un) {
-		free(list_get(un));
+		free(lnode_get(un));
 		un = list_next(srconf.ul, un);
 	}
 	list_destroy_nodes(srconf.ul);
@@ -103,8 +103,22 @@ void sr_cb_config(char *arg, int configtype) {
 }
 	
 extern int __do_auth(User *u, int curlvl) {
-
-return curlvl;
+	lnode_t *un;
+	char *nick;
+	if (u->Umode & UMODE_REGNICK) {
+		un = list_first(srconf.ul);
+		while (un) {
+			if (!strcasecmp(u->nick, lnode_get(un))) {
+				if (srconf.auth == 1) {
+					return (1200);
+				} else {
+					return (200);
+				}
+			}
+			un = list_next(srconf.ul, un);
+		}
+	}
+	return curlvl;
 }
 
 extern int __list_auth(User *u) {
@@ -115,4 +129,5 @@ extern int __list_auth(User *u) {
 		snumeric_cmd(243, u->nick, "O *@* %s S", (char *) lnode_get(un));
 		un = list_next(srconf.ul, un);
 	}
+	return 1;
 }

@@ -115,7 +115,6 @@ struct me {
 	int action;
 	char message[BUFSIZE];
 	char chan[BUFSIZE];
-	char roots[BUFSIZE];
 	unsigned int onchan : 1;
 	unsigned int usesmo : 1;
 	Server *s;
@@ -282,7 +281,7 @@ extern const char *ns_version_help[];
 extern const char *ns_load_help[];
 extern const char *ns_unload_help[];
 extern const char *ns_modlist_help[];
-
+extern const char *ns_roots[];
 #ifdef ICQSERV
 /* icq.c */
 extern void IcqServer(char *);
