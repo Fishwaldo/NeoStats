@@ -20,44 +20,47 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.h,v 1.2 2003/04/10 09:32:01 fishwaldo Exp $
+** $Id: log.c,v 1.1 2003/04/10 09:32:01 fishwaldo Exp $
 */
 
+#include "stats.h"
+#include "conf.h"
 
-#ifndef _conf_h_
-#define _conf_h_
+const char *loglevels[10] = {
+	"CRITICAL",
+	"ERROR",
+	"WARNING",
+	"NOTICE",
+	"NORMAL",
+	"INFO",
+	"DEBUG1",
+	"DEBUG2",
+	"DEBUG3",
+	"INSANE"
+};
 
-/*
- * conf.h
- * dynamic configuration runtime libary
+
+
+/** @Configurable logging function
  */
+void nlog(int level, int scope, char *fmt, ...) {
+	va_list ap;
+	static FILE *logfile;
+	char buf[512], fmttime[80];
+	time_t ts = time(NULL);
+	
+	if (level <= config.debug) {	
+		if (!logfile) 
+			if ((logfile = fopen("logs/neostats.log", "a")) == NULL) return;
 
-/* define the config types */
-
-#define CFGSTR   1
-#define CFGINT   2
-#define CFGFLOAT 3
-#define CFGBOOL  4
-
-
-/* general configuration items */
-struct config {
-	/* debug level */
-	unsigned int debug;
-	/* enable recv.log */
-	unsigned int recvlog : 1;
-	/* dont load modules on startup */
-	unsigned int modnoload : 1;
-	/* dont output anything on start */
-	unsigned int quiet : 1;
-	/* dont detach into background */
-	unsigned int foreground : 1;
-} config;
-
-
-int GetConf(void **data, int type, const char *item);
-int SetConf(void *data, int type, char *item);
-
-
-
-#endif
+		strftime(fmttime, 80, "%d/%m/%Y[%H:%M]", localtime(&ts));
+		va_start(ap, fmt);
+		vsnprintf(buf, 512, fmt, ap);
+	
+		fprintf(logfile, "(%s) %s %s - %s\n", fmttime, loglevels[level-1], scope ? "core" : segvinmodule, buf);
+	
+		if (config.foreground)
+			printf("%s %s - %s\n", loglevels[level-1], scope ? "core" : segvinmodule, buf);
+		va_end(ap);
+	}
+}		

@@ -141,6 +141,8 @@ keeper/kp_util.c -text
 keeper/kp_util.h -text
 /list.c -text
 /list.h -text
+/log.c -text
+/log.h -text
 logs/.keepme -text
 /main.c -text
 /makeconf -text

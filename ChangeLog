@@ -7,6 +7,14 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - added conf.h and keeper.c, the NeoStats API to the keeper database.
  - Created and tested initial SetConf, GetConf functions to set and retrive config data. 
  - added the ability for NeoStats to Bind to a IP address. Put "BINDTO <ipaddy>" in the neostats.cfg to effect this. Works for all network communication (including opsb)
+ - Continue to try to load modules even if one fails when booting up. 
+ - Added Command line options processing:
+	Quiet Mode: usefull for cron scripts
+	No Load: Don't load modules on startup
+	recv.log: enable recv.log 
+	debug level: what level to write debug messages.
+	help and version info
+ - Started the new logging function, nlog
 
 * NeoStats * Fish * Version 2.5.1
  - ConnectServ's username was too long for NeoIRCd, fixed

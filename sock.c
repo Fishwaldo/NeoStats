@@ -22,18 +22,16 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.30 2003/04/10 06:06:10 fishwaldo Exp $
+** $Id: sock.c,v 1.31 2003/04/10 09:32:01 fishwaldo Exp $
 */
 
 #include <fcntl.h>
 #include "stats.h"
 #include "dl.h"
 #include <adns.h>
+#include "conf.h"
 
-
-#ifdef RECVLOG
 void recvlog(char *line);
-#endif
 
 struct sockaddr_in lsa;
 int dobind;
@@ -143,9 +141,7 @@ void read_loop()
 						if ((c == '\n') || (c == '\r')) {
 							me.RcveM++;
 							me.lastmsg = time(NULL);
-#ifdef RECVLOG
-							recvlog(buf);
-#endif
+							if (config.recvlog) recvlog(buf);
 							parse(buf);
 							break;
 						}
@@ -221,7 +217,6 @@ extern int getmaxsock() {
 	return ret;
 }
 
-#ifdef RECVLOG
 void recvlog(char *line)
 {
 	FILE *logfile;
@@ -230,7 +225,6 @@ void recvlog(char *line)
 		fprintf(logfile, "%s", line);
 	fclose(logfile);
 }
-#endif
 
 void log(char *fmt, ...)
 {

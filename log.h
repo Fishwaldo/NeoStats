@@ -20,44 +20,42 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.h,v 1.2 2003/04/10 09:32:01 fishwaldo Exp $
+** $Id: log.h,v 1.1 2003/04/10 09:32:01 fishwaldo Exp $
 */
 
 
-#ifndef _conf_h_
-#define _conf_h_
+#ifndef _log_h_
+#define _log_h_
 
 /*
- * conf.h
+ * log.h
  * dynamic configuration runtime libary
  */
 
-/* define the config types */
+/* define the log levels */
 
-#define CFGSTR   1
-#define CFGINT   2
-#define CFGFLOAT 3
-#define CFGBOOL  4
-
-
-/* general configuration items */
-struct config {
-	/* debug level */
-	unsigned int debug;
-	/* enable recv.log */
-	unsigned int recvlog : 1;
-	/* dont load modules on startup */
-	unsigned int modnoload : 1;
-	/* dont output anything on start */
-	unsigned int quiet : 1;
-	/* dont detach into background */
-	unsigned int foreground : 1;
-} config;
-
-
-int GetConf(void **data, int type, const char *item);
-int SetConf(void *data, int type, char *item);
+/* critcal crash type notices */
+#define LOG_CRITICAL   	1
+/* something is majorly wrong */
+#define LOG_ERROR	2
+/* Hey, you should know about this type messages */
+#define LOG_WARNING	3
+/* did you know messages */
+#define LOG_NOTICE	4
+/* our normal logging level? */
+#define LOG_NORMAL	5
+/* lots of info about what we are doing */
+#define LOG_INFO	6
+/* debug notices about important functions that are going on */
+#define LOG_DEBUG1	7
+/* more debug notices that are usefull */
+#define LOG_DEBUG2	8
+/* even more stuff, that would be useless to most normal people */
+#define LOG_DEBUG3	9
+/* are you insane? */
+#define LOG_DEBUG4	10
 
 
+extern void nlog(int level, int scope, char *fmt, ...);
 
 #endif

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.83 2003/04/10 06:06:10 fishwaldo Exp $
+** $Id: main.c,v 1.84 2003/04/10 09:32:01 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -62,7 +62,7 @@ const char version_time[] = __TIME__;
 
 static void start();
 static void setup_signals();
-
+void get_options(int argc, char **argv);
 
 
 /*! have we forked */
@@ -78,7 +78,7 @@ int forked = 0;
  *
  * @todo Close STDIN etc correctly
  */
-int main()
+int main(int argc, char *argv[])
 {
 	FILE *fp;
 	char *test;
@@ -100,20 +100,21 @@ int main()
 	strcpy(segv_location, "main");
 	strcpy(segvinmodule, "");
 	me.onchan = 0;
-	if (usr_mds)
-	printf("\n\n");
-	printf("NeoStats %d.%d.%d%s Loading...\n", MAJOR, MINOR, REV, version);
-	printf("-----------------------------------------------\n");
-	printf("Copyright: NeoStats Group. 2000-2002\n");
-	printf("Justin Hammond (fish@neostats.net)\n");
-	printf("Adam Rutter (shmad@neostats.net)\n");
-	printf("^Enigma^ (enigma@neostats.net)\n");
-	printf("-----------------------------------------------\n\n");
+	get_options(argc, argv);
+	if (!config.quiet) {
+		printf("NeoStats %d.%d.%d%s Loading...\n", MAJOR, MINOR, REV, version);
+		printf("-----------------------------------------------\n");
+		printf("Copyright: NeoStats Group. 2000-2002\n");
+		printf("Justin Hammond (fish@neostats.net)\n");
+		printf("Adam Rutter (shmad@neostats.net)\n");
+		printf("^Enigma^ (enigma@neostats.net)\n");
+		printf("-----------------------------------------------\n\n");
+	}
 	me.t_start = time(NULL);
 	me.want_privmsg = 0;
 	me.enable_spam = 0;
 	me.die = 0;
-	me.local[0] = "\0";
+	me.local[0] = '\0';
 	me.coder_debug=0;
 	me.noticelag=0;
 	me.usesmo=0;
@@ -153,29 +154,94 @@ int main()
 
 
 #ifndef DEBUG
-	forked=fork();
+	if (!config.foreground) {
+		forked=fork();
 #endif
-	if (forked) {
-		fp = fopen("neostats.pid", "w");
-		fprintf(fp, "%i", forked);
-		fclose(fp);
-		printf("\n");
-		printf("NeoStats %d.%d.%d%s Successfully Launched into Background\n", MAJOR, MINOR, REV, version);
-		printf("PID: %i - Wrote to neostats.pid\n",forked);
-
-		return 0;
-	}
+		if (forked) {
+			fp = fopen("neostats.pid", "w");
+			fprintf(fp, "%i", forked);
+			fclose(fp);
+			if (!config.quiet) {
+				printf("\n");
+				printf("NeoStats %d.%d.%d%s Successfully Launched into Background\n", MAJOR, MINOR, REV, version);
+				printf("PID: %i - Wrote to neostats.pid\n",forked);
+			}
+			return 0;
+		}
 #ifndef DEBUG
-	if (setpgid(0, 0) < 0) {
-		log("setpgid() failed");
-	}
-		
+		if (setpgid(0, 0) < 0) {
+			log("setpgid() failed");
+		}
+	}	
 #endif
 	log("Statistics Started (NeoStats %d.%d.%d%s).", MAJOR, MINOR, REV, version);
+
 	start();
 
 	return 1;
 }
+
+/** @brief Process COmmandline Options
+ *
+ * Processes commandline options
+*/
+void get_options(int argc, char **argv) {
+	int c;
+	int dbg;
+
+	while ((c=getopt(argc,argv, "hvrd:nqf")) != -1) {
+		switch(c) {
+			case 'h':
+				printf("NeoStats: Usage: \"neostats [options]\"\n");
+				printf("          -h (Show this screen)\n");
+				printf("	  -v (Show Version Number)\n");
+				printf("	  -r (Enable Recv.log)\n");
+				printf("	  -d 1-10 (Enable Debuging output 1= lowest, 10 = highest)\n");
+				printf("	  -n (Do not load any modules on startup)\n");
+				printf("	  -q (Quiet Start - For Cron Scripts)\n");
+				exit(1);
+			case 'v':
+				printf("NeoStats Version %d.%d.%d%s\n", MAJOR, MINOR, REV, version);
+				printf("Compiled: %s at %s\n", version_date, version_time);
+				printf("Flag after version number indicates what IRCd NeoStats is compiled for:\n");
+				printf("(U)  - Unreal IRCd\n");
+				printf("(UL3)- Ultimate 3.x.x IRCd\n");
+				printf("(UL) - Ultimate 2.x.x IRCd (Depriciated)\n");
+				printf("(H)  - Hybrid 7.x IRCd\n");
+				printf("(N)  - NeoIRCd IRCd\n");
+				printf("\nNeoStats: http://www.neostats.net\n");
+				exit(1);
+			case 'r':
+				printf("Recv.log enabled. Watch your DiskSpace\n");
+				config.recvlog = 1;
+				break;
+			case 'n':
+				config.modnoload = 1;
+				break;
+			case 'q':
+				config.quiet = 1;
+				break;
+			case 'd':
+				dbg = atoi(optarg);
+				if ((dbg > 10) || (dbg < 1)) {
+					printf("Invalid Debug Level %d\n", dbg);
+					exit(1);
+				}
+				config.debug = dbg;
+				break;
+			case 'f':
+				config.foreground = 1;
+				break;
+			default:
+				printf("Unknown Commandline switch %c\n", optopt);
+		}
+	}  
+	
+
+}
+
+
+
 /** @brief Sigterm Signal handler
  *
  * Called by the signal handler if we get a SIGTERM

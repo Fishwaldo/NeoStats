@@ -20,11 +20,12 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.c,v 1.19 2003/04/10 06:06:10 fishwaldo Exp $
+** $Id: conf.c,v 1.20 2003/04/10 09:32:01 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "dotconf.h"
+#include "conf.h"
 #include "dl.h"
 
 static void cb_Server(char *, int);
@@ -128,13 +129,15 @@ void ConfLoad() {
 void cb_Module(char *arg, int configtype) {
 	int i;
 		strcpy(segv_location, "cb_Module");
-		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) { 
-			if (!strcasecmp(load_mods[i], arg)) {
-				return;
+		if (!config.modnoload) {
+			for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) { 
+				if (!strcasecmp(load_mods[i], arg)) {
+					return;
+				}
 			}
+			load_mods[i] = sstrdup(arg);
+			log("Added Module %d :%s", i, load_mods[i]);
 		}
-		load_mods[i] = sstrdup(arg);
-		log("Added Module %d :%s", i, load_mods[i]);
 }
 
 /** @brief Load the modules 
@@ -160,7 +163,6 @@ int init_modules() {
 			log("Successfully Loaded Module %s", load_mods[i]);
 		} else {
 			log("Could Not Load Module %s, Please check above error Messages", load_mods[i]);
-			return -1;
 		}
 	}
 	return 1;
