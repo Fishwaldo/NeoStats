@@ -435,12 +435,6 @@ void parse(char *line)
  	if (!strcasecmp("PRIVMSG",cmd) || (!strcasecmp("!",cmd))) {
  		/* its a privmsg, now lets see who too... */       
 
-		/* if its a message from our own internal bots, silently drop it */
-		  if (findbot(origin)) {
-			chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", origin, av[0]);
-			free(av);
-	                return;
-		}
 		if (!strcasecmp(s_Services,av[0])) {
 			/* its to the Internal Services Bot */
 			strcpy(segv_location, "servicesbot");

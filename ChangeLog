@@ -1,6 +1,8 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
 * NeoStats * Fish & Shmad * Version 2.5.0-Beta3
+ - Removed someones crackheaded checking for internal in ircd.c which we dont need now
+   that I've fixed the GHOST bug. (Shmad)
  - Fixed that ANNOYING GHOST bug if a service Messages or Notices itself. fun fun stuff (Shmad).
  - Missed some Locking code.. removed it all now (Shmad)
  - Fought with sourceforge CVS for awhile.. (Shmad)
