@@ -290,11 +290,26 @@ int os_sock_close( OS_SOCKET sock )
 
 int os_sock_write( OS_SOCKET s, const char* buf, int len )
 {
+	int ret;
+
+	/* reset local errno implementation */
+	os_sock_errno = 0;
 #ifdef WIN32
-	return send( s, buf, len, 0 );
-#else	
-	return write( s, buf, len );
+	ret = send( s, buf, len, 0 );
+	if( ret == SOCKET_ERROR )
+	{
+		os_sock_errno = WSAGetLastError();
+		nlog( LOG_ERROR, "os_sock_write: failed for socket %d with error %d %s", s, os_sock_errno, WinSockErrToString( os_sock_errno ) );
+	}
+#else
+	ret = write( s, buf, len );
+	if( ret != 0 )
+	{
+		os_sock_errno = errno;
+		nlog( LOG_ERROR, "os_sock_write: failed for socket %d with error %s", s, strerror( errno ) );
+	}
 #endif
+	return ret;
 }
 
 /*
@@ -303,11 +318,26 @@ int os_sock_write( OS_SOCKET s, const char* buf, int len )
 
 int os_sock_read( OS_SOCKET s, char* buf, int len )
 {
+	int ret;
+
+	/* reset local errno implementation */
+	os_sock_errno = 0;
 #ifdef WIN32
-	return recv( s, buf, len, 0 );
+	ret = recv( s, buf, len, 0 );
+	if( ret == SOCKET_ERROR )
+	{
+		os_sock_errno = WSAGetLastError();
+		nlog( LOG_ERROR, "os_sock_read: failed for socket %d with error %d %s", s, os_sock_errno, WinSockErrToString( os_sock_errno ) );
+	}
 #else
-	return read( s, buf, len );
+	ret = read( s, buf, len );
+	if( ret != 0 )
+	{
+		os_sock_errno = errno;
+		nlog( LOG_ERROR, "os_sock_read: failed for socket %d with error %s", s, strerror( errno ) );
+	}
 #endif
+	return ret;
 }
 
 /*

@@ -208,7 +208,7 @@ void Connect( void )
 	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, me.port);
 	mysock = ConnectTo (me.uplink, me.port);
 	if (mysock <= 0) {
-		nlog (LOG_WARNING, "Unable to connect to %s: %s", me.uplink, strerror(errno));
+		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
 	} else {
 		me.servsock=add_linemode_socket("IRCd", mysock, irc_parse, error_from_ircd_socket, NULL);
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
@@ -310,7 +310,6 @@ send_to_sock(Sock *sock, const char *buf, const int buflen) {
     } else if ((sock->socktype == SOCK_NATIVE) | (sock->socktype == SOCK_STANDARD)) {
         sent = os_sock_write(sock->sock_no, buf, buflen);
         if (sent == -1) {
-	    	nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
 			sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
 	    	/* Try to close socket then reset the servsock value to avoid cyclic calls */
     		DelSock(sock);
@@ -772,7 +771,7 @@ read_sock_activity(int fd, short what, void *data) {
 	    	}
 		    n = os_sock_read(sock->sock_no, p, howmuch);
    			if (n == -1 || n == 0) {
-    			dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
+    			dlog(DEBUG1, "sock_read: failed %s", sock->name);
 	    		sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
 		    	DelSock(sock);
 				return;
