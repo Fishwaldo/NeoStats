@@ -332,6 +332,8 @@ send_squit (const char *server, const char *quitmsg)
 void 
 send_quit (const char *who, const char *quitmsg)
 {
+	int i;
+
 	/* Clear numeric */
 	for(i = 0; i < 64; i++)
 	{
