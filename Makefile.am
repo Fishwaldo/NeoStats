@@ -10,7 +10,7 @@ dist_doc_DATA		= doc/FAQ doc/README.sqlsrv doc/USERMAN
 
 DISTCLEANFILES		= ccdv
 
-EXTRA_DIST		= ccdv.c CREDITS INSTNOTES README.win32 RELNOTES
+EXTRA_DIST		= ccdv.c CREDITS INSTNOTES RELNOTES
 
 all-local:
 		echo "Compilation complete."
