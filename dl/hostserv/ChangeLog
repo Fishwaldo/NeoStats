@@ -2,12 +2,12 @@ HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
 
-* Version 2.3 * Shmad * January 4th, 2002
+* Version 2.3 * Shmad & Fish * January 4th, 2002
 + Write to DB who added the record.
 + VIEW # now shows also who added the record.
 + hostserv.h now contains defines for access for each function.
 + Fixed a segfault when upgrading from earlier versions if a passwd field wasnt present.
-
++ Made it possible to configure the levels for each command due to different people wanting different levels... :) removed Shmads old hostserv.h
 
 * Version 2.2 * Fish * December 26th, 2002
 + Due to massive bitching by people who use HostServ opers can

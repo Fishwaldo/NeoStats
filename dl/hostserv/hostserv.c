@@ -20,14 +20,14 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.27 2003/01/05 07:24:07 shmad Exp $
+** $Id: hostserv.c,v 1.28 2003/01/06 08:40:09 fishwaldo Exp $
 */
 
 #include <stdio.h>
 #include <fnmatch.h>
 #include "dl.h"
+#include "dotconf.h"
 #include "stats.h"
-#include "hostserv.h"
 #include "hs_help.c"
 
 
@@ -53,11 +53,19 @@ struct hs_map_ {
 };
 HS_Map *nnickmap;
 
+struct hs_lvl {
+    int view;
+    int list;
+    int del;
+    int add;
+} hs_lvl;
+
 char nnick[255];
 
 extern const char *hs_help[];
 static int hs_sign_on(char **av, int ac);
 
+static void _init();
 static void hs_add(User *u, char *cmd, char *m, char *h, char *p);
 static void hs_list(User *u);
 static void hs_view(User *u, int tmpint);
@@ -65,7 +73,7 @@ static void hs_del(User *u, int tmpint);
 static void hs_login(User *u, char *login, char *pass);
 /* static void hs_chpass(User *u, char *login, char *pass, char *newpass); */
 static int new_m_version(char *origin, char **av, int ac);
-
+void hs_cb_Config(char *arg, int configtype);
 void hslog(char *, ...);
 void hsdat(char *, ...);
 void hshsamend(char *, ...);
@@ -87,6 +95,48 @@ Module_Info HostServ_info[] = { {
     "2.3"
 } };
 
+
+
+
+static config_option options[] = {
+{ "HOSTSERV_LVL_VIEW", ARG_STR, hs_cb_Config, 0},
+{ "HOSTSERV_LVL_ADD", ARG_STR, hs_cb_Config, 1},
+{ "HOSTSERV_LVL_DEL", ARG_STR, hs_cb_Config, 2},
+{ "HOSTSERV_LVL_LIST", ARG_STR, hs_cb_Config, 3},
+};
+
+
+void hs_cb_Config(char *arg, int configtype) {
+	int lvl;
+	strcpy(segv_location, "HostServ-hs_cb_Config");
+
+	if (configtype == 0) {
+		/* View */
+		lvl = atoi(arg);
+		if (lvl > 200)
+			return;
+		hs_lvl.view = lvl;
+	} else if (configtype == 1) {
+		/* Add */
+		lvl = atoi(arg);
+		if (lvl > 200)
+			return;
+		hs_lvl.add = lvl;
+	} else if (configtype == 2) {
+		/* del */
+		lvl = atoi(arg);
+		if (lvl > 200)
+			return;
+		hs_lvl.del = lvl;
+	} else if (configtype == 3) {
+		/* list */
+		lvl = atoi(arg);
+		if (lvl > 200)
+			return;
+		hs_lvl.list = lvl;
+	} 
+	
+}
 
 int new_m_version(char *origin, char **av, int ac) {
     snumeric_cmd(351, origin, "Module HostServ Loaded, Version: %s %s %s",HostServ_info[0].module_version,hsversion_date,hsversion_time);
@@ -144,16 +194,16 @@ int __Bot_Message(char *origin, char **av, int ac)
         if (ac <= 2) {
             privmsg_list(u->nick, s_HostServ, hs_help); 
             return 1;
-        } else if (!strcasecmp(av[2], "ADD") && (UserLevel(u) >= CAN_ADD)) {
+        } else if (!strcasecmp(av[2], "ADD") && (UserLevel(u) >= hs_lvl.add)) {
             privmsg_list(u->nick, s_HostServ, hs_help_add);
             return 1;
-        } else if (!strcasecmp(av[2], "DEL") && (UserLevel(u) >= CAN_DEL)) {
+        } else if (!strcasecmp(av[2], "DEL") && (UserLevel(u) >= hs_lvl.del)) {
             privmsg_list(u->nick, s_HostServ, hs_help_del);
             return 1;        
-        } else if (!strcasecmp(av[2], "LIST") && (UserLevel(u) >= CAN_LIST)) {
+        } else if (!strcasecmp(av[2], "LIST") && (UserLevel(u) >= hs_lvl.list)) {
             privmsg_list(u->nick, s_HostServ, hs_help_list);
             return 1;
-	} else if (!strcasecmp(av[2], "VIEW") && (UserLevel(u) >= CAN_VIEW)) {
+	} else if (!strcasecmp(av[2], "VIEW") && (UserLevel(u) >= hs_lvl.view)) {
 	    privmsg_list(u->nick, s_HostServ, hs_help_view);
 	    return 1;
 	} else if (!strcasecmp(av[2], "LOGIN")) {
@@ -168,14 +218,14 @@ int __Bot_Message(char *origin, char **av, int ac)
 
     if (!strcasecmp(av[1], "ABOUT")) {
                 privmsg_list(u->nick, s_HostServ, hs_help_about);
-    } else if (!strcasecmp(av[1], "ADD") && (UserLevel(u) >= CAN_ADD)) {
+    } else if (!strcasecmp(av[1], "ADD") && (UserLevel(u) >= hs_lvl.add)) {
                 if (ac < 6) {
                     prefmsg(u->nick, s_HostServ, "Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>", s_HostServ);
                     prefmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
                     return -1;
                 }
                 hs_add(u, av[2], av[3], av[4], av[5]);
-    } else if (!strcasecmp(av[1], "DEL") && (UserLevel(u) >= CAN_DEL)) {
+    } else if (!strcasecmp(av[1], "DEL") && (UserLevel(u) >= hs_lvl.del)) {
                 if (!av[2]) {
                     prefmsg(u->nick, s_HostServ, "Syntax: /msg %s DEL #", s_HostServ);
                     prefmsg(u->nick, s_HostServ, "The users # is got from /msg %s LIST", s_HostServ);
@@ -188,9 +238,9 @@ int __Bot_Message(char *origin, char **av, int ac)
                     return -1;
                 }
                 hs_del(u, t);
-    } else if (!strcasecmp(av[1], "LIST") && (UserLevel(u) >= CAN_LIST)) {
+    } else if (!strcasecmp(av[1], "LIST") && (UserLevel(u) >= hs_lvl.list)) {
                 hs_list(u);
-    } else if (!strcasecmp(av[1], "VIEW") && (UserLevel(u) >= CAN_VIEW)) {
+    } else if (!strcasecmp(av[1], "VIEW") && (UserLevel(u) >= hs_lvl.view)) {
 		if (!av[2]) {
 		    prefmsg(u->nick, s_HostServ, "Syntax: /msg %s VIEW #", s_HostServ);
 		    prefmsg(u->nick, s_HostServ, "The users # is got from /msg %s LIST", s_HostServ);
@@ -245,9 +295,18 @@ EventFnList *__module_get_events() {
 };
 
 
-void _init() {
+static void _init() {
     s_HostServ = "HostServ";
-    globops(me.name, "HostServ Module Loaded",me.name);
+    hs_lvl.add = 40;
+    hs_lvl.del = 40;
+    hs_lvl.list = 40;
+    hs_lvl.view = 100;
+	if (!config_read("neostats.cfg", options) == 0) {
+		log("Error, HostServ could not be configured");
+		chanalert(s_Services, "Error, HostServ could not be configured");
+		return;
+	}
+
     Loadhosts();
 }
 
@@ -363,11 +422,6 @@ static void hs_list(User *u)
     int i;
 
     strcpy(segv_location, "hs_list");
-    if (!(UserLevel(u) >= CAN_LIST)) {
-        hslog("Access Denied (LIST) to %s", u->nick);
-        prefmsg(u->nick, s_HostServ, "Access Denied.");
-        return;
-    }
 
     fp = fopen("data/vhosts.db", "r");
     if (!fp) {
@@ -397,11 +451,6 @@ static void hs_view(User *u, int tmpint)
     char buf[512];
     int i;
     strcpy(segv_location, "hs_view");
-    if (!(UserLevel(u) >= CAN_VIEW)) {
-        hslog("Access Denied (LIST) to %s", u->nick);
-        prefmsg(u->nick, s_HostServ, "Access Denied.");
-        return;
-    }
 
     fp = fopen("data/vhosts.db", "r");
     if (!fp) {
@@ -419,7 +468,11 @@ static void hs_view(User *u, int tmpint)
 	    prefmsg(u->nick, s_HostServ, "RealHost: %s", ListArry[1]);
 	    prefmsg(u->nick, s_HostServ, "V-host:   %s", ListArry[2]);
 	    prefmsg(u->nick, s_HostServ, "Password: %s", ListArry[3]);
-	    prefmsg(u->nick, s_HostServ, "Added by: %s", ListArry[4]);
+	    if (ListArryCount > 4) {
+		prefmsg(u->nick, s_HostServ, "Added by: %s", ListArry[4]);
+	    } else {
+		prefmsg(u->nick, s_HostServ, "Added by: <unknown>");
+	    }
 	    prefmsg(u->nick, s_HostServ, "--- End of information for %s ---",ListArry[0]);
         }
 	i++;
@@ -448,11 +501,11 @@ void Loadhosts()
             strcpy(map->nnick, LoadArry[0]);
             strcpy(map->host, LoadArry[1]);
             strcpy(map->vhost, LoadArry[2]);
-	    if (LoadArry[3]) { /* Check for upgrades from earlier versions */
+	    if (LoadArryCount > 3) { /* Check for upgrades from earlier versions */
 		strcpy(map->passwd, LoadArry[3]);
 	    } else /* Upgrading from earlier version, no passwds exist */
 		strcpy(map->passwd, "0");
-	    if (LoadArry[4]) { /* Does who set it exist? Yes? go ahead */
+	    if (LoadArryCount > 4) { /* Does who set it exist? Yes? go ahead */
 	    	strcpy(map->added, LoadArry[4]);
 	    } else /* We have no information on who set it so its null */
 	    	strcpy(map->added, "0");
@@ -483,11 +536,6 @@ static void hs_del(User *u, int tmpint)
     int i = 1;
 
     strcpy(segv_location, "hs_del");
-    if (!(UserLevel(u) >= CAN_DEL)) {
-        hslog("Access Denied To %s To User on Access list #%s", u->nick, tmpint);
-        prefmsg(u->nick, s_HostServ, "Access Denied To %s To Delete User \2#%s\2", u->nick, tmpint);
-        return;
-    }
 
     if (!fp) {
         prefmsg(u->nick, s_HostServ, "Unable to open data/vhosts.db");
