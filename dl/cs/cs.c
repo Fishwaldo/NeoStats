@@ -38,11 +38,11 @@
 
 #ifdef DISABLE_COLOUR_SUPPORT
 char msg_nickchange[]="\2NICK\2 %s (%s@%s) Changed their nick to %s";
-char msg_signon[]="\2SIGNON\2 %s (%s@%s) has signed on at %s";
+char msg_signon[]="\2SIGNON\2 %s (%s@%s - %s) has signed on at %s";
 char msg_localkill[]="\2LOCAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";
 char msg_globalkill[]="\2GLOBAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2";
 char msg_serverkill[]="\2SERVER KILL\2 %s was Killed by the Server %s - Reason sighted: \2%s\2";  
-char msg_signoff[]="\2SIGNOFF\2 %s (%s@%s) has signed off at %s - %s";
+char msg_signoff[]="\2SIGNOFF\2 %s (%s@%s - %s) has signed off at %s - %s";
 char msg_netadmin[]="\2NETADMIN\2 %s is Now a Network Administrator (+%c)";
 char msg_netadminoff[]="\2NETADMIN\2 %s is No Longer a Network Administrator (-%c)";
 char msg_conetadmin[]="\2CO-NETADMIN\2 %s is Now a Co-Network Administrator (+%c)";
@@ -71,11 +71,11 @@ char msg_invisible[]="\2INVISIBLE\2 %s Is Using \2Invisible Mode\2 (+%c)";
 char msg_invisibleoff[]="\2INVISIBLE\2 %s Is no longer using \2Invisible Mode\2 (-%c)";
 #else
 char msg_nickchange[]="\2\0037Nick Change\2 user: \2%s\2 (%s@%s) Changed their nick to \2%s\2\003"; 
-char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s) at: \2%s\2\003";
+char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s - %s) at: \2%s\2\003";
 char msg_localkill[]="\2LOCAL KILL\2 user: \2%s\2 (%s@%s) was Killed by: \2%s\2 - Reason sighted: \2%s\2";
 char msg_globalkill[]="\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2\003";
 char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
-char msg_signoff[]="\2\0033Signed Off\2 user: %s (%s@%s) at: %s - %s\003";
+char msg_signoff[]="\2\0033Signed Off\2 user: %s (%s@%s - %s) at: %s - %s\003";
 char msg_netadmin[]="\2\00313%s\2 is \2Now\2 a \2Network Administrator\2 (+%c)\003";
 char msg_netadminoff[]="\02\00313%s\2 is \2No Longer\2 a \2Network Administrator\2 (-%c)\003";
 char msg_conetadmin[]="\2\00313%s\2 is \2Now\2 a \2Co-Network Administrator\2 (+%c)\003";
@@ -136,7 +136,7 @@ static ModUser *cs_bot;
 ModuleInfo __module_info = {
 	"ConnectServ",
 	"Network Connection & Mode Monitoring Service",
-	"1.11",
+	"1.12",
 	__DATE__,
 	__TIME__
 };
@@ -232,7 +232,7 @@ static int cs_new_user(char **av, int ac)
 	/* Print Connection Notice */
 	if (cs_cfg.sign_watch) {
 		chanalert(s_ConnectServ, msg_signon,
-			  u->nick, u->username, u->hostname,
+			  u->nick, u->username, u->hostname, u->realname,
 			  u->server->name);
 	}
 	return 1;
@@ -294,7 +294,7 @@ static int cs_del_user(char **av, int ac)
 	if (cs_cfg.sign_watch) {
 		chanalert(s_ConnectServ,
 			msg_signoff,
-			  u->nick, u->username, u->hostname,
+			  u->nick, u->username, u->hostname, u->realname,
 			  u->server->name, QuitMsg);
 	}
 	free(QuitMsg);

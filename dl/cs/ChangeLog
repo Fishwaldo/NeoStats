@@ -1,6 +1,9 @@
 ConnectServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma^
 ==============================================================================
+* Version 1.12 * Fish (F) * December 28, 2003
+ - Gecos is echoed in signon/signoff now (F)
+
 * Version 1.11 * Mark (M) * December 2, 2003
  - Use core bot message handler to process commands (M)
  - Use core bot set handler (M)
