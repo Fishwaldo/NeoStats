@@ -589,18 +589,6 @@ prefmsg (char *to, const char *from, char *fmt, ...)
 }
 
 void
-privmsg_list (char *to, char *from, const char **text)
-{
-	while (*text) {
-		if (**text)
-			prefmsg (to, from, (char*)*text);
-		else
-			prefmsg (to, from, " ");
-		text++;
-	}
-}
-
-void
 globops (char *from, char *fmt, ...)
 {
 	va_list ap;

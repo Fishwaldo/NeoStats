@@ -710,3 +710,15 @@ ns_usr_stats (char *origin, char **argv, int argc)
 	snumeric_cmd (RPL_ENDOFSTATS, u->nick, "%s :End of /STATS report", what);
 	chanalert (s_Services, "%s Requested Stats %s", u->nick, what);
 };
+
+void
+privmsg_list (char *to, char *from, const char **text)
+{
+	while (*text) {
+		if (**text)
+			prefmsg (to, from, (char*)*text);
+		else
+			prefmsg (to, from, " ");
+		text++;
+	}
+}

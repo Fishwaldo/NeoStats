@@ -566,20 +566,6 @@ notice (char *to, const char *from, char *fmt, ...)
 	sts (":%s NOTICE %s :%s", from, to, ircd_buf);
 }
 
-
-void
-privmsg_list (char *to, char *from, const char **text)
-{
-	while (*text) {
-		if (**text)
-			prefmsg (to, from, (char*)*text);
-		else
-			prefmsg (to, from, " ");
-		text++;
-	}
-}
-
-
 void
 globops (char *from, char *fmt, ...)
 {

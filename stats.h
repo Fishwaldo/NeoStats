@@ -468,12 +468,12 @@ int flood (User * u);
 /* (M) For backwards compatibility only, bots are moving to a new interface */
 int init_bot (char * nick, char * user, char * host, char * rname, const char *modes, char * modname);
 int del_bot (char * nick, char * reason);
+void privmsg_list (char *to, char *from, const char **text);
 
 /* ircd specific files */
 void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 void privmsg (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 void notice (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-void privmsg_list (char *to, char *from, const char **text);
 void globops (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 void chanalert (char * who, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
