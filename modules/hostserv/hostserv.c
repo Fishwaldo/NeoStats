@@ -847,14 +847,16 @@ static int hs_cmd_view (CmdParams *cmdparams)
 
 static int hs_cmd_del (CmdParams *cmdparams)
 {
+	lnode_t *hn;
 	vhostentry *vhe;
 
 	SET_SEGV_LOCATION();
-	vhe = (vhostentry *) list_find (vhost_list, cmdparams->av[0], findnick);
-	if (!vhe) {
+	hn = list_find (vhost_list, cmdparams->av[0], findnick);
+	if (!hn) {
 		irc_prefmsg (hs_bot, cmdparams->source, "No vhost for user %s", cmdparams->av[0]);
 		return NS_SUCCESS;
 	}
+	vhe = (vhostentry *) lnode_get (hn);
 	irc_prefmsg (hs_bot, cmdparams->source, "removed vhost %s for %s",
 		vhe->nick, vhe->vhost);
 	nlog (LOG_NOTICE, "%s removed the vhost %s for %s", 
@@ -904,4 +906,3 @@ static int hs_cmd_login (CmdParams *cmdparams)
 		"Incorrect login or password. Do you have a vhost added?");
 	return NS_SUCCESS;
 }
-
