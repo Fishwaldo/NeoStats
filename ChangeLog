@@ -71,6 +71,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Changed debug dump outputs to be more readable and make helper functions for 
    each dump type instead of having the dump code written twice (M)
  - SERVERDUMP now takes an optional parameter of server name to work like chan/userdump (M)
+ - Add new version information for checking modules and the core are compatible (M)
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database

@@ -1454,9 +1454,16 @@ load_module (char *modfilename, User * u)
 	/* call __ModInit (replacement for library __init() call */
 	ModInit = ns_dlsym ((int *) dl_handle, "__ModInit");
 	if (ModInit) {
+		int err;
 		SET_SEGV_LOCATION();
 		SET_SEGV_INMODULE(mod_ptr->info->module_name);
-		if ((*ModInit) (i, API_VER) < 1) {
+		err = (*ModInit) (i, API_VER);
+		if (err == NS_ERR_VERSION ) {
+			nlog (LOG_NORMAL, LOG_CORE, "Module %s was built with an old version of NeoStats. Please recompile %s.", mod_ptr->info->module_name, mod_ptr->info->module_name);
+			unload_module(mod_ptr->info->module_name, NULL);
+			return NS_FAILURE;
+		}
+		else if (err < 1) {
 			nlog (LOG_NORMAL, LOG_CORE, "Unable to load module %s. See %s.log for further information.", mod_ptr->info->module_name, mod_ptr->info->module_name);
 			unload_module(mod_ptr->info->module_name, NULL);
 			return NS_FAILURE;

@@ -165,6 +165,10 @@ EventFnList __module_events[] = {
 
 int __ModInit(int modnum, int apiver)
 {
+	/* Check that our compiled version if compatible with the calling version of NeoStats */
+	if(	ircstrncasecmp (me.version, NEOSTATS_VERSION, VERSIONSIZE) !=0) {
+		return NS_ERR_VERSION;
+	}
 	LoadConfig();
 	return 1;
 }

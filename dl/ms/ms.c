@@ -93,6 +93,10 @@ int __ModInit(int modnum, int apiver)
 {
  	char *temp = NULL;
 
+	/* Check that our compiled version if compatible with the calling version of NeoStats */
+	if(	ircstrncasecmp (me.version, NEOSTATS_VERSION, VERSIONSIZE) !=0) {
+		return NS_ERR_VERSION;
+	}
 	if(GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
 		strlcpy(s_MoraleServ ,"MoraleServ" ,MAXNICK);
 	}

@@ -207,6 +207,9 @@
 */
 #define MAX_MOD_NAME	32
 
+/* Buffer size for version string */
+#define VERSIONSIZE	8
+
 /* doesn't have to be so big atm */
 #define NUM_MODULES		20
 #define S_TABLE_SIZE	-1
@@ -247,6 +250,9 @@
 typedef enum NS_ERR {
 	NS_ERR_NICK_IN_USE		= 0x8000001,
 	NS_ERR_OUT_OF_MEMORY	= 0x8000002,
+	/* Error value for incompatible version */
+	NS_ERR_VERSION			= 0x8000003,
+
 }NS_ERR ;
 
 /* do_exit call exit type definitions */
@@ -270,8 +276,6 @@ typedef enum NS_TRANSFER {
 	NS_FILE=0,
 	NS_MEMORY=1,
 } NS_TRANSFER;
-
-
 
 #define SEGV_LOCATION_BUFSIZE	255
 #ifdef LEAN_AND_MEAN
@@ -385,6 +389,7 @@ struct me {
 	char sqlhost[MAXHOST];
 	int sqlport;
 #endif
+	char version[VERSIONSIZE];
 } me;
 
 /** @brief Bans structure

@@ -99,6 +99,10 @@ main (int argc, char *argv[])
 	/* our crash trace variables */
 	SET_SEGV_LOCATION();
 	CLEAR_SEGV_INMODULE();
+
+	/* initialise version */
+	strlcpy(me.version, NEOSTATS_VERSION, VERSIONSIZE);
+
 	/* keep quiet if we are told to :) */
 	if (!config.quiet) {
 		printf ("NeoStats %s%s Loading...\n", NEOSTATS_VERSION, ircd_version);
