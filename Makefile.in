@@ -26,7 +26,7 @@ IRCDSRC = Ultimate.c Unreal.c hybrid7.c neoircd.c Bahamut.c \
 		Ircu.c mystic.c QuantumIRCd.c liquidircd.c Viagra.c
 IRCDINC = ${IRCDSRC:.c=.h}
 
-INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h \
+INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h neostats.h \
 		conf.h log.h support.h ircstring.h events.h numeric.h pcre.h \
 		transfer.h
 COREINCS = dns.h services.h sock.h ircd.h exclude.h \
