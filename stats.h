@@ -68,15 +68,11 @@
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
 
-
-
-/* Define this to enable Recived Line Logging - Only enable if Coders ask you to! */
-#ifdef DEBUG
-#define RECVLOG
-#endif
-/* this is a security hack to give the coders the right levels to debug a NeoStats. Don't define unless we ask you to */
-
+/**  this is a security hack to give the coders the right levels to debug NeoStats. 
+  *  Don't define unless we ask you to 
+  */
 #undef CODERHACK
+
 #define CHANLEN			50
 #define BUFSIZE			512
 #define CONFIG_NAME		"neostats.cfg"
@@ -89,8 +85,6 @@
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
 /* doesn't have to be so big atm */
 #define NUM_MODULES		20
-
-
 #define S_TABLE_SIZE	-1
 #define U_TABLE_SIZE	-1
 #define C_TABLE_SIZE	-1
@@ -98,11 +92,11 @@
 #define MAXJOINCHANS	-1
 #define T_TABLE_SIZE	300	/* Number of Timers */
 #define B_TABLE_SIZE	100	/* Number of Bots */
-#define MAXMODES	-1
+#define MAXMODES		-1
 #define DNS_QUEUE_SIZE  100	/* number on concurrent DNS lookups */
 
 #define bzero(x, y)		memset(x, '\0', y);
-#define is_synced	me.synced
+#define is_synced		me.synced
 
 #define SEGV_LOCATION_BUFSIZE	255
 #ifdef LEAN_AND_MEAN
@@ -142,14 +136,9 @@ adns_state ads;
 /* version info */
 extern const char version_date[], version_time[];
 
-
-
-
 typedef struct server_ Server;
 typedef struct user_ User;
-typedef struct myuser_ MyUser;
 typedef struct chans_ Chans;
-typedef struct config_mod_ Config_Mod;
 typedef struct chanmem_ Chanmem;
 typedef struct modeparms_ ModesParm;
 
@@ -222,7 +211,6 @@ struct user_ {
 	char realname[MAXREALNAME];
 	char vhost[MAXHOST];
 	Server *server;
-	MyUser *myuser;
 	int flood;
 	int is_away;
 	time_t t_flood;
@@ -321,7 +309,6 @@ extern void TimerPings ();
 extern void TimerMidnight ();
 extern int is_midnight ();
 
-extern MyUser *myuhead;
 extern void AddUser (const char *, const char *, const char *, const char *, const unsigned long ip, const unsigned long TS);
 extern void DelUser (const char *);
 void AddRealName (const char *, const char *);
@@ -339,14 +326,9 @@ extern Server *findserver (const char *);
 extern void ServerDump ();
 extern void ChanDump ();
 extern void init_server_hash ();
-extern void LoadMyUsers ();
-extern void SaveMyUsers ();
-extern void DeleteMyUser (char *);
-extern MyUser *findmyuser (char *);
 extern int UserLevel (User *);
 void Do_Away (User *, const char *);
 void KillUser (const char *nick);
-
 
 /* ns_help.c */
 extern const char *ns_help[];

@@ -30,23 +30,10 @@
 #include "dl.h"
 #include "log.h"
 
-
-
-void doDelUser (const char *, int);
-
-
-
-
-
-
-MyUser *myuhead;
-
+static void doDelUser (const char *, int);
 static User *new_user (const char *);
 
-
-
-
-User *
+static User *
 new_user (const char *nick)
 {
 	User *u;
@@ -89,7 +76,6 @@ AddUser (const char *nick, const char *user, const char *host, const char *serve
 	u->t_flood = time (NULL);
 	u->flood = 0;
 	u->is_away = 0;
-	u->myuser = NULL;
 	u->Umode = 0;
 #ifdef ULTIMATE3
 	u->Smode = 0;
@@ -143,7 +129,7 @@ DelUser (const char *nick)
 	doDelUser (nick, 0);
 }
 
-void
+static void
 doDelUser (const char *nick, int i)
 {
 	User *u;
