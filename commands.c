@@ -385,7 +385,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 		}
 		/* Do we have a set command? */
 		if(bot_ptr->bot_settings && userlevel >= bot_ptr->set_ulevel) {
-			prefmsg(u->nick, bot_ptr->nick, "SET                 Configure %s", bot_ptr->nick);
+			prefmsg(u->nick, bot_ptr->nick, "    %-20s Configure %s", bot_ptr->nick);
 		}
 		restartlevel:
 		hash_scan_begin(&hs, bot_ptr->botcmds);

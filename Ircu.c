@@ -35,6 +35,7 @@ void process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac);
 int splitbuf (char *buf, char ***argv, int colon_special);
 
 static void ircu_m_private (char *origin, char **argv, int argc, int srv);
+static void ircu_m_notice (char *origin, char **argv, int argc, int srv);
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
 static void m_admin (char *origin, char **argv, int argc, int srv);
@@ -67,9 +68,9 @@ const char services_bot_modes[]= "+iok";
 ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
 	{MSG_PRIVATE, TOK_PRIVATE, ircu_m_private, 0},
-	{MSG_CPRIVMSG, TOK_CPRIVMSG, m_private, 0},
-	{MSG_NOTICE, TOK_NOTICE, m_notice, 0},
-	{MSG_CNOTICE, TOK_CNOTICE, m_notice, 0},
+	{MSG_CPRIVMSG, TOK_CPRIVMSG, ircu_m_private, 0},
+	{MSG_NOTICE, TOK_NOTICE, ircu_m_notice, 0},
+	{MSG_CNOTICE, TOK_CNOTICE, ircu_m_notice, 0},
 	{MSG_STATS, TOK_STATS, m_stats, 0},
 	{MSG_VERSION, TOK_VERSION, m_version, 0},
 	{MSG_MOTD, TOK_MOTD, m_motd, 0},
@@ -442,9 +443,7 @@ send_privmsg (const char *from, const char *to, const char *buf)
 	if(to[0] == '#') {
 		send_cmd (":%s %s %s :%s", from, TOK_PRIVATE, to, buf);
 	} else {
-/*		DOESN'T WORK!
-		send_cmd ("%s %s %s :%s", nicktobase64 (from), TOK_PRIVATE, nicktobase64 (to), buf);*/
-		send_cmd (":%s %s %s :%s", from, TOK_PRIVATE, to, buf);
+		send_cmd ("%s %s %s :%s", nicktobase64 (from), TOK_PRIVATE, nicktobase64 (to), buf);
 	}
 }
 
@@ -798,3 +797,24 @@ ircu_m_private (char *origin, char **argv, int argc, int srv)
 	free (av);
 }
 
+static void 
+ircu_m_notice (char *origin, char **argv, int argc, int srv)
+{
+	char **av;
+	int ac = 0;
+	int i;
+	char* av0;
+	
+	if(argv[0][0] == '#') {
+		av0 = argv[0];
+	} else {
+		av0 = base64tonick(argv[0]);
+	}
+	
+	AddStringToList (&av, av0, &ac);
+	for(i = 1; i < argc; i++) {
+		AddStringToList (&av, argv[i], &ac);
+	}
+	m_notice (base64tonick(origin), av, ac, srv);
+	free (av);
+}

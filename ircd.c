@@ -520,32 +520,18 @@ joinbuf (char **av, int ac, int from)
 void 
 m_notice (char* origin, char **av, int ac, int cmdptr)
 {
-#ifndef IRCU
 	int argc;
 	char **argv;
+	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], privmsgbuffer);
 	argc = split_buf (privmsgbuffer, &argv, 1);
 	ModuleFunction (cmdptr, MSG_NOTICE, origin, argv, argc);
 	free (argv);
-#else
-	char** argv;
-	int argc = 0;
-	int i;
-	User* u;
-	User* ud;
-
-	u = finduser(origin);
-	ud = finduser(av[0]);
-	if(u && ud) {
-		AddStringToList (&argv, ud->nick, &argc);
-		for(i = 1; i < ac; i++) {
-			AddStringToList (&argv, av[i], &argc);
-		}
-		ModuleFunction (1, MSG_NOTICE, u->nick, argv, argc);
-		free(argv);
-	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "m_notice: skipping %s %s", origin, av[0]);
-	}
-#endif
+	argc = 0;
+	AddStringToList (&argv, origin, &argc);
+	AddStringToList (&argv, av[0], &argc);
+	AddStringToList (&argv, privmsgbuffer, &argc);
+	ModuleEvent (EVENT_PRIVATE, argv, argc);
+	free (argv);
 	SkipModuleFunction = 1;
 }
 
@@ -562,6 +548,7 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 	char **argv;
 	char target[64];
 
+	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], privmsgbuffer);
 	/* its a privmsg, now lets see who too... */
 	if (strstr (av[0], "!")) {
 		strlcpy (target, av[0], 64);
@@ -577,6 +564,12 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 	} else {
 		bot_message (origin, argv, argc);
 	}
+	free (argv);
+	argc = 0;
+	AddStringToList (&argv, origin, &argc);
+	AddStringToList (&argv, av[0], &argc);
+	AddStringToList (&argv, privmsgbuffer, &argc);
+	ModuleEvent (EVENT_PRIVATE, argv, argc);
 	free (argv);
 	return;
 }
