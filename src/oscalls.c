@@ -261,6 +261,19 @@ char *os_tempnam( const char *dir, const char *prefix )
 }
 
 /*
+ *  Wrapper function for mkstemp
+ */
+
+int os_mkstemp( char *ftemplate )
+{
+#ifdef WIN32
+	return mktemp( ftemplate );
+#else
+	return mkstemp( ftemplate );
+#endif
+}
+
+/*
  *  Wrapper function for strerror
  */
 
