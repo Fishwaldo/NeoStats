@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.12 2002/09/13 14:54:38 shmad Exp $
+** $Id: cs.c,v 1.13 2002/09/26 08:48:40 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -224,10 +224,9 @@ int cs_new_user(char **av, int ac) {
     strcpy(segv_location, "cs_new_user");
     u = finduser(av[0]);
     /* Print Connection Notice */
-    if (sign_watch) {
+    if (u && sign_watch) {
     if (is_synced) chanalert(s_ConnectServ, "\2SIGNON\2 %s (%s@%s) has Signed on at %s", u->nick, u->username, u->hostname, u->server->name);
     }
-    if (findbot(u->nick)) return 1;
   return 1;
 }
 
