@@ -32,7 +32,8 @@
 #include "internal.h"
     
 void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
-		     int serv, int viatcp, struct timeval now) {
+		     int serv, int viatcp, struct timeval now)
+{
   int cbyte, rrstart, wantedrrs, rri, foundsoa, foundns, cname_here;
   int id, f1, f2, qdcount, ancount, nscount, arcount;
   int flg_ra, flg_rd, flg_tc, flg_qr, opcode;
@@ -49,7 +50,9 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
   parseinfo pai;
   
   if (dglen<DNS_HDRSIZE) {
-    adns__diag(ads,serv,0,"received datagram too short for message header (%d)",dglen);
+		adns__diag(ads, serv, 0,
+			   "received datagram too short for message header (%d)",
+			   dglen);
     return;
   }
   cbyte= 0;
@@ -72,11 +75,14 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
   cname_here= 0;
   
   if (!flg_qr) {
-    adns__diag(ads,serv,0,"server sent us a query, not a response");
+		adns__diag(ads, serv, 0,
+			   "server sent us a query, not a response");
     return;
   }
   if (opcode) {
-    adns__diag(ads,serv,0,"server sent us unknown opcode %d (wanted 0=QUERY)",opcode);
+		adns__diag(ads, serv, 0,
+			   "server sent us unknown opcode %d (wanted 0=QUERY)",
+			   opcode);
     return;
   }
 
@@ -84,10 +90,13 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
   /* See if we can find the relevant query, or leave qu=0 otherwise ... */   
 
   if (qdcount == 1) {
-    for (qu= viatcp ? ads->tcpw.head : ads->udpw.head; qu; qu= nqu) {
+		for (qu = viatcp ? ads->tcpw.head : ads->udpw.head; qu;
+		     qu = nqu) {
       nqu= qu->next;
-      if (qu->id != id) continue;
-      if (dglen < qu->query_dglen) continue;
+			if (qu->id != id)
+				continue;
+			if (dglen < qu->query_dglen)
+				continue;
       if (memcmp(qu->query_dgram+DNS_HDRSIZE,
 		 dgram+DNS_HDRSIZE,
 		 qu->query_dglen-DNS_HDRSIZE))
@@ -96,14 +105,17 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
 	assert(qu->state == query_tcpw);
       } else {
 	assert(qu->state == query_tosend);
-	if (!(qu->udpsent & (1<<serv))) continue;
+				if (!(qu->udpsent & (1 << serv)))
+					continue;
       }
       break;
     }
     if (qu) {
       /* We're definitely going to do something with this query now */
-      if (viatcp) LIST_UNLINK(ads->tcpw,qu);
-      else LIST_UNLINK(ads->udpw,qu);
+			if (viatcp)
+				LIST_UNLINK(ads->tcpw, qu);
+			else
+				LIST_UNLINK(ads->udpw, qu);
     }
   }
   
@@ -116,37 +128,53 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
   case rcode_nxdomain:
     break;
   case rcode_formaterror:
-    adns__warn(ads,serv,qu,"server cannot understand our query (Format Error)");
-    if (qu) adns__query_fail(qu,adns_s_rcodeformaterror);
+		adns__warn(ads, serv, qu,
+			   "server cannot understand our query (Format Error)");
+		if (qu)
+			adns__query_fail(qu, adns_s_rcodeformaterror);
     return;
   case rcode_servfail:
-    if (qu) adns__query_fail(qu,adns_s_rcodeservfail);
-    else adns__debug(ads,serv,qu,"server failure on unidentifiable query");
+		if (qu)
+			adns__query_fail(qu, adns_s_rcodeservfail);
+		else
+			adns__debug(ads, serv, qu,
+				    "server failure on unidentifiable query");
     return;
   case rcode_notimp:
-    adns__warn(ads,serv,qu,"server claims not to implement our query");
-    if (qu) adns__query_fail(qu,adns_s_rcodenotimplemented);
+		adns__warn(ads, serv, qu,
+			   "server claims not to implement our query");
+		if (qu)
+			adns__query_fail(qu, adns_s_rcodenotimplemented);
     return;
   case rcode_refused:
     adns__debug(ads,serv,qu,"server refused our query");
-    if (qu) adns__query_fail(qu,adns_s_rcoderefused);
+		if (qu)
+			adns__query_fail(qu, adns_s_rcoderefused);
     return;
   default:
-    adns__warn(ads,serv,qu,"server gave unknown response code %d",rcode);
-    if (qu) adns__query_fail(qu,adns_s_rcodeunknown);
+		adns__warn(ads, serv, qu,
+			   "server gave unknown response code %d", rcode);
+		if (qu)
+			adns__query_fail(qu, adns_s_rcodeunknown);
     return;
   }
 
   if (!qu) {
     if (!qdcount) {
-      adns__diag(ads,serv,0,"server sent reply without quoting our question");
+			adns__diag(ads, serv, 0,
+				   "server sent reply without quoting our question");
     } else if (qdcount>1) {
-      adns__diag(ads,serv,0,"server claimed to answer %d questions with one message",
+			adns__diag(ads, serv, 0,
+				   "server claimed to answer %d questions with one message",
 		 qdcount);
     } else if (ads->iflags & adns_if_debug) {
       adns__vbuf_init(&tempvb);
-      adns__debug(ads,serv,0,"reply not found, id %02x, query owner %s",
-		  id, adns__diag_domain(ads,serv,0,&tempvb,dgram,dglen,DNS_HDRSIZE));
+			adns__debug(ads, serv, 0,
+				    "reply not found, id %02x, query owner %s",
+				    id, adns__diag_domain(ads, serv, 0,
+							  &tempvb, dgram,
+							  dglen,
+							  DNS_HDRSIZE));
       adns__vbuf_free(&tempvb);
     }
     return;
@@ -165,50 +193,87 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
   for (rri= 0; rri<ancount; rri++) {
     rrstart= cbyte;
     st= adns__findrr(qu,serv, dgram,dglen,&cbyte,
-		     &rrtype,&rrclass,&ttl, &rdlength,&rdstart,
-		     &ownermatched);
-    if (st) { adns__query_fail(qu,st); return; }
-    if (rrtype == -1) goto x_truncated;
+				  &rrtype, &rrclass, &ttl, &rdlength,
+				  &rdstart, &ownermatched);
+		if (st) {
+			adns__query_fail(qu, st);
+			return;
+		}
+		if (rrtype == -1)
+			goto x_truncated;
 
     if (rrclass != DNS_CLASS_IN) {
-      adns__diag(ads,serv,qu,"ignoring answer RR with wrong class %d (expected IN=%d)",
+			adns__diag(ads, serv, qu,
+				   "ignoring answer RR with wrong class %d (expected IN=%d)",
 		 rrclass,DNS_CLASS_IN);
       continue;
     }
     if (!ownermatched) {
       if (ads->iflags & adns_if_debug) {
-	adns__debug(ads,serv,qu,"ignoring RR with an unexpected owner %s",
-		    adns__diag_domain(ads,serv,qu, &qu->vb, dgram,dglen,rrstart));
+				adns__debug(ads, serv, qu,
+					    "ignoring RR with an unexpected owner %s",
+					    adns__diag_domain(ads, serv,
+							      qu, &qu->vb,
+							      dgram, dglen,
+							      rrstart));
       }
       continue;
     }
     if (rrtype == adns_r_cname &&
-	(qu->typei->type & adns__rrt_typemask) != adns_r_cname) {
+		    (qu->typei->type & adns__rrt_typemask) !=
+		    adns_r_cname) {
       if (qu->flags & adns_qf_cname_forbid) {
-	adns__query_fail(qu,adns_s_prohibitedcname);
+				adns__query_fail(qu,
+						 adns_s_prohibitedcname);
 	return;
       } else if (qu->cname_dgram) { /* Ignore second and subsequent CNAME(s) */
-	adns__debug(ads,serv,qu,"allegedly canonical name %s is actually alias for %s",
+				adns__debug(ads, serv, qu,
+					    "allegedly canonical name %s is actually alias for %s",
 		    qu->answer->cname,
-		    adns__diag_domain(ads,serv,qu, &qu->vb, dgram,dglen,rdstart));
-	adns__query_fail(qu,adns_s_prohibitedcname);
+					    adns__diag_domain(ads, serv,
+							      qu, &qu->vb,
+							      dgram, dglen,
+							      rdstart));
+				adns__query_fail(qu,
+						 adns_s_prohibitedcname);
 	return;
       } else if (wantedrrs) { /* Ignore CNAME(s) after RR(s). */
-	adns__debug(ads,serv,qu,"ignoring CNAME (to %s) coexisting with RR",
-		    adns__diag_domain(ads,serv,qu, &qu->vb, dgram,dglen,rdstart));
+				adns__debug(ads, serv, qu,
+					    "ignoring CNAME (to %s) coexisting with RR",
+					    adns__diag_domain(ads, serv,
+							      qu, &qu->vb,
+							      dgram, dglen,
+							      rdstart));
       } else {
 	qu->cname_begin= rdstart;
 	qu->cname_dglen= dglen;
-	st= adns__parse_domain(ads,serv,qu, &qu->vb,
-			       qu->flags & adns_qf_quotefail_cname ? 0 : pdf_quoteok,
-			       dgram,dglen, &rdstart,rdstart+rdlength);
-	if (!qu->vb.used) goto x_truncated;
-	if (st) { adns__query_fail(qu,st); return; }
+				st = adns__parse_domain(ads, serv, qu,
+							&qu->vb,
+							qu->
+							flags &
+							adns_qf_quotefail_cname
+							? 0 : pdf_quoteok,
+							dgram, dglen,
+							&rdstart,
+							rdstart +
+							rdlength);
+				if (!qu->vb.used)
+					goto x_truncated;
+				if (st) {
+					adns__query_fail(qu, st);
+					return;
+				}
 	l= strlen(qu->vb.buf)+1;
-	qu->answer->cname= adns__alloc_preserved(qu,l);
-	if (!qu->answer->cname) { adns__query_fail(qu,adns_s_nomemory); return; }
+				qu->answer->cname =
+				    adns__alloc_preserved(qu, l);
+				if (!qu->answer->cname) {
+					adns__query_fail(qu,
+							 adns_s_nomemory);
+					return;
+				}
 
-	qu->cname_dgram= adns__alloc_mine(qu,dglen);
+				qu->cname_dgram =
+				    adns__alloc_mine(qu, dglen);
 	memcpy(qu->cname_dgram,dgram,dglen);
 
 	memcpy(qu->answer->cname,qu->vb.buf,l);
@@ -220,17 +285,21 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
 	 * it contains the relevant info.
 	 */
       }
-    } else if (rrtype == (qu->typei->type & adns__rrt_typemask)) {
+		} else if (rrtype ==
+			   (qu->typei->type & adns__rrt_typemask)) {
       wantedrrs++;
     } else {
-      adns__debug(ads,serv,qu,"ignoring answer RR with irrelevant type %d",rrtype);
+			adns__debug(ads, serv, qu,
+				    "ignoring answer RR with irrelevant type %d",
+				    rrtype);
     }
   }
 
   /* We defer handling truncated responses here, in case there was a CNAME
    * which we could use.
    */
-  if (flg_tc) goto x_truncated;
+	if (flg_tc)
+		goto x_truncated;
   
   nsstart= cbyte;
 
@@ -238,21 +307,33 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
     /* Oops, NODATA or NXDOMAIN or perhaps a referral (which would be a problem) */
 
     /* RFC2308: NODATA has _either_ a SOA _or_ _no_ NS records in authority section */
-    foundsoa= 0; soattl= 0; foundns= 0;
+		foundsoa = 0;
+		soattl = 0;
+		foundns = 0;
     for (rri= 0; rri<nscount; rri++) {
       rrstart= cbyte;
       st= adns__findrr(qu,serv, dgram,dglen,&cbyte,
-		       &rrtype,&rrclass,&ttl, &rdlength,&rdstart, 0);
-      if (st) { adns__query_fail(qu,st); return; }
-      if (rrtype==-1) goto x_truncated;
+					  &rrtype, &rrclass, &ttl,
+					  &rdlength, &rdstart, 0);
+			if (st) {
+				adns__query_fail(qu, st);
+				return;
+			}
+			if (rrtype == -1)
+				goto x_truncated;
       if (rrclass != DNS_CLASS_IN) {
 	adns__diag(ads,serv,qu,
 		   "ignoring authority RR with wrong class %d (expected IN=%d)",
 		   rrclass,DNS_CLASS_IN);
 	continue;
       }
-      if (rrtype == adns_r_soa_raw) { foundsoa= 1; soattl= ttl; break; }
-      else if (rrtype == adns_r_ns_raw) { foundns= 1; }
+			if (rrtype == adns_r_soa_raw) {
+				foundsoa = 1;
+				soattl = ttl;
+				break;
+			} else if (rrtype == adns_r_ns_raw) {
+				foundns = 1;
+			}
     }
     
     if (rcode == rcode_nxdomain) {
@@ -279,17 +360,21 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
      * a CNAME in this datagram then we should probably do our own CNAME
      * lookup now in the hope that we won't get a referral again.
      */
-    if (cname_here) goto x_restartquery;
+		if (cname_here)
+			goto x_restartquery;
 
     /* Bloody hell, I thought we asked for recursion ? */
     if (!flg_ra) {
-      adns__diag(ads,serv,qu,"server is not willing to do recursive lookups for us");
+			adns__diag(ads, serv, qu,
+				   "server is not willing to do recursive lookups for us");
       adns__query_fail(qu,adns_s_norecurse);
     } else {
       if (!flg_rd)
-	adns__diag(ads,serv,qu,"server thinks we didn't ask for recursive lookup");
+				adns__diag(ads, serv, qu,
+					   "server thinks we didn't ask for recursive lookup");
       else
-	adns__debug(ads,serv,qu,"server claims to do recursion, but gave us a referral");
+				adns__debug(ads, serv, qu,
+					    "server claims to do recursion, but gave us a referral");
       adns__query_fail(qu,adns_s_invalidresponse);
     }
     return;
@@ -297,8 +382,12 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
 
   /* Now, we have some RRs which we wanted. */
 
-  qu->answer->rrs.untyped= adns__alloc_interim(qu,qu->typei->rrsz*wantedrrs);
-  if (!qu->answer->rrs.untyped) { adns__query_fail(qu,adns_s_nomemory); return; }
+	qu->answer->rrs.untyped =
+	    adns__alloc_interim(qu, qu->typei->rrsz * wantedrrs);
+	if (!qu->answer->rrs.untyped) {
+		adns__query_fail(qu, adns_s_nomemory);
+		return;
+	}
 
   typei= qu->typei;
   cbyte= anstart;
@@ -316,17 +405,23 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
 
   for (rri=0, nrrs=0; rri<ancount; rri++) {
     st= adns__findrr(qu,serv, dgram,dglen,&cbyte,
-		     &rrtype,&rrclass,&ttl, &rdlength,&rdstart,
-		     &ownermatched);
-    assert(!st); assert(rrtype != -1);
+				  &rrtype, &rrclass, &ttl, &rdlength,
+				  &rdstart, &ownermatched);
+		assert(!st);
+		assert(rrtype != -1);
     if (rrclass != DNS_CLASS_IN ||
 	rrtype != (qu->typei->type & adns__rrt_typemask) ||
 	!ownermatched)
       continue;
     adns__update_expires(qu,ttl,now);
-    st= typei->parse(&pai, rdstart,rdstart+rdlength, rrsdata+nrrs*typei->rrsz);
-    if (st) { adns__query_fail(qu,st); return; }
-    if (rdstart==-1) goto x_truncated;
+		st = typei->parse(&pai, rdstart, rdstart + rdlength,
+				  rrsdata + nrrs * typei->rrsz);
+		if (st) {
+			adns__query_fail(qu, st);
+			return;
+		}
+		if (rdstart == -1)
+			goto x_truncated;
     nrrs++;
   }
   assert(nrrs==wantedrrs);
@@ -344,7 +439,8 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
  x_truncated:
   
   if (!flg_tc) {
-    adns__diag(ads,serv,qu,"server sent datagram which points outside itself");
+		adns__diag(ads, serv, qu,
+			   "server sent datagram which points outside itself");
     adns__query_fail(qu,adns_s_invalidresponse);
     return;
   }
@@ -353,19 +449,28 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
  x_restartquery:
   if (qu->cname_dgram) {
     st= adns__mkquery_frdgram(qu->ads,&qu->vb,&qu->id,
-			      qu->cname_dgram, qu->cname_dglen, qu->cname_begin,
+					   qu->cname_dgram,
+					   qu->cname_dglen,
+					   qu->cname_begin,
 			      qu->typei->type, qu->flags);
-    if (st) { adns__query_fail(qu,st); return; }
+		if (st) {
+			adns__query_fail(qu, st);
+			return;
+		}
     
-    newquery= adns_realloc(qu->query_dgram,qu->vb.used);
-    if (!newquery) { adns__query_fail(qu,adns_s_nomemory); return; }
+		newquery = realloc(qu->query_dgram, qu->vb.used);
+		if (!newquery) {
+			adns__query_fail(qu, adns_s_nomemory);
+			return;
+		}
     
     qu->query_dgram= newquery;
     qu->query_dglen= qu->vb.used;
     memcpy(newquery,qu->vb.buf,qu->vb.used);
   }
   
-  if (qu->state == query_tcpw) qu->state= query_tosend;
+	if (qu->state == query_tcpw)
+		qu->state = query_tosend;
   qu->retries= 0;
   adns__reset_preserved(qu);
   adns__query_send(qu,now);

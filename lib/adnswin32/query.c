@@ -44,9 +44,9 @@ static adns_query query_alloc(adns_state ads, const typeinfo *typei,
   qu->ads= ads;
   qu->state= query_tosend;
   qu->back= qu->next= qu->parent= 0;
-  LIST_INIT(qu->children);
-  LINK_INIT(qu->siblings);
-  LIST_INIT(qu->allocations);
+  ALIST_INIT(qu->children);
+  ALINK_INIT(qu->siblings);
+  ALIST_INIT(qu->allocations);
   qu->interim_allocd= 0;
   qu->preserved_allocd= 0;
   qu->final_allocspace= 0;
@@ -415,7 +415,7 @@ static void free_query_allocs(adns_query qu) {
 
   cancel_children(qu);
   for (an= qu->allocations.head; an; an= ann) { ann= an->next; adns_free(an); }
-  LIST_INIT(qu->allocations);
+  ALIST_INIT(qu->allocations);
   adns__vbuf_free(&qu->vb);
   adns__vbuf_free(&qu->search_vb);
   adns_free(qu->query_dgram);

@@ -29,10 +29,12 @@
  * - RR-type-specific code, and the machinery to call it
  */
 
-#include "internal.h"
-
+#ifdef WIN32
+#else
 #include <arpa/inet.h>
+#endif
 
+#include "internal.h"
 
 #define R_NOMEM           return adns_s_nomemory
 #define CSP_ADDSTR(s)     do { if (!adns__vbuf_appendstr(vb,(s))) R_NOMEM; } while (0)
@@ -1223,17 +1225,14 @@ static const typeinfo typeinfos[] = {
 	DEEP_TYPE(soa_raw, "SOA", "raw", soa, pa_soa, 0, cs_soa),
 	DEEP_TYPE(ptr_raw, "PTR", "raw", str, pa_host_raw, 0, cs_domain),
 	DEEP_TYPE(hinfo, "HINFO", 0, intstrpair, pa_hinfo, 0, cs_hinfo),
-	DEEP_TYPE(mx_raw, "MX", "raw", intstr, pa_mx_raw, di_mx_raw,
-		  cs_inthost),
+	DEEP_TYPE(mx_raw, "MX",   "raw",  intstr,     pa_mx_raw,  di_mx_raw,  cs_inthost    ),
 	DEEP_TYPE(txt, "TXT", 0, manyistr, pa_txt, 0, cs_txt),
 	DEEP_TYPE(rp_raw, "RP", "raw", strpair, pa_rp, 0, cs_rp),
 
 	FLAT_TYPE(addr, "A", "addr", addr, pa_addr, di_addr, cs_addr),
-	DEEP_TYPE(ns, "NS", "+addr", hostaddr, pa_hostaddr, di_hostaddr,
-		  cs_hostaddr),
+	DEEP_TYPE(ns,     "NS", "+addr",  hostaddr,   pa_hostaddr,di_hostaddr,cs_hostaddr   ),
 	DEEP_TYPE(ptr, "PTR", "checked", str, pa_ptr, 0, cs_domain),
-	DEEP_TYPE(mx, "MX", "+addr", inthostaddr, pa_mx, di_mx,
-		  cs_inthostaddr),
+	DEEP_TYPE(mx,     "MX", "+addr",  inthostaddr,pa_mx,      di_mx,      cs_inthostaddr),
 
 	DEEP_TYPE(soa, "SOA", "822", soa, pa_soa, 0, cs_soa),
 	DEEP_TYPE(rp, "RP", "822", strpair, pa_rp, 0, cs_rp),

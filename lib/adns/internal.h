@@ -49,14 +49,18 @@ typedef unsigned char byte;
 #endif
 #include <errno.h>
 #include <stdlib.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 
 #include <stdarg.h>
 #include <assert.h>
 #include <signal.h>
 #include <string.h>
+#ifndef WIN32
 #include <poll.h>
 #include <sys/time.h>
+#endif
 #ifdef HAVE_TIME_H
 #include <time.h>
 #endif
@@ -74,7 +78,7 @@ typedef unsigned char byte;
 #include "dlist.h"
 
 #ifdef ADNS_REGRESS_TEST
-# include "hredirect.h"
+#include "hredirect.h"
 #endif
 
 /* GNU C attributes. */
@@ -150,7 +154,7 @@ typedef unsigned char byte;
 
 #define DNS_INADDR_ARPA "in-addr", "arpa"
 
-#define MAX_POLLFDS  2
+#define MAX_POLLFDS  ADNS_POLLFDS_RECOMMENDED
 
 typedef enum {
 	cc_user,

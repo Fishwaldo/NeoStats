@@ -34,7 +34,7 @@
 #define ADNS_H_INCLUDED
 
 #ifdef WIN32
-# include "adns_win32.h"
+#include "adns_win32.h"
 #else
 #include <stdio.h>
 

@@ -30,8 +30,12 @@
  * - send queries
  */
 
-#include "internal.h"
+#ifdef WIN32
+#else
 #include <sys/uio.h>
+#endif
+
+#include "internal.h"
 #include "tvarith.h"
 
 #define MKQUERY_START(vb) (rqp= (vb)->buf+(vb)->used)
@@ -224,7 +228,10 @@ void adns__querysend_tcp(adns_query qu, struct timeval now)
 		iov[1].iov_base = qu->query_dgram;
 		iov[1].iov_len = qu->query_dglen;
 		adns__sigpipe_protect(qu->ads);
+
+    ADNS_CLEAR_ERRNO;
 		wr = writev(qu->ads->tcpsocket, iov, 2);
+    ADNS_CAPTURE_ERRNO;
 		adns__sigpipe_unprotect(qu->ads);
 		if (wr < 0) {
 			if (!
@@ -288,8 +295,10 @@ void adns__query_send(adns_query qu, struct timeval now)
 	servaddr.sin_addr = ads->servers[serv].addr;
 	servaddr.sin_port = htons(DNS_PORT);
 
+  ADNS_CLEAR_ERRNO;
 	r = sendto(ads->udpsocket, qu->query_dgram, qu->query_dglen, 0,
 		   (const struct sockaddr *) &servaddr, sizeof(servaddr));
+	ADNS_CAPTURE_ERRNO;
 	if (r < 0 && errno == EMSGSIZE) {
 		qu->retries = 0;
 		query_usetcp(qu, now);
