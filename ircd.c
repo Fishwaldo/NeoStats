@@ -98,7 +98,9 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname, const char *modes, unsigned int flags, char * mod_name)
+ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname, 
+						const char *modes, unsigned int flags, 
+						char * mod_name)
 {
 	ModUser * bot_ptr;
 	User *u;

@@ -129,6 +129,30 @@ del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* cmd_list)
 	return NS_SUCCESS;
 }
 
+/** @brief del_all_bot_cmds delete all commands from the bot
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+int 
+del_all_bot_cmds(ModUser* bot_ptr) 
+{
+	hnode_t *cmdnode;
+	hscan_t hs;
+	/* Check we have a command hash */
+	if(!bot_ptr->botcmds)
+		return NS_FAILURE;
+	/* Cycle through command hash and delete each command */
+	hash_scan_begin(&hs, bot_ptr->botcmds);
+	while ((cmdnode = hash_scan_next(&hs)) != NULL) {
+		hash_delete(bot_ptr->botcmds, cmdnode);
+		hnode_destroy(cmdnode);
+	}
+	/* Destroy command */
+	hash_destroy(bot_ptr->botcmds);
+	bot_ptr->botcmds = NULL;
+	return NS_SUCCESS;
+}
+
 /** @brief add_services_cmd_list adds a list of commands to the services bot
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
@@ -204,7 +228,6 @@ void
 run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 {
 	int userlevel;
-	int cmdlevel;
 	bot_cmd* cmd_ptr;
 	hnode_t *cmdnode;
 
@@ -227,7 +250,7 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 		/* Is user authorised to issue this command? */
 		if(cmd_ptr->ulevel > 200) {
 			/* int pointer rather than value */
-			cmdlevel = *(int*)cmd_ptr->ulevel;
+			int cmdlevel = *(int*)cmd_ptr->ulevel;
 			if (userlevel < cmdlevel) {
 				prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
 				chanalert (bot_ptr->nick, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);

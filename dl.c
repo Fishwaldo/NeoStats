@@ -44,6 +44,7 @@ Module *ModList[NUM_MODULES];
 char segv_location[SEGV_LOCATION_BUFSIZE];
 char segv_inmodule[SEGV_INMODULE_BUFSIZE];
 
+int del_all_bot_cmds(ModUser* bot_ptr);
 
 /* @brief Module hash list */
 static hash_t *mh;
@@ -729,6 +730,7 @@ del_mod_user (char *bot_name)
 	if (bn) {
 		hash_delete (bh, bn);
 		mod_usr = hnode_get (bn);
+		del_all_bot_cmds(mod_usr);
 		hnode_destroy (bn);
 		free (mod_usr);
 		return NS_SUCCESS;
