@@ -826,7 +826,6 @@ Srv_Svinfo (char *origin, char **argv, int argc)
 static void
 Srv_Netinfo (char *origin, char **argv, int argc)
 {
-	me.onchan = 1;
 	ircd_srv.uprot = atoi (argv[2]);
 	strlcpy (ircd_srv.cloak, argv[3], 10);
 	strlcpy (me.netname, argv[7], MAXPASS);

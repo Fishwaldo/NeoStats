@@ -639,10 +639,10 @@ init_services_bot (void)
 	ircsnprintf (me.rname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
 	Umode = UmodeStringToMask(services_bot_modes, 0);
 	SignOn_NewBot (s_Services, me.user, me.host, me.rname, Umode);
+	me.onchan = 1;
 	AddStringToList (&av, me.uplink, &ac);
 	ModuleEvent (EVENT_ONLINE, av, ac);
 	free (av);
-	me.onchan = 1;
 	return NS_SUCCESS;
 }
 

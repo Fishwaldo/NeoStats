@@ -96,8 +96,6 @@ main (int argc, char *argv[])
 	/* our crash trace variables */
 	SET_SEGV_LOCATION();
 	CLEAR_SEGV_INMODULE();
-	/* for modules, let them know we are not ready */
-	me.onchan = 0;
 	/* keep quiet if we are told to :) */
 	if (!config.quiet) {
 		printf ("NeoStats %d.%d.%d%s Loading...\n", MAJOR, MINOR, REV, ircd_version);
@@ -119,6 +117,7 @@ main (int argc, char *argv[])
 	me.numeric = 1;
 	me.lastmsg = me.now;
 	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
+	/* for modules, let them know we are not ready */
 	me.synced = 0;
 	me.onchan = 0;
 	me.maxsocks = getmaxsock ();
