@@ -387,6 +387,22 @@ struct me {
 #endif
 } me;
 
+/** @brief Bans structure
+ *  
+ */
+typedef struct Ban {
+	char type;
+	char user[MAXUSER];
+	char host[MAXHOST];
+	char mask[MAXHOST];
+	char reason[BUFSIZE];
+	char setby[MAXHOST];
+	time_t tsset;
+	time_t tsexpires;
+} Ban;
+
+
+
 /** @brief User structure
  *  
  */

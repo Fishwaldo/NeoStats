@@ -20,7 +20,7 @@ KEEPER_OBJS = keeper/kp_cache.o keeper/kp_dir.o keeper/kp_enum.o keeper/kp_get.o
 OBJS = ${SRCS:.c=.o} @sqlsrvbuild@
 SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
 		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
-		support.c ircstring.c commands.c transfer.c exclude.c match.c \
+		support.c ircstring.c commands.c transfer.c exclude.c match.c bans.c \
 		@IRCD_FILES_SRC@
 IRCDSRC = Ultimate.c Unreal.c hybrid7.c neoircd.c Bahamut.c \
 		Ircu.c mystic.c QuantumIRCd.c liquidircd.c Viagra.c
@@ -30,7 +30,7 @@ INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h neostats.h \
 		conf.h log.h support.h ircstring.h events.h numeric.h pcre.h \
 		transfer.h
 COREINCS = dns.h services.h sock.h ircd.h exclude.h \
-		ns_help.h timer.h users.h chans.h server.h
+		ns_help.h timer.h users.h chans.h server.h bans.h
 BUILDFILES = configure config.sub config.guess *.in \
 		dl/Makefile install-sh Config makeconf cronchk
 

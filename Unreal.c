@@ -59,6 +59,7 @@ static void m_protocol (char *origin, char **argv, int argc, int srv);
 static void m_whois (char *origin, char **argv, int argc, int srv);
 static void m_smo (char *origin, char **argv, int argc, int srv);
 static void m_swhois (char *origin, char **argv, int argc, int srv);
+static void m_tkl (char *origin, char **argv, int argc, int srv);
 
 #define SJOIN
 #define NICKV2	
@@ -107,6 +108,7 @@ ircd_cmd cmd_list[] = {
 #ifdef UNREAL32
 	{MSG_EOS, TOK_EOS, m_eos, 0},
 #endif
+	{MSG_TKL, TOK_TKL, m_tkl, 0},
 };
 
 ChanModes chan_modes[] = {
@@ -762,4 +764,22 @@ m_smo (char *origin, char **argv, int argc, int srv)
 	/* TODO */
 }
 
+/*
+ *  argv[0]  +|- 
+ *  argv[1]  G   
+ *  argv[2]  user 
+ *  argv[3]  host 
+ *  argv[4]  setby 
+ *  argv[5]  expire_at 
+ *  argv[6]  set_at 
+ *  argv[7]  reason 
 
+R: :server BD + G * mask setter 1074811259 1074206459 :reason
+R: :server BD + Z * mask setter 0 1070062390 :reason
+R: :server c dos_bot* :Reserved nickname: Dosbot
+*/
+
+static void m_tkl (char *origin, char **argv, int argc, int srv)
+{
+	do_tkl(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7]);
+}

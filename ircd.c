@@ -1826,6 +1826,18 @@ do_swhois (char *who, char *swhois)
 }
 #endif
 
+#ifdef MSG_TKL
+void 
+do_tkl(const char *add, const char *type, const char *user, const char *host, const char *setby, const char *tsexpire, const char *tsset, const char *reason)
+{
+	if(add[0] == '+') {
+		AddBan();
+	} else {
+		DelBan();
+	}
+}
+#endif
+
 void
 send_cmd (char *fmt, ...)
 {

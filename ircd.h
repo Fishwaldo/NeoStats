@@ -140,6 +140,9 @@ void do_burst (char *origin, char **argv, int argc);
 #ifdef MSG_SWHOIS
 void do_swhois (char *who, char *swhois);
 #endif
+#ifdef MSG_TKL
+void do_tkl(const char *add, const char *type, const char *user, const char *host, const char *setby, const char *tsexpire, const char *tsset, const char *reason);
+#endif
 
 /* Defined in ircd specific files but common to all */
 void init_ircd (void);
