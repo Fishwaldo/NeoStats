@@ -36,7 +36,7 @@
 #include "lang.h"
 #include "hash.h"
 
-#ifdef WIN32
+#if (defined WIN32) || (!defined HAVE_DB_H)
 void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc) 
 {
 }
