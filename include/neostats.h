@@ -801,21 +801,6 @@ typedef struct bot_setting {
  */
 typedef int (*timer_handler) ( void );
 
-/** @brief Socket function types
- * 
- */
-typedef int (*sock_func) ( int sock_no, char *name );
-typedef int (*before_poll_func) ( void *data, struct pollfd * );
-typedef void (*after_poll_func) ( void *data, struct pollfd *, unsigned int );
-
-/* socket interface type */
-#define SOCK_POLL 1
-#define SOCK_STANDARD 2
-#define SOCK_BUFFERED 3
-#define SOCK_LINEMODE 4
-#define SOCK_LISTEN 5
-#define SOCK_NOTIFY 6
-
 /* Event system flags */
 #define	EVENT_FLAG_DISABLED			0x00000001	/* Event is disabled */
 #define	EVENT_FLAG_IGNORE_SYNCH		0x00000002	/* Event triggers even if not synched */
@@ -932,20 +917,24 @@ EXPORTVAR extern int RunLevel;
 #define GET_CUR_MODNAME() RunModule[RunLevel]->info->name
 #define GET_CUR_MODVERSION() RunModule[RunLevel]->info->version
 
+
+
+/** @brief Socket function types
+ * 
+ */
+typedef int (*sock_func) ( int sock_no, char *name );
+
+/* socket interface type */
+#define SOCK_STANDARD 1
+#define SOCK_BUFFERED 2
+#define SOCK_LINEMODE 3
+#define SOCK_LISTEN 4
+#define SOCK_NOTIFY 5
+
+
 typedef void (*linemodecb)(char *);
 typedef int (*sockcb)(int, void *data);
 typedef int (*sockfunccb)(void *, void *, size_t);
-
-#if 0
-
-struct sockinfo {
-        int fd;
-        struct event ev;
-        int what;
-        int rwhat;
-        int pollswitch;
-}
-#endif
 
 /** @brief Module socket list structure
  * 
@@ -959,11 +948,6 @@ typedef struct Sock {
 	char name[MAX_MOD_NAME];
 	/** socket interface (poll or standard) type */
 	int socktype;
-	/** if socktype = SOCK_POLL, before poll function */
-	/** Socket before poll function */
-	before_poll_func beforepoll;
-	/** Socket after poll function */
-	after_poll_func afterpoll;
 	/** data */
 	void *data;
 	/* if socktype = SOCK_STANDARD, function calls */
@@ -1002,11 +986,6 @@ typedef struct Sock {
 			sockcb writefunc;
 		} standmode;
 	} sfunc;		
-#if 0
-	struct sockinfo *sockets[];
-	int pollswitch
-	int highfds;
-#endif
 } Sock;
 
 typedef enum TIMER_TYPE {
@@ -1101,7 +1080,6 @@ EXPORTFUNC Timer *FindTimer( const char *timer_name );
 
 EXPORTFUNC Sock *add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv, int type);
 EXPORTFUNC int update_sock(Sock *sock, short what, short reset, struct timeval *tv);
-EXPORTFUNC int add_sockpoll( const char *sock_name, void *data, before_poll_func beforepoll, after_poll_func afterpoll );
 EXPORTFUNC int del_sock(Sock *sock);
 EXPORTFUNC Sock *find_sock( const char *sock_name );
 EXPORTFUNC int sock_connect (int socktype, struct in_addr ip, int port);

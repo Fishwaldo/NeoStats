@@ -158,7 +158,6 @@ static int rta_set_rtaport_cb (CmdParams* cmdparams, SET_REASON reason)
 
 static int rta_set_rtatimeout_cb (CmdParams *cmdparams, SET_REASON reason)
 {
-#warning TODO
 	return NS_SUCCESS;
 }
 static bot_setting rta_settings[]=
@@ -467,7 +466,9 @@ void rtaserv_fini (void)
 	list_destroy_auto (sqlconnections);
 	rta_active = 1;
 	del_services_set_list (rta_settings);
-	del_sock(listensock);
+	if (listensock) {
+    	del_sock(listensock);
+    }
 	rta_exit();
 }
 
