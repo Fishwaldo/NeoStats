@@ -1,7 +1,13 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 =====================================================================================
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.14
- - remove sprotocol_cmd since it is very ircd specfic
+ - Remove sprotocol_cmd since it is very ircd specfic (M)
+ - Initialize me.now at bootup so we do not get random timestamps (M)
+ - Fix Unreal PROTOCTL sending so it works correctly (M)
+ - Add correct sjoin support to Unreal  (M)
+ - Introduce new ssjoin_cmd for sjoin processing (M)
+ - Fix midnight detection in core (M)
+ - kick_chan tidyups  (M)
 
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.13
  - Added a new event for Channel Mode changes (F)
