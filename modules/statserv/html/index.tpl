@@ -61,16 +61,18 @@ HR {height:2px}
 			<tr>
 				<td class="row1"><table width="100%" cellspacing="0" cellpadding="4" border="0">
 					<tr>
-	 		<td width="90%"><span class="gensmall"><center><a href="#map">Map</a>
-                          <font color="#444444">
-                          |</font> <a href="#netstats">Network Statistics</a> <font color="#444444">|</font>
+	 		<td width="90%"><span class="gensmall"><center>
+                          <a href="#map">Map</a> <font color="#444444">|</font> 
+                          <a href="#netstats">Network Statistics</a> <font color="#444444">|</font>
                           <a href="#daily">Daily Network Statistics</a> <font color="#444444">|</font>
-                          <a href="#top10chan">Top 10 Online Channels</a> <font color="#444444"> |</font>
-                          <a href="#srvlist">Server List</a>
-                          <font color="#444444">|</font> <a href="#popchan">Popular Channels</a>
-                          <font color="#444444"> |</font> <a href="#kickchan">Most Unwelcome Channels</a>
-                          <font color="#444444"> |</font> <a href="#topicchan">Most Topic Channels</a>
-			<font color="#444444"> |</font> <a href="#srvdev">Server Details</a>
+                          <a href="#weekly">Weekly Network Statistics</a> <font color="#444444">|</font>
+                          <a href="#monthly">Monthly Network Statistics</a> <font color="#444444">|</font>
+                          <a href="#top10chan">Top 10 Channels</a> <font color="#444444"> |</font>
+                          <a href="#srvlist">Server List</a> <font color="#444444">|</font> 
+                          <a href="#joinchan">Top Join Channels</a> <font color="#444444"> |</font> 
+                          <a href="#kickchan">Top Kick Channels</a> <font color="#444444"> |</font> 
+                          <a href="#topicchan">Top Topic Channels</a> <font color="#444444"> |</font> 
+                          <a href="#srvdet">Server Details</a> 
 			  </center></span></td>
 					</tr>
 				</table></td>
@@ -131,7 +133,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=daily>!WEEKLYSTATS!
+				<a name=weekly>!WEEKLYSTATS!
 			</td>
 			</tr>
 			<tr>
@@ -139,7 +141,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=daily>!MONTHLYSTATS!
+				<a name=monthly>!MONTHLYSTATS!
 			</td>
 			</tr>
 			<tr>
@@ -155,7 +157,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=top10chan>!DAILYTOPCHAN!
+				<a name=top10chan>!TOP10CHAN!
 			</td>
 			</tr>
 			<tr>
@@ -163,7 +165,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=popchan>!TOP10CHAN!
+				<a name=joinchan>!TOP10JOIN!
 			</td>
 			</tr>
 			<tr>

@@ -66,7 +66,7 @@ static Client *new_user (const char *nick)
 
 static void lookupnickip (char *data, adns_answer *a) 
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Client *u;
 	
 	u = find_user ((char *)data);
@@ -106,7 +106,7 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	const char *realname, const char *server, const char *ip, const char *TS, 
 	const char *numeric)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	unsigned long ipaddress = 0;
 	Client *u;
 
@@ -193,7 +193,7 @@ void KillUser (const char* source, const char *nick, const char *reason)
 	char *killreason;
 	char** av;
 	int ac = 0;
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Client *u;
 
 	SET_SEGV_LOCATION();
@@ -237,7 +237,7 @@ void KillUser (const char* source, const char *nick, const char *reason)
 
 void QuitUser (const char *nick, const char *reason)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Client *u;
 
 	SET_SEGV_LOCATION();
@@ -282,7 +282,7 @@ void QuitUser (const char *nick, const char *reason)
 
 void UserAway (const char *nick, const char *awaymsg)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Client *u;
 
 	u = find_user (nick);
@@ -310,12 +310,12 @@ void UserAway (const char *nick, const char *awaymsg)
 	ns_free (cmdparams);
 }
 
-int UserNickChange (const char * oldnick, const char *newnick, const char * ts)
+int UserNickChange (const char *oldnick, const char *newnick, const char *ts)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	hnode_t *un;
 	lnode_t *cm;
-	Client * u;
+	Client *u;
 
 	SET_SEGV_LOCATION();
 	dlog (DEBUG2, "UserNickChange: %s -> %s", oldnick, newnick);
@@ -390,11 +390,13 @@ int InitUsers (void)
 	return NS_SUCCESS;
 }
 
-static void dumpuser (CmdParams *cmdparams, Client *u)
+static void dumpuser (Client *u, void* v)
 {
+	CmdParams *cmdparams;
 	lnode_t *cm;
 	int i = 0;
-					          
+
+	cmdparams = (CmdParams *) v;
 	if (ircd_srv.protocol & PROTOCOL_B64SERVER) {
 		irc_prefmsg (ns_botptr, cmdparams->source, __("User:     %s!%s@%s (%s)", cmdparams->source), u->name, u->user->username, u->user->hostname, u->name64);
 	} else {
@@ -426,7 +428,6 @@ static void dumpuser (CmdParams *cmdparams, Client *u)
 void ListUsers (CmdParams *cmdparams, const char *nick)
 {
 	Client *u;
-	hscan_t us;
 
 #ifndef DEBUG
 	if (!nsconfig.debug)
@@ -435,17 +436,11 @@ void ListUsers (CmdParams *cmdparams, const char *nick)
 	SET_SEGV_LOCATION();
 	irc_prefmsg (ns_botptr, cmdparams->source, __("================USERLIST================", cmdparams->source));
 	if (!nick) {
-		hnode_t* un;
-
-		hash_scan_begin (&us, userhash);
-		while ((un = hash_scan_next (&us)) != NULL) {
-			u = hnode_get (un);
-			dumpuser (cmdparams, u);
-		}
+		GetUserList (dumpuser, cmdparams);
 	} else {
-		u = (Client *)hnode_find (userhash, nick);
+		u = find_user (nick);
 		if (u) {
-			dumpuser (cmdparams, u);
+			dumpuser (u, (void *)cmdparams);
 		} else {
 			irc_prefmsg (ns_botptr, cmdparams->source, __("ListUsers: can't find user %s", cmdparams->source), nick);
 		}
@@ -483,7 +478,7 @@ void SetUserVhost (const char *nick, const char *vhost)
 
 void UserMode (const char *nick, const char *modes)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Client *u;
 	long oldmode;
 
@@ -515,7 +510,7 @@ void UserMode (const char *nick, const char *modes)
 
 void UserSMode (const char *nick, const char *modes)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Client *u;
 
 	SET_SEGV_LOCATION();
