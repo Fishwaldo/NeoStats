@@ -1069,7 +1069,7 @@ Srv_Kill (char *origin, char **argv, int argc)
 extern int
 SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
 {
-	snewnick_cmd (nick, user, host, rname);
+	snewnick_cmd (nick, user, host, rname, Umode);
 	sumode_cmd (nick, nick, Umode);
 	if ((me.allbots > 0) || (Umode & UMODE_SERVICES)) {
 		sjoin_cmd (nick, me.chan);
