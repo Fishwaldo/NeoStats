@@ -321,10 +321,109 @@ int __Bot_Message(char *origin, char **av, int ac)
 	}
 	return 1;
 }
+int topchan(const void *key1, const void *key2) {
+	CStats *chan1 = key1;
+	CStats *chan2 = key2;
+	return (chan2->members - chan1->members);
+
+}
+int topjoin(const void *key1, const void *key2) {
+	CStats *chan1 = key1;
+	CStats *chan2 = key2;
+	return (chan2->totmem - chan1->totmem);
+}
+int topkick(const void *key1, const void *key2) {
+	CStats *chan1 = key1;
+	CStats *chan2 = key2;
+	return (chan2->kicks - chan1->kicks);
+}
+int toptopics(const void *key1, const void *key2) {
+	CStats *chan1 = key1;
+	CStats *chan2 = key2;
+	return (chan2->topics - chan1->topics);
+}
+
+
 static void ss_chans(User *u, char *chan) {
 	CStats *cs;
+	lnode_t *cn;
+	int i;
 	if (!chan) {
-		privmsg(u->nick, s_StatServ, "TODO");
+		/* they want the top10 Channels online atm */
+		if (!list_is_sorted(Chead, topchan)) {
+			list_sort(Chead, topchan);
+		} 
+		cn = list_first(Chead);
+		cs = lnode_get(cn);
+		privmsg(u->nick, s_StatServ, "Top10 Online Channels:");
+		privmsg(u->nick, s_StatServ, "======================");
+		for (i = 0; i <= 10; i++) {
+			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Members", cs->name, cs->members);
+			cn = list_next(Chead, cn);
+			if (cn) {
+				cs = lnode_get(cn);
+			} else {
+				break;
+			}
+		}
+		privmsg(u->nick, s_StatServ, "End of List.");
+	} else if (!strcasecmp(chan, "POP")) {
+		/* they want the top10 Popular Channels (based on joins) */
+		if (!list_is_sorted(Chead, topjoin)) {
+			list_sort(Chead, topjoin);
+		}
+		cn = list_first(Chead);
+		cs = lnode_get(cn);
+		privmsg(u->nick, s_StatServ, "Top10 Channels (Ever):");
+		privmsg(u->nick, s_StatServ, "======================");
+		for (i = 0; i <= 10; i++) {
+			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Joins", cs->name, cs->totmem);
+			cn = list_next(Chead, cn);
+			if (cn) {
+				cs = lnode_get(cn);
+			} else {
+				break;
+			}
+		}
+		privmsg(u->nick, s_StatServ, "End of List.");
+	} else if (!strcasecmp(chan, "KICKS")) {
+		/* they want the top10 most unwelcome channels (based on kicks) */
+		if (!list_is_sorted(Chead, topkick)) {
+			list_sort(Chead, topkick);
+		}
+		cn = list_first(Chead);
+		cs = lnode_get(cn);
+		privmsg(u->nick, s_StatServ, "Top10 Most un-welcome Channels (Ever):");
+		privmsg(u->nick, s_StatServ, "======================================");
+		for (i = 0; i <= 10; i++) {
+			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Kicks", cs->name, cs->kicks);
+			cn = list_next(Chead, cn);
+			if (cn) {
+				cs = lnode_get(cn);
+			} else {
+				break;
+			}
+		}
+		privmsg(u->nick, s_StatServ, "End of List.");
+	} else if (!strcasecmp(chan, "TOPICS")) {
+		/* they want the top10 most undecisive channels (based on topics) */
+		if (!list_is_sorted(Chead, toptopics)) {
+			list_sort(Chead, toptopics);
+		}
+		cn = list_first(Chead);
+		cs = lnode_get(cn);
+		privmsg(u->nick, s_StatServ, "Top10 Most undecisive Channels (Ever):");
+		privmsg(u->nick, s_StatServ, "======================================");
+		for (i = 0; i <= 10; i++) {
+			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Topics", cs->name, cs->topics);
+			cn = list_next(Chead, cn);
+			if (cn) {
+				cs = lnode_get(cn);
+			} else {
+				break;
+			}
+		}
+		privmsg(u->nick, s_StatServ, "End of List.");
 	} else {
 		cs = findchanstats(chan);
 		if (!cs) {

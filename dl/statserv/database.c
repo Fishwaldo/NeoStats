@@ -19,8 +19,9 @@ void SaveStats()
     FILE *fp = fopen("data/stats.db", "w");
     SStats *s;
     CStats *c;
-    hscan_t ss;
     hnode_t *sn;
+    lnode_t *cn;
+    hscan_t ss;
     strcpy(segv_location, "StatServ-SaveStats");
 
 
@@ -45,13 +46,14 @@ void SaveStats()
     	log("Unable to open cstats.db for writting.");
     	return;
     }
-    hash_scan_begin(&ss, Chead);
-    while ((sn = hash_scan_next(&ss))) {
-    	c = hnode_get(sn);
+    cn = list_first(Chead);
+    while (cn) {
+    	c = lnode_get(cn);
 #ifdef DEBUG
 	log("Writting Statistics to database for %s", c->name);
 #endif
 	fprintf(fp, "%s %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld\n", c->name, c->topics, c->totmem, c->kicks, (long)c->lastseen, c->maxmems, (long)c->t_maxmems, c->maxkicks, (long)c->t_maxkicks, c->maxjoins, (long)c->t_maxjoins);
+	cn = list_next(Chead, cn);
     }
     fclose(fp);
     if ((fp = fopen("data/nstats.db", "w")) == NULL) {
@@ -76,6 +78,7 @@ void LoadStats()
 
 
     hnode_t *sn;
+    lnode_t *cn;
     int count;
     strcpy(segv_location, "StatServ-LoadStats");
 
@@ -160,7 +163,7 @@ void LoadStats()
 	}
     }
     fclose(fp);
-    Chead = hash_create(C_TABLE_SIZE,0,0);
+    Chead = list_create(C_TABLE_SIZE);
     if ((fp = fopen("data/cstats.db", "r")) == NULL)
     	return;
     memset(buf, '\0', BUFSIZE);
@@ -193,15 +196,15 @@ void LoadStats()
 	c->topicstoday = 0;
 	c->joinstoday = 0;
 	c->members = 0;
-	sn = hnode_create(c);
-	if (hash_isfull(Chead)) {
+	cn = lnode_create(c);
+	if (list_isfull(Chead)) {
 		log("Eeek, StatServ Channel Hash is Full!");
 	} else {
 #ifdef DEBUG
 		log("Loading %s Channel Data", c->name);
 #endif
 		if ((time(NULL) - c->lastseen) <  604800) {
-			hash_insert(Chead, sn, c->name);
+			list_append(Chead, cn);
 		} else {
 			log("Deleting Old Channel %s", c->name);
 		}

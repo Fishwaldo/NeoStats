@@ -564,9 +564,7 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 	} else {
 		modes = argv[2];
 	}
-	log("%s", modes);
 	if (*modes == '#') {
-		log("%s %s", origin, modes);
 		join_chan(finduser(origin), modes);
 		return;
 	}		

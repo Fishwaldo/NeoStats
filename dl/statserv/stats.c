@@ -89,10 +89,10 @@ void s_chan_kick(Chans *c) {
 
 CStats *findchanstats(char *name) {
 	CStats *cs;
-	hnode_t *cn;
-	cn = hash_lookup(Chead, name);
+	lnode_t *cn;
+	cn = list_find(Chead, name, comparef);
 	if (cn) {
-		cs = hnode_get(cn);
+		cs = lnode_get(cn);
 	} else {
 #ifdef DEBUG
 		log("findchanstats(%s) -> NOT FOUND", name);
@@ -102,28 +102,29 @@ CStats *findchanstats(char *name) {
 	return cs;
 }
 void DelOldChan() {
-	hnode_t *cn;
-	hscan_t cs;
+	lnode_t *cn;
 	CStats *c;
-	hash_scan_begin(&cs, Chead);
-	while ((cn = hash_scan_next(&cs))) {
-		c = hnode_get(cn);
+	cn = list_first(Chead);
+	while (cn) {
+		c = lnode_get(cn);
 		if ((time(NULL) - c->lastseen) < 604800) {
 			if (!findchan(c->name)) {
 #ifdef DEBUG
 				log("Deleting Old Channel %s", c->name);
 #endif
-				hash_delete(Chead, cn);
-				hnode_destroy(cn);
+				list_delete(Chead, cn);
+				lnode_destroy(cn);
 				free(c);
+				return;
 			}
 		}
+		cn = list_next(Chead, cn);
 	}
 }
 
 CStats *AddChanStats(char *name) {
 	CStats *cs;
-	hnode_t *cn;
+	lnode_t *cn;
 
 	cs = smalloc(sizeof(CStats));
 	strcpy(cs->name, name);
@@ -143,11 +144,11 @@ CStats *AddChanStats(char *name) {
 	cs->maxjoins = 0;
 	cs->t_maxjoins = 0;
 	cs->lastseen = time(NULL);
-	cn = hnode_create(cs);
-	if (hash_isfull(Chead)) {
+	cn = lnode_create(cs);
+	if (list_isfull(Chead)) {
 		log("Eeek, Can't add Channel to Statserv Channel Hash. Has is full");
 	} else {
-		hash_insert(Chead, cn, name);
+		list_append(Chead, cn);
 	}	
 	return cs;
 }
@@ -489,8 +490,7 @@ void Is_Midnight() {
 	time_t current = time(NULL);
 	struct tm *ltm = localtime(&current);
 	TLD *t;
-	hscan_t cs;
-	hnode_t *cn;
+	lnode_t *cn;
 	CStats *c;
 
 	strcpy(segv_location, "StatServ-Is_Midnight");
@@ -511,14 +511,15 @@ void Is_Midnight() {
 			daily.t_chans = time(NULL);
 			for (t = tldhead; t; t = t->next) 
 				t->daily_users = 0;
-			hash_scan_begin(&cs, Chead);
-			while ((cn = hash_scan_next(&cs))) {
-				c = hnode_get(cn);
+			cn = list_first(Chead);
+			while (cn) {
+				c = lnode_get(cn);
 				c->maxmemtoday = c->members;;
 				c->joinstoday = 0;
 				c->maxkickstoday = 0;
 				c->topicstoday = 0;
 				c->t_maxmemtoday = time(NULL);
+				cn = list_next(Chead, cn);
 			}	
 			
 		}

@@ -26,7 +26,7 @@ typedef struct tld_ TLD;
 typedef struct server_stats SStats;
 typedef struct chan_stats CStats;
 hash_t *Shead;
-hash_t *Chead;
+list_t *Chead;
 TLD *tldhead;
 
 
