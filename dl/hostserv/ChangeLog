@@ -1,6 +1,10 @@
 HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
+
+* Version 2.7.1 * Shmad * May 11th, 2003
++ Fixed a nasty seg bug *smacks fish* we don't free(s_HostServ);
+
 * Version 2.7 * Fish * Apr 15th, 2003
 + Moved Hostserv over to new configuration backed
 + added interface to manipulate the ban list (/msg hostserv help bans for more info)

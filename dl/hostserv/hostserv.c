@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.41 2003/04/17 13:48:15 fishwaldo Exp $
+** $Id: hostserv.c,v 1.42 2003/05/12 11:38:56 shmad Exp $
 */
 
 #include <stdio.h>
@@ -97,7 +97,7 @@ int ListArryCount = 0;
 Module_Info HostServ_info[] = { {
     "HostServ",
     "Network User Virtual Host Service",
-    "2.7"
+    "2.7.1"
 } };
 
 void hs_Config() {
@@ -143,7 +143,7 @@ void hs_Config() {
 			hash_insert(bannedvhosts, hn, host2);
 		}
 	} 
-	free(ban2); 
+	free(ban2);
 }
 
 int new_m_version(char *origin, char **av, int ac) {
@@ -433,7 +433,6 @@ void _init() {
 void _fini() {
 	hnode_t *hn;
 	hscan_t hs;
-	free(s_HostServ);
 	hash_scan_begin(&hs, vhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
 		hash_scan_delete(vhosts, hn);
