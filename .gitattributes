@@ -241,6 +241,7 @@ doc/USERMAN -text
 doc/USERMAN.xml -text
 doc/old/ChangeLog.connectserv.old -text
 doc/old/ChangeLog.hostserv.old -text
+doc/old/ChangeLog.loveserv.old -text
 doc/old/ChangeLog.neoserv.old -text
 doc/old/ChangeLog.noraleserv.old -text
 doc/old/ChangeLog.operlog.old -text

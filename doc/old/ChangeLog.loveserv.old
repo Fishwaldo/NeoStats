@@ -1,0 +1,64 @@
+Program: LoveServ Module for NeoStats 2.x ChangeLog
+Author:  Shmad <shmad@neostats.net>
+==============================================================================
+* Version 1.91 * 
+ - We now try to read nick, user, host and realname so these can be configured more 
+   easily (M)
+ - SET interface for nick/user/host/realname added (M)
+
+* Version 1.9 * 
+ - Use core bot message handler to process commands (M)
+ - Code cleaned up to reduce bloat (M)
+ - Removed local module_function table to use core for /VERSION replies (M)
+
+* Version 1.8 * October 6th, 2003
+ - Help text cleanup (M) 
+ - Added ABOUT command (M)
+ - Changed to use new module export API (M)
+ - Added missing NULL checks for finduser results to avoid referencing NULL pointers (M)
+
+* Version 1.7 * April 17th, 2003
+ - Updated with new Logging functions
+
+* Version 1.6 * July 25, 2002
+ - Updated for new handlers
+
+* Version 1.5 * March 16, 2002
+ - Code overhaul for NeoStats-2.5 core.
+ - Fixed HELP sysetm not displaying command commands for techs
+
+
+* Version 1.4 * November 25, 2001 
+ - Fixed some typos/formatting in Help System.
+ - Changed the way LoveServ checks to see if a user exists before sending any data.
+ - LoveServ now CANNOT send itself things.. You ppl :)
+ - Added APOLOGY to send someone an APOLOGY (w/reason)
+ - Added THANKYOU to send someone a thank you note (w/reason)
+
+
+* Version 1.2 * October 31, 2001
+ - Added VERSION to show LoveServ's Version & Author contact information.
+ - LoveServ now checks to see if User Exists before sending any data (much safer)
+   ^Enigma^ should switch MoraleServ to this as well before MoraleServ sends any data.
+ - Made LoveServ Neo compliant storing logs in logs/ directory instead of main directory.
+ - VIEWLOGS added for Network and Technical Admins to view the LoveServ log file.
+ - Added Network/Technical Admin Features
+ - Added Missing HELP Topics.
+ - Improved on HELP parsing routine in main help function for LoveServ, much faster now.
+
+
+* Version 1.1 * October 25, 2001
+ - Removed Hardcoded servernames, and replaced with me.name (Thanks to fish for noticing and Patching)
+
+
+* Version 1.0 * September 1st, 2001
+ - Send someone a customized LOVENOTE
+ - Send someone some CANDY yummy!
+ - Send someone some CHOCOLATE mmmm
+ - Added ADMIRER - tell someone they have a secret admirer
+ - HUG someone
+ - TONSIL kiss someone very deeply LOL
+ - KISS to kiss someone
+ - ROSE to send a rose to someone
+ - Added new command KISS to send a virtual kiss to someone
+ - Started the module, not much here yet.
