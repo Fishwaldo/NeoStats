@@ -159,7 +159,7 @@ bin_PROGRAMS = neostats
 
 neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c nsdba.c \
 		dl.c dns.c dotconf.c exclude.c hash.c ircd.c ircstring.c \
-		keeper.c lang.c list.c log.c main.c match.c misc.c modules.c \
+		lang.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c modes.c ctcp.c dcc.c oscalls.c nsmemory.c \
 		rtaserv.c rtabans.c rtachannels.c rtamodules.c rtaservers.c rtausers.c \
@@ -189,13 +189,12 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	channels.$(OBJEXT) commands.$(OBJEXT) conf.$(OBJEXT) \
 	nsdba.$(OBJEXT) dl.$(OBJEXT) dns.$(OBJEXT) dotconf.$(OBJEXT) \
 	exclude.$(OBJEXT) hash.$(OBJEXT) ircd.$(OBJEXT) \
-	ircstring.$(OBJEXT) keeper.$(OBJEXT) lang.$(OBJEXT) \
-	list.$(OBJEXT) log.$(OBJEXT) main.$(OBJEXT) match.$(OBJEXT) \
-	misc.$(OBJEXT) modules.$(OBJEXT) ns_help.$(OBJEXT) \
-	servers.$(OBJEXT) services.$(OBJEXT) signals.$(OBJEXT) \
-	sock.$(OBJEXT) support.$(OBJEXT) timer.$(OBJEXT) \
-	transfer.$(OBJEXT) users.$(OBJEXT) modes.$(OBJEXT) \
-	ctcp.$(OBJEXT) dcc.$(OBJEXT) oscalls.$(OBJEXT) \
+	ircstring.$(OBJEXT) lang.$(OBJEXT) list.$(OBJEXT) log.$(OBJEXT) \
+	main.$(OBJEXT) match.$(OBJEXT) misc.$(OBJEXT) modules.$(OBJEXT) \
+	ns_help.$(OBJEXT) servers.$(OBJEXT) services.$(OBJEXT) \
+	signals.$(OBJEXT) sock.$(OBJEXT) support.$(OBJEXT) \
+	timer.$(OBJEXT) transfer.$(OBJEXT) users.$(OBJEXT) \
+	modes.$(OBJEXT) ctcp.$(OBJEXT) dcc.$(OBJEXT) oscalls.$(OBJEXT) \
 	nsmemory.$(OBJEXT) rtaserv.$(OBJEXT) rtabans.$(OBJEXT) \
 	rtachannels.$(OBJEXT) rtamodules.$(OBJEXT) rtaservers.$(OBJEXT) \
 	rtausers.$(OBJEXT) base64.$(OBJEXT)
@@ -215,14 +214,13 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/dns.Po ./$(DEPDIR)/dotconf.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/exclude.Po ./$(DEPDIR)/hash.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/ircd.Po ./$(DEPDIR)/ircstring.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/keeper.Po ./$(DEPDIR)/lang.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/list.Po ./$(DEPDIR)/log.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/main.Po ./$(DEPDIR)/match.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/misc.Po ./$(DEPDIR)/modes.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/modules.Po ./$(DEPDIR)/ns_help.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/nsdba.Po ./$(DEPDIR)/nsmemory.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/oscalls.Po ./$(DEPDIR)/rtabans.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/rtachannels.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/lang.Po ./$(DEPDIR)/list.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/log.Po ./$(DEPDIR)/main.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/match.Po ./$(DEPDIR)/misc.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/modes.Po ./$(DEPDIR)/modules.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/ns_help.Po ./$(DEPDIR)/nsdba.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/nsmemory.Po ./$(DEPDIR)/oscalls.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/rtabans.Po ./$(DEPDIR)/rtachannels.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/rtamodules.Po ./$(DEPDIR)/rtaserv.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/rtaservers.Po ./$(DEPDIR)/rtausers.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/servers.Po ./$(DEPDIR)/services.Po \
@@ -310,7 +308,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircstring.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/keeper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lang.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@
