@@ -34,32 +34,38 @@
  *	server connected to
  */
 #define EVENT_ONLINE	    "ONLINE"
+
 /*  SIGNON is called when a new user signs onto the network. the user 
- *  structure User is passed as a parameter, so you can see who signed on.
+ *  nickname is passed as a parameter, so you can see who signed on.
  *  SIGNON parameters are:
- *	user nick
+ *	nick
  */
 #define EVENT_SIGNON		"SIGNON"
-/*  SIGNOFF is called when a user quits the network. The user structure 
- *  User is passed as a parameter, so you can see who signed off.
+
+/*  SIGNOFF is called when a user quits the network. The user 
+ *  nickname is passed as a parameter, so you can see who signed off.
  *  SIGNOFF parameters are:
- *	user nick
+ *	nick
+ *	reason
  */
 #define EVENT_SIGNOFF		"SIGNOFF"
+
 /*  KILL is called when a user is killed on the network. the user 
- *  structure User is passed as a parameter, so you can see who
+ *  nick is passed as a parameter, so you can see who
  *  was killed (You would have to use the recbuf global 
  *  variable to see who killed them though)
  *  KILL parameters are:
- *	user nick
+ *	nick
  */
 #define EVENT_KILL			"KILL"
+
 /*  BOTKILL	is called if one of the NeoStats bots gets killed. You would 
  *  use it to reinitialize the bot.
  *  BOTKILL parameters are:
  *	
  */
 #define EVENT_BOTKILL		"BOTKILL"
+
 /*  SERVER is called when a server connects to the network. the server 
  *  structure Server is passed as a parameter so you can see 
  *  details about the new server
@@ -68,31 +74,36 @@
  *	uplink
  */
 #define EVENT_SERVER		"SERVER"
+
 /*  SQUIT is called when a server squits the network 
  *  SQUIT parameters are:
  *	server name
  *	reason
  */
 #define EVENT_SQUIT			"SQUIT"
+
 /*  NETINFO	is called when the connection to the network is synced. 
  *  NETINFO parameters are:
  *	none
  */
 #define EVENT_NETINFO		"NETINFO"
+
 /*  UMODE is called when a user changes Umodes. (e.g., /mode +o fish) 
  *  the user structure User is passed as a parameter.
  *  UMODE parameters are:
- *	user nick
+ *	nick
  *	mode string
  */
 #define EVENT_UMODE			"UMODE"
+
 /*  SMODE is called when a user changes Smodes.
  *  the user structure User is passed as a parameter.
  *  SMODE parameters are:
- *	user nick
+ *	nick
  *	mode string
  */
 #define EVENT_SMODE			"SMODE"
+
 /*  NICKCHANGE is called when a user changes nick
  *  the user structure User is passed as a parameter.
  *  NICKCHANGE parameters are:
@@ -100,40 +111,49 @@
  *	new nick
  */
 #define EVENT_NICKCHANGE	"NICKCHANGE"
+
 /*  PONG parameters are:
  *	server name
  */
 #define EVENT_PONG			"PONG"
+
 /*  AWAY parameters are:
- *	user nick
+ *	nick
  *	away message if setting away, NULL if cancel away
  */
 #define EVENT_AWAY			"AWAY"
+
 /*  NEWCHAN parameters are:
  *	channel name
  */
 #define EVENT_NEWCHAN		"NEWCHAN"
+
 /*  DELCHAN parameters are:
  *	channel name
  */
 #define EVENT_DELCHAN		"DELCHAN"
+
 /*  JOINCHAN parameters are:
  *	channel name
  *	user nick
  */
 #define EVENT_JOINCHAN		"JOINCHAN"
+
 /*  PARTCHAN parameters are:
  *	channel name
  *	user nick
  *	reason
  */
 #define EVENT_PARTCHAN		"PARTCHAN"
+
 /*  KICK parameters are:
  *	channel name
  *	nick of user who made the kick
  *	nick of user who was kick
+ *	reason
  */
 #define EVENT_KICK			"KICK"
+
 /*  KICKBOT parameters are:
  *	channel name
  *	nick of user who made the kick
@@ -141,23 +161,27 @@
  *	reason
  */
 #define EVENT_KICKBOT		"KICKBOT"
+
 /*  PARTBOT parameters are:
  *	channel name
  *	user nick
  *	reason
  */
 #define EVENT_PARTBOT		"PARTBOT"
+
 /*  TOPICCHANGE parameters are:
  *	channel name
  *	owner
  *	topic
  */
 #define EVENT_TOPICCHANGE	"TOPICCHANGE"
+
 /*  CLIENTVERSION parameters are:
  *	user nick
  *	client version string
  */
 #define EVENT_CLIENTVERSION	"CLIENTVERSION"
+
 
 /* CHANMODE params are:
  *	channel name

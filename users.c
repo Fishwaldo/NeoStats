@@ -161,13 +161,16 @@ doDelUser (const char *nick, int killflag, const char *reason)
 	}
 	u = hnode_get (un);
 
+	bzero(quitreason, BUFSIZE);
 	if(reason)
 		strlcpy(quitreason, reason, BUFSIZE);
 	list_process (u->chans, u, UserPart);
-	bzero(quitreason, BUFSIZE);
 
 	/* run the event to delete a user */
 	AddStringToList (&av, u->nick, &ac);
+	if(reason) {
+		AddStringToList (&av, reason, &ac);
+	}
 	if (killflag == 0) {
 		ModuleEvent (EVENT_SIGNOFF, av, ac);
 	} else if (killflag == 1) {
