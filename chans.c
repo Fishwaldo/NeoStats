@@ -485,6 +485,7 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 			free (av);
 			ac = 0;
 		}
+		un = list_find (u->chans, c->name, comparef);
 		if (un) {
 			lnode_destroy (list_delete (u->chans, un));
 		}
