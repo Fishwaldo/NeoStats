@@ -3,7 +3,7 @@ include ../../Makefile.inc
 SRCS = statserv.c ss_help.c database.c tld.c stats.c htmlstats.c 
 OBJS = ${SRCS:.c=.o}
 TARGET = statserv.so
-GEOCFLAGS = $(CFLAGS) -DGEOIPDATADIR=\"$(DIRECTORY)/data\" -DSYSCONFDIR=\"$(DIRECTORY)/data/\"
+GEOCFLAGS = $(CFLAGS) -DGEOIPDATADIR=\"$(DATADIRECTORY)\" -DSYSCONFDIR=\"$(DATADIRECTORY)\"
 GEOSRCS = GeoIPBitReader.c GeoIP.c GeoIPCity.c md5.c
 GEOOBJS = GeoIPBitReader.o GeoIP.o GeoIPCity.o md5.o
 HTML = html/index.tpl
@@ -22,9 +22,9 @@ clean:
 	$(RM) *.o *.lo *.so
 
 install: $(TARGET)
-	$(INSTALL_MOD) $(TARGET) $(DIRECTORY)/dl
-	$(INSTALL_DATA) $(HTML) $(DIRECTORY)/data
-	$(INSTALL_DATA) $(DATA) $(DIRECTORY)/data
+	$(INSTALL_MOD) $(TARGET) $(MODDIRECTORY)
+	$(INSTALL_DATA) $(HTML) $(DATADIRECTORY)
+	$(INSTALL_DATA) $(DATA) $(DATADIRECTORY)
 
 dist:	$(DISTFILES)
 	@mkdir $(DISTDIR)/html

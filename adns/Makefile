@@ -17,7 +17,7 @@ depend:
 	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SRCS) > .depend
 
 install:
-	$(INSTALL_DATA) adns.h $(DIRECTORY)/include
+	$(INSTALL_DATA) adns.h $(INCDIRECTORY)
 
 DISTFILES =*.c adns.h dlist.h internal.h tvarith.h Makefile *.in
 

@@ -45,7 +45,7 @@ do_sql.o: do_sql.c do_sql.h rta.h
 rtatables.o: rtatables.c do_sql.h rta.h
 
 install:
-	$(INSTALL_DATA) rta.h $(DIRECTORY)/include
+	$(INSTALL_DATA) rta.h $(INCDIRECTORY)
 
 DISTFILES =*.c *.h *.y *.l README Makefile.in
 

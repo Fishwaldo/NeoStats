@@ -15,7 +15,6 @@ all: 	configtool
 .c.o:
 	$(CC) $(TOOLSCFLAGS) $(GCFLAGS) $(INCLUDES) -c $<
 
-
 configtool:	$(OBJS)
 	$(CC) $(GLDFLAGS) $(OBJS) $(KEEPER_OBJS) -o $@
 

@@ -17,7 +17,7 @@ clean:
 	$(RM) *.o *.lo *.so
 
 install: $(TARGET)
-	$(INSTALL_MOD) $(TARGET) $(DIRECTORY)/dl
+	$(INSTALL_MOD) $(TARGET) $(MODDIRECTORY)
 
 dist: 	$(DISTFILES)
 	@for files in $(DISTFILES); do \
