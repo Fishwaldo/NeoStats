@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.28 2002/12/19 01:06:08 fishwaldo Exp $
+** $Id: stats.c,v 1.29 2002/12/19 09:38:27 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -152,6 +152,7 @@ void DelOldChan() {
 				list_delete(Chead, cn1);
         			lnode_destroy(cn1);
 				free(c);
+				continue;
 			}
 		}
 		cn = list_next(Chead, cn);
