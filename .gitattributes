@@ -122,6 +122,8 @@ dl/statserv/stats.c -text
 dl/statserv/statserv.c -text
 dl/statserv/statserv.h -text
 dl/statserv/tld.c -text
+dl/template/Makefile -text
+dl/template/template.c -text
 dl/version/Makefile -text
 dl/version/version.c -text
 /dns.c -text
