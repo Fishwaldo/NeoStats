@@ -204,9 +204,6 @@ dl/ms/ms_help.c -text
 dl/neoserv/Makefile -text
 dl/neoserv/neoserv.c -text
 dl/neoserv/neoserv_help.c -text
-dl/operlog/Makefile -text
-dl/operlog/ol_help.c -text
-dl/operlog/operlog.c -text
 dl/statserv/.indent.pro -text
 dl/statserv/GeoIP.c -text
 dl/statserv/GeoIP.dat -text
@@ -329,6 +326,10 @@ sqlsrv/rta.h -text
 sqlsrv/rtatables.c -text
 sqlsrv/token.c -text
 sqlsrv/token.l -text
+src/modules/operlog/ChangeLog -text
+src/modules/operlog/Makefile -text
+src/modules/operlog/ol_help.c -text
+src/modules/operlog/operlog.c -text
 /stats.h eol=lf
 /support.c eol=lf
 /support.h eol=lf
