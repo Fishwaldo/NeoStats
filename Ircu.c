@@ -160,7 +160,7 @@ const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 /* Temporary buffers for numeric conversion */
 char neostatsbase64[3] = "\0";
 /* Flags for numeric usage; limits to 64 clients */
-char neonicknumerics[64][MAXNICK];
+char neonicknumerics[64];
 
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
@@ -326,17 +326,12 @@ send_squit (const char *server, const char *quitmsg)
 void 
 send_quit (const char *who, const char *quitmsg)
 {
+	char* num;
 	int i;
 
 	/* Clear numeric */
-	for(i = 0; i < 64; i++)
-	{
-		if(strcmp(neonicknumerics[i], who)==0)
-		{
-			neonicknumerics[i][0] = 0;
-			break;
-		}
-	}
+	num = nicktobase64 (who);
+	neonicknumerics[convert2n[num[4]]] = 0;
 	send_cmd ("%s %s :%s", nicktobase64 (who), TOK_QUIT, quitmsg);
 }
 
@@ -375,11 +370,13 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 	{
 		/* Reserve numeric */
 		if(neonicknumerics[i]==0)
+		{
+			neonicknumerics[i] = 1;
 			break;
-	}
-	strlcpy(neonicknumerics[i], nick, MAXNICK);
-	send_cmd ("%s %s %s 1 %lu %s %s %s AAAAAA %sAA%c :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, neostatsbase64, (i+'A'), realname);
-	snprintf(nicknumbuf, 6, "%sAA%c", neostatsbase64, (i+'A'));
+		}
+	}	
+	snprintf(nicknumbuf, 6, "%sAA%c", neostatsbase64, convert2y[i]);
+	send_cmd ("%s %s %s 1 %lu %s %s %s AAAAAA %s :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, nicknumbuf, realname);
 	setnickbase64 (nick, nicknumbuf);
 }
 
