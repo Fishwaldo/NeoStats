@@ -30,8 +30,6 @@
 #include "ls_help.c"
 #include "log.h"
 
-const char loveversion_date[] = __DATE__;
-const char loveversion_time[] = __TIME__;
 char *s_LoveServ;
 
 static void ls_rose(User * u, char *cmd);
@@ -47,22 +45,24 @@ static void ls_thankyou(User * u, char *cmd, char *m);
 static void ls_version(User * u);
 static int new_m_version(char *origin, char **av, int ac);
 
-Module_Info my_info[] = { {
-			   "LoveServ",
-			   "A Network Love Service",
-			   "1.7"}
+ModuleInfo __module_info = {
+   "LoveServ",
+   "A Network Love Service",
+   "1.7",
+	__DATE__,
+	__TIME__
 };
 
 int new_m_version(char *origin, char **av, int ac)
 {
 	snumeric_cmd(351, origin,
 		     "Module LoveServ Loaded, Version: %s %s %s",
-		     my_info[0].module_version, loveversion_date,
-		     loveversion_time);
+			 __module_info.module_version, __module_info.module_build_date,
+			 __module_info.module_build_time);
 	return 0;
 }
 
-Functions my_fn_list[] = {
+Functions __module_functions[] = {
 	{MSG_VERSION, new_m_version, 1}
 	,
 #ifdef HAVE_TOKEN_SUP
@@ -257,48 +257,28 @@ int Online(char **av, int ac)
 {
 	if (init_bot
 	    (s_LoveServ, "love", me.name, "Network Love Service", "+oS",
-	     my_info[0].module_name) == -1) {
+	     __module_info.module_name) == -1) {
 		/* Nick was in use!!!! */
 		s_LoveServ = strcat(s_LoveServ, "_");
 		init_bot(s_LoveServ, "love", me.name,
 			 "Network Love Service", "+oS",
-			 my_info[0].module_name);
+			 __module_info.module_name);
 	}
 	return 1;
 };
 
 
-EventFnList my_event_list[] = {
+EventFnList __module_events[] = {
 	{"ONLINE", Online}
 	,
 	{NULL, NULL}
 };
-
-
-Module_Info *__module_get_info()
-{
-	return my_info;
-};
-
-
-Functions *__module_get_functions()
-{
-	return my_fn_list;
-};
-
-
-EventFnList *__module_get_events()
-{
-	return my_event_list;
-};
-
 
 int __ModInit(int modnum, int apiver)
 {
 	s_LoveServ = "LoveServ";
 	return 1;
 }
-
 
 void __ModFini()
 {
@@ -540,7 +520,7 @@ static void ls_version(User * u)
 	prefmsg(u->nick, s_LoveServ, "\2%s Version Information\2",
 		s_LoveServ);
 	prefmsg(u->nick, s_LoveServ, "%s Version: %s - running on: %s",
-		s_LoveServ, my_info[0].module_version, me.name);
+		s_LoveServ, __module_info.module_version, me.name);
 	prefmsg(u->nick, s_LoveServ,
 		"%s Author: Shmad <shmad@neostats.net>", s_LoveServ);
 	prefmsg(u->nick, s_LoveServ,
