@@ -352,7 +352,6 @@ int load_module(char *path1, User *u) {
 #else 
 	char *dl_error = NULL;
 #endif
-	char *dl_error = NULL;
 	void *dl_handle = NULL;
 	int do_msg;
 	char *path = NULL;
