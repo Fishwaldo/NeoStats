@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hs_help.c,v 1.10 2003/02/04 11:22:17 fishwaldo Exp $
+** $Id: hs_help.c,v 1.11 2003/04/15 14:03:44 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -116,20 +116,33 @@ NULL
 };
 
 const char *hs_help_listban[] = {
-"\2HostServ Help : LISTBAN",
-"\2Usage:\2 LISTBAN",
+"\2HostServ Help : BANS",
+"\2Usage:\2 BANS <[add/del] <option>]",
 "",
+"Controls the vhost banned list entries:",
+"\2BANS\2",
 "This lists current vhosts that are banned by the network adminstration.",
+"",
+"The following options are only available to Network Administration:",
+"\2BANS add <wildcard>\2",
+"Add a banned vhost to the list",
 "Wildcards, like *fbi* are permitted.",
 "",
+"\2BANS del #\2",
+"Delete a banned vhost with ID number #",
+"You may figure out the ID number by using \2BANS\2 by itself",
 NULL
 };
 
 const char *hs_help_levels[] = {
 "\2HostServ Help : LEVELS",
-"\2Usage:\2 LEVELS",
+"\2Usage:\2 LEVELS <[add/view/list/del] <level>>",
 "",
+"\2LEVELS\2",
 "This lists the levels required to perform certian functions with hostserv.",
 "",
+"The Following Options are only available to Network Administration:",
+"\2LEVELS [add/view/list/del] <level>",
+"Change the UserLevels required to perform administration functions. Level must be between 1 and 200",
 NULL
 };

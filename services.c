@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: services.c,v 1.53 2003/04/12 06:21:29 fishwaldo Exp $
+** $Id: services.c,v 1.54 2003/04/15 14:03:36 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -143,12 +143,10 @@ void servicesbot(char *nick, char **av, int ac) {
 			return;
 		}
 		rval = unload_module(av[2],u);
-		if (rval) { 
+		if (rval > 0) { 
 			chanalert(s_Services,"%s Unloaded Module %s", u->nick, av[2]);
-		} else {
-			chanalert(s_Services,"%s Tried to Unload the Module %s, but that does not exist", u->nick, av[2]);
-			prefmsg(s_Services, u->nick, "Module %s does not exist. Try modlist", av[2]);
-		}
+		} 
+		return;
 	} else if (!strcasecmp(av[1], "MODBOTLIST")) {
 		if (!(UserLevel(u) >= 180)) {
 			prefmsg(nick,s_Services,"Permission Denied");

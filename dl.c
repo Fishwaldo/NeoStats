@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.50 2003/04/12 06:21:29 fishwaldo Exp $
+** $Id: dl.c,v 1.51 2003/04/15 14:03:33 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -496,6 +496,7 @@ int load_module(char *path1, User *u) {
 		snprintf(p, 255, "%s/%s", me.modpath, path);
 		dl_handle = dlopen(p, RTLD_NOW || RTLD_GLOBAL); 
 	}
+	strcpy(segvinmodule, "");
 	if (!dl_handle) {
 		if (do_msg) prefmsg(u->nick, s_Services, "Error, Couldn't Load Module");
 		if (do_msg) prefmsg(u->nick, s_Services, "%s",dlerror());
@@ -639,7 +640,18 @@ int unload_module(char *module_name, User *u) {
 
 	strcpy(segv_location, "unload_module");
 	/* Check to see if this Module has any timers registered....  */
-	chanalert(s_Services, "Unloading Module %s", module_name);
+
+	modnode = hash_lookup(mh, module_name);
+	if (modnode) {
+		chanalert(s_Services, "Unloading Module %s", module_name);
+	} else {
+		if (u) {
+			prefmsg(u->nick,s_Services,"Couldn't Find Module  %s Loaded, Try /msg %s modlist",module_name,s_Services);
+			chanalert(s_Services,"%s tried to Unload %s but its not loaded",u->nick,module_name);
+			return -1;
+		}
+		return -1;
+	}
 
 	hash_scan_begin(&hscan, th);
 	while ((modnode = hash_scan_next(&hscan)) != NULL) {
@@ -668,7 +680,6 @@ int unload_module(char *module_name, User *u) {
 			del_bot(mod_ptr->nick, "Module Unloaded");
 		}
 	}
-
 	modnode = hash_lookup(mh, module_name);
 	if (modnode) {
 		nlog(LOG_DEBUG1, LOG_CORE, "Deleting Module %s from ModHash", module_name);
@@ -679,12 +690,7 @@ int unload_module(char *module_name, User *u) {
 		dlclose(list->dl_handle);
 		free(list);
 		return 1;
-	} else {
-		if (u) {
-			prefmsg(u->nick,s_Services,"Couldn't Find Module  %s Loaded, Try /msg %s modlist",module_name,s_Services);
-			chanalert(s_Services,"%s tried to Unload %s but its not loaded",u->nick,module_name);
-		}
-	}
+	} 	
 	return -1;
 }
 

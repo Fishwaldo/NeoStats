@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.88 2003/04/11 10:50:29 fishwaldo Exp $
+** $Id: main.c,v 1.89 2003/04/15 14:03:35 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -592,7 +592,9 @@ unsigned long HASH(const unsigned char *name, int size_of_table)
 
 char *strlower(char *s)
 {
-	char *t = s; 
+	char *t;
+	t = malloc(strlen(s));
+	strncpy(t, s, strlen(s));
 	while (*t) {
 		*t++ = tolower (*t);
 	}

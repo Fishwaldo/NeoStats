@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.22 2003/04/12 06:21:30 fishwaldo Exp $
+** $Id: cs.c,v 1.23 2003/04/15 14:03:37 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -143,7 +143,6 @@ int Online(char **av, int ac) {
 	char *rname;
 	
 	if (GetConf((void *)&s_ConnectServ, CFGSTR, "Nick") < 0) {
-	printf("hu?\n");
 		s_ConnectServ = "ConnectServ";
 	}
 	if (GetConf((void *)&user, CFGSTR, "User") < 0) {
@@ -158,7 +157,6 @@ int Online(char **av, int ac) {
 		rname = malloc(MAXHOST);
 		snprintf(rname, MAXHOST, "Connection Monitoring Service");
 	}
-    Loadconfig();
 
 
     if (init_bot(s_ConnectServ,user, host, rname, "+oikSwgleq-x", my_info[0].module_name) == -1 ) {
@@ -200,6 +198,7 @@ EventFnList *__module_get_events() {
 
 
 void _init() {
+    Loadconfig();
 }
 
 void _fini() {
@@ -664,6 +663,7 @@ static void cs_status(User *u)
 void Loadconfig()
 {
     	strcpy(segv_location, "cs_Loadconfig");
+	strcpy(segvinmodule, my_info[0].module_name);
 
 	/* some defaults */
         sign_watch=1;
