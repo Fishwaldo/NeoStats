@@ -171,12 +171,16 @@ lib/adns/.indent.pro -text
 lib/adns/Makefile.am -text
 lib/adns/Makefile.in -text
 lib/adns/adns.h -text
+lib/adns/adns_unix_calls.c -text
+lib/adns/adns_win32.h -text
 lib/adns/check.c -text
+lib/adns/configwin32.h -text
 lib/adns/dlist.h -text
 lib/adns/event.c -text
 lib/adns/general.c -text
 lib/adns/internal.h -text
 lib/adns/parse.c -text
+lib/adns/poll.c -text
 lib/adns/query.c -text
 lib/adns/reply.c -text
 lib/adns/setup.c -text
