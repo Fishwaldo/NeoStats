@@ -233,6 +233,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 				privmsg_list(u->nick, s_StatServ, ss_myuser_help);
 		} else if (!strcasecmp(av[2], "SERVER"))
 			privmsg_list(u->nick, s_StatServ, ss_server_help);
+		else if (!strcasecmp(av[2], "CHAN") 
+			privmsg_list(u->nick, s_StatServ, ss_chan_help);
 		else if (!strcasecmp(av[2], "RESET") && UserLevel(u) >= 190)
 			privmsg_list(u->nick, s_StatServ, ss_reset_help);
 		else if (!strcasecmp(av[2], "MAP"))
@@ -243,12 +245,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 			privmsg_list(u->nick, s_StatServ, ss_netstats_help);
 		else if (!strcasecmp(av[2], "DAILY"))
 			privmsg_list(u->nick, s_StatServ, ss_daily_help);
-		else if (!strcasecmp(av[2], "HTMLSTATS"))
-			privmsg_list(u->nick, s_StatServ, ss_htmlstats_help);
 		else if (!strcasecmp(av[2], "FORCEHTML"))
 			privmsg_list(u->nick, s_StatServ, ss_forcehtml_help);
-		else if (!strcasecmp(av[2], "NOTICES"))
-			privmsg_list(u->nick, s_StatServ, ss_notices_help);
 		else if (!strcasecmp(av[2], "TLD"))
 			privmsg_list(u->nick, s_StatServ, ss_tld_help);
 		else if (!strcasecmp(av[2], "TLDMAP"))
@@ -298,18 +296,18 @@ int __Bot_Message(char *origin, char **av, int ac)
 		ss_tld_map(u);
 		notice(s_StatServ,"%s Wanted to see a Country Breakdown",u->nick);
 	} else if (!strcasecmp(av[1], "OPERLIST")) {
-	if (ac < 4) {
-		privmsg(u->nick, s_StatServ, "OperList Syntax Not Valid");
-		privmsg(u->nick, s_StatServ, "For Help: /msg %s HELP OPERLIST", s_StatServ);
-	}
+		if (ac < 4) {
+			privmsg(u->nick, s_StatServ, "OperList Syntax Not Valid");
+			privmsg(u->nick, s_StatServ, "For Help: /msg %s HELP OPERLIST", s_StatServ);
+		}
 		ss_operlist(u, av[2], av[3]);
 	} else if (!strcasecmp(av[1], "BOTLIST")) {
 		ss_botlist(u);
 		notice(s_StatServ,"%s Wanted to see the Bot List",u->nick);
 	} else if (!strcasecmp(av[1], "STATS") && (UserLevel(u) >= 185)) {
-	if (ac < 5) {
-		privmsg(u->nick, s_StatServ, "Incorrect Syntax: /msg %s HELP STATS", s_StatServ);
-	}
+		if (ac < 5) {
+			privmsg(u->nick, s_StatServ, "Incorrect Syntax: /msg %s HELP STATS", s_StatServ);
+		}
 		ss_stats(u, av[2], av[3], av[4]);
 		notice(s_StatServ,"%s Wants to Look at my Stats!! 34/24/34",u->nick);
 	} else if (!strcasecmp(av[1], "RESET") && (UserLevel(u) >= 185)) {

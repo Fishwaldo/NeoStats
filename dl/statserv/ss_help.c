@@ -17,6 +17,7 @@ const char *ss_help[] = {
 "Commands:",
 "\2SERVER\2     Request information about a server.",
 "\2MAP\2        Show the network map.",
+"\2CHAN\2	Channel Information.",
 "\2NETSTATS\2   General Network Statistics.",
 "\2DAILY\2      Daily Network Statistics.",
 "\2TLD\2        Show what country a TLD represents.",
@@ -33,7 +34,6 @@ const char *ss_myuser_help[] = {
 "",
 "*** Additional Commands For Net & Tech Admins:***",
 "",
-"\2HTMLSTATS\2  Output IRC statistics to a HTML file",
 "\2FORCEHTML\2  Force an update of the HTML ouput file",
 "\2RESET\2      DELETES data files and starts stats over new!",
 "\2JOIN\2       Join a Channel.",
@@ -43,6 +43,20 @@ const char *ss_myuser_help[] = {
 NULL
 };
 
+const char *ss_chan_help[] = {
+"*** Statistics: \2CHAN\2 Help ***",
+"",
+"Usage: \2CHAN \37<POP/KICKS/TOPICS/<Channame>>\37\2",
+"",
+"Provides Statistics on Channels on the network",
+"\2CHAN\2 By itself provides a list of the top10 Channels based on the current number of members",
+"\2CHAN POP\2 gives you information on the most popular channels on the network based on the number of joins",
+"\2CHAN KICKS\2 Gives you the top 10 kicking channels",
+"\2CHAN TOPICS\2 Gives you the top10 Topic Changing Channels",
+"\2CHAN <name>\2 Gives you specific information on a channel",
+"End of Help",
+NULL
+};
 
 const char *ss_server_help[] = {
 "*** Statistics: \2SERVER\2 Help ***",
@@ -189,30 +203,6 @@ const char *ss_join_help[] = {
 NULL
 };
 
-const char *icq_help[] = {
-"*** Statistics: \2JOIN\2 Help ***",
-"Usage: \2JOIN <Channel>\2",
-"",
-"Get StatServ to Join a Channel",
-"It will then Echo Events as they happen to that Channel, So it Shouldn't Join Public Channels",
-"",
-"End of Help.",
-NULL
-};
-
-const char *ss_htmlstats_help[] = {
-"*** Statistics: \2HTMLSTATS\2 Help ***",
-"",
-"Usage: \2HTMLSTATS <ON/OFF> <PATH TO HTML FILE IF HTMLTURNING STATS ON>\2",
-"",
-"Print the Statistics to a .html file for veiwing on a website.",
-"The path to the html file should be from the /NeoStats-2.x directory eg:",
-"'../public_html/neostats/mystats.html'",
-"",
-"End of Help.",
-NULL
-};
-
 const char *ss_forcehtml_help[] = {
 "*** Statistics: \2FORCEUPDATE\2 Help ***",
 "",
@@ -225,14 +215,3 @@ const char *ss_forcehtml_help[] = {
 NULL
 };
 
-const char *ss_notices_help[] = {
-"*** Statistics: \2NOTICES\2 Help ***",
-"",
-"Usage: \2NOTICES\2",
-"",
-"Turns StatServ Information requests on and off. The default",
-"setting when neostats is loaded is 'off'",
-"",
-"End of Help.",
-NULL
-};
