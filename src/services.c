@@ -223,10 +223,14 @@ int init_services_bot( void )
  */
 static int ns_cmd_shutdown( CmdParams *cmdparams )
 {
+	char *message;
+
 	SET_SEGV_LOCATION();
-	irc_chanalert( ns_botptr, _( "%s requested SHUTDOWN for %s" ), cmdparams->source->name, cmdparams->av[cmdparams->ac-1] );
+	message = joinbuf( cmdparams->av, cmdparams->ac, 0 );
+	irc_chanalert( ns_botptr, _( "%s requested SHUTDOWN for %s" ), cmdparams->source->name, message );
 	ircsnprintf( quitmsg, BUFSIZE, _( "%s [%s] (%s) requested SHUTDOWN for %s." ), 
-		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, cmdparams->av[cmdparams->ac-1] );
+		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, message );
+	ns_free( message );
 	irc_globops( ns_botptr, "%s", quitmsg );
 	nlog( LOG_NOTICE, "%s", quitmsg );
 	do_exit( NS_EXIT_NORMAL, quitmsg );
@@ -242,10 +246,14 @@ static int ns_cmd_shutdown( CmdParams *cmdparams )
  */
 static int ns_cmd_reload( CmdParams *cmdparams )
 {
+	char *message;
+
 	SET_SEGV_LOCATION();
-	irc_chanalert( ns_botptr, _( "%s requested RELOAD for %s" ), cmdparams->source->name, cmdparams->av[cmdparams->ac - 1] );
+	message = joinbuf( cmdparams->av, cmdparams->ac, 0 );
+	irc_chanalert( ns_botptr, _( "%s requested RELOAD for %s" ), cmdparams->source->name, message );
 	ircsnprintf( quitmsg, BUFSIZE, _( "%s [%s] (%s) requested RELOAD for %s." ), 
-		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, cmdparams->av[cmdparams->ac - 1] );
+		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, message );
+	ns_free( message );
 	irc_globops( ns_botptr, "%s", quitmsg );
 	nlog( LOG_NOTICE, "%s", quitmsg );
 	do_exit( NS_EXIT_RELOAD, quitmsg );
