@@ -44,7 +44,7 @@ static char SmodeStringBuf[64];
 static long services_bot_umode= 0;
 
 /* Fully split buffer */
-#ifdef NEW_STYLE_SPLITBUF
+#ifndef IRCU
 static char privmsgbuffer[BUFSIZE];
 #endif
 /* Temp flag for backward compatibility in new splitbuf system */
@@ -388,7 +388,6 @@ CloakHost (ModUser *bot_ptr)
  * @return 
  */
 #ifndef IRCD_SPLITBUF
-#ifdef NEW_STYLE_SPLITBUF
 int
 splitbuf (char *buf, char ***argv, int colon_special)
 {
@@ -430,9 +429,6 @@ splitbuf (char *buf, char ***argv, int colon_special)
 	}
 	return argc;
 }
-#else
-#define splitbuf split_buf
-#endif
 #endif
 
 int
@@ -523,7 +519,7 @@ joinbuf (char **av, int ac, int from)
 void 
 m_notice (char* origin, char **av, int ac, int cmdptr)
 {
-#ifdef NEW_STYLE_SPLITBUF
+#ifndef IRCU
 	int argc;
 	char **argv;
 	argc = split_buf (privmsgbuffer, &argv, 1);
@@ -544,7 +540,7 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 void
 m_privmsg (char* origin, char **av, int ac, int cmdptr)
 {
-#ifdef NEW_STYLE_SPLITBUF
+#ifndef IRCU
 	int argc;
 	char **argv;
 #endif
@@ -559,7 +555,7 @@ m_privmsg (char* origin, char **av, int ac, int cmdptr)
 		av[0] = strtok (target, "@");
 	}
 
-#ifdef NEW_STYLE_SPLITBUF
+#ifndef IRCU
 	argc = split_buf (privmsgbuffer, &argv, 1);
 	if(av[0][0] == '#') {
 		bot_chan_message (origin, argv, argc);
@@ -662,7 +658,7 @@ parse (char *line)
 		coreLine = line + strlen (line);
 	}
 	strlcpy (cmd, line, sizeof (cmd)); 
-#ifdef NEW_STYLE_SPLITBUF
+#ifndef IRCU
 	strlcpy (privmsgbuffer, coreLine, BUFSIZE);
 #endif
 	ac = splitbuf (coreLine, &av, 1);
@@ -1443,91 +1439,6 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 }
 
 /* SJOIN <TS> #<channel> <modes> :[@][+]<nick_1> ...  [@][+]<nick_n> */
-#ifndef NEW_STYLE_SPLITBUF
-void 
-do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **argv, int argc)
-{
-	char nick[MAXNICK];
-	char* nicklist;
-	long mode = 0;
-	long mode1 = 0;
-	int ok = 1, i, j = 3;
-	ModesParm *m;
-	Chans *c;
-	lnode_t *mn = NULL;
-	list_t *tl; 
-
-	if (*modes == '#') {
-		join_chan (sjoinnick, modes);
-		return;
-	}
-	tl = list_create (10);
-	if (*modes == '+') {
-		while (*modes) {
-			for (i = 0; i < ircd_cmodecount; i++) {
-				if (*modes == chan_modes[i].flag) {
-					if (chan_modes[i].parameters) {
-						m = smalloc (sizeof (ModesParm));
-						m->mode = chan_modes[i].mode;
-						strlcpy (m->param, argv[j], PARAMSIZE);
-						mn = lnode_create (m);
-						if (!list_isfull (tl)) {
-							list_append (tl, mn);
-						} else {
-							nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
-							do_exit (NS_EXIT_ERROR, "List full - see log file");
-						}
-						j++;
-					} else {
-						mode1 |= chan_modes[i].mode;
-					}
-				}
-			}
-			modes++;
-		}
-	}
-	while (argc > j) {
-		nicklist = argv[j];
-		mode = 0;
-		while (ok == 1) {
-			for (i = 0; i < ircd_cmodecount; i++) {
-				if (chan_modes[i].sjoin != 0) {
-					if (*nicklist == chan_modes[i].sjoin) {
-						mode |= chan_modes[i].mode;
-						nicklist++;
-						i = -1;
-					}
-				} else {
-					/* sjoin's should be at the top of the list */
-					ok = 0;
-					strlcpy (nick, nicklist, MAXNICK);
-					break;
-				}
-			}
-		}
-		join_chan (nick, channame); 
-		ChanUserMode (channame, nick, 1, mode);
-		j++;
-		ok = 1;
-	}
-	c = findchan (channame);
-	if(c) {
-		/* update the TS time */
-		SetChanTS (c, atoi (tstime)); 
-		c->modes |= mode1;
-		if (!list_isempty (tl)) {
-			if (!list_isfull (c->modeparms)) {
-				list_transfer (c->modeparms, tl, list_first (tl));
-			} else {
-				/* eeeeeeek, list is full! */
-				nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
-				do_exit (NS_EXIT_ERROR, "List full - see log file");
-			}
-		}
-	}
-	list_destroy (tl);
-}
-#else
 void 
 do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **argv, int argc)
 {
@@ -1627,7 +1538,6 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 	list_destroy (tl);
 	free(param);
 }
-#endif
 
 #ifdef MSG_NETINFO
 void 

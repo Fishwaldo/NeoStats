@@ -70,33 +70,24 @@
 
 #if UNREAL == 1
 #include "Unreal.h"
-#define NEW_STYLE_SPLITBUF
 #elif ULTIMATE == 1
 #include "Ultimate.h"
-#define NEW_STYLE_SPLITBUF
 #elif HYBRID7 == 1	
 #include "hybrid7.h"
-#define NEW_STYLE_SPLITBUF
 #elif NEOIRCD == 1
 #include "neoircd.h"
-#define NEW_STYLE_SPLITBUF
 #elif MYSTIC == 1
 #include "mystic.h" 
-#define NEW_STYLE_SPLITBUF
 #elif IRCU == 1
 #include "Ircu.h"
 #elif BAHAMUT == 1
 #include "Bahamut.h"
-#define NEW_STYLE_SPLITBUF
 #elif QUANTUM == 1
 #include "QuantumIRCd.h"
-#define NEW_STYLE_SPLITBUF
 #elif LIQUID == 1
 #include "liquidircd.h"
-#define NEW_STYLE_SPLITBUF
 #elif VIAGRA == 1 
 #include "Viagra.h"
-#define NEW_STYLE_SPLITBUF
 #else
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
