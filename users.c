@@ -154,7 +154,13 @@ DelUser (const char *nick, int killflag, const char *reason)
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "doDelUser: %s", nick);
 
-	un = hash_lookup (uh, nick);
+	u = finduser(nick);
+	if(!u) {
+		nlog (LOG_WARNING, LOG_CORE, "doDelUser: %s failed!", nick);
+		return;
+	}
+
+	un = hash_lookup (uh, u->nick);
 	if (!un) {
 		nlog (LOG_WARNING, LOG_CORE, "doDelUser: %s failed!", nick);
 		return;
