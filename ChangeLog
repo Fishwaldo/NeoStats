@@ -3,6 +3,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Added MrAllThats Colourisation of ConnectServ Messages 
  - Fixed ConnectServ to not show notices for local events (BugID: 44)
  - Fixed a compile problem with StatServ (BugID: 47)
+ - Strip Colors from clientversions in StatServ
+ - Output clientversions in the HTML output (ReqID: 40)
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number
