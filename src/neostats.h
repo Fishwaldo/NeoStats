@@ -190,7 +190,7 @@
 /* Umode macros */
 /* ifdef checks for macros until umodes updated */
 #ifdef UMODE_LOCOP
-#define is_oper(x) ((x) && ((x->Umode & (UMODE_OPER|UMODE_LOCOP)))
+#define is_oper(x) ((x) && ((x->Umode & (UMODE_OPER|UMODE_LOCOP))))
 #else
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
 #endif
@@ -199,7 +199,7 @@
 #else
 /* Hack for Ultimate 2 while umodes are updated */
 #ifdef UMODE_RBOT
-#define is_bot(x) ((x) && ((x->Umode & (UMODE_RBOT|UMODE_SBOT)))
+#define is_bot(x) ((x) && ((x->Umode & (UMODE_RBOT|UMODE_SBOT))))
 #else
 #define is_bot(x) (0)
 #endif
