@@ -121,14 +121,21 @@ typedef struct ModTimer {
 /** @brief Module User structure
  * 
  */
+
+#define BOT_FLAG_ONLYOPERS	0x00000001
+
 typedef struct ModUser {
 	/** Nick */
 	char nick[MAXNICK];
 	/** Module name */
 	char modname[MAX_MOD_NAME];
-	/** function */
+	/* bot flags */
+	unsigned int flags;
+	/* hash for command list */
+	hash_t *botcmds;
+	/** bot message function */
 	message_function function;
-	/** function */
+	/** channel message function */
 	message_function chanfunc;
 }ModUser;
 
