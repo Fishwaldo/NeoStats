@@ -57,7 +57,7 @@ static void tcp_close(adns_state ads)
     if (ads->fdfunc) 
       ads->fdfunc(ads->tcpsocket, -1);
       
-	adns_socket_close(ads->tcpsocket);
+	os_sock_close(ads->tcpsocket);
 	ads->tcpsocket = -1;
 	ads->tcprecv.used = ads->tcprecv_skip = ads->tcpsend.used = 0;
 }
@@ -104,7 +104,7 @@ static void tcp_connected(adns_state ads, struct timeval now)
 
 void adns__tcp_tryconnect(adns_state ads, struct timeval now) {
   int r, tries;
-  ADNS_SOCKET fd;
+  OS_SOCKET fd;
 	struct sockaddr_in addr;
 	struct protoent *proto;
 
@@ -140,7 +140,7 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now) {
 			adns__diag(ads, -1, 0,
 				   "cannot make TCP socket nonblocking: %s",
 				   strerror(r));
-			adns_socket_close(fd);
+			os_sock_close(fd);
 			return;
 		}
 		memset(&addr, 0, sizeof(addr));
@@ -403,7 +403,7 @@ int adns__pollfds(adns_state ads, struct pollfd pollfds_buf[MAX_POLLFDS])
 	return 2;
 }
 
-int adns_processreadable(adns_state ads, ADNS_SOCKET fd, const struct timeval *now) {
+int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now) {
 	int want, dgramlen, r, udpaddrlen, serv, old_skip;
 	byte udpbuf[DNS_MAXUDP];
 	struct sockaddr_in udpaddr;
@@ -550,7 +550,7 @@ int adns_processreadable(adns_state ads, ADNS_SOCKET fd, const struct timeval *n
 	return r;
 }
 
-int adns_processwriteable(adns_state ads, ADNS_SOCKET fd,
+int adns_processwriteable(adns_state ads, OS_SOCKET fd,
 			  const struct timeval *now)
 {
 	int r;
@@ -636,7 +636,7 @@ int adns_processwriteable(adns_state ads, ADNS_SOCKET fd,
 	return r;
 }
 
-int adns_processexceptional(adns_state ads, ADNS_SOCKET fd,
+int adns_processexceptional(adns_state ads, OS_SOCKET fd,
 			    const struct timeval *now)
 {
 	adns__consistency(ads, 0, cc_entex);
@@ -658,10 +658,10 @@ int adns_processexceptional(adns_state ads, ADNS_SOCKET fd,
 	return 0;
 }
 
-static void fd_event(adns_state ads, ADNS_SOCKET fd,
+static void fd_event(adns_state ads, OS_SOCKET fd,
 		     int revent, int pollflag,
 		     int maxfd, const fd_set * fds,
-		     int (*func)(adns_state, ADNS_SOCKET fd, const struct timeval *now),
+		     int (*func)(adns_state, OS_SOCKET fd, const struct timeval *now),
 		     struct timeval now, int *r_r) {
 	int r;
 
@@ -688,7 +688,7 @@ void adns__fdevents(adns_state ads,
 		    const fd_set * writefds, const fd_set * exceptfds,
 		    struct timeval now, int *r_r) {
   int i, revents;
-  ADNS_SOCKET fd;
+  OS_SOCKET fd;
 
 	for (i = 0; i < npollfds; i++) {
 		fd = pollfds[i].fd;
@@ -714,7 +714,7 @@ void adns_beforeselect(adns_state ads, int *maxfd_io, fd_set * readfds_io,
 	struct timeval tv_nowbuf;
 	struct pollfd pollfds[MAX_POLLFDS];
   int i, maxfd, npollfds;
-  ADNS_SOCKET fd;
+  OS_SOCKET fd;
 
 	adns__consistency(ads, 0, cc_entex);
 

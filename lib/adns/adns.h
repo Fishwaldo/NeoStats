@@ -36,12 +36,7 @@
 #ifdef WIN32
 #include "adns_win32.h"
 #else
-#include <stdio.h>
-
-#include <sys/types.h>
 # define ADNS_API
-# define ADNS_SOCKET int
-# define adns_socket_close(sck) close(sck)
 # define adns_socket_read(sck, data, len) read(sck, data, len)
 # define adns_socket_write(sck, data, len) write(sck, data, len)
 # define ADNS_CAPTURE_ERRNO {}
@@ -581,9 +576,9 @@ ADNS_API int adns_processany(adns_state ads);
  * value is returned.
  */
 
-ADNS_API int adns_processreadable(adns_state ads, ADNS_SOCKET fd, const struct timeval *now);
-ADNS_API int adns_processwriteable(adns_state ads, ADNS_SOCKET fd, const struct timeval *now);
-ADNS_API int adns_processexceptional(adns_state ads, ADNS_SOCKET fd, const struct timeval *now);
+ADNS_API int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now);
+ADNS_API int adns_processwriteable(adns_state ads, OS_SOCKET fd, const struct timeval *now);
+ADNS_API int adns_processexceptional(adns_state ads, OS_SOCKET fd, const struct timeval *now);
 /* Gives adns flow-of-control so that it can process incoming data
  * from, or send outgoing data via, fd.  Very like _processany.  If it
  * returns zero then fd will no longer be readable or writeable

@@ -74,24 +74,12 @@ extern "C"
 
 /* ---------------- START OF C HEADER -------------- */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <Winsock2.h>
 #include <windows.h>
-#include <sys/types.h>
-#include <time.h>
-#include <errno.h>
-#include <assert.h>
 #include <limits.h>
 #include <malloc.h>
 #include <signal.h>
 
-#ifndef inline
-#define inline __inline
-#endif
-
-#define ADNS_SOCKET SOCKET
-#define adns_socket_close(sck) closesocket(sck)
 #define adns_socket_read(sck, data, len) recv(sck, (char *)data, len, 0)
 #define adns_socket_write(sck, data, len) send(sck, (char *)data, len, 0)
 

@@ -558,7 +558,7 @@ static void readconfigenvtext(adns_state ads, const char *envvar)
 }
 
 
-int adns__setnonblock(adns_state ads, ADNS_SOCKET fd) {
+int adns__setnonblock(adns_state ads, OS_SOCKET fd) {
 #ifdef WIN32
    unsigned long Val = 1;
    return (ioctlsocket (fd, FIONBIO, &Val) == 0) ? 0 : -1;
@@ -668,7 +668,7 @@ static int init_finish(adns_state ads)
 	return 0;
 
       x_closeudp:
-  adns_socket_close(ads->udpsocket);
+  os_sock_close(ads->udpsocket);
       x_free:
   ns_free(ads);
 #ifdef WIN32
@@ -825,12 +825,12 @@ void adns_finish(adns_state ads)
     if (ads->fdfunc) 
       ads->fdfunc(ads->udpsocket, -1);
 
-  adns_socket_close(ads->udpsocket);
+  os_sock_close(ads->udpsocket);
 	if (ads->tcpsocket >= 0) {
       
 	    if (ads->fdfunc) 
 	        ads->fdfunc(ads->tcpsocket, -1);
-		adns_socket_close(ads->tcpsocket);
+		os_sock_close(ads->tcpsocket);
     }
 	adns__vbuf_free(&ads->tcpsend);
 	adns__vbuf_free(&ads->tcprecv);

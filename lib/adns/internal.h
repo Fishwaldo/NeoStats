@@ -317,7 +317,7 @@ struct adns__state {
 	struct query_queue udpw, tcpw, childw, output;
 	adns_query forallnext;
   int nextid;
-  ADNS_SOCKET udpsocket, tcpsocket;
+  OS_SOCKET udpsocket, tcpsocket;
 	vbuf tcpsend, tcprecv;
   int nservers, nsortlist, nsearchlist, searchndots, tcpserver, tcprecv_skip;
 	enum adns__tcpstate {
@@ -346,7 +346,7 @@ struct adns__state {
 
 /* From setup.c: */
 
-int adns__setnonblock(adns_state ads, ADNS_SOCKET fd); /* => errno value */
+int adns__setnonblock(adns_state ads, OS_SOCKET fd); /* => errno value */
 
 /* From general.c: */
 
