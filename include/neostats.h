@@ -403,6 +403,8 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 
 #define is_synched		me.synched
 
+#define i_am_synched	GET_CUR_MODULE()->synched
+
 /* Early creation of unified return values and error system */
 /* These are program exit codes usually defined in stdlib.h but 
    if not found will be defined here */
@@ -495,6 +497,8 @@ typedef struct _Bot Bot;
  *  structure containing all details of a server
  */
 typedef struct Server {
+	unsigned int users;
+	unsigned int awaycount;
 	int hops;
 	int numeric;
 	int ping;
@@ -534,7 +538,7 @@ typedef struct Client {
 	char name[MAXNICK];
 	char name64[B64SIZE];
 	char uplinkname[MAXHOST];
-	struct Client* uplink;
+	struct Client *uplink;
 	char info[MAXREALNAME];
 	char version[MAXHOST];
 	unsigned int flags;
@@ -559,7 +563,11 @@ typedef struct tme {
 	char local[MAXHOST];
 	int port;
 	int lang;
-	time_t t_start;
+	time_t ts_boot;
+	unsigned int usercount;
+	unsigned int awaycount;
+	unsigned int channelcount;
+	unsigned int servercount;
 	unsigned int maxsocks;
 	unsigned int cursocks;
 	unsigned int want_nickip:1;
@@ -608,15 +616,6 @@ typedef struct ModesParm {
 	char param[PARAMSIZE];
 } ModesParm;
 
-/** @brief Chanmem structure
- *  
- */
-typedef struct Chanmem {
-	char nick[MAXNICK];
-	time_t tsjoin;
-	long flags;
-} Chanmem;
-
 /** @brief Channel structure
  *  
  */
@@ -628,7 +627,7 @@ typedef struct Channel {
 	unsigned int persistentusers;
 	int lang;
 	unsigned int modes;
-	list_t *chanmembers;
+	list_t *ChannelMemberbers;
 	char topic[BUFSIZE];
 	char topicowner[MAXHOST];	/* because a "server" can be a topic owner */
 	time_t topictime;
@@ -877,8 +876,8 @@ typedef struct Module {
 	unsigned int error;
 }Module;
 
-extern Module *RunModule[10];
-extern int RunLevel;
+EXPORTVAR extern Module *RunModule[10];
+EXPORTVAR extern int RunLevel;
 
 /* Simple stack to manage run level replacing original segv_module stuff 
  * which will hopefully make it easier to determine where we are running
@@ -1039,10 +1038,11 @@ EXPORTFUNC void fatal_error(char *file, int line, char *func, char *error_text) 
 #define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__,(error_text)); 
 
 /* nsmemory.c */
+
 EXPORTFUNC void *ns_malloc (const int size);
 EXPORTFUNC void *ns_calloc (const int size);
 EXPORTFUNC void *ns_realloc (void *ptr, const int size);
-EXPORTFUNC void _ns_free (void **buf);
+EXPORTFUNC void _ns_free (void **ptr);
 #define ns_free(ptr) _ns_free ((void **) &(ptr));
 
 /* misc.c */
@@ -1126,13 +1126,13 @@ EXPORTFUNC int irc_svstime (const Bot *botptr, Client *target, const time_t ts);
 
 /*  CTCP functions to correctly format CTCP requests and replies
  */
-EXPORTFUNC int irc_ctcp_version_req (Bot* botptr, Client* target);
-EXPORTFUNC int irc_ctcp_version_rpl (Bot* botptr, Client* target, const char *version);
-EXPORTFUNC int irc_ctcp_ping_req (Bot* botptr, Client* target);
+EXPORTFUNC int irc_ctcp_version_req (Bot* botptr, Client *target);
+EXPORTFUNC int irc_ctcp_version_rpl (Bot* botptr, Client *target, const char *version);
+EXPORTFUNC int irc_ctcp_ping_req (Bot* botptr, Client *target);
 
-EXPORTFUNC int irc_ctcp_finger_req (Bot* botptr, Client* target);
+EXPORTFUNC int irc_ctcp_finger_req (Bot* botptr, Client *target);
 
-EXPORTFUNC int irc_ctcp_action_req (Bot* botptr, Client* target, const char *action);
+EXPORTFUNC int irc_ctcp_action_req (Bot* botptr, Client *target, const char *action);
 
 /* users.c */
 EXPORTFUNC Client *find_user (const char *nick);
@@ -1144,7 +1144,7 @@ EXPORTFUNC Client *find_server (const char *name);
 /* chans.c */
 EXPORTFUNC Channel *find_chan (const char *chan);
 EXPORTFUNC int CheckChanMode (Channel *c, const unsigned int mode);
-EXPORTFUNC int IsChanMember(Channel *c, Client *u);
+EXPORTFUNC int IsChannelMemberber(Channel *c, Client *u);
 EXPORTFUNC int test_cumode(char *chan, char *nick, int flag);
 
 #define is_chanop(chan, nick)		test_cumode(chan, nick, CUMODE_CHANOP)
@@ -1262,12 +1262,12 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 EXPORTFUNC void nlog (LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC void dlog (DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
-typedef void (*ChannelListHandler) (Channel *c);
-EXPORTFUNC void GetChannelList(ChannelListHandler handler);
-typedef void (*UserListHandler) (Client *u);
-EXPORTFUNC void GetUserList(UserListHandler handler);
-typedef void (*ServerListHandler) (Client *s);
-EXPORTFUNC void GetServerList(ServerListHandler handler);
+typedef void (*ChannelListHandler) (Channel *c, void *v);
+EXPORTFUNC void GetChannelList (ChannelListHandler handler, void *v);
+typedef void (*UserListHandler) (Client *u, void *v);
+EXPORTFUNC void GetUserList (UserListHandler handler, void *v);
+typedef void (*ServerListHandler) (Client *s, void *v);
+EXPORTFUNC void GetServerList (ServerListHandler handler, void *v);
 
 EXPORTFUNC hash_t *GetServerHash (void);
 EXPORTFUNC hash_t *GetBanHash (void);
@@ -1355,25 +1355,25 @@ EXPORTFUNC void *AllocChannelModPtr (Channel* c, int size);
 EXPORTFUNC void FreeChannelModPtr (Channel *c);
 EXPORTFUNC void *GetChannelModPtr (Channel* c);
 
-EXPORTFUNC void *AllocUserModPtr (Client* u, int size);
-EXPORTFUNC void FreeUserModPtr (Client* u);
-EXPORTFUNC void *GetUserModPtr (Client* u);
+EXPORTFUNC void *AllocUserModPtr (Client *u, int size);
+EXPORTFUNC void FreeUserModPtr (Client *u);
+EXPORTFUNC void *GetUserModPtr (Client *u);
 
-EXPORTFUNC void *AllocServerModPtr (Client* s, int size);
-EXPORTFUNC void FreeServerModPtr (Client* s);
-EXPORTFUNC void *GetServerModPtr (Client* s);
+EXPORTFUNC void *AllocServerModPtr (Client *s, int size);
+EXPORTFUNC void FreeServerModPtr (Client *s);
+EXPORTFUNC void *GetServerModPtr (Client *s);
 
 EXPORTFUNC void ClearChannelModValue (Channel* c);
 EXPORTFUNC void SetChannelModValue (Channel* c, void *data);
 EXPORTFUNC void *GetChannelModValue (Channel* c);
 
-EXPORTFUNC void ClearUserModValue (Client* u);
-EXPORTFUNC void SetUserModValue (Client* u, void *data);
-EXPORTFUNC void *GetUserModValue (Client* u);
+EXPORTFUNC void ClearUserModValue (Client *u);
+EXPORTFUNC void SetUserModValue (Client *u, void *data);
+EXPORTFUNC void *GetUserModValue (Client *u);
 
-EXPORTFUNC void ClearServerModValue (Client* s);
-EXPORTFUNC void SetServerModValue (Client* s, void *data);
-EXPORTFUNC void *GetServerModValue (Client* s);
+EXPORTFUNC void ClearServerModValue (Client *s);
+EXPORTFUNC void SetServerModValue (Client *s, void *data);
+EXPORTFUNC void *GetServerModValue (Client *s);
 
 EXPORTFUNC void rtaserv_add_table (void *ptbl);
 

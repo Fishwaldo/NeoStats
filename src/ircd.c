@@ -1619,7 +1619,7 @@ do_stats (const char* nick, const char *what)
 	}
 	if (!ircstrcasecmp (what, "u")) {
 		/* server uptime - Shmad */
-		time_t uptime = me.now - me.t_start;
+		time_t uptime = me.now - me.ts_boot;
 		irc_numeric (RPL_STATSUPTIME, u->name, __("Statistical Server up %ld days, %ld:%02ld:%02ld", u), uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 	} else if (!ircstrcasecmp (what, "c")) {
 		/* Connections */
@@ -1630,7 +1630,7 @@ do_stats (const char* nick, const char *what)
 	} else if (!ircstrcasecmp (what, "l")) {
 		/* Port Lists */
 		tmp = me.now - me.lastmsg;
-		tmp2 = me.now - me.t_start;
+		tmp2 = me.now - me.ts_boot;
 		irc_numeric (RPL_STATSLINKINFO, u->name, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
 		irc_numeric (RPL_STATSLLINE, u->name, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, (int)me.SendM, (int)me.SendBytes, (int)me.RcveM, (int)me.RcveBytes, (int)tmp2, (int)tmp);
         } else if (!ircstrcasecmp(what, "Z")) {

@@ -21,16 +21,20 @@
 ** $Id$
 */
 
-#ifndef _EXCLUDE_H_
-#define _EXCLUDE_H_
+#ifndef _VERSION_H_
+#define _VERSION_H_
 
-int InitExcludes(void);
-void FiniExcludes(void);
-int ns_cmd_exclude_add (CmdParams* cmdparams);
-int ns_cmd_exclude_del (CmdParams* cmdparams);
-int ns_cmd_exclude_list (CmdParams* cmdparams);
-void ns_do_exclude_chan(Channel *c);
-void ns_do_exclude_server(Client *s);
-void ns_do_exclude_user(Client *u);
+typedef struct ctcpversionstat {
+	char name[BUFSIZE];
+	statistic users;
+}ctcpversionstat;
 
-#endif /* _EXCLUDE_H_ */
+extern list_t *versionstatlist;
+
+int topversions(const void *key1, const void *key2);
+int ss_cmd_userversion(CmdParams *cmdparams);
+int ss_event_ctcpversion(CmdParams *cmdparams);
+void InitVersionStats (void);
+void FiniVersionStats (void);
+
+#endif /* _VERSION_H_ */

@@ -162,7 +162,7 @@ static int LANGOpenDatabase()
 			continue;
 		}
 		lang_list[i].ok = 1;
-		lang_stats.lang_list[i] = strdup(lang_list[i].langname);
+		lang_stats.lang_list[i] = sstrdup(lang_list[i].langname);
 		lang_stats.noofloadedlanguages++;
 	}
 	LANGDEBUG("opened %d langs", lang_info.nooflangs);
@@ -268,7 +268,7 @@ int LANGNewLang(char *lang)
 		}
 		lang_info.dbp->close(lang_info.dbp, 0);		
 		lang_stats.noofloadedlanguages++;
-		lang_stats.lang_list[lang_info.nooflangs] = strdup(lang);
+		lang_stats.lang_list[lang_info.nooflangs] = sstrdup(lang);
 		return lang_info.nooflangs - 1;
 	}	
 }		

@@ -311,15 +311,12 @@ void bot_private (char *origin, char **av, int ac)
 			/* Check CTCP first to avoid Unknown command messages later */
 			if (av[ac - 1][0] == '\1') {
 				ctcp_private (cmdparams);
-				return;
-			} 			
-			if ((cmdparams->bot->flags & BOT_FLAG_SERVICEBOT)) {
-				if (run_bot_cmd (cmdparams) != NS_FAILURE) {
-					ns_free (cmdparams);
-					return;
+			} else {
+				if (!(cmdparams->bot->flags & BOT_FLAG_SERVICEBOT) ||
+					run_bot_cmd (cmdparams) == NS_FAILURE) {
+					SendModuleEvent (EVENT_PRIVATE, cmdparams, cmdparams->bot->moduleptr);
 				}
 			}
-			SendModuleEvent (EVENT_PRIVATE, cmdparams, cmdparams->bot->moduleptr);
 		}
 	}
 	ns_free (cmdparams);

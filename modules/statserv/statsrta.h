@@ -26,7 +26,7 @@
 #ifndef STATSRTA_H
 #define STATSRTA_H
 
-void statserv_rta_init (void);
-void statserv_rta_fini (void);
+void InitRTAStats (void);
+void FiniRTAStats (void);
 
 #endif

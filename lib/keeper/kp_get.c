@@ -315,7 +315,7 @@ int _kp_read_file(char *path, kp_key ** ksp)
 			newkey->next = keys;
 			keys = newkey;
 		}
-		free(buf);
+		ns_free(buf);
 	} while (!finished);
 
 	fclose(fp);
@@ -347,7 +347,7 @@ static int kp_is_singleval(const char *path)
 			else
 				is_singleval = 1;
 
-			free(buf);
+			ns_free(buf);
 		}
 		fclose(fp);
 	}
@@ -406,10 +406,10 @@ int _kp_get_subkeys_dir(char *path, struct key_array *keys)
 						dirent->d_name);
 					_kp_add_subkey_check(keys,
 							     realname);
-					free(realname);
+					ns_free(realname);
 				}
 			}
-			free(fullpath);
+			ns_free(fullpath);
 		}
 	} while (dirent != NULL);
 

@@ -143,13 +143,14 @@ static Channel *new_chan (const char *chan)
 	c = ns_calloc (sizeof (Channel));
 	strlcpy (c->name, chan, MAXCHANLEN);
 	hnode_create_insert (channelhash, c, c->name);
-	c->chanmembers = list_create (CHANNEL_MEM_SIZE);
+	c->ChannelMemberbers = list_create (CHANNEL_MEM_SIZE);
 	c->modeparms = list_create (CHANNEL_MAXMODES);
 	c->creationtime = me.now;
 	/* XXX TODO: Set the channel language */
 	c->lang = me.lang;
 	/* check exclusions */
 	ns_do_exclude_chan(c);
+	me.channelcount++;
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
 	SendAllModuleEvent (EVENT_NEWCHAN, cmdparams);
@@ -179,12 +180,13 @@ del_chan (Channel *c)
 		nlog (LOG_WARNING, "del_chan: channel %s not found.", c->name);
 		return;
 	}
+	me.channelcount--;
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
 	SendAllModuleEvent (EVENT_DELCHAN, cmdparams);
 	ns_free (cmdparams);
 	list_destroy_auto (c->modeparms);
-	list_destroy (c->chanmembers);
+	list_destroy (c->ChannelMemberbers);
 	hash_delete (channelhash, cn);
 	hnode_destroy (cn);
 	ns_free (c);
@@ -209,7 +211,7 @@ void del_chan_user (Channel *c, Client *u)
 	} else {
 		lnode_destroy (list_delete (u->user->chans, un));
 	}
-	dlog (DEBUG3, "del_chan_user: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
+	dlog (DEBUG3, "del_chan_user: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->ChannelMemberbers));
 	if (c->users <= 0) {
 		del_chan (c);
 	} else if (c->neousers > 0 && c->neousers == c->users) {
@@ -218,22 +220,22 @@ void del_chan_user (Channel *c, Client *u)
 	}
 }
 
-/** @brief Remove chanmember
+/** @brief Remove ChannelMemberber
  *
  *
  */
-int del_chanmember (Channel *c, Client *user)
+int del_ChannelMemberber (Channel *c, Client *user)
 {
-	Chanmem *cm;
+	ChannelMember *cm;
 	lnode_t *un;
 	
-	un = list_find (c->chanmembers, user->name, comparef);
+	un = list_find (c->ChannelMemberbers, user->name, comparef);
 	if (!un) {
 		nlog (LOG_WARNING, "%s isn't a member of channel %s", user->name, c->name);
 		return NS_FAILURE;
 	}
 	cm = lnode_get (un);
-	lnode_destroy (list_delete (c->chanmembers, un));
+	lnode_destroy (list_delete (c->ChannelMemberbers, un));
 	ns_free (cm);
 	return NS_SUCCESS;
 }
@@ -267,7 +269,7 @@ KickChannel (const char *kickby, const char *chan, const char *kicked, const cha
 		nlog (LOG_WARNING, "KickChannel: channel %s not found", chan);
 		return;
 	} 
-	if (del_chanmember (c, u) != NS_SUCCESS) {
+	if (del_ChannelMemberber (c, u) != NS_SUCCESS) {
 		return;
 	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
@@ -319,7 +321,7 @@ void PartChannel (Client * u, const char *chan, const char *reason)
 		nlog (LOG_WARNING, "PartChannel: channel %s not found", chan);
 		return;
 	}
-	if (del_chanmember (c, u) != NS_SUCCESS) {
+	if (del_ChannelMemberber (c, u) != NS_SUCCESS) {
 		return;
 	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
@@ -351,10 +353,10 @@ void PartChannel (Client * u, const char *chan, const char *reason)
 void
 ChannelNickChange (Channel *c, const char *newnick, const char *oldnick)
 {
-	Chanmem *cml;
+	ChannelMember *cml;
 
 	SET_SEGV_LOCATION();
-	cml = lnode_find (c->chanmembers, oldnick, comparef);
+	cml = lnode_find (c->ChannelMemberbers, oldnick, comparef);
 	if (!cml) {
 		nlog (LOG_WARNING, "ChannelNickChange: %s isn't a member of %s", oldnick, c->name);
 		return;
@@ -381,7 +383,7 @@ JoinChannel (const char* nick, const char *chan)
 	CmdParams *cmdparams;
 	Client * u;
 	Channel *c;
-	Chanmem *cm;
+	ChannelMember *cm;
 	
 	SET_SEGV_LOCATION();
 	u = find_user (nick);
@@ -402,20 +404,20 @@ JoinChannel (const char* nick, const char *chan)
 		c = new_chan (chan);
 	}
 	/* add this users details to the channel members hash */
-	if (list_find (c->chanmembers, u->name, comparef)) {
+	if (list_find (c->ChannelMemberbers, u->name, comparef)) {
 		nlog (LOG_WARNING, "JoinChannel: tried to add %s to channel %s but they are already a member", u->name, chan);
 		return;
 	}
-	if (list_isfull (c->chanmembers)) {
+	if (list_isfull (c->ChannelMemberbers)) {
 		nlog (LOG_CRITICAL, "JoinChannel: channel %s member list is full", c->name);
 		return;
 	}
 	dlog (DEBUG2, "JoinChannel: adding usernode %s to channel %s", u->name, chan);
-	cm = ns_calloc (sizeof (Chanmem));
+	cm = ns_calloc (sizeof (ChannelMember));
 	strlcpy (cm->nick, u->name, MAXNICK);
 	cm->tsjoin = me.now;
 	cm->flags = 0;
-	lnode_create_append (c->chanmembers, cm);
+	lnode_create_append (c->ChannelMemberbers, cm);
 	c->users++;
 	if (list_isfull (u->user->chans)) {
 		nlog (LOG_CRITICAL, "JoinChannel: user %s member list is full", u->name);
@@ -431,7 +433,7 @@ JoinChannel (const char* nick, const char *chan)
 	}
 	SendAllModuleEvent (EVENT_JOIN, cmdparams);
 	ns_free (cmdparams);
-	dlog (DEBUG3, "JoinChannel: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
+	dlog (DEBUG3, "JoinChannel: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->ChannelMemberbers));
 }
 
 /** @brief Dump Channel information
@@ -446,15 +448,15 @@ JoinChannel (const char* nick, const char *chan)
 
 static void ListChannelMembers (CmdParams* cmdparams, Channel *c)
 {
- 	Chanmem *cm;
+ 	ChannelMember *cm;
 	lnode_t *cmn;
 
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Members:    %d (List %d)", cmdparams->source), c->users, (int)list_count (c->chanmembers));
-	cmn = list_first (c->chanmembers);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Members:    %d (List %d)", cmdparams->source), c->users, (int)list_count (c->ChannelMemberbers));
+	cmn = list_first (c->ChannelMemberbers);
 	while (cmn) {
 		cm = lnode_get (cmn);
 		irc_prefmsg (ns_botptr, cmdparams->source, __("            %s Modes %s Joined: %ld", cmdparams->source), cm->nick, CmodeMaskToString (cm->flags), (long)cm->tsjoin);
-		cmn = list_next (c->chanmembers, cmn);
+		cmn = list_next (c->ChannelMemberbers, cmn);
 	}
 }
 
@@ -519,7 +521,7 @@ Channel *find_chan (const char *chan)
 	return c;
 }
 
-/** @brief IsChanMember 
+/** @brief IsChannelMemberber 
  *
  *  Check whether nick is a member of the channel
  *
@@ -529,12 +531,12 @@ Channel *find_chan (const char *chan)
  *  @returns NS_TRUE if user is a member of channel, NS_FALSE if not 
 */
 
-int IsChanMember (Channel *c, Client *u) 
+int IsChannelMemberber (Channel *c, Client *u) 
 {
 	if (!u || !c) {
 		return NS_FALSE;
 	}
-	if (list_find (c->chanmembers, u->name, comparef)) {
+	if (list_find (c->ChannelMemberbers, u->name, comparef)) {
 		return NS_TRUE;
 	}
 	return NS_FALSE;
@@ -554,14 +556,14 @@ int test_cumode (char* chan, char* nick, int flag)
 {
 	Client * u;
 	Channel *c;
- 	Chanmem *cm;
+ 	ChannelMember *cm;
 
 	u = find_user(nick);
 	c = find_chan(chan);
 	if (!u || !c) {
 		return NS_FALSE;
 	}
-	cm = lnode_find (c->chanmembers, nick, comparef);
+	cm = lnode_find (c->ChannelMemberbers, nick, comparef);
 	if (cm) {
 		if (cm->flags & flag) {
 			return NS_TRUE;
@@ -605,7 +607,7 @@ void FiniChannels (void)
 	hash_destroy(channelhash);
 }
 
-void GetChannelList(ChannelListHandler handler)
+void GetChannelList (ChannelListHandler handler, void *v)
 {
 	hnode_t *node;
 	hscan_t scan;
@@ -615,7 +617,7 @@ void GetChannelList(ChannelListHandler handler)
 	hash_scan_begin(&scan, channelhash);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		c = hnode_get(node);
-		handler(c);
+		handler (c, v);
 	}
 }
 hash_t *GetChannelHash (void)
@@ -636,6 +638,11 @@ void *AllocChannelModPtr (Channel* c, int size)
 void FreeChannelModPtr (Channel *c)
 {
 	ns_free (c->modptr[GET_CUR_MODNUM()]);
+	moddatacnt[GET_CUR_MODNUM()]--;
+	if (moddatacnt[GET_CUR_MODNUM()] == 0)
+	{
+		fchannelmoddata &= ~(1 << GET_CUR_MODNUM());
+	}
 }
 
 void* GetChannelModPtr (Channel *c)
@@ -649,6 +656,10 @@ void ClearChannelModValue (Channel *c)
 	{
 		c->modvalue[GET_CUR_MODNUM()] = NULL;
 		moddatacnt[GET_CUR_MODNUM()]--;
+	}
+	if (moddatacnt[GET_CUR_MODNUM()] == 0)
+	{
+		fchannelmoddata &= ~(1 << GET_CUR_MODNUM());
 	}
 }
 
@@ -679,6 +690,7 @@ void CleanupChannelModdata (int index)
 
 	SET_SEGV_LOCATION();
 	if (moddatacnt[index] > 0) {
+		nlog (LOG_WARNING, "Cleaning up channels after dirty module!");
 		hash_scan_begin(&scan, channelhash);
 		while ((node = hash_scan_next(&scan)) != NULL) {
 			c = hnode_get(node);

@@ -149,7 +149,7 @@ static char *kp_init_globaldb(void)
 
 	basedir = (char *) ns_malloc(strlen(globaldir) + 2);
 	sprintf(basedir, "%s/", globaldir);
-	free(globaldir);
+	ns_free(globaldir);
 
 #ifdef WIN32
 	mkdir(basedir);
@@ -188,8 +188,8 @@ static void kp_init(int dbindex)
  * ------------------------------------------------------------------------- */
 void kp_exit()
 {
-	free(kp_tmpname);
-	free(kp_basedirs[KPDB_LOCAL]);
+	ns_free(kp_tmpname);
+	ns_free(kp_basedirs[KPDB_LOCAL]);
 
 	_kp_clear_cache();
 }
@@ -248,7 +248,7 @@ char *_kp_get_line(FILE * fp, char **valuep)
 		if (*s)
 			found = 1;
 		else
-			free(buf);
+			ns_free(buf);
 	} while (!found);
 
 	*s = '\0';
@@ -355,7 +355,7 @@ int _kp_lock_file(int dbindex, int iswrite)
 		mode = O_RDONLY;
 
 	lockfd = open(lockfile, O_CREAT | mode, 0644);
-	free(lockfile);
+	ns_free(lockfile);
 	if (lockfd == -1) {
 		/* Silently return if lockfile creation fails */
 		return -1;

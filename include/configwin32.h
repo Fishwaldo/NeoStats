@@ -11,6 +11,7 @@
 
 /* 'Enable Debugging' */
 /* #undef DEBUG */
+#define DEBUG
 
 /* Set to explicitly specify we don't want to use thread-safe functions in
    curl */

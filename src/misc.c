@@ -93,7 +93,8 @@ strip (char *line)
 
 char* sstrdup (const char *s)
 {
-	char *t = strdup (s);
+	char *t = ns_malloc (strlen(s)+1);
+	strlcpy (t, s, strlen(s)+1);
 	if (!t) {
 		nlog (LOG_CRITICAL, "sstrdup(): out of memory.");
 		do_exit (NS_EXIT_ERROR, "Out of memory");

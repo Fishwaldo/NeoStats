@@ -60,22 +60,29 @@ int InitExcludes(void)
 			e = ns_calloc(sizeof(excludes));
 			if (GetData((void *)&tmp, CFGSTR, "Exclusions", row[i], "Pattern") > 0) {
 				strlcpy(e->pattern, tmp, MAXHOST);
+				ns_free (tmp);
 			} else {
 				nlog(LOG_WARNING, "Exclusions: Can't add entry %s, Pattern invalid", row[i]);
 				continue;
 			}
 			if (GetData((void *)&tmp, CFGSTR, "Exclusions", row[i], "AddedBy") > 0) {
 				strlcpy(e->addedby, tmp, MAXNICK);
+				ns_free (tmp);
 			}
 			e->addedon = atoi(row[i]);
 			GetData((void *)&e->type, CFGINT, "Exclusions", row[i], "Type");
 			dlog(DEBUG2, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
 			lnode_create_append (exclude_list, e);
 		}
-		free(row);
 	}
+	ns_free (row);
 	return NS_SUCCESS;
 } 
+
+void FiniExcludes(void) 
+{
+	list_destroy_auto (exclude_list);
+}
 
 /* @brief add a entry to the exlusion list
  * 

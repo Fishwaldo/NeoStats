@@ -46,12 +46,12 @@ int kp_get_enum(const char *keypath, const char *names[], int *valp)
 	for (i = 0; names[i] != NULL; i++) {
 		if (strcmp(str, names[i]) == 0) {
 			*valp = i;
-			free(str);
+			ns_free(str);
 			return 0;
 		}
 	}
 
-	free(str);
+	ns_free(str);
 
 	return KPERR_BADTYPE;
 }

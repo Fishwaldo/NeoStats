@@ -57,7 +57,7 @@ KPDIR *kp_dir_open(const char *keypath)
 const char *kp_dir_getpath(KPDIR * kpdir, const char *subkey)
 {
 	if (kpdir != NULL) {
-		free(kpdir->retpath);
+		ns_free(kpdir->retpath);
 		kpdir->retpath =
 		    (char *) ns_malloc(strlen(kpdir->basepath) + 1 +
 					  strlen(subkey) + 1);
@@ -73,9 +73,9 @@ const char *kp_dir_getpath(KPDIR * kpdir, const char *subkey)
  * ------------------------------------------------------------------------- */
 void kp_dir_close(KPDIR * kpdir)
 {
-	free(kpdir->retpath);
-	free(kpdir->basepath);
-	free(kpdir);
+	ns_free(kpdir->retpath);
+	ns_free(kpdir->basepath);
+	ns_free(kpdir);
 }
 
 /* End of kp_dir.c */

@@ -24,6 +24,15 @@
 #ifndef _CHANNELS_H_
 #define _CHANNELS_H_
 
+/** @brief ChannelMember structure
+ *  
+ */
+typedef struct ChannelMember {
+	char nick[MAXNICK];
+	time_t tsjoin;
+	long flags;
+} ChannelMember;
+
 void ListChannels (CmdParams* cmdparams, const char *chan);
 void PartChannel (Client *u, const char *chan, const char *reason);
 void PartAllChannels (Client *u, const char *reason);

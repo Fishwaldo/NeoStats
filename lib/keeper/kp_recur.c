@@ -71,7 +71,7 @@ int kp_recursive_do(const char *key, kp_func func, int stop_on_err,
 			}
 		}
 		kp_dir_close(dir);
-		free(keys);
+		ns_free(keys);
 	}
 
 	return finalres;

@@ -21,16 +21,37 @@
 ** $Id$
 */
 
-#ifndef _EXCLUDE_H_
-#define _EXCLUDE_H_
+#ifndef _NETWORK_H_
+#define _NETWORK_H_
 
-int InitExcludes(void);
-void FiniExcludes(void);
-int ns_cmd_exclude_add (CmdParams* cmdparams);
-int ns_cmd_exclude_del (CmdParams* cmdparams);
-int ns_cmd_exclude_list (CmdParams* cmdparams);
-void ns_do_exclude_chan(Channel *c);
-void ns_do_exclude_server(Client *s);
-void ns_do_exclude_user(Client *u);
+typedef struct networkstat {
+	statistic servers;
+	statistic channels;
+	statistic users;
+	statistic opers;
+	statistic kills;
+} networkstat;
 
-#endif /* _EXCLUDE_H_ */
+extern networkstat networkstats;
+
+void AddNetworkServer (void);
+void AddNetworkChannel (void);
+void AddNetworkUser (void);
+void AddNetworkOper (void);
+void AddNetworkKill (void);
+void DelNetworkServer (void);
+void DelNetworkChannel (void);
+void DelNetworkUser (void);
+void DelNetworkOper (void);
+void DelNetworkKill (void);
+int ss_cmd_netstats (CmdParams *cmdparams);
+int ss_cmd_daily (CmdParams *cmdparams);
+
+void AverageNetworkStatistics (void);
+void ResetNetworkStatistics (void);
+void InitNetworkStats (void);
+void FiniNetworkStats (void);
+void SaveNetworkStats (void);
+
+
+#endif /* _NETWORK_H_ */

@@ -547,8 +547,10 @@ void rtaserv_init (void)
 
 void rtaserv_fini (void)
 {
+	list_destroy_auto (sqlconnections);
 	rta_active = 1;
 	del_services_set_list (rta_settings);
+	rta_exit();
 }
 
 #endif

@@ -31,6 +31,9 @@
 #include "dns.h"
 #include "ircd.h"
 #include "auth.h"
+#include "users.h"
+#include "channels.h"
+#include "servers.h"
 
 /** @brief Module list
  * 

@@ -25,7 +25,26 @@
 
 #include "neostats.h"
 #include "statserv.h"
+#include "stats.h"
+#include "network.h"
+#include "channel.h"
+#include "tld.h"
+#include "server.h"
+#include "version.h"
 #include "rta.h"
+
+#if 0
+
+static int zerovalue = 0;
+
+void *display_channel_current_users (void *tbl, char *col, char *sql, void *row) 
+{
+	channelstat *data = row;
+
+	if (data->c)
+		return &data->c->users;
+	return &zerovalue;
+}                        
 
 COLDEF statserv_chanscols[] = {
 	{
@@ -33,7 +52,7 @@ COLDEF statserv_chanscols[] = {
 		"name",
 		RTA_STR,
 		MAXCHANLEN,
-		offsetof(struct CStats, name),
+		offsetof(struct channelstat, name),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -44,9 +63,9 @@ COLDEF statserv_chanscols[] = {
 		"nomems",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, members),
+		0,
 		RTA_READONLY,
-		NULL, 
+		display_channel_current_users, 
 		NULL,
 		"The no of users in the channel"
 	},
@@ -55,7 +74,7 @@ COLDEF statserv_chanscols[] = {
 		"topics",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, topics),
+		offsetof(struct channelstat, topics),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -66,7 +85,7 @@ COLDEF statserv_chanscols[] = {
 		"totmem",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, totmem),
+		offsetof(struct channelstat, totmem),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -77,7 +96,7 @@ COLDEF statserv_chanscols[] = {
 		"kicks",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, kicks),
+		offsetof(struct channelstat, kicks),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -88,7 +107,7 @@ COLDEF statserv_chanscols[] = {
 		"topicstoday",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, topicstoday),
+		offsetof(struct channelstat, topicstoday),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -99,7 +118,7 @@ COLDEF statserv_chanscols[] = {
 		"joinstoday",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, joinstoday),
+		offsetof(struct channelstat, joinstoday),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -110,7 +129,7 @@ COLDEF statserv_chanscols[] = {
 		"kickstoday",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, maxkickstoday),
+		offsetof(struct channelstat, maxkickstoday),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -121,7 +140,7 @@ COLDEF statserv_chanscols[] = {
 		"maxmemtoday",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, maxmemtoday),
+		offsetof(struct channelstat, maxmemtoday),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -132,7 +151,7 @@ COLDEF statserv_chanscols[] = {
 		"maxmemtodaytime",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, t_maxmemtoday),
+		offsetof(struct channelstat, t_maxmemtoday),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -143,7 +162,7 @@ COLDEF statserv_chanscols[] = {
 		"maxmem",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, maxmems),
+		offsetof(struct channelstat, maxmems),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -154,7 +173,7 @@ COLDEF statserv_chanscols[] = {
 		"maxmemtime",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, t_maxmems),
+		offsetof(struct channelstat, t_maxmems),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -165,7 +184,7 @@ COLDEF statserv_chanscols[] = {
 		"maxkicks",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, maxkicks),
+		offsetof(struct channelstat, maxkicks),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -176,7 +195,7 @@ COLDEF statserv_chanscols[] = {
 		"maxkickstime",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, t_maxkicks),
+		offsetof(struct channelstat, t_maxkicks),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -187,7 +206,7 @@ COLDEF statserv_chanscols[] = {
 		"maxjoins",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, maxjoins),
+		offsetof(struct channelstat, maxjoins),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -198,7 +217,7 @@ COLDEF statserv_chanscols[] = {
 		"maxjoinstime",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CStats, t_maxjoins),
+		offsetof(struct channelstat, t_maxjoins),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -210,7 +229,7 @@ COLDEF statserv_chanscols[] = {
 TBLDEF statserv_chans = {
 	"statserv_chans",
 	NULL, 	/* for now */
-	sizeof(struct CStats),
+	sizeof(struct channelstat),
 	0,
 	TBL_LIST,
 	statserv_chanscols,
@@ -219,200 +238,209 @@ TBLDEF statserv_chans = {
 	"The stats of online Channels on the IRC network"
 };
 
+void *display_server_current_users (void *tbl, char *col, char *sql, void *row) 
+{
+	serverstat *data = row;
+
+	if (data->s)
+		return &data->s->server->users;
+	return &zerovalue;
+}                        
+
 COLDEF statserv_serverscols[] = {
 	{
-		"SStats",
+		"serverstat",
 		"name",
 		RTA_STR,
 		MAXHOST,
-		offsetof(struct SStats, name),
+		offsetof(struct serverstat, name),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The name of the server"
 	},
 	{
-		"SStats",
+		"serverstat",
 		"users",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, users),
+		0,
 		RTA_READONLY,
-		NULL, 
+		display_server_current_users, 
 		NULL,
 		"The no of users on the server"
 	},
 	{
-		"SStats",
+		"serverstat",
 		"opers",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, opers),
+		offsetof(struct serverstat, opers),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The no of Opers on this server"
 	},
 	{
-		"SStats",
+		"serverstat",
 		"lowestping",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, lowest_ping),
+		offsetof(struct serverstat, lowest_ping),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The lowest ping this server had"
 	},
 	{
-		"SStats",
+		"serverstat",
 		"highestping",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, highest_ping),
+		offsetof(struct serverstat, highest_ping),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The highest ping this server had"
 	},
 	{	
-		"SStats",
+		"serverstat",
 		"lowestpingtime",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, t_lowest_ping),
+		offsetof(struct serverstat, t_lowest_ping),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The time of the lowest ping"
 	},
 	{	
-		"SStats",
+		"serverstat",
 		"highestpingtime",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, t_highest_ping),
+		offsetof(struct serverstat, t_highest_ping),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The time of the highest ping"
 	},
 	{	
-		"SStats",
+		"serverstat",
 		"numsplits",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, numsplits),
+		offsetof(struct serverstat, numsplits),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The number of splits this server has had"
 	},
 	{	
-		"SStats",
+		"serverstat",
 		"maxusers",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, maxusers),
+		offsetof(struct serverstat, maxusers),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The Max no of users this server has had"
 	},
 	{	
-		"SStats",
+		"serverstat",
 		"maxuserstime",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, t_maxusers),
+		offsetof(struct serverstat, t_maxusers),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The time of of max users record"
 	},
 	{	
-		"SStats",
+		"serverstat",
 		"maxopers",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, maxopers),
+		offsetof(struct serverstat, maxopers),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The Max no of opers this server has ever had"
 	},
 	{	
-		"SStats",
+		"serverstat",
 		"maxoperstime",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, t_maxopers),
+		offsetof(struct serverstat, t_maxopers),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The time of the maxopers record"
 	},
 	{	
-		"SStats",
-		"t_lastseen",
+		"serverstat",
+		"ts_lastseen",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, t_lastseen),
+		offsetof(struct serverstat, ts_lastseen),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"When was this server last seen"
 	},
 	{	
-		"SStats",
-		"t_start",
+		"serverstat",
+		"ts_start",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, t_start),
+		offsetof(struct serverstat, ts_start),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"when was this server first seen"
 	},
 	{	
-		"SStats",
+		"serverstat",
 		"operkills",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, operkills),
+		offsetof(struct serverstat, operkills),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The no of oper issued kills for this server"
 	},
 	{	
-		"SStats",
+		"serverstat",
 		"serverkills",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, serverkills),
+		offsetof(struct serverstat, serverkills),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The no of Server issued kills"
 	},
 	{	
-		"SStats",
+		"serverstat",
 		"totalusers",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, totusers),
+		offsetof(struct serverstat, totusers),
 		RTA_READONLY,
 		NULL,
 		NULL,
 		"The total no of users ever connected to this server"
 	},
 	{	
-		"SStats",
+		"serverstat",
 		"daily_totalusers",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct SStats, daily_totusers),
+		offsetof(struct serverstat, daily_totusers),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -424,7 +452,7 @@ COLDEF statserv_serverscols[] = {
 TBLDEF statserv_servers = {
 	"statserv_servers",
 	NULL, 	/* for now */
-	sizeof(struct SStats),
+	sizeof(struct serverstat),
 	0,
 	TBL_HASH,
 	statserv_serverscols,
@@ -439,7 +467,7 @@ COLDEF statserv_versionscols[] = {
 		"name",
 		RTA_STR,
 		BUFSIZE,
-		offsetof(struct CVersions, name),
+		offsetof(struct ctcpversionstat, name),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -450,7 +478,7 @@ COLDEF statserv_versionscols[] = {
 		"count",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct CVersions, count),
+		offsetof(struct ctcpversionstat, count),
 		RTA_READONLY,
 		NULL, 
 		NULL,
@@ -461,7 +489,7 @@ COLDEF statserv_versionscols[] = {
 TBLDEF statserv_versions = {
 	"statserv_versions",
 	NULL, 	/* for now */
-	sizeof(struct CVersions),
+	sizeof(struct ctcpversionstat),
 	0,
 	TBL_LIST,
 	statserv_versionscols,
@@ -504,6 +532,7 @@ COLDEF statserv_tldcols[] = {
 		NULL,
 		"The No of Online Users"
 	},
+#if 0
 	{
 		"statserv_tld",
 		"daily_users",
@@ -515,6 +544,7 @@ COLDEF statserv_tldcols[] = {
 		NULL,
 		"The No of Users connected today"
 	},
+#endif
 };
 
 TBLDEF statserv_tld = {
@@ -528,6 +558,37 @@ TBLDEF statserv_tld = {
 	"",
 	"The TLD stats of the IRC network"
 };
+
+void *display_network_current_users (void *tbl, char *col, char *sql, void *row) 
+{
+	return &networkstats.users.current;
+}                        
+
+void *display_network_current_away (void *tbl, char *col, char *sql, void *row) 
+{
+	return &me.awaycount;
+}                        
+
+void *display_network_current_channels (void *tbl, char *col, char *sql, void *row) 
+{
+	return &networkstats.channels.current;
+}                        
+
+void *display_network_current_servers (void *tbl, char *col, char *sql, void *row) 
+{
+	return &networkstats.servers.current;
+}                        
+
+static char fmtime[TIMEBUFSIZE];
+
+void *display_timestamp_maxopers (void *tbl, char *col, char *sql, void *row) 
+{
+	struct tm *ltm;
+	struct stats_network_ *data = row;
+	ltm = localtime (&data->t_maxopers);
+	strftime (fmtime, TIMEBUFSIZE, "%a %b %d %Y %I:%M", ltm);
+	return fmtime;
+}
 
 COLDEF statserv_networkcols[] = {
 	{
@@ -546,9 +607,9 @@ COLDEF statserv_networkcols[] = {
 		"chans",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct stats_network_, chans),
+		0,
 		RTA_READONLY,
-		NULL, 
+		display_network_current_channels,
 		NULL,
 		"The no of channels on the network"
 	},
@@ -566,11 +627,11 @@ COLDEF statserv_networkcols[] = {
 	{
 		"statserv_network",
 		"maxoperstime",
-		RTA_INT,
+		RTA_STR,//RTA_INT,
 		sizeof(int),
-		offsetof(struct stats_network_, t_maxopers),
+		0, //offsetof(struct stats_network_, t_maxopers),
 		RTA_READONLY,
-		NULL, 
+		display_timestamp_maxopers, 
 		NULL,
 		"The time of max no of opers on the network"
 	},
@@ -579,9 +640,9 @@ COLDEF statserv_networkcols[] = {
 		"users",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct stats_network_, users),
+		0,
 		RTA_READONLY,
-		NULL, 
+		display_network_current_users,
 		NULL,
 		"The max no of users on the network"
 	},
@@ -623,9 +684,9 @@ COLDEF statserv_networkcols[] = {
 		"away",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct stats_network_, away),
+		0,
 		RTA_READONLY,
-		NULL, 
+		display_network_current_away,
 		NULL,
 		"The no of users marked away"
 	},
@@ -634,9 +695,9 @@ COLDEF statserv_networkcols[] = {
 		"servers",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct stats_network_, servers),
+		0,
 		RTA_READONLY,
-		NULL, 
+		display_network_current_servers,
 		NULL,
 		"The no of servers connected to the network"
 	},
@@ -817,8 +878,11 @@ TBLDEF statserv_daily = {
 
 list_t *fakedaily;
 
-void statserv_rta_init (void)
+#endif
+
+void InitRTAStats (void)
 {
+#if 0
 	/* ok, now export the server and chan data into the sql emulation layers */
 	/* for the network and daily stats, we use a fake list, so we can easily import into rta */
 
@@ -829,24 +893,27 @@ void statserv_rta_init (void)
 	
 	/* find the address of each list/hash, and export to rta */
 	 
-	statserv_chans.address = Chead;
+	statserv_chans.address = channelstatlist;
 	rtaserv_add_table (&statserv_chans);
-	statserv_tld.address = Thead;
+	statserv_tld.address = tldstatlist;
 	rtaserv_add_table (&statserv_tld);
-	statserv_servers.address = Shead;
+	statserv_servers.address = serverstathash;
 	rtaserv_add_table (&statserv_servers);
-	statserv_versions.address = Vhead;
+	statserv_versions.address = versionstatlist;
 	rtaserv_add_table (&statserv_versions);
 	statserv_network.address = fakenetwork;
 	rtaserv_add_table (&statserv_network);
 	statserv_daily.address = fakedaily;
 	rtaserv_add_table (&statserv_daily);
+#endif
 }
 
-void statserv_rta_fini (void)
+void FiniRTAStats (void)
 {
+#if 0
 	list_destroy_nodes (fakedaily);
 	list_destroy (fakedaily);
 	list_destroy_nodes (fakenetwork);
 	list_destroy (fakenetwork);
+#endif
 }

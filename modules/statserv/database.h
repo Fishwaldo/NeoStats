@@ -21,16 +21,7 @@
 ** $Id$
 */
 
-#ifndef _EXCLUDE_H_
-#define _EXCLUDE_H_
+#ifndef _DATABASE_H_
+#define _DATABASE_H_
 
-int InitExcludes(void);
-void FiniExcludes(void);
-int ns_cmd_exclude_add (CmdParams* cmdparams);
-int ns_cmd_exclude_del (CmdParams* cmdparams);
-int ns_cmd_exclude_list (CmdParams* cmdparams);
-void ns_do_exclude_chan(Channel *c);
-void ns_do_exclude_server(Client *s);
-void ns_do_exclude_user(Client *u);
-
-#endif /* _EXCLUDE_H_ */
+#endif /* _DATABASE_H_ */

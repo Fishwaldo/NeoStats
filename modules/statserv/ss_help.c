@@ -27,14 +27,13 @@
 
 const char ss_help_server_oneline[]="Request information about a server";
 const char ss_help_map_oneline[]="Show the network map";
-const char ss_help_chan_oneline[]="Channel Information";
+const char ss_help_channel_oneline[]="Channel Information";
 const char ss_help_netstats_oneline[]="General Network Statistics";
 const char ss_help_daily_oneline[]="Daily Network Statistics";
-const char ss_help_tld_oneline[]="Show what country a TLD represents";
 const char ss_help_tldmap_oneline[]="Statistics on TLD's";
 const char ss_help_operlist_oneline[]="Show a listing of on-line IRCops";
 const char ss_help_botlist_oneline[]="Show a listing of on-line BOTS";
-const char ss_help_clientversions_oneline[]="Shows you a list of Client Versions";
+const char ss_help_userversion_oneline[]="Shows you a list of Client Versions";
 const char ss_help_forcehtml_oneline[]="Force an update of the HTML output file";
 const char ss_help_stats_oneline[]="Modify Statistic Entries.";
 
@@ -44,12 +43,10 @@ const char *ss_about[] = {
 	NULL
 };
 
-const char *ss_help_clientversions[] = {
-	"Syntax: \2CLIENTVERSIONS \37<limit>\37\2",
+const char *ss_help_userversion[] = {
+	"Syntax: \2USERVERSION \37<limit>\37\2",
 	"",
 	"Provides Statistics on the Client Versions found",
-	"The list will only be active if you have SecureServ",
-	"installed and Active.",
 	"<limit> Specifies how many results to show. Results are",
 	"sorted by most to least popular",
 	NULL
@@ -57,13 +54,13 @@ const char *ss_help_clientversions[] = {
 
 const char *ss_help_set_htmlpath[] = {
 	"\2HTMLPATH <path>\2",
-	"Set the Pathname (including filename) to write HTML",
-	"statistics to if HTML Statistics are enabled",
+	"Set the full pathname including filename used to write HTML",
+	"statistics when HTML Statistics are enabled",
 	NULL
 };
 
 const char *ss_help_set_exclusions[] = {
-	"\2USEEXCLUSIONS <on/off>\2",
+	"\2EXCLUSIONS <on/off>\2",
 	"Should statserv use the global exclusions when calculating",
 	"and displaying statistical data?",
 	NULL
@@ -94,8 +91,8 @@ const char *ss_help_set_lagtime[] = {
 	NULL
 };
 
-const char *ss_help_set_htmlupdatetime[] = {
-	"\2HTMLUPDATETIME <seconds>\2",
+const char *ss_help_set_htmltime[] = {
+	"\2HTMLTIME <seconds>\2",
 	"<seconds> is the time in seconds at which statserv",
 	"updates the HTML file.",
 	NULL
@@ -123,7 +120,7 @@ const char *ss_help_set_recordalert[] = {
 	NULL
 };
 
-const char *ss_help_chan[] = {
+const char *ss_help_channel[] = {
 	"Syntax: \2CHAN \37<POP/KICKS/TOPICS/<Channame>>\37\2",
 	"",
 	"Provides Statistics on Channels on the network",
@@ -164,14 +161,6 @@ const char *ss_help_daily[] = {
 	"",
 	"Provides information about records",
 	"that have been set today.",
-	NULL
-};
-
-const char *ss_help_tld[] = {
-	"Syntax: \2TLD \37top_level_domain\37\2",
-	"",
-	"Provides the country-name for a specific TLD.",
-	"An example of a TLD is \2.NET\2",
 	NULL
 };
 

@@ -92,9 +92,9 @@ static inline void kp_value_new(kp_key * ck, kpval_t type,
 static inline void kp_value_destroy(kp_key * ck)
 {
 	if (ck->data != NULL)
-		free(ck->data);
+		ns_free(ck->data);
 	if (ck->name != NULL)
-		free(ck->name);
+		ns_free(ck->name);
 }
 
 /* ------------------------------------------------------------------------- 

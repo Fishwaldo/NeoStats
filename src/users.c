@@ -60,6 +60,7 @@ static Client *new_user (const char *nick)
 	strlcpy (u->name, nick, MAXNICK);
 	u->user = ns_calloc (sizeof (User));
 	hnode_create_insert (userhash, u, u->name);
+	me.usercount++;
 	return u;
 }
 
@@ -132,6 +133,7 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	strlcpy (u->info, realname, MAXREALNAME);
 	u->user->ulevel = -1;
 	u->uplink = find_server (server);
+	u->uplink->server->users++;
 	u->user->tslastmsg = me.now;
 	u->user->chans = list_create (MAXJOINCHANS);
 	u->ip.s_addr = htonl (ipaddress);
@@ -175,8 +177,14 @@ static void deluser (Client *u)
 	hash_delete (userhash, un);
 	hnode_destroy (un);
 	list_destroy (u->user->chans);
+	u->uplink->server->users--;
+	if ((u->user->is_away == 1)) {
+		me.awaycount--;
+		u->uplink->server->awaycount--;
+	}
 	ns_free (u->user);
 	ns_free (u);
+	me.usercount--;
 }
 
 void KillUser (const char* source, const char *nick, const char *reason)
@@ -291,8 +299,12 @@ void UserAway (const char *nick, const char *awaymsg)
 	cmdparams->source = u;
 	if ((u->user->is_away == 1) && (!awaymsg)) {
 		u->user->is_away = 0;
+		me.awaycount--;
+		u->uplink->server->awaycount--;
 	} else if ((u->user->is_away == 0) && (awaymsg)) {
 		u->user->is_away = 1;
+		me.awaycount++;
+		u->uplink->server->awaycount++;
 	}
 	SendAllModuleEvent (EVENT_AWAY, cmdparams);
 	ns_free (cmdparams);
@@ -579,7 +591,7 @@ void QuitServerUsers (Client *s)
 	}
 }
 
-void GetUserList (UserListHandler handler)
+void GetUserList (UserListHandler handler, void *v)
 {
 	Client *u;
 	hscan_t scan;
@@ -589,7 +601,7 @@ void GetUserList (UserListHandler handler)
 	hash_scan_begin (&scan, userhash);
 	while ((node = hash_scan_next (&scan)) != NULL) {
 		u = hnode_get (node);
-		handler (u);
+		handler (u, v);
 	}
 }
 
@@ -660,6 +672,10 @@ void FreeUserModPtr (Client* u)
 {
 	ns_free (u->modptr[GET_CUR_MODNUM()]);
 	moddatacnt[GET_CUR_MODNUM()]--;
+	if (moddatacnt[GET_CUR_MODNUM()] == 0)
+	{
+		fusermoddata &= ~(1 << GET_CUR_MODNUM());
+	}
 }
 
 void* GetUserModPtr (Client* u)
@@ -673,6 +689,10 @@ void ClearUserModValue (Client *u)
 	{
 		u->modvalue[GET_CUR_MODNUM()] = NULL;
 		moddatacnt[GET_CUR_MODNUM()]--;
+	}
+	if (moddatacnt[GET_CUR_MODNUM()] == 0)
+	{
+		fusermoddata &= ~(1 << GET_CUR_MODNUM());
 	}
 }
 
@@ -704,6 +724,7 @@ void CleanupUserModdata (int index)
 	SET_SEGV_LOCATION();
 	hash_scan_begin (&scan, userhash);
 	if (moddatacnt[index] > 0) {
+		nlog (LOG_WARNING, "Cleaning up users after dirty module!");
 		while ((node = hash_scan_next (&scan)) != NULL) {
 			u = hnode_get (node);
 			if (u->modptr[index]) {

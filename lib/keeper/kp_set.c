@@ -234,7 +234,7 @@ static void kp_delete_path(kp_path * kpp)
 		if (res == -1)
 			break;
 	}
-	free(ipath);
+	ns_free(ipath);
 }
 
 /* ------------------------------------------------------------------------- 
@@ -315,7 +315,7 @@ static int kp_create_path(kp_path * kpp)
 	}
 
 	if (res != 0) {
-		free(ipath);
+		ns_free(ipath);
 		return res;
 	}
 
@@ -347,7 +347,7 @@ static int kp_create_path(kp_path * kpp)
 		}
 	}
 
-	free(ipath);
+	ns_free(ipath);
 
 	return res;
 }
@@ -402,7 +402,7 @@ static int kp_remove_keys(kp_path * kpp, FILE * tmpfp, kp_key * keys,
 			fprintf(tmpfp, "%s%c%s\n", buf, SEP1, value);
 			empty = 0;
 		}
-		free(buf);
+		ns_free(buf);
 	} while (!finished);
 
 	fclose(fp);
@@ -428,7 +428,7 @@ static void kp_write_keys(FILE * fp, kp_key * keys, int *emptyp)
 				buf = kp_code_value(k);
 				fprintf(fp, "%s%c%s\n", k->name, SEP1,
 					buf);
-				free(buf);
+				ns_free(buf);
 			}
 
 			k->flags &= ~KPFL_DIRTY;
@@ -495,7 +495,7 @@ int _kp_write_file(kp_path * kpp, kp_key * keys)
 		}
 		unlink(tmppath);
 	}
-	free(tmppath);
+	ns_free(tmppath);
 
 	if (delpath)
 		kp_delete_path(kpp);

@@ -40,7 +40,6 @@ void *ns_malloc (const int size)
 {
 	unsigned int allocsize;
 	void *buf;
-
 	allocsize = size;
 	if (!allocsize) {
 		nlog (LOG_WARNING, "ns_malloc: illegal attempt to allocate 0 bytes!");
@@ -95,7 +94,6 @@ void *ns_calloc (const int size)
 void *ns_realloc (void* ptr, const int size)
 {
 	void *newptr;
-
 	newptr = realloc (ptr, size);
 	if (!newptr) {
 		nlog (LOG_CRITICAL, "ns_realloc: out of memory.");
@@ -114,12 +112,12 @@ void *ns_realloc (void* ptr, const int size)
  * @returns none
  */
 
-void _ns_free (void **buf)
+void _ns_free (void **ptr)
 {
-	if (!*buf) {
+	if (!*ptr) {
 		nlog (LOG_WARNING, "ns_free: illegal attempt to free NULL pointer");
 		return;
 	}
-	free (*buf);
-	*buf = 0;
+	free (*ptr);
+	*ptr = 0;
 }

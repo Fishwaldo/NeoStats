@@ -310,8 +310,8 @@ static void LoadBans (void)
 			}
 			hnode_create_insert (banhash, ban, ban->host);
 		}
-		free(data);
 	}
+	ns_free (data);
 }
 
 /** @brief hs_set_regnick_cb
@@ -497,6 +497,18 @@ int ModSynch (void)
 
 void ModFini (void)
 {
+	banentry *ban;
+	hnode_t *hn;
+	hscan_t hs;
+
+	hash_scan_begin (&hs, banhash);
+	while ((hn = hash_scan_next (&hs)) != NULL) {
+		ban = ((banentry *)hnode_get (hn));
+		hash_delete (banhash, hn);
+		hnode_destroy (hn);
+		ns_free (ban);
+	}
+	hash_destroy(banhash);
 	list_destroy_auto (vhost_list);
 }
 

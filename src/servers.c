@@ -53,6 +53,7 @@ new_server (const char *name)
 	strlcpy (s->name, name, MAXHOST);
 	s->server = ns_calloc (sizeof (Server));
 	hnode_create_insert (serverhash, s, s->name);
+	me.servercount++;
 	return s;
 }
 
@@ -126,6 +127,7 @@ DelServer (const char *name, const char* reason)
 	if(ircd_srv.protocol & PROTOCOL_NOQUIT) {
 		QuitServerUsers (s);
 	}
+	me.servercount--;
 	/* run the event for delete server */
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = s;
@@ -176,7 +178,7 @@ static void
 dumpserver (Client *s)
 {
 	/* Calculate uptime as uptime from server plus uptime of NeoStats */
-	time_t uptime = s->server->uptime  + (me.now - me.t_start);
+	time_t uptime = s->server->uptime  + (me.now - me.ts_boot);
 
 	if(ircd_srv.protocol & PROTOCOL_B64SERVER) {
 		irc_chanalert (ns_botptr, _("Server: %s (%s)"), s->name, s->name64);
@@ -269,7 +271,7 @@ FiniServers (void)
 	hash_destroy(serverhash);
 }
 
-void GetServerList(ServerListHandler handler)
+void GetServerList (ServerListHandler handler, void *v)
 {
 	hnode_t *node;
 	hscan_t scan;
@@ -279,7 +281,7 @@ void GetServerList(ServerListHandler handler)
 	hash_scan_begin(&scan, serverhash);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		ss = hnode_get(node);
-		handler(ss);
+		handler (ss, v);
 	}
 }
 
@@ -317,6 +319,10 @@ void FreeServerModPtr (Client* s)
 {
 	ns_free (s->modptr[GET_CUR_MODNUM()]);
 	moddatacnt[GET_CUR_MODNUM()]--;
+	if (moddatacnt[GET_CUR_MODNUM()] == 0)
+	{
+		fservermoddata &= ~(1 << GET_CUR_MODNUM());
+	}
 }
 
 void* GetServerModPtr (Client* s)
@@ -330,6 +336,10 @@ void ClearServerModValue (Client* s)
 	{
 		s->modvalue[GET_CUR_MODNUM()] = NULL;
 		moddatacnt[GET_CUR_MODNUM()]--;
+	}
+	if (moddatacnt[GET_CUR_MODNUM()] == 0)
+	{
+		fservermoddata &= ~(1 << GET_CUR_MODNUM());
 	}
 }
 
@@ -361,6 +371,7 @@ void CleanupServerModdata (int index)
 	SET_SEGV_LOCATION();
 	hash_scan_begin(&scan, serverhash);
 	if (moddatacnt[index] > 0) {
+		nlog (LOG_WARNING, "Cleaning up servers after dirty module!");
 		while ((node = hash_scan_next(&scan)) != NULL) {
 			s = hnode_get(node);
 			if (s->modptr[index]) {

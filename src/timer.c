@@ -166,6 +166,10 @@ add_timer (TIMER_TYPE type, timer_function func_name, const char *name, int inte
 		nlog (LOG_WARNING, "Module %s timer %s does not exist", moduleptr->info->name, name);
 		return NS_FAILURE;
 	}
+	if (find_timer (name)) {
+		nlog (LOG_WARNING, "Module %s timer %s already exists. Not adding.", moduleptr->info->name, name);
+		return NS_FAILURE;
+	}
 	timer = new_timer (name);
 	if (timer) {
 		timer->type = type;

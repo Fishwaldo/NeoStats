@@ -363,7 +363,7 @@ ns_cmd_banlist (CmdParams* cmdparams)
 static int 
 ns_cmd_status (CmdParams* cmdparams)
 {
-	time_t uptime = me.now - me.t_start;
+	time_t uptime = me.now - me.ts_boot;
 
 	SET_SEGV_LOCATION();
 	irc_prefmsg (ns_botptr, cmdparams->source, __("%s status:", cmdparams->source), ns_botptr->name);
@@ -381,6 +381,9 @@ ns_cmd_status (CmdParams* cmdparams)
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Reconnect time: %d", cmdparams->source), nsconfig.r_time);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Requests: %d",cmdparams->source), me.requests);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Max sockets: %d (in use: %d)", cmdparams->source), me.maxsocks, me.cursocks);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Current Servers: %d", cmdparams->source), me.servercount);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Current Channels: %d", cmdparams->source), me.channelcount);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Current Users: %d (Away: %d)", cmdparams->source), me.usercount, me.awaycount);
 	if (nsconfig.debug)
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Debugging mode enabled", cmdparams->source));
 	else

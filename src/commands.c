@@ -444,6 +444,7 @@ run_bot_cmd (CmdParams *cmdparams)
 				msg_error_need_more_params(cmdparams);
 			} else {
 				/* Seems OK so report the command call so modules do not have to */
+				SET_RUN_LEVEL(cmdparams->bot->moduleptr);
 				if (nsconfig.cmdreport) {
 					irc_chanalert (cmdparams->bot, _("%s used %s"), cmdparams->source->name, cmd_ptr->cmd);
 				}
@@ -451,11 +452,10 @@ run_bot_cmd (CmdParams *cmdparams)
 				nlog (LOG_NORMAL, "%s used %s", cmdparams->source->name, cmdparams->param);
 				/* call handler */
 				if (setjmp (sigvbuf) == 0) {
-					SET_RUN_LEVEL(cmdparams->bot->moduleptr);
 					cmdret = cmd_ptr->handler(cmdparams);
-					RESET_RUN_LEVEL();
 				}
 				check_cmd_result (cmdparams, cmdret, NULL);
+				RESET_RUN_LEVEL();
 			}
 			ns_free (av);
 			ns_free (cmdparams->av);

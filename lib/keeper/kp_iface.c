@@ -110,7 +110,7 @@ static int kp_get(const char *keypath, kp_key * ck, kpval_t type)
 		else {
 			res = _kp_cache_get(&kpp, keyname, type, ck);
 		}
-		free(kpp.path);
+		ns_free(kpp.path);
 		keypath++;
 	} while (res == KPERR_NOKEY);
 
@@ -209,7 +209,7 @@ static void kp_combine_strings(struct key_array *keys)
 		strsize = ROUND_TO(strsize, 8);
 
 		strcpy(s, *kp);
-		free(*kp);
+		ns_free(*kp);
 		*kp = s;
 
 		s += strsize;
@@ -224,9 +224,9 @@ static void kp_free_keyarray(struct key_array *keys)
 	char **kp;
 
 	for (kp = keys->array; *kp != NULL; kp++)
-		free(*kp);
+		ns_free(*kp);
 
-	free(keys->array);
+	ns_free(keys->array);
 }
 
 /* ------------------------------------------------------------------------- 
@@ -248,7 +248,7 @@ static int kp_get_subkeys(const char *keypath, struct key_array *keys)
 		if (res == 0) {
 			_kp_cache_get_subkeys(&kpp, keyname, iskeyfile,
 					      keys);
-			free(kpp.path);
+			ns_free(kpp.path);
 		}
 		keypath++;
 	}
@@ -301,7 +301,7 @@ int kp_get_type(const char *keypath, kpval_t * typep)
 			return res;
 
 		res = _kp_cache_get_type(&kpp, keyname, iskeyfile, typep);
-		free(kpp.path);
+		ns_free(kpp.path);
 		keypath++;
 	} while (res == KPERR_NOKEY);
 
@@ -332,7 +332,7 @@ static int kp_set(const char *keypath, kp_key * ck)
 		ck->name = sstrdup(keyname);
 		res = _kp_cache_set(&kpp, ck);
 	}
-	free(kpp.path);
+	ns_free(kpp.path);
 
 	return res;
 }

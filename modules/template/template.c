@@ -141,12 +141,12 @@ ModuleInfo module_info = {
  *  example command
  *  Just sends "Hello World!" to the services channel
  */
-static int template_hello_world(CmdParams* cmdparams)
+static int template_hello_world (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	irc_chanalert (template_bot, "%s says \"Hello World!\"",
 		cmdparams->source->name);
-	return 1;
+	return NS_SUCCESS;
 }
 
 /** OPTIONAL:

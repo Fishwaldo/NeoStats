@@ -67,7 +67,7 @@ void InitMe(void)
 {
 	/* set some defaults before we parse the config file */
 	memset(&me, 0, sizeof(me));
-	me.t_start = time(NULL);
+	me.ts_boot = time(NULL);
 	me.now = time(NULL);
 	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
 #ifdef DEBUG
@@ -360,8 +360,10 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		}
 		sleep(1);
 		/* now free up the users and servers memory */
+		FiniCurl();
 		FiniUsers();
 		FiniChannels();
+		FiniExcludes();
 		FiniServers();
 		FiniBans();
 		FiniDns();

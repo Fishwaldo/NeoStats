@@ -65,7 +65,7 @@ HR {height:2px}
                           <font color="#444444">
                           |</font> <a href="#netstats">Network Statistics</a> <font color="#444444">|</font>
                           <a href="#daily">Daily Network Statistics</a> <font color="#444444">|</font>
-                          <a href="#top10chan">Top10 Online Channels</a> <font color="#444444"> |</font>
+                          <a href="#top10chan">Top 10 Online Channels</a> <font color="#444444"> |</font>
                           <a href="#srvlist">Server List</a>
                           <font color="#444444">|</font> <a href="#popchan">Popular Channels</a>
                           <font color="#444444"> |</font> <a href="#kickchan">Most Unwelcome Channels</a>
@@ -127,32 +127,39 @@ cellspacing="0" border="1">
 			</td>
 			</tr>
 			<tr>
-	 	 	<td class="cat" height="30"><span class="cattitle"><b>Top10</b>&nbsp;Online Channels</span></td>
+	 		 <td class="cat" height="30"><span class="cattitle"><b>Weekly</b>&nbsp;Network Statistics</span></td>
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=top10chan>!DAILYTOPCHAN!
+				<a name=daily>!WEEKLYSTATS!
 			</td>
 			</tr>
-	 	 	<td class="cat" height="30"><span class="cattitle"><b>Top10</b>&nbsp;Client Versions</span></td>
+			<tr>
+	 		 <td class="cat" height="30"><span class="cattitle"><b>Monthly</b>&nbsp;Network Statistics</span></td>
+			</tr>
+			<tr>
+				<td class="row1" align="center">
+				<a name=daily>!MONTHLYSTATS!
+			</td>
+			</tr>
+			<tr>
+	 	 	<td class="cat" height="30"><span class="cattitle"><b>Top 10</b>&nbsp;Client Versions</span></td>
 			</tr>
 			<tr>
 				<td class="row1" align="center">
 				<a name=clivers>!CLIENTSTATS!
 			</td>
 			</tr>
-	 		<td class="cat" height="30"><span class="cattitle"><b>Server</b>&nbsp;List</span></td>
+			<tr>
+	 	 	<td class="cat" height="30"><span class="cattitle"><b>Top 10</b>&nbsp;Online Channels</span></td>
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=srvlist>!SRVLIST!
-				(*) indicates server is online at the moment<br>
-				(Click on a Server name for more information)
+				<a name=top10chan>!DAILYTOPCHAN!
 			</td>
 			</tr>
-	
 			<tr>
-	 		<td class="cat" height="30"><span class="cattitle"><b>Top10</b>&nbsp;Channels Ever</span></td>
+	 		<td class="cat" height="30"><span class="cattitle"><b>Top 10</b>&nbsp;Join Channels</span></td>
 			</tr>
 			<tr>
 				<td class="row1" align="center">
@@ -160,7 +167,7 @@ cellspacing="0" border="1">
 			</td>
 			</tr>
 			<tr>
-	 	 	<td class="cat" height="30"><span class="cattitle"><b>Top10</b>&nbsp;Unwelcome Channels</span></td>
+	 	 	<td class="cat" height="30"><span class="cattitle"><b>Top 10</b>&nbsp;Kick Channels</span></td>
 			</tr>
 			<tr>
 				<td class="row1" align="center">
@@ -169,12 +176,22 @@ cellspacing="0" border="1">
 			</td>
 			</tr>
 			<tr>
-	 	 	<td class="cat" height="30"><span class="cattitle"><b>Top10</b>&nbsp;Topic Change Channels</span></td>
+	 	 	<td class="cat" height="30"><span class="cattitle"><b>Top 10</b>&nbsp;Topic Change Channels</span></td>
 			</tr>
 			<tr>
 				<td class="row1" align="center">
 				<a name=topicchan>!TOP10TOPICS!
 				(*) indicates channel is active at the moment
+			</td>
+			</tr>
+			<tr>
+	 		<td class="cat" height="30"><span class="cattitle"><b>Server</b>&nbsp;List</span></td>
+			</tr>
+			<tr>
+				<td class="row1" align="center">
+				<a name=srvlist>!SRVLIST!
+				(*) indicates server is online at the moment<br>
+				(Click on a Server name for more information)
 			</td>
 			</tr>
 			<tr>

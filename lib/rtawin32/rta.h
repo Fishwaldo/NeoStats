@@ -431,6 +431,7 @@ typedef void (*logcb) (char *logmsg);
  * Return: None
  **************************************************************/
 void     rta_init(logcb);
+void     rta_exit(void);
 
 /* change the uname/password for authentication */
 void rta_change_auth(char *uname, char *pass);

@@ -25,40 +25,44 @@
 
 #include "neostats.h"
 #include "statserv.h"
+#include "stats.h"
+#include "network.h"
+#include "tld.h"
 #include "GeoIP.h"
 #include "GeoIPCity.h"
 
 #define UNKNOWN_COUNTRY_CODE	"???"
 
-list_t *Thead;
+list_t *tldstatlist;
 GeoIP *gi;
 
-void _setup_dbfilename();
-
-void ResetTLD() 
+void ResetTLDStatistics (void) 
 {
 	lnode_t *tn, *tn2;
 	TLD *t;
 	
-	tn = list_first(Thead);
+	tn = list_first(tldstatlist);
 	while (tn != NULL) {
 		t = lnode_get(tn);
-		t->daily_users = 0;
-		if (t->users == 0) {
+		ResetStatistic (&t->users);
+		if (t->users.current == 0) {
 			/* don't delete the tld entry ??? as its our "unknown" entry */
 			if (ircstrcasecmp(t->tld, UNKNOWN_COUNTRY_CODE)) {
-				tn2 = list_next(Thead, tn);
+				tn2 = list_next(tldstatlist, tn);
 				ns_free(t);
-				list_delete(Thead, tn);
+				list_delete(tldstatlist, tn);
 				lnode_destroy(tn);
 				tn = tn2;
 				continue;
 			}
 		}
-		tn = list_next(Thead, tn);
+		tn = list_next(tldstatlist, tn);
 	}
 }
 
+void AverageTLDStatistics (void)
+{
+}
 
 static int findcc(const void *v, const void *cc) {
 	const TLD *t = (void *)v;
@@ -67,30 +71,44 @@ static int findcc(const void *v, const void *cc) {
 int sortusers(const void *v, const void *v2) {
 	const TLD *t = (void *)v;
 	const TLD *t2 = (void *)v2;
-	return (t2->users - t->users);
+	return (t2->users.daily.max - t->users.daily.max);
 }
 
-void DisplayTLDmap(Client *u) 
+void GetTLDStats (TLDStatHandler handler, void *v)
 {
 	TLD *t;
 	lnode_t *tn;
 	
-	irc_prefmsg(ss_bot, u, "Top Level Domain Statistics:");
-	list_sort(Thead, sortusers);
-	tn = list_first(Thead);
+	list_sort (tldstatlist, sortusers);
+	tn = list_first (tldstatlist);
 	while (tn) {
-		t = lnode_get(tn);
-		irc_prefmsg(ss_bot, u, 
-			"%3s \2%3d\2 (%2.0f%%) -> %s ---> Daily Total: %d",
-			t->tld, t->users,
-			((float) t->users / (float) stats_network.users) * 100,
-			t->country, t->daily_users);
-		tn = list_next(Thead, tn);
+		t = lnode_get (tn);
+		handler (t, v);
+		tn = list_next (tldstatlist, tn);
 	}
-	irc_prefmsg(ss_bot, u, "End of list.");
 }
 
-/** @brief DelTLD
+void TLDReport (TLD *tld, void *v)
+{
+	Client *targetuser;
+
+	targetuser = (Client *) v;
+	irc_prefmsg(ss_bot, targetuser, 
+		"%3s \2%3d\2 (%2.0f%%) -> %s ---> Daily Total: %d",
+		tld->tld, tld->users.alltime.max, ((float) tld->users.current / (float) networkstats.users.current) * 100,
+		tld->country, tld->users.current);
+}
+
+int ss_cmd_tldmap(CmdParams *cmdparams)
+{
+	SET_SEGV_LOCATION();
+	irc_prefmsg(ss_bot, cmdparams->source, "Top Level Domain Statistics:");
+	GetTLDStats (TLDReport, (void *)cmdparams->source);
+	irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
+	return NS_SUCCESS;
+}
+
+/** @brief DelTLDUser
  *
  *  Delete a TLD from the current stats
  *
@@ -98,7 +116,7 @@ void DisplayTLDmap(Client *u)
  *
  *  @return none
  */
-void DelTLD(Client * u)
+void DelTLDUser (Client * u)
 {
 	const char *country_code;
 	TLD *t = NULL;
@@ -109,13 +127,11 @@ void DelTLD(Client * u)
 	}
 	country_code = GeoIP_country_code_by_addr(gi, u->hostip);
 	if (country_code) {
-		t = lnode_find (Thead, country_code, findcc);
+		t = lnode_find (tldstatlist, country_code, findcc);
 	} else {
-		t = lnode_find (Thead, UNKNOWN_COUNTRY_CODE, findcc);
+		t = lnode_find (tldstatlist, UNKNOWN_COUNTRY_CODE, findcc);
 	}
-	if (t) {
-		t->users--;
-	} 
+	DecStatistic (&t->users);		
 }
 
 /** @brief AddTLD
@@ -126,7 +142,7 @@ void DelTLD(Client * u)
  *
  *  @return none
  */
-void AddTLD(Client * u)
+int ss_event_nickip (CmdParams *cmdparams)
 {
 	const char *country_name;
 	const char *country_code;
@@ -134,30 +150,59 @@ void AddTLD(Client * u)
 	
 	SET_SEGV_LOCATION();
 	if (!gi) {
-		return;
+		return NS_SUCCESS;
 	}	
-	country_code = GeoIP_country_code_by_addr(gi, u->hostip);
+	country_code = GeoIP_country_code_by_addr(gi, cmdparams->source->hostip);
 	if (country_code) {
-		t = lnode_find (Thead, country_code, findcc);
+		t = lnode_find (tldstatlist, country_code, findcc);
+		if (!t) {
+			country_name = GeoIP_country_name_by_addr(gi, cmdparams->source->hostip);
+			t = ns_malloc(sizeof(TLD));
+			strlcpy(t->tld, country_code, 5);
+			strlcpy(t->country, country_name, 32);
+			lnode_create_append (tldstatlist, t);
+		}
 	} else {
-		t = lnode_find (Thead, UNKNOWN_COUNTRY_CODE, findcc);
+		t = lnode_find (tldstatlist, UNKNOWN_COUNTRY_CODE, findcc);
 	}
-	if (t) {
-		t->users++;
-		t->daily_users++;
-	} else {
-		country_name = GeoIP_country_name_by_addr(gi, u->hostip);
-		t = ns_malloc(sizeof(TLD));
-		strlcpy(t->tld, country_code, 5);
-		strlcpy(t->country, country_name, 32);
-		t->users = 1;
-		t->daily_users = 1;
-		lnode_create_append (Thead, t);
-	}
-	return;
+	IncStatistic (&t->users);
+	return NS_SUCCESS;
 }
 
-/** @brief InitTLD
+void SaveTLDStats (void)
+{
+	lnode_t *tn;
+	TLD *t;
+	
+	tn = list_first(tldstatlist);
+	while (tn != NULL) {
+		t = lnode_get(tn);
+		SaveStatistic (&t->users, "TLD", t->tld, "users");
+		tn = list_next(tldstatlist, tn);
+	}
+}
+
+void LoadTLDStats (void)
+{
+	TLD *t;
+	int i;
+	char **data;
+
+	if (GetTableData ("TLD", &data) > 0) {
+		for (i = 0; data[i] != NULL; i++) {
+			if (strncmp (data[i], "???", 5) != 0)
+			{
+				t = ns_malloc (sizeof (TLD));
+				strlcpy (t->tld, data[i], 5);
+				LoadStatistic (&t->users, "TLD", t->tld, "users");
+				lnode_create_append (tldstatlist, t);
+			}
+		}
+	}
+	ns_free (data);
+}
+
+/** @brief InitTLDStatistics
  *
  *  Init TLD lists
  *
@@ -165,16 +210,15 @@ void AddTLD(Client * u)
  *
  *  @return none
  */
-void InitTLD(void)
+void InitTLDStatistics (void)
 {
 	TLD *t;
 
 	SET_SEGV_LOCATION();
-	Thead = list_create(-1);
+	tldstatlist = list_create(-1);
 	gi = NULL;
 	/* setup the GeoIP db filenames */
 	_setup_dbfilename();	
-	StatServ.GeoDBtypes = -1;
 	/* now open the various DB's */
 	if (GeoIP_db_avail(GEOIP_COUNTRY_EDITION)) {
 		gi = GeoIP_open_type(GEOIP_COUNTRY_EDITION, GEOIP_STANDARD);
@@ -189,10 +233,12 @@ void InitTLD(void)
 	t = ns_calloc(sizeof(TLD));
 	ircsnprintf(t->tld, 5, UNKNOWN_COUNTRY_CODE);
 	strlcpy(t->country, "Unknown", 8);
-	lnode_create_append (Thead, t);
+	lnode_create_append (tldstatlist, t);
+	LoadStatistic (&t->users, "TLD", "???", "users");
+	LoadTLDStats ();
 }
 
-/** @brief FiniTLD
+/** @brief FiniTLDStatistics
  *
  *  Clean up TLD lists
  *
@@ -200,11 +246,12 @@ void InitTLD(void)
  *
  *  @return none
  */
-void FiniTLD(void) 
+void FiniTLDStatistics(void) 
 {
+	SaveTLDStats ();
 	if (gi) {
 		GeoIP_delete (gi);
 		gi = NULL;
 	}
-	list_destroy_auto (Thead);
+	list_destroy_auto (tldstatlist);
 }

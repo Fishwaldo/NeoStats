@@ -57,6 +57,11 @@ int InitCurl(void)
 	return NS_SUCCESS;
 }
 
+void FiniCurl(void) 
+{
+	list_destroy_auto (activetransfers);
+}
+
 static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, void *stream) 
 {
 	size_t writesize;

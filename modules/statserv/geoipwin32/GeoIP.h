@@ -155,4 +155,6 @@ GEOIP_API unsigned long _addr_to_num (const char *addr);
 }
 #endif
 
+void _setup_dbfilename();
+
 #endif /* GEOIP_H */

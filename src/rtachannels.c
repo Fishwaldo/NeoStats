@@ -25,6 +25,7 @@
 
 #include "neostats.h"
 #include "rta.h"
+#include "channels.h"
 
 static char chanusers[BUFSIZE*10];
 void *display_chanusers (void *tbl, char *col, char *sql, void *row) 
@@ -32,15 +33,15 @@ void *display_chanusers (void *tbl, char *col, char *sql, void *row)
 	Channel *c = row;
 	lnode_t *cmn;
 	char final[BUFSIZE*2];
- 	Chanmem *cm;
+ 	ChannelMember *cm;
 	
 	chanusers[0] = '\0';
-	cmn = list_first (c->chanmembers);
+	cmn = list_first (c->ChannelMemberbers);
 	while (cmn) {
 		cm = lnode_get (cmn);
 		ircsnprintf(final, BUFSIZE*2, "%s %s%s,", CmodeMaskToString (cm->flags), CmodeMaskToPrefixString (cm->flags), cm->nick);
 		strlcat(chanusers, final, BUFSIZE*10);
-		cmn = list_next (c->chanmembers, cmn);
+		cmn = list_next (c->ChannelMemberbers, cmn);
 	}
 	return chanusers;
 }
@@ -106,7 +107,7 @@ COLDEF neo_chanscols[] = {
 		"users",
 		RTA_STR,
 		BUFSIZE*10,
-		offsetof(struct Channel, chanmembers),
+		offsetof(struct Channel, ChannelMemberbers),
 		RTA_READONLY,
 		display_chanusers,
 		NULL,

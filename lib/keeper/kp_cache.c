@@ -53,7 +53,7 @@ static void kp_free_keys(kp_key * k)
 	while (k != NULL) {
 		nextk = k->next;
 		kp_value_destroy(k);
-		free(k);
+		ns_free(k);
 		k = nextk;
 	}
 }
@@ -109,9 +109,9 @@ static void kp_free_file(kp_fil * fil)
 #ifdef KPDEBUG
 	printf("kp_free_file: %s\n", fil->kpp.path);
 #endif
-	free(fil->kpp.path);
+	ns_free(fil->kpp.path);
 	kp_free_keys(fil->keys);
-	free(fil);
+	ns_free(fil);
 }
 
 /* ------------------------------------------------------------------------- 
@@ -533,7 +533,7 @@ static int kp_get_subkeys_file(kp_path * kpp, const char *keyname,
 			*s = '\0';
 
 			_kp_add_subkey_check(keys, ent);
-			free(ent);
+			ns_free(ent);
 
 			found = 1;
 		}

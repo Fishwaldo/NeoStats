@@ -324,7 +324,7 @@ config_parse (FILE * config)
 					int i;
 					for (i = 0; i < word_count; i++) {	/* prepare list */
 						config_substitute_env (values[i]);
-						data[i] = strdup (values[i]);
+						data[i] = sstrdup (values[i]);
 					}
 					opt.callback (data, word_count, USER_DATA);
 

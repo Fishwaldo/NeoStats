@@ -8,6 +8,7 @@
 
 */
 
+#include "neostats.h"
 #include <dirent.h>
 #include <errno.h>
 #include <io.h> /* _findfirst and _findnext set errno iff they return -1 */
@@ -37,8 +38,8 @@ DIR *opendir(const char *name)
         const char *all = /* search pattern must end with suitable wildcard */
             strchr("/\\", name[base_length - 1]) ? "*" : "/*";
 
-        if((dir = (DIR *) malloc(sizeof *dir)) != 0 &&
-           (dir->name = (char *) malloc(base_length + strlen(all) + 1)) != 0)
+        if((dir = (DIR *) ns_malloc(sizeof *dir)) != 0 &&
+           (dir->name = (char *) ns_malloc(base_length + strlen(all) + 1)) != 0)
         {
             strcat(strcpy(dir->name, name), all);
 
@@ -48,14 +49,14 @@ DIR *opendir(const char *name)
             }
             else /* rollback */
             {
-                free(dir->name);
-                free(dir);
+                ns_free(dir->name);
+                ns_free(dir);
                 dir = 0;
             }
         }
         else /* rollback */
         {
-            free(dir);
+            ns_free(dir);
             dir   = 0;
             errno = ENOMEM;
         }
@@ -79,8 +80,8 @@ int closedir(DIR *dir)
             result = _findclose(dir->handle);
         }
 
-        free(dir->name);
-        free(dir);
+        ns_free(dir->name);
+        ns_free(dir);
     }
 
     if(result == -1) /* map all errors to EBADF */

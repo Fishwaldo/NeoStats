@@ -21,16 +21,26 @@
 ** $Id$
 */
 
-#ifndef _EXCLUDE_H_
-#define _EXCLUDE_H_
+#ifndef _TLD_H_
+#define _TLD_H_
 
-int InitExcludes(void);
-void FiniExcludes(void);
-int ns_cmd_exclude_add (CmdParams* cmdparams);
-int ns_cmd_exclude_del (CmdParams* cmdparams);
-int ns_cmd_exclude_list (CmdParams* cmdparams);
-void ns_do_exclude_chan(Channel *c);
-void ns_do_exclude_server(Client *s);
-void ns_do_exclude_user(Client *u);
+typedef struct TLD {
+	char tld[5];
+	char country[32];
+	statistic users;
+}TLD;
 
-#endif /* _EXCLUDE_H_ */
+typedef void (*TLDStatHandler) (TLD *tld, void *v);
+
+extern list_t *tldstatlist;
+
+void DelTLDUser (Client * u);
+int ss_cmd_tldmap (CmdParams *cmdparams);
+int ss_event_nickip (CmdParams *cmdparams);
+void InitTLDStatistics (void);
+void FiniTLDStatistics (void);
+void GetTLDStats (TLDStatHandler handler, void *v);
+void AverageTLDStatistics (void);
+void ResetTLDStatistics (void);
+
+#endif /* _TLD_H_ */

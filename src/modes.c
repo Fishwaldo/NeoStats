@@ -610,7 +610,7 @@ int ChanMode (char *origin, char **av, int ac)
 void
 ChanUserMode (const char *chan, const char *nick, int add, const unsigned int mask)
 {
-	Chanmem *cm;
+	ChannelMember *cm;
 	Channel *c;
 	Client *u;
 
@@ -624,7 +624,7 @@ ChanUserMode (const char *chan, const char *nick, int add, const unsigned int ma
 		nlog (LOG_WARNING, "ChanUserMode: can't find channel %s", chan);
 		return;
 	}
-	cm = lnode_find (c->chanmembers, u->name, comparef);
+	cm = lnode_find (c->ChannelMemberbers, u->name, comparef);
 	if (!cm) {
 		nlog (LOG_WARNING, "ChanUserMode: %s is not a member of channel %s", u->name, c->name);
 		return;

@@ -21,16 +21,10 @@
 ** $Id$
 */
 
-#ifndef _EXCLUDE_H_
-#define _EXCLUDE_H_
+#ifndef _HTMLSTATS_H_
+#define _HTMLSTATS_H_
 
-int InitExcludes(void);
-void FiniExcludes(void);
-int ns_cmd_exclude_add (CmdParams* cmdparams);
-int ns_cmd_exclude_del (CmdParams* cmdparams);
-int ns_cmd_exclude_list (CmdParams* cmdparams);
-void ns_do_exclude_chan(Channel *c);
-void ns_do_exclude_server(Client *s);
-void ns_do_exclude_user(Client *u);
+int ss_cmd_forcehtml (CmdParams *cmdparams);
+int ss_html (void);
 
-#endif /* _EXCLUDE_H_ */
+#endif /* _HTMLSTATS_H_ */

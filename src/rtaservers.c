@@ -24,6 +24,12 @@
 #include "neostats.h"
 #include "rta.h"
 
+void *display_server_users (void *tbl, char *col, char *sql, void *row) 
+{
+	Client *data = row;
+	return &data->server->users;
+}                        
+
 void *display_server_hops (void *tbl, char *col, char *sql, void *row) 
 {
 	Client *data = row;
@@ -59,6 +65,17 @@ COLDEF neo_serverscols[] = {
 		NULL,
 		"The Number of hops away from the NeoStats Server"
 	},
+	{
+		"servers",
+		"users",
+		RTA_INT,
+		sizeof(int),
+		0,
+		RTA_READONLY,
+		display_server_users, 
+		NULL,
+		"The Number of users on server"
+	},	
 	{
 		"servers",
 		"connected",
