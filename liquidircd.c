@@ -573,15 +573,15 @@ sburst_cmd (int b)
 }
 
 void
-chanalert (char *who, char *buf, ...)
+chanalert (char *who, char *fmt, ...)
 {
 	va_list ap;
 
 	if (!me.onchan)
 		return;
 
-	va_start (ap, buf);
-	ircvsnprintf (ircd_buf, BUFSIZE, buf, ap);
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 	sts (":%s PRIVMSG %s :%s", who, me.chan, ircd_buf);
 }
