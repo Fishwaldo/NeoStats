@@ -34,6 +34,7 @@
 #include "bots.h"
 #include "users.h"
 #include "ctcp.h"
+#include "modexclude.h"
 
 #define BOT_TABLE_SIZE		100		/* Max number of bots */
 
@@ -655,6 +656,9 @@ Bot *AddBot (BotInfo *botinfo)
 		add_bot_cmd_list (botptr, botinfo->bot_cmd_list);
 		add_bot_setting_list (botptr, botinfo->bot_setting_list);
 		add_bot_info_settings (botptr, botinfo);
+		if (botptr->moduleptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES) {
+			add_bot_cmd_list (botptr, mod_exclude_commands);
+		}
 	}
 	return botptr;
 }

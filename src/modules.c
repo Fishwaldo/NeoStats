@@ -34,6 +34,7 @@
 #include "users.h"
 #include "channels.h"
 #include "servers.h"
+#include "modexclude.h"
 
 /** @brief Module list
  * 
@@ -344,6 +345,10 @@ load_module (const char *modfilename, Client * u)
 		unload_module(mod_ptr->info->name, NULL);
 		return NULL;
 	}
+	if (info_ptr->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
+	{
+		ModInitExempts(mod_ptr);
+	}
 	SET_SEGV_LOCATION();
 
 	/* Let this module know we are online if we are! */
@@ -415,6 +420,10 @@ unload_module (const char *modname, Client * u)
 	if (mod_ptr->info->flags & MODULE_FLAG_AUTH)
 	{
 		DelAuthModule (mod_ptr);
+	}
+	if (mod_ptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
+	{
+		ModFiniExempts(mod_ptr);
 	}
 	moduleindex = mod_ptr->modnum;
 	/* canx any DNS queries used by this module */

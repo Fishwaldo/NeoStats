@@ -24,19 +24,18 @@
 /* @file global exclusion handling functions
  */
 
+/*  TODO:
+ *  - Combine appropriate functions with new module exclude API for
+ *    easier maintainance.
+ *  - Add check for existing exclusions during add
+ */
+
 #include "neostats.h"
 #include "exclude.h"
 #include "services.h"
 #include "ircstring.h"
 
 static list_t *exclude_list;
-
-typedef struct Exclude {
-	NS_EXCLUDE type;
-	char pattern[MAXHOST]; /* because hostname is the biggest this can get */
-	char addedby[MAXNICK];
-	time_t addedon;
-} Exclude;
 
 const char* ExcludeDesc[NS_EXCLUDE_MAX] = {
 	"Host",
@@ -73,54 +72,57 @@ void FiniExcludes(void)
 /* @brief add a entry to the exlusion list
  * 
  * @param u the user that sent the request
- * @param type the type of exclusion being added. Chan, Host or Server
+ * @param type the type of exclusion being added. Channel, Host or Server
  * @param pattern the actual pattern to use 
  * @returns nothing
  */
 int ns_cmd_exclude_add(CmdParams* cmdparams) 
 {
+	NS_EXCLUDE type;
+	char *buf;
 	Exclude *e;
 	
-	if (cmdparams->ac < 3) {
+	if (cmdparams->ac < 4) {
 		return NS_ERR_NEED_MORE_PARAMS;
 	}
 	/* we dont do any checking to see if a similar entry already exists... oh well, thats upto the user */
-	e = ns_calloc (sizeof(Exclude));
-	strlcpy(e->addedby, cmdparams->source->name, MAXNICK);
-	e->addedon = me.now;
+
 	if (!ircstrcasecmp("HOST", cmdparams->av[1])) {
 		if (!index(cmdparams->av[2], '.')) {
-			irc_prefmsg(ns_botptr, cmdparams->source, __("Error, Pattern must contain at least one \2.\2",cmdparams->source));
-			ns_free(e);
+			irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid host name");
 			return NS_SUCCESS;
 		}
-		e->type = NS_EXCLUDE_HOST;
-		strlcpy(e->pattern, collapse(cmdparams->av[2]), MAXHOST);
+		type = NS_EXCLUDE_HOST;
 	} else if (!ircstrcasecmp("CHANNEL", cmdparams->av[1])) {
 		if (cmdparams->av[2][0] != '#') {
-			irc_prefmsg(ns_botptr, cmdparams->source, __("Error, Pattern must begin with a \2#\2", cmdparams->source));
-			ns_free(e);
+			irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid channel name");
 			return NS_SUCCESS;
 		}
-		e->type = NS_EXCLUDE_CHANNEL;
-		strlcpy(e->pattern, collapse(cmdparams->av[2]), MAXHOST);
+		type = NS_EXCLUDE_CHANNEL;
 	} else if (!ircstrcasecmp("SERVER", cmdparams->av[1])) {
 		if (!index(cmdparams->av[2], '.')) {
-			irc_prefmsg(ns_botptr, cmdparams->source, __("Error, Pattern must contain at least one \2.\2", cmdparams->source));
-			ns_free(e);
+			irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid host name");
 			return NS_SUCCESS;
 		}
-		e->type = NS_EXCLUDE_SERVER;
-		strlcpy(e->pattern, collapse(cmdparams->av[2]), MAXHOST);
+		type = NS_EXCLUDE_SERVER;
 	} else {
-		irc_prefmsg(ns_botptr, cmdparams->source, __("Error, Unknown type %s",cmdparams->source), cmdparams->av[1]);
-		ns_free(e);
+		irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid exclude type");
 		return NS_SUCCESS;
 	}
+	e = ns_calloc (sizeof(Exclude));
+	e->type = type;
+	e->addedon = me.now;
+	strlcpy(e->pattern, collapse(cmdparams->av[2]), MAXHOST);
+	strlcpy(e->addedby, cmdparams->source->name, MAXNICK);
+	buf = joinbuf(cmdparams->av, cmdparams->ac, 3);
+	strlcpy(e->reason, buf, MAXREASON);
+	ns_free (buf);
 	/* if we get here, then e is valid */
 	lnode_create_append (exclude_list, e);
-	irc_prefmsg(ns_botptr, cmdparams->source, __("Added %s (%s) to exclusion list", cmdparams->source), e->pattern, cmdparams->av[1]);
-	irc_chanalert(ns_botptr, _("%s added %s (%s) to the exclusion list"), cmdparams->source->name, e->pattern, cmdparams->av[1]);
+	irc_prefmsg(cmdparams->bot, cmdparams->source, __("Added %s (%s) to exclusion list", cmdparams->source), e->pattern, cmdparams->av[1]);
+	if (nsconfig.cmdreport) {
+		irc_chanalert(cmdparams->bot, _("%s added %s (%s) to the exclusion list"), cmdparams->source->name, e->pattern, cmdparams->av[1]);
+	}
 	/* now save the exclusion list */
 	DBAStore ("exclusions", e->pattern, (void *)e, sizeof (Exclude));
 	return NS_SUCCESS;
@@ -145,7 +147,7 @@ int ns_cmd_exclude_del(CmdParams* cmdparams)
 		e = lnode_get(en);
 		if (ircstrcasecmp (e->pattern, cmdparams->av[1]) == 0) { 
 			DBADelete ("exclusions", e->pattern);
-			irc_prefmsg(ns_botptr, cmdparams->source, __("%s delete from exclusion list",cmdparams->source), e->pattern);
+			irc_prefmsg(cmdparams->bot, cmdparams->source, __("%s delete from exclusion list",cmdparams->source), e->pattern);
 			ns_free(e);
 			list_delete(exclude_list, en);
 			lnode_destroy(en);
@@ -154,7 +156,7 @@ int ns_cmd_exclude_del(CmdParams* cmdparams)
 		en = list_next(exclude_list, en);
 	}
 	/* if we get here, means that we never got a match */
-	irc_prefmsg(ns_botptr, cmdparams->source, __("%s not found in the exclusion list",cmdparams->source), cmdparams->av[1]);
+	irc_prefmsg(cmdparams->bot, cmdparams->source, __("%s not found in the exclusion list",cmdparams->source), cmdparams->av[1]);
 	return NS_SUCCESS;
 } 
 
@@ -169,14 +171,14 @@ int ns_cmd_exclude_list(CmdParams* cmdparams)
 	lnode_t *en;
 	Exclude *e;
 	
-	irc_prefmsg(ns_botptr, cmdparams->source, __("Global exclusion list:", cmdparams->source));
+	irc_prefmsg(cmdparams->bot, cmdparams->source, __("Global exclusion list:", cmdparams->source));
 	en = list_first(exclude_list);
 	while (en != NULL) {
 		e = lnode_get(en);			
-		irc_prefmsg(ns_botptr, cmdparams->source, __("%s (%s) Added by %s on %s", cmdparams->source), e->pattern, ExcludeDesc[e->type], e->addedby, sftime(e->addedon));
+		irc_prefmsg(cmdparams->bot, cmdparams->source, __("%s (%s) Added by %s on %s", cmdparams->source), e->pattern, ExcludeDesc[e->type], e->addedby, sftime(e->addedon));
 		en = list_next(exclude_list, en);
 	}
-	irc_prefmsg(ns_botptr, cmdparams->source, __("End of list.", cmdparams->source));
+	irc_prefmsg(cmdparams->bot, cmdparams->source, __("End of list.", cmdparams->source));
 	return NS_SUCCESS;
 } 
 

@@ -32,7 +32,7 @@ const char ns_help_reload_oneline[]="Reload NeoStats";
 const char ns_help_load_oneline[]="Load module";
 const char ns_help_unload_oneline[]="Unload module";
 const char ns_help_jupe_oneline[]="Jupiter a server";
-const char ns_help_exclude_oneline[]="Maintain global exclusions";
+const char ns_help_exclude_oneline[]="Maintain exclusion list";
 #ifdef USE_RAW
 const char ns_help_raw_oneline[]="Send a raw command";
 #endif
@@ -71,27 +71,22 @@ const char *ns_help_jupe[] = {
 };
 
 const char *ns_help_exclude[] = {
-	"Syntax: \2EXCLUDE \37<ADD> <HOST/SERVER/CHAN> <pattern>\37\2",
-	"        \2EXCLUDE \37<DEL> <position>\37\2",
+	"Syntax: \2EXCLUDE \37<ADD> <HOST|SERVER|CHANNEL> <pattern> <reason>\37\2",
+	"        \2EXCLUDE \37<DEL> <pattern>\37\2",
 	"        \2EXCLUDE \37<LIST>\37\2",
 	"",
-	"This command is to maintain the global exclusion lists, which the NeoStats",
-	"modules can take advantage of, and means you only have to maintain",
-	"one exclusion list, rather than many exclusion lists",
-	"The Syntax is:",
-	"\2EXCLUDE ADD <HOST/SERVER/CHAN> <pattern>\2",
+	"Maintin the exclustion list. Exception lists are used to exclude",
+	"channels, users, or servers from scanning.",
+	"\2ADD <HOST|SERVER|CHANNEL> <pattern> <reason>\2",
 	"Add a new exclusion to the list, matching either a hostname of a client",
 	"or a servername, or a channel name",
-	"\2EXCLUDE DEL <position>\2",
+	"Reason allows you to set a reason for the exclusion for future reference",
+	"Wildcards such as * and ? may be used in the pattern.",
+	"\2EXCLUDE DEL <pattern>\2",
 	"Delete a entry from the exclusion list.",
-	"Deleting a entry will only take effect for newly connected clients or created channels",
 	"\2EXCLUDE LIST\2",
-	"List the current Exclusions that are active",
+	"List the current exclusions",
 	"",
-	"\2Please Note:\2",
-	"Not all modules may take advantage of the global exclusion lists. Currently, all core",
-	"modules do, but you should consult the documentation of any 3rd party module you use",
-	"to see if it supports the global exlusions",
 	NULL
 };
 

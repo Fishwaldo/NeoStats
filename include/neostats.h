@@ -830,11 +830,11 @@ typedef struct ModuleEvent {
 
 typedef int ModuleProtocol;
 typedef int ModuleFeatures;
+typedef int ModuleFlags;
 
-typedef enum ModuleFlags {
-	MODULE_FLAG_NONE = 0,
-	MODULE_FLAG_AUTH
-} ModuleFlags;
+#define MODULE_FLAG_NONE			0x00000000
+#define MODULE_FLAG_AUTH			0x00000001
+#define MODULE_FLAG_LOCAL_EXCLUDES	0x00000002
 
 /** @brief Module Info structure
  *	This describes the module to the NeoStats core and provides information
@@ -1206,6 +1206,10 @@ EXPORTFUNC int new_transfer(char *url, char *params, NS_TRANSFER savetofileormem
 /* Has NeoStats issued a SETHOST for this user? */
 #define IsUserSetHosted(x)  ((x) && ((x)->flags & CLIENT_FLAG_SETHOST))
 
+EXPORTFUNC int ModIsServerExempt(Client *s);
+EXPORTFUNC int ModIsUserExempt(Client *u);
+EXPORTFUNC int ModIsChanExempt(Channel *c);
+
 EXPORTFUNC int validate_nick (char *nick);
 EXPORTFUNC int validate_user (char *username);
 EXPORTFUNC int validate_host (char *hostname);
@@ -1396,6 +1400,9 @@ MODULEFUNC void ModFini (void);
 MODULEVAR extern ModuleEvent module_events[];  
 /* Module Auth Interface */
 MODULEFUNC int ModAuthUser (Client *u);
+
+EXPORTFUNC int ModIsUserExempt(Client *u);
+EXPORTFUNC int ModIsChanExempt(Channel *c);
 
 EXPORTFUNC void *AllocChannelModPtr (Channel* c, int size);
 EXPORTFUNC void FreeChannelModPtr (Channel *c);

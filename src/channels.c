@@ -22,9 +22,7 @@
 */
 
 /*  TODO:
- *  - Change member lists to user Client struct pointers rather than nicks to
- *    save a little CPU by reducing string ops and removing the need to process
- *    channel nick changes. Also change to use a hash rather than a list.
+ *  - 
  */
 
 #include "neostats.h"

@@ -24,6 +24,16 @@
 #ifndef _EXCLUDE_H_
 #define _EXCLUDE_H_
 
+#define MAXREASON		128
+
+typedef struct Exclude {
+	NS_EXCLUDE type;
+	char pattern[MAXHOST];
+	char addedby[MAXNICK];
+	char reason[MAXREASON];
+	time_t addedon;
+} Exclude;
+
 int InitExcludes(void);
 void FiniExcludes(void);
 int ns_cmd_exclude_add (CmdParams* cmdparams);
@@ -32,5 +42,7 @@ int ns_cmd_exclude_list (CmdParams* cmdparams);
 void ns_do_exclude_chan(Channel *c);
 void ns_do_exclude_server(Client *s);
 void ns_do_exclude_user(Client *u);
+
+extern const char* ExcludeDesc[NS_EXCLUDE_MAX];
 
 #endif /* _EXCLUDE_H_ */
