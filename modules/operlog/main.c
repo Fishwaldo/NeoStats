@@ -31,6 +31,7 @@ static int operlog_event_wallops( CmdParams *cmdparams );
 static int operlog_event_localkill( CmdParams *cmdparams );
 static int operlog_event_globalkill( CmdParams *cmdparams );
 static int operlog_event_serverkill( CmdParams *cmdparams );
+static int operlog_event_umode( CmdParams *cmdparams );
 
 /** Bot pointer */
 static Bot *operlog_bot;
@@ -87,6 +88,7 @@ ModuleEvent module_events[] =
 	{EVENT_LOCALKILL,	operlog_event_localkill },
 	{EVENT_GLOBALKILL,	operlog_event_globalkill },
 	{EVENT_SERVERKILL,	operlog_event_serverkill },
+	{EVENT_UMODE,		operlog_event_umode },	
 	{EVENT_NULL,		NULL}
 };
 
@@ -248,3 +250,40 @@ static int operlog_event_serverkill( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
+/** @brief operlog_event_mode
+ *
+ *  mode handler
+ *  log operator mode
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int operlog_event_umode(CmdParams *cmdparams)
+{
+	int add = 1;
+	char *modes = cmdparams->param;
+
+	SET_SEGV_LOCATION();
+	while (*modes) {
+		switch (*modes) {
+		case '+':
+			add = 1;
+			break;
+		case '-':
+			add = 0;
+			break;
+		case 'O':
+		case 'o':
+			if (add) {
+				nlog( LOG_NOTICE, "OPER: %s is now an IRC Operator", cmdparams->source->name );
+			}
+			break;
+		default:
+			break;
+		}
+		modes++;
+	}
+	return NS_SUCCESS;
+}
