@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Unreal.c,v 1.32 2003/01/13 07:20:53 fishwaldo Exp $
+** $Id: Unreal.c,v 1.33 2003/01/15 14:18:47 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -306,7 +306,8 @@ int ssvskill_cmd(const char *target, const char *reason, ...) {
 		sts(":%s %s %s :%s", me.name, (me.token ? TOK_SVSKILL : MSG_SVSKILL), target, buf);
 		AddStringToList(&av, u->nick, &ac);
 		Module_Event("KILL", av, ac);
-		FreeList(av, ac);
+		free(av);
+\\		FreeList(av, ac);
 		DelUser(target);
 		va_end(ap);
 		return 1;

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.h,v 1.24 2002/09/04 08:40:26 fishwaldo Exp $
+** $Id: dl.h,v 1.25 2003/01/15 14:18:47 fishwaldo Exp $
 */
 
 
@@ -52,11 +52,11 @@ extern char *sftime(time_t);
 struct sock_list_struct {
 	long hash;
 	int sock_no;
-	char *sockname;
+	char sockname[MAXHOST];
 	int (*readfnc)(int sock_no, char *sockname);
 	int (*writefnc)(int sock_no, char *sockname);
 	int (*errfnc)(int sock_no, char *sockname);
-	char *modname;
+	char modname[MAXHOST];
 	long rmsgs;
 	long rbytes;
 };
@@ -65,8 +65,8 @@ hash_t *sockh;
 
 struct mod_timer_list {
 	long hash;
-	char *modname;
-	char *timername;
+	char modname[MAXHOST];
+	char timername[MAXHOST];
 	int interval;
 	time_t lastrun;
 	int (*function)();
@@ -76,8 +76,8 @@ hash_t *th;
 
 struct mod_user_list {
 	long hash;
-	char *nick;
-	char *modname;
+	char nick[MAXNICK];
+	char modname[MAXHOST];
 	int (*function)(char *origin, char **av, int ac);
 	int (*chanfunc)(char *origin, char *chan, char **av, int ac);
 	hash_t *chanlist;
@@ -87,7 +87,7 @@ typedef struct mod_user_list Mod_User;
 hash_t *bh;
 
 struct _chan_bot_list {
-	char *chan;
+	char chan[CHANLEN];
 	list_t *bots;
 };
 

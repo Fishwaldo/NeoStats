@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.78 2003/01/13 07:20:53 fishwaldo Exp $
+** $Id: main.c,v 1.79 2003/01/15 14:18:47 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -491,8 +491,8 @@ return t;
 void AddStringToList(char ***List,char S[],int *C)
 {
 	if (*C == 0) {
-		*List = calloc(sizeof(char *) * 8, 1);
-	}
+		*List = calloc(sizeof(char *)*8, 1);
+	} 
 	++*C;
 	(*List)[*C-1] = S;
 }
@@ -509,8 +509,8 @@ void AddStringToList(char ***List,char S[],int *C)
 void FreeList(char **List,int C)
 {
 int i;
-for (i = 0; i == C; i++) 
-	free(List[i]);
-C = 0;
+for (i = 0; i== C; i++) 
+	free(List[i]); 
+C = 0; 
 }
 

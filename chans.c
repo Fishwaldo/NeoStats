@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.38 2003/01/13 07:20:53 fishwaldo Exp $
+** $Id: chans.c,v 1.39 2003/01/15 14:18:47 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -64,7 +64,8 @@ extern void Change_Topic(char *owner, Chans *c, time_t time, char *topic) {
 	AddStringToList(&av, owner, &ac);
 	AddStringToList(&av, topic, &ac);
 	Module_Event("TOPICCHANGE",av, ac);
-	FreeList(av, ac);
+	free(av);
+//	FreeList(av, ac);
 }
 /** @brief Compare channel modes from the channel hash
  *
@@ -346,7 +347,9 @@ void part_chan(User *u, char *chan) {
 			AddStringToList(&av, c->name, &ac);
 			AddStringToList(&av, u->nick, &ac);
 			Module_Event("PARTCHAN", av, ac);
-			FreeList(av, ac);
+			free(av);
+			ac = 0;
+//			FreeList(av, ac);
 			c->cur_users--;
 		}
 #ifdef DEBUG
@@ -355,7 +358,9 @@ void part_chan(User *u, char *chan) {
 		if (c->cur_users <= 0) {
 			AddStringToList(&av, c->name, &ac);
 			Module_Event("DELCHAN", av, ac);
-			FreeList(av, ac);
+			free(av);
+			ac = 0;
+//			FreeList(av, ac);
 			del_chan(c);
 		}
 		un = list_find(u->chans, c->name, comparef);
@@ -458,7 +463,9 @@ void join_chan(User *u, char *chan) {
 		c->modes = 0;
 		AddStringToList(&av, c->name, &ac);
 		Module_Event("NEWCHAN", av, ac);
-		FreeList(av, ac);
+		free(av);
+		ac = 0;
+//		FreeList(av, ac);
 	}
 	/* add this users details to the channel members hash */	
 	cm = smalloc(sizeof(Chanmem));
@@ -493,7 +500,8 @@ void join_chan(User *u, char *chan) {
 	AddStringToList(&av, c->name, &ac);
 	AddStringToList(&av, u->nick, &ac);
 	Module_Event("JOINCHAN", av, ac);
-	FreeList(av, ac);
+	free(av);
+//	FreeList(av, ac);
 #ifdef DEBUG
 	log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
 #endif

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.59 2003/01/07 13:23:14 fishwaldo Exp $
+** $Id: statserv.c,v 1.60 2003/01/15 14:18:47 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -192,7 +192,9 @@ void _init() {
 		ac = 0;
 		AddStringToList(&av, ss->name, &ac);
 		s_new_server(av, ac);
-		FreeList(av, ac);
+		free(av);
+		ac = 0;
+//		FreeList(av, ac);
 #ifdef DEBUG
 		log("Added Server %s to StatServ List", ss->name);
 #endif
@@ -205,7 +207,9 @@ void _init() {
 		s_new_user(av, ac);
 		AddStringToList(&av, u->modes, &ac);
 		s_user_modes(av, ac);
-		FreeList(av, ac);
+		free(av);
+		ac = 0;
+//		FreeList(av, ac);
 #ifdef DEBUG
 			log("Adduser user %s to StatServ List", u->nick);
 #endif
@@ -219,7 +223,9 @@ void _init() {
 		ac = 0;
 		AddStringToList(&av, c->name, &ac);
 		s_chan_new(av, ac);
-		FreeList(av, ac);
+//		FreeList(av, ac);
+		free(av);
+		ac = 0;	
 		for (i = 1; i <= count; i++) {
 #ifdef DEBUG
 			log("Chanjoin %s", c->name);
@@ -228,7 +234,9 @@ void _init() {
 			AddStringToList(&av, c->name, &ac);
 			AddStringToList(&av, chan, &ac);
 			s_chan_join(av, ac);
-			FreeList(av, ac);
+			free(av);
+			ac = 0;
+//			FreeList(av, ac);
 			if (i < count) {
 				chanmem = list_next(c->chanmembers, chanmem);
 				chan = lnode_get(chanmem);

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: database.c,v 1.9 2002/09/04 08:40:29 fishwaldo Exp $
+** $Id: database.c,v 1.10 2003/01/15 14:18:47 fishwaldo Exp $
 */
 
 
@@ -191,7 +191,6 @@ void LoadStats()
     topics = malloc(BUFSIZE);
     totmem = malloc(BUFSIZE);
     kicks = malloc(BUFSIZE);
-    joins = malloc(BUFSIZE);
     lastseen = malloc(BUFSIZE);
     maxmems = malloc(BUFSIZE);
     t_maxmems = malloc(BUFSIZE);
@@ -201,6 +200,7 @@ void LoadStats()
     t_maxjoins = malloc(BUFSIZE);
     while (fgets(buf, BUFSIZE, fp)) {
         c = malloc(sizeof(CStats));
+
         count = sscanf(buf, "%s %s %s %s %s %s %s %s %s %s %s\n", name, topics, totmem, kicks, lastseen, maxmems, t_maxmems, maxkicks, t_maxkicks, maxjoins, t_maxjoins);
         strcpy(c->name, name);
         c->topics = atol(topics);
@@ -227,22 +227,24 @@ void LoadStats()
 			list_append(Chead, cn);
 		} else {
 			log("Deleting Old Channel %s", c->name);
+			lnode_destroy(cn);
+			free(c);
 		}
+	free(name);
+   	free(topics);
+   	free(totmem);
+   	free(kicks);
+   	free(lastseen);
+   	free(maxmems);
+   	free(t_maxmems);
+   	free(maxkicks);
+   	free(t_maxkicks);
+   	free(maxjoins);
+   	free(t_maxjoins);
+
 	}
     }    
    fclose(fp);    
-   free(name);
-   free(topics);
-   free(totmem);
-   free(kicks);
-   free(joins);
-   free(lastseen);
-   free(maxmems);
-   free(t_maxmems);
-   free(maxkicks);
-   free(t_maxkicks);
-   free(maxjoins);
-   free(t_maxjoins);
     
 
 

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.46 2002/12/30 12:09:38 fishwaldo Exp $
+** $Id: dl.c,v 1.47 2003/01/15 14:18:47 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -57,7 +57,7 @@ static Mod_Timer *new_timer(char *timer_name)
 	t = smalloc(sizeof(Mod_Timer));
 	if (!timer_name)
 		timer_name="";
-	t->timername = timer_name;	
+	strncpy(t->timername, timer_name, MAXHOST);	
 	tn = hnode_create(t);
 	if (hash_isfull(th)) {
 		log("new_timer(): Couldn't add new Timer, Hash is Full!");
@@ -89,7 +89,7 @@ int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interva
 	Mod_timer_list = new_timer(timer_name);
 	Mod_timer_list->interval = interval;
 	Mod_timer_list->lastrun = time(NULL);
-	Mod_timer_list->modname = sstrdup(mod_name);
+	strncpy(Mod_timer_list->modname, mod_name, MAXHOST);
 	Mod_timer_list->function = dlsym((int *)get_dl_handle(mod_name), func_name);
 	log("Registered Module %s with timer for Function %s", mod_name, func_name);
 	return 1;
@@ -144,7 +144,7 @@ static Sock_List *new_sock(char *sock_name)
 	s = smalloc(sizeof(Sock_List));
 	if (!sock_name)
 		sock_name="";
-	s->sockname = sstrdup(sock_name);
+	strncpy(s->sockname, sock_name, MAXHOST);
 	sn = hnode_create(s);
 	if (hash_isfull(sockh)) {
 		log("Eeek, SocketHash is full, can not add a new socket");
@@ -188,7 +188,7 @@ int add_socket(char *readfunc, char *writefunc, char *errfunc, char *sock_name, 
 	}	
 	Sockets_mod_list = new_sock(sock_name);
 	Sockets_mod_list->sock_no = socknum;
-	Sockets_mod_list->modname = sstrdup(mod_name);
+	strncpy(Sockets_mod_list->modname, mod_name, MAXHOST);
 	Sockets_mod_list->readfnc = dlsym((int *)get_dl_handle(mod_name), readfunc);
 	Sockets_mod_list->writefnc = dlsym((int *)get_dl_handle(mod_name), writefunc);
 	Sockets_mod_list->errfnc = dlsym((int *)get_dl_handle(mod_name), errfunc);
@@ -243,7 +243,7 @@ extern void add_bot_to_chan(char *bot, char *chan) {
 	cbn = hash_lookup(bch, chan);
 	if (!cbn) {
 		bc = malloc(sizeof(Chan_Bot));
-		bc->chan = sstrdup(chan);
+		strncpy(bc->chan, chan, CHANLEN);
 		bc->bots = list_create(B_TABLE_SIZE);
 		cbn = hnode_create(bc);
 		if (hash_isfull(bch)) {
@@ -280,12 +280,11 @@ extern void del_bot_from_chan(char *bot, char *chan) {
 		return;
 	}
 	list_delete(bc->bots, bmn);
-	
+	free(lnode_get(bmn));
 	if (list_isempty(bc->bots)) {
 	/* delete the hash and list because its all over */
 		hash_delete(bch, cbn);
 		list_destroy(bc->bots);
-		free(lnode_get(bmn));
 		lnode_destroy(bmn);
 		free(bc->chan);
 		hnode_destroy(cbn);
@@ -348,7 +347,7 @@ static Mod_User *new_bot(char *bot_name)
 	u = smalloc(sizeof(Mod_User));
 	if (!bot_name)
 		bot_name="";
-	u->nick = sstrdup(bot_name);	
+	strncpy(u->nick, bot_name, MAXNICK);
 	u->chanlist = hash_create(C_TABLE_SIZE, 0, 0);
 	bn = hnode_create(u);
 	if (hash_isfull(bh)) {
@@ -369,8 +368,8 @@ int add_mod_user(char *nick, char *mod_name) {
 
 	Mod_Usr_list = new_bot(nick);
 	/* add a brand new user */
-	Mod_Usr_list->nick = sstrdup(nick);
-	Mod_Usr_list->modname = sstrdup(mod_name);
+	strncpy(Mod_Usr_list->nick, nick, MAXNICK);
+	strncpy(Mod_Usr_list->modname, mod_name, MAXHOST);
 	
 	mn = hash_lookup(mh, mod_name);
 	if (mn) {
@@ -442,8 +441,8 @@ int bot_nick_change(char *oldnick, char *newnick)
 		
 			/* add a brand new user */
 			
-			mod_tmp->nick = sstrdup(newnick);
-			mod_tmp->modname = sstrdup(mod_ptr->modname);
+			strncpy(mod_tmp->nick, newnick, MAXNICK);
+			strncpy(mod_tmp->modname, mod_ptr->modname, MAXHOST);
 			mod_tmp->function = mod_ptr->function;
 			
 			/* Now Delete the Old bot nick */
@@ -489,7 +488,7 @@ int load_module(char *path1, User *u) {
 #endif
 	void *dl_handle;
 	int do_msg;
-	char *path = NULL;
+	char path[255];
 	char p[255];
 	char **av;
 	int ac = 0;
@@ -509,9 +508,7 @@ int load_module(char *path1, User *u) {
 	} else {
 		do_msg = 1;
 	}
-	path = sstrdup(path1);
-	path = strcat(path,".so");
-
+	snprintf(path, 255, "%s.so", path1);
 	dl_handle = dlopen(path, RTLD_NOW || RTLD_GLOBAL); 
 	if (!dl_handle) {
 		snprintf(p, 255, "%s/%s", me.modpath, path);
@@ -601,7 +598,8 @@ int load_module(char *path1, User *u) {
 			if (!strcasecmp(event_fn_ptr->cmd_name, "ONLINE")) {
 				AddStringToList(&av, me.s->name, &ac);
 				event_fn_ptr->function(av, ac);
-				FreeList(av, ac);
+				free(av);
+//				FreeList(av, ac);
 				break;
 			}
 			event_fn_ptr++;

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.106 2003/01/13 07:20:53 fishwaldo Exp $
+** $Id: ircd.c,v 1.107 2003/01/15 14:18:47 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -326,7 +326,8 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 #endif /* ultimate3 */
 	AddStringToList(&av, nick, &ac);
 	Module_Event("SIGNON", av, ac);
-	FreeList(av, ac);
+	free(av);
+//	FreeList(av, ac);
 	return 1;
 }
 
@@ -346,7 +347,8 @@ int del_bot(char *nick, char *reason)
 	}
 	AddStringToList(&av, nick, &ac);
 	Module_Event("SIGNOFF", av, ac);
-	FreeList(av, ac);
+	free(av);
+//	FreeList(av, ac);
 	squit_cmd(nick, reason);
 	del_mod_user(nick);
 	return 1;
@@ -679,10 +681,13 @@ void init_ServBot()
 	me.onchan = 1;
 	AddStringToList(&av, me.uplink, &ac);
 	Module_Event("ONLINE", av, ac);
-	FreeList(av, ac);
+	free(av);
+	ac = 0;
+//	FreeList(av, ac);
 	AddStringToList(&av, s_Services, &ac);
 	Module_Event("SIGNON", av, ac);
-	FreeList(av, ac);
+	free(av);
+//	FreeList(av, ac);
 	
 }
 
@@ -893,14 +898,16 @@ void Usr_AddServer(char *origin, char **argv, int argc){
 	AddServer(argv[0],origin,atoi(argv[1]));
 	AddStringToList(&av, argv[0], &ac);
 	Module_Event("NEWSERVER", av, ac);
-	FreeList(av, ac);
+	free(av);
+//	FreeList(av, ac);
 }
 void Usr_DelServer(char *origin, char **argv, int argc){
 	char **av;
 	int ac = 0;
 	AddStringToList(&av, argv[0], &ac);
 	Module_Event("DELSERVER", av, ac);
-	FreeList(av, ac);
+	free(av);
+//	FreeList(av, ac);
 	DelServer(argv[0]);
 }
 void Usr_DelUser(char *origin, char **argv, int argc) {
@@ -908,7 +915,8 @@ void Usr_DelUser(char *origin, char **argv, int argc) {
 	int ac = 0;
 	AddStringToList(&av, origin, &ac);
 	Module_Event("SIGNOFF", av, ac);
-	FreeList(av, ac);
+	free(av);
+//	FreeList(av, ac);
 	DelUser(origin);
 }
 void Usr_Smode(char *origin, char **argv, int argc) {
@@ -930,7 +938,8 @@ void Usr_Smode(char *origin, char **argv, int argc) {
 	/* its a channel svsmode change */
 		ChanMode(origin, argv, argc);
 	}
-	FreeList(av, ac);
+	free(av);
+//	FreeList(av, ac);
 }
 void Usr_Mode(char *origin, char **argv, int argc) {
 	char **av;
@@ -947,7 +956,8 @@ void Usr_Mode(char *origin, char **argv, int argc) {
 		AddStringToList(&av, argv[0], &ac);
 		AddStringToList(&av, argv[1], &ac);
 		Module_Event("UMODE", av, ac);
-		FreeList(av, ac);
+		free(av);
+//		FreeList(av, ac);
 	} else {
 		ChanMode(origin, argv, argc);
 	}	
@@ -962,7 +972,8 @@ void Usr_Kill(char *origin, char **argv, int argc) {
 	if (mod_ptr) { /* Oh Oh, one of our Bots has been Killed off! */
 		AddStringToList(&av, argv[0], &ac);
 		Module_Event("BOTKILL", av, ac);
-		FreeList(av, ac);
+		free(av);
+//		FreeList(av, ac);
 		DelUser(argv[0]);
 		return;
 	}
@@ -970,7 +981,8 @@ void Usr_Kill(char *origin, char **argv, int argc) {
 	if (u) {
 		AddStringToList(&av, u->nick, &ac);
 		Module_Event("KILL", av, ac);
-		FreeList(av, ac);
+		free(av);
+//		FreeList(av, ac);
 		DelUser(argv[0]);
 	}
 }
@@ -1002,7 +1014,8 @@ void Usr_Pong(char *origin, char **argv, int argc) {
 			ping.ulag = me.s->ping;
 		AddStringToList(&av, argv[0], &ac);
 		Module_Event("PONG", av, ac);
-		FreeList(av, ac);
+		free(av);
+//		FreeList(av, ac);
 	} else {
 		log("Received PONG from unknown server: %s", argv[0]);
 	}
@@ -1020,7 +1033,8 @@ void Usr_Away(char *origin, char **argv, int argc) {
 			u->is_away = 1;
 			Module_Event("AWAY", av, ac);
 		}
-		FreeList(av, ac);
+		free(av);
+//		FreeList(av, ac);
 	} else {
 		log("Warning, Unable to find User %s for Away", origin);
 	}
@@ -1034,7 +1048,8 @@ void Usr_Nick(char *origin, char **argv, int argc) {
 		AddStringToList(&av, origin, &ac);
 		AddStringToList(&av, argv[0], &ac);
 		Module_Event("NICK_CHANGE",av, ac);
-		FreeList(av, ac);
+		free(av);
+//		FreeList(av, ac);
 	}
 }
 void Usr_Topic(char *origin, char **argv, int argc) {
@@ -1062,7 +1077,8 @@ void Usr_Kick(char *origin, char **argv, int argc) {
 	AddStringToList(&av, argv[0], &ac);
 	AddStringToList(&av, argv[1], &ac);
 	Module_Event("KICK", av, ac);
-	FreeList(av, ac);
+	free(av);
+//	FreeList(av, ac);
 	part_chan(finduser(argv[1]), argv[0]);
 	
 }
@@ -1140,7 +1156,8 @@ void Srv_Server(char *origin, char **argv, int argc) {
 			me.s = s;
 			AddStringToList(&av, argv[0], &ac);
 			Module_Event("NEWSERVER", av, ac);
-			FreeList(av, ac);
+			free(av);
+//			FreeList(av, ac);
 }
 void Srv_Squit(char *origin, char **argv, int argc) {
 			char **av;
@@ -1150,7 +1167,8 @@ void Srv_Squit(char *origin, char **argv, int argc) {
 			if (s) {
 				AddStringToList(&av, argv[0], &ac);
 				Module_Event("SQUIT", av, ac);
-				FreeList(av, ac);
+				free(av);
+//				FreeList(av, ac);
 				DelServer(argv[0]);
 			} else {
 				log("Waring, Squit from Unknown Server %s", argv[0]);
@@ -1205,7 +1223,8 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
 #endif
-			FreeList(av, ac);
+			free(av);
+//			FreeList(av, ac);
 }
 
 /* Ultimate3 Client Support */
@@ -1222,7 +1241,8 @@ void Srv_Client(char *origin, char **argv, int argc) {
 			UserMode(argv[0], argv[3], 0);
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
-			FreeList(av, ac);
+			free(av);
+//			FreeList(av, ac);
 #ifdef ULTIMATE3
 			AddStringToList(&av, argv[0], &ac);
 #ifdef DEBUG
@@ -1231,7 +1251,8 @@ void Srv_Client(char *origin, char **argv, int argc) {
 			UserMode(argv[0], argv[4], 1);
 			AddStringToList(&av, argv[4], &ac);
 			Module_Event("UMODE", av, ac);
-			FreeList(av, ac);
+			free(av);
+//			FreeList(av, ac);
 #endif
 
 }
@@ -1245,7 +1266,8 @@ void Srv_Svsnick(char *origin, char **argv, int argc) {
 			AddStringToList(&av, argv[0], &ac);
 			AddStringToList(&av, argv[1], &ac);
 			Module_Event("NICK_CHANGE",av, ac);
-			FreeList(av, ac);
+			free(av);
+//			FreeList(av, ac);
 
 }		
 void Srv_Kill(char *origin, char **argv, int argc) {
@@ -1360,5 +1382,6 @@ static void Showcredits(char *nick)
 	snumeric_cmd(351, nick, ":- Error51 for Translating our FAQ and README files");
 	snumeric_cmd(351, nick, ":- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!");
 	snumeric_cmd(351, nick, ":- Eggy for proving to use our code still had bugs when we thought it didn't (and all the bug reports!)");
+	snumeric_cmd(351, nick, ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
 }
 
