@@ -159,8 +159,8 @@
 #include "protocol/neoircd.h"
 #elif MYSTIC == 1
 #include "protocol/mystic.h" 
-#elif IRCU == 1
-#include "protocol/ircu.h"
+#elif IRCUP10 == 1
+#include "protocol/ircup10.h"
 #elif BAHAMUT == 1
 #include "protocol/bahamut.h"
 #elif QUANTUM == 1

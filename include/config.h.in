@@ -442,7 +442,7 @@
 #undef HYBRID7
 
 /* 'Enable IRCu Support' */
-#undef IRCU
+#undef IRCUP10
 
 /* "PCRE Lnk size" */
 #undef LINK_SIZE
@@ -573,13 +573,13 @@
 #undef TM_IN_SYS_TIME
 
 /* 'Enable Ultimate 2.x.x Support' */
-#undef ULTIMATE
+#undef ULTIMATE2
 
 /* "Enable Ultimate 3.x.x Support' */
 #undef ULTIMATE3
 
 /* 'Enable Unreal 3.1.x Support' */
-#undef UNREAL
+#undef UNREAL31
 
 /* 'Enable Unreal 3.2.x Support' */
 #undef UNREAL32

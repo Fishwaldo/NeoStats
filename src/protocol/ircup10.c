@@ -24,7 +24,7 @@
 #include "neostats.h"
 #include "ircd.h"
 #include "sock.h"
-#include "ircu.h"
+#include "ircup10.h"
 #include "users.h"
 #include "servers.h"
 #include "channels.h"
