@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.prealpha3-dev
+ - Add API for IRCd specific host cloaking. (M)
  - ConnectServ: Add option to watch AWAY events. (M)
  - CODERHACK changed to a more secure format. Users will now be required to set
    CODERHACK to a nick agreed between the network and the developent team so 

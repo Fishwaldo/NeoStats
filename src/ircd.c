@@ -112,6 +112,8 @@ static void( *irc_send_setname )( const char* nick, const char* realname );
 static void( *irc_send_sethost )( const char* nick, const char* host );
 static void( *irc_send_setident )( const char* nick, const char* ident );
 
+static void( *irc_send_cloakhost )( char* host );
+
 protocol_entry protocol_list[] =
 {
 	{"TOKEN",	PROTOCOL_TOKEN},
@@ -166,6 +168,7 @@ static ircd_sym ircd_sym_table[] =
 	{( void * )&irc_send_setname, "send_setname", 0, 0},
 	{( void * )&irc_send_sethost, "send_sethost", 0, 0},
 	{( void * )&irc_send_setident, "send_setident", 0, 0},
+	{( void * )&irc_send_cloakhost, "cloakhost", 0, 0},
 	{NULL, NULL, 0, 0},
 };
 
@@ -1117,6 +1120,10 @@ int irc_cloakhost( const Bot *botptr )
 {
 	if( ircd_srv.features&FEATURE_UMODECLOAK ) {
 		irc_umode( botptr, botptr->name, UMODE_HIDE );
+		return NS_SUCCESS;	
+	}
+	if( irc_send_cloakhost ) {
+		irc_send_cloakhost( botptr->u->user->vhost );
 		return NS_SUCCESS;	
 	}
 	return NS_FAILURE;	

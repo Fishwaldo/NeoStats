@@ -211,6 +211,8 @@ MODULEFUNC void send_setname(const char *nick, const char *realname);
 MODULEFUNC void send_sethost (const char *nick, const char *host);
 MODULEFUNC void send_setident (const char *nick, const char *ident);
 
+MODULEFUNC void cloakhost( char *host );
+
 int InitIrcd( void );
 int irc_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink );
 int irc_nick( const char *nick, const char *user, const char *host, const char *realname, const char *modes );
