@@ -129,7 +129,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s HAIL <WHO TO HAIL> <NICK TO SEND HAIL TO>",
 				s_MoraleServ);
 			prefmsg(u->nick, s_MoraleServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_MoraleServ);
 			return -1;
 		}
@@ -140,7 +140,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s ODE <WHO THE ODE ODE IS ABOUT> <NICK TO SEND ODE TO>",
 				s_MoraleServ);
 			prefmsg(u->nick, s_MoraleServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_MoraleServ);
 			return -1;
 		}
@@ -151,7 +151,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s LAPDANCE <NICK>",
 				s_MoraleServ);
 			prefmsg(u->nick, s_MoraleServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_MoraleServ);
 			return -1;
 		}
@@ -171,7 +171,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s POEM <WHO THE POEM IS ABOUT> <NICK TO SEND TO>",
 				s_MoraleServ);
 			prefmsg(u->nick, s_MoraleServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_MoraleServ);
 			return -1;
 		}
@@ -182,7 +182,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s REDNECK <NICK>",
 				s_MoraleServ);
 			prefmsg(u->nick, s_MoraleServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_MoraleServ);
 			return -1;
 		}
@@ -193,7 +193,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s CHEERUP <NICK>",
 				s_MoraleServ);
 			prefmsg(u->nick, s_MoraleServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_MoraleServ);
 			return -1;
 		}
@@ -204,7 +204,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s BEHAPPY <NICK>",
 				s_MoraleServ);
 			prefmsg(u->nick, s_MoraleServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_MoraleServ);
 			return -1;
 		}
@@ -215,7 +215,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s WONDERFUL <NICK>",
 				s_MoraleServ);
 			prefmsg(u->nick, s_MoraleServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_MoraleServ);
 			return -1;
 		}
@@ -289,7 +289,7 @@ static void ms_hail(User * u, char *cmd, char *m)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(m, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		chanalert(s_Services,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
@@ -323,7 +323,7 @@ static void ms_lapdance(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		chanalert(s_Services,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
@@ -362,12 +362,12 @@ static void ms_ode(User * u, char *cmd, char *m)
 			"Syntax: /msg %s ODE <WHO THE ODE ODE IS ABOUT> <NICK TO SEND ODE TO>",
 			s_MoraleServ);
 		prefmsg(u->nick, s_MoraleServ,
-			"For addtional help: /msg %s HELP", s_MoraleServ);
+			"For additional help: /msg %s HELP", s_MoraleServ);
 		return;
 	}
 	if (!strcasecmp(m, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		chanalert(s_Services,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
@@ -409,7 +409,7 @@ static void ms_version(User * u)
 	prefmsg(u->nick, s_MoraleServ,
 		"%s Author: ^Enigma^ <enigma@neostats.net>", s_MoraleServ);
 	prefmsg(u->nick, s_MoraleServ,
-		"Neostats Satistical Software: http://www.neostats.net");
+		"Neostats Statistical Software: http://www.neostats.net");
 }
 
 
@@ -422,12 +422,12 @@ static void ms_poem(User * u, char *cmd, char *m)
 			"Syntax: /msg %s POEM <WHO THE POEM IS ABOUT> <NICK TO SEND TO>",
 			s_MoraleServ);
 		prefmsg(u->nick, s_MoraleServ,
-			"For addtional help: /msg %s HELP", s_MoraleServ);
+			"For additional help: /msg %s HELP", s_MoraleServ);
 		return;
 	}
 	if (!strcasecmp(m, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		chanalert(s_Services,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
@@ -464,7 +464,7 @@ static void ms_redneck(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		chanalert(s_Services,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
@@ -485,7 +485,7 @@ static void ms_redneck(User * u, char *cmd)
 	prefmsg(cmd, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
 	prefmsg(cmd, s_MoraleServ, "*recites*", u->nick);
 	prefmsg(cmd, s_MoraleServ,
-		"I dub thee \"Redneck\", May you enjoy your coons and over sexation and many hours of wierd contemplation. If its dead you eat it, ifs living kill it than eat it. This is the redneck way. Country Music all the time no rap no jive no rock no hop this is the redneck way, now go forth into a redneck world and don't forget your boots.",
+		"I dub thee \"Redneck\", May you enjoy your coons and over sexation and many hours of weird contemplation. If its dead you eat it, ifs living kill it than eat it. This is the redneck way. Country Music all the time no rap no jive no rock no hop this is the redneck way, now go forth into a redneck world and don't forget your boots.",
 		u->nick);
 	prefmsg(cmd, s_MoraleServ, "*bows*", u->nick);
 	nlog(LOG_NORMAL, LOG_MOD, "%s sent a REDNECK \"dubbing\" to %s",
@@ -500,7 +500,7 @@ static void ms_cheerup(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		chanalert(s_Services,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
@@ -529,7 +529,7 @@ static void ms_behappy(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		chanalert(s_Services,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);
@@ -607,7 +607,7 @@ static void ms_wonderful(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		chanalert(s_Services,
 			  "Prevented %s from making %s message %s",
 			  u->nick, s_MoraleServ, s_MoraleServ);

@@ -59,7 +59,7 @@ hash_t *logs;
 
 void *close_logs ();
 
-/** @brief Initilize the logging functions 
+/** @brief initialize the logging functions 
  */
 int
 init_logs ()
@@ -67,7 +67,7 @@ init_logs ()
 	SET_SEGV_LOCATION();
 	logs = hash_create (-1, 0, 0);
 	if (!logs) {
-		printf ("ERROR: Can't Initilize Log SubSystem. Exiting!");
+		printf ("ERROR: Can't initialize log subsystem. Exiting!");
 		return -1;
 	}
 	return 0;

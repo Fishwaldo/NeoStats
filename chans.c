@@ -27,9 +27,9 @@
 #include "hash.h"
 #include "log.h"
 
-/** @brief initilize the channel data
+/** @brief initialize the channel data
  *
- * Initilizes the channel data and channel hash ch.
+ * initializes the channel data and channel hash ch.
  *
  * @return Nothing
 */

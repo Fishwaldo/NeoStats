@@ -136,7 +136,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 			prefmsg(u->nick, s_LoveServ,
 				"Syntax: /msg %s ROSE NICK", s_LoveServ);
 			prefmsg(u->nick, s_LoveServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_LoveServ);
 			return -1;
 		}
@@ -146,7 +146,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 			prefmsg(u->nick, s_LoveServ,
 				"Syntax: /msg %s KISS NICK", s_LoveServ);
 			prefmsg(u->nick, s_LoveServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_LoveServ);
 			return -1;
 		}
@@ -156,7 +156,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 			prefmsg(u->nick, s_LoveServ,
 				"Syntax: /msg %s TONSIL NICK", s_LoveServ);
 			prefmsg(u->nick, s_LoveServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_LoveServ);
 			return -1;
 		}
@@ -166,7 +166,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 			prefmsg(u->nick, s_LoveServ,
 				"Syntax: /msg %s HUG NICK", s_LoveServ);
 			prefmsg(u->nick, s_LoveServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_LoveServ);
 			return -1;
 		}
@@ -177,7 +177,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s ADMIRER NICK",
 				s_LoveServ);
 			prefmsg(u->nick, s_LoveServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_LoveServ);
 			return -1;
 		}
@@ -188,7 +188,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s CHOCOLATE NICK",
 				s_LoveServ);
 			prefmsg(u->nick, s_LoveServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_LoveServ);
 			return -1;
 		}
@@ -198,7 +198,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 			prefmsg(u->nick, s_LoveServ,
 				"Syntax: /msg %s CANDY NICK", s_LoveServ);
 			prefmsg(u->nick, s_LoveServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_LoveServ);
 			return -1;
 		}
@@ -209,7 +209,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s LOVENOTE NICK NOTE",
 				s_LoveServ);
 			prefmsg(u->nick, s_LoveServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_LoveServ);
 			return -1;
 		}
@@ -222,7 +222,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s APOLOGY NICK APOLOGY-REASON",
 				s_LoveServ);
 			prefmsg(u->nick, s_LoveServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_LoveServ);
 			return -1;
 		}
@@ -235,7 +235,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s THANKYOU NICK THANKYOU-REASON",
 				s_LoveServ);
 			prefmsg(u->nick, s_LoveServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_LoveServ);
 			return -1;
 		}
@@ -310,7 +310,7 @@ static void ls_rose(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		return;
 	}
 	if (!finduser(cmd)) {
@@ -333,7 +333,7 @@ static void ls_kiss(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		return;
 	}
 	if (!finduser(cmd)) {
@@ -353,7 +353,7 @@ static void ls_tonsil(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		return;
 	}
 	if (!finduser(cmd)) {
@@ -377,7 +377,7 @@ static void ls_hug(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		return;
 	}
 	if (!finduser(cmd)) {
@@ -398,7 +398,7 @@ static void ls_admirer(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		return;
 	}
 	if (!finduser(cmd)) {
@@ -419,7 +419,7 @@ static void ls_choco(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		return;
 	}
 	if (!finduser(cmd)) {
@@ -443,7 +443,7 @@ static void ls_candy(User * u, char *cmd)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		return;
 	}
 	if (!finduser(cmd)) {
@@ -468,7 +468,7 @@ static void ls_lovenote(User * u, char *cmd, char *m)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		return;
 	}
 	if (!finduser(cmd)) {
@@ -492,7 +492,7 @@ static void ls_apology(User * u, char *cmd, char *m)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		return;
 	}
 	if (!finduser(cmd)) {
@@ -516,7 +516,7 @@ static void ls_thankyou(User * u, char *cmd, char *m)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
-			"Surley we have better things to do with our time than make a service message itself?");
+			"Surely we have better things to do with our time than make a service message itself?");
 		return;
 	}
 	if (!finduser(cmd)) {
@@ -544,6 +544,6 @@ static void ls_version(User * u)
 	prefmsg(u->nick, s_LoveServ,
 		"%s Author: Shmad <shmad@neostats.net>", s_LoveServ);
 	prefmsg(u->nick, s_LoveServ,
-		"Neostats Satistical Software: http://www.neostats.net");
+		"Neostats Statistical Software: http://www.neostats.net");
 
 }

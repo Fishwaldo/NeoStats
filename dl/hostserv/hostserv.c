@@ -296,7 +296,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>",
 				s_HostServ);
 			prefmsg(u->nick, s_HostServ,
-				"For addtional help: /msg %s HELP",
+				"For additional help: /msg %s HELP",
 				s_HostServ);
 			return -1;
 		}
@@ -445,7 +445,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Syntax: /msg %s LOGIN <NICK> <PASSWORD>",
 				s_HostServ);
 			prefmsg(u->nick, s_HostServ,
-				"For addtional help: /msg %s HELP LOGIN",
+				"For additional help: /msg %s HELP LOGIN",
 				s_HostServ);
 			return -1;
 		}
@@ -810,7 +810,7 @@ static void hs_add(User * u, char *cmd, char *m, char *h, char *p)
 					"%s is online now, setting vhost to %s",
 					cmd, h);
 				prefmsg(cmd, s_HostServ,
-					"You Vhost has been created with Real HostMask of %s and username %s with password %s",
+					"Your Vhost has been created with Real HostMask of %s and username %s with password %s",
 					m, cmd, p);
 				prefmsg(cmd, s_HostServ,
 					"For security, you should change your vhost password. See /msg %s help chpass",

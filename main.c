@@ -81,7 +81,7 @@ int forked = 0;
 /** @brief Main Entry point into program
  *
  * Sets up defaults, and parses the config file.
- * Also initilizes different parts of NeoStats
+ * Also initializes different parts of NeoStats
  * 
  * @return Exits the program!
  *
@@ -163,7 +163,7 @@ main (int argc, char *argv[])
 		exit (0);
 	}
 
-	/* initilize the rest of the subsystems */
+	/* initialize the rest of the subsystems */
 	TimerReset ();
 	init_dns ();
 	init_server_hash ();
@@ -208,7 +208,7 @@ main (int argc, char *argv[])
 		}
 	}
 #endif
-	nlog (LOG_NOTICE, LOG_CORE, "Statistics Started (NeoStats %d.%d.%d%s).", MAJOR, MINOR, REV, version);
+	nlog (LOG_NOTICE, LOG_CORE, "NeoStats started (NeoStats %d.%d.%d%s).", MAJOR, MINOR, REV, version);
 
 	/* don't init_modules till after we fork. This fixes the load->fork-exit->call _fini problems when we fork */
 	init_modules ();
@@ -219,7 +219,7 @@ main (int argc, char *argv[])
 	return 1;
 }
 
-/** @brief Process COmmandline Options
+/** @brief Process Commandline Options
  *
  * Processes commandline options
  *
@@ -314,8 +314,8 @@ serv_die ()
 #else /* VALGRIND */
 	User *u;
 	u = finduser (s_Services);
-	nlog (LOG_CRITICAL, LOG_CORE, "Sigterm Received, Shuting Down Server!!!!");
-	ns_shutdown (u, "SigTerm Received");
+	nlog (LOG_CRITICAL, LOG_CORE, "SIGTERM received, shutting down server.");
+	ns_shutdown (u, "SIGTERM received");
 	ssquit_cmd (me.name);  
 #endif /* VALGRIND */
 }
@@ -333,8 +333,8 @@ RETSIGTYPE
 conf_rehash ()
 {
 /*	struct sigaction act; */
-	chanalert (s_Services, "Received SIGHUP, Attempting to Rehash");
-	globops (me.name, "Received SIGHUP, Attempted to Rehash");
+	chanalert (s_Services, "SIGHUP received, attempting to rehash");
+	globops (me.name, "SIGHUP received, attempted to rehash");
 /*	act.sa_handler = conf_rehash;
 	act.sa_flags=0;
 	(void)sigemptyset(&act.sa_mask);
@@ -695,13 +695,13 @@ do_exit (int segv)
 
 	switch (segv) {
 	case 0:
-		nlog (LOG_CRITICAL, LOG_CORE, "Normal shut down SubSystems");
+		nlog (LOG_CRITICAL, LOG_CORE, "Normal shut down subsystems");
 		break;
 	case 2:
-		nlog (LOG_CRITICAL, LOG_CORE, "Restarting NeoStats SubSystems");
+		nlog (LOG_CRITICAL, LOG_CORE, "Restarting NeoStats subsystems");
 		break;
 	case 1:
-		nlog (LOG_CRITICAL, LOG_CORE, "Shutting Down SubSystems without saving data due to core");
+		nlog (LOG_CRITICAL, LOG_CORE, "Shutting down subsystems without saving data due to core");
 		/* exit code to error */
 		exit_code=-1;
 		break;

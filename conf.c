@@ -62,7 +62,7 @@ static config_option options[] = {
 };
 
 
-/** @brief Initilize the configuration parser
+/** @brief initialize the configuration parser
  *
  * Currently does nothing
  *
