@@ -1,7 +1,6 @@
 /* NeoStats - IRC Statistical Services
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
-**
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -37,7 +36,7 @@
  */
 typedef struct Chanmem {
 	char nick[MAXNICK];
-	time_t jointime;
+	time_t tsjoin;
 	long flags;
 	void *moddata[NUM_MODULES];
 } Chanmem;
@@ -370,9 +369,10 @@ new_chan (const char *chan)
 	cn = hnode_create (c);
 	if (hash_isfull (ch)) {
 		nlog (LOG_CRITICAL, LOG_CORE, "new_chan: channel hash is full");
-	} else {
-		hash_insert (ch, cn, c->name);
+		free (c);
+		return NULL;
 	}
+	hash_insert (ch, cn, c->name);
 	c->chanmembers = list_create (CHAN_MEM_SIZE);
 	c->modeparms = list_create (MAXMODES);
 	c->users = 0;
@@ -539,6 +539,7 @@ part_chan (User * u, const char *chan, const char *reason)
 	char **av;
 	Chanmem *cm;
 	int ac = 0;
+
 	SET_SEGV_LOCATION();
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "part_chan: trying to part NULL user from %s", chan);
@@ -691,7 +692,7 @@ join_chan (const char* nick, const char *chan)
 	/* add this users details to the channel members hash */
 	cm = smalloc (sizeof (Chanmem));
 	strlcpy (cm->nick, u->nick, MAXNICK);
-	cm->jointime = me.now;
+	cm->tsjoin = me.now;
 	cm->flags = 0;
 	cn = lnode_create (cm);
 	nlog (LOG_DEBUG2, LOG_CORE, "join_chan: adding usernode %s to channel %s", u->nick, chan);
@@ -709,9 +710,8 @@ join_chan (const char* nick, const char *chan)
 		lnode_destroy (cn);
 		free (cm);
 		return;
-	} else {
-		list_append (c->chanmembers, cn);
 	}
+	list_append (c->chanmembers, cn);
 	c->users++;
 	un = lnode_create (c->name);
 	if (list_isfull (u->chans)) {
@@ -785,14 +785,13 @@ dumpchan (Channel* c)
 				mode[++j] = chan_modes[i].flag;
 			}
 		}
-		debugtochannel("            %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->jointime);
+		debugtochannel("            %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->tsjoin);
 		cmn = list_next (c->chanmembers, cmn);
 	}
 	debugtochannel("========================================");
 }
 
-void
-ChanDump (const char *chan)
+void ChanDump (const char *chan)
 {
 	hnode_t *cn;
 	hscan_t sc;
@@ -891,7 +890,7 @@ int test_chan_user_mode(char* chan, char* nick, int flag)
 	}
 	cm = lnode_get (cmn);
 	if (cm->flags & flag) {
-			return 1;
+		return 1;
 	}	
 	return 0;
 }
@@ -935,8 +934,9 @@ void *display_chanmodes (void *tbl, char *col, char *sql, void *row)
 /* its huge, because we can have a *LOT* of users in a channel */
 
 static char chanusers[BUFSIZE*10];
-void *display_chanusers (void *tbl, char *col, char *sql, void *row) {
-        Channel *c = row;
+void *display_chanusers (void *tbl, char *col, char *sql, void *row) 
+{
+	Channel *c = row;
 	lnode_t *cmn;
 	char sjoin[BUFSIZE];
 	char mode[BUFSIZE];

@@ -27,6 +27,7 @@
 #include <setjmp.h>
 #include "neostats.h"
 #include "ircd.h"
+#include "modules.h"
 #include "dl.h"
 #include "bots.h"
 #include "commands.h"
@@ -45,9 +46,6 @@ static char UmodeStringBuf[64];
 static char SmodeStringBuf[64];
 #endif
 static long services_bot_umode= 0;
-
-/* Fully split buffer */
-static char privmsgbuffer[BUFSIZE];
 
 static int signon_newbot (const char *nick, const char *user, const char *host, const char *realname, long Umode);
 #ifdef IRCU
@@ -536,12 +534,10 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 	}
 #endif
 	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
-	strlcpy (privmsgbuffer, av[ac-1], BUFSIZE);
-	free (argv);
 	argc = 0;
 	AddStringToList (&argv, origin, &argc);
 	AddStringToList (&argv, av[0], &argc);
-	AddStringToList (&argv, privmsgbuffer, &argc);
+	AddStringToList (&argv, av[ac-1], &argc);
 	if(av[0][0] == '#') {
 		SendModuleEvent (EVENT_CNOTICE, argv, argc);
 	} else {
@@ -559,17 +555,11 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 void
 m_private (char* origin, char **av, int ac, int cmdptr)
 {
-	int i;
-	int ret = NS_SUCCESS;
-	int splitargc;
-	char **splitargv;
-	int argc;
-	char **argv;
 	char target[64];
 
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
-		nlog (LOG_DEBUG1, LOG_CORE, "m_private: dropping unknown privmsg from %s, to %s : %s", origin, av[0], av[ac-1]);
+		nlog (LOG_DEBUG1, LOG_CORE, "m_private: dropping privmsg from %s to NULL user : %s", origin, av[ac-1]);
 		return;
 	}
 	nlog (LOG_DEBUG1, LOG_CORE, "m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
@@ -581,32 +571,7 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 		strlcpy (target, av[0], 64);
 		av[0] = strtok (target, "@");
 	}
-	strlcpy (privmsgbuffer, av[ac-1], BUFSIZE);
-	splitargc = split_buf (av[ac-1], &splitargv, 0);
-	argc = 0;
-	AddStringToList (&argv, av[0], &argc);
-	for( i = 0 ; i < splitargc ; i++ ) {
-		AddStringToList (&argv, splitargv[i], &argc);
-	}
-	if(av[0][0] == '#') {
-		bot_chan_message (origin, argv, argc);
-	} else {
-		ret = bot_message (origin, argv, argc);
-	}
-	free (argv);
-	free (splitargv);
-	if(ret == NS_FAILURE) {
-		argc = 0;
-		AddStringToList (&argv, origin, &argc);
-		AddStringToList (&argv, av[0], &argc);
-		AddStringToList (&argv, privmsgbuffer, &argc);
-		if(av[0][0] == '#') {
-			SendModuleEvent (EVENT_CPRIVATE, argv, argc);
-		} else {
-			SendModuleEvent (EVENT_PRIVATE, argv, argc);
-		}
-		free (argv);
-	}
+	bot_message (origin, av, ac);
 	return;
 }
 
@@ -1781,7 +1746,7 @@ do_svsmode_user (const char* nick, const char* modes, const char* ts)
 	char modebuf[MODESIZE];
 	
 	if (ts && isdigit(*ts)) {
-		char* pModes;	
+		const char* pModes;	
 		char* pNewModes;	
 
 		SetUserServicesTS (nick, ts);

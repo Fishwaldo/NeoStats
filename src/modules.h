@@ -21,11 +21,20 @@
 ** $Id$
 */
 
-#ifndef _COMMANDS_H_
-#define _COMMANDS_H_
+#ifndef _MODULES_H_
+#define _MODULES_H_
 
-int add_bot_cmd_list(ModUser *bot_ptr, bot_cmd *bot_cmd_list);
-int del_bot_cmd_list(ModUser *bot_ptr, bot_cmd *bot_cmd_list);
-int run_bot_cmd (ModUser *bot_ptr, User *u, char *command_string);
+int InitModules (void);
+int FiniModules (void);
+void SendModuleEvent (char * event, char **av, int ac);
+int load_module (char *path, User * u);
+int unload_module (char *module_name, User * u);
+int list_modules (User * u, char **av, int ac);
+int get_dl_handle (char *mod_name);
+int get_mod_num (char *mod_name);
+Module *get_mod_ptr (char *mod_name);
+void unload_modules(void);
 
-#endif /* _COMMANDS_H_ */
+void ModulesVersion (const char* nick, const char *remoteserver);
+
+#endif /* _MODULES_H_ */

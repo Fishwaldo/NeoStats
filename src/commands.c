@@ -23,7 +23,7 @@
 
 #include <arpa/inet.h> 
 #include "neostats.h"
-#include "dl.h"
+#include "modules.h"
 #include "conf.h"
 
 static int bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac);
@@ -358,27 +358,35 @@ del_services_cmd_list(bot_cmd* bot_cmd_list)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int
-run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
+run_bot_cmd (ModUser* bot_ptr, User *u, char *command_string)
 {
+	static char privmsgbuffer[BUFSIZE];
 	int userlevel;
 	bot_cmd* cmd_ptr;
 	hnode_t *cmdnode;
 	int cmdlevel;
 	char* parambuf; 
+	char **av;
+	int ac = 0;
 
 	SET_SEGV_LOCATION();
 	userlevel = getuserlevel (bot_ptr, u);
+
+	strlcpy (privmsgbuffer, command_string, BUFSIZE);
+	ac = split_buf (privmsgbuffer, &av, 0);
+
 	/* Check user authority to use this command set */
 	if (( (bot_ptr->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
 		( (bot_ptr->flags & BOT_FLAG_ONLY_OPERS) && me.onlyopers && (userlevel < NS_ULEVEL_OPER) )){
 		prefmsg (u->nick, bot_ptr->nick, "This service is only available to IRC operators.");
-		chanalert (bot_ptr->nick, "%s requested %s, but is not an operator.", u->nick, av[1]);
-		nlog (LOG_NORMAL, LOG_MOD, "%s requested %s, but is not an operator.", u->nick, av[1]);
+		chanalert (bot_ptr->nick, "%s requested %s, but is not an operator.", u->nick, av[0]);
+		nlog (LOG_NORMAL, LOG_MOD, "%s requested %s, but is not an operator.", u->nick, av[0]);
+		free (av);
 		return NS_SUCCESS;
 	}
-
+	
 	/* Process command list */
-	cmdnode = hash_lookup(bot_ptr->botcmds, av[1]);
+	cmdnode = hash_lookup(bot_ptr->botcmds, av[0]);
 	if (cmdnode) {
 		cmd_ptr = hnode_get(cmdnode);	
 		cmdlevel = calc_cmd_ulevel(cmd_ptr);
@@ -387,20 +395,22 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 			prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
 			chanalert (bot_ptr->nick, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
 			nlog (LOG_NORMAL, LOG_MOD, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
+			free (av);
 			return NS_SUCCESS;
 		}
 		/* First two parameters are bot name and command name so 
 		 * subtract 2 to get parameter count */
-		if((ac - 2) < cmd_ptr->minparams ) {
+		if((ac - 1) < cmd_ptr->minparams ) {
 			prefmsg (u->nick, bot_ptr->nick, "Syntax error: insufficient parameters");
 			prefmsg (u->nick, bot_ptr->nick, "/msg %s HELP %s for more information", bot_ptr->nick, cmd_ptr->cmd);
+			free (av);
 			return NS_SUCCESS;
 		}
 		/* Seems OK so report the command call so modules do not have to */
 		chanalert (bot_ptr->nick, "%s used %s", u->nick, cmd_ptr->cmd);
 		/* Grab the parameters for the log so modules do not have to log */
-		if(ac > 2) {
-			parambuf = joinbuf(av, ac, 2);
+		if(ac > 1) {
+			parambuf = joinbuf(av, ac, 1);
 			nlog (LOG_NORMAL, LOG_MOD, "%s used %s %s", u->nick, cmd_ptr->cmd, parambuf);
 			free(parambuf);
 		} else {
@@ -408,38 +418,44 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 		}
 		/* call handler */
 		cmd_ptr->handler(u, av, ac);
+		free (av);
 		return NS_SUCCESS;
 	}
 
 	/* Handle intrinsic commands */
 	/* Help */
-	if (!ircstrcasecmp(av[1], "HELP")) {
+	if (!ircstrcasecmp(av[0], "HELP")) {
 		bot_cmd_help(bot_ptr, u, av, ac);
+		free (av);
 		return NS_SUCCESS;
 	}
 	/* Handle SET if we have it */
-	if (bot_ptr->bot_settings && !ircstrcasecmp(av[1], "SET") ) {
+	if (bot_ptr->bot_settings && !ircstrcasecmp(av[0], "SET") ) {
 		bot_cmd_set(bot_ptr, u, av, ac);
+		free (av);
 		return NS_SUCCESS;
 	}
 
 #if 0
 	/* About */
-	if (!ircstrcasecmp(av[1], "ABOUT")) {
+	if (!ircstrcasecmp(av[0], "ABOUT")) {
 		bot_cmd_about(bot_ptr, u, av, ac);
+		free (av);
 		return NS_SUCCESS;
 	}
 
 	/* Version */
-	if (!ircstrcasecmp(av[1], "VERSION")) {
+	if (!ircstrcasecmp(av[0], "VERSION")) {
 		bot_cmd_version(bot_ptr, u, av, ac);
+		free (av);
 		return NS_SUCCESS;
 	}
 #endif
 
 	/* We have run out of commands so report failure */
-	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[1]);
-	chanalert (bot_ptr->nick, "%s requested %s, but that is an unknown command", u->nick, av[1]);
+	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[0]);
+	chanalert (bot_ptr->nick, "%s requested %s, but that is an unknown command", u->nick, av[0]);
+	free (av);
 	return NS_FAILURE;
 }
 

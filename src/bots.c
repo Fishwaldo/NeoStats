@@ -22,7 +22,7 @@
 */
 
 #include "neostats.h"
-#include "dl.h"
+#include "modules.h"
 
 #define MAX_CMD_LINE_LENGTH		350
 
@@ -134,127 +134,64 @@ del_bot_from_chan (char *bot, char *chan)
  * 
  * @return none
  */
-void
-bot_chan_message (char *origin, char **av, int ac)
+void bot_message (char *origin, char **av, int ac)
 {
-	hnode_t *cbn;
-	ModChanBot *mod_chan_bot;
-	lnode_t *bmn;
-	ModUser *mod_usr;
-
-	cbn = hash_lookup (bch, av[0]);
-	if (!cbn) {
-		/* this isn't bad, just means our bot parted the channel? */
-		nlog (LOG_DEBUG1, LOG_CORE, "bot_chan_message: can't find channel %s", av[0]);
-		return;
-	}
-	mod_chan_bot = hnode_get (cbn);
-	bmn = list_first (mod_chan_bot->bots);
-	while (bmn) {
-		mod_usr = findbot (lnode_get (bmn));
-		if (mod_usr->chanfunc) {
-			nlog (LOG_DEBUG2, LOG_CORE, "bot_chan_message: running module for chanmessage %s", av[0]);
-			SET_SEGV_INMODULE(mod_usr->modname);
-			mod_usr->chanfunc (origin, av, ac);
-			CLEAR_SEGV_INMODULE();
-		}
-		bmn = list_next (mod_chan_bot->bots, bmn);
-	}
-}
-
-/** @brief send a message to a channel bot
- *
- * @param origin 
- * @param av (note chan string in av[0])
- * @param ac
- * 
- * @return none
- */
-int
-bot_message (char *origin, char **av, int ac)
-{
-	int ret = NS_SUCCESS;
+	int ret = NS_FAILURE;
 	User *u;
 	User *bot_user;
 	ModUser *mod_usr;
-	char** argv;
-	int argc = 0;
-	int i;
 
-	/* Check command length */
-	if (strnlen (av[1], MAX_CMD_LINE_LENGTH) >= MAX_CMD_LINE_LENGTH) {
-		prefmsg (origin, s_Services, "command line too long!");
-		notice (s_Services, "%s tried to send a very LARGE command, we told them to shove it!", origin);
-		return NS_SUCCESS;
-	}
-
+	SET_SEGV_LOCATION();
 	u = finduser (origin);
-
 	if(!u) {
-		return NS_SUCCESS;
+		return;
 	}
-
 	if (flood (u)) {
-		return NS_SUCCESS;
+		return;
 	}
-
 	bot_user = finduser(av[0]);
 	if (!bot_user) {
 		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: bot %s not found", av[0]);
-		return NS_SUCCESS;
+		return;
 	}
 	mod_usr = findbot (bot_user->nick);
 	/* Check to see if any of the Modules have this nick Registered */
 	if (!mod_usr) {
 		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: mod_usr %s not found", bot_user->nick);
-		return NS_SUCCESS;
+		return;
 	}
 	nlog (LOG_DEBUG1, LOG_CORE, "bot_message: bot %s", mod_usr->nick);
 
-	SET_SEGV_LOCATION();
-	if (setjmp (sigvbuf) == 0) {
-		SET_SEGV_INMODULE(mod_usr->modname);
-		if(mod_usr->function) {
-			AddStringToList (&argv, bot_user->nick, &argc);
-			for(i = 1; i < ac; i++) {
-				AddStringToList (&argv, av[i], &argc);
-			}
-			mod_usr->function (u->nick, argv, argc);
-			free(argv);
-		} else {
 #if 0
-			/* Trap CTCP commands and silently drop them to avoid unknown command errors 
-			 * Why bother? Well we might be able to use some of them in the future
-			 * so this is mainly a test and we may want to pass some of this onto
-			 * SecureServ for a quick trojan check so log attempts to give an indication 
-			 * of usage.
-			 */
-			if (av[1][0] == '\1') {
-				char* buf;
-				buf = joinbuf(av, ac, 1);
-				nlog (LOG_NORMAL, LOG_MOD, "%s requested CTCP %s", u->nick, buf);
-				free(buf);
-				return NS_SUCCESS;
-			}
-#endif
-			if (!u) {
-				nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", u->nick, mod_usr->nick);
-			} else {
-				AddStringToList (&argv, bot_user->nick, &argc);
-				for(i = 1; i < ac; i++) {
-					AddStringToList (&argv, av[i], &argc);
-				}
-				if(mod_usr->botcmds) {
-					ret = run_bot_cmd(mod_usr, u, argv, argc);
-				} else {
-					ret = NS_FAILURE;
-				}
-				free(argv);
-			}
-		}
-		CLEAR_SEGV_INMODULE();
+	/* Trap CTCP commands and silently drop them to avoid unknown command errors 
+		* Why bother? Well we might be able to use some of them in the future
+		* so this is mainly a test and we may want to pass some of this onto
+		* SecureServ for a quick trojan check so log attempts to give an indication 
+		* of usage.
+		*/
+	if (av[1][0] == '\1') {
+		nlog (LOG_NORMAL, LOG_MOD, "%s requested %s", u->nick, av[1]);
+		return;
 	}
-	return ret;
+#endif
+
+	if (mod_usr->botcmds) {
+		if (setjmp (sigvbuf) == 0) {
+			SET_SEGV_INMODULE(mod_usr->modname);
+			ret = run_bot_cmd(mod_usr, u, av[ac - 1]);
+			CLEAR_SEGV_INMODULE();
+		}
+	}
+	if (ret == NS_FAILURE) {
+		if(av[0][0] == '#') {
+			SendModuleEvent (EVENT_CPRIVATE, av, ac);
+		} else {
+			SendModuleEvent (EVENT_PRIVATE, av, ac);
+		}
+	}
+	return ;
+
+	ret = NS_FAILURE;
 }
 
 /** @brief dump list of module bots and channels
@@ -358,8 +295,6 @@ add_neostats_mod_user (char *nick)
 #else
 		mod_usr->modname[0] = 0;
 #endif
-		mod_usr->function = NULL;
-		mod_usr->chanfunc = NULL;
 		mod_usr->botcmds = hash_create(-1, 0, 0);
 		return mod_usr;
 	}
@@ -440,7 +375,6 @@ bot_nick_change (char *oldnick, char *newnick)
 			/* add a brand new user */ 
 			strlcpy (mod_usr_new->nick, newnick, MAXNICK);
 			strlcpy (mod_usr_new->modname, mod_usr->modname, MAX_MOD_NAME);
-			mod_usr_new->function = mod_usr->function;
 
 			/* Now Delete the Old bot nick */   
 			del_mod_user (oldnick);

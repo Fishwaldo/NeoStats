@@ -796,8 +796,6 @@ typedef struct ModUser {
 	bot_setting *bot_settings;
 	/* min ulevel for settings */
 	unsigned int set_ulevel;
-	/** bot message function */
-	message_function function;
 	/** channel message function */
 	message_function chanfunc;
 }ModUser;
@@ -859,8 +857,7 @@ ModSock *findsock (char *sock_name);
 ModUser * init_mod_bot (char * nick, char * user, char * host, char * realname, const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list, char * modname);
 void add_bot_to_chan (char *bot, char *chan);
 void del_bot_from_chan (char *bot, char *chan);
-void bot_chan_message (char *origin, char **av, int ac);
-int bot_message (char *origin, char **av, int ac);
+void bot_message (char *origin, char **av, int ac);
 ModUser *findbot (char * bot_name);
 int bot_nick_change (char * oldnick, char *newnick);
 

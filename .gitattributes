@@ -220,6 +220,8 @@ src/log.h eol=lf
 src/main.c eol=lf
 src/match.c -text
 src/misc.c eol=lf
+src/modules.c -text
+src/modules.h -text
 src/modules/.indent.pro -text
 src/modules/Makefile -text
 src/modules/Makefile.inc.in -text

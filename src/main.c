@@ -90,12 +90,14 @@ main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	/* Change to the working Directory */
+#if 0
 	if (chdir (NEO_PREFIX) < 0) {
 		printf ("NeoStats Could not change to %s\n", NEO_PREFIX);
 		printf ("Did you 'make install' after compiling?\n");
 		printf ("Error Was: %s\n", strerror (errno));
 		return EXIT_FAILURE;
 	}
+#endif
 
 	/* before we do anything, make sure logging is setup */
 	if(init_logs () != NS_SUCCESS)

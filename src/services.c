@@ -26,7 +26,7 @@
 */
 
 #include "neostats.h"
-#include "dl.h"
+#include "modules.h"
 #include "bots.h"
 #include "timer.h"
 #include "commands.h"
@@ -121,23 +121,23 @@ init_services(void)
 static int
 ns_exclude (User *u, char **av, int ac) 
 {
-	if (ac < 3) {
+	if (ac < 2) {
 		prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
 		return NS_FAILURE;
 	}
 	if (!ircstrcasecmp(av[2], "ADD")) {
-		if (ac < 5) {
-			prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
-			return NS_FAILURE;
-		}
-		ns_do_exclude_add(u, av[3], av[4]);
-	} else if (!ircstrcasecmp(av[2], "DEL")) {
 		if (ac < 4) {
 			prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
 			return NS_FAILURE;
 		}
-		ns_do_exclude_del(u, av[3]);
-	} else if (!ircstrcasecmp(av[2], "LIST")) {
+		ns_do_exclude_add(u, av[2], av[3]);
+	} else if (!ircstrcasecmp(av[1], "DEL")) {
+		if (ac < 3) {
+			prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
+			return NS_FAILURE;
+		}
+		ns_do_exclude_del(u, av[2]);
+	} else if (!ircstrcasecmp(av[1], "LIST")) {
 		ns_do_exclude_list(u, s_Services);
 	} else {
 		prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
@@ -159,11 +159,11 @@ ns_shutdown (User * u, char **av, int ac)
 	char *tmp;
 
 	SET_SEGV_LOCATION();
-	if (ac <= 2) {
+	if (ac <= 1) {
 		ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
 			u->nick, u->username, u->hostname, no_reason);
 	} else {
-		tmp = joinbuf (av, ac, 2);
+		tmp = joinbuf (av, ac, 1);
 		chanalert (s_Services, "%s Wants me to SHUTDOWN for %s", u->nick, tmp);
 		ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
 			u->nick, u->username, u->hostname, tmp);
@@ -190,11 +190,11 @@ ns_reload (User * u, char **av, int ac)
 	char *tmp;
 
 	SET_SEGV_LOCATION();
-	if (ac <= 2) {
+	if (ac <= 1) {
 		prefmsg (u->nick, s_Services, "You must supply a Reason to Reload");
 		return 0;
 	}
-	tmp = joinbuf (av, ac, 2);
+	tmp = joinbuf (av, ac, 1);
 	chanalert (s_Services, "%s Wants me to RELOAD! for %s", u->nick, tmp);
 	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested RELOAD for %s.", 
 		u->nick, u->username, u->hostname, tmp);
@@ -254,10 +254,10 @@ ns_jupe (User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	ircsnprintf (infoline, 255, "[Jupitered by %s]", u->nick);
-	sserver_cmd (av[2], 1, infoline);
-	nlog (LOG_NOTICE, LOG_CORE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, av[2]);
-	chanalert (s_Services, "%s Wants to JUPE this Server %s", u->nick, av[2]);
-	prefmsg(u->nick, s_Services, "%s has been Jupitered", av[2]);
+	sserver_cmd (av[1], 1, infoline);
+	nlog (LOG_NOTICE, LOG_CORE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, av[1]);
+	chanalert (s_Services, "%s Wants to JUPE this Server %s", u->nick, av[1]);
+	prefmsg(u->nick, s_Services, "%s has been Jupitered", av[1]);
    	return 1;
 }
 
@@ -274,11 +274,11 @@ static int
 ns_set_debug (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	if ((!ircstrcasecmp(av[2], "YES")) || (!ircstrcasecmp(av[2], "ON"))) {
+	if ((!ircstrcasecmp(av[1], "YES")) || (!ircstrcasecmp(av[1], "ON"))) {
 		me.debug_mode = 1;
 		globops (me.name, "\2DEBUG MODE\2 Activated by %s", u->nick);
 		prefmsg (u->nick, s_Services, "Debuging Mode Enabled!");
-	} else if ((!ircstrcasecmp(av[2], "NO")) || (!ircstrcasecmp(av[2], "OFF"))) {
+	} else if ((!ircstrcasecmp(av[1], "NO")) || (!ircstrcasecmp(av[1], "OFF"))) {
 		me.debug_mode = 0;
 		globops (me.name, "\2DEBUG MODE\2 Deactivated by %s", u->nick);
 		prefmsg (u->nick, s_Services, "Debuging Mode Disabled");
@@ -308,12 +308,12 @@ ns_userdump (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 	   	return 0;
 	}
-	if(ac < 3) {
+	if(ac < 2) {
 		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump!", u->nick);
 		UserDump (NULL);
 	} else {
-		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump for %s!", u->nick, av[2]);
-		UserDump (av[2]);
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump for %s!", u->nick, av[1]);
+		UserDump (av[1]);
 	}
    	return 1;
 }
@@ -335,12 +335,12 @@ ns_serverdump (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 	   	return 0;
 	}
-	if(ac < 3) {
+	if(ac < 2) {
 		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump!", u->nick);
 		ServerDump (NULL);
 	} else {
-		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump for %s!", u->nick, av[2]);
-		ServerDump (av[2]);
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump for %s!", u->nick, av[1]);
+		ServerDump (av[1]);
 	}
    	return 1;
 }
@@ -362,12 +362,12 @@ ns_chandump (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 	   	return 0;
 	}
-	if(ac < 3) {
+	if(ac < 2) {
 		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ChannelDump!", u->nick);
 		ChanDump (NULL);
 	} else {
-		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ChannelDump for %s!", u->nick, av[2]);
-		ChanDump (av[2]);
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ChannelDump for %s!", u->nick, av[1]);
+		ChanDump (av[1]);
 	}
    	return 1;
 }
@@ -441,9 +441,9 @@ static int
 ns_level (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	if(ac > 2) {
+	if(ac > 1) {
 		User * otheruser;
-		otheruser = finduser(av[2]);
+		otheruser = finduser(av[1]);
 		if(otheruser) {
 			prefmsg (u->nick, s_Services, "User Level for %s is %d", otheruser->nick, UserLevel (otheruser));
 		}
@@ -466,10 +466,10 @@ static int
 ns_load (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	if (load_module (av[2], u) == NS_SUCCESS) {
-		chanalert (s_Services, "%s Loaded Module %s", u->nick, av[2]);
+	if (load_module (av[1], u) == NS_SUCCESS) {
+		chanalert (s_Services, "%s Loaded Module %s", u->nick, av[1]);
 	} else {
-		chanalert (s_Services, "%s Tried to Load Module %s, but Failed", u->nick, av[2]);
+		chanalert (s_Services, "%s Tried to Load Module %s, but Failed", u->nick, av[1]);
 	}
    	return 1;
 }
@@ -487,8 +487,8 @@ static int
 ns_unload (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	if (unload_module (av[2], u) > 0) {
-		chanalert (s_Services, "%s Unloaded Module %s", u->nick, av[2]);
+	if (unload_module (av[1], u) > 0) {
+		chanalert (s_Services, "%s Unloaded Module %s", u->nick, av[1]);
 	}
    	return 1;
 }
@@ -509,7 +509,7 @@ ns_raw (User * u, char **av, int ac)
 	char *message;
 
 	SET_SEGV_LOCATION();
-	message = joinbuf (av, ac, 2);
+	message = joinbuf (av, ac, 1);
 	chanalert (s_Services, "\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)", u->nick, message);
 	nlog (LOG_INFO, LOG_CORE, "RAW COMMAND %sIssued a Raw Command!(%s)", u->nick, message);
 	send_cmd ("%s", message);
