@@ -248,7 +248,7 @@ cat > $CONF << __EOF__
 ## NeoStats (c) 1999-2002 The NeoStats Group.
 ## support@neostats.net
 ## Web: http://www.NeoStats.Net
-## File Revision: 2.5.0.20
+## File Revision: 2.5.0-24
 ##################################################
 
 ##############################
@@ -385,6 +385,18 @@ ICQSERV_PASSWORD blahblah
 ICQSERV_SERVER 205.188.179.42
 
 
+#######################
+# NeoStats ROOT users #
+#######################
+
+# If you configured and compiled with --enable-auth==sr please edit
+# This section and add your nicks Remove the #'s as well.
+
+#SERVICE_ROOTS Shmad
+#SERVICE_ROOTS ^Enigma^
+#SERVICE_ROOTS Fish
+#SERVICE_ROOTS_AUTH 1
+
 
 
 ###############################################################################
@@ -407,6 +419,10 @@ chmod 700 $STATSCONF
                 echo "*------------------------------------------------*"
 		echo "| Also make sure modules are compiled and in the |"
 		echo "| stats.cfg properly for them to work :)         |"
+		echo "*------------------------------------------------*"
+		echo "| If you configured with --enable-auth==sr       |"
+		echo "| Edit stats.cfg and edit the proper section to  |"
+		echo "| enable Service ROOTS.                          |"
 		echo "*------------------------------------------------*"
                 echo ""
 		exit 1
