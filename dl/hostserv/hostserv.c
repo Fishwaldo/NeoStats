@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.28 2003/01/06 08:40:09 fishwaldo Exp $
+** $Id: hostserv.c,v 1.29 2003/01/06 12:16:24 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -65,7 +65,6 @@ char nnick[255];
 extern const char *hs_help[];
 static int hs_sign_on(char **av, int ac);
 
-static void _init();
 static void hs_add(User *u, char *cmd, char *m, char *h, char *p);
 static void hs_list(User *u);
 static void hs_view(User *u, int tmpint);
@@ -295,8 +294,9 @@ EventFnList *__module_get_events() {
 };
 
 
-static void _init() {
-    s_HostServ = "HostServ";
+void _init() {
+    s_HostServ = malloc(MAXNICK);
+    strcpy(s_HostServ, "HostServ");
     hs_lvl.add = 40;
     hs_lvl.del = 40;
     hs_lvl.list = 40;
