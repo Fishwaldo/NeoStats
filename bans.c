@@ -131,17 +131,6 @@ BanDump (void)
 	debugtochannel("End of Listing.");
 }
 
-int 
-InitBans (void)
-{
-	banshash = hash_create (-1, 0, 0);
-	if (!banshash) {
-		nlog (LOG_CRITICAL, LOG_CORE, "Create bans hash failed\n");
-		return NS_FAILURE;
-	}
-	return NS_SUCCESS;
-}
-
 void 
 FreeBans ()
 {
@@ -264,3 +253,20 @@ TBLDEF neo_bans = {
 	"The list of bans on the IRC network"
 };
 #endif /* SQLSRV */
+
+int 
+InitBans (void)
+{
+	banshash = hash_create (-1, 0, 0);
+	if (!banshash) {
+		nlog (LOG_CRITICAL, LOG_CORE, "Create bans hash failed\n");
+		return NS_FAILURE;
+	}
+#ifdef SQLSRV
+	/* add the server hash to the sql library */
+	neo_bans.address = banshash;
+	rta_add_table(&neo_bans);
+#endif
+	return NS_SUCCESS;
+}
+
