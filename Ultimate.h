@@ -395,6 +395,9 @@
 #define SMODE_CH_TECHADMIN 'T'		/* Set to a number as we dont use */
 #else
 
+/* message macros */
+#define is_privmsg(msg) ( !strcmp (MSG_PRIVATE, (msg)) || !strcmp ("!", (msg)) )
+
 /* Umode chars */
 #define UMODE_CH_LOCOP 'O'
 #define UMODE_CH_OPER 'o'

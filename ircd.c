@@ -557,12 +557,7 @@ parse (char *line)
 #endif
 
 	/* First, check if its a privmsg, and if so, handle it in the correct Function */
-#ifndef IRCU
-	if (!strcmp (MSG_PRIVATE, cmd) || (!strcmp ("!", cmd))) {
-#else 
-	if (!strcmp(MSG_PRIVATE, cmd) || !strcmp("P", cmd) || !strcmp("CPRIVMSG", cmd) || !strcmp("CP", cmd)) {
-#endif
-
+	if( is_privmsg(cmd) ) {
 		/* its a privmsg, now lets see who too... */
 		if (strstr (av[0], "!")) {
 			strlcpy (cmd, av[0], 64);

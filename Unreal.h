@@ -608,6 +608,9 @@
 #define TOK_BOTSERV	"BS"
 #endif
 
+/* message macros */
+#define is_privmsg(msg) ( !strcmp (MSG_PRIVATE, (msg)) || !strcmp ("!", (msg)) )
+
 /* Umode chars */
 #define UMODE_CH_LOCOP 'O'
 #define UMODE_CH_OPER 'o'
