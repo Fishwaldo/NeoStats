@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.33 2002/07/17 05:25:37 fishwaldo Exp $
+** $Id: users.c,v 1.34 2002/07/18 06:45:04 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -53,7 +53,7 @@ User *new_user(const char *nick)
 	return(u);
 }
 
-void AddUser(const char *nick, const char *user, const char *host, const char *server)
+void AddUser(const char *nick, const char *user, const char *host, const char *server, const unsigned long ipaddr)
 {
 	User *u;
 
@@ -78,6 +78,7 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 	u->Umode = 0;
 	u->chans = list_create(MAXJOINCHANS);
 	strcpy(u->modes,"");
+	u->ipaddr.s_addr = ipaddr;
 
 }
 

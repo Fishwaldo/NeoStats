@@ -988,10 +988,10 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			int ac = 0;
 			AddStringToList(&av, argv[0], &ac);
 #ifndef ULTIMATE3
-			AddUser(argv[0], argv[3], argv[4], argv[5]);
+			AddUser(argv[0], argv[3], argv[4], argv[5], strtoul(argv[8], NULL, 10));
 			Module_Event("SIGNON", av, ac);
 #else
-			AddUser(argv[0], argv[4], argv[5], argv[6]);
+			AddUser(argv[0], argv[4], argv[5], argv[6], strtoul(argv[8], NULL, 10));
 #ifdef DEBUG
 			log("Mode: UserMode: %s",argv[3]);
 #endif

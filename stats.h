@@ -167,6 +167,7 @@ struct user_ {
 	int ulevel;
 	long Umode;
 	list_t *chans;
+	struct in_addr ipaddr;
 };
 
 struct chans_ {
@@ -254,7 +255,7 @@ extern int is_midnight();
 extern Server *serverlist[S_TABLE_SIZE];
 extern User *userlist[U_TABLE_SIZE];
 extern MyUser *myuhead;
-extern void AddUser(const char *, const char *, const char *, const char *);
+extern void AddUser(const char *, const char *, const char *, const char *, const unsigned long ip);
 extern void DelUser(const char *);
 extern void Change_User(User *, const char *);
 extern void sendcoders(char *message,...);
