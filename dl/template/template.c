@@ -92,9 +92,9 @@ int __BotMessage(char *origin, char **argv, int argc)
 		return -1;
 	}
 	buf = joinbuf(argv, argc, 1);
-	globops(me.name, "Bot recieved %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
-	chanalert(s_module_bot_name, "Bot recieved %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
-	nlog(LOG_NORMAL, LOG_MOD, "Bot recieved %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
+	globops(me.name, "Bot received %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
+	chanalert(s_module_bot_name, "Bot received %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
+	nlog(LOG_NORMAL, LOG_MOD, "Bot received %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
 	free(buf);
 	return 1;
 }

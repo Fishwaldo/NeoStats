@@ -239,7 +239,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		}
 	}	
 
-	/* the callback function for data recieved from the server */
+	/* the callback function for data received from the server */
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_WRITEFUNCTION, neocurl_callback)) != 0) {
 		nlog(LOG_WARNING, LOG_CORE, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, LOG_CORE, "Error Was: %s", newtrans->curlerror);
