@@ -19,6 +19,7 @@
 */
 
 #include <setjmp.h>
+#include <stdio.h>
 #include "stats.h"
 #include "signal.h"
 #include "dl.h"
@@ -26,14 +27,31 @@
 #include <execinfo.h>
 #endif
 
-char s_Debug[MAXNICK] = "Stats_Debug";
 char s_Services[MAXNICK] = "NeoStats";
-const char version[] = "NeoStats-2.5_Beta3(CVS)";
+
+#ifdef UNREAL
+const char version[] = "NeoStats-2.5_Beta3(U)";
+#elif ULTIMATE3
+const char version[] = "NeoStats-2.5_Beta3(UL)";
+#elif ULTIMATE
+const char version[] = "NeoStats-2.5_Beta3(UL3)";
+#elif HYBRID7
+const char version[] = "NeoStats-2.5_Beta3(H)";
+#endif
+
+
+
+
+
 const char version_date[] = __DATE__;
 const char version_time[] = __TIME__;
 
 static void start();
 static void setup_signals();
+
+int fcloseall(void);
+
+
 int forked = 0;
 
 int main()
@@ -157,9 +175,9 @@ RETSIGTYPE serv_segv() {
 		log("Unloading Module and restoring stacks. Doing Backtrace:");
 		chanalert(s_Services, "Location *could* be %s. Doing Backtrace:", segv_location);
 #ifdef HAVE_BACKTRACE
-		for (i = 0; i < size; i++) {
-			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
-			log("BackTrace(%d): %s", i, strings[i]);
+		for (i = 2; i < size; i++) {
+			chanalert(s_Services, "Backtrace(%d): %s", i-1, strings[i]);
+			log("BackTrace(%d): %s", i-1, strings[i]);
 		}
 #else 
 		chanalert(s_Services, "Backtrace not available on this platform");
@@ -181,9 +199,9 @@ RETSIGTYPE serv_segv() {
 		globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 		chanalert(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s Backtrace:", recbuf, segv_location);
 #ifdef HAVE_BACKTRACE
-		for (i = 0; i < size; i++) {
-			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
-			log("BackTrace(%d): %s", i, strings[i]);
+		for (i = 2; i < size; i++) {
+			chanalert(s_Services, "Backtrace(%d): %s", i-1, strings[i]);
+			log("BackTrace(%d): %s", i-1, strings[i]);
 		}
 #else 
 		chanalert(s_Services, "Backtrace not available on this platform");

@@ -3646,6 +3646,11 @@ echo "${ECHO_T}yes" >&6
    "hybrid7.c")
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
+	echo "*******************************************************"
+	echo "Hybrid7 Support is very very experimental at the moment"
+	echo "Please report any bugs, or Desyncs to:"
+	echo "http://www.neostats.net/boards"
+	echo "*******************************************************"
 	;;
   *)
 	echo "$as_me:$LINENO: result: no" >&5

@@ -53,6 +53,7 @@ Oper_Modes usr_mds[] = {
                       		{UMODE_EXTERNAL, 'x', 0},
                         	{UMODE_SPY, 'y', 0},
                           	{UMODE_OPERWALL, 'z', 0},
+				{UMODE_SERVICES, 'S', 0},
                                 {0, 0, 0 }
 };
 
@@ -61,25 +62,25 @@ void init_ircd() {
 };
 
 int seob_cmd(const char *server) {
-	sts(":%s %s", server, (me.token ? TOK_EOB : MSG_EOB));
+	sts(":%s %s", server,  MSG_EOB);
 	return 1;
 }
 
 
 int sserver_cmd(const char *name, const int numeric, const char *infoline) {
-	sts("%s %s %s %d :%s", me.name, (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	sts("%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
 	return 1;
 }
 
 int slogin_cmd(const char *name, const int numeric, const char *infoline, const char *pass) {
-	sts("%s %s :TS", (me.token ? TOK_PASS : MSG_PASS), pass);
-	sts("CAPAB TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS");
-	sts("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	sts("%s %s :TS", MSG_PASS, pass);
+	sts("CAPAB TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS MX");
+	sts("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
 	return 1;
 }
 
 int ssquit_cmd(const char *server) {
-	sts("%s %s", (me.token ? TOK_SQUIT : MSG_SQUIT), server);
+	sts("%s %s", MSG_SQUIT, server);
 	return 1;
 }
 
@@ -88,13 +89,13 @@ int sprotocol_cmd(const char *option) {
 }
 
 int squit_cmd(const char *who, const char *quitmsg) {
-	sts(":%s %s :%s", who, (me.token ? TOK_QUIT : MSG_QUIT), quitmsg);
+	sts(":%s %s :%s", who, MSG_QUIT, quitmsg);
 	DelUser(who);
 	return 1;
 }
 
 int spart_cmd(const char *who, const char *chan) {
-	sts("%s %s %s", who, (me.token ? TOK_PART : MSG_PART), chan);
+	sts("%s %s %s", who, MSG_PART, chan);
 	part_chan(finduser(who), (char *)chan);
 	return 1;
 }
@@ -110,7 +111,7 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 	int ac;	
 	char tmp[512];
 
-	sts(":%s %s %s %s %s %lu", who, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args, time(NULL));
+	sts(":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, time(NULL));
 	sprintf(tmp, "%s %s %s", chan, mode, args);
 	ac = split_buf(tmp, &av, 0);
 	ChanMode("", av, ac);
@@ -127,14 +128,14 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host, const ch
 			sprintf(newmode, "%s%c", newmode, usr_mds[i].mode);
 		}
 	}
-	sts("%s %s 1 %lu %s %s %s %s :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), newmode, ident, host, me.name, realname);
+	sts("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, time(NULL), newmode, ident, host, me.name, realname);
 	AddUser(nick,ident, host, me.name, 0);
 	UserMode(nick, newmode);
 	return 1;
 }  
 
 int sping_cmd(const char *from, const char *reply, const char *to) {
-	sts(":%s %s %s :%s", from, (me.token ? TOK_PING : MSG_PING), reply, to);
+	sts(":%s %s %s :%s", from, MSG_PING, reply, to);
 	return 1;
 }
 
@@ -148,7 +149,7 @@ int sumode_cmd(const char *who, const char *target, long mode) {
 			sprintf(newmode, "%s%c", newmode, usr_mds[i].mode);
 		}
 	}
-	sts(":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, newmode);
+	sts(":%s %s %s :%s", who, MSG_MODE, target, newmode);
 	UserMode(target, newmode);
 	return 1;
 }
@@ -164,63 +165,58 @@ int snumeric_cmd(const int numeric, const char *target, const char *data,...) {
 }
 
 int  spong_cmd(const char *reply) {
-	sts("%s %s", (me.token ? TOK_PONG : MSG_PONG), reply);
+	sts("%s %s", MSG_PONG, reply);
 	return 1;
 }
 
-int snetinfo_cmd() {
-	sts(":%s %s 0 %d %d %s 0 0 0 :%s",me.name,MSG_SNETINFO, time(NULL),ircd_srv.uprot, ircd_srv.cloak,me.netname);
-	return 1;
-}
 
-int vctrl_cmd() {
-	sts("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, ircd_srv.nicklg, ircd_srv.modex, ircd_srv.gc, me.netname);
-	return 1;
-}
 int skill_cmd(const char *from, const char *target, const char *reason,...) {
 	va_list ap;
 	char buf[512];
 	va_start(ap, reason);
 	vsnprintf(buf, 512, reason, ap);
-	sts(":%s %s %s :%s", from, (me.token ? TOK_KILL : MSG_KILL), target, buf);
+	sts(":%s %s %s :%s", from, MSG_KILL, target, buf);
 	va_end(ap);
 	DelUser(target);
 	return 1;
 }
 
 int ssmo_cmd(const char *from, const char *umodetarget, const char *msg) {
-	notice(s_Services, "Warning, Module %s tried to SMO, which is not supported in Ultimate", segvinmodule);
-	log("Warning, Module %s tried to SMO, which is not supported in Ultimate", segvinmodule);
+	notice(s_Services, "Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
+	log("Warning, Module %s tried to SMO, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 
 int snick_cmd(const char *oldnick, const char *newnick) {
 	Change_User(finduser(oldnick), newnick);
-	sts(":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, time(NULL));
+	sts(":%s %s %s %d", oldnick, MSG_NICK, newnick, time(NULL));
 	return 1;
 }
 int sswhois_cmd(const char *target, const char *swhois) {
-	notice(s_Services, "Warning Module %s tried to SWHOIS, which is not supported in Ultimate", segvinmodule);
-	log("Warning. Module %s tried to SWHOIS, which is not supported in Ultimate", segvinmodule);
+	notice(s_Services, "Warning Module %s tried to SWHOIS, which is not supported in Hybrid", segvinmodule);
+	log("Warning. Module %s tried to SWHOIS, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 int ssvsnick_cmd(const char *target, const char *newnick) {
-	sts("%s %s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, time(NULL));
+	notice(s_Services, "Warning Module %s tried to SVSNICK, which is not supported in Hybrid", segvinmodule);
+	log("Warning. Module %s tried to SVSNICK, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 
 int ssvsjoin_cmd(const char *target, const char *chan) {
-	sts("%s %s %s", (me.token ? TOK_SVSJOIN : MSG_SVSJOIN), target, chan);
+	notice(s_Services, "Warning Module %s tried to SJOIN, which is not supported in Hybrid", segvinmodule);
+	log("Warning. Module %s tried to SJOIN, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 
 int ssvspart_cmd(const char *target, const char *chan) {
-	sts("%s %s %s", (me.token ? TOK_SVSPART : MSG_SVSPART), target, chan);
+	notice(s_Services, "Warning Module %s tried to SVSPART, which is not supported in Hybrid", segvinmodule);
+	log("Warning. Module %s tried to SVSPART, which is not supported in Hybrid", segvinmodule);
 	return 1;
 }
 
 int skick_cmd(const char *who, const char *target, const char *chan, const char *reason) {
-	sts(":%s %s %s %s :%s", who, (me.token ? TOK_KICK : MSG_KICK), chan, target, (reason ? reason : "No Reason Given"));
+	sts(":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
 	part_chan(finduser(target), (char *)chan); 
 	return 1;
 }
@@ -229,22 +225,14 @@ int swallops_cmd(const char *who, const char *msg,...) {
 	char buf[512];
 	va_start(ap, msg);
 	vsnprintf(buf, 512, msg, ap);
-	sts(":%s %s :%s", who, (me.token ? TOK_WALLOPS : MSG_WALLOPS), buf);
+	sts(":%s %s :%s", who, MSG_WALLOPS, buf);
 	va_end(ap);
 	return 1;
 }
 
 int ssvshost_cmd(const char *who, const char *vhost) {
-	User *u;
-	u = finduser(who);
-	if (!u) {
-		log("Can't Find user %s for ssvshost_cmd", who);
-		return 0;
-	} else {
-		strcpy(u->vhost, vhost);
-		sts(":%s %s %s %s", me.name, (me.token ? TOK_SETHOST : MSG_SETHOST), who, vhost);
-		return 1;
-	}
+	notice(s_Services, "Warning Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
+	log("Warning. Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
 }
 int ssvinfo_cmd() {
 	sts("SVINFO 5 3 0 :%d", time(NULL));
@@ -317,18 +305,13 @@ void prefmsg(char *to, const char *from, char *fmt, ...)
 
 	va_start(ap, fmt);
 	vsnprintf(buf2, sizeof(buf2), fmt, ap);
+        if (findbot(to)) {
+	        chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+                return;
+        }
 	if (me.want_privmsg) {
-                  if (findbot(to)) {
-                        chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
-                        return;
-                }
 		sprintf(buf, ":%s PRIVMSG %s :%s", from, to, buf2);
 	} else {
-                  if (findbot(to)) {
-                        chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
-                        return;
-                }
-
 		sprintf(buf, ":%s NOTICE %s :%s", from, to, buf2);
 	}
 	sts("%s", buf);
@@ -373,9 +356,9 @@ void privmsg_list(char *to, char *from, const char **text)
 {
 	while (*text) {
 		if (**text)
-			privmsg(to, from, "%s", *text);
+			prefmsg(to, from, "%s", *text);
 		else
-			privmsg(to, from, " ");
+			prefmsg(to, from, " ");
 		text++;
 	}	
 }

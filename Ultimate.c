@@ -54,7 +54,7 @@ Oper_Modes usr_mds[] = {
                                  {UMODE_SERVNOTICE, 's',0},
                                  {UMODE_KILLS, 'k',0},
                                  {UMODE_SERVICES, 'S',200},
-                                 {UMODE_SERVICESADMIN, 'P',100},
+                                 {UMODE_SERVICESADMIN, 'P',200},
 				 {UMODE_RBOT, 'B',0},
 		 		 {UMODE_SBOT, 'b', 0},
 	   			 {UMODE_DEAF,    'd',0},
@@ -83,7 +83,7 @@ Oper_Modes usr_mds[] = {
                                  {UMODE_SERVNOTICE, 's',0},
                                  {UMODE_KILLS, 'k',0},
                                  {UMODE_SERVICES, 'S',200},
-                                 {UMODE_SERVICESADMIN, 'P',100},
+                                 {UMODE_SERVICESADMIN, 'P',200},
                                  {UMODE_RBOT, 'B',0},
                                  {UMODE_SBOT, 'b', 0},
                                  {UMODE_DEAF,    'd',0},
@@ -383,18 +383,13 @@ void prefmsg(char *to, const char *from, char *fmt, ...)
 
 	va_start(ap, fmt);
 	vsnprintf(buf2, sizeof(buf2), fmt, ap);
+        if (findbot(to)) {
+	        chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+                return;
+        }
 	if (me.want_privmsg) {
-                  if (findbot(to)) {
-                        chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
-                        return;
-                }
 		sprintf(buf, ":%s PRIVMSG %s :%s", from, to, buf2);
 	} else {
-                  if (findbot(to)) {
-                        chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
-                        return;
-                }
-
 		sprintf(buf, ":%s NOTICE %s :%s", from, to, buf2);
 	}
 	sts("%s", buf);
@@ -439,9 +434,9 @@ void privmsg_list(char *to, char *from, const char **text)
 {
 	while (*text) {
 		if (**text)
-			privmsg(to, from, "%s", *text);
+			prefmsg(to, from, "%s", *text);
 		else
-			privmsg(to, from, " ");
+			prefmsg(to, from, " ");
 		text++;
 	}	
 }

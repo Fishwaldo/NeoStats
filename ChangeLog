@@ -1,6 +1,13 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
 * NeoStats * Fish & Shmad * Version 2.5.0-Beta3
+ - Added eggy to the credits 
+ - A few level permissions problems with Ultimate were fixed
+ - Hybrd Dun use Tokens. Duh!
+ - Message from help section were not being sent as correct type. (PRIVMSG/NOTICE) according to config file. Fixed. (and fixed a crazy crackhead shmad bug!)
+ - Fixed up a few issues with logging FindServer messages, and trying to track down a Desync
+ - Added Hybrid7 ircd support (fish)
+ - Fixed up Unreal stuff (fish)
  - Fixed up Unreal stuff (fish) Reported by eggy yet again
  - Added ADNS libary to core Neostats. Now can do DNS lookups without timing out neostats itself (it calls back when it gets a answer) (fish)
  - we now close stdin, stdout, and stderr when we fork, as we should have always done (Fish)

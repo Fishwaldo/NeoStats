@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: server.c,v 1.11 2002/07/17 05:25:37 fishwaldo Exp $
+** $Id: server.c,v 1.12 2002/08/16 04:48:04 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -96,7 +96,9 @@ Server *findserver(const char *name)
 		s = hnode_get(sn);
 		return s;
 	} else {
+#ifdef DEBUG
 		log("FindServer(): %s not found!", name);
+#endif
 		return NULL;
 	}	
 }

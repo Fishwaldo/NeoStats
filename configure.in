@@ -126,6 +126,11 @@ case "$IRCD_FILES_SRC" in
 	;;
    "hybrid7.c")
 	AC_MSG_RESULT(yes)
+	echo "*******************************************************"
+	echo "Hybrid7 Support is very very experimental at the moment"
+	echo "Please report any bugs, or Desyncs to:"
+	echo "http://www.neostats.net/boards"
+	echo "*******************************************************"
 	;;
   *)
 	AC_MSG_RESULT(no)

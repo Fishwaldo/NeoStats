@@ -340,7 +340,6 @@ static void ns_jupe(User *u, char *server)
 
 void ns_debug_to_coders(char *u)
 {
-	char realname[63];
 	strcpy(segv_location, "ns_debug_to_coders");
 	if (!me.coder_debug) {
 		me.coder_debug = 1;

@@ -146,7 +146,6 @@ IntCommands cmd_list[] = {
 IntCommands cmd_list[] = {
 	/* Command	Function		srvmsg*/
 	{MSG_STATS,	Usr_Stats, 		1},
-	{MSG_SETHOST, 	Usr_Vhost,		1},
 	{MSG_VERSION,	Usr_Version,		1},
 	{MSG_MOTD,	Usr_ShowMOTD,		1},
 	{MSG_ADMIN,	Usr_ShowADMIN,		1},
@@ -155,7 +154,6 @@ IntCommands cmd_list[] = {
 	{MSG_SQUIT,	Usr_DelServer,		1},
 	{MSG_QUIT,	Usr_DelUser,		1},
 	{MSG_MODE,	Usr_Mode,		1},
-	{MSG_SVSMODE,	Usr_Smode,		1},
 	{MSG_KILL,	Usr_Kill,		1},
 	{MSG_PONG,	Usr_Pong,		1},
 	{MSG_AWAY,	Usr_Away,		1},
@@ -171,7 +169,6 @@ IntCommands cmd_list[] = {
 	{MSG_SERVER,	Srv_Server,		0},
 	{MSG_SQUIT,	Srv_Squit,		0},
 	{MSG_NICK,	Srv_Nick,		0},
-	{MSG_SVSNICK,	Srv_Svsnick,		0},
 	{MSG_KILL,	Srv_Kill,		0},
 	{MSG_EOB, 	Srv_Burst, 		1},
 	{MSG_SJOIN,	Srv_Sjoin,		1},
@@ -275,7 +272,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	snewnick_cmd(nick, user, host, rname, UMODE_ADMIN);
 #else 
 	snewnick_cmd(nick, user, host, rname);
-	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+//	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif
 #ifdef UNREAL
 	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
@@ -580,7 +577,7 @@ void init_ServBot()
 	sburst_cmd(1);
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #elif HYBRID7
-	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_ADMIN);
+	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_ADMIN | UMODE_SERVICES);
 #else 
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname);
 #endif
@@ -667,9 +664,11 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 				mode |= MODE_CHANOP;
 				modes++;
 #ifndef HYBRID7
+#ifndef UNREAL
 			} else if (*modes == '*') {
 				mode |= MODE_CHANADMIN;
 				modes++;
+#endif
 #endif
 			} else if (*modes == '%') {
 				mode |= MODE_HALFOP;
@@ -680,6 +679,7 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 			} else {
 				strcpy(nick, modes);
 				ok = 0;
+				break;
 			}
 		}
 		join_chan(finduser(nick), argv[1]);
@@ -700,6 +700,7 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 	}
 	list_destroy(tl);
 }
+#ifndef UNREAL
 void Srv_Burst(char *origin, char **argv, int argc) {
 	if (argc > 0) {
 		if (ircd_srv.burst == 1) {
@@ -716,6 +717,7 @@ void Srv_Burst(char *origin, char **argv, int argc) {
 #endif
 	
 }
+#endif
 void Srv_Connect(char *origin, char **argv, int argc) {
 	int i;
 
@@ -992,9 +994,11 @@ void Srv_Vctrl(char *origin, char **argv, int argc) {
 
 }
 #endif
+#ifndef UNREAL
 void Srv_Svinfo(char *origin, char **argv, int argc) {
 	ssvinfo_cmd();
 }
+#endif
 #ifndef ULTIMATE3
 void Srv_Netinfo(char *origin, char **argv, int argc) {
 		        me.onchan = 1;
@@ -1002,7 +1006,9 @@ void Srv_Netinfo(char *origin, char **argv, int argc) {
 			strcpy(ircd_srv.cloak, argv[3]);
 			strcpy(me.netname, argv[7]);
 
+#ifndef HYBRID7
 			snetinfo_cmd();
+#endif
 			globops(me.name,"Link with Network \2Complete!\2");
 			#ifdef DEBUG
         			ns_debug_to_coders(me.chan);
@@ -1048,14 +1054,14 @@ void Srv_Squit(char *origin, char **argv, int argc) {
 			}
 						
 }
+
+/* BE REALLY CAREFULL ABOUT THE ORDER OF THESE ifdef's */
+
 void Srv_Nick(char *origin, char **argv, int argc) {
 			char **av;
 			int ac = 0;
 			AddStringToList(&av, argv[0], &ac);
 #ifdef UNREAL 
-			AddUser(argv[0], argv[3], argv[4], argv[5], 0);
-			Module_Event("SIGNON", av, ac);
-#elif ULTIMATE
 			AddUser(argv[0], argv[3], argv[4], argv[5], 0);
 			Module_Event("SIGNON", av, ac);
 #elif ULTIMATE3
@@ -1067,6 +1073,12 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			UserMode(argv[0], argv[3]);
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
+#elif ULTIMATE
+			AddUser(argv[0], argv[3], argv[4], argv[5], 0);
+			Module_Event("SIGNON", av, ac);
+#elif ULTIMATE3
+			AddUser(argv[0], argv[5], argv[6], argv[7], strtoul(argv[8], NULL, 10));
+			Module_Event("SIGNON", av, ac);
 #elif HYBRID7
 			AddUser(argv[0], argv[4], argv[5], argv[6], strtoul(argv[3], NULL, 10));
 			Module_Event("SIGNON", av, ac);
@@ -1076,9 +1088,6 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			UserMode(argv[0], argv[3]);
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
-#endif
-#ifdef DEBUG
-			log("Mode: UserMode: %s",argv[3]);
 #endif
 			FreeList(av, ac);
 }
@@ -1186,5 +1195,6 @@ static void Showcredits(char *nick)
 	snumeric_cmd(351, nick, ":- sre and Jacob for development systems and access");
 	snumeric_cmd(351, nick, ":- Error51 for Translating our FAQ and README files");
 	snumeric_cmd(351, nick, ":- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!");
+	snumeric_cmd(351, nick, ":- Eggy for proving to use our code still had bugs when we thought it didn't (and all the bug reports!)");
 }
 
