@@ -121,7 +121,7 @@ typedef struct CStats {
 	time_t lastsave;
 }CStats;
 
-struct daily_ {
+typedef struct Daily {
 	int servers;
 	time_t t_servers;
 	int users;
@@ -131,7 +131,9 @@ struct daily_ {
 	int tot_users;
 	int chans;
 	time_t t_chans;
-} daily;
+} Daily;
+
+extern Daily daily;
 
 typedef struct TLD {
 	char tld[5];

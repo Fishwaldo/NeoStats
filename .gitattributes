@@ -380,6 +380,8 @@ modules/statserv/ss_help.c -text
 modules/statserv/stats.c -text
 modules/statserv/statserv.c -text
 modules/statserv/statserv.h -text
+modules/statserv/statsrta.c -text
+modules/statserv/statsrta.h -text
 modules/statserv/tld.c -text
 modules/template/Makefile.am -text
 modules/template/Makefile.in -text

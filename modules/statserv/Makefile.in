@@ -153,7 +153,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 pkglib_LTLIBRARIES = statserv.la
 statserv_la_SOURCES = database.c stats.c statserv.c htmlstats.c \
-			sqlstats.h statserv.h ss_help.c tld.c \
+			statsrta.c statsrta.h statserv.h ss_help.c tld.c \
 			geoip/GeoIPCity.c geoip/GeoIPCity.h \
 			geoip/GeoIPBitReader.c geoip/GeoIPBitReader.h \
 			geoip/GeoIP.c geoip/GeoIP.h \
@@ -176,8 +176,8 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 
 statserv_la_LIBADD =
 am_statserv_la_OBJECTS = database.lo stats.lo statserv.lo htmlstats.lo \
-	ss_help.lo tld.lo GeoIPCity.lo GeoIPBitReader.lo GeoIP.lo \
-	md5.lo
+	statsrta.lo ss_help.lo tld.lo GeoIPCity.lo GeoIPBitReader.lo \
+	GeoIP.lo md5.lo
 statserv_la_OBJECTS = $(am_statserv_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
@@ -188,7 +188,8 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/GeoIPCity.Plo ./$(DEPDIR)/database.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/htmlstats.Plo ./$(DEPDIR)/md5.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ss_help.Plo ./$(DEPDIR)/stats.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/statserv.Plo ./$(DEPDIR)/tld.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/statserv.Plo ./$(DEPDIR)/statsrta.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/tld.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -246,6 +247,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ss_help.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stats.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/statserv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/statsrta.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tld.Plo@am__quote@
 
 GeoIPCity.o: geoip/GeoIPCity.c

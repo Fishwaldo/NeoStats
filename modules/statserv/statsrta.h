@@ -23,15 +23,10 @@
 ** $Id$
 */
 
-#ifndef SQLSTATS_H
-#define SQLSTATS_H
+#ifndef STATSRTA_H
+#define STATSRTA_H
 
-/* only include the following code if SQLSRV is included */
-#ifdef SQLSRV
+void statserv_rta_init (void);
+void statserv_rta_fini (void);
 
-#include "sqlsrv/rta.h"
-
-
-
-#endif /* SQLSRV */
-#endif /* SQLSTATS_H */
+#endif

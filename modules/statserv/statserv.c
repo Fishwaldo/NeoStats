@@ -25,10 +25,7 @@
 
 #include "neostats.h"
 #include "statserv.h"
-#ifdef SQLSRV
-#include "sqlsrv/rta.h"
-#include "sqlstats.h"
-#endif
+#include "statsrta.h"
 
 static int ss_chans(CmdParams* cmdparams);
 static int ss_daily(CmdParams* cmdparams);
@@ -61,6 +58,8 @@ static int ss_event_kick(CmdParams* cmdparams);
 
 static Client * listu;
 static int listindex = 0;
+Daily daily;
+
 /** Bot pointer */
 Bot *ss_bot;
 
@@ -183,31 +182,8 @@ int ModInit (Module *mod_ptr)
 	GetChannelList(StatsAddChan);
 	/* TODO get member counts */
 
-#ifdef SQLSRV
-	/* ok, now export the server and chan data into the sql emulation layers */
-	/* for the network and daily stats, we use a fake list, so we can easily import into rta */
+	statserv_rta_init ();
 
-	fakedaily = list_create(-1);
-	lnode_create_append (fakedaily, &daily);
-	fakenetwork = list_create(-1);
-	lnode_create_append (fakenetwork, &stats_network);
-	
-	/* find the address of each list/hash, and export to rta */
-	 
-	statserv_chans.address = Chead;
-	rta_add_table(&statserv_chans);
-	statserv_tld.address = Thead;
-	rta_add_table(&statserv_tld);
-	statserv_servers.address = Shead;
-	rta_add_table(&statserv_servers);
-	statserv_versions.address = Vhead;
-	rta_add_table(&statserv_versions);
-	statserv_network.address = fakenetwork;
-	rta_add_table(&statserv_network);
-	statserv_daily.address = fakedaily;
-	rta_add_table(&statserv_daily);
-
-#endif
 #ifdef USE_BERKELEY
 	DBOpenDatabase();
 #endif
@@ -258,12 +234,9 @@ void ModFini (void)
 	FiniStats ();
 	FiniTLD ();
 	save_client_versions ();
-#if SQLSRV
-	list_destroy_nodes (fakedaily);
-	list_destroy (fakedaily);
-	list_destroy_nodes (fakenetwork);
-	list_destroy (fakenetwork);
-#endif
+
+	statserv_rta_fini();
+
 #ifdef USE_BERKELEY
 	DBCloseDatabase();
 #endif      

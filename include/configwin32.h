@@ -547,9 +547,6 @@
 /* The size of a `off_t', as computed by sizeof. */
 #define SIZEOF_OFF_T 8
 
-/* 'Use Sql Server Emulation' */
-/* #undef SQLSRV */
-
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
    automatically deduced at run-time.

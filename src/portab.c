@@ -98,7 +98,7 @@ int sys_file_printf (FILE_HANDLE handle, char *fmt, ...)
 	return fprintf (handle, "%s", tempbuf);	
 }
 
-int sys_file_read (const void *buffer, size_t size, size_t count, FILE_HANDLE handle)
+int sys_file_read (void *buffer, size_t size, size_t count, FILE_HANDLE handle)
 {
 	return fread (buffer, size, count, handle);
 }
@@ -147,7 +147,7 @@ int sys_file_get_size (const char* filename)
 			nlog (LOG_CRITICAL, "No such file: %s", filename);
 			return -1;
 		} else {
-			nlog (LOG_CRITICAL, "File error: %s", sys_file_get_last_error ());
+			nlog (LOG_CRITICAL, "File error: %s", sys_file_get_last_error_string ());
 			return -1;
 		}
 	}

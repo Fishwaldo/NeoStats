@@ -1259,7 +1259,7 @@ EXPORTFUNC int sys_check_create_dir (const char* dirname);
 EXPORTFUNC FILE_HANDLE sys_file_open (const char * filename, int filemode);
 EXPORTFUNC int sys_file_close (FILE_HANDLE handle);
 EXPORTFUNC int sys_file_printf (FILE_HANDLE handle, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC int sys_file_read (const void *buffer, size_t size, size_t count, FILE_HANDLE handle);
+EXPORTFUNC int sys_file_read (void *buffer, size_t size, size_t count, FILE_HANDLE handle);
 EXPORTFUNC int sys_file_write (const void *buffer, size_t size, size_t count, FILE_HANDLE handle);
 EXPORTFUNC int sys_file_flush (FILE_HANDLE handle);
 EXPORTFUNC int sys_file_rename (const char* oldname, const char* newname);
