@@ -47,6 +47,7 @@ AC_TYPE_SIGNAL
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS(strlcpy strlcat strnlen)
 AC_CHECK_FUNCS(socket strdup)
+AC_CHECK_FUNCS(strndup)
 AC_CHECK_FUNCS(bcopy memmove strerror)
 
 
