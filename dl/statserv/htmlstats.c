@@ -56,80 +56,80 @@ void ss_html() {
 		notice(s_StatServ, "Can't open StatServ HTML output file - Check Permissions");
 		return;
 	}
-	buf = malloc(20480);
+	buf = malloc(40960);
 	while (fgets(buf, 512, tpl)) {
-		tmpbuf = malloc(10240);
+		tmpbuf = malloc(20480);
 		if (strstr(buf, "!MAP!")) {
 			tmpbuf = get_map("", 0);
 			sprintf(tmpbuf, "%s </table>\n", tmpbuf);
-			strnrepl(buf, 10240, "!MAP!", tmpbuf);
+			strnrepl(buf, 20480, "!MAP!", tmpbuf);
 #ifdef DEBUG
 			log("gotmap");
 #endif
 		}
 		if (strstr(buf, "!SRVLIST!")) {
-			strnrepl(buf, 10240, "!SRVLIST!", get_srvlist());
+			strnrepl(buf, 20480, "!SRVLIST!", get_srvlist());
 #ifdef DEBUG
 			log("gotsrvlist");
 #endif
 		}
 		if (strstr(buf, "!SRVLISTDET!")) {
-			strnrepl(buf, 10240, "!SRVLISTDET!", get_srvlistdet());
+			strnrepl(buf, 20480, "!SRVLISTDET!", get_srvlistdet());
 #ifdef DEBUG
 			log("gotsrvlistdet");
 #endif
 		}
 		if (strstr(buf, "</HTML>")) {
-			strnrepl(buf, 10240, "</html>", put_copyright());			
+			strnrepl(buf, 20480, "</html>", put_copyright());			
 			gothtml = 1;
 #ifdef DEBUG
 			log("gotcopyright");
 #endif
 		}
 		if (strstr(buf, "!NETSTATS!")) {
-			strnrepl(buf, 10240, "!NETSTATS!", get_netstats());
+			strnrepl(buf, 20480, "!NETSTATS!", get_netstats());
 #ifdef DEBUG
 			log("gotnetstats");
 #endif
 		}
 		if (strstr(buf, "!DAILYSTATS!")) {
-			strnrepl(buf, 10240, "!DAILYSTATS!", get_dailystats());
+			strnrepl(buf, 20480, "!DAILYSTATS!", get_dailystats());
 #ifdef DEBUG
 			log("gotdailystats");
 #endif
 		}
 		if (strstr(buf, "!DAILYTOPCHAN!")) {
-			strnrepl(buf, 10240, "!DAILYTOPCHAN!", get_chantop10());
+			strnrepl(buf, 20480, "!DAILYTOPCHAN!", get_chantop10());
 #ifdef DEBUG
 			log("gotdailytopchan");
 #endif
 		}
 		if (strstr(buf, "!TOP10CHAN!")) {
-			strnrepl(buf, 10240, "!TOP10CHAN!", get_chantop10eva());
+			strnrepl(buf, 20480, "!TOP10CHAN!", get_chantop10eva());
 #ifdef DEBUG
 			log("gottop10");
 #endif
 		}
 		if (strstr(buf, "!TOP10KICKS!")) {
-			strnrepl(buf, 10240, "!TOP10KICKS!", get_unwelcomechan());
+			strnrepl(buf, 20480, "!TOP10KICKS!", get_unwelcomechan());
 #ifdef DEBUG
 			log("gotdailykicks");
 #endif
 		}
 		if (strstr(buf, "!TOP10TOPICS!")) {
-			strnrepl(buf, 10240, "!TOP10TOPICS!", get_chantops());
+			strnrepl(buf, 20480, "!TOP10TOPICS!", get_chantops());
 #ifdef DEBUG
 			log("gotdailytopics");
 #endif
 		}
 		if (strstr(buf, "!TLDMAP!")) {
-			strnrepl(buf, 10240, "!TLDMAP!", get_tldmap());
+			strnrepl(buf, 20480, "!TLDMAP!", get_tldmap());
 		}
 		if (strstr(buf, "!VERSION!")) {
-			strnrepl(buf, 10240, "!VERSION!", version);
+			strnrepl(buf, 20480, "!VERSION!", version);
 		}
 		if (strstr(buf, "!TITLE!")) {
-			strnrepl(buf, 10240, "!TITLE!", get_title());
+			strnrepl(buf, 20480, "!TITLE!", get_title());
 		}
 
 		
@@ -137,7 +137,7 @@ void ss_html() {
 		free(tmpbuf);
 	}
 	if (!gothtml) {
-		tmpbuf = malloc(10240);
+		tmpbuf = malloc(20480);
 		tmpbuf = put_copyright();
 		fputs(tmpbuf, opf);
 		free(tmpbuf);
