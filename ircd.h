@@ -25,17 +25,17 @@
 
 #define MAX_CMD_LINE_LENGTH		350
 
-typedef void (*int_cmd_handler) (char *origin, char **argv, int argc);
+typedef void (*ircd_cmd_handler) (char *origin, char **argv, int argc, int srv);
 
-typedef struct IntCommands{
+typedef struct IrcdCommands{
 	const char *name;
 #ifdef GOTTOKENSUPPORT
 	const char *token;
 #endif
-	int_cmd_handler function;
+	ircd_cmd_handler function;
 	int srvmsg;		/* Should this be a Server Message(1), or a User Message?(0) */
 	int usage;
-}IntCommands;
+}IrcdCommands;
 
 typedef struct ChanModes {
 	long mode;
@@ -56,7 +56,7 @@ extern UserModes user_umodes[];
 extern UserModes user_smodes[];
 #endif
 
-extern IntCommands cmd_list[];
+extern IrcdCommands cmd_list[];
 extern ChanModes chan_modes[];
 extern const int ircd_cmdcount;
 extern const int ircd_umodecount;

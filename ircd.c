@@ -472,7 +472,7 @@ process_ircd_cmd(int cmdptr, char *cmd, char* origin, char **av, int ac)
 				||(me.token && cmd_list[i].token && !strcmp (cmd_list[i].token, cmd))
 #endif
 				) {
-				cmd_list[i].function (origin, av, ac);
+				cmd_list[i].function (origin, av, ac, cmdptr);
 				cmd_list[i].usage++;
 				break;
 			}
