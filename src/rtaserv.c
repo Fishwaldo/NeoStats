@@ -315,7 +315,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
        Once we've read all of the data we can, we call the DB routine to
        parse out the SQL command and to execute it. */
 	ret = os_sock_read (sqlconn->fd,
-		&(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos));
+		(char *)&(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos));
 
 	/* shutdown manager conn on error or on zero bytes read */
 	if (ret <= 0)

@@ -3,8 +3,7 @@ BUILT_SOURCES=version.h
 CLEANFILES = version.h
 
 include_HEADERS		=	neostats.h config.h \
-						list.h hash.h support.h events.h numeric.h \
-						version.sh
+						list.h hash.h support.h events.h numeric.h 
 
 noinst_HEADERS		=	commands.h  dns.h servers.h users.h conf.h \
 						dotconf.h log.h services.h modes.h signals.h \
@@ -13,6 +12,6 @@ noinst_HEADERS		=	commands.h  dns.h servers.h users.h conf.h \
 						bots.h dcc.h ircstring.h numeric.h timer.h \
 						channels.h dl.h lang.h rtaserv.h transfer.h 
 
-version.h: version.sh
+version.h:
 	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
 

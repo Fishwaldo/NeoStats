@@ -157,8 +157,7 @@ BUILT_SOURCES = version.h
 CLEANFILES = version.h
 
 include_HEADERS = neostats.h config.h \
-						list.h hash.h support.h events.h numeric.h \
-						version.sh
+						list.h hash.h support.h events.h numeric.h 
 
 
 noinst_HEADERS = commands.h  dns.h servers.h users.h conf.h \
@@ -411,7 +410,7 @@ uninstall-am: uninstall-includeHEADERS uninstall-info-am
 	uninstall-am uninstall-includeHEADERS uninstall-info-am
 
 
-version.h: version.sh
+version.h:
 	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

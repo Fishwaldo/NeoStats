@@ -103,7 +103,7 @@ void AddBan (const char *type, const char *user, const char *host, const char *m
 	ban->tsexpires = atol(tsexpires);
 	/* run the module event */
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	cmdparams->param = ban;
+	cmdparams->param = (char *)ban;
 	SendAllModuleEvent (EVENT_ADDBAN, cmdparams);
 	ns_free (cmdparams);
 }
@@ -141,7 +141,7 @@ void DelBan (const char *type, const char *user, const char *host, const char *m
 	ban = hnode_get (bansnode);
 	/* run the module event */
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	cmdparams->param = ban;
+	cmdparams->param = (char *)ban;
 	SendAllModuleEvent (EVENT_DELBAN, cmdparams);
 	ns_free (cmdparams);
 	hash_delete (banhash, bansnode);
