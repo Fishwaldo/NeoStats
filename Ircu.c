@@ -690,36 +690,30 @@ static char ircd_buf[BUFSIZE];
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
-	int param = 2; 
+	int param; 
 
+	/* IRCu passes this information in a stupid order so we must first
+	 * find and process clients and ignore modes to "create" the channel 
+	 * then process modes and ignore clients - look into better system for NS2.6
+	 */
+	param = 2;
 	while (param < argc) {
 	    switch (argv[param][0]) {
 			case '+': /* mode string */
 			{
 				char *modes;
-				char **av;
-				int ac;
-				int i;
 
 				modes = argv[param];
 				param++;
 				modes++;
 				while(*modes) {
-
+					int i;
 					for (i = 0; i < ircd_cmodecount; i++) {
 						if (*modes == chan_modes[i].flag) {
 							if (chan_modes[i].parameters) {
-								ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], *modes, argv[param]);
-								ac = split_buf (ircd_buf, &av, 0);
-								ChanMode (me.name, av, ac);
 								param ++;
-								free (av);
-							} else {
-								ircsnprintf (ircd_buf, BUFSIZE, "%s +%c", argv[0], *modes);
-								ac = split_buf (ircd_buf, &av, 0);
-								ChanMode (me.name, av, ac);
-								free (av);
 							}
+							break;
 						}
 					}
 					modes++;
@@ -753,6 +747,50 @@ m_burst (char *origin, char **argv, int argc, int srv)
 						free (av);
 					}
 				}
+				param++;
+				break;
+			}
+		}
+	}
+
+	param = 2;
+	while (param < argc) {
+	    switch (argv[param][0]) {
+			case '+': /* mode string */
+			{
+				char *modes;
+
+				modes = argv[param];
+				param++;
+				modes++;
+				while(*modes) {
+					char **av;
+					int ac;
+					int i;
+					for (i = 0; i < ircd_cmodecount; i++) {
+						if (*modes == chan_modes[i].flag) {
+							if (chan_modes[i].parameters) {
+								ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], *modes, argv[param]);
+								param ++;
+							} else {
+								ircsnprintf (ircd_buf, BUFSIZE, "%s +%c", argv[0], *modes);
+							}
+							ac = split_buf (ircd_buf, &av, 0);
+							ChanMode (me.name, av, ac);
+							free (av);
+							break;
+						}
+					}
+					modes++;
+				}
+				break;
+			}
+		    case '%': /* bans */
+				/* ignored for now */
+				param++;
+				break;
+		    default: /* clients */
+			{
 				param++;
 				break;
 			}
