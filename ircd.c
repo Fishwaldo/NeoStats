@@ -215,13 +215,9 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 	ssjoin_cmd(who, chan, chflag);
 #else
 	sjoin_cmd(who, chan);
-	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN)
-#if defined(IRCU)
-		schmode_cmd(who, chan, "+o", nicktobase64 (who));
-#else
+	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN) {
 		schmode_cmd(who, chan, "+o", who);
-#endif
-
+	}
 #endif
 	SET_SEGV_INMODULE(savemod);
 	return NS_SUCCESS;
@@ -243,12 +239,7 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 		ssjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
 #else
 		sjoin_cmd (nick, me.chan);
-#if defined(IRCU)
-		schmode_cmd(nick, me.chan, "+o", nicktobase64 (nick));
-#else
 		schmode_cmd(nick, me.chan, "+o", nick);
-#endif
-
 #endif
 	}
 	return NS_SUCCESS;
@@ -1174,7 +1165,11 @@ schmode_cmd (const char *who, const char *chan, const char *mode, const char *ar
 	char **av;
 	int ac;
 
+#if defined(IRCU)
+	send_cmode (me.name, nicktobase64 (who), chan, mode, args, me.now);
+#else
 	send_cmode (me.name, who, chan, mode, args, me.now);
+#endif
 	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
