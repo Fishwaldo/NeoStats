@@ -6,7 +6,7 @@ dist_bin_SCRIPTS 	= makeconf
 dist_data_DATA		= neostats.motd
 
 docdir			= @prefix@/doc
-dist_doc_DATA		= doc/*
+dist_doc_DATA		= doc/FAQ doc/FAQ README.sqlsrv USERMAN
 
 DISTCLEANFILES		= ccdv
 
@@ -20,7 +20,10 @@ all-local:
 install-exec-hook:
 		$(CCDV) $(dist_binSCRIPT_INSTALL) "neostats" "@prefix@/neostats";
 		test -z "@prefix@/logs" || $(mkdir_p) "@prefix@/logs";
+
+install-data-hook:
 		echo "Installation complete."
 		echo "Change directory to '@prefix@' then run './neostats'"
 		echo "If you require support, see the README file."
+
 include $(top_srcdir)/autotools/rules.mk

@@ -39,7 +39,6 @@ autotools/rules.mk -text
 data/niconfig.db -text
 data/tlds.nfo -text
 doc/FAQ -text
-doc/FAQ.pt -text
 doc/README.dev -text
 doc/README.french -text
 doc/README.sqlsrv -text
