@@ -55,6 +55,7 @@ if [ -r config.h ]; then
 else
 	echo "Hmm, you need to run configure first!"
 	echo "Type ./configure"
+        echo "To enable Service Roots run configure with --enable-auth==sr"
 	echo "If you have run configure, make sure you are in the directory"
 	echo "you ran it from."
 	exit 1
@@ -295,6 +296,10 @@ SERVICES_CHAN $NEOCHAN
 # Time in seconds that we wait before attempting
 # to reconnect to the server.
 RECONNECT_TIME $NEOCONN
+
+########################
+# HTML OUTPUT SETTINGS #
+########################
 
 # Should NeoStats write out HTML statistics?  Comment this out to disable
 # HTML_STATS to enable or #HTML_STATS to disable.
