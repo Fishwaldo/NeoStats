@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.112 2003/03/04 12:49:05 fishwaldo Exp $
+** $Id: ircd.c,v 1.113 2003/03/06 11:18:12 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -304,7 +304,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 #elif defined(HYBRID7) 
 	snewnick_cmd(nick, user, host, rname, UMODE_ADMIN);
 #elif defined(NEOIRCD)
-	snewnick_cmd(nick, user, host, rname, UMODE_ADMIN | UMODE_SERVICES);
+	snewnick_cmd(nick, user, host, rname, UMODE_SERVICES);
 #else 
 	snewnick_cmd(nick, user, host, rname);
 //	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.68 2003/01/23 10:53:38 fishwaldo Exp $
+** $Id: stats.h,v 1.69 2003/03/06 11:18:12 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -76,7 +76,7 @@
 #define MAXHOST			128
 #define MAXPASS			32
 #define MAXNICK			32
-#define MAXUSER			10
+#define MAXUSER			15
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
 #define NUM_MODULES		255

@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.4 2003/02/14 13:10:38 fishwaldo Exp $
+** $Id: neoircd.c,v 1.5 2003/03/06 11:18:12 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -44,7 +44,7 @@ aCtab cFlagTab[] = {
 		{MODE_INVEX,		'I', 0, 1},	
 		{MODE_REGCHAN,		'r', 0, 0},
 		{MODE_OPERSONLY,	'O', 0, 0},
-		{MODE_CHANADMIN,		'a', 1, 0},
+		{MODE_CHANADMIN,	'a', 1, 0},
 		{0x0, 0x0, 0x0, 0x0}
 };
 
@@ -136,12 +136,16 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 int snewnick_cmd(const char *nick, const char *ident, const char *host, const char *realname, long mode) {
 	int i;
 	char newmode[20];
-	newmode[0] = '+';
-	newmode[1] = '\0';
+	char newmode1[20];
+	newmode1[0] = '+';
+	newmode1[1] = '\0';
+	snprintf(newmode, 20, "%s", newmode1);
 	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1); i++) {
 		if (mode & usr_mds[i].umodes) {
-			snprintf(newmode, 512, "%s%c", newmode, usr_mds[i].mode);
+			snprintf(newmode1, 20, "%s%c", newmode, usr_mds[i].mode);
+			strncpy(newmode, newmode1, 20);
 		}
+		
 	}
 	sts("%s %s 1 %lu %s %s %s * %s 0 :%s", MSG_NICK, nick, time(NULL), newmode, ident, host, me.name, realname);
 	AddUser(nick,ident, host, me.name, 0, time(NULL));
