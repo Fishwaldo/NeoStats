@@ -11,6 +11,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - StatServ now stores and retrives all data from the Keeper Database. old data/*.db code kept to help upgrade to the new database backend
  - Some Cleanups suggested by Mark
  - Update Config script
+ - Fixed ConnectServ nickwatch being Fubar (BugID 49)
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number
