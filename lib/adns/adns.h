@@ -33,9 +33,20 @@
 #ifndef ADNS_H_INCLUDED
 #define ADNS_H_INCLUDED
 
+#ifdef WIN32
+# include "adns_win32.h"
+#else
 #include <stdio.h>
 
 #include <sys/types.h>
+# define ADNS_API
+# define ADNS_SOCKET int
+# define adns_socket_close(sck) close(sck)
+# define adns_socket_read(sck, data, len) read(sck, data, len)
+# define adns_socket_write(sck, data, len) write(sck, data, len)
+# define ADNS_CAPTURE_ERRNO {}
+# define ADNS_CLEAR_ERRNO {}
+#endif
 
 #ifdef __cplusplus
 extern "C" {			/* I really dislike this - iwj. */
