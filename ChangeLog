@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Split unreal and ultimate protocol files into ultimate2, ultimate3, unreal31 
+   and unreal32 for easier maintainance. (M)
  - Begin moving common mode defines to neostats.h from ircd specific files. (M)
  - Channel key and limit modes now have explicit support rather than being 
    included in general mode parameters list. (M)

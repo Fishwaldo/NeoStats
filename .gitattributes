@@ -336,8 +336,8 @@ src/protocol/bahamut.c eol=lf
 src/protocol/bahamut.h eol=lf
 src/protocol/hybrid7.c eol=lf
 src/protocol/hybrid7.h eol=lf
-src/protocol/ircu.c eol=lf
-src/protocol/ircu.h eol=lf
+src/protocol/ircup10.c eol=lf
+src/protocol/ircup10.h eol=lf
 src/protocol/liquid.c -text
 src/protocol/liquid.h -text
 src/protocol/mystic.c eol=lf

@@ -25,7 +25,7 @@
 
 #include "neostats.h"
 #include "ircd.h"
-#include "ultimate.h"
+#include "ultimate2.h"
 #include "services.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);

@@ -1045,7 +1045,7 @@ Optional Features:
   --enable-quantum - enable Quantum IRCD Support
   --enable-mystic - enable Mystic IRCD Support
   --enable-bahamut - enable Bahamut IRCD Support
-  --enable-ircu - enable IRCu IRCD Support
+  --enable-ircup10 - enable IRCu P10 IRCD Support
   --enable-liquid - enable Liquid IRCD Support
   --enable-viagra - enable Viagra IRCD Support
   --enable-ircdauth - IRCd user mode authentication
@@ -27974,21 +27974,21 @@ fi;
 
 echo "$as_me:$LINENO: checking Whether to Enable IRCu IRCD Support..." >&5
 echo $ECHO_N "checking Whether to Enable IRCu IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-ircu or --disable-ircu was given.
-if test "${enable_ircu+set}" = set; then
-  enableval="$enable_ircu"
+# Check whether --enable-ircup10 or --disable-ircup10 was given.
+if test "${enable_ircup10+set}" = set; then
+  enableval="$enable_ircup10"
    case "$enableval" in
   yes)
 
 cat >>confdefs.h <<\_ACEOF
-#define IRCU 1
+#define IRCUP10 1
 _ACEOF
 
     	cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "IRCu"
+#define NS_PROTOCOL "IRCUP10"
 _ACEOF
 
-	PROTOCOL="ircu"
+	PROTOCOL="ircup10"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;

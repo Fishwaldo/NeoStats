@@ -359,13 +359,12 @@ AC_MSG_RESULT(no))
 
 dnl check to see if we should enable IRCu IRCD Support
 AC_MSG_CHECKING(Whether to Enable IRCu IRCD Support...)
-AC_ARG_ENABLE(ircu, [  --enable-ircu - enable IRCu IRCD Support],
+AC_ARG_ENABLE(ircup10, [  --enable-ircup10 - enable IRCu P10 IRCD Support],
 [ case "$enableval" in
   yes)  
-dnl	AC_MSG_ERROR('Sorry IRCu support isnt complete yet')
-	AC_DEFINE(IRCU, 1, 'Enable IRCu Support')
-    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "IRCu")
-	PROTOCOL="ircu"
+	AC_DEFINE(IRCUP10, 1, 'Enable IRCu Support')
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "IRCUP10")
+	PROTOCOL="ircup10"
 	AC_MSG_RESULT(yes)
 	;;
   *)

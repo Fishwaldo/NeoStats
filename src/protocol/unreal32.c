@@ -24,7 +24,7 @@
 */
 
 #include "neostats.h"
-#include "unreal.h"
+#include "unreal32.h"
 #include "ircd.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
