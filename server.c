@@ -146,6 +146,20 @@ setservernumeric (const char *name, const char* num)
 	}
 }
 
+char* 
+getnumfromserver(const char* server)
+{
+	Server *s;
+
+	nlog (LOG_DEBUG1, LOG_CORE, "getnumfromserver: scanning for %s", server);
+	s = finduser(server);
+	if(s) {
+		return s->name64;
+	} else {
+		nlog (LOG_DEBUG1, LOG_CORE, "getnumfromserver: cannot find %s", server);
+	}
+	return NULL;
+}
 
 Server *
 findserverbase64 (const char *num)

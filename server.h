@@ -32,6 +32,7 @@ void PingServers (void);
 void FreeServers();
 #ifdef BASE64NICKNAME
 void setservernumeric (const char *name, const char* num);
+char* getnumfromserver (const char* server);
 #endif
 
 #endif /* _SERVER_H_ */

@@ -213,6 +213,8 @@
 #define TOK_END_OF_BURST	"EB"
 #define MSG_END_OF_BURST_ACK	"EOB_ACK"	/* EOB_ */
 #define TOK_END_OF_BURST_ACK	"EA"
+#define MSG_JUPE                "JUPE"          /* JUPE */
+#define TOK_JUPE                "JU"
 #define MSG_POST                "POST"          /* POS */
 #define TOK_POST                "POST"
 

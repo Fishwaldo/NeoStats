@@ -259,7 +259,7 @@ DEBUG2 CORE - SENT: :stats.mark.net PING stats.mark.net :mark.local.org
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
-	send_cmd ("%s %s * +%s 86400 %lu :%s", sender, TOK_SERVER, name, me.now, infoline);
+	send_cmd ("%s %s * +%s 604800 %lu :%s", neonumericbuf, TOK_JUPE, name, me.now, infoline);
 }
 
 /*
