@@ -893,6 +893,7 @@ static void ss_reset(User *u)
 		log("%s requested RESET.", u->nick);
 		globops(s_StatServ, "Rebuilding Statistics DataBase after RESET...");
 	prefmsg(u->nick, s_StatServ, "Databases Reset! I hope you wanted to really do that!");
+/*	LoadStats(); */
 }
 
 static void ss_JOIN(User *u, char *chan)
