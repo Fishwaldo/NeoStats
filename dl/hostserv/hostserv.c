@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.16 2002/10/15 20:44:43 shmad Exp $
+** $Id: hostserv.c,v 1.17 2002/10/15 20:45:25 shmad Exp $
 */
 
 #include <stdio.h>
@@ -520,8 +520,6 @@ static void hs_login(User *u, char *login, char *pass)
     /* Check HostName Against Data Contained in vhosts.data */
       for (map = nnickmap; map; map = map->next) {
            if (!strcasecmp(map->nnick, login)) {
-	  
-	hslog("Client sent: %s We have in DB: %s", strlower(pass), map->passwd);
 	      if (!strcasecmp(map->passwd, pass)) {
 	              ssvshost_cmd(u->nick, map->vhost);
 		      prefmsg(u->nick, s_HostServ, "Your VHOST %s has been set.", map->vhost);
