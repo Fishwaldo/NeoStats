@@ -891,7 +891,7 @@ bot_message (char *origin, char **av, int ac)
 			for(i = 1; i < ac; i++) {
 				AddStringToList (&argv, av[i], &argc);
 			}
-			mod_usr->function (u->nick, av, ac);
+			mod_usr->function (u->nick, argv, argc);
 			free(argv);
 		} else {
 			/* Trap CTCP commands and silently drop them to avoid unknown command errors 
@@ -914,7 +914,7 @@ bot_message (char *origin, char **av, int ac)
 				for(i = 1; i < ac; i++) {
 					AddStringToList (&argv, av[i], &argc);
 				}
-				run_bot_cmd(mod_usr, u, av, ac);
+				run_bot_cmd(mod_usr, u, argv, argc);
 				free(argv);
 			}
 		}
