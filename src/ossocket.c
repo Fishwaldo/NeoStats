@@ -526,7 +526,7 @@ int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char* optval,
  *  Wrapper function for ioctl
  */
 
-int os_sock_ioctl( OS_SOCKET s, long cmd, u_long* argp )
+int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp )
 {
 #ifdef WIN32
 	return ioctlsocket( s, cmd, argp );

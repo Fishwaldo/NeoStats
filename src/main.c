@@ -49,6 +49,8 @@
 #include "nsdba.h"
 #include "dcc.h"
 
+static void do_reconnect( void );
+
 #define PID_FILENAME	"neostats.pid"
 
 #ifdef WIN32
@@ -447,7 +449,7 @@ int main( int argc, char *argv[] )
  *
  *  @return none
  */
-void do_reconnect( void )
+static void do_reconnect( void )
 {
 	if( nsconfig.r_time > 0 ) {
 		nlog( LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", nsconfig.r_time, attempts );
