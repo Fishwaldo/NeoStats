@@ -14,6 +14,7 @@
 /Makefile.in -text
 /NEWS -text
 /README -text
+/README.win32 -text
 /RELNOTES -text
 /TODO -text
 /aclocal.m4 -text
