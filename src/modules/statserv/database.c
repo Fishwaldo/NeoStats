@@ -186,14 +186,14 @@ CStats *load_chan(char *name)
 	if ((data = DBGetData(name)) != NULL) {
 		memcpy(c, data, sizeof(CStats));
 #else
-	strlcpy(c->name, name, MAXCHAN);	
+	strlcpy(c->name, name, MAXCHANLEN);	
 	if (GetData((void *)&data, CFGSTR, "ChanStats", c->name, "ChanData") > 0) {
 		sscanf(data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins);
 		GetData((void *)&c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
 		sfree(data);
 #endif
 	} else {
-		strlcpy(c->name, name, MAXCHAN);	
+		strlcpy(c->name, name, MAXCHANLEN);	
 		c->totmem = 0;
 		c->topics = 0;
 		c->kicks = 0;

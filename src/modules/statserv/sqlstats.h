@@ -39,7 +39,7 @@ COLDEF statserv_chanscols[] = {
 		"statserv_chans",
 		"name",
 		RTA_STR,
-		MAXCHAN,
+		MAXCHANLEN,
 		offsetof(struct chan_stats, name),
 		RTA_READONLY,
 		NULL,

@@ -103,7 +103,7 @@ typedef struct CVersions {
 }CVersions;
 
 typedef struct CStats {
-	char name[MAXCHAN];
+	char name[MAXCHANLEN];
 	long members;
 	long topics;
 	long totmem;
