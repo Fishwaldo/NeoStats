@@ -509,7 +509,7 @@ int UmodeAuth(User * u)
 	 * should be a lot faster!
 	 */
 	for (i = 0; i < ircd_umodecount; i++) {
-		if(user_umodes[i].umode == 0)
+		if(user_umodes[i].level == 0)
 			break;
 		if (u->Umode & user_umodes[i].umode) {
 			tmplvl = user_umodes[i].level;
@@ -520,12 +520,15 @@ int UmodeAuth(User * u)
 
 /* I hate SMODEs damn it */
 #ifdef GOTUSERSMODES
+	/* hey, smode can equal 0 as well you know */
 	/* see umode comments above */
 	for (i = 0; i < ircd_smodecount; i++) {
-		if(user_smodes[i].umode == 0)
+		if(user_smodes[i].level == 0)
 			break;
 		if (u->Smode & user_smodes[i].umode) {
-			tmplvl = user_smodes[i].level;
+			/* only if the smode level is higher than standard, do we alter tmplvl */
+			if (user_smodes[i].level > tmplvl) 
+				tmplvl = user_smodes[i].level;
 			break;
 		}
 	}

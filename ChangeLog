@@ -1,6 +1,15 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 =====================================================================================
-* NeoStats * Fish (F) & Mark (M)* Version 2.5.11
+* NeoStats * Fish (F) & Mark (M) * Version 2.5.13
+ - Added a new event for Channel Mode changes (F)
+ - Fixed up Ultimate2 Token Support (M)
+ - Added some new params (Quit, KILL, part messages) to existing defines. Should not break backwards compat (F)
+ - Fixed up a UserLevel problem with Smodes and made UserLevel function as per M's comments (F)
+
+* NeoStats * Fish (F) & Mark (M) * Version 2.5.12
+ - Fixed a compile problem with some compilers with C++ comments etc (M)
+
+* NeoStats * Fish (F) & Mark (M) * Version 2.5.11
  - removed unused "hash" entry from structures (M)
  - new files to handle command related functions for new bot message system (M)
  - introduced flags field into ModUser structure (M)

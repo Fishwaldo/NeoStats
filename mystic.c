@@ -147,7 +147,8 @@ UserModes user_umodes[] = {
 	{UMODE_COADMIN, 'z', NS_ULEVEL_OPER},
 	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
 	{UMODE_SUPER, 'p', NS_ULEVEL_OPER},
-	{UMODE_LOCOP, 'O', NS_ULEVEL_OPER},
+	{UMODE_LOCOP, 'O', NS_ULEVEL_LOCOPER},
+	{UMODE_REGNICK, 'r', NS_ULEVEL_REG},
 	{UMODE_INVISIBLE, 'i', 0},
 	{UMODE_WALLOP, 'w', 0},
 	{UMODE_FAILOP, 'g', 0},
@@ -158,7 +159,6 @@ UserModes user_umodes[] = {
 	{UMODE_SBOT, 'b', 0},
 	{UMODE_CLIENT, 'c', 0},
 	{UMODE_FLOOD, 'f', 0},
-	{UMODE_REGNICK, 'r', 0},
 	{UMODE_HIDE, 'x', 0},
 	{UMODE_WATCHER, 'W', 0},
 };
