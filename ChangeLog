@@ -1,6 +1,8 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
 * NeoStats * Shmad & Fish * Version ???? 
+ - Due to major issues with Versions of UltimateIRCd3.x.x prior to a26 SSJ3 and SSJ4 support has
+   again been removed.  Lets just leave it at SSJ5 now! (S)
  - stats.motd is now neostats.motd demo neostats.motd included with distro (S)
  - Code cleanup. (S)
  - Fixed Ultimate2 CHGHOST for vhosts.. ugh im going insane..tested & working (S)
