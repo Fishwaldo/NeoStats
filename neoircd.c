@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.8 2003/04/11 10:50:29 fishwaldo Exp $
+** $Id: neoircd.c,v 1.9 2003/04/21 10:30:37 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -119,7 +119,7 @@ int spart_cmd(const char *who, const char *chan) {
 }
 
 int sjoin_cmd(const char *who, const char *chan) {
-	sts(":%s %s 0 %s + :%s", me.name, MSG_SJOIN, chan, who);
+	sts(":%s %s %d %s + :%s", me.name, MSG_SJOIN, time(NULL), chan, who);
 	join_chan(finduser(who), (char *)chan);
 	return 1;
 }

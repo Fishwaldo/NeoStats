@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.c,v 1.22 2003/04/11 09:26:30 fishwaldo Exp $
+** $Id: conf.c,v 1.23 2003/04/21 10:30:37 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -115,6 +115,11 @@ void ConfLoad() {
 	#ifdef EXTAUTH
 		load_module("extauth", NULL);
 	#endif
+
+	/* if all bots should join the chan */
+	if (GetConf((void *)&me.allbots, CFGBOOL, "AllBotsJoinChan") <= 0) {
+		me.allbots = 0;
+	}
 	done_mods = 0;
 }
 

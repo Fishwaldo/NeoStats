@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.116 2003/04/18 06:41:34 fishwaldo Exp $
+** $Id: ircd.c,v 1.117 2003/04/21 10:30:37 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -288,6 +288,12 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 #endif
 	char **av;
 	int ac = 0;
+        int add = 0;
+	int i;
+	long Umode;
+	char tmpmode;
+
+
 	strcpy(segv_location, "init_bot");
 	u = finduser(nick);
 	if (u) {
@@ -298,38 +304,66 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 		nlog(LOG_WARNING, LOG_CORE, "Warning, %s bot %s has a username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
 	}		
 	add_mod_user(nick, mod_name);
+	Umode = 0;
+	tmpmode = *(modes);
+	while (tmpmode) {
+		switch(tmpmode) {
+			case '+'	: add = 1; break;
+			case '-'	: add = 0; break;
+			default		: 
+					for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 
+						if (usr_mds[i].mode == tmpmode) {
+							if (add) {
+								Umode |= usr_mds[i].umodes;
+								break;
+							} else { 
+								Umode &= ~usr_mds[i].umodes;
+								break;
+							}				
+						}
+			 		}
+		}
+	tmpmode = *modes++;
+	}
 
 
 #ifdef ULTIMATE3
-	snewnick_cmd(nick, user, host, rname, UMODE_SERVICES);
+	snewnick_cmd(nick, user, host, rname, Umode);
 #elif defined(HYBRID7) 
-	snewnick_cmd(nick, user, host, rname, UMODE_ADMIN);
+	snewnick_cmd(nick, user, host, rname, Umode);
 #elif defined(NEOIRCD)
-	snewnick_cmd(nick, user, host, rname, UMODE_SERVICES);
+	snewnick_cmd(nick, user, host, rname, Umode);
 #else 
 	snewnick_cmd(nick, user, host, rname);
-//	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+//	sumode_cmd(nick, nick, Umode);
 #endif
 #ifdef UNREAL
-	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
+	sumode_cmd(nick, nick, Umode);
 #elif !ULTIMATE
 #if !defined(HYBRID7) && !defined(NEOIRCD)
-	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+	sumode_cmd(nick, nick, Umode);
 #endif
+#endif
+#ifndef HYBRID7
+	if ((me.allbots > 0) || (Umode & UMODE_SERVICES)) {
 #endif
 #ifdef ULTIMATE3
-	sjoin_cmd(nick, me.chan, MODE_CHANADMIN);
+		sjoin_cmd(nick, me.chan, MODE_CHANADMIN);
 #else /* ulitmate3 */
-	sjoin_cmd(nick, me.chan);
-	snprintf(cmd, 63, "%s %s", nick, nick);
+		sjoin_cmd(nick, me.chan);
+		snprintf(cmd, 63, "%s %s", nick, nick);
 #ifndef HYBRID7
 #ifdef NEOIRCD
-	schmode_cmd(me.name, me.chan, "+a", cmd);
+		schmode_cmd(me.name, me.chan, "+a", cmd);
 #else /* neoircd */
-	schmode_cmd(nick, me.chan, "+oa", cmd);
+		schmode_cmd(nick, me.chan, "+oa", cmd);
 #endif /* neoircd */
 #endif /* hybrid7 */
 #endif /* ultimate3 */
+#ifndef HYRBID7
+	/* all bots join */
+	}
+#endif
 	AddStringToList(&av, nick, &ac);
 	Module_Event("SIGNON", av, ac);
 	free(av);
@@ -415,6 +449,7 @@ extern int split_buf(char *buf, char ***argv, int colon_special)
     int argc;
     char *s;
     int flag = 0;
+    int colcount = 0;
 
     *argv = calloc(sizeof(char *) * argvsize, 1);
     argc = 0;
@@ -424,12 +459,16 @@ extern int split_buf(char *buf, char ***argv, int colon_special)
 	    argvsize += 8;
 	    *argv = realloc(*argv, sizeof(char *) * argvsize);
 	}
+#if 0
 	if ((colon_special ==1) && (*buf==':')) {
 		(*argv)[argc++] = buf+1;
 		buf = "";
 		flag = 1;
-	} else if (*buf == ':') {
+	} 
+#endif 
+	if ((*buf == ':') && (colcount < 1)) {
 		buf++;
+		colcount++;
 	}
 	s = strpbrk(buf, " ");
 	if (s) {
@@ -510,7 +549,7 @@ void parse(char *line)
 		coreLine = line + strlen(line);
     	strncpy(cmd, line, sizeof(cmd));
 
-	ac = split_buf(coreLine, &av, 0);
+	ac = split_buf(coreLine, &av, 1);
 	
 
 

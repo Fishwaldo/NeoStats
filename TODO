@@ -10,6 +10,8 @@ fnmatch is Baaaad news... find a good ircmatch function and port it over...
 
 unkline on Hybrid7
 
+vhost code in NeoIRCd needs to be implemented for bots that are +x
+
 2.6.0 Series - 
 ------------
 
