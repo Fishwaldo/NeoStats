@@ -265,7 +265,8 @@ get_options (int argc, char **argv)
 			printf ("NeoStats Version %d.%d.%d%s\n", MAJOR, MINOR, REV, ircd_version);
 			printf ("Compiled: %s at %s\n", version_date, version_time);
 			printf ("Flag after version number indicates what IRCd NeoStats is compiled for:\n");
-			printf ("(U)  - Unreal IRCd\n");
+			printf ("(U31)- Unreal 3.1.x IRCd\n");
+			printf ("(U32)- Unreal 3.2.x IRCd\n");
 			printf ("(UL3)- Ultimate 3.x.x IRCd\n");
 			printf ("(UL) - Ultimate 2.x.x IRCd (Depreciated)\n");
 			printf ("(H)  - Hybrid 7.x IRCd\n");
