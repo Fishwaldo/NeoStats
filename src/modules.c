@@ -583,12 +583,12 @@ ModuleConfig(bot_setting* set_ptr)
 		switch(set_ptr->type) {
 			case SET_TYPE_BOOLEAN:
 				if (GetConf((void *)set_ptr->varptr, CFGBOOL, set_ptr->confitem) <= 0) {
-					set_ptr->varptr = set_ptr->defaultval;
+					*(int *)set_ptr->varptr = set_ptr->defaultval;
 				}
 				break;
 			case SET_TYPE_INT:
 				if (GetConf((void *)set_ptr->varptr, CFGINT, set_ptr->confitem) <= 0) {
-					set_ptr->varptr = set_ptr->defaultval;
+					*(int *)set_ptr->varptr = set_ptr->defaultval;
 				}
 				break;
 			case SET_TYPE_STRING:
