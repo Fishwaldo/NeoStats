@@ -285,8 +285,9 @@ cb_Server (char *arg, int configtype)
 		/* Convert hours input to seconds */
 		me.setservertimes = me.setservertimes * 60 * 60;
 		/* limit value - really need to print error and quit */
-		if(me.setservertimes <=0)
-			me.setservertimes =24;
+		if(me.setservertimes <= 0) {
+			me.setservertimes = (24 * 60 * 60);
+		}
 	}
 
 }
