@@ -255,7 +255,7 @@ COLDEF neo_banscols[] = {
 TBLDEF neo_bans = {
 	"bans",
 	NULL, 	/* for now */
-	sizeof(struct Bans),
+	sizeof(struct Ban),
 	0,
 	TBL_HASH,
 	neo_banscols,
