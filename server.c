@@ -158,6 +158,7 @@ ServerDump (void)
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
 		debugtochannel("Server Entry: %s Flags: %lx", s->name, s->flags);
+		debugtochannel("uplink: %s", s->uplink);
 	}
 	debugtochannel("End of Listing.");
 }

@@ -649,12 +649,13 @@ static void makemap(char *uplink, User * u, int level)
 	hash_scan_begin(&hs, sh);
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
-		if (StatServ.exclusions && IsExcluded(s)) {
-			makemap(s->name, u, level);
-		}
 		ss = findstats(s->name);
 		if ((level == 0) && (s->uplink[0] == 0)) {
 			/* its the root server */
+printf("locallevel %s\n", s->name);
+			if (StatServ.exclusions && IsExcluded(s)) {
+				makemap(s->name, u, level);
+			}
 			prefmsg(u->nick, s_StatServ,
 				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
 				ss->name, ss->users, (int)ss->maxusers,
@@ -662,6 +663,10 @@ static void makemap(char *uplink, User * u, int level)
 				ss->highest_ping);
 			makemap(s->name, u, level + 1);
 		} else if ((level > 0) && !ircstrcasecmp(uplink, s->uplink)) {
+printf("highlevel %s\n", s->name);
+			if (StatServ.exclusions && IsExcluded(s)) {
+				makemap(s->name, u, level);
+			}
 			/* its not the root server */
 			buf[0]='\0';
 			for (i = 1; i < level; i++) {

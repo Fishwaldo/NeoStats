@@ -244,14 +244,14 @@ void ns_do_exclude_user(User *u) {
 		e = lnode_get(en);
 		if (e->type == NS_EXCLUDE_HOST) {
 			if (match(e->pattern, u->hostname)) {
-				u->flags &= ~NS_FLAGS_EXCLUDED;
+				u->flags |= NS_FLAGS_EXCLUDED;
 				return;
 			}
 		}
 		en = list_next(exclude_list, en);
 	}
 	/* if we are here, there is no match */
-	u->flags |= NS_FLAGS_EXCLUDED;
+	u->flags &= ~NS_FLAGS_EXCLUDED;
 }
 
 /* @brief check if a server is matched against a exclusion
@@ -272,14 +272,14 @@ void ns_do_exclude_server(Server *s) {
 		e = lnode_get(en);
 		if (e->type == NS_EXCLUDE_SERVER) {
 			if (match(e->pattern, s->name)) {
-				s->flags &= ~NS_FLAGS_EXCLUDED;
+				s->flags |= NS_FLAGS_EXCLUDED;
 				return;
 			}
 		}
 		en = list_next(exclude_list, en);
 	}
 	/* if we are here, there is no match */
-	s->flags |= NS_FLAGS_EXCLUDED;
+	s->flags &= ~NS_FLAGS_EXCLUDED;
 }
 
 
@@ -301,12 +301,13 @@ void ns_do_exclude_chan(Chans *c) {
 		e = lnode_get(en);
 		if (e->type == NS_EXCLUDE_CHAN) {
 			if (match(e->pattern, c->name)) {
-				c->flags &= ~NS_FLAGS_EXCLUDED;
+				c->flags |= NS_FLAGS_EXCLUDED;
 				return;
 			}
 		}
 		en = list_next(exclude_list, en);
 	}
 	/* if we are here, there is no match */
-	c->flags |= NS_FLAGS_EXCLUDED;
+	c->flags &= ~NS_FLAGS_EXCLUDED;
 }
+
