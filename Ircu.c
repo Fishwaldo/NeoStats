@@ -526,7 +526,7 @@ m_server (char *origin, char **argv, int argc, int srv)
 static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
-	do_squit (base64toserver(argv[0]), argv[2]);
+	do_squit (argv[0], argv[2]);
 }
 
 static void
@@ -560,7 +560,7 @@ m_kill (char *origin, char **argv, int argc, int srv)
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
 {
-	do_pong (base64toserver(argv[0]), argv[1]);
+	do_pong (base64toserver(origin), argv[1]);
 }
 
 static void
