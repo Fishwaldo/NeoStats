@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: opsb.h,v 1.4 2002/08/24 02:51:41 fishwaldo Exp $
+** $Id: opsb.h,v 1.5 2002/08/28 09:12:56 fishwaldo Exp $
 */
 
 
@@ -107,6 +107,8 @@ list_t *exempt;
 /* opsb.c */
 int findscan(const void *key1, const void *key2);
 void do_ban(scaninfo *scandata);
+void checkqueue();
+void addtocache(unsigned long ipaddr);
 
 
 /* proxy.c */

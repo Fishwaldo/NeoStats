@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: opsb.c,v 1.11 2002/08/28 09:11:47 fishwaldo Exp $
+** $Id: opsb.c,v 1.12 2002/08/28 09:12:56 fishwaldo Exp $
 */
 
 
@@ -28,8 +28,7 @@ void reportdns(char *data, adns_answer *a);
 void dnsblscan(char *data, adns_answer *a);
 static int ScanNick(char **av, int ac);
 int startscan(scaninfo *scandata);
-void checkqueue();
-void addtocache(unsigned long ipaddr);
+
 void loadcache();
 
 
@@ -45,7 +44,7 @@ extern const char *opsb_help_set[];
 Module_Info my_info[] = { {
 	"OPSB",
 	"A Open Proxy Scanning Bot",
-	"$Revision: 1.11 $"
+	"$Revision: 1.12 $"
 } };
 
 
