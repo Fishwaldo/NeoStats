@@ -1810,7 +1810,7 @@ do_topic (const char* chan, const char *owner, const char* ts, const char *topic
 void 
 do_svsmode_servicests (const char* nick, const char* ts)
 {	
-	do_svsmode_servicests (nick, ts);
+	SetUserServicesTS (nick, ts);
 }
 
 void 
