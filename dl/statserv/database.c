@@ -29,7 +29,10 @@ void SaveStats()
         log("Unable to open stats.db for writing.");
         return;
     }
-
+    if (StatServ.newdb == 1) {
+    	chanalert(s_StatServ, "Enabling Record yelling!");
+    	StatServ.newdb = 0;
+    }
     hash_scan_begin(&ss, Shead);
     while ((sn = hash_scan_next(&ss))) {
     	s=hnode_get(sn);
@@ -86,34 +89,35 @@ void LoadStats()
 
 
     if (fp) {
-    while (fgets(buf, BUFSIZE, fp)) {
-        stats_network.maxopers = atoi(strtok(buf, " "));
-        stats_network.maxusers = atol(strtok(NULL, " "));
-        stats_network.maxservers = atoi(strtok(NULL, " "));
-        stats_network.t_maxopers = atoi(strtok(NULL, " "));
-        stats_network.t_maxusers = atol(strtok(NULL, " "));
-        stats_network.t_maxservers = atoi(strtok(NULL, " "));
-        tmp = strtok(NULL, " ");
-        if (tmp==NULL) {
-            fprintf(stderr, "Detected Old Version(1.0) of Network Database, Upgrading\n");
-            stats_network.totusers = stats_network.maxusers;
-        } else {
-            stats_network.totusers = atoi(tmp);
-        }
-        tmp = strtok(NULL, " ");
-        if (tmp == NULL) {
-           log("Detected Old version (3.0) of Network Database, Upgrading");
-           stats_network.maxchans = 0;
-	   stats_network.t_chans = time(NULL);
-        } else {
-           stats_network.maxchans = atol(tmp);
-	   tmp = strtok(NULL, "");
-           stats_network.t_chans = atol(tmp);
-
-        }
-        
-    }
-    fclose(fp);
+    	while (fgets(buf, BUFSIZE, fp)) {
+        	stats_network.maxopers = atoi(strtok(buf, " "));
+        	stats_network.maxusers = atol(strtok(NULL, " "));
+        	stats_network.maxservers = atoi(strtok(NULL, " "));
+        	stats_network.t_maxopers = atoi(strtok(NULL, " "));
+        	stats_network.t_maxusers = atol(strtok(NULL, " "));
+        	stats_network.t_maxservers = atoi(strtok(NULL, " "));
+        	tmp = strtok(NULL, " ");
+        	if (tmp==NULL) {
+            		fprintf(stderr, "Detected Old Version(1.0) of Network Database, Upgrading\n");
+            		stats_network.totusers = stats_network.maxusers;
+        	} else {
+            		stats_network.totusers = atoi(tmp);
+        	}
+        	tmp = strtok(NULL, " ");
+        	if (tmp == NULL) {
+           		log("Detected Old version (3.0) of Network Database, Upgrading");
+           		stats_network.maxchans = 0;
+	   		stats_network.t_chans = time(NULL);
+        	} else {
+           		stats_network.maxchans = atol(tmp);
+	   		tmp = strtok(NULL, "");
+           		stats_network.t_chans = atol(tmp);
+        	}
+    	}     
+    	StatServ.newdb = 0;   
+    	fclose(fp);
+    }	else {
+    	StatServ.newdb = 1;
     }
     if ((fp = fopen("data/stats.db", "r")) == NULL)
         return; 

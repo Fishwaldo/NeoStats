@@ -934,7 +934,7 @@ void Srv_Netinfo(char *origin, char **argv, int argc) {
 			snetinfo_cmd();
 			globops(me.name,"Link with Network \2Complete!\2");
 			#ifdef DEBUG
-        			ns_debug_to_coders("");
+        			ns_debug_to_coders(me.chan);
         		#endif
 			if (ircd_srv.uprot == 2109) {
 				me.usesmo = 1;

@@ -6,6 +6,7 @@ Shmad & ^Enigma & Fish^
 
 * Version 3.41 * July 29th, 2002 (S)
  - Fixed a bug where channel alerts would get dropped notice changed to chanalert()
+ - Stopped walloping new records on new DB and when syncing to the network (not walloping on syncing only works in statserv is loaded via config file. If loaded via /msg neostats load, then it will yell. Tough. Load it via the config file!)
 
 * Version 3.4 * July 17th, 2002(F)
  - Ported to the new Module Event API

@@ -1,6 +1,6 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../..
+INCLUDES = -I../.. -I../../adns
 
 SOURCES= statserv.c ss_help.c database.c tld.c stats.c htmlstats.c
 OBJECTS= statserv.o ss_help.o database.o tld.o stats.o htmlstats.o

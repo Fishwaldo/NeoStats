@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.20 2002/07/30 04:26:28 fishwaldo Exp $
+** $Id: sock.c,v 1.21 2002/07/30 05:16:07 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -60,6 +60,8 @@ void read_loop()
 	hscan_t ms;
 	hnode_t *mn;
 
+	TimeOut = malloc(sizeof(struct timeval));
+
 	while (1) {
 		strcpy(segv_location, "Read_Loop");
 		memset(buf, '\0', BUFSIZE);
@@ -68,9 +70,8 @@ void read_loop()
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds);
 		FD_ZERO(&errfds);
-		//TimeOut->tv_sec = 1;
-		//TimeOut->tv_usec = 0;
-		TimeOut = 0;
+		TimeOut->tv_sec = 1;
+		TimeOut->tv_usec = 0;
 		FD_SET(servsock, &readfds);
 		hash_scan_begin(&ss, sockh);
 		me.cursocks = 1; /* always one socket for ircd */

@@ -33,6 +33,9 @@ list_t *Chead;
 TLD *tldhead;
 
 
+#define ok_to_wallop	!StatServ.newdb && StatServ.onchan && me.synced
+
+
 extern const char version_date[], version_time[];
 
 struct stats_network_ {
@@ -62,6 +65,7 @@ struct StatServ {
 	int html;
 	char htmlpath[BUFSIZE];
 	int onchan;
+	int newdb;
 } StatServ;
 
 
