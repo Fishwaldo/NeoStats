@@ -129,6 +129,7 @@
 /*  PARTCHAN parameters are:
  *	channel name
  *	user nick
+ *	reason
  */
 #define EVENT_PARTCHAN		"PARTCHAN"
 /*  KICK parameters are:
@@ -141,11 +142,13 @@
  *	channel name
  *	nick of user who made the kick
  *	nick of user who was kick
+ *	reason
  */
 #define EVENT_KICKBOT		"KICKBOT"
 /*  PARTBOT parameters are:
  *	channel name
  *	user nick
+ *	reason
  */
 #define EVENT_PARTBOT		"PARTBOT"
 /*  TOPICCHANGE parameters are:

@@ -559,7 +559,9 @@ part_chan (User * u, const char *chan, char *partreason)
 			free (cm);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			if (partreason != NULL) AddStringToList (&av, partreason, &ac);
+			if (partreason != NULL) {
+				AddStringToList (&av, partreason, &ac);
+			}
 			ModuleEvent (EVENT_PARTCHAN, av, ac);
 			free (av);
 			ac = 0;
@@ -570,7 +572,9 @@ part_chan (User * u, const char *chan, char *partreason)
 			del_bot_from_chan (u->nick, c->name);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			if (partreason != NULL) AddStringToList (&av, partreason, &ac);
+			if (partreason != NULL) {
+				AddStringToList (&av, partreason, &ac);
+			}
 			ModuleEvent (EVENT_PARTBOT, av, ac);
 			free (av);
 			ac = 0;
