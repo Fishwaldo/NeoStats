@@ -59,7 +59,7 @@
 #endif
 #endif
 
-#include <adns.h>
+#include "adns.h"
 #include "pcre.h"
 #include "list.h"
 #include "hash.h"
