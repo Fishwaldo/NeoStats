@@ -61,7 +61,9 @@ rta_init(logcb logfunc)
   extern TBLDEF pg_userTable;
   extern TBLDEF rta_tablesTable;
   extern TBLDEF rta_columnsTable;
+#ifdef SHWDBGTBL
   extern TBLDEF rta_dbgTable;
+#endif
   extern TBLDEF rta_statTable;
   extern TBLDEF pg_connTable;
 #ifdef SYSLOG
@@ -85,7 +87,9 @@ rta_init(logcb logfunc)
   (void) rta_add_table(&rta_columnsTable);
   (void) rta_add_table(&pg_userTable);
   (void) rta_add_table(&pg_connTable);
+#ifdef SHWDBGTBL
   (void) rta_add_table(&rta_dbgTable);
+#endif
   (void) rta_add_table(&rta_statTable);
 #ifdef SYSLOG
   restart_syslog((char *) 0, (char *) 0, (char *) 0, 0);

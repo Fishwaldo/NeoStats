@@ -27,7 +27,6 @@
 
 /* Forward reference for read callbacks */
 void    *spoof_user(void *, char *, char *, void *);
-void     restart_syslog(char *, char *, char *, int);
 void    *compute_time(void *, char *col, char *sql, void *);
 
 /***************************************************************
@@ -634,7 +633,7 @@ struct EpgDbg rtadbg = {
   LOG_USER,                     /* see sys/syslog.h */
   "rta"                         /* see 'man openlog' */
 };
-
+#ifdef SHWDBGTBL
 /* Define the table columns */
 COLDEF   rta_dbgCols[] = {
   {
@@ -777,7 +776,7 @@ TBLDEF   rta_dbgTable = {
     "SQL_string() to set the values when you initialize your "
     "program."
 };
-
+#endif
 /***************************************************************
  *     The rta_stats table contains usage and error statistics
  * which might be of interest to developers.  All fields are
