@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: kp_util.c,v 1.6 2003/06/13 14:44:37 fishwaldo Exp $
+** $Id$
 */
 /*
  * KEEPER: A configuration reading and writing library

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: spam.c,v 1.27 2003/08/19 13:08:13 fishwaldo Exp $
+** $Id$
 */
 
 

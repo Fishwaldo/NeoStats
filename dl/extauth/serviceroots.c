@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: serviceroots.c,v 1.12 2003/06/13 14:49:31 fishwaldo Exp $
+** $Id$
 */
 
 #include <stdio.h>

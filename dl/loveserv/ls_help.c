@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ls_help.c,v 1.7 2003/06/13 14:49:32 fishwaldo Exp $
+** $Id$
 */
 
 const char *ls_help[] = {

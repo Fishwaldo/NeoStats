@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: loveserv.c,v 1.15 2003/06/13 14:49:32 fishwaldo Exp $
+** $Id$
 */
 
 

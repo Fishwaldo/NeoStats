@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.h,v 1.13 2003/08/29 11:16:00 fishwaldo Exp $
+** $Id$
 */
 
 

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: database.c,v 1.17 2003/09/15 10:39:39 fishwaldo Exp $
+** $Id$
 */
 
 

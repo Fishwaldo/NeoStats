@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: tld.c,v 1.7 2003/06/13 14:49:34 fishwaldo Exp $
+** $Id$
 */
 
 #include "statserv.h"

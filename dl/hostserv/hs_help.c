@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hs_help.c,v 1.14 2003/08/05 13:14:43 fishwaldo Exp $
+** $Id$
 */
 
 #include "stats.h"
