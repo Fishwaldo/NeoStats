@@ -29,8 +29,6 @@ const char version[] = "NeoStats-2.5_Beta2-1";
 const char version_date[] = __DATE__;
 const char version_time[] = __TIME__;
 
-void RemoveLock();
-
 static void start();
 static void setup_signals();
 int forked = 0;
@@ -62,7 +60,6 @@ int main()
 	me.synced = 0;
 	me.onchan = 0;
 	strcpy(me.modpath,"dl");
-	RemoveLock();
 #ifdef RECVLOG
 	remove("logs/recv.log");
 #endif
@@ -153,7 +150,6 @@ RETSIGTYPE serv_segv() {
 		globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 		chanalert(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 		globops(me.name,"Dumped Core to netstats.debug, Please Read the Readme file to find out what to do with it!");
-		RemoveLock();		
 		sleep(2);
 		kill(forked, 3);
 		kill(forked, 9);
@@ -191,16 +187,6 @@ static	void	setup_signals()
 	(void)signal(SIGHUP, conf_rehash);
 	(void)signal(SIGTERM, serv_die); 
 	(void)signal(SIGSEGV, serv_segv);
-}
-
-
-/* Routine For Removing Chmod Lock On Modules */
-void RemoveLock()
-{
-	int fmode;
-	fmode = 0755;
-	chmod(me.modpath, fmode);
-	log("RemoveLock() called: We must be segging!");
 }
 
 
