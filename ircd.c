@@ -1580,6 +1580,14 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		   
 	while (paramcnt > paramidx) {
 		nicklist = param[paramidx];
+#ifdef UNREAL
+		/* Unreal passes +b(&) and +e(") via SJ3 so skip them for now */	
+		if(*nicklist == '&' || *nicklist == '"') {
+			nlog (LOG_DEBUG1, LOG_CORE, "Skipping %s", nicklist);
+			paramidx++;
+			continue;
+		}
+#endif
 		mode = 0;
 		while (ok == 1) {
 			for (i = 0; i < ircd_cmodecount; i++) {
