@@ -395,9 +395,9 @@ kick_chan (User * u, char *chan, User * k)
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "%s Kicking %s from %s", k->nick, u->nick, chan);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Ehh, KIcking a Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
+		nlog (LOG_WARNING, LOG_CORE, "Ehh, KIcking an Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
 		if (me.coder_debug) {
-			chanalert (s_Services, "Ehh, Kicking a Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
+			chanalert (s_Services, "Ehh, Kicking an Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
 			chandump (chan);
 			UserDump (u->nick);
 		}
@@ -484,9 +484,9 @@ part_chan (User * u, char *chan)
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "Parting %s from %s", u->nick, chan);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Ehh, Parting a Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
+		nlog (LOG_WARNING, LOG_CORE, "Ehh, Parting an Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
 		if (me.coder_debug) {
-			chanalert (s_Services, "Ehh, Parting a Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
+			chanalert (s_Services, "Ehh, Parting an Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
 			chandump (chan);
 			UserDump (u->nick);
 		}
@@ -609,7 +609,7 @@ join_chan (User * u, char *chan)
 	int ac = 0;
 	SET_SEGV_LOCATION();
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "ehhh, Joining a Unknown user to %s: %s", chan, recbuf);
+		nlog (LOG_WARNING, LOG_CORE, "ehhh, Joining an Unknown user to %s: %s", chan, recbuf);
 		return;
 	}
 	if (!strcasecmp ("0", chan)) {

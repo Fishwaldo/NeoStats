@@ -300,7 +300,7 @@ Syntax:
     /msg NeoStats UNLOAD <module>
 Description: 
     Allows you to unload a module while NeoStats is running
-    Some modules can not be unloaded at runtime, and will return a error
+    Some modules can not be unloaded at runtime, and will return an error
 Example:
     /msg NeoStats UNLOAD statserv
 
@@ -684,7 +684,7 @@ This option can not be disabled. (Sorry, but its our little
 advertisement for all the hard work we have done to create NeoStats 
 for you to use!) 
 
-A example template is provided for you so you don't have to waste time 
+An example template is provided for you so you don't have to waste time 
 getting your own template ready. If you wish to create your own 
 template, replace the index.tpl file in the data directory with your 
 version.
@@ -1162,8 +1162,8 @@ Example:
 Syntax: 
     /msg MoraleServ WONDERFUL <NICK>
 Description: 
-    Send a I hope you don't mind, that I put down in words... song to a 
-    loved one on IRC to cheer them up. This function will send the 
+    Send an "I hope you don't mind, that I put down in words..." song to 
+    a loved one on IRC to cheer them up. This function will send the 
     lyrics with the target nick in them to the target nick
 Example:
     /msg MoraleServ WONDERFUL Angel
@@ -1201,7 +1201,7 @@ Send it a message, and watch what happens.
 -----------------
 
 ExtAuth may be listed as a loaded module, but its not a true module as
-described above. It allows you to provide a alternative Authentication
+described above. It allows you to provide an alternative Authentication
 /level scheme that is not based on Umodes. You should consult the README
 file for neostats for more detailed information regarding its 
 configuration. 

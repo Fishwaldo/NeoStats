@@ -61,7 +61,7 @@ Functions my_fn_list[] = {
 	{NULL, NULL, 0}
 };
 
-	/* a easter egg for all the Neo users */
+	/* an easter egg for all the Neo users */
 
 int __Chan_Message(char *origin, char *chan, char **argv, int argc)
 {

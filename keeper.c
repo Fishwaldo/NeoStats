@@ -68,7 +68,7 @@ GetConf (void **data, int type, const char *item)
 	return 1;
 }
 
-/* @brief return a array of strings containing all subkeys in a directory */
+/* @brief return an array of strings containing all subkeys in a directory */
 
 int
 GetDir (char *item, char ***data)
@@ -203,7 +203,7 @@ GetData (void **data, int type, const char *table, const char *row, const char *
 	return 1;
 }
 
-/* @brief return a array of strings containing all rows in a database */
+/* @brief return an array of strings containing all rows in a database */
 
 int
 GetTableData (char *table, char ***data)

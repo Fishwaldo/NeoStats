@@ -62,7 +62,7 @@ list_t *dnslist;
 /** @brief starts a DNS lookup
  *
  * starts a DNS lookup for str of type type can callback the function
- * when complete. Data is a identifier that is not modified to identify this lookup to the callback function
+ * when complete. Data is an identifier that is not modified to identify this lookup to the callback function
  *
  * @param str the record to lookup 
  * @param type The type of record to lookup. See adns.h for more details
@@ -178,7 +178,7 @@ do_dns ()
 			dnsnode = list_next (dnslist, dnsnode);
 			break;
 		}
-		/* there was a error */
+		/* there was an error */
 		if (status) {
 			nlog (LOG_CRITICAL, LOG_CORE, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror (status));
 			chanalert (s_Services, "Bad Error on DNS lookup. Please check logfile");

@@ -637,9 +637,9 @@ strlower (char *s)
 	return t;
 }
 
-/** @brief Adds a string to a array of strings
+/** @brief Adds a string to an array of strings
  *
- * used for the event functions, adds a string to a array of string pointers to pass to modules
+ * used for the event functions, adds a string to an array of string pointers to pass to modules
  *
  * @param List the array you wish to append S to 
  * @param S the string you wish to append

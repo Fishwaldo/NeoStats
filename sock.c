@@ -148,7 +148,7 @@ read_loop ()
 							break;
 						}
 					} else {
-						nlog (LOG_WARNING, LOG_CORE, "read returned a Error");
+						nlog (LOG_WARNING, LOG_CORE, "read returned an Error");
 						return;
 					}
 				} else {
@@ -257,7 +257,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
 		return (-1);
 
 
-	/* bind to a IP address */
+	/* bind to an IP address */
 	if (dobind > 0) {
 		if (bind (s, (struct sockaddr *) &lsa, sizeof (lsa)) < 0) {
 			nlog (LOG_WARNING, LOG_CORE, "sock_connect(): Warning, Couldn't bind to IP address %s", strerror (errno));

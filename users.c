@@ -390,7 +390,7 @@ UserMode (const char *nick, const char *modes, int smode)
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Changing Modes for a Unknown User %s!", nick);
+		nlog (LOG_WARNING, LOG_CORE, "Warning, Changing Modes for an Unknown User %s!", nick);
 		nlog (LOG_DEBUG1, LOG_CORE, "Recbuf: %s", recbuf);
 		return;
 	}

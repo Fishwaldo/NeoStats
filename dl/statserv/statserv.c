@@ -428,7 +428,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 		prefmsg(u->nick, s_StatServ, "Unknown Command: \2%s\2",
 			av[1]);
 		chanalert(s_StatServ,
-			  "%s Reqested %s, but that is a Unknown Command",
+			  "%s Reqested %s, but that is an Unknown Command",
 			  u->nick, av[1]);
 	}
 	return 1;

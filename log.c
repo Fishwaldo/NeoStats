@@ -201,7 +201,7 @@ ResetLogs ()
 
 
 
-/* this is for printing out details during a assertion failure */
+/* this is for printing out details during an assertion failure */
 extern void
 nassert_fail (const char *expr, const char *file, const int line, const char *infunk)
 {

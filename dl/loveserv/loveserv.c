@@ -410,7 +410,7 @@ static void ls_admirer(User * u, char *cmd)
 	prefmsg(u->nick, s_LoveServ, "Anonymous admire sent to %s :)",
 		cmd);
 	prefmsg(cmd, s_LoveServ, "You have a secret admirer! ;)");
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent a ADMIRER to %s", u->nick, cmd);
+	nlog(LOG_NORMAL, LOG_MOD, "%s sent an ADMIRER to %s", u->nick, cmd);
 }
 
 

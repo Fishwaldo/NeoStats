@@ -71,7 +71,7 @@ AddServer (char *name, char *uplink, int hops)
 	s = new_server (name);
 	s->hops = hops;
 	s->connected_since = time (NULL);
-	/* this is kionda useless right ? */
+	/* this is kinda useless right ? */
 /*	s->last_announce = time(NULL); */
 	if (uplink) {
 		memcpy (s->uplink, uplink, MAXHOST);

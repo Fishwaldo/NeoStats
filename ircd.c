@@ -53,7 +53,7 @@ init_bot (char *nick, char *user, char *host, char *rname, char *modes, char *mo
 		return -1;
 	}
 	if (strlen (user) > 8) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, %s bot %s has a username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
+		nlog (LOG_WARNING, LOG_CORE, "Warning, %s bot %s has an username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
 	}
 	add_mod_user (nick, mod_name);
 	Umode = 0;

@@ -516,7 +516,7 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 int
 srakill_cmd (const char *host, const char *ident)
 {
-	/* ultimate2 needs a oper to remove */
+	/* ultimate2 needs an oper to remove */
 	sts (":%s %s :%s@%s", s_Services, MSG_REMGLINE, host, ident);
 
 	return 1;
@@ -768,7 +768,7 @@ Usr_Stats (char *origin, char **argv, int argc)
 	User *u;
 	u = finduser (origin);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Received a Message from a Unknown User! (%s)", origin);
+		nlog (LOG_WARNING, LOG_CORE, "Received a Message from an Unknown User! (%s)", origin);
 		return;
 	}
 	ShowStats (argv[0], u);

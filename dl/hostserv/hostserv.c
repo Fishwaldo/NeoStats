@@ -34,7 +34,7 @@
 
 
 
-/* hostserv doesn't work on Hybrid, Echo a error and exit the compile */
+/* hostserv doesn't work on Hybrid, Echo an error and exit the compile */
 #ifndef GOTSVSVHOST
 #error "Error: This IRCd doesn't support changing a users host. This module will not compile"
 #endif

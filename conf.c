@@ -139,7 +139,7 @@ ConfLoad ()
  * When the config file encounters directives to Load Modules, it calls this function which prepares to load the modules (but doesn't actually load them)
  *
  * @param arg the module name in this case
- * @param configtype a index of what config item is currently being processed. Ignored
+ * @param configtype an index of what config item is currently being processed. Ignored
  * @returns Nothing
  */
 

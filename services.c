@@ -63,7 +63,7 @@ servicesbot (char *nick, char **av, int ac)
 
 	if (me.onlyopers && (UserLevel (u) < 40)) {
 		prefmsg (u->nick, s_Services, "This service is only available to IRCops.");
-		chanalert (s_Services, "%s Requested %s, but he is Not a Operator!", u->nick, av[1]);
+		chanalert (s_Services, "%s Requested %s, but he is Not an Operator!", u->nick, av[1]);
 		return;
 	}
 	if (!strcasecmp (av[1], "HELP")) {
@@ -302,7 +302,7 @@ servicesbot (char *nick, char **av, int ac)
 #endif
 	} else {
 		prefmsg (nick, s_Services, "Unknown Command: \2%s\2", av[1]);
-		chanalert (s_Services, "%s Reqested %s, but that is a Unknown Command", u->nick, av[1]);
+		chanalert (s_Services, "%s Reqested %s, but that is an Unknown Command", u->nick, av[1]);
 	}
 }
 

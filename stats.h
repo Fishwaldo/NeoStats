@@ -65,7 +65,7 @@
 #elif QUANTUM == 1
 #include "QuantumIRCd.h"
 #else
-#error Error, you must select a IRCD to use. See ./configure --help for more information
+#error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
 
 

@@ -569,7 +569,7 @@ It should link and sync with your server in a matter of seconds.
 Please now read USERMAN for details on how to operate NeoStats from an 
 IRC Client.
 
-If anything goes wrong, there *might* be a error message in the log 
+If anything goes wrong, there *might* be an error message in the log 
 files. Have a look in ~/NeoStats/logs/NeoStats.log it might give you a 
 clue to what's wrong! NeoStats might also send a wallops to the network 
 about what went wrong. Check the status window of your IRC client. 

@@ -14,11 +14,11 @@ Shmad <shmad@neostats.net>
 * Version 2.7 * Fish * Apr 15th, 2003
 + Moved Hostserv over to new configuration backed
 + added interface to manipulate the ban list (/msg hostserv help bans for more info)
-+ Added a interface to manipulate default levels (/msg hostserv levels)
++ Added an interface to manipulate default levels (/msg hostserv levels)
 + added autoexpiry of un-used vhosts. Defaults at 60 days. Add option "ExpireDays" to HostServ config to change default.
 
 * Version 2.6 * Fish * Mar 11th, 2003
-+ Fixed a bug with adding Vhosts for users online already and sending a online message to the wrong user!
++ Fixed a bug with adding Vhosts for users online already and sending an online message to the wrong user!
 
 * Version 2.5 * Fish * Feb 3rd, 2003
 + check for duplicate nicks before adding entries

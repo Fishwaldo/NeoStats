@@ -459,7 +459,7 @@ sburst_cmd (int b)
 int
 sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
 {
-	/* there isn't a akill on Hybrid, so we send a kline to all servers! */
+	/* there isn't an akill on Hybrid, so we send a kline to all servers! */
 
 	va_list ap;
 	char buf[512];
@@ -714,7 +714,7 @@ Usr_Stats (char *origin, char **argv, int argc)
 	User *u;
 	u = finduser (origin);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Received a Message from a Unknown User!");
+		nlog (LOG_WARNING, LOG_CORE, "Received a Message from an Unknown User!");
 		return;
 	}
 	ShowStats (argv[0], u);
