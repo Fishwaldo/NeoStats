@@ -241,7 +241,18 @@ canx_dns(const char *modname) {
 			dnsnode = lnode2;
 		}
 	}
-	dns_check_queue();
+        dnsnode = list_first(dnsqueue);
+        while (dnsnode) {
+                dnsdata = lnode_get(dnsnode);
+                if (!ircstrcasecmp(dnsdata->mod_name, modname)) {
+                        free(dnsdata);
+                        lnode2 = list_next(dnsqueue, dnsnode);
+                        list_delete(dnsqueue, dnsnode);
+                        lnode_destroy(dnsnode);
+                        dnsnode = lnode2;
+                }
+        }
+        dns_check_queue();
 }
 
 
