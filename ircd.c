@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.101 2002/12/14 09:58:37 fishwaldo Exp $
+** $Id: ircd.c,v 1.102 2002/12/15 04:02:08 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -504,10 +504,6 @@ void parse(char *line)
         /* First, check if its a privmsg, and if so, handle it in the correct Function */
  	if (!strcasecmp("PRIVMSG",cmd) || (!strcasecmp("!",cmd))) {
 
-		if (flood(finduser(origin))) {
-			free(av);
-			return;
-		}
 
 
  		/* its a privmsg, now lets see who too... */       
@@ -524,6 +520,10 @@ void parse(char *line)
 		}
 	
 		if (!strcasecmp(s_Services,nick)) {
+			if (flood(finduser(origin))) {
+				free(av);
+				return;
+			}
 			/* its to the Internal Services Bot */
 			strcpy(segv_location, "servicesbot");
 			servicesbot(origin,av, ac);
@@ -539,6 +539,10 @@ void parse(char *line)
 #ifdef DEBUG
 				log("nicks: %s", list->nick);
 #endif
+				if (flood(finduser(origin))) {
+					free(av);
+					return;
+				}
 
 				/* Check to make sure there are no blank spaces so we dont crash */
 			        if (strlen(av[1]) >= 350) {
