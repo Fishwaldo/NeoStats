@@ -379,6 +379,7 @@ lib/pcre/maketables.c eol=lf
 lib/pcre/pcre.c eol=lf
 lib/pcre/pcre.h -text
 lib/pcre/pcre.vcproj -text
+lib/pcre/pcredftables.vcproj -text
 lib/pcre/study.c eol=lf
 logs/.keepme -text
 /makeconf -text
