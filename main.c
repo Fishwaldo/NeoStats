@@ -55,7 +55,6 @@ int forked = 0;
 int main()
 {
 	FILE *fp;
-	int adnsstart;
 
 	strcpy(segv_location, "main");
 	strcpy(segvinmodule, "");
@@ -89,15 +88,7 @@ int main()
 	setup_signals();
 	ConfLoad();
 	TimerReset();
-#ifndef DEBUG
-	adnsstart = adns_init(&ads, adns_if_noerrprint|adns_if_noautosys, 0);
-#else 
-	adnsstart = adns_init(&ads, adns_if_debug|adns_if_noautosys, 0);
-#endif
-	if (adnsstart) {
-		printf("ADNS init failed: %s\n", strerror(adnsstart));
-		exit(-1);
-	}	
+	init_dns();
 	init_server_hash();
 	init_user_hash();
 	init_chan_hash();

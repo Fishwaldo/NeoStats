@@ -71,7 +71,7 @@
 #define T_TABLE_SIZE	100 /* Number of Timers */
 #define B_TABLE_SIZE	100 /* Number of Bots */
 #define MAXMODES	CHAN_MEM_SIZE
-
+#define DNS_QUEUE_SIZE  100 /* number on concurrent DNS lookups */
 
 
 #define bzero(x, y)		memset(x, '\0', y);

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.21 2002/07/30 05:16:07 fishwaldo Exp $
+** $Id: sock.c,v 1.22 2002/08/20 09:30:37 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -87,6 +87,10 @@ void read_loop()
 		SelectResult = select(FD_SETSIZE, &readfds, &writefds, &errfds, TimeOut);
 		if (SelectResult > 0) {
 			adns_afterselect(ads, me.maxsocks, &readfds, &writefds, &errfds, 0);
+		
+			/* do and dns related callbacks now */
+			do_dns();
+
 			for (j = 0; j < BUFSIZE; j++) {
 				if (FD_ISSET(servsock, &readfds)) {
 					i = read(servsock, &c, 1);
