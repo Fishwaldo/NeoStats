@@ -44,11 +44,22 @@ adns_state ads;
 struct dnslookup_struct {
 	adns_query q;	/**< the ADNS query */
 	adns_answer *a;	/**< the ADNS result if we have completed */
+	adns_rrtype type; /**< the type we are looking for, only populated if we add to a queue */
 	char data[255];	/**< the User data based to the callback */
+	char lookupdata[255]; /**< the look up data, only populated if we add to a queue */
 	void (*callback) (char *data, adns_answer * a);
 						      /**< a function pointer to call when we have a result */
 	char mod_name[MAX_MOD_NAME];
 };
+
+struct DNSStats {
+	int totalq;
+	int maxqueued;
+	int totalqueued;
+	int success;
+	int failure;
+} DNSStats;
+
 
 /** @brief DNS structures
   */
@@ -59,6 +70,13 @@ typedef struct dnslookup_struct DnsLookup;
  */
 list_t *dnslist;
 
+/** @brief list of DNS queries that are queued up
+ * 
+ */
+list_t *dnsqueue;
+
+
+void dns_check_queue();
 
 /** @brief starts a DNS lookup
  *
@@ -82,13 +100,12 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 	struct sockaddr_in sa;
 
 	SET_SEGV_LOCATION();
-	if (list_isfull (dnslist)) {
-		nlog (LOG_ERROR, "DNS: Lookup list is full");
-		return 0;
-	}
+
 	dnsdata = malloc (sizeof (DnsLookup));
+	DNSStats.totalq++;
 	if (!dnsdata) {
 		nlog (LOG_CRITICAL, "DNS: Out of Memory");
+		DNSStats.failure++;
 		return 0;
 	}
 	/* set the module name */
@@ -101,6 +118,21 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 	}
 	strlcpy (dnsdata->data, data, 254);
 	dnsdata->callback = callback;
+	dnsdata->type = type;
+	
+	if (list_isfull (dnslist)) {
+		nlog (LOG_DEBUG1, "DNS: Lookup list is full, adding to queue");
+		strlcpy(dnsdata->lookupdata, str, 254);
+		dnsnode = lnode_create (dnsdata);
+		list_append (dnsqueue, dnsnode);
+		DNSStats.totalqueued++;
+		if (list_count(dnsqueue) > DNSStats.maxqueued) {
+			DNSStats.maxqueued = list_count(dnsqueue);
+		}
+		return NS_SUCCESS;
+	}
+
+
 	if (type == adns_r_ptr) {
 		sa.sin_family = AF_INET;
 		sa.sin_addr.s_addr = inet_addr (str);
@@ -111,6 +143,7 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 	if (status) {
 		nlog (LOG_WARNING, "DNS: adns_submit error: %s", strerror (status));
 		free (dnsdata);
+		DNSStats.failure++;
 		return 0;
 	}
 
@@ -138,6 +171,10 @@ InitDns ()
 	SET_SEGV_LOCATION();
 	dnslist = list_create (DNS_QUEUE_SIZE);
 	if (!dnslist)
+		return NS_FAILURE;
+	/* dnsqueue is unlimited. */
+	dnsqueue = list_create(-1);
+	if (!dnsqueue) 
 		return NS_FAILURE;
 #ifndef DEBUG
 	adnsstart = adns_init (&ads, adns_if_noerrprint | adns_if_noautosys, 0);
@@ -172,6 +209,12 @@ FiniDns (void)
 		free (dnsdata);
 	}
 	list_destroy_nodes(dnslist);
+	dnsnode = list_first(dnsqueue);
+	while (dnsnode) {
+		dnsdata = lnode_get(dnsnode);
+		free(dnsdata);
+	}
+	list_destroy_nodes(dnsqueue);
 	free(ads);
 }
 /** @brief Canx any DNS queries for modules we might be unloading
@@ -199,6 +242,19 @@ canx_dns(const char *modname) {
 			dnsnode = lnode2;
 		}
 	}
+	dnsnode = list_first(dnsqueue);
+	while (dnsnode) {
+		dnsdata = lnode_get(dnsnode);
+		if (!ircstrcasecmp(dnsdata->mod_name, modname)) {
+			free(dnsdata);
+			lnode2 = list_next(dnsqueue, dnsnode);
+			list_delete(dnsqueue, dnsnode);
+			lnode_destroy(dnsnode);
+			dnsnode = lnode2;
+		}
+	}
+
+	dns_check_queue();
 }
 
 
@@ -221,8 +277,10 @@ do_dns ()
 
 	SET_SEGV_LOCATION();
 	/* if the list is empty, no use doing anything */
-	if (list_isempty (dnslist))
+	if (list_isempty (dnslist)) {
+		dns_check_queue();
 		return;
+	}
 
 	dnsnode = list_first (dnslist);
 	while (dnsnode) {
@@ -239,7 +297,7 @@ do_dns ()
 		if (status) {
 			nlog (LOG_CRITICAL, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror (status));
 			chanalert (ns_botptr->nick, "Bad Error on DNS lookup. Please check logfile");
-
+			DNSStats.failure++;
 			/* set this so nlog works good */
 			SET_SEGV_INMODULE(dnsdata->mod_name);
 			/* call the callback function with answer set to NULL */
@@ -254,6 +312,7 @@ do_dns ()
 			break;
 		}
 		nlog (LOG_DEBUG1, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->mod_name);
+		DNSStats.success++;
 		SET_SEGV_INMODULE(dnsdata->mod_name);
 		/* call the callback function */
 		dnsdata->callback (dnsdata->data, dnsdata->a);
@@ -265,5 +324,63 @@ do_dns ()
 		free (dnsdata);
 		lnode_destroy (dnsnode1);
 	}
+	dns_check_queue();
+}
+/** @breif Checks the DNS queue and if we can
+ * add new queries to the active DNS queries and remove from Queue 
+*/
+void dns_check_queue() {
+	lnode_t *dnsnode, *dnsnode2;
+	DnsLookup *dnsdata;
+	struct sockaddr_in sa;
+	int status;
+	
+	/* first, if the DNSLIST is full, just exit straight away */
+	if (list_isfull(dnslist)) {
+		nlog(LOG_DEBUG2, "DNS list is still full. Can't work on queue");
+		return;
+	}
+	/* if the dnsqueue isn't empty, then lets process some more till we are full again */
+	if (!list_isempty(dnsqueue)) {
+		dnsnode = list_first(dnsqueue);
+		while ((dnsnode) && (!list_isfull(dnslist))) {
+			dnsdata = lnode_get(dnsnode);	
+			nlog(LOG_DEBUG2, "Moving DNS query %s from queue to active", dnsdata->data);
+			if (dnsdata->type == adns_r_ptr) {
+				sa.sin_family = AF_INET;
+				sa.sin_addr.s_addr = inet_addr (dnsdata->lookupdata);
+				status = adns_submit_reverse (ads, (const struct sockaddr *) &sa, dnsdata->type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
+			} else {
+				status = adns_submit (ads, dnsdata->lookupdata, dnsdata->type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
+			}
+			if (status) {
+				/* delete from queue and delete node */
+				nlog (LOG_WARNING, "DNS: adns_submit error: %s", strerror (status));
+				free (dnsdata);
+				dnsnode2 = dnsnode;
+				dnsnode = list_next(dnsqueue, dnsnode);
+				list_delete(dnsqueue, dnsnode2);
+				lnode_destroy(dnsnode2);
+				continue;
+			}
+			/* move from queue to active list */
+			dnsnode2 = dnsnode;
+			dnsnode = list_next(dnsqueue, dnsnode);
+			list_delete(dnsqueue, dnsnode2);
+			list_append(dnslist, dnsnode2);
+			nlog (LOG_DEBUG1, "DNS: Added dns query %s to list", dnsdata->data);
+		/* while loop */
+		}
+	/* isempty */
+	}
+}
 
+
+void do_dns_stats_Z(User *u) {
+	numeric (RPL_MEMSTATS, u->nick, "Active DNS queries: %d", (int) list_count(dnslist));
+	numeric (RPL_MEMSTATS, u->nick, "Queued DNS Queries: %d", (int) list_count(dnsqueue));
+	numeric (RPL_MEMSTATS, u->nick, "Max Queued Queries: %d", DNSStats.maxqueued);
+	numeric (RPL_MEMSTATS, u->nick, "Total DNS Questions: %d", DNSStats.totalq);
+	numeric (RPL_MEMSTATS, u->nick, "SuccessFull Lookups: %d", DNSStats.success);
+	numeric (RPL_MEMSTATS, u->nick, "Un-Successfull Lookups: %d", DNSStats.failure);
 }

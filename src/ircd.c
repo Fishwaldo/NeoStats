@@ -761,6 +761,10 @@ do_stats (const char* nick, const char *what)
 		tmp2 = me.now - me.t_start;
 		numeric (RPL_STATSLINKINFO, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
 		numeric (RPL_STATSLLINE, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, (int)me.SendM, (int)me.SendBytes, (int)me.RcveM, (int)me.RcveBytes, (int)tmp2, (int)tmp);
+        } else if (!ircstrcasecmp(what, "Z")) {
+                if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
+                        do_dns_stats_Z(u);
+                }
 	} else if (!ircstrcasecmp (what, "M")) {
 		for (i = 0; i < ircd_cmdcount; i++) {
 			if (cmd_list[i].usage > 0)

@@ -678,4 +678,7 @@ the current IRC server.
  
 #define ERR_NOSERVICEHOST 492 /*reserved in RFC1459, RFC2812*/
 
+#define RPL_MEMSTATS 249 /* stats Z */
+
+
 #endif /* _NUMERIC_H_ */
