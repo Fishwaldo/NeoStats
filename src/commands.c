@@ -458,14 +458,14 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 				}
 				cmdret = NS_SUCCESS;
 			}
-		}
-	} else {
-		cmdret = run_intrinsic_cmds( av[0], cmdparams );
-		if( cmdret != NS_SUCCESS ) {
-			/* We have run out of commands so report failure */
-			if( !ischancmd )
-				msg_unknown_command( cmdparams );
-			cmdret = NS_FAILURE;
+		} else {
+			cmdret = run_intrinsic_cmds( av[0], cmdparams );
+			if( cmdret != NS_SUCCESS ) {
+				/* We have run out of commands so report failure */
+				if( !ischancmd )
+					msg_unknown_command( cmdparams );
+				cmdret = NS_FAILURE;
+			}
 		}
 	}
 	ns_free( av );
