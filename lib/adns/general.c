@@ -30,11 +30,10 @@
  * - vbuf handling
  */
 
+#include "internal.h"
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-
-#include "internal.h"
 
 /* Core diagnostic functions */
 

@@ -31,7 +31,6 @@
  */
 
 #include "internal.h"
-
 #ifdef WIN32
 #include <iphlpapi.h>
 #else

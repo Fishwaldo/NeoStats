@@ -31,11 +31,10 @@
  * - user-visible check/wait and event-loop-related functions
  */
 
+#include "internal.h"
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-
-#include "internal.h"
 #include "tvarith.h"
 
 /* socket monitoring managemnet */

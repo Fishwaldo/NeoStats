@@ -30,12 +30,10 @@
  * - send queries
  */
 
-#ifdef WIN32
-#else
+#include "internal.h"
+#ifndef WIN32
 #include <sys/uio.h>
 #endif
-
-#include "internal.h"
 #include "tvarith.h"
 
 #define MKQUERY_START(vb) (rqp= (vb)->buf+(vb)->used)
