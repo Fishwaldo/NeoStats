@@ -112,14 +112,20 @@
 #include "version.h"
 #endif
 
+/* when db stuff is working, change this back */
+/* #ifdef HAVE_DB_H */
+#if 0
+#define USEGETTEXT
+#else 
 /* so our defines for _(x) are not active */
 #undef USEGETTEXT
+#endif
 
 #ifdef WIN32
 #define _(x) (x)
 #define __(x, y) (x)
 #else
-#ifdef HAVE_DB_H
+#ifdef USEGETTEXT
 char *LANGgettext(const char *string, int mylang);
 /* our own defines for language support */
 /* this one is for standard language support */
