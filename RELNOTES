@@ -1,4 +1,4 @@
-* NeoStats * M & Fish * Version 2.5.15
+* NeoStats * M & Fish * Version 2.5.17
 ==============================================================================
 Important Changes you should know: (READ THIS!)
 ==============================================================================
@@ -7,9 +7,9 @@ RedHat 9.0 / Fedora / Slakware 9.0 Users:
 	Kernels that affects NeoStats. If you are running RedHat 9.0 or Fedora
 	or Slakware 9.0 please read 
 	http://www.neostats.net/boards/viewtopic.php?t=391
- 
+
 Experimental IRCu support:
-	NeoStats 2.5.15 includes experimental support for IRCu. It may not work
+	NeoStats 2.5.17 includes experimental support for IRCu. It may not work
 	correctly on your network especially if you run a modified version of
 	IRCu. Currently we only aim to support the main IRCu branch but do have
 	some support for Nefarious and Asuka modifications. You will need to
@@ -17,3 +17,7 @@ Experimental IRCu support:
 	have support for a different branch of IRCu (e.g. boxen) you should 
 	request this on the forums.
 
+StatServ client version reports:
+    You must delete any existing ssversions.dat file in your NeoStats/data
+    directory due to a bug in the previous version
+ 
