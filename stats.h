@@ -76,6 +76,8 @@
 #define CHANLEN			50
 #define BUFSIZE			512
 #define CONFIG_NAME		"neostats.cfg"
+#define MOD_PATH		"dl"
+#define RECV_LOG		"logs/recv.log"
 #define MAXHOST			128
 #define MAXPASS			32
 #define MAXNICK			32
@@ -143,7 +145,6 @@ int	ns_snprintf(char *string, size_t size, const char *format, ...);
 #define segvinmodule segv_inmodule
 
 int servsock;
-int times;
 extern char s_Services[MAXNICK];
 extern const char version[];
 char recbuf[BUFSIZE];
@@ -169,8 +170,6 @@ typedef struct modeparms_ ModesParm;
 
 struct me {
 	char name[MAXHOST];
-/* M - Not used */
-/*	char modpath[BUFSIZE]; */
 	int port;
 	int r_time;
 	int lag_time;
@@ -298,8 +297,6 @@ extern void rehash ();
 
 /* main.c */
 extern int init_modules ();
-extern void login ();
-extern void init_ServBot ();
 extern void *smalloc (long);
 extern char *sstrdup (const char *);
 extern unsigned long HASH (const unsigned char *, int);

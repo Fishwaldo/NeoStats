@@ -238,7 +238,7 @@ static void
 recvlog (char *line)
 {
 	FILE *logfile;
-	if ((logfile = fopen ("logs/recv.log", "a")) == NULL)
+	if ((logfile = fopen (RECV_LOG, "a")) == NULL)
 		return;
 	if (logfile)
 		fprintf (logfile, "%s", line);

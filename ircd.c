@@ -30,8 +30,6 @@
 #include "dl.h"
 #include "log.h"
 
-extern const char protocol_version[];
-
 extern IntCommands cmd_list[];
 
 int
@@ -374,7 +372,7 @@ parse (char *line)
 they should update the internal Structures */
 
 void
-init_ServBot ()
+init_ServBot (void)
 {
 	char rname[63];
 	char **av;

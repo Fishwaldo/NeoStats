@@ -69,8 +69,9 @@ const char version_date[] = __DATE__;
 /*! Time we were compiled */
 const char version_time[] = __TIME__;
 
-static void start ();
-static void setup_signals ();
+static void login (void);
+static void start (void);
+static void setup_signals (void);
 static int get_options (int argc, char **argv);
 
 
@@ -138,12 +139,10 @@ main (int argc, char *argv[])
 #ifdef ULTIMATE3
 	me.client = 0;
 #endif
-/* M - Not used */
-/*	strcpy (me.modpath, "dl"); */
 
 	/* if we are doing recv.log, remove the previous version */
 	if (config.recvlog)
-		remove ("logs/recv.log");
+		remove (RECV_LOG);
 
 	/* initilze our Module subsystem */
 	__init_mod_list ();
@@ -316,7 +315,6 @@ serv_die ()
 	u = finduser (s_Services);
 	nlog (LOG_CRITICAL, LOG_CORE, "SIGTERM received, shutting down server.");
 	ns_shutdown (u, "SIGTERM received");
-	ssquit_cmd (me.name);  
 #endif /* VALGRIND */
 }
 
@@ -440,7 +438,7 @@ serv_segv ()
  *
  */
 static void
-setup_signals ()
+setup_signals (void)
 {
 	struct sigaction act;
 	act.sa_handler = SIG_IGN;
@@ -485,7 +483,7 @@ setup_signals ()
  * @todo make the restart code nicer so it doesn't go mad when we can't connect
  */
 static void
-start ()
+start (void)
 {
 	static int attempts = 0;
 
@@ -527,8 +525,8 @@ start ()
  *
  */
 
-void
-login ()
+static void
+login (void)
 {
 	SET_SEGV_LOCATION();
 	slogin_cmd (me.name, 1, me.infoline, me.pass);

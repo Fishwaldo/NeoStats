@@ -30,21 +30,18 @@
 #include "log.h"
 
 
-extern const char version_date[], version_time[];
-extern const char protocol_version[];
-
 static void ns_reload (User * u, char *reason);
-static void ns_logs (User *);
-static void ns_jupe (User *, char *);
-void ns_debug_to_coders (char *);
+static void ns_logs (User * u);
+static void ns_jupe (User * u, char * server);
+void ns_debug_to_coders (char * u);
 #ifdef USE_RAW
-static void ns_raw (User *, char *);
+static void ns_raw (User * u, char * message);
 #endif
-static void ns_user_dump (User *, char *);
-static void ns_server_dump (User *);
-static void ns_chan_dump (User *, char *);
-static void ns_uptime (User *);
-static void ns_version (User *);
+static void ns_user_dump (User * u, char * nick);
+static void ns_server_dump (User * u);
+static void ns_chan_dump (User * u, char * channel);
+static void ns_uptime (User * u);
+static void ns_version (User * u);
 
 void
 servicesbot (char *nick, char **av, int ac)

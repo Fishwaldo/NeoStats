@@ -642,7 +642,7 @@ load_module (char *modfilename, User * u)
 	} else {
 		do_msg = 1;
 	}
-	snprintf (path, 255, "dl/%s.so", modfilename);
+	snprintf (path, 255, "%s/%s.so", MOD_PATH, modfilename);
 	dl_handle = dlopen (path, RTLD_NOW || RTLD_GLOBAL);
 	CLEAR_SEGV_INMODULE();
 	if (!dl_handle) {

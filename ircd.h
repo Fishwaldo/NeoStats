@@ -23,24 +23,20 @@
 #ifndef IRCD_H
 #define IRCD_H
 
-struct int_cmds {
+struct _IntCommands {
 	char *name;
 	void (*function) (char *origin, char **argv, int argc);
 	int srvmsg;		/* Should this be a Server Message(1), or a User Message?(0) */
 	int usage;
-} int_cmds;
+};
 
-typedef struct int_cmds IntCommands;
+typedef struct _IntCommands IntCommands;
 
-
-
-
-void ShowMOTD (char *);
-void ShowADMIN (char *);
-void Showcredits (char *);
-void ShowStats (char *, User *);
-void dopong (Server *);
-
-
+void init_ServBot (void);
+void ShowMOTD (char *nick);
+void ShowADMIN (char *nick);
+void Showcredits (char *nick);
+void ShowStats (char * what, User *u);
+void dopong (Server *s);
 
 #endif
