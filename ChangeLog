@@ -1,9 +1,11 @@
 ===============================================================================
 NeoStats 3.x ChangeLog 
 Anything we add/remove/fix/change is in here (even our rants)
-Fish (F), Mark (M)
+Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - HostServ: add nick/host/vhost limits to list command (D)
+ - HostServ: add option to limit vhost adding to current nick only (D)
  - Introduce framework for new textserv module. (M)
  - Remove LoveServ and MoraleServ since these are to be replaced by the new
    textserv module. (M)
