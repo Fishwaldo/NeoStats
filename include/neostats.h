@@ -1092,7 +1092,7 @@ EXPORTFUNC int irc_svsjoin (const Bot *botptr, Client *target, const char *chan)
 EXPORTFUNC int irc_svspart (const Bot *botptr, Client *target, const char *chan);
 EXPORTFUNC int irc_svshost (const Bot *botptr, Client *target, const char *vhost);
 EXPORTFUNC int irc_svsmode (const Bot *botptr, Client *target, const char *modes);
-EXPORTFUNC int irc_svskill (const Bot *botptr, Client *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC int irc_svskill (const Bot *botptr, Client *target, const char *reason, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 EXPORTFUNC int irc_svstime (const Bot *botptr, Client *target, const time_t ts);
 
 /*  CTCP functions to correctly format CTCP requests and replies
