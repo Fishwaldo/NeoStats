@@ -382,15 +382,17 @@
 #ifdef ULTIMATE3
 #define UMODE_CH_LOCOP 'O'
 #define UMODE_CH_OPER 'o'
-#define UMODE_CH_GUESTADMIN 'G'
-#define UMODE_CH_COADMIN 'J'
-#define UMODE_CH_ADMIN 'A'
-#define UMODE_CH_CONETADMIN 'n'
-#define UMODE_CH_NETADMIN 'N'
-#define UMODE_CH_COTECHADMIN 't'
-#define UMODE_CH_TECHADMIN 'T'		/* Set to a number as we dont use */
 #define UMODE_CH_SADMIN 'a'
 #define UMODE_CH_SERVICES 'S'
+
+/* Smode chars */
+#define SMODE_CH_GUESTADMIN 'G'
+#define SMODE_CH_COADMIN 'J'
+#define SMODE_CH_ADMIN 'A'
+#define SMODE_CH_CONETADMIN 'n'
+#define SMODE_CH_NETADMIN 'N'
+#define SMODE_CH_COTECHADMIN 't'
+#define SMODE_CH_TECHADMIN 'T'		/* Set to a number as we dont use */
 #else
 
 /* Umode chars */

@@ -11,6 +11,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Trap and silently drop (but log) CTCP commands send to NeoStats (M)
  - tidy up of various error messages to help with tracking problems (M)
  - Log message when no configured modules in neostats.cfg (M)
+ - UMODE_CH_xxxx defines for Smodes changed to SMODE_CH_xxxx (M)
 
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.13
  - Added a new event for Channel Mode changes (F)

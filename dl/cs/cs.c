@@ -36,72 +36,39 @@
 */
 /* #define DISABLE_COLOUR_SUPPORT */
 
+static const char mode_netadmin[]="Network Administrator";
+static const char mode_conetadmin[]="Co-Network Administrator";
+static const char mode_techadmin[]="Network Technical Administrator";
+static const char mode_cotechadmin[]="Network Co-Technical Administrator";
+static const char mode_serveradmin[]="Server Administrator";
+static const char mode_coserveradmin[]="Co-Server Administrator";
+static const char mode_guestadmin[]="Guest Administrator";
+static const char mode_servicesadmin[]="Services Administrator";
+static const char mode_globop[]="global operator";
+static const char mode_locop[]="local operator";
+static const char mode_netservice[]="Network Service";
+static const char mode_bot[]="Bot";
+
 #ifdef DISABLE_COLOUR_SUPPORT
-char msg_nickchange[]="\2NICK\2 %s (%s@%s) Changed their nick to %s";
-char msg_signon[]="\2SIGNON\2 %s (%s@%s - %s) has signed on at %s";
-char msg_localkill[]="\2LOCAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";
-char msg_globalkill[]="\2GLOBAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2";
-char msg_serverkill[]="\2SERVER KILL\2 %s was Killed by the Server %s - Reason sighted: \2%s\2";  
-char msg_signoff[]="\2SIGNOFF\2 %s (%s@%s - %s) has signed off at %s - %s";
-char msg_netadmin[]="\2NETADMIN\2 %s is Now a Network Administrator (+%c)";
-char msg_netadminoff[]="\2NETADMIN\2 %s is No Longer a Network Administrator (-%c)";
-char msg_conetadmin[]="\2CO-NETADMIN\2 %s is Now a Co-Network Administrator (+%c)";
-char msg_conetadminoff[]="\2CO-NETADMIN\2 %s is No Longer a Co-Network Administrator (-%c)";
-char msg_techadmin[]="\2TECHADMIN\2 %s is Now a Network Technical Administrator (+%c)";
-char msg_techadminoff[]="\2TECHADMIN\2 %s is No Longer a Network Technical Administrator (-%c)";
-char msg_cotechadmin[]="\2CO-TECHADMIN\2 %s is Now a Network Co-Technical Administrator (+%c)";
-char msg_cotechadminoff[]="\2CO-TECHADMIN\2 %s is No Longer a Network Co-Technical Administrator (-%c)";
-char msg_serveradmin[]="\2SERVERADMIN\2 %s is Now a Server Administrator (+%c) on %s";
-char msg_serveradminoff[]="\2SERVERADMIN\2 %s is No Longer a Server Administrator (-%c) on %s";
-char msg_coserveradmin[]="\2CO-SERVERADMIN\2 %s is Now a Co-Server Administrator (+%c) on %s";
-char msg_coserveradminoff[]="\2CO-SERVERADMIN\2 %s is No Longer a Co-Server Administrator (-%c) on %s";
-char msg_guestadmin[]="\2GUESTADMIN\2 %s is Now a Guest Administrator on (+%c) %s";
-char msg_guestadminoff[]="\2GUESTADMIN\2 %s is No Longer a Guest Administrator (-%c) on %s";
-char msg_servicesadmin[]="\2SERVICESADMIN\2 %s is Now a Services Administrator (+%c)";
-char msg_servicesadminoff[]="\2SERVICESADMIN\2 %s is No Longer a Services Administrator (-%c)";
-char msg_globop[]="\2OPER\2 %s is Now a global operator (+%c) on %s";
-char msg_globopoff[]="\2OPER\2 %s is No Longer an global operator (-%c) on %s";
-char msg_locop[]="\2LOCALOPER\2 %s is Now a local operator (+%c) on %s";
-char msg_locopoff[]="\2LOCALOPER\2 %s is No Longer a local operator (-%c) on %s";
-char msg_netservice[]="\2SERVICES\2 %s is Now a Network Service (+%c)";
-char msg_netserviceoff[]="\2SERVICES\2 %s is No Longer a Network Service (-%c)";
-char msg_bot[]="\2BOT\2 %s is Now a Bot (+%c)";
-char msg_botoff[]="\2BOT\2 %s is No Longer a Bot (-%c)";
-char msg_invisible[]="\2INVISIBLE\2 %s Is Using \2Invisible Mode\2 (+%c)";
-char msg_invisibleoff[]="\2INVISIBLE\2 %s Is no longer using \2Invisible Mode\2 (-%c)";
+static char msg_nickchange[]="\2NICK\2 %s (%s@%s) changed their nick to %s";
+static char msg_signon[]="\2SIGNON\2 %s (%s@%s) has signed on at %s";
+static char msg_signoff[]="\2SIGNOFF\2 %s (%s@%s) has signed off at %s - %s";
+static char msg_localkill[]="\2LOCAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";
+static char msg_globalkill[]="\2GLOBAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";
+static char msg_serverkill[]="\2SERVER KILL\2 %s was killed by the server %s - Reason sighted: \2%s\2";  
+static char msg_mode[]="\2MODE\2 %s is %s a %s (%c%c)";
+static char msg_mode_serv[]="\2MODE\2 %s is %s a %s (%c%c) on %s";
+static char msg_bot[]="\2BOT\2 %s is %s a Bot (%c%c)";
 #else
-char msg_nickchange[]="\2\0037Nick Change\2 user: \2%s\2 (%s@%s) Changed their nick to \2%s\2\003"; 
-char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s - %s) at: \2%s\2\003";
-char msg_localkill[]="\2LOCAL KILL\2 user: \2%s\2 (%s@%s) was Killed by: \2%s\2 - Reason sighted: \2%s\2";
-char msg_globalkill[]="\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2\003";
-char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
-char msg_signoff[]="\2\0033Signed Off\2 user: %s (%s@%s - %s) at: %s - %s\003";
-char msg_netadmin[]="\2\00313%s\2 is \2Now\2 a \2Network Administrator\2 (+%c)\003";
-char msg_netadminoff[]="\02\00313%s\2 is \2No Longer\2 a \2Network Administrator\2 (-%c)\003";
-char msg_conetadmin[]="\2\00313%s\2 is \2Now\2 a \2Co-Network Administrator\2 (+%c)\003";
-char msg_conetadminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Co-Network Administrator\2 (-%c)\003";
-char msg_techadmin[]="\2\00313%s\2 is \2Now\2 a \2Network Technical Administrator\2 (+%c)\003";
-char msg_techadminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Network Technical Administrator\2 (-%c)\003";
-char msg_cotechadmin[]="\2\00313%s\2 is \2Now\2 a \2Network Co-Technical Administrator\2 (+%c)\003";
-char msg_cotechadminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Network Co-Technical Administrator\2 (-%c)\003";
-char msg_serveradmin[]="\2\00313%s\2 is \2Now\2 a \2Server Administrator\2 (+%c) on \2%s\2\003";
-char msg_serveradminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Server Administrator\2 (-%c) on \2%s\2\003";
-char msg_coserveradmin[]="\2\00313%s\2 is \2Now\2 a \2Co-Server Administrator\2 (+%c) on \2%s\2\003";
-char msg_coserveradminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Co-Server Administrator\2 (-%c) on \2%s\2\003";
-char msg_guestadmin[]="\2\00313%s\2 is \2Now\2 a \2Guest Administrator\2 (+%c) on \2%s\2\003";
-char msg_guestadminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Guest Administrator\2 (-%c) on \2%s\2\003";
-char msg_servicesadmin[]="\2\00313%s\2 is \2Now\2 a \2Services Administrator\2 (+%c)\003";
-char msg_servicesadminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Services Administrator\2 (-%c)\003";
-char msg_globop[]="\2\00313%s\2 is \2Now\2 a \2Global Operator\2 (+%c) on \2%s\2\003";
-char msg_globopoff[]="\2\00313%s\2 is \2No Longer\2 a \2Global Operator\2 (-%c) on \2%s\2\003";
-char msg_locop[]="\2\00313%s\2 is \2Now\2 a \2Local Operator\2 (+%c) on \2%s\2\003";
-char msg_locopoff[]="\2\00313%s\2 is \2No Longer\2 a \2Local Operator\2 (-%c) on \2%s\2\003";
-char msg_netservice[]="\2\00313%s\2 is \2Now\2 a \2Network Service\2 (+%c)\003";
-char msg_netserviceoff[]="\2\00313%s\2 is \2No Longer\2 a \2Network Service\2 (-%c)\003";
-char msg_bot[]="\2\00313%s\2 is \2Now\2 a \2Bot\2 (+%c)\003";
-char msg_botoff[]="\2\00313%s\2 is \2No Longer\2 a \2Bot\2 (-%c)\003";
-char msg_invisible[]="\2%s\2 Is Using \2Invisible Mode\2 (+%c)";
-char msg_invisibleoff[]="\2%s\2 Is no longer using \2Invisible Mode\2 (-%c)";
+static char msg_nickchange[]="\2\0037Nick Change\2 user: \2%s\2 (%s@%s) Changed their nick to \2%s\2\003"; 
+static char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s) at: \2%s\2\003";
+static char msg_signoff[]="\2\0033Signed Off\2 user: %s (%s@%s) at: %s - %s\003";
+static char msg_localkill[]="\2LOCAL KILL\2 user: \2%s\2 (%s@%s) was Killed by: \2%s\2 - Reason sighted: \2%s\2";
+static char msg_globalkill[]="\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2\003";
+static char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
+static char msg_mode[]="\200313%s\2 is \2%s\2 a \2%s\2 (%c%c)\003";
+static char msg_mode_serv[]="\200313%s\2 is \2%s\2 a \2%s\2 (%c%c) on \2%s\2\003";
+static char msg_bot[]="\2\00313%s\2 is \2%s\2 a \2Bot\2 (%c%c)\003";
 #endif
 
 static int cs_new_user(char **av, int ac);
@@ -311,6 +278,28 @@ static int cs_del_user(char **av, int ac)
 }
 
 /* 
+ * report mode change
+ */
+
+static int cs_report_mode(User* u, int add, char mode, const char* mode_desc, int serverinfo)
+{
+	if(serverinfo) {
+		chanalert(s_ConnectServ, msg_mode_serv, u->nick, 
+			add?"now":"no longer", 
+			mode_desc,
+			add?'+':'-',
+			mode, u->server->name);
+	} else {
+		chanalert(s_ConnectServ, msg_mode, u->nick, 
+			add?"now":"no longer", 
+			mode_desc,
+			add?'+':'-',
+			mode);
+	}
+	return 1;
+}
+
+/* 
  * Echo oper mode changes
  */
 static int cs_user_modes(char **av, int ac)
@@ -321,10 +310,7 @@ static int cs_user_modes(char **av, int ac)
 
 	SET_SEGV_LOCATION();
 
-	if (!cs_online)
-		return 1;
-
-	if (cs_cfg.mode_watch != 1)
+	if (!cs_online || !cs_cfg.mode_watch)
 		return -1;
 
 	u = finduser(av[0]);
@@ -345,151 +331,59 @@ static int cs_user_modes(char **av, int ac)
 		case '-':
 			add = 0;
 			break;
-#ifndef GOTUSERSMODES
-/* these modes in Ultimate3 are Smodes */
 #ifdef UMODE_CH_NETADMIN
 		case UMODE_CH_NETADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_netadmin,
-					  u->nick, UMODE_CH_NETADMIN);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_netadminoff,
-					  u->nick, UMODE_CH_NETADMIN);
-			}
+			cs_report_mode(u, add, UMODE_CH_NETADMIN, mode_netadmin, 0);
 			break;
 #endif
 #ifdef UMODE_CH_CONETADMIN
 		case UMODE_CH_CONETADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_conetadmin,
-					  u->nick, UMODE_CH_CONETADMIN);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_conetadminoff,
-					  u->nick, UMODE_CH_CONETADMIN);
-			}
+			cs_report_mode(u, add, UMODE_CH_CONETADMIN, mode_conetadmin, 0);
 			break;
 #endif
 #ifdef UMODE_CH_TECHADMIN
 		case UMODE_CH_TECHADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_techadmin,
-					  u->nick, UMODE_CH_TECHADMIN);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_techadminoff,
-					  u->nick, UMODE_CH_TECHADMIN);
-			}
+			cs_report_mode(u, add, UMODE_CH_TECHADMIN, mode_techadmin, 0);
 			break;
 #endif
 #ifdef UMODE_CH_ADMIN
 		case UMODE_CH_ADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_serveradmin,
-					  u->nick, UMODE_CH_ADMIN, u->server->name);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_serveradminoff,
-					  u->nick, UMODE_CH_ADMIN, u->server->name);
-			}
+			cs_report_mode(u, add, UMODE_CH_ADMIN, mode_serveradmin, 1);
 			break;
 #endif
 #ifdef UMODE_CH_COADMIN
 		case UMODE_CH_COADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_coserveradmin,
-					  u->nick, UMODE_CH_COADMIN, u->server->name);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_coserveradminoff,
-					  u->nick, UMODE_CH_COADMIN, u->server->name);
-			}
+			cs_report_mode(u, add, UMODE_CH_COADMIN, mode_coserveradmin, 1);
 			break;
 #endif
 #ifdef UMODE_CH_GUESTADMIN
 		case UMODE_CH_GUESTADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_guestadmin,
-					  u->nick, UMODE_CH_GUESTADMIN, u->server->name);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_guestadminoff,
-					  u->nick, UMODE_CH_GUESTADMIN, u->server->name);
-			}
+			cs_report_mode(u, add, UMODE_CH_GUESTADMIN, mode_guestadmin, 1);
 			break;
-/* these modes are not used in Ultimate3 */
 #endif
 #ifdef UMODE_CH_BOT
 		case UMODE_CH_BOT:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_bot,
-					  u->nick, UMODE_CH_BOT);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_botoff,
-					  u->nick, UMODE_CH_BOT);
-			}
+			chanalert(s_ConnectServ, msg_bot, u->nick, add?"now":"no longer", add?'+':'-', UMODE_CH_BOT);			
 			break;
-#endif
 #endif
 #ifdef UMODE_CH_SADMIN
 		case UMODE_CH_SADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_servicesadmin,
-					  u->nick, UMODE_CH_SADMIN);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_servicesadminoff,
-					  u->nick, UMODE_CH_SADMIN);
-			}
+			cs_report_mode(u, add, UMODE_CH_SADMIN, mode_servicesadmin, 0);
 			break;
 #endif
 #ifdef UMODE_CH_OPER
 		case UMODE_CH_OPER:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_globop,
-					  u->nick, UMODE_CH_OPER, u->server->name);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_globopoff,
-					  u->nick, UMODE_CH_OPER, u->server->name);
-			}
+			cs_report_mode(u, add, UMODE_CH_OPER, mode_globop, 1);
 			break;
 #endif
 #ifdef UMODE_CH_LOCOP
 		case UMODE_CH_LOCOP:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_locop,
-					  u->nick, UMODE_CH_LOCOP, u->server->name);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_locopoff,
-					  u->nick, UMODE_CH_LOCOP, u->server->name);
-			}
+			cs_report_mode(u, add, UMODE_CH_LOCOP, mode_locop, 1);
 			break;
 #endif
 #ifdef UMODE_CH_SERVICES
 		case UMODE_CH_SERVICES:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_netservice,
-					  u->nick, UMODE_CH_SERVICES);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_netserviceoff,
-					  u->nick, UMODE_CH_SERVICES);
-			}
+			cs_report_mode(u, add, UMODE_CH_SERVICES, mode_netservice, 0);
 			break;
 #endif
 		default:
@@ -510,16 +404,11 @@ static int cs_user_smodes(char **av, int ac)
 
 	SET_SEGV_LOCATION();
 
-	if (!cs_online)
-		return 1;
-
-	if (cs_cfg.mode_watch != 1)
+	if (!cs_online || !cs_cfg.mode_watch)
 		return -1;
 
 	u = finduser(av[0]);
 	if (!u) {
-		nlog(LOG_WARNING, LOG_MOD,
-			"cs_user_smodes: mode change for unknown user %s", u->nick);
 		return -1;
 	}
 
@@ -537,95 +426,39 @@ static int cs_user_smodes(char **av, int ac)
 		case '-':
 			add = 0;
 			break;
-#ifdef UMODE_CH_NETADMIN
-		case UMODE_CH_NETADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_netadmin,
-					  u->nick, UMODE_CH_NETADMIN);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_netadminoff,
-					  u->nick, UMODE_CH_NETADMIN);
-			}
+#ifdef SMODE_CH_NETADMIN
+		case SMODE_CH_NETADMIN:
+			cs_report_mode(u, add, SMODE_CH_NETADMIN, mode_netadmin, 0);
 			break;
 #endif
-#ifdef UMODE_CH_CONETADMIN
-		case UMODE_CH_CONETADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_conetadmin,
-					  u->nick, UMODE_CH_CONETADMIN);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_conetadminoff,
-					  u->nick, UMODE_CH_CONETADMIN);
-			}
+#ifdef SMODE_CH_CONETADMIN
+		case SMODE_CH_CONETADMIN:
+			cs_report_mode(u, add, SMODE_CH_CONETADMIN, mode_conetadmin, 0);
 			break;
 #endif
-#ifdef UMODE_CH_TECHADMIN
-		case UMODE_CH_TECHADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_techadmin,
-					  u->nick, UMODE_CH_TECHADMIN);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_techadminoff,
-					  u->nick, UMODE_CH_TECHADMIN);
-			}
+#ifdef SMODE_CH_TECHADMIN
+		case SMODE_CH_TECHADMIN:
+			cs_report_mode(u, add, SMODE_CH_TECHADMIN, mode_techadmin, 0);
 			break;
 #endif
-#ifdef UMODE_CH_COTECHADMIN
-		case UMODE_CH_COTECHADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_cotechadmin,
-					  u->nick, UMODE_CH_COTECHADMIN);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_cotechadminoff,
-					  u->nick, UMODE_CH_COTECHADMIN);
-			}
+#ifdef SMODE_CH_COTECHADMIN
+		case SMODE_CH_COTECHADMIN:
+			cs_report_mode(u, add, SMODE_CH_COTECHADMIN, mode_cotechadmin, 0);
 			break;
 #endif
-#ifdef UMODE_CH_ADMIN
-		case UMODE_CH_ADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_serveradmin,
-					  u->nick, UMODE_CH_ADMIN, u->server->name);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_serveradminoff,
-					  u->nick, UMODE_CH_ADMIN, u->server->name);
-			}
+#ifdef SMODE_CH_ADMIN
+		case SMODE_CH_ADMIN:
+			cs_report_mode(u, add, SMODE_CH_ADMIN, mode_serveradmin, 1);
 			break;
 #endif
-#ifdef UMODE_CH_COADMIN
-		case UMODE_CH_COADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_coserveradmin,
-					  u->nick,UMODE_CH_COADMIN,  u->server->name);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_coserveradminoff,
-					  u->nick, UMODE_CH_COADMIN, u->server->name);
-			}
+#ifdef SMODE_CH_COADMIN
+		case SMODE_CH_COADMIN:
+			cs_report_mode(u, add, SMODE_CH_COADMIN, mode_coserveradmin, 1);
 			break;
 #endif
-#ifdef UMODE_CH_GUESTADMIN
-		case UMODE_CH_GUESTADMIN:
-			if (add) {
-				chanalert(s_ConnectServ,
-					msg_guestadmin,
-					  u->nick, UMODE_CH_GUESTADMIN, u->server->name);
-			} else {
-				chanalert(s_ConnectServ,
-					msg_guestadminoff,
-					  u->nick, UMODE_CH_GUESTADMIN, u->server->name);
-			}
+#ifdef SMODE_CH_GUESTADMIN
+		case SMODE_CH_GUESTADMIN:
+			cs_report_mode(u, add, SMODE_CH_GUESTADMIN, mode_guestadmin, 1);
 			break;
 #endif
 		default:
@@ -687,7 +520,7 @@ static int cs_user_nick(char **av, int ac)
 
 	SET_SEGV_LOCATION();
 
-	if (!cs_online ||!cs_cfg.nick_watch)
+	if (!cs_online || !cs_cfg.nick_watch)
 		return 1;
 
 	u = finduser(av[1]);
@@ -764,7 +597,7 @@ static int cs_server_join(char **av, int ac)
 	Server *s;
 
 	SET_SEGV_LOCATION();
-	if (!cs_online ||!cs_cfg.serv_watch)
+	if (!cs_online || !cs_cfg.serv_watch)
 		return 1;
 
 	s = findserver(av[0]);
@@ -780,13 +613,13 @@ static int cs_server_quit(char **av, int ac)
 	Server *s;
 
 	SET_SEGV_LOCATION();
-	if (!cs_online ||!cs_cfg.serv_watch)
+	if (!cs_online || !cs_cfg.serv_watch)
 		return 1;
 
 	s = findserver(av[0]);
 	if (!s)
 		return 0;
-	chanalert (s_ConnectServ, "\2SERVER\2 %s has left the Network at %s",
-		s->name, s->uplink);
+	chanalert (s_ConnectServ, "\2SERVER\2 %s has left the Network at %s for %s",
+		s->name, s->uplink, (ac == 2) ? av[1] : "");
 	return 1;
 }
