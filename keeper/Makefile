@@ -5,8 +5,6 @@ INCLUDES = -I.. -DHAVE_CONFIG_H
 SRCS= kp_cache.c kp_dir.c kp_enum.c kp_get.c kp_iface.c kp_recur.c kp_set.c kp_sort.c kp_util.c
 OBJS= ${SRCS:.c=.o}
 
-$(OBJS): Makefile ../Makefile.inc 
-
 all:	$(OBJS)
 
 .c.o:
