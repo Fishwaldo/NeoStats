@@ -98,7 +98,7 @@ int ListArryCount = 0;
 Module_Info HostServ_info[] = { {
 				 "HostServ",
 				 "Network User Virtual Host Service",
-				 "2.8"}
+				 "3.0"}
 };
 
 int findnick(const void *key1, const void *key2)
@@ -240,6 +240,9 @@ int __Bot_Message(char *origin, char **av, int ac)
 	if (!strcasecmp(av[1], "HELP")) {
 		if (ac <= 2) {
 			privmsg_list(u->nick, s_HostServ, hs_help);
+			if (UserLevel(u) >= 150)
+				privmsg_list(u->nick, s_HostServ, hs_user_help);
+			privmsg_list(u->nick, s_HostServ, hs_help_on_help);
 			return 1;
 		} else if (!strcasecmp(av[2], "ADD")
 			   && (UserLevel(u) >= hs_cfg.add)) {
@@ -362,6 +365,20 @@ int __Bot_Message(char *origin, char **av, int ac)
 				hs_cfg.add, hs_cfg.del, hs_cfg.list,
 				hs_cfg.view);
 			return 1;
+		} else if (ac == 3) {
+			if (UserLevel(u) >= 185) {
+				if (!strcasecmp(av[2], "RESET")) {
+					hs_cfg.add = 40;
+					SetConf((void *) t, CFGINT, "AddLevel");
+					hs_cfg.del = 40;
+					SetConf((void *) t, CFGINT, "DelLevel");
+					hs_cfg.list = 40;
+					SetConf((void *) t, CFGINT, "ListLevel");
+					hs_cfg.view = 100;
+					SetConf((void *) t, CFGINT, "ViewLevel");
+				}
+			}
+			prefmsg(u->nick, s_HostServ, "Permission Denied");
 		} else if (ac == 4) {
 			if (UserLevel(u) >= 185) {
 				t = atoi(av[3]);

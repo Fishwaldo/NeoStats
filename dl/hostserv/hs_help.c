@@ -26,136 +26,149 @@
 #include "stats.h"
 
 const char *hs_help[] = {
-	"\2HostServ HELP\2",
+	"The following commands can be used with HostServ",
 	"",
-	"COMMANDS:",
-	"     ABOUT     LOGIN     ADD",
-	"     DEL       LIST      VIEW",
-	"     CHPASS    BANS      LEVELS",
-	"     SET",
+	"    ABOUT       About HostServ",
+	"    LOGIN       Login to HostServ",
+	"    CHPASS      Change password for a vhost",
+	"    BANS        List banned vhosts",
+	NULL
+};
+
+const char *hs_user_help[] = {
 	"",
-	"Not all commands are available to users",
+	"Additional commands for Service Roots",
+	"",
+	"    ADD         Add a vhost",
+	"    DEL         Delete a vhost",
+	"    LIST        List vhosts",
+	"    VIEW        Detailed vhost list",
+	"    SET         HostServ configuration",
+	"    LEVELS      Levels to manage HostServ",
+	NULL
+};
+
+const char *hs_help_on_help[] = {
+	"",
+	"To use a command, type:",
+	"    \2/msg HostServ command\2",
+	"For more information on a command, type:", 
+	"    \2/msg HostServ HELP command\2.",
 	NULL
 };
 
 const char *hs_help_about[] = {
-	"\2About HostServ\2",
+	"\2HostServ\2 allows users to use their own unique host",
+	"while on the Network. IRC Operators add them to the",
+	"database and upon connection the user gets their vhost.",
 	"",
-	"HostServ is designed to let users use their own unique host",
-	"While on the Network. IRC Operators add them to the database",
-	"And upon connection the user gets their unique host.",
-	"",
-	"If you find your host is not working, it could have been removed",
-	"Due to abuse, or the fact you are connecting from a different",
-	"Internet Provider or have a numerical address. Contact an admin",
-	"",
+	"If you find your host is not working, it could have been",
+	"removed due to abuse, or the fact you are connecting from",
+	"a different ISP or have a numerical address.",
+	"Contact an admin.",
 	NULL
 };
 
 const char *hs_help_add[] = {
-	"\2HostServ Help : ADD\2",
-	"\2Usage:\2 ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>",
+	"Syntax: \2ADD <NICK> <HOSTNAME> <VHOST NAME> <PASSWORD>\2",
 	"",
-	"Register a host name to be set. eg: my-host.com 4DO NOT INCLUDE AN @",
-	"The <HOST NAME> must be where the user is connecting from 4WITHOUT THE @",
-	"HostServ supports wildcards such as *.myhost.com in the <HOST NAME> setting",
-	"The <PASSWORD> field is new.  If a user connects with a different host",
-	"They can now /msg HostServ LOGIN nick password",
-	"",
+	"Register a host name. e.g. my-host.com DO NOT INCLUDE AN @.",
+	"HOSTNAME must be where the user is connecting from WITHOUT",
+	"THE @. HOSTNAME can include wildcards e.g. *.myhost.com",
+	"Users can also get their VHOST by typing the command:",
+	"    \2/msg HostServ LOGIN nick password\2",
+	"This allows them to use the VHOST from any host and for",
+	"multiple users to share one VHOST",
 	NULL
 };
 
 const char *hs_help_del[] = {
-	"\2HostServ Help : DEL\2",
-	"\2Usage:\2 DEL <ACCESS LIST #>",
+	"Syntax: \2DEL <ACCESS LIST #>\2",
 	"",
-	"The information needed for this is in the LIST command.  To delete Number 3",
-	"use DEL 3 ... its that easy!",
-	"",
+	"Delete a VHOST.",
+	"Use \2LIST\2 to find the number to use in this command",
 	NULL
 };
 
 const char *hs_help_view[] = {
-	"\2HostServ Help : VIEW",
-	"\2Usage:\2 VIEW <ACCESS LIST #>",
+	"Syntax: \2VIEW <ACCESS LIST #>\2",
 	"",
-	"View Detailed information about the user on the access list # you selected",
-	"",
+	"View Detailed information about a VHOST.",
+	"Use \2LIST\2 to find the number to use in this command",
 	NULL
 };
 
 const char *hs_help_list[] = {
-	"\2HostServ Help : LIST",
-	"\2Usage:\2 LIST [<startpos>]",
+	"Syntax: \2LIST <startpos>\2",
 	"",
-	"Lists the people and vhosts in the Database",
-	"For more descriptive info on a SINGLE vhost see HELP VIEW",
+	"Lists the people and vhosts in the database",
+	"For more descriptive info on a vhost see \2HELP VIEW\2",
 	"",
-	"If you supply a value for startpos (optional) the list will start at that position",
+	"If you supply a value for startpos (optional) the list",
+	"will start at that position",
 	NULL
 };
 
 const char *hs_help_login[] = {
-	"\2HostServ Help : LOGIN",
-	"\2Usage:\2 LOGIN <NICK> <PASSWORD>",
+	"Syntax: \2LOGIN <NICK> <PASSWORD>\2",
 	"",
-	"Login to HostServ with your NICK and PASSWORD and your vhost",
-	"will be assigned to your nick on successful login.",
-	"",
+	"Login to HostServ with your NICK and PASSWORD and your",
+	"vhost will be assigned to your nick on successful login.",
 	NULL
 };
 
 const char *hs_help_chpass[] = {
-	"\2HostServ Help : CHPASS",
-	"\2Usage:\2 CHPASS <NICK> <OLDPASS> <NEWPASS>",
+	"Syntax: \2CHPASS <NICK> <OLDPASS> <NEWPASS>\2",
 	"",
 	"Use this command to change the password assigned to your",
-	"Vhost Account. You must supply your current password and a ",
-	"valid account for it to be successfull",
-	"",
+	"vhost account. You must supply your current password and",
+	"a valid account for it to be successful",
 	NULL
 };
 
 const char *hs_help_listban[] = {
-	"\2HostServ Help : BANS",
-	"\2Usage:\2 BANS <[add/del] <option>]",
+	"Syntax: \2BANS\2",
+	"        \2BANS ADD <hostname>\2",
+	"        \2BANS DEL <index>\2",
 	"",
-	"Controls the vhost banned list entries:",
-	"\2BANS\2",
-	"This lists current vhosts that are banned by the network adminstration.",
+	"Maintain the list of banned vhosts.",
+	"\2BANS\2 lists current vhosts that are banned by network",
+	"administration.",
 	"",
-	"The following options are only available to Network Administration:",
-	"\2BANS add <wildcard>\2",
-	"Add a banned vhost to the list",
-	"Wildcards, like *fbi* are permitted.",
+	"Service Roots may also add a banned vhost to the list using"
+	"ADD. Wildcards, like *fbi* are permitted.",
 	"",
-	"\2BANS del #\2",
-	"Delete a banned vhost with ID number #",
-	"You may figure out the ID number by using \2BANS\2 by itself",
+	"DEL will delete a banned vhost with ID number index",
+	"Use \2BANS\2 to find the index",
 	NULL
 };
 
 const char *hs_help_levels[] = {
-	"\2HostServ Help : LEVELS",
-	"\2Usage:\2 LEVELS <[add/view/list/del] <level>>",
+	"Syntax: \2LEVELS\2",
+	"        \2LEVELS ADD <level>\2",
+	"        \2LEVELS LIST <level>\2",
+	"        \2LEVELS DEL <level>\2",
+	"        \2LEVELS VIEW <level>\2",
+	"        \2LEVELS RESET\2",
 	"",
-	"\2LEVELS\2",
-	"This lists the levels required to perform certian functions with hostserv.",
+	"\2LEVELS\2 without any parameters will lists the levels",
+	"required to perform certain HostServ functions.",
 	"",
-	"The Following Options are only available to Network Administration:",
-	"\2LEVELS [add/view/list/del] <level>",
-	"Change the UserLevels required to perform administration functions. Level must be between 1 and 200",
+	"Service Roots can modify these levels.",
+	"LEVEL must be between 1 and 200",
+	"RESET will restore the levels to original settings.",
 	NULL
 };
 
 const char *hs_help_set[] = {
-	"\2HostServ Help : SET",
-	"\2Usage:\2 SET [<option>  <value>]",
+	"Syntax: \2SET LIST\2",
+	"        \2SET EXPIRE <TIME>\2",
 	"",
-	"\2SET\2",
+	"\2SET LIST\2",
 	"This lists the current settings for HostServ.",
 	"",
-	"\2SET EXPIRE <time>",
-	"How long before un-used hostserv entries should be automatically deleted.",
+	"\2SET EXPIRE <TIME>\2",
+	"How long before unused HostServ entries should be",
+	"automatically deleted.",
 	NULL
 };

@@ -4,6 +4,8 @@ Shmad <shmad@neostats.net>
 
 * Version 3.0 * Fish * Oct 6th, 2003
 + Moved to lists to allow sorting and displaying
++ (M) Help text cleanup
++ (M) Added ABOUT command
  
 * Version 2.7.1 * Shmad * May 11th, 2003
 + Fixed a nasty seg bug *smacks fish* we don't free(s_HostServ);
