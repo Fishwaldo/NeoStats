@@ -152,12 +152,12 @@ doc/read-userman -text
 logs/.keepme -text
 /main.c -text
 /makeconf -text
+/neostats.cfg.dist -text
 /ns_help.c -text
 /server.c -text
 /services.c -text
 /sock.c -text
 /ss_help.c -text
-/stats.cfg.dist -text
 /stats.h -text
 /timer.c -text
 /users.c -text
