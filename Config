@@ -63,7 +63,7 @@ while [ $validselection -eq 0 ] ; do
 			echo "correctly."
 			;;
 		1)
- 			IRCD="--enable-unreal"
+ 			IRCD="--enable-unreal31"
 			validselection=1
 			;;
 		2)

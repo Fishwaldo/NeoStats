@@ -841,8 +841,8 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
  --enable-debug - Enable Debuging
- --enable-unreal - enable Unreal 3.1.x IRCD Support
- --enable-unreal - enable Unreal 3.2.x IRCD Support
+ --enable-unreal31 - enable Unreal 3.1.x IRCD Support
+ --enable-unreal32 - enable Unreal 3.2.x IRCD Support
  --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support
  --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support
  --enable-hybrid7 - enable Hybrid7 IRCD Support
@@ -5126,8 +5126,8 @@ echo "${ECHO_T}no" >&6
 
 fi;
 
-echo "$as_me:$LINENO: checking Whether to Enable Unreal IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Unreal IRCD Support...... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking Whether to Enable Unreal 3.1.x IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Unreal 3.1.x IRCD Support...... $ECHO_C" >&6
 # Check whether --enable-unreal or --disable-unreal was given.
 if test "${enable_unreal+set}" = set; then
   enableval="$enable_unreal"
@@ -5152,8 +5152,8 @@ else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi;
-echo "$as_me:$LINENO: checking Whether to Enable Unreal 3.2 IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Unreal 3.2 IRCD Support...... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking Whether to Enable Unreal 3.2.x IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Unreal 3.2.x IRCD Support...... $ECHO_C" >&6
 # Check whether --enable-unreal32 or --disable-unreal32 was given.
 if test "${enable_unreal32+set}" = set; then
   enableval="$enable_unreal32"
