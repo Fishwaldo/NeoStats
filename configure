@@ -1284,10 +1284,10 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 cat >>confdefs.h <<\_ACEOF
-#define REV 9
+#define REV 10
 _ACEOF
 
-VERSION=2.5.9
+VERSION=2.5.10
 
 CFLAGS="$CFLAGS -O2 -g"
 
