@@ -518,6 +518,7 @@ Showcredits (char *nick)
 	snumeric_cmd (RPL_VERSION, nick, ":- M - Updating lots of Doco and code and providing lots of great feedback");
 	snumeric_cmd (RPL_VERSION, nick, ":- J Michael Jones - Giving us Patches to support QuantumIRCd");
 	snumeric_cmd (RPL_VERSION, nick, ":- Blud - Giving us patches for Mystic IRCd");
+	snumeric_cmd (RPL_VERSION, nick, ":- herrohr - Giving us patches for Liquid IRCd support");
 }
 
 /** @brief 

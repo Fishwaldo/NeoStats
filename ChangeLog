@@ -15,9 +15,11 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - cleanups of core functions and module API including cleanup of module types and references (M)
  - Updated command user levels and associated help text (M)
  - Made M's bot message handling and help functions dynamic.. so modules can add/remove commands to the services bot... should make these functions a bit more generic so they could be called from any modules to handle messages. (F)
- - imported LiquidIRCd support from ???? (F)
+ - imported LiquidIRCd support from herrohr (F)
  - Admin text filename changed from "stats.admin" to "neostats.admin" (M)
  - Added services_bot_modes to each IRCd. This should contain the required ircd specific modes for a services bot (M)
+ - fix a bug with statserv map (F)
+ - Output channel related data in daily and network information on HTML page for statserv (F)
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.8
  - strncpy replaced by strlcpy - faster and safer (M)

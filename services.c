@@ -190,6 +190,7 @@ del_services_cmd_list(bot_cmd* cmd_list)
 		}
 		cmd_list++;
 	}
+	return NS_SUCCESS;
 }
 
 void
