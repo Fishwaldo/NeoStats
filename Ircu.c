@@ -619,7 +619,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	do_topic (argv[0], origin, NULL, argv[2]);
+	do_topic (argv[0], origin, NULL, argv[argc-1]);
 }
 
 static void
@@ -781,10 +781,10 @@ ircu_m_private (char *origin, char **argv, int argc, int srv)
 	char **av;
 	int ac = 0;
 	int i;
-	char* nick = base64tonick(argv[0]);
+	char* nick = base64tonick(origin);
 	
 	AddStringToList (&av, nick, &ac);
-	for(i = 1; i < argc; i++) {
+	for(i = 0; i < argc; i++) {
 		AddStringToList (&av, argv[i], &ac);
 	}
 	m_private (base64tonick(origin), av, ac, srv);
