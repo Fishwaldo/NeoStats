@@ -250,6 +250,7 @@ dl/version/version.c -text
 /dns.h eol=lf
 doc/FAQ -text
 doc/FAQ.pt -text
+doc/README.dev -text
 doc/README.french -text
 doc/README.sqlsrv -text
 doc/USERMAN -text
