@@ -52,13 +52,11 @@ static void ns_chan_dump (User * u, char **av, int ac);
 static void ns_info (User * u, char **av, int ac);
 static void ns_version (User * u, char **av, int ac);
 static void ns_show_level (User * u, char **av, int ac);
-static void ns_do_help (User * u, char **av, int ac);
 static void ns_load_module (User * u, char **av, int ac);
 static void ns_unload_module (User * u, char **av, int ac);
 
 static bot_cmd ns_commands[]=
 {
-/*	{"HELP",		ns_do_help,		0, 	0,					ns_help_on_help, 	1, 	ns_help_help_oneline},*/
 	{"LEVEL",		ns_show_level,	0, 	0,					ns_level_help, 		1, 	ns_level_help_oneline},
 	{"INFO",		ns_info,		0, 	0,					ns_info_help, 		1, 	ns_info_help_oneline},
 	{"VERSION",		ns_version,		0, 	0,					ns_version_help, 	1, 	ns_version_help_oneline},
@@ -273,12 +271,6 @@ ns_show_level (User * u, char **av, int ac)
 	} else {
 		prefmsg (u->nick, s_Services, "Your Level is %d", UserLevel (u));
 	}
-}
-
-static void 
-ns_do_help (User * u, char **av, int ac)
-{
-	services_cmd_help (u, av, ac);
 }
 
 static void 

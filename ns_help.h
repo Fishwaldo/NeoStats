@@ -25,10 +25,6 @@
 #define _NS_HELP_H_
 
 /* ns_help.c */
-extern const char *ns_help[];
-extern const char *ns_help_on_help[];
-extern const char *ns_sa_help[];
-extern const char *ns_sr_help[];
 extern const char *ns_shutdown_help[];
 extern const char *ns_reload_help[];
 extern const char *ns_logs_help[];

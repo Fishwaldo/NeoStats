@@ -50,16 +50,6 @@ const char ns_userdump_help_oneline[]="Debug user table";
 const char ns_chandump_help_oneline[]="Debug channel table";
 const char ns_serverdump_help_oneline[]="Debug server table";
 
-const char *ns_help_on_help[] = {
-	"",
-	"To use a command, type",
-	"    \2/msg NeoStats command\2",
-	"For for more information on a command, type", 
-	"    \2/msg NeoStats HELP command\2.",
-	NULL
-};
-
-
 const char *ns_level_help[] = {
 	"Syntax: \2LEVEL [nick]\2",
 	"",

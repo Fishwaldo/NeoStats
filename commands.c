@@ -34,9 +34,9 @@ static ModUser fake_bot;
 /* help title strings for different user levels */
 char * help_level_title[]=
 {
-	"\2Commands Available to Opers and Above:\2",
-	"\2Commands Available to Service Admins and Above:\2",
-	"\2Commands Available to Service Roots:\2",
+	"\2Operators\2",
+	"\2Service Admins\2",
+	"\2Service Roots\2",
 };
 
 /* Intrinsic commands 
@@ -265,19 +265,6 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	chanalert (bot_ptr->nick, "%s requested %s, but that is an unknown command", u->nick, av[1]);
 }
 
-/** @brief services_cmd_help process services bot help command
- *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
- */
-void 
-services_cmd_help (User * u, char **av, int ac)
-{
-	/* Use fake bot structure so we can use the main command routine */
-	strlcpy(fake_bot.nick, s_Services, MAXNICK);
-	fake_bot.botcmds = botcmds;
-	bot_cmd_help(&fake_bot, u, av, ac);
-}
-
 /** @brief bot_cmd_help process bot help command
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
@@ -285,7 +272,7 @@ services_cmd_help (User * u, char **av, int ac)
 static void 
 bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 {
-	char* curmsg=NULL;
+	char* curlevelmsg=NULL;
 	int donemsg=0;
 	bot_cmd* cmd_ptr;
 	int curlevel, lowlevel;
@@ -303,8 +290,8 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 		while ((cmdnode = hash_scan_next(&hs)) != NULL) {
 			cmd_ptr = hnode_get(cmdnode);
 			if ((cmd_ptr->ulevel < curlevel) && (cmd_ptr->ulevel >= lowlevel)) {
-				if(curmsg && !donemsg) {
-					prefmsg(u->nick, bot_ptr->nick, curmsg);
+				if(curlevelmsg && !donemsg) {
+					prefmsg(u->nick, bot_ptr->nick, "\2Additional Commands for %s:\2", curlevelmsg);
 					donemsg = 1;
 				}
 				prefmsg(u->nick, bot_ptr->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
@@ -315,19 +302,19 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 				case NS_ULEVEL_OPER:
 						curlevel = NS_ULEVEL_ADMIN;
 						lowlevel = NS_ULEVEL_OPER;
-						curmsg=help_level_title[0];
+						curlevelmsg=help_level_title[0];
 						donemsg=0;
 						goto restartlevel;
 				case NS_ULEVEL_ADMIN:
 						curlevel = NS_ULEVEL_ROOT;
 						lowlevel = NS_ULEVEL_ADMIN;
-						curmsg=help_level_title[1];
+						curlevelmsg=help_level_title[1];
 						donemsg=0;
 						goto restartlevel;
 				case NS_ULEVEL_ROOT:
 						curlevel = 201;
 						lowlevel = 200;
-						curmsg=help_level_title[2];
+						curlevelmsg=help_level_title[2];
 						donemsg=0;
 						goto restartlevel;
 				default:	
