@@ -847,6 +847,7 @@ void
 bot_message (char *origin, char **av, int ac)
 {
 	User *u;
+	User *bot_user;
 	ModUser *mod_usr;
 
 	/* Check command length */
@@ -866,10 +867,15 @@ bot_message (char *origin, char **av, int ac)
 		return;
 	}
 
-	mod_usr = findbot (av[0]);
+	bot_user = finduser(av[0]);
+	if (!bot_user) {
+		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", av[0]);
+		return;
+	}
+	mod_usr = findbot (bot_user->nick);
 	/* Check to see if any of the Modules have this nick Registered */
 	if (!mod_usr) {
-		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", av[0]);
+		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", bot_user->nick);
 		return;
 	}
 	nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s", mod_usr->nick);
@@ -1033,9 +1039,14 @@ findbot (char *bot_name)
 
 	SET_SEGV_LOCATION();
 
-	bn = hash_lookup (bh, bot_name);
-	if (bn) {
-		return (ModUser *) hnode_get (bn);
+	u = finduser(bot_name);
+	if(u) {
+		bn = hash_lookup (bh, u->nick);
+		if (bn) {
+			return (ModUser *) hnode_get (bn);
+		}
+	} else {
+		nlog (LOG_WARNING, LOG_CORE, "findbot: unable to find user %s", bot_name);
 	}
 	return NULL;
 }
