@@ -17,11 +17,19 @@
 #include "stats.h"
 #include "dotconf.h"
 
+#define SSMNAME "statserv"
+
 
 extern char s_StatServ[MAXNICK];
 
 typedef struct tld_ TLD;
 typedef struct server_stats SStats;
+
+SStats *Shead;
+TLD *tldhead;
+
+
+extern const char version_date[], version_time[];
 
 struct stats_network_ {
 	int opers;
@@ -45,6 +53,9 @@ struct StatServ {
 	char user[MAXUSER];
 	char host[MAXHOST];
 	int lag;
+	int html;
+	char htmlpath[BUFSIZE];
+	int onchan;
 } StatServ;
 
 
@@ -102,6 +113,15 @@ extern void AddStats(Server *);
 extern SStats *findstats(char *);
 extern void SaveStats();
 extern void LoadStats();
+extern int Online(void *);
+extern int pong(Server *);
+extern int s_user_away(User *);
+extern int s_new_server(Server *);
+extern int s_del_server(Server *);
+extern int s_new_user(User *);
+extern int s_del_user(User *);
+extern int s_user_modes(User *);
+extern int s_user_kill(User *);
 
 /* ss_help.c */
 extern const char *ss_help[];
@@ -128,5 +148,10 @@ extern const char *icq_help[];
 extern const char *ss_htmlstats_help[];
 extern const char *ss_forcehtml_help[];
 extern const char *ss_notices_help[];
+
+/* tld.c */
+extern void DelTLD(User *u);
+
+
 
 #endif
