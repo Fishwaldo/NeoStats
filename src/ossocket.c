@@ -303,7 +303,7 @@ int os_sock_write( OS_SOCKET s, const char* buf, int len )
 	}
 #else
 	ret = write( s, buf, len );
-	if( ret != 0 )
+	if( ret < 0 )
 	{
 		os_sock_errno = errno;
 		nlog( LOG_ERROR, "os_sock_write: failed for socket %d with error %s", s, strerror( errno ) );
@@ -331,7 +331,7 @@ int os_sock_read( OS_SOCKET s, char* buf, int len )
 	}
 #else
 	ret = read( s, buf, len );
-	if( ret != 0 )
+	if( ret < 0 )
 	{
 		os_sock_errno = errno;
 		nlog( LOG_ERROR, "os_sock_read: failed for socket %d with error %s", s, strerror( errno ) );

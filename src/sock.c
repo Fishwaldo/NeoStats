@@ -418,9 +418,6 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 
 void
 socket_linemode_write_done (struct bufferevent *bufferevent, void *arg) {
-#ifdef WIN32
-printf("linemode_write_done called back\n");
-#endif
 /* NOOP - We require this otherwise the event subsystem segv's */
 }
 
