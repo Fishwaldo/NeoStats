@@ -406,6 +406,12 @@ UserMode (const char *nick, const char *modes, int smode)
 	AddStringToList (&av, u->nick, &ac);
 	AddStringToList (&av, (char *) modes, &ac);
 
+	if (smode > 0) {
+		Module_Event ("SMODE", av, ac);
+	} else {
+		Module_Event ("UMODE", av, ac);
+	}
+
 
 	tmpmode = *(modes);
 	while (tmpmode) {
@@ -447,13 +453,8 @@ UserMode (const char *nick, const char *modes, int smode)
 	}
 	if (smode > 0) {
 		nlog (LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p", u->nick, u->Smode);
-		Module_Event ("SMODE", av, ac);
 	} else {
 		nlog (LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, u->Umode);
-		Module_Event ("UMODE", av, ac);
 	}
 	free (av);
-
-
-
 }
