@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.21 2002/08/31 07:40:34 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.22 2002/09/01 13:05:22 fishwaldo Exp $
  */
 
 
@@ -302,11 +302,11 @@
 #define MSG_TSCTL "TSCTL"
 #define TOK_TSCTL "AW"
 #define MSG_SVSJOIN "SVSJOIN"
-#define TOK_SVSJOIN "AX"
+#define TOK_SVSJOIN "BR"
 #define MSG_SAJOIN "SAJOIN"
-#define TOK_SAJOIN "AY"
+#define TOK_SAJOIN "AX"
 #define MSG_SVSPART "SVSPART"
-#define TOK_SVSPART "AX"
+#define TOK_SVSPART "BT"
 #define MSG_SAPART "SAPART"
 #define TOK_SAPART "AY"
 #define MSG_CHGIDENT "CHGIDENT"

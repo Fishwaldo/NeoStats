@@ -1,4 +1,7 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Version ????
+ - fixed up some Unreal tokens
+
 * NeoStats * Fish * Version 2.5.0-Beta5
  - Fixed a problem with prefmsg in Unreal only.
  - Fixed more bsd related bugs 
