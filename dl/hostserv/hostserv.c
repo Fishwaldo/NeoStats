@@ -1015,7 +1015,7 @@ static void LoadConfig(void)
 	if(GetConf((void *) &hs_cfg.old, CFGINT, "ExpireDays") < 0) {
 		hs_cfg.old = 60;
 	}
-	GetConf((void *) &hs_cfg.regnick, CFGINT, "UnetVhosts");
+	GetConf((void *) &hs_cfg.regnick, CFGBOOL, "UnetVhosts");
 	if (hs_cfg.regnick < 0) {
 		 hs_cfg.regnick = 0;
 	}
