@@ -484,17 +484,13 @@ int ssquit_cmd (const char *server);
 int sprotocol_cmd (const char *option);
 int squit_cmd (const char *who, const char *quitmsg);
 int spart_cmd (const char *who, const char *chan);
-#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM)
+#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID)
 int sjoin_cmd (const char *who, const char *chan, unsigned long chflag);
 #else
 int sjoin_cmd (const char *who, const char *chan);
 #endif
 int schmode_cmd (const char *who, const char *chan, const char *mode, const char *args);
-#if defined(ULTIMATE3) || defined(HYBRID7) || defined(NEOIRCD) || defined(BAHAMUT) || defined(QUANTUM) || defined(IRCU)
 int snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode);
-#else
-int snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname);
-#endif
 int sping_cmd (const char *from, const char *reply, const char *to);
 int sumode_cmd (const char *who, const char *target, long mode);
 int snumeric_cmd (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */

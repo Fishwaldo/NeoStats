@@ -410,7 +410,7 @@ schmode_cmd (const char *who, const char *chan, const char *mode, const char *ar
 }
 
 int
-snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname)
+snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
 {
 	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, me.now, ident, host, me.name, realname);
 	AddUser (nick, ident, host, me.name, 0, me.now);
