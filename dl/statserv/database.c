@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: database.c,v 1.11 2003/01/22 16:36:58 fishwaldo Exp $
+** $Id: database.c,v 1.12 2003/01/23 10:53:38 fishwaldo Exp $
 */
 
 
@@ -230,21 +230,19 @@ void LoadStats()
 			lnode_destroy(cn);
 			free(c);
 		}
-#if 0
-	free(name);
-   	free(topics);
-   	free(totmem);
-   	free(kicks);
-   	free(lastseen);
-   	free(maxmems);
-   	free(t_maxmems);
-   	free(maxkicks);
-   	free(t_maxkicks);
-   	free(maxjoins);
-   	free(t_maxjoins);
-#endif
 	}
     }    
+    free(name);
+    free(topics);
+    free(totmem);
+    free(kicks);
+    free(lastseen);
+    free(maxmems);
+    free(t_maxmems);
+    free(maxkicks);
+    free(t_maxkicks);
+    free(maxjoins);
+    free(t_maxjoins);
    fclose(fp);    
     
 

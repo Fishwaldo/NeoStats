@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.67 2003/01/22 16:37:38 fishwaldo Exp $
+** $Id: stats.h,v 1.68 2003/01/23 10:53:38 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -77,6 +77,8 @@
 #define MAXPASS			32
 #define MAXNICK			32
 #define MAXUSER			10
+#define MODESIZE		53
+#define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
 #define NUM_MODULES		255
 
 
@@ -184,16 +186,16 @@ struct server_ {
 
 struct user_ {
 	char nick[MAXNICK];
-	char hostname[BUFSIZE];
-	char username[BUFSIZE];
-	char vhost[BUFSIZE];
+	char hostname[MAXHOST];
+	char username[MAXUSER];
+	char vhost[MAXHOST];
 	Server *server;
 	MyUser *myuser;
 	int flood;
 	int is_away;
 	time_t t_flood;
 	long hash;
-	char modes[BUFSIZE];
+	char modes[MODESIZE];
 	int ulevel;
 	long Umode;
 	list_t *chans;
@@ -211,7 +213,7 @@ struct chans_ {
 	list_t *chanmembers;
 	list_t *modeparms;
 	char topic[BUFSIZE];
-	char topicowner[BUFSIZE];
+	char topicowner[MAXHOST]; /* becuase a "server" can be a topic owner */
 	time_t topictime;
 } chans_;
 
@@ -223,7 +225,7 @@ struct chanmem_ {
 
 struct modeparms_ {
 	long mode;
-	char param[512];
+	char param[PARAMSIZE];
 } modeparms_;
 
 

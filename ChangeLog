@@ -31,6 +31,9 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - ultimate3 SMODE support
  - Ultiamte3 SMODE broke ConnectServ. Bah Humbug
  - stopped double global messages when a module is loaded/unloaded
+ - some more memory leaks found with memprof and a 4000 user network!!!!
+ - Drastically reduced the amount of memory that Neostats now uses. 4000 users used to be around 12Mbs, got it down to 3.6Mbs
+ - Fixed up connectserv for SMODE support
 
 * NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 2 
  - Misc. Updates (S)

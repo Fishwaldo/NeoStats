@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.39 2003/01/15 14:18:47 fishwaldo Exp $
+** $Id: chans.c,v 1.40 2003/01/23 10:53:38 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -58,7 +58,7 @@ extern void Change_Topic(char *owner, Chans *c, time_t time, char *topic) {
 	char **av;
 	int ac = 0;
 	strncpy(c->topic, topic, BUFSIZE);
-	strncpy(c->topicowner, owner, BUFSIZE);
+	strncpy(c->topicowner, owner, MAXHOST);
 	c->topictime = time;
 	AddStringToList(&av, c->name, &ac);
 	AddStringToList(&av, owner, &ac);
@@ -130,12 +130,12 @@ int ChanMode(char *origin, char **av, int ac) {
 											m = lnode_get(mn);
 											/* mode limit and mode key replace current values */
 											if ((m->mode == MODE_LIMIT) && (cFlagTab[i].mode == MODE_LIMIT)) {
-												strcpy(m->param, av[j]);
+												strncpy(m->param, av[j], PARAMSIZE);
 												j++;
 												modeexists = 1;
 												break;
 											} else if ((m->mode == MODE_KEY) && (cFlagTab[i].mode == MODE_KEY)) {
-												strcpy(m->param, av[j]);
+												strncpy(m->param, av[j], PARAMSIZE);
 												j++;
 												modeexists = 1;
 												break;
@@ -152,7 +152,7 @@ int ChanMode(char *origin, char **av, int ac) {
 										if (modeexists != 1) {
 											m = smalloc(sizeof(ModesParm));
 											m->mode = cFlagTab[i].mode;
-											strcpy(m->param, av[j]);
+											strncpy(m->param, av[j], PARAMSIZE);
 											mn = lnode_create(m);
 											if (list_isfull(c->modeparms)) {
 												log("Eeek, Can't add additional Modes to Channel %s. Modelist is full", c->name);
@@ -253,7 +253,7 @@ Chans *new_chan(char *chan) {
 
 	strcpy(segv_location, "new_chan");
 	c = smalloc(sizeof(Chans));
-	strcpy(c->name, chan);
+	strncpy(c->name, chan, CHANLEN);
 	cn = hnode_create(c);
 	if (hash_isfull(ch)) {
 		log("Eeek, Channel Hash is full");
@@ -292,6 +292,7 @@ void del_chan(Chans *c) {
 		}
 		list_destroy_nodes(c->modeparms);
 		list_destroy(c->modeparms);		
+		list_destroy(c->chanmembers);
 		hash_delete(ch, cn);
 		hnode_destroy(cn);
 		free(c);
@@ -315,6 +316,7 @@ void part_chan(User *u, char *chan) {
 	Chans *c;
 	lnode_t *un;
 	char **av;
+	Chanmem *cm;
 	int ac = 0;
 	strcpy(segv_location, "part_chan");
 #ifdef DEBUG
@@ -343,7 +345,9 @@ void part_chan(User *u, char *chan) {
 				UserDump(u->nick);
 			}
 		} else {
+			cm = lnode_get(un);
 			lnode_destroy(list_delete(c->chanmembers, un));
+			free(cm);
 			AddStringToList(&av, c->name, &ac);
 			AddStringToList(&av, u->nick, &ac);
 			Module_Event("PARTCHAN", av, ac);
@@ -411,7 +415,7 @@ void change_user_nick(Chans *c, char *newnick, char *oldnick) {
 		log("Change_User_Nick(): NewNick %s, OldNick %s", newnick, oldnick);
 #endif
 		cml = lnode_get(cm);
-		strcpy(cml->nick, newnick);
+		strncpy(cml->nick, newnick, MAXNICK);
 	}		
 }
 
@@ -469,7 +473,7 @@ void join_chan(User *u, char *chan) {
 	}
 	/* add this users details to the channel members hash */	
 	cm = smalloc(sizeof(Chanmem));
-	strcpy(cm->nick, u->nick);
+	strncpy(cm->nick, u->nick, MAXNICK);
 	cm->joint = time(NULL);
 	cm->flags = 0;
 	cn = lnode_create(cm);	
@@ -487,6 +491,9 @@ void join_chan(User *u, char *chan) {
 	}
 	if (list_isfull(c->chanmembers)) {
 		log("ekk, Channel %s Members list is full", c->name);
+		lnode_destroy(cn);
+		free(cm);
+		return;
 	} else {
 		list_append(c->chanmembers, cn);
 	}
@@ -494,6 +501,7 @@ void join_chan(User *u, char *chan) {
 	un = lnode_create(c->name);
 	if (list_isfull(u->chans)) {
 		log("eek, User %s members list is full", u->nick);
+		lnode_destroy(un);
 	} else {
 		list_append(u->chans, un); 
 	}
@@ -542,7 +550,7 @@ void chandump(char *chan) {
 			strcpy(mode, "+");
 			for (i = 0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1); i++) {
 					if (c->modes & cFlagTab[i].mode) {
-					sprintf(mode, "%s%c", mode, cFlagTab[i].flag);
+					snprintf(mode, 10, "%s%c", mode, cFlagTab[i].flag);
 				}
 			}
 			sendcoders("Channel: %s Members: %d (List %d) Flags %s", c->name, c->cur_users, list_count(c->chanmembers), mode);
@@ -564,7 +572,7 @@ void chandump(char *chan) {
 				strcpy(mode, "+");
 				for (i = 0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1); i++) {
 					if (cm->flags & cFlagTab[i].mode) {
-						sprintf(mode, "%s%c", mode, cFlagTab[i].flag);
+						snprintf(mode, 10, "%s%c", mode, cFlagTab[i].flag);
 					}
 				}
 				sendcoders("Members: %s Modes %s Joined %d", cm->nick, mode, cm->joint);
@@ -579,7 +587,7 @@ void chandump(char *chan) {
 			strcpy(mode, "+");
 			for (i = 0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1); i++) {
 				if (c->modes & cFlagTab[i].mode) {
-					sprintf(mode, "%s%c", mode, cFlagTab[i].flag);
+					snprintf(mode, 10, "%s%c", mode, cFlagTab[i].flag);
 				}
 			}
 			sendcoders("Channel: %s Members: %d (List %d) Flags %s", c->name, c->cur_users, list_count(c->chanmembers), mode);
@@ -600,7 +608,7 @@ void chandump(char *chan) {
 				strcpy(mode, "+");
 				for (i = 0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1); i++) {
 					if (cm->flags & cFlagTab[i].mode) {
-						sprintf(mode, "%s%c", mode, cFlagTab[i].flag);
+						snprintf(mode, 10, "%s%c", mode, cFlagTab[i].flag);
 					}
 				}
 				sendcoders("Members: %s Modes %s Joined: %d", cm->nick, mode, cm->joint);

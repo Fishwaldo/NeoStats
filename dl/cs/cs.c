@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.16 2003/01/21 13:15:33 fishwaldo Exp $
+** $Id: cs.c,v 1.17 2003/01/23 10:53:38 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -36,6 +36,7 @@ char *s_ConnectServ;
 extern const char *cs_help[];
 int cs_new_user(char **av, int ac);
 int cs_user_modes(char **av, int ac);
+int cs_user_smodes(char **av, int ac);
 int cs_del_user(char **av, int ac);
 int cs_user_kill(char **av, int ac);
 int cs_user_nick(char **av, int ac);
@@ -147,7 +148,9 @@ EventFnList my_event_list[] = {
     { "ONLINE", Online},
     { "SIGNON", cs_new_user},
     { "UMODE", cs_user_modes},
-    { "SMODE", cs_user_modes},
+#ifdef ULTIMATE3
+    { "SMODE", cs_user_smodes},
+#endif
     { "SIGNOFF", cs_del_user},
     { "KILL", cs_user_kill},
     { "NICK_CHANGE", cs_user_nick},
@@ -237,21 +240,24 @@ int cs_del_user(char **av, int ac) {
     /* Approximate Segfault Location */
     strcpy(segv_location, "cs_del_user");
     u = finduser(av[0]);
+    
     cmd = sstrdup(recbuf);
-	lcl = sstrdup(recbuf);
+    lcl = sstrdup(recbuf);
 
     QuitCount = split_buf(cmd, &Quit, 0);
-	QuitMsg = joinbuf (Quit, QuitCount, 2);
+    QuitMsg = joinbuf (Quit, QuitCount, 2);
 
     /* Local Kill Watch For Signoff */
     if (kill_watch) {
         if (strstr(cmd ,"Local kill by") && strstr(cmd, "[") && strstr(cmd, "]")) {
 
 		  LocalCount = split_buf(lcl, &Local, 0);
-          KillMsg = joinbuf (Local, LocalCount, 7);
-
+          	  KillMsg = joinbuf (Local, LocalCount, 7);
 		  if (is_synced) chanalert(s_ConnectServ, "\2LOCAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Local[6], KillMsg);
-          free(KillMsg);
+          	  free(KillMsg);
+		  free(QuitMsg);
+	  	  free(cmd);
+		  free(lcl);
 		  return 1;
 
 	   }
@@ -260,15 +266,142 @@ int cs_del_user(char **av, int ac) {
     /* Print Disconnection Notice */
     if (sign_watch) {
         if (is_synced) chanalert(s_ConnectServ, "\2SIGNOFF\2 %s (%s@%s) has Signed off at %s - %s", u->nick, u->username, u->hostname, u->server->name, QuitMsg);
-	}
-	free(QuitMsg);
-
-  return 1;
+    }
+    free(QuitMsg);
+    free(cmd);
+    free(lcl);
+    free(Quit);
+    QuitCount = 0;
+    return 1;
 }
 
 
 /* Routine for MODES message to be echoed */
 int cs_user_modes(char **av, int ac) {
+    int add = 1;
+    char *modes;
+    User *u;
+
+    /* Approximate Segfault Location */
+    strcpy(segv_location, "cs_user_modes");
+
+    if (mode_watch != 1) return -1;
+
+    u = finduser(av[0]);
+    if (!u) {
+        cslog("Changing modes for unknown user: %s", u->nick);
+        return -1;
+    }
+  
+    if (!u->modes) return -1; 
+    modes = u->modes;
+    switch (*av[1]) {
+    	case '+': add = 1;	break;
+        case '-': add = 0;	break;
+    }
+
+    while (*av[1]++) {
+        switch(*av[1]) {
+            case '+': add = 1;    break;
+            case '-': add = 0;    break;
+#ifndef ULTIMATE3
+/* these modes in Ultimate3 are Smodes */
+            case NETADMIN_MODE:
+                if (add) {
+                    if (is_synced) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is Now a Network Administrator", u->nick);
+                } else {
+                    if (is_synced) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is No Longer a Network Administrator", u->nick);
+                }
+                break;
+	    case CONETADMIN_MODE:
+                if (add) {
+                    if (is_synced) chanalert(s_ConnectServ, "\2Co-NetAdmin\2 %s is Now a Co-Network Administrator", u->nick);
+                } else {
+                    if (is_synced) chanalert(s_ConnectServ, "\2Co-NetAdmin\2 %s is No Longer a Co-Network Administrator", u->nick);
+                }
+                break;
+            case TECHADMIN_MODE:
+                if (add) {
+                    if (is_synced) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is Now a Network Technical Administrator", u->nick);
+                } else {
+                    if (is_synced) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is No Longer a Network Technical Administrator", u->nick);
+                }
+                break;
+            case SERVERADMIN_MODE:
+                if (add) {
+                    if (is_synced) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s", u->nick, u->server->name);
+                } else {
+                    if (is_synced) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s", u->nick, u->server->name);
+                }
+                break;
+            case COSERVERADMIN_MODE:
+                if (add) {
+                    if (is_synced) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s", u->nick, u->server->name);
+                } else {
+                    if (is_synced) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s", u->nick, u->server->name);
+                }
+                break;
+	    case GUESTADMIN_MODE:
+		if (add) {
+		    if (is_synced) chanalert(s_ConnectServ, "\2GuestAdmin\2 %s is Now a Guest Administrator on %s", u->nick, u->server->name);
+		} else {
+		    if (is_synced) chanalert(s_ConnectServ, "\2GuestAdmin\2 %s is No Longer a Guest Administrator on %s", u->nick, u->server->name);
+		}
+		break;
+/* these modes are not used in Ultimate3 */
+            case BOT_MODE:
+                if (add) {
+                    if (is_synced) chanalert(s_ConnectServ, "\2Bot\2 %s is Now a Bot", u->nick);
+                } else {
+                    if (is_synced) chanalert(s_ConnectServ, "\2Bot\2 %s is No Longer a Bot", u->nick);
+                }
+                break;
+            case INVISIBLE_MODE:
+                if (add) {
+                   globops(s_ConnectServ,"\2%s\2 Is Using \2Invisible Mode\2",u->nick);
+                } else {
+                   globops(s_ConnectServ,"\2%s\2 Is no longer using \2Invisible Mode\2",u->nick);
+                }
+                break;
+#endif
+            case SERVICESADMIN_MODE:
+                if (add) {
+                    if (is_synced) chanalert(s_ConnectServ, "\2ServicesAdmin\2 %s is Now a Services Administrator", u->nick);
+                } else {
+                    if (is_synced) chanalert(s_ConnectServ, "\2ServicesAdmin\2 %s is No Longer a Services Administrator", u->nick);
+                }
+                break;
+            case OPER_MODE:
+                if (add) {
+                    if (is_synced) chanalert(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s", u->nick, u->server->name);
+                } else {
+                    if (is_synced) chanalert(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s", u->nick, u->server->name);
+                }
+                break;
+            case LOCOP_MODE:
+                if (add) {
+                    if (is_synced) chanalert(s_ConnectServ, "\2LocalOper\2 %s is Now a Local Oper on %s", u->nick, u->server->name);
+                } else {
+                    if (is_synced) chanalert(s_ConnectServ, "\2LocalOper\2 %s is No Longer a Local Oper on %s", u->nick, u->server->name);
+                }
+                break;
+            case NETSERVICE_MODE:
+                if (add) {
+                    if (is_synced) chanalert(s_ConnectServ, "\2Services\2 %s is Now a Network Service", u->nick);
+                } else {
+                    if (is_synced) chanalert(s_ConnectServ, "\2Services\2 %s is No Longer a Network Service", u->nick);
+                }
+                break;
+            default: 
+                break; 
+        }
+    }
+    return 1;
+}
+
+#ifdef ULTIMATE3
+/* smode support for Ultimate3 */
+int cs_user_smodes(char **av, int ac) {
     int add = 1;
     char *modes;
     User *u;
@@ -309,13 +442,6 @@ int cs_user_modes(char **av, int ac) {
                     if (is_synced) chanalert(s_ConnectServ, "\2Co-NetAdmin\2 %s is No Longer a Co-Network Administrator", u->nick);
                 }
                 break;
-            case NETSERVICE_MODE:
-                if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Services\2 %s is Now a Network Service", u->nick);
-                } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Services\2 %s is No Longer a Network Service", u->nick);
-                }
-                break;
             case TECHADMIN_MODE:
                 if (add) {
                     if (is_synced) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is Now a Network Technical Administrator", u->nick);
@@ -323,18 +449,18 @@ int cs_user_modes(char **av, int ac) {
                     if (is_synced) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is No Longer a Network Technical Administrator", u->nick);
                 }
                 break;
+	    case COTECHADMIN_MODE:
+		if (add) {
+			if (is_synced) chanalert(s_ConnectServ, "\2Co-TechAdmin\2 %s is Now a Network Co-Technical Administrator", u->nick);
+		} else {
+		 	if (is_synced) chanalert(s_ConnectServ, "\2Co-TechAdmin\2 %s is No Longer a Network Co-Technical Administrator", u->nick);
+	 	}
+		break;
             case SERVERADMIN_MODE:
                 if (add) {
                     if (is_synced) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s", u->nick, u->server->name);
                 } else {
                     if (is_synced) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s", u->nick, u->server->name);
-                }
-                break;
-            case SERVICESADMIN_MODE:
-                if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2ServicesAdmin\2 %s is Now a Services Administrator", u->nick);
-                } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2ServicesAdmin\2 %s is No Longer a Services Administrator", u->nick);
                 }
                 break;
             case COSERVERADMIN_MODE:
@@ -351,41 +477,13 @@ int cs_user_modes(char **av, int ac) {
 		    if (is_synced) chanalert(s_ConnectServ, "\2GuestAdmin\2 %s is No Longer a Guest Administrator on %s", u->nick, u->server->name);
 		}
 		break;
-            case BOT_MODE:
-                if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Bot\2 %s is Now a Bot", u->nick);
-                } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Bot\2 %s is No Longer a Bot", u->nick);
-                }
-                break;
-            case INVISIBLE_MODE:
-                if (add) {
-                   globops(s_ConnectServ,"\2%s\2 Is Using \2Invisible Mode\2",u->nick);
-                } else {
-                   globops(s_ConnectServ,"\2%s\2 Is no longer using \2Invisible Mode\2",u->nick);
-                }
-                break;
-            case OPER_MODE:
-                if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s", u->nick, u->server->name);
-                } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s", u->nick, u->server->name);
-                }
-                break;
-            case LOCOP_MODE:
-                if (add) {
-                    if (is_synced) chanalert(s_ConnectServ, "\2LocalOper\2 %s is Now a Local Oper on %s", u->nick, u->server->name);
-                } else {
-                    if (is_synced) chanalert(s_ConnectServ, "\2LocalOper\2 %s is No Longer a Local Oper on %s", u->nick, u->server->name);
-                }
-                break;
             default: 
                 break; 
         }
     }
     return 1;
 }
-
+#endif
 
 /* Routine for KILL message to be echoed */
 int cs_user_kill(char **av, int ac) {

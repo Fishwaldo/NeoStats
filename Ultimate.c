@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.35 2003/01/13 07:20:53 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.36 2003/01/23 10:53:38 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -369,7 +369,7 @@ int ssvshost_cmd(const char *who, const char *vhost) {
 		log("Can't Find user %s for ssvshost_cmd", who);
 		return 0;
 	} else {
-		strcpy(u->vhost, vhost);
+		strncpy(u->vhost, vhost, MAXHOST);
 #ifdef ULTIMATE3
 		sts(":%s %s %s %s", me.name, (me.token ? TOK_SETHOST : MSG_SETHOST), who, vhost);
 #elif ULTIMATE

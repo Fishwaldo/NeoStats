@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.h,v 1.7 2003/01/13 07:20:53 fishwaldo Exp $
+** $Id: cs.h,v 1.8 2003/01/23 10:53:38 fishwaldo Exp $
 */
 
 
@@ -30,13 +30,14 @@
 #ifdef ULTIMATE3
   #define LOCOP_MODE 'O'
   #define OPER_MODE 'o'
-  #define GUESTADMIN_MODE 'j'
-  #define COSERVERADMIN_MODE 'J'
+  #define GUESTADMIN_MODE 'G'
+  #define COSERVERADMIN_MODE 'a'
   #define SERVERADMIN_MODE 'A'
-  #define CONETADMIN_MODE 't'
-  #define NETADMIN_MODE 'T'
-  #define TECHADMIN_MODE '7'		/* Set to a number as we dont use */
-  #define SERVICESADMIN_MODE 'P'
+  #define CONETADMIN_MODE 'n'
+  #define NETADMIN_MODE 'N'
+  #define COTECHADMIN_MODE 't'
+  #define TECHADMIN_MODE 'T'		/* Set to a number as we dont use */
+  #define SERVICESADMIN_MODE 'a'
   #define NETSERVICE_MODE 'S'
   #define INVISIBLE_MODE '8'		/* Set to a number as we dont use */
   #define BOT_MODE '9'			/* Set to a number as we dont use */

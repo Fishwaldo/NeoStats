@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.41 2003/01/06 12:07:25 fishwaldo Exp $
+** $Id: users.c,v 1.42 2003/01/23 10:53:38 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -85,8 +85,8 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 	}
 
 	u = new_user(nick);
-	strcpy(u->hostname,host);
-	strcpy(u->username, user);
+	strncpy(u->hostname,host, MAXHOST);
+	strncpy(u->username, user, MAXUSER);
 	u->server = findserver(server);
 	u->t_flood = time(NULL);
 	u->flood = 0;
@@ -126,6 +126,7 @@ void DelUser(const char *nick)
 	
 	hash_delete(uh, un);
 	hnode_destroy(un);
+	list_destroy(u->chans);
 	free(u);
 }
 
@@ -149,7 +150,7 @@ void Change_User(User *u, const char *newnick)
 	}
 	strcpy(segv_location, "Change_User_Return");
 	hash_delete(uh, un);
-	strcpy(u->nick, newnick);
+	strncpy(u->nick, newnick, MAXNICK);
 	hash_insert(uh, un, u->nick);
 
 }
@@ -313,7 +314,7 @@ void UserMode(const char *nick, const char *modes)
 #endif
 	log("Modes: %s", modes);
 #endif
-	strcpy(u->modes, modes);
+	strncpy(u->modes, modes, MODESIZE);
 	tmpmode = *(modes);
 	while (tmpmode) {
 		switch(tmpmode) {

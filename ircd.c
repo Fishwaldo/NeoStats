@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.108 2003/01/21 13:09:23 fishwaldo Exp $
+** $Id: ircd.c,v 1.109 2003/01/23 10:53:38 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -477,7 +477,7 @@ void parse(char *line)
 	strcpy(segv_location, "parse");
 
 	strip(line);
-	strcpy(recbuf, line);
+	strncpy(recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
 #ifdef DEBUG
@@ -728,7 +728,7 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 				if (cFlagTab[i].parameters) {
 					m = smalloc(sizeof(ModesParm));
 					m->mode = cFlagTab[i].mode;
-					strcpy(m->param, argv[j]);										
+					strncpy(m->param, argv[j], PARAMSIZE);
 					mn = lnode_create(m);
 					if (!list_isfull(tl)) {
 						list_append(tl, mn);
@@ -775,7 +775,7 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 				mode |= MODE_VOICE;
 				modes++;
 			} else {
-				strcpy(nick, modes);
+				strncpy(nick, modes, MAXNICK);
 				ok = 0;
 				break;
 			}
@@ -997,9 +997,9 @@ void Usr_Vhost(char *origin, char **argv, int argc) {
 #endif
 	if (u) {
 #ifndef ULTIMATE3
-		strcpy(u->vhost, argv[0]);
+		strncpy(u->vhost, argv[0], MAXHOST);
 #else
-		strcpy(u->vhost, argv[1]);
+		strncpy(u->vhost, argv[1], MAXHOST);
 #endif
 	}
 }
@@ -1111,7 +1111,7 @@ void Srv_Vctrl(char *origin, char **argv, int argc) {
 		ircd_srv.nicklg = atoi(argv[1]);
 		ircd_srv.modex = atoi(argv[2]);
 		ircd_srv.gc = atoi(argv[3]);
-		strcpy(me.netname, argv[14]);
+		strncpy(me.netname, argv[14], MAXPASS);
 		vctrl_cmd();
 }
 #endif
@@ -1124,8 +1124,8 @@ void Srv_Svinfo(char *origin, char **argv, int argc) {
 void Srv_Netinfo(char *origin, char **argv, int argc) {
 		        me.onchan = 1;
 			ircd_srv.uprot = atoi(argv[2]);
-			strcpy(ircd_srv.cloak, argv[3]);
-			strcpy(me.netname, argv[7]);
+			strncpy(ircd_srv.cloak, argv[3], 10);
+			strncpy(me.netname, argv[7], MAXPASS);
 
 #if !defined(HYBRID7) && !defined(NEOIRCD)
 			snetinfo_cmd();
@@ -1216,7 +1216,7 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			Module_Event("SIGNON", av, ac);
 			u = finduser(argv[0]);
 			if (u) {
-				strcpy(u->vhost, argv[6]);
+				strncpy(u->vhost, argv[6], MAXHOST);
 			}
 #ifdef DEBUG
 			log("Mode: UserMode: %s",argv[3]);
