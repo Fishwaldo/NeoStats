@@ -45,7 +45,6 @@
 
 #include <stdlib.h>
 #include <stddef.h>
-#include <assert.h>
 #include <string.h>
 #include <ctype.h>
 #define HASH_IMPLEMENTATION

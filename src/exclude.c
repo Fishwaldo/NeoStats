@@ -28,7 +28,6 @@
 #include "neostats.h"
 #include "exclude.h"
 #include "services.h"
-#include "lang.h"
 
 static list_t *exclude_list;
 

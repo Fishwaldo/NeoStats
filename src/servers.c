@@ -31,7 +31,6 @@
 #include "servers.h"
 #include "services.h"
 #include "users.h"
-#include "lang.h"
 
 tconfig config;
 static hash_t *serverhash;

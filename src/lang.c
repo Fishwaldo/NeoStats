@@ -25,14 +25,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#ifdef HAVE_STRINGS_H
 #include <strings.h>
+#endif
 #include <string.h>
-
+#ifdef HAVE_DB_H
 #include <db.h>
+#endif
 #include "neostats.h"
 #include "lang.h"
 #include "hash.h"
 
+#ifdef WIN32
+void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc) 
+{
+}
+
+void LANGfini() 
+{
+}
+#else
 static DBT dbkey;
 static DBT dbdata;
 static int dbret;
@@ -157,7 +169,7 @@ static int LANGOpenDatabase()
 	return 1;
 }
 
-extern int LANGDumpDB(char *lang, int missing, void *mylist)
+int LANGDumpDB(char *lang, int missing, void *mylist)
 {
 	int rc;
 	DBT key, data;
@@ -208,7 +220,7 @@ extern int LANGDumpDB(char *lang, int missing, void *mylist)
 	return count;
 }	
 
-extern int LANGNewLang(char *lang) 
+int LANGNewLang(char *lang) 
 {
 	DBT dbkey, dbdata;
 	int rc;
@@ -309,7 +321,7 @@ static void* LANGGetData(void* key, int lang)
 	lang_stats.dbfails[lang]++;
 	return NULL;
 }
-extern int LANGfindlang(char *lang) {
+int LANGfindlang(char *lang) {
 	int i;
 	for (i = 0; i < lang_info.nooflangs; i++) {
 		if (!strcasecmp(lang_list[i].langname, lang)) {
@@ -320,7 +332,7 @@ extern int LANGfindlang(char *lang) {
 	return -1;
 }
 
-extern int LANGGotData(char *key, char *lang) {
+int LANGGotData(char *key, char *lang) {
 	int rc;
 	rc = LANGfindlang(lang);
 	if (rc == -1) {
@@ -334,7 +346,7 @@ extern int LANGGotData(char *key, char *lang) {
 	}
 }
 
-extern void LANGSetData(char* key, void* data, int size, char *lang, int keydone)
+void LANGSetData(char* key, void* data, int size, char *lang, int keydone)
 {
 	int rc;
 	char tmpbuf[KEYSIZE];
@@ -368,7 +380,7 @@ restart:
 	lang_stats.dbupdates[rc]++;
 }
 
-extern char *LANGgettext(const char *string, int mylang)
+char *LANGgettext(const char *string, int mylang)
 {
 	hnode_t *node;
 	char *transtring;
@@ -407,7 +419,7 @@ extern char *LANGgettext(const char *string, int mylang)
 	return "Translation Error";	
 }	
 
-extern void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc) 
+void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc) 
 {
 	int i;
 	lang_info.langdebug = debug;
@@ -428,7 +440,7 @@ extern void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc)
 	
 }
 
-extern void LANGfini() 
+void LANGfini() 
 {
 	hscan_t hc;
 	hnode_t *node;
@@ -443,3 +455,4 @@ extern void LANGfini()
 		LANGCloseDatabase(i);
 	}
 }
+#endif

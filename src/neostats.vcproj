@@ -170,6 +170,9 @@
 				RelativePath=".\keeper.c">
 			</File>
 			<File
+				RelativePath=".\lang.c">
+			</File>
+			<File
 				RelativePath=".\list.c">
 			</File>
 			<File
@@ -278,6 +281,9 @@
 			</File>
 			<File
 				RelativePath="..\include\ircstring.h">
+			</File>
+			<File
+				RelativePath="..\include\lang.h">
 			</File>
 			<File
 				RelativePath="..\include\list.h">

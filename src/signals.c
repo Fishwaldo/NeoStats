@@ -30,7 +30,6 @@
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #endif
-#include "lang.h"
 
 /*! File handle for segfault report */
 static FILE *segfault;

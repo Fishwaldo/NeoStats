@@ -45,7 +45,6 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-#include <assert.h>
 #define LIST_IMPLEMENTATION
 #include "neostats.h"
 #include "list.h"

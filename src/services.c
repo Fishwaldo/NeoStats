@@ -38,7 +38,6 @@
 #include "exclude.h"
 #include "services.h"
 #include "bans.h"
-#include "lang.h"
 
 static int ns_shutdown (CmdParams* cmdparams);
 static int ns_reload (CmdParams* cmdparams);

@@ -34,7 +34,6 @@
 #include "ns_help.h"
 #include "modules.h"
 #include "services.h"
-#include "lang.h"
 
 static int bot_cmd_help (CmdParams * cmdparams);
 static int bot_cmd_set (CmdParams * cmdparams);

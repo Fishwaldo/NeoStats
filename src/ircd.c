@@ -37,7 +37,6 @@
 #include "bans.h"
 #include "auth.h"
 #include "dns.h"
-#include "lang.h"
 
 ircd_server ircd_srv;
 

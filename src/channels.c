@@ -31,7 +31,6 @@
 #include "exclude.h"
 #include "services.h"
 #include "modules.h"
-#include "lang.h"
 
 static hash_t *channelhash;
 static char quitreason[BUFSIZE];

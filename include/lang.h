@@ -74,7 +74,6 @@ extern int LANGDumpDB(char *lang, int missing, void *);
 extern int LANGNewLang(char *lang);
 extern void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc);
 extern void LANGfini();
-extern char *LANGgettext(const char *string, int mylang);
 extern int LANGfindlang(char *);
 
 #ifdef USEGETTEXT

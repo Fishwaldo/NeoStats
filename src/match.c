@@ -44,8 +44,8 @@ int match(const char *mask, const char *name)
   int   wild  = 0;
   int   calls = 0;
 
-  assert(mask != NULL);
-  assert(name != NULL);
+  nassert(mask != NULL);
+  nassert(name != NULL);
 
   if (!mask || !name)
     return 0;
@@ -121,8 +121,8 @@ int match_esc(const char *mask, const char *name)
   int   calls = 0;
   int   quote = 0;
 
-  assert(mask != NULL);
-  assert(name != NULL);
+  nassert(mask != NULL);
+  nassert(name != NULL);
 
   if (!mask || !name)
     return 0;
@@ -345,53 +345,6 @@ char *collapse_esc(char *pattern)
  *po++ = 0;
  return pattern;
 }
-
-#if 0
-/* mark has already got something like this in ircstrings.c/h */
-
-/*
- * irccmp - case insensitive comparison of two 0 terminated strings.
- *
- *      returns  0, if s1 equal to s2
- *              <0, if s1 lexicographically less than s2
- *              >0, if s1 lexicographically greater than s2
- */
-int irccmp(const char *s1, const char *s2)
-{
-  const unsigned char* str1 = (const unsigned char*) s1;
-  const unsigned char* str2 = (const unsigned char*) s2;
-  int   res;
-
-  assert(s1 != NULL);
-  assert(s2 != NULL);
-  
-  while ((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
-  {
-    if (*str1 == '\0')
-      return 0;
-    str1++;
-    str2++;
-  }
-  return (res);
-}
-
-int ircncmp(const char* s1, const char *s2, int n)
-{
-  const unsigned char* str1 = (const unsigned char*) s1;
-  const unsigned char* str2 = (const unsigned char*) s2;
-  int res;
-  assert(s1 != NULL);
-  assert(s2 != NULL);
-
-  while ((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
-  {
-    str1++; str2++; n--;
-    if (n == 0 || (*str1 == '\0' && *str2 == '\0'))
-      return 0;
-  }
-  return (res);
-}
-#endif
 
 const unsigned char ToLowerTab[] = { 
   0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa,

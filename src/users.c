@@ -38,7 +38,6 @@
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-#include "lang.h"
 
 static hash_t *userhash;
 

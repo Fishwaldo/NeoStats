@@ -80,11 +80,17 @@
 /* so our defines for _(x) are not active */
 #undef USEGETTEXT
 
+#ifdef WIN32
+#define _(x) (x)
+#define __(x, y) (x)
+#else
+char *LANGgettext(const char *string, int mylang);
 /* our own defines for language support */
 /* this one is for standard language support */
 #define _(x) LANGgettext(x, me.lang)
 /* this one is for custom langs based on chan/user struct */
 #define __(x,y) LANGgettext(x,(y)->lang)
+#endif
 
 /* If we're not using GNU C, elide __attribute__ */
 #ifndef __GNUC__

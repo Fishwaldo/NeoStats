@@ -24,7 +24,6 @@
 #include "neostats.h"
 #include "modules.h"
 #include "services.h"
-#include "lang.h"
 
 static hash_t *banhash;
 

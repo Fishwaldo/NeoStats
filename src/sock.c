@@ -41,7 +41,6 @@
 #include "dotconf.h"
 #include "services.h"
 #include "ircd.h"
-#include "lang.h"
 
 static void recvlog (char *line);
 

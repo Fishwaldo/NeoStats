@@ -35,7 +35,6 @@
 #include "bots.h"
 #include "users.h"
 #include "ctcp.h"
-#include "lang.h"
 
 #define MAX_CMD_LINE_LENGTH		350
 

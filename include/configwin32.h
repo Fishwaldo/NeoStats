@@ -1,99 +1,14 @@
-/* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
-   systems. This function is required for `alloca.c' support on those systems.
-   */
-/* #undef CRAY_STACKSEG_END */
-
-/* Define to 1 if using `alloca.c'. */
-/* #undef C_ALLOCA */
-
-/* 'Enable Debugging' */
-/* #undef DEBUG */
-
-/* Set to explicitly specify we don't want to use thread-safe functions in
-   curl */
-/* #undef DISABLED_THREADSAFE */
-
-/* Define to 1 if you have `alloca', as a function or macro. */
-#define HAVE_ALLOCA 1
-
-/* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
-   */
-#define HAVE_ALLOCA_H 1
-
-/* Define to 1 if you have the `argz_append' function. */
-#define HAVE_ARGZ_APPEND 1
-
-/* Define to 1 if you have the `argz_create_sep' function. */
-#define HAVE_ARGZ_CREATE_SEP 1
-
-/* Define to 1 if you have the <argz.h> header file. */
-/*#define HAVE_ARGZ_H 1*/
-
-/* Define to 1 if you have the `argz_insert' function. */
-#define HAVE_ARGZ_INSERT 1
-
-/* Define to 1 if you have the `argz_next' function. */
-#define HAVE_ARGZ_NEXT 1
-
-/* Define to 1 if you have the `argz_stringify' function. */
-#define HAVE_ARGZ_STRINGIFY 1
-
-/* Define to 1 if you have the <arpa/inet.h> header file. */
-/* #define HAVE_ARPA_INET_H 1 */
-
 /* Define to 1 if you have the <assert.h> header file. */
 #define HAVE_ASSERT_H 1
 
 /* 'backtrace function available' */
 /* #undef HAVE_BACKTRACE */
 
-/* Define to 1 if you have the `bcopy' function. */
-#define HAVE_BCOPY 1
-
-/* Define to 1 if you have the `btowc' function. */
-/* #undef HAVE_BTOWC */
-
-/* Define to 1 if you have the `closedir' function. */
-#define HAVE_CLOSEDIR 1
-
-/* Define to 1 if you have the `closesocket' function. */
-/* #undef HAVE_CLOSESOCKET */
-
 /* Define to 1 if you have the <ctype.h> header file. */
 #define HAVE_CTYPE_H 1
 
 /* Define to 1 if you have the <db.h> header file. */
 #define HAVE_DB_H 1
-
-/* Define to 1 if you have the declaration of `getenv', and to 0 if you don't.
-   */
-/* #undef HAVE_DECL_GETENV */
-
-/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
-   */
-/*
-#define HAVE_DIRENT_H 1
-*/
-/* disabled non-blocking sockets */
-/* #undef HAVE_DISABLED_NONBLOCKING */
-
-/* Define if you have the GNU dld library. */
-/* #undef HAVE_DLD */
-
-/* Define to 1 if you have the <dld.h> header file. */
-/* #undef HAVE_DLD_H */
-
-/* Define to 1 if you have the `dlerror' function. */
-#define HAVE_DLERROR 1
-
-/* Define to 1 if you have the <dlfcn.h> header file. */
-/* #define HAVE_DLFCN_H 1 */
-
-/* Define to 1 if you have the `dlopen' function. */
-#define HAVE_DLOPEN 1
-
-/* Define to 1 if you have the <dl.h> header file. */
-/* #undef HAVE_DL_H */
 
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 /* #undef HAVE_DOPRNT */
@@ -131,18 +46,6 @@
 /* Define to 1 if you have the `gettimeofday' function. */
 #define HAVE_GETTIMEOFDAY 1
 
-/* HAVE_GNUC25_ATTRIB */
-#define HAVE_GNUC25_ATTRIB 1
-
-/* HAVE_GNUC25_CONST */
-#define HAVE_GNUC25_CONST 1
-
-/* HAVE_GNUC25_NORETURN */
-#define HAVE_GNUC25_NORETURN 1
-
-/* HAVE_GNUC25_PRINTFFORMAT */
-#define HAVE_GNUC25_PRINTFFORMAT 1
-
 /* Define to 1 if you have the `index' function. */
 /* #undef HAVE_INDEX */
 
@@ -167,32 +70,14 @@
 /* Define to 1 if you have the <io.h> header file. */
 #define HAVE_IO_H 1
 
-/* Define if you have the libdl library or equivalent. */
-#define HAVE_LIBDL 1
-
-/* Define to 1 if you have the `nsl' library (-lnsl). */
-/* #undef HAVE_LIBNSL */
-
-/* Define to 1 if you have the `resolve' library (-lresolve). */
-/* #undef HAVE_LIBRESOLVE */
-
-/* Define to 1 if you have the `socket' library (-lsocket). */
-/* #undef HAVE_LIBSOCKET */
-
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
 
 /* if your compiler supports 'long long' */
 #define HAVE_LONGLONG 1
 
-/* Define to 1 if you have the <mach-o/dyld.h> header file. */
-/* #undef HAVE_MACH_O_DYLD_H */
-
 /* Define to 1 if you have the <malloc.h> header file. */
 #define HAVE_MALLOC_H 1
-
-/* Define to 1 if you have the `mbsrtowcs' function. */
-/* #undef HAVE_MBSRTOWCS */
 
 /* Define to 1 if <wchar.h> declares mbstate_t. */
 #define HAVE_MBSTATE_T 1
@@ -434,40 +319,10 @@
 /* Define this symbol if your OS supports changing the contents of argv */
 /* #undef HAVE_WRITABLE_ARGV */
 
-/* 'Enable hybrid7 IRCD support' */
-/* #undef HYBRID7 */
-
-/* 'Enable IRCu Support' */
-/*#define IRCUP10 */
-
 /* "PCRE Lnk size" */
 #define LINK_SIZE   2
 #define MATCH_LIMIT 10000000
 #define POSIX_MALLOC_THRESHOLD 10
-
-/* 'Enable Liquid IRCd Support' */
-/* #undef LIQUID */
-
-/* Define to 1 if `lstat' dereferences a symlink specified with a trailing
-   slash. */
-#define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
-
-/* Define if the OS needs help to load dependent libraries for dlopen(). */
-#define LTDL_DLOPEN_DEPLIBS 1
-
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
-#define LTDL_OBJDIR ".libs/"
-
-/* Define to the name of the environment variable that determines the dynamic
-   library search path. */
-#define LTDL_SHLIBPATH_VAR "PATH"
-
-/* Define to the extension used for shared libraries, say, ".so". */
-#define LTDL_SHLIB_EXT ".dll"
-
-/* Define to the system default library search path. */
-#define LTDL_SYSSEARCHPATH "/lib:/usr/lib"
 
 /* "Major Version Number" */
 #define MAJOR 3
@@ -478,17 +333,11 @@
 /* "Minor Version Number" */
 #define MINOR 0
 
-/* 'Enable Mystic Support' */
-/* #undef MYSTIC */
-
 /* "Our Platfrom requires Underscores" */
 #define NEED_UNDERSCORE_PREFIX 1
 
 /* Define if dlsym() requires a leading underscore in symbol names. */
 /* #undef NEED_USCORE */
-
-/* 'Enable NeoIRCd IRCD support' */
-/* #undef NEOIRCD */
 
 /* "Installation Prefix" */
 #define NEO_PREFIX "/home/Mark/NeoStats3.0"
@@ -513,21 +362,6 @@
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION ""
-
-/* "PCRE Version" */
-/* #undef PCRE_MAJOR_VERSION */
-
-/* "PCRE Version" */
-/* #undef PCRE_MINOR_VERSION */
-
-/* "Pcre full version" */
-/* #undef PCRE_VERSION */
-
-/* "Malloc Threshold" */
-/* #undef POSIX_MALLOC_THRESHOLD */
-
-/* 'Enable Quantum Support' */
-/* #undef QUANTUM */
 
 /* Define as the return type of signal handlers (`int' or `void'). */
 #define RETSIGTYPE void
@@ -564,29 +398,11 @@
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 /* #undef TM_IN_SYS_TIME */
 
-/* 'Enable client only Support' */
-/*#define CLIENT 1*/
-
-/* 'Enable Ultimate 2.x.x Support' */
-/* #undef ULTIMATE2 */
-
-/* "Enable Ultimate 3.x.x Support' */
-/* #undef ULTIMATE3 */
-
-/* 'Enable Unreal 3.1.x Support' */
-/* #undef UNREAL31 */
-
-/* 'Enable Unreal 3.2.x Support' */
-#define UNREAL32
-
 /* 'Use Raw command' */
 /* #undef USE_RAW */
 
 /* "Full Version" */
 #define VERSION "3.0.genesis"
-
-/* 'Enable Viagra IRCd Support' */
-/* #undef VIAGRA */
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */

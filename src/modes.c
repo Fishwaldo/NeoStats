@@ -28,7 +28,6 @@
 #include "users.h"
 #include "channels.h"
 #include "modules.h"
-#include "lang.h"
 
 unsigned char UmodeChRegNick = 'r';
 static char ModeStringBuf[64];

@@ -28,7 +28,6 @@
 #include "services.h"
 #include "modules.h"
 #include "log.h"
-#include "lang.h"
 
 /* @brief Module Timer hash list */
 static hash_t *timerhash;
