@@ -46,6 +46,8 @@
 # define adns_socket_write(sck, data, len) write(sck, data, len)
 # define ADNS_CAPTURE_ERRNO {}
 # define ADNS_CLEAR_ERRNO {}
+#define adns_malloc malloc
+#define adns_free free
 #endif
 
 #ifdef __cplusplus
