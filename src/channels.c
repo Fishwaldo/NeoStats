@@ -647,7 +647,7 @@ void FiniChannels( void )
 	hash_destroy( channelhash );
 }
 
-Channel *GetRandomChan( void ) 
+Channel *GetRandomChannel( void ) 
 {
 	hscan_t cs;
 	hnode_t *cn;
@@ -665,8 +665,22 @@ Channel *GetRandomChan( void )
 		}
 		curno++;
 	}
-	nlog( LOG_WARNING, "GetRandomChan() ran out of channels?" );
+	nlog( LOG_WARNING, "GetRandomChannel() ran out of channels?" );
 	return NULL;
+}
+
+char *GetRandomChannelKey( int length ) 
+{
+	int i;
+	char *key;
+
+	key = ns_malloc( ( length + 1 ) );
+	for( i = 0; i < length; i++ )
+	{
+		key[i] = ( ( rand() % 26) + 'a' );
+	}
+	key[i] = 0;
+	return key;
 }
 
 int GetChannelList( ChannelListHandler handler, void *v )

@@ -1162,7 +1162,7 @@ EXPORTFUNC Channel *FindChannel( const char *chan );
 EXPORTFUNC int CheckChanMode( Channel *c, const unsigned int mode );
 EXPORTFUNC int IsChannelMember( Channel *c, Client *u );
 EXPORTFUNC int test_cumode( char *chan, char *nick, int flag );
-EXPORTFUNC Channel *GetRandomChan( void );
+EXPORTFUNC Channel *GetRandomChannel( void );
 
 #define IsChanOp( chan, nick ) test_cumode(chan, nick, CUMODE_CHANOP)
 #define IsChanHalfOp( chan, nick ) test_cumode(chan, nick, CUMODE_HALFOP)
@@ -1218,6 +1218,7 @@ EXPORTFUNC int ValidateUser( char *username );
 EXPORTFUNC int ValidateHost( char *hostname );
 EXPORTFUNC int ValidateURL( char *url );
 EXPORTFUNC int ValidateChannel( char *channel_name );
+EXPORTFUNC int ValidateChannelKey( char *key );
 
 #define CONFIG_TABLE_NAME	"config"
 

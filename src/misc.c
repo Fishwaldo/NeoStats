@@ -28,41 +28,41 @@
 #include "services.h"
 #include "ircstring.h"
 
-/* @brief hrand
+/** @brief hrand
  * 
  * 
  * 
- * @params upperbound
- * @params lowerbound
+ *  @param upperbound
+ *  @param lowerbound
  *
- * @returns result
+ *  @returns result
  */
 
-unsigned hrand(unsigned upperbound, unsigned lowerbound) 
+unsigned hrand( unsigned upperbound, unsigned lowerbound ) 
 {
-	if ((upperbound < 1)) {
-		nlog (LOG_WARNING, "hrand() invalid value for upperbound");
+	if( ( upperbound < 1 ) ) {
+		nlog( LOG_WARNING, "hrand() invalid value for upperbound" );
 		return -1;
 	}
-	return ((unsigned)(rand()%((int)(upperbound-lowerbound+1))-((int)(lowerbound-1))));
+	return( ( unsigned )( rand()%( ( int )( upperbound-lowerbound+1 ) )-( ( int )( lowerbound-1 ) ) ) );
 }
 
-/* @brief Make the name of a file safe for a filename
+/** @brief make_safe_filename
  * 
- * given a name, make sure its a safe name for a filename
+ *  given a name, make sure its a safe name for a filename
  * 
- * @params name the name to check. Warning, the name is modified
+ *  @param name to check; name is modified
  *
- * @returns a modified version of the name, that is safe to use as a filename
+ *  @returns modified version of name that is safe to use as a filename
  */
 
-char *make_safe_filename (char *name) 
+char *make_safe_filename( char *name ) 
 {
 	char *ptr;
 
 	ptr = name;
-	while (*ptr) {
-		switch (*ptr) {
+	while( *ptr ) {
+		switch( *ptr ) {
 #ifdef WIN32
 			case '#':
 			*ptr = '_';
@@ -81,316 +81,324 @@ char *make_safe_filename (char *name)
 	return name;
 }
 
-/** @brief strip newlines carriage returns
+/** @brief strip
+ * 
+ *  removes newlines and carriage returns from a string
+ * 
+ *  @param line to strip; line is modified
  *
- * removes newlines and carriage returns from a string
- *
- * @param line the line to strip (warning, Modfied!)
- * @retval line the stripped line
+ *  @returns stripped line
  */
 
-void
-strip (char *line)
+void strip( char *line )
 {
 	char *c;
-	if ((c = strchr (line, '\n')))
+	if( ( c = strchr( line, '\n' ) ) )
 		*c = '\0';
-	if ((c = strchr (line, '\r')))
+	if( ( c = strchr( line, '\r' ) ) )
 		*c = '\0';
 }
 
-/** @brief Duplicate a string
+/** @brief sstrdup
+ * 
+ *  make a copy of a string allocating memory for the new string
+ * 
+ *  @param pointer to the string to duplicate
  *
- * make a copy of a string, with memory allocated for the new string
- *
- * @param s a pointer to the string to duplicate
- *
- * @returns a pointer to the new string
- *
- * @deprecated  Try not to use this function, it will go away one day
- *
+ *  @returns pointer to the new string
  */
 
-char* sstrdup (const char *s)
+char* sstrdup( const char *s )
 {
-	char *t = ns_malloc (strlen(s)+1);
-	strlcpy (t, s, strlen(s)+1);
-	if (!t) {
-		nlog (LOG_CRITICAL, "sstrdup(): out of memory.");
-		do_exit (NS_EXIT_ERROR, "Out of memory");
+	char *t = ns_malloc( strlen( s )+1 );
+	strlcpy( t, s, strlen( s )+1 );
+	if( !t ) {
+		nlog( LOG_CRITICAL, "sstrdup(): out of memory." );
+		do_exit( NS_EXIT_ERROR, "Out of memory" );
 	}
 	return t;
 }
 
-/** @brief convert a string to lowercase
+/** @brief strlwr
+ * 
+ *  make string string lowercase
+ * 
+ *  @param string to convert to lowercase; string is modified
  *
- * makes a string lowercase
- *
- * @param s the string to convert to lowercase. WARNING: the result overwrites this variable
- *
- * @returns pointer to the lowercase version of s
- *
+ *  @returns pointer to the new string
  */
 
-char* strlwr (char *s)
+char* strlwr( char *s )
 {
 	char *t;
 	t = s;
-	while (*t) {
-		*t = tolower (*t);
+	while( *t ) {
+		*t = tolower( *t );
 		t++;
 	}
 	return s;
 }
 
-/** @brief split_buf
- *  Split a buffer into argument list
+/** @brief ircsplitbuf
+ * 
+ *  Split a buffer into argument list observing IRC protocols
+ * 
+ *  @param buf buffer to convert
+ *  @param argv list of arguments to write
+ *  @param colon_special flag to indicate colon processing
  *
- * @return 
+ *  @returns count of arguments created from split
  */
 
-EXPORTFUNC int ircsplitbuf (char *buf, char ***argv, int colon_special)
+EXPORTFUNC int ircsplitbuf( char *buf, char ***argv, int colon_special )
 {
 	int argvsize = 8;
 	int argc;
 	char *s;
 	int colcount = 0;
 	SET_SEGV_LOCATION();
-	*argv = ns_calloc (sizeof (char *) * argvsize);
+	*argv = ns_calloc( sizeof( char * ) * argvsize );
 	argc = 0;
-	/*if (*buf == ':')
+	/*if( *buf == ':' )
 		buf++;*/
-	while (*buf) {
-		if (argc == argvsize) {
+	while( *buf ) {
+		if( argc == argvsize ) {
 			argvsize += 8;
-			*argv = ns_realloc (*argv, sizeof (char *) * argvsize);
+			*argv = ns_realloc( *argv, sizeof( char * ) * argvsize );
 		}
-		if ((*buf == ':') && (colcount < 1)) {
+		if( ( *buf == ':' ) &&( colcount < 1 ) ) {
 			buf++;
 			colcount++;
-			if(colon_special) {
-				(*argv)[argc++] = buf;
+			if( colon_special ) {
+				( *argv )[argc++] = buf;
 				break;
 			}
 		}
-		s = strpbrk (buf, " ");
-		if (s) {
+		s = strpbrk( buf, " " );
+		if( s ) {
 			*s++ = 0;
-			while (isspace (*s))
+			while( isspace( *s ) )
 				s++;
 		} else {
-			s = buf + strnlen (buf, BUFSIZE);
+			s = buf + strnlen( buf, BUFSIZE );
 		}
-		if (*buf == 0) {
+		if( *buf == 0 ) {
 			buf++;
 		}
-		(*argv)[argc++] = buf;
+		( *argv )[argc++] = buf;
 		buf = s;
 	}
 	return argc;
 }
 
 /** @brief split_buf
+ * 
  *  Split a buffer into argument list
+ * 
+ *  @param buf buffer to convert
+ *  @param argv list of arguments to write
+ *  @param colon_special flag to indicate colon processing
  *
- * @return 
+ *  @returns count of arguments created from split
  */
 
-int split_buf (char *buf, char ***argv, int colon_special)
+int split_buf( char *buf, char ***argv, int colon_special )
 {
 	int argvsize = 8;
 	int argc;
 	char *s;
 	int colcount = 0;
 	SET_SEGV_LOCATION();
-	*argv = ns_calloc (sizeof (char *) * argvsize);
+	*argv = ns_calloc( sizeof( char * ) * argvsize );
 	argc = 0;
-	if (*buf == ':')
+	if( *buf == ':' )
 		buf++;
-	while (*buf) {
-		if (argc == argvsize) {
+	while( *buf ) {
+		if( argc == argvsize ) {
 			argvsize += 8;
-			*argv = ns_realloc (*argv, sizeof (char *) * argvsize);
+			*argv = ns_realloc( *argv, sizeof( char * ) * argvsize );
 		}
-		if ((*buf == ':') && (colcount < 1)) {
+		if( ( *buf == ':' ) &&( colcount < 1 ) ) {
 			buf++;
 			colcount++;
 		}
-		s = strpbrk (buf, " ");
-		if (s) {
+		s = strpbrk( buf, " " );
+		if( s ) {
 			*s++ = 0;
-			while (isspace (*s))
+			while( isspace( *s ) )
 				s++;
 		} else {
-			s = buf + strnlen (buf, BUFSIZE);
+			s = buf + strnlen( buf, BUFSIZE );
 		}
-		if (*buf == 0) {
+		if( *buf == 0 ) {
 			buf++;
 		}
-		(*argv)[argc++] = buf;
+		( *argv )[argc++] = buf;
 		buf = s;
 	}
 	return argc;
 }
 
-/** @brief joinbuf 
- *
+/** @brief joinbuf
+ * 
  *  join an array of arguments into a single buffer
+ * 
+ *  @param av list of arguments to combine
+ *  @param ac count of arguments to combine
+ *  @param from position to start combine
  *
- * @return 
+ *  @returns buffer containing combined arguments
  */
 
-char* joinbuf (char **av, int ac, int from)
+char* joinbuf( char **av, int ac, int from )
 {
 	int i;
 	char *buf;
 
-	buf = ns_malloc (BUFSIZE);
-	if(from >= ac) {
-		dlog(DEBUG1, "joinbuf: from (%d) >= ac (%d)", from, ac);
-		strlcpy (buf, "(null)", BUFSIZE);
+	buf = ns_malloc( BUFSIZE );
+	if( from >= ac ) {
+		dlog( DEBUG1, "joinbuf: from( %d ) >= ac( %d )", from, ac );
+		strlcpy( buf, "( null )", BUFSIZE );
 	}
 	else {
-		strlcpy (buf, av[from], BUFSIZE);
-		for (i = from + 1; i < ac; i++) {
-			strlcat (buf, " ", BUFSIZE);
-			strlcat (buf, av[i], BUFSIZE);
+		strlcpy( buf, av[from], BUFSIZE );
+		for( i = from + 1; i < ac; i++ ) {
+			strlcat( buf, " ", BUFSIZE );
+			strlcat( buf, av[i], BUFSIZE );
 		}
 	}
-	return (char *) buf;
+	return( char * ) buf;
 }
 
-/** @brief Adds a string to an array of strings
- *
- * used for the event functions, adds a string to an array of string pointers to pass to modules
- *
- * @param List the array you wish to append S to 
- * @param S the string you wish to append
- * @param C the current size of the array
+/** @brief AddStringToList
  * 
- * @returns Nothing
+ *  Adds a string to an array of strings
+ * 
+ *  @param List the array you wish to append S to 
+ *  @param S the string you wish to append
+ *  @param C current size of the array
  *
+ *  @returns none
  */
 
-void AddStringToList (char ***List, char S[], int *C)
+void AddStringToList( char ***List, char S[], int *C )
 {
 	static int numargs = 8;
 
-	if (*C == 0) {
+	if( *C == 0 ) {
 		numargs = 8;
-		*List = ns_calloc (sizeof (char *) * numargs);
-	} else if (*C  == numargs) {
+		*List = ns_calloc( sizeof( char * ) * numargs );
+	} else if( *C  == numargs ) {
 		numargs += 8;
-		*List = ns_realloc (*List, sizeof (char *) * numargs);
+		*List = ns_realloc( *List, sizeof( char * ) * numargs );
 	}
-	(*List)[*C] = S;
+	( *List )[*C] = S;
 	++*C;
 }
 
-/** @brief 
- *
- * @param 
+/** @brief strip_mirc_codes
  * 
- * @returns 
+ *  Remove colour control codes from mirc, pirch etc.
+ *  taken from eggdrop
+ * 
+ *  @param text to strip
  *
- */
-/* this came from eggdrop sources */
-/* Remove the color control codes that mIRC,pIRCh etc use to make
- * their client seem so fecking cool! (Sorry, Khaled, you are a nice
- * guy, but when you added this feature you forced people to either
- * use your *SHAREWARE* client or face screenfulls of crap!)
+ *  @returns none
  */
 
-void strip_mirc_codes(char *text)
+void strip_mirc_codes( char *text )
 {
-  char *dd = text;
+	char *dd = text;
 
-  while (*text) {
-    switch (*text) {
-    case 1:
-    	text++;			/* ctcp stuff */
-    	continue;
-      break;
-    case 2:			/* Bold text */
-	text++;
-	continue;
-      break;
-    case 3:			/* mIRC colors? */
-	if (isdigit(text[1])) {	/* Is the first char a number? */
-	  text += 2;		/* Skip over the ^C and the first digit */
-	  if (isdigit(*text))
-	    text++;		/* Is this a double digit number? */
-	  if (*text == ',') {	/* Do we have a background color next? */
-	    if (isdigit(text[1]))
-	      text += 2;	/* Skip over the first background digit */
-	    if (isdigit(*text))
-	      text++;		/* Is it a double digit? */
-	  }
-	continue;
-      }
-      break;
-    case 7:
-	text++;
-	continue;
-      break;
-    case 0x16:			/* Reverse video */
-	text++;
-	continue;
-      break;
-    case 0x1f:			/* Underlined text */
-	text++;
-	continue;
-      break;
-    case 033:
-	text++;
-	if (*text == '[') {
-	  text++;
-	  while ((*text == ';') || isdigit(*text))
-	    text++;
-	  if (*text)
-	    text++;		/* also kill the following char */
+	while( *text ) {
+		switch( *text ) {
+			case 1:
+				text++;			/* ctcp stuff */
+				continue;
+				break;
+			case 2:			/* Bold text */
+				text++;
+				continue;
+				break;
+			case 3:			/* mIRC colors? */
+				if( isdigit( text[1] ) ) {	/* Is the first char a number? */
+					text += 2;		/* Skip over the ^C and the first digit */
+					if( isdigit( *text ) )
+						text++;		/* Is this a double digit number? */
+					if( *text == ',' ) {	/* Do we have a background color next? */
+						if( isdigit( text[1] ) )
+							text += 2;	/* Skip over the first background digit */
+						if( isdigit( *text ) )
+							text++;		/* Is it a double digit? */
+					}
+					continue;
+				}
+				break;
+			case 7:
+				text++;
+				continue;
+				break;
+			case 0x16:			/* Reverse video */
+				text++;
+				continue;
+				break;
+			case 0x1f:			/* Underlined text */
+				text++;
+				continue;
+				break;
+			case 033:
+				text++;
+				if( *text == '[' ) {
+					text++;
+					while( ( *text == ';' ) || isdigit( *text ) )
+						text++;
+					if( *text )
+						text++;		/* also kill the following char */
+				}
+				continue;
+				break;
+		}
+		*dd++ = *text++;		/* Move on to the next char */
 	}
-	continue;
-      break;
-    }
-    *dd++ = *text++;		/* Move on to the next char */
-  }
-  *dd = 0;
+	*dd = 0;
 }
 
-/** @brief 
- *
- * @param 
+/** @brief sctime
  * 
- * @returns 
+ *  
+ * 
+ *  @param stuff
  *
+ *  @returns 
  */
 
-char* sctime (time_t stuff)
+char* sctime( time_t stuff )
 {
 	char *s, *c;
 
-	s = ctime (&stuff);
-	if ((c = strchr (s, '\n')))
+	s = ctime( &stuff );
+	if( ( c = strchr( s, '\n' ) ) )
 		*c = '\0';
 
 	return s;
 }
 
-/** @brief 
- *
- * @param 
+/** @brief sftime
  * 
- * @returns 
+ *  
+ * 
+ *  @param stuff
  *
+ *  @returns 
  */
+
 static char fmtime[TIMEBUFSIZE];
 
-char* sftime (time_t stuff)
+char* sftime( time_t stuff )
 {
-	struct tm *ltm = localtime (&stuff);
+	struct tm *ltm = localtime( &stuff );
 
-	strftime (fmtime, TIMEBUFSIZE, "%a %b %d %Y %I:%M %p %Z", ltm);
+	strftime( fmtime, TIMEBUFSIZE, "%a %b %d %Y %I:%M %p %Z", ltm );
 	return fmtime;
 }
 
@@ -402,13 +410,14 @@ char* sftime (time_t stuff)
  *  
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int ValidateNick (char* nick)
+
+int ValidateNick( char* nick )
 {
 	char* ptr;
 
 	ptr = nick;
-	while (*ptr) {
-		if (!IsNickChar(*ptr)) {
+	while( *ptr ) {
+		if( !IsNickChar( *ptr ) ) {
 			return NS_FAILURE;
 		}
 		ptr++;
@@ -424,13 +433,14 @@ int ValidateNick (char* nick)
  *  
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int ValidateUser (char* username)
+
+int ValidateUser( char* username )
 {
 	char* ptr;
 
 	ptr = username;
-	while (*ptr) {
-		if (!IsUserChar(*ptr)) {
+	while( *ptr ) {
+		if( !IsUserChar( *ptr ) ) {
 			return NS_FAILURE;
 		}
 		ptr++;
@@ -446,13 +456,14 @@ int ValidateUser (char* username)
  *  
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int ValidateHost (char* hostname)
+
+int ValidateHost( char* hostname )
 {
 	char* ptr;
 
 	ptr = hostname;
-	while (*ptr) {
-		if (!IsHostChar(*ptr)) {
+	while( *ptr ) {
+		if( !IsHostChar( *ptr ) ) {
 			return NS_FAILURE;
 		}
 		ptr++;
@@ -468,16 +479,17 @@ int ValidateHost (char* hostname)
  *  
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int ValidateURL (char* url)
+
+int ValidateURL( char* url )
 {
 	char* ptr;
 
-	if (ircstrncasecmp (url, "http://", 7) !=0)
+	if( ircstrncasecmp( url, "http://", 7 ) !=0 )
 		return NS_FAILURE;
 	ptr = url;
 	ptr += 7;
-	while (*ptr) {
-		if (!IsURLChar(*ptr)) {
+	while( *ptr ) {
+		if( !IsURLChar( *ptr ) ) {
 			return NS_FAILURE;
 		}
 		ptr++;
@@ -493,17 +505,43 @@ int ValidateURL (char* url)
  *  
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int ValidateChannel (char* channel_name)
+
+int ValidateChannel( char* channel_name )
 {
 	char* ptr;
 
 	ptr = channel_name;
-	if (!IsChanPrefix(*ptr)) {
+	if( !IsChanPrefix( *ptr ) ) {
 		return NS_FAILURE;
 	}
 	ptr ++;
-	while (*ptr) {
-		if (!IsChanChar(*ptr)) {
+	while( *ptr ) {
+		if( !IsChanChar( *ptr ) ) {
+			return NS_FAILURE;
+		}
+		ptr++;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief ValidateChannelKey
+ *  
+ *  Check that passed string is a valid channel key
+ *  
+ *  @param channel key to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ *  
+ *  @TODO: establish valid key charset
+ */
+
+int ValidateChannelKey( char* key )
+{
+	char* ptr;
+
+	ptr = key;
+	while( *ptr ) {
+		if( !IsAlNum( *ptr ) ) {
 			return NS_FAILURE;
 		}
 		ptr++;
