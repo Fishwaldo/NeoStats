@@ -166,7 +166,7 @@
 #undef USE_RAW
 
 /* Version number of package */
-#undef NEOSTATS_VERSION
+#undef NEOSTATS_PACKAGE_VERSION
 
 /* Install directory */
 #ifndef NEO_PREFIX

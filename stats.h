@@ -59,6 +59,8 @@
 #endif
 #endif
 
+#include "version.h"
+
 #include "adns.h"
 #include "pcre.h"
 #include "list.h"
@@ -90,6 +92,12 @@
 #include "Viagra.h"
 #else
 #error Error, you must select an IRCD to use. See ./configure --help for more information
+#endif
+
+#ifdef NEOSTATS_REVISION
+#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION " (" NEOSTATS_REVISION ")"
+#else
+#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION
 #endif
 
 #ifndef TS_CURRENT	/* Allow IRCd to overide */
@@ -208,7 +216,7 @@
 #define MAX_MOD_NAME	32
 
 /* Buffer size for version string */
-#define VERSIONSIZE	8
+#define VERSIONSIZE		32
 
 /* doesn't have to be so big atm */
 #define NUM_MODULES		20
@@ -390,6 +398,7 @@ struct me {
 	int sqlport;
 #endif
 	char version[VERSIONSIZE];
+	char versionfull[VERSIONSIZE];
 } me;
 
 /** @brief Bans structure

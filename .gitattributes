@@ -375,3 +375,4 @@ tools/sqlphp/rta_view.php -text
 /transfer.h -text
 /users.c eol=lf
 /users.h eol=lf
+/version.sh -text

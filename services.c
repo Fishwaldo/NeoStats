@@ -420,8 +420,7 @@ ns_version (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	prefmsg (u->nick, s_Services, "\2NeoStats Version\2");
-	prefmsg (u->nick, s_Services, "NeoStats Version: %s%s", 
-		NEOSTATS_VERSION, ircd_version);
+	prefmsg (u->nick, s_Services, "NeoStats Version: %s", me.versionfull);
 	prefmsg (u->nick, s_Services, "http://www.neostats.net");
    	return 1;
 }

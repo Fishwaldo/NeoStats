@@ -80,6 +80,12 @@ int
 main (int argc, char *argv[])
 {
 	FILE *fp;
+
+	/* initialise version */
+	strlcpy(me.version, NEOSTATS_VERSION, VERSIONSIZE);
+	strlcpy(me.versionfull, NEOSTATS_VERSION, VERSIONSIZE);
+	strlcat(me.versionfull, ircd_version, VERSIONSIZE);
+
 	/* get our commandline options */
 	if(get_options (argc, argv)!=NS_SUCCESS)
 		return EXIT_FAILURE;
@@ -100,12 +106,9 @@ main (int argc, char *argv[])
 	SET_SEGV_LOCATION();
 	CLEAR_SEGV_INMODULE();
 
-	/* initialise version */
-	strlcpy(me.version, NEOSTATS_VERSION, VERSIONSIZE);
-
 	/* keep quiet if we are told to :) */
 	if (!config.quiet) {
-		printf ("NeoStats %s%s Loading...\n", NEOSTATS_VERSION, ircd_version);
+		printf ("NeoStats %s Loading...\n", me.versionfull);
 		printf ("-----------------------------------------------\n");
 		printf ("Copyright: NeoStats Group. 2000-2004\n");
 		printf ("Justin Hammond (fish@neostats.net)\n");
@@ -211,7 +214,7 @@ main (int argc, char *argv[])
 			fclose (fp);
 			if (!config.quiet) {
 				printf ("\n");
-				printf ("NeoStats %s%s Successfully Launched into Background\n", NEOSTATS_VERSION, ircd_version);
+				printf ("NeoStats %s Successfully Launched into Background\n", me.versionfull);
 				printf ("PID: %i - Wrote to %s\n", forked, PID_FILENAME);
 			}
 			return EXIT_SUCCESS; /* parent exits */ 
@@ -227,7 +230,7 @@ main (int argc, char *argv[])
 		}
 	}
 #endif
-	nlog (LOG_NOTICE, LOG_CORE, "NeoStats started (NeoStats %s%s).", NEOSTATS_VERSION, ircd_version);
+	nlog (LOG_NOTICE, LOG_CORE, "NeoStats started (Version %s).", me.versionfull);
 
 	/* don't init_modules till after we fork. This fixes the load->fork-exit->call _fini problems when we fork */
 	ConfLoadModules ();
@@ -275,7 +278,7 @@ get_options (int argc, char **argv)
 			printf ("     -f (Do not fork into background\n");
 			return NS_FAILURE;
 		case 'v':
-			printf ("NeoStats Version %s%s\n", NEOSTATS_VERSION, ircd_version);
+			printf ("NeoStats Version %s\n", me.versionfull);
 			printf ("Compiled: %s at %s\n", version_date, version_time);
 			printf ("Flag after version number indicates what IRCd NeoStats is compiled for:\n");
 			printf ("(U31)- Unreal 3.1.x IRCd\n");
@@ -445,7 +448,7 @@ serv_segv ()
 	globops (me.name, "Segmentation Fault. Server Terminating. Refer to log file for details.");
 	chanalert (s_Services, "Segmentation Fault. Server Terminating. Refer to log file for details.");
 	globops (me.name, "Buffer: %s, Approx Location %s", recbuf, segv_location);
-	chanalert (s_Services, "NeoStats (%s%s) Buffer: %s, Approx Location: %s Backtrace:", NEOSTATS_VERSION, ircd_version, recbuf, segv_location);
+	chanalert (s_Services, "NeoStats (%s) Buffer: %s, Approx Location: %s Backtrace:", me.versionfull, recbuf, segv_location);
 	nlog (LOG_CRITICAL, LOG_CORE, "------------------------SEGFAULT REPORT-------------------------");
 	nlog (LOG_CRITICAL, LOG_CORE, "Please view the README for how to submit a bug report");
 	nlog (LOG_CRITICAL, LOG_CORE, "and include this segfault report in your submission.");
