@@ -801,4 +801,34 @@ sftime (time_t stuff)
 	return fmtime;
 }
 
+/* Buffer overrun protection */
+#ifdef BUFFER_OVERRUN_PROTECTION
+/* Restore lib function */
+#undef snprintf
+int	snprintf(char *, size_t, const char *, ...);
+int	ns_snprintf(char *string, size_t size, const char *format, ...)
+{
+    va_list args;
+    int ret;
+    va_start(args, format);
+    /* Overflow protect with size-1 and pass to normal lib func */
+	ret = snprintf(string, (size-1), format, args);
+    va_end(args);
+    /* NULL terminate for full buffers */
+	string[(size-1)] = '\0';
+    return ret;
+}
 
+/* Restore lib function */
+#undef strncpy
+char *strncpy(char *s1, const char *s2, size_t n);
+char *ns_strncpy(char *s1, const char *s2, size_t n)
+{
+    /* Overflow protect with size-1 and pass to normal lib func */
+	strncpy(s1, (s2), ((n)-1));
+    /* NULL terminate for full buffers */
+	s1[(n-1)] = '\0';
+	return s1;
+}
+#endif /* BUFFER_OVERRUN_PROTECTION */
+/* End buffer overflow protection */

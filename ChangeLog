@@ -36,7 +36,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - HostServ supports Undernet style hidden hosts for Registered users now. (F)
  - Module API improvements removing the need for the get functions to get function tables etc (M)
  - Changed all modules to use new module export API (M)
- - Load/Unload module name and case fixes 
+ - Load/Unload module name and case fixes (M)
+ - Improved buffer overrun protection in use of strncpy and snprintf (M)
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number
