@@ -146,7 +146,7 @@ int bot_nick_change(char *oldnick, char *newnick)
 		}
 	u = finduser(newnick);
 	if (!u) { 
-		mod_ptr = module_bot_lists->next;
+		mod_ptr = module_bot_lists;
 		while(mod_ptr != NULL ) {
 			if (!strcasecmp(mod_ptr->nick, oldnick)) {
 				/* Ok, found the nick, change it */

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.1 2000/02/03 23:45:59 fishwaldo Exp $
+** $Id: spam.c,v 1.2 2000/02/05 00:22:59 fishwaldo Exp $
 */
 
 
@@ -37,31 +37,27 @@ void TimerSpam()
 {
 	register char c;
 	register int i;
-	char *t;
+	char temp[5];
 
 	srand(time(NULL));
 
-	t = sstrdup(s_Spam);
-	bzero(s_Spam, sizeof(s_Spam));
-	for (i = 0; i < sizeof(s_Spam-1); i++) {
-		c = (((u_short)rand())%26)+97;
-		s_Spam[i] = c;
-	}
+	bzero(temp, sizeof(temp));
 
+	for (i = 0; i < sizeof(temp)-1; i++) {
+		c = (((u_short)rand())%26)+97;
+		temp[i] = c;
+
+	}
 	if (servsock > 0) {
-		if (bot_nick_change(t,s_Spam) == 1) {
-			notice(s_Spam, "Spam Users Nick is now: %s",s_Spam);
+		if (bot_nick_change(s_Spam, temp) == 1) {
+			s_Spam = sstrdup(temp);
+			notice(s_Spam, "Spam Users Nick is now: %s",temp);
 		} else {
-			/* The newnick already existed on the network */
-			log("ehh, couldn't change my nick!");
-			notice(t, "Attempted to change nick to %s but its already in use",s_Spam);
-			for (i = 0; i < sizeof(t-1); i++) {
-				s_Spam[i] = t[i];
-			}			
+/* ToDo: Add routine if nick is in use, to find another nick */
+			return;
 		}		
 	}
 
-	free(t);
 }
 
 int __Bot_Message(char *origin, char *coreLine, int type)
@@ -122,7 +118,6 @@ void _init() {
 
 
 void _fini() {
-	log("unloading Spam");
 	sts(":%s GLOBOPS :Spam Module Unloaded",me.name);
 
 };

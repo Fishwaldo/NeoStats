@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: services.c,v 1.2 2000/02/04 02:54:12 fishwaldo Exp $
+** $Id: services.c,v 1.3 2000/02/05 00:22:59 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -96,6 +96,10 @@ void servicesbot(char *nick, char *line) {
 			return;
 		}
 		cmd = strtok(NULL, " ");
+		if (cmd == NULL) {
+			privmsg(nick,s_Services,"Please Specify a Module");
+			return;
+		}
 		rval = load_module(cmd,u);
 		if (!rval) {
 			notice(s_Services,"%s Loaded Module %s",u->nick,cmd);
@@ -104,6 +108,11 @@ void servicesbot(char *nick, char *line) {
 			notice(s_Services,"%s Tried to Load Module %s, but Failed",u->nick,cmd);
 		}
 	} else if (!strcasecmp(cmd,"MODLIST")) {
+		if (!u->is_tecmin) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to MODLIST, but is not a Techadmin",nick);
+			return;
+		}
 		list_module(u);
 	} else if (!strcasecmp(cmd,"UNLOAD")) {
 		if (!u->is_tecmin) {
@@ -112,6 +121,10 @@ void servicesbot(char *nick, char *line) {
 			return;
 		}
 		cmd = strtok(NULL, " ");
+		if (cmd == NULL) {
+			privmsg(nick,s_Services," Please Specify a Module Name");
+			return;
+		}
 		rval = unload_module(cmd,u);
 		if (!rval) { 
 			notice(s_Services,"%s Unloaded Module %s", u->nick, cmd);
@@ -119,10 +132,22 @@ void servicesbot(char *nick, char *line) {
 			notice(s_Services,"%s Tried to Unload the Module %s, but that does not exist", u->nick, cmd);
 		}
 	} else if (!strcasecmp(cmd, "MODBOTLIST")) {
+		if (!u->is_coder) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to MODBOTLIST, but is not a Coder",nick);
+			return;
+		}
 		list_module_bots(u);
 	} else if (!strcasecmp(cmd, "MODTIMERLIST")) {
+		if (!u->is_coder) {
+			privmsg(nick,s_Services,"Permission Denied");
+			notice(s_Services,"%s Tried to MODTIMERLIST, but is not a Coder",nick);
+			return;
+		}
 		list_module_timer(u);
 	} else if (!strcasecmp(cmd, "UPTIME")) {
+		notice(s_Services,"Broken atm :(");
+		return;
 		ns_uptime(u);
 		notice(s_Services,"%s Wanted to see %s's Uptime ",u->nick,me.name);
 	} else if (!strcasecmp(cmd, "SHUTDOWN")) {
@@ -249,12 +274,21 @@ static void ns_reload(User *u, char *reason)
                 privmsg(u->nick, s_Services, "Access Denied.");
                 return;
         }
-        globops(s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
-        log("%s requested RELOAD.", u->nick);
+        if (reason != NULL) {
+      	  	globops(s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
+	        log("%s requested RELOAD.", u->nick);
 
-	sts("SQUIT %s :Reload", me.name);
+		sts("SQUIT %s :Reload", me.name);
 
-	sts(":%s QUIT :%s Sent RELOAD: %s",s_Services,u->nick,reason);
+		sts(":%s QUIT :%s Sent RELOAD: %s",s_Services,u->nick,reason);
+	} else {
+        	globops(s_Services, "%s requested \2RELOAD\2 for no Reason!", u->nick, reason);
+        	log("%s requested RELOAD.", u->nick);
+
+		sts("SQUIT %s :Reload", me.name);
+
+		sts(":%s QUIT :%s Sent RELOAD",s_Services,u->nick,reason);
+	}
 	sleep(1);
         close(servsock);
         init_server_hash(); 

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: timer.c,v 1.1 2000/02/03 23:45:56 fishwaldo Exp $
+** $Id: timer.c,v 1.2 2000/02/05 00:22:59 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -20,7 +20,7 @@ void chk()
 {
 	Mod_Timer *mod_ptr = NULL;
 	time_t current = time(NULL);
-
+	segv_location = "chk";
 /* First, lets see if any modules have a function that is due to run..... */
 	mod_ptr = module_timer_lists->next;
 	while(mod_ptr != NULL) {
@@ -28,6 +28,7 @@ void chk()
 			log("timer: Running Module %s Timers",mod_ptr->modname);
 			mod_ptr->function();
 			mod_ptr->lastrun = time(NULL);
+			log("Finished Timer");
 		}
 		mod_ptr = mod_ptr->next;
 	}
