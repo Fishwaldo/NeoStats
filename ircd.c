@@ -247,10 +247,15 @@ joinbuf (char **av, int ac, int from)
 	char *buf;
 
 	buf = malloc (BUFSIZE);
-	strlcpy (buf, av[from], BUFSIZE);
-	for (i = from + 1; i < ac; i++) {
-		strlcat (buf, " ", BUFSIZE);
-		strlcat (buf, av[i], BUFSIZE);
+	if(from > ac) {
+		strlcpy (buf, "(null)", BUFSIZE);
+	}
+	else {
+		strlcpy (buf, av[from], BUFSIZE);
+		for (i = from + 1; i < ac; i++) {
+			strlcat (buf, " ", BUFSIZE);
+			strlcat (buf, av[i], BUFSIZE);
+		}
 	}
 	return (char *) buf;
 }
