@@ -693,6 +693,7 @@ add_mod_user (char *nick, char *mod_name)
 		mod_ptr = hnode_get (mn);
 		mod_usr->function = dlsym (mod_ptr->dl_handle, "__BotMessage");
 		mod_usr->chanfunc = dlsym (mod_ptr->dl_handle, "__ChanMessage");
+		mod_usr->botcmds = hash_create(-1, 0, 0);
 		return NS_SUCCESS;
 	}
 	nlog (LOG_WARNING, LOG_CORE, "add_mod_user(): Couldn't Add ModuleBot to List");
