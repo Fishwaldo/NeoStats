@@ -268,6 +268,17 @@ lib/pcre/pcre.c eol=lf
 lib/pcre/pcre.h -text
 lib/pcre/pcre.vcproj -text
 lib/pcre/study.c eol=lf
+lib/rtawin32/api.c -text
+lib/rtawin32/do_sql.c -text
+lib/rtawin32/do_sql.h -text
+lib/rtawin32/parse.tab.c -text
+lib/rtawin32/parse.tab.h -text
+lib/rtawin32/parse.y -text
+lib/rtawin32/rta.h -text
+lib/rtawin32/rta.vcproj -text
+lib/rtawin32/rtatables.c -text
+lib/rtawin32/token.c -text
+lib/rtawin32/token.l -text
 lib/sqlsrv/README -text
 lib/sqlsrv/api.c -text
 lib/sqlsrv/do_sql.c -text
