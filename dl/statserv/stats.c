@@ -385,6 +385,9 @@ int s_user_kill(char **av, int ac)
 		nlog(LOG_DEBUG2, LOG_MOD, "Decreasing OperCount on %s due to kill", u->server->name);
 		DecreaseOpers(s);
 	}
+	if (u->is_away == 1) {
+		stats_network.away = stats_network.away - 1;
+	}
 	DecreaseUsers(s);
 	DelTLD(u);
 	rbuf = sstrdup(recbuf);
@@ -501,6 +504,10 @@ int s_del_user(char **av, int ac)
 		nlog(LOG_DEBUG2, LOG_MOD, "Decreasing OperCount on %s due to signoff", u->server->name);
 		DecreaseOpers(s);
 	}
+	if (u->is_away == 1) {
+		stats_network.away = stats_network.away - 1;
+	}
+
 	DecreaseUsers(s);
 	DelTLD(u);
 	return 1;

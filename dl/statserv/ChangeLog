@@ -17,6 +17,7 @@ Shmad & ^Enigma & Fish^
  - Fix mem leak from strdup (M)
  - TLDmap is now using GeoIP from Netmax.com. Will add City and Region/ISP code soon (but requires a paid version of the DB) (F)
  - Most of the commands were limited to opers, changed back so users can view stats (F)
+ - bug fix for #109 away counts (M)
    
 * Revision 810 * Nov 23rd, 2003 (M)
  - change SSMNAME to __module_info.module_name to be consistent with other modules (M)
