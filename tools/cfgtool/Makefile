@@ -26,7 +26,7 @@ install:
 depend:
 	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SRCS) > .depend
 
-$(OBJS): Makefile ../Makefile.inc
+$(OBJS): Makefile ../../Makefile.inc
 
 gkeeper.o: gkeeper.c gkeeper.h ../../config.h ../../keeper/keeper.h
 tree.o: tree.c gkeeper.h ../../config.h ../../keeper/keeper.h pixmaps/folder_open.xpm pixmaps/folder_closed.xpm pixmaps/book_open.xpm pixmaps/book_closed.xpm pixmaps/string.xpm pixmaps/data.xpm pixmaps/float.xpm pixmaps/num.xpm
