@@ -2,6 +2,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
 =====================================================================================
 * NeoStats * Mark (M) * Version 2.5.20
  - Fix crash on IRCu in do_server (M)
+ - Fix bug with Unreal IP addresses - bug 188 (M)
 
 * NeoStats * Fish (F) * Version 2.5.19
  - Fix up a problem with exclude lists (F)
