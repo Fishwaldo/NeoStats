@@ -525,7 +525,7 @@ Usr_Away (char *origin, char **argv, int argc, int srv)
 static void
 Usr_Nick (char *origin, char **argv, int argc, int srv)
 {
-	UserNick (origin, argv[0]);
+	UserNick (origin, argv[0], NULL);
 }
 static void
 Usr_Topic (char *origin, char **argv, int argc, int srv)
@@ -615,7 +615,7 @@ Srv_Nick (char *origin, char **argv, int argc, int srv)
 	char *realname;
 
 	realname = joinbuf (argv, argc, 9);
-	AddUser (argv[0], argv[4], argv[5], realname, argv[6], strtoul (argv[8], NULL, 10), strtoul (argv[2], NULL, 10));
+	AddUser (argv[0], argv[4], argv[5], realname, argv[6], argv[8], argv[2]);
 	free (realname);
 	UserMode (argv[0], argv[3]);
 }
@@ -627,7 +627,7 @@ Srv_Client (char *origin, char **argv, int argc, int srv)
 	char *realname;
 
 	realname = joinbuf (argv, argc, 11);
-	AddUser (argv[0], argv[5], argv[6], realname, argv[8], strtoul (argv[10], NULL, 10), strtoul (argv[2], NULL, 10));
+	AddUser (argv[0], argv[5], argv[6], realname, argv[8], argv[10], argv[2]);
 	free (realname);
 	UserMode (argv[0], argv[3]);
 	UserSMode (argv[0], argv[4]);
@@ -645,6 +645,6 @@ Srv_Smode (char *origin, char **argv, int argc, int srv)
 static void
 Srv_Svsnick (char *origin, char **argv, int argc, int srv)
 {
-	UserNick (argv[0], argv[1]);
+	UserNick (argv[0], argv[1], NULL);
 }
 

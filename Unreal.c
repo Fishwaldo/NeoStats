@@ -531,10 +531,10 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		char *realname;
 	
 		realname = joinbuf (argv, argc, 7);
-		AddUser (argv[0], argv[3], argv[4], realname, argv[5], 0, strtol (argv[2], NULL, 10));
+		AddUser (argv[0], argv[3], argv[4], realname, argv[5], NULL, argv[2]);
 		free (realname);
 	} else {
-		UserNick (origin, argv[0]);
+		UserNick (origin, argv[0], NULL);
 	}
 }
 
@@ -630,7 +630,7 @@ m_pass (char *origin, char **argv, int argc, int srv)
 static void
 m_svsnick (char *origin, char **argv, int argc, int srv)
 {
-	UserNick (argv[0], argv[1]);
+	UserNick (argv[0], argv[1], NULL);
 }
 
 static void

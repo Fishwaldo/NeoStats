@@ -24,9 +24,9 @@
 #ifndef _USERS_H_
 #define _USERS_H_
 
-void AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const unsigned long ip, const unsigned long TS);
+void AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS);
 void UserQuit (const char *nick, const char *quitmsg);
-int UserNick (const char * oldnick, const char * newnick);
+int UserNick (const char * oldnick, const char * newnick, const char * ts);
 void UserDump (const char *nick);
 void UserPart (list_t *list, lnode_t *node, void *v);
 void UserJoin (const char* nick, const char* chanlist);

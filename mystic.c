@@ -473,7 +473,7 @@ Usr_Away (char *origin, char **argv, int argc, int srv)
 static void
 Usr_Nick (char *origin, char **argv, int argc, int srv)
 {
-	UserNick (origin, argv[0]);
+	UserNick (origin, argv[0], NULL);
 }
 static void
 Usr_Topic (char *origin, char **argv, int argc, int srv)
@@ -570,7 +570,7 @@ Srv_Nick (char *origin, char **argv, int argc, int srv)
 	char *realname;
 
 	realname = joinbuf (argv, argc, 7);
-	AddUser (argv[0], argv[3], argv[4], realname, argv[5], 0, strtoul (argv[2], NULL, 10));
+	AddUser (argv[0], argv[3], argv[4], realname, argv[5], NULL, argv[2]);
 	free (realname);
 }
 
@@ -578,6 +578,6 @@ Srv_Nick (char *origin, char **argv, int argc, int srv)
 static void
 Srv_Svsnick (char *origin, char **argv, int argc, int srv)
 {
-	UserNick (argv[0], argv[1]);
+	UserNick (argv[0], argv[1], NULL);
 }
 

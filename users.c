@@ -67,20 +67,33 @@ new_user (const char *nick)
 }
 
 void
-AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const unsigned long ipaddr, const unsigned long TS)
+AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS)
 {
+	unsigned long ipaddress;
+	unsigned long time;
 	char **av;
 	int ac = 0;
 	User *u;
 	int i;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "AddUser: %s (%s@%s) %s (%d) -> %s at %lu", nick, user, host, realname, (int)htonl (ipaddr), server, (unsigned long)TS);
 	u = finduser (nick);
 	if (u) {
 		nlog (LOG_WARNING, LOG_CORE, "AddUser: trying to add a user that already exists %s", nick);
 		return;
 	}
+
+	if(ip) {
+		ipaddress = strtoul (ip, NULL, 10);
+	} else {
+		ipaddress = 0;
+	}
+	if(TS) {
+		time = strtoul (TS, NULL, 10);
+	} else {
+		time = me.now;
+	}
+	nlog (LOG_DEBUG2, LOG_CORE, "AddUser: %s (%s@%s) %s (%d) -> %s at %lu", nick, user, host, realname, (int)htonl (ipaddress), server, (unsigned long)time);
 
 	u = new_user (nick);
 	strlcpy (u->hostname, host, MAXHOST);
@@ -98,8 +111,8 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 #endif
 	u->chans = list_create (MAXJOINCHANS);
 	u->modes[0]= '\0';
-	u->ipaddr.s_addr = htonl (ipaddr);
-	u->TS = TS;
+	u->ipaddr.s_addr = htonl (ipaddress);
+	u->TS = time;
 	
 	/* make sure the module pointers are all null */
 	for (i = 0; i < NUM_MODULES; i++) {
@@ -222,13 +235,14 @@ UserAway (const char *nick, const char *awaymsg)
 }
 
 int 
-UserNick (const char * oldnick, const char *newnick)
+UserNick (const char * oldnick, const char *newnick, const char * ts)
 {
 	hnode_t *un;
 	lnode_t *cm;
 	char **av;
 	int ac = 0;
 	User * u;
+	time_t time;
 
 	SET_SEGV_LOCATION();
 	u = finduser (oldnick);
@@ -236,6 +250,13 @@ UserNick (const char * oldnick, const char *newnick)
 		nlog (LOG_WARNING, LOG_CORE, "UserNick: can't find user %s", oldnick);
 		return NS_FAILURE;
 	}
+
+	if(ts) {
+		time = atoi (ts);
+	} else {
+		time = me.now;
+	}
+
 	nlog (LOG_DEBUG2, LOG_CORE, "UserNick: s -> %s", u->nick, newnick);
 	un = hash_lookup (uh, u->nick);
 	if (!un) {
@@ -250,9 +271,15 @@ UserNick (const char * oldnick, const char *newnick)
 	SET_SEGV_LOCATION();
 	hash_delete (uh, un);
 	strlcpy (u->nick, newnick, MAXNICK);
+	if(ts) {
+		u->TS = time;
+	}
 	hash_insert (uh, un, u->nick);
 	AddStringToList (&av, (char*)oldnick, &ac);
 	AddStringToList (&av, u->nick, &ac);
+	if(ts) {
+		AddStringToList (&av, (char*)ts, &ac);
+	}
 	ModuleEvent (EVENT_NICKCHANGE, av, ac);
 	free (av);
 	return NS_SUCCESS;
