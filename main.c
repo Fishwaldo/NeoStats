@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.87 2003/04/11 10:02:29 fishwaldo Exp $
+** $Id: main.c,v 1.88 2003/04/11 10:50:29 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -213,6 +213,16 @@ int main(int argc, char *argv[])
 void get_options(int argc, char **argv) {
 	int c;
 	int dbg;
+	
+	/* set some defaults first */
+#ifdef DEBUG
+	config.debug = 8;
+	config.foreground = 1;
+#else
+	config.debug = 5;
+	config.foreground = 0;
+#endif
+
 
 	while ((c=getopt(argc,argv, "hvrd:nqf")) != -1) {
 		switch(c) {

@@ -22,13 +22,15 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: spam.c,v 1.20 2003/01/21 13:15:34 fishwaldo Exp $
+** $Id: spam.c,v 1.21 2003/04/11 10:50:29 fishwaldo Exp $
 */
 
 
 #include <stdio.h>
 #include "dl.h"
 #include "stats.h"
+#include "conf.h"
+#include "log.h"
 
 const char spamversion_date[] = __DATE__;
 const char spamversion_time[] = __TIME__;
@@ -37,7 +39,7 @@ char *s_Spam;
 Module_Info my_info[] = { {
 	"Spam",
 	"A User to Help Catch Spammers on the IRC network",
-	"1.1"
+	"1.2"
 } };
 
 
@@ -61,8 +63,7 @@ int __Chan_Message(char *origin, char *chan, char **argv, int argc)
 	char *fortune;
 	fortune = malloc(255);
 	if (!strcasecmp(argv[1], s_Spam)) {
-		fort = popen("/usr/local/games/fortune", "r");
-		if (!fort) fort = popen("/usr/games/fortune", "r");
+		fort = popen("/usr/games/fortune", "r");
 		if (fort) {
 			while ((fortune = fgets(fortune, 255, fort))) {
 				privmsg(chan, s_Spam, "%s", fortune);
@@ -81,7 +82,7 @@ int __Bot_Message(char *origin, char **argv, int argc)
 	char *buf;
 	u = finduser(origin); 
 	if (!u) { 
-		log("Unable to find user %s (spam)", origin); 
+		nlog(LOG_WARNING, LOG_CORE, "Unable to find user %s (spam)", origin); 
 		return -1; 
 	} 
 /* 	if (u->is_oper)
@@ -91,18 +92,38 @@ int __Bot_Message(char *origin, char **argv, int argc)
 	globops(me.name, "Possible Mass Message -\2(%s!%s@%s)\2- %s", u->nick,
 		u->username, u->hostname, buf);
 	chanalert(s_Spam,"WooHoo, A Spammer has Spammed! -\2(%s!%s@%s)\2- Sent me this: %s",u->nick,u->username,u->hostname,buf);
-	log("Possible Mass Message -(%s!%s@%s)- %s", u->nick, u->username,
+	nlog(LOG_CRITICAL, LOG_MOD, "Possible Mass Message -(%s!%s@%s)- %s", u->nick, u->username,
 		u->hostname, buf);
 	free(buf);
 	return 1;
 }
 
 int Online(char **av, int ac) {
+	char *user;
+	char *host;
+	char *rname;
+	
+	if (GetConf((void *)&s_Spam, CFGSTR, "Nick") < 0) {
+		s_Spam = "sumyungguy";
+	}
+	if (GetConf((void *)&user, CFGSTR, "User") < 0) {
+		user = malloc(MAXUSER);
+		strncat(user, "please", MAXUSER);
+	}
+	if (GetConf((void *)&host, CFGSTR, "Host") < 0) {
+		host = malloc(MAXHOST);
+		strncat(host, me.name, MAXHOST);
+	}
+	if (GetConf((void *)&rname, CFGSTR, "RealName") < 0) {
+		rname = malloc(MAXHOST);
+		strncat(rname, "Chat to me", MAXHOST);
+	}
+	
 
-	if (init_bot(s_Spam,"please",me.name,"Chat to me", "+S-x", my_info[0].module_name) == -1 ) {
+	if (init_bot(s_Spam,user,host,rname, "+S-x", my_info[0].module_name) == -1 ) {
 		/* Nick was in use!!!! */
 		s_Spam = strcat(s_Spam, "_");
-		init_bot(s_Spam,"Please",me.name,"Chat to me", "+S-x", my_info[0].module_name);
+		init_bot(s_Spam,user,host, rname, "+S-x", my_info[0].module_name);
 	}
 	return 1;
 };

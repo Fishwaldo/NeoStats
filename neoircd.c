@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.7 2003/04/11 09:26:30 fishwaldo Exp $
+** $Id: neoircd.c,v 1.8 2003/04/11 10:50:29 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -419,7 +419,7 @@ void globops(char *from, char *fmt, ...)
 
 /* Fish - now that was crackhead coding! */
 	if (me.onchan) { 
-		snprintf(buf, 512, ":%s GLOBOPS :%s", from, buf2);
+		snprintf(buf, 512, ":%s WALLOPS :%s", from, buf2);
 		sts("%s", buf);
 	} else {
 		nlog(LOG_NORMAL, LOG_CORE, "%s", buf2);

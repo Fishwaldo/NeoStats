@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.c,v 1.3 2003/04/11 10:02:29 fishwaldo Exp $
+** $Id: log.c,v 1.4 2003/04/11 10:50:28 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -77,7 +77,7 @@ void *close_logs() {
 			logentry->flush = 0;
 		}
 #ifdef DEBUG
-		printf("Closing Logfile %s\n", logentry->name);
+		printf("Closing Logfile %s (%s)\n", logentry->name, (char *)hnode_getkey(hn));
 #endif
 		fclose(logentry->logfile);
 		hash_scan_delete(logs, hn);
@@ -97,7 +97,6 @@ void nlog(int level, int scope, char *fmt, ...) {
 	hnode_t *hn;
 	struct logs_ *logentry;
 	time_t ts = time(NULL);
-	
 	
 	if (level <= config.debug) {	
 		/* if scope is > 0, then log to a diff file */
@@ -126,12 +125,12 @@ void nlog(int level, int scope, char *fmt, ...) {
 			}
 				
 			logentry = malloc(sizeof(struct logs_));
-			strncpy(logentry->name, scope ? segvinmodule : "core", 30);
-			snprintf(buf, 40, "logs/%s.log", scope ? segvinmodule : "NeoStats");
+			strncpy(logentry->name, scope > 0 ? segvinmodule : "core", 30);
+			snprintf(buf, 40, "logs/%s.log", scope > 0 ? segvinmodule : "NeoStats");
 			logentry->logfile = fopen(buf, "a");
 			logentry->flush = 0;
 			hn = hnode_create(logentry);
-			hash_insert(logs, hn, scope ? segvinmodule : "core");
+			hash_insert(logs, hn, logentry->name);
 		}
 
 		if (!logentry->logfile) {
@@ -144,12 +143,12 @@ void nlog(int level, int scope, char *fmt, ...) {
 		va_start(ap, fmt);
 		vsnprintf(buf, 512, fmt, ap);
 	
-		fprintf(logentry->logfile, "(%s) %s %s - %s\n", fmttime, loglevels[level-1], segvinmodule ? "core" : segvinmodule, buf);
+		fprintf(logentry->logfile, "(%s) %s %s - %s\n", fmttime, loglevels[level-1], scope > 0 ? segvinmodule : "CORE" , buf);
 		logentry->flush = 1;
 #ifndef DEBUG	
 		if (config.foreground)
 #endif
-			printf("%s %s - %s\n", loglevels[level-1], segvinmodule ? "core" : segvinmodule, buf);
+			printf("%s %s - %s\n", loglevels[level-1], scope > 0 ? segvinmodule : "CORE", buf);
 		va_end(ap);
 	}
 }		
