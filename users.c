@@ -660,6 +660,21 @@ UserMode (const char *nick, const char *modes)
 	ModuleEvent (EVENT_UMODE, av, ac);
 	free (av);
 	u->Umode = UmodeStringToMask(modes, u->Umode);
+	/* This needs to track +x and +t really but
+	 * should be enough for Trystan to work on the SQL stuff
+	 */
+#ifdef UMODE_HIDE
+	/* Do we have a hidden host? */
+	if(u->Umode & UMODE_HIDE) {
+#ifdef UMODE_SETHOST
+		/* Is it really a vhost? */
+		if(!(u->Umode & UMODE_SETHOST)) 
+#endif
+		{
+			strlcpy (u->vhost, "*", MAXHOST);
+		}
+	}
+#endif
 	nlog (LOG_DEBUG1, LOG_CORE, "UserMode: modes for %s is now %p", u->nick, (int *)u->Umode);
 }
 
