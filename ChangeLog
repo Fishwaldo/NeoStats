@@ -4,6 +4,11 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Alter CODERHACK dependency so it only requires a rebuild of auth.c rather 
+   than potentially a reconfigure and full rebuild. (M)
+ - Change UserDump and ChanDump to use prefmsg rather than chanalert and remove
+   calls during error conditions to prevent flooding the services channel. (M)
+ - Extended and optimised mode support. (M)
  - Ability to enable/disable events so that a module can "optimise" it's event
    table based on options e.g. disabling ConnectServ sign watch can disable
    the SIGNON event core side. (M)

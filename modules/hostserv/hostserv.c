@@ -194,9 +194,6 @@ void set_moddata(Client * u)
 
 static int hs_event_quit(CmdParams* cmdparams) 
 {
-	if(!HaveUmodeRegNick()) 
-		return -1;
-
 	if (cmdparams->source->moddata[hs_module->modnum]) {
 		dlog(DEBUG2, "hs_event_quit: free module data");
 		sfree(cmdparams->source->moddata[hs_module->modnum]);
@@ -269,6 +266,12 @@ int ModSynch (void)
 		return NS_FAILURE;
 	}
 	add_timer (TIMER_TYPE_INTERVAL, CleanupHosts, "CleanupHosts", 7200);
+	if(!HaveUmodeRegNick()) 
+	{
+		DisableEvent (EVENT_UMODE);
+		DisableEvent (EVENT_QUIT);
+		DisableEvent (EVENT_KILL);
+	}
 	return NS_SUCCESS;
 }
 
@@ -291,9 +294,6 @@ int hs_event_mode (CmdParams* cmdparams)
 	int add = 0;
 	char *modes;
 	char vhost[MAXHOST];
-
-	if(!HaveUmodeRegNick()) 
-		return -1;
 
 	/* bail out if its not enabled */
 	if (hs_cfg.regnick != 1) 

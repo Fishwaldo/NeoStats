@@ -565,41 +565,41 @@ InitUsers (void)
 }
 
 static void
-dumpuser (Client * u)
+dumpuser (CmdParams* cmdparams, Client * u)
 {
 	lnode_t *cm;
 	int i = 0;
 					          
 	if (ircd_srv.protocol & PROTOCOL_B64SERVER) {
-		irc_chanalert (ns_botptr, "User:     %s!%s@%s (%s)", u->name, u->user->username, u->user->hostname, u->name64);
+		irc_prefmsg (ns_botptr, cmdparams->source, "User:     %s!%s@%s (%s)", u->name, u->user->username, u->user->hostname, u->name64);
 	} else {
-		irc_chanalert (ns_botptr, "User:     %s!%s@%s", u->name, u->user->username, u->user->hostname);
+		irc_prefmsg (ns_botptr, cmdparams->source, "User:     %s!%s@%s", u->name, u->user->username, u->user->hostname);
 	}
-	irc_chanalert (ns_botptr, "IP:       %s", u->hostip);
-	irc_chanalert (ns_botptr, "Vhost:    %s", u->user->vhost);
-	irc_chanalert (ns_botptr, "Flags:    0x%x", u->flags);
-	irc_chanalert (ns_botptr, "Modes:    %s (0x%x)", UmodeMaskToString(u->user->Umode), u->user->Umode);
-	irc_chanalert (ns_botptr, "Smodes:   %s (0x%x)", SmodeMaskToString(u->user->Smode), u->user->Smode);
+	irc_prefmsg (ns_botptr, cmdparams->source, "IP:       %s", u->hostip);
+	irc_prefmsg (ns_botptr, cmdparams->source, "Vhost:    %s", u->user->vhost);
+	irc_prefmsg (ns_botptr, cmdparams->source, "Flags:    0x%x", u->flags);
+	irc_prefmsg (ns_botptr, cmdparams->source, "Modes:    %s (0x%x)", UmodeMaskToString(u->user->Umode), u->user->Umode);
+	irc_prefmsg (ns_botptr, cmdparams->source, "Smodes:   %s (0x%x)", SmodeMaskToString(u->user->Smode), u->user->Smode);
 	if(u->user->is_away) {
-		irc_chanalert (ns_botptr, "Away:     %s", u->user->awaymsg);
+		irc_prefmsg (ns_botptr, cmdparams->source, "Away:     %s", u->user->awaymsg);
 	}
-	irc_chanalert (ns_botptr, "Version:  %s", u->version);
+	irc_prefmsg (ns_botptr, cmdparams->source, "Version:  %s", u->version);
 
 	cm = list_first (u->user->chans);
 	while (cm) {
 		if(i==0) {
-			irc_chanalert (ns_botptr, "Channels: %s", (char *) lnode_get (cm));
+			irc_prefmsg (ns_botptr, cmdparams->source, "Channels: %s", (char *) lnode_get (cm));
 		} else {
-			irc_chanalert (ns_botptr, "          %s", (char *) lnode_get (cm));
+			irc_prefmsg (ns_botptr, cmdparams->source, "          %s", (char *) lnode_get (cm));
 		}
 		cm = list_next (u->user->chans, cm);
 		i++;
 	}
-	irc_chanalert (ns_botptr, "========================================");
+	irc_prefmsg (ns_botptr, cmdparams->source, "========================================");
 }
 
 void
-UserDump (const char *nick)
+UserDump (CmdParams* cmdparams, const char *nick)
 {
 	Client *u;
 	hscan_t us;
@@ -609,21 +609,21 @@ UserDump (const char *nick)
 		return;
 #endif
 	SET_SEGV_LOCATION();
-	irc_chanalert (ns_botptr, "================USERDUMP================");
+	irc_prefmsg (ns_botptr, cmdparams->source, "================USERDUMP================");
 	if (!nick) {
 		hnode_t* un;
 
 		hash_scan_begin (&us, userhash);
 		while ((un = hash_scan_next (&us)) != NULL) {
 			u = hnode_get (un);
-			dumpuser (u);
+			dumpuser (cmdparams, u);
 		}
 	} else {
 		u = (Client *)hnode_find (userhash, nick);
 		if (u) {
-			dumpuser (u);
+			dumpuser (cmdparams, u);
 		} else {
-			irc_chanalert (ns_botptr, "UserDump: can't find user %s", nick);
+			irc_prefmsg (ns_botptr, cmdparams->source, "UserDump: can't find user %s", nick);
 		}
 	}
 }
@@ -635,20 +635,6 @@ UserLevel (Client * u)
 	if(u->user->ulevel != -1) {
 		return u->user->ulevel;
 	}
-
-#ifdef DEBUG
-#ifdef CODERHACK
-	/* this is only cause I dun have the right O lines on some of my "Beta" 
-	   Networks, so I need to hack this in :) */
-	if (!ircstrcasecmp (u->name, "FISH"))
-		u->user->ulevel = NS_ULEVEL_ROOT;
-	else if (!ircstrcasecmp (u->name, "SHMAD"))
-		u->user->ulevel = NS_ULEVEL_ROOT;
-	else if (!ircstrcasecmp (u->name, "MARK"))
-		u->user->ulevel = NS_ULEVEL_ROOT;
-	else
-#endif
-#endif
 	u->user->ulevel = UserAuth(u);
 	/* Set user level so we no longer need to calculate */
 	dlog(DEBUG1, "UserLevel for %s is %d", u->name, u->user->ulevel);
@@ -691,7 +677,7 @@ UserMode (const char *nick, const char *modes)
 	u->user->ulevel = -1;
 	strlcpy (u->user->modes, modes, MODESIZE);
 	oldmode = u->user->Umode;
-	u->user->Umode = UmodeStringToMask(modes, u->user->Umode);
+	u->user->Umode |= UmodeStringToMask (modes);
 	if (ircd_srv.features&FEATURE_UMODECLOAK) {
 		/* Do we have a hidden host any more? */
 		if((oldmode & UMODE_HIDE) && (!(u->user->Umode & UMODE_HIDE))) {
@@ -721,7 +707,7 @@ UserSMode (const char *nick, const char *modes)
 	}
 	/* Reset user level so it will be recalculated */
 	u->user->ulevel = -1;
-	u->user->Smode = SmodeStringToMask(modes, u->user->Smode);
+	u->user->Smode |= SmodeStringToMask(modes);
 	dlog(DEBUG1, "UserSMode: smode for %s is now %x", u->name, u->user->Smode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source = u;	

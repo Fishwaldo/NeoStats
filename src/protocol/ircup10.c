@@ -111,13 +111,13 @@ ircd_cmd cmd_list[] = {
 	{0, 0, 0, 0},
 };
 
-cumode_init chan_umodes[] = {
-	{'o', CUMODE_CHANOP, '@'},
-	{'v', CUMODE_VOICE, '+'},
+mode_init chan_umodes[] = {
+	{'o', CUMODE_CHANOP, 0, '@'},
+	{'v', CUMODE_VOICE, 0, '+'},
 	{0, 0, 0},
 };
 
-cmode_init chan_modes[] = {
+mode_init chan_modes[] = {
 	{'s', CMODE_SECRET, 0},
 	{'p', CMODE_PRIVATE, 0},
 	{'m', CMODE_MODERATED, 0},
@@ -151,7 +151,7 @@ cmode_init chan_modes[] = {
 	{0, 0, 0},
 };
 
-umode_init user_umodes[] = {
+mode_init user_umodes[] = {
 	{'o', UMODE_OPER},
 	{'O', UMODE_LOCOP},
 	{'g', UMODE_DEBUG},
@@ -746,7 +746,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 				param++;
 				modes++;
 				while(*modes) {
-					if (ircd_cmodes[(int)*modes].flags&MODEPARAM) {
+					if (CmodeCharToFlags (*modes) & MODEPARAM) {
 						param ++;
 					}
 					modes++;
@@ -800,7 +800,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 					char **av;
 					int ac;
 
-					if (ircd_cmodes[(int)*modes].flags&MODEPARAM) {
+					if (CmodeCharToFlags (*modes) & MODEPARAM) {
 						ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], *modes, argv[param]);
 						param ++;
 					} else {

@@ -78,12 +78,12 @@ static int cs_event_nick (CmdParams* cmdparams);
 static int cs_event_server (CmdParams* cmdparams);
 static int cs_event_squit (CmdParams* cmdparams);
 
-static int cs_set_exclusions_cb (CmdParams* cmdparams);
-static int cs_set_sign_watch_cb (CmdParams* cmdparams);
-static int cs_set_kill_watch_cb (CmdParams* cmdparams);
-static int cs_set_mode_watch_cb (CmdParams* cmdparams);
-static int cs_set_nick_watch_cb (CmdParams* cmdparams);
-static int cs_set_serv_watch_cb (CmdParams* cmdparams);
+static int cs_set_exclusions_cb (CmdParams* cmdparams, SET_REASON reason);
+static int cs_set_sign_watch_cb (CmdParams* cmdparams, SET_REASON reason);
+static int cs_set_kill_watch_cb (CmdParams* cmdparams, SET_REASON reason);
+static int cs_set_mode_watch_cb (CmdParams* cmdparams, SET_REASON reason);
+static int cs_set_nick_watch_cb (CmdParams* cmdparams, SET_REASON reason);
+static int cs_set_serv_watch_cb (CmdParams* cmdparams, SET_REASON reason);
 
 /** Bot pointer */
 static Bot *cs_bot;
@@ -228,9 +228,6 @@ void ModFini (void)
 static int cs_event_signon (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_cfg.sign_watch) {
-		return NS_SUCCESS;
-	}
 	/* Print Connection Notice */
 	irc_chanalert(cs_bot, msg_signon,
 		cmdparams->source->name, cmdparams->source->user->username, 
@@ -319,9 +316,6 @@ static int cs_event_umode (CmdParams* cmdparams)
 	ModeDef* def;
 
 	SET_SEGV_LOCATION();
-	if (!cs_cfg.mode_watch) {
-		return -1;
-	}
 	modes = cmdparams->param;
 	while (*modes) {
 		switch (*modes) {
@@ -332,7 +326,7 @@ static int cs_event_umode (CmdParams* cmdparams)
 			add = 0;
 			break;
 		default:
-			mask = GetUmodeMask (*modes);
+			mask = UmodeCharToMask (*modes);
 			if (mask == UMODE_BOT) {
 				irc_chanalert (cs_bot, msg_bot, cmdparams->source->name, 
 					add?"now":"no longer", add?'+':'-', *modes);			
@@ -363,9 +357,6 @@ static int cs_event_smode (CmdParams* cmdparams)
 	ModeDef* def;
 
 	SET_SEGV_LOCATION();
-	if (!cs_cfg.mode_watch) {
-		return -1;
-	}
 	modes = cmdparams->param;
 	while (*modes) {
 		switch (*modes) {
@@ -376,7 +367,7 @@ static int cs_event_smode (CmdParams* cmdparams)
 				add = 0;
 				break;
 			default:
-				mask = GetSmodeMask (*modes);
+				mask = SmodeCharToMask (*modes);
 				def = OperSmodes;
 				while(def->mask) {
 					if(def->mask == mask) 
@@ -404,9 +395,6 @@ static int cs_event_kill (CmdParams* cmdparams)
 	int KillCount = 0;
 
 	SET_SEGV_LOCATION();
-	if (!cs_cfg.kill_watch) {
-		return NS_SUCCESS;
-	}
 	cmd = sstrdup(recbuf);
 	KillCount = split_buf(cmd, &Kill, 0);
 	GlobalMsg = joinbuf(Kill, KillCount, 4);
@@ -433,9 +421,6 @@ static int cs_event_kill (CmdParams* cmdparams)
 static int cs_event_nick (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_cfg.nick_watch) {
-		return NS_SUCCESS;
-	}
 	irc_chanalert(cs_bot, msg_nickchange, cmdparams->param, 
 		cmdparams->source->user->username, cmdparams->source->user->hostname, 
 		cmdparams->source->name);
@@ -445,9 +430,6 @@ static int cs_event_nick (CmdParams* cmdparams)
 static int cs_event_server (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_cfg.serv_watch) {
-		return NS_SUCCESS;
-	}
 	irc_chanalert (cs_bot, "\2SERVER\2 %s has joined the network at %s",
 		cmdparams->source->name, cmdparams->source->uplink);
 	return NS_SUCCESS;
@@ -456,22 +438,19 @@ static int cs_event_server (CmdParams* cmdparams)
 static int cs_event_squit (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_cfg.serv_watch) {
-		return NS_SUCCESS;
-	}
 	irc_chanalert (cs_bot, "\2SERVER\2 %s has left the network at %s for %s",
 		cmdparams->source->name, cmdparams->source->uplink, 
-		cmdparams->param ? cmdparams->param : "");
+		cmdparams->param ? cmdparams->param : "reason unknown");
 	return NS_SUCCESS;
 }
 
-static int cs_set_exclusions_cb (CmdParams* cmdparams)
+static int cs_set_exclusions_cb (CmdParams* cmdparams, SET_REASON reason)
 {
 	SetAllEventFlags (EVENT_FLAG_USE_EXCLUDE, cs_cfg.use_exc);
 	return NS_SUCCESS;
 }
 
-static int cs_set_sign_watch_cb (CmdParams* cmdparams)
+static int cs_set_sign_watch_cb (CmdParams* cmdparams, SET_REASON reason)
 {
 	if (cs_cfg.sign_watch) {
 		EnableEvent (EVENT_SIGNON);
@@ -483,7 +462,7 @@ static int cs_set_sign_watch_cb (CmdParams* cmdparams)
 	return NS_SUCCESS;
 }
 
-static int cs_set_kill_watch_cb (CmdParams* cmdparams)
+static int cs_set_kill_watch_cb (CmdParams* cmdparams, SET_REASON reason)
 {
 	if (cs_cfg.kill_watch) {
 		EnableEvent (EVENT_KILL);
@@ -493,7 +472,7 @@ static int cs_set_kill_watch_cb (CmdParams* cmdparams)
 	return NS_SUCCESS;
 }
 
-static int cs_set_mode_watch_cb (CmdParams* cmdparams)
+static int cs_set_mode_watch_cb (CmdParams* cmdparams, SET_REASON reason)
 {
 	if (cs_cfg.mode_watch) {
 		EnableEvent (EVENT_UMODE);
@@ -505,7 +484,7 @@ static int cs_set_mode_watch_cb (CmdParams* cmdparams)
 	return NS_SUCCESS;
 }
 
-static int cs_set_nick_watch_cb (CmdParams* cmdparams)
+static int cs_set_nick_watch_cb (CmdParams* cmdparams, SET_REASON reason)
 {
 	if (cs_cfg.nick_watch) {
 		EnableEvent (EVENT_NICK);
@@ -515,7 +494,7 @@ static int cs_set_nick_watch_cb (CmdParams* cmdparams)
 	return NS_SUCCESS;
 }
 
-static int cs_set_serv_watch_cb (CmdParams* cmdparams)
+static int cs_set_serv_watch_cb (CmdParams* cmdparams, SET_REASON reason)
 {
 	if (cs_cfg.serv_watch) {
 		EnableEvent (EVENT_SERVER);

@@ -915,12 +915,12 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
 		if (mode == NULL) {
 			irc_send_sjoin (me.name, botptr->u->name, chan, (unsigned long)ts);
 		} else {
-			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", ircd_cmodes[(int)mode[1]].sjoin, botptr->u->name);
+			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", CmodeCharToPrefix (mode[1]), botptr->u->name);
 			irc_send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
 		}
 		join_chan (botptr->u->name, chan);
 		if (mode) {
-			ChanUserMode(chan, botptr->u->name, 1, CUmodeStringToMask(mode,0));
+			ChanUserMode(chan, botptr->u->name, 1, CmodeStringToMask(mode));
 		}
 	/* sjoin not available so use normal join */	
 	} else if(irc_send_join) {
@@ -1018,7 +1018,7 @@ irc_chanusermode (const Bot *botptr, const char *chan, const char *mode, const c
 	} else {
 		irc_send_cmode (me.name, botptr->u->name, chan, mode, target, me.now);
 	}
-	ChanUserMode (chan, target, 1, CUmodeStringToMask(mode,0));
+	ChanUserMode (chan, target, 1, CmodeStringToMask(mode));
 	return NS_SUCCESS;
 }
 
@@ -1253,10 +1253,8 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 {
 	char nick[MAXNICK];
 	char* nicklist;
-	int modeexists;
-	long mode = 0;
-	int ok = 1, i, j = 3;
-	ModesParm *m;
+	long mask = 0;
+	int ok = 1, j = 3;
 	Channel *c;
 	lnode_t *mn = NULL;
 	char **param;
@@ -1280,19 +1278,14 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 				continue;
 			}
 		}
-		mode = 0;
-		for (i = 0; i < MODE_TABLE_SIZE; i++) {
-			if (ircd_cmodes[i].sjoin != 0) {
-				if (*nicklist == ircd_cmodes[i].sjoin) {
-					mode |= ircd_cmodes[i].mode;
-					nicklist++;
-					i = -1;
-				}
-			}
+		mask = 0;
+		while (CmodePrefixToMask (*nicklist)) {
+			mask |= CmodePrefixToMask (*nicklist);
+			nicklist ++;
 		}
 		strlcpy (nick, nicklist, MAXNICK);
 		join_chan (nick, channame); 
-		ChanUserMode (channame, nick, 1, mode);
+		ChanUserMode (channame, nick, 1, mask);
 		paramidx++;
 		ok = 1;
 	}
@@ -1300,51 +1293,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 	if(c) {
 		/* update the TS time */
 		SetChanTS (c, atoi (tstime)); 
-		if (*modes == '+') {
-			while (*modes) {
-				unsigned int mode;
-				unsigned int flags;      
-
-				mode = ircd_cmodes[(int)*modes].mode;
-				flags = ircd_cmodes[(int)*modes].flags;
-
-				/* mode limit and mode key replace current values */
-				if (mode == CMODE_LIMIT) {
-					c->limit = atoi(argv[j]);
-					j++;
-				} else if (mode == CMODE_KEY) {
-					strlcpy (c->key, argv[j], KEYLEN);
-					j++;
-				} else if (flags) {
-					mn = list_first (c->modeparms);
-					modeexists = 0;
-					while (mn) {
-						m = lnode_get (mn);
-						if ((m->mode == mode) && !ircstrcasecmp (m->param, argv[j])) {
-							dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", *modes, argv[j]);
-							j++;
-							modeexists = 1;
-							break;
-						}
-						mn = list_next (c->modeparms, mn);
-					}
-					if (modeexists != 1) {
-						m = smalloc (sizeof (ModesParm));
-						m->mode = mode;
-						strlcpy (m->param, argv[j], PARAMSIZE);
-						if (list_isfull (c->modeparms)) {
-							nlog (LOG_CRITICAL, "ChanMode: modelist is full adding to channel %s", c->name);
-							do_exit (NS_EXIT_ERROR, "List full - see log file");
-						}
-						lnode_create_append (c->modeparms, m);
-						j++;
-					}
-				} else {
-					c->modes |= mode;
-				}
-				modes++;
-			}
-		}
+		j = ChanModeHandler (c, modes, j, argv, argc);
 	}
 	sfree(param);
 }

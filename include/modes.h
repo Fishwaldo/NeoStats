@@ -23,16 +23,32 @@
 #ifndef MODES_H
 #define MODES_H
 
-EXPORTVAR extern ChanModes ircd_cmodes[MODE_TABLE_SIZE];
-extern UserModes ircd_umodes[MODE_TABLE_SIZE];
-extern UserModes ircd_smodes[MODE_TABLE_SIZE];
+unsigned int UmodeStringToMask (const char *UmodeString);
+char *UmodeMaskToString (const unsigned int mask);
+char UmodeMaskToChar (const unsigned int mask);
 
-char* UmodeMaskToString(const long Umode);
-long UmodeStringToMask(const char* UmodeString, long Umode);
-char* SmodeMaskToString(const long Umode);
-long SmodeStringToMask(const char* UmodeString, long Smode);
+unsigned int SmodeStringToMask (const char *UmodeString);
+char *SmodeMaskToString (const unsigned int mask);
+char SmodeMaskToChar (const unsigned int mask);
+
+unsigned int CmodeStringToMask (const char *UmodeString);
+char *CmodeMaskToString (const unsigned int mask);
+char *CmodeMaskToPrefixString (const unsigned int mask);
+int CmodeCharToMask (const char mode);
+char CmodeMaskToChar (const unsigned int mask);
+EXPORTFUNC int CmodeCharToFlags (const char mode);
+unsigned int CmodePrefixToMask (const char prefix);
+char CmodePrefixToChar (const char prefix);
+char CmodeMaskToPrefix (const unsigned int mask);
+char CmodeCharToPrefix (const char mode);
 
 int InitIrcdModes (void);
-long CUmodeStringToMask(const char* UmodeString, long Umode);
+
+EXPORTFUNC int ChanMode (char *origin, char **av, int ac);
+int ChanModeHandler (Channel* c, char *modes, int j, char **av, int ac);
+void ChanUserMode (const char *chan, const char *nick, int add, const unsigned int mode);
+
+void dumpchanmodes (CmdParams* cmdparams, Channel* c);
+
 
 #endif

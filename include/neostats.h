@@ -223,6 +223,8 @@
 
 EXPORTVAR extern unsigned int ircd_supported_umodes;
 EXPORTVAR extern unsigned int ircd_supported_smodes;
+EXPORTVAR extern unsigned int ircd_supported_cmodes;
+EXPORTVAR extern unsigned int ircd_supported_cumodes;
 #define HaveUmodeRegNick() (ircd_supported_umodes&UMODE_REGNICK)
 #define HaveUmodeDeaf() (ircd_supported_umodes&UMODE_DEAF)
 
@@ -237,9 +239,9 @@ EXPORTVAR extern unsigned int ircd_supported_smodes;
 EXPORTFUNC int IsOperMode(const char mode);
 EXPORTFUNC int IsOperSMode(const char mode);
 EXPORTFUNC int IsBotMode(const char mode);
-EXPORTFUNC int GetUmodeMask(const char mode);
+EXPORTFUNC int UmodeCharToMask(const char mode);
 EXPORTFUNC const char * GetUmodeDesc (const unsigned int mask);
-EXPORTFUNC int GetSmodeMask(const char mode);
+EXPORTFUNC int SmodeCharToMask(const char mode);
 EXPORTFUNC const char * GetSmodeDesc (const unsigned int mask);
 
 #ifndef NEOSTATS_PACKAGE_VERSION
@@ -554,6 +556,16 @@ typedef struct Ban {
 } Ban;
 
 
+/** @brief Chanmem structure
+ *  
+ */
+typedef struct Chanmem {
+	char nick[MAXNICK];
+	time_t tsjoin;
+	long flags;
+	void *moddata[NUM_MODULES];
+} Chanmem;
+
 /** @brief Channel structure
  *  
  */
@@ -584,15 +596,6 @@ typedef struct CmdParams {
 	int ac;
 } CmdParams; 
 
-/** @brief ModesParm structure
- *  
- */
-typedef struct ModesParm {
-	long mode;
-	char param[PARAMSIZE];
-	void *moddata[NUM_MODULES];
-} ModesParm;
-
 /** @brief ping structure
  *  
  */
@@ -610,7 +613,15 @@ struct ping {
 /** @brief bot_cmd_handler type
  *  defines handler function definition
  */
+
+typedef enum SET_REASON {
+	SET_LOAD = 0,
+	SET_LIST,
+	SET_CHANGE,
+} SET_REASON;
+
 typedef int (*bot_cmd_handler) (CmdParams* cmdparams);
+typedef int (*bot_set_handler) (CmdParams* cmdparams, SET_REASON reason);
 
 /** @brief bot_cmd structure
  *  defines command lists for bots
@@ -695,7 +706,7 @@ typedef struct bot_setting {
 	char			*confitem;	/* config string for kptool */
 	const char		*desc;		/* description of setting for messages e.g. seconds, days*/
 	const char**	helptext;	/* pointer to help text */
-	bot_cmd_handler	handler;	/* handler for custom/post-set processing */
+	bot_set_handler	handler;	/* handler for custom/post-set processing */
 	void*			defaultval; /* default value for setting */
 }bot_setting;
 
@@ -1074,7 +1085,7 @@ EXPORTFUNC Client *find_server (const char *name);
 
 /* chans.c */
 EXPORTFUNC Channel *find_chan (const char *chan);
-EXPORTFUNC int CheckChanMode (Channel * c, long mode);
+EXPORTFUNC int CheckChanMode (Channel * c, const unsigned int mode);
 EXPORTFUNC int IsChanMember(Channel *c, Client *u);
 EXPORTFUNC int test_cumode(char* chan, char* nick, int flag);
 

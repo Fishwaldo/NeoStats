@@ -105,22 +105,22 @@ ircd_cmd cmd_list[] = {
 	{0, 0, 0, 0},
 };
 
-cumode_init chan_umodes[] = {
+mode_init chan_umodes[] = {
 /* CMODE_DECHANOWNER */
 /* CMODE_DECHANPROT	*/
 /* CMODE_DEOPPED */
 /* CMODE_DEHALFOPPED */
 /* CMODE_DEUOP	*/
-	{'q', CUMODE_CHANOWNER, '!'},
-	{'a', CUMODE_CHANPROT, '*'},
-	{'o', CUMODE_CHANOP, '@'},
-	{'h', CUMODE_HALFOP, '%'},
-	{'v', CUMODE_VOICE, '+'},
-	{'u', CMODE_UOP, '-'},
+	{'q', CUMODE_CHANOWNER, 0, '!'},
+	{'a', CUMODE_CHANPROT, 0, '*'},
+	{'o', CUMODE_CHANOP, 0, '@'},
+	{'h', CUMODE_HALFOP, 0, '%'},
+	{'v', CUMODE_VOICE, 0, '+'},
+	{'u', CMODE_UOP, 0, '-'},
 	{0, 0, 0},
 };
 
-cmode_init chan_modes[] = {
+mode_init chan_modes[] = {
 	{'b', CMODE_BAN, MODEPARAM},
 	{'c', CMODE_NOCOLOR, 0},
 	{'i', CMODE_INVITEONLY, 0},
@@ -142,7 +142,7 @@ cmode_init chan_modes[] = {
 	{0, 0, 0},
 };
 
-umode_init user_umodes[] = {
+mode_init user_umodes[] = {
 	{'a', UMODE_SADMIN},
 	{'T', UMODE_TECHADMIN},
 	{'N', UMODE_NETADMIN},
@@ -178,7 +178,7 @@ umode_init user_umodes[] = {
 	{0, 0},
 };
 
-umode_init user_smodes[] = {
+mode_init user_smodes[] = {
 	{'s', SMODE_SSL},
 	{0, 0},
 };

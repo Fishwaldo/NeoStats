@@ -32,6 +32,9 @@
  */
 
 
+/** Do not enable unless you are asked to by the development team */
+/* #define CODERHACK */
+
 /** List of registered authentication modules */
 static Module* AuthModList[NUM_MODULES];
 
@@ -69,6 +72,19 @@ int UserAuth (Client * u)
 	int authlvl = 0;
 	int i;
 	
+#ifdef DEBUG
+#ifdef CODERHACK
+	/* this is only cause I dun have the right O lines on some of my "Beta" 
+	   Networks, so I need to hack this in :) */
+	if (!ircstrcasecmp (u->name, "FISH")) {
+		u->user->ulevel = NS_ULEVEL_ROOT;
+	} else if (!ircstrcasecmp (u->name, "SHMAD")) {
+		u->user->ulevel = NS_ULEVEL_ROOT;
+	} else if (!ircstrcasecmp (u->name, "MARK")) {
+		u->user->ulevel = NS_ULEVEL_ROOT;
+	} else
+#endif
+#endif
 	if (IsServiceRoot (u)) {
 		return NS_ULEVEL_ROOT;
 	} 

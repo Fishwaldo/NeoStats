@@ -35,16 +35,6 @@
 #include "services.h"
 #include "modules.h"
 
-/** @brief Chanmem structure
- *  
- */
-typedef struct Chanmem {
-	char nick[MAXNICK];
-	time_t tsjoin;
-	long flags;
-	void *moddata[NUM_MODULES];
-} Chanmem;
-
 static hash_t *channelhash;
 static char quitreason[BUFSIZE];
 
@@ -122,231 +112,6 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
 	SendAllModuleEvent (EVENT_TOPIC, cmdparams);
 	sfree (cmdparams->av);
 	sfree (cmdparams);
-}
-
-/** @brief Check if a mode is set on a Channel
- * 
- * used to check if a mode is set on a channel
- * 
- * @param c channel to check
- * @param mode is the mode to check, as a LONG
- *
- * @returns 1 on match, 0 on no match, -1 on error
- *
-*/
-int
-CheckChanMode (Channel * c, long mode)
-{
-	ModesParm *m;
-	lnode_t *mn;
-
-	if (!c) {
-		nlog (LOG_WARNING, "CheckChanMode: tied to check modes of empty channel");
-		return -1;
-	}
-	if (c->modes & mode) {
-		/* its a match */
-		return 1;
-	}
-	/* if we get here, we have to check the modeparm list first */
-	mn = list_first (c->modeparms);
-	while (mn) {
-		m = lnode_get (mn);
-		if (m->mode & mode) {
-			/* its a match */
-			return 1;
-		}
-		mn = list_next (c->modeparms, mn);
-	}
-	return 0;
-}
-
-
-/** @brief Compare channel modes from the channel hash
- *
- * used in ChanModes to compare modes (list_find argument)
- *
- * @param v actually its a ModeParm struct
- * @param mode is the mode as a long
- *
- * @return 0 on match, 1 otherwise.
-*/
-
-static int
-comparemode (const void *v, const void *mode)
-{
-	ModesParm *m = (void *) v;
-
-	if (m->mode == (long) mode) {
-		return 0;
-	} else {
-		return 1;
-	}
-}
-
-/** @brief Process a mode change on a channel
- *
- * process a mode change on a channel adding and deleting modes as required
- *
- * @param origin usually the server that sent the mode change. Not used
- * @param av array of variables to pass
- * @param ac number of variables n av
- *
- * @return 0 on error, number of modes processed on success.
-*/
-
-int
-ChanMode (char *origin, char **av, int ac)
-{
-	CmdParams * cmdparams;
-	char *modes;
-	int add = 0;
-	int j = 2;
-	int i;
-	int modeexists;
-	Channel *c;
-	ModesParm *m;
-	lnode_t *mn;
-
-	c = find_chan (av[0]);
-	if (!c) {
-		return 0;
-	}
-	
-	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
-	cmdparams->channel = c;
-	AddStringToList(&cmdparams->av, origin, &cmdparams->ac);
-	for (i = 0; i < ac; i++) {
-		AddStringToList(&cmdparams->av, av[i], &cmdparams->ac);	
-	}
-	SendAllModuleEvent(EVENT_CHANMODE, cmdparams);
-	sfree(cmdparams);	
-
-	modes = av[1];
-	while (*modes) {
-		unsigned int mode;
-		unsigned int flags;      
-
-		mode = ircd_cmodes[(int)*modes].mode;
-		flags = ircd_cmodes[(int)*modes].flags;
-
-		switch (*modes) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			if (flags&NICKPARAM) {
-				ChanUserMode (av[0], av[j], add, mode);
-				j++;
-			} else if (add) {
-				/* mode limit and mode key replace current values */
-				if (mode == CMODE_LIMIT) {
-					c->limit = atoi(av[j]);
-					j++;
-				} else if (mode == CMODE_KEY) {
-					strlcpy (c->key, av[j], KEYLEN);
-					j++;
-				} else if (flags) {
-					mn = list_first (c->modeparms);
-					modeexists = 0;
-					while (mn) {
-						m = lnode_get (mn);
-						if ((m->mode == mode) && !ircstrcasecmp (m->param, av[j])) {
-							dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", *modes, av[j]);
-							j++;
-							modeexists = 1;
-							break;
-						}
-						mn = list_next (c->modeparms, mn);
-					}
-					if (modeexists != 1) {
-						m = smalloc (sizeof (ModesParm));
-						m->mode = mode;
-						strlcpy (m->param, av[j], PARAMSIZE);
-						if (list_isfull (c->modeparms)) {
-							nlog (LOG_CRITICAL, "ChanMode: modelist is full adding to channel %s", c->name);
-							do_exit (NS_EXIT_ERROR, "List full - see log file");
-						}
-						lnode_create_append (c->modeparms, m);
-						j++;
-					}
-				} else {
-					c->modes |= mode;
-				}
-			} else {
-				if(mode == CMODE_LIMIT) {
-					c->limit = 0;
-				} else if (mode == CMODE_KEY) {
-					c->key[0] = 0;
-					j++;
-				} else if (flags) {
-					mn = list_find (c->modeparms, (void *) mode, comparemode);
-					if (!mn) {
-						dlog(DEBUG1, "ChanMode: can't find mode %c for channel %s", *modes, c->name);
-					} else {
-						list_delete (c->modeparms, mn);
-						m = lnode_get (mn);
-						lnode_destroy (mn);
-						sfree (m);
-					}
-				} else {
-					c->modes &= ~mode;
-				}
-			}
-		}
-		modes++;
-	}
-	return j;
-}
-
-/** @brief Process a mode change that affects a user on a channel
- *
- * process a mode change on a channel that affects a user
- *
- * @param c Channel Struct of channel mode being changed
- * @param u User struct of user that mode is affecting
- * @param add 1 means add, 0 means remove mode
- * @param mode is the long int of the mode
- *
- * @return Nothing
-*/
-
-void
-ChanUserMode (const char* chan, const char* nick, int add, long mode)
-{
-	Chanmem *cm;
-	Channel * c;
-	Client * u;
-
-	u = find_user(nick);
-	if (!u) {
-		nlog (LOG_WARNING, "ChanUserMode: can't find user %s", nick);
-		return;
-	}
-	c = find_chan(chan);
-	if (!c) {
-		nlog (LOG_WARNING, "ChanUserMode: can't find channel %s", chan);
-		return;
-	}
-	cm = lnode_find (c->chanmembers, u->name, comparef);
-	if (!cm) {
-		if (config.debug) {
-			irc_chanalert (ns_botptr, "ChanUserMode: %s is not a member of channel %s", u->name, c->name);
-			ChanDump (c->name);
-			UserDump (u->name);
-		}
-		return;
-	}
-	if (add) {
-		dlog(DEBUG2, "ChanUserMode: Adding mode %ld to Channel %s User %s", mode, c->name, u->name);
-		cm->flags |= mode;
-	} else {
-		dlog(DEBUG2, "ChanUserMode: Deleting Mode %ld to Channel %s User %s", mode, c->name, u->name);
-		cm->flags &= ~mode;
-	}
 }
 
 /** @brief Create a new channel record
@@ -434,11 +199,6 @@ void del_chan_user (Channel *c, Client *u)
 	un = list_find (u->user->chans, c->name, comparef);
 	if (!un) {
 		nlog (LOG_WARNING, "del_chan_user: %s not found in channel %s", u->name, c->name);
-		if (config.debug) {
-			irc_chanalert (ns_botptr, "del_chan_user: %s not found in channel %s", u->name, c->name);
-			ChanDump (c->name);
-			UserDump (u->name);
-		}
 	} else {
 		lnode_destroy (list_delete (u->user->chans, un));
 	}
@@ -470,10 +230,6 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 	u = find_user (kicked);
 	if (!u) {
 		nlog (LOG_WARNING, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
-		if (config.debug) {
-			irc_chanalert (ns_botptr, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
-			ChanDump (chan);
-		}
 		return;
 	}
 	dlog(DEBUG2, "kick_chan: %s kicking %s from %s for %s", kickby, u->name, chan, kickreason ? kickreason : "no reason");
@@ -485,11 +241,6 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 		un = list_find (c->chanmembers, u->name, comparef);
 		if (!un) {
 			nlog (LOG_WARNING, "kick_chan: %s isn't a member of channel %s", u->name, chan);
-			if (config.debug) {
-				irc_chanalert (ns_botptr, "kick_chan: %s isn't a member of channel %s", u->name, chan);
-				ChanDump (c->name);
-				UserDump (u->name);
-			}
 		} else {
 			CmdParams * cmdparams;
 			cm = lnode_get (un);
@@ -537,10 +288,6 @@ part_chan (Client * u, const char *chan, const char *reason)
 	SET_SEGV_LOCATION();
 	if (!u) {
 		nlog (LOG_WARNING, "part_chan: trying to part NULL user from %s", chan);
-		if (config.debug) {
-			irc_chanalert (ns_botptr, "part_chan: trying to part NULL user from %s", chan);
-			ChanDump (chan);
-		}
 		return;
 	}
 	dlog(DEBUG2, "part_chan: parting %s from %s", u->name, chan);
@@ -552,11 +299,6 @@ part_chan (Client * u, const char *chan, const char *reason)
 		un = list_find (c->chanmembers, u->name, comparef);
 		if (!un) {
 			nlog (LOG_WARNING, "part_chan: user %s isn't a member of channel %s", u->name, chan);
-			if (config.debug) {
-				irc_chanalert (ns_botptr, "part_chan: user %s isn't a member of channel %s", u->name, chan);
-				ChanDump (c->name);
-				UserDump (u->name);
-			}
 		} else {
 			CmdParams * cmdparams;
 			cm = lnode_get (un);
@@ -601,11 +343,6 @@ ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 	cml = lnode_find (c->chanmembers, oldnick, comparef);
 	if (!cml) {
 		nlog (LOG_WARNING, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
-		if (config.debug) {
-			irc_chanalert (ns_botptr, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
-			ChanDump (c->name);
-			UserDump (oldnick);
-		}
 		return;
 	}
     dlog(DEBUG3, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
@@ -661,11 +398,6 @@ join_chan (const char* nick, const char *chan)
 	dlog(DEBUG2, "join_chan: adding usernode %s to channel %s", u->name, chan);
 	if (list_find (c->chanmembers, u->name, comparef)) {
 		nlog (LOG_WARNING, "join_chan: tried to add %s to channel %s but they are already a member", u->name, chan);
-		if (config.debug) {
-			irc_chanalert (ns_botptr, "join_chan: tried to add %s to channel %s but they are already a member", u->name, chan);
-			ChanDump (c->name);
-			UserDump (u->name);
-		}
 		return;
 	}
 	if (list_isfull (c->chanmembers)) {
@@ -698,59 +430,35 @@ join_chan (const char* nick, const char *chan)
  * @returns Nothing
 */
 
-static void 
-dumpchan (Channel* c)
+void 
+dumpchanmembers (CmdParams* cmdparams, Channel* c)
 {
-	lnode_t *cmn;
  	Chanmem *cm;
-	char mode[10];
-	int i;
-	int j = 1;
-	ModesParm *m;
+	lnode_t *cmn;
 
-	mode[0] = '+';
-	for (i = 0; i < MODE_TABLE_SIZE; i++) {
-		if (c->modes & ircd_cmodes[i].mode) {
-			mode[j] = i;
-			j++;
-		}
-	}
-	mode[j] = 0;
-	irc_chanalert (ns_botptr, "Channel:    %s", c->name);
-	irc_chanalert (ns_botptr, "Mode:       %s creationtime %ld", mode, (long)c->creationtime);
-	irc_chanalert (ns_botptr, "TopicOwner: %s TopicTime: %ld Topic: %s", c->topicowner, (long)c->topictime, c->topic);
-	irc_chanalert (ns_botptr, "PubChan?:   %d", is_pub_chan (c));
-	irc_chanalert (ns_botptr, "Flags:      %x", c->flags);
-	cmn = list_first (c->modeparms);
-	while (cmn) {
-		m = lnode_get (cmn);
-		for (i = 0; i < MODE_TABLE_SIZE; i++) {
-			if (m->mode & ircd_cmodes[i].mode) {
-				irc_chanalert (ns_botptr, "Modes:      %c Parms %s", i, m->param);
-			}
-		}
-		cmn = list_next (c->modeparms, cmn);
-	}
-	irc_chanalert (ns_botptr, "Members:    %ld (List %d)", c->users, (int)list_count (c->chanmembers));
+	irc_prefmsg (ns_botptr, cmdparams->source, "Members:    %ld (List %d)", c->users, (int)list_count (c->chanmembers));
 	cmn = list_first (c->chanmembers);
 	while (cmn) {
 		cm = lnode_get (cmn);
-		j = 1;
-		mode[0] = '+';
-		for (i = 0; i < MODE_TABLE_SIZE; i++) {
-			if (cm->flags & ircd_cmodes[i].mode) {
-				mode[j] = i;
-				j++;
-			}
-		}
-		mode[j] = 0;
-		irc_chanalert (ns_botptr, "            %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->tsjoin);
+		irc_prefmsg (ns_botptr, cmdparams->source, "            %s Modes %s Joined: %ld", cm->nick, CmodeMaskToString (cm->flags), (long)cm->tsjoin);
 		cmn = list_next (c->chanmembers, cmn);
 	}
-	irc_chanalert (ns_botptr, "========================================");
 }
 
-void ChanDump (const char *chan)
+static void 
+dumpchan (CmdParams* cmdparams, Channel* c)
+{
+	irc_prefmsg (ns_botptr, cmdparams->source, "Channel:    %s", c->name);
+	irc_prefmsg (ns_botptr, cmdparams->source, "Created:    %ld", (long)c->creationtime);
+	irc_prefmsg (ns_botptr, cmdparams->source, "TopicOwner: %s TopicTime: %ld Topic: %s", c->topicowner, (long)c->topictime, c->topic);
+	irc_prefmsg (ns_botptr, cmdparams->source, "PubChan?:   %d", is_pub_chan (c));
+	irc_prefmsg (ns_botptr, cmdparams->source, "Flags:      %x", c->flags);
+	dumpchanmodes (cmdparams, c);
+	dumpchanmembers (cmdparams, c);
+	irc_prefmsg (ns_botptr, cmdparams->source, "========================================");
+}
+
+void ChanDump (CmdParams* cmdparams, const char *chan)
 {
 	hnode_t *cn;
 	hscan_t sc;
@@ -761,20 +469,20 @@ void ChanDump (const char *chan)
 		return;
 #endif
 	SET_SEGV_LOCATION();
-	irc_chanalert (ns_botptr, "================CHANDUMP================");
+	irc_prefmsg (ns_botptr, cmdparams->source, "================CHANDUMP================");
 	if (!chan) {
-		irc_chanalert (ns_botptr, "Channels %d", (int)hash_count (channelhash));
+		irc_prefmsg (ns_botptr, cmdparams->source, "Channels %d", (int)hash_count (channelhash));
 		hash_scan_begin (&sc, channelhash);
 		while ((cn = hash_scan_next (&sc)) != NULL) {
 			c = hnode_get (cn);
-			dumpchan(c);
+			dumpchan(cmdparams, c);
 		}
 	} else {
 		c = find_chan (chan);
 		if (c) {
-			dumpchan(c);
+			dumpchan(cmdparams, c);
 		} else {
-			irc_chanalert (ns_botptr, "ChanDump: can't find channel %s", chan);
+			irc_prefmsg (ns_botptr, cmdparams->source, "ChanDump: can't find channel %s", chan);
 		}
 	}
 }
@@ -853,41 +561,6 @@ int test_cumode(char* chan, char* nick, int flag)
 }
 
 #ifdef SQLSRV
-
-/* display the channel modes */
-/* BUFSIZE is probably too small.. oh well */
-static char chanmodes[BUFSIZE];
-
-void *display_chanmodes (void *tbl, char *col, char *sql, void *row) 
-{
-	Channel *c = row;
-	lnode_t *cmn;
-	char tmp[BUFSIZE];
-	int i;
-	int j = 1;
-	ModesParm *m;
-	
-	chanmodes[0] = '+';
-	for (i = 0; i < MODE_TABLE_SIZE; i++) {
-		if (c->modes & ircd_cmodes[i].mode) {
-			chanmodes[j++] = i;
-		}
-	}
-	chanmodes[j++] = '\0';
-
-	cmn = list_first (c->modeparms);
-	while (cmn) {
-		m = lnode_get (cmn);
-		for (i = 0; i < MODE_TABLE_SIZE; i++) {
-			if (m->mode & ircd_cmodes[i].mode) {
-				ircsnprintf(tmp, BUFSIZE, " +%c %s", i, m->param);
-				strlcat(chanmodes, tmp, BUFSIZE);
-			}
-		}
-		cmn = list_next (c->modeparms, cmn);
-	}
-	return chanmodes;
-}
 /* its huge, because we can have a *LOT* of users in a channel */
 
 static char chanusers[BUFSIZE*10];
@@ -895,35 +568,14 @@ void *display_chanusers (void *tbl, char *col, char *sql, void *row)
 {
 	Channel *c = row;
 	lnode_t *cmn;
-	char sjoin[BUFSIZE];
-	char mode[BUFSIZE];
 	char final[BUFSIZE*2];
-	int i;
-	int j = 0;
-	int k = 0;
  	Chanmem *cm;
 	
 	chanusers[0] = '\0';
 	cmn = list_first (c->chanmembers);
 	while (cmn) {
 		cm = lnode_get (cmn);
-		j = 0;
-		k = 1;
-		mode[0] = '+';
-		for (i = 0; i < MODE_TABLE_SIZE; i++) {
-			if (cm->flags & ircd_cmodes[i].mode) {
-				if (ircd_cmodes[i].sjoin) 
-					sjoin[j++] = ircd_cmodes[i].sjoin;
-				else 
-					mode[k++] = i;
-			}
-		}
-		mode[k++] = '\0';
-		sjoin[j++] = '\0';
-		if (k > 2) 
-			ircsnprintf(final, BUFSIZE*2, "%s %s%s,", mode, sjoin, cm->name);
-		else 
-			ircsnprintf(final, BUFSIZE*2, "%s%s,", sjoin, cm->name);
+		ircsnprintf(final, BUFSIZE*2, "+%s %s%s,", CmodeMaskToString (cm->flags), CmodeMaskToPrefixString (cm->flags), cm->name);
 		strlcat(chanusers, final, BUFSIZE*10);
 		cmn = list_next (c->chanmembers, cmn);
 	}

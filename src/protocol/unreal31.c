@@ -118,16 +118,16 @@ ircd_cmd cmd_list[] = {
 	{0, 0, 0, 0},
 };
 
-cumode_init chan_umodes[] = {
-	{'v', CUMODE_VOICE, '+'},
-	{'h', CUMODE_HALFOP, '%'},
-	{'o', CUMODE_CHANOP, '@'},
-	{'a', CUMODE_CHANPROT, '*'},
-	{'q', CUMODE_CHANOWNER, '~'},
+mode_init chan_umodes[] = {
+	{'v', CUMODE_VOICE, 0, '+'},
+	{'h', CUMODE_HALFOP, 0, '%'},
+	{'o', CUMODE_CHANOP, 0, '@'},
+	{'a', CUMODE_CHANPROT, 0, '*'},
+	{'q', CUMODE_CHANOWNER, 0, '~'},
 	{0, 0, 0},
 };
 
-cmode_init chan_modes[] = {
+mode_init chan_modes[] = {
 	{'l', CMODE_LIMIT, MODEPARAM},
 	{'p', CMODE_PRIVATE, 0},
 	{'s', CMODE_SECRET, 0},
@@ -158,7 +158,7 @@ cmode_init chan_modes[] = {
 	{0, 0},
 };
 
-umode_init user_umodes[] = {
+mode_init user_umodes[] = {
 	{'S', UMODE_SERVICES},
 	{'N', UMODE_NETADMIN},
 	{'a', UMODE_SADMIN},

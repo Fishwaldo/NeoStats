@@ -755,7 +755,7 @@ bot_cmd_set_list (CmdParams * cmdparams)
 					break;
 				case SET_TYPE_CUSTOM:
 					if(set_ptr->handler) {
-						set_ptr->handler(cmdparams);
+						set_ptr->handler(cmdparams, SET_LIST);
 					}
 					break;
 				default:
@@ -968,7 +968,7 @@ static int
 bot_cmd_set_custom (CmdParams * cmdparams, bot_setting* set_ptr)
 {
 	if(set_ptr->handler) {
-		set_ptr->handler(cmdparams);
+		set_ptr->handler(cmdparams, SET_CHANGE);
 	}
 	return NS_SUCCESS;
 }
@@ -1031,7 +1031,7 @@ bot_cmd_set (CmdParams * cmdparams)
 		/* Call back after SET so that a module can "react" to a change in a setting */
 		if(set_ptr->type != SET_TYPE_CUSTOM) {
 			if(set_ptr->handler) {
-				set_ptr->handler(cmdparams);
+				set_ptr->handler(cmdparams, SET_CHANGE);
 			}
 		}
 		return NS_SUCCESS;
@@ -1169,33 +1169,53 @@ int del_all_bot_settings (Bot *bot_ptr)
 	return NS_SUCCESS;
 }
 
-int bot_set_nick_cb(CmdParams* cmdparams)
+int bot_set_nick_cb(CmdParams* cmdparams, SET_REASON reason)
 {
+	/* Ignore bootup callback */
+	if (reason == SET_LOAD) {
+		return NS_SUCCESS;
+	}
 	irc_nickchange(cmdparams->bot, cmdparams->av[1]);
 	return NS_SUCCESS;
 }
 
-int bot_set_altnick_cb(CmdParams* cmdparams)
+int bot_set_altnick_cb(CmdParams* cmdparams, SET_REASON reason)
 {
+	/* Ignore bootup callback */
+	if (reason == SET_LOAD) {
+		return NS_SUCCESS;
+	}
 	return NS_SUCCESS;
 }
 
-int bot_set_user_cb(CmdParams* cmdparams)
+int bot_set_user_cb(CmdParams* cmdparams, SET_REASON reason)
 {
+	/* Ignore bootup callback */
+	if (reason == SET_LOAD) {
+		return NS_SUCCESS;
+	}
 	irc_setident (cmdparams->bot, cmdparams->av[1]);
 	return NS_SUCCESS;
 }
 
-int bot_set_host_cb(CmdParams* cmdparams)
+int bot_set_host_cb(CmdParams* cmdparams, SET_REASON reason)
 {
+	/* Ignore bootup callback */
+	if (reason == SET_LOAD) {
+		return NS_SUCCESS;
+	}
 	irc_sethost (cmdparams->bot, cmdparams->av[1]);
 	return NS_SUCCESS;
 }
 
-int bot_set_realname_cb(CmdParams* cmdparams)
+int bot_set_realname_cb(CmdParams* cmdparams, SET_REASON reason)
 {
 	char *buf;
 
+	/* Ignore bootup callback */
+	if (reason == SET_LOAD) {
+		return NS_SUCCESS;
+	}
 	buf = joinbuf(cmdparams->av, cmdparams->ac, 1);
 	irc_setname(cmdparams->bot, buf);
 	sfree(buf);

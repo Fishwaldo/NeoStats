@@ -24,14 +24,12 @@
 #ifndef _CHANS_H_
 #define _CHANS_H_
 
-void ChanDump (const char *chan);
+void ChanDump (CmdParams* cmdparams, const char *chan);
 void part_chan (Client * u, const char *chan, const char* reason);
 void PartAllChannels (Client * u, const char* reason);
 void join_chan (const char* nick, const char *chan);
 void ChanNickChange (Channel * c, const char *newnick, const char *oldnick);
-EXPORTFUNC int ChanMode (char *origin, char **av, int ac);
 void ChanTopic (const char* chan, const char *owner, const char* ts, const char *topic);
-void ChanUserMode (const char* chan, const char* nick, int add, long mode);
 void kick_chan (const char *kickby, const char *chan, const char *kicked, const char *kickreason);
 void SetChanTS (Channel * c, const time_t tstime);
 int InitChannels (void);

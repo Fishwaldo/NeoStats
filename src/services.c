@@ -290,7 +290,7 @@ ns_userdump (CmdParams* cmdparams)
 	   	return NS_FAILURE;
 	}
 #endif
-	UserDump ((cmdparams->ac < 1)? NULL : cmdparams->av[0]);
+	UserDump (cmdparams, (cmdparams->ac < 1)? NULL : cmdparams->av[0]);
    	return NS_SUCCESS;
 }
 
@@ -332,7 +332,7 @@ ns_chandump (CmdParams* cmdparams)
 	   	return NS_FAILURE;
 	}
 #endif
-	ChanDump ((cmdparams->ac < 1)? NULL : cmdparams->av[0]);
+	ChanDump (cmdparams, (cmdparams->ac < 1)? NULL : cmdparams->av[0]);
    	return NS_SUCCESS;
 }
 

@@ -616,10 +616,16 @@ ModuleConfig(bot_setting* set_ptr)
 					if (GetConf((void *)set_ptr->varptr, CFGBOOL, set_ptr->confitem) <= 0) {
 						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
 					}
+					if(set_ptr->handler) {
+						set_ptr->handler(NULL, SET_LOAD);
+					}
 					break;
 				case SET_TYPE_INT:
 					if (GetConf((void *)set_ptr->varptr, CFGINT, set_ptr->confitem) <= 0) {
 						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
+					}
+					if(set_ptr->handler) {
+						set_ptr->handler(NULL, SET_LOAD);
 					}
 					break;
 				case SET_TYPE_STRING:
@@ -637,10 +643,13 @@ ModuleConfig(bot_setting* set_ptr)
 						strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
 						
 					}
+					if(set_ptr->handler) {
+						set_ptr->handler(NULL, SET_LOAD);
+					}
 					break;			
 				case SET_TYPE_CUSTOM:
 					if(set_ptr->handler) {
-						set_ptr->handler(NULL);
+						set_ptr->handler(NULL, SET_LOAD);
 					}
 					break;
 				default:

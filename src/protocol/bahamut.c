@@ -103,14 +103,14 @@ ircd_cmd cmd_list[] = {
 	{0, 0, 0, 0},
 };
 
-cumode_init chan_umodes[] = {
-	{'o', CUMODE_CHANOP, '@'},
-	{'v', CUMODE_VOICE, '+'},
+mode_init chan_umodes[] = {
+	{'o', CUMODE_CHANOP, 0, '@'},
+	{'v', CUMODE_VOICE, 0, '+'},
 /* CMODE_DEOPPED */
 	{0, 0, 0},
 };
 
-cmode_init chan_modes[] = {
+mode_init chan_modes[] = {
  	{'p', CMODE_PRIVATE, 0},
 	{'s', CMODE_SECRET, 0},
 	{'m', CMODE_MODERATED, 0},
@@ -129,7 +129,7 @@ cmode_init chan_modes[] = {
 	{0, 0, 0},
 };
 
-umode_init user_umodes[] = {
+mode_init user_umodes[] = {
 	{'a', UMODE_SADMIN},
 	{'A', UMODE_ADMIN},
 	{'o', UMODE_OPER},

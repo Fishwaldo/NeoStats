@@ -40,34 +40,18 @@ typedef struct ircd_cmd{
 	unsigned int usage;
 }ircd_cmd;
 
-typedef struct cmode_init {
-	unsigned char modechar;
-	unsigned int mode;
-	unsigned int flags;
-} cmode_init;
-
-typedef struct ChanModes {
-	unsigned int mode;
+typedef struct mode_init {
+	unsigned char mode;
+	unsigned int mask;
 	unsigned int flags;
 	unsigned char sjoin;
-} ChanModes;
+} mode_init;
 
-typedef struct cumode_init {
-	unsigned char modechar;
-	unsigned int mode;
+typedef struct mode_data {
+	unsigned int mask;
+	unsigned int flags;
 	unsigned char sjoin;
-} cumode_init;
-
-typedef struct umode_init {
-	unsigned char modechar;
-	unsigned int umode;
-	unsigned int flags;
-} umode_init;
-
-typedef struct UserModes {
-	unsigned int umode;
-	unsigned int flags;
-} UserModes;
+} mode_data;
 
 typedef struct ircd_server {
 	int burst;
@@ -96,16 +80,16 @@ typedef struct ProtocolInfo {
 } ProtocolInfo;
 
 #ifdef NEOSTATSCORE
-extern cumode_init* chan_umodes;
-extern cmode_init* chan_modes;
-extern umode_init* user_umodes;
-extern umode_init* user_smodes;
+extern mode_init* chan_umodes;
+extern mode_init* chan_modes;
+extern mode_init* user_umodes;
+extern mode_init* user_smodes;
 #else
 MODULEVAR extern ircd_cmd cmd_list[];
-MODULEVAR extern cumode_init chan_umodes[];
-MODULEVAR extern cmode_init chan_modes[];
-MODULEVAR extern umode_init user_umodes[];
-MODULEVAR extern umode_init user_smodes[];
+MODULEVAR extern mode_init chan_umodes[];
+MODULEVAR extern mode_init chan_modes[];
+MODULEVAR extern mode_init user_umodes[];
+MODULEVAR extern mode_init user_smodes[];
 #endif
 
 EXPORTVAR extern ircd_server ircd_srv;

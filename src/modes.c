@@ -24,23 +24,41 @@
 #include "neostats.h"
 #include "ircd.h"
 #include "modes.h"
+#include "services.h"
+#include "users.h"
+#include "channels.h"
+#include "modules.h"
 
 unsigned char UmodeChRegNick = 'r';
-static char UmodeStringBuf[64];
-static char SmodeStringBuf[64];
+static char ModeStringBuf[64];
 unsigned int ircd_supported_umodes = 0;
 unsigned int ircd_supported_smodes = 0;
-cumode_init* chan_umodes;
-cmode_init* chan_modes;
-umode_init* user_umodes;
-umode_init* user_smodes;
-ChanModes ircd_cmodes[MODE_TABLE_SIZE];
-UserModes ircd_umodes[MODE_TABLE_SIZE];
-UserModes ircd_smodes[MODE_TABLE_SIZE];
+unsigned int ircd_supported_cmodes = 0;
+unsigned int ircd_supported_cumodes = 0;
+mode_init* chan_umodes;
+mode_init* chan_modes;
+mode_init* user_umodes;
+mode_init* user_smodes;
+
+static mode_data ircd_cmodes[MODE_TABLE_SIZE];
+static mode_data ircd_umodes[MODE_TABLE_SIZE];
+static mode_data ircd_smodes[MODE_TABLE_SIZE];
+
+static char ircd_cmode_char_map[32];
+static char ircd_umode_char_map[32];
+static char ircd_smode_char_map[32];
+
+/** @brief ModesParm structure
+ *  
+ */
+typedef struct ModesParm {
+	unsigned int mask;
+	char param[PARAMSIZE];
+} ModesParm;
 
 typedef struct ModeDesc {
 	unsigned int mask;
-	const char * desc;
+	const char *desc;
 } ModeDesc;
 
 static ModeDesc UmodeDesc[] = {
@@ -90,64 +108,58 @@ static ModeDesc SmodeDesc[] = {
  *
  * @return 
  */
+unsigned int
+BuildModeTable (char *mode_char_map, mode_data * dest, mode_init * src, unsigned int flagall)
+{
+	unsigned int maskall;
+
+	while(src->mode) 
+	{
+		dlog(DEBUG4, "Adding mode %c", src->mode);
+		dest[(int)src->mode].mask = src->mask;
+		dest[(int)src->mode].flags = src->flags;
+		dest[(int)src->mode].flags |= flagall;
+		dest[(int)src->mode].sjoin = src->sjoin;
+		/* Build supported modes mask */
+		maskall |= src->mask;
+		src ++;
+	}
+	return maskall;
+}
+
+/** @brief InitIrcdModes
+ *
+ *  Build internal mode tables by translating the protocol information
+ *  into a faster indexed lookup table
+ *
+ * @return 
+ */
 int
 InitIrcdModes (void)
 {
-	cmode_init* cmodes;
-	cumode_init* cumodes;
-	umode_init* umodes;
-	umode_init* smodes;
-
 	/* build cmode lookup table */
 	memset(&ircd_cmodes, 0, sizeof(ircd_cmodes));
-	cmodes = chan_modes;
-	while(cmodes->modechar) 
-	{
-		dlog(DEBUG4, "Adding channel mode %c", cmodes->modechar);
-		ircd_cmodes[(int)cmodes->modechar].mode = cmodes->mode;
-		ircd_cmodes[(int)cmodes->modechar].flags = cmodes->flags;
-		cmodes ++;
-	}
-	cumodes = chan_umodes;
-	while(cumodes->modechar) 
-	{
-		dlog(DEBUG4, "Adding channel user mode %c", cumodes->modechar);
-		ircd_cmodes[(int)cumodes->modechar].mode = cumodes->mode;
-		ircd_cmodes[(int)cumodes->modechar].sjoin = cumodes->sjoin;
-		ircd_cmodes[(int)cmodes->modechar].flags = NICKPARAM;
-		cumodes ++;
-	}
+	dlog(DEBUG4, "Build channel mode table...");
+	ircd_supported_cmodes = BuildModeTable (ircd_cmode_char_map, ircd_cmodes, chan_modes, 0);
+	/* build cumode lookup table */
+	dlog(DEBUG4, "Build channel user mode table...");
+	ircd_supported_cumodes = BuildModeTable (ircd_cmode_char_map, ircd_cmodes, chan_umodes, NICKPARAM);
 	/* build umode lookup table */
 	memset(&ircd_umodes, 0, sizeof(ircd_umodes));
-	umodes = user_umodes;
-	while(umodes->modechar) 
-	{	
-		dlog(DEBUG4, "Adding user mode %c", umodes->modechar);
-		ircd_umodes[(int)umodes->modechar].umode = umodes->umode;
-		ircd_umodes[(int)umodes->modechar].flags = umodes->flags;
-		/* Build supported modes mask */
-		ircd_supported_umodes |= umodes->umode;
-		if(umodes->umode&UMODE_REGNICK) {
-			UmodeChRegNick = umodes->modechar;
-		}
-		umodes ++;
-	}
+	dlog(DEBUG4, "Build user mode table...");
+	ircd_supported_umodes = BuildModeTable (ircd_umode_char_map, ircd_umodes, user_umodes, 0);
 	/* build smode lookup table */
-	memset(&ircd_smodes, 0, sizeof(ircd_smodes));
-	smodes = user_smodes;
-	if(smodes) {
-		while(umodes->modechar) 
-		{
-			dlog(DEBUG4, "Adding user smode %c", smodes->modechar);
-			ircd_smodes[(int)smodes->modechar].umode = smodes->umode;
-			ircd_smodes[(int)smodes->modechar].flags = smodes->flags;
-			/* Build supported smodes mask */
-			ircd_supported_umodes |= umodes->umode;
-			smodes ++;
-		}
+	if (user_smodes) {
+		memset(&ircd_smodes, 0, sizeof(ircd_smodes));
+		dlog(DEBUG4, "Build user smode table...");
+		ircd_supported_smodes = BuildModeTable (ircd_smode_char_map, ircd_smodes, user_smodes, 0);
+	}
+	/* Check for registered nick support */
+	if(ircd_supported_umodes & UMODE_REGNICK) {
+		UmodeChRegNick = UmodeMaskToChar(UMODE_REGNICK);
 	}
 	/* preset our umode mask so we do not have to calculate in real time */
-	me.servicesumodemask = UmodeStringToMask(me.servicesumode, 0);
+	me.servicesumodemask = UmodeStringToMask(me.servicesumode);
 	return NS_SUCCESS;
 };
 
@@ -157,21 +169,21 @@ InitIrcdModes (void)
  *
  * @return 
  */
-char* 
-UmodeMaskToString(const long Umode) 
+char *
+ModeMaskToString (mode_data* mode_table, const long mask) 
 {
 	int i, j;
 
-	UmodeStringBuf[0] = '+';
+	ModeStringBuf[0] = '+';
 	j = 1;
 	for (i = 0; i < MODE_TABLE_SIZE; i++) {
-		if (Umode & ircd_umodes[i].umode) {
-			UmodeStringBuf[j] = i;
+		if (mask & mode_table[i].mask) {
+			ModeStringBuf[j] = i;
 			j++;
 		}
 	}
-	UmodeStringBuf[j] = '\0';
-	return UmodeStringBuf;
+	ModeStringBuf[j] = '\0';
+	return ModeStringBuf;
 }
 
 /** @brief UmodeStringToMask
@@ -180,14 +192,15 @@ UmodeMaskToString(const long Umode)
  *
  * @return 
  */
-long
-UmodeStringToMask(const char* UmodeString, long Umode)
+unsigned int 
+ModeStringToMask (mode_data* mode_table, const char *ModeString)
 {
+	unsigned int Umode = 0;
 	int add = 0;
-	char* tmpmode;
+	char *tmpmode;
 
-	/* Walk through mode string and convert to umode */
-	tmpmode = (char*)UmodeString;
+	/* Walk through mode string and convert to mask */
+	tmpmode = (char*)ModeString;
 	while (*tmpmode) {
 		switch (*tmpmode) {
 		case '+':
@@ -198,16 +211,40 @@ UmodeStringToMask(const char* UmodeString, long Umode)
 			break;
 		default:
 			if (add) {
-				Umode |= ircd_umodes[(int)*tmpmode].umode;
+				Umode |= mode_table[(int)*tmpmode].mask;
 				break;
 			} else {
-				Umode &= ~ircd_umodes[(int)*tmpmode].umode;
+				Umode &= ~mode_table[(int)*tmpmode].mask;
 				break;
 			}
 		}
 		tmpmode++;
 	}
 	return Umode;
+}
+
+/** @brief UmodeMaskToString
+ *
+ *  Translate a mode mask to the string equivalent
+ *
+ * @return 
+ */
+char *
+UmodeMaskToString(const unsigned int Umode) 
+{
+	return ModeMaskToString(ircd_umodes, Umode);
+}
+
+/** @brief UmodeStringToMask
+ *
+ *  Translate a mode string to the mask equivalent
+ *
+ * @return 
+ */
+unsigned int
+UmodeStringToMask(const char *UmodeString)
+{
+	return ModeStringToMask (ircd_umodes, UmodeString);
 }
 
 /** @brief SmodeMaskToString
@@ -216,21 +253,10 @@ UmodeStringToMask(const char* UmodeString, long Umode)
  *
  * @return 
  */
-char* 
-SmodeMaskToString(const long Smode) 
+char *
+SmodeMaskToString(const unsigned int Smode) 
 {
-	int i, j;
-
-	SmodeStringBuf[0] = '+';
-	j = 1;
-	for (i = 0; i < MODE_TABLE_SIZE; i++) {
-		if (Smode & ircd_smodes[i].umode) {
-			SmodeStringBuf[j] = i;
-			j++;
-		}
-	}
-	SmodeStringBuf[j] = '\0';
-	return SmodeStringBuf;
+	return ModeMaskToString(ircd_smodes, Smode);
 }
 
 /** @brief SmodeStringToMask
@@ -239,91 +265,136 @@ SmodeMaskToString(const long Smode)
  *
  * @return 
  */
-long
-SmodeStringToMask(const char* SmodeString, long Smode)
+unsigned int
+SmodeStringToMask (const char *SmodeString)
 {
-	int add = 0;
-	char* tmpmode;
-
-	/* Walk through mode string and convert to smode */
-	tmpmode = (char*)SmodeString;
-	while (*tmpmode) {
-		switch (*tmpmode) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			if (add) {
-				Smode |= ircd_smodes[(int)*tmpmode].umode;
-				break;
-			} else {
-				Smode &= ~ircd_smodes[(int)*tmpmode].umode;
-				break;
-			}
-		}
-		tmpmode++;
-	}
-	return Smode;
+	return ModeStringToMask (ircd_smodes, SmodeString);
 }
 
-/** @brief CUmodeStringToMask
+/** @brief CmodeStringToMask
  *
  *  Translate a mode string to the mask equivalent
  *
  * @return 
  */
-long
-CUmodeStringToMask (const char* UmodeString, long Umode)
+unsigned int
+CmodeStringToMask (const char *UmodeString)
 {
-	int add = 0;
-	char* tmpmode;
-
-	/* Walk through mode string and convert to umode */
-	tmpmode = (char*)UmodeString;
-	while (*tmpmode) {
-		switch (*tmpmode) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			if (add) {
-				Umode |= ircd_cmodes[(int)*tmpmode].mode;
-				break;
-			} else {
-				Umode &= ~ircd_cmodes[(int)*tmpmode].mode;
-				break;
-			}
-		}
-		tmpmode++;
-	}
-	return Umode;
+	return ModeStringToMask (ircd_cmodes, UmodeString);
 }
+
+char *CmodeMaskToString (const unsigned int mask)
+{
+	return ModeMaskToString (ircd_cmodes, mask);
+}
+
+char *CmodeMaskToPrefixString (const unsigned int mask)
+{
+	int i, j;
+
+	ModeStringBuf[0] = '+';
+	j = 1;
+	for (i = 0; i < MODE_TABLE_SIZE; i++) {
+		if (mask & ircd_cmodes[i].mask) {
+			ModeStringBuf[j] = ircd_cmodes[i].sjoin;
+			j++;
+		}
+	}
+	ModeStringBuf[j] = '\0';
+	return ModeStringBuf;
+}
+
 
 int IsBotMode (const char mode)
 {
-	if(ircd_umodes[(int)mode].umode & UMODE_BOT) {
+	if(ircd_umodes[(int)mode].mask & UMODE_BOT) {
 		return NS_TRUE;
 	}
 	return NS_FALSE;
 }
 
-int GetUmodeMask (const char mode)
+int UmodeCharToMask (const char mode)
 {
-	return ircd_umodes[(int)mode].umode;
+	return ircd_umodes[(int)mode].mask;
 }
 
-int GetSmodeMask (const char mode)
+int SmodeCharToMask (const char mode)
 {
-	return ircd_smodes[(int)mode].umode;
+	return ircd_smodes[(int)mode].mask;
 }
 
-const char * GetUmodeDesc (const unsigned int mask)
+int CmodeCharToMask (const char mode)
+{
+	return ircd_cmodes[(int)mode].mask;
+}
+
+int CmodeCharToFlags (const char mode)
+{
+	return ircd_cmodes[(int)mode].flags;
+}
+
+char ModeMaskToChar (char *mode_char_map, unsigned int mask)
+{
+    int bitcount = 0;
+	
+	while (mask >>= 1) {
+		bitcount ++;
+	}
+    return mode_char_map[bitcount];
+}
+
+char UmodeMaskToChar (const unsigned int mask)
+{
+	return ModeMaskToChar (ircd_umode_char_map, mask);
+}
+
+char SmodeMaskToChar (const unsigned int mask)
+{
+	return ModeMaskToChar (ircd_smode_char_map, mask);
+}
+
+char CmodeMaskToChar (const unsigned int mask)
+{
+	return ModeMaskToChar (ircd_cmode_char_map, mask);
+}
+
+unsigned int CmodePrefixToMask (const char prefix)
+{
+	int i;
+
+	for (i = 0; i < MODE_TABLE_SIZE; i++)
+	{
+		if (ircd_cmodes[i].sjoin == prefix) {
+			return ircd_cmodes[i].mask;
+		}
+	}
+	return 0;
+}
+
+char CmodePrefixToChar (const char prefix)
+{
+	int i;
+
+	for (i = 0; i < MODE_TABLE_SIZE; i++)
+	{
+		if (ircd_cmodes[i].sjoin == prefix) {
+			return i;
+		}
+	}
+	return 0;
+}
+
+char CmodeMaskToPrefix (const unsigned int mask)
+{
+	return ircd_cmodes[(int) ModeMaskToChar (ircd_umode_char_map, mask)].sjoin;
+}
+
+char CmodeCharToPrefix (const char mode)
+{
+	return (ircd_cmodes[(int)mode].sjoin);
+}
+
+const char *GetUmodeDesc (const unsigned int mask)
 {
 	ModeDesc* entry;
 
@@ -337,7 +408,7 @@ const char * GetUmodeDesc (const unsigned int mask)
 	return NULL;
 }
 
-const char * GetSmodeDesc (const unsigned int mask)
+const char *GetSmodeDesc (const unsigned int mask)
 {
 	ModeDesc* entry;
 
@@ -351,3 +422,276 @@ const char * GetSmodeDesc (const unsigned int mask)
 	return NULL;
 }
 
+/** @brief Check if a mode is set on a Channel
+ * 
+ * used to check if a mode is set on a channel
+ * 
+ * @param c channel to check
+ * @param mode is the mode to check, as a LONG
+ *
+ * @returns 1 on match, 0 on no match, -1 on error
+ *
+*/
+int
+CheckChanMode (Channel *c, const unsigned int mask)
+{
+	ModesParm *m;
+	lnode_t *mn;
+
+	if (!c) {
+		nlog (LOG_WARNING, "CheckChanMode: tied to check modes of empty channel");
+		return -1;
+	}
+	if (c->modes & mask) {
+		/* its a match */
+		return 1;
+	}
+	/* if we get here, we have to check the modeparm list first */
+	mn = list_first (c->modeparms);
+	while (mn) {
+		m = lnode_get (mn);
+		if (m->mask & mask) {
+			/* its a match */
+			return 1;
+		}
+		mn = list_next (c->modeparms, mn);
+	}
+	return 0;
+}
+
+
+/** @brief Compare channel modes from the channel hash
+ *
+ * used in mode_data to compare modes (list_find argument)
+ *
+ * @param v actually its a ModeParm struct
+ * @param mask is the mode as a long
+ *
+ * @return 0 on match, 1 otherwise.
+*/
+
+static int
+comparemode (const void *v, const void *mask)
+{
+	ModesParm *m = (void *) v;
+
+	if (m->mask == (unsigned int) mask) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+/** @brief Process a mode change on a channel
+ *
+ * process a mode change on a channel adding and deleting modes as required
+ *
+ * @param origin usually the server that sent the mode change. Not used
+ * @param av array of variables to pass
+ * @param ac number of variables n av
+ *
+ * @return 0 on error, number of modes processed on success.
+*/
+
+int ChanModeHandler (Channel* c, char *modes, int j, char **av, int ac)
+{
+	int modeexists;
+	ModesParm *m;
+	lnode_t *mn;
+	int add = 0;
+
+	while (*modes) {
+		unsigned int mask;
+		unsigned int flags;      
+
+		mask = CmodeCharToMask (*modes);
+		flags = CmodeCharToFlags (*modes);
+
+		switch (*modes) {
+		case '+':
+			add = 1;
+			break;
+		case '-':
+			add = 0;
+			break;
+		default:
+			if (flags&NICKPARAM) {
+				ChanUserMode (av[0], av[j], add, mask);
+				j++;
+			} else if (add) {
+				/* mode limit and mode key replace current values */
+				if (mask == CMODE_LIMIT) {
+					c->limit = atoi(av[j]);
+					j++;
+				} else if (mask == CMODE_KEY) {
+					strlcpy (c->key, av[j], KEYLEN);
+					j++;
+				} else if (flags) {
+					mn = list_first (c->modeparms);
+					modeexists = 0;
+					while (mn) {
+						m = lnode_get (mn);
+						if ((m->mask == mask) && !ircstrcasecmp (m->param, av[j])) {
+							dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", *modes, av[j]);
+							j++;
+							modeexists = 1;
+							break;
+						}
+						mn = list_next (c->modeparms, mn);
+					}
+					if (modeexists != 1) {
+						m = smalloc (sizeof (ModesParm));
+						m->mask = mask;
+						strlcpy (m->param, av[j], PARAMSIZE);
+						if (list_isfull (c->modeparms)) {
+							nlog (LOG_CRITICAL, "ChanMode: modelist is full adding to channel %s", c->name);
+							do_exit (NS_EXIT_ERROR, "List full - see log file");
+						}
+						lnode_create_append (c->modeparms, m);
+						j++;
+					}
+				} else {
+					c->modes |= mask;
+				}
+			} else {
+				if(mask == CMODE_LIMIT) {
+					c->limit = 0;
+				} else if (mask == CMODE_KEY) {
+					c->key[0] = 0;
+					j++;
+				} else if (flags) {
+					mn = list_find (c->modeparms, (void *) mask, comparemode);
+					if (!mn) {
+						dlog(DEBUG1, "ChanMode: can't find mode %c for channel %s", *modes, c->name);
+					} else {
+						list_delete (c->modeparms, mn);
+						m = lnode_get (mn);
+						lnode_destroy (mn);
+						sfree (m);
+					}
+				} else {
+					c->modes &= ~mask;
+				}
+			}
+		}
+		modes++;
+	}
+	return j;
+}
+
+int
+ChanMode (char *origin, char **av, int ac)
+{
+	Channel *c;
+	CmdParams * cmdparams;
+	int j = 2;
+	int i;
+
+	c = find_chan (av[0]);
+	if (!c) {
+		return 0;
+	}
+	
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->channel = c;
+	AddStringToList(&cmdparams->av, origin, &cmdparams->ac);
+	for (i = 0; i < ac; i++) {
+		AddStringToList(&cmdparams->av, av[i], &cmdparams->ac);	
+	}
+	SendAllModuleEvent(EVENT_CHANMODE, cmdparams);
+	sfree(cmdparams);	
+
+	j = ChanModeHandler (c, av[1], j, av, ac);
+
+	return j;
+}
+
+/** @brief Process a mode change that affects a user on a channel
+ *
+ * process a mode change on a channel that affects a user
+ *
+ * @param c Channel Struct of channel mode being changed
+ * @param u User struct of user that mode is affecting
+ * @param add 1 means add, 0 means remove mode
+ * @param mask is the long int of the mode
+ *
+ * @return Nothing
+*/
+
+void
+ChanUserMode (const char *chan, const char *nick, int add, const unsigned int mask)
+{
+	Chanmem *cm;
+	Channel *c;
+	Client *u;
+
+	u = find_user(nick);
+	if (!u) {
+		nlog (LOG_WARNING, "ChanUserMode: can't find user %s", nick);
+		return;
+	}
+	c = find_chan(chan);
+	if (!c) {
+		nlog (LOG_WARNING, "ChanUserMode: can't find channel %s", chan);
+		return;
+	}
+	cm = lnode_find (c->chanmembers, u->name, comparef);
+	if (!cm) {
+		nlog (LOG_WARNING, "ChanUserMode: %s is not a member of channel %s", u->name, c->name);
+		return;
+	}
+	if (add) {
+		dlog(DEBUG2, "ChanUserMode: Adding mode %ld to Channel %s User %s", mask, c->name, u->name);
+		cm->flags |= mask;
+	} else {
+		dlog(DEBUG2, "ChanUserMode: Deleting Mode %ld to Channel %s User %s", mask, c->name, u->name);
+		cm->flags &= ~mask;
+	}
+}
+
+void 
+dumpchanmodes (CmdParams* cmdparams, Channel* c)
+{
+	lnode_t *cmn;
+	ModesParm *m;
+	int i;
+
+	irc_prefmsg (ns_botptr, cmdparams->source, "Mode:       %s", UmodeMaskToString (c->modes));
+	cmn = list_first (c->modeparms);
+	while (cmn) {
+		m = lnode_get (cmn);
+		for (i = 0; i < MODE_TABLE_SIZE; i++) {
+			if (m->mask & ircd_cmodes[i].mask) {
+				irc_prefmsg (ns_botptr, cmdparams->source, "Modes:      %c Parms %s", i, m->param);
+			}
+		}
+		cmn = list_next (c->modeparms, cmn);
+	}
+
+}
+
+#ifdef SQLSRV
+
+/* display the channel modes */
+/* BUFSIZE is probably too small.. oh well */
+static char chanmodes[BUFSIZE];
+
+void *display_chanmodes (void *tbl, char *col, char *sql, void *row) 
+{
+	Channel *c = row;
+	lnode_t *cmn;
+	char tmp[BUFSIZE];
+	ModesParm *m;
+	
+	strlcpy (chanmodes, CmodeMaskToString (c->modes), BUFSIZE);
+	cmn = list_first (c->modeparms);
+	while (cmn) {
+		m = lnode_get (cmn);	
+		ircsnprintf(tmp, BUFSIZE, " +%c %s", CmodeMaskToChar (m->mask), m->param);
+		strlcat(chanmodes, tmp, BUFSIZE);
+		cmn = list_next (c->modeparms, cmn);
+	}
+	return chanmodes;
+}
+
+#endif
