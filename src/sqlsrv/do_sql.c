@@ -21,6 +21,8 @@
 #include "do_sql.h"
 #include "list.h"
 #include "hash.h"
+#include "neostats.h"
+#include "log.h"
 
 struct Sql_Cmd cmd;
 

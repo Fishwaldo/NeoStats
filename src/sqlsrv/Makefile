@@ -1,7 +1,7 @@
 include ../Makefile.inc
 
 OBJS   = api.o token.o parse.tab.o do_sql.o rtatables.o
-SQLINCLUDES = -I. -I..
+SQLINCLUDES = -I. -I.. -I../pcre -I../adns
 LIBS   = 
 
 all: librtadb.a
