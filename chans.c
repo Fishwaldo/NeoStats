@@ -831,6 +831,10 @@ findchan (char *chan)
 	Chans *c;
 	hnode_t *cn;
 	SET_SEGV_LOCATION();
+	if (chan == "#") {
+		nlog (LOG_DEBUG3, LOG_CORE, "FindChan(%s) -> Trying to  find a null channel",chan);
+		return NULL;
+	}
 	cn = hash_lookup (ch, chan);
 	if (cn) {
 		c = hnode_get (cn);
