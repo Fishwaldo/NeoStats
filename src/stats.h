@@ -76,25 +76,25 @@
 #include "events.h"
 
 #if UNREAL == 1
-#include "Unreal.h"
+#include "protocol/unreal.h"
 #elif ULTIMATE == 1
-#include "Ultimate.h"
+#include "protocol/ultimate.h"
 #elif HYBRID7 == 1	
-#include "hybrid7.h"
+#include "protocol/hybrid7.h"
 #elif NEOIRCD == 1
-#include "neoircd.h"
+#include "protocol/neoircd.h"
 #elif MYSTIC == 1
-#include "mystic.h" 
+#include "protocol/mystic.h" 
 #elif IRCU == 1
-#include "Ircu.h"
+#include "protocol/ircu.h"
 #elif BAHAMUT == 1
-#include "Bahamut.h"
+#include "protocol/bahamut.h"
 #elif QUANTUM == 1
-#include "QuantumIRCd.h"
+#include "protocol/quantum.h"
 #elif LIQUID == 1
-#include "liquidircd.h"
+#include "protocol/liquidircd.h"
 #elif VIAGRA == 1 
-#include "Viagra.h"
+#include "protocol/viagra.h"
 #else
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
