@@ -108,8 +108,23 @@ ChanModes chan_modes[] = {
 	{CMODE_KEY, 'k', 0, 1, 0},
 	{CMODE_BAN, 'b', 0, 1, 0},
 	/*{CMODE_SENDTS, 'b', 0, 1, 0},*/
+#if ( defined NEFARIOUS ) || (defined ASUKA )
+	{CMODE_NOCOLOUR, 'c', 0, 0, 0},
+	{CMODE_NOCTCP, 'C', 0, 0, 0},
+	{CMODE_NONOTICE, 'N', 0, 0, 0},
+#endif
 #ifdef ASUKA
-	{CMODE_DELAYJOINS, 'D', 0, 1, 0},
+	{CMODE_DELJOINS, 'D', 0, 1, 0},
+	{CMODE_NOQUITPARTS, 'u', 0, 0, 0},
+	{CMODE_WASDELJOIN, 'd', 0, 0, 0},
+#endif
+#ifdef NEFARIOUS
+	{CMODE_NOQUITPARTS, 'Q', 0, 0, 0},
+	{CMODE_SSLONLY, 'z', 0, 0, 0},
+	{CMODE_ACCONLY, 'M', 0, 0, 0},
+	{CMODE_OPERONLY, 'O', 0, 0, 0},
+	{CMODE_STRIP, 'S', 0, 0, 0},
+	{CMODE_NOAMSG, 'T', 0, 0, 0},
 #endif
 	/*{CMODE_LISTED, 'b', 0, 1, 0},*/
 	{CMODE_REGONLY, 'r', 0, 0, 0},

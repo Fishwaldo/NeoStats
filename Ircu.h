@@ -289,10 +289,29 @@
 #define CMODE_LIMIT		0x0400
 #define CMODE_SENDTS	0x0800	
 #ifdef ASUKA
-#define CMODE_DELAYJOINS 0x1000
+#define CMODE_DELJOINS 0x1000
 #endif
 #define CMODE_LISTED	0x10000
 #define CMODE_REGONLY	0x20000
+#if ( defined NEFARIOUS ) || (defined ASUKA )
+#define CMODE_NOCOLOUR	0x40000
+#define CMODE_NOCTCP	0x80000
+#define CMODE_NONOTICE	0x100000
+#endif
+#ifdef ASUKA
+#define CMODE_NOQUITPARTS	0x200000
+#define CMODE_WASDELJOIN 0x200000
+#endif
+#ifdef NEFARIOUS
+#define CMODE_NOQUITPARTS	0x400000
+#define CMODE_SSLONLY	0x800000
+#define CMODE_ACCONLY	0x1000000
+#define CMODE_OPERONLY	0x2000000
+#define CMODE_STRIP		0x4000000
+#define CMODE_NOAMSG	0x8000000
+#endif
+
+
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))
