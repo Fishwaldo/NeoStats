@@ -36,3 +36,5 @@ Module Config File Support improvements. (I got ideas :)
 
 Re-Do the send/recv code... Its Horrible..
 
+Move all the stuff in ircd.c into relevent ircd support files. ircd.c is
+getting just way to hard to manage now
