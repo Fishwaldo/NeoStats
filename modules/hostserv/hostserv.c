@@ -222,7 +222,7 @@ static int hs_event_signon(CmdParams* cmdparams)
 static int hs_event_online(CmdParams* cmdparams)
 {
 	hs_bot = init_bot(&hs_botinfo);
-	add_timer (CleanupHosts, "CleanupHosts", 7200);
+	add_timer (TIMER_TYPE_INTERVAL, CleanupHosts, "CleanupHosts", 7200);
 	return 1;
 };
 

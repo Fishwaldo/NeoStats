@@ -23,6 +23,7 @@
 ** $Id$
 */
 
+#include "neostats.h"
 #include "statserv.h"
 
 #define IncreaseOpers(x)	(x)->opers++;		stats_network.opers++;
@@ -514,7 +515,7 @@ void StatsUserMode(Client * u, char *modes)
 void StatsUserAway(Client * u)
 {
 	SET_SEGV_LOCATION();
-	if (u->user->is_away == 1) {
+	if (u->user->is_away) {
 		stats_network.away ++;
 	} else {
 		stats_network.away --;
@@ -550,34 +551,30 @@ void StatsAddUser(Client * u)
 
 int StatsMidnight(void)
 {
-	struct tm *ltm = localtime(&me.now);
 	lnode_t *cn;
 	CStats *c;
 
 	SET_SEGV_LOCATION();
-	if (ltm->tm_hour == 0 && ltm->tm_min == 0) {
-		/* its Midnight! */
-		irc_chanalert(ss_bot, "Reset Daily Statistics - Its Midnight here!");
-		dlog(DEBUG1, "Reset Daily Statistics");
-		daily.servers = stats_network.servers;
-		daily.t_servers = me.now;
-		daily.users = stats_network.users;
-		daily.t_users = me.now;
-		daily.opers = stats_network.opers;
-		daily.t_opers = me.now;
-		daily.chans = stats_network.chans;
-		daily.t_chans = me.now;
-		ResetTLD();
-		cn = list_first(Chead);
-		while (cn) {
-			c = lnode_get(cn);
-			c->maxmemtoday = c->members;;
-			c->joinstoday = 0;
-			c->maxkickstoday = 0;
-			c->topicstoday = 0;
-			c->t_maxmemtoday = me.now;
-			cn = list_next(Chead, cn);
-		}
+	irc_chanalert (ss_bot, "Reset Daily Statistics - Its Midnight here!");
+	dlog (DEBUG1, "Reset Daily Statistics");
+	daily.servers = stats_network.servers;
+	daily.t_servers = me.now;
+	daily.users = stats_network.users;
+	daily.t_users = me.now;
+	daily.opers = stats_network.opers;
+	daily.t_opers = me.now;
+	daily.chans = stats_network.chans;
+	daily.t_chans = me.now;
+	ResetTLD ();
+	cn = list_first (Chead);
+	while (cn) {
+		c = lnode_get (cn);
+		c->maxmemtoday = c->members;;
+		c->joinstoday = 0;
+		c->maxkickstoday = 0;
+		c->topicstoday = 0;
+		c->t_maxmemtoday = me.now;
+		cn = list_next (Chead, cn);
 	}
 	return 1;
 }

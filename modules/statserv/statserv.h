@@ -26,8 +26,6 @@
 #ifndef STATSERV_H
 #define STATSERV_H
 
-#include "neostats.h"
-
 /* this is the how often to save a portion of the DB. Don't alter this unless you need to */
 /* DO NOT set PROGCHANTIME less than ((DBSAVETIME + (DBSAVETIME/2)) * 4) otherwise you will not have the enitre database progressively saved! */
 

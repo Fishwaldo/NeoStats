@@ -202,38 +202,28 @@ int FiniModules (void)
 void
 SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 {
-	ModuleEvent *ev_list;
-
 	SET_SEGV_LOCATION();
 	if (event == EVENT_ONLINE) {
 		module_ptr->synched = 1;
 	}
-	ev_list = module_ptr->event_list;
-	if (ev_list) {
-		while (ev_list->event != EVENT_NULL) {
-			/* This goes through each Command */
-			if (ev_list->event == event) {
-				/* If we are not yet synched, check that the module supports 
-				 * the event before we are synched. */
-				if (!module_ptr->synched && !(ev_list->flags & EVENT_FLAG_IGNORE_SYNCH)) {
-					dlog(DEBUG1, "Skipping module %s for event %d since module is not yet synched", module_ptr->info->name, event);
-					break;
-				}
-				dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
-				SET_SEGV_LOCATION();
-				if (setjmp (sigvbuf) == 0) {
-					SET_RUN_LEVEL(module_ptr);
-					ev_list->function (cmdparams);
-					RESET_RUN_LEVEL();
-				} else {
-					nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->name);
-				}
-				SET_SEGV_LOCATION();
-#ifndef VALGRIND
-				break;
-#endif
+	if (module_ptr->event_list) {
+		if (module_ptr->event_list[event].function) {
+			/* If we are not yet synched, check that the module supports 
+				* the event before we are synched. */
+			if (!module_ptr->synched && !(module_ptr->event_list[event].flags & EVENT_FLAG_IGNORE_SYNCH)) {
+				dlog(DEBUG1, "Skipping module %s for event %d since module is not yet synched", module_ptr->info->name, event);
+				return;
 			}
-			ev_list++;
+			dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
+			SET_SEGV_LOCATION();
+			if (setjmp (sigvbuf) == 0) {
+				SET_RUN_LEVEL(module_ptr);
+				module_ptr->event_list[event].function (cmdparams);
+				RESET_RUN_LEVEL();
+			} else {
+				nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->name);
+			}
+			SET_SEGV_LOCATION();
 		}
 	}
 }
@@ -255,7 +245,9 @@ SendAllModuleEvent (Event event, CmdParams* cmdparams)
 	hash_scan_begin (&ms, modulehash);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
-		SendModuleEvent(event, cmdparams, module_ptr);
+		if (module_ptr->event_list) {
+			SendModuleEvent(event, cmdparams, module_ptr);
+		}
 	}
 }
 
@@ -280,6 +272,56 @@ ModulesVersion (const char* nick, const char *remoteserver)
 			"Module %s version: %s %s %s",
 			module_ptr->info->name, module_ptr->info->version, 
 			module_ptr->info->build_date, module_ptr->info->build_time);
+	}
+}
+
+/** @brief 
+ *
+ * 
+ *
+ * @return none
+ */
+void RegisterEventList (Module* mod_ptr, ModuleEvent *event_ptr)
+{
+	mod_ptr->event_list = scalloc ( sizeof(ModuleEvent) * EVENT_COUNT );
+	while (event_ptr->event != EVENT_NULL) {
+		memcpy (&mod_ptr->event_list[event_ptr->event], event_ptr, sizeof(ModuleEvent));
+		event_ptr ++;
+	}
+}
+
+/** @brief 
+ *
+ * 
+ *
+ * @return none
+ */
+void RegisterEvent (Event event, event_function function, unsigned int flags)
+{
+	Module* mod_ptr;
+
+	mod_ptr = GET_CUR_MODULE();
+	if (!mod_ptr->event_list) {
+		mod_ptr->event_list = scalloc ( sizeof(ModuleEvent) * EVENT_COUNT );
+	}
+	mod_ptr->event_list[event].function = function;
+	mod_ptr->event_list[event].flags = flags;
+}
+
+/** @brief 
+ *
+ * 
+ *
+ * @return none
+ */
+void DeleteEvent (Event event)
+{
+	Module* mod_ptr;
+
+	mod_ptr = GET_CUR_MODULE();
+	if (mod_ptr->event_list) {
+		mod_ptr->event_list[event].function = NULL;
+		mod_ptr->event_list[event].flags = 0;
 	}
 }
 
@@ -378,7 +420,9 @@ load_module (const char *modfilename, Client * u)
 	dlog(DEBUG1, "Module description: %s", info_ptr->description);
 	mod_ptr->info = info_ptr;
 	mod_ptr->dl_handle = dl_handle;
-	mod_ptr->event_list = event_ptr;
+	if(event_ptr) {
+		RegisterEventList (mod_ptr, event_ptr);
+	}
 	/* Module side user authentication for SecureServ helpers */
 	mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "ModAuth");
 	/* assign a module number to this module */
@@ -471,6 +515,11 @@ unload_module (const char *modname, Client * u)
 	del_sockets (mod_ptr);
 	dlog(DEBUG1, "Deleting Module %s from Hash", modname);
 	irc_globops (NULL, "%s Module Unloaded", modname);
+	/* Delete any associated event list */
+	if (mod_ptr->event_list) {
+		sfree (mod_ptr->event_list);
+		mod_ptr->event_list = NULL;
+	}
 	/* Remove from the module hash so we dont call events for this module 
 	 * during signoff 
 	 */

@@ -37,7 +37,7 @@ static int lastservertimesync = 0;
 
 static int is_midnight (void);
 static void TimerMidnight (void);
-void run_mod_timers (void);
+static void run_mod_timers (int ismidnight);
 
 int InitTimers (void)
 {
@@ -51,18 +51,17 @@ int InitTimers (void)
 
 int FiniTimers (void)
 {
-	hash_destroy(timerhash);
+	hash_destroy (timerhash);
 	return NS_SUCCESS;
 }
 
 void
 CheckTimers (void)
 {
-	run_mod_timers();
 	SET_SEGV_LOCATION();
 	if (me.now - ping.last_sent > config.pingtime) {
 		PingServers ();
-		flush_keeper();
+		flush_keeper ();
 		ping.last_sent = me.now;
 		/* flush log files */
 		fflush (NULL);
@@ -71,25 +70,20 @@ CheckTimers (void)
 		if((me.now - lastservertimesync) > config.setservertimes) {
 			/* The above check does not need to be exact, but 
 			   setting times ought to be so reset me.now */
-			me.now = time(NULL);
+			me.now = time (NULL);
 			irc_svstime (me.now);
 			lastservertimesync = me.now;
 		}
 	}
 	if (is_midnight () == 1 && midnight == 0) {
-		TimerMidnight ();
+		run_mod_timers (1);
+		ResetLogs ();
 		midnight = 1;
 	} else {
+		run_mod_timers (0);
 		if (midnight == 1 && is_midnight () == 0)
 			midnight = 0;
 	}
-}
-
-static void
-TimerMidnight (void)
-{
-	dlog(DEBUG1, "Its midnight!!! -> %s", sctime (me.now));
-	ResetLogs ();
 }
 
 static int
@@ -97,9 +91,10 @@ is_midnight (void)
 {
 	struct tm *ltm = localtime (&me.now);
 
-	if (ltm->tm_hour == 0 && ltm->tm_min == 0)
+	if (ltm->tm_hour == 0 && ltm->tm_min == 0) {
+		dlog (DEBUG1, "Its midnight!!! -> %s", sctime (me.now));
 		return 1;
-
+	}
 	return 0;
 }
 
@@ -121,7 +116,7 @@ new_timer (const char *name)
 		nlog (LOG_WARNING, "new_timer: timer hash is full");
 		return NULL;
 	}
-	dlog(DEBUG2, "new_timer: %s", name);
+	dlog (DEBUG2, "new_timer: %s", name);
 	timer = smalloc (sizeof (Timer));
 	strlcpy (timer->name, name, MAX_MOD_NAME);
 	hnode_create_insert (timerhash, timer, name);
@@ -160,7 +155,7 @@ find_timer (const char *name)
  * @return NS_SUCCESS if added, NS_FAILURE if not 
 */
 int
-add_timer (timer_function func_name, const char *name, int interval)
+add_timer (TIMER_TYPE type, timer_function func_name, const char *name, int interval)
 {
 	Timer *timer;
 	Module* moduleptr;
@@ -173,11 +168,12 @@ add_timer (timer_function func_name, const char *name, int interval)
 	}
 	timer = new_timer (name);
 	if (timer) {
+		timer->type = type;
 		timer->interval = interval;
 		timer->lastrun = me.now;
 		timer->moduleptr = moduleptr;
 		timer->function = func_name;
-		dlog(DEBUG2, "add_timer: Module %s added timer %s", moduleptr->info->name, name);
+		dlog (DEBUG2, "add_timer: Module %s added timer %s", moduleptr->info->name, name);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -298,27 +294,40 @@ list_timers (CmdParams* cmdparams)
  * 
  * @return none
 */
-void
-run_mod_timers (void)
+static void
+run_mod_timers (int ismidnight)
 {
 	Timer *timer = NULL;
 	hscan_t ts;
 	hnode_t *tn;
 
-/* First, lets see if any modules have a function that is due to run..... */
+	/* First, lets see if any modules have a function that is due to run..... */
 	hash_scan_begin (&ts, timerhash);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
 		SET_SEGV_LOCATION();
 		timer = hnode_get (tn);
-		if (me.now - timer->lastrun > timer->interval) {
+		/* If a module is not yet synched, reset it's lastrun */
+		if (!timer->moduleptr->synched) {
+			timer->lastrun = (int) me.now;
+		} else {
+			switch (timer->type) {
+				case TIMER_TYPE_MIDNIGHT:
+					if (!ismidnight)
+						continue;
+					break;
+				case TIMER_TYPE_INTERVAL:
+					if (me.now - timer->lastrun < timer->interval) 
+						continue;
+					break;
+			}
 			if (setjmp (sigvbuf) == 0) {
-				SET_RUN_LEVEL(timer->moduleptr);
-				dlog(DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name);
+				dlog (DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name);
+				SET_RUN_LEVEL (timer->moduleptr);
 				if (timer->function () < 0) {
-					dlog(DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name);
-					hash_scan_delete(timerhash, tn);
-					hnode_destroy(tn);
-					sfree(timer);
+					dlog (DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name);
+					hash_scan_delete (timerhash, tn);
+					hnode_destroy (tn);
+					sfree (timer);
 				} else {
 					timer->lastrun = (int) me.now;
 				}

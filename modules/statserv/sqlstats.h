@@ -26,8 +26,6 @@
 #ifndef SQLSTATS_H
 #define SQLSTATS_H
 
-#include "neostats.h"
-
 /* only include the following code if SQLSRV is included */
 #ifdef SQLSRV
 

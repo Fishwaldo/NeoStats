@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-#include <stdio.h>
+#include "neostats.h"
 #include "statserv.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
@@ -151,11 +151,11 @@ static int ss_event_online(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	ss_bot = init_bot (&ss_botinfo);
 	/* now that we are online, setup the timer to save the Stats database every so often */
-	add_timer (SaveStats, "SaveStats", DBSAVETIME);
-	add_timer (ss_html, "ss_html", 3600);
+	add_timer (TIMER_TYPE_INTERVAL, SaveStats, "SaveStats", DBSAVETIME);
+	add_timer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", 3600);
 	/* also add a timer to check if its midnight (to reset the daily stats */
-	add_timer (StatsMidnight, "StatsMidnight", 60);
-	add_timer (DelOldChan, "DelOldChan", 3600);
+	add_timer (TIMER_TYPE_MIDNIGHT, StatsMidnight, "StatsMidnight", 60);
+	add_timer (TIMER_TYPE_INTERVAL, DelOldChan, "DelOldChan", 3600);
 	return 1;
 }
 

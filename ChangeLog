@@ -4,6 +4,13 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Timers now have a new type field to select the standard interval timer or 
+   a midnight timer. Other types to follow. (M).
+ - Timers now check module synched before running. (M).
+ - Event system now uses an array per module so that issuing an event is a 
+   simple (and quick) table lookup rather than parsing the whole list each 
+   time. This also makes it possible for modules to add and delete events while 
+   running. (M).
  - Core now handles synch checking for module events. If a module wants to
    receive an event before synch complete, they just add a flag into the event 
    table and the core will always pass the flagged event along. (M).

@@ -327,4 +327,9 @@ typedef enum Event {
  */
 	EVENT_DELBAN,
 
+/*  EVENT_COUNT
+ *    dummy value to provide last event number
+ */
+	EVENT_COUNT,
+
 } Event;

@@ -849,6 +849,11 @@ typedef struct Sock {
 	long rbytes;
 } Sock;
 
+typedef enum TIMER_TYPE {
+	TIMER_TYPE_INTERVAL,
+	TIMER_TYPE_MIDNIGHT,
+} TIMER_TYPE;
+
 /** @brief Module Timer structure
  * 
  */
@@ -856,11 +861,14 @@ typedef struct Timer {
 	/** Owner module ptr */
 	Module* moduleptr;
 	/** Timer type */
-	int type;
+	TIMER_TYPE type;
 	/** Timer name */
 	char name[MAX_MOD_NAME];
 	/** Timer interval */
 	int interval;
+	/** Timer at values */
+	int hours;
+	int minutes;
 	/** Time last run */
 	time_t lastrun;
 	/** Timer function */
@@ -914,7 +922,7 @@ typedef struct _Bot {
 
 EXPORTFUNC int ModuleConfig(bot_setting* bot_settings);
 
-EXPORTFUNC int add_timer (timer_function func, const char* name, int interval);
+EXPORTFUNC int add_timer (TIMER_TYPE type, timer_function func, const char* name, int interval);
 EXPORTFUNC int del_timer (const char *timer_name);
 EXPORTFUNC int set_timer_interval (const char *timer_name, int interval);
 EXPORTFUNC Timer *find_timer(const char *timer_name);
@@ -1179,6 +1187,9 @@ EXPORTFUNC void GetServerList(ServerListHandler handler);
 EXPORTFUNC hash_t * GetServerHash(void);
 
 EXPORTFUNC int HaveFeature (int mask);
+
+EXPORTFUNC void RegisterEvent (Event event, event_function function, unsigned int flags);
+EXPORTFUNC void DeleteEvent (Event event);
 
 /* 
  * Module Interface 
