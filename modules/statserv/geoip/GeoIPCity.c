@@ -20,12 +20,14 @@
 
 #include "GeoIP.h"
 #include "GeoIPCity.h"
-#ifndef WIN32
+#ifndef _WIN32
 #include <netdb.h>
-#else
-#include <winsock.h>
-#endif
 #include <netinet/in.h> /* For ntohl */
+#else
+#include <windows.h>
+#include <winsock.h>
+#define uint32_t unsigned int
+#endif
 #include <sys/types.h> /* For uint32_t */
 #ifdef HAVE_STDINT_H
 #include <stdint.h>     /* For uint32_t */
