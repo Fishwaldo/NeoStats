@@ -263,8 +263,8 @@ void AddStringToList (char ***List, char S[], int *C)
 		numargs += 8;
 		*List = ns_realloc (*List, sizeof (char *) * numargs);
 	}
+	(*List)[*C] = S;
 	++*C;
-	(*List)[*C - 1] = S;
 }
 
 /** @brief 

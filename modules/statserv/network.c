@@ -26,6 +26,8 @@
 #include "stats.h"
 #include "network.h"
 
+#define NETWORK_TABLE	"Network"
+
 networkstat networkstats;
 
 void AverageNetworkStatistics (void)
@@ -148,23 +150,23 @@ int ss_cmd_daily (CmdParams *cmdparams)
 
 void LoadNetworkStats(void) 
 {
-	LoadStatistic (&networkstats.servers, "NetStats", "Global", "servers");
-	LoadStatistic (&networkstats.channels, "NetStats", "Global", "channels");
-	LoadStatistic (&networkstats.users, "NetStats", "Global", "users");
-	LoadStatistic (&networkstats.opers, "NetStats", "Global", "opers");
-	LoadStatistic (&networkstats.kills, "NetStats", "Global", "kills");
+	LoadStatistic (&networkstats.servers, NETWORK_TABLE, "Global", "servers");
+	LoadStatistic (&networkstats.channels, NETWORK_TABLE, "Global", "channels");
+	LoadStatistic (&networkstats.users, NETWORK_TABLE, "Global", "users");
+	LoadStatistic (&networkstats.opers, NETWORK_TABLE, "Global", "opers");
+	LoadStatistic (&networkstats.kills, NETWORK_TABLE, "Global", "kills");
 }
 
 void SaveNetworkStats(void)
 {
 	/* clear the old database */
-	DelTable("NetStats");
+	DelTable(NETWORK_TABLE);
 	/* save stats */
-	SaveStatistic (&networkstats.servers, "NetStats", "Global", "servers");
-	SaveStatistic (&networkstats.channels, "NetStats", "Global", "channels");
-	SaveStatistic (&networkstats.users, "NetStats", "Global", "users");
-	SaveStatistic (&networkstats.opers, "NetStats", "Global", "opers");
-	SaveStatistic (&networkstats.kills, "NetStats", "Global", "kills");
+	SaveStatistic (&networkstats.servers, NETWORK_TABLE, "Global", "servers");
+	SaveStatistic (&networkstats.channels, NETWORK_TABLE, "Global", "channels");
+	SaveStatistic (&networkstats.users, NETWORK_TABLE, "Global", "users");
+	SaveStatistic (&networkstats.opers, NETWORK_TABLE, "Global", "opers");
+	SaveStatistic (&networkstats.kills, NETWORK_TABLE, "Global", "kills");
 }
 
 void InitNetworkStats (void)

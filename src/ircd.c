@@ -920,16 +920,10 @@ irc_nick (const char *nick, const char *user, const char *host, const char *real
 	return NS_SUCCESS;
 }
 
-/** @brief CloakBotHost
+/** @brief irc_cloakhost
  *
  *  Create a hidden hostmask for the bot 
- *  Currently only Unreal support via UMODE auto cloaking
- *  but function created for future use and propogation to
- *  external modules to avoid a future joint release.
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-/** @brief irc_cloakhost
+ *  Support is currently just via UMODE auto cloaking
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */

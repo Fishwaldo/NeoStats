@@ -45,15 +45,17 @@ typedef struct statistic {
 void AverageStatisticEntry (statisticentry *stat, unsigned int current);
 void AverageStatistic (statistic *stat);
 int AverageStatistics (void);
-void ResetStatistic (statistic *stat);
 void ResetStatisticEntry (statisticentry *stat, unsigned int current);
+void ResetStatistic (statistic *stat);
 int ResetStatistics (void);
-int IncStatistic (statistic *stat);
 int IncStatisticEntry (statisticentry *stat, unsigned int current);
-void DecStatistic (statistic *stat);
+int IncStatistic (statistic *stat);
 void DecStatisticEntry (statisticentry *stat, unsigned int current);
-void SaveStatistic (statistic *stat, char *tablename, char *entryname, char *statname);
-void LoadStatistic (statistic *stat, char *tablename, char *entryname, char *statname);
+void DecStatistic (statistic *stat);
+int SetStatisticEntry (statisticentry *stat, unsigned int current, unsigned int diff);
+int SetStatistic (statistic *stat, int current);
+void SaveStatistic (statistic *stat, char *table, char *row, char *field);
+void LoadStatistic (statistic *stat, char *table, char *row, char *field);
 
 int GetAllTimePercent (statistic *stat);
 int GetDailyPercent (statistic *stat);

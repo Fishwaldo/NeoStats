@@ -31,13 +31,13 @@ typedef struct serverstat {
 	time_t ts_lastseen;
 	statistic users;
 	statistic opers;
+	statistic operkills;
+	statistic serverkills;
+	statistic splits;
 	long lowest_ping;
 	time_t t_lowest_ping;
 	long highest_ping;
 	time_t t_highest_ping;
-	unsigned int numsplits;
-	unsigned int operkills;
-	unsigned int serverkills;
 }serverstat;
 
 extern hash_t *serverstathash;

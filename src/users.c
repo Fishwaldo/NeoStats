@@ -75,7 +75,7 @@ static void lookupnickip (char *data, adns_answer *a)
 		if (u->ip.s_addr > 0) {
 			cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 			cmdparams->source = u;	
-			SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
+			SendAllModuleEvent (EVENT_NICKIP, cmdparams);
 			ns_free (cmdparams);
 		}
 	}
@@ -88,7 +88,7 @@ static int process_ip (const char *nick, const char *host)
 	int res;
 
 	/* first, if the u->host is a ip address, just convert it */
-	ipad = ns_malloc (sizeof(struct in_addr));
+	ipad = ns_calloc (sizeof(struct in_addr));
 	res = inet_aton (host, ipad);
 	if (res > 0) {
 		/* its valid */
@@ -151,7 +151,7 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	SendAllModuleEvent (EVENT_SIGNON, cmdparams);
 	if (me.want_nickip == 1 && ipaddress != 0) {
 		/* only fire this event if we have the nickip and some module wants it */
-		SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
+		SendAllModuleEvent (EVENT_NICKIP, cmdparams);
 	}
 	ns_free (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
@@ -423,7 +423,7 @@ static void dumpuser (CmdParams *cmdparams, Client *u)
 	irc_prefmsg (ns_botptr, cmdparams->source, "========================================");
 }
 
-void UserDump (CmdParams *cmdparams, const char *nick)
+void ListUsers (CmdParams *cmdparams, const char *nick)
 {
 	Client *u;
 	hscan_t us;
@@ -447,7 +447,7 @@ void UserDump (CmdParams *cmdparams, const char *nick)
 		if (u) {
 			dumpuser (cmdparams, u);
 		} else {
-			irc_prefmsg (ns_botptr, cmdparams->source, __("UserDump: can't find user %s", cmdparams->source), nick);
+			irc_prefmsg (ns_botptr, cmdparams->source, __("ListUsers: can't find user %s", cmdparams->source), nick);
 		}
 	}
 }

@@ -27,6 +27,8 @@
 #include "network.h"
 #include "server.h"
 
+#define SERVER_TABLE	"Server"
+
 hash_t *serverstathash;
 
 void AverageServerStatistics (void)
@@ -148,7 +150,7 @@ static void DelServerStat (Client* s)
 	serverstat *ss;
 	
 	ss = (serverstat *) GetServerModValue (s);
-	ss->numsplits ++;
+	IncStatistic (&ss->splits);
 	ClearServerModValue (s);
 	ss->s = NULL;
 }
@@ -283,9 +285,9 @@ int ss_cmd_server (CmdParams *cmdparams)
 		irc_prefmsg (ss_bot, cmdparams->source, "Server Last Seen: %s", 
 			sftime(ss->ts_lastseen));
 	} else {
-		irc_prefmsg (ss_bot, cmdparams->source, "Current Users: %-3ld (%2.0f%%)", 
+		irc_prefmsg (ss_bot, cmdparams->source, "Current Users: %-3ld (%d%%)", 
 			(long) s->server->users, 
-			(float) s->server->users / (float) networkstats.users.current * 100);
+			(int)(float) s->server->users / (float) networkstats.users.current * 100);
 	}
 	irc_prefmsg (ss_bot, cmdparams->source, "Maximum users: %-3ld at %s",
 		ss->users.alltime.max, sftime(ss->users.alltime.ts_max));
@@ -295,8 +297,8 @@ int ss_cmd_server (CmdParams *cmdparams)
 	}
 	irc_prefmsg (ss_bot, cmdparams->source, "Maximum opers: %-3ld at %s",
 		(long)ss->opers.alltime.max, sftime(ss->opers.alltime.ts_max));
-	irc_prefmsg (ss_bot, cmdparams->source, "IRCop kills: %d", ss->operkills);
-	irc_prefmsg (ss_bot, cmdparams->source, "Server kills: %d", ss->serverkills);
+	irc_prefmsg (ss_bot, cmdparams->source, "IRCop kills: %d", ss->operkills.alltime.runningtotal);
+	irc_prefmsg (ss_bot, cmdparams->source, "Server kills: %d", ss->serverkills.alltime.runningtotal);
 	irc_prefmsg (ss_bot, cmdparams->source, "Lowest ping: %-3d at %s",
 		(int)ss->lowest_ping, sftime(ss->t_lowest_ping));
 	irc_prefmsg (ss_bot, cmdparams->source, "Higest ping: %-3d at %s",
@@ -304,10 +306,10 @@ int ss_cmd_server (CmdParams *cmdparams)
 	if (s) {
 		irc_prefmsg (ss_bot, cmdparams->source, "Current Ping: %-3d", s->server->ping);
 	}
-	if (ss->numsplits >= 1) {
+	if (ss->splits.alltime.runningtotal >= 1) {
 		irc_prefmsg (ss_bot, cmdparams->source, 
 			"%s has split from the network %d time %s",
-			ss->name, ss->numsplits, (ss->numsplits == 1) ? "" : "s");
+			ss->name, ss->splits.alltime.runningtotal, (ss->splits.alltime.runningtotal == 1) ? "" : "s");
 	} else {
 		irc_prefmsg (ss_bot, cmdparams->source, "%s has never split from the network.", 
 			ss->name);
@@ -410,14 +412,13 @@ int ss_cmd_stats (CmdParams *cmdparams)
 static void SaveServer (serverstat *ss)
 {
 	dlog (DEBUG1, "Writing statistics to database for %s", ss->name);
-	SetData ((void *)ss->ts_start, CFGINT, "ServerStats", ss->name, "ts_start");
-	SetData ((void *)ss->ts_lastseen, CFGINT, "ServerStats", ss->name, "ts_lastseen");
-	SetData ((void *)ss->numsplits, CFGINT, "ServerStats", ss->name, "Splits");
-	SetData ((void *)ss->operkills, CFGINT, "ServerStats", ss->name, "OperKills");
-	SetData ((void *)ss->serverkills, CFGINT, "ServerStats", ss->name, "ServerKills");
-
-	SaveStatistic (&ss->users, "ServerStats", ss->name, "users");
-	SaveStatistic (&ss->opers, "ServerStats", ss->name, "opers");
+	SetData ((void *)ss->ts_start, CFGINT, SERVER_TABLE, ss->name, "ts_start");
+	SetData ((void *)ss->ts_lastseen, CFGINT, SERVER_TABLE, ss->name, "ts_lastseen");
+	SaveStatistic (&ss->users, SERVER_TABLE, ss->name, "users");
+	SaveStatistic (&ss->opers, SERVER_TABLE, ss->name, "opers");
+	SaveStatistic (&ss->operkills, SERVER_TABLE, ss->name, "operkills");
+	SaveStatistic (&ss->serverkills, SERVER_TABLE, ss->name, "serverkills");
+	SaveStatistic (&ss->splits, SERVER_TABLE, ss->name, "splits");
 }
 
 void SaveServerStats(void)
@@ -427,7 +428,7 @@ void SaveServerStats(void)
 	hscan_t hs;
 
 	/* clear the old database */
-	DelTable ("ServerStats");
+	DelTable (SERVER_TABLE);
 	/* run through stats and save them */
 	hash_scan_begin (&hs, serverstathash);
 	while ((sn = hash_scan_next (&hs))) {
@@ -442,7 +443,7 @@ void LoadServerStats(void)
 	char **row;
 	int count;
 
-	if (GetTableData ("ServerStats", &row) > 0) {
+	if (GetTableData (SERVER_TABLE, &row) > 0) {
 		for (count = 0; row[count] != NULL; count++) {
 			if (hash_isfull (serverstathash)) {
 				nlog (LOG_CRITICAL, "StatServ server hash full");
@@ -450,14 +451,14 @@ void LoadServerStats(void)
 			}
 			ss = ns_calloc (sizeof(serverstat));
 			strlcpy (ss->name, row[count], MAXHOST);
-			GetData ((void *)&ss->ts_start, CFGINT, "ServerStats", ss->name, "ts_start");
-			GetData ((void *)&ss->ts_lastseen, CFGINT, "ServerStats", ss->name, "ts_lastseen");
-			GetData ((void *)&ss->numsplits, CFGINT, "ServerStats", ss->name, "Splits");
-			GetData ((void *)&ss->operkills, CFGINT, "ServerStats", ss->name, "OperKills");
-			GetData ((void *)&ss->serverkills, CFGINT, "ServerStats", ss->name, "ServerKills");
+			GetData ((void *)&ss->ts_start, CFGINT, SERVER_TABLE, ss->name, "ts_start");
+			GetData ((void *)&ss->ts_lastseen, CFGINT, SERVER_TABLE, ss->name, "ts_lastseen");
 
-			LoadStatistic (&ss->users, "ServerStats", ss->name, "users");
-			LoadStatistic (&ss->opers, "ServerStats", ss->name, "opers");
+			LoadStatistic (&ss->users, SERVER_TABLE, ss->name, "users");
+			LoadStatistic (&ss->opers, SERVER_TABLE, ss->name, "opers");
+			LoadStatistic (&ss->operkills, SERVER_TABLE, ss->name, "operkills");
+			LoadStatistic (&ss->serverkills, SERVER_TABLE, ss->name, "serverkills");
+			LoadStatistic (&ss->splits, SERVER_TABLE, ss->name, "numsplits");
 
 			dlog (DEBUG1, "Loaded statistics for %ss", ss->name);
 			hnode_create_insert (serverstathash, ss, ss->name);

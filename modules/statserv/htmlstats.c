@@ -98,16 +98,16 @@ void get_srvlistdet()
 		fprintf (opf, "<tr><td>Total Users Connected:</td><td colspan = 2>%ld</td></tr>",
 			s->users.alltime.runningtotal);
 		fprintf (opf, "<tr><td>IrcOp Kills</td><td colspan = 2>%d</td></tr>", 
-			s->operkills);
+			s->operkills.alltime.runningtotal);
 		fprintf (opf, "<tr><td>Server Kills</td><td colspan = 2>%d</td></tr>",
-			s->serverkills);
+			s->serverkills.alltime.runningtotal);
 		fprintf (opf, "<tr><td>Highest Ping</td><td>%d</td><td>at %s</td></tr>",
 			(int)s->highest_ping, sftime(s->t_highest_ping));
 		if (ss)
 			fprintf (opf, "<tr><td>Current Ping</td><td colspan = 2>%d</td></tr>",
 				ss->server->ping);
 		fprintf (opf, "<tr><td>Server Splits</td><td colspan = 2>%d</td></tr>",
-			s->numsplits);
+			s->splits.alltime.runningtotal);
 	}
 	fprintf (opf, "</table>");
 }
@@ -309,8 +309,8 @@ void get_clientstats()
 	ctcpversionstat *cv;
 	lnode_t *cn;
 	int i;
-	if (!list_is_sorted(versionstatlist, topversions)) {
-		list_sort(versionstatlist, topversions);
+	if (!list_is_sorted(versionstatlist, topcurrentversions)) {
+		list_sort(versionstatlist, topcurrentversions);
 	}
 	cn = list_first(versionstatlist);
 	fprintf (opf, "<table border = 0><tr><th>Version</th><th align=right>Count</th></tr>");
@@ -325,15 +325,13 @@ void get_clientstats()
 
 void HTMLTLDReport (TLD *tld, void *v)
 {
-	if (tld->users.current > 0) {
-		fprintf (opf, "<tr><td>%s</td><td>%s</td><td>%3d</td><td>%3d</td><td>%3d</td><td>%3d</td></tr>",
-			tld->tld, tld->country, tld->users.current, tld->users.current, tld->users.current, tld->users.current);
-	}
+	fprintf (opf, "<tr><td>%s</td><td>%s</td><td>%3d</td><td>%3d</td><td>%3d</td><td>%3d</td><td>%3d</td></tr>",
+		tld->tld, tld->country, tld->users.current, tld->users.daily.runningtotal, tld->users.weekly.runningtotal, tld->users.monthly.runningtotal, tld->users.alltime.runningtotal);
 }
 
 void HTMLTLDMap (void)
 {
-	fprintf (opf, "<table border = 0><tr><th>tld</th><th>Country</th><th>Current</th><th>Day</th><th>Week</th><th>Month</th></tr>");
+	fprintf (opf, "<table border = 0><tr><th>tld</th><th>Country</th><th>Current</th><th>Day</th><th>Week</th><th>Month</th><th>All Time</th></tr>");
 	GetTLDStats (HTMLTLDReport, NULL);
 	fprintf (opf, "</table>");
 }

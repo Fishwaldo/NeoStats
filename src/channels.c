@@ -521,7 +521,7 @@ Channel *find_chan (const char *chan)
 	return c;
 }
 
-/** @brief IsChannelMemberber 
+/** @brief IsChannelMember 
  *
  *  Check whether nick is a member of the channel
  *
@@ -531,7 +531,7 @@ Channel *find_chan (const char *chan)
  *  @returns NS_TRUE if user is a member of channel, NS_FALSE if not 
 */
 
-int IsChannelMemberber (Channel *c, Client *u) 
+int IsChannelMember (Channel *c, Client *u) 
 {
 	if (!u || !c) {
 		return NS_FALSE;

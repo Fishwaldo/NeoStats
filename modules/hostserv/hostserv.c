@@ -218,7 +218,7 @@ static void LoadHosts (void)
 
 	if (GetTableData ("Vhosts", &data) > 0) {
 		for (i = 0; data[i] != NULL; i++) {
-			vhe = ns_malloc (sizeof(vhostentry));
+			vhe = ns_calloc (sizeof(vhostentry));
 			strlcpy (vhe->nick, data[i], MAXNICK);
 			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Host") > 0) {
 				strlcpy (vhe->host, tmp, MAXHOST);
@@ -298,7 +298,7 @@ static void LoadBans (void)
 
 	if (GetTableData ("Ban", &data) > 0) {
 		for (i = 0; data[i] != NULL; i++) {
-			ban = ns_malloc (sizeof (banentry));
+			ban = ns_calloc (sizeof (banentry));
 			strlcpy (ban->host, data[i], MAXHOST);
 			if (GetData ((void *)&tmp, CFGSTR, "Ban", ban->host, "Who") > 0) {
 				strlcpy (ban->who, tmp, MAXNICK);
@@ -529,7 +529,7 @@ static void new_vhost (char *nick, char *host, char *vhost, char *pass, char *wh
 {
 	vhostentry *vhe;
 
-	vhe = ns_malloc (sizeof(vhostentry));
+	vhe = ns_calloc (sizeof(vhostentry));
 	strlcpy (vhe->nick, nick, MAXNICK);
 	strlcpy (vhe->host, host, MAXHOST);
 	strlcpy (vhe->vhost, vhost, MAXHOST);

@@ -80,8 +80,8 @@ ModuleInfo ns_module_info = {
 	"NeoStats Statistical services", 	
 	ns_copyright,
 	ns_about,
-	VERSION,
-	VERSION,
+	NEOSTATS_VERSION,
+	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__,
 	0,
@@ -309,7 +309,7 @@ ns_cmd_userlist (CmdParams* cmdparams)
 	   	return NS_FAILURE;
 	}
 #endif
-	UserDump (cmdparams, (cmdparams->ac < 1)? NULL : cmdparams->av[0]);
+	ListUsers (cmdparams, (cmdparams->ac < 1)? NULL : cmdparams->av[0]);
    	return NS_SUCCESS;
 }
 
@@ -330,7 +330,7 @@ ns_cmd_serverlist (CmdParams* cmdparams)
 	   	return NS_FAILURE;
 	}
 #endif
-	ServerDump ((cmdparams->ac < 1)? NULL : cmdparams->av[0]);
+	ListServers ((cmdparams->ac < 1)? NULL : cmdparams->av[0]);
    	return NS_SUCCESS;
 }
 

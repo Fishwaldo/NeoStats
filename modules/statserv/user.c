@@ -95,7 +95,7 @@ int ss_event_globalkill(CmdParams *cmdparams)
 
 	DelUser (cmdparams->source);
 	ss = GetServerModValue (cmdparams->source->uplink);
-	ss->operkills ++;
+	IncStatistic (&ss->operkills);
 	return NS_SUCCESS;
 }
 
@@ -105,7 +105,7 @@ int ss_event_serverkill(CmdParams *cmdparams)
 
 	DelUser (cmdparams->source);
 	ss = GetServerModValue (cmdparams->source);
-	ss->serverkills ++;
+	IncStatistic (&ss->serverkills);
 	return NS_SUCCESS;
 }
 

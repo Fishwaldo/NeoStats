@@ -31,6 +31,7 @@
 #include "GeoIP.h"
 #include "GeoIPCity.h"
 
+#define TLD_TABLE		"TLD"
 #define UNKNOWN_COUNTRY_CODE	"???"
 
 list_t *tldstatlist;
@@ -94,8 +95,8 @@ void TLDReport (TLD *tld, void *v)
 
 	targetuser = (Client *) v;
 	irc_prefmsg(ss_bot, targetuser, 
-		"%3s \2%3d\2 (%2.0f%%) -> %s ---> Daily Total: %d",
-		tld->tld, tld->users.alltime.max, ((float) tld->users.current / (float) networkstats.users.current) * 100,
+		"%3s \2%3d\2 (%d%%) -> %s ---> Daily Total: %d",
+		tld->tld, tld->users.alltime.max, (int) ((float) tld->users.current / (float) networkstats.users.current) * 100,
 		tld->country, tld->users.current);
 }
 
@@ -148,7 +149,7 @@ void AddTLDUser (Client *u)
 		t = lnode_find (tldstatlist, country_code, findcc);
 		if (!t) {
 			country_name = GeoIP_country_name_by_addr(gi, u->hostip);
-			t = ns_malloc(sizeof(TLD));
+			t = ns_calloc (sizeof(TLD));
 			strlcpy(t->tld, country_code, 5);
 			strlcpy(t->country, country_name, 32);
 			lnode_create_append (tldstatlist, t);
@@ -182,8 +183,8 @@ void SaveTLDStats (void)
 	tn = list_first(tldstatlist);
 	while (tn != NULL) {
 		t = lnode_get(tn);
-		SetData((void *)t->country, CFGSTR, "TLD", t->tld, "country");
-		SaveStatistic (&t->users, "TLD", t->tld, "users");
+		SetData((void *)t->country, CFGSTR, TLD_TABLE, t->tld, "country");
+		SaveStatistic (&t->users, TLD_TABLE, t->tld, "users");
 		tn = list_next(tldstatlist, tn);
 	}
 }
@@ -195,20 +196,20 @@ void LoadTLDStats (void)
 	char **data;
 	char *tmp;
 
-	if (GetTableData ("TLD", &data) > 0) {
+	if (GetTableData (TLD_TABLE, &data) > 0) {
 		for (i = 0; data[i] != NULL; i++) {
-			if (strncmp (data[i], "???", 5) != 0)
+			if (strncmp (data[i], "???", 3) != 0)
 			{
 				t = ns_calloc (sizeof (TLD));
 				strlcpy (t->tld, data[i], 5);
-				if (GetData((void *)&tmp, CFGSTR, "TLD", t->tld, "country") > 0) {
+				if (GetData((void *)&tmp, CFGSTR, TLD_TABLE, t->tld, "country") > 0) {
 					strlcpy(t->country, tmp, MAXHOST);
 					ns_free (tmp);
 				} else {
 					strlcpy(t->country, "???", MAXHOST);
 					continue;
 				}
-				LoadStatistic (&t->users, "TLD", t->tld, "users");
+				LoadStatistic (&t->users, TLD_TABLE, t->tld, "users");
 				lnode_create_append (tldstatlist, t);
 			}
 		}
@@ -248,7 +249,7 @@ void InitTLDStatistics (void)
 	ircsnprintf(t->tld, 5, UNKNOWN_COUNTRY_CODE);
 	strlcpy(t->country, "Unknown", 8);
 	lnode_create_append (tldstatlist, t);
-	LoadStatistic (&t->users, "TLD", "???", "users");
+	LoadStatistic (&t->users, TLD_TABLE, "???", "users");
 	LoadTLDStats ();
 }
 

@@ -1054,8 +1054,6 @@ EXPORTFUNC void strip_mirc_codes(char *text);
 EXPORTFUNC char *sctime (time_t t);
 EXPORTFUNC char *sftime (time_t t);
 EXPORTFUNC char *make_safe_filename (char *name);
-
-/* ircd.c */
 EXPORTFUNC char *joinbuf (char **av, int ac, int from);
 EXPORTFUNC int split_buf (char *buf, char ***argv, int colon_special);
 
@@ -1104,7 +1102,7 @@ EXPORTFUNC int irc_chanusermode (const Bot *botptr, const char *chan, const char
  *  Require an opered bot to operate
  */
 EXPORTFUNC int irc_kill (const Bot *botptr, const char *target, const char *reason, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC int irc_akill (const Bot *botptr, const char *host, const char *ident, const unsigned long length, const char *reason, ...);
+EXPORTFUNC int irc_akill (const Bot *botptr, const char *host, const char *ident, const unsigned long length, const char *reason, ...)  __attribute__((format(printf,5,6))); /* 5=format 6=params */
 EXPORTFUNC int irc_rakill (const Bot *botptr, const char *host, const char *ident);
 EXPORTFUNC int irc_swhois (const char *target, const char *swhois);
 EXPORTFUNC int irc_sethost (const Bot *botptr, const char *host);
@@ -1144,15 +1142,15 @@ EXPORTFUNC Client *find_server (const char *name);
 /* chans.c */
 EXPORTFUNC Channel *find_chan (const char *chan);
 EXPORTFUNC int CheckChanMode (Channel *c, const unsigned int mode);
-EXPORTFUNC int IsChannelMemberber(Channel *c, Client *u);
-EXPORTFUNC int test_cumode(char *chan, char *nick, int flag);
+EXPORTFUNC int IsChannelMember (Channel *c, Client *u);
+EXPORTFUNC int test_cumode (char *chan, char *nick, int flag);
 
-#define is_chanop(chan, nick)		test_cumode(chan, nick, CUMODE_CHANOP)
-#define is_chanhalfop(chan, nick)	test_cumode(chan, nick, CUMODE_HALFOP)
-#define is_chanvoice(chan, nick)	test_cumode(chan, nick, CUMODE_VOICE)
-#define is_chanowner(chan, nick)	test_cumode(chan, nick, CUMODE_CHANOWNER)
-#define is_chanprot(chan, nick)		test_cumode(chan, nick, CUMODE_CHANPROT)
-#define is_chanadmin(chan, nick)	test_cumode(chan, nick, CUMODE_CHANADMIN)
+#define IsChanOp(chan, nick)		test_cumode(chan, nick, CUMODE_CHANOP)
+#define IsChanHalfOp(chan, nick)	test_cumode(chan, nick, CUMODE_HALFOP)
+#define IsChanVoice(chan, nick)		test_cumode(chan, nick, CUMODE_VOICE)
+#define IsChanOwner(chan, nick)		test_cumode(chan, nick, CUMODE_CHANOWNER)
+#define IsChanProt(chan, nick)		test_cumode(chan, nick, CUMODE_CHANPROT)
+#define IsChanAdmin(chan, nick)		test_cumode(chan, nick, CUMODE_CHANADMIN)
 
 EXPORTVAR unsigned char UmodeChRegNick;
 

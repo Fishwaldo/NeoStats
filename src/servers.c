@@ -193,7 +193,7 @@ dumpserver (Client *s)
 }
 
 void
-ServerDump (const char *name)
+ListServers (const char *name)
 {
 	Client *s;
 	hscan_t ss;
@@ -211,7 +211,7 @@ ServerDump (const char *name)
 		if (s) {
 			dumpserver (s);
 		} else {
-			irc_chanalert (ns_botptr, _("ServerDump: can't find server %s"), name);
+			irc_chanalert (ns_botptr, _("ListServers: can't find server %s"), name);
 		}
 	}
 }

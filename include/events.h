@@ -67,36 +67,33 @@ typedef enum Event {
  */
 
 /*  EVENT_SIGNON 
- *    Called when a new user signs onto the network. the user 
- *    nickname is passed as a parameter, so you can see who signed on.
+ *    Called when a new user signs onto the network. 
  *    parameters:
  *      user in cmdparams->source
  */
 	EVENT_SIGNON,
 
 /*  EVENT_QUIT
- *    Called when a user quits the network. The user 
- *    nickname is passed as a parameter, so you can see who signed off.
+ *    Called when a user quits the network. 
  *    parameters:
  *      user in cmdparams->source
  *      reason in cmdparams->param
  */
 	EVENT_QUIT,
 
-/*	EVENT_GOTNICKIP
- *	fired when we get the IP address of a user
- *	only fired if me.want_nickip = 1 and:
- *	the ircd sends the nickip as part of the connect message
- *	or a dns lookup completes and is successfull
- * 
+/*	EVENT_NICKIP
+ *		Called when we get the IP address of a user. This is 
+ *		either when the ircd sends the nickip as part of the 
+ *		connect message or a dns lookup sucessfully completes.
  *	  parameters:
  *		user in cmdparams->source
  */ 
-	EVENT_GOTNICKIP,
+	EVENT_NICKIP,
 
 /*  EVENT_KILL 
  *    Called when a user is killed.
  *    parameters:
+ *      oper / server that issued kill in cmdparams->source
  *      user who was killed in cmdparams->target
  *      reason in cmdparams->param
  */
@@ -220,6 +217,7 @@ typedef enum Event {
 
 /*  EVENT_KICK 
  *    parameters:
+ *      user/server which kicked in cmdparams->source
  *      user in cmdparams->target
  *      channel in cmdparams->channel
  *      reason in cmdparams->param
@@ -228,6 +226,7 @@ typedef enum Event {
 
 /*  EVENT_KICKBOT 
  *    parameters:
+ *      user/server which kicked in cmdparams->source
  *      user in cmdparams->target
  *      channel in cmdparams->channel
  *      reason in cmdparams->param

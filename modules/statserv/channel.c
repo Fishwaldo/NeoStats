@@ -26,7 +26,8 @@
 #include "stats.h"
 #include "network.h"
 #include "channel.h"
-#include "database.h"
+
+#define CHANNEL_TABLE	"Channel"
 
 list_t *channelstatlist;
 
@@ -357,12 +358,12 @@ channelstat *load_chan(char *name)
 		dlog (DEBUG2, "Loading channel %s", c->name);
 #else
 	strlcpy (c->name, name, MAXCHANLEN);	
-	if (GetData ((void *)&data, CFGSTR, "ChanStats", c->name, "ChanData") > 0) {
+	if (GetData ((void *)&data, CFGSTR, CHANNEL_TABLE, c->name, "ChanData") > 0) {
 		dlog (DEBUG2, "Loading channel %s", c->name);
-		LoadStatistic (&c->users, "ChanStats", c->name, "users");
-		LoadStatistic (&c->kicks, "ChanStats", c->name, "kicks");
-		LoadStatistic (&c->topics, "ChanStats", c->name, "topics");
-		LoadStatistic (&c->joins, "ChanStats", c->name, "joins");
+		LoadStatistic (&c->users, CHANNEL_TABLE, c->name, "users");
+		LoadStatistic (&c->kicks, CHANNEL_TABLE, c->name, "kicks");
+		LoadStatistic (&c->topics, CHANNEL_TABLE, c->name, "topics");
+		LoadStatistic (&c->joins, CHANNEL_TABLE, c->name, "joins");
 		ns_free (data);
 #endif
 	} else {
@@ -396,11 +397,11 @@ void save_chan(channelstat *c)
 	DBSetData (c->name, data, sizeof(channelstat));
 #else
 	/* we keep this seperate so we can easily delete old channels */
-	SetData ((void *)c->ts_lastseen, CFGINT, "ChanStats", c->name, "ts_lastseen");
-	SaveStatistic (&c->users, "ChanStats", c->name, "users");
-	SaveStatistic (&c->kicks, "ChanStats", c->name, "kicks");
-	SaveStatistic (&c->topics, "ChanStats", c->name, "topics");
-	SaveStatistic (&c->joins, "ChanStats", c->name, "joins");
+	SetData ((void *)c->ts_lastseen, CFGINT, CHANNEL_TABLE, c->name, "ts_lastseen");
+	SaveStatistic (&c->users, CHANNEL_TABLE, c->name, "users");
+	SaveStatistic (&c->kicks, CHANNEL_TABLE, c->name, "kicks");
+	SaveStatistic (&c->topics, CHANNEL_TABLE, c->name, "topics");
+	SaveStatistic (&c->joins, CHANNEL_TABLE, c->name, "joins");
 #endif
 	c->lastsave = me.now;
 }
@@ -422,20 +423,20 @@ int DelOldChan(void)
 	
 	start = time (NULL);
 	dlog (DEBUG1, "Deleting old channels");
-	if (GetTableData ("ChanStats", &row) > 0) {
+	if (GetTableData (CHANNEL_TABLE, &row) > 0) {
 		for (count = 0; row[count] != NULL; count++) {
-			if (GetData ((void *)&ts_lastseen, CFGINT, "ChanStats", row[count], "ts_lastseen") > 0) {
+			if (GetData ((void *)&ts_lastseen, CFGINT, CHANNEL_TABLE, row[count], "ts_lastseen") > 0) {
 				/* delete it if its old and not online 
 				 * use find_chan, instead of findchanstats, and find_chan is based on hashes, so its faster 
 				 */
 				if (((me.now - ts_lastseen) > 604800) && (!find_chan(row[count]))) {
 					dlog (DEBUG1, "Deleting Channel %s", row[count]);
-					DelRow("ChanStats", row[count]);
+					DelRow(CHANNEL_TABLE, row[count]);
 				}
 			} else {
 				/* database corruption? */
 				nlog (LOG_WARNING, "Channel %s corrupted: deleting record", row[count]);
-				DelRow ("ChanStats", row[count]);
+				DelRow (CHANNEL_TABLE, row[count]);
 			}
 		}
 	}

@@ -23,6 +23,11 @@
 ** $Id$
 */
 
+/*  TODO:
+ *  - Identify bootup and netjoin stats and handle differently
+ *    to improve accuracy
+ */
+
 #include "neostats.h"
 #include "statserv.h"
 #include "statsrta.h"
@@ -32,7 +37,6 @@
 #include "channel.h"
 #include "user.h"
 #include "version.h"
-#include "database.h"
 #include "tld.h"
 #include "htmlstats.h"
 
@@ -50,7 +54,7 @@ ModuleEvent module_events[] = {
 	{EVENT_SERVER,		ss_event_server,	EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_SQUIT,		ss_event_squit,		EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_SIGNON,		ss_event_signon,	EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_GOTNICKIP,	ss_event_nickip,	EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_NICKIP,		ss_event_nickip,	EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_UMODE,		ss_event_mode,		EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_QUIT,		ss_event_quit,		EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_GLOBALKILL,	ss_event_globalkill,EVENT_FLAG_IGNORE_SYNCH},
@@ -185,6 +189,8 @@ int ModInit (Module *mod_ptr)
 int ModSynch (void)
 {
 	SET_SEGV_LOCATION();
+	/* RTA init must be in synch since core does not start 
+	   RTA during the init cycle when NeoStats first boots */
 	InitRTAStats ();
 	ss_bot = AddBot (&ss_botinfo);
 	if (!ss_bot) {
@@ -193,18 +199,19 @@ int ModSynch (void)
 	/* Timer to save the database */
 	add_timer (TIMER_TYPE_INTERVAL, SaveStats, "SaveStats", DBSAVETIME);
 	/* Timer to output html */
-	add_timer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime);
+	if (StatServ.html) {
+		add_timer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime);
+		/* Initial output at load */
+		ss_html ();
+	}
 	/* Timer to reset timeslice stats */
 	add_timer (TIMER_TYPE_MIDNIGHT, ResetStatistics, "ResetStatistics", 0);
 	/* Timer to average stats */
 	add_timer (TIMER_TYPE_INTERVAL, AverageStatistics, "AverageStatistics", 3600);
+	/* Initial average at load */
+	AverageStatistics();
 	/* Timer to delete old channels */
 	add_timer (TIMER_TYPE_INTERVAL, DelOldChan, "DelOldChan", 3600);
-	AverageStatistics();
-	if (StatServ.html) {
-		ss_html ();
-	}
-
 	return NS_SUCCESS;
 }
 

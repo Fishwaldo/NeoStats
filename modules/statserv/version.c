@@ -28,7 +28,7 @@
 
 list_t *versionstatlist;
 
-int topversions(const void *key1, const void *key2)
+int topcurrentversions(const void *key1, const void *key2)
 {
 	const ctcpversionstat *ver1 = key1;
 	const ctcpversionstat *ver2 = key2;
@@ -72,12 +72,12 @@ static void LoadVersionStats (void)
 	
 	input = fopen("data/ssversions.dat", "rb");
 	if(input) {
-		clientv = ns_malloc(sizeof(ctcpversionstat));
+		clientv = ns_calloc(sizeof(ctcpversionstat));
 		fread(clientv, sizeof(ctcpversionstat), 1, input);	
 		while(!feof(input)) {
 			lnode_create_append (versionstatlist, clientv);
 			dlog(DEBUG2, "Loaded version %s", clientv->name);
-			clientv = ns_malloc(sizeof(ctcpversionstat));
+			clientv = ns_calloc(sizeof(ctcpversionstat));
 			fread(clientv, sizeof(ctcpversionstat), 1, input);	
 		}
 		fclose(input);
@@ -100,8 +100,8 @@ int ss_cmd_userversion(CmdParams *cmdparams)
 		irc_prefmsg(ss_bot, cmdparams->source, "No Stats Available.");
 		return NS_SUCCESS;
 	}
-	if (!list_is_sorted (versionstatlist, topversions)) {
-		list_sort (versionstatlist, topversions);
+	if (!list_is_sorted (versionstatlist, topcurrentversions)) {
+		list_sort (versionstatlist, topcurrentversions);
 	}
 	irc_prefmsg (ss_bot, cmdparams->source, "Top %d Client Versions:", num);
 	irc_prefmsg (ss_bot, cmdparams->source, "======================");
