@@ -63,6 +63,9 @@ Frequently Asked Questions (FAQ)
 	don't be surprised if this is some time away. Once we have the 
 	remaining bugs ironed out, a windows version has a 50% chance of 
 	happening. Don't ask us when, we don't know. 
+	
+	The main NeoStats core will now compiler and run on Windows using 
+	cygwin but modules currently do not work. 
 
 -----------------------------------<>-----------------------------------
 
@@ -70,9 +73,9 @@ Frequently Asked Questions (FAQ)
 
 	The NeoStats Team recommend that you use a supported IRCd package.
 	NeoStats currently supports Unreal, Ultimate 2.x.x, Ultimate 3.x.x,
-	Hybrid7 and our own NeoIRCd.
+	Hybrid7, Bahamut, Mystic, Quantum and our own NeoIRCd.
 
-	Check ./configure --help for more information.
+	Check ./configure --help and the README for more information.
 
 -----------------------------------<>-----------------------------------
 
@@ -231,7 +234,7 @@ Frequently Asked Questions (FAQ)
 	NeoStats. During this design a module with multiple nick's was 
 	designed and so was a patch to the API which enabled this feature. 
 	At this stage there are no plans to release the multiple nicks API, 
-	but rather intergate it into the NeoStats-2.5 release.
+	but rather integrate it into the NeoStats-2.5 release.
 
 -----------------------------------<>-----------------------------------
 5. Bugs, suggestions, contributions
@@ -257,6 +260,6 @@ Frequently Asked Questions (FAQ)
 -----------------------------------<>-----------------------------------
 
 ************************************************************************
-** This document was last updated on May 27, 2003 by M and is         **
+** This document was last updated on October 6th, 2003 by M and is    **
 ** based on documents originally created by Shmad and Fish.           **
 ************************************************************************
