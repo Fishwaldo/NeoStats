@@ -85,6 +85,9 @@ void (*irc_send_svinfo) (const int tscurrent, const int tsmin, const unsigned lo
 void (*irc_send_vctrl) (const int uprot, const int nicklen, const int modex, const int gc, const char* netname);
 void (*irc_send_burst) (int b);
 void (*irc_send_svstime) (const char *source, const unsigned long ts);
+void (*irc_send_setname) (const char* nick, const char* realname);
+void (*irc_send_sethost) (const char* nick, const char* host);
+void (*irc_send_setident) (const char* nick, const char* ident);
 
 static void m_numeric242 (char *origin, char **argv, int argc, int srv);
 static void m_numeric351 (char *origin, char **argv, int argc, int srv);
@@ -234,6 +237,10 @@ InitIrcdSymbols (void)
 	irc_send_svinfo = ns_dlsym( protocol_module_handle, "send_svinfo");
 	irc_send_vctrl = ns_dlsym( protocol_module_handle, "send_vctrl");
 	irc_send_burst = ns_dlsym( protocol_module_handle, "send_burst");
+	irc_send_setname = ns_dlsym( protocol_module_handle, "send_setname");
+	irc_send_sethost = ns_dlsym( protocol_module_handle, "send_sethost");
+	irc_send_setident = ns_dlsym( protocol_module_handle, "send_setident");
+
 	return NS_SUCCESS;
 }
 
@@ -934,6 +941,40 @@ irc_nickchange (const Bot *botptr, const char *newnick)
 	return NS_SUCCESS;
 }
 
+int irc_setname(const Bot *botptr, const char* realname)
+{
+	if (!irc_send_setname) {
+		unsupported_cmd ("SETNAME");
+		return NS_FAILURE;
+	}
+	irc_send_setname (botptr->name, realname);
+	strlcpy (botptr->u->info, (char*)realname, MAXHOST);
+	return NS_SUCCESS;
+}
+
+int irc_sethost (const Bot *botptr, const char* host)
+{
+	if (!irc_send_sethost) {
+		unsupported_cmd("SETNAME");
+		return NS_FAILURE;
+	}
+	irc_send_sethost (botptr->name, host);
+	strlcpy (botptr->u->user->hostname, (char*)host, MAXHOST);
+	return NS_SUCCESS;
+}
+ 
+int irc_setident (const Bot *botptr, const char* ident)
+{
+	if (!irc_send_setident) {
+		unsupported_cmd ("SETNAME");
+		return NS_FAILURE;
+	}
+	irc_send_setident (botptr->name, ident);
+	strlcpy (botptr->u->user->username, (char*)ident, MAXHOST);
+	return NS_SUCCESS;
+}
+
+
 int
 irc_chanmode (const Bot *botptr, const char *chan, const char *mode, const char *args)
 {
@@ -1558,11 +1599,50 @@ do_eos (const char *name)
 	Client *s;
 
 	s = find_server (name);
-	if(s) {
+	if (s) {
 		SynchServer(s);
-		dlog(DEBUG1, "do_eos: server %s is now synched", name);
+		dlog (DEBUG1, "do_eos: server %s is now synched", name);
 	} else {
 		nlog (LOG_WARNING, "do_eos: server %s not found", name);
+	}
+}
+
+void do_setname (const char* nick, const char* realname)
+{
+	Client *u;
+
+	u = find_user(nick);
+	if (u) {
+		dlog (DEBUG1, "do_setname: setting realname of user %s to %s", nick, realname);
+		strlcpy(u->info, (char*)realname, MAXHOST);
+	} else {
+		nlog (LOG_WARNING, "do_setname: user %s not found", nick);
+	}
+}
+
+void do_sethost (const char* nick, const char* host)
+{
+	Client *u;
+
+	u = find_user(nick);
+	if (u) {
+		dlog (DEBUG1, "do_sethost: setting host of user %s to %s", nick, host);
+		strlcpy(u->user->hostname, (char*)host, MAXHOST);
+	} else {
+		nlog (LOG_WARNING, "do_sethost: user %s not found", nick);
+	}
+}
+
+void do_setident (const char* nick, const char* ident)
+{
+	Client *u;
+
+	u = find_user(nick);
+	if (u) {
+		dlog (DEBUG1, "do_setident: setting ident of user %s to %s", nick, ident);
+		strlcpy(u->user->username, (char*)ident, MAXHOST);
+	} else {
+		nlog (LOG_WARNING, "do_setident: user %s not found", nick);
 	}
 }
 

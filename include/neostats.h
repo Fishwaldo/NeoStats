@@ -963,6 +963,9 @@ EXPORTFUNC int irc_part (const Bot *botptr, const char *chan);
 EXPORTFUNC int irc_kick (const Bot *botptr, const char *chan, const char *target, const char *reason);
 EXPORTFUNC int irc_invite (const Bot *botptr, const char *target, const char *chan);
 EXPORTFUNC int irc_cloakhost (const Bot *botptr);
+EXPORTFUNC int irc_setname (const Bot *botptr, const char* realname);
+EXPORTFUNC int irc_sethost (const Bot *botptr, const char* host);
+EXPORTFUNC int irc_setident (const Bot *botptr, const char* ident);
 
 /*  Mode functions
  *  Require a bot to operate

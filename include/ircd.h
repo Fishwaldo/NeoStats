@@ -95,17 +95,17 @@ typedef struct ProtocolInfo {
 	char* services_cmode;
 } ProtocolInfo;
 
-#ifndef NEOSTATSCORE
+#ifdef NEOSTATSCORE
+extern cumode_init* chan_umodes;
+extern cmode_init* chan_modes;
+extern umode_init* user_umodes;
+extern umode_init* user_smodes;
+#else
 MODULEVAR extern ircd_cmd cmd_list[];
 MODULEVAR extern cumode_init chan_umodes[];
 MODULEVAR extern cmode_init chan_modes[];
 MODULEVAR extern umode_init user_umodes[];
 MODULEVAR extern umode_init user_smodes[];
-#else
-extern cumode_init* chan_umodes;
-extern cmode_init* chan_modes;
-extern umode_init* user_umodes;
-extern umode_init* user_smodes;
 #endif
 
 EXPORTVAR extern ircd_server ircd_srv;
@@ -177,6 +177,9 @@ EXPORTFUNC void do_burst (char *origin, char **argv, int argc);
 EXPORTFUNC void do_swhois (char *who, char *swhois);
 EXPORTFUNC void do_tkl(const char *add, const char *type, const char *user, const char *host, const char *setby, const char *tsexpire, const char *tsset, const char *reason);
 EXPORTFUNC void do_eos(const char *name);
+EXPORTFUNC void do_setname(const char* nick, const char* realname);
+EXPORTFUNC void do_sethost (const char *nick, const char *host);
+EXPORTFUNC void do_setident (const char *nick, const char *ident);
 
 /* Defined in ircd specific files */
 MODULEFUNC void send_privmsg (const char *source, const char *to, const char *buf);
@@ -216,6 +219,9 @@ MODULEFUNC void send_svinfo (const int tscurrent, const int tsmin, const unsigne
 MODULEFUNC void send_vctrl (const int uprot, const int nicklen, const int modex, const int gc, const char* netname);
 MODULEFUNC void send_burst (int b);
 MODULEFUNC void send_svstime (const char *source, const unsigned long ts);
+MODULEFUNC void send_setname(const char* nick, const char* realname);
+MODULEFUNC void send_sethost (const char *nick, const char *host);
+MODULEFUNC void send_setident (const char *nick, const char *ident);
 
 int InitIrcd (void);
 int irc_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink);

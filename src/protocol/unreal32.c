@@ -58,6 +58,9 @@ static void m_whois (char *origin, char **argv, int argc, int srv);
 static void m_smo (char *origin, char **argv, int argc, int srv);
 static void m_swhois (char *origin, char **argv, int argc, int srv);
 static void m_tkl (char *origin, char **argv, int argc, int srv);
+static void m_setname (char *origin, char **argv, int argc, int srv);
+static void m_sethost (char *origin, char **argv, int argc, int srv);
+static void m_setident (char *origin, char **argv, int argc, int srv);
 
 #define NICKV2	
 #define NICKIP
@@ -118,6 +121,9 @@ ircd_cmd cmd_list[] = {
 	{MSG_SMO, TOK_SMO, m_smo, 0},
 	{MSG_EOS, TOK_EOS, m_eos, 0},
 	{MSG_TKL, TOK_TKL, m_tkl, 0},
+	{MSG_SETNAME, TOK_SETNAME, m_setname, 0},
+	{MSG_SETHOST, TOK_SETHOST, m_sethost, 0},
+	{MSG_SETIDENT, TOK_SETIDENT, m_setident, 0},
 	{0, 0, 0, 0},
 };
 
@@ -445,6 +451,24 @@ void
 send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
 {
 	send_cmd (":%s %s %s %lu", oldnick, MSGTOK(NICK), newnick, ts);
+}
+
+void 
+send_setname (const char *nick, const char *realname)
+{
+	send_cmd (":%s %s :%s", nick, MSGTOK(SETNAME), realname);
+}
+
+void 
+send_sethost (const char *nick, const char *host)
+{
+	send_cmd (":%s %s :%s", nick, MSGTOK(SETHOST), host);
+}
+
+void 
+send_setident (const char *nick, const char *ident)
+{
+	send_cmd (":%s %s :%s", nick, MSGTOK(SETIDENT), ident);
 }
 
 void
@@ -947,4 +971,19 @@ R: :server c dos_bot* :Reserved nickname: Dosbot
 static void m_tkl (char *origin, char **argv, int argc, int srv)
 {
 	do_tkl(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7]);
+}
+
+static void m_setname (char *origin, char **argv, int argc, int srv)
+{
+	do_setname(origin, argv[0]);
+}
+
+static void m_sethost (char *origin, char **argv, int argc, int srv)
+{
+	do_sethost(origin, argv[0]);
+}
+
+static void m_setident (char *origin, char **argv, int argc, int srv)
+{
+	do_setident(origin, argv[0]);
 }

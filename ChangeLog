@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Add support for online bot realname, host and ident changes. (M)
+ - Add support for IRCd SETNAME, SETIDENT and SETHOST functions. (M)
  - Add support for online bot nick changes. (M)
  - Combined BOTCHANLIST command with BOTLIST command. (M)
  - Remove redundant botchanhash code and tables. We can get this information

@@ -1181,16 +1181,23 @@ int bot_set_altnick_cb(CmdParams* cmdparams)
 
 int bot_set_user_cb(CmdParams* cmdparams)
 {
+	irc_setident (cmdparams->bot, cmdparams->av[1]);
 	return NS_SUCCESS;
 }
 
 int bot_set_host_cb(CmdParams* cmdparams)
 {
+	irc_sethost (cmdparams->bot, cmdparams->av[1]);
 	return NS_SUCCESS;
 }
 
 int bot_set_realname_cb(CmdParams* cmdparams)
 {
+	char *buf;
+
+	buf = joinbuf(cmdparams->av, cmdparams->ac, 1);
+	irc_setname(cmdparams->bot, buf);
+	sfree(buf);
 	return NS_SUCCESS;
 }
 
