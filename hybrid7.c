@@ -27,9 +27,6 @@
 #include "hybrid7.h"
 #include "dl.h"
 #include "log.h"
-#include "users.h"
-#include "server.h"
-#include "chans.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
@@ -151,6 +148,11 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 	sts ("%s %s :TS", MSG_PASS, pass);
 	sts ("CAPAB :TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS MX");
 	sts ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
+}
+
+void
+send_burst (int b)
+{
 }
 
 void
@@ -354,15 +356,7 @@ m_credits (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	if(!srv) {
-		if (*origin == 0) {
-			me.s = AddServer (argv[0], me.name, argv[1], NULL, NULL);
-		} else {
-			me.s = AddServer (argv[0], origin, argv[1], NULL, NULL);
-		}
-	} else {
-		AddServer (argv[0], origin, argv[1], NULL, NULL);
-	}
+	do_server (argv[0], origin, argv[1], NULL, NULL, srv);
 }
 
 static void
@@ -402,19 +396,15 @@ m_pong (char *origin, char **argv, int argc, int srv)
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
-	if (argc > 0) {
-		UserAway (origin, argv[0]);
-	} else {
-		UserAway (origin, NULL);
-	}
+	do_away (origin, (argc > 0) ? argv[0] : NULL);
 }
 
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
-		AddUser (argv[0], argv[4], argv[5], argv[7], argv[6], NULL, argv[2]);
-		UserMode (argv[0], argv[3]);
+		do_nick (argv[0], argv[1], argv[2], argv[4], argv[5], 
+			argv[6], NULL, NULL, argv[3], NULL, argv[7]);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}
@@ -432,9 +422,9 @@ m_topic (char *origin, char **argv, int argc, int srv)
 	** - Hwy
 	*/	
 	if (finduser(origin)) {
-		ChanTopic (argv[0], origin, NULL, argv[1]);
+		do_topic (argv[0], origin, NULL, argv[1]);
 	} else if (findserver(origin)) {
-		ChanTopic (argv[0], argv[1], argv[2], argv[3]);
+		do_topic (argv[0], argv[1], argv[2], argv[3]);
 	} else {
 		nlog(LOG_WARNING, LOG_CORE, "m_topic: can't find topic setter %s for topic %s", origin, argv[1]); 
 	}

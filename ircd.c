@@ -1108,7 +1108,7 @@ spart_cmd (const char *who, const char *chan)
 int
 snick_cmd (const char *oldnick, const char *newnick)
 {
-	do_nickchange (oldnick, newnick, NULL);
+	UserNick (oldnick, newnick, NULL);
 	send_nickchange (oldnick, newnick, me.now);
 	return NS_SUCCESS;
 }
@@ -1697,6 +1697,27 @@ do_nick (const char *nick, const char *hopcount, const char* TS,
 #endif		
 }
 
+void 
+do_client (const char *nick, const char *arg1, const char *TS, 
+		const char *modes, const char *smodes, 
+		const char *user, const char *host, const char *vhost, 
+		const char *server, const char *arg9, 
+		const char *ip, const char *realname)
+{
+	AddUser (nick, user, host, realname, server, ip, TS);
+	if(modes) {
+		UserMode (nick, modes);
+	}
+	if(vhost) {
+		SetUserVhost(nick, vhost);
+	}
+#ifdef GOTUSERSMODES
+	if(smodes) {
+		UserSMode (nick, smodes);
+	}
+#endif		
+}
+
 void
 do_kill (const char *nick, const char *reason)
 {
@@ -1709,7 +1730,8 @@ do_quit (const char *nick, const char *quitmsg)
 	DelUser (nick, 0, quitmsg);
 }
 
-void do_squit(const char *name, const char* reason)
+void 
+do_squit(const char *name, const char* reason)
 {
 	DelServer (name, reason);
 }
@@ -1741,6 +1763,14 @@ do_vctrl (const char* uprot, const char* nicklen, const char* modex, const char*
 }
 #endif
 
+#ifdef GOTUSERSMODES
+void 
+do_smode (const char* nick, const char* modes)
+{
+	UserSMode (nick, modes);
+}
+#endif
+
 void 
 do_mode_user (const char* nick, const char* modes)
 {
@@ -1752,3 +1782,65 @@ do_mode_channel (char *origin, char **argv, int argc)
 {
 	ChanMode (origin, argv, argc);
 }
+
+void 
+do_away (const char* nick, const char *reason)
+{
+	UserAway (nick, reason);
+}
+
+void 
+do_vhost (const char* nick, const char *vhost)
+{
+	SetUserVhost(nick, vhost);
+}
+
+void
+do_nickchange (const char * oldnick, const char *newnick, const char * ts)
+{
+	UserNick (oldnick, newnick, ts);
+}
+
+void 
+do_topic (const char* chan, const char *owner, const char* ts, const char *topic)
+{
+	ChanTopic (chan, owner, ts, topic);
+}
+
+void 
+do_svsmode_servicests (const char* nick, const char* ts)
+{	
+	do_svsmode_servicests (nick, ts);
+}
+
+void 
+do_server (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline, int srv)
+{
+	if(!srv) {
+		if (*uplink == 0) {
+			me.s = AddServer (name, uplink, hops, numeric, infoline);
+		} else {
+			me.s = AddServer (name, uplink, hops, numeric, infoline);
+		}
+	} else {
+		AddServer (name, uplink, hops, numeric, infoline);
+	}
+	
+}
+
+#ifdef MSG_BURST
+void 
+do_burst (char *origin, char **argv, int argc)
+{
+	if (argc > 0) {
+		if (ircd_srv.burst == 1) {
+			send_burst (0);
+			ircd_srv.burst = 0;
+			me.synced = 1;
+			init_services_bot ();
+		}
+	} else {
+		ircd_srv.burst = 1;
+	}
+}
+#endif

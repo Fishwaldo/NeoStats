@@ -29,9 +29,6 @@
 #include "QuantumIRCd.h"
 #include "dl.h"
 #include "log.h"
-#include "users.h"
-#include "server.h"
-#include "chans.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
@@ -388,16 +385,7 @@ m_sjoin (char *origin, char **argv, int argc, int srv)
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
-	if (argc > 0) {
-		if (ircd_srv.burst == 1) {
-			send_burst (0);
-			ircd_srv.burst = 0;
-			me.synced = 1;
-			init_services_bot ();
-		}
-	} else {
-		ircd_srv.burst = 1;
-	}
+	do_burst (origin, argv, argc);
 }
 
 static void
@@ -439,15 +427,7 @@ m_credits (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	if(!srv) {
-		if (*origin == 0) {
-			me.s = AddServer (argv[0], me.name, argv[1], NULL, NULL);
-		} else {
-			me.s = AddServer (argv[0], origin, argv[1], NULL, NULL);
-		}
-	} else {
-		AddServer (argv[0], origin, argv[1], NULL, NULL);
-	}
+	do_server (argv[0], origin, argv[1], NULL, NULL, srv);
 }
 
 static void
@@ -490,7 +470,7 @@ m_kill (char *origin, char **argv, int argc, int srv)
 static void
 m_vhost (char *origin, char **argv, int argc, int srv)
 {
-	SetUserVhost(argv[0], argv[1]);
+	do_vhost (argv[0], argv[1]);
 }
 
 static void
@@ -502,19 +482,15 @@ m_pong (char *origin, char **argv, int argc, int srv)
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
-	if (argc > 0) {
-		UserAway (origin, argv[0]);
-	} else {
-		UserAway (origin, NULL);
-	}
+	do_away (origin, (argc > 0) ? argv[0] : NULL);
 }
 
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
-		AddUser (argv[0], argv[4], argv[5], argv[9], argv[6], argv[8], argv[2]);
-		UserMode (argv[0], argv[3]);
+		do_nick (argv[0], argv[1], argv[2], argv[4], argv[5],
+			argv[6], argv[8], NULL, argv[3], NULL, argv[9]);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}
@@ -523,7 +499,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	ChanTopic (argv[0], argv[1], argv[2], argv[3]);
+	do_topic (argv[0], argv[1], argv[2], argv[3]);
 }
 
 static void
@@ -571,15 +547,14 @@ m_pass (char *origin, char **argv, int argc, int srv)
 static void
 m_client (char *origin, char **argv, int argc, int srv)
 {
-	AddUser (argv[0], argv[5], argv[6], argv[11], argv[8], argv[10], argv[2]);
-	UserMode (argv[0], argv[3]);
-	UserSMode (argv[0], argv[4]);
+	do_client (argv[0], NULL, argv[2], argv[3], argv[4], argv[5], argv[6], 
+		 NULL, argv[8], NULL, argv[10], argv[11]);
 }
 
 static void
 m_smode (char *origin, char **argv, int argc, int srv)
 {
-	UserSMode (argv[0], argv[1]);
+	do_smode (argv[0], argv[1]);
 };
 
 /* ultimate 3 */

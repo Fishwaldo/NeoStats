@@ -94,14 +94,19 @@ void do_netinfo (const char* maxglobalcnt, const char* tsendsync, const char* pr
 void do_snetinfo (const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname);
 void do_join (const char* nick, const char* chanlist, const char* keys);
 void do_part (const char* nick, const char* chan, const char* reason);
-void do_nick (const char *nick, const char *hopcount, const char* TS, 
-		 const char *user, const char *host, const char *server, 
-		 const char *ip, const char *servicestamp, const char *modes, 
-		 const char *vhost, const char *realname
+void do_nick (const char *nick, const char *hopcount, const char *TS, 
+		const char *user, const char *host, const char *server, 
+		const char *ip, const char *servicestamp, const char *modes, 
+		const char *vhost, const char *realname
 #ifdef GOTUSERSMODES
-		 , const char *smodes
+		, const char *smodes
 #endif
 		 );
+void do_client (const char *nick, const char *arg1, const char *TS, 
+		const char *modes, const char *smodes, 
+		const char *user, const char *host, const char *vhost, 
+		const char *server, const char *arg9, 
+		const char *ip, const char *realname);
 void do_quit (const char *nick, const char *quitmsg);
 void do_kill (const char *nick, const char *killmsg);
 void do_squit (const char *name, const char* reason);
@@ -112,6 +117,9 @@ void do_svinfo (void);
 #ifdef MSG_VCTRL
 void do_vctrl (const char* uprot, const char* nicklen, const char* modex, const char* gc, const char* netname);
 #endif
+#ifdef GOTUSERSMODES
+void do_smode (const char* nick, const char* modes);
+#endif
 void do_mode_user (const char* nick, const char* modes);
 void do_mode_channel (char *origin, char **argv, int argc);
 /* These are the same for now but we might need to be different in the 
@@ -119,6 +127,15 @@ void do_mode_channel (char *origin, char **argv, int argc);
  */
 #define do_svsmode_user do_mode_user
 #define do_svsmode_channel do_mode_channel
+void do_away (const char* nick, const char *reason);
+void do_vhost (const char* nick, const char *vhost);
+void do_nickchange (const char * oldnick, const char *newnick, const char * ts);
+void do_topic (const char* chan, const char *owner, const char* ts, const char *topic);
+void do_svsmode_servicests (const char* nick, const char* ts);
+void do_server (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline, int srv);
+#ifdef MSG_BURST
+void do_burst (char *origin, char **argv, int argc);
+#endif
 
 /* Defined in ircd specific files but common to all */
 void init_ircd (void);
@@ -176,6 +193,9 @@ void send_svinfo (const int tscurrent, const int tsmin, const int tsnow);
 #endif
 #ifdef MSG_VCTRL
 void send_vctrl (const int uprot, const int nicklen, const int modex, const int gc, const char* netname);
+#endif
+#ifdef MSG_BURST
+void send_burst (int b);
 #endif
 
 int sserver_cmd (const char *name, const int numeric, const char *infoline);

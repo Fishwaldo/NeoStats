@@ -217,7 +217,7 @@ UserAway (const char *nick, const char *awaymsg)
 }
 
 int 
-do_nickchange (const char * oldnick, const char *newnick, const char * ts)
+UserNick (const char * oldnick, const char *newnick, const char * ts)
 {
 	hnode_t *un;
 	lnode_t *cm;
@@ -229,7 +229,7 @@ do_nickchange (const char * oldnick, const char *newnick, const char * ts)
 	SET_SEGV_LOCATION();
 	u = finduser (oldnick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "do_nickchange: can't find user %s", oldnick);
+		nlog (LOG_WARNING, LOG_CORE, "UserNick: can't find user %s", oldnick);
 		return NS_FAILURE;
 	}
 
@@ -239,10 +239,10 @@ do_nickchange (const char * oldnick, const char *newnick, const char * ts)
 		time = me.now;
 	}
 
-	nlog (LOG_DEBUG2, LOG_CORE, "do_nickchange: %s -> %s", u->nick, newnick);
+	nlog (LOG_DEBUG2, LOG_CORE, "UserNick: %s -> %s", u->nick, newnick);
 	un = hash_lookup (uh, u->nick);
 	if (!un) {
-		nlog (LOG_WARNING, LOG_CORE, "do_nickchange: %s -> %s failed!", u->nick, newnick);
+		nlog (LOG_WARNING, LOG_CORE, "UserNick: %s -> %s failed!", u->nick, newnick);
 		return NS_FAILURE;
 	}
 	cm = list_first (u->chans);

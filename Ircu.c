@@ -27,9 +27,6 @@
 #include "Ircu.h"
 #include "dl.h"
 #include "log.h"
-#include "users.h"
-#include "server.h"
-#include "chans.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
@@ -298,15 +295,7 @@ m_admin (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	if(!srv) {
-		if (*origin == 0) {
-			me.s = AddServer (argv[0], me.name, argv[1], NULL, NULL);
-		} else {
-			me.s = AddServer (argv[0], origin, argv[1], NULL, NULL);
-		}
-	} else {
-		AddServer (argv[0], origin, argv[1], NULL, NULL);
-	}
+	do_server (argv[0], origin, argv[1], NULL, NULL, srv);
 }
 
 static void
@@ -356,10 +345,10 @@ m_away (char *origin, char **argv, int argc, int srv)
 
 	if (argc > 0) {
 		buf = joinbuf (argv, argc, 0);
-		UserAway (origin, buf);
+		do_away (origin, buf);
 		free (buf);
 	} else {
-		UserAway (origin, NULL);
+		do_away (origin, NULL);
 	}
 }
 static void
@@ -367,11 +356,10 @@ m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 		char *realname;
-
 		realname = joinbuf (argv, argc, 7);
-		AddUser (argv[0], argv[4], argv[5], realname, argv[6], NULL, argv[2]);
+		do_nick (argv[0], argv[1], argv[2], argv[4], argv[5], 
+			argv[6], NULL, NULL, argv[3], NULL, realname);
 		free (realname);
-		UserMode (argv[0], argv[3]);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}
@@ -382,7 +370,7 @@ m_topic (char *origin, char **argv, int argc, int srv)
 	char *buf;
 
 	buf = joinbuf (argv, argc, 2);
-	ChanTopic (argv[0], origin, NULL, buf);
+	do_topic (argv[0], origin, NULL, buf);
 	free (buf);
 }
 

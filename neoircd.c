@@ -27,9 +27,6 @@
 #include "neoircd.h"
 #include "dl.h"
 #include "log.h"
-#include "users.h"
-#include "server.h"
-#include "chans.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
@@ -347,16 +344,7 @@ m_sjoin (char *origin, char **argv, int argc, int srv)
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
-	if (argc > 0) {
-		if (ircd_srv.burst == 1) {
-			send_burst (0);
-			ircd_srv.burst = 0;
-			me.synced = 1;
-			init_services_bot ();
-		}
-	} else {
-		ircd_srv.burst = 1;
-	}
+	do_burst (origin, argv, argc);
 	send_eob (me.name);
 }
 
@@ -393,15 +381,7 @@ m_credits (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	if(!srv) {
-		if (*origin == 0) {
-			me.s = AddServer (argv[0], me.name, argv[1], NULL, NULL);
-		} else {
-			me.s = AddServer (argv[0], origin, argv[1], NULL, NULL);
-		}
-	} else {
-		AddServer (argv[0], origin, argv[1], NULL, NULL);
-	}
+	do_server (argv[0], origin, argv[1], NULL, NULL, srv);
 }
 
 static void
@@ -438,19 +418,14 @@ m_pong (char *origin, char **argv, int argc, int srv)
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
-	if (argc > 0) {
-		UserAway (origin, argv[0]);
-	} else {
-		UserAway (origin, NULL);
-	}
+	do_away (origin, (argc > 0) ? argv[0] : NULL);
 }
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
-		AddUser (argv[0], argv[4], argv[5], argv[9], argv[7], NULL, argv[2]);
-		SetUserVhost(argv[0], argv[6]);
-		UserMode (argv[0], argv[3]);
+		do_nick (argv[0], argv[1], argv[2], argv[4], argv[5], 
+			argv[7], NULL, NULL, argv[3], argv[6], argv[9]);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}
@@ -458,7 +433,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	ChanTopic (argv[0], argv[1], argv[2], argv[3]);
+	do_topic (argv[0], argv[1], argv[2], argv[3]);
 }
 
 static void
@@ -501,6 +476,6 @@ m_pass (char *origin, char **argv, int argc, int srv)
 static void
 m_tburst (char *origin, char **argv, int argc, int srv)
 {
-	ChanTopic (argv[1], argv[3], argv[2], argv[4]);
+	do_topic (argv[1], argv[3], argv[2], argv[4]);
 }
 

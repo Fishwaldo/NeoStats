@@ -29,9 +29,6 @@
 #include "Ultimate.h"
 #include "dl.h"
 #include "log.h"
-#include "users.h"
-#include "server.h"
-#include "chans.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
@@ -74,6 +71,11 @@ const char services_bot_modes[]= "+oS";
 const char ircd_version[] = "(UL)";
 const char services_bot_modes[]= "+oS";
 #endif
+
+/* Ultimate 2 does support these 5 tokens so may need to add them back 
+ * in at some point
+ * TOK_MODE, TOK_JOIN, TOK_NICK, TOK_AWAY, TOK_TOPIC
+ */
 
 ircd_cmd cmd_list[] = {
 	/* Command      Token          Function       srvmsg */
@@ -238,7 +240,8 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 #else
 	sts ("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
 	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
-	sts ("%s TOKEN CLIENT", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
+/*	sts ("%s TOKEN CLIENT", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));*/
+	sts ("%s CLIENT", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 #endif
 }
 
@@ -468,16 +471,7 @@ m_sjoin (char *origin, char **argv, int argc, int srv)
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
-	if (argc > 0) {
-		if (ircd_srv.burst == 1) {
-			send_burst (0);
-			ircd_srv.burst = 0;
-			me.synced = 1;
-			init_services_bot ();
-		}
-	} else {
-		ircd_srv.burst = 1;
-	}
+	do_burst (origin, argv, argc);
 }
 #endif
 
@@ -520,15 +514,7 @@ m_credits (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	if(!srv) {
-		if (*origin == 0) {
-			me.s = AddServer (argv[0], me.name, argv[1], NULL, NULL);
-		} else {
-			me.s = AddServer (argv[0], origin, argv[1], NULL, NULL);
-		}
-	} else {
-		AddServer (argv[0], origin, argv[1], NULL, NULL);
-	}
+	do_server (argv[0], origin, argv[1], NULL, NULL, srv);
 }
 
 static void
@@ -574,9 +560,9 @@ static void
 m_vhost (char *origin, char **argv, int argc, int srv)
 {
 #ifdef ULTIMATE3
-	SetUserVhost(argv[0], argv[1]);
+	do_vhost (argv[0], argv[1]);
 #else
-	SetUserVhost(origin, argv[0]);
+	do_vhost (origin, argv[0]);
 #endif
 }
 static void
@@ -587,21 +573,18 @@ m_pong (char *origin, char **argv, int argc, int srv)
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
-	if (argc > 0) {
-		UserAway (origin, argv[0]);
-	} else {
-		UserAway (origin, NULL);
-	}
+	do_away (origin, (argc > 0) ? argv[0] : NULL);
 }
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 #ifdef ULTIMATE3
-		AddUser (argv[0], argv[4], argv[5], argv[9], argv[6], argv[8], argv[2]);
-		UserMode (argv[0], argv[3]);
+		do_nick (argv[0], argv[1], argv[2], argv[4], argv[5], 
+			argv[6], argv[8], NULL, argv[3], NULL, argv[9], NULL);
 #elif ULTIMATE
-		AddUser (argv[0], argv[3], argv[4], argv[7], argv[5], NULL, argv[2]);
+		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4],
+			argv[5], NULL, NULL, NULL, NULL, argv[7]);
 #endif
 	} else {
 		do_nickchange (origin, argv[0], NULL);
@@ -610,7 +593,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	ChanTopic (argv[0], argv[1], argv[2], argv[3]);
+	do_topic (argv[0], argv[1], argv[2], argv[3]);
 }
 
 static void
@@ -667,16 +650,14 @@ m_pass (char *origin, char **argv, int argc, int srv)
 static void
 m_client (char *origin, char **argv, int argc, int srv)
 {
-	AddUser (argv[0], argv[5], argv[6], argv[11], argv[8], argv[10], argv[2]);
-	SetUserVhost(argv[0], argv[7]);
-	UserMode (argv[0], argv[3]);
-	UserSMode (argv[0], argv[4]);
+	do_client (argv[0], NULL, argv[2], argv[3], argv[4], argv[5], argv[6], 
+		 argv[7], argv[8], NULL, argv[10], argv[11]);
 }
 
 static void
 m_smode (char *origin, char **argv, int argc, int srv)
 {
-	UserSMode (argv[0], argv[1]);
+	do_smode (argv[0], argv[1]);
 };
 
 /* ultimate 3 */

@@ -29,9 +29,6 @@
 #include "Unreal.h"
 #include "dl.h"
 #include "log.h"
-#include "users.h"
-#include "server.h"
-#include "chans.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
@@ -462,15 +459,7 @@ m_server (char *origin, char **argv, int argc, int srv)
 	}
 #endif
 
-	if(!srv) {
-		if (*origin == 0) {
-			me.s = AddServer (argv[0], me.name, argv[1], argv[2], s);
-		} else {
-			me.s = AddServer (argv[0], origin, argv[1], argv[2], s);
-		}
-	} else {
-		AddServer (argv[0], origin, argv[1], argv[2], s);
-	}
+	do_server (argv[0], origin, argv[1], argv[2], s, srv);
 }
 
 /* m_squit
@@ -504,7 +493,7 @@ m_svsmode (char *origin, char **argv, int argc, int srv)
 		do_svsmode_channel (origin, argv, argc);
 	} else {
 		if (argv[2] && isdigit(*argv[2])) {
-			SetUserServicesTS(argv[0], argv[2]); 
+			do_svsmode_servicests (argv[0], argv[2]); 
 		} else {
 			do_svsmode_user (argv[0], argv[1]);
 		}
@@ -553,7 +542,7 @@ m_kill (char *origin, char **argv, int argc, int srv)
 static void
 m_vhost (char *origin, char **argv, int argc, int srv)
 {
-	SetUserVhost(origin, argv[0]);
+	do_vhost (origin, argv[0]);
 }
 
 /* m_pong
@@ -572,7 +561,7 @@ m_pong (char *origin, char **argv, int argc, int srv)
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
-	UserAway (origin, (argc > 0) ? argv[0] : NULL);
+	do_away (origin, (argc > 0) ? argv[0] : NULL);
 }
 
 /* m_nick
@@ -601,11 +590,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 #ifdef NICKV2	
 		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
 			NULL, argv[6], argv[7], argv[8], argv[9]);
-/*		AddUser (argv[0], argv[3], argv[4], argv[9], argv[5], NULL, argv[2]);
-		UserMode (argv[0], argv[7]);
-		SetUserVhost(argv[0], argv[8]);*/
 #else
-/*		AddUser (argv[0], argv[3], argv[4], argv[7], argv[5], NULL, argv[2]);*/
 		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
 			NULL, argv[6], NULL, NULL, argv[9]);
 #endif
@@ -626,7 +611,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	ChanTopic (argv[0], argv[1], argv[2], argv[3]);
+	do_topic (argv[0], argv[1], argv[2], argv[3]);
 }
 
 /* m_kick
