@@ -588,7 +588,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		/*       nick,    hopcount, TS,     user,    host, */
         do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
 			/* server, ip, servicestamp, modes*/
-			origin, NULL, NULL, (argv[5][0] == '+' : argv[5]: NULL),
+			origin, NULL, NULL, (argv[5][0] == '+' ? argv[5]: NULL),
 			/*, vhost, realname, numeric*/ 
 			NULL, realname, argv[argc-2]);
 		free (realname);
