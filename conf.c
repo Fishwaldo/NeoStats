@@ -28,6 +28,7 @@
 #include "conf.h"
 #include "dl.h"
 #include "log.h"
+#include "services.h"
 
 static void cb_Server (char *, int);
 static void cb_Module (char *, int);
@@ -198,10 +199,10 @@ cb_Server (char *arg, int configtype)
 		me.r_time = atoi (arg);
 	} else if (configtype == 7) {
 		/* NeoStat Host */
-		strlcpy (Servbot.host, arg, sizeof (Servbot.host));
+		strlcpy (me.host, arg, MAXHOST);
 	} else if (configtype == 8) {
 		/* NeoStat User */
-		strlcpy (Servbot.user, arg, sizeof (Servbot.user));
+		strlcpy (me.user, arg, MAXUSER);
 	} else if (configtype == 9) {
 		me.want_privmsg = 1;
 	} else if (configtype == 10) {

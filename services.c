@@ -35,9 +35,6 @@
 #include "chans.h"
 #include "hash.h"
 
-static char quitmsg[BUFSIZE];
-static char no_reason[]="no reason given";
-
 static void ns_set_debug (User * u, char **av, int ac);
 static void ns_shutdown (User * u, char **av, int ac);
 static void ns_reload (User * u, char **av, int ac);
@@ -54,6 +51,9 @@ static void ns_version (User * u, char **av, int ac);
 static void ns_show_level (User * u, char **av, int ac);
 static void ns_load_module (User * u, char **av, int ac);
 static void ns_unload_module (User * u, char **av, int ac);
+
+static char quitmsg[BUFSIZE];
+static char no_reason[]="no reason given";
 
 static bot_cmd ns_commands[]=
 {
@@ -81,22 +81,37 @@ static bot_cmd ns_commands[]=
 	{NULL,			NULL,			0, 	0,			NULL, 			0,	NULL}
 };
 
-int 
-init_services() 
+/** @brief init services
+ *
+ *  Setup command list for main services bot
+ *   
+ *  @param none
+ *  @returns NS_SUCCESS or NS_FAILURE
+ */ 
+int  
+init_services(void) 
 {
+	SET_SEGV_LOCATION();
 	/* Add command list to services bot */
 	add_services_cmd_list(ns_commands);
-
 	return NS_SUCCESS;
 }
 
+/** @brief SHUTDOWN command handler
+ *
+ *  Shutdown NeoStats
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void
 ns_shutdown (User * u, char **av, int ac)
 {
 	char *tmp;
 
 	SET_SEGV_LOCATION();
-
 	if (ac <= 2) {
 		ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
 			u->nick, u->username, u->hostname, no_reason);
@@ -112,13 +127,21 @@ ns_shutdown (User * u, char **av, int ac)
 	do_exit (NS_EXIT_NORMAL, quitmsg);
 }
 
+/** @brief RELOAD command handler
+ *
+ *  Reload NeoStats
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void
 ns_reload (User * u, char **av, int ac)
 {
 	char *tmp;
 
 	SET_SEGV_LOCATION();
-
 	if (ac <= 2) {
 		prefmsg (u->nick, s_Services, "You must supply a Reason to Reload");
 		return;
@@ -128,12 +151,20 @@ ns_reload (User * u, char **av, int ac)
 	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested RELOAD for %s.", 
 		u->nick, u->username, u->hostname, tmp);
 	free (tmp);
-
 	globops (s_Services, quitmsg);
 	nlog (LOG_NOTICE, LOG_CORE, quitmsg);
 	do_exit (NS_EXIT_RELOAD, quitmsg);
 }
 
+/** @brief LOGS command handler
+ *
+ *  Send logs to nick
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void
 ns_logs (User * u, char **av, int ac)
 {
@@ -157,6 +188,15 @@ ns_logs (User * u, char **av, int ac)
 #endif
 }
 
+/** @brief JUPE command handler
+ *
+ *  Jupiter a server
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void
 ns_jupe (User * u, char **av, int ac)
 {
@@ -170,6 +210,15 @@ ns_jupe (User * u, char **av, int ac)
 	prefmsg(u->nick, s_Services, "%s has been Jupitered", av[2]);
 }
 
+/** @brief DEBUG command handler
+ *
+ *  Set debug mode on/off 
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void
 ns_set_debug (User * u, char **av, int ac)
 {
@@ -190,9 +239,19 @@ ns_set_debug (User * u, char **av, int ac)
 	}
 }
 
+/** @brief USERDUMP command handler
+ *
+ *  Dump user list
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void
 ns_user_dump (User * u, char **av, int ac)
 {
+	SET_SEGV_LOCATION();
 	if (!me.debug_mode) {
 		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 		return;
@@ -200,6 +259,16 @@ ns_user_dump (User * u, char **av, int ac)
 	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump!", u->nick);
 	UserDump (((ac < 3) ? NULL : av[2]));
 }
+
+/** @brief SERVERDUMP command handler
+ *
+ *  Dump server list
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void
 ns_server_dump (User * u, char **av, int ac)
 {
@@ -211,6 +280,16 @@ ns_server_dump (User * u, char **av, int ac)
 	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump!", u->nick);
 	ServerDump ();
 }
+
+/** @brief CHANDUMP command handler
+ *
+ *  Dump channel list
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void
 ns_chan_dump (User * u, char **av, int ac)
 {
@@ -223,6 +302,15 @@ ns_chan_dump (User * u, char **av, int ac)
 	ChanDump (((ac < 3) ? NULL : av[2]));
 }
 
+/** @brief INFO command handler
+ *
+ *  Display NeoStats info
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void 
 ns_info (User * u, char **av, int ac)
 {
@@ -250,6 +338,16 @@ ns_info (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "Debugging Mode is Disabled!");
 	prefmsg (u->nick, s_Services, "End of Information.");
 }
+
+/** @brief VERSION command handler
+ *
+ *  NeoStats Version
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void
 ns_version (User * u, char **av, int ac)
 {
@@ -259,9 +357,19 @@ ns_version (User * u, char **av, int ac)
 	prefmsg (u->nick, s_Services, "http://www.neostats.net");
 }
 
+/** @brief LEVEL command handler
+ *
+ *  Display user level
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void 
 ns_show_level (User * u, char **av, int ac)
 {
+	SET_SEGV_LOCATION();
 	if(ac > 2) {
 		User * otheruser;
 		otheruser = finduser(av[2]);
@@ -273,9 +381,19 @@ ns_show_level (User * u, char **av, int ac)
 	}
 }
 
+/** @brief LOAD command handler
+ *
+ *  Load module
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void 
 ns_load_module (User * u, char **av, int ac)
 {
+	SET_SEGV_LOCATION();
 	if (load_module (av[2], u) == NS_SUCCESS) {
 		chanalert (s_Services, "%s Loaded Module %s", u->nick, av[2]);
 	} else {
@@ -283,22 +401,41 @@ ns_load_module (User * u, char **av, int ac)
 	}
 }
 
+/** @brief UNLOAD command handler
+ *
+ *  Unload module
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 static void 
 ns_unload_module (User * u, char **av, int ac)
 {
+	SET_SEGV_LOCATION();
 	if (unload_module (av[2], u) > 0) {
 		chanalert (s_Services, "%s Unloaded Module %s", u->nick, av[2]);
 	}
 }
 
+/** @brief RAW command handler
+ *
+ *  issue a RAW command
+ *   
+ *  @param user
+ *  @param list of arguments
+ *  @param number of arguments
+ *  @returns none
+ */
 #ifdef USE_RAW
 static void
 ns_raw (User * u, char **av, int ac)
 {
 	char *message;
 
-	message = joinbuf (av, ac, 2);
 	SET_SEGV_LOCATION();
+	message = joinbuf (av, ac, 2);
 	chanalert (s_Services, "\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)", u->nick, message);
 	nlog (LOG_INFO, LOG_CORE, "RAW COMMAND %sIssued a Raw Command!(%s)", u->nick, message);
 	sts(message);

@@ -361,7 +361,6 @@ parse (char *line)
 void
 init_ServBot (void)
 {
-	char rname[MAXREALNAME];
 	char **av;
 	int ac = 0;
 
@@ -370,8 +369,8 @@ init_ServBot (void)
 		/* nick already exists on the network */
 		strlcat (s_Services, "1", MAXNICK);
 	}
-	ircsnprintf (rname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
-	SignOn_NewBot (s_Services, Servbot.user, Servbot.host, rname, UMODE_SERVICES);
+	ircsnprintf (me.rname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
+	SignOn_NewBot (s_Services, me.user, me.host, me.rname, UMODE_SERVICES);
 	me.onchan = 1;
 	AddStringToList (&av, me.uplink, &ac);
 	ModuleEvent (EVENT_ONLINE, av, ac);
@@ -432,7 +431,7 @@ flood (User * u)
 	}
 	if (u->flood >= 5) {
 		nlog (LOG_NORMAL, LOG_CORE, "FLOODING: %s!%s@%s", u->nick, u->username, u->hostname);
-		ssvskill_cmd (u->nick, "%s!%s (Flooding Services.)", Servbot.host, s_Services);
+		ssvskill_cmd (u->nick, "%s!%s (Flooding Services.)", me.host, s_Services);
 		return 1;
 	} else {
 		u->flood++;

@@ -245,6 +245,9 @@ struct me {
 	char infoline[MAXHOST];
 	char netname[MAXPASS];
 	char local[MAXHOST];
+	char user[MAXUSER];			/* bot user */
+	char host[MAXHOST];			/* bot host */
+	char rname[MAXREALNAME];	/* bot real name */
 	time_t t_start;
 	unsigned int allbots;
 	unsigned int maxsocks;
@@ -275,14 +278,6 @@ struct me {
 	int pingtime;
 	time_t now;
 } me;
-
-/** @brief Servbot structure
- *  
- */
-struct Servbot {
-	char user[MAXUSER];
-	char host[MAXHOST];
-} Servbot;
 
 /** @brief User structure
  *  
@@ -366,6 +361,16 @@ typedef struct bot_cmd {
 	const char* 	onelinehelp;	/* single line help for generic help function */
 }bot_cmd;
 
+/** @brief flags for bots
+ *  flags to influence how bots are managed
+ *  e.g. restrict to opers
+ */
+
+/* Restrict module bot to only respond to oper requests
+ * when ONLY_OPERS is set in the config file
+ */
+#define BOT_FLAG_ONLYOPERS	0x00000001
+
 /* SET Comand handling */
 /* (Work in progress) */
 
@@ -425,6 +430,7 @@ void parse (char* line);
 char *joinbuf (char **av, int ac, int from);
 int split_buf (char *buf, char ***argv, int colon_special);
 int flood (User * u);
+/* (M) For backwards compatibility only, bots are moving to a new interface */
 int init_bot (char * nick, char * user, char * host, char * rname, const char *modes, char * modname);
 int del_bot (char * nick, char * reason);
 
@@ -451,7 +457,7 @@ int IsChanMember(Chans *c, User *u);
 int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);
 
 /* services.c */
-int init_services();
+int init_services(void);
 int add_services_cmd_list(bot_cmd* cmd_list);
 int del_services_cmd_list(bot_cmd* cmd_list);
 void services_cmd_help (User * u, char **av, int ac);

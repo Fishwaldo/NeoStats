@@ -145,6 +145,9 @@ struct cs_cfg {
 
 static int cs_online = 0;
 
+ModUser *cs_bot;
+
+
 ModuleInfo __module_info = {
 	"ConnectServ",
 	"Network Connection & Mode Monitoring Service",
@@ -223,7 +226,6 @@ static void do_set(User * u, char **av, int ac)
 
 static int Online(char **av, int ac)
 {
-	ModUser *mybot;
 	if (init_bot
 	    (s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.rname, services_bot_modes,
 	     __module_info.module_name) == -1) {
@@ -232,8 +234,8 @@ static int Online(char **av, int ac)
 		init_bot(s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.rname, services_bot_modes,
 			 __module_info.module_name);
 	}
-	mybot = findbot(s_ConnectServ);
-	add_bot_cmd_list(mybot, cs_commands);
+	cs_bot = findbot(s_ConnectServ);
+	add_bot_cmd_list(cs_bot, cs_commands);
 	cs_online = 1;
 	return 1;
 };

@@ -62,6 +62,7 @@
  * 
  */
 typedef int (*message_function) (char *origin, char **av, int ac);
+typedef int (*timer_function) (void);
 
 /** @brief Socket function types
  * 
@@ -115,14 +116,12 @@ typedef struct ModTimer {
 	/** Time last run */
 	time_t lastrun;
 	/** Timer function */
-	int (*function) ();
+	timer_function function;
 }ModTimer;
 
 /** @brief Module User structure
  * 
  */
-
-#define BOT_FLAG_ONLYOPERS	0x00000001
 
 typedef struct ModUser {
 	/** Nick */
@@ -238,9 +237,12 @@ int get_mod_num (char *mod_name);
 void unload_modules(void);
 int bot_nick_change (char * oldnick, char *newnick);
 void verify_hashes(void);
+
 int add_bot_cmd_list(ModUser *bot_ptr, bot_cmd *cmd_list);
 int del_bot_cmd_list(ModUser *bot_ptr, bot_cmd *cmd_list);
 void run_bot_cmd (ModUser *bot_ptr, User *u, char **av, int ac);
+ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname, const char *modes, char * modname);
+int del_mod_bot (ModUser *bot_ptr, char * reason);
 
 /* 
  * Module Interface 
