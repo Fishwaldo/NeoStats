@@ -1,10 +1,13 @@
 HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
+* Version 2.5 * Fish * Feb 3rd, 2003
++ check for duplicate nicks before adding entries
++ added a command to show configured levels
+
 * Version 2.4 * Fish * Jan 29th, 2003
 + a few typo's in the messages
 + chpass can only be used if you match the host, or u have level 100 with neostats
-
 
 * Version 2.3 * Shmad & Fish * January 4th, 2003
 + Write to DB who added the record.

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hs_help.c,v 1.9 2003/01/07 13:07:08 fishwaldo Exp $
+** $Id: hs_help.c,v 1.10 2003/02/04 11:22:17 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -31,7 +31,7 @@ const char *hs_help[] = {
 "COMMANDS:",
 "     ABOUT     LOGIN     ADD",
 "     DEL       LIST      VIEW",
-"     CHPASS    LISTBAN",
+"     CHPASS    LISTBAN   LEVELS",
 "",
 "Only Network Admins can use the DEL function",
 "",
@@ -121,6 +121,15 @@ const char *hs_help_listban[] = {
 "",
 "This lists current vhosts that are banned by the network adminstration.",
 "Wildcards, like *fbi* are permitted.",
+"",
+NULL
+};
+
+const char *hs_help_levels[] = {
+"\2HostServ Help : LEVELS",
+"\2Usage:\2 LEVELS",
+"",
+"This lists the levels required to perform certian functions with hostserv.",
 "",
 NULL
 };

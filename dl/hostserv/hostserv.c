@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.36 2003/01/29 10:06:51 fishwaldo Exp $
+** $Id: hostserv.c,v 1.37 2003/02/04 11:22:17 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -92,7 +92,7 @@ int ListArryCount = 0;
 Module_Info HostServ_info[] = { {
     "HostServ",
     "Network User Virtual Host Service",
-    "2.4"
+    "2.5"
 } };
 
 
@@ -219,6 +219,9 @@ int __Bot_Message(char *origin, char **av, int ac)
 	} else if (!strcasecmp(av[2], "VIEW") && (UserLevel(u) >= hs_lvl.view)) {
 	    privmsg_list(u->nick, s_HostServ, hs_help_view);
 	    return 1;
+	} else if (!strcasecmp(av[2], "LEVELS") && (UserLevel(u) >= 40)) {
+	    privmsg_list(u->nick, s_HostServ, hs_help_levels);
+	    return 1;
 	} else if (!strcasecmp(av[2], "LOGIN")) {
 	    privmsg_list(u->nick, s_HostServ, hs_help_login);
 	    return 1;
@@ -261,6 +264,9 @@ int __Bot_Message(char *origin, char **av, int ac)
                 hs_list(u);
     } else if (!strcasecmp(av[1], "LISTBAN")) {
     		hs_listban(u);
+    } else if (!strcasecmp(av[1], "LEVELS") && (UserLevel(u) >= 40)) {
+    	    	prefmsg(u->nick, s_HostServ, "Configured Levels: Add: %d, Del: %d, List: %d, View: %d", hs_lvl.add, hs_lvl.del, hs_lvl.list, hs_lvl.view);
+		return 1;
     } else if (!strcasecmp(av[1], "VIEW") && (UserLevel(u) >= hs_lvl.view)) {
 		if (!av[2]) {
 		    prefmsg(u->nick, s_HostServ, "Syntax: /msg %s VIEW #", s_HostServ);
@@ -477,21 +483,26 @@ static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
     }
 
     
-    hsdat(cmd, m, h, p, u->nick);
-    hslog("%s added a vhost for %s with realhost %s vhost %s and password %s",u->nick, cmd, m, h, p);
-    prefmsg(u->nick, s_HostServ, "%s has sucessfuly been registered under realhost: %s vhost: %s and password: %s",cmd, m, h, p);
-    chanalert(s_HostServ, "%s added a vhost %s for %s with realhost %s", u->nick, h, cmd, m);
-    /* Apply The New Hostname If The User Is Online */        
-    if ((u = finduser(cmd)) != NULL) {
-          if (findbot(cmd)) return;
-          tmp = strlower(u->hostname);
-	  if (fnmatch(m, tmp, 0) == 0) {
-              ssvshost_cmd(u->nick, h);
-              prefmsg(u->nick, s_HostServ, "%s is online now, setting vhost to %s", cmd, h);
-	      prefmsg(cmd, s_HostServ, "You Vhost has been created with Real HostMask of %s and username %s with password %s", m, cmd, p);
-	      prefmsg(cmd, s_HostServ, "For security, you should change your vhost password. See /msg %s help chpass", s_HostServ);
-              return;
-          }
+    if (!hash_lookup(vhosts, cmd)) {
+	    hsdat(cmd, m, h, p, u->nick);
+	    hslog("%s added a vhost for %s with realhost %s vhost %s and password %s",u->nick, cmd, m, h, p);
+	    prefmsg(u->nick, s_HostServ, "%s has sucessfuly been registered under realhost: %s vhost: %s and password: %s",cmd, m, h, p);
+	    chanalert(s_HostServ, "%s added a vhost %s for %s with realhost %s", u->nick, h, cmd, m);
+	    /* Apply The New Hostname If The User Is Online */        
+	    if ((u = finduser(cmd)) != NULL) {
+        	  if (findbot(cmd)) return;
+	          tmp = strlower(u->hostname);
+		  if (fnmatch(m, tmp, 0) == 0) {
+	              ssvshost_cmd(u->nick, h);
+        	      prefmsg(u->nick, s_HostServ, "%s is online now, setting vhost to %s", cmd, h);
+		      prefmsg(cmd, s_HostServ, "You Vhost has been created with Real HostMask of %s and username %s with password %s", m, cmd, p);
+		      prefmsg(cmd, s_HostServ, "For security, you should change your vhost password. See /msg %s help chpass", s_HostServ);
+	              return;
+        	  }
+	    }
+    } else {
+    	prefmsg(u->nick, s_HostServ, "%s already has a HostServ Entry", cmd);
+    	return;
     }
 }
 
@@ -561,23 +572,27 @@ void Loadhosts()
     	load_synch = 1;
 		while (fgets(buf, 512, fp)) {
         	    strip(buf);
-	            map = malloc(sizeof(hs_map));
 
         	    LoadArryCount = split_buf(buf, &LoadArry, 0);
-	            strcpy(map->nnick, LoadArry[0]);
-        	    strcpy(map->host, LoadArry[1]);
-	            strcpy(map->vhost, LoadArry[2]);
-		    if (LoadArryCount > 3) { /* Check for upgrades from earlier versions */
-			strcpy(map->passwd, LoadArry[3]);
-		    } else /* Upgrading from earlier version, no passwds exist */
-			strcpy(map->passwd, NULL);
-		    if (LoadArryCount > 4) { /* Does who set it exist? Yes? go ahead */
-	    		strcpy(map->added, LoadArry[4]);
-		    } else /* We have no information on who set it so its null */
-		    	strcpy(map->added, "0");
-		    /* add it to the hash */
-		    hn = hnode_create(map);
-		    hash_insert(vhosts, hn, map->nnick);
+		    if (!hash_lookup(vhosts, LoadArry[0])) {
+		            map = malloc(sizeof(hs_map));
+		            strcpy(map->nnick, LoadArry[0]);
+        		    strcpy(map->host, LoadArry[1]);
+		            strcpy(map->vhost, LoadArry[2]);
+			    if (LoadArryCount > 3) { /* Check for upgrades from earlier versions */
+				strcpy(map->passwd, LoadArry[3]);
+			    } else /* Upgrading from earlier version, no passwds exist */
+				strcpy(map->passwd, NULL);
+			    if (LoadArryCount > 4) { /* Does who set it exist? Yes? go ahead */
+	    			strcpy(map->added, LoadArry[4]);
+			    } else /* We have no information on who set it so its null */
+			    	strcpy(map->added, "0");
+			    /* add it to the hash */
+			    hn = hnode_create(map);
+			    hash_insert(vhosts, hn, map->nnick);
+		    } else
+	    		    log("HostServ: db entry for %s already exists", LoadArry[0]);
+		
 	    	}
     	fclose(fp);
     } 
