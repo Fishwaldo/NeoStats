@@ -173,7 +173,7 @@
 /* Umode chars */
 #define UMODE_CH_LOCOP 'O'
 #define UMODE_CH_OPER 'o'
-#define UMODE_CH_ADMIN 'a'
+#define UMODE_CH_ADMIN 'A'
 
 /* Umodes */
 #define UMODE_OPER     0x00001	/* umode +o - Oper */
