@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.56 2003/05/14 16:07:18 fishwaldo Exp $
+** $Id: dl.c,v 1.57 2003/05/14 16:18:18 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -503,6 +503,7 @@ int load_module(char *path1, User *u) {
 		if (do_msg) prefmsg(u->nick, s_Services, "Error, Couldn't Load Module");
 		if (do_msg) prefmsg(u->nick, s_Services, "%s",dlerror());
 		nlog(LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dlerror());
+		nlog(LOG_WARNING, LOG_CORE, "Module was %s", p);
 		return -1;
 	}
 
