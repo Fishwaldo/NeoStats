@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.11 2002/02/27 12:33:13 fishwaldo Exp $
+** $Id: users.c,v 1.12 2002/02/27 13:30:59 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -66,7 +66,7 @@ User *new_user(char *nick)
 	hnode_t *un;
 
 	/* before we add a new user, we check the table */
-	if (hash_verify(uh)) {
+	if (!hash_verify(uh)) {
 		globops(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
 		notice(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
 		log("Eeek, Users table is corrupted!");

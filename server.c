@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: server.c,v 1.2 2002/02/27 13:09:39 fishwaldo Exp $
+** $Id: server.c,v 1.3 2002/02/27 13:30:59 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -18,9 +18,6 @@ Server *new_server(char *);
 
 hash_t *sh;
 
-#ifdef DEBUG
-#error this sucks
-#endif
 
 
 Server *new_server(char *name)
@@ -28,7 +25,7 @@ Server *new_server(char *name)
 	Server *s;
 	hnode_t *sn;
 
-	if (hash_verify(sh)) {
+	if (!hash_verify(sh)) {
 		globops(me.name, "Eeek, Server Table is corrupted! Continuing, but expect a crash");
 		notice(me.name, "Eeek, Server Table is corrupted! Continuing, but expect a crash");
 		log("Eeek, Server table is corrupted");
@@ -38,12 +35,14 @@ Server *new_server(char *name)
 		name = "";
 	memcpy(s->name, name, MAXHOST);
 	sn = hnode_create(s);
-	if (hash_isfull(sh)) {
-		log("Eeek, Server Hash is full!");
-	} else {
-		hash_insert(sh, sn, s);
+	if (!sn) {
+		printf("eek\n");
 	}
-
+	if (hash_isfull(sh)) {
+		log("Eeek, Server Hash is full!\n");
+	} else {
+		hash_insert(sh, sn, s->name);
+	}
 	return s;
 }
 
@@ -88,7 +87,7 @@ Server *findserver(char *name)
 	Server *s;
 	hnode_t *sn;
 
-	strlower(name);
+	name = strlower(name);
 	sn = hash_lookup(sh, name);
 	if (sn) {
 		s = hnode_get(sn);
@@ -118,6 +117,10 @@ void ServerDump()
 void init_server_hash()
 {
 	sh = hash_create(S_TABLE_SIZE, 0, 0);	
+	if (!sh) {
+		log("Create Server Hash Failed\n");
+		exit(-1);
+	}
 	AddServer(me.name,me.name, 0);
 }
 
