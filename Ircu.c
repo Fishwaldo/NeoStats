@@ -577,6 +577,7 @@ m_away (char *origin, char **argv, int argc, int srv)
 -1 <fullname>
 */
 /* R: AB N Mark 1 1076011621 a xxx.xxx.xxx.xxx DAqO4N ABAAB :M */
+/* R: AB N TheEggMan 1 1076104492 ~eggy 64.XX.XXX.XXX +oiwg BAFtnj ABAAA :eggy */
 /* R: ABAAH N m2 1076077934 */
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
@@ -584,8 +585,9 @@ m_nick (char *origin, char **argv, int argc, int srv)
 	if(argc > 2) {
 		char *realname;
 		realname = joinbuf (argv, argc, (argc - 1));
+		/*       nick,    hopcount, TS,     user,    host, server, ip, servicestamp, modes, vhost, realname, numeric*/
         do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
-			argv[6], NULL, NULL, NULL, NULL, realname, argv[argc-2]);
+			origin, NULL, NULL, NULL, NULL, realname, argv[argc-2]);
 		free (realname);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
