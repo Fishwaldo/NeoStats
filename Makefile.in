@@ -94,7 +94,7 @@ distclean:
 	(cd sqlsrv; $(MAKE) $@)
 	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc dl/Makefile.inc *.log *.a *.d *.exe config.status
 
-install: neostats modules
+install: neostats
 	@echo "Installing ..."
 	@$(RM) @prefix@/dl/cs.so
 	@$(RM) @prefix@/dl/ms.so
