@@ -206,7 +206,7 @@ esac
 
 dnl check to see what type of authentication to use
 AC_MSG_CHECKING(What type of Authentication to use...)
-AC_ARG_ENABLE(auth, [ --enable-auth==TYPE - what type of Authentication to use. See Readme File],
+AC_ARG_ENABLE(auth, [ --enable-auth=TYPE - what type of Authentication to use. See Readme File],
 [ case "$enableval" in
   sr)  
 	AC_DEFINE(EXTAUTH, 1, 'Use IRCD Authentication')

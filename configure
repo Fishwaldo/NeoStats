@@ -829,7 +829,7 @@ Optional Features:
  --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support
  --enable-hybrid7 - enable Hybrid7 IRCD Support
  --enable-neoircd - enable NeoIRCd IRCD Support
- --enable-auth==TYPE - what type of Authentication to use. See Readme File
+ --enable-auth=TYPE - what type of Authentication to use. See Readme File
  --enable-raw - Enable Raw command
  --enable-modules="MODULES" - space seperated list of modules to compile
 
