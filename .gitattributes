@@ -18,6 +18,9 @@ dl/Makefile.in -text
 dl/icq/DOESNOTCOMPILE -text
 dl/icq/Makefile.in -text
 dl/icq/icq.c -text
+dl/icq/icq.h -text
+dl/icq/icq_help.c -text
+dl/icq/icqconfig.h -text
 dl/icq/icqlib.c -text
 dl/icq/icqlib.h -text
 dl/modules.txt -text
