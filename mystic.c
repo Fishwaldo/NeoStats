@@ -141,6 +141,7 @@ UserModes user_umodes[] = {
 	{UMODE_SADMIN, 'P', NS_ULEVEL_ROOT},
 	{UMODE_TECHADMIN, 'T', NS_ULEVEL_ADMIN},
 	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN},
+	{UMODE_ADMIN, 'A', NS_ULEVEL_ADMIN}, 
 	{UMODE_SERVICESOPER, 'a', NS_ULEVEL_OPER},
 	{UMODE_IRCADMIN, 'Z', NS_ULEVEL_OPER},
 	{UMODE_COADMIN, 'z', NS_ULEVEL_OPER},
@@ -160,6 +161,12 @@ UserModes user_umodes[] = {
 	{UMODE_FLOOD, 'f', 0},
 	{UMODE_HIDE, 'x', 0},
 	{UMODE_WATCHER, 'W', 0},
+	{UMODE_CHATOP, 'C', 0},
+	{UMODE_NGLOBAL, 'G', 0},
+	{UMODE_WHOIS, 'm', 0},
+	{UMODE_NETINFO, 'n', 0},
+	{UMODE_MAGICK, 'M', 0},
+	{UMODE_NETMON, 'X', 0},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
