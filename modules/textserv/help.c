@@ -29,3 +29,32 @@ const char *ts_about[] =
 	NULL
 };
 
+const char ts_help_add_oneline[] ="Add a database";
+const char ts_help_del_oneline[] ="Delete a database";
+const char ts_help_list_oneline[] ="List databases";
+
+const char *ts_help_add[] = {
+	"Syntax: \2ADD <database> <nick> <channel>\2",
+	"",
+	"Register a database with textserv.",
+	"<database> is the name of the database to load",
+	"<nick> is the optional name of the bot you want to use. If not",
+	"specified, the database name is used as the nick",
+	"<channel> is the optional channel you want the bot to join. If not",
+	"specified, the bot will not join a channel",
+	NULL
+};
+
+const char *ts_help_del[] = {
+	"Syntax: \2DEL <database>\2",
+	"",
+	"Delete a database.",
+	NULL
+};
+
+const char *ts_help_list[] = {
+	"Syntax: \2LIST\2",
+	"",
+	"Lists loaded databases.",
+	NULL
+};
