@@ -408,22 +408,13 @@ send_burst (int b)
 void 
 send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
-	/* there isn't an akill on Hybrid, so we send a kline to all servers! */
-	hscan_t ss;
-	hnode_t *sn;
-	Server *s;
-
-	hash_scan_begin (&ss, sh);
-	while ((sn = hash_scan_next (&ss)) != NULL) {
-		s = hnode_get (sn);
-		//send_cmd (":%s %s %s %lu %s %s :%s", setby, TOK_KLINE, s->name, (unsigned long)length, ident, host, reason);
-	}
+	send_cmd ("%s %s * +%s@%s %lu :%s", neonumericbuf, TOK_GLINE, ident, host, (ts + length), reason);
 }
 
 void 
 send_rakill (const char *sender, const char *host, const char *ident)
 {
-	chanalert (s_Services, "Please Manually remove KLINES using /unkline on each server");
+	send_cmd ("%s %s * -%s@%s", neonumericbuf, TOK_GLINE, ident, host);
 }
 
 void
