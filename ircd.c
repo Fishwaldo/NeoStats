@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.95 2002/10/13 06:57:43 fishwaldo Exp $
+** $Id: ircd.c,v 1.96 2002/10/15 19:30:38 shmad Exp $
 */
  
 #include <setjmp.h>
@@ -1187,7 +1187,7 @@ int flood(User *u)
 	return 0;
 }
 
-/* Display our MOTD Message of the Day from the external stats.motd file */
+/* Display our MOTD Message of the Day from the external neostats.motd file */
 static void ShowMOTD(char *nick)
 {
     FILE *fp;
@@ -1197,7 +1197,7 @@ static void ShowMOTD(char *nick)
     snumeric_cmd(372, nick, ":- %s. Copyright (c) 1999 - 2002 The NeoStats Group", version);
     snumeric_cmd(372, nick, ":-");
 
-    fp = fopen ("stats.motd", "r");
+    fp = fopen ("neostats.motd", "r");
 
     if (fp)
     {

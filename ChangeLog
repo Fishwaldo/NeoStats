@@ -1,6 +1,8 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
 * NeoStats * Shmad & Fish * Version ????
+ - stats.motd is now neostats.motd demo neostats.motd included with distro (S)
+ - Code cleanup. (S)
  - Fixed Ultimate2 CHGHOST for vhosts.. ugh im going insane..tested & working (S)
  - Misc. Module updates (S)
  - Ultimate 2 uses CHGHOST not SETHOST, updated internals to reflect this. (S)
