@@ -30566,8 +30566,10 @@ echo ""
 autotools/shtool echo -e "%BConfiguration complete.%b"
 echo ""
 
-read -p "Press Enter key to read the release notes"
-clear
-more RELNOTES
-echo "Run 'make' (or 'gmake' on some systems) to compile NeoStats."
-echo "If you require support, see the README file."
+if test ! -f .hush; then \
+	read -p "Press Enter key to read the release notes"; \
+	clear; \
+	more RELNOTES; \
+	echo "Run 'make' (or 'gmake' on some systems) to compile NeoStats."; \
+	echo "If you require support, see the README file."; \
+fi;

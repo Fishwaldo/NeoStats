@@ -29,6 +29,7 @@ autotools/config.guess -text
 autotools/config.sub -text
 autotools/depcomp -text
 autotools/install-sh -text
+autotools/libevent.m4 -text
 autotools/ltmain.sh -text
 autotools/missing -text
 autotools/mkinstalldirs -text
