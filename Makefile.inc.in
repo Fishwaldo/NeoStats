@@ -1,5 +1,5 @@
 CC=@CC@
-CFLAGS=@CFLAGS@ -fPIC -DPIC
+CFLAGS=@CFLAGS@ -fPIC -DPIC -DNEO_PREFIX=\"@prefix@\" 
 LD=ld
 LDFLAGS= -rdynamic @LIBS@
 MODLDFLAGS = -shared

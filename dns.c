@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dns.c,v 1.11 2003/05/20 05:15:45 fishwaldo Exp $
+** $Id: dns.c,v 1.12 2003/05/21 09:33:17 fishwaldo Exp $
 */
 
 
@@ -184,7 +184,7 @@ void do_dns() {
 
 			/* call the callback function with answer set to NULL */
 			dnsdata->callback(dnsdata->data, NULL);
-			strcpy(seginmodule, "");
+			strcpy(segvinmodule, "");
 			/* delete from list */
 			dnsnode1 = list_delete(dnslist, dnsnode); 
 			dnsnode = list_next(dnslist, dnsnode1);
@@ -194,7 +194,7 @@ void do_dns() {
 			break;
 		}
 		nlog(LOG_DEBUG2, LOG_CORE, "DNS: Calling callback function with data %s", dnsdata->data);
-		strncpy(segvinmodule, dns->data->mod_name, MAXHOST);
+		strncpy(segvinmodule, dnsdata->mod_name, MAXHOST);
 		/* call the callback function */
 		dnsdata->callback(dnsdata->data, dnsdata->a);
 		strcpy(segvinmodule, "");

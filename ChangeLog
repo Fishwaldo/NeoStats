@@ -8,6 +8,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Jupe was fixed - BugID#4
  - make install was failing in the tools directory on some systems. Fixed - BugID#8
  - missed -f switch in ./neostats -h summary usage
+ - This should teach people to "make install" :)
 
 * NeoStats * Fish * Version 2.5.2
  - Added Keeper Library for storing configuration and optionally data, and reserved space for language file storage

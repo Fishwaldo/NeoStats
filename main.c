@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.90 2003/05/20 05:15:45 fishwaldo Exp $
+** $Id: main.c,v 1.91 2003/05/21 09:33:17 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -84,6 +84,14 @@ int main(int argc, char *argv[])
 	FILE *fp;
 	/* get our commandline options */
 	get_options(argc, argv);
+	
+	/* Change to the working Directory */
+	if (chdir(NEO_PREFIX) < 0) {
+		printf("NeoStats Could not change to %s\n", NEO_PREFIX);
+		printf("Did you 'make install' after compiling?\n");
+		printf("Error Was: %s\n", strerror(errno));
+		exit(-1);
+	}
 	
 	/* before we do anything, make sure logging is setup */
 	init_logs();
