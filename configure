@@ -25239,7 +25239,7 @@ fi
 
 echo "$as_me:$LINENO: checking for va_copy" >&5
 echo $ECHO_N "checking for va_copy... $ECHO_C" >&6
-if test "${unet_cv_c_va_copy+set}" = set; then
+if test "${ns_va_copy+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cat >conftest.$ac_ext <<_ACEOF
@@ -25279,20 +25279,20 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  unet_cv_c_va_copy="yes"
+  ns_va_copy="yes"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-unet_cv_c_va_copy="no"
+ns_va_copy="no"
 
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 fi
-echo "$as_me:$LINENO: result: $unet_cv_c_va_copy" >&5
-echo "${ECHO_T}$unet_cv_c_va_copy" >&6
-if test "$unet_cv_c_va_copy" = "yes" ; then
+echo "$as_me:$LINENO: result: $ns_va_copy" >&5
+echo "${ECHO_T}$ns_va_copy" >&6
+if test "$ns_va_copy" = "yes" ; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_VA_COPY 1
@@ -25301,7 +25301,7 @@ _ACEOF
 
 echo "$as_me:$LINENO: checking for __va_copy" >&5
 echo $ECHO_N "checking for __va_copy... $ECHO_C" >&6
-if test "${unet_cv_c___va_copy+set}" = set; then
+if test "${ns___va_copy+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cat >conftest.$ac_ext <<_ACEOF
@@ -25341,20 +25341,20 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  unet_cv_c___va_copy="yes"
+  ns___va_copy="yes"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-unet_cv_c___va_copy="no"
+ns___va_copy="no"
 
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 fi
-echo "$as_me:$LINENO: result: $unet_cv_c___va_copy" >&5
-echo "${ECHO_T}$unet_cv_c___va_copy" >&6
-if test "$unet_cv_c___va_copy" = "yes" ; then
+echo "$as_me:$LINENO: result: $ns___va_copy" >&5
+echo "${ECHO_T}$ns___va_copy" >&6
+if test "$ns___va_copy" = "yes" ; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE___VA_COPY 1
