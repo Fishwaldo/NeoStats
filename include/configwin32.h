@@ -421,7 +421,7 @@
 #define RETSIGTYPE void
 
 /* "Revision Version Number" */
-#define REV "a2"
+#define REV "a3-dev"
 
 /* Define to the type of arg 1 for `select'. */
 #define SELECT_TYPE_ARG1 int
@@ -459,7 +459,7 @@
 /* #undef USE_RAW */
 
 /* "Full Version" */
-#define VERSION "3.0.a2"
+#define VERSION "3.0.a3-dev"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */

@@ -26,10 +26,6 @@
 #ifndef STATSERV_H
 #define STATSERV_H
 
-#ifdef HAVE_DB_H
-/*#define USE_BERKELEY*/
-#endif
-
 /* this is the how often to save a portion of the DB. Don't alter this unless you need to */
 /* DO NOT set PROGCHANTIME less than ((DBSAVETIME + (DBSAVETIME/2)) * 4) otherwise you will not have the enitre database progressively saved! */
 

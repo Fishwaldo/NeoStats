@@ -168,10 +168,6 @@ int ModInit( void )
 	InitVersionStats ();
 	InitTLDStatistics ();	
 	InitUserStats ();	
-#ifdef USE_BERKELEY
-	DBAOpenTable();
-#endif
-	
 	return NS_SUCCESS;
 }
 
@@ -232,9 +228,6 @@ int ModFini (void)
 	FiniVersionStats ();
 	FiniRTAStats();
 	FiniNetworkStats();
-#ifdef USE_BERKELEY
-	DBACloseTable();
-#endif      
 	return NS_SUCCESS;
 }
 

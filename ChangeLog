@@ -3,6 +3,9 @@ NeoStats 3.x ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
+* NeoStats * Version 3.0.a3-dev
+ - StatServ: Remove 2.5.x bdb remnants. (M)
+
 * NeoStats * Version 3.0.a2
  - Fix bug with module excludes when there are multiple modules loaded using
    module excludes. (M)
