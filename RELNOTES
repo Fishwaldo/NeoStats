@@ -1,11 +1,11 @@
-* NeoStats * M & Fish * Version 2.5.6
+* NeoStats * M & Fish * Version 2.5.7
 ==============================================================================
 Important Changes you should know: (READ THIS!)
 ==============================================================================
-RedHat 9.0 Users:
-        There have been some changes to the RedHat 9 Kernel that affects
-        NeoStats. If you are running RedHat 9.0 please read
-        http://www.neostats.net/boards/viewtopic.php?t=391
+RedHat/Slakware 9.0 Users:
+        There have been some changes to the RedHat and slakware 9 Kernels that
+	affects NeoStats. If you are running RedHat or Slakware 9.0 please 
+	read http://www.neostats.net/boards/viewtopic.php?t=391
  
 Module Name Change
 	*****************************************************************
@@ -15,22 +15,5 @@ Module Name Change
         MoraleServ, ConnectServ have had their module names changed. When
         Loading these modules via neostats.cfg, use the full names
         (lowercase) instead of previously ms, and cs
-
-ConnectServ now in Color
-	MrAllThat contributed some updates to ConnectServ that output the
-        different activities in Color. If you wish to disable, read the 
-        source of ConnectServ
-
-HostServ and Undernet Style Hidden Hosts
-        HostServ had a Overhaul, and now supports sorted output for lists
-        and additionally, can set a Undernet Style hidden host for registered
-        users. (<nick>.domain). This feature can be turned off, or the domain
-        can be customized. HostServ will only set the hidden host once to 
-        avoid it being used to ban evade on channels.
-
-Help Cleanups. 
-        All the modules and core have had the help cleaned up and made
-        consistent. 
-
 
 Read the ChangeLog for a complete description of what has changed
