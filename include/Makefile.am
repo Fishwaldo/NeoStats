@@ -9,7 +9,7 @@ noinst_HEADERS		=	commands.h dns.h servers.h users.h conf.h \
 				auth.h config.h.in  exclude.h  modules.h sock.h \
 				bans.h base64.h ctcp.h ircd.h ns_help.h support.h \
 				bots.h dcc.h ircstring.h numeric.h timer.h \
-				channels.h dl.h lang.h rtaserv.h transfer.h nsdbm.h \
+				channels.h dl.h lang.h transfer.h nsdbm.h \
 				nsdba.h main.h numerics.h settings.h botinfo.h
 
 version.h:
