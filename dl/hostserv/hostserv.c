@@ -1071,6 +1071,5 @@ static void LoadConfig(void)
 			host = strtok(NULL, ";");
 		}
 		free(temp);
-		free(ban);
 	}
 }
