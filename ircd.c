@@ -53,6 +53,7 @@ UmodeMaskToString(long Umode)
 		}
 	}
 	UmodeStringBuf[j] = '\0';
+	return(UmodeStringBuf);
 }
 
 /** @brief UmodeStringToMask
