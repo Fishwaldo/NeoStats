@@ -29,8 +29,10 @@
 #include "log.h"
 #include "users.h"
 #include "server.h"
+#include "chans.h"
 
 void process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac);
+int splitbuf (char *buf, char ***argv, int colon_special);
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);

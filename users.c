@@ -325,7 +325,6 @@ finduserbase64 (const char *num)
 {
 	User *u;
 	hnode_t *un;
-	lnode_t *cm;
 	hscan_t us;
 
 	nlog (LOG_DEBUG1, LOG_CORE, "finduserbase64: scanning for %s", num);
