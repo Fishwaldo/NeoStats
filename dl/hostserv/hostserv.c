@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.33 2003/01/22 16:36:58 fishwaldo Exp $
+** $Id: hostserv.c,v 1.34 2003/01/24 17:08:20 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -466,7 +466,7 @@ static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
     hsdat(cmd, m, h, p, u->nick);
     hslog("%s added a vhost for %s with realhost %s vhost %s and password %s",u->nick, cmd, m, h, p);
     prefmsg(u->nick, s_HostServ, "%s has sucessfuly been registered under realhost: %s vhost: %s and password: %s",cmd, m, h, p);
-    chanalert(s_HostServ, "%s added a vhost %s for %s with realhost %s", u->nick, h, cmd, h);
+    chanalert(s_HostServ, "%s added a vhost %s for %s with realhost %s", u->nick, h, cmd, m);
     /* Apply The New Hostname If The User Is Online */        
     if ((u = finduser(cmd)) != NULL) {
           if (findbot(cmd)) return;
@@ -474,6 +474,8 @@ static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
 	  if (fnmatch(m, tmp, 0) == 0) {
               ssvshost_cmd(u->nick, h);
               prefmsg(u->nick, s_HostServ, "%s is online now, setting vhost to %s", cmd, h);
+	      prefmsg(cmd, s_HostServ, "You Vhost has been created with Real HostMask of %s and username %s with password %s", m, cmd, p);
+	      prefmsg(cmd, s_HostServ, "For security, you should change your vhost password. See /msg %s help chpass", s_HostServ);
               return;
           }
     }
