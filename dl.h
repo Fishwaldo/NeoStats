@@ -219,6 +219,7 @@ int add_mod_user (char *nick, char *mod_name);
 int del_mod_user (char *nick);
 int add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval);
 int del_mod_timer (char *timer_name);
+int change_mod_timer_interval (char *timer_name, int interval);
 ModTimer *findtimer(char *timer_name);
 void list_timers (User * u, char **av, int ac);
 void run_mod_timers (void);

@@ -213,6 +213,31 @@ del_mod_timer (char *timer_name)
 	return NS_FAILURE;
 }
 
+/** @brief delete a timer from the timer list
+ *
+ * For module use. Deletes a timer with the given name from the timer list
+ *
+ * @param timer_name the name of timer to delete
+ * 
+ * @return NS_SUCCESS if deleted, NS_FAILURE if not found
+*/
+int
+change_mod_timer_interval (char *timer_name, int interval)
+{
+	ModTimer *mod_tmr;
+	hnode_t *tn;
+
+	SET_SEGV_LOCATION();
+	tn = hash_lookup (th, timer_name);
+	if (tn) {
+		mod_tmr = hnode_get (tn);
+		mod_tmr->interval = interval;
+		nlog (LOG_DEBUG2, LOG_CORE, "Changing timer interval for %s from Module %s", timer_name, mod_tmr->modname);
+		return NS_SUCCESS;
+	}
+	return NS_FAILURE;
+}
+
 /** @brief list timers in use
  *
  * NeoStats command to list the current timers from IRC
