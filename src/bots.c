@@ -113,7 +113,7 @@ flood_test (Client * u)
  *
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
-int process_origin(CmdParams * cmdparams, char* origin)
+int process_origin(CmdParams * cmdparams, char *origin)
 {
 	cmdparams->source = find_user (origin);
 	if(cmdparams->source) {
@@ -138,7 +138,7 @@ int process_origin(CmdParams * cmdparams, char* origin)
  *
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
-int process_target_user(CmdParams * cmdparams, char* target)
+int process_target_user(CmdParams * cmdparams, char *target)
 {
 	cmdparams->target = find_user (target);
 	if(cmdparams->target) {
@@ -160,7 +160,7 @@ int process_target_user(CmdParams * cmdparams, char* target)
  *
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
-int process_target_chan(CmdParams * cmdparams, char* target)
+int process_target_chan(CmdParams * cmdparams, char *target)
 {
 	cmdparams->channel = find_chan(target);
 	if(cmdparams->channel) {
@@ -193,7 +193,7 @@ bot_chan_event (Event event, CmdParams* cmdparams)
 		cm = list_first (botptr->u->user->chans);
 		if (!(botptr->u->user->Umode & UMODE_DEAF)) {
 			while (cm) {
-				char* chan;
+				char *chan;
 
 				chan = (char *) lnode_get (cm);
 				cmdparams->bot = botptr;
@@ -542,9 +542,9 @@ void del_module_bots (Module *mod_ptr)
 Bot *init_bot (BotInfo* botinfo)
 {
 	Bot * botptr; 
-	char* nick;
+	char *nick;
 	Module* modptr;
-	char* host;
+	char *host;
 
 	SET_SEGV_LOCATION();
 	modptr = GET_CUR_MODULE();
@@ -638,10 +638,11 @@ Bot *init_bot (BotInfo* botinfo)
 void handle_dead_channel (Channel *c)
 {
 	CmdParams* cmdparams;
-	lnode_t *cm;
 	Bot *botptr;
 	hnode_t *bn;
 	hscan_t bs;
+	lnode_t *cm;
+	char *chan;
 
 	SET_SEGV_LOCATION();
 	if (ircstrcasecmp(c->name, me.serviceschan) == 0) {
@@ -653,26 +654,21 @@ void handle_dead_channel (Channel *c)
 	}
 	hash_scan_begin (&bs, bothash);
 	cmdparams = ns_calloc (sizeof (CmdParams));
+	cmdparams->channel = c;
 	while ((bn = hash_scan_next (&bs)) != NULL) {
 		botptr = hnode_get (bn);
-restart:
-		cm = list_first (botptr->u->user->chans);
-		if (!(botptr->u->user->Umode & UMODE_DEAF)) {
-			while (cm) {
-				char* chan;
-
-				chan = (char *) lnode_get (cm);
-				cmdparams->bot = botptr;
-				cmdparams->channel = c;
-				if (ircstrcasecmp(c->name, chan) == 0) {
-					/* Force the bot to leave the channel */
-					irc_part (botptr, c->name);
-					/* Tell the module we kicked them out */
-					SendModuleEvent (EVENT_EMPTYCHAN, cmdparams, botptr->moduleptr);
-					goto restart;
-				}
-				cm = list_next (botptr->u->user->chans, cm);
+		cmdparams->bot = botptr;
+		cm = list_first (cmdparams->bot->u->user->chans);
+		while (cm) {
+			chan = (char *) lnode_get (cm);
+			if (ircstrcasecmp (cmdparams->channel->name, chan) == 0) {
+				/* Force the bot to leave the channel */
+				irc_part (cmdparams->bot, cmdparams->channel->name);
+				/* Tell the module we kicked them out */
+				SendModuleEvent (EVENT_EMPTYCHAN, cmdparams, cmdparams->bot->moduleptr);
+				break;
 			}
+			cm = list_next (cmdparams->bot->u->user->chans, cm);
 		}
 	}
 	free (cmdparams);
