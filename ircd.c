@@ -213,9 +213,6 @@ int
 signon_newbot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
 {
 	snewnick_cmd (nick, user, host, rname, Umode);
-#if (defined(ULTIMATE) && !defined(ULTIMATE3) ) || defined(UNREAL) || defined(MYSTIC)
-	sumode_cmd (nick, nick, Umode);
-#endif
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
 #if defined(BAHAMUT) || defined(LIQUID)
 		sjoin_cmd (nick, me.chan, CMODE_CHANOP);	
@@ -1373,6 +1370,8 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 	AddUser (nick, ident, host, realname, me.name, 0, me.now);
 #if defined(ULTIMATE3) || defined(BAHAMUT) || defined(HYBRID7) || defined(IRCU) || defined(NEOIRCD) || defined(QUANTUM) || defined(LIQUID)
 	UserMode (nick, newmode);
+#else
+	sumode_cmd (nick, nick, Umode);
 #endif
 	return 1;
 }
@@ -1382,6 +1381,7 @@ void
 handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoinchan, char **argv, int argc)
 {
 	char nick[MAXNICK];
+	char* nicklist;
 	long mode = 0;
 	long mode1 = 0;
 	int ok = 1, i;
@@ -1420,20 +1420,20 @@ handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoin
 		}
 	}
 	while (argc > offset) {
-		modes = argv[offset];
+		nicklist = argv[offset];
 		mode = 0;
 		while (ok == 1) {
 			for (i = 0; i < ircd_cmodecount; i++) {
 				if (chan_modes[i].sjoin != 0) {
-					if (*modes == chan_modes[i].sjoin) {
+					if (*nicklist == chan_modes[i].sjoin) {
 						mode |= chan_modes[i].mode;
-						modes++;
+						nicklist++;
 						i = -1;
 					}
 				} else {
 					/* sjoin's should be at the top of the list */
 					ok = 0;
-					strlcpy (nick, modes, MAXNICK);
+					strlcpy (nick, nicklist, MAXNICK);
 					break;
 				}
 			}
