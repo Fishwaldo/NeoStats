@@ -194,6 +194,8 @@ static int InitMe( void )
 #ifdef WIN32
 	nsconfig.loglevel = LOG_NORMAL;
 #endif /* WIN32 */
+	/* default DBM */
+	strlcpy(me.dbm, "gdbm" ,MAXHOST );
 	return NS_SUCCESS;
 }
 

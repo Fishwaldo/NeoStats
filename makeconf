@@ -241,41 +241,6 @@ done
 IRCD_DEFAULT=$INPUT
 echo ""
 
-####
-
-###########################################################################
-# select database
-#temp force until we have other support
-DATABASE="gdbm"
-#DATABASE_DEFAULT="1"
-#DATABASE=
-#validselection=0
-#echo "Which datbase storage do you wish to use?"
-#echo "     1) GDBM"
-#echo "     2) Berkeley DB"
-#while [ $validselection -eq 0 ] ; do
-#	echo $n " [$DATABASE_DEFAULT] -> $c"
-#	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
-#	if [ ! "$INPUT" ] ; then
-#		INPUT=$DATABASE_DEFAULT
-#	fi
-#	case $INPUT in
-#		"1")
-# 			DATABASE="gdbm"
-#			validselection=1
-#			;;
-#		"2")
-# 			DATABASE="bdb"
-#			validselection=1
-#			;;
-#		*)
-#			echo "Please enter a valid option number."
-#			;;
-#	esac
-#done
-#DATABASE_DEFAULT=$INPUT
-#echo ""
-
 echo " "
 echo "What will your root nickname be? (ie: $ROOTNICK)"
 echo $n " [$ROOTNICK] -> $c"
@@ -364,8 +329,6 @@ cat > $CONF << __EOF__
 #    [RECOMMENDED] - optional but may cause problems if not set.
 #    [OPTIONAL]    - optional and the feature will be disabled if not set.
 #    [DISCOURAGED] - may cause undesirable side effects if enabled.
-#Although we have included instructions for each setting in this file
-#you should refer to the README file for more information
 ##################################################
 
 ##############################
@@ -385,15 +348,16 @@ cat > $CONF << __EOF__
 
 PROTOCOL "$IRCD"
 
-# DBM <dbm> [REQUIRED]
+# DBM <dbm> [OPTIONAL]
 #    Specifies the database manager module to use.
+#    NeoStats will default to GDBM if this is not provided.
 #    Valid options are:
 #          gdbm
 #
 #          DBM "gdbm"
 #      
-
-DBM "$DATABASE"
+#
+#DBM "$DATABASE"
 
 # ROOT_NICK <nick> [REQUIRED]
 #    Specifies the nick of the NeoStats root bot
