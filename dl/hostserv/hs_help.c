@@ -165,7 +165,7 @@ const char *hs_help_set[] = {
 	"        \2SET EXPIRE <TIME>\2",
 	"        \2SET HIDDENHOST <OFF/host>\2",
 	"",
-	"\2SET LIST\2",
+	"\2SET\2",
 	"This lists the current settings for HostServ.",
 	"",
 	"\2SET EXPIRE <TIME>\2",
