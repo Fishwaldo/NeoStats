@@ -1,7 +1,9 @@
 HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
-
+* Version 3.0 * Fish * Oct 6th, 2003
++ Moved to lists to allow sorting and displaying
+ 
 * Version 2.7.1 * Shmad * May 11th, 2003
 + Fixed a nasty seg bug *smacks fish* we don't free(s_HostServ);
 
