@@ -46,11 +46,8 @@ static char SmodeStringBuf[64];
 static long services_bot_umode= 0;
 
 /* Fully split buffer */
-#ifdef IRCU
-char privmsgbuffer[BUFSIZE];
-#else
 static char privmsgbuffer[BUFSIZE];
-#endif
+
 /* Temp flag for backward compatibility in new splitbuf system */
 static int SkipModuleFunction = 0;
 
@@ -525,11 +522,12 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
-		nlog (LOG_DEBUG1, LOG_CORE, "m_private: dropping unknown privmsg from %s, to %s : %s", origin, av[0], privmsgbuffer);
+		nlog (LOG_DEBUG1, LOG_CORE, "m_notice: dropping unknown privmsg from %s, to %s : %s", origin, av[0], av[ac-1]);
 		return;
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], privmsgbuffer);
-	argc = split_buf (privmsgbuffer, &argv, 1);
+	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
+	strlcpy (privmsgbuffer, av[ac-1], BUFSIZE);
+	argc = split_buf (av[ac-1], &argv, 1);
 	ModuleFunction (cmdptr, MSG_NOTICE, origin, argv, argc);
 	free (argv);
 	argc = 0;
@@ -554,17 +552,20 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 void
 m_private (char* origin, char **av, int ac, int cmdptr)
 {
+	int i;
 	int ret = NS_SUCCESS;
+	int splitargc;
+	char **splitargv;
 	int argc;
 	char **argv;
 	char target[64];
 
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
-		nlog (LOG_DEBUG1, LOG_CORE, "m_private: dropping unknown privmsg from %s, to %s : %s", origin, av[0], privmsgbuffer);
+		nlog (LOG_DEBUG1, LOG_CORE, "m_private: dropping unknown privmsg from %s, to %s : %s", origin, av[0], av[ac-1]);
 		return;
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "m_private: from %s, to %s : %s", origin, av[0], privmsgbuffer);
+	nlog (LOG_DEBUG1, LOG_CORE, "m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
 	/* its a privmsg, now lets see who too... */
 	if (strstr (av[0], "!")) {
 		strlcpy (target, av[0], 64);
@@ -573,14 +574,20 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 		strlcpy (target, av[0], 64);
 		av[0] = strtok (target, "@");
 	}
-
-	argc = split_buf (privmsgbuffer, &argv, 1);
+	strlcpy (privmsgbuffer, av[ac-1], BUFSIZE);
+	splitargc = split_buf (av[ac-1], &splitargv, 0);
+	argc = 0;
+	AddStringToList (&argv, av[0], &argc);
+	for( i = 0 ; i < splitargc ; i++ ) {
+		AddStringToList (&argv, splitargv[i], &argc);
+	}
 	if(av[0][0] == '#') {
 		bot_chan_message (origin, argv, argc);
 	} else {
 		ret = bot_message (origin, argv, argc);
 	}
 	free (argv);
+	free (splitargv);
 	if(ret == NS_FAILURE) {
 		argc = 0;
 		AddStringToList (&argv, origin, &argc);
@@ -686,8 +693,8 @@ parse (char *line)
 		coreLine = line + strlen (line);
 	}
 	strlcpy (cmd, line, sizeof (cmd)); 
-	strlcpy (privmsgbuffer, coreLine, BUFSIZE);
 	ac = splitbuf (coreLine, &av, 1);
+	strlcpy (privmsgbuffer, av[ac-1], BUFSIZE);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	free (av);
 }

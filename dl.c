@@ -875,24 +875,16 @@ bot_message (char *origin, char **av, int ac)
 
 	bot_user = finduser(av[0]);
 	if (!bot_user) {
-#ifdef BASE64NICKNAME
-		bot_user = finduser(base64tonick(av[0]));
-		if (!bot_user) {
-			nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", av[0]);
-			return NS_SUCCESS;
-		}
-#else
-		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", av[0]);
+		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: bot %s not found", av[0]);
 		return NS_SUCCESS;
-#endif
 	}
 	mod_usr = findbot (bot_user->nick);
 	/* Check to see if any of the Modules have this nick Registered */
 	if (!mod_usr) {
-		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", bot_user->nick);
+		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: mod_usr %s not found", bot_user->nick);
 		return NS_SUCCESS;
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s", mod_usr->nick);
+	nlog (LOG_DEBUG1, LOG_CORE, "bot_message: bot %s", mod_usr->nick);
 
 	SET_SEGV_LOCATION();
 	if (setjmp (sigvbuf) == 0) {
@@ -905,6 +897,7 @@ bot_message (char *origin, char **av, int ac)
 			mod_usr->function (u->nick, argv, argc);
 			free(argv);
 		} else {
+#if 0
 			/* Trap CTCP commands and silently drop them to avoid unknown command errors 
 			 * Why bother? Well we might be able to use some of them in the future
 			 * so this is mainly a test and we may want to pass some of this onto
@@ -918,6 +911,7 @@ bot_message (char *origin, char **av, int ac)
 				free(buf);
 				return NS_SUCCESS;
 			}
+#endif
 			if (!u) {
 				nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", u->nick, mod_usr->nick);
 			} else {

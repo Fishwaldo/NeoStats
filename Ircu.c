@@ -709,8 +709,6 @@ m_end_of_burst (char *origin, char **argv, int argc, int srv)
 	}
 }
 
-extern char privmsgbuffer[BUFSIZE];
-
 /* :<source> <command> <param1> <paramN> :<last parameter> */
 /* <source> <command> <param1> <paramN> :<last parameter> */
 void
@@ -764,8 +762,9 @@ parse (char *line)
 		nlog (LOG_DEBUG1, LOG_CORE, "origin: %s", origin);
 		nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
 		nlog (LOG_DEBUG1, LOG_CORE, "args  : %s", line);
-		strlcpy (privmsgbuffer, line, BUFSIZE);
-		if(line) ac = splitbuf(line, &av, 1);
+		if(line) {
+			ac = splitbuf(line, &av, 1);
+		}
 		nlog (LOG_DEBUG1, LOG_CORE, "0 %d", ac);
 	}
 
