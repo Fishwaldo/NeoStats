@@ -35,6 +35,7 @@
 #include "hash.h"
 #include "config.h"
 #include "log.h"
+#include "dns.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -1591,6 +1592,8 @@ unload_module (char *module_name, User * u)
 		return NS_FAILURE;
 	}
 
+	/* canx any DNS queries running */
+	canx_dns(module_name);
 	/* Check to see if this Module has any timers registered....  */
 	del_mod_timers (module_name);
 

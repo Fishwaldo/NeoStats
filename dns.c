@@ -171,6 +171,30 @@ fini_adns() {
 	list_destroy_nodes(dnslist);
 	free(ads);
 }
+/** @brief Canx any DNS queries for modules we might be unloading
+ * 
+ * @param module name
+ * @return Nothing
+ */
+void 
+canx_dns(const char *modname) {
+	lnode_t *dnsnode;
+	DnsLookup *dnsdata;
+
+	SET_SEGV_LOCATION();
+	
+	dnsnode = list_first (dnslist);
+	while (dnsnode) {
+		dnsdata = lnode_get(dnsnode);
+		if (!ircstrcasecmp(dnsdata->mod_name, modname)) {
+			adns_cancel(dnsdata->q);
+			free (dnsdata->a);
+			free (dnsdata);
+		}
+	}
+}
+
+
 
 /** @brief Checks for Completed DNS queries
  *

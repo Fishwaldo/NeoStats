@@ -27,4 +27,5 @@
 int init_dns (void);
 void do_dns (void);
 void fini_adns();
+void  canx_dns(const char *modname);
 #endif /* _DNS_H_ */
