@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.29 2003/01/06 12:16:24 fishwaldo Exp $
+** $Id: hostserv.c,v 1.30 2003/01/06 15:03:20 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -42,16 +42,15 @@
 const char hsversion_date[] = __DATE__;
 const char hsversion_time[] = __TIME__;
 char *s_HostServ;
-typedef struct hs_map_ HS_Map;
-struct hs_map_ {
-    HS_Map *next, *prev;
+typedef struct hs_map_ {
     char nnick[30];
     char host[MAXHOST];
     char vhost[MAXHOST];
     char passwd[30];
     char added[30];
-};
-HS_Map *nnickmap;
+} hs_map;
+
+hash_t *vhosts;
 
 struct hs_lvl {
     int view;
@@ -74,8 +73,8 @@ static void hs_login(User *u, char *login, char *pass);
 static int new_m_version(char *origin, char **av, int ac);
 void hs_cb_Config(char *arg, int configtype);
 void hslog(char *, ...);
-void hsdat(char *, ...);
-void hshsamend(char *, ...);
+void hsdat(char *nick, char *host, char *vhost, char *pass, char *who);
+
 void Loadhosts();
 
 int data_synch;
@@ -147,9 +146,10 @@ int new_m_version(char *origin, char **av, int ac) {
 static int hs_sign_on(char **av, int ac) {
     char *tmp = NULL;
     char *tmp2 = NULL;
-        HS_Map *map;
+    hnode_t *hn;
+    hs_map *map;
+    User *u;
 
-        User *u;
         u = finduser(av[0]);
         if (!u) return 1;
 
@@ -157,22 +157,22 @@ static int hs_sign_on(char **av, int ac) {
 
         strcpy(segv_location, "HostServ-hs_signon");
 
-    if (findbot(u->nick)) return 1;
-    if (!load_synch) return 1;
+    	if (findbot(u->nick)) return 1;
+    	if (!load_synch) return 1;
 
-    /* Check HostName Against Data Contained in vhosts.data */        
+    	/* Check HostName Against Data Contained in vhosts.data */        
 
-      for (map = nnickmap; map; map = map->next) {
-	   if (!strcasecmp(map->nnick, u->nick)) {
-          tmp = strlower(map->host);
-	  tmp2 = strlower(u->hostname);
-		  if (fnmatch(tmp, tmp2, 0) == 0) {
-              ssvshost_cmd(u->nick, map->vhost);
-              return 1;
-           }
-       }
-    }
-return 1;
+      	hn = hash_lookup(vhosts, u->nick);
+      	if (hn) {
+      	  	map = hnode_get(hn);
+          	tmp = strlower(map->host);
+	  	tmp2 = strlower(u->hostname);
+	  	if (fnmatch(tmp, tmp2, 0) == 0) {
+          		ssvshost_cmd(u->nick, map->vhost);
+              		return 1;
+          	}
+      	}
+	return 1;
 }
 
 Functions HostServ_fn_list[] = { 
@@ -297,6 +297,11 @@ EventFnList *__module_get_events() {
 void _init() {
     s_HostServ = malloc(MAXNICK);
     strcpy(s_HostServ, "HostServ");
+    vhosts = hash_create(-1, 0, 0);
+    if (!vhosts) {
+	log("Error, Can't create vhosts hash");
+	chanalert(s_Services, "Error, Can't create Vhosts Hash");
+    }    	
     hs_lvl.add = 40;
     hs_lvl.del = 40;
     hs_lvl.list = 40;
@@ -311,7 +316,15 @@ void _init() {
 }
 
 void _fini() {
-    globops(me.name, "HostServ Module Unloaded",me.name);
+	hnode_t *hn;
+	hscan_t hs;
+	free(s_HostServ);
+	hash_scan_begin(&hs, vhosts);
+	while ((hn = hash_scan_next(&hs)) != NULL) {
+		free(hnode_get(hn));
+		hash_scan_delete(vhosts, hn);
+	}
+	hash_destroy(vhosts);
 
 };
 
@@ -342,51 +355,28 @@ void hslog(char *fmt, ...)
 
 
 /* Routine for registrations with the 'vhosts.db' file */
-void hsdat(char *fmt, ...)
+void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 {
-        va_list ap;
         FILE *hsfile = fopen("data/vhosts.db", "a");
-        char buf[512], fmtime[80];
-        time_t tmp = time(NULL);
+	hnode_t *hn;
+	hs_map *map;
 
-        va_start(ap, fmt);
-        vsnprintf(buf, 512, fmt, ap);
-
-        strftime(fmtime, 80, "%H:%M[%m/%d/%Y]", localtime(&tmp));
+	map = malloc(sizeof(hs_map));
+	strncpy(map->nnick, nick, MAXNICK);
+	strncpy(map->host, host, MAXHOST);
+	strncpy(map->vhost, vhost, MAXHOST);
+	strncpy(map->passwd, pass, 30);
+	strncpy(map->added, who, MAXNICK);
+	hn = hnode_create(map);
+	hash_insert(vhosts, hn, map->nnick);
 
         if (!hsfile) {
-        log("Unable to open data/vhosts.db for writing.");
-        return;
+	        log("Unable to open data/vhosts.db for writing.");
+        	return;
         }
 
-        fprintf(hsfile, "%s\n", buf);
-        va_end(ap);
+        fprintf(hsfile, ":%s %s %s %s %s\n", nick, host, vhost, pass, who);
         fclose(hsfile);
-
-}
-
-
-/* Routine for creating the 'vhosts.new' file */
-void hsamend(char *fmt, ...)
-{
-        va_list ap;
-        FILE *hsamend = fopen("data/vhosts.new", "a");
-        char buf[512], fmtime[80];
-        time_t tmp = time(NULL);
-
-        va_start(ap, fmt);
-        vsnprintf(buf, 512, fmt, ap);
-
-        strftime(fmtime, 80, "%H:%M[%m/%d/%Y]", localtime(&tmp));
-
-        if (!hsamend) {
-        hslog("Unable to open data/vhosts.new for writing.");
-        return;
-        }
-
-        fprintf(hsamend, "%s\n", buf);
-        va_end(ap);
-        fclose(hsamend);
 
 }
 
@@ -396,7 +386,7 @@ static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
 
     char *tmp;
     strcpy(segv_location, "hs_add");
-    hsdat(":%s %s %s %s %s", cmd, m, h, p, u->nick);
+    hsdat(cmd, m, h, p, u->nick);
     hslog("%s added a vhost for %s with realhost %s vhost %s and password %s",u->nick, cmd, m, h, p);
     prefmsg(u->nick, s_HostServ, "%s has sucessfuly been registered under realhost: %s vhost: %s and password: %s",cmd, m, h, p);
     /* Apply The New Hostname If The User Is Online */        
@@ -406,40 +396,31 @@ static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
           tmp = strlower(u->hostname);
 	  if (fnmatch(m, tmp, 0) == 0) {
               ssvshost_cmd(u->nick, h);
-	    Loadhosts();
               return;
           }
     }
-    Loadhosts();
 }
 
 
 /* Routine for 'HostServ' to print out its data */
 static void hs_list(User *u)
 {
-    FILE *fp;
-    char buf[512];
     int i;
+    hnode_t *hn;
+    hscan_t hs;
+    hs_map *map;
 
     strcpy(segv_location, "hs_list");
 
-    fp = fopen("data/vhosts.db", "r");
-    if (!fp) {
-        prefmsg(u->nick, s_HostServ, "Unable to open data/vhosts.db");
-        return;
-    }
     i = 1;
     prefmsg(u->nick, s_HostServ, "Current HostServ VHOST list:");
     prefmsg(u->nick, s_HostServ, "%-5s %-12s %-30s","Num", "Nick", "Vhost");
-    while (fgets(buf, sizeof(buf), fp)) {
-        buf[strlen(buf)] = '\0';
-
-        ListArryCount = split_buf(buf, &ListArry, 0);
-/*        prefmsg(u->nick, s_HostServ, "%-5d %-12s %-19s %-8s", i, ListArry[0], ListArry[1], ListArry[2]); */
-        prefmsg(u->nick, s_HostServ, "%-5d %-12s %-30s", i, ListArry[0], ListArry[2]);
+    hash_scan_begin(&hs, vhosts);
+    while ((hn = hash_scan_next(&hs)) != NULL) {
+	map = hnode_get(hn);
+        prefmsg(u->nick, s_HostServ, "%-5d %-12s %-30s", i, map->nnick, map->vhost);
 	i++;
     }
-    fclose(fp);
     prefmsg(u->nick, s_HostServ, "For more information on someone use /msg %s VIEW #", s_HostServ);
     prefmsg(u->nick, s_HostServ, "--- End of List ---");
 }
@@ -447,37 +428,27 @@ static void hs_list(User *u)
 /* Routine for VIEW */
 static void hs_view(User *u, int tmpint)
 {
-    FILE *fp;
-    char buf[512];
     int i;
+    hnode_t *hn;
+    hscan_t hs;
+    hs_map *map;
     strcpy(segv_location, "hs_view");
 
-    fp = fopen("data/vhosts.db", "r");
-    if (!fp) {
-        prefmsg(u->nick, s_HostServ, "Unable to open data/vhosts.db");
-        return;
-    }
     i = 1;
-    while (fgets(buf, sizeof(buf), fp)) {
-        buf[strlen(buf)] = '\0';
-
-        ListArryCount = split_buf(buf, &ListArry, 0);
+    hash_scan_begin(&hs, vhosts);
+    while ((hn = hash_scan_next(&hs)) != NULL) {
         if (tmpint == i) {
+	    map = hnode_get(hn);
 	    prefmsg(u->nick, s_HostServ, "Virtual Host information:");
-            prefmsg(u->nick, s_HostServ, "Nick:     %s", ListArry[0]);
-	    prefmsg(u->nick, s_HostServ, "RealHost: %s", ListArry[1]);
-	    prefmsg(u->nick, s_HostServ, "V-host:   %s", ListArry[2]);
-	    prefmsg(u->nick, s_HostServ, "Password: %s", ListArry[3]);
-	    if (ListArryCount > 4) {
-		prefmsg(u->nick, s_HostServ, "Added by: %s", ListArry[4]);
-	    } else {
-		prefmsg(u->nick, s_HostServ, "Added by: <unknown>");
-	    }
-	    prefmsg(u->nick, s_HostServ, "--- End of information for %s ---",ListArry[0]);
+            prefmsg(u->nick, s_HostServ, "Nick:     %s", map->nnick);
+	    prefmsg(u->nick, s_HostServ, "RealHost: %s", map->host);
+	    prefmsg(u->nick, s_HostServ, "V-host:   %s", map->vhost);
+	    prefmsg(u->nick, s_HostServ, "Password: %s", map->passwd);
+	    prefmsg(u->nick, s_HostServ, "Added by: %s", map->added ? map->added : "<unknown>");
+	    prefmsg(u->nick, s_HostServ, "--- End of information for %s ---",map->nnick);
         }
 	i++;
     }
-    fclose(fp);
     if (tmpint > i) prefmsg(u->nick, s_HostServ, "ERROR: There is no vhost on list number \2%d\2",tmpint);
 }
 
@@ -488,42 +459,34 @@ static void hs_view(User *u, int tmpint)
 void Loadhosts()
 {
     FILE *fp = fopen("data/vhosts.db", "r");
-    HS_Map *map;
-    char buf[BUFSIZE];
+    hs_map *map;
+    hnode_t *hn;
+    char buf[512];
 
     if (fp) {
-        load_synch = 1;
-		while (fgets(buf, BUFSIZE, fp)) {
-            strip(buf);
-            map = malloc(sizeof(HS_Map));
+    	load_synch = 1;
+		while (fgets(buf, 512, fp)) {
+        	    strip(buf);
+	            map = malloc(sizeof(hs_map));
 
-            LoadArryCount = split_buf(buf, &LoadArry, 0);
-            strcpy(map->nnick, LoadArry[0]);
-            strcpy(map->host, LoadArry[1]);
-            strcpy(map->vhost, LoadArry[2]);
-	    if (LoadArryCount > 3) { /* Check for upgrades from earlier versions */
-		strcpy(map->passwd, LoadArry[3]);
-	    } else /* Upgrading from earlier version, no passwds exist */
-		strcpy(map->passwd, "0");
-	    if (LoadArryCount > 4) { /* Does who set it exist? Yes? go ahead */
-	    	strcpy(map->added, LoadArry[4]);
-	    } else /* We have no information on who set it so its null */
-	    	strcpy(map->added, "0");
-            if (!nnickmap) {
-                nnickmap = map;
-                nnickmap->next = NULL;
-            } else {
-                map->next = nnickmap;
-                nnickmap = map;
-            }
-    }
-      fclose(fp);
-    } else {
-      if (!data_synch) {
-/*          notice(s_Services, "data/vhosts.db Database Not Found! Either Add a User or Disable This Function"); */
-          data_synch = 1;
-	  }
-   }
+        	    LoadArryCount = split_buf(buf, &LoadArry, 0);
+	            strcpy(map->nnick, LoadArry[0]);
+        	    strcpy(map->host, LoadArry[1]);
+	            strcpy(map->vhost, LoadArry[2]);
+		    if (LoadArryCount > 3) { /* Check for upgrades from earlier versions */
+			strcpy(map->passwd, LoadArry[3]);
+		    } else /* Upgrading from earlier version, no passwds exist */
+			strcpy(map->passwd, NULL);
+		    if (LoadArryCount > 4) { /* Does who set it exist? Yes? go ahead */
+	    		strcpy(map->added, LoadArry[4]);
+		    } else /* We have no information on who set it so its null */
+		    	strcpy(map->added, "0");
+		    /* add it to the hash */
+		    hn = hnode_create(map);
+		    hash_insert(vhosts, hn, LoadArry[0]);
+	    	}
+    	fclose(fp);
+    } 
 }
 
 
@@ -531,62 +494,53 @@ void Loadhosts()
 static void hs_del(User *u, int tmpint)
 {
 
-    FILE *fp = fopen("data/vhosts.db", "r");
-    char buf[BUFSIZE];
     int i = 1;
+    hnode_t *hn;
+    hscan_t hs;
+    hs_map *map;
 
     strcpy(segv_location, "hs_del");
 
-    if (!fp) {
-        prefmsg(u->nick, s_HostServ, "Unable to open data/vhosts.db");
-        return;
-    }
-
-    if (fp) {
-        while (fgets(buf, BUFSIZE, fp)) {
-            strip(buf);
-
-	      if (i != tmpint) {
-		hsamend("%s", buf);
-	    }
-
-
+    hash_scan_begin(&hs, vhosts);
+    while ((hn = hash_scan_next(&hs)) != NULL) {
 	      if (i == tmpint) {
-		prefmsg(u->nick, s_HostServ, "The following line was removed from the Vhosts Database");
-	        prefmsg(u->nick, s_HostServ, "\2%s\2", buf);
-		hslog("%s removed the VHOST: %s", u->nick, buf);
+		map = hnode_get(hn);
+		prefmsg(u->nick, s_HostServ, "The following vhost was removed from the Vhosts Database");
+	        prefmsg(u->nick, s_HostServ, "\2%s - %s\2", map->nnick, map->vhost);
+		hslog("%s removed the VHOST: %s for %s", u->nick,map->vhost,map->nnick);
+		free(map);
+		hash_scan_delete(vhosts, hn);
+		hnode_destroy(hn);
 	    }
 	i++;
     }
-     fclose(fp);
-    remove("data/vhosts.db");
-    rename("data/vhosts.new", "data/vhosts.db");    
-    Loadhosts();
-    } 
 
-    if (tmpint > i) prefmsg(u->nick, s_HostServ, "ERROR: There is no vhost on list number \2%d\2",tmpint);
-        return;
+    if (tmpint > i) 
+    prefmsg(u->nick, s_HostServ, "ERROR: There is no vhost on list number \2%d\2",tmpint);
+    return;
 }
 
 
 /* Routine to allow users to login and get their vhosts */
 static void hs_login(User *u, char *login, char *pass)
 {
-        HS_Map *map;
-
+        hs_map *map;
+        hnode_t *hn;
+        
         strcpy(segv_location, "HostServ-hs_login");
 
-    /* Check HostName Against Data Contained in vhosts.data */
-      for (map = nnickmap; map; map = map->next) {
-           if (!strcasecmp(map->nnick, login)) {
-	      if (!strcasecmp(map->passwd, pass)) {
-	              ssvshost_cmd(u->nick, map->vhost);
-		      prefmsg(u->nick, s_HostServ, "Your VHOST %s has been set.", map->vhost);
-		      hslog("%s used LOGIN to obtain userhost of %s",u->nick, map->vhost);
-	              return;
-           }
-       }
-    }
+    	/* Check HostName Against Data Contained in vhosts.data */
+      	hn = hash_lookup(vhosts, login);
+printf("%s\n", login);
+	if (hn) {
+		map = hnode_get(hn);
+		if (!strcasecmp(map->passwd, pass)) {
+	        	ssvshost_cmd(u->nick, map->vhost);
+		      	prefmsg(u->nick, s_HostServ, "Your VHOST %s has been set.", map->vhost);
+		      	hslog("%s used LOGIN to obtain userhost of %s",u->nick, map->vhost);
+	              	return;
+           	}
+       	}
 	prefmsg(u->nick, s_HostServ, "Incorrect Login or Password.  Do you have a vhost added?");
         return;
 }

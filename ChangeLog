@@ -20,6 +20,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - StatServ updates 
  - Ultimate Smode (a28) added, but what did I break?
  - Some Solaris Porting fixes thanks to Hwy.. Time to get onto the Solaris Compile file at sf though :(
+ - Removed Bignet Support, and made lists dynamic now
 
 * NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 2 
  - Misc. Updates (S)

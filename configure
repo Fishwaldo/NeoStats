@@ -824,7 +824,6 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
  --enable-debug - Enable Debuging
- --enable-bignet - Large Network Support
  --enable-unreal - enable Unreal IRCD Support
  --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support
  --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support
@@ -4699,31 +4698,6 @@ _ACEOF
 	CFLAGS="$CFLAGS -ggdb -Wall"
 	echo "$as_me:$LINENO: result: yes - Watch your Log Files" >&5
 echo "${ECHO_T}yes - Watch your Log Files" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-  esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
-echo "$as_me:$LINENO: checking Whether to Large Network Support (More than 2000 users)..." >&5
-echo $ECHO_N "checking Whether to Large Network Support (More than 2000 users)...... $ECHO_C" >&6
-# Check whether --enable-bignet or --disable-bignet was given.
-if test "${enable_bignet+set}" = set; then
-  enableval="$enable_bignet"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define BIGNET 1
-_ACEOF
-
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
 	;;
   *)
 	echo "$as_me:$LINENO: result: no" >&5

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.64 2003/01/06 12:07:25 fishwaldo Exp $
+** $Id: stats.h,v 1.65 2003/01/06 15:03:19 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -81,15 +81,14 @@
 
 
 #ifdef BIGNET
-#define S_TABLE_SIZE	200
-#define U_TABLE_SIZE	3999
-#define D_TABLE_SIZE	3999
-#define C_TABLE_SIZE	3999
-#define CHAN_MEM_SIZE	3000
-#define MAXJOINCHANS	3000
+#define S_TABLE_SIZE	-1
+#define U_TABLE_SIZE	-1
+#define C_TABLE_SIZE	-1
+#define CHAN_MEM_SIZE	-1
+#define MAXJOINCHANS	-1
 #define T_TABLE_SIZE	300 /* Number of Timers */
 #define B_TABLE_SIZE	100 /* Number of Bots */
-#define MAXMODES	CHAN_MEM_SIZE
+#define MAXMODES	-1
 #define DNS_QUEUE_SIZE  100 /* number on concurrent DNS lookups */
 #else
 #define S_TABLE_SIZE	97
@@ -299,9 +298,6 @@ extern void TimerPings();
 extern void TimerMidnight();
 extern int is_midnight();
 
-/* users.c */
-extern Server *serverlist[S_TABLE_SIZE];
-extern User *userlist[U_TABLE_SIZE];
 extern MyUser *myuhead;
 extern void AddUser(const char *, const char *, const char *, const char *, const unsigned long ip, const unsigned long TS);
 extern void DelUser(const char *);

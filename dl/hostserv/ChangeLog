@@ -8,6 +8,7 @@ Shmad <shmad@neostats.net>
 + hostserv.h now contains defines for access for each function.
 + Fixed a segfault when upgrading from earlier versions if a passwd field wasnt present.
 + Made it possible to configure the levels for each command due to different people wanting different levels... :) removed Shmads old hostserv.h
++ Moved HostServ to use NeoStats hash system to store data. More efficient and nicer than righting and reading and moving files around... 
 
 * Version 2.2 * Fish * December 26th, 2002
 + Due to massive bitching by people who use HostServ opers can
