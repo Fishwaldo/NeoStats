@@ -44,7 +44,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.23 2002/09/04 08:40:26 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.24 2002/09/16 04:27:20 fishwaldo Exp $
  */
 
 
@@ -338,6 +338,10 @@
 #define TOK_SWHOIS "BA"
 #define MSG_SVSO "SVSO"
 #define TOK_SVSO "BB"
+#define MSG_TKL           "TKL"
+#define TOK_TKL   "BD"
+
+
 
 #define	UMODE_INVISIBLE  0x0001 /* makes user invisible */
 #define	UMODE_OPER       0x0002	/* Operator */

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.90 2002/09/16 03:31:46 fishwaldo Exp $
+** $Id: ircd.c,v 1.91 2002/09/16 04:27:20 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -606,9 +606,6 @@ void init_ServBot()
 #endif
 #ifdef UNREAL
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
-	sjoin_cmd(s_Services, me.chan);
-	sprintf(rname, "%s %s", s_Services, s_Services);
-	schmode_cmd(s_Services, me.chan, "+oa", rname);
 #elif !ULTIMATE
 #ifndef HYBRID7
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
@@ -730,10 +727,10 @@ void Srv_Burst(char *origin, char **argv, int argc) {
 			sburst_cmd(0);
 			ircd_srv.burst = 0;
 			me.synced = 1;
+			init_ServBot();
 		}
 	} else {
 		ircd_srv.burst = 1;
-		init_ServBot();
 	}
 #ifdef HYBRID7
 	seob_cmd(origin);
@@ -749,9 +746,6 @@ void Srv_Connect(char *origin, char **argv, int argc) {
 			me.token = 1;
 		}
 	}
-#ifndef ULTIMATE3
-	init_ServBot();
-#endif
 }
 
 
@@ -1019,7 +1013,6 @@ void Srv_Vctrl(char *origin, char **argv, int argc) {
 		ircd_srv.gc = atoi(argv[3]);
 		strcpy(me.netname, argv[14]);
 		vctrl_cmd();
-
 }
 #endif
 #ifndef UNREAL
@@ -1037,6 +1030,7 @@ void Srv_Netinfo(char *origin, char **argv, int argc) {
 #ifndef HYBRID7
 			snetinfo_cmd();
 #endif
+			init_ServBot();
 			globops(me.name,"Link with Network \2Complete!\2");
 			#ifdef DEBUG
         			ns_debug_to_coders(me.chan);
@@ -1102,7 +1096,7 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
 #elif ULTIMATE
-			AddUser(argv[0], argv[3], argv[4], argv[5], 0, 0);
+			AddUser(argv[0], argv[3], argv[4], argv[5], 0, strtoul(argv[2], NULL, 10));
 			Module_Event("SIGNON", av, ac);
 #elif HYBRID7
 			AddUser(argv[0], argv[4], argv[5], argv[6], 0, strtoul(argv[2], NULL, 10));

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.67 2002/09/04 08:40:27 fishwaldo Exp $
+** $Id: main.c,v 1.68 2002/09/16 04:27:20 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -99,7 +99,6 @@ int main()
 	init_server_hash();
 	init_user_hash();
 	init_chan_hash();
-	init_ircd();
 
 /* Shmad */
 /* This section ALWAYS craps out so we ignore it-- for now */

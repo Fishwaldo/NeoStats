@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Unreal.c,v 1.30 2002/09/04 08:40:26 fishwaldo Exp $
+** $Id: Unreal.c,v 1.31 2002/09/16 04:27:20 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -311,12 +311,15 @@ int ssvskill_cmd(const char *target, const char *reason, ...) {
 		return 1;
 	}
 }
+
+/* akill is gone in the latest Unreals, so we set Glines instead */
+
 int sakill_cmd(const char *host, const char *ident, const char *setby, const int length, const char *reason,...) {
 	va_list ap;
 	char buf[512];
 	va_start(ap, reason);
 	vsnprintf(buf, 512, reason, ap);
-	sts(":%s %s %s %s %d %s %d :%s", me.name, (me.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, time(NULL), buf);
+	sts(":%s %s + G %s %s %s %d %d :%s", me.name, (me.token ? TOK_TKL : MSG_TKL), ident, host, setby, time(NULL) + length, time(NULL), buf);
 	va_end(ap);
 	return 1;
 }

@@ -15,6 +15,9 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fixed up the timer.c segv in module code (F)
  - Fixed up segv locatation code in dns.c (F)
  - Fixed up a few mem leaks in dns.c
+ - Fixed up some weirdness in how NeoStats gets introduced to the network
+ - Fixed a bug where NeoStats would join the #services channel twice (hu?)
+ - Moved Unreal port from using Akills to TKL's to hopefully avoid problems with newwer unreal versions that don't use akill.
 
 * NeoStats * Fish * Version 2.5.0-Beta5
  - Fixed a problem with prefmsg in Unreal only.

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.24 2002/09/04 08:40:26 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.25 2002/09/16 04:27:20 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -126,11 +126,6 @@ Oper_Modes usr_mds[] = {
 
 
 
-
-
-void init_ircd() {
-	if (usr_mds);
-};
 
 
 int sserver_cmd(const char *name, const int numeric, const char *infoline) {
