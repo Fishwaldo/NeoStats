@@ -86,8 +86,6 @@ extern "C"
 #include <malloc.h>
 #include <signal.h>
 
-#define HAVE_WINSOCK 1
-//#define PRINTFFORMAT(si,tc)
 #ifndef inline
 #define inline __inline
 #endif
@@ -109,8 +107,6 @@ extern "C"
 #define EINPROGRESS WSAEINPROGRESS
 #define EMSGSIZE WSAEMSGSIZE
 #define ENOPROTOOPT WSAENOPROTOOPT
-//#define NONRETURNING
-//#define NONRETURNPRINTFFORMAT(si,tc) 
 
  /*
   * UNIX system API for Win32

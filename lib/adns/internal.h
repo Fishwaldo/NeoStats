@@ -102,37 +102,6 @@ typedef unsigned char byte;
 #define PRINTFFORMAT(si,tc) FUNCATTR((ATTRPRINTF(si,tc)))
 #endif
 
-/* GNU C nonreturning functions, or null. */
-#ifndef ATTRNORETURN
-#ifdef HAVE_GNUC25_NORETURN
-#define ATTRNORETURN noreturn
-#else
-#define ATTRNORETURN
-#endif
-#endif
-#ifndef NONRETURNING
-#define NONRETURNING FUNCATTR((ATTRNORETURN))
-#endif
-
-/* Combination of both the above. */
-#ifndef NONRETURNPRINTFFORMAT
-#define NONRETURNPRINTFFORMAT(si,tc) FUNCATTR((ATTRPRINTF(si,tc),ATTRNORETURN))
-#endif
-
-/* GNU C constant functions, or null. */
-#ifndef ATTRCONST
-#ifdef HAVE_GNUC25_CONST
-#define ATTRCONST const
-#else
-#define ATTRCONST
-#endif
-#endif
-#ifndef CONSTANT
-#define CONSTANT FUNCATTR((ATTRCONST))
-#endif
-
-
-
 /* Configuration and constants */
 
 #define MAXSERVERS 5

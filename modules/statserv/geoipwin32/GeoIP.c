@@ -26,6 +26,7 @@
 #include <string.h>
 #ifndef _WIN32
 #include <netdb.h>
+#include <sys/socket.h>
 #include <netinet/in.h> /* For ntohl */
 #include <arpa/inet.h>
 #else
