@@ -56,9 +56,11 @@ int main()
 	__init_mod_list();
 	setup_signals();
 	ConfLoad();
-/*	LoadStats();
-	LoadTLD();
-*/
+	if (init_modules()) {
+		printf("WARNING: Some Modules Failed to Load");
+	}
+
+
 #ifndef DEBUG
 	forked=fork();
 #endif
@@ -198,7 +200,7 @@ void login()
 	segv_location = "login";
 	sts("PASS %s", me.pass);
 	sts("SERVER %s 1 :%s", me.name,me.infoline);
-	sts("PROTOCTL TOKEN");
+	sts("PROTOCTL :TOKEN");
 	init_ServBot();
 
 }

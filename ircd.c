@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.1 2000/02/03 23:45:54 fishwaldo Exp $
+** $Id: ircd.c,v 1.2 2000/02/04 04:52:45 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -193,7 +193,7 @@ void parse(char *line)
 	if (!(*line))
 		return;
 
-	coreLine = strdup(line);
+	coreLine = sstrdup(line);
 
 #ifdef DEBUG
 	log("R: %s", line);

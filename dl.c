@@ -235,9 +235,11 @@ void list_module_bots(User *u) {
 
 
 
-int load_module(char *path, User *u) {
+int load_module(char *path1, User *u) {
 	char *dl_error = NULL;
 	void *dl_handle = NULL;
+	int do_msg;
+	char *path = NULL;
 	Module_Info * (*mod_get_info)() = NULL;
 	Functions * (*mod_get_funcs)() = NULL;
 	EventFnList * (*mod_get_events)() = NULL;
@@ -247,6 +249,12 @@ int load_module(char *path, User *u) {
 	Module *mod_ptr = NULL, *list_ptr = NULL;
 
 	segv_location = "load_module";
+	if (u == NULL) {
+		do_msg = 0;
+	} else {
+		do_msg = 1;
+	}
+	path = sstrdup(path1);
 	path = strcat(path,".so");
 	dl_handle = dlopen(path, RTLD_NOW);
 	if (!dl_handle) {
@@ -263,24 +271,24 @@ int load_module(char *path, User *u) {
 			}
 		}
 		if (!dl_handle) {
-			privmsg(u->nick, s_Services, "Error, Couldn't Load Module");
-			privmsg(u->nick, s_Services, "%s",dlerror());
+			if (do_msg) privmsg(u->nick, s_Services, "Error, Couldn't Load Module");
+			if (do_msg) privmsg(u->nick, s_Services, "%s",dlerror());
 			return -1;
 		}
 	}
 
 	mod_get_info = dlsym(dl_handle, "__module_get_info");
 	if ((dl_error = dlerror()) != NULL) {
-		privmsg(u->nick, s_Services, "Error, Couldn't Load Module");
-		privmsg(u->nick, s_Services, "%s",dl_error);
+		if (do_msg) privmsg(u->nick, s_Services, "Error, Couldn't Load Module");
+		if (do_msg) privmsg(u->nick, s_Services, "%s",dl_error);
 		dlclose(dl_handle);
 		return -1;
 	}
 
 	mod_get_funcs = dlsym(dl_handle, "__module_get_functions");
 	if ((dl_error = dlerror()) != NULL) {
-		privmsg(u->nick, s_Services, "Error, Couldn't Load Module");
-		privmsg(u->nick, s_Services, "%s",dl_error);
+		if (do_msg) privmsg(u->nick, s_Services, "Error, Couldn't Load Module");
+		if (do_msg) privmsg(u->nick, s_Services, "%s",dl_error);
 		dlclose(dl_handle);
 		return -1;
 	}
@@ -304,7 +312,7 @@ int load_module(char *path, User *u) {
 	while (list_ptr != NULL) {
 		if (!strcasecmp(list_ptr->info->module_name, mod_info_ptr->module_name )) {
 			dlclose(dl_handle);
-			privmsg(u->nick,s_Services,"Module %s already Loaded, Can't Load 2 Copies",mod_info_ptr->module_name);
+			if (do_msg) privmsg(u->nick,s_Services,"Module %s already Loaded, Can't Load 2 Copies",mod_info_ptr->module_name);
 			return -1;
 		}
 		list_ptr = list_ptr->next;
@@ -342,7 +350,7 @@ int load_module(char *path, User *u) {
 			event_fn_ptr++;
 		}
 	}
-	privmsg(u->nick,s_Services,"Module %s Loaded, Description: %s",mod_info_ptr->module_name,mod_info_ptr->module_description);
+	if (do_msg) privmsg(u->nick,s_Services,"Module %s Loaded, Description: %s",mod_info_ptr->module_name,mod_info_ptr->module_description);
 	
 	return 0;
 

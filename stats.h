@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.1 2000/02/03 23:45:55 fishwaldo Exp $
+** $Id: stats.h,v 1.2 2000/02/04 04:52:45 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -36,6 +36,7 @@
 #define MAXPASS			32
 #define MAXNICK			32
 #define MAXUSER			10
+#define NUM_MODULES		255
 #define S_TABLE_SIZE	97
 #define U_TABLE_SIZE	1999
 #define D_TABLE_SIZE	1999
@@ -194,6 +195,7 @@ extern void notice(char *,char *, ...);
 extern void strip(char *);
 extern void ConfLoad();
 extern void rehash();
+extern int init_modules();
 
 /* main.c */
 extern void login();

@@ -5,13 +5,16 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: conf.c,v 1.1 2000/02/03 23:45:53 fishwaldo Exp $
+** $Id: conf.c,v 1.2 2000/02/04 04:52:45 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "dotconf.h"
 
 static void cb_Server(char *, int);
+static void cb_Module(char *, int);
+static void *load_mods[NUM_MODULES];
+static int done_mods;
 
 static config_option options[] =
 { 
@@ -26,7 +29,8 @@ static config_option options[] =
 { "NEOSTAT_USER", ARG_STR, cb_Server, 8},
 { "WANT_PRIVMSG", ARG_STR, cb_Server, 9},
 { "SERVICES_CHAN", ARG_STR, cb_Server, 10},
-{ "MODULE_PATH", ARG_STR, cb_Server, 11}
+{ "MODULE_PATH", ARG_STR, cb_Server, 11},
+{ "LOAD_MODULE", ARG_STR, cb_Module, 0}
 };
 
 
@@ -54,7 +58,36 @@ if (!config_read("stats.cfg", options) == 0 ) {
 	exit(0);
 }
 printf("Sucessfully Loaded Config File, Now Booting NeoStats\n");
+done_mods = 0;
+}
+void cb_Module(char *arg, int configtype) {
+	int i;
+		segv_location="cb_Module";
+		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) { 
+			if (!strcasecmp(load_mods[i], arg)) {
+				return;
+			}
+		}
+		load_mods[i] = sstrdup(arg);
+		log("Added Module %s", load_mods[i]);
+}
 
+int init_modules() {
+	int i;
+	int rval;
+	User *u=NULL;
+
+	segv_location="init_modules";
+	for (i = 1; (i < NUM_MODULES) && (load_mods[i] !=0); i++) {
+		rval = load_module(load_mods[i], u);
+		if (!rval) {
+			log("Successfully Loaded Module %s", load_mods[i]);
+		} else {
+			log("Could Not Load Module %s, Please check above error Messages", load_mods[i]);
+			return -1;
+		}
+	}
+return 1;
 }
 void cb_Server(char *arg, int configtype) {
 
