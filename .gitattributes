@@ -75,6 +75,7 @@ include/ircd.h eol=lf
 include/ircstring.h eol=lf
 include/list.h eol=lf
 include/log.h eol=lf
+include/modes.h -text
 include/modules.h -text
 include/neostats.h -text
 include/ns_help.h eol=lf
@@ -366,7 +367,6 @@ src/main.c eol=lf
 src/match.c -text
 src/misc.c eol=lf
 src/modes.c -text
-src/modes.h -text
 src/modules.c -text
 src/ns_help.c eol=lf
 src/protocol/Makefile.am -text
