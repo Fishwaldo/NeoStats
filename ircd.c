@@ -438,7 +438,7 @@ void parse(char *line)
         /* now, Parse the Command to the Internal Functions... */
 	strcpy(segv_location, "Parse - Internal Functions");
 	for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
-		if (!strcasecmp(cmd_list[I].name, cmd)) {
+		if (!strcmp(cmd_list[I].name, cmd)) {
 			if (cmd_list[I].srvmsg == cmdptr) {
 				strcpy(segv_location, cmd_list[I].name);
 				cmd_list[I].function(origin, av, ac);
