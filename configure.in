@@ -31,6 +31,13 @@ case "$host_os" in
 	LDFLAGS="-rdynamic";;	
 esac
 
+case "$host_os" in
+*freebsd)
+	MAKEDEPENDENCIES=" ";;
+*)
+	MAKEDEPENDENCIES="-include \$(OBJS:.o=.d)";;
+esac
+
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL 
@@ -520,6 +527,7 @@ AC_MSG_RESULT(Thats Impressive!!!)
 AC_MSG_CHECKING(The Modules that will be compiled)
 AC_MSG_RESULT($MODULES)
 
+AC_SUBST(MAKEDEPENDENCIES)
 AC_SUBST(DIRINST)
 AC_SUBST(CFLAGS)
 AC_SUBST(LDFLAGS)

@@ -68,7 +68,7 @@ neostats: $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) @sqlsrvbuild@ $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(EXTRA_LDFLAGS) -o $@
 
 # include dependency info 
--include $(OBJS:.o=.d)
+@MAKEDEPENDENCIES@
 
 .c.o:
 	$(CC) $(NEOCFLAGS) $(NEOINCLUDES) -c $< 
