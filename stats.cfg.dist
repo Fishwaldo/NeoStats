@@ -1,27 +1,41 @@
-###############################################################################
+##################################################
 ## Configuration file for NeoStats
-## NeoStats (c) 1999 Codeworks.
-## codework@kamserve.com
-###############################################################################
+## Created:  Thu, Mar 28 2002 - 17:09:24 CET
+## NeoStats (c) 1999-2002 The NeoStats Group.
+## support@neostats.net
+## Web: http://www.NeoStats.Net
+##################################################
+
+##############################
+# IRCd Linking Configuration #
+##############################
 
 # The server name that we appear as.
-SERVER_NAME stats.dynam.ac
+SERVER_NAME stats.somenet.net
 
 # The port to connect to.
 SERVER_PORT 6667
 
-# Hostname we are connecting to.
+# Hostname we are connecting to
 CONNECT_TO 127.0.0.1
 
-# Password that we send in order to connect.
-CONNECT_PASS bla
+# Password we send in order to connect.
+CONNECT_PASS LinkPass
 
 # Infoline Displayed in /links for this server
-SERVER_INFOLINE Network Statistical Server
+SERVER_INFOLINE NeoStats 2.5B1 IRC Statistical Server!
+
+# Your network name (fx: irc.irc-chat.net put irc-chat, if unknown refer to your network file)
+STATSERV_NETNAME "SomeNet-IRC"
+
+
+##########################
+# NeoStats Configuration #
+##########################
 
 # This is the Apparent Host that NeoStats is connecting from.. Some people
-# like to make it the same as your Services host (eg, services.global-irc.net)
-NEOSTAT_HOST NeoStats.net
+# like to make it the same as your Services host (eg, services.irc-chat.net) 
+NEOSTAT_HOST NeoStats.Net
 
 # This is the User that NeoStats uses (the part before the @host)
 NEOSTAT_USER Neo
@@ -32,78 +46,100 @@ SERVICES_CHAN #services
 # Should we send privmsg's or notice's?
 # Comment this out for NOTICE's, otherwise
 # leave it alone.
-WANT_PRIVMSG
+#WANT_PRIVMSG
 
 # Time in seconds that we wait before attempting
 # to reconnect to the server.
 RECONNECT_TIME 10
 
-###########################
-#ServiceRoots Module:     #
-###########################
-#who should be given full access to NeoStats (they must have the +r flag
-#to be able to use this feature though. Most times, this means identifing
-#to services (You can specify this option upto 10 times for 10 different
-#nicks)
+# Should NeoStats write out HTML statistics?  Comment this out to disable
+# HTML_STATS to enable or #HTML_STATS to disable.
+HTML_STATS
 
-SERVICE_ROOTS mynick
-
-#should we control access to NeoStats with serviceroots option only?
-#This means that if you are not listed in the
-#serviceroots option, you won't have access to any privledged command
-#(regardless of you O line flags) (uncomment to enable)
-
-#SERVICE_ROOTS_AUTH 1
+# Path to NeoStats HTML Output file.  INCLUDE FILENAME!! This is required.
+# Example: /home/shmad/public_html/stats.html
+HTML_STATS /home/shmad/public_html/stats.html
 
 
+#####################################
+# Module Configurations and Loading #
+#####################################
 
-###########################
-# MODULE LOADING OPTIONS: #
-###########################
 # Now for each Module we want to load at boot time, we specify the following
 # this loads the Spam Module
 LOAD_MODULE spam
+
+# This is a demo Module, called Version.. All it does is append a reply to /version <NeoStats server
+name>
+LOAD_MODULE version
+
 # this is the StatServ Module
 LOAD_MODULE statserv
 
-# Some Modules require there own configuration information.. Here are some 
+#This is the NetInfo Module, All it does is join users based on TLDs to specific channels.
+# IF you use this make sure to edit data/niconfig.db
+#LOAD_MODULE netinfo
+
+#This is a new module.  LoveServ, send a rose, hug, kiss, chocolate, etc to that
+# Special IRC Somebody. :D
+#LOAD_MODULE loveserv
+
+# Some Modules require there own configuration information.. Here are some
 # Configuration options that are usefull for the Modules that come with
 # NeoStats
+
+# For all other modules, just add them above in the format:
+# LOAD_MODULE modulename
+
+
 
 ############################
 # STATSERV CONFIG FOLLOWS: #
 ############################
-# This is the nickname that StatServ uses, if not specified, defaults to
-# Statserv
+
+# This is the nickname that StatServ uses, if not specified, defaults to StatServ
 #STATSERV_NICK StatServ
 
 # This is the User portion that StatServ uses, if not specified, it uses
 # whatever NeoStats is configured to use
 #STATSERV_USER Stats
- 
-# This is the Host that StatServ appears to come from, if not specified, it
+
+
+# This is the Host that StatServ appears to come from, if not specified, it 
 # uses whatever NeoStats is configured to use
-#STATSERV_HOST my.stats.irc.net
+#STATSERV_HOST stats.irc-chat.net
 
 # This is used to specified the number of seconds a Server is tolerated
 # before it is considered Laged. A non value, or value of 0, disables Lag
 # Notifications
 LAG_NOTICE 60
 
-# Should we enable the HTML output option? Uncomment this option to enable
-# it.
-#HTML_STATS
 
-# This specifies the path to write the HTML statistics out to on
-# your host. It should be placed within your web directory, or a place
-# when you can ftp it to your WebServer at a regular interval (currently
-# this page is updated hourly) You should also make sure you
-# have permissions to write to this location as the user that NeoStats
-# runs as.
-#HTML_PATH /var/www/html/stats/index.html
+############################
+# ICQSERV CONFIG FOLLOWS:  #
+############################
+
+# This is the nickname that IcqServ uses, if not specified, defaults to
+# ICQserv
+#ICQSERV_NICK IcqServ
+
+# This is the User portion that IcqServ uses, if not specified, it uses
+# whatever NeoStats is configured to use
+#ICQSERV_USER Stats
+
+# This is the Host that IcqServ appears to come from, if not specified, it
+# uses whatever NeoStats is configured to use
+#ICQSERV_HOST my.stats.irc.net
+
+ICQSERV_UIN 000000001
+ICQSERV_PASSWORD blahblah
+ICQSERV_SERVER 205.188.179.42
+
 
 
 
 ###############################################################################
 ## End of Configuration                                                      ##
 ###############################################################################
+
+

@@ -1,5 +1,5 @@
-NeoStats 2.0.x Configuration Manual
------------------------------------
+NeoStats 2.x Configuration Manual
+---------------------------------
 This file should explain how to INSTALL and CONFIGURE NeoStats.
 If you have any problems NOT addressed in one of these help documents,
 please hop on irc.neostats.net and we will be happy to help you.
@@ -54,6 +54,11 @@ Your prompt should look something similar to:
 
 Now Type:
 ./configure (this is CASE sensitive guys remember that -- everything is)
+
+ADDITIONAL NOTE: If you use UnrealIRCd use --enable-unreal
+			    Ultimate use   --enable-ultimate
+			    Ultimate3 use  --enable-ultimate3
+
 
 Now the script will check to see if all necessary programs to run NeoStats
 are installed on your system. A small note here, for those of you who have

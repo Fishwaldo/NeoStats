@@ -1,5 +1,9 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+
 * NeoStats * Fish * Version 2.5.0-Beta1
+ - Fixed makeconf for new stats.cfg options (Shmad)
+ - Updated FAQ (Shmad)
+ - Updated Misc. other things and fixed Fish's typos (Shmad)
  - Some updates to sock.c to detect zombie servers (Servers that we havn't recieved anything from for 180 seconds) and restart if thats the case
  - restart, reconnect code updated to unload the modules and re-execute stats from scrath
  - updates to statserv to support channels (top channel data)

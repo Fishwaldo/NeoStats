@@ -1,9 +1,21 @@
-NeoStas 2.5.0
+NeoStats 2.5.0
 ~~~~~~~~~~~~~~~
-Thanks for Downloading NeoStats. NeoStats is a powerfull and extendable set of *services* for IRC.
-By Services, we do not mean NickServ/Chanserv etc (although those are being developed) but additional services. Things like StatServ which give you information on the number of users/operators/channels/servers... basically IRC statistics, or MoraleServ, which is a *fun* module, to send funny messages to users, to utility modules.
-Some modules have a usefull function on your network, other modules are developed for fun, and to make your IRC network more attractive to users (thats whats it all about right?, IRC users?)
-With the release of 2.5 series of NeoStats, several changes have taken place compared to the old version of NeoStats 2.0 series (don't ask me what happened to versions 2.1, 2.2, 2.3 or 2.4, I don't know!)
+
+---------------------------------------
+PLEASE READ THE 'BETA' FILE NOW
+---------------------------------------
+
+Thanks for Downloading NeoStats. NeoStats is a powerfull and extendable set
+of *services* for IRC. By Services, we do not mean NickServ/Chanserv etc 
+(although those are being developed) but additional services. Things like
+StatServ which give you information on the number of users/operators/channels/servers
+... basically IRC statistics, or MoraleServ, which is a *fun* module, to send
+funny messages to users, to utility modules. Some modules have a usefull function
+ on your network, other modules are developed for fun, and to make your IRC 
+network more attractive to users (thats whats it all about right?, IRC users?)
+With the release of 2.5 series of NeoStats, several changes have taken place 
+compared to the old version of NeoStats 2.0 series (don't ask me what happened
+to versions 2.1, 2.2, 2.3 or 2.4, I don't know!)
 A detailed list of changes can be found in the ChangeLog file, but a brief summary is:
 	-ServiceRoots support
 	-External MOTD files

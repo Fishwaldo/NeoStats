@@ -5,7 +5,7 @@ TIME=`date +"%H:%M:%S %Z"`
 DATE=`date +"%a, %b %e %Y"`
 STATSCONF="stats.cfg"
 SERVNAME="stats.somenet.net"
-COMMENT="NeoStats 2.0.6 IRC Statistical Server!"
+COMMENT="NeoStats 2.5B1 IRC Statistical Server!"
 LINKPORT="6667"
 LINKSERVER="127.0.0.1"
 LINKPASS="LinkPass"
@@ -14,7 +14,8 @@ NEOHOST="NeoStats.Net"
 NEOUSER="Neo"
 NEOCHAN="#services"
 NEOCONN="10"
-NEOMPATH="/home/shmad/NeoStats2.0/dl"
+NEOWRITE="HTML_STATS"
+NEOHTML="/home/shmad/public_html/stats.html"
 NEOLAG="60"
 
 # these are so I can use stuff like $1 without it replacing it...like by
@@ -215,11 +216,19 @@ if [ ! -z "$cc" ]; then
 fi
 
 echo " "
-echo "Full path to the modules (ie: /home/shmad/NeoStats2.0/dl)"
-echo $n " [$NEOMPATH] -> $c"
+echo "Should NeoStats write HTML stats?  Put: HTML_STATS to enable or #HTML_STATS to disable"
+echo $n " [$NEOWRITE] -> $c"
 read cc
 if [ ! -z "$cc" ]; then
-        NEOMPATH="$cc"
+	NEOWRITE="$cc"
+fi
+
+echo " "
+echo "Please put the path & Filename to output HTML Statistics to"
+echo $n " [$NEOHTML] -> $c"
+read cc
+if [ ! -z "$cc" ]; then
+	NEOHTML="$cc"
 fi
 
 echo " "
@@ -235,8 +244,10 @@ cat > $CONF << __EOF__
 ##################################################
 ## Configuration file for NeoStats
 ## Created:  $DATE - $TIME
-## NeoStats (c) 1999-2001 Codeworks.
+## NeoStats (c) 1999-2002 The NeoStats Group.
 ## support@neostats.net
+## Web: http://www.NeoStats.Net
+## File Revision: 2.5.0.19
 ##################################################
 
 ##############################
@@ -256,9 +267,9 @@ CONNECT_TO $LINKSERVER
 CONNECT_PASS $LINKPASS
 
 # Infoline Displayed in /links for this server
-SERVER_INFOLINE $COMMENT
+SERVER_INFOLINE "$COMMENT"
 
-# Your network name (fx: irc.dreaming.org put Dreaming, etc refer to your Unreal network file)
+# Your network name (fx: irc.irc-chat.net put irc-chat, if unknown refer to your network file)
 STATSERV_NETNAME $NETNAME
 
 
@@ -267,7 +278,7 @@ STATSERV_NETNAME $NETNAME
 ##########################
 
 # This is the Apparent Host that NeoStats is connecting from.. Some people
-# like to make it the same as your Services host (eg, services.global-irc.net) 
+# like to make it the same as your Services host (eg, services.irc-chat.net) 
 NEOSTAT_HOST $NEOHOST
 
 # This is the User that NeoStats uses (the part before the @host)
@@ -279,21 +290,24 @@ SERVICES_CHAN $NEOCHAN
 # Should we send privmsg's or notice's?
 # Comment this out for NOTICE's, otherwise
 # leave it alone.
-WANT_PRIVMSG
+#WANT_PRIVMSG
 
 # Time in seconds that we wait before attempting
 # to reconnect to the server.
 RECONNECT_TIME $NEOCONN
 
+# Should NeoStats write out HTML statistics?  Comment this out to disable
+# HTML_STATS to enable or #HTML_STATS to disable.
+$NEOWRITE
 
+# Path to NeoStats HTML Output file.  INCLUDE FILENAME!! This is required.
+# Example: /home/shmad/public_html/stats.html
+HTML_STATS $NEOHTML
 
 
 #####################################
 # Module Configurations and Loading #
 #####################################
-
-# First, The Path that we try to find the Modules in
-MODULE_PATH $NEOMPATH
 
 # Now for each Module we want to load at boot time, we specify the following
 # this loads the Spam Module
@@ -308,15 +322,20 @@ LOAD_MODULE statserv
 
 #This is the NetInfo Module, All it does is join users based on TLDs to specific channels.
 # IF you use this make sure to edit data/niconfig.db
-LOAD_MODULE netinfo
+#LOAD_MODULE netinfo
 
 #This is a new module.  LoveServ, send a rose, hug, kiss, chocolate, etc to that
 # Special IRC Somebody. :D
-LOAD_MODULE loveserv
+#LOAD_MODULE loveserv
 
 # Some Modules require there own configuration information.. Here are some
 # Configuration options that are usefull for the Modules that come with
 # NeoStats
+
+# For all other modules, just add them above in the format:
+# LOAD_MODULE modulename
+
+
 
 ############################
 # STATSERV CONFIG FOLLOWS: #
@@ -332,7 +351,7 @@ LOAD_MODULE loveserv
 
 # This is the Host that StatServ appears to come from, if not specified, it 
 # uses whatever NeoStats is configured to use
-#STATSERV_HOST my.stats.irc.net
+#STATSERV_HOST stats.irc-chat.net
 
 # This is used to specified the number of seconds a Server is tolerated
 # before it is considered Laged. A non value, or value of 0, disables Lag
@@ -381,5 +400,8 @@ chmod 700 $STATSCONF
 		echo "| Thanks for choosing NeoStats. Have a nice day. |"
 		echo "| Please check stats.cfg for any errors.         |"
                 echo "*------------------------------------------------*"
+		echo "| Also make sure modules are compiled and in the |"
+		echo "| stats.cfg properly for them to work :)         |"
+		echo "*------------------------------------------------*"
                 echo ""
 		exit 1
