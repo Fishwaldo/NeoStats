@@ -455,6 +455,7 @@ del_bot_from_chan (char *bot, char *chan)
 	hnode_t *cbn;
 	Chan_Bot *bc;
 	lnode_t *bmn;
+	char *botname;
 
 	cbn = hash_lookup (bch, chan);
 	if (!cbn) {
@@ -468,12 +469,13 @@ del_bot_from_chan (char *bot, char *chan)
 		return;
 	}
 	list_delete (bc->bots, bmn);
-	free (lnode_get (bmn));
+	botname = lnode_get(bmn);
+	free (botname);
+	lnode_destroy (bmn);
 	if (list_isempty (bc->bots)) {
 		/* delete the hash and list because its all over */
 		hash_delete (bch, cbn);
 		list_destroy (bc->bots);
-		lnode_destroy (bmn);
 		free (bc->chan);
 		hnode_destroy (cbn);
 	}
@@ -560,7 +562,6 @@ new_bot (char *bot_name)
 		strsetnull (u->nick);
 	else
 		strlcpy (u->nick, bot_name, MAXNICK);
-	u->chanlist = hash_create (C_TABLE_SIZE, 0, 0);
 	bn = hnode_create (u);
 	if (hash_isfull (bh)) {
 		chanalert (s_Services, "Warning ModuleBotlist is full");

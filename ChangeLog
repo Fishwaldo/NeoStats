@@ -25,6 +25,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - replaced all calls to time(NULL) with me.now, which is updated a couple of times each loop. Should reduce the number of system calls a bit. 
  - StatServ has had big performance improvements with regards to the database. Now progressively saves channel data, and only loads channel data when required. Should stop some of those mysterious 8 hour pingouts on large networks and reduce memory overhead !
  - dont do assertion checking by default anymore. We are pretty stable. pass --enable-debug to configure to enable if you have weird crashes now
+ - Some Memory Leak cleanups
 
 * NeoStats * Fish (F) & Mark (M)*  Version 2.5.7
  - Update parse() and splitbuf to suport IRCu (F)

@@ -258,6 +258,7 @@ CStats *load_chan(char *name) {
 		/* its the new database format... Good */
 		sscanf(data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins);		
 		GetData((void *)&c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
+		free(data);
 	} else if (GetData((void *)&c->topics, CFGINT, "ChanStats", c->name, "Topics") > 0) {
 		GetData((void *)&c->totmem, CFGINT, "ChanStats", c->name, "TotalMems");
 		GetData((void *)&c->kicks, CFGINT, "ChanStats", c->name, "Kicks");
@@ -281,7 +282,6 @@ CStats *load_chan(char *name) {
 		c->maxjoins = 0;
 		c->t_maxjoins = c->t_maxmems;
 	}
-	free(data);
 	c->topicstoday = 0;
 	c->joinstoday = 0;
 	c->members = 0;

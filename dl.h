@@ -144,8 +144,6 @@ typedef struct {
 	message_function function;
 	/** function */
 	chan_message_function chanfunc;
-	/** channel list */
-	hash_t *chanlist;
 }Mod_User;
 
 hash_t *bh;
