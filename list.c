@@ -14,7 +14,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: list.c,v 1.2 2002/03/11 06:55:04 fishwaldo Exp $
+ * $Id: list.c,v 1.3 2002/03/13 16:30:12 fishwaldo Exp $
  * $Name:  $
  */
 
@@ -45,7 +45,7 @@
 #define lnode_prev(N)		((N)->prev)
 
 #ifdef KAZLIB_RCSID
-static const char rcsid[] = "$Id: list.c,v 1.2 2002/03/11 06:55:04 fishwaldo Exp $";
+static const char rcsid[] = "$Id: list.c,v 1.3 2002/03/13 16:30:12 fishwaldo Exp $";
 #endif
 
 /*
@@ -73,7 +73,7 @@ list_t *list_init(list_t *list, listcount_t maxcount)
 
 list_t *list_create(listcount_t maxcount)
 {
-    list_t *new = malloc(sizeof *new);
+    list_t *new = smalloc(sizeof *new);
     if (new) {
 	assert (maxcount != 0);
 	new->nilnode.next = &new->nilnode;
@@ -229,7 +229,7 @@ void list_process(list_t *list, void *context,
 
 lnode_t *lnode_create(void *data)
 {
-    lnode_t *new = malloc(sizeof *new);
+    lnode_t *new = smalloc(sizeof *new);
     if (new) {
 	new->data = data;
 	new->next = NULL;
@@ -294,10 +294,10 @@ lnodepool_t *lnode_pool_create(listcount_t n)
 
     assert (n != 0);
 
-    pool = malloc(sizeof *pool);
+    pool = smalloc(sizeof *pool);
     if (!pool)
 	return NULL;
-    nodes = malloc(n * sizeof *nodes);
+    nodes = smalloc(n * sizeof *nodes);
     if (!nodes) {
 	free(pool);
 	return NULL;
@@ -819,7 +819,7 @@ static int tokenize(char *string, ...)
 static char *dupstring(char *str)
 {
     int sz = strlen(str) + 1;
-    char *new = malloc(sz);
+    char *new = smalloc(sz);
     if (new)
 	memcpy(new, str, sz);
     return new;

@@ -181,7 +181,7 @@ struct chanmem_ {
 
 struct modeparms_ {
 	long mode;
-	char param[64];
+	char param[512];
 } modeparms_;
 
 

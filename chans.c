@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.12 2002/03/13 11:35:09 fishwaldo Exp $
+** $Id: chans.c,v 1.13 2002/03/13 16:30:11 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -32,7 +32,6 @@ extern void Change_Topic(char *owner, Chans *c, time_t time, char *topic) {
 }
 
 int comparemode(ModesParm *m, long mode) {
-log("Modes %d -> %d", m->mode, mode);
 	if (m->mode == mode) {
 		return 0;
 	} else {
@@ -68,7 +67,7 @@ void ChanMode(char *origin, char **av, int ac) {
 									j++;
 								} else {	
 									if (cFlagTab[i].parameters) {
-										m = malloc(sizeof(ModesParm));
+										m = smalloc(sizeof(ModesParm));
 										m->mode = cFlagTab[i].mode;
 										strcpy(m->param, av[j]);										
 										mn = lnode_create(m);
@@ -141,7 +140,7 @@ Chans *new_chan(char *chan) {
 	hnode_t *cn;
 
 	strcpy(segv_location, "new_chan");
-	c = malloc(sizeof(Chans));
+	c = smalloc(sizeof(Chans));
 	strcpy(c->name, chan);
 	cn = hnode_create(c);
 	if (hash_isfull(ch)) {
@@ -153,6 +152,8 @@ Chans *new_chan(char *chan) {
 }
 void del_chan(Chans *c) {
 	hnode_t *cn;
+	lnode_t *cm;
+	
 	strcpy(segv_location, "del_chan");
 	cn = hash_lookup(ch, c->name);
 	if (!cn) {
@@ -160,6 +161,13 @@ void del_chan(Chans *c) {
 		return;
 	} else {
 		log("Deleting Channel %s", c->name);
+		cm = list_first(c->modeparms);
+		while (cm) {
+			free(lnode_get(cm));
+			cm = list_next(c->modeparms, cm);
+		}
+		list_destroy_nodes(c->modeparms);
+		list_destroy(c->modeparms);		
 		hash_delete(ch, cn);
 		hnode_destroy(cn);
 		free(c);
@@ -266,7 +274,7 @@ void join_chan(User *u, char *chan) {
 		c->topictime = 0;
 	} 
 	/* add this users details to the channel members hash */	
-	cm = malloc(sizeof(Chanmem));
+	cm = smalloc(sizeof(Chanmem));
 	strcpy(cm->nick, u->nick);
 	cm->joint = time(NULL);
 	cm->flags = 0;

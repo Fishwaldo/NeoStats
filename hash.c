@@ -14,7 +14,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: hash.c,v 1.3 2002/03/08 11:46:07 fishwaldo Exp $
+ * $Id: hash.c,v 1.4 2002/03/13 16:30:11 fishwaldo Exp $
  * $Name:  $
  */
 
@@ -27,7 +27,7 @@
 #include "hash.h"
 
 #ifdef KAZLIB_RCSID
-static const char rcsid[] = "$Id: hash.c,v 1.3 2002/03/08 11:46:07 fishwaldo Exp $";
+static const char rcsid[] = "$Id: hash.c,v 1.4 2002/03/13 16:30:11 fishwaldo Exp $";
 #endif
 
 #define INIT_BITS	6
@@ -297,10 +297,10 @@ hash_t *hash_create(hashcount_t maxcount, hash_comp_t compfun,
     if (hash_val_t_bit == 0)	/* 1 */
 	compute_bits();
 
-    hash = malloc(sizeof *hash);	/* 2 */
+    hash = smalloc(sizeof *hash);	/* 2 */
 
     if (hash) {		/* 3 */
-	hash->table = malloc(sizeof *hash->table * INIT_SIZE);	/* 4 */
+	hash->table = smalloc(sizeof *hash->table * INIT_SIZE);	/* 4 */
 	if (hash->table) {	/* 5 */
 	    hash->nchains = INIT_SIZE;		/* 6 */
 	    hash->highmark = INIT_SIZE * 2;
@@ -742,7 +742,7 @@ int hash_isempty(hash_t *hash)
 
 static hnode_t *hnode_alloc(void *context)
 {
-    return malloc(sizeof *hnode_alloc(NULL));
+    return smalloc(sizeof *hnode_alloc(NULL));
 }
 
 static void hnode_free(hnode_t *node, void *context)
@@ -757,7 +757,7 @@ static void hnode_free(hnode_t *node, void *context)
 
 hnode_t *hnode_create(void *data)
 {
-    hnode_t *node = malloc(sizeof *node);
+    hnode_t *node = smalloc(sizeof *node);
     if (node) {
 	node->data = data;
 	node->next = NULL;
@@ -881,7 +881,7 @@ static int tokenize(char *string, ...)
 static char *dupstring(char *str)
 {
     int sz = strlen(str) + 1;
-    char *new = malloc(sz);
+    char *new = smalloc(sz);
     if (new)
 	memcpy(new, str, sz);
     return new;

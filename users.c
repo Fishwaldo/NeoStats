@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.24 2002/03/12 07:56:02 fishwaldo Exp $
+** $Id: users.c,v 1.25 2002/03/13 16:30:12 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -82,9 +82,6 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 }
 
 void part_u_chan(list_t *list, lnode_t *node, User *u) {
-#ifdef DEBUG
-	log("Parting %s", lnode_get(node));
-#endif
 	part_chan(u, lnode_get(node));
 }
 

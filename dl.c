@@ -445,7 +445,7 @@ int load_module(char *path1, User *u) {
 			return -1;
 	}
 	
-	mod_ptr = (Module *)malloc(sizeof(Module));
+	mod_ptr = (Module *)smalloc(sizeof(Module));
 
 	mn = hnode_create(mod_ptr);
 	if (hash_isfull(mh)) {
