@@ -1,4 +1,4 @@
-lib_LTLIBRARIES		= template.la
+pkglib_LTLIBRARIES	= template.la
 template_la_SOURCES	= template.c 
 template_la_LDFLAGS	= -module -avoid-version -no-undefined
 AM_CFLAGS		= -I../.. -I../../pcre -I../../curl -I../../adns

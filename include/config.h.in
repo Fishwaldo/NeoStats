@@ -58,6 +58,9 @@
 /* Define to 1 if you have the `btowc' function. */
 #undef HAVE_BTOWC
 
+/* Define to 1 if you have the `closedir' function. */
+#undef HAVE_CLOSEDIR
+
 /* Define to 1 if you have the `closesocket' function. */
 #undef HAVE_CLOSESOCKET
 
@@ -98,6 +101,9 @@
 
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 #undef HAVE_DOPRNT
+
+/* Define if you have the _dyld_func_lookup function. */
+#undef HAVE_DYLD
 
 /* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H
@@ -183,6 +189,9 @@
 /* if your compiler supports 'long long' */
 #undef HAVE_LONGLONG
 
+/* Define to 1 if you have the <mach-o/dyld.h> header file. */
+#undef HAVE_MACH_O_DYLD_H
+
 /* Define to 1 if you have the <malloc.h> header file. */
 #undef HAVE_MALLOC_H
 
@@ -216,6 +225,9 @@
 /* Define to 1 if you have the <net/if.h> header file. */
 #undef HAVE_NET_IF_H
 
+/* Define to 1 if you have the `opendir' function. */
+#undef HAVE_OPENDIR
+
 /* use O_NONBLOCK for non-blocking sockets */
 #undef HAVE_O_NONBLOCK
 
@@ -230,6 +242,9 @@
 
 /* Define to 1 if you have the <pwd.h> header file. */
 #undef HAVE_PWD_H
+
+/* Define to 1 if you have the `readdir' function. */
+#undef HAVE_READDIR
 
 /* Define to 1 if you have the `rindex' function. */
 #undef HAVE_RINDEX
@@ -543,9 +558,9 @@
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
    automatically deduced at run-time.
-        STACK_DIRECTION > 0 => grows toward higher addresses
-        STACK_DIRECTION < 0 => grows toward lower addresses
-        STACK_DIRECTION = 0 => direction of growth unknown */
+	STACK_DIRECTION > 0 => grows toward higher addresses
+	STACK_DIRECTION < 0 => grows toward lower addresses
+	STACK_DIRECTION = 0 => direction of growth unknown */
 #undef STACK_DIRECTION
 
 /* Define to 1 if you have the ANSI C header files. */
@@ -587,7 +602,7 @@
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 
-/* Define to a type to use for \`error_t' if it is not otherwise available. */
+/* Define to a type to use for `error_t' if it is not otherwise available. */
 #undef error_t
 
 /* Define to rpl_fnmatch if the replacement function should be used. */
@@ -596,9 +611,11 @@
 /* type to use in place of in_addr_t if not defined */
 #undef in_addr_t
 
-/* Define as `__inline' if that's what the C compiler calls it, or to nothing
-   if it is not supported. */
+/* Define to `__inline__' or `__inline' if that's what the C compiler
+   calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
 #undef inline
+#endif
 
 /* Define to a type if <wchar.h> does not define. */
 #undef mbstate_t

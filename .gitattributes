@@ -31,7 +31,7 @@ autotools/mkinstalldirs -text
 autotools/rules.mk -text
 /configure -text
 /configure.in -text
-/cronchk -text
+/cronchk.in -text
 data/niconfig.db -text
 data/tlds.nfo -text
 doc/FAQ -text
@@ -61,7 +61,6 @@ logs/.keepme -text
 /makeconf -text
 /neostats.motd -text
 src/Makefile.am -text
-src/Makefile.in -text
 src/Makefile.inc.in -text
 src/adns/.indent.pro -text
 src/adns/Makefile.am -text
