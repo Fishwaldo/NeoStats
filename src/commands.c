@@ -27,7 +27,7 @@
  *		- Make command alerts optional
  */
 
-#ifndef WIN32
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 #include "neostats.h"

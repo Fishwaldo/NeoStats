@@ -25,20 +25,14 @@
 ** $Id$
 */
 
-#ifndef WIN32
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
+#endif
+#ifdef HAVE_SYS_POLL_H 
 #include <poll.h>
-#else
-struct pollfd { int fd; short events; short revents; };
-#define POLLIN  1
-#define POLLPRI 2
-#define POLLOUT 4
-#define POLLERR 8
 #endif
 #include "neostats.h"
-#include <fcntl.h>
-
-                     
+#include <fcntl.h>                   
 #include "adns.h"
 #include "timer.h"
 #include "dns.h"

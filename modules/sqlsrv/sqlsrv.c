@@ -31,7 +31,7 @@
 /* sqlsrv struct for tracking connections */
 typedef struct Sql_Conn {
 	struct sockaddr_in cliskt;
-	int fd;
+	SYS_SOCKET fd;
 	long long nbytein;
 	long long nbyteout;
 	char response[50000];
@@ -40,7 +40,7 @@ typedef struct Sql_Conn {
 	int cmd[1000];
 } Sql_Conn;
 
-int sqlListenSock = -1;
+SYS_SOCKET sqlListenSock = -1;
 
 list_t *sqlconnections;
 char sqlsrvuser[MAXUSER];
@@ -48,8 +48,8 @@ char sqlsrvpass[MAXPASS];
 char sqlsrvhost[MAXHOST];
 int sqlsrvport;
 
-static void sql_accept_conn(int srvfd);
-static int sqllisten_on_port(int port);
+static void sql_accept_conn(SYS_SOCKET srvfd);
+static SYS_SOCKET sqllisten_on_port(int port);
 static int sql_handle_ui_request(lnode_t *sqlnode);
 static int sql_handle_ui_output(lnode_t *sqlnode);
 int check_sql_sock();
@@ -182,13 +182,12 @@ int check_sql_sock()
  * Output:       The file descriptor of the socket
  * Effects:      none
  ***************************************************************/
-int
+SYS_SOCKET
 sqllisten_on_port(int port)
 {
-	int      srvfd;      /* FD for our listen server socket */
+	SYS_SOCKET srvfd;      /* FD for our listen server socket */
 	struct sockaddr_in srvskt;
 	int      adrlen;
-	int      flags;
 
 	adrlen = sizeof(struct sockaddr_in);
 	(void) memset((void *) &srvskt, 0, (size_t) adrlen);
@@ -205,14 +204,7 @@ sqllisten_on_port(int port)
 		nlog(LOG_CRITICAL, "SqlSrv: Unable to get socket for port %d.", port);
 		return -1;
 	}
-#ifdef WIN32
-	flags = 1;
-	ioctlsocket(srvfd, FIONBIO, &flags);
-#else
-	flags = fcntl(srvfd, F_GETFL, 0);
-	flags |= O_NONBLOCK;
-	(void) fcntl(srvfd, F_SETFL, flags);
-#endif
+	sys_set_nonblocking_sock (srvfd);
 	if (bind(srvfd, (struct sockaddr *) &srvskt, adrlen) < 0)
 	{
 		nlog(LOG_CRITICAL, "Unable to bind to port %d", port);
@@ -240,21 +232,16 @@ sqllisten_on_port(int port)
  * Effects:      manager connection table (ui)
  ***************************************************************/
 void
-sql_accept_conn(int srvfd)
+sql_accept_conn(SYS_SOCKET srvfd)
 {
 	int      adrlen;     /* length of an inet socket address */
-	int      flags;      /* helps set non-blocking IO */
 	Sql_Conn *newui;
 	char     tmp[16];
 
 	/* if we reached our max connection, just exit */
 	if (list_count(sqlconnections) > 5) {
 		nlog(LOG_NOTICE, "Can not accept new SQL connection. Full");
-#ifdef WIN32
-		closesocket (srvfd);
-#else
-		close (srvfd);
-#endif      			
+		sys_close_sock (srvfd);
 		return;
 	}
 
@@ -270,56 +257,27 @@ sql_accept_conn(int srvfd)
 	{
 		nlog(LOG_WARNING, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
 		sfree(newui);
-#ifdef WIN32
-		closesocket (srvfd);
-#else
-		close (srvfd);
-#endif      			
+		sys_close_sock (srvfd);
 		return;
 	}
 	else
 	{
-#ifdef WIN32
-	{
-		unsigned char* src = &(newui->cliskt.sin_addr.s_addr);
-		sprintf(tmp, "%u.%u.%u.%u", src[0], src[1], src[2], src[3]);
-	}
-#else
 		inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
-#endif
 		if (!match(sqlsrvhost, tmp)) {
     	/* we didnt get a match, bye bye */
 			nlog(LOG_NOTICE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
-#ifdef WIN32
-			closesocket (newui->fd);
-#else
-			close (newui->fd);
-#endif      			
+			sys_close_sock (newui->fd);
 			sfree(newui);
 			return;
 		}
 		/* inc number ui, then init new ui */
-#ifdef WIN32
-		flags = 1;
-		ioctlsocket(srvfd, FIONBIO, &flags);
-#else
-		flags = fcntl(newui->fd, F_GETFL, 0);
-		flags |= O_NONBLOCK;
-		(void) fcntl(newui->fd, F_SETFL, flags);
-#endif
+		sys_set_nonblocking_sock (srvfd);
 		newui->cmdpos = 0;
 		newui->responsefree = 50000; /* max response packetsize if 50000 */
 		newui->nbytein = 0;
 		newui->nbyteout = 0;
 		lnode_create_append (sqlconnections, newui);
-#ifdef WIN32
-		{
-			unsigned char* src = &newui->cliskt.sin_addr.s_addr;
-			sprintf(tmp, "%u.%u.%u.%u", src[0], src[1], src[2], src[3]);
-		}
-#else
 	    inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
-#endif
 		dlog(DEBUG1, "New SqlConnection from %s", tmp);
 	}
 }
@@ -355,13 +313,8 @@ sql_handle_ui_request(lnode_t *sqlnode)
 	/* We read data from the connection into the buffer in the ui struct. 
        Once we've read all of the data we can, we call the DB routine to
        parse out the SQL command and to execute it. */
-#ifdef WIN32
-	ret = recv(sqlconn->fd,
-		&(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos), 0);
-#else
-	ret = read(sqlconn->fd,
+	ret = sys_read_sock (sqlconn->fd,
 		&(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos));
-#endif
 
 	/* shutdown manager conn on error or on zero bytes read */
 	if (ret <= 0)
@@ -370,11 +323,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
 		   client program? */
 		dlog(DEBUG1, "Disconnecting SqlClient for failed read");
 		deldbconnection(sqlconn->fd);
-#ifdef WIN32
-		closesocket (sqlconn->fd);
-#else
-		close(sqlconn->fd);
-#endif      			
+		sys_close_sock (sqlconn->fd);
 		list_delete(sqlconnections, sqlnode);
 		lnode_destroy(sqlnode);
 		sfree(sqlconn);
@@ -428,20 +377,12 @@ sql_handle_ui_output(lnode_t *sqlnode)
   
 	if (sqlconn->responsefree < 50000)
 	{
-#ifdef WIN32
-		ret = send (sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree), 0);
-#else
-		ret = write(sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree));
-#endif
+		ret = sys_write_sock (sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree));
 		if (ret < 0)
 		{
 			nlog(LOG_WARNING, "Got a write error when attempting to return data to the SQL Server");
 			deldbconnection(sqlconn->fd);
-#ifdef WIN32
-			closesocket (sqlconn->fd);
-#else
-			close(sqlconn->fd);
-#endif      			
+			sys_close_sock (sqlconn->fd);
 			list_delete(sqlconnections, sqlnode);
 			lnode_destroy(sqlnode);
 			sfree(sqlconn);

@@ -31,7 +31,7 @@
  * dynamic runtime library loading routines
  */
 
-#ifndef WIN32
+#ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #endif
 #include <stdio.h>

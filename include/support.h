@@ -36,5 +36,8 @@ EXPORTFUNC size_t strlcat(char *dst, const char *src, size_t size);
 #ifndef HAVE_STRNDUP
 EXPORTFUNC char *strndup(const char *src, size_t count);
 #endif /* HAVE_STRNDUP */
+#ifndef HAVE_INET_NTOP
+EXPORTFUNC char *inet_ntop(int af, const unsigned char *src, char *dst, size_t size); 
+#endif /* HAVE_INET_NTOP */
 
 #endif /* _SUPPORT_H_ */

@@ -70,6 +70,7 @@
 #define MODULEVAR 
 #define EXPORTVAR
 #define EXPORTFUNC
+#include "version.h"
 #endif
 
 #ifdef HAVE_DB_H
@@ -81,19 +82,7 @@
 #define __attribute__(x)  /* NOTHING */
 #endif
 
-
-
-/* 
- * NeoStats core API version.
- * A module should check this when loaded to ensure compatibility
- */
-#define API_VER 3
-
-#ifndef WIN32
-#include "version.h"
-#endif
 #include "pcre.h"
-
 #include "adns.h"
 #include "list.h"
 #include "hash.h"
@@ -1262,13 +1251,15 @@ EXPORTFUNC void DisableEvent (Event event);
 int sys_mkdir (const char *filename, mode_t mode);
 
 /* Socket functions */
-#ifndef SOCKET 
-#define SOCKET int
+#ifdef WIN32
+typedef SOCKET SYS_SOCKET;
+#else
+typedef int SYS_SOCKET;
 #endif
-int sys_close_sock (int sock);
-int sys_write_sock (SOCKET s, const char* buf, int len);
-int sys_read_sock (SOCKET s, char* buf, int len);
-int sys_set_nonblocking_sock (SOCKET s);
+EXPORTFUNC int sys_close_sock (SYS_SOCKET sock);
+EXPORTFUNC int sys_write_sock (SYS_SOCKET s, const char* buf, int len);
+EXPORTFUNC int sys_read_sock (SYS_SOCKET s, char* buf, int len);
+EXPORTFUNC int sys_set_nonblocking_sock (SYS_SOCKET s);
 
 /* 
  * Module Interface 

@@ -29,7 +29,7 @@
 #include "users.h"
 #include "servers.h"
 #include "channels.h"
-#ifndef WIN32
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 

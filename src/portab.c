@@ -35,7 +35,7 @@ int sys_mkdir (const char *filename, mode_t mode)
 #endif
 }
 
-int sys_close_sock (int sock)
+int sys_close_sock (SYS_SOCKET sock)
 {
 #ifdef WIN32
 	return closesocket (sock);
@@ -44,7 +44,7 @@ int sys_close_sock (int sock)
 #endif      			
 }
 
-int sys_write_sock (SOCKET s, const char* buf, int len)
+int sys_write_sock (SYS_SOCKET s, const char* buf, int len)
 {
 #ifdef WIN32
 	return send (s, buf, len, 0);
@@ -53,7 +53,7 @@ int sys_write_sock (SOCKET s, const char* buf, int len)
 #endif
 }
 
-int sys_read_sock (SOCKET s, char* buf, int len)
+int sys_read_sock (SYS_SOCKET s, char* buf, int len)
 {
 #ifdef WIN32
 	return recv (s, buf, len, 0);
@@ -62,14 +62,16 @@ int sys_read_sock (SOCKET s, char* buf, int len)
 #endif
 }
 
-int sys_set_nonblocking_sock (SOCKET s)
+int sys_set_nonblocking_sock (SYS_SOCKET s)
 {
-#ifdef WIN32
 	int flags;
+#ifdef WIN32
 
 	flags = 1;
 	return ioctlsocket(s, FIONBIO, &flags);
 #else
-	return fcntl (s, F_SETFL, O_NONBLOCK));
+	flags = fcntl(s, F_GETFL, 0);
+	flags |= O_NONBLOCK;
+	return fcntl (s, F_SETFL, flags));
 #endif
 }

@@ -39,7 +39,7 @@
 #define HAVE_ARGZ_STRINGIFY 1
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
-#define HAVE_ARPA_INET_H 1
+/* #define HAVE_ARPA_INET_H 1 */
 
 /* Define to 1 if you have the <assert.h> header file. */
 #define HAVE_ASSERT_H 1
@@ -87,7 +87,7 @@
 #define HAVE_DLERROR 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-#define HAVE_DLFCN_H 1
+/* #define HAVE_DLFCN_H 1 */
 
 /* Define to 1 if you have the `dlopen' function. */
 #define HAVE_DLOPEN 1
@@ -354,7 +354,7 @@
 #define HAVE_SYS_PARAM_H 1
 
 /* Define to 1 if you have the <sys/poll.h> header file. */
-#define HAVE_SYS_POLL_H 1
+/* #define HAVE_SYS_POLL_H 1 */
 
 /* Define to 1 if you have the <sys/select.h> header file. */
 #define HAVE_SYS_SELECT_H 1
@@ -652,6 +652,7 @@
 #define snprintf _snprintf
 #include <io.h>
 #define access _access
+#define vsnprintf _vsnprintf
 #include <direct.h>
 //#define S_IWUSR _S_IWRITE
 //#define S_IRUSR _S_IREAD
@@ -667,4 +668,10 @@ typedef int_t mode_t;
 /* Disable warning for:
    warning C4311: 'type cast' : pointer truncation from 'void *' to 'int' */
 #pragma warning( disable : 4311 )
+
+struct pollfd { int fd; short events; short revents; };
+#define POLLIN  1
+#define POLLPRI 2
+#define POLLOUT 4
+#define POLLERR 8
 

@@ -34,9 +34,6 @@
 #endif
 #include "neostats.h"
 #include "ircstring.h"
-#ifdef WIN32
-#define vsnprintf _vsnprintf
-#endif
 
 /* buffer for itoa conversion 
  * int ranges from 

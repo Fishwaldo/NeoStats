@@ -159,7 +159,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 		dl.c dns.c dotconf.c exclude.c hash.c ircd.c ircstring.c \
 		keeper.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
-		timer.c transfer.c users.c modes.c ctcp.c dcc.c
+		timer.c transfer.c users.c modes.c ctcp.c dcc.c portab.c
 
 AM_CFLAGS = -I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/keeper \
 		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE
@@ -188,7 +188,8 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	modules.$(OBJEXT) ns_help.$(OBJEXT) servers.$(OBJEXT) \
 	services.$(OBJEXT) signals.$(OBJEXT) sock.$(OBJEXT) \
 	support.$(OBJEXT) timer.$(OBJEXT) transfer.$(OBJEXT) \
-	users.$(OBJEXT) modes.$(OBJEXT) ctcp.$(OBJEXT) dcc.$(OBJEXT)
+	users.$(OBJEXT) modes.$(OBJEXT) ctcp.$(OBJEXT) dcc.$(OBJEXT) \
+	portab.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/keeper/libkeeper.a \
 	$(top_srcdir)/lib/adns/libadns.la
@@ -208,11 +209,11 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/log.Po ./$(DEPDIR)/main.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/match.Po ./$(DEPDIR)/misc.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/modes.Po ./$(DEPDIR)/modules.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/ns_help.Po ./$(DEPDIR)/servers.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/services.Po ./$(DEPDIR)/signals.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/sock.Po ./$(DEPDIR)/support.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/timer.Po ./$(DEPDIR)/transfer.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/users.Po
+@AMDEP_TRUE@	./$(DEPDIR)/ns_help.Po ./$(DEPDIR)/portab.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/servers.Po ./$(DEPDIR)/services.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/signals.Po ./$(DEPDIR)/sock.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/support.Po ./$(DEPDIR)/timer.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/transfer.Po ./$(DEPDIR)/users.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -303,6 +304,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modules.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ns_help.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/portab.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/services.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signals.Po@am__quote@

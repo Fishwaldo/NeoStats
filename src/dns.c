@@ -26,7 +26,7 @@
 ** so that DNS lookups will not block. It uses the adns libary (installed in the adns directory
 */
 #include "neostats.h"
-#ifndef WIN32
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 #include "adns.h"
