@@ -127,7 +127,7 @@ const char *ns_modlist_help[] = {
 };
 
 const char *ns_debug_help[] = {
-	"Syntax: \2DEBUG <ON|OFF>\2",
+	"Syntax: \2DEBUG\2",
 	"",
 	"Toggles debug mode. When enabled, debugging information is",
 	"sent to the services channel.",
@@ -230,7 +230,6 @@ const char *ns_modbotchanlist_help[] = {
 	"",
 	"NeoStats will send you by notice a list of the current bots",
 	"and the channels they are using for each module.",
-	"List of current module bot channels",
 	NULL
 };
 
