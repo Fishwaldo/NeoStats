@@ -72,6 +72,18 @@ const char* template_copyright[] =
 };
 
 /** 
+ *  Help text for example command
+ */
+const char template_help_hello_world_oneline[]="Give someone a rose";
+const char *template_help_hello_world[] = {
+	"Syntax: \2HELLOWORLD\2",
+	"",
+	"Example of a privmsg command which just sends HELLO WORLD",
+	"to the services channel.",
+	NULL
+};
+
+/** 
  *  Example about text
  */
 const char* template_about[] = 
@@ -126,13 +138,62 @@ ModuleInfo module_info = {
 	0,
 };
 
+/** 
+ *  example command
+ *  Just sends "Hello World!" to the services channel
+ */
+static int template_hello_world(CmdParams* cmdparams)
+{
+	SET_SEGV_LOCATION();
+	chanalert(template_bot->nick, "%s says \"Hello World!\"",
+		cmdparams->source.user->nick);
+	return 1;
+}
+
+/** OPTIONAL:
+ *  Table of commands available in our bot
+ *  This lists commands that a user can send via privmsg
+ */
+static bot_cmd template_commands[]=
+{
+	{"HELLO",	template_hello_world,	0, 	0,	template_help_hello_world,		template_help_hello_world_oneline },
+	{NULL,		NULL,					0, 	0,	NULL, 			NULL}
+};
+
+/** OPTIONAL:
+ *  Table of settings available in our bot
+ *  This lists settings that a user can set via privmsg
+ */
+static bot_setting template_settings[]=
+{
+	{"NICK",		&template_bot_info.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, (void*)"changeme" },
+	{"ALTNICK",		&template_bot_info.altnick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, (void*)"altnick" },
+	{"USER",		&template_bot_info.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, (void*)"changeme" },
+	{"HOST",		&template_bot_info.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, (void*)"" },
+	{"REALNAME",	&template_bot_info.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"Example NeoStats module" },
+	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
+};
+
 /** Online event processing
  *  What we do when we first come online
  */
 static int tm_event_online(CmdParams* cmdparams)
 {
 	/* Introduce a bot onto the network saving the bot handle */
-	template_bot = init_bot ( &template_bot_info, "-x", 0, NULL, NULL);
+	template_bot = init_bot (
+		&template_bot_info,		/* REQUIRED: pointer to bot info */
+		"-x",					/* OPTIONAL: user modes we want 
+								 * for the bot, use "" for none */
+		0,						/* OPTIONAL: flags affecting our bot
+								 * use 0 for none
+								 */
+		template_commands,		/* OPTIONAL: pointer to command list
+								 * use NULL for none
+								 */
+		template_settings		/* OPTIONAL: pointer to set command list
+								 * use NULL for none
+								 */
+		);
 	return 1;
 };
 
