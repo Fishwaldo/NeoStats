@@ -13,6 +13,14 @@
 #include "hash.h"
 #include "stats.h"
 
+#ifndef RTLD_NOW
+#define RTLD_NOW RTLD_LAZY /* openbsd deficiency */
+#endif
+#ifndef RTLD_GLOBAL
+#define RTLD_GLOBAL 0
+#endif
+
+
 extern char *sftime(time_t);
 
 struct sock_list_struct {

@@ -4152,3 +4152,48 @@ AC_DEFUN([AM_PROG_NM],        [AC_PROG_NM])
 # This is just to silence aclocal about the macro not being used
 ifelse([AC_DISABLE_FAST_INSTALL])
 
+dnl DPKG_CACHED_TRY_COMPILE(<description>,<cachevar>,<include>,<program>,<ifyes>,<ifno>)
+define(DPKG_CACHED_TRY_COMPILE,[
+ AC_MSG_CHECKING($1)
+ AC_CACHE_VAL($2,[
+  AC_TRY_COMPILE([$3],[$4],[$2=yes],[$2=no])
+ ])
+ if test "x$$2" = xyes; then
+  true
+  $5
+ else
+  true
+  $6
+ fi
+])
+
+define(ADNS_C_GCCATTRIB,[
+ DPKG_CACHED_TRY_COMPILE(__attribute__((,,)),adns_cv_c_attribute_supported,,
+  [extern int testfunction(int x) __attribute__((,,))],
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_GNUC25_ATTRIB)
+   DPKG_CACHED_TRY_COMPILE(__attribute__((noreturn)),adns_cv_c_attribute_noreturn,,
+    [extern int testfunction(int x) __attribute__((noreturn))],
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(HAVE_GNUC25_NORETURN),
+    AC_MSG_RESULT(no))
+   DPKG_CACHED_TRY_COMPILE(__attribute__((const)),adns_cv_c_attribute_const,,
+    [extern int testfunction(int x) __attribute__((const))],
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(HAVE_GNUC25_CONST),
+    AC_MSG_RESULT(no))
+   DPKG_CACHED_TRY_COMPILE(__attribute__((format...)),adns_cv_attribute_format,,
+    [extern int testfunction(char *y, ...) __attribute__((format(printf,1,2)))],
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(HAVE_GNUC25_PRINTFFORMAT),
+    AC_MSG_RESULT(no)),
+  AC_MSG_RESULT(no))
+])
+
+define(ADNS_C_GETFUNC,[
+ AC_CHECK_FUNC([$1],,[
+  AC_CHECK_LIB([$2],[$1],[$3],[
+    AC_MSG_ERROR([cannot find library function $1])
+  ])
+ ])
+])

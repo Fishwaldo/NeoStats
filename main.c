@@ -189,7 +189,9 @@ RETSIGTYPE serv_segv() {
 		chanalert(s_Services, "Restoring Stack to before Crash");
 		longjmp(sigvbuf, -1);
 		chanalert(s_Services, "Done");
+#ifdef HAVE_BACKTRACE
 		free(strings);
+#endif
 	} else {	
 		/* Thanks to Stskeeps and Unreal for this stuff :) */
 		log("Uh Oh, Segmentation Fault.. Server Terminating");
