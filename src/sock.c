@@ -187,11 +187,11 @@ read_loop ()
 		SET_SEGV_LOCATION();
 		memset (buf, '\0', BUFSIZE);
 		me.now = time(NULL);
-		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%ld", (long)me.now);
+		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
 		CheckTimers ();
 		SET_SEGV_LOCATION();
 		me.now = time(NULL);
-		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%ld", (long)me.now);
+		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
 		FD_ZERO (&readfds);
 		FD_ZERO (&writefds);
 		FD_ZERO (&errfds);
@@ -266,7 +266,7 @@ read_loop ()
 #endif
 		SelectResult = select (FD_SETSIZE, &readfds, &writefds, &errfds, TimeOut);
 		me.now = time(NULL);
-		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%ld", (long)me.now);
+		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
 		if (SelectResult > 0) {
 			/* check ADNS fds */
 			adns_afterselect (ads, me.maxsocks, &readfds, &writefds, &errfds, 0);

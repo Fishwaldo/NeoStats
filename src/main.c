@@ -69,7 +69,7 @@ void InitMe(void)
 	memset(&me, 0, sizeof(me));
 	me.t_start = time(NULL);
 	me.now = time(NULL);
-	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%ld", (long)me.now);
+	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
 #ifdef DEBUG
 	me.debug_mode = 1;
 #endif
