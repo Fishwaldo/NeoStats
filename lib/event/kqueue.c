@@ -208,7 +208,7 @@ kq_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 		return (0);
 	}
 
-	event_debug("%s: kevent reports %d", __func__, res);
+	event_debug(("%s: kevent reports %d", __func__, res));
 
 	for (i = 0; i < res; i++) {
 		int which = 0;
