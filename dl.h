@@ -187,7 +187,7 @@ hash_t *mh;
 /* 
  * Prototypes
  */
-void __init_mod_list (void);
+int __init_mod_list (void);
 int load_module (char *path, User * u);
 int unload_module (char *module_name, User * u);
 int add_ld_path (char *path);

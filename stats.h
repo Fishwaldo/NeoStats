@@ -108,6 +108,21 @@
 #define bzero(x, y)		memset(x, '\0', y);
 #define is_synced		me.synced
 
+/* Early creation of unified return values and error system */
+/* These are program exit codes usually defined in stdlib.h but 
+   if not found will be defined here */
+#ifndef EXIT_FAILURE 
+#define EXIT_FAILURE 1
+#endif /* EXIT_FAILURE */
+#ifndef EXIT_SUCCESS
+#define EXIT_SUCCESS 0
+#endif /* EXIT_SUCCESS */
+
+#define NS_SUCCESS			 1
+#define NS_FAILURE			-1
+
+#define NS_ERROR_xxx		-2
+
 /* do_exit call exit type definitions */
 enum {
 	NS_EXIT_NORMAL=0,
@@ -287,12 +302,12 @@ void rehash (void);
 int init_modules (void);
 
 /* main.c */
+void do_exit (int exitcode);
 void *smalloc (long size);
 char *sstrdup (const char * s);
 char *strlower (char * s);
 void AddStringToList (char ***List, char S[], int *C);
 void FreeList (char **List, int C);
-void do_exit (int exitcode);
 void strip_mirc_codes(char *text);
 char *sctime (time_t t);
 char *sftime (time_t t);
@@ -333,7 +348,7 @@ User *finduser (const char *nick);
 void UserDump (char *nick);
 void part_u_chan (list_t *list, lnode_t *node, void *v);
 void UserMode (const char *nick, const char *modes, int smode);
-void init_user_hash (void);
+int init_user_hash (void);
 int UserLevel (User *u);
 void Do_Away (User *u, const char *awaymsg);
 void KillUser (const char *nick);
@@ -343,7 +358,7 @@ void AddServer (char *name, char *uplink, int hops);
 void DelServer (char *name);
 Server *findserver (const char *name);
 void ServerDump (void);
-void init_server_hash (void);
+int init_server_hash (void);
 
 /* ns_help.c */
 extern const char *ns_help[];
@@ -389,7 +404,7 @@ void kick_chan (User *, char *, User *);
 void Change_Chan_Ts (Chans * c, time_t tstime);
 int CheckChanMode (Chans * c, long mode);
 int IsChanMember(Chans *c, User *u);
-void init_chan_hash (void);
+int init_chan_hash (void);
 
 /* dns.c */
 int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);

@@ -89,7 +89,7 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 extern void nlog (int level, int scope, char *fmt, ...);
 void *close_logs ();
 int init_logs ();
-void ResetLogs ();
+void reset_logs ();
 
 /* Configurable log filename format string */
 extern char LogFileNameFormat[MAX_LOGFILENAME];

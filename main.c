@@ -61,9 +61,6 @@ const char version[] = "(IRCU)";
 const char version[] = "(B)";
 #endif
 
-
-
-
 /*! Date when we were compiled */
 const char version_date[] = __DATE__;
 /*! Time we were compiled */
@@ -73,7 +70,6 @@ static void login (void);
 static void start (void);
 static void setup_signals (void);
 static int get_options (int argc, char **argv);
-
 
 /*! have we forked */
 int forked = 0;
@@ -93,20 +89,20 @@ main (int argc, char *argv[])
 {
 	FILE *fp;
 	/* get our commandline options */
-	if(get_options (argc, argv)<0)
-		exit(-1);
+	if(get_options (argc, argv)!=NS_SUCCESS)
+		return EXIT_FAILURE;
 
 	/* Change to the working Directory */
 	if (chdir (NEO_PREFIX) < 0) {
 		printf ("NeoStats Could not change to %s\n", NEO_PREFIX);
 		printf ("Did you 'make install' after compiling?\n");
 		printf ("Error Was: %s\n", strerror (errno));
-		exit (-1);
+		return EXIT_FAILURE;
 	}
 
 	/* before we do anything, make sure logging is setup */
-	if(init_logs ()<0)
-		exit(-1);
+	if(init_logs () != NS_SUCCESS)
+		return EXIT_FAILURE;
 
 	/* our crash trace variables */
 	SET_SEGV_LOCATION();
@@ -146,29 +142,33 @@ main (int argc, char *argv[])
 		remove (RECV_LOG);
 
 	/* initilze our Module subsystem */
-	__init_mod_list ();
+	if(__init_mod_list () != NS_SUCCESS)
+		return EXIT_FAILURE;
 
 	/* prepare to catch errors */
 	setup_signals ();
 
 	/* load the config files */
-	if(ConfLoad ()<0)
-		exit(-1);
+	if(ConfLoad () != NS_SUCCESS)
+		return EXIT_FAILURE;
+
 	if (me.die) {
 		printf ("\n-----> ERROR: Read the README file then edit %s! <-----\n\n",CONFIG_NAME);
 		nlog (LOG_CRITICAL, LOG_CORE, "Read the README file and edit your %s",CONFIG_NAME);
-		sleep (1);
-		close (servsock);
-		/* we are exiting the parent, not the program, don't call do_exit() */
-		exit (0);
+		/* we are exiting the parent, not the program, so just return */
+		return EXIT_FAILURE;
 	}
 
 	/* initialize the rest of the subsystems */
 	TimerReset ();
-	init_dns ();
-	init_server_hash ();
-	init_user_hash ();
-	init_chan_hash ();
+	if(init_dns () != NS_SUCCESS)
+		return EXIT_FAILURE;
+	if(init_server_hash () != NS_SUCCESS)
+		return EXIT_FAILURE;
+	if(init_user_hash () != NS_SUCCESS)
+		return EXIT_FAILURE;
+	if(init_chan_hash () != NS_SUCCESS)
+		return EXIT_FAILURE;
 	init_ircd ();
 
 
@@ -181,7 +181,7 @@ main (int argc, char *argv[])
 		/* Error check fork() */ 
 		if (forked<0) { 
 			perror("fork"); 
-			exit(1); /* fork error */ 
+			return EXIT_FAILURE; /* fork error */ 
 		} 
 #endif
 		/* we are the parent */ 
@@ -195,13 +195,13 @@ main (int argc, char *argv[])
 				printf ("NeoStats %d.%d.%d%s Successfully Launched into Background\n", MAJOR, MINOR, REV, version);
 				printf ("PID: %i - Wrote to neostats.pid\n", forked);
 			}
-			exit(0); /* parent exits */ 
+			return EXIT_SUCCESS; /* parent exits */ 
 		}
 #ifndef DEBUG
 		/* child (daemon) continues */ 
 		/* reopen logs for child */ 
-		if(init_logs ()<0)
-			exit(-1);
+		if(init_logs () != NS_SUCCESS)
+			return EXIT_FAILURE;
 		/* detach from parent process */
 		if (setpgid (0, 0) < 0) {
 			nlog (LOG_WARNING, LOG_CORE, "setpgid() failed");
@@ -216,7 +216,10 @@ main (int argc, char *argv[])
 	/* we are ready to start now Duh! */
 	start ();
 
-	return 1;
+	/* We should never reach here but the compiler does not realise and may
+	   complain about not all paths control returning values without the return 
+	   Since it should never happen, treat as an error condition! */
+	return EXIT_FAILURE;
 }
 
 /** @brief Process Commandline Options
@@ -251,7 +254,7 @@ get_options (int argc, char **argv)
 			printf ("	  -n (Do not load any modules on startup)\n");
 			printf ("	  -q (Quiet start - for cron scripts)\n");
 			printf ("     -f (Do not fork into background\n");
-			return (-1);
+			return NS_FAILURE;
 		case 'v':
 			printf ("NeoStats Version %d.%d.%d%s\n", MAJOR, MINOR, REV, version);
 			printf ("Compiled: %s at %s\n", version_date, version_time);
@@ -266,7 +269,7 @@ get_options (int argc, char **argv)
 			printf ("(B)  - Bahamut IRCd\n");
 			printf ("(IRCu) - IRCu (P10) IRCd\n");
 			printf ("\nNeoStats: http://www.neostats.net\n");
-			return (-1);
+			return NS_FAILURE;
 		case 'r':
 			printf ("recv.log enabled. Watch your DiskSpace\n");
 			config.recvlog = 1;
@@ -281,7 +284,7 @@ get_options (int argc, char **argv)
 			dbg = atoi (optarg);
 			if ((dbg > 10) || (dbg < 1)) {
 				printf ("Invalid Debug Level %d\n", dbg);
-				return (-1);
+				return NS_FAILURE;
 			}
 			config.debug = dbg;
 			break;
@@ -292,7 +295,7 @@ get_options (int argc, char **argv)
 			printf ("Unknown command line switch %c\n", optopt);
 		}
 	}
-	return(0);
+	return NS_SUCCESS;
 }
 
 
@@ -310,7 +313,7 @@ RETSIGTYPE
 serv_die ()
 {
 #ifdef VALGRIND
-	exit(1);
+	exit(NS_SUCCESS);
 #else /* VALGRIND */
 	User *u;
 	u = finduser (s_Services);
@@ -444,28 +447,31 @@ setup_signals (void)
 	struct sigaction act;
 	act.sa_handler = SIG_IGN;
 	act.sa_flags = 0;
+
+	/* SIGPIPE/SIGALRM */
 	(void) sigemptyset (&act.sa_mask);
 	(void) sigaddset (&act.sa_mask, SIGPIPE);
 	(void) sigaddset (&act.sa_mask, SIGALRM);
 	(void) sigaction (SIGPIPE, &act, NULL);
 	(void) sigaction (SIGALRM, &act, NULL);
 
+	/* SIGHUP */
 	act.sa_handler = conf_rehash;
 	(void) sigemptyset (&act.sa_mask);
 	(void) sigaddset (&act.sa_mask, SIGHUP);
 	(void) sigaction (SIGHUP, &act, NULL);
 
+	/* SIGTERM/SIGINT */
 	act.sa_handler = serv_die;
 	(void) sigaddset (&act.sa_mask, SIGTERM);
 	(void) sigaction (SIGTERM, &act, NULL);
 	(void) sigaddset (&act.sa_mask, SIGINT);
 	(void) sigaction (SIGINT, &act, NULL);
 
-/* handling of SIGSEGV as well -sts */
+    /* SIGSEGV as well -sts */
 	act.sa_handler = serv_segv;
 	(void) sigaddset (&act.sa_mask, SIGSEGV);
 	(void) sigaction (SIGSEGV, &act, NULL);
-
 
 	(void) signal (SIGHUP, conf_rehash);
 	(void) signal (SIGTERM, serv_die);
@@ -498,24 +504,22 @@ start (void)
 	if (servsock <= 0) {
 		nlog (LOG_WARNING, LOG_CORE, "Unable to connect to %s", me.uplink);
 	} else {
-		attempts = 0;
 		login ();
 		read_loop ();
+		close (servsock);
 	}
-	if(me.r_time>0)
-		nlog (LOG_NOTICE, LOG_CORE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
-	else
-		nlog (LOG_NOTICE, LOG_CORE, "Reconnect time is zero, shutting down");
-	close (servsock);
 
 	unload_modules(NULL);
 
 	if(me.r_time>0) {
+		nlog (LOG_NOTICE, LOG_CORE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
 		sleep (me.r_time);
 		do_exit (NS_EXIT_RESTART);
 	}
-	else
+	else {
+		nlog (LOG_NOTICE, LOG_CORE, "Reconnect time is zero, shutting down");
 		do_exit (NS_EXIT_NORMAL);
+	}
 }
 
 /** @brief Login to IRC
@@ -533,6 +537,42 @@ login (void)
 	slogin_cmd (me.name, me.numeric, me.infoline, me.pass);
 	sprotocol_cmd ("TOKEN CLIENT");
 }
+
+/** @brief before exiting call this function. It flushes log files and tidy's up.
+ *
+ *  Cleans up before exiting 
+ *  @parm segv 1 = we are exiting because of a segv fault, 0, we are not.
+ *  if 1, we don't prompt to save data
+ */
+void
+do_exit (int segv)
+{
+	/* Initialise exit code to OK */
+	int exit_code=EXIT_SUCCESS;
+
+	switch (segv) {
+	case NS_EXIT_NORMAL:
+		nlog (LOG_CRITICAL, LOG_CORE, "Normal shut down subsystems");
+		break;
+	case NS_EXIT_RESTART:
+		nlog (LOG_CRITICAL, LOG_CORE, "Restarting NeoStats subsystems");
+		break;
+	case NS_EXIT_SEGFAULT:
+		nlog (LOG_CRITICAL, LOG_CORE, "Shutting down subsystems without saving data due to core");
+		exit_code=EXIT_FAILURE;	/* exit code to error */
+		break;
+	}
+	kp_flush();
+	close_logs ();
+	if (segv == NS_EXIT_RESTART) {
+		execve ("./neostats", NULL, NULL);
+		exit_code=EXIT_FAILURE;	/* exit code to error */
+	}
+	remove ("neostats.pid");
+	exit (exit_code);
+}
+
+/* @todo Everything below here wants moving into a different file */
 
 /** @brief Our Own implementation of Malloc.
  *
@@ -675,42 +715,6 @@ FreeList (char **List, int C)
 	for (i = 0; i == C; i++)
 		free (List[i]);
 	C = 0;
-}
-
-/** @brief before exiting call this function. It flushes log files and tidy's up.
- *
- *  Cleans up before exiting 
- *  @parm segv 1 = we are exiting because of a segv fault, 0, we are not.
- *  if 1, we don't prompt to save data
- */
-void
-do_exit (int segv)
-{
-	/* Initialise exit code to OK */
-	int exit_code=1;
-
-	switch (segv) {
-	case 0:
-		nlog (LOG_CRITICAL, LOG_CORE, "Normal shut down subsystems");
-		break;
-	case 2:
-		nlog (LOG_CRITICAL, LOG_CORE, "Restarting NeoStats subsystems");
-		break;
-	case 1:
-		nlog (LOG_CRITICAL, LOG_CORE, "Shutting down subsystems without saving data due to core");
-		/* exit code to error */
-		exit_code=-1;
-		break;
-	}
-	kp_flush();
-	close_logs ();
-	if (segv == 2) {
-		execve ("./neostats", NULL, NULL);
-		/* exit code to error */
-		exit_code=-2;
-	}
-	remove ("neostats.pid");
-	exit (exit_code);
 }
 
 /* this came from eggdrop sources */

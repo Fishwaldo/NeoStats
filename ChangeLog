@@ -46,6 +46,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Statserv HTML fix for clientversions when its empty (F)
  - Added support for numeric to config file (M)
  - Added defines for parameter used in do_exit and ported calls accordingly (M)
+ - Improvements to return values and error checking (M)
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number

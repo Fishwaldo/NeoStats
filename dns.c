@@ -135,7 +135,7 @@ init_dns ()
 	SET_SEGV_LOCATION();
 	dnslist = list_create (DNS_QUEUE_SIZE);
 	if (!dnslist)
-		return 0;
+		return NS_FAILURE;
 #ifndef DEBUG
 	adnsstart = adns_init (&ads, adns_if_noerrprint | adns_if_noautosys, 0);
 #else
@@ -144,9 +144,9 @@ init_dns ()
 	if (adnsstart) {
 		printf ("ADNS init failed: %s\n", strerror (adnsstart));
 		nlog (LOG_CRITICAL, LOG_CORE, "ADNS init failed: %s", strerror (adnsstart));
-		return 0;
+		return NS_FAILURE;
 	}
-	return 1;
+	return NS_SUCCESS;
 
 }
 

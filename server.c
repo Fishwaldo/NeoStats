@@ -148,15 +148,16 @@ ServerDump ()
 	sendcoders ("End of Listing.");
 }
 
-void
+int 
 init_server_hash ()
 {
 	sh = hash_create (S_TABLE_SIZE, 0, 0);
 	if (!sh) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Create Server Hash Failed\n");
-		do_exit (NS_EXIT_SEGFAULT);
+		return NS_FAILURE;
 	}
 	AddServer (me.name, NULL, 0);
+	return NS_SUCCESS;
 }
 
 void

@@ -34,9 +34,6 @@ static void cb_Module (char *, int);
 /** @brief The list of modules to load
  */
 static void *load_mods[NUM_MODULES];
-/** @brief Hrm?
- */
-static int done_mods;
 
 /** @brief Core Configuration Items
  * 
@@ -116,7 +113,7 @@ ConfLoad ()
 		printf ("*                                                 *\n");
 		printf ("*             NeoStats NOT Started                *\n");
 		printf ("***************************************************\n");
-		return -1;
+		return NS_FAILURE;
 	}
 	printf ("Sucessfully Loaded Config File, Now Booting NeoStats\n");
 #ifdef EXTAUTH
@@ -130,8 +127,7 @@ ConfLoad ()
 	if (GetConf ((void *) &me.pingtime, CFGINT, "PingServerTime") <= 0) {
 		me.pingtime = 120;
 	}
-	done_mods = 0;
-	return 0;
+	return NS_SUCCESS;
 }
 
 

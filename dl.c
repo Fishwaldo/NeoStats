@@ -53,15 +53,26 @@ struct {
  * 
  * @return none
 */
-void
+int 
 __init_mod_list ()
 {
 	SET_SEGV_LOCATION();
 	mh = hash_create (NUM_MODULES, 0, 0);
+	if(!mh)
+		return NS_FAILURE;
 	bh = hash_create (B_TABLE_SIZE, 0, 0);
+	if(!bh)
+		return NS_FAILURE;
 	th = hash_create (T_TABLE_SIZE, 0, 0);
+	if(!th)
+		return NS_FAILURE;
 	bch = hash_create (C_TABLE_SIZE, 0, 0);
+	if(!bch)
+		return NS_FAILURE;
 	sockh = hash_create (me.maxsocks, 0, 0);
+	if(!sockh)
+		return NS_FAILURE;
+	return NS_SUCCESS;
 }
 
 /** @brief create new timer

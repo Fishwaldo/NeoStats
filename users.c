@@ -260,11 +260,13 @@ finduser (const char *nick)
 }
 
 
-void
+int
 init_user_hash ()
 {
 	uh = hash_create (U_TABLE_SIZE, 0, 0);
-
+	if(!uh)	
+		return NS_FAILURE;
+	return NS_SUCCESS;
 }
 
 void

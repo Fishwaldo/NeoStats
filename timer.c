@@ -28,11 +28,7 @@
 #include "log.h"
 #include "conf.h"
 
-static time_t last_stats_save;
-static time_t last_lag_check;
-static time_t last_cache_save;
 static int midnight = 0;
-
 
 void
 chk ()
@@ -95,23 +91,10 @@ chk ()
 }
 
 void
-TimerReset ()
-{
-	time_t current = time (NULL);
-	last_stats_save = current;
-	last_lag_check = current;
-	last_cache_save = current;
-}
-
-
-
-
-
-void
 TimerMidnight ()
 {
 	nlog (LOG_DEBUG1, LOG_CORE, "Its midnight!!! -> %s", sctime (time (NULL)));
-	ResetLogs ();
+	reset_logs ();
 }
 
 int

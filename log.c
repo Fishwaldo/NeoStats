@@ -68,9 +68,9 @@ init_logs ()
 	logs = hash_create (-1, 0, 0);
 	if (!logs) {
 		printf ("ERROR: Can't initialize log subsystem. Exiting!");
-		return -1;
+		return NS_FAILURE;
 	}
-	return 0;
+	return NS_SUCCESS;
 }
 
 /** @brief Occasionally flush log files out 
@@ -168,7 +168,7 @@ nlog (int level, int scope, char *fmt, ...)
 	}
 }
 void
-ResetLogs ()
+reset_logs ()
 {
 	char tmp[255], tmp2[255];
 	time_t t = time (NULL);
@@ -224,5 +224,5 @@ nassert_fail (const char *expr, const char *file, const int line, const char *in
 	}
 #endif
 	nlog (LOG_CRITICAL, LOG_CORE, "Shutting Down!");
-	exit (-1);
+	exit (EXIT_FAILURE);
 }

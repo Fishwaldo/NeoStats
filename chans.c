@@ -35,11 +35,13 @@
 */
 
 
-void
+int 
 init_chan_hash ()
 {
 	ch = hash_create (C_TABLE_SIZE, 0, 0);
-
+	if(!ch)	
+		return NS_FAILURE;
+	return NS_SUCCESS;
 }
 
 /** @brief Process the Channel TS Time 
