@@ -14,7 +14,7 @@
 #include <fcntl.h>
 
 
-#define STARTBUFSIZE 161920
+#define STARTBUFSIZE 8192
 int bufsize;
 
 void get_map();
