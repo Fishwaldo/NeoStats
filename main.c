@@ -122,15 +122,17 @@ int main()
 
 		return 0;
 	}
-#ifndef DEBUG
-#ifdef HAVE_FCLOSEALL
-	fcloseall();
-#else
-	fclose(0);
-	fclose(1);
-	fclose(2);
-#endif
-#endif
+//#ifndef DEBUG
+	if (forked) {
+		if (isatty(0)) close(0);
+		if (isatty(1)) close(1);
+		if (isatty(2)) close(2);
+		if (setpgid(0, 0) < 0) {
+			log("setpgid() failed");
+		}
+	}
+	
+//#endif
 	log("Statistics Started (%s).", version);
 	start();
 
