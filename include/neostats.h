@@ -98,6 +98,12 @@
 #include <sys/ioctl.h>
 #endif
 
+#ifdef WIN32
+typedef SOCKET OS_SOCKET;
+#else /* WIN32 */
+typedef int OS_SOCKET;
+#endif /* WIN32 */
+
 /* These macros handle DLL imports and exports for win32 module support */
 #ifdef WIN32
 #ifdef NEOSTATSCORE
@@ -933,12 +939,18 @@ typedef int (*sock_func) ( int sock_no, char *name );
 #endif
 
 /* socket interface type */
-#define SOCK_STANDARD 1
-#define SOCK_BUFFERED 2
-#define SOCK_LINEMODE 3
-#define SOCK_LISTEN 4
-#define SOCK_NATIVE 5
-
+typedef enum SOCK_TYPE {
+	/* */
+	SOCK_STANDARD = 1,
+	/* */
+	SOCK_BUFFERED,
+	/* */
+	SOCK_LINEMODE,
+	/* */
+	SOCK_LISTEN,
+	/* */
+	SOCK_NATIVE,
+}SOCK_TYPE;
 
 #if 0
 typedef void (*linemodecb)(char *);
@@ -953,7 +965,7 @@ typedef struct Sock {
 	/** Owner module ptr */
 	Module *moduleptr;
 	/** Socket number */
-	int sock_no;
+	OS_SOCKET sock_no;
 	/** Socket name */
 	char name[MAX_MOD_NAME];
 	/** socket interface (poll or standard) type */
@@ -1090,15 +1102,15 @@ EXPORTFUNC int SetTimerInterval( const char *timer_name, int interval );
 /* Find timer from name */
 EXPORTFUNC Timer *FindTimer( const char *timer_name );
 
-EXPORTFUNC Sock *add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv, int type);
-EXPORTFUNC int update_sock(Sock *sock, short what, short reset, struct timeval *tv);
-EXPORTFUNC int del_sock(Sock *sock);
-EXPORTFUNC Sock *find_sock( const char *sock_name );
-EXPORTFUNC int sock_connect (int socktype, struct in_addr ip, int port);
+EXPORTFUNC Sock *AddSock( SOCK_TYPE type, const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv);
+EXPORTFUNC int UpdateSock( Sock *sock, short what, short reset, struct timeval *tv );
+EXPORTFUNC int DelSock( Sock *sock );
+EXPORTFUNC Sock *FindSock( const char *sock_name );
+EXPORTFUNC OS_SOCKET sock_connect( int socktype, struct in_addr ip, int port );
 EXPORTFUNC int sock_disconnect( const char *name );
-EXPORTFUNC Sock *add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb, void *data);
-EXPORTFUNC Sock *add_linemode_socket(const char *sock_name, int socknum, sockfunccb readcb, sockcb errcb, void *arg);
-EXPORTFUNC int send_to_sock(Sock *sock, const char *buf, const int buflen);
+EXPORTFUNC Sock *add_listen_sock( const char *sock_name, const int port, int type, sockcb acceptcb, void *data );
+EXPORTFUNC Sock *add_linemode_socket( const char *sock_name, OS_SOCKET socknum, sockfunccb readcb, sockcb errcb, void *arg );
+EXPORTFUNC int send_to_sock( Sock *sock, const char *buf, const int buflen );
 
 /* Add a new bot to NeoStats */
 EXPORTFUNC Bot *AddBot( BotInfo *botinfo );
@@ -1446,16 +1458,16 @@ EXPORTFUNC int os_file_get_size( const char *filename );
 EXPORTFUNC size_t os_strftime( char *strDest, size_t maxsize, const char *format, const struct tm *timeptr );
 EXPORTFUNC struct tm* os_localtime( const time_t *timer );
 /* Socket functions */
-#ifdef WIN32
-typedef SOCKET OS_SOCKET;
-#else /* WIN32 */
-typedef int OS_SOCKET;
-#endif /* WIN32 */
 EXPORTFUNC int os_sock_close( OS_SOCKET sock );
 EXPORTFUNC int os_sock_write( OS_SOCKET s, const char *buf, int len );
 EXPORTFUNC int os_sock_read( OS_SOCKET s, char *buf, int len );
 EXPORTFUNC int os_sock_set_nonblocking( OS_SOCKET s );
 int os_sock_connect( OS_SOCKET s, const struct sockaddr* name, int namelen );
+OS_SOCKET os_sock_socket(int socket_family, int socket_type, int protocol );
+int os_sock_bind(OS_SOCKET s, const struct sockaddr* name, int namelen );
+int os_sock_listen( OS_SOCKET s, int backlog );
+int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char* optval, int optlen );
+
 /* Memory functions */
 EXPORTFUNC void *os_memset( void *dest, int c, size_t count );
 EXPORTFUNC void *os_memcpy( void *dest, const void *src, size_t count );

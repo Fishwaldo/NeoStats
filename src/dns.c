@@ -158,32 +158,31 @@ adns_write(int fd, void *data) {
     return NS_SUCCESS;
 }
 
-void 
-sock_update (int fd, short what) {
+void sock_update (int fd, short what) 
+{
+    static char tmpname[32];
     Sock *sock;
-    char tmpname[BUFSIZE];
     int what2;
 
-    ircsnprintf(tmpname, BUFSIZE, "ADNS-%d", fd);
-    sock = find_sock(tmpname);
+    ircsnprintf(tmpname, 32, "ADNS-%d", fd);
+    sock = FindSock(tmpname);
     what2 = EV_PERSIST;
     if (what & POLLIN) {
-          what2 |= EV_READ;
+		what2 |= EV_READ;
     } else if (what & POLLOUT) {
-          what2 |= EV_WRITE;
+		what2 |= EV_WRITE;
     } else if (what == -1) {
-          del_sock(sock);
-          return;
+		DelSock(sock);
+		return;
     }
     if (sock) {
-          update_sock(sock, what2, 1, NULL);
-          /* just update */
+		UpdateSock(sock, what2, 1, NULL);
+		/* just update */
     } else {
-          /* its new */
-          sock = add_sock(tmpname, fd, adns_read, adns_write, what2, sock, NULL, SOCK_NATIVE);
-          sock->data = sock;
+		/* its new */
+		sock = AddSock( SOCK_NATIVE, tmpname, fd, adns_read, adns_write, what2, sock, NULL );
+		sock->data = sock;
     }
-
 }
 
 /** @brief sets up DNS subsystem

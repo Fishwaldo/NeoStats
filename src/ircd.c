@@ -2821,7 +2821,9 @@ void send_cmd( char *fmt, ... )
 		buf[BUFSIZE - 2] = '\n';
 	}
 	buflen = strnlen( buf, BUFSIZE );
-	send_to_ircd_socket( buf, buflen );
+	if (send_to_sock(me.servsock, buf, buflen) == NS_FAILURE) {
+		do_exit(NS_EXIT_ERROR, NULL);
+	}
 }
 
 /** @brief HaveFeature

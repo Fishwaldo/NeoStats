@@ -429,6 +429,7 @@ int main( int argc, char *argv[] )
 #ifdef WIN32
 	return 0;
 #else /* WIN32 */
+	do_reconnect();
 	/* We should never reach here but the compiler does not realise and may
 	   complain about not all paths control returning values without the return 
 	   Since it should never happen, treat as an error condition! */

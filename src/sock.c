@@ -83,7 +83,7 @@ static int
 error_from_ircd_socket(int what, void *data) {
 	nlog (LOG_CRITICAL, "Error from IRCd Socket: %s", strerror(errno));
 	/* Try to close socket then reset the servsock value to avoid cyclic calls */
-	del_sock(me.servsock);
+	DelSock(me.servsock);
 	me.servsock = NULL;
 	/* XXX really exit? */
 	do_exit (NS_EXIT_ERROR, NULL);
@@ -92,49 +92,33 @@ error_from_ircd_socket(int what, void *data) {
 
 /** @brief Connect to a IRC server. Only used internally. 
  *
- *  also setups the SQL listen socket if defined 
- *
  * @param host to connect to
  * @param port on remote host to connect to
  * 
  * @return socket connected to on success
  *         NS_FAILURE on failure 
  */
-static int
-ConnectTo (char *host, int port)
+static OS_SOCKET ConnectTo (char *host, int port)
 {
 	struct hostent *hp;
 	struct sockaddr_in sa;
-	int s;
+	OS_SOCKET s;
 
-	me.dobind = 0;
-	/* bind to a local ip */
-	memset (&me.lsa, 0, sizeof (me.lsa));
-	if (me.local[0] != 0) {
-		if ((hp = gethostbyname (me.local)) == NULL) {
-			nlog (LOG_WARNING, "Warning, Couldn't bind to IP address %s", me.local);
-		} else {
-			memcpy ((char *) &me.lsa.sin_addr, hp->h_addr, hp->h_length);
-			me.lsa.sin_family = hp->h_addrtype;
-			me.dobind = 1;
-		}
-	}
 	if ((hp = gethostbyname (host)) == NULL) {
 		return NS_FAILURE;
 	}
-	if ((s = (int)socket (AF_INET, SOCK_STREAM, 0)) < 0) {
-		ns_free(hp);
-		return NS_FAILURE;
-	}
-	if (me.dobind > 0) {
-		if (bind (s, (struct sockaddr *) &me.lsa, sizeof (me.lsa)) < 0) {
-			nlog (LOG_WARNING, "bind(): Warning, Couldn't bind to IP address %s", strerror (errno));
-		}
-	}
-	memset (&sa, 0, sizeof (sa));
+	os_memset( &sa, 0, sizeof( sa ) );
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons (port);
-	memcpy ((char *) &sa.sin_addr, hp->h_addr, hp->h_length);
+	os_memcpy( ( char * ) &sa.sin_addr, hp->h_addr, hp->h_length );
+	if( ( s = os_sock_socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 )
+	{
+		return NS_FAILURE;
+	}
+	if( me.dobind )
+	{
+		os_sock_bind( s, ( struct sockaddr * ) &me.lsa, sizeof( me.lsa ) );
+	}
 	if( os_sock_connect( s, ( struct sockaddr * ) &sa, sizeof( sa ) ) != 0 ) 
 	{
 		os_sock_close (s);
@@ -216,10 +200,10 @@ read_loop ()
  *
  * @todo make the restart code nicer so it doesn't go mad when we can't connect
  */
-void
-Connect (void)
+void Connect( void )
 {
-	int mysock;
+	OS_SOCKET mysock;
+
 	SET_SEGV_LOCATION();
 	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, me.port);
 	mysock = ConnectTo (me.uplink, me.port);
@@ -227,16 +211,12 @@ Connect (void)
 		nlog (LOG_WARNING, "Unable to connect to %s: %s", me.uplink, strerror(errno));
 	} else {
 		me.servsock=add_linemode_socket("IRCd", mysock, irc_parse, error_from_ircd_socket, NULL);
-
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
 		irc_connect (me.name, me.numeric, me.infoline, nsconfig.pass, (unsigned long)me.ts_boot, (unsigned long)me.now);
 #ifndef WIN32
 		read_loop ();
 #endif
 	}
-#ifndef WIN32
-	do_reconnect();
-#endif
 }
 
 /** @brief get max available sockets
@@ -273,62 +253,32 @@ getmaxsock (void)
  * @return socket number if connect successful
  *         NS_FAILURE if unsuccessful
  */
-int
-sock_connect (int socktype, struct in_addr ip, int port)
+OS_SOCKET sock_connect( int socktype, struct in_addr ip, int port )
 {
 	struct sockaddr_in sa;
-	int s;
-	int i;
+	OS_SOCKET s;
 	int flags = 1;
 
-	/* socktype = SOCK_STREAM */
-	if ((s = (int)socket (AF_INET, socktype, 0)) < 0)
-		return NS_FAILURE;
-
-	/* bind to an IP address */
-	if (me.dobind > 0) {
-		if (bind (s, (struct sockaddr *) &me.lsa, sizeof (me.lsa)) < 0) {
-			nlog (LOG_WARNING, "sock_connect(): Warning, Couldn't bind to IP address %s", strerror (errno));
-		}
-	}
-
-	memset (&sa, 0, sizeof (sa));
+	os_memset( &sa, 0, sizeof( sa ) );
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons (port);
 	sa.sin_addr.s_addr = ip.s_addr;
-
-	/* set non blocking */
-
-	if ((i = os_sock_set_nonblocking (s)) < 0) {
-		nlog (LOG_CRITICAL, "can't set socket %d(%s) non-blocking: %s", s, GET_CUR_MODNAME(), strerror (i));
+	if( ( s = os_sock_socket( AF_INET, socktype, 0 ) ) < 0 )
 		return NS_FAILURE;
-	}
-	setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&flags, sizeof(flags));
+	/* bind to an IP address */
+	if (me.dobind) 
+		os_sock_bind( s, ( struct sockaddr * ) &me.lsa, sizeof( me.lsa ) );
+	/* set non blocking */
+	if( os_sock_set_nonblocking( s ) < 0 )
+		return NS_FAILURE;
+	os_sock_setsockopt( s, SOL_SOCKET, SO_REUSEADDR, (char *)&flags, sizeof( flags ) );
 	if( os_sock_connect( s, ( struct sockaddr * ) &sa, sizeof( sa ) ) != 0 ) 
 	{
-		nlog (LOG_WARNING, "Socket %d(%s) cant connect %s", s, GET_CUR_MODNAME(), strerror (errno));
 		os_sock_close (s);
 		return NS_FAILURE;
 	}
-
 	return s;
 }
-
-/** @brief send to socket
- *
- * @param buf the text we want to send to the IRC Server
- * @param buflen the size of the text we are sending
- * 
- * @return none
- */
-void
-send_to_ircd_socket (const char *buf, const int buflen)
-{
-	if (send_to_sock(me.servsock, buf, buflen) == NS_FAILURE) {
-		do_exit(NS_EXIT_ERROR, NULL);
-	}
-}
-
 
 /** @brief send to a linemode based socket
  * 
@@ -354,16 +304,16 @@ send_to_sock(Sock *sock, const char *buf, const int buflen) {
 	    	nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
 	    	/* Try to close socket then reset the servsock value to avoid cyclic calls */
 			sock->sfunc.linemode.errcb(-1, sock->data);	
-    		del_sock(sock);
+    		DelSock(sock);
 	    	return NS_FAILURE;		
     	}
     } else if ((sock->socktype == SOCK_NATIVE) | (sock->socktype == SOCK_STANDARD)) {
-        sent = os_write(sock->sock_no, buf, buflen);
+        sent = os_sock_write(sock->sock_no, buf, buflen);
         if (sent == -1) {
 	    	nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
 			sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
 	    	/* Try to close socket then reset the servsock value to avoid cyclic calls */
-    		del_sock(sock);
+    		DelSock(sock);
 	    	return NS_FAILURE;		
         }
     } else {
@@ -411,9 +361,9 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 			 * we should drop the connection
 			 */
 			if ((len + thisock->sfunc.linemode.readbufsize) > thisock->sfunc.linemode.recvq) {
-				nlog(LOG_ERROR, "RecvQ for %s(%s) exceeded. Dropping Connection", thisock->name, thisock->moduleptr?thisock->moduleptr->info->name:"N/A");
+				nlog(LOG_ERROR, "RecvQ for %s(%s) exceeded. Dropping Connection", thisock->name, thisock->moduleptr->info->name);
 				thisock->sfunc.linemode.errcb(-1, thisock->data);	
-				del_sock(thisock);
+				DelSock(thisock);
 				return;
 			}
 			thisock->rbytes += len;
@@ -440,7 +390,7 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 						printf("line:|%s| %d %d\n", thisock->sfunc.linemode.readbuf, thisock->sfunc.linemode.readbufsize, bufpos);
 #endif
 						if(thisock->sfunc.linemode.funccb(thisock->data, thisock->sfunc.linemode.readbuf, thisock->sfunc.linemode.readbufsize) == NS_FAILURE) {
-						    del_sock(thisock);
+						    DelSock(thisock);
                         }
 						/* ok, reset the recbuf */
 						thisock->sfunc.linemode.readbufsize = 0;
@@ -505,7 +455,7 @@ socket_linemode_error(struct bufferevent *bufferevent, short what, void *arg) {
 			break;
 	}
 	sock->sfunc.linemode.errcb(what, sock->data);	
-	del_sock(sock);
+	DelSock(sock);
 }
 	
 
@@ -518,11 +468,25 @@ socket_linemode_error(struct bufferevent *bufferevent, short what, void *arg) {
 
 int InitSocks (void)
 {
+	struct hostent *hp;
+
 	me.maxsocks = getmaxsock ();
 	sockethash = hash_create (me.maxsocks, 0, 0);
 	if(!sockethash) {
 		nlog (LOG_CRITICAL, "Unable to create socks hash");
 		return NS_FAILURE;
+	}
+	me.dobind = 0;
+	/* bind to a local ip */
+	memset (&me.lsa, 0, sizeof (me.lsa));
+	if (me.local[0] != 0) {
+		if ((hp = gethostbyname (me.local)) == NULL) {
+			nlog (LOG_WARNING, "Warning, Couldn't bind to IP address %s", me.local);
+		} else {
+			memcpy ((char *) &me.lsa.sin_addr, hp->h_addr, hp->h_length);
+			me.lsa.sin_family = hp->h_addrtype;
+			me.dobind = 1;
+		}
 	}
 	event_set_log_callback(libevent_log);
 	event_init();
@@ -546,7 +510,7 @@ void FiniSocks (void)
 	hash_scan_begin (&ss, sockethash);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		sock = hnode_get (sn);
-		del_sock(sock);
+		DelSock(sock);
 	}
 	if (me.servsock) {
 		me.servsock = NULL;
@@ -562,20 +526,21 @@ void FiniSocks (void)
  * 
  * @return pointer to created socket on success, NULL on error
  */
-static Sock *
-new_sock (const char *sock_name)
+static Sock *new_sock(const char *sock_name)
 {
 	Sock *sock;
 
 	SET_SEGV_LOCATION();
-	if (hash_isfull (sockethash)) {
-		nlog (LOG_CRITICAL, "new_sock: socket hash is full");
+	if (hash_isfull( sockethash ) ) 
+	{
+		nlog( LOG_CRITICAL, "new_sock: socket hash is full" );
 		return NULL;
 	}
-	dlog(DEBUG2, "new_sock: %s", sock_name);
-	sock = ns_calloc (sizeof (Sock));
-	strlcpy (sock->name, sock_name, MAX_MOD_NAME);
-	hnode_create_insert (sockethash, sock, sock->name);
+	dlog( DEBUG2, "new_sock: %s", sock_name );
+	sock = ns_calloc( sizeof( Sock ) );
+	strlcpy( sock->name, sock_name, MAX_MOD_NAME );
+	sock->moduleptr = GET_CUR_MODULE();
+	hnode_create_insert( sockethash, sock, sock->name );
 	return sock;
 }
 
@@ -587,15 +552,13 @@ new_sock (const char *sock_name)
  * 
  * @return pointer to socket if found, NULL if not found
  */
-Sock *
-find_sock (const char *sock_name)
+Sock *FindSock (const char *sock_name)
 {
 	Sock *sock;
 
-	/* XXX shouldn't hnode_get be here? */
 	sock = (Sock *)hnode_find (sockethash, sock_name);
 	if (!sock) {
-		dlog (DEBUG3, "find_sock: %s not found!", sock_name);		
+		dlog (DEBUG3, "FindSock: %s not found!", sock_name);		
 	}
 	return sock;
 }
@@ -615,8 +578,10 @@ find_sock (const char *sock_name)
  */
 
 Sock *
-add_linemode_socket(const char *sock_name, int socknum, sockfunccb readcb, sockcb errcb, void *arg) {
+add_linemode_socket(const char *sock_name, OS_SOCKET socknum, sockfunccb readcb, sockcb errcb, void *arg) 
+{
 	Sock *sock;
+
 	sock = add_buffered_socket(sock_name, socknum, linemode_read, socket_linemode_write_done, socket_linemode_error, arg);
 	if (sock) {
 		sock->sfunc.linemode.readbuf = os_malloc(nsconfig.recvq);
@@ -625,7 +590,7 @@ add_linemode_socket(const char *sock_name, int socknum, sockfunccb readcb, sockc
 		sock->sfunc.linemode.errcb = errcb;
 		sock->sfunc.linemode.readbufsize = 0;
 		sock->socktype = SOCK_LINEMODE;
-		dlog(DEBUG3, "add_linemode_socket: Added a new Linemode Socket called %s (%s)", sock_name, sock->moduleptr?sock->moduleptr->info->name:"N/A");
+		dlog(DEBUG3, "add_linemode_socket: Added a new Linemode Socket called %s (%s)", sock_name, sock->moduleptr->info->name);
 	}
 	return sock;
 }
@@ -647,28 +612,25 @@ add_linemode_socket(const char *sock_name, int socknum, sockfunccb readcb, sockc
  */
 
 Sock *
-add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuffercb writecb, everrorcb errcb, void *arg) {
+add_buffered_socket(const char *sock_name, OS_SOCKET socknum, evbuffercb readcb, evbuffercb writecb, everrorcb errcb, void *arg) {
 	Sock *sock;
-	Module *moduleptr;
 
 	SET_SEGV_LOCATION();
-	moduleptr = GET_CUR_MODULE();
 	if (!readcb) {
-		nlog(LOG_WARNING, "add_buffered_socket: read buffer function doesn't exist = %s (%s)", sock_name, moduleptr?moduleptr->info->name:"N/A");
+		nlog(LOG_WARNING, "add_buffered_socket: read buffer function doesn't exist = %s (%s)", sock_name, GET_CUR_MODNAME() );
 		return NULL;
 	}
 	if (!errcb) {
-		nlog(LOG_WARNING, "add_buffered_socket: error function doesn't exist = %s (%s)", sock_name, moduleptr?moduleptr->info->name:"N/A");
+		nlog(LOG_WARNING, "add_buffered_socket: error function doesn't exist = %s (%s)", sock_name, GET_CUR_MODNAME() );
 		return NULL;
 	}
 	if (!writecb) {
-		nlog(LOG_WARNING, "add_buffered_socket: write function doesn't exist = %s (%s)", sock_name, moduleptr?moduleptr->info->name:"N/A");
+		nlog(LOG_WARNING, "add_buffered_socket: write function doesn't exist = %s (%s)", sock_name, GET_CUR_MODNAME() );
 		return NULL;
     }  
 	
 	sock = new_sock(sock_name);
 	sock->sock_no = socknum;
-	sock->moduleptr = moduleptr;
 	sock->socktype = SOCK_BUFFERED;
 	sock->data = arg;
 	
@@ -676,12 +638,12 @@ add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuf
 	sock->event.buffered = bufferevent_new(sock->sock_no, readcb, writecb, errcb, sock);
 	if (!sock->event.buffered) {
 		nlog(LOG_WARNING, "bufferevent_new() failed");
-		del_sock(sock);
+		DelSock(sock);
 		return NULL;
 	}
 	bufferevent_enable(sock->event.buffered, EV_READ|EV_WRITE);	
 	bufferevent_setwatermark(sock->event.buffered, EV_READ|EV_WRITE, 0, 0);
-	dlog(DEBUG3, "add_buffered_sock: Registered Module %s with Standard Socket functions %s", moduleptr?moduleptr->info->name:"core", sock->name);
+	dlog(DEBUG3, "add_buffered_sock: Registered Module %s with Standard Socket functions %s", GET_CUR_MODNAME(), sock->name);
 	return sock;
 }
 
@@ -706,10 +668,9 @@ listen_accept_sock(int fd, short what, void *arg) {
 		/* re-add this listen socket if the acceptcb succeeds */
 		event_add(sock->event.event, NULL);
 		sock->rmsgs++;
-		return;
 	} else {
 		dlog(DEBUG1, "Deleting Listen Socket %d port %d (%s)", sock->sock_no, sock->sfunc.listenmode.port, sock->name);
-		del_sock(sock);
+		DelSock(sock);
 	}
 }
 
@@ -729,14 +690,12 @@ listen_accept_sock(int fd, short what, void *arg) {
 
 Sock *
 add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb, void *data) {
-	OS_SOCKET srvfd;      /* FD for our listen server socket */
+	OS_SOCKET s;
 	struct sockaddr_in srvskt;
-	int      adrlen;
 	Sock *sock;
 	
 	SET_SEGV_LOCATION();
-	adrlen = sizeof(struct sockaddr_in);
-	(void) memset((void *) &srvskt, 0, (size_t) adrlen);
+	os_memset( ( void * ) &srvskt, 0, sizeof( struct sockaddr_in ) );
 	srvskt.sin_family = AF_INET;
 	/* bind to the local IP */
 	if (me.dobind) {
@@ -744,26 +703,22 @@ add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb
 	} else {
 		srvskt.sin_addr.s_addr = INADDR_ANY;
 	}
-	srvskt.sin_port = htons(port);
-	if ((srvfd = socket(AF_INET, type, 0)) < 0)
+	srvskt.sin_port = htons( port );
+	if( ( s = os_sock_socket( AF_INET, type, 0 ) ) < 0 )
 	{
-		nlog(LOG_CRITICAL, "Unable to get socket for port %d. (%s)", port, GET_CUR_MODNAME());
 		return NULL;
 	}
-	os_sock_set_nonblocking (srvfd);
-	if (bind(srvfd, (struct sockaddr *) &srvskt, adrlen) < 0)
+	os_sock_set_nonblocking( s );
+	if( os_sock_bind( s, ( struct sockaddr * ) &srvskt, sizeof( struct sockaddr_in ) ) < 0 )
 	{
-		nlog(LOG_CRITICAL, "Unable to bind to port %d (%s)", port, GET_CUR_MODNAME());
 		return NULL;
 	}
-	if (listen(srvfd, 1) < 0)
+	if( os_sock_listen( s, 1 ) < 0 )
 	{
-		nlog(LOG_CRITICAL, "Unable to listen on port %d (%s)", port, GET_CUR_MODNAME());
 		return NULL;
 	}
 	sock = new_sock(sock_name);
-	sock->sock_no = srvfd;
-	sock->moduleptr = GET_CUR_MODULE();
+	sock->sock_no = s;
 	sock->socktype = SOCK_LISTEN;
 	sock->data = data;
 	sock->sfunc.listenmode.port = port;
@@ -771,7 +726,7 @@ add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb
 	sock->event.event = os_malloc(sizeof(struct event));	
 	event_set(sock->event.event, sock->sock_no, EV_READ, listen_accept_sock, (void*) sock);
 	event_add(sock->event.event, NULL);	
-	return (sock);
+	return sock;
 }
 
 /** @brief Read Data from a "STANDARD" Socket
@@ -794,7 +749,10 @@ read_sock_activity(int fd, short what, void *data) {
 	size_t howmuch = READBUFSIZE;
 
 	if (what & EV_READ) { 	
-#ifndef WIN32
+#ifdef WIN32
+		if( ioctlsocket (sock->sock_no, FIONREAD, &howmuch) == SOCKET_ERROR )
+			howmuch = READBUFSIZE;
+#else
 #ifdef FIONREAD
 		if (ioctl(sock->sock_no, FIONREAD, &howmuch) == -1)
 			howmuch = READBUFSIZE;
@@ -816,7 +774,7 @@ read_sock_activity(int fd, short what, void *data) {
    			if (n == -1 || n == 0) {
     			dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
 	    		sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
-		    	del_sock(sock);
+		    	DelSock(sock);
 				return;
    			}
 			dlog(DEBUG1, "sock_read: Read %d bytes from fd %d (%s)", n, sock->sock_no, sock->name);
@@ -826,26 +784,26 @@ read_sock_activity(int fd, short what, void *data) {
 		}
 		if (sock->sfunc.standmode.readfunc(sock->data, p, n) == NS_FAILURE) {
 			dlog(DEBUG1, "sock_read_activity: Read Callback failed, Closing Socket on fd %d (%s)", sock->sock_no, sock->name);
-			del_sock(sock);
+			DelSock(sock);
 			return;
 		}
 	} else if (what & EV_WRITE) {
 		if ((sock->sfunc.standmode.writefunc(fd, sock->data)) == NS_FAILURE) {
 			dlog(DEBUG1, "sock_read: Write Callback Failed, Closing Socket on fd %d (%s)", sock->sock_no, sock->name);
-			del_sock(sock);
+			DelSock(sock);
 			return;
 		}
 	} else if (what & EV_TIMEOUT) {
 		dlog(DEBUG1, "sock_read_activity: Timeout on %d (%s)", sock->sock_no, sock->name);
 		if (sock->sfunc.standmode.readfunc(sock->data, NULL, -2) == NS_FAILURE) {
 			dlog(DEBUG1, "sock_read: Timeout Read Callback Failed, Closing Socket on fd %d (%s)", sock->sock_no, sock->name);
-			del_sock(sock);
+			DelSock(sock);
 			return;
 		}
 	} else {
 		nlog(LOG_WARNING, "Error, Unknown State in sock_read_activity %d", what);
 		sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
-		del_sock(sock);
+		DelSock(sock);
 	}
 }
 
@@ -860,22 +818,22 @@ read_sock_activity(int fd, short what, void *data) {
  * @return success or failure
 */
 int 
-update_sock(Sock *sock, short what, short reset, struct timeval *tv) {
+UpdateSock(Sock *sock, short what, short reset, struct timeval *tv) {
 
 	if (reset) {
 		dlog(DEBUG1, "Event for fd %d (%s) has been reset", sock->sock_no, sock->name);
 		event_del(sock->event.event);
 	}
 	if ((!sock->sfunc.standmode.readfunc) && (what & EV_READ)) {
-		nlog (LOG_WARNING, "update_sock: read socket function doesn't exist = %s (%s)", sock->name, sock->moduleptr->info->name);
+		nlog (LOG_WARNING, "UpdateSock: read socket function doesn't exist = %s (%s)", sock->name, sock->moduleptr->info->name);
 		return NS_FAILURE;
 	}
 	if ((!sock->sfunc.standmode.writefunc) && (what & EV_WRITE)) {
-		nlog (LOG_WARNING, "update_sock: write socket function doesn't exist = %s (%s)", sock->name, sock->moduleptr->info->name);
+		nlog (LOG_WARNING, "UpdateSock: write socket function doesn't exist = %s (%s)", sock->name, sock->moduleptr->info->name);
 		return NS_FAILURE;
 	}
 	if ((!tv) && (what & EV_TIMEOUT)) {
-		nlog(LOG_WARNING, "update_sock: Timeout wanted but not specified on %s (%s)", sock->name, sock->moduleptr->info->name);
+		nlog(LOG_WARNING, "UpdateSock: Timeout wanted but not specified on %s (%s)", sock->name, sock->moduleptr->info->name);
 		return NS_FAILURE;
 	}
 	event_set(sock->event.event, sock->sock_no, what, read_sock_activity, (void*) sock);
@@ -895,57 +853,51 @@ update_sock(Sock *sock, short what, short reset, struct timeval *tv) {
  * 
  * @return pointer to socket if found, NULL if not found
 */
-Sock *
-add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv, int type)
+Sock *AddSock( SOCK_TYPE type, const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv )
 {
 	Sock *sock;
 
 	SET_SEGV_LOCATION();
+	if (type != SOCK_STANDARD && type != SOCK_NATIVE) {
+		nlog(LOG_ERROR, "AddSock: incorrect socket type. Module: %s, socket name: %s", GET_CUR_MODNAME(), sock_name);
+		return NULL;
+    }
 	if ((!readfunc) && (what & EV_READ)) {
-		nlog (LOG_WARNING, "add_sock: read socket function doesn't exist = %s (%s)", sock_name, GET_CUR_MODNAME());
+		nlog (LOG_WARNING, "AddSock: read socket function doesn't exist = %s (%s)", sock_name, GET_CUR_MODNAME());
 		return NULL;
 	}
 	if ((!writefunc) && (what & EV_WRITE)) {
-		nlog (LOG_WARNING, "add_sock: write socket function doesn't exist = %s (%s)", sock_name, GET_CUR_MODNAME());
+		nlog (LOG_WARNING, "AddSock: write socket function doesn't exist = %s (%s)", sock_name, GET_CUR_MODNAME());
 		return NULL;
 	}
 	if ((!tv) && (what & EV_TIMEOUT)) {
-		nlog(LOG_WARNING, "add_sock: Timeout wanted but not specified on %s (%s)", sock_name, GET_CUR_MODNAME());
+		nlog(LOG_WARNING, "AddSock: Timeout wanted but not specified on %s (%s)", sock_name, GET_CUR_MODNAME());
 		return NULL;
 	}
-	if (type != SOCK_STANDARD && type != SOCK_NATIVE) {
-		nlog(LOG_ERROR, "wrong socket type for add_sock. Module: %s, Name: %s", GET_CUR_MODNAME(), sock_name);
-		return NULL;
-    }
 	sock = new_sock (sock_name);
 	sock->socktype = type;
 	sock->sock_no = socknum;
-	sock->moduleptr = GET_CUR_MODULE();
 	sock->data = data;
 	sock->sfunc.standmode.readfunc = readfunc;
 	sock->sfunc.standmode.writefunc = writefunc;
 	sock->event.event = os_malloc(sizeof(struct event));
 	event_set(sock->event.event, sock->sock_no, what, read_sock_activity, (void*) sock);
 	event_add(sock->event.event, tv);
-	dlog(DEBUG2, "add_sock: Registered Module %s with Standard Socket functions %s", GET_CUR_MODNAME(), sock->name);
+	dlog(DEBUG2, "AddSock: Registered Module %s with Standard Socket functions %s", GET_CUR_MODNAME(), sock->name);
 	return sock;
 }
 
-
-/** @brief delete a socket from the socket list
+/** @brief CloseSock
  *
- * For module use. Deletes a socket with the given name from the socket list
+ *  Close socket and free event information
  *
- * @param socket_name the name of socket to delete
+ *  @param sock
  * 
- * @return NS_SUCCESS if deleted, NS_FAILURE if not found
-*/
-int
-del_sock (Sock *sock)
-{
-	hnode_t *sn;
+ *  @return none
+ */
 
-	SET_SEGV_LOCATION();
+void CloseSock( Sock *sock )
+{
 	switch (sock->socktype) {
 		case SOCK_STANDARD:
 		case SOCK_LISTEN:
@@ -963,13 +915,28 @@ del_sock (Sock *sock)
 			os_sock_close (sock->sock_no);
 			break;
 	}
-	sn = hash_lookup (sockethash, sock->name);
-	if (sn) {
-		sock = hnode_get (sn);
-		dlog(DEBUG2, "del_sock: Unregistered Socket function %s from Module %s", sock->name, sock->moduleptr->info->name);
-		hash_delete(sockethash, sn);
-		hnode_destroy (sn);
-		ns_free (sock);
+}
+
+/** @brief delete a socket from the socket list
+ *
+ * For module use. Deletes a socket with the given name from the socket list
+ *
+ * @param socket_name the name of socket to delete
+ * 
+ * @return NS_SUCCESS if deleted, NS_FAILURE if not found
+*/
+int DelSock( Sock *sock )
+{
+	hnode_t *sn;
+
+	SET_SEGV_LOCATION();
+	CloseSock( sock );
+	if( ( sn = hash_lookup( sockethash, sock->name ) ) != NULL ) {
+		sock = hnode_get( sn );
+		dlog( DEBUG2, "DelSock: deleting socket %s from module %s", sock->name, sock->moduleptr->info->name );
+		hash_delete( sockethash, sn );
+		hnode_destroy( sn );
+		ns_free( sock );
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -987,15 +954,20 @@ int
 del_sockets (Module *mod_ptr)
 {
 	Sock *sock;
-	hnode_t *modnode;
+	hnode_t *socknode;
 	hscan_t hscan;
 
-	hash_scan_begin (&hscan, sockethash);
-	while ((modnode = hash_scan_next (&hscan)) != NULL) {
-		sock = hnode_get (modnode);
-		if (sock->moduleptr == mod_ptr) {
-			dlog(DEBUG1, "del_sockets: deleting socket %s from module %s.", sock->name, mod_ptr->info->name);
-    		del_sock (sock);
+	hash_scan_begin( &hscan, sockethash );
+	while( ( socknode = hash_scan_next( &hscan ) ) != NULL ) 
+	{
+		sock = hnode_get( socknode );
+		if( sock->moduleptr == mod_ptr ) 
+		{
+			dlog( DEBUG1, "del_sockets: deleting socket %s from module %s", sock->name, mod_ptr->info->name );
+   			CloseSock( sock );
+			hash_scan_delete( sockethash, socknode );
+			hnode_destroy( socknode );
+			ns_free( sock );
 		}
 	}
 	return NS_SUCCESS;
@@ -1052,13 +1024,10 @@ int ns_cmd_socklist (CmdParams* cmdparams)
 				irc_prefmsg (ns_botptr, cmdparams->source, __("Listen Socket - fd %d Port %d", cmdparams->source), sock->sock_no, sock->sfunc.listenmode.port);
 				irc_prefmsg (ns_botptr, cmdparams->source, __("Accepted Connections: %ld", cmdparams->source), sock->rmsgs);
 				break;
-			default:
-				irc_prefmsg (ns_botptr, cmdparams->source, __("Uknown (Error!)", cmdparams->source));
-				break;
 		}
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Received Bytes: %ld, Received Messages: %ld", cmdparams->source), sock->rbytes, sock->rmsgs);
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Sent Bytes: %ld, Sent Messages: %ld", cmdparams->source), sock->sbytes, sock->smsgs);
 	}
 	irc_prefmsg (ns_botptr, cmdparams->source, __("End of Socket List", cmdparams->source));
-	return 0;
+	return NS_SUCCESS;
 }

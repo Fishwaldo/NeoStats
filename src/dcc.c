@@ -56,7 +56,7 @@ static dcc_cmd dcc_cmds[]=
 
 static void DCCChatDisconnect(Client *dcc)
 {
-	del_sock(dcc->sock);
+	DelSock(dcc->sock);
 }
 
 static void DCCGotAddr(void *data, adns_answer *a) {
@@ -202,7 +202,7 @@ int dcc_error(int sock_no, void *name)
 	} else {
 		nlog(LOG_WARNING, "Problem, Sock->data is NULL, therefore we can't delete DCCClient!");
 	}
-	del_sock(sock);
+	DelSock(sock);
 	return NS_SUCCESS;
 }
 
