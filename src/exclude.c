@@ -415,15 +415,17 @@ int ModIsUserExcluded(Client *u)
 	while (node) {
 		e = lnode_get(node);
 		if (e->type == NS_EXCLUDE_SERVER) {
+			dlog (DEBUG4, "Testing %s against server %s", u->uplink->name, e->pattern);
 			/* match a server */
 			if (match(e->pattern, u->uplink->name)) {
-				dlog (DEBUG1, "User %s exclude. Matched server entry %s in Excludeions", u->name, e->pattern);
+				dlog (DEBUG1, "User %s excluded. Matched server entry %s in exclusions", u->name, e->pattern);
 				return NS_TRUE;
 			}
 		} else if (e->type == NS_EXCLUDE_HOST) {
+			dlog (DEBUG4, "Testing %s against host %s", u->user->hostname, e->pattern);
 			/* match a hostname */
 			if (match(e->pattern, u->user->hostname)) {
-				dlog (DEBUG1, "User %s is exclude. Matched Host Entry %s in Exceptions", u->name, e->pattern);
+				dlog (DEBUG1, "User %s is excluded. Matched host entry %s in exclusions", u->name, e->pattern);
 				return NS_TRUE;
 			}
 		}				
