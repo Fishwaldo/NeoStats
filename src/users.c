@@ -32,6 +32,7 @@
 #include "modules.h"
 #include "bots.h"
 #include "auth.h"
+#include "services.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif

@@ -236,7 +236,7 @@ void bot_notice (char *origin, char **av, int ac)
 		}
 	}
 	if (!strncasecmp(av[ac - 1], "\1version", 8)) {
- 		SendModuleEvent (EVENT_CLIENTVERSION, cmdparams, NULL);
+ 		SendModuleEvent (EVENT_CTCPVERSION, cmdparams, NULL);
 	}
 	free (cmdparams);
 
