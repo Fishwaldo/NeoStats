@@ -5,7 +5,6 @@
 /ChangeLog -text
 /INSTALL -text
 /INSTALL.pt -text
-/LICENCE -text
 /Makefile.in -text
 /Makefile.inc.in -text
 /NEWS -text
@@ -41,7 +40,6 @@ adns/types.c -text
 /config.sub -text
 /configure -text
 /configure.in -text
-data/niconfig.db -text
 data/tlds.nfo -text
 /dl.c -text
 /dl.h -text
@@ -89,11 +87,6 @@ dl/operlog/ChangeLog -text
 dl/operlog/Makefile -text
 dl/operlog/ol_help.c -text
 dl/operlog/operlog.c -text
-dl/operme/ChangeLog -text
-dl/operme/Makefile -text
-dl/operme/README -text
-dl/operme/om_help.c -text
-dl/operme/operme.c -text
 dl/opsb/Makefile -text
 dl/opsb/opsb.c -text
 dl/opsb/opsb.h -text
@@ -115,13 +108,9 @@ dl/statserv/tld.c -text
 dl/version/Makefile -text
 dl/version/version.c -text
 /dns.c -text
-doc/FAQ -text
-doc/FAQ.pt -text
-doc/USERMAN -text
 doc/read-faq -text
 doc/read-userman -text
 /dotconf.c -text
-/dotconf.h -text
 /hash.c -text
 /hash.h -text
 /hybrid7.c -text
@@ -139,7 +128,6 @@ logs/.keepme -text
 /server.c -text
 /services.c -text
 /sock.c -text
-/ss_help.c -text
 /stats.h -text
 /timer.c -text
 /users.c -text
