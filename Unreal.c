@@ -48,17 +48,17 @@ int spart_cmd(const char *who, const char *chan) {
 }
 
 int sjoin_cmd(const char *who, const char *chan) {
-	sts("%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
+	sts(":%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
 	return 1;
 }
 
 int schmode_cmd(const char *who, const char *chan, const char *mode, const char *args) {
-	sts(":%s %s %s %s %s", who, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args);
+	sts(":%s %s %s %s %s %lu", who, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args, time(NULL));
 	return 1;
 }
 
 int snick_cmd(const char *nick, const char *ident, const char *host, const char *realname) {
-	sts("%s %s 1 1 %s %s %s %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, ident, host, me.name, time(NULL), realname);
+	sts("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), ident, host, me.name, realname);
 	AddUser(nick,ident, host, me.name);
 	return 1;
 }  
@@ -69,7 +69,7 @@ int sping_cmd(const char *from, const char *reply, const char *to) {
 }
 
 int sumode_cmd(const char *who, const char *target, const char *mode) { 
-	sts(":%s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, mode);
+	sts(":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, mode);
 /* TODO usermode is broken (expects mode to start with :) fix it! */
 	UserMode(target, mode);
 	return 1;

@@ -203,7 +203,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	}
 	add_mod_user(nick, mod_name);
 	snick_cmd(nick, user, host, rname);
-	sumode_cmd(me.name, nick, modes);
+	sumode_cmd(nick, nick, modes);
 	sjoin_cmd(nick, me.chan);
 	schmode_cmd(me.name, me.chan, "+oa", nick);
 	Module_Event("SIGNON", finduser(nick));
@@ -401,7 +401,7 @@ void init_ServBot()
 
 	sprintf(rname, "/msg %s \2HELP\2", s_Services);
 	snick_cmd(s_Services, Servbot.user, Servbot.host, rname);
-	sumode_cmd(me.name, s_Services, "+Sqd");
+	sumode_cmd(s_Services, s_Services, "+Sqd");
 	sjoin_cmd(s_Services, me.chan);
 	schmode_cmd(me.name, me.chan, "+oa", s_Services);
 	me.onchan = 1;
