@@ -59,7 +59,7 @@ static char msg_bot[]="\2BOT\2 %s is %s a Bot (%c%c)";
 #else
 static char msg_nickchange[]="\2\0037NICK CHANGE\2 user: \2%s\2 (%s@%s) Changed their nick to \2%s\2\003"; 
 static char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s - %s) at: \2%s\2\003";
-static char msg_signoff[]="\2\0033SIGNED ODD\2 user: %s (%s@%s - %s) at: %s - %s\003";
+static char msg_signoff[]="\2\0033SIGNED OFF\2 user: %s (%s@%s - %s) at: %s - %s\003";
 static char msg_localkill[]="\2LOCAL KILL\2 user: \2%s\2 (%s@%s) was Killed by: \2%s\2 - Reason sighted: \2%s\2";
 static char msg_globalkill[]="\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2\003";
 static char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 (%s@%s) was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
