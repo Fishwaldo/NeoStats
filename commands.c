@@ -465,7 +465,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	/* If no parameter to help, generate main help text */
 	if (ac < 3) {
 		lowlevel = 0;
-		curlevel = NS_ULEVEL_OPER;
+		curlevel = 30;
 		chanalert (bot_ptr->nick, "%s requested %s help", u->nick, bot_ptr->nick);
 		nlog (LOG_NORMAL, LOG_MOD, "%s requested %s help", u->nick, bot_ptr->nick);
 		prefmsg(u->nick, bot_ptr->nick, "The following commands can be used with %s:", bot_ptr->nick);
