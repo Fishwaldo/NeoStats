@@ -31,7 +31,6 @@ AC_LIBLTDL_CONVENIENCE
 AC_PROG_CC
 AC_PROG_LIBTOOL
 AC_PROG_YACC 
-
 AC_PATH_PROG( SED, sed, , $PATH:/usr/bin:/usr/local/bin)
 
 AC_SYS_LARGEFILE
@@ -66,6 +65,7 @@ AC_CHECK_HEADERS(
         io.h \
         pwd.h \
         utime.h \
+	limits.h \
         sys/utime.h \
         sys/poll.h \
         setjmp.h,
@@ -140,6 +140,9 @@ AC_CHECK_FUNCS( socket \
                 dlopen \
                 utime \
                 sigsetjmp \
+		memmove \
+		bcopy \
+		strerror \
                 poll,
 dnl if found
 [],
@@ -569,6 +572,23 @@ AC_ARG_ENABLE(debug,
 CFLAGS="$CFLAGS -DNDEBUG"
 AC_MSG_RESULT(no)
 )
+
+AC_MSG_CHECKING(To Enable AutoTools Debug Mode?)
+AC_ARG_ENABLE(autodebug, [    --enable-autodebug - Enable AutoTools Debug],
+[ case "$enableval" in
+  yes)
+	AC_MSG_RESULT(yes)
+	;;
+  *)
+	AC_MSG_RESULT(no)
+	AX_MAINTAINER_MODE_AUTO_SILENT
+	;;
+esac],
+AC_MSG_RESULT(no)
+AX_MAINTAINER_MODE_AUTO_SILENT
+)
+	
+
 AC_MSG_CHECKING(To Enable Raw command?)
 AC_ARG_ENABLE(raw, [ --enable-raw - Enable Raw command],
 [ case "$enableval" in
@@ -657,7 +677,18 @@ else
 fi
 
 
+dnl PCRE options
+NPCRE_MAJOR_VERSION=4
+NPCRE_MINOR_VERSION=3
+NPCRE_VERSION=$PCRE_MAJOR_VERSION.$PCRE_MINOR_VERSION
 
+AC_DEFINE(LINK_SIZE, 2, "PCRE Lnk size")
+AC_DEFINE(POSIX_MALLOC_THRESHOLD, 5, "Malloc Threshold")
+AC_DEFINE(MATCH_LIMIT, 10000000, "PCRE Match limit")
+
+AC_DEFINE(PCRE_MAJOR_VERSION, $NPCRE_MAJOR_VERSION, "PCRE Version")
+AC_DEFINE(PCRE_MINOR_VERSION, NPCRE_MINOR_VERSION, "PCRE Version")
+AC_DEFINE(PCRE_VERSION, NPCRE_VERSION, "Pcre full version")
 
 AC_SUBST(build_configtool)
 AC_SUBST(PROTOCOL)
@@ -668,6 +699,7 @@ AC_SUBST(LIBLTDL)
 
 AC_CONFIG_FILES([Makefile include/Makefile src/Makefile
 		src/protocol/Makefile src/curl/Makefile
-		src/keeper/Makefile src/adns/Makefile])
+		src/keeper/Makefile src/adns/Makefile
+		src/pcre/Makefile])
 AC_CACHE_SAVE
 AC_OUTPUT

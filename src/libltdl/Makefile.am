@@ -46,3 +46,4 @@ local-install-files: $(DISTFILES)
 	    || cp $$d/$$file $(DESTDIR)$(datadir)/libtool/libltdl/$$file || :; \
 	  fi; \
 	done
+include $(top_srcdir)/autotools/rules.mk

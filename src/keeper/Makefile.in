@@ -134,7 +134,7 @@ libkeeper_la_SOURCES = keeper.h kp_cache.c kp_dir.c kp_enum.c kp_get.c \
 			kp_iface.c  kp_recur.c kp_set.c kp_sort.c kp_util.c \
 			kp_util.h
 
-libkeeper_la_CFLAGS = -I../pcre -I../adns -I../curl -I../../include -I..
+AM_CFLAGS = -I../pcre -I../adns -I../curl -I../../include -I..
 subdir = src/keeper
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
@@ -144,25 +144,18 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 
 libkeeper_la_LDFLAGS =
 libkeeper_la_LIBADD =
-am_libkeeper_la_OBJECTS = libkeeper_la-kp_cache.lo \
-	libkeeper_la-kp_dir.lo libkeeper_la-kp_enum.lo \
-	libkeeper_la-kp_get.lo libkeeper_la-kp_iface.lo \
-	libkeeper_la-kp_recur.lo libkeeper_la-kp_set.lo \
-	libkeeper_la-kp_sort.lo libkeeper_la-kp_util.lo
+am_libkeeper_la_OBJECTS = kp_cache.lo kp_dir.lo kp_enum.lo kp_get.lo \
+	kp_iface.lo kp_recur.lo kp_set.lo kp_sort.lo kp_util.lo
 libkeeper_la_OBJECTS = $(am_libkeeper_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libkeeper_la-kp_cache.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libkeeper_la-kp_dir.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libkeeper_la-kp_enum.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libkeeper_la-kp_get.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libkeeper_la-kp_iface.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libkeeper_la-kp_recur.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libkeeper_la-kp_set.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libkeeper_la-kp_sort.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libkeeper_la-kp_util.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/kp_cache.Plo ./$(DEPDIR)/kp_dir.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/kp_enum.Plo ./$(DEPDIR)/kp_get.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/kp_iface.Plo ./$(DEPDIR)/kp_recur.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/kp_set.Plo ./$(DEPDIR)/kp_sort.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/kp_util.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -171,14 +164,15 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libkeeper_la_SOURCES)
-DIST_COMMON = $(srcdir)/Makefile.in Makefile.am
+DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk \
+	Makefile.am
 SOURCES = $(libkeeper_la_SOURCES)
 
 all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
-$(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
+$(srcdir)/Makefile.in:  Makefile.am $(top_srcdir)/autotools/rules.mk $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
 	  $(AUTOMAKE) --gnu  src/keeper/Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -201,345 +195,15 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeeper_la-kp_cache.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeeper_la-kp_dir.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeeper_la-kp_enum.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeeper_la-kp_get.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeeper_la-kp_iface.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeeper_la-kp_recur.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeeper_la-kp_set.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeeper_la-kp_sort.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeeper_la-kp_util.Plo@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `test -f '$<' || echo '$(srcdir)/'`$<
-
-.c.obj:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`
-
-.c.lo:
-@am__fastdepCC_TRUE@	if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
-
-libkeeper_la-kp_cache.o: kp_cache.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_cache.o -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_cache.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_cache.o `test -f 'kp_cache.c' || echo '$(srcdir)/'`kp_cache.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_cache.Tpo" "$(DEPDIR)/libkeeper_la-kp_cache.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_cache.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_cache.c' object='libkeeper_la-kp_cache.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_cache.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_cache.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_cache.o `test -f 'kp_cache.c' || echo '$(srcdir)/'`kp_cache.c
-
-libkeeper_la-kp_cache.obj: kp_cache.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_cache.obj -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_cache.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_cache.obj `if test -f 'kp_cache.c'; then $(CYGPATH_W) 'kp_cache.c'; else $(CYGPATH_W) '$(srcdir)/kp_cache.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_cache.Tpo" "$(DEPDIR)/libkeeper_la-kp_cache.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_cache.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_cache.c' object='libkeeper_la-kp_cache.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_cache.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_cache.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_cache.obj `if test -f 'kp_cache.c'; then $(CYGPATH_W) 'kp_cache.c'; else $(CYGPATH_W) '$(srcdir)/kp_cache.c'; fi`
-
-libkeeper_la-kp_cache.lo: kp_cache.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_cache.lo -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_cache.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_cache.lo `test -f 'kp_cache.c' || echo '$(srcdir)/'`kp_cache.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_cache.Tpo" "$(DEPDIR)/libkeeper_la-kp_cache.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_cache.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_cache.c' object='libkeeper_la-kp_cache.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_cache.Plo' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_cache.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_cache.lo `test -f 'kp_cache.c' || echo '$(srcdir)/'`kp_cache.c
-
-libkeeper_la-kp_dir.o: kp_dir.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_dir.o -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_dir.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_dir.o `test -f 'kp_dir.c' || echo '$(srcdir)/'`kp_dir.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_dir.Tpo" "$(DEPDIR)/libkeeper_la-kp_dir.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_dir.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_dir.c' object='libkeeper_la-kp_dir.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_dir.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_dir.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_dir.o `test -f 'kp_dir.c' || echo '$(srcdir)/'`kp_dir.c
-
-libkeeper_la-kp_dir.obj: kp_dir.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_dir.obj -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_dir.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_dir.obj `if test -f 'kp_dir.c'; then $(CYGPATH_W) 'kp_dir.c'; else $(CYGPATH_W) '$(srcdir)/kp_dir.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_dir.Tpo" "$(DEPDIR)/libkeeper_la-kp_dir.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_dir.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_dir.c' object='libkeeper_la-kp_dir.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_dir.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_dir.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_dir.obj `if test -f 'kp_dir.c'; then $(CYGPATH_W) 'kp_dir.c'; else $(CYGPATH_W) '$(srcdir)/kp_dir.c'; fi`
-
-libkeeper_la-kp_dir.lo: kp_dir.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_dir.lo -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_dir.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_dir.lo `test -f 'kp_dir.c' || echo '$(srcdir)/'`kp_dir.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_dir.Tpo" "$(DEPDIR)/libkeeper_la-kp_dir.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_dir.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_dir.c' object='libkeeper_la-kp_dir.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_dir.Plo' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_dir.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_dir.lo `test -f 'kp_dir.c' || echo '$(srcdir)/'`kp_dir.c
-
-libkeeper_la-kp_enum.o: kp_enum.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_enum.o -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_enum.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_enum.o `test -f 'kp_enum.c' || echo '$(srcdir)/'`kp_enum.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_enum.Tpo" "$(DEPDIR)/libkeeper_la-kp_enum.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_enum.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_enum.c' object='libkeeper_la-kp_enum.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_enum.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_enum.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_enum.o `test -f 'kp_enum.c' || echo '$(srcdir)/'`kp_enum.c
-
-libkeeper_la-kp_enum.obj: kp_enum.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_enum.obj -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_enum.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_enum.obj `if test -f 'kp_enum.c'; then $(CYGPATH_W) 'kp_enum.c'; else $(CYGPATH_W) '$(srcdir)/kp_enum.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_enum.Tpo" "$(DEPDIR)/libkeeper_la-kp_enum.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_enum.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_enum.c' object='libkeeper_la-kp_enum.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_enum.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_enum.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_enum.obj `if test -f 'kp_enum.c'; then $(CYGPATH_W) 'kp_enum.c'; else $(CYGPATH_W) '$(srcdir)/kp_enum.c'; fi`
-
-libkeeper_la-kp_enum.lo: kp_enum.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_enum.lo -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_enum.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_enum.lo `test -f 'kp_enum.c' || echo '$(srcdir)/'`kp_enum.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_enum.Tpo" "$(DEPDIR)/libkeeper_la-kp_enum.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_enum.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_enum.c' object='libkeeper_la-kp_enum.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_enum.Plo' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_enum.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_enum.lo `test -f 'kp_enum.c' || echo '$(srcdir)/'`kp_enum.c
-
-libkeeper_la-kp_get.o: kp_get.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_get.o -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_get.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_get.o `test -f 'kp_get.c' || echo '$(srcdir)/'`kp_get.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_get.Tpo" "$(DEPDIR)/libkeeper_la-kp_get.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_get.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_get.c' object='libkeeper_la-kp_get.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_get.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_get.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_get.o `test -f 'kp_get.c' || echo '$(srcdir)/'`kp_get.c
-
-libkeeper_la-kp_get.obj: kp_get.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_get.obj -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_get.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_get.obj `if test -f 'kp_get.c'; then $(CYGPATH_W) 'kp_get.c'; else $(CYGPATH_W) '$(srcdir)/kp_get.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_get.Tpo" "$(DEPDIR)/libkeeper_la-kp_get.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_get.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_get.c' object='libkeeper_la-kp_get.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_get.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_get.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_get.obj `if test -f 'kp_get.c'; then $(CYGPATH_W) 'kp_get.c'; else $(CYGPATH_W) '$(srcdir)/kp_get.c'; fi`
-
-libkeeper_la-kp_get.lo: kp_get.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_get.lo -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_get.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_get.lo `test -f 'kp_get.c' || echo '$(srcdir)/'`kp_get.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_get.Tpo" "$(DEPDIR)/libkeeper_la-kp_get.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_get.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_get.c' object='libkeeper_la-kp_get.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_get.Plo' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_get.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_get.lo `test -f 'kp_get.c' || echo '$(srcdir)/'`kp_get.c
-
-libkeeper_la-kp_iface.o: kp_iface.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_iface.o -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_iface.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_iface.o `test -f 'kp_iface.c' || echo '$(srcdir)/'`kp_iface.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_iface.Tpo" "$(DEPDIR)/libkeeper_la-kp_iface.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_iface.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_iface.c' object='libkeeper_la-kp_iface.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_iface.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_iface.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_iface.o `test -f 'kp_iface.c' || echo '$(srcdir)/'`kp_iface.c
-
-libkeeper_la-kp_iface.obj: kp_iface.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_iface.obj -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_iface.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_iface.obj `if test -f 'kp_iface.c'; then $(CYGPATH_W) 'kp_iface.c'; else $(CYGPATH_W) '$(srcdir)/kp_iface.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_iface.Tpo" "$(DEPDIR)/libkeeper_la-kp_iface.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_iface.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_iface.c' object='libkeeper_la-kp_iface.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_iface.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_iface.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_iface.obj `if test -f 'kp_iface.c'; then $(CYGPATH_W) 'kp_iface.c'; else $(CYGPATH_W) '$(srcdir)/kp_iface.c'; fi`
-
-libkeeper_la-kp_iface.lo: kp_iface.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_iface.lo -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_iface.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_iface.lo `test -f 'kp_iface.c' || echo '$(srcdir)/'`kp_iface.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_iface.Tpo" "$(DEPDIR)/libkeeper_la-kp_iface.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_iface.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_iface.c' object='libkeeper_la-kp_iface.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_iface.Plo' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_iface.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_iface.lo `test -f 'kp_iface.c' || echo '$(srcdir)/'`kp_iface.c
-
-libkeeper_la-kp_recur.o: kp_recur.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_recur.o -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_recur.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_recur.o `test -f 'kp_recur.c' || echo '$(srcdir)/'`kp_recur.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_recur.Tpo" "$(DEPDIR)/libkeeper_la-kp_recur.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_recur.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_recur.c' object='libkeeper_la-kp_recur.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_recur.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_recur.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_recur.o `test -f 'kp_recur.c' || echo '$(srcdir)/'`kp_recur.c
-
-libkeeper_la-kp_recur.obj: kp_recur.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_recur.obj -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_recur.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_recur.obj `if test -f 'kp_recur.c'; then $(CYGPATH_W) 'kp_recur.c'; else $(CYGPATH_W) '$(srcdir)/kp_recur.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_recur.Tpo" "$(DEPDIR)/libkeeper_la-kp_recur.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_recur.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_recur.c' object='libkeeper_la-kp_recur.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_recur.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_recur.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_recur.obj `if test -f 'kp_recur.c'; then $(CYGPATH_W) 'kp_recur.c'; else $(CYGPATH_W) '$(srcdir)/kp_recur.c'; fi`
-
-libkeeper_la-kp_recur.lo: kp_recur.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_recur.lo -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_recur.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_recur.lo `test -f 'kp_recur.c' || echo '$(srcdir)/'`kp_recur.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_recur.Tpo" "$(DEPDIR)/libkeeper_la-kp_recur.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_recur.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_recur.c' object='libkeeper_la-kp_recur.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_recur.Plo' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_recur.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_recur.lo `test -f 'kp_recur.c' || echo '$(srcdir)/'`kp_recur.c
-
-libkeeper_la-kp_set.o: kp_set.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_set.o -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_set.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_set.o `test -f 'kp_set.c' || echo '$(srcdir)/'`kp_set.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_set.Tpo" "$(DEPDIR)/libkeeper_la-kp_set.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_set.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_set.c' object='libkeeper_la-kp_set.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_set.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_set.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_set.o `test -f 'kp_set.c' || echo '$(srcdir)/'`kp_set.c
-
-libkeeper_la-kp_set.obj: kp_set.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_set.obj -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_set.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_set.obj `if test -f 'kp_set.c'; then $(CYGPATH_W) 'kp_set.c'; else $(CYGPATH_W) '$(srcdir)/kp_set.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_set.Tpo" "$(DEPDIR)/libkeeper_la-kp_set.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_set.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_set.c' object='libkeeper_la-kp_set.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_set.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_set.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_set.obj `if test -f 'kp_set.c'; then $(CYGPATH_W) 'kp_set.c'; else $(CYGPATH_W) '$(srcdir)/kp_set.c'; fi`
-
-libkeeper_la-kp_set.lo: kp_set.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_set.lo -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_set.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_set.lo `test -f 'kp_set.c' || echo '$(srcdir)/'`kp_set.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_set.Tpo" "$(DEPDIR)/libkeeper_la-kp_set.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_set.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_set.c' object='libkeeper_la-kp_set.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_set.Plo' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_set.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_set.lo `test -f 'kp_set.c' || echo '$(srcdir)/'`kp_set.c
-
-libkeeper_la-kp_sort.o: kp_sort.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_sort.o -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_sort.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_sort.o `test -f 'kp_sort.c' || echo '$(srcdir)/'`kp_sort.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_sort.Tpo" "$(DEPDIR)/libkeeper_la-kp_sort.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_sort.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_sort.c' object='libkeeper_la-kp_sort.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_sort.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_sort.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_sort.o `test -f 'kp_sort.c' || echo '$(srcdir)/'`kp_sort.c
-
-libkeeper_la-kp_sort.obj: kp_sort.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_sort.obj -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_sort.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_sort.obj `if test -f 'kp_sort.c'; then $(CYGPATH_W) 'kp_sort.c'; else $(CYGPATH_W) '$(srcdir)/kp_sort.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_sort.Tpo" "$(DEPDIR)/libkeeper_la-kp_sort.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_sort.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_sort.c' object='libkeeper_la-kp_sort.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_sort.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_sort.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_sort.obj `if test -f 'kp_sort.c'; then $(CYGPATH_W) 'kp_sort.c'; else $(CYGPATH_W) '$(srcdir)/kp_sort.c'; fi`
-
-libkeeper_la-kp_sort.lo: kp_sort.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_sort.lo -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_sort.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_sort.lo `test -f 'kp_sort.c' || echo '$(srcdir)/'`kp_sort.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_sort.Tpo" "$(DEPDIR)/libkeeper_la-kp_sort.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_sort.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_sort.c' object='libkeeper_la-kp_sort.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_sort.Plo' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_sort.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_sort.lo `test -f 'kp_sort.c' || echo '$(srcdir)/'`kp_sort.c
-
-libkeeper_la-kp_util.o: kp_util.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_util.o -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_util.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_util.o `test -f 'kp_util.c' || echo '$(srcdir)/'`kp_util.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_util.Tpo" "$(DEPDIR)/libkeeper_la-kp_util.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_util.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_util.c' object='libkeeper_la-kp_util.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_util.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_util.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_util.o `test -f 'kp_util.c' || echo '$(srcdir)/'`kp_util.c
-
-libkeeper_la-kp_util.obj: kp_util.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_util.obj -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_util.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_util.obj `if test -f 'kp_util.c'; then $(CYGPATH_W) 'kp_util.c'; else $(CYGPATH_W) '$(srcdir)/kp_util.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_util.Tpo" "$(DEPDIR)/libkeeper_la-kp_util.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_util.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_util.c' object='libkeeper_la-kp_util.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_util.Po' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_util.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_util.obj `if test -f 'kp_util.c'; then $(CYGPATH_W) 'kp_util.c'; else $(CYGPATH_W) '$(srcdir)/kp_util.c'; fi`
-
-libkeeper_la-kp_util.lo: kp_util.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -MT libkeeper_la-kp_util.lo -MD -MP -MF "$(DEPDIR)/libkeeper_la-kp_util.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libkeeper_la-kp_util.lo `test -f 'kp_util.c' || echo '$(srcdir)/'`kp_util.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkeeper_la-kp_util.Tpo" "$(DEPDIR)/libkeeper_la-kp_util.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libkeeper_la-kp_util.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kp_util.c' object='libkeeper_la-kp_util.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libkeeper_la-kp_util.Plo' tmpdepfile='$(DEPDIR)/libkeeper_la-kp_util.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkeeper_la_CFLAGS) $(CFLAGS) -c -o libkeeper_la-kp_util.lo `test -f 'kp_util.c' || echo '$(srcdir)/'`kp_util.c
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kp_cache.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kp_dir.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kp_enum.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kp_get.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kp_iface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kp_recur.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kp_set.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kp_sort.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kp_util.Plo@am__quote@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -610,6 +274,7 @@ top_distdir = ../..
 distdir = $(top_distdir)/$(PACKAGE)-$(VERSION)
 
 distdir: $(DISTFILES)
+	$(mkinstalldirs) $(distdir)/../../autotools
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -725,6 +390,41 @@ uninstall-am: uninstall-info-am
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool pdf \
 	pdf-am ps ps-am tags uninstall uninstall-am uninstall-info-am
 
+.c.o:
+			@echo "Building $@"
+@am__fastdepCC_TRUE@	@if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c `test -f '$<' || echo '$(srcdir)/'`$<
+
+.c.obj:
+			@echo "Building $@"
+@am__fastdepCC_TRUE@	@if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`
+
+.c.lo:
+			@echo "Building $@"
+@am__fastdepCC_TRUE@	@if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -84,6 +84,7 @@ $(srcdir)/ca-bundle.h: Makefile.in Makefile
 	@if test -f $@; then \
 	  chmod 0644 $@; \
 	fi
-	echo "/* The file is generated automaticly */" > $@
-	echo '#undef CURL_CA_BUNDLE /* unknown */' >> $@
+	@echo "/* The file is generated automaticly */" > $@
+	@echo '#undef CURL_CA_BUNDLE /* unknown */' >> $@
 
+include $(top_srcdir)/autotools/rules.mk

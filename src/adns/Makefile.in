@@ -134,7 +134,7 @@ libadns_la_SOURCES = adns.h check.c dlist.h event.c general.c internal.h \
 			parse.c query.c reply.c setup.c transmit.c tvarith.h \
 			types.c
 
-libadns_la_CFLAGS = -I../../include -I.. -I../pcre -I../curl
+AM_CFLAGS = -I../../include -I.. -I../pcre -I../curl
 subdir = src/adns
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
@@ -144,24 +144,18 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 
 libadns_la_LDFLAGS =
 libadns_la_LIBADD =
-am_libadns_la_OBJECTS = libadns_la-check.lo libadns_la-event.lo \
-	libadns_la-general.lo libadns_la-parse.lo libadns_la-query.lo \
-	libadns_la-reply.lo libadns_la-setup.lo libadns_la-transmit.lo \
-	libadns_la-types.lo
+am_libadns_la_OBJECTS = check.lo event.lo general.lo parse.lo query.lo \
+	reply.lo setup.lo transmit.lo types.lo
 libadns_la_OBJECTS = $(am_libadns_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libadns_la-check.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libadns_la-event.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libadns_la-general.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libadns_la-parse.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libadns_la-query.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libadns_la-reply.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libadns_la-setup.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libadns_la-transmit.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libadns_la-types.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/check.Plo ./$(DEPDIR)/event.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/general.Plo ./$(DEPDIR)/parse.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/query.Plo ./$(DEPDIR)/reply.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/setup.Plo ./$(DEPDIR)/transmit.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/types.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -170,14 +164,15 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libadns_la_SOURCES)
-DIST_COMMON = $(srcdir)/Makefile.in Makefile.am
+DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk \
+	Makefile.am
 SOURCES = $(libadns_la_SOURCES)
 
 all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
-$(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
+$(srcdir)/Makefile.in:  Makefile.am $(top_srcdir)/autotools/rules.mk $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
 	  $(AUTOMAKE) --gnu  src/adns/Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -200,345 +195,15 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libadns_la-check.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libadns_la-event.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libadns_la-general.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libadns_la-parse.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libadns_la-query.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libadns_la-reply.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libadns_la-setup.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libadns_la-transmit.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libadns_la-types.Plo@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `test -f '$<' || echo '$(srcdir)/'`$<
-
-.c.obj:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`
-
-.c.lo:
-@am__fastdepCC_TRUE@	if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
-
-libadns_la-check.o: check.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-check.o -MD -MP -MF "$(DEPDIR)/libadns_la-check.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-check.o `test -f 'check.c' || echo '$(srcdir)/'`check.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-check.Tpo" "$(DEPDIR)/libadns_la-check.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-check.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='check.c' object='libadns_la-check.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-check.Po' tmpdepfile='$(DEPDIR)/libadns_la-check.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-check.o `test -f 'check.c' || echo '$(srcdir)/'`check.c
-
-libadns_la-check.obj: check.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-check.obj -MD -MP -MF "$(DEPDIR)/libadns_la-check.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-check.obj `if test -f 'check.c'; then $(CYGPATH_W) 'check.c'; else $(CYGPATH_W) '$(srcdir)/check.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-check.Tpo" "$(DEPDIR)/libadns_la-check.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-check.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='check.c' object='libadns_la-check.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-check.Po' tmpdepfile='$(DEPDIR)/libadns_la-check.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-check.obj `if test -f 'check.c'; then $(CYGPATH_W) 'check.c'; else $(CYGPATH_W) '$(srcdir)/check.c'; fi`
-
-libadns_la-check.lo: check.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-check.lo -MD -MP -MF "$(DEPDIR)/libadns_la-check.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-check.lo `test -f 'check.c' || echo '$(srcdir)/'`check.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-check.Tpo" "$(DEPDIR)/libadns_la-check.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-check.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='check.c' object='libadns_la-check.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-check.Plo' tmpdepfile='$(DEPDIR)/libadns_la-check.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-check.lo `test -f 'check.c' || echo '$(srcdir)/'`check.c
-
-libadns_la-event.o: event.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-event.o -MD -MP -MF "$(DEPDIR)/libadns_la-event.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-event.o `test -f 'event.c' || echo '$(srcdir)/'`event.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-event.Tpo" "$(DEPDIR)/libadns_la-event.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-event.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='event.c' object='libadns_la-event.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-event.Po' tmpdepfile='$(DEPDIR)/libadns_la-event.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-event.o `test -f 'event.c' || echo '$(srcdir)/'`event.c
-
-libadns_la-event.obj: event.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-event.obj -MD -MP -MF "$(DEPDIR)/libadns_la-event.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-event.obj `if test -f 'event.c'; then $(CYGPATH_W) 'event.c'; else $(CYGPATH_W) '$(srcdir)/event.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-event.Tpo" "$(DEPDIR)/libadns_la-event.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-event.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='event.c' object='libadns_la-event.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-event.Po' tmpdepfile='$(DEPDIR)/libadns_la-event.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-event.obj `if test -f 'event.c'; then $(CYGPATH_W) 'event.c'; else $(CYGPATH_W) '$(srcdir)/event.c'; fi`
-
-libadns_la-event.lo: event.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-event.lo -MD -MP -MF "$(DEPDIR)/libadns_la-event.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-event.lo `test -f 'event.c' || echo '$(srcdir)/'`event.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-event.Tpo" "$(DEPDIR)/libadns_la-event.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-event.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='event.c' object='libadns_la-event.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-event.Plo' tmpdepfile='$(DEPDIR)/libadns_la-event.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-event.lo `test -f 'event.c' || echo '$(srcdir)/'`event.c
-
-libadns_la-general.o: general.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-general.o -MD -MP -MF "$(DEPDIR)/libadns_la-general.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-general.o `test -f 'general.c' || echo '$(srcdir)/'`general.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-general.Tpo" "$(DEPDIR)/libadns_la-general.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-general.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='general.c' object='libadns_la-general.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-general.Po' tmpdepfile='$(DEPDIR)/libadns_la-general.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-general.o `test -f 'general.c' || echo '$(srcdir)/'`general.c
-
-libadns_la-general.obj: general.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-general.obj -MD -MP -MF "$(DEPDIR)/libadns_la-general.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-general.obj `if test -f 'general.c'; then $(CYGPATH_W) 'general.c'; else $(CYGPATH_W) '$(srcdir)/general.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-general.Tpo" "$(DEPDIR)/libadns_la-general.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-general.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='general.c' object='libadns_la-general.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-general.Po' tmpdepfile='$(DEPDIR)/libadns_la-general.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-general.obj `if test -f 'general.c'; then $(CYGPATH_W) 'general.c'; else $(CYGPATH_W) '$(srcdir)/general.c'; fi`
-
-libadns_la-general.lo: general.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-general.lo -MD -MP -MF "$(DEPDIR)/libadns_la-general.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-general.lo `test -f 'general.c' || echo '$(srcdir)/'`general.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-general.Tpo" "$(DEPDIR)/libadns_la-general.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-general.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='general.c' object='libadns_la-general.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-general.Plo' tmpdepfile='$(DEPDIR)/libadns_la-general.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-general.lo `test -f 'general.c' || echo '$(srcdir)/'`general.c
-
-libadns_la-parse.o: parse.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-parse.o -MD -MP -MF "$(DEPDIR)/libadns_la-parse.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-parse.o `test -f 'parse.c' || echo '$(srcdir)/'`parse.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-parse.Tpo" "$(DEPDIR)/libadns_la-parse.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-parse.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parse.c' object='libadns_la-parse.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-parse.Po' tmpdepfile='$(DEPDIR)/libadns_la-parse.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-parse.o `test -f 'parse.c' || echo '$(srcdir)/'`parse.c
-
-libadns_la-parse.obj: parse.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-parse.obj -MD -MP -MF "$(DEPDIR)/libadns_la-parse.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-parse.obj `if test -f 'parse.c'; then $(CYGPATH_W) 'parse.c'; else $(CYGPATH_W) '$(srcdir)/parse.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-parse.Tpo" "$(DEPDIR)/libadns_la-parse.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-parse.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parse.c' object='libadns_la-parse.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-parse.Po' tmpdepfile='$(DEPDIR)/libadns_la-parse.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-parse.obj `if test -f 'parse.c'; then $(CYGPATH_W) 'parse.c'; else $(CYGPATH_W) '$(srcdir)/parse.c'; fi`
-
-libadns_la-parse.lo: parse.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-parse.lo -MD -MP -MF "$(DEPDIR)/libadns_la-parse.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-parse.lo `test -f 'parse.c' || echo '$(srcdir)/'`parse.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-parse.Tpo" "$(DEPDIR)/libadns_la-parse.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-parse.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parse.c' object='libadns_la-parse.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-parse.Plo' tmpdepfile='$(DEPDIR)/libadns_la-parse.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-parse.lo `test -f 'parse.c' || echo '$(srcdir)/'`parse.c
-
-libadns_la-query.o: query.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-query.o -MD -MP -MF "$(DEPDIR)/libadns_la-query.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-query.o `test -f 'query.c' || echo '$(srcdir)/'`query.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-query.Tpo" "$(DEPDIR)/libadns_la-query.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-query.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='query.c' object='libadns_la-query.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-query.Po' tmpdepfile='$(DEPDIR)/libadns_la-query.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-query.o `test -f 'query.c' || echo '$(srcdir)/'`query.c
-
-libadns_la-query.obj: query.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-query.obj -MD -MP -MF "$(DEPDIR)/libadns_la-query.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-query.obj `if test -f 'query.c'; then $(CYGPATH_W) 'query.c'; else $(CYGPATH_W) '$(srcdir)/query.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-query.Tpo" "$(DEPDIR)/libadns_la-query.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-query.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='query.c' object='libadns_la-query.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-query.Po' tmpdepfile='$(DEPDIR)/libadns_la-query.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-query.obj `if test -f 'query.c'; then $(CYGPATH_W) 'query.c'; else $(CYGPATH_W) '$(srcdir)/query.c'; fi`
-
-libadns_la-query.lo: query.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-query.lo -MD -MP -MF "$(DEPDIR)/libadns_la-query.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-query.lo `test -f 'query.c' || echo '$(srcdir)/'`query.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-query.Tpo" "$(DEPDIR)/libadns_la-query.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-query.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='query.c' object='libadns_la-query.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-query.Plo' tmpdepfile='$(DEPDIR)/libadns_la-query.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-query.lo `test -f 'query.c' || echo '$(srcdir)/'`query.c
-
-libadns_la-reply.o: reply.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-reply.o -MD -MP -MF "$(DEPDIR)/libadns_la-reply.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-reply.o `test -f 'reply.c' || echo '$(srcdir)/'`reply.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-reply.Tpo" "$(DEPDIR)/libadns_la-reply.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-reply.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reply.c' object='libadns_la-reply.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-reply.Po' tmpdepfile='$(DEPDIR)/libadns_la-reply.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-reply.o `test -f 'reply.c' || echo '$(srcdir)/'`reply.c
-
-libadns_la-reply.obj: reply.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-reply.obj -MD -MP -MF "$(DEPDIR)/libadns_la-reply.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-reply.obj `if test -f 'reply.c'; then $(CYGPATH_W) 'reply.c'; else $(CYGPATH_W) '$(srcdir)/reply.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-reply.Tpo" "$(DEPDIR)/libadns_la-reply.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-reply.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reply.c' object='libadns_la-reply.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-reply.Po' tmpdepfile='$(DEPDIR)/libadns_la-reply.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-reply.obj `if test -f 'reply.c'; then $(CYGPATH_W) 'reply.c'; else $(CYGPATH_W) '$(srcdir)/reply.c'; fi`
-
-libadns_la-reply.lo: reply.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-reply.lo -MD -MP -MF "$(DEPDIR)/libadns_la-reply.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-reply.lo `test -f 'reply.c' || echo '$(srcdir)/'`reply.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-reply.Tpo" "$(DEPDIR)/libadns_la-reply.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-reply.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reply.c' object='libadns_la-reply.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-reply.Plo' tmpdepfile='$(DEPDIR)/libadns_la-reply.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-reply.lo `test -f 'reply.c' || echo '$(srcdir)/'`reply.c
-
-libadns_la-setup.o: setup.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-setup.o -MD -MP -MF "$(DEPDIR)/libadns_la-setup.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-setup.o `test -f 'setup.c' || echo '$(srcdir)/'`setup.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-setup.Tpo" "$(DEPDIR)/libadns_la-setup.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-setup.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='setup.c' object='libadns_la-setup.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-setup.Po' tmpdepfile='$(DEPDIR)/libadns_la-setup.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-setup.o `test -f 'setup.c' || echo '$(srcdir)/'`setup.c
-
-libadns_la-setup.obj: setup.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-setup.obj -MD -MP -MF "$(DEPDIR)/libadns_la-setup.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-setup.obj `if test -f 'setup.c'; then $(CYGPATH_W) 'setup.c'; else $(CYGPATH_W) '$(srcdir)/setup.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-setup.Tpo" "$(DEPDIR)/libadns_la-setup.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-setup.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='setup.c' object='libadns_la-setup.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-setup.Po' tmpdepfile='$(DEPDIR)/libadns_la-setup.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-setup.obj `if test -f 'setup.c'; then $(CYGPATH_W) 'setup.c'; else $(CYGPATH_W) '$(srcdir)/setup.c'; fi`
-
-libadns_la-setup.lo: setup.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-setup.lo -MD -MP -MF "$(DEPDIR)/libadns_la-setup.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-setup.lo `test -f 'setup.c' || echo '$(srcdir)/'`setup.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-setup.Tpo" "$(DEPDIR)/libadns_la-setup.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-setup.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='setup.c' object='libadns_la-setup.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-setup.Plo' tmpdepfile='$(DEPDIR)/libadns_la-setup.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-setup.lo `test -f 'setup.c' || echo '$(srcdir)/'`setup.c
-
-libadns_la-transmit.o: transmit.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-transmit.o -MD -MP -MF "$(DEPDIR)/libadns_la-transmit.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-transmit.o `test -f 'transmit.c' || echo '$(srcdir)/'`transmit.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-transmit.Tpo" "$(DEPDIR)/libadns_la-transmit.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-transmit.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='transmit.c' object='libadns_la-transmit.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-transmit.Po' tmpdepfile='$(DEPDIR)/libadns_la-transmit.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-transmit.o `test -f 'transmit.c' || echo '$(srcdir)/'`transmit.c
-
-libadns_la-transmit.obj: transmit.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-transmit.obj -MD -MP -MF "$(DEPDIR)/libadns_la-transmit.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-transmit.obj `if test -f 'transmit.c'; then $(CYGPATH_W) 'transmit.c'; else $(CYGPATH_W) '$(srcdir)/transmit.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-transmit.Tpo" "$(DEPDIR)/libadns_la-transmit.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-transmit.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='transmit.c' object='libadns_la-transmit.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-transmit.Po' tmpdepfile='$(DEPDIR)/libadns_la-transmit.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-transmit.obj `if test -f 'transmit.c'; then $(CYGPATH_W) 'transmit.c'; else $(CYGPATH_W) '$(srcdir)/transmit.c'; fi`
-
-libadns_la-transmit.lo: transmit.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-transmit.lo -MD -MP -MF "$(DEPDIR)/libadns_la-transmit.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-transmit.lo `test -f 'transmit.c' || echo '$(srcdir)/'`transmit.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-transmit.Tpo" "$(DEPDIR)/libadns_la-transmit.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-transmit.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='transmit.c' object='libadns_la-transmit.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-transmit.Plo' tmpdepfile='$(DEPDIR)/libadns_la-transmit.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-transmit.lo `test -f 'transmit.c' || echo '$(srcdir)/'`transmit.c
-
-libadns_la-types.o: types.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-types.o -MD -MP -MF "$(DEPDIR)/libadns_la-types.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-types.o `test -f 'types.c' || echo '$(srcdir)/'`types.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-types.Tpo" "$(DEPDIR)/libadns_la-types.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-types.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='types.c' object='libadns_la-types.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-types.Po' tmpdepfile='$(DEPDIR)/libadns_la-types.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-types.o `test -f 'types.c' || echo '$(srcdir)/'`types.c
-
-libadns_la-types.obj: types.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-types.obj -MD -MP -MF "$(DEPDIR)/libadns_la-types.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-types.obj `if test -f 'types.c'; then $(CYGPATH_W) 'types.c'; else $(CYGPATH_W) '$(srcdir)/types.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-types.Tpo" "$(DEPDIR)/libadns_la-types.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-types.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='types.c' object='libadns_la-types.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-types.Po' tmpdepfile='$(DEPDIR)/libadns_la-types.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-types.obj `if test -f 'types.c'; then $(CYGPATH_W) 'types.c'; else $(CYGPATH_W) '$(srcdir)/types.c'; fi`
-
-libadns_la-types.lo: types.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -MT libadns_la-types.lo -MD -MP -MF "$(DEPDIR)/libadns_la-types.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o libadns_la-types.lo `test -f 'types.c' || echo '$(srcdir)/'`types.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libadns_la-types.Tpo" "$(DEPDIR)/libadns_la-types.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/libadns_la-types.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='types.c' object='libadns_la-types.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/libadns_la-types.Plo' tmpdepfile='$(DEPDIR)/libadns_la-types.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libadns_la_CFLAGS) $(CFLAGS) -c -o libadns_la-types.lo `test -f 'types.c' || echo '$(srcdir)/'`types.c
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/general.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parse.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reply.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/setup.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transmit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -609,6 +274,7 @@ top_distdir = ../..
 distdir = $(top_distdir)/$(PACKAGE)-$(VERSION)
 
 distdir: $(DISTFILES)
+	$(mkinstalldirs) $(distdir)/../../autotools
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -724,6 +390,41 @@ uninstall-am: uninstall-info-am
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool pdf \
 	pdf-am ps ps-am tags uninstall uninstall-am uninstall-info-am
 
+.c.o:
+			@echo "Building $@"
+@am__fastdepCC_TRUE@	@if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c `test -f '$<' || echo '$(srcdir)/'`$<
+
+.c.obj:
+			@echo "Building $@"
+@am__fastdepCC_TRUE@	@if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`
+
+.c.lo:
+			@echo "Building $@"
+@am__fastdepCC_TRUE@	@if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -31,6 +31,9 @@
 /* 'backtrace function available' */
 #undef HAVE_BACKTRACE
 
+/* Define to 1 if you have the `bcopy' function. */
+#undef HAVE_BCOPY
+
 /* Define to 1 if you have the `btowc' function. */
 #undef HAVE_BTOWC
 
@@ -122,6 +125,9 @@
 /* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
 
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
+
 /* if your compiler supports 'long long' */
 #undef HAVE_LONGLONG
 
@@ -133,6 +139,9 @@
 
 /* Define to 1 if <wchar.h> declares mbstate_t. */
 #undef HAVE_MBSTATE_T
+
+/* Define to 1 if you have the `memmove' function. */
+#undef HAVE_MEMMOVE
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
@@ -206,6 +215,9 @@
 
 /* Define to 1 if you have the `strdup' function. */
 #undef HAVE_STRDUP
+
+/* Define to 1 if you have the `strerror' function. */
+#undef HAVE_STRERROR
 
 /* Define to 1 if you have the `strftime' function. */
 #undef HAVE_STRFTIME
@@ -327,6 +339,9 @@
 /* 'Enable IRCu Support' */
 #undef IRCU
 
+/* "PCRE Lnk size" */
+#undef LINK_SIZE
+
 /* 'Enable Liquid IRCd Support' */
 #undef LIQUID
 
@@ -336,6 +351,9 @@
 
 /* "Major Version Number" */
 #undef MAJOR
+
+/* "PCRE Match limit" */
+#undef MATCH_LIMIT
 
 /* "Minor Version Number" */
 #undef MINOR
@@ -372,6 +390,18 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* "PCRE Version" */
+#undef PCRE_MAJOR_VERSION
+
+/* "PCRE Version" */
+#undef PCRE_MINOR_VERSION
+
+/* "Pcre full version" */
+#undef PCRE_VERSION
+
+/* "Malloc Threshold" */
+#undef POSIX_MALLOC_THRESHOLD
 
 /* 'Enable Quantum Support' */
 #undef QUANTUM

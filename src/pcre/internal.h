@@ -239,6 +239,10 @@ ESC_n is defined as yet another macro, which is set in config.h to either \n
 #define ESC_f '\f'
 #endif
 
+#ifndef NEWLINE                                                                                                           
+#define NEWLINE '\n'
+#endif
+
 #ifndef ESC_n
 #define ESC_n NEWLINE
 #endif

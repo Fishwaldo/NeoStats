@@ -1,4 +1,4 @@
-SUBDIRS		= protocol curl keeper adns libltdl
+SUBDIRS		= protocol curl keeper adns libltdl pcre
 
 
 bin_PROGRAMS = neostats
@@ -8,6 +8,8 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 		keeper.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c
-neostats_CFLAGS = -Ipcre -Iadns -Icurl -Ikeeper @INCLTDL@
+AM_CFLAGS = -Ipcre -Iadns -Icurl -Ikeeper @INCLTDL@
 neostats_LDADD = protocol/libprotocol.la curl/libcurl.la keeper/libkeeper.la \
-		adns/libadns.la libltdl/libltdlc.la
+		adns/libadns.la libltdl/libltdlc.la pcre/libpcre.la
+
+include $(top_srcdir)/autotools/rules.mk

@@ -129,7 +129,7 @@ sqlsrvbuild = @sqlsrvbuild@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-SUBDIRS = protocol curl keeper adns libltdl
+SUBDIRS = protocol curl keeper adns libltdl pcre
 
 bin_PROGRAMS = neostats
 
@@ -139,9 +139,9 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c
 
-neostats_CFLAGS = -Ipcre -Iadns -Icurl -Ikeeper @INCLTDL@
+AM_CFLAGS = -Ipcre -Iadns -Icurl -Ikeeper @INCLTDL@
 neostats_LDADD = protocol/libprotocol.la curl/libcurl.la keeper/libkeeper.la \
-		adns/libadns.la libltdl/libltdlc.la
+		adns/libadns.la libltdl/libltdlc.la pcre/libpcre.la
 
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -151,59 +151,40 @@ CONFIG_CLEAN_FILES =
 bin_PROGRAMS = neostats$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
-am_neostats_OBJECTS = neostats-auth.$(OBJEXT) neostats-bans.$(OBJEXT) \
-	neostats-bots.$(OBJEXT) neostats-channels.$(OBJEXT) \
-	neostats-commands.$(OBJEXT) neostats-conf.$(OBJEXT) \
-	neostats-db.$(OBJEXT) neostats-dl.$(OBJEXT) \
-	neostats-dns.$(OBJEXT) neostats-dotconf.$(OBJEXT) \
-	neostats-exclude.$(OBJEXT) neostats-hash.$(OBJEXT) \
-	neostats-ircd.$(OBJEXT) neostats-ircstring.$(OBJEXT) \
-	neostats-keeper.$(OBJEXT) neostats-list.$(OBJEXT) \
-	neostats-log.$(OBJEXT) neostats-main.$(OBJEXT) \
-	neostats-match.$(OBJEXT) neostats-misc.$(OBJEXT) \
-	neostats-modules.$(OBJEXT) neostats-ns_help.$(OBJEXT) \
-	neostats-servers.$(OBJEXT) neostats-services.$(OBJEXT) \
-	neostats-signals.$(OBJEXT) neostats-sock.$(OBJEXT) \
-	neostats-support.$(OBJEXT) neostats-timer.$(OBJEXT) \
-	neostats-transfer.$(OBJEXT) neostats-users.$(OBJEXT)
+am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
+	channels.$(OBJEXT) commands.$(OBJEXT) conf.$(OBJEXT) \
+	db.$(OBJEXT) dl.$(OBJEXT) dns.$(OBJEXT) dotconf.$(OBJEXT) \
+	exclude.$(OBJEXT) hash.$(OBJEXT) ircd.$(OBJEXT) \
+	ircstring.$(OBJEXT) keeper.$(OBJEXT) list.$(OBJEXT) \
+	log.$(OBJEXT) main.$(OBJEXT) match.$(OBJEXT) misc.$(OBJEXT) \
+	modules.$(OBJEXT) ns_help.$(OBJEXT) servers.$(OBJEXT) \
+	services.$(OBJEXT) signals.$(OBJEXT) sock.$(OBJEXT) \
+	support.$(OBJEXT) timer.$(OBJEXT) transfer.$(OBJEXT) \
+	users.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = protocol/libprotocol.la curl/libcurl.la \
-	keeper/libkeeper.la adns/libadns.la libltdl/libltdlc.la
+	keeper/libkeeper.la adns/libadns.la libltdl/libltdlc.la \
+	pcre/libpcre.la
 neostats_LDFLAGS =
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/neostats-auth.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-bans.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-bots.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-channels.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-commands.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-conf.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-db.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-dl.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-dns.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-dotconf.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-exclude.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-hash.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-ircd.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-ircstring.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-keeper.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-list.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-log.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-main.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-match.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-misc.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-modules.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-ns_help.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-servers.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-services.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-signals.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-sock.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-support.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-timer.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-transfer.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/neostats-users.Po
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/auth.Po ./$(DEPDIR)/bans.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/bots.Po ./$(DEPDIR)/channels.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/commands.Po ./$(DEPDIR)/conf.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/db.Po ./$(DEPDIR)/dl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/dns.Po ./$(DEPDIR)/dotconf.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/exclude.Po ./$(DEPDIR)/hash.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/ircd.Po ./$(DEPDIR)/ircstring.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/keeper.Po ./$(DEPDIR)/list.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/log.Po ./$(DEPDIR)/main.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/match.Po ./$(DEPDIR)/misc.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/modules.Po ./$(DEPDIR)/ns_help.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/servers.Po ./$(DEPDIR)/services.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/signals.Po ./$(DEPDIR)/sock.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/support.Po ./$(DEPDIR)/timer.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/transfer.Po ./$(DEPDIR)/users.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -218,7 +199,8 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	all-recursive install-data-recursive install-exec-recursive \
 	installdirs-recursive install-recursive uninstall-recursive \
 	check-recursive installcheck-recursive
-DIST_COMMON = $(srcdir)/Makefile.in Makefile.am
+DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk \
+	Makefile.am
 DIST_SUBDIRS = $(SUBDIRS)
 SOURCES = $(neostats_SOURCES)
 
@@ -226,7 +208,7 @@ all: all-recursive
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
-$(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
+$(srcdir)/Makefile.in:  Makefile.am $(top_srcdir)/autotools/rules.mk $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
 	  $(AUTOMAKE) --gnu  src/Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -270,1059 +252,36 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-auth.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-bans.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-bots.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-channels.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-commands.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-conf.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-db.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-dl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-dns.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-dotconf.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-exclude.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-hash.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-ircd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-ircstring.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-keeper.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-list.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-log.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-match.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-misc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-modules.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-ns_help.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-servers.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-services.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-signals.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-sock.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-support.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-timer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-transfer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neostats-users.Po@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `test -f '$<' || echo '$(srcdir)/'`$<
-
-.c.obj:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`
-
-.c.lo:
-@am__fastdepCC_TRUE@	if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
-
-neostats-auth.o: auth.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-auth.o -MD -MP -MF "$(DEPDIR)/neostats-auth.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-auth.o `test -f 'auth.c' || echo '$(srcdir)/'`auth.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-auth.Tpo" "$(DEPDIR)/neostats-auth.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-auth.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='auth.c' object='neostats-auth.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-auth.Po' tmpdepfile='$(DEPDIR)/neostats-auth.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-auth.o `test -f 'auth.c' || echo '$(srcdir)/'`auth.c
-
-neostats-auth.obj: auth.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-auth.obj -MD -MP -MF "$(DEPDIR)/neostats-auth.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-auth.obj `if test -f 'auth.c'; then $(CYGPATH_W) 'auth.c'; else $(CYGPATH_W) '$(srcdir)/auth.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-auth.Tpo" "$(DEPDIR)/neostats-auth.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-auth.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='auth.c' object='neostats-auth.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-auth.Po' tmpdepfile='$(DEPDIR)/neostats-auth.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-auth.obj `if test -f 'auth.c'; then $(CYGPATH_W) 'auth.c'; else $(CYGPATH_W) '$(srcdir)/auth.c'; fi`
-
-neostats-auth.lo: auth.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-auth.lo -MD -MP -MF "$(DEPDIR)/neostats-auth.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-auth.lo `test -f 'auth.c' || echo '$(srcdir)/'`auth.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-auth.Tpo" "$(DEPDIR)/neostats-auth.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-auth.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='auth.c' object='neostats-auth.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-auth.Plo' tmpdepfile='$(DEPDIR)/neostats-auth.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-auth.lo `test -f 'auth.c' || echo '$(srcdir)/'`auth.c
-
-neostats-bans.o: bans.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-bans.o -MD -MP -MF "$(DEPDIR)/neostats-bans.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-bans.o `test -f 'bans.c' || echo '$(srcdir)/'`bans.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-bans.Tpo" "$(DEPDIR)/neostats-bans.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-bans.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bans.c' object='neostats-bans.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-bans.Po' tmpdepfile='$(DEPDIR)/neostats-bans.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-bans.o `test -f 'bans.c' || echo '$(srcdir)/'`bans.c
-
-neostats-bans.obj: bans.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-bans.obj -MD -MP -MF "$(DEPDIR)/neostats-bans.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-bans.obj `if test -f 'bans.c'; then $(CYGPATH_W) 'bans.c'; else $(CYGPATH_W) '$(srcdir)/bans.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-bans.Tpo" "$(DEPDIR)/neostats-bans.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-bans.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bans.c' object='neostats-bans.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-bans.Po' tmpdepfile='$(DEPDIR)/neostats-bans.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-bans.obj `if test -f 'bans.c'; then $(CYGPATH_W) 'bans.c'; else $(CYGPATH_W) '$(srcdir)/bans.c'; fi`
-
-neostats-bans.lo: bans.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-bans.lo -MD -MP -MF "$(DEPDIR)/neostats-bans.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-bans.lo `test -f 'bans.c' || echo '$(srcdir)/'`bans.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-bans.Tpo" "$(DEPDIR)/neostats-bans.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-bans.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bans.c' object='neostats-bans.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-bans.Plo' tmpdepfile='$(DEPDIR)/neostats-bans.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-bans.lo `test -f 'bans.c' || echo '$(srcdir)/'`bans.c
-
-neostats-bots.o: bots.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-bots.o -MD -MP -MF "$(DEPDIR)/neostats-bots.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-bots.o `test -f 'bots.c' || echo '$(srcdir)/'`bots.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-bots.Tpo" "$(DEPDIR)/neostats-bots.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-bots.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bots.c' object='neostats-bots.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-bots.Po' tmpdepfile='$(DEPDIR)/neostats-bots.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-bots.o `test -f 'bots.c' || echo '$(srcdir)/'`bots.c
-
-neostats-bots.obj: bots.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-bots.obj -MD -MP -MF "$(DEPDIR)/neostats-bots.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-bots.obj `if test -f 'bots.c'; then $(CYGPATH_W) 'bots.c'; else $(CYGPATH_W) '$(srcdir)/bots.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-bots.Tpo" "$(DEPDIR)/neostats-bots.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-bots.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bots.c' object='neostats-bots.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-bots.Po' tmpdepfile='$(DEPDIR)/neostats-bots.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-bots.obj `if test -f 'bots.c'; then $(CYGPATH_W) 'bots.c'; else $(CYGPATH_W) '$(srcdir)/bots.c'; fi`
-
-neostats-bots.lo: bots.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-bots.lo -MD -MP -MF "$(DEPDIR)/neostats-bots.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-bots.lo `test -f 'bots.c' || echo '$(srcdir)/'`bots.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-bots.Tpo" "$(DEPDIR)/neostats-bots.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-bots.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bots.c' object='neostats-bots.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-bots.Plo' tmpdepfile='$(DEPDIR)/neostats-bots.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-bots.lo `test -f 'bots.c' || echo '$(srcdir)/'`bots.c
-
-neostats-channels.o: channels.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-channels.o -MD -MP -MF "$(DEPDIR)/neostats-channels.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-channels.o `test -f 'channels.c' || echo '$(srcdir)/'`channels.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-channels.Tpo" "$(DEPDIR)/neostats-channels.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-channels.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='channels.c' object='neostats-channels.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-channels.Po' tmpdepfile='$(DEPDIR)/neostats-channels.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-channels.o `test -f 'channels.c' || echo '$(srcdir)/'`channels.c
-
-neostats-channels.obj: channels.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-channels.obj -MD -MP -MF "$(DEPDIR)/neostats-channels.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-channels.obj `if test -f 'channels.c'; then $(CYGPATH_W) 'channels.c'; else $(CYGPATH_W) '$(srcdir)/channels.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-channels.Tpo" "$(DEPDIR)/neostats-channels.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-channels.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='channels.c' object='neostats-channels.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-channels.Po' tmpdepfile='$(DEPDIR)/neostats-channels.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-channels.obj `if test -f 'channels.c'; then $(CYGPATH_W) 'channels.c'; else $(CYGPATH_W) '$(srcdir)/channels.c'; fi`
-
-neostats-channels.lo: channels.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-channels.lo -MD -MP -MF "$(DEPDIR)/neostats-channels.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-channels.lo `test -f 'channels.c' || echo '$(srcdir)/'`channels.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-channels.Tpo" "$(DEPDIR)/neostats-channels.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-channels.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='channels.c' object='neostats-channels.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-channels.Plo' tmpdepfile='$(DEPDIR)/neostats-channels.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-channels.lo `test -f 'channels.c' || echo '$(srcdir)/'`channels.c
-
-neostats-commands.o: commands.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-commands.o -MD -MP -MF "$(DEPDIR)/neostats-commands.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-commands.o `test -f 'commands.c' || echo '$(srcdir)/'`commands.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-commands.Tpo" "$(DEPDIR)/neostats-commands.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-commands.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='commands.c' object='neostats-commands.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-commands.Po' tmpdepfile='$(DEPDIR)/neostats-commands.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-commands.o `test -f 'commands.c' || echo '$(srcdir)/'`commands.c
-
-neostats-commands.obj: commands.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-commands.obj -MD -MP -MF "$(DEPDIR)/neostats-commands.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-commands.obj `if test -f 'commands.c'; then $(CYGPATH_W) 'commands.c'; else $(CYGPATH_W) '$(srcdir)/commands.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-commands.Tpo" "$(DEPDIR)/neostats-commands.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-commands.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='commands.c' object='neostats-commands.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-commands.Po' tmpdepfile='$(DEPDIR)/neostats-commands.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-commands.obj `if test -f 'commands.c'; then $(CYGPATH_W) 'commands.c'; else $(CYGPATH_W) '$(srcdir)/commands.c'; fi`
-
-neostats-commands.lo: commands.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-commands.lo -MD -MP -MF "$(DEPDIR)/neostats-commands.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-commands.lo `test -f 'commands.c' || echo '$(srcdir)/'`commands.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-commands.Tpo" "$(DEPDIR)/neostats-commands.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-commands.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='commands.c' object='neostats-commands.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-commands.Plo' tmpdepfile='$(DEPDIR)/neostats-commands.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-commands.lo `test -f 'commands.c' || echo '$(srcdir)/'`commands.c
-
-neostats-conf.o: conf.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-conf.o -MD -MP -MF "$(DEPDIR)/neostats-conf.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-conf.o `test -f 'conf.c' || echo '$(srcdir)/'`conf.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-conf.Tpo" "$(DEPDIR)/neostats-conf.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-conf.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='conf.c' object='neostats-conf.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-conf.Po' tmpdepfile='$(DEPDIR)/neostats-conf.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-conf.o `test -f 'conf.c' || echo '$(srcdir)/'`conf.c
-
-neostats-conf.obj: conf.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-conf.obj -MD -MP -MF "$(DEPDIR)/neostats-conf.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-conf.obj `if test -f 'conf.c'; then $(CYGPATH_W) 'conf.c'; else $(CYGPATH_W) '$(srcdir)/conf.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-conf.Tpo" "$(DEPDIR)/neostats-conf.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-conf.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='conf.c' object='neostats-conf.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-conf.Po' tmpdepfile='$(DEPDIR)/neostats-conf.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-conf.obj `if test -f 'conf.c'; then $(CYGPATH_W) 'conf.c'; else $(CYGPATH_W) '$(srcdir)/conf.c'; fi`
-
-neostats-conf.lo: conf.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-conf.lo -MD -MP -MF "$(DEPDIR)/neostats-conf.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-conf.lo `test -f 'conf.c' || echo '$(srcdir)/'`conf.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-conf.Tpo" "$(DEPDIR)/neostats-conf.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-conf.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='conf.c' object='neostats-conf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-conf.Plo' tmpdepfile='$(DEPDIR)/neostats-conf.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-conf.lo `test -f 'conf.c' || echo '$(srcdir)/'`conf.c
-
-neostats-db.o: db.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-db.o -MD -MP -MF "$(DEPDIR)/neostats-db.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-db.o `test -f 'db.c' || echo '$(srcdir)/'`db.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-db.Tpo" "$(DEPDIR)/neostats-db.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-db.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='db.c' object='neostats-db.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-db.Po' tmpdepfile='$(DEPDIR)/neostats-db.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-db.o `test -f 'db.c' || echo '$(srcdir)/'`db.c
-
-neostats-db.obj: db.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-db.obj -MD -MP -MF "$(DEPDIR)/neostats-db.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-db.obj `if test -f 'db.c'; then $(CYGPATH_W) 'db.c'; else $(CYGPATH_W) '$(srcdir)/db.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-db.Tpo" "$(DEPDIR)/neostats-db.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-db.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='db.c' object='neostats-db.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-db.Po' tmpdepfile='$(DEPDIR)/neostats-db.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-db.obj `if test -f 'db.c'; then $(CYGPATH_W) 'db.c'; else $(CYGPATH_W) '$(srcdir)/db.c'; fi`
-
-neostats-db.lo: db.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-db.lo -MD -MP -MF "$(DEPDIR)/neostats-db.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-db.lo `test -f 'db.c' || echo '$(srcdir)/'`db.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-db.Tpo" "$(DEPDIR)/neostats-db.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-db.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='db.c' object='neostats-db.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-db.Plo' tmpdepfile='$(DEPDIR)/neostats-db.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-db.lo `test -f 'db.c' || echo '$(srcdir)/'`db.c
-
-neostats-dl.o: dl.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-dl.o -MD -MP -MF "$(DEPDIR)/neostats-dl.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-dl.o `test -f 'dl.c' || echo '$(srcdir)/'`dl.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-dl.Tpo" "$(DEPDIR)/neostats-dl.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-dl.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dl.c' object='neostats-dl.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-dl.Po' tmpdepfile='$(DEPDIR)/neostats-dl.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-dl.o `test -f 'dl.c' || echo '$(srcdir)/'`dl.c
-
-neostats-dl.obj: dl.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-dl.obj -MD -MP -MF "$(DEPDIR)/neostats-dl.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-dl.obj `if test -f 'dl.c'; then $(CYGPATH_W) 'dl.c'; else $(CYGPATH_W) '$(srcdir)/dl.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-dl.Tpo" "$(DEPDIR)/neostats-dl.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-dl.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dl.c' object='neostats-dl.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-dl.Po' tmpdepfile='$(DEPDIR)/neostats-dl.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-dl.obj `if test -f 'dl.c'; then $(CYGPATH_W) 'dl.c'; else $(CYGPATH_W) '$(srcdir)/dl.c'; fi`
-
-neostats-dl.lo: dl.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-dl.lo -MD -MP -MF "$(DEPDIR)/neostats-dl.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-dl.lo `test -f 'dl.c' || echo '$(srcdir)/'`dl.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-dl.Tpo" "$(DEPDIR)/neostats-dl.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-dl.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dl.c' object='neostats-dl.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-dl.Plo' tmpdepfile='$(DEPDIR)/neostats-dl.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-dl.lo `test -f 'dl.c' || echo '$(srcdir)/'`dl.c
-
-neostats-dns.o: dns.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-dns.o -MD -MP -MF "$(DEPDIR)/neostats-dns.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-dns.o `test -f 'dns.c' || echo '$(srcdir)/'`dns.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-dns.Tpo" "$(DEPDIR)/neostats-dns.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-dns.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dns.c' object='neostats-dns.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-dns.Po' tmpdepfile='$(DEPDIR)/neostats-dns.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-dns.o `test -f 'dns.c' || echo '$(srcdir)/'`dns.c
-
-neostats-dns.obj: dns.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-dns.obj -MD -MP -MF "$(DEPDIR)/neostats-dns.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-dns.obj `if test -f 'dns.c'; then $(CYGPATH_W) 'dns.c'; else $(CYGPATH_W) '$(srcdir)/dns.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-dns.Tpo" "$(DEPDIR)/neostats-dns.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-dns.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dns.c' object='neostats-dns.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-dns.Po' tmpdepfile='$(DEPDIR)/neostats-dns.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-dns.obj `if test -f 'dns.c'; then $(CYGPATH_W) 'dns.c'; else $(CYGPATH_W) '$(srcdir)/dns.c'; fi`
-
-neostats-dns.lo: dns.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-dns.lo -MD -MP -MF "$(DEPDIR)/neostats-dns.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-dns.lo `test -f 'dns.c' || echo '$(srcdir)/'`dns.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-dns.Tpo" "$(DEPDIR)/neostats-dns.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-dns.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dns.c' object='neostats-dns.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-dns.Plo' tmpdepfile='$(DEPDIR)/neostats-dns.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-dns.lo `test -f 'dns.c' || echo '$(srcdir)/'`dns.c
-
-neostats-dotconf.o: dotconf.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-dotconf.o -MD -MP -MF "$(DEPDIR)/neostats-dotconf.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-dotconf.o `test -f 'dotconf.c' || echo '$(srcdir)/'`dotconf.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-dotconf.Tpo" "$(DEPDIR)/neostats-dotconf.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-dotconf.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dotconf.c' object='neostats-dotconf.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-dotconf.Po' tmpdepfile='$(DEPDIR)/neostats-dotconf.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-dotconf.o `test -f 'dotconf.c' || echo '$(srcdir)/'`dotconf.c
-
-neostats-dotconf.obj: dotconf.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-dotconf.obj -MD -MP -MF "$(DEPDIR)/neostats-dotconf.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-dotconf.obj `if test -f 'dotconf.c'; then $(CYGPATH_W) 'dotconf.c'; else $(CYGPATH_W) '$(srcdir)/dotconf.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-dotconf.Tpo" "$(DEPDIR)/neostats-dotconf.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-dotconf.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dotconf.c' object='neostats-dotconf.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-dotconf.Po' tmpdepfile='$(DEPDIR)/neostats-dotconf.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-dotconf.obj `if test -f 'dotconf.c'; then $(CYGPATH_W) 'dotconf.c'; else $(CYGPATH_W) '$(srcdir)/dotconf.c'; fi`
-
-neostats-dotconf.lo: dotconf.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-dotconf.lo -MD -MP -MF "$(DEPDIR)/neostats-dotconf.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-dotconf.lo `test -f 'dotconf.c' || echo '$(srcdir)/'`dotconf.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-dotconf.Tpo" "$(DEPDIR)/neostats-dotconf.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-dotconf.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dotconf.c' object='neostats-dotconf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-dotconf.Plo' tmpdepfile='$(DEPDIR)/neostats-dotconf.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-dotconf.lo `test -f 'dotconf.c' || echo '$(srcdir)/'`dotconf.c
-
-neostats-exclude.o: exclude.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-exclude.o -MD -MP -MF "$(DEPDIR)/neostats-exclude.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-exclude.o `test -f 'exclude.c' || echo '$(srcdir)/'`exclude.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-exclude.Tpo" "$(DEPDIR)/neostats-exclude.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-exclude.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='exclude.c' object='neostats-exclude.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-exclude.Po' tmpdepfile='$(DEPDIR)/neostats-exclude.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-exclude.o `test -f 'exclude.c' || echo '$(srcdir)/'`exclude.c
-
-neostats-exclude.obj: exclude.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-exclude.obj -MD -MP -MF "$(DEPDIR)/neostats-exclude.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-exclude.obj `if test -f 'exclude.c'; then $(CYGPATH_W) 'exclude.c'; else $(CYGPATH_W) '$(srcdir)/exclude.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-exclude.Tpo" "$(DEPDIR)/neostats-exclude.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-exclude.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='exclude.c' object='neostats-exclude.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-exclude.Po' tmpdepfile='$(DEPDIR)/neostats-exclude.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-exclude.obj `if test -f 'exclude.c'; then $(CYGPATH_W) 'exclude.c'; else $(CYGPATH_W) '$(srcdir)/exclude.c'; fi`
-
-neostats-exclude.lo: exclude.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-exclude.lo -MD -MP -MF "$(DEPDIR)/neostats-exclude.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-exclude.lo `test -f 'exclude.c' || echo '$(srcdir)/'`exclude.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-exclude.Tpo" "$(DEPDIR)/neostats-exclude.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-exclude.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='exclude.c' object='neostats-exclude.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-exclude.Plo' tmpdepfile='$(DEPDIR)/neostats-exclude.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-exclude.lo `test -f 'exclude.c' || echo '$(srcdir)/'`exclude.c
-
-neostats-hash.o: hash.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-hash.o -MD -MP -MF "$(DEPDIR)/neostats-hash.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-hash.o `test -f 'hash.c' || echo '$(srcdir)/'`hash.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-hash.Tpo" "$(DEPDIR)/neostats-hash.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-hash.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='hash.c' object='neostats-hash.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-hash.Po' tmpdepfile='$(DEPDIR)/neostats-hash.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-hash.o `test -f 'hash.c' || echo '$(srcdir)/'`hash.c
-
-neostats-hash.obj: hash.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-hash.obj -MD -MP -MF "$(DEPDIR)/neostats-hash.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-hash.obj `if test -f 'hash.c'; then $(CYGPATH_W) 'hash.c'; else $(CYGPATH_W) '$(srcdir)/hash.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-hash.Tpo" "$(DEPDIR)/neostats-hash.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-hash.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='hash.c' object='neostats-hash.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-hash.Po' tmpdepfile='$(DEPDIR)/neostats-hash.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-hash.obj `if test -f 'hash.c'; then $(CYGPATH_W) 'hash.c'; else $(CYGPATH_W) '$(srcdir)/hash.c'; fi`
-
-neostats-hash.lo: hash.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-hash.lo -MD -MP -MF "$(DEPDIR)/neostats-hash.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-hash.lo `test -f 'hash.c' || echo '$(srcdir)/'`hash.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-hash.Tpo" "$(DEPDIR)/neostats-hash.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-hash.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='hash.c' object='neostats-hash.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-hash.Plo' tmpdepfile='$(DEPDIR)/neostats-hash.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-hash.lo `test -f 'hash.c' || echo '$(srcdir)/'`hash.c
-
-neostats-ircd.o: ircd.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-ircd.o -MD -MP -MF "$(DEPDIR)/neostats-ircd.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-ircd.o `test -f 'ircd.c' || echo '$(srcdir)/'`ircd.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-ircd.Tpo" "$(DEPDIR)/neostats-ircd.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-ircd.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ircd.c' object='neostats-ircd.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-ircd.Po' tmpdepfile='$(DEPDIR)/neostats-ircd.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-ircd.o `test -f 'ircd.c' || echo '$(srcdir)/'`ircd.c
-
-neostats-ircd.obj: ircd.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-ircd.obj -MD -MP -MF "$(DEPDIR)/neostats-ircd.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-ircd.obj `if test -f 'ircd.c'; then $(CYGPATH_W) 'ircd.c'; else $(CYGPATH_W) '$(srcdir)/ircd.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-ircd.Tpo" "$(DEPDIR)/neostats-ircd.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-ircd.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ircd.c' object='neostats-ircd.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-ircd.Po' tmpdepfile='$(DEPDIR)/neostats-ircd.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-ircd.obj `if test -f 'ircd.c'; then $(CYGPATH_W) 'ircd.c'; else $(CYGPATH_W) '$(srcdir)/ircd.c'; fi`
-
-neostats-ircd.lo: ircd.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-ircd.lo -MD -MP -MF "$(DEPDIR)/neostats-ircd.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-ircd.lo `test -f 'ircd.c' || echo '$(srcdir)/'`ircd.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-ircd.Tpo" "$(DEPDIR)/neostats-ircd.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-ircd.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ircd.c' object='neostats-ircd.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-ircd.Plo' tmpdepfile='$(DEPDIR)/neostats-ircd.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-ircd.lo `test -f 'ircd.c' || echo '$(srcdir)/'`ircd.c
-
-neostats-ircstring.o: ircstring.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-ircstring.o -MD -MP -MF "$(DEPDIR)/neostats-ircstring.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-ircstring.o `test -f 'ircstring.c' || echo '$(srcdir)/'`ircstring.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-ircstring.Tpo" "$(DEPDIR)/neostats-ircstring.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-ircstring.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ircstring.c' object='neostats-ircstring.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-ircstring.Po' tmpdepfile='$(DEPDIR)/neostats-ircstring.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-ircstring.o `test -f 'ircstring.c' || echo '$(srcdir)/'`ircstring.c
-
-neostats-ircstring.obj: ircstring.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-ircstring.obj -MD -MP -MF "$(DEPDIR)/neostats-ircstring.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-ircstring.obj `if test -f 'ircstring.c'; then $(CYGPATH_W) 'ircstring.c'; else $(CYGPATH_W) '$(srcdir)/ircstring.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-ircstring.Tpo" "$(DEPDIR)/neostats-ircstring.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-ircstring.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ircstring.c' object='neostats-ircstring.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-ircstring.Po' tmpdepfile='$(DEPDIR)/neostats-ircstring.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-ircstring.obj `if test -f 'ircstring.c'; then $(CYGPATH_W) 'ircstring.c'; else $(CYGPATH_W) '$(srcdir)/ircstring.c'; fi`
-
-neostats-ircstring.lo: ircstring.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-ircstring.lo -MD -MP -MF "$(DEPDIR)/neostats-ircstring.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-ircstring.lo `test -f 'ircstring.c' || echo '$(srcdir)/'`ircstring.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-ircstring.Tpo" "$(DEPDIR)/neostats-ircstring.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-ircstring.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ircstring.c' object='neostats-ircstring.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-ircstring.Plo' tmpdepfile='$(DEPDIR)/neostats-ircstring.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-ircstring.lo `test -f 'ircstring.c' || echo '$(srcdir)/'`ircstring.c
-
-neostats-keeper.o: keeper.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-keeper.o -MD -MP -MF "$(DEPDIR)/neostats-keeper.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-keeper.o `test -f 'keeper.c' || echo '$(srcdir)/'`keeper.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-keeper.Tpo" "$(DEPDIR)/neostats-keeper.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-keeper.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='keeper.c' object='neostats-keeper.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-keeper.Po' tmpdepfile='$(DEPDIR)/neostats-keeper.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-keeper.o `test -f 'keeper.c' || echo '$(srcdir)/'`keeper.c
-
-neostats-keeper.obj: keeper.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-keeper.obj -MD -MP -MF "$(DEPDIR)/neostats-keeper.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-keeper.obj `if test -f 'keeper.c'; then $(CYGPATH_W) 'keeper.c'; else $(CYGPATH_W) '$(srcdir)/keeper.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-keeper.Tpo" "$(DEPDIR)/neostats-keeper.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-keeper.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='keeper.c' object='neostats-keeper.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-keeper.Po' tmpdepfile='$(DEPDIR)/neostats-keeper.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-keeper.obj `if test -f 'keeper.c'; then $(CYGPATH_W) 'keeper.c'; else $(CYGPATH_W) '$(srcdir)/keeper.c'; fi`
-
-neostats-keeper.lo: keeper.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-keeper.lo -MD -MP -MF "$(DEPDIR)/neostats-keeper.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-keeper.lo `test -f 'keeper.c' || echo '$(srcdir)/'`keeper.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-keeper.Tpo" "$(DEPDIR)/neostats-keeper.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-keeper.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='keeper.c' object='neostats-keeper.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-keeper.Plo' tmpdepfile='$(DEPDIR)/neostats-keeper.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-keeper.lo `test -f 'keeper.c' || echo '$(srcdir)/'`keeper.c
-
-neostats-list.o: list.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-list.o -MD -MP -MF "$(DEPDIR)/neostats-list.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-list.o `test -f 'list.c' || echo '$(srcdir)/'`list.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-list.Tpo" "$(DEPDIR)/neostats-list.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-list.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='list.c' object='neostats-list.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-list.Po' tmpdepfile='$(DEPDIR)/neostats-list.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-list.o `test -f 'list.c' || echo '$(srcdir)/'`list.c
-
-neostats-list.obj: list.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-list.obj -MD -MP -MF "$(DEPDIR)/neostats-list.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-list.obj `if test -f 'list.c'; then $(CYGPATH_W) 'list.c'; else $(CYGPATH_W) '$(srcdir)/list.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-list.Tpo" "$(DEPDIR)/neostats-list.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-list.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='list.c' object='neostats-list.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-list.Po' tmpdepfile='$(DEPDIR)/neostats-list.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-list.obj `if test -f 'list.c'; then $(CYGPATH_W) 'list.c'; else $(CYGPATH_W) '$(srcdir)/list.c'; fi`
-
-neostats-list.lo: list.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-list.lo -MD -MP -MF "$(DEPDIR)/neostats-list.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-list.lo `test -f 'list.c' || echo '$(srcdir)/'`list.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-list.Tpo" "$(DEPDIR)/neostats-list.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-list.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='list.c' object='neostats-list.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-list.Plo' tmpdepfile='$(DEPDIR)/neostats-list.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-list.lo `test -f 'list.c' || echo '$(srcdir)/'`list.c
-
-neostats-log.o: log.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-log.o -MD -MP -MF "$(DEPDIR)/neostats-log.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-log.o `test -f 'log.c' || echo '$(srcdir)/'`log.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-log.Tpo" "$(DEPDIR)/neostats-log.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-log.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='log.c' object='neostats-log.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-log.Po' tmpdepfile='$(DEPDIR)/neostats-log.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-log.o `test -f 'log.c' || echo '$(srcdir)/'`log.c
-
-neostats-log.obj: log.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-log.obj -MD -MP -MF "$(DEPDIR)/neostats-log.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-log.obj `if test -f 'log.c'; then $(CYGPATH_W) 'log.c'; else $(CYGPATH_W) '$(srcdir)/log.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-log.Tpo" "$(DEPDIR)/neostats-log.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-log.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='log.c' object='neostats-log.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-log.Po' tmpdepfile='$(DEPDIR)/neostats-log.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-log.obj `if test -f 'log.c'; then $(CYGPATH_W) 'log.c'; else $(CYGPATH_W) '$(srcdir)/log.c'; fi`
-
-neostats-log.lo: log.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-log.lo -MD -MP -MF "$(DEPDIR)/neostats-log.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-log.lo `test -f 'log.c' || echo '$(srcdir)/'`log.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-log.Tpo" "$(DEPDIR)/neostats-log.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-log.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='log.c' object='neostats-log.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-log.Plo' tmpdepfile='$(DEPDIR)/neostats-log.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-log.lo `test -f 'log.c' || echo '$(srcdir)/'`log.c
-
-neostats-main.o: main.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-main.o -MD -MP -MF "$(DEPDIR)/neostats-main.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-main.Tpo" "$(DEPDIR)/neostats-main.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-main.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='neostats-main.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-main.Po' tmpdepfile='$(DEPDIR)/neostats-main.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
-
-neostats-main.obj: main.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-main.obj -MD -MP -MF "$(DEPDIR)/neostats-main.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-main.Tpo" "$(DEPDIR)/neostats-main.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-main.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='neostats-main.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-main.Po' tmpdepfile='$(DEPDIR)/neostats-main.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
-
-neostats-main.lo: main.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-main.lo -MD -MP -MF "$(DEPDIR)/neostats-main.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-main.lo `test -f 'main.c' || echo '$(srcdir)/'`main.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-main.Tpo" "$(DEPDIR)/neostats-main.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-main.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='neostats-main.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-main.Plo' tmpdepfile='$(DEPDIR)/neostats-main.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-main.lo `test -f 'main.c' || echo '$(srcdir)/'`main.c
-
-neostats-match.o: match.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-match.o -MD -MP -MF "$(DEPDIR)/neostats-match.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-match.o `test -f 'match.c' || echo '$(srcdir)/'`match.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-match.Tpo" "$(DEPDIR)/neostats-match.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-match.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='match.c' object='neostats-match.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-match.Po' tmpdepfile='$(DEPDIR)/neostats-match.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-match.o `test -f 'match.c' || echo '$(srcdir)/'`match.c
-
-neostats-match.obj: match.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-match.obj -MD -MP -MF "$(DEPDIR)/neostats-match.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-match.obj `if test -f 'match.c'; then $(CYGPATH_W) 'match.c'; else $(CYGPATH_W) '$(srcdir)/match.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-match.Tpo" "$(DEPDIR)/neostats-match.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-match.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='match.c' object='neostats-match.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-match.Po' tmpdepfile='$(DEPDIR)/neostats-match.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-match.obj `if test -f 'match.c'; then $(CYGPATH_W) 'match.c'; else $(CYGPATH_W) '$(srcdir)/match.c'; fi`
-
-neostats-match.lo: match.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-match.lo -MD -MP -MF "$(DEPDIR)/neostats-match.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-match.lo `test -f 'match.c' || echo '$(srcdir)/'`match.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-match.Tpo" "$(DEPDIR)/neostats-match.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-match.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='match.c' object='neostats-match.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-match.Plo' tmpdepfile='$(DEPDIR)/neostats-match.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-match.lo `test -f 'match.c' || echo '$(srcdir)/'`match.c
-
-neostats-misc.o: misc.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-misc.o -MD -MP -MF "$(DEPDIR)/neostats-misc.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-misc.o `test -f 'misc.c' || echo '$(srcdir)/'`misc.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-misc.Tpo" "$(DEPDIR)/neostats-misc.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-misc.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='misc.c' object='neostats-misc.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-misc.Po' tmpdepfile='$(DEPDIR)/neostats-misc.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-misc.o `test -f 'misc.c' || echo '$(srcdir)/'`misc.c
-
-neostats-misc.obj: misc.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-misc.obj -MD -MP -MF "$(DEPDIR)/neostats-misc.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-misc.obj `if test -f 'misc.c'; then $(CYGPATH_W) 'misc.c'; else $(CYGPATH_W) '$(srcdir)/misc.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-misc.Tpo" "$(DEPDIR)/neostats-misc.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-misc.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='misc.c' object='neostats-misc.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-misc.Po' tmpdepfile='$(DEPDIR)/neostats-misc.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-misc.obj `if test -f 'misc.c'; then $(CYGPATH_W) 'misc.c'; else $(CYGPATH_W) '$(srcdir)/misc.c'; fi`
-
-neostats-misc.lo: misc.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-misc.lo -MD -MP -MF "$(DEPDIR)/neostats-misc.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-misc.lo `test -f 'misc.c' || echo '$(srcdir)/'`misc.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-misc.Tpo" "$(DEPDIR)/neostats-misc.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-misc.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='misc.c' object='neostats-misc.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-misc.Plo' tmpdepfile='$(DEPDIR)/neostats-misc.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-misc.lo `test -f 'misc.c' || echo '$(srcdir)/'`misc.c
-
-neostats-modules.o: modules.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-modules.o -MD -MP -MF "$(DEPDIR)/neostats-modules.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-modules.o `test -f 'modules.c' || echo '$(srcdir)/'`modules.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-modules.Tpo" "$(DEPDIR)/neostats-modules.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-modules.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='modules.c' object='neostats-modules.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-modules.Po' tmpdepfile='$(DEPDIR)/neostats-modules.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-modules.o `test -f 'modules.c' || echo '$(srcdir)/'`modules.c
-
-neostats-modules.obj: modules.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-modules.obj -MD -MP -MF "$(DEPDIR)/neostats-modules.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-modules.obj `if test -f 'modules.c'; then $(CYGPATH_W) 'modules.c'; else $(CYGPATH_W) '$(srcdir)/modules.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-modules.Tpo" "$(DEPDIR)/neostats-modules.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-modules.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='modules.c' object='neostats-modules.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-modules.Po' tmpdepfile='$(DEPDIR)/neostats-modules.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-modules.obj `if test -f 'modules.c'; then $(CYGPATH_W) 'modules.c'; else $(CYGPATH_W) '$(srcdir)/modules.c'; fi`
-
-neostats-modules.lo: modules.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-modules.lo -MD -MP -MF "$(DEPDIR)/neostats-modules.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-modules.lo `test -f 'modules.c' || echo '$(srcdir)/'`modules.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-modules.Tpo" "$(DEPDIR)/neostats-modules.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-modules.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='modules.c' object='neostats-modules.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-modules.Plo' tmpdepfile='$(DEPDIR)/neostats-modules.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-modules.lo `test -f 'modules.c' || echo '$(srcdir)/'`modules.c
-
-neostats-ns_help.o: ns_help.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-ns_help.o -MD -MP -MF "$(DEPDIR)/neostats-ns_help.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-ns_help.o `test -f 'ns_help.c' || echo '$(srcdir)/'`ns_help.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-ns_help.Tpo" "$(DEPDIR)/neostats-ns_help.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-ns_help.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ns_help.c' object='neostats-ns_help.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-ns_help.Po' tmpdepfile='$(DEPDIR)/neostats-ns_help.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-ns_help.o `test -f 'ns_help.c' || echo '$(srcdir)/'`ns_help.c
-
-neostats-ns_help.obj: ns_help.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-ns_help.obj -MD -MP -MF "$(DEPDIR)/neostats-ns_help.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-ns_help.obj `if test -f 'ns_help.c'; then $(CYGPATH_W) 'ns_help.c'; else $(CYGPATH_W) '$(srcdir)/ns_help.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-ns_help.Tpo" "$(DEPDIR)/neostats-ns_help.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-ns_help.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ns_help.c' object='neostats-ns_help.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-ns_help.Po' tmpdepfile='$(DEPDIR)/neostats-ns_help.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-ns_help.obj `if test -f 'ns_help.c'; then $(CYGPATH_W) 'ns_help.c'; else $(CYGPATH_W) '$(srcdir)/ns_help.c'; fi`
-
-neostats-ns_help.lo: ns_help.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-ns_help.lo -MD -MP -MF "$(DEPDIR)/neostats-ns_help.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-ns_help.lo `test -f 'ns_help.c' || echo '$(srcdir)/'`ns_help.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-ns_help.Tpo" "$(DEPDIR)/neostats-ns_help.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-ns_help.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ns_help.c' object='neostats-ns_help.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-ns_help.Plo' tmpdepfile='$(DEPDIR)/neostats-ns_help.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-ns_help.lo `test -f 'ns_help.c' || echo '$(srcdir)/'`ns_help.c
-
-neostats-servers.o: servers.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-servers.o -MD -MP -MF "$(DEPDIR)/neostats-servers.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-servers.o `test -f 'servers.c' || echo '$(srcdir)/'`servers.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-servers.Tpo" "$(DEPDIR)/neostats-servers.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-servers.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='servers.c' object='neostats-servers.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-servers.Po' tmpdepfile='$(DEPDIR)/neostats-servers.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-servers.o `test -f 'servers.c' || echo '$(srcdir)/'`servers.c
-
-neostats-servers.obj: servers.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-servers.obj -MD -MP -MF "$(DEPDIR)/neostats-servers.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-servers.obj `if test -f 'servers.c'; then $(CYGPATH_W) 'servers.c'; else $(CYGPATH_W) '$(srcdir)/servers.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-servers.Tpo" "$(DEPDIR)/neostats-servers.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-servers.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='servers.c' object='neostats-servers.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-servers.Po' tmpdepfile='$(DEPDIR)/neostats-servers.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-servers.obj `if test -f 'servers.c'; then $(CYGPATH_W) 'servers.c'; else $(CYGPATH_W) '$(srcdir)/servers.c'; fi`
-
-neostats-servers.lo: servers.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-servers.lo -MD -MP -MF "$(DEPDIR)/neostats-servers.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-servers.lo `test -f 'servers.c' || echo '$(srcdir)/'`servers.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-servers.Tpo" "$(DEPDIR)/neostats-servers.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-servers.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='servers.c' object='neostats-servers.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-servers.Plo' tmpdepfile='$(DEPDIR)/neostats-servers.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-servers.lo `test -f 'servers.c' || echo '$(srcdir)/'`servers.c
-
-neostats-services.o: services.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-services.o -MD -MP -MF "$(DEPDIR)/neostats-services.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-services.o `test -f 'services.c' || echo '$(srcdir)/'`services.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-services.Tpo" "$(DEPDIR)/neostats-services.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-services.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='services.c' object='neostats-services.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-services.Po' tmpdepfile='$(DEPDIR)/neostats-services.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-services.o `test -f 'services.c' || echo '$(srcdir)/'`services.c
-
-neostats-services.obj: services.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-services.obj -MD -MP -MF "$(DEPDIR)/neostats-services.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-services.obj `if test -f 'services.c'; then $(CYGPATH_W) 'services.c'; else $(CYGPATH_W) '$(srcdir)/services.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-services.Tpo" "$(DEPDIR)/neostats-services.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-services.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='services.c' object='neostats-services.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-services.Po' tmpdepfile='$(DEPDIR)/neostats-services.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-services.obj `if test -f 'services.c'; then $(CYGPATH_W) 'services.c'; else $(CYGPATH_W) '$(srcdir)/services.c'; fi`
-
-neostats-services.lo: services.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-services.lo -MD -MP -MF "$(DEPDIR)/neostats-services.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-services.lo `test -f 'services.c' || echo '$(srcdir)/'`services.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-services.Tpo" "$(DEPDIR)/neostats-services.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-services.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='services.c' object='neostats-services.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-services.Plo' tmpdepfile='$(DEPDIR)/neostats-services.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-services.lo `test -f 'services.c' || echo '$(srcdir)/'`services.c
-
-neostats-signals.o: signals.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-signals.o -MD -MP -MF "$(DEPDIR)/neostats-signals.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-signals.o `test -f 'signals.c' || echo '$(srcdir)/'`signals.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-signals.Tpo" "$(DEPDIR)/neostats-signals.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-signals.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signals.c' object='neostats-signals.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-signals.Po' tmpdepfile='$(DEPDIR)/neostats-signals.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-signals.o `test -f 'signals.c' || echo '$(srcdir)/'`signals.c
-
-neostats-signals.obj: signals.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-signals.obj -MD -MP -MF "$(DEPDIR)/neostats-signals.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-signals.obj `if test -f 'signals.c'; then $(CYGPATH_W) 'signals.c'; else $(CYGPATH_W) '$(srcdir)/signals.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-signals.Tpo" "$(DEPDIR)/neostats-signals.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-signals.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signals.c' object='neostats-signals.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-signals.Po' tmpdepfile='$(DEPDIR)/neostats-signals.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-signals.obj `if test -f 'signals.c'; then $(CYGPATH_W) 'signals.c'; else $(CYGPATH_W) '$(srcdir)/signals.c'; fi`
-
-neostats-signals.lo: signals.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-signals.lo -MD -MP -MF "$(DEPDIR)/neostats-signals.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-signals.lo `test -f 'signals.c' || echo '$(srcdir)/'`signals.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-signals.Tpo" "$(DEPDIR)/neostats-signals.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-signals.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signals.c' object='neostats-signals.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-signals.Plo' tmpdepfile='$(DEPDIR)/neostats-signals.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-signals.lo `test -f 'signals.c' || echo '$(srcdir)/'`signals.c
-
-neostats-sock.o: sock.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-sock.o -MD -MP -MF "$(DEPDIR)/neostats-sock.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-sock.o `test -f 'sock.c' || echo '$(srcdir)/'`sock.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-sock.Tpo" "$(DEPDIR)/neostats-sock.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-sock.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sock.c' object='neostats-sock.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-sock.Po' tmpdepfile='$(DEPDIR)/neostats-sock.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-sock.o `test -f 'sock.c' || echo '$(srcdir)/'`sock.c
-
-neostats-sock.obj: sock.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-sock.obj -MD -MP -MF "$(DEPDIR)/neostats-sock.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-sock.obj `if test -f 'sock.c'; then $(CYGPATH_W) 'sock.c'; else $(CYGPATH_W) '$(srcdir)/sock.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-sock.Tpo" "$(DEPDIR)/neostats-sock.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-sock.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sock.c' object='neostats-sock.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-sock.Po' tmpdepfile='$(DEPDIR)/neostats-sock.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-sock.obj `if test -f 'sock.c'; then $(CYGPATH_W) 'sock.c'; else $(CYGPATH_W) '$(srcdir)/sock.c'; fi`
-
-neostats-sock.lo: sock.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-sock.lo -MD -MP -MF "$(DEPDIR)/neostats-sock.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-sock.lo `test -f 'sock.c' || echo '$(srcdir)/'`sock.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-sock.Tpo" "$(DEPDIR)/neostats-sock.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-sock.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sock.c' object='neostats-sock.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-sock.Plo' tmpdepfile='$(DEPDIR)/neostats-sock.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-sock.lo `test -f 'sock.c' || echo '$(srcdir)/'`sock.c
-
-neostats-support.o: support.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-support.o -MD -MP -MF "$(DEPDIR)/neostats-support.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-support.o `test -f 'support.c' || echo '$(srcdir)/'`support.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-support.Tpo" "$(DEPDIR)/neostats-support.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-support.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='support.c' object='neostats-support.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-support.Po' tmpdepfile='$(DEPDIR)/neostats-support.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-support.o `test -f 'support.c' || echo '$(srcdir)/'`support.c
-
-neostats-support.obj: support.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-support.obj -MD -MP -MF "$(DEPDIR)/neostats-support.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-support.obj `if test -f 'support.c'; then $(CYGPATH_W) 'support.c'; else $(CYGPATH_W) '$(srcdir)/support.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-support.Tpo" "$(DEPDIR)/neostats-support.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-support.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='support.c' object='neostats-support.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-support.Po' tmpdepfile='$(DEPDIR)/neostats-support.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-support.obj `if test -f 'support.c'; then $(CYGPATH_W) 'support.c'; else $(CYGPATH_W) '$(srcdir)/support.c'; fi`
-
-neostats-support.lo: support.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-support.lo -MD -MP -MF "$(DEPDIR)/neostats-support.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-support.lo `test -f 'support.c' || echo '$(srcdir)/'`support.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-support.Tpo" "$(DEPDIR)/neostats-support.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-support.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='support.c' object='neostats-support.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-support.Plo' tmpdepfile='$(DEPDIR)/neostats-support.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-support.lo `test -f 'support.c' || echo '$(srcdir)/'`support.c
-
-neostats-timer.o: timer.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-timer.o -MD -MP -MF "$(DEPDIR)/neostats-timer.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-timer.o `test -f 'timer.c' || echo '$(srcdir)/'`timer.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-timer.Tpo" "$(DEPDIR)/neostats-timer.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-timer.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='timer.c' object='neostats-timer.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-timer.Po' tmpdepfile='$(DEPDIR)/neostats-timer.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-timer.o `test -f 'timer.c' || echo '$(srcdir)/'`timer.c
-
-neostats-timer.obj: timer.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-timer.obj -MD -MP -MF "$(DEPDIR)/neostats-timer.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-timer.obj `if test -f 'timer.c'; then $(CYGPATH_W) 'timer.c'; else $(CYGPATH_W) '$(srcdir)/timer.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-timer.Tpo" "$(DEPDIR)/neostats-timer.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-timer.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='timer.c' object='neostats-timer.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-timer.Po' tmpdepfile='$(DEPDIR)/neostats-timer.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-timer.obj `if test -f 'timer.c'; then $(CYGPATH_W) 'timer.c'; else $(CYGPATH_W) '$(srcdir)/timer.c'; fi`
-
-neostats-timer.lo: timer.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-timer.lo -MD -MP -MF "$(DEPDIR)/neostats-timer.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-timer.lo `test -f 'timer.c' || echo '$(srcdir)/'`timer.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-timer.Tpo" "$(DEPDIR)/neostats-timer.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-timer.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='timer.c' object='neostats-timer.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-timer.Plo' tmpdepfile='$(DEPDIR)/neostats-timer.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-timer.lo `test -f 'timer.c' || echo '$(srcdir)/'`timer.c
-
-neostats-transfer.o: transfer.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-transfer.o -MD -MP -MF "$(DEPDIR)/neostats-transfer.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-transfer.o `test -f 'transfer.c' || echo '$(srcdir)/'`transfer.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-transfer.Tpo" "$(DEPDIR)/neostats-transfer.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-transfer.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='transfer.c' object='neostats-transfer.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-transfer.Po' tmpdepfile='$(DEPDIR)/neostats-transfer.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-transfer.o `test -f 'transfer.c' || echo '$(srcdir)/'`transfer.c
-
-neostats-transfer.obj: transfer.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-transfer.obj -MD -MP -MF "$(DEPDIR)/neostats-transfer.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-transfer.obj `if test -f 'transfer.c'; then $(CYGPATH_W) 'transfer.c'; else $(CYGPATH_W) '$(srcdir)/transfer.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-transfer.Tpo" "$(DEPDIR)/neostats-transfer.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-transfer.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='transfer.c' object='neostats-transfer.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-transfer.Po' tmpdepfile='$(DEPDIR)/neostats-transfer.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-transfer.obj `if test -f 'transfer.c'; then $(CYGPATH_W) 'transfer.c'; else $(CYGPATH_W) '$(srcdir)/transfer.c'; fi`
-
-neostats-transfer.lo: transfer.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-transfer.lo -MD -MP -MF "$(DEPDIR)/neostats-transfer.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-transfer.lo `test -f 'transfer.c' || echo '$(srcdir)/'`transfer.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-transfer.Tpo" "$(DEPDIR)/neostats-transfer.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-transfer.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='transfer.c' object='neostats-transfer.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-transfer.Plo' tmpdepfile='$(DEPDIR)/neostats-transfer.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-transfer.lo `test -f 'transfer.c' || echo '$(srcdir)/'`transfer.c
-
-neostats-users.o: users.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-users.o -MD -MP -MF "$(DEPDIR)/neostats-users.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-users.o `test -f 'users.c' || echo '$(srcdir)/'`users.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-users.Tpo" "$(DEPDIR)/neostats-users.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-users.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='users.c' object='neostats-users.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-users.Po' tmpdepfile='$(DEPDIR)/neostats-users.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-users.o `test -f 'users.c' || echo '$(srcdir)/'`users.c
-
-neostats-users.obj: users.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-users.obj -MD -MP -MF "$(DEPDIR)/neostats-users.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-users.obj `if test -f 'users.c'; then $(CYGPATH_W) 'users.c'; else $(CYGPATH_W) '$(srcdir)/users.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-users.Tpo" "$(DEPDIR)/neostats-users.Po"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-users.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='users.c' object='neostats-users.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-users.Po' tmpdepfile='$(DEPDIR)/neostats-users.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-users.obj `if test -f 'users.c'; then $(CYGPATH_W) 'users.c'; else $(CYGPATH_W) '$(srcdir)/users.c'; fi`
-
-neostats-users.lo: users.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -MT neostats-users.lo -MD -MP -MF "$(DEPDIR)/neostats-users.Tpo" \
-@am__fastdepCC_TRUE@	  -c -o neostats-users.lo `test -f 'users.c' || echo '$(srcdir)/'`users.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/neostats-users.Tpo" "$(DEPDIR)/neostats-users.Plo"; \
-@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/neostats-users.Tpo"; exit 1; \
-@am__fastdepCC_TRUE@	fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='users.c' object='neostats-users.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/neostats-users.Plo' tmpdepfile='$(DEPDIR)/neostats-users.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(neostats_CFLAGS) $(CFLAGS) -c -o neostats-users.lo `test -f 'users.c' || echo '$(srcdir)/'`users.c
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/auth.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bans.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bots.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/channels.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/commands.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dotconf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exclude.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircstring.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/keeper.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/misc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modules.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ns_help.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servers.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/services.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signals.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sock.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/support.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transfer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/users.Po@am__quote@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1463,6 +422,7 @@ top_distdir = ..
 distdir = $(top_distdir)/$(PACKAGE)-$(VERSION)
 
 distdir: $(DISTFILES)
+	$(mkinstalldirs) $(distdir)/../autotools
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -1601,6 +561,41 @@ uninstall-info: uninstall-info-recursive
 	tags-recursive uninstall uninstall-am uninstall-binPROGRAMS \
 	uninstall-info-am uninstall-info-recursive uninstall-recursive
 
+.c.o:
+			@echo "Building $@"
+@am__fastdepCC_TRUE@	@if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c `test -f '$<' || echo '$(srcdir)/'`$<
+
+.c.obj:
+			@echo "Building $@"
+@am__fastdepCC_TRUE@	@if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`
+
+.c.lo:
+			@echo "Building $@"
+@am__fastdepCC_TRUE@	@if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	@source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
