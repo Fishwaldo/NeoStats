@@ -161,6 +161,8 @@ main (int argc, char *argv[])
 		return EXIT_FAILURE;
 	if(InitBots() != NS_SUCCESS)
 		return EXIT_FAILURE;
+	if(InitSocks() != NS_SUCCESS)
+		return EXIT_FAILURE;
 
 	/* load the config files */
 	if(ConfLoad () != NS_SUCCESS)
@@ -603,6 +605,9 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		FreeBans();
 		fini_adns();
 		FiniModules();
+		FiniSocks();
+		FiniBots();
+		FiniTimers();
 	}
 
 	kp_flush();

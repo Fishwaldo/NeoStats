@@ -51,8 +51,6 @@ int del_all_bot_cmds(ModUser* bot_ptr);
 
 /* @brief Module hash list */
 static hash_t *mh;
-/* @brief Module Socket List hash */
-hash_t *sockh;
 
 #ifdef SQLSRV
 
@@ -209,9 +207,6 @@ InitModules ()
 	mh = hash_create (NUM_MODULES, 0, 0);
 	if(!mh)
 		return NS_FAILURE;
-	sockh = hash_create (me.maxsocks, 0, 0);
-	if(!sockh)
-		return NS_FAILURE;
 
 #ifdef SQLSRV
         /* add the module hash to the sql library */
@@ -225,7 +220,6 @@ InitModules ()
 int FiniModules (void) 
 {
 	hash_destroy(mh);
-	hash_destroy(sockh);
 }
 
 /** @brief SendModuleEvent

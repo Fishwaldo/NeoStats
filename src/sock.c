@@ -49,6 +49,8 @@ static void recvlog (char *line);
 
 static struct sockaddr_in lsa;
 static int dobind;
+/* @brief Module Socket List hash */
+static hash_t *sockh;
 
 int servsock;
 char recbuf[BUFSIZE];

@@ -48,11 +48,6 @@
 #define RTLD_GLOBAL 0
 #endif
 
-/* @brief Module Socket List hash
- * 
- */
-extern hash_t *sockh;
-
 /* 
  * Prototypes
  */
