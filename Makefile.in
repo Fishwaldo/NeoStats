@@ -1,63 +1,50 @@
 # Makefile for NeoStats
-# NeoStats CVS Identification
-# $Id: Makefile.in 581 2003-09-20 08:44:59Z Fish $
-# makefile originally created by Andy Church.
 include Makefile.inc 
 
-PCRE_OBJS = pcre/pcre.o pcre/get.o pcre/study.o
-ADNS_OBJS =	adns/check.o adns/event.o adns/general.o adns/parse.o adns/query.o \
-			adns/reply.o adns/setup.o adns/transmit.o adns/types.o
-KEEPER_OBJS= keeper/kp_cache.o keeper/kp_dir.o keeper/kp_enum.o keeper/kp_get.o \
-			keeper/kp_iface.o keeper/kp_recur.o keeper/kp_set.o keeper/kp_sort.o \
-			keeper/kp_util.o
-CURL_LDFLAGS = `curl/mycurl-config --libs`
-OBJS =	dns.o chans.o dotconf.o services.o main.o sock.o conf.o ircd.o timer.o \
-		 users.o ns_help.o dl.o list.o hash.o server.o keeper.o log.o misc.o \
-		 support.o ircstring.o commands.o transfer.o exclude.o match.o\
-		 @IRCD_FILES_OBJS@ @sqlsrvbuild@
-SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
-		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
-		support.c ircstring.c commands.c transfer.c exclude.c match.c\
-		@IRCD_FILES_SRC@
+EXTRA_LDFLAGS = `curl/mycurl-config --libs`
 
 PROGS = neostats cronchk makeconf
 CONF = neostats.motd
 DOCS = doc/FAQ doc/USERMAN README BUGS AUTHORS COPYING CREDITS TODO \
-		tools/README* tools/cfgtool/README* ChangeLog doc/README.*
+		ChangeLog doc/README.* dl/modules.txt RELNOTES doc/old/*
 DOCS_PROGS = doc/read-faq doc/read-userman
 DATA = data/tlds.nfo
-INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h Unreal.h \
-		adns/adns.h hybrid7.h neoircd.h conf.h log.h Bahamut.h \
-		Ircu.h mystic.h QuantumIRCd.h sock.h ircd.h exclude.h\
-		support.h ircstring.h events.h liquidircd.h Viagra.h numeric.h pcre.h \
-		dns.h services.h transfer.h sqlsrv/rta.h
-BUILDFILES = configure config.sub config.guess *.in adns/Makefile adns/config.h.in dl/Makefile \
-		dl/modules.txt RELNOTES install-sh neoircd.c neoircd.h \
-		hybrid7.c hybrid7.h Ultimate.c Ultimate.h Unreal.c Unreal.h \
-		makeconf cronchk tools/Makefile.in tools/cfgtool/Makefile \
-		keeper/Makefile doc/old/* Bahamut.c Ircu.c mystic.c \
-		QuantumIRCd.c Config liquidircd.c Viagra.c sqlsrv/*.c sqlsrv/*.h sqlsrv/*.y sqlsrv/*.l
-TOOLFILES = tools/*.c tools/*.h tools/cfgtool/*.h tools/cfgtool/*.c \
-		tools/cfgtool/pixmaps/*.xpm tools/sqlphp/*.php tools/sqlphp/README
-DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) \
-		$(BUILDFILES) $(TOOLFILES) keeper/*.c keeper/*.h adns/*.c \
-		adns/adns.h adns/dlist.h  adns/internal.h  adns/tvarith.h \
-		ns_help.h timer.h users.h chans.h server.h pcre/*.c pcre/*.h \
-		pcre/*.in pcre/README pcre/COPYING curl/*.in curl/*.h \
-		curl/*.c curl/*.m4 curl/configure curl/config.sub curl/COPYING \
-		curl/depcomp curl/*.y curl/README curl/RELEASE-NOTES sqlsrv/*.c \
-                sqlsrv/*.h sqlsrv/*.y sqlsrv/*.l sqlsrv/README sqlsrv/Makefile.in
+
+PCRE_OBJS = pcre/pcre.o pcre/get.o pcre/study.o
+ADNS_OBJS =	adns/check.o adns/event.o adns/general.o adns/parse.o adns/query.o \
+		adns/reply.o adns/setup.o adns/transmit.o adns/types.o
+KEEPER_OBJS= keeper/kp_cache.o keeper/kp_dir.o keeper/kp_enum.o keeper/kp_get.o \
+		keeper/kp_iface.o keeper/kp_recur.o keeper/kp_set.o keeper/kp_sort.o \
+		keeper/kp_util.o
+OBJS= ${SRCS:.c=.o} @sqlsrvbuild@
+SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
+		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
+		support.c ircstring.c commands.c transfer.c exclude.c match.c \
+		@IRCD_FILES_SRC@
+IRCDSRC=Ultimate.c Unreal.c hybrid7.c neoircd.c Bahamut.c \
+		Ircu.c mystic.c QuantumIRCd.c liquidircd.c Viagra.c
+IRCDINC=Ultimate.h Unreal.h hybrid7.h neoircd.h Bahamut.h \
+		Ircu.h mystic.h QuantumIRCd.h liquidircd.h Viagra.h
+
+INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h \
+		conf.h log.h support.h ircstring.h events.h numeric.h pcre.h \
+		transfer.h
+COREINCS = dns.h services.h sock.h ircd.h exclude.h \
+		ns_help.h timer.h users.h chans.h server.h
+BUILDFILES = configure config.sub config.guess *.in \
+		dl/Makefile install-sh Config makeconf cronchk
+
+DISTFILES = $(INCLUDES) $(COREINCS) $(SRCS) $(IRCDSRC) $(IRCDINC) \
+		$(BUILDFILES) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF)	
  
-distdir = @PACKAGE@-@VERSION@
-SUBDIRS = doc doc/old data adns logs keeper tools tools/cfgtool \
-		tools/cfgtool/pixmaps pcre curl sqlsrv tools/sqlphp
+SUBDIRS = doc doc/old data logs tools 
+DISTLIBS = adns pcre curl sqlsrv keeper
 DISTMOD = cs extauth hostserv loveserv ms statserv template
 
 .c.o:
 	$(CC) $(NEOINCLUDES) $(CFLAGS) -c $< 
 
-
-all: 	@buildsqlsrv@ libadns libkeeper libpcre libcurl.a neostats modules utils 
+all: @buildsqlsrv@ libadns libkeeper libpcre libcurl.a neostats modules utils 
 
 modules:
 	(cd dl; $(MAKE) $@)
@@ -80,7 +67,6 @@ sqlsrvlib:
 utils:
 	(cd tools; $(MAKE) $@)
 
-
 clean:
 	(cd dl; $(MAKE) $@)
 	(cd adns; $(MAKE) $@)
@@ -91,14 +77,15 @@ clean:
 	(cd sqlsrv; $(MAKE) $@)
 	/bin/rm -rf *.o neostats *.cache Makefile config.h  Makefile.inc *.log *.a
 
-
-neostats: $(OBJS) $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) 
-	$(CC) $(LDFLAGS) $(OBJS) $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(CURL_LDFLAGS) -o $@
+neostats: $(OBJS)
+	$(CC) $(LDFLAGS) $(OBJS) $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(EXTRA_LDFLAGS) -o $@
 
 install: neostats modules
+	@echo "Installing ..."
 	@rm -rf @prefix@/dl/cs.so
 	@rm -rf @prefix@/dl/ms.so
 	@rm -rf @prefix@/dl/SecureServ.so
+	@rm -rf @prefix@/include/*.h
 	$(INSTALL) -m 755 -d @prefix@
 	$(INSTALL) -m 755 -d @prefix@/dl
 	$(INSTALL) -m 755 -d @prefix@/include
@@ -111,64 +98,74 @@ install: neostats modules
 	$(INSTALL) -m 755 $(DOCS_PROGS) @prefix@/doc
 	$(INSTALL) -m 644 $(DATA) @prefix@/data
 	$(INSTALL) -m 644 $(INCLUDES) @prefix@/include
+	$(INSTALL) -m 644 @IRCD_FILES_INC@ @prefix@/include
+	(cd adns; $(MAKE) $@)
+	(cd sqlsrv; $(MAKE) $@)
 	(cd dl; $(MAKE) $@)
 	(cd tools; $(MAKE) $@)
+	@echo "Done."
 
 dist: 	
 	@echo -n "Creating Directories"
-	@-rm -rf $(distdir)
+	@-rm -rf $(DISTDIR)
 	@echo -n "."
-	@mkdir $(distdir)
+	@mkdir $(DISTDIR)
 	@echo -n "."
-	@mkdir $(distdir)/dl
+	@mkdir $(DISTDIR)/dl
 	@echo -n "."
 	@for subdir in $(SUBDIRS); do \
 		echo -n "."; \
-		mkdir $(distdir)/$$subdir; \
-		chmod 777 $(distdir)/$$subdir; \
+		mkdir $(DISTDIR)/$$subdir; \
+		chmod 777 $(DISTDIR)/$$subdir; \
 	done
 	@echo "Done"
-	@echo -n "Coping Core Distribution files"
+	@echo -n "Copying Core Distribution files"
 	@for file in $(DISTFILES); do \
 		echo -n "."; \
-		cp -pr $$file $(distdir)/$$file; \
+		cp -pr $$file $(DISTDIR)/$$file; \
 	done
-	@rm -rf $(distdir)/config.h
-	@rm -rf $(distdir)/configure.in
+	@rm -rf $(DISTDIR)/config.h
+	@rm -rf $(DISTDIR)/configure.in
+	@echo "Done"
+	@echo "Copying Library Distribution files"
+	@for subdir in $(DISTLIBS); do \
+		mkdir $(DISTDIR)/$$subdir; \
+		chmod 777 $(DISTDIR)/$$subdir; \
+		(cd $$subdir && $(MAKE) dist DISTDIR=../$(DISTDIR)/$$subdir && cd ..) || exit 1; \
+	done
+	@echo "Done"
+	@echo "Copying Tools Distribution files"
+	@(cd tools && $(MAKE) dist DISTDIR=../$(DISTDIR)/tools && cd ..) || exit 1;
 	@echo "Done"
 	@echo "Copying Module Distribution files"
 	@for mod in $(DISTMOD); do \
-		mkdir $(distdir)/dl/$$mod; \
-		(cd dl/$$mod && $(MAKE) dist distdir=../../$(distdir)/dl/$$mod && cd ../..) || exit 1; \
+		mkdir $(DISTDIR)/dl/$$mod; \
+		(cd dl/$$mod && $(MAKE) dist DISTDIR=../../$(DISTDIR)/dl/$$mod && cd ../..) || exit 1; \
 	done
 	@echo "Done"
-	@tar -czf $(distdir).tar.gz $(distdir)/*
-#	@rm -rf $(distdir)
-	@echo "Tar file $(distdir).tar.gz created. Freshmeat time!"
-
-
-
+	@tar -czf $(DISTDIR).tar.gz $(DISTDIR)/*
+#	@rm -rf $(DISTDIR)
+	@echo "Tar file $(DISTDIR).tar.gz created. Freshmeat time!"
 
 # Catch any changes in compilation options at the top of this file
 $(OBJS): Makefile
 
-dns.o: dns.c stats.h adns/adns.h list.h hash.h config.h neoircd.h log.h
-chans.o: chans.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h log.h
+dns.o: dns.c stats.h adns/adns.h list.h hash.h config.h log.h
+chans.o: chans.c stats.h adns/adns.h list.h hash.h config.h dl.h log.h
 dotconf.o: dotconf.c dotconf.h
-services.o: services.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h log.h
-main.o: main.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h conf.h log.h
-sock.o: sock.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h conf.h log.h
-conf.o: conf.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dotconf.h conf.h dl.h log.h
-ircd.o: ircd.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h log.h
-timer.o: timer.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h log.h
-users.o: users.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h log.h
-ns_help.o: ns_help.c stats.h adns/adns.h list.h hash.h config.h neoircd.h
-dl.o: dl.c dl.h hash.h stats.h adns/adns.h list.h config.h neoircd.h log.h
+services.o: services.c stats.h adns/adns.h list.h hash.h config.h dl.h log.h
+main.o: main.c stats.h adns/adns.h list.h hash.h config.h dl.h conf.h log.h
+sock.o: sock.c stats.h adns/adns.h list.h hash.h config.h dl.h conf.h log.h
+conf.o: conf.c stats.h adns/adns.h list.h hash.h config.h dotconf.h conf.h dl.h log.h
+ircd.o: ircd.c stats.h adns/adns.h list.h hash.h config.h dl.h log.h
+timer.o: timer.c stats.h adns/adns.h list.h hash.h config.h dl.h log.h
+users.o: users.c stats.h adns/adns.h list.h hash.h config.h dl.h log.h
+ns_help.o: ns_help.c stats.h adns/adns.h list.h hash.h config.h 
+dl.o: dl.c dl.h hash.h stats.h adns/adns.h list.h config.h log.h
 list.o: list.c list.h
 hash.o: hash.c hash.h
-server.o: server.c stats.h adns/adns.h list.h hash.h config.h neoircd.h log.h
-keeper.o: keeper.c stats.h adns/adns.h list.h hash.h config.h neoircd.h keeper/keeper.h conf.h log.h
-log.o: log.c stats.h adns/adns.h list.h hash.h config.h neoircd.h conf.h log.h
-neoircd.o: neoircd.c stats.h adns/adns.h list.h hash.h config.h neoircd.h hybrid7.h dl.h log.h
+server.o: server.c stats.h adns/adns.h list.h hash.h config.h log.h
+keeper.o: keeper.c stats.h adns/adns.h list.h hash.h config.h keeper/keeper.h conf.h log.h
+log.o: log.c stats.h adns/adns.h list.h hash.h config.h conf.h log.h
 transfer.o: transfer.c transfer.h stats.h list.h
 exclude.o: exclude.c exclude.h

@@ -2,9 +2,9 @@ include ../Makefile.inc
 
 INCLUDES = -I..
 
-SOURCES= check.c  event.c  general.c  parse.c  query.c  reply.c  setup.c  transmit.c  types.c
-OBJECTS= check.o  event.o  general.o  parse.o  query.o  reply.o  setup.o  transmit.o  types.o
-all:	$(OBJECTS)
+SRCS= check.c  event.c  general.c  parse.c  query.c  reply.c  setup.c  transmit.c  types.c
+OBJS= ${SRCS:.c=.o}
+all:	$(OBJS)
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
@@ -13,11 +13,19 @@ clean:
 	/bin/rm -rf *.o *.lo *.so *.a
 
 depend:
-	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SOURCES) > .depend
+	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SRCS) > .depend
 
-install: 
+install:
+	$(INSTALL) -m 644 adns.h $(DIRECTORY)/include
 
-$(OBJECTS): Makefile ../Makefile.inc
+DISTFILES =*.c adns.h dlist.h internal.h tvarith.h Makefile *.in
+
+dist:
+	@for file in $(DISTFILES); do \
+		cp -pr $$file $(DISTDIR)/$$file; \
+	done
+
+$(OBJS): Makefile ../Makefile.inc
 
 check.o: check.c internal.h config.h adns.h dlist.h
 event.o: event.c internal.h config.h adns.h dlist.h tvarith.h

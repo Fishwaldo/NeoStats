@@ -3,11 +3,11 @@ include ../Makefile.inc
 
 INCLUDES=-I.. -I.
 
-SOURCES= get.c pcre.c study.c
-OBJECTS= get.o pcre.o study.o
+SRCS= get.c pcre.c study.c
+OBJS= ${SRCS:.c=.o}
 DOCS=README.pcre COPYING
 
-all:	 ${OBJECTS}
+all:	 ${OBJS}
 
 .c.o:	
 	 $(CC) -c $(CFLAGS) $(INCLUDES) $<
@@ -26,9 +26,14 @@ clean:
 
 install: 
 
-dist:	
+DISTFILES =*.c *.h *.in README COPYING
 
-$(OBJECTS): Makefile
+dist:
+	@for file in $(DISTFILES); do \
+		cp -pr $$file $(DISTDIR)/$$file; \
+	done
+
+$(OBJS): Makefile
 pcre.o:	chartables.c ../pcre.h internal.h ../config.h
 get.o: ../pcre.h internal.h ../config.h
 study.o: ../pcre.h internal.h ../config.h

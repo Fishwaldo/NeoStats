@@ -33,8 +33,23 @@ install:
 		$(INSTALL) -m 644 cfgtool/README.configtool @prefix@; \
 	fi
 
+DISTFILES = *.c *.h Makefile.in \
+		README* cfgtool/README* \
+		cfgtool/*.h cfgtool/*.c cfgtool/pixmaps/*.xpm cfgtool/Makefile \
+		sqlphp/*.php sqlphp/README
 
-$(OBJECTS): Makefile ../Makefile.inc
+TOOLDIRS = cfgtool cfgtool/pixmaps sqlphp
+
+dist:
+	@for subdir in $(TOOLDIRS); do \
+		mkdir $(DISTDIR)/$$subdir; \
+		chmod 777 $(DISTDIR)/$$subdir; \
+	done
+	@for file in $(DISTFILES); do \
+		cp -pr $$file $(DISTDIR)/$$file; \
+	done
+
+$(OBJS): Makefile ../Makefile.inc
 kp_exp.o: kp_exp.c kptool.h ../config.h ../keeper/keeper.h
 kp_imp.o: kp_imp.c kptool.h ../config.h ../keeper/keeper.h
 kptool.o: kptool.c kptool.h ../config.h ../keeper/keeper.h

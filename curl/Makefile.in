@@ -3,17 +3,19 @@ CC=@CC@
 CFLAGS= -DHAVE_CONFIG_H @CFLAGS@ @CPPFLAGS@
 LDFLAGS= @LDFLAGS@ @LIBS@
 
-SOURCES= base64.c easy.c getdate.c http.c if2ip.c md5.c progress.c ssluse.c transfer.c connect.c escape.c getenv.c http_chunks.c \
+SRCS= base64.c easy.c getdate.c http.c if2ip.c md5.c progress.c ssluse.c transfer.c connect.c escape.c getenv.c http_chunks.c \
          inet_pton.c memdebug.c security.c strequal.c url.c content_encoding.c file.c getinfo.c http_digest.c krb4.c mprintf.c sendf.c \
          strtok.c version.c cookie.c formdata.c hash.c http_negotiate.c ldap.c multi.c share.c telnet.c dict.c ftp.c hostip.c \
          http_ntlm.c llist.c netrc.c speedcheck.c timeval.c
-OBJECTS= ${SOURCES:.c=.o}
-DOCS=README.pcre COPYING
+OBJS= ${SRCS:.c=.o}
 
-all:	 ${OBJECTS}
-	 ar cru libcurl.a ${OBJECTS}
+libcurl.a: ${OBJS} Makefile
+	 ar cru libcurl.a ${OBJS}
 	 ranlib libcurl.a
 	 chmod +x mycurl-config
+
+all: libcurl.a  
+
 .c.o:	
 	 $(CC) -c $(CFLAGS) $<
 
@@ -29,9 +31,14 @@ clean:
 
 install: 
 
-dist:	
+DISTFILES =*.in *.h *.c *.m4 configure config.sub COPYING depcomp *.y README RELEASE-NOTES
 
-$(OBJECTS): Makefile
+dist:
+	@for file in $(DISTFILES); do \
+		cp -pr $$file $(DISTDIR)/$$file; \
+	done
+
+$(OBJS): Makefile
 base64.o: base64.c setup.h config.h mprintf.h base64.h
 easy.o: easy.c setup.h config.h strequal.h curl.h types.h easy.h multi.h \
   urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \

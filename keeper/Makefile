@@ -2,9 +2,9 @@ include ../Makefile.inc
 
 INCLUDES = -I.. -DHAVE_CONFIG_H
 
-SOURCES= kp_cache.c kp_dir.c kp_enum.c kp_get.c kp_iface.c kp_recur.c kp_set.c kp_sort.c kp_util.c
-OBJECTS= kp_cache.o kp_dir.o kp_enum.o kp_get.o kp_iface.o kp_recur.o kp_set.o kp_sort.o kp_util.o
-all:	$(OBJECTS)
+SRCS= kp_cache.c kp_dir.c kp_enum.c kp_get.c kp_iface.c kp_recur.c kp_set.c kp_sort.c kp_util.c
+OBJS= ${SRCS:.c=.o}
+all:	$(OBJS)
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
@@ -13,11 +13,18 @@ clean:
 	/bin/rm -rf *.o *.lo *.so *.a
 
 depend:
-	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SOURCES) > .depend
+	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SRCS) > .depend
 
-install: 
+install:
 
-$(OBJECTS): Makefile ../Makefile.inc
+DISTFILES =Makefile *.c *.h 
+
+dist:
+	@for file in $(DISTFILES); do \
+		cp -pr $$file $(DISTDIR)/$$file; \
+	done
+
+$(OBJS): Makefile ../Makefile.inc
 
 kp_cache.o: kp_cache.c kp_util.h keeper.h ../config.h
 kp_dir.o: kp_dir.c kp_util.h keeper.h ../config.h

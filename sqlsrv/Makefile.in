@@ -44,6 +44,15 @@ do_sql.o: do_sql.c do_sql.h rta.h
 
 rtatables.o: rtatables.c do_sql.h rta.h
 
+install:
+	$(INSTALL) -m 644 rta.h $(DIRECTORY)/include
+
+DISTFILES =*.c *.h *.y *.l README Makefile.in
+
+dist:
+	@for file in $(DISTFILES); do \
+		cp -pr $$file $(DISTDIR)/$$file; \
+	done
 
 clean: 
 	rm -rf *.o lib* parse.output parse.save
