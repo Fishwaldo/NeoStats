@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.45 2003/06/13 14:49:31 fishwaldo Exp $
+** $Id: hostserv.c,v 1.46 2003/07/01 14:06:01 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -186,6 +186,7 @@ static int hs_sign_on(char **av, int ac)
 	hn = hash_lookup(vhosts, u->nick);
 	if (hn) {
 		map = hnode_get(hn);
+		nlog(LOG_DEBUG1, LOG_MOD, "Checking %s against %s for HostName Match", map->host, u->hostname);
 		if (fnmatch(map->host, u->hostname, 0) == 0) {
 			ssvshost_cmd(u->nick, map->vhost);
 			prefmsg(u->nick, s_HostServ,
