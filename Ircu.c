@@ -52,6 +52,10 @@ static void m_pass (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_end_of_burst (char *origin, char **argv, int argc, int srv);
 
+void send_end_of_burst_ack(void);
+void send_end_of_burst(void);
+
+
 const char ircd_version[] = "(IRCU)";
 const char services_bot_modes[]= "+oS";
 
@@ -123,7 +127,7 @@ char servlist[4096][MAXHOST];
 char nicklist[262144][MAXNICK];
 int neonumeric;
 char neonumericbuf[3];
-
+int neonickcount = 0;
 
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
@@ -279,7 +283,8 @@ send_part (const char *who, const char *chan)
 void
 send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
 {
-	send_cmd (":%s %s 0 %s + :%s", sender, TOK_JOIN, chan, who);
+//	send_cmd (":%s %s 0 %s + :%s", sender, TOK_JOIN, chan, who);
+	send_cmd (":%s %s %s %lu :%s", who, TOK_JOIN, chan, (unsigned long)me.now, who);
 }
 
 void 
@@ -291,7 +296,8 @@ send_cmode (const char *sender, const char *who, const char *chan, const char *m
 void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
-	send_cmd ("%s %s 1 %lu %s %s %s %s :%s", TOK_NICK, nick, ts, newmode, ident, host, server, realname);
+	send_cmd ("%s %s %s 1 %lu %s %s %sAA%c :%s", neonumericbuf, TOK_NICK, nick, ts, ident, host, neonumericbuf, (neonickcount+'A'), realname);
+	neonickcount ++;
 }
 
 void
@@ -356,6 +362,15 @@ void
 send_end_of_burst_ack(void)
 {
 	send_cmd ("%s %s", neonumericbuf, TOK_END_OF_BURST_ACK);
+	init_services_bot ();
+	send_end_of_burst ();
+	me.synced = 1;
+}
+
+void
+send_end_of_burst(void)
+{
+	send_cmd ("%s %s", neonumericbuf, TOK_END_OF_BURST);
 }
 
 void
