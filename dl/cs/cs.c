@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.31 2003/09/17 03:18:53 fishwaldo Exp $
+** $Id: cs.c,v 1.32 2003/09/19 12:13:43 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -754,10 +754,9 @@ int cs_user_nick(char **av, int ac)
 		return 1;
 
 	if (nick_watch) {
-		u = finduser(av[0]);
-		if (!u) 
-			return -1;
-	
+		u = finduser(av[1]);
+		if (!u)
+			return -1
 		if (!strcasecmp(u->server->name, me.name)) {
 			/* its me, forget it */
 			return 1;
