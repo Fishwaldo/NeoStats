@@ -27,6 +27,7 @@ else
   AC_CHECK_LIB(pcre, pcre_study)
   if test "$ac_cv_lib_pcre_pcre_study" = "yes" ; then
      PCRE_LIBS="-lpcre"
+     PCRE_CFLAGS="-I$(top_srcdir)/lib/pcre"
      LIBS="$OLDLIBS"
      AC_MSG_CHECKING([lib pcre])
      AC_MSG_RESULT([$PCRE_LIBS])
@@ -79,9 +80,8 @@ AC_DEFINE(PCRE_MAJOR_VERSION, $NPCRE_MAJOR_VERSION, "PCRE Version")
 AC_DEFINE(PCRE_MINOR_VERSION, NPCRE_MINOR_VERSION, "PCRE Version")
 AC_DEFINE(PCRE_VERSION, NPCRE_VERSION, "Pcre full version")
 PCRE_LIBS='${top_srcdir}/'src/pcre/libpcre.la
-PCRE_CFLAGS='-I${top_srcdir}/'src/pcre
+PCRE_CFLAGS='-I${top_srcdir}/'lib/pcre
 AC_SUBST([PCRE_LIBS])
 AC_SUBST([PCRE_CFLAGS])
 AM_CONDITIONAL(BUILD_PCRE, true)
-AC_MSG_RESULT([ok])
 ])

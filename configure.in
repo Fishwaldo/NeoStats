@@ -25,8 +25,8 @@ AC_DEFINE_UNQUOTED(REV, $x_rev, "Revision Version Number")
 AC_DEFINE_UNQUOTED(VERSION, $x_version, "Full Version")
 AC_LIBTOOL_DLOPEN
 dnl AC_DISABLE_SHARED
-AC_LIBTOOL_WIN32_DLL
-AC_LIBLTDL_CONVENIENCE
+dnl AC_LIBTOOL_WIN32_DLL
+dnl AC_LIBLTDL_CONVENIENCE
 
 # Checks for programs.
 AC_PROG_CC
@@ -35,7 +35,7 @@ AC_PROG_YACC
 AC_PATH_PROG( SED, sed, , $PATH:/usr/bin:/usr/local/bin)
 
 # Checks for libraries.
-AC_LIB_LTDL
+dnl AC_LIB_LTDL
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -262,16 +262,15 @@ AC_ARG_ENABLE(sqlsrv, [  --enable-sqlsrv - Enable Sql Server Emulation],
   yes)
 	AC_DEFINE(SQLSRV, 1, 'Use Sql Server Emulation')
 	AC_MSG_RESULT(yes)
-	sqlsrvbuild=sqlsrv/librtadb.a
-	AC_SUBST(sqlsrvbuild)
-	buildsqlsrv=sqlsrvlib
-	AC_SUBST(buildsqlsrv)
+	AM_CONDITIONAL(BUILD_SQL, true)
 	;;
   *)
+	AM_CONDITIONAL(BUILD_SQL, false)
 	AC_MSG_RESULT(no)
 	;;
 esac],
 AC_MSG_RESULT(no)
+AM_CONDITIONAL(BUILD_SQL, false)
 )
 
 AC_MSG_CHECKING(The Modules that will be automatically compiled)
@@ -306,19 +305,25 @@ AC_SUBST(LIBLTDL)
 AC_SUBST(LIBTOOL_DEPS)
 AC_SUBST(MODULES)
 
-AC_CONFIG_FILES([Makefile include/Makefile src/Makefile
-		src/protocol/Makefile src/curl/Makefile
-		src/keeper/Makefile src/adns/Makefile
-		src/pcre/Makefile src/libltdl/Makefile
-		src/modules/Makefile src/modules/connectserv/Makefile
-		src/modules/extauth/Makefile
-		src/modules/hostserv/Makefile
-		src/modules/ircdauth/Makefile
-		src/modules/loveserv/Makefile
-		src/modules/moraleserv/Makefile
-		src/modules/statserv/Makefile
-		src/modules/template/Makefile
-		src/modules/templateauth/Makefile
+AC_CONFIG_FILES([Makefile 
+		include/Makefile 
+		src/Makefile
+		src/protocol/Makefile 
+		lib/Makefile
+		lib/curl/Makefile
+		lib/keeper/Makefile 
+		lib/adns/Makefile
+		lib/pcre/Makefile 
+		modules/Makefile 
+		modules/connectserv/Makefile
+		modules/extauth/Makefile
+		modules/hostserv/Makefile
+		modules/ircdauth/Makefile
+		modules/loveserv/Makefile
+		modules/moraleserv/Makefile
+		modules/statserv/Makefile
+		modules/template/Makefile
+		modules/templateauth/Makefile
 		cronchk])
 
 AC_CACHE_SAVE

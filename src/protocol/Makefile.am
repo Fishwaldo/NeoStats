@@ -15,5 +15,5 @@ unreal31_la_SOURCES = unreal31.c unreal31.h
 unreal32_la_SOURCES = unreal32.c unreal32.h
 viagra_la_SOURCES = viagra.c viagra.h
 AM_LDFLAGS	= -module -avoid-version -no-undefined
-AM_CFLAGS		= -I.. -I../../include -I../pcre -I../adns
+AM_CFLAGS		= -I$(top_srcdir)/lib/adns/ -I$(top_srcdir)/lib/keeper @PCRE_CFLAGS@ @CURL_CFLAGS@
 include $(top_srcdir)/autotools/rules.mk

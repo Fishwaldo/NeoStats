@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS 	= foreign
-SUBDIRS 		= include src
+SUBDIRS 		= include lib modules tools src
 ACLOCAL_AMFLAGS 	= -I autotools
 
 bin_SCRIPTS		= makeconf cronchk
