@@ -616,11 +616,6 @@ void InitStats(void)
 	Chead = list_create(-1);
 	Shead = hash_create(-1, 0, 0);
 	Vhead = list_create(-1);
-	GetServerList(StatsAddServer);
-	GetUserList(StatsAddUser);
-	/* TODO get user modes */
-	GetChannelList(StatsAddChan);
-	/* TODO get member counts */
 }
 
 void FiniStats(void)

@@ -179,8 +179,13 @@ int ModInit(Module* mod_ptr)
 		StatServ.html = 0;
 	}
 	InitTLD();
-	LoadStats();
 	InitStats();
+	LoadStats();
+	GetServerList(StatsAddServer);
+	GetUserList(StatsAddUser);
+	/* TODO get user modes */
+	GetChannelList(StatsAddChan);
+	/* TODO get member counts */
 
 #ifdef SQLSRV
 	/* ok, now export the server and chan data into the sql emulation layers */
