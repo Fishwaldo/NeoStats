@@ -302,7 +302,7 @@ static int ss_event_kick(CmdParams* cmdparams)
 
 int ss_event_ctcpversion(CmdParams* cmdparams)
 {
-	StatsAddCTCPVersion(cmdparams->av[1]);
+	StatsAddCTCPVersion(cmdparams->av[0]);
 	return 1;
 }
 
@@ -402,7 +402,7 @@ static int ss_clientversions(CmdParams* cmdparams)
 {
 	int num;
 
-	num = cmdparams->ac > 2 ? atoi(cmdparams->av[2]) : 10;
+	num = cmdparams->ac > 0 ? atoi(cmdparams->av[0]) : 10;
 	if (num < 10) {
 		num = 10;
 	}
@@ -416,7 +416,7 @@ static int ss_chans(CmdParams* cmdparams)
 	lnode_t *cn;
 	int i;
 
-	if (!cmdparams->av[2]) {
+	if (!cmdparams->av[0]) {
 		/* they want the top10 Channels online atm */
 		if (!list_is_sorted(Chead, topchan)) {
 			list_sort(Chead, topchan);
@@ -449,7 +449,7 @@ static int ss_chans(CmdParams* cmdparams)
 			}
 		}
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List.");
-	} else if (!ircstrcasecmp(cmdparams->av[2], "POP")) {
+	} else if (!ircstrcasecmp(cmdparams->av[0], "POP")) {
 		/* they want the top10 Popular Channels (based on joins) */
 		if (!list_is_sorted(Chead, topjoin)) {
 			list_sort(Chead, topjoin);
@@ -481,7 +481,7 @@ static int ss_chans(CmdParams* cmdparams)
 			}
 		}
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List.");
-	} else if (!ircstrcasecmp(cmdparams->av[2], "KICKS")) {
+	} else if (!ircstrcasecmp(cmdparams->av[0], "KICKS")) {
 		/* they want the top10 most unwelcome channels (based on kicks) */
 		if (!list_is_sorted(Chead, topkick)) {
 			list_sort(Chead, topkick);
@@ -515,7 +515,7 @@ static int ss_chans(CmdParams* cmdparams)
 			}
 		}
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List.");
-	} else if (!ircstrcasecmp(cmdparams->av[2], "TOPICS")) {
+	} else if (!ircstrcasecmp(cmdparams->av[0], "TOPICS")) {
 		/* they want the top10 most undecisive channels (based on topics) */
 		if (!list_is_sorted(Chead, toptopics)) {
 			list_sort(Chead, toptopics);
@@ -548,14 +548,14 @@ static int ss_chans(CmdParams* cmdparams)
 		}
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List.");
 	} else {
-		cs = findchanstats(cmdparams->av[2]);
+		cs = findchanstats(cmdparams->av[0]);
 		if (!cs) {
 			prefmsg(cmdparams->source.user->nick, ss_bot->nick,
-				"Error, Can't find any information about Channel %s", cmdparams->av[2]);
+				"Error, Can't find any information about Channel %s", cmdparams->av[0]);
 			return 0;
 		}
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "\2Channel Information for %s (%s)\2", 
-			cmdparams->av[2], (findchan(cmdparams->av[2]) ? "Online" : "Offline"));
+			cmdparams->av[0], (findchan(cmdparams->av[0]) ? "Online" : "Offline"));
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Current Members: %ld (Max %ld on %s)",
 			cs->members, cs->maxmems, sftime(cs->t_maxmems));
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick,
@@ -571,7 +571,7 @@ static int ss_chans(CmdParams* cmdparams)
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Total Kicks: %ld", cs->kicks);
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Total Kicks today %ld (Max %ld on %s)",
 			cs->maxkickstoday, cs->maxkicks, sftime(cs->t_maxkicks));
-		if (!findchan(cmdparams->av[2]))
+		if (!findchan(cmdparams->av[0]))
 			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Channel was last seen at %s",
 				sftime(cs->lastseen));
 	}
@@ -689,7 +689,7 @@ static int ss_server(CmdParams* cmdparams)
 	char *server;
 
 	SET_SEGV_LOCATION();
-	server = cmdparams->av[2];
+	server = cmdparams->av[0];
 	if (!server) {
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Server listing:");
 		hash_scan_begin(&hs, Shead);
@@ -783,13 +783,13 @@ static int ss_operlist(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	operlistaway = 0;
 	listindex = 0;
-	if (cmdparams->ac == 2) {
+	if (cmdparams->ac == 0) {
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Online IRCops:");
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "ID  %-15s %-15s %-10s", 
 			"Nick", "Server", "Level");
 	}
-	flags = cmdparams->av[2];
-	operlistserver = cmdparams->av[3];
+	flags = cmdparams->av[0];
+	operlistserver = cmdparams->av[1];
 	if (flags && !ircstrcasecmp(flags, "NOAWAY")) {
 		operlistaway = 1;
 		flags = NULL;
@@ -834,7 +834,7 @@ static int ss_stats(CmdParams* cmdparams)
 	hscan_t scan;
 
 	SET_SEGV_LOCATION();
-	if (!ircstrcasecmp(cmdparams->av[2], "LIST")) {
+	if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
 		int i = 1;
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Statistics Database:");
 		hash_scan_begin(&scan, Shead);
@@ -845,69 +845,69 @@ static int ss_stats(CmdParams* cmdparams)
 		}
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List.");
 		nlog(LOG_NOTICE, "%s requested STATS LIST.", cmdparams->source.user->nick);
-	} else if (!ircstrcasecmp(cmdparams->av[2], "DEL")) {
-		if (!cmdparams->av[3]) {
+	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
+		if (!cmdparams->av[1]) {
 			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Syntax: /msg %s STATS DEL <name>",
 				ss_bot->nick);
 			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "For additonal help, /msg %s HELP", 
 				ss_bot->nick);
 			return 0;
 		}
-		st = findserverstats(cmdparams->av[3]);
+		st = findserverstats(cmdparams->av[1]);
 		if (!st) {
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "%s is not in the database", cmdparams->av[3]);
+			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "%s is not in the database", cmdparams->av[1]);
 			return 0;
 		}
-		if (!findserver(cmdparams->av[3])) {
-			node = hash_lookup(Shead, cmdparams->av[3]);
+		if (!findserver(cmdparams->av[1])) {
+			node = hash_lookup(Shead, cmdparams->av[1]);
 			if (node) {
 				hash_delete(Shead, node);
 				st = hnode_get(node);
 				hnode_destroy(node);
 				free(st);
 				prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Removed %s from the database.",
-					cmdparams->av[3]);
-				nlog(LOG_NOTICE, "%s requested STATS DEL %s", cmdparams->source.user->nick, cmdparams->av[3]);
+					cmdparams->av[1]);
+				nlog(LOG_NOTICE, "%s requested STATS DEL %s", cmdparams->source.user->nick, cmdparams->av[1]);
 				return 0;
 			}
 		} else {
 			prefmsg(cmdparams->source.user->nick, ss_bot->nick, 
-				"Cannot remove %s from the database, it is online!!", cmdparams->av[3]);
+				"Cannot remove %s from the database, it is online!!", cmdparams->av[1]);
 			nlog(LOG_WARNING,
 			     "%s requested STATS DEL %s, but that server is online!!",
-			     cmdparams->source.user->nick, cmdparams->av[3]);
+			     cmdparams->source.user->nick, cmdparams->av[1]);
 				return 0;
 		}
 
-	} else if (!ircstrcasecmp(cmdparams->av[2], "COPY")) {
+	} else if (!ircstrcasecmp(cmdparams->av[0], "COPY")) {
 		Server *s;
 
-		if (!cmdparams->av[3] || !cmdparams->av[4]) {
+		if (!cmdparams->av[1] || !cmdparams->av[2]) {
 			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Syntax: /msg %s STATS COPY <name> "
 				" <newname>", ss_bot->nick);
 			return 0;
 		}
-		st = findserverstats(cmdparams->av[4]);
+		st = findserverstats(cmdparams->av[2]);
 		if (st)
 			free(st);
 
-		st = findserverstats(cmdparams->av[3]);
+		st = findserverstats(cmdparams->av[1]);
 		if (!st) {
 			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "%s is not in the database", 
-				cmdparams->av[3]);
+				cmdparams->av[1]);
 			return 0;
 		}
-		s = findserver(cmdparams->av[3]);
+		s = findserver(cmdparams->av[1]);
 		if (s) {
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Server %s is online!", cmdparams->av[3]);
+			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Server %s is online!", cmdparams->av[1]);
 			return 0;
 		}
 		s = NULL;
-		memcpy(st->name, cmdparams->av[4], sizeof(st->name));
+		memcpy(st->name, cmdparams->av[2], sizeof(st->name));
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Moved database entry for %s to %s", 
-			cmdparams->av[3], cmdparams->av[4]);
+			cmdparams->av[1], cmdparams->av[1]);
 		nlog(LOG_NOTICE, "%s requested STATS COPY %s -> %s", cmdparams->source.user->nick, 
-			cmdparams->av[3], cmdparams->av[4]);
+			cmdparams->av[1], cmdparams->av[2]);
 	} else {
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Invalid Argument.");
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "For help, /msg %s HELP", ss_bot->nick);
