@@ -335,6 +335,7 @@ int s_user_kill(char **av, int ac)
 		ss = findstats(who);
 		ss->serverkills = ss->serverkills + 1;
 	}
+	free(cmd);
 	return 1;
 }
 
@@ -371,7 +372,6 @@ int s_user_modes(char **av, int ac)
 	}
 	modes = av[1];
 	while (*modes) {
-		nlog(LOG_DEBUG1, LOG_MOD, "Checking %c mode", *modes);
 		switch (*modes) {
 		case '+':
 			add = 1;
@@ -412,8 +412,7 @@ int s_user_modes(char **av, int ac)
 			} else {
 				if (is_oper(u)) {
 					nlog(LOG_DEBUG1, LOG_MOD, "Decreasing OperCount for %s", u->server->name);
-					DecreaseOpers(findstats
-						      (u->server->name));
+					DecreaseOpers(s);
 				}
 			}
 			break;
@@ -650,12 +649,13 @@ SStats *findstats(char *name)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	nlog(LOG_DEBUG2, LOG_MOD, "findstats(%s)", name);
 
 	sn = hash_lookup(Shead, name);
 	if (sn) {
+		nlog(LOG_DEBUG2, LOG_MOD, "findstats(%s) - Found", name);
 		return hnode_get(sn);
 	} else {
+		nlog(LOG_DEBUG2, LOG_MOD, "findstats(%s) - NOT Found", name);
 		return NULL;
 	}
 }

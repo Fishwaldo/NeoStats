@@ -137,6 +137,7 @@ void LoadStats() {
 	if (GetTableData("ServerStats", &row) > 0) {
 		for (count = 0; row[count] != NULL; count++) {
 			s = malloc(sizeof(SStats));
+			bzero(s, sizeof(SStats));
 			name = strncpy(s->name, row[count], MAXHOST);
 			GetData((void *)&s->numsplits, CFGINT, "ServerStats", s->name, "Splits");
 			GetData((void *)&s->maxusers, CFGINT, "ServerStats", s->name, "MaxUsers");
@@ -148,6 +149,11 @@ void LoadStats() {
 			GetData((void *)&s->totusers, CFGINT, "ServerStats", s->name, "TotalUsers");
 			GetData((void *)&s->maxopers, CFGINT, "ServerStats", s->name, "MaxOpers");
 			GetData((void *)&s->t_maxopers, CFGINT, "ServerStats", s->name, "MaxOpersTime");
+			s->users = 0;
+			s->opers = 0;
+			s->daily_totusers = 0;
+			s->lowest_ping = s->highest_ping = s->daily_totusers = 0;
+
 			nlog(LOG_DEBUG1, LOG_MOD,
 			     "LoadStats(): Loaded statistics for %s", s->name);
 			sn = hnode_create(s);
