@@ -1,6 +1,5 @@
 include ../Makefile.inc
 
-
 default: all
 modules: all
 install:
@@ -11,8 +10,6 @@ install:
 		echo "<=== $(SDP)modules/$$i"; \
 	  fi; \
 	done
-
-
 
 all clean :: 
 	@for i in $(MODULES) ""; do \

@@ -326,7 +326,7 @@ src/signals.c -text
 src/signals.h -text
 src/sock.c eol=lf
 src/sock.h eol=lf
-src/sqlsrv/Makefile.in -text
+src/sqlsrv/Makefile -text
 src/sqlsrv/README -text
 src/sqlsrv/api.c -text
 src/sqlsrv/do_sql.c -text

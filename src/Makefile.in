@@ -5,17 +5,17 @@ NEOCFLAGS = $(CFLAGS)
 EXTRA_LDFLAGS = `curl/mycurl-config --libs`
 
 PCRE_OBJS = pcre/pcre.o pcre/get.o pcre/study.o
-ADNS_OBJS =	adns/check.o adns/event.o adns/general.o adns/parse.o adns/query.o \
-		adns/reply.o adns/setup.o adns/transmit.o adns/types.o
-KEEPER_OBJS = keeper/kp_cache.o keeper/kp_dir.o keeper/kp_enum.o keeper/kp_get.o \
-		keeper/kp_iface.o keeper/kp_recur.o keeper/kp_set.o keeper/kp_sort.o \
-		keeper/kp_util.o
+ADNS_OBJS =	adns/check.o adns/event.o adns/general.o adns/parse.o \
+		adns/query.o adns/reply.o adns/setup.o adns/transmit.o adns/types.o
+KEEPER_OBJS = keeper/kp_cache.o keeper/kp_dir.o keeper/kp_enum.o \
+		keeper/kp_get.o keeper/kp_iface.o keeper/kp_recur.o keeper/kp_set.o \
+		keeper/kp_sort.o keeper/kp_util.o
 PROTOCOL_OBJS = protocol/@PROTOCOL@.o
 OBJS = ${SRCS:.c=.o} 
-SRCS =	dns.c channels.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
-		users.c ns_help.c dl.c list.c hash.c servers.c keeper.c log.c misc.c \
-		support.c ircstring.c commands.c transfer.c exclude.c match.c bans.c \
-		bots.c modules.c auth.c signals.c
+SRCS =	dns.c channels.c dotconf.c services.c main.c sock.c conf.c ircd.c \
+		timer.c users.c ns_help.c dl.c list.c hash.c servers.c keeper.c log.c \
+		misc.c support.c ircstring.c commands.c transfer.c exclude.c match.c \
+		bans.c bots.c modules.c auth.c signals.c
 
 INCLUDES = config.h dl.h dotconf.h hash.h list.h neostats.h \
 		conf.h log.h support.h ircstring.h events.h numeric.h pcre.h \
@@ -28,7 +28,8 @@ BUILDFILES = *.in modules/Makefile modules/Makefile.inc.in
 DISTFILES = $(INCLUDES) $(COREINCS) $(SRCS) $(BUILDFILES) 
  
 DISTLIBS = neoprotocol libs sqlsrv
-DISTMOD = connectserv extauth hostserv loveserv moraleserv statserv template
+DISTMOD = connectserv extauth hostserv loveserv moraleserv statserv \
+		  template
 
 all: buildversion @buildsqlsrv@ libs neoprotocol neostats neomodules utils 
 
@@ -71,8 +72,10 @@ clean:
 	(cd pcre; $(MAKE) $@)
 	(cd curl; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
-	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc modules/Makefile.inc *.log *.a *.d *.exe version.h
-
+	$(RM) neostats *.o *.a *.d *.exe
+	$(RM) Makefile Makefile.inc modules/Makefile.inc 
+	$(RM) version.h config.h
+	
 distclean:
 	(cd modules; $(MAKE) $@)
 	(cd adns; $(MAKE) $@)
@@ -81,7 +84,9 @@ distclean:
 	(cd pcre; $(MAKE) $@)
 	(cd curl; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
-	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc modules/Makefile.inc *.log *.a *.d *.exe config.status version.h
+	$(RM) neostats *.o *.a *.d *.exe
+	$(RM) Makefile Makefile.inc modules/Makefile.inc 
+	$(RM) version.h config.h
 
 install: neostats
 	$(INSTALL_DATA) $(INCLUDES) @prefix@/include

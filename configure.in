@@ -519,7 +519,7 @@ AC_SUBST(EXTAUTH_SRC)
 AC_SUBST(EXTAUTH_OBJS)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
-AC_OUTPUT(src/Makefile.inc src/Makefile src/protocol/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile)
+AC_OUTPUT(src/Makefile.inc src/Makefile src/protocol/Makefile src/modules/Makefile.inc src/tools/Makefile)
 NEO_SUBDIR_CONFIG(src/curl, [--disable-thread --disable-ipv6 --enable-nonblocking --without-ssl])
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"

@@ -177,7 +177,7 @@ validate_channel (char* channel)
  */
 static int calc_cmd_ulevel(bot_cmd* cmd_ptr)
 {
-	if(cmd_ptr->ulevel > 200) {
+	if(cmd_ptr->ulevel > NS_ULEVEL_ROOT) {
 		/* int pointer rather than value */
 		return(*(int*)cmd_ptr->ulevel);
 	}

@@ -4,10 +4,12 @@ include src/Makefile.inc
 PROGS = src/neostats cronchk makeconf
 CONF = neostats.motd
 DOCS = doc/FAQ doc/USERMAN README BUGS AUTHORS COPYING CREDITS TODO \
-		ChangeLog doc/README.* src/modules/modules.txt RELNOTES INSTNOTES doc/old/*
+		ChangeLog doc/README.* src/modules/modules.txt RELNOTES INSTNOTES \
+		doc/old/*
 DOCS_PROGS = doc/read-faq doc/read-userman
 DATA = data/tlds.nfo
-BUILDFILES = configure config.sub config.guess *.in install-sh Config makeconf cronchk Makefile
+BUILDFILES = configure config.sub config.guess *.in install-sh Config \
+		makeconf cronchk Makefile
 
 DISTFILES = $(BUILDFILES) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF)	
 
@@ -17,9 +19,12 @@ all:
 	(cd src; $(MAKE) $@)
 
 clean:
+	$(RM) *.cache *.log 
 	(cd src; $(MAKE) $@)
 
 distclean:
+	$(RM) *.cache *.log 
+	$(RM) config.status
 	(cd src; $(MAKE) $@)
 
 install: 
@@ -67,4 +72,3 @@ dist:
 	@tar -czf $(DISTDIR).tar.gz $(DISTDIR)/*
 #	@$(RM) $(DISTDIR)
 	@echo "Tar file $(DISTDIR).tar.gz created. Freshmeat time!"
-
