@@ -503,6 +503,12 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 		}
 		if (userlevel >= curlevel) {
 			switch (curlevel) {
+				case 30:
+						curlevel = NS_ULEVEL_OPER;
+						lowlevel = 30;
+						curlevelmsg=NULL;
+						donemsg=0;
+						goto restartlevel;
 				case NS_ULEVEL_OPER:
 						curlevel = NS_ULEVEL_ADMIN;
 						lowlevel = NS_ULEVEL_OPER;
