@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.h,v 1.1 2000/02/03 23:46:04 fishwaldo Exp $
+** $Id: statserv.h,v 1.2 2000/02/05 04:54:00 fishwaldo Exp $
 */
 
 #ifndef STATSERV_H
@@ -18,7 +18,6 @@
 
 extern char s_StatServ[MAXNICK];
 
-typedef struct stats_ Stats;
 typedef struct tld_ TLD;
 typedef struct server_stats SStats;
 
@@ -46,20 +45,14 @@ struct StatServ {
 
 
 struct server_stats {
-	Server *next, *prev;
+	SStats *next, *prev;
 	char name[MAXHOST];
-	Stats *stats;
 	unsigned int users;
 	int opers;
 	int lowest_ping;
 	int highest_ping;
 	time_t t_lowest_ping;
 	time_t t_highest_ping;
-};
-
-struct stats_ {
-	Stats *next;
-	char name[MAXHOST];
 	int numsplits;
 	long maxusers;
 	time_t t_maxusers;
@@ -71,7 +64,6 @@ struct stats_ {
 	unsigned int serverkills;
 	long totusers;
 	long daily_totusers;
-
 };
 
 struct daily {
@@ -101,7 +93,7 @@ extern TLD *AddTLD(User *);
 extern void LoadTLD();
 extern void init_tld();
 extern void AddStats(SStats *);
-extern Stats *findstats(char *);
+extern SStats *findstats(char *);
 extern void SaveStats();
 extern void LoadStats();
 

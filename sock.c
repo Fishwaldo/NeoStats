@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.1 2000/02/03 23:45:55 fishwaldo Exp $
+** $Id: sock.c,v 1.2 2000/02/05 04:54:00 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -179,7 +179,7 @@ char *sftime(time_t stuff)
 {
 	struct tm *ltm = localtime(&stuff);
 
-	strftime(fmtime, 80, "[%b (%a %d) %I:%M [%p/%Z]]", ltm);
+	strftime(fmtime, 80, "[%b (%a %d) %Y  %I:%M [%p/%Z]]", ltm);
 
 	return fmtime;
 }

@@ -5,12 +5,12 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.c,v 1.1 2000/02/03 23:46:03 fishwaldo Exp $
+** $Id: stats.c,v 1.2 2000/02/05 04:54:00 fishwaldo Exp $
 */
 
 #include "statserv.h"
 
-/* Stats *shead; */
+SStats *Shead;
 TLD *tldhead;
 /* static Stats *new_stats(const char *); */
 
@@ -158,18 +158,22 @@ void AddStats(SStats *s)
 		st->lastseen = time(NULL);
 	}
 }
+*/
 
-Stats *findstats(char *name)
+SStats *findstats(char *name)
 {
-	Stats *t;
+	SStats *t;
 #ifdef DEBUG
 	log("findstats(%s)", name);
 #endif
-	for (t = shead; t; t = t->next)
+	for (t = Shead; t; t = t->next) {
 		if (!strcasecmp(name, t->name))
 			return t;
+	}
 	return NULL;
 }
+
+/*
 
 void SaveStats()
 {
@@ -199,11 +203,11 @@ void SaveStats()
 		stats_network.maxservers, stats_network.t_maxopers, stats_network.t_maxusers, stats_network.t_maxservers, stats_network.totusers);
 	fclose(fp);
 }
-
+*/
 void LoadStats()
 {
 	FILE *fp = fopen("data/nstats.db", "r");
-	Stats *s;
+	SStats *s;
 	char buf[BUFSIZE];
 	char *tmp;
 	char *name, *numsplits, *maxusers, *t_maxusers,
@@ -233,7 +237,7 @@ void LoadStats()
 
 	memset(buf, '\0', BUFSIZE);
 	while (fgets(buf, BUFSIZE, fp)) {
-		s = smalloc(sizeof(Stats));
+		s = smalloc(sizeof(SStats));
 		name = strtok(buf, " ");
 		numsplits = strtok(NULL, " ");
 		maxusers = strtok(NULL, " ");
@@ -266,14 +270,13 @@ void LoadStats()
 #ifdef DEBUG
 	log("LoadStats(): Loaded statistics for %s", s->name);
 #endif
-		if (!shead) {
-			shead = s;
-			shead->next = NULL;
+		if (!Shead) {
+			Shead = s;
+			Shead->next = NULL;
 		} else {
-			s->next = shead;
-			shead = s;
+			s->next = Shead;
+			Shead = s;
 		}
 	}
 	fclose(fp);
 }
-*/

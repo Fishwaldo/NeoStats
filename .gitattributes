@@ -23,6 +23,7 @@ dl/services/services.c -text
 dl/services/services.lo -text svneol=unset#unset
 dl/spam.c -text
 dl/statserv/build -text
+dl/statserv/m_stats.h -text
 dl/statserv/ss_help.c -text
 dl/statserv/stats.c -text
 dl/statserv/statserv.c -text
@@ -35,7 +36,6 @@ doc/read-userman -text
 /dotconf.c -text
 /dotconf.h -text
 /ircd.c -text
-/m_stats.h -text
 /main.c -text
 /ns_help.c -text
 /services.c -text

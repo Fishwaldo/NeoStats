@@ -4,10 +4,9 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.c,v 1.3 2000/02/05 02:51:50 fishwaldo Exp $
+** $Id: statserv.c,v 1.4 2000/02/05 04:54:00 fishwaldo Exp $
 */
 
-#include "stats.h"
 #include "statserv.h"
 #include "stats.c"
 #include "ss_help.c"
@@ -18,6 +17,7 @@ static void ss_tld(User *u, char *tld);
 static void ss_operlist(User *origuser, char *flags, char *server);
 static void ss_botlist(User *origuser);
 static void ss_version(User *u);
+static void ss_server(User *u, char *server);
 static int Online(Server *);
 static int pong(char *);
 static void ss_cb_Config(char *, int);
@@ -73,6 +73,7 @@ void _init() {
 	
 	LoadTLD();
 	init_tld();
+	LoadStats();
 
 }
 
@@ -100,6 +101,8 @@ int Online(Server *s) {
    } else {
 	   init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+Sd", Statserv_Info[0].module_name);
    }
+
+
    return 1;
    
 }
@@ -179,11 +182,10 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 		else
 			privmsg(u->nick, s_StatServ, "Unknown Help Topic: \2%s\2",
 				coreLine);
-/*	} else if (!strcasecmp(cmd, "SERVER")) {
+	} else if (!strcasecmp(cmd, "SERVER")) {
 		cmd = strtok(NULL, " ");
 		ss_server(u, cmd);
 		notice(s_StatServ,"%s Wanted Server Information on %s",u->nick, cmd);
-*/
 	} else if (!strcasecmp(cmd, "JOIN")) {
 		cmd = strtok(NULL, " ");
 		ss_JOIN(u, cmd);
@@ -245,7 +247,54 @@ static void ss_version(User *u)
 }
 
 
+static void ss_server(User *u, char *server) {
 
+	SStats *ss;
+	Server *s;
+	if (!server) {
+		privmsg(u->nick, s_StatServ, "Error, the Syntax is Incorrect. Please Specify a Server");
+		privmsg(u->nick, s_StatServ, "Server Listing:");
+		for (ss = Shead; ss; ss = ss->next) {
+			log("test");
+			if (findserver(ss->name)) {
+				log("found");
+				privmsg(u->nick, s_StatServ, "Server: %s (*)", ss->name);
+			} else {
+				log("notfound");
+				privmsg(u->nick, s_StatServ, "Server: %s",ss->name);
+			}
+		}		
+		privmsg(u->nick, s_StatServ, "***** End of List (* indicates Server is online at the moment) *****");		
+		return;
+	}
+	/* ok, found the Server, lets do some Statistics work now ! */
+	ss = findstats(server);
+	s=findserver(server);
+	if (!ss) {
+		log("Wups, Problem, Cant find Server Statistics for Server %s", server);
+		privmsg(u->nick, s_StatServ, "Internal Error! Please Consult the Log file");
+		return;
+	}
+	privmsg(u->nick, s_StatServ, "Statistics for %s since %s", ss->name, sftime(ss->starttime));
+	if (!s) privmsg(u->nick, s_StatServ, "Server Last Seen: %s", sftime(ss->lastseen));
+	/* if (s) privmsg(u->nick, s_StatServ, "Current Users %-3ld (%s.0f%%)", ss->users, (float)ss->users / (float)me.users * 100); */
+	privmsg(u->nick, s_StatServ, "Maximum Users: %-3ld at %s", ss->maxusers, sftime(ss->t_maxusers));
+	if (s) privmsg(u->nick, s_StatServ, "Current Opers: %-3ld", ss->opers);
+	privmsg(u->nick, s_StatServ, "Maximum Opers: %-3ld at %s", ss->maxopers, sftime(ss->t_maxopers));
+	privmsg(u->nick, s_StatServ, "IRCop Kills: %d", ss->operkills);
+	privmsg(u->nick, s_StatServ, "Server Kills: %d", ss->serverkills);
+	privmsg(u->nick, s_StatServ, "Lowest Ping: %-3d at %s", ss->lowest_ping, sftime(ss->t_lowest_ping));
+	privmsg(u->nick, s_StatServ, "Higest Ping: %-3d at %s", ss->highest_ping, sftime(ss->t_highest_ping));
+	if (s) privmsg(u->nick, s_StatServ, "Current Ping: %-3d", s->ping);
+	if (ss->numsplits >= 1) 
+		privmsg(u->nick, s_StatServ, "%s has Split from the network %d time%s", ss->name, ss->numsplits, (ss->numsplits == 1) ? "" : "s");
+	else
+		privmsg(u->nick, s_StatServ, "%s has never split from the Network.", ss->name);
+	privmsg(u->nick, s_StatServ, "***** End of Statistics *****");	
+
+
+
+}
 static void ss_tld(User *u, char *tld)
 {
 	TLD *tmp;

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: m_stats.h,v 1.1 2000/02/03 23:45:54 fishwaldo Exp $
+** $Id: m_stats.h,v 1.1 2000/02/05 04:54:00 fishwaldo Exp $
 */
 
 #ifndef M_STATS_H

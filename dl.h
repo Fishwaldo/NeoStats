@@ -11,6 +11,10 @@
 #include <string.h>
 #include <time.h>
 
+extern char *sftime(time_t);
+
+
+
 struct mod_timer_list {
 	struct mod_timer_list *prev;
 	struct mod_timer_list *next;
