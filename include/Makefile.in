@@ -165,7 +165,7 @@ noinst_HEADERS = commands.h  dns.h servers.h users.h conf.h \
 						bans.h base64.h ctcp.h ircd.h ns_help.h support.h \
 						bots.h dcc.h ircstring.h numeric.h timer.h \
 						channels.h dl.h lang.h rtaserv.h transfer.h \
-						modexcludes.h
+						modexclude.h
 
 subdir = include
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
