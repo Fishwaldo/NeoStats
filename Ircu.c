@@ -395,7 +395,7 @@ send_kill (const char *from, const char *target, const char *reason)
 void 
 send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
 {
-	send_cmd ("%s %s %s %s %lu", nicktobase64 (oldnick), TOK_NICK, newnick, newnick, ts);
+	send_cmd ("%s %s %s %lu", nicktobase64 (oldnick), TOK_NICK, newnick, ts);
 }
 
 void
@@ -441,7 +441,8 @@ send_end_of_burst(void)
 void 
 send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
-	send_cmd ("%s %s * +%s@%s %lu %lu :%s", neostatsbase64, TOK_GLINE, ident, host, (ts + length), ts, reason);
+	send_cmd ("%s %s * +%s@%s %lu :%s", neostatsbase64, TOK_GLINE, ident, host, length, reason);
+
 }
 
 void 
