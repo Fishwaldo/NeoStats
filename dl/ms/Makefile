@@ -4,7 +4,7 @@ INCLUDES = -I../.. -I../../adns
 
 SOURCES= ms.c
 OBJECTS= ms.o
-TARGET= ms.so
+TARGET= moraleserv.so
 DISTFILES = $(SOURCES) Makefile ChangeLog ms_help.c
 all:	ms
 
