@@ -530,7 +530,80 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 		nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);
 	}
 #endif
+	/* Send to modules */
+	ModuleFunction (cmdptr, cmd, origin, av, ac);
 }
+
+/** @brief process privmsg
+ *
+ * 
+ *
+ * @return none
+ */
+static void
+m_privmsg (int cmdptr, char *cmd, char* origin, char **av, int ac)
+{
+	User *u;
+	ModUser *mod_usr;
+
+	/* its a privmsg, now lets see who too... */
+	if (strstr (av[0], "!")) {
+		strlcpy (cmd, av[0], 64);
+		av[0] = strtok (cmd, "!");
+	} else if (strstr (av[0], "@")) {
+		strlcpy (cmd, av[0], 64);
+		av[0] = strtok (cmd, "@");
+	}
+	if (!strcasecmp (s_Services, av[0])) {
+		if (flood (finduser (origin))) {
+			return;
+		}
+		/* its to the Internal Services Bot */
+		servicesbot (origin, av, ac);
+		SET_SEGV_LOCATION();
+		return;
+	} else {
+		mod_usr = findbot (av[0]);
+		/* Check to see if any of the Modules have this nick Registered */
+		if (mod_usr) {
+			nlog (LOG_DEBUG1, LOG_CORE, "nicks: %s", mod_usr->nick);
+			if (flood (finduser (origin))) {
+				return;
+			}
+
+			/* Check command length */
+			if (strnlen (av[1], MAX_CMD_LINE_LENGTH) >= MAX_CMD_LINE_LENGTH) {
+				prefmsg (origin, s_Services, "command line too long!");
+				notice (s_Services, "%s tried to send a very LARGE command, we told them to shove it!", origin);
+				return;
+			}
+
+			SET_SEGV_LOCATION();
+			SET_SEGV_INMODULE(mod_usr->modname);
+			if (setjmp (sigvbuf) == 0) {
+				if(mod_usr->function) {
+					mod_usr->function (origin, av, ac);
+				}
+				else {
+					u = finduser (origin);
+					if (!u) {
+						nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", origin, mod_usr->nick);
+						return;
+					}
+					run_bot_cmd(mod_usr, u, av, ac);
+				}
+			}
+			CLEAR_SEGV_INMODULE();
+			SET_SEGV_LOCATION();
+			return;
+		} else {
+			bot_chan_message (origin, av, ac);
+			return;
+		}
+	}
+	return;
+}
+
 
 /** @brief parse
  *
@@ -541,12 +614,10 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 void
 parse (char *line)
 {
-	User *u;
 	char origin[64], cmd[64], *coreLine;
 	int cmdptr = 0;
 	int ac;
 	char **av;
-	ModUser *mod_usr;
 
 	SET_SEGV_LOCATION();
 	strip (line);
@@ -595,82 +666,17 @@ parse (char *line)
 	}
 
 #else 
-	strlcpy (cmd, line, sizeof (cmd));
-
+	strlcpy (cmd, line, sizeof (cmd)); 
 	ac = split_buf (coreLine, &av, 1);
 #endif
 
-	/* First, check if its a privmsg, and if so, handle it in the correct Function */
+	/* If a privmsg, handle it internally */
 	if( is_privmsg(cmd) ) {
-		/* its a privmsg, now lets see who too... */
-		if (strstr (av[0], "!")) {
-			strlcpy (cmd, av[0], 64);
-			av[0] = strtok (cmd, "!");
-		} else if (strstr (av[0], "@")) {
-			strlcpy (cmd, av[0], 64);
-			av[0] = strtok (cmd, "@");
-		}
-		if (!strcasecmp (s_Services, av[0])) {
-			if (flood (finduser (origin))) {
-				free (av);
-				return;
-			}
-			/* its to the Internal Services Bot */
-			servicesbot (origin, av, ac);
-			SET_SEGV_LOCATION();
-			free (av);
-			return;
-		} else {
-			mod_usr = findbot (av[0]);
-			/* Check to see if any of the Modules have this nick Registered */
-			if (mod_usr) {
-				nlog (LOG_DEBUG1, LOG_CORE, "nicks: %s", mod_usr->nick);
-				if (flood (finduser (origin))) {
-					free (av);
-					return;
-				}
-
-				/* Check to make sure there are no blank spaces so we dont crash */
-				/* Use strnlen so long lines do not just DOS the server by tying us up
-				   in strlen */
-				if (strnlen (av[1], MAX_CMD_LINE_LENGTH) >= MAX_CMD_LINE_LENGTH) {
-					prefmsg (origin, s_Services, "command line too long!");
-					notice (s_Services, "%s tried to send a very LARGE command, we told them to shove it!", origin);
-					free (av);
-					return;
-				}
-
-				SET_SEGV_LOCATION();
-				SET_SEGV_INMODULE(mod_usr->modname);
-				if (setjmp (sigvbuf) == 0) {
-					if(mod_usr->function) {
-						mod_usr->function (origin, av, ac);
-					}
-					else {
-						u = finduser (origin);
-						if (!u) {
-							nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", origin, mod_usr->nick);
-							return;
-						}
-						run_bot_cmd(mod_usr, u, av, ac);
-					}
-				}
-				CLEAR_SEGV_INMODULE();
-				SET_SEGV_LOCATION();
-				free (av);
-				return;
-			} else {
-				bot_chan_message (origin, av, ac);
-				free (av);
-				return;
-			}
-		}
+		m_privmsg (cmdptr, cmd, origin, av, ac);
+	} else {
+		/* send on the command for processing */
+		process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	}
-
-	/* now, Parse the Command to the Internal Functions... */
-	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	/* K, now Parse it to the Module functions */
-	ModuleFunction (cmdptr, cmd, origin, av, ac);
 	free (av);
 }
 
