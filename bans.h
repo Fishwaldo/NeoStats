@@ -24,5 +24,7 @@
 #ifndef _BANS_H_
 #define _BANS_H_
 
+int InitBans (void);
+void FreeBans (void);
 
 #endif /* _BANS_H_ */

@@ -112,11 +112,14 @@ UserModes user_umodes[] = {
 	{UMODE_OPER,		'o', NS_ULEVEL_ADMIN},
 	{UMODE_LOCOP,		'O', NS_ULEVEL_OPER},
 	{UMODE_INVISIBLE,	'i', 0},
-	{UMODE_WALLOP,	'w', 0},
+	{UMODE_WALLOP,		'w', 0},
 	{UMODE_SERVNOTICE,	's', 0},
 	{UMODE_DEAF,		'd', 0},
-	{UMODE_CHSERV,	'k', 0},
-	{UMODE_HELPER,	'h', 0},
+	{UMODE_CHSERV,		'k', 0},
+	{UMODE_ACCOUNT,     'r', 0},
+	{UMODE_HIDDENHOST,  'x', 0},
+	/* Afternet extension */
+	{UMODE_HELPER,		'h', 0},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));

@@ -219,6 +219,7 @@ UserAway (const char *nick, const char *awaymsg)
 
 	u = finduser (nick);
 	if (u) {
+		strlcpy(u->awaymsg, awaymsg, MAXHOST);
 		AddStringToList (&av, u->nick, &ac);
 		if ((u->is_away == 1) && (!awaymsg)) {
 			u->is_away = 0;

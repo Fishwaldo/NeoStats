@@ -178,6 +178,8 @@ main (int argc, char *argv[])
 		return EXIT_FAILURE;
 	if(init_chan_hash () != NS_SUCCESS)
 		return EXIT_FAILURE;
+	if(InitBans () != NS_SUCCESS)
+		return EXIT_FAILURE;	
 	/* initilize out transfer subsystem */
 	if (init_curl () != NS_SUCCESS)
 		return EXIT_FAILURE;
@@ -582,6 +584,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		/* now free up the users and servers memory */
 		FreeUsers();
 		FreeServers();
+		FreeBans();
 		fini_adns();
 		finiModuleHash();
 	}
@@ -589,9 +592,6 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 	kp_flush();
 	kp_exit();
 	fini_logs ();
-
-
-
 
 	if ((exitcode == NS_EXIT_RECONNECT && me.r_time > 0) || exitcode == NS_EXIT_RELOAD) {
 		execve ("./neostats", NULL, NULL);
