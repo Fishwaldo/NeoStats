@@ -27,7 +27,6 @@
  * You can copy this file as a template for writing your own modules
  */
 
-#include <stdio.h>
 #include "neostats.h"	/* Neostats API */
 
 /** 
