@@ -5,4 +5,5 @@ NeoStats - TODO Log:
 Shmad:
 ------
 
+- Horrible crash bug when trying to delete statservs own stats for itself as a server
 - Just Bug fixes right now.
