@@ -417,8 +417,8 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 
 /* services.c */
 int init_services();
-int add_services_cmd(const char *cmd, bot_cmd_handler handler, int minparams, int ulevel, const char** helptext, const char* onelinehelp);
-int del_services_cmd(const char *cmd);
+int add_services_cmd(bot_cmd* cmd);
+int del_services_cmd(bot_cmd* cmd);
 int add_services_cmd_list(bot_cmd* cmd_list);
 int del_services_cmd_list(bot_cmd* cmd_list);
 

@@ -76,14 +76,12 @@ struct srconf {
 	int auth;
 } srconf;
 
-struct users {
+typedef struct users {
 	char nick[MAXNICK];
 	char ident[MAXUSER];
 	char host[MAXHOST];
 	int lvl;
 } users;
-
-
 
 int new_m_version(char *origin, char **av, int ac)
 {
@@ -105,20 +103,21 @@ int __ModInit(int modnum, int apiver)
 		     "ServiceRoots: ehh, config failed");
 		/* we can't unload the extauth module so don't return -1 */
 	}
-	add_services_cmd("SRLIST", ext_auth_list, 0, NS_ULEVEL_OPER, sr_help_list, sr_help_list_oneline);
+	add_services_cmd_list(extauth_commands);
 	return 1;
 }
 
 void __ModFini()
 {
 	lnode_t *un;
+
 	un = list_first(srconf.ul);
 	while (un) {
 		free(lnode_get(un));
 		un = list_next(srconf.ul, un);
 	}
 	list_destroy_nodes(srconf.ul);
-	del_services_cmd("SRLIST");
+	del_services_cmd_list(extauth_commands);
 }
 
 void sr_cb_config(char *arg, int configtype)
@@ -127,7 +126,7 @@ void sr_cb_config(char *arg, int configtype)
 	char *nick;
 	char *user;
 	char *host;
-	struct users *sru;
+	users *sru;
 
 	SET_SEGV_LOCATION();
 	if (configtype == 0) {
@@ -168,10 +167,12 @@ void sr_cb_config(char *arg, int configtype)
 	}
 }
 
-extern int __do_auth(User * u, int curlvl)
+int __do_auth(User * u, int curlvl)
 {
 	lnode_t *un;
-	struct users *sru;
+	users *sru;
+
+	SET_SEGV_LOCATION();
 	un = list_first(srconf.ul);
 	while (un) {
 		sru = lnode_get(un);
@@ -185,11 +186,12 @@ extern int __do_auth(User * u, int curlvl)
 	return curlvl;
 }
 
-extern int __list_auth(User * u)
+int __list_auth(User * u)
 {
-
 	lnode_t *un;
-	struct users *sru;
+	users *sru;
+
+	SET_SEGV_LOCATION();
 	un = list_first(srconf.ul);
 	while (un) {
 		sru = lnode_get(un);
@@ -200,9 +202,9 @@ extern int __list_auth(User * u)
 	return 1;
 }
 
-extern void ext_auth_list(User *u, char **av, int ac) {
+void ext_auth_list(User *u, char **av, int ac) {
 	lnode_t *un;
-	struct users *sru;
+	users *sru;
 	
 	SET_SEGV_LOCATION();
 	un = list_first(srconf.ul);

@@ -107,44 +107,24 @@ init_services()
 }
 	
 int 
-add_services_cmd(const char *cmd, bot_cmd_handler handler, int minparams, int ulevel, const char** helptext, const char* onelinehelp) 
+add_services_cmd(bot_cmd* cmd_ptr) 
 {
-	bot_cmd *cmd_ptr;
 	hnode_t *cmdnode;
-	
-	cmd_ptr = malloc(sizeof(bot_cmd));
-	cmd_ptr->cmd = cmd;
-	cmd_ptr->handler = handler;
-	cmd_ptr->minparams = minparams;
-	cmd_ptr->ulevel = ulevel;
-	cmd_ptr->helptext = helptext;
-	cmd_ptr->internal = 0;
-	cmd_ptr->onelinehelp = onelinehelp;
 	
 	cmdnode = hnode_create(cmd_ptr);
 	hash_insert(botcmds, cmdnode, cmd_ptr->cmd);
-	nlog(LOG_DEBUG2, LOG_CORE, "Added a new command %s to Services Bot", cmd);
+	nlog(LOG_DEBUG2, LOG_CORE, "Added a new command %s to Services Bot", cmd_ptr->cmd);
 	return 1;
 }
 
 int 
 add_services_cmd_list(bot_cmd* cmd_list) 
 {
-	bot_cmd *cmd_ptr;
 	hnode_t *cmdnode;
 	
 	while(cmd_list->cmd) {
-		cmd_ptr = malloc(sizeof(bot_cmd));
-		cmd_ptr->cmd = cmd_list->cmd;
-		cmd_ptr->handler = cmd_list->handler;
-		cmd_ptr->minparams = cmd_list->minparams;
-		cmd_ptr->ulevel = cmd_list->ulevel;
-		cmd_ptr->helptext = cmd_list->helptext;
-		cmd_ptr->internal = 0;
-		cmd_ptr->onelinehelp = cmd_list->onelinehelp;
-		
-		cmdnode = hnode_create(cmd_ptr);
-		hash_insert(botcmds, cmdnode, cmd_ptr->cmd);
+		cmdnode = hnode_create(cmd_list);
+		hash_insert(botcmds, cmdnode, cmd_list->cmd);
 		nlog(LOG_DEBUG2, LOG_CORE, "Added a new command %s to Services Bot", cmd_list->cmd);
 		cmd_list++;
 	}
@@ -152,20 +132,15 @@ add_services_cmd_list(bot_cmd* cmd_list)
 }
 
 int 
-del_services_cmd(const char *cmd) 
+del_services_cmd(bot_cmd* cmd_ptr) 
 {
-	bot_cmd *cmd_ptr;
 	hnode_t *cmdnode;
 	
-	cmdnode = hash_lookup(botcmds, cmd);
+	cmdnode = hash_lookup(botcmds, cmd_ptr->cmd);
 	if (cmdnode) {
 		hash_delete(botcmds, cmdnode);
 		cmd_ptr = hnode_get(cmdnode);
 		hnode_destroy(cmdnode);
-		/* free if its a external (malloc'd) command */
-		if (cmd_ptr->internal == 0) {
-			free(cmd_ptr);
-		}
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -174,19 +149,13 @@ del_services_cmd(const char *cmd)
 int 
 del_services_cmd_list(bot_cmd* cmd_list) 
 {
-	bot_cmd *cmd_ptr;
 	hnode_t *cmdnode;
 	
 	while(cmd_list->cmd) {
 		cmdnode = hash_lookup(botcmds, cmd_list->cmd);
 		if (cmdnode) {
 			hash_delete(botcmds, cmdnode);
-			cmd_ptr = hnode_get(cmdnode);
 			hnode_destroy(cmdnode);
-			/* free if its a external (malloc'd) command */
-			if (cmd_ptr->internal == 0) {
-				free(cmd_ptr);
-			}
 		}
 		cmd_list++;
 	}
