@@ -26,6 +26,7 @@
 */
 
 #include "stats.h"
+#include "ircd.h"
 #include "hash.h"
 #include "dl.h"
 #include "log.h"
@@ -301,7 +302,7 @@ UserLevel (User * u)
 #endif
 
 	
-	for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
+	for (i = 0; i < ircd_srv.umodecount; i++) {
 		if (u->Umode & usr_mds[i].umodes) {
 			if (usr_mds[i].level > tmplvl)
 				tmplvl = usr_mds[i].level;
@@ -311,7 +312,7 @@ UserLevel (User * u)
 
 /* I hate SMODEs damn it */
 #ifdef GOTUSERSMODES
-	for (i = 0; i < ((sizeof (susr_mds) / sizeof (susr_mds[0])) - 1); i++) {
+	for (i = 0; i < ircd_srv.usmodecount; i++) {
 		if (u->Smode & susr_mds[i].umodes) {
 			if (susr_mds[i].level > tmplvl)
 				tmplvl = susr_mds[i].level;
@@ -385,7 +386,7 @@ UserMode (const char *nick, const char *modes)
 			add = 0;
 			break;
 		default:
-			for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
+			for (i = 0; i < ircd_srv.umodecount; i++) {
 				if (usr_mds[i].mode == tmpmode) {
 					if (add) {
 						u->Umode |= usr_mds[i].umodes;
@@ -442,7 +443,7 @@ UserSMode (const char *nick, const char *modes)
 			add = 0;
 			break;
 		default:
-			for (i = 0; i < ((sizeof (susr_mds) / sizeof (susr_mds[0])) - 1); i++) {
+			for (i = 0; i < ircd_srv.usmodecount; i++) {
 				if (susr_mds[i].mode == tmpmode) {
 					if (add) {
 						u->Smode |= susr_mds[i].umodes;

@@ -40,6 +40,17 @@ typedef struct aCtab{
 	char sjoin;
 } aCtab;
 
+typedef struct {
+	unsigned long umodes;
+	char mode;
+	int level;
+} Oper_Modes;
+
+extern Oper_Modes usr_mds[];
+#ifdef GOTUSERSMODES
+extern Oper_Modes susr_mds[];
+#endif
+
 extern IntCommands cmd_list[];
 extern aCtab cFlagTab[33];
 
@@ -52,5 +63,6 @@ void ns_usr_pong (char *origin, char **argv, int argc);
 
 /* Defined in ircd specific files but common to all */
 int SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode);
+void init_ircd (void);
 
 #endif

@@ -205,6 +205,7 @@ init_ircd ()
 {
 	/* count the number of commands */
 	ircd_srv.cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])) - 1);
+	ircd_srv.umodecount = ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1);
 };
 
 int
@@ -289,7 +290,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 	char newmode[20];
 	newmode[0] = '+';
 	j = 1;
-	for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
+	for (i = 0; i < ircd_srv.umodecount; i++) {
 		if (mode & usr_mds[i].umodes) {
 			newmode[j] = usr_mds[i].mode;
 			j++;
@@ -317,7 +318,7 @@ sumode_cmd (const char *who, const char *target, long mode)
 	char newmode[20];
 	newmode[0] = '+';
 	j = 1;
-	for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
+	for (i = 0; i < ircd_srv.umodecount; i++) {
 		if (mode & usr_mds[i].umodes) {
 			newmode[j] = usr_mds[i].mode;
 			j++;

@@ -28,6 +28,7 @@
 #include <setjmp.h>
 #include <stdio.h>
 #include "stats.h"
+#include "ircd.h"
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #endif

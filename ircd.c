@@ -56,7 +56,7 @@ init_bot_modes (const char *modes)
 			add = 0;
 			break;
 		default:
-			for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
+			for (i = 0; i < ircd_srv.umodecount; i++) {
 				if (usr_mds[i].mode == tmpmode) {
 					if (add) {
 						Umode |= usr_mds[i].umodes;
@@ -666,7 +666,7 @@ ns_usr_stats (char *origin, char **argv, int argc)
 		tmp = me.now - me.lastmsg;
 		tmp2 = me.now - me.t_start;
 		snumeric_cmd (RPL_STATSLINKINFO, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
-		snumeric_cmd (RPL_STATSLLINE, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes, me.RcveM, me.RcveBytes, tmp2, tmp);
+		snumeric_cmd (RPL_STATSLLINE, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, (int)me.SendM, (int)me.SendBytes, (int)me.RcveM, (int)me.RcveBytes, (int)tmp2, (int)tmp);
 	} else if (!strcasecmp (what, "M")) {
 		for (i = 0; i < ircd_srv.cmdcount; i++) {
 			if (cmd_list[i].usage > 0)

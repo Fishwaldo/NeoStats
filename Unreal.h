@@ -726,51 +726,7 @@ struct ircd_srv_ {
 	int uprot;
 	char cloak[10];
 	int cmdcount;
+	int umodecount;
 } ircd_srv;
-
-typedef struct {
-	unsigned long umodes;
-	char mode;
-	int level;
-} Oper_Modes;
-
-Oper_Modes usr_mds[27];
-
-/* function declarations */
-extern void init_ircd ();
-extern void chanalert (char * who, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-extern int sserver_cmd (const char *, const int numeric, const char *);
-extern int slogin_cmd (const char *, const int numeric, const char *, const char *);
-extern int ssquit_cmd (const char *);
-extern int sprotocol_cmd (const char *);
-extern int squit_cmd (const char *, const char *);
-extern int spart_cmd (const char *, const char *);
-extern int sjoin_cmd (const char *, const char *);
-extern int schmode_cmd (const char *, const char *, const char *, const char *);
-extern int snewnick_cmd (const char *, const char *, const char *, const char *);
-extern int sping_cmd (const char *from, const char *reply, const char *to);
-extern int sumode_cmd (const char *who, const char *target, long mode);
-extern int snumeric_cmd (const int numeric, const char *target, const char *data, ...);
-extern int spong_cmd (const char *reply);
-extern int snetinfo_cmd ();
-extern int skill_cmd (const char *from, const char *target, const char *reason, ...);
-extern int ssvskill_cmd (const char *who, const char *reason, ...);
-extern int ssmo_cmd (const char *from, const char *umodetarget, const char *msg);
-extern int snick_cmd (const char *oldnick, const char *newnick);
-extern int sswhois_cmd (const char *target, const char *swhois);
-extern int ssvsnick_cmd (const char *target, const char *newnick);
-extern int ssvsjoin_cmd (const char *target, const char *chan);
-extern int ssvspart_cmd (const char *target, const char *chan);
-extern int ssvshost_cmd (const char *who, const char *vhost);
-extern int skick_cmd (const char *who, const char *target, const char *chan, const char *reason);
-extern int swallops_cmd (const char *who, const char *msg, ...);
-extern int ssvsmode_cmd (const char *target, const char *modes);
-extern int ssvshost_cmd (const char *who, const char *vhost);
-extern int ssvskill_cmd (const char *target, const char *reason, ...);
-extern int sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...);
-extern int srakill_cmd (const char *host, const char *ident);
-extern int sinvite_cmd (const char *from, const char *to, const char *chan);
-
-
 
 #endif /* UNREAL_H Define */
