@@ -261,18 +261,13 @@ send_part (const char *who, const char *chan)
 	send_cmd (":%s %s %s", who, (ircd_srv.token ? TOK_PART : MSG_PART), chan);
 }
 
+void 
+send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
+{
 #ifdef ULTIMATE3
-void 
-send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
-{
 	send_cmd (":%s %s %lu %s + :%c%s", sender, MSG_SJOIN, ts, chan, flag, who);
-}
-#else
-void 
-send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
-{
-}
 #endif
+}
 
 void 
 send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
