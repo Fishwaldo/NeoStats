@@ -298,4 +298,18 @@ char *strlower(char *s)
 	}
 return t;
 }
-
+void AddStringToList(char ***List,char S[],int *C)
+{
+	if (*C == 0) {
+		*List = calloc(sizeof(char *) * 8, 1);
+	}
+	++*C;
+	(*List)[*C-1] = S;
+}
+                            
+                            
+void FreeList(char **List,int C)
+{
+//free(List);
+}
+                                          

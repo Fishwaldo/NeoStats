@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.25 2002/06/21 07:06:13 fishwaldo Exp $
+** $Id: chans.c,v 1.26 2002/07/04 11:02:27 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -24,11 +24,16 @@ void init_chan_hash()
 }
 
 extern void Change_Topic(char *owner, Chans *c, time_t time, char *topic) {
-
+	char **av;
+	int ac = 0;
 	strncpy(c->topic, topic, BUFSIZE);
 	strncpy(c->topicowner, owner, BUFSIZE);
 	c->topictime = time;
-	Module_Event("TOPICCHANGE", c);
+	AddStringToList(&av, c->name, &ac);
+	AddStringToList(&av, owner, &ac);
+	AddStringToList(&av, topic, &ac);
+	Module_Event("TOPICCHANGE",av, ac);
+	FreeList(av, ac);
 }
 
 int comparemode(const void *v, const void *mode) {
@@ -49,7 +54,6 @@ int ChanMode(char *origin, char **av, int ac) {
 	Chans *c;
 	ModesParm *m;
 	lnode_t *mn;
-
 	c = findchan(av[0]);
 	if (!c) {
 		return 0;
@@ -182,6 +186,8 @@ void del_chan(Chans *c) {
 void part_chan(User *u, char *chan) {
 	Chans *c;
 	lnode_t *un;
+	char **av;
+	int ac = 0;
 	strcpy(segv_location, "part_chan");
 #ifdef DEBUG
 	log("Parting %s from %s", u->nick, chan);
@@ -210,14 +216,19 @@ void part_chan(User *u, char *chan) {
 			}
 		} else {
 			lnode_destroy(list_delete(c->chanmembers, un));
-			Module_Event("PARTCHAN", c);
+			AddStringToList(&av, c->name, &ac);
+			AddStringToList(&av, u->nick, &ac);
+			Module_Event("PARTCHAN", av, ac);
+			FreeList(av, ac);
 			c->cur_users--;
 		}
 #ifdef DEBUG
 		log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
 #endif
 		if (c->cur_users <= 0) {
-			Module_Event("DELCHAN", c);
+			AddStringToList(&av, c->name, &ac);
+			Module_Event("DELCHAN", av, ac);
+			FreeList(av, ac);
 			del_chan(c);
 		}
 		un = list_find(u->chans, c->name, comparef);
@@ -263,12 +274,13 @@ void join_chan(User *u, char *chan) {
 	Chans *c;
 	lnode_t *un, *cn;
 	Chanmem *cm;
+	char **av;
+	int ac = 0;
 	strcpy(segv_location, "join_chan");
 	if (!u) {
 		log("ehhh, Joining a Unknown user to %s: %s", chan, recbuf);
 		return;
 	} 
-		
 	c = findchan(chan);
 	if (!c) {
 		/* its a new Channel */
@@ -280,7 +292,10 @@ void join_chan(User *u, char *chan) {
 		c->modeparms = list_create(MAXMODES);
 		c->cur_users =0;
 		c->topictime = 0;
-		Module_Event("NEWCHAN", c);
+		c->modes = 0;
+		AddStringToList(&av, c->name, &ac);
+		Module_Event("NEWCHAN", av, ac);
+		FreeList(av, ac);
 	} 
 	/* add this users details to the channel members hash */	
 	cm = smalloc(sizeof(Chanmem));
@@ -307,12 +322,16 @@ void join_chan(User *u, char *chan) {
 	}
 	c->cur_users++;
 	un = lnode_create(c->name);
-	if (list_isfull(c->chanmembers)) {
+	if (list_isfull(u->chans)) {
 		log("eek, User %s members list is full", u->nick);
 	} else {
 		list_append(u->chans, un); 
-	Module_Event("JOINCHAN", c);
 	}
+	chandump(NULL);
+	AddStringToList(&av, c->name, &ac);
+	AddStringToList(&av, u->nick, &ac);
+	Module_Event("JOINCHAN", av, ac);
+	FreeList(av, ac);
 #ifdef DEBUG
 	log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
 #endif
@@ -337,7 +356,7 @@ void chandump(char *chan) {
 			sendcoders("====================");
 			strcpy(mode, "+");
 			for (i = 0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1); i++) {
-				if (c->modes & cFlagTab[i].mode) {
+					if (c->modes & cFlagTab[i].mode) {
 					sprintf(mode, "%s%c", mode, cFlagTab[i].flag);
 				}
 			}

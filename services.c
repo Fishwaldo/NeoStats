@@ -337,7 +337,7 @@ void ns_debug_to_coders(char *u)
 	strcpy(segv_location, "ns_debug_to_coders");
 	if (!me.coder_debug) {
 		me.coder_debug = 1;
-		if (!u) { 
+		if (u) { 
 			globops(me.name, "\2DEBUG MODE\2 Activated by %s",u);
 			privmsg(u, s_Services, "Debuging Mode Enabled!");
 		} else {

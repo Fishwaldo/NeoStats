@@ -364,6 +364,8 @@ int load_module(char *path1, User *u) {
 	FILE *lockmod;
 	FILE *lmfile;
 #endif
+	char **av;
+	int ac = 0;
 	Module_Info * (*mod_get_info)() = NULL;
 	Functions * (*mod_get_funcs)() = NULL;
 	EventFnList * (*mod_get_events)() = NULL;
@@ -470,7 +472,9 @@ int load_module(char *path1, User *u) {
 	if (me.onchan == 1) {
 		while (event_fn_ptr->cmd_name != NULL ) {
 			if (!strcasecmp(event_fn_ptr->cmd_name, "ONLINE")) {
-				event_fn_ptr->function(me.s);
+				AddStringToList(&av, me.s->name, &ac);
+				event_fn_ptr->function(av, ac);
+				FreeList(av, ac);
 				break;
 			}
 			event_fn_ptr++;

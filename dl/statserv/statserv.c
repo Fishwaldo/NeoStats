@@ -51,7 +51,7 @@ Functions StatServ_fn_list[] = {
 
 
 EventFnList StatServ_Event_List[] = {
-	{ "ONLINE",	 Online},
+	{ "ONLINE",	 *Online},
 	{ "PONG",	 pong},
 	{ "NEWSERVER",	s_new_server},
 	{ "SQUIT",	s_del_server},

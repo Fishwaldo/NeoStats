@@ -224,6 +224,8 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 {
 	User *u;
 	char cmd[63];
+	char **av;
+	int ac = 0;
 	strcpy(segv_location, "init_bot");
 	u = finduser(nick);
 	if (u) {
@@ -245,13 +247,17 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
 	schmode_cmd(me.name, me.chan, "+oa", cmd);
-	Module_Event("SIGNON", finduser(nick));
+	AddStringToList(&av, nick, &ac);
+	Module_Event("SIGNON", av, ac);
+	FreeList(av, ac);
 	return 1;
 }
 
 int del_bot(char *nick, char *reason)
 {
 	User *u;
+	char **av;
+	int ac = 0;
 	strcpy(segv_location, "del_bot");
 	u = finduser(nick);
 #ifdef DEBUG
@@ -261,7 +267,9 @@ int del_bot(char *nick, char *reason)
 		log("Attempting to Logoff with a Nickname that does not Exists: %s",nick);
 		return -1;
 	}
-	Module_Event("SIGNOFF", finduser(nick));
+	AddStringToList(&av, nick, &ac);
+	Module_Event("SIGNOFF", av, ac);
+	FreeList(av, ac);
 	squit_cmd(nick, reason);
 	del_mod_user(nick);
 	return 1;
@@ -270,7 +278,7 @@ int del_bot(char *nick, char *reason)
 		
 
 
-void Module_Event(char *event, void *data) {
+void Module_Event(char *event, char **av, int ac) {
 	Module *module_ptr;
 	EventFnList *ev_list;
 	hscan_t ms;
@@ -291,7 +299,7 @@ void Module_Event(char *event, void *data) {
 						strcpy(segv_location, module_ptr->info->module_name);
 						strcpy(segvinmodule, module_ptr->info->module_name);
 						if (setjmp(sigvbuf) == 0) {
-							ev_list->function(data);			
+							ev_list->function(av, ac);			
 						} else {
 							log("setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
 						}
@@ -523,6 +531,8 @@ they should update the internal Structures */
 void init_ServBot()
 {
 	char rname[63];
+	char **av;
+	int ac = 0;
 	strcpy(segv_location, "init_ServBot");
 	sprintf(rname, "/msg %s \2HELP\2", s_Services);
 #ifdef ULTIMATE3
@@ -539,12 +549,13 @@ void init_ServBot()
 #elif !ULTIMATE
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif
-//	ssjoin_cmd(s_Services, me.chan, 
 	sjoin_cmd(s_Services, me.chan);
 	sprintf(rname, "%s %s", s_Services, s_Services);
 	schmode_cmd(me.name, me.chan, "+oa", rname);
 	me.onchan = 1;
-	Module_Event("SIGNON", finduser(s_Services));
+	AddStringToList(&av, s_Services, &ac);
+	Module_Event("SIGNON", av, ac);
+	FreeList(av, ac);
 	
 }
 
@@ -717,49 +728,78 @@ void Usr_Showcredits(char *origin, char **argv, int argc) {
 	Showcredits(origin);
 }
 void Usr_AddServer(char *origin, char **argv, int argc){
+	char **av;
+	int ac = 0;
 	AddServer(argv[0],origin,atoi(argv[1]));
-	Module_Event("NEWSERVER", findserver(argv[0]));
+	AddStringToList(&av, argv[0], &ac);
+	Module_Event("NEWSERVER", av, ac);
+	FreeList(av, ac);
 }
 void Usr_DelServer(char *origin, char **argv, int argc){
-	Module_Event("DELSERVER", findserver(argv[0]));
+	char **av;
+	int ac = 0;
+	AddStringToList(&av, argv[0], &ac);
+	Module_Event("DELSERVER", av, ac);
+	FreeList(av, ac);
 	DelServer(argv[0]);
 }
 void Usr_DelUser(char *origin, char **argv, int argc) {
-	Module_Event("SIGNOFF", finduser(origin));
+	char **av;
+	int ac = 0;
+	AddStringToList(&av, origin, &ac);
+	Module_Event("SIGNOFF", av, ac);
+	FreeList(av, ac);
 	DelUser(origin);
 }
 void Usr_Smode(char *origin, char **argv, int argc) {
+	char **av;
+	int ac = 0;
+	AddStringToList(&av, argv[0], &ac);
 #ifdef ULTIMATE3
+	AddStringToList(&av, argv[2], &ac);
 	UserMode(argv[0], argv[2]);
 #else
+	AddStringToList(&av, argv[1], &ac);
 	UserMode(argv[0], argv[1]);
 #endif
-	Module_Event("UMODE", finduser(argv[0]));
+	Module_Event("UMODE", av, ac);
+	FreeList(av, ac);
 }
 void Usr_Mode(char *origin, char **argv, int argc) {
-			if (!strchr(argv[0], '#')) {
+	char **av;
+	int ac = 0;
+	if (!strchr(argv[0], '#')) {
 #ifdef DEBUG
-				log("Mode: UserMode: %s",argv[0]);
+		log("Mode: UserMode: %s",argv[0]);
 #endif
-				UserMode(argv[0], argv[1]);
-				Module_Event("UMODE", finduser(argv[0]));
-			} else {
-				ChanMode(origin, argv, argc);
-			}	
+		UserMode(argv[0], argv[1]);
+		AddStringToList(&av, argv[0], &ac);
+		AddStringToList(&av, argv[1], &ac);
+		Module_Event("UMODE", av, ac);
+		FreeList(av, ac);
+	} else {
+		ChanMode(origin, argv, argc);
+	}	
 }	
 void Usr_Kill(char *origin, char **argv, int argc) {
 	User *u;
 	Mod_User *mod_ptr;
-	
+	char **av;
+	int ac = 0;	
+
 	mod_ptr = findbot(argv[0]);
 	if (mod_ptr) { /* Oh Oh, one of our Bots has been Killed off! */
-		Module_Event("BOTKILL", argv[0]);
+		AddStringToList(&av, argv[0], &ac);
+		Module_Event("BOTKILL", av, ac);
+		FreeList(av, ac);
 		DelUser(argv[0]);
 		return;
 	}
 	u = finduser(argv[0]);
 	if (u) {
-		Module_Event("KILL", u);
+		AddStringToList(&av, u->nick, &ac);
+		Module_Event("KILL", av, ac);
+		FreeList(av, ac);
 		DelUser(argv[0]);
 	}
 }
@@ -779,40 +819,51 @@ void Usr_Vhost(char *origin, char **argv, int argc) {
 	}
 }
 void Usr_Pong(char *origin, char **argv, int argc) {
-			Server *s;
-			s = findserver(argv[0]);
-			if (s) {
-				s->ping = time(NULL) - ping.last_sent;
-				if (ping.ulag > 1)
-					s->ping -= (float) ping.ulag;
-				if (!strcmp(me.s->name, s->name))
-					ping.ulag = me.s->ping;
-				Module_Event("PONG", s);
-
-			} else {
-				log("Received PONG from unknown server: %s", argv[0]);
-			}
+	Server *s;
+	char **av;
+	int ac = 0;
+	s = findserver(argv[0]);
+	if (s) {
+		s->ping = time(NULL) - ping.last_sent;
+		if (ping.ulag > 1)
+			s->ping -= (float) ping.ulag;
+		if (!strcmp(me.s->name, s->name))
+			ping.ulag = me.s->ping;
+		AddStringToList(&av, argv[0], &ac);
+		Module_Event("PONG", av, ac);
+		FreeList(av, ac);
+	} else {
+		log("Received PONG from unknown server: %s", argv[0]);
+	}
 }
 void Usr_Away(char *origin, char **argv, int argc) {
-			User *u = finduser(origin);
-			if (u) {
-				if (u->is_away) {
-					u->is_away = 0;
-				} else {
-					u->is_away = 1;
-				}
-				Module_Event("AWAY", u);
-			} else {
-				log("Warning, Unable to find User %s for Away", origin);
-			}
+	char **av;
+	int ac = 0;
+	User *u = finduser(origin);
+	if (u) {
+		if (u->is_away) {
+			u->is_away = 0;
+		} else {
+			u->is_away = 1;
+		}
+		AddStringToList(&av, origin, &ac);
+		Module_Event("AWAY", av, ac);
+		FreeList(av, ac);
+	} else {
+		log("Warning, Unable to find User %s for Away", origin);
+	}
 }	
 void Usr_Nick(char *origin, char **argv, int argc) {
-			User *u = finduser(origin);
-			if (u) {
-				Change_User(u, argv[0]);
-				Module_Event("NICK_CHANGE",argv[0]);
-
-			}
+	char **av;
+	int ac = 0;
+	User *u = finduser(origin);
+	if (u) {
+		Change_User(u, argv[0]);
+		AddStringToList(&av, origin, &ac);
+		AddStringToList(&av, argv[0], &ac);
+		Module_Event("NICK_CHANGE",av, ac);
+		FreeList(av, ac);
+	}
 }
 void Usr_Topic(char *origin, char **argv, int argc) {
 	char *buf;
@@ -829,7 +880,12 @@ void Usr_Topic(char *origin, char **argv, int argc) {
 }
 
 void Usr_Kick(char *origin, char **argv, int argc) {
-	Module_Event("KICK", findchan(argv[0]));
+	char **av;
+	int ac = 0;
+	AddStringToList(&av, argv[0], &ac);
+	AddStringToList(&av, argv[1], &ac);
+	Module_Event("KICK", av, ac);
+	FreeList(av, ac);
 	part_chan(finduser(argv[1]), argv[0]);
 	
 }
@@ -885,13 +941,15 @@ void Srv_Netinfo(char *origin, char **argv, int argc) {
 			if (ircd_srv.uprot == 2109) {
 				me.usesmo = 1;
 			} 
-			Module_Event("NETINFO", NULL); 
+			Module_Event("NETINFO", NULL, 0); 
 }
 #endif
 
 void Srv_Pass(char *origin, char **argv, int argc) {
 }
 void Srv_Server(char *origin, char **argv, int argc) {
+			char **av;
+			int ac = 0;
 			Server *s;
 			if (*origin == 0) {
 				AddServer(argv[0],me.name, atoi(argv[1]));
@@ -900,14 +958,20 @@ void Srv_Server(char *origin, char **argv, int argc) {
 			}
 			s = findserver(argv[0]);
 			me.s = s;
-			Module_Event("ONLINE", s);
-			Module_Event("NEWSERVER", s);
+			AddStringToList(&av, argv[0], &ac);
+			Module_Event("ONLINE", av, ac);
+			Module_Event("NEWSERVER", av, ac);
+			FreeList(av, ac);
 }
 void Srv_Squit(char *origin, char **argv, int argc) {
+			char **av;
+			int ac = 0;
 			Server *s;
 			s = findserver(argv[0]);
 			if (s) {
-				Module_Event("SQUIT", s);
+				AddStringToList(&av, argv[0], &ac);
+				Module_Event("SQUIT", av, ac);
+				FreeList(av, ac);
 				DelServer(argv[0]);
 			} else {
 				log("Waring, Squit from Unknown Server %s", argv[0]);
@@ -915,26 +979,34 @@ void Srv_Squit(char *origin, char **argv, int argc) {
 						
 }
 void Srv_Nick(char *origin, char **argv, int argc) {
+			char **av;
+			int ac = 0;
+			AddStringToList(&av, argv[0], &ac);
 #ifndef ULTIMATE3
 			AddUser(argv[0], argv[3], argv[4], argv[5]);
-			Module_Event("SIGNON", finduser(argv[0]));
+			Module_Event("SIGNON", av, ac);
 #else
 			AddUser(argv[0], argv[4], argv[5], argv[6]);
 #ifdef DEBUG
 			log("Mode: UserMode: %s",argv[3]);
 #endif
+			Module_Event("SIGNON", av, ac);
 			UserMode(argv[0], argv[3]);
-			Module_Event("SIGNON", finduser(argv[0]));
-			Module_Event("UMODE", finduser(argv[0]));
-			
+			AddStringToList(&av, argv[3], &ac);
+			Module_Event("UMODE", av, ac);
 #endif
+			FreeList(av, ac);
 }
 void Srv_Svsnick(char *origin, char **argv, int argc) {
 			User *u;
-
+			char **av;
+			int ac = 0;
 			u = finduser(argv[0]);
 			Change_User(u, argv[1]);
-			Module_Event("NICK_CHANGE",argv[1]);
+			AddStringToList(&av, argv[0], &ac);
+			AddStringToList(&av, argv[1], &ac);
+			Module_Event("NICK_CHANGE",av, ac);
+			FreeList(av, ac);
 
 }		
 void Srv_Kill(char *origin, char **argv, int argc) {

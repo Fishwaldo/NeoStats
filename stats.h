@@ -217,6 +217,8 @@ extern void *smalloc(long);
 extern char *sstrdup(const char *);
 extern unsigned long HASH(const unsigned char *, int);
 extern char *strlower(char *);
+extern void AddStringToList(char ***List,char S[],int *C);
+void FreeList(char **List,int C);
 
 /* ircd.c */
 extern void parse();
@@ -228,7 +230,7 @@ extern void globops(char *, char *, ...);
 extern int flood(User *);
 extern int init_bot(char *, char *, char *, char *, char *,char *);
 extern int del_bot(char *, char *);
-extern void Module_Event(char *, void *);
+extern void Module_Event(char *, char **av, int ac);
 extern int bot_nick_change(char *, char *);
 
 /* timer.c */
