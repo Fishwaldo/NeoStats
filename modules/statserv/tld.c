@@ -219,8 +219,6 @@ void InitTLDStatistics (void)
 	SET_SEGV_LOCATION();
 	tldstatlist = list_create(-1);
 	gi = NULL;
-	/* setup the GeoIP db filenames */
-	_setup_dbfilename();	
 	/* now open the various DB's */
 	if (GeoIP_db_avail(GEOIP_COUNTRY_EDITION)) {
 		gi = GeoIP_open_type(GEOIP_COUNTRY_EDITION, GEOIP_STANDARD);

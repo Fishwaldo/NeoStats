@@ -192,25 +192,25 @@
 			Name="GeoIP"
 			Filter="">
 			<File
-				RelativePath=".\geoipwin32\GeoIP.c">
+				RelativePath=".\geoip\GeoIP.c">
 			</File>
 			<File
-				RelativePath=".\geoipwin32\GeoIP.h">
+				RelativePath=".\geoip\GeoIP.h">
 			</File>
 			<File
-				RelativePath=".\geoipwin32\GeoIPBitReader.c">
+				RelativePath=".\geoip\GeoIPBitReader.c">
 			</File>
 			<File
-				RelativePath=".\geoipwin32\GeoIPBitReader.h">
+				RelativePath=".\geoip\GeoIPBitReader.h">
 			</File>
 			<File
-				RelativePath=".\geoipwin32\GeoIPCity.c">
+				RelativePath=".\geoip\GeoIPCity.c">
 			</File>
 			<File
-				RelativePath=".\geoipwin32\GeoIPCity.h">
+				RelativePath=".\geoip\GeoIPCity.h">
 			</File>
 			<File
-				RelativePath=".\geoipwin32\global.h">
+				RelativePath=".\geoip\global.h">
 			</File>
 		</Filter>
 		<File
