@@ -1463,7 +1463,7 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 		mode= '\0';
 	}
 	if (mode == 0) {
-		ircsnprintf (ircd_buf, BUFSIZE, "%s", flag, who);
+		ircsnprintf (ircd_buf, BUFSIZE, "%s", who);
 	} else {
 		ircsnprintf (ircd_buf, BUFSIZE, "%c%s", flag, who);
 	}
