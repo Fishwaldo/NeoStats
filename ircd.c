@@ -118,7 +118,7 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname, 
-						const char *modes, unsigned int flags, bot_cmd *cmd_list, 
+						const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, 
 						char * mod_name)
 {
 	ModUser * bot_ptr;
@@ -149,7 +149,7 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
 	bot_ptr->flags = flags;
-	add_bot_cmd_list(bot_ptr, cmd_list);
+	add_bot_cmd_list(bot_ptr, bot_cmd_list);
 	
 	return bot_ptr;
 }

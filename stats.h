@@ -462,8 +462,8 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 
 /* services.c */
 int init_services(void);
-int add_services_cmd_list(bot_cmd* cmd_list);
-int del_services_cmd_list(bot_cmd* cmd_list);
+int add_services_cmd_list(bot_cmd* bot_cmd_list);
+int del_services_cmd_list(bot_cmd* bot_cmd_list);
 void services_cmd_help (User * u, char **av, int ac);
 
 #endif

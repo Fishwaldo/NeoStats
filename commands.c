@@ -128,16 +128,16 @@ del_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int 
-add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* cmd_list) 
+add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list) 
 {
 	/* If no hash return failure */
 	if(bot_ptr->botcmds == NULL) {
 		return NS_FAILURE;
 	}
 	/* Cycle through command list and add them */
-	while(cmd_list->cmd) {
-		add_bot_cmd(bot_ptr->botcmds, cmd_list);
-		cmd_list++;
+	while(bot_cmd_list->cmd) {
+		add_bot_cmd(bot_ptr->botcmds, bot_cmd_list);
+		bot_cmd_list++;
 	}
 	return NS_SUCCESS;
 }
@@ -147,16 +147,16 @@ add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* cmd_list)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int 
-del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* cmd_list) 
+del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list) 
 {
 	/* If no hash return failure */
 	if(bot_ptr->botcmds == NULL) {
 		return NS_FAILURE;
 	}
 	/* Cycle through command list and delete them */
-	while(cmd_list->cmd) {
-		add_bot_cmd(bot_ptr->botcmds, cmd_list);
-		cmd_list++;
+	while(bot_cmd_list->cmd) {
+		add_bot_cmd(bot_ptr->botcmds, bot_cmd_list);
+		bot_cmd_list++;
 	}
 	return NS_SUCCESS;
 }
@@ -192,7 +192,7 @@ del_all_bot_cmds(ModUser* bot_ptr)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int 
-add_services_cmd_list(bot_cmd* cmd_list) 
+add_services_cmd_list(bot_cmd* bot_cmd_list) 
 {
 	/* init bot hash if not created */
 	if(botcmds == NULL) {
@@ -203,9 +203,9 @@ add_services_cmd_list(bot_cmd* cmd_list)
 		return NS_FAILURE;
 	}
 	/* Cycle through command list and add them */
-	while(cmd_list->cmd) {
-		add_bot_cmd(botcmds, cmd_list);
-		cmd_list++;
+	while(bot_cmd_list->cmd) {
+		add_bot_cmd(botcmds, bot_cmd_list);
+		bot_cmd_list++;
 	}
 	return NS_SUCCESS;
 }
@@ -215,16 +215,16 @@ add_services_cmd_list(bot_cmd* cmd_list)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int 
-del_services_cmd_list(bot_cmd* cmd_list) 
+del_services_cmd_list(bot_cmd* bot_cmd_list) 
 {
 	/* If no hash return failure */
 	if(botcmds == NULL) {
 		return NS_FAILURE;
 	}
 	/* Cycle through command list and delete them */
-	while(cmd_list->cmd) {
-		del_bot_cmd(botcmds, cmd_list);
-		cmd_list++;
+	while(bot_cmd_list->cmd) {
+		del_bot_cmd(botcmds, bot_cmd_list);
+		bot_cmd_list++;
 	}
 	return NS_SUCCESS;
 }
