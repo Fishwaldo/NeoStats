@@ -1,5 +1,5 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
-=======
+
 * NeoStats * Shmad & Fish * Version ????
  - fixed 'make install' now copies the html template over (reported by eggy) (S)
  - Changed stats.pid to NeoStats.pid (reported by eggy) (S)
