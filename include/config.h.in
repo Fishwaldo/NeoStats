@@ -25,8 +25,29 @@
    */
 #undef HAVE_ALLOCA_H
 
+/* Define to 1 if you have the `argz_append' function. */
+#undef HAVE_ARGZ_APPEND
+
+/* Define to 1 if you have the `argz_create_sep' function. */
+#undef HAVE_ARGZ_CREATE_SEP
+
+/* Define to 1 if you have the <argz.h> header file. */
+#undef HAVE_ARGZ_H
+
+/* Define to 1 if you have the `argz_insert' function. */
+#undef HAVE_ARGZ_INSERT
+
+/* Define to 1 if you have the `argz_next' function. */
+#undef HAVE_ARGZ_NEXT
+
+/* Define to 1 if you have the `argz_stringify' function. */
+#undef HAVE_ARGZ_STRINGIFY
+
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
+
+/* Define to 1 if you have the <assert.h> header file. */
+#undef HAVE_ASSERT_H
 
 /* 'backtrace function available' */
 #undef HAVE_BACKTRACE
@@ -40,6 +61,9 @@
 /* Define to 1 if you have the `closesocket' function. */
 #undef HAVE_CLOSESOCKET
 
+/* Define to 1 if you have the <ctype.h> header file. */
+#undef HAVE_CTYPE_H
+
 /* Define to 1 if you have the <db.h> header file. */
 #undef HAVE_DB_H
 
@@ -47,8 +71,21 @@
    */
 #undef HAVE_DECL_GETENV
 
+/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_DIRENT_H
+
 /* disabled non-blocking sockets */
 #undef HAVE_DISABLED_NONBLOCKING
+
+/* Define if you have the GNU dld library. */
+#undef HAVE_DLD
+
+/* Define to 1 if you have the <dld.h> header file. */
+#undef HAVE_DLD_H
+
+/* Define to 1 if you have the `dlerror' function. */
+#undef HAVE_DLERROR
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
@@ -56,8 +93,17 @@
 /* Define to 1 if you have the `dlopen' function. */
 #undef HAVE_DLOPEN
 
+/* Define to 1 if you have the <dl.h> header file. */
+#undef HAVE_DL_H
+
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 #undef HAVE_DOPRNT
+
+/* Define to 1 if you have the <errno.h> header file. */
+#undef HAVE_ERRNO_H
+
+/* Define to 1 if the system has the type `error_t'. */
+#undef HAVE_ERROR_T
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
@@ -95,6 +141,9 @@
 /* HAVE_GNUC25_PRINTFFORMAT */
 #undef HAVE_GNUC25_PRINTFFORMAT
 
+/* Define to 1 if you have the `index' function. */
+#undef HAVE_INDEX
+
 /* Define to 1 if you have the `inet_addr' function. */
 #undef HAVE_INET_ADDR
 
@@ -115,6 +164,9 @@
 
 /* Define to 1 if you have the <io.h> header file. */
 #undef HAVE_IO_H
+
+/* Define if you have the libdl library or equivalent. */
+#undef HAVE_LIBDL
 
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
@@ -140,6 +192,9 @@
 /* Define to 1 if <wchar.h> declares mbstate_t. */
 #undef HAVE_MBSTATE_T
 
+/* Define to 1 if you have the `memcpy' function. */
+#undef HAVE_MEMCPY
+
 /* Define to 1 if you have the `memmove' function. */
 #undef HAVE_MEMMOVE
 
@@ -148,6 +203,9 @@
 
 /* Define to 1 if you have the `mempcpy' function. */
 #undef HAVE_MEMPCPY
+
+/* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
+#undef HAVE_NDIR_H
 
 /* Define to 1 if you have the <netdb.h> header file. */
 #undef HAVE_NETDB_H
@@ -167,8 +225,14 @@
 /* Define to 1 if you have the `poll' function. */
 #undef HAVE_POLL
 
+/* Define if libtool can extract symbol lists from object files. */
+#undef HAVE_PRELOADED_SYMBOLS
+
 /* Define to 1 if you have the <pwd.h> header file. */
 #undef HAVE_PWD_H
+
+/* Define to 1 if you have the `rindex' function. */
+#undef HAVE_RINDEX
 
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT
@@ -178,6 +242,9 @@
 
 /* Define to 1 if you have the <sgtty.h> header file. */
 #undef HAVE_SGTTY_H
+
+/* Define if you have the shl_load function. */
+#undef HAVE_SHL_LOAD
 
 /* Define to 1 if you have the `sigaction' function. */
 #undef HAVE_SIGACTION
@@ -204,11 +271,20 @@
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
+
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
 /* Define to 1 if you have the `strcasecmp' function. */
 #undef HAVE_STRCASECMP
+
+/* Define to 1 if you have the `strchr' function. */
+#undef HAVE_STRCHR
+
+/* Define to 1 if you have the `strcmp' function. */
+#undef HAVE_STRCMP
 
 /* Define to 1 if you have the `strcmpi' function. */
 #undef HAVE_STRCMPI
@@ -243,11 +319,25 @@
 /* Define to 1 if you have the `strnlen' function. */
 #undef HAVE_STRNLEN
 
+/* Define to 1 if you have the `strrchr' function. */
+#undef HAVE_STRRCHR
+
 /* Define to 1 if you have the `strstr' function. */
 #undef HAVE_STRSTR
 
 /* Define to 1 if you have the `strtok_r' function. */
 #undef HAVE_STRTOK_R
+
+/* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_SYS_DIR_H
+
+/* Define to 1 if you have the <sys/dl.h> header file. */
+#undef HAVE_SYS_DL_H
+
+/* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_SYS_NDIR_H
 
 /* Define to 1 if you have the <sys/param.h> header file. */
 #undef HAVE_SYS_PARAM_H
@@ -349,6 +439,23 @@
    slash. */
 #undef LSTAT_FOLLOWS_SLASHED_SYMLINK
 
+/* Define if the OS needs help to load dependent libraries for dlopen(). */
+#undef LTDL_DLOPEN_DEPLIBS
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LTDL_OBJDIR
+
+/* Define to the name of the environment variable that determines the dynamic
+   library search path. */
+#undef LTDL_SHLIBPATH_VAR
+
+/* Define to the extension used for shared libraries, say, ".so". */
+#undef LTDL_SHLIB_EXT
+
+/* Define to the system default library search path. */
+#undef LTDL_SYSSEARCHPATH
+
 /* "Major Version Number" */
 #undef MAJOR
 
@@ -363,6 +470,9 @@
 
 /* "Our Platfrom requires Underscores" */
 #undef NEED_UNDERSCORE_PREFIX
+
+/* Define if dlsym() requires a leading underscore in symbol names. */
+#undef NEED_USCORE
 
 /* 'Enable NeoIRCd IRCD support' */
 #undef NEOIRCD
@@ -473,6 +583,9 @@
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
+
+/* Define to a type to use for \`error_t' if it is not otherwise available. */
+#undef error_t
 
 /* Define to rpl_fnmatch if the replacement function should be used. */
 #undef fnmatch

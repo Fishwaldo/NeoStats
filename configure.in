@@ -37,6 +37,7 @@ AC_PATH_PROG( SED, sed, , $PATH:/usr/bin:/usr/local/bin)
 AC_SYS_LARGEFILE
 
 # Checks for libraries.
+AC_LIB_LTDL
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -306,7 +307,7 @@ AC_MSG_RESULT($mimpure)
 dnl AM_CONDITIONAL(MIMPURE, test x$mimpure = xyes)
 
 
-AC_CONFIG_SUBDIRS(src/libltdl)
+dnl AC_CONFIG_SUBDIRS(src/libltdl)
 
 
 
@@ -318,7 +319,7 @@ AUTH=no
 dnl check IRCD support first to save time
 dnl check to see if we should enable Unreal IRCD Support
 AC_MSG_CHECKING(Whether to Enable Unreal 3.1.x IRCD Support...)
-AC_ARG_ENABLE(unreal31, [ --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
+AC_ARG_ENABLE(unreal31, [  --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
@@ -332,7 +333,7 @@ AC_ARG_ENABLE(unreal31, [ --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
 esac],
 AC_MSG_RESULT(no))
 AC_MSG_CHECKING(Whether to Enable Unreal 3.2.x IRCD Support...)
-AC_ARG_ENABLE(unreal32, [ --enable-unreal32 - enable Unreal 3.2.x IRCD Support],
+AC_ARG_ENABLE(unreal32, [  --enable-unreal32 - enable Unreal 3.2.x IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
@@ -349,7 +350,7 @@ AC_MSG_RESULT(no))
 
 dnl check to see if we should enable Ultimate IRCD Support
 AC_MSG_CHECKING(Whether to Enable Ultimate 2.x.x IRCD Support...)
-AC_ARG_ENABLE(ultimate2, [ --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support],
+AC_ARG_ENABLE(ultimate2, [  --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate Support')
@@ -364,7 +365,7 @@ esac],
 AC_MSG_RESULT(no)
 )
 AC_MSG_CHECKING(Whether to Enable Ultimate 3.x.x IRCD Support...)
-AC_ARG_ENABLE(ultimate3, [ --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support],
+AC_ARG_ENABLE(ultimate3, [  --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate 2.x.x Support')
@@ -381,7 +382,7 @@ AC_MSG_RESULT(no)
 )
 
 AC_MSG_CHECKING(Whether to Enable Hybrid 7.x.x IRCD Support...)
-AC_ARG_ENABLE(hybrid7, [ --enable-hybrid7 - enable Hybrid7 IRCD Support],
+AC_ARG_ENABLE(hybrid7, [  --enable-hybrid7 - enable Hybrid7 IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(HYBRID7, 1, 'Enable hybrid7 IRCD support')
@@ -400,7 +401,7 @@ AC_MSG_RESULT(no)
 )
 
 AC_MSG_CHECKING(Whether to Enable NeoIRCd IRCD Support...)
-AC_ARG_ENABLE(neoircd, [ --enable-neoircd - enable NeoIRCd IRCD Support],
+AC_ARG_ENABLE(neoircd, [  --enable-neoircd - enable NeoIRCd IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(NEOIRCD, 1, 'Enable NeoIRCd IRCD support')
@@ -417,7 +418,7 @@ AC_MSG_RESULT(no)
 
 dnl check to see if we should enable Quantum IRCD Support
 AC_MSG_CHECKING(Whether to Enable Quantum IRCD Support...)
-AC_ARG_ENABLE(quantum, [ --enable-quantum - enable Quantum IRCD Support],
+AC_ARG_ENABLE(quantum, [  --enable-quantum - enable Quantum IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(QUANTUM, 1, 'Enable Quantum Support')
@@ -433,7 +434,7 @@ AC_MSG_RESULT(no))
 
 dnl check to see if we should enable Mystic IRCD Support
 AC_MSG_CHECKING(Whether to Enable Mystic IRCD Support...)
-AC_ARG_ENABLE(mystic, [ --enable-mystic - enable Mystic IRCD Support],
+AC_ARG_ENABLE(mystic, [  --enable-mystic - enable Mystic IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(MYSTIC, 1, 'Enable Mystic Support')
@@ -449,7 +450,7 @@ AC_MSG_RESULT(no))
 
 dnl check to see if we should enable Bahamut IRCD Support
 AC_MSG_CHECKING(Whether to Enable Bahamut IRCD Support...)
-AC_ARG_ENABLE(bahamut, [ --enable-bahamut - enable Bahamut IRCD Support],
+AC_ARG_ENABLE(bahamut, [  --enable-bahamut - enable Bahamut IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(BAHAMUT, 1, 'Enable Bahamut Support')
@@ -465,7 +466,7 @@ AC_MSG_RESULT(no))
 
 dnl check to see if we should enable IRCu IRCD Support
 AC_MSG_CHECKING(Whether to Enable IRCu IRCD Support...)
-AC_ARG_ENABLE(ircu, [ --enable-ircu - enable IRCu IRCD Support],
+AC_ARG_ENABLE(ircu, [  --enable-ircu - enable IRCu IRCD Support],
 [ case "$enableval" in
   yes)  
 dnl	AC_MSG_ERROR('Sorry IRCu support isnt complete yet')
@@ -482,7 +483,7 @@ AC_MSG_RESULT(no))
 
 dnl check to see if we should enable liquid IRCD Support
 AC_MSG_CHECKING(Whether to Enable Liquid IRCD Support...)
-AC_ARG_ENABLE(liquid, [ --enable-liquid - enable Liquid IRCD Support],
+AC_ARG_ENABLE(liquid, [  --enable-liquid - enable Liquid IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(LIQUID, 1, 'Enable Liquid IRCd Support')
@@ -499,7 +500,7 @@ AC_MSG_RESULT(no)
 
 dnl check to see if we should enable Viagra IRCD Support
 AC_MSG_CHECKING(Whether to Enable Viagra IRCD Support...)
-AC_ARG_ENABLE(viagra, [ --enable-viagra - enable Viagra IRCD Support],
+AC_ARG_ENABLE(viagra, [  --enable-viagra - enable Viagra IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(VIAGRA, 1, 'Enable Viagra IRCd Support')
@@ -524,7 +525,7 @@ fi
 
 dnl check whether to enable IRCd user mode authentication
 AC_MSG_CHECKING(Whether to enable IRCd user mode authentication...)
-AC_ARG_ENABLE(ircdauth, [ --enable-ircdauth - IRCd user mode authentication],
+AC_ARG_ENABLE(ircdauth, [  --enable-ircdauth - IRCd user mode authentication],
 [ case "$enableval" in
 yes)
 	MODULES="$MODULES ircdauth"
@@ -541,7 +542,7 @@ AC_MSG_RESULT(no)
 dnl check whether to enable nick!user@host authentication
 if test "$do_extauth" = no; then
 	AC_MSG_CHECKING(Whether to enable nick!user@host authentication...)
-	AC_ARG_ENABLE(extauth, [ --enable-extauth - whether to enable nick!user@host authentication],
+	AC_ARG_ENABLE(extauth, [  --enable-extauth - whether to enable nick!user@host authentication],
 	[ case "$enableval" in
 	yes)
 		MODULES="$MODULES extauth"
@@ -558,7 +559,7 @@ fi
 dnl check if we are running with Debug....
 AC_MSG_CHECKING(Whether to Enable Debuging...)
 AC_ARG_ENABLE(debug,
-[ --enable-debug - Enable Debuging],
+[  --enable-debug - Enable Debuging],
 [ case "$enableval" in
   yes)
 	AC_DEFINE(DEBUG, 1, 'Enable Debugging')
@@ -575,7 +576,7 @@ AC_MSG_RESULT(no)
 )
 
 AC_MSG_CHECKING(To Enable AutoTools Debug Mode?)
-AC_ARG_ENABLE(autodebug, [    --enable-autodebug - Enable AutoTools Debug],
+AC_ARG_ENABLE(autodebug, [  --enable-autodebug - Enable AutoTools Debug],
 [ case "$enableval" in
   yes)
 	AC_MSG_RESULT(yes)
@@ -591,7 +592,7 @@ AX_MAINTAINER_MODE_AUTO_SILENT
 	
 
 AC_MSG_CHECKING(To Enable Raw command?)
-AC_ARG_ENABLE(raw, [ --enable-raw - Enable Raw command],
+AC_ARG_ENABLE(raw, [  --enable-raw - Enable Raw command],
 [ case "$enableval" in
   yes)
 	AC_DEFINE(USE_RAW, 1, 'Use Raw command')
@@ -606,7 +607,7 @@ AC_MSG_RESULT(no)
 
 
 AC_MSG_CHECKING(To Enable Sql Server Emulation?)
-AC_ARG_ENABLE(sqlsrv, [ --enable-sqlsrv - Enable Sql Server Emulation],
+AC_ARG_ENABLE(sqlsrv, [  --enable-sqlsrv - Enable Sql Server Emulation],
 [ case "$enableval" in
   yes)
 	AC_DEFINE(SQLSRV, 1, 'Use Sql Server Emulation')
@@ -623,48 +624,11 @@ esac],
 AC_MSG_RESULT(no)
 )
 
-configtool=no
-AC_MSG_CHECKING(Enable Building of ConfigTool?)
-AC_ARG_ENABLE(configtool,
-[ --enable-configtool - Enable building of the configtool program (Needs X windows)],
-[if test "$enableval" = yes; then configtool=yes; else configtool=no; fi])
-
-if test "$configtool" = yes; then
-   AC_MSG_RESULT(Yes.... Testing for Dependancies!) 
-   AC_PATH_PROG(GTK_CONFIG, gtk-config, no)
-   if test "$GTK_CONFIG" = no; then
-      AC_MSG_WARN([Cannot find GTK+, configtool will not be built])
-   else
-      AC_MSG_CHECKING([GTK version (need at least 1.2.0)])
-
-      gtk_version=`$GTK_CONFIG --version`
-      gtk_maj_ver=`echo $gtk_version | cut -f 1 -d .`
-      gtk_min_ver=`echo $gtk_version | cut -f 2 -d .`
-      gtk_sub_ver=`echo $gtk_version | cut -f 3 -d .`
-
-      AC_MSG_RESULT(${gtk_maj_ver}.${gtk_min_ver}.${gtk_sub_ver})
-
-      if test $gtk_maj_ver -lt 1 -o $gtk_min_ver -lt 2; then
-	 configtool=no
-	 AC_MSG_WARN([GTK+ version is too old, configtool will not be built])
-      fi
-   fi
-else
-   AC_MSG_RESULT(no)
-fi
-
-if test "$configtool" = yes; then
-   build_configtool=configtool
-else
-   build_configtool=
-fi
-
-
 AC_MSG_CHECKING(The Modules that will be automatically compiled)
 AC_MSG_RESULT($MODULES)
 
 AC_MSG_CHECKING(The additionall modules to compile?)
-AC_ARG_WITH(modules, [ --with-modules - Additional Modules to compile],
+AC_ARG_WITH(modules, [  --with-modules - Additional Modules to compile],
 MODULES="$MODULES $withval"
 AC_MSG_RESULT($withval),
 AC_MSG_RESULT("None"))
@@ -696,11 +660,11 @@ AC_SUBST(PROTOCOL)
 AC_SUBST(SED)
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
-
+AC_SUBST(LIBTOOL_DEPS)
 
 AC_CONFIG_FILES([Makefile include/Makefile src/Makefile
 		src/protocol/Makefile src/curl/Makefile
 		src/keeper/Makefile src/adns/Makefile
-		src/pcre/Makefile])
+		src/pcre/Makefile src/libltdl/Makefile])
 AC_CACHE_SAVE
 AC_OUTPUT
