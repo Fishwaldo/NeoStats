@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.96 2003/06/30 15:18:24 fishwaldo Exp $
+** $Id: main.c,v 1.97 2003/07/01 12:02:33 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -265,6 +265,10 @@ void get_options(int argc, char **argv)
 			    ("(UL) - Ultimate 2.x.x IRCd (Depriciated)\n");
 			printf("(H)  - Hybrid 7.x IRCd\n");
 			printf("(N)  - NeoIRCd IRCd\n");
+			printf("(M)  - Mystic IRCd\n");
+			printf("(Q)  - Quantum IRCd\n");
+			printf("(B)  - Bahamut IRCd\n");
+			printf("(IRCu) - IRCu (P10) IRCd\n");
 			printf("\nNeoStats: http://www.neostats.net\n");
 			exit(1);
 		case 'r':

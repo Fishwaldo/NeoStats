@@ -220,8 +220,8 @@ AC_ARG_ENABLE(mystic, [ --enable-mystic - enable Mystic IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(MYSTIC, 1, 'Enable Mystic Support')
-	IRCD_FILES_SRC="Mystic.c"
-	IRCD_FILES_OBJS="Mystic.o"
+	IRCD_FILES_SRC="mystic.c"
+	IRCD_FILES_OBJS="mystic.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -273,7 +273,7 @@ case "$IRCD_FILES_SRC" in
    "hybrid7.c")
 	AC_MSG_RESULT(yes)
 	;;
-   "Mystic.c")
+   "mystic.c")
 	AC_MSG_RESULT(yes)
 	;;
    "QuantumIRCd.c")
