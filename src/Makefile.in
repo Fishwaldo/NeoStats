@@ -54,7 +54,7 @@ utils:
 buildversion: 
 	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
 
-neostats: $(OBJS)
+neostats: $(OBJS) $(PROTOCOL_OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) $(PROTOCOL_OBJS) @sqlsrvbuild@ $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a @LIBDB@ $(EXTRA_LDFLAGS) -o $@
 
 # include dependency info 

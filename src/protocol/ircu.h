@@ -32,25 +32,12 @@
 /* #define NEFARIOUS */
 /* #define ASUKA */
 
-/* we support server names as base 64 numerics */
-#define BASE64SERVERNAME
-/* we support nick names as base 64 numerics */
-#define BASE64NICKNAME
-
 /* Feature support for use by modules to determine whether
  * certain functionality is available
  */
 /* The following defines might not be correct for IRCu but are used to 
  * ensure NeoStats compiles correctly until we get updated files */
 
-/* we support tokens */
-#define GOTTOKENSUPPORT
-/* we don't have sjoin */
-#undef GOTSJOIN
-/* we don't support CLIENT */
-#undef GOTCLIENTSUPPORT
-/* we don't support svstime */
-#undef GOTSVSTIME
 /* we don't have vhost support */
 #undef GOTSVSHOST 
 /* we don't have svsjoin */
@@ -76,8 +63,6 @@
 /* we have nickip support */
 #define GOTNICKIP
 
-/* Override NeoStats core splitbuf function */
-/* #define IRCD_SPLITBUF */
 /* Override NeoStats core parse function */
 #define IRCD_PARSE
 

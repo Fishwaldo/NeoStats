@@ -67,7 +67,6 @@ CheckTimers (void)
 		/* flush log files */
 		fflush (NULL);
 	}
-#ifdef GOTSVSTIME
 	if (me.synced && config.setservertimes) {
 		if((me.now - lastservertimesync) > config.setservertimes) {
 			/* The above check does not need to be exact, but 
@@ -77,7 +76,6 @@ CheckTimers (void)
 			lastservertimesync = me.now;
 		}
 	}
-#endif
 	if (is_midnight () == 1 && midnight == 0) {
 		TimerMidnight ();
 		midnight = 1;

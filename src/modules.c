@@ -574,7 +574,7 @@ ModuleConfig(bot_setting* set_ptr)
 				case SET_TYPE_REALNAME:
 				case SET_TYPE_IPV4:
 					if(GetConf((void *) &temp, CFGSTR, set_ptr->confitem) > 0) {
-						strlcpy(set_ptr->varptr, temp, MAXNICK);
+						strlcpy(set_ptr->varptr, temp, set_ptr->max);
 						sfree(temp);
 					} else {
 						strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);

@@ -52,37 +52,40 @@ static void m_svinfo (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 
+const int ircd_minprotocol = PROTOCOL_SJOIN;
+const int ircd_optprotocol = 0;
+const int ircd_features = 0;
 const char services_umode[]= "+oS";
 const char services_cmode[]= "+o";
 
 ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
-	{MSG_PRIVATE, m_private, 0},
-	{MSG_NOTICE, m_notice, 0},
-	{MSG_STATS, m_stats, 0},
-	{MSG_VERSION, m_version, 0},
-	{MSG_MOTD, m_motd, 0},
-	{MSG_ADMIN, m_admin, 0},
-	{MSG_SERVER, m_server, 0},
-	{MSG_SQUIT, m_squit, 0},
-	{MSG_QUIT, m_quit, 0},
-	{MSG_MODE, m_mode, 0},
-	{MSG_SVSMODE, m_svsmode, 0},
-	{MSG_KILL, m_kill, 0},
-	{MSG_PONG, m_pong, 0},
-	{MSG_AWAY, m_away, 0},
-	{MSG_NICK, m_nick, 0},
-	{MSG_TOPIC, m_topic, 0},
-	{MSG_KICK, m_kick, 0},
-	{MSG_JOIN, m_join, 0},
-	{MSG_PART, m_part, 0},
-	{MSG_PING, m_ping, 0},
-	{MSG_SVINFO, m_svinfo, 0},
-	{MSG_CAPAB, m_protoctl, 0},
-	{MSG_BURST, m_burst, 0},
-	{MSG_SJOIN, m_sjoin, 0},
-	{MSG_PASS, m_pass, 0},
-	{MSG_SVSNICK, m_svsnick, 0},
+	{MSG_PRIVATE, 0, m_private, 0},
+	{MSG_NOTICE, 0, m_notice, 0},
+	{MSG_STATS, 0, m_stats, 0},
+	{MSG_VERSION, 0, m_version, 0},
+	{MSG_MOTD, 0, m_motd, 0},
+	{MSG_ADMIN, 0, m_admin, 0},
+	{MSG_SERVER, 0, m_server, 0},
+	{MSG_SQUIT, 0, m_squit, 0},
+	{MSG_QUIT, 0, m_quit, 0},
+	{MSG_MODE, 0, m_mode, 0},
+	{MSG_SVSMODE, 0, m_svsmode, 0},
+	{MSG_KILL, 0, m_kill, 0},
+	{MSG_PONG, 0, m_pong, 0},
+	{MSG_AWAY, 0, m_away, 0},
+	{MSG_NICK, 0, m_nick, 0},
+	{MSG_TOPIC, 0, m_topic, 0},
+	{MSG_KICK, 0, m_kick, 0},
+	{MSG_JOIN, 0, m_join, 0},
+	{MSG_PART, 0, m_part, 0},
+	{MSG_PING, 0, m_ping, 0},
+	{MSG_SVINFO, 0, m_svinfo, 0},
+	{MSG_CAPAB, 0, m_protoctl, 0},
+	{MSG_BURST, 0, m_burst, 0},
+	{MSG_SJOIN, 0, m_sjoin, 0},
+	{MSG_PASS, 0, m_pass, 0},
+	{MSG_SVSNICK, 0, m_svsnick, 0},
 };
 
 ChanModes chan_modes[] = {
@@ -307,6 +310,10 @@ send_globops (const char *from, const char *buf)
 	send_cmd (":%s %s :%s", from, MSG_GLOBOPS, buf);
 }
 
+void 
+send_svstime (const char *sender, const unsigned long ts)
+{
+}
 /* from SJOIN TS TS chan modebuf parabuf :nicks */
 /* from SJOIN TS TS chan modebuf :nicks */
 /* from SJOIN TS TS chan modebuf parabuf : */

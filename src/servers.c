@@ -29,6 +29,7 @@
 #include "exclude.h"
 #include "modules.h"
 #include "servers.h"
+#include "services.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -124,7 +125,7 @@ DelServer (const char *name, const char* reason)
 	}
 	s = hnode_get (sn);
 	del_server_leaves(s);
-	if(ircd_srv.noquit) {
+	if(ircd_srv.protocol & PROTOCOL_NOQUIT) {
 		QuitServerUsers (s);
 	}
 	/* run the event for delete server */
@@ -140,7 +141,6 @@ DelServer (const char *name, const char* reason)
 	sfree (s);
 }
 
-#ifdef BASE64SERVERNAME
 Server *
 findserverbase64 (const char *num)
 {
@@ -159,7 +159,6 @@ findserverbase64 (const char *num)
 	dlog(DEBUG3, "findserverbase64: %s not found!", num);
 	return NULL;
 }
-#endif
 
 Server *
 findserver (const char *name)
@@ -177,14 +176,14 @@ findserver (const char *name)
 static void 
 dumpserver (Server *s)
 {
-#ifdef BASE64SERVERNAME
-	debugtochannel("Server: %s (%s)", s->name, s->name64);
-#else
-	debugtochannel("Server: %s", s->name);
-#endif
-	debugtochannel("Flags:  %lx", s->flags);
-	debugtochannel("Uplink: %s", s->uplink);
-	debugtochannel("========================================");
+	if(ircd_srv.protocol & PROTOCOL_B64SERVER) {
+		chanalert (ns_botptr->nick, "Server: %s (%s)", s->name, s->name64);
+	} else {
+		chanalert (ns_botptr->nick, "Server: %s", s->name);
+	}
+	chanalert (ns_botptr->nick, "Flags:  %lx", s->flags);
+	chanalert (ns_botptr->nick, "Uplink: %s", s->uplink);
+	chanalert (ns_botptr->nick, "========================================");
 }
 
 void
@@ -194,7 +193,7 @@ ServerDump (const char *name)
 	hscan_t ss;
 	hnode_t *sn;
 
-	debugtochannel("===============SERVERDUMP===============");
+	chanalert (ns_botptr->nick, "===============SERVERDUMP===============");
 	if (!name) {
 		hash_scan_begin (&ss, serverhash);
 		while ((sn = hash_scan_next (&ss)) != NULL) {
@@ -206,7 +205,7 @@ ServerDump (const char *name)
 		if (s) {
 			dumpserver (s);
 		} else {
-			debugtochannel("ServerDump: can't find server %s", name);
+			chanalert (ns_botptr->nick, "ServerDump: can't find server %s", name);
 		}
 	}
 }

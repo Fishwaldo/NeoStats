@@ -127,6 +127,24 @@
 
 #endif /* TS_MIN */
 
+#define PROTOCOL_NOQUIT	0x00000001	/* NOQUIT */
+#define PROTOCOL_TOKEN	0x00000002	/* TOKEN */
+#define PROTOCOL_SJOIN	0x00000004	/* SJOIN */
+#define PROTOCOL_NICKv2	0x00000008	/* NICKv2 */
+#define PROTOCOL_SJOIN2	0x00000010	/* SJOIN2 */
+#define PROTOCOL_UMODE2	0x00000020	/* UMODE2 */
+#define PROTOCOL_NS		0x00000040	/* NS */
+#define PROTOCOL_ZIP	0x00000080	/* ZIP - not actually supported by NeoStats */
+#define PROTOCOL_VL		0x00000100	/* VL */
+#define PROTOCOL_SJ3	0x00000200	/* SJ3 */
+#define PROTOCOL_VHP	0x00000400	/* Send hostnames in NICKv2 even if not sethosted */
+#define PROTOCOL_SJB64	0x00000800  /* */
+#define PROTOCOL_CLIENT	0x00001000  /* CLIENT */
+#define PROTOCOL_B64SERVER	0x00002000  /* Server names use Base 64 */
+#define PROTOCOL_B64NICK	0x00004000  /* Nick names use Base 64 */
+
+#define FEATURE_SVSTIME	0x00000001	/* SVSTIME */
+
 #include "numeric.h"
 
 #define CONFIG_NAME		"neostats.cfg"
@@ -675,7 +693,6 @@ typedef struct Module {
 	mod_auth mod_auth_cb;
 	void *dl_handle;
 	unsigned int modnum;
-	unsigned int debuglevel;
 }Module;
 
 extern Module* RunModule[10];
@@ -838,14 +855,10 @@ void AddStringToList (char ***List, char S[], int *C);
 void strip_mirc_codes(char *text);
 char *sctime (time_t t);
 char *sftime (time_t t);
-void debugtochannel(char *message, ...) __attribute__((format(printf,1,2))); /* 1=format 2=params */
 
 /* ircd.c */
-void parse (char* line);
 char *joinbuf (char **av, int ac, int from);
 int split_buf (char *buf, char ***argv, int colon_special);
-int flood (User * u);
-int join_bot_to_chan (const char *who, const char *chan, const char *modes);
 
 void privmsg_list (char *to, char *from, const char **text);
 void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
@@ -856,17 +869,14 @@ void chanalert (char * from, char * fmt, ...) __attribute__((format(printf,2,3))
 void wallops (const char *from, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 void numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 
+int join_bot_to_chan (const char *who, const char *chan, const char *modes);
+int part_bot_from_chan (const char *who, const char *chan);
+
 /* function declarations */
-#ifdef GOTSJOIN
-int ssjoin_cmd (const char *who, const char *chan, const char *mode);
-#endif
-int sjoin_cmd (const char *who, const char *chan);
-int spart_cmd (const char *who, const char *chan);
 int squit_cmd (const char *who, const char *quitmsg);
 int skick_cmd (const char *who, const char *chan, const char *target, const char *reason);
 int sinvite_cmd (const char *from, const char *to, const char *chan);
-int schmode_cmd (const char *who, const char *chan, const char *mode, const char *args);
-int snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode);
+int scmode_cmd (const char *who, const char *chan, const char *mode, const char *args);
 int sumode_cmd (const char *who, const char *target, long mode);
 int skill_cmd (const char *from, const char *target, const char *reason, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 int sping_cmd (const char *from, const char *reply, const char *to);
@@ -882,6 +892,7 @@ int ssvskill_cmd (const char *target, const char *reason, ...) __attribute__((fo
 int sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...);
 int srakill_cmd (const char *host, const char *ident);
 int ssvstime_cmd (const time_t ts);
+int schanusermode_cmd (const char *who, const char *chan, const char *mode, const char *bot);
 
 /* users.c */
 User *finduser (const char *nick);

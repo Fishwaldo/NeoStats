@@ -25,23 +25,10 @@
 #ifndef VIAGRA_H
 #define VIAGRA_H
 
-/* we don't support server names as base 64 numerics */
-#undef BASE64SERVERNAME
-/* we don't support nick names as base 64 numerics */
-#undef BASE64NICKNAME
-
 /* Feature support for use by modules to determine whether
  * certain functionality is available
  */
 
-/* we don't support tokens */
-#undef GOTTOKENSUPPORT
-/* we have sjoin */
-#define GOTSJOIN
-/* we don't support CLIENT */
-#undef GOTCLIENTSUPPORT
-/* we don't support svstime */
-#undef GOTSVSTIME
 /* we have svshost support */
 #define GOTSVSHOST 
 /* we have svsjoin support */

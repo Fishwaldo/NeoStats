@@ -47,10 +47,6 @@ static char SmodeStringBuf[64];
 #endif
 long service_umode_mask= 0;
 
-#ifdef IRCU
-int scmode_op (const char *who, const char *chan, const char *mode, const char *bot);
-#endif
-
 /** @brief InitIrcd
  *
  *  ircd initialisation
@@ -62,12 +58,9 @@ InitIrcd ()
 {
 	/* Clear IRCD info */
 	memset(&ircd_srv, 0, sizeof(ircd_srv));
-	InitServices();
-#ifdef IRCU
-	/* Temp: force tokens for IRCU */
-	ircd_srv.token = 1;
-	ircd_srv.noquit = 1;
-#endif
+	/* set min protocol */
+	ircd_srv.protocol = ircd_minprotocol;
+	/* preset our umode mask so we do not have to calculate in real time */
 	service_umode_mask = UmodeStringToMask(me.servicesumode, 0);
 };
 
@@ -207,21 +200,46 @@ SmodeStringToMask(const char* SmodeString, long Smode)
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
+static char get_sjoin_char(const char* mode)
+{
+	char c = 0;
+	int i;
+
+	for (i = 0; i < ircd_cmodecount; i++) {
+		if (chan_modes[i].sjoin == 0 || mode[1] == chan_modes[i].flag) {
+			c = chan_modes[i].sjoin;
+			break;
+		}
+	}
+	return(c);
+}
+
 int 
 join_bot_to_chan (const char *who, const char *chan, const char *mode)
 {
-#ifdef GOTSJOIN
-	ssjoin_cmd(who, chan, mode);
-#else
-	sjoin_cmd(who, chan);
-	if(mode) {
-#if defined(IRCU)
-		scmode_op(who, chan, me.servicescmode, who);
-#else
-		schmode_cmd(who, chan, me.servicescmode, who);
-#endif
+	if(ircd_srv.protocol & PROTOCOL_SJOIN) {
+		time_t ts;
+		Channel *c;
+
+		c = findchan (chan);
+		ts = (!c) ? me.now : c->creationtime;
+		if (mode == NULL) {
+			send_sjoin (me.name, who, chan, (unsigned long)ts);
+		} else {
+			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", get_sjoin_char(mode), who);
+			send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
+		}
+		join_chan (who, chan);
+		if (mode) {
+			ChanUserMode(chan, who, 1, UmodeStringToMask(mode,0));
+		}
+	} else {
+		send_join (me.name, who, chan, me.now);
+		join_chan (who, chan);
+		if(mode) {
+			schanusermode_cmd(who, chan, mode, who);
+		}
 	}
-#endif
 	return NS_SUCCESS;
 }
 
@@ -233,11 +251,13 @@ join_bot_to_chan (const char *who, const char *chan, const char *mode)
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int
-signon_newbot (const char *nick, const char *user, const char *host, const char *realname, long Umode)
+signon_newbot (const char *nick, const char *user, const char *host, const char *realname, const char *modes, long Umode)
 {
-	snewnick_cmd (nick, user, host, realname, Umode);
+	AddUser (nick, user, host, realname, me.name, NULL, NULL, NULL);
+	send_nick (nick, (unsigned long)me.now, modes, user, host, me.name, realname);
+	UserMode (nick, modes);
 	if ((config.allbots > 0) || (Umode & service_umode_mask)) {
-		//join_bot_to_chan(nick, me.serviceschan, me.servicescmode);
+		join_bot_to_chan(nick, me.serviceschan, me.servicescmode);
 	}
 	return NS_SUCCESS;
 }
@@ -273,7 +293,6 @@ CloakHost (Bot *bot_ptr)
  *
  * @return 
  */
-#ifndef IRCD_SPLITBUF
 int
 splitbuf (char *buf, char ***argv, int colon_special)
 {
@@ -315,7 +334,6 @@ splitbuf (char *buf, char ***argv, int colon_special)
 	}
 	return argc;
 }
-#endif
 
 int
 split_buf (char *buf, char ***argv, int colon_special)
@@ -469,9 +487,7 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 	SET_SEGV_LOCATION();
 	for (i = 0; i < ircd_cmdcount; i++) {
 		if (!strcmp (cmd_list[i].name, cmd)
-#ifdef GOTTOKENSUPPORT
-			||(ircd_srv.token && cmd_list[i].token && !strcmp (cmd_list[i].token, cmd))
-#endif
+			||((ircd_srv.protocol & PROTOCOL_TOKEN) && cmd_list[i].token && !strcmp (cmd_list[i].token, cmd))
 			) {
 			if(cmd_list[i].function) {
 				dlog(DEBUG3, "process_ircd_cmd: running command %s", cmd_list[i].name);
@@ -498,8 +514,8 @@ parse (char *line)
 {
 	char origin[64], cmd[64], *coreLine;
 	int cmdptr = 0;
-	int ac;
-	char **av;
+	int ac = 0;
+	char **av = NULL;
 
 	SET_SEGV_LOCATION();
 	if (!(*line))
@@ -593,15 +609,13 @@ do_pong (const char* origin, const char* destination)
 int
 flood (User * u)
 {
-	time_t current = me.now;
-
 	if (!u) {
 		nlog (LOG_WARNING, "flood: can't find user");
 		return 0;
 	}
 	if (UserLevel (u) >= NS_ULEVEL_OPER)	/* locop or higher */
 		return 0;
-	if (current - u->tslastmsg > 10) {
+	if ((me.now - u->tslastmsg) > 10) {
 		u->tslastmsg = me.now;
 		u->flood = 0;
 		return 0;
@@ -780,26 +794,18 @@ do_protocol (char *origin, char **argv, int argc)
 	int i;
 
 	for (i = 0; i < argc; i++) {
-#ifdef GOTTOKENSUPPORT
 		if (!ircstrcasecmp ("TOKEN", argv[i])) {
-			ircd_srv.token = 1;
+			ircd_srv.protocol |= PROTOCOL_TOKEN;
 		}
-#endif
-#ifdef GOTCLIENTSUPPORT
 		if (!ircstrcasecmp ("CLIENT", argv[i])) {
-			ircd_srv.client = 1;
+			ircd_srv.protocol |= PROTOCOL_CLIENT;
 		}
-#endif
-#if defined(HYBRID7)
 		if (!ircstrcasecmp ("UNKLN", argv[i])) {
 			ircd_srv.unkline = 1;
 		}
-#endif
-#ifdef GOTNOQUITSUPPORT
 		if (!ircstrcasecmp ("NOQUIT", argv[i])) {
-			ircd_srv.noquit = 1;
+			ircd_srv.protocol |= PROTOCOL_NOQUIT;
 		}
-#endif
 	}
 }
 
@@ -939,7 +945,7 @@ sumode_cmd (const char *who, const char *target, long mode)
 }
 
 int
-spart_cmd (const char *who, const char *chan)
+part_bot_from_chan (const char *who, const char *chan)
 {
 	send_part(who, chan);
 	part_chan (finduser (who), (char *) chan, NULL);
@@ -954,24 +960,8 @@ snick_cmd (const char *oldnick, const char *newnick)
 	return NS_SUCCESS;
 }
 
-#ifdef IRCU
-int 
-scmode_op (const char *who, const char *chan, const char *mode, const char *bot)
-{
-	char **av;
-	int ac;
-
-	send_cmode (me.name, who, chan, mode, nicktobase64 (bot), me.now);
-	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, bot);
-	ac = split_buf (ircd_buf, &av, 0);
-	ChanMode (me.name, av, ac);
-	sfree (av);
-	return NS_SUCCESS;
-}
-#endif
-
 int
-schmode_cmd (const char *who, const char *chan, const char *mode, const char *args)
+scmode_cmd (const char *who, const char *chan, const char *mode, const char *args)
 {
 	char **av;
 	int ac;
@@ -981,6 +971,18 @@ schmode_cmd (const char *who, const char *chan, const char *mode, const char *ar
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
 	sfree (av);
+	return NS_SUCCESS;
+}
+
+int
+schanusermode_cmd (const char *who, const char *chan, const char *mode, const char *bot)
+{
+#ifdef IRCU
+	send_cmode (me.name, who, chan, mode, nicktobase64 (bot), me.now);
+#else
+	send_cmode (me.name, who, chan, mode, bot, me.now);
+#endif
+	ChanUserMode (chan, who, 1, UmodeStringToMask(mode,0));
 	return NS_SUCCESS;
 }
 
@@ -1022,15 +1024,17 @@ ssvskill_cmd (const char *target, const char *reason, ...)
 	return NS_SUCCESS;
 }
 
-#ifdef GOTSVSTIME
 int 
 ssvstime_cmd (const time_t ts)
 {
-	send_svstime(me.name, (unsigned long)ts);
-	nlog (LOG_NOTICE, "ssvstime_cmd: synching server times to %lu", ts);
+	if(ircd_features & FEATURE_SVSTIME) {
+		send_svstime(me.name, (unsigned long)ts);
+		nlog (LOG_NOTICE, "ssvstime_cmd: synching server times to %lu", ts);
+	} else {
+		unsupported_cmd("SVSTIME");
+	}
 	return NS_SUCCESS;
 }
-#endif
 
 int
 skick_cmd (const char *who, const char *chan, const char *target, const char *reason)
@@ -1160,59 +1164,6 @@ srakill_cmd (const char *host, const char *ident)
 	return NS_SUCCESS;
 }
 
-static char get_sjoin_char(const char* mode)
-{
-	char c = 0;
-	int i;
-
-	for (i = 0; i < ircd_cmodecount; i++) {
-		if (chan_modes[i].sjoin == 0 || mode[1] == chan_modes[i].flag) {
-			c = chan_modes[i].sjoin;
-			break;
-		}
-	}
-	return(c);
-}
-
-int
-ssjoin_cmd (const char *who, const char *chan, const char *mode)
-{
-	time_t ts;
-	Channel *c;
-
-	c = findchan ((char *) chan);
-	if (!c) {
-		ts = me.now;
-	} else {
-		ts = c->creationtime;
-	}
-	if (mode == NULL) {
-		ircsnprintf (ircd_buf, BUFSIZE, "%s", who);
-	} else {
-		ircsnprintf (ircd_buf, BUFSIZE, "%c%s", get_sjoin_char(mode), who);
-	}
-	send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
-	join_chan (who, chan);
-	if (mode) {
-		char **av;
-		int ac;
-
-		ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, who);
-		ac = split_buf (ircd_buf, &av, 0);
-		ChanMode (me.name, av, ac);
-		sfree (av);
-	}
-	return NS_SUCCESS;
-}
-
-int
-sjoin_cmd (const char *who, const char *chan)
-{
-	send_join (me.name, who, chan, me.now);
-	join_chan (who, chan);
-	return NS_SUCCESS;
-}
-
 int
 sping_cmd (const char *from, const char *reply, const char *to)
 {
@@ -1238,18 +1189,6 @@ int
 ssquit_cmd (const char *server, const char *quitmsg)
 {
 	send_squit (server, quitmsg);
-	return NS_SUCCESS;
-}
-
-int
-snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
-{
-	char* newmode;
-	
-	newmode = UmodeMaskToString(mode);
-	AddUser (nick, ident, host, realname, me.name, NULL, NULL, NULL);
-	send_nick (nick, (unsigned long)me.now, newmode, ident, host, me.name, realname);
-	UserMode (nick, newmode);
 	return NS_SUCCESS;
 }
 
@@ -1426,6 +1365,10 @@ do_nick (const char *nick, const char *hopcount, const char* TS,
 #endif
 		 )
 {
+	if (!nick) {
+		nlog (LOG_CRITICAL, "do_nick: trying to add user with NULL nickname");
+		return;
+	}
 	AddUser (nick, user, host, realname, server, ip, TS, numeric);
 	if(modes) {
 		UserMode (nick, modes);
@@ -1447,6 +1390,10 @@ do_client (const char *nick, const char *arg1, const char *TS,
 		const char *server, const char *arg9, 
 		const char *ip, const char *realname)
 {
+	if (!nick) {
+		nlog (LOG_CRITICAL, "do_client: trying to add user with NULL nickname");
+		return;
+	}
 	AddUser (nick, user, host, realname, server, ip, TS, NULL);
 	if(modes) {
 		UserMode (nick, modes);
@@ -1617,7 +1564,6 @@ do_burst (char *origin, char **argv, int argc)
 #endif
 #endif
 
-#ifdef MSG_SWHOIS
 void 
 do_swhois (char *who, char *swhois)
 {
@@ -1627,9 +1573,7 @@ do_swhois (char *who, char *swhois)
 		strlcpy(u->swhois, swhois, MAXHOST);
 	}
 }
-#endif
 
-#ifdef MSG_TKL
 void 
 do_tkl(const char *add, const char *type, const char *user, const char *host, const char *setby, const char *tsexpire, const char *tsset, const char *reason)
 {
@@ -1641,9 +1585,7 @@ do_tkl(const char *add, const char *type, const char *user, const char *host, co
 		DelBan(type, user, host, mask, reason, setby, tsset, tsexpire);
 	}
 }
-#endif
 
-#ifdef MSG_EOS
 void 
 do_eos (const char *name)
 {
@@ -1657,7 +1599,6 @@ do_eos (const char *name)
 		nlog (LOG_WARNING, "do_eos: server %s not found", name);
 	}
 }
-#endif
 
 void
 send_cmd (char *fmt, ...)
@@ -1680,8 +1621,6 @@ send_cmd (char *fmt, ...)
 	buflen = strnlen (buf, BUFSIZE);
 	sts (buf, buflen);
 }
-
-#ifdef BASE64SERVERNAME
 
 void
 setserverbase64 (const char *name, const char* num)
@@ -1727,9 +1666,6 @@ base64toserver (const char* num)
 	return NULL;
 }
 
-#endif
-
-#ifdef BASE64NICKNAME
 void
 setnickbase64 (const char *nick, const char* num)
 {
@@ -1774,5 +1710,4 @@ base64tonick (const char* num)
 	return NULL;
 }
 
-#endif
 

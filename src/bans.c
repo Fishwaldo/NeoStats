@@ -23,6 +23,7 @@
 
 #include "neostats.h"
 #include "modules.h"
+#include "services.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -124,13 +125,13 @@ BanDump (void)
 	hscan_t ss;
 	hnode_t *bansnode;
 
-	debugtochannel("Server Listing:");
+	chanalert (ns_botptr->nick, "Server Listing:");
 	hash_scan_begin (&ss, banshash);
 	while ((bansnode = hash_scan_next (&ss)) != NULL) {
 		ban = hnode_get (bansnode);
-		debugtochannel("Ban: %s ", ban->mask);
+		chanalert (ns_botptr->nick, "Ban: %s ", ban->mask);
 	}
-	debugtochannel("End of Listing.");
+	chanalert (ns_botptr->nick, "End of Listing.");
 }
 
 void FiniBans (void)

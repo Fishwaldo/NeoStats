@@ -60,6 +60,9 @@ static void m_end_of_burst (char *origin, char **argv, int argc, int srv);
 void send_end_of_burst_ack(void);
 void send_end_of_burst(void);
 
+const int ircd_minprotocol = PROTOCOL_TOKEN|PROTOCOL_NOQUIT|PROTOCOL_B64SERVER|PROTOCOL_B64NICK;
+const int ircd_optprotocol = 0;
+const int ircd_features = 0;
 const char services_umode[]= "+iok";
 const char services_cmode[]= "+o";
 
@@ -474,6 +477,10 @@ send_globops (const char *from, const char *buf)
 	}
 }
 
+void 
+send_svstime (const char *sender, const unsigned long ts)
+{
+}
 
 static void
 m_stats (char *origin, char **argv, int argc, int srv)
@@ -870,7 +877,7 @@ parse (char *line)
 		dlog(DEBUG1, "0 %d", ac);
 	}
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	if(av) sfree (av);
+	sfree (av);
 	dlog(DEBUG1, "-------------------------END PARSE--------------------------");
 }
 
@@ -925,3 +932,4 @@ ircu_m_notice (char *origin, char **argv, int argc, int srv)
 	m_notice (base64tonick(origin), av, ac, srv);
 	sfree (av);
 }
+

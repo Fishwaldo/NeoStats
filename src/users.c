@@ -86,16 +86,11 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 #endif
 
 	SET_SEGV_LOCATION();
-	if (!nick) {
-		nlog (LOG_CRITICAL, "AddUser: trying to add user with NULL nickname");
-		return;
-	}
 	u = finduser (nick);
 	if (u) {
 		nlog (LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick);
 		return;
 	}
-
 	if(ip) {
 		ipaddress = strtoul (ip, NULL, 10);
 #ifndef GOTNICKIP
@@ -137,11 +132,9 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	}
 	/* check if the user is excluded */
 	ns_do_exclude_user(u);
-#ifdef BASE64NICKNAME
-	if(numeric) {
+	if((ircd_srv.protocol & PROTOCOL_B64SERVER) && numeric) {
 		setnickbase64 (u->nick, numeric);
 	}
-#endif
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.user = u;	
 	SendAllModuleEvent (EVENT_SIGNON, cmdparams);
@@ -295,7 +288,6 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	return NS_SUCCESS;
 }
 
-#ifdef BASE64NICKNAME
 User *
 finduserbase64 (const char *num)
 {
@@ -314,7 +306,6 @@ finduserbase64 (const char *num)
 	dlog(DEBUG3, "finduserbase64: %s not found", num);
 	return NULL;
 }
-#endif
 
 User *
 finduser (const char *nick)
@@ -580,33 +571,33 @@ dumpuser (User* u)
 	lnode_t *cm;
 	int i = 0;
 					          
-#ifdef BASE64NICKNAME
-	debugtochannel("User:     %s!%s@%s (%s)", u->nick, u->username, u->hostname, u->name64);
-#else
-	debugtochannel("User:     %s!%s@%s", u->nick, u->username, u->hostname);
-#endif
-	debugtochannel("IP:       %s", inet_ntoa(u->ipaddr));
-	debugtochannel("Vhost:    %s", u->vhost);
-	debugtochannel("Flags:    0x%lx", u->flags);
-	debugtochannel("Modes:    %s (0x%lx)", UmodeMaskToString(u->Umode), u->Umode);
+	if (ircd_srv.protocol & PROTOCOL_B64SERVER) {
+		chanalert (ns_botptr->nick, "User:     %s!%s@%s (%s)", u->nick, u->username, u->hostname, u->name64);
+	} else {
+		chanalert (ns_botptr->nick, "User:     %s!%s@%s", u->nick, u->username, u->hostname);
+	}
+	chanalert (ns_botptr->nick, "IP:       %s", inet_ntoa(u->ipaddr));
+	chanalert (ns_botptr->nick, "Vhost:    %s", u->vhost);
+	chanalert (ns_botptr->nick, "Flags:    0x%lx", u->flags);
+	chanalert (ns_botptr->nick, "Modes:    %s (0x%lx)", UmodeMaskToString(u->Umode), u->Umode);
 #ifdef GOTUSERSMODES
-	debugtochannel("Smodes:   %s (0x%lx)", SmodeMaskToString(u->Smode), u->Smode);
+	chanalert (ns_botptr->nick, "Smodes:   %s (0x%lx)", SmodeMaskToString(u->Smode), u->Smode);
 #endif
 	if(u->is_away) {
-		debugtochannel("Away:     %s", u->awaymsg);
+		chanalert (ns_botptr->nick, "Away:     %s", u->awaymsg);
 	}
 
 	cm = list_first (u->chans);
 	while (cm) {
 		if(i==0) {
-			debugtochannel("Channels: %s", (char *) lnode_get (cm));
+			chanalert (ns_botptr->nick, "Channels: %s", (char *) lnode_get (cm));
 		} else {
-			debugtochannel("          %s", (char *) lnode_get (cm));
+			chanalert (ns_botptr->nick, "          %s", (char *) lnode_get (cm));
 		}
 		cm = list_next (u->chans, cm);
 		i++;
 	}
-	debugtochannel("========================================");
+	chanalert (ns_botptr->nick, "========================================");
 }
 
 void
@@ -616,8 +607,12 @@ UserDump (const char *nick)
 	hnode_t *un;
 	hscan_t us;
 
+#ifndef DEBUG
+	if (!config.debug)
+		return;
+#endif
 	SET_SEGV_LOCATION();
-	debugtochannel("================USERDUMP================");
+	chanalert (ns_botptr->nick, "================USERDUMP================");
 	if (!nick) {
 		hash_scan_begin (&us, userhash);
 		while ((un = hash_scan_next (&us)) != NULL) {
@@ -630,7 +625,7 @@ UserDump (const char *nick)
 			u = hnode_get (un);
 			dumpuser (u);
 		} else {
-			debugtochannel("UserDump: can't find user %s", nick);
+			chanalert (ns_botptr->nick, "UserDump: can't find user %s", nick);
 		}
 	}
 }

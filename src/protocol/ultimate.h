@@ -25,25 +25,12 @@
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
 
-/* we don't support server names as base 64 numerics */
-#undef BASE64SERVERNAME
-/* we don't support nick names as base 64 numerics */
-#undef BASE64NICKNAME
-
 /* Feature support for use by modules to determine whether
  * certain functionality is available
  */
 
 #ifdef ULTIMATE3
 
-/* we support tokens */
-#undef GOTTOKENSUPPORT
-/* we have sjoin */
-#define GOTSJOIN
-/* we support CLIENT */
-#define GOTCLIENTSUPPORT
-/* we don't support svstime */
-#undef GOTSVSTIME
 /* we have vhost support */
 #define GOTSVSHOST 
 /* we have svsjoin from a30 onwards */
@@ -65,14 +52,6 @@
 
 #else /* !ULTIMATE3 */
 
-/* we support tokens */
-#undef GOTTOKENSUPPORT
-/* we don't have sjoin */
-#undef GOTSJOIN
-/* we don't support CLIENT */
-#undef GOTCLIENTSUPPORT
-/* we don't support svstime */
-#undef GOTSVSTIME
 /* we have vhost support */
 #define GOTSVSHOST 
 /* old Ultimate2 doesn't have svsjoin */
@@ -483,7 +462,7 @@
 #define UMODE_SADMIN	0x2000000	/* Marks the client as a Services Administrator */
 #define UMODE_WATCHER		0x4000000	/* Recive Monitor Globals */
 #define UMODE_NETMON		0x8000000	/* Marks the client as an Network Monitor */
-#define UMODE_SADMIN		0x10000000	/* Marks the client as a Server Admin */
+#define UMODE_ADMIN		0x10000000	/* Marks the client as a Server Admin */
 #define UMODE_TECHADMIN		0x20000000	/* Marks the client as a Technical Admin */
 #endif
 

@@ -48,6 +48,7 @@ static int ns_raw (CmdParams* cmdparams);
 static int ns_userdump (CmdParams* cmdparams);
 static int ns_serverdump (CmdParams* cmdparams);
 static int ns_chandump (CmdParams* cmdparams);
+static int ns_bandump (CmdParams* cmdparams);
 static int ns_status (CmdParams* cmdparams);
 static int ns_level (CmdParams* cmdparams);
 static int ns_load (CmdParams* cmdparams);
@@ -98,6 +99,7 @@ static bot_cmd ns_commands[]=
 	{"USERDUMP",	ns_userdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_userdump, 	ns_help_userdump_oneline},
 	{"CHANDUMP",	ns_chandump,	0, 	NS_ULEVEL_ROOT,  	ns_help_chandump, 	ns_help_chandump_oneline},
 	{"SERVERDUMP",	ns_serverdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverdump, ns_help_serverdump_oneline},
+	{"BANDUMP",		ns_bandump,		0, 	NS_ULEVEL_ROOT,  	ns_help_bandump,	ns_help_bandump_oneline},
 	{NULL,			NULL,			0, 	0,					NULL, 				NULL}
 };
 
@@ -262,10 +264,12 @@ static int
 ns_userdump (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
+#ifndef DEBUG
 	if (!config.debug) {
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
+#endif
 	UserDump ((cmdparams->ac < 1)? NULL : cmdparams->av[0]);
    	return NS_SUCCESS;
 }
@@ -281,10 +285,12 @@ static int
 ns_serverdump (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
+#ifndef DEBUG
 	if (!config.debug) {
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
+#endif
 	ServerDump ((cmdparams->ac < 1)? NULL : cmdparams->av[0]);
    	return NS_SUCCESS;
 }
@@ -300,11 +306,34 @@ static int
 ns_chandump (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
+#ifndef DEBUG
 	if (!config.debug) {
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
+#endif
 	ChanDump ((cmdparams->ac < 1)? NULL : cmdparams->av[0]);
+   	return NS_SUCCESS;
+}
+
+/** @brief USERDUMP command handler
+ *
+ *  Dump user list
+ *   
+ *  @param cmdparams structure with command information
+ *  @returns none
+ */
+static int
+ns_bandump (CmdParams* cmdparams)
+{
+	SET_SEGV_LOCATION();
+#ifndef DEBUG
+	if (!config.debug) {
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "\2Error:\2 debug mode disabled");
+	   	return NS_FAILURE;
+	}
+#endif
+	BanDump ();
    	return NS_SUCCESS;
 }
 

@@ -57,6 +57,9 @@ static void m_vctrl (char *origin, char **argv, int argc, int srv);
 static void m_client (char *origin, char **argv, int argc, int srv);
 static void m_smode (char *origin, char **argv, int argc, int srv);
 
+const int ircd_minprotocol = PROTOCOL_SJOIN;
+const int ircd_optprotocol = PROTOCOL_TOKEN | PROTOCOL_CLIENT;
+const int ircd_features = 0;
 const char services_umode[]= "+oS";
 const char services_cmode[]= "+a";
 
@@ -177,33 +180,33 @@ const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
-	send_cmd (":%s %s %s %d :%s", sender, (ircd_srv.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	send_cmd (":%s %s %s %d :%s", sender, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 }
 
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
-	send_cmd ("%s %s :TS", (ircd_srv.token ? TOK_PASS : MSG_PASS), pass);
+	send_cmd ("%s %s :TS", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PASS : MSG_PASS), pass);
 	send_cmd ("CAPAB TS5 BURST SSJ5 NICKIP CLIENT");
-	send_cmd ("%s %s %d :%s", (ircd_srv.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	send_cmd ("%s %s %d :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 }
 
 void
 send_squit (const char *server, const char *quitmsg)
 {
-	send_cmd ("%s %s :%s", (ircd_srv.token ? TOK_SQUIT : MSG_SQUIT), server, quitmsg);
+	send_cmd ("%s %s :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SQUIT : MSG_SQUIT), server, quitmsg);
 }
 
 void 
 send_quit (const char *who, const char *quitmsg)
 {
-	send_cmd (":%s %s :%s", who, (ircd_srv.token ? TOK_QUIT : MSG_QUIT), quitmsg);
+	send_cmd (":%s %s :%s", who, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_QUIT : MSG_QUIT), quitmsg);
 }
 
 void 
 send_part (const char *who, const char *chan)
 {
-	send_cmd (":%s %s %s", who, (ircd_srv.token ? TOK_PART : MSG_PART), chan);
+	send_cmd (":%s %s %s", who, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PART : MSG_PART), chan);
 }
 
 void 
@@ -221,25 +224,25 @@ send_join (const char *sender, const char *who, const char *chan, const unsigned
 void 
 send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %s %s %lu", sender, (ircd_srv.token ? TOK_MODE : MSG_MODE), chan, mode, args, ts);
+	send_cmd (":%s %s %s %s %s %lu", sender, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_MODE : MSG_MODE), chan, mode, args, ts);
 }
 
 void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
-	send_cmd ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (ircd_srv.token ? TOK_NICK : MSG_NICK), nick, ts, newmode, ident, host, server, ts, realname);
+	send_cmd ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NICK : MSG_NICK), nick, ts, newmode, ident, host, server, ts, realname);
 }
 
 void
 send_ping (const char *from, const char *reply, const char *to)
 {
-	send_cmd (":%s %s %s :%s", from, (ircd_srv.token ? TOK_PING : MSG_PING), reply, to);
+	send_cmd (":%s %s %s :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PING : MSG_PING), reply, to);
 }
 
 void 
 send_umode (const char *who, const char *target, const char *mode)
 {
-	send_cmd (":%s %s %s :%s", who, (ircd_srv.token ? TOK_MODE : MSG_MODE), target, mode);
+	send_cmd (":%s %s %s :%s", who, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_MODE : MSG_MODE), target, mode);
 }
 
 void 
@@ -251,19 +254,19 @@ send_numeric (const char *from, const int numeric, const char *target, const cha
 void
 send_pong (const char *reply)
 {
-	send_cmd ("%s %s", (ircd_srv.token ? TOK_PONG : MSG_PONG), reply);
+	send_cmd ("%s %s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PONG : MSG_PONG), reply);
 }
 
 void
 send_snetinfo (const char* from, const int prot, const char* cloak, const char* netname, const unsigned long ts)
 {
-	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", from, (ircd_srv.token ? TOK_SNETINFO : MSG_SNETINFO), ts, prot, cloak, netname);
+	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SNETINFO : MSG_SNETINFO), ts, prot, cloak, netname);
 }
 
 void
 send_netinfo (const char* from, const int prot, const char* cloak, const char* netname, const unsigned long ts)
 {
-	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", from, (ircd_srv.token ? TOK_NETINFO : MSG_NETINFO), ts, prot, cloak, netname);
+	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NETINFO : MSG_NETINFO), ts, prot, cloak, netname);
 }
 
 void
@@ -275,7 +278,7 @@ send_vctrl (const int uprot, const int nicklen, const int modex, const int gc, c
 void 
 send_kill (const char *from, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s :%s", from, (ircd_srv.token ? TOK_KILL : MSG_KILL), target, reason);
+	send_cmd (":%s %s %s :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_KILL : MSG_KILL), target, reason);
 }
 
 void 
@@ -287,43 +290,43 @@ send_svskill (const char *sender, const char *target, const char *reason)
 void 
 send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %lu", oldnick, (ircd_srv.token ? TOK_NICK : MSG_NICK), newnick, ts);
+	send_cmd (":%s %s %s %lu", oldnick, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NICK : MSG_NICK), newnick, ts);
 }
 
 void 
 send_svsnick (const char *sender, const char *target, const char *newnick, const unsigned long ts)
 {
-	send_cmd ("%s %s %s :%lu", (ircd_srv.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, ts);
+	send_cmd ("%s %s %s :%lu", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, ts);
 }
 
 void
 send_svsjoin (const char *sender, const char *target, const char *chan)
 {
-	send_cmd ("%s %s %s", (ircd_srv.token ? TOK_SVSJOIN : MSG_SVSJOIN), target, chan);
+	send_cmd ("%s %s %s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SVSJOIN : MSG_SVSJOIN), target, chan);
 }
 
 void
 send_svspart (const char *sender, const char *target, const char *chan)
 {
-	send_cmd ("%s %s %s", (ircd_srv.token ? TOK_SVSPART : MSG_SVSPART), target, chan);
+	send_cmd ("%s %s %s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SVSPART : MSG_SVSPART), target, chan);
 }
 
 void 
 send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s %s :%s", who, (ircd_srv.token ? TOK_KICK : MSG_KICK), chan, target, (reason ? reason : "No Reason Given"));
+	send_cmd (":%s %s %s %s :%s", who, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_KICK : MSG_KICK), chan, target, (reason ? reason : "No Reason Given"));
 }
 
 void 
 send_wallops (const char *who, const char *buf)
 {
-	send_cmd (":%s %s :%s", who, (ircd_srv.token ? TOK_WALLOPS : MSG_WALLOPS), buf);
+	send_cmd (":%s %s :%s", who, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_WALLOPS : MSG_WALLOPS), buf);
 }
 
 void
 send_svshost (const char *sender, const char *who, const char *vhost)
 {
-	send_cmd (":%s %s %s %s", sender, (ircd_srv.token ? TOK_SETHOST : MSG_SETHOST), who, vhost);
+	send_cmd (":%s %s %s %s", sender, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SETHOST : MSG_SETHOST), who, vhost);
 }
 
 void
@@ -335,13 +338,13 @@ send_invite (const char *from, const char *to, const char *chan)
 void 
 send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, (ircd_srv.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, ts, reason);
+	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, ts, reason);
 }
 
 void 
 send_rakill (const char *sender, const char *host, const char *ident)
 {
-	send_cmd (":%s %s %s %s", sender, (ircd_srv.token ? TOK_RAKILL : MSG_RAKILL), host, ident);
+	send_cmd (":%s %s %s %s", sender, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_RAKILL : MSG_RAKILL), host, ident);
 }
 
 
@@ -364,19 +367,24 @@ send_burst (int b)
 void
 send_privmsg (const char *from, const char *to, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, (ircd_srv.token ? TOK_PRIVATE : MSG_PRIVATE), to, buf);
+	send_cmd (":%s %s %s :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PRIVATE : MSG_PRIVATE), to, buf);
 }
 
 void
 send_notice (const char *from, const char *to, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, (ircd_srv.token ? TOK_NOTICE : MSG_NOTICE), to, buf);
+	send_cmd (":%s %s %s :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NOTICE : MSG_NOTICE), to, buf);
 }
 
 void
 send_globops (const char *from, const char *buf)
 {
-	send_cmd (":%s %s :%s", from, (ircd_srv.token ? TOK_GLOBOPS : MSG_GLOBOPS), buf);
+	send_cmd (":%s %s :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_GLOBOPS : MSG_GLOBOPS), buf);
+}
+
+void 
+send_svstime (const char *sender, const unsigned long ts)
+{
 }
 
 static void

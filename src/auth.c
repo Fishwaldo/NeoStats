@@ -24,7 +24,6 @@
 #include "neostats.h"
 #include "modules.h"
 #include "dl.h"
-#include "ircd.h"
 #include "services.h"
 
 typedef int (*getauthfunc) (User *, int curlvl);

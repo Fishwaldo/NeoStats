@@ -34,6 +34,7 @@ extern const char *ns_help_raw[];
 extern const char *ns_help_userdump[];
 extern const char *ns_help_chandump[];
 extern const char *ns_help_serverdump[];
+extern const char *ns_help_bandump[];
 extern const char *ns_help_load[];
 extern const char *ns_help_unload[];
 extern const char *ns_help_modlist[];
@@ -64,6 +65,7 @@ extern const char ns_help_modlist_oneline[];
 extern const char ns_help_userdump_oneline[];
 extern const char ns_help_chandump_oneline[];
 extern const char ns_help_serverdump_oneline[];
+extern const char ns_help_bandump_oneline[];
 
 extern const char *ns_help_set_pingtime[];
 extern const char *ns_help_set_versionscan[];

@@ -25,23 +25,10 @@
 #ifndef QUANTUM_H
 #define QUANTUM_H
 
-/* we don't support server names as base 64 numerics */
-#undef BASE64SERVERNAME
-/* we don't support nick names as base 64 numerics */
-#undef BASE64NICKNAME
-
 /* Feature support for use by modules to determine whether
  * certain functionality is available
  */
 
-/* we support tokens */
-#define GOTTOKENSUPPORT
-/* we have sjoin */
-#define GOTSJOIN
-/* we support CLIENT */
-#define GOTCLIENTSUPPORT
-/* we don't support svstime */
-#undef GOTSVSTIME
 /* we have vhost support */
 #define GOTSVSHOST 
 /* we dont have svsjoin */

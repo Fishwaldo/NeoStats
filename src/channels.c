@@ -759,22 +759,22 @@ dumpchan (Channel* c)
 			mode[++j] = chan_modes[i].flag;
 		}
 	}
-	debugtochannel("Channel:    %s", c->name);
-	debugtochannel("Mode:       %s creationtime %ld", mode, (long)c->creationtime);
-	debugtochannel("TopicOwner: %s TopicTime: %ld Topic: %s", c->topicowner, (long)c->topictime, c->topic);
-	debugtochannel("PubChan?:   %d", is_pub_chan (c));
-	debugtochannel("Flags:      %lx", c->flags);
+	chanalert (ns_botptr->nick, "Channel:    %s", c->name);
+	chanalert (ns_botptr->nick, "Mode:       %s creationtime %ld", mode, (long)c->creationtime);
+	chanalert (ns_botptr->nick, "TopicOwner: %s TopicTime: %ld Topic: %s", c->topicowner, (long)c->topictime, c->topic);
+	chanalert (ns_botptr->nick, "PubChan?:   %d", is_pub_chan (c));
+	chanalert (ns_botptr->nick, "Flags:      %lx", c->flags);
 	cmn = list_first (c->modeparms);
 	while (cmn) {
 		m = lnode_get (cmn);
 		for (i = 0; i < ircd_cmodecount; i++) {
 			if (m->mode & chan_modes[i].mode) {
-				debugtochannel("Modes:      %c Parms %s", chan_modes[i].flag, m->param);
+				chanalert (ns_botptr->nick, "Modes:      %c Parms %s", chan_modes[i].flag, m->param);
 			}
 		}
 		cmn = list_next (c->modeparms, cmn);
 	}
-	debugtochannel("Members:    %ld (List %d)", c->users, (int)list_count (c->chanmembers));
+	chanalert (ns_botptr->nick, "Members:    %ld (List %d)", c->users, (int)list_count (c->chanmembers));
 	cmn = list_first (c->chanmembers);
 	while (cmn) {
 		cm = lnode_get (cmn);
@@ -786,10 +786,10 @@ dumpchan (Channel* c)
 				mode[++j] = chan_modes[i].flag;
 			}
 		}
-		debugtochannel("            %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->tsjoin);
+		chanalert (ns_botptr->nick, "            %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->tsjoin);
 		cmn = list_next (c->chanmembers, cmn);
 	}
-	debugtochannel("========================================");
+	chanalert (ns_botptr->nick, "========================================");
 }
 
 void ChanDump (const char *chan)
@@ -798,10 +798,14 @@ void ChanDump (const char *chan)
 	hscan_t sc;
 	Channel *c;
 
+#ifndef DEBUG
+	if (!config.debug)
+		return;
+#endif
 	SET_SEGV_LOCATION();
-	debugtochannel("================CHANDUMP================");
+	chanalert (ns_botptr->nick, "================CHANDUMP================");
 	if (!chan) {
-		debugtochannel("Channels %d", (int)hash_count (channelhash));
+		chanalert (ns_botptr->nick, "Channels %d", (int)hash_count (channelhash));
 		hash_scan_begin (&sc, channelhash);
 		while ((cn = hash_scan_next (&sc)) != NULL) {
 			c = hnode_get (cn);
@@ -812,7 +816,7 @@ void ChanDump (const char *chan)
 		if (c) {
 			dumpchan(c);
 		} else {
-			debugtochannel("ChanDump: can't find channel %s", chan);
+			chanalert (ns_botptr->nick, "ChanDump: can't find channel %s", chan);
 		}
 	}
 }

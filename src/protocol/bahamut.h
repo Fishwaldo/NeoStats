@@ -25,23 +25,10 @@
 #ifndef BAHAMUT_H
 #define BAHAMUT_H
 
-/* we don't support server names as base 64 numerics */
-#undef BASE64SERVERNAME
-/* we don't support nick names as base 64 numerics */
-#undef BASE64NICKNAME
-
 /* Feature support for use by modules to determine whether
  * certain functionality is available
  */
 
-/* we don't support tokens */
-#undef GOTTOKENSUPPORT
-/* we have sjoin */
-#define GOTSJOIN
-/* we don't support CLIENT */
-#undef GOTCLIENTSUPPORT
-/* we don't support svstime */
-#undef GOTSVSTIME
 /* we don't have svshost support */
 #undef GOTSVSHOST 
 /* we don't have svsjoin support */

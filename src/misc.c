@@ -326,25 +326,3 @@ sftime (time_t stuff)
 	return fmtime;
 }
 
-/** @brief 
- *
- * @param 
- * 
- * @returns 
- *
- */
-void
-debugtochannel(char *message, ...)
-{
-	va_list ap;
-
-	SET_SEGV_LOCATION();
-#ifndef DEBUG
-	if (!config.debug)
-		return;
-#endif
-	va_start (ap, message);
-	ircvsnprintf (misc_buf, BUFSIZE, message, ap);
-	va_end (ap);
-	chanalert (ns_botptr->nick, misc_buf);
-}

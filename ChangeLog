@@ -4,6 +4,13 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Replace spart_cmd with part_bot_from_chan function (M)
+ - Add BANDUMP command to display ban table (M)
+ - Remove debugtochannel and optimise code path of functions using it (M)
+ - Remove ssjoin_cmd and sjoin_cmd functions. All channel joins must use
+   join_bot_to_chan. (M)
+ - Remove snewnick_cmd function. All new users must be introduced using 
+   init_bot (M)
  - Change is_pub_chan so it returns TRUE for a public channel. (M)
  - Begin IRCD "soft" protocol/feature design. (M)
  - Remove old CMODE_CH_xxx and CMODE_FL_xxx defines that new sjoin system makes

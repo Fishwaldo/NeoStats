@@ -30,8 +30,6 @@ void ServerDump (const char *name);
 int InitServers (void);
 void PingServers (void);
 void FiniServers (void);
-#ifdef BASE64SERVERNAME
 Server *findserverbase64 (const char *num);
-#endif
 
 #endif /* _SERVER_H_ */

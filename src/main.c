@@ -124,6 +124,7 @@ static int InitCore(void)
 		return NS_FAILURE;	
 	if (InitCurl () != NS_SUCCESS)
 		return NS_FAILURE;
+	InitServices();
 	InitIrcd ();
 	dlog(DEBUG1, "Core init successful");
 	return NS_SUCCESS;

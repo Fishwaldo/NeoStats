@@ -37,9 +37,7 @@ void UserMode (const char *nick, const char *modes);
 void UserSMode (const char *nick, const char *modes);
 #endif
 void UserAway (const char *nick, const char *awaymsg);
-#ifdef BASE64NICKNAME
 User *finduserbase64 (const char *num);
-#endif
 void UserDump (const char *nick);
 void QuitServerUsers (Server* s);
 

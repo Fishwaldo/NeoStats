@@ -432,19 +432,16 @@ del_ns_bot (const char *bot_name)
 int
 bot_nick_change (const char *oldnick, const char *newnick)
 {
-	User *u;
 	Bot *botptr;
 	hnode_t *bn;
 
 	SET_SEGV_LOCATION();
 	/* First, try to find out if the newnick is unique! */
-	u = finduser (oldnick);
-	if (!u) {
+	if (!finduser (oldnick)) {
 		nlog (LOG_WARNING, "Unknown bot %s tried to change nick to %s", oldnick, newnick);
 		return NS_FAILURE;
 	}
-	u = finduser (newnick);
-	if (u) {
+	if (finduser (newnick)) {
 		nlog (LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", oldnick, newnick);
 		return NS_FAILURE;
 	}
@@ -557,7 +554,8 @@ Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd
 		return NULL;
 	}
 	Umode = UmodeStringToMask(modes, 0);
-	signon_newbot (nick, botinfo->user, ((*botinfo->host)==0?me.name:botinfo->host), botinfo->realname, Umode);
+	signon_newbot (nick, botinfo->user, ((*botinfo->host)==0?me.name:botinfo->host), 
+		botinfo->realname, modes, Umode);
 	u = finduser (nick);
 	/* set our link back to user struct for bot */
 	botptr->u = u;

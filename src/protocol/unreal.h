@@ -24,23 +24,10 @@
 #ifndef UNREAL_H
 #define UNREAL_H
 
-/* we don't support server names as base 64 numerics */
-#undef BASE64SERVERNAME
-/* we don't support nick names as base 64 numerics */
-#undef BASE64NICKNAME
-
 /* Feature support for use by modules to determine whether
  * certain functionality is available
  */
 
-/* we have token support */
-#define GOTTOKENSUPPORT
-/* we have sjoin */
-#define GOTSJOIN
-/* we don't support CLIENT */
-#undef GOTCLIENTSUPPORT
-/* we have svstime */
-#define GOTSVSTIME
 /* we have vhost support */
 #define GOTSVSHOST 
 /* we have svsmode */
