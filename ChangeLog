@@ -20,6 +20,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Ultimate2 akills are moved to glines. BugID#29
  - ModNum Structure created for tracking module numbers for module data pointers in users/server/channels/modes pointers 
  - Unreal works (it seems)
+ - Ultimate2/3 Works
 
 * NeoStats * Fish * Version 2.5.3
  - Added ability to turn off StatServ wallops. "/msg statserv set msgthrottle off" - BugID#6

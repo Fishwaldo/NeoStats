@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.54 2003/06/26 06:00:43 fishwaldo Exp $
+** $Id: users.c,v 1.55 2003/07/11 14:06:45 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -391,6 +391,10 @@ void UserMode(const char *nick, const char *modes, int smode)
 	if (smode == 0)
 		strncpy(u->modes, modes, MODESIZE);
 
+	AddStringToList(&av, u->nick, &ac);
+	AddStringToList(&av, (char *) modes, &ac);
+
+
 	tmpmode = *(modes);
 	while (tmpmode) {
 		switch (tmpmode) {
@@ -443,16 +447,15 @@ void UserMode(const char *nick, const char *modes, int smode)
 		}
 		tmpmode = *modes++;
 	}
-	if (smode > 0)
+	if (smode > 0) {
 		nlog(LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p",
 		     u->nick, u->Smode);
-	else
+		     Module_Event("SMODE", av, ac);
+	} else {
 		nlog(LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p",
 		     u->nick, u->Umode);
-
-	AddStringToList(&av, u->nick, &ac);
-	AddStringToList(&av, (char *) modes, &ac);
-	Module_Event("UMODE", av, ac);
+		Module_Event("UMODE", av, ac);
+	}
 	free(av);
 
 

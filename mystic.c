@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: mystic.c,v 1.6 2003/07/08 05:35:37 fishwaldo Exp $
+** $Id: mystic.c,v 1.7 2003/07/11 14:06:45 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -517,7 +517,9 @@ int sakill_cmd(const char *host, const char *ident, const char *setby,
 
 int srakill_cmd(const char *host, const char *ident)
 {
-	chanalert(s_Services, "Warning, MysticIRCd doesn't support removing Glines");
+	/* ultimate2 needs a oper to remove */
+	sts(":%s %s :%s@%s", s_Services, MSG_REMGLINE, host, ident);
+
 	return 1;
 }
 

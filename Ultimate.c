@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.56 2003/07/08 05:35:37 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.57 2003/07/11 14:06:45 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -700,7 +700,8 @@ int srakill_cmd(const char *host, const char *ident)
 	sts(":%s %s %s %s", me.name, (me.token ? TOK_RAKILL : MSG_RAKILL),
 	    host, ident);
 #elif ULTIMATE
-	chanalert(s_Services, "Warning, Ultimate2 doesn't support removing Glines");
+	/* ultimate2 needs a oper to remove */
+	sts(":%s %s :%s@%s", s_Services, MSG_REMGLINE, host, ident);
 #endif 
 	return 1;
 }
@@ -1019,7 +1020,7 @@ void Usr_Smode(char *origin, char **argv, int argc)
 void Usr_Mode(char *origin, char **argv, int argc)
 {
 	if (!strchr(argv[0], '#')) {
-		nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[0]);
+		nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s %s", argv[0], argv[1]);
 		UserMode(argv[0], argv[1], 0);
 	} else {
 		ChanMode(origin, argv, argc);
