@@ -383,7 +383,7 @@ config_read (char *fname, config_option * options)
 	char *dc_env;		/* pointer to DC_INCLUDEPATH */
 
 	if (access (fname, R_OK)) {
-		fprintf (stderr, "Error opening configuration file '%s'\n", fname);
+		fprintf (stderr, "Error opening configuration file '%s/%s'\n", NEO_PREFIX, fname);
 		return 1;
 	}
 
