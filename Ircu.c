@@ -696,20 +696,32 @@ m_burst (char *origin, char **argv, int argc, int srv)
 	    switch (argv[param][0]) {
 			case '+': /* mode string */
 			{
-				int count;			
 				char *modes;
 				char **av;
 				int ac;
+				int i;
 
 				modes = argv[param];
 				param++;
 				modes++;
 				while(*modes) {
-					ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], *modes, argv[param]);
-					ac = split_buf (ircd_buf, &av, 0);
-					count = ChanMode (me.name, av, ac);
-					param = param + count - 2;
-					free (av);
+
+					for (i = 0; i < ircd_cmodecount; i++) {
+						if (*modes == chan_modes[i].flag) {
+							if (chan_modes[i].parameters) {
+								ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], *modes, argv[param]);
+								ac = split_buf (ircd_buf, &av, 0);
+								ChanMode (me.name, av, ac);
+								param ++;
+								free (av);
+							} else {
+								ircsnprintf (ircd_buf, BUFSIZE, "%s +%c", argv[0], *modes);
+								ac = split_buf (ircd_buf, &av, 0);
+								ChanMode (me.name, av, ac);
+								free (av);
+							}
+						}
+					}
 					modes++;
 				}
 				break;
