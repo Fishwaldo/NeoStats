@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.29 2003/04/03 14:36:37 fishwaldo Exp $
+** $Id: sock.c,v 1.30 2003/04/10 06:06:10 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -35,6 +35,9 @@
 void recvlog(char *line);
 #endif
 
+struct sockaddr_in lsa;
+int dobind;
+
 void init_sock() {
 	if (usr_mds);
 }
@@ -44,17 +47,38 @@ int ConnectTo(char *host, int port)
 	struct sockaddr_in sa;
 	int s;
 
+	dobind = 0;
+	/* bind to a local ip */
+	memset(&lsa, 0, sizeof(lsa));
+	if (strlen(me.local) > 1) {
+		if ((hp = gethostbyname(me.local)) == NULL) {
+			log("Warning, Couldn't bind to IP address %s", me.local);
+		} else {
+			memcpy((char *)&lsa.sin_addr, hp->h_addr, hp->h_length);
+			lsa.sin_family = hp->h_addrtype;
+			dobind = 1;
+		}
+	}
+
+
+
 	if ((hp = gethostbyname (host)) == NULL) {
 		return (-1);
 	}
 
 	if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		return (-1);
-
+	if (dobind > 0) {
+		if (bind(s,(struct sockaddr *)&lsa, sizeof(lsa)) < 0) {
+			log("bind(): Warning, Couldn't bind to IP address %s", strerror(errno));
+		}
+	}
+	
+	
 	bzero(&sa, sizeof(sa));
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons (port);
-    bcopy(hp->h_addr, (char *) &sa.sin_addr, hp->h_length);
+    	bcopy(hp->h_addr, (char *) &sa.sin_addr, hp->h_length);
 
 	if (connect (s, (struct sockaddr *) &sa, sizeof (sa)) < 0) {
 		close (s);
@@ -276,6 +300,15 @@ int sock_connect(int socktype, unsigned long ipaddr, int port, char *sockname, c
 
 	if ((s = socket(AF_INET, socktype, 0)) < 0)
 		return (-1);
+
+
+	/* bind to a IP address */
+	if (dobind > 0) {
+		if (bind(s,(struct sockaddr *)&lsa, sizeof(lsa)) < 0) {
+			log("sock_connect(): Warning, Couldn't bind to IP address %s", strerror(errno));
+		}
+	}
+
 	bzero(&sa, sizeof(sa));
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons (port);

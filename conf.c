@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.c,v 1.18 2002/12/30 12:09:38 fishwaldo Exp $
+** $Id: conf.c,v 1.19 2003/04/10 06:06:10 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -55,7 +55,8 @@ static config_option options[] =
 { "SERVICES_CHAN", ARG_STR, cb_Server, 10},
 { "LOAD_MODULE", ARG_STR, cb_Module, 0},
 { "ONLY_OPERS", ARG_STR, cb_Server, 11},
-{ "NO_LOAD", ARG_STR, cb_Server, 12}
+{ "NO_LOAD", ARG_STR, cb_Server, 12},
+{ "BINDTO", ARG_STR, cb_Server, 13}
 };
 
 
@@ -211,6 +212,8 @@ void cb_Server(char *arg, int configtype) {
 			me.onlyopers = 1;
 		} else if (configtype == 12) {
 			me.die = 1;
+		} else if (configtype == 13) {
+			memcpy(me.local, arg, sizeof(me.local));
 		}
 
 }

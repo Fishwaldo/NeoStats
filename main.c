@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.82 2003/04/09 14:29:51 fishwaldo Exp $
+** $Id: main.c,v 1.83 2003/04/10 06:06:10 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -113,6 +113,7 @@ int main()
 	me.want_privmsg = 0;
 	me.enable_spam = 0;
 	me.die = 0;
+	me.local[0] = "\0";
 	me.coder_debug=0;
 	me.noticelag=0;
 	me.usesmo=0;

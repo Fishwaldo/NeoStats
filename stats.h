@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.70 2003/04/03 14:36:37 fishwaldo Exp $
+** $Id: stats.h,v 1.71 2003/04/10 06:06:10 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -136,6 +136,7 @@ struct me {
 	char services_name[MAXHOST];
         char infoline[MAXHOST];
         char netname[MAXPASS];
+	char local[MAXHOST];
 	time_t t_start;
 	unsigned int maxsocks;
 	unsigned int cursocks;
