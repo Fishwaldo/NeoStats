@@ -81,6 +81,8 @@ void LoadStats()
     lnode_t *cn;
     int count;
     strcpy(segv_location, "StatServ-LoadStats");
+    Chead = list_create(C_TABLE_SIZE);
+    Shead = hash_create(S_TABLE_SIZE,0,0);
 
 
     if (fp) {
@@ -113,9 +115,8 @@ void LoadStats()
     }
     fclose(fp);
     }
-    Shead = hash_create(S_TABLE_SIZE,0,0);
     if ((fp = fopen("data/stats.db", "r")) == NULL)
-        return;
+        return; 
 
     memset(buf, '\0', BUFSIZE);
     while (fgets(buf, BUFSIZE, fp)) {
@@ -163,7 +164,6 @@ void LoadStats()
 	}
     }
     fclose(fp);
-    Chead = list_create(C_TABLE_SIZE);
     if ((fp = fopen("data/cstats.db", "r")) == NULL)
     	return;
     memset(buf, '\0', BUFSIZE);

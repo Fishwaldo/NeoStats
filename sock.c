@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.16 2002/03/25 08:13:52 fishwaldo Exp $
+** $Id: sock.c,v 1.17 2002/03/29 17:03:24 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -173,7 +173,7 @@ void ResetLogs()
 	
 	strcpy(segv_location, "ResetLogs");
 	strftime(tmp, 25, "logs/stats-%m-%d.log", localtime(&t));
-	rename("stats.log", tmp);
+	rename("logs/stats.log", tmp);
 	log("Started fresh logfile.");
 }
 
