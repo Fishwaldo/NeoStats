@@ -241,11 +241,9 @@ finduser (const char *nick)
 	if (un != NULL) {
 		u = hnode_get (un);
 		return u;
-	} else {
-		nlog (LOG_DEBUG2, LOG_CORE, "FindUser(%s) -> NOTFOUND", nick);
-		return NULL;
 	}
-
+	nlog (LOG_DEBUG2, LOG_CORE, "FindUser(%s) -> NOTFOUND", nick);
+	return NULL;
 }
 
 
