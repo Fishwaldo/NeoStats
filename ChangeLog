@@ -39,6 +39,9 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Load/Unload module name and case fixes (M)
  - Improved buffer overrun protection in use of strncpy and snprintf (M)
  - Hybrid cleanups as suggested by Hwy. (F)
+ - Fixed a bug with Non-Zero counts with StatServ when loading up. (F)
+ - Tidy up Jupe Command. Now echo's a message back to the user when the jupe is done (F)
+ - Fix up a Segv_inmodule error in the dns stuff. Its a hack, but works (F)
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number

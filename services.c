@@ -249,7 +249,6 @@ servicesbot (char *nick, char **av, int ac)
 			return;
 		}
 		ns_jupe (u, av[2]);
-		chanalert (s_Services, "%s Wants to JUPE this Server %s", u->nick, av[2]);
 	} else if (!strcasecmp (av[1], "DEBUG")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (u->nick, s_Services, "Permission Denied, you need to be authorised to Enable Debug Mode!");
@@ -370,6 +369,8 @@ ns_jupe (User * u, char *server)
 	snprintf (infoline, 255, "[Jupitered by %s]", u->nick);
 	sserver_cmd (server, 1, infoline);
 	nlog (LOG_NOTICE, LOG_CORE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, server);
+	chanalert (s_Services, "%s Wants to JUPE this Server %s", u->nick, server);
+	prefmsg(u->nick, s_Services, "%s has been Jupitered", server);
 }
 
 void

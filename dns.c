@@ -91,7 +91,11 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 		return 0;
 	}
 	/* set the module name */
-	SET_SEGV_INMODULE(dnsdata->mod_name);
+	/* This is a bad bad hack... */
+	if (segv_inmodule) {
+		/* why MAXHOST? because thats the size of mod_name!?!? */
+		strncpy(dnsdata->mod_name, segv_inmodule, MAXHOST);
+	}
 	strncpy (dnsdata->data, data, 254);
 	dnsdata->callback = callback;
 	if (type == adns_r_ptr) {
@@ -197,7 +201,7 @@ do_dns ()
 			lnode_destroy (dnsnode1);
 			break;
 		}
-		nlog (LOG_DEBUG2, LOG_CORE, "DNS: Calling callback function with data %s", dnsdata->data);
+		nlog (LOG_NORMAL, LOG_CORE, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->mod_name);
 		SET_SEGV_INMODULE(dnsdata->mod_name);
 		/* call the callback function */
 		dnsdata->callback (dnsdata->data, dnsdata->a);
