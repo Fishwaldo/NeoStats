@@ -1,5 +1,5 @@
 CC=@CC@
-CFLAGS=@CFLAGS@
+CFLAGS=@CFLAGS@ -fPIC -DPIC
 LD=ld
 LDFLAGS= -rdynamic @LIBS@
 MODLDFLAGS = -shared

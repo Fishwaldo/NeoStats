@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.92 2002/09/21 05:26:04 shmad Exp $
+** $Id: ircd.c,v 1.93 2002/09/24 10:44:18 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -683,12 +683,19 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 			if (*modes == '@') {
 				mode |= MODE_CHANOP;
 				modes++;
-#ifndef HYBRID7
-#ifndef UNREAL
+#ifdef ULTIMATE3
+			/* Ultimate3 has had 3 different flags for Chan Admins! */
 			} else if (*modes == '!') {
 				mode |= MODE_CHANADMIN;
 				modes++;
+			} else if (*modes == '¤') {
+				mode |= MODE_CHANADMIN;
+				modes++;
 #endif
+#if defined(ULTIMATE) || defined(ULTIMATE3)
+			} else if (*modes == '*') {
+				mode |= MODE_CHANADMIN;
+				modes++;
 #endif
 			} else if (*modes == '%') {
 				mode |= MODE_HALFOP;
