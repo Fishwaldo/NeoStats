@@ -63,6 +63,7 @@ static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(N)";
 const char services_bot_modes[]= "+oS";
+static const long services_bot_umode= 0;
 
 /* this is the command list and associated functions to run */
 IntCommands cmd_list[] = {
@@ -217,6 +218,7 @@ init_ircd ()
 	/* count the number of commands */
 	ircd_srv.cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])) - 1);
 	ircd_srv.umodecount = ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1);
+	services_bot_umode = UmodeStringToMask(services_bot_modes);
 }
 
 
@@ -261,7 +263,7 @@ int
 squit_cmd (const char *who, const char *quitmsg)
 {
 	sts (":%s %s :%s", who, MSG_QUIT, quitmsg);
-	DelUser (who);
+	UserQuit (who, quitmsg);
 	return 1;
 }
 
@@ -348,7 +350,7 @@ skill_cmd (const char *from, const char *target, const char *reason, ...)
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
 	sts (":%s %s %s :%s", from, MSG_KILL, target, ircd_buf);
-	DelUser (target);
+	UserQuit (target, ircd_buf);
 	return 1;
 }
 
@@ -362,7 +364,7 @@ ssvskill_cmd (const char *who, const char *reason, ...)
 	va_end (ap);
 	sts (":%s %s %s :%s", me.name, MSG_KILL, who, ircd_buf);
 /* neoircd doesn't have svskill, so this is handled just like a normal kill */
-	DelUser (who);
+	UserQuit (who, ircd_buf);
 	return 1;
 }
 
@@ -662,7 +664,7 @@ Usr_Squit (char *origin, char **argv, int argc)
 static void
 Usr_Quit (char *origin, char **argv, int argc)
 {
-	DelUser (origin);
+	UserQuit (origin, NULL);
 }
 
 static void
@@ -729,14 +731,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 static void
 Usr_Kick (char *origin, char **argv, int argc)
 {
-	User *u, *k;
-	u = finduser (argv[1]);
-	k = finduser (origin);
-	if (u) {
-		kick_chan (u, argv[0], k);
-	} else {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Can't find user %s for kick %s", argv[1], argv[0]);
-	}
+	kick_chan(argv[0], argv[1], origin);
 }
 static void
 Usr_Join (char *origin, char **argv, int argc)
@@ -839,7 +834,7 @@ SignOn_NewBot (const char *nick, const char *user, const char *host, const char 
 
 	snewnick_cmd (nick, user, host, rname, Umode);
 
-	if ((me.allbots > 0) || (Umode & UMODE_SERVICES)) {
+	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
 		sjoin_cmd (nick, me.chan);
 		schmode_cmd (me.name, me.chan, "+a", nick);
 	}

@@ -196,8 +196,6 @@
 #define	UMODE_OPER       	0x0002	/* Operator */
 #define UMODE_LOCOP             0x0004  /* Local Operator */
 #define UMODE_WALLOP            0x0008  /* */
-/* UMODE_SERVICES is actually UMODE_OPER on Bahamut !*/
-#define UMODE_SERVICES UMODE_OPER
 #define UMODE_REGONLY		0x0010	/* only registered nicks may PM */
 #define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
 #define UMODE_SERVADMIN		0x0040	/* server admin */

@@ -25,7 +25,7 @@
 #define _USERS_H_
 
 void AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const unsigned long ip, const unsigned long TS);
-void DelUser (const char *nick);
+void UserQuit (const char *nick, const char *quitmsg);
 int UserNick (const char * oldnick, const char * newnick);
 void UserDump (char *nick);
 void UserPart (list_t *list, lnode_t *node, void *v);

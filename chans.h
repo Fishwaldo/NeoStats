@@ -31,7 +31,7 @@ void change_user_nick (Chans * c, char *newnick, char *oldnick);
 int ChanMode (char *origin, char **av, int ac);
 void ChangeTopic (char *, Chans *, time_t t, char *);
 void ChangeChanUserMode (Chans * c, User * u, int add, long mode);
-void kick_chan (User *, char *, User *);
+void kick_chan (char *chan, char *kicked, char *kickby);
 void ChangeChanTS (Chans * c, time_t tstime);
 int init_chan_hash (void);
 

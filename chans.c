@@ -411,27 +411,22 @@ del_chan (Chans * c)
  */
 
 void
-kick_chan (User * u, char *chan, User * k)
+kick_chan (char *chan, char *kicked, char *kickby)		
 {
 	char **av;
 	int ac = 0;
 	Chans *c;
 	Chanmem *cm;
 	lnode_t *un;
+	User *u, *k;
 
 	SET_SEGV_LOCATION();
-	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to kick_chan u=NULL, chan=%s: %s", chan, recbuf);
+	u = finduser (kicked);
+	k = finduser (kickby);
+	if (!u||!k) {
+		nlog (LOG_WARNING, LOG_CORE, "Can't find user %s for Kick %s %s", chan, kicked, kickby);
 		if (me.debug_mode) {
-			chanalert (s_Services, "NULL user passed to kick_chan u=NULL, chan=%s: %s", chan, recbuf);
-			ChanDump (chan);
-		}
-		return;
-	}
-	if (!k) {
-		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to kick_chan k=NULL, chan=%s: %s", chan, recbuf);
-		if (me.debug_mode) {
-			chanalert (s_Services, "NULL user passed to kick_chan k=NULL, chan=%s: %s", chan, recbuf);
+			chanalert (s_Services, "Can't find user %s for Kick %s %s", chan, kicked, kickby);
 			ChanDump (chan);
 		}
 		return;

@@ -212,7 +212,6 @@
 #define UMODE_EXTERNAL	0x8000	/* client can see server joins/splits */
 #define UMODE_SPY	0x10000	/* client can spy on user commands */
 #define UMODE_OPERWALL	0x20000	/* client gets operwalls */
-#define UMODE_SERVICES	0x40000	/* client is services */
 
 
 #define	MODE_CHANOP	0x0001

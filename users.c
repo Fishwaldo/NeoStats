@@ -67,9 +67,8 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	User *u;
 	int i;
 
-	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): %s (%s@%s)(%d) -> %s at %lu", nick, user, host, (int)htonl (ipaddr), server, (unsigned long)TS);
-	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): RealName(%s): %s", nick, realname);
 	SET_SEGV_LOCATION();
+	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): %s (%s@%s) %s (%d) -> %s at %lu", nick, user, host, realname, (int)htonl (ipaddr), server, (unsigned long)TS);
 	u = finduser (nick);
 	if (u) {
 		nlog (LOG_WARNING, LOG_CORE, "trying to add a user that already exists? (%s)", nick);
@@ -116,7 +115,7 @@ KillUser (const char *nick)
 }
 
 void
-DelUser (const char *nick)
+UserQuit (const char *nick, const char *quitmsg)
 {
 	doDelUser (nick, 0);
 }
@@ -130,11 +129,11 @@ doDelUser (const char *nick, int killflag)
 	int ac = 0;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "DelUser(%s)", nick);
+	nlog (LOG_DEBUG2, LOG_CORE, "UserQuit(%s)", nick);
 
 	un = hash_lookup (uh, nick);
 	if (!un) {
-		nlog (LOG_WARNING, LOG_CORE, "DelUser(%s) failed!", nick);
+		nlog (LOG_WARNING, LOG_CORE, "UserQuit(%s) failed!", nick);
 		return;
 	}
 	u = hnode_get (un);

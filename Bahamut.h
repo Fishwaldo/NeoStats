@@ -187,8 +187,6 @@
 
 #define	UMODE_INVISIBLE  	0x0001	/* makes user invisible */
 #define	UMODE_OPER       	0x0002	/* Operator */
-/* UMODE_SERVICES is actually UMODE_OPER on Bahamut !*/
-#define UMODE_SERVICES UMODE_OPER
 #define UMODE_REGONLY		0x0010	/* only registered nicks may PM */
 #define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
 #define UMODE_SERVADMIN		0x0040	/* server admin */

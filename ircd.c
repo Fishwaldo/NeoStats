@@ -66,7 +66,35 @@ UmodeMaskToString(long Umode)
 long
 UmodeStringToMask(char* UmodeString)
 {
-	return(0);
+	int add = 0;
+	char tmpmode;
+	long Umode;
+
+	tmpmode = *(modes);
+	while (tmpmode) {
+		switch (tmpmode) {
+		case '+':
+			add = 1;
+			break;
+		case '-':
+			add = 0;
+			break;
+		default:
+			for (i = 0; i < ircd_srv.umodecount; i++) {
+				if (usr_mds[i].mode == tmpmode) {
+					if (add) {
+						Umode |= usr_mds[i].umodes;
+						break;
+					} else {
+						Umode &= ~usr_mds[i].umodes;
+						break;
+					}
+				}
+			}
+		}
+		tmpmode = *modes++;
+	}
+	return(Umode);
 }
 
 /** @brief init_bot_modes
