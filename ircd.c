@@ -330,9 +330,9 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 #ifdef UMODE_DEAF
 	if(flags&BOT_FLAG_DEAF) {
 #ifdef IRCU
-		schmode_cmd (nick, me.chan, "+d", getnumfromnick(nick));
+		sumode_cmd (nick, nick, UMODE_DEAF);
 #else
-		schmode_cmd (nick, me.chan, "+d", nick);
+		sumode_cmd (nick, nick, UMODE_DEAF);
 #endif
 	}
 #endif
@@ -717,6 +717,13 @@ init_services_bot (void)
 	ircsnprintf (me.rname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
 	Umode = UmodeStringToMask(services_bot_modes, 0);
 	signon_newbot (s_Services, me.user, me.host, me.rname, Umode);
+#ifdef UMODE_DEAF
+#ifdef IRCU
+	sumode_cmd (s_Services, s_Services, UMODE_DEAF);
+#else
+	sumode_cmd (s_Services, nick, UMODE_DEAF);
+#endif
+#endif
 	me.onchan = 1;
 	AddStringToList (&av, me.uplink, &ac);
 	ModuleEvent (EVENT_ONLINE, av, ac);
