@@ -1,4 +1,4 @@
-SUBDIRS		= protocol curl keeper adns libltdl pcre
+SUBDIRS		= protocol curl keeper adns libltdl pcre modules
 
 
 bin_PROGRAMS = neostats
@@ -11,5 +11,6 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 AM_CFLAGS = -Ipcre -Iadns -Icurl -Ikeeper @INCLTDL@
 neostats_LDADD = protocol/libprotocol.la curl/libcurl.la keeper/libkeeper.la \
 		adns/libadns.la libltdl/libltdlc.la pcre/libpcre.la
+neostats_LDFLAGS = --export-dynamic -rdynamic
 
 include $(top_srcdir)/autotools/rules.mk

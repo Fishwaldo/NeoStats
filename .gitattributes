@@ -243,10 +243,8 @@ src/misc.c eol=lf
 src/modules.c -text
 src/modules.h -text
 src/modules/.indent.pro -text
-src/modules/Makefile -text
-src/modules/Makefile.inc.in -text
+src/modules/Makefile.am -text
 src/modules/connectserv/.indent.pro -text
-src/modules/connectserv/Makefile -text
 src/modules/connectserv/cs.c -text
 src/modules/connectserv/cs.h -text
 src/modules/connectserv/cs_help.c -text

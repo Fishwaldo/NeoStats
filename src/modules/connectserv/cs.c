@@ -384,7 +384,7 @@ static int cs_event_smode(CmdParams* cmdparams)
 		/* its me, forget it */
 		return 1;
 	}
-	modes = (char *)(av[1]);
+	modes = cmdparams->param;
 	while (*modes) {
 		switch (*modes) {
 		case '+':

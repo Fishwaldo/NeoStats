@@ -58,9 +58,6 @@
 #define __attribute__(x)  /* NOTHING */
 #endif
 
-#ifndef NEOSTATS_PACKAGE_VERSION
-#define NEOSTATS_PACKAGE_VERSION PACKAGE
-#endif
 
 
 /* 
@@ -132,6 +129,11 @@
 #else
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
+
+#ifndef NEOSTATS_PACKAGE_VERSION
+#define NEOSTATS_PACKAGE_VERSION PACKAGE
+#endif
+
 
 #ifdef NEOSTATS_REVISION
 #define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION " (" NEOSTATS_REVISION ") " NS_PROTOCOL " " NS_HOST

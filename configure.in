@@ -24,7 +24,7 @@ AC_DEFINE_UNQUOTED(MINOR, $x_min, "Minor Version Number")
 AC_DEFINE_UNQUOTED(REV, $x_rev, "Revision Version Number")
 AC_DEFINE_UNQUOTED(VERSION, $x_version, "Full Version")
 AC_LIBTOOL_DLOPEN
-AC_DISABLE_SHARED
+dnl AC_DISABLE_SHARED
 AC_LIBTOOL_WIN32_DLL
 AC_LIBLTDL_CONVENIENCE
 
@@ -655,16 +655,21 @@ AC_DEFINE(PCRE_MAJOR_VERSION, $NPCRE_MAJOR_VERSION, "PCRE Version")
 AC_DEFINE(PCRE_MINOR_VERSION, NPCRE_MINOR_VERSION, "PCRE Version")
 AC_DEFINE(PCRE_VERSION, NPCRE_VERSION, "Pcre full version")
 
+AC_DEFINE_UNQUOTED(NS_HOST, "$host_os", "Operating System Host")
+
 AC_SUBST(build_configtool)
 AC_SUBST(PROTOCOL)
 AC_SUBST(SED)
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
 AC_SUBST(LIBTOOL_DEPS)
+AC_SUBST(MODULES)
 
 AC_CONFIG_FILES([Makefile include/Makefile src/Makefile
 		src/protocol/Makefile src/curl/Makefile
 		src/keeper/Makefile src/adns/Makefile
-		src/pcre/Makefile src/libltdl/Makefile])
+		src/pcre/Makefile src/libltdl/Makefile
+		src/modules/Makefile src/modules/connectserv/Makefile])
+
 AC_CACHE_SAVE
 AC_OUTPUT

@@ -480,6 +480,9 @@
 /* "Installation Prefix" */
 #undef NEO_PREFIX
 
+/* "Operating System Host" */
+#undef NS_HOST
+
 /* "IRCd Protocol we are compiled with" */
 #undef NS_PROTOCOL
 
