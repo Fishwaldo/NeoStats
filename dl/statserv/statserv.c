@@ -46,7 +46,9 @@ static void ss_map(User *u, char **av, int ac);
 static void ss_netstats(User *u, char **av, int ac);
 static void ss_set(User *u, char **av, int ac);
 static void ss_clientversions(User * u, char **av, int ac);
-void ss_html(User * u, char **av, int ac);
+static void ss_forcehtml(User * u, char **av, int ac);
+
+void ss_html(void);
 
 static void ss_Config();
 static int new_m_version(char *origin, char **av, int ac);
@@ -261,7 +263,7 @@ bot_cmd ss_commands[]=
 #endif																						
 	{"CLIENTVERSIONS",	ss_clientversions,0,NS_ULEVEL_OPER,	ss_help_clientversions,1, 	ss_help_clientversions_oneline},
 	{"SET",				ss_set,			1, 	NS_ULEVEL_ADMIN,ss_help_set, 		1,		ss_help_set_oneline},
-	{"FORCEHTML",		ss_html,		0, 	NS_ULEVEL_ADMIN,ss_help_forcehtml, 	1,		ss_help_forcehtml_oneline},
+	{"FORCEHTML",		ss_forcehtml,	0, 	NS_ULEVEL_ADMIN,ss_help_forcehtml, 	1,		ss_help_forcehtml_oneline},
 	{"STATS",			ss_stats,		1, 	NS_ULEVEL_ADMIN,ss_help_stats, 		1,		ss_help_stats_oneline},
 	{NULL,				NULL,			0, 	0,					NULL, 				0,		NULL}
 };
@@ -1086,3 +1088,19 @@ static void ss_stats(User * u, char **av, int ac)
 			s_StatServ);
 	}
 }
+
+static void ss_forcehtml(User * u, char **av, int ac)
+{
+	if(UserLevel(u) < NS_ULEVEL_ADMIN)
+		return;
+	
+	nlog(LOG_NOTICE, LOG_MOD,
+		    "%s!%s@%s Forced an update of the NeoStats Statistics HTML file with the most current statistics",
+		    u->nick, u->username, u->hostname);
+	chanalert(s_StatServ,
+			"%s Forced the NeoStats Statistics HTML file to be updated with the most current statistics",
+			u->nick);
+
+	ss_html();
+}
+
