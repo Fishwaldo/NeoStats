@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.64 2003/08/18 15:20:21 fishwaldo Exp $
+** $Id: dl.c,v 1.65 2003/08/19 13:08:13 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -56,7 +56,7 @@ new_timer (char *timer_name)
 	hnode_t *tn;
 	strcpy (segv_location, "Mod_Timer");
 	nlog (LOG_DEBUG2, LOG_CORE, "New Timer: %s", timer_name);
-	t = smalloc (sizeof (Mod_Timer));
+	t = malloc (sizeof (Mod_Timer));
 	if (!timer_name)
 		timer_name = "";
 	strncpy (t->timername, timer_name, MAXHOST);

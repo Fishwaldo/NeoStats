@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.137 2003/08/14 13:23:03 fishwaldo Exp $
+** $Id: ircd.c,v 1.138 2003/08/19 13:08:13 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -130,13 +130,15 @@ Module_Event (char *event, char **av, int ac)
 					strcpy (segv_location, module_ptr->info->module_name);
 					strcpy (segvinmodule, module_ptr->info->module_name);
 					if (setjmp (sigvbuf) == 0) {
-						ev_list->function (av, ac);
+						if (ev_list->function) ev_list->function (av, ac);
 					} else {
 						nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
 					}
 					strcpy (segvinmodule, "");
 					strcpy (segv_location, "Module_Event_Return");
+#ifndef VALGRIND
 					break;
+#endif
 				}
 				ev_list++;
 			}

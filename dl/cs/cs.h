@@ -20,18 +20,18 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.h,v 1.11 2003/08/18 15:29:22 fishwaldo Exp $
+** $Id: cs.h,v 1.12 2003/08/19 13:08:13 fishwaldo Exp $
 */
 
 
 /* 
 ** If we're compiled for Ultimate 3.x.x IRCd, use these modes and flags
 */
-#ifdef ULTIMATE3
+#if defined(ULTIMATE3) || defined(QUANTUM)
   #define LOCOP_MODE 'O'
   #define OPER_MODE 'o'
   #define GUESTADMIN_MODE 'G'
-  #define COSERVERADMIN_MODE 'a'
+  #define COSERVERADMIN_MODE 'J'
   #define SERVERADMIN_MODE 'A'
   #define CONETADMIN_MODE 'n'
   #define NETADMIN_MODE 'N'

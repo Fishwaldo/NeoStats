@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.99 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: main.c,v 1.100 2003/08/19 13:08:13 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -296,6 +296,9 @@ get_options (int argc, char **argv)
 RETSIGTYPE
 serv_die ()
 {
+#ifdef VALGRIND
+	exit(1);
+#endif
 	User *u;
 	u = finduser (s_Services);
 	nlog (LOG_CRITICAL, LOG_CORE, "Sigterm Recieved, Shuting Down Server!!!!");

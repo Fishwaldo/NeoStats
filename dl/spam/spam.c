@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: spam.c,v 1.26 2003/06/13 14:49:33 fishwaldo Exp $
+** $Id: spam.c,v 1.27 2003/08/19 13:08:13 fishwaldo Exp $
 */
 
 
@@ -67,13 +67,14 @@ int __Chan_Message(char *origin, char *chan, char **argv, int argc)
 {
 	FILE *fort;
 	char *fortune;
-	fortune = malloc(255);
 	if (!strcasecmp(argv[1], s_Spam)) {
 		fort = popen("/usr/games/fortune", "r");
 		if (fort) {
+			fortune = malloc(255);
 			while ((fortune = fgets(fortune, 255, fort))) {
 				privmsg(chan, s_Spam, "%s", fortune);
 			}
+			free(fortune);
 			pclose(fort);
 		}
 	}

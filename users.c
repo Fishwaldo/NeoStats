@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.58 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: users.c,v 1.59 2003/08/19 13:08:13 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -59,7 +59,7 @@ new_user (const char *nick)
 	u = smalloc (sizeof (User));
 	if (!nick)
 		nick = "";
-	memcpy (u->nick, nick, MAXNICK);
+	strncpy (u->nick, nick, MAXNICK);
 	un = hnode_create (u);
 	if (hash_isfull (uh)) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Hash is full");

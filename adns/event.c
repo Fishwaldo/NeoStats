@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: event.c,v 1.3 2003/06/13 14:44:36 fishwaldo Exp $
+** $Id: event.c,v 1.4 2003/08/19 13:08:13 fishwaldo Exp $
 */
 /*
  * event.c
@@ -736,7 +736,11 @@ void adns_beforeselect(adns_state ads, int *maxfd_io, fd_set * readfds_io,
 		adns__must_gettimeofday(ads, &now, &tv_nowbuf);
 		if (!now) {
 			inter_immed(tv_mod, tv_tobuf);
+			adns__consistency(ads, 0, cc_entex);
+			return;
+#if 0
 			goto xit;
+#endif
 		}
 		adns__timeouts(ads, 0, tv_mod, tv_tobuf, *now);
 	}
@@ -755,8 +759,9 @@ void adns_beforeselect(adns_state ads, int *maxfd_io, fd_set * readfds_io,
 			FD_SET(fd, exceptfds_io);
 	}
 	*maxfd_io = maxfd;
-
+#if 0
       xit:
+#endif
 	adns__consistency(ads, 0, cc_entex);
 }
 
