@@ -181,6 +181,7 @@ read_loop ()
 	TimeOut = malloc (sizeof (struct timeval));
 	ufds = malloc((sizeof *ufds) *  me.maxsocks);
 
+	me.lastmsg = me.now;
 	while (1) {
 		SET_SEGV_LOCATION();
 		memset (buf, '\0', BUFSIZE);

@@ -114,7 +114,6 @@ main (int argc, char *argv[])
 	me.debug_mode = 0;
 	me.r_time = 10;
 	me.numeric = 1;
-	me.lastmsg = me.now;
 	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
 	/* for modules, let them know we are not ready */
 	me.synced = 0;
