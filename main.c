@@ -557,7 +557,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		if(quitmsg)
 		{
 			squit_cmd (s_Services, quitmsg);
-			ssquit_cmd (me.name);
+			ssquit_cmd (me.name, quitmsg);
 		}
 		sleep(1);
 		if (servsock > 0)

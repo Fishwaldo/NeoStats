@@ -177,9 +177,9 @@ slogin_cmd (const char *name, const int numeric, const char *infoline, const cha
 }
 
 int
-ssquit_cmd (const char *server)
+ssquit_cmd (const char *server, const char *quitmsg)
 {
-	sts ("%s %s", MSG_SQUIT, server);
+	sts ("%s %s :%s", MSG_SQUIT, server, quitmsg);
 	return 1;
 }
 

@@ -122,7 +122,7 @@ void send_rakill (const char *host, const char *ident);
 
 int sserver_cmd (const char *name, const int numeric, const char *infoline);
 int slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass);
-int ssquit_cmd (const char *server);
+int ssquit_cmd (const char *server, const char *quitmsg);
 int snetinfo_cmd (void);
 int ssvinfo_cmd (void);
 int sburst_cmd (int b);
