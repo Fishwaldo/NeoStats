@@ -72,7 +72,7 @@ struct users {
 int new_m_version(char *origin, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	snumeric_cmd(351, origin,
+	snumeric_cmd(RPL_VERSION, origin,
 		     "Module ServiceRoots Loaded, Version: %s %s %s",
 			 __module_info.module_version, __module_info.module_build_date,
 			 __module_info.module_build_time);
@@ -175,7 +175,7 @@ extern int __list_auth(User * u)
 	un = list_first(srconf.ul);
 	while (un) {
 		sru = lnode_get(un);
-		snumeric_cmd(243, u->nick, "O %s@%s %s %d", sru->ident,
+		snumeric_cmd(RPL_STATSOLINE, u->nick, "O %s@%s %s %d", sru->ident,
 			     sru->host, sru->nick, sru->lvl);
 		un = list_next(srconf.ul, un);
 	}

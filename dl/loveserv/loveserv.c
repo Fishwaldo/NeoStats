@@ -55,7 +55,7 @@ ModuleInfo __module_info = {
 
 int new_m_version(char *origin, char **av, int ac)
 {
-	snumeric_cmd(351, origin,
+	snumeric_cmd(RPL_VERSION, origin,
 		     "Module LoveServ Loaded, Version: %s %s %s",
 			 __module_info.module_version, __module_info.module_build_date,
 			 __module_info.module_build_time);

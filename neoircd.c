@@ -723,7 +723,7 @@ Usr_Stats (char *origin, char **argv, int argc)
 void
 Usr_Version (char *origin, char **argv, int argc)
 {
-	snumeric_cmd (351, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, version, me.name, version_date, version_time);
+	snumeric_cmd (RPL_VERSION, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, version, me.name, version_date, version_time);
 }
 
 void

@@ -446,22 +446,22 @@ ShowMOTD (char *nick)
 	FILE *fp;
 	char buf[BUFSIZE];
 	SET_SEGV_LOCATION();
-	snumeric_cmd (375, nick, ":- %s Message of the Day -", me.name);
-	snumeric_cmd (372, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
-	snumeric_cmd (372, nick, ":-");
+	snumeric_cmd (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
+	snumeric_cmd (RPL_MOTD, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
+	snumeric_cmd (RPL_MOTD, nick, ":-");
 
 	fp = fopen ("neostats.motd", "r");
 
 	if (fp) {
 		while (fgets (buf, sizeof (buf), fp)) {
 			buf[strlen (buf) - 1] = 0;
-			snumeric_cmd (372, nick, ":- %s", buf);
+			snumeric_cmd (RPL_MOTD, nick, ":- %s", buf);
 		}
 		fclose (fp);
 	} else {
-		snumeric_cmd (372, nick, ":- MOTD file Missing");
+		snumeric_cmd (RPL_MOTD, nick, ":- MOTD file Missing");
 	}
-	snumeric_cmd (376, nick, ":End of /MOTD command.");
+	snumeric_cmd (RPL_ENDOFMOTD, nick, ":End of /MOTD command.");
 }
 
 
@@ -473,19 +473,19 @@ ShowADMIN (char *nick)
 	char buf[BUFSIZE];
 	SET_SEGV_LOCATION();
 
-	snumeric_cmd (256, nick, ":- %s NeoStats Admins -", me.name);
-	snumeric_cmd (256, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
+	snumeric_cmd (RPL_ADMINME, nick, ":- %s NeoStats Admins -", me.name);
+	snumeric_cmd (RPL_ADMINME, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
 
 	fp = fopen ("stats.admin", "r");
 
 	if (fp) {
 		while (fgets (buf, sizeof (buf), fp)) {
 			buf[strlen (buf) - 1] = 0;
-			snumeric_cmd (257, nick, ":- %s", buf);
+			snumeric_cmd (RPL_ADMINLOC1, nick, ":- %s", buf);
 		}
 		fclose (fp);
 	}
-	snumeric_cmd (258, nick, ":End of /ADMIN command.");
+	snumeric_cmd (RPL_ADMINLOC2, nick, ":End of /ADMIN command.");
 }
 
 
@@ -493,26 +493,26 @@ void
 Showcredits (char *nick)
 {
 	SET_SEGV_LOCATION();
-	snumeric_cmd (351, nick, ":- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, version);
-	snumeric_cmd (351, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
-	snumeric_cmd (351, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
-	snumeric_cmd (351, nick, ":- irc.irc-chat.net #NeoStats");
-	snumeric_cmd (351, nick, ":- Thanks to:");
-	snumeric_cmd (351, nick, ":- Enigma for being part of the dev team");
-	snumeric_cmd (351, nick, ":- Stskeeps for Writting the best IRCD ever!");
-	snumeric_cmd (351, nick, ":- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)");
-	snumeric_cmd (351, nick, ":- monkeyIRCD for the Module Segv Catching code");
-	snumeric_cmd (351, nick, ":- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!");
-	snumeric_cmd (351, nick, ":- Andy For Ideas");
-	snumeric_cmd (351, nick, ":- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies");
-	snumeric_cmd (351, nick, ":- sre and Jacob for development systems and access");
-	snumeric_cmd (351, nick, ":- Error51 for Translating our FAQ and README files");
-	snumeric_cmd (351, nick, ":- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!");
-	snumeric_cmd (351, nick, ":- Eggy for proving to use our code still had bugs when we thought it didn't (and all the bug reports!)");
-	snumeric_cmd (351, nick, ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
-	snumeric_cmd (351, nick, ":- M - Updating lots of Doco and code and providing lots of great feedback");
-	snumeric_cmd (351, nick, ":- J Michael Jones - Giving us Patches to support QuantumIRCd");
-	snumeric_cmd (351, nick, ":- Blud - Giving us patches for Mystic IRCd");
+	snumeric_cmd (RPL_VERSION, nick, ":- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, version);
+	snumeric_cmd (RPL_VERSION, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
+	snumeric_cmd (RPL_VERSION, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
+	snumeric_cmd (RPL_VERSION, nick, ":- irc.irc-chat.net #NeoStats");
+	snumeric_cmd (RPL_VERSION, nick, ":- Thanks to:");
+	snumeric_cmd (RPL_VERSION, nick, ":- Enigma for being part of the dev team");
+	snumeric_cmd (RPL_VERSION, nick, ":- Stskeeps for Writting the best IRCD ever!");
+	snumeric_cmd (RPL_VERSION, nick, ":- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)");
+	snumeric_cmd (RPL_VERSION, nick, ":- monkeyIRCD for the Module Segv Catching code");
+	snumeric_cmd (RPL_VERSION, nick, ":- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!");
+	snumeric_cmd (RPL_VERSION, nick, ":- Andy For Ideas");
+	snumeric_cmd (RPL_VERSION, nick, ":- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies");
+	snumeric_cmd (RPL_VERSION, nick, ":- sre and Jacob for development systems and access");
+	snumeric_cmd (RPL_VERSION, nick, ":- Error51 for Translating our FAQ and README files");
+	snumeric_cmd (RPL_VERSION, nick, ":- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!");
+	snumeric_cmd (RPL_VERSION, nick, ":- Eggy for proving to use our code still had bugs when we thought it didn't (and all the bug reports!)");
+	snumeric_cmd (RPL_VERSION, nick, ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
+	snumeric_cmd (RPL_VERSION, nick, ":- M - Updating lots of Doco and code and providing lots of great feedback");
+	snumeric_cmd (RPL_VERSION, nick, ":- J Michael Jones - Giving us Patches to support QuantumIRCd");
+	snumeric_cmd (RPL_VERSION, nick, ":- Blud - Giving us patches for Mystic IRCd");
 }
 
 void
@@ -533,11 +533,11 @@ ShowStats (char *what, User * u)
 	if (!strcasecmp (what, "u")) {
 		/* server uptime - Shmad */
 		int uptime = time (NULL) - me.t_start;
-		snumeric_cmd (242, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
+		snumeric_cmd (RPL_STATSUPTIME, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 	} else if (!strcasecmp (what, "c")) {
 		/* Connections */
-		snumeric_cmd (214, u->nick, "N *@%s * * %d 50", me.uplink, me.port);
-		snumeric_cmd (213, u->nick, "C *@%s * * %d 50", me.uplink, me.port);
+		snumeric_cmd (RPL_STATSNLINE, u->nick, "N *@%s * * %d 50", me.uplink, me.port);
+		snumeric_cmd (RPL_STATSCLINE, u->nick, "C *@%s * * %d 50", me.uplink, me.port);
 	} else if (!strcasecmp (what, "o")) {
 		/* Operators */
 #ifdef EXTAUTH
@@ -548,19 +548,19 @@ ShowStats (char *what, User * u)
 				(*listauth) (u);
 		} else
 #endif
-			snumeric_cmd (243, u->nick, "Operators think they are God, but you and I know they are not!");
+			snumeric_cmd (RPL_STATSOLINE, u->nick, "Operators think they are God, but you and I know they are not!");
 	} else if (!strcasecmp (what, "l")) {
 		/* Port Lists */
 		tmp = time (NULL) - me.lastmsg;
 		tmp2 = time (NULL) - me.t_start;
-		snumeric_cmd (211, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
-		snumeric_cmd (241, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes, me.RcveM, me.RcveBytes, tmp2, tmp);
+		snumeric_cmd (RPL_STATSLINKINFO, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
+		snumeric_cmd (RPL_STATSLLINE, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes, me.RcveM, me.RcveBytes, tmp2, tmp);
 	} else if (!strcasecmp (what, "M")) {
 		for (I = 0; I < ircd_srv.cmdcount; I++) {
 			if (cmd_list[I].usage > 0)
-				snumeric_cmd (212, u->nick, "Command %s Usage %d", cmd_list[I].name, cmd_list[I].usage);
+				snumeric_cmd (RPL_STATSCOMMANDS, u->nick, "Command %s Usage %d", cmd_list[I].name, cmd_list[I].usage);
 		}
 	}
-	snumeric_cmd (219, u->nick, "%s :End of /STATS report", what);
+	snumeric_cmd (RPL_ENDOFSTATS, u->nick, "%s :End of /STATS report", what);
 	chanalert (s_Services, "%s Requested Stats %s", u->nick, what);
 };

@@ -141,7 +141,7 @@ void ss_Config()
 int new_m_version(char *origin, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	snumeric_cmd(351, origin,
+	snumeric_cmd(RPL_VERSION, origin,
 		     "Module StatServ Loaded, Version: %s %s %s",
 			 __module_info.module_version, __module_info.module_build_date,
 			 __module_info.module_build_time);

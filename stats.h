@@ -68,6 +68,33 @@
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
 
+/* Numeric used by NeoStats. Need to be in ircd code eventually
+ *
+ */
+
+#define RPL_STATSLINKINFO    211
+#define RPL_STATSCOMMANDS    212
+#define RPL_STATSCLINE       213
+#define RPL_STATSOLDNLINE    214
+#define RPL_STATSNLINE		RPL_STATSOLDNLINE
+
+#define RPL_ENDOFSTATS       219
+
+#define	RPL_STATSLLINE       241
+#define	RPL_STATSUPTIME      242
+#define	RPL_STATSOLINE       243
+
+#define	RPL_ADMINME          256
+#define	RPL_ADMINLOC1        257
+#define	RPL_ADMINLOC2        258
+
+#define RPL_VERSION          351
+
+#define	RPL_MOTD             372
+
+#define	RPL_MOTDSTART        375
+#define	RPL_ENDOFMOTD        376
+
 /**  this is a security hack to give the coders the right levels to debug NeoStats. 
   *  Don't define unless we ask you to 
   */
