@@ -2,8 +2,6 @@
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
-**  Portions Copyright (c) 2000-2001 ^Enigma^
-**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -240,6 +238,22 @@
  *      av[2] message
  */
 #define EVENT_CNOTICE "CNOTICE"
+
+/*  EVENT_CTCPPRIVATE
+ *    parameters:
+ *      av[0] from nick 
+ *      av[1] to nick
+ *      av[2] message
+ */
+#define EVENT_CTCPPRIVATE "CTCPPRIVATE"
+
+/*  EVENT_CTCPNOTICE
+ *    parameters:
+ *      av[0] from nick 
+ *      av[1] to nick
+ *      av[2] message
+ */
+#define EVENT_CTCPNOTICE "CTCPNOTICE"
 
 /*  EVENT_ADDBAN
  *    parameters:

@@ -70,7 +70,7 @@ add_bot_to_chan (char *bot, char *chan)
 		mod_chan_bot->bots = list_create (B_TABLE_SIZE);
 		cbn = hnode_create (mod_chan_bot);
 		if (hash_isfull (bch)) {
-			nlog (LOG_CRITICAL, LOG_CORE, "eek, bot channel hash is full");
+			nlog (LOG_CRITICAL, LOG_CORE, "add_bot_to_chan: eek, bot channel hash is full");
 			return;
 		}
 		hash_insert (bch, cbn, mod_chan_bot->chan);
@@ -126,17 +126,28 @@ del_bot_from_chan (char *bot, char *chan)
 	}
 }
 
-/** @brief send a message to a channel bot
+void handle_ctcp_private (ModUser *mod_usr, User* u, char* msg)
+{
+
+}
+
+void handle_ctcp_notice (ModUser *mod_usr, User* u, char* msg)
+{
+
+}
+
+/** @brief send a message to a bot
  *
  * @param origin 
- * @param av (note chan string in av[0])
+ * @param av 
  * @param ac
  * 
  * @return none
  */
-void bot_message (char *origin, char **av, int ac)
+void bot_notice (char *origin, char **av, int ac)
 {
-	int ret = NS_FAILURE;
+	int argc;
+	char **argv;
 	User *u;
 	User *bot_user;
 	ModUser *mod_usr;
@@ -162,36 +173,88 @@ void bot_message (char *origin, char **av, int ac)
 	}
 	nlog (LOG_DEBUG1, LOG_CORE, "bot_message: bot %s", mod_usr->nick);
 
-#if 0
-	/* Trap CTCP commands and silently drop them to avoid unknown command errors 
-		* Why bother? Well we might be able to use some of them in the future
-		* so this is mainly a test and we may want to pass some of this onto
-		* SecureServ for a quick trojan check so log attempts to give an indication 
-		* of usage.
-		*/
-	if (av[1][0] == '\1') {
+	if (av[ac - 1][0] == '\1') {
+		handle_ctcp_notice (mod_usr, u, av[ac - 1]);
 		nlog (LOG_NORMAL, LOG_MOD, "%s requested %s", u->nick, av[1]);
 		return;
 	}
-#endif
+
+	argc = 0;
+	AddStringToList (&argv, origin, &argc);
+	AddStringToList (&argv, av[0], &argc);
+	AddStringToList (&argv, av[ac-1], &argc);
+	if(av[0][0] == '#') {
+		SendModuleEvent (EVENT_CNOTICE, argv, argc);
+	} else {
+		SendModuleEvent (EVENT_NOTICE, argv, argc);
+	}
+	free (argv);
+}
+
+/** @brief send a message to a bot
+ *
+ * @param origin 
+ * @param av 
+ * @param ac
+ * 
+ * @return none
+ */
+void bot_message (char *origin, char **av, int ac)
+{
+	int argc;
+	char **argv;
+	User *u;
+	User *bot_user;
+	ModUser *mod_usr;
+
+	SET_SEGV_LOCATION();
+	u = finduser (origin);
+	if(!u) {
+		return;
+	}
+	if (flood (u)) {
+		return;
+	}
+	bot_user = finduser(av[0]);
+	if (!bot_user) {
+		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: bot %s not found", av[0]);
+		return;
+	}
+	mod_usr = findbot (bot_user->nick);
+	/* Check to see if any of the Modules have this nick Registered */
+	if (!mod_usr) {
+		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: mod_usr %s not found", bot_user->nick);
+		return;
+	}
+	nlog (LOG_DEBUG1, LOG_CORE, "bot_message: bot %s", mod_usr->nick);
+
+	if (av[ac - 1][0] == '\1') {
+		handle_ctcp_private (mod_usr, u, av[ac - 1]);
+		nlog (LOG_NORMAL, LOG_MOD, "%s requested %s", u->nick, av[1]);
+		return;
+	}
 
 	if (mod_usr->botcmds) {
 		if (setjmp (sigvbuf) == 0) {
+			int ret;
+
 			SET_SEGV_INMODULE(mod_usr->modname);
 			ret = run_bot_cmd(mod_usr, u, av[ac - 1]);
 			CLEAR_SEGV_INMODULE();
+			if(ret == NS_SUCCESS)
+				return;
 		}
 	}
-	if (ret == NS_FAILURE) {
-		if(av[0][0] == '#') {
-			SendModuleEvent (EVENT_CPRIVATE, av, ac);
-		} else {
-			SendModuleEvent (EVENT_PRIVATE, av, ac);
-		}
+	argc = 0;
+	AddStringToList (&argv, origin, &argc);
+	AddStringToList (&argv, av[0], &argc);
+	AddStringToList (&argv, av[ac-1], &argc);
+	if(av[0][0] == '#') {
+		SendModuleEvent (EVENT_CNOTICE, argv, argc);
+	} else {
+		SendModuleEvent (EVENT_NOTICE, argv, argc);
 	}
-	return ;
-
-	ret = NS_FAILURE;
+	free (argv);
 }
 
 /** @brief dump list of module bots and channels

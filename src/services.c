@@ -65,14 +65,14 @@ static bot_cmd ns_commands[]=
 	{"LEVEL",		ns_level,		0, 	0,					ns_help_level, 		ns_help_level_oneline},
 	{"STATUS",		ns_status,		0, 	0,					ns_help_status, 	ns_help_status_oneline},
 	{"VERSION",		ns_version,		0, 	0,					ns_help_version, 	ns_help_version_oneline},
-	{"SHUTDOWN",	ns_shutdown,	0, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown, 	ns_help_shutdown_oneline},
-	{"RELOAD",		ns_reload,		0, 	NS_ULEVEL_ADMIN, 	ns_help_reload,		ns_help_reload_oneline},
+	{"SHUTDOWN",	ns_shutdown,	1, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown, 	ns_help_shutdown_oneline},
+	{"RELOAD",		ns_reload,		1, 	NS_ULEVEL_ADMIN, 	ns_help_reload,		ns_help_reload_oneline},
 	{"LOGS",		ns_logs,		0, 	NS_ULEVEL_OPER, 	ns_help_logs,		ns_help_logs_oneline},
 	{"MODLIST",		list_modules,	0, 	NS_ULEVEL_ADMIN,  	ns_help_modlist, 	ns_help_modlist_oneline},
 	{"LOAD",		ns_load,		1, 	NS_ULEVEL_ADMIN, 	ns_help_load, 		ns_help_load_oneline},
 	{"UNLOAD",		ns_unload,		1,	NS_ULEVEL_ADMIN, 	ns_help_unload, 	ns_help_unload_oneline},
 	{"JUPE",		ns_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_help_jupe,		ns_help_jupe_oneline},
-	{"EXCLUDE",		ns_exclude,		0,	NS_ULEVEL_ADMIN,	ns_help_exclude,	ns_help_exclude_oneline},
+	{"EXCLUDE",		ns_exclude,		1,	NS_ULEVEL_ADMIN,	ns_help_exclude,	ns_help_exclude_oneline},
 #ifdef USE_RAW																
 	{"RAW",			ns_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_help_raw, 		ns_help_raw_oneline},
 #endif																	
@@ -121,10 +121,6 @@ init_services(void)
 static int
 ns_exclude (User *u, char **av, int ac) 
 {
-	if (ac < 2) {
-		prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
-		return NS_FAILURE;
-	}
 	if (!ircstrcasecmp(av[2], "ADD")) {
 		if (ac < 4) {
 			prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
@@ -156,19 +152,10 @@ ns_exclude (User *u, char **av, int ac)
 static int
 ns_shutdown (User * u, char **av, int ac)
 {
-	char *tmp;
-
 	SET_SEGV_LOCATION();
-	if (ac <= 1) {
-		ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
-			u->nick, u->username, u->hostname, no_reason);
-	} else {
-		tmp = joinbuf (av, ac, 1);
-		chanalert (s_Services, "%s Wants me to SHUTDOWN for %s", u->nick, tmp);
-		ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
-			u->nick, u->username, u->hostname, tmp);
-		free (tmp);
-	}
+	chanalert (s_Services, "%s requested SHUTDOWN for %s", u->nick, av[ac-1]);
+	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
+		u->nick, u->username, u->hostname, av[ac-1]);
 	globops (s_Services, "%s", quitmsg);
 	nlog (LOG_NOTICE, LOG_CORE, "%s", quitmsg);
 	do_exit (NS_EXIT_NORMAL, quitmsg);
@@ -187,18 +174,10 @@ ns_shutdown (User * u, char **av, int ac)
 static int
 ns_reload (User * u, char **av, int ac)
 {
-	char *tmp;
-
 	SET_SEGV_LOCATION();
-	if (ac <= 1) {
-		prefmsg (u->nick, s_Services, "You must supply a Reason to Reload");
-		return 0;
-	}
-	tmp = joinbuf (av, ac, 1);
-	chanalert (s_Services, "%s Wants me to RELOAD! for %s", u->nick, tmp);
+	chanalert (s_Services, "%s Wants me to RELOAD! for %s", u->nick, av[ac - 1] );
 	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested RELOAD for %s.", 
-		u->nick, u->username, u->hostname, tmp);
-	free (tmp);
+		u->nick, u->username, u->hostname, av[ac - 1] );
 	globops (s_Services, "%s", quitmsg);
 	nlog (LOG_NOTICE, LOG_CORE, "%s", quitmsg);
 	do_exit (NS_EXIT_RELOAD, quitmsg);
@@ -250,14 +229,14 @@ ns_logs (User * u, char **av, int ac)
 static int
 ns_jupe (User * u, char **av, int ac)
 {
-	char infoline[255];
+	static char infoline[255];
 
 	SET_SEGV_LOCATION();
 	ircsnprintf (infoline, 255, "[Jupitered by %s]", u->nick);
 	sserver_cmd (av[1], 1, infoline);
 	nlog (LOG_NOTICE, LOG_CORE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, av[1]);
-	chanalert (s_Services, "%s Wants to JUPE this Server %s", u->nick, av[1]);
-	prefmsg(u->nick, s_Services, "%s has been Jupitered", av[1]);
+	chanalert (s_Services, "%s jupitered %s", u->nick, av[1]);
+	prefmsg(u->nick, s_Services, "%s has been jupitered", av[1]);
    	return 1;
 }
 
@@ -467,9 +446,9 @@ ns_load (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	if (load_module (av[1], u) == NS_SUCCESS) {
-		chanalert (s_Services, "%s Loaded Module %s", u->nick, av[1]);
+		chanalert (s_Services, "%s loaded module %s", u->nick, av[1]);
 	} else {
-		chanalert (s_Services, "%s Tried to Load Module %s, but Failed", u->nick, av[1]);
+		chanalert (s_Services, "%s tried to load module %s, but load failed", u->nick, av[1]);
 	}
    	return 1;
 }
@@ -488,7 +467,7 @@ ns_unload (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	if (unload_module (av[1], u) > 0) {
-		chanalert (s_Services, "%s Unloaded Module %s", u->nick, av[1]);
+		chanalert (s_Services, "%s unloaded module %s", u->nick, av[1]);
 	}
    	return 1;
 }

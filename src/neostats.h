@@ -254,12 +254,9 @@
 typedef enum NS_ERR {
 	NS_ERR_NICK_IN_USE		= 0x8000001,
 	NS_ERR_OUT_OF_MEMORY	= 0x8000002,
-	/* Error value for incompatible version */
-	/* Temporarily done as #define for forward port */
-	/*	NS_ERR_VERSION			= 0x8000003,*/
+	NS_ERR_VERSION			= 0x8000003,
+	NS_ERR_SYNTAX_ERROR		= 0x8000004,
 }NS_ERR ;
-
-#define	NS_ERR_VERSION 0x8000003
 
 /* do_exit call exit type definitions */
 typedef enum {
@@ -857,7 +854,6 @@ ModSock *findsock (char *sock_name);
 ModUser * init_mod_bot (char * nick, char * user, char * host, char * realname, const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list, char * modname);
 void add_bot_to_chan (char *bot, char *chan);
 void del_bot_from_chan (char *bot, char *chan);
-void bot_message (char *origin, char **av, int ac);
 ModUser *findbot (char * bot_name);
 int bot_nick_change (char * oldnick, char *newnick);
 

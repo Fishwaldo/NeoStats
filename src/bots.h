@@ -32,5 +32,7 @@ int list_bot_chans (User * u, char **av, int ac);
 int del_mod_bot (ModUser *bot_ptr, char * reason);
 int InitBots(void);
 int FiniBots(void);
+void bot_message (char *origin, char **av, int ac);
+void bot_notice (char *origin, char **av, int ac);
 
 #endif /* _BOTS_H_ */

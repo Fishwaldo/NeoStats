@@ -516,12 +516,6 @@ joinbuf (char **av, int ac, int from)
 void 
 m_notice (char* origin, char **av, int ac, int cmdptr)
 {
-	int i;
-	int splitargc;
-	char **splitargv;
-	int argc;
-	char **argv;
-
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
 		nlog (LOG_DEBUG1, LOG_CORE, "m_notice: dropping unknown privmsg from %s, to %s : %s", origin, av[0], av[ac-1]);
@@ -534,16 +528,8 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 	}
 #endif
 	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
-	argc = 0;
-	AddStringToList (&argv, origin, &argc);
-	AddStringToList (&argv, av[0], &argc);
-	AddStringToList (&argv, av[ac-1], &argc);
-	if(av[0][0] == '#') {
-		SendModuleEvent (EVENT_CNOTICE, argv, argc);
-	} else {
-		SendModuleEvent (EVENT_NOTICE, argv, argc);
-	}
-	free (argv);
+
+	bot_notice (origin, av, ac);
 }
 
 /** @brief process privmsg
@@ -591,7 +577,6 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 	int i;
 
 	SET_SEGV_LOCATION();
-
 	for (i = 0; i < ircd_cmdcount; i++) {
 		if (!strcmp (cmd_list[i].name, cmd)
 #ifdef GOTTOKENSUPPORT
@@ -605,14 +590,10 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 				nlog (LOG_DEBUG3, LOG_CORE, "process_ircd_cmd: ignoring command %s", cmd);
 			}
 			cmd_list[i].usage++;
-			break;
+			return;
 		}
 	}
-#if 0
-	if(i >= ircd_cmdcount) {
-		nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);
-	}
-#endif
+	nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);
 }
 
 /** @brief parse
