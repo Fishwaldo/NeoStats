@@ -20,13 +20,17 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.h,v 1.23 2003/06/30 14:56:25 fishwaldo Exp $
+** $Id: Ultimate.h,v 1.24 2003/07/23 10:35:47 fishwaldo Exp $
 */
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
 
 /* we support tokens */
 #define HAVE_TOKEN_SUP
+
+/* we have vhost support */
+#define GOTSVSVHOST
+
 
 
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
@@ -404,7 +408,7 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_KEY) || CheckChanMode(x, MODE_RGSTRONLY) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_ADMONLY) || CheckChanMode(x, MODE_OPERONLY) ))
 
 struct ircd_srv_ {
 	int uprot;

@@ -44,7 +44,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.31 2003/06/30 14:56:25 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.32 2003/07/23 10:35:47 fishwaldo Exp $
  */
 
 
@@ -57,6 +57,8 @@
 /* we have token support */
 #define HAVE_TOKEN_SUP 1
 
+/* we have vhost support */
+#define GOTSVSVHOST
 
 
 /*
@@ -414,6 +416,7 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_ADMONLY) || CheckChanMode(x, MODE_OPERONLY) || CheckChanMode(x, MODE_KEY) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_RGSTRONLY)))
 
 
 struct ircd_srv_ {

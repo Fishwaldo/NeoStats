@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.46 2003/07/01 14:06:01 fishwaldo Exp $
+** $Id: hostserv.c,v 1.47 2003/07/23 10:35:47 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -35,8 +35,8 @@
 
 
 /* hostserv doesn't work on Hybrid, Echo a error and exit the compile */
-#ifdef HYBRID7
-#error "Error: Hybrid7 doesn't support changing a users host. This module will not compile"
+#ifndef GOTSVSVHOST
+#error "Error: This IRCd doesn't support changing a users host. This module will not compile"
 #endif
 
 

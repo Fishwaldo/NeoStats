@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.h,v 1.9 2003/05/26 09:18:29 fishwaldo Exp $
+** $Id: cs.h,v 1.10 2003/07/23 10:35:47 fishwaldo Exp $
 */
 
 
@@ -102,4 +102,19 @@
   #define NETSERVICE_MODE '4'
   #define INVISIBLE_MODE '3'
   #define BOT_MODE '2'
+#endif
+
+#ifdef BAHAMUT
+  #define LOCOP_MODE 'O'
+  #define OPER_MODE 'o'
+  #define GUESTADMIN_MODE '1'		/* Set to a number we dont use */
+  #define COSERVERADMIN_MODE '2'
+  #define SERVERADMIN_MODE 'a'
+  #define CONETADMIN_MODE '3'		/* Set to a number we dont use */
+  #define NETADMIN_MODE '4'
+  #define TECHADMIN_MODE '5'
+  #define SERVICESADMIN_MODE '6'
+  #define NETSERVICE_MODE '7'
+  #define INVISIBLE_MODE '8'
+  #define BOT_MODE '9'
 #endif

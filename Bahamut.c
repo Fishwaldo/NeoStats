@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Bahamut.c,v 1.2 2003/07/22 15:01:49 fishwaldo Exp $
+** $Id: Bahamut.c,v 1.3 2003/07/23 10:35:47 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -222,6 +222,9 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_SERVADMIN, 'A', 100}
 	,
+	/* this is needed for bot support */
+	{UMODE_SERVICES, 'S', 200}
+	,
 	{0, 0, 0}
 };
 
@@ -242,7 +245,7 @@ int slogin_cmd(const char *name, const int numeric, const char *infoline,
 	       const char *pass)
 {
 	sts("%s %s :TS", (me.token ? TOK_PASS : MSG_PASS), pass);
-	sts("CAPAB TS5 BURST NICKIP CLIENT");
+	sts("CAPAB TS5 SSJOIN BURST NICKIP CLIENT");
 	sts("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name,
 	    numeric, infoline);
 	return 1;
@@ -279,11 +282,20 @@ int sjoin_cmd(const char *who, const char *chan, unsigned long chflag)
 	char mode[2];
 	char **av;
 	int ac;
+	time_t tstime;
 	char tmp[512];
+	Chans *c;
+	
+	c = findchan((char *)chan);
+	if (!c) {
+		tstime = time(NULL);
+	} else {
+		tstime = c->tstime;
+	}
 	switch (chflag) {
 	case MODE_CHANOP:
 		flag = '@';
-		strcpy(mode, "0");
+		strcpy(mode, "o");
 		break;
 	case MODE_VOICE:
 		flag = '+';
@@ -293,7 +305,7 @@ int sjoin_cmd(const char *who, const char *chan, unsigned long chflag)
 		flag = ' ';
 		strcpy(mode, "");
 	}
-	sts(":%s %s 0 %s + :%c%s", me.name, MSG_SJOIN, chan, flag, who);
+	sts(":%s %s %d %s + :%c%s", me.name, MSG_SJOIN, tstime, chan, flag, who);
 	join_chan(finduser(who), (char *) chan);
 	snprintf(tmp, 512, "%s +%s %s", chan, mode, who);
 	ac = split_buf(tmp, &av, 0);
@@ -661,23 +673,22 @@ void Srv_Sjoin(char *origin, char **argv, int argc)
 	long mode = 0;
 	long mode1 = 0;
 	char *modes;
-	int ok = 1, i, j = 4;
+	int ok = 1, i, j = 3;
 	ModesParm *m;
 	Chans *c;
 	lnode_t *mn = NULL;
 	list_t *tl;
-	if (argc <= 2) {
+	if (argc > 4) {
 		modes = argv[2];
 	} else {
-		modes = argv[3];
+		modes = argv[1];
 	}
-#if 0
 printf("%s %s\n", argv[2], argv[1]);
 	if (*modes == '#') {
 		join_chan(finduser(origin), modes);
 		return;
 	}
-#endif
+printf("%s\n", modes);
 	tl = list_create(10);
 	if (*modes != '+') {
 		goto nomodes;
@@ -732,13 +743,15 @@ printf("%s %s\n", argv[2], argv[1]);
 				}
 			}
 		}
-		join_chan(finduser(nick), argv[2]);
-		ChangeChanUserMode(findchan(argv[2]), finduser(nick), 1,
+		join_chan(finduser(nick), argv[1]);
+		ChangeChanUserMode(findchan(argv[1]), finduser(nick), 1,
 				   mode);
 		j++;
 		ok = 1;
 	}
-	c = findchan(argv[2]);
+	c = findchan(argv[1]);
+	/* update the TS time */
+	Change_Chan_Ts(c, atoi(argv[0]));
 	c->modes |= mode1;
 	if (!list_isempty(tl)) {
 		if (!list_isfull(c->modeparms)) {
@@ -1005,7 +1018,9 @@ int SignOn_NewBot(const char *nick, const char *user,
 	snewnick_cmd(nick, user, host, rname, Umode);
 	if ((me.allbots > 0) || (Umode & UMODE_SERVICES)) {
 		sjoin_cmd(nick, me.chan, MODE_CHANOP);
-		schmode_cmd(nick, me.chan, "+a", nick);
+#if 0
+		schmode_cmd(nick, me.chan, "+o", nick);
+#endif
 		/* all bots join */
 	}
 	return 1;

@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hybrid7.h,v 1.11 2003/06/30 14:56:25 fishwaldo Exp $
+** $Id: hybrid7.h,v 1.12 2003/07/23 10:35:47 fishwaldo Exp $
 */
 
 
@@ -219,6 +219,7 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & MODE_SECRET))
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_KEY) || CheckChanMode(x, MODE_INVITEONLY)))
 
 
 struct ircd_srv_ {

@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.46 2003/07/08 05:35:37 fishwaldo Exp $
+** $Id: chans.c,v 1.47 2003/07/23 10:35:47 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -42,6 +42,25 @@ void init_chan_hash()
 	ch = hash_create(C_TABLE_SIZE, 0, 0);
 
 }
+/** @brief Process the Channel TS Time 
+ * 
+ * Addes the channel TS time to the channel struct 
+ *
+ * @param c Channel Struct of channel who's ts is being changed
+ * @param tstime ts time of the channel
+ *
+ * @returns Nothing
+ *
+ */
+void Change_Chan_Ts(Chans *c, time_t tstime) {
+	if (!c) {
+		nlog(LOG_WARNING, LOG_CORE, "Warning, Called Change_Change_Ts with null channel");
+		return;
+	}
+	c->tstime = tstime;
+}
+
+
 
 /** @brief Process a Topic Change
  *
@@ -70,6 +89,41 @@ extern void Change_Topic(char *owner, Chans * c, time_t time, char *topic)
 	free(av);
 //      FreeList(av, ac);
 }
+
+/** @brief Check if a mode is set on a Channel
+ * 
+ * used to check if a mode is set on a channel
+ * 
+ * @param c channel to check
+ * @param mode is the mode to check, as a LONG
+ *
+ * @returns 1 on match, 0 on no match, -1 on error
+ *
+*/
+extern int CheckChanMode(Chans *c, long mode) {
+	ModesParm *m;
+	lnode_t *mn;
+	if (!c) {
+		nlog(LOG_WARNING, LOG_CORE, "Warning, CheckChanMode Called with empty channel");
+		return -1;
+	}
+	if (c->modes & mode) {
+		/* its a match */
+		return 1;
+	} 
+	/* if we get here, we have to check the modeparm list first */
+	mn = list_first(c->modeparms);
+	while (mn) {
+		m = lnode_get(mn);
+		if (m->mode & mode) {
+			/* its a match */
+			return 1;
+		}
+		mn = list_next(c->modeparms, mn);
+	}
+	return 0;
+}
+
 
 /** @brief Compare channel modes from the channel hash
  *
@@ -239,6 +293,7 @@ int ChanMode(char *origin, char **av, int ac)
 									lnode_destroy
 									    (mn);
 									free(m);
+
 									if (!(cFlagTab[i].mode == MODE_LIMIT || cFlagTab[i].mode == MODE_KEY))
 										j++;
 								}
@@ -656,6 +711,7 @@ void join_chan(User * u, char *chan)
 		c->cur_users = 0;
 		c->topictime = 0;
 		c->modes = 0;
+		c->tstime = 0;
 		AddStringToList(&av, c->name, &ac);
 		Module_Event("NEWCHAN", av, ac);
 		free(av);
@@ -755,12 +811,13 @@ void chandump(char *chan)
 				}
 			}
 			sendcoders
-			    ("Channel: %s Members: %d (List %d) Flags %s",
+			    ("Channel: %s Members: %d (List %d) Flags %s tstime %d",
 			     c->name, c->cur_users,
-			     list_count(c->chanmembers), mode);
+			     list_count(c->chanmembers), mode, c->tstime);
 			sendcoders
 			    ("       Topic Owner %s, TopicTime: %d, Topic %s",
 			     c->topicowner, c->topictime, c->topic);
+			sendcoders("PubChan?: %d", is_pub_chan(c));
 			cmn = list_first(c->modeparms);
 			while (cmn) {
 				m = lnode_get(cmn);
@@ -815,12 +872,13 @@ void chandump(char *chan)
 				}
 			}
 			sendcoders
-			    ("Channel: %s Members: %d (List %d) Flags %s",
+			    ("Channel: %s Members: %d (List %d) Flags %s tstime %d",
 			     c->name, c->cur_users,
-			     list_count(c->chanmembers), mode);
+			     list_count(c->chanmembers), mode, c->tstime);
 			sendcoders
 			    ("       Topic Owner %s, TopicTime: %d Topic %s",
 			     c->topicowner, c->topictime, c->topic);
+			sendcoders("PubChan?: %d", is_pub_chan(c));
 			cmn = list_first(c->modeparms);
 			while (cmn) {
 				m = lnode_get(cmn);

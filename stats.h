@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.87 2003/07/15 11:21:45 fishwaldo Exp $
+** $Id: stats.h,v 1.88 2003/07/23 10:35:47 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -231,6 +231,7 @@ struct chans_ {
 	char topicowner[MAXHOST];	/* becuase a "server" can be a topic owner */
 	time_t topictime;
 	void *moddata[NUM_MODULES];
+	time_t tstime;
 } chans_;
 
 struct chanmem_ {
@@ -375,7 +376,8 @@ extern int ChanMode(char *origin, char **av, int ac);
 extern void Change_Topic(char *, Chans *, time_t t, char *);
 extern void ChangeChanUserMode(Chans * c, User * u, int add, long mode);
 void kick_chan(User *, char *, User *);
-
+void Change_Chan_Ts(Chans *c, time_t tstime);
+extern int CheckChanMode(Chans *c, long mode);
 
 /* dns.c */
 extern int dns_lookup(char *str, adns_rrtype type,

@@ -20,13 +20,16 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: QuantumIRCd.h,v 1.2 2003/07/15 11:21:45 fishwaldo Exp $
+** $Id: QuantumIRCd.h,v 1.3 2003/07/23 10:35:47 fishwaldo Exp $
 */
 #ifndef QUANTUM_H
 #define QUANTUM_H
 
 /* we support tokens */
 #define HAVE_TOKEN_SUP
+
+/* we have vhost support */
+#define GOTSVSVHOST
 
 
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
@@ -392,7 +395,7 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_ADMONLY) || CheckChanMode(x, MODE_OPERONLY) || CheckChanMode(x, MODE_KEY)))
 
 struct ircd_srv_ {
 	int uprot;

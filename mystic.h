@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: mystic.h,v 1.3 2003/07/02 09:48:55 fishwaldo Exp $
+** $Id: mystic.h,v 1.4 2003/07/23 10:35:47 fishwaldo Exp $
 */
 #ifndef MYSTIC_H
 #define MYSTIC_H
@@ -28,6 +28,8 @@
 /* we support tokens */
 #define HAVE_TOKEN_SUP
 
+/* we have vhost support */
+#define GOTSVSVHOST
 
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"		/* 33 */
@@ -378,7 +380,7 @@
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_ADMONLY) || CheckChanMode(x, MODE_OPERONLY) || CheckChanMode(x, MODE_KEY) || CheckChanMode(x, MODE_RGSTRONLY) || CheckChanMode(x, MODE_INVITEONLY)))
 
 struct ircd_srv_ {
 	int uprot;
