@@ -1400,8 +1400,8 @@ case "$host_os" in
 esac
 
 case "$host_os" in
-*cygwin)
-	MAKEDEPENDENCIES="";;
+*freebsd)
+	MAKEDEPENDENCIES=" ";;
 *)
 	MAKEDEPENDENCIES="-include \$(OBJS:.o=.d)";;
 esac
