@@ -296,6 +296,7 @@ list_timers (CmdParams* cmdparams)
 static void
 run_mod_timers (int ismidnight)
 {
+	int deleteme = 0;
 	Timer *timer = NULL;
 	hscan_t ts;
 	hnode_t *tn;
@@ -318,6 +319,9 @@ run_mod_timers (int ismidnight)
 					if (me.now - timer->lastrun < timer->interval) 
 						continue;
 					break;
+				case TIMER_TYPE_COUNTDOWN:
+					deleteme = 1;
+					break;
 			}
 			if (setjmp (sigvbuf) == 0) {
 				dlog (DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name);
@@ -331,6 +335,11 @@ run_mod_timers (int ismidnight)
 					timer->lastrun = (int) me.now;
 				}
 				RESET_RUN_LEVEL();
+				if (deleteme) {
+					hash_scan_delete (timerhash, tn);
+					hnode_destroy (tn);
+					ns_free (timer);
+				}
 			} else {
 				nlog (LOG_CRITICAL, "run_mod_timers: setjmp() failed, can't call module %s\n", timer->moduleptr->info->name);
 			}

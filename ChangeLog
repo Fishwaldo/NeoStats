@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Add new timer type TIMER_TYPE_COUNTDOWN. This is a one shot timer that 
+   deletes itself after it has triggered. (M)
  - Initial import of Language Functions. Two Macro's to use now, _(x) is for
    default language, and __(x, Client*) is for user/channel language
    settings. (F)

@@ -318,7 +318,7 @@ void bot_chan_private (char *origin, char **av, int ac)
 			if (av[ac - 1][0] == '\1') {
 				ctcp_cprivate (cmdparams);
 			} else {
-				bot_chan_event (EVENT_CNOTICE, cmdparams);
+				bot_chan_event (EVENT_CPRIVATE, cmdparams);
 			}
 		}
 	}

@@ -913,6 +913,7 @@ typedef struct Sock {
 typedef enum TIMER_TYPE {
 	TIMER_TYPE_INTERVAL,
 	TIMER_TYPE_MIDNIGHT,
+	TIMER_TYPE_COUNTDOWN,
 } TIMER_TYPE;
 
 /** @brief Module Timer structure
