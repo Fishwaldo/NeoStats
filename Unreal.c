@@ -201,7 +201,7 @@ void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
 /* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 */
-	send_cmd ("%s TOKEN NICKv2 SJOIN SJOIN2 SJ3 UMODE2", (ircd_srv.token ? TOK_PROTOCTL : MSG_PROTOCTL));
+	send_cmd ("%s TOKEN NICKv2 VHP SJOIN SJOIN2 SJ3 UMODE2", (ircd_srv.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 	send_cmd ("%s %s", (ircd_srv.token ? TOK_PASS : MSG_PASS), pass);
 	send_cmd ("%s %s %d :%s", (ircd_srv.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 }

@@ -83,6 +83,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Add selection of rotuines to determine channel status e.g. is_chanop (M)
  - StatServ now saves and loads client version records (M)
  - Fix mode tracking for -k (Key) (M)
+ - Vhost/Hidden Host system redone and get Unreal to Send Hidden Host with VHP protocol option (F)
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database

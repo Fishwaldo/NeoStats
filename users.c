@@ -394,6 +394,18 @@ void *display_umode(void *tbl, char *col, char *sql, void *row) {
 	User *data = row;
 	return UmodeMaskToString(data->Umode);
 }
+
+void *display_vhost(void *tbl, char *col, char *sql, void *row) {
+	User *u = row;
+#ifdef UMODE_HIDE
+	/* Do we have a hidden host? */
+	if(u->Umode & UMODE_HIDE) {
+			return u->vhost;
+	}
+	return "*";	
+#endif
+}
+
 #ifdef GOTUSERSMODES
 void *display_smode(void *tbl, char *col, char *sql, void *row) {
 	User *data = row;
@@ -468,7 +480,7 @@ COLDEF neo_userscols[] = {
 		MAXHOST,
 		offsetof(struct User, vhost),
 		RTA_READONLY,
-		NULL,
+		display_vhost,
 		NULL,
 		"The users Vhost, if the IRCd supports VHOSTS"
 	},
@@ -622,9 +634,9 @@ dumpuser (User* u)
 	debugtochannel("IP:       %lu.%lu.%lu.%lu", (unsigned long)((u->ipaddr.s_addr >> 24) & 255), (unsigned long)((u->ipaddr.s_addr >> 16) & 255), (unsigned long)((u->ipaddr.s_addr >> 8) & 255), (unsigned long)(u->ipaddr.s_addr & 255) );
 	debugtochannel("Vhost:    %s", u->vhost);
 #ifdef GOTUSERSMODES
-	debugtochannel("Flags:    0x%lx Modes: %s (0x%lx) Smodes: %lx", u->flags, u->modes, u->Umode, u->Smode);
+	debugtochannel("Flags:    0x%lx Modes: %s (0x%lx) Smodes: %lx", u->flags, UmodeMaskToString(u->Umode), u->Umode, u->Smode);
 #else
-	debugtochannel("Flags:    0x%lx Modes: %s (0x%lx)", u->flags, u->modes, u->Umode);
+	debugtochannel("Flags:    0x%lx Modes: %s (0x%lx)", u->flags, UmodeMaskToString(u->Umode), u->Umode);
 #endif
 	if(u->is_away) {
 		debugtochannel("Away:     %s ", u->awaymsg);
@@ -758,8 +770,15 @@ SetUserVhost(const char* nick, const char* vhost)
 {
 	User *u;
 	u = finduser (nick);
+	nlog(LOG_DEBUG1, LOG_CORE, "Vhost %s", vhost);
 	if (u) {
 		strlcpy (u->vhost, vhost, MAXHOST);
+/* these are precautions */
+/* damn Unreal. /sethost on IRC doesn't send +xt, but /umode +x sends +x */
+/* so, we will never be 100% sure about +t */
+#ifdef UMODE_HIDE
+		u->Umode |= UMODE_HIDE;
+#endif
 	}
 }
 
@@ -772,6 +791,7 @@ UserMode (const char *nick, const char *modes)
 	User *u;
 	char **av;
 	int ac = 0;
+	long oldmode;
 
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG1, LOG_CORE, "UserMode: user %s modes %s", nick, modes);
@@ -786,20 +806,15 @@ UserMode (const char *nick, const char *modes)
 	AddStringToList (&av, (char *) modes, &ac);
 	ModuleEvent (EVENT_UMODE, av, ac);
 	free (av);
+	oldmode = u->Umode;
 	u->Umode = UmodeStringToMask(modes, u->Umode);
 	/* This needs to track +x and +t really but
 	 * should be enough for Trystan to work on the SQL stuff
 	 */
 #ifdef UMODE_HIDE
-	/* Do we have a hidden host? */
-	if(u->Umode & UMODE_HIDE) {
-#ifdef UMODE_SETHOST
-		/* Is it really a vhost? */
-		if(!(u->Umode & UMODE_SETHOST)) 
-#endif
-		{
-			strlcpy (u->vhost, "*", MAXHOST);
-		}
+	/* Do we have a hidden host any more? */
+	if((oldmode & UMODE_HIDE) && (!(u->Umode & UMODE_HIDE))) {
+		strlcpy(u->vhost, u->hostname, MAXHOST);
 	}
 #endif
 	nlog (LOG_DEBUG1, LOG_CORE, "UserMode: modes for %s is now %p", u->nick, (int *)u->Umode);

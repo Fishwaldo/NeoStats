@@ -124,7 +124,11 @@ main (int argc, char *argv[])
 	me.want_nickip = 0;
 	me.die = 0;
 	me.local[0] = '\0';
+#ifndef DEBUG
 	me.debug_mode = 0;
+#else
+	me.debug_mode = 1;
+#endif
 	me.r_time = 10;
 	me.numeric = 1;
 	me.setservertimes = 0;
