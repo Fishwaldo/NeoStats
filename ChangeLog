@@ -31,6 +31,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - (M) Paranoid buffer overflow checking - all strcpy and sprintf changed to strncpy and snprintf
  - (M) Changed all instances of "neostats.cfg" to CONFIG_NAME
  - (M) Changed "not Tech Admin" type errors to "not authorised"
+ - (M) Improved comments in makeconf and added support for custom log filenames
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number
