@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.10 2002/07/12 09:11:31 fishwaldo Exp $
+** $Id: spam.c,v 1.11 2002/07/13 06:30:36 fishwaldo Exp $
 */
 
 
@@ -33,12 +33,23 @@ Functions my_fn_list[] = {
 	{ TOK_VERSION,	new_m_version,	1 },
 	{ NULL,		NULL,		0 }
 };
+	/* a easter egg for all the Neo users */
 
 int __Chan_Message(char *chan, char **argv, int argc)
 {
-	/* we don't handle channel messages */
-	privmsg(chan, s_Spam, "Say what Nigger? your speaking gibberish in %s", chan);
-	return 1;
+	FILE *fort;
+	char *fortune;
+	fortune = malloc(255);
+	if (!strcasecmp(argv[1], s_Spam)) {
+		fort = popen("/usr/games/fortune", "r");
+		if (fort) {
+			while ((fortune = fgets(fortune, 255, fort))) {
+				privmsg(chan, s_Spam, "%s", fortune);
+			}
+			pclose(fort);
+		}
+ 	}
+	return 1;	
 }
 
 
