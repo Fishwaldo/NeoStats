@@ -29,6 +29,7 @@
 #include "dl.h"
 #include "hash.h"
 #include "log.h"
+#include "ircd.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
