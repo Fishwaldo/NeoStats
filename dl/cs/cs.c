@@ -251,7 +251,7 @@ static int cs_del_user(User *u) {
 
 /* Routine for MODES message to be echoed */
 static int cs_user_modes(User *u) {
-    int add = 0;
+    int add = 1;
     char *modes;
 
     /* Approximate Segfault Location */
