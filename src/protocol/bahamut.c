@@ -119,11 +119,11 @@ mode_init chan_modes[] = {
 	{'k', CMODE_KEY, MODEPARAM},
 	{'b', CMODE_BAN, MODEPARAM},
 	{'l', CMODE_LIMIT, MODEPARAM},
-	{'M', CMODE_RGSTR, 0},
+	{'r', CMODE_RGSTR, 0},
 	{'R', CMODE_RGSTRONLY, 0},
 	{'x', CMODE_NOCOLOR, 0},
 	{'O', CMODE_OPERONLY, 0},
-/* CMODE_MODREG */
+	{'M', CMODE_MODREG, 0},
 	{'L', CMODE_LISTED, 0},
 	{0, 0, 0},
 };
