@@ -66,8 +66,8 @@ static char msg_signoff[]="\2\0033Signed Off\2 user: %s (%s@%s) at: %s - %s\003"
 static char msg_localkill[]="\2LOCAL KILL\2 user: \2%s\2 (%s@%s) was Killed by: \2%s\2 - Reason sighted: \2%s\2";
 static char msg_globalkill[]="\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2\003";
 static char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 (%s@%s) was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
-static char msg_mode[]="\200313%s\2 is \2%s\2 a \2%s\2 (%c%c)\003";
-static char msg_mode_serv[]="\200313%s\2 is \2%s\2 a \2%s\2 (%c%c) on \2%s\2\003";
+static char msg_mode[]="\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c)\003";
+static char msg_mode_serv[]="\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c) on \2%s\2\003";
 static char msg_bot[]="\2\00313%s\2 is \2%s\2 a \2Bot\2 (%c%c)\003";
 #endif
 
