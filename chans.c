@@ -191,10 +191,21 @@ ChanMode (char *origin, char **av, int ac)
 	Chans *c;
 	ModesParm *m;
 	lnode_t *mn;
+	char **data;
+	int datasize = 0;
+
 	c = findchan (av[0]);
 	if (!c) {
 		return 0;
 	}
+	
+	AddStringToList(&data, origin, &datasize);
+	for (i = 0; i < ac; i++) {
+		AddStringToList(&data, av[i], &datasize);	
+	}
+	ModuleEvent(EVENT_CHANMODE, data, datasize);
+	free(data);	
+
 	modes = av[1];
 	while (*modes) {
 		switch (*modes) {

@@ -159,3 +159,9 @@
  *	client version string
  */
 #define EVENT_CLIENTVERSION	"CLIENTVERSION"
+
+/* CHANMODE params are:
+ *	channel name
+ *	mode string
+ */
+#define EVENT_CHANMODE		"CHANMODE"
