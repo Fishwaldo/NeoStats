@@ -345,7 +345,9 @@ FISH: We do use less than 5 sometimes, I commented this out.. each section does 
 		}
 */
 		ss_stats(u, av[2], av[3], av[4]);
-		chanalert(s_StatServ,"%s Wants to Look at my Stats!! 34/24/34",u->nick);
+		if (ac < 3) { 
+			chanalert(s_StatServ,"%s Wants to Look at my Stats!! 34/24/34",u->nick);
+		}
 	} else if (!strcasecmp(av[1], "RESET") && (UserLevel(u) >= 185)) {
 		chanalert(s_StatServ,"%s Wants me to RESET the databases.. here goes..",u->nick);
 		ss_reset(u);
@@ -779,10 +781,10 @@ static void ss_botlist(User *origuser)
 
 static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 {
-        Server *s;
 	SStats *st;
-	hscan_t hs;
-	hnode_t *sn;
+        hnode_t *node;
+        hscan_t scan;
+
 
 	strcpy(segv_location, "StatServ-ss_stats");
 
@@ -803,9 +805,9 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 	if (!strcasecmp(cmd, "LIST")) {
 		int i = 1;
 		prefmsg(u->nick, s_StatServ, "Statistics Database:");
-		hash_scan_begin(&hs, Shead);
-		while ((sn = hash_scan_next(&hs))) {
-			st = hnode_get(sn);
+		hash_scan_begin(&scan, Shead);
+		while ((node = hash_scan_next(&scan))) {
+			st = hnode_get(node);
 			prefmsg(u->nick, s_StatServ, "[%-2d] %s", i, st->name);
 			i++;
 		}
@@ -825,23 +827,23 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 				arg);
 			return;
 		}
-		chanalert(s_StatServ, "I am %s, you wanted to del %s",me.name,arg);
-		sn = hash_lookup(Shead, arg);
-		if (sn) {
-			hash_delete(Shead, sn);
-			st = hnode_get(sn);
-			hnode_destroy(sn); 
+                if (!findserver(arg)) {
+		node = hash_lookup(Shead, arg);
+		if (node) {
+			hash_delete(Shead, node);
+			st = hnode_get(node);
+			hnode_destroy(node); 
 			free(st);
-			chanalert(s_StatServ, "Deleted Statiscis for Server: %s",arg);
-		        s = findserver(arg);
-			if (s) {
-	        		AddStats(s);
-				st = findstats(arg);
+		        prefmsg(u->nick, s_StatServ, "Removed %s from the database.", arg);
+                	log("%s requested STATS DEL %s", u->nick, arg);
+			return;
 			}
-
+		} else {
+			prefmsg(u->nick, s_StatServ, "Cannot remove %s from the database, it is online!!", arg);
+			log("%s requested STATS DEL %s, but that server is online!!", u->nick, arg);
+			return;
 		}
-		prefmsg(u->nick, s_StatServ, "Removed %s from the database.", arg);
-		log("%s requested STATS DEL %s", u->nick, arg);
+
 	} else if (!strcasecmp(cmd, "COPY")) {
 		Server *s;
 
@@ -887,13 +889,15 @@ static void ss_reset(User *u)
 				prefmsg(u->nick, s_StatServ, "Access Denied.");
 				return;
 		}
-		remove("data/nstats.db");
+/*		remove("data/nstats.db");
 		remove("data/stats.db");
 		globops(s_StatServ, "%s requested \2RESET\2 databases.", u->nick);
 		log("%s requested RESET.", u->nick);
 		globops(s_StatServ, "Rebuilding Statistics DataBase after RESET...");
 	prefmsg(u->nick, s_StatServ, "Databases Reset! I hope you wanted to really do that!");
-/*	LoadStats(); */
+	LoadStats(); */
+	prefmsg(u->nick, s_StatServ, "This command is depreciated.");
+	prefmsg(u->nick, s_StatServ, "To RESET server databases, unload StatServ and remove stats.db in the data directory!");
 }
 
 static void ss_JOIN(User *u, char *chan)
