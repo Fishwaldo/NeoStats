@@ -1,30 +1,34 @@
+/* NeoStats - IRC Statistical Services 
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
+** http://www.neostats.net/
+**
+**  Based on adns, which is
+**    Copyright (C) 1997-2000 Ian Jackson <ian@davenant.greenend.org.uk>
+**    Copyright (C) 1999-2000 Tony Finch <dot@dotat.at>
+**  
+**  This program is free software; you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation; either version 2 of the License, or
+**  (at your option) any later version.
+**
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with this program; if not, write to the Free Software
+**  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+**  USA
+**
+** NeoStats CVS Identification
+** $Id: internal.h 2418 2005-04-01 21:09:27Z Mark $
+*/
 /*
  * internal.h
  * - declarations of private objects with external linkage (adns__*)
  * - definitons of internal macros
  * - comments regarding library data structures
- */
-/*
- *  This file is
- *    Copyright (C) 1997-2000 Ian Jackson <ian@davenant.greenend.org.uk>
- *
- *  It is part of adns, which is
- *    Copyright (C) 1997-2000 Ian Jackson <ian@davenant.greenend.org.uk>
- *    Copyright (C) 1999-2000 Tony Finch <dot@dotat.at>
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2, or (at your option)
- *  any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software Foundation,
- *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
 #ifndef ADNS_INTERNAL_H_INCLUDED
@@ -35,6 +39,7 @@
 #else
 #include "config.h"
 #endif
+
 typedef unsigned char byte;
 
 #include <stdarg.h>
@@ -57,6 +62,58 @@ typedef unsigned char byte;
 #ifdef ADNS_REGRESS_TEST
 # include "hredirect.h"
 #endif
+
+/* GNU C attributes. */
+#ifndef FUNCATTR
+#ifdef HAVE_GNUC25_ATTRIB
+#define FUNCATTR(x) __attribute__(x)
+#else
+#define FUNCATTR(x)
+#endif
+#endif
+
+/* GNU C printf formats, or null. */
+#ifndef ATTRPRINTF
+#ifdef HAVE_GNUC25_PRINTFFORMAT
+#define ATTRPRINTF(si,tc) format(printf,si,tc)
+#else
+#define ATTRPRINTF(si,tc)
+#endif
+#endif
+#ifndef PRINTFFORMAT
+#define PRINTFFORMAT(si,tc) FUNCATTR((ATTRPRINTF(si,tc)))
+#endif
+
+/* GNU C nonreturning functions, or null. */
+#ifndef ATTRNORETURN
+#ifdef HAVE_GNUC25_NORETURN
+#define ATTRNORETURN noreturn
+#else
+#define ATTRNORETURN
+#endif
+#endif
+#ifndef NONRETURNING
+#define NONRETURNING FUNCATTR((ATTRNORETURN))
+#endif
+
+/* Combination of both the above. */
+#ifndef NONRETURNPRINTFFORMAT
+#define NONRETURNPRINTFFORMAT(si,tc) FUNCATTR((ATTRPRINTF(si,tc),ATTRNORETURN))
+#endif
+
+/* GNU C constant functions, or null. */
+#ifndef ATTRCONST
+#ifdef HAVE_GNUC25_CONST
+#define ATTRCONST const
+#else
+#define ATTRCONST
+#endif
+#endif
+#ifndef CONSTANT
+#define CONSTANT FUNCATTR((ATTRCONST))
+#endif
+
+
 
 /* Configuration and constants */
 
@@ -182,9 +239,15 @@ struct adns__query {
   adns_state ads;
   enum { query_tosend, query_tcpw, query_childw, query_done } state;
   adns_query back, next, parent;
-  struct { adns_query head, tail; } children;
-  struct { adns_query back, next; } siblings;
-  struct { allocnode *head, *tail; } allocations;
+	struct {
+		adns_query head, tail;
+	} children;
+	struct {
+		adns_query back, next;
+	} siblings;
+	struct {
+		allocnode *head, *tail;
+	} allocations;
   int interim_allocd, preserved_allocd;
   void *final_allocspace;
 
@@ -286,7 +349,9 @@ struct adns__query {
    */
 };
 
-struct query_queue { adns_query head, tail; };
+struct query_queue {
+	adns_query head, tail;
+};
 
 struct adns__state {
   adns_initflags iflags;
@@ -695,17 +760,32 @@ void adns__consistency(adns_state ads, adns_query qu, consistency_checks cc);
 
 /* Useful static inline functions: */
 
-static inline int ctype_whitespace(int c) { return c==' ' || c=='\n' || c=='\t'; }
-static inline int ctype_digit(int c) { return c>='0' && c<='9'; }
-static inline int ctype_alpha(int c) {
+static inline int ctype_whitespace(int c)
+{
+	return c == ' ' || c == '\n' || c == '\t';
+}
+static inline int ctype_digit(int c)
+{
+	return c >= '0' && c <= '9';
+}
+static inline int ctype_alpha(int c)
+{
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
-static inline int ctype_822special(int c) { return strchr("()<>@,;:\\\".[]",c) != 0; }
-static inline int ctype_domainunquoted(int c) {
-  return ctype_alpha(c) || ctype_digit(c) || (strchr("-_/+",c) != 0);
+static inline int ctype_822special(int c)
+{
+	return strchr("()<>@,;:\\\".[]", c) != 0;
+}
+static inline int ctype_domainunquoted(int c)
+{
+	return ctype_alpha(c) || ctype_digit(c)
+	    || (strchr("-_/+", c) != 0);
 }
 
-static inline int errno_resources(int e) { return e==ENOMEM || e==ENOBUFS; }
+static inline int errno_resources(int e)
+{
+	return e == ENOMEM || e == ENOBUFS;
+}
 
 /* Useful macros */
 

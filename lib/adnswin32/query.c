@@ -1,40 +1,35 @@
+/* NeoStats - IRC Statistical Services 
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
+** http://www.neostats.net/
+**
+**  Based on adns, which is
+**    Copyright (C) 1997-2000 Ian Jackson <ian@davenant.greenend.org.uk>
+**    Copyright (C) 1999-2000 Tony Finch <dot@dotat.at>
+**  
+**  This program is free software; you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation; either version 2 of the License, or
+**  (at your option) any later version.
+**
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with this program; if not, write to the Free Software
+**  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+**  USA
+**
+** NeoStats CVS Identification
+** $Id: query.c 1748 2004-04-23 22:00:48Z Mark $
+*/
 /*
  * query.c
  * - overall query management (allocation, completion)
  * - per-query memory management
  * - query submission and cancellation (user-visible and internal)
  */
-/*
- *  This file is
- *    Copyright (C) 1997-2000 Ian Jackson <ian@davenant.greenend.org.uk>
- *
- *  It is part of adns, which is
- *    Copyright (C) 1997-2000 Ian Jackson <ian@davenant.greenend.org.uk>
- *    Copyright (C) 1999-2000 Tony Finch <dot@dotat.at>
- *  
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2, or (at your option)
- *  any later version.
- *  
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *  
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software Foundation,
- *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. 
- */
-
-#ifdef WIN32
-# include "adns_win32.h"
-#else
-# include <stdlib.h>
-# include <unistd.h>
-# include <errno.h>
-# include <sys/time.h>
-#endif
 
 #include "internal.h"
 
