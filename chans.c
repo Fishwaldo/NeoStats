@@ -686,7 +686,7 @@ join_chan (const char* nick, const char *chan)
 		c->cur_users = 0;
 		c->topictime = 0;
 		c->modes = 0;
-		c->tstime = 0;
+		c->tstime = me.now;
 		c->flags = 0;
 		AddStringToList (&av, c->name, &ac);
 		ModuleEvent (EVENT_NEWCHAN, av, ac);
