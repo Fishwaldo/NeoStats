@@ -29,6 +29,7 @@ void UserQuit (const char *nick, const char *quitmsg);
 int UserNick (const char * oldnick, const char * newnick);
 void UserDump (const char *nick);
 void UserPart (list_t *list, lnode_t *node, void *v);
+void UserJoin (const char* nick, const char* chanlist);
 void SetUserVhost(char* nick, char* vhost);
 void UserMode (const char *nick, const char *modes);
 #ifdef GOTUSERSMODES

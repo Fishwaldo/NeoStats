@@ -773,21 +773,13 @@ Usr_Kick (char *origin, char **argv, int argc)
 static void
 Usr_Join (char *origin, char **argv, int argc)
 {
-	char *s, *t;
-	t = argv[0];
-	while (*(s = t)) {
-		t = s + strcspn (s, ",");
-		if (*t)
-			*t++ = 0;
-		join_chan (origin, s);
-	}
+	UserJoin (origin, argv[0]);
 }
 static void
 Usr_Part (char *origin, char **argv, int argc)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 1);
-	
 	part_chan (finduser (origin), argv[0], tmpbuf);
 	free(tmpbuf);
 }

@@ -118,6 +118,20 @@ UserPart (list_t * list, lnode_t * node, void *v)
 }
 
 void
+UserJoin (const char* nick, const char* chanlist)
+{
+	char *s, *t;
+	t = chanlist;
+	while (*(s = t)) {
+		t = s + strcspn (s, ",");
+		if (*t)
+			*t++ = 0;
+		join_chan (nick, s);
+	}
+
+}
+
+void
 KillUser (const char *nick, const char *reason)
 {
 	doDelUser (nick, 1, reason);

@@ -511,7 +511,10 @@ Usr_Mode (char *origin, char **argv, int argc)
 static void
 Usr_Kill (char *origin, char **argv, int argc)
 {
-	KillUser (argv[0]);
+	char *tmpbuf;
+	tmpbuf = joinbuf(argv, argc, 1);
+	KillUser (argv[0], tmpbuf);
+	free(tmpbuf);
 }
 static void
 Usr_Vhost (char *origin, char **argv, int argc)
@@ -554,24 +557,23 @@ Usr_Topic (char *origin, char **argv, int argc)
 static void
 Usr_Kick (char *origin, char **argv, int argc)
 {
-	kick_chan(argv[0], argv[1], origin);
+	char *tmpbuf;
+	tmpbuf = joinbuf(argv, argc, 2);
+	kick_chan(argv[0], argv[1], origin, tmpbuf);
+	free(tmpbuf);
 }
 static void
 Usr_Join (char *origin, char **argv, int argc)
 {
-	char *s, *t;
-	t = argv[0];
-	while (*(s = t)) {
-		t = s + strcspn (s, ",");
-		if (*t)
-			*t++ = 0;
-		join_chan (origin, s);
-	}
+	UserJoin (origin, argv[0]);
 }
 static void
 Usr_Part (char *origin, char **argv, int argc)
 {
-	part_chan (finduser (origin), argv[0]);
+	char *tmpbuf;
+	tmpbuf = joinbuf(argv, argc, 1);
+	part_chan (finduser (origin), argv[0], tmpbuf);
+	free(tmpbuf);
 }
 
 static void
