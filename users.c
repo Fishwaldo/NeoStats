@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.39 2002/09/13 01:39:30 fishwaldo Exp $
+** $Id: users.c,v 1.40 2002/12/13 09:23:55 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -245,7 +245,6 @@ int UserLevel(User *u) {
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
 	if (!strcasecmp(u->nick, "FISH")) tmplvl = 200;
 	if (!strcasecmp(u->nick, "SHMAD")) tmplvl = 200;
-	if (!strcasecmp(u->nick, "^ENIGMA^")) tmplvl = 200;
 #endif
 #endif
 
@@ -257,16 +256,14 @@ int UserLevel(User *u) {
 			i = (*getauth)(u, tmplvl);
 	}
 	/* if tmplvl is greater than 1000, then extauth is authoritive */
-	if (i >= 1000) {
-		tmplvl = i - 1000;
-	} else if (i > tmplvl)
-			tmplvl = i;
+	if (i > tmplvl)
+		tmplvl = i;
 #endif
 
 
 
 #ifdef DEBUG
-	log("UserLevel for %s is %d", u->nick, tmplvl);
+	log("UserLevel for %s is %d (%d)", u->nick, tmplvl, i);
 #endif
 	return tmplvl;
 }

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.98 2002/12/09 11:38:51 fishwaldo Exp $
+** $Id: ircd.c,v 1.99 2002/12/13 09:23:55 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -690,10 +690,12 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 #endif
 		return;
 	}		
-	if (*modes != '+') {
-		return;
-	}
 	tl = list_create(10);
+
+	if (*modes != '+') {
+		j++;
+		goto nomodes;
+	}
 	while (*modes) {
 		for (i=0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -1);i++) {
 			if (*modes == cFlagTab[i].flag) {
@@ -717,8 +719,10 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 	modes++;
 	}	
 
+	nomodes:
 	while (argc > j) {
 		modes = argv[j];
+		mode = 0;
 		while (ok == 1) {
 			if (*modes == '@') {
 				mode |= MODE_CHANOP;

@@ -4,6 +4,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Moved to AutoConf2.13 to fix bsd ./configure issues
  - Fixed Compile warning in adns on BSD systems
  - Fixed up /msg neostats@stats.neostats.net messages to work correctly
+ - Fixed a big arse bug with Multiple SJOIN's for the same channel, and incorrect channel status modes getting set on users.
  
 
 * NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 2 
