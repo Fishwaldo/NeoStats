@@ -42,7 +42,7 @@ DISTLIBS = adns pcre curl sqlsrv keeper
 DISTMOD = cs extauth hostserv loveserv ms statserv template
 
 .c.o:
-	$(CC) $(NEOINCLUDES) $(NEOCFLAGS) -c $< 
+	$(CC) $(NEOCFLAGS) $(NEOINCLUDES) -c $< 
 
 all: @buildsqlsrv@ libadns libkeeper libpcre libcurl.a neostats modules utils 
 

@@ -23,6 +23,9 @@
 
 #include "stats.h"
 #include "log.h"
+#ifdef SQLSRV
+#include "sqlsrv/rta.h"
+#endif
 
 static hash_t *banshash;
 
@@ -154,3 +157,109 @@ FreeBans ()
 	}
 	hash_destroy(banshash);
 }
+
+
+#ifdef SQLSRV
+COLDEF neo_banscols[] = {
+	{
+		"bans",
+		"type",
+		RTA_STR,
+		1,
+		offsetof(struct Server, type),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"type"
+	},
+	{
+		"bans",
+		"user",
+		RTA_STR,
+		MAXUSER,
+		offsetof(struct Server, user),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"user"
+	},
+	{
+		"bans",
+		"host",
+		RTA_STR,
+		MAXHOST,
+		offsetof(struct Server, host),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"host"
+	},
+	{
+		"bans",
+		"mask",
+		RTA_STR,
+		MAXHOST,
+		offsetof(struct Server, mask),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"mask"
+	},
+	{
+		"bans",
+		"reason",
+		RTA_STR,
+		BUFSIZE,
+		offsetof(struct Server, reason),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"reason"
+	},
+	{
+		"bans",
+		"setby",
+		RTA_STR,
+		MAXHOST,
+		offsetof(struct Server, setby),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"setby"
+	},
+	{
+		"bans",
+		"tsset",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct Server, tsset),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"tsset"
+	},
+	{
+		"bans",
+		"tsexpire",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct Server, tsexpire),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"tsexpire"
+	},
+};
+
+TBLDEF neo_bans = {
+	"bans",
+	NULL, 	/* for now */
+	sizeof(struct Bans),
+	0,
+	TBL_HASH,
+	neo_banscols,
+	sizeof(neo_banscols) / sizeof(COLDEF),
+	"",
+	"The list of bans on the IRC network"
+};
+#endif /* SQLSRV */
