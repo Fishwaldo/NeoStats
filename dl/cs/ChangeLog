@@ -2,6 +2,7 @@ ConnectServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma^
 
 * Version 1.5 * September 12th, 2002
+- Fixed cosmetic bug reported by eggy (Shmad)
 - Added NICK watching support for nick changes (Shmad)
 - Fixed other misc bugs.
 
