@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.27 2003/07/15 10:53:18 fishwaldo Exp $
+** $Id: cs.c,v 1.28 2003/08/21 13:03:20 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -277,7 +277,7 @@ int cs_new_user(char **av, int ac)
 	/* Print Connection Notice */
 	if (u && sign_watch) {
 		chanalert(s_ConnectServ,
-			  "\2SIGNON\2 %s (%s@%s) has Signed on at %s",
+			  "\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s) at: \2%s\2\003",
 			  u->nick, u->username, u->hostname,
 			  u->server->name);
 	}
@@ -312,7 +312,7 @@ int cs_del_user(char **av, int ac)
 			LocalCount = split_buf(lcl, &Local, 0);
 			KillMsg = joinbuf(Local, LocalCount, 7);
 			chanalert(s_ConnectServ,
-				  "\2LOCAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2",
+				  "\2LOCAL KILL\2 user: \2%s\2 (%s@%s) was Killed by: \2%s\2 - Reason sighted: \2%s\2",
 				  u->nick, u->username, u->hostname,
 				  Local[6], KillMsg);
 			free(KillMsg);
@@ -327,7 +327,7 @@ int cs_del_user(char **av, int ac)
 	/* Print Disconnection Notice */
 	if (sign_watch) {
 		chanalert(s_ConnectServ,
-			  "\2SIGNOFF\2 %s (%s@%s) has Signed off at %s - %s",
+			  "\2\0033Signed Off\2 user: %s (%s@%s) at: %s - %s\003",
 			  u->nick, u->username, u->hostname,
 			  u->server->name, QuitMsg);
 	}
@@ -389,66 +389,66 @@ int cs_user_modes(char **av, int ac)
 		case NETADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2NetAdmin\2 %s is Now a Network Administrator",
+					  "\2\00313%s\2 is \2Now\2 a \2Network Administrator\2 (+N)\003",
 					  u->nick);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2NetAdmin\2 %s is No Longer a Network Administrator",
+					  "\02\00313%s\2 is \2No Longer\2 a \2Network Administrator\2 (-N)\003",
 					  u->nick);
 			}
 			break;
 		case CONETADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2Co-NetAdmin\2 %s is Now a Co-Network Administrator",
+					  "\2\00313%s\2 is \2Now\2 a \2Co-Network Administrator\2 (+8)\003",
 					  u->nick);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2Co-NetAdmin\2 %s is No Longer a Co-Network Administrator",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Co-Network Administrator\2 (-8)\003",
 					  u->nick);
 			}
 			break;
 		case TECHADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2TechAdmin\2 %s is Now a Network Technical Administrator",
+					  "\2\00313%s\2 is \2Now\2 a \2Network Technical Administrator\2 (+T)\003",
 					  u->nick);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2TechAdmin\2 %s is No Longer a Network Technical Administrator",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Network Technical Administrator\2 (-T)\003",
 					  u->nick);
 			}
 			break;
 		case SERVERADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2ServerAdmin\2 %s is Now a Server Administrator on %s",
+					  "\2\00313%s\2 is \2Now\2 a \2Server Administrator\2 (+A) on \2%s\2\003",
 					  u->nick, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Server Administrator\2 (-A) on \2%s\2\003",
 					  u->nick, u->server->name);
 			}
 			break;
 		case COSERVERADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s",
+					  "\2\00313%s\2 is \2Now\2 a \2Co-Server Administrator\2 (+C) on \2%s\2\003",
 					  u->nick, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Co-Server Administrator\2 (-C) on \2%s\2\003",
 					  u->nick, u->server->name);
 			}
 			break;
 		case GUESTADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2GuestAdmin\2 %s is Now a Guest Administrator on %s",
+					  "\2\00313%s\2 is \2Now\2 a \2Guest Administrator\2 (+7) on \2%s\2\003",
 					  u->nick, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2GuestAdmin\2 %s is No Longer a Guest Administrator on %s",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Guest Administrator\2 (-7) on \2%s\2\003",
 					  u->nick, u->server->name);
 			}
 			break;
@@ -456,22 +456,22 @@ int cs_user_modes(char **av, int ac)
 		case BOT_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2Bot\2 %s is Now a Bot",
+					  "\2\00313%s\2 is \2Now\2 a \2Bot\2 (+B)\003",
 					  u->nick);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2Bot\2 %s is No Longer a Bot",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Bot\2 (-B)\003",
 					  u->nick);
 			}
 			break;
 		case INVISIBLE_MODE:
 			if (add) {
 				globops(s_ConnectServ,
-					"\2%s\2 Is Using \2Invisible Mode\2",
+					"\2%s\2 Is Using \2Invisible Mode\2 (+I)",
 					u->nick);
 			} else {
 				globops(s_ConnectServ,
-					"\2%s\2 Is no longer using \2Invisible Mode\2",
+					"\2%s\2 Is no longer using \2Invisible Mode\2 (-I)",
 					u->nick);
 			}
 			break;
@@ -479,44 +479,44 @@ int cs_user_modes(char **av, int ac)
 		case SERVICESADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2ServicesAdmin\2 %s is Now a Services Administrator",
+					  "\2\00313%s\2 is \2Now\2 a \2Services Administrator\2 (+a)\003",
 					  u->nick);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2ServicesAdmin\2 %s is No Longer a Services Administrator",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Services Administrator\2 (-a)\003",
 					  u->nick);
 			}
 			break;
 		case OPER_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2Oper\2 %s is Now a Oper on %s",
+					  "\2\00313%s\2 is \2Now\2 a \2Global Operator\2 (+o) on \2%s\2\003",
 					  u->nick, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2Oper\2 %s is No Longer a Oper on %s",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Global Operator\2 (-o) on \2%s\2\003",
 					  u->nick, u->server->name);
 			}
 			break;
 		case LOCOP_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2LocalOper\2 %s is Now a Local Oper on %s",
+					  "\2\00313%s\2 is \2Now\2 a \2Local Operator\2 (+O) on \2%s\2\003",
 					  u->nick, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2LocalOper\2 %s is No Longer a Local Oper on %s",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Local Operator\2 (-O) on \2%s\2\003",
 					  u->nick, u->server->name);
 			}
 			break;
 		case NETSERVICE_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2Services\2 %s is Now a Network Service",
+					  "\2\00313%s\2 is \2Now\2 a \2Network Service\2 (+S)\003",
 					  u->nick);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2Services\2 %s is No Longer a Network Service",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Network Service\2 (-S)\003",
 					  u->nick);
 			}
 			break;
@@ -572,77 +572,77 @@ int cs_user_smodes(char **av, int ac)
 		case NETADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2NetAdmin\2 %s is Now a Network Administrator",
+					  "\2\00313%s\2 is \2Now\2 a \2Network Administrator\2 (+N)\003",
 					  u->nick);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2NetAdmin\2 %s is No Longer a Network Administrator",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Network Administrator\2 (-N)\003",
 					  u->nick);
 			}
 			break;
 		case CONETADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2Co-NetAdmin\2 %s is Now a Co-Network Administrator",
+					  "\2\00313%s\2 is \2Now\2 a \2Co-Network Administrator\2 (+8)\003",
 					  u->nick);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2Co-NetAdmin\2 %s is No Longer a Co-Network Administrator",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Co-Network Administrator\2 (-8)\003",
 					  u->nick);
 			}
 			break;
 		case TECHADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2TechAdmin\2 %s is Now a Network Technical Administrator",
+					  "\2\00313%s\2 is \2Now\2 a \2Network Technical Administrator\2 (+T)\003",
 					  u->nick);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2TechAdmin\2 %s is No Longer a Network Technical Administrator",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Network Technical Administrator\2 (-T)\003",
 					  u->nick);
 			}
 			break;
 		case COTECHADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2Co-TechAdmin\2 %s is Now a Network Co-Technical Administrator",
+					  "\2\00313%s\2 is \2Now\2 a \2Network Co-Technical Administrator\2\003",
 					  u->nick);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2Co-TechAdmin\2 %s is No Longer a Network Co-Technical Administrator",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Network Co-Technical Administrator\2\003",
 					  u->nick);
 			}
 			break;
 		case SERVERADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2ServerAdmin\2 %s is Now a Server Administrator on %s",
+					  "\2\00313%s\2 is \2Now\2 a \2Server Administrator\2 (+A) on \2%s\2\003",
 					  u->nick, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Server Administrator\2 (-A) on \2%s\2\003",
 					  u->nick, u->server->name);
 			}
 			break;
 		case COSERVERADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s",
+					  "\2\00313%s\2 is \2Now\2 a \2Co-Server Administrator\2 (+C) on \2%s\2\003",
 					  u->nick, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Co-Server Administrator\2 (-C) on \2%s\2\003",
 					  u->nick, u->server->name);
 			}
 			break;
 		case GUESTADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-					  "\2GuestAdmin\2 %s is Now a Guest Administrator on %s",
+					  "\2\00313%s\2 is \2Now\2 a \2Guest Administrator\2 (+7) on \2%s\2\003",
 					  u->nick, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-					  "\2GuestAdmin\2 %s is No Longer a Guest Administrator on %s",
+					  "\2\00313%s\2 is \2No Longer\2 a \2Guest Administrator\2 (-7) on \2%s\2\003",
 					  u->nick, u->server->name);
 			}
 			break;
@@ -674,13 +674,13 @@ int cs_user_kill(char **av, int ac)
 		/* it was a User who was killed */
 		if (kill_watch)
 			chanalert(s_ConnectServ,
-				  "\2GLOBAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2",
+				  "\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2\003",
 				  u->nick, u->username, u->hostname,
 				  Kill[0], GlobalMsg);
 	} else if (findserver(Kill[2])) {
 		if (kill_watch)
 			chanalert(s_ConnectServ,
-				  "\2SERVER KILL\2 %s was Killed by the Server %s - Reason sighted: %s",
+				  "\2SERVER KILL\2 user: \2%s\2 was Killed by the Server \2%s\2 - Reason sighted: \2%s\2",
 				  u->nick, Kill[0], GlobalMsg);
 	}
 	free(GlobalMsg);
@@ -698,7 +698,7 @@ int cs_user_nick(char **av, int ac)
 
 	if (nick_watch)
 		chanalert(s_ConnectServ,
-			  "\2NICK\2 %s Changed their nick to %s", av[0],
+			  "\2\0037Nick Change\2 user: \2%s\2 Changed their nick to \2%s\2\003", av[0],
 			  av[1]);
 	return 1;
 }
@@ -717,7 +717,7 @@ static void cs_set_nickwatch(User * u, char **av, int ac)
 	}
 	if ((!strcasecmp(av[3], "YES")) || (!strcasecmp(av[3], "ON"))) {
 		nick_watch = 1;
-		chanalert(s_ConnectServ, "\2NICK WATCH\2 Activated by %s",
+		chanalert(s_ConnectServ, "\2NICK WATCH\2 Activated by \2%s\2",
 			  u->nick);
 		nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Activated NICK WATCH",
 		     u->nick, u->username, u->hostname);
@@ -728,7 +728,7 @@ static void cs_set_nickwatch(User * u, char **av, int ac)
 		   || (!strcasecmp(av[3], "OFF"))) {
 		nick_watch = 0;
 		chanalert(s_ConnectServ,
-			  "\2NICK WATCH\2 Deactivated by %s", u->nick);
+			  "\2NICK WATCH\2 Deactivated by \2%s\2", u->nick);
 		nlog(LOG_NORMAL, LOG_MOD,
 		     "%s!%s@%s Deactivated NICK WATCH", u->nick,
 		     u->username, u->hostname);
@@ -761,7 +761,7 @@ static void cs_set_signwatch(User * u, char **av, int ac)
 	if ((!strcasecmp(av[3], "YES")) || (!strcasecmp(av[3], "ON"))) {
 		sign_watch = 1;
 		chanalert(s_ConnectServ,
-			  "\2SIGNON/SIGNOFF WATCH\2 Activated by %s",
+			  "\2SIGNON/SIGNOFF WATCH\2 Activated by \2%s\2",
 			  u->nick);
 		nlog(LOG_NORMAL, LOG_MOD,
 		     "%s!%s@%s Activated SIGNON/SIGNOFF WATCH", u->nick,
@@ -773,7 +773,7 @@ static void cs_set_signwatch(User * u, char **av, int ac)
 		   || (!strcasecmp(av[3], "OFF"))) {
 		sign_watch = 0;
 		chanalert(s_ConnectServ,
-			  "\2SIGNON/SIGNOFF WATCH\2 Deactivated by %s",
+			  "\2SIGNON/SIGNOFF WATCH\2 Deactivated by \2%s\2",
 			  u->nick);
 		nlog(LOG_NORMAL, LOG_MOD,
 		     "%s!%s@%s Deactivated SIGNON/SIGNOFF WATCH", u->nick,
@@ -805,7 +805,7 @@ static void cs_set_killwatch(User * u, char **av, int ac)
 	}
 	if ((!strcasecmp(av[3], "YES")) || (!strcasecmp(av[3], "ON"))) {
 		kill_watch = 1;
-		chanalert(s_ConnectServ, "\2KILL WATCH\2 Activated by %s",
+		chanalert(s_ConnectServ, "\2KILL WATCH\2 Activated by \2%s\2",
 			  u->nick);
 		nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Activated KILL WATCH",
 		     u->nick, u->username, u->hostname);
@@ -816,7 +816,7 @@ static void cs_set_killwatch(User * u, char **av, int ac)
 		   || (!strcasecmp(av[3], "OFF"))) {
 		kill_watch = 0;
 		chanalert(s_ConnectServ,
-			  "\2KILL WATCH\2 Deactivated by %s", u->nick);
+			  "\2KILL WATCH\2 Deactivated by \2%s\2", u->nick);
 		nlog(LOG_NORMAL, LOG_MOD,
 		     "%s!%s@%s Deactivated KILL WATCH", u->nick,
 		     u->username, u->hostname);
@@ -847,7 +847,7 @@ static void cs_set_modewatch(User * u, char **av, int ac)
 	}
 	if ((!strcasecmp(av[3], "YES")) || (!strcasecmp(av[3], "ON"))) {
 		mode_watch = 1;
-		chanalert(s_ConnectServ, "\2MODE WATCH\2 Activated by %s",
+		chanalert(s_ConnectServ, "\2MODE WATCH\2 Activated by \2%s\2",
 			  u->nick);
 		nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Activated MODE WATCH",
 		     u->nick, u->username, u->hostname);
@@ -858,7 +858,7 @@ static void cs_set_modewatch(User * u, char **av, int ac)
 		   || (!strcasecmp(av[3], "OFF"))) {
 		mode_watch = 0;
 		chanalert(s_ConnectServ,
-			  "\2MODE WATCH\2 Deactivated by %s", u->nick);
+			  "\2MODE WATCH\2 Deactivated by \2%s\2", u->nick);
 		nlog(LOG_NORMAL, LOG_MOD,
 		     "%s!%s@%s Deactivated MODE WATCH", u->nick,
 		     u->username, u->hostname);
