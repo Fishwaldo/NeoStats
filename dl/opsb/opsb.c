@@ -1,61 +1,17 @@
-/* NetStats - IRC Statistical Services Copyright (c) 1999 Adam Rutter,
-** Justin Hammond http://codeworks.kamserve.com
-*
-** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
-*
-** NetStats CVS Identification
-** $Id: opsb.c,v 1.5 2002/08/20 14:21:59 fishwaldo Exp $
-*/
 
 
 #include <stdio.h>
 #include "dl.h"
 #include "stats.h"
+#include "opsb.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <arpa/nameser.h>
 
-const char opsbversion_date[] = __DATE__;
-const char opsbversion_time[] = __TIME__;
-char *s_opsb;
-
-
-/* max scans in the max concurrent scans at any one time */
-#define MAX_SCANS 100
-/* max queue is the max amount of scans that may be concurrent and queued. */
-#define MAX_QUEUE MAX_SCANS * 100
 
 
 
-struct scanq {
-	char who[MAXNICK];
-	int state;
-	char lookup[MAXHOST];
-	struct in_addr ipaddr;
-	User *u;
-	int doreport;
-};
-
-typedef struct scanq scaninfo;
-
-struct opsb {
-	char opmdomain[MAXHOST];
-	int init;
-} opsb;
-
-
-/* this is the list of items to be queued */
-list_t *opsbq;
-/* this is the list of currently active scans */
-list_t *opsbl;
-
-
-
-/* these are some status flags */
-#define REPORT_DNS 	0x0001
-#define GET_NICK_IP	0x0002
-#define DO_OPM_LOOKUP	0x0004
 
 void reportdns(char *data, adns_answer *a);
 void dnsblscan(char *data, adns_answer *a);
@@ -66,7 +22,7 @@ void start_proxy_scan(lnode_t *scannode);
 Module_Info my_info[] = { {
 	"OPSB",
 	"A Open Proxy Scanning Bot",
-	"1.0"
+	"$Revision: 1.6 $";"
 } };
 
 
@@ -416,7 +372,14 @@ void _init() {
 	s_opsb = "opsb";
 	globops(me.name, "OPSB Module Loaded");
 
-	opsbl = list_create(MAX_SCANS);
+
+	/* we don't want to use more than half the available socks */
+	if (MAX_SCANS > me.maxsocks / 2)
+		opsbl = list_create(maxsocks /2);
+	else 
+		opsbl = list_create(MAX_SCANS);
+	
+	/* queue can be anything we want */
 	opsbq = list_create(MAX_QUEUE);
 	sprintf(opsb.opmdomain, "%s", "opm.blitzed.org");
 
