@@ -575,7 +575,9 @@ void Usr_DelUser(char *origin, char **argv, int argc) {
 	DelUser(origin);
 }
 void Usr_Smode(char *origin, char **argv, int argc) {
-	log("Please send this line to fish@neostats.net: Usr_Smode %s", recbuf);
+	log("svsmode nick %s Mode %s", argv[0], argv[1]);
+	UserMode(argv[0], argv[1]);
+	Module_Event("UMODE", finduser(argv[0]));
 }
 void Usr_Mode(char *origin, char **argv, int argc) {
 			if (!strchr(argv[0], '#')) {

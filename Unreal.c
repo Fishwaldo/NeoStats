@@ -132,7 +132,7 @@ int sswhois_cmd(const char *target, const char *swhois) {
 	return 1;
 }
 int ssvsnick_cmd(const char *target, const char *newnick) {
-	sts("%s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, time(NULL));
+	sts("%s %s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, time(NULL));
 	Change_User(finduser(target), newnick);
 	return 1;
 }
@@ -160,6 +160,23 @@ int swallops_cmd(const char *who, const char *msg,...) {
 	va_end(ap);
 	return 1;
 }
+
+int ssvshost_cmd(const char *who, const char *vhost) {
+	User *u;
+	u = finduser(who);
+	if (!u) {
+		log("Can't Find user %s for ssvshost_cmd", who);
+		return 0;
+	} else {
+		strcpy(u->vhost, vhost);
+		sts(":%s %s %s %s", me.name, (me.token ? TOK_CHGHOST : MSG_CHGHOST), who, vhost);
+		return 1;
+	}
+}
+
+
+
+
 
 void sts(char *fmt,...)
 {

@@ -238,8 +238,8 @@ void servicesbot(char *nick, char **av, int ac) {
 			notice(s_Services,"%s Tried to use RAW, but is not a Techadmin",nick);
 			return;
 		}
-		tmp = joinbuf(av, ac, 1);
-		ns_raw(u);
+		tmp = joinbuf(av, ac, 2);
+		ns_raw(u, tmp);
 		free(tmp);
 	} else {
 		privmsg(nick, s_Services, "Unknown Command: \2%s\2", av[1]);
@@ -386,7 +386,7 @@ static void ns_raw(User *u, char *message)
 {
 	int sent;
 	segv_location = sstrdup("ns_raw");
-	notice(s_Services,"\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!",u->nick);
+	notice(s_Services,"\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)",u->nick, message);
 #ifdef DEBUG
         log("SENT: %s", message);
 #endif
