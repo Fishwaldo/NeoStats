@@ -447,7 +447,6 @@ src/win32/winmain.c -text
 win32/README -text
 win32/adns/adns.vcproj -text
 win32/curl/curl.vcproj -text
-win32/nscon/nscon.vcproj -text
 win32/nswin32.sln -text
 win32/nswindow/nswindow.vcproj -text
 win32/pcre/pcre.vcproj -text
