@@ -63,7 +63,7 @@ new_user (const char *nick)
 	} else {
 		hash_insert (uh, un, u->nick);
 	}
-	return (u);
+	return u;
 }
 #ifndef GOTNICKIP
 static void lookupnickip(char *data, adns_answer *a) 
@@ -139,7 +139,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	u->chans = list_create (MAXJOINCHANS);
 	u->ipaddr.s_addr = htonl (ipaddress);
 	u->TS = time;
-	if (!ircstrcasecmp(server, me.name)) {
+	if (IsMe(u->server)) {
 		u->flags |= NS_FLAGS_ME;
 	}
 	/* check if the user is excluded */
@@ -666,13 +666,14 @@ void
 SetUserVhost(const char* nick, const char* vhost) 
 {
 	User *u;
+
 	u = finduser (nick);
 	nlog(LOG_DEBUG1, "Vhost %s", vhost);
 	if (u) {
 		strlcpy (u->vhost, vhost, MAXHOST);
-/* these are precautions */
-/* damn Unreal. /sethost on IRC doesn't send +xt, but /umode +x sends +x */
-/* so, we will never be 100% sure about +t */
+	/* sethost on Unreal doesn't send +xt, but /umode +x sends +x 
+	 * so, we will never be 100% sure about +t 
+	 */
 #ifdef UMODE_HIDE
 		u->Umode |= UMODE_HIDE;
 #endif
@@ -697,9 +698,6 @@ UserMode (const char *nick, const char *modes)
 	strlcpy (u->modes, modes, MODESIZE);
 	oldmode = u->Umode;
 	u->Umode = UmodeStringToMask(modes, u->Umode);
-	/* This needs to track +x and +t really but
-	 * should be enough for Trystan to work on the SQL stuff
-	 */
 #ifdef UMODE_HIDE
 	/* Do we have a hidden host any more? */
 	if((oldmode & UMODE_HIDE) && (!(u->Umode & UMODE_HIDE))) {
@@ -742,6 +740,7 @@ UserSMode (const char *nick, const char *modes)
 void SetUserServicesTS(const char* nick, const char* ts) 
 {
 	User* u;
+
 	u = finduser(nick);
 	if(u) {
 		u->servicestamp = strtoul(ts, NULL, 10);

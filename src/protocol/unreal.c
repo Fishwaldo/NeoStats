@@ -237,10 +237,29 @@ send_cmode (const char *sender, const char *who, const char *chan, const char *m
 	send_cmd (":%s %s %s %s %s %lu", who, (ircd_srv.token ? TOK_MODE : MSG_MODE), chan, mode, args, ts);
 }
 
+/* m_nick
+ *  argv[0] = nickname
+ * if from new client
+ *  argv[1] = nick password
+ * if from server:
+ *  argv[1] = hopcount
+ *  argv[2] = timestamp
+ *  argv[3] = username
+ *  argv[4] = hostname
+ *  argv[5] = servername
+ * if NICK version 1:
+ *  argv[6] = servicestamp
+ *  argv[7] = info
+ * if NICK version 2:
+ *  argv[6] = servicestamp
+ *  argv[7] = umodes
+ *  argv[8] = virthost, * if none
+ *  argv[9] = info
+ */
 void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
-	send_cmd ("%s %s 1 %lu %s %s %s 0 :%s", (ircd_srv.token ? TOK_NICK : MSG_NICK), nick, ts, ident, host, server, realname);
+	send_cmd ("%s %s 1 %lu %s %s %s 0 %s * :%s", (ircd_srv.token ? TOK_NICK : MSG_NICK), nick, ts, ident, host, server, newmode, realname);
 }
 
 void

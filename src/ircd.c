@@ -1288,7 +1288,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 	newmode = UmodeMaskToString(mode);
 	AddUser (nick, ident, host, realname, me.name, NULL, NULL, NULL);
 	send_nick (nick, (unsigned long)me.now, newmode, ident, host, me.name, realname);
-#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(HYBRID7) || defined(IRCU) || defined(NEOIRCD) || defined(QUANTUM) || defined(LIQUID)
+#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(HYBRID7) || defined(IRCU) || defined(NEOIRCD) || defined(QUANTUM) || defined(LIQUID) || defined(UNREAL)
 	UserMode (nick, newmode);
 #else
 	sumode_cmd (nick, nick, mode);

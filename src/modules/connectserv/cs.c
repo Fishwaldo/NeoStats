@@ -183,7 +183,7 @@ static int cs_event_online(CmdParams* cmdparams)
 static int cs_event_signon(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_online)	{
+	if (!cs_online || !cs_cfg.sign_watch) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
@@ -194,12 +194,10 @@ static int cs_event_signon(CmdParams* cmdparams)
 		return 1;
 	}
 	/* Print Connection Notice */
-	if (cs_cfg.sign_watch) {
-		chanalert(cs_bot->nick, msg_signon,
-			  cmdparams->source.user->nick, cmdparams->source.user->username, 
-			  cmdparams->source.user->hostname, cmdparams->source.user->realname,
-			  cmdparams->source.user->server->name);
-	}
+	chanalert(cs_bot->nick, msg_signon,
+		cmdparams->source.user->nick, cmdparams->source.user->username, 
+		cmdparams->source.user->hostname, cmdparams->source.user->realname,
+		cmdparams->source.user->server->name);
 	return 1;
 }
 
