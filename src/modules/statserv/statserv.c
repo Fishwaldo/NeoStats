@@ -302,7 +302,7 @@ static int ss_event_kick(CmdParams* cmdparams)
 
 int ss_event_ctcpversion(CmdParams* cmdparams)
 {
-	StatsAddCTCPVersion(cmdparams->av[0]);
+	StatsAddCTCPVersion(cmdparams->param);
 	return 1;
 }
 
