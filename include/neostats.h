@@ -1157,6 +1157,8 @@ EXPORTFUNC void GetUserList(UserListHandler handler);
 typedef void (*ServerListHandler) (Client * s);
 EXPORTFUNC void GetServerList(ServerListHandler handler);
 
+EXPORTFUNC hash_t * GetServerHash(void);
+
 EXPORTFUNC int HaveFeature (int mask);
 
 /* 

@@ -574,14 +574,14 @@ void get_chantops()
 
 void get_map(char *uplink, int level)
 {
-#if 0
 	hscan_t hs;
 	hnode_t *sn;
 	Client *s;
 	SStats *ss;
 	char buf[256];
 	int i;
-	hash_scan_begin(&hs, sh);
+
+	hash_scan_begin(&hs, GetServerHash ());
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
 		ss = findserverstats(s->name);
@@ -612,5 +612,4 @@ void get_map(char *uplink, int level)
 			get_map(s->name, level + 1);
 		}
 	}
-#endif
 }

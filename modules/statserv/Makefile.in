@@ -75,13 +75,11 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
-INCLTDL = @INCLTDL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
-LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -154,13 +152,15 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 pkglib_LTLIBRARIES = statserv.la
-statserv_la_SOURCES = database.c GeoIPCity.c global.h md5.c stats.c \
-			GeoIPBitReader.c GeoIPCity.h md5.h statserv.c \
-			GeoIPBitReader.h htmlstats.c sqlstats.h \
-			statserv.h GeoIP.c GeoIP.h ss_help.c tld.c
+statserv_la_SOURCES = database.c stats.c statserv.c htmlstats.c \
+			sqlstats.h statserv.h ss_help.c tld.c \
+			GeoIP/GeoIPCity.c GeoIP/GeoIPCity.h \
+			GeoIP/GeoIPBitReader.c GeoIP/GeoIPBitReader.h \
+			GeoIP/GeoIP.c GeoIP/GeoIP.h \
+			GeoIP/global.h GeoIP/md5.c GeoIP/md5.h 
 
 statserv_la_LDFLAGS = -module -avoid-version -no-undefined
-AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/lib/keeper/ -I$(top_srcdir)/lib/adns/ -DGEOIPDATADIR=\"$(datadir)\" \
+AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/lib/keeper/ -I$(top_srcdir)/lib/adns/ -Igeoip -DGEOIPDATADIR=\"$(datadir)\" \
 			-DSYSCONFDIR=\"$(sysconfdir)\"
 
 dist_data_DATA = GeoIP.dat html/index.tpl
@@ -175,9 +175,9 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 
 statserv_la_LIBADD =
-am_statserv_la_OBJECTS = database.lo GeoIPCity.lo md5.lo stats.lo \
-	GeoIPBitReader.lo statserv.lo htmlstats.lo GeoIP.lo ss_help.lo \
-	tld.lo
+am_statserv_la_OBJECTS = database.lo stats.lo statserv.lo htmlstats.lo \
+	ss_help.lo tld.lo GeoIPCity.lo GeoIPBitReader.lo GeoIP.lo \
+	md5.lo
 statserv_la_OBJECTS = $(am_statserv_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
@@ -247,6 +247,138 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stats.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/statserv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tld.Plo@am__quote@
+
+GeoIPCity.o: GeoIP/GeoIPCity.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT GeoIPCity.o -MD -MP -MF "$(DEPDIR)/GeoIPCity.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o GeoIPCity.o `test -f 'GeoIP/GeoIPCity.c' || echo '$(srcdir)/'`GeoIP/GeoIPCity.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/GeoIPCity.Tpo" "$(DEPDIR)/GeoIPCity.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/GeoIPCity.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/GeoIPCity.c' object='GeoIPCity.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/GeoIPCity.Po' tmpdepfile='$(DEPDIR)/GeoIPCity.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o GeoIPCity.o `test -f 'GeoIP/GeoIPCity.c' || echo '$(srcdir)/'`GeoIP/GeoIPCity.c
+
+GeoIPCity.obj: GeoIP/GeoIPCity.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT GeoIPCity.obj -MD -MP -MF "$(DEPDIR)/GeoIPCity.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o GeoIPCity.obj `if test -f 'GeoIP/GeoIPCity.c'; then $(CYGPATH_W) 'GeoIP/GeoIPCity.c'; else $(CYGPATH_W) '$(srcdir)/GeoIP/GeoIPCity.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/GeoIPCity.Tpo" "$(DEPDIR)/GeoIPCity.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/GeoIPCity.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/GeoIPCity.c' object='GeoIPCity.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/GeoIPCity.Po' tmpdepfile='$(DEPDIR)/GeoIPCity.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o GeoIPCity.obj `if test -f 'GeoIP/GeoIPCity.c'; then $(CYGPATH_W) 'GeoIP/GeoIPCity.c'; else $(CYGPATH_W) '$(srcdir)/GeoIP/GeoIPCity.c'; fi`
+
+GeoIPCity.lo: GeoIP/GeoIPCity.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT GeoIPCity.lo -MD -MP -MF "$(DEPDIR)/GeoIPCity.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o GeoIPCity.lo `test -f 'GeoIP/GeoIPCity.c' || echo '$(srcdir)/'`GeoIP/GeoIPCity.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/GeoIPCity.Tpo" "$(DEPDIR)/GeoIPCity.Plo"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/GeoIPCity.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/GeoIPCity.c' object='GeoIPCity.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/GeoIPCity.Plo' tmpdepfile='$(DEPDIR)/GeoIPCity.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o GeoIPCity.lo `test -f 'GeoIP/GeoIPCity.c' || echo '$(srcdir)/'`GeoIP/GeoIPCity.c
+
+GeoIPBitReader.o: GeoIP/GeoIPBitReader.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT GeoIPBitReader.o -MD -MP -MF "$(DEPDIR)/GeoIPBitReader.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o GeoIPBitReader.o `test -f 'GeoIP/GeoIPBitReader.c' || echo '$(srcdir)/'`GeoIP/GeoIPBitReader.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/GeoIPBitReader.Tpo" "$(DEPDIR)/GeoIPBitReader.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/GeoIPBitReader.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/GeoIPBitReader.c' object='GeoIPBitReader.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/GeoIPBitReader.Po' tmpdepfile='$(DEPDIR)/GeoIPBitReader.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o GeoIPBitReader.o `test -f 'GeoIP/GeoIPBitReader.c' || echo '$(srcdir)/'`GeoIP/GeoIPBitReader.c
+
+GeoIPBitReader.obj: GeoIP/GeoIPBitReader.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT GeoIPBitReader.obj -MD -MP -MF "$(DEPDIR)/GeoIPBitReader.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o GeoIPBitReader.obj `if test -f 'GeoIP/GeoIPBitReader.c'; then $(CYGPATH_W) 'GeoIP/GeoIPBitReader.c'; else $(CYGPATH_W) '$(srcdir)/GeoIP/GeoIPBitReader.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/GeoIPBitReader.Tpo" "$(DEPDIR)/GeoIPBitReader.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/GeoIPBitReader.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/GeoIPBitReader.c' object='GeoIPBitReader.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/GeoIPBitReader.Po' tmpdepfile='$(DEPDIR)/GeoIPBitReader.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o GeoIPBitReader.obj `if test -f 'GeoIP/GeoIPBitReader.c'; then $(CYGPATH_W) 'GeoIP/GeoIPBitReader.c'; else $(CYGPATH_W) '$(srcdir)/GeoIP/GeoIPBitReader.c'; fi`
+
+GeoIPBitReader.lo: GeoIP/GeoIPBitReader.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT GeoIPBitReader.lo -MD -MP -MF "$(DEPDIR)/GeoIPBitReader.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o GeoIPBitReader.lo `test -f 'GeoIP/GeoIPBitReader.c' || echo '$(srcdir)/'`GeoIP/GeoIPBitReader.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/GeoIPBitReader.Tpo" "$(DEPDIR)/GeoIPBitReader.Plo"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/GeoIPBitReader.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/GeoIPBitReader.c' object='GeoIPBitReader.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/GeoIPBitReader.Plo' tmpdepfile='$(DEPDIR)/GeoIPBitReader.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o GeoIPBitReader.lo `test -f 'GeoIP/GeoIPBitReader.c' || echo '$(srcdir)/'`GeoIP/GeoIPBitReader.c
+
+GeoIP.o: GeoIP/GeoIP.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT GeoIP.o -MD -MP -MF "$(DEPDIR)/GeoIP.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o GeoIP.o `test -f 'GeoIP/GeoIP.c' || echo '$(srcdir)/'`GeoIP/GeoIP.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/GeoIP.Tpo" "$(DEPDIR)/GeoIP.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/GeoIP.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/GeoIP.c' object='GeoIP.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/GeoIP.Po' tmpdepfile='$(DEPDIR)/GeoIP.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o GeoIP.o `test -f 'GeoIP/GeoIP.c' || echo '$(srcdir)/'`GeoIP/GeoIP.c
+
+GeoIP.obj: GeoIP/GeoIP.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT GeoIP.obj -MD -MP -MF "$(DEPDIR)/GeoIP.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o GeoIP.obj `if test -f 'GeoIP/GeoIP.c'; then $(CYGPATH_W) 'GeoIP/GeoIP.c'; else $(CYGPATH_W) '$(srcdir)/GeoIP/GeoIP.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/GeoIP.Tpo" "$(DEPDIR)/GeoIP.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/GeoIP.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/GeoIP.c' object='GeoIP.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/GeoIP.Po' tmpdepfile='$(DEPDIR)/GeoIP.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o GeoIP.obj `if test -f 'GeoIP/GeoIP.c'; then $(CYGPATH_W) 'GeoIP/GeoIP.c'; else $(CYGPATH_W) '$(srcdir)/GeoIP/GeoIP.c'; fi`
+
+GeoIP.lo: GeoIP/GeoIP.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT GeoIP.lo -MD -MP -MF "$(DEPDIR)/GeoIP.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o GeoIP.lo `test -f 'GeoIP/GeoIP.c' || echo '$(srcdir)/'`GeoIP/GeoIP.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/GeoIP.Tpo" "$(DEPDIR)/GeoIP.Plo"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/GeoIP.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/GeoIP.c' object='GeoIP.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/GeoIP.Plo' tmpdepfile='$(DEPDIR)/GeoIP.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o GeoIP.lo `test -f 'GeoIP/GeoIP.c' || echo '$(srcdir)/'`GeoIP/GeoIP.c
+
+md5.o: GeoIP/md5.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT md5.o -MD -MP -MF "$(DEPDIR)/md5.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o md5.o `test -f 'GeoIP/md5.c' || echo '$(srcdir)/'`GeoIP/md5.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/md5.Tpo" "$(DEPDIR)/md5.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/md5.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/md5.c' object='md5.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/md5.Po' tmpdepfile='$(DEPDIR)/md5.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o md5.o `test -f 'GeoIP/md5.c' || echo '$(srcdir)/'`GeoIP/md5.c
+
+md5.obj: GeoIP/md5.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT md5.obj -MD -MP -MF "$(DEPDIR)/md5.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o md5.obj `if test -f 'GeoIP/md5.c'; then $(CYGPATH_W) 'GeoIP/md5.c'; else $(CYGPATH_W) '$(srcdir)/GeoIP/md5.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/md5.Tpo" "$(DEPDIR)/md5.Po"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/md5.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/md5.c' object='md5.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/md5.Po' tmpdepfile='$(DEPDIR)/md5.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o md5.obj `if test -f 'GeoIP/md5.c'; then $(CYGPATH_W) 'GeoIP/md5.c'; else $(CYGPATH_W) '$(srcdir)/GeoIP/md5.c'; fi`
+
+md5.lo: GeoIP/md5.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT md5.lo -MD -MP -MF "$(DEPDIR)/md5.Tpo" \
+@am__fastdepCC_TRUE@	  -c -o md5.lo `test -f 'GeoIP/md5.c' || echo '$(srcdir)/'`GeoIP/md5.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/md5.Tpo" "$(DEPDIR)/md5.Plo"; \
+@am__fastdepCC_TRUE@	else rm -f "$(DEPDIR)/md5.Tpo"; exit 1; \
+@am__fastdepCC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='GeoIP/md5.c' object='md5.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/md5.Plo' tmpdepfile='$(DEPDIR)/md5.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o md5.lo `test -f 'GeoIP/md5.c' || echo '$(srcdir)/'`GeoIP/md5.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -141,7 +141,7 @@ static BotInfo ss_botinfo =
 	"SS", 
 	BOT_COMMON_HOST, 
 	"Statistics service", 
-	BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
+	BOT_FLAG_SERVICEBOT|BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
 	ss_commands, 
 	ss_settings,
 };
@@ -413,7 +413,7 @@ static int ss_chans(CmdParams* cmdparams)
 	lnode_t *cn;
 	int i;
 
-	if (!cmdparams->av[0]) {
+	if (cmdparams->ac == 0) {
 		/* they want the top10 Channels online atm */
 		if (!list_is_sorted(Chead, topchan)) {
 			list_sort(Chead, topchan);
@@ -626,7 +626,6 @@ static int ss_daily(CmdParams* cmdparams)
 
 static void makemap(char *uplink, Client * u, int level)
 {
-#if 0
 	hscan_t hs;
 	hnode_t *sn;
 	Client *s;
@@ -634,7 +633,7 @@ static void makemap(char *uplink, Client * u, int level)
 	char buf[256];
 	int i;
 
-	hash_scan_begin(&hs, sh);
+	hash_scan_begin(&hs, GetServerHash ());
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
 		ss = findserverstats(s->name);
@@ -643,8 +642,8 @@ static void makemap(char *uplink, Client * u, int level)
 			if (StatServ.exclusions && IsExcluded(s)) {
 				makemap(s->name, u, level);
 			}
-			irc_prefmsg(u->name, ss_bot,
--45s      				%[ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
+			irc_prefmsg (ss_bot, u,
+				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
 				ss->name, ss->users, (int)ss->maxusers,
 				ss->opers, ss->maxopers, (long)s->server->ping, ss->highest_ping);
 			makemap(s->name, u, level + 1);
@@ -657,14 +656,13 @@ static void makemap(char *uplink, Client * u, int level)
 			for (i = 1; i < level; i++) {
 				strlcat (buf, "     |", 256);
 			}
-			irc_prefmsg(u->name, ss_bot,
-\_				\\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
+			irc_prefmsg (ss_bot, u,
+				"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
 				buf, ss->name, ss->users, (int)ss->maxusers,
 				ss->opers, ss->maxopers, (long)s->server->ping, ss->highest_ping);
 			makemap(s->name, u, level + 1);
 		}
 	}
-#endif
 }
 
 static int ss_map(CmdParams* cmdparams)
@@ -686,8 +684,7 @@ static int ss_server(CmdParams* cmdparams)
 	char *server;
 
 	SET_SEGV_LOCATION();
-	server = cmdparams->av[0];
-	if (!server) {
+	if (cmdparams->ac ==0) {
 		irc_prefmsg(ss_bot, cmdparams->source, "Server listing:");
 		hash_scan_begin(&hs, Shead);
 		while ((sn = hash_scan_next(&hs))) {
@@ -703,6 +700,7 @@ static int ss_server(CmdParams* cmdparams)
 		return 0;
 	}
 
+	server = cmdparams->av[0];
 	/* ok, found the Server, lets do some Statistics work now ! */
 	ss = findserverstats(server);
 	s = find_server(server);
