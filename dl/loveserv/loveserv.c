@@ -24,10 +24,8 @@
 */
 
 #include <stdio.h>
-#include "dl.h"
-#include "stats.h"
+#include "neostats.h"
 #include "ls_help.c"
-#include "log.h"
 
 static char s_LoveServ[MAXNICK];
 static ModUser *ls_bot;

@@ -25,11 +25,7 @@
 ** $Id$
 */
 
-
-#include "stats.h"
-#include "conf.h"
 #include "statserv.h"
-#include "log.h"
 
 /* define this if you want the old database format.... but beware, its slow */
 #undef OLDDATABASE

@@ -25,11 +25,8 @@
 
 #include <stdio.h>
 #include <fnmatch.h>
-#include "dl.h"
-#include "stats.h"
+#include "neostats.h"
 #include "hs_help.c"
-#include "log.h"
-#include "conf.h"
 
 
 /* hostserv doesn't work on Hybrid, Echo an error and exit the compile */

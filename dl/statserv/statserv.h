@@ -26,9 +26,8 @@
 #ifndef STATSERV_H
 #define STATSERV_H
 
-#include "dl.h"
+#include "neostats.h"
 #include "m_stats.h"
-#include "stats.h"
 
 /* this is the max number of statserv channels our database can hold... */
 #define SS_CHAN_SIZE -1

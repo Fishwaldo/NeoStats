@@ -26,14 +26,11 @@
 #ifndef SQLSTATS_H
 #define SQLSTATS_H
 
-#include "stats.h"
+#include "neostats.h"
 
 /* only include the following code if SQLSRV is included */
 #ifdef SQLSRV
 
-
-#include "dl.h"
-#include "statserv.h"
 #include "sqlsrv/rta.h"
 
 

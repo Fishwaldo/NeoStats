@@ -24,9 +24,7 @@
 */
 
 #include <stdio.h>
-#include "dl.h"
-#include "stats.h"
-#include "log.h"
+#include "neostats.h"
 #include "ms_help.c"
 
 static char s_MoraleServ[MAXNICK];

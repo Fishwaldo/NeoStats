@@ -28,9 +28,7 @@
  */
 
 #include <stdio.h>
-#include "dl.h"       /* Required for module */
-#include "stats.h"    /* Required for bot support */
-#include "log.h"      /* Log systems support */
+#include "neostats.h"	/* Neostats API */
 
 /** 
  * A string to hold the name of our bot

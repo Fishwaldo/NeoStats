@@ -42,6 +42,7 @@
 #include "server.h"
 #include "chans.h"
 #include "dns.h"
+#include "dotconf.h"
 #include "transfer.h"
 #include "exclude.h"
 #ifdef SQLSRV

@@ -56,6 +56,19 @@ typedef struct _cfgoption {
 	int userdata;		/* userdefinable value/flag */
 } config_option;
 
+/* general configuration items */
+struct config {
+	/* debug level */
+	unsigned int debug;
+	/* enable recv.log */
+	unsigned int recvlog:1;
+	/* dont load modules on startup */
+	unsigned int modnoload:1;
+	/* dont output anything on start */
+	unsigned int quiet:1;
+	/* dont detach into background */
+	unsigned int foreground:1;
+} config;
 
 /* config_read takes the following arguments:
  * 1. the filename of the configuration file to read

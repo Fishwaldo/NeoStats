@@ -24,12 +24,9 @@
 */
 
 #include <stdio.h>
-#include "dl.h"
-#include "stats.h"
+#include "neostats.h"
 #include "cs_help.c"
 #include "cs.h"
-#include "log.h"
-#include "conf.h"
 
 /* Uncomment this line to disable colours in ConnectServ 
    channel messages

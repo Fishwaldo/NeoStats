@@ -24,15 +24,11 @@
 */
 
 #include <stdio.h>
-#include "dl.h"
-#include "stats.h"
 #include "statserv.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #include "sqlstats.h"
 #endif
-#include "log.h"
-#include "conf.h"
 
 static int ss_chans(User * u, char **av, int ac);
 static int ss_daily(User * u, char **av, int ac);

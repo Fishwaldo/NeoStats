@@ -41,6 +41,7 @@
 #include "transfer.h"
 #include "curl.h"
 #include "ircstring.h"
+#include "dotconf.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif

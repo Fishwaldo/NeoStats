@@ -24,11 +24,8 @@
 */
 
 #include <stdio.h>
-#include "dl.h"
-#include "stats.h"
+#include "neostats.h"
 #include "dotconf.h"
-#include "log.h"
-#include "conf.h"
 
 void sr_cb_config(char *arg, int configtype);
 static int ext_auth_list(User *u, char **av, int ac);

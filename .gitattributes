@@ -297,6 +297,7 @@ logs/.keepme -text
 /mystic.h eol=lf
 /neoircd.c eol=lf
 /neoircd.h eol=lf
+/neostats.h -text
 /neostats.motd -text
 /ns_help.c eol=lf
 /ns_help.h eol=lf

@@ -55,6 +55,12 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Add OpenBSD support (M)
  - Add wrappers fo dlxxx calls so we can support a.out and OSes requiring leading underscore on symbols (M)
  - Report errors for missing admin.motd fails in an appropriate manner with ERR_ numerics (M)
+ - Introduce new file (neostats.h) to export API to modules. This will replace 
+   the stats.h and dl.h that we use at the moment and bring in functions from 
+   other headers that we export but should be restricted to the core. Why a new
+   file? It allows us to track propogation to modules and maintain backward 
+   compatibility more easily (M)
+ - Port core modules to use neostats.h and tidy up includes (M)
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database

@@ -27,6 +27,7 @@
 #include "conf.h"
 #include "hash.h"
 #include "log.h"
+#include "dotconf.h"
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #endif
