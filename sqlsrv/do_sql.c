@@ -92,7 +92,7 @@ do_sql(char *buf, int *nbuf)
         return;
 
       /* The command looks good. Update and do callbacks */
-      do_update(buf, nbuf);
+      sqldo_update(buf, nbuf);
       rtastat.nupdate++;
       break;
 
@@ -884,7 +884,7 @@ send_error(char *filename, int lineno, char *fmt, char *arg)
 }
 
 /***************************************************************
- * do_update(): - Execute the SQL update command in the
+ * sqldo_update(): - Execute the SQL update command in the
  * sql_cmd structure.
  *
  * Input:        A buffer to store the output
@@ -894,7 +894,7 @@ send_error(char *filename, int lineno, char *fmt, char *arg)
  *               are executed.
  ***************************************************************/
 void
-do_update(char *buf, int *nbuf)
+sqldo_update(char *buf, int *nbuf)
 {
   int      nr;         /* the Number of Rows in the table */
   int      sr;         /* the Size of each Row in the table */
