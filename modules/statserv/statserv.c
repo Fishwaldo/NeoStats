@@ -93,7 +93,7 @@ ModuleInfo module_info = {
 /** Bot comand table */
 static bot_cmd ss_commands[]=
 {
-	{"SERVER",		ss_cmd_server,		0, 	0,		ss_help_server,		 	ss_help_server_oneline},
+	{"SERVER",		ss_cmd_server,		1, 	0,		ss_help_server,		 	ss_help_server_oneline},
 	{"MAP",			ss_cmd_map,			0, 	0,		ss_help_map, 		 	ss_help_map_oneline},
 	{"CHANNEL",		ss_cmd_channel,		0, 	0,		ss_help_channel, 		ss_help_channel_oneline},
 	{"NETSTATS",	ss_cmd_netstats,	0, 	0,		ss_help_netstats, 	 	ss_help_netstats_oneline},

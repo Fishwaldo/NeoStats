@@ -24,6 +24,10 @@ Fish (F), Mark (M)
  - Exclude system del now takes a host rather than an index. (M)
  - Channel members now use client pointer so they do not need to track nick 
    changes. (M)
+ - Fix up make install, make dist and wrappers for starting/stopping
+   NeoStats (F)
+ - Fix statserv map command, and fix neostats server list command (F)
+ - Fix Statserv server minparam count (F)
 
 * NeoStats * Version 3.0.prealpha2
  - First recommended release to devlist only as prealpha2. (M)
