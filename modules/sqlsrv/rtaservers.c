@@ -27,13 +27,13 @@
 void *display_server_hops (void *tbl, char *col, char *sql, void *row) 
 {
 	Client *data = row;
-	return data->server->hops;                        
+	return &data->server->hops;                        
 }                        
 
 void *display_server_ping (void *tbl, char *col, char *sql, void *row) 
 {
 	Client *data = row;
-	return data->server->ping;                        
+	return &data->server->ping;                        
 }                        
 
 COLDEF neo_serverscols[] = {

@@ -91,7 +91,7 @@ void *display_user_username (void *tbl, char *col, char *sql, void *row)
 void *display_user_is_away (void *tbl, char *col, char *sql, void *row) 
 {
 	Client *data = row;
-	return data->user->is_away;                        
+	return &data->user->is_away;                        
 }                        
 
 void *display_user_awaymsg (void *tbl, char *col, char *sql, void *row) 
