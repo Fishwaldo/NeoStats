@@ -9,7 +9,6 @@ IRCD=
 MODULELIST=""
 MSTATSERV=1
 MSPAM=0
-MVERSION=0
 MLOVESERV=1
 MHOSTSERV=1
 MMORALESERV=1
@@ -161,37 +160,6 @@ while [ $validselection -eq 0 ] ; do
 			;;
 		y*|Y*)
 			MSPAM=1
-			HAVEMODS=1
-			validselection=1
-			;;
-		*)
-			echo 'Please enter "yes" or "no".'
-			;;
-	esac
-done
-echo ""
-
-if [ "$MVERSION" = 1 ] ; then
-	YN_DEFAULT=yes
-else
-	YN_DEFAULT=no
-fi
-
-validselection=0
-echo "Do you want to build version?"
-while [ $validselection -eq 0 ] ; do
-	echo_no_lf "[$YN_DEFAULT] "
-	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
-	if [ ! "$INPUT" ] ; then
-		INPUT=$YN_DEFAULT
-	fi
-	case $INPUT in
-		n*|N*)
-			MVERSION=0
-			validselection=1
-			;;
-		y*|Y*)
-			MVERSION=1
 			HAVEMODS=1
 			validselection=1
 			;;
@@ -379,13 +347,6 @@ MODULELIST="$MODULELIST "
 fi
 HAVEMOD=1
 MODULELIST=$MODULELIST"spam"
-fi
-if [ "$MVERSION" = 1 ] ; then
-if [ "$HAVEMOD" = 1 ] ; then
-MODULELIST="$MODULELIST "
-fi
-HAVEMOD=1
-MODULELIST=$MODULELIST"version"
 fi
 if [ "$MLOVESERV" = 1 ] ; then
 if [ "$HAVEMOD" = 1 ] ; then

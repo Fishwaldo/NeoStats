@@ -473,8 +473,6 @@ RECONNECT_TIME $NEOCONN
 # to the services channel. It can also watch and report Nickname changes.
 #LOAD_MODULE cs
 
-# For all other modules, just add them above in the format:
-#LOAD_MODULE modulename
 
 ########################################
 # NeoStats ROOT users (ExtAuth module) #
