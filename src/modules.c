@@ -360,7 +360,7 @@ load_module (const char *modfilename, User * u)
 		return NULL;
 	}
 	/* Check module was built for this version of NeoStats */
-	if(	ircstrncasecmp (NEOSTATS_VERSION, info_ptr->neostats_version, VERSIONSIZE) !=0 ) {
+	if(	ircstrncasecmp (VERSION, info_ptr->neostats_version, VERSIONSIZE) !=0 ) {
 		nlog (LOG_WARNING, "Unable to load module: %s was built with an old version of NeoStats and must be rebuilt.", modfilename);
 		ns_dlclose (dl_handle);
 		return NULL;

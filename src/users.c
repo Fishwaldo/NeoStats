@@ -133,9 +133,11 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	}
 	/* check if the user is excluded */
 	ns_do_exclude_user(u);
+#ifdef IRCU
 	if((ircd_srv.protocol & PROTOCOL_B64SERVER) && numeric) {
 		setnickbase64 (u->nick, numeric);
 	}
+#endif
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.user = u;	
 	SendAllModuleEvent (EVENT_SIGNON, cmdparams);
@@ -288,7 +290,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	sfree (cmdparams);
 	return NS_SUCCESS;
 }
-
+#ifdef IRCU
 User *
 finduserbase64 (const char *num)
 {
@@ -307,7 +309,7 @@ finduserbase64 (const char *num)
 	dlog(DEBUG3, "finduserbase64: %s not found", num);
 	return NULL;
 }
-
+#endif
 User *
 finduser (const char *nick)
 {

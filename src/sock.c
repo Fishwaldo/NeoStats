@@ -28,6 +28,7 @@
 #include "neostats.h"
 #include <fcntl.h>
 #include <arpa/inet.h>
+#include <poll.h>
                      
 #include "dl.h"
 #include "adns.h"

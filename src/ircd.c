@@ -1639,7 +1639,7 @@ servertobase64 (const char* name)
 	}
 	return NULL;
 }
-
+#ifdef IRCU
 char* 
 base64toserver (const char* num)
 {
@@ -1698,5 +1698,5 @@ base64tonick (const char* num)
 	}
 	return NULL;
 }
-
+#endif
 

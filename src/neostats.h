@@ -58,6 +58,11 @@
 #define __attribute__(x)  /* NOTHING */
 #endif
 
+#ifndef NEOSTATS_PACKAGE_VERSION
+#define NEOSTATS_PACKAGE_VERSION PACKAGE
+#endif
+
+
 /* 
  * NeoStats core API version.
  * A module should check this when loaded to ensure compatibility

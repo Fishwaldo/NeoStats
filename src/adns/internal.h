@@ -42,6 +42,7 @@ typedef unsigned char byte;
 #include <signal.h>
 #include <errno.h>
 #include <string.h>
+#include <poll.h>
 
 #include "adns.h"
 #include "dlist.h"
@@ -49,6 +50,58 @@ typedef unsigned char byte;
 #ifdef ADNS_REGRESS_TEST
 # include "hredirect.h"
 #endif
+
+/* GNU C attributes. */
+#ifndef FUNCATTR
+#ifdef HAVE_GNUC25_ATTRIB
+#define FUNCATTR(x) __attribute__(x)
+#else
+#define FUNCATTR(x)
+#endif
+#endif
+
+/* GNU C printf formats, or null. */
+#ifndef ATTRPRINTF
+#ifdef HAVE_GNUC25_PRINTFFORMAT
+#define ATTRPRINTF(si,tc) format(printf,si,tc)
+#else
+#define ATTRPRINTF(si,tc)
+#endif
+#endif
+#ifndef PRINTFFORMAT
+#define PRINTFFORMAT(si,tc) FUNCATTR((ATTRPRINTF(si,tc)))
+#endif
+
+/* GNU C nonreturning functions, or null. */
+#ifndef ATTRNORETURN
+#ifdef HAVE_GNUC25_NORETURN
+#define ATTRNORETURN noreturn
+#else
+#define ATTRNORETURN
+#endif
+#endif
+#ifndef NONRETURNING
+#define NONRETURNING FUNCATTR((ATTRNORETURN))
+#endif
+
+/* Combination of both the above. */
+#ifndef NONRETURNPRINTFFORMAT
+#define NONRETURNPRINTFFORMAT(si,tc) FUNCATTR((ATTRPRINTF(si,tc),ATTRNORETURN))
+#endif
+
+/* GNU C constant functions, or null. */
+#ifndef ATTRCONST
+#ifdef HAVE_GNUC25_CONST
+#define ATTRCONST const
+#else
+#define ATTRCONST
+#endif
+#endif
+#ifndef CONSTANT
+#define CONSTANT FUNCATTR((ATTRCONST))
+#endif
+
+
 
 /* Configuration and constants */
 
@@ -71,7 +124,7 @@ typedef unsigned char byte;
 
 #define DNS_INADDR_ARPA "in-addr", "arpa"
 
-#define MAX_POLLFDS  ADNS_POLLFDS_RECOMMENDED
+#define MAX_POLLFDS  2
 
 typedef enum {
 	cc_user,

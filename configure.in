@@ -1,17 +1,309 @@
-dnl Process this file with autoconf to produce a configure script.
-AC_INIT(src/main.c)
-AC_CONFIG_HEADER(src/config.h)
-PACKAGE=NeoStats
-MAJOR=3
-MINOR=0
-REV=genesis
-AC_DEFINE_UNQUOTED(MAJOR, $MAJOR)
-AC_DEFINE_UNQUOTED(MINOR, $MINOR)
-AC_DEFINE_UNQUOTED(REV, $REV)
-VERSION=$MAJOR.$MINOR.$REV
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+AC_PREREQ(2.57)
+AC_INIT()
+AC_CONFIG_AUX_DIR(autotools)
+AC_CONFIG_SRCDIR([src/main.c])
+AC_CONFIG_HEADER([include/config.h])
 AC_PREFIX_DEFAULT(~/NeoStats)
-MODLDFLAGS="-shared"
-AC_DEFINE_UNQUOTED(NEOSTATS_PACKAGE_VERSION, "$VERSION")
+AC_CACHE_LOAD
+
+#Standard Defines for autoconf here
+x_maj=3
+x_min='0'
+x_rev="genesis"
+x_package='NeoStats'
+MODULES="connectserv hostserv loveserv moraleserv statserv"
+#dont edit anything after this line!
+
+x_version=$x_maj.$x_min.$x_rev
+AM_INIT_AUTOMAKE($x_package, $x_version)
+AC_DEFINE_UNQUOTED(MAJOR, $x_maj, "Major Version Number")
+AC_DEFINE_UNQUOTED(MINOR, $x_min, "Minor Version Number")
+AC_DEFINE_UNQUOTED(REV, $x_rev, "Revision Version Number")
+AC_DEFINE_UNQUOTED(VERSION, $x_version, "Full Version")
+AC_LIBTOOL_DLOPEN
+AC_DISABLE_SHARED
+AC_LIBTOOL_WIN32_DLL
+AC_LIBLTDL_CONVENIENCE
+
+# Checks for programs.
+AC_PROG_CC
+AC_PROG_LIBTOOL
+
+AC_PATH_PROG( SED, sed, , $PATH:/usr/bin:/usr/local/bin)
+
+AC_SYS_LARGEFILE
+
+# Checks for libraries.
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(
+        sys/types.h \
+        sys/time.h \
+        sys/select.h \
+        sys/socket.h \
+        unistd.h \
+        malloc.h \
+        stdlib.h \
+        arpa/inet.h \
+        net/if.h \
+        netinet/in.h \
+        netdb.h \
+        sys/sockio.h \
+        sys/stat.h \
+        sys/param.h \
+        termios.h \
+        termio.h \
+        sgtty.h \
+        fcntl.h \
+        dlfcn.h \
+        alloca.h \
+        winsock.h \
+        time.h \
+        io.h \
+        pwd.h \
+        utime.h \
+        sys/utime.h \
+        sys/poll.h \
+        setjmp.h,
+dnl to do if not found
+[],
+dnl to do if found
+[],
+dnl default includes
+[
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+]
+)
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_OFF_T
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+AC_STRUCT_TM
+AC_C_VOLATILE
+AC_CHECK_SIZEOF(off_t)
+
+AC_CHECK_TYPE(long long,
+   [AC_DEFINE(HAVE_LONGLONG, 1, [if your compiler supports 'long long'])])
+
+# check for ssize_t
+AC_CHECK_TYPE(ssize_t, ,
+   AC_DEFINE(ssize_t, int, [the signed version of size_t]))
+
+TYPE_SOCKLEN_T
+TYPE_IN_ADDR_T
+
+AC_FUNC_SELECT_ARGTYPES
+AC_CHECK_FUNCS( socket \
+                select \
+                strdup \
+                strstr \
+                strtok_r \
+                strftime \
+                uname \
+                strcasecmp \
+                stricmp \
+                strcmpi \
+                gethostbyaddr \
+                gettimeofday \
+                inet_addr \
+                inet_ntoa \
+                inet_pton \
+                tcsetattr \
+                tcgetattr \
+                perror \
+                closesocket \
+                siginterrupt \
+                sigaction \
+                signal \
+                getpass_r \
+                strlcat \
+                getpwuid \
+                geteuid \
+                dlopen \
+                utime \
+                sigsetjmp \
+                poll,
+dnl if found
+[],
+dnl if not found, $ac_func is the name we check for
+  func="$ac_func"
+  AC_MSG_CHECKING([deeper for $func])
+  AC_TRY_LINK( [],
+               [ $func ();],
+               AC_MSG_RESULT(yes!)
+               eval "ac_cv_func_$func=yes"
+               def=`echo "HAVE_$func" | tr 'a-z' 'A-Z'`
+               AC_DEFINE_UNQUOTED($def, 1, [If you have $func]),
+               AC_MSG_RESULT(but still no)
+               )
+
+)
+ADNS_C_GCCATTRIB
+
+
+
+# Checks for library functions.
+AC_REPLACE_FNMATCH
+AC_FUNC_FORK
+AC_PROG_GCC_TRADITIONAL
+AC_FUNC_SELECT_ARGTYPES
+AC_TYPE_SIGNAL
+AC_FUNC_STAT
+AC_FUNC_STRFTIME
+AC_FUNC_STRNLEN
+AC_FUNC_STRTOD
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS(strnlen strlcpy strlcat strndup)
+CURL_CHECK_NONBLOCKING_SOCKET
+AC_DEFINE(DISABLED_THREADSAFE, 1, Set to explicitly specify we don't want to use thread-safe functions in curl)
+
+dnl backtrace is used for segv reporting
+AC_CHECK_FUNC(backtrace, 
+[AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available')
+LIBS="-g $LIBS"]
+)
+
+dnl gethostbyname in the nsl lib?
+AC_CHECK_FUNC(gethostbyname, , [ AC_CHECK_LIB(nsl, gethostbyname) ])
+
+if test "$ac_cv_lib_nsl_gethostbyname" != "yes" -a "$ac_cv_func_gethostbyname" != "yes"; then
+  dnl gethostbyname in the socket lib?
+  AC_CHECK_FUNC(gethostbyname, , [ AC_CHECK_LIB(socket, gethostbyname) ])
+fi
+
+dnl At least one system has been identified to require BOTH nsl and
+dnl socket libs to link properly.
+if test "$ac_cv_lib_nsl_gethostbyname" != "yes" -a "$ac_cv_lib_socket_gethostbyname" != "yes" -a "$ac_cv_func_gethostbyname" != "yes"; then
+  AC_MSG_CHECKING([trying both nsl and socket libs])
+  my_ac_save_LIBS=$LIBS
+  LIBS="-lnsl -lsocket $LIBS"
+  AC_TRY_LINK( ,
+             [gethostbyname();],
+             my_ac_link_result=success,
+             my_ac_link_result=failure )
+
+  if test "$my_ac_link_result" = "failure"; then
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR([couldn't find libraries for gethostbyname()])
+    dnl restore LIBS
+    LIBS=$my_ac_save_LIBS
+  else
+    AC_MSG_RESULT([yes])
+  fi
+fi
+
+dnl resolve lib?
+AC_CHECK_FUNC(strcasecmp, , [ AC_CHECK_LIB(resolve, strcasecmp) ])
+
+if test "$ac_cv_lib_resolve_strcasecmp" = "$ac_cv_func_strcasecmp"; then
+  AC_CHECK_LIB(resolve, strcasecmp,
+              [LIBS="-lresolve $LIBS"],
+               ,
+               -lnsl)
+fi
+
+dnl socket lib?
+AC_CHECK_FUNC(connect, , [ AC_CHECK_LIB(socket, connect) ])
+
+AC_MSG_CHECKING([if argv can be written to])
+AC_CACHE_VAL(curl_cv_writable_argv, [
+AC_RUN_IFELSE([[
+int main(int argc, char ** argv) {
+	argv[0][0] = ' ';
+	return (argv[0][0] == ' ')?0:1;
+}
+	]],
+	curl_cv_writable_argv=yes,
+	curl_cv_writable_argv=no,
+	curl_cv_writable_argv=cross)
+])
+case $curl_cv_writable_argv in
+yes)
+	AC_DEFINE(HAVE_WRITABLE_ARGV, 1, [Define this symbol if your OS supports changing the contents of argv])
+	AC_MSG_RESULT(yes)
+	;;
+no)
+	AC_MSG_RESULT(no)
+	;;
+*)
+        AC_MSG_RESULT(no)
+        AC_MSG_WARN([the previous check could not be made default was used])
+	;;
+esac
+
+
+
+dnl **** Check for underscore on external symbols ****
+
+AC_CACHE_CHECK(whether external symbols need an underscore prefix,
+               ac_cv_c_extern_prefix,
+[saved_libs=$LIBS
+LIBS="conftest_asm.s $LIBS"
+cat > conftest_asm.s <<EOF
+	.globl _ac_test
+_ac_test:
+	.long 0
+EOF
+AC_TRY_LINK([extern int ac_test;],[if (ac_test) return 1],
+            ac_cv_c_extern_prefix="yes",ac_cv_c_extern_prefix="no")
+LIBS=$saved_libs])
+if test "$ac_cv_c_extern_prefix" = "yes"
+then
+  AC_DEFINE(NEED_UNDERSCORE_PREFIX, 1, "Our Platfrom requires Underscores")
+fi
+
+dnl check for berkeley db support
+AC_CHECK_HEADER(db.h, AC_DEFINE(HAVE_DB_H, 1, [Define to 1 if you have the <db.h> header file.])
+				AC_CHECK_LIB(db, db_create, LIBDB="-ldb"))
+
+
+AC_MSG_CHECKING([if we need -no-undefined])
+case $host in
+  *-*-cygwin | *-*-mingw* | *-*-pw32*)
+    need_no_undefined=yes
+    ;;
+  *)
+    need_no_undefined=no
+    ;;
+esac
+AC_MSG_RESULT($need_no_undefined)
+dnl AM_CONDITIONAL(NO_UNDEFINED, test x$need_no_undefined = xyes)
+
+AC_MSG_CHECKING([if we need -mimpure-text])
+case $host in
+  *-*-solaris2*)
+    if test "$GCC" = "yes"; then
+      mimpure="yes"
+    fi
+    ;;
+  *)
+    mimpure=no
+    ;;
+esac
+AC_MSG_RESULT($mimpure)
+dnl AM_CONDITIONAL(MIMPURE, test x$mimpure = xyes)
+
+
+AC_CONFIG_SUBDIRS(src/libltdl)
+
+
 
 do_extauth=no
 do_ircdauth=no
@@ -25,7 +317,7 @@ AC_ARG_ENABLE(unreal31, [ --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Unreal 3.1")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Unreal 3.1", "IRCd Protocol we are compiled with")
 	PROTOCOL="unreal"
 	AC_MSG_RESULT(yes)
 	;;
@@ -40,7 +332,7 @@ AC_ARG_ENABLE(unreal32, [ --enable-unreal32 - enable Unreal 3.2.x IRCD Support],
   yes)  
 	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
 	AC_DEFINE(UNREAL32, 1, 'Enable Unreal 3.2.x Support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Unreal 3.2")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Unreal 3.2", "IRCd Protocol we are compiled with")
 	PROTOCOL="unreal"
 	AC_MSG_RESULT(yes)
 	;;
@@ -56,7 +348,7 @@ AC_ARG_ENABLE(ultimate2, [ --enable-ultimate2 - enable Ultimate 2.x.x IRCD Suppo
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate Support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Ultimate 2.x.x")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Ultimate 2.x.x")
 	PROTOCOL="ultimate"
 	AC_MSG_RESULT(yes)
 	;;
@@ -72,7 +364,7 @@ AC_ARG_ENABLE(ultimate3, [ --enable-ultimate3 - enable Ultimate 3.x.x IRCD Suppo
   yes)  
 	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate 2.x.x Support')
 	AC_DEFINE(ULTIMATE3, 1, "Enable Ultimate 3.x.x Support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Ultimate 3.x.x")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Ultimate 3.x.x")
 	PROTOCOL="ultimate"
 	AC_MSG_RESULT(yes)
 	;;
@@ -88,7 +380,7 @@ AC_ARG_ENABLE(hybrid7, [ --enable-hybrid7 - enable Hybrid7 IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(HYBRID7, 1, 'Enable hybrid7 IRCD support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Hybrid 7")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Hybrid 7")
 	PROTOCOL="hybrid7"
 	AC_MSG_CHECKING(Auto-Enabling ServiceRoots Authentication Module)
 	do_extauth=yes
@@ -107,7 +399,7 @@ AC_ARG_ENABLE(neoircd, [ --enable-neoircd - enable NeoIRCd IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(NEOIRCD, 1, 'Enable NeoIRCd IRCD support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "NeoIRCd")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "NeoIRCd")
 	PROTOCOL="neoircd"
 	AC_MSG_RESULT(yes)
 	;;
@@ -124,7 +416,7 @@ AC_ARG_ENABLE(quantum, [ --enable-quantum - enable Quantum IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(QUANTUM, 1, 'Enable Quantum Support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Quantum")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Quantum")
 	PROTOCOL="quantum"
 	AC_MSG_RESULT(yes)
 	;;
@@ -140,7 +432,7 @@ AC_ARG_ENABLE(mystic, [ --enable-mystic - enable Mystic IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(MYSTIC, 1, 'Enable Mystic Support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Mystic")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Mystic")
 	PROTOCOL="mystic"
 	AC_MSG_RESULT(yes)
 	;;
@@ -156,7 +448,7 @@ AC_ARG_ENABLE(bahamut, [ --enable-bahamut - enable Bahamut IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(BAHAMUT, 1, 'Enable Bahamut Support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Bahamut")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Bahamut")
 	PROTOCOL="bahamut"
 	AC_MSG_RESULT(yes)
 	;;
@@ -173,7 +465,7 @@ AC_ARG_ENABLE(ircu, [ --enable-ircu - enable IRCu IRCD Support],
   yes)  
 dnl	AC_MSG_ERROR('Sorry IRCu support isnt complete yet')
 	AC_DEFINE(IRCU, 1, 'Enable IRCu Support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "IRCu")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "IRCu")
 	PROTOCOL="ircu"
 	AC_MSG_RESULT(yes)
 	;;
@@ -189,7 +481,7 @@ AC_ARG_ENABLE(liquid, [ --enable-liquid - enable Liquid IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(LIQUID, 1, 'Enable Liquid IRCd Support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Liquid")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Liquid")
 	PROTOCOL="liquid"
 	AC_MSG_RESULT(yes)
 	;;
@@ -206,7 +498,7 @@ AC_ARG_ENABLE(viagra, [ --enable-viagra - enable Viagra IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(VIAGRA, 1, 'Enable Viagra IRCd Support')
-    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Viagra")
+    	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Viagra")
 	PROTOCOL="viagra"
 	AC_MSG_RESULT(yes)
 	;;
@@ -258,157 +550,6 @@ if test "$do_extauth" = no; then
 	AC_MSG_RESULT(no)
 	)
 fi
-
-dnl AC_MSG_CHECKING(An authentication module is specified)
-dnl if test "$AUTH" = no; then
-dnl 	AC_MSG_RESULT(no)
-dnl 	AC_MSG_ERROR('You must define an authentication module to use. See ./configure --help for more information')
-dnl else
-dnl 	AC_MSG_RESULT(yes)
-dnl fi
-
-dnl Get system type
-AC_CANONICAL_HOST
-AC_DEFINE_UNQUOTED(NS_HOST, "$host_os")
-case "$host_os" in
-*cygwin)
-	CFLAGS="$CFLAGS -O2 -g"
-	LDFLAGS="$LDFLAGS -export-dynamic";;
-*mingw32)
-	CFLAGS="$CFLAGS -O2 -g -mno-cygwin"
-	LDFLAGS="$LDFLAGS -export-dynamic";;
-*openbsd)
-	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
-	LDFLAGS="-export-dynamic";;
-*)
-	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
-	LDFLAGS="-rdynamic";;	
-esac
-
-case "$host_os" in
-*openbsd*)
-	MAKEDEPENDENCIES="";;
-*freebsd*)
-	MAKEDEPENDENCIES="";;
-*)
-	MAKEDEPENDENCIES="-include \$(OBJS:.o=.d)";;
-esac
-
-dnl Checks for programs.
-AC_PROG_CC
-AC_PROG_INSTALL 
-AC_PROG_LEX
-AC_PROG_YACC
-AC_PROG_RANLIB
-AC_CACHE_SAVE
-
-dnl Checks for libraries.
-dnl Replace `main' with a function in -ldl:
-AC_CHECK_LIB(dl, dlopen)
-
-ADNS_C_GETFUNC(socket,socket)
-ADNS_C_GETFUNC(inet_ntoa,nsl)
-
-AC_CHECK_FUNC(backtrace, 
-[AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available')
-LIBS="-g $LIBS"]
-)
-AC_CACHE_SAVE
-
-
-dnl Checks for header files.
-AC_HEADER_STDC
-AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(sys/time.h unistd.h limits.h sys/poll.h)
-AC_CACHE_SAVE
-
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_TYPE_SIZE_T
-AC_HEADER_TIME
-AC_STRUCT_TM
-AC_CACHE_SAVE
-
-dnl Checks for library functions.
-AC_FUNC_FNMATCH
-AC_TYPE_SIGNAL
-AC_FUNC_STRFTIME
-AC_CHECK_FUNCS(strlcpy strlcat strnlen)
-AC_CHECK_FUNCS(socket strdup poll)
-AC_CHECK_FUNCS(strndup)
-AC_CHECK_FUNCS(bcopy memmove strerror)
-
-
-ADNS_C_GETFUNC(inet_aton,resolv,[
- LIBS="-lresolv $LIBS";
- AC_MSG_WARN([inet_aton is in libresolv, urgh.  Must use -lresolv.])
-])
-
-DPKG_CACHED_TRY_COMPILE(inlines,dpkg_cv_c_inline,,
- [} inline int foo (int x) {],
- AC_MSG_RESULT(yes)
- AC_DEFINE(HAVE_INLINE),
- AC_MSG_RESULT(no))
-
-ADNS_C_GCCATTRIB
-AC_CHECK_HEADERS(sys/select.h)
-
-AC_MSG_CHECKING(for INADDR_LOOPBACK)
-AC_CACHE_VAL(adns_cv_decl_inaddrloopback,[
- AC_TRY_COMPILE([
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
- ],[
-  INADDR_LOOPBACK;
- ],
- adns_cv_decl_inaddrloopback=yes,
- adns_cv_decl_inaddrloopback=no)])
-if test "$adns_cv_decl_inaddrloopback" = yes; then
- AC_MSG_RESULT(found)
-else
- AC_MSG_RESULT([not in standard headers, urgh...])
- AC_CHECK_HEADER(rpc/types.h,[
-  AC_DEFINE(HAVEUSE_RPCTYPES_H)
- ],[
-  AC_MSG_ERROR([cannot find INADDR_LOOPBACK or rpc/types.h])
- ])
-fi
-
-dnl **** Check for underscore on external symbols ****
-
-AC_CACHE_CHECK(whether external symbols need an underscore prefix,
-               ac_cv_c_extern_prefix,
-[saved_libs=$LIBS
-LIBS="conftest_asm.s $LIBS"
-cat > conftest_asm.s <<EOF
-	.globl _ac_test
-_ac_test:
-	.long 0
-EOF
-AC_TRY_LINK([extern int ac_test;],[if (ac_test) return 1],
-            ac_cv_c_extern_prefix="yes",ac_cv_c_extern_prefix="no")
-LIBS=$saved_libs])
-if test "$ac_cv_c_extern_prefix" = "yes"
-then
-  AC_DEFINE(NEED_UNDERSCORE_PREFIX)
-fi
-
-dnl check for berkeley db support
-AC_CHECK_HEADER(db.h, AC_DEFINE(HAVE_DB_H, 1, [Define to 1 if you have the <db.h> header file.])
-				AC_CHECK_LIB(db, db_create, LIBDB="-ldb"))
-
-PCRE_MAJOR=4
-PCRE_MINOR=3
-PCRE_DATE=21-May-2003
-PCRE_VERSION=${PCRE_MAJOR}.${PCRE_MINOR}
-
-dnl Default values for miscellaneous macros
-
-AC_DEFINE(POSIX_MALLOC_THRESHOLD,10)
-
-
-
 dnl check if we are running with Debug....
 AC_MSG_CHECKING(Whether to Enable Debuging...)
 AC_ARG_ENABLE(debug,
@@ -416,7 +557,7 @@ AC_ARG_ENABLE(debug,
 [ case "$enableval" in
   yes)
 	AC_DEFINE(DEBUG, 1, 'Enable Debugging')
-	CFLAGS="$CFLAGS -ggdb -Wall"
+	CFLAGS="$CFLAGS -ggdb -Wall -DCURLDEBUG"
 	AC_MSG_RESULT(yes - Watch your Log Files)
 	;;
   *)
@@ -427,9 +568,6 @@ AC_ARG_ENABLE(debug,
 CFLAGS="$CFLAGS -DNDEBUG"
 AC_MSG_RESULT(no)
 )
-
-AC_CACHE_SAVE
-
 AC_MSG_CHECKING(To Enable Raw command?)
 AC_ARG_ENABLE(raw, [ --enable-raw - Enable Raw command],
 [ case "$enableval" in
@@ -463,14 +601,6 @@ esac],
 AC_MSG_RESULT(no)
 )
 
-
-dnl Lets see what Modules to Compile
-AC_MSG_CHECKING(Any other modules to compile?)
-AC_ARG_ENABLE(modules, [ --enable-modules="MODULES" - space seperated list of modules to compile],
-AC_MSG_RESULT($enableval) 
-MODULES="$MODULES $enableval",
-AC_MSG_RESULT(none)
-)
 configtool=no
 AC_MSG_CHECKING(Enable Building of ConfigTool?)
 AC_ARG_ENABLE(configtool,
@@ -507,61 +637,36 @@ else
    build_configtool=
 fi
 
-AC_SUBST(build_configtool)
 
-AC_MSG_CHECKING(The Modules that will be compiled)
+AC_MSG_CHECKING(The Modules that will be automatically compiled)
 AC_MSG_RESULT($MODULES)
+
+AC_MSG_CHECKING(The additionall modules to compile?)
+AC_ARG_WITH(modules, [ --with-modules - Additional Modules to compile],
+MODULES="$MODULES $withval"
+AC_MSG_RESULT($withval),
+AC_MSG_RESULT("None"))
+
 
 dnl Set NEO_PREFIX in config.h.
 if test "x${prefix}" = "xNONE"; then
-   AC_DEFINE_UNQUOTED(NEO_PREFIX, "${ac_default_prefix}")
+   AC_DEFINE_UNQUOTED(NEO_PREFIX, "${ac_default_prefix}", "Installation Prefix")
 else
-  AC_DEFINE_UNQUOTED(NEO_PREFIX, "${prefix}")
+  AC_DEFINE_UNQUOTED(NEO_PREFIX, "${prefix}", "Installation Prefix")
 fi
 
-AC_SUBST(LIBDB)
-AC_SUBST(MAKEDEPENDENCIES)
-AC_SUBST(DIRINST)
-AC_SUBST(CFLAGS)
-AC_SUBST(LDFLAGS)
-AC_SUBST(MODLDFLAGS)
-AC_SUBST(LINK_SIZE)
-AC_SUBST(MATCH_LIMIT)
-AC_SUBST(NEWLINE)
-AC_DEFINE(POSIX_MALLOC_THRESHOLD,10)
-AC_SUBST(POSIX_MALLOC_THRESHOLD)
-AC_SUBST(UTF8)
 
+
+
+AC_SUBST(build_configtool)
 AC_SUBST(PROTOCOL)
-AC_SUBST(MODULES)
-AC_SUBST(LIBS)
-AC_SUBST(EXTAUTH_SRC)
-AC_SUBST(EXTAUTH_OBJS)
-AC_SUBST(PACKAGE)
-AC_SUBST(VERSION)
-AC_OUTPUT(src/Makefile.inc src/Makefile src/protocol/Makefile src/modules/Makefile.inc src/tools/Makefile)
-NEO_SUBDIR_CONFIG(src/curl, [--disable-thread --disable-ipv6 --enable-nonblocking --without-ssl])
-echo "(*----------------------------------------------------------*)"
-echo "(| Important Instructions                                   |)"
-echo "(*----------------------------------------------------------*)"
-echo "(| If you just typed ./configure and didnt read the README  |)"
-echo "(| NeoStats may not be configured correctly.                |)"
-echo "(| We suggest you at least type ./configure --help to see   |)"
-echo "(| available options and read the README file for further   |)"
-echo "(| information on that option.                              |)"
-echo "(*----------------------------------------------------------*)"
-echo "(| For Support please visit:                                |)"
-echo "(|    IRC:                   /server irc.irc-chat.net       |)"
-echo "(|                                   #neostats channel      |)"
-echo "(|    WWW:   http://www.neostats.net/boards/                |)"
-echo "(*----------------------------------------------------------*)"
-echo "(| Now that configure is complete, type 'make' to compile   |)"
-echo "(| the program. When the compile has completed, type        |)"
-echo "(| 'make install' to install the program.                   |)"
-echo "(| For BSD you might need to use 'gmake' and 'gmake install'|)"
-echo "(*----------------------------------------------------------*)"
-if test "$shush" != yes; then
-	read -p "Press Enter Key to Read the Release Notes"
-	clear
-	more ./RELNOTES
-fi
+AC_SUBST(SED)
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
+
+
+AC_CONFIG_FILES([Makefile include/Makefile src/Makefile
+		src/protocol/Makefile src/curl/Makefile
+		src/keeper/Makefile src/adns/Makefile])
+AC_CACHE_SAVE
+AC_OUTPUT

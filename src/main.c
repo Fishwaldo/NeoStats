@@ -145,7 +145,7 @@ main (int argc, char *argv[])
 	FILE *fp;
 
 	/* initialise version */
-	strlcpy(me.version, NEOSTATS_VERSION, VERSIONSIZE);
+	strlcpy(me.version, VERSION, VERSIONSIZE);
 	/* get our commandline options */
 	if(get_options (argc, argv)!=NS_SUCCESS)
 		return EXIT_FAILURE;
@@ -215,7 +215,7 @@ main (int argc, char *argv[])
 		}
 	}
 #endif
-	nlog (LOG_NOTICE, "NeoStats \"%s\" started.", NEOSTATS_VERSION);
+	nlog (LOG_NOTICE, "NeoStats \"%s\" started.", VERSION);
 
 	/* Load modules after we fork. This fixes the load->fork-exit->call 
 	   _fini problems when we fork */

@@ -141,7 +141,7 @@ DelServer (const char *name, const char* reason)
 	hnode_destroy (sn);
 	sfree (s);
 }
-
+#ifdef IRCU
 Server *
 findserverbase64 (const char *num)
 {
@@ -160,7 +160,7 @@ findserverbase64 (const char *num)
 	dlog(DEBUG3, "findserverbase64: %s not found!", num);
 	return NULL;
 }
-
+#endif
 Server *
 findserver (const char *name)
 {
