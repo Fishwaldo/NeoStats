@@ -721,11 +721,15 @@ typedef void (*after_poll_func) (void *data, struct pollfd *, unsigned int);
 /** @brief ModuleEvent functions structure
  * 
  */
+
+#define	EVENT_FLAG_IGNORE_SYNCH 0x00000001
+
 typedef int (*event_function) (CmdParams *cmdparams);
 
 typedef struct ModuleEvent {
 	Event event;
 	event_function function;
+	unsigned int flags;
 }ModuleEvent;
 
 typedef int ModuleFlags;
@@ -1034,6 +1038,16 @@ EXPORTFUNC int irc_svsmode (Client *target, const char *modes);
 EXPORTFUNC int irc_svskill (Client *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC int irc_svstime (const time_t ts);
 
+/*  CTCP functions to correctly format CTCP requests and replies
+ */
+EXPORTFUNC int irc_ctcp_version_req (Bot* botptr, Client* target);
+EXPORTFUNC int irc_ctcp_version_rpl (Bot* botptr, Client* target, const char* version);
+EXPORTFUNC int irc_ctcp_ping_req (Bot* botptr, Client* target);
+
+EXPORTFUNC int irc_ctcp_finger_req (Bot* botptr, Client* target);
+
+EXPORTFUNC int irc_ctcp_action_req (Bot* botptr, Client* target, const char *action);
+
 /* users.c */
 EXPORTFUNC Client *find_user (const char *nick);
 EXPORTFUNC int UserLevel (Client *u);
@@ -1169,12 +1183,20 @@ EXPORTFUNC int HaveFeature (int mask);
 /* 
  * Module Interface 
  */
-int MODULEFUNC ModInit(Module* mod_ptr);
-void MODULEFUNC ModFini(void);
-int MODULEFUNC ModAuth (Client * u);
-int MODULEFUNC ModAuthUser(Client * u);
-int MODULEFUNC ModAuthList(Client * u);
 extern MODULEVAR ModuleInfo module_info;   
+int MODULEFUNC ModInit (Module* mod_ptr);
+void MODULEFUNC ModFini (void);
+
+/* 
+ * Module Event Interface 
+ */
 extern MODULEVAR ModuleEvent module_events[];  
+
+/* 
+ * Module Auth Interface 
+ */
+int MODULEFUNC ModAuth (Client * u);
+int MODULEFUNC ModAuthUser (Client * u);
+int MODULEFUNC ModAuthList (Client * u);
 
 #endif /* NEOSTATS_H */

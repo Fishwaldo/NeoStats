@@ -398,7 +398,7 @@ parse (char *line)
 	if (!(*line))
 		return;
 	dlog(DEBUG1, "------------------------BEGIN PARSE-------------------------");
-	dlog(DEBUG1, "RX: %s", line);
+	dlog(DEBUGRX, "RX: %s", line);
 	if (*line == ':') {
 		coreLine = strpbrk (line, " ");
 		if (!coreLine)

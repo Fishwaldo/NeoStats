@@ -159,7 +159,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 		dl.c dns.c dotconf.c exclude.c hash.c ircd.c ircstring.c \
 		keeper.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
-		timer.c transfer.c users.c modes.c
+		timer.c transfer.c users.c modes.c ctcp.c dcc.c
 
 AM_CFLAGS = -I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/keeper \
 		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE
@@ -188,7 +188,7 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	modules.$(OBJEXT) ns_help.$(OBJEXT) servers.$(OBJEXT) \
 	services.$(OBJEXT) signals.$(OBJEXT) sock.$(OBJEXT) \
 	support.$(OBJEXT) timer.$(OBJEXT) transfer.$(OBJEXT) \
-	users.$(OBJEXT) modes.$(OBJEXT)
+	users.$(OBJEXT) modes.$(OBJEXT) ctcp.$(OBJEXT) dcc.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/keeper/libkeeper.a \
 	$(top_srcdir)/lib/adns/libadns.la
@@ -199,7 +199,8 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/auth.Po ./$(DEPDIR)/bans.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/bots.Po ./$(DEPDIR)/channels.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/commands.Po ./$(DEPDIR)/conf.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/db.Po ./$(DEPDIR)/dl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/ctcp.Po ./$(DEPDIR)/db.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/dcc.Po ./$(DEPDIR)/dl.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/dns.Po ./$(DEPDIR)/dotconf.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/exclude.Po ./$(DEPDIR)/hash.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/ircd.Po ./$(DEPDIR)/ircstring.Po \
@@ -283,7 +284,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/channels.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/commands.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ctcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dcc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dotconf.Po@am__quote@

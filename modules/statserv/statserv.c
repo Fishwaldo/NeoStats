@@ -82,7 +82,7 @@ ModuleEvent module_events[] = {
 	{EVENT_PART,		ss_event_part},
 	{EVENT_KICK,		ss_event_kick},
 	{EVENT_TOPIC,		ss_event_topic},
-	{EVENT_CTCPVERSION,	ss_event_ctcpversion},
+	{EVENT_CTCPVERSIONRPL,	ss_event_ctcpversion},
 	{EVENT_NULL,		NULL}
 };
 

@@ -205,11 +205,23 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 	ModuleEvent *ev_list;
 
 	SET_SEGV_LOCATION();
+	if (event == EVENT_ONLINE) {
+		module_ptr->synched = 1;
+	}
 	ev_list = module_ptr->event_list;
 	if (ev_list) {
 		while (ev_list->event != EVENT_NULL) {
 			/* This goes through each Command */
 			if (ev_list->event == event) {
+#if 0 
+				/* work in progress */
+				/* If we are not yet synched, check that the module supports 
+				 * the event before we are synched. */
+				if (!module_ptr->synched && !(ev_list->flags & EVENT_FLAG_IGNORE_SYNCH)) {
+					dlog(DEBUG1, "Skipping module %s for event %d since module is not yet synched", module_ptr->info->name, event);
+					break;
+				}
+#endif
 				dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
 				SET_SEGV_LOCATION();
 				if (setjmp (sigvbuf) == 0) {
@@ -239,7 +251,6 @@ void
 SendAllModuleEvent (Event event, CmdParams* cmdparams)
 {
 	Module *module_ptr;
-	ModuleEvent *ev_list;
 	hscan_t ms;
 	hnode_t *mn;
 
@@ -247,31 +258,7 @@ SendAllModuleEvent (Event event, CmdParams* cmdparams)
 	hash_scan_begin (&ms, modulehash);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
-		if(event == EVENT_ONLINE) {
-			module_ptr->synched = 1;
-		}
-		ev_list = module_ptr->event_list;
-		if (ev_list) {
-			while (ev_list->event != EVENT_NULL) {
-				/* This goes through each Command */
-				if (ev_list->event == event) {
-					dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
-					SET_SEGV_LOCATION();
-					if (setjmp (sigvbuf) == 0) {
-						SET_RUN_LEVEL(module_ptr);
-						ev_list->function (cmdparams);
-						RESET_RUN_LEVEL();
-					} else {
-						nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->name);
-					}
-					SET_SEGV_LOCATION();
-#ifndef VALGRIND
-					break;
-#endif
-				}
-				ev_list++;
-			}
-		}
+		SendModuleEvent(event, cmdparams, module_ptr);
 	}
 }
 

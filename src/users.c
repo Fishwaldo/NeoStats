@@ -34,6 +34,7 @@
 #include "bots.h"
 #include "auth.h"
 #include "services.h"
+#include "ctcp.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -147,7 +148,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	sfree (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
 	if(is_synched && config.versionscan && !IsExcluded(u) && !IsMe(u)) {
-		irc_privmsg(ns_botptr, u, "\1VERSION\1");
+		irc_ctcp_version_req (ns_botptr, u);
 	}
 	return u;
 }
@@ -196,7 +197,7 @@ KillUser (const char *nick, const char *reason)
 	/* if its one of our bots inform the module */
 	if ( IsMe(u) ) {
 		nlog (LOG_NOTICE, "KillUser: deleting bot %s as it was killed", u->name);
-		SendModuleEvent (EVENT_BOTKILL, cmdparams, find_bot(u->name)->moduleptr);
+		SendModuleEvent (EVENT_BOTKILL, cmdparams, u->user->bot->moduleptr);
 	}
 	deluser(u);
 	sfree (cmdparams);
@@ -584,7 +585,7 @@ dumpuser (Client * u)
 	if(u->user->is_away) {
 		irc_chanalert (ns_botptr, "Away:     %s", u->user->awaymsg);
 	}
-	irc_chanalert (ns_botptr, "Version:   %s", u->version);
+	irc_chanalert (ns_botptr, "Version:  %s", u->version);
 
 	cm = list_first (u->user->chans);
 	while (cm) {

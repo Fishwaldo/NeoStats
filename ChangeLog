@@ -4,6 +4,10 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Fake deaf mode on IRCds that do not support it natively. (M)
+ - CTCP handling to send and process CTCPs easily. (M)
+ - Update events and group them by type so events.h is a more useful 
+   development resource. (M)
  - StatServ: Modify GeoIP for Win32 and add as a second version. (M)
  - StatServ: GeoIP lib moved to own directory. (M)
  - New debug levels of DEBUGRX and DEBUGTX to identify incoming and outgoing

@@ -66,6 +66,8 @@ include/commands.h -text
 include/conf.h eol=lf
 include/config.h.in -text
 include/configwin32.h -text
+include/ctcp.h -text
+include/dcc.h -text
 include/dl.h eol=lf
 include/dns.h eol=lf
 include/dotconf.h eol=lf
@@ -377,7 +379,9 @@ src/bots.c -text
 src/channels.c eol=lf
 src/commands.c -text
 src/conf.c eol=lf
+src/ctcp.c -text
 src/db.c -text
+src/dcc.c -text
 src/dl.c eol=lf
 src/dns.c eol=lf
 src/dotconf.c eol=lf

@@ -214,6 +214,7 @@ ChanMode (char *origin, char **av, int ac)
 	}
 	
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->channel = c;
 	AddStringToList(&cmdparams->av, origin, &cmdparams->ac);
 	for (i = 0; i < ac; i++) {
 		AddStringToList(&cmdparams->av, av[i], &cmdparams->ac);	

@@ -34,6 +34,7 @@
 #include "commands.h"
 #include "bots.h"
 #include "users.h"
+#include "ctcp.h"
 
 #define MAX_CMD_LINE_LENGTH		350
 
@@ -168,6 +169,43 @@ int process_target_chan(CmdParams * cmdparams, char* target)
 	return NS_FALSE;
 }
 
+/** @brief list_bots
+ *
+ *  list all neostats bots
+ *
+ *  @param cmdparams pointer to command parameters
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+bot_chan_event (Event event, CmdParams* cmdparams)
+{
+	lnode_t *cm;
+	Bot *botptr;
+	hnode_t *bn;
+	hscan_t bs;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin (&bs, bothash);
+	while ((bn = hash_scan_next (&bs)) != NULL) {
+		botptr = hnode_get (bn);
+		cm = list_first (botptr->u->user->chans);
+		if (!(botptr->u->user->Umode & UMODE_DEAF)) {
+			while (cm) {
+				char* chan;
+
+				chan = (char *) lnode_get (cm);
+				cmdparams->bot = botptr;
+				if (ircstrcasecmp(cmdparams->channel->name, chan) == 0) {
+					SendModuleEvent (event, cmdparams, botptr->moduleptr);
+				}
+				cm = list_next (botptr->u->user->chans, cm);
+			}
+		}
+	}
+	return NS_SUCCESS;
+}
+
 /** @brief send a message to a bot
  *
  * @param origin 
@@ -187,12 +225,10 @@ void bot_notice (char *origin, char **av, int ac)
 		/* Find target bot */
 		if (process_target_user(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
-			SendModuleEvent (EVENT_NOTICE, cmdparams, cmdparams->bot->moduleptr);
-			if (!strncasecmp(av[ac - 1], "\1version", 8)) {
-				/* skip "\1version " */
-				cmdparams->param += 9;
-				strlcpy(cmdparams->source->version, cmdparams->param, MAXHOST);
- 				SendModuleEvent (EVENT_CTCPVERSION, cmdparams, cmdparams->bot->moduleptr);
+			if (av[ac - 1][0] == '\1') {
+				ctcp_notice (cmdparams);
+			} else {
+				SendModuleEvent (EVENT_NOTICE, cmdparams, cmdparams->bot->moduleptr);
 			}
 		}		
 	}
@@ -217,9 +253,10 @@ void bot_chan_notice (char *origin, char **av, int ac)
 	if(process_origin(cmdparams, origin)) {
 		if(process_target_chan(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
-			SendModuleEvent (EVENT_CNOTICE, cmdparams, cmdparams->bot->moduleptr);
 			if (av[ac - 1][0] == '\1') {
-				/* TODO CTCP handler */
+				ctcp_cnotice (cmdparams);
+			} else {
+				bot_chan_event (EVENT_CNOTICE, cmdparams);
 			}
 		}
 	}
@@ -236,7 +273,7 @@ void bot_chan_notice (char *origin, char **av, int ac)
  */
 void bot_private (char *origin, char **av, int ac)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
@@ -244,6 +281,11 @@ void bot_private (char *origin, char **av, int ac)
 		/* Find target bot */
 		if (process_target_user(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
+			/* Check CTCP first to avoid Unknown command messages later */
+			if (av[ac - 1][0] == '\1') {
+				ctcp_private (cmdparams);
+				return;
+			} 			
 			if ((cmdparams->bot->flags & BOT_FLAG_SERVICEBOT)) {
 				if(run_bot_cmd (cmdparams) != NS_FAILURE) {
 					sfree (cmdparams);
@@ -251,9 +293,6 @@ void bot_private (char *origin, char **av, int ac)
 				}
 			}
 			SendModuleEvent (EVENT_PRIVATE, cmdparams, cmdparams->bot->moduleptr);
-			if (av[ac - 1][0] == '\1') {
-				/* TODO CTCP handler */
-			}
 		}
 	}
 	sfree (cmdparams);
@@ -276,9 +315,10 @@ void bot_chan_private (char *origin, char **av, int ac)
 	if(process_origin(cmdparams, origin)) {
 		if(process_target_chan(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
-			/* TEMP SendModuleEvent (EVENT_CPRIVATE, cmdparams, cmdparams->bot->moduleptr); */
 			if (av[ac - 1][0] == '\1') {
-				/* TODO CTCP handler */
+				ctcp_cprivate (cmdparams);
+			} else {
+				bot_chan_event (EVENT_CNOTICE, cmdparams);
 			}
 		}
 	}
@@ -555,10 +595,15 @@ Bot *init_bot (BotInfo* botinfo)
 		if ((config.allbots > 0)) {
 			irc_join(botptr, me.serviceschan, me.servicescmode);
 		}
-	}
-
-	if (HaveUmodeDeaf()&&(botinfo->flags&BOT_FLAG_DEAF)) {
-		irc_usermode (botptr, nick, UMODE_DEAF);
+	}	
+	if (botinfo->flags & BOT_FLAG_DEAF) {
+		if (HaveUmodeDeaf()) {
+			/* Set deaf mode at IRCd level */
+			irc_usermode (botptr, nick, UMODE_DEAF);
+		} else {
+			/* No ircd support, so fake it internally */
+			botptr->u->user->Umode |= UMODE_DEAF;
+		}
 	}
 	botptr->flags = botinfo->flags;
 	if (botinfo->bot_cmd_list) {

@@ -137,7 +137,13 @@
 				RelativePath=".\conf.c">
 			</File>
 			<File
+				RelativePath=".\ctcp.c">
+			</File>
+			<File
 				RelativePath=".\db.c">
+			</File>
+			<File
+				RelativePath=".\dcc.c">
 			</File>
 			<File
 				RelativePath=".\dl.c">
@@ -239,6 +245,12 @@
 			</File>
 			<File
 				RelativePath="..\include\configwin32.h">
+			</File>
+			<File
+				RelativePath="..\include\ctcp.h">
+			</File>
+			<File
+				RelativePath="..\include\dcc.h">
 			</File>
 			<File
 				RelativePath="..\include\dl.h">

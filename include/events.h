@@ -21,15 +21,19 @@
 ** $Id$
 */
 
-/*  Events sent to modules. Each event has 2 parameters:
- *    av is a list of parameters.
- *    ac is the number of parameters
+/*  Events. 
+ *    An event handler is passed a structure pointer of type
+ *    CmdParams.
  */
 typedef enum Event {
 /*  EVENT_NULL
  *    dummy value to end lists
  */
 	EVENT_NULL = -1,
+
+/*  Network events 
+ *    Generated in response to network events
+ */
 
 /*  EVENT_ONLINE
  *    Called when NeoStats connects to the Network. 
@@ -38,6 +42,48 @@ typedef enum Event {
  *      none
  */
 	EVENT_ONLINE = 0,
+
+/*  EVENT_NETINFO 
+ *    Called when the connection to the network is synched. 
+ *    parameters:
+ *      none
+ */
+	EVENT_NETINFO,
+
+/*  Network events 
+ *    Generated in response to server events
+ */
+
+/*  EVENT_SERVER 
+ *    Called when a server connects to the network. 
+ *    parameters:
+ *      server in cmdparams->source
+ */
+	EVENT_SERVER,
+
+/*  EVENT_SQUIT 
+ *    Called when a server squits the network 
+ *    parameters:
+ *      server in cmdparams->source
+ *      reason in cmdparams->param
+ */
+	EVENT_SQUIT,
+
+/*  EVENT_PING 
+ *    parameters:
+ *      server in cmdparams->source
+ */
+	EVENT_PING,
+
+/*  EVENT_PONG 
+ *    parameters:
+ *      server in cmdparams->source
+ */
+	EVENT_PONG,
+
+/*  User events 
+ *    Generated in response to user events
+ */
 
 /*  EVENT_SIGNON 
  *    Called when a new user signs onto the network. the user 
@@ -52,9 +98,20 @@ typedef enum Event {
  *    nickname is passed as a parameter, so you can see who signed off.
  *    parameters:
  *      user in cmdparams->source
- *      reason in cmdparams->message
+ *      reason in cmdparams->param
  */
 	EVENT_QUIT,
+
+/*	EVENT_GOTNICKIP
+ *	fired when we get the IP address of a user
+ *	only fired if me.want_nickip = 1 and:
+ *	the ircd sends the nickip as part of the connect message
+ *	or a dns lookup completes and is successfull
+ * 
+ *	  parameters:
+ *		user in cmdparams->source
+ */ 
+	EVENT_GOTNICKIP,
 
 /*  EVENT_KILL 
  *    Called when a user is killed on the network. the user 
@@ -62,7 +119,8 @@ typedef enum Event {
  *    was killed (You would have to use the recbuf global 
  *    variable to see who killed them though)
  *    parameters:
- *      av[0] nick
+ *      user in cmdparams->source
+ *      reason in cmdparams->param
  */
 	EVENT_KILL,
 
@@ -70,233 +128,203 @@ typedef enum Event {
  *    is called if one of the NeoStats bots gets killed. You would 
  *    use it to reinitialize the bot.
  *    parameters:
- *      av[0] botnick
+ *      user in cmdparams->source
+ *      reason in cmdparams->param
  */
 	EVENT_BOTKILL,
 
-/*  EVENT_SERVER 
- *    Called when a server connects to the network. 
+/*  EVENT_NICK
+ *    Called when a user changes nick
  *    parameters:
- *      av[0] server name
- *      av[1] uplink
- *      av[2] hops
- *      av[3] numeric
- *      av[4] infoline
+ *      user in cmdparams->source
+ *      oldnick in cmdparams->param
  */
-	EVENT_SERVER,
+	EVENT_NICK,
 
-/*  EVENT_SQUIT 
- *    Called when a server squits the network 
+/*  EVENT_AWAY 
  *    parameters:
- *      av[0] server name
- *      av[1] reason
+ *      user in cmdparams->source
  */
-	EVENT_SQUIT,
-
-/*  EVENT_NETINFO 
- *    Called when the connection to the network is synched. 
- *    parameters:
- *      av[0] none
- */
-	EVENT_NETINFO,
+	EVENT_AWAY,
 
 /*  EVENT_UMODE 
  *    Called when a user changes Umodes. (e.g., /mode +o fish) 
  *    parameters:
- *      av[0] nick
- *      av[1] mode string
+ *      user in cmdparams->source
+ *      modes in cmdparams->param
  */
 	EVENT_UMODE,
 
 /*  EVENT_SMODE 
  *    Called when a user changes Smodes.
  *    parameters:
- *      av[0] nick
- *      av[1] mode string
+ *      user in cmdparams->source
+ *      modes in cmdparams->param
  */
 	EVENT_SMODE,
 
-/*  EVENT_NICK
- *    Called when a user changes nick
- *    parameters:
- *      av[0] old nick
- *      av[1] new nick
+/*  Channel events 
+ *    Generated in response to channel events
  */
-	EVENT_NICK,
-
-/*  EVENT_PONG 
- *    parameters:
- *      av[0] server name
- */
-	EVENT_PONG,
-
-/*  EVENT_AWAY 
- *    parameters:
- *      av[0] nick
- *      av[1] away message if setting away, NULL if cancel away
- */
-	EVENT_AWAY,
 
 /*  EVENT_NEWCHAN 
  *    parameters:
- *      av[0] channel name
+ *      channel in cmdparams->channel
  */
 	EVENT_NEWCHAN,
 
 /*  EVENT_DELCHAN 
  *    parameters:
- *      av[0] channel name
+ *      channel in cmdparams->channel
  */
 	EVENT_DELCHAN,
 
 /*  EVENT_JOIN
  *    parameters:
- *      av[0] channel name
- *      av[1] user nick
+ *      user in cmdparams->source
+ *      channel in cmdparams->channel
  */
 	EVENT_JOIN,
 
 /*  EVENT_PART
  *    parameters:
- *      av[0] channel name
- *      av[1] user nick
- *      av[2] reason
+ *      user in cmdparams->source
+ *      channel in cmdparams->channel
+ *      reason in cmdparams->param
  */
 	EVENT_PART,
 
+/*  EVENT_PARTBOT 
+ *    parameters:
+ *      user in cmdparams->source
+ *      channel in cmdparams->channel
+ *      reason in cmdparams->param
+ */
+	EVENT_PARTBOT,
+
 /*  EVENT_KICK 
  *    parameters:
- *      av[0] channel name
- *      av[1] nick of user who made the kick
- *      av[2] nick of user who was kick
- *      av[3] reason
+ *      user in cmdparams->target
+ *      channel in cmdparams->channel
+ *      reason in cmdparams->param
  */
 	EVENT_KICK,
 
 /*  EVENT_KICKBOT 
  *    parameters:
- *      av[0] channel name
- *      av[1] nick of user who made the kick
- *      av[2] nick of user who was kick
- *      av[3] reason
+ *      user in cmdparams->target
+ *      channel in cmdparams->channel
+ *      reason in cmdparams->param
  */
 	EVENT_KICKBOT,
 
-/*  EVENT_PARTBOT 
- *    parameters:
- *      av[0] channel name
- *      av[1] user nick
- *      av[2] reason
- */
-	EVENT_PARTBOT,
-
 /*  EVENT_TOPIC 
  *    parameters:
- *      av[0] channel name
- *      av[1] owner
- *      av[2] topic
+ *      channel in cmdparams->channel
+ *      owner in cmdparams->av[0]
+ *      topic in cmdparams->av[1]
  */
 	EVENT_TOPIC,
 
-/*  EVENT_CTCPVERSION 
- *    parameters:
- *      av[0] user nick
- *      av[1] client version string
- */
-	EVENT_CTCPVERSION,
-
 /*  EVENT_CHANMODE
  *    parameters:
- *      av[0] channel name
- *      av[1] mode string
+ *      channel in cmdparams->channel
+ *      modes in cmdparams->av[0]..av[cmdparams->ac-1]
  */
 	EVENT_CHANMODE,
 
+/*  Messages event
+ *    Generated in response to messages received 
+ */
+
 /*  EVENT_PRIVATE
  *    parameters:
- *      av[0] from nick 
- *      av[1] to nick 
- *      av[2] message
+ *      from in cmdparams->source
+ *      to in cmdparams->bot
+ *      message in cmdparams->param
  */
 	EVENT_PRIVATE,
 
 /*  EVENT_NOTICE
  *    parameters:
- *      av[0] from nick 
- *      av[1] to nick 
- *      av[2] message
+ *      from in cmdparams->source
+ *      to in cmdparams->bot
+ *      message in cmdparams->param
  */
 	EVENT_NOTICE,
 
 /*  EVENT_CPRIVATE
  *    parameters:
- *      av[0] from nick 
- *      av[1] to channel
- *      av[2] message
+ *      from in cmdparams->source
+ *      channel in cmdparams->channel
+ *      message in cmdparams->param
  */
 	EVENT_CPRIVATE,
 
 /*  EVENT_CNOTICE
  *    parameters:
- *      av[0] from nick 
- *      av[1] to channel
- *      av[2] message
+ *      from in cmdparams->source
+ *      channel in cmdparams->channel
+ *      message in cmdparams->param
  */
 	EVENT_CNOTICE,
 
-/*  EVENT_CTCPPRIVATE
- *    parameters:
- *      av[0] from nick 
- *      av[1] to nick
- *      av[2] message
+/*  CTCP events 
+ *    Generated in response to ctcp events
  */
-	EVENT_CTCPPRIVATE,
 
-/*  EVENT_CTCPNOTICE
+/*  EVENT_CTCPVERSIONRPL 
  *    parameters:
- *      av[0] from nick 
- *      av[1] to nick
- *      av[2] message
+ *      user in cmdparams->source
+ *      version in cmdparams->param
  */
-	EVENT_CTCPNOTICE,
+	EVENT_CTCPVERSIONRPL,
+
+/*  EVENT_CTCPVERSIONREQ
+ *    parameters:
+ *      user in cmdparams->source
+ */
+	EVENT_CTCPVERSIONREQ,
+
+/*  DCC events 
+ *    Generated in response to ctcp dcc events
+ */
+
+/*  EVENT_DCCSEND 
+ *    parameters:
+ *      user in cmdparams->source
+ *      parameters in cmdparams->param
+ */
+	EVENT_DCCSEND,
+
+/*  Ban events 
+ *    Generated in response to ban events
+ */
 
 /*  EVENT_ADDBAN
  *    parameters:
- *      av[0] type
- *      av[1] user
- *      av[2] host
- *      av[3] mask
- *      av[4] reason
- *      av[5] setby
- *      av[6] tsset
- *      av[7] tsexpires
+ *      cmdparams->av[0] type
+ *      cmdparams->av[1] user
+ *      cmdparams->av[2] host
+ *      cmdparams->av[3] mask
+ *      cmdparams->av[4] reason
+ *      cmdparams->av[5] setby
+ *      cmdparams->av[6] tsset
+ *      cmdparams->av[7] tsexpires
  */
 	EVENT_ADDBAN,
 
 /*  EVENT_DELBAN
  *    parameters:
- *      av[0] type
- *      av[1] user
- *      av[2] host
- *      av[3] mask
- *      av[4] reason
- *      av[5] setby
- *      av[6] tsset
- *      av[7] tsexpires
+ *      cmdparams->av[0] type
+ *      cmdparams->av[1] user
+ *      cmdparams->av[2] host
+ *      cmdparams->av[3] mask
+ *      cmdparams->av[4] reason
+ *      cmdparams->av[5] setby
+ *      cmdparams->av[6] tsset
+ *      cmdparams->av[7] tsexpires
  */
 	EVENT_DELBAN,
-
-/* EVENT_GOTNICKIP
- * fired when we get the IP address of a user
- * only fired if me.want_nickip = 1 and:
- * the ircd sends the nickip as part of the connect message
- * or
- * a dns lookup completes and is successfull
- * 
- * Parameters:
- *	av[0] nick
- */
- 
-	EVENT_GOTNICKIP,
 
 } Event;
