@@ -37,7 +37,7 @@ void *DBMOpenTable( const char *name )
 
 	dlog( DEBUG4, "DBMOpenTable" );
 	ircsprintf( filename, "%s.gdbm", name );
-	gdbm_file = gdbm_open( filename, 0, GDBM_WRCREAT, 00664, NULL );
+	gdbm_file = gdbm_open( filename, 0, GDBM_WRCREAT | GDBM_NOLOCK, 00664, NULL );
 	if( gdbm_file == NULL )
 	{
 		dlog( DEBUG1, "gdbm_open fail: %s", gdbm_strerror( gdbm_errno ) );
