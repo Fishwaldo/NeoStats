@@ -1,6 +1,5 @@
 * text=auto !eol
 /ChangeLog -text
-/FAQ -text
 /INSTALL -text
 /LICENCE -text
 /Makefile.in -text

@@ -1,20 +1,23 @@
 This is a very brief INSTALL guide for setting up and using NeoStats,
 the IRC Statistical Services.
 
-NeoStats Website is at http://codeworks.kamserve.com
+NeoStats Website is at http://www.neostats.net
 
 [1] Download NeoStats from our website.  If you have it skip to step 2
 
 [2] uncompress the tarball, this can be accomplished by typing:
-    tar xvfz NeoStats-1.1.2.tar.gz
+    tar xvfz NeoStats-2.0.tar.gz
 
-[3] go into the directory and type "make" without the quotes, this will
-    compile the software.
+[3] go into the NeoStats-2.0 Directory, and run ./configure. To Enable
+    Specific Features, or other IRCD Support, type ./configure --help to get a
+    list of Specific --enable-<options> that are available in this release
 
-[4] edit the stats.cfg file, if you don't you won't be able to run NeoStats
+[4] type "make" without the quotes, this will compile the software.
+
+[5] edit the stats.cfg file, if you don't you won't be able to run NeoStats
     type: pico stats.cfg    or   joe stats.cfg whichever editor you like to use.
 
-[5] Once you have finished editting the config file, you are ready to start NeoStats
+[6] Once you have finished editting the config file, you are ready to start NeoStats
     This is accomplished by typing "./stats" without the quotes.
 
 
