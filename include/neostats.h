@@ -568,6 +568,8 @@ typedef struct Client {
 	int lang;
 	void *modptr[NUM_MODULES];
 	void *modvalue[NUM_MODULES];
+	int fd;
+	int port;
 } Client; 
 
 /** @brief me structure

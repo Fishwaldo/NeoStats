@@ -43,6 +43,7 @@
 #include "lang.h"
 #include "nsdba.h"
 #include "rtaserv.h"
+#include "dcc.h"
 
 #define PID_FILENAME	"neostats.pid"
 
@@ -132,6 +133,8 @@ static int InitCore(void)
 	if (InitCurl () != NS_SUCCESS)
 		return NS_FAILURE;
 	if (InitIrcd () != NS_SUCCESS)
+		return NS_FAILURE;
+	if (InitDCC() != NS_SUCCESS)
 		return NS_FAILURE;
 	InitServices();
 	dlog(DEBUG1, "Core init successful");
@@ -382,6 +385,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		}
 		sleep(1);
 		/* now free up the users and servers memory */
+		FiniDCC();
 		FiniCurl();
 		FiniUsers();
 		FiniChannels();

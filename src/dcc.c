@@ -31,6 +31,9 @@ typedef struct dcc_cmd {
 	dcc_cmd_handler req_handler;
 } dcc_cmd;
 
+static list_t *dcclist;
+static int dccoutput = 0;
+
 static int dcc_req_send (CmdParams* cmdparams);
 static int dcc_req_chat (CmdParams* cmdparams);
 
@@ -39,6 +42,52 @@ static dcc_cmd dcc_cmds[]= {
 	{"CHAT", dcc_req_chat},
 	{NULL},
 };
+
+int InitDCC(void)
+{
+	dcclist = list_create(-1);
+	return NS_SUCCESS;
+}
+
+void FiniDCC(void)
+{
+	Client *dcc;
+	lnode_t *dccnode;
+ 
+	dccnode = list_first (dcclist);
+	while (dccnode) {
+		dcc = (Client *)lnode_get(dccnode);
+		lnode_destroy (dccnode);
+		ns_free (dcc);
+		dccnode = list_next(dcclist, dccnode);
+	}
+	list_destroy (dcclist);
+}
+
+Client *AddDCCClient(CmdParams *cmdparams)
+{
+	Client *dcc;
+
+	dcc = ns_calloc(sizeof(Client));
+	if (dcc) 
+	{
+		os_memcpy(dcc, cmdparams->source, sizeof(Client));
+		lnode_create_append (dcclist, dcc);
+		return dcc;
+	}
+	return NULL;
+}
+
+void DelDCCClient(Client *dcc)
+{
+	lnode_t *dccnode;
+
+	dccnode = lnode_find (dcclist, dcc->name, comparef);
+	if (dccnode) {
+		lnode_destroy (dccnode);
+		ns_free (dcc);
+	}
+}
 
 int dcc_req (CmdParams* cmdparams)
 {
@@ -68,6 +117,7 @@ static int dcc_req_send (CmdParams* cmdparams)
 	return NS_SUCCESS;
 }
 
+/* RX: :Mark ! neostats :\1DCC CHAT chat 2130706433 1028\1 */
 static int dcc_req_chat (CmdParams* cmdparams)
 {
 	dlog (DEBUG5, "DCC CHAT request from %s to %s", cmdparams->source->name, cmdparams->bot->name);

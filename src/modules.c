@@ -147,7 +147,7 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 				return;
 			}
 			if (module_ptr->event_list[event]->flags & EVENT_FLAG_EXCLUDE_MODME) {
-				if (cmdparams->source->user->bot && cmdparams->source->user->bot->moduleptr == module_ptr) {
+				if (cmdparams->source->user && cmdparams->source->user->bot && cmdparams->source->user->bot->moduleptr == module_ptr) {
 					dlog(DEBUG1, "Skipping module %s for event %d since %s is excluded as a Module client", module_ptr->info->name, event, cmdparams->source->name);
 					return;
 				}

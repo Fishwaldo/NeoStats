@@ -43,6 +43,7 @@
 #include "services.h"
 #include "ircd.h"
 #include "rtaserv.h"
+#include "dcc.h"
 
 static void recvlog (char *line);
 

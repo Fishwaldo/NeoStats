@@ -69,7 +69,6 @@ serv_die (int signum)
 RETSIGTYPE
 conf_rehash (int signum)
 {
-	irc_chanalert (ns_botptr, _("SIGHUP received, attempting to rehash"));
 	irc_globops (NULL, _("SIGHUP received, attempted to rehash"));
 	/* at the moment, the reshash just checks for a the SQL port is opened, if enabled */
 #ifdef SQLSRV
@@ -133,7 +132,7 @@ void report_segfault(const char* modulename)
 	}
 	fprintf (segfault, "Location: %s\n", segv_location);
 	fprintf (segfault, "recbuf:   %s\n", recbuf);
-	irc_chanalert (ns_botptr, "Location *could* be %s.", segv_location);
+	irc_globops (ns_botptr, "Location *could* be %s.", segv_location);
 	do_backtrace();
 	fprintf (segfault, "-------------------------END OF REPORT--------------------------\n");
 	fflush (segfault);
@@ -152,11 +151,11 @@ serv_segv (int signum)
 		strlcpy (name, GET_CUR_MODNAME(), MAX_MOD_NAME);
 		RunLevel = 0;
 		unload_module (name, NULL);
-		irc_chanalert (ns_botptr, "Restoring Stack to before Crash");
+		irc_globops (ns_botptr, "Restoring Stack to before Crash");
 		/* flush the logs out */
 		CloseLogs (); 
 		longjmp (sigvbuf, -1);
-		irc_chanalert (ns_botptr, "Done");
+		irc_globops (ns_botptr, "Done");
 		return;
 	}
 	/** segv happened in our core */

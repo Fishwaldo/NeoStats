@@ -147,9 +147,9 @@ static int rta_set_rtaport_cb (CmdParams* cmdparams, SET_REASON reason)
 
 static bot_setting rta_settings[]=
 {
-	{"RTAUSER",	&rtauser,	SET_TYPE_STRING,	0, MAXUSER, NS_ULEVEL_ADMIN, "rtauser",	NULL,	rta_help_set_rtauser, rta_set_rtauser_cb, (void*)"user" },
-	{"RTAPASS",	&rtapass,	SET_TYPE_STRING,	0, MAXPASS, NS_ULEVEL_ADMIN, "rtapass",	NULL,	rta_help_set_rtapass, rta_set_rtapass_cb, (void*)"pass" },
-	{"RTAHOST",	&rtahost,	SET_TYPE_HOST,		0, MAXHOST, NS_ULEVEL_ADMIN, "rtahost",	NULL,	rta_help_set_rtahost, rta_set_rtahost_cb, (void*)"127.0.0.1" },
+	{"RTAUSER",	rtauser,	SET_TYPE_STRING,	0, MAXUSER, NS_ULEVEL_ADMIN, "rtauser",	NULL,	rta_help_set_rtauser, rta_set_rtauser_cb, (void*)"user" },
+	{"RTAPASS",	rtapass,	SET_TYPE_STRING,	0, MAXPASS, NS_ULEVEL_ADMIN, "rtapass",	NULL,	rta_help_set_rtapass, rta_set_rtapass_cb, (void*)"pass" },
+	{"RTAHOST",	rtahost,	SET_TYPE_HOST,		0, MAXHOST, NS_ULEVEL_ADMIN, "rtahost",	NULL,	rta_help_set_rtahost, rta_set_rtahost_cb, (void*)"127.0.0.1" },
 	{"RTAPORT",	&rtaport,	SET_TYPE_INT,		0, 0, 		NS_ULEVEL_ADMIN, "rtaport",	NULL,	rta_help_set_rtaport, rta_set_rtaport_cb, (void*)8888 },
 	{NULL,		NULL,		0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
