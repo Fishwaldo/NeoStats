@@ -22,7 +22,7 @@ clean:
 	$(RM) *.o *.lo *.so
 
 install: $(TARGET)
-	$(INSTALLMOD) $(TARGET) $(DIRECTORY)/dl
+	$(INSTALL_MOD) $(TARGET) $(DIRECTORY)/dl
 	$(INSTALL_DATA) $(HTML) $(DIRECTORY)/data
 	$(INSTALL_DATA) $(DATA) $(DIRECTORY)/data
 

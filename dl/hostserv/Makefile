@@ -18,8 +18,8 @@ hostserv: $(OBJS)
 clean:
 	$(RM) *.o *.lo *.so
 
-install: hostserv
-	$(INSTALLMOD) $(TARGET) $(DIRECTORY)/dl
+install: $(TARGET)
+	$(INSTALL_MOD) $(TARGET) $(DIRECTORY)/dl
 
 dist:	$(DISTFILES)
 	@for files in $(DISTFILES); do \

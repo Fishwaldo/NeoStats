@@ -18,8 +18,8 @@ extauth: $(OBJS)
 clean:
 	$(RM) *.o *.lo *.so
 
-install: extauth
-	$(INSTALLMOD) $(TARGET) $(DIRECTORY)/dl
+install: $(TARGET)
+	$(INSTALL_MOD) $(TARGET) $(DIRECTORY)/dl
 
 dist:	$(DISTFILES)
 	@for files in $(DISTFILES); do \

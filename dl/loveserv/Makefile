@@ -16,8 +16,8 @@ loveserv: $(OBJS)
 clean:
 	$(RM) *.o *.lo *.so
 
-install: loveserv
-	$(INSTALLMOD) -m 644 $(TARGET) $(DIRECTORY)/dl
+install: $(TARGET)
+	$(INSTALL_MOD) -m 644 $(TARGET) $(DIRECTORY)/dl
 
 dist:	$(DISTFILES)
 	@for files in $(DISTFILES); do \
