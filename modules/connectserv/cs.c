@@ -51,7 +51,7 @@ typedef struct ModeDef {
 /** output message and format strings */
 #ifdef ENABLE_COLOUR_SUPPORT
 static char msg_nickchange[] = "\2\0037NICK\2 user: \2%s\2 (%s@%s) changed their nick to \2%s\2\003"; 
-static char msg_away[] = "\2AWAY\2 %s (%s@%s) is %s away";
+static char msg_away[] = "\2AWAY\2 %s (%s@%s) is %s away %s";
 static char msg_signon[] = "\2\0034SIGNON\2 user: \2%s\2 (%s@%s %s) at \2%s\2\003";
 static char msg_signoff[] = "\2\0033SIGNOFF\2 user: %s (%s@%s %s) at %s %s\003";
 static char msg_localkill[] = "\2\00312LOCAL KILL\2 user: \2%s\2 (%s@%s) killed by \2%s\2 for \2%s\2\003";
@@ -64,7 +64,7 @@ static char msg_server[] = "\2SERVER\2 %s joined the network at %s";
 static char msg_squit[] = "\2SERVER\2 %s left the network at %s for %s";
 #else
 static char msg_nickchange[] = "\2NICK\2 %s (%s@%s) changed their nick to %s";
-static char msg_away[] = "\2AWAY\2 %s (%s@%s) is %s away";
+static char msg_away[] = "\2AWAY\2 %s (%s@%s) is %s away %s";
 static char msg_signon[] = "\2SIGNON\2 %s (%s@%s %s) signed on at %s";
 static char msg_signoff[] = "\2SIGNOFF\2 %s (%s@%s %s) signed off at %s %s";
 static char msg_localkill[] = "\2LOCAL KILL\2 %s (%s@%s) killed by %s for \2%s\2";
@@ -520,7 +520,7 @@ static int cs_event_away( CmdParams *cmdparams )
 	SET_SEGV_LOCATION();
 	cs_report( msg_away, cmdparams->source->name, 
 		cmdparams->source->user->username, cmdparams->source->user->hostname, 
-		IsAway( cmdparams->source ) ? "now" : "no longer" );
+		IsAway( cmdparams->source ) ? "now" : "no longer", cmdparams->source->user->awaymsg );
 	return NS_SUCCESS;
 }
 
