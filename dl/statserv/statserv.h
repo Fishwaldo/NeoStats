@@ -77,11 +77,15 @@ struct StatServ {
 	char host[MAXHOST];
 	char rname[MAXREALNAME];
 	int lag;
+	int lagtime;
+	int lagalert;
+	int recordalert;
 	int html;
-	char htmlpath[255];
+	char htmlpath[MAXPATH];
 	int onchan;
 	int newdb;
-	int interval;
+	int msginterval;
+	int msglimit;
 	int shutdown;
 } StatServ;
 
@@ -218,8 +222,11 @@ extern const char *ss_help_forcehtml[];
 extern const char *ss_help_chan[];
 extern const char *ss_help_set_htmlpath[];
 extern const char *ss_help_set_html[];
-extern const char *ss_help_set_msgthrottle[];
-extern const char *ss_help_set_lagwallop[];
+extern const char *ss_help_set_msginterval[];
+extern const char *ss_help_set_msglimit[];
+extern const char *ss_help_set_lagtime[];
+extern const char *ss_help_set_lagalert[];
+extern const char *ss_help_set_recordalert[];
 extern const char *ss_help_clientversions[];
 
 extern const char ss_help_about_oneline[];

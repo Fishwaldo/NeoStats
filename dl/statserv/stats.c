@@ -37,10 +37,10 @@ static int ok_to_wallop()
 		return -1;
 	}
 	/* 0 means all wallops disabled */
-	if (StatServ.interval == 0)
+	if (StatServ.msginterval == 0)
 		return -1;
-	if (me.now - lasttime < StatServ.interval) {
-		if (++count > 5)
+	if (me.now - lasttime < StatServ.msginterval ) {
+		if (++count > StatServ.msglimit)
 			return -1;
 	} else {
 		lasttime = me.now;
@@ -54,11 +54,26 @@ announce_record(const char *msg, ...)
 {
 	va_list ap;
 
+	if(StatServ.recordalert < 0) {
+		return 1;
+	}
+
 	if (ok_to_wallop() > 0) {
 		va_start (ap, msg);
 		ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
 		va_end (ap);
-		wallops (s_StatServ, "%s", announce_buf);
+		switch(StatServ.recordalert) {
+			case 3:
+				wallops (s_StatServ, "%s", announce_buf);
+				break;
+			case 2:
+				globops (s_StatServ, "%s", announce_buf);
+				break;
+			case 1:
+			default:
+				chanalert (s_StatServ, "%s", announce_buf);
+				break;
+		}
 	}
 	return 1;
 }
@@ -68,11 +83,26 @@ announce_lag(const char *msg, ...)
 {
 	va_list ap;
 
+	if(StatServ.lagalert < 0) {
+		return 1;
+	}
+
 	if (ok_to_wallop() > 0) {
 		va_start (ap, msg);
 		ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
 		va_end (ap);
-		globops (s_StatServ, "%s", announce_buf);
+		switch(StatServ.lagalert) {
+			case 3:
+				wallops (s_StatServ, "%s", announce_buf);
+				break;
+			case 2:
+				globops (s_StatServ, "%s", announce_buf);
+				break;
+			case 1:
+			default:
+				chanalert (s_StatServ, "%s", announce_buf);
+				break;
+		}
 	}
 	return 1;
 }
@@ -542,12 +572,11 @@ int pong(char **av, int ac)
 	}
 
 	/* ok, updated the statistics, now lets see if this server is "lagged out" */
-	if (StatServ.lag > 0) {
-		if (s->ping > StatServ.lag) {
-			announce_lag("\2%s\2 is Lagged out with a ping of %d",
-				s->name, s->ping);
-		}
+	if (s->ping > StatServ.lag) {
+		announce_lag("\2%s\2 is Lagged out with a ping of %d",
+			s->name, s->ping);
 	}
+
 	return 1;
 }
 

@@ -501,18 +501,34 @@ Description:
     Set the Pathname (including filename) to write HTML statistics to
     if HTML Statistics are enabled
 
-    HTML 
-    Toggle HTML Statistics Generation on/off
+    HTML <ON/OFF>
+    Enable or disable HTML statistics generation.
 
-    MSGTHROTTLE [<seconds>]
-    if <seconds> is greater than 0, then set 5 Wallops per <seconds> 
-    throttle
-    if <seconds> is equal to 0, then all Wallops are disabled
+	MSGINTERVAL <seconds>
+	Limit alerts to MSGLIMIT in <seconds>.
 
-    LAGWALLOP <seconds>
-    if <seconds> is greater than 0, then when servers are lagged by this 
-    many seconds, issue a warning
-    if <seconds> is equal to 0, then disable Lag Monitoring
+	MSGLIMIT <count>
+	Limit alerts to <count> in MSGINTERVAL seconds.
+
+    LAGTIME <seconds>
+	<seconds> is the time in seconds at which a server is
+	considered lagged.
+
+	LAGALERT <alerttype>
+	How StatServ announces lag on the network
+	Options for <alerttype> are:
+	    0 - Never
+	    1 - Announce in services channel
+	    2 - Announce by globops
+	    3 - Announce by wallops
+
+	RECORDALERT <alerttype>
+	How StatServ announces new records on the network
+	Options for <alerttype> are:
+	    0 - Never
+	    1 - Announce in services channel
+	    2 - Announce by globops
+	    3 - Announce by wallops
 
 Example:
     /msg statserv set msgthrottle off

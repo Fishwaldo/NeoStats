@@ -10,7 +10,11 @@ Shmad & ^Enigma & Fish^
  - begin reworking announcement code for wallops
  - move SERVER join/quit anouncements to ConnectServ since it is not really a 
    StatServ task
-
+ - New set options LAGALERT and RECORDALERT which allow a user to determine
+   how these alerts are managed 0 none, 1 channel, 2 globops, 3 wallops
+ - Removed MSGTHROTTLE and LAG options. These are superceded by new options
+	MSGINTERVAL, MSGLIMIT, LAGTIME     
+    
 * Revision 810 * Nov 23rd, 2003 (M)
  - change SSMNAME to __module_info.module_name to be consistent with other modules (M)
  - Use core bot message handler to process commands (M)

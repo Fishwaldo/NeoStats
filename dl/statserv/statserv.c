@@ -116,8 +116,20 @@ void ss_Config()
 		strlcpy(StatServ.rname, tmp, MAXREALNAME);
 		free(tmp);
 	}
-	if (GetConf((void *) &StatServ.lag, CFGINT, "Lag") < 0) {
-		StatServ.lag = 0;
+	if (GetConf((void *) &StatServ.lagtime, CFGINT, "LagTime") < 0) {
+		StatServ.lagtime = 30;
+	}
+	if (GetConf((void *) &StatServ.lagalert, CFGINT, "LagAlert") < 0) {
+		StatServ.lagalert = 1;
+	}
+	if (GetConf((void *) &StatServ.recordalert, CFGINT, "RecordAlert") < 0) {
+		StatServ.recordalert = 1;
+	}
+	if (GetConf((void *) &StatServ.msginterval , CFGINT, "MsgInterval") < 0) {
+		StatServ.msginterval  = 60;
+	}
+	if (GetConf((void *) &StatServ.msglimit , CFGINT, "MsgLimit") < 0) {
+		StatServ.msglimit  = 5;
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "HTML_Path") < 0) {
 		StatServ.html = 0;
@@ -127,12 +139,8 @@ void ss_Config()
 		if (GetConf((void *) &StatServ.html, CFGINT, "HTML_Enabled") < 0) {
 			StatServ.html = 1;
 		}
-		strlcpy(StatServ.htmlpath, tmp, 255);
+		strlcpy(StatServ.htmlpath, tmp, MAXPATH);
 		free(tmp);
-	}
-	if (GetConf((void *) &StatServ.interval, CFGINT, "Wallop_Throttle")
-	    < 0) {
-		StatServ.interval = 0;
 	}
 }
 
@@ -283,11 +291,14 @@ bot_cmd ss_commands[]=
 
 bot_setting ss_settings[]=
 {
-	{"HTML",		&StatServ.html,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN,	"HTML_Enabled",		NULL,		ss_help_set_html },
-	{"HTMLPATH",	&StatServ.htmlpath,	SET_TYPE_STRING,	0, 255,	NS_ULEVEL_ADMIN,	"HTML_Path",		NULL,		ss_help_set_htmlpath },
-	{"MSGTHROTTLE",	&StatServ.interval,	SET_TYPE_INT,		0, 99, 	NS_ULEVEL_ADMIN,	"Wallop_Throttle",	"seconds",	ss_help_set_msgthrottle },
-	{"LAGWALLOP",	&StatServ.lag,		SET_TYPE_INT,		0, 99, 	NS_ULEVEL_ADMIN,	"Lag",				"seconds",	ss_help_set_lagwallop },
-	{NULL,			NULL,				0,					0, 0,	0,					NULL,				NULL,		NULL },
+	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN,	"HTML_Enabled",		NULL,		ss_help_set_html },
+	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,	NS_ULEVEL_ADMIN,	"HTML_Path",		NULL,		ss_help_set_htmlpath },
+	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 		NS_ULEVEL_ADMIN,	"MsgInterval",		"seconds",	ss_help_set_msginterval },
+	{"MSGLIMIT",	&StatServ.msglimit,		SET_TYPE_INT,		1, 99, 		NS_ULEVEL_ADMIN,	"MsgLimit",			NULL,		ss_help_set_msglimit },
+	{"LAGTIME",		&StatServ.lagtime,		SET_TYPE_INT,		1, 256,		NS_ULEVEL_ADMIN,	"LagTime",			"seconds",	ss_help_set_lagtime },
+	{"LAGALERT",	&StatServ.lagalert,		SET_TYPE_INT,		0, 3, 		NS_ULEVEL_ADMIN,	"LagAlert",			NULL,		ss_help_set_lagalert },
+	{"RECORDALERT", &StatServ.recordalert,	SET_TYPE_INT,		0, 3, 		NS_ULEVEL_ADMIN,	"RecordAlert",		NULL,		ss_help_set_recordalert },
+	{NULL,			NULL,					0,					0, 0,		0,					NULL,				NULL,		NULL },
 };
 
 int topchan(const void *key1, const void *key2)

@@ -67,23 +67,51 @@ const char *ss_help_set_htmlpath[] = {
 	"statistics to if HTML Statistics are enabled",
 	NULL
 };
+
 const char *ss_help_set_html[] = {
 	"\2HTML <ON/OFF>\2",
-	"Toggle HTML Statistics Generation on/off",
+	"Enable or disable HTML statistics generation.",
 	NULL
 };
-const char *ss_help_set_msgthrottle[] = {
-	"\2MSGTHROTTLE <seconds>\2",
-	"if <seconds> is greater than 0, then set 5 Wallops per",
-	" <seconds> throttle",
-	"if <seconds> is equal to 0, then disable Wallop Throttling",
+
+const char *ss_help_set_msginterval[] = {
+	"\2MSGINTERVAL <seconds>\2",
+	"Limit alerts to MSGLIMIT in <seconds>.",
 	NULL
 };
-const char *ss_help_set_lagwallop[] = {
-	"\2LAGWALLOP <seconds>\2",
-	"if <seconds> is greater than 0, then when servers are",
-	"lagged by this many seconds, issue a warning",
-	"if <seconds> is equal to 0, then disable Lag Monitoring",
+
+const char *ss_help_set_msglimit[] = {
+	"\2MSGLIMIT <count>\2",
+	"Limit alerts to <count> in MSGINTERVAL seconds.",
+	NULL
+};
+
+const char *ss_help_set_lagtime[] = {
+	"\2LAGTIME <seconds>\2",
+	"<seconds> is the time in seconds at which a server is",
+	"considered lagged.",
+	NULL
+};
+
+const char *ss_help_set_lagalert[] = {
+	"\2LAGALERT <alerttype>\2",
+	"Announce when a server on the network is lagged",
+	"Options for <alerttype> are:",
+	"    0 - Never",
+	"    1 - Announce in services channel",
+	"    2 - Announce by globops",
+	"    3 - Announce by wallops",
+	NULL
+};
+
+const char *ss_help_set_recordalert[] = {
+	"\2RECORDALERT <alerttype>\2",
+	"How StatServ announces new records on the network",
+	"Options for <alerttype> are:",
+	"    0 - Never",
+	"    1 - Announce in services channel",
+	"    2 - Announce by globops",
+	"    3 - Announce by wallops",
 	NULL
 };
 
