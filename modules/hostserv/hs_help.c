@@ -72,11 +72,13 @@ const char *hs_help_view[] = {
 const char *hs_help_list[] = {
 	"Syntax: \2LIST\2",
 	"        \2LIST <startpos>\2",
+	"        \2LIST <NICK|HOST|VHOST> <limit>\2",
 	"",
 	"Lists the vhosts stored in the database.",
 	"For detailed information on a vhost see \2HELP VIEW\2",
 	"20 vhosts are displayed at a time. To view other vhosts the",
 	"<startpos> parameter allows listing from that position.",
+	"<NICK|HOST|VHOST> display only those matching the wildcard <limit>.",
 	NULL
 };
 
@@ -143,5 +145,13 @@ const char *hs_help_set_operhosts[] = {
 const char *hs_help_set_verbose[] = {
 	"\2VERBOSE <ON/OFF>\2",
 	"Control HostServ verbosity",
+	NULL
+};
+
+const char *hs_help_set_addlevel[] = {
+	"\2ADDLEVEL <level>\2",
+	"Restricts the adding of VHOSTS for nicks,",
+	"other than the nick currently in use,",
+	"to this level or above",
 	NULL
 };

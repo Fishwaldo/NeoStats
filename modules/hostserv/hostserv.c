@@ -49,6 +49,7 @@ struct hs_cfg {
 	char vhostdom[MAXHOST];
 	int operhosts;
 	int verbose;
+	int addlevel;
 } hs_cfg;
 
 static int hs_event_signon( CmdParams *cmdparams );
@@ -59,6 +60,7 @@ static int hs_cmd_login( CmdParams *cmdparams );
 static int hs_cmd_chpass( CmdParams *cmdparams );
 static int hs_cmd_add( CmdParams *cmdparams );
 static int hs_cmd_list( CmdParams *cmdparams );
+static int hs_cmd_list_limit( CmdParams *cmdparams );
 static int hs_cmd_view( CmdParams *cmdparams );
 static int hs_cmd_del( CmdParams *cmdparams );
 
@@ -109,12 +111,13 @@ static bot_cmd hs_commands[]=
 /** Bot setting table */
 static bot_setting hs_settings[]=
 {
-	{"EXPIRE",		&hs_cfg.expire,		SET_TYPE_INT,		0, 99, 		NS_ULEVEL_ADMIN, "days",hs_help_set_expire,	hs_set_expire_cb,( void* )60 },
-	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_hiddenhost, hs_set_regnick_cb,( void* )0 },
-	{"HOSTNAME",	hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST, NS_ULEVEL_ADMIN, NULL,	hs_help_set_hostname,	NULL,( void* )"" },
-	{"OPERHOSTS",	&hs_cfg.operhosts,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_operhosts,	NULL,( void* )0 },
-	{"VERBOSE",		&hs_cfg.verbose,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_verbose,	NULL,( void* )1 },
-	{NULL,			NULL,				0,					0, 0, 		0,				 NULL,		  NULL,	NULL	},
+	{"EXPIRE",	&hs_cfg.expire,		SET_TYPE_INT,		0, 99, 		NS_ULEVEL_ADMIN, "days",hs_help_set_expire,	hs_set_expire_cb,	( void* )60	},
+	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_hiddenhost, hs_set_regnick_cb,	( void* )0	},
+	{"HOSTNAME",	hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST,	NS_ULEVEL_ADMIN, NULL,	hs_help_set_hostname,	NULL,			( void* )""	},
+	{"OPERHOSTS",	&hs_cfg.operhosts,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_operhosts,	NULL,			( void* )0	},
+	{"VERBOSE",	&hs_cfg.verbose,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_verbose,	NULL,			( void* )1	},
+	{"ADDLEVEL",	&hs_cfg.addlevel,	SET_TYPE_INT,		0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_addlevel,	NULL,			( void* )NS_ULEVEL_LOCOPER },
+	{NULL,		NULL,			0,			0, 0, 		0,				 NULL,		NULL,			NULL	},
 };
 
 /** BotInfo */
@@ -718,6 +721,10 @@ static int hs_cmd_add( CmdParams *cmdparams )
 	Client *u;
 
 	SET_SEGV_LOCATION();
+	if (cmdparams->source->user->ulevel < hs_cfg.addlevel && ircstrcasecmp(cmdparams->source->name, cmdparams->av[0])) {
+		irc_prefmsg( hs_bot, cmdparams->source, "VHOST may be added for current nick only (%s)", cmdparams->source->name );
+		return NS_SUCCESS;
+	}
 	hash_scan_begin( &hs, banhash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
 		ban =( banentry * ) hnode_get( hn );
@@ -776,7 +783,11 @@ static int hs_cmd_add( CmdParams *cmdparams )
  *  Command handler for LIST
  *
  *  @param cmdparams
- *    cmdparams->av[0] = optionally max number to display
+ *    cmdparams->av[0] = Optional Number to start display after
+ *   OR
+ *    cmdparams->av[0] = Limit Type (NICK|HOST|VHOST)
+ *    cmdparams->av[1] = wildcard match for Limit Type
+ *	Calls hs_cmd_list_limit if limit type specified
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -790,6 +801,11 @@ static int hs_cmd_list( CmdParams *cmdparams )
 	int vhostcount;
 
 	SET_SEGV_LOCATION();
+	if( cmdparams->ac == 2 ) {
+		if( !ircstrcasecmp(cmdparams->av[0], "nick") || !ircstrcasecmp(cmdparams->av[0], "host") || !ircstrcasecmp(cmdparams->av[0], "vhost")) {
+			return hs_cmd_list_limit(cmdparams);
+		}
+	}
 	if( cmdparams->ac == 1 ) {
 		start = atoi( cmdparams->av[0] );
 	}
@@ -828,6 +844,53 @@ static int hs_cmd_list( CmdParams *cmdparams )
 	irc_prefmsg( hs_bot, cmdparams->source, "End of list." );
 	if( vhostcount >= i ) {
 		irc_prefmsg( hs_bot, cmdparams->source, "Type \2/msg %s list %d\2 to see next %d", hs_bot->name, i-1, PAGESIZE );
+	}
+	return NS_SUCCESS;
+}
+
+static int hs_cmd_list_limit( CmdParams *cmdparams )
+{
+	int i;
+	int wm;
+	lnode_t *hn;
+	vhostentry *vhe;
+	int vhostcount;
+
+	if( !ircstrcasecmp(cmdparams->av[1], "*") ) {
+		irc_prefmsg( hs_bot, cmdparams->source, "%s wildcard too broad, Refine wildcard limit (%s).", cmdparams->av[0], cmdparams->av[1] );
+		return NS_SUCCESS;
+	}
+	vhostcount = list_count( vhost_list );
+	if( vhostcount == 0 ) {
+		irc_prefmsg( hs_bot, cmdparams->source, "No vhosts are defined." );
+		return NS_SUCCESS;
+	}
+	i = 1;
+	wm = 0;
+	irc_prefmsg( hs_bot, cmdparams->source, "Current vhost list: " );
+	irc_prefmsg( hs_bot, cmdparams->source, "Showing entries matching %s of %s", cmdparams->av[0], cmdparams->av[1]);
+	irc_prefmsg( hs_bot, cmdparams->source, "%-5s %-12s %-30s", "Num", "Nick", "Vhost" );
+	hn = list_first( vhost_list );
+	while( hn != NULL ) {
+		vhe = lnode_get( hn );
+		if ( (!ircstrcasecmp(cmdparams->av[0], "nick") && match(cmdparams->av[1], vhe->nick)) || (!ircstrcasecmp(cmdparams->av[0], "host") && match(cmdparams->av[1], vhe->host)) || (!ircstrcasecmp(cmdparams->av[0], "vhost") && match(cmdparams->av[1], vhe->vhost)) ) {
+			wm++;
+			/* limit to PAGESIZE entries per screen */
+			if ( wm <= PAGESIZE ) {
+				irc_prefmsg( hs_bot, cmdparams->source, "%-5d %-12s %-30s", i, vhe->nick, vhe->vhost );
+			} else {
+				break;
+			}
+		}
+		i++;
+		hn = list_next( vhost_list, hn );
+	}
+	irc_prefmsg( hs_bot, cmdparams->source, 
+		"For detailed information on a vhost use /msg %s VIEW <nick>",
+		hs_bot->name );
+	irc_prefmsg( hs_bot, cmdparams->source, "End of list." );
+	if( wm > PAGESIZE ) {
+		irc_prefmsg( hs_bot, cmdparams->source, "Not all matching entries shown, refine match to limit display");
 	}
 	return NS_SUCCESS;
 }
