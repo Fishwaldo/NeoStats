@@ -98,6 +98,10 @@ ircd_cmd cmd_list[] = {
 	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
 	{MSG_SMO, TOK_SMO, m_smo, 0},
 	{MSG_TKL, TOK_TKL, m_tkl, 0},
+	{MSG_GLOBOPS, TOK_GLOBOPS, _m_globops, 0},
+	{MSG_WALLOPS, TOK_WALLOPS, _m_wallops, 0},
+	{MSG_CHATOPS, TOK_CHATOPS, _m_chatops, 0},
+	{MSG_LOCOPS, TOK_LOCOPS, _m_locops, 0},
 	{0, 0, 0, 0},
 };
 

@@ -103,6 +103,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_PASS, TOK_PASS, _m_pass, 0},
 	{MSG_BURST, TOK_BURST, m_burst, 0},
 	{MSG_END_OF_BURST, TOK_END_OF_BURST, m_end_of_burst, 0},
+	{MSG_WALLOPS, TOK_WALLOPS, _m_wallops, 0},
 	{0, 0, 0, 0},
 };
 

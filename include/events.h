@@ -301,6 +301,34 @@ typedef enum Event {
  */
 	EVENT_CNOTICE,
 
+/*  EVENT_GLOBOPS
+ *    parameters:
+ *      from in cmdparams->source
+ *      message in cmdparams->param
+ */
+	EVENT_GLOBOPS,
+
+/*  EVENT_CHATOPS
+ *    parameters:
+ *      from in cmdparams->source
+ *      message in cmdparams->param
+ */
+	EVENT_CHATOPS,
+
+/*  EVENT_WALLOPS
+ *    parameters:
+ *      from in cmdparams->source
+ *      message in cmdparams->param
+ */
+	EVENT_WALLOPS,
+
+/*  EVENT_LOCOPS
+ *    parameters:
+ *      from in cmdparams->source
+ *      message in cmdparams->param
+ */
+	EVENT_LOCOPS,
+
 /*  CTCP events 
  *    Generated in response to ctcp events
  */

@@ -329,6 +329,86 @@ int InitIrcd( void )
  *  coders to concentrate on the areas that need it.
  */
 
+/** @brief _m_glopops
+ *
+ *  process GLOBOPS command
+ *  RX: :Mark GLOBOPS :test globops
+ *  GLOBOPS :message
+ *	argv[0] = message
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_globops( char* origin, char **av, int ac, int cmdptr )
+{
+	
+}
+
+/** @brief _m_wallops
+ *
+ *  process WALLOPS command
+ *  RX: :Mark WALLOPS :test wallops
+ *  WALLOPS :message
+ *	argv[0] = message
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_wallops( char* origin, char **av, int ac, int cmdptr )
+{
+	
+}
+
+/** @brief _m_chatops
+ *
+ *  process CHATOPS command
+ *  RX: :Mark CHATOPS :test chatops
+ *  CHATOPS :message
+ *	argv[0] = message
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_chatops( char* origin, char **av, int ac, int cmdptr )
+{
+	
+}
+
+/** @brief _m_locops
+ *
+ *  process LOCOPS command
+ *  RX: :Mark LOCOPS :test locops
+ *  CHATOPS :message
+ *	argv[0] = message
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_locops( char* origin, char **av, int ac, int cmdptr )
+{
+	
+}
+
 /** @brief _m_pass
  *
  *  process PASS command

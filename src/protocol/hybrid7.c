@@ -82,6 +82,9 @@ ircd_cmd cmd_list[] = {
 	{MSG_EOB, 0, m_burst, 0},
 	{MSG_SJOIN, 0, m_sjoin, 0},
 	{MSG_CAPAB, 0, _m_capab, 0},
+	{MSG_WALLOPS,	0, _m_wallops, 0},
+	{MSG_CHATOPS,	0, _m_chatops, 0},
+	{MSG_LOCOPS,	0, _m_locops, 0},
 	{0, 0, 0, 0},
 };
 

@@ -86,6 +86,10 @@ ircd_cmd cmd_list[] = {
 	{MSG_PASS,      0,      _m_pass,      0},
 	{MSG_SVSNICK,   0,   m_svsnick,   0},
 	{MSG_PROTOCTL,  0,  _m_protoctl,  0},
+	{MSG_GLOBOPS,	0, _m_globops, 0},
+	{MSG_WALLOPS,	0, _m_wallops, 0},
+	{MSG_CHATOPS,	0, _m_chatops, 0},
+	{MSG_LOCOPS,	0, _m_locops, 0},
 	{0, 0, 0, 0},
 };
 
