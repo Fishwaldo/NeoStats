@@ -360,6 +360,7 @@ load_module (char *modfilename, User * u)
 		if (do_msg) {
 			chanalert (ns_botptr->nick, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
 			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
+			nlog (LOG_WARNING, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
 		}
 		ns_dlclose (dl_handle);
 		free (mod_ptr);

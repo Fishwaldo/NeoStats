@@ -88,7 +88,7 @@ ModuleEvent module_events[] = {
 };
 
 
-int ModInit(int modnum, int apiver)
+int ModInit(Module* modptr)
 {
 	srconf.auth = 0;
 	/* only a max of 10 serviceroots */
