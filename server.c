@@ -32,6 +32,7 @@
 #include "ircd.h"
 #include "exclude.h"
 #include "server.h"
+#include "users.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
