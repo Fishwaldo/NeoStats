@@ -9,6 +9,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fixed a problem with floodcontrol crashing NeoStats BugID 18
  - Only opers can stats m
  - First Pass of Spliting up ircd.c to make IRCD porting easier
+ - Added some Doco Updates from M, and connectserv cleanups
 
 * NeoStats * Fish * Version 2.5.3
  - Added ability to turn off StatServ wallops. "/msg statserv set msgthrottle off" - BugID#6
