@@ -1446,7 +1446,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 /* SJOIN <TS> #<channel> <modes> :[@][+]<nick_1> ...  [@][+]<nick_n> */
 #ifndef NEW_STYLE_SPLITBUF
 void 
-do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc)
+do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **argv, int argc)
 {
 	char nick[MAXNICK];
 	char* nicklist;
@@ -1459,7 +1459,7 @@ do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan
 	list_t *tl; 
 
 	if (*modes == '#') {
-		join_chan (sjoinchan, modes);
+		join_chan (sjoinnick, modes);
 		return;
 	}
 	tl = list_create (10);
@@ -1530,13 +1530,13 @@ do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan
 }
 #else
 void 
-do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc)
+do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **argv, int argc)
 {
 	char nick[MAXNICK];
 	char* nicklist;
 	long mode = 0;
 	long mode1 = 0;
-	int ok = 1, i;
+	int ok = 1, i, j = 3;
 	ModesParm *m;
 	Chans *c;
 	lnode_t *mn = NULL;
@@ -1546,11 +1546,10 @@ do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan
 	int paramidx = 0;
 
 	if (*modes == '#') {
-		join_chan (sjoinchan, modes);
+		join_chan (sjoinnick, modes);
 		return;
 	}
 
-	paramcnt = split_buf(argv[offset], &param, 0);
 	tl = list_create (10);
 	if (*modes == '+') {
 		while (*modes) {
@@ -1559,7 +1558,7 @@ do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan
 					if (chan_modes[i].parameters) {
 						m = smalloc (sizeof (ModesParm));
 						m->mode = chan_modes[i].mode;
-						strlcpy (m->param, param[paramidx], PARAMSIZE);
+						strlcpy (m->param, argv[j], PARAMSIZE);
 						mn = lnode_create (m);
 						if (!list_isfull (tl)) {
 							list_append (tl, mn);
@@ -1567,7 +1566,7 @@ do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan
 							nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
 							do_exit (NS_EXIT_ERROR, "List full - see log file");
 						}
-						paramidx++;
+						j++;
 					} else {
 						mode1 |= chan_modes[i].mode;
 					}
@@ -1576,6 +1575,9 @@ do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan
 			modes++;
 		}
 	}
+
+	paramcnt = split_buf(argv[argc-1], &param, 0);
+		   
 	while (paramcnt > paramidx) {
 		nicklist = param[paramidx];
 		mode = 0;

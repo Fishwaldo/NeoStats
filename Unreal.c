@@ -722,7 +722,7 @@ static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
 	nlog (LOG_INFO, LOG_CORE, "SJOIN: %s", recbuf);
-	do_sjoin (argv[0], argv[1], argv[2], 4, origin, argv, argc);
+	do_sjoin (argv[0], argv[1], argv[2], origin, argv, argc);
 }
 
 /* m_pass

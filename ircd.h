@@ -89,7 +89,7 @@ void do_ping (const char* origin, const char *destination);
 void do_pong (const char* origin, const char* destination);
 void do_version (const char* nick, const char *remoteserver);
 void do_protocol (char *origin, char **argv, int argc);
-void do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc);
+void do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **argv, int argc);
 void do_netinfo (const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname);
 void do_snetinfo (const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname);
 void do_join (const char* nick, const char* chanlist, const char* keys);

@@ -307,10 +307,22 @@ send_globops (const char *from, const char *buf)
 	sts (":%s %s :%s", from, MSG_GLOBOPS, buf);
 }
 
+/* from SJOIN TS TS chan modebuf parabuf :nicks */
+/* from SJOIN TS TS chan modebuf :nicks */
+/* from SJOIN TS TS chan modebuf parabuf : */
+/* from SJOIN TS TS chan + :@nicks */
+/* from SJOIN TS TS chan 0 : */
+/* from SJOIN TS chan modebuf parabuf :nicks */
+/* from SJOIN TS chan modebuf :nicks */
+/* from SJOIN TS chan modebuf parabuf : */
+/* from SJOIN TS chan + :@nicks */
+/* from SJOIN TS chan 0 : */
+/* from SJOIN TS chan */
+
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
-	do_sjoin (argv[0], argv[1], ((argc > 4) ? argv[2] : argv[1]), 3, origin, argv, argc);
+	do_sjoin (argv[0], argv[1], ((argc <= 2) ? argv[1] : argv[2]), origin, argv, argc);
 }
 
 static void

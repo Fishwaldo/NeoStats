@@ -301,10 +301,11 @@ send_globops (const char *from, const char *buf)
 	sts (":%s %s :%s", from, MSG_WALLOPS, buf);
 }
 
+/* from SJOIN ts chan modes param:" */
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
-	do_sjoin (argv[0], argv[1], ((argc <= 2) ? argv[1] : argv[2]), 3, argv[4], argv, argc);
+	do_sjoin (argv[0], argv[1], ((argc <= 2) ? argv[1] : argv[2]), argv[4], argv, argc);
 }
 
 static void

@@ -456,10 +456,13 @@ send_globops (const char *from, const char *buf)
 }
 
 #ifdef ULTIMATE3
+/* :from SJOIN TS #chan modebuf  :nickbuf */
+/* :from SJOIN TS #chan modebuf parabuf :nickbuf */
+/* :from SJOIN TS #chan */
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
-	do_sjoin (argv[0], argv[1], ((argc <= 2) ? argv[1] : argv[2]), 3, origin, argv, argc);
+	do_sjoin (argv[0], argv[1], ((argc <= 2) ? argv[1] : argv[2]), origin, argv, argc);
 }
 
 static void
