@@ -16,10 +16,10 @@ const char csversion_time[] = __TIME__;
 char *s_ConnectServ;
 
 extern const char *cs_help[];
-static int cs_new_user(User *);
-static int cs_user_modes(User *);
-static int cs_del_user(User *);
-static int cs_user_kill(User *);
+int cs_new_user(char **av, int ac);
+int cs_user_modes(char **av, int ac);
+int cs_del_user(char **av, int ac);
+int cs_user_kill(char **av, int ac);
 
 static void cs_status(User *);
 static void cs_signwatch(User *u);
@@ -49,8 +49,8 @@ Module_Info my_info[] = { {
     "1.3"
 } };
 
-int new_m_version(char *av, char *tmp) {
-    snumeric_cmd(351, av, "Module ConnectServ Loaded, Version: %s %s %s",my_info[0].module_version,csversion_date,csversion_time);
+int new_m_version(char *origin, char **av, int ac) {
+    snumeric_cmd(351, origin, "Module ConnectServ Loaded, Version: %s %s %s",my_info[0].module_version,csversion_date,csversion_time);
     return 0;
 }
 
@@ -107,7 +107,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 
 }
 
-int Online(Server *data) {
+int Online(char **av, int ac) {
 
     if (init_bot(s_ConnectServ,"ConnectServ",me.name,"Network Connection & Mode Monitoring Service", "+oikSdwgleq-x", my_info[0].module_name) == -1 ) {
         /* Nick was in use */
@@ -140,19 +140,11 @@ EventFnList *__module_get_events() {
 
 
 void _init() {
-    User *u;
-    hnode_t *node;
-    hscan_t scan;
-
     Loadconfig();
 
     s_ConnectServ = "ConnectServ";
     globops(me.name, "ConnectServ Module Loaded",me.name);
 
-   hash_scan_begin(&scan, uh);
-   while ((node = hash_scan_next(&scan)) != NULL ) {
-   	u = hnode_get(node);
-   }
 }
 
 void _fini() {
@@ -198,10 +190,11 @@ void SaveSettings()
 
 
 /* Routine for SIGNON message to be echoed */
-static int cs_new_user(User *u) {
+int cs_new_user(char **av, int ac) {
+    User *u;
     /* Approximate Segfault Location */
     strcpy(segv_location, "cs_new_user");
-
+    u = finduser(av[0]);
     /* Print Connection Notice */
     if (sign_watch) {
     notice(s_ConnectServ, "\2SIGNON\2 %s (%s@%s) has Signed on at %s", u->nick, u->username, u->hostname, u->server->name);
@@ -212,12 +205,12 @@ static int cs_new_user(User *u) {
 
 
 /* Routine for SIGNOFF message to be echoed */
-static int cs_del_user(User *u) {
+int cs_del_user(char **av, int ac) {
     char *cmd, *lcl, *QuitMsg, *KillMsg;
-
+    User *u;
     /* Approximate Segfault Location */
     strcpy(segv_location, "cs_del_user");
-
+    u = finduser(av[0]);
     cmd = sstrdup(recbuf);
 	lcl = sstrdup(recbuf);
 
@@ -244,21 +237,22 @@ static int cs_del_user(User *u) {
 	}
 	free(QuitMsg);
 
-    if (findbot(u->nick)) return 1;
   return 1;
 }
 
 
 /* Routine for MODES message to be echoed */
-static int cs_user_modes(User *u) {
+int cs_user_modes(char **av, int ac) {
     int add = 1;
     char *modes;
+    User *u;
 
     /* Approximate Segfault Location */
     strcpy(segv_location, "cs_user_modes");
 
     if (mode_watch != 1) return -1;
 
+    u = finduser(av[0]);
     if (!u) {
         cslog("Changing modes for unknown user: %s", u->nick);
         return -1;
@@ -266,10 +260,13 @@ static int cs_user_modes(User *u) {
   
     if (!u->modes) return -1; 
     modes = u->modes;
+    switch (*av[1]) {
+    	case '+': add = 1;	break;
+        case '-': add = 0;	break;
+    }
 
-    while (*modes++) {
-
-        switch(*modes) {
+    while (*av[1]++) {
+        switch(*av[1]) {
             case '+': add = 1;    break;
             case '-': add = 0;    break;
             case 'N':
@@ -351,12 +348,12 @@ static int cs_user_modes(User *u) {
 
 
 /* Routine for KILL message to be echoed */
-static int cs_user_kill(User *u) {
+int cs_user_kill(char **av, int ac) {
     char *cmd, *GlobalMsg;
-
+    User *u;
     /* Approximate Segfault Location */
     strcpy(segv_location, "cs_user_kill");
-
+    u = finduser(av[0]);
     cmd = sstrdup(recbuf);
     KillCount = split_buf(cmd, &Kill, 0);
 	GlobalMsg = joinbuf (Kill, KillCount, 4);
