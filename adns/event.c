@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: event.c,v 1.4 2003/08/19 13:08:13 fishwaldo Exp $
+** $Id$
 */
 /*
  * event.c

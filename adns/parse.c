@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: parse.c,v 1.3 2003/06/13 14:44:36 fishwaldo Exp $
+** $Id$
 */
 /*
  * parse.c

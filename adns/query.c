@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: query.c,v 1.4 2003/06/13 14:44:36 fishwaldo Exp $
+** $Id$
 */
 /*
  * query.c

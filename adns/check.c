@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: check.c,v 1.3 2003/06/13 14:44:35 fishwaldo Exp $
+** $Id$
 */
 /*
  * check.c

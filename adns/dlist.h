@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dlist.h,v 1.3 2003/05/26 09:18:29 fishwaldo Exp $
+** $Id$
 */
 /*
  * dlist.h
