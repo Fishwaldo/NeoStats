@@ -532,7 +532,6 @@ m_privmsg (int cmdptr, char* origin, char **av, int ac)
 		}
 		/* its to the Internal Services Bot */
 		servicesbot (origin, av, ac);
-		SET_SEGV_LOCATION();
 		return;
 	} else {
 		mod_usr = findbot (av[0]);
@@ -566,7 +565,6 @@ m_privmsg (int cmdptr, char* origin, char **av, int ac)
 				}
 			}
 			CLEAR_SEGV_INMODULE();
-			SET_SEGV_LOCATION();
 			return;
 		} else {
 			bot_chan_message (origin, av, ac);

@@ -790,7 +790,9 @@ bot_chan_message (char *origin, char **av, int ac)
 		mod_usr = findbot (lnode_get (bmn));
 		if (mod_usr->chanfunc) {
 			nlog (LOG_DEBUG2, LOG_CORE, "bot_chan_message: running module for chanmessage %s", av[0]);
+			SET_SEGV_INMODULE(mod_usr->modname);
 			mod_usr->chanfunc (origin, av, ac);
+			CLEAR_SEGV_INMODULE();
 		}
 		bmn = list_next (mod_chan_bot->bots, bmn);
 	}
