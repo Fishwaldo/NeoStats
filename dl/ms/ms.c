@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ms.c,v 1.9 2003/01/04 04:56:03 fishwaldo Exp $
+** $Id: ms.c,v 1.10 2003/01/21 13:09:24 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -221,12 +221,12 @@ EventFnList *__module_get_events() {
     return my_event_list;
 };
 
-static void _init() {
+void _init() {
     s_MoraleServ = "MoraleServ";
 }
 
 
-static void _fini() {
+void _fini() {
 };
 
 

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.h,v 1.16 2003/01/13 07:20:53 fishwaldo Exp $
+** $Id: Ultimate.h,v 1.17 2003/01/21 13:09:23 fishwaldo Exp $
 */
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
@@ -314,6 +314,7 @@
 #define MSG_BURST	"BURST"
 #define MSG_SJOIN	"SJOIN"
 #define MSG_CLIENT	"CLIENT"
+#define MSG_SMODE	"SMODE"
 
 
 

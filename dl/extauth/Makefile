@@ -11,8 +11,8 @@ all:	extauth
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-extauth: $(SOURCES)
-	$(CC) $(MODLDFLAGS) $(INCLUDES) $(CFLAGS) -o $(TARGET) $(LIBS) $(SOURCES)
+extauth: $(OBJECTS)
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
 	/bin/cp $(TARGET) ../
 
 clean:

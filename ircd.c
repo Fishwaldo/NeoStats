@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.107 2003/01/15 14:18:47 fishwaldo Exp $
+** $Id: ircd.c,v 1.108 2003/01/21 13:09:23 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -73,6 +73,7 @@ void Srv_Tburst(char *origin, char **argv, int argc);
 #endif
 #ifdef ULTIMATE3
 void Srv_Client(char *, char **, int argc);
+void Srv_Smode(char *origin, char **argv, int argc);
 #endif
 
 static void ShowMOTD(char *);
@@ -251,6 +252,7 @@ IntCommands cmd_list[] = {
 	{MSG_BURST,	Srv_Burst, 		0, 	0},
 	{MSG_SJOIN,	Srv_Sjoin,		1,	0},
 	{MSG_CLIENT,	Srv_Client,		0,	0},
+	{MSG_SMODE,	Srv_Smode, 		1, 	0},
 #endif
 	{MSG_VCTRL,	Srv_Vctrl, 		0, 	0},
 	{TOK_VCTRL,	Srv_Vctrl, 		0, 	0},
@@ -1243,6 +1245,7 @@ void Srv_Client(char *origin, char **argv, int argc) {
 			Module_Event("UMODE", av, ac);
 			free(av);
 //			FreeList(av, ac);
+			ac = 0;
 #ifdef ULTIMATE3
 			AddStringToList(&av, argv[0], &ac);
 #ifdef DEBUG
@@ -1250,12 +1253,24 @@ void Srv_Client(char *origin, char **argv, int argc) {
 #endif
 			UserMode(argv[0], argv[4], 1);
 			AddStringToList(&av, argv[4], &ac);
-			Module_Event("UMODE", av, ac);
+			Module_Event("SMODE", av, ac);
 			free(av);
 //			FreeList(av, ac);
 #endif
 
 }
+
+void Srv_Smode(char *origin, char **argv, int argc) {
+			char **av;
+			int ac = 0;
+			AddStringToList(&av, argv[0], &ac);
+			AddStringToList(&av, argv[1], &ac);
+			UserMode(argv[0], argv[1], 1);
+			Module_Event("SMODE", av, ac);
+			free(av);
+};
+			 
+
 #endif
 void Srv_Svsnick(char *origin, char **argv, int argc) {
 			User *u;

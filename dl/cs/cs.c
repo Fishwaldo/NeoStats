@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.14 2002/10/14 01:06:20 shmad Exp $
+** $Id: cs.c,v 1.15 2003/01/21 13:09:23 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -147,6 +147,7 @@ EventFnList my_event_list[] = {
     { "ONLINE", Online},
     { "SIGNON", cs_new_user},
     { "UMODE", cs_user_modes},
+    { "SMODE", cs_user_modes},
     { "SIGNOFF", cs_del_user},
     { "KILL", cs_user_kill},
     { "NICK_CHANGE", cs_user_nick},
