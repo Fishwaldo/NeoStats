@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.41 2003/07/15 10:34:24 fishwaldo Exp $
+** $Id: stats.c,v 1.42 2003/09/11 13:08:15 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -64,26 +64,100 @@ CVersions *findversions(char *name)
 	return cv;
 }
 
+#define ATTR_BOLD '\002'
+#define ATTR_COLOR '\003'
+#define ATTR_BEEP '\007'
+#define ATTR_RESET '\017'
+#define ATTR_REVERSE '\026'
+#define ATTR_ESCAPE '\033'
+#define ATTR_UNDERLINE '\037'
+#define ATTR_STAR '*'
+#define ATTR_QUESTION '?'
+
+/* this came form X-Chat if I remember correctly. Credit due where Credit Due */
+
+unsigned char *
+Strip_Colors (unsigned char *text, int len, unsigned char *outbuf, int *newlen)
+{
+	int nc = 0;
+	int i = 0;
+	int col = -1;
+	unsigned char *new_str;
+
+	if (outbuf == NULL)
+		new_str = malloc (len + 2);
+	else
+		new_str = outbuf;
+
+	while (len > 0)
+	{
+		if ((col && isdigit (*text) && nc < 2) ||
+			 (col && *text == ',' && isdigit (*(text+1)) && nc < 3))
+		{
+			nc++;
+			if (*text == ',')
+				nc = 0;
+		} else
+		{
+			col = -1;
+			switch (*text)
+			{
+			case ATTR_COLOR:
+				col = 1;
+				nc = 0;
+				break;
+			case ATTR_BEEP:
+			case ATTR_RESET:
+			case ATTR_REVERSE:
+			case ATTR_BOLD:
+			case ATTR_UNDERLINE:
+			case ATTR_STAR:
+			case ATTR_QUESTION:
+				break;
+			default:
+				if ((int)*text > 127) 
+					break;
+				new_str[i] = *text;
+					i++;
+			}
+		}
+		text++;
+		len--;
+	}
+
+	new_str[i] = 0;
+
+	if (newlen != NULL)
+		*newlen = i;
+
+	return new_str;
+}
+
 
 int s_client_version(char **av, int ac)
 {
 	lnode_t *node;
 	CVersions *clientv;
+	char *nocols;
+	
+	nocols = Strip_Colors(av[1], strlen(av[1]), NULL, NULL);
 
-	clientv = findversions(av[1]);
+	clientv = findversions(nocols);
 	if (clientv) {
 		nlog(LOG_DEBUG2, LOG_MOD, "Found Client Version Node %s",
-		     av[1]);
+		     nocols);
 		clientv->count++;
+		free(nocols);
 		return 1;
 	}
 	clientv = malloc(sizeof(CVersions));
-	strncpy(clientv->name, av[1], 512);
+	strncpy(clientv->name, nocols, 512);
 	clientv->count = 1;
 	node = lnode_create(clientv);
 	list_append(Vhead, node);
 	nlog(LOG_DEBUG2, LOG_MOD, "Added Version to List %s",
 	     clientv->name);
+	free(nocols);
 	return 1;
 }
 

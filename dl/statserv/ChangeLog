@@ -4,6 +4,7 @@ Shmad & ^Enigma & Fish^
 (F) denotes Fish
 * Version 3.10 * Sep 11th, 2003 (F)
  - Added clientstats to html output
+ - strip colors/underlines etc from client versions
 * Version 3.9 * July 15th, 2003 (F)
  - Fixed a minor problem with oper counting. 
 
