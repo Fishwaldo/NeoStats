@@ -3,25 +3,6 @@
 #include <io.h> /* needed in nearly all files */
 #endif
 
-#ifdef STATIC_BUILD
-# define DLLIMPORT
-# define DLLEXPORT
-#else
-#ifdef WIN32
-# define DLLEXPORT __declspec(dllexport)      // dll-creation
-# define DLLIMPORT __declspec(dllimport)
-#else
-# define DLLIMPORT                            // static lib
-# define DLLEXPORT
-#endif
-#endif
-
-#ifdef USE_DLL
-# define IMEXPORT DLLIMPORT
-#else
-# define IMEXPORT DLLEXPORT
-#endif
-
 /* Define to empty if platform is not WINDOWS (which has nearly nothing by default) */
 #define HAVE_NOTHING 1
 

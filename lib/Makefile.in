@@ -185,9 +185,6 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 wi_PWD = @wi_PWD@
 SUBDIRS = adns pcre curl event
-EXTRA_DIST = gdbm/autoconf.h.in gdbm/gdbmdefs.h gdbm/gdbmerrno.h gdbm/extern.h \
-		  gdbm/systems.h gdbm/gdbmconst.h gdbm/proto.h
-
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
@@ -356,7 +353,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/../autotools $(distdir)/gdbm
+	$(mkdir_p) $(distdir)/../autotools
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
