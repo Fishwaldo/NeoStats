@@ -111,7 +111,7 @@ static CVersions *findversions(char *name)
 	if (cn) {
 		cv = lnode_get(cn);
 	} else {
-		nlog(LOG_DEBUG2, LOG_MOD, "findversions(%s) -> NOT FOUND",
+		nlog(LOG_DEBUG2, "findversions(%s) -> NOT FOUND",
 		     name);
 		return NULL;
 	}
@@ -130,7 +130,7 @@ int save_client_versions(void)
 		while (cn != NULL) {
 			cv = lnode_get(cn);
 			fwrite(cv, sizeof(CVersions), 1, output);	
-			nlog(LOG_DEBUG2, LOG_MOD, "Save version %s", cv->name);
+			nlog(LOG_DEBUG2, "Save version %s", cv->name);
 			cn = list_next(Vhead, cn);
 		}
 		fclose(output);
@@ -151,7 +151,7 @@ int load_client_versions(void)
 			fread(clientv, sizeof(CVersions), 1, input);	
 			node = lnode_create(clientv);
 			list_append(Vhead, node);
-			nlog(LOG_DEBUG2, LOG_MOD, "Loaded version %s", clientv->name);
+			nlog(LOG_DEBUG2, "Loaded version %s", clientv->name);
 		}
 		fclose(input);
 	}
@@ -168,7 +168,7 @@ int s_client_version(char **av, int ac)
 	
 	clientv = findversions(nocols);
 	if (clientv) {
-		nlog(LOG_DEBUG2, LOG_MOD, "Found Client Version Node %s",
+		nlog(LOG_DEBUG2, "Found Client Version Node %s",
 		     nocols);
 		clientv->count++;
 		return 1;
@@ -178,7 +178,7 @@ int s_client_version(char **av, int ac)
 	clientv->count = 1;
 	node = lnode_create(clientv);
 	list_append(Vhead, node);
-	nlog(LOG_DEBUG2, LOG_MOD, "Added Version to List %s",
+	nlog(LOG_DEBUG2, "Added Version to List %s",
 	     clientv->name);
 	return 1;
 }
@@ -224,7 +224,7 @@ int s_chan_del(char **av, int ac)
 		lnode_destroy(ln);
 		free(cs);
 	} else {
-		nlog(LOG_WARNING, LOG_MOD, "Ehhh, Couldn't find channel %s when deleting out of stats", av[0]);
+		nlog(LOG_WARNING, "Ehhh, Couldn't find channel %s when deleting out of stats", av[0]);
 	}
 	return 1;
 }
@@ -319,7 +319,7 @@ CStats *findchanstats(char *name)
 	if (cn) {
 		cs = lnode_get(cn);
 	} else {
-		nlog(LOG_DEBUG2, LOG_MOD, "findchanstats(%s) -> NOT FOUND",
+		nlog(LOG_DEBUG2, "findchanstats(%s) -> NOT FOUND",
 		     name);
 		return NULL;
 	}
@@ -352,7 +352,7 @@ CStats *AddChanStats(char *name)
 	cs->lastseen = me.now;
 	cn = lnode_create(cs);
 	if (list_isfull(Chead)) {
-		nlog(LOG_CRITICAL, LOG_MOD,
+		nlog(LOG_CRITICAL,
 		     "Eeek, Can't add Channel to Statserv Channel Hash. Has is full");
 	} else {
 		list_append(Chead, cn);
@@ -422,7 +422,7 @@ int s_user_kill(char **av, int ac)
 	}
 	s = findstats(u->server->name);
 	if (is_oper(u)) {
-		nlog(LOG_DEBUG2, LOG_MOD, "Decreasing OperCount on %s due to kill", u->server->name);
+		nlog(LOG_DEBUG2, "Decreasing OperCount on %s due to kill", u->server->name);
 		DecreaseOpers(s);
 	}
 	if (u->is_away == 1) {
@@ -467,13 +467,13 @@ int s_user_modes(char **av, int ac)
 	}
 	s = findstats(u->server->name);
 	if (!s) {
-		nlog(LOG_WARNING, LOG_MOD,
+		nlog(LOG_WARNING,
 			"Hrm, Couldn't find stats for %s", u->server->name);
 		return -1;
 	}
 
 	if (ac < 2) {
-		nlog(LOG_WARNING, LOG_MOD, "Didn't get mode for Umode Event");
+		nlog(LOG_WARNING, "Didn't get mode for Umode Event");
 		return -1;
 	}
 	modes = av[1];
@@ -488,7 +488,7 @@ int s_user_modes(char **av, int ac)
 		case 'O':
 		case 'o':
 			if (add) {
-				nlog(LOG_DEBUG1, LOG_MOD, "Increasing OperCount for %s (%d)", u->server->name, s->opers);
+				nlog(LOG_DEBUG1, "Increasing OperCount for %s (%d)", u->server->name, s->opers);
 				IncreaseOpers(s);
 				if (stats_network.maxopers <
 				    stats_network.opers) {
@@ -511,7 +511,7 @@ int s_user_modes(char **av, int ac)
 				}
 			} else {
 				if (is_oper(u)) {
-					nlog(LOG_DEBUG1, LOG_MOD, "Decreasing OperCount for %s", u->server->name);
+					nlog(LOG_DEBUG1, "Decreasing OperCount for %s", u->server->name);
 					DecreaseOpers(s);
 				}
 			}
@@ -541,7 +541,7 @@ int s_del_user(char **av, int ac)
 	if (!u->modes)
 		return -1;
 	if (is_oper(u)) {
-		nlog(LOG_DEBUG2, LOG_MOD, "Decreasing OperCount on %s due to signoff", u->server->name);
+		nlog(LOG_DEBUG2, "Decreasing OperCount on %s due to signoff", u->server->name);
 		DecreaseOpers(s);
 	}
 	if (u->is_away == 1) {
@@ -604,7 +604,7 @@ int s_new_user(char **av, int ac)
 	s = findstats(u->server->name);
 	IncreaseUsers(s);
 
-	nlog(LOG_DEBUG2, LOG_MOD, "added a User %s to stats, now at %d",
+	nlog(LOG_DEBUG2, "added a User %s to stats, now at %d",
 	     u->nick, s->users);
 
 	if (s->maxusers < s->users) {
@@ -680,23 +680,22 @@ int pong(char **av, int ac)
 
 extern bot_cmd ss_commands[];
 extern bot_setting ss_settings[];
-ModUser *ss_bot;
+Bot *ss_bot;
+static Module* ss_module;
 
 int Online(char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	ss_bot = init_mod_bot(s_StatServ, StatServ.user, StatServ.host, StatServ.realname,
-		 services_bot_modes, BOT_FLAG_ONLY_OPERS|BOT_FLAG_DEAF, ss_commands, ss_settings, __module_info.module_name);
+	ss_bot = init_bot(ss_module, s_StatServ, StatServ.user, StatServ.host, StatServ.realname,
+		 services_bot_modes, BOT_FLAG_ONLY_OPERS|BOT_FLAG_DEAF, ss_commands, ss_settings);
 
 	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */
-	add_mod_timer("SaveStats", "Save_Stats_DB", __module_info.module_name, DBSAVETIME);
-
-	add_mod_timer("ss_html", "TimerWeb", __module_info.module_name, 3600);
-
+	add_timer (ss_module, SaveStats, "SaveStats", DBSAVETIME);
+	add_timer (ss_module, ss_html, "ss_html", 3600);
 	/* also add a timer to check if its midnight (to reset the daily stats */
-	add_mod_timer("Is_Midnight", "Daily_Stats_Reset", __module_info.module_name, 60);
-	add_mod_timer("DelOldChan", "DelOldStatServChans", __module_info.module_name, 3600);
+	add_timer (ss_module, StatsMidnight, "StatsMidnight", 60);
+	add_timer (ss_module, DelOldChan, "DelOldChan", 3600);
 
 
 	return 1;
@@ -710,10 +709,10 @@ extern SStats *new_stats(const char *name)
 	SStats *s = calloc(sizeof(SStats), 1);
 
 	SET_SEGV_LOCATION();
-	nlog(LOG_DEBUG2, LOG_MOD, "new_stats(%s)", name);
+	nlog(LOG_DEBUG2, "new_stats(%s)", name);
 
 	if (!s) {
-		nlog(LOG_CRITICAL, LOG_MOD, "Out of memory.");
+		nlog(LOG_CRITICAL, "Out of memory.");
 		FATAL_ERROR("Out of memory.")
 	}
 
@@ -737,7 +736,7 @@ extern SStats *new_stats(const char *name)
 	s->serverkills = 0;
 	sn = hnode_create(s);
 	if (hash_isfull(Shead)) {
-		nlog(LOG_CRITICAL, LOG_MOD,
+		nlog(LOG_CRITICAL,
 		     "Eeek, StatServ Server hash is full!");
 	} else {
 		hash_insert(Shead, sn, s->name);
@@ -750,7 +749,7 @@ void AddStats(Server * s)
 	SStats *st = findstats(s->name);
 
 	SET_SEGV_LOCATION();
-	nlog(LOG_DEBUG2, LOG_MOD, "AddStats(%s)", s->name);
+	nlog(LOG_DEBUG2, "AddStats(%s)", s->name);
 
 	if (!st) {
 		st = new_stats(s->name);
@@ -767,17 +766,17 @@ SStats *findstats(char *name)
 
 	sn = hash_lookup(Shead, name);
 	if (sn) {
-		nlog(LOG_DEBUG2, LOG_MOD, "findstats(%s) - Found", name);
+		nlog(LOG_DEBUG2, "findstats(%s) - Found", name);
 		return hnode_get(sn);
 	} else {
-		nlog(LOG_DEBUG2, LOG_MOD, "findstats(%s) - NOT Found", name);
+		nlog(LOG_DEBUG2, "findstats(%s) - NOT Found", name);
 		return NULL;
 	}
 }
 
 
 
-void Is_Midnight()
+void StatsMidnight()
 {
 	struct tm *ltm = localtime(&me.now);
 	lnode_t *cn;
@@ -789,7 +788,7 @@ void Is_Midnight()
 			/* its Midnight! */
 			chanalert(s_StatServ,
 				  "Reseting Daily Statistics - Its Midnight here!");
-			nlog(LOG_DEBUG1, LOG_MOD,
+			nlog(LOG_DEBUG1,
 			     "Resetting Daily Statistics");
 			daily.servers = stats_network.servers;
 			daily.t_servers = me.now;

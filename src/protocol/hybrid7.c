@@ -396,6 +396,16 @@ m_away (char *origin, char **argv, int argc, int srv)
 	do_away (origin, (argc > 0) ? argv[0] : NULL);
 }
 
+/*  m_nick
+ *    argv[0] = nickname
+ *    argv[1] = hop count
+ *    argv[2] = TS
+ *    argv[3] = umode
+ *    argv[4] = username
+ *    argv[5] = hostname
+ *    argv[6] = server
+ *    argv[7] = ircname
+ */
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
@@ -423,7 +433,7 @@ m_topic (char *origin, char **argv, int argc, int srv)
 	} else if (findserver(origin)) {
 		do_topic (argv[0], argv[1], argv[2], argv[3]);
 	} else {
-		nlog(LOG_WARNING, LOG_CORE, "m_topic: can't find topic setter %s for topic %s", origin, argv[1]); 
+		nlog(LOG_WARNING, "m_topic: can't find topic setter %s for topic %s", origin, argv[1]); 
 	}
 }
 

@@ -108,7 +108,7 @@ do_sql(char *buf, int *nbuf)
       break;
 
     default:
-      nlog(LOG_CORE, LOG_NOTICE, "SQLSRC error: no SQL cmd\n");
+      nlog(LOG_NOTICE, "SQLSRC error: no SQL cmd\n");
       break;
   }
 }

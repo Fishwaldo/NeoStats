@@ -460,6 +460,26 @@ typedef struct Channel {
 	void *moddata[NUM_MODULES];
 } Channel;
 
+/** @brief Client structure
+ *  work in progress
+ */
+/*
+typedef struct Client {
+do we use:
+	User* user;
+	Server* server;
+or:
+	source sptr;
+	dest dptr;
+	int command;
+	int flags;
+	int sock;
+	char **av;
+	int ac;
+	char param[BUFSIZE];
+	void *moddata[NUMMODS];
+} Client; */
+
 /** @brief ModesParm structure
  *  
  */
@@ -570,14 +590,151 @@ typedef int (*timer_function) (void);
 /** @brief Socket function types
  * 
  */
-typedef int (*socket_function) (int sock_no, char *sockname);
+typedef int (*socket_function) (int sock_no, char *name);
 typedef int (*before_poll_function) (void *data, struct pollfd *);
 typedef void (*after_poll_function) (void *data, struct pollfd *, unsigned int);
 
 
+/* socket interface type */
+#define SOCK_POLL 1
+#define SOCK_STANDARD 2
+
+/** @brief ModuleEvent functions structure
+ * 
+ */
+typedef int (*event_function) (char **av, int ac);
+
+typedef struct ModuleEvent {
+	char *cmd_name;
+	event_function function;
+}ModuleEvent;
+
+/** @brief Module Info structure
+ * 
+ */
+typedef struct ModuleInfo {
+	char *module_name;
+	char *module_description;
+	char *module_author;
+	char *module_neostats_version;
+	char *module_version;
+	char *module_build_date;
+	char *module_build_time;
+	char *reserved;
+}ModuleInfo;
+
+typedef int (*mod_auth) (User * u);
+
+/** @brief Module structure
+ * 
+ */
+typedef struct Module {
+	ModuleInfo *info;
+	ModuleEvent *event_list;
+	mod_auth mod_auth_cb;
+	void *dl_handle;
+}Module;
+
+/** @brief Module socket list structure
+ * 
+ */
+typedef struct Sock {
+	/** Owner module ptr */
+	Module* moduleptr;
+	/** Socket number */
+	int sock_no;
+	/** Socket name */
+	char name[MAX_MOD_NAME];
+	/** socket interface (poll or standard) type */
+	int socktype;
+	/** if socktype = SOCK_POLL, before poll function */
+	/** Socket before poll function */
+	before_poll_function beforepoll;
+	/** Socket after poll function */
+	after_poll_function afterpoll;
+	/** data */
+	void *data;
+	/* if socktype = SOCK_STANDARD, function calls */
+	/** Socket read function */
+	socket_function readfnc;
+	/** Socket write function */
+	socket_function writefnc;
+	/** Socket error function */
+	socket_function errfnc;
+	/** rmsgs */
+	long rmsgs;
+	/** rbytes */
+	long rbytes;
+} Sock;
+
+/** @brief Module Timer structure
+ * 
+ */
+typedef struct Timer {
+	/** Owner module ptr */
+	Module* moduleptr;
+	/** Timer type */
+	int type;
+	/** Timer name */
+	char name[MAX_MOD_NAME];
+	/** Timer interval */
+	int interval;
+	/** Time last run */
+	time_t lastrun;
+	/** Timer function */
+	timer_function function;
+} Timer;
+
+/** @brief BotInfo structure
+ * 
+ */
+
+typedef struct BotInfo {
+	char nick[MAXNICK];
+	char user[MAXUSER];
+	char host[MAXHOST];
+	char realname[MAXREALNAME];
+} BotInfo;
+
+/** @brief Bot structure
+ * 
+ */
+
+typedef struct Bot {
+	/** Owner module ptr */
+	Module* moduleptr;
+	/** Nick */
+	char nick[MAXNICK];
+	/* bot flags */
+	unsigned int flags;
+	/* hash for command list */
+	hash_t *botcmds;
+	/* hash for settings */
+	bot_setting *bot_settings;
+	/* min ulevel for settings */
+	unsigned int set_ulevel;
+	/** channel message function */
+	message_function chanfunc;
+}Bot;
+
+int add_timer (Module* moduleptr, timer_function func, char* name, int interval);
+int del_timer (char *timer_name);
+int set_timer_interval (char *timer_name, int interval);
+Timer *findtimer(char *timer_name);
+
+int add_socket (Module* moduleptr, socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum);
+int add_sockpoll (Module* moduleptr, before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, void *data);
+int del_socket (char *name);
+Sock *findsock (char *sock_name);
+
+Bot * init_bot (Module* modptr, char * nick, char * user, char * host, char * realname, const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list);
+int del_bot (Bot *botptr, char * reason);
+Bot *findbot (char * bot_name);
+int bot_nick_change (char * oldnick, char *newnick);
+
 /* sock.c */
-int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, socket_function func_read, socket_function func_write, socket_function func_error);
-int sock_disconnect (char *sockname);
+int sock_connect (Module* moduleptr, int socktype, unsigned long ipaddr, int port, char *module, socket_function func_read, socket_function func_write, socket_function func_error);
+int sock_disconnect (char *name);
 
 /* conf.c */
 int ConfLoad (void);
@@ -608,8 +765,6 @@ int flood (User * u);
 int join_bot_to_chan (const char *who, const char *chan, unsigned long chflag);
 
 /* (M) For backwards compatibility only, bots are moving to a new interface */
-int init_bot (char * nick, char * user, char * host, char * realname, const char *modes, char * modname);
-int del_bot (char * nick, char * reason);
 void privmsg_list (char *to, char *from, const char **text);
 void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 void privmsg (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
@@ -684,10 +839,8 @@ int test_chan_user_mode(char* chan, char* nick, int flag);
 int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);
 
 /* services.c */
-int init_services(void);
 int add_services_cmd_list(bot_cmd* bot_cmd_list);
 int del_services_cmd_list(bot_cmd* bot_cmd_list);
-void services_cmd_help (User * u, char **av, int ac);
 int is_target_valid(char* bot_name, User* u, char* target_nick);
 
 /* transfer.c stuff */
@@ -724,139 +877,6 @@ void* DBGetData(char* key);
 void DBSetData(char* key, void * data, int size);
 #endif
 
-/* socket interface type */
-#define SOCK_POLL 1
-#define SOCK_STANDARD 2
-
-/** @brief Module socket list structure
- * 
- */
-typedef struct ModSock {
-	/** Socket number */
-	int sock_no;
-	/** Socket name */
-	char sockname[MAX_MOD_NAME];
-	/** socket interface (poll or standard) type */
-	int socktype;
-	/** if socktype = SOCK_POLL, before poll function */
-	/** Socket before poll function */
-	before_poll_function beforepoll;
-	/** Socket after poll function */
-	after_poll_function afterpoll;
-	/** data */
-	void *data;
-	/* if socktype = SOCK_STANDARD, function calls */
-	/** Socket read function */
-	socket_function readfnc;
-	/** Socket write function */
-	socket_function writefnc;
-	/** Socket error function */
-	socket_function errfnc;
-	/** Module name */
-	char modname[MAX_MOD_NAME];
-	/** rmsgs */
-	long rmsgs;
-	/** rbytes */
-	long rbytes;
-}ModSock;
-
-/** @brief Module Timer structure
- * 
- */
-typedef struct ModTimer {
-	/** Module name */
-	char modname[MAX_MOD_NAME];
-	/** Timer name */
-	char timername[MAX_MOD_NAME];
-	/** Timer interval */
-	int interval;
-	/** Time last run */
-	time_t lastrun;
-	/** Timer function */
-	timer_function function;
-}ModTimer;
-
-/** @brief Module User structure
- * 
- */
-
-typedef struct ModUser {
-	/** Nick */
-	char nick[MAXNICK];
-	/** Module name */
-	char modname[MAX_MOD_NAME];
-	/* bot flags */
-	unsigned int flags;
-	/* hash for command list */
-	hash_t *botcmds;
-	/* hash for settings */
-	bot_setting *bot_settings;
-	/* min ulevel for settings */
-	unsigned int set_ulevel;
-	/** channel message function */
-	message_function chanfunc;
-}ModUser;
-
-/** @brief Channel bot structure
- * 
- */
-typedef struct ModChanBot {
-	/** channel name */
-	char chan[CHANLEN];
-	/** bot list */
-	list_t *bots;
-}ModChanBot;
-
-/** @brief ModuleEvent functions structure
- * 
- */
-typedef int (*event_function) (char **av, int ac);
-
-typedef struct ModuleEvent {
-	char *cmd_name;
-	event_function function;
-}ModuleEvent;
-
-/** @brief Module Info structure
- * 
- */
-typedef struct ModuleInfo {
-	char *module_name;
-	char *module_description;
-	char *module_author;
-	char *module_neostats_version;
-	char *module_version;
-	char *module_build_date;
-	char *module_build_time;
-	char *reserved;
-}ModuleInfo;
-
-typedef int (*mod_auth) (User * u);
-
-/** @brief Module structure
- * 
- */
-typedef struct Module {
-	ModuleInfo *info;
-	ModuleEvent *event_list;
-	mod_auth mod_auth_cb;
-	void *dl_handle;
-}Module;
-
-int add_mod_timer (timer_function func_name, char *timer_name, char *mod_name, int interval);
-int del_mod_timer (char *timer_name);
-int change_mod_timer_interval (char *timer_name, int interval);
-ModTimer *findtimer(char *timer_name);
-int add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum, char *mod_name);
-int add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, char *mod_name, void *data);
-int del_socket (char *sockname);
-ModSock *findsock (char *sock_name);
-ModUser * init_mod_bot (char * nick, char * user, char * host, char * realname, const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list, char * modname);
-void add_bot_to_chan (char *bot, char *chan);
-void del_bot_from_chan (char *bot, char *chan);
-ModUser *findbot (char * bot_name);
-int bot_nick_change (char * oldnick, char *newnick);
-
 /* log.c API export */
 /* define the log levels */
 
@@ -872,13 +892,6 @@ typedef enum LOG_LEVEL {
 	LOG_DEBUG3,		/* even more stuff, that would be useless to most normal people */
 	LOG_DEBUG4,		/* are you insane? */
 } LOG_LEVEL;
-
-/* Scope of Logging Defines: */
-
-typedef enum LOG_SCOPE {
-	LOG_CORE = 0,
-	LOG_MOD = 1,
-} LOG_SCOPE;
 
 /* this is for the neostats assert replacement. */
 /* Version 2.4 and later of GCC define a magical variable _PRETTY_FUNCTION__'
@@ -907,17 +920,17 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 #define nassert(expr) (__ASSERT_VOID_CAST (0))
 #endif
 
-void nlog (int level, int scope, char *fmt, ...) __attribute__((format(printf,3,4))); /* 2=format 3=params */
+void nlog (LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
 
 #include "conf.h"
 
-int CloakHost (ModUser *bot_ptr);
+int CloakHost (Bot *bot_ptr);
 
 /* 
  * Module Interface 
  */
-int ModInit(int modnum, int apiver);
+int ModInit(Module* mod_ptr);
 void ModFini(void);
 int ModAuth (User * u);
 extern ModuleInfo module_info;   

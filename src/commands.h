@@ -24,8 +24,10 @@
 #ifndef _COMMANDS_H_
 #define _COMMANDS_H_
 
-int add_bot_cmd_list(ModUser *bot_ptr, bot_cmd *bot_cmd_list);
-int del_bot_cmd_list(ModUser *bot_ptr, bot_cmd *bot_cmd_list);
-int run_bot_cmd (ModUser *bot_ptr, User *u, char *command_string);
+int add_bot_cmd_list (Bot *bot_ptr, bot_cmd *bot_cmd_list);
+int del_bot_cmd_list (Bot *bot_ptr, bot_cmd *bot_cmd_list);
+int run_bot_cmd (Bot *bot_ptr, User *u, char *command_string);
+int add_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list);
+int del_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list);
 
 #endif /* _COMMANDS_H_ */

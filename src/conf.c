@@ -140,7 +140,7 @@ cb_Module (char *arg, int configtype)
 			}
 		}
 		load_mods[i] = sstrdup (arg);
-		nlog (LOG_DEBUG1, LOG_CORE, "Added Module %d :%s", i, (char *)load_mods[i]);
+		nlog (LOG_DEBUG1, "Added Module %d :%s", i, (char *)load_mods[i]);
 	}
 }
 
@@ -162,24 +162,24 @@ cb_SqlConf (char *arg, int configtype)
 	SET_SEGV_LOCATION();
 	if (configtype == 0) {
 		if ((uname = strtok(arg, "!")) == NULL) {
-			nlog(LOG_WARNING, LOG_CORE, "Invalid SQLSRV_AUTH syntax in config file (Username)");
+			nlog(LOG_WARNING, "Invalid SQLSRV_AUTH syntax in config file (Username)");
 			return;
 		}
 		if ((pass = strtok(NULL, "@")) == NULL) {
-			nlog(LOG_WARNING, LOG_CORE, "Invalid SQLSRV_AUTH syntax in config file (Pass)");
+			nlog(LOG_WARNING, "Invalid SQLSRV_AUTH syntax in config file (Pass)");
 			return;
 		}
 		if ((host = strtok(NULL, "")) == NULL) {
-			nlog(LOG_WARNING, LOG_CORE, "Invalid SQLSRV_AUTH syntax in config file (Host)");
+			nlog(LOG_WARNING, "Invalid SQLSRV_AUTH syntax in config file (Host)");
 			return;
 		}
-		nlog(LOG_DEBUG1, LOG_CORE, "SqlSrv Uname %s Pass %s Host %s", uname, pass, host);
+		nlog(LOG_DEBUG1, "SqlSrv Uname %s Pass %s Host %s", uname, pass, host);
 		rta_change_auth(uname, pass);
 		strncpy(me.sqlhost, host, MAXHOST);
 	} else if (configtype == 1) {
 		me.sqlport = atoi(arg);
 		if (me.sqlport == 0) {
-			nlog(LOG_WARNING, LOG_CORE, "Invalid Port Specified for SQLSRV_PORT, Using Default");
+			nlog(LOG_WARNING, "Invalid Port Specified for SQLSRV_PORT, Using Default");
 			me.sqlport = 8888;
 		}
 	}
@@ -202,21 +202,21 @@ ConfLoadModules ()
 
 	SET_SEGV_LOCATION();
 	if(load_mods[1] == 0) {
-		nlog (LOG_NORMAL, LOG_CORE, "No modules configured for loading"); 
+		nlog (LOG_NORMAL, "No modules configured for loading"); 
 		return NS_SUCCESS;
 	}
-	nlog (LOG_NORMAL, LOG_CORE, "Loading configured modules"); 
+	nlog (LOG_NORMAL, "Loading configured modules"); 
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
-		nlog (LOG_DEBUG1, LOG_CORE, "ConfLoadModules: Loading Module %s", (char *)load_mods[i]);
+		nlog (LOG_DEBUG1, "ConfLoadModules: Loading Module %s", (char *)load_mods[i]);
 		rval = load_module (load_mods[i], NULL);
 		if (rval == NS_SUCCESS) {
-			nlog (LOG_NORMAL, LOG_CORE, "Successfully Loaded Module %s", (char *)load_mods[i]);
+			nlog (LOG_NORMAL, "Successfully Loaded Module %s", (char *)load_mods[i]);
 		} else {
-			nlog (LOG_WARNING, LOG_CORE, "Could Not Load Module %s, Please check above error Messages", (char *)load_mods[i]);
+			nlog (LOG_WARNING, "Could Not Load Module %s, Please check above error Messages", (char *)load_mods[i]);
 		}
 		free(load_mods[i]);
 	}
-	nlog (LOG_NORMAL, LOG_CORE, "Completed loading configured modules"); 
+	nlog (LOG_NORMAL, "Completed loading configured modules"); 
 	return NS_SUCCESS;
 }
 

@@ -101,8 +101,8 @@ struct cs_cfg {
 
 static char s_ConnectServ[MAXNICK];
 static int cs_online = 0;
-static ModUser *cs_bot;
-
+static Bot *cs_bot;
+static Module* cs_module;
 ModuleInfo module_info = {
 	"ConnectServ",
 	"Network connection and mode monitoring service",
@@ -143,8 +143,8 @@ static int cs_about(User * u, char **av, int ac)
 
 static int Online(char **av, int ac)
 {
-	cs_bot = init_mod_bot(s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.realname, 
-		services_bot_modes, BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, cs_commands, cs_settings, module_info.module_name);
+	cs_bot = init_bot(cs_module, s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.realname, 
+		services_bot_modes, BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, cs_commands, cs_settings);
 	if(cs_bot)
 		cs_online = 1;
 	return 1;
@@ -165,12 +165,9 @@ ModuleEvent module_events[] = {
 	{NULL, NULL}
 };
 
-int ModInit(int modnum, int apiver)
+int ModInit(Module* mod_ptr)
 {
-	/* Check that our compiled version if compatible with the calling version of NeoStats */
-	if(	ircstrncasecmp (me.version, NEOSTATS_VERSION, VERSIONSIZE) !=0) {
-		return NS_ERR_VERSION;
-	}
+	cs_module = mod_ptr;
 	LoadConfig();
 	return 1;
 }

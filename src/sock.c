@@ -111,7 +111,7 @@ ConnectTo (char *host, int port)
 	memset (&lsa, 0, sizeof (lsa));
 	if (me.local[0] != 0) {
 		if ((hp = gethostbyname (me.local)) == NULL) {
-			nlog (LOG_WARNING, LOG_CORE, "Warning, Couldn't bind to IP address %s", me.local);
+			nlog (LOG_WARNING, "Warning, Couldn't bind to IP address %s", me.local);
 		} else {
 			memcpy ((char *) &lsa.sin_addr, hp->h_addr, hp->h_length);
 			lsa.sin_family = hp->h_addrtype;
@@ -128,7 +128,7 @@ ConnectTo (char *host, int port)
 	}
 	if (dobind > 0) {
 		if (bind (s, (struct sockaddr *) &lsa, sizeof (lsa)) < 0) {
-			nlog (LOG_WARNING, LOG_CORE, "bind(): Warning, Couldn't bind to IP address %s", strerror (errno));
+			nlog (LOG_WARNING, "bind(): Warning, Couldn't bind to IP address %s", strerror (errno));
 		}
 	}
 
@@ -148,7 +148,7 @@ ConnectTo (char *host, int port)
 	
 	sqlListenSock = sqllisten_on_port(me.sqlport);
 	if (sqlListenSock == -1) {
-		nlog(LOG_CRITICAL, LOG_CORE, "Failed to Setup Sql Port. SQL not available");
+		nlog(LOG_CRITICAL, "Failed to Setup Sql Port. SQL not available");
 	}
 #endif	
 	return s;
@@ -169,7 +169,7 @@ read_loop ()
 	int maxfdsunused;
 	char c;
 	char buf[BUFSIZE];
-	ModSock *mod_sock;
+	Sock *sock;
 	struct pollfd *ufds;
 	int pollsize, pollflag;
 	hscan_t ss;
@@ -202,19 +202,19 @@ read_loop ()
 		hash_scan_begin (&ss, sockh);
 		me.cursocks = 1;	/* always one socket for ircd */
 		while ((sn = hash_scan_next (&ss)) != NULL) {
-			mod_sock = hnode_get (sn);
-			if (mod_sock->socktype == SOCK_STANDARD) {
-				if (mod_sock->readfnc)
-					FD_SET (mod_sock->sock_no, &readfds);
-				if (mod_sock->writefnc)
-					FD_SET (mod_sock->sock_no, &writefds);
-				if (mod_sock->errfnc)
-					FD_SET (mod_sock->sock_no, &errfds);
+			sock = hnode_get (sn);
+			if (sock->socktype == SOCK_STANDARD) {
+				if (sock->readfnc)
+					FD_SET (sock->sock_no, &readfds);
+				if (sock->writefnc)
+					FD_SET (sock->sock_no, &writefds);
+				if (sock->errfnc)
+					FD_SET (sock->sock_no, &errfds);
 				++me.cursocks;
 			} else {
 				/* its a poll interface, setup for select instead */
-				SET_SEGV_INMODULE(mod_sock->modname);
-				j = mod_sock->beforepoll (mod_sock->data, ufds);
+				SET_SEGV_INMODULE(sock->moduleptr->info->module_name);
+				j = sock->beforepoll (sock->data, ufds);
 				CLEAR_SEGV_INMODULE();
 				/* if we don't have any socks, just continue */
 				if (j == -1)
@@ -317,7 +317,7 @@ restartsql:
 							break;
 						}
 					} else {
-						nlog (LOG_WARNING, LOG_CORE, "read returned an Error");
+						nlog (LOG_WARNING, "read returned an Error");
 						servsock = -1;
 						return;
 					}
@@ -327,22 +327,22 @@ restartsql:
 				hash_scan_begin (&ss, sockh);
 				while ((sn = hash_scan_next (&ss)) != NULL) {
 					pollflag = 0;
-					mod_sock = hnode_get (sn);
-					SET_SEGV_INMODULE(mod_sock->modname);
-					if (mod_sock->socktype == SOCK_STANDARD) {
-						if (FD_ISSET (mod_sock->sock_no, &readfds)) {
-							nlog (LOG_DEBUG3, LOG_CORE, "Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
-							if (mod_sock->readfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
+					sock = hnode_get (sn);
+					SET_SEGV_INMODULE(sock->moduleptr->info->module_name);
+					if (sock->socktype == SOCK_STANDARD) {
+						if (FD_ISSET (sock->sock_no, &readfds)) {
+							nlog (LOG_DEBUG3, "Running module %s readsock function for %s", sock->moduleptr->info->module_name, sock->name);
+							if (sock->readfnc (sock->sock_no, sock->name) < 0)
 								continue;
 						}
-						if (FD_ISSET (mod_sock->sock_no, &writefds)) {
-							nlog (LOG_DEBUG3, LOG_CORE, "Running module %s writesock function for %s", mod_sock->modname, mod_sock->sockname);
-							if (mod_sock->writefnc (mod_sock->sock_no, mod_sock->sockname) < 0)
+						if (FD_ISSET (sock->sock_no, &writefds)) {
+							nlog (LOG_DEBUG3, "Running module %s writesock function for %s", sock->moduleptr->info->module_name, sock->name);
+							if (sock->writefnc (sock->sock_no, sock->name) < 0)
 								continue;
 						}
-						if (FD_ISSET (mod_sock->sock_no, &errfds)) {
-							nlog (LOG_DEBUG3, LOG_CORE, "Running module %s errorsock function for %s", mod_sock->modname, mod_sock->sockname);
-							if (mod_sock->errfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
+						if (FD_ISSET (sock->sock_no, &errfds)) {
+							nlog (LOG_DEBUG3, "Running module %s errorsock function for %s", sock->moduleptr->info->module_name, sock->name);
+							if (sock->errfnc (sock->sock_no, sock->name) < 0)
 								continue;
 						}
 					} else {
@@ -363,7 +363,7 @@ restartsql:
 							}
 						}
 						if (pollflag == 1) {
-							mod_sock->afterpoll(mod_sock->data, ufds, pollsize);
+							sock->afterpoll(sock->data, ufds, pollsize);
 						}
 					}
 				}
@@ -374,17 +374,17 @@ restartsql:
 			if ((me.now - me.lastmsg) > 180) {
 				/* if we havnt had a message for 3 minutes, more than likely, we are on a zombie server */
 				/* disconnect and try to reconnect */
-				nlog (LOG_WARNING, LOG_CORE, "Eeek, Zombie Server, Reconnecting");
+				nlog (LOG_WARNING, "Eeek, Zombie Server, Reconnecting");
 				return;
 			}
 		} else if (SelectResult == -1) {
 			if (errno != EINTR) {
-				nlog (LOG_WARNING, LOG_CORE, "Lost connection to server.");
+				nlog (LOG_WARNING, "Lost connection to server.");
 				return;
 			}
 		}
 	}
-	nlog (LOG_NORMAL, LOG_CORE, "hu, how did we get here");
+	nlog (LOG_NORMAL, "hu, how did we get here");
 }
 
 /** @brief get max available sockets
@@ -429,7 +429,7 @@ recvlog (char *line)
  * @param socktype type of socket
  * @param ipaddr ip address of target
  * @param port to connect to
- * @param sockname name of this socket
+ * @param name name of this socket
  * @param module name of the module
  * @param func_read read socket function
  * @param func_write write socket function
@@ -439,7 +439,7 @@ recvlog (char *line)
  *         NS_FAILURE if unsuccessful
  */
 int
-sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, socket_function func_read, socket_function func_write, socket_function func_error)
+sock_connect (Module* moduleptr, int socktype, unsigned long ipaddr, int port, char *name, socket_function func_read, socket_function func_write, socket_function func_error)
 {
 	struct sockaddr_in sa;
 	int s;
@@ -452,7 +452,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
 	/* bind to an IP address */
 	if (dobind > 0) {
 		if (bind (s, (struct sockaddr *) &lsa, sizeof (lsa)) < 0) {
-			nlog (LOG_WARNING, LOG_CORE, "sock_connect(): Warning, Couldn't bind to IP address %s", strerror (errno));
+			nlog (LOG_WARNING, "sock_connect(): Warning, Couldn't bind to IP address %s", strerror (errno));
 		}
 	}
 
@@ -464,7 +464,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
 	/* set non blocking */
 
 	if ((i = fcntl (s, F_SETFL, O_NONBLOCK)) < 0) {
-		nlog (LOG_CRITICAL, LOG_CORE, "can't set socket %s(%s) non-blocking: %s", sockname, module, strerror (i));
+		nlog (LOG_CRITICAL, "can't set socket %s(%s) non-blocking: %s", name, moduleptr->info->module_name, strerror (i));
 		return NS_FAILURE;
 	}
 
@@ -473,13 +473,13 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
 		case EINPROGRESS:
 			break;
 		default:
-			nlog (LOG_WARNING, LOG_CORE, "Socket %s(%s) cant connect %s", sockname, module, strerror (errno));
+			nlog (LOG_WARNING, "Socket %s(%s) cant connect %s", name, moduleptr->info->module_name, strerror (errno));
 			close (s);
 			return NS_FAILURE;
 		}
 	}
 
-	add_socket (func_read, func_write, func_error, sockname, s, module);
+	add_socket (moduleptr, func_read, func_write, func_error, name, s);
 	return s;
 }
 
@@ -491,32 +491,32 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
  *         NS_FAILURE if unsuccessful
  */
 int
-sock_disconnect (char *sockname)
+sock_disconnect (char *name)
 {
-	ModSock *mod_sock;
+	Sock *sock;
 	fd_set fds;
 	struct timeval tv;
 	int i;
 
-	mod_sock = findsock (sockname);
-	if (!mod_sock) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Can not find Socket %s in list", sockname);
+	sock = findsock (name);
+	if (!sock) {
+		nlog (LOG_WARNING, "Warning, Can not find Socket %s in list", name);
 		return NS_FAILURE;
 	}
 
 	/* the following code makes sure its a valid file descriptor */
 	FD_ZERO (&fds);
-	FD_SET (mod_sock->sock_no, &fds);
+	FD_SET (sock->sock_no, &fds);
 	tv.tv_sec = 0;
 	tv.tv_usec = 0;
 	i = select (1, &fds, NULL, NULL, &tv);
 	if (!i && errno == EBADF) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Bad File Descriptor %s in list", sockname);
+		nlog (LOG_WARNING, "Warning, Bad File Descriptor %s in list", name);
 		return NS_FAILURE;
 	}
-	nlog (LOG_DEBUG3, LOG_CORE, "Closing Socket %s with Number %d", sockname, mod_sock->sock_no);
-	close (mod_sock->sock_no);
-	del_socket (sockname);
+	nlog (LOG_DEBUG3, "Closing Socket %s with Number %d", name, sock->sock_no);
+	close (sock->sock_no);
+	del_socket (name);
 	return NS_SUCCESS;
 }
 
@@ -532,12 +532,12 @@ sts (const char *buf, const int buflen)
 	int sent;
 
 	if (servsock == -1) {
-		nlog(LOG_WARNING, LOG_CORE, "Not sending to server as we have a invalid socket");
+		nlog(LOG_WARNING, "Not sending to server as we have a invalid socket");
 		return;
 	}
 	sent = write (servsock, buf, buflen);
 	if (sent == -1) {
-		nlog (LOG_CRITICAL, LOG_CORE, "Write error: %s", strerror(errno));
+		nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
 		do_exit (NS_EXIT_ERROR, NULL);
 	}
 	me.SendM++;
@@ -555,10 +555,10 @@ sts (const char *buf, const int buflen)
 /* rehash handler */
 int check_sql_sock() {
 	if (sqlListenSock < 1) {
-		nlog(LOG_DEBUG1, LOG_CORE, "Rehashing SQL sock");
+		nlog(LOG_DEBUG1, "Rehashing SQL sock");
         	sqlListenSock = sqllisten_on_port(me.sqlport);
 		if (sqlListenSock == -1) {
-			nlog(LOG_CRITICAL, LOG_CORE, "Failed to Setup Sql Port. SQL not available");
+			nlog(LOG_CRITICAL, "Failed to Setup Sql Port. SQL not available");
                 	return NS_FAILURE;
                 }
         }
@@ -598,7 +598,7 @@ sqllisten_on_port(int port)
   srvskt.sin_port = htons(me.sqlport);
   if ((srvfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
   {
-    nlog(LOG_CRITICAL,LOG_CORE, "SqlSrv: Unable to get socket for port %d.", port);
+    nlog(LOG_CRITICAL, "SqlSrv: Unable to get socket for port %d.", port);
     return -1;
   }
   flags = fcntl(srvfd, F_GETFL, 0);
@@ -606,12 +606,12 @@ sqllisten_on_port(int port)
   (void) fcntl(srvfd, F_SETFL, flags);
   if (bind(srvfd, (struct sockaddr *) &srvskt, adrlen) < 0)
   {
-    nlog(LOG_CRITICAL, LOG_CORE, "Unable to bind to port %d", port);
+    nlog(LOG_CRITICAL, "Unable to bind to port %d", port);
     return -1;
   }
   if (listen(srvfd, 1) < 0)
   {
-    nlog(LOG_CRITICAL, LOG_CORE, "Unable to listen on port %d", port);
+    nlog(LOG_CRITICAL, "Unable to listen on port %d", port);
     return -1;
   }
   return (srvfd);
@@ -641,7 +641,7 @@ sql_accept_conn(int srvfd)
 
   /* if we reached our max connection, just exit */
   if (list_count(sqlconnections) > 5) {
-  	nlog(LOG_NOTICE, LOG_CORE, "Can not accept new SQL connection. Full");
+  	nlog(LOG_NOTICE, "Can not accept new SQL connection. Full");
   	close (srvfd);
   	return;
   }
@@ -657,7 +657,7 @@ sql_accept_conn(int srvfd)
 
   if (newui->fd < 0)
   {
-    nlog(LOG_WARNING, LOG_CORE, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
+    nlog(LOG_WARNING, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
     free(newui);
     close(srvfd);
     return;
@@ -667,7 +667,7 @@ sql_accept_conn(int srvfd)
     inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
     if (!match(me.sqlhost, tmp)) {
     	/* we didnt get a match, bye bye */
-	nlog(LOG_NOTICE, LOG_CORE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
+	nlog(LOG_NOTICE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
 	close(newui->fd);
 	free(newui);
         return;
@@ -683,7 +683,7 @@ sql_accept_conn(int srvfd)
     newuinode = lnode_create(newui);
     list_append(sqlconnections, newuinode);
     inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
-    nlog(LOG_DEBUG1, LOG_CORE, "New SqlConnection from %s", tmp);
+    nlog(LOG_DEBUG1, "New SqlConnection from %s", tmp);
   }
 }
 
@@ -711,7 +711,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
   Sql_Conn *sqlconn;
 
   if ((sqlconn = lnode_get(sqlnode)) == NULL) {
-  	nlog(LOG_WARNING, LOG_CORE, "Got a Sql Handle without a valid node");
+  	nlog(LOG_WARNING, "Got a Sql Handle without a valid node");
   	return NS_SUCCESS;
   }
 
@@ -727,7 +727,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
   {
     /* log this since a normal close is with an 'X' command from the
        client program? */
-    nlog(LOG_DEBUG1, LOG_CORE, "Disconnecting SqlClient for failed read");
+    nlog(LOG_DEBUG1, "Disconnecting SqlClient for failed read");
     deldbconnection(sqlconn->fd);
     close(sqlconn->fd);
     list_delete(sqlconnections, sqlnode);
@@ -776,7 +776,7 @@ sql_handle_ui_output(lnode_t *sqlnode)
   Sql_Conn *sqlconn;
  
   if ((sqlconn = lnode_get(sqlnode)) == NULL) {
-  	nlog(LOG_WARNING, LOG_CORE, "Got a Sql write Handle without a valid node");
+  	nlog(LOG_WARNING, "Got a Sql write Handle without a valid node");
   	return NS_SUCCESS;
   }
   
@@ -785,7 +785,7 @@ sql_handle_ui_output(lnode_t *sqlnode)
     ret = write(sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree));
     if (ret < 0)
     {
-    	nlog(LOG_WARNING, LOG_CORE, "Got a write error when attempting to return data to the SQL Server");
+    	nlog(LOG_WARNING, "Got a write error when attempting to return data to the SQL Server");
 	deldbconnection(sqlconn->fd);
       	close(sqlconn->fd);
 	list_delete(sqlconnections, sqlnode);
@@ -834,23 +834,23 @@ int FiniSocks (void)
  * 
  * @return pointer to created socket on success, NULL on error
 */
-static ModSock *
+static Sock *
 new_sock (char *sock_name)
 {
-	ModSock *mod_sock;
+	Sock *sock;
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "new_sock: %s", sock_name);
-	mod_sock = smalloc (sizeof (ModSock));
-	strlcpy (mod_sock->sockname, sock_name, MAX_MOD_NAME);
-	sn = hnode_create (mod_sock);
+	nlog (LOG_DEBUG2, "new_sock: %s", sock_name);
+	sock = smalloc (sizeof (Sock));
+	strlcpy (sock->name, sock_name, MAX_MOD_NAME);
+	sn = hnode_create (sock);
 	if (hash_isfull (sockh)) {
-		nlog (LOG_CRITICAL, LOG_CORE, "new_sock: socket hash is full, can't add a new socket");
+		nlog (LOG_CRITICAL, "new_sock: socket hash is full, can't add a new socket");
 		return NULL;
 	}
-	hash_insert (sockh, sn, mod_sock->sockname);
-	return mod_sock;
+	hash_insert (sockh, sn, sock->name);
+	return sock;
 }
 
 /** \fn @brief find socket
@@ -861,7 +861,7 @@ new_sock (char *sock_name)
  * 
  * @return pointer to socket if found, NULL if not found
  */
-ModSock *
+Sock *
 findsock (char *sock_name)
 {
 	hnode_t *sn;
@@ -886,32 +886,32 @@ findsock (char *sock_name)
  * @return pointer to socket if found, NULL if not found
 */
 int
-add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum, char *mod_name)
+add_socket (Module* moduleptr, socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum)
 {
-	ModSock *mod_sock;
+	Sock *sock;
 
 	SET_SEGV_LOCATION();
 	if (!readfunc) {
-		nlog (LOG_WARNING, LOG_CORE, "add_socket: read socket function doesn't exist = %s (%s)", readfunc, mod_name);
+		nlog (LOG_WARNING, "add_socket: read socket function doesn't exist = %s (%s)", readfunc, moduleptr->info->module_name);
 		return NS_FAILURE;
 	}
 	if (!writefunc) {
-		nlog (LOG_WARNING, LOG_CORE, "add_socket: write socket function doesn't exist = %s (%s)", writefunc, mod_name);
+		nlog (LOG_WARNING, "add_socket: write socket function doesn't exist = %s (%s)", writefunc, moduleptr->info->module_name);
 		return NS_FAILURE;
 	}
 	if (!errfunc) {
-		nlog (LOG_WARNING, LOG_CORE, "add_socket: error socket function doesn't exist = %s (%s)", errfunc, mod_name);
+		nlog (LOG_WARNING, "add_socket: error socket function doesn't exist = %s (%s)", errfunc, moduleptr->info->module_name);
 		return NS_FAILURE;
 	}
-	mod_sock = new_sock (sock_name);
-	mod_sock->sock_no = socknum;
-	strlcpy (mod_sock->modname, mod_name, MAX_MOD_NAME);
-	mod_sock->readfnc = readfunc;
-	mod_sock->writefnc = writefunc;
-	mod_sock->errfnc = errfunc;
-	mod_sock->socktype = SOCK_STANDARD;
+	sock = new_sock (sock_name);
+	sock->sock_no = socknum;
+	sock->moduleptr = moduleptr;
+	sock->readfnc = readfunc;
+	sock->writefnc = writefunc;
+	sock->errfnc = errfunc;
+	sock->socktype = SOCK_STANDARD;
 	
-	nlog (LOG_DEBUG2, LOG_CORE, "add_socket: Registered Module %s with Standard Socket functions %s", mod_name, mod_sock->sockname);
+	nlog (LOG_DEBUG2, "add_socket: Registered Module %s with Standard Socket functions %s", moduleptr->info->module_name, sock->name);
 	return NS_SUCCESS;
 }
 
@@ -927,26 +927,26 @@ add_socket (socket_function readfunc, socket_function writefunc, socket_function
  * @return pointer to socket if found, NULL if not found
 */
 int
-add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, char *mod_name, void *data)
+add_sockpoll (Module* moduleptr, before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, void *data)
 {
-	ModSock *mod_sock;
+	Sock *sock;
 
 	SET_SEGV_LOCATION();
 	if (!beforepoll) {
-		nlog (LOG_WARNING, LOG_CORE, "add_sockpoll: read socket function doesn't exist = %s (%s)", beforepoll, mod_name);
+		nlog (LOG_WARNING, "add_sockpoll: read socket function doesn't exist = %s (%s)", beforepoll, moduleptr->info->module_name);
 		return NS_FAILURE;
 	}
 	if (!afterpoll) {
-		nlog (LOG_WARNING, LOG_CORE, "add_sockpoll: write socket function doesn't exist = %s (%s)", afterpoll, mod_name);
+		nlog (LOG_WARNING, "add_sockpoll: write socket function doesn't exist = %s (%s)", afterpoll, moduleptr->info->module_name);
 		return NS_FAILURE;
 	}
-	mod_sock = new_sock (sock_name);
-	strlcpy (mod_sock->modname, mod_name, MAX_MOD_NAME);
-	mod_sock->socktype = SOCK_POLL;
-	mod_sock->beforepoll = beforepoll;
-	mod_sock->afterpoll = afterpoll;
-	mod_sock->data = data;
-	nlog (LOG_DEBUG2, LOG_CORE, "add_sockpoll: Registered Module %s with Poll Socket functions %s", mod_name, mod_sock->sockname);
+	sock = new_sock (sock_name);
+	sock->moduleptr = moduleptr;
+	sock->socktype = SOCK_POLL;
+	sock->beforepoll = beforepoll;
+	sock->afterpoll = afterpoll;
+	sock->data = data;
+	nlog (LOG_DEBUG2, "add_sockpoll: Registered Module %s with Poll Socket functions %s", moduleptr->info->module_name, sock->name);
 	return NS_SUCCESS;
 }
 
@@ -961,17 +961,17 @@ add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, ch
 int
 del_socket (char *sock_name)
 {
-	ModSock *mod_sock;
+	Sock *sock;
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
 	sn = hash_lookup (sockh, sock_name);
 	if (sn) {
-		mod_sock = hnode_get (sn);
-		nlog (LOG_DEBUG2, LOG_CORE, "del_socket: Unregistered Socket function %s from Module %s", sock_name, mod_sock->modname);
+		sock = hnode_get (sn);
+		nlog (LOG_DEBUG2, "del_socket: Unregistered Socket function %s from Module %s", sock_name, sock->moduleptr->info->module_name);
 		hash_scan_delete (sockh, sn);
 		hnode_destroy (sn);
-		free (mod_sock);
+		free (sock);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -988,16 +988,16 @@ del_socket (char *sock_name)
 int
 del_sockets (char *module_name)
 {
-	ModSock *mod_sock;
+	Sock *sock;
 	hnode_t *modnode;
 	hscan_t hscan;
 
 	hash_scan_begin (&hscan, sockh);
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
-		mod_sock = hnode_get (modnode);
-		if (!ircstrcasecmp (mod_sock->modname, module_name)) {
-			nlog (LOG_DEBUG1, LOG_CORE, "del_sockets: Module %s had Socket %s Registered. Deleting..", module_name, mod_sock->sockname);
-			del_socket (mod_sock->sockname);
+		sock = hnode_get (modnode);
+		if (!ircstrcasecmp (sock->moduleptr->info->module_name, module_name)) {
+			nlog (LOG_DEBUG1, "del_sockets: Module %s had Socket %s Registered. Deleting..", module_name, sock->name);
+			del_socket (sock->name);
 		}
 	}
 	return NS_SUCCESS;
@@ -1014,7 +1014,7 @@ del_sockets (char *module_name)
 int
 list_sockets (User * u, char **av, int ac)
 {
-	ModSock *mod_sock = NULL;
+	Sock *sock = NULL;
 	hscan_t ss;
 	hnode_t *sn;
 
@@ -1022,11 +1022,11 @@ list_sockets (User * u, char **av, int ac)
 	prefmsg (u->nick, s_Services, "Sockets List: (%d)", (int)hash_count (sockh));
 	hash_scan_begin (&ss, sockh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
-		mod_sock = hnode_get (sn);
-		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_sock->modname);
-		prefmsg (u->nick, s_Services, "Socket Name: %s", mod_sock->sockname);
-		if (mod_sock->socktype == SOCK_STANDARD) {
-			prefmsg (u->nick, s_Services, "Socket Number: %d", mod_sock->sock_no);
+		sock = hnode_get (sn);
+		prefmsg (u->nick, s_Services, "%s:--------------------------------", sock->moduleptr->info->module_name);
+		prefmsg (u->nick, s_Services, "Socket Name: %s", sock->name);
+		if (sock->socktype == SOCK_STANDARD) {
+			prefmsg (u->nick, s_Services, "Socket Number: %d", sock->sock_no);
 		} else {
 			prefmsg (u->nick, s_Services, "Poll Interface");
 		}

@@ -210,6 +210,7 @@ void send_burst (int b);
 #ifdef GOTSVSTIME
 void send_svstime (const char *sender, const unsigned long ts);
 #endif
+int signon_newbot (const char *nick, const char *user, const char *host, const char *realname, long Umode);
 
 int sserver_cmd (const char *name, const int numeric, const char *infoline);
 int ssquit_cmd (const char *server, const char *quitmsg);

@@ -27,7 +27,8 @@
 #include "loveserv.h"
 
 static char s_LoveServ[MAXNICK];
-static ModUser *ls_bot;
+static Bot *ls_bot;
+static Module* ls_module;
 
 struct ls_cfg { 
 	char user[MAXUSER];
@@ -85,8 +86,8 @@ static bot_setting ls_settings[]=
 
 static int Online(char **av, int ac)
 {
-	ls_bot = init_mod_bot(s_LoveServ, ls_cfg.user, ls_cfg.host, ls_cfg.realname, 
-		services_bot_modes, BOT_FLAG_DEAF, ls_commands, ls_settings, module_info.module_name);
+	ls_bot = init_bot(ls_module, s_LoveServ, ls_cfg.user, ls_cfg.host, ls_cfg.realname, 
+		services_bot_modes, BOT_FLAG_DEAF, ls_commands, ls_settings);
 	return 1;
 };
 

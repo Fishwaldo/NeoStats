@@ -29,10 +29,7 @@
  */
 static Module *ModList[NUM_MODULES];
 
-char segv_location[SEGV_LOCATION_BUFSIZE];
-char segv_inmodule[SEGV_INMODULE_BUFSIZE];
-
-int del_all_bot_cmds(ModUser* bot_ptr);
+int del_all_bot_cmds(Bot* bot_ptr);
 
 /* @brief Module hash list */
 static hash_t *mh;
@@ -41,35 +38,40 @@ static hash_t *mh;
 
 char sqlbuf[BUFSIZE];
 
-void *display_module_name (void *tbl, char *col, char *sql, void *row) {
+void *display_module_name (void *tbl, char *col, char *sql, void *row) 
+{
 	Module *mod_ptr = row;
 	
 	strlcpy(sqlbuf, mod_ptr->info->module_name, MAX_MOD_NAME);
 	return sqlbuf;	
 }
 
-void *display_module_desc (void *tbl, char *col, char *sql, void *row) {
+void *display_module_desc (void *tbl, char *col, char *sql, void *row) 
+{
 	Module *mod_ptr = row;
 	
 	strlcpy(sqlbuf, mod_ptr->info->module_description, BUFSIZE);
 	return sqlbuf;
 }
 
-void *display_module_version (void *tbl, char *col, char *sql, void *row) {
+void *display_module_version (void *tbl, char *col, char *sql, void *row) 
+{
 	Module *mod_ptr = row;
 	
 	strlcpy(sqlbuf, mod_ptr->info->module_version, BUFSIZE);
 	return sqlbuf;
 }
 
-void *display_module_builddate (void *tbl, char *col, char *sql, void *row) {
+void *display_module_builddate (void *tbl, char *col, char *sql, void *row) 
+{
 	Module *mod_ptr = row;
 	
 	ircsnprintf(sqlbuf, BUFSIZE, "%s - %s", mod_ptr->info->module_build_date, mod_ptr->info->module_build_time);
 	return sqlbuf;
 }
 
-void *display_core_info (void *tbl, char *col, char *sql, void *row) {
+void *display_core_info (void *tbl, char *col, char *sql, void *row) 
+{
 	ircsnprintf(sqlbuf, BUFSIZE, "%s", me.versionfull);
 	return sqlbuf;	
 }
@@ -199,14 +201,14 @@ SendModuleEvent (char *event, char **av, int ac)
 			while (ev_list->cmd_name != NULL) {
 				/* This goes through each Command */
 				if (!ircstrcasecmp (ev_list->cmd_name, event)) {
-					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Command %s -> %s", module_ptr->info->module_name, event, ev_list->cmd_name);
+					nlog (LOG_DEBUG1, "Running Module %s for Command %s -> %s", module_ptr->info->module_name, event, ev_list->cmd_name);
 					SET_SEGV_LOCATION();
 					if (setjmp (sigvbuf) == 0) {
 						SET_SEGV_INMODULE(module_ptr->info->module_name);
 						ev_list->function (av, ac);
 						CLEAR_SEGV_INMODULE();
 					} else {
-						nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
+						nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
 					}
 					SET_SEGV_LOCATION();
 #ifndef VALGRIND
@@ -268,7 +270,7 @@ load_module (char *modfilename, User * u)
 	ModuleEvent *event_fn_ptr = NULL;
 	Module *mod_ptr = NULL;
 	hnode_t *mn;
-	int (*ModInit) (int modnum, int apiver);
+	int (*ModInit) (Module * module_ptr);
 
 	SET_SEGV_LOCATION();
 	if (u == NULL) {
@@ -285,7 +287,7 @@ load_module (char *modfilename, User * u)
 		if (do_msg) {
 			prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
 		}
-		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
+		nlog (LOG_WARNING, "Couldn't Load Module: %s %s", dl_error, path);
 		return NS_FAILURE;
 	}
 
@@ -299,7 +301,7 @@ load_module (char *modfilename, User * u)
 		if (do_msg) {
 			prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
 		}
-		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
+		nlog (LOG_WARNING, "Couldn't Load Module: %s %s", dl_error, path);
 		ns_dlclose (dl_handle);
 		return NS_FAILURE;
 	}
@@ -328,8 +330,8 @@ load_module (char *modfilename, User * u)
 	} else {
 		hash_insert (mh, mn, mod_info_ptr->module_name);
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "Module Internal name: %s", mod_info_ptr->module_name);
-	nlog (LOG_DEBUG1, LOG_CORE, "Module description: %s", mod_info_ptr->module_description);
+	nlog (LOG_DEBUG1, "Module Internal name: %s", mod_info_ptr->module_name);
+	nlog (LOG_DEBUG1, "Module description: %s", mod_info_ptr->module_description);
 
 	mod_ptr->info = mod_info_ptr;
 	mod_ptr->dl_handle = dl_handle;
@@ -341,25 +343,33 @@ load_module (char *modfilename, User * u)
 		i++;
 	/* no need to check for overflow of NUM_MODULES, as its done above */
 	ModList[i] = mod_ptr;
-	nlog (LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, mod_ptr->info->module_name);
+	nlog (LOG_DEBUG1, "Assigned %d to Module %s for ModuleNum", i, mod_ptr->info->module_name);
 
 	/* Module side user authentication for SecureServ helpers */
 	mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "ModuleAuth");
 
 	/* call ModInit (replacement for library __init() call */
 	ModInit = ns_dlsym ((int *) dl_handle, "ModInit");
-	if (ModInit) {
+	if (!ModInit) {
+		if (do_msg) {
+			chanalert (s_Services, "Unable to load %s, missing ModInit.", mod_ptr->info->module_name);
+			prefmsg (u->nick, s_Services, "Unable to load %s, missing ModInit.", mod_ptr->info->module_name);
+		}
+		ns_dlclose (dl_handle);
+		free (mod_ptr);
+		return NS_FAILURE;
+	} else {
 		int err;
 		SET_SEGV_LOCATION();
 		SET_SEGV_INMODULE(mod_ptr->info->module_name);
-		err = (*ModInit) (i, API_VER);
+		err = (*ModInit) (mod_ptr);
 		if (err == NS_ERR_VERSION ) {
-			nlog (LOG_NORMAL, LOG_CORE, "Module %s was built with an old version of NeoStats. Please recompile %s.", mod_ptr->info->module_name, mod_ptr->info->module_name);
+			nlog (LOG_NORMAL, "Module %s was built with an old version of NeoStats. Please recompile %s.", mod_ptr->info->module_name, mod_ptr->info->module_name);
 			unload_module(mod_ptr->info->module_name, NULL);
 			return NS_FAILURE;
 		}
 		else if (err < 1) {
-			nlog (LOG_NORMAL, LOG_CORE, "Unable to load module %s. See %s.log for further information.", mod_ptr->info->module_name, mod_ptr->info->module_name);
+			nlog (LOG_NORMAL, "Unable to load module %s. See %s.log for further information.", mod_ptr->info->module_name, mod_ptr->info->module_name);
 			unload_module(mod_ptr->info->module_name, NULL);
 			return NS_FAILURE;
 		}
@@ -384,8 +394,8 @@ load_module (char *modfilename, User * u)
 		}
 	}
 	if (do_msg) {
-		prefmsg (u->nick, s_Services, "Module %s Loaded, Description: %s", mod_info_ptr->module_name, mod_info_ptr->module_description);
-		globops (me.name, "%s Module Loaded", mod_info_ptr->module_name);
+		prefmsg (u->nick, s_Services, "Module %s loaded, %s", mod_info_ptr->module_name, mod_info_ptr->module_description);
+		globops (me.name, "Module %s loaded", mod_info_ptr->module_name);
 	}
 	return NS_SUCCESS;
 }
@@ -429,7 +439,7 @@ get_mod_num (char *mod_name)
 		}
 	}
 	/* if we get here, it wasn't found */
-	nlog (LOG_DEBUG1, LOG_CORE, "get_mod_num: can't find %s in module number list", mod_name);
+	nlog (LOG_DEBUG1, "get_mod_num: can't find %s in module number list", mod_name);
 	return NS_FAILURE;
 }
 
@@ -452,7 +462,7 @@ get_mod_ptr (char *mod_name)
 		}
 	}
 	/* if we get here, it wasn't found */
-	nlog (LOG_DEBUG1, LOG_CORE, "get_mod_ptr: can't find %s in module number list", mod_name);
+	nlog (LOG_DEBUG1, "get_mod_ptr: can't find %s in module number list", mod_name);
 	return NULL;
 }
 
@@ -510,13 +520,13 @@ unload_module (char *module_name, User * u)
 	/* canx any DNS queries running */
 	canx_dns(module_name);
 	/* Check to see if this Module has any timers registered....  */
-	del_mod_timers (module_name);
+	del_timers (module_name);
 	/* check if the module had a socket registered... */
 	del_sockets (module_name);
 	/* Remove module....  */
 	modnode = hash_lookup (mh, module_name);
 	if (modnode) {
-		nlog (LOG_DEBUG1, LOG_CORE, "Deleting Module %s from Hash", module_name);
+		nlog (LOG_DEBUG1, "Deleting Module %s from Hash", module_name);
 		globops (me.name, "%s Module Unloaded", module_name);
 		i = get_mod_num (module_name);
 		mod_ptr = hnode_get (modnode);
@@ -542,7 +552,7 @@ unload_module (char *module_name, User * u)
 		CLEAR_SEGV_INMODULE();
 		if (i >= 0) {
 			/* free the module number */
-			nlog (LOG_DEBUG1, LOG_CORE, "Free %d from Module Numbers", i);
+			nlog (LOG_DEBUG1, "Free %d from Module Numbers", i);
 			ModList[i] = NULL;
 		}
 		free (mod_ptr);

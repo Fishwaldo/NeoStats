@@ -26,11 +26,11 @@
 #include "modules.h"
 #include "conf.h"
 
-static int bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac);
-static int bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac);
+static int bot_cmd_help (Bot* bot_ptr, User * u, char **av, int ac);
+static int bot_cmd_set (Bot* bot_ptr, User * u, char **av, int ac);
 #if 0
-static int bot_cmd_about (ModUser* bot_ptr, User * u, char **av, int ac);
-static int bot_cmd_version (ModUser* bot_ptr, User * u, char **av, int ac);
+static int bot_cmd_about (Bot* bot_ptr, User * u, char **av, int ac);
+static int bot_cmd_version (Bot* bot_ptr, User * u, char **av, int ac);
 #endif
 
 /* help title strings for different user levels */
@@ -187,7 +187,7 @@ static int calc_cmd_ulevel(bot_cmd* cmd_ptr)
  *  @param pointer to command structure
  *  @return command user level requires
  */
-static int getuserlevel(ModUser* bot_ptr, User* u)
+static int getuserlevel(Bot* bot_ptr, User* u)
 {
 	int ulevel = 0;
 	int modlevel = 0;
@@ -198,7 +198,7 @@ static int getuserlevel(ModUser* bot_ptr, User* u)
 
 	/* If less than a locop see if the module can give us a user level */
 	if(ulevel < NS_ULEVEL_LOCOPER) {
-		Mod = get_mod_ptr(bot_ptr->modname);
+		Mod = get_mod_ptr(bot_ptr->moduleptr->info->module_name);
 		if(Mod) {
 			if(Mod->mod_auth_cb) {
 				modlevel = Mod->mod_auth_cb(u);
@@ -225,12 +225,12 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 	 * For now we verify help during processing since it is not critical. */
 	/* No command, we cannot recover from this */
 	if(!cmd_ptr->cmd) {
-		nlog (LOG_ERROR, LOG_MOD, "add_bot_cmd: missing command, command (unknown) not added");
+		nlog (LOG_ERROR, "add_bot_cmd: missing command, command (unknown) not added");
 		return NS_FAILURE;
 	}
 	/* No handler, we cannot recover from this */
 	if(!cmd_ptr->handler) {
-		nlog (LOG_ERROR, LOG_MOD, "add_bot_cmd: missing command handler, command %s not added", 
+		nlog (LOG_ERROR, "add_bot_cmd: missing command handler, command %s not added", 
 			cmd_ptr->cmd);
 		return NS_FAILURE;
 	}
@@ -238,7 +238,7 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 	cmdnode = hnode_create(cmd_ptr);
 	if (cmdnode) {
 		hash_insert(cmd_hash, cmdnode, cmd_ptr->cmd);
-		nlog(LOG_DEBUG3, LOG_MOD, "add_bot_cmd: added a new command %s to services bot", cmd_ptr->cmd);
+		nlog(LOG_DEBUG3, "add_bot_cmd: added a new command %s to services bot", cmd_ptr->cmd);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -268,7 +268,7 @@ del_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int 
-add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list) 
+add_bot_cmd_list(Bot* bot_ptr, bot_cmd* bot_cmd_list) 
 {
 	/* If no hash create */
 	if(bot_ptr->botcmds == NULL) {
@@ -287,7 +287,7 @@ add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int 
-del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list) 
+del_bot_cmd_list(Bot* bot_ptr, bot_cmd* bot_cmd_list) 
 {
 	/* If no hash return failure */
 	if(bot_ptr->botcmds == NULL) {
@@ -306,7 +306,7 @@ del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int 
-del_all_bot_cmds(ModUser* bot_ptr) 
+del_all_bot_cmds(Bot* bot_ptr) 
 {
 	hnode_t *cmdnode;
 	hscan_t hs;
@@ -334,7 +334,7 @@ del_all_bot_cmds(ModUser* bot_ptr)
 int 
 add_services_cmd_list(bot_cmd* bot_cmd_list) 
 {
-	ModUser* bot_ptr;
+	Bot* bot_ptr;
 
 	bot_ptr = findbot(s_Services);
 	return(add_bot_cmd_list(bot_ptr, bot_cmd_list));
@@ -347,7 +347,7 @@ add_services_cmd_list(bot_cmd* bot_cmd_list)
 int 
 del_services_cmd_list(bot_cmd* bot_cmd_list) 
 {
-	ModUser* bot_ptr;
+	Bot* bot_ptr;
 
 	bot_ptr = findbot(s_Services);
 	return(del_bot_cmd_list(bot_ptr, bot_cmd_list));
@@ -358,7 +358,7 @@ del_services_cmd_list(bot_cmd* bot_cmd_list)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int
-run_bot_cmd (ModUser* bot_ptr, User *u, char *command_string)
+run_bot_cmd (Bot* bot_ptr, User *u, char *command_string)
 {
 	static char privmsgbuffer[BUFSIZE];
 	int userlevel;
@@ -380,7 +380,7 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char *command_string)
 		( (bot_ptr->flags & BOT_FLAG_ONLY_OPERS) && me.onlyopers && (userlevel < NS_ULEVEL_OPER) )){
 		prefmsg (u->nick, bot_ptr->nick, "This service is only available to IRC operators.");
 		chanalert (bot_ptr->nick, "%s requested %s, but is not an operator.", u->nick, av[0]);
-		nlog (LOG_NORMAL, LOG_MOD, "%s requested %s, but is not an operator.", u->nick, av[0]);
+		nlog (LOG_NORMAL, "%s requested %s, but is not an operator.", u->nick, av[0]);
 		free (av);
 		return NS_SUCCESS;
 	}
@@ -394,7 +394,7 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char *command_string)
 		if (userlevel < cmdlevel) {
 			prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
 			chanalert (bot_ptr->nick, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
-			nlog (LOG_NORMAL, LOG_MOD, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
+			nlog (LOG_NORMAL, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
 			free (av);
 			return NS_SUCCESS;
 		}
@@ -411,10 +411,10 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char *command_string)
 		/* Grab the parameters for the log so modules do not have to log */
 		if(ac > 1) {
 			parambuf = joinbuf(av, ac, 1);
-			nlog (LOG_NORMAL, LOG_MOD, "%s used %s %s", u->nick, cmd_ptr->cmd, parambuf);
+			nlog (LOG_NORMAL, "%s used %s %s", u->nick, cmd_ptr->cmd, parambuf);
 			free(parambuf);
 		} else {
-			nlog (LOG_NORMAL, LOG_MOD, "%s used %s", u->nick, cmd_ptr->cmd);
+			nlog (LOG_NORMAL, "%s used %s", u->nick, cmd_ptr->cmd);
 		}
 		/* call handler */
 		cmd_ptr->handler(u, av, ac);
@@ -464,7 +464,7 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char *command_string)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 static int 
-bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
+bot_cmd_help (Bot* bot_ptr, User * u, char **av, int ac)
 {
 	char* curlevelmsg=NULL;
 	int donemsg=0;
@@ -482,7 +482,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 		lowlevel = 0;
 		curlevel = 30;
 		chanalert (bot_ptr->nick, "%s requested %s help", u->nick, bot_ptr->nick);
-		nlog (LOG_NORMAL, LOG_MOD, "%s requested %s help", u->nick, bot_ptr->nick);
+		nlog (LOG_NORMAL, "%s requested %s help", u->nick, bot_ptr->nick);
 		prefmsg(u->nick, bot_ptr->nick, "The following commands can be used with %s:", bot_ptr->nick);
 
 		/* Handle intrinsic commands */
@@ -510,7 +510,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 				/* Warn about missing help text then skip */ 
 				if(!cmd_ptr->onelinehelp) {
 					/* Missing help text!!! */
-					nlog (LOG_WARNING, LOG_MOD, "Missing one line help text for command %s", cmd_ptr->cmd);
+					nlog (LOG_WARNING, "Missing one line help text for command %s", cmd_ptr->cmd);
 				} else {					
 					prefmsg(u->nick, bot_ptr->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
 				}
@@ -555,7 +555,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 		return 1;
 	}
 	chanalert (bot_ptr->nick, "%s requested %s help on %s", u->nick, bot_ptr->nick, av[2]);
-	nlog (LOG_NORMAL, LOG_MOD, "%s requested %s help on %s", u->nick, bot_ptr->nick, av[2]);
+	nlog (LOG_NORMAL, "%s requested %s help on %s", u->nick, bot_ptr->nick, av[2]);
 
 	/* Process command list */
 	cmdnode = hash_lookup(bot_ptr->botcmds, av[2]);
@@ -568,7 +568,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 		}		
 		if(!cmd_ptr->helptext) {
 			/* Warn about missing help text then skip */ 
-			nlog (LOG_WARNING, LOG_MOD, "Missing help text for command %s", cmd_ptr->cmd);
+			nlog (LOG_WARNING, "Missing help text for command %s", cmd_ptr->cmd);
 			return 1;
 		}
 		privmsg_list (u->nick, bot_ptr->nick, cmd_ptr->helptext);
@@ -634,7 +634,7 @@ int is_target_valid(char* bot_name, User* u, char* target_nick)
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 static int 
-bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
+bot_cmd_set (Bot* bot_ptr, User * u, char **av, int ac)
 {
 	int intval;
 	bot_setting* set_ptr;
@@ -642,7 +642,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 
 	if (ac < 3) {
 		prefmsg(u->nick, bot_ptr->nick,
-			"Invalid Syntax. /msg %s HELP SET for more info", 
+			"Syntax error. /msg %s HELP SET for more info", 
 			bot_ptr->nick);
 		return 1;
 	} 
@@ -651,7 +651,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 	if( userlevel < bot_ptr->set_ulevel) {
 		prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
 		chanalert (bot_ptr->nick, "%s tried to use SET, but is not authorised", u->nick);
-		nlog (LOG_NORMAL, LOG_MOD, "%s tried to use SET, but is not authorised", u->nick);
+		nlog (LOG_NORMAL, "%s tried to use SET, but is not authorised", u->nick);
 		return 1;
 	}
 
@@ -706,7 +706,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 
 	if (ac < 4) {
 		prefmsg(u->nick, bot_ptr->nick,
-			"Invalid Syntax. /msg %s HELP SET for more info", 
+			"Syntax error. /msg %s HELP SET for more info", 
 			bot_ptr->nick);
 		return 1;
 	} 
@@ -727,7 +727,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 	if( userlevel < set_ptr->ulevel) {
 		prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
 		chanalert (bot_ptr->nick, "%s tried to use SET %s, but is not authorised", u->nick, av[2]);
-		nlog (LOG_NORMAL, LOG_MOD, "%s tried to use SET %s, but is not authorised", u->nick, av[2]);
+		nlog (LOG_NORMAL, "%s tried to use SET %s, but is not authorised", u->nick, av[2]);
 		return 1;
 	}
 	switch(set_ptr->type) {
@@ -737,7 +737,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				SetConf((void *) 1, CFGBOOL, set_ptr->confitem);
 				chanalert(bot_ptr->nick, "%s enabled by \2%s\2", 
 					set_ptr->option, u->nick);
-				nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s enabled %s",
+				nlog(LOG_NORMAL, "%s!%s@%s enabled %s",
 					u->nick, u->username, u->hostname, set_ptr->option);
 				prefmsg(u->nick, bot_ptr->nick,
 					"\2%s\2 enabled", set_ptr->option);
@@ -746,13 +746,13 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				SetConf(0, CFGBOOL, set_ptr->confitem);
 				chanalert(bot_ptr->nick, "%s disabled by \2%s\2", 
 					set_ptr->option, u->nick);
-				nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s disabled %s ", 
+				nlog(LOG_NORMAL, "%s!%s@%s disabled %s ", 
 					u->nick, u->username, u->hostname, set_ptr->option);
 				prefmsg(u->nick, bot_ptr->nick,
 					"\2%s\2 disabled", set_ptr->option);
 			} else {
 				prefmsg(u->nick, bot_ptr->nick,
-					"Invalid Syntax. /msg %s HELP SET for more info",
+					"Syntax error. /msg %s HELP SET for more info",
 					bot_ptr->nick);
 				return 1;
 			}
@@ -787,7 +787,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			SetConf((void *)intval, CFGINT, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %d by \2%s\2", 
 				set_ptr->option, intval, u->nick);
-			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %d", 
+			nlog(LOG_NORMAL, "%s!%s@%s set %s to %d", 
 				u->nick, u->username, u->hostname, set_ptr->option, intval);
 			prefmsg(u->nick, bot_ptr->nick,
 				"%s set to %d", set_ptr->option, intval);
@@ -797,7 +797,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
 				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
 				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
 			prefmsg(u->nick, bot_ptr->nick,
 				"%s set to %s", set_ptr->option, av[3]);
@@ -812,7 +812,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
 				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
 				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
 			prefmsg(u->nick, bot_ptr->nick,
 				"%s set to %s", set_ptr->option, av[3]);
@@ -826,7 +826,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				SetConf((void *)buf, CFGSTR, set_ptr->confitem);
 				chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
 					set_ptr->option, buf, u->nick);
-				nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+				nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
 					u->nick, u->username, u->hostname, set_ptr->option, buf);
 				prefmsg(u->nick, bot_ptr->nick,
 					"%s set to %s", set_ptr->option, buf);
@@ -843,7 +843,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
 				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
 				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
 			prefmsg(u->nick, bot_ptr->nick,
 				"%s set to %s", set_ptr->option, av[3]);
@@ -858,7 +858,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
 				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
 				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
 			prefmsg(u->nick, bot_ptr->nick,
 				"%s set to %s", set_ptr->option, av[3]);
@@ -878,7 +878,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
 				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
 				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
 			prefmsg(u->nick, bot_ptr->nick,
 				"%s set to %s", set_ptr->option, av[3]);
@@ -892,7 +892,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				SetConf((void *)buf, CFGSTR, set_ptr->confitem);
 				chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
 					set_ptr->option, buf, u->nick);
-				nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+				nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
 					u->nick, u->username, u->hostname, set_ptr->option, buf);
 				prefmsg(u->nick, bot_ptr->nick,
 					"%s set to %s", set_ptr->option, buf);
@@ -909,7 +909,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
 				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
 				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
 			prefmsg(u->nick, bot_ptr->nick,
 				"%s set to %s", set_ptr->option, av[3]);
@@ -922,7 +922,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 		default:
 			chanalert(bot_ptr->nick, "Unsupported SET type %d requested by %s for %s %s", 
 				set_ptr->type, u->nick, set_ptr->option, av[3]);
-			nlog(LOG_NORMAL, LOG_MOD, "Unsupported SET type %d requested by %s for %s %s", 
+			nlog(LOG_NORMAL, "Unsupported SET type %d requested by %s for %s %s", 
 				set_ptr->type, u->nick, set_ptr->option, av[3]);
 			prefmsg(u->nick, bot_ptr->nick,"Unsupported SET type %d for %s %s", 
 				set_ptr->type, set_ptr->option, av[3]);
@@ -942,7 +942,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
  *	work in progress
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-static int bot_cmd_about (ModUser* bot_ptr, User * u, char **av, int ac)
+static int bot_cmd_about (Bot* bot_ptr, User * u, char **av, int ac)
 {
 	return 1;
 }
@@ -950,8 +950,25 @@ static int bot_cmd_about (ModUser* bot_ptr, User * u, char **av, int ac)
  *	work in progress
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-static int bot_cmd_version (ModUser* bot_ptr, User * u, char **av, int ac)
+static int bot_cmd_version (Bot* bot_ptr, User * u, char **av, int ac)
 {
 	return 1;
 }
 #endif
+
+int add_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list)
+{
+	bot_ptr->bot_settings = bot_setting_list;	
+	/* Default SET to ROOT only */
+	bot_ptr->set_ulevel = NS_ULEVEL_ROOT;
+	/* Now calculate minimum defined user level */
+	while(bot_setting_list->option != NULL) {
+		if(bot_setting_list->ulevel < bot_ptr->set_ulevel)
+			bot_ptr->set_ulevel = bot_setting_list->ulevel;
+		bot_setting_list++;
+	}
+}
+
+int del_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list)
+{
+}

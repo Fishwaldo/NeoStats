@@ -54,6 +54,9 @@ ModuleInfo module_info = {
 static int Online(char **av, int ac)
 {
 	/* Introduce a bot onto the network */
+	template_bot = init_bot(template_module, s_module_bot_name, "user", me.name, "Real Name",
+		  "-x", 0, NULL, NULL);
+
 	if (init_bot(s_module_bot_name, "user", me.name, "Real Name", "-x",
 		module_info.module_name) == -1) {
 			/* Nick was in use */

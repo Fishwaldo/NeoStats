@@ -24,14 +24,15 @@
 #ifndef _BOTS_H_
 #define _BOTS_H_
 
-int list_bots (User * u, char **av, int ac);
-ModUser* add_mod_user (char *nick, char *mod_name);
-ModUser* add_neostats_mod_user (char *nick);
-int del_mod_user (char *nick);
-int list_bot_chans (User * u, char **av, int ac);
-int del_mod_bot (ModUser *bot_ptr, char * reason);
 int InitBots(void);
 int FiniBots(void);
+Bot* add_mod_user (Module* modptr, char *nick);
+Bot* add_neostats_mod_user (char *nick);
+int list_bots (User * u, char **av, int ac);
+int del_mod_user (char *nick);
+void add_chan_bot (char *bot, char *chan);
+void del_chan_bot (char *bot, char *chan);
+int list_bot_chans (User * u, char **av, int ac);
 void bot_message (char *origin, char **av, int ac);
 void bot_notice (char *origin, char **av, int ac);
 

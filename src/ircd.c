@@ -47,7 +47,6 @@ static char SmodeStringBuf[64];
 #endif
 static long services_bot_umode= 0;
 
-static int signon_newbot (const char *nick, const char *user, const char *host, const char *realname, long Umode);
 #ifdef IRCU
 int scmode_op (const char *who, const char *chan, const char *mode, const char *bot);
 #endif
@@ -253,112 +252,6 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 	return NS_SUCCESS;
 }
 
-/** @brief init_bot
- *
- * 
- *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
- */
-int
-init_bot (char *nick, char *user, char *host, char *realname, const char *modes, char *mod_name)
-{
-	User *u;
-	long Umode;
-
-	SET_SEGV_LOCATION();
-	u = finduser (nick);
-	if (u) {
-		nlog (LOG_WARNING, LOG_CORE, "Attempting to Login with a Nickname that already Exists: %s", nick);
-		return NS_FAILURE;
-	}
-	if(!add_mod_user (nick, mod_name)) {
-		nlog (LOG_WARNING, LOG_CORE, "add_mod_user failed for module %s bot %s", mod_name, nick);
-		return NS_FAILURE;
-	}
-	Umode = UmodeStringToMask(modes, 0);
-	signon_newbot (nick, user, host, realname, Umode);
-	/* restore segv_inmodule from SIGNON */
-	SET_SEGV_INMODULE(mod_name);
-	return NS_SUCCESS;
-}
-
-/** @brief init_mod_bot
- *
- *  replacement for init_bot - work in progress
- *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
- */
-ModUser * init_mod_bot (char * nick, char * user, char * host, char * realname, 
-						const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, 
-						bot_setting *bot_setting_list, char * mod_name)
-{
-	ModUser * bot_ptr; 
-	User *u;
-	long Umode;
-
-	SET_SEGV_LOCATION();
-	u = finduser (nick);
-	if (u) {
-		nlog (LOG_WARNING, LOG_CORE, "Attempting to Login with a Nickname that already Exists: %s", nick);
-		return NULL;
-	}
-	bot_ptr = add_mod_user (nick, mod_name);
-	if(!bot_ptr) {
-		nlog (LOG_WARNING, LOG_CORE, "add_mod_user failed for module %s bot %s", mod_name, nick);
-		return NULL;
-	}
-	Umode = UmodeStringToMask(modes, 0);
-	signon_newbot (nick, user, host, realname, Umode);
-#ifdef UMODE_DEAF
-	if(flags&BOT_FLAG_DEAF) {
-		sumode_cmd (nick, nick, UMODE_DEAF);
-	}
-#endif
-	/* restore segv_inmodule from SIGNON */
-	SET_SEGV_INMODULE(mod_name);
-	bot_ptr->flags = flags;
-	add_bot_cmd_list(bot_ptr, bot_cmd_list);
-	if (bot_setting_list != NULL) {
-		bot_ptr->bot_settings = bot_setting_list;	
-		/* Default SET to ROOT only */
-		bot_ptr->set_ulevel = NS_ULEVEL_ROOT;
-		/* Now calculate minimum defined user level */
-		while(bot_setting_list->option != NULL) {
-			if(bot_setting_list->ulevel < bot_ptr->set_ulevel)
-				bot_ptr->set_ulevel = bot_setting_list->ulevel;
-			bot_setting_list++;
-		}
-	} else {
-		bot_ptr->bot_settings = NULL;	
-		bot_ptr->set_ulevel = NS_ULEVEL_ROOT;
-	}
-	return bot_ptr;
-}
-
-/** @brief del_bot
- *
- * 
- *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
- */
-int
-del_bot (char *nick, char *reason)
-{
-	User *u;
-
-	SET_SEGV_LOCATION();
-	u = finduser (nick);
-	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Attempting to Logoff with a Nickname that does not Exists: %s", nick);
-		return NS_FAILURE;
-	}
-	nlog (LOG_DEBUG1, LOG_CORE, "Deleting bot %s for %s", nick, reason);
-	//XXXX TODO: need to free the channel list hash. We dont according to valgrind
-	squit_cmd (nick, reason);
-	del_mod_user (nick);
-	return NS_SUCCESS;
-}
-
 /** @brief CloakBotHost
  *
  *  Create a hidden hostmask for the bot 
@@ -369,7 +262,7 @@ del_bot (char *nick, char *reason)
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int 
-CloakHost (ModUser *bot_ptr)
+CloakHost (Bot *bot_ptr)
 {
 #ifdef GOTUMODECLOAKING
 	sumode_cmd (bot_ptr->nick, bot_ptr->nick, UMODE_HIDE);
@@ -494,7 +387,7 @@ joinbuf (char **av, int ac, int from)
 	 * the caller handle that case. 
 	 */
 	if(from >= ac) {
-		nlog (LOG_DEBUG1, LOG_CORE, "joinbuf: from (%d) >= ac (%d)", from, ac);
+		nlog (LOG_DEBUG1, "joinbuf: from (%d) >= ac (%d)", from, ac);
 		strlcpy (buf, "(null)", BUFSIZE);
 	}
 	else {
@@ -518,16 +411,16 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 {
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
-		nlog (LOG_DEBUG1, LOG_CORE, "m_notice: dropping unknown privmsg from %s, to %s : %s", origin, av[0], av[ac-1]);
+		nlog (LOG_DEBUG1, "m_notice: dropping unknown privmsg from %s, to %s : %s", origin, av[0], av[ac-1]);
 		return;
 	}
 #if 0
 	if( ircstrcasecmp(av[0], "AUTH")) {
-		nlog (LOG_DEBUG1, LOG_CORE, "m_notice: dropping server notice from %s, to %s : %s", origin, av[0], av[ac-1]);
+		nlog (LOG_DEBUG1, "m_notice: dropping server notice from %s, to %s : %s", origin, av[0], av[ac-1]);
 		return;
 	}
 #endif
-	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
+	nlog (LOG_DEBUG1, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
 
 	bot_notice (origin, av, ac);
 }
@@ -545,10 +438,10 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
-		nlog (LOG_DEBUG1, LOG_CORE, "m_private: dropping privmsg from %s to NULL user : %s", origin, av[ac-1]);
+		nlog (LOG_DEBUG1, "m_private: dropping privmsg from %s to NULL user : %s", origin, av[ac-1]);
 		return;
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
+	nlog (LOG_DEBUG1, "m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
 	/* its a privmsg, now lets see who too... */
 	if (strstr (av[0], "!")) {
 		strlcpy (target, av[0], 64);
@@ -584,16 +477,16 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 #endif
 			) {
 			if(cmd_list[i].function) {
-				nlog (LOG_DEBUG3, LOG_CORE, "process_ircd_cmd: running command %s", cmd_list[i].name);
+				nlog (LOG_DEBUG3, "process_ircd_cmd: running command %s", cmd_list[i].name);
 				cmd_list[i].function (origin, av, ac, cmdptr);
 			} else {
-				nlog (LOG_DEBUG3, LOG_CORE, "process_ircd_cmd: ignoring command %s", cmd);
+				nlog (LOG_DEBUG3, "process_ircd_cmd: ignoring command %s", cmd);
 			}
 			cmd_list[i].usage++;
 			return;
 		}
 	}
-	nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);
+	nlog (LOG_INFO, "No support for %s", cmd);
 }
 
 /** @brief parse
@@ -617,8 +510,8 @@ parse (char *line)
 	strlcpy (recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
-	nlog (LOG_DEBUG1, LOG_CORE, "--------------------------BEGIN PARSE---------------------------");
-	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
+	nlog (LOG_DEBUG1, "--------------------------BEGIN PARSE---------------------------");
+	nlog (LOG_DEBUG1, "R: %s", line);
 	if (*line == ':') {
 		coreLine = strpbrk (line, " ");
 		if (!coreLine)
@@ -642,12 +535,12 @@ parse (char *line)
 		coreLine = line + strlen (line);
 	}
 	strlcpy (cmd, line, sizeof (cmd)); 
-	nlog (LOG_DEBUG1, LOG_CORE, "origin: %s", origin);
-	nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
-	nlog (LOG_DEBUG1, LOG_CORE, "args  : %s", coreLine);
+	nlog (LOG_DEBUG1, "origin: %s", origin);
+	nlog (LOG_DEBUG1, "cmd   : %s", cmd);
+	nlog (LOG_DEBUG1, "args  : %s", coreLine);
 	ac = splitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	nlog (LOG_DEBUG1, LOG_CORE, "---------------------------END PARSE----------------------------");
+	nlog (LOG_DEBUG1, "---------------------------END PARSE----------------------------");
 	free (av);
 }
 #endif
@@ -724,7 +617,7 @@ do_pong (const char* origin, const char* destination)
 		SendModuleEvent (EVENT_PONG, av, ac);
 		free (av);
 	} else {
-		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", origin);
+		nlog (LOG_NOTICE, "Received PONG from unknown server: %s", origin);
 	}
 }
 
@@ -740,7 +633,7 @@ flood (User * u)
 	time_t current = me.now;
 
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "flood: can't find user");
+		nlog (LOG_WARNING, "flood: can't find user");
 		return 0;
 	}
 	if (UserLevel (u) >= NS_ULEVEL_OPER)	/* locop or higher */
@@ -751,7 +644,7 @@ flood (User * u)
 		return 0;
 	}
 	if (u->flood >= 5) {
-		nlog (LOG_NORMAL, LOG_CORE, "FLOODING: %s!%s@%s", u->nick, u->username, u->hostname);
+		nlog (LOG_NORMAL, "FLOODING: %s!%s@%s", u->nick, u->username, u->hostname);
 		ssvskill_cmd (u->nick, "%s!%s (Flooding Services.)", me.host, s_Services);
 		return 1;
 	} else {
@@ -888,7 +781,7 @@ do_stats (const char* nick, const char *what)
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "do_stats: message from unknown user %s", nick);
+		nlog (LOG_WARNING, "do_stats: message from unknown user %s", nick);
 		return;
 	}
 	if (!ircstrcasecmp (what, "u")) {
@@ -1041,7 +934,7 @@ globops (char *from, char *fmt, ...)
 	if (me.onchan) {
 		send_globops(from, ircd_buf);
 	} else {
-		nlog (LOG_NORMAL, LOG_CORE, ircd_buf);
+		nlog (LOG_NORMAL, ircd_buf);
 	}
 }
 
@@ -1073,7 +966,7 @@ void
 unsupported_cmd(const char* cmd)
 {
 	chanalert (s_Services, "Warning, %s tried to %s which is not supported", ((segv_inmodule[0] != 0)? segv_inmodule : ""), cmd);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning, %s tried to %s, which is not supported", ((segv_inmodule[0] != 0)? segv_inmodule : ""), cmd);
+	nlog (LOG_NOTICE, "Warning, %s tried to %s, which is not supported", ((segv_inmodule[0] != 0)? segv_inmodule : ""), cmd);
 }
 
 int
@@ -1176,7 +1069,7 @@ int
 ssvstime_cmd (const time_t ts)
 {
 	send_svstime(me.name, (unsigned long)ts);
-	nlog (LOG_NOTICE, LOG_CORE, "ssvstime_cmd: synching server times to %lu", ts);
+	nlog (LOG_NOTICE, "ssvstime_cmd: synching server times to %lu", ts);
 	return NS_SUCCESS;
 }
 #endif
@@ -1204,7 +1097,7 @@ ssvsmode_cmd (const char *target, const char *modes)
 
 	u = finduser (target);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "ssvsmode_cmd: can't find user %s", target);
+		nlog (LOG_WARNING, "ssvsmode_cmd: can't find user %s", target);
 		return 0;
 	}
 	send_svsmode(me.name, target, modes);
@@ -1223,7 +1116,7 @@ ssvshost_cmd (const char *who, const char *vhost)
 
 	u = finduser (who);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "ssvshost_cmd: can't find user %s", who);
+		nlog (LOG_WARNING, "ssvshost_cmd: can't find user %s", who);
 		return 0;
 	}
 
@@ -1275,7 +1168,7 @@ ssvsnick_cmd (const char *target, const char *newnick)
 	send_svsnick (me.name, target, newnick, me.now);
 #else
 	notice (s_Services, "Warning Module %s tried to SVSNICK, which is not supported", segv_inmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSNICK, which is not supported", segv_inmodule);
+	nlog (LOG_NOTICE, "Warning. Module %s tried to SVSNICK, which is not supported", segv_inmodule);
 #endif
 	return NS_SUCCESS;
 }
@@ -1476,7 +1369,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 #ifdef UNREAL
 		/* Unreal passes +b(&) and +e(") via SJ3 so skip them for now */	
 		if(*nicklist == '&' || *nicklist == '"') {
-			nlog (LOG_DEBUG1, LOG_CORE, "Skipping %s", nicklist);
+			nlog (LOG_DEBUG1, "Skipping %s", nicklist);
 			paramidx++;
 			continue;
 		}
@@ -1528,7 +1421,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 									modeexists = 1;
 									break;
 								} else if (((int *) m->mode == (int *) chan_modes[i].mode) && !ircstrcasecmp (m->param, argv[j])) {
-									nlog (LOG_INFO, LOG_CORE, "ChanMode: Mode %c (%s) already exists, not adding again", chan_modes[i].flag, argv[j]);
+									nlog (LOG_INFO, "ChanMode: Mode %c (%s) already exists, not adding again", chan_modes[i].flag, argv[j]);
 									j++;
 									modeexists = 1;
 									break;
@@ -1541,7 +1434,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 								strlcpy (m->param, argv[j], PARAMSIZE);
 								mn = lnode_create (m);
 								if (list_isfull (c->modeparms)) {
-									nlog (LOG_CRITICAL, LOG_CORE, "ChanMode: modelist is full adding to channel %s", c->name);
+									nlog (LOG_CRITICAL, "ChanMode: modelist is full adding to channel %s", c->name);
 									do_exit (NS_EXIT_ERROR, "List full - see log file");
 								} else {
 									list_append (c->modeparms, mn);
@@ -1727,7 +1620,7 @@ do_svsmode_user (const char* nick, const char* modes, const char* ts)
 		SetUserServicesTS (nick, ts);
 		/* If only setting TS, we do not need further mode processing */
 		if(strcasecmp(modes, "+d") == 0) {
-			nlog (LOG_DEBUG3, LOG_CORE, "dropping modes since this is a services TS %s", modes);
+			nlog (LOG_DEBUG3, "dropping modes since this is a services TS %s", modes);
 			return;
 		}
 		/* We need to strip the d from the mode string */
@@ -1847,9 +1740,9 @@ do_eos (const char *name)
 	s = findserver (name);
 	if(s) {
 		SynchServer(s);
-		nlog (LOG_DEBUG1, LOG_CORE, "do_eos: server %s is now synched", name);
+		nlog (LOG_DEBUG1, "do_eos: server %s is now synched", name);
 	} else {
-		nlog (LOG_WARNING, LOG_CORE, "do_eos: server %s not found", name);
+		nlog (LOG_WARNING, "do_eos: server %s not found", name);
 	}
 }
 #endif
@@ -1865,7 +1758,7 @@ send_cmd (char *fmt, ...)
 	ircvsnprintf (buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 
-	nlog (LOG_DEBUG2, LOG_CORE, "SENT: %s", buf);
+	nlog (LOG_DEBUG2, "SENT: %s", buf);
 	if(strnlen (buf, BUFSIZE) < BUFSIZE - 2) {
 		strlcat (buf, "\n", BUFSIZE);
 	} else {
@@ -1885,10 +1778,10 @@ setserverbase64 (const char *name, const char* num)
 
 	s = findserver(name);
 	if(s) {
-		nlog (LOG_DEBUG1, LOG_CORE, "setserverbase64: setting %s to %s", name, num);
+		nlog (LOG_DEBUG1, "setserverbase64: setting %s to %s", name, num);
 		strlcpy(s->name64, num, 6);
 	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "setserverbase64: cannot find %s for %s", name, num);
+		nlog (LOG_DEBUG1, "setserverbase64: cannot find %s for %s", name, num);
 	}
 }
 
@@ -1897,12 +1790,12 @@ servertobase64 (const char* name)
 {
 	Server *s;
 
-	nlog (LOG_DEBUG1, LOG_CORE, "servertobase64: scanning for %s", name);
+	nlog (LOG_DEBUG1, "servertobase64: scanning for %s", name);
 	s = findserver(name);
 	if(s) {
 		return s->name64;
 	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "servertobase64: cannot find %s", name);
+		nlog (LOG_DEBUG1, "servertobase64: cannot find %s", name);
 	}
 	return NULL;
 }
@@ -1912,12 +1805,12 @@ base64toserver (const char* num)
 {
 	Server *s;
 
-	nlog (LOG_DEBUG1, LOG_CORE, "base64toserver: scanning for %s", num);
+	nlog (LOG_DEBUG1, "base64toserver: scanning for %s", num);
 	s = findserverbase64(num);
 	if(s) {
 		return s->name;
 	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "base64toserver: cannot find %s", num);
+		nlog (LOG_DEBUG1, "base64toserver: cannot find %s", num);
 	}
 	return NULL;
 }
@@ -1932,10 +1825,10 @@ setnickbase64 (const char *nick, const char* num)
 
 	u = finduser(nick);
 	if(u) {
-		nlog (LOG_DEBUG1, LOG_CORE, "setnickbase64: setting %s to %s", nick, num);
+		nlog (LOG_DEBUG1, "setnickbase64: setting %s to %s", nick, num);
 		strlcpy(u->nick64, num, B64SIZE);
 	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "setnickbase64: cannot find %s for %s", nick, num);
+		nlog (LOG_DEBUG1, "setnickbase64: cannot find %s for %s", nick, num);
 	}
 }
 
@@ -1944,12 +1837,12 @@ nicktobase64 (const char* nick)
 {
 	User *u;
 
-	nlog (LOG_DEBUG1, LOG_CORE, "nicktobase64: scanning for %s", nick);
+	nlog (LOG_DEBUG1, "nicktobase64: scanning for %s", nick);
 	u = finduser(nick);
 	if(u) {
 		return u->nick64;
 	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "nicktobase64: cannot find %s", nick);
+		nlog (LOG_DEBUG1, "nicktobase64: cannot find %s", nick);
 	}
 	return NULL;
 }
@@ -1959,12 +1852,12 @@ base64tonick (const char* num)
 {
 	User *u;
 
-	nlog (LOG_DEBUG1, LOG_CORE, "base64tonick: scanning for %s", num);
+	nlog (LOG_DEBUG1, "base64tonick: scanning for %s", num);
 	u = finduserbase64(num);
 	if(u) {
 		return u->nick;
 	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "base64tonick: cannot find %s", num);
+		nlog (LOG_DEBUG1, "base64tonick: cannot find %s", num);
 	}
 	return NULL;
 }

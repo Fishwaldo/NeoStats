@@ -173,7 +173,7 @@ int ModInit(int modnum, int apiver)
 
 	ss_Config();
 	if (StatServ.html && StatServ.htmlpath[0] == 0) {
-		nlog(LOG_NOTICE, LOG_MOD,
+		nlog(LOG_NOTICE,
 		     "StatServ HTML stats disabled as HTML_PATH is not set");
 		StatServ.html = 0;
 	}
@@ -188,7 +188,7 @@ int ModInit(int modnum, int apiver)
 		s_new_server(av, ac);
 		free(av);
 		ac = 0;
-		nlog(LOG_DEBUG2, LOG_CORE, "Added Server %s to StatServ List", ss->name);
+		nlog(LOG_DEBUG2, "Added Server %s to StatServ List", ss->name);
 	}
 	hash_scan_begin(&scan, uh);
 	while ((node = hash_scan_next(&scan)) != NULL) {
@@ -200,7 +200,7 @@ int ModInit(int modnum, int apiver)
 		s_user_modes(av, ac);
 		free(av);
 		ac = 0;
-		nlog(LOG_DEBUG2, LOG_CORE, "Add user %s to StatServ List", u->nick);
+		nlog(LOG_DEBUG2, "Add user %s to StatServ List", u->nick);
 	}
 	hash_scan_begin(&scan, ch);
 	while ((node = hash_scan_next(&scan)) != NULL) {
@@ -214,7 +214,7 @@ int ModInit(int modnum, int apiver)
 		free(av);
 		ac = 0;
 		for (i = 1; i <= count; i++) {
-			nlog(LOG_DEBUG2, LOG_CORE, "Chanjoin %s", c->name);
+			nlog(LOG_DEBUG2, "Chanjoin %s", c->name);
 			ac = 0;
 			AddStringToList(&av, c->name, &ac);
 			AddStringToList(&av, chan, &ac);
@@ -713,8 +713,7 @@ static int ss_server(User * u, char **av, int ac)
 	ss = findstats(server);
 	s = findserver(server);
 	if (!ss) {
-		nlog(LOG_CRITICAL, LOG_CORE,
-		     "Unable to find server statistics for %s", server);
+		nlog(LOG_CRITICAL, "Unable to find server statistics for %s", server);
 		prefmsg(u->nick, s_StatServ,
 			"Internal Error! Please Consult the Log file");
 		return 0;
@@ -869,7 +868,7 @@ static int ss_stats(User * u, char **av, int ac)
 			i++;
 		}
 		prefmsg(u->nick, s_StatServ, "End of List.");
-		nlog(LOG_NOTICE, LOG_MOD, "%s requested STATS LIST.", u->nick);
+		nlog(LOG_NOTICE, "%s requested STATS LIST.", u->nick);
 	} else if (!ircstrcasecmp(av[2], "DEL")) {
 		if (!av[3]) {
 			prefmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS DEL <name>", s_StatServ);
@@ -889,14 +888,14 @@ static int ss_stats(User * u, char **av, int ac)
 				hnode_destroy(node);
 				free(st);
 				prefmsg(u->nick, s_StatServ, "Removed %s from the database.", av[3]);
-				nlog(LOG_NOTICE, LOG_MOD, "%s requested STATS DEL %s", u->nick, av[3]);
+				nlog(LOG_NOTICE, "%s requested STATS DEL %s", u->nick, av[3]);
 				return 0;
 			}
 		} else {
 			prefmsg(u->nick, s_StatServ, 
 				"Cannot remove %s from the database, it is online!!",
 				av[3]);
-			nlog(LOG_WARNING, LOG_MOD,
+			nlog(LOG_WARNING,
 			     "%s requested STATS DEL %s, but that server is online!!",
 			     u->nick, av[3]);
 				return 0;
@@ -929,7 +928,7 @@ static int ss_stats(User * u, char **av, int ac)
 		memcpy(st->name, av[4], sizeof(st->name));
 		prefmsg(u->nick, s_StatServ, 
 			"Moved database entry for %s to %s", av[3], av[4]);
-		nlog(LOG_NOTICE, LOG_MOD,
+		nlog(LOG_NOTICE,
 		     "%s requested STATS COPY %s -> %s", u->nick, av[3], av[4]);
 	} else {
 		prefmsg(u->nick, s_StatServ, "Invalid Argument.");
@@ -940,7 +939,7 @@ static int ss_stats(User * u, char **av, int ac)
 
 static int ss_forcehtml(User * u, char **av, int ac)
 {
-	nlog(LOG_NOTICE, LOG_MOD, "%s!%s@%s forced an update of the StatServ HTML file.",
+	nlog(LOG_NOTICE, "%s!%s@%s forced an update of the StatServ HTML file.",
 		    u->nick, u->username, u->hostname);
 	chanalert(s_StatServ, "%s forced an update of the StatServ HTML file.",
 			u->nick);

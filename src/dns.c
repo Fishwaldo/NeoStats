@@ -82,12 +82,12 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 
 	SET_SEGV_LOCATION();
 	if (list_isfull (dnslist)) {
-		nlog (LOG_ERROR, LOG_CORE, "DNS: Lookup list is full");
+		nlog (LOG_ERROR, "DNS: Lookup list is full");
 		return 0;
 	}
 	dnsdata = malloc (sizeof (DnsLookup));
 	if (!dnsdata) {
-		nlog (LOG_CRITICAL, LOG_CORE, "DNS: Out of Memory");
+		nlog (LOG_CRITICAL, "DNS: Out of Memory");
 		return 0;
 	}
 	/* set the module name */
@@ -106,12 +106,12 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 		status = adns_submit (ads, str, type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
 	}
 	if (status) {
-		nlog (LOG_WARNING, LOG_CORE, "DNS: adns_submit error: %s", strerror (status));
+		nlog (LOG_WARNING, "DNS: adns_submit error: %s", strerror (status));
 		free (dnsdata);
 		return 0;
 	}
 
-	nlog (LOG_DEBUG1, LOG_CORE, "DNS: Added dns query %s to list", data);
+	nlog (LOG_DEBUG1, "DNS: Added dns query %s to list", data);
 	/* if we get here, then the submit was successful. Add it to the list of queryies */
 	dnsnode = lnode_create (dnsdata);
 	list_append (dnslist, dnsnode);
@@ -143,7 +143,7 @@ init_dns ()
 #endif
 	if (adnsstart) {
 		printf ("ADNS init failed: %s\n", strerror (adnsstart));
-		nlog (LOG_CRITICAL, LOG_CORE, "ADNS init failed: %s", strerror (adnsstart));
+		nlog (LOG_CRITICAL, "ADNS init failed: %s", strerror (adnsstart));
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
@@ -227,13 +227,13 @@ do_dns ()
 		status = adns_check (ads, &dnsdata->q, &dnsdata->a, NULL);
 		/* if status == eagain, the lookup hasn't completed yet */
 		if (status == EAGAIN) {
-			nlog (LOG_DEBUG2, LOG_CORE, "DNS: Lookup hasn't completed for %s",(char *) &dnsdata->data);
+			nlog (LOG_DEBUG2, "DNS: Lookup hasn't completed for %s",(char *) &dnsdata->data);
 			dnsnode = list_next (dnslist, dnsnode);
 			break;
 		}
 		/* there was an error */
 		if (status) {
-			nlog (LOG_CRITICAL, LOG_CORE, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror (status));
+			nlog (LOG_CRITICAL, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror (status));
 			chanalert (s_Services, "Bad Error on DNS lookup. Please check logfile");
 
 			/* set this so nlog works good */
@@ -249,7 +249,7 @@ do_dns ()
 			lnode_destroy (dnsnode1);
 			break;
 		}
-		nlog (LOG_DEBUG1, LOG_CORE, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->mod_name);
+		nlog (LOG_DEBUG1, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->mod_name);
 		SET_SEGV_INMODULE(dnsdata->mod_name);
 		/* call the callback function */
 		dnsdata->callback (dnsdata->data, dnsdata->a);

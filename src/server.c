@@ -47,10 +47,10 @@ new_server (const char *name)
 	strlcpy (s->name, name, MAXHOST);
 	sn = hnode_create (s);
 	if (!sn) {
-		nlog (LOG_WARNING, LOG_CORE, "Eeek, Hash is broken\n");
+		nlog (LOG_WARNING, "Eeek, Hash is broken\n");
 	}
 	if (hash_isfull (sh)) {
-		nlog (LOG_WARNING, LOG_CORE, "Eeek, Server Hash is full!\n");
+		nlog (LOG_WARNING, "Eeek, Server Hash is full!\n");
 	} else {
 		hash_insert (sh, sn, s->name);
 	}
@@ -64,7 +64,7 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	char **av;
 	int ac = 0;
 
-	nlog (LOG_DEBUG1, LOG_CORE, "New Server: %s", name);
+	nlog (LOG_DEBUG1, "New Server: %s", name);
 	s = new_server (name);
 	if(hops) {
 		s->hops = atoi (hops);
@@ -111,7 +111,7 @@ DelServer (const char *name, const char* reason)
 	}
 	sn = hash_lookup (sh, name);
 	if (!sn) {
-		nlog (LOG_WARNING, LOG_CORE, "DelServer: squit from unknown server %s", name);
+		nlog (LOG_WARNING, "DelServer: squit from unknown server %s", name);
 		return;
 	}
 	s = hnode_get (sn);
@@ -141,11 +141,11 @@ findserverbase64 (const char *num)
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
 		if(strncmp(s->name64, num, BASE64SERVERSIZE) == 0) {
-			nlog (LOG_DEBUG1, LOG_CORE, "findserverbase64: %s -> %s", num, s->name);
+			nlog (LOG_DEBUG1, "findserverbase64: %s -> %s", num, s->name);
 			return s;
 		}
 	}
-	nlog (LOG_DEBUG3, LOG_CORE, "findserverbase64: %s not found!", num);
+	nlog (LOG_DEBUG3, "findserverbase64: %s not found!", num);
 	return NULL;
 }
 #endif
@@ -161,7 +161,7 @@ findserver (const char *name)
 		s = hnode_get (sn);
 		return s;
 	}
-	nlog (LOG_DEBUG3, LOG_CORE, "findserver: %s not found!", name);
+	nlog (LOG_DEBUG3, "findserver: %s not found!", name);
 	return NULL;
 }
 
@@ -302,7 +302,7 @@ init_server_hash (void)
 {
 	sh = hash_create (S_TABLE_SIZE, 0, 0);
 	if (!sh) {
-		nlog (LOG_CRITICAL, LOG_CORE, "Create Server Hash Failed\n");
+		nlog (LOG_CRITICAL, "Create Server Hash Failed\n");
 		return NS_FAILURE;
 	}
 	AddServer (me.name, NULL, 0, NULL, me.infoline);
@@ -324,7 +324,7 @@ PingServers (void)
 
 	if(!me.synced)
 		return;
-	nlog (LOG_DEBUG3, LOG_CORE, "Sending pings...");
+	nlog (LOG_DEBUG3, "Sending pings...");
 	ping.ulag = 0;
 
 	hash_scan_begin (&ss, sh);

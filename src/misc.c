@@ -65,12 +65,12 @@ smalloc (long size)
 	void *buf;
 
 	if (!size) {
-		nlog (LOG_WARNING, LOG_CORE, "smalloc(): illegal attempt to allocate 0 bytes!");
+		nlog (LOG_WARNING, "smalloc(): illegal attempt to allocate 0 bytes!");
 		size = 1;
 	}
 	buf = malloc (size);
 	if (!buf) {
-		nlog (LOG_CRITICAL, LOG_CORE, "smalloc(): out of memory.");
+		nlog (LOG_CRITICAL, "smalloc(): out of memory.");
 		do_exit (NS_EXIT_ERROR, "Out of memory");
 	}
 	return buf;
@@ -93,7 +93,7 @@ sstrdup (const char *s)
 {
 	char *t = strdup (s);
 	if (!t) {
-		nlog (LOG_CRITICAL, LOG_CORE, "sstrdup(): out of memory.");
+		nlog (LOG_CRITICAL, "sstrdup(): out of memory.");
 		do_exit (NS_EXIT_ERROR, "Out of memory");
 	}
 	return t;

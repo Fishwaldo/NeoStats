@@ -97,7 +97,7 @@ static bot_cmd ns_commands[]=
 int  
 init_services(void) 
 {
-	ModUser* bot_ptr;
+	Bot* bot_ptr;
 
 	SET_SEGV_LOCATION();
 	/* Add command list to services bot */
@@ -123,20 +123,20 @@ ns_exclude (User *u, char **av, int ac)
 {
 	if (!ircstrcasecmp(av[2], "ADD")) {
 		if (ac < 4) {
-			prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
+			prefmsg(u->nick, s_Services, "Syntax error. /msg %s help exclude", s_Services);
 			return NS_FAILURE;
 		}
 		ns_do_exclude_add(u, av[2], av[3]);
 	} else if (!ircstrcasecmp(av[1], "DEL")) {
 		if (ac < 3) {
-			prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
+			prefmsg(u->nick, s_Services, "Syntax error. /msg %s help exclude", s_Services);
 			return NS_FAILURE;
 		}
 		ns_do_exclude_del(u, av[2]);
 	} else if (!ircstrcasecmp(av[1], "LIST")) {
 		ns_do_exclude_list(u, s_Services);
 	} else {
-		prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
+		prefmsg(u->nick, s_Services, "Syntax error. /msg %s help exclude", s_Services);
 	}
 	return 1;
 }
@@ -157,7 +157,7 @@ ns_shutdown (User * u, char **av, int ac)
 	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
 		u->nick, u->username, u->hostname, av[ac-1]);
 	globops (s_Services, "%s", quitmsg);
-	nlog (LOG_NOTICE, LOG_CORE, "%s", quitmsg);
+	nlog (LOG_NOTICE, "%s", quitmsg);
 	do_exit (NS_EXIT_NORMAL, quitmsg);
    	return 1;
 }
@@ -175,11 +175,11 @@ static int
 ns_reload (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	chanalert (s_Services, "%s Wants me to RELOAD! for %s", u->nick, av[ac - 1] );
+	chanalert (s_Services, "%s requested RELOAD for %s", u->nick, av[ac - 1]);
 	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested RELOAD for %s.", 
-		u->nick, u->username, u->hostname, av[ac - 1] );
+		u->nick, u->username, u->hostname, av[ac - 1]);
 	globops (s_Services, "%s", quitmsg);
-	nlog (LOG_NOTICE, LOG_CORE, "%s", quitmsg);
+	nlog (LOG_NOTICE, "%s", quitmsg);
 	do_exit (NS_EXIT_RELOAD, quitmsg);
    	return 1;
 }
@@ -232,9 +232,9 @@ ns_jupe (User * u, char **av, int ac)
 	static char infoline[255];
 
 	SET_SEGV_LOCATION();
-	ircsnprintf (infoline, 255, "[Jupitered by %s]", u->nick);
+	ircsnprintf (infoline, 255, "[jupitered by %s]", u->nick);
 	sserver_cmd (av[1], 1, infoline);
-	nlog (LOG_NOTICE, LOG_CORE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, av[1]);
+	nlog (LOG_NOTICE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, av[1]);
 	chanalert (s_Services, "%s jupitered %s", u->nick, av[1]);
 	prefmsg(u->nick, s_Services, "%s has been jupitered", av[1]);
    	return 1;
@@ -255,16 +255,15 @@ ns_set_debug (User * u, char **av, int ac)
 	SET_SEGV_LOCATION();
 	if ((!ircstrcasecmp(av[1], "YES")) || (!ircstrcasecmp(av[1], "ON"))) {
 		me.debug_mode = 1;
-		globops (me.name, "\2DEBUG MODE\2 Activated by %s", u->nick);
-		prefmsg (u->nick, s_Services, "Debuging Mode Enabled!");
+		globops (me.name, "\2DEBUG MODE\2 enabled by %s", u->nick);
+		prefmsg (u->nick, s_Services, "Debug mode enabled!");
 	} else if ((!ircstrcasecmp(av[1], "NO")) || (!ircstrcasecmp(av[1], "OFF"))) {
 		me.debug_mode = 0;
-		globops (me.name, "\2DEBUG MODE\2 Deactivated by %s", u->nick);
-		prefmsg (u->nick, s_Services, "Debuging Mode Disabled");
+		globops (me.name, "\2DEBUG MODE\2 disabled by %s", u->nick);
+		prefmsg (u->nick, s_Services, "Debug mode disabled");
 	} else {
 		prefmsg(u->nick, s_Services,
-			"Syntax Error: /msg %s HELP DEBUG for more info",
-			s_Services);
+			"Syntax Error: /msg %s HELP DEBUG for more info", s_Services);
 		   	return 0;
 	}
    	return 1;
@@ -284,14 +283,14 @@ ns_userdump (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	if (!me.debug_mode) {
-		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
+		prefmsg (u->nick, s_Services, "\2Error:\2 debug mode disabled");
 	   	return 0;
 	}
 	if(ac < 2) {
-		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump!", u->nick);
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 requested a user dump", u->nick);
 		UserDump (NULL);
 	} else {
-		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump for %s!", u->nick, av[1]);
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 requested a user dump for %s", u->nick, av[1]);
 		UserDump (av[1]);
 	}
    	return 1;
@@ -311,14 +310,14 @@ ns_serverdump (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	if (!me.debug_mode) {
-		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
+		prefmsg (u->nick, s_Services, "\2Error:\2 debug mode disabled");
 	   	return 0;
 	}
 	if(ac < 2) {
-		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump!", u->nick);
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 requested a server dump", u->nick);
 		ServerDump (NULL);
 	} else {
-		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ServerDump for %s!", u->nick, av[1]);
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 requested a server dump for %s", u->nick, av[1]);
 		ServerDump (av[1]);
 	}
    	return 1;
@@ -338,14 +337,14 @@ ns_chandump (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	if (!me.debug_mode) {
-		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
+		prefmsg (u->nick, s_Services, "\2Error:\2 debug mode disabled");
 	   	return 0;
 	}
 	if(ac < 2) {
-		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ChannelDump!", u->nick);
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 requested a channel dump", u->nick);
 		ChanDump (NULL);
 	} else {
-		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ChannelDump for %s!", u->nick, av[1]);
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 requested a channel dump for %s", u->nick, av[1]);
 		ChanDump (av[1]);
 	}
    	return 1;
@@ -366,7 +365,7 @@ ns_status (User * u, char **av, int ac)
 	int uptime = me.now - me.t_start;
 
 	SET_SEGV_LOCATION();
-	prefmsg (u->nick, s_Services, "%s Status:", s_Services);
+	prefmsg (u->nick, s_Services, "%s status:", s_Services);
 	if (uptime > 86400) {
 		prefmsg (u->nick, s_Services, "%s up \2%d\2 day%s, \2%02d:%02d\2", s_Services, uptime / 86400, (uptime / 86400 == 1) ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60);
 	} else if (uptime > 3600) {
@@ -376,15 +375,15 @@ ns_status (User * u, char **av, int ac)
 	} else {
 		prefmsg (u->nick, s_Services, "%s up \2%d second%s\2", s_Services, uptime, uptime == 1 ? "" : "s");
 	}
-	prefmsg (u->nick, s_Services, "Sent %ld Messages Totaling %ld Bytes", me.SendM, me.SendBytes);
-	prefmsg (u->nick, s_Services, "Received %ld Messages, Totaling %ld Bytes", me.RcveM, me.RcveBytes);
-	prefmsg (u->nick, s_Services, "Reconnect Time: %d", me.r_time);
-	prefmsg (u->nick, s_Services, "Statistic Requests: %d", me.requests);
-	prefmsg (u->nick, s_Services, "Max Sockets: %d (in use: %d)", me.maxsocks, me.cursocks);
+	prefmsg (u->nick, s_Services, "Sent %ld messages, %ld bytes", me.SendM, me.SendBytes);
+	prefmsg (u->nick, s_Services, "Received %ld messages, %ld Bytes", me.RcveM, me.RcveBytes);
+	prefmsg (u->nick, s_Services, "Reconnect time: %d", me.r_time);
+	prefmsg (u->nick, s_Services, "Requests: %d", me.requests);
+	prefmsg (u->nick, s_Services, "Max sockets: %d (in use: %d)", me.maxsocks, me.cursocks);
 	if (me.debug_mode)
-		prefmsg (u->nick, s_Services, "Debugging Mode is \2ON!\2");
+		prefmsg (u->nick, s_Services, "Debugging mode enabled");
 	else
-		prefmsg (u->nick, s_Services, "Debugging Mode is Disabled!");
+		prefmsg (u->nick, s_Services, "Debugging mode disabled");
 	return 0;
 }
 
@@ -401,8 +400,8 @@ static int
 ns_version (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	prefmsg (u->nick, s_Services, "\2NeoStats Version\2");
-	prefmsg (u->nick, s_Services, "NeoStats Version: %s", me.versionfull);
+	prefmsg (u->nick, s_Services, "\2NeoStats version\2");
+	prefmsg (u->nick, s_Services, "NeoStats version: %s", me.versionfull);
 	prefmsg (u->nick, s_Services, "http://www.neostats.net");
    	return 1;
 }
@@ -424,10 +423,10 @@ ns_level (User * u, char **av, int ac)
 		User * otheruser;
 		otheruser = finduser(av[1]);
 		if(otheruser) {
-			prefmsg (u->nick, s_Services, "User Level for %s is %d", otheruser->nick, UserLevel (otheruser));
+			prefmsg (u->nick, s_Services, "User level for %s is %d", otheruser->nick, UserLevel (otheruser));
 		}
 	} else {
-		prefmsg (u->nick, s_Services, "Your Level is %d", UserLevel (u));
+		prefmsg (u->nick, s_Services, "Your level is %d", UserLevel (u));
 	}
 	return 1;
 }
@@ -489,8 +488,8 @@ ns_raw (User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	message = joinbuf (av, ac, 1);
-	chanalert (s_Services, "\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)", u->nick, message);
-	nlog (LOG_INFO, LOG_CORE, "RAW COMMAND %sIssued a Raw Command!(%s)", u->nick, message);
+	chanalert (s_Services, "\2RAW COMMAND\2 \2%s\2 issued a raw command!(%s)", u->nick, message);
+	nlog (LOG_INFO, "RAW COMMAND %s issued a raw command!(%s)", u->nick, message);
 	send_cmd ("%s", message);
 	free (message);
    	return 1;

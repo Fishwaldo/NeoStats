@@ -24,6 +24,6 @@
 #ifndef _SERVICES_H_
 #define _SERVICES_H_
 
-void servicesbot (char *nick, char **av, int ac);
+int init_services(void);
 
 #endif /* _SERVICES_H_ */

@@ -3,6 +3,7 @@ NeoStats ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 ===============================================================================
 * NeoStats * Fish (F) & Mark (M) * Version 3.0.genesis
+ - Logging scope is now automatic rather than requiring a specific option (M)
  - Module support calls to access timers/bots/sockets etc must now pass 
    correctly typed function pointers rather than using core symbol lookups (M)
  - dl.c/h split into files dedicated to a part of the module sytstem e.g. 

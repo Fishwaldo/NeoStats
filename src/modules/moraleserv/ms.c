@@ -27,7 +27,8 @@
 #include "ms.h"
 
 static char s_MoraleServ[MAXNICK];
-static ModUser *ms_bot;
+static Bot *ms_bot;
+static Module* ms_module;
 
 struct ms_cfg { 
 	char user[MAXUSER];
@@ -81,8 +82,8 @@ static bot_setting ms_settings[]=
 
 static int Online(char **av, int ac)
 {
-	ms_bot = init_mod_bot(s_MoraleServ, ms_cfg.user, ms_cfg.host, ms_cfg.realname, 
-		services_bot_modes, BOT_FLAG_DEAF, ms_commands, ms_settings, module_info.module_name);
+	ms_bot = init_bot(cs_module, s_MoraleServ, ms_cfg.user, ms_cfg.host, ms_cfg.realname, 
+		services_bot_modes, BOT_FLAG_DEAF, ms_commands, ms_settings);
 	return 1;
 };
 

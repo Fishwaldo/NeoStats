@@ -58,7 +58,7 @@ void SaveStats()
 	hash_scan_begin(&ss, Shead);
 	while ((sn = hash_scan_next(&ss))) {
 		s = hnode_get(sn);
-		nlog(LOG_DEBUG1, LOG_MOD,
+		nlog(LOG_DEBUG1,
 		     "Writing statistics to database for %s", s->name);
 		SetData((void *)s->numsplits, CFGINT, "ServerStats", s->name, "Splits");
 		SetData((void *)s->maxusers, CFGINT, "ServerStats", s->name, "MaxUsers");
@@ -102,7 +102,7 @@ void SaveStats()
 		}
 /* we need to squeze as much performance out of this as we can */
 #if 0
-		nlog(LOG_DEBUG1, LOG_MOD,
+		nlog(LOG_DEBUG1,
 		     "Writting Statistics to database for %s (%d)", c->name, count);
 #endif
 		save_chan(c);
@@ -178,11 +178,11 @@ void LoadStats() {
 			s->daily_totusers = 0;
 			s->lowest_ping = s->highest_ping = s->daily_totusers = 0;
 
-			nlog(LOG_DEBUG1, LOG_MOD,
+			nlog(LOG_DEBUG1,
 			     "LoadStats(): Loaded statistics for %s", s->name);
 			sn = hnode_create(s);
 			if (hash_isfull(Shead)) {
-				nlog(LOG_CRITICAL, LOG_MOD,
+				nlog(LOG_CRITICAL,
 				     "Eeek, StatServ Server Hash is Full!");
 			} else {
 				hash_insert(Shead, sn, s->name);
@@ -215,15 +215,15 @@ void LoadStats() {
 			c->members = 0;
 			cn = lnode_create(c);
 			if (list_isfull(Chead)) {
-				nlog(LOG_CRITICAL, LOG_MOD,
+				nlog(LOG_CRITICAL,
 				     "Eeek, StatServ Channel Hash is Full!");
 			} else {
-				nlog(LOG_DEBUG2, LOG_MOD,
+				nlog(LOG_DEBUG2,
 				     "Loading %s Channel Data", c->name);
 				if ((me.now - c->lastseen) < 604800) {
 					list_append(Chead, cn);
 				} else {
-					nlog(LOG_DEBUG1, LOG_MOD,
+					nlog(LOG_DEBUG1,
 					     "Deleting Old Channel %s", c->name);
 					lnode_destroy(cn);
 					free(c);
@@ -297,11 +297,11 @@ CStats *load_chan(char *name) {
 	c->lastsave = me.now;
 	cn = lnode_create(c);
 	if (list_isfull(Chead)) {
-		nlog(LOG_CRITICAL, LOG_MOD, "Eeek, StatServ Channel Hash is Full!");
+		nlog(LOG_CRITICAL, "Eeek, StatServ Channel Hash is Full!");
 	} else {
-		nlog(LOG_DEBUG2, LOG_MOD, "Loading %s Channel Data", c->name);
+		nlog(LOG_DEBUG2, "Loading %s Channel Data", c->name);
 		if ((me.now - c->lastseen) > 604800) {
-			nlog(LOG_DEBUG1, LOG_MOD,
+			nlog(LOG_DEBUG1,
 			     "Resetting Old Channel %s", c->name);
 			c->totmem = 0;
 			c->topics = 0;
@@ -384,7 +384,7 @@ void DelOldChan()
 	time_t start;
 	
 	start = time(NULL);
-	nlog(LOG_DEBUG1, LOG_MOD, "Starting To Clean Channel Database");
+	nlog(LOG_DEBUG1, "Starting To Clean Channel Database");
 	if (GetTableData("ChanStats", &row) > 0) {
 		for (count = 0; row[count] != NULL; count++) {
 			if (GetData((void *)&lastseen, CFGINT, "ChanStats", row[count], "LastSeen") > 0) {
@@ -392,18 +392,18 @@ void DelOldChan()
 				 * use findchan, instead of findchanstats, and findchan is based on hashes, so its faster 
 				 */
 				if (((me.now - lastseen) > 604800) && (!findchan(row[count]))) {
-					nlog(LOG_DEBUG1, LOG_MOD, "Deleting Channel %s", row[count]);
+					nlog(LOG_DEBUG1, "Deleting Channel %s", row[count]);
 					DelRow("ChanStats", row[count]);
 				}
 			} else {
 				/* database corruption? */
-				nlog(LOG_WARNING, LOG_MOD, "Hrm, Database Corruption for Channel %s?. Deleting Record", row[count]);
+				nlog(LOG_WARNING, "Hrm, Database Corruption for Channel %s?. Deleting Record", row[count]);
 				DelRow("ChanStats", row[count]);
 			}
 		}
 	}
 	free(row);
-	nlog(LOG_INFO, LOG_MOD, "Took %d seconds to clean %d channel stats", (int)(time(NULL) - start), count);
+	nlog(LOG_INFO, "Took %d seconds to clean %d channel stats", (int)(time(NULL) - start), count);
 }
 
 

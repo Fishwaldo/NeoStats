@@ -54,14 +54,14 @@ new_user (const char *nick)
 	u = smalloc (sizeof (User));
 	bzero(u, sizeof(User));
 	if (!nick) {
-		nlog (LOG_CRITICAL, LOG_CORE, "new_user: trying to add user with NULL nickname");
+		nlog (LOG_CRITICAL, "new_user: trying to add user with NULL nickname");
 		return NULL;
 	} else {
 		strlcpy (u->nick, nick, MAXNICK);
 	}
 	un = hnode_create (u);
 	if (hash_isfull (uh)) {
-		nlog (LOG_CRITICAL, LOG_CORE, "new_user: user hash is full");
+		nlog (LOG_CRITICAL, "new_user: user hash is full");
 		return NULL;
 	} else {
 		hash_insert (uh, un, u->nick);
@@ -100,7 +100,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (u) {
-		nlog (LOG_WARNING, LOG_CORE, "AddUser: trying to add a user that already exists %s", nick);
+		nlog (LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick);
 		return;
 	}
 
@@ -131,7 +131,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	} else {
 		time = me.now;
 	}
-	nlog (LOG_DEBUG2, LOG_CORE, "AddUser: %s (%s@%s) %s (%d) -> %s at %lu", nick, user, host, realname, (int)htonl (ipaddress), server, (unsigned long)time);
+	nlog (LOG_DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %lu", nick, user, host, realname, (int)htonl (ipaddress), server, (unsigned long)time);
 
 	u = new_user (nick);
 	if (!u) {
@@ -199,17 +199,17 @@ DelUser (const char *nick, int killflag, const char *reason)
 	int ac = 0;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "doDelUser: %s", nick);
+	nlog (LOG_DEBUG2, "doDelUser: %s", nick);
 
 	u = finduser(nick);
 	if(!u) {
-		nlog (LOG_WARNING, LOG_CORE, "doDelUser: %s failed!", nick);
+		nlog (LOG_WARNING, "doDelUser: %s failed!", nick);
 		return;
 	}
 
 	un = hash_lookup (uh, u->nick);
 	if (!un) {
-		nlog (LOG_WARNING, LOG_CORE, "doDelUser: %s failed!", nick);
+		nlog (LOG_WARNING, "doDelUser: %s failed!", nick);
 		return;
 	}
 	u = hnode_get (un);
@@ -236,7 +236,7 @@ DelUser (const char *nick, int killflag, const char *reason)
 	/* if its one of our bots, remove it from the modlist */
 	if (findbot (u->nick)) {
 		if (killflag == 1) {
-			nlog (LOG_NOTICE, LOG_CORE, "doDelUser: deleting bot %s as it was killed", u->nick);
+			nlog (LOG_NOTICE, "doDelUser: deleting bot %s as it was killed", u->nick);
 			strlcpy(killnick,u->nick,MAXNICK);
 			botflag = 1;
 		}
@@ -281,7 +281,7 @@ UserAway (const char *nick, const char *awaymsg)
 			free (av);
 		}
 	} else {
-		nlog (LOG_WARNING, LOG_CORE, "UserAway: unable to find user %s for away", nick);
+		nlog (LOG_WARNING, "UserAway: unable to find user %s for away", nick);
 	}
 }
 
@@ -299,7 +299,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	SET_SEGV_LOCATION();
 	u = finduser (oldnick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "UserNick: can't find user %s", oldnick);
+		nlog (LOG_WARNING, "UserNick: can't find user %s", oldnick);
 		return NS_FAILURE;
 	}
 	strlcpy(uoldnick, u->nick, MAXNICK);
@@ -310,10 +310,10 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 		time = me.now;
 	}
 
-	nlog (LOG_DEBUG2, LOG_CORE, "UserNick: %s -> %s", u->nick, newnick);
+	nlog (LOG_DEBUG2, "UserNick: %s -> %s", u->nick, newnick);
 	un = hash_lookup (uh, u->nick);
 	if (!un) {
-		nlog (LOG_WARNING, LOG_CORE, "UserNick: %s -> %s failed!", u->nick, newnick);
+		nlog (LOG_WARNING, "UserNick: %s -> %s failed!", u->nick, newnick);
 		return NS_FAILURE;
 	}
 	cm = list_first (u->chans);
@@ -350,11 +350,11 @@ finduserbase64 (const char *num)
 	while ((un = hash_scan_next (&us)) != NULL) {
 		u = hnode_get (un);
 		if(strncmp(u->nick64, num, BASE64NICKSIZE) == 0) {
-			nlog (LOG_DEBUG1, LOG_CORE, "finduserbase64: %s -> %s", num, u->nick);
+			nlog (LOG_DEBUG1, "finduserbase64: %s -> %s", num, u->nick);
 			return u;
 		}
 	}
-	nlog (LOG_DEBUG3, LOG_CORE, "finduserbase64: %s not found", num);
+	nlog (LOG_DEBUG3, "finduserbase64: %s not found", num);
 	return NULL;
 }
 #endif
@@ -370,7 +370,7 @@ finduser (const char *nick)
 		u = hnode_get (un);
 		return u;
 	}
-	nlog (LOG_DEBUG3, LOG_CORE, "finduser: %s not found", nick);
+	nlog (LOG_DEBUG3, "finduser: %s not found", nick);
 	return NULL;
 }
 
@@ -711,7 +711,7 @@ int UmodeAuth(User * u)
 			break;
 		}
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "UmodeAuth: umode level for %s is %d", u->nick, tmplvl);
+	nlog (LOG_DEBUG1, "UmodeAuth: umode level for %s is %d", u->nick, tmplvl);
 
 /* I hate SMODEs damn it */
 #ifdef GOTUSERSMODES
@@ -727,7 +727,7 @@ int UmodeAuth(User * u)
 			break;
 		}
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "UmodeAuth: smode level for %s is %d", u->nick, tmplvl);
+	nlog (LOG_DEBUG1, "UmodeAuth: smode level for %s is %d", u->nick, tmplvl);
 #endif
 	return tmplvl;
 }
@@ -757,7 +757,7 @@ UserLevel (User * u)
 #endif
 #endif
 
-	nlog (LOG_DEBUG1, LOG_CORE, "UserLevel for %s is %d (%d)", u->nick, tmplvl, i);
+	nlog (LOG_DEBUG1, "UserLevel for %s is %d (%d)", u->nick, tmplvl, i);
 	return tmplvl;
 }
 
@@ -766,7 +766,7 @@ SetUserVhost(const char* nick, const char* vhost)
 {
 	User *u;
 	u = finduser (nick);
-	nlog(LOG_DEBUG1, LOG_CORE, "Vhost %s", vhost);
+	nlog(LOG_DEBUG1, "Vhost %s", vhost);
 	if (u) {
 		strlcpy (u->vhost, vhost, MAXHOST);
 /* these are precautions */
@@ -790,13 +790,13 @@ UserMode (const char *nick, const char *modes)
 	long oldmode;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG1, LOG_CORE, "UserMode: user %s modes %s", nick, modes);
+	nlog (LOG_DEBUG1, "UserMode: user %s modes %s", nick, modes);
 	u = finduser (nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "UserMode: mode change for unknown user %s %s", nick, modes);
+		nlog (LOG_WARNING, "UserMode: mode change for unknown user %s %s", nick, modes);
 		return;
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "Modes: %s", modes);
+	nlog (LOG_DEBUG1, "Modes: %s", modes);
 	strlcpy (u->modes, modes, MODESIZE);
 	AddStringToList (&av, u->nick, &ac);
 	AddStringToList (&av, (char *) modes, &ac);
@@ -813,7 +813,7 @@ UserMode (const char *nick, const char *modes)
 		strlcpy(u->vhost, u->hostname, MAXHOST);
 	}
 #endif
-	nlog (LOG_DEBUG1, LOG_CORE, "UserMode: modes for %s is now %p", u->nick, (int *)u->Umode);
+	nlog (LOG_DEBUG1, "UserMode: modes for %s is now %p", u->nick, (int *)u->Umode);
 }
 
 #ifdef GOTUSERSMODES
@@ -825,19 +825,19 @@ UserSMode (const char *nick, const char *modes)
 	int ac = 0;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG1, LOG_CORE, "UserSMode: user %s modes %s", nick, modes);
+	nlog (LOG_DEBUG1, "UserSMode: user %s modes %s", nick, modes);
 	u = finduser (nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "UserSMode: smode change for unknown user %s %s", nick, modes);
+		nlog (LOG_WARNING, "UserSMode: smode change for unknown user %s %s", nick, modes);
 		return;
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "Smodes: %s", modes);
+	nlog (LOG_DEBUG1, "Smodes: %s", modes);
 	AddStringToList (&av, u->nick, &ac);
 	AddStringToList (&av, (char *) modes, &ac);
 	SendModuleEvent (EVENT_SMODE, av, ac);
 	free (av);
 	u->Smode = SmodeStringToMask(modes, u->Smode);
-	nlog (LOG_DEBUG1, LOG_CORE, "UserSMode: smode for %s is now %p", u->nick, (int *)u->Smode);
+	nlog (LOG_DEBUG1, "UserSMode: smode for %s is now %p", u->nick, (int *)u->Smode);
 }
 #endif
 
@@ -872,7 +872,7 @@ FreeUsers ()
 		
 		/* something is wrong if its our bots */
 		if (findbot (u->nick)) {
-			nlog (LOG_NOTICE, LOG_CORE, "Ehhh. FreeUsers called while we still have bots online. Baaad User: %s", u->nick);
+			nlog (LOG_NOTICE, "Ehhh. FreeUsers called while we still have bots online. Baaad User: %s", u->nick);
 		}
 		hash_scan_delete (uh, un);
 		hnode_destroy (un);

@@ -87,7 +87,7 @@ CheckTimers (void)
 static void
 TimerMidnight (void)
 {
-	nlog (LOG_DEBUG1, LOG_CORE, "Its midnight!!! -> %s", sctime (me.now));
+	nlog (LOG_DEBUG1, "Its midnight!!! -> %s", sctime (me.now));
 	reset_logs ();
 }
 
@@ -106,45 +106,45 @@ is_midnight (void)
  *
  * For core use only, creates a timer
  *
- * @param timer_name the name of new timer
+ * @param name the name of new timer
  * 
  * @return pointer to new timer on success, NULL on error
 */
-static ModTimer *
-new_timer (char *timer_name)
+static Timer *
+new_timer (char *name)
 {
-	ModTimer *mod_tmr;
+	Timer *timer;
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "new_timer: %s", timer_name);
-	mod_tmr = malloc (sizeof (ModTimer));
-	strlcpy (mod_tmr->timername, timer_name, MAX_MOD_NAME);
-	tn = hnode_create (mod_tmr);
+	nlog (LOG_DEBUG2, "new_timer: %s", name);
+	timer = malloc (sizeof (Timer));
+	strlcpy (timer->name, name, MAX_MOD_NAME);
+	tn = hnode_create (timer);
 	if (hash_isfull (th)) {
-		nlog (LOG_WARNING, LOG_CORE, "new_timer: couldn't add new timer, hash is full!");
+		nlog (LOG_WARNING, "new_timer: couldn't add new timer, hash is full!");
 		return NULL;
 	}
-	hash_insert (th, tn, timer_name);
-	return mod_tmr;
+	hash_insert (th, tn, name);
+	return timer;
 }
 
 /** @brief find timer
  *
  * For core use only, finds a timer in the current list of timers
  *
- * @param timer_name the name of timer to find
+ * @param name the name of timer to find
  * 
  * @return pointer to timer if found, NULL if not found
 */
-ModTimer *
-findtimer (char *timer_name)
+Timer *
+findtimer (char *name)
 {
 	hnode_t *tn;
 
-	tn = hash_lookup (th, timer_name);
+	tn = hash_lookup (th, name);
 	if (tn)
-		return (ModTimer *) hnode_get (tn);
+		return (Timer *) hnode_get (tn);
 	return NULL;
 }
 
@@ -153,29 +153,29 @@ findtimer (char *timer_name)
  * For module use. Adds a timer with the given function to the timer list
  *
  * @param func_name the name of function to register with this timer
- * @param timer_name the name of timer to register
+ * @param name the name of timer to register
  * @param mod_name the name of module registering the timer
  * @param interval the interval at which the timer triggers in seconds
  * 
  * @return NS_SUCCESS if added, NS_FAILURE if not 
 */
 int
-add_mod_timer (timer_function func_name, char *timer_name, char *mod_name, int interval)
+add_timer (Module* moduleptr, timer_function func_name, char *name, int interval)
 {
-	ModTimer *mod_tmr;
+	Timer *timer;
 
 	SET_SEGV_LOCATION();
 	if (func_name == NULL) {
-		nlog (LOG_WARNING, LOG_CORE, "%s: Timer %s Function %s doesn't exist", mod_name, timer_name, func_name);
+		nlog (LOG_WARNING, "%s: Timer %s Function %s doesn't exist", moduleptr->info->module_name, name, func_name);
 		return NS_FAILURE;
 	}
-	mod_tmr = new_timer (timer_name);
-	if (mod_tmr) {
-		mod_tmr->interval = interval;
-		mod_tmr->lastrun = me.now;
-		strlcpy (mod_tmr->modname, mod_name, MAX_MOD_NAME);
-		mod_tmr->function = func_name;
-		nlog (LOG_DEBUG2, LOG_CORE, "add_mod_timer: Registered Module %s with timer for Function %s", mod_name, func_name);
+	timer = new_timer (name);
+	if (timer) {
+		timer->interval = interval;
+		timer->lastrun = me.now;
+		timer->moduleptr = moduleptr;
+		timer->function = func_name;
+		nlog (LOG_DEBUG2, "add_timer: Registered Module %s with timer for Function %s", moduleptr->info->module_name, func_name);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -185,24 +185,24 @@ add_mod_timer (timer_function func_name, char *timer_name, char *mod_name, int i
  *
  * For module use. Deletes a timer with the given name from the timer list
  *
- * @param timer_name the name of timer to delete
+ * @param name the name of timer to delete
  * 
  * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
 int
-del_mod_timer (char *timer_name)
+del_timer (char *name)
 {
-	ModTimer *mod_tmr;
+	Timer *timer;
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	tn = hash_lookup (th, timer_name);
+	tn = hash_lookup (th, name);
 	if (tn) {
-		mod_tmr = hnode_get (tn);
-		nlog (LOG_DEBUG2, LOG_CORE, "del_mod_timer: Unregistered Timer function %s from Module %s", timer_name, mod_tmr->modname);
+		timer = hnode_get (tn);
+		nlog (LOG_DEBUG2, "del_timer: Unregistered Timer function %s from Module %s", name, timer->moduleptr->info->module_name);
 		hash_delete (th, tn);
 		hnode_destroy (tn);
-		free (mod_tmr);
+		free (timer);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -217,18 +217,18 @@ del_mod_timer (char *timer_name)
  * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
 int
-del_mod_timers (char *module_name)
+del_timers (char *module_name)
 {
-	ModTimer *mod_tmr;
+	Timer *timer;
 	hnode_t *modnode;
 	hscan_t hscan;
 
 	hash_scan_begin (&hscan, th);
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
-		mod_tmr = hnode_get (modnode);
-		if (!ircstrcasecmp (mod_tmr->modname, module_name)) {
-			nlog (LOG_DEBUG1, LOG_CORE, "del_mod_timers: Module %s has timer %s Registered. Deleting..", module_name, mod_tmr->timername);
-			del_mod_timer (mod_tmr->timername);
+		timer = hnode_get (modnode);
+		if (!ircstrcasecmp (timer->moduleptr->info->module_name, module_name)) {
+			nlog (LOG_DEBUG1, "del_timers: Module %s has timer %s Registered. Deleting..", module_name, timer->name);
+			del_timer (timer->name);
 		}
 	}
 	return NS_SUCCESS;
@@ -238,22 +238,22 @@ del_mod_timers (char *module_name)
  *
  * For module use. Deletes a timer with the given name from the timer list
  *
- * @param timer_name the name of timer to delete
+ * @param name the name of timer to delete
  * 
  * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
 int
-change_mod_timer_interval (char *timer_name, int interval)
+set_timer_interval (char *name, int interval)
 {
-	ModTimer *mod_tmr;
+	Timer *timer;
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	tn = hash_lookup (th, timer_name);
+	tn = hash_lookup (th, name);
 	if (tn) {
-		mod_tmr = hnode_get (tn);
-		mod_tmr->interval = interval;
-		nlog (LOG_DEBUG2, LOG_CORE, "change_mod_timer_interval: Changing timer interval for %s from Module %s", timer_name, mod_tmr->modname);
+		timer = hnode_get (tn);
+		timer->interval = interval;
+		nlog (LOG_DEBUG2, "set_timer_interval: timer interval for %s (%s) set to %d", name, timer->moduleptr->info->module_name, interval);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -270,7 +270,7 @@ change_mod_timer_interval (char *timer_name, int interval)
 int
 list_timers (User * u, char **av, int ac)
 {
-	ModTimer *mod_tmr = NULL;
+	Timer *timer = NULL;
 	hscan_t ts;
 	hnode_t *tn;
 
@@ -278,11 +278,11 @@ list_timers (User * u, char **av, int ac)
 	prefmsg (u->nick, s_Services, "Module timer List:");
 	hash_scan_begin (&ts, th);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
-		mod_tmr = hnode_get (tn);
-		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_tmr->modname);
-		prefmsg (u->nick, s_Services, "Module Timer Name: %s", mod_tmr->timername);
-		prefmsg (u->nick, s_Services, "Module Interval: %d", mod_tmr->interval);
-		prefmsg (u->nick, s_Services, "Time till next Run: %ld", (long)(mod_tmr->interval - (me.now - mod_tmr->lastrun)));
+		timer = hnode_get (tn);
+		prefmsg (u->nick, s_Services, "%s:--------------------------------", timer->moduleptr->info->module_name);
+		prefmsg (u->nick, s_Services, "Module Timer Name: %s", timer->name);
+		prefmsg (u->nick, s_Services, "Module Interval: %d", timer->interval);
+		prefmsg (u->nick, s_Services, "Time till next Run: %ld", (long)(timer->interval - (me.now - timer->lastrun)));
 	}
 	prefmsg (u->nick, s_Services, "End of Module timer List");
 	return 0;
@@ -299,7 +299,7 @@ list_timers (User * u, char **av, int ac)
 void
 run_mod_timers (void)
 {
-	ModTimer *mod_tmr = NULL;
+	Timer *timer = NULL;
 	hscan_t ts;
 	hnode_t *tn;
 
@@ -307,23 +307,22 @@ run_mod_timers (void)
 	hash_scan_begin (&ts, th);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
 		SET_SEGV_LOCATION();
-		mod_tmr = hnode_get (tn);
-		if (me.now - mod_tmr->lastrun > mod_tmr->interval) {
-			strlcpy (segv_location, mod_tmr->modname, SEGV_LOCATION_BUFSIZE);
+		timer = hnode_get (tn);
+		if (me.now - timer->lastrun > timer->interval) {
 			if (setjmp (sigvbuf) == 0) {
-				SET_SEGV_INMODULE(mod_tmr->modname);
-				nlog(LOG_DEBUG3, LOG_CORE, "run_mod_timers: Running timer %s for module %s", mod_tmr->timername, mod_tmr->modname);
-				if (mod_tmr->function () < 0) {
-					nlog(LOG_DEBUG2, LOG_CORE, "run_mod_timers: Deleting Timer %s for Module %s as requested", mod_tmr->timername, mod_tmr->modname);
+				SET_SEGV_INMODULE(timer->moduleptr->info->module_name);
+				nlog(LOG_DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->module_name);
+				if (timer->function () < 0) {
+					nlog(LOG_DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->module_name);
 					hash_scan_delete(th, tn);
 					hnode_destroy(tn);
-					free(mod_tmr);
+					free(timer);
 				} else {
-					mod_tmr->lastrun = (int) me.now;
+					timer->lastrun = (int) me.now;
 				}
 				CLEAR_SEGV_INMODULE();
 			} else {
-				nlog (LOG_CRITICAL, LOG_CORE, "run_mod_timers: setjmp() failed, can't call module %s\n", mod_tmr->modname);
+				nlog (LOG_CRITICAL, "run_mod_timers: setjmp() failed, can't call module %s\n", timer->moduleptr->info->module_name);
 			}
 		}
 	}

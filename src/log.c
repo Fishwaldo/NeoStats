@@ -142,23 +142,15 @@ void make_log_filename(char* modname, char *logname)
 /** @Configurable logging function
  */
 void
-nlog (int level, int scope, char *fmt, ...)
+nlog (LOG_LEVEL level, char *fmt, ...)
 {
 	va_list ap;
 	hnode_t *hn;
 	struct logs_ *logentry;
 	
 	if (level <= config.debug) {
-		/* if scope is > 0, then log to a diff file */
-		if (scope > 0) {
-			if (segv_inmodule[0] != 0) {
-				hn = hash_lookup (logs, segv_inmodule);
-			} else {
-#if 0
-				nlog (LOG_ERROR, LOG_CORE, "Warning, nlog called with LOG_MOD, but segv_inmodule is blank! Logging to Core");
-#endif
-				hn = hash_lookup (logs, CoreLogFileName);
-			}
+		if (segv_inmodule[0] != 0) {
+			hn = hash_lookup (logs, segv_inmodule);
 		} else {
 			hn = hash_lookup (logs, CoreLogFileName);
 		}
@@ -168,16 +160,8 @@ nlog (int level, int scope, char *fmt, ...)
 			if(!logentry->logfile)
 				logentry->logfile = fopen (logentry->logname, "a");
 		} else {
-			/* log file not found */
-			if (segv_inmodule[0] == 0 && (scope > 0)) {
-#ifdef DEBUG
-				printf ("segv_inmodule is blank, but scope is for Modules!\n");
-#endif
-				/* bad, but hey ! */
-				scope = 0;
-			}
 			logentry = malloc (sizeof (struct logs_));
-			strlcpy (logentry->name, scope > 0 ? segv_inmodule : CoreLogFileName, MAX_MOD_NAME);
+			strlcpy (logentry->name, segv_inmodule[0] == 0 ? CoreLogFileName : segv_inmodule , MAX_MOD_NAME);
 			make_log_filename(logentry->name, logentry->logname);
 			logentry->logfile = fopen (logentry->logname, "a");
 			logentry->flush = 0;
@@ -199,12 +183,12 @@ nlog (int level, int scope, char *fmt, ...)
 		ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
 		va_end (ap);
 
-		fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], scope > 0 ? segv_inmodule : "CORE", log_buf);
+		fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], segv_inmodule[0] == 0 ? "CORE" : segv_inmodule, log_buf);
 		logentry->flush = 1;
 #ifndef DEBUG
 		if (config.foreground)
 #endif
-			printf ("%s %s - %s\n", loglevels[level - 1], scope > 0 ? segv_inmodule : "CORE", log_buf);
+			printf ("%s %s - %s\n", loglevels[level - 1], segv_inmodule[0] == 0 ? "CORE" : segv_inmodule, log_buf);
 	}
 }
 
@@ -252,21 +236,21 @@ nassert_fail (const char *expr, const char *file, const int line, const char *in
 	strings = backtrace_symbols (array, size);
 #endif
 
-	nlog (LOG_CRITICAL, LOG_CORE, "Assertion Failure!!!!!!!!!!!");
-	nlog (LOG_CRITICAL, LOG_CORE, "Function: %s (%s:%d)", infunk, file, line);
-	nlog (LOG_CRITICAL, LOG_CORE, "Expression: %s", expr);
+	nlog (LOG_CRITICAL, "Assertion Failure!!!!!!!!!!!");
+	nlog (LOG_CRITICAL, "Function: %s (%s:%d)", infunk, file, line);
+	nlog (LOG_CRITICAL, "Expression: %s", expr);
 #ifdef HAVE_BACKTRACE
 	for (i = 1; i < size; i++) {
-		nlog (LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s", i - 1, strings[i]);
+		nlog (LOG_CRITICAL, "BackTrace(%d): %s", i - 1, strings[i]);
 	}
 #endif
-	nlog (LOG_CRITICAL, LOG_CORE, "Shutting Down!");
+	nlog (LOG_CRITICAL, "Shutting Down!");
 	exit (EXIT_FAILURE);
 }
 
 #if SQLSRV
 /* this is for sqlserver logging callback */
 void sqlsrvlog(char *logline) {
-	nlog(LOG_DEBUG1, LOG_CORE, "SqlSrv: %s", logline);
+	nlog(LOG_DEBUG1, "SqlSrv: %s", logline);
 }
 #endif

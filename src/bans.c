@@ -40,10 +40,10 @@ new_ban (const char *mask)
 	strlcpy (ban->mask, mask, MAXHOST);
 	bansnode = hnode_create (ban);
 	if (!bansnode) {
-		nlog (LOG_WARNING, LOG_CORE, "bans hash is broken\n");
+		nlog (LOG_WARNING, "bans hash is broken\n");
 	}
 	if (hash_isfull (banshash)) {
-		nlog (LOG_WARNING, LOG_CORE, "bans hash is full!\n");
+		nlog (LOG_WARNING, "bans hash is full!\n");
 	} else {
 		hash_insert (banshash, bansnode, ban->mask);
 	}
@@ -91,7 +91,7 @@ DelBan(const char* type, const char* user, const char* host, const char* mask,
 
 	bansnode = hash_lookup (banshash, mask);
 	if (!bansnode) {
-		nlog (LOG_WARNING, LOG_CORE, "DelBan: unknown ban %s", mask);
+		nlog (LOG_WARNING, "DelBan: unknown ban %s", mask);
 		return;
 	}
 	ban = hnode_get (bansnode);
@@ -257,7 +257,7 @@ InitBans (void)
 {
 	banshash = hash_create (-1, 0, 0);
 	if (!banshash) {
-		nlog (LOG_CRITICAL, LOG_CORE, "Create bans hash failed\n");
+		nlog (LOG_CRITICAL, "Create bans hash failed\n");
 		return NS_FAILURE;
 	}
 #ifdef SQLSRV

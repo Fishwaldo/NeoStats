@@ -56,12 +56,12 @@ GetConf (void **data, int type, const char *item)
 		i = kp_get_bool (keypath, (int *) *&data);
 		break;
 	default:
-		nlog (LOG_WARNING, LOG_CORE, "Keeper: Called GetConf with invalid datatype %d", type);
+		nlog (LOG_WARNING, "Keeper: Called GetConf with invalid datatype %d", type);
 		return -1;
 	}
 	/* check for errors */
 	if (i != 0) {
-		nlog (LOG_DEBUG1, LOG_CORE, "GetConf: %s - Path: %s", kp_strerror (i), keypath);
+		nlog (LOG_DEBUG1, "GetConf: %s - Path: %s", kp_strerror (i), keypath);
 		return -1;
 	}
 	return 1;
@@ -88,7 +88,7 @@ GetDir (char *item, char ***data)
 		return 1;
 	}
 	*data = NULL;
-	nlog (LOG_DEBUG1, LOG_CORE, "GetDir: %s - Path: %s", kp_strerror (i), keypath);
+	nlog (LOG_DEBUG1, "GetDir: %s - Path: %s", kp_strerror (i), keypath);
 	return -1;
 
 }
@@ -126,12 +126,12 @@ SetConf (void *data, int type, char *item)
 		i = kp_set_bool (keypath, (int) data);
 		break;
 	default:
-		nlog (LOG_WARNING, LOG_CORE, "Keeper: Called SetConf with invalid datatype %d", type);
+		nlog (LOG_WARNING, "Keeper: Called SetConf with invalid datatype %d", type);
 		return -1;
 	}
 	/* check for errors */
 	if (i != 0) {
-		nlog (LOG_WARNING, LOG_CORE, "SetConf: %s", kp_strerror (i));
+		nlog (LOG_WARNING, "SetConf: %s", kp_strerror (i));
 		return -1;
 	}
 	return 1;
@@ -156,7 +156,7 @@ DelConf (char *item)
 	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
 	/* check for errors */
 	if (i != 0) {
-		nlog (LOG_WARNING, LOG_CORE, "DelConf: %s (%s)", kp_strerror (i), keypath);
+		nlog (LOG_WARNING, "DelConf: %s (%s)", kp_strerror (i), keypath);
 		return -1;
 	}
 	return 1;
@@ -191,12 +191,12 @@ GetData (void **data, int type, const char *table, const char *row, const char *
 		i = kp_get_bool (keypath, (int *) *&data);
 		break;
 	default:
-		nlog (LOG_WARNING, LOG_CORE, "Keeper: Called GetData with invalid datatype %d", type);
+		nlog (LOG_WARNING, "Keeper: Called GetData with invalid datatype %d", type);
 		return -1;
 	}
 	/* check for errors */
 	if (i != 0) {
-		nlog (LOG_DEBUG1, LOG_CORE, "GetData: %s - Path: %s", kp_strerror (i), keypath);
+		nlog (LOG_DEBUG1, "GetData: %s - Path: %s", kp_strerror (i), keypath);
 		return -1;
 	}
 	return 1;
@@ -223,7 +223,7 @@ GetTableData (char *table, char ***data)
 		return 1;
 	}
 	*data = NULL;
-	nlog (LOG_DEBUG1, LOG_CORE, "GetTableData: %s - Path: %s", kp_strerror (i), keypath);
+	nlog (LOG_DEBUG1, "GetTableData: %s - Path: %s", kp_strerror (i), keypath);
 	return -1;
 
 }
@@ -260,12 +260,12 @@ SetData (void *data, int type, char *table, char *row, char *field)
 		i = kp_set_bool (keypath, (int) data);
 		break;
 	default:
-		nlog (LOG_WARNING, LOG_CORE, "Keeper: Called SetData with invalid datatype %d", type);
+		nlog (LOG_WARNING, "Keeper: Called SetData with invalid datatype %d", type);
 		return -1;
 	}
 	/* check for errors */
 	if (i != 0) {
-		nlog (LOG_WARNING, LOG_CORE, "SetData: %s", kp_strerror (i));
+		nlog (LOG_WARNING, "SetData: %s", kp_strerror (i));
 		return -1;
 	}
 	return 1;
@@ -290,7 +290,7 @@ DelRow (char *table, char *row)
 	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
 	/* check for errors */
 	if (i != 0) {
-		nlog (LOG_WARNING, LOG_CORE, "DelRow: %s (%s)", kp_strerror (i), keypath);
+		nlog (LOG_WARNING, "DelRow: %s (%s)", kp_strerror (i), keypath);
 		return -1;
 	}
 	return 1;
@@ -313,7 +313,7 @@ DelTable (char *table)
 	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
 	/* check for errors */
 	if (i != 0) {
-		nlog (LOG_WARNING, LOG_CORE, "DelTable: %s (%s)", kp_strerror (i), keypath);
+		nlog (LOG_WARNING, "DelTable: %s (%s)", kp_strerror (i), keypath);
 		return -1;
 	}
 	return 1;

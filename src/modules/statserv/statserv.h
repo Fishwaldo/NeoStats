@@ -41,7 +41,7 @@
 #define PROGCHANTIME 3600
 
 extern char s_StatServ[MAXNICK];
-extern ModuleInfo __module_info;
+extern ModuleInfo module_info;
 
 typedef struct tld_ TLD;
 typedef struct region_ Region;

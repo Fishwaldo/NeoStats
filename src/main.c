@@ -45,10 +45,13 @@
 #include "transfer.h"
 #include "exclude.h"
 #include "bans.h"
+#include "services.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
 
+char segv_location[SEGV_LOCATION_BUFSIZE];
+char segv_inmodule[SEGV_INMODULE_BUFSIZE];
 
 /* this is the name of the services bot */
 char s_Services[MAXNICK] = "NeoStats";
@@ -182,7 +185,7 @@ main (int argc, char *argv[])
 
 	if (me.die) {
 		printf ("\n-----> ERROR: Read the README file then edit %s! <-----\n\n",CONFIG_NAME);
-		nlog (LOG_CRITICAL, LOG_CORE, "Read the README file and edit your %s",CONFIG_NAME);
+		nlog (LOG_CRITICAL, "Read the README file and edit your %s",CONFIG_NAME);
 		/* we are exiting the parent, not the program, so just return */
 		return EXIT_FAILURE;
 	}
@@ -238,11 +241,11 @@ main (int argc, char *argv[])
 			return EXIT_FAILURE;
 		/* detach from parent process */
 		if (setpgid (0, 0) < 0) {
-			nlog (LOG_WARNING, LOG_CORE, "setpgid() failed");
+			nlog (LOG_WARNING, "setpgid() failed");
 		}
 	}
 #endif
-	nlog (LOG_NOTICE, LOG_CORE, "NeoStats started (Version %s).", me.versionfull);
+	nlog (LOG_NOTICE, "NeoStats started (Version %s).", me.versionfull);
 
 	/* don't init_modules till after we fork. This fixes the load->fork-exit->call _fini problems when we fork */
 	ConfLoadModules ();
@@ -356,7 +359,7 @@ serv_die ()
 	User *u;
 
 	u = finduser (s_Services);
-	nlog (LOG_CRITICAL, LOG_CORE, msg_sigterm);
+	nlog (LOG_CRITICAL, msg_sigterm);
 	globops (s_Services, msg_sigterm);
 	do_exit (NS_EXIT_NORMAL, msg_sigterm);
 #endif /* VALGRIND */
@@ -408,18 +411,18 @@ void do_backtrace(void)
 	char **strings;
 	int i;
 
-	nlog (LOG_CRITICAL, LOG_CORE, "Backtrace:");
+	nlog (LOG_CRITICAL, "Backtrace:");
 	chanalert (s_Services, "Backtrace: %s", segv_location);
 	size = backtrace (array, 10);
 	strings = backtrace_symbols (array, size);
 	for (i = 1; i < size; i++) {
 		chanalert (s_Services, "Backtrace(%d): %s", i, strings[i]);
-		nlog (LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s", i - 1, strings[i]);
+		nlog (LOG_CRITICAL, "BackTrace(%d): %s", i - 1, strings[i]);
 	}
 	free (strings);
 #else
 	chanalert (s_Services, backtrace_unavailable);
-	nlog (LOG_CRITICAL, LOG_CORE, backtrace_unavailable);
+	nlog (LOG_CRITICAL, backtrace_unavailable);
 #endif
 }
 
@@ -434,16 +437,16 @@ serv_segv ()
 	if (segv_inmodule[0] != 0) {
 		globops (me.name, "Segmentation Fault in %s. Refer to log file for details.", segv_inmodule);
 		chanalert (s_Services, "Segmentation Fault in %s. Refer to log file for details.", segv_inmodule);
-		nlog (LOG_CRITICAL, LOG_CORE, "------------------------SEGFAULT REPORT-------------------------");
-		nlog (LOG_CRITICAL, LOG_CORE, "Please view the README for how to submit a bug report");
-		nlog (LOG_CRITICAL, LOG_CORE, "and include this segfault report in your submission.");
-		nlog (LOG_CRITICAL, LOG_CORE, "Module:   %s", segv_inmodule);
-		nlog (LOG_CRITICAL, LOG_CORE, "Location: %s", segv_location);
-		nlog (LOG_CRITICAL, LOG_CORE, "recbuf:   %s", recbuf);
-		nlog (LOG_CRITICAL, LOG_CORE, "Unloading Module and restoring stacks. Backtrace:");
+		nlog (LOG_CRITICAL, "------------------------SEGFAULT REPORT-------------------------");
+		nlog (LOG_CRITICAL, "Please view the README for how to submit a bug report");
+		nlog (LOG_CRITICAL, "and include this segfault report in your submission.");
+		nlog (LOG_CRITICAL, "Module:   %s", segv_inmodule);
+		nlog (LOG_CRITICAL, "Location: %s", segv_location);
+		nlog (LOG_CRITICAL, "recbuf:   %s", recbuf);
+		nlog (LOG_CRITICAL, "Unloading Module and restoring stacks. Backtrace:");
 		chanalert (s_Services, "Location *could* be %s.", segv_location);
 		do_backtrace();
-		nlog (LOG_CRITICAL, LOG_CORE, "-------------------------END OF REPORT--------------------------");
+		nlog (LOG_CRITICAL, "-------------------------END OF REPORT--------------------------");
 		strlcpy (name, segv_inmodule, MAX_MOD_NAME);
 		CLEAR_SEGV_INMODULE();
 		unload_module (name, NULL);
@@ -461,13 +464,13 @@ serv_segv ()
 	chanalert (s_Services, "Segmentation Fault. Server Terminating. Refer to log file for details.");
 	globops (me.name, "Buffer: %s, Approx Location %s", recbuf, segv_location);
 	chanalert (s_Services, "NeoStats (%s) Buffer: %s, Approx Location: %s Backtrace:", me.versionfull, recbuf, segv_location);
-	nlog (LOG_CRITICAL, LOG_CORE, "------------------------SEGFAULT REPORT-------------------------");
-	nlog (LOG_CRITICAL, LOG_CORE, "Please view the README for how to submit a bug report");
-	nlog (LOG_CRITICAL, LOG_CORE, "and include this segfault report in your submission.");
-	nlog (LOG_CRITICAL, LOG_CORE, "Location: %s", segv_location);
-	nlog (LOG_CRITICAL, LOG_CORE, "recbuf:   %s", recbuf);
+	nlog (LOG_CRITICAL, "------------------------SEGFAULT REPORT-------------------------");
+	nlog (LOG_CRITICAL, "Please view the README for how to submit a bug report");
+	nlog (LOG_CRITICAL, "and include this segfault report in your submission.");
+	nlog (LOG_CRITICAL, "Location: %s", segv_location);
+	nlog (LOG_CRITICAL, "recbuf:   %s", recbuf);
 	do_backtrace();
-	nlog (LOG_CRITICAL, LOG_CORE, "-------------------------END OF REPORT--------------------------");
+	nlog (LOG_CRITICAL, "-------------------------END OF REPORT--------------------------");
 	close_logs();
 	/* clean up */
 	do_exit (NS_EXIT_SEGFAULT, NULL);
@@ -534,12 +537,12 @@ static void
 start (void)
 {
 	SET_SEGV_LOCATION();
-	nlog (LOG_NOTICE, LOG_CORE, "Connecting to %s:%d", me.uplink, me.port);
+	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, me.port);
 
 	servsock = ConnectTo (me.uplink, me.port);
 
 	if (servsock <= 0) {
-		nlog (LOG_WARNING, LOG_CORE, "Unable to connect to %s", me.uplink);
+		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
 	} else {
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
 		send_server_connect (me.name, me.numeric, me.infoline, me.pass, (unsigned long)me.t_start, (unsigned long)me.now);
@@ -563,20 +566,20 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 
 	switch (exitcode) {
 	case NS_EXIT_NORMAL:
-		nlog (LOG_CRITICAL, LOG_CORE, "Normal shut down subsystems");
+		nlog (LOG_CRITICAL, "Normal shut down subsystems");
 		break;
 	case NS_EXIT_RELOAD:
-		nlog (LOG_CRITICAL, LOG_CORE, "Reloading NeoStats");
+		nlog (LOG_CRITICAL, "Reloading NeoStats");
 		break;
 	case NS_EXIT_RECONNECT:
-		nlog (LOG_CRITICAL, LOG_CORE, "Restarting NeoStats subsystems");
+		nlog (LOG_CRITICAL, "Restarting NeoStats subsystems");
 		break;
 	case NS_EXIT_ERROR:
-		nlog (LOG_CRITICAL, LOG_CORE, "Exiting due to error");
+		nlog (LOG_CRITICAL, "Exiting due to error");
 		return_code=EXIT_FAILURE;	/* exit code to error */
 		break;		
 	case NS_EXIT_SEGFAULT:
-		nlog (LOG_CRITICAL, LOG_CORE, "Shutting down subsystems without saving data due to core");
+		nlog (LOG_CRITICAL, "Shutting down subsystems without saving data due to core");
 		return_code=EXIT_FAILURE;	/* exit code to error */
 		break;
 	}
@@ -593,11 +596,11 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 			close (servsock);
 		if (exitcode == NS_EXIT_RECONNECT) {
 			if(me.r_time>0) {
-				nlog (LOG_NOTICE, LOG_CORE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
+				nlog (LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
 				sleep (me.r_time);
 			}
 			else {
-				nlog (LOG_NOTICE, LOG_CORE, "Reconnect time is zero, shutting down");
+				nlog (LOG_NOTICE, "Reconnect time is zero, shutting down");
 			}
 		}
 
@@ -626,6 +629,6 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 
 void fatal_error(char* file, int line, char* func, char* error_text)
 {
-	nlog (LOG_CRITICAL, LOG_CORE, "Fatal Error: %s %d %s %s", file, line, func, error_text);
+	nlog (LOG_CRITICAL, "Fatal Error: %s %d %s %s", file, line, func, error_text);
 	do_exit (NS_EXIT_ERROR, "Fatal Error - check log file");
 }

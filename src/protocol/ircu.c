@@ -831,8 +831,8 @@ parse (char *line)
 	strlcpy (recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
-	nlog (LOG_DEBUG1, LOG_CORE, "--------------------------BEGIN PARSE---------------------------");
-	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
+	nlog (LOG_DEBUG1, "--------------------------BEGIN PARSE---------------------------");
+	nlog (LOG_DEBUG1, "R: %s", line);
 	coreLine = strpbrk (line, " ");
 	if (coreLine) {
 		*coreLine = 0;
@@ -841,11 +841,11 @@ parse (char *line)
 		coreLine = line + strlen (line);
 	if ((!ircstrcasecmp(line, "SERVER")) || (!ircstrcasecmp(line, "PASS"))) {
 		strlcpy(cmd, line, sizeof(cmd));
-		nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
-		nlog (LOG_DEBUG1, LOG_CORE, "args  : %s", coreLine);
+		nlog (LOG_DEBUG1, "cmd   : %s", cmd);
+		nlog (LOG_DEBUG1, "args  : %s", coreLine);
 		ac = splitbuf(coreLine, &av, 1);
 		cmdptr = 2;
-		nlog (LOG_DEBUG1, LOG_CORE, "0 %d", ac);
+		nlog (LOG_DEBUG1, "0 %d", ac);
 		/* really needs to be in AddServer since this is a NeoStats wide bug
 		 if config uplink name does not match our uplinks server name we can
 		 never find the uplink!
@@ -863,17 +863,17 @@ parse (char *line)
 		} /*else
 			coreLine = line + strlen (line);*/
 		strlcpy(cmd, coreLine, sizeof(cmd));
-		nlog (LOG_DEBUG1, LOG_CORE, "origin: %s", origin);
-		nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
-		nlog (LOG_DEBUG1, LOG_CORE, "args  : %s", line);
+		nlog (LOG_DEBUG1, "origin: %s", origin);
+		nlog (LOG_DEBUG1, "cmd   : %s", cmd);
+		nlog (LOG_DEBUG1, "args  : %s", line);
 		if(line) {
 			ac = splitbuf(line, &av, 1);
 		}
-		nlog (LOG_DEBUG1, LOG_CORE, "0 %d", ac);
+		nlog (LOG_DEBUG1, "0 %d", ac);
 	}
 
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	nlog (LOG_DEBUG1, LOG_CORE, "---------------------------END PARSE----------------------------");
+	nlog (LOG_DEBUG1, "---------------------------END PARSE----------------------------");
 	if(av) free (av);
 }
 

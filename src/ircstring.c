@@ -239,6 +239,10 @@ static const unsigned char irctolowertable[256] = {
 int
 ircstrcasecmp(const char *s1, const char *s2)
 {
+	/* How should we handle nulls... hmmm */
+	if(s1 == 0 || s2 == 0) {
+		return 0;
+	}
 	while (IRCTOLOWER(*s1) == IRCTOLOWER(*s2)) {
 		if(*s1 == 0)
 			return 0;
@@ -256,9 +260,12 @@ ircstrcasecmp(const char *s1, const char *s2)
 int 
 ircstrncasecmp(const char *s1, const char *s2, size_t size)
 {
+	/* How should we handle nulls... hmmm */
+	if(s1 == 0 || s2 == 0) {
+		return 0;
+	}
 	if (size == 0)
 		return 0;
-
 	while (size && (IRCTOLOWER(*s1) == IRCTOLOWER(*s2)))
 	{
 		if(*s1 == 0)
@@ -267,7 +274,8 @@ ircstrncasecmp(const char *s1, const char *s2, size_t size)
 		s2++;
 		size--;
 	}
-	if(size)
+	if(size) {
 		return IRCTOLOWER(*s1) - IRCTOLOWER(*s2);
+	}
 	return(0);
 }

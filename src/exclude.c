@@ -63,7 +63,7 @@ int init_exclude_list() {
 			if (GetData((void *)&tmp, CFGSTR, "Exclusions", row[i], "Pattern") > 0) {
 				strlcpy(e->pattern, tmp, MAXHOST);
 			} else {
-				nlog(LOG_WARNING, LOG_CORE, "Exclusions: Can't add entry %s, Pattern invalid", row[i]);
+				nlog(LOG_WARNING, "Exclusions: Can't add entry %s, Pattern invalid", row[i]);
 				continue;
 			}
 			if (GetData((void *)&tmp, CFGSTR, "Exclusions", row[i], "AddedBy") > 0) {
@@ -71,7 +71,7 @@ int init_exclude_list() {
 			}
 			e->addedon = atoi(row[i]);
 			GetData((void *)&e->type, CFGINT, "Exclusions", row[i], "Type");
-			nlog(LOG_DEBUG2, LOG_CORE, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
+			nlog(LOG_DEBUG2, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
 			en = lnode_create(e);
 			list_append(exclude_list, en);
 		}

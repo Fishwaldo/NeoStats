@@ -52,10 +52,10 @@ Contents
         2.3.14 USERDUMP    
         2.3.15 SERVERDUMP    
         2.3.16 CHANDUMP    
-        2.3.17 MODBOTLIST
-        2.3.18 MODSOCKLIST
-        2.3.19 MODTIMERLIST
-        2.3.20 MODBOTCHANLIST
+        2.3.17 BOTLIST
+        2.3.18 SOCKLIST
+        2.3.19 TIMERLIST
+        2.3.20 BOTCHANLIST
 3.  StatServ 
     3.1 About StatServ
     3.2 Available Commands
@@ -207,10 +207,10 @@ DEBUG          Enable/Disable debugging
 USERDUMP       Dump User info for debug
 SERVERDUMP     Dump Server info for debug
 CHANDUMP       Dump Channel info for debug
-MODBOTLIST     List of current module bots
-MODSOCKLIST    List of current module sockets
-MODTIMERLIST   List of current module timers
-MODBOTCHANLIST List of current module bot channels
+BOTLIST        List of current bots
+SOCKLIST       List of current sockets
+TIMERLIST      List of current timers
+BOTCHANLIST    List of current bot channels
 
 2.3 Command Reference
 ---------------------
@@ -393,45 +393,45 @@ Description:
 Example:
     /msg NeoStats CHANDUMP
 
-2.3.17 MODBOTLIST
------------------
+2.3.17 BOTLIST
+--------------
 Syntax: 
-    /msg NeoStats MODBOTLIST
+    /msg NeoStats BOTLIST
 Description: 
     NeoStats will send you by notice a list of the current bots
     being used on the network for each module.
 Example:
-    /msg NeoStats MODBOTLIST
+    /msg NeoStats BOTLIST
 
-2.3.18 MODSOCKLIST
-------------------
+2.3.18 SOCKLIST
+---------------
 Syntax: 
-    /msg NeoStats MODSOCKLIST
+    /msg NeoStats SOCKLIST
 Description: 
     NeoStats will send you by notice a list of the current
     sockets being used on the network for each module.
 Example:
-    /msg NeoStats MODSOCKLIST
+    /msg NeoStats SOCKLIST
 
-2.3.19 MODTIMERLIST
--------------------
+2.3.19 TIMERLIST
+----------------
 Syntax: 
-    /msg NeoStats MODTIMERLIST
+    /msg NeoStats TIMERLIST
 Description: 
     NeoStats will send you by notice a list of the current
     timer functions being used on the network by each module.
 Example:
-    /msg NeoStats MODTIMERLIST
+    /msg NeoStats TIMERLIST
 
-2.3.20 MODBOTCHANLIST
----------------------
+2.3.20 BOTCHANLIST
+------------------
 Syntax: 
-    /msg NeoStats MODBOTCHANLIST
+    /msg NeoStats BOTCHANLIST
 Description: 
     NeoStats will send you by notice a list of the current bots
     and the channels they are using for each module.
 Example:
-    /msg NeoStats MODBOTCHANLIST
+    /msg NeoStats BOTCHANLIST
 
 
 -----------------------------------<>-----------------------------------

@@ -166,12 +166,12 @@ void init_tld()
 	if (GeoIP_db_avail(GEOIP_COUNTRY_EDITION)) {
 		gi = GeoIP_open_type(GEOIP_COUNTRY_EDITION, GEOIP_STANDARD);
 		if (gi != NULL) {
-			nlog(LOG_NOTICE, LOG_MOD, "Loaded %s GeoIP Database", GeoIPDBDescription[GEOIP_COUNTRY_EDITION]);
+			nlog(LOG_NOTICE, "Loaded %s GeoIP Database", GeoIPDBDescription[GEOIP_COUNTRY_EDITION]);
 		} else {
-			nlog(LOG_WARNING, LOG_MOD, "%s Database may be corrupt", GeoIPDBDescription[GEOIP_COUNTRY_EDITION]);
+			nlog(LOG_WARNING, "%s Database may be corrupt", GeoIPDBDescription[GEOIP_COUNTRY_EDITION]);
 		}
 	} else {
-		nlog(LOG_WARNING, LOG_MOD, "GeoIP Database is not available. TLD stats will not be available");
+		nlog(LOG_WARNING, "GeoIP Database is not available. TLD stats will not be available");
 	}
 	Thead = list_create(-1);
 	t = malloc(sizeof(TLD));

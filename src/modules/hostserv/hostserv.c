@@ -112,7 +112,8 @@ int LoadArryCount = 0;
 int DelArryCount = 0;
 int ListArryCount = 0;
 
-ModUser *hs_bot;
+Bot *hs_bot;
+static Module* hs_module;
 
 ModuleInfo module_info = {
 	"HostServ",
@@ -187,7 +188,7 @@ int del_moddata(char **av, int ac) {
 	if (!u) /* User not found */
 		return 1;
 	if (u->moddata[hs_cfg.modnum]) {
-		nlog(LOG_DEBUG2, LOG_MOD, "Freeing Module data");
+		nlog(LOG_DEBUG2, "Freeing Module data");
 		free(u->moddata[hs_cfg.modnum]);
 		u->moddata[hs_cfg.modnum] = NULL;
 	}
@@ -226,7 +227,7 @@ static int hs_sign_on(char **av, int ac)
 	hn = list_find(vhosts, u->nick, findnick);
 	if (hn) {
 		map = lnode_get(hn);
-		nlog(LOG_DEBUG1, LOG_MOD, "Checking %s against %s for HostName Match", map->host, u->hostname);
+		nlog(LOG_DEBUG1, "Checking %s against %s for HostName Match", map->host, u->hostname);
 		if (fnmatch(map->host, u->hostname, 0) == 0) {
 			ssvshost_cmd(u->nick, map->vhost);
 			prefmsg(u->nick, s_HostServ,
@@ -245,10 +246,9 @@ static int hs_sign_on(char **av, int ac)
 
 static int Online(char **av, int ac)
 {
-	hs_bot = init_mod_bot(s_HostServ, hs_cfg.user, hs_cfg.host, hs_cfg.realname, 
-		services_bot_modes, BOT_FLAG_DEAF, hs_commands, hs_settings, module_info.module_name);
-	add_mod_timer("CleanupHosts", "Cleanup_Old_Vhosts",
-		      module_info.module_name, 7200);
+	hs_bot = init_bot(hs_module, s_HostServ, hs_cfg.user, hs_cfg.host, hs_cfg.realname, 
+		services_bot_modes, BOT_FLAG_DEAF, hs_commands, hs_settings);
+	add_timer (hs_module, CleanupHosts, "CleanupHosts", 7200);
 	LoadHosts();
 	return 1;
 };
@@ -273,7 +273,7 @@ int ModInit(int modnum, int apiver)
 	vhosts = list_create(-1);
 	bannedvhosts = hash_create(-1, 0, 0);
 	if (!vhosts) {
-		nlog(LOG_CRITICAL, LOG_CORE,
+		nlog(LOG_CRITICAL,
 		     "Error, Can't create vhosts hash");
 		chanalert(s_Services, "Error, Can't create Vhosts Hash");
 		return -1;
@@ -331,10 +331,10 @@ int hs_mode(char **av, int ac) {
 		case 'r':
 			if (add) {
 				if (u->moddata[hs_cfg.modnum] != NULL) {
-					nlog(LOG_DEBUG2, LOG_MOD, "not setting hidden host on %s", av[0]);
+					nlog(LOG_DEBUG2, "not setting hidden host on %s", av[0]);
 					return -1;
 				}
-				nlog(LOG_DEBUG2, LOG_MOD, "Regnick Mode on %s", av[0]);
+				nlog(LOG_DEBUG2, "Regnick Mode on %s", av[0]);
 				ircsnprintf(vhost, MAXHOST, "%s.%s", av[0], hs_cfg.vhostdom);
 				ssvshost_cmd(av[0], vhost);
 				prefmsg(av[0], s_HostServ,
@@ -381,8 +381,7 @@ static int hs_levels(User * u, char **av, int ac)
 	if (ac == 2) {
 		prefmsg(u->nick, s_HostServ,
 			"Configured Levels: Add: %d, Del: %d, List: %d, View: %d",
-			hs_cfg.add, hs_cfg.del, hs_cfg.list,
-			hs_cfg.view);
+			hs_cfg.add, hs_cfg.del, hs_cfg.list,hs_cfg.view);
 			return 1;
 	} else if (ac == 3) {
 		if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
@@ -436,7 +435,7 @@ static int hs_levels(User * u, char **av, int ac)
 		prefmsg(u->nick, s_HostServ, "Permission Denied");
 	}
 	prefmsg(u->nick, s_HostServ,
-		"Invalid Syntax. /msg %s help levels", s_HostServ);
+		"Syntax error. /msg %s help levels", s_HostServ);
 	return 1;
 }
 
@@ -532,7 +531,7 @@ static void hs_delban(User * u, char *ban)
 			chanalert(s_HostServ,
 				  "%s deleted %s from the banned vhost list",
 				  u->nick, (char *) hnode_get(hn));
-			nlog(LOG_NOTICE, LOG_MOD,
+			nlog(LOG_NOTICE,
 			     "%s deleted %s from the banned vhost list",
 			     u->nick, (char *) hnode_get(hn));
 			free(hnode_get(hn));
@@ -593,7 +592,7 @@ static int hs_chpass(User * u, char **av, int ac)
 				  "%s tried to change the password for %s, but the hosts do not match (%s->%s)",
 				  u->nick, map->nnick, u->hostname,
 				  map->host);
-			nlog(LOG_WARNING, LOG_MOD,
+			nlog(LOG_WARNING,
 			     "%s tried to change the password for %s but the hosts do not match (%s -> %s)",
 			     u->nick, map->nnick, u->hostname, map->host);
 			return 1;
@@ -643,7 +642,7 @@ static int hs_add(User * u, char **av, int ac)
 
 	if (!list_find(vhosts, cmd, findnick)) {
 		hsdat(cmd, m, h, p, u->nick);
-		nlog(LOG_NOTICE, LOG_MOD,
+		nlog(LOG_NOTICE,
 		     "%s added a vhost for %s with realhost %s vhost %s and password %s",
 		     u->nick, cmd, m, h, p);
 		prefmsg(u->nick, s_HostServ,
@@ -821,11 +820,11 @@ static void LoadHosts()
 				hn = lnode_create(map);
 				list_append(vhosts, hn);
 				save_vhost(map);
-				nlog(LOG_DEBUG1, LOG_CORE,
+				nlog(LOG_DEBUG1,
 				     "Upgraded Database Entry %s (%s) into Vhosts",
 				     map->nnick, map->vhost);
 			} else {
-				nlog(LOG_NOTICE, LOG_CORE,
+				nlog(LOG_NOTICE,
 				     "HostServ: db entry for %s already exists",
 				     LoadArry[0]);
 			}
@@ -849,7 +848,7 @@ static void LoadHosts()
 			GetData((void *)&map->lused, CFGINT, "Vhosts", map->nnick, "LastUsed");
 			hn = lnode_create(map);
 			list_append(vhosts, hn);
-			nlog(LOG_DEBUG1, LOG_CORE,
+			nlog(LOG_DEBUG1,
 			     "Loaded %s (%s) into Vhosts",
 			     map->nnick, map->vhost);
 		}
@@ -886,7 +885,7 @@ static int hs_del(User * u, char **av, int ac)
 				"The following vhost was removed from the Vhosts Database");
 			prefmsg(u->nick, s_HostServ, "\2%s - %s\2",
 				map->nnick, map->vhost);
-			nlog(LOG_NOTICE, LOG_MOD,
+			nlog(LOG_NOTICE,
 			     "%s removed the VHOST: %s for %s", u->nick,
 			     map->vhost, map->nnick);
 			chanalert(s_HostServ, "%s removed vhost %s for %s",
@@ -928,7 +927,7 @@ static int hs_login(User * u, char **av, int ac)
 			map->lused = me.now;
 			prefmsg(u->nick, s_HostServ,
 				"Your VHOST %s has been set.", map->vhost);
-			nlog(LOG_NORMAL, LOG_MOD,
+			nlog(LOG_NORMAL,
 			     "%s used LOGIN to obtain userhost of %s",
 			     u->nick, map->vhost);
 			chanalert(s_HostServ,
@@ -959,7 +958,7 @@ void CleanupHosts()
 	while (hn != NULL) {
 		map = lnode_get(hn);
 		if (map->lused < (me.now - (hs_cfg.old * 86400))) {
-			nlog(LOG_NOTICE, LOG_MOD,
+			nlog(LOG_NOTICE,
 			     "Old Vhost Automatically removed: %s for %s",
 			     map->vhost, map->nnick);
 			del_vhost(map);

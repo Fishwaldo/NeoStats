@@ -45,7 +45,7 @@ bot_cmd extauth_commands[]=
 	{NULL,		NULL,			0, 	0,				NULL, 			NULL}
 };
 
-ModuleInfo __module_info = {
+ModuleInfo module_info = {
 	"ExtAuth",
 	"ServiceRoots Authentication Module",
 	"NeoStats",
@@ -78,7 +78,7 @@ int __ModInit(int modnum, int apiver)
 	/* only a max of 10 serviceroots */
 	srconf.ul = list_create(10);
 	if (!config_read(CONFIG_NAME, options) == 0) {
-		nlog(LOG_WARNING, LOG_CORE,
+		nlog(LOG_WARNING,
 		     "ServiceRoots: ehh, config failed");
 		/* we can't unload the extauth module so don't return -1 */
 	}
@@ -110,14 +110,14 @@ void sr_cb_config(char *arg, int configtype)
 	SET_SEGV_LOCATION();
 	if (configtype == 0) {
 		if (list_isfull(srconf.ul)) {
-			nlog(LOG_WARNING, LOG_CORE,
+			nlog(LOG_WARNING,
 			     "Exceded Maxium Number of ServiceRoots(10)");
 			return;
 		} else {
 			/* new code to do hostname. ident lookups */
 			if (strstr(arg, "!")) {
 				if (!strstr(arg, "@")) {
-					nlog(LOG_WARNING, LOG_CORE,
+					nlog(LOG_WARNING,
 					     "Invalid ServiceRoots Entry. Must be of the form nick!ident@host, was %s",
 					     arg);
 					return;
@@ -137,7 +137,7 @@ void sr_cb_config(char *arg, int configtype)
 				strlcpy(sru->ident, "*", MAXUSER);
 				strlcpy(sru->host, "*", MAXHOST);
 				sru->lvl = NS_ULEVEL_ROOT;
-				nlog(LOG_WARNING, LOG_CORE,
+				nlog(LOG_WARNING,
 				     "Old ServiceRoots Entry Detected. Suggest you upgrade ASAP to <nick>!<ident>@<host> (WildCards are allowed)");
 			}
 			un = lnode_create(sru);
