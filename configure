@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CPP RANLIB ac_ct_RANLIB EGREP GTK_CONFIG build_configtool DIRINST LINK_SIZE MATCH_LIMIT NEWLINE PCRE_MAJOR PCRE_MINOR PCRE_DATE PCRE_VERSION PCRE_LIB_VERSION PCRE_POSIXLIB_VERSION POSIX_MALLOC_THRESHOLD UTF8 IRCD_FILES_SRC IRCD_FILES_OBJS MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CPP RANLIB ac_ct_RANLIB EGREP sqlsrvbuild buildsqlsrv GTK_CONFIG build_configtool DIRINST LINK_SIZE MATCH_LIMIT NEWLINE PCRE_MAJOR PCRE_MINOR PCRE_DATE PCRE_VERSION PCRE_LIB_VERSION PCRE_POSIXLIB_VERSION POSIX_MALLOC_THRESHOLD UTF8 IRCD_FILES_SRC IRCD_FILES_OBJS MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -854,6 +854,7 @@ Optional Features:
  --enable-liquid - enable Liquid IRCD Support
  --enable-auth=TYPE - what type of Authentication to use. See Readme File
  --enable-raw - Enable Raw command
+ --enable-sqlsrv - Enable Sql Server Emulation
  --enable-modules="MODULES" - space seperated list of modules to compile
 --enable-configtool - Enable building of the configtool program (Needs X windows)
 
@@ -5559,6 +5560,38 @@ echo "${ECHO_T}no" >&6
 
 fi;
 
+
+echo "$as_me:$LINENO: checking To Enable Sql Server Emulation?" >&5
+echo $ECHO_N "checking To Enable Sql Server Emulation?... $ECHO_C" >&6
+# Check whether --enable-sqlsrv or --disable-sqlsrv was given.
+if test "${enable_sqlsrv+set}" = set; then
+  enableval="$enable_sqlsrv"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define SQLSRV 1
+_ACEOF
+
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	sqlsrvbuild=sqlsrv/librtadb.a
+
+	buildsqlsrv=sqlsrvlib
+
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
+
+
 echo "$as_me:$LINENO: checking Any other modules to compile?" >&5
 echo $ECHO_N "checking Any other modules to compile?... $ECHO_C" >&6
 # Check whether --enable-modules or --disable-modules was given.
@@ -6330,6 +6363,8 @@ s,@CPP@,$CPP,;t t
 s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
 s,@EGREP@,$EGREP,;t t
+s,@sqlsrvbuild@,$sqlsrvbuild,;t t
+s,@buildsqlsrv@,$buildsqlsrv,;t t
 s,@GTK_CONFIG@,$GTK_CONFIG,;t t
 s,@build_configtool@,$build_configtool,;t t
 s,@DIRINST@,$DIRINST,;t t

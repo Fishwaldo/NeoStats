@@ -144,6 +144,16 @@ typedef struct
 /* the connections list */
 hash_t  *pgconn;
 
+
+/* this is a struct that stores the RTA runtime config */
+struct RTA_Conf 
+{
+  logcb loggingfunc; /* logging callback */
+} RTA_Conf;
+
+
+
+
 /* Forward references */
 void     do_sql(char *, int *);
 void     send_error(char *, int, char *, char *);

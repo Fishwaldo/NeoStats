@@ -176,3 +176,6 @@
 
 /* have fgets_unlocked and friends? */
 #undef HAVE_UNLOCKED
+
+/* if we are compiling with SQL support */
+#undef SQLSRV

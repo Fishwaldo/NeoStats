@@ -1,4 +1,4 @@
-/* NeoStats - IRC Statistical Services 
+/* NeoStats - IRC Statistical Services k
 ** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
@@ -43,6 +43,11 @@
 #include "chans.h"
 #include "dns.h"
 #include "transfer.h"
+#ifdef SQLSRV
+#include "sqlsrv/rta.h"
+#endif
+
+
 /* this is the name of the services bot */
 char s_Services[MAXNICK] = "NeoStats";
 /*! Date when we were compiled */
@@ -120,7 +125,9 @@ main (int argc, char *argv[])
 #ifdef ULTIMATE3
 	me.client = 0;
 #endif
-
+#ifdef SQLSRV
+	me.sqlport = 8888;
+#endif
 	/* if we are doing recv.log, remove the previous version */
 	if (config.recvlog)
 		remove (RECV_LOG);
@@ -132,6 +139,11 @@ main (int argc, char *argv[])
 
 	/* prepare to catch errors */
 	setup_signals ();
+
+	/* init the sql subsystem if used */
+#ifdef SQLSRV
+	rta_init(sqlsrvlog);
+#endif
 
 	/* load the config files */
 	if(ConfLoad () != NS_SUCCESS)
@@ -376,7 +388,7 @@ void do_backtrace(void)
 	int i;
 
 	nlog (LOG_CRITICAL, LOG_CORE, "Backtrace:");
-	chanalert (s_Services, "Backtrace:", segv_location);
+	chanalert (s_Services, "Backtrace: %s", segv_location);
 	size = backtrace (array, 10);
 	strings = backtrace_symbols (array, size);
 	for (i = 1; i < size; i++) {

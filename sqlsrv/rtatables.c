@@ -64,16 +64,23 @@ struct Pg_User
 /* Allocate and initialize the table */
 struct Pg_User pg_user[] = {
   {
-      "Fish",                   /* user name */
+      "master",                   /* user name */
       100,                      /* user ID */
       "f",                      /* creat DB */
       "f",                      /* trace execution */
       "f",                      /* super user */
       "f",
-      "blah",                   /* the password */
+      "password",                   /* the password */
       ""                        /* valid until .... */
     }
 };
+
+void rta_change_auth(char *uname, char *pass) {
+	strncpy(pg_user[0].usename, uname, MX_PGNAMELEN);
+	strncpy(pg_user[0].passwd, pass, MX_PGNAMELEN);
+}
+
+
 
 /* Define the table columns */
 COLDEF   pg_userCols[] = {
@@ -865,3 +872,5 @@ TBLDEF   rta_statTable = {
   "",                           /* save file name */
   "Usage and error counts for the rta package."
 };
+
+

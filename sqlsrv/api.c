@@ -17,7 +17,9 @@
 #include <libgen.h>             /* for dirname() */
 #include <string.h>             /* for strlen() */
 #include <limits.h>             /* for PATH_MAX */
+#ifdef SYSLOG
 #include <syslog.h>
+#endif
 #include <time.h>
 #include "rta.h"                /* for various constants */
 #include "do_sql.h"             /* for LOC */
@@ -53,7 +55,7 @@ getconndata(int id)
  * Output:       None.
  **************************************************************/
 void
-rta_init()
+rta_init(logcb logfunc)
 {
   int      i;          /* loop index */
   extern TBLDEF pg_userTable;
@@ -62,7 +64,11 @@ rta_init()
   extern TBLDEF rta_dbgTable;
   extern TBLDEF rta_statTable;
   extern TBLDEF pg_connTable;
+#ifdef SYSLOG
   extern void restart_syslog();
+#else 
+  RTA_Conf.loggingfunc = logfunc;
+#endif
 
   for (i = 0; i < MX_TBL; i++)
   {
@@ -81,9 +87,12 @@ rta_init()
   (void) rta_add_table(&pg_connTable);
   (void) rta_add_table(&rta_dbgTable);
   (void) rta_add_table(&rta_statTable);
-
+#ifdef SYSLOG
   restart_syslog((char *) 0, (char *) 0, (char *) 0, 0);
+#endif
 }
+
+
 
 /***************************************************************
  * rta_add_table(): - Add one table to the list of

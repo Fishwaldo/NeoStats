@@ -230,3 +230,10 @@ nassert_fail (const char *expr, const char *file, const int line, const char *in
 	nlog (LOG_CRITICAL, LOG_CORE, "Shutting Down!");
 	exit (EXIT_FAILURE);
 }
+
+#if SQLSRV
+/* this is for sqlserver logging callback */
+void sqlsrvlog(char *logline) {
+	nlog(LOG_DEBUG1, LOG_CORE, "SqlSrv: %s", logline);
+}
+#endif

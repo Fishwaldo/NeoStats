@@ -38,6 +38,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - AddUser changes to fix bug 94 (M)
  - New function UmodeMaskToString as a helper for Umode handling (M)
  - Import new SQL Server emulation library, Real Time Access. (F)
+ - new configure option --enable-sqlsrv to enable sql server emulation
 
 * NeoStats * Fish (F) * Version 2.5.10
  - Fix a problem with Umode +T being reintroduced on Unreal Beta19 as a normal usermode. 

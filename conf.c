@@ -29,9 +29,14 @@
 #include "dl.h"
 #include "log.h"
 #include "services.h"
+#ifdef SQLSRV
+#include "sqlsrv/rta.h"
+#endif
 
 static void cb_Server (char *, int);
 static void cb_Module (char *, int);
+static void cb_SqlConf (char *, int);
+
 /** @brief The list of modules to load
  */
 static void *load_mods[NUM_MODULES];
@@ -58,6 +63,10 @@ static config_option options[] = {
 	{"BINDTO", ARG_STR, cb_Server, 13},
 	{"LOGFILENAMEFORMAT", ARG_STR, cb_Server, 14},
 	{"SERVER_NUMERIC", ARG_STR, cb_Server, 15},
+#ifdef SQLSRV
+	{"SQLSRV_AUTH", ARG_STR, cb_SqlConf, 0},
+	{"SQLSRV_PORT", ARG_STR, cb_SqlConf, 1},
+#endif
 };
 
 /** @brief initialize the configuration parser
@@ -116,7 +125,6 @@ ConfLoad ()
  * @param configtype an index of what config item is currently being processed. Ignored
  * @returns Nothing
  */
-
 void
 cb_Module (char *arg, int configtype)
 {
@@ -134,6 +142,48 @@ cb_Module (char *arg, int configtype)
 	}
 }
 
+
+#ifdef SQLSRV
+/** @brief prepare SqlAuthentication defined in the config file
+ *
+ * load the Sql UserName/Password and Host if we are using SQL Server option
+ *
+ * @param arg the module name in this case
+ * @param configtype an index of what config item is currently being processed. Ignored
+ * @returns Nothing
+ */
+
+void
+cb_SqlConf (char *arg, int configtype)
+{
+	char *uname, *pass, *host;
+	SET_SEGV_LOCATION();
+	if (configtype == 0) {
+		if ((uname = strtok(arg, "!")) == NULL) {
+			nlog(LOG_WARNING, LOG_CORE, "Invalid SQLSRV_AUTH syntax in config file (Username)");
+			return;
+		}
+		if ((pass = strtok(NULL, "@")) == NULL) {
+			nlog(LOG_WARNING, LOG_CORE, "Invalid SQLSRV_AUTH syntax in config file (Pass)");
+			return;
+		}
+		if ((host = strtok(NULL, "")) == NULL) {
+			nlog(LOG_WARNING, LOG_CORE, "Invalid SQLSRV_AUTH syntax in config file (Host)");
+			return;
+		}
+		nlog(LOG_DEBUG1, LOG_CORE, "SqlSrv Uname %s Pass %s Host %s", uname, pass, host);
+		rta_change_auth(uname, pass);
+		strncpy(me.sqlhost, host, MAXHOST);
+	} else if (configtype == 1) {
+		me.sqlport = atoi(arg);
+		if (me.sqlport == 0) {
+			nlog(LOG_WARNING, LOG_CORE, "Invalid Port Specified for SQLSRV_PORT, Using Default");
+			me.sqlport = 8888;
+		}
+	}
+	
+}
+#endif
 /** @brief Load the modules 
  *
  * Actually load the modules that were found in the config file

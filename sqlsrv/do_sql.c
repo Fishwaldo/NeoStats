@@ -15,7 +15,10 @@
 #include <stdlib.h>
 #include <stdarg.h>             /* for va_arg */
 #include <string.h>
+#if 0
 #include <syslog.h>
+#endif
+#include "log.h"
 #include "do_sql.h"
 #include "list.h"
 #include "hash.h"
@@ -106,7 +109,7 @@ do_sql(char *buf, int *nbuf)
       break;
 
     default:
-      syslog(LOG_ERR, "DB error: no SQL cmd\n");
+      nlog(LOG_CORE, LOG_NOTICE, "SQLSRC error: no SQL cmd\n");
       break;
   }
 }
@@ -1266,6 +1269,7 @@ rtalog(char *fname,    /* error detected in file... */
   char    *s1;         /* first optional argument */
   char    *s2;         /* second optional argument */
   char    *sptr;       /* used to look for %s */
+  char 	  final[1024];
 
   s1 = (char *) 0;
   s2 = (char *) 0;
@@ -1282,5 +1286,6 @@ rtalog(char *fname,    /* error detected in file... */
       s2 = va_arg(ap, char *);
   }
   va_end(ap);
-  fprintf(stderr, format, fname, linen, s1, s2);
+  snprintf(final, 1024, format, fname, linen, s1, s2);
+  RTA_Conf.loggingfunc(final);
 }

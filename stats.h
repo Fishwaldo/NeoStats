@@ -303,6 +303,10 @@ struct me {
 	time_t lastmsg;
 	int pingtime;
 	time_t now;
+#ifdef SQLSRV
+	char sqlhost[MAXHOST];
+	int sqlport;
+#endif
 } me;
 
 /** @brief User structure
@@ -360,6 +364,9 @@ struct ping {
 	time_t last_sent;
 	int ulag;
 } ping;
+
+
+
 
 /* Comand list handling */
 /** @brief flags for command list

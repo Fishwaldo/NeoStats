@@ -9,7 +9,7 @@ CURL_LDFLAGS = `curl/mycurl-config --libs`
 OBJS =	dns.o chans.o dotconf.o services.o main.o sock.o conf.o ircd.o timer.o \
 		 users.o ns_help.o dl.o list.o hash.o server.o keeper.o log.o misc.o \
 		 support.o ircstring.o commands.o transfer.o\
-		 @IRCD_FILES_OBJS@
+		 @IRCD_FILES_OBJS@ @sqlsrvbuild@
 SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
 		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
 		support.c ircstring.c commands.c transfer.c\
@@ -51,7 +51,7 @@ DISTMOD = cs extauth hostserv loveserv ms statserv template
 	$(CC) $(NEOINCLUDES) $(CFLAGS) -c $< 
 
 
-all: 	libadns.a libkeeper.a libpcre libcurl.a neostats modules utils 
+all: 	@buildsqlsrv@ libadns.a libkeeper.a libpcre libcurl.a neostats modules utils 
 
 modules:
 	(cd dl; $(MAKE) $@)
@@ -68,6 +68,9 @@ libpcre:
 libcurl.a:
 	(cd curl; $(MAKE))
 
+sqlsrvlib:
+	(cd sqlsrv; $(MAKE))
+
 utils:
 	(cd tools; $(MAKE) $@)
 
@@ -79,6 +82,7 @@ clean:
 	(cd tools; $(MAKE) $@)
 	(cd pcre; $(MAKE) $@)
 	(cd curl; $(MAKE) $@)
+	(cd sqlsrv; $(MAKE) $@)
 	/bin/rm -rf *.o neostats *.cache Makefile config.h  Makefile.inc *.log *.a
 
 

@@ -419,6 +419,11 @@ void     deldbconnection(int connid);
  **************************************************************/
 int      rta_add_table(TBLDEF *);
 
+/*
+ * Logging function callback 
+ */
+typedef void (*logcb) (char *logmsg);
+
 /** ************************************************************
  * rta_init():  - Initialize all internal variables and tables
  * This may be called more than once.
@@ -426,7 +431,10 @@ int      rta_add_table(TBLDEF *);
  * Input:  None
  * Return: None
  **************************************************************/
-void     rta_init();
+void     rta_init(logcb);
+
+/* change the uname/password for authentication */
+void rta_change_auth(char *uname, char *pass);
 
 /** ************************************************************
  * SQL_string():  - Execute single SQL command
