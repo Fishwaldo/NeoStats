@@ -7,7 +7,6 @@
 /COPYING -text
 /CREDITS -text
 /ChangeLog -text
-/Config -text
 /Ircu.c -text
 /Ircu.h -text
 /Makefile.in -text
@@ -102,11 +101,6 @@ dl/operlog/ChangeLog -text
 dl/operlog/Makefile -text
 dl/operlog/ol_help.c -text
 dl/operlog/operlog.c -text
-dl/operme/ChangeLog -text
-dl/operme/Makefile -text
-dl/operme/README -text
-dl/operme/om_help.c -text
-dl/operme/operme.c -text
 dl/spam/.indent.pro -text
 dl/spam/Makefile -text
 dl/spam/spam.c -text
@@ -125,12 +119,6 @@ dl/statserv/tld.c -text
 dl/version/Makefile -text
 dl/version/version.c -text
 /dns.c -text
-doc/FAQ -text
-doc/FAQ.pt -text
-doc/USERMAN -text
-doc/old/FAQ.pt -text
-doc/old/INSTALL.pt -text
-doc/old/README.pt -text
 doc/read-faq -text
 doc/read-userman -text
 /dotconf.c -text
