@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.33 2003/01/07 13:30:36 fishwaldo Exp $
+** $Id: stats.c,v 1.34 2003/03/28 10:30:48 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -306,7 +306,9 @@ int s_user_modes(char **av, int ac) {
 						daily.t_opers = time(NULL);
 					}	
 				} else {
-					 DecreaseOpers(findstats(u->server->name));
+					if (is_oper(u)) {
+						 DecreaseOpers(findstats(u->server->name));
+					}
 				}
 				break;
 			default: 

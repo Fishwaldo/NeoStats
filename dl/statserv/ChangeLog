@@ -2,6 +2,9 @@ StatServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish
+* Version 3.6 * March 28th, 2003 (F)
+ - Fix a problem with oper counts... something got messed up somewhere
+
 * Version 3.5 * December 13th, 2002 (F)
  - StatServ now has the option to only wallop 5 records broken in a particular timeframe.
 	eg, 5 wallops per 5 minutes, any more, and statserv doesn't say a thing.
