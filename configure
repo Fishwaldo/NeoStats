@@ -2642,92 +2642,6 @@ fi
 
 
 
-
-
-for ac_func in poll
-do
-as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $ac_func" >&5
-echo $ECHO_N "checking for $ac_func... $ECHO_C" >&6
-if eval "test \"\${$as_ac_var+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char $ac_func (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char $ac_func ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined (__stub_$ac_func) || defined (__stub___$ac_func)
-choke me
-#else
-char (*f) () = $ac_func;
-#endif
-#ifdef __cplusplus
-}
-#endif
-
-int
-main ()
-{
-return f != $ac_func;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  eval "$as_ac_var=yes"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-eval "$as_ac_var=no"
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_var'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_var'}'`" >&6
-if test `eval echo '${'$as_ac_var'}'` = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define `echo "HAVE_$ac_func" | $as_tr_cpp` 1
-_ACEOF
-
-fi
-done
-
-
  echo "$as_me:$LINENO: checking for socket" >&5
 echo $ECHO_N "checking for socket... $ECHO_C" >&6
 if test "${ac_cv_func_socket+set}" = set; then
@@ -3413,8 +3327,7 @@ done
 
 
 
-
-for ac_header in sys/time.h unistd.h db.h
+for ac_header in sys/time.h unistd.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if eval "test \"\${$as_ac_Header+set}\" = set"; then
@@ -4150,143 +4063,6 @@ _ACEOF
 fi
 
 done
-
-
-echo "$as_me:$LINENO: checking for pthread_mutex_lock" >&5
-echo $ECHO_N "checking for pthread_mutex_lock... $ECHO_C" >&6
-if test "${ac_cv_func_pthread_mutex_lock+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char pthread_mutex_lock (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char pthread_mutex_lock ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined (__stub_pthread_mutex_lock) || defined (__stub___pthread_mutex_lock)
-choke me
-#else
-char (*f) () = pthread_mutex_lock;
-#endif
-#ifdef __cplusplus
-}
-#endif
-
-int
-main ()
-{
-return f != pthread_mutex_lock;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_func_pthread_mutex_lock=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_func_pthread_mutex_lock=no
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: $ac_cv_func_pthread_mutex_lock" >&5
-echo "${ECHO_T}$ac_cv_func_pthread_mutex_lock" >&6
-if test $ac_cv_func_pthread_mutex_lock = yes; then
-  cat >>confdefs.h <<\_ACEOF
-#define HAVE_PTHREAD_MUTEX 1
-_ACEOF
-
-fi
-
-
-echo "$as_me:$LINENO: checking for *_unlocked file operations" >&5
-echo $ECHO_N "checking for *_unlocked file operations... $ECHO_C" >&6
-cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-#define _BSD_SOURCE
-#include <stdio.h>
-
-int
-main ()
-{
-
-  fgets_unlocked("", 0, -1);
-
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  have_unlocked_code=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-have_unlocked_code=no
-fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-if test "$have_unlocked_code" = yes; then
- echo "$as_me:$LINENO: result: found" >&5
-echo "${ECHO_T}found" >&6
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_UNLOCKED 1
-_ACEOF
-
-else
- echo "$as_me:$LINENO: result: Not Found" >&5
-echo "${ECHO_T}Not Found" >&6
-fi
 
 
 echo "$as_me:$LINENO: checking for INADDR_LOOPBACK" >&5
@@ -5042,10 +4818,7 @@ done
 
 
 
-
-
-
-for ac_func in regcomp select socket strdup fcloseall
+for ac_func in socket strdup
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ac_func" >&5
@@ -5407,6 +5180,35 @@ else
 echo "${ECHO_T}no" >&6
 fi;
 
+echo "$as_me:$LINENO: checking What type of Authentication to use..." >&5
+echo $ECHO_N "checking What type of Authentication to use...... $ECHO_C" >&6
+# Check whether --enable-auth or --disable-auth was given.
+if test "${enable_auth+set}" = set; then
+  enableval="$enable_auth"
+   case "$enableval" in
+  sr)
+
+cat >>confdefs.h <<\_ACEOF
+#define EXTAUTH 1
+_ACEOF
+
+	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
+	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
+	echo "$as_me:$LINENO: result: External" >&5
+echo "${ECHO_T}External" >&6
+	MODULES="$MODULES extauth"
+	;;
+  *)
+	echo "$as_me:$LINENO: result: IRCD" >&5
+echo "${ECHO_T}IRCD" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: IRCD" >&5
+echo "${ECHO_T}IRCD" >&6
+
+fi;
+
 echo "$as_me:$LINENO: checking A compatible IRCD is specified" >&5
 echo $ECHO_N "checking A compatible IRCD is specified... $ECHO_C" >&6
 case "$IRCD_FILES_SRC" in
@@ -5421,6 +5223,18 @@ echo "${ECHO_T}yes" >&6
    "hybrid7.c")
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
+	echo "$as_me:$LINENO: checking Auto-Enabling ServiceRoots Authentication Module" >&5
+echo $ECHO_N "checking Auto-Enabling ServiceRoots Authentication Module... $ECHO_C" >&6
+
+cat >>confdefs.h <<\_ACEOF
+#define EXTAUTH 1
+_ACEOF
+
+	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
+	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
+	MODULES="$MODULES extauth"
+	echo "$as_me:$LINENO: result: OK" >&5
+echo "${ECHO_T}OK" >&6
 	;;
    "mystic.c")
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -5452,42 +5266,6 @@ echo "$as_me: error: 'You must define a IRCD to use. See ./configure --help for 
 esac
 
 
-echo "$as_me:$LINENO: checking What type of Authentication to use..." >&5
-echo $ECHO_N "checking What type of Authentication to use...... $ECHO_C" >&6
-# Check whether --enable-auth or --disable-auth was given.
-if test "${enable_auth+set}" = set; then
-  enableval="$enable_auth"
-   case "$enableval" in
-  sr)
-
-cat >>confdefs.h <<\_ACEOF
-#define EXTAUTH 1
-_ACEOF
-
-	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
-	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
-	echo "$as_me:$LINENO: result: External" >&5
-echo "${ECHO_T}External" >&6
-	MODULES="$MODULES extauth"
-	;;
-  *)
-	cat >>confdefs.h <<\_ACEOF
-#define IRCDAUTH 1
-_ACEOF
-
-	echo "$as_me:$LINENO: result: IRCD" >&5
-echo "${ECHO_T}IRCD" >&6
-	;;
-esac
-else
-  cat >>confdefs.h <<\_ACEOF
-#define IRCDAUTH 1
-_ACEOF
-
-echo "$as_me:$LINENO: result: IRCD" >&5
-echo "${ECHO_T}IRCD" >&6
-
-fi;
 
 echo "$as_me:$LINENO: checking To Enable Raw command?" >&5
 echo $ECHO_N "checking To Enable Raw command?... $ECHO_C" >&6

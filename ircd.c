@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.130 2003/06/30 14:56:25 fishwaldo Exp $
+** $Id: ircd.c,v 1.131 2003/07/15 09:16:15 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -112,9 +112,6 @@ int del_bot(char *nick, char *reason)
 		     nick);
 		return -1;
 	}
-	AddStringToList(&av, nick, &ac);
-	Module_Event("SIGNOFF", av, ac);
-	free(av);
 	squit_cmd(nick, reason);
 	del_mod_user(nick);
 	return 1;

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.60 2003/07/11 13:43:27 fishwaldo Exp $
+** $Id: dl.c,v 1.61 2003/07/15 09:16:15 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -38,7 +38,6 @@
 
 void __init_mod_list()
 {
-	int i;
 	
 	strcpy(segv_location, "__init_mod_list");
 
@@ -47,12 +46,6 @@ void __init_mod_list()
 	th = hash_create(T_TABLE_SIZE, 0, 0);
 	bch = hash_create(C_TABLE_SIZE, 0, 0);
 	sockh = hash_create(me.maxsocks, 0, 0);
-#if 0
-	for (i = 0; i <= NUM_MODULES; i++) {
-		ModNum[i].mod = NULL;
-		ModNum[i].used = 0;
-	}
-#endif
 }
 
 static Mod_Timer *new_timer(char *timer_name)

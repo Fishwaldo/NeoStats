@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: server.c,v 1.19 2003/06/13 13:11:49 fishwaldo Exp $
+** $Id: server.c,v 1.20 2003/07/15 09:16:15 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -108,7 +108,7 @@ void DelServer(char *name)
 
 	/* run the event for delete server */
 	AddStringToList(&av, s->name, &ac);
-	Module_Event("DELSERVER", av, ac);
+	Module_Event("SQUIT", av, ac);
 	free(av);
 
 	hash_delete(sh, sn);
