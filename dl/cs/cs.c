@@ -47,6 +47,8 @@ int cs_del_user(char **av, int ac);
 int cs_user_kill(char **av, int ac);
 int cs_user_nick(char **av, int ac);
 void do_set(User * u, char **av, int ac);
+void SaveSettings();
+void Loadconfig();
 
 static void cs_version(User * u);
 static void cs_set_list(User * u, char **av, int ac);
@@ -55,15 +57,11 @@ static void cs_set_killwatch(User * u, char **av, int ac);
 static void cs_set_modewatch(User * u, char **av, int ac);
 static void cs_set_nickwatch(User * u, char **av, int ac);
 
-int sign_watch;
-int kill_watch;
-int mode_watch;
-int nick_watch;
-
-void SaveSettings();
-void Loadconfig();
-
-int cs_online = 0;
+static int sign_watch;
+static int kill_watch;
+static int mode_watch;
+static int nick_watch;
+static int cs_online = 0;
 
 Module_Info my_info[] = { {
 			   "ConnectServ",
@@ -105,6 +103,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 	if (!strcasecmp(av[1], "HELP")) {
 		if (ac <= 2) {
 			privmsg_list(u->nick, s_ConnectServ, cs_help);
+			privmsg_list(u->nick, s_ConnectServ, cs_help_on_help);			
 			return 1;
 		} else if (!strcasecmp(av[2], "SET")) {
 			privmsg_list(u->nick, s_ConnectServ,
@@ -116,11 +115,14 @@ int __Bot_Message(char *origin, char **av, int ac)
 			return 1;
 		} else if (!strcasecmp(av[2], "VERSION")) {
 			privmsg_list(u->nick, s_ConnectServ,
-				     cs_help_about);
+				     cs_help_version);
 			return 1;
 		} else
 			prefmsg(u->nick, s_ConnectServ,
 				"Unknown Help Topic: \2%s\2", av[2]);
+	} else if (!strcasecmp(av[1], "ABOUT")) {
+		privmsg_list(u->nick, s_ConnectServ,
+				    cs_help_about);
 	} else if (!strcasecmp(av[1], "SET")) {
 		do_set(u, av, ac);
 	} else if (!strcasecmp(av[1], "VERSION")) {
@@ -160,7 +162,6 @@ void do_set(User * u, char **av, int ac)
 		return;
 	}
 }
-
 
 int Online(char **av, int ac)
 {
@@ -246,8 +247,9 @@ void __ModFini()
 
 };
 
-
-/* Routine for VERSION */
+/* 
+ * VERSION
+ */
 static void cs_version(User * u)
 {
 	SET_SEGV_LOCATION();
@@ -263,8 +265,9 @@ static void cs_version(User * u)
 		"-------------------------------------");
 }
 
-
-/* Routine for SIGNON message to be echoed */
+/* 
+ * Echo signon
+ */
 int cs_new_user(char **av, int ac)
 {
 	User *u;
@@ -294,8 +297,9 @@ int cs_new_user(char **av, int ac)
 	return 1;
 }
 
-
-/* Routine for SIGNOFF message to be echoed */
+/* 
+ * Echo signoff
+ */
 int cs_del_user(char **av, int ac)
 {
 	char *cmd, *lcl, *QuitMsg, *KillMsg;
@@ -365,8 +369,9 @@ int cs_del_user(char **av, int ac)
 	return 1;
 }
 
-
-/* Routine for MODES message to be echoed */
+/* 
+ * Echo oper mode changes
+ */
 int cs_user_modes(char **av, int ac)
 {
 	int add = 1;
@@ -847,7 +852,9 @@ int cs_user_smodes(char **av, int ac)
 }
 #endif
 
-/* Routine for KILL message to be echoed */
+/* 
+ * Echo kills
+ */
 int cs_user_kill(char **av, int ac)
 {
 	char *cmd, *GlobalMsg;
@@ -896,7 +903,9 @@ int cs_user_kill(char **av, int ac)
 	return 1;
 }
 
-/* If a user has changed their nick say so */
+/* 
+ * Echo nick changes
+ */
 int cs_user_nick(char **av, int ac)
 {
 	User *u;
@@ -925,11 +934,12 @@ int cs_user_nick(char **av, int ac)
 	return 1;
 }
 
-
+/* 
+ * SET NICKWATCH ON or OFF
+ */
 static void cs_set_nickwatch(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-
 	if (ac < 4) {
 		prefmsg(u->nick, s_ConnectServ,
 			"Invalid Syntax. /msg %s help set for more info",
@@ -965,13 +975,12 @@ static void cs_set_nickwatch(User * u, char **av, int ac)
 
 }
 
-
-
-/* Routine for Signon/Signoff ENABLE or DISABLE */
+/* 
+ * SET SIGNWATCH ON or OFF
+ */
 static void cs_set_signwatch(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-
 	if (ac < 4) {
 		prefmsg(u->nick, s_ConnectServ,
 			"Invalid Syntax. /msg %s help set for more info",
@@ -1007,15 +1016,14 @@ static void cs_set_signwatch(User * u, char **av, int ac)
 			s_ConnectServ);
 		return;
 	}
-
 }
 
-
-/* Routine for kill watch ENABLE or DISABLE */
+/* 
+ * SET KILLWATCH ON or OFF
+ */
 static void cs_set_killwatch(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-
 	if (ac < 4) {
 		prefmsg(u->nick, s_ConnectServ,
 			"Invalid Syntax. /msg %s help set for more info",
@@ -1048,15 +1056,14 @@ static void cs_set_killwatch(User * u, char **av, int ac)
 			s_ConnectServ);
 		return;
 	}
-
 }
 
-
-/* Routine for mode watch ENABLE or DISABLE */
+/* 
+ * SET MODEWATCH ON or OFF
+ */
 static void cs_set_modewatch(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-
 	if (ac < 4) {
 		prefmsg(u->nick, s_ConnectServ,
 			"Invalid Syntax. /msg %s help set for more info",
@@ -1089,11 +1096,11 @@ static void cs_set_modewatch(User * u, char **av, int ac)
 			s_ConnectServ);
 		return;
 	}
-
 }
 
-
-/* Routine for STATUS echo */
+/* 
+ * SET LIST - List current settings
+ */
 static void cs_set_list(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
@@ -1109,7 +1116,9 @@ static void cs_set_list(User * u, char **av, int ac)
 		nick_watch ? "Enabled" : "Disabled");
 }
 
-/* Load ConnectServ Config file and set defaults if does not exist */
+/* 
+ * Load ConnectServ Configuration file and set defaults if does not exist
+ */
 void Loadconfig()
 {
 	SET_SEGV_LOCATION();

@@ -24,51 +24,53 @@
 */
 
 const char *cs_help[] = {
-	"\2ConnectServ HELP\2",
+	"The following commands can be used with ConnectServ",
 	"",
-	"COMMANDS:",
-	"HELP       - Online command help",
-	"VERSION    - Shows the current ConnectServ Version",
-	"SET        - Adjust settings for ConnectServ",
+	"    ABOUT       About ConnectServ",
+	"    VERSION     Display version info",
+	"    SET         Configure ConnectServ",
+	NULL
+};
+
+const char *cs_help_on_help[] = {
 	"",
+	"To use a command, type",
+	"    \2/msg ConnectServ command\2",
+	"For for more information on a command, type", 
+	"    \2/msg ConnectServ HELP command\2.",
 	NULL
 };
 
 const char *cs_help_about[] = {
-	"\2About ConnectServ\2",
-	"",
-	"ConnectServ is designed to echo the signing on/off of users,",
-	"killing of users, modes that the operators are using and",
-	"nickname changes. These echo types can be customised to be",
-	"echoed to the services channel or NOT to be echoed at all.",
-	"",
+	"\2ConnectServ\2 is designed to track users signing on and",
+	"off, killing of users, modes that the operators are using",
+	"and nickname changes. These events can be optionally",
+	"echoed to the services channel.",
 	NULL
 };
 
 const char *cs_help_version[] = {
-	"\2ConnectServ Help : VERSION \2",
-	"\2Usage:\2 VERSION",
+	"Syntax: \2VERSION\2",
 	"",
 	"Show ConnectServ version information",
-	"",
 	NULL
 };
 
 const char *cs_help_status[] = {
-	"\2ConnectServ Help : SET \2",
-	"\2Usage:\2 SET <OPTION>",
+	"Syntax: \2SET LIST\2",
+	"        \2SET SIGNWATCH <ON|OFF>\2",
+	"        \2SET KILLWATCH <ON|OFF>\2",
+	"        \2SET MODEWATCH <ON|OFF>\2",
+	"        \2SET NICKWATCH <ON|OFF>\2",
 	"",
-	"LIST",
-	"This will tell you the current status of the settings.",
-	"eg: MODEWATCH is enabled.",
-	"SIGNWATCH <ON|OFF>",
-	"echo signon/signoff events.",
-	"KILLWATCH <ON|OFF>",
-	"echo kill events.",
-	"MODEWATCH <ON|OFF>",
-	"echo operator mode changes.",
-	"NICKWATCH <ON|OFF>",
-	"echo nickname changes.",
-	"",
+	"LIST will show the current settings.",
+	"SIGNWATCH configures whether to echo signon/signoff",
+	"events to the services channel.",
+	"KILLWATCH configures whether to echo kill",
+	"events to the services channel.",
+	"MODEWATCH configures whether to echo operator modes",
+	"events to the services channel.",
+	"NICKWATCH configures whether to echo nick changes",
+	"events to the services channel.",
 	NULL
 };
