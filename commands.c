@@ -278,7 +278,11 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	int curlevel, lowlevel;
 	hnode_t *cmdnode;
 	hscan_t hs;
+	int userlevel;
 
+	userlevel = UserLevel(u);
+
+	/* If no parameter to help, generate main help text */
 	if (ac < 3) {
 		lowlevel = 0;
 		curlevel = NS_ULEVEL_OPER;
@@ -297,7 +301,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 				prefmsg(u->nick, bot_ptr->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
 			}
 		}
-		if (UserLevel(u) >= curlevel) {
+		if (userlevel >= curlevel) {
 			switch (curlevel) {
 				case NS_ULEVEL_OPER:
 						curlevel = NS_ULEVEL_ADMIN;
