@@ -62,6 +62,9 @@ static void m_protocol (char *origin, char **argv, int argc, int srv);
 static void m_whois (char *origin, char **argv, int argc, int srv);
 static void m_smo (char *origin, char **argv, int argc, int srv);
 
+#define SJOIN
+#define NICKV2	
+
 #ifdef UNREAL32
 const char ircd_version[] = "(U32)";
 #else
@@ -194,7 +197,7 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 {
 /* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 */
 #ifdef SJOIN
-	sts ("%s TOKEN NICKv2 SJOIN SJOIN2 UMODE2", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
+	sts ("%s TOKEN NICKv2 SJOIN SJOIN2 SJ3 UMODE2", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 #else
 	sts ("%s TOKEN NICKv2 UMODE2", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 #endif
@@ -707,7 +710,7 @@ static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
 	nlog (LOG_INFO, LOG_CORE, "SJOIN: %s", recbuf);
-	do_sjoin (argv[0], argv[1], argv[2], origin, argv, argc);
+	do_sjoin (argv[0], argv[1], ((argc <= 2) ? argv[1] : argv[2]), origin, argv, argc);
 }
 
 /* m_pass
