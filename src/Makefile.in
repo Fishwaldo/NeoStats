@@ -70,7 +70,7 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	modes.$(OBJEXT) ctcp.$(OBJEXT) dcc.$(OBJEXT) \
 	nsmemory.$(OBJEXT) base64.$(OBJEXT) numerics.$(OBJEXT) \
 	settings.$(OBJEXT) botinfo.$(OBJEXT) oscalls.$(OBJEXT) \
-	ossocket.$(OBJEXT)
+	ossocket.$(OBJEXT) osfile.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/adns/libadns.la \
 	$(top_srcdir)/lib/event/libevent.a
@@ -227,7 +227,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confusel
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c \
 		base64.c numerics.c settings.c botinfo.c \
-		oscalls.c ossocket.c 
+		oscalls.c ossocket.c osfile.c 
 
 AM_CFLAGS = -I$(top_srcdir)/lib/adns \
 		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE \
@@ -331,6 +331,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nsmemory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/numerics.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/oscalls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/osfile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ossocket.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/services.Po@am__quote@

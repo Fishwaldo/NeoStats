@@ -627,6 +627,7 @@ src/nsdba.c -text
 src/nsmemory.c -text
 src/numerics.c -text
 src/oscalls.c -text
+src/osfile.c -text
 src/ossocket.c -text
 src/protocol/Makefile.am -text
 src/protocol/Makefile.in -text
