@@ -161,7 +161,6 @@ static int ls_tonsil(User * u, char **av, int ac)
 	prefmsg(target_nick, s_LoveServ,
 		"%s would like to send a SLoW..LoNG..DeeP..PeNeTRaTiNG..ToNSiL-TiCKLiNG.. HaiR STRaiGHTeNiNG..Toe-CuRLiNG..NeRVe-JaNGLiNG..LiFe-aLTeRiNG.. FaNTaSY-CauSiNG..i JuST SaW GoD!..GoSH, DiD MY CLoTHeS FaLL oFF?.. YeS, i'M GLaD i CaMe oN iRC..KiSS oN Da LiPS!!!",
 		u->nick);
-	     target_nick);
 	return 1;
 }
 
