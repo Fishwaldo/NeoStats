@@ -5,6 +5,7 @@ INCLUDES = -I../.. -I../../adns
 SOURCES= statserv.c ss_help.c database.c tld.c stats.c htmlstats.c
 OBJECTS= statserv.o ss_help.o database.o tld.o stats.o htmlstats.o
 TARGET= statserv.so
+HTML= html/index.tpl
 
 all:	statserv
 
@@ -22,7 +23,7 @@ clean:
 
 install: statserv
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
-
+	$(INSTALL) -m 644 $(HTML) $(DIRECTORY)/dl
 
 
 

@@ -105,12 +105,12 @@ int main()
 	forked=fork();
 #endif
 	if (forked) {
-		fp = fopen("stats.pid", "w");
+		fp = fopen("neostats.pid", "w");
 		fprintf(fp, "%i", forked);
 		fclose(fp);
 		printf("\n");
 		printf("%s Successfully Launched into Background\n", version);
-		printf("PID: %i - Wrote to stats.pid\n",forked);
+		printf("PID: %i - Wrote to neostats.pid\n",forked);
 
 		return 0;
 	}

@@ -11,7 +11,7 @@ dir="/home/services/NeoStats2.0.7/"
 ircdexe="stats"
 
 # I wouldn't touch this if I were you.
-ircdname="stats.pid"
+ircdname="neostats.pid"
 
 ########## you probably don't need to change anything below here ##########
 

@@ -1,5 +1,7 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
-* NeoStats * Fish & Shmad * Version ????
+* NeoStats * Shmad * Version ????
+ - fixed 'make install' now copies the html template over (reported by eggy)
+ - Changed stats.pid to NeoStats.pid (reported by eggy)
  - other minor fixes to makeconf script that could potentially stop it from running on some hosts.
  - fixed makeconf to work after 'make install' is ran (a little oversight sorry)
  - fixed up some Unreal tokens

@@ -277,7 +277,7 @@ extern void ns_shutdown(User *u, char *reason)
 	ssquit_cmd(me.name);
 	sleep(1);
 	close(servsock);
-	remove("stats.pid");
+	remove("neostats.pid");
 	log("%s [%s](%s) requested SHUTDOWN.", u->nick, u->username,
 		u->hostname);
 	exit(0);
