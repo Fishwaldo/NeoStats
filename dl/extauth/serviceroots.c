@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: serviceroots.c,v 1.11 2003/05/26 09:18:29 fishwaldo Exp $
+** $Id: serviceroots.c,v 1.12 2003/06/13 14:49:31 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -37,30 +37,32 @@ static int new_m_version(char *origin, char **av, int ac);
 void sr_cb_config(char *arg, int configtype);
 
 Module_Info extauth_Info[] = { {
-    "extauth",
-    "ServiceRoots Authentication Module",
-    "1.1"
-} };
+				"extauth",
+				"ServiceRoots Authentication Module",
+				"1.1"}
+};
 
-Functions ServiceRoots_fn_list[] = { 
-    { MSG_VERSION,    new_m_version,    1 },
+Functions ServiceRoots_fn_list[] = {
+	{MSG_VERSION, new_m_version, 1},
 #ifdef HAVE_TOKEN_SUP
-    { TOK_VERSION,    new_m_version,    1 },
+	{TOK_VERSION, new_m_version, 1},
 #endif
-    { NULL,        NULL,     0}
+	{NULL, NULL, 0}
 };
 
 
-Module_Info *__module_get_info() {
-    return extauth_Info;
+Module_Info *__module_get_info()
+{
+	return extauth_Info;
 };
 
-Functions *__module_get_functions() {
-    return ServiceRoots_fn_list;
+Functions *__module_get_functions()
+{
+	return ServiceRoots_fn_list;
 };
 
 static config_option options[] = {
-{ "SERVICE_ROOTS", ARG_STR, sr_cb_config, 0}
+	{"SERVICE_ROOTS", ARG_STR, sr_cb_config, 0}
 };
 
 
@@ -78,22 +80,29 @@ struct users {
 
 
 
-int new_m_version(char *origin, char **av, int ac) {
-    strcpy(segv_location, "serviceRoots-new_m_version");
-    snumeric_cmd(351, origin, "Module ServiceRoots Loaded, Version: %s %s %s",extauth_Info[0].module_version,version_date,version_time);
-    return 0;
+int new_m_version(char *origin, char **av, int ac)
+{
+	strcpy(segv_location, "serviceRoots-new_m_version");
+	snumeric_cmd(351, origin,
+		     "Module ServiceRoots Loaded, Version: %s %s %s",
+		     extauth_Info[0].module_version, version_date,
+		     version_time);
+	return 0;
 }
 
-void _init() {
-	srconf.auth=0;
+void _init()
+{
+	srconf.auth = 0;
 	/* only a max of 10 serviceroots */
 	srconf.ul = list_create(10);
-	if (!config_read("neostats.cfg", options) ==0 ) {
-		nlog(LOG_WARNING, LOG_CORE, "ServiceRoots: ehh, config failed");
-	}	
+	if (!config_read("neostats.cfg", options) == 0) {
+		nlog(LOG_WARNING, LOG_CORE,
+		     "ServiceRoots: ehh, config failed");
+	}
 }
 
-void _fini() {
+void _fini()
+{
 	lnode_t *un;
 	un = list_first(srconf.ul);
 	while (un) {
@@ -103,24 +112,28 @@ void _fini() {
 	list_destroy_nodes(srconf.ul);
 }
 
-void sr_cb_config(char *arg, int configtype) {
+void sr_cb_config(char *arg, int configtype)
+{
 	lnode_t *un;
 	char *nick;
 	char *user;
 	char *host;
 	struct users *sru;
-	
-	
+
+
 	strcpy(segv_location, "StatServ-ss_cb_Config");
 	if (configtype == 0) {
 		if (list_isfull(srconf.ul)) {
-			nlog(LOG_WARNING, LOG_CORE, "Exceded Maxium Number of ServiceRoots(10)");
+			nlog(LOG_WARNING, LOG_CORE,
+			     "Exceded Maxium Number of ServiceRoots(10)");
 			return;
 		} else {
 			/* new code to do hostname. ident lookups */
 			if (strstr(arg, "!")) {
 				if (!strstr(arg, "@")) {
-					nlog(LOG_WARNING, LOG_CORE, "Invalid ServiceRoots Entry. Must be of the form nick!ident@host, was %s", arg);
+					nlog(LOG_WARNING, LOG_CORE,
+					     "Invalid ServiceRoots Entry. Must be of the form nick!ident@host, was %s",
+					     arg);
 					return;
 				}
 				nick = strtok(arg, "!");
@@ -130,7 +143,7 @@ void sr_cb_config(char *arg, int configtype) {
 				strncpy(sru->nick, nick, MAXNICK);
 				strncpy(sru->ident, user, MAXUSER);
 				strncpy(sru->host, host, MAXHOST);
-				sru->lvl = 200;				
+				sru->lvl = 200;
 			} else {
 				/* old format... Warn, but keep going */
 				sru = malloc(sizeof(users));
@@ -138,21 +151,25 @@ void sr_cb_config(char *arg, int configtype) {
 				strncpy(sru->ident, "*", MAXUSER);
 				strncpy(sru->host, "*", MAXHOST);
 				sru->lvl = 200;
-				nlog(LOG_WARNING, LOG_CORE, "Old ServiceRoots Entry Detected. Suggest you upgrade ASAP to <nick>!<ident>@<host> (WildCards are allowed)");
+				nlog(LOG_WARNING, LOG_CORE,
+				     "Old ServiceRoots Entry Detected. Suggest you upgrade ASAP to <nick>!<ident>@<host> (WildCards are allowed)");
 			}
 			un = lnode_create(sru);
 			list_append(srconf.ul, un);
-		}	
+		}
 	}
 }
-	
-extern int __do_auth(User *u, int curlvl) {
+
+extern int __do_auth(User * u, int curlvl)
+{
 	lnode_t *un;
 	struct users *sru;
 	un = list_first(srconf.ul);
 	while (un) {
 		sru = lnode_get(un);
-		if ((!fnmatch(sru->nick, u->nick, 0)) && (!fnmatch(sru->ident, u->username, 0)) && (!fnmatch(sru->host, u->hostname, 0))) {
+		if ((!fnmatch(sru->nick, u->nick, 0))
+		    && (!fnmatch(sru->ident, u->username, 0))
+		    && (!fnmatch(sru->host, u->hostname, 0))) {
 			return (sru->lvl);
 		}
 		un = list_next(srconf.ul, un);
@@ -160,14 +177,16 @@ extern int __do_auth(User *u, int curlvl) {
 	return curlvl;
 }
 
-extern int __list_auth(User *u) {
+extern int __list_auth(User * u)
+{
 
 	lnode_t *un;
 	struct users *sru;
 	un = list_first(srconf.ul);
 	while (un) {
 		sru = lnode_get(un);
-		snumeric_cmd(243, u->nick, "O %s@%s %s %d", sru->ident, sru->host, sru->nick, sru->lvl);
+		snumeric_cmd(243, u->nick, "O %s@%s %s %d", sru->ident,
+			     sru->host, sru->nick, sru->lvl);
 		un = list_next(srconf.ul, un);
 	}
 	return 1;

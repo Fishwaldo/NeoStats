@@ -56,8 +56,10 @@ dl/cs/Makefile -text
 dl/cs/cs.c -text
 dl/cs/cs.h -text
 dl/cs/cs_help.c -text
+dl/extauth/.indent.pro -text
 dl/extauth/Makefile -text
 dl/extauth/serviceroots.c -text
+dl/hostserv/.indent.pro -text
 dl/hostserv/ChangeLog -text
 dl/hostserv/Makefile -text
 dl/hostserv/README -text
@@ -72,12 +74,14 @@ dl/icq/icq_help.c -text
 dl/icq/icqconfig.h -text
 dl/icq/icqlib.c -text
 dl/icq/icqlib.h -text
+dl/loveserv/.indent.pro -text
 dl/loveserv/ChangeLog -text
 dl/loveserv/Makefile -text
 dl/loveserv/TODO -text
 dl/loveserv/loveserv.c -text
 dl/loveserv/ls_help.c -text
 dl/modules.txt -text
+dl/ms/.indent.pro -text
 dl/ms/ChangeLog -text
 dl/ms/Makefile -text
 dl/ms/ms.c -text
@@ -98,8 +102,10 @@ dl/operme/Makefile -text
 dl/operme/README -text
 dl/operme/om_help.c -text
 dl/operme/operme.c -text
+dl/spam/.indent.pro -text
 dl/spam/Makefile -text
 dl/spam/spam.c -text
+dl/statserv/.indent.pro -text
 dl/statserv/ChangeLog -text
 dl/statserv/Makefile -text
 dl/statserv/database.c -text

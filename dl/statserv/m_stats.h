@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: m_stats.h,v 1.10 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id: m_stats.h,v 1.11 2003/06/13 14:49:33 fishwaldo Exp $
 */
 
 #ifndef M_STATS_H
@@ -30,7 +30,7 @@
 #define DecreaseUsers(x)	x->users--;		stats_network.users--;
 #define DecreaseServers()	stats_network.servers--;
 
-#define IncreaseOpers(x)	x->opers++;		stats_network.opers++; 	
+#define IncreaseOpers(x)	x->opers++;		stats_network.opers++;
 #define IncreaseUsers(x)	x->users++;		stats_network.users++;	x->totusers++;	stats_network.totusers++; daily.tot_users++;
 #define IncreaseServers()	stats_network.servers++;
 

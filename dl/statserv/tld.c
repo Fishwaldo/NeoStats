@@ -20,141 +20,147 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: tld.c,v 1.6 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id: tld.c,v 1.7 2003/06/13 14:49:34 fishwaldo Exp $
 */
 
 #include "statserv.h"
 #include "log.h"
 
 
-void DelTLD(User *u) {
-    TLD *t = NULL;
-    char *m;
+void DelTLD(User * u)
+{
+	TLD *t = NULL;
+	char *m;
 
-    strcpy(segv_location, "StatServ-DelTLD");
-    
+	strcpy(segv_location, "StatServ-DelTLD");
 
-    m = strrchr(u->hostname, '.');
 
-    if (!m)
-        t = findtld("num");
-    else
-        m++;
+	m = strrchr(u->hostname, '.');
 
-    if (!t) {
-        if (!isdigit(*m))
-            t = findtld(m);
-        else
-            t = findtld("num");
-    }
+	if (!m)
+		t = findtld("num");
+	else
+		m++;
 
-    if (!t) {
-        nlog(LOG_NORMAL, LOG_MOD, "Unable to find TLD entry for %s (%s), damn vhosts!", u->nick, m);
-        return;
-    }
-    t->users--;
-}    
+	if (!t) {
+		if (!isdigit(*m))
+			t = findtld(m);
+		else
+			t = findtld("num");
+	}
+
+	if (!t) {
+		nlog(LOG_NORMAL, LOG_MOD,
+		     "Unable to find TLD entry for %s (%s), damn vhosts!",
+		     u->nick, m);
+		return;
+	}
+	t->users--;
+}
 
 /* "net" -- not DOT"net" */
 TLD *findtld(char *tld)
 {
-    TLD *t;
+	TLD *t;
 
-    strcpy(segv_location, "StatServ-findtld");
+	strcpy(segv_location, "StatServ-findtld");
 
 
-    for (t = tldhead; t; t = t->next) {
-        if (!strcasecmp(t->tld, tld))
-            return t;
-    }
+	for (t = tldhead; t; t = t->next) {
+		if (!strcasecmp(t->tld, tld))
+			return t;
+	}
 
-    return NULL;
+	return NULL;
 }
 
-TLD *AddTLD(User *u)
+TLD *AddTLD(User * u)
 {
-    TLD *t = NULL;
-    char *m;
+	TLD *t = NULL;
+	char *m;
 
-    strcpy(segv_location, "StatServ-AddTLD");
+	strcpy(segv_location, "StatServ-AddTLD");
 
-    m = strrchr(u->hostname, '.');
+	m = strrchr(u->hostname, '.');
 
-    if (!m)
-        t = findtld("num");
-    else
-        m++;
+	if (!m)
+		t = findtld("num");
+	else
+		m++;
 
-    if (!t) {
-        if (!isdigit(*m))
-            t = findtld(m);
-        else
-            t = findtld("num");
-    }
+	if (!t) {
+		if (!isdigit(*m))
+			t = findtld(m);
+		else
+			t = findtld("num");
+	}
 
-    if (!t) {
-        nlog(LOG_NORMAL, LOG_MOD, "Unable to find TLD entry for %s (%s), damn vhosts!", u->nick, m);
-        return NULL;
-    }
-    t->users++;
-    t->daily_users++;
+	if (!t) {
+		nlog(LOG_NORMAL, LOG_MOD,
+		     "Unable to find TLD entry for %s (%s), damn vhosts!",
+		     u->nick, m);
+		return NULL;
+	}
+	t->users++;
+	t->daily_users++;
 
-    return t;
+	return t;
 }
 
 void LoadTLD()
 {
-    register int i;
-    FILE *fp;
-    char buf[BUFSIZE], buf2[BUFSIZE];
-    char *tmp = NULL, *tmp2 = NULL;
-    TLD *t;
+	register int i;
+	FILE *fp;
+	char buf[BUFSIZE], buf2[BUFSIZE];
+	char *tmp = NULL, *tmp2 = NULL;
+	TLD *t;
 
-    strcpy(segv_location, "StatServ-LoadTLD");
+	strcpy(segv_location, "StatServ-LoadTLD");
 
 
-    if ((fp = fopen("data/tlds.nfo", "r")) == NULL) {
-        nlog(LOG_WARNING, LOG_MOD, "Top Level Domain Statistics not loaded: file not found.");
-        return;
-    }
+	if ((fp = fopen("data/tlds.nfo", "r")) == NULL) {
+		nlog(LOG_WARNING, LOG_MOD,
+		     "Top Level Domain Statistics not loaded: file not found.");
+		return;
+	}
 
-    while (fgets(buf, BUFSIZE, fp)) {
-        memcpy(buf2, buf, sizeof(buf));
-        tmp = strrchr(buf, '(');
-        tmp++;
-        tmp[strlen(tmp) - 1] = '\0';
-        tmp[strlen(tmp) - 1] = '\0';
-        for (i = 0; buf[i] != '('; i++)
-            buf2[strlen(buf2) + 1] = buf[i];
+	while (fgets(buf, BUFSIZE, fp)) {
+		memcpy(buf2, buf, sizeof(buf));
+		tmp = strrchr(buf, '(');
+		tmp++;
+		tmp[strlen(tmp) - 1] = '\0';
+		tmp[strlen(tmp) - 1] = '\0';
+		for (i = 0; buf[i] != '('; i++)
+			buf2[strlen(buf2) + 1] = buf[i];
 
-        if ((tmp2 = strchr(buf2, '\n')))    *tmp2 = '\0';
+		if ((tmp2 = strchr(buf2, '\n')))
+			*tmp2 = '\0';
 
-        t = malloc(sizeof(TLD));
-        t->users = 0;
-        t->country = sstrdup(buf2);
-        memcpy(t->tld, tmp, sizeof(t->tld));
+		t = malloc(sizeof(TLD));
+		t->users = 0;
+		t->country = sstrdup(buf2);
+		memcpy(t->tld, tmp, sizeof(t->tld));
 
-        if (!tldhead) {
-            tldhead = t;
-            tldhead->next = NULL;
-        } else {
-            t->next = tldhead;
-            tldhead = t;
-        }
-    }
-    fclose(fp);
+		if (!tldhead) {
+			tldhead = t;
+			tldhead->next = NULL;
+		} else {
+			t->next = tldhead;
+			tldhead = t;
+		}
+	}
+	fclose(fp);
 }
 
 void init_tld()
 {
-    TLD *t;
+	TLD *t;
 
-    strcpy(segv_location, "StatServ-init_tld");
+	strcpy(segv_location, "StatServ-init_tld");
 
 
-    for (t = tldhead; t; t = t->next) {
-        t->users = 0;
-	t->daily_users = 0;
-    }
+	for (t = tldhead; t; t = t->next) {
+		t->users = 0;
+		t->daily_users = 0;
+	}
 }
-

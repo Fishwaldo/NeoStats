@@ -20,16 +20,17 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.39 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id: stats.c,v 1.40 2003/06/13 14:49:33 fishwaldo Exp $
 */
 
 #include "statserv.h"
 #include "log.h"
 
-int ok_to_wallop() {
+int ok_to_wallop()
+{
 	static int lasttime;
 	static int count;
-	
+
 	if (StatServ.newdb || !StatServ.onchan || !me.synced) {
 		return -1;
 	}
@@ -44,51 +45,60 @@ int ok_to_wallop() {
 		count = 0;
 	}
 	return 1;
-	
+
 
 }
 
-CVersions *findversions(char *name) {
+CVersions *findversions(char *name)
+{
 	CVersions *cv;
 	lnode_t *cn;
 	cn = list_find(Vhead, name, comparef);
 	if (cn) {
 		cv = lnode_get(cn);
 	} else {
-		nlog(LOG_DEBUG2, LOG_MOD, "findversions(%s) -> NOT FOUND", name);
+		nlog(LOG_DEBUG2, LOG_MOD, "findversions(%s) -> NOT FOUND",
+		     name);
 		return NULL;
 	}
 	return cv;
 }
 
 
-int s_client_version(char **av, int ac) {
+int s_client_version(char **av, int ac)
+{
 	lnode_t *node;
 	CVersions *clientv;
-	
+
 	clientv = findversions(av[1]);
 	if (clientv) {
-		nlog(LOG_DEBUG2, LOG_MOD, "Found Client Version Node %s", av[1]);
+		nlog(LOG_DEBUG2, LOG_MOD, "Found Client Version Node %s",
+		     av[1]);
 		clientv->count++;
 		return 1;
-	} 
+	}
 	clientv = malloc(sizeof(CVersions));
 	strncpy(clientv->name, av[1], 512);
 	clientv->count = 1;
 	node = lnode_create(clientv);
 	list_append(Vhead, node);
-	nlog(LOG_DEBUG2, LOG_MOD, "Added Version to List %s", clientv->name);
+	nlog(LOG_DEBUG2, LOG_MOD, "Added Version to List %s",
+	     clientv->name);
 	return 1;
 }
 
-int s_chan_new(char **av, int ac) {
+int s_chan_new(char **av, int ac)
+{
 	long count;
 	IncreaseChans();
 	count = hash_count(ch);
 	if (count > stats_network.maxchans) {
 		stats_network.maxchans = count;
 		stats_network.t_chans = time(NULL);
-		if (ok_to_wallop() > 0) swallops_cmd(s_StatServ, "\2NEW CHANNEL RECORD\2 Wow, there is now %d Channels on the Network", stats_network.maxchans);
+		if (ok_to_wallop() > 0)
+			swallops_cmd(s_StatServ,
+				     "\2NEW CHANNEL RECORD\2 Wow, there is now %d Channels on the Network",
+				     stats_network.maxchans);
 	}
 	if (count > daily.chans) {
 		daily.chans = count;
@@ -97,12 +107,14 @@ int s_chan_new(char **av, int ac) {
 	return 1;
 }
 
-int s_chan_del(char **av, int ac) {
+int s_chan_del(char **av, int ac)
+{
 	DecreaseChans();
 	return 1;
 }
 
-int s_chan_join(char **av, int ac) {
+int s_chan_join(char **av, int ac)
+{
 	CStats *cs;
 	cs = findchanstats(av[0]);
 	if (cs) {
@@ -120,7 +132,7 @@ int s_chan_join(char **av, int ac) {
 			cs->t_maxjoins = time(NULL);
 		}
 	} else {
-		cs = AddChanStats(av[0]);		
+		cs = AddChanStats(av[0]);
 		Increasemems(cs);
 		cs->maxmemtoday++;
 		cs->t_maxmemtoday = time(NULL);
@@ -128,8 +140,9 @@ int s_chan_join(char **av, int ac) {
 		cs->t_maxmems = time(NULL);
 	}
 	return 1;
-}			
-int s_chan_part(char **av, int ac) {
+}
+int s_chan_part(char **av, int ac)
+{
 	CStats *cs;
 	cs = findchanstats(av[0]);
 	if (cs) {
@@ -138,7 +151,8 @@ int s_chan_part(char **av, int ac) {
 	return 1;
 }
 
-int s_topic_change(char **av, int ac) {
+int s_topic_change(char **av, int ac)
+{
 	CStats *cs;
 	cs = findchanstats(av[0]);
 	if (cs) {
@@ -146,7 +160,8 @@ int s_topic_change(char **av, int ac) {
 	}
 	return 1;
 }
-int s_chan_kick(char **av, int ac) {
+int s_chan_kick(char **av, int ac)
+{
 	CStats *cs;
 	cs = findchanstats(av[0]);
 	if (cs) {
@@ -155,36 +170,43 @@ int s_chan_kick(char **av, int ac) {
 			cs->maxkicks = cs->maxkickstoday;
 			cs->t_maxkicks = time(NULL);
 		}
-	}	
-	return 1;	
+	}
+	return 1;
 
 }
 
-CStats *findchanstats(char *name) {
+CStats *findchanstats(char *name)
+{
 	CStats *cs;
 	lnode_t *cn;
 	cn = list_find(Chead, name, comparef);
 	if (cn) {
 		cs = lnode_get(cn);
 	} else {
-		nlog(LOG_DEBUG2, LOG_MOD, "findchanstats(%s) -> NOT FOUND", name);
+		nlog(LOG_DEBUG2, LOG_MOD, "findchanstats(%s) -> NOT FOUND",
+		     name);
 		return NULL;
 	}
 	return cs;
 }
-void DelOldChan() {
+
+void DelOldChan()
+{
 	lnode_t *cn, *cn1;
 	CStats *c;
 	cn = list_first(Chead);
 	while (cn) {
 		c = lnode_get(cn);
-		if ((c->members <= 0 ) && ((time(NULL) - c->lastseen) < 604800)) {
+		if ((c->members <= 0)
+		    && ((time(NULL) - c->lastseen) < 604800)) {
 			if (!findchan(c->name)) {
-				nlog(LOG_DEBUG1, LOG_MOD, "StatServ: Deleting Old Channel %s", c->name);
+				nlog(LOG_DEBUG1, LOG_MOD,
+				     "StatServ: Deleting Old Channel %s",
+				     c->name);
 				cn1 = cn;
 				cn = list_next(Chead, cn);
 				list_delete(Chead, cn1);
-        			lnode_destroy(cn1);
+				lnode_destroy(cn1);
 				free(c);
 				continue;
 			}
@@ -193,7 +215,8 @@ void DelOldChan() {
 	}
 }
 
-CStats *AddChanStats(char *name) {
+CStats *AddChanStats(char *name)
+{
 	CStats *cs;
 	lnode_t *cn;
 
@@ -208,7 +231,7 @@ CStats *AddChanStats(char *name) {
 	cs->maxkickstoday = 0;
 	cs->maxmemtoday = 0;
 	cs->t_maxmemtoday = 0;
-	cs->maxmems  = 0;
+	cs->maxmems = 0;
 	cs->t_maxmems = 0;
 	cs->maxkicks = 0;
 	cs->t_maxkicks = 0;
@@ -217,61 +240,77 @@ CStats *AddChanStats(char *name) {
 	cs->lastseen = time(NULL);
 	cn = lnode_create(cs);
 	if (list_isfull(Chead)) {
-		nlog(LOG_CRITICAL, LOG_MOD, "Eeek, Can't add Channel to Statserv Channel Hash. Has is full");
+		nlog(LOG_CRITICAL, LOG_MOD,
+		     "Eeek, Can't add Channel to Statserv Channel Hash. Has is full");
 	} else {
 		list_append(Chead, cn);
-	}	
+	}
 	return cs;
 }
 
-int s_new_server(char **av, int ac) {
+int s_new_server(char **av, int ac)
+{
 	Server *s;
 	strcpy(segv_location, "StatServ-s_new_server");
 	s = findserver(av[0]);
-	if (!s) return 0;
+	if (!s)
+		return 0;
 	AddStats(s);
 	IncreaseServers();
 	if (stats_network.maxservers < stats_network.servers) {
 		stats_network.maxservers = stats_network.servers;
 		stats_network.t_maxservers = time(NULL);
-		if (ok_to_wallop() > 0) swallops_cmd(s_StatServ, "\2NEW SERVER RECORD\2 Wow, there are now %d Servers on the Network", stats_network.servers); 
+		if (ok_to_wallop() > 0)
+			swallops_cmd(s_StatServ,
+				     "\2NEW SERVER RECORD\2 Wow, there are now %d Servers on the Network",
+				     stats_network.servers);
 	}
 	if (stats_network.servers > daily.servers) {
-	daily.servers = stats_network.servers;
-	daily.t_servers = time(NULL);
+		daily.servers = stats_network.servers;
+		daily.t_servers = time(NULL);
 	}
-	if (ok_to_wallop() > 0) chanalert(s_StatServ, "\2SERVER\2 %s has joined the Network at %s", s->name, s->uplink);
+	if (ok_to_wallop() > 0)
+		chanalert(s_StatServ,
+			  "\2SERVER\2 %s has joined the Network at %s",
+			  s->name, s->uplink);
 	return 1;
 
 }
 
-int s_del_server(char **av, int ac) {
+int s_del_server(char **av, int ac)
+{
 	SStats *ss;
 	Server *s;
 	strcpy(segv_location, "StatServ-s_del_server");
 	s = findserver(av[0]);
-	if (!s) return 0;
+	if (!s)
+		return 0;
 	DecreaseServers();
-	if (ok_to_wallop() > 0) chanalert(s_StatServ, "\2SERVER\2 %s has left the Network at %s", s->name, s->uplink);
+	if (ok_to_wallop() > 0)
+		chanalert(s_StatServ,
+			  "\2SERVER\2 %s has left the Network at %s",
+			  s->name, s->uplink);
 	ss = findstats(s->name);
 	if (s->name != me.uplink)
-	ss->numsplits = ss->numsplits +1;
+		ss->numsplits = ss->numsplits + 1;
 	return 1;
 
 }
 
 
-int s_user_kill(char **av, int ac) {
+int s_user_kill(char **av, int ac)
+{
 	SStats *s;
 	SStats *ss;
 	char *cmd, *who;
 	User *u;
 	u = finduser(av[0]);
-	if (!u) return 0;
+	if (!u)
+		return 0;
 
 	strcpy(segv_location, "StatServ-s_user_kill");
 
-	s=findstats(u->server->name);
+	s = findstats(u->server->name);
 	if (is_oper(u)) {
 		DecreaseOpers(s);
 	}
@@ -285,83 +324,107 @@ int s_user_kill(char **av, int ac) {
 	cmd++;
 	who++;
 	if (finduser(who)) {
-	/* it was a User that killed the target */
-	ss = findstats(u->server->name); 
-	ss->operkills = ss->operkills +1; 
+		/* it was a User that killed the target */
+		ss = findstats(u->server->name);
+		ss->operkills = ss->operkills + 1;
 	} else if (findserver(who)) {
 		ss = findstats(who);
-		ss->serverkills = ss->serverkills +1;
+		ss->serverkills = ss->serverkills + 1;
 	}
 	return 1;
 }
 
-int s_user_modes(char **av, int ac) {
+int s_user_modes(char **av, int ac)
+{
 	int add = 1;
 	char *modes;
 	SStats *s;
 	User *u;
-	
+
 	strcpy(segv_location, "StatServ-s_user_modes");
 
 	u = finduser(av[0]);
 	if (!u) {
-		nlog(LOG_WARNING, LOG_MOD, "Changing modes for unknown user: %s", u->nick);
+		nlog(LOG_WARNING, LOG_MOD,
+		     "Changing modes for unknown user: %s", u->nick);
 		return -1;
 	}
-	if (!u->modes) return -1; 
+	if (!u->modes)
+		return -1;
 	modes = u->modes;
 	while (*modes) {
-		switch(*modes) {
-			case '+': add = 1;	break;
-			case '-': add = 0;	break;
-			case 'O':
-			case 'o':
-				if (add) {
-					IncreaseOpers(findstats(u->server->name));
-					s = findstats(u->server->name);
-					if (stats_network.maxopers < stats_network.opers) {
-						stats_network.maxopers = stats_network.opers;
-						stats_network.t_maxopers = time(NULL);
-						if (ok_to_wallop() > 0) swallops_cmd(s_StatServ, "\2Oper Record\2 The Network has reached a New Record for Opers at %d", stats_network.opers);
-					}
-					if (s->maxopers < s->opers) {
-						s->maxopers = s->opers;
-						s->t_maxopers = time(NULL);
-						if (ok_to_wallop() > 0) swallops_cmd(s_StatServ, "\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s->name, s->opers);
-					}
-					if (s->opers > daily.opers) {
-						daily.opers = s->opers;
-						daily.t_opers = time(NULL);
-					}	
-				} else {
-					if (is_oper(u)) {
-						 DecreaseOpers(findstats(u->server->name));
-					}
+		switch (*modes) {
+		case '+':
+			add = 1;
+			break;
+		case '-':
+			add = 0;
+			break;
+		case 'O':
+		case 'o':
+			if (add) {
+				IncreaseOpers(findstats(u->server->name));
+				s = findstats(u->server->name);
+				if (stats_network.maxopers <
+				    stats_network.opers) {
+					stats_network.maxopers =
+					    stats_network.opers;
+					stats_network.t_maxopers =
+					    time(NULL);
+					if (ok_to_wallop() > 0)
+						swallops_cmd(s_StatServ,
+							     "\2Oper Record\2 The Network has reached a New Record for Opers at %d",
+							     stats_network.
+							     opers);
 				}
-				break;
-			default: 
-				break;
+				if (s->maxopers < s->opers) {
+					s->maxopers = s->opers;
+					s->t_maxopers = time(NULL);
+					if (ok_to_wallop() > 0)
+						swallops_cmd(s_StatServ,
+							     "\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers",
+							     s->name,
+							     s->opers);
+				}
+				if (s->opers > daily.opers) {
+					daily.opers = s->opers;
+					daily.t_opers = time(NULL);
+				}
+			} else {
+				if (is_oper(u)) {
+					DecreaseOpers(findstats
+						      (u->server->name));
+				}
+			}
+			break;
+		default:
+			break;
 		}
 		modes++;
 	}
 	return 1;
 }
 
-void re_init_bot() {
+void re_init_bot()
+{
 	strcpy(segv_location, "StatServ-re_init_bot");
 
 	chanalert(s_Services, "Re-Initilizing %s Bot", s_StatServ);
-	init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oS", SSMNAME);
+	init_bot(s_StatServ, StatServ.user, StatServ.host,
+		 "/msg Statserv HELP", "+oS", SSMNAME);
 }
-int s_del_user(char **av, int ac) {
+int s_del_user(char **av, int ac)
+{
 	SStats *s;
 	User *u;
 	u = finduser(av[0]);
-	if (!u) return 0;
+	if (!u)
+		return 0;
 
-	s=findstats(u->server->name);
+	s = findstats(u->server->name);
 
-	if (!u->modes) return -1; 
+	if (!u->modes)
+		return -1;
 	if (is_oper(u)) {
 		DecreaseOpers(s);
 	}
@@ -371,15 +434,17 @@ int s_del_user(char **av, int ac) {
 }
 
 
-int s_user_away(char **av, int ac) {
+int s_user_away(char **av, int ac)
+{
 	User *u;
 	strcpy(segv_location, "StatServ-s_user_away");
 	u = finduser(av[0]);
-	if (!u) return 0;
+	if (!u)
+		return 0;
 	if (u->is_away == 1) {
-		stats_network.away = stats_network.away +1;
+		stats_network.away = stats_network.away + 1;
 	} else {
-		stats_network.away = stats_network.away -1;
+		stats_network.away = stats_network.away - 1;
 	}
 	return 1;
 
@@ -387,39 +452,48 @@ int s_user_away(char **av, int ac) {
 
 
 
-int s_new_user(char **av, int ac) {
+int s_new_user(char **av, int ac)
+{
 	SStats *s;
 	User *u;
 	u = finduser(av[0]);
-	if (!u) return 0;
-	
-	if (u->server->name == me.name) return 0;
+	if (!u)
+		return 0;
+
+	if (u->server->name == me.name)
+		return 0;
 
 	strcpy(segv_location, "StatServ-s_new_user");
 
 	s = findstats(u->server->name);
-	IncreaseUsers(s); 
+	IncreaseUsers(s);
 
-	nlog(LOG_DEBUG2, LOG_MOD, "added a User %s to stats, now at %d", u->nick, s->users);
+	nlog(LOG_DEBUG2, LOG_MOD, "added a User %s to stats, now at %d",
+	     u->nick, s->users);
 
 	if (s->maxusers < s->users) {
 		/* New User Record */
 		s->maxusers = s->users;
 		s->t_maxusers = time(NULL);
 		if (ok_to_wallop() > 0)
-			 swallops_cmd(s_StatServ, "\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!", s->name, s->users);	
-			 
+			swallops_cmd(s_StatServ,
+				     "\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!",
+				     s->name, s->users);
+
 	}
 
 	if (stats_network.maxusers < stats_network.users) {
 		stats_network.maxusers = stats_network.users;
 		stats_network.t_maxusers = time(NULL);
-		if (ok_to_wallop() > 0) swallops_cmd(s_StatServ, "\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %d users!", stats_network.users);
+		if (ok_to_wallop() > 0)
+			swallops_cmd(s_StatServ,
+				     "\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %d users!",
+				     stats_network.users);
 	}
 
 	if (stats_network.users > daily.users) {
-	daily.users = stats_network.users;
- 	daily.t_users = time(NULL);
+		daily.users = stats_network.users;
+		daily.t_users = time(NULL);
 	}
 
 
@@ -427,23 +501,27 @@ int s_new_user(char **av, int ac) {
 	return 1;
 }
 
-int pong(char **av, int ac) {
+int pong(char **av, int ac)
+{
 	SStats *ss;
 	Server *s;
 
 	strcpy(segv_location, "StatServ-pong");
 	s = findserver(av[0]);
-	if (!s) return 0;
+	if (!s)
+		return 0;
 
 	/* we don't want negative pings! */
-	if (s->ping < 0) return -1; 
-	
+	if (s->ping < 0)
+		return -1;
+
 	ss = findstats(s->name);
-	if (!ss) return -1;
-	
+	if (!ss)
+		return -1;
+
 	/* this is a tidy up from old versions of StatServ that used to have negative pings! */
 	if (ss->lowest_ping < 0) {
-		ss->lowest_ping = 0; 
+		ss->lowest_ping = 0;
 	}
 	if (ss->highest_ping < 0) {
 		ss->highest_ping = 0;
@@ -461,34 +539,40 @@ int pong(char **av, int ac) {
 	/* ok, updated the statistics, now lets see if this server is "lagged out" */
 	if (StatServ.lag > 0) {
 		if (s->ping > StatServ.lag) {
-			if (ok_to_wallop() > 0) globops(s_StatServ, "\2%s\2 is Lagged out with a ping of %d", s->name, s->ping);
+			if (ok_to_wallop() > 0)
+				globops(s_StatServ,
+					"\2%s\2 is Lagged out with a ping of %d",
+					s->name, s->ping);
 		}
 	}
 	return 1;
 }
 
-int Online(char **av, int ac) {
+int Online(char **av, int ac)
+{
 
 	strcpy(segv_location, "StatServ-Online");
 
-   #ifdef ULTIMATE3
-	   init_bot(s_StatServ, StatServ.user,StatServ.host,StatServ.rname, "+oS", SSMNAME);
-   #else
-	   init_bot(s_StatServ, StatServ.user,StatServ.host,StatServ.rname, "+oS", SSMNAME);
-   #endif
-   StatServ.onchan = 1;
-   /* now that we are online, setup the timer to save the Stats database every so often */
-   add_mod_timer("SaveStats", "Save_Stats_DB", SSMNAME, 600);
+#ifdef ULTIMATE3
+	init_bot(s_StatServ, StatServ.user, StatServ.host, StatServ.rname,
+		 "+oS", SSMNAME);
+#else
+	init_bot(s_StatServ, StatServ.user, StatServ.host, StatServ.rname,
+		 "+oS", SSMNAME);
+#endif
+	StatServ.onchan = 1;
+	/* now that we are online, setup the timer to save the Stats database every so often */
+	add_mod_timer("SaveStats", "Save_Stats_DB", SSMNAME, 600);
 
-   add_mod_timer("ss_html", "TimerWeb", SSMNAME, 3600);
+	add_mod_timer("ss_html", "TimerWeb", SSMNAME, 3600);
 
-   /* also add a timer to check if its midnight (to reset the daily stats */
-   add_mod_timer("Is_Midnight", "Daily_Stats_Reset", SSMNAME, 60);
-   add_mod_timer("DelOldChan", "DelOldStatServChans", SSMNAME, 3600);
+	/* also add a timer to check if its midnight (to reset the daily stats */
+	add_mod_timer("Is_Midnight", "Daily_Stats_Reset", SSMNAME, 60);
+	add_mod_timer("DelOldChan", "DelOldStatServChans", SSMNAME, 3600);
 
 
-   return 1;
-   
+	return 1;
+
 }
 
 
@@ -527,14 +611,15 @@ extern SStats *new_stats(const char *name)
 	s->serverkills = 0;
 	sn = hnode_create(s);
 	if (hash_isfull(Shead)) {
-		nlog(LOG_CRITICAL, LOG_MOD, "Eeek, StatServ Server hash is full!");
+		nlog(LOG_CRITICAL, LOG_MOD,
+		     "Eeek, StatServ Server hash is full!");
 	} else {
 		hash_insert(Shead, sn, s->name);
 	}
 	return s;
 }
 
-void AddStats(Server *s)
+void AddStats(Server * s)
 {
 	SStats *st = findstats(s->name);
 	strcpy(segv_location, "StatServ-AddStats");
@@ -566,7 +651,8 @@ SStats *findstats(char *name)
 
 
 
-void Is_Midnight() {
+void Is_Midnight()
+{
 	time_t current = time(NULL);
 	struct tm *ltm = localtime(&current);
 	TLD *t;
@@ -579,8 +665,10 @@ void Is_Midnight() {
 	if (ltm->tm_hour == 0) {
 		if (ltm->tm_min == 0) {
 			/* its Midnight! */
-			chanalert(s_StatServ, "Reseting Daily Statistics - Its Midnight here!");
-			nlog(LOG_NORMAL, LOG_MOD, "Resetting Daily Statistics");
+			chanalert(s_StatServ,
+				  "Reseting Daily Statistics - Its Midnight here!");
+			nlog(LOG_NORMAL, LOG_MOD,
+			     "Resetting Daily Statistics");
 			daily.servers = stats_network.servers;
 			daily.t_servers = time(NULL);
 			daily.users = stats_network.users;
@@ -589,7 +677,7 @@ void Is_Midnight() {
 			daily.t_opers = time(NULL);
 			daily.chans = stats_network.chans;
 			daily.t_chans = time(NULL);
-			for (t = tldhead; t; t = t->next) 
+			for (t = tldhead; t; t = t->next)
 				t->daily_users = 0;
 			cn = list_first(Chead);
 			while (cn) {
@@ -600,8 +688,8 @@ void Is_Midnight() {
 				c->topicstoday = 0;
 				c->t_maxmemtoday = time(NULL);
 				cn = list_next(Chead, cn);
-			}	
-			
+			}
+
 		}
-	}	
+	}
 }

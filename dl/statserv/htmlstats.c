@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: htmlstats.c,v 1.24 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id: htmlstats.c,v 1.25 2003/06/13 14:49:33 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -47,7 +47,8 @@ void get_unwelcomechan();
 void get_title();
 void get_tldmap();
 FILE *tpl, *opf;
-void ss_html() {
+void ss_html()
+{
 	char *buf;
 	char *buf1;
 	char *bufold;
@@ -55,7 +56,8 @@ void ss_html() {
 	int gothtml = 0;
 	if (StatServ.html) {
 		if (strlen(StatServ.htmlpath) <= 0) {
-			nlog(LOG_WARNING, LOG_MOD, "Can't do HTML Writout as html path is not defined");
+			nlog(LOG_WARNING, LOG_MOD,
+			     "Can't do HTML Writout as html path is not defined");
 			return;
 		}
 	} else {
@@ -66,19 +68,22 @@ void ss_html() {
 		tpl = fopen("data/index.tpl", "r");
 	}
 	if (!tpl) {
-		nlog(LOG_WARNING, LOG_MOD, "can't open StatServ HTML template");
+		nlog(LOG_WARNING, LOG_MOD,
+		     "can't open StatServ HTML template");
 		chanalert(s_StatServ, "Can't Open StatServ HTML Template");
 		return;
 	}
 	opf = fopen(StatServ.htmlpath, "w");
 	if (!opf) {
-		nlog(LOG_WARNING, LOG_MOD, "Can't open StatServ HTML output file - Check Permissions");
-		chanalert(s_StatServ, "Can't open StatServ HTML output file - Check Permissions");
+		nlog(LOG_WARNING, LOG_MOD,
+		     "Can't open StatServ HTML output file - Check Permissions");
+		chanalert(s_StatServ,
+			  "Can't open StatServ HTML output file - Check Permissions");
 		return;
 	}
-	buf = malloc(STARTBUFSIZE*2);
+	buf = malloc(STARTBUFSIZE * 2);
 	bufold = buf;
-	buf1 = malloc(STARTBUFSIZE*2);
+	buf1 = malloc(STARTBUFSIZE * 2);
 	while (fgets(buf, STARTBUFSIZE, tpl)) {
 
 		buf1 = strstr(buf, "!MAP!");
@@ -87,21 +92,21 @@ void ss_html() {
 			fwrite(buf, startstr, 1, opf);
 			get_map("", 0);
 			fputs("</TABLE>\n", opf);
-			buf = buf1+strlen("!MAP!");
+			buf = buf1 + strlen("!MAP!");
 		}
 		buf1 = strstr(buf, "!SRVLIST!");
 		if (buf1) {
 			startstr = strlen(buf) - strlen(buf1);
 			fwrite(buf, startstr, 1, opf);
 			get_srvlist();
-			buf = buf1+strlen("!SRVLIST!");
+			buf = buf1 + strlen("!SRVLIST!");
 		}
 		buf1 = strstr(buf, "!SRVLISTDET!");
 		if (buf1) {
 			startstr = strlen(buf) - strlen(buf1);
 			fwrite(buf, startstr, 1, opf);
 			get_srvlistdet();
-			buf = buf1+strlen("!SRVLISTDET!");
+			buf = buf1 + strlen("!SRVLISTDET!");
 
 		}
 		buf1 = strstr(buf, "</HTML>");
@@ -176,7 +181,7 @@ void ss_html() {
 			buf = buf1 + strlen("!TITLE!");
 		}
 
-		
+
 		fputs(buf, opf);
 	}
 	free(buf1);
@@ -189,122 +194,189 @@ void ss_html() {
 
 }
 
-void get_title() {
-	fprintf(opf,  "Network Statistics for %s", me.netname);
-}
-void put_copyright() {
-	fprintf(opf,  "<br><br><center>Statistics last updated at %s<br>", sftime(time(NULL)));
-	fprintf(opf,  "<b>StatServ Information:</b>\n");
-	fprintf(opf,  "<br> %s - %s Compiled %s at %s\n",me.name, SSMNAME, version_date, version_time);
-	fprintf(opf,  "<br><a href=\"http://www.neostats.net\">http://www.neostats.net</a>\n");
-	fprintf(opf,  "</center></html>\n");
+void get_title()
+{
+	fprintf(opf, "Network Statistics for %s", me.netname);
 }
 
-void get_srvlist() {
+void put_copyright()
+{
+	fprintf(opf, "<br><br><center>Statistics last updated at %s<br>",
+		sftime(time(NULL)));
+	fprintf(opf, "<b>StatServ Information:</b>\n");
+	fprintf(opf, "<br> %s - %s Compiled %s at %s\n", me.name, SSMNAME,
+		version_date, version_time);
+	fprintf(opf,
+		"<br><a href=\"http://www.neostats.net\">http://www.neostats.net</a>\n");
+	fprintf(opf, "</center></html>\n");
+}
+
+void get_srvlist()
+{
 	SStats *s;
 	hscan_t hs;
 	hnode_t *sn;
 
-	fprintf(opf, "<table border=0><tr><th colspan = 2>Server name</th></tr>");
+	fprintf(opf,
+		"<table border=0><tr><th colspan = 2>Server name</th></tr>");
 	hash_scan_begin(&hs, Shead);
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
 		if (findserver(s->name)) {
-			fprintf(opf,  "<tr><td height=\"4\">Server: </td>\n");
-			fprintf(opf,  "<td height=\"4\"><a href=#%s> %s (*) </a></td></tr>\n",s->name, s->name);
+			fprintf(opf,
+				"<tr><td height=\"4\">Server: </td>\n");
+			fprintf(opf,
+				"<td height=\"4\"><a href=#%s> %s (*) </a></td></tr>\n",
+				s->name, s->name);
 		} else {
-			fprintf(opf,  "<tr><td height=\"4\">Server: </td>\n");
-			fprintf(opf,  "<td height=\"4\"><a href=#%s> %s </a></td></tr>\n", s->name, s->name);
+			fprintf(opf,
+				"<tr><td height=\"4\">Server: </td>\n");
+			fprintf(opf,
+				"<td height=\"4\"><a href=#%s> %s </a></td></tr>\n",
+				s->name, s->name);
 		}
 	}
-	fprintf(opf,  "</table>");
+	fprintf(opf, "</table>");
 }
-void get_srvlistdet() {
+
+void get_srvlistdet()
+{
 	SStats *s;
 	Server *ss;
 	hscan_t hs;
 	hnode_t *sn;
-	fprintf(opf,  "<table border=0>");
+	fprintf(opf, "<table border=0>");
 	hash_scan_begin(&hs, Shead);
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
 		ss = findserver(s->name);
-		fprintf(opf,  "<tr><th><a name=%s>Server:</th><th colspan = 2><b>%s</b></th></tr>\n",s->name, s->name);
-		if (!ss) fprintf(opf,  "<tr><td>Last Seen:</td><td colspan = 2>%s</td></tr>\n", sftime(s->lastseen));
-		if (ss) fprintf(opf,  "<tr><td>Current Users:</td><td>%d (%2.0f%%)</td><td>Max %ld at %s</td></tr>\n", s->users, (float)s->users / (float)stats_network.users * 100, s->maxusers, sftime(s->t_maxusers));
-		if (ss) fprintf(opf,  "<tr><td>Current Opers:</td><td>%d (%2.0f%%)</td><td>Max %d at %s</td></tr>\n", s->opers, (float)s->opers / (float)stats_network.opers *100, s->maxopers, sftime(s->t_maxopers));
-		fprintf(opf,  "<tr><td>Total Users Connected:</td><td colspan = 2>%ld</td></tr>", s->totusers);
-		fprintf(opf,  "<tr><td>IrcOp Kills</td><td colspan = 2>%d</td></tr>", s->operkills);
-		fprintf(opf,  "<tr><td>Server Kills</td><td colspan = 2>%d</td></tr>", s->serverkills);
-		fprintf(opf,  "<tr><td>Highest Ping</td><td>%d</td><td>at %s</td></tr>", s->highest_ping, sftime(s->t_highest_ping));
-		if (ss) fprintf(opf,  "<tr><td>Current Ping</td><td colspan = 2>%d</td></tr>", ss->ping);
-		fprintf(opf,  "<tr><td>Server Splits</td><td colspan = 2>%d</td></tr>", s->numsplits);
+		fprintf(opf,
+			"<tr><th><a name=%s>Server:</th><th colspan = 2><b>%s</b></th></tr>\n",
+			s->name, s->name);
+		if (!ss)
+			fprintf(opf,
+				"<tr><td>Last Seen:</td><td colspan = 2>%s</td></tr>\n",
+				sftime(s->lastseen));
+		if (ss)
+			fprintf(opf,
+				"<tr><td>Current Users:</td><td>%d (%2.0f%%)</td><td>Max %ld at %s</td></tr>\n",
+				s->users,
+				(float) s->users /
+				(float) stats_network.users * 100,
+				s->maxusers, sftime(s->t_maxusers));
+		if (ss)
+			fprintf(opf,
+				"<tr><td>Current Opers:</td><td>%d (%2.0f%%)</td><td>Max %d at %s</td></tr>\n",
+				s->opers,
+				(float) s->opers /
+				(float) stats_network.opers * 100,
+				s->maxopers, sftime(s->t_maxopers));
+		fprintf(opf,
+			"<tr><td>Total Users Connected:</td><td colspan = 2>%ld</td></tr>",
+			s->totusers);
+		fprintf(opf,
+			"<tr><td>IrcOp Kills</td><td colspan = 2>%d</td></tr>",
+			s->operkills);
+		fprintf(opf,
+			"<tr><td>Server Kills</td><td colspan = 2>%d</td></tr>",
+			s->serverkills);
+		fprintf(opf,
+			"<tr><td>Highest Ping</td><td>%d</td><td>at %s</td></tr>",
+			s->highest_ping, sftime(s->t_highest_ping));
+		if (ss)
+			fprintf(opf,
+				"<tr><td>Current Ping</td><td colspan = 2>%d</td></tr>",
+				ss->ping);
+		fprintf(opf,
+			"<tr><td>Server Splits</td><td colspan = 2>%d</td></tr>",
+			s->numsplits);
 
 	}
-	fprintf(opf,  "</table>");
+	fprintf(opf, "</table>");
 }
 
-void get_netstats() {
+void get_netstats()
+{
 
-	fprintf(opf,  "<table border = 0>");
-	fprintf(opf,  "<tr><th colspan=\"4\"><b>Network Statistics:</b></th></tr>\n");
-	fprintf(opf,  "<td>Current Users: </td>\n");
-	fprintf(opf,  "<td> %ld </td>\n", stats_network.users);
-	fprintf(opf,  "<td>Maximum Users: </td>\n");
-	fprintf(opf,  "<td> %ld [%s] </td></tr>\n", stats_network.maxusers, sftime(stats_network.t_maxusers));
-	fprintf(opf,  "<tr><td colspan=2>Total Users Ever Connected</td><td colspan=2>%ld</td></tr>", stats_network.totusers);
-	fprintf(opf,  "<tr><td>Current Opers: </td>\n");
-	fprintf(opf,  "<td> %i </td>\n", stats_network.opers);
-	fprintf(opf,  "<td>Maximum Opers: </td>\n");
-	fprintf(opf,  "<td> %i [%s] </td></tr>\n", stats_network.maxopers, sftime(stats_network.t_maxopers));
-	fprintf(opf,  "<td>Current Servers: </td>\n");
-	fprintf(opf,  "<td> %d </td>\n", stats_network.servers);
-	fprintf(opf,  "<td>Maximum Servers: </td>\n");
-	fprintf(opf,  "<td> %d [%s] </td>\n", stats_network.maxservers, sftime(stats_network.t_maxservers));
-	fprintf(opf,  "<tr><td colspan=\"2\">Users Set Away: </td>\n");
-	fprintf(opf,  "<td colspan=\"2\"> %ld </td></tr></table>\n", stats_network.away);
+	fprintf(opf, "<table border = 0>");
+	fprintf(opf,
+		"<tr><th colspan=\"4\"><b>Network Statistics:</b></th></tr>\n");
+	fprintf(opf, "<td>Current Users: </td>\n");
+	fprintf(opf, "<td> %ld </td>\n", stats_network.users);
+	fprintf(opf, "<td>Maximum Users: </td>\n");
+	fprintf(opf, "<td> %ld [%s] </td></tr>\n", stats_network.maxusers,
+		sftime(stats_network.t_maxusers));
+	fprintf(opf,
+		"<tr><td colspan=2>Total Users Ever Connected</td><td colspan=2>%ld</td></tr>",
+		stats_network.totusers);
+	fprintf(opf, "<tr><td>Current Opers: </td>\n");
+	fprintf(opf, "<td> %i </td>\n", stats_network.opers);
+	fprintf(opf, "<td>Maximum Opers: </td>\n");
+	fprintf(opf, "<td> %i [%s] </td></tr>\n", stats_network.maxopers,
+		sftime(stats_network.t_maxopers));
+	fprintf(opf, "<td>Current Servers: </td>\n");
+	fprintf(opf, "<td> %d </td>\n", stats_network.servers);
+	fprintf(opf, "<td>Maximum Servers: </td>\n");
+	fprintf(opf, "<td> %d [%s] </td>\n", stats_network.maxservers,
+		sftime(stats_network.t_maxservers));
+	fprintf(opf, "<tr><td colspan=\"2\">Users Set Away: </td>\n");
+	fprintf(opf, "<td colspan=\"2\"> %ld </td></tr></table>\n",
+		stats_network.away);
 
 }
 
-void get_dailystats() {
+void get_dailystats()
+{
 
-	fprintf(opf,  "<table border = 0>");
-	fprintf(opf,  "<tr><th colspan=\"4\"><b>Daily Network Statistics:</b></th></tr>\n");
-	fprintf(opf,  "<tr><td colspan=\"2\">Max Daily Users: </td>\n");
-	fprintf(opf,  "<td colspan=\"2\"> %-2d %s </td></tr>\n", daily.users, sftime(daily.t_users));
-	fprintf(opf,  "<tr><td colspan=\"2\">Total Users Connected:</td>\n");
-	fprintf(opf,  "<td colspan=\"2\"> %-2d</td></tr>\n", daily.tot_users);
-	fprintf(opf,  "<tr><td colspan=\"2\">Max Daily Opers: </td>\n");
-	fprintf(opf,  "<td colspan=\"2\"> %-2d %s </td></tr>\n", daily.opers, sftime(daily.t_opers));
-	fprintf(opf,  "<tr><td colspan=\"2\">Max Daily Servers: </td>\n");
-	fprintf(opf,  "<td colspan=\"2\"> %-2d %s </td></tr>\n", daily.servers, sftime(daily.t_servers));
-	fprintf(opf,  "<tr><td colspan=\"4\"><center>(All Daily Statistics are reset at Midnight)</center></td>\n");
-	fprintf(opf,  "</tr></table>\n");
+	fprintf(opf, "<table border = 0>");
+	fprintf(opf,
+		"<tr><th colspan=\"4\"><b>Daily Network Statistics:</b></th></tr>\n");
+	fprintf(opf, "<tr><td colspan=\"2\">Max Daily Users: </td>\n");
+	fprintf(opf, "<td colspan=\"2\"> %-2d %s </td></tr>\n",
+		daily.users, sftime(daily.t_users));
+	fprintf(opf,
+		"<tr><td colspan=\"2\">Total Users Connected:</td>\n");
+	fprintf(opf, "<td colspan=\"2\"> %-2d</td></tr>\n",
+		daily.tot_users);
+	fprintf(opf, "<tr><td colspan=\"2\">Max Daily Opers: </td>\n");
+	fprintf(opf, "<td colspan=\"2\"> %-2d %s </td></tr>\n",
+		daily.opers, sftime(daily.t_opers));
+	fprintf(opf, "<tr><td colspan=\"2\">Max Daily Servers: </td>\n");
+	fprintf(opf, "<td colspan=\"2\"> %-2d %s </td></tr>\n",
+		daily.servers, sftime(daily.t_servers));
+	fprintf(opf,
+		"<tr><td colspan=\"4\"><center>(All Daily Statistics are reset at Midnight)</center></td>\n");
+	fprintf(opf, "</tr></table>\n");
 }
 
-void get_chantop10() {
+void get_chantop10()
+{
 	CStats *cs;
 	lnode_t *cn;
 	int i;
 	if (!list_is_sorted(Chead, topchan)) {
 		list_sort(Chead, topchan);
-	} 
+	}
 	cn = list_first(Chead);
 	cs = lnode_get(cn);
-	fprintf(opf,  "<table border = 0><tr><th>Channel</th><th align=right>Members</th></tr>");
+	fprintf(opf,
+		"<table border = 0><tr><th>Channel</th><th align=right>Members</th></tr>");
 	for (i = 0; i <= 10; i++) {
-			/* only show hidden chans to operators */
-			if (is_hidden_chan(findchan(cs->name))) {
-				i--;
-				cn = list_next(Chead, cn);
-				if (cn) {
-					cs = lnode_get(cn);
-				} else {
-					break;
-				}
-				continue;
+		/* only show hidden chans to operators */
+		if (is_hidden_chan(findchan(cs->name))) {
+			i--;
+			cn = list_next(Chead, cn);
+			if (cn) {
+				cs = lnode_get(cn);
+			} else {
+				break;
 			}
-		if (cs->members > 0) fprintf(opf,  "<tr><td>%s</td><td align=right>%ld</td></tr>\n", cs->name, cs->members);
+			continue;
+		}
+		if (cs->members > 0)
+			fprintf(opf,
+				"<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+				cs->name, cs->members);
 		cn = list_next(Chead, cn);
 		if (cn) {
 			cs = lnode_get(cn);
@@ -312,9 +384,11 @@ void get_chantop10() {
 			break;
 		}
 	}
-	fprintf(opf,  "</table>");
+	fprintf(opf, "</table>");
 }
-void get_chantop10eva() {
+
+void get_chantop10eva()
+{
 	CStats *cs;
 	lnode_t *cn;
 	int i;
@@ -323,20 +397,24 @@ void get_chantop10eva() {
 	}
 	cn = list_first(Chead);
 	cs = lnode_get(cn);
-	fprintf(opf,  "<table border = 0><tr><th>Channel</th><th align=right>Total Joins</th></tr>");
+	fprintf(opf,
+		"<table border = 0><tr><th>Channel</th><th align=right>Total Joins</th></tr>");
 	for (i = 0; i <= 10; i++) {
-			/* only show hidden chans to operators */
-			if (is_hidden_chan(findchan(cs->name))) {
-				i--;
-				cn = list_next(Chead, cn);
-				if (cn) {
-					cs = lnode_get(cn);
-				} else {
-					break;
-				}
-				continue;
+		/* only show hidden chans to operators */
+		if (is_hidden_chan(findchan(cs->name))) {
+			i--;
+			cn = list_next(Chead, cn);
+			if (cn) {
+				cs = lnode_get(cn);
+			} else {
+				break;
 			}
-		fprintf(opf,  "<tr><td>%s %s</td><td align=right>%ld</td></tr>\n", cs->name, (findchan(cs->name) ? "(*)" : ""), cs->totmem);
+			continue;
+		}
+		fprintf(opf,
+			"<tr><td>%s %s</td><td align=right>%ld</td></tr>\n",
+			cs->name, (findchan(cs->name) ? "(*)" : ""),
+			cs->totmem);
 		cn = list_next(Chead, cn);
 		if (cn) {
 			cs = lnode_get(cn);
@@ -344,23 +422,30 @@ void get_chantop10eva() {
 			break;
 		}
 	}
-	fprintf(opf,  "</table>");
+	fprintf(opf, "</table>");
 }
-void get_tldmap() {
+
+void get_tldmap()
+{
 	TLD *t;
-	fprintf(opf,  "<table border = 0><tr><th>tld</th><th>Country</th><th>Current Users</th><th>Daily Total</th></tr>");
+	fprintf(opf,
+		"<table border = 0><tr><th>tld</th><th>Country</th><th>Current Users</th><th>Daily Total</th></tr>");
 	for (t = tldhead; t; t = t->next) {
 		if (t->users > 0) {
-			fprintf(opf,  "<tr><td>%s</td><td>%s</td><td>%3d</td><td>%3d</td></tr>", t->tld, t->country, t->users, t->daily_users);
+			fprintf(opf,
+				"<tr><td>%s</td><td>%s</td><td>%3d</td><td>%3d</td></tr>",
+				t->tld, t->country, t->users,
+				t->daily_users);
 		}
 	}
-	fprintf(opf,  "</table>");
+	fprintf(opf, "</table>");
 }
 
 
 
 
-void get_unwelcomechan() {
+void get_unwelcomechan()
+{
 	CStats *cs;
 	lnode_t *cn;
 	int i;
@@ -369,20 +454,24 @@ void get_unwelcomechan() {
 	}
 	cn = list_first(Chead);
 	cs = lnode_get(cn);
-	fprintf(opf,  "<table border = 0><tr><th>Channel</th><th>Total Kicks</th></tr>");
+	fprintf(opf,
+		"<table border = 0><tr><th>Channel</th><th>Total Kicks</th></tr>");
 	for (i = 0; i <= 10; i++) {
-			/* only show hidden chans to operators */
-			if (is_hidden_chan(findchan(cs->name))) {
-				i--;
-				cn = list_next(Chead, cn);
-				if (cn) {
-					cs = lnode_get(cn);
-				} else {
-					break;
-				}
-				continue;
+		/* only show hidden chans to operators */
+		if (is_hidden_chan(findchan(cs->name))) {
+			i--;
+			cn = list_next(Chead, cn);
+			if (cn) {
+				cs = lnode_get(cn);
+			} else {
+				break;
 			}
-		fprintf(opf,  "<tr><td>%s %s</td><td align=right>%ld</td></tr>\n", cs->name, (findchan(cs->name) ? "(*)" : ""), cs->kicks); 
+			continue;
+		}
+		fprintf(opf,
+			"<tr><td>%s %s</td><td align=right>%ld</td></tr>\n",
+			cs->name, (findchan(cs->name) ? "(*)" : ""),
+			cs->kicks);
 		cn = list_next(Chead, cn);
 		if (cn) {
 			cs = lnode_get(cn);
@@ -390,10 +479,12 @@ void get_unwelcomechan() {
 			break;
 		}
 	}
-	fprintf(opf,  "</table>");
+	fprintf(opf, "</table>");
 
-}	
-void get_chantops() {
+}
+
+void get_chantops()
+{
 	CStats *cs;
 	lnode_t *cn;
 	int i;
@@ -402,20 +493,24 @@ void get_chantops() {
 	}
 	cn = list_first(Chead);
 	cs = lnode_get(cn);
-	fprintf(opf,  "<table border = 0><tr><th>Channel</th><th>Total Topics</th></tr>");
+	fprintf(opf,
+		"<table border = 0><tr><th>Channel</th><th>Total Topics</th></tr>");
 	for (i = 0; i <= 10; i++) {
-			/* only show hidden chans to operators */
-			if (is_hidden_chan(findchan(cs->name))) {
-				i--;
-				cn = list_next(Chead, cn);
-				if (cn) {
-					cs = lnode_get(cn);
-				} else {
-					break;
-				}
-				continue;
+		/* only show hidden chans to operators */
+		if (is_hidden_chan(findchan(cs->name))) {
+			i--;
+			cn = list_next(Chead, cn);
+			if (cn) {
+				cs = lnode_get(cn);
+			} else {
+				break;
 			}
-		fprintf(opf,  "<tr><td>%s %s</td><td align=right>%ld</td></tr>\n", cs->name, (findchan(cs->name) ? "(*)" : ""), cs->topics);
+			continue;
+		}
+		fprintf(opf,
+			"<tr><td>%s %s</td><td align=right>%ld</td></tr>\n",
+			cs->name, (findchan(cs->name) ? "(*)" : ""),
+			cs->topics);
 		cn = list_next(Chead, cn);
 		if (cn) {
 			cs = lnode_get(cn);
@@ -423,11 +518,12 @@ void get_chantops() {
 			break;
 		}
 	}
-	fprintf(opf,  "</table>");
-}	
+	fprintf(opf, "</table>");
+}
 
 
-void get_map(char *uplink, int level) {
+void get_map(char *uplink, int level)
+{
 	hscan_t hs;
 	hnode_t *sn;
 	Server *s;
@@ -439,21 +535,30 @@ void get_map(char *uplink, int level) {
 		s = hnode_get(sn);
 		ss = findstats(s->name);
 
-		if ((level == 0) && (strlen(s->uplink) <= 0)) { 
+		if ((level == 0) && (strlen(s->uplink) <= 0)) {
 			/* its the root server */
-			fprintf(opf, "<table border=0><tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Lag/Max</th></tr>");
-			fprintf(opf, "<tr><td>%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n", ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
-			get_map(s->name, level+1);
+			fprintf(opf,
+				"<table border=0><tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Lag/Max</th></tr>");
+			fprintf(opf,
+				"<tr><td>%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
+				ss->name, ss->users, ss->maxusers,
+				ss->opers, ss->maxopers, s->ping,
+				ss->highest_ping);
+			get_map(s->name, level + 1);
 		} else if ((level > 0) && !strcasecmp(uplink, s->uplink)) {
 			/* its not the root server */
 			sprintf(buf, " ");
 			for (i = 1; i < level; i++) {
-				sprintf(buf, "%s&nbsp&nbsp&nbsp&nbsp&nbsp|", buf);
-			}	
-			fprintf(opf, "<tr><td>%s\\_%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n", buf, ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
-			get_map(s->name, level+1);
+				sprintf(buf,
+					"%s&nbsp&nbsp&nbsp&nbsp&nbsp|",
+					buf);
+			}
+			fprintf(opf,
+				"<tr><td>%s\\_%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
+				buf, ss->name, ss->users, ss->maxusers,
+				ss->opers, ss->maxopers, s->ping,
+				ss->highest_ping);
+			get_map(s->name, level + 1);
 		}
 	}
 }
-
-

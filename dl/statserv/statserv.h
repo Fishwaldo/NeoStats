@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.h,v 1.24 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id: statserv.h,v 1.25 2003/06/13 14:49:34 fishwaldo Exp $
 */
 
 #ifndef STATSERV_H
@@ -151,43 +151,43 @@ struct tld_ {
 };
 
 /* statserv.c */
- void statserv(char *);
- void re_init_bot();
+void statserv(char *);
+void re_init_bot();
 int topchan(const void *key1, const void *key2);
 int topjoin(const void *key1, const void *key2);
 int topkick(const void *key1, const void *key2);
 int toptopics(const void *key1, const void *key2);
 
 /* stats.c */
- TLD *tldhead;
- TLD *findtld(char *);
- TLD *AddTLD(User *);
- void LoadTLD();
- void init_tld();
- int s_client_version(char **av, int ac);
- void AddStats(Server *);
- SStats *findstats(char *);
- void SaveStats();
- void LoadStats();
- int Online(char **av, int ac);
- int pong(char **av, int ac);
- int s_user_away(char **av, int ac);
- int s_new_server(char **av, int ac);
- int s_del_server(char **av, int ac);
- int s_new_user(char **av, int ac);
- int s_del_user(char **av, int ac);
- int s_user_modes(char **av, int ac);
- int s_user_kill(char **av, int ac);
- int s_chan_new(char **av, int ac);
- int s_chan_del(char **av, int ac);
- int s_chan_join(char **av, int ac);
- int s_chan_part(char **av, int ac);
+TLD *tldhead;
+TLD *findtld(char *);
+TLD *AddTLD(User *);
+void LoadTLD();
+void init_tld();
+int s_client_version(char **av, int ac);
+void AddStats(Server *);
+SStats *findstats(char *);
+void SaveStats();
+void LoadStats();
+int Online(char **av, int ac);
+int pong(char **av, int ac);
+int s_user_away(char **av, int ac);
+int s_new_server(char **av, int ac);
+int s_del_server(char **av, int ac);
+int s_new_user(char **av, int ac);
+int s_del_user(char **av, int ac);
+int s_user_modes(char **av, int ac);
+int s_user_kill(char **av, int ac);
+int s_chan_new(char **av, int ac);
+int s_chan_del(char **av, int ac);
+int s_chan_join(char **av, int ac);
+int s_chan_part(char **av, int ac);
 CStats *findchanstats(char *);
 CStats *AddChanStats(char *);
 void DelOldChan();
- int s_topic_change(char **av, int ac);
- int s_chan_kick(char **av, int ac);
- int ok_to_wallop();
+int s_topic_change(char **av, int ac);
+int s_chan_kick(char **av, int ac);
+int ok_to_wallop();
 
 
 /* ss_help.c */
@@ -219,7 +219,7 @@ extern const char *ss_chan_help[];
 extern const char *ss_set_help[];
 extern const char *ss_clientversions_help[];
 /* tld.c */
- void DelTLD(User *u);
+void DelTLD(User * u);
 
 
 
