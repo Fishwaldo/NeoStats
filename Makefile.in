@@ -32,7 +32,7 @@ INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h neostats.h \
 COREINCS = dns.h services.h sock.h ircd.h exclude.h \
 		ns_help.h timer.h users.h chans.h server.h bans.h
 BUILDFILES = configure config.sub config.guess *.in \
-		dl/Makefile install-sh Config makeconf cronchk
+		dl/Makefile dl/Makefile.inc install-sh Config makeconf cronchk
 
 DISTFILES = $(INCLUDES) $(COREINCS) $(SRCS) $(IRCDSRC) $(IRCDINC) \
 		$(BUILDFILES) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF)	
