@@ -1033,12 +1033,9 @@ findbot (char *bot_name)
 
 	SET_SEGV_LOCATION();
 
-	u = finduser(bot_name);
-	if(u) {
-		bn = hash_lookup (bh, u->nick);
-		if (bn) {
-			return (ModUser *) hnode_get (bn);
-		}
+	bn = hash_lookup (bh, bot_name);
+	if (bn) {
+		return (ModUser *) hnode_get (bn);
 	}
 	return NULL;
 }
