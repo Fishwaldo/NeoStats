@@ -4,6 +4,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Removed someones crackheaded checking for internal in ircd.c which we dont need now
    that I've fixed the GHOST bug. (Shmad)
  - Fixed that ANNOYING GHOST bug if a service Messages or Notices itself. fun fun stuff (Shmad).
+   Thanks to ShadowMaster (UltimateIRCd) for his insight on this.
  - Missed some Locking code.. removed it all now (Shmad)
  - Fought with sourceforge CVS for awhile.. (Shmad)
  - StatServ wont flood records now - hehe
