@@ -173,12 +173,13 @@ UserAway (User * u, const char *awaymsg)
 		if ((u->is_away == 1) && (!awaymsg)) {
 			u->is_away = 0;
 			ModuleEvent (EVENT_AWAY, av, ac);
+			free (av);
 		} else if ((u->is_away == 0) && (awaymsg)) {
 			u->is_away = 1;
 			AddStringToList (&av, (char *) awaymsg, &ac);
 			ModuleEvent (EVENT_AWAY, av, ac);
+			free (av);
 		}
-		free (av);
 	}
 }
 
