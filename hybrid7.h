@@ -304,6 +304,7 @@ extern int ssvinfo_cmd ();
 extern int sburst_cmd (int b);
 extern int seob_cmd (const char *server);
 extern int sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...);
+extern int sinvite_cmd (const char *from, const char *to, const char *chan);
 extern int srakill_cmd (const char *host, const char *ident);
 
 
