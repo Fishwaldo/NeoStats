@@ -603,7 +603,7 @@ Bot *init_bot (BotInfo* botinfo)
 	if (botinfo->flags & BOT_FLAG_DEAF) {
 		if (HaveUmodeDeaf()) {
 			/* Set deaf mode at IRCd level */
-			irc_usermode (botptr, nick, UMODE_DEAF);
+			irc_umode (botptr, nick, UMODE_DEAF);
 		} else {
 			/* No ircd support, so fake it internally */
 			botptr->u->user->Umode |= UMODE_DEAF;

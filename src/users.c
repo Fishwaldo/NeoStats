@@ -324,6 +324,9 @@ int UserNick (const char * oldnick, const char *newnick, const char * ts)
 	cmdparams->param = (char *)oldnick;
 	SendAllModuleEvent (EVENT_NICK, cmdparams);
 	ns_free (cmdparams);
+	if (IsMe(u)) {
+		bot_nick_change (u->user->bot, newnick);
+	}
 	return NS_SUCCESS;
 }
 

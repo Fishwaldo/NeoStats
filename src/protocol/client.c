@@ -29,11 +29,8 @@
 
 static void client_private (char* origin, char **av, int ac, int cmdptr);
 static void client_notice (char* origin, char **av, int ac, int cmdptr);
-static void m_version (char *origin, char **argv, int argc, int srv);
-static void m_quit (char *origin, char **argv, int argc, int srv);
 static void m_mode (char *origin, char **argv, int argc, int srv);
 static void m_kill (char *origin, char **argv, int argc, int srv);
-static void m_pong (char *origin, char **argv, int argc, int srv);
 static void m_away (char *origin, char **argv, int argc, int srv);
 static void m_nick (char *origin, char **argv, int argc, int srv);
 static void m_topic (char *origin, char **argv, int argc, int srv);
@@ -41,7 +38,6 @@ static void m_kick (char *origin, char **argv, int argc, int srv);
 static void m_join (char *origin, char **argv, int argc, int srv);
 static void m_part (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
-static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_emotd (char *origin, char **argv, int argc, int srv);
 
 /* buffer sizes */
@@ -70,18 +66,17 @@ ircd_cmd cmd_list[] = {
 	{MSG_NOTICE, 0, client_notice, 0},
 	{"376", 0, m_emotd, 0},
 	{MSG_SETHOST, 0, m_vhost, 0},
-	{MSG_VERSION, 0, m_version, 0},
-	{MSG_QUIT, 0, m_quit, 0},
+	{MSG_QUIT, 0, _m_quit, 0},
 	{MSG_MODE, 0, m_mode, 0},
 	{MSG_KILL, 0, m_kill, 0},
-	{MSG_PONG, 0, m_pong, 0},
+	{MSG_PONG, 0, _m_pong, 0},
 	{MSG_AWAY, 0, m_away, 0},
 	{MSG_NICK, 0, m_nick, 0},
 	{MSG_TOPIC, 0, m_topic, 0},
 	{MSG_KICK, 0, m_kick, 0},
 	{MSG_JOIN, 0, m_join, 0},
 	{MSG_PART, 0, m_part, 0},
-	{MSG_PING, 0, m_ping, 0},
+	{MSG_PING, 0, _m_ping, 0},
 	{0, 0, 0, 0},
 };
 
@@ -273,21 +268,6 @@ send_swhois (const char *source, const char *target, const char *swhois)
 }
 
 void 
-send_svsnick (const char *source, const char *target, const char *newnick, const unsigned long ts)
-{
-}
-
-void
-send_svsjoin (const char *source, const char *target, const char *chan)
-{
-}
-
-void
-send_svspart (const char *source, const char *target, const char *chan)
-{
-}
-
-void 
 send_kick (const char *source, const char *chan, const char *target, const char *reason)
 {
 	send_cmd (":%s %s %s %s :%s", source, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
@@ -303,16 +283,6 @@ void
 send_invite (const char *from, const char *target, const char *chan) 
 {
 	send_cmd (":%s %s %s %s", from, MSG_INVITE, target, chan);
-}
-
-void
-send_svsmode (const char *source, const char *target, const char *modes)
-{
-}
-
-void 
-send_svskill (const char *source, const char *target, const char *reason)
-{
 }
 
 /* akill is gone in the latest Unreals, so we set Glines instead */
@@ -344,30 +314,6 @@ void
 send_globops (const char *source, const char *buf)
 {
 	send_cmd (":%s %s :%s", source, MSG_GLOBOPS, buf);
-}
-
-void 
-send_svstime (const char *source, const unsigned long ts)
-{
-}
-
-/*
- * m_version
- *	argv[0] = remote server
- */
-static void
-m_version (char *origin, char **argv, int argc, int srv)
-{
-	do_version (origin, argv[0]);
-}
-
-/* m_quit
- *	argv[0] = comment
- */
-static void
-m_quit (char *origin, char **argv, int argc, int srv)
-{
-	do_quit (origin, argv[0]);
 }
 
 /* m_mode 
@@ -404,16 +350,6 @@ static void
 m_vhost (char *origin, char **argv, int argc, int srv)
 {
 	do_vhost (origin, argv[0]);
-}
-
-/* m_pong
- *  argv[0] = origin
- *  argv[1] = destination
- */
-static void
-m_pong (char *origin, char **argv, int argc, int srv)
-{
-	do_pong (argv[0], argv[1]);
 }
 
 /* m_away
@@ -501,16 +437,6 @@ m_part (char *origin, char **argv, int argc, int srv)
 	do_part (origin, argv[0], argv[1]);
 }
 
-/* m_ping
- *	argv[0] = origin
- *	argv[1] = destination
- */
-static void
-m_ping (char *origin, char **argv, int argc, int srv)
-{
-	do_ping (argv[0], argv[1]);
-}
-
 /** @brief process privmsg
  *
  * 
@@ -522,10 +448,10 @@ client_notice (char* origin, char **av, int ac, int cmdptr)
 {
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
-		dlog(DEBUG1, "m_notice: dropping notice from %s to NULL: %s", origin, av[ac-1]);
+		dlog(DEBUG1, "_m_notice: dropping notice from %s to NULL: %s", origin, av[ac-1]);
 		return;
 	}
-	dlog(DEBUG1, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
+	dlog(DEBUG1, "_m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
 	/* who to */
 	if(av[0][0] == '#') {
 		bot_chan_notice (origin, av, ac);
@@ -533,7 +459,7 @@ client_notice (char* origin, char **av, int ac, int cmdptr)
 	}
 #if 0
 	if( ircstrcasecmp(av[0], "AUTH")) {
-		dlog(DEBUG1, "m_notice: dropping server notice from %s, to %s : %s", origin, av[0], av[ac-1]);
+		dlog(DEBUG1, "_m_notice: dropping server notice from %s, to %s : %s", origin, av[0], av[ac-1]);
 		return;
 	}
 #endif
@@ -554,10 +480,10 @@ client_private (char* origin, char **av, int ac, int cmdptr)
 
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
-		dlog(DEBUG1, "m_private: dropping privmsg from %s to NULL: %s", origin, av[ac-1]);
+		dlog(DEBUG1, "_m_private: dropping privmsg from %s to NULL: %s", origin, av[ac-1]);
 		return;
 	}
-	dlog(DEBUG1, "m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
+	dlog(DEBUG1, "_m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
 	/* who to */
 	if(av[0][0] == '#') {
 		bot_chan_private (origin, av, ac);
@@ -578,5 +504,5 @@ client_private (char* origin, char **av, int ac, int cmdptr)
 static void m_emotd (char *origin, char **argv, int argc, int srv)
 {
 	send_cmd ("%s mark mark", MSG_OPER);
-	init_services_bot ();
+	do_synch_neostats ();
 }

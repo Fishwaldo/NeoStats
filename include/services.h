@@ -74,5 +74,6 @@ extern BotInfo ns_botinfo;
 EXPORTVAR extern Bot* ns_botptr;
 
 void InitServices(void);
+int init_services_bot (void);
 
 #endif /* _SERVICES_H_ */

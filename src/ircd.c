@@ -123,13 +123,13 @@ static ircd_sym ircd_sym_table[] =
 	{(void *)&irc_send_globops, "send_globops", 0, 0},
 	{(void *)&irc_send_wallops, "send_wallops", 0, 0},
 	{(void *)&irc_send_numeric, "send_numeric", 0, 0},
-	{(void *)&irc_send_umode, "send_umode", 0, 0},
-	{(void *)&irc_send_join, "send_join", 0, 0},
+	{(void *)&irc_send_umode, "send_umode", 1, 0},
+	{(void *)&irc_send_join, "send_join", 1, 0},
 	{(void *)&irc_send_sjoin, "send_sjoin", 0, 0},
-	{(void *)&irc_send_part, "send_part", 0, 0},
-	{(void *)&irc_send_nickchange, "send_nickchange", 0, 0},
-	{(void *)&irc_send_cmode, "send_cmode", 0, 0},
-	{(void *)&irc_send_quit, "send_quit", 0, 0},
+	{(void *)&irc_send_part, "send_part", 1, 0},
+	{(void *)&irc_send_nickchange, "send_nickchange", 1, 0},
+	{(void *)&irc_send_cmode, "send_cmode", 1, 0},
+	{(void *)&irc_send_quit, "send_quit", 1, 0},
 	{(void *)&irc_send_kill, "send_kill", 0, 0},
 	{(void *)&irc_send_kick, "send_kick", 0, 0},
 	{(void *)&irc_send_invite, "send_invite", 0, 0},
@@ -302,17 +302,146 @@ InitIrcd (void)
 	return NS_SUCCESS;
 }
 
+/*  _m_command functions are highly generic support functions for 
+ *  use in protocol modules. If a protocol differs at all from 
+ *  the RFC, they must provide their own local version of this 
+ *  function. These	are purely to avoid protocol module bloat for
+ *  the more common forms of these commands and allow protocol module
+ *  coders to concentrate on the areas that need it.
+ */
+
 /** @brief process PASS
  *
- * m_pass
+ * _m_pass
+ *  RX: 
+ *  PASS :password
  *	argv[0] = password
  *
  * @return none
  */
-void 
-m_pass (char* origin, char **av, int ac, int cmdptr)
+void _m_pass (char* origin, char **av, int ac, int cmdptr)
 {
 	
+}
+
+/** @brief process protoctl
+ *
+ * _m_protoctl
+ *  RX: 
+ *  PROTOCTL <token list>
+ * @return none
+ */
+void _m_protoctl (char *origin, char **argv, int argc, int cmdptr)
+{
+	do_protocol (origin, argv, argc);
+}
+
+/** @brief process VERSION
+ *
+ * _m_version
+ *  origin VERSION :stats.neostats.net
+ *	argv[0] = remote server
+ *
+ * @return none
+ */
+void _m_version (char *origin, char **argv, int argc, int srv)
+{
+	do_version (origin, argv[0]);
+}
+
+/** @brief process MOTD
+ *
+ * _m_motd
+ *  origin MOTD :stats.neostats.net
+ *
+ * @return none
+ */
+void _m_motd (char *origin, char **argv, int argc, int srv)
+{
+	do_motd (origin, argv[0]);
+}
+
+/** @brief process ADMIN
+ *
+ * _m_admin
+ *  origin ADMIN :stats.neostats.net
+ *	argv[0] = servername
+ *
+ * @return none
+ */
+void _m_admin (char *origin, char **argv, int argc, int srv)
+{
+	do_admin (origin, argv[0]);
+}
+
+/** @brief process CREDITS
+ *
+ * _m_credits
+ *  origin CREDITS :stats.neostats.net
+ *	argv[0] = servername
+ *
+ * @return none
+ */
+void _m_credits (char *origin, char **argv, int argc, int srv)
+{
+	do_credits (origin, argv[0]);
+}
+
+/** @brief process STATS
+ *
+ * _m_stats
+ *  RX: 
+ *  :origin STATS u :stats.neostats.net
+ *	argv[0] = stats type
+ *	argv[1] = destination
+ *
+ * @return none
+ */
+void _m_stats (char *origin, char **argv, int argc, int srv)
+{
+	do_stats (origin, argv[0]);
+}
+
+/** @brief process PING
+ *
+ * _m_ping
+ *  RX: 
+ *  PING :irc.foonet.com
+ *	argv[0] = origin
+ *	argv[1] = destination
+ *
+ * @return none
+ */
+void _m_ping (char *origin, char **argv, int argc, int srv)
+{
+	do_ping (argv[0], argc > 1 ? argv[1] : NULL);
+}
+
+/** @brief process PONG
+ *
+ * _m_pong
+ *  irc.foonet.com PONG irc.foonet.com :stats.neostats.net
+ *  argv[0] = origin
+ *  argv[1] = destination
+ *
+ * @return none
+ */
+void _m_pong (char *origin, char **argv, int argc, int srv)
+{
+	do_pong (argv[0], argv[1]);
+}
+
+/** @brief process QUIT
+ *
+ * _m_quit
+ *  origin QUIT :comment
+ *  argv[0] = comment
+ *
+ * @return none
+ */
+void _m_quit (char *origin, char **argv, int argc, int srv)
+{
+	do_quit (origin, argv[0]);
 }
 
 /** @brief process notice
@@ -322,26 +451,26 @@ m_pass (char* origin, char **av, int ac, int cmdptr)
  * @return none
  */
 void 
-m_notice (char* origin, char **av, int ac, int cmdptr)
+_m_notice (char* origin, char **argv, int argc, int cmdptr)
 {
 	SET_SEGV_LOCATION();
-	if (av[0] == NULL) {
-		dlog(DEBUG1, "m_notice: dropping notice from %s to NULL: %s", origin, av[ac-1]);
+	if (argv[0] == NULL) {
+		dlog (DEBUG1, "_m_notice: dropping notice from %s to NULL: %s", origin, argv[argc-1]);
 		return;
 	}
-	dlog(DEBUG1, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
+	dlog (DEBUG1, "_m_notice: from %s, to %s : %s", origin, argv[0], argv[argc-1]);
 	/* who to */
-	if (av[0][0] == '#') {
-		bot_chan_notice (origin, av, ac);
+	if (argv[0][0] == '#') {
+		bot_chan_notice (origin, argv, argc);
 		return;
 	}
 #if 0
-	if ( ircstrcasecmp(av[0], "AUTH")) {
-		dlog(DEBUG1, "m_notice: dropping server notice from %s, to %s : %s", origin, av[0], av[ac-1]);
+	if ( ircstrcasecmp(argv[0], "AUTH")) {
+		dlog (DEBUG1, "_m_notice: dropping server notice from %s, to %s : %s", origin, argv[0], argv[argc-1]);
 		return;
 	}
 #endif
-	bot_notice (origin, av, ac);
+	bot_notice (origin, argv, argc);
 }
 
 /** @brief process privmsg
@@ -352,29 +481,29 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
  */
 
 void
-m_private (char* origin, char **av, int ac, int cmdptr)
+_m_private (char* origin, char **argv, int argc, int cmdptr)
 {
 	char target[64];
 
 	SET_SEGV_LOCATION();
-	if (av[0] == NULL) {
-		dlog(DEBUG1, "m_private: dropping privmsg from %s to NULL: %s", origin, av[ac-1]);
+	if (argv[0] == NULL) {
+		dlog (DEBUG1, "_m_private: dropping privmsg from %s to NULL: %s", origin, argv[argc-1]);
 		return;
 	}
-	dlog(DEBUG1, "m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
+	dlog (DEBUG1, "_m_private: from %s, to %s : %s", origin, argv[0], argv[argc-1]);
 	/* who to */
-	if (av[0][0] == '#') {
-		bot_chan_private (origin, av, ac);
+	if (argv[0][0] == '#') {
+		bot_chan_private (origin, argv, argc);
 		return;
 	}
-	if (strstr (av[0], "!")) {
-		strlcpy (target, av[0], 64);
-		av[0] = strtok (target, "!");
-	} else if (strstr (av[0], "@")) {
-		strlcpy (target, av[0], 64);
-		av[0] = strtok (target, "@");
+	if (strstr (argv[0], "!")) {
+		strlcpy (target, argv[0], 64);
+		argv[0] = strtok (target, "!");
+	} else if (strstr (argv[0], "@")) {
+		strlcpy (target, argv[0], 64);
+		argv[0] = strtok (target, "@");
 	}
-	bot_private (origin, av, ac);
+	bot_private (origin, argv, argc);
 }
 
 /** @brief process ircd commands
@@ -390,15 +519,15 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	ircd_cmd_ptr = cmd_list;
-	while(ircd_cmd_ptr->name) {
+	while (ircd_cmd_ptr->name) {
 		if (!strcmp (ircd_cmd_ptr->name, cmd)
 			||((ircd_srv.protocol & PROTOCOL_TOKEN) && ircd_cmd_ptr->token && !strcmp (ircd_cmd_ptr->token, cmd))
 			) {
 			if (ircd_cmd_ptr->function) {
-				dlog(DEBUG3, "process_ircd_cmd: running command %s", ircd_cmd_ptr->name);
+				dlog (DEBUG3, "process_ircd_cmd: running command %s", ircd_cmd_ptr->name);
 				ircd_cmd_ptr->function (origin, av, ac, cmdptr);
 			} else {
-				dlog(DEBUG3, "process_ircd_cmd: ignoring command %s", cmd);
+				dlog (DEBUG3, "process_ircd_cmd: ignoring command %s", cmd);
 			}
 			ircd_cmd_ptr->usage++;
 			return;
@@ -408,13 +537,13 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 	
 	ircd_cmd_ptr = numeric_cmd_list;	
 	/* Process numeric replies */
-	while(ircd_cmd_ptr->name) {
+	while (ircd_cmd_ptr->name) {
 		if (!strcmp (ircd_cmd_ptr->name, cmd)) {
 			if (ircd_cmd_ptr->function) {
-				dlog(DEBUG3, "process_ircd_cmd: running command %s", ircd_cmd_ptr->name);
+				dlog (DEBUG3, "process_ircd_cmd: running command %s", ircd_cmd_ptr->name);
 				ircd_cmd_ptr->function (origin, av, ac, cmdptr);
 			} else {
-				dlog(DEBUG3, "process_ircd_cmd: ignoring command %s", cmd);
+				dlog (DEBUG3, "process_ircd_cmd: ignoring command %s", cmd);
 			}
 			ircd_cmd_ptr->usage++;
 			return;
@@ -442,8 +571,8 @@ parse (char *line)
 	SET_SEGV_LOCATION();
 	if (!(*line))
 		return;
-	dlog(DEBUG1, "------------------------BEGIN PARSE-------------------------");
-	dlog(DEBUGRX, "RX: %s", line);
+	dlog (DEBUG1, "------------------------BEGIN PARSE-------------------------");
+	dlog (DEBUGRX, "RX: %s", line);
 	if (*line == ':') {
 		coreLine = strpbrk (line, " ");
 		if (!coreLine)
@@ -467,13 +596,13 @@ parse (char *line)
 		coreLine = line + strlen (line);
 	}
 	strlcpy (cmd, line, sizeof (cmd)); 
-	dlog(DEBUG1, "origin: %s", origin);
-	dlog(DEBUG1, "cmd   : %s", cmd);
-	dlog(DEBUG1, "args  : %s", coreLine);
+	dlog (DEBUG1, "origin: %s", origin);
+	dlog (DEBUG1, "cmd   : %s", cmd);
+	dlog (DEBUG1, "args  : %s", coreLine);
 	ac = ircsplitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	ns_free (av);
-	dlog(DEBUG1, "-------------------------END PARSE--------------------------");
+	dlog (DEBUG1, "-------------------------END PARSE--------------------------");
 }
 
 /** @brief unsupported_cmd
@@ -679,7 +808,7 @@ irc_globops (const Bot *botptr, const char *fmt, ...)
 			nlog (LOG_NOTICE, "Dropping unhandled globops: %s", ircd_buf);
 			return NS_FAILURE;
 		}
-		irc_send_globops((botptr?botptr->u->name:me.name), ircd_buf);
+		irc_send_globops ((botptr?botptr->u->name:me.name), ircd_buf);
 	} else {
 		nlog (LOG_NORMAL, ircd_buf);
 	}
@@ -734,10 +863,6 @@ irc_numeric (const int numeric, const char *target, const char *data, ...)
 int
 irc_nick (const char *nick, const char *user, const char *host, const char *realname, const char *modes)
 {
-	if (!irc_send_nick) {
-		unsupported_cmd ("NICK");
-		return NS_FAILURE;
-	} 
 	irc_send_nick (nick, (unsigned long)me.now, modes, user, host, me.name, realname);
 	return NS_SUCCESS;
 }
@@ -759,26 +884,22 @@ int
 irc_cloakhost (const Bot *botptr)
 {
 	if (ircd_srv.features&FEATURE_UMODECLOAK) {
-		irc_usermode (botptr, botptr->name, UMODE_HIDE);
+		irc_umode (botptr, botptr->name, UMODE_HIDE);
 		return NS_SUCCESS;	
 	}
 	return NS_FAILURE;	
 }
 
-/** @brief irc_usermode
+/** @brief irc_umode
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int
-irc_usermode (const Bot *botptr, const char *target, long mode)
+irc_umode (const Bot *botptr, const char *target, long mode)
 {
 	char* newmode;
 	
 	newmode = UmodeMaskToString(mode);
-	if (!irc_send_umode) {
-		unsupported_cmd ("UMODE");
-		return NS_FAILURE;
-	}
 	irc_send_umode (botptr->u->name, target, newmode);
 	UserMode (target, newmode);
 	return NS_SUCCESS;
@@ -810,20 +931,16 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
 			c->persistentusers ++;
 		}
 		if (mode) {
-			ChanUserMode(chan, botptr->u->name, 1, CmodeStringToMask(mode));
+			ChanUserMode (chan, botptr->u->name, 1, CmodeStringToMask(mode));
 		}
+		return NS_SUCCESS;
+	}
 	/* sjoin not available so use normal join */	
-	} else if (irc_send_join) {
-		irc_send_join (botptr->u->name, chan, me.now);
-		join_chan (botptr->u->name, chan);
-		if (mode) {
-			irc_chanusermode(botptr, chan, mode, botptr->u->name);
-		}
-	/* Error */
-	} else {
-		unsupported_cmd ("SJOIN/JOIN");
-		return NS_FAILURE;
-	} 
+	irc_send_join (botptr->u->name, chan, me.now);
+	join_chan (botptr->u->name, chan);
+	if (mode) {
+		irc_chanusermode (botptr, chan, mode, botptr->u->name);
+	}
 	return NS_SUCCESS;
 }
 
@@ -860,10 +977,6 @@ irc_part (const Bot *botptr, const char *chan)
 int
 irc_nickchange (const Bot *botptr, const char *newnick)
 {
-	if (!irc_send_nickchange) {
-		unsupported_cmd ("NICKCHANGE");
-		return NS_FAILURE;
-	}
 	if (!botptr) {
 		nlog (LOG_WARNING, "Unknown bot tried to change nick to %s", newnick);
 		return NS_FAILURE;
@@ -875,7 +988,6 @@ irc_nickchange (const Bot *botptr, const char *newnick)
 	}
 	UserNick (botptr->name, newnick, NULL);
 	irc_send_nickchange (botptr->name, newnick, me.now);
-	bot_nick_change(botptr, newnick);
 	return NS_SUCCESS;
 }
 
@@ -927,20 +1039,16 @@ irc_setident (const Bot *botptr, const char* ident)
 	return NS_SUCCESS;
 }
 
-/** @brief irc_chanmode
+/** @brief irc_cmode
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int
-irc_chanmode (const Bot *botptr, const char *chan, const char *mode, const char *args)
+irc_cmode (const Bot *botptr, const char *chan, const char *mode, const char *args)
 {
 	char **av;
 	int ac;
 
-	if (!irc_send_cmode) {
-		unsupported_cmd ("CMODE");
-		return NS_FAILURE;
-	}
 	irc_send_cmode (me.name, botptr->u->name, chan, mode, args, me.now);
 	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
 	ac = split_buf (ircd_buf, &av, 0);
@@ -956,10 +1064,6 @@ irc_chanmode (const Bot *botptr, const char *chan, const char *mode, const char 
 int
 irc_chanusermode (const Bot *botptr, const char *chan, const char *mode, const char *target)
 {
-	if (!irc_send_cmode) {
-		unsupported_cmd ("CMODE");
-		return NS_FAILURE;
-	}
 	if ((ircd_srv.protocol & PROTOCOL_B64NICK)) {
 		irc_send_cmode (me.name, botptr->u->name, chan, mode, nicktobase64 (target), me.now);
 	} else {
@@ -976,10 +1080,6 @@ irc_chanusermode (const Bot *botptr, const char *chan, const char *mode, const c
 int
 irc_quit (const Bot * botptr, const char *quitmsg)
 {
-	if (!irc_send_quit) {
-		unsupported_cmd ("QUIT");
-		return NS_FAILURE;
-	}
 	irc_send_quit (botptr->u->name, quitmsg);
 	do_quit (botptr->u->name, quitmsg);
 	return NS_SUCCESS;
@@ -1033,7 +1133,7 @@ irc_invite (const Bot *botptr, const char *to, const char *chan)
 		unsupported_cmd ("INVITE");
 		return NS_FAILURE;
 	}
-	irc_send_invite(botptr->u->name, to, chan);
+	irc_send_invite (botptr->u->name, to, chan);
 	return NS_SUCCESS;
 }
 
@@ -1048,7 +1148,7 @@ irc_svstime (const Bot *botptr, Client *target, const time_t ts)
 		unsupported_cmd ("SVSTIME");
 		return NS_FAILURE;
 	}
-	irc_send_svstime(me.name, (unsigned long)ts);
+	irc_send_svstime (me.name, (unsigned long)ts);
 	nlog (LOG_NOTICE, "irc_svstime: synching server times to %lu", ts);
 	return NS_SUCCESS;
 }
@@ -1279,6 +1379,19 @@ irc_squit (const char *server, const char *quitmsg)
 	return NS_SUCCESS;
 }
 
+/** @brief do_synch_neostats
+ *
+ * 
+ *
+ * @return none
+ */
+void
+do_synch_neostats (void)
+{
+	irc_globops (NULL, _("Link with Network \2Complete!\2"));
+	init_services_bot ();
+}
+
 /** @brief do_ping
  *
  * 
@@ -1334,6 +1447,12 @@ do_version (const char* nick, const char *remoteserver)
 	SET_SEGV_LOCATION();
 	irc_numeric (RPL_VERSION, nick, "%s :%s -> %s %s", me.version, me.name, ns_module_info.build_date, ns_module_info.build_time);
 	ModulesVersion (nick, remoteserver);
+}
+
+void
+m_version (char *origin, char **argv, int argc, int srv)
+{
+	do_version (origin, argv[0]);
 }
 
 /** @brief Display our MOTD Message of the Day from the external neostats.motd file 
@@ -1472,7 +1591,7 @@ do_stats (const char* nick, const char *what)
                 }
 	} else if (!ircstrcasecmp (what, "M")) {
 		ircd_cmd_ptr = cmd_list;
-		while(ircd_cmd_ptr->name) {
+		while (ircd_cmd_ptr->name) {
 			if (ircd_cmd_ptr->usage > 0) {
 				irc_numeric (RPL_STATSCOMMANDS, u->name, "Command %s Usage %d", ircd_cmd_ptr->name, ircd_cmd_ptr->usage);
 			}
@@ -1498,6 +1617,7 @@ void do_protocol (char *origin, char **argv, int argc)
 					break;
 				}
 			}
+			protocol_ptr ++;
 		}
 	}
 }
@@ -1527,7 +1647,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		if (ircd_srv.protocol & PROTOCOL_SJ3) {
 			/* Unreal passes +b(&) and +e(") via SJ3 so skip them for now */	
 			if (*nicklist == '&' || *nicklist == '"') {
-				dlog(DEBUG1, "Skipping %s", nicklist);
+				dlog (DEBUG1, "Skipping %s", nicklist);
 				paramidx++;
 				continue;
 			}
@@ -1561,8 +1681,7 @@ do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, co
 	strlcpy (ircd_srv.cloak, cloak, CLOAKKEYLEN);
 	strlcpy (me.netname, netname, MAXPASS);
 	irc_send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
-	init_services_bot ();
-	irc_globops (NULL, _("Link with Network \2Complete!\2"));
+	do_synch_neostats ();
 }
 
 void 
@@ -1572,8 +1691,7 @@ do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, c
 	strlcpy (ircd_srv.cloak, cloak, CLOAKKEYLEN);
 	strlcpy (me.netname, netname, MAXPASS);
 	irc_send_snetinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
-	init_services_bot ();
-	irc_globops (NULL, _("Link with Network \2Complete!\2"));
+	do_synch_neostats ();
 }
 
 void
@@ -1619,26 +1737,14 @@ do_nick (const char *nick, const char *hopcount, const char* TS,
 }
 
 void 
-do_client (const char *nick, const char *arg1, const char *TS, 
+do_client (const char *nick, const char *hopcount, const char *TS, 
 		const char *modes, const char *smodes, 
 		const char *user, const char *host, const char *vhost, 
-		const char *server, const char *arg9, 
+		const char *server, const char *servicestamp, 
 		const char *ip, const char *realname)
 {
-	if (!nick) {
-		nlog (LOG_CRITICAL, "do_client: trying to add user with NULL nickname");
-		return;
-	}
-	AddUser (nick, user, host, realname, server, ip, TS, NULL);
-	if (modes) {
-		UserMode (nick, modes);
-	}
-	if (vhost) {
-		SetUserVhost(nick, vhost);
-	}
-	if (smodes) {
-		UserSMode (nick, smodes);
-	}
+	do_nick (nick, hopcount, TS, user, host, server, ip, servicestamp, 
+		modes, vhost, realname, NULL, smodes );
 }
 
 void
@@ -1708,13 +1814,13 @@ do_svsmode_user (const char* targetnick, const char* modes, const char* ts)
 		SetUserServicesTS (targetnick, ts);
 		/* If only setting TS, we do not need further mode processing */
 		if (ircstrcasecmp(modes, "+d") == 0) {
-			dlog(DEBUG3, "dropping modes since this is a services TS %s", modes);
+			dlog (DEBUG3, "dropping modes since this is a services TS %s", modes);
 			return;
 		}
 		/* We need to strip the d from the mode string */
 		pNewModes = modebuf;
 		pModes = modes;
-		while(*pModes) {
+		while (*pModes) {
 			if (*pModes != 'd') {
 				*pNewModes = *pModes;
 			}
@@ -1783,7 +1889,7 @@ do_burst (char *origin, char **argv, int argc)
 				irc_send_burst (0);
 			}
 			ircd_srv.burst = 0;
-			init_services_bot ();
+			do_synch_neostats ();
 		}
 	} else {
 		ircd_srv.burst = 1;
@@ -1880,7 +1986,7 @@ send_cmd (char *fmt, ...)
 	ircvsnprintf (buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 
-	dlog(DEBUGTX, "%s", buf);
+	dlog (DEBUGTX, "%s", buf);
 	if (strnlen (buf, BUFSIZE) < BUFSIZE - 2) {
 		strlcat (buf, "\n", BUFSIZE);
 	} else {
@@ -1891,120 +1997,8 @@ send_cmd (char *fmt, ...)
 	send_to_socket (buf, buflen);
 }
 
-/** @brief setserverbase64
- *
- *  @return none
- */
-void
-setserverbase64 (const char *name, const char* num)
-{
-	Client *s;
-
-	s = find_server(name);
-	if (s) {
-		dlog(DEBUG1, "setserverbase64: setting %s to %s", name, num);
-		strlcpy(s->name64, num, 6);
-	} else {
-		dlog(DEBUG1, "setserverbase64: cannot find %s for %s", name, num);
-	}
-}
-
-/** @brief servertobase64
- *
- *  @return base64
- */
-char* 
-servertobase64 (const char* name)
-{
-	Client *s;
-
-	dlog(DEBUG1, "servertobase64: scanning for %s", name);
-	s = find_server(name);
-	if (s) {
-		return s->name64;
-	} else {
-		dlog(DEBUG1, "servertobase64: cannot find %s", name);
-	}
-	return NULL;
-}
-
-/** @brief base64toserver
- *
- *  @return server name
- */
-char* 
-base64toserver (const char* num)
-{
-	Client *s;
-
-	dlog(DEBUG1, "base64toserver: scanning for %s", num);
-	s = findserverbase64(num);
-	if (s) {
-		return s->name;
-	} else {
-		dlog(DEBUG1, "base64toserver: cannot find %s", num);
-	}
-	return NULL;
-}
-
-/** @brief setnickbase64
- *
- *  @return none
- */
-void
-setnickbase64 (const char *nick, const char* num)
-{
-	Client *u;
-
-	u = find_user(nick);
-	if (u) {
-		dlog(DEBUG1, "setnickbase64: setting %s to %s", nick, num);
-		strlcpy(u->name64, num, B64SIZE);
-	} else {
-		dlog(DEBUG1, "setnickbase64: cannot find %s for %s", nick, num);
-	}
-}
-
-/** @brief nicktobase64
- *
- *  @return base64
- */
-char* 
-nicktobase64 (const char* nick)
-{
-	Client *u;
-
-	dlog(DEBUG1, "nicktobase64: scanning for %s", nick);
-	u = find_user(nick);
-	if (u) {
-		return u->name64;
-	} else {
-		dlog(DEBUG1, "nicktobase64: cannot find %s", nick);
-	}
-	return NULL;
-}
-
-/** @brief base64tonick
- *
- *  @return nickname
- */
-char* 
-base64tonick (const char* num)
-{
-	Client *u;
-
-	dlog(DEBUG1, "base64tonick: scanning for %s", num);
-	u = finduserbase64(num);
-	if (u) {
-		return u->name;
-	} else {
-		dlog(DEBUG1, "base64tonick: cannot find %s", num);
-	}
-	return NULL;
-}
-
 /*
-RX: :irc.foo.com 351 stats.mark.net Unreal3.2. irc.foo.com :FinWXOoZ [*=2303]
+RX: :irc.foo.com 351 stats.neostats.net Unreal3.2. irc.foo.com :FinWXOoZ [*=2303]
 */
 static void m_numeric351 (char *origin, char **argv, int argc, int srv)
 {

@@ -573,19 +573,16 @@ int ChanModeHandler (Channel* c, char *modes, int j, char **av, int ac)
 	return j;
 }
 
-int
-ChanMode (char *origin, char **av, int ac)
+int ChanMode (char *origin, char **av, int ac)
 {
 	Channel *c;
 	CmdParams * cmdparams;
-	int j = 2;
-	int i;
+	int i, j = 2;
 
 	c = find_chan (av[0]);
 	if (!c) {
 		return 0;
-	}
-	
+	}	
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
 	AddStringToList(&cmdparams->av, origin, &cmdparams->ac);
@@ -594,9 +591,7 @@ ChanMode (char *origin, char **av, int ac)
 	}
 	SendAllModuleEvent(EVENT_CMODE, cmdparams);
 	ns_free(cmdparams);	
-
 	j = ChanModeHandler (c, av[1], j, av, ac);
-
 	return j;
 }
 

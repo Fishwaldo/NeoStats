@@ -126,6 +126,9 @@
 				RelativePath=".\bans.c">
 			</File>
 			<File
+				RelativePath=".\base64.c">
+			</File>
+			<File
 				RelativePath=".\bots.c">
 			</File>
 			<File

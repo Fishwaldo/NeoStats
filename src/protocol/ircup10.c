@@ -24,17 +24,12 @@
 #include "ircup10.h"
 #include "neostats.h"
 #include "ircd.h"
-#include "modes.h"
-#include "sock.h"
-#include "users.h"
-#include "servers.h"
-#include "channels.h"
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 
-static void ircu_m_private (char *origin, char **argv, int argc, int srv);
-static void ircu_m_notice (char *origin, char **argv, int argc, int srv);
+static void m_private (char *origin, char **argv, int argc, int srv);
+static void m_notice (char *origin, char **argv, int argc, int srv);
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
 static void m_admin (char *origin, char **argv, int argc, int srv);
@@ -82,10 +77,10 @@ ProtocolInfo protocol_info = {
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
 	/* Command Token Function usage */
-	{MSG_PRIVATE, TOK_PRIVATE, ircu_m_private, 0},
-	{MSG_CPRIVMSG, TOK_CPRIVMSG, ircu_m_private, 0},
-	{MSG_NOTICE, TOK_NOTICE, ircu_m_notice, 0},
-	{MSG_CNOTICE, TOK_CNOTICE, ircu_m_notice, 0},
+	{MSG_PRIVATE, TOK_PRIVATE, m_private, 0},
+	{MSG_CPRIVMSG, TOK_CPRIVMSG, m_private, 0},
+	{MSG_NOTICE, TOK_NOTICE, m_notice, 0},
+	{MSG_CNOTICE, TOK_CNOTICE, m_notice, 0},
 	{MSG_STATS, TOK_STATS, m_stats, 0},
 	{MSG_VERSION, TOK_VERSION, m_version, 0},
 	{MSG_MOTD, TOK_MOTD, m_motd, 0},
@@ -104,7 +99,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_JOIN, TOK_JOIN, m_join, 0},
 	{MSG_PART, TOK_PART, m_part, 0},
 	{MSG_PING, TOK_PING, m_ping, 0},
-	{MSG_PASS, TOK_PASS, m_pass, 0},
+	{MSG_PASS, TOK_PASS, _m_pass, 0},
 	{MSG_BURST, TOK_BURST, m_burst, 0},
 	{MSG_END_OF_BURST, TOK_END_OF_BURST, m_end_of_burst, 0},
 	{0, 0, 0, 0},
@@ -222,12 +217,8 @@ char neonicknumerics[64];
  * '&', '#', '+', '$', '@' and '%' :
  *        Because m_message() matches these characters to detect special cases.
  */
-static const char convert2y[] = {
-  'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
-  'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
-  'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
-  'w','x','y','z','0','1','2','3','4','5','6','7','8','9','[',']'
-};
+static const char convert2y[] = 
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]";
 
 static const unsigned int convert2n[] = {
    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -258,7 +249,7 @@ unsigned int base64toint(const char* s)
 		i <<= NUMNICKLOG;
 		i += convert2n[(unsigned char) *s++];
 		max++;
-		if(max>=5) 
+		if (max>=5) 
 			break;
 	}
 	return i;
@@ -379,7 +370,7 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 	for(i = 0; i < 64; i++)
 	{
 		/* Reserve numeric */
-		if(neonicknumerics[i]==0)
+		if (neonicknumerics[i]==0)
 		{
 			neonicknumerics[i] = 1;
 			break;
@@ -441,19 +432,18 @@ send_kick (const char *source, const char *chan, const char *target, const char 
 void 
 send_wallops (const char *source, const char *buf)
 {
-	if(nicktobase64 (source)) {
+	if (nicktobase64 (source)) {
 		send_cmd ("%s %s :%s", nicktobase64 (source), TOK_WALLUSERS, buf);
-	} else if(servertobase64 (source)) {
+	} else if (servertobase64 (source)) {
 		send_cmd ("%s %s :%s", servertobase64 (source), TOK_WALLUSERS, buf);
 	}
 }
-
 
 void
 send_end_of_burst_ack(void)
 {
 	if (!is_synched) {
-		init_services_bot ();
+		do_synch_neostats ();
 		send_end_of_burst ();
 	}
 	send_cmd ("%s %s", neostatsbase64, TOK_END_OF_BURST_ACK);
@@ -480,7 +470,7 @@ send_rakill (const char *source, const char *host, const char *ident)
 void
 send_privmsg (const char *source, const char *target, const char *buf)
 {
-	if(target[0] == '#') {
+	if (target[0] == '#') {
 		send_cmd ("%s %s %s :%s", nicktobase64 (source), TOK_PRIVATE, target, buf);
 	} else {
 		send_cmd ("%s %s %s :%s", nicktobase64 (source), TOK_PRIVATE, nicktobase64 (target), buf);
@@ -496,9 +486,9 @@ send_notice (const char *source, const char *target, const char *buf)
 void
 send_globops (const char *source, const char *buf)
 {
-	if(nicktobase64 (source)) {
+	if (nicktobase64 (source)) {
 		send_cmd ("%s %s :%s", nicktobase64 (source), TOK_WALLOPS, buf);
-	} else if(servertobase64 (source)) {
+	} else if (servertobase64 (source)) {
 		send_cmd ("%s %s :%s", servertobase64 (source), TOK_WALLOPS, buf);
 	}
 }
@@ -548,7 +538,7 @@ AB S srvname hop TSBoot TSLink Prot numcap modes :desc
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	if(srv == 2) {
+	if (srv == 2) {
 		do_server (argv[0], NULL, argv[1], NULL, argv[argc-1], 0);
 	} else {
 		do_server (argv[0], base64toserver (origin), argv[1], NULL, argv[argc-1], srv);
@@ -586,7 +576,7 @@ static void
 m_kill (char *origin, char **argv, int argc, int srv)
 {
 	char* num = base64tonick(argv[0]);
-	if(num) {
+	if (num) {
 		do_kill (origin, num, argv[1]);
 	}
 }
@@ -634,7 +624,7 @@ m_away (char *origin, char **argv, int argc, int srv)
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
-	if(argc > 2) {
+	if (argc > 2) {
 		char IPAddress[32];
 		unsigned long IP;
 
@@ -654,9 +644,9 @@ m_nick (char *origin, char **argv, int argc, int srv)
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	if(base64tonick(origin)) {
+	if (base64tonick(origin)) {
 		do_topic (argv[0], base64tonick(origin), NULL, argv[argc-1]);
-	} else if(base64toserver (origin)) {
+	} else if (base64toserver (origin)) {
 		do_topic (argv[0], base64toserver(origin), NULL, argv[argc-1]);
 	}
 }
@@ -762,15 +752,15 @@ m_burst (char *origin, char **argv, int argc, int srv)
 					if (*t)
 						*t++ = 0;
 					do_join (base64tonick(s), argv[0], NULL);
-					if(s[5] == ':') {
+					if (s[5] == ':') {
 						modechar = s[6];
 					}
-					if(modechar) {
+					if (modechar) {
 						char **av;
 						int ac;
 						ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], modechar, base64tonick(s));
 						ac = split_buf (ircd_buf, &av, 0);
-						ChanMode (me.name, av, ac);
+						do_mode_channel (me.name, av, ac);
 						ns_free (av);
 					}
 				}
@@ -801,7 +791,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 						ircsnprintf (ircd_buf, BUFSIZE, "%s +%c", argv[0], *modes);
 					}
 					ac = split_buf (ircd_buf, &av, 0);
-					ChanMode (me.name, av, ac);
+					do_mode_channel (me.name, av, ac);
 					ns_free (av);
 					modes++;
 				}
@@ -823,8 +813,8 @@ m_burst (char *origin, char **argv, int argc, int srv)
 static void
 m_end_of_burst (char *origin, char **argv, int argc, int srv)
 {
-	if(strcmp(base64toserver(origin), me.uplink) == 0) {
-		send_end_of_burst_ack();
+	if (strcmp (base64toserver (origin), me.uplink) == 0) {
+		send_end_of_burst_ack ();
 	}
 }
 
@@ -841,30 +831,30 @@ parse (char *line)
 	SET_SEGV_LOCATION();
 	if (!(*line))
 		return;
-	dlog(DEBUG1, "------------------------BEGIN PARSE-------------------------");
-	dlog(DEBUGRX, "%s", line);
+	dlog (DEBUG1, "------------------------BEGIN PARSE-------------------------");
+	dlog (DEBUGRX, "%s", line);
 	coreLine = strpbrk (line, " ");
 	if (coreLine) {
 		*coreLine = 0;
 		while (isspace (*++coreLine));
 	} else
 		coreLine = line + strlen (line);
-	if ((!ircstrcasecmp(line, "SERVER")) || (!ircstrcasecmp(line, "PASS"))) {
-		strlcpy(cmd, line, sizeof(cmd));
-		dlog(DEBUG1, "cmd   : %s", cmd);
-		dlog(DEBUG1, "args  : %s", coreLine);
-		ac = ircsplitbuf(coreLine, &av, 1);
+	if ((!ircstrcasecmp (line, "SERVER")) || (!ircstrcasecmp (line, "PASS"))) {
+		strlcpy (cmd, line, sizeof(cmd));
+		dlog (DEBUG1, "cmd   : %s", cmd);
+		dlog (DEBUG1, "args  : %s", coreLine);
+		ac = ircsplitbuf (coreLine, &av, 1);
 		cmdptr = 2;
-		dlog(DEBUG1, "0 %d", ac);
+		dlog (DEBUG1, "0 %d", ac);
 		/* really needs to be in AddServer since this is a NeoStats wide bug
 		 if config uplink name does not match our uplinks server name we can
 		 never find the uplink!
 		*/
-		if(strcmp(cmd, "SERVER") ==0) {
-			strlcpy(me.uplink, av[0], MAXHOST);
+		if (strcmp(cmd, "SERVER") ==0) {
+			strlcpy (me.uplink, av[0], MAXHOST);
 		}
 	} else {
-		strlcpy(origin, line, sizeof(origin));	
+		strlcpy (origin, line, sizeof(origin));	
 		cmdptr = 0;
 		line = strpbrk (coreLine, " ");
 		if (line) {
@@ -872,69 +862,66 @@ parse (char *line)
 			while (isspace (*++line));
 		} /*else
 			coreLine = line + strlen (line);*/
-		strlcpy(cmd, coreLine, sizeof(cmd));
-		dlog(DEBUG1, "origin: %s", origin);
-		dlog(DEBUG1, "cmd   : %s", cmd);
-		dlog(DEBUG1, "args  : %s", line);
-		if(line) {
-			ac = ircsplitbuf(line, &av, 1);
+		strlcpy (cmd, coreLine, sizeof(cmd));
+		dlog (DEBUG1, "origin: %s", origin);
+		dlog (DEBUG1, "cmd   : %s", cmd);
+		dlog (DEBUG1, "args  : %s", line);
+		if (line) {
+			ac = ircsplitbuf (line, &av, 1);
 		}
-		dlog(DEBUG1, "0 %d", ac);
+		dlog (DEBUG1, "0 %d", ac);
 	}
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	ns_free (av);
-	dlog(DEBUG1, "-------------------------END PARSE--------------------------");
+	dlog (DEBUG1, "-------------------------END PARSE--------------------------");
 }
 
 static void 
-ircu_m_private (char *origin, char **argv, int argc, int srv)
+m_private (char *origin, char **argv, int argc, int srv)
 {
 	char **av;
 	int ac = 0;
 	int i;
 	char* av0;
 	
-	if(argv[0][0] == '#') {
+	if (argv[0][0] == '#') {
 		av0 = argv[0];
 	} else {
 		av0 = base64tonick(argv[0]);
 		/* In case a real nick came through*/
-		if(av0 == NULL) {
+		if (av0 == NULL) {
 			av0 = argv[0];
 		}
-	}
-	
+	}	
 	AddStringToList (&av, av0, &ac);
 	for(i = 1; i < argc; i++) {
 		AddStringToList (&av, argv[i], &ac);
 	}
-	m_private (base64tonick(origin), av, ac, srv);
+	_m_private (base64tonick(origin), av, ac, srv);
 	ns_free (av);
 }
 
 static void 
-ircu_m_notice (char *origin, char **argv, int argc, int srv)
+m_notice (char *origin, char **argv, int argc, int srv)
 {
 	char **av;
 	int ac = 0;
 	int i;
 	char* av0;
 	
-	if(argv[0][0] == '#') {
+	if (argv[0][0] == '#') {
 		av0 = argv[0];
 	} else {
 		av0 = base64tonick(argv[0]);
 		/* In case a real nick came through*/
-		if(av0 == NULL) {
+		if (av0 == NULL) {
 			av0 = argv[0];
 		}
 	}
-	
 	AddStringToList (&av, av0, &ac);
 	for(i = 1; i < argc; i++) {
 		AddStringToList (&av, argv[i], &ac);
 	}
-	m_notice (base64tonick(origin), av, ac, srv);
+	_m_notice (base64tonick(origin), av, ac, srv);
 	ns_free (av);
 }
-

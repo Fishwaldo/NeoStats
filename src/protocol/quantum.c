@@ -27,28 +27,19 @@
 #include "neostats.h"
 #include "ircd.h"
 
-static void m_version (char *origin, char **argv, int argc, int srv);
-static void m_motd (char *origin, char **argv, int argc, int srv);
-static void m_admin (char *origin, char **argv, int argc, int srv);
-static void m_credits (char *origin, char **argv, int argc, int srv);
 static void m_server (char *origin, char **argv, int argc, int srv);
 static void m_squit (char *origin, char **argv, int argc, int srv);
-static void m_quit (char *origin, char **argv, int argc, int srv);
 static void m_mode (char *origin, char **argv, int argc, int srv);
 static void m_svsmode (char *origin, char **argv, int argc, int srv);
 static void m_kill (char *origin, char **argv, int argc, int srv);
-static void m_pong (char *origin, char **argv, int argc, int srv);
 static void m_away (char *origin, char **argv, int argc, int srv);
 static void m_nick (char *origin, char **argv, int argc, int srv);
 static void m_topic (char *origin, char **argv, int argc, int srv);
 static void m_kick (char *origin, char **argv, int argc, int srv);
 static void m_join (char *origin, char **argv, int argc, int srv);
 static void m_part (char *origin, char **argv, int argc, int srv);
-static void m_stats (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
-static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_svsnick (char *origin, char **argv, int argc, int srv);
-static void m_protoctl (char *origin, char **argv, int argc, int srv);
 static void m_svinfo (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
@@ -78,38 +69,38 @@ ProtocolInfo protocol_info = {
 
 ircd_cmd cmd_list[] = {
 	/* Command Token Function usage */
-	{MSG_PRIVATE, TOK_PRIVATE, m_private, 0},
-	{MSG_NOTICE, TOK_NOTICE, m_notice, 0},
-	{MSG_STATS, TOK_STATS, m_stats, 0},
+	{MSG_PRIVATE, TOK_PRIVATE, _m_private, 0},
+	{MSG_NOTICE, TOK_NOTICE, _m_notice, 0},
+	{MSG_STATS, TOK_STATS, _m_stats, 0},
 	{MSG_SETHOST, TOK_SETHOST, m_vhost, 0},
-	{MSG_VERSION, TOK_VERSION, m_version, 0},
-	{MSG_MOTD, TOK_MOTD, m_motd, 0},
-	{MSG_ADMIN, TOK_ADMIN, m_admin, 0},
-	{MSG_CREDITS, TOK_CREDITS, m_credits, 0},
+	{MSG_VERSION, TOK_VERSION, _m_version, 0},
+	{MSG_MOTD, TOK_MOTD, _m_motd, 0},
+	{MSG_ADMIN, TOK_ADMIN, _m_admin, 0},
+	{MSG_CREDITS, TOK_CREDITS, _m_credits, 0},
 	{MSG_SERVER, TOK_SERVER, m_server, 0},
 	{MSG_SQUIT, TOK_SQUIT, m_squit, 0},
-	{MSG_QUIT, TOK_QUIT, m_quit, 0},
+	{MSG_QUIT, TOK_QUIT, _m_quit, 0},
 	{MSG_MODE, TOK_MODE, m_mode, 0},
 	{MSG_SVSMODE, TOK_SVSMODE, m_svsmode, 0},
 	{MSG_KILL, TOK_KILL, m_kill, 0},
-	{MSG_PONG, TOK_PONG, m_pong, 0},
+	{MSG_PONG, TOK_PONG, _m_pong, 0},
 	{MSG_AWAY, TOK_AWAY, m_away, 0},
 	{MSG_NICK, TOK_NICK, m_nick, 0},
 	{MSG_TOPIC, TOK_TOPIC, m_topic, 0},
 	{MSG_KICK, TOK_KICK, m_kick, 0},
 	{MSG_JOIN, TOK_JOIN, m_join, 0},
 	{MSG_PART, TOK_PART, m_part, 0},
-	{MSG_PING, TOK_PING, m_ping, 0},
+	{MSG_PING, TOK_PING, _m_ping, 0},
 	{MSG_SVINFO, NULL, m_svinfo, 0},
-	{MSG_CAPAB, NULL, m_protoctl, 0},
+	{MSG_CAPAB, NULL, _m_capab, 0},
 	{MSG_BURST, NULL, m_burst, 0},
 	{MSG_SJOIN, NULL, m_sjoin, 0},
 	{MSG_CLIENT, NULL, m_client, 0},
 	{MSG_SMODE, NULL, m_smode, 0},
 	{MSG_VCTRL, TOK_VCTRL, m_vctrl, 0},
-	{MSG_PASS, TOK_PASS, m_pass, 0},
+	{MSG_PASS, TOK_PASS, _m_pass, 0},
 	{MSG_SVSNICK, TOK_SVSNICK, m_svsnick, 0},
-	{MSG_PROTOCTL, TOK_PROTOCTL, m_protoctl, 0},
+	{MSG_PROTOCTL, TOK_PROTOCTL, _m_protoctl, 0},
 	{0, 0, 0, 0},
 };
 
@@ -411,42 +402,6 @@ m_burst (char *origin, char **argv, int argc, int srv)
 }
 
 static void
-m_protoctl (char *origin, char **argv, int argc, int srv)
-{
-	do_protocol (origin, argv, argc);
-}
-
-static void
-m_stats (char *origin, char **argv, int argc, int srv)
-{
-	do_stats (origin, argv[0]);
-}
-
-static void
-m_version (char *origin, char **argv, int argc, int srv)
-{
-	do_version (origin, argv[0]);
-}
-
-static void
-m_motd (char *origin, char **argv, int argc, int srv)
-{
-	do_motd (origin, argv[0]);
-}
-
-static void
-m_admin (char *origin, char **argv, int argc, int srv)
-{
-	do_admin (origin, argv[0]);
-}
-
-static void
-m_credits (char *origin, char **argv, int argc, int srv)
-{
-	do_credits (origin, argv[0]);
-}
-
-static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
 	if(argc > 2) {
@@ -460,12 +415,6 @@ static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
 	do_squit (argv[0], argv[1]);
-}
-
-static void
-m_quit (char *origin, char **argv, int argc, int srv)
-{
-	do_quit (origin, argv[0]);
 }
 
 static void
@@ -497,12 +446,6 @@ static void
 m_vhost (char *origin, char **argv, int argc, int srv)
 {
 	do_vhost (argv[0], argv[1]);
-}
-
-static void
-m_pong (char *origin, char **argv, int argc, int srv)
-{
-	do_pong (argv[0], argv[1]);
 }
 
 static void
@@ -547,12 +490,6 @@ m_part (char *origin, char **argv, int argc, int srv)
 }
 
 static void
-m_ping (char *origin, char **argv, int argc, int srv)
-{
-	do_ping (argv[0], argv[1]);
-}
-
-static void
 m_vctrl (char *origin, char **argv, int argc, int srv)
 {
 	do_vctrl (argv[0], argv[1], argv[2], argv[3], argv[14]);
@@ -568,7 +505,7 @@ m_svinfo (char *origin, char **argv, int argc, int srv)
 static void
 m_client (char *origin, char **argv, int argc, int srv)
 {
-	do_client (argv[0], NULL, argv[2], argv[3], argv[4], argv[5], argv[6], 
+	do_client (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], 
 		 NULL, argv[8], NULL, argv[10], argv[11]);
 }
 

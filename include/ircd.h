@@ -96,12 +96,21 @@ EXPORTFUNC int ircsplitbuf (char *buf, char ***argv, int colon_special);
 EXPORTFUNC void process_ircd_cmd (int cmdptr, char *cmd, char *origin, char **av, int ac);
 
 /* IRCD protocol module API */
-EXPORTFUNC int init_services_bot (void);
+EXPORTFUNC void _m_private (char *origin, char **argv, int argc, int cmdptr);
+EXPORTFUNC void _m_notice (char *origin, char **argv, int argc, int cmdptr);
+EXPORTFUNC void _m_pass (char *origin, char **argv, int argc, int cmdptr);
+EXPORTFUNC void _m_protoctl (char *origin, char **argv, int argc, int cmdptr);
+#define _m_capab _m_protoctl
+EXPORTFUNC void _m_version (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_motd (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_admin (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_credits (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_stats (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_ping (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_pong (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_quit (char *origin, char **argv, int argc, int srv);
 
-EXPORTFUNC void m_private (char *origin, char **av, int ac, int cmdptr);
-EXPORTFUNC void m_notice (char *origin, char **av, int ac, int cmdptr);
-EXPORTFUNC void m_pass (char *origin, char **av, int ac, int cmdptr);
-
+EXPORTFUNC void do_synch_neostats (void);
 EXPORTFUNC void do_motd (const char *nick, const char *remoteserver);
 EXPORTFUNC void do_admin (const char *nick, const char *remoteserver);
 EXPORTFUNC void do_credits (const char *nick, const char *remoteserver);
@@ -110,6 +119,7 @@ EXPORTFUNC void do_ping (const char *origin, const char *destination);
 EXPORTFUNC void do_pong (const char *origin, const char *destination);
 EXPORTFUNC void do_version (const char *nick, const char *remoteserver);
 EXPORTFUNC void do_protocol (char *origin, char **argv, int argc);
+#define do_capab do_protocol
 EXPORTFUNC void do_sjoin (char *tstime, char *channame, char *modes, char *sjoinnick, char **argv, int argc);
 EXPORTFUNC void do_netinfo (const char *maxglobalcnt, const char *tsendsync, const char *prot, const char *cloak, const char *netname);
 EXPORTFUNC void do_snetinfo (const char *maxglobalcnt, const char *tsendsync, const char *prot, const char *cloak, const char *netname);
@@ -120,10 +130,10 @@ EXPORTFUNC void do_nick (const char *nick, const char *hopcount, const char *TS,
 		const char *ip, const char *servicestamp, const char *modes, 
 		const char *vhost, const char *realname, const char *numeric, 
 		const char *smodes);
-EXPORTFUNC void do_client (const char *nick, const char *arg1, const char *TS, 
+EXPORTFUNC void do_client (const char *nick, const char *hopcount, const char *TS, 
 		const char *modes, const char *smodes, 
 		const char *user, const char *host, const char *vhost, 
-		const char *server, const char *arg9, 
+		const char *server, const char *servicestamp, 
 		const char *ip, const char *realname);
 EXPORTFUNC void do_quit (const char *target, const char *quitmsg);
 EXPORTFUNC void do_kill (const char *source, const char *target, const char *killmsg);

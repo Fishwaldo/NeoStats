@@ -398,6 +398,7 @@ src/Makefile.am -text
 src/Makefile.in -text
 src/auth.c -text
 src/bans.c -text
+src/base64.c -text
 src/bots.c -text
 src/channels.c eol=lf
 src/commands.c -text
