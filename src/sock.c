@@ -561,6 +561,9 @@ sts (const char *buf, const int buflen)
 	sent = write (servsock, buf, buflen);
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
+		/* Try to close socket then reset the servsock value to avoid cyclic calls */
+		close(servsock);
+		servsock = -1;
 		do_exit (NS_EXIT_ERROR, NULL);
 	}
 	me.SendM++;
