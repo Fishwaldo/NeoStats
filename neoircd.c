@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.3 2003/01/30 11:49:55 fishwaldo Exp $
+** $Id: neoircd.c,v 1.4 2003/02/14 13:10:38 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -277,16 +277,15 @@ int sakill_cmd(const char *host, const char *ident, const char *setby, const int
 	char buf[512];
 	va_start(ap, reason);
 	vsnprintf(buf, 512, reason, ap);
-	
-        hash_scan_begin(&ss, sh);
-        while ((sn = hash_scan_next(&ss)) != NULL) {
-        	s = hnode_get(sn);
-		sts(":%s %s %s %lu %s %s :%s", setby, MSG_KLINE, s->name, length, ident, host, buf);
-        }	
+	sts(":%s GLINE %s %s %d :%s", me.name, ident, host, time(NULL) + length, buf);
 	va_end(ap);
 	return 1;
 }
 
+int srakill_cmd(const char *host, const char *ident) {
+	sts(":%s UNGLINE %s@%s", me.name, ident, host);
+	return 1;
+}
 
 
 void sts(char *fmt,...)

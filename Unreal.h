@@ -44,7 +44,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.25 2003/01/13 07:20:53 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.26 2003/02/14 13:10:38 fishwaldo Exp $
  */
 
 
@@ -476,5 +476,6 @@ extern int ssvsmode_cmd(const char *target, const char *modes);
 extern int ssvshost_cmd(const char *who, const char *vhost);
 extern int ssvskill_cmd(const char *target, const char *reason, ...);
 extern int sakill_cmd(const char *host, const char *ident, const char *setby, const int length, const char *reason,...);
+extern int srakill_cmd(const char *host, const char *ident);
 #endif  /* UNREAL_H Define */
 

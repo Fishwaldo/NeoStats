@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Unreal.c,v 1.35 2003/01/30 11:49:55 fishwaldo Exp $
+** $Id: Unreal.c,v 1.36 2003/02/14 13:10:38 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -325,7 +325,10 @@ int sakill_cmd(const char *host, const char *ident, const char *setby, const int
 	return 1;
 }
 
-
+int srakill_cmd(const char *host, const char *ident) {
+	sts(":%s %s - G %s %s %s", me.name, (me.token ? TOK_TKL : MSG_TKL), ident, host, me.name);
+	return 1;
+}
 
 void sts(char *fmt,...)
 {

@@ -1,4 +1,10 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Version 2.5.0
+ - Fixed up UserLevels with SMODE support on Ultimate3 (sigh)
+ - Fixed a bug when adding entries to hostserv if the nick already exists
+ - Added rakill (or equivelent) support to Core for opsb remove function
+ - Fixed up a problem with joinbuf that was caused when we moved to snprintf :(
+
 * NeoStats * Fish & Shmad * Version 2.5.0-Release Candidate 3
  - Added support to makeconf for WALLOP_INTERVAL (S)
  - Fixed up --enable-auth==TYPE typo in configure script

@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hybrid7.c,v 1.9 2003/01/30 11:49:55 fishwaldo Exp $
+** $Id: hybrid7.c,v 1.10 2003/02/14 13:10:38 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -279,7 +279,10 @@ int sakill_cmd(const char *host, const char *ident, const char *setby, const int
 	va_end(ap);
 	return 1;
 }
-
+int srakill_cmd(const char *host, const char *ident) {
+	chanalert(s_Services, "Please Manually remove KLINES using /unkline on each server");
+	return 1;
+}
 
 
 void sts(char *fmt,...)

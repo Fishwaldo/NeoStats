@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.h,v 1.3 2003/01/13 07:20:53 fishwaldo Exp $
+** $Id: neoircd.h,v 1.4 2003/02/14 13:10:38 fishwaldo Exp $
 */
 
 
@@ -289,4 +289,5 @@ extern int ssvinfo_cmd();
 extern int sburst_cmd(int b);
 extern int seob_cmd(const char *server);
 extern int sakill_cmd(const char *host, const char *ident, const char *setby, const int length, const char *reason,...);
+extern int srakill_cmd(const char *host, const char *ident);
 #endif

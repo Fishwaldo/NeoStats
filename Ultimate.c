@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.40 2003/02/03 02:34:57 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.41 2003/02/14 13:10:38 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -385,6 +385,11 @@ int sakill_cmd(const char *host, const char *ident, const char *setby, const int
 	vsnprintf(buf, 512, reason, ap);
 	sts(":%s %s %s %s %d %s %d :%s", me.name, (me.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, time(NULL), buf);
 	va_end(ap);
+	return 1;
+}
+
+int srakill_cmd(const char *host, const char *ident) {
+	sts(":%s %s %s %s", me.name, (me.token ? TOK_RAKILL : MSG_RAKILL), host, ident);
 	return 1;
 }
 
