@@ -33,7 +33,7 @@
                      
 #include "stats.h"
 #include "dl.h"
-#include <adns.h>
+#include "adns.h"
 #include "conf.h"
 #include "log.h"
 #include "timer.h"
