@@ -103,7 +103,6 @@ static bot_cmd ss_commands[]=
 	{"BOTLIST",		ss_cmd_botlist,		0, 	0,		ss_help_botlist, 	 	ss_help_botlist_oneline},
 	{"USERVERSION",	ss_cmd_userversion,	0,	0,		ss_help_userversion, ss_help_userversion_oneline},
 	{"FORCEHTML",	ss_cmd_forcehtml,	0, 	NS_ULEVEL_ADMIN,	ss_help_forcehtml, 		ss_help_forcehtml_oneline},
-	{"STATS",		ss_cmd_stats,		1, 	NS_ULEVEL_ADMIN,	ss_help_stats, 			ss_help_stats_oneline},
 	{NULL,			NULL,				0, 	0,					NULL, 					NULL}
 };
 

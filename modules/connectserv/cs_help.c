@@ -29,45 +29,46 @@ const char *cs_about[] = {
 	"\2ConnectServ\2 is designed to track users signing on and",
 	"off, killing of users, modes that the operators are using",
 	"and nickname changes. These events can be optionally",
-	"echoed to the services channel.",
+	"reported to the services channel and can optionally be",
+	"logged.",
 	NULL
 };
 
 const char *cs_help_set_signwatch[] = {
-	"SIGNWATCH <ON/OFF> whether to echo signon/signoff",
-	"events to the services channel.",
+	"SIGNWATCH <ON/OFF>",
+	"Report signon/signoff events to the services channel.",
 	NULL
 };
 
 const char *cs_help_set_exclusions[] = {
-	"USEEXCLUSIONS <ON/OFF> whether to use the NeoStats",
-	"exclusions before displaying events",
+	"EXCLUSIONS <ON/OFF>",
+	"Use the global exclusions before displaying events",
 	NULL
 };
 
 const char *cs_help_set_logging[] = {
-	"LOGGING <ON/OFF> whether to log the events",
-	"reported by connectserv",
+	"LOGGING <ON/OFF>",
+	"Log events reported by connectserv",
 	NULL
 };
 
 const char *cs_help_set_killwatch[] = {
-	"KILLWATCH <ON/OFF> whether to echo kill",
-	"events to the services channel.",
+	"KILLWATCH <ON/OFF>",
+	"Report kill events to the services channel.",
 	NULL
 };
 const char *cs_help_set_modewatch[] = {
-	"MODEWATCH <ON/OFF> whether to echo operator modes",
-	"events to the services channel.",
+	"MODEWATCH <ON/OFF>",
+	"Report operator modes events to the services channel.",
 	NULL
 };
 const char *cs_help_set_nickwatch[] = {
-	"NICKWATCH <ON/OFF> whether to echo nick changes",
-	"events to the services channel.",
+	"NICKWATCH <ON/OFF>",
+	"Report nick changes events to the services channel.",
 	NULL
 };
 const char *cs_help_set_servwatch[] = {
-	"SERVWATCH <ON/OFF> whether to echo server",
-	"joins and quits to the services channel.",
+	"SERVWATCH <ON/OFF>",
+	"Report server joins and quits to the services channel.",
 	NULL
 };

@@ -25,17 +25,16 @@
 
 #include "neostats.h"
 
-const char ss_help_server_oneline[]="Request information about a server";
-const char ss_help_map_oneline[]="Show the network map";
-const char ss_help_channel_oneline[]="Channel Information";
-const char ss_help_netstats_oneline[]="General Network Statistics";
-const char ss_help_daily_oneline[]="Daily Network Statistics";
-const char ss_help_tldmap_oneline[]="Statistics on TLD's";
-const char ss_help_operlist_oneline[]="Show a listing of on-line IRCops";
-const char ss_help_botlist_oneline[]="Show a listing of on-line BOTS";
-const char ss_help_userversion_oneline[]="Shows you a list of Client Versions";
-const char ss_help_forcehtml_oneline[]="Force an update of the HTML output file";
-const char ss_help_stats_oneline[]="Modify Statistic Entries.";
+const char ss_help_server_oneline[]="Display server statistics";
+const char ss_help_map_oneline[]="Display network map";
+const char ss_help_channel_oneline[]="Display channel statistics";
+const char ss_help_netstats_oneline[]="Display network statistics";
+const char ss_help_daily_oneline[]="Display daily statistics";
+const char ss_help_tldmap_oneline[]="Display TLD statistics";
+const char ss_help_operlist_oneline[]="Display list of IRC operators";
+const char ss_help_botlist_oneline[]="Display list of BOTS";
+const char ss_help_userversion_oneline[]="Display client versions statistics";
+const char ss_help_forcehtml_oneline[]="Force output of the HTML statistics";
 
 const char *ss_about[] = {
 	"\2StatServ\2 provides detailed statistics about your",
@@ -44,11 +43,10 @@ const char *ss_about[] = {
 };
 
 const char *ss_help_userversion[] = {
-	"Syntax: \2USERVERSION \37<limit>\37\2",
+	"Syntax: \2USERVERSION [limit]\2",
 	"",
-	"Provides Statistics on the Client Versions found",
-	"<limit> Specifies how many results to show. Results are",
-	"sorted by most to least popular",
+	"Display statistics on the client versions used on the network",
+	"optional parameter <limit> specifies how many results to show.",
 	NULL
 };
 
@@ -60,14 +58,13 @@ const char *ss_help_set_htmlpath[] = {
 };
 
 const char *ss_help_set_exclusions[] = {
-	"\2EXCLUSIONS <on/off>\2",
-	"Should statserv use the global exclusions when calculating",
-	"and displaying statistical data?",
+	"\2EXCLUSIONS <ON|OFF>\2",
+	"Whether to ignore exlcuded items from statistics calculations",
 	NULL
 };
 
 const char *ss_help_set_html[] = {
-	"\2HTML <ON/OFF>\2",
+	"\2HTML <ON|OFF>\2",
 	"Enable or disable HTML statistics generation.",
 	NULL
 };
@@ -86,15 +83,13 @@ const char *ss_help_set_msglimit[] = {
 
 const char *ss_help_set_lagtime[] = {
 	"\2LAGTIME <seconds>\2",
-	"<seconds> is the time in seconds at which a server is",
-	"considered lagged.",
+	"Time in seconds at which a server is considered lagged.",
 	NULL
 };
 
 const char *ss_help_set_htmltime[] = {
 	"\2HTMLTIME <seconds>\2",
-	"<seconds> is the time in seconds at which statserv",
-	"updates the HTML file.",
+	"Interval in seconds at which statserv updates the HTML file.",
 	NULL
 };
 
@@ -111,7 +106,7 @@ const char *ss_help_set_lagalert[] = {
 
 const char *ss_help_set_recordalert[] = {
 	"\2RECORDALERT <alerttype>\2",
-	"How StatServ announces new records on the network",
+	"Announce new records on the network",
 	"Options for <alerttype> are:",
 	"    0 - Never",
 	"    1 - Announce in services channel",
@@ -121,54 +116,66 @@ const char *ss_help_set_recordalert[] = {
 };
 
 const char *ss_help_channel[] = {
-	"Syntax: \2CHAN \37<POP/KICKS/TOPICS/<Channame>>\37\2",
+	"Syntax: \2CHANNEL\2",
+	"        \2CHANNEL <Channame>\2",
+	"        \2CHANNEL <POP>\2",
+	"        \2CHANNEL <KICKS>\2",
+	"        \2CHANNEL <TOPICS>\2",
 	"",
-	"Provides Statistics on Channels on the network",
-	"\2CHAN\2 By itself provides a list of the top 10 channels",
-	"    based on the current number of members",
-	"\2CHAN POP\2 gives you information on the most popular",
-	"    channels on the network based on the number of joins",
-	"\2CHAN KICKS\2 Gives you the top 10 kicking channels",
-	"\2CHAN TOPICS\2 Gives you the top 10 topic changing channels",
-	"\2CHAN <name>\2 Gives you specific information on a channel",
+	"Display statistics about current channels",
+	"With no parameters, display top 10 channels by current member count",
+	"",
+	"\2<name>\2 display detailed statistics on channel",
+	"",
+	"\2POP\2 display top 10 channels by total joins",
+	"",
+	"\2KICKS\2 display top 10 channels by total kicks",
+	"",
+	"\2TOPICS\2 display top 10 channels by total topic changes",
 	NULL
 };
 
 const char *ss_help_server[] = {
-	"Syntax: \2SERVER \37<server name>\37\2",
+	"Syntax: \2SERVER <server name>\2",
+	"        \2SERVER LIST\2",
+	"        \2SERVER DEL <servername>\2",
+	"        \2SERVER COPY <oldservername> <newservername>\2",
 	"",
-	"Provides statistics on a specific server.",
+	"Display server statistics for passed server name.",
+	"",
+	"LIST displays all database entries.",
+	"",
+	"DEL removes an entry.",
+	"",
+	"COPY copies an entry.",
 	NULL
 };
 
 const char *ss_help_map[] = {
 	"Syntax: \2MAP\2",
 	"",
-	"Provides a server listing with minimal statistics.",
+	"Display a server map with basic statistics.",
 	NULL
 };
 
 const char *ss_help_netstats[] = {
 	"Syntax: \2NETSTATS\2",
 	"",
-	"Provides information about the",
-	"performance of the network.",
+	"Display network wide statistics",
 	NULL
 };
 
 const char *ss_help_daily[] = {
 	"Syntax: \2DAILY\2",
 	"",
-	"Provides information about records",
-	"that have been set today.",
+	"Display statistics based on today.",
 	NULL
 };
 
 const char *ss_help_tldmap[] = {
 	"Syntax: \2TLDMAP\2",
 	"",
-	"Shows the network map in",
-	"relation to top level domains.",
+	"Display map of top level domains on the network.",
 	NULL
 };
 
@@ -177,34 +184,25 @@ const char *ss_help_operlist[] = {
 	"        \2OPERLIST NOAWAY\2",
 	"        \2OPERLIST SERVER <servername>\2",
 	"",
-	"Shows a listing of IRCops. You can use NOAWAY to not show",
-	"opers that are set away and SERVER with a server name to",
-	"only show opers on that server.",
+	"Display current list of IRC operators.",
+	"",
+	"NOAWAY will ignore opers that are set away", 
+	"",
+	"SERVER will only show opers on the named server.",
 	NULL
 };
 
 const char *ss_help_botlist[] = {
 	"Syntax: \2BOTLIST\2",
 	"",
-	"Shows all current bots on the network.",
-	"(umode +B users)",
-	NULL
-};
-
-const char *ss_help_stats[] = {
-	"Syntax: \2STATS LIST\2",
-	"        \2STATS DEL <servername>\2",
-	"        \2STATS COPY <oldservername> <newservername>\2",
-	"",
-	"Use, LIST to list all database entries. DEL to remove an",
-	"entry and COPY to copy an entry.",
+	"Display current list of bots on the network.",
+	"i.e. Clients with UMODE_BOT set.",
 	NULL
 };
 
 const char *ss_help_forcehtml[] = {
 	"Syntax: \2FORCEUPDATE\2",
 	"",
-	"Forces an update of the HTML data file with the most",
-	"current network statistics.",
+	"Forces an immediate update of the HTML statistics output.",
 	NULL
 };

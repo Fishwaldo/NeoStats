@@ -51,7 +51,6 @@ int ss_event_squit (CmdParams *cmdparams);
 int ss_event_pong (CmdParams *cmdparams);
 int ss_cmd_map (CmdParams *cmdparams);
 int ss_cmd_server (CmdParams *cmdparams);
-int ss_cmd_stats (CmdParams *cmdparams);
 void InitServerStats (void);
 void FiniServerStats (void);
 void SaveServerStats (void);

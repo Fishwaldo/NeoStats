@@ -260,24 +260,85 @@ int ss_cmd_server_list (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
+static int ss_server_del (CmdParams *cmdparams)
+{
+	serverstat *ss;
+	hnode_t *node;
 
-int ss_cmd_server (CmdParams *cmdparams)
+	if (cmdparams->ac < 2) {
+		return NS_ERR_NEED_MORE_PARAMS;
+	}
+	ss = findserverstats (cmdparams->av[1]);
+	if (!ss) {
+		irc_prefmsg (ss_bot, cmdparams->source, "%s is not in the database", cmdparams->av[1]);
+		return NS_SUCCESS;
+	}
+	if (ss->s) {
+		irc_prefmsg (ss_bot, cmdparams->source, 
+			"Cannot remove %s from the database, it is online!!", cmdparams->av[1]);
+		return NS_SUCCESS;
+	}
+	node = hash_lookup(serverstathash, cmdparams->av[1]);
+	if (node) {
+		ns_free (hnode_get (node));
+		hash_delete (serverstathash, node);
+		hnode_destroy (node);
+		irc_prefmsg (ss_bot, cmdparams->source, "Removed %s from the database.",
+			cmdparams->av[1]);
+		nlog (LOG_NOTICE, "%s deleted stats for %s", cmdparams->source->name, cmdparams->av[1]);
+	}
+	return NS_SUCCESS;
+}
+
+static int ss_server_copy (CmdParams *cmdparams)
+{
+	serverstat *dest;
+	serverstat *src;
+
+	if (UserLevel(cmdparams->source) < NS_ULEVEL_ADMIN) {
+		return NS_ERR_NO_PERMISSION;
+	}
+	if (cmdparams->ac < 3) {
+		return NS_ERR_NEED_MORE_PARAMS;
+	}
+	dest = findserverstats (cmdparams->av[2]);
+	if (dest)
+	{
+		if (dest->s) {
+			irc_prefmsg (ss_bot, cmdparams->source, "Server %s is online!", cmdparams->av[2]);
+			return NS_SUCCESS;
+		}
+		ns_free(dest);
+	}
+	src = findserverstats (cmdparams->av[1]);
+	if (!src) {
+		irc_prefmsg (ss_bot, cmdparams->source, "%s is not in the database", 
+			cmdparams->av[1]);
+		return NS_SUCCESS;
+	}
+	memcpy (dest, src, sizeof(serverstat));
+	strlcpy (dest->name, cmdparams->av[2], MAXHOST);
+	irc_prefmsg (ss_bot, cmdparams->source, "Moved database entry for %s to %s", 
+		cmdparams->av[1], cmdparams->av[2]);
+	nlog (LOG_NOTICE, "%s requested STATS COPY %s to %s", cmdparams->source->name, 
+		cmdparams->av[1], cmdparams->av[2]);
+	return NS_SUCCESS;
+}
+
+static int ss_cmd_server_stats (CmdParams *cmdparams)
 {
 	serverstat *ss;
 	Client *s;
 	char *server;
 
-	SET_SEGV_LOCATION();
-	if (cmdparams->ac ==0) {
-		return ss_cmd_server_list (cmdparams);
+	if (cmdparams->ac == 0) {
+		return NS_ERR_SYNTAX_ERROR;
 	}
 	server = cmdparams->av[0];
-	/* ok, found the Server, lets do some Statistics work now ! */
 	ss = findserverstats (server);
 	if (!ss) {
 		nlog (LOG_CRITICAL, "Unable to find server statistics for %s", server);
-		irc_prefmsg (ss_bot,cmdparams->source, 
-			"Internal Error! Please Consult the Log file");
+		irc_prefmsg (ss_bot, cmdparams->source, "Unable to find server statistics for %s", server);
 		return NS_SUCCESS;
 	}
 	irc_prefmsg (ss_bot, cmdparams->source, "Statistics for \2%s\2 since %s",
@@ -320,95 +381,18 @@ int ss_cmd_server (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-static int ss_stats_list (CmdParams *cmdparams)
-{
-	serverstat *ss;
-	hnode_t *node;
-	hscan_t scan;
 
-	irc_prefmsg (ss_bot, cmdparams->source, "Servers statistics list:");
-	hash_scan_begin (&scan, serverstathash);
-	while ((node = hash_scan_next (&scan))) {
-		ss = hnode_get (node);
-		irc_prefmsg (ss_bot, cmdparams->source, "  %s", ss->name);
-	}
-	irc_prefmsg (ss_bot, cmdparams->source, "End of list.");
-	return NS_SUCCESS;
-}
-
-static int ss_stats_del (CmdParams *cmdparams)
-{
-	serverstat *ss;
-	hnode_t *node;
-
-	if (cmdparams->ac < 2) {
-		return NS_ERR_NEED_MORE_PARAMS;
-	}
-	ss = findserverstats (cmdparams->av[1]);
-	if (!ss) {
-		irc_prefmsg (ss_bot, cmdparams->source, "%s is not in the database", cmdparams->av[1]);
-		return NS_SUCCESS;
-	}
-	if (ss->s) {
-		irc_prefmsg (ss_bot, cmdparams->source, 
-			"Cannot remove %s from the database, it is online!!", cmdparams->av[1]);
-		return NS_SUCCESS;
-	}
-	node = hash_lookup(serverstathash, cmdparams->av[1]);
-	if (node) {
-		ns_free (hnode_get (node));
-		hash_delete (serverstathash, node);
-		hnode_destroy (node);
-		irc_prefmsg (ss_bot, cmdparams->source, "Removed %s from the database.",
-			cmdparams->av[1]);
-		nlog (LOG_NOTICE, "%s deleted stats for %s", cmdparams->source->name, cmdparams->av[1]);
-	}
-	return NS_SUCCESS;
-}
-
-static int ss_stats_copy (CmdParams *cmdparams)
-{
-	serverstat *dest;
-	serverstat *src;
-
-	if (cmdparams->ac < 3) {
-		return NS_ERR_NEED_MORE_PARAMS;
-	}
-	dest = findserverstats (cmdparams->av[2]);
-	if (dest)
-	{
-		if (dest->s) {
-			irc_prefmsg (ss_bot, cmdparams->source, "Server %s is online!", cmdparams->av[2]);
-			return NS_SUCCESS;
-		}
-		ns_free(dest);
-	}
-	src = findserverstats (cmdparams->av[1]);
-	if (!src) {
-		irc_prefmsg (ss_bot, cmdparams->source, "%s is not in the database", 
-			cmdparams->av[1]);
-		return NS_SUCCESS;
-	}
-	memcpy (dest, src, sizeof(serverstat));
-	strlcpy (dest->name, cmdparams->av[2], MAXHOST);
-	irc_prefmsg (ss_bot, cmdparams->source, "Moved database entry for %s to %s", 
-		cmdparams->av[1], cmdparams->av[2]);
-	nlog (LOG_NOTICE, "%s requested STATS COPY %s to %s", cmdparams->source->name, 
-		cmdparams->av[1], cmdparams->av[2]);
-	return NS_SUCCESS;
-}
-
-int ss_cmd_stats (CmdParams *cmdparams)
+int ss_cmd_server (CmdParams *cmdparams)
 {
 	SET_SEGV_LOCATION();
 	if (!ircstrcasecmp (cmdparams->av[0], "LIST")) {
-		return ss_stats_list (cmdparams);
+		return ss_cmd_server_list (cmdparams);
 	} else if (!ircstrcasecmp (cmdparams->av[0], "DEL")) {
-		return ss_stats_del (cmdparams);
+		return ss_server_del (cmdparams);
 	} else if (!ircstrcasecmp (cmdparams->av[0], "COPY")) {
-		return ss_stats_copy (cmdparams);	
+		return ss_server_copy (cmdparams);	
 	}
-	return NS_ERR_SYNTAX_ERROR;
+	return ss_cmd_server_stats (cmdparams);
 }
 
 static void SaveServer (serverstat *ss)

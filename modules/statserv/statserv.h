@@ -62,7 +62,6 @@ extern const char *ss_help_daily[];
 extern const char *ss_help_tldmap[];
 extern const char *ss_help_operlist[];
 extern const char *ss_help_botlist[];
-extern const char *ss_help_stats[];
 extern const char *ss_help_htmlstats[];
 extern const char *ss_help_forcehtml[];
 extern const char *ss_help_channel[];
@@ -87,7 +86,6 @@ extern const char ss_help_operlist_oneline[];
 extern const char ss_help_botlist_oneline[];
 extern const char ss_help_userversion_oneline[];
 extern const char ss_help_forcehtml_oneline[];
-extern const char ss_help_stats_oneline[];
 
 int sortusers(const void *v, const void *v2);
 

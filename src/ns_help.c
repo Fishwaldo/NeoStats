@@ -53,15 +53,15 @@ const char cmd_help_levels_oneline[] = "Change command user level";
 const char *ns_help_level[] = {
 	"Syntax: \2LEVEL [nick]\2",
 	"",
-	"Show permission level for NeoStats.",
-	"This may range from 0 (lowest) to 200 (highest).",
+	"Display permission level for NeoStats.",
+	"This will range from 0 (lowest) to 200 (highest).",
 	"Optional nick parameter allows you to see the level",
 	"for another user",
 	NULL
 };
 
 const char *ns_help_jupe[] = {
-	"Syntax: \2JUPE \37Server\37\2",
+	"Syntax: \2JUPE <servername>\2",
 	"",
 	"Cause NeoStats to jupiter a server; i.e. create a fake",
 	"\"server\" connected to the NeoStats host which prevents",
@@ -71,28 +71,26 @@ const char *ns_help_jupe[] = {
 };
 
 const char *ns_help_exclude[] = {
-	"Syntax: \2EXCLUDE \37<ADD> <HOST|SERVER|CHANNEL> <pattern> <reason>\37\2",
-	"        \2EXCLUDE \37<DEL> <pattern>\37\2",
-	"        \2EXCLUDE \37<LIST>\37\2",
+	"Syntax: \2EXCLUDE <ADD> <HOST|SERVER|CHANNEL> <pattern> <reason>\2",
+	"        \2EXCLUDE <DEL> <pattern>\2",
+	"        \2EXCLUDE <LIST>\2",
 	"",
-	"Maintin the exclustion list. Exception lists are used to exclude",
-	"channels, users, or servers from scanning.",
-	"\2ADD <HOST|SERVER|CHANNEL> <pattern> <reason>\2",
-	"Add a new exclusion to the list, matching either a hostname of a client",
-	"or a servername, or a channel name",
-	"Reason allows you to set a reason for the exclusion for future reference",
+	"Maintain the exclusion list which is used to exclude channels,",
+	"users and servers from certain scans and events.",
+	"",
+	"\2ADD\2 Add a new exclusion to the list. Reason allows",
+	"you to set a reason for the exclusion for future reference.",
 	"Wildcards such as * and ? may be used in the pattern.",
-	"\2EXCLUDE DEL <pattern>\2",
-	"Delete a entry from the exclusion list.",
-	"\2EXCLUDE LIST\2",
-	"List the current exclusions",
 	"",
+	"\2DEL\2 Delete a entry from the exclusion list.",
+	"",
+	"\2LIST\2 List the current exclusions",
 	NULL
 };
 
 #ifdef USE_RAW
 const char *ns_help_raw[] = {
-	"Syntax: \2RAW \37Command\37\2",
+	"Syntax: \2RAW <command>\2",
 	"",
 	"Sends a string of raw text directly to the server to which",
 	"NeoStats is connected. Nothing is returned to the user",
@@ -105,18 +103,16 @@ const char *ns_help_raw[] = {
 #endif
 
 const char *ns_help_load[] = {
-	"Syntax: \2LOAD \37module file name\37\2",
+	"Syntax: \2LOAD <module name>\2",
 	"",
-	"Load a module while NeoStats is running. Some modules",
-	"cannot be loaded at runtime, and will return an error.",
+	"Load a module.",
 	NULL
 };
 
 const char *ns_help_unload[] = {
-	"Syntax: \2UNLOAD \37module name\37\2",
+	"Syntax: \2UNLOAD <module name>\2",
 	"",
-	"Unload a module while NeoStats is running. Some modules",
-	"cannot be unloaded at runtime, and will return an error.",
+	"Unload a module.",
 	NULL
 };
 
@@ -149,67 +145,64 @@ const char *ns_help_reload[] = {
 
 const char *ns_help_userlist[] = {
 	"Syntax: \2USERLIST\2",
-	"Syntax: \2USERLIST <nick>\2",
+	"        \2USERLIST <name>\2",
 	"",
-	"When in debug mode, Neostats will send its user table to",
-	"the services channel. Only useful for debugging Neostats",
-	"If nick is passed, only the information of that nick is",
-	"returned, otherwise the entire user list is dumped.",
+	"Display list of users on the network.",	
+	"Optional parameter name limits display to that user.",	
+	"This command is only available in debug mode and is only",
+	"useful for debugging Neostats.",
 	NULL
 };
 
 const char *ns_help_serverlist[] = {
 	"Syntax: \2SERVERLIST\2",
-	"Syntax: \2SERVERLIST <name>\2",
+	"        \2SERVERLIST <name>\2",
 	"",
-	"When in debug mode, Neostats will send its server table to",
-	"the services channel. Only useful for debugging Neostats",
-	"If name is passed, only the information for that server is",
-	"returned, otherwise the entire server list is dumped.",
+	"Display list of servers on the network.",	
+	"Optional parameter name limits display to that server.",	
+	"This command is only available in debug mode and is only",
+	"useful for debugging Neostats.",
 	NULL
 };
 
 const char *ns_help_banlist[] = {
 	"Syntax: \2BANLIST\2",
 	"",
-	"When in debug mode, Neostats will send its ban table to",
-	"the services channel. Only useful for debugging Neostats",
+	"Display list of bans on the network.",	
+	"This command is only available in debug mode and is only",
+	"useful for debugging Neostats.",
 	NULL
 };
 
 const char *ns_help_chanlist[] = {
 	"Syntax: \2CHANLIST\2",
-	"Syntax: \2CHANLIST <channel>\2",
+	"        \2CHANLIST <name>\2",
 	"",
-	"When in debug mode, Neostats will send its channel table to",
-	"the services channel. Only useful for debugging Neostats",
-	"If channel is passed, only the information of that nick is",
-	"returned, otherwise the entire channel list is dumped.",
+	"Display list of channels on the network.",	
+	"Optional parameter name limits display to that channel.",	
+	"This command is only available in debug mode and is only",
+	"useful for debugging Neostats.",
 	NULL
 };
 
 const char *ns_help_botlist[] = {
 	"Syntax: \2BOTLIST\2",
 	"",
-	"NeoStats will send you by notice a list of the current bots",
-	"being used on the network for each module and what channels",
-	"they are using.",
+	"Display list of neostats bots being used on the network.",	
 	NULL
 };
 
 const char *ns_help_socklist[] = {
 	"Syntax: \2SOCKLIST\2",
 	"",
-	"NeoStats will send you by notice a list of the current",
-	"sockets being used on the network for each module.",	
+	"Display list of sockets being used on the network.",	
 	NULL
 };
 
 const char *ns_help_timerlist[] = {
 	"Syntax: \2TIMERLIST\2",
 	"",
-	"NeoStats will send you by notice a list of the current",
-	"timer functions being used on the network by each module.",	
+	"Display list of timer functions being used on the network.",	
 	NULL
 };
 
@@ -222,13 +215,13 @@ const char *ns_help_status[] = {
 
 const char *ns_help_set_joinserviceschan[] = {
 	"\2JOINSERVICESCHAN <on/off>\2",
-	"Whether NeoStats bots join services channel",
+	"Whether NeoStats service bots join services channel",
 	NULL
 };
 
 const char *ns_help_set_splittime[] = {
 	"\2SPLITTIME <timediff>\2",
-	"This is used to determine if users connecting to the network",
+	"Used to determine if users connecting to the network",
 	"are part of a net join (when two servers link together)",
 	"This setting should not be changed unless you know the",
 	"effects in full",
@@ -237,7 +230,7 @@ const char *ns_help_set_splittime[] = {
 
 const char *ns_help_set_pingtime[] = {
 	"\2PINGTIME <seconds>\2",
-	"Set ping interval at which NeoStats pings servers",
+	"Interval at which NeoStats pings servers",
 	NULL
 };
 
@@ -250,21 +243,20 @@ const char *ns_help_set_loglevel[] = {
 
 const char *ns_help_set_cmdchar[] = {
 	"\2CMDCHAR <char>\2",
-	"Sets the character used to indicate a command",
-	"in a channel message.",
+	"Character used to indicate a channel message is a command.",
 	NULL
 };
 
 const char *ns_help_set_cmdreport[] = {
 	"\2CMDREPORT <ON|OFF>\2",
-	"Whether command usage is reported to services channel",
+	"Report command usage to the services channel",
 	NULL
 };
 
 const char *ns_help_set_debug[] = {
 	"\2DEBUG <ON|OFF>\2",
-	"When enabled, debugging information is sent to debug.log",
-	"and to DEBUGCHAN if DEBUGTOCHAN is enabled.",
+	"Send debugging information to debug.log and to the channel",
+	"defined by DEBUGCHAN if DEBUGTOCHAN is enabled.",
 	NULL
 };
 
@@ -283,7 +275,7 @@ const char *ns_help_set_debugchan[] = {
 
 const char *ns_help_set_debugmodule[] = {
 	"\2DEBUGMODULE <modulename|all>\2",
-	"Whether to debug a single module or all",
+	"What module to report debug text for or all",
 	NULL
 };
 
@@ -294,97 +286,102 @@ const char *ns_help_set_debugtochan[] = {
 };
 
 const char *ns_help_set_nick[] = {
-	"\2NICK <newnick>\2 Change bot nickname",
+	"\2NICK <newnick>\2",
+	"Change bot nickname",
 	NULL
 };
 
 const char *ns_help_set_altnick[] = {
-	"\2ALTNICK <newnick>\2 Change bot alternate nickname",
+	"\2ALTNICK <newnick>\2",
+	"Change bot alternate nickname",
 	NULL
 };
 
 const char *ns_help_set_user[] = {
-	"\2USER <username>\2 Change bot username",
-	"(requires restart to take effect).",
+	"\2USER <username>\2",
+	"Change bot username",
+	"(may require restart to take effect).",
 	NULL
 };
 
 const char *ns_help_set_host[] = {
-	"\2HOST <host>\2 Change bot host",
-	"(requires restart to take effect).",
+	"\2HOST <host>\2",
+	"Change bot host",
+	"(may require restart to take effect).",
 	NULL
 };
 
 const char *ns_help_set_realname[] = {
-	"\2REALNAME <realname>\2 Change bot realname",
-	"(requires restart to take effect).",
+	"\2REALNAME <realname>\2",
+	"Change bot realname",
+	"(may require restart to take effect).",
 	NULL
 };
 
 const char *ns_help_set_versionscan[] = {
 	"\2VERSIONSCAN <ON|OFF>\2",
-	"Whether NeoStats performs a CTCP version scan",
-	"when users connect to the network.",
+	"CTCP version users on connection to the network.",
 	NULL
 };
 
 const char *ns_help_set_servicecmode[] = {
-	"\2SERVICEBOTCMODE <mode>\2",
-	"Set the channel modes assigned to service bots when",
-	"they join the services channel. You must prefix with",
-	"a + sign e.g. +o or +a or +v etc",
-	"(requires restart to take effect).",
+	"\2SERVICECMODE <mode>\2",
+	"Channel modes assigned to service bots when they join",
+	"the services channel. You must prefix with '+'",
+	"e.g. +o or +a or +v etc",
+	"(requires restart to affect existing service bots).",
 	NULL
 };
 
 const char *ns_help_set_serviceumode[] = {
-	"\2SERVICEBOTUMODE <mode>\2",
-	"Set the user modes assigned to service bots when",
-	"they join the network. You must prefix with",
-	"a + sign e.g. +S or +So etc",
-	"(requires restart to take effect).",
+	"\2SERVICEUMODE <mode>\2",
+	"User modes assigned to service bots when they join",
+	"the network. You must prefix with '+'",
+	"e.g. +S or +So etc",
+	"(requires restart to affect existing service bots).",
 	NULL
 };
 
 const char *cmd_help_help[] = {
 	"Syntax: \2HELP [command]\2",
 	"",
-	"Provides help on the bot commands",
+	"Display help on the bot commands",
 	NULL
 };
 
 const char *cmd_help_about[] = {
 	"Syntax: \2ABOUT\2",
 	"",
-	"Provides information about the module",
+	"Display information about the module",
 	NULL
 };
 
 const char *cmd_help_credits[] = {
 	"Syntax: \2CREDITS\2",
 	"",
-	"Show credits",
+	"Display credits",
 	NULL
 };
 
 const char *cmd_help_version[] = {
 	"Syntax: \2VERSION\2",
 	"",
-	"Show version information",
+	"Display version information",
 	NULL
 };
 
 const char *cmd_help_levels[] = {
-	"Syntax: \2LEVELS <command> <level>\2",
+	"Syntax: \2LEVELS LIST\2",
+	"        \2LEVELS <command> <level>\2",
 	"",
-	"Change minimum user level for a command.",
+	"List or change minimum user level for a command.",
 	"<level> must be between 0 and 200.",
 	NULL
 };
 
 const char *cmd_help_set[] = {
 	"Syntax: \2SET LIST\2",
-	"        \2SET <option> [<value>]\2",
+	"        \2SET <option> <value>\2",
 	"",
 	"LIST    display the current settings",
 	"",
