@@ -87,6 +87,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	u->flood = 0;
 	u->is_away = 0;
 	u->Umode = 0;
+	u->flags = 0;
 #ifdef GOTUSERSMODES
 	u->Smode = 0;
 #endif

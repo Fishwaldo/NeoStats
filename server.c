@@ -78,7 +78,8 @@ AddServer (char *name, char *uplink, int hops)
 		strsetnull (s->uplink);
 	}
 	s->ping = 0;
-
+	s->flags = 0;
+	
 	/* run the module event for a new server. */
 	AddStringToList (&av, s->name, &ac);
 	ModuleEvent (EVENT_NEWSERVER, av, ac);

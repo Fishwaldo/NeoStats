@@ -291,6 +291,7 @@ typedef struct Server {
 	int ping;
 	char uplink[MAXHOST];
 	void *moddata[NUM_MODULES];
+	long flags;
 } Server;
 
 /** @brief me structure
@@ -367,6 +368,7 @@ typedef struct User {
 	time_t TS;
 	long Smode;
 	void *moddata[NUM_MODULES];
+	long flags;
 } User;
 
 /** @brief Chans structure
@@ -383,6 +385,7 @@ typedef struct Chans {
 	time_t topictime;
 	void *moddata[NUM_MODULES];
 	time_t tstime;
+	long flags;
 } Chans;
 
 /** @brief ModesParm structure

@@ -7,22 +7,20 @@ RedHat 9.0 / Fedora / Slakware 9.0 Users:
 	affects NeoStats. If you are running RedHat 9.0 or Fedora or Slakware 9.0 please 
 	read http://www.neostats.net/boards/viewtopic.php?t=391
  
-SPAM module GONE!
-	the Spam module is no longer part of the NeoStats distribution.
-	SecureServ does a much better job of getting spammers. Use SecureServ
-	instead. 
+Unreal Users:
+	Due to compatibility issues between Unreal 3.1.x and 3.2.x series of
+	IRCd's we have no had to change the ./configure options so you now have to
+	specify --enable-unreal31 or --enable-unreal32 depending on what version of
+	Unreal you use. 
 
-Additionally Channel Stats in HTML output:
-	StatServ now outputs channel counts and max counts in the daily and
-	netstat sections of the HTML output. 
+SQL Server Emulation:
+	NeoStats can now Emulate a PostgreSQL Server. This means you can use
+	PHP/Perl to query Stats directly. This is Experimental at this stage, and
+	chances are it might crash your NeoStats. Read README.sqlsrv in the docs
+	directory for more information. 
 
-LiquidIRCd Support
-	Thanks to herrohr, we now have LiquidIRCd support. This still
-	experiemental, so bug reports are appricaited. 
-
-Cleanups to code and help text
-	Again, M has been busy cleaning up the code and improving the help
-	text for NeoStats and its modules. Some commands have changed format
-	slightly. Check the USERMAN/online help for the exact syntax.
+Command Syntax:
+	Some of the commands for bots have changed. Consult the Online help
+	for the exact syntax of the commands. 
 
 Read the ChangeLog for a complete description of what has changed
