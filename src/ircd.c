@@ -99,6 +99,16 @@ void (*irc_send_vctrl) (const int uprot, const int nicklen, const int modex, con
 void (*irc_send_burst) (int b);
 void (*irc_send_svstime) (const char *sender, const unsigned long ts);
 
+static void m_numeric242 (char *origin, char **argv, int argc, int srv);
+static void m_numeric351 (char *origin, char **argv, int argc, int srv);
+
+ircd_cmd numeric_cmd_list[] = {
+	/*Message	Token	Function	usage */
+	{"351", "351", m_numeric351, 0},
+	{"242", "242", m_numeric242, 0},
+	{0, 0, 0, 0},
+};
+
 
 /** @brief InitIrcdCalls
  *
@@ -697,6 +707,23 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 		}
 		ircd_cmd_ptr ++;
 	}
+	
+	ircd_cmd_ptr = numeric_cmd_list;	
+	/* Process numeric replies */
+	while(ircd_cmd_ptr->name) {
+		if (!strcmp (ircd_cmd_ptr->name, cmd)) {
+			if(ircd_cmd_ptr->function) {
+				dlog(DEBUG3, "process_ircd_cmd: running command %s", ircd_cmd_ptr->name);
+				ircd_cmd_ptr->function (origin, av, ac, cmdptr);
+			} else {
+				dlog(DEBUG3, "process_ircd_cmd: ignoring command %s", cmd);
+			}
+			ircd_cmd_ptr->usage++;
+			return;
+		}
+		ircd_cmd_ptr ++;
+	}
+
 	nlog (LOG_INFO, "No support for %s", cmd);
 }
 
@@ -1009,6 +1036,11 @@ do_protocol (char *origin, char **argv, int argc)
 		else if (!ircstrcasecmp ("NOQUIT", argv[i])) {
 			if(protocol_info->optprotocol&PROTOCOL_NOQUIT) {
 				ircd_srv.protocol |= PROTOCOL_NOQUIT;
+			}			
+		}
+		else if (!ircstrcasecmp ("NICKIP", argv[i])) {
+			if(protocol_info->optprotocol&PROTOCOL_NICKIP) {
+				ircd_srv.protocol |= PROTOCOL_NICKIP;
 			}			
 		}
 	}
@@ -1725,7 +1757,7 @@ do_server (const char *name, const char *uplink, const char* hops, const char *n
 	} else {
 		AddServer (name, uplink, hops, numeric, infoline);
 	}
-	
+	send_cmd(":%s VERSION %s", me.name, name);
 }
 
 void 
@@ -1887,5 +1919,58 @@ base64tonick (const char* num)
 		dlog(DEBUG1, "base64tonick: cannot find %s", num);
 	}
 	return NULL;
+}
+
+/*
+RX: :irc.foo.com 351 stats.mark.net Unreal3.2. irc.foo.com :FinWXOoZ [*=2303]
+*/
+static void m_numeric351 (char *origin, char **argv, int argc, int srv)
+{
+	Server* s;
+
+	s = findserver(origin);
+	if(s) {
+		strlcpy(s->version, argv[1], MAXHOST);
+	}
+}
+
+/*
+RX: :irc.foo.com 242 NeoStats :Server Up 6 days, 23:52:55
+RX: :irc.foo.com 250 NeoStats :Highest connection count: 3 (2 clients)
+RX: :irc.foo.com 219 NeoStats u :End of /STATS report
+*/
+static void m_numeric242 (char *origin, char **argv, int argc, int srv)
+{
+	Server* s;
+
+	s = findserver(origin);
+	if(s) {
+		/* Convert "Server Up 6 days, 23:52:55" to seconds*/
+		char *ptr;
+		time_t secs;
+
+		/* Server Up 6 days, 23:52:55 */
+		strtok(argv[argc-1], " ");
+		/* Up 6 days, 23:52:55 */
+		strtok(NULL, " ");
+		/* 6 days, 23:52:55 */
+		ptr = strtok(NULL, " ");
+		secs = atoi(ptr) * 86400;
+		/* days, 23:52:55 */
+		strtok(NULL, " ");
+		/* , 23:52:55 */
+		ptr = strtok(NULL, "");
+		/* 23:52:55 */
+		ptr = strtok(ptr , ":");
+		secs += atoi(ptr)*3600;
+		/* 52:55 */
+		ptr = strtok(NULL, ":");
+		secs += atoi(ptr)*60;
+		/* 55 */
+		ptr = strtok(NULL, "");
+		secs += atoi(ptr);
+
+		s->uptime = secs;
+	}
 }
 

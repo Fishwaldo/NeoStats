@@ -4,6 +4,14 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Optimise UserLevel processing so after a user level is calculated it is then
+   a lookup rather than needing to recalculate every time. (M)
+ - Send STATS u request to incoming servers so we can store uptime info for 
+   statistics. (M)
+ - Store client CTCP version reply in user struct so we can access it after the
+   event. (M)
+ - Send VERSION request to incoming servers so we can store version info for
+   statistics. (M)
  - update hostserv to use match rather than fnmatch. (F)
  - More autotools updates to shut it up some more, and improve build process (F)
  - Update makeconf to generate a PROTOCOL line. (M)

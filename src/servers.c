@@ -178,13 +178,18 @@ findserver (const char *name)
 static void 
 dumpserver (Server *s)
 {
+	/* Calculate uptime as uptime from server plus uptime of NeoStats */
+	int uptime = s->uptime  + (me.now - me.t_start);
+
 	if(ircd_srv.protocol & PROTOCOL_B64SERVER) {
 		chanalert (ns_botptr->nick, "Server: %s (%s)", s->name, s->name64);
 	} else {
 		chanalert (ns_botptr->nick, "Server: %s", s->name);
 	}
-	chanalert (ns_botptr->nick, "Flags:  %lx", s->flags);
-	chanalert (ns_botptr->nick, "Uplink: %s", s->uplink);
+	chanalert (ns_botptr->nick, "Version: %s", s->version);
+	chanalert (ns_botptr->nick, "Uptime:  %d day%s, %02d:%02d:%02d", (uptime / 86400), (uptime / 86400 == 1) ? "" : "s", ((uptime / 3600) % 24), ((uptime / 60) % 60), (uptime % 60) );
+	chanalert (ns_botptr->nick, "Flags:   %lx", s->flags);
+	chanalert (ns_botptr->nick, "Uplink:  %s", s->uplink);
 	chanalert (ns_botptr->nick, "========================================");
 }
 
@@ -375,5 +380,20 @@ void GetServerList(ServerListHandler handler)
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		ss = hnode_get(node);
 		handler(ss);
+	}
+}
+
+void RequestServerUptimes (void)
+{
+	Server *s;
+	hscan_t ss;
+	hnode_t *sn;
+
+	hash_scan_begin (&ss, serverhash);
+	while ((sn = hash_scan_next (&ss)) != NULL) {
+		s = hnode_get (sn);
+		if (strcmp (me.name, s->name)) {
+			send_cmd(":%s STATS u %s", ns_botptr->u->nick, s->name);
+		}
 	}
 }

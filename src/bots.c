@@ -234,12 +234,13 @@ void bot_notice (char *origin, char **av, int ac)
 		if (process_target_user(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
 			SendModuleEvent (EVENT_NOTICE, cmdparams, cmdparams->dest.bot->moduleptr);
+		}		
+		if (!strncasecmp(av[ac - 1], "\1version", 8)) {
+			/* skip "\1version " */
+			cmdparams->param += 9;
+			strlcpy(cmdparams->source.user->version, cmdparams->param, MAXHOST);
+ 			SendModuleEvent (EVENT_CTCPVERSION, cmdparams, cmdparams->dest.bot->moduleptr);
 		}
-	}
-	if (!strncasecmp(av[ac - 1], "\1version", 8)) {
-		/* skip "\1version " */
-		cmdparams->param += 9;
- 		SendModuleEvent (EVENT_CTCPVERSION, cmdparams, cmdparams->dest.bot->moduleptr);
 	}
 	sfree (cmdparams);
 

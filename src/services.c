@@ -164,6 +164,8 @@ init_services_bot (void)
 	ns_botptr = init_bot (&ns_botinfo, me.servicesumode, flags, ns_commands, ns_settings);
 	me.onchan = 1;
 	SendAllModuleEvent (EVENT_ONLINE, NULL);
+	RequestServerUptimes();	
+
 	return NS_SUCCESS;
 }
 

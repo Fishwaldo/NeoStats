@@ -69,13 +69,12 @@ const int proto_topiclen	= (512 + 1);
 
 ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
-	PROTOCOL_SJOIN,
+	PROTOCOL_SJOIN | PROTOCOL_NICKIP,
 	/* Protocol options negotiated at link by this IRCd */
 	PROTOCOL_CLIENT,
 	/* Features supported by this IRCd */
 	FEATURE_SVSHOST \
 		| FEATURE_SMODES \
-		| FEATURE_NICKIP \
 		| FEATURE_SVSJOIN \
 		| FEATURE_SVSNICK \
 		| FEATURE_SVSKILL ,

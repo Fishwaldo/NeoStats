@@ -65,9 +65,9 @@ ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
 	PROTOCOL_SJOIN,
 	/* Protocol options negotiated at link by this IRCd */
-	0,
+	PROTOCOL_NICKIP,
 	/* Features supported by this IRCd */
-	FEATURE_NICKIP | FEATURE_SVSNICK | FEATURE_SVSKILL,
+	FEATURE_SVSNICK | FEATURE_SVSKILL,
 	"+oS",
 	"+o",
 };

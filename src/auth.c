@@ -51,8 +51,9 @@ int UserAuth(User * u)
 	int authlvl = 0;
 	int i;
 	
-	if(IsServiceRoot(u))
+	if(IsServiceRoot(u)) {
 		return(NS_ULEVEL_ROOT);
+	}
 	for(i = 0; i < AuthModuleCount; i ++)
 	{
 		if (AuthModList[i].getauth) {

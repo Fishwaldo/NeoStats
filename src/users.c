@@ -90,7 +90,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	}
 	if(ip) {
 		ipaddress = strtoul (ip, NULL, 10);
-	} else if (!(protocol_info->features&FEATURE_NICKIP) && me.want_nickip == 1) {
+	} else if (!(ircd_srv.protocol&PROTOCOL_NICKIP) && me.want_nickip == 1) {
 		struct in_addr *ipad;
 		int res;
 
@@ -121,6 +121,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	strlcpy (u->vhost, host, MAXHOST);
 	strlcpy (u->username, user, MAXUSER);
 	strlcpy (u->realname, realname, MAXREALNAME);
+	u->ulevel = -1;
 	u->server = findserver (server);
 	u->tslastmsg = me.now;
 	u->chans = list_create (MAXJOINCHANS);
@@ -578,6 +579,7 @@ dumpuser (User* u)
 	if(u->is_away) {
 		chanalert (ns_botptr->nick, "Away:     %s", u->awaymsg);
 	}
+	chanalert (ns_botptr->nick, "Version:   %s", u->version);
 
 	cm = list_first (u->chans);
 	while (cm) {
@@ -627,18 +629,29 @@ UserLevel (User * u)
 {
 	int ulevel = 0;
 
-	ulevel = UserAuth(u);
+	/* Have we already calculated the user level? */
+	if(u->ulevel != -1) {
+		return u->ulevel;
+	}
+
 #ifdef DEBUG
 #ifdef CODERHACK
-	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
+	/* this is only cause I dun have the right O lines on some of my "Beta" 
+	   Networks, so I need to hack this in :) */
 	if (!ircstrcasecmp (u->nick, "FISH"))
 		ulevel = NS_ULEVEL_ROOT;
-	if (!ircstrcasecmp (u->nick, "SHMAD"))
+	else if (!ircstrcasecmp (u->nick, "SHMAD"))
 		ulevel = NS_ULEVEL_ROOT;
-	if (!ircstrcasecmp (u->nick, "MARK"))
+	else if (!ircstrcasecmp (u->nick, "MARK"))
 		ulevel = NS_ULEVEL_ROOT;
+	else
 #endif
 #endif
+	ulevel = UserAuth(u);
+
+	/* Set user level so we no longer need to calculate */
+	/* TODO: Under what circumstances do we reset this e.g. nick change? */
+	u->ulevel = ulevel;
 	dlog(DEBUG1, "UserLevel for %s is %d", u->nick, ulevel);
 	return ulevel;
 }

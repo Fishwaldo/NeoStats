@@ -119,6 +119,7 @@
 #define PROTOCOL_B64SERVER	0x00002000  /* Server names use Base 64 */
 #define PROTOCOL_B64NICK	0x00004000  /* Nick names use Base 64 */
 #define PROTOCOL_UNKLN		0x00008000  /*  */
+#define PROTOCOL_NICKIP		0x00010000  /* NICK passes IP address */
 
 #define FEATURE_SWHOIS		0x00000001	/* SWHOIS */
 #define FEATURE_SVSTIME		0x00000002	/* SVSTIME */
@@ -129,11 +130,10 @@
 #define FEATURE_SVSNICK		0x00000040	/* SVSNICK */
 #define FEATURE_SVSKILL		0x00000080	/* SVSKILL */
 #define FEATURE_UMODECLOAK  0x00000100	/* auto cloak host with umode */
-#define FEATURE_NICKIP		0x00000200	/* NICK passes IP address */
-#define FEATURE_SMODES		0x00000400	/* Smode field */
-#define FEATURE_BOTMODES	0x00000800	/* Umodes for bots available */
-#define FEATURE_SMO			0x00001000	/* SMO */
-#define FEATURE_USERSMODES	0x00002000	/* User Smodes */
+#define FEATURE_SMODES		0x00000200	/* Smode field */
+#define FEATURE_BOTMODES	0x00000400	/* Umodes for bots available */
+#define FEATURE_SMO			0x00000800	/* SMO */
+#define FEATURE_USERSMODES	0x00001000	/* User Smodes */
 
 /* cumodes are channel modes which affect a user */
 #define CUMODE_CHANOP		0x00000001
@@ -420,6 +420,7 @@ typedef struct Server {
 	int ping;
 	char uplink[MAXHOST];
 	char version[MAXHOST];
+	time_t uptime;
 	char infoline[MAXINFO];
 	long flags;
 	void *moddata[NUM_MODULES];
@@ -491,6 +492,7 @@ typedef struct User {
 	char vhost[MAXHOST];
 	char awaymsg[MAXHOST];
 	char swhois[MAXHOST];
+	char version[MAXHOST];
 	struct in_addr ipaddr;
 	Server *server;
 	int flood;

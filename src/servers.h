@@ -31,5 +31,6 @@ int InitServers (void);
 void PingServers (void);
 void FiniServers (void);
 Server *findserverbase64 (const char *num);
+void RequestServerUptimes (void);
 
 #endif /* _SERVER_H_ */
