@@ -596,9 +596,11 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		char IPAddress[32]; /* argv[argc-3] */
 		char *realname;
 		unsigned long IP = base64toint(argv[argc-3]);
-		
+#if 0		
 		ircsnprintf( IPAddress, 32, "%lu.%lu.%lu.%lu", 
 			(IP >> 24) & 255, (IP >> 16) & 255, (IP >> 8) & 255, IP & 255 );
+#endif
+		ircsnprintf( IPAddress, 32, "%lu", IP);
 
 		realname = joinbuf (argv, argc, (argc - 1));
 		/* Note realname + 1 is temp to dump colon - remove when parser fixed */
