@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.11 2002/02/28 10:33:10 fishwaldo Exp $
+** $Id: sock.c,v 1.12 2002/03/05 06:59:06 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -100,55 +100,7 @@ void read_loop()
 	}
  log("hu, how did we get here");
 }
-void notice(char *who, char *buf,...)
-{
-	va_list ap;
-	char tmp[512];
-	char out[512];
-	int sent;
-	va_start (ap, buf);
-	vsnprintf (tmp, 512, buf, ap);
 
-	if (me.onchan) {
-		sprintf(out,":%s PRIVMSG %s :%s",who, me.chan, tmp);
-#ifdef DEBUG
-		log("SENT: %s", out);
-#endif
-
-		strcat (out, "\n");
-		sent = write(servsock, out, strlen (out));
-		if (sent == -1) {
-			me.onchan = 0;
-			log("Write error.");
-			exit(0);
-		}
-		me.SendM++;
-		me.SendBytes = me.SendBytes + sent;
-	}
-	va_end (ap);
-}
-
-void sts(char *fmt,...)
-{
-	va_list ap;
-	char buf[512];
-	int sent;
-	va_start (ap, fmt);
-	vsnprintf (buf, 512, fmt, ap);
-
-#ifdef DEBUG
-	log("SENT: %s", buf);
-#endif
-	strcat (buf, "\n");
-	sent = write (servsock, buf, strlen (buf));
-	if (sent == -1) {
-		log("Write error.");
-		exit(0);
-	}
-	me.SendM++;
-	me.SendBytes = me.SendBytes + sent;
-	va_end (ap);
-}
 
 void log(char *fmt, ...)
 {

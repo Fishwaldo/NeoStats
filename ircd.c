@@ -823,3 +823,4 @@ static void Showcredits(char *nick)
 	sts(":%s 351 %s :- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies",me.name,nick);
 	sts(":%s 351 %s :- sre and Jacob for development systems and access",me.name, nick);
 }
+

@@ -184,7 +184,7 @@ extern void log(char *, ...);
 extern void ResetLogs();
 extern char *sctime(time_t);
 extern char *sftime(time_t);
-extern void notice(char *,char *, ...);
+
 
 
 /* conf.c */

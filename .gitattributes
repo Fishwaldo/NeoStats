@@ -5,7 +5,9 @@
 /Makefile.in -text
 /README -text
 /TODO -text
+/Ultimate.c -text
 /Ultimate.h -text
+/Unreal.c -text
 /Unreal.h -text
 /chans.c -text
 /chkstats -text

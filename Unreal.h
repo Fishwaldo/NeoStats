@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.4 2002/02/27 11:15:16 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.5 2002/03/05 06:59:06 fishwaldo Exp $
  */
 
 
@@ -28,9 +28,6 @@
 
 
 /* Shamelessly Stolen from Unreal2.1.7 for Token Support!  - Fish*/
-
-
-
 
 /*
  * The tokens are in the ascii character range of 33-127, and we start
@@ -351,6 +348,12 @@ struct Oper_Modes {
 	char mode;
 	int level;
 };
+
+
+/* function declarations */
+extern void sts(char *, ...);
+extern void notice(char *,char *, ...);
+
 
 
 

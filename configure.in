@@ -55,7 +55,8 @@ AC_ARG_ENABLE(unreal, [ --enable-unreal - enable Unreal IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(UNREAL)
-	IRCD_FILES="Unreal.c"
+	IRCD_FILES_SRC="Unreal.c"
+	IRCD_FILES_OBJS="Unreal.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -70,7 +71,8 @@ AC_ARG_ENABLE(ultimate, [ --enable-ultimate - enable Ultimate IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(ULTIMATE)
-	IRCD_FILES="Ultimate.c"
+	IRCD_FILES_SRC="Ultimate.c"
+	IRCD_FILES_OBJS="Ultimate.o"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -225,7 +227,8 @@ AC_MSG_CHECKING(The Modules that will be compiled)
 AC_MSG_RESULT($MODULES)
 
 
-AC_SUBST(IRCD_FILES)
+AC_SUBST(IRCD_FILES_SRC)
+AC_SUBST(IRCD_FILES_OBJS)
 AC_SUBST(MODULES)
 AC_OUTPUT(dl/statserv/Makefile dl/services/Makefile dl/icq/Makefile dl/version/Makefile dl/Makefile dl/spam/Makefile dl/netinfo/Makefile Makefile dl/services/Makefile dl/loveserv/Makefile)
 echo "(*----------------------------------------------------------*)"

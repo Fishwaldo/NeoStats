@@ -1578,7 +1578,8 @@ if test "${enable_unreal+set}" = set; then
 #define UNREAL 1
 EOF
 
-	IRCD_FILES="Unreal.c"
+	IRCD_FILES_SRC="Unreal.c"
+	IRCD_FILES_OBJS="Unreal.o"
 	echo "$ac_t""yes" 1>&6
 	;;
   *)
@@ -1591,7 +1592,7 @@ fi
 
 
 echo $ac_n "checking Whether to Enable Ultimate IRCD Support...""... $ac_c" 1>&6
-echo "configure:1595: checking Whether to Enable Ultimate IRCD Support..." >&5
+echo "configure:1596: checking Whether to Enable Ultimate IRCD Support..." >&5
 # Check whether --enable-ultimate or --disable-ultimate was given.
 if test "${enable_ultimate+set}" = set; then
   enableval="$enable_ultimate"
@@ -1601,7 +1602,8 @@ if test "${enable_ultimate+set}" = set; then
 #define ULTIMATE 1
 EOF
 
-	IRCD_FILES="Ultimate.c"
+	IRCD_FILES_SRC="Ultimate.c"
+	IRCD_FILES_OBJS="Ultimate.o"
 	echo "$ac_t""yes" 1>&6
 	;;
   *)
@@ -1614,7 +1616,7 @@ else
 fi
 
 echo $ac_n "checking What type of Authentication to use...""... $ac_c" 1>&6
-echo "configure:1618: checking What type of Authentication to use..." >&5
+echo "configure:1620: checking What type of Authentication to use..." >&5
 # Check whether --enable-auth or --disable-auth was given.
 if test "${enable_auth+set}" = set; then
   enableval="$enable_auth"
@@ -1658,7 +1660,7 @@ fi
 
 
 echo $ac_n "checking Whether to Enable StatServ Module?""... $ac_c" 1>&6
-echo "configure:1662: checking Whether to Enable StatServ Module?" >&5
+echo "configure:1664: checking Whether to Enable StatServ Module?" >&5
 # Check whether --enable-statserv or --disable-statserv was given.
 if test "${enable_statserv+set}" = set; then
   enableval="$enable_statserv"
@@ -1679,7 +1681,7 @@ fi
 
 
 echo $ac_n "checking Whether to Enable Spam Module?""... $ac_c" 1>&6
-echo "configure:1683: checking Whether to Enable Spam Module?" >&5
+echo "configure:1685: checking Whether to Enable Spam Module?" >&5
 # Check whether --enable-spam or --disable-spam was given.
 if test "${enable_spam+set}" = set; then
   enableval="$enable_spam"
@@ -1700,7 +1702,7 @@ fi
 
 
 echo $ac_n "checking Whether to Enable Icq Module?""... $ac_c" 1>&6
-echo "configure:1704: checking Whether to Enable Icq Module?" >&5
+echo "configure:1706: checking Whether to Enable Icq Module?" >&5
 # Check whether --enable-icq or --disable-icq was given.
 if test "${enable_icq+set}" = set; then
   enableval="$enable_icq"
@@ -1720,7 +1722,7 @@ fi
 
 	
 echo $ac_n "checking Whether to Enable Version Module?""... $ac_c" 1>&6
-echo "configure:1724: checking Whether to Enable Version Module?" >&5
+echo "configure:1726: checking Whether to Enable Version Module?" >&5
 # Check whether --enable-version or --disable-version was given.
 if test "${enable_version+set}" = set; then
   enableval="$enable_version"
@@ -1740,7 +1742,7 @@ fi
 
 
 echo $ac_n "checking Whether to Enable Netinfo Module?""... $ac_c" 1>&6
-echo "configure:1744: checking Whether to Enable Netinfo Module?" >&5
+echo "configure:1746: checking Whether to Enable Netinfo Module?" >&5
 # Check whether --enable-netinfo or --disable-netinfo was given.
 if test "${enable_netinfo+set}" = set; then
   enableval="$enable_netinfo"
@@ -1760,7 +1762,7 @@ fi
 
 
 echo $ac_n "checking Whether to Enable Services Module?""... $ac_c" 1>&6
-echo "configure:1764: checking Whether to Enable Services Module?" >&5
+echo "configure:1766: checking Whether to Enable Services Module?" >&5
 # Check whether --enable-services or --disable-services was given.
 if test "${enable_services+set}" = set; then
   enableval="$enable_services"
@@ -1780,7 +1782,7 @@ fi
 
 
 echo $ac_n "checking Whether to Enable LoveServ Module?""... $ac_c" 1>&6
-echo "configure:1784: checking Whether to Enable LoveServ Module?" >&5
+echo "configure:1786: checking Whether to Enable LoveServ Module?" >&5
 # Check whether --enable-loveserv or --disable-loveserv was given.
 if test "${enable_loveserv+set}" = set; then
   enableval="$enable_loveserv"
@@ -1799,7 +1801,7 @@ else
 fi
 
 echo $ac_n "checking Any other modules to compile?""... $ac_c" 1>&6
-echo "configure:1803: checking Any other modules to compile?" >&5
+echo "configure:1805: checking Any other modules to compile?" >&5
 # Check whether --enable-modules or --disable-modules was given.
 if test "${enable_modules+set}" = set; then
   enableval="$enable_modules"
@@ -1813,11 +1815,12 @@ fi
 
 
 echo $ac_n "checking Your Current Bank Balance""... $ac_c" 1>&6
-echo "configure:1817: checking Your Current Bank Balance" >&5
+echo "configure:1819: checking Your Current Bank Balance" >&5
 echo "$ac_t""Thats Impressive!!!" 1>&6
 echo $ac_n "checking The Modules that will be compiled""... $ac_c" 1>&6
-echo "configure:1820: checking The Modules that will be compiled" >&5
+echo "configure:1822: checking The Modules that will be compiled" >&5
 echo "$ac_t""$MODULES" 1>&6
+
 
 
 
@@ -1956,7 +1959,8 @@ s%@infodir@%$infodir%g
 s%@mandir@%$mandir%g
 s%@CC@%$CC%g
 s%@CPP@%$CPP%g
-s%@IRCD_FILES@%$IRCD_FILES%g
+s%@IRCD_FILES_SRC@%$IRCD_FILES_SRC%g
+s%@IRCD_FILES_OBJS@%$IRCD_FILES_OBJS%g
 s%@MODULES@%$MODULES%g
 
 CEOF
