@@ -39,7 +39,7 @@ char s_StatServ[MAXNICK] = "StatServ";
 Module_Info Statserv_Info[] = { {
 	SSMNAME,
 	"Statistical Bot For NeoStats",
-	"3.41"
+	"3.42"
 } };
 
 

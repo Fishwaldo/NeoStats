@@ -3,6 +3,8 @@ Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish
 
+* Version 3.42 * September 1st, 2002 (S)
+ - Fixed a crash bug if you tried to Delete STATS for statserv itself.  We dont allow this!!!
 
 * Version 3.41 * July 29th, 2002 (S)
  - Fixed a bug where channel alerts would get dropped notice changed to chanalert()
