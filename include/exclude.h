@@ -27,7 +27,7 @@
 int InitExcludes(void);
 void ns_do_exclude_add(Client *u, char *type, char *pattern);
 void ns_do_exclude_del(Client *u, char *position);
-void ns_do_exclude_list(Client *u, char *from);
+void ns_do_exclude_list(Client *source, Bot* botptr);
 void ns_do_exclude_chan(Channel *c);
 void ns_do_exclude_server(Client *s);
 void ns_do_exclude_user(Client *u);

@@ -294,12 +294,15 @@ static int cs_event_umode(CmdParams* cmdparams)
 			add = 0;
 			break;
 		default:
+#if 0
 			if(IsOperMode(*modes)) {
 				cs_report_mode(cmdparams->source, add, *modes, mode_netadmin, 0);
 			} else if(IsBotMode(*modes)) {
 				irc_chanalert(cs_bot, msg_bot, cmdparams->source->name, 
 					add?"now":"no longer", add?'+':'-', *modes);			
 			}
+#endif
+			break;
 		}
 		modes++;
 	}

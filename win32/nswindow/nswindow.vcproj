@@ -143,40 +143,19 @@
 				RelativePath="..\..\src\auth.c">
 			</File>
 			<File
-				RelativePath="..\..\src\auth.h">
-			</File>
-			<File
 				RelativePath="..\..\src\bans.c">
-			</File>
-			<File
-				RelativePath="..\..\src\bans.h">
 			</File>
 			<File
 				RelativePath="..\..\src\bots.c">
 			</File>
 			<File
-				RelativePath="..\..\src\bots.h">
-			</File>
-			<File
 				RelativePath="..\..\src\channels.c">
-			</File>
-			<File
-				RelativePath="..\..\src\channels.h">
 			</File>
 			<File
 				RelativePath="..\..\src\commands.c">
 			</File>
 			<File
-				RelativePath="..\..\src\commands.h">
-			</File>
-			<File
 				RelativePath="..\..\src\conf.c">
-			</File>
-			<File
-				RelativePath="..\..\src\conf.h">
-			</File>
-			<File
-				RelativePath="..\..\src\configwin32.h">
 			</File>
 			<File
 				RelativePath="..\..\src\db.c">
@@ -185,46 +164,22 @@
 				RelativePath="..\..\src\dl.c">
 			</File>
 			<File
-				RelativePath="..\..\src\dl.h">
-			</File>
-			<File
 				RelativePath="..\..\src\dns.c">
-			</File>
-			<File
-				RelativePath="..\..\src\dns.h">
 			</File>
 			<File
 				RelativePath="..\..\src\dotconf.c">
 			</File>
 			<File
-				RelativePath="..\..\src\dotconf.h">
-			</File>
-			<File
-				RelativePath="..\..\src\events.h">
-			</File>
-			<File
 				RelativePath="..\..\src\exclude.c">
-			</File>
-			<File
-				RelativePath="..\..\src\exclude.h">
 			</File>
 			<File
 				RelativePath="..\..\src\hash.c">
 			</File>
 			<File
-				RelativePath="..\..\src\hash.h">
-			</File>
-			<File
 				RelativePath="..\..\src\ircd.c">
 			</File>
 			<File
-				RelativePath="..\..\src\ircd.h">
-			</File>
-			<File
 				RelativePath="..\..\src\ircstring.c">
-			</File>
-			<File
-				RelativePath="..\..\src\ircstring.h">
 			</File>
 			<File
 				RelativePath="..\..\src\keeper.c">
@@ -233,25 +188,10 @@
 				RelativePath="..\..\src\list.c">
 			</File>
 			<File
-				RelativePath="..\..\src\list.h">
-			</File>
-			<File
 				RelativePath="..\..\src\log.c">
 			</File>
 			<File
-				RelativePath="..\..\src\log.h">
-			</File>
-			<File
 				RelativePath="..\..\src\main.c">
-			</File>
-			<File
-				RelativePath="..\..\src\Makefile.in">
-			</File>
-			<File
-				RelativePath="..\..\src\Makefile.inc">
-			</File>
-			<File
-				RelativePath="..\..\src\Makefile.inc.in">
 			</File>
 			<File
 				RelativePath="..\..\src\match.c">
@@ -263,117 +203,39 @@
 				RelativePath="..\..\src\modes.c">
 			</File>
 			<File
-				RelativePath="..\..\src\modes.h">
-			</File>
-			<File
 				RelativePath="..\..\src\modules.c">
-			</File>
-			<File
-				RelativePath="..\..\src\modules.h">
-			</File>
-			<File
-				RelativePath="..\..\src\neostats.h">
 			</File>
 			<File
 				RelativePath="..\..\src\ns_help.c">
 			</File>
 			<File
-				RelativePath="..\..\src\ns_help.h">
-			</File>
-			<File
-				RelativePath="..\..\src\numeric.h">
-			</File>
-			<File
 				RelativePath="..\..\src\servers.c">
-			</File>
-			<File
-				RelativePath="..\..\src\servers.h">
 			</File>
 			<File
 				RelativePath="..\..\src\services.c">
 			</File>
 			<File
-				RelativePath="..\..\src\services.h">
-			</File>
-			<File
 				RelativePath="..\..\src\signals.c">
-			</File>
-			<File
-				RelativePath="..\..\src\signals.h">
 			</File>
 			<File
 				RelativePath="..\..\src\sock.c">
 			</File>
 			<File
-				RelativePath="..\..\src\sock.h">
-			</File>
-			<File
 				RelativePath="..\..\src\support.c">
-			</File>
-			<File
-				RelativePath="..\..\src\support.h">
 			</File>
 			<File
 				RelativePath="..\..\src\timer.c">
 			</File>
 			<File
-				RelativePath="..\..\src\timer.h">
-			</File>
-			<File
 				RelativePath="..\..\src\transfer.c">
 			</File>
 			<File
-				RelativePath="..\..\src\transfer.h">
-			</File>
-			<File
 				RelativePath="..\..\src\users.c">
-			</File>
-			<File
-				RelativePath="..\..\src\users.h">
 			</File>
 			<Filter
 				Name="win32">
 				<File
 					RelativePath="..\..\src\win32\winmain.c">
-				</File>
-			</Filter>
-			<Filter
-				Name="keeper">
-				<File
-					RelativePath="..\..\src\keeper\keeper.h">
-				</File>
-				<File
-					RelativePath="..\..\src\keeper\kp_cache.c">
-				</File>
-				<File
-					RelativePath="..\..\src\keeper\kp_dir.c">
-				</File>
-				<File
-					RelativePath="..\..\src\keeper\kp_enum.c">
-				</File>
-				<File
-					RelativePath="..\..\src\keeper\kp_get.c">
-				</File>
-				<File
-					RelativePath="..\..\src\keeper\kp_iface.c">
-				</File>
-				<File
-					RelativePath="..\..\src\keeper\kp_recur.c">
-				</File>
-				<File
-					RelativePath="..\..\src\keeper\kp_set.c">
-				</File>
-				<File
-					RelativePath="..\..\src\keeper\kp_sort.c">
-				</File>
-				<File
-					RelativePath="..\..\src\keeper\kp_util.c">
-				</File>
-				<File
-					RelativePath="..\..\src\keeper\kp_util.h">
-				</File>
-				<File
-					RelativePath="..\..\src\keeper\Makefile">
 				</File>
 			</Filter>
 		</Filter>
