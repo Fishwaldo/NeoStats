@@ -354,7 +354,7 @@ send_quit (const char *who, const char *quitmsg)
 
 	/* Clear numeric */
 	num = nicktobase64 (who);
-	neonicknumerics[(int)convert2n[num[4]]] = 0;
+	neonicknumerics[convert2n[(int)num[4]]] = 0;
 	send_cmd ("%s %s :%s", nicktobase64 (who), TOK_QUIT, quitmsg);
 }
 

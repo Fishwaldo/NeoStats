@@ -502,9 +502,6 @@
 /* "Operating System Host" */
 #define NS_HOST "Win32"
 
-/* "IRCd Protocol we are compiled with" */
-#define NS_PROTOCOL "Client"
-
 /* Name of package */
 #define PACKAGE "NeoStats"
 
