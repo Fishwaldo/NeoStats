@@ -622,10 +622,10 @@ static void LoadConfig(void)
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "RealName") < 0) {
-		strlcpy(cs_cfg.rname, "Connection Monitoring Service", MAXREALNAME);
+		strlcpy(cs_cfg.realname, "Connection Monitoring Service", MAXREALNAME);
 	}
 	else {
-		strlcpy(cs_cfg.rname, temp, MAXREALNAME);
+		strlcpy(cs_cfg.realname, temp, MAXREALNAME);
 		free(temp);
 	}
 }
