@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - HostServ: BANS DEL now takes host as a parameter not an index. (M)
+ - HostServ: DEL and VIEW now take nick as a parameter not an index. (M)
  - StatServ: add option to configure html update interval. (M)
  - Add support for persistent bots which do not auto leave channel when it is 
    empty. (M)

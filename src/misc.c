@@ -25,6 +25,7 @@
 
 #include "neostats.h"
 #include "services.h"
+#include "ircstring.h"
 
 /* @brief Make the name of a file safe for a filename
  * 
@@ -370,4 +371,121 @@ char* sftime (time_t stuff)
 
 	strftime (fmtime, TIMEBUFSIZE, "%a %b %d %Y %I:%M %p %Z", ltm);
 	return fmtime;
+}
+
+/** @brief validate_nick
+ *  
+ *  Check that passed string is a valid nick
+ *  
+ *  @param nick to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int validate_nick (char* nick)
+{
+	char* ptr;
+
+	ptr = nick;
+	while (*ptr) {
+		if (!IsNickChar(*ptr)) {
+			return NS_FAILURE;
+		}
+		ptr++;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief validate_user
+ *  
+ *  Check that passed string is a valid username
+ *  
+ *  @param username to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int validate_user (char* username)
+{
+	char* ptr;
+
+	ptr = username;
+	while (*ptr) {
+		if (!IsUserChar(*ptr)) {
+			return NS_FAILURE;
+		}
+		ptr++;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief validate_host
+ *  
+ *  Check that passed string is a valid hostname
+ *  
+ *  @param hostname to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int validate_host (char* hostname)
+{
+	char* ptr;
+
+	ptr = hostname;
+	while (*ptr) {
+		if (!IsHostChar(*ptr)) {
+			return NS_FAILURE;
+		}
+		ptr++;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief validate_url
+ *  
+ *  Check that passed string is a valid url
+ *  
+ *  @param url to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int validate_url (char* url)
+{
+	char* ptr;
+
+	if (ircstrncasecmp (url, "http://", 7) !=0)
+		return NS_FAILURE;
+	ptr = url;
+	ptr += 7;
+	while (*ptr) {
+		if (!IsURLChar(*ptr)) {
+			return NS_FAILURE;
+		}
+		ptr++;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief validate_channel
+ *  
+ *  Check that passed string is a valid channel name
+ *  
+ *  @param channel name to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int validate_channel (char* channel_name)
+{
+	char* ptr;
+
+	ptr = channel_name;
+	if (!IsChanPrefix(*ptr)) {
+		return NS_FAILURE;
+	}
+	ptr ++;
+	while (*ptr) {
+		if (!IsChanChar(*ptr)) {
+			return NS_FAILURE;
+		}
+		ptr++;
+	}
+	return NS_SUCCESS;
 }

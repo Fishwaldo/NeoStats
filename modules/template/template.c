@@ -274,7 +274,7 @@ int ModInit (Module *mod_ptr)
 int ModSynch (void)
 {
 	/* Introduce a bot onto the network saving the bot handle */
-	template_bot = init_bot (&template_bot_info);
+	template_bot = AddBot (&template_bot_info);
 	if (!template_bot) {
 		return NS_FAILURE;
 	}

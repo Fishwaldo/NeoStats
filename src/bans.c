@@ -21,14 +21,35 @@
 ** $Id$
 */
 
+/*  TODO:
+ *  - Other ban types beside Unreal TKL
+ *  - Channel bans?
+ */
+
 #include "neostats.h"
 #include "modules.h"
 #include "services.h"
 
+/** Bans subsystem
+ *
+ *  Handle bans on the network
+ */
+
+/** List of bans
+ *  Bans subsystem use only. */
 static hash_t *banhash;
 
-static Ban *
-new_ban (const char *mask)
+/** @brief new_ban
+ *
+ *  Create a new ban
+ *  Bans subsystem use only.
+ *
+ *  @param mask of client to create ban for
+ *
+ *  @return pointer to newly created entry or NULL for failure
+ */
+
+static Ban *new_ban (const char *mask)
 {
 	Ban *ban;
 
@@ -36,6 +57,7 @@ new_ban (const char *mask)
 		nlog (LOG_CRITICAL, "new_ban: bans hash is full");
 		return NULL;
 	}
+	/* Allocate memory for ban and add to hash table */
 	dlog(DEBUG2, "new_ban: %s", mask);
 	ban = ns_calloc (sizeof (Ban));
 	strlcpy (ban->mask, mask, MAXHOST);
@@ -43,45 +65,68 @@ new_ban (const char *mask)
 	return ban;
 }
 
-void AddBan(const char* type, const char* user, const char* host, const char* mask,
-	const char* reason, const char* setby, const char* tsset, const char* tsexpires)
+/** @brief AddBan
+ *
+ *  Add a new ban to the system
+ *  NeoStats core use only.
+ *
+ *  @param type
+ *  @param user
+ *  @param host
+ *  @param mask,
+ *  @param reason
+ *  @param setby
+ *  @param tsset
+ *  @param tsexpires
+ *
+ *  @return nothing
+ */
+
+void AddBan (const char *type, const char *user, const char *host, const char *mask,
+			 const char *reason, const char *setby, const char *tsset, const char *tsexpires)
 {
 	CmdParams * cmdparams;
 	Ban* ban;
 
 	SET_SEGV_LOCATION();
 	ban = new_ban (mask);
-	if(!ban) {
+	if (!ban) {
 		return;
 	}
-	ban->type[0] = type[0];
-	ban->type[1] = 0;
-	strlcpy(ban->user, user, MAXUSER);
-	strlcpy(ban->host, host, MAXHOST);
-	strlcpy(ban->mask, mask, MAXHOST);
-	strlcpy(ban->reason, reason,BUFSIZE);
-	strlcpy(ban->setby ,setby, MAXHOST);
+	strlcpy (ban->type, type, 8);
+	strlcpy (ban->user, user, MAXUSER);
+	strlcpy (ban->host, host, MAXHOST);
+	strlcpy (ban->mask, mask, MAXHOST);
+	strlcpy (ban->reason, reason,BUFSIZE);
+	strlcpy (ban->setby ,setby, MAXHOST);
 	ban->tsset = atol(tsset);
 	ban->tsexpires = atol(tsexpires);
-
 	/* run the module event */
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	AddStringToList (&cmdparams->av, (char*)type, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)user, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)host, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)mask, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)reason, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)setby, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)tsset, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)tsexpires, &cmdparams->ac);
+	cmdparams->param = ban;
 	SendAllModuleEvent (EVENT_ADDBAN, cmdparams);
-	ns_free (cmdparams->av);
 	ns_free (cmdparams);
 }
 
-void 
-DelBan(const char* type, const char* user, const char* host, const char* mask,
-	const char* reason, const char* setby, const char* tsset, const char* tsexpires)
+/** @brief DelBan
+ *
+ *  Delete a ban from the system
+ *  NeoStats core use only.
+ *
+ *  @param type
+ *  @param user
+ *  @param host
+ *  @param mask,
+ *  @param reason
+ *  @param setby
+ *  @param tsset
+ *  @param tsexpires
+ *
+ *  @return nothing
+ */
+
+void DelBan (const char *type, const char *user, const char *host, const char *mask,
+			 const char *reason, const char *setby, const char *tsset, const char *tsexpires)
 {
 	CmdParams * cmdparams;
 	Ban *ban;
@@ -94,28 +139,27 @@ DelBan(const char* type, const char* user, const char* host, const char* mask,
 		return;
 	}
 	ban = hnode_get (bansnode);
-
 	/* run the module event */
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	AddStringToList (&cmdparams->av, (char*)type, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)user, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)host, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)mask, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)reason, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)setby, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)tsset, &cmdparams->ac);
-	AddStringToList (&cmdparams->av, (char*)tsexpires, &cmdparams->ac);
+	cmdparams->param = ban;
 	SendAllModuleEvent (EVENT_DELBAN, cmdparams);
-	ns_free (cmdparams->av);
 	ns_free (cmdparams);
-
 	hash_delete (banhash, bansnode);
 	hnode_destroy (bansnode);
 	ns_free (ban);
 }
 
-void
-BanDump (void)
+/** @brief ListBans
+ *
+ *  List all bans currently set
+ *  NeoStats core use only.
+ *
+ *  @param none
+ *
+ *  @return nothing
+ */
+
+void ListBans (void)
 {
 	Ban *ban;
 	hscan_t ss;
@@ -130,25 +174,43 @@ BanDump (void)
 	irc_chanalert (ns_botptr, _("End of list."));
 }
 
+/** @brief FiniBans
+ *
+ *  Cleanup bans subsystem
+ *  NeoStats core use only.
+ *
+ *  @param none
+ *
+ *  @return nothing
+ */
+
 void FiniBans (void)
 {
 	Ban *ban;
 	hnode_t *bansnode;
 	hscan_t hs;
 
-	hash_scan_begin(&hs, banhash);
+	hash_scan_begin (&hs, banhash);
 	while ((bansnode = hash_scan_next(&hs)) != NULL ) {
 		ban = hnode_get (bansnode);
 		hash_delete (banhash, bansnode);
 		hnode_destroy (bansnode);
 		ns_free (ban);
 	}
-	hash_destroy(banhash);
+	hash_destroy (banhash);
 }
 
+/** @brief InitBans
+ *
+ *  Init bans subsystem
+ *  NeoStats core use only.
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 
-int 
-InitBans (void)
+int InitBans (void)
 {
 	banhash = hash_create (-1, 0, 0);
 	if (!banhash) {
@@ -157,6 +219,16 @@ InitBans (void)
 	}
 	return NS_SUCCESS;
 }
+
+/** @brief GetBanHash
+ *
+ *  Get pointer to bans hash table
+ *  Use at own risk.
+ *
+ *  @param none
+ *
+ *  @return pointer to hash table
+ */
 
 hash_t *GetBanHash (void)
 {

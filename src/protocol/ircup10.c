@@ -24,6 +24,7 @@
 #include "ircup10.h"
 #include "neostats.h"
 #include "ircd.h"
+#include "base64.h"
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
@@ -197,11 +198,8 @@ char neonicknumerics[64];
 /* These must be the same on ALL servers ! Do not change ! */
 
 #define NUMNICKLOG 6
-#define NUMNICKMAXCHAR 'z'      /* See convert2n[] */
 #define NUMNICKBASE 64          /* (2 << NUMNICKLOG) */
 #define NUMNICKMASK 63          /* (NUMNICKBASE-1) */
-#define NN_MAX_SERVER 4096      /* (NUMNICKBASE * NUMNICKBASE) */
-#define NN_MAX_CLIENT 262144    /* NUMNICKBASE ^ 3 */
 
 /*
  * convert2y[] converts a numeric to the corresponding character.
@@ -322,7 +320,7 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 	inttobase64(neostatsbase64, numeric, 2);
 	send_cmd ("%s %s", MSG_PASS, pass);
     send_cmd ("%s %s 1 %lu %lu J10 %s]]] +s :%s", MSG_SERVER, name, tsboot, tslink, neostatsbase64, infoline);
-	setserverbase64 (name, neostatsbase64);
+	set_server_base64 (name, neostatsbase64);
 }
 
 void
@@ -337,21 +335,21 @@ send_quit (const char *source, const char *quitmsg)
 	char* num;
 
 	/* Clear numeric */
-	num = nicktobase64 (source);
+	num = nick_to_base64 (source);
 	neonicknumerics[convert2n[(int)num[4]]] = 0;
-	send_cmd ("%s %s :%s", nicktobase64 (source), TOK_QUIT, quitmsg);
+	send_cmd ("%s %s :%s", nick_to_base64 (source), TOK_QUIT, quitmsg);
 }
 
 void 
 send_part (const char *source, const char *chan)
 {
-	send_cmd ("%s %s %s", nicktobase64 (source), TOK_PART, chan);
+	send_cmd ("%s %s %s", nick_to_base64 (source), TOK_PART, chan);
 }
 
 void
 send_join (const char *source, const char *chan, const unsigned long ts)
 {
-	send_cmd ("%s %s %s %lu", nicktobase64 (source), TOK_JOIN, chan, ts);
+	send_cmd ("%s %s %s %lu", nick_to_base64 (source), TOK_JOIN, chan, ts);
 }
 
 /* R: ABAAH M #c3 +tn */
@@ -378,7 +376,7 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 	}
 	ircsnprintf(nicknumbuf, 6, "%sAA%c", neostatsbase64, (i+'A'));
 	send_cmd ("%s %s %s 1 %lu %s %s %s AAAAAA %s :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, nicknumbuf, realname);
-	setnickbase64 (nick, nicknumbuf);
+	set_nick_base64 (nick, nicknumbuf);
 }
 
 void
@@ -390,13 +388,13 @@ send_ping (const char *source, const char *reply, const char *target)
 void 
 send_umode (const char *source, const char *target, const char *mode)
 {
-	send_cmd ("%s %s %s :%s", nicktobase64 (source), TOK_MODE, target, mode);
+	send_cmd ("%s %s %s :%s", nick_to_base64 (source), TOK_MODE, target, mode);
 }
 
 void 
 send_numeric (const char *source, const int numeric, const char *target, const char *buf)
 {
-	send_cmd ("%s %d %s :%s", neostatsbase64, numeric, nicktobase64 (target), buf);
+	send_cmd ("%s %d %s :%s", neostatsbase64, numeric, nick_to_base64 (target), buf);
 }
 
 void
@@ -408,34 +406,34 @@ send_pong (const char *reply)
 void 
 send_kill (const char *source, const char *target, const char *reason)
 {
-	send_cmd ("%s %s %s :%s", neostatsbase64, TOK_KILL, nicktobase64 (target), reason);
+	send_cmd ("%s %s %s :%s", neostatsbase64, TOK_KILL, nick_to_base64 (target), reason);
 }
 
 void 
 send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
 {
-	send_cmd ("%s %s %s %lu", nicktobase64 (oldnick), TOK_NICK, newnick, ts);
+	send_cmd ("%s %s %s %lu", nick_to_base64 (oldnick), TOK_NICK, newnick, ts);
 }
 
 void
 send_invite (const char *source, const char *target, const char *chan) 
 {
-	send_cmd ("%s %s %s %s", nicktobase64 (source), TOK_INVITE, target, chan);
+	send_cmd ("%s %s %s %s", nick_to_base64 (source), TOK_INVITE, target, chan);
 }
 
 void 
 send_kick (const char *source, const char *chan, const char *target, const char *reason)
 {
-	send_cmd ("%s %s %s %s :%s", nicktobase64 (source), TOK_KICK, chan, nicktobase64 (target), (reason ? reason : "No Reason Given"));
+	send_cmd ("%s %s %s %s :%s", nick_to_base64 (source), TOK_KICK, chan, nick_to_base64 (target), (reason ? reason : "No Reason Given"));
 }
 
 void 
 send_wallops (const char *source, const char *buf)
 {
-	if (nicktobase64 (source)) {
-		send_cmd ("%s %s :%s", nicktobase64 (source), TOK_WALLUSERS, buf);
-	} else if (servertobase64 (source)) {
-		send_cmd ("%s %s :%s", servertobase64 (source), TOK_WALLUSERS, buf);
+	if (nick_to_base64 (source)) {
+		send_cmd ("%s %s :%s", nick_to_base64 (source), TOK_WALLUSERS, buf);
+	} else if (server_to_base64 (source)) {
+		send_cmd ("%s %s :%s", server_to_base64 (source), TOK_WALLUSERS, buf);
 	}
 }
 
@@ -471,51 +469,51 @@ void
 send_privmsg (const char *source, const char *target, const char *buf)
 {
 	if (target[0] == '#') {
-		send_cmd ("%s %s %s :%s", nicktobase64 (source), TOK_PRIVATE, target, buf);
+		send_cmd ("%s %s %s :%s", nick_to_base64 (source), TOK_PRIVATE, target, buf);
 	} else {
-		send_cmd ("%s %s %s :%s", nicktobase64 (source), TOK_PRIVATE, nicktobase64 (target), buf);
+		send_cmd ("%s %s %s :%s", nick_to_base64 (source), TOK_PRIVATE, nick_to_base64 (target), buf);
 	}
 }
 
 void
 send_notice (const char *source, const char *target, const char *buf)
 {
-	send_cmd ("%s %s %s :%s", nicktobase64 (source), TOK_NOTICE, nicktobase64 (target), buf);
+	send_cmd ("%s %s %s :%s", nick_to_base64 (source), TOK_NOTICE, nick_to_base64 (target), buf);
 }
 
 void
 send_globops (const char *source, const char *buf)
 {
-	if (nicktobase64 (source)) {
-		send_cmd ("%s %s :%s", nicktobase64 (source), TOK_WALLOPS, buf);
-	} else if (servertobase64 (source)) {
-		send_cmd ("%s %s :%s", servertobase64 (source), TOK_WALLOPS, buf);
+	if (nick_to_base64 (source)) {
+		send_cmd ("%s %s :%s", nick_to_base64 (source), TOK_WALLOPS, buf);
+	} else if (server_to_base64 (source)) {
+		send_cmd ("%s %s :%s", server_to_base64 (source), TOK_WALLOPS, buf);
 	}
 }
 
 static void
 m_stats (char *origin, char **argv, int argc, int srv)
 {
-	do_stats (base64tonick (origin), argv[0]);
+	do_stats (base64_to_nick (origin), argv[0]);
 }
 
 /* ABAAB V :Bj */
 static void
 m_version (char *origin, char **argv, int argc, int srv)
 {
-	do_version (base64tonick (origin), base64toserver (argv[0]));
+	do_version (base64_to_nick (origin), base64_to_server (argv[0]));
 }
 
 static void
 m_motd (char *origin, char **argv, int argc, int srv)
 {
-	do_motd (base64tonick (origin), base64toserver (argv[0]));
+	do_motd (base64_to_nick (origin), base64_to_server (argv[0]));
 }
 
 static void
 m_admin (char *origin, char **argv, int argc, int srv)
 {
-	do_admin (base64tonick (origin), base64toserver (argv[0]));
+	do_admin (base64_to_nick (origin), base64_to_server (argv[0]));
 }
 
 /* m_server
@@ -541,9 +539,9 @@ m_server (char *origin, char **argv, int argc, int srv)
 	if (srv == 2) {
 		do_server (argv[0], NULL, argv[1], NULL, argv[argc-1], 0);
 	} else {
-		do_server (argv[0], base64toserver (origin), argv[1], NULL, argv[argc-1], srv);
+		do_server (argv[0], base64_to_server (origin), argv[1], NULL, argv[argc-1], srv);
 	}
-	setserverbase64 (argv[0], argv[5]);
+	set_server_base64 (argv[0], argv[5]);
 }
 
 /* R: AB SQ mark.local.org 0 :Ping timeout */
@@ -557,7 +555,7 @@ m_squit (char *origin, char **argv, int argc, int srv)
 static void
 m_quit (char *origin, char **argv, int argc, int srv)
 {
-	do_quit (base64tonick(origin), argv[0]);
+	do_quit (base64_to_nick(origin), argv[0]);
 }
 
 /* R: ABAAE M Mark :+i */
@@ -567,7 +565,7 @@ static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
 	if (argv[0][0] == '#') {
-		do_mode_channel (base64tonick(origin), argv, argc);
+		do_mode_channel (base64_to_nick(origin), argv, argc);
 	} else {
 		do_mode_user (argv[0], argv[1]);
 	}
@@ -575,7 +573,7 @@ m_mode (char *origin, char **argv, int argc, int srv)
 static void
 m_kill (char *origin, char **argv, int argc, int srv)
 {
-	char* num = base64tonick(argv[0]);
+	char* num = base64_to_nick(argv[0]);
 	if (num) {
 		do_kill (origin, num, argv[1]);
 	}
@@ -585,7 +583,7 @@ m_kill (char *origin, char **argv, int argc, int srv)
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
 {
-	do_pong (base64toserver(origin), argv[1]);
+	do_pong (base64_to_server(origin), argv[1]);
 }
 
 static void
@@ -595,10 +593,10 @@ m_away (char *origin, char **argv, int argc, int srv)
 
 	if (argc > 0) {
 		buf = joinbuf (argv, argc, 0);
-		do_away (base64tonick(origin), buf);
+		do_away (base64_to_nick(origin), buf);
 		ns_free (buf);
 	} else {
-		do_away (base64tonick(origin), NULL);
+		do_away (base64_to_nick(origin), NULL);
 	}
 }
 
@@ -634,52 +632,52 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		/*       nick,    hopcount, TS,     user,    host, */       
 		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
 			/* server, ip, servicestamp, modes*/
-			base64toserver(origin), IPAddress, NULL, (argv[5][0] == '+' ? argv[5]: NULL),
+			base64_to_server(origin), IPAddress, NULL, (argv[5][0] == '+' ? argv[5]: NULL),
 			/*, vhost, realname, numeric*/ 
 			NULL, argv[argc-1], argv[argc-2], NULL);
 	} else {
-		do_nickchange (base64tonick(origin), argv[0], argv[1]);
+		do_nickchange (base64_to_nick(origin), argv[0], argv[1]);
 	}
 }
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	if (base64tonick(origin)) {
-		do_topic (argv[0], base64tonick(origin), NULL, argv[argc-1]);
-	} else if (base64toserver (origin)) {
-		do_topic (argv[0], base64toserver(origin), NULL, argv[argc-1]);
+	if (base64_to_nick(origin)) {
+		do_topic (argv[0], base64_to_nick(origin), NULL, argv[argc-1]);
+	} else if (base64_to_server (origin)) {
+		do_topic (argv[0], base64_to_server(origin), NULL, argv[argc-1]);
 	}
 }
 
 static void
 m_kick (char *origin, char **argv, int argc, int srv)
 {
-	do_kick (base64tonick(origin), argv[0], base64tonick(argv[1]), argv[2]);
+	do_kick (base64_to_nick(origin), argv[0], base64_to_nick(argv[1]), argv[2]);
 }
 
 /* R: ABAAE C #chan 1076069009 */
 static void
 m_create (char *origin, char **argv, int argc, int srv)
 {
-	do_join (base64tonick(origin), argv[0], argv[1]);
+	do_join (base64_to_nick(origin), argv[0], argv[1]);
 }
 
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
-	do_join (base64tonick(origin), argv[0], argv[1]);
+	do_join (base64_to_nick(origin), argv[0], argv[1]);
 }
 
 static void
 m_part (char *origin, char **argv, int argc, int srv)
 {
-	do_part (base64tonick(origin), argv[0], argv[1]);
+	do_part (base64_to_nick(origin), argv[0], argv[1]);
 }
 
 static void
 m_ping (char *origin, char **argv, int argc, int srv)
 {
-	do_ping (base64toserver(origin), argv[1]);
+	do_ping (base64_to_server(origin), argv[1]);
 }
 
 /*
@@ -751,14 +749,14 @@ m_burst (char *origin, char **argv, int argc, int srv)
 					t = s + strcspn (s, ",");
 					if (*t)
 						*t++ = 0;
-					do_join (base64tonick(s), argv[0], NULL);
+					do_join (base64_to_nick(s), argv[0], NULL);
 					if (s[5] == ':') {
 						modechar = s[6];
 					}
 					if (modechar) {
 						char **av;
 						int ac;
-						ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], modechar, base64tonick(s));
+						ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], modechar, base64_to_nick(s));
 						ac = split_buf (ircd_buf, &av, 0);
 						do_mode_channel (me.name, av, ac);
 						ns_free (av);
@@ -813,7 +811,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 static void
 m_end_of_burst (char *origin, char **argv, int argc, int srv)
 {
-	if (strcmp (base64toserver (origin), me.uplink) == 0) {
+	if (strcmp (base64_to_server (origin), me.uplink) == 0) {
 		send_end_of_burst_ack ();
 	}
 }
@@ -887,7 +885,7 @@ m_private (char *origin, char **argv, int argc, int srv)
 	if (argv[0][0] == '#') {
 		av0 = argv[0];
 	} else {
-		av0 = base64tonick(argv[0]);
+		av0 = base64_to_nick(argv[0]);
 		/* In case a real nick came through*/
 		if (av0 == NULL) {
 			av0 = argv[0];
@@ -897,7 +895,7 @@ m_private (char *origin, char **argv, int argc, int srv)
 	for(i = 1; i < argc; i++) {
 		AddStringToList (&av, argv[i], &ac);
 	}
-	_m_private (base64tonick(origin), av, ac, srv);
+	_m_private (base64_to_nick(origin), av, ac, srv);
 	ns_free (av);
 }
 
@@ -912,7 +910,7 @@ m_notice (char *origin, char **argv, int argc, int srv)
 	if (argv[0][0] == '#') {
 		av0 = argv[0];
 	} else {
-		av0 = base64tonick(argv[0]);
+		av0 = base64_to_nick(argv[0]);
 		/* In case a real nick came through*/
 		if (av0 == NULL) {
 			av0 = argv[0];
@@ -922,6 +920,6 @@ m_notice (char *origin, char **argv, int argc, int srv)
 	for(i = 1; i < argc; i++) {
 		AddStringToList (&av, argv[i], &ac);
 	}
-	_m_notice (base64tonick(origin), av, ac, srv);
+	_m_notice (base64_to_nick(origin), av, ac, srv);
 	ns_free (av);
 }

@@ -66,10 +66,9 @@ InitModules ()
 	return NS_SUCCESS;
 }
 
-int FiniModules (void) 
+void FiniModules (void) 
 {
 	hash_destroy(modulehash);
-	return NS_SUCCESS;
 }
 
 /** @brief SynchModule 
@@ -315,7 +314,7 @@ load_module (const char *modfilename, Client * u)
 	}
     /* For Auth modules, register auth function */
 	if (info_ptr->flags & MODULE_FLAG_AUTH) {
-		if (init_auth_module (mod_ptr) != NS_SUCCESS) {
+		if (AddAuthModule (mod_ptr) != NS_SUCCESS) {
 			load_module_error (u, __("Unable to load auth module: %s missing ModAuthUser function",u), info_ptr->name);
 			unload_module(mod_ptr->info->name, NULL);
 			return NULL;
@@ -418,7 +417,7 @@ unload_module (const char *modname, Client * u)
 	irc_chanalert (ns_botptr, _("Unloading module %s"), modname);
 	if (mod_ptr->info->flags & MODULE_FLAG_AUTH)
 	{
-		delete_auth_module (mod_ptr);
+		DelAuthModule (mod_ptr);
 	}
 	moduleindex = mod_ptr->modnum;
 	/* canx any DNS queries used by this module */
@@ -447,7 +446,7 @@ unload_module (const char *modname, Client * u)
 	/* Delete any bots used by this module. Done after ModFini, so the bot 
 	 * can still send messages during ModFini 
 	 */
-	del_module_bots (mod_ptr);
+	DelModuleBots (mod_ptr);
 	hnode_destroy (modnode);
 	/* Close module */
 	SET_RUN_LEVEL(mod_ptr);

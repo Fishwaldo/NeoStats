@@ -127,8 +127,8 @@ int ns_cmd_exclude_add(CmdParams* cmdparams)
 	}
 	/* if we get here, then e is valid */
 	lnode_create_append (exclude_list, e);
-	irc_prefmsg(ns_botptr, cmdparams->source, __("Successfully added %s (%s) to Exclusion List", cmdparams->source), e->pattern, cmdparams->av[1]);
-	irc_chanalert(ns_botptr, _("%s added %s (%s) to the Exclusion List"), cmdparams->source->name, e->pattern, cmdparams->av[1]);
+	irc_prefmsg(ns_botptr, cmdparams->source, __("Added %s (%s) to exclusion list", cmdparams->source), e->pattern, cmdparams->av[1]);
+	irc_chanalert(ns_botptr, _("%s added %s (%s) to the exclusion list"), cmdparams->source->name, e->pattern, cmdparams->av[1]);
 
 	/* now save the exclusion list */
 	ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
@@ -165,7 +165,7 @@ int ns_cmd_exclude_del(CmdParams* cmdparams)
 			e = lnode_get(en);
 			ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
 			DelRow("Exclusions", tmp);
-			irc_prefmsg(ns_botptr, cmdparams->source, __("Deleted %s out of Exclusion List",cmdparams->source), e->pattern);
+			irc_prefmsg(ns_botptr, cmdparams->source, __("Deleted %s out of exclusion list",cmdparams->source), e->pattern);
 			ns_free(e);
 			list_delete(exclude_list, en);
 			lnode_destroy(en);
@@ -192,7 +192,7 @@ int ns_cmd_exclude_list(CmdParams* cmdparams)
 	int i = 0;
 	static char tmp[BUFSIZE];
 	
-	irc_prefmsg(ns_botptr, cmdparams->source, __("Global Exclusion List:", cmdparams->source));
+	irc_prefmsg(ns_botptr, cmdparams->source, __("Global exclusion list:", cmdparams->source));
 	en = list_first(exclude_list);
 	i = 1;
 	while (en != NULL) {

@@ -209,7 +209,7 @@ int ModInit (Module *mod_ptr)
 int ModSynch (void)
 {
 	SET_SEGV_LOCATION();
-	ss_bot = init_bot (&ss_botinfo);
+	ss_bot = AddBot (&ss_botinfo);
 	if (!ss_bot) {
 		return NS_FAILURE;
 	}
@@ -442,31 +442,21 @@ static int ss_chans(CmdParams* cmdparams)
 			list_sort(Chead, topchan);
 		}
 		cn = list_first(Chead);
-		cs = lnode_get(cn);
 		irc_prefmsg(ss_bot, cmdparams->source, "Top10 Online Channels:");
 		irc_prefmsg(ss_bot, cmdparams->source, "======================");
-		for (i = 0; i <= 10; i++) {
+		for (i = 0; i <= 10, cn; i++) {
+			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(find_chan(cs->name))
 			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(Chead, cn);
-				if (cn) {
-					cs = lnode_get(cn);
-				} else {
-					break;
-				}
 				continue;
 			}
 			irc_prefmsg(ss_bot,cmdparams->source, 
 				"Channel %s -> %ld Members", cs->name,
 				cs->members);
 			cn = list_next(Chead, cn);
-			if (cn) {
-				cs = lnode_get(cn);
-			} else {
-				break;
-			}
 		}
 		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "POP")) {
@@ -475,30 +465,20 @@ static int ss_chans(CmdParams* cmdparams)
 			list_sort(Chead, topjoin);
 		}
 		cn = list_first(Chead);
-		cs = lnode_get(cn);
 		irc_prefmsg(ss_bot, cmdparams->source, "Top10 Channels (Ever):");
 		irc_prefmsg(ss_bot, cmdparams->source, "======================");
-		for (i = 0; i <= 10; i++) {
+		for (i = 0; i <= 10, cn; i++) {
+			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(find_chan(cs->name))
 			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(Chead, cn);
-				if (cn) {
-					cs = lnode_get(cn);
-				} else {
-					break;
-				}
 				continue;
 			}
 			irc_prefmsg(ss_bot, cmdparams->source, "Channel %s -> %ld Joins", 
 				cs->name, cs->totmem);
 			cn = list_next(Chead, cn);
-			if (cn) {
-				cs = lnode_get(cn);
-			} else {
-				break;
-			}
 		}
 		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "KICKS")) {
@@ -507,32 +487,22 @@ static int ss_chans(CmdParams* cmdparams)
 			list_sort(Chead, topkick);
 		}
 		cn = list_first(Chead);
-		cs = lnode_get(cn);
 		irc_prefmsg(ss_bot,cmdparams->source, 
 			"Top10 Most un-welcome Channels (Ever):");
 		irc_prefmsg(ss_bot,cmdparams->source, 
 			"======================================");
 		for (i = 0; i <= 10; i++) {
+			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(find_chan(cs->name))
 			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(Chead, cn);
-				if (cn) {
-					cs = lnode_get(cn);
-				} else {
-					break;
-				}
 				continue;
 			}
 			irc_prefmsg(ss_bot, cmdparams->source, "Channel %s -> %ld Kicks", 
 				cs->name, cs->kicks);
 			cn = list_next(Chead, cn);
-			if (cn) {
-				cs = lnode_get(cn);
-			} else {
-				break;
-			}
 		}
 		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "TOPICS")) {
@@ -541,30 +511,20 @@ static int ss_chans(CmdParams* cmdparams)
 			list_sort(Chead, toptopics);
 		}
 		cn = list_first(Chead);
-		cs = lnode_get(cn);
 		irc_prefmsg(ss_bot, cmdparams->source, "Top10 Most undecisive Channels (Ever):");
 		irc_prefmsg(ss_bot, cmdparams->source, "======================================");
 		for (i = 0; i <= 10; i++) {
+			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(find_chan(cs->name))
 			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(Chead, cn);
-				if (cn) {
-					cs = lnode_get(cn);
-				} else {
-					break;
-				}
 				continue;
 			}
 			irc_prefmsg(ss_bot, cmdparams->source, "Channel %s -> %ld Topics", 
 				cs->name, cs->topics);
 			cn = list_next(Chead, cn);
-			if (cn) {
-				cs = lnode_get(cn);
-			} else {
-				break;
-			}
 		}
 		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else {

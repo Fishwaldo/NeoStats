@@ -245,6 +245,9 @@
 				RelativePath="..\include\bans.h">
 			</File>
 			<File
+				RelativePath="..\include\base64.h">
+			</File>
+			<File
 				RelativePath="..\include\bots.h">
 			</File>
 			<File

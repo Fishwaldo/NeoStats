@@ -37,6 +37,7 @@
 #include "bans.h"
 #include "auth.h"
 #include "dns.h"
+#include "base64.h"
 
 typedef struct ircd_sym {
 	void **ptr;
@@ -925,7 +926,7 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
 			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", CmodeCharToPrefix (mode[1]), botptr->u->name);
 			irc_send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
 		}
-		join_chan (botptr->u->name, chan);
+		JoinChannel (botptr->u->name, chan);
 		/* Increment number of persistent users if needed */
 		if (botptr->flags & BOT_FLAG_PERSIST) {
 			c->persistentusers ++;
@@ -937,7 +938,7 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
 	}
 	/* sjoin not available so use normal join */	
 	irc_send_join (botptr->u->name, chan, me.now);
-	join_chan (botptr->u->name, chan);
+	JoinChannel (botptr->u->name, chan);
 	if (mode) {
 		irc_chanusermode (botptr, chan, mode, botptr->u->name);
 	}
@@ -965,8 +966,8 @@ irc_part (const Bot *botptr, const char *chan)
 	if (botptr->flags & BOT_FLAG_PERSIST) {
 		c->persistentusers --;
 	}
-	irc_send_part(botptr->u->name, chan);
-	part_chan (botptr->u, (char *) chan, NULL);
+	irc_send_part (botptr->u->name, chan);
+	PartChannel (botptr->u, (char *) chan, NULL);
 	return NS_SUCCESS;
 }
 
@@ -986,7 +987,7 @@ irc_nickchange (const Bot *botptr, const char *newnick)
 		nlog (LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", botptr->name, newnick);
 		return NS_FAILURE;
 	}
-	UserNick (botptr->name, newnick, NULL);
+	UserNickChange (botptr->name, newnick, NULL);
 	irc_send_nickchange (botptr->name, newnick, me.now);
 	return NS_SUCCESS;
 }
@@ -1065,7 +1066,7 @@ int
 irc_chanusermode (const Bot *botptr, const char *chan, const char *mode, const char *target)
 {
 	if ((ircd_srv.protocol & PROTOCOL_B64NICK)) {
-		irc_send_cmode (me.name, botptr->u->name, chan, mode, nicktobase64 (target), me.now);
+		irc_send_cmode (me.name, botptr->u->name, chan, mode, nick_to_base64 (target), me.now);
 	} else {
 		irc_send_cmode (me.name, botptr->u->name, chan, mode, target, me.now);
 	}
@@ -1118,7 +1119,7 @@ irc_kick (const Bot *botptr, const char *chan, const char *target, const char *r
 		return NS_FAILURE;
 	}
 	irc_send_kick (botptr->u->name, chan, target, reason);
-	part_chan (find_user (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
+	PartChannel (find_user (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
 	return NS_SUCCESS;
 }
 
@@ -1636,7 +1637,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 	int paramidx = 0;
 
 	if (*modes == '#') {
-		join_chan (sjoinnick, modes);
+		JoinChannel (sjoinnick, modes);
 		return;
 	}
 
@@ -1658,7 +1659,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 			nicklist ++;
 		}
 		strlcpy (nick, nicklist, MAXNICK);
-		join_chan (nick, channame); 
+		JoinChannel (nick, channame); 
 		ChanUserMode (channame, nick, 1, mask);
 		paramidx++;
 		ok = 1;
@@ -1666,7 +1667,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 	c = find_chan (channame);
 	if (c) {
 		/* update the TS time */
-		SetChanTS (c, atoi (tstime)); 
+		c->creationtime = atoi (tstime);
 		j = ChanModeHandler (c, modes, j, argv, argc);
 	}
 	ns_free(param);
@@ -1703,14 +1704,14 @@ do_join (const char* nick, const char* chanlist, const char* keys)
 		t = s + strcspn (s, ",");
 		if (*t)
 			*t++ = 0;
-		join_chan (nick, s);
+		JoinChannel (nick, s);
 	}
 }
 
 void 
 do_part (const char* nick, const char* chan, const char* reason)
 {
-	part_chan (find_user (nick), chan, reason);
+	PartChannel (find_user (nick), chan, reason);
 }
 
 void 
@@ -1768,7 +1769,7 @@ do_squit(const char *name, const char* reason)
 void
 do_kick (const char *kickby, const char *chan, const char *kicked, const char *kickreason)
 {
-	kick_chan (kickby, chan, kicked, kickreason);
+	KickChannel (kickby, chan, kicked, kickreason);
 }
 
 void 
@@ -1856,13 +1857,13 @@ do_vhost (const char* nick, const char *vhost)
 void
 do_nickchange (const char * oldnick, const char *newnick, const char * ts)
 {
-	UserNick (oldnick, newnick, ts);
+	UserNickChange (oldnick, newnick, ts);
 }
 
 void 
 do_topic (const char* chan, const char *owner, const char* ts, const char *topic)
 {
-	ChanTopic (chan, owner, ts, topic);
+	ChannelTopic (chan, owner, ts, topic);
 }
 
 void 
@@ -1909,12 +1910,13 @@ do_swhois (char *who, char *swhois)
 void 
 do_tkl(const char *add, const char *type, const char *user, const char *host, const char *setby, const char *tsexpire, const char *tsset, const char *reason)
 {
-	char mask[MAXHOST];
+	static char mask[MAXHOST];
+
 	ircsnprintf(mask, MAXHOST, "%s@%s", user, host);
 	if (add[0] == '+') {
-		AddBan(type, user, host, mask, reason, setby, tsset, tsexpire);
+		AddBan (type, user, host, mask, reason, setby, tsset, tsexpire);
 	} else {
-		DelBan(type, user, host, mask, reason, setby, tsset, tsexpire);
+		DelBan (type, user, host, mask, reason, setby, tsset, tsexpire);
 	}
 }
 

@@ -61,63 +61,59 @@ const char *hs_help_add[] = {
 };
 
 const char *hs_help_del[] = {
-	"Syntax: \2DEL <ACCESS LIST #>\2",
+	"Syntax: \2DEL <nick>\2",
 	"",
-	"Delete a vhost.",
-	"Use \2LIST\2 to find the number to use in this command",
+	"Delete the vhost for <nick>.",
 	NULL
 };
 
 const char *hs_help_view[] = {
-	"Syntax: \2VIEW <ACCESS LIST #>\2",
+	"Syntax: \2VIEW <nick>\2",
 	"",
-	"View Detailed information about a vhost.",
-	"Use \2LIST\2 to find the number to use in this command",
+	"View detailed information about the vhost for <nick>.",
 	NULL
 };
 
 const char *hs_help_list[] = {
-	"Syntax: \2LIST <startpos>\2",
+	"Syntax: \2LIST\2",
+	"        \2LIST <startpos>\2",
 	"",
-	"Lists the people and vhosts in the database",
+	"Lists the current vhosts stored in the database.",
 	"For more descriptive info on a vhost see \2HELP VIEW\2",
 	"",
-	"If you supply a value for startpos (optional) the list",
-	"will start at that position",
+	"Optional startpos will start listing from that position",
 	NULL
 };
 
 const char *hs_help_login[] = {
 	"Syntax: \2LOGIN <NICK> <PASSWORD>\2",
 	"",
-	"Login to HostServ with your NICK and PASSWORD and your",
-	"vhost will be assigned to your nick on successful login.",
+	"Sets your vhost if it was not set when you connect to IRC",
+	"or you are connecting from a different host.",
 	NULL
 };
 
 const char *hs_help_chpass[] = {
 	"Syntax: \2CHPASS <NICK> <OLDPASS> <NEWPASS>\2",
 	"",
-	"Use this command to change the password assigned to your",
-	"vhost account. You must supply your current password and",
-	"a valid account for it to be successful",
+	"Change the password for your vhost.",
 	NULL
 };
 
 const char *hs_help_bans[] = {
-	"Syntax: \2BANS\2",
+	"Syntax: \2BANS LIST\2",
 	"        \2BANS ADD <hostname>\2",
-	"        \2BANS DEL <index>\2",
+	"        \2BANS DEL <hostname>\2",
 	"",
 	"Maintain the list of banned vhosts.",
-	"\2BANS\2 lists current vhosts that are banned by network",
-	"administration.",
 	"",
-	"Service Roots may also add a banned vhost to the list using"
-	"ADD. Wildcards, like *fbi* are permitted.",
+	"\2LIST\2 list banned vhosts.",
 	"",
-	"DEL will delete a banned vhost with ID number index",
-	"Use \2BANS\2 to find the index",
+	"\2ADD\2 add a banned vhost.",
+	"Wildcards, like *host* are permitted.",
+	"",
+	"\DEL\2 delete a banned vhost.",
+	"hostname must match the one used to add the vhost.",
 	NULL
 };
 

@@ -20,113 +20,166 @@
 ** NeoStats CVS Identification
 ** $Id$
 */
+
 #include "neostats.h"
 #include "ircd.h"
 #include "servers.h"
 #include "users.h"
+#include "base64.h"
 
-/** @brief setserverbase64
+/** Base64 subsystem
  *
- *  @return none
+ *  base64 nick/server etc support functions 
  */
-void setserverbase64 (const char *name, const char* num)
+
+/*  TODO:
+ *  - Create secondary user/server hash tables to speed up base64 lookups.
+ *  - Extend base64 support to IRCds other than IRCu, e.g. Unreal.
+ */
+
+/** @brief base64 lookup tables for fast conversion
+ */
+static char base64tochar[65];
+static unsigned int base64toint[256];
+
+/** @brief set_server_base64
+ *
+ *  Set server base64 string
+ *  NeoStats core use and protocol use only.
+ *
+ *  @param name of server to find
+ *  @param base64name to set
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int set_server_base64 (const char *name, const char* base64name)
 {
 	Client *s;
 
-	s = find_server(name);
-	if (s) {
-		dlog (DEBUG1, "setserverbase64: setting %s to %s", name, num);
-		strlcpy(s->name64, num, 6);
-	} else {
-		dlog (DEBUG1, "setserverbase64: cannot find %s for %s", name, num);
+	s = find_server (name);
+	if (!s) {
+		dlog (DEBUG1, "set_server_base64: cannot find %s for %s", name, base64name);
+		return NS_FAILURE;
 	}
+	dlog (DEBUG1, "set_server_base64: setting %s to %s", name, base64name);
+	strlcpy (s->name64, base64name, 6);
+	return NS_SUCCESS;
 }
 
-/** @brief servertobase64
+/** @brief server_to_base64
  *
- *  @return base64
+ *  Get server base64name from name
+ *  NeoStats core use and protocol use only.
+ *
+ *  @param name of server to get base64 string for
+ *
+ *  @return base64 name or NULL if not found
  */
-char *servertobase64 (const char* name)
+
+char *server_to_base64 (const char* name)
 {
 	Client *s;
 
-	dlog (DEBUG1, "servertobase64: scanning for %s", name);
-	s = find_server(name);
+	dlog (DEBUG1, "server_to_base64: scanning for %s", name);
+	s = find_server (name);
 	if (s) {
 		return s->name64;
-	} else {
-		dlog (DEBUG1, "servertobase64: cannot find %s", name);
 	}
+	dlog (DEBUG1, "server_to_base64: cannot find %s", name);
 	return NULL;
 }
 
-/** @brief base64toserver
+/** @brief base64_to_server
  *
- *  @return server name
+ *  Get server name from base64 name
+ *  NeoStats core use and protocol use only.
+ *
+ *  @param base64name to find
+ *
+ *  @return name or NULL if not found
  */
-char *base64toserver (const char* num)
+
+char *base64_to_server (const char* base64name)
 {
 	Client *s;
 
-	dlog (DEBUG1, "base64toserver: scanning for %s", num);
-	s = findserverbase64(num);
+	dlog (DEBUG1, "base64_to_server: scanning for %s", base64name);
+	s = find_server_base64 (base64name);
 	if (s) {
 		return s->name;
-	} else {
-		dlog (DEBUG1, "base64toserver: cannot find %s", num);
 	}
+	dlog (DEBUG1, "base64_to_server: cannot find %s", base64name);
 	return NULL;
 }
 
-/** @brief setnickbase64
+/** @brief set_nick_base64
  *
- *  @return none
+ *  Set user base64 string
+ *  NeoStats core use and protocol use only.
+ *
+ *  @param name of server to find
+ *  @param base64name to set
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-void setnickbase64 (const char *nick, const char* num)
+
+int set_nick_base64 (const char *nick, const char* base64name)
 {
 	Client *u;
 
-	u = find_user(nick);
-	if (u) {
-		dlog (DEBUG1, "setnickbase64: setting %s to %s", nick, num);
-		strlcpy(u->name64, num, B64SIZE);
-	} else {
-		dlog (DEBUG1, "setnickbase64: cannot find %s for %s", nick, num);
+	u = find_user (nick);
+	if (!u) {
+		dlog (DEBUG1, "set_nick_base64: cannot find %s for %s", nick, base64name);
+		return NS_FAILURE;
 	}
+	dlog (DEBUG1, "set_nick_base64: setting %s to %s", nick, base64name);
+	strlcpy (u->name64, base64name, B64SIZE);
+	return NS_SUCCESS;
 }
 
-/** @brief nicktobase64
+/** @brief nick_to_base64
  *
- *  @return base64
+ *  Get user base64name from name
+ *  NeoStats core use and protocol use only.
+ *
+ *  @param name of user to get base64 string for
+ *
+ *  @return base64 name or NULL if not found
  */
-char *nicktobase64 (const char* nick)
+
+char *nick_to_base64 (const char* nick)
 {
 	Client *u;
 
-	dlog (DEBUG1, "nicktobase64: scanning for %s", nick);
-	u = find_user(nick);
+	dlog (DEBUG1, "nick_to_base64: scanning for %s", nick);
+	u = find_user (nick);
 	if (u) {
 		return u->name64;
-	} else {
-		dlog (DEBUG1, "nicktobase64: cannot find %s", nick);
 	}
+	dlog (DEBUG1, "nick_to_base64: cannot find %s", nick);
 	return NULL;
 }
 
-/** @brief base64tonick
+/** @brief base64_to_nick
  *
- *  @return nickname
+ *  Get user name from base64 name
+ *  NeoStats core use and protocol use only.
+ *
+ *  @param base64name to find
+ *
+ *  @return name or NULL if not found
  */
-char *base64tonick (const char* num)
+
+char *base64_to_nick (const char* base64name)
 {
 	Client *u;
 
-	dlog (DEBUG1, "base64tonick: scanning for %s", num);
-	u = finduserbase64(num);
+	dlog (DEBUG1, "base64_to_nick: scanning for %s", base64name);
+	u = find_user_base64 (base64name);
 	if (u) {
 		return u->name;
-	} else {
-		dlog (DEBUG1, "base64tonick: cannot find %s", num);
 	}
+	dlog (DEBUG1, "base64_to_nick: cannot find %s", base64name);
 	return NULL;
 }

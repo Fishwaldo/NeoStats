@@ -237,8 +237,6 @@ typedef enum Event {
 /*  EVENT_TOPIC 
  *    parameters:
  *      channel in cmdparams->channel
- *      owner in cmdparams->av[0]
- *      topic in cmdparams->av[1]
  */
 	EVENT_TOPIC,
 
@@ -364,27 +362,13 @@ typedef enum Event {
 
 /*  EVENT_ADDBAN
  *    parameters:
- *      cmdparams->av[0] type
- *      cmdparams->av[1] user
- *      cmdparams->av[2] host
- *      cmdparams->av[3] mask
- *      cmdparams->av[4] reason
- *      cmdparams->av[5] setby
- *      cmdparams->av[6] tsset
- *      cmdparams->av[7] tsexpires
+ *      cmdparams->param pointer to Ban struct
  */
 	EVENT_ADDBAN,
 
 /*  EVENT_DELBAN
  *    parameters:
- *      cmdparams->av[0] type
- *      cmdparams->av[1] user
- *      cmdparams->av[2] host
- *      cmdparams->av[3] mask
- *      cmdparams->av[4] reason
- *      cmdparams->av[5] setby
- *      cmdparams->av[6] tsset
- *      cmdparams->av[7] tsexpires
+ *      cmdparams->param pointer to Ban struct
  */
 	EVENT_DELBAN,
 

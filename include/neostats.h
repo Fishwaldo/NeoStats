@@ -285,9 +285,9 @@ EXPORTFUNC int IsOperMode(const char mode);
 EXPORTFUNC int IsOperSMode(const char mode);
 EXPORTFUNC int IsBotMode(const char mode);
 EXPORTFUNC int UmodeCharToMask(const char mode);
-EXPORTFUNC const char * GetUmodeDesc (const unsigned int mask);
+EXPORTFUNC const char *GetUmodeDesc (const unsigned int mask);
 EXPORTFUNC int SmodeCharToMask(const char mode);
-EXPORTFUNC const char * GetSmodeDesc (const unsigned int mask);
+EXPORTFUNC const char *GetSmodeDesc (const unsigned int mask);
 EXPORTFUNC unsigned int UmodeStringToMask (const char *UmodeString);
 EXPORTFUNC char *UmodeMaskToString (const unsigned int mask);
 EXPORTFUNC char UmodeMaskToChar (const unsigned int mask);
@@ -520,7 +520,7 @@ typedef struct User {
 	unsigned int Smode;
 	int ulevel;
 	list_t *chans;
-	Bot * bot;
+	Bot *bot;
 } User;
 
 /** @brief Client structure
@@ -641,9 +641,9 @@ typedef struct Channel {
 typedef struct CmdParams {
 	Client *source;
 	Client *target;
-	Bot * bot;
-	char* param;
-	char* cmd;
+	Bot *bot;
+	char *param;
+	char *cmd;
 	Channel* channel;
 	char **av;
 	int ac;
@@ -680,8 +680,8 @@ typedef struct bot_cmd {
 	bot_cmd_handler	handler;	/* handler */
 	int				minparams;	/* min num params */
 	int				ulevel;		/* min user level */
-	const char**	helptext;	/* pointer to help text */
-	const char* 	onelinehelp;/* single line help for generic help function */
+	const char		**helptext;	/* pointer to help text */
+	const char		*onelinehelp;/* single line help for generic help function */
 }bot_cmd;
 
 /** @brief flags for bots
@@ -744,26 +744,21 @@ typedef enum SET_TYPE {
 	SET_TYPE_CUSTOM,	/* handled by module */
 }SET_TYPE;
 
-typedef union uval {
-	char*			s;
-	unsigned int	i;
-}uval;
-
 /** @brief bot_setting structure
  *  defines SET list for bots
  */
 typedef struct bot_setting {
 	char			*option;	/* option string */
-	void*			varptr;		/* pointer to var */
+	void			*varptr;		/* pointer to var */
 	SET_TYPE		type;		/* type of var */
 	int				min;		/* min value */
 	int				max;		/* max value */
 	int				ulevel;		/* min user level */
 	char			*confitem;	/* config string for kptool */
 	const char		*desc;		/* description of setting for messages e.g. seconds, days*/
-	const char**	helptext;	/* pointer to help text */
+	const char		**helptext;	/* pointer to help text */
 	bot_set_handler	handler;	/* handler for custom/post-set processing */
-	void*			defaultval; /* default value for setting */
+	void			*defaultval; /* default value for setting */
 }bot_setting;
 
 
@@ -870,7 +865,7 @@ typedef struct ModuleInfo {
 	const int padding[5];	
 }ModuleInfo;
 
-typedef int (*mod_auth) (Client * u);
+typedef int (*mod_auth) (Client *u);
 typedef int (*userauthfunc) (Client *u);
 
 /** @brief Module structure
@@ -888,14 +883,14 @@ typedef struct Module {
 	unsigned int error;
 }Module;
 
-extern Module* RunModule[10];
+extern Module *RunModule[10];
 extern int RunLevel;
 
 /* Simple stack to manage run level replacing original segv_module stuff 
  * which will hopefully make it easier to determine where we are running
  * and avoid the need for modules to ever manage this and the core to
  * have to set/reset when a module calls a core function which triggers
- * other modules to run (e.g. init_bot)
+ * other modules to run (e.g. AddBot)
  */
 #define SET_RUN_LEVEL(moduleptr) {if(RunLevel<10){RunLevel++;RunModule[RunLevel] = moduleptr;}}
 #define RESET_RUN_LEVEL() {if(RunLevel>0){RunLevel--;}}
@@ -908,7 +903,7 @@ extern int RunLevel;
  */
 typedef struct Sock {
 	/** Owner module ptr */
-	Module* moduleptr;
+	Module *moduleptr;
 	/** Socket number */
 	int sock_no;
 	/** Socket name */
@@ -946,7 +941,7 @@ typedef enum TIMER_TYPE {
  */
 typedef struct Timer {
 	/** Owner module ptr */
-	Module* moduleptr;
+	Module *moduleptr;
 	/** Timer type */
 	TIMER_TYPE type;
 	/** Timer name */
@@ -990,7 +985,7 @@ typedef struct BotInfo {
 
 typedef struct _Bot {
 	/** Owner module ptr */
-	Module* moduleptr;
+	Module *moduleptr;
 	/** Nick */
 	char name[MAXNICK];
 	/* bot flags */
@@ -1004,12 +999,12 @@ typedef struct _Bot {
 	/* min ulevel for settings */
 	int set_ulevel;
 	/* Link back to user struct associated with this bot*/
-	Client * u;
+	Client *u;
 }_Bot;
 
 EXPORTFUNC int ModuleConfig(bot_setting *bot_settings);
 
-EXPORTFUNC int add_timer (TIMER_TYPE type, timer_function func, const char* name, int interval);
+EXPORTFUNC int add_timer (TIMER_TYPE type, timer_function func, const char *name, int interval);
 EXPORTFUNC int del_timer (const char *timer_name);
 EXPORTFUNC int set_timer_interval (const char *timer_name, int interval);
 EXPORTFUNC Timer *find_timer(const char *timer_name);
@@ -1021,7 +1016,7 @@ EXPORTFUNC Sock *find_sock (const char *sock_name);
 EXPORTFUNC int sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, sock_func func_read, sock_func func_write, sock_func func_error);
 EXPORTFUNC int sock_disconnect (const char *name);
 
-EXPORTFUNC Bot *init_bot (BotInfo *botinfo);
+EXPORTFUNC Bot *AddBot (BotInfo *botinfo);
 EXPORTFUNC Bot *find_bot (const char *bot_name);
 
 /* keeper interface */
@@ -1045,21 +1040,21 @@ EXPORTFUNC int GetData (void **data, int type, const char *table, const char *ro
 EXPORTFUNC void flush_keeper();
 
 /* main.c */
-void do_exit (NS_EXIT_TYPE exitcode, char* quitmsg) __attribute__((noreturn));
-EXPORTFUNC void fatal_error(char* file, int line, char* func, char* error_text) __attribute__((noreturn));;
+void do_exit (NS_EXIT_TYPE exitcode, char *quitmsg) __attribute__((noreturn));
+EXPORTFUNC void fatal_error(char *file, int line, char *func, char *error_text) __attribute__((noreturn));;
 #define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__,(error_text)); 
 
 /* nsmemory.c */
 EXPORTFUNC void *ns_malloc (const int size);
 EXPORTFUNC void *ns_calloc (const int size);
-EXPORTFUNC void *ns_realloc (void* ptr, const int size);
+EXPORTFUNC void *ns_realloc (void *ptr, const int size);
 EXPORTFUNC void _ns_free (void **buf);
 #define ns_free(ptr) _ns_free ((void **) &(ptr));
 
 /* misc.c */
-EXPORTFUNC void strip (char * line);
-EXPORTFUNC char *sstrdup (const char * s);
-char *strlwr (char * s);
+EXPORTFUNC void strip (char *line);
+EXPORTFUNC char *sstrdup (const char *s);
+char *strlwr (char *s);
 EXPORTFUNC void AddStringToList (char ***List, char S[], int *C);
 EXPORTFUNC void strip_mirc_codes(char *text);
 EXPORTFUNC char *sctime (time_t t);
@@ -1103,7 +1098,7 @@ EXPORTFUNC int irc_part (const Bot *botptr, const char *chan);
 EXPORTFUNC int irc_kick (const Bot *botptr, const char *chan, const char *target, const char *reason);
 EXPORTFUNC int irc_invite (const Bot *botptr, const char *target, const char *chan);
 EXPORTFUNC int irc_cloakhost (const Bot *botptr);
-EXPORTFUNC int irc_setname (const Bot *botptr, const char* realname);
+EXPORTFUNC int irc_setname (const Bot *botptr, const char *realname);
 
 /*  Mode functions
  */
@@ -1118,8 +1113,8 @@ EXPORTFUNC int irc_kill (const Bot *botptr, const char *target, const char *reas
 EXPORTFUNC int irc_akill (const Bot *botptr, const char *host, const char *ident, const unsigned long length, const char *reason, ...);
 EXPORTFUNC int irc_rakill (const Bot *botptr, const char *host, const char *ident);
 EXPORTFUNC int irc_swhois (const char *target, const char *swhois);
-EXPORTFUNC int irc_sethost (const Bot *botptr, const char* host);
-EXPORTFUNC int irc_setident (const Bot *botptr, const char* ident);
+EXPORTFUNC int irc_sethost (const Bot *botptr, const char *host);
+EXPORTFUNC int irc_setident (const Bot *botptr, const char *ident);
 
 int irc_ping (const char *source, const char *reply, const char *to);
 int irc_pong (const char *reply);
@@ -1138,7 +1133,7 @@ EXPORTFUNC int irc_svstime (const Bot *botptr, Client *target, const time_t ts);
 /*  CTCP functions to correctly format CTCP requests and replies
  */
 EXPORTFUNC int irc_ctcp_version_req (Bot* botptr, Client* target);
-EXPORTFUNC int irc_ctcp_version_rpl (Bot* botptr, Client* target, const char* version);
+EXPORTFUNC int irc_ctcp_version_rpl (Bot* botptr, Client* target, const char *version);
 EXPORTFUNC int irc_ctcp_ping_req (Bot* botptr, Client* target);
 
 EXPORTFUNC int irc_ctcp_finger_req (Bot* botptr, Client* target);
@@ -1154,9 +1149,9 @@ EXPORTFUNC Client *find_server (const char *name);
 
 /* chans.c */
 EXPORTFUNC Channel *find_chan (const char *chan);
-EXPORTFUNC int CheckChanMode (Channel * c, const unsigned int mode);
+EXPORTFUNC int CheckChanMode (Channel *c, const unsigned int mode);
 EXPORTFUNC int IsChanMember(Channel *c, Client *u);
-EXPORTFUNC int test_cumode(char* chan, char* nick, int flag);
+EXPORTFUNC int test_cumode(char *chan, char *nick, int flag);
 
 #define is_chanop(chan, nick)		test_cumode(chan, nick, CUMODE_CHANOP)
 #define is_chanhalfop(chan, nick)	test_cumode(chan, nick, CUMODE_HALFOP)
@@ -1177,7 +1172,7 @@ EXPORTFUNC int add_services_cmd_list (bot_cmd* bot_cmd_list);
 EXPORTFUNC int add_services_set_list (bot_setting *bot_setting_list);
 EXPORTFUNC int del_services_cmd_list (bot_cmd* bot_cmd_list);
 EXPORTFUNC int del_services_set_list (bot_setting *bot_setting_list);
-EXPORTFUNC Client * find_valid_user(Bot* botptr, Client * u, const char* target_nick);
+EXPORTFUNC Client *find_valid_user(Bot* botptr, Client *u, const char *target_nick);
 
 /* transfer.c stuff */
 typedef void (transfer_callback) (void *data, int returncode, char *body, int bodysize);
@@ -1196,16 +1191,17 @@ EXPORTFUNC int new_transfer(char *url, char *params, NS_TRANSFER savetofileormem
 /* Mark server as synched */
 #define SynchServer(x) (((x)->flags |= CLIENT_FLAG_SYNCHED))
 
-EXPORTFUNC int validate_nick (char* nick);
-EXPORTFUNC int validate_user (char* user);
-EXPORTFUNC int validate_host (char* host);
-EXPORTFUNC int validate_url (char* url);
+EXPORTFUNC int validate_nick (char *nick);
+EXPORTFUNC int validate_user (char *username);
+EXPORTFUNC int validate_host (char *hostname);
+EXPORTFUNC int validate_url (char *url);
+EXPORTFUNC int validate_channel (char *channel_name);
 
 #ifdef HAVE_DB_H
 EXPORTFUNC int DBOpenDatabase(void);
 EXPORTFUNC void DBCloseDatabase(void);
-EXPORTFUNC void* DBGetData(char* key);
-EXPORTFUNC void DBSetData(char* key, void * data, int size);
+EXPORTFUNC void *DBGetData(char *key);
+EXPORTFUNC void DBSetData(char *key, void *data, int size);
 #endif
 
 /* log.c API export */
@@ -1269,11 +1265,11 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 EXPORTFUNC void nlog (LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC void dlog (DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
-typedef void (*ChannelListHandler) (Channel * c);
+typedef void (*ChannelListHandler) (Channel *c);
 EXPORTFUNC void GetChannelList(ChannelListHandler handler);
-typedef void (*UserListHandler) (Client * u);
+typedef void (*UserListHandler) (Client *u);
 EXPORTFUNC void GetUserList(UserListHandler handler);
-typedef void (*ServerListHandler) (Client * s);
+typedef void (*ServerListHandler) (Client *s);
 EXPORTFUNC void GetServerList(ServerListHandler handler);
 
 EXPORTFUNC hash_t *GetServerHash (void);
@@ -1284,10 +1280,10 @@ EXPORTFUNC hash_t *GetModuleHash (void);
 
 EXPORTFUNC int HaveFeature (int mask);
 
-EXPORTFUNC void RegisterEvent (ModuleEvent* event);
-EXPORTFUNC void RegisterEventList (ModuleEvent* event);
+EXPORTFUNC void RegisterEvent (ModuleEvent *event);
+EXPORTFUNC void RegisterEventList (ModuleEvent *event);
 EXPORTFUNC void DeleteEvent (Event event);
-EXPORTFUNC void DeleteEventList (ModuleEvent* event);
+EXPORTFUNC void DeleteEventList (ModuleEvent *event);
 EXPORTFUNC void SetAllEventFlags (unsigned int flag, unsigned int enable);
 EXPORTFUNC void SetEventFlags (Event event, unsigned int flag, unsigned int enable);
 EXPORTFUNC void EnableEvent (Event event);
@@ -1314,23 +1310,23 @@ EXPORTFUNC extern int match(const char *mask, const char *name);
 EXPORTVAR int os_errno;
 
 EXPORTFUNC int os_mkdir (const char *filename, mode_t mode);
-EXPORTFUNC int os_check_create_dir (const char* dirname);
-EXPORTFUNC FILE* os_fopen (const char * filename, const char * filemode);
-EXPORTFUNC int os_fclose (FILE* handle);
-EXPORTFUNC int os_fseek (FILE* handle, long offset, int origin);
-EXPORTFUNC long os_ftell (FILE* handle);
-EXPORTFUNC int os_fprintf (FILE* handle, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC int os_fread (void *buffer, size_t size, size_t count, FILE* handle);
-EXPORTFUNC char* os_fgets (char *string, int n, FILE* handle);
-EXPORTFUNC int os_fwrite (const void *buffer, size_t size, size_t count, FILE* handle);
-EXPORTFUNC int os_fflush (FILE* handle);
-EXPORTFUNC int os_rename (const char* oldname, const char* newname);
+EXPORTFUNC int os_check_create_dir (const char *dirname);
+EXPORTFUNC FILE *os_fopen (const char *filename, const char *filemode);
+EXPORTFUNC int os_fclose (FILE *handle);
+EXPORTFUNC int os_fseek (FILE *handle, long offset, int origin);
+EXPORTFUNC long os_ftell (FILE *handle);
+EXPORTFUNC int os_fprintf (FILE *handle, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC int os_fread (void *buffer, size_t size, size_t count, FILE *handle);
+EXPORTFUNC char *os_fgets (char *string, int n, FILE *handle);
+EXPORTFUNC int os_fwrite (const void *buffer, size_t size, size_t count, FILE *handle);
+EXPORTFUNC int os_fflush (FILE *handle);
+EXPORTFUNC int os_rename (const char *oldname, const char *newname);
 EXPORTFUNC int os_stat (const char *path, struct stat *buffer);
 EXPORTFUNC int os_access(const char *path, int mode);
-EXPORTFUNC char* os_strerror (void);
+EXPORTFUNC char *os_strerror (void);
 EXPORTFUNC size_t os_strftime (char *strDest, size_t maxsize, const char *format, const struct tm *timeptr);
 EXPORTFUNC struct tm* os_localtime (const time_t *timer);
-EXPORTFUNC int os_file_get_size (const char* filename);
+EXPORTFUNC int os_file_get_size (const char *filename);
 EXPORTFUNC void *os_memset (void *dest, int c, size_t count);
 EXPORTFUNC void *os_memcpy (void *dest, const void *src, size_t count);
 
@@ -1341,8 +1337,8 @@ typedef SOCKET OS_SOCKET;
 typedef int OS_SOCKET;
 #endif
 EXPORTFUNC int os_sock_close (OS_SOCKET sock);
-EXPORTFUNC int os_sock_write (OS_SOCKET s, const char* buf, int len);
-EXPORTFUNC int os_sock_read (OS_SOCKET s, char* buf, int len);
+EXPORTFUNC int os_sock_write (OS_SOCKET s, const char *buf, int len);
+EXPORTFUNC int os_sock_read (OS_SOCKET s, char *buf, int len);
 EXPORTFUNC int os_sock_set_nonblocking (OS_SOCKET s);
 
 /* 
@@ -1356,16 +1352,16 @@ MODULEFUNC void ModFini (void);
 /* Module Event Interface */
 MODULEVAR extern ModuleEvent module_events[];  
 /* Module Auth Interface */
-MODULEFUNC int ModAuthUser (Client * u);
+MODULEFUNC int ModAuthUser (Client *u);
 
 EXPORTFUNC void clear_channel_moddata (Channel* c);
-EXPORTFUNC void set_channel_moddata (Channel* c, void * data);
+EXPORTFUNC void set_channel_moddata (Channel* c, void *data);
 EXPORTFUNC void *get_channel_moddata (Channel* c);
 EXPORTFUNC void clear_user_moddata (Client* u);
-EXPORTFUNC void set_user_moddata (Client* u, void * data);
+EXPORTFUNC void set_user_moddata (Client* u, void *data);
 EXPORTFUNC void *get_user_moddata (Client* u);
 EXPORTFUNC void clear_server_moddata (Client* s);
-EXPORTFUNC void set_server_moddata (Client* s, void * data);
+EXPORTFUNC void set_server_moddata (Client* s, void *data);
 EXPORTFUNC void *get_server_moddata (Client* s);
 
 #endif /* NEOSTATS_H */

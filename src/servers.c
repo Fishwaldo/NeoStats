@@ -139,7 +139,7 @@ DelServer (const char *name, const char* reason)
 }
 
 Client *
-findserverbase64 (const char *num)
+find_server_base64 (const char *num)
 {
 	Client *s;
 	hscan_t ss;
@@ -149,11 +149,11 @@ findserverbase64 (const char *num)
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
 		if(strncmp(s->name64, num, BASE64SERVERSIZE) == 0) {
-			dlog(DEBUG1, "findserverbase64: %s -> %s", num, s->name);
+			dlog(DEBUG1, "find_server_base64: %s -> %s", num, s->name);
 			return s;
 		}
 	}
-	dlog(DEBUG3, "findserverbase64: %s not found!", num);
+	dlog(DEBUG3, "find_server_base64: %s not found!", num);
 	return NULL;
 }
 

@@ -116,7 +116,7 @@ int ModInit (Module *mod_ptr)
 
 int ModSynch (void)
 {
-	ls_bot = init_bot(&ls_botinfo);
+	ls_bot = AddBot (&ls_botinfo);
 	if (!ls_bot) {
 		return NS_FAILURE;
 	}

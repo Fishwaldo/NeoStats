@@ -24,9 +24,9 @@
 #ifndef _AUTH_H_
 #define _AUTH_H_
 
-int InitAuth(void);
-int init_auth_module (Module *mod_ptr);
-int delete_auth_module (Module *mod_ptr);
-int UserAuth(Client *u);
+int InitAuth (void);
+int AddAuthModule (Module *mod_ptr);
+int DelAuthModule (Module *mod_ptr);
+int AuthUser (Client *u);
 
 #endif /* _AUTH_H_ */

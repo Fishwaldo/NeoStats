@@ -27,8 +27,8 @@
 #include "users.h"
 #include "ircd.h"
 
-static void client_private (char* origin, char **av, int ac, int cmdptr);
-static void client_notice (char* origin, char **av, int ac, int cmdptr);
+static void m_private (char* origin, char **av, int ac, int cmdptr);
+static void m_notice (char* origin, char **av, int ac, int cmdptr);
 static void m_mode (char *origin, char **argv, int argc, int srv);
 static void m_kill (char *origin, char **argv, int argc, int srv);
 static void m_away (char *origin, char **argv, int argc, int srv);
@@ -62,8 +62,8 @@ ProtocolInfo protocol_info = {
 
 ircd_cmd cmd_list[] = {
 	/*Message	Token	Function	usage */
-	{MSG_PRIVATE, 0, client_private, 0},
-	{MSG_NOTICE, 0, client_notice, 0},
+	{MSG_PRIVATE, 0, m_private, 0},
+	{MSG_NOTICE, 0, m_notice, 0},
 	{"376", 0, m_emotd, 0},
 	{MSG_SETHOST, 0, m_vhost, 0},
 	{MSG_QUIT, 0, _m_quit, 0},
@@ -444,26 +444,9 @@ m_part (char *origin, char **argv, int argc, int srv)
  * @return none
  */
 void 
-client_notice (char* origin, char **av, int ac, int cmdptr)
+m_notice (char* origin, char **av, int ac, int cmdptr)
 {
-	SET_SEGV_LOCATION();
-	if( av[0] == NULL) {
-		dlog(DEBUG1, "_m_notice: dropping notice from %s to NULL: %s", origin, av[ac-1]);
-		return;
-	}
-	dlog(DEBUG1, "_m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
-	/* who to */
-	if(av[0][0] == '#') {
-		bot_chan_notice (origin, av, ac);
-		return;
-	}
-#if 0
-	if( ircstrcasecmp(av[0], "AUTH")) {
-		dlog(DEBUG1, "_m_notice: dropping server notice from %s, to %s : %s", origin, av[0], av[ac-1]);
-		return;
-	}
-#endif
-	bot_notice (origin, av, ac);
+	_m_notice (origin, av, ac, cmdptr);
 }
 
 /** @brief process privmsg
@@ -473,31 +456,10 @@ client_notice (char* origin, char **av, int ac, int cmdptr)
  * @return none
  */
 
-void
-client_private (char* origin, char **av, int ac, int cmdptr)
+void m_private (char* origin, char **av, int ac, int cmdptr)
 {
-	char target[64];
-
-	SET_SEGV_LOCATION();
-	if( av[0] == NULL) {
-		dlog(DEBUG1, "_m_private: dropping privmsg from %s to NULL: %s", origin, av[ac-1]);
-		return;
-	}
-	dlog(DEBUG1, "_m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
-	/* who to */
-	if(av[0][0] == '#') {
-		bot_chan_private (origin, av, ac);
-		return;
-	}
 	AddFakeUser(origin);
-	if (strstr (origin, "!")) {
-		strlcpy (target, origin, 64);
-		origin = strtok (target, "!");
-	} else if (strstr (origin, "@")) {
-		strlcpy (target, origin, 64);
-		origin = strtok (target, "@");
-	}
-	bot_private (origin, av, ac);
+	_m_private (origin, av, ac, cmdptr);
 	DelFakeUser(origin);
 }
 

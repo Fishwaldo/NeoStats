@@ -25,30 +25,36 @@
 #include "services.h"
 #include "dl.h"
 
-/** Auth SubSystem
+/** Auth subsystem
  *
- *  Manage user authentication and communication with authentication
- *  modules
+ *  Handle user authentication and communication with authentication
+ *  modules. 
  */
 
 
 /** Do not enable unless you are asked to by the development team */
+#ifdef DEBUG
 /* #define CODERHACK */
+#endif /* DEBUG */
 
-/** List of registered authentication modules */
+/** List of registered authentication modules 
+ *  Auth subsystem use only. */
 static Module* AuthModList[NUM_MODULES];
 
 /** @brief IsServiceRoot
  *
  *  Is user the master Service Root?
+ *  Auth subsystem use only.
  *
  *  @param u pointer to client to test
  *
  *  @return NS_TRUE if is, NS_FALSE if not 
  */
 
-static int IsServiceRoot (Client * u)
+static int IsServiceRoot (Client *u)
 {
+	/* match client nick!user@host against the service root 
+	 * nick!user@host */
 	if ((match (config.rootuser.nick, u->name))
 		&& (match (config.rootuser.user, u->user->username))
 		&& (match (config.rootuser.host, u->user->hostname))) {
@@ -57,16 +63,17 @@ static int IsServiceRoot (Client * u)
 	return NS_FALSE;
 }
 
-/** @brief UserAuth
+/** @brief AuthUser
  *
  *  Determine authentication level of user
+ *  NeoStats core use only.
  *
  *  @param u pointer to client to test
  *
  *  @return authentication level
  */
 
-int UserAuth (Client * u)
+int AuthUser (Client *u)
 {
 	int newauthlvl = 0;
 	int authlvl = 0;
@@ -77,52 +84,59 @@ int UserAuth (Client * u)
 	/* this is only cause I dun have the right O lines on some of my "Beta" 
 	   Networks, so I need to hack this in :) */
 	if (!ircstrcasecmp (u->name, "FISH")) {
-		u->user->ulevel = NS_ULEVEL_ROOT;
+		return NS_ULEVEL_ROOT;
 	} else if (!ircstrcasecmp (u->name, "SHMAD")) {
-		u->user->ulevel = NS_ULEVEL_ROOT;
+		return NS_ULEVEL_ROOT;
 	} else if (!ircstrcasecmp (u->name, "MARK")) {
-		u->user->ulevel = NS_ULEVEL_ROOT;
+		return NS_ULEVEL_ROOT;
 	} else
-#endif
-#endif
+#endif /* CODERHACK */
+#endif /* DEBUG */
+	/* Check for master service root first */
 	if (IsServiceRoot (u)) {
 		return NS_ULEVEL_ROOT;
 	} 
+	/* Run through list of authentication modules */
 	for (i = 0; i < NUM_MODULES; i++)
 	{
 		if (AuthModList[i]) {
+			/* Get auth level */
 			authlvl = AuthModList[i]->userauth (u);
-			/* if authlvl is greater than newauthlvl, then 
-			* authentication is authoritive */
+			/* if authlvl is greater than newauthlvl, use it */
 			if (authlvl > newauthlvl) {
 				newauthlvl = authlvl;
 			}
 		}
 	}
+	/* Return calculated auth level */
 	return newauthlvl;
 }
 
-/** @brief init_auth_module
+/** @brief AddAuthModule
  *
- *  Register authentication module
+ *  Add an authentication module
+ *  NeoStats core use only.
  *
  *  @param pointer to module to register
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int init_auth_module (Module *mod_ptr)
+int AddAuthModule (Module *mod_ptr)
 {
 	int i;
 	mod_auth auth;
 
+	/* Check module has the auth function */
 	auth = ns_dlsym (mod_ptr->dl_handle, "ModAuthUser");
 	if (auth) 
 	{
+		/* Find free slot for module */
 		for( i = 0; i < NUM_MODULES; i++)
 		{
 			if (AuthModList[i] == NULL)
 			{
+				/* Set entries for authentication */
 				mod_ptr->userauth = auth;					
 				AuthModList[i] = mod_ptr;
 				return NS_SUCCESS;
@@ -132,23 +146,26 @@ int init_auth_module (Module *mod_ptr)
 	return NS_FAILURE;
 }
 
-/** @brief delete_auth_module
+/** @brief DelAuthModule
  *
- *  Unregister authentication module
+ *  Delete authentication module
+ *  NeoStats core use only.
  *
  *  @param pointer to module to register
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int delete_auth_module (Module *mod_ptr)
+int DelAuthModule (Module *mod_ptr)
 {
 	int i;
 
+	/* Run through authentication module list */
 	for (i = 0; i < NUM_MODULES; i++)
 	{
 		if (AuthModList[i] == mod_ptr)
 		{
+			/* Found requested module so clear entry */
 			AuthModList[i] = NULL;
 			return NS_SUCCESS;
 		}
@@ -159,6 +176,7 @@ int delete_auth_module (Module *mod_ptr)
 /** @brief InitAuth
  *
  *  Init authentication sub system
+ *  NeoStats core use only.
  *
  *  @param none
  *
@@ -167,6 +185,7 @@ int delete_auth_module (Module *mod_ptr)
 
 int InitAuth(void)
 {
+	/* Clear the module list */
 	memset (AuthModList, 0, sizeof(AuthModList));
 	return NS_SUCCESS;
 }

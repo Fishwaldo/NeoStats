@@ -34,6 +34,7 @@
 #include "auth.h"
 #include "services.h"
 #include "ctcp.h"
+#include "base64.h"
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
@@ -75,6 +76,27 @@ static void lookupnickip (char *data, adns_answer *a)
 	}
 }
 
+static int process_ip (const char *nick, const char *host)
+{
+	unsigned long ipaddress = 0;
+	struct in_addr *ipad;
+	int res;
+
+	/* first, if the u->host is a ip address, just convert it */
+	ipad = ns_malloc (sizeof(struct in_addr));
+	res = inet_aton (host, ipad);
+	if (res > 0) {
+		/* its valid */
+		ipaddress = htonl (ipad->s_addr);
+		ns_free (ipad);
+	} else {		
+		/* kick of a dns reverse lookup for this host */
+		dns_lookup ((char *)host, adns_r_addr, lookupnickip, (void *)nick);
+		ipaddress = 0;
+	}		
+	return ipaddress;
+}
+
 Client *AddUser (const char *nick, const char *user, const char *host, 
 	const char *realname, const char *server, const char *ip, const char *TS, 
 	const char *numeric)
@@ -92,32 +114,14 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	if (ip) {
 		ipaddress = strtoul (ip, NULL, 10);
 	} else if (!(ircd_srv.protocol&PROTOCOL_NICKIP) && me.want_nickip == 1) {
-		struct in_addr *ipad;
-		int res;
-
-		/* first, if the u->host is a ip address, just convert it */
-		ipad = ns_malloc (sizeof(struct in_addr));
-		res = inet_aton (host, ipad);
-		if (res > 0) {
-			/* its valid */
-			ipaddress = htonl (ipad->s_addr);
-			ns_free (ipad);
-		} else {		
-			/* kick of a dns reverse lookup for this host */
-			dns_lookup ((char *)host, adns_r_addr, lookupnickip, (void *)nick);
-			ipaddress = 0;
-		}		
+		ipaddress = process_ip (nick, host);
 	}
 	dlog (DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, (int)htonl (ipaddress), server, TS);
 	u = new_user (nick);
 	if (!u) {
 		return NULL;
 	}
-	if (TS) {
-		u->tsconnect = strtoul (TS, NULL, 10);
-	} else {
-		u->tsconnect = me.now;
-	}
+	u->tsconnect = TS ? strtoul (TS, NULL, 10) : me.now;
 	strlcpy (u->user->hostname, host, MAXHOST);
 	strlcpy (u->user->vhost, host, MAXHOST);
 	strlcpy (u->user->username, user, MAXUSER);
@@ -134,7 +138,7 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	/* check if the user is excluded */
 	ns_do_exclude_user(u);
 	if ((ircd_srv.protocol & PROTOCOL_B64SERVER) && numeric) {
-		setnickbase64 (u->name, numeric);
+		set_nick_base64 (u->name, numeric);
 	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;	
@@ -162,7 +166,7 @@ static void deluser (Client *u)
 	}
 	/* if its one of our bots, remove it from the modlist */
 	if (IsMe(u)) {
-		del_bot (u->name);
+		DelBot (u->name);
 	}
 	hash_delete (userhash, un);
 	hnode_destroy (un);
@@ -290,7 +294,7 @@ void UserAway (const char *nick, const char *awaymsg)
 	ns_free (cmdparams);
 }
 
-int UserNick (const char * oldnick, const char *newnick, const char * ts)
+int UserNickChange (const char * oldnick, const char *newnick, const char * ts)
 {
 	CmdParams * cmdparams;
 	hnode_t *un;
@@ -298,16 +302,16 @@ int UserNick (const char * oldnick, const char *newnick, const char * ts)
 	Client * u;
 
 	SET_SEGV_LOCATION();
-	dlog (DEBUG2, "UserNick: %s -> %s", oldnick, newnick);
+	dlog (DEBUG2, "UserNickChange: %s -> %s", oldnick, newnick);
 	un = hash_lookup (userhash, oldnick);
 	if (!un) {
-		nlog (LOG_WARNING, "UserNick: can't find user %s", oldnick);
+		nlog (LOG_WARNING, "UserNickChange: can't find user %s", oldnick);
 		return NS_FAILURE;
 	}
 	u = (Client *) hnode_get (un);
 	cm = list_first (u->user->chans);
 	while (cm) {
-		ChanNickChange (find_chan (lnode_get (cm)), (char *) newnick, u->name);
+		ChannelNickChange (find_chan (lnode_get (cm)), (char *) newnick, u->name);
 		cm = list_next (u->user->chans, cm);
 	}
 	SET_SEGV_LOCATION();
@@ -325,12 +329,12 @@ int UserNick (const char * oldnick, const char *newnick, const char * ts)
 	SendAllModuleEvent (EVENT_NICK, cmdparams);
 	ns_free (cmdparams);
 	if (IsMe(u)) {
-		bot_nick_change (u->user->bot, newnick);
+		BotNickChange (u->user->bot, newnick);
 	}
 	return NS_SUCCESS;
 }
 
-Client *finduserbase64 (const char *num)
+Client *find_user_base64 (const char *num)
 {
 	Client *u;
 	hnode_t *un;
@@ -340,11 +344,11 @@ Client *finduserbase64 (const char *num)
 	while ((un = hash_scan_next (&us)) != NULL) {
 		u = hnode_get (un);
 		if (strncmp (u->name64, num, BASE64NICKSIZE) == 0) {
-			dlog (DEBUG1, "finduserbase64: %s -> %s", num, u->name);
+			dlog (DEBUG1, "find_user_base64: %s -> %s", num, u->name);
 			return u;
 		}
 	}
-	dlog (DEBUG3, "finduserbase64: %s not found", num);
+	dlog (DEBUG3, "find_user_base64: %s not found", num);
 	return NULL;
 }
 
@@ -438,7 +442,7 @@ int UserLevel (Client *u)
 	if (u->user->ulevel != -1) {
 		return u->user->ulevel;
 	}
-	u->user->ulevel = UserAuth(u);
+	u->user->ulevel = AuthUser(u);
 	/* Set user level so we no longer need to calculate */
 	dlog (DEBUG1, "UserLevel for %s is %d", u->name, u->user->ulevel);
 	return u->user->ulevel;

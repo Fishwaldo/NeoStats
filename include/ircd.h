@@ -217,14 +217,6 @@ int irc_smo (const char *source, const char *umodetarget, const char *msg);
 
 EXPORTFUNC void send_cmd (char *fmt, ...) __attribute__((format(printf,1,2))); /* 2=format 3=params */
 
-EXPORTFUNC void setserverbase64 (const char *name, const char *num);
-EXPORTFUNC char *servertobase64 (const char *name);
-EXPORTFUNC char *base64toserver (const char *num);
-
-EXPORTFUNC void setnickbase64 (const char *nick, const char *num);
-EXPORTFUNC char *nicktobase64 (const char *nick);
-EXPORTFUNC char *base64tonick (const char *num);
-
 MODULEFUNC void parse (char *line);
 
 void (*irc_parse) (char *line);

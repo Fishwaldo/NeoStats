@@ -143,7 +143,7 @@ BotInfo ns_botinfo = {
 	BOT_COMMON_HOST,
 	"",
 	/* 0x80000000 is a "hidden" flag to identify the core bot */
-	0x80000000|BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF,
+	0x80000000|BOT_FLAG_ONLY_OPERS|BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF,
 	ns_commands, 
 	ns_settings,
 };
@@ -178,7 +178,7 @@ init_services_bot (void)
 	if(config.onlyopers) 
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
 	ns_module.insynch = 1;
-	ns_botptr = init_bot (&ns_botinfo);
+	ns_botptr = AddBot (&ns_botinfo);
 	ns_module.synched = 1;
 	me.synched = 1;
 	SynchAllModules ();
@@ -326,7 +326,7 @@ ns_cmd_chanlist (CmdParams* cmdparams)
 	   	return NS_FAILURE;
 	}
 #endif
-	ChanDump (cmdparams, (cmdparams->ac < 1)? NULL : cmdparams->av[0]);
+	ListChannels (cmdparams, (cmdparams->ac < 1)? NULL : cmdparams->av[0]);
    	return NS_SUCCESS;
 }
 
@@ -347,7 +347,7 @@ ns_cmd_banlist (CmdParams* cmdparams)
 	   	return NS_FAILURE;
 	}
 #endif
-	BanDump ();
+	ListBans ();
    	return NS_SUCCESS;
 }
 

@@ -2,6 +2,8 @@
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
+**  Portions Copyright (c) 2000-2001 ^Enigma^
+**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -21,21 +23,15 @@
 ** $Id$
 */
 
-#ifndef _MODULES_H_
-#define _MODULES_H_
+#ifndef _BASE64_H_
+#define _BASE64_H_
 
-extern jmp_buf sigvbuf;
+EXPORTFUNC int set_server_base64 (const char *name, const char *base64name);
+EXPORTFUNC char *server_to_base64 (const char *name);
+EXPORTFUNC char *base64_to_server (const char *base64name);
 
-int InitModules (void);
-void FiniModules (void);
-Module *load_module (const char *path, Client * u);
-int unload_module (const char *module_name, Client * u);
-void unload_modules(void);
-int ns_cmd_modlist (CmdParams* cmdparams);
-void ModulesVersion (const char* nick, const char *remoteserver);
-void SendAllModuleEvent (Event event, CmdParams* cmdparams);
-void SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr);
-int SynchModule (Module* module_ptr);
-int SynchAllModules (void);
+EXPORTFUNC int set_nick_base64 (const char *nick, const char *base64name);
+EXPORTFUNC char *nick_to_base64 (const char *nick);
+EXPORTFUNC char *base64_to_nick (const char *base64name);
 
-#endif /* _MODULES_H_ */
+#endif /* _BASE64_H_ */

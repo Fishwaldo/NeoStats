@@ -21,18 +21,17 @@
 ** $Id$
 */
 
-#ifndef _CHANS_H_
-#define _CHANS_H_
+#ifndef _CHANNELS_H_
+#define _CHANNELS_H_
 
-void ChanDump (CmdParams* cmdparams, const char *chan);
-void part_chan (Client * u, const char *chan, const char* reason);
-void PartAllChannels (Client * u, const char* reason);
-void join_chan (const char* nick, const char *chan);
-void ChanNickChange (Channel * c, const char *newnick, const char *oldnick);
-void ChanTopic (const char* chan, const char *owner, const char* ts, const char *topic);
-void kick_chan (const char *kickby, const char *chan, const char *kicked, const char *kickreason);
-void SetChanTS (Channel * c, const time_t tstime);
+void ListChannels (CmdParams* cmdparams, const char *chan);
+void PartChannel (Client *u, const char *chan, const char *reason);
+void PartAllChannels (Client *u, const char *reason);
+void JoinChannel (const char *nick, const char *chan);
+void ChannelNickChange (Channel *c, const char *newnick, const char *oldnick);
+void ChannelTopic (const char *chan, const char *owner, const char *ts, const char *topic);
+void KickChannel (const char *kickby, const char *chan, const char *kicked, const char *kickreason);
 int InitChannels (void);
 void FiniChannels (void);
 
-#endif /* _CHANS_H_ */
+#endif /* _CHANNELS_H_ */

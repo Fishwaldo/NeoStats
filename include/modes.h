@@ -29,7 +29,7 @@ EXPORTFUNC int ChanMode (char *origin, char **av, int ac);
 int ChanModeHandler (Channel* c, char *modes, int j, char **av, int ac);
 void ChanUserMode (const char *chan, const char *nick, int add, const unsigned int mode);
 
-void dumpchanmodes (CmdParams* cmdparams, Channel* c);
+void ListChannelModes (CmdParams* cmdparams, Channel* c);
 
 
 #endif

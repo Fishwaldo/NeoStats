@@ -27,7 +27,7 @@
 #define SOCK_H
 
 int InitSocks (void);
-int FiniSocks (void);
+void FiniSocks (void);
 int ns_cmd_socklist (CmdParams* cmdparams);
 int del_sockets (Module *mod_ptr);
 void Connect (void);

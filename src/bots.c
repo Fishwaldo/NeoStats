@@ -21,8 +21,8 @@
 ** $Id$
 */
 
-/*	TODO:
- *	- find free nick for bots if NICK and ALTNICK are in use
+/*  TODO:
+ *  - find free nick for bots if NICK and ALTNICK are in use
  */
 
 #include "neostats.h"
@@ -42,10 +42,14 @@ static hash_t *bothash;
 
 /** @brief InitBots 
  *
- *  initialise bot systems
+ *  initialise bot subsystem
+ *  NeoStats core use only.
+ *
+ *  @param none
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 int InitBots (void)
 {
 	bothash = hash_create (BOT_TABLE_SIZE, 0, 0);
@@ -58,32 +62,31 @@ int InitBots (void)
 
 /** @brief FiniBots
  *
- *  cleanup bot systems
+ *  cleanup bot subsystem
+ *  NeoStats core use only.
  *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ *  @param none
+ *
+ *  @return none
  */
-int FiniBots (void)
+
+void FiniBots (void)
 {
 	hash_destroy (bothash);
-	return NS_SUCCESS;
 }
 
 /** @brief flood_test
  *
  *  Check whether client is flooding NeoStats
+ *  Bot subsystem use only.
  *
  *  @param pointer to client to test
  *
  *  @return NS_TRUE if client flooded, NS_FALSE if not 
  */
-int
-flood_test (Client * u)
+
+static int flood_test (Client *u)
 {
-	/* sanity test */
-	if (!u) {
-		nlog (LOG_WARNING, "flood_test: NULL user");
-		return NS_FALSE;
-	}
 	/* locop or higher are expempt from flood checks */
 	if (UserLevel (u) >= NS_ULEVEL_OPER)	
 		return NS_FALSE;
@@ -105,13 +108,15 @@ flood_test (Client * u)
 /** @brief process_origin
  *
  *  validate message origin and populate cmdparams structure
+ *  Bot subsystem use only.
  *
  *  @param cmdparam structure to populate 
  *  @param origin nick or server name 
  *
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
-int process_origin (CmdParams * cmdparams, char *origin)
+
+static int process_origin (CmdParams *cmdparams, const char *origin)
 {
 	cmdparams->source = find_user (origin);
 	if (cmdparams->source) {
@@ -130,13 +135,15 @@ int process_origin (CmdParams * cmdparams, char *origin)
 /** @brief process_target_user
  *
  *  validate message target and populate cmdparams structure
+ *  Bot subsystem use only.
  *
  *  @param cmdparam structure to populate 
  *  @param target nick
  *
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
-int process_target_user (CmdParams * cmdparams, char *target)
+
+static int process_target_user (CmdParams *cmdparams, const char *target)
 {
 	cmdparams->target = find_user (target);
 	if (cmdparams->target) {
@@ -145,65 +152,68 @@ int process_target_user (CmdParams * cmdparams, char *target)
 			return NS_TRUE;
 		}
 	}
-	dlog(DEBUG1, "process_target_user: user %s not found", target);
+	dlog (DEBUG1, "process_target_user: user %s not found", target);
 	return NS_FALSE;
 }
 
 /** @brief process_target_chan
  *
  *  validate message target and populate cmdparams structure
+ *  Bot subsystem use only.
  *
  *  @param cmdparam structure to populate 
  *  @param target channel
  *
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
-int process_target_chan (CmdParams * cmdparams, char *target)
+
+static int process_target_chan (CmdParams *cmdparams, const char *target)
 {
 	cmdparams->channel = find_chan(target);
 	if (cmdparams->channel) {
 		return NS_TRUE;
 	}
-	dlog(DEBUG1, "cmdparams->channel: chan %s not found", target);
+	dlog (DEBUG1, "cmdparams->channel: chan %s not found", target);
 	return NS_FALSE;
 }
 
 /** @brief bot_chan_event
  *
- *  
+ *  Process event regarding to bot channel
+ *  Bot subsystem use only.
  *
  *  @param cmdparams pointer to command parameters
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int
-bot_chan_event (Event event, CmdParams* cmdparams)
+
+static int bot_chan_event (Event event, CmdParams *cmdparams)
 {
 	lnode_t *cm;
 	Bot *botptr;
 	hnode_t *bn;
 	hscan_t bs;
+	int cmdflag = 0;
+	char *chan;
 
 	SET_SEGV_LOCATION();
+	if (cmdparams->param[0] == config.cmdchar[0]) {
+		/* skip over command char */
+		cmdparams->param ++;
+		cmdflag = 1;
+	}
 	hash_scan_begin (&bs, bothash);
 	while ((bn = hash_scan_next (&bs)) != NULL) {
 		botptr = hnode_get (bn);
 		cm = list_first (botptr->u->user->chans);
 		if (!(botptr->u->user->Umode & UMODE_DEAF)) {
-			while (cm) {
-				char *chan;
-
+			while (cm) {	
 				chan = (char *) lnode_get (cm);
 				cmdparams->bot = botptr;
 				if (ircstrcasecmp (cmdparams->channel->name, chan) == 0) {
-					if (cmdparams->param[0] == config.cmdchar[0]) {
-						/* skip over command char */
-						cmdparams->param ++;
-						if (run_bot_cmd (cmdparams) != NS_FAILURE) {
-							return NS_SUCCESS;
-						}
+					if (!cmdflag || run_bot_cmd (cmdparams) != NS_SUCCESS) {
+						SendModuleEvent (event, cmdparams, botptr->moduleptr);
 					}
-					SendModuleEvent (event, cmdparams, botptr->moduleptr);
 				}
 				cm = list_next (botptr->u->user->chans, cm);
 			}
@@ -212,24 +222,28 @@ bot_chan_event (Event event, CmdParams* cmdparams)
 	return NS_SUCCESS;
 }
 
-/** @brief send a message to a bot
+/** @brief bot_notice
  *
- * @param origin 
- * @param av 
- * @param ac
+ *  send a notice to a bot
+ *  NeoStats core use only.
+ *
+ *  @param origin 
+ *  @param av 
+ *  @param ac
  * 
- * @return none
+ *  @return none
  */
+
 void bot_notice (char *origin, char **av, int ac)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	/* Check origin validity */
-	if (process_origin(cmdparams, origin)) {
+	if (process_origin (cmdparams, origin)) {
 		/* Find target bot */
-		if (process_target_user(cmdparams, av[0])) {
+		if (process_target_user (cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
 			if (av[ac - 1][0] == '\1') {
 				ctcp_notice (cmdparams);
@@ -241,22 +255,26 @@ void bot_notice (char *origin, char **av, int ac)
 	ns_free (cmdparams);
 }
 
-/** @brief send a message to a bot
+/** @brief bot_chan_notice
  *
- * @param origin 
- * @param av 
- * @param ac
+ *  send a channel notice to a bot
+ *  NeoStats core use only.
+ *
+ *  @param origin 
+ *  @param av 
+ *  @param ac
  * 
- * @return none
+ *  @return none
  */
+
 void bot_chan_notice (char *origin, char **av, int ac)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	if (process_origin(cmdparams, origin)) {
-		if (process_target_chan(cmdparams, av[0])) {
+	if (process_origin (cmdparams, origin)) {
+		if (process_target_chan (cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
 			if (av[ac - 1][0] == '\1') {
 				ctcp_cnotice (cmdparams);
@@ -268,23 +286,27 @@ void bot_chan_notice (char *origin, char **av, int ac)
 	ns_free (cmdparams);
 }
 
-/** @brief send a message to a bot
+/** @brief bot_private
  *
- * @param origin 
- * @param av 
- * @param ac
+ *  send a private message to a bot
+ *  NeoStats core use only.
+ *
+ *  @param origin 
+ *  @param av 
+ *  @param ac
  * 
- * @return none
+ *  @return none
  */
+
 void bot_private (char *origin, char **av, int ac)
 {
 	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	if (process_origin(cmdparams, origin)) {
+	if (process_origin (cmdparams, origin)) {
 		/* Find target bot */
-		if (process_target_user(cmdparams, av[0])) {
+		if (process_target_user (cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
 			/* Check CTCP first to avoid Unknown command messages later */
 			if (av[ac - 1][0] == '\1') {
@@ -303,22 +325,26 @@ void bot_private (char *origin, char **av, int ac)
 	ns_free (cmdparams);
 }
 
-/** @brief send a message to a bot
+/** @brief bot_chan_private
  *
- * @param origin 
- * @param av 
- * @param ac
+ *  send a channel private message to a bot
+ *  NeoStats core use only.
+ *
+ *  @param origin 
+ *  @param av 
+ *  @param ac
  * 
- * @return none
+ *  @return none
  */
+
 void bot_chan_private (char *origin, char **av, int ac)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	if (process_origin(cmdparams, origin)) {
-		if (process_target_chan(cmdparams, av[0])) {
+	if (process_origin (cmdparams, origin)) {
+		if (process_target_chan (cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
 			if (av[ac - 1][0] == '\1') {
 				ctcp_cprivate (cmdparams);
@@ -330,53 +356,6 @@ void bot_chan_private (char *origin, char **av, int ac)
 	ns_free (cmdparams);
 }
 
-/** @brief create a new bot
- *
- * @param bot_name string containing bot name
- * 
- * @return none
- */
-static Bot *new_bot (const char *bot_name)
-{
-	Bot *botptr;
-
-	SET_SEGV_LOCATION();
-	if (hash_isfull (bothash)) {
-		nlog (LOG_CRITICAL, "new_bot: bot list is full");
-		return NULL;
-	}
-	dlog(DEBUG2, "new_bot: %s", bot_name);
-	botptr = ns_calloc (sizeof (Bot));
-	strlcpy (botptr->name, bot_name, MAXNICK);
-	hnode_create_insert (bothash, botptr, botptr->name);
-	return botptr;
-}
-
-/** @brief add_bot
- *
- *  allocate bot
- *
- *  @param modptr pointer to module requesting bot
- *  @param nick name of new bot
- *
- *  @return pointer to bot or NULL if not found
- */
-Bot *add_bot (Module* modptr, const char *nick)
-{
-	Bot *botptr;
-
-	SET_SEGV_LOCATION();
-	/* add a brand new user */
-	botptr = new_bot (nick);
-	if (botptr) {
-		botptr->moduleptr = modptr;
-		botptr->set_ulevel = NS_ULEVEL_ROOT;
-		return botptr;
-	}
-	nlog (LOG_WARNING, "add_bot: Couldn't Add Bot to List");
-	return NULL;
-}
-
 /** @brief find_bot
  *
  *  find bot
@@ -385,6 +364,7 @@ Bot *add_bot (Module* modptr, const char *nick)
  *
  *  @return pointer to bot or NULL if not found
  */
+
 Bot *find_bot (const char *bot_name)
 {
 	Bot* bot;
@@ -392,49 +372,53 @@ Bot *find_bot (const char *bot_name)
 	SET_SEGV_LOCATION(); 
 	bot = (Bot *)hnode_find (bothash, bot_name);
 	if (!bot) {
-		dlog(DEBUG3, "find_bot: %s not found", bot_name);
+		dlog (DEBUG3, "find_bot: %s not found", bot_name);
 	}
 	return bot;
 }
 
-/** @brief del_bot
+/** @brief DelBot
  *
  *  delete bot
+ *  NeoStats core use only.
  *
  *  @param bot_name name of bot to delete
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int del_bot (const char *bot_name)
+
+int DelBot (const char *bot_name)
 {
 	Bot *botptr;
 	hnode_t *bn;
 
 	SET_SEGV_LOCATION();
 	bn = hash_lookup (bothash, bot_name);
-	if (bn) {
-		botptr = hnode_get (bn);
-		del_all_bot_cmds(botptr);
-		del_bot_info_settings(botptr);
-		del_all_bot_settings(botptr);
-		hash_delete (bothash, bn);
-		hnode_destroy (bn);
-		ns_free (botptr);
-		return NS_SUCCESS;
+	if (!bn) {
+		return NS_FAILURE;
 	}
-	return NS_FAILURE;
+	botptr = hnode_get (bn);
+	del_all_bot_cmds (botptr);
+	del_bot_info_settings (botptr);
+	del_all_bot_settings (botptr);
+	hash_delete (bothash, bn);
+	hnode_destroy (bn);
+	ns_free (botptr);
+	return NS_SUCCESS;
 }
 
-/** @brief bot_nick_change
+/** @brief BotNickChange
  *
  *  change bot nick
+ *  NeoStats core use only.
  *
  *  @param botptr pointer to bot
  *  @param newnick new nick
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int bot_nick_change (const Bot *botptr, const char *newnick)
+
+int BotNickChange (const Bot *botptr, const char *newnick)
 {
 	hnode_t *bn;
 
@@ -446,7 +430,7 @@ int bot_nick_change (const Bot *botptr, const char *newnick)
 	}
 	/* remove old hash entry */
 	hash_delete (bothash, bn);
-	dlog(DEBUG3, "Bot %s changed nick to %s", botptr->name, newnick);
+	dlog (DEBUG3, "Bot %s changed nick to %s", botptr->name, newnick);
 	strlcpy ((char*)botptr->name, newnick, MAXNICK);
 	/* insert new hash entry */
 	hash_insert (bothash, bn, botptr->name);
@@ -456,12 +440,14 @@ int bot_nick_change (const Bot *botptr, const char *newnick)
 /** @brief ns_cmd_botlist
  *
  *  list all neostats bots
+ *  NeoStats core use only.
  *
  *  @param cmdparams pointer to command parameters
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int ns_cmd_botlist (CmdParams* cmdparams)
+
+int ns_cmd_botlist (CmdParams *cmdparams)
 {
 	int i;
 	lnode_t *cm;
@@ -497,15 +483,17 @@ int ns_cmd_botlist (CmdParams* cmdparams)
 	return NS_SUCCESS;
 }
 
-/** @brief del_module_bots
+/** @brief DelModuleBots
  *
  *  delete all bots associated with a given module
+ *  NeoStats core use only.
  *
  *  @param mod_ptr pointer to module
  *
  *  @return none
  */
-void del_module_bots (Module *mod_ptr)
+
+void DelModuleBots (Module *mod_ptr)
 {
 	Bot *botptr;
 	hnode_t *modnode;
@@ -515,27 +503,125 @@ void del_module_bots (Module *mod_ptr)
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		botptr = hnode_get (modnode);
 		if (botptr->moduleptr == mod_ptr) {
-			dlog(DEBUG1, "Deleting module %s bot %s", mod_ptr->info->name, botptr->name);
+			dlog (DEBUG1, "Deleting module %s bot %s", mod_ptr->info->name, botptr->name);
 			irc_quit (botptr, _("Module Unloaded"));
 		}
 	}
 	return;
 }
 
-/** @brief init_bot
+/** @brief new_bot
  *
- *  initialise a new bot
+ *  allocate a new bot
+ *  Bot subsystem use only.
+ *
+ *  @param bot_name string containing bot name
+ * 
+ *  @return none
+ */
+
+static Bot *new_bot (const char *bot_name)
+{
+	Bot *botptr;
+
+	SET_SEGV_LOCATION();
+	if (hash_isfull (bothash)) {
+		nlog (LOG_CRITICAL, "new_bot: bot list is full");
+		return NULL;
+	}
+	dlog (DEBUG2, "new_bot: %s", bot_name);
+	botptr = ns_calloc (sizeof (Bot));
+	strlcpy (botptr->name, bot_name, MAXNICK);
+	hnode_create_insert (bothash, botptr, botptr->name);
+	return botptr;
+}
+
+/** @brief GetBotNick
+ *
+ *  check the requested nick
+ *  Bot subsystem use only.
+ *
+ *  @param botinfo pointer to bot description
+ *  @param pointer to nick buffer
+ *
+ *  @return nick or NULL if failed
+ */
+
+static char *GetBotNick (BotInfo *botinfo, char *nickbuf)
+{
+	char* nick;
+
+	/* Check primary nick */
+	nick = botinfo->nick;
+	if (find_user (nick)) {
+		nlog (LOG_WARNING, "Bot nick %s already in use", nick);
+		/* Check alternate nick */
+		if (botinfo->altnick) {
+			nick = botinfo->altnick;
+			if (find_user (nick)) {
+				nlog (LOG_WARNING, "Bot alt nick %s already in use", nick);
+				/* TODO: try and find a free nick */
+				return NULL;
+			}
+		} else {
+			/* TODO: try and find a free nick */
+			return NULL;
+		}
+	} 
+	strlcpy (nickbuf, nick, MAXNICK);
+	return nickbuf;
+}
+
+/** @brief ConnectBot
+ *
+ *  Connect bot to IRC
+ *  Bot subsystem use only.
+ *
+ *  @param botptr pointer to bot 
+ *
+ *  @return none
+ */
+
+static void ConnectBot (Bot *botptr)
+{
+	if (botptr->flags&BOT_FLAG_SERVICEBOT) {
+		irc_nick (botptr->name, botptr->u->user->username, botptr->u->user->hostname, botptr->u->info, me.servicesumode);
+		UserMode (botptr->name, me.servicesumode);
+		if (config.joinserviceschan) {
+			irc_join (botptr, me.serviceschan, me.servicescmode);
+		}
+	} else {
+		irc_nick (botptr->name, botptr->u->user->username, botptr->u->user->hostname, botptr->u->info, "");
+		if ((config.allbots > 0)) {
+			irc_join (botptr, me.serviceschan, me.servicescmode);
+		}
+	}	
+	if (botptr->flags & BOT_FLAG_DEAF) {
+		if (HaveUmodeDeaf()) {
+			/* Set deaf mode at IRCd level */
+			irc_umode (botptr, botptr->name, UMODE_DEAF);
+		} else {
+			/* No ircd support, so fake it internally */
+			botptr->u->user->Umode |= UMODE_DEAF;
+		}
+	}
+}
+
+/** @brief AddBot
+ *
+ *  Add a new bot
+ *  NeoStats core use and Module API call.
  *
  *  @param botinfo pointer to bot description
  *
  *  @return pointer to bot or NULL if failed
  */
-Bot *init_bot (BotInfo* botinfo)
+
+Bot *AddBot (BotInfo *botinfo)
 {
-	Bot * botptr; 
-	char *nick;
-	Module* modptr;
-	char *host;
+	static char nick[MAXNICK];
+	Bot *botptr; 
+	Module *modptr;
 
 	SET_SEGV_LOCATION();
 	modptr = GET_CUR_MODULE();
@@ -544,118 +630,69 @@ Bot *init_bot (BotInfo* botinfo)
 		modptr->error = 1;
 		return NULL;
 	}
-	/* When we are using single bot mode, for example in client mode where we
-	 * can only use one bot, if we have initialised the main bot just add all 
-	 * commands and settings to it 
-	 */
+	/* In single bot mode, just add all commands and settings to main bot */
 	if (config.singlebotmode && ns_botptr) {
-		if (botinfo->bot_cmd_list) {
-			SET_RUN_LEVEL(modptr);
-			add_bot_cmd_list (ns_botptr, botinfo->bot_cmd_list);
-			RESET_RUN_LEVEL();
-		}
-		if (botinfo->bot_setting_list) {
-			SET_RUN_LEVEL(modptr);
-			add_bot_setting_list (ns_botptr, botinfo->bot_setting_list);
-			RESET_RUN_LEVEL();
-		}
+		add_bot_cmd_list (ns_botptr, botinfo->bot_cmd_list);
+		add_bot_setting_list (ns_botptr, botinfo->bot_setting_list);
 		return(ns_botptr);
 	}
-	nick = botinfo->nick;
-	if (find_user (nick)) {
-		nlog (LOG_WARNING, "Bot nick %s already in use", botinfo->nick);
-		if (botinfo->altnick) {
-			nick = botinfo->altnick;
-			if (find_user (nick)) {
-				nlog (LOG_WARNING, "Bot alt nick %s already in use", botinfo->altnick);
-				/* TODO: try and find a free nick */
-				nlog (LOG_WARNING, "Unable to init bot");
-				return NULL;
-			}
-		} else {
-			/* TODO: try and find a free nick */
-			nlog (LOG_WARNING, "Unable to init bot");
-			return NULL;
-		}
-	} 
-	botptr = add_bot (modptr, nick);
-	if (!botptr) {
-		nlog (LOG_WARNING, "add_bot failed for module %s bot %s", modptr->info->name, nick);
+	if (GetBotNick (botinfo, nick) == NULL) {
+		nlog (LOG_WARNING, "Unable to init bot");
 		return NULL;
 	}
-	host = ((*botinfo->host) == 0 ? me.name : botinfo->host);
+	botptr = new_bot (nick);
+	if (!botptr) {
+		nlog (LOG_WARNING, "new_bot failed for module %s bot %s", modptr->info->name, nick);
+		return NULL;
+	}
+	botptr->moduleptr = modptr;
+	botptr->set_ulevel = NS_ULEVEL_ROOT;
 	/* For more efficient transversal of bot/user lists, link 
 	 * associated user struct to bot and link bot into user struct */
-	botptr->u = AddUser (nick, botinfo->user, host, botinfo->realname, me.name, NULL, NULL, NULL);
+	botptr->u = AddUser (botptr->name, botinfo->user, ((*botinfo->host) == 0 ? me.name : botinfo->host), botinfo->realname, me.name, NULL, NULL, NULL);
 	botptr->u->user->bot = botptr;
-	if (botinfo->flags&BOT_FLAG_SERVICEBOT) {
-		irc_nick (nick, botinfo->user, host, botinfo->realname, me.servicesumode);
-		UserMode (nick, me.servicesumode);
-		if (config.joinserviceschan) {
-			irc_join(botptr, me.serviceschan, me.servicescmode);
-		}
-	} else {
-		irc_nick (nick, botinfo->user, host, botinfo->realname, "");
-		if ((config.allbots > 0)) {
-			irc_join(botptr, me.serviceschan, me.servicescmode);
-		}
-	}	
-	if (botinfo->flags & BOT_FLAG_DEAF) {
-		if (HaveUmodeDeaf()) {
-			/* Set deaf mode at IRCd level */
-			irc_umode (botptr, nick, UMODE_DEAF);
-		} else {
-			/* No ircd support, so fake it internally */
-			botptr->u->user->Umode |= UMODE_DEAF;
-		}
-	}
 	botptr->flags = botinfo->flags;
-	if (botinfo->bot_cmd_list) {
-		SET_RUN_LEVEL(modptr);
-		add_bot_cmd_list (botptr, botinfo->bot_cmd_list);
-		RESET_RUN_LEVEL();
-	}
-	if (botinfo->bot_setting_list) {
-		SET_RUN_LEVEL(modptr);
-		add_bot_setting_list (botptr, botinfo->bot_setting_list);
-		RESET_RUN_LEVEL();
-	}
-	SET_RUN_LEVEL(modptr);
-	add_bot_info_settings (botptr, botinfo);
+	ConnectBot (botptr);
+	SET_RUN_LEVEL(GET_CUR_MODULE());
+	add_bot_cmd_list (botptr, botinfo->bot_cmd_list);
+	add_bot_setting_list (botptr, botinfo->bot_setting_list);
 	RESET_RUN_LEVEL();
+	add_bot_info_settings (botptr, botinfo);
 	return botptr;
 }
 
 /** @brief handle_dead_channel
  *
  *  remove bots from dead channel
+ *  NeoStats core use only.
+ *
+ *  @param channel to process
  *
  *  @return none
  */
+
 void handle_dead_channel (Channel *c)
 {
-	CmdParams* cmdparams;
-	Bot *botptr;
+	CmdParams *cmdparams;
 	hnode_t *bn;
 	hscan_t bs;
 	lnode_t *cm;
 	char *chan;
 
 	SET_SEGV_LOCATION();
+	/* If services channel ignore it */
 	if (ircstrcasecmp (c->name, me.serviceschan) == 0) {
-		/* Services channel so ignore */
 		return;
 	}
+	/* If channel has persistent bot(s) ignore it */
 	if (c->persistentusers) {
-		/* Channel has persistent bot(s) so ignore */
 		return;
 	}
 	hash_scan_begin (&bs, bothash);
 	cmdparams = ns_calloc (sizeof (CmdParams));
 	cmdparams->channel = c;
 	while ((bn = hash_scan_next (&bs)) != NULL) {
-		botptr = hnode_get (bn);
-		cmdparams->bot = botptr;
+		cmdparams->bot = hnode_get (bn);
 		cm = list_first (cmdparams->bot->u->user->chans);
 		while (cm) {
 			chan = (char *) lnode_get (cm);

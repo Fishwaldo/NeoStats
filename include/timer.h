@@ -25,7 +25,7 @@
 #define _TIMER_H_
 
 int InitTimers (void);
-int FiniTimers (void);
+void FiniTimers (void);
 int ns_cmd_timerlist (CmdParams* cmdparams);
 void CheckTimers (void);
 int del_timers (Module *mod_ptr);

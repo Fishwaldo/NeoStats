@@ -21,6 +21,10 @@
 ** $Id$
 */
 
+/*  TODO:
+ *  - 
+ */
+
 #include "neostats.h"
 #include "ircd.h"
 #include "modes.h"
@@ -31,17 +35,43 @@
 #include "services.h"
 #include "modules.h"
 
+/* @brief hash and list sizes */
 #define CHANNEL_TABLE_SIZE	-1
 #define CHANNEL_MEM_SIZE	-1
 #define CHANNEL_MAXMODES	-1
 
+/* @brief Module channel hash list */
 static hash_t *channelhash;
+/* @brief quit reason buffer */
 static char quitreason[BUFSIZE];
+
+/** @brief ChanPartHandler
+ *
+ *  list handler for channel parts
+ *  Channel subsystem use only.
+ *
+ *  @param list
+ *  @param node
+ *  @param v
+ *
+ *  @return none
+ */
 
 static void ChanPartHandler (list_t * list, lnode_t * node, void *v)
 {
-	part_chan ((Client *)v, lnode_get (node), quitreason[0] != 0 ? quitreason : NULL);
+	PartChannel ((Client *)v, lnode_get (node), quitreason[0] != 0 ? quitreason : NULL);
 }
+
+/** @brief PartAllChannels
+ *
+ *  Part client from all channels
+ *  NeoStats core use only.
+ *
+ *  @param u
+ *  @param reason
+ *
+ *  @return none
+ */
 
 void PartAllChannels (Client * u, const char* reason)
 {
@@ -53,44 +83,27 @@ void PartAllChannels (Client * u, const char* reason)
 	list_process (u->user->chans, u, ChanPartHandler);
 }
 
-/** @brief Process the Channel TS Time 
- * 
- * Addes the channel TS time to the channel struct 
+/** @brief ChannelTopic
  *
- * @param c Channel Struct of channel who's ts is being changed
- * @param creationtime ts time of the channel
+ *  Process channel topic change and send EVENT_TOPIC to modules
+ *  NeoStats core use only.
  *
- * @returns Nothing
+ *  @param channel name
+ *  @param owner who changed the topic
+ *  @param time topic was changed
+ *  @param topic
  *
+ *  @return none
  */
-void
-SetChanTS (Channel * c, const time_t creationtime)
-{
-	c->creationtime = creationtime;
-}
 
-/** @brief Process a Topic Change
- *
- * Processes a Channel topic Change for particular channel and updates internals
- * Also triggers off a TOPICCHANGE event for modules
- *
- * @param owner Char of who changed the topic. Can't be a userstruct as the user might not be online anymore
- * @param c Channel Struct of channel who's topic is being changed
- * @param time when the topic was changed (might have been in the past 
- * @param topic the new topic
- *
- * @return Nothing
-*/
-
-void
-ChanTopic (const char* chan, const char *owner, const char* ts, const char *topic)
+void ChannelTopic (const char* chan, const char *owner, const char* ts, const char *topic)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Channel *c;
 
 	c = find_chan (chan);
 	if (!c) {
-		nlog (LOG_WARNING, "ChanTopic: can't find channel %s", chan);
+		nlog (LOG_WARNING, "ChannelTopic: can't find channel %s", chan);
 		return;
 	}
 	if(topic) {
@@ -102,14 +115,7 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
 	c->topictime = (ts) ? atoi (ts) : me.now;
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
-	AddStringToList (&cmdparams->av, (char*)owner, &cmdparams->ac);
-	if(topic) {
-		AddStringToList (&cmdparams->av, (char*)topic, &cmdparams->ac);
-	} else {
-		AddStringToList (&cmdparams->av, "", &cmdparams->ac);
-	}
 	SendAllModuleEvent (EVENT_TOPIC, cmdparams);
-	ns_free (cmdparams->av);
 	ns_free (cmdparams);
 }
 
@@ -123,10 +129,9 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
  * @returns c the newly created channel record
  * @todo Dynamically resizable channel hashes
 */
-static Channel *
-new_chan (const char *chan)
+static Channel *new_chan (const char *chan)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Channel *c;
 
 	if (hash_isfull (channelhash)) {
@@ -160,29 +165,27 @@ new_chan (const char *chan)
 */
 
 void
-del_chan (Channel * c)
+del_chan (Channel *c)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	hnode_t *cn;
 
 	SET_SEGV_LOCATION();
+	dlog (DEBUG2, "del_chan: deleting channel %s", c->name);
 	cn = hash_lookup (channelhash, c->name);
 	if (!cn) {
 		nlog (LOG_WARNING, "del_chan: channel %s not found.", c->name);
 		return;
-	} else {
-		dlog (DEBUG2, "del_chan: deleting channel %s", c->name);
-		cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-		cmdparams->channel = c;
-		SendAllModuleEvent (EVENT_DELCHAN, cmdparams);
-		ns_free (cmdparams);
-
-		list_destroy_auto (c->modeparms);
-		list_destroy (c->chanmembers);
-		hash_delete (channelhash, cn);
-		hnode_destroy (cn);
-		ns_free (c);
 	}
+	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
+	cmdparams->channel = c;
+	SendAllModuleEvent (EVENT_DELCHAN, cmdparams);
+	ns_free (cmdparams);
+	list_destroy_auto (c->modeparms);
+	list_destroy (c->chanmembers);
+	hash_delete (channelhash, cn);
+	hnode_destroy (cn);
+	ns_free (c);
 }
 
 /** @brief Deletes a channel user record
@@ -235,7 +238,7 @@ int del_chanmember (Channel *c, Client *user)
 
 /** @brief Process a kick from a channel. 
  *
- * In fact, this does nothing special apart from call part_chan, and processing a channel kick
+ * In fact, this does nothing special apart from call PartChannel, and processing a channel kick
  * @param kickby, the user nick or servername doing the kick
  * @param chan, channel name user being kicked from
  * @param kicked, the user nick getting kicked
@@ -244,26 +247,27 @@ int del_chanmember (Channel *c, Client *user)
  */
 
 void
-kick_chan (const char *kickby, const char *chan, const char *kicked, const char *kickreason)		
+KickChannel (const char *kickby, const char *chan, const char *kicked, const char *kickreason)		
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Channel *c;
 	Client *u;
 
 	SET_SEGV_LOCATION();
-	dlog (DEBUG2, "kick_chan: %s kicked %s from %s for %s", kickby, kicked, chan, kickreason ? kickreason : "no reason");
+	dlog (DEBUG2, "KickChannel: %s kicked %s from %s for %s", kickby, kicked, chan, kickreason ? kickreason : "no reason");
 	u = find_user (kicked);
 	if (!u) {
-		nlog (LOG_WARNING, "kick_chan: user %s not found", kicked);
+		nlog (LOG_WARNING, "KickChannel: user %s not found", kicked);
 		return;
 	}
 	c = find_chan (chan);
 	if (!c) {
-		nlog (LOG_WARNING, "kick_chan: channel %s not found", chan);
+		nlog (LOG_WARNING, "KickChannel: channel %s not found", chan);
 		return;
 	} 
-	if (del_chanmember (c, u) != NS_SUCCESS)
+	if (del_chanmember (c, u) != NS_SUCCESS) {
 		return;
+	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->target = u;
 	cmdparams->channel = c;
@@ -297,25 +301,25 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
  * @returns Nothing
 */
 
-void
-part_chan (Client * u, const char *chan, const char *reason)
+void PartChannel (Client * u, const char *chan, const char *reason)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Channel *c;
 
 	SET_SEGV_LOCATION();
-	dlog (DEBUG2, "part_chan: parting %s from %s", u->name, chan);
+	dlog (DEBUG2, "PartChannel: parting %s from %s", u->name, chan);
 	if (!u) {
-		nlog (LOG_WARNING, "part_chan: trying to part NULL user from %s", chan);
+		nlog (LOG_WARNING, "PartChannel: trying to part NULL user from %s", chan);
 		return;
 	}
 	c = find_chan (chan);
 	if (!c) {
-		nlog (LOG_WARNING, "part_chan: channel %s not found", chan);
+		nlog (LOG_WARNING, "PartChannel: channel %s not found", chan);
 		return;
 	}
-	if (del_chanmember (c, u) != NS_SUCCESS)
+	if (del_chanmember (c, u) != NS_SUCCESS) {
 		return;
+	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
 	cmdparams->source = u;
@@ -343,17 +347,17 @@ part_chan (Client * u, const char *chan, const char *reason)
 */
 
 void
-ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
+ChannelNickChange (Channel *c, const char *newnick, const char *oldnick)
 {
 	Chanmem *cml;
 
 	SET_SEGV_LOCATION();
 	cml = lnode_find (c->chanmembers, oldnick, comparef);
 	if (!cml) {
-		nlog (LOG_WARNING, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
+		nlog (LOG_WARNING, "ChannelNickChange: %s isn't a member of %s", oldnick, c->name);
 		return;
 	}
-    dlog (DEBUG3, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
+    dlog (DEBUG3, "ChannelNickChange: newnick %s, oldnick %s", newnick, oldnick);
 	strlcpy (cml->nick, newnick, MAXNICK);
 }
 
@@ -369,11 +373,10 @@ ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
  * @returns Nothing
 */
 
-
 void
-join_chan (const char* nick, const char *chan)
+JoinChannel (const char* nick, const char *chan)
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Client * u;
 	Channel *c;
 	Chanmem *cm;
@@ -381,40 +384,39 @@ join_chan (const char* nick, const char *chan)
 	SET_SEGV_LOCATION();
 	u = find_user (nick);
 	if (!u) {
-		nlog (LOG_WARNING, "join_chan: tried to join unknown user %s to channel %s", nick, chan);
+		nlog (LOG_WARNING, "JoinChannel: tried to join unknown user %s to channel %s", nick, chan);
 		return;
 	}
 	if (!ircstrcasecmp ("0", chan)) {
 		/* join 0 is actually part all chans */
-		dlog (DEBUG2, "join_chan: parting %s from all channels", u->name);
+		dlog (DEBUG2, "JoinChannel: parting %s from all channels", u->name);
 		PartAllChannels (u, NULL);
 		return;
 	}
 	c = find_chan (chan);
 	if (!c) {
 		/* its a new Channel */
-		dlog (DEBUG2, "join_chan: new channel %s", chan);
+		dlog (DEBUG2, "JoinChannel: new channel %s", chan);
 		c = new_chan (chan);
 	}
 	/* add this users details to the channel members hash */
+	if (list_find (c->chanmembers, u->name, comparef)) {
+		nlog (LOG_WARNING, "JoinChannel: tried to add %s to channel %s but they are already a member", u->name, chan);
+		return;
+	}
+	if (list_isfull (c->chanmembers)) {
+		nlog (LOG_CRITICAL, "JoinChannel: channel %s member list is full", c->name);
+		return;
+	}
+	dlog (DEBUG2, "JoinChannel: adding usernode %s to channel %s", u->name, chan);
 	cm = ns_calloc (sizeof (Chanmem));
 	strlcpy (cm->nick, u->name, MAXNICK);
 	cm->tsjoin = me.now;
 	cm->flags = 0;
-	dlog (DEBUG2, "join_chan: adding usernode %s to channel %s", u->name, chan);
-	if (list_find (c->chanmembers, u->name, comparef)) {
-		nlog (LOG_WARNING, "join_chan: tried to add %s to channel %s but they are already a member", u->name, chan);
-		return;
-	}
-	if (list_isfull (c->chanmembers)) {
-		nlog (LOG_CRITICAL, "join_chan: channel %s member list is full", c->name);
-		ns_free (cm);
-		return;
-	}
 	lnode_create_append (c->chanmembers, cm);
 	c->users++;
 	if (list_isfull (u->user->chans)) {
-		nlog (LOG_CRITICAL, "join_chan: user %s member list is full", u->name);
+		nlog (LOG_CRITICAL, "JoinChannel: user %s member list is full", u->name);
 		return;
 	}
 	lnode_create_append (u->user->chans, c->name);
@@ -427,7 +429,7 @@ join_chan (const char* nick, const char *chan)
 	}
 	SendAllModuleEvent (EVENT_JOIN, cmdparams);
 	ns_free (cmdparams);
-	dlog (DEBUG3, "join_chan: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
+	dlog (DEBUG3, "JoinChannel: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 }
 
 /** @brief Dump Channel information
@@ -440,8 +442,7 @@ join_chan (const char* nick, const char *chan)
  * @returns Nothing
 */
 
-void 
-dumpchanmembers (CmdParams* cmdparams, Channel* c)
+static void ListChannelMembers (CmdParams* cmdparams, Channel *c)
 {
  	Chanmem *cm;
 	lnode_t *cmn;
@@ -455,20 +456,19 @@ dumpchanmembers (CmdParams* cmdparams, Channel* c)
 	}
 }
 
-static void 
-dumpchan (CmdParams* cmdparams, Channel* c)
+static void ListChannel (CmdParams* cmdparams, Channel *c)
 {
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Channel:    %s", cmdparams->source), c->name);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Created:    %ld", cmdparams->source), (long)c->creationtime);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("TopicOwner: %s TopicTime: %ld Topic: %s", cmdparams->source), c->topicowner, (long)c->topictime, c->topic);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("PubChan?:   %d", cmdparams->source), is_pub_chan (c));
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Flags:      %x", cmdparams->source), c->flags);
-	dumpchanmodes (cmdparams, c);
-	dumpchanmembers (cmdparams, c);
+	ListChannelModes (cmdparams, c);
+	ListChannelMembers (cmdparams, c);
 	irc_prefmsg (ns_botptr, cmdparams->source, "========================================");
 }
 
-void ChanDump (CmdParams* cmdparams, const char *chan)
+void ListChannels (CmdParams* cmdparams, const char *chan)
 {
 	hnode_t *cn;
 	hscan_t sc;
@@ -485,33 +485,30 @@ void ChanDump (CmdParams* cmdparams, const char *chan)
 		hash_scan_begin (&sc, channelhash);
 		while ((cn = hash_scan_next (&sc)) != NULL) {
 			c = hnode_get (cn);
-			dumpchan(cmdparams, c);
+			ListChannel (cmdparams, c);
 		}
 	} else {
 		c = find_chan (chan);
 		if (c) {
-			dumpchan(cmdparams, c);
+			ListChannel (cmdparams, c);
 		} else {
-			irc_prefmsg (ns_botptr, cmdparams->source, __("ChanDump: can't find channel %s", cmdparams->source), chan);
+			irc_prefmsg (ns_botptr, cmdparams->source, __("ListChannels: can't find channel %s", cmdparams->source), chan);
 		}
 	}
 }
 
-
-/** @brief Find a channel
+/** @brief find_chan
  *
- * Finds the channel structure for the channel named chan, or NULL if it can't be found
+ *  Finds the channel structure for the channel named chan
  *
- * @param chan the channel name to find
+ *  @param chan the channel name to find
  *
- * @returns The Channel structure for chan, or NULL if it can't be found.
+ *  @returns channel structure for chan, or NULL if it can't be found.
 */
 
-
-Channel *
-find_chan (const char *chan)
+Channel *find_chan (const char *chan)
 {
-	Channel* c;
+	Channel *c;
 
 	c = (Channel *)hnode_find (channelhash, chan);
 	if (!c) {
@@ -520,66 +517,68 @@ find_chan (const char *chan)
 	return c;
 }
 
-/** @brief Returns if the nick is a member of the channel
+/** @brief IsChanMember 
  *
- * Returns 1 if nick is part of the channel, 0 if they are not
+ *  Check whether nick is a member of the channel
  *
- * @param chan the channel to check
- * @param u the user to check 
+ *  @param c the channel to check
+ *  @param u the user to check 
  *
- * @returns 1 if they are, 0 if they are not 
+ *  @returns NS_TRUE if user is a member of channel, NS_FALSE if not 
 */
 
-int 
-IsChanMember (Channel *c, Client *u) 
+int IsChanMember (Channel *c, Client *u) 
 {
 	if (!u || !c) {
-		return 0;
+		return NS_FALSE;
 	}
 	if (list_find (c->chanmembers, u->name, comparef)) {
-		return 1;
+		return NS_TRUE;
 	}
-	return 0;
+	return NS_FALSE;
 }
 
-/** @brief Returns if the nick has a particular channel status e.g. ChanOp
+/** @brief test_cumode
  *
- * @param chan the channel to check
- * @param nick the nick to check 
+ *  Whether nick has a particular channel status e.g. ChanOp
  *
- * @returns 1 if they are, 0 if they are not 
-*/
+ *  @param chan the channel to check
+ *  @param nick the nick to check 
+ *
+ *  @return NS_TRUE if has, else NS_FALSE
+ */
 
-int test_cumode(char* chan, char* nick, int flag)
+int test_cumode (char* chan, char* nick, int flag)
 {
 	Client * u;
-	Channel* c;
+	Channel *c;
  	Chanmem *cm;
 
 	u = find_user(nick);
 	c = find_chan(chan);
 	if (!u || !c) {
-		return 0;
+		return NS_FALSE;
 	}
 	cm = lnode_find (c->chanmembers, nick, comparef);
 	if (cm) {
 		if (cm->flags & flag) {
-			return 1;
+			return NS_TRUE;
 		}
 	}	
-	return 0;
+	return NS_FALSE;
 }
 
-
-/** @brief initialize the channel data
+/** @brief InitChannels
  *
- * initializes the channel data and channel hash channelhash.
+ *  initialise channel subsystem
+ *  NeoStats core use only.
  *
- * @return Nothing
-*/
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 
-int 
-InitChannels ()
+int InitChannels (void)
 {
 	channelhash = hash_create (CHANNEL_TABLE_SIZE, 0, 0);
 	if(!channelhash)	{
@@ -588,6 +587,16 @@ InitChannels ()
 	}
 	return NS_SUCCESS;
 }
+
+/** @brief FiniChannels
+ *
+ *  cleanup channel subsystem
+ *  NeoStats core use only.
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 void FiniChannels (void)
 {
@@ -612,7 +621,7 @@ hash_t *GetChannelHash (void)
 	return channelhash;
 }
 
-void clear_channel_moddata (Channel* c)
+void clear_channel_moddata (Channel *c)
 {
 	if (c)
 	{
@@ -620,7 +629,7 @@ void clear_channel_moddata (Channel* c)
 	}
 }
 
-void set_channel_moddata (Channel* c, void * data)
+void set_channel_moddata (Channel *c, void * data)
 {
 	if (c)
 	{
@@ -628,7 +637,7 @@ void set_channel_moddata (Channel* c, void * data)
 	}
 }
 
-void* get_channel_moddata (Channel* c)
+void* get_channel_moddata (Channel *c)
 {
 	if (c)
 	{

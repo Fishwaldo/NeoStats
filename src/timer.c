@@ -50,10 +50,9 @@ int InitTimers (void)
 	return NS_SUCCESS;
 }
 
-int FiniTimers (void)
+void FiniTimers (void)
 {
 	hash_destroy (timerhash);
-	return NS_SUCCESS;
 }
 
 void

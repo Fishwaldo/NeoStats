@@ -204,7 +204,7 @@ int ModInit (Module *mod_ptr)
 
 int ModSynch (void)
 {
-	cs_bot = init_bot (&cs_botinfo);
+	cs_bot = AddBot (&cs_botinfo);
 	if (!cs_bot) {
 		return NS_FAILURE;
 	}

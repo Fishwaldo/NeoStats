@@ -60,6 +60,7 @@ include/Makefile.am -text
 include/Makefile.in -text
 include/auth.h -text
 include/bans.h -text
+include/base64.h -text
 include/bots.h -text
 include/channels.h eol=lf
 include/commands.h -text

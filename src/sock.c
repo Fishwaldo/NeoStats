@@ -532,14 +532,13 @@ int InitSocks (void)
 	return NS_SUCCESS;
 }
 
-int FiniSocks (void) 
+void FiniSocks (void) 
 {
 	ns_free(TimeOut);
 	ns_free(ufds);
 	if (servsock > 0)
 		os_sock_close (servsock);
 	hash_destroy(sockethash);
-	return NS_SUCCESS;
 }
 
 /** @brief create a new socket

@@ -30,7 +30,7 @@ void ServerDump (const char *name);
 int InitServers (void);
 void PingServers (void);
 void FiniServers (void);
-Client *findserverbase64 (const char *num);
+Client *find_server_base64 (const char *num);
 void RequestServerUptimes (void);
 
 #endif /* _SERVER_H_ */
