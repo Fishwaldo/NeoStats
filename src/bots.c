@@ -590,7 +590,7 @@ static void ConnectBot( Bot *botptr )
 			irc_join( botptr, me.serviceschan, me.servicescmode );
 		}
 	} else {
-		irc_nick( botptr->name, botptr->u->user->username, botptr->u->user->hostname, botptr->u->info, "" );
+		irc_nick( botptr->name, botptr->u->user->username, botptr->u->user->hostname, botptr->u->info, "+" );
 	}	
 	if( botptr->flags & BOT_FLAG_DEAF ) {
 		if( HaveUmodeDeaf() ) {
