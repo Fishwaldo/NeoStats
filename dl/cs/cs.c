@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.11 2002/09/12 15:42:36 shmad Exp $
+** $Id: cs.c,v 1.12 2002/09/13 14:54:38 shmad Exp $
 */
 
 #include <stdio.h>
@@ -38,7 +38,7 @@ int cs_new_user(char **av, int ac);
 int cs_user_modes(char **av, int ac);
 int cs_del_user(char **av, int ac);
 int cs_user_kill(char **av, int ac);
-int cs_user_nick(char *nick, char *newnick);
+int cs_user_nick(char **av, int ac);
 
 static void cs_status(User *);
 static void cs_signwatch(User *u);
@@ -149,7 +149,7 @@ EventFnList my_event_list[] = {
     { "UMODE", cs_user_modes},
     { "SIGNOFF", cs_del_user},
     { "KILL", cs_user_kill},
-    { "NICK", cs_user_nick},
+    { "NICK_CHANGE", cs_user_nick},
     { NULL, NULL}
 };
 
@@ -411,11 +411,11 @@ int cs_user_kill(char **av, int ac) {
 }
 
 /* If a user has changed their nick say so */
-int cs_user_nick(char *nick, char *newnick) {
+int cs_user_nick(char **av, int ac) {
     /* Approximate Segfault Location */
     strcpy(segv_location, "cs_user_nick");
 
-    if (nick_watch) if (is_synced) chanalert(s_ConnectServ, "\2NICK\2 %s Changed their nick to %s", nick, newnick);
+    if (nick_watch) if (is_synced) chanalert(s_ConnectServ, "\2NICK\2 %s Changed their nick to %s", av[0], av[1]);
     return 1;
 }
 
