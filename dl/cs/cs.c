@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.30 2003/09/09 11:33:08 fishwaldo Exp $
+** $Id: cs.c,v 1.31 2003/09/17 03:18:53 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -354,7 +354,7 @@ int cs_del_user(char **av, int ac)
 int cs_user_modes(char **av, int ac)
 {
 	int add = 1;
-	char *modes, *modes1;
+	char *modes;
 	User *u;
 
 	/* Approximate Segfault Location */
@@ -376,11 +376,8 @@ int cs_user_modes(char **av, int ac)
 		/* its me, forget it */
 		return 1;
 	}
-	if (!u->modes)
-		return -1;
-	modes = u->modes;
-	modes1 = (char *)(av[1]);
-	switch (*modes1) {
+	modes = (char *)(av[1]);
+	switch (*modes) {
 	case '+':
 		add = 1;
 		break;
@@ -389,8 +386,8 @@ int cs_user_modes(char **av, int ac)
 		break;
 	}
 
-	while (*modes1++) {
-		switch (*modes1) {
+	while (*modes++) {
+		switch (*modes) {
 		case '+':
 			add = 1;
 			break;
@@ -569,7 +566,7 @@ int cs_user_modes(char **av, int ac)
 int cs_user_smodes(char **av, int ac)
 {
 	int add = 1;
-	char *modes, *modes1;
+	char *modes;
 	User *u;
 
 	/* Approximate Segfault Location */
@@ -590,11 +587,8 @@ int cs_user_smodes(char **av, int ac)
 		return 1;
 	}
 
-	if (!u->modes)
-		return -1;
-	modes = u->modes;
-	modes1 = (char *)(av[1]);
-	switch (*modes1) {
+	modes = (char *)(av[1]);
+	switch (*modes) {
 	case '+':
 		add = 1;
 		break;
@@ -603,8 +597,8 @@ int cs_user_smodes(char **av, int ac)
 		break;
 	}
 
-	while (*modes1++) {
-		switch (*modes1) {
+	while (*modes++) {
+		switch (*modes) {
 		case '+':
 			add = 1;
 			break;
