@@ -237,8 +237,7 @@ extern int s_user_modes(User *u) {
 	}
 	 if (!u->modes) return -1; 
 	modes = u->modes;
-	while (*modes++) {
-
+	while (*modes) {
 		switch(*modes) {
 			case '+': add = 1;	break;
 			case '-': add = 0;	break;
@@ -267,6 +266,7 @@ extern int s_user_modes(User *u) {
 			default: 
 				break;
 		}
+		modes++;
 	}
 	return 1;
 }

@@ -2,8 +2,11 @@ HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
 
+* Version 1.7 * March 30th, 2002
+- Possible signon crash fixed
+- "Can't Find db" message only appears once now
+
 * Version 1.6 * March 15th, 2002
-- Moved module to proper core dir lmao.. oh no its broken lmfao (Shmad)
 - Code overhaul for NeoStats-2.5 core.
 
 * Version 1.5 * January 14th, 2002

@@ -2,7 +2,7 @@
 *
 ** Module: HostServ
 ** Description: Network User Virtual Host Service
-** Version: 1.6
+** Version: 1.7
 ** Authors: ^Enigma^ & Shmad
 */
 
@@ -38,6 +38,9 @@ void hsdat(char *, ...);
 void hshsamend(char *, ...);
 void Loadhosts();
 
+int data_synch;
+int load_synch;
+
 char **LoadArry;
 char **DelArry;
 char **ListArry;
@@ -48,7 +51,7 @@ int ListArryCount = 0;
 Module_Info my_info[] = { {
     "HostServ",
     "Network User Virtual Host Service",
-    "1.6"
+    "1.7"
 } };
 
 int new_m_version(char *av, char *tmp) {
@@ -65,6 +68,7 @@ static int hs_sign_on(User *u) {
     Loadhosts();
 
     if (findbot(u->nick)) return 1;
+    if (!load_synch) return 1;
 
     /* Check HostName Against Data Contained in vhosts.data */        
       for (map = nnickmap; map; map = map->next) {
@@ -311,7 +315,8 @@ void Loadhosts()
     char buf[BUFSIZE];
 
     if (fp) {
-        while (fgets(buf, BUFSIZE, fp)) {
+        load_synch = 1;
+		while (fgets(buf, BUFSIZE, fp)) {
             strip(buf);
             map = smalloc(sizeof(HS_Map));
 
@@ -329,8 +334,11 @@ void Loadhosts()
     }
       fclose(fp);
     } else {
-        notice(s_Services, "data/vhosts.db Database Not Found! Either Add a User or Disable This Function");
-    }
+      if (!data_synch) {
+          notice(s_Services, "data/vhosts.db Database Not Found! Either Add a User or Disable This Function");
+          data_synch = 1;
+	  }
+   }
 }
 
 
