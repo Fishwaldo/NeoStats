@@ -238,6 +238,7 @@ int DBAOpenTable( char *table )
 	tbe->handle = DBMOpenTable( tbe->name );
 	if( !tbe->handle ) {
 		ns_free( tbe );
+		FATAL_ERROR( "DBAOpenTable failed. Check log file for details" );
 		return NS_FAILURE;
 	}
 	hnode_create_insert( dbe->tablehash, tbe, tbe->name );

@@ -40,12 +40,12 @@ void *DBMOpenTable( const char *name )
 	gdbm_file = gdbm_open( filename, 0, GDBM_WRCREAT | GDBM_NOLOCK, 00664, NULL );
 	if( gdbm_file == NULL )
 	{
-		dlog( DEBUG1, "gdbm_open fail: %s", gdbm_strerror( gdbm_errno ) );
+		nlog( LOG_ERROR, "gdbm_open fail: %s", gdbm_strerror( gdbm_errno ) );
 		return NULL;
 	}
 	if( gdbm_setopt( gdbm_file, GDBM_CACHESIZE, &cache_size, sizeof( int ) ) == -1 )
 	{
-		dlog( DEBUG1, "gdbm_setopt fail: %s", gdbm_strerror( gdbm_errno ) );
+		nlog( LOG_ERROR, "gdbm_setopt fail: %s", gdbm_strerror( gdbm_errno ) );
 		return NULL;
 	}
 	return ( void * )gdbm_file;

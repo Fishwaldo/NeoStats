@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - DBA layer will now cause NeoStats to exit in the event of an error opening
+   a table. (M)
  - Remove GDBM locking to try and fix problems on BSD. (M)
  - Remove RTA support. (M)
  - Add Umask function so our config files are not world/group readable, and
