@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.30 2003/01/06 15:03:20 fishwaldo Exp $
+** $Id: hostserv.c,v 1.31 2003/01/07 12:22:33 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -169,6 +169,7 @@ static int hs_sign_on(char **av, int ac) {
 	  	tmp2 = strlower(u->hostname);
 	  	if (fnmatch(tmp, tmp2, 0) == 0) {
           		ssvshost_cmd(u->nick, map->vhost);
+			prefmsg(u->nick, s_HostServ, "Automatically setting your Virtual Host to %s", map->vhost);
               		return 1;
           	}
       	}
@@ -261,6 +262,7 @@ int __Bot_Message(char *origin, char **av, int ac)
                 hs_login(u, av[2], av[3]);
     } else {
         prefmsg(u->nick, s_HostServ, "Unknown Command: \2%s\2, perhaps you need some HELP?", av[1]);
+	chanalert(s_HostServ, "%s tried %s, but they have no access, or command was not found", u->nick, av[1]);
     }
     return 1;
 
@@ -352,12 +354,23 @@ void hslog(char *fmt, ...)
         fclose(hsfile);
 
 }
+void write_database() {
+        FILE *hsfile = fopen("data/vhosts.db", "w");
+	hnode_t *hn;
+	hscan_t hs;
+	hs_map *map;
 
+	hash_scan_begin(&hs, vhosts);
+	while ((hn = hash_scan_next(&hs)) != NULL) {
+		map = hnode_get(hn);
+	        fprintf(hsfile, ":%s %s %s %s %s\n", map->nnick, map->host, map->vhost, map->passwd, map->added);
+	}
+        fclose(hsfile);
+}
 
 /* Routine for registrations with the 'vhosts.db' file */
 void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 {
-        FILE *hsfile = fopen("data/vhosts.db", "a");
 	hnode_t *hn;
 	hs_map *map;
 
@@ -370,13 +383,7 @@ void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 	hn = hnode_create(map);
 	hash_insert(vhosts, hn, map->nnick);
 
-        if (!hsfile) {
-	        log("Unable to open data/vhosts.db for writing.");
-        	return;
-        }
-
-        fprintf(hsfile, ":%s %s %s %s %s\n", nick, host, vhost, pass, who);
-        fclose(hsfile);
+	write_database();
 
 }
 
@@ -389,13 +396,14 @@ static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
     hsdat(cmd, m, h, p, u->nick);
     hslog("%s added a vhost for %s with realhost %s vhost %s and password %s",u->nick, cmd, m, h, p);
     prefmsg(u->nick, s_HostServ, "%s has sucessfuly been registered under realhost: %s vhost: %s and password: %s",cmd, m, h, p);
+    chanalert(s_HostServ, "%s added a vhost %s for %s with realhost %s", u->nick, h, cmd, h);
     /* Apply The New Hostname If The User Is Online */        
-    if (finduser(cmd)) {
-          u = finduser(cmd);
-          if (findbot(u->nick)) return;
+    if ((u = finduser(cmd)) != NULL) {
+          if (findbot(cmd)) return;
           tmp = strlower(u->hostname);
 	  if (fnmatch(m, tmp, 0) == 0) {
               ssvshost_cmd(u->nick, h);
+              prefmsg(u->nick, s_HostServ, "%s is online now, setting vhost to %s", cmd, h);
               return;
           }
     }
@@ -483,7 +491,7 @@ void Loadhosts()
 		    	strcpy(map->added, "0");
 		    /* add it to the hash */
 		    hn = hnode_create(map);
-		    hash_insert(vhosts, hn, LoadArry[0]);
+		    hash_insert(vhosts, hn, map->nnick);
 	    	}
     	fclose(fp);
     } 
@@ -508,15 +516,18 @@ static void hs_del(User *u, int tmpint)
 		prefmsg(u->nick, s_HostServ, "The following vhost was removed from the Vhosts Database");
 	        prefmsg(u->nick, s_HostServ, "\2%s - %s\2", map->nnick, map->vhost);
 		hslog("%s removed the VHOST: %s for %s", u->nick,map->vhost,map->nnick);
-		free(map);
+		chanalert(s_HostServ, "%s removed vhost %s for %s", u->nick, map->vhost, map->nnick);
 		hash_scan_delete(vhosts, hn);
+		free(map);
 		hnode_destroy(hn);
 	    }
 	i++;
     }
 
     if (tmpint > i) 
-    prefmsg(u->nick, s_HostServ, "ERROR: There is no vhost on list number \2%d\2",tmpint);
+	prefmsg(u->nick, s_HostServ, "ERROR: There is no vhost on list number \2%d\2",tmpint);
+    else
+    	write_database();
     return;
 }
 
@@ -531,13 +542,13 @@ static void hs_login(User *u, char *login, char *pass)
 
     	/* Check HostName Against Data Contained in vhosts.data */
       	hn = hash_lookup(vhosts, login);
-printf("%s\n", login);
 	if (hn) {
 		map = hnode_get(hn);
 		if (!strcasecmp(map->passwd, pass)) {
 	        	ssvshost_cmd(u->nick, map->vhost);
 		      	prefmsg(u->nick, s_HostServ, "Your VHOST %s has been set.", map->vhost);
 		      	hslog("%s used LOGIN to obtain userhost of %s",u->nick, map->vhost);
+			chanalert(s_HostServ, "%s used login to get Vhost %s", u->nick, map->vhost);
 	              	return;
            	}
        	}
