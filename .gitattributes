@@ -627,6 +627,7 @@ src/nsdba.c -text
 src/nsmemory.c -text
 src/numerics.c -text
 src/oscalls.c -text
+src/ossocket.c -text
 src/protocol/Makefile.am -text
 src/protocol/Makefile.in -text
 src/protocol/bahamut14.c eol=lf

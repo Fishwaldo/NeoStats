@@ -210,6 +210,9 @@
 				RelativePath=".\oscalls.c">
 			</File>
 			<File
+				RelativePath=".\ossocket.c">
+			</File>
+			<File
 				RelativePath=".\servers.c">
 			</File>
 			<File

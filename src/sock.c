@@ -48,31 +48,47 @@ static hash_t *sockethash;
 
 char recbuf[BUFSIZE];
 
-/** @breif Event Subsystem Callback
+/** @brief Event Subsystem Callback
  */
-void libevent_log(int severity, const char *msg) {
-      switch (severity) {
-            case _EVENT_LOG_DEBUG:
-                    dlog(DEBUG1, "LibEvent: %s", msg);
-                    break;
-            case _EVENT_LOG_MSG:
-                    nlog(LOG_INFO, "LibEvent: %s", msg);
-                    break;
-            case _EVENT_LOG_WARN:
-                    nlog(LOG_WARNING, "LibEvent: %s", msg);
-                    break;
-            case _EVENT_LOG_ERR:
-                    nlog(LOG_ERROR, "LibEvent: %s", msg);
-                    break;
-            default:
-                    nlog(LOG_WARNING, "LibEvent(%d): %s", severity, msg);
-                    break;
-      }
+void libevent_log(int severity, const char *msg) 
+{
+	switch (severity) {
+		case _EVENT_LOG_DEBUG:
+			dlog(DEBUG1, "LibEvent: %s", msg);
+			break;
+		case _EVENT_LOG_MSG:
+			nlog(LOG_INFO, "LibEvent: %s", msg);
+			break;
+		case _EVENT_LOG_WARN:
+			nlog(LOG_WARNING, "LibEvent: %s", msg);
+			break;
+		case _EVENT_LOG_ERR:
+			nlog(LOG_ERROR, "LibEvent: %s", msg);
+			break;
+		default:
+			nlog(LOG_WARNING, "LibEvent(%d): %s", severity, msg);
+			break;
+	}
 }      
 
+/** @brief Called when we receive a error from the ircd socket 
+  * 
+  * @param what the type of error
+  * @data not used.
+  *
+  * @return Never Returns. Just exits
+  */
 
-
-static int error_from_ircd_socket(int what, void *data);
+static int 
+error_from_ircd_socket(int what, void *data) {
+	nlog (LOG_CRITICAL, "Error from IRCd Socket: %s", strerror(errno));
+	/* Try to close socket then reset the servsock value to avoid cyclic calls */
+	del_sock(me.servsock);
+	me.servsock = NULL;
+	/* XXX really exit? */
+	do_exit (NS_EXIT_ERROR, NULL);
+	return 0;
+}
 
 /** @brief Connect to a IRC server. Only used internally. 
  *
@@ -290,10 +306,12 @@ sock_connect (int socktype, struct in_addr ip, int port)
 
 	/* set non blocking */
 
+#ifndef WIN32
 	if ((i = os_sock_set_nonblocking (s)) < 0) {
 		nlog (LOG_CRITICAL, "can't set socket %d(%s) non-blocking: %s", s, GET_CUR_MODNAME(), strerror (i));
 		return NS_FAILURE;
 	}
+#endif
 	setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&flags, sizeof(flags));
 	
 	if ((i = connect (s, (struct sockaddr *) &sa, sizeof (sa))) < 0) {
@@ -372,24 +390,6 @@ send_to_sock(Sock *sock, const char *buf, const int buflen) {
 }
 
 
-/** @breif Called when we receive a error from the ircd socket 
-  * 
-  * @param what the type of error
-  * @data not used.
-  *
-  * @return Never Returns. Just exits
-  */
-
-static int 
-error_from_ircd_socket(int what, void *data) {
-	nlog (LOG_CRITICAL, "Error from IRCd Socket: %s", strerror(errno));
-	/* Try to close socket then reset the servsock value to avoid cyclic calls */
-	del_sock(me.servsock);
-	me.servsock = NULL;
-	/* XXX really exit? */
-	do_exit (NS_EXIT_ERROR, NULL);
-	return 0;
-}
 #undef SOCKDEBUG 
 
 /** @brief This function actually handles reading data from our sockets

@@ -46,7 +46,9 @@ static int dcc_parse(void *arg, void *line, size_t);
 static int dcc_error(int what, void *arg);
 static void DelDCCClient(Client *dcc);
 static int dcc_write(Client *dcc, char *buf);
-static dcc_cmd dcc_cmds[]= {
+
+static dcc_cmd dcc_cmds[]= 
+{
 	{"SEND", dcc_req_send},
 	{"CHAT", dcc_req_chat},
 	{NULL},
@@ -74,7 +76,6 @@ static void DCCGotAddr(void *data, adns_answer *a) {
 
 static int DCCChatStart(Client *dcc, int port)
 {
-
 	dcc->port = port;
 	if (dcc->ip.s_addr > 0) {
 		/* we have a valid IP address for this user, so just go and kick off the connection straight away */
@@ -86,10 +87,8 @@ static int DCCChatStart(Client *dcc, int port)
 	return NS_SUCCESS;
 }
 
-
-
-
-static int DCCChatConnect(Client *dcc, int port) {
+static int DCCChatConnect(Client *dcc, int port) 
+{
 	OS_SOCKET socketfd;
 	char tmpname[BUFSIZE];
 

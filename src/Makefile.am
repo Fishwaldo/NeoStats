@@ -6,8 +6,9 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confusel
 		dotconf.c conf.c dl.c dns.c exclude.c hash.c ircd.c ircstring.c \
 		lang.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
-		timer.c transfer.c users.c modes.c ctcp.c dcc.c oscalls.c nsmemory.c \
-		base64.c numerics.c settings.c botinfo.c
+		timer.c transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c \
+		base64.c numerics.c settings.c botinfo.c \
+		oscalls.c ossocket.c 
 AM_CFLAGS = 	-I$(top_srcdir)/lib/adns \
 		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE \
 		-I$(top_srcdir)/lib/event

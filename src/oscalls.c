@@ -379,63 +379,6 @@ int os_file_get_size( const char* filename )
 }
 
 /*
- *  Wrapper function for sock_close
- */
-
-int os_sock_close( OS_SOCKET sock )
-{
-#ifdef WIN32
-	return closesocket( sock );
-#else
-	return close( sock );
-#endif      			
-}
-
-/*
- *  Wrapper function for sock_write
- */
-
-int os_sock_write( OS_SOCKET s, const char* buf, int len )
-{
-#ifdef WIN32
-	return send( s, buf, len, 0 );
-#else	
-	return write( s, buf, len );
-#endif
-}
-
-/*
- *  Wrapper function for sock_read
- */
-
-int os_sock_read( OS_SOCKET s, char* buf, int len )
-{
-#ifdef WIN32
-	return recv( s, buf, len, 0 );
-#else
-	return read( s, buf, len );
-#endif
-}
-
-/*
- *  Wrapper function for sock_set_nonblocking
- */
-
-int os_sock_set_nonblocking( OS_SOCKET s )
-{
-	int flags;
-
-#ifdef WIN32
-	flags = 1;
-	return ioctlsocket( s, FIONBIO, &flags );
-#else
-	flags = fcntl( s, F_GETFL, 0 );
-	flags |= O_NONBLOCK;
-	return fcntl( s, F_SETFL, flags );
-#endif
-}
-
-/*
  *  Wrapper function for strftime
  */
 
