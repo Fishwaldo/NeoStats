@@ -41,8 +41,6 @@
 
 
 
-const char hsversion_date[] = __DATE__;
-const char hsversion_time[] = __TIME__;
 char s_HostServ[MAXNICK];
 typedef struct hs_map_ {
 	char nnick[MAXNICK];
@@ -107,10 +105,12 @@ int LoadArryCount = 0;
 int DelArryCount = 0;
 int ListArryCount = 0;
 
-Module_Info HostServ_info[] = { {
-				 "HostServ",
-				 "Network User Virtual Host Service",
-				 "3.0"}
+ModuleInfo __module_info = {
+	 "HostServ",
+	 "Network User Virtual Host Service",
+	 "3.0",
+	__DATE__,
+	__TIME__
 };
 
 int findnick(const void *key1, const void *key2)
@@ -218,8 +218,8 @@ int new_m_version(char *origin, char **av, int ac)
 {
 	snumeric_cmd(351, origin,
 		     "Module HostServ Loaded, Version: %s %s %s",
-		     HostServ_info[0].module_version, hsversion_date,
-		     hsversion_time);
+			 __module_info.module_version, __module_info.module_build_date,
+			 __module_info.module_build_time);
 	return 0;
 }
 
@@ -269,7 +269,7 @@ static int hs_sign_on(char **av, int ac)
 	return 1;
 }
 
-Functions HostServ_fn_list[] = {
+Functions __module_functions[] = {
 	{MSG_VERSION, new_m_version, 1}
 	,
 #ifdef HAVE_TOKEN_SUP
@@ -605,11 +605,11 @@ int Online(char **av, int ac)
 
 	if (init_bot
 	    (s_HostServ, user, host, rname, "+oS",
-	     HostServ_info[0].module_name) == -1) {
+	     __module_info.module_name) == -1) {
 		/* Nick was in use */
 		snprintf(s_HostServ, MAXNICK, "%s_", s_HostServ);
 		init_bot(s_HostServ, user, host, rname, "+oS",
-			 HostServ_info[0].module_name);
+			 __module_info.module_name);
 	}
 	free(user);
 	free(host);
@@ -619,13 +619,13 @@ int Online(char **av, int ac)
 		  hs_cfg.add, hs_cfg.del, hs_cfg.list, hs_cfg.view);
 
 	add_mod_timer("CleanupHosts", "Cleanup_Old_Vhosts",
-		      HostServ_info[0].module_name, 7200);
+		      __module_info.module_name, 7200);
 	Loadhosts();
 
 	return 1;
 };
 
-EventFnList HostServ_Event_list[] = {
+EventFnList __module_events[] = {
 	{"ONLINE", Online}
 	,
 	{"SIGNON", hs_sign_on}
@@ -640,22 +640,6 @@ EventFnList HostServ_Event_list[] = {
 #endif
 	{NULL, NULL}
 };
-
-Module_Info *__module_get_info()
-{
-	return HostServ_info;
-};
-
-Functions *__module_get_functions()
-{
-	return HostServ_fn_list;
-};
-
-EventFnList *__module_get_events()
-{
-	return HostServ_Event_list;
-};
-
 
 int __ModInit(int modnum, int apiver)
 {
