@@ -1,7 +1,15 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
-
-
-
+* NeoStats * Fish * Version 2.0.14-jh1
+ - Lots of Updates and fixes
+ - kazlib is now used for Users/Servers list. Has self checks for corruption
+ - when a module crashes (segv) now, Neo doesn't crash as well, but it
+	will unload the module and contine in most cases (depends on how the
+	module crashed, its possible that the module could corrupt the
+	core neo memory still (credit for that peice of code to MonkeyIRCD
+ - sending a message to the spam module will test the above changes. Feedback please!
+ - Cross IRCD support started. Lots of work to do on it though. Initial ircd will be Ultimate!
+ - configure interface changed to support cross ircd support
+ 
 * NeoStats * Fish & Shmad * Version 2.0.13 
  - Fixed a massive problem with crashing and flooding off the entire network!!! (Shmad)
     -> Reported by |clown|
