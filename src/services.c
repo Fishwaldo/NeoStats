@@ -62,7 +62,7 @@ static const char *ns_about[] = {
 	NULL
 };
 
-static ModuleInfo ns_module_info = {
+ModuleInfo ns_module_info = {
 	"NeoStats",
 	"NeoStats Statistical services", 	
 	ns_copyright,

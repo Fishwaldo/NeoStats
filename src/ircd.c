@@ -627,7 +627,7 @@ void
 do_version (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
-	numeric (RPL_VERSION, nick, "%s :%s -> %s %s", me.versionfull, me.name, version_date, version_time);
+	numeric (RPL_VERSION, nick, "%s :%s -> %s %s", me.versionfull, me.name, ns_module_info.build_date, ns_module_info.build_time);
 	ModulesVersion (nick, remoteserver);
 }
 
@@ -1060,19 +1060,19 @@ ssvsmode_cmd (const char *target, const char *modes)
 }
 
 int
-ssvshost_cmd (const char *who, const char *vhost)
+ssvshost_cmd (const char *target, const char *vhost)
 {
 #ifdef GOTSVSHOST 
 	User *u;
 
-	u = finduser (who);
+	u = finduser (target);
 	if (!u) {
-		nlog (LOG_WARNING, "ssvshost_cmd: can't find user %s", who);
+		nlog (LOG_WARNING, "ssvshost_cmd: can't find user %s", target);
 		return 0;
 	}
 
 	strlcpy (u->vhost, vhost, MAXHOST);
-	send_svshost(me.name, who, vhost);
+	send_svshost(me.name, target, vhost);
 #else
 	unsupported_cmd("SVSHOST");
 #endif
@@ -1507,13 +1507,13 @@ do_client (const char *nick, const char *arg1, const char *TS,
 void
 do_kill (const char *nick, const char *reason)
 {
-	DelUser (nick, 1, reason);
+	KillUser (nick, reason);
 }
 
 void
 do_quit (const char *nick, const char *quitmsg)
 {
-	DelUser (nick, 0, quitmsg);
+	QuitUser (nick, quitmsg);
 }
 
 void 

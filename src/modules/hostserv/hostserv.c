@@ -72,10 +72,9 @@ typedef struct hs_user {
 #endif
 
 static int hs_event_signon(CmdParams* cmdparams);
-#if UMODE_REGNICK
+#ifdef UMODE_REGNICK
 static int hs_event_mode(CmdParams* cmdparams);
 #endif
-static int hs_about(CmdParams* cmdparams);
 static int hs_levels(CmdParams* cmdparams);
 static int hs_bans(CmdParams* cmdparams);
 static int hs_login(CmdParams* cmdparams);
@@ -85,9 +84,9 @@ static int hs_list(CmdParams* cmdparams);
 static int hs_view(CmdParams* cmdparams);
 static int hs_del(CmdParams* cmdparams);
 
-static void hs_listban(User * cmdparams->source.user);
-static void hs_addban(User * cmdparams->source.user, char *ban);
-static void hs_delban(User * cmdparams->source.user, char *ban);
+static void hs_listban(User* u);
+static void hs_addban(User* u, char *ban);
+static void hs_delban(User* u, char *ban);
 
 static void SaveBans(void);
 static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who);
@@ -107,11 +106,11 @@ int ListArryCount = 0;
 Bot *hs_bot;
 static BotInfo hs_botinfo = 
 {
+	"HostServ", 
+	"HostServ", 
+	"HS", 
 	"", 
-	"", 
-	"", 
-	"", 
-	"", 
+	"Network virtual host service",
 };
 static Module* hs_module;
 
@@ -130,7 +129,6 @@ ModuleInfo module_info = {
 
 static bot_cmd hs_commands[]=
 {
-	{"ABOUT",	hs_about,	0, 	0,					hs_help_about,	hs_help_about_oneline },
 	{"ADD",		hs_add,		4,	(int)&hs_cfg.add,	hs_help_add,	hs_help_add_oneline },
 	{"DEL",		hs_del,		1, 	(int)&hs_cfg.del,	hs_help_del,	hs_help_del_oneline },
 	{"LIST",	hs_list,	0, 	(int)&hs_cfg.list,	hs_help_list,	hs_help_list_oneline },
@@ -144,13 +142,14 @@ static bot_cmd hs_commands[]=
 
 static bot_setting hs_settings[]=
 {
-	{"NICK",		&hs_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
-	{"USER",		&hs_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
-	{"HOST",		&hs_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
-	{"REALNAME",	&hs_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
-	{"EXPIRE",		&hs_cfg.old,		SET_TYPE_INT,		0, 99, 			NS_ULEVEL_ADMIN, "ExpireDays","days",hs_help_set_expire	},
-	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, "UnetVhosts",NULL,	hs_help_set_hiddenhost	},
-	{"HOSTNAME",	&hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN, "UnetDomain",NULL,	hs_help_set_hostname	},
+	{"NICK",		&hs_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, (void*)"HostServ" },
+	{"ALTNICK",		&hs_botinfo.altnick,SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, (void*)"HostServ" },
+	{"USER",		&hs_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, (void*)"HS" },
+	{"HOST",		&hs_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, (void*)"" },
+	{"REALNAME",	&hs_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"Network virtual host service" },
+	{"EXPIRE",		&hs_cfg.old,		SET_TYPE_INT,		0, 99, 			NS_ULEVEL_ADMIN, "ExpireDays","days",hs_help_set_expire, NULL, (void*)60 },
+	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, "UnetVhosts",NULL,	hs_help_set_hiddenhost, NULL, (void*)0 },
+	{"HOSTNAME",	&hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN, "UnetDomain",NULL,	hs_help_set_hostname, NULL, (void*)"" },
 	{NULL,			NULL,				0,					0, 0, 			0,				 NULL,		  NULL,	NULL	},
 };
 
@@ -177,24 +176,19 @@ void del_vhost(hs_map *vhost)
 	/* no need to list sort here, because its already sorted */
 }
 
-void set_moddata(User *cmdparams->source.user) 
+void set_moddata(User* u) 
 {
 	hs_user *hs;
 
-	if (!cmdparams->source.user->moddata[hs_module->modnum]) {
+	if (!u->moddata[hs_module->modnum]) {
 		hs = malloc(sizeof(hs_user));
 		hs->vhostset = 1;
-		cmdparams->source.user->moddata[hs_module->modnum] = hs;
+		u->moddata[hs_module->modnum] = hs;
 	}
 }
 
 static int hs_event_quit(CmdParams* cmdparams) 
 {
-	User *cmdparams->source.user;
-
-	cmdparams->source.user = finduser(cmdparams->av[0]);
-	if (!cmdparams->source.user) /* User not found */
-		return 1;
 	if (cmdparams->source.user->moddata[hs_module->modnum]) {
 		nlog(LOG_DEBUG2, "hs_event_quit: free module data");
 		free(cmdparams->source.user->moddata[hs_module->modnum]);
@@ -208,15 +202,11 @@ static int hs_event_signon(CmdParams* cmdparams)
 {
 	lnode_t *hn;
 	hs_map *map;
-	User *cmdparams->source.user;
 
 	SET_SEGV_LOCATION();
 
 	if (!is_synced)
 		return 0;
-	cmdparams->source.user = finduser(cmdparams->av[0]);
-	if (!cmdparams->source.user)
-		return 1;
 
 	if (IsMe(cmdparams->source.user)) 
 		return 1;
@@ -275,9 +265,10 @@ int ModInit(Module* mod_ptr)
 	vhosts = list_create(-1);
 	bannedvhosts = hash_create(-1, 0, 0);
 	if (!vhosts) {
-		nlog(LOG_CRITICAL, "Error, Can't create vhosts hash");
+		nlog(LOG_CRITICAL, "Error, can't create vhosts hash");
 		return -1;
 	}
+	ModuleConfig(hs_module, hs_settings);
 	LoadConfig();
 	return 1;
 }
@@ -294,12 +285,11 @@ void ModFini()
 	list_destroy_nodes(vhosts);
 }
 
-#if UMODE_REGNICK
+#ifdef UMODE_REGNICK
 int hs_event_mode(CmdParams* cmdparams) 
 {
 	int add = 0;
 	char *modes;
-	User *cmdparams->source.user;
 	char vhost[MAXHOST];
 
 	/* bail out if its not enabled */
@@ -310,9 +300,6 @@ int hs_event_mode(CmdParams* cmdparams)
 	if (!is_synced || !load_synch)
 		return 0;
 		
-	cmdparams->source.user = finduser(cmdparams->av[0]);
-	if (!cmdparams->source.user) /* User not found */
-		return 1;
 	if (is_oper(cmdparams->source.user)) 
 		/* don't set a opers vhost. Most likely already done */
 		return 1;
@@ -369,12 +356,6 @@ static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 	hn = lnode_create(map);
 	list_append(vhosts, hn);
 	save_vhost(map);
-}
-
-static int hs_about(CmdParams* cmdparams)
-{
-	privmsg_list(cmdparams->source.user->nick, hs_bot->nick, hs_help_about);
-	return 1;
 }
 
 static int hs_levels(CmdParams* cmdparams)
@@ -460,27 +441,28 @@ static int hs_bans(CmdParams* cmdparams)
 	return NS_ERR_SYNTAX_ERROR;
 }
 
-static void hs_listban(User * cmdparams->source.user)
+static void hs_listban(User* u)
 {
 	hnode_t *hn;
 	hscan_t hs;
-	int i = 0;
+	int i = 1;
+
 	hash_scan_begin(&hs, bannedvhosts);
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Banned vhosts");
+	prefmsg(u->nick, hs_bot->nick, "Banned vhosts");
 	while ((hn = hash_scan_next(&hs)) != NULL) {
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick, "%d - %s", ++i,
-			(char *) hnode_get(hn));
+		prefmsg(u->nick, hs_bot->nick, "%d - %s", i, (char *)hnode_get(hn));
+		i++;
 	}
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "End of List.");
+	prefmsg(u->nick, hs_bot->nick, "End of List.");
 
 }
-static void hs_addban(User * cmdparams->source.user, char *ban)
+static void hs_addban(User* u, char *ban)
 {
 	hnode_t *hn;
 	char *host;
 
 	if (hash_lookup(bannedvhosts, ban) != NULL) {
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+		prefmsg(u->nick, hs_bot->nick,
 			"%s already exists in the banned vhost list", ban);
 		return;
 	}
@@ -488,14 +470,14 @@ static void hs_addban(User * cmdparams->source.user, char *ban)
 	strlcpy(host, ban, MAXHOST);
 	hn = hnode_create(host);
 	hash_insert(bannedvhosts, hn, host);
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+	prefmsg(u->nick, hs_bot->nick,
 		"%s added to the banned vhosts list", ban);
 	chanalert(hs_bot->nick, "%s added %s to the banned vhosts list",
-		  cmdparams->source.user->nick, ban);
+		  u->nick, ban);
 	SaveBans();
 }
 
-static void hs_delban(User * cmdparams->source.user, char *ban)
+static void hs_delban(User* u, char *ban)
 {
 	hnode_t *hn;
 	hscan_t hs;
@@ -504,7 +486,7 @@ static void hs_delban(User * cmdparams->source.user, char *ban)
 
 	i = atoi(ban);
 	if ((i < 1) || (i > hash_count(bannedvhosts))) {
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+		prefmsg(u->nick, hs_bot->nick,
 			"Invalid Entry. /msg %s bans for the list",
 			hs_bot->nick);
 		return;
@@ -515,22 +497,22 @@ static void hs_delban(User * cmdparams->source.user, char *ban)
 		++j;
 		if (i == j) {
 			hash_scan_delete(bannedvhosts, hn);
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+			prefmsg(u->nick, hs_bot->nick,
 				"Deleted %s from the banned vhost list",
 				(char *) hnode_get(hn));
 			chanalert(hs_bot->nick,
 				  "%s deleted %s from the banned vhost list",
-				  cmdparams->source.user->nick, (char *) hnode_get(hn));
+				  u->nick, (char *) hnode_get(hn));
 			nlog(LOG_NOTICE,
 			     "%s deleted %s from the banned vhost list",
-			     cmdparams->source.user->nick, (char *) hnode_get(hn));
+			     u->nick, (char *) hnode_get(hn));
 			free(hnode_get(hn));
 			hnode_destroy(hn);
 			SaveBans();
 			return;
 		}
 	}
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Entry %d was not found (Weird?!?)", i);
+	prefmsg(u->nick, hs_bot->nick, "Entry %d was not found (Weird?!?)", i);
 }
 
 static void SaveBans()
@@ -772,7 +754,6 @@ static void LoadHosts()
 {
 	hs_map *map;
 	lnode_t *hn;
-	char buf[BUFSIZE];
 	char *tmp;
 	int count;
 	char **LoadArry;
@@ -922,35 +903,6 @@ static void LoadConfig(void)
 
 	SET_SEGV_LOCATION();
 
-	if (GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
-		strlcpy(hs_bot->nick, "HostServ", MAXNICK);
-	}
-	else {
-		strlcpy(hs_bot->nick, temp, MAXNICK);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "User") < 0) {
-		strlcpy(hs_botinfo.user, "HS", MAXUSER);
-	}
-	else {
-		strlcpy(hs_botinfo.user, temp, MAXUSER);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "Host") < 0) {
-		strlcpy(hs_botinfo.host, me.name, MAXHOST);
-	}
-	else {
-		strlcpy(hs_botinfo.host, temp, MAXHOST);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "RealName") < 0) {
-		strlcpy(hs_botinfo.realname, "Network Virtual Host Service", MAXREALNAME);
-	}
-	else {
-		strlcpy(hs_botinfo.realname, temp, MAXREALNAME);
-		free(temp);
-	}
-
 	GetConf((void *) &hs_cfg.view, CFGINT, "ViewLevel");
 	if ((hs_cfg.view > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
 		hs_cfg.view = 100;
@@ -963,20 +915,6 @@ static void LoadConfig(void)
 	GetConf((void *) &hs_cfg.list, CFGINT, "ListLevel");
 	if ((hs_cfg.list > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
 		hs_cfg.list = 40;
-	if(GetConf((void *) &hs_cfg.old, CFGINT, "ExpireDays") < 0) {
-		hs_cfg.old = 60;
-	}
-	GetConf((void *) &hs_cfg.regnick, CFGBOOL, "UnetVhosts");
-	if (hs_cfg.regnick < 0) {
-		 hs_cfg.regnick = 0;
-	}
-	if (GetConf((void *) &temp, CFGSTR, "UnetDomain") > 0) {
-		strlcpy(hs_cfg.vhostdom, temp, MAXHOST);
-		free(temp);
-	} else {
-		hs_cfg.vhostdom[0] = '\0';
-	}
-		
 	/* banned vhosts */
 	if (GetConf((void *) &temp, CFGSTR, "BannedVhosts") >= 0) {
 		host = strtok(temp, ";");

@@ -40,10 +40,8 @@
 /* but only save data older than 1 hour! */
 #define PROGCHANTIME 3600
 
-extern BotInfo ss_botinfo;
 extern Bot *ss_bot;
 extern ModuleInfo module_info;
-extern Module* ss_module;
 
 typedef struct tld_ TLD;
 typedef struct region_ Region;
@@ -166,6 +164,7 @@ struct region_ {
 	int daily_users;
 };
 
+int StatsMidnight(void);
 /* statserv.c */
 void statserv(char *);
 int topchan(const void *key1, const void *key2);

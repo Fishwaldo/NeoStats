@@ -241,6 +241,11 @@ const char *ns_help_set_nick[] = {
 	NULL
 };
 
+const char *ns_help_set_altnick[] = {
+	"\2ALTNICK <newnick>\2 Change bot alternate nickname",
+	NULL
+};
+
 const char *ns_help_set_user[] = {
 	"\2USER <username>\2 Change bot username",
 	"(requires restart to take effect).",

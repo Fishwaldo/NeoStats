@@ -27,9 +27,8 @@
 
 static char announce_buf[BUFSIZE];
 
-static int StatsMidnight(void);
 static int ss_event_ctcpversion(CmdParams* cmdparams);
-static int ss_event_online(CmdParams* cmdparams);
+int ss_event_online(CmdParams* cmdparams);
 static int ss_event_pong(CmdParams* cmdparams);
 static int ss_event_away(CmdParams* cmdparams);
 static int ss_event_server(CmdParams* cmdparams);
@@ -85,61 +84,49 @@ static int check_interval()
 	return 1;
 }
 
-static int
+static void
+announce(int announcetype, const char *msg)
+{
+	switch(announcetype) {
+		case 3:
+			wallops (ss_bot->nick, "%s", msg);
+			break;
+		case 2:
+			globops (ss_bot->nick, "%s", msg);
+			break;
+		case 1:
+		default:
+			chanalert (ss_bot->nick, "%s", msg);
+			break;
+	}
+}
+
+static void
 announce_record(const char *msg, ...)
 {
 	va_list ap;
 
-	if(StatServ.recordalert < 0) {
-		return 1;
+	if(StatServ.recordalert < 0 || check_interval() < 0) {
+		return;
 	}
-	if (check_interval() > 0) {
-		va_start (ap, msg);
-		ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
-		va_end (ap);
-		switch(StatServ.recordalert) {
-			case 3:
-				wallops (ss_bot->nick, "%s", announce_buf);
-				break;
-			case 2:
-				globops (ss_bot->nick, "%s", announce_buf);
-				break;
-			case 1:
-			default:
-				chanalert (ss_bot->nick, "%s", announce_buf);
-				break;
-		}
-	}
-	return 1;
+	va_start (ap, msg);
+	ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
+	va_end (ap);
+	announce(StatServ.recordalert, announce_buf);
 }
 
-static int
+static void
 announce_lag(const char *msg, ...)
 {
 	va_list ap;
 
-	if(StatServ.lagalert < 0) {
-		return 1;
+	if(StatServ.lagalert < 0 || check_interval() < 0) {
+		return;
 	}
-
-	if (check_interval() > 0) {
-		va_start (ap, msg);
-		ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
-		va_end (ap);
-		switch(StatServ.lagalert) {
-			case 3:
-				wallops (ss_bot->nick, "%s", announce_buf);
-				break;
-			case 2:
-				globops (ss_bot->nick, "%s", announce_buf);
-				break;
-			case 1:
-			default:
-				chanalert (ss_bot->nick, "%s", announce_buf);
-				break;
-		}
-	}
-	return 1;
+	va_start (ap, msg);
+	ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
+	va_end (ap);
+	announce(StatServ.lagalert, announce_buf);
 }
 
 static CVersions *findversions(char *name)
@@ -200,13 +187,13 @@ int ss_event_ctcpversion(CmdParams* cmdparams)
 {
 	lnode_t *node;
 	CVersions *clientv;
-	char *nocols = cmdparams->cmdparams->av[1];
+	char *nocols = cmdparams->av[1];
 
 	strip_mirc_codes(nocols);
 	
 	clientv = findversions(nocols);
 	if (clientv) {
-		nlog(LOG_DEBUG2, "Found Client Version Node %s", nocols);
+		nlog(LOG_DEBUG2, "Found version: %s", nocols);
 		clientv->count++;
 		return 1;
 	}
@@ -215,8 +202,7 @@ int ss_event_ctcpversion(CmdParams* cmdparams)
 	clientv->count = 1;
 	node = lnode_create(clientv);
 	list_append(Vhead, node);
-	nlog(LOG_DEBUG2, "Added Version to List %s",
-	     clientv->name);
+	nlog(LOG_DEBUG2, "Added version: %s", clientv->name);
 	return 1;
 }
 
@@ -261,7 +247,7 @@ int ss_event_delchan(CmdParams* cmdparams)
 		lnode_destroy(ln);
 		free(cs);
 	} else {
-		nlog(LOG_WARNING, "Ehhh, Couldn't find channel %s when deleting out of stats", cmdparams->av[0]);
+		nlog(LOG_WARNING, "Couldn't find channel %s when deleting from stats", cmdparams->av[0]);
 	}
 	return 1;
 }
@@ -305,7 +291,7 @@ int ss_event_part(CmdParams* cmdparams)
 {
 	CStats *cs;
 	/* only check exclusions after increasing channel count */
-	if (StatServ.exclusions && (IsExcluded(cmdparams->channel)|| IsExcluded(cmdparams->source.user)))) {
+	if (StatServ.exclusions && (IsExcluded(cmdparams->channel) || IsExcluded(cmdparams->source.user))) {
 		return 1;
 	}
 	cs = findchanstats(cmdparams->channel->name);
@@ -329,6 +315,7 @@ int ss_event_topic(CmdParams* cmdparams)
 	}
 	return 1;
 }
+
 int ss_event_kick(CmdParams* cmdparams)
 {
 	CStats *cs;
@@ -337,7 +324,6 @@ int ss_event_kick(CmdParams* cmdparams)
 	if (StatServ.exclusions && IsExcluded(cmdparams->channel)) {
 		return 1;
 	}
-
 	cs = findchanstats(cmdparams->channel->name);
 	if (cs) {
 		IncreaseKicks(cs);
@@ -347,13 +333,13 @@ int ss_event_kick(CmdParams* cmdparams)
 		}
 	}
 	return 1;
-
 }
 
 CStats *findchanstats(char *name)
 {
 	CStats *cs;
 	lnode_t *cn;
+
 	cn = list_find(Chead, name, comparef);
 	if (cn) {
 		cs = lnode_get(cn);
@@ -388,6 +374,7 @@ int ss_event_server(CmdParams* cmdparams)
 int ss_event_squit(CmdParams* cmdparams)
 {
 	SStats *ss;
+
 	SET_SEGV_LOCATION();
 	DecreaseServers();
 	ss = findstats(cmdparams->source.server->name);
@@ -452,7 +439,6 @@ int ss_event_mode(CmdParams* cmdparams)
 			"Unable to find stats for %s", cmdparams->source.user->server->name);
 		return -1;
 	}
-
 	modes = cmdparams->av[1];
 	while (*modes) {
 		switch (*modes) {
@@ -567,13 +553,10 @@ int ss_event_signon(CmdParams* cmdparams)
 		announce_record("\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %ld users!",
 				     stats_network.users);
 	}
-
 	if (stats_network.users > daily.users) {
 		daily.users = stats_network.users;
 		daily.t_users = me.now;
 	}
-
-
 	return 1;
 }
 
@@ -585,12 +568,9 @@ int ss_event_pong(CmdParams* cmdparams)
 	/* we don't want negative pings! */
 	if (cmdparams->source.server->ping < 0)
 		return -1;
-
-
 	ss = findstats(cmdparams->source.server->name);
 	if (!ss)
 		return -1;
-
 	/* this is a tidy up from old versions of StatServ that used to have negative pings! */
 	if (ss->lowest_ping < 0) {
 		ss->lowest_ping = 0;
@@ -598,7 +578,6 @@ int ss_event_pong(CmdParams* cmdparams)
 	if (ss->highest_ping < 0) {
 		ss->highest_ping = 0;
 	}
-
 	if (cmdparams->source.server->ping > ss->highest_ping) {
 		ss->highest_ping = cmdparams->source.server->ping;
 		ss->t_highest_ping = me.now;
@@ -607,40 +586,11 @@ int ss_event_pong(CmdParams* cmdparams)
 		ss->lowest_ping = cmdparams->source.server->ping;
 		ss->t_lowest_ping = me.now;
 	}
-
 	/* ok, updated the statistics, now lets see if this server is "lagged out" */
 	if (cmdparams->source.server->ping > StatServ.lagtime) {
 		announce_lag("\2%s\2 is lagged out with a ping of %d",
 			cmdparams->source.server->name, cmdparams->source.server->ping);
 	}
-
-	return 1;
-}
-
-extern bot_cmd ss_commands[];
-extern bot_setting ss_settings[];
-Bot *ss_bot;
-BotInfo ss_botinfo = 
-{
-	"", 
-	"", 
-	"", 
-	"", 
-	"", 
-};
-Module* ss_module;
-
-int ss_event_online(CmdParams* cmdparams)
-{
-	SET_SEGV_LOCATION();
-	ss_bot = init_bot (ss_module, &ss_botinfo, services_bot_modes, BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, ss_commands, ss_settings);
-	StatServ.onchan = 1;
-	/* now that we are online, setup the timer to save the Stats database every so often */
-	add_timer (ss_module, SaveStats, "SaveStats", DBSAVETIME);
-	add_timer (ss_module, ss_html, "ss_html", 3600);
-	/* also add a timer to check if its midnight (to reset the daily stats */
-	add_timer (ss_module, StatsMidnight, "StatsMidnight", 60);
-	add_timer (ss_module, DelOldChan, "DelOldChan", 3600);
 	return 1;
 }
 
@@ -651,7 +601,7 @@ SStats *new_stats(const char *name)
 
 	SET_SEGV_LOCATION();
 	nlog(LOG_DEBUG2, "new_stats(%s)", name);
-	s = scalloc(sizeof(SStats), 1);
+	s = scalloc(sizeof(SStats));
 	if (!s) {
 		FATAL_ERROR("Out of memory.")
 	}
@@ -665,7 +615,7 @@ SStats *new_stats(const char *name)
 	sn = hnode_create(s);
 	if (hash_isfull(Shead)) {
 		nlog(LOG_CRITICAL, "StatServ Server hash is full!");
-		free s;
+		free(s);
 		return NULL;
 	}
 	hash_insert(Shead, sn, s->name);

@@ -427,31 +427,36 @@ int
 bot_nick_change (char *oldnick, char *newnick)
 {
 	User *u;
-	Bot *botptr_new, *botptr;
+	Bot *botptr;
+	hnode_t *bn;
 
 	SET_SEGV_LOCATION();
 	/* First, try to find out if the newnick is unique! */
 	u = finduser (oldnick);
 	if (!u) {
-		nlog (LOG_WARNING, "A non-registered bot(%s) attempted to change its nick to %s", oldnick, newnick);
+		nlog (LOG_WARNING, "Unknown bot %s tried to change nick to %s", oldnick, newnick);
 		return NS_FAILURE;
 	}
 	u = finduser (newnick);
-	if (!u) {
-		if ((botptr = findbot (oldnick)) != NULL) {
-			nlog (LOG_DEBUG3, "Bot %s Changed its nick to %s", oldnick, newnick);
-			botptr_new = new_bot (newnick);
-			/* add a brand new user */ 
-			strlcpy (botptr_new->nick, newnick, MAXNICK);
-			botptr_new->moduleptr->info = botptr->moduleptr->info;
-			/* Now Delete the Old bot nick */   
-			del_ns_bot (oldnick);
-			snick_cmd (oldnick, newnick);
-			return NS_SUCCESS;
-		}
+	if (u) {
+		nlog (LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", oldnick, newnick);
+		return NS_FAILURE;
 	}
-	nlog (LOG_NOTICE, "Couldn't find Bot Nick %s in Bot list", oldnick);
-	return NS_FAILURE;
+	bn = hash_lookup (bh, oldnick);
+	if (!bn) {
+		nlog (LOG_NOTICE, "Couldn't find bot %s in bot list", oldnick);
+		return NS_FAILURE;
+	}
+	botptr = hnode_get (bn);
+	/* remove old hash entry */
+	hash_delete (bh, bn);
+	nlog (LOG_DEBUG3, "Bot %s changed nick to %s", oldnick, newnick);
+	strlcpy (botptr->nick, newnick, MAXNICK);
+	/* insert new hash entry */
+	hash_insert (bh, bn, botptr->nick);
+	/* send bot nick change */   
+	snick_cmd (oldnick, newnick);
+	return NS_SUCCESS;
 }
 
 /** @brief 

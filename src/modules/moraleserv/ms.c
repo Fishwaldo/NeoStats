@@ -75,6 +75,7 @@ static bot_cmd ms_commands[]=
 static bot_setting ms_settings[]=
 {
 	{"NICK",	&ms_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, (void*)"MoraleServ"  },
+	{"ALTNICK",	&ms_botinfo.altnick,SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, (void*)"MoraleServ"  },
 	{"USER",	&ms_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, (void*)"MS"  },
 	{"HOST",	&ms_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, (void*)""  },
 	{"REALNAME",&ms_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"Network morale service"  },
@@ -93,24 +94,7 @@ ModuleEvent module_events[] = {
 
 int ModInit(Module* mod_ptr)
 {
- 	char *temp = NULL;
-
-	if(GetConf((void *) &temp, CFGSTR, "Nick") > 0) {
-		strlcpy(ms_botinfo.nick , temp, MAXNICK);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "User") > 0) {
-		strlcpy(ms_botinfo.user, temp, MAXUSER);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "Host") > 0) {
-		strlcpy(ms_botinfo.host, temp, MAXHOST);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "RealName") > 0) {
-		strlcpy(ms_botinfo.realname, temp, MAXREALNAME);
-		free(temp);
-	}
+	ModuleConfig(ms_module, ms_settings);
 	return 1;
 }
 

@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -26,10 +26,10 @@
 #include "neostats.h"
 #include "cs.h"
 
-/* Uncomment this line to disable colours in ConnectServ 
+/* Uncomment this line to enable colours in ConnectServ 
    channel messages
 */
-/* #define DISABLE_COLOUR_SUPPORT */
+/* #define ENABLE_COLOUR_SUPPORT */
 
 static const char mode_netadmin[]="network administrator";
 static const char mode_conetadmin[]="co network administrator";
@@ -44,7 +44,7 @@ static const char mode_locop[]="local operator";
 static const char mode_netservice[]="network service";
 static const char mode_bot[]="bot";
 
-#ifdef DISABLE_COLOUR_SUPPORT
+#ifndef ENABLE_COLOUR_SUPPORT
 static char msg_nickchange[]="\2NICK\2 %s (%s@%s) changed their nick to %s";
 static char msg_signon[]="\2SIGNON\2 %s (%s@%s - %s) has signed on at %s";
 static char msg_signoff[]="\2SIGNOFF\2 %s (%s@%s - %s) has signed off at %s - %s";
@@ -81,8 +81,6 @@ static int cs_event_kill(CmdParams* cmdparams);
 static int cs_event_nick(CmdParams* cmdparams);
 static int cs_event_server(CmdParams* cmdparams);
 static int cs_event_squit(CmdParams* cmdparams);
-
-static void LoadConfig(void);
 
 struct cs_cfg { 
 	int sign_watch;
@@ -131,6 +129,7 @@ static bot_cmd cs_commands[]=
 static bot_setting cs_settings[]=
 {
 	{"NICK",		&cs_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, (void*)"ConnectServ" },
+	{"ALTNICK",		&cs_botinfo.altnick,SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, (void*)"ConnectServ" },
 	{"USER",		&cs_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, (void*)"CS" },
 	{"HOST",		&cs_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, (void*)"" },
 	{"REALNAME",	&cs_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"" },
@@ -161,7 +160,7 @@ ModuleEvent module_events[] = {
 int ModInit(Module* mod_ptr)
 {
 	cs_module = mod_ptr;
-	LoadConfig();
+	ModuleConfig(cs_module, cs_settings);
 	return 1;
 }
 
@@ -245,7 +244,6 @@ static int cs_event_quit(CmdParams* cmdparams)
 			free(cmd);
 			free(lcl);
 			return 1;
-
 		}
 	}
 	/* Print Disconnection Notice */
@@ -506,37 +504,6 @@ static int cs_event_nick(CmdParams* cmdparams)
 		cmdparams->source.user->username, cmdparams->source.user->hostname, 
 		cmdparams->source.user->nick);
 	return 1;
-}
-
-/* 
- * Load ConnectServ Configuration file and set defaults if does not exist
- */
-static void LoadConfig(void)
-{
-	char *temp = NULL;
-
-	GetConf((void *) &cs_cfg.sign_watch, CFGBOOL, "SignWatch");
-	GetConf((void *) &cs_cfg.kill_watch, CFGBOOL, "KillWatch");
-	GetConf((void *) &cs_cfg.mode_watch, CFGBOOL, "ModeWatch");
-	GetConf((void *) &cs_cfg.nick_watch, CFGBOOL, "NickWatch");
-	GetConf((void *) &cs_cfg.serv_watch, CFGBOOL, "ServWatch");
-	GetConf((void *) &cs_cfg.use_exc, CFGBOOL, "Exclusions";
-	if(GetConf((void *) &temp, CFGSTR, "Nick") > 0) {
-		strlcpy(cs_botinfo.nick, temp, MAXNICK);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "User") > 0) {
-		strlcpy(cs_botinfo.user, temp, MAXUSER);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "Host") > 0) {
-		strlcpy(cs_botinfo.host, temp, MAXHOST);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "RealName") > 0) {
-		strlcpy(cs_botinfo.realname, temp, MAXREALNAME);
-		free(temp);
-	}
 }
 
 static int cs_event_server(CmdParams* cmdparams)

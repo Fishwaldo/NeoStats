@@ -322,7 +322,6 @@ extern hash_t *ch;
 /* this is the dns structure */
 extern adns_state ads;
 
-
 /* version info */
 extern const char version_date[], version_time[];
 
@@ -861,7 +860,7 @@ int sswhois_cmd (const char *target, const char *swhois);
 int ssvsnick_cmd (const char *target, const char *newnick);
 int ssvsjoin_cmd (const char *target, const char *chan);
 int ssvspart_cmd (const char *target, const char *chan);
-int ssvshost_cmd (const char *who, const char *vhost);
+int ssvshost_cmd (const char *target, const char *vhost);
 int ssvsmode_cmd (const char *target, const char *modes);
 int ssvskill_cmd (const char *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...);
@@ -927,6 +926,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 
 /* Some standard text help messages */
 extern const char *ns_help_set_nick[];
+extern const char *ns_help_set_altnick[];
 extern const char *ns_help_set_user[];
 extern const char *ns_help_set_host[];
 extern const char *ns_help_set_realname[];

@@ -26,17 +26,6 @@
 #include "neostats.h"
 #include "loveserv.h"
 
-static Bot *ls_bot;
-static BotInfo ls_botinfo = 
-{
-	"LoveServ", 
-	"LoveServ", 
-	"LS", 
-	"", 
-	"Network love service",
-};
-static Module* ls_module;
-
 static int ls_rose(CmdParams* cmdparams);
 static int ls_kiss(CmdParams* cmdparams);
 static int ls_tonsil(CmdParams* cmdparams);
@@ -47,6 +36,9 @@ static int ls_candy(CmdParams* cmdparams);
 static int ls_lovenote(CmdParams* cmdparams);
 static int ls_apology(CmdParams* cmdparams);
 static int ls_thankyou(CmdParams* cmdparams);
+
+static Bot *ls_bot;
+static Module* ls_module;
 
 ModuleInfo module_info = {
 	"LoveServ",
@@ -59,6 +51,15 @@ ModuleInfo module_info = {
 	__TIME__,
 	0,
 	0,
+};
+
+static BotInfo ls_botinfo = 
+{
+	"LoveServ", 
+	"LoveServ", 
+	"LS", 
+	"", 
+	"Network love service",
 };
 
 static bot_cmd ls_commands[]=
@@ -78,13 +79,14 @@ static bot_cmd ls_commands[]=
 
 static bot_setting ls_settings[]=
 {
-	{"NICK",	&ls_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, (void*)"" },
-	{"USER",	&ls_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, (void*)"" },
+	{"NICK",	&ls_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, (void*)"LoveServ" },
+	{"ALTNICK",	&ls_botinfo.altnick,SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, (void*)"LoveServ" },
+	{"USER",	&ls_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, (void*)"LS" },
 	{"HOST",	&ls_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, (void*)"" },
-	{"REALNAME",&ls_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"" },
+	{"REALNAME",&ls_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"Network love service" },
 };
 
-static int ls_event_online(char **av, int ac)
+static int ls_event_online(CmdParams* cmdparams)
 {
 	ls_bot = init_bot(ls_module, &ls_botinfo, services_bot_modes, BOT_FLAG_DEAF, ls_commands, ls_settings);
 	return 1;
@@ -97,24 +99,7 @@ ModuleEvent module_events[] = {
 
 int ModInit(Module* mod_ptr)
 {
- 	char *temp = NULL;
-
-	if(GetConf((void *) &temp, CFGSTR, "Nick") > 0) {
-		strlcpy(ls_botinfo.nick , temp, MAXNICK);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "User") > 0) {
-		strlcpy(ls_botinfo.user, temp, MAXUSER);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "Host") > 0) {
-		strlcpy(ls_botinfo.host, temp, MAXHOST);
-		free(temp);
-	}
-	if(GetConf((void *) &temp, CFGSTR, "RealName") > 0) {
-		strlcpy(ls_botinfo.realname, temp, MAXREALNAME);
-		free(temp);
-	}
+	ModuleConfig(ls_module, ls_settings);
 	return 1;
 }
 

@@ -46,6 +46,18 @@ typedef struct Chanmem {
 
 hash_t *ch;
 
+extern char quitreason[BUFSIZE];
+
+static void
+ChanPartHandler (list_t * list, lnode_t * node, void *v)
+{
+	part_chan ((User *)v, lnode_get (node), quitreason[0] != 0 ? quitreason : NULL);
+}
+
+void PartAllChannels (User* u)
+{
+	list_process (u->chans, u, ChanPartHandler);
+}
 
 /** @brief Process the Channel TS Time 
  * 
@@ -663,7 +675,7 @@ join_chan (const char* nick, const char *chan)
 	if (!ircstrcasecmp ("0", chan)) {
 		/* join 0 is actually part all chans */
 		nlog (LOG_DEBUG2, "join_chan: parting %s from all channels", u->nick);
-		list_process (u->chans, u, UserPart);
+		PartAllChannels (u);
 		return;
 	}
 	c = findchan (chan);

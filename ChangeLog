@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - ConnectServ: reverse colour define so default is disabled. (M)
+ - Core modules now use core config loading system (M)
  - All socket code now in socks.c for easier upgrade (M)
  - Early support for module semi auto config designed to perform loading of 
    module config settings or set defaults without the module having to code it. 

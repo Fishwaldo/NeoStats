@@ -27,11 +27,11 @@
 int InitUsers (void);
 void FiniUsers (void);
 void AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric);
-void DelUser (const char *nick, int killflag, const char *reason);
+void KillUser (const char *nick, const char *reason);
+void QuitUser (const char *nick, const char *reason);
 void SetUserVhost (const char* nick, const char* vhost);
 void SetUserServicesTS (const char* nick, const char* ts);
 int UserNick (const char * oldnick, const char * newnick, const char * ts);
-void UserPart (list_t *list, lnode_t *node, void *v);
 void UserMode (const char *nick, const char *modes);
 #ifdef GOTUSERSMODES
 void UserSMode (const char *nick, const char *modes);

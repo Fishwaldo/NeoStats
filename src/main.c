@@ -263,7 +263,7 @@ get_options (int argc, char **argv)
 			return NS_FAILURE;
 		case 'v':
 			printf ("NeoStats Version %s\n", me.versionfull);
-			printf ("Compiled: %s at %s\n", version_date, version_time);
+			printf ("Compiled: %s at %s\n", ns_module_info.build_date, ns_module_info.build_time);
 			printf ("Flag after version number indicates what IRCd NeoStats is compiled for:\n");
 			printf ("(U31)- Unreal 3.1.x IRCd\n");
 			printf ("(U32)- Unreal 3.2.x IRCd\n");
