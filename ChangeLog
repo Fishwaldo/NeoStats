@@ -1,6 +1,7 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 =====================================================================================
 * NeoStats * Mark (M) * Version 2.5.20
+ - Fix memory leak in statserv (M)
  - Fix crash on IRCu in do_server (M)
  - Fix bug with Unreal IP addresses - bug 188 (M)
 

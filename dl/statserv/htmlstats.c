@@ -89,7 +89,6 @@ void ss_html()
 	}
 	buf = malloc(STARTBUFSIZE * 2);
 	bufold = buf;
-	buf1 = malloc(STARTBUFSIZE * 2);
 	while (fgets(buf, STARTBUFSIZE, tpl)) {
 
 		buf1 = strstr(buf, "!MAP!");
@@ -199,7 +198,6 @@ void ss_html()
 
 		fputs(buf, opf);
 	}
-	free(buf1);
 	free(bufold);
 	if (!gothtml) {
 		put_copyright();
