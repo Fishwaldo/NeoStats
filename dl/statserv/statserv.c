@@ -358,6 +358,17 @@ static void ss_chans(User *u, char *chan) {
 		privmsg(u->nick, s_StatServ, "Top10 Online Channels:");
 		privmsg(u->nick, s_StatServ, "======================");
 		for (i = 0; i <= 10; i++) {
+			/* only show hidden chans to operators */
+			if (is_hidden_chan(findchan(cs->name)) && (UserLevel(u) < 40)) {
+				i--;
+				cn = list_next(Chead, cn);
+				if (cn) {
+					cs = lnode_get(cn);
+				} else {
+					break;
+				}
+				continue;
+			}
 			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Members", cs->name, cs->members);
 			cn = list_next(Chead, cn);
 			if (cn) {
@@ -377,6 +388,17 @@ static void ss_chans(User *u, char *chan) {
 		privmsg(u->nick, s_StatServ, "Top10 Channels (Ever):");
 		privmsg(u->nick, s_StatServ, "======================");
 		for (i = 0; i <= 10; i++) {
+			/* only show hidden chans to operators */
+			if (is_hidden_chan(findchan(cs->name)) && (UserLevel(u) < 40)) {
+				i--;
+				cn = list_next(Chead, cn);
+				if (cn) {
+					cs = lnode_get(cn);
+				} else {
+					break;
+				}
+				continue;
+			}
 			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Joins", cs->name, cs->totmem);
 			cn = list_next(Chead, cn);
 			if (cn) {
@@ -396,6 +418,17 @@ static void ss_chans(User *u, char *chan) {
 		privmsg(u->nick, s_StatServ, "Top10 Most un-welcome Channels (Ever):");
 		privmsg(u->nick, s_StatServ, "======================================");
 		for (i = 0; i <= 10; i++) {
+			/* only show hidden chans to operators */
+			if (is_hidden_chan(findchan(cs->name)) && (UserLevel(u) < 40)) {
+				i--;
+				cn = list_next(Chead, cn);
+				if (cn) {
+					cs = lnode_get(cn);
+				} else {
+					break;
+				}
+				continue;
+			}
 			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Kicks", cs->name, cs->kicks);
 			cn = list_next(Chead, cn);
 			if (cn) {
@@ -415,6 +448,17 @@ static void ss_chans(User *u, char *chan) {
 		privmsg(u->nick, s_StatServ, "Top10 Most undecisive Channels (Ever):");
 		privmsg(u->nick, s_StatServ, "======================================");
 		for (i = 0; i <= 10; i++) {
+			/* only show hidden chans to operators */
+			if (is_hidden_chan(findchan(cs->name)) && (UserLevel(u) < 40)) {
+				i--;
+				cn = list_next(Chead, cn);
+				if (cn) {
+					cs = lnode_get(cn);
+				} else {
+					break;
+				}
+				continue;
+			}
 			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Topics", cs->name, cs->topics);
 			cn = list_next(Chead, cn);
 			if (cn) {

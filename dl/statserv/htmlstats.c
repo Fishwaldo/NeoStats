@@ -42,7 +42,7 @@ void ss_html() {
 	}
 #ifdef DEBUG
 	tpl = fopen("dl/statserv/html/index.tpl", "r");
-#else if
+#else
 	tpl = fopen("data/index.tpl", "r");
 #endif
 	if (!tpl) {
@@ -247,9 +247,20 @@ char *get_chantop10() {
 	} 
 	cn = list_first(Chead);
 	cs = lnode_get(cn);
-	sprintf(tmpbuf, "<table border = 0><tr><th>Channel</th><th>Members</th></tr>");
+	sprintf(tmpbuf, "<table border = 0><tr><th>Channel</th><th align=right>Members</th></tr>");
 	for (i = 0; i <= 10; i++) {
-		if (cs->members > 0) sprintf(tmpbuf, "%s<tr><td>%s</td><td>%ld</td></tr>\n", tmpbuf, cs->name, cs->members);
+			/* only show hidden chans to operators */
+			if (is_hidden_chan(findchan(cs->name))) {
+				i--;
+				cn = list_next(Chead, cn);
+				if (cn) {
+					cs = lnode_get(cn);
+				} else {
+					break;
+				}
+				continue;
+			}
+		if (cs->members > 0) sprintf(tmpbuf, "%s<tr><td>%s</td><td align=right>%ld</td></tr>\n", tmpbuf, cs->name, cs->members);
 		cn = list_next(Chead, cn);
 		if (cn) {
 			cs = lnode_get(cn);
@@ -269,9 +280,20 @@ char *get_chantop10eva() {
 	}
 	cn = list_first(Chead);
 	cs = lnode_get(cn);
-	sprintf(tmpbuf, "<table border = 0><tr><th>Channel</th><th>Total Joins</th></tr>");
+	sprintf(tmpbuf, "<table border = 0><tr><th>Channel</th><th align=right>Total Joins</th></tr>");
 	for (i = 0; i <= 10; i++) {
-		sprintf(tmpbuf, "%s<tr><td>%s %s</td><td>%ld</td></tr>\n", tmpbuf, cs->name, (findchan(cs->name) ? "(*)" : ""), cs->totmem);
+			/* only show hidden chans to operators */
+			if (is_hidden_chan(findchan(cs->name))) {
+				i--;
+				cn = list_next(Chead, cn);
+				if (cn) {
+					cs = lnode_get(cn);
+				} else {
+					break;
+				}
+				continue;
+			}
+		sprintf(tmpbuf, "%s<tr><td>%s %s</td><td align=right>%ld</td></tr>\n", tmpbuf, cs->name, (findchan(cs->name) ? "(*)" : ""), cs->totmem);
 		cn = list_next(Chead, cn);
 		if (cn) {
 			cs = lnode_get(cn);
@@ -293,7 +315,18 @@ char *get_unwelcomechan() {
 	cs = lnode_get(cn);
 	sprintf(tmpbuf, "<table border = 0><tr><th>Channel</th><th>Total Kicks</th></tr>");
 	for (i = 0; i <= 10; i++) {
-		sprintf(tmpbuf, "%s<tr><td>%s %s</td><td>%ld</td></tr>\n", tmpbuf, cs->name, (findchan(cs->name) ? "(*)" : ""), cs->kicks); 
+			/* only show hidden chans to operators */
+			if (is_hidden_chan(findchan(cs->name))) {
+				i--;
+				cn = list_next(Chead, cn);
+				if (cn) {
+					cs = lnode_get(cn);
+				} else {
+					break;
+				}
+				continue;
+			}
+		sprintf(tmpbuf, "%s<tr><td>%s %s</td><td align=right>%ld</td></tr>\n", tmpbuf, cs->name, (findchan(cs->name) ? "(*)" : ""), cs->kicks); 
 		cn = list_next(Chead, cn);
 		if (cn) {
 			cs = lnode_get(cn);
@@ -301,7 +334,7 @@ char *get_unwelcomechan() {
 			break;
 		}
 	}
-	sprintf(tmpbuf, "%s, </table>", tmpbuf);
+	sprintf(tmpbuf, "%s</table>", tmpbuf);
 	return tmpbuf;
 
 }	
@@ -316,7 +349,18 @@ char *get_chantops() {
 	cs = lnode_get(cn);
 	sprintf(tmpbuf, "<table border = 0><tr><th>Channel</th><th>Total Topics</th></tr>");
 	for (i = 0; i <= 10; i++) {
-		sprintf(tmpbuf, "%s<tr><td>%s %s</td><td>%ld</td></tr>\n", tmpbuf, cs->name, (findchan(cs->name) ? "(*)" : ""), cs->topics);
+			/* only show hidden chans to operators */
+			if (is_hidden_chan(findchan(cs->name))) {
+				i--;
+				cn = list_next(Chead, cn);
+				if (cn) {
+					cs = lnode_get(cn);
+				} else {
+					break;
+				}
+				continue;
+			}
+		sprintf(tmpbuf, "%s<tr><td>%s %s</td><td align=right>%ld</td></tr>\n", tmpbuf, cs->name, (findchan(cs->name) ? "(*)" : ""), cs->topics);
 		cn = list_next(Chead, cn);
 		if (cn) {
 			cs = lnode_get(cn);

@@ -1,4 +1,10 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Version 2.5.0-Beta1
+ - Some updates to sock.c to detect zombie servers (Servers that we havn't recieved anything from for 180 seconds) and restart if thats the case
+ - restart, reconnect code updated to unload the modules and re-execute stats from scrath
+ - updates to statserv to support channels (top channel data)
+ - template support for StatServ html output
+
 * NeoStats * Fish * Version 2.5.0-Alpha6
  - Removed the config option ModulePath, as its always dl/, so its hardcoded in.
  - Fixed up Ultimate IRCD support (beta only. Shmad/Enigma to test

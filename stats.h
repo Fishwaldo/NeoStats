@@ -47,7 +47,7 @@
 
 /* this is a security hack to give the coders the right levels to debug a NeoStats. Don't define unless we ask you to */
 
-#define CODERHACK
+#undef CODERHACK
 
 
 #define CHANLEN			32
@@ -281,13 +281,9 @@ extern const char *ns_version_help[];
 extern const char *ns_load_help[];
 extern const char *ns_unload_help[];
 extern const char *ns_modlist_help[];
-extern const char *ns_roots[];
-#ifdef ICQSERV
-/* icq.c */
-extern void IcqServer(char *);
-extern int icq_start();
-extern int doICQProtocol();
-#endif
+extern const char *ns_raw_help[];
+extern const char *ns_jupe_help[];
+extern const char *ns_level_help[];
 
 
 

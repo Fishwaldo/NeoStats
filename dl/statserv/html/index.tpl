@@ -163,7 +163,7 @@ cellspacing="0" border="1">
 			</td>
 			</tr>
 			<tr>
-	 	 	<td class="cat" height="30"><span class="cattitle"><b>Top10</b>&nbsp;Topic Change Channels</span></td>
+	 	 	<td class="cat" height="30"><span class="cattitle"><b>Server</b>&nbsp;Details</span></td>
 			</tr>
 			<tr>
 				<td class="row1" align="center">

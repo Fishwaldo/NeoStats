@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.14 2002/03/18 07:13:01 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.15 2002/03/28 05:29:36 fishwaldo Exp $
  */
 
 
@@ -382,6 +382,11 @@
 #define MODE_AUDITORIUM		0x20000000
 #define MODE_ONLYSECURE		0x40000000
 #define MODE_NONICKCHANGE	0x80000000
+
+
+#define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
+
+
 
 struct ircd_srv_ {
 	int uprot;

@@ -21,7 +21,6 @@ extern const char protocol_version[];
 static void ns_reload(User *u, char *reason);
 static void ns_logs(User *);
 static void ns_jupe(User *, char *);
-static void ns_JOIN(User *, char *);
 void ns_debug_to_coders(char *);
 static void ns_raw(User *, char *);
 static void ns_user_dump(User *, char *);
@@ -76,20 +75,22 @@ void servicesbot(char *nick, char **av, int ac) {
 			privmsg_list(nick, s_Services, ns_unload_help);
 		else if (!strcasecmp(av[2], "MODLIST") && (UserLevel(u) >= 180))
 			privmsg_list(nick, s_Services, ns_modlist_help);
-		else if (!strcasecmp(av[2], "JOIN") && (UserLevel(u) >= 180))
-			privmsg_list(nick, s_Services, ns_join_help);
-		else if (!strcasecmp(av[2], "USERDUMP") && (UserLevel(u) >= 180))
+		else if (!strcasecmp(av[2], "USERDUMP") && (UserLevel(u) >= 180) && (me.coder_debug))
 			privmsg_list(nick, s_Services, ns_userdump_help);
-		else if (!strcasecmp(av[2], "CHANDUMP") && (UserLevel(u) >= 180))
+		else if (!strcasecmp(av[2], "CHANDUMP") && (UserLevel(u) >= 180) && (me.coder_debug))
 			privmsg_list(nick, s_Services, ns_chandump_help);
-		else if (!strcasecmp(av[2], "SERVERDUMP") && (UserLevel(u) >= 180))
+		else if (!strcasecmp(av[2], "SERVERDUMP") && (UserLevel(u) >= 180) && (me.coder_debug))
 			privmsg_list(nick, s_Services, ns_serverdump_help);
-#ifdef EXTAUTH
-		else if (!strcasecmp(av[2], "ROOTS"))
-			privmsg_list(nick, s_Services, ns_roots);
-#endif
+		else if (!strcasecmp(av[2], "JUPE") && (UserLevel(u) >= 180))
+			privmsg_list(nick, s_Services, ns_jupe_help);
+		else if (!strcasecmp(av[2], "RAW") && (UserLevel(u) >= 180))
+			privmsg_list(nick, s_Services, ns_raw_help);
+		else if (!strcasecmp(av[2], "LEVEL"))
+			privmsg_list(nick, s_Services, ns_level_help);
 		else
 		privmsg(nick, s_Services, "Unknown Help Topic: \2%s\2", av[2]);
+	} else if (!strcasecmp(av[1], "LEVEL")) {
+		privmsg(nick, s_Services, "Your Level is %d", UserLevel(u));
 	} else if (!strcasecmp(av[1], "LOAD")) {
 		if (!(UserLevel(u) >= 180)) {
 			privmsg(nick,s_Services,"Permission Denied");
@@ -198,17 +199,6 @@ void servicesbot(char *nick, char **av, int ac) {
 		}
 		ns_jupe(u, av[2]);
 		notice(s_Services,"%s Wants to JUPE this Server %s",u->nick,av[2]);
-	} else if (!strcasecmp(av[1], "JOIN")) {
-		if (!(UserLevel(u) >= 180)) {
-			privmsg(nick,s_Services,"Permission Denied");
-			notice(s_Services,"%s Tried to use JOIN, but is not a Techadmin",nick);
-			return;
-		}
-		if (ac <= 2) {
-			privmsg(nick,s_Services, "You must supply a ChannelName to Join");
-			return;
-		}
-		ns_JOIN(u, av[2]);
 	} else if (!strcasecmp(av[1], "DEBUG")) {
 		if (!(UserLevel(u) >= 180)) {
 			privmsg(u->nick, s_Services, "Permission Denied, you need to be a Techadmin to Enable Debug Mode!");
@@ -341,17 +331,6 @@ static void ns_jupe(User *u, char *server)
 	log("%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, server);
 }
 
-static void ns_JOIN(User *u, char *chan)
-{
-	strcpy(segv_location, "ns_JOIN");
-	globops(s_Services, "JOINING CHANNEL -\2(%s)\2- Thanks to %s!%s@%s)", chan, u->nick, u->username, u->hostname);
-	privmsg(me.chan, s_Services, "%s Asked me to Join %s, So, I'm Leaving %s", u->nick, chan, me.chan);
-	spart_cmd(s_Services, me.chan);
-	log("%s!%s@%s Asked me to Join %s, I was on %s", u->nick, u->username, u->hostname, chan, me.chan);
-	sprintf(me.chan,"%s",chan);
-	sjoin_cmd(s_Services, chan);
-	schmode_cmd(me.name, chan, "+o", s_Services);
-}
 void ns_debug_to_coders(char *u)
 {
 	char realname[63];
@@ -471,6 +450,3 @@ static void ns_version(User *u)
 		privmsg(u->nick, s_Services, "http://www.neostats.net");
 }
 
-void init_services() {
-	if (usr_mds);
-}

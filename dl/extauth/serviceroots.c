@@ -61,7 +61,6 @@ int new_m_version(char *origin, char **av, int ac) {
 }
 
 void _init() {
-log("haha");
 	srconf.auth=0;
 	/* only a max of 10 serviceroots */
 	srconf.ul = list_create(10);
@@ -92,8 +91,10 @@ void sr_cb_config(char *arg, int configtype) {
 			return;
 		} else {
 			strcpy(nick, arg);
+			if (list_find(srconf.ul, nick, comparef)) {
+				return;
+			}
 			un = lnode_create(nick);
-			printf("nick %s\n", nick);
 			list_append(srconf.ul, un);
 		}	
 	} else if (configtype == 1) {
@@ -104,7 +105,6 @@ void sr_cb_config(char *arg, int configtype) {
 	
 extern int __do_auth(User *u, int curlvl) {
 	lnode_t *un;
-	char *nick;
 	if (u->Umode & UMODE_REGNICK) {
 		un = list_first(srconf.ul);
 		while (un) {
@@ -116,6 +116,10 @@ extern int __do_auth(User *u, int curlvl) {
 				}
 			}
 			un = list_next(srconf.ul, un);
+		}
+	} else {
+		if (srconf.auth == 1) {
+			curlvl = 0;
 		}
 	}
 	return curlvl;

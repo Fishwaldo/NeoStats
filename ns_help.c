@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ns_help.c,v 1.4 2002/03/18 05:44:11 fishwaldo Exp $
+** $Id: ns_help.c,v 1.5 2002/03/28 05:29:36 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -21,9 +21,7 @@ const char *ns_help[] = {
 "Commands:",
 "\2INFO\2       Stats Info on NeoStats.",
 "\2VERSION\2    Shows you the current StatServ Version.",
-#ifdef EXTAUTH
-"\2ROOTS\2	Show the External Auth info.",
-#endif
+"\2LEVEL\2      Show you your Permission Level for NeoStats.",
 "",
 "End of Help.",
 NULL
@@ -31,40 +29,43 @@ NULL
 
 const char *ns_myuser_help[] = {
 "",
-"*** Additional Commands For Tech Admins!***",
+"*** Additional Commands For Service Roots!***",
 "",
 "\2SHUTDOWN\2   Shutdown NeoStats.",
 "\2RELOAD\2     Force NeoStats to Reload Itself.",
 "\2LOAD\2       Load a Module.",
 "\2UNLOAD\2     Unload a Module.",
 "\2MODLIST\2    List Loaded Modules.",
-"\2JOIN\2       Join a Channel.",
 "\2LOGS\2       View logfiles.",
 "\2RAW\2        Send a Raw Command from this Server!",
-"\2Debug\2      Toggle Debuging Mode!",
-"               Running this can flood you offline.",
-"\2UserDump\2   In Debug Mode, Request statserv to send a ",
-"               UserDump to all TechAdmins, this can flood",
-"               you off the server!",
-"\2ServerDump\2 In Debug Mode, ServerDump sent to all",
-"               Techadmins.",
-"\2ChanDump\2   In Debug Mode, ChanDump sent to all",
-"               Techadmins.",
+"\2JUPE\2       Jupiter a Server",
 "End of Help",
 NULL
 };
 
-const char *ns_roots[] = {
-"*** NeoStats: \2ROOTS\2 Help ***",
+
+const char *ns_level_help[] = {
+"*** NeoStats: \2LEVEL\2 Help ***",
 "",
-"Usage: /stats o <NeoStats Server>",
+"Usage: \2LEVEL\2",
 "",
-"Allow you to view information about external Authentication Mechinisms"
+"Allows you to see your Permissions level with regards",
+"NeoStats. 0 is lowest, 200 is highest, you could be anywhere in between!",
 "",
 "End of Help.",
 NULL
 };
 
+const char *ns_jupe_help[] = {
+"*** NeoStats: \2JUPE\2 Help ***",
+"",
+"Usage: \2JUPE \37Server\37\2",
+"",
+"Allows you to Jupe a server on the network",
+"",
+"End of Help.",
+NULL
+};
 
 const char *ns_raw_help[] = {
 "*** NeoStats: \2RAW\2 Help ***",

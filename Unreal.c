@@ -50,6 +50,7 @@ aCtab cFlagTab[] = {
 	{0x0, 0x0, 0x0}
 };
 
+
 Oper_Modes usr_mds[] = {
 				 {UMODE_OPER, 'o', 50},
                                  {UMODE_LOCOP, 'O', 40},

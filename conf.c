@@ -62,6 +62,9 @@ if (!config_read("stats.cfg", options) == 0 ) {
 	exit(0);
 }
 printf("Sucessfully Loaded Config File, Now Booting NeoStats\n");
+#ifdef EXTAUTH
+	load_module("extauth", NULL);
+#endif
 
 done_mods = 0;
 }
@@ -84,9 +87,6 @@ int init_modules() {
 	int rval;
 	
 	strcpy(segv_location,"init_modules");
-#ifdef EXTAUTH
-	load_module("extauth", NULL);
-#endif
 	
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] !=0); i++) {
 #ifdef DEBUG
