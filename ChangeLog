@@ -5,6 +5,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - new files to handle command related functions for new bot message system (M)
  - introduced flags field into ModUser structure (M)
  - early version of generic bot message handler (M)
+ - log messages now have second resolution (M)
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.9
  - import of libpcre into core (M)
