@@ -420,7 +420,15 @@ ns_version (User * u, char **av, int ac)
 static void 
 ns_show_level (User * u, char **av, int ac)
 {
-	prefmsg (u->nick, s_Services, "Your Level is %d", UserLevel (u));
+	if(ac > 2) {
+		User * otheruser;
+		otheruser = finduser(av[2]);
+		if(otheruser) {
+			prefmsg (u->nick, s_Services, "User Level for %s is %d", otheruser->nick, UserLevel (otheruser));
+		}
+	} else {
+		prefmsg (u->nick, s_Services, "Your Level is %d", UserLevel (u));
+	}
 }
 
 static void 
