@@ -86,11 +86,12 @@ const char *hs_help_view[] = {
 
 const char *hs_help_list[] = {
 	"\2HostServ Help : LIST",
-	"\2Usage:\2 LIST",
+	"\2Usage:\2 LIST [<startpos>]",
 	"",
 	"Lists the people and vhosts in the Database",
 	"For more descriptive info on a SINGLE vhost see HELP VIEW",
 	"",
+	"If you supply a value for startpos (optional) the list will start at that position",
 	NULL
 };
 

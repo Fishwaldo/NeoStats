@@ -53,7 +53,7 @@ typedef struct hs_map_ {
 	time_t lused;
 } hs_map;
 
-hash_t *vhosts;
+list_t *vhosts;
 hash_t *bannedvhosts;
 
 struct hs_lvl {
@@ -70,7 +70,7 @@ extern const char *hs_help[];
 static int hs_sign_on(char **av, int ac);
 
 static void hs_add(User * u, char *cmd, char *m, char *h, char *p);
-static void hs_list(User * u);
+static void hs_list(User * u, int count);
 static void hs_view(User * u, int tmpint);
 static void hs_del(User * u, int tmpint);
 static void hs_login(User * u, char *login, char *pass);
@@ -82,7 +82,6 @@ static void SaveBans();
 static int new_m_version(char *origin, char **av, int ac);
 void hsdat(char *nick, char *host, char *vhost, char *pass, char *who);
 void CleanupHosts();
-
 void Loadhosts();
 
 int data_synch;
@@ -97,8 +96,28 @@ int ListArryCount = 0;
 Module_Info HostServ_info[] = { {
 				 "HostServ",
 				 "Network User Virtual Host Service",
-				 "2.7.1"}
+				 "2.8"}
 };
+
+int findnick(const void *key1, const void *key2)
+{
+	const hs_map *vhost = key1;
+	return (strcasecmp(vhost->nnick, (char *)key2));
+}
+
+void save_vhost(hs_map *vhost) {
+	SetData((void *)vhost->host, CFGSTR, "Vhosts", vhost->nnick, "Host");
+	SetData((void *)vhost->vhost, CFGSTR, "Vhosts", vhost->nnick , "Vhost");
+	SetData((void *)vhost->passwd, CFGSTR, "Vhosts", vhost->nnick , "Passwd");
+	SetData((void *)vhost->added, CFGSTR, "Vhosts", vhost->nnick , "Added");
+	SetData((void *)vhost->lused, CFGINT, "Vhosts", vhost->nnick , "LastUsed");
+	list_sort(vhosts, findnick);
+}
+void del_vhost(hs_map *vhost) {
+	DelRow("Vhosts", vhost->nnick);
+	free(vhost);
+	/* no need to list sort here, because its already sorted */
+}
 
 void hs_Config()
 {
@@ -160,7 +179,7 @@ int new_m_version(char *origin, char **av, int ac)
 /* Routine For Setting the Virtual Host */
 static int hs_sign_on(char **av, int ac)
 {
-	hnode_t *hn;
+	lnode_t *hn;
 	hs_map *map;
 	User *u;
 
@@ -183,9 +202,9 @@ static int hs_sign_on(char **av, int ac)
 
 	/* Check HostName Against Data Contained in vhosts.data */
 
-	hn = hash_lookup(vhosts, u->nick);
+	hn = list_find(vhosts, u->nick, findnick);
 	if (hn) {
-		map = hnode_get(hn);
+		map = lnode_get(hn);
 		nlog(LOG_DEBUG1, LOG_MOD, "Checking %s against %s for HostName Match", map->host, u->hostname);
 		if (fnmatch(map->host, u->hostname, 0) == 0) {
 			ssvshost_cmd(u->nick, map->vhost);
@@ -193,6 +212,7 @@ static int hs_sign_on(char **av, int ac)
 				"Automatically setting your Virtual Host to %s",
 				map->vhost);
 			map->lused = time(NULL);
+			save_vhost(map);
 			return 1;
 		}
 	}
@@ -295,7 +315,11 @@ int __Bot_Message(char *origin, char **av, int ac)
 		hs_del(u, t);
 	} else if (!strcasecmp(av[1], "LIST")
 		   && (UserLevel(u) >= hs_lvl.list)) {
-		hs_list(u);
+		if (ac == 2) {
+			hs_list(u, 0);
+		} else if (ac == 3) {
+			hs_list(u, atoi(av[2]));
+		}
 		return 1;
 	} else if (!strcasecmp(av[1], "BANS")) {
 		if (ac == 2) {
@@ -499,7 +523,7 @@ EventFnList *__module_get_events()
 
 int __ModInit(int modnum, int apiver)
 {
-	vhosts = hash_create(-1, 0, 0);
+	vhosts = list_create(-1);
 	bannedvhosts = hash_create(-1, 0, 0);
 	if (!vhosts) {
 		nlog(LOG_CRITICAL, LOG_CORE,
@@ -517,39 +541,21 @@ int __ModInit(int modnum, int apiver)
 
 void __ModFini()
 {
-	hnode_t *hn;
-	hscan_t hs;
-	hash_scan_begin(&hs, vhosts);
-	while ((hn = hash_scan_next(&hs)) != NULL) {
-		hash_scan_delete(vhosts, hn);
-		free(hnode_get(hn));
+	lnode_t *hn;
+	hn = list_first(vhosts);
+	while (hn != NULL) {
+		free(lnode_get(hn));
+		hn = list_next(vhosts, hn);
 	}
-	hash_destroy(vhosts);
+	list_destroy_nodes(vhosts);
 
 };
 
 
-void write_database()
-{
-	FILE *hsfile = fopen("data/vhosts.db", "w");
-	hnode_t *hn;
-	hscan_t hs;
-	hs_map *map;
-
-	hash_scan_begin(&hs, vhosts);
-	while ((hn = hash_scan_next(&hs)) != NULL) {
-		map = hnode_get(hn);
-		fprintf(hsfile, ":%s %s %s %s %s %ld\n", map->nnick,
-			map->host, map->vhost, map->passwd, map->added,
-			map->lused);
-	}
-	fclose(hsfile);
-}
-
 /* Routine for registrations with the 'vhosts.db' file */
 void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 {
-	hnode_t *hn;
+	lnode_t *hn;
 	hs_map *map;
 
 	map = malloc(sizeof(hs_map));
@@ -559,12 +565,11 @@ void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 	strncpy(map->passwd, pass, 30);
 	strncpy(map->added, who, MAXNICK);
 	map->lused = time(NULL);
-	hn = hnode_create(map);
-	hash_insert(vhosts, hn, map->nnick);
-
-	write_database();
-
+	hn = lnode_create(map);
+	list_append(vhosts, hn);
+	save_vhost(map);
 }
+
 static void hs_listban(User * u)
 {
 	hnode_t *hn;
@@ -658,12 +663,12 @@ static void SaveBans()
 
 static void hs_chpass(User * u, char *nick, char *oldpass, char *newpass)
 {
-	hnode_t *hn;
+	lnode_t *hn;
 	hs_map *map;
 
-	hn = hash_lookup(vhosts, nick);
+	hn = list_find(vhosts, nick, findnick);
 	if (hn) {
-		map = hnode_get(hn);
+		map = lnode_get(hn);
 		if ((fnmatch(map->host, u->hostname, 0) == 0)
 		    || (UserLevel(u) >= 100)) {
 			if (!strcasecmp(map->passwd, oldpass)) {
@@ -674,7 +679,7 @@ static void hs_chpass(User * u, char *nick, char *oldpass, char *newpass)
 					  "%s changed the password for %s",
 					  u->nick, map->nnick);
 				map->lused = time(NULL);
-				write_database();
+				save_vhost(map);
 				return;
 			}
 		} else {
@@ -723,7 +728,7 @@ static void hs_add(User * u, char *cmd, char *m, char *h, char *p)
 	}
 
 
-	if (!hash_lookup(vhosts, cmd)) {
+	if (!list_find(vhosts, cmd, findnick)) {
 		hsdat(cmd, m, h, p, u->nick);
 		nlog(LOG_NOTICE, LOG_MOD,
 		     "%s added a vhost for %s with realhost %s vhost %s and password %s",
@@ -761,47 +766,62 @@ static void hs_add(User * u, char *cmd, char *m, char *h, char *p)
 
 
 /* Routine for 'HostServ' to print out its data */
-static void hs_list(User * u)
+static void hs_list(User * u, int start)
 {
 	int i;
-	hnode_t *hn;
-	hscan_t hs;
+	lnode_t *hn;
 	hs_map *map;
 
 	SET_SEGV_LOCATION();
 
+	if (start >= list_count(vhosts)) {
+		prefmsg(u->nick, s_HostServ,  "Value out of Range. There are only %d entries", list_count(vhosts));
+		return;
+	}
+		
 	i = 1;
-	prefmsg(u->nick, s_HostServ, "Current HostServ VHOST list:");
+	prefmsg(u->nick, s_HostServ, "Current HostServ VHOST list: ");
+	prefmsg(u->nick, s_HostServ, "Showing %d to %d entries of %d total Vhosts", start+1, start+20, list_count(vhosts));
 	prefmsg(u->nick, s_HostServ, "%-5s %-12s %-30s", "Num", "Nick",
 		"Vhost");
-	hash_scan_begin(&hs, vhosts);
-	while ((hn = hash_scan_next(&hs)) != NULL) {
-		map = hnode_get(hn);
+	hn = list_first(vhosts);
+	while (hn != NULL) {
+		if (i <= start) {
+			i++;
+			hn = list_next(vhosts, hn);
+			continue;
+		}
+		map = lnode_get(hn);
 		prefmsg(u->nick, s_HostServ, "%-5d %-12s %-30s", i,
 			map->nnick, map->vhost);
 		i++;
+		/* limit to x entries per screen */
+		if (i > start + 20) 
+			break;
+		hn = list_next(vhosts, hn);
 	}
 	prefmsg(u->nick, s_HostServ,
 		"For more information on someone use /msg %s VIEW #",
 		s_HostServ);
 	prefmsg(u->nick, s_HostServ, "--- End of List ---");
+	if (list_count(vhosts) >= i) 
+	prefmsg(u->nick, s_HostServ, "Type \2/msg %s list %d\2 to see next page", s_HostServ, i-1);
 }
 
 /* Routine for VIEW */
 static void hs_view(User * u, int tmpint)
 {
 	int i;
-	hnode_t *hn;
-	hscan_t hs;
+	lnode_t *hn;
 	hs_map *map;
 	char ltime[80];
 	SET_SEGV_LOCATION();
 
 	i = 1;
-	hash_scan_begin(&hs, vhosts);
-	while ((hn = hash_scan_next(&hs)) != NULL) {
+	hn = list_first(vhosts);
+	while (hn != NULL) {
 		if (tmpint == i) {
-			map = hnode_get(hn);
+			map = lnode_get(hn);
 			prefmsg(u->nick, s_HostServ,
 				"Virtual Host information:");
 			prefmsg(u->nick, s_HostServ, "Nick:     %s",
@@ -822,6 +842,7 @@ static void hs_view(User * u, int tmpint)
 				"--- End of information for %s ---",
 				map->nnick);
 		}
+		hn = list_next(vhosts, hn);
 		i++;
 	}
 	if (tmpint > i)
@@ -836,18 +857,22 @@ static void hs_view(User * u, int tmpint)
 /* Routine For Loading The Hosts into Array */
 void Loadhosts()
 {
-	FILE *fp;
 	hs_map *map;
-	hnode_t *hn;
+	lnode_t *hn;
 	char buf[512];
+	char *tmp;
+	int count;
 	char **LoadArry;
+	FILE *fp;
 	fp = fopen("data/vhosts.db", "r");
+
+	/* if fp is valid, means we need to upgrade the database */
 	if (fp) {
 		load_synch = 1;
 		while (fgets(buf, 512, fp)) {
 			strip(buf);
 			LoadArryCount = split_buf(buf, &LoadArry, 0);
-			if (!hash_lookup(vhosts, LoadArry[0])) {
+			if (!list_find(vhosts, LoadArry[0], findnick)) {
 				map = malloc(sizeof(hs_map));
 				strncpy(map->nnick, LoadArry[0], MAXNICK);
 				strncpy(map->host, LoadArry[1], MAXHOST);
@@ -868,10 +893,11 @@ void Loadhosts()
 					map->lused = time(NULL);
 				map->nnick[strlen(map->nnick)] = '\0';
 				/* add it to the hash */
-				hn = hnode_create(map);
-				hash_insert(vhosts, hn, map->nnick);
+				hn = lnode_create(map);
+				list_append(vhosts, hn);
+				save_vhost(map);
 				nlog(LOG_DEBUG1, LOG_CORE,
-				     "Loaded %s (%s) into Vhosts",
+				     "Upgraded Database Entry %s (%s) into Vhosts",
 				     map->nnick, map->vhost);
 			} else {
 				nlog(LOG_NOTICE, LOG_CORE,
@@ -881,7 +907,28 @@ void Loadhosts()
 			free(LoadArry);
 		}
 		fclose(fp);
-	}
+		unlink("data/vhosts.db");
+	} else if (GetTableData("Vhosts", &LoadArry) > 0) {
+		for (count = 0; LoadArry[count] != NULL; count++) {
+			map = malloc(sizeof(hs_map));
+			strncpy(map->nnick, LoadArry[count], MAXNICK);
+			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Host") > 0) 
+				strncpy(map->host, tmp, MAXHOST);
+			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Vhost") > 0) 
+				strncpy(map->vhost, tmp, MAXHOST);
+			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Passwd") > 0) 
+				strncpy(map->passwd, tmp, 30);
+			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Added") > 0)
+				strncpy(map->added, tmp, MAXNICK);
+			GetData((void *)&map->lused, CFGINT, "Vhosts", map->nnick, "LastUsed");
+			hn = lnode_create(map);
+			list_append(vhosts, hn);
+			nlog(LOG_DEBUG1, LOG_CORE,
+			     "Loaded %s (%s) into Vhosts",
+			     map->nnick, map->vhost);
+		}
+	}			
+	list_sort(vhosts, findnick);
 }
 
 
@@ -890,16 +937,15 @@ static void hs_del(User * u, int tmpint)
 {
 
 	int i = 1;
-	hnode_t *hn;
-	hscan_t hs;
+	lnode_t *hn;
 	hs_map *map;
 
 	SET_SEGV_LOCATION();
 
-	hash_scan_begin(&hs, vhosts);
-	while ((hn = hash_scan_next(&hs)) != NULL) {
+	hn = list_first(vhosts);
+	while (hn != NULL) {
 		if (i == tmpint) {
-			map = hnode_get(hn);
+			map = lnode_get(hn);
 			prefmsg(u->nick, s_HostServ,
 				"The following vhost was removed from the Vhosts Database");
 			prefmsg(u->nick, s_HostServ, "\2%s - %s\2",
@@ -909,10 +955,12 @@ static void hs_del(User * u, int tmpint)
 			     map->vhost, map->nnick);
 			chanalert(s_HostServ, "%s removed vhost %s for %s",
 				  u->nick, map->vhost, map->nnick);
-			hash_scan_delete(vhosts, hn);
-			free(map);
-			hnode_destroy(hn);
+			del_vhost(map);
+			list_delete(vhosts, hn);
+			lnode_destroy(hn);
+			return;
 		}
+		hn = list_next(vhosts, hn);
 		i++;
 	}
 
@@ -920,8 +968,6 @@ static void hs_del(User * u, int tmpint)
 		prefmsg(u->nick, s_HostServ,
 			"ERROR: There is no vhost on list number \2%d\2",
 			tmpint);
-	else
-		write_database();
 	return;
 }
 
@@ -930,14 +976,14 @@ static void hs_del(User * u, int tmpint)
 static void hs_login(User * u, char *login, char *pass)
 {
 	hs_map *map;
-	hnode_t *hn;
+	lnode_t *hn;
 
 	SET_SEGV_LOCATION();
 
 	/* Check HostName Against Data Contained in vhosts.data */
-	hn = hash_lookup(vhosts, login);
+	hn = list_find(vhosts, login, findnick);
 	if (hn) {
-		map = hnode_get(hn);
+		map = lnode_get(hn);
 		if (!strcasecmp(map->passwd, pass)) {
 			ssvshost_cmd(u->nick, map->vhost);
 			map->lused = time(NULL);
@@ -949,6 +995,7 @@ static void hs_login(User * u, char *login, char *pass)
 			chanalert(s_HostServ,
 				  "%s used login to get Vhost %s", u->nick,
 				  map->vhost);
+			save_vhost(map);
 			return;
 		}
 	}
@@ -959,22 +1006,25 @@ static void hs_login(User * u, char *login, char *pass)
 
 void CleanupHosts()
 {
-	hnode_t *hn;
-	hscan_t hs;
+	lnode_t *hn, *hn2;
 	hs_map *map;
 
 	SET_SEGV_LOCATION();
 
-	hash_scan_begin(&hs, vhosts);
-	while ((hn = hash_scan_next(&hs)) != NULL) {
-		map = hnode_get(hn);
+	hn = list_first(vhosts);
+	while (hn != NULL) {
+		map = lnode_get(hn);
 		if (map->lused < (time(NULL) - (hs_lvl.old * 86400))) {
 			nlog(LOG_NOTICE, LOG_MOD,
 			     "Old Vhost Automatically removed: %s for %s",
 			     map->vhost, map->nnick);
-			hash_scan_delete(vhosts, hn);
-			free(map);
-			hnode_destroy(hn);
+			del_vhost(map);
+			hn2 = list_next(vhosts, hn);
+			list_delete(vhosts, hn);
+			lnode_destroy(hn);
+			hn = hn2;
+		} else {
+			hn = list_next(vhosts, hn);
 		}
 	}
 }
