@@ -270,6 +270,7 @@ EXPORTVAR extern unsigned int ircd_supported_smodes;
 #define MAXREALNAME		(50 + 1)
 #define MAXCHANLEN		(50 + 1)
 #define MAXTOPICLEN		(307 + 1)
+#define CLOAKKEYLEN		(40 + 1)
 
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10

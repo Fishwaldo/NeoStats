@@ -240,6 +240,9 @@ http_ntlm.c http_ntlm.h ca-bundle.h inet_pton.c inet_pton.h
 noinst_HEADERS = setup.h transfer.h
 
 BUILT_SOURCES = $(srcdir)/getdate.c $(srcdir)/ca-bundle.h
+LINK = @echo "Linking $@"; $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+        $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
 subdir = src/curl
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
@@ -290,8 +293,6 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
 	$(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libcurl_la_SOURCES)
 HEADERS = $(noinst_HEADERS)
 
@@ -595,6 +596,7 @@ $(srcdir)/ca-bundle.h: Makefile.in Makefile
 	fi
 	@echo "/* The file is generated automaticly */" > $@
 	@echo '#undef CURL_CA_BUNDLE /* unknown */' >> $@
+
 .c.o:
 			@echo "Building $@"
 @am__fastdepCC_TRUE@	@if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \

@@ -12,7 +12,7 @@ endif
 
 
 
-SUBDIRS		= protocol $(CURLDIR) keeper adns libltdl $(PCREDIR) modules
+SUBDIRS		= protocol $(CURLDIR) keeper adns libltdl $(PCREDIR) . modules
 
 
 bin_PROGRAMS = neostats

@@ -1,3 +1,6 @@
+LINK = @echo "Linking $@"; $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+        $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
 .c.o:
 			@echo "Building $@"
 @am__fastdepCC_TRUE@	@if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \

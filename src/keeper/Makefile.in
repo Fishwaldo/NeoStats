@@ -170,6 +170,9 @@ libkeeper_a_SOURCES = keeper.h kp_cache.c kp_dir.c kp_enum.c kp_get.c \
 			kp_util.h
 
 AM_CFLAGS = -I../pcre -I../adns -I../curl -I../../include -I..
+LINK = @echo "Linking $@"; $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+        $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
 subdir = src/keeper
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
@@ -198,8 +201,6 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
 	$(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libkeeper_a_SOURCES)
 DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk \
 	Makefile.am
@@ -422,6 +423,7 @@ uninstall-am: uninstall-info-am
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool pdf \
 	pdf-am ps ps-am tags uninstall uninstall-am uninstall-info-am
+
 
 .c.o:
 			@echo "Building $@"

@@ -168,6 +168,9 @@ pkglib_LTLIBRARIES = connectserv.la
 connectserv_la_SOURCES = cs.c cs.h cs_help.c
 connectserv_la_LDFLAGS = -module -avoid-version -no-undefined
 AM_CFLAGS = -I../.. -I../../pcre -I../../curl -I../../adns
+LINK = @echo "Linking $@"; $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+        $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
 subdir = src/modules/connectserv
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
@@ -188,8 +191,6 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
 	$(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(connectserv_la_SOURCES)
 DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk \
 	Makefile.am
@@ -421,6 +422,7 @@ uninstall-am: uninstall-info-am uninstall-pkglibLTLIBRARIES
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-info-am \
 	uninstall-pkglibLTLIBRARIES
+
 
 .c.o:
 			@echo "Building $@"

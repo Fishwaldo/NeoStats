@@ -171,6 +171,9 @@ dftables_SOURCES = dftables.c internal.h pcre.h
 dftables_DEPENDENCES = maketables.c
 
 AM_CFLAGS = -I../../include -I.. -I../pcre -I../curl
+LINK = @echo "Linking $@"; $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+        $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
 subdir = src/pcre
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
@@ -202,8 +205,6 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
 	$(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libpcre_la_SOURCES) $(dftables_SOURCES)
 DIST_COMMON = README $(srcdir)/Makefile.in \
 	$(top_srcdir)/autotools/rules.mk COPYING Makefile.am
@@ -462,6 +463,7 @@ uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES
 
 chartables.c: dftables
 	$(top_builddir)/src/pcre/dftables > $@
+
 .c.o:
 			@echo "Building $@"
 @am__fastdepCC_TRUE@	@if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \

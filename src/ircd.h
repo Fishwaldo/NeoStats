@@ -73,7 +73,7 @@ typedef struct ircd_server {
 	int modex;
 	int nicklen;
 	int gc;
-	char cloak[35];
+	char cloak[CLOAKKEYLEN];
 	int maxglobalcnt;
 	int tsendsync;
 	unsigned int protocol;
