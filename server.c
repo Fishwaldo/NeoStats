@@ -86,10 +86,11 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	ns_do_exclude_server(s);
 
 	/* run the module event for a new server. */
-	AddStringToList (&av, s->name, &ac);
+	AddStringToList (&av, (char*)name, &ac);
 	AddStringToList (&av, (char*)uplink, &ac);
 	AddStringToList (&av, (char*)hops, &ac);
-	AddStringToList (&av, s->infoline, &ac);
+	AddStringToList (&av, (char*)numeric, &ac);
+	AddStringToList (&av, (char*)infoline, &ac);
 	ModuleEvent (EVENT_SERVER, av, ac);
 	free (av);
 	return(s);
@@ -137,7 +138,7 @@ findserver (const char *name)
 		s = hnode_get (sn);
 		return s;
 	}
-	nlog (LOG_DEBUG2, LOG_CORE, "FindServer: %s not found!", name);
+	nlog (LOG_DEBUG3, LOG_CORE, "findserver: %s not found!", name);
 	return NULL;
 }
 

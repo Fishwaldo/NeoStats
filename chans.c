@@ -39,7 +39,7 @@
  */
 typedef struct Chanmem {
 	char nick[MAXNICK];
-	time_t joint;
+	time_t jointime;
 	long flags;
 	void *moddata[NUM_MODULES];
 } Chanmem;
@@ -699,7 +699,7 @@ join_chan (const char* nick, const char *chan)
 	/* add this users details to the channel members hash */
 	cm = smalloc (sizeof (Chanmem));
 	strlcpy (cm->nick, u->nick, MAXNICK);
-	cm->joint = me.now;
+	cm->jointime = me.now;
 	cm->flags = 0;
 	cn = lnode_create (cm);
 	nlog (LOG_DEBUG2, LOG_CORE, "join_chan: adding usernode %s to channel %s", u->nick, chan);
@@ -802,7 +802,7 @@ ChanDump (const char *chan)
 						mode[++j] = chan_modes[i].flag;
 					}
 				}
-				debugtochannel("Members: %s Modes %s Joined %ld", cm->nick, mode, (long)cm->joint);
+				debugtochannel("Members: %s Modes %s Joined %ld", cm->nick, mode, (long)cm->jointime);
 				cmn = list_next (c->chanmembers, cmn);
 			}
 		}
@@ -844,7 +844,7 @@ ChanDump (const char *chan)
 						mode[++j] = chan_modes[i].flag;
 					}
 				}
-				debugtochannel("Members: %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->joint);
+				debugtochannel("Members: %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->jointime);
 				cmn = list_next (c->chanmembers, cmn);
 			}
 		}
@@ -867,13 +867,13 @@ findchan (const char *chan)
 {
 	Chans *c;
 	hnode_t *cn;
-	SET_SEGV_LOCATION();
+
 	cn = hash_lookup (ch, chan);
 	if (cn) {
 		c = hnode_get (cn);
 		return c;
 	}
-	nlog (LOG_DEBUG3, LOG_CORE, "FindChan: %s not found", chan);
+	nlog (LOG_DEBUG3, LOG_CORE, "findchan: %s not found", chan);
 	return NULL;
 }
 
@@ -888,7 +888,7 @@ findchan (const char *chan)
 */
 
 int 
-IsChanMember(Chans *c, User *u) 
+IsChanMember (Chans *c, User *u) 
 {
 	if (!u || !c) {
 		return 0;

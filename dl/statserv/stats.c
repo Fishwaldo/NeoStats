@@ -151,7 +151,7 @@ int s_chan_new(char **av, int ac)
 
 	IncreaseChans();
 	/* only check exclusions after increasing channel count */
-	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
+	if (StatServ.exclusions && IsExcluded(findchan(av[0]))) {
 		return 1;
 	}
 	count = hash_count(ch);
@@ -175,7 +175,7 @@ int s_chan_del(char **av, int ac)
 	
 	DecreaseChans();
 	/* only check exclusions after increasing channel count */
-	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
+	if (StatServ.exclusions && IsExcluded(findchan(av[0]))) {
 		return 1;
 	}
 	ln = list_find(Chead, av[0], comparef);
@@ -196,7 +196,7 @@ int s_chan_join(char **av, int ac)
 	CStats *cs;
 
 	/* only check exclusions after increasing channel count */
-	if (StatServ.exclusions && (Is_Excluded(findchan(av[0]))|| Is_Excluded(finduser(av[1])))) {
+	if (StatServ.exclusions && (IsExcluded(findchan(av[0]))|| IsExcluded(finduser(av[1])))) {
 		return 1;
 	}
 
@@ -229,7 +229,7 @@ int s_chan_part(char **av, int ac)
 {
 	CStats *cs;
 	/* only check exclusions after increasing channel count */
-	if (StatServ.exclusions && (Is_Excluded(findchan(av[0]))|| Is_Excluded(finduser(av[1])))) {
+	if (StatServ.exclusions && (IsExcluded(findchan(av[0]))|| IsExcluded(finduser(av[1])))) {
 		return 1;
 	}
 	cs = findchanstats(av[0]);
@@ -243,7 +243,7 @@ int s_topic_change(char **av, int ac)
 {
 	CStats *cs;
 	/* only check exclusions after increasing channel count */
-	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
+	if (StatServ.exclusions && IsExcluded(findchan(av[0]))) {
 		return 1;
 	}
 	cs = findchanstats(av[0]);
@@ -257,7 +257,7 @@ int s_chan_kick(char **av, int ac)
 	CStats *cs;
 
 	/* only check exclusions after increasing channel count */
-	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
+	if (StatServ.exclusions && IsExcluded(findchan(av[0]))) {
 		return 1;
 	}
 
@@ -336,7 +336,7 @@ int s_new_server(char **av, int ac)
 	if (stats_network.maxservers < stats_network.servers) {
 		stats_network.maxservers = stats_network.servers;
 		stats_network.t_maxservers = me.now;
-		if (!(StatServ.exclusions && Is_Excluded(s))) {
+		if (!(StatServ.exclusions && IsExcluded(s))) {
 			announce_record("\2NEW SERVER RECORD\2 Wow, there are now %ld Servers on the Network",
 				stats_network.servers);
 		}
@@ -379,7 +379,7 @@ int s_user_kill(char **av, int ac)
 	if (!u)
 		return 0;
 
-	if (StatServ.exclusions && Is_Excluded(u)) {
+	if (StatServ.exclusions && IsExcluded(u)) {
 		return 0;
 	}
 	s = findstats(u->server->name);
@@ -421,7 +421,7 @@ int s_user_modes(char **av, int ac)
 	if (!u) {
 		return -1;
 	}
-	if (StatServ.exclusions && Is_Excluded(u)) {
+	if (StatServ.exclusions && IsExcluded(u)) {
 		return -1;
 	}
 	s = findstats(u->server->name);
@@ -491,7 +491,7 @@ int s_del_user(char **av, int ac)
 	if (!u)
 		return 0;
 
-	if (StatServ.exclusions && Is_Excluded(u)) {
+	if (StatServ.exclusions && IsExcluded(u)) {
 		return 0;
 	}
 
@@ -519,7 +519,7 @@ int s_user_away(char **av, int ac)
 	if (!u)
 		return 0;
 
-	if (StatServ.exclusions && Is_Excluded(u)) {
+	if (StatServ.exclusions && IsExcluded(u)) {
 		return 0;
 	}
 
@@ -545,7 +545,7 @@ int s_new_user(char **av, int ac)
 		return 0;
 
 	/* ignore them if they are excluded */
-	if (StatServ.exclusions && Is_Excluded(u)) {
+	if (StatServ.exclusions && IsExcluded(u)) {
 		return 0;
 	}
 	
@@ -598,7 +598,7 @@ int pong(char **av, int ac)
 		return -1;
 
 
-	if (StatServ.exclusions && Is_Excluded(s)) {
+	if (StatServ.exclusions && IsExcluded(s)) {
 		return -1;
 	}
 

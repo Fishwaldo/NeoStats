@@ -272,12 +272,13 @@ finduser (const char *nick)
 {
 	User *u;
 	hnode_t *un;
+
 	un = hash_lookup (uh, nick);
 	if (un != NULL) {
 		u = hnode_get (un);
 		return u;
 	}
-	nlog (LOG_DEBUG2, LOG_CORE, "finduser: %s not found", nick);
+	nlog (LOG_DEBUG3, LOG_CORE, "finduser: %s not found", nick);
 	return NULL;
 }
 

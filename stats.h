@@ -625,5 +625,9 @@ int is_target_valid(char* bot_name, User* u, char* target_nick);
 typedef void (transfer_callback) (void *data, int returncode, char *body, int bodysize);
 void transfer_status();
 int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback);
+
+/* exclude */
+#define IsExcluded(x) ((x) && (x->flags && NS_FLAGS_EXCLUDED))
+
 #endif
 

@@ -213,7 +213,7 @@ static int hs_sign_on(char **av, int ac)
 		return 1;
 
 	/* is this user excluded via a global exclusion? */
-	if (Is_Excluded(u)) 
+	if (IsExcluded(u)) 
 		return 1;
 
 	if (findbot(u->nick))
@@ -311,7 +311,7 @@ int hs_mode(char **av, int ac) {
 		/* don't set a opers vhost. Most likely already done */
 		return 1;
 		
-	if (Is_Excluded(u)) 
+	if (IsExcluded(u)) 
 		return 1;
 		
 	/* first, find if its a regnick mode */

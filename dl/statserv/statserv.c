@@ -642,7 +642,7 @@ static void makemap(char *uplink, User * u, int level)
 	hash_scan_begin(&hs, sh);
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
-		if (StatServ.exclusions && Is_Excluded(s)) {
+		if (StatServ.exclusions && IsExcluded(s)) {
 			makemap(s->name, u, level);
 		}
 		ss = findstats(s->name);

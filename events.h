@@ -73,6 +73,7 @@
  *	server name
  *	uplink
  *	hops
+ *	numeric
  *	infoline
  */
 #define EVENT_SERVER		"SERVER"

@@ -32,7 +32,4 @@ void ns_do_exclude_chan(Chans *c);
 void ns_do_exclude_server(Server *s);
 void ns_do_exclude_user(User *u);
 
-#define Is_Excluded(x) ((x) && (x->flags && NS_FLAGS_EXCLUDED))
-
-
 #endif /* _EXCLUDE_H_ */

@@ -207,7 +207,7 @@ static int cs_new_user(char **av, int ac)
 	if (!u) /* User not found */
 		return 1;
 
-	if (cs_cfg.use_exc && Is_Excluded(u)) 
+	if (cs_cfg.use_exc && IsExcluded(u)) 
 		return 1;
 
 	if (!ircstrcasecmp(u->server->name, me.name)) {
@@ -245,7 +245,7 @@ static int cs_del_user(char **av, int ac)
 	if (!u) /* User not found */
 		return 1;
 
-	if (cs_cfg.use_exc && Is_Excluded(u)) 
+	if (cs_cfg.use_exc && IsExcluded(u)) 
 		return 1;
 	if (!ircstrcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
@@ -333,7 +333,7 @@ static int cs_user_modes(char **av, int ac)
 		return -1;
 	}
 
-	if (cs_cfg.use_exc && Is_Excluded(u)) 
+	if (cs_cfg.use_exc && IsExcluded(u)) 
 		return 1;
 
 	if (!ircstrcasecmp(u->server->name, me.name)) {
@@ -432,7 +432,7 @@ static int cs_user_smodes(char **av, int ac)
 	}
 
 
-	if (cs_cfg.use_exc && Is_Excluded(u)) 
+	if (cs_cfg.use_exc && IsExcluded(u)) 
 		return 1;
 
 	if (!ircstrcasecmp(u->server->name, me.name)) {
@@ -513,7 +513,7 @@ static int cs_user_kill(char **av, int ac)
 		return 1;
 	
 
-	if (cs_cfg.use_exc && Is_Excluded(u)) 
+	if (cs_cfg.use_exc && IsExcluded(u)) 
 		return 1;
 
 	if (!ircstrcasecmp(u->server->name, me.name)) {
@@ -556,7 +556,7 @@ static int cs_user_nick(char **av, int ac)
 	if (!u)
 		return -1;
 
-	if (cs_cfg.use_exc && Is_Excluded(u)) 
+	if (cs_cfg.use_exc && IsExcluded(u)) 
 		return 1;
 
 	if (!ircstrcasecmp(u->server->name, me.name)) {
@@ -640,7 +640,7 @@ static int cs_server_join(char **av, int ac)
 	if (!s)
 		return 0;
 
-	if (cs_cfg.use_exc && Is_Excluded(s)) 
+	if (cs_cfg.use_exc && IsExcluded(s)) 
 		return 1;
 
 	chanalert (s_ConnectServ, "\2SERVER\2 %s has joined the Network at %s",
@@ -660,7 +660,7 @@ static int cs_server_quit(char **av, int ac)
 	if (!s)
 		return 0;
 
-	if (cs_cfg.use_exc && Is_Excluded(s)) 
+	if (cs_cfg.use_exc && IsExcluded(s)) 
 		return 1;
 
 	chanalert (s_ConnectServ, "\2SERVER\2 %s has left the Network at %s for %s",
