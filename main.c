@@ -97,7 +97,7 @@ main (int argc, char *argv[])
 		printf ("-----------------------------------------------\n\n");
 	}
 	/* set some defaults before we parse the config file */
-	me.t_start = me.now;
+	me.t_start = time(NULL);
 	me.want_privmsg = 0;
 	me.die = 0;
 	me.local[0] = '\0';
