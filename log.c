@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.c,v 1.8 2003/06/13 13:11:49 fishwaldo Exp $
+** $Id: log.c,v 1.9 2003/06/24 14:12:47 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -180,25 +180,25 @@ void ResetLogs()
 		if (logentry->flush > 0) {
 			fflush(logentry->logfile);
 			logentry->flush = 0;
-		}
 #ifdef DEBUG
-		printf("Closing Logfile %s (%s)\n", logentry->name,
-		       (char *) hnode_getkey(hn));
+			printf("Closing Logfile %s (%s)\n", logentry->name,
+			       (char *) hnode_getkey(hn));
 #endif
-		fclose(logentry->logfile);
-		if (!strcasecmp(logentry->name, "core")) {
-			strftime(tmp, 255, "logs/NeoStats-%m-%d.log",
-				 localtime(&t));
-			rename("logs/NeoStats.log", tmp);
-			logentry->logfile =
-			    fopen("logs/NeoStats.log", "a");
-		} else {
-			strftime(tmp2, 255, "%m-%d.log", localtime(&t));
-			snprintf(tmp, 255, "logs/%s-%s", logentry->name,
-				 tmp2);
-			snprintf(tmp2, 255, "logs/%s.log", logentry->name);
-			rename(tmp2, tmp);
-			logentry->logfile = fopen(tmp2, "a");
+			fclose(logentry->logfile);
+			if (!strcasecmp(logentry->name, "core")) {
+				strftime(tmp, 255, "logs/NeoStats-%m-%d.log",
+					 localtime(&t));
+				rename("logs/NeoStats.log", tmp);
+				logentry->logfile =
+				    fopen("logs/NeoStats.log", "a");
+			} else {
+				strftime(tmp2, 255, "%m-%d.log", localtime(&t));
+				snprintf(tmp, 255, "logs/%s-%s", logentry->name,
+					 tmp2);
+				snprintf(tmp2, 255, "logs/%s.log", logentry->name);
+				rename(tmp2, tmp);
+				logentry->logfile = fopen(tmp2, "a");
+			}
 		}
 	}
 }

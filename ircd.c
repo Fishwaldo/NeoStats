@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.126 2003/06/20 12:24:27 fishwaldo Exp $
+** $Id: ircd.c,v 1.127 2003/06/24 14:12:47 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -52,77 +52,6 @@ if "srvmsg" is defined, it means that the command must be prefixed by ":" indica
 #if defined(HYBRID7) || defined(NEOIRCD)
 #endif
 #ifdef ULTIMATE
-IntCommands cmd_list[] = {
-	/* Command      Function                srvmsg */
-	{MSG_STATS, Usr_Stats, 1, 0},
-	{TOK_STATS, Usr_Stats, 1, 0},
-	{MSG_SETHOST, Usr_Vhost, 1, 0},
-	{TOK_SETHOST, Usr_Vhost, 1, 0},
-	{MSG_VERSION, Usr_Version, 1, 0},
-	{TOK_VERSION, Usr_Version, 1, 0},
-	{MSG_MOTD, Usr_ShowMOTD, 1, 0},
-	{TOK_MOTD, Usr_ShowMOTD, 1, 0},
-	{MSG_CREDITS, Usr_Showcredits, 1, 0},
-	{TOK_CREDITS, Usr_Showcredits, 1, 0},
-	{MSG_SERVER, Usr_AddServer, 1, 0},
-	{TOK_SERVER, Usr_AddServer, 1, 0},
-	{MSG_SQUIT, Usr_DelServer, 1, 0},
-	{TOK_SQUIT, Usr_DelServer, 1, 0},
-	{MSG_QUIT, Usr_DelUser, 1, 0},
-	{TOK_QUIT, Usr_DelUser, 1, 0},
-	{MSG_MODE, Usr_Mode, 1, 0},
-	{TOK_MODE, Usr_Mode, 1, 0},
-	{MSG_SVSMODE, Usr_Smode, 1, 0},
-	{TOK_SVSMODE, Usr_Smode, 1, 0},
-	{MSG_KILL, Usr_Kill, 1, 0},
-	{TOK_KILL, Usr_Kill, 1, 0},
-	{MSG_PONG, Usr_Pong, 1, 0},
-	{TOK_PONG, Usr_Pong, 1, 0},
-	{MSG_AWAY, Usr_Away, 1, 0},
-	{TOK_AWAY, Usr_Away, 1, 0},
-	{MSG_NICK, Usr_Nick, 1, 0},
-	{TOK_NICK, Usr_Nick, 1, 0},
-	{MSG_TOPIC, Usr_Topic, 1, 0},
-	{TOK_TOPIC, Usr_Topic, 1, 0},
-	{MSG_KICK, Usr_Kick, 1, 0},
-	{TOK_KICK, Usr_Kick, 1, 0},
-	{MSG_JOIN, Usr_Join, 1, 0},
-	{TOK_JOIN, Usr_Join, 1, 0},
-	{MSG_PART, Usr_Part, 1, 0},
-	{TOK_PART, Usr_Part, 1, 0},
-	{MSG_PING, Srv_Ping, 0, 0},
-	{TOK_PING, Srv_Ping, 0, 0},
-#ifndef ULTIMATE3
-	{MSG_SNETINFO, Srv_Netinfo, 0, 0},
-	{TOK_SNETINFO, Srv_Netinfo, 0, 0},
-
-#endif
-#ifdef ULTIMATE3
-	{MSG_SVINFO, Srv_Svinfo, 0, 0},
-	{MSG_CAPAB, Srv_Connect, 0, 0},
-	{MSG_BURST, Srv_Burst, 0, 0},
-	{MSG_SJOIN, Srv_Sjoin, 1, 0},
-	{MSG_CLIENT, Srv_Client, 0, 0},
-	{MSG_SMODE, Srv_Smode, 1, 0},
-#endif
-	{MSG_VCTRL, Srv_Vctrl, 0, 0},
-	{TOK_VCTRL, Srv_Vctrl, 0, 0},
-	{MSG_PASS, Srv_Pass, 0, 0},
-	{TOK_PASS, Srv_Pass, 0, 0},
-	{MSG_SERVER, Srv_Server, 0, 0},
-	{TOK_SERVER, Srv_Server, 0, 0},
-	{MSG_SQUIT, Srv_Squit, 0, 0},
-	{TOK_SQUIT, Srv_Squit, 0, 0},
-	{MSG_NICK, Srv_Nick, 0, 0},
-	{TOK_NICK, Srv_Nick, 0, 0},
-	{MSG_SVSNICK, Srv_Svsnick, 0, 0},
-	{TOK_SVSNICK, Srv_Svsnick, 0, 0},
-	{MSG_KILL, Srv_Kill, 0, 0},
-	{TOK_KILL, Srv_Kill, 0, 0},
-	{MSG_PROTOCTL, Srv_Connect, 0, 0},
-	{TOK_PROTOCTL, Srv_Connect, 0, 0},
-	{NULL, NULL, 0, 0}
-};
 #endif
 
 

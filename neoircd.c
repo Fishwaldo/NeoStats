@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.15 2003/06/13 13:11:49 fishwaldo Exp $
+** $Id: neoircd.c,v 1.16 2003/06/24 14:12:47 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -555,9 +555,7 @@ void Srv_Sjoin(char *origin, char **argv, int argc)
 		goto nomodes;
 	}
 	while (*modes) {
-		for (i = 0;
-		     i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1);
-		     i++) {
+ 		for (i = 0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1); i++) {
 			if (*modes == cFlagTab[i].flag) {
 				if (cFlagTab[i].parameters) {
 					m = smalloc(sizeof(ModesParm));
@@ -586,10 +584,7 @@ void Srv_Sjoin(char *origin, char **argv, int argc)
 		modes = argv[j];
 		mode = 0;
 		while (ok == 1) {
-			for (i = 0;
-			     i <
-			     ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -
-			      1); i++) {
+			for (i = 0;i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -1); i++) {
 				if (cFlagTab[i].sjoin != 0) {
 					if (*modes == cFlagTab[i].sjoin) {
 						mode |= cFlagTab[i].mode;
