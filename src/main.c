@@ -357,9 +357,6 @@ serv_die ()
 #ifdef VALGRIND
 	exit(NS_SUCCESS);
 #else /* VALGRIND */
-	User *u;
-
-	u = finduser (ns_botptr->nick);
 	nlog (LOG_CRITICAL, msg_sigterm);
 	globops (ns_botptr->nick, msg_sigterm);
 	do_exit (NS_EXIT_NORMAL, msg_sigterm);
