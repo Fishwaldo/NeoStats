@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: keeper.h,v 1.3 2003/06/13 14:44:37 fishwaldo Exp $
+** $Id: keeper.h,v 1.4 2003/09/15 10:39:39 fishwaldo Exp $
 */
 /*
  * KEEPER: A configuration reading and writing library
@@ -44,6 +44,9 @@
 
 #ifndef _KEEPER_H
 #define _KEEPER_H
+
+/* define this to debug some functions in keeper */
+#undef KPDEBUG
 
 typedef enum {
 	KPVAL_UNKNOWN = -1,

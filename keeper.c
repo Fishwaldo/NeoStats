@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: keeper.c,v 1.13 2003/09/12 16:52:26 fishwaldo Exp $
+** $Id: keeper.c,v 1.14 2003/09/15 10:39:39 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -138,7 +138,6 @@ SetConf (void *data, int type, char *item)
 		nlog (LOG_WARNING, LOG_CORE, "SetConf: %s", kp_strerror (i));
 		return -1;
 	}
-	kp_flush ();
 	return 1;
 
 }
@@ -164,7 +163,6 @@ DelConf (char *item)
 		nlog (LOG_WARNING, LOG_CORE, "DelConf: %s (%s)", kp_strerror (i), keypath);
 		return -1;
 	}
-	kp_flush ();
 	return 1;
 }	
 
@@ -183,7 +181,6 @@ GetData (void **data, int type, const char *table, const char *row, const char *
 	} else {
 		snprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
 	}
-
 	switch (type) {
 	case CFGSTR:
 		i = kp_get_string (keypath, (char **) *&data);
@@ -279,7 +276,6 @@ SetData (void *data, int type, char *table, char *row, char *field)
 		nlog (LOG_WARNING, LOG_CORE, "SetData: %s", kp_strerror (i));
 		return -1;
 	}
-	kp_flush ();
 	return 1;
 
 }
@@ -305,7 +301,6 @@ DelRow (char *table, char *row)
 		nlog (LOG_WARNING, LOG_CORE, "DelRow: %s (%s)", kp_strerror (i), keypath);
 		return -1;
 	}
-	kp_flush ();
 	return 1;
 }	
 
@@ -329,6 +324,11 @@ DelTable (char *table)
 		nlog (LOG_WARNING, LOG_CORE, "DelTable: %s (%s)", kp_strerror (i), keypath);
 		return -1;
 	}
-	kp_flush ();
 	return 1;
 }	
+/** @brief flushes the Keeper Database out 
+*/
+void
+flush_keeper() {
+	kp_flush();
+}

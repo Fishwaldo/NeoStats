@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: kp_cache.c,v 1.4 2003/06/13 14:44:37 fishwaldo Exp $
+** $Id: kp_cache.c,v 1.5 2003/09/15 10:39:39 fishwaldo Exp $
 */
 /*
  * KEEPER: A configuration reading and writing library
@@ -87,9 +87,13 @@ static kp_fil *kp_get_cached_file(kp_path * kpp)
 	char *path = kpp->path;
 
 	for (fil = kp_cachef; fil != NULL; fil = fil->next)
-		if (strcmp(fil->kpp.path, path) == 0)
+		if (strcmp(fil->kpp.path, path) == 0) {
+#ifdef KPDEBUG
+			printf("kp_get_cached_file: %s\n", fil->kpp.path);
+#endif
 			break;
 
+		}
 	return fil;
 }
 
@@ -110,6 +114,9 @@ static kp_fil *kp_new_cached_file(kp_path * kpp)
 	fil->check = 0;
 	fil->next = kp_cachef;
 	kp_cachef = fil;
+#ifdef KPDEBUG
+	printf("kp_new_cached_file: %s\n", fil->kpp.path);
+#endif
 
 	return fil;
 }
@@ -119,6 +126,9 @@ static kp_fil *kp_new_cached_file(kp_path * kpp)
  * ------------------------------------------------------------------------- */
 static void kp_free_file(kp_fil * fil)
 {
+#ifdef KPDEBUG
+	printf("kp_free_file: %s\n", fil->kpp.path);
+#endif
 	free(fil->kpp.path);
 	kp_free_keys(fil->keys);
 	free(fil);
@@ -134,6 +144,9 @@ static void kp_remove_file_from_cache(kp_fil * rfil)
 	for (filp = &kp_cachef; *filp != NULL; filp = &(*filp)->next) {
 		if (*filp == rfil) {
 			*filp = rfil->next;
+#ifdef KPDEBUG
+			printf("kp_remove_file_from_cache: %s\n", rfil->kpp.path);
+#endif
 			kp_free_file(rfil);
 			return;
 		}
@@ -150,6 +163,9 @@ static void kp_remove_file_from_cache(kp_fil * rfil)
  * ------------------------------------------------------------------------- */
 void _kp_clear_cache(void)
 {
+#ifdef KPDEBUG
+	printf("kp_clear_cache\n");
+#endif
 	while (kp_cachef != NULL)
 		kp_remove_file_from_cache(kp_cachef);
 }
@@ -170,6 +186,9 @@ static void kp_clean_up_cache(time_t now)
 		fil = *filp;
 		if (fil->use < expire && !fil->dirty) {
 			*filp = fil->next;
+#ifdef KPDEBUG
+			printf("kp_clean_up_cache: %d < %d (Dirty: %d): %s\n", fil->use, expire, fil->dirty, fil->kpp.path);
+#endif
 			kp_free_file(fil);
 		} else
 			filp = &(*filp)->next;
@@ -184,9 +203,12 @@ static kp_key *kp_get_cached_key(kp_fil * fil, const char *name)
 	kp_key *key;
 
 	for (key = fil->keys; key != NULL; key = key->next)
-		if (strcmp(key->name, name) == 0)
+		if (strcmp(key->name, name) == 0) {
+#ifdef KPDEBUG
+			printf("kp_get_cached_file: %s-%s\n", fil->kpp.path, name);
+#endif
 			break;
-
+		} 
 	return key;
 }
 
@@ -199,13 +221,19 @@ static int kp_check_insert(kp_fil * fil, char *name, kp_key ** keyretp)
 	kp_key *key;
 
 	for (key = fil->keys; key != NULL; key = key->next) {
-		if (strcmp(key->name, name) == 0)
+		if (strcmp(key->name, name) == 0) {
+#ifdef KPDEBUG
+			printf("kp_check_insert: Got key %s-%s\n", fil->kpp.path, name);
+#endif
 			break;
+		}
 		if (kp_is_subkey(name, key->name)
 		    || kp_is_subkey(key->name, name))
 			return KPERR_BADKEY;
 	}
-
+#ifdef KPDEBUG
+	printf("kp_check_insert: Got it\n");
+#endif
 	*keyretp = key;
 	return 0;
 }
@@ -242,32 +270,51 @@ static int kp_get_file(kp_path * kpp, kp_fil ** fp, int *isdirp)
 	if (fil != NULL && !fil->dirty && now != fil->check) {
 		res = stat(kpp->path, &stbuf);
 
-		if (fil->keys == NULL && res == -1 && errno == ENOENT)
+		if (fil->keys == NULL && res == -1 && errno == ENOENT) {
+#ifdef KPDEBUG
+			printf("kp_get_file: does not exist: %s\n",kpp->path);
+#endif 
 			fil->check = now;
-		else if (res == -1 || !S_ISREG(stbuf.st_mode) ||
+		} else if (res == -1 || !S_ISREG(stbuf.st_mode) ||
 			 stbuf.st_mtime != fil->modif) {
+#ifdef KPDEBUG
+			printf("kp_get_file: not regular file: %s\n", kpp->path);
+#endif
 			kp_remove_file_from_cache(fil);
 			fil = NULL;
-		} else
+		} else {
+#ifdef KPDEBUG
+			printf("kp_get_file: ok %s\n", kpp->path);
+#endif
 			fil->check = now;
+		}
 	}
 
-	if (fil != NULL)
+	if (fil != NULL) {
+#ifdef KPDEBUG
+		printf("kp_get_file: existing file\n");
+#endif
 		fil->use = now;
-	else {
+	} else {
 		kp_key *keys = NULL;
 
 		/* Clean up old cached files */
 		kp_clean_up_cache(now);
 
 		res = stat(kpp->path, &stbuf);
-		if (res != 0)
+		if (res != 0) {
+#ifdef KPDEBUG
+			printf("kp_get_file: stat failed\n");
+#endif
 			res = _kp_errno_to_kperr(errno);
-		else if (!S_ISREG(stbuf.st_mode)) {
+		} else if (!S_ISREG(stbuf.st_mode)) {
 			res = KPERR_BADKEY;
 			if (S_ISDIR(stbuf.st_mode))
 				*isdirp = 1;
 		} else {
+#ifdef KPDEBUG
+			printf("kp_get_file: kp_read_file called\n");
+#endif
 			res = _kp_read_file(kpp->path, &keys);
 			if (res == 0) {
 				res = stat(kpp->path, &stbuf);
@@ -314,6 +361,9 @@ int _kp_cache_set(kp_path * kpp, kp_key * ck)
 		return res;
 
 	if ((ck->flags & KPFL_REMOVED) != 0) {
+#ifdef KPDEBUG
+		printf("kp_cache_set: get cached key %s\n", kpp->path);
+#endif
 		key = kp_get_cached_key(fil, ck->name);
 
 		if (key == NULL)
@@ -321,6 +371,9 @@ int _kp_cache_set(kp_path * kpp, kp_key * ck)
 	}
 
 	if (!(ck->flags & KPFL_REMOVED)) {
+#ifdef KPDEBUG
+		printf("Kp_cache_set: kp_check_insert %s\n", kpp->path);
+#endif
 		res = kp_check_insert(fil, ck->name, &key);
 		if (res != 0)
 			return res;
@@ -331,6 +384,9 @@ int _kp_cache_set(kp_path * kpp, kp_key * ck)
 	if (key != NULL)
 		kp_value_destroy(key);
 	else {
+#ifdef KPDEBUG
+		printf("kp_cache_set: create new %s\n", kpp->path);
+#endif
 		key = (kp_key *) malloc_check(sizeof(kp_key));
 		key->next = fil->keys;
 		fil->keys = key;
@@ -360,6 +416,9 @@ int _kp_cache_get(kp_path * kpp, const char *keyname, kpval_t type,
 	kp_key *key;
 	int res;
 	int isdir;
+#ifdef KPDEBUG
+	printf("kp_cache_get\n");
+#endif
 
 	res = kp_get_file(kpp, &fil, &isdir);
 	if (res != 0)
@@ -393,6 +452,9 @@ int _kp_cache_get_type(kp_path * kpp, char *keyname, int iskeyfile,
 	int res;
 	unsigned int keynamelen;
 	int isdir;
+#ifdef KPDEBUG
+	printf("kp_cache_get_type\n");
+#endif
 
 	res = kp_get_file(kpp, &fil, &isdir);
 	if (isdir) {
@@ -459,6 +521,9 @@ static int kp_get_subkeys_file(kp_path * kpp, const char *keyname,
 	char *s;
 	char *ent;
 	int isdir;
+#ifdef KPDEBUG
+	printf("kp_cache_get_subkeys_file\n");
+#endif
 
 	res = kp_get_file(kpp, &fil, &isdir);
 	if (res != 0)
@@ -510,6 +575,9 @@ int _kp_cache_get_subkeys(kp_path * kpp, const char *keypath,
 			  int iskeyfile, struct key_array *keys)
 {
 	int res;
+#ifdef KPDEBUG
+	printf("kp_cache_get_subkeys\n");
+#endif
 
 	if (!iskeyfile) {
 		res = _kp_get_subkeys_dir(kpp->path, keys);
@@ -527,7 +595,9 @@ int _kp_cache_flush()
 	int res;
 	int finalres = 0;
 	kp_fil *fil;
-
+#ifdef KPDEBUG
+	printf("kp_cache_flush\n");
+#endif
 	for (fil = kp_cachef; fil != NULL; fil = fil->next) {
 		if (fil->dirty) {
 			res = _kp_write_file(&fil->kpp, fil->keys);

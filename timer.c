@@ -20,12 +20,13 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: timer.c,v 1.25 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: timer.c,v 1.26 2003/09/15 10:39:39 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "dl.h"
 #include "log.h"
+#include "conf.h"
 
 static time_t last_stats_save;
 static time_t last_lag_check;
@@ -67,6 +68,7 @@ chk ()
 
 	if (current - ping.last_sent > me.pingtime) {
 		TimerPings ();
+		flush_keeper();
 		ping.last_sent = time (NULL);
 		if (hash_verify (sockh) == 0) {
 			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the socket hash");

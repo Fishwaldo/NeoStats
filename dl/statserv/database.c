@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: database.c,v 1.16 2003/09/12 16:52:26 fishwaldo Exp $
+** $Id: database.c,v 1.17 2003/09/15 10:39:39 fishwaldo Exp $
 */
 
 
@@ -31,6 +31,7 @@
 #include "statserv.h"
 #include "log.h"
 
+void LoadOldStats();
 
 void SaveStats()
 {
@@ -65,6 +66,8 @@ void SaveStats()
 		SetData((void *)s->operkills, CFGINT, "ServerStats", s->name, "OperKills");
 		SetData((void *)s->serverkills, CFGINT, "ServerStats", s->name, "ServerKills");
 		SetData((void *)s->totusers, CFGINT, "ServerStats", s->name, "TotalUsers");
+		SetData((void *)s->maxopers, CFGINT, "ServerStats", s->name, "MaxOpers");
+		SetData((void *)s->t_maxopers, CFGINT, "ServerStats", s->name, "MaxOpersTime");
 	}
 
 	/* ok, Now Channel Stats */
@@ -98,74 +101,109 @@ void SaveStats()
 	SetData((void *)stats_network.totusers, CFGINT, "NetStats", "Global", "TotalUsers");
 	SetData((void *)stats_network.maxchans, CFGINT, "NetStats", "Global", "MaxChans");
 	SetData((void *)stats_network.t_chans, CFGINT, "NetStats", "Global", "MaxChansTime");
-
-	/* old config file stuff follows*/
-#if 0
-	FILE *fp = fopen("data/stats.db", "w");
-	SStats *s;
-	CStats *c;
-	hnode_t *sn;
-	lnode_t *cn;
-	hscan_t ss;
-	strcpy(segv_location, "StatServ-SaveStats");
-
-
-	if (!fp) {
-		nlog(LOG_WARNING, LOG_MOD,
-		     "Unable to open stats.db for writing.");
-		return;
-	}
-	if (StatServ.newdb == 1) {
-		chanalert(s_StatServ, "Enabling Record yelling!");
-		StatServ.newdb = 0;
-	}
-	hash_scan_begin(&ss, Shead);
-	while ((sn = hash_scan_next(&ss))) {
-		s = hnode_get(sn);
-		nlog(LOG_DEBUG1, LOG_MOD,
-		     "Writing statistics to database for %s", s->name);
-		fprintf(fp, "%s %d %ld %ld %d %ld %ld %ld %d %d %ld\n",
-			s->name, s->numsplits, s->maxusers, s->t_maxusers,
-			s->maxopers, s->t_maxopers, s->lastseen,
-			s->starttime, s->operkills, s->serverkills,
-			s->totusers);
-	}
-	fclose(fp);
-	if ((fp = fopen("data/cstats.db", "w")) == NULL) {
-		nlog(LOG_WARNING, LOG_MOD,
-		     "Unable to open cstats.db for writting.");
-		return;
-	}
-	cn = list_first(Chead);
-	while (cn) {
-		c = lnode_get(cn);
-		nlog(LOG_DEBUG1, LOG_MOD,
-		     "Writting Statistics to database for %s", c->name);
-		fprintf(fp, "%s %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld\n",
-			c->name, c->topics, c->totmem, c->kicks,
-			(long) c->lastseen, c->maxmems,
-			(long) c->t_maxmems, c->maxkicks,
-			(long) c->t_maxkicks, c->maxjoins,
-			(long) c->t_maxjoins);
-		cn = list_next(Chead, cn);
-	}
-	fclose(fp);
-	if ((fp = fopen("data/nstats.db", "w")) == NULL) {
-		nlog(LOG_WARNING, LOG_MOD,
-		     "Unable to open nstats.db for writing.");
-		return;
-	}
-	fprintf(fp, "%d %ld %d %ld %ld %ld %ld %ld %ld\n",
-		stats_network.maxopers, stats_network.maxusers,
-		stats_network.maxservers, stats_network.t_maxopers,
-		stats_network.t_maxusers, stats_network.t_maxservers,
-		stats_network.totusers, stats_network.maxchans,
-		stats_network.t_chans);
-	fclose(fp);
-#endif
 }
 
-void LoadStats()
+void LoadStats() {
+	SStats *s;
+	CStats *c;
+	char *name;
+	char **row;
+
+	hnode_t *sn;
+	lnode_t *cn;
+	int count;
+	strcpy(segv_location, "StatServ-LoadStats");
+	Chead = list_create(SS_CHAN_SIZE);
+	Shead = hash_create(S_TABLE_SIZE, 0, 0);
+
+        if (GetData ((void *) &stats_network.maxopers, CFGINT, "NetStats", "Global", "MaxOpers") <= 0) {
+		/* if this doesn't exist, then try LoadOldStats() */
+		nlog(LOG_WARNING, LOG_MOD, "Trying to load StatServ stats from old database");
+		LoadOldStats();
+		return;
+        }
+	/* the rest don't need such valid checking */
+	GetData((void *)&stats_network.maxusers, CFGINT, "NetStats", "Global", "MaxUsers");
+	GetData((void *)&stats_network.maxservers, CFGINT, "NetStats", "Global", "MaxServers");
+	GetData((void *)&stats_network.t_maxopers, CFGINT, "NetStats", "Global", "MaxOpersTime");
+	GetData((void *)&stats_network.t_maxusers, CFGINT, "NetStats", "Global", "MaxUsersTime");
+	GetData((void *)&stats_network.t_maxservers, CFGINT, "NetStats", "Global", "MaxServersTime");
+	GetData((void *)&stats_network.totusers, CFGINT, "NetStats", "Global", "TotalUsers");
+	GetData((void *)&stats_network.maxchans, CFGINT, "NetStats", "Global", "MaxChans");
+	GetData((void *)&stats_network.t_chans, CFGINT, "NetStats", "Global", "MaxChansTime");
+
+
+	/* ok, now load the server stats */
+	if (GetTableData("ServerStats", &row) > 0) {
+		for (count = 0; row[count] != NULL; count++) {
+			s = malloc(sizeof(SStats));
+			name = strncpy(s->name, row[count], MAXHOST);
+			GetData((void *)&s->numsplits, CFGINT, "ServerStats", s->name, "Splits");
+			GetData((void *)&s->maxusers, CFGINT, "ServerStats", s->name, "MaxUsers");
+			GetData((void *)&s->t_maxusers, CFGINT, "ServerStats", s->name, "MaxUsersTime");
+			GetData((void *)&s->lastseen, CFGINT, "ServerStats", s->name, "LastSeen");
+			GetData((void *)&s->starttime, CFGINT, "ServerStats", s->name, "StartTime");
+			GetData((void *)&s->operkills, CFGINT, "ServerStats", s->name, "OperKills");
+			GetData((void *)&s->serverkills, CFGINT, "ServerStats", s->name, "ServerKills");
+			GetData((void *)&s->totusers, CFGINT, "ServerStats", s->name, "TotalUsers");
+			GetData((void *)&s->maxopers, CFGINT, "ServerStats", s->name, "MaxOpers");
+			GetData((void *)&s->t_maxopers, CFGINT, "ServerStats", s->name, "MaxOpersTime");
+			nlog(LOG_DEBUG1, LOG_MOD,
+			     "LoadStats(): Loaded statistics for %s", s->name);
+			sn = hnode_create(s);
+			if (hash_isfull(Shead)) {
+				nlog(LOG_CRITICAL, LOG_MOD,
+				     "Eeek, StatServ Server Hash is Full!");
+			} else {
+				hash_insert(Shead, sn, s->name);
+			}
+		}
+	}                                        
+				
+	/* ok, and now the channel stats. */
+	if (GetTableData("ChanStats", &row) > 0) {
+		for (count = 0; row[count] != NULL; count++) {
+			c = malloc(sizeof(CStats));
+			strncpy(c->name, row[count], CHANLEN);	
+			GetData((void *)&c->topics, CFGINT, "ChanStats", c->name, "Topics");
+			GetData((void *)&c->totmem, CFGINT, "ChanStats", c->name, "TotalMems");
+			GetData((void *)&c->kicks, CFGINT, "ChanStats", c->name, "Kicks");
+			GetData((void *)&c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
+			GetData((void *)&c->maxmems, CFGINT, "ChanStats", c->name, "MaxMems");
+			GetData((void *)&c->t_maxmems, CFGINT, "ChanStats", c->name, "MaxMemsTime");
+			GetData((void *)&c->maxkicks, CFGINT, "ChanStats", c->name, "MaxKicks");
+			GetData((void *)&c->t_maxkicks, CFGINT, "ChanStats", c->name, "MaxKicksTime");
+			GetData((void *)&c->maxjoins, CFGINT, "ChanStats", c->name, "MaxJoins");
+			GetData((void *)&c->t_maxjoins, CFGINT, "ChanStats", c->name, "MaxJoinsTime");
+			c->topicstoday = 0;
+			c->joinstoday = 0;
+			c->members = 0;
+			cn = lnode_create(c);
+			if (list_isfull(Chead)) {
+				nlog(LOG_CRITICAL, LOG_MOD,
+				     "Eeek, StatServ Channel Hash is Full!");
+			} else {
+				nlog(LOG_DEBUG2, LOG_MOD,
+				     "Loading %s Channel Data", c->name);
+				if ((time(NULL) - c->lastseen) < 604800) {
+					list_append(Chead, cn);
+				} else {
+					nlog(LOG_DEBUG1, LOG_MOD,
+					     "Deleting Old Channel %s", c->name);
+					lnode_destroy(cn);
+					free(c);
+				}
+			}
+		}
+	}
+	StatServ.newdb = 0;
+}
+
+
+/* @brief This loads the old database format for statistics. This is depreciated and only
+ * retained for backwards compatibility with old DB formats. will go away one day.
+ */
+void LoadOldStats()
 {
 	FILE *fp = fopen("data/nstats.db", "r");
 	SStats *s;
@@ -183,9 +221,6 @@ void LoadStats()
 	lnode_t *cn;
 	int count;
 	strcpy(segv_location, "StatServ-LoadStats");
-	Chead = list_create(SS_CHAN_SIZE);
-	Shead = hash_create(S_TABLE_SIZE, 0, 0);
-
 
 	if (fp) {
 		while (fgets(buf, BUFSIZE, fp)) {
@@ -219,6 +254,7 @@ void LoadStats()
 		}
 		StatServ.newdb = 0;
 		fclose(fp);
+		unlink("data/nstats.db");
 	} else {
 		StatServ.newdb = 1;
 	}
@@ -270,6 +306,8 @@ void LoadStats()
 		}
 	}
 	fclose(fp);
+	unlink("data/stats.db");
+	
 	if ((fp = fopen("data/cstats.db", "r")) == NULL)
 		return;
 	memset(buf, '\0', BUFSIZE);
@@ -335,7 +373,8 @@ void LoadStats()
 	free(maxjoins);
 	free(t_maxjoins);
 	fclose(fp);
-
+	unlink("data/cstats.db");
+	SaveStats();
 
 
 

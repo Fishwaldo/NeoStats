@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.100 2003/08/19 13:08:13 fishwaldo Exp $
+** $Id: main.c,v 1.101 2003/09/15 10:39:39 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -34,6 +34,7 @@
 #include "signal.h"
 #include "dl.h"
 #include "conf.h"
+#include "keeper.h"
 #include "log.h"
 
 
@@ -688,6 +689,7 @@ do_exit (int segv)
 		nlog (LOG_CRITICAL, LOG_CORE, "Shutting Down SubSystems without saving data due to core");
 		break;
 	}
+	kp_flush();
 	close_logs ();
 
 	if (segv == 1) {

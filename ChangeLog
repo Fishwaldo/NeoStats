@@ -7,6 +7,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Output clientversions in the HTML output (ReqID: 40)
  - First go and implementing Data API. SLOOOOW (DON'T USE THIS FOR PRODUCTION)
  - update doco slightly
+ - Keeper wasn't doing so good at caching files. Fixed that
+ - StatServ now stores and retrives all data from the Keeper Database. old data/*.db code kept to help upgrade to the new database backend
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number
