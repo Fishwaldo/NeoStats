@@ -9,6 +9,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - IRCu: Fix +D problem reported on ASUKA bug 138 (M)
  - send_sjoin bug fix where user has no modes (M)
  - IRCu: Fix statserv map (M)
+ - IRCu: Umode +g no longer sets auth level (M)
 
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.15
  - Remove sprotocol_cmd since it is very ircd specfic (M)
