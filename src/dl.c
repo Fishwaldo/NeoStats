@@ -1316,11 +1316,6 @@ load_module (char *modfilename, User * u)
 	int ac = 0;
 	int i = 0;
 	int isnewstyle = 1;
-#ifdef OLD_MODULE_EXPORT_SUPPORT
-	ModuleInfo *(*mod_get_info) () = NULL;
-	Functions *(*mod_get_funcs) () = NULL;
-	EventFnList *(*mod_get_events) () = NULL;
-#endif /* OLD_MODULE_EXPORT_SUPPORT */
 	ModuleInfo *mod_info_ptr = NULL;
 	Functions *mod_funcs_ptr = NULL;
 	EventFnList *event_fn_ptr = NULL;
@@ -1347,34 +1342,7 @@ load_module (char *modfilename, User * u)
 		return NS_FAILURE;
 	}
 
-	/* new system */
 	mod_info_ptr = ns_dlsym (dl_handle, "__module_info");
-#ifdef OLD_MODULE_EXPORT_SUPPORT
-	if(mod_info_ptr == NULL) {
-		/* old system */
-		isnewstyle = 0;
-		mod_get_info = ns_dlsym (dl_handle, "__module_get_info");
-#ifndef HAVE_LIBDL
-		if (mod_get_info == NULL) {
-			dl_error = ns_dlerror ();
-#else /* HAVE_LIBDL */
-		if ((dl_error = ns_dlerror ()) != NULL) {
-#endif /* HAVE_LIBDL */
-			if (do_msg) {
-				prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
-			}
-			nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
-			ns_dlclose (dl_handle);
-			return NS_FAILURE;
-		}
-		mod_info_ptr = (*mod_get_info) ();
-		if (mod_info_ptr == NULL) {
-			ns_dlclose (dl_handle);
-			nlog (LOG_WARNING, LOG_CORE, "Module has no info structure: %s", path);
-			return NS_FAILURE;
-		}
-	}
-#else /* OLD_MODULE_EXPORT_SUPPORT */
 #ifndef HAVE_LIBDL
 	if(mod_info_ptr == NULL) {
 		dl_error = ns_dlerror ();
@@ -1388,35 +1356,9 @@ load_module (char *modfilename, User * u)
 		ns_dlclose (dl_handle);
 		return NS_FAILURE;
 	}
-#endif /* OLD_MODULE_EXPORT_SUPPORT */
 
-	/* new system */
 	mod_funcs_ptr = ns_dlsym (dl_handle, "__module_functions");
-#ifdef OLD_MODULE_EXPORT_SUPPORT
-	if(mod_funcs_ptr == NULL) {
-		/* old system */
-		mod_get_funcs = ns_dlsym (dl_handle, "__module_get_functions");
-		/* no error check here - this one isn't essential to the functioning of the module */
-
-		if (mod_get_funcs) {
-			mod_funcs_ptr = (*mod_get_funcs) ();
-		}
-	}
-#endif /* OLD_MODULE_EXPORT_SUPPORT */
-
-	/* new system */
 	event_fn_ptr = ns_dlsym (dl_handle, "__module_events");
-#ifdef OLD_MODULE_EXPORT_SUPPORT
-	if(event_fn_ptr == NULL)
-	{
-		/* old system */
-		mod_get_events = ns_dlsym (dl_handle, "__module_get_events");
-		/* no error check here - this one isn't essential to the functioning of the module */
-
-		if (mod_get_events)
-			event_fn_ptr = (*mod_get_events) ();
-	}
-#endif
 
 	/* Check that the Module hasn't already been loaded */
 	if (hash_lookup (mh, mod_info_ptr->module_name)) {

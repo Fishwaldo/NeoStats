@@ -271,18 +271,6 @@ int __BotMessage(char *origin, char **av, int ac);
 #define __Bot_Message __BotMessage
 int __ChanMessage(char *origin, char **argv, int argc);
 
-/* temporary define to support for module API backwards compatibility 
- * old system used function addresses to call into a module to get data addresses
- * new system just grabs data addresses directly to simplify module coding
- */
-#define OLD_MODULE_EXPORT_SUPPORT
-
-#ifdef OLD_MODULE_EXPORT_SUPPORT
-Module_Info *__module_get_info(void);
-Functions *__module_get_functions(void);
-EventFnList *__module_get_events(void);
-#endif /* OLD_MODULE_EXPORT_SUPPORT */
-
 extern ModuleInfo		__module_info;   
 extern Functions		__module_functions[];
 extern EventFnList		__module_events[];  
