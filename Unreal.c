@@ -136,6 +136,10 @@ IntCommands cmd_list[] = {
 	,
 	{TOK_NETINFO, Srv_Netinfo, 0, 0}
 	,
+	{MSG_SJOIN, Srv_Sjoin, 1, 0}
+	,
+	{TOK_SJOIN, Srv_Sjoin, 1, 0}
+	,
 	{MSG_PASS, Srv_Pass, 0, 0}
 	,
 	{TOK_PASS, Srv_Pass, 0, 0}
@@ -896,6 +900,94 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 	globops (me.name, "Link with Network \2Complete!\2");
 	ModuleEvent (EVENT_NETINFO, NULL, 0);
 	me.synced = 1;
+}
+
+void
+Srv_Sjoin (char *origin, char **argv, int argc)
+{
+	char nick[MAXNICK];
+	long mode = 0;
+	long mode1 = 0;
+	char *modes;
+	int ok = 1, i, j = 3;
+	ModesParm *m;
+	Chans *c;
+	lnode_t *mn = NULL;
+	list_t *tl;
+	if (argc > 4) {
+		modes = argv[2];
+	} else {
+		modes = argv[1];
+	}
+	if (*modes == '#') {
+		join_chan (finduser (origin), modes);
+		return;
+	}
+	tl = list_create (10);
+	if (*modes != '+') {
+		goto nomodes;
+	}
+	while (*modes) {
+		for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
+			if (*modes == cFlagTab[i].flag) {
+				if (cFlagTab[i].parameters) {
+					m = smalloc (sizeof (ModesParm));
+					m->mode = cFlagTab[i].mode;
+					strlcpy (m->param, argv[j], PARAMSIZE);
+					mn = lnode_create (m);
+					if (!list_isfull (tl)) {
+						list_append (tl, mn);
+					} else {
+						nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
+						do_exit (NS_EXIT_ERROR, "List full - see log file");
+					}
+					j++;
+				} else {
+					mode1 |= cFlagTab[i].mode;
+				}
+			}
+		}
+		modes++;
+	}
+      nomodes:
+	while (argc > j) {
+		modes = argv[j];
+		mode = 0;
+		while (ok == 1) {
+			for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
+				if (cFlagTab[i].sjoin != 0) {
+					if (*modes == cFlagTab[i].sjoin) {
+						mode |= cFlagTab[i].mode;
+						modes++;
+						i = -1;
+					}
+				} else {
+					/* sjoin's should be at the top of the list */
+					ok = 0;
+					strlcpy (nick, modes, MAXNICK);
+					break;
+				}
+			}
+		}
+		join_chan (finduser (nick), argv[1]);
+		ChangeChanUserMode (findchan (argv[1]), finduser (nick), 1, mode);
+		j++;
+		ok = 1;
+	}
+	c = findchan (argv[1]);
+	/* update the TS time */
+	ChangeChanTS (c, atoi (argv[0]));
+	c->modes |= mode1;
+	if (!list_isempty (tl)) {
+		if (!list_isfull (c->modeparms)) {
+			list_transfer (c->modeparms, tl, list_first (tl));
+		} else {
+			/* eeeeeeek, list is full! */
+			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
+			do_exit (NS_EXIT_ERROR, "List full - see log file");
+		}
+	}
+	list_destroy (tl);
 }
 
 void
