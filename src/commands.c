@@ -1197,7 +1197,7 @@ int add_bot_info_settings (Bot *bot_ptr, BotInfo* botinfo)
 int del_bot_info_settings (Bot *bot_ptr)
 {
 	if(bot_ptr->bot_info_settings) {
-		del_bot_setting_list(bot_ptr->bot_info_settings);
+		del_bot_setting_list(bot_ptr, bot_ptr->bot_info_settings);
 		sfree(bot_ptr->bot_info_settings);
 	}
 	return NS_SUCCESS;
