@@ -89,7 +89,9 @@
  */
 #define API_VER 3
 
+#ifndef WIN32
 #include "version.h"
+#endif
 #include "pcre.h"
 
 #include "adns.h"
