@@ -282,7 +282,7 @@ sql_accept_conn(int srvfd)
   {
 #ifdef WIN32
 	{
-		char* src = &newui->cliskt.sin_addr.s_addr;
+		unsigned char* src = &(newui->cliskt.sin_addr.s_addr);
 		sprintf(tmp, "%u.%u.%u.%u", src[0], src[1], src[2], src[3]);
 	}
 #else
@@ -315,7 +315,7 @@ sql_accept_conn(int srvfd)
 	lnode_create_append (sqlconnections, newui);
 #ifdef WIN32
 	{
-		char* src = &newui->cliskt.sin_addr.s_addr;
+		unsigned char* src = &newui->cliskt.sin_addr.s_addr;
 		sprintf(tmp, "%u.%u.%u.%u", src[0], src[1], src[2], src[3]);
 	}
 #else
@@ -546,6 +546,9 @@ ModuleInfo module_info = {
 int ModInit (Module *modptr)
 {
 	ModuleConfig (sql_settings);
+	if (InitSqlSrv () != NS_SUCCESS) {
+		return NS_FAILURE;
+	}
 	return NS_SUCCESS;
 }
 
@@ -560,9 +563,6 @@ int ModInit (Module *modptr)
 
 int ModSynch (void)
 {
-	if (InitSqlSrv () != NS_SUCCESS) {
-		return NS_FAILURE;
-	}
 	if (add_services_set_list (sql_settings) != NS_SUCCESS) {
 		return NS_FAILURE;
 	}
