@@ -67,7 +67,6 @@ struct stats_network_ {
 	time_t t_maxopers;
 	time_t t_maxusers;
 	time_t t_maxservers;
-	int requests;
 	long maxchans;
 	time_t t_chans;
 } stats_network;

@@ -255,8 +255,6 @@ int __BotMessage(char *origin, char **av, int ac)
 		return -1;
 	}
 
-	stats_network.requests++;
-
 	nlog(LOG_NORMAL, LOG_MOD, "%s received message from %s: %s",
 	     s_StatServ, u->nick, av[1]);
 
