@@ -531,7 +531,20 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 	ModuleFunction (cmdptr, MSG_NOTICE, origin, argv, argc);
 	free (argv);
 #else
-	ModuleFunction (cmdptr, MSG_NOTICE, origin, av, ac);
+	char** argv;
+	int argc = 0;
+	int i;
+	User* u;
+
+	u = finduser(origin);
+	if(u) {
+		AddStringToList (&argv, u->nick, &argc);
+		for(i = 1; i < ac; i++) {
+			AddStringToList (&argv, av[i], &argc);
+		}
+		ModuleFunction (cmdptr, MSG_NOTICE, origin, argv, argc);
+		free(argv);
+	}
 #endif
 	SkipModuleFunction = 1;
 }
