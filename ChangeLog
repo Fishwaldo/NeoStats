@@ -22,6 +22,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - updates from mark on Log formatting
  - HostServ upgraded to use lists, keeper for datastorage. list output is sorted and a max of 20 entries are displayed per /msg hostserv list
  - More cleanups and IRCd portability updates from Mark. 
+ - You can now specify the expire time with hostserv (/msg hostserv help set)
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number
