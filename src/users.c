@@ -143,7 +143,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	strlcpy (u->username, user, MAXUSER);
 	strlcpy (u->realname, realname, MAXREALNAME);
 	u->server = findserver (server);
-	u->t_flood = me.now;
+	u->tslastmsg = me.now;
 	u->flood = 0;
 	u->is_away = 0;
 	u->Umode = 0;
@@ -847,7 +847,7 @@ void SetUserServicesTS(const char* nick, const char* ts)
 	User* u;
 	u = finduser(nick);
 	if(u) {
-		u->servicesstamp = strtoul(ts, NULL, 10);
+		u->servicestamp = strtoul(ts, NULL, 10);
 	}
 }
 

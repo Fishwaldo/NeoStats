@@ -28,7 +28,7 @@ int init_exclude_list();
 void ns_do_exclude_add(User *u, char *type, char *pattern);
 void ns_do_exclude_del(User *u, char *position);
 void ns_do_exclude_list(User *u, char *from);
-void ns_do_exclude_chan(Chans *c);
+void ns_do_exclude_chan(Channel *c);
 void ns_do_exclude_server(Server *s);
 void ns_do_exclude_user(User *u);
 

@@ -171,6 +171,7 @@
 #define MAXINFO			128
 #define B64SIZE			16
 
+#define	KEYLEN		32
 
 /* MAXCHANLIST
  * the max length a string can be that holds channel lists 
@@ -331,9 +332,10 @@ typedef struct Server {
 	time_t connected_since;
 	int ping;
 	char uplink[MAXHOST];
+	char version[MAXHOST];
 	char infoline[MAXINFO];
-	void *moddata[NUM_MODULES];
 	long flags;
+	void *moddata[NUM_MODULES];
 } Server;
 
 /** @brief me structure
@@ -417,39 +419,43 @@ typedef struct User {
 	char vhost[MAXHOST];
 	char awaymsg[MAXHOST];
 	char swhois[MAXHOST];
+	struct in_addr ipaddr;
 	Server *server;
 	int flood;
 	int is_away;
-	time_t t_flood;
-	char modes[MODESIZE];
-	int ulevel;
-	long Umode;
-	list_t *chans;
-	struct in_addr ipaddr;
+	time_t tslastmsg;
+	time_t tslastnick;
+	time_t tslastaway;
 	time_t TS;
-	time_t servicesstamp;
+	time_t servicestamp;
+	char modes[MODESIZE];
+	long Umode;
 	long Smode;
-	void *moddata[NUM_MODULES];
+	int ulevel;
+	list_t *chans;
 	long flags;
+	void *moddata[NUM_MODULES];
 } User;
 
-/** @brief Chans structure
+/** @brief Channel structure
  *  
  */
-typedef struct Chans {
+typedef struct Channel {
 	char name[CHANLEN];
 	char name64[B64SIZE];
-	long cur_users;
+	long users;
 	long modes;
 	list_t *chanmembers;
-	list_t *modeparms;
 	char topic[BUFSIZE];
 	char topicowner[MAXHOST];	/* because a "server" can be a topic owner */
 	time_t topictime;
-	void *moddata[NUM_MODULES];
-	time_t tstime;
+	int  limit;
+	char key[KEYLEN + 1];
+	list_t *modeparms;
+	time_t creationtime;
 	long flags;
-} Chans;
+	void *moddata[NUM_MODULES];
+} Channel;
 
 /** @brief ModesParm structure
  *  
@@ -632,9 +638,9 @@ int UserLevel (User *u);
 Server *findserver (const char *name);
 
 /* chans.c */
-Chans *findchan (const char *chan);
-int CheckChanMode (Chans * c, long mode);
-int IsChanMember(Chans *c, User *u);
+Channel *findchan (const char *chan);
+int CheckChanMode (Channel * c, long mode);
+int IsChanMember(Channel *c, User *u);
 int test_chan_user_mode(char* chan, char* nick, int flag);
 
 #ifdef CMODE_CHANOP

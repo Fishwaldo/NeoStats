@@ -28,25 +28,25 @@ DISTFILES = $(INCLUDES) $(COREINCS) $(SRCS) $(BUILDFILES)
 DISTLIBS = protocol adns pcre curl sqlsrv keeper
 DISTMOD = connectserv extauth hostserv loveserv moraleserv statserv template
 
-all: @buildsqlsrv@ libs libcurl.a neostats modules utils 
-
-libs:
-	(cd protocol; $(MAKE))
-	(cd adns; $(MAKE))
-	(cd keeper; $(MAKE))
-	(cd pcre; $(MAKE))
-
-libcurl.a:
-	(cd curl; $(MAKE))
+all: @buildsqlsrv@ libs neoprotocol neostats neomodules utils 
 
 sqlsrvlib:
 	(cd sqlsrv; $(MAKE))
 
-modules:
-	(cd modules; $(MAKE) $@)
+libs:
+	(cd adns; $(MAKE))
+	(cd keeper; $(MAKE))
+	(cd pcre; $(MAKE))
+	(cd curl; $(MAKE))
+
+neoprotocol:
+	(cd protocol; $(MAKE))
+
+neomodules:
+	(cd modules; $(MAKE))
 
 utils:
-	(cd tools; $(MAKE) $@)
+	(cd tools; $(MAKE))
 
 buildversion: 
 	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)

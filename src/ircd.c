@@ -797,8 +797,8 @@ flood (User * u)
 	}
 	if (UserLevel (u) >= NS_ULEVEL_OPER)	/* locop or higher */
 		return 0;
-	if (current - u->t_flood > 10) {
-		u->t_flood = me.now;
+	if (current - u->tslastmsg > 10) {
+		u->tslastmsg = me.now;
 		u->flood = 0;
 		return 0;
 	}
@@ -1376,13 +1376,13 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 	char **av;
 	int ac;
 	time_t ts;
-	Chans *c;
+	Channel *c;
 
 	c = findchan ((char *) chan);
 	if (!c) {
 		ts = me.now;
 	} else {
-		ts = c->tstime;
+		ts = c->creationtime;
 	}
 	switch (chflag) {
 #ifdef CMODE_FL_CHANOP
@@ -1516,7 +1516,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 	long mode = 0;
 	int ok = 1, i, j = 3;
 	ModesParm *m;
-	Chans *c;
+	Channel *c;
 	lnode_t *mn = NULL;
 	char **param;
 	int paramcnt = 0;

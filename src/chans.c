@@ -51,15 +51,15 @@ hash_t *ch;
  * Addes the channel TS time to the channel struct 
  *
  * @param c Channel Struct of channel who's ts is being changed
- * @param tstime ts time of the channel
+ * @param creationtime ts time of the channel
  *
  * @returns Nothing
  *
  */
 void
-SetChanTS (Chans * c, const time_t tstime)
+SetChanTS (Channel * c, const time_t creationtime)
 {
-	c->tstime = tstime;
+	c->creationtime = creationtime;
 }
 
 /** @brief Process a Topic Change
@@ -80,7 +80,7 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
 {
 	char **av;
 	int ac = 0;
-	Chans *c;
+	Channel *c;
 	time_t time;
 
 	c = findchan (chan);
@@ -123,7 +123,7 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
  *
 */
 int
-CheckChanMode (Chans * c, long mode)
+CheckChanMode (Channel * c, long mode)
 {
 	ModesParm *m;
 	lnode_t *mn;
@@ -189,7 +189,7 @@ ChanMode (char *origin, char **av, int ac)
 	int j = 2;
 	int i;
 	int modeexists;
-	Chans *c;
+	Channel *c;
 	ModesParm *m;
 	lnode_t *mn;
 	char **data;
@@ -315,7 +315,7 @@ ChanUserMode (const char* chan, const char* nick, int add, long mode)
 {
 	lnode_t *cmn;
 	Chanmem *cm;
-	Chans * c;
+	Channel * c;
 	User * u;
 
 	u = finduser(nick);
@@ -357,16 +357,16 @@ ChanUserMode (const char* chan, const char* nick, int add, long mode)
  * @returns c the newly created channel record
  * @todo Dynamically resizable channel hashes
 */
-static Chans *
+static Channel *
 new_chan (const char *chan)
 {
 	char **av;
 	int ac = 0;
-	Chans *c;
+	Channel *c;
 	hnode_t *cn;
 
 	SET_SEGV_LOCATION();
-	c = calloc (sizeof (Chans), 1);
+	c = calloc (sizeof (Channel), 1);
 	strlcpy (c->name, chan, CHANLEN);
 	cn = hnode_create (c);
 	if (hash_isfull (ch)) {
@@ -376,10 +376,10 @@ new_chan (const char *chan)
 	}
 	c->chanmembers = list_create (CHAN_MEM_SIZE);
 	c->modeparms = list_create (MAXMODES);
-	c->cur_users = 0;
+	c->users = 0;
 	c->topictime = 0;
 	c->modes = 0;
-	c->tstime = me.now;
+	c->creationtime = me.now;
 	c->flags = 0;
 	/* check exclusions */
 	ns_do_exclude_chan(c);
@@ -399,7 +399,7 @@ new_chan (const char *chan)
 */
 
 void
-del_chan (Chans * c)
+del_chan (Channel * c)
 {
 	hnode_t *cn;
 	lnode_t *cm;
@@ -440,7 +440,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 {
 	char **av;
 	int ac = 0;
-	Chans *c;
+	Channel *c;
 	Chanmem *cm;
 	lnode_t *un;
 	User *u;
@@ -482,7 +482,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 			ModuleEvent (EVENT_KICK, av, ac);
 			free (av);
 			ac = 0;
-			c->cur_users--;
+			c->users--;
 		}
 		if (findbot (u->nick)) {
 			/* its one of our bots, so add it to the botchan list */
@@ -508,8 +508,8 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 		} else {
 			lnode_destroy (list_delete (u->chans, un));
 		}
-		nlog (LOG_DEBUG3, LOG_CORE, "kick_chan: cur users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
-		if (c->cur_users <= 0) {
+		nlog (LOG_DEBUG3, LOG_CORE, "kick_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
+		if (c->users <= 0) {
 			AddStringToList (&av, c->name, &ac);
 			ModuleEvent (EVENT_DELCHAN, av, ac);
 			free (av);
@@ -535,7 +535,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 void
 part_chan (User * u, const char *chan, const char *reason)
 {
-	Chans *c;
+	Channel *c;
 	lnode_t *un;
 	char **av;
 	Chanmem *cm;
@@ -575,7 +575,7 @@ part_chan (User * u, const char *chan, const char *reason)
 			ModuleEvent (EVENT_PARTCHAN, av, ac);
 			free (av);
 			ac = 0;
-			c->cur_users--;
+			c->users--;
 		}
 		if (findbot (u->nick)) {
 			/* its one of our bots, so add it to the botchan list */
@@ -601,8 +601,8 @@ part_chan (User * u, const char *chan, const char *reason)
 		} else {
 			lnode_destroy (list_delete (u->chans, un));
 		}
-		nlog (LOG_DEBUG3, LOG_CORE, "part_chan: cur users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
-		if (c->cur_users <= 0) {
+		nlog (LOG_DEBUG3, LOG_CORE, "part_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
+		if (c->users <= 0) {
 			AddStringToList (&av, c->name, &ac);
 			ModuleEvent (EVENT_DELCHAN, av, ac);
 			free (av);
@@ -625,7 +625,7 @@ part_chan (User * u, const char *chan, const char *reason)
 */
 
 void
-ChanNickChange (Chans * c, const char *newnick, const char *oldnick)
+ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 {
 	lnode_t *cm;
 	Chanmem *cml;
@@ -665,7 +665,7 @@ void
 join_chan (const char* nick, const char *chan)
 {
 	User* u;
-	Chans *c;
+	Channel *c;
 	lnode_t *un, *cn;
 	Chanmem *cm;
 	char **av;
@@ -713,7 +713,7 @@ join_chan (const char* nick, const char *chan)
 	} else {
 		list_append (c->chanmembers, cn);
 	}
-	c->cur_users++;
+	c->users++;
 	un = lnode_create (c->name);
 	if (list_isfull (u->chans)) {
 		nlog (LOG_CRITICAL, LOG_CORE, "join_chan: user %s member list is full", u->nick);
@@ -725,7 +725,7 @@ join_chan (const char* nick, const char *chan)
 	AddStringToList (&av, u->nick, &ac);
 	ModuleEvent (EVENT_JOINCHAN, av, ac);
 	free (av);
-	nlog (LOG_DEBUG3, LOG_CORE, "join_chan: cur users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
+	nlog (LOG_DEBUG3, LOG_CORE, "join_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 	if (findbot (u->nick)) {
 		nlog(LOG_DEBUG3, LOG_CORE, "join_chan: joining bot %s to channel %s", u->nick, c->name);
 		add_bot_to_chan (u->nick, c->name);
@@ -743,7 +743,7 @@ join_chan (const char* nick, const char *chan)
 */
 
 static void 
-dumpchan (Chans* c)
+dumpchan (Channel* c)
 {
 	lnode_t *cmn;
  	Chanmem *cm;
@@ -760,7 +760,7 @@ dumpchan (Chans* c)
 		}
 	}
 	debugtochannel("Channel:    %s", c->name);
-	debugtochannel("Mode:       %s tstime %ld", mode, (long)c->tstime);
+	debugtochannel("Mode:       %s creationtime %ld", mode, (long)c->creationtime);
 	debugtochannel("TopicOwner: %s TopicTime: %ld Topic: %s", c->topicowner, (long)c->topictime, c->topic);
 	debugtochannel("PubChan?:   %d", is_pub_chan (c));
 	debugtochannel("Flags:      %lx", c->flags);
@@ -774,7 +774,7 @@ dumpchan (Chans* c)
 		}
 		cmn = list_next (c->modeparms, cmn);
 	}
-	debugtochannel("Members:    %ld (List %d)", c->cur_users, (int)list_count (c->chanmembers));
+	debugtochannel("Members:    %ld (List %d)", c->users, (int)list_count (c->chanmembers));
 	cmn = list_first (c->chanmembers);
 	while (cmn) {
 		cm = lnode_get (cmn);
@@ -797,7 +797,7 @@ ChanDump (const char *chan)
 {
 	hnode_t *cn;
 	hscan_t sc;
-	Chans *c;
+	Channel *c;
 
 	SET_SEGV_LOCATION();
 	debugtochannel("================CHANDUMP================");
@@ -829,10 +829,10 @@ ChanDump (const char *chan)
 */
 
 
-Chans *
+Channel *
 findchan (const char *chan)
 {
-	Chans *c;
+	Channel *c;
 	hnode_t *cn;
 
 	cn = hash_lookup (ch, chan);
@@ -855,7 +855,7 @@ findchan (const char *chan)
 */
 
 int 
-IsChanMember (Chans *c, User *u) 
+IsChanMember (Channel *c, User *u) 
 {
 	if (!u || !c) {
 		return 0;
@@ -877,7 +877,7 @@ IsChanMember (Chans *c, User *u)
 int test_chan_user_mode(char* chan, char* nick, int flag)
 {
 	User* u;
-	Chans* c;
+	Channel* c;
 	lnode_t *cmn;
  	Chanmem *cm;
 
@@ -905,7 +905,7 @@ static char chanmodes[BUFSIZE];
 
 void *display_chanmodes (void *tbl, char *col, char *sql, void *row) 
 {
-	Chans *c = row;
+	Channel *c = row;
 	lnode_t *cmn;
 	char tmp[BUFSIZE];
 	int i;
@@ -937,7 +937,7 @@ void *display_chanmodes (void *tbl, char *col, char *sql, void *row)
 
 static char chanusers[BUFSIZE*10];
 void *display_chanusers (void *tbl, char *col, char *sql, void *row) {
-        Chans *c = row;
+        Channel *c = row;
 	lnode_t *cmn;
 	char sjoin[BUFSIZE];
 	char mode[BUFSIZE];
@@ -984,7 +984,7 @@ COLDEF neo_chanscols[] = {
 		"name",
 		RTA_STR,
 		CHANLEN,
-		offsetof(struct Chans, name),
+		offsetof(struct Channel, name),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -995,7 +995,7 @@ COLDEF neo_chanscols[] = {
 		"nomems",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct Chans, cur_users),
+		offsetof(struct Channel, users),
 		RTA_READONLY,
 		NULL, 
 		NULL,
@@ -1006,7 +1006,7 @@ COLDEF neo_chanscols[] = {
 		"modes",
 		RTA_STR,
 		BUFSIZE,
-		offsetof(struct Chans, modes),
+		offsetof(struct Channel, modes),
 		RTA_READONLY,
 		display_chanmodes,
 		NULL,
@@ -1017,7 +1017,7 @@ COLDEF neo_chanscols[] = {
 		"users",
 		RTA_STR,
 		BUFSIZE*10,
-		offsetof(struct Chans, chanmembers),
+		offsetof(struct Channel, chanmembers),
 		RTA_READONLY,
 		display_chanusers,
 		NULL,
@@ -1028,7 +1028,7 @@ COLDEF neo_chanscols[] = {
 		"topic",
 		RTA_STR,
 		BUFSIZE,
-		offsetof(struct Chans, topic),
+		offsetof(struct Channel, topic),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -1039,7 +1039,7 @@ COLDEF neo_chanscols[] = {
 		"topicowner",
 		RTA_STR,
 		MAXHOST,
-		offsetof(struct Chans, topicowner),
+		offsetof(struct Channel, topicowner),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -1050,7 +1050,7 @@ COLDEF neo_chanscols[] = {
 		"topictime",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct Chans, topictime),
+		offsetof(struct Channel, topictime),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -1061,7 +1061,7 @@ COLDEF neo_chanscols[] = {
 		"created",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct Chans, tstime),
+		offsetof(struct Channel, creationtime),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -1072,7 +1072,7 @@ COLDEF neo_chanscols[] = {
 		"flags",
 		RTA_INT,
 		sizeof(int),
-		offsetof(struct Chans, flags),
+		offsetof(struct Channel, flags),
 		RTA_READONLY,
 		NULL,
 		NULL,
@@ -1084,7 +1084,7 @@ COLDEF neo_chanscols[] = {
 TBLDEF neo_chans = {
 	"chans",
 	NULL, 	/* for now */
-	sizeof(struct Chans),
+	sizeof(struct Channel),
 	0,
 	TBL_HASH,
 	neo_chanscols,

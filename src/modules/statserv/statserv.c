@@ -150,7 +150,7 @@ int __ModInit(int modnum, int apiver)
 	lnode_t *lnode;
 #endif
 	int count, i;
-	Chans *c;
+	Channel *c;
 	char **av;
 	int ac = 0;
 	char *chan;
@@ -614,7 +614,7 @@ static int ss_daily(User * u, char **av, int ac)
 		daily.servers, sftime(daily.t_servers));
 	prefmsg(u->nick, s_StatServ, "Maximum Users: %-2d %s", daily.users,
 		sftime(daily.t_users));
-	prefmsg(u->nick, s_StatServ, "Maximum Chans: %-2d %s", daily.chans,
+	prefmsg(u->nick, s_StatServ, "Maximum Channel: %-2d %s", daily.chans,
 		sftime(daily.t_chans));
 	prefmsg(u->nick, s_StatServ, "Maximum Opers: %-2d %s", daily.opers,
 		sftime(daily.t_opers));

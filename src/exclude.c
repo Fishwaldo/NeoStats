@@ -291,7 +291,7 @@ void ns_do_exclude_server(Server *s) {
  * @returns nothing
  */
 
-void ns_do_exclude_chan(Chans *c) {
+void ns_do_exclude_chan(Channel *c) {
 	lnode_t *en;
 	excludes *e;
 	
