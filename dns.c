@@ -69,7 +69,7 @@ list_t *dnslist;
  * @param callback the function to callback when we are complete
  * @param data a string to pass unmodified to the callback function to help identifing this lookup
  * 
- * @return returns 1 on success, 0 on failure (to add the lookup, not a successfull lookup
+ * @return returns 1 on success, 0 on failure (to add the lookup, not a successful lookup
 */
 
 int
@@ -108,7 +108,7 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 	}
 
 	nlog (LOG_DEBUG1, LOG_CORE, "DNS: Added dns query %s to list", data);
-	/* if we get here, then the submit was successfull. Add it to the list of queryies */
+	/* if we get here, then the submit was successful. Add it to the list of queryies */
 	dnsnode = lnode_create (dnsdata);
 	list_append (dnslist, dnsnode);
 
@@ -149,7 +149,7 @@ init_dns ()
 /** @brief Checks for Completed DNS queries
  *
  *  Goes through the dnslist of pending queries and calls the callback function for each lookup
- *  with the adns_answer set. Always calls the callback function even if the lookup was unsuccessfull
+ *  with the adns_answer set. Always calls the callback function even if the lookup was unsuccessful
 *  its upto the callback function to make check the answer struct to see if it failed or not
  *
  * @return Nothing

@@ -768,7 +768,7 @@ Usr_Stats (char *origin, char **argv, int argc)
 	User *u;
 	u = finduser (origin);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Recieved a Message from a Unknown User! (%s)", origin);
+		nlog (LOG_WARNING, LOG_CORE, "Received a Message from a Unknown User! (%s)", origin);
 		return;
 	}
 	ShowStats (argv[0], u);

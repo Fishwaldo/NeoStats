@@ -314,8 +314,8 @@ serv_die ()
 #else /* VALGRIND */
 	User *u;
 	u = finduser (s_Services);
-	nlog (LOG_CRITICAL, LOG_CORE, "Sigterm Recieved, Shuting Down Server!!!!");
-	ns_shutdown (u, "SigTerm Recieved");
+	nlog (LOG_CRITICAL, LOG_CORE, "Sigterm Received, Shuting Down Server!!!!");
+	ns_shutdown (u, "SigTerm Received");
 	ssquit_cmd (me.name);  
 #endif /* VALGRIND */
 }
@@ -333,7 +333,7 @@ RETSIGTYPE
 conf_rehash ()
 {
 /*	struct sigaction act; */
-	chanalert (s_Services, "Recieved SIGHUP, Attempting to Rehash");
+	chanalert (s_Services, "Received SIGHUP, Attempting to Rehash");
 	globops (me.name, "Received SIGHUP, Attempted to Rehash");
 /*	act.sa_handler = conf_rehash;
 	act.sa_flags=0;

@@ -485,7 +485,7 @@ ns_uptime (User * u)
 		prefmsg (u->nick, s_Services, "%s up \2%ld second%s\2", s_Services, uptime, uptime == 1 ? "" : "s");
 	}
 	prefmsg (u->nick, s_Services, "Sent %ld Messages Totaling %ld Bytes", me.SendM, me.SendBytes);
-	prefmsg (u->nick, s_Services, "Recieved %ld Messages, Totaling %ld Bytes", me.RcveM, me.RcveBytes);
+	prefmsg (u->nick, s_Services, "Received %ld Messages, Totaling %ld Bytes", me.RcveM, me.RcveBytes);
 	prefmsg (u->nick, s_Services, "Reconnect Time: %d", me.r_time);
 	prefmsg (u->nick, s_Services, "Statistic Requests: %d", me.requests);
 	prefmsg (u->nick, s_Services, "Max Sockets: %d (in use: %d)", me.maxsocks, me.cursocks);

@@ -714,7 +714,7 @@ Usr_Stats (char *origin, char **argv, int argc)
 	User *u;
 	u = finduser (origin);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Recieved a Message from a Unknown User!");
+		nlog (LOG_WARNING, LOG_CORE, "Received a Message from a Unknown User!");
 		return;
 	}
 	ShowStats (argv[0], u);
@@ -811,7 +811,7 @@ Usr_Pong (char *origin, char **argv, int argc)
 	if (s) {
 		dopong (s);
 	} else {
-		nlog (LOG_NOTICE, LOG_CORE, "Recieved PONG from unknown Server %s", argv[0]);
+		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown Server %s", argv[0]);
 	}
 }
 void
