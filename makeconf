@@ -345,10 +345,10 @@ cat > $CONF << __EOF__
 # PROTOCOL <protocol> [REQUIRED]
 #    Specifies the protocol module to use.
 #    Valid protocol options are:
-#          bahamut14 bahamut18 client hybrid7 ircup10 
-#          liquid mystic neoircd quantum plexus
+#          bahamut14 bahamut18 client hybrid7 
+#          ircup10 plexus
 #          ultimate2 ultimate3 unreal31 unreal32 
-#          viagra
+#          
 #
 #          PROTOCOL "unreal32"
 #      

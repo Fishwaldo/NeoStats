@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) $(client_la_SOURCES) $(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) $(liquid_la_SOURCES) $(mystic_la_SOURCES) $(neoircd_la_SOURCES) $(plexus_la_SOURCES) $(quantum_la_SOURCES) $(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) $(unreal32_la_SOURCES) $(viagra_la_SOURCES)
+SOURCES = $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) $(client_la_SOURCES) $(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) $(plexus_la_SOURCES) $(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -77,21 +77,9 @@ hybrid7_la_OBJECTS = $(am_hybrid7_la_OBJECTS)
 ircup10_la_LIBADD =
 am_ircup10_la_OBJECTS = ircup10.lo
 ircup10_la_OBJECTS = $(am_ircup10_la_OBJECTS)
-liquid_la_LIBADD =
-am_liquid_la_OBJECTS = liquid.lo
-liquid_la_OBJECTS = $(am_liquid_la_OBJECTS)
-mystic_la_LIBADD =
-am_mystic_la_OBJECTS = mystic.lo
-mystic_la_OBJECTS = $(am_mystic_la_OBJECTS)
-neoircd_la_LIBADD =
-am_neoircd_la_OBJECTS = neoircd.lo
-neoircd_la_OBJECTS = $(am_neoircd_la_OBJECTS)
 plexus_la_LIBADD =
 am_plexus_la_OBJECTS = plexus.lo
 plexus_la_OBJECTS = $(am_plexus_la_OBJECTS)
-quantum_la_LIBADD =
-am_quantum_la_OBJECTS = quantum.lo
-quantum_la_OBJECTS = $(am_quantum_la_OBJECTS)
 ultimate2_la_LIBADD =
 am_ultimate2_la_OBJECTS = ultimate2.lo
 ultimate2_la_OBJECTS = $(am_ultimate2_la_OBJECTS)
@@ -104,9 +92,6 @@ unreal31_la_OBJECTS = $(am_unreal31_la_OBJECTS)
 unreal32_la_LIBADD =
 am_unreal32_la_OBJECTS = unreal32.lo
 unreal32_la_OBJECTS = $(am_unreal32_la_OBJECTS)
-viagra_la_LIBADD =
-am_viagra_la_OBJECTS = viagra.lo
-viagra_la_OBJECTS = $(am_viagra_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include -I$(top_builddir)/lib/gdbm
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -118,20 +103,14 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 CCLD = $(CC)
 SOURCES = $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) \
 	$(client_la_SOURCES) $(hybrid7_la_SOURCES) \
-	$(ircup10_la_SOURCES) $(liquid_la_SOURCES) \
-	$(mystic_la_SOURCES) $(neoircd_la_SOURCES) \
-	$(plexus_la_SOURCES) $(quantum_la_SOURCES) \
+	$(ircup10_la_SOURCES) $(plexus_la_SOURCES) \
 	$(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) \
-	$(unreal31_la_SOURCES) $(unreal32_la_SOURCES) \
-	$(viagra_la_SOURCES)
+	$(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
 DIST_SOURCES = $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) \
 	$(client_la_SOURCES) $(hybrid7_la_SOURCES) \
-	$(ircup10_la_SOURCES) $(liquid_la_SOURCES) \
-	$(mystic_la_SOURCES) $(neoircd_la_SOURCES) \
-	$(plexus_la_SOURCES) $(quantum_la_SOURCES) \
+	$(ircup10_la_SOURCES) $(plexus_la_SOURCES) \
 	$(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) \
-	$(unreal31_la_SOURCES) $(unreal32_la_SOURCES) \
-	$(viagra_la_SOURCES)
+	$(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -258,25 +237,20 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 wi_PWD = @wi_PWD@
-pkglib_LTLIBRARIES = bahamut14.la bahamut18.la client.la hybrid7.la ircup10.la liquid.la \
-						mystic.la neoircd.la plexus.la quantum.la ultimate2.la \
-						ultimate3.la unreal31.la unreal32.la viagra.la
+pkglib_LTLIBRARIES = bahamut14.la bahamut18.la client.la hybrid7.la \
+						ircup10.la plexus.la \
+						ultimate2.la ultimate3.la unreal31.la unreal32.la
 
 bahamut14_la_SOURCES = bahamut14.c bahamut14.h
 bahamut18_la_SOURCES = bahamut18.c bahamut18.h
 client_la_SOURCES = client.c client.h
 hybrid7_la_SOURCES = hybrid7.c hybrid7.h
 ircup10_la_SOURCES = ircup10.c ircup10.h
-liquid_la_SOURCES = liquid.c liquid.h
-mystic_la_SOURCES = mystic.c mystic.h
-neoircd_la_SOURCES = neoircd.c neoircd.h
 plexus_la_SOURCES = plexus.c plexus.h
-quantum_la_SOURCES = quantum.c quantum.h
 ultimate2_la_SOURCES = ultimate2.c ultimate2.h
 ultimate3_la_SOURCES = ultimate3.c ultimate3.h
 unreal31_la_SOURCES = unreal31.c unreal31.h
 unreal32_la_SOURCES = unreal32.c unreal32.h
-viagra_la_SOURCES = viagra.c viagra.h
 AM_LDFLAGS = -module -avoid-version -no-undefined
 AM_CFLAGS = -I$(top_srcdir)/lib/adns/ -I$(top_srcdir)/lib/keeper @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -342,16 +316,8 @@ hybrid7.la: $(hybrid7_la_OBJECTS) $(hybrid7_la_DEPENDENCIES)
 	$(LINK) -rpath $(pkglibdir) $(hybrid7_la_LDFLAGS) $(hybrid7_la_OBJECTS) $(hybrid7_la_LIBADD) $(LIBS)
 ircup10.la: $(ircup10_la_OBJECTS) $(ircup10_la_DEPENDENCIES) 
 	$(LINK) -rpath $(pkglibdir) $(ircup10_la_LDFLAGS) $(ircup10_la_OBJECTS) $(ircup10_la_LIBADD) $(LIBS)
-liquid.la: $(liquid_la_OBJECTS) $(liquid_la_DEPENDENCIES) 
-	$(LINK) -rpath $(pkglibdir) $(liquid_la_LDFLAGS) $(liquid_la_OBJECTS) $(liquid_la_LIBADD) $(LIBS)
-mystic.la: $(mystic_la_OBJECTS) $(mystic_la_DEPENDENCIES) 
-	$(LINK) -rpath $(pkglibdir) $(mystic_la_LDFLAGS) $(mystic_la_OBJECTS) $(mystic_la_LIBADD) $(LIBS)
-neoircd.la: $(neoircd_la_OBJECTS) $(neoircd_la_DEPENDENCIES) 
-	$(LINK) -rpath $(pkglibdir) $(neoircd_la_LDFLAGS) $(neoircd_la_OBJECTS) $(neoircd_la_LIBADD) $(LIBS)
 plexus.la: $(plexus_la_OBJECTS) $(plexus_la_DEPENDENCIES) 
 	$(LINK) -rpath $(pkglibdir) $(plexus_la_LDFLAGS) $(plexus_la_OBJECTS) $(plexus_la_LIBADD) $(LIBS)
-quantum.la: $(quantum_la_OBJECTS) $(quantum_la_DEPENDENCIES) 
-	$(LINK) -rpath $(pkglibdir) $(quantum_la_LDFLAGS) $(quantum_la_OBJECTS) $(quantum_la_LIBADD) $(LIBS)
 ultimate2.la: $(ultimate2_la_OBJECTS) $(ultimate2_la_DEPENDENCIES) 
 	$(LINK) -rpath $(pkglibdir) $(ultimate2_la_LDFLAGS) $(ultimate2_la_OBJECTS) $(ultimate2_la_LIBADD) $(LIBS)
 ultimate3.la: $(ultimate3_la_OBJECTS) $(ultimate3_la_DEPENDENCIES) 
@@ -360,8 +326,6 @@ unreal31.la: $(unreal31_la_OBJECTS) $(unreal31_la_DEPENDENCIES)
 	$(LINK) -rpath $(pkglibdir) $(unreal31_la_LDFLAGS) $(unreal31_la_OBJECTS) $(unreal31_la_LIBADD) $(LIBS)
 unreal32.la: $(unreal32_la_OBJECTS) $(unreal32_la_DEPENDENCIES) 
 	$(LINK) -rpath $(pkglibdir) $(unreal32_la_LDFLAGS) $(unreal32_la_OBJECTS) $(unreal32_la_LIBADD) $(LIBS)
-viagra.la: $(viagra_la_OBJECTS) $(viagra_la_DEPENDENCIES) 
-	$(LINK) -rpath $(pkglibdir) $(viagra_la_LDFLAGS) $(viagra_la_OBJECTS) $(viagra_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -374,16 +338,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hybrid7.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircup10.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liquid.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mystic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neoircd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plexus.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/quantum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ultimate2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ultimate3.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unreal31.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unreal32.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/viagra.Plo@am__quote@
 
 mostlyclean-libtool:
 	-rm -f *.lo
