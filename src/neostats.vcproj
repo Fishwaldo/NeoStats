@@ -189,9 +189,6 @@
 				RelativePath=".\modes.c">
 			</File>
 			<File
-				RelativePath=".\modexclude.c">
-			</File>
-			<File
 				RelativePath=".\modules.c">
 			</File>
 			<File
@@ -327,9 +324,6 @@
 			</File>
 			<File
 				RelativePath="..\include\modes.h">
-			</File>
-			<File
-				RelativePath="..\include\modexclude.h">
 			</File>
 			<File
 				RelativePath="..\include\modules.h">

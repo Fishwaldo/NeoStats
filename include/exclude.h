@@ -36,13 +36,14 @@ typedef struct Exclude {
 
 int InitExcludes(void);
 void FiniExcludes(void);
-int ns_cmd_exclude_add (CmdParams* cmdparams);
-int ns_cmd_exclude_del (CmdParams* cmdparams);
-int ns_cmd_exclude_list (CmdParams* cmdparams);
+int InitModExcludes(Module *mod_ptr);
+void FiniModExcludes(Module *mod_ptr);
 void ns_do_exclude_chan(Channel *c);
 void ns_do_exclude_server(Client *s);
 void ns_do_exclude_user(Client *u);
+int ns_cmd_exclude (CmdParams* cmdparams);
 
 extern const char* ExcludeDesc[NS_EXCLUDE_MAX];
+extern bot_cmd mod_exclude_commands[];
 
 #endif /* _EXCLUDE_H_ */

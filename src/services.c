@@ -42,7 +42,6 @@
 static int ns_cmd_shutdown (CmdParams* cmdparams);
 static int ns_cmd_reload (CmdParams* cmdparams);
 static int ns_cmd_jupe (CmdParams* cmdparams);
-static int ns_cmd_exclude (CmdParams* cmdparams);
 #ifdef USE_RAW
 static int ns_cmd_raw (CmdParams* cmdparams);
 #endif
@@ -213,26 +212,6 @@ init_services_bot (void)
 	return NS_SUCCESS;
 }
 
-/** @brief EXCLUDE command handler
- *
- *  maintain global exclusion list, which modules can take advantage off
- *   
- *  @param cmdparams structure with command information
- *  @returns none
- */
-
-static int
-ns_cmd_exclude (CmdParams* cmdparams) 
-{
-	if (!ircstrcasecmp(cmdparams->av[0], "ADD")) {
-		return ns_cmd_exclude_add(cmdparams);
-	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
-		return ns_cmd_exclude_del(cmdparams);
-	} else if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
-		return ns_cmd_exclude_list(cmdparams);
-	}
-	return NS_ERR_SYNTAX_ERROR;
-}
 /** @brief SHUTDOWN command handler
  *
  *  Shutdown NeoStats

@@ -25,8 +25,6 @@
  */
 
 /*  TODO:
- *  - Combine appropriate functions with new module exclude API for
- *    easier maintainance.
  *  - Add check for existing exclusions during add
  */
 
@@ -34,8 +32,16 @@
 #include "exclude.h"
 #include "services.h"
 #include "ircstring.h"
+#include "ns_help.h"
 
+int mod_cmd_exclude(CmdParams *cmdparams);
+
+/* this is the size of the mod exclude list */
+#define MAX_MOD_EXCLUDES		100
+
+/* this is the list of excluded hosts/servers */
 static list_t *exclude_list;
+static list_t *excludelists[NUM_MODULES];
 
 const char* ExcludeDesc[NS_EXCLUDE_MAX] = {
 	"Host",
@@ -43,14 +49,30 @@ const char* ExcludeDesc[NS_EXCLUDE_MAX] = {
 	"Channel",
 };
 
-void new_exclude (void *data)
+bot_cmd mod_exclude_commands[]=
+{
+	{"EXCLUDE",	mod_cmd_exclude,1,	NS_ULEVEL_ADMIN,ns_help_exclude,ns_help_exclude_oneline},
+	{NULL,		NULL,			0, 	0,				NULL, 			NULL}
+};
+
+static void new_exclude(list_t *elist, void *data)
 {
 	Exclude *e;
 
 	e = ns_calloc(sizeof(Exclude));
 	os_memcpy (e, data, sizeof(Exclude));
-	lnode_create_append (exclude_list, e);
-	dlog(DEBUG2, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
+	lnode_create_append (elist, e);
+	dlog(DEBUG2, "Added exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
+}
+
+static void new_global_exclude(void *data)
+{
+	new_exclude(exclude_list, data);
+}
+
+static void new_mod_exclude(void *data)
+{
+	new_exclude(excludelists[GET_CUR_MODNUM()], data);
 }
 
 /* @brief initilize the exlusion list
@@ -60,13 +82,27 @@ void new_exclude (void *data)
 int InitExcludes(void) 
 {
 	exclude_list = list_create(-1);
-	DBAFetchRows ("exclusions", new_exclude);
+	DBAFetchRows ("exclusions", new_global_exclude);
 	return NS_SUCCESS;
 } 
+
+int InitModExcludes(Module *mod_ptr)
+{
+	SET_SEGV_LOCATION();
+	/* init the exclusions list */
+	excludelists[mod_ptr->modnum] = list_create(MAX_MOD_EXCLUDES);
+	DBAFetchRows ("exclusions", new_mod_exclude);
+	return NS_SUCCESS;
+}
 
 void FiniExcludes(void) 
 {
 	list_destroy_auto (exclude_list);
+}
+
+void FiniModExcludes(Module *mod_ptr)
+{
+	list_destroy_auto (excludelists[mod_ptr->modnum]);
 }
 
 /* @brief add a entry to the exlusion list
@@ -76,7 +112,7 @@ void FiniExcludes(void)
  * @param pattern the actual pattern to use 
  * @returns nothing
  */
-int ns_cmd_exclude_add(CmdParams* cmdparams) 
+static int do_exclude_add(list_t *elist, CmdParams* cmdparams) 
 {
 	NS_EXCLUDE type;
 	char *buf;
@@ -84,6 +120,10 @@ int ns_cmd_exclude_add(CmdParams* cmdparams)
 	
 	if (cmdparams->ac < 4) {
 		return NS_ERR_NEED_MORE_PARAMS;
+	}
+	if (list_isfull(elist)) {
+		irc_prefmsg (cmdparams->bot, cmdparams->source, "Error, Exception list is full");
+		return NS_SUCCESS;
 	}
 	/* we dont do any checking to see if a similar entry already exists... oh well, thats upto the user */
 
@@ -118,7 +158,7 @@ int ns_cmd_exclude_add(CmdParams* cmdparams)
 	strlcpy(e->reason, buf, MAXREASON);
 	ns_free (buf);
 	/* if we get here, then e is valid */
-	lnode_create_append (exclude_list, e);
+	lnode_create_append (elist, e);
 	irc_prefmsg(cmdparams->bot, cmdparams->source, __("Added %s (%s) to exclusion list", cmdparams->source), e->pattern, cmdparams->av[1]);
 	if (nsconfig.cmdreport) {
 		irc_chanalert(cmdparams->bot, _("%s added %s (%s) to the exclusion list"), cmdparams->source->name, e->pattern, cmdparams->av[1]);
@@ -128,13 +168,23 @@ int ns_cmd_exclude_add(CmdParams* cmdparams)
 	return NS_SUCCESS;
 } 
 
+static int ns_cmd_exclude_add(CmdParams* cmdparams) 
+{
+	return do_exclude_add(exclude_list, cmdparams);
+} 
+
+static int mod_cmd_exclude_add(CmdParams *cmdparams)
+{
+	return do_exclude_add(excludelists[GET_CUR_MODNUM()], cmdparams);
+}
+
 /* @brief del a entry from the exlusion list
  * 
  * @param u the user that sent the request
  * @param postition the position in the list that we are excluding
  * @returns nothing
  */
-int ns_cmd_exclude_del(CmdParams* cmdparams) 
+static int do_exclude_del(list_t *elist, CmdParams* cmdparams) 
 {
 	lnode_t *en;
 	Exclude *e;
@@ -142,23 +192,33 @@ int ns_cmd_exclude_del(CmdParams* cmdparams)
 	if (cmdparams->ac < 2) {
 		return NS_ERR_NEED_MORE_PARAMS;
 	}
-	en = list_first(exclude_list);
+	en = list_first(elist);
 	while (en != NULL) {
 		e = lnode_get(en);
 		if (ircstrcasecmp (e->pattern, cmdparams->av[1]) == 0) { 
+			list_delete(elist, en);
+			lnode_destroy(en);
 			DBADelete ("exclusions", e->pattern);
 			irc_prefmsg(cmdparams->bot, cmdparams->source, __("%s delete from exclusion list",cmdparams->source), e->pattern);
 			ns_free(e);
-			list_delete(exclude_list, en);
-			lnode_destroy(en);
 			return NS_SUCCESS;
 		}
-		en = list_next(exclude_list, en);
+		en = list_next(elist, en);
 	}
 	/* if we get here, means that we never got a match */
 	irc_prefmsg(cmdparams->bot, cmdparams->source, __("%s not found in the exclusion list",cmdparams->source), cmdparams->av[1]);
 	return NS_SUCCESS;
 } 
+
+static int ns_cmd_exclude_del(CmdParams* cmdparams) 
+{
+	return do_exclude_del(exclude_list, cmdparams);
+} 
+
+static int mod_cmd_exclude_del(CmdParams *cmdparams)
+{
+	return do_exclude_del(excludelists[GET_CUR_MODNUM()], cmdparams);
+}
 
 /* @brief list the entries from the exlusion list
  * 
@@ -166,21 +226,65 @@ int ns_cmd_exclude_del(CmdParams* cmdparams)
  * @param from the "user" that this message should come from, so we can call from modules
  * @returns nothing
  */
-int ns_cmd_exclude_list(CmdParams* cmdparams) 
+static int do_exclude_list(list_t *elist, CmdParams* cmdparams) 
 {
 	lnode_t *en;
 	Exclude *e;
 	
-	irc_prefmsg(cmdparams->bot, cmdparams->source, __("Global exclusion list:", cmdparams->source));
-	en = list_first(exclude_list);
+	irc_prefmsg(cmdparams->bot, cmdparams->source, __("Exclusion list:", cmdparams->source));
+	en = list_first(elist);
 	while (en != NULL) {
 		e = lnode_get(en);			
-		irc_prefmsg(cmdparams->bot, cmdparams->source, __("%s (%s) Added by %s on %s", cmdparams->source), e->pattern, ExcludeDesc[e->type], e->addedby, sftime(e->addedon));
-		en = list_next(exclude_list, en);
+		irc_prefmsg(cmdparams->bot, cmdparams->source, __("%s (%s) Added by %s on %s for %s", cmdparams->source), e->pattern, ExcludeDesc[e->type], e->addedby, sftime(e->addedon), e->reason);
+		en = list_next(elist, en);
 	}
 	irc_prefmsg(cmdparams->bot, cmdparams->source, __("End of list.", cmdparams->source));
 	return NS_SUCCESS;
 } 
+
+
+static int ns_cmd_exclude_list(CmdParams* cmdparams) 
+{
+	return do_exclude_list(exclude_list, cmdparams);
+} 
+
+static int mod_cmd_exclude_list(CmdParams *cmdparams)
+{
+	return do_exclude_list(excludelists[GET_CUR_MODNUM()], cmdparams);
+}
+
+/** @brief EXCLUDE command handler
+ *
+ *  maintain global exclusion list, which modules can take advantage off
+ *   
+ *  @param cmdparams structure with command information
+ *  @returns none
+ */
+
+int ns_cmd_exclude (CmdParams* cmdparams) 
+{
+	if (!ircstrcasecmp(cmdparams->av[0], "ADD")) {
+		return ns_cmd_exclude_add(cmdparams);
+	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
+		return ns_cmd_exclude_del(cmdparams);
+	} else if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
+		return ns_cmd_exclude_list(cmdparams);
+	}
+	return NS_ERR_SYNTAX_ERROR;
+}
+
+int mod_cmd_exclude(CmdParams *cmdparams)
+{
+	SET_SEGV_LOCATION();
+	if (!ircstrcasecmp(cmdparams->av[0], "ADD")) {
+		return mod_cmd_exclude_add(cmdparams);
+	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
+		return mod_cmd_exclude_del(cmdparams);
+	} else if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
+		return mod_cmd_exclude_list(cmdparams);
+	}
+	return NS_ERR_SYNTAX_ERROR;
+}
 
 /* @brief check if a user is matched against a exclusion
  * 
@@ -272,4 +376,81 @@ void ns_do_exclude_chan(Channel *c)
 	}
 	/* if we are here, there is no match */
 	c->flags &= ~NS_FLAG_EXCLUDED;
+}
+
+int ModIsServerExcluded(Client *s)
+{
+	lnode_t *node;
+	Exclude *e;
+
+	node = list_first(excludelists[GET_CUR_MODNUM()]);
+	while (node) {
+		e = lnode_get(node);
+		if (e->type == NS_EXCLUDE_SERVER) {
+			if (match(e->pattern, s->name)) {
+				dlog (DEBUG1, "Matched server entry %s in Excludeions", e->pattern);
+				return NS_TRUE;
+			}
+		}
+		node = list_next(excludelists[GET_CUR_MODNUM()], node);
+	}
+	return NS_FALSE;
+}
+
+int ModIsUserExcluded(Client *u) 
+{
+	lnode_t *node;
+	Exclude *e;
+
+	SET_SEGV_LOCATION();
+	if (!ircstrcasecmp(u->uplink->name, me.name)) {
+		dlog (DEBUG1, "User %s Exclude. its Me!", u->name);
+		return NS_TRUE;
+	}
+	/* don't scan users from a server that is excluded */
+	node = list_first(excludelists[GET_CUR_MODNUM()]);
+	while (node) {
+		e = lnode_get(node);
+		if (e->type == NS_EXCLUDE_SERVER) {
+			/* match a server */
+			if (match(e->pattern, u->uplink->name)) {
+				dlog (DEBUG1, "User %s exclude. Matched server entry %s in Excludeions", u->name, e->pattern);
+				return NS_TRUE;
+			}
+		} else if (e->type == NS_EXCLUDE_HOST) {
+			/* match a hostname */
+			if (match(e->pattern, u->user->hostname)) {
+				dlog (DEBUG1, "User %s is exclude. Matched Host Entry %s in Exceptions", u->name, e->pattern);
+				return NS_TRUE;
+			}
+		}				
+		node = list_next(excludelists[GET_CUR_MODNUM()], node);
+	}
+	return NS_FALSE;
+}
+
+int ModIsChannelExcluded(Channel *c) 
+{
+	lnode_t *node;
+	Exclude *e;
+
+	SET_SEGV_LOCATION();
+	if (IsServicesChannel( c )) {
+		dlog (DEBUG1, "Services channel %s is exclude.", c->name);
+		return NS_TRUE;
+	}
+	/* don't scan users from a server that is excluded */
+	node = list_first(excludelists[GET_CUR_MODNUM()]);
+	while (node) {
+		e = lnode_get(node);
+		if (e->type == NS_EXCLUDE_CHANNEL) {
+			/* match a channel */
+			if (match(e->pattern, c->name)) {
+				dlog (DEBUG1, "Channel %s exclude. Matched Channel entry %s in Excludeions", c->name, e->pattern);
+				return NS_TRUE;
+			}
+		}				
+		node = list_next(excludelists[GET_CUR_MODNUM()], node);
+	}
+	return NS_FALSE;
 }
