@@ -1340,6 +1340,9 @@ EXPORTFUNC extern int match(const char *mask, const char *name);
 /* File system functions */
 EXPORTVAR int os_errno;
 
+EXPORTFUNC void *os_malloc(size_t size);
+EXPORTFUNC void os_free(void *ptr);
+
 EXPORTFUNC int os_mkdir (const char *filename, mode_t mode);
 EXPORTFUNC int os_check_create_dir (const char *dirname);
 EXPORTFUNC FILE *os_fopen (const char *filename, const char *filemode);

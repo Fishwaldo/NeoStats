@@ -45,6 +45,11 @@
 
 #define PID_FILENAME	"neostats.pid"
 
+#ifdef WIN32
+void *(*old_malloc)(size_t);
+void (*old_free) (void *);
+#endif
+
 char segv_location[SEGV_LOCATION_BUFSIZE];
 
 /*! Date when we were compiled */
@@ -229,6 +234,12 @@ neostats ()
 #endif
 #endif
 	nlog (LOG_NOTICE, "NeoStats \"%s\" started.", VERSION);
+#ifdef WIN32
+	old_malloc = pcre_malloc;
+	old_free = pcre_free;
+	pcre_malloc = os_malloc;
+	pcre_free = os_free;
+#endif
 
 	/* Load modules after we fork. This fixes the load->fork-exit->call 
 	   _fini problems when we fork */
@@ -387,6 +398,10 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 	FiniDBA ();
 	FiniLogs ();
 	LANGfini();
+#ifdef WIN32
+	pcre_malloc = old_malloc;
+	pcre_free = old_free;
+#endif
 	if ((exitcode == NS_EXIT_RECONNECT && nsconfig.r_time > 0) || exitcode == NS_EXIT_RELOAD) {
 		execve ("./neostats", NULL, NULL);
 		return_code=EXIT_FAILURE;	/* exit code to error */

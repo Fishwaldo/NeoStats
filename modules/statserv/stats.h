@@ -52,7 +52,7 @@ int IncStatisticEntry (statisticentry *stat, unsigned int current);
 int IncStatistic (statistic *stat);
 void DecStatisticEntry (statisticentry *stat, unsigned int current);
 void DecStatistic (statistic *stat);
-int SetStatisticEntry (statisticentry *stat, unsigned int current, unsigned int diff);
+int SetStatisticEntry (statisticentry *stat, unsigned int current, int diff);
 int SetStatistic (statistic *stat, int current);
 void PreSaveStatistic (statistic *stat);
 void PostLoadStatistic (statistic *stat);

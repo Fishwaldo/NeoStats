@@ -135,7 +135,7 @@ void DecStatistic (statistic *stat)
 	}
 }
 
-int SetStatisticEntry (statisticentry *stat, unsigned int current, unsigned int diff)
+int SetStatisticEntry (statisticentry *stat, unsigned int current, int diff)
 {
 	int isrecord = 0;
 
@@ -149,7 +149,10 @@ int SetStatisticEntry (statisticentry *stat, unsigned int current, unsigned int 
 	{
 		stat->ts_max = me.now;
 	}
-	stat->runningtotal += diff;
+	/* Only adjust running total if diff is > 0 */
+	if (diff > 0) {
+		stat->runningtotal += diff;
+	}
 	return isrecord;
 }
 

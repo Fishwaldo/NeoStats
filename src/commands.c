@@ -117,6 +117,18 @@ static int getuserlevel(CmdParams *cmdparams)
 }
 
 /** common message handlers */
+void command_report (const Bot *botptr, const char *fmt, ...)
+{
+	static char buf[BUFSIZE];
+	va_list ap;
+
+	if (!is_synched || !botptr || !nsconfig.cmdreport)
+		return;
+	va_start (ap, fmt);
+	ircvsnprintf (buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	irc_chanalert (botptr, buf);
+}
 
 void msg_permission_denied (CmdParams *cmdparams, char *subcommand)
 {

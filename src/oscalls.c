@@ -278,3 +278,13 @@ void *os_memcpy (void *dest, const void *src, size_t count)
 {
 	return memcpy (dest, src, count);
 }
+
+void *os_malloc(size_t size)
+{
+	return malloc (size);
+}
+
+void os_free(void *ptr)
+{
+	free(ptr);
+}
