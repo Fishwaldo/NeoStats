@@ -206,6 +206,8 @@ extern char *strlower(char *);
 
 /* ircd.c */
 extern void parse();
+extern char *joinbuf(char **av, int ac, int from);
+extern int split_buf(char *buf, char ***argv, int colon_special);
 extern void privmsg(char *, const char *, char *, ...);
 extern void privmsg_list(char *, char *, const char **);
 extern void globops(char *, char *, ...);

@@ -287,7 +287,7 @@ void Module_Event(char *event, void *data) {
  *             the buffer by side effect.
  */
 
-int split_buf(char *buf, char ***argv, int colon_special)
+extern int split_buf(char *buf, char ***argv, int colon_special)
 {
     int argvsize = 8;
     int argc;
@@ -323,7 +323,16 @@ int split_buf(char *buf, char ***argv, int colon_special)
     return argc - flag;
 }
 
+extern char *joinbuf(char **av, int ac, int from) {
+	int i;
+	char *buf;
 
+	buf = malloc(512);
+	for (i = from; i < ac; i++) {
+		sprintf(buf, "%s %s", buf, av[i]);
+	}
+	return (char *)buf;
+}
 
 
 void parse(char *line)
