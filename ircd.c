@@ -97,7 +97,10 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
 	if (strnlen (user, MAXUSER) > MAXUSERWARN) {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, %s bot %s has an username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
 	}
-	add_mod_user (nick, mod_name);
+	if(!add_mod_user (nick, mod_name)) {
+		nlog (LOG_WARNING, LOG_CORE, "add_mod_user failed for module %s bot %s", mod_name, nick);
+		return NS_FAILURE;
+	}
 	Umode = init_bot_modes(modes);
 	SignOn_NewBot (nick, user, host, rname, Umode);
 	AddStringToList (&av, nick, &ac);
@@ -115,7 +118,7 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname, 
-						const char *modes, unsigned int flags, 
+						const char *modes, unsigned int flags, bot_cmd *cmd_list, 
 						char * mod_name)
 {
 	ModUser * bot_ptr;
@@ -133,7 +136,11 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 	if (strnlen (user, MAXUSER) > MAXUSERWARN) {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, %s bot %s has an username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
 	}
-	add_mod_user (nick, mod_name);
+	bot_ptr = add_mod_user (nick, mod_name);
+	if(!bot_ptr) {
+		nlog (LOG_WARNING, LOG_CORE, "add_mod_user failed for module %s bot %s", mod_name, nick);
+		return NULL;
+	}
 	Umode = init_bot_modes(modes);
 	SignOn_NewBot (nick, user, host, rname, Umode);
 	AddStringToList (&av, nick, &ac);
@@ -141,8 +148,9 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 	free (av);
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
-	bot_ptr = findbot(nick);
 	bot_ptr->flags = flags;
+	add_bot_cmd_list(bot_ptr, cmd_list);
+	
 	return bot_ptr;
 }
 

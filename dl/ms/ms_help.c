@@ -55,16 +55,16 @@ const char *ms_help_ode[] = {
 };
 
 const char *ms_help_lapdance[] = {
-	"Syntax: \2LAPDANCE <NICK>",
+	"Syntax: \2LAPDANCE <NICK>\2",
 	"",
-	"Send a \"lapdance\" to a loved one on IRC, sure to cheer any person up\2",
+	"Send a \"lapdance\" to a loved one on IRC, sure to cheer any person up",
 	NULL
 };
 
 const char *ms_help_version[] = {
 	"Syntax: \2VERISON\2",
 	"",
-	"Display current version information via PRIVMSG/NOTICE\2",
+	"Display current version information",
 	NULL
 };
 

@@ -25,7 +25,7 @@
 #include "dl.h"
 #include "log.h"
 
-static void bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac);
+static int bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac);
 
 /* hash for services bot command list */
 static hash_t *botcmds = NULL;
@@ -53,6 +53,23 @@ bot_cmd intrinsic_commands[]=
 };
 */
 
+/** @brief calc_cmd_ulevel calculate cmd ulevel
+ *  done as a function so we can support potentially complex  
+ *  ulevel calculations without impacting other code.
+ *
+ *  @param pointer to command structure
+ *  @return command user level requires
+ */
+static int calc_cmd_ulevel(bot_cmd* cmd_ptr)
+{
+	if(cmd_ptr->ulevel > 200) {
+		/* int pointer rather than value */
+		return(*(int*)cmd_ptr->ulevel);
+	}
+	/* use cmd entry directly */
+	return(cmd_ptr->ulevel);
+}
+
 /** @brief add_bot_cmd adds a single command to the command hash
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
@@ -62,6 +79,21 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 {
 	hnode_t *cmdnode;
 	
+	/* Verify the command is OK before we add it so we do not have to 
+	 * check validity during processing. Only check critical elements.
+	 * For now we verify help during processing since it is not critical. */
+	/* No command, we cannot recover from this */
+	if(!cmd_ptr->cmd) {
+		nlog (LOG_ERROR, LOG_MOD, "Missing command, command %s not added");
+		return NS_FAILURE;
+	}
+	/* No handler, we cannot recover from this */
+	if(!cmd_ptr->handler) {
+		nlog (LOG_ERROR, LOG_MOD, "Missing command handler, command %s not added", 
+			cmd_ptr->cmd);
+		return NS_FAILURE;
+	}
+
 	/* Add the command */
 	cmdnode = hnode_create(cmd_ptr);
 	if (cmdnode) {
@@ -138,9 +170,11 @@ del_all_bot_cmds(ModUser* bot_ptr)
 {
 	hnode_t *cmdnode;
 	hscan_t hs;
+
 	/* Check we have a command hash */
-	if(!bot_ptr->botcmds)
+	if(bot_ptr->botcmds == NULL) {
 		return NS_FAILURE;
+	}
 	/* Cycle through command hash and delete each command */
 	hash_scan_begin(&hs, bot_ptr->botcmds);
 	while ((cmdnode = hash_scan_next(&hs)) != NULL) {
@@ -210,9 +244,7 @@ servicesbot (char *nick, char **av, int ac)
 		nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", nick, s_Services);
 		return;
 	}
-
 	me.requests++;
-
 	/* Use fake bot structure so we can use the main command routine */
 	strlcpy(fake_bot.nick, s_Services, MAXNICK);
 	fake_bot.botcmds = botcmds;
@@ -224,81 +256,69 @@ servicesbot (char *nick, char **av, int ac)
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-void
+int
 run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 {
 	int userlevel;
 	bot_cmd* cmd_ptr;
 	hnode_t *cmdnode;
+	int cmdlevel;
 
 	SET_SEGV_LOCATION();
 	userlevel = UserLevel (u);
 	/* Check user authority to use this command set */
 	if (( (bot_ptr->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
 		( (bot_ptr->flags & BOT_FLAG_ONLY_OPERS) && me.onlyopers && (userlevel < NS_ULEVEL_OPER) )){
-		prefmsg (u->nick, bot_ptr->nick, "This service is only available to IRCops.");
-		chanalert (bot_ptr->nick, "%s Requested %s, but he is Not an Operator!", u->nick, av[1]);
-		return;
+		prefmsg (u->nick, bot_ptr->nick, "This service is only available to IRC operators.");
+		chanalert (bot_ptr->nick, "%s requested %s, but is not an operator.", u->nick, av[1]);
+		nlog (LOG_NORMAL, LOG_MOD, "%s requested %s, but is not an operator.", u->nick, av[1]);
+		return 1;
 	}
 
 	/* Process command list */
 	cmdnode = hash_lookup(bot_ptr->botcmds, av[1]);
-
 	if (cmdnode) {
-		cmd_ptr = hnode_get(cmdnode);
-	
+		cmd_ptr = hnode_get(cmdnode);	
+		cmdlevel = calc_cmd_ulevel(cmd_ptr);
 		/* Is user authorised to issue this command? */
-		if(cmd_ptr->ulevel > 200) {
-			/* int pointer rather than value */
-			int cmdlevel = *(int*)cmd_ptr->ulevel;
-			if (userlevel < cmdlevel) {
-				prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
-				chanalert (bot_ptr->nick, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
-				return;
-			}
-		}
-		else if (userlevel < cmd_ptr->ulevel) {
+		if (userlevel < cmdlevel) {
 			prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
 			chanalert (bot_ptr->nick, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
-			return;
+			nlog (LOG_NORMAL, LOG_MOD, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
+			return 1;
 		}
 		/* First two parameters are bot name and command name so 
 		 * subtract 2 to get parameter count */
 		if((ac - 2) < cmd_ptr->minparams ) {
 			prefmsg (u->nick, bot_ptr->nick, "Syntax error: insufficient parameters");
 			prefmsg (u->nick, bot_ptr->nick, "/msg %s HELP %s for more information", bot_ptr->nick, cmd_ptr->cmd);
-			return;
-		}
-		/* Missing handler?! */
-		if(!cmd_ptr->handler) {
-			prefmsg (u->nick, bot_ptr->nick, "Unable to find handler for %s", cmd_ptr->cmd);
-			chanalert (bot_ptr->nick, "Unable to find handler for %s used by %s", cmd_ptr->cmd, u->nick);
-			return;
+			return 1;
 		}
 		/* Seems OK so report the command call then call appropriate handler */
 		chanalert (bot_ptr->nick, "%s used %s", u->nick, cmd_ptr->cmd);
+		nlog (LOG_NORMAL, LOG_MOD, "%s used %s", u->nick, cmd_ptr->cmd);
 		cmd_ptr->handler(u, av, ac);
-		return;
+		return 1;
 	}
 
 	/* Handle intrinsic commands */
-
 	/* Help */
 	if (!strcasecmp(av[1], "HELP")) {
 		bot_cmd_help(bot_ptr, u, av, ac);
-		return;
+		return 1;
 	}
 
 	/* We have run out of commands so report failure */
 	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[1]);
 	chanalert (bot_ptr->nick, "%s requested %s, but that is an unknown command", u->nick, av[1]);
+	return 1;
 }
 
 /** @brief bot_cmd_help process bot help command
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-static void 
+static int 
 bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 {
 	char* curlevelmsg=NULL;
@@ -308,6 +328,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	hnode_t *cmdnode;
 	hscan_t hs;
 	int userlevel;
+	int cmdlevel;
 
 	userlevel = UserLevel(u);
 
@@ -315,19 +336,26 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	if (ac < 3) {
 		lowlevel = 0;
 		curlevel = NS_ULEVEL_OPER;
-		chanalert (bot_ptr->nick, "%s Requested %s Help", u->nick, bot_ptr->nick);
+		chanalert (bot_ptr->nick, "%s requested %s help", u->nick, bot_ptr->nick);
 		prefmsg(u->nick, bot_ptr->nick, "The following commands can be used with %s:", bot_ptr->nick);
 
 		restartlevel:
 		hash_scan_begin(&hs, bot_ptr->botcmds);
 		while ((cmdnode = hash_scan_next(&hs)) != NULL) {
 			cmd_ptr = hnode_get(cmdnode);
-			if ((cmd_ptr->ulevel < curlevel) && (cmd_ptr->ulevel >= lowlevel)) {
+			cmdlevel = calc_cmd_ulevel(cmd_ptr);
+			if ((cmdlevel < curlevel) && (cmdlevel >= lowlevel)) {
 				if(curlevelmsg && !donemsg) {
 					prefmsg(u->nick, bot_ptr->nick, "\2Additional commands available to %s:\2", curlevelmsg);
 					donemsg = 1;
 				}
-				prefmsg(u->nick, bot_ptr->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
+				/* Warn about missing help text then skip */ 
+				if(!cmd_ptr->onelinehelp) {
+					/* Missing help text!!! */
+					nlog (LOG_WARNING, LOG_MOD, "Missing one line help text for command %s", cmd_ptr->cmd);
+				} else {					
+					prefmsg(u->nick, bot_ptr->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
+				}
 			}
 		}
 		if (userlevel >= curlevel) {
@@ -354,42 +382,44 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 						break;
 			}
 		}						
+		/* Generate help on help footer text */
 		prefmsg(u->nick, bot_ptr->nick, " ");
 		prefmsg(u->nick, bot_ptr->nick, "To use a command, type");
 		prefmsg(u->nick, bot_ptr->nick, "    \2/msg %s command\2", bot_ptr->nick);
 		prefmsg(u->nick, bot_ptr->nick, "For for more information on a command, type");
 		prefmsg(u->nick, bot_ptr->nick, "    \2/msg %s HELP command\2.", bot_ptr->nick);
-		return;
+		return 1;
 	}
-	chanalert (bot_ptr->nick, "%s Requested %s Help on %s", u->nick, bot_ptr->nick, av[2]);
+	chanalert (bot_ptr->nick, "%s requested %s help on %s", u->nick, bot_ptr->nick, av[2]);
 
 	/* Process command list */
 	cmdnode = hash_lookup(bot_ptr->botcmds, av[2]);
 	if (cmdnode) {
 		cmd_ptr = hnode_get(cmdnode);
-		if (UserLevel (u) < cmd_ptr->ulevel) {
+		cmdlevel = calc_cmd_ulevel(cmd_ptr);
+		if (UserLevel (u) < cmdlevel) {
 			prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
-			return;
+			return 1;
 		}		
 		if(!cmd_ptr->helptext) {
-			/* Missing help text!!! */
-			return;
+			/* Warn about missing help text then skip */ 
+			nlog (LOG_WARNING, LOG_MOD, "Missing help text for command %s", cmd_ptr->cmd);
+			return 1;
 		}
 		privmsg_list (u->nick, bot_ptr->nick, cmd_ptr->helptext);
-		return;
+		return 1;
 	}
 
 	/* Handle intrinsic commands */
-
 	/* Help */
 	if (!strcasecmp(av[2], "HELP")) {
 		prefmsg(u->nick, bot_ptr->nick, "Syntax: \2HELP [command]\2");
 		prefmsg(u->nick, bot_ptr->nick, "");
 		prefmsg(u->nick, bot_ptr->nick, "Provides help on the bot commands");
-		return;
+		return 1;
 	}
 
 	/* Command not found so report as unknown */
-	prefmsg (u->nick, bot_ptr->nick, "Unknown Help Topic: \2%s\2", av[2]);
+	prefmsg (u->nick, bot_ptr->nick, "No help available or unknown help topic: \2%s\2", av[2]);
+	return 1;
 }
-

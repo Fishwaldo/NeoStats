@@ -226,9 +226,9 @@ static int cs_set(User * u, char **av, int ac)
 static int Online(char **av, int ac)
 {
 	cs_bot = init_mod_bot(s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.rname, 
-		services_bot_modes,BOT_FLAG_RESTRICT_OPERS,__module_info.module_name);
-	add_bot_cmd_list(cs_bot, cs_commands);
-	cs_online = 1;
+		services_bot_modes, BOT_FLAG_RESTRICT_OPERS, cs_commands, __module_info.module_name);
+	if(cs_bot)
+		cs_online = 1;
 	return 1;
 };
 

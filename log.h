@@ -91,7 +91,7 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 #endif
 
 extern void nlog (int level, int scope, char *fmt, ...);
-void *close_logs ();
+void close_logs ();
 int init_logs ();
 void reset_logs ();
 

@@ -54,7 +54,7 @@ static char logname[MAXPATH];
 
 struct logs_ {
 	FILE *logfile;
-	char name[30];
+	char name[MAX_MOD_NAME];
 	unsigned int flush;
 } logs_;
 
@@ -76,7 +76,7 @@ init_logs ()
 
 /** @brief Occasionally flush log files out 
  */
-void *
+void
 close_logs ()
 {
 	hscan_t hs;
@@ -97,7 +97,6 @@ close_logs ()
 		hnode_destroy (hn);
 		free (logentry);
 	}
-	return NULL;
 }
 
 /** @Configurable logging function
@@ -106,10 +105,8 @@ void
 nlog (int level, int scope, char *fmt, ...)
 {
 	va_list ap;
-	int gotlog;
 	hnode_t *hn;
 	struct logs_ *logentry;
-
 	
 	if (level <= config.debug) {
 		/* if scope is > 0, then log to a diff file */
@@ -126,7 +123,6 @@ nlog (int level, int scope, char *fmt, ...)
 		if (hn) {
 			/* we found our log entry */
 			logentry = hnode_get (hn);
-			gotlog = 1;
 		} else {
 			/* log file not found */
 			if (segvinmodule[0] == 0 && (scope > 0)) {
@@ -137,7 +133,7 @@ nlog (int level, int scope, char *fmt, ...)
 				scope = 0;
 			}
 			logentry = malloc (sizeof (struct logs_));
-			strlcpy (logentry->name, scope > 0 ? segvinmodule : CoreLogFileName, 30);
+			strlcpy (logentry->name, scope > 0 ? segvinmodule : CoreLogFileName, MAX_MOD_NAME);
 			ircsnprintf (logname, MAXPATH, "logs/%s.log", logentry->name);
 			logentry->logfile = fopen (logname, "a");
 			logentry->flush = 0;
