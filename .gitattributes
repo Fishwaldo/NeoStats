@@ -66,6 +66,7 @@ doc/read-userman -text
 /ircdchk -text
 /list.c -text
 /list.h -text
+logs/.keepme -text
 /main.c -text
 /makeconf -text
 /ns_help.c -text
