@@ -93,7 +93,7 @@ static int DCCChatConnect(Client *dcc, int port)
 	char tmpname[BUFSIZE];
 
 	if ((socketfd = sock_connect(SOCK_STREAM, dcc->ip, port)) == NS_FAILURE) {
-		nlog(LOG_WARNING, "Error Connecting to DCC Host %s(%s:%d): %s", dcc->user->hostname, inet_ntoa(dcc->ip), port, strerror(errno));
+		nlog(LOG_WARNING, "Error Connecting to DCC Host %s(%s:%d)", dcc->user->hostname, inet_ntoa(dcc->ip), port);
 		DelDCCClient(dcc);
 		return NS_FAILURE;
 	}			
