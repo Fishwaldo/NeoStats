@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.13 2003/06/08 05:59:25 fishwaldo Exp $
+** $Id: neoircd.c,v 1.14 2003/06/10 13:21:00 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -626,7 +626,7 @@ void Usr_Smode(char *origin, char **argv, int argc) {
 void Usr_Mode(char *origin, char **argv, int argc) {
 	if (!strchr(argv[0], '#')) {
 		nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s",argv[0]);
-		UserMode(argv[0], argv[1]);
+		UserMode(argv[0], argv[1], 0);
 	} else {
 		ChanMode(origin, argv, argc);
 	}	
@@ -649,6 +649,7 @@ void Usr_Kill(char *origin, char **argv, int argc) {
 		return;
 	}
 #endif
+/* XXX todo- Make UserKill function */
 	u = finduser(argv[0]);
 	if (u) {
 		AddStringToList(&av, u->nick, &ac);
@@ -669,6 +670,8 @@ void Usr_Pong(char *origin, char **argv, int argc) {
 	s = findserver(argv[0]);
 	if (s) {
 		dopong(s);
+	} else {
+		nlog(LOG_NOTICE, LOG_CORE, "Recieved PONG from unknown Server ");
 	}
 }
 void Usr_Away(char *origin, char **argv, int argc) {
@@ -682,6 +685,9 @@ void Usr_Away(char *origin, char **argv, int argc) {
 			buf = NULL;
 		}	
 		Do_Away(u, buf);
+		if (argc > 0) {
+			free(buf);
+		}
 	} else {	
 		nlog(LOG_NOTICE, LOG_CORE, "Warning, Unable to find User %s for Away", origin);
 	}
@@ -711,6 +717,8 @@ void Usr_Kick(char *origin, char **argv, int argc) {
 	u = finduser(argv[1]);
 	if (u) {
 		kick_chan(u, argv[0]);
+	} else {
+		nlog(LOG_WARNING, LOG_CORE, "Warning, Can't find user %s for kick %s", argv[1], argv[0]);
 	}
 }
 void Usr_Join(char *origin, char **argv, int argc) {

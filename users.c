@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.50 2003/06/08 05:59:25 fishwaldo Exp $
+** $Id: users.c,v 1.51 2003/06/10 13:21:00 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -324,11 +324,7 @@ int UserLevel(User *u) {
 }
 
 
-#ifdef ULTIMATE3
 void UserMode(const char *nick, const char *modes, int smode)
-#else
-void UserMode(const char *nick, const char *modes)
-#endif
 {
 	/* I don't know why, but I spent like 3 hours trying to make this function work and 
 	   I finally got it... what a waste of time... gah, oh well... basically, it sets both the User Flags, and also the User Levels.. 
@@ -348,24 +344,21 @@ void UserMode(const char *nick, const char *modes)
 		nlog(LOG_DEBUG1, LOG_CORE, "Recbuf: %s", recbuf);
 		return;
 	}
-#ifdef ULTIMATE3
+	/* support for Smodes */
 	if (smode > 0)
 		nlog(LOG_DEBUG1, LOG_CORE, "Smodes: %s", modes);
 	else 
-#endif
 	nlog(LOG_DEBUG1, LOG_CORE, "Modes: %s", modes);
 
-#ifdef ULTIMATE3
 	if (smode == 0) 
-#endif
 		strncpy(u->modes, modes, MODESIZE);
+
 	tmpmode = *(modes);
 	while (tmpmode) {
 		switch(tmpmode) {
 			case '+'	: add = 1; break;
 			case '-'	: add = 0; break;
 			default		: 
-#ifdef ULTIMATE3
 					if (smode > 0) {
 						for (i=0; i < ((sizeof(susr_mds) / sizeof(susr_mds[0])) -1);i++) { 
 							if (susr_mds[i].mode == tmpmode) {
@@ -379,7 +372,6 @@ void UserMode(const char *nick, const char *modes)
 							}
 					 	}
 					} else {
-#endif										
 						for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 
 							if (usr_mds[i].mode == tmpmode) {
 								if (add) {
@@ -391,18 +383,14 @@ void UserMode(const char *nick, const char *modes)
 								}				
 							}
 				 		}
-#ifdef ULTIMATE3
 					}
-#endif
 		}
 	tmpmode = *modes++;
 	}
-#ifdef ULTIMATE3
 	if (smode > 0)
 		nlog(LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p", u->nick, u->Smode);
 	else 
-#endif
-	nlog(LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, u->Umode);
+		nlog(LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, u->Umode);
 
 	AddStringToList(&av, u->nick, &ac);
 	AddStringToList(&av, (char *)modes, &ac);

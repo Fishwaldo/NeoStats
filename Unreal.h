@@ -44,7 +44,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.28 2003/06/08 05:59:25 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.29 2003/06/10 13:20:59 fishwaldo Exp $
  */
 
 
@@ -419,6 +419,7 @@
 struct ircd_srv_ {
 	int uprot;
 	char cloak[10];
+	int cmdcount;
 } ircd_srv;
 
 typedef struct {
@@ -426,6 +427,7 @@ typedef struct {
 	char flag;
 	unsigned  nickparam : 1;		/* 1 = yes 0 = no */
 	unsigned  parameters : 1; 
+	char sjoin;
 } aCtab;
 
 
@@ -441,7 +443,7 @@ typedef struct {
 
 aCtab cFlagTab[33];
 Oper_Modes usr_mds[27];
-
+Oper_Modes susr_mds[0];
 
 
 
@@ -477,5 +479,43 @@ extern int ssvshost_cmd(const char *who, const char *vhost);
 extern int ssvskill_cmd(const char *target, const char *reason, ...);
 extern int sakill_cmd(const char *host, const char *ident, const char *setby, const int length, const char *reason,...);
 extern int srakill_cmd(const char *host, const char *ident);
+extern int SignOn_NewBot(const char *, const char *, const char *, const char *, long);
+
+void Usr_Version(char *, char **, int argc);
+void Usr_ShowMOTD(char *, char **, int argc);
+void Usr_ShowADMIN(char *, char **, int argc);
+void Usr_Showcredits(char *, char **, int argc);
+void Usr_AddServer(char *, char **, int argc);
+void Usr_DelServer(char *, char **, int argc);
+void Usr_DelUser(char *, char **, int argc);
+void Usr_Mode(char *, char **, int argc);
+void Usr_Smode(char *, char **, int argc);
+void Usr_Kill(char *, char **, int argc);
+void Usr_Pong(char *, char **, int argc);
+void Usr_Away(char *, char **, int argc);
+void Usr_Nick(char *, char **, int argc);
+void Usr_Topic(char *, char **, int argc);
+void Usr_Kick(char *, char **, int argc);
+void Usr_Join(char *, char **, int argc);
+void Usr_Part(char *, char **, int argc);
+void Usr_Stats(char *, char **, int argc);
+void Usr_Vhost(char *, char **, int argc);
+void Srv_Topic(char *, char **, int argc);
+void Srv_Ping(char *, char **, int argc);
+void Srv_Netinfo(char *, char **, int argc);
+void Srv_Pass(char *, char **, int argc);
+void Srv_Server(char *, char **, int argc);
+void Srv_Squit(char *, char **, int argc);
+void Srv_Nick(char *, char **, int argc);
+void Srv_Svsnick(char *, char **, int argc);
+void Srv_Kill(char *, char **, int argc);
+void Srv_Connect(char *, char **, int argc);
+void Srv_Svinfo(char *, char **, int argc);
+void Srv_Burst(char *origin, char **argv, int argc);
+void Srv_Sjoin(char *origin, char **argv, int argc);
+void Srv_Tburst(char *origin, char **argv, int argc);
+
+
+
 #endif  /* UNREAL_H Define */
 

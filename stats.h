@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.79 2003/06/09 02:52:36 shmad Exp $
+** $Id: stats.h,v 1.80 2003/06/10 13:21:00 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -211,9 +211,7 @@ struct user_ {
 	list_t *chans;
 	struct in_addr ipaddr;
 	time_t TS;
-#ifdef ULTIMATE3
 	long Smode;
-#endif
 };
 
 struct chans_ {
@@ -314,11 +312,7 @@ extern void sendcoders(char *message,...);
 extern User *finduser(const char *);
 extern void UserDump(char *);
 extern void part_u_chan(list_t *, lnode_t *, void *);
-#ifdef ULTIMATE3
 extern void UserMode(const char *, const char *, int);
-#else
-extern void UserMode(const char *, const char *);
-#endif
 extern void init_user_hash();
 extern void init_chan_hash();
 extern void AddServer(char *, char *,int);

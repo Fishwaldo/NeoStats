@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.h,v 1.19 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: Ultimate.h,v 1.20 2003/06/10 13:20:59 fishwaldo Exp $
 */
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
@@ -434,12 +434,8 @@ typedef struct {
 
 
 aCtab cFlagTab[33];
-#ifdef ULTIMATE3
 Oper_Modes usr_mds[29];
 Oper_Modes susr_mds[9];
-#else
-Oper_Modes usr_mds[27];
-#endif
 
 
 
