@@ -3,9 +3,9 @@
 Important Changes you should know: (READ THIS!)
 ==============================================================================
 HostServ: 
-	HostServ now records the Oper that added the entry. Old DB's are
-	backwards compatible and the oper entry wont be shown for users created
-	with older copies HostServ
+	HostServ now records the Oper that added the entry. 
+	Old DB's might cause segfaults, if this is the case, delete
+	your old HostServ DB's
 
 	HostServ now can have a list of "Banned" vhosts, and
 	wont let any opers add a vhost that matches the banned string.

@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.32 2003/01/29 11:48:37 fishwaldo Exp $
+# $Id: Makefile.in,v 1.33 2003/02/02 14:02:53 fishwaldo Exp $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
@@ -20,7 +20,7 @@ BUILDFILES = configure *.in adns/Makefile adns/config.h.in dl/Makefile dl/module
 DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) $(BUILDFILES) adns/*.c adns/adns.h adns/dlist.h  adns/internal.h  adns/tvarith.h
  
 distdir = @PACKAGE@-@VERSION@
-SUBDIRS = doc data adns
+SUBDIRS = doc data adns logs
 DISTMOD = cs extauth hostserv loveserv ms spam statserv version
 
 .c.o:
