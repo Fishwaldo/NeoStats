@@ -345,10 +345,6 @@ send_svstime (const char *sender, const unsigned long ts)
 {
 }
 void 
-send_swhois (const char *sender, const char *target, const char *swhois)
-{
-}
-void 
 send_smo (const char *from, const char *umodetarget, const char *msg)
 {
 }

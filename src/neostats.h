@@ -102,6 +102,7 @@
 #define FEATURE_NICKIP		0x00000200	/* NICK passes IP address */
 #define FEATURE_SMODES		0x00000400	/* Smode field */
 #define FEATURE_BOTMODES	0x00000800	/* Umodes for bots available */
+#define FEATURE_SMO			0x00001000	/* SMO */
 
 #if UNREAL == 1
 #include "protocol/unreal.h"

@@ -26,6 +26,7 @@
 #include "neostats.h"
 #include "ircd.h"
 #include "ultimate.h"
+#include "services.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
@@ -61,20 +62,19 @@ static void m_snetinfo (char *origin, char **argv, int argc, int srv);
 #endif
 static void m_vctrl (char *origin, char **argv, int argc, int srv);
 
+#ifdef ULTIMATE3
 const int ircd_minprotocol = PROTOCOL_SJOIN;
-#ifdef ULTIMATE3
 const int ircd_optprotocol = PROTOCOL_CLIENT;
-#else
-const int ircd_optprotocol = 0;
-#endif
-	;
 const int ircd_features = 0;
-#ifdef ULTIMATE3
 const char services_umode[]= "+oS";
-#else
-const char services_umode[]= "+oS";
-#endif
 const char services_cmode[]= "+a";
+#else
+const int ircd_minprotocol = PROTOCOL_SJOIN;
+const int ircd_optprotocol = 0;
+const int ircd_features = 0;
+const char services_umode[]= "+oS";
+const char services_cmode[]= "+a";
+#endif
 
 /* Ultimate 2 does support these 5 tokens so may need to add them back 
  * in at some point
@@ -299,7 +299,7 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 	send_cmd ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NICK : MSG_NICK), nick, ts, newmode, ident, host, server, ts, realname);
 #else
 	send_cmd ("%s %s 1 %lu %s %s %s 0 :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NICK : MSG_NICK), nick, ts, ident, host, server, realname);
-	sumode_cmd (nick, nick, newmode);
+	send_umode (nick, nick, newmode);
 #endif
 }
 

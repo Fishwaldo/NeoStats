@@ -30,6 +30,7 @@
 #include "modules.h"
 #include "servers.h"
 #include "services.h"
+#include "users.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif

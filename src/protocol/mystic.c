@@ -213,7 +213,7 @@ void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
 	send_cmd ("%s %s 1 %lu %s %s %s 0 :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NICK : MSG_NICK), nick, ts, ident, host, server, realname);
-	sumode_cmd (nick, nick, newmode);
+	send_umode (nick, nick, newmode);
 }
 
 void

@@ -27,8 +27,6 @@
 #include "neostats.h"
 #include "services.h"
 
-static char misc_buf[BUFSIZE];
-
 /** @brief strip newlines carriage returns
  *
  * removes newlines and carriage returns from a string
