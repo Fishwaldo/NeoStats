@@ -1,6 +1,7 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
 * NeoStats * Fish & Shmad * Version 2.5.0-Beta3
+ - Fixed HostServ not giving people their vhosts (reported by eggy whos brave enuf to run cvs) (Shmad)
  - Fixed issue in services.c where neostats wouldnt get restarted as it tried to run "stats" (Shmad)
  - Config file is now 'neostats.cfg' (Shmad)
  - Binary is now 'neostats'
