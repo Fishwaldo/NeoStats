@@ -89,7 +89,7 @@ int
 del_services_cmd_list(bot_cmd* cmd_list) 
 {
 	while(cmd_list->cmd) {
-		del_services_cmd(cmd_list->cmd);
+		del_services_cmd(cmd_list);
 		cmd_list++;
 	}
 	return NS_SUCCESS;
