@@ -444,9 +444,9 @@ m_topic (char *origin, char **argv, int argc, int srv)
 	** Both forms must be accepted.
 	** - Hwy
 	*/	
-	if (finduser(origin)) {
+	if (find_user(origin)) {
 		do_topic (argv[0], origin, NULL, argv[1]);
-	} else if (findserver(origin)) {
+	} else if (find_server(origin)) {
 		do_topic (argv[0], argv[1], argv[2], argv[3]);
 	} else {
 		nlog(LOG_WARNING, "m_topic: can't find topic setter %s for topic %s", origin, argv[1]); 

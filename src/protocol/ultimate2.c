@@ -334,7 +334,7 @@ void
 send_rakill (const char *source, const char *host, const char *ident)
 {
 	/* ultimate2 needs an oper to remove */
-	send_cmd (":%s %s :%s@%s", ns_botptr->nick, MSG_REMGLINE, host, ident);
+	send_cmd (":%s %s :%s@%s", ns_botptr->name, MSG_REMGLINE, host, ident);
 }
 
 void
