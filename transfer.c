@@ -73,9 +73,9 @@ static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, vo
 	size_t writesize;
 	int rembuffer;
 	char *newbuf;
+	neo_transfer *neotrans = (neo_transfer *)stream;
 
 	SET_SEGV_LOCATION();
-	neo_transfer *neotrans = (neo_transfer *)stream;
 	switch (neotrans->savefileormem) {
 		case NS_FILE:
 			/* we are saving to a file... :) */
