@@ -95,8 +95,8 @@ int UserAuth(User * u)
 	/* tmplvl = UmodeAuth(u); */
 	for(i = 0; i < AuthModuleCount; i ++)
 	{
-		if (AuthModList[AuthModuleCount].getauth) {
-			authlvl = AuthModList[AuthModuleCount].getauth (u, tmplvl);
+		if (AuthModList[i].getauth) {
+			authlvl = AuthModList[i].getauth (u, tmplvl);
 			/* if authlvl is greater than tmplvl, then auth is authoritive */
 			if (authlvl > tmplvl) {
 				tmplvl = authlvl;
