@@ -7,6 +7,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - early version of generic bot message handler (M)
  - log messages now have second resolution (M)
  - Unreal support split between 3.1.x and 3.2.x since they require different support now (M)
+ - Unreal updates to reflect the current versions of Unreal (M)
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.9
  - import of libpcre into core (M)
