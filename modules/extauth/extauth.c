@@ -96,7 +96,7 @@ bot_cmd extauth_commands[] =
  *  @return none
  */
 
-static int dbaccesslisthandler (void *data)
+static int dbaccesslisthandler( void *data, int size )
 {
 	AccessEntry *access;
 	

@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - DBA layer will now pass size of data fetched in FetchRows. (M)
  - Add support to ircd layer for processing ERROR messages from the uplink. (M)
  - Add optional SERVICE_HOST config entry to allow users to set a default host
    for service bots. If not specified, server name is used. (M)

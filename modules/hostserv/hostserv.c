@@ -204,7 +204,7 @@ int ExpireOldHosts( void )
 	return NS_SUCCESS;
 }
 
-int new_dbvhost( void *data )
+int new_dbvhost( void *data, int size )
 {
 	vhostentry *vhe;
 
@@ -268,7 +268,7 @@ static void SaveBan( banentry *ban )
  *  @return none
  */
 
-static int new_ban( void *data )
+static int new_ban( void *data, int size )
 {
 	banentry *ban;
 

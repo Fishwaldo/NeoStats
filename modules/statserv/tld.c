@@ -188,7 +188,7 @@ void SaveTLDStats (void)
 	}
 }
 
-int new_tld (void *data)
+int new_tld( void *data, int size )
 {
 	TLD *t;
 

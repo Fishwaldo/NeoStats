@@ -1229,7 +1229,7 @@ EXPORTFUNC int ValidateChannelKey( char *key );
 
 #define CONFIG_TABLE_NAME	"config"
 
-typedef int (*DBRowHandler) ( void *data );
+typedef int (*DBRowHandler) ( void *data, int size );
 
 /* DB API */
 EXPORTFUNC int DBAOpenDatabase( void );

@@ -375,7 +375,7 @@ void SaveChanStats( void )
  * @returns nothing
  */
 
-static int del_chan( void *data )
+static int del_chan( void *data, int size )
 {
 	channelstat *cs;
 	

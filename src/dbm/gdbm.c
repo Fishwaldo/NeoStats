@@ -109,7 +109,7 @@ int DBMGetTableRows( void *handle, DBRowHandler handler )
 		dlog( DEBUG4, "DBMGetTableRows: key %s", dbkey.dptr );
 		dbdata = gdbm_fetch( ( gdbm_file_info * )handle, dbkey );
 		/* Allow handler to exit the fetch loop */
-		if( handler( dbdata.dptr ) != NS_FALSE  )
+		if( handler( dbdata.dptr, dbdata.dsize ) != NS_FALSE  )
 		{
 			free( dbdata.dptr );
 			free( dbkey.dptr );
