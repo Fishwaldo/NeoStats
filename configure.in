@@ -10,6 +10,7 @@ libdir='${exec_prefix}dl/'
 datadir='${exec_prefix}data/'
 sysconfdir='${exec_prefix}'
 infodir='${exec_prefix}doc/'
+localstatedir='${exec_prefix}logs/'
 AM_DISABLE_STATIC 
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
@@ -236,7 +237,7 @@ AC_SUBST(IRCD_FILES_OBJS)
 AC_SUBST(MODULES)
 AC_SUBST(LIBS)
 AC_OUTPUT(dl/statserv/Makefile dl/services/Makefile dl/icq/Makefile dl/version/Makefile dl/Makefile dl/spam/Makefile dl/netinfo/Makefile Makefile dl/services/Makefile dl/loveserv/Makefile)
-AC_OUTPUT(dl/cs/Makefile dl/hostserv/Makefile dl/ms/Makefile dl/neoserv/Makefile data/Makefile doc/Makefile)
+AC_OUTPUT(dl/cs/Makefile dl/hostserv/Makefile dl/ms/Makefile dl/neoserv/Makefile data/Makefile doc/Makefile logs/Makefile)
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"
 echo "(*----------------------------------------------------------*)"

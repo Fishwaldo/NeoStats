@@ -27,7 +27,7 @@ libexecdir = ${exec_prefix}/libexec
 datadir = ${exec_prefix}data/
 sysconfdir = ${exec_prefix}
 sharedstatedir = ${prefix}/com
-localstatedir = ${prefix}/var
+localstatedir = ${exec_prefix}logs/
 libdir = ${exec_prefix}dl/
 infodir = ${exec_prefix}doc/
 mandir = ${prefix}/man
@@ -72,8 +72,8 @@ DEPDIR = .deps
 DLLTOOL = @DLLTOOL@
 ECHO = echo
 INSTALL_STRIP_PROGRAM = ${SHELL} $(install_sh) -c -s
-IRCD_FILES_OBJS = 
-IRCD_FILES_SRC = 
+IRCD_FILES_OBJS = Unreal.o
+IRCD_FILES_SRC = Unreal.c
 LIBS = -ldl 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
@@ -82,7 +82,7 @@ OBJDUMP = @OBJDUMP@
 PACKAGE = NeoStats
 RANLIB = ranlib
 STRIP = strip
-VERSION = 2.5.0
+VERSION = 2.5.0Alpha5
 am__include = include
 am__quote = 
 install_sh = /home/fish/2.5Alpha4/2.0/install-sh
@@ -113,7 +113,7 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-CFLAGS = -g -O2 -O2 -Wall
+CFLAGS = -g -O2 -O2 -Wall -ggdb
 DIST_SOURCES = $(loveserv_so_SOURCES)
 DIST_COMMON = ChangeLog Makefile.am Makefile.in TODO
 SOURCES = $(loveserv_so_SOURCES)
