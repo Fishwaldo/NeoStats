@@ -39,7 +39,7 @@
 
 COLDEF statserv_chanscols[] = {
 	{
-		"chan_stats",
+		"statserv_chans",
 		"name",
 		RTA_STR,
 		CHANLEN,
@@ -50,7 +50,7 @@ COLDEF statserv_chanscols[] = {
 		"The name of the channel"
 	},
 	{
-		"chan_stats",
+		"statserv_chans",
 		"nomems",
 		RTA_INT,
 		sizeof(int),
@@ -61,7 +61,7 @@ COLDEF statserv_chanscols[] = {
 		"The no of users in the channel"
 	},
 	{
-		"chan_stats",
+		"statserv_chans",
 		"topics",
 		RTA_INT,
 		sizeof(int),
@@ -72,7 +72,7 @@ COLDEF statserv_chanscols[] = {
 		"The no of Topic Changes"
 	},
 	{
-		"chan_stats",
+		"statserv_chans",
 		"totmem",
 		RTA_INT,
 		sizeof(int),
@@ -83,7 +83,7 @@ COLDEF statserv_chanscols[] = {
 		"The total joins ever on this channel"
 	},
 	{
-		"chan_stats",
+		"statserv_chans",
 		"kicks",
 		RTA_INT,
 		sizeof(int),
@@ -94,7 +94,7 @@ COLDEF statserv_chanscols[] = {
 		"The total number of kicks in this channel"
 	},
 	{	
-		"chan_stats",
+		"statserv_chans",
 		"topicstoday",
 		RTA_INT,
 		sizeof(int),
@@ -105,7 +105,7 @@ COLDEF statserv_chanscols[] = {
 		"The number of topic changes today"
 	},
 	{	
-		"chan_stats",
+		"statserv_chans",
 		"joinstoday",
 		RTA_INT,
 		sizeof(int),
@@ -116,7 +116,7 @@ COLDEF statserv_chanscols[] = {
 		"The number of joins today"
 	},
 	{	
-		"chan_stats",
+		"statserv_chans",
 		"kickstoday",
 		RTA_INT,
 		sizeof(int),
@@ -127,7 +127,7 @@ COLDEF statserv_chanscols[] = {
 		"The number of kicks today"
 	},
 	{	
-		"chan_stats",
+		"statserv_chans",
 		"maxmemtoday",
 		RTA_INT,
 		sizeof(int),
@@ -138,7 +138,7 @@ COLDEF statserv_chanscols[] = {
 		"The Max no of members today"
 	},
 	{	
-		"chan_stats",
+		"statserv_chans",
 		"maxmemtodaytime",
 		RTA_INT,
 		sizeof(int),
@@ -149,7 +149,7 @@ COLDEF statserv_chanscols[] = {
 		"The time of max no of members today"
 	},
 	{	
-		"chan_stats",
+		"statserv_chans",
 		"maxmem",
 		RTA_INT,
 		sizeof(int),
@@ -160,7 +160,7 @@ COLDEF statserv_chanscols[] = {
 		"The Max no of members this channel had ever."
 	},
 	{	
-		"chan_stats",
+		"statserv_chans",
 		"maxmemtime",
 		RTA_INT,
 		sizeof(int),
@@ -171,7 +171,7 @@ COLDEF statserv_chanscols[] = {
 		"The time when max no of members this channel had ever."
 	},
 	{	
-		"chan_stats",
+		"statserv_chans",
 		"maxkicks",
 		RTA_INT,
 		sizeof(int),
@@ -182,7 +182,7 @@ COLDEF statserv_chanscols[] = {
 		"The Max no of kicks a channel had in a single day."
 	},
 	{	
-		"chan_stats",
+		"statserv_chans",
 		"maxkickstime",
 		RTA_INT,
 		sizeof(int),
@@ -193,7 +193,7 @@ COLDEF statserv_chanscols[] = {
 		"The time this channel had the Max kicks"
 	},
 	{	
-		"chan_stats",
+		"statserv_chans",
 		"maxjoins",
 		RTA_INT,
 		sizeof(int),
@@ -204,7 +204,7 @@ COLDEF statserv_chanscols[] = {
 		"The Max no of joins a channel had in a day"
 	},
 	{	
-		"chan_stats",
+		"statserv_chans",
 		"maxjoinstime",
 		RTA_INT,
 		sizeof(int),
@@ -218,7 +218,7 @@ COLDEF statserv_chanscols[] = {
 };
 
 TBLDEF statserv_chans = {
-	"chan_stats",
+	"statserv_chans",
 	NULL, 	/* for now */
 	sizeof(struct chan_stats),
 	0,
@@ -445,7 +445,7 @@ TBLDEF statserv_servers = {
 
 COLDEF statserv_versionscols[] = {
 	{
-		"version_stats",
+		"statserv_versions",
 		"name",
 		RTA_STR,
 		MAX_CLIENT_VERSION_NAME,
@@ -456,7 +456,7 @@ COLDEF statserv_versionscols[] = {
 		"The client version"
 	},
 	{
-		"version_stats",
+		"statserv_versions",
 		"count",
 		RTA_INT,
 		sizeof(int),
@@ -482,7 +482,7 @@ TBLDEF statserv_versions = {
 
 COLDEF statserv_networkcols[] = {
 	{
-		"network_stats",
+		"statserv_network",
 		"opers",
 		RTA_INT,
 		sizeof(int),
@@ -493,7 +493,7 @@ COLDEF statserv_networkcols[] = {
 		"The no of opers on the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"chans",
 		RTA_INT,
 		sizeof(int),
@@ -504,7 +504,7 @@ COLDEF statserv_networkcols[] = {
 		"The no of channels on the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"maxopers",
 		RTA_INT,
 		sizeof(int),
@@ -515,7 +515,7 @@ COLDEF statserv_networkcols[] = {
 		"The max no of opers on the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"maxoperstime",
 		RTA_INT,
 		sizeof(int),
@@ -526,7 +526,7 @@ COLDEF statserv_networkcols[] = {
 		"The time of max no of opers on the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"users",
 		RTA_INT,
 		sizeof(int),
@@ -537,7 +537,7 @@ COLDEF statserv_networkcols[] = {
 		"The max no of users on the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"totusers",
 		RTA_INT,
 		sizeof(int),
@@ -548,7 +548,7 @@ COLDEF statserv_networkcols[] = {
 		"The no of users ever connected to the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"maxusers",
 		RTA_INT,
 		sizeof(int),
@@ -559,7 +559,7 @@ COLDEF statserv_networkcols[] = {
 		"The max no of users connected to the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"maxuserstime",
 		RTA_INT,
 		sizeof(int),
@@ -570,7 +570,7 @@ COLDEF statserv_networkcols[] = {
 		"The time of max no of users connected to the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"away",
 		RTA_INT,
 		sizeof(int),
@@ -581,7 +581,7 @@ COLDEF statserv_networkcols[] = {
 		"The no of users marked away"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"servers",
 		RTA_INT,
 		sizeof(int),
@@ -592,7 +592,7 @@ COLDEF statserv_networkcols[] = {
 		"The no of servers connected to the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"maxservers",
 		RTA_INT,
 		sizeof(int),
@@ -603,7 +603,7 @@ COLDEF statserv_networkcols[] = {
 		"The Max no of servers ever connected to the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"maxserverstime",
 		RTA_INT,
 		sizeof(int),
@@ -614,7 +614,7 @@ COLDEF statserv_networkcols[] = {
 		"The time of Max no of servers ever connected to the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"maxchans",
 		RTA_INT,
 		sizeof(int),
@@ -625,7 +625,7 @@ COLDEF statserv_networkcols[] = {
 		"The Max no of channels ever on the network"
 	},
 	{
-		"network_stats",
+		"statserv_network",
 		"maxchanstime",
 		RTA_INT,
 		sizeof(int),
@@ -654,7 +654,7 @@ list_t *fakenetwork;
 
 COLDEF statserv_dailycols[] = {
 	{
-		"daily_stats",
+		"statserv_daily",
 		"servers",
 		RTA_INT,
 		sizeof(int),
@@ -665,7 +665,7 @@ COLDEF statserv_dailycols[] = {
 		"The Max no of servers connected today"
 	},
 	{
-		"daily_stats",
+		"statserv_daily",
 		"serverstime",
 		RTA_INT,
 		sizeof(int),
@@ -676,7 +676,7 @@ COLDEF statserv_dailycols[] = {
 		"The time of the Max no of servers today"
 	},
 	{
-		"daily_stats",
+		"statserv_daily",
 		"maxusers",
 		RTA_INT,
 		sizeof(int),
@@ -687,7 +687,7 @@ COLDEF statserv_dailycols[] = {
 		"The max no of users on the network today"
 	},
 	{
-		"daily_stats",
+		"statserv_daily",
 		"maxuserstime",
 		RTA_INT,
 		sizeof(int),
@@ -698,7 +698,7 @@ COLDEF statserv_dailycols[] = {
 		"The time of max no of users today"
 	},
 	{
-		"daily_stats",
+		"statserv_daily",
 		"maxopers",
 		RTA_INT,
 		sizeof(int),
@@ -709,7 +709,7 @@ COLDEF statserv_dailycols[] = {
 		"The max no of opers on the network today"
 	},
 	{
-		"daily_stats",
+		"statserv_daily",
 		"maxoperstime",
 		RTA_INT,
 		sizeof(int),
@@ -720,7 +720,7 @@ COLDEF statserv_dailycols[] = {
 		"The no of opers connected to the network today"
 	},
 	{
-		"daily_stats",
+		"statserv_daily",
 		"totalusers",
 		RTA_INT,
 		sizeof(int),
@@ -731,7 +731,7 @@ COLDEF statserv_dailycols[] = {
 		"The no of users connected to the network today"
 	},
 	{
-		"daily_stats",
+		"statserv_daily",
 		"maxchans",
 		RTA_INT,
 		sizeof(int),
@@ -742,7 +742,7 @@ COLDEF statserv_dailycols[] = {
 		"The max no of channels on the network today"
 	},
 	{
-		"daily_stats",
+		"statserv_daily",
 		"maxchanstime",
 		RTA_INT,
 		sizeof(int),

@@ -49,6 +49,7 @@ new_user (const char *nick)
 
 	SET_SEGV_LOCATION();
 	u = smalloc (sizeof (User));
+	bzero(u, sizeof(User));
 	if (!nick)
 		strsetnull (u->nick);
 	else
@@ -80,6 +81,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 
 	u = new_user (nick);
 	strlcpy (u->hostname, host, MAXHOST);
+	strlcpy (u->vhost, host, MAXHOST);
 	strlcpy (u->username, user, MAXUSER);
 	strlcpy (u->realname, realname, MAXREALNAME);
 	u->server = findserver (server);
@@ -456,7 +458,7 @@ UserDump (const char *nick)
 		hash_scan_begin (&us, uh);
 		while ((un = hash_scan_next (&us)) != NULL) {
 			u = hnode_get (un);
-			debugtochannel("User: %s", u->nick);
+			debugtochannel("User: %s!%s@%s (%s)", u->nick, u->username, u->hostname, u->vhost);
 			cm = list_first (u->chans);
 			while (cm) {
 				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
@@ -467,7 +469,7 @@ UserDump (const char *nick)
 		un = hash_lookup (uh, nick);
 		if (un) {
 			u = hnode_get (un);
-			debugtochannel("User: %s", u->nick);
+			debugtochannel("User: %s!%s@%s (%s)", u->nick, u->username, u->hostname, u->vhost);
 			cm = list_first (u->chans);
 			while (cm) {
 				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
