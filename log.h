@@ -90,7 +90,7 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 #define nassert(expr) (__ASSERT_VOID_CAST (0))
 #endif
 
-extern void nlog (int level, int scope, char *fmt, ...);
+extern void nlog (int level, int scope, char *fmt, ...) __attribute__((format(printf,3,4))); /* 2=format 3=params */
 void close_logs ();
 int init_logs ();
 void reset_logs ();

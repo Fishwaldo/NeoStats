@@ -486,7 +486,7 @@ Oper_Modes susr_mds[9];
 
 /* function declarations */
 extern void init_ircd ();
-extern void chanalert (char *, char *, ...);
+extern void chanalert (char * who, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 extern int sserver_cmd (const char *, const int numeric, const char *);
 extern int slogin_cmd (const char *, const int numeric, const char *, const char *);
 extern int ssquit_cmd (const char *);

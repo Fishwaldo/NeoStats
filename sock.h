@@ -29,6 +29,6 @@
 int ConnectTo (char * host, int port);
 void read_loop (void);
 int getmaxsock (void);
-void sts (char *fmt, ...);
+void sts (char *fmt, ...) __attribute__((format(printf,1,2))); /* 2=format 3=params */
 
 #endif
