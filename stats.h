@@ -136,10 +136,8 @@ struct me {
 /* fc is the count of that array */
 
 struct EvntMsg_ {
-	union {
-		Server *s;
-		User *u;
-	};
+	Server *s;
+	User *u;
 	char *origin;
 	int  isserv;
 	char *cmd;

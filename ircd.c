@@ -249,10 +249,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
 	schmode_cmd(nick, me.chan, "+oa", cmd);
-	EM = malloc(sizeof(EvntMsg));
-	EM->fndata[0] = finduser(nick);
-	EM->fc = 1;
-	Module_Event("SIGNON", EM);
+//	Module_Event("SIGNON", EM);
 	return 1;
 }
 
@@ -269,10 +266,7 @@ int del_bot(char *nick, char *reason)
 		log("Attempting to Logoff with a Nickname that does not Exists: %s",nick);
 		return -1;
 	}
-	EM = malloc(sizeof(EvntMsg));
-	EM->fndata[0] = finduser(nick);
-	EM->fc = 1;
-	Module_Event("SIGNOFF", EM);
+//	Module_Event("SIGNOFF", EM);
 	squit_cmd(nick, reason);
 	del_mod_user(nick);
 	return 1;
@@ -399,9 +393,11 @@ void parse(char *line)
 	if (EM->cmdptr == 1) {
 		if (findserver(EM->origin)) {
 			EM->s = findserver(EM->origin);
+			EM->u = NULL;
 			EM->isserv = 1;
 		} else if (finduser(EM->origin)) {
 			EM->u = finduser(EM->origin);
+			EM->s = NULL;
 			EM->u->ulevel = _UserLevel(EM->u);
 			EM->isserv = 0;
 		} else if (me.onchan) {
@@ -504,12 +500,12 @@ void parse(char *line)
 	parend:
 	FreeList(EM->av, EM->ac);
 /* its upto the calling function of EM->fndata to free it, as we don't know if we are allowed to free some function data */
-	for (I = 0; I< EM->fc; I++) {
-		if (EM->canfree[I] == 1) {
-			free(EM->fndata[I]);
-			EM->canfree[I] = 0;
-		}
-	}
+//	for (I = 0; I< EM->fc; I++) {
+//		if (EM->canfree[I] == 1) {
+//			free(EM->fndata[I]);
+//			EM->canfree[I] = 0;
+//		}
+//	}
 	EM->fc = 0;
 	free(EM);
 }
@@ -549,10 +545,7 @@ void init_ServBot()
 	sprintf(rname, "%s %s", s_Services, s_Services);
 	schmode_cmd(s_Services, me.chan, "+oa", rname);
 	me.onchan = 1;
-	EM = malloc(sizeof(EvntMsg));
-	EM->fndata[0] = finduser(s_Services);
-	EM->fc = 1;
-	Module_Event("SIGNON", EM);
+//	Module_Event("SIGNON", EM);
 }
 
 #ifdef ULTIMATE3
@@ -856,11 +849,11 @@ void Usr_Join(EvntMsg *EM) {
                 if (*t)
                 	*t++ = 0;
 		join_chan(EM->u, s);
-		EM->fndata[0] = malloc(strlen(s));
-		strncpy(EM->fndata[0], s, strlen(s));
-		EM->fc = 1;
+//		EM->fndata[0] = malloc(strlen(s));
+//		strncpy(EM->fndata[0], s, strlen(s));
+//		EM->fc = 1;
 		Module_Event("JOINCHAN", EM);
-		free(EM->fndata[0]);
+//		free(EM->fndata[0]);
 	}
 }
 void Usr_Part(EvntMsg *EM) {
