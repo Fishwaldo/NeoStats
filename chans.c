@@ -143,7 +143,7 @@ CheckChanMode (Chans * c, long mode)
 
 /** @brief Compare channel modes from the channel hash
  *
- * used in ChanMode to compare modes (list_find argument)
+ * used in ChanModes to compare modes (list_find argument)
  *
  * @param v actually its a ModeParm struct
  * @param mode is the mode as a long
@@ -198,32 +198,32 @@ ChanMode (char *origin, char **av, int ac)
 			add = 0;
 			break;
 		default:
-			for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
+			for (i = 0; i < ircd_cmodecount; i++) {
 
-				if (*modes == cFlagTab[i].flag) {
+				if (*modes == chan_modes[i].flag) {
 					if (add) {
-						if (cFlagTab[i].nickparam) {
-							ChangeChanUserMode (c, finduser (av[j]), 1, cFlagTab[i].mode);
+						if (chan_modes[i].nickparam) {
+							ChangeChanUserMode (c, finduser (av[j]), 1, chan_modes[i].mode);
 							j++;
 						} else {
-							if (cFlagTab[i].parameters) {
+							if (chan_modes[i].parameters) {
 								mn = list_first (c->modeparms);
 								modeexists = 0;
 								while (mn) {
 									m = lnode_get (mn);
 									/* mode limit and mode key replace current values */
-									if ((m->mode == MODE_LIMIT) && (cFlagTab[i].mode == MODE_LIMIT)) {
+									if ((m->mode == MODE_LIMIT) && (chan_modes[i].mode == MODE_LIMIT)) {
 										strlcpy (m->param, av[j], PARAMSIZE);
 										j++;
 										modeexists = 1;
 										break;
-									} else if ((m->mode == MODE_KEY) && (cFlagTab[i].mode == MODE_KEY)) {
+									} else if ((m->mode == MODE_KEY) && (chan_modes[i].mode == MODE_KEY)) {
 										strlcpy (m->param, av[j], PARAMSIZE);
 										j++;
 										modeexists = 1;
 										break;
-									} else if (((int *) m->mode == (int *) cFlagTab[i].mode) && !strcasecmp (m->param, av[j])) {
-										nlog (LOG_INFO, LOG_CORE, "Mode %c (%s) already exists, not adding again", cFlagTab[i].flag, av[j]);
+									} else if (((int *) m->mode == (int *) chan_modes[i].mode) && !strcasecmp (m->param, av[j])) {
+										nlog (LOG_INFO, LOG_CORE, "Mode %c (%s) already exists, not adding again", chan_modes[i].flag, av[j]);
 										j++;
 										modeexists = 1;
 										break;
@@ -232,7 +232,7 @@ ChanMode (char *origin, char **av, int ac)
 								}
 								if (modeexists != 1) {
 									m = smalloc (sizeof (ModesParm));
-									m->mode = cFlagTab[i].mode;
+									m->mode = chan_modes[i].mode;
 									strlcpy (m->param, av[j], PARAMSIZE);
 									mn = lnode_create (m);
 									if (list_isfull (c->modeparms)) {
@@ -244,16 +244,16 @@ ChanMode (char *origin, char **av, int ac)
 									j++;
 								}
 							} else {
-								c->modes |= cFlagTab[i].mode;
+								c->modes |= chan_modes[i].mode;
 							}
 						}
 					} else {
-						if (cFlagTab[i].nickparam) {
-							ChangeChanUserMode (c, finduser (av[j]), 0, cFlagTab[i].mode);
+						if (chan_modes[i].nickparam) {
+							ChangeChanUserMode (c, finduser (av[j]), 0, chan_modes[i].mode);
 							j++;
 						} else {
-							if (cFlagTab[i].parameters) {
-								mn = list_find (c->modeparms, (int *) cFlagTab[i].mode, comparemode);
+							if (chan_modes[i].parameters) {
+								mn = list_find (c->modeparms, (int *) chan_modes[i].mode, comparemode);
 								if (!mn) {
 									nlog (LOG_INFO, LOG_CORE, "Can't find Mode %c for Chan %s", *modes, c->name);
 								} else {
@@ -262,11 +262,11 @@ ChanMode (char *origin, char **av, int ac)
 									lnode_destroy (mn);
 									free (m);
 
-									if (!(cFlagTab[i].mode == MODE_LIMIT || cFlagTab[i].mode == MODE_KEY))
+									if (!(chan_modes[i].mode == MODE_LIMIT || chan_modes[i].mode == MODE_KEY))
 										j++;
 								}
 							} else {
-								c->modes &= ~cFlagTab[i].mode;
+								c->modes &= ~chan_modes[i].mode;
 							}
 						}
 					}
@@ -726,9 +726,9 @@ ChanDump (char *chan)
 			debugtochannel("====================");
 			bzero (mode, 10);
 			mode[0] = '+';
-			for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-				if (c->modes & cFlagTab[i].mode) {
-					mode[++j] = cFlagTab[i].flag;
+			for (i = 0; i < ircd_cmodecount; i++) {
+				if (c->modes & chan_modes[i].mode) {
+					mode[++j] = chan_modes[i].flag;
 				}
 			}
 			debugtochannel("Channel: %s Members: %ld (List %d) Flags %s tstime %ld", c->name, c->cur_users, (int)list_count (c->chanmembers), mode, (long)c->tstime);
@@ -737,9 +737,9 @@ ChanDump (char *chan)
 			cmn = list_first (c->modeparms);
 			while (cmn) {
 				m = lnode_get (cmn);
-				for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-					if (m->mode & cFlagTab[i].mode) {
-						debugtochannel("        Modes: %c Parms %s", cFlagTab[i].flag, m->param);
+				for (i = 0; i < ircd_cmodecount; i++) {
+					if (m->mode & chan_modes[i].mode) {
+						debugtochannel("        Modes: %c Parms %s", chan_modes[i].flag, m->param);
 					}
 				}
 
@@ -751,9 +751,9 @@ ChanDump (char *chan)
 				bzero (mode, 10);
 				j = 0;
 				mode[0] = '+';
-				for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-					if (cm->flags & cFlagTab[i].mode) {
-						mode[++j] = cFlagTab[i].flag;
+				for (i = 0; i < ircd_cmodecount; i++) {
+					if (cm->flags & chan_modes[i].mode) {
+						mode[++j] = chan_modes[i].flag;
 					}
 				}
 				debugtochannel("Members: %s Modes %s Joined %ld", cm->nick, mode, (long)cm->joint);
@@ -768,9 +768,9 @@ ChanDump (char *chan)
 			bzero (mode, 10);
 			j = 0;
 			mode[0] = '+';
-			for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-				if (c->modes & cFlagTab[i].mode) {
-					mode[++j] = cFlagTab[i].flag;
+			for (i = 0; i < ircd_cmodecount; i++) {
+				if (c->modes & chan_modes[i].mode) {
+					mode[++j] = chan_modes[i].flag;
 				}
 			}
 			debugtochannel("Channel: %s Members: %ld (List %d) Flags %s tstime %ld", c->name, c->cur_users, (int)list_count (c->chanmembers), mode, (long)c->tstime);
@@ -779,9 +779,9 @@ ChanDump (char *chan)
 			cmn = list_first (c->modeparms);
 			while (cmn) {
 				m = lnode_get (cmn);
-				for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-					if (m->mode & cFlagTab[i].mode) {
-						debugtochannel("        Modes: %c Parms %s", cFlagTab[i].flag, m->param);
+				for (i = 0; i < ircd_cmodecount; i++) {
+					if (m->mode & chan_modes[i].mode) {
+						debugtochannel("        Modes: %c Parms %s", chan_modes[i].flag, m->param);
 					}
 				}
 				cmn = list_next (c->modeparms, cmn);
@@ -792,9 +792,9 @@ ChanDump (char *chan)
 				bzero (mode, 10);
 				mode[0] = '+';
 				j = 0;
-				for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-					if (cm->flags & cFlagTab[i].mode) {
-						mode[++j] = cFlagTab[i].flag;
+				for (i = 0; i < ircd_cmodecount; i++) {
+					if (cm->flags & chan_modes[i].mode) {
+						mode[++j] = chan_modes[i].flag;
 					}
 				}
 				debugtochannel("Members: %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->joint);
@@ -862,8 +862,9 @@ IsChanMember(Chans *c, User *u)
 /* BUFSIZE is probably too small.. oh well */
 static char chanmodes[BUFSIZE];
 
-void *display_chanmodes (void *tbl, char *col, char *sql, void *row) {
-        Chans *c = row;
+void *display_chanmodes (void *tbl, char *col, char *sql, void *row) 
+{
+	Chans *c = row;
 	lnode_t *cmn;
 	char tmp[BUFSIZE];
 	int i;
@@ -871,9 +872,9 @@ void *display_chanmodes (void *tbl, char *col, char *sql, void *row) {
 	ModesParm *m;
 	
 	chanmodes[0] = '+';
-	for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-		if (c->modes & cFlagTab[i].mode) {
-			chanmodes[j++] = cFlagTab[i].flag;
+	for (i = 0; i < ircd_cmodecount; i++) {
+		if (c->modes & chan_modes[i].mode) {
+			chanmodes[j++] = chan_modes[i].flag;
 		}
 	}
 	chanmodes[j++] = '\0';
@@ -881,9 +882,9 @@ void *display_chanmodes (void *tbl, char *col, char *sql, void *row) {
 	cmn = list_first (c->modeparms);
 	while (cmn) {
 		m = lnode_get (cmn);
-		for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-			if (m->mode & cFlagTab[i].mode) {
-				ircsnprintf(tmp, BUFSIZE, "+%c %s", cFlagTab[i].flag, m->param);
+		for (i = 0; i < ircd_cmodecount; i++) {
+			if (m->mode & chan_modes[i].mode) {
+				ircsnprintf(tmp, BUFSIZE, "+%c %s", chan_modes[i].flag, m->param);
 				strlcat(chanmodes, tmp, BUFSIZE);
 			}
 		}
@@ -912,12 +913,12 @@ void *display_chanusers (void *tbl, char *col, char *sql, void *row) {
 		j = 0;
 		k = 1;
 		mode[0] = '+';
-		for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-			if (cm->flags & cFlagTab[i].mode) {
-				if (cFlagTab[i].sjoin != 0) 
-					sjoin[j++] = cFlagTab[i].sjoin;
+		for (i = 0; i < ircd_cmodecount; i++) {
+			if (cm->flags & chan_modes[i].mode) {
+				if (chan_modes[i].sjoin != 0) 
+					sjoin[j++] = chan_modes[i].sjoin;
 				else 
-					mode[k++] = cFlagTab[i].flag;
+					mode[k++] = chan_modes[i].flag;
 			}
 		}
 		mode[k++] = '\0';

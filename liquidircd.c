@@ -69,186 +69,99 @@ static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(L)";
 const char services_bot_modes[]= "+oS";
-static long services_bot_umode= 0;
+long services_bot_umode= 0;
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
-	{MSG_STATS, Usr_Stats, 1, 0}
-	,
-        {MSG_SETHOST, Usr_Vhost, 1, 0}
-        ,
-	{MSG_VERSION, Usr_Version, 1, 0}
-	,
-	{MSG_MOTD, Usr_MOTD, 1, 0}
-	,
-	{MSG_ADMIN, Usr_Admin, 1, 0}
-	,
-	{MSG_CREDITS, Usr_Credits, 1, 0}
-	,
-	{MSG_SERVER, Usr_Server, 1, 0}
-	,
-	{MSG_SQUIT, Usr_Squit, 1, 0}
-	,
-	{MSG_QUIT, Usr_Quit, 1, 0}
-	,
-	{MSG_MODE, Usr_Mode, 1, 0}
-	,
-	{MSG_SVSMODE, Usr_Smode, 1, 0}
-	,
-	{MSG_KILL, Usr_Kill, 1, 0}
-	,
-	{MSG_PONG, Usr_Pong, 1, 0}
-	,
-	{MSG_AWAY, Usr_Away, 1, 0}
-	,
-	{MSG_NICK, Usr_Nick, 1, 0}
-	,
-	{MSG_TOPIC, Usr_Topic, 1, 0}
-	,
-	{MSG_KICK, Usr_Kick, 1, 0}
-	,
-	{MSG_JOIN, Usr_Join, 1, 0}
-	,
-	{MSG_PART, Usr_Part, 1, 0}
-	,
-	{MSG_PING, Srv_Ping, 0, 0}
-	,
-	{MSG_SVINFO, Srv_Svinfo, 0, 0}
-	,
-	{MSG_CAPAB, Srv_Connect, 0, 0}
-	,
-	{MSG_BURST, Srv_Burst, 0, 0}
-	,
-	{MSG_SJOIN, Srv_Sjoin, 1, 0}
-	,
-	{MSG_PASS, Srv_Pass, 0, 0}
-	,
-	{MSG_SERVER, Srv_Server, 0, 0}
-	,
-	{MSG_SQUIT, Srv_Squit, 0, 0}
-	,
-	{MSG_NICK, Srv_Nick, 0, 0}
-	,
-	{MSG_SVSNICK, Srv_Svsnick, 0, 0}
-	,
-	{MSG_KILL, Srv_Kill, 0, 0}
-	,
-	{NULL, NULL, 0, 0}
+	{MSG_STATS, Usr_Stats, 1, 0},
+	{MSG_SETHOST, Usr_Vhost, 1, 0},
+	{MSG_VERSION, Usr_Version, 1, 0},
+	{MSG_MOTD, Usr_MOTD, 1, 0},
+	{MSG_ADMIN, Usr_Admin, 1, 0},
+	{MSG_CREDITS, Usr_Credits, 1, 0},
+	{MSG_SERVER, Usr_Server, 1, 0},
+	{MSG_SQUIT, Usr_Squit, 1, 0},
+	{MSG_QUIT, Usr_Quit, 1, 0},
+	{MSG_MODE, Usr_Mode, 1, 0},
+	{MSG_SVSMODE, Usr_Smode, 1, 0},
+	{MSG_KILL, Usr_Kill, 1, 0},
+	{MSG_PONG, Usr_Pong, 1, 0},
+	{MSG_AWAY, Usr_Away, 1, 0},
+	{MSG_NICK, Usr_Nick, 1, 0},
+	{MSG_TOPIC, Usr_Topic, 1, 0},
+	{MSG_KICK, Usr_Kick, 1, 0},
+	{MSG_JOIN, Usr_Join, 1, 0},
+	{MSG_PART, Usr_Part, 1, 0},
+	{MSG_PING, Srv_Ping, 0, 0},
+	{MSG_SVINFO, Srv_Svinfo, 0, 0},
+	{MSG_CAPAB, Srv_Connect, 0, 0},
+	{MSG_BURST, Srv_Burst, 0, 0},
+	{MSG_SJOIN, Srv_Sjoin, 1, 0},
+	{MSG_PASS, Srv_Pass, 0, 0},
+	{MSG_SERVER, Srv_Server, 0, 0},
+	{MSG_SQUIT, Srv_Squit, 0, 0},
+	{MSG_NICK, Srv_Nick, 0, 0},
+	{MSG_SVSNICK, Srv_Svsnick, 0, 0},
+	{MSG_KILL, Srv_Kill, 0, 0},
 };
 
-
-
-
-aCtab cFlagTab[] = {
-        {MODE_CHANOWNER, 'q', 1, 0, '!'}
-        ,
-        {MODE_CHANPROT, 'a', 1, 0, '*'}
-        ,
-        {MODE_CHANOP, 'o', 1, 0, '@'}
-        ,
-	{MODE_VIP, 'V', 1, 0, '='}
-	,
-        {MODE_HALFOP, 'h', 1, 0, '%'}
-        ,
-	{MODE_VOICE, 'v', 1, 0, '+'}
-	,
-        {MODE_UOP, 'u', 1, 0, '-'}
-        ,
-	{MODE_BAN, 'b', 0, 1, 0}
-	,
-        {MODE_NOCOLOR, 'c', 0, 0, 0}
-        ,
-	{MODE_INVITEONLY, 'i', 0, 0, 0}
-	,
-	{MODE_KEY, 'k', 0, 1, 0}
-	,
-	{MODE_LIMIT, 'l', 0, 1, 0}
-	,
-        {MODE_LINK, 'L', 0, 1, 0}
-        ,
-	{MODE_MODERATED, 'm', 0, 0, 0}
-	,
-	{MODE_NOPRIVMSGS, 'n', 0, 0, 0}
-	,
-        {MODE_NONICKCHANGE, 'N', 0, 0, 0}
-        ,
-	{MODE_PRIVATE, 'p', 0, 0, 0}
-	,
-	{MODE_RGSTR, 'r', 0, 0, 0}
-	,
-        {MODE_RGSTRONLY, 'R', 0, 0, 0}
-        ,
-	{MODE_SECRET, 's', 0, 0, 0}
-	,
-        {MODE_STRIP, 'S', 0, 0, 0}
-        ,
-	{MODE_TOPICLIMIT, 't', 0, 0, 0}
-	,
-	{MODE_OPERONLY, 'O', 0, 0, 0}
-	,
-	/* XXX todo, Mode COLOR */
-	{0x0, 0x0, 0x0, 0x0, 0x0}
+ChanModes chan_modes[] = {
+	{MODE_CHANOWNER, 'q', 1, 0, '!'},
+	{MODE_CHANPROT, 'a', 1, 0, '*'},
+	{MODE_CHANOP, 'o', 1, 0, '@'},
+	{MODE_VIP, 'V', 1, 0, '='},
+	{MODE_HALFOP, 'h', 1, 0, '%'},
+	{MODE_VOICE, 'v', 1, 0, '+'},
+	{MODE_UOP, 'u', 1, 0, '-'},
+	{MODE_BAN, 'b', 0, 1, 0},
+	{MODE_NOCOLOR, 'c', 0, 0, 0},
+	{MODE_INVITEONLY, 'i', 0, 0, 0},
+	{MODE_KEY, 'k', 0, 1, 0},
+	{MODE_LIMIT, 'l', 0, 1, 0},
+	{MODE_LINK, 'L', 0, 1, 0},
+	{MODE_MODERATED, 'm', 0, 0, 0},
+	{MODE_NOPRIVMSGS, 'n', 0, 0, 0},
+	{MODE_NONICKCHANGE, 'N', 0, 0, 0},
+	{MODE_PRIVATE, 'p', 0, 0, 0},
+	{MODE_RGSTR, 'r', 0, 0, 0},
+	{MODE_RGSTRONLY, 'R', 0, 0, 0},
+	{MODE_SECRET, 's', 0, 0, 0},
+	{MODE_STRIP, 'S', 0, 0, 0},
+	{MODE_TOPICLIMIT, 't', 0, 0, 0},
+	{MODE_OPERONLY, 'O', 0, 0, 0},
 };
 
-
-Oper_Modes usr_mds[] = {
-	{UMODE_OPER, 'o', 50}
-	,
-        {UMODE_LOCOP, 'O', NS_ULEVEL_OPER}
-        ,
-	{UMODE_INVISIBLE, 'i', 0}
-	,
-        {UMODE_WALLOP, 'w', 0}
-        ,
-        {UMODE_FAILOP, 'g', 0}
-        ,
-        {UMODE_HELPOP, 'h', 30}
-        ,
-	{UMODE_REGNICK, 'r', 10}
-	,
-	{UMODE_SERVNOTICE, 's', 0}
-        ,
-        {UMODE_KILLS, 'k', 0}
-        ,
-        {UMODE_CLIENT, 'c', 0}
-        ,
-        {UMODE_FLOOD, 'f', 0}
-        ,
-	{UMODE_SERVICESADMIN, 'a', NS_ULEVEL_ROOT}
-	,
-	{UMODE_SERVADMIN, 'A', 100}
-	,
-        {UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN}
-        ,
-        {UMODE_TECHADMIN, 'T', 190}
-        ,
-	{UMODE_REGONLY, 'R', 0}
-	,
-        {UMODE_KIX, 'q', 0}
-        ,
-        {UMODE_BOT, 'B', 0}
-        ,
-        {UMODE_HIDE, 'z', 0}
-        ,
-        {UMODE_WHOIS, 'W', 0}
-        ,
-	{0, 0, 0}
-};
-Oper_Modes susr_mds[] = {
-        {SMODE_SSL, 's', 0}
-        ,
-        {0, 0, 0}
+UserModes user_umodes[] = {
+	{UMODE_OPER, 'o', 50},
+	{UMODE_LOCOP, 'O', NS_ULEVEL_OPER},
+	{UMODE_SERVICESADMIN, 'a', NS_ULEVEL_ROOT},
+	{UMODE_TECHADMIN, 'T', 190},
+	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN},
+	{UMODE_SERVADMIN, 'A', 100},
+	{UMODE_INVISIBLE, 'i', 0},
+	{UMODE_WALLOP, 'w', 0},
+	{UMODE_FAILOP, 'g', 0},
+	{UMODE_HELPOP, 'h', 0},
+	{UMODE_REGNICK, 'r', 0},
+	{UMODE_SERVNOTICE, 's', 0},
+	{UMODE_KILLS, 'k', 0},
+	{UMODE_CLIENT, 'c', 0},
+	{UMODE_FLOOD, 'f', 0},
+	{UMODE_REGONLY, 'R', 0},
+	{UMODE_KIX, 'q', 0},
+	{UMODE_BOT, 'B', 0},
+	{UMODE_HIDE, 'z', 0},
+	{UMODE_WHOIS, 'W', 0},
 };
 
-void
-init_ircd ()
-{
-	/* count the number of commands */
-	ircd_srv.cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])) - 1);
-	ircd_srv.umodecount = ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1);
-	ircd_srv.usmodecount = ((sizeof (susr_mds) / sizeof (susr_mds[0])) - 1);
-	services_bot_umode = UmodeStringToMask(services_bot_modes);
+UserModes user_smodes[] = {
+	{SMODE_SSL, 's', 0},
 };
+
+const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
+const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
+const int ircd_smodecount = ((sizeof (user_smodes) / sizeof (user_smodes[0])));
+const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 int
 sserver_cmd (const char *name, const int numeric, const char *infoline)
@@ -604,11 +517,11 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 		goto nomodes;
 	}
 	while (*modes) {
-		for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-			if (*modes == cFlagTab[i].flag) {
-				if (cFlagTab[i].parameters) {
+		for (i = 0; i < ircd_cmodecount; i++) {
+			if (*modes == chan_modes[i].flag) {
+				if (chan_modes[i].parameters) {
 					m = smalloc (sizeof (ModesParm));
-					m->mode = cFlagTab[i].mode;
+					m->mode = chan_modes[i].mode;
 					strlcpy (m->param, argv[j], PARAMSIZE);
 					mn = lnode_create (m);
 					if (!list_isfull (tl)) {
@@ -619,7 +532,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 					}
 					j++;
 				} else {
-					mode1 |= cFlagTab[i].mode;
+					mode1 |= chan_modes[i].mode;
 				}
 			}
 		}
@@ -630,10 +543,10 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 		modes = argv[j];
 		mode = 0;
 		while (ok == 1) {
-			for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-				if (cFlagTab[i].sjoin != 0) {
-					if (*modes == cFlagTab[i].sjoin) {
-						mode |= cFlagTab[i].mode;
+			for (i = 0; i < ircd_cmodecount; i++) {
+				if (chan_modes[i].sjoin != 0) {
+					if (*modes == chan_modes[i].sjoin) {
+						mode |= chan_modes[i].mode;
 						modes++;
 						i = -1;
 					}

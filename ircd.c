@@ -37,6 +37,18 @@ static char UmodeStringBuf[64];
 static char SmodeStringBuf[64];
 #endif
 
+/** @brief init_ircd
+ *
+ *  ircd initialisation
+ *
+ * @return 
+ */
+void
+init_ircd ()
+{
+	services_bot_umode = UmodeStringToMask(services_bot_modes);
+};
+
 /** @brief UmodeMaskToString
  *
  *  Translate a mode mask to the string equivalent
@@ -44,15 +56,15 @@ static char SmodeStringBuf[64];
  * @return 
  */
 char* 
-UmodeMaskToString(long Umode) 
+UmodeMaskToString(const long Umode) 
 {
 	int i, j;
 
 	UmodeStringBuf[0] = '+';
 	j = 1;
-	for (i = 0; i < ircd_srv.umodecount; i++) {
-		if (Umode & usr_mds[i].umodes) {
-			UmodeStringBuf[j] = usr_mds[i].mode;
+	for (i = 0; i < ircd_umodecount; i++) {
+		if (Umode & user_umodes[i].umode) {
+			UmodeStringBuf[j] = user_umodes[i].mode;
 			j++;
 		}
 	}
@@ -67,7 +79,7 @@ UmodeMaskToString(long Umode)
  * @return 
  */
 long
-UmodeStringToMask(char* UmodeString)
+UmodeStringToMask(const char* UmodeString)
 {
 	int i;
 	int add = 0;
@@ -85,13 +97,13 @@ UmodeStringToMask(char* UmodeString)
 			add = 0;
 			break;
 		default:
-			for (i = 0; i < ircd_srv.umodecount; i++) {
-				if (usr_mds[i].mode == tmpmode) {
+			for (i = 0; i < ircd_umodecount; i++) {
+				if (user_umodes[i].mode == tmpmode) {
 					if (add) {
-						Umode |= usr_mds[i].umodes;
+						Umode |= user_umodes[i].umode;
 						break;
 					} else {
-						Umode &= ~usr_mds[i].umodes;
+						Umode &= ~user_umodes[i].umode;
 						break;
 					}
 				}
@@ -110,15 +122,15 @@ UmodeStringToMask(char* UmodeString)
  * @return 
  */
 char* 
-SmodeMaskToString(long Smode) 
+SmodeMaskToString(const long Smode) 
 {
 	int i, j;
 
 	SmodeStringBuf[0] = '+';
 	j = 1;
-	for (i = 0; i < ircd_srv.usmodecount; i++) {
-		if (Smode & susr_mds[i].umodes) {
-			SmodeStringBuf[j] = susr_mds[i].mode;
+	for (i = 0; i < ircd_smodecount; i++) {
+		if (Smode & user_smodes[i].umode) {
+			SmodeStringBuf[j] = user_smodes[i].mode;
 			j++;
 		}
 	}
@@ -133,7 +145,7 @@ SmodeMaskToString(long Smode)
  * @return 
  */
 long
-SmodeStringToMask(char* SmodeString)
+SmodeStringToMask(const char* SmodeString)
 {
 	int i;
 	int add = 0;
@@ -151,13 +163,13 @@ SmodeStringToMask(char* SmodeString)
 			add = 0;
 			break;
 		default:
-			for (i = 0; i < ircd_srv.usmodecount; i++) {
-				if (susr_mds[i].mode == tmpmode) {
+			for (i = 0; i < ircd_smodecount; i++) {
+				if (user_smodes[i].mode == tmpmode) {
 					if (add) {
-						Smode |= susr_mds[i].umodes;
+						Smode |= user_smodes[i].umode;
 						break;
 					} else {
-						Smode &= ~susr_mds[i].umodes;
+						Smode &= ~user_smodes[i].umode;
 						break;
 					}
 				}
@@ -378,7 +390,7 @@ process_ircd_cmd(int cmdptr, char *cmd, char* origin, char **av, int ac)
 	int i;
 
 	SET_SEGV_LOCATION();
-	for (i = 0; i < ircd_srv.cmdcount; i++) {
+	for (i = 0; i < ircd_cmdcount; i++) {
 		if (cmd_list[i].srvmsg == cmdptr) {
 			if (!strcmp (cmd_list[i].name, cmd)
 #ifdef GOTTOKENSUPPORT
@@ -392,7 +404,7 @@ process_ircd_cmd(int cmdptr, char *cmd, char* origin, char **av, int ac)
 		}
 	}
 #if 0
-	if(i >= ircd_srv.cmdcount) {
+	if(i >= ircd_cmdcount) {
 		nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);
 	}
 #endif
@@ -789,7 +801,7 @@ ns_usr_stats (char *origin, char **argv, int argc)
 		snumeric_cmd (RPL_STATSLINKINFO, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
 		snumeric_cmd (RPL_STATSLLINE, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, (int)me.SendM, (int)me.SendBytes, (int)me.RcveM, (int)me.RcveBytes, (int)tmp2, (int)tmp);
 	} else if (!strcasecmp (what, "M")) {
-		for (i = 0; i < ircd_srv.cmdcount; i++) {
+		for (i = 0; i < ircd_cmdcount; i++) {
 			if (cmd_list[i].usage > 0)
 				snumeric_cmd (RPL_STATSCOMMANDS, u->nick, "Command %s Usage %d", cmd_list[i].name, cmd_list[i].usage);
 		}
@@ -900,7 +912,7 @@ swallops_cmd (const char *who, const char *msg, ...)
 	va_start (ap, msg);
 	ircvsnprintf (ircd_buf, BUFSIZE, msg, ap);
 	va_end (ap);
-	send_wallops (who, (char*)ircd_buf);
+	send_wallops ((char*)who, (char*)ircd_buf);
 	return 1;
 }
 

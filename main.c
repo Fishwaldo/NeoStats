@@ -156,6 +156,7 @@ main (int argc, char *argv[])
 #ifdef EXTAUTH
 	/* load extauth if we need to */
 	load_module ("extauth", NULL);
+	InitExtAuth();
 #endif
 
 	if (me.die) {

@@ -69,7 +69,7 @@ static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(M)";
 const char services_bot_modes[]= "+oS";
-static long services_bot_umode= 0;
+long services_bot_umode= 0;
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -102,122 +102,64 @@ IntCommands cmd_list[] = {
 	{MSG_SVSNICK, TOK_SVSNICK, Srv_Svsnick, 0, 0},
 	{MSG_KILL, TOK_KILL, Srv_Kill, 0, 0},
 	{MSG_PROTOCTL, TOK_PROTOCTL, Srv_Connect, 0, 0},
-	{NULL, NULL, NULL, 0, 0}
 };
 
-
-
-
-aCtab cFlagTab[] = {
-	{MODE_CHANOP, 'o', 1, 0, '@'}
-	,
-	{MODE_HALFOP, 'h', 1, 0, '%'}
-	,
-	{MODE_VOICE, 'v', 1, 0, '+'}
-	,
-	{MODE_BAN, 'b', 0, 1, 0}
-	,
-	{MODE_EXCEPT, 'e', 0, 1, 0}
-	,
-	{MODE_FLOODLIMIT, 'f', 0, 1, 0}
-	,			/* Flood limiter */
-	{MODE_INVITEONLY, 'i', 0, 0, 0}
-	,
-	{MODE_KEY, 'k', 0, 1, 0}
-	,
-	{MODE_LIMIT, 'l', 0, 1, 0}
-	,
-	{MODE_MODERATED, 'm', 0, 0, 0}
-	,
-	{MODE_NOPRIVMSGS, 'n', 0, 0, 0}
-	,
-	{MODE_PRIVATE, 'p', 0, 0, 0}
-	,
-	{MODE_RGSTR, 'r', 0, 0, 0}
-	,
-	{MODE_SECRET, 's', 0, 0, 0}
-	,
-	{MODE_TOPICLIMIT, 't', 0, 0, 0}
-	,
-	{MODE_NOCOLOR, 'x', 0, 0, 0}
-	,
-	{MODE_ADMONLY, 'A', 0, 0, 0}
-	,
-	{MODE_NOINVITE, 'I', 0, 0, 0}
-	,			/* no invites */
-	{MODE_NOKNOCK, 'K', 0, 0, 0}
-	,			/* knock knock (no way!) */
-	{MODE_LINK, 'L', 0, 1, 0}
-	,
-	{MODE_OPERONLY, 'O', 0, 0, 0}
-	,
-	{MODE_RGSTRONLY, 'R', 0, 0, 0}
-	,
-	{MODE_STRIP, 'S', 0, 0, 0}
-	,			/* works? */
-	{MODE_STRIPBADWORDS, 'U', 0, 0, 0}
-	,
-	{0x0, 0x0, 0x0, 0x0, 0x0}
+ChanModes chan_modes[] = {
+	{MODE_CHANOP, 'o', 1, 0, '@'},
+	{MODE_HALFOP, 'h', 1, 0, '%'},
+	{MODE_VOICE, 'v', 1, 0, '+'},
+	{MODE_BAN, 'b', 0, 1, 0},
+	{MODE_EXCEPT, 'e', 0, 1, 0},
+	{MODE_FLOODLIMIT, 'f', 0, 1, 0},			/* Flood limiter */
+	{MODE_INVITEONLY, 'i', 0, 0, 0},
+	{MODE_KEY, 'k', 0, 1, 0},
+	{MODE_LIMIT, 'l', 0, 1, 0},
+	{MODE_MODERATED, 'm', 0, 0, 0},
+	{MODE_NOPRIVMSGS, 'n', 0, 0, 0},
+	{MODE_PRIVATE, 'p', 0, 0, 0},
+	{MODE_RGSTR, 'r', 0, 0, 0},
+	{MODE_SECRET, 's', 0, 0, 0},
+	{MODE_TOPICLIMIT, 't', 0, 0, 0},
+	{MODE_NOCOLOR, 'x', 0, 0, 0},
+	{MODE_ADMONLY, 'A', 0, 0, 0},
+	{MODE_NOINVITE, 'I', 0, 0, 0},			/* no invites */
+	{MODE_NOKNOCK, 'K', 0, 0, 0},			/* knock knock (no way!) */
+	{MODE_LINK, 'L', 0, 1, 0},
+	{MODE_OPERONLY, 'O', 0, 0, 0},
+	{MODE_RGSTRONLY, 'R', 0, 0, 0},
+	{MODE_STRIP, 'S', 0, 0, 0},			/* works? */
+	{MODE_STRIPBADWORDS, 'U', 0, 0, 0},
 };
 
-Oper_Modes usr_mds[] = {
-	{UMODE_OPER, 'o', 50}
-	,
-	{UMODE_LOCOP, 'O', 40}
-	,
-	{UMODE_INVISIBLE, 'i', 0}
-	,
-	{UMODE_WALLOP, 'w', 0}
-	,
-	{UMODE_FAILOP, 'g', 0}
-	,
-	{UMODE_HELPOP, 'h', 30}
-	,
-	{UMODE_SERVNOTICE, 's', 0}
-	,
-	{UMODE_KILLS, 'k', 0}
-	,
-	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT}
-	,
-	{UMODE_SERVICESADMIN, 'P', NS_ULEVEL_ROOT}
-	,
-	{UMODE_RBOT, 'B', 0}
-	,
-	{UMODE_SBOT, 'b', 0}
-	,
-	{UMODE_COADMIN, 'z', 70}
-	,
-	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN}
-	,
-	{UMODE_TECHADMIN, 'T', 190}
-	,
-	{UMODE_CLIENT, 'c', 0}
-	,
-	{UMODE_FLOOD, 'f', 0}
-	,
-	{UMODE_REGNICK, 'r', 0}
-	,
-	{UMODE_HIDE, 'x', 0}
-	,
-	{UMODE_WATCHER, 'W', 0}
-	,
-	{UMODE_SERVICESOPER, 'a', 100}
-	,
-	{UMODE_SUPER, 'p', 40}
-	,
-	{UMODE_IRCADMIN, 'Z', 100}
-	,
-	{0, 0, 0}
+UserModes user_umodes[] = {
+	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT},
+	{UMODE_SERVICESADMIN, 'P', NS_ULEVEL_ROOT},
+	{UMODE_TECHADMIN, 'T', 190},
+	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN},
+	{UMODE_SERVICESOPER, 'a', 100},
+	{UMODE_IRCADMIN, 'Z', 100},
+	{UMODE_COADMIN, 'z', 70},
+	{UMODE_OPER, 'o', 50},
+	{UMODE_SUPER, 'p', 40},
+	{UMODE_LOCOP, 'O', 40},
+	{UMODE_INVISIBLE, 'i', 0},
+	{UMODE_WALLOP, 'w', 0},
+	{UMODE_FAILOP, 'g', 0},
+	{UMODE_HELPOP, 'h', 0},
+	{UMODE_SERVNOTICE, 's', 0},
+	{UMODE_KILLS, 'k', 0},
+	{UMODE_RBOT, 'B', 0},
+	{UMODE_SBOT, 'b', 0},
+	{UMODE_CLIENT, 'c', 0},
+	{UMODE_FLOOD, 'f', 0},
+	{UMODE_REGNICK, 'r', 0},
+	{UMODE_HIDE, 'x', 0},
+	{UMODE_WATCHER, 'W', 0},
 };
 
-void
-init_ircd ()
-{
-	/* count the number of commands */
-	ircd_srv.cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])) - 1);
-	ircd_srv.umodecount = ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1);
-	services_bot_umode = UmodeStringToMask(services_bot_modes);
-};
+const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
+const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
+const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 int
 sserver_cmd (const char *name, const int numeric, const char *infoline)

@@ -37,32 +37,37 @@ typedef struct IntCommands{
 	int usage;
 }IntCommands;
 
-typedef struct aCtab{
+typedef struct ChanModes {
 	long mode;
 	char flag;
 	unsigned nickparam:1;	/* 1 = yes 0 = no */
 	unsigned parameters:1;
 	char sjoin;
-} aCtab;
+} ChanModes;
 
 typedef struct {
-	unsigned long umodes;
+	unsigned long umode;
 	char mode;
 	int level;
-} Oper_Modes;
+} UserModes;
 
-extern Oper_Modes usr_mds[];
+extern UserModes user_umodes[];
 #ifdef GOTUSERSMODES
-extern Oper_Modes susr_mds[];
+extern UserModes user_smodes[];
 #endif
 
 extern IntCommands cmd_list[];
-extern aCtab cFlagTab[33];
+extern ChanModes chan_modes[];
+extern const int ircd_cmdcount;
+extern const int ircd_umodecount;
+extern const int ircd_smodecount;
+extern const int ircd_cmodecount;
+extern long services_bot_umode;
 
-char* UmodeMaskToString(long Umode);
-long UmodeStringToMask(char* UmodeString);
-char* SmodeMaskToString(long Umode);
-long SmodeStringToMask(char* UmodeString);
+char* UmodeMaskToString(const long Umode);
+long UmodeStringToMask(const char* UmodeString);
+char* SmodeMaskToString(const long Umode);
+long SmodeStringToMask(const char* UmodeString);
 int init_services_bot (void);
 void ns_usr_motd (char *nick, char **argv, int argc);
 void ns_usr_admin (char *nick, char **argv, int argc);

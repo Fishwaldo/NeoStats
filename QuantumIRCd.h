@@ -426,9 +426,6 @@ struct ircd_srv_ {
 	int gc;
 	char cloak[25];
 	int burst;
-	int cmdcount;
-	int umodecount;
-	int usmodecount;
 } ircd_srv;
 
 #endif

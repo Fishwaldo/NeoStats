@@ -72,7 +72,7 @@ const char ircd_version[] = "(U32)";
 const char ircd_version[] = "(U31)";
 #endif
 const char services_bot_modes[]= "+oSqd";
-static long services_bot_umode= 0;
+long services_bot_umode= 0;
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -107,150 +107,83 @@ IntCommands cmd_list[] = {
 	{MSG_SVSNICK, TOK_SVSNICK, Srv_Svsnick, 0, 0},
 	{MSG_KILL, TOK_KILL, Srv_Kill, 0, 0},
 	{MSG_PROTOCTL, TOK_PROTOCTL, Srv_Connect, 0, 0},
-	{NULL, NULL, NULL, 0, 0}
 };
 
-
-
-aCtab cFlagTab[] = {
-	{MODE_VOICE, 'v', 1, 0, '+'}
-	,
-	{MODE_HALFOP, 'h', 1, 0, '+'}
-	,
-	{MODE_CHANOP, 'o', 1, 0, '@'}
-	,
-	{MODE_LIMIT, 'l', 0, 1}
-	,
-	{MODE_PRIVATE, 'p', 0, 0}
-	,
-	{MODE_SECRET, 's', 0, 0}
-	,
-	{MODE_MODERATED, 'm', 0, 0}
-	,
-	{MODE_NOPRIVMSGS, 'n', 0, 0}
-	,
-	{MODE_TOPICLIMIT, 't', 0, 0}
-	,
-	{MODE_INVITEONLY, 'i', 0, 0}
-	,
-	{MODE_KEY, 'k', 0, 1}
-	,
-	{MODE_RGSTR, 'r', 0, 0}
-	,
-	{MODE_RGSTRONLY, 'R', 0, 0}
-	,
-	{MODE_NOCOLOR, 'c', 0, 0}
-	,
-	{MODE_CHANPROT, 'a', 1, 0}
-	,
-	{MODE_CHANOWNER, 'q', 1, 0}
-	,
-	{MODE_OPERONLY, 'O', 0, 0}
-	,
-	{MODE_ADMONLY, 'A', 0, 0}
-	,
-	{MODE_LINK, 'L', 0, 1}
-	,
-	{MODE_NOKICKS, 'Q', 0, 0}
-	,
-	{MODE_BAN, 'b', 0, 1}
-	,
-	{MODE_STRIP, 'S', 0, 0}
-	,			/* works? */
-	{MODE_EXCEPT, 'e', 0, 1}
-	,			/* exception ban */
-	{MODE_NOKNOCK, 'K', 0, 0}
-	,			/* knock knock (no way!) */
-	{MODE_NOINVITE, 'V', 0, 0}
-	,			/* no invites */
-	{MODE_FLOODLIMIT, 'f', 0, 1}
-	,			/* flood limiter */
-	{MODE_MODREG, 'M', 0, 0}
-	,			/* need umode +r to talk */
-	{MODE_STRIPBADWORDS, 'G', 0, 0}
-	,			/* no badwords */
-	{MODE_NOCTCP, 'C', 0, 0}
-	,			/* no CTCPs */
-	{MODE_AUDITORIUM, 'u', 0, 0}
-	,
-	{MODE_ONLYSECURE, 'z', 0, 0}
-	,
-	{MODE_NONICKCHANGE, 'N', 0, 0}
-	,
-	{0x0, 0x0, 0x0}
+ChanModes chan_modes[] = {
+	{MODE_VOICE, 'v', 1, 0, '+'},
+	{MODE_HALFOP, 'h', 1, 0, '+'},
+	{MODE_CHANOP, 'o', 1, 0, '@'},
+	{MODE_LIMIT, 'l', 0, 1},
+	{MODE_PRIVATE, 'p', 0, 0},
+	{MODE_SECRET, 's', 0, 0},
+	{MODE_MODERATED, 'm', 0, 0},
+	{MODE_NOPRIVMSGS, 'n', 0, 0},
+	{MODE_TOPICLIMIT, 't', 0, 0},
+	{MODE_INVITEONLY, 'i', 0, 0},
+	{MODE_KEY, 'k', 0, 1},
+	{MODE_RGSTR, 'r', 0, 0},
+	{MODE_RGSTRONLY, 'R', 0, 0},
+	{MODE_NOCOLOR, 'c', 0, 0},
+	{MODE_CHANPROT, 'a', 1, 0},
+	{MODE_CHANOWNER, 'q', 1, 0},
+	{MODE_OPERONLY, 'O', 0, 0},
+	{MODE_ADMONLY, 'A', 0, 0},
+	{MODE_LINK, 'L', 0, 1},
+	{MODE_NOKICKS, 'Q', 0, 0},
+	{MODE_BAN, 'b', 0, 1},
+	{MODE_STRIP, 'S', 0, 0},			/* works? */
+	{MODE_EXCEPT, 'e', 0, 1},			/* exception ban */
+	{MODE_NOKNOCK, 'K', 0, 0},			/* knock knock (no way!) */
+	{MODE_NOINVITE, 'V', 0, 0},			/* no invites */
+	{MODE_FLOODLIMIT, 'f', 0, 1},			/* flood limiter */
+	{MODE_MODREG, 'M', 0, 0},			/* need umode +r to talk */
+	{MODE_STRIPBADWORDS, 'G', 0, 0},			/* no badwords */
+	{MODE_NOCTCP, 'C', 0, 0},			/* no CTCPs */
+	{MODE_AUDITORIUM, 'u', 0, 0},
+	{MODE_ONLYSECURE, 'z', 0, 0},
+	{MODE_NONICKCHANGE, 'N', 0, 0},
 };
 
-
-Oper_Modes usr_mds[] = {
-	{UMODE_OPER, 'o', 50}
-	,
-	{UMODE_LOCOP, 'O', 40}
-	,
-	{UMODE_INVISIBLE, 'i', 0}
-	,
-	{UMODE_WALLOP, 'w', 0}
-	,
-	{UMODE_FAILOP, 'g', 0}
-	,
-	{UMODE_HELPOP, 'h', 30}
-	,
-	{UMODE_SERVNOTICE, 's', 0}
-	,
+UserModes user_umodes[] = {
+	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT},
+	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN},
+	{UMODE_SADMIN, 'a', 100},
+	{UMODE_ADMIN, 'A', 70},
+	{UMODE_COADMIN, 'C', 60},
+	{UMODE_OPER, 'o', 50},
+	{UMODE_LOCOP, 'O', 40},
+	{UMODE_INVISIBLE, 'i', 0},
+	{UMODE_WALLOP, 'w', 0},
+	{UMODE_FAILOP, 'g', 0},
+	{UMODE_HELPOP, 'h', 0},
+	{UMODE_SERVNOTICE, 's', 0},
 #ifndef UNREAL32
-	{UMODE_KILLS, 'k', 0}
-	,
-#endif
-	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT}
-	,
-	{UMODE_SADMIN, 'a', 100}
-	,
-	{UMODE_COADMIN, 'C', 60}
-	,
-#ifndef UNREAL32
-	{UMODE_EYES, 'e', 0}
-	,
-#endif
-	{UMODE_KIX, 'q', 0}
-	,
-	{UMODE_BOT, 'B', 0}
-	,
-#ifndef UNREAL32
-	{UMODE_FCLIENT, 'F', 0}
-	,
-#endif
-	{UMODE_DEAF, 'd', 0}
-	,
-	{UMODE_ADMIN, 'A', 70}
-	,
-	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN}
-	,
-#ifndef UNREAL32
-	{UMODE_CLIENT, 'c', 0}
-	,
+	{UMODE_KILLS, 'k', 0},
 #endif
 #ifndef UNREAL32
-	{UMODE_FLOOD, 'f', 0}
-	,
+	{UMODE_EYES, 'e', 0},
 #endif
-	{UMODE_REGNICK, 'r', 0}
-	,
-	{UMODE_HIDE, 'x', 0}
-	,
-	/*{UMODE_CHATOP, 'b', 0}
-	,*/
-	{UMODE_WHOIS, 'W', 0}
-	,
-	{0, 0, 0}
+	{UMODE_KIX, 'q', 0},
+	{UMODE_BOT, 'B', 0},
+#ifndef UNREAL32
+	{UMODE_FCLIENT, 'F', 0},
+#endif
+	{UMODE_DEAF, 'd', 0},
+#ifndef UNREAL32
+	{UMODE_CLIENT, 'c', 0},
+#endif
+#ifndef UNREAL32
+	{UMODE_FLOOD, 'f', 0},
+#endif
+	{UMODE_REGNICK, 'r', 0},
+	{UMODE_HIDE, 'x', 0},
+	/*{UMODE_CHATOP, 'b', 0},*/
+	{UMODE_WHOIS, 'W', 0},
 };
 
-void
-init_ircd ()
-{
-	/* count the number of commands */
-	ircd_srv.cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])) - 1);
-	ircd_srv.umodecount = ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1);
-	services_bot_umode = UmodeStringToMask(services_bot_modes);
-};
+const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
+const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
+const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 int
 sserver_cmd (const char *name, const int numeric, const char *infoline)
@@ -741,11 +674,11 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 		goto nomodes;
 	}
 	while (*modes) {
-		for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-			if (*modes == cFlagTab[i].flag) {
-				if (cFlagTab[i].parameters) {
+		for (i = 0; i < ircd_cmodecount; i++) {
+			if (*modes == chan_modes[i].flag) {
+				if (chan_modes[i].parameters) {
 					m = smalloc (sizeof (ModesParm));
-					m->mode = cFlagTab[i].mode;
+					m->mode = chan_modes[i].mode;
 					strlcpy (m->param, argv[j], PARAMSIZE);
 					mn = lnode_create (m);
 					if (!list_isfull (tl)) {
@@ -756,7 +689,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 					}
 					j++;
 				} else {
-					mode1 |= cFlagTab[i].mode;
+					mode1 |= chan_modes[i].mode;
 				}
 			}
 		}
@@ -767,10 +700,10 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 		modes = argv[j];
 		mode = 0;
 		while (ok == 1) {
-			for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-				if (cFlagTab[i].sjoin != 0) {
-					if (*modes == cFlagTab[i].sjoin) {
-						mode |= cFlagTab[i].mode;
+			for (i = 0; i < ircd_cmodecount; i++) {
+				if (chan_modes[i].sjoin != 0) {
+					if (*modes == chan_modes[i].sjoin) {
+						mode |= chan_modes[i].mode;
 						modes++;
 						i = -1;
 					}

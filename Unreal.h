@@ -725,8 +725,6 @@
 struct ircd_srv_ {
 	int uprot;
 	char cloak[10];
-	int cmdcount;
-	int umodecount;
 } ircd_srv;
 
 #endif /* UNREAL_H Define */

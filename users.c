@@ -215,7 +215,7 @@ UserNick (const char * oldnick, const char *newnick)
 	hash_delete (uh, un);
 	strlcpy (u->nick, newnick, MAXNICK);
 	hash_insert (uh, un, u->nick);
-	AddStringToList (&av, oldnick, &ac);
+	AddStringToList (&av, (char*)oldnick, &ac);
 	AddStringToList (&av, u->nick, &ac);
 	ModuleEvent (EVENT_NICKCHANGE, av, ac);
 	free (av);
@@ -464,33 +464,71 @@ UserDump (char *nick)
 	}
 }
 
-int
-UserLevel (User * u)
-{
-	int i, tmplvl = 0;
+/* Do dl lookups in advance to speed up UserLevel processing 
+ *
+ */
 #ifdef EXTAUTH
-	int (*getauth) (User *, int curlvl);
+int (*getauth) (User *, int curlvl);
+int InitExtAuth(void)
+{
+	int i;
+	i = get_dl_handle ("extauth");
+	if (i > 0) {
+		getauth = dlsym ((int *) i, "__do_auth");
+	}
+}
 #endif
 
-	
-	for (i = 0; i < ircd_srv.umodecount; i++) {
-		if (u->Umode & usr_mds[i].umodes) {
-			if (usr_mds[i].level > tmplvl)
-				tmplvl = usr_mds[i].level;
+int UmodeAuth(User * u)
+{
+	int i, tmplvl = 0;
+	/* Note, tables have been reordered highest to lowest so the 
+	 * first hit will give the highest level for a given umode
+	 * combination so we can just set it without checking against
+	 * the current level 
+	 * we can also quit on the first occurrence of 0
+	 * should be a lot faster!
+	 */
+	for (i = 0; i < ircd_umodecount; i++) {
+		if(user_umodes[i].umode == 0)
+			break;
+		if (u->Umode & user_umodes[i].umode) {
+			tmplvl = user_umodes[i].level;
+			break;
 		}
 	}
 	nlog (LOG_DEBUG1, LOG_CORE, "Umode Level for %s is %d", u->nick, tmplvl);
 
 /* I hate SMODEs damn it */
 #ifdef GOTUSERSMODES
-	for (i = 0; i < ircd_srv.usmodecount; i++) {
-		if (u->Smode & susr_mds[i].umodes) {
-			if (susr_mds[i].level > tmplvl)
-				tmplvl = susr_mds[i].level;
+	/* see umode comments above */
+	for (i = 0; i < ircd_smodecount; i++) {
+		if(user_smodes[i].umode == 0)
+			break;
+		if (u->Smode & user_smodes[i].umode) {
+			tmplvl = user_smodes[i].level;
+			break;
 		}
 	}
-#endif
 	nlog (LOG_DEBUG1, LOG_CORE, "Smode Level for %s is %d", u->nick, tmplvl);
+#endif
+	return tmplvl;
+}
+
+int
+UserLevel (User * u)
+{
+	int i, tmplvl = 0;
+	tmplvl = UmodeAuth(u);
+
+#ifdef EXTAUTH
+	if (getauth)
+		i = (*getauth) (u, tmplvl);
+	/* if tmplvl is greater than 1000, then extauth is authoritive */
+	if (i > tmplvl)
+		tmplvl = i;
+#endif
+
 #ifdef DEBUG
 #ifdef CODERHACK
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
@@ -500,20 +538,6 @@ UserLevel (User * u)
 		tmplvl = NS_ULEVEL_ROOT;
 #endif
 #endif
-
-#ifdef EXTAUTH
-	i = get_dl_handle ("extauth");
-	if (i > 0) {
-		getauth = dlsym ((int *) i, "__do_auth");
-		if (getauth)
-			i = (*getauth) (u, tmplvl);
-	}
-	/* if tmplvl is greater than 1000, then extauth is authoritive */
-	if (i > tmplvl)
-		tmplvl = i;
-#endif
-
-
 
 	nlog (LOG_DEBUG1, LOG_CORE, "UserLevel for %s is %d (%d)", u->nick, tmplvl, i);
 	return tmplvl;
