@@ -283,11 +283,7 @@ joinbuf (char **av, int ac, int from)
 	 * the caller handle that case. 
 	 */
 	if(from >= ac) {
-		/* For debugging the reported topic crash.
-		 * Keep in for 2.5.11 so people can report any occurence 
-		 * of this in logs then remove in 2.5.12
-		 */
-		nlog (LOG_WARNING, LOG_CORE, "joinbuf: from (%d) >= ac (%d)", from, ac);
+		nlog (LOG_DEBUG1, LOG_CORE, "joinbuf: from (%d) >= ac (%d)", from, ac);
 		strlcpy (buf, "(null)", BUFSIZE);
 	}
 	else {
@@ -298,6 +294,33 @@ joinbuf (char **av, int ac, int from)
 		}
 	}
 	return (char *) buf;
+}
+
+/** @brief process ircd commands
+ *
+ * 
+ *
+ * @return none
+ */
+static void 
+process_ircd_cmd(int cmdptr, char *cmd, char* origin, char **av, int ac)
+{
+	int i;
+
+	SET_SEGV_LOCATION();
+	for (i = 0; i < ircd_srv.cmdcount; i++) {
+		if (cmd_list[i].srvmsg == cmdptr) {
+			if (!strcmp (cmd_list[i].name, cmd)
+#ifdef GOTTOKENSUPPORT
+				||(me.token && cmd_list[i].token && !strcmp (cmd_list[i].token, cmd))
+#endif
+				) {
+				cmd_list[i].function (origin, av, ac);
+				cmd_list[i].usage++;
+				break;
+			}
+		}
+	}
 }
 
 /** @brief parse
@@ -312,7 +335,6 @@ parse (char *line)
 	User *u;
 	char origin[64], cmd[64], *coreLine;
 	int cmdptr = 0;
-	int i = 0;
 	int ac;
 	char **av;
 	ModUser *mod_usr;
@@ -390,7 +412,6 @@ parse (char *line)
 				return;
 			}
 			/* its to the Internal Services Bot */
-			SET_SEGV_LOCATION();
 			servicesbot (origin, av, ac);
 			SET_SEGV_LOCATION();
 			free (av);
@@ -443,18 +464,8 @@ parse (char *line)
 	}
 
 	/* now, Parse the Command to the Internal Functions... */
-	SET_SEGV_LOCATION();
-	for (i = 0; i < ircd_srv.cmdcount; i++) {
-		if (!strcmp (cmd_list[i].name, cmd) ) {
-			if (cmd_list[i].srvmsg == cmdptr) {
-				cmd_list[i].function (origin, av, ac);
-				cmd_list[i].usage++;
-				break;
-			}
-		}
-	}
+	process_ircd_cmd(cmdptr, cmd, origin, av, ac);
 	/* K, now Parse it to the Module functions */
-	SET_SEGV_LOCATION();
 	ModuleFunction (cmdptr, cmd, origin, av, ac);
 	free (av);
 }
