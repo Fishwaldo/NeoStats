@@ -303,7 +303,7 @@ int ssvshost_cmd(const char *who, const char *vhost) {
 		return 0;
 	} else {
 		strcpy(u->vhost, vhost);
-		sts(":%s %s %s %s", me.name, (me.token ? TOK_CHGHOST : MSG_CHGHOST), who, vhost);
+		sts(":%s %s %s %s", me.name, (me.token ? TOK_SETHOST : MSG_SETHOST), who, vhost);
 		return 1;
 	}
 }
