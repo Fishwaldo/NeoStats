@@ -55,11 +55,6 @@
 #endif
 
 /* 
- * Need to locate lib include for this
- */
-extern char *sftime (time_t);
-
-/* 
  * Module socket list structure
  */
 struct _Sock_List {

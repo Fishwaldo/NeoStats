@@ -262,8 +262,6 @@ struct ping {
 /* sock.c */
 extern int ConnectTo (char *, int);
 extern void read_loop ();
-extern char *sctime (time_t);
-extern char *sftime (time_t);
 extern int getmaxsock ();
 extern int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);
 extern int sock_disconnect (char *sockname);
@@ -285,6 +283,8 @@ extern void AddStringToList (char ***List, char S[], int *C);
 void FreeList (char **List, int C);
 void do_exit (int);
 void strip_mirc_codes(char *text);
+extern char *sctime (time_t);
+extern char *sftime (time_t);
 
 /* ircd.c */
 extern void parse ();

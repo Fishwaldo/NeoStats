@@ -220,31 +220,6 @@ recvlog (char *line)
 	fclose (logfile);
 }
 
-char *
-sctime (time_t stuff)
-{
-	char *s, *c;
-
-	s = ctime (&stuff);
-	if ((c = strchr (s, '\n')))
-		*c = '\0';
-
-	return s;
-}
-
-char fmtime[80];
-
-char *
-sftime (time_t stuff)
-{
-	struct tm *ltm = localtime (&stuff);
-
-	strftime (fmtime, 80, "[%b (%a %d) %Y  %I:%M [%p/%Z]]", ltm);
-
-	return fmtime;
-}
-
-
 int
 sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error)
 {

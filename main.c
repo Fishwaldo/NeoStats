@@ -777,3 +777,28 @@ void strip_mirc_codes(char *text)
   *dd = 0;
 }
 
+char *
+sctime (time_t stuff)
+{
+	char *s, *c;
+
+	s = ctime (&stuff);
+	if ((c = strchr (s, '\n')))
+		*c = '\0';
+
+	return s;
+}
+
+static char fmtime[80];
+
+char *
+sftime (time_t stuff)
+{
+	struct tm *ltm = localtime (&stuff);
+
+	strftime (fmtime, 80, "[%b (%a %d) %Y  %I:%M [%p/%Z]]", ltm);
+
+	return fmtime;
+}
+
+
