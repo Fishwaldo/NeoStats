@@ -37,6 +37,7 @@ adns/tvarith.h -text
 adns/types.c -text
 /chans.c -text
 /conf.c -text
+/conf.h -text
 /config.guess -text
 /config.h.in -text
 /config.sub -text
@@ -125,6 +126,7 @@ doc/read-userman -text
 /hybrid7.h -text
 /install-sh -text
 /ircd.c -text
+/keeper.c -text
 keeper/Makefile -text
 keeper/keeper.h -text
 keeper/kp_cache.c -text

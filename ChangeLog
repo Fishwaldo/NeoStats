@@ -1,4 +1,12 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Version 2.5.2
+ - Added Keeper Library for storing configuration and optionally data, and reserved space for language file storage
+ - Added kptool, a command line tool from keeper libary to maintain configuration databases
+ - Added configtool, a GTK gui to maintain config database (from Keeper Libary)
+ - started work on configtool to suit NeoStats setup.
+ - added conf.h and keeper.c, the NeoStats API to the keeper database.
+ - Created and tested initial SetConf, GetConf functions to set and retrive config data. 
+
 * NeoStats * Fish * Version 2.5.1
  - ConnectServ's username was too long for NeoIRCd, fixed
  - Fixed a usermode bug with NeoIRCd and the bots

@@ -1,21 +1,21 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.35 2003/04/08 13:23:43 fishwaldo Exp $
+# $Id: Makefile.in,v 1.36 2003/04/09 14:29:49 fishwaldo Exp $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
 
 OBJS =	dns.o chans.o dotconf.o services.o main.o sock.o conf.o ircd.o timer.o users.o \
-		ns_help.o dl.o list.o hash.o server.o @IRCD_FILES_OBJS@
+		ns_help.o dl.o list.o hash.o server.o keeper.o @IRCD_FILES_OBJS@
 SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c users.c \
-		ns_help.c dl.c list.c hash.c server.c @IRCD_FILES_SRC@
+		ns_help.c dl.c list.c hash.c server.c keeper.c @IRCD_FILES_SRC@
 
 PROGS = neostats cronchk makeconf
 CONF = neostats.motd
 DOCS = doc/FAQ* doc/USERMAN README* BUGS AUTHORS COPYING CREDITS INSTALL* LICENCE NEWS TODO
 DOCS_PROGS = doc/read-faq doc/read-userman
 DATA = data/tlds.nfo
-INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h  Unreal.h adns/adns.h hybrid7.h neoircd.h
+INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h Unreal.h adns/adns.h hybrid7.h neoircd.h conf.h
 BUILDFILES = configure *.in adns/Makefile adns/config.h.in dl/Makefile dl/modules.txt RelNotes.txt install-sh neoircd.* hybrid7.* Ultimate.* Unreal.* makeconf cronchk
 DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) $(BUILDFILES) adns/*.c adns/adns.h adns/dlist.h  adns/internal.h  adns/tvarith.h
  

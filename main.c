@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.81 2003/04/03 14:36:36 fishwaldo Exp $
+** $Id: main.c,v 1.82 2003/04/09 14:29:51 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -30,6 +30,7 @@
 #include "stats.h"
 #include "signal.h"
 #include "dl.h"
+#include "conf.h"
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #endif
@@ -80,7 +81,22 @@ int forked = 0;
 int main()
 {
 	FILE *fp;
-
+	char *test;
+	int i;
+#if 0
+/* testing of keeper database */	
+	SetConf("test", 1, "testconf");
+	SetConf((void *)12, 2, "this");
+	SetConf((void *)10, 4, "bool");
+	GetConf((void *)&test, 1, "testconf");
+	GetConf((void *)&i, 2, "this");
+	printf("%s\n", test);
+	printf("%d\n", i);
+	GetConf((void *)&i, 4, "bool");
+	printf("%d\n", i);
+	free(test);
+#endif
+	
 	strcpy(segv_location, "main");
 	strcpy(segvinmodule, "");
 	me.onchan = 0;
