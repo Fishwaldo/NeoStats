@@ -33,13 +33,62 @@
 #include "tld.h"
 #include <fcntl.h>
 
+typedef void (*htmlhandler) (void);
+
+typedef struct htmlfunc {
+	char* directive;
+	htmlhandler handler;
+}htmlfunc;
+
 FILE *opf;
 
 const char html_template[]="data/index.tpl";
 
+void html_map (void);
+void get_srvlist (void);
+void get_srvlistdet (void);
+void get_netstats (void);
+void get_dailystats (void);
+void get_weeklystats (void);
+void get_monthlystats (void);
+void get_chantop10 (void);
+void get_chantop10eva (void);
+void get_unwelcomechan (void);
+void get_chantops (void);
+void HTMLTLDMap (void);
+void get_version (void);
+void get_title (void);
+void get_clientstats (void);
+
+
+htmlfunc htmlfuncs[]=
+{
+	{"!MAP!", html_map},
+	{"!SRVLIST!", get_srvlist},
+	{"!SRVLISTDET!", get_srvlistdet},
+	{"!NETSTATS!", get_netstats},
+	{"!DAILYSTATS!", get_dailystats},
+	{"!WEEKLYSTATS!", get_weeklystats},
+	{"!MONTHLYSTATS!", get_monthlystats},
+	{"!DAILYTOPCHAN!", get_chantop10},
+	{"!TOP10CHAN!", get_chantop10eva},
+	{"!TOP10KICKS!", get_unwelcomechan},
+	{"!TOP10TOPICS!", get_chantops},
+	{"!TLDMAP!", HTMLTLDMap},
+	{"!VERSION!", get_version},
+	{"!TITLE!", get_title},
+	{"!CLIENTSTATS!", get_clientstats},
+	{NULL, NULL},
+};
+
 void get_title()
 {
 	fprintf (opf, "Network Statistics for %s", me.netname);
+}
+
+void get_version()
+{
+	fputs (me.version, opf);
 }
 
 void put_copyright()
@@ -55,59 +104,57 @@ void put_copyright()
 
 void get_srvlist()
 {
-	serverstat *s;
+	serverstat *ss;
 	hscan_t hs;
 	hnode_t *sn;
 
 	fprintf (opf, "<table border=0><tr><th colspan = 2>Server name</th></tr>");
 	hash_scan_begin(&hs, serverstathash);
 	while ((sn = hash_scan_next(&hs))) {
-		s = hnode_get(sn);
+		ss = hnode_get(sn);
 		fprintf (opf, "<tr><td height=\"4\"></td>\n");
-		fprintf (opf, "<td height=\"4\"><a href=#%s> %s (%s) </a></td></tr>\n",
-			s->name, s->name, (s->s) ? "ONLINE" : "OFFLINE");
+		fprintf (opf, "<td height=\"4\"><a href=#%s> %s (%s)</a></td></tr>\n",
+			ss->name, ss->name, (ss->s) ? "ONLINE" : "OFFLINE");
 	}
 	fprintf (opf, "</table>");
 }
 
 void get_srvlistdet()
 {
-	serverstat *s;
-	Client *ss;
+	serverstat *ss;
 	hscan_t hs;
 	hnode_t *sn;
 	fprintf (opf, "<table border=0>");
 	hash_scan_begin(&hs, serverstathash);
 	while ((sn = hash_scan_next(&hs))) {
-		s = hnode_get(sn);
-		ss = s->s;
+		ss = hnode_get(sn);
 		fprintf (opf, "<tr><th><a name=%s>Server:</th><th colspan = 2><b>%s</b></th></tr>\n",
-			s->name, s->name);
-		if (!ss) {
+			ss->name, ss->name);
+		if (!ss->s) {
 			fprintf (opf, "<tr><td>Last Seen:</td><td colspan = 2>%s</td></tr>\n",
-				sftime(s->ts_lastseen));
+				sftime(ss->ts_lastseen));
 		} else {
 			fprintf (opf,"<tr><td>Current Users:</td><td>%d (%d%%)</td><td>Max %ld at %s</td></tr>\n",
-				s->users.current, (int)(((float) s->users.current / (float) networkstats.users.current) * 100),
-				s->users.alltime.max, sftime(s->users.alltime.ts_max));
+				ss->users.current, (int)(((float) ss->users.current / (float) networkstats.users.current) * 100),
+				ss->users.alltime.max, sftime(ss->users.alltime.ts_max));
 			fprintf (opf,
 				"<tr><td>Current Opers:</td><td>%d (%d%%)</td><td>Max %d at %s</td></tr>\n",
-				s->opers.current, (int)(((float) s->opers.current / (float) networkstats.opers.current) * 100),
-				s->opers.alltime.max, sftime(s->opers.alltime.ts_max));
+				ss->opers.current, (int)(((float) ss->opers.current / (float) networkstats.opers.current) * 100),
+				ss->opers.alltime.max, sftime(ss->opers.alltime.ts_max));
 		}
 		fprintf (opf, "<tr><td>Total Users Connected:</td><td colspan = 2>%ld</td></tr>",
-			s->users.alltime.runningtotal);
+			ss->users.alltime.runningtotal);
 		fprintf (opf, "<tr><td>IrcOp Kills</td><td colspan = 2>%d</td></tr>", 
-			s->operkills.alltime.runningtotal);
+			ss->operkills.alltime.runningtotal);
 		fprintf (opf, "<tr><td>Server Kills</td><td colspan = 2>%d</td></tr>",
-			s->serverkills.alltime.runningtotal);
+			ss->serverkills.alltime.runningtotal);
 		fprintf (opf, "<tr><td>Highest Ping</td><td>%d</td><td>at %s</td></tr>",
-			(int)s->highest_ping, sftime(s->t_highest_ping));
-		if (ss)
+			(int)ss->highest_ping, sftime(ss->t_highest_ping));
+		if (ss->s)
 			fprintf (opf, "<tr><td>Current Ping</td><td colspan = 2>%d</td></tr>",
-				ss->server->ping);
+				ss->s->server->ping);
 		fprintf (opf, "<tr><td>Server Splits</td><td colspan = 2>%d</td></tr>",
-			s->splits.alltime.runningtotal);
+			ss->splits.alltime.runningtotal);
 	}
 	fprintf (opf, "</table>");
 }
@@ -144,9 +191,9 @@ void get_netstats()
 		GetAllTimePercent (&networkstats.servers));
 	fprintf (opf, "<td>%d</td>\n", networkstats.servers.alltime.average);
 	fprintf (opf, "<td>%d</td>\n", networkstats.servers.alltime.max);
-	fprintf (opf, "<td>%s </td>\n", sftime(networkstats.servers.alltime.ts_max));
-	fprintf (opf, "<tr><td colspan=\"3\">Users Set Away: </td>\n");
-	fprintf (opf, "<td colspan=\"3\"> %ld </td></tr></table>\n", me.awaycount);
+	fprintf (opf, "<td>%s</td>\n", sftime(networkstats.servers.alltime.ts_max));
+	fprintf (opf, "<tr><td colspan=\"3\">Users Set Away:</td>\n");
+	fprintf (opf, "<td colspan=\"3\">%ld</td></tr></table>\n", me.awaycount);
 }
 
 void get_dailystats()
@@ -180,7 +227,7 @@ void get_dailystats()
 		GetDailyPercent (&networkstats.servers));
 	fprintf (opf, "<td>%-2d</td>\n", networkstats.servers.daily.average);
 	fprintf (opf, "<td>%-2d</td>\n", networkstats.servers.daily.max);
-	fprintf (opf, "<td>%s </td></tr>\n", sftime(networkstats.servers.daily.ts_max));
+	fprintf (opf, "<td>%s</td></tr>\n", sftime(networkstats.servers.daily.ts_max));
 	fprintf (opf, "</tr></table>\n");
 }
 
@@ -215,7 +262,7 @@ void get_weeklystats()
 		GetWeeklyPercent (&networkstats.servers));
 	fprintf (opf, "<td>%-2d</td>\n", networkstats.servers.weekly.average);
 	fprintf (opf, "<td>%-2d</td>\n", networkstats.servers.weekly.max);
-	fprintf (opf, "<td>%s </td></tr>\n", sftime(networkstats.servers.weekly.ts_max));
+	fprintf (opf, "<td>%s</td></tr>\n", sftime(networkstats.servers.weekly.ts_max));
 	fprintf (opf, "</tr></table>\n");
 }
 
@@ -250,7 +297,7 @@ void get_monthlystats()
 		GetMonthlyPercent (&networkstats.servers));
 	fprintf (opf, "<td>%-2d</td>\n", networkstats.servers.monthly.average);
 	fprintf (opf, "<td>%-2d</td>\n", networkstats.servers.monthly.max);
-	fprintf (opf, "<td>%s </td></tr>\n", sftime(networkstats.servers.monthly.ts_max));
+	fprintf (opf, "<td>%s</td></tr>\n", sftime(networkstats.servers.monthly.ts_max));
 	fprintf (opf, "</tr></table>\n");
 }
 
@@ -424,6 +471,12 @@ void get_map(char *uplink, int level)
 	}
 }
 
+void html_map()
+{
+	get_map("", 0);
+	fputs ("</TABLE>\n", opf);
+}
+
 int ss_html (void)
 {
 #define READBUFSIZE 512
@@ -432,7 +485,8 @@ int ss_html (void)
 	char *buftemp;
 	char *bufptr;
 	int gothtml = 0;
-	
+	htmlfunc* htmlfuncptr;
+
 	tpl = fopen(html_template, "r");
 	if (!tpl) {
 		nlog (LOG_WARNING, "Failed to open StatServ HTML template %s.", html_template);
@@ -445,28 +499,17 @@ int ss_html (void)
 		irc_chanalert(ss_bot, "Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath);
 		return NS_SUCCESS;
 	}
-	bufptr = buf;
-	while (fgets(bufptr, READBUFSIZE, tpl)) {
-
-		buftemp = strstr (bufptr, "!MAP!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_map("", 0);
-			fputs ("</TABLE>\n", opf);
-			bufptr = buftemp + strlen ("!MAP!");
-		}
-		buftemp = strstr (bufptr, "!SRVLIST!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_srvlist();
-			bufptr = buftemp + strlen ("!SRVLIST!");
-		}
-		buftemp = strstr (bufptr, "!SRVLISTDET!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_srvlistdet();
-			bufptr = buftemp + strlen ("!SRVLISTDET!");
-
+	while (fgets(buf, READBUFSIZE, tpl)) {
+		bufptr = buf;
+		htmlfuncptr = htmlfuncs;
+		while (htmlfuncptr->directive) {
+			buftemp = strstr (bufptr, htmlfuncptr->directive);
+			if (buftemp) {
+				fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
+				htmlfuncptr->handler();
+				bufptr = buftemp + strlen (htmlfuncptr->directive);
+			}		
+			htmlfuncptr++;
 		}
 		buftemp = strstr (bufptr, "</HTML>");
 		if (buftemp) {
@@ -475,80 +518,7 @@ int ss_html (void)
 			bufptr = buftemp;
 			gothtml = 1;
 		}
-		buftemp = strstr (bufptr, "!NETSTATS!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_netstats();
-			bufptr = buftemp + strlen ("!NETSTATS!");
-		}
-		buftemp = strstr (bufptr, "!DAILYSTATS!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_dailystats();
-			bufptr = buftemp + strlen ("!DAILYSTATS!");
-		}
-		buftemp = strstr (bufptr, "!WEEKLYSTATS!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_weeklystats();
-			bufptr = buftemp + strlen ("!WEEKLYSTATS!");
-		}
-		buftemp = strstr (bufptr, "!MONTHLYSTATS!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_monthlystats();
-			bufptr = buftemp + strlen ("!MONTHLYSTATS!");
-		}
-		buftemp = strstr (bufptr, "!DAILYTOPCHAN!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_chantop10();
-			bufptr = buftemp + strlen ("!DAILYTOPCHAN!");
-		}
-		buftemp = strstr (bufptr, "!TOP10CHAN!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_chantop10eva();
-			bufptr = buftemp + strlen ("!TOP10CHAN!");
-		}
-		buftemp = strstr (bufptr, "!TOP10KICKS!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_unwelcomechan();
-			bufptr = buftemp + strlen ("!TOP10KICKS!");
-		}
-		buftemp = strstr (bufptr, "!TOP10TOPICS!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_chantops();
-			bufptr = buftemp + strlen ("!TOP10TOPICS!");
-		}
-		buftemp = strstr (bufptr, "!TLDMAP!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			HTMLTLDMap();
-			bufptr = buftemp + strlen ("!TLDMAP!");
-		}
-		buftemp = strstr (bufptr, "!VERSION!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			fputs (me.version, opf);
-			bufptr = buftemp + strlen ("!VERSION!");
-		}
-		buftemp = strstr (bufptr, "!TITLE!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_title();
-			bufptr = buftemp + strlen ("!TITLE!");
-		}
-		buftemp = strstr (bufptr, "!CLIENTSTATS!");
-		if (buftemp) {
-			fwrite (bufptr, (int)buftemp - (int)bufptr, 1, opf);
-			get_clientstats();
-			bufptr = buftemp + strlen ("!CLIENTSTATS!");
-		}
 		fputs (bufptr, opf);
-		bufptr = buf;
 	}
 	if (!gothtml) {
 		put_copyright();
