@@ -161,7 +161,7 @@ ChanModes chan_modes[] = {
 
 #ifdef ULTIMATE3
 UserModes user_umodes[] = {
-	{UMODE_IRCADMIN, 'Z', NS_ULEVEL_ROOT},
+	{UMODE_SRA, 'Z', NS_ULEVEL_ROOT},
 	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT},
 	{UMODE_SADMIN, 'P', NS_ULEVEL_ADMIN},
 	{UMODE_SERVICESOPER, 'a', NS_ULEVEL_OPER},
@@ -173,24 +173,23 @@ UserModes user_umodes[] = {
 	{UMODE_SERVNOTICE, 's', 0},
 	{UMODE_CLIENT, 'c', 0},
 	{UMODE_KILLS, 'k', 0},
-	{UMODE_FAILOP, 'g', 0},
 	{UMODE_HELPOP, 'h', 0},
 	{UMODE_FLOOD, 'f', 0},
 	{UMODE_SPY, 'y', 0},
 	{UMODE_DCC, 'D', 0},
 	{UMODE_GLOBOPS, 'g', 0},
-	{UMODE_CHATOP, 'c', 0},
+	{UMODE_CHATOPS, 'c', 0},
 	{UMODE_REJ, 'j', 0},
 	{UMODE_ROUTE, 'n', 0},
 	{UMODE_SPAM, 'm', 0},
 	{UMODE_HIDE, 'x', 0},
-	{UMODE_PROT, 'p', 0},
-	{UMODE_GLOBCON, 'F', 0},
+	{UMODE_KIX, 'p', 0},
+	{UMODE_FCLIENT, 'F', 0},
 #if 0
 	/* useless modes, ignore them as services use these modes for services ID */
 	{UMODE_DEBUG, 'd', 0},
-	{UMODE_DCCWARN, 'd', 0},
 #endif
+	{UMODE_DCCWARN, 'e', 0},
 	{UMODE_WHOIS, 'W', 0},
 };
 
@@ -205,7 +204,7 @@ UserModes user_smodes[] = {
 	{SMODE_SSL, 's', 0},
 };
 
-#elif ULTIMATE
+#else
 UserModes user_umodes[] = {
 	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT},
 	{UMODE_SADMIN, 'P', NS_ULEVEL_ROOT},

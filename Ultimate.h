@@ -412,6 +412,35 @@
 #endif
 
 /* Umodes */
+#ifdef ULTIMATE3
+#define UMODE_OPER     	0x00000001	/* umode +o - Oper */
+#define UMODE_LOCOP     	0x00000002	/* umode +O - Local Oper */
+#define UMODE_INVISIBLE     	0x00000004	/* umode +i - Invisible */
+#define UMODE_WALLOP     	0x00000008	/* umode +w - Get wallops */
+#define UMODE_SERVNOTICE     	0x00000010	/* umode +s - Server notices */
+#define UMODE_CLIENT     	0x00000020	/* umode +c - Client connections/exits */
+#define UMODE_REGNICK     	0x00000040	/* umode +r - registered nick - Should be moved to smode if possible without breaking services compat*/
+#define UMODE_KILLS     	0x00000080	/* umode +k - Server kill messages */
+#define UMODE_FLOOD     	0x00000100	/* umode +f - Server flood messages */
+#define UMODE_SPY		0x00000200	/* umode +y - Stats/links */
+#define UMODE_DCC     	0x00000400	/* umode +D - pseudo/hidden, has seen dcc warning message */
+#define UMODE_GLOBOPS     	0x00001000	/* umode +g - Globops */
+#define UMODE_CHATOPS     	0x00002000	/* umode +C - Chatops */
+#define UMODE_SERVICESOPER     	0x00004000	/* umode +a - Services Operator - Should be moved to smode */
+#define UMODE_REJ		0x00008000	/* umode +j - Reject notices */
+#define UMODE_ROUTE     	0x00010000	/* umode +n - Routing Notices */
+#define UMODE_HELPOP     	0x00020000	/* umode +h - Helper */
+#define UMODE_SPAM     	0x00040000	/* umode +m - spambot notices */
+#define UMODE_HIDE     	0x00080000	/* umode +x - hidden hostname */
+#define UMODE_SRA		0x01000000	/* umode +Z - Services Root Admin - Should be moved to smode */
+#define UMODE_SADMIN		0x02000000	/* umode +P - Services Admin - Should be moved to smode */
+#define UMODE_SERVICES		0x04000000	/* umode +S - Services Client - Should be moved to smode if possible without breaking services compat */
+#define UMODE_KIX		0x08000000	/* umode +p - Protected Oper */
+#define UMODE_FCLIENT		0x10000000	/* umode +F - Global client connections/exits */
+#define UMODE_DEBUG		0x20000000	/* umode +d - Debug Info */
+#define UMODE_DCCWARN		0x40000000	/* umode +e - See DCC send warnings */
+#define UMODE_WHOIS		0x80000000	/* umode +W - Opers can see when a user /whois's them */
+#else
 #define	UMODE_INVISIBLE  	0x0001	/* makes user invisible */
 #define	UMODE_OPER       	0x0002	/* Operator */
 #define	UMODE_WALLOP     	0x0004	/* send wallops to them */
@@ -419,33 +448,7 @@
 #define UMODE_HELPOP	 	0x0010	/* Help system operator */
 #define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
 #define UMODE_SERVICESOPER	0x0040	/* Services Oper */
-#ifdef ULTIMATE3
-#define UMODE_SPY		0x0080	/* Oper Spy */
-#define UMODE_DCC		0x10000	/* Oper DCC Notices */
-#define UMODE_GLOBOPS		0x20000	/* send/recv global notices */
-#define UMODE_REJ		0x40000	/* see DCC reject notices */
-#define UMODE_ROUTE		0x80000	/* see Routing Notices */
-#define UMODE_SPAM		0x100000	/* see spambot warnings */
-#define UMODE_PROT		0x400000	/* protected IRC op */
-#define UMODE_GLOBCON		0x800000	/* Global Connect notices */
-#define UMODE_DEBUG		0x4000000	/* see debug notices */
-#define UMODE_DCCWARN		0x8000000	/* see DCC warnings */
-#else
 #define UMODE_ADMIN	 	0x0080	/* Admin */
-#define UMODE_NETADMIN  	0x10000	/* Network Admin */
-#define	UMODE_SUPER		0x20000	/* Oper Is Protected from Kick's and Kill's */
-#define UMODE_RBOT      	0x40000	/* Marks the client as a Registered Bot */
-#define UMODE_SBOT      	0x80000	/* Marks the client as a Server Bot */
-#define UMODE_NGLOBAL  		0x100000	/* See Network Globals */
-#define UMODE_NETINFO  		0x400000	/* Server link, Delink Notces etc. */
-#define UMODE_MAGICK   		0x800000	/* Allows Opers To See +s and +p Channels */
-#define UMODE_WATCHER		0x4000000	/* Recive Monitor Globals */
-#define UMODE_NETMON		0x8000000	/* Marks the client as an Network Monitor */
-#define UMODE_SERVADMIN		0x40000000	/* Marks the client as a Server Admin */
-#define UMODE_TECHADMIN		0x80000000	/* Marks the client as a Technical Admin */
-#define UMODE_DEAF		0x100000000	/* client is deaf on channels */
-#endif
-
 #define	UMODE_SERVNOTICE 	0x0100	/* server notices such as kill */
 #define	UMODE_LOCOP      	0x0200	/* Local operator -- SRB */
 #define UMODE_KILLS	 	0x0400	/* Show server-kills... */
@@ -454,9 +457,21 @@
 #define UMODE_CHATOP	 	0x2000	/* can receive chatops */
 #define UMODE_SERVICES   	0x4000	/* services */
 #define UMODE_HIDE	 	0x8000	/* Hide from Nukes */
+#define UMODE_NETADMIN  	0x10000	/* Network Admin */
+#define	UMODE_SUPER		0x20000	/* Oper Is Protected from Kick's and Kill's */
+#define UMODE_RBOT      	0x40000	/* Marks the client as a Registered Bot */
+#define UMODE_SBOT      	0x80000	/* Marks the client as a Server Bot */
+#define UMODE_NGLOBAL  		0x100000	/* See Network Globals */
 #define UMODE_WHOIS    		0x200000	/* Lets Opers see when people do a /WhoIs on them */
+#define UMODE_NETINFO  		0x400000	/* Server link, Delink Notces etc. */
+#define UMODE_MAGICK   		0x800000	/* Allows Opers To See +s and +p Channels */
 #define UMODE_IRCADMIN 		0x1000000	/* Marks the client as an IRC Administrator */
 #define UMODE_SADMIN	0x2000000	/* Marks the client as a Services Administrator */
+#define UMODE_WATCHER		0x4000000	/* Recive Monitor Globals */
+#define UMODE_NETMON		0x8000000	/* Marks the client as an Network Monitor */
+#define UMODE_SERVADMIN		0x10000000	/* Marks the client as a Server Admin */
+#define UMODE_TECHADMIN		0x20000000	/* Marks the client as a Technical Admin */
+#endif
 
 /* Smodes */
 #define SMODE_SSL		0x1	/* ssl client */

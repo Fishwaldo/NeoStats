@@ -173,23 +173,23 @@
 #define UMODE_REGNICK     0x00040	/* umode +r - registered nick */
 #define UMODE_KILLS     0x00080	/* umode +k - Server kill messages */
 #define UMODE_FLOOD     0x00100	/* umode +f - Server flood messages */
-#define UMODE_y     0x00200	/* umode +y - Stats/links */
+#define UMODE_SPY     0x00200	/* umode +y - Stats/links */
 #define UMODE_DEBUG     0x00400	/* umode +d - Debug info */
 #define UMODE_GLOBOPS     0x01000	/* umode +g - Globops */
 #define UMODE_CHATOPS     0x02000	/* umode +b - Chatops */
 #define UMODE_SADMIN     0x04000	/* umode +a - Services Admin */
 #define UMODE_ADMIN     0x08000     /* umode +A - Server Admin */
-#define UMODE_n     0x10000	/* umode +n - Routing Notices */
+#define UMODE_ROUTE     0x10000	/* umode +n - Routing Notices */
 #define UMODE_HELPOP     0x20000     /* umode +h - Helper */
-#define UMODE_m     0x40000     /* umode +m - spambot notices */
+#define UMODE_SPAM     0x40000     /* umode +m - spambot notices */
 #define UMODE_REGONLY     0x80000     /* unmode +R - No non registered msgs */
-#define UMODE_e     0x100000    /* umode +e - oper notices for the above +D */
-#define UMODE_x     0x200000    /* umode +x - Squelch with notice */
-#define UMODE_X     0x400000    /* umode +X - Squelch without notice */
-#define UMODE_D     0x800000    /* umode +D - Hidden dccallow umode */
-#define UMODE_F     0x1000000   /* umode +F - no cptr->since message rate throttle */
-#define UMODE_j	    0x2000000   /* umode +j - client rejection notices */
-#define UMODE_K     0x4000000   /* umode +K - U: lined server kill messages */
+#define UMODE_OPERNOTICE     0x100000    /* umode +e - oper notices for the above +D */
+#define UMODE_SQUELCH     0x200000    /* umode +x - Squelch with notice */
+#define UMODE_SQUELCHN     0x400000    /* umode +X - Squelch without notice */
+#define UMODE_HIDDENDCC     0x800000    /* umode +D - Hidden dccallow umode */
+#define UMODE_THROTTLE     0x1000000   /* umode +F - no cptr->since message rate throttle */
+#define UMODE_REJ	    0x2000000   /* umode +j - client rejection notices */
+#define UMODE_ULINEKILL     0x4000000   /* umode +K - U: lined server kill messages */
 
 /* Cmode chars */
 #define CMODE_CH_CHANOP 'o'
