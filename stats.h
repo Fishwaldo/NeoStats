@@ -267,9 +267,11 @@ typedef enum NS_ERR {
 	NS_ERR_NICK_IN_USE		= 0x8000001,
 	NS_ERR_OUT_OF_MEMORY	= 0x8000002,
 	/* Error value for incompatible version */
-	NS_ERR_VERSION			= 0x8000003,
-
+	/* Temporarily done as #define for forward port */
+	/*	NS_ERR_VERSION			= 0x8000003,*/
 }NS_ERR ;
+
+#define	NS_ERR_VERSION 0x8000003
 
 /* do_exit call exit type definitions */
 typedef enum {
