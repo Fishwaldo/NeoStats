@@ -78,14 +78,11 @@ static void send_vctrl (void);
 static struct ircd_srv_ {   
 	int uprot;  
 	int modex;   
-        int nicklg;   
-        int gc;   
-        char cloak[25];   
-        int burst;   
-} ircd_srv; 
-                                                        
-
-
+	int nicklg;   
+	int gc;   
+	char cloak[25];   
+	int burst;   
+} ircd_srv;                                                    
 
 #ifndef ULTIMATE3
 const char ircd_version[] = "(UL)";

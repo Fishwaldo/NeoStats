@@ -70,7 +70,6 @@ static struct ircd_srv_ {
 	int nicklg;
 	int gc;
 	char cloak[25];
-	int burst;
 } ircd_srv;
 
 const char ircd_version[] = "(M)";

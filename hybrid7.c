@@ -60,11 +60,6 @@ static void Srv_Sjoin (char *origin, char **argv, int argc);
 static void Srv_Protocol (char *origin, char **argv, int argc);
 
 static struct ircd_srv_ {
-	int uprot;
-	int modex;
-	int nicklg;
-	int gc;
-	char cloak[25];
 	int unkline;
 } ircd_srv;
 
