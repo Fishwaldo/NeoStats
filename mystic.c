@@ -565,6 +565,7 @@ globops (char *from, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
+
 	if (me.onchan) {
 		sts (":%s GLOBOPS :%s", from, ircd_buf);
 	} else {

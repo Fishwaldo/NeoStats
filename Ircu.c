@@ -497,7 +497,6 @@ chanalert (char *who, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	nlog (LOG_DEBUG3, LOG_CORE, "SENT: :%s PRIVMSG %s :%s", who, me.chan, ircd_buf);
 	sts (":%s PRIVMSG %s :%s", who, me.chan, ircd_buf);
 }
 
