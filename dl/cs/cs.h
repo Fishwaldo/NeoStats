@@ -51,7 +51,7 @@
   #define COSERVERADMIN_MODE 'C'
   #define SERVERADMIN_MODE 'A'
   #define CONETADMIN_MODE '8'		/* Set to a number we dont use */
-  #define NETADMIN_MODE 'T'
+  #define NETADMIN_MODE 'N'
   #define TECHADMIN_MODE 'T'
   #define SERVICESADMIN_MODE 'A'
   #define NETSERVICE_MODE 'S'
