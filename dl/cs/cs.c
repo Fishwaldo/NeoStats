@@ -341,7 +341,7 @@ static int cs_user_modes(char **av, int ac)
 		case '-':
 			add = 0;
 			break;
-#ifdef GOTUSERSMODES
+#ifndef GOTUSERSMODES
 /* these modes in Ultimate3 are Smodes */
 #ifdef UMODE_CH_NETADMIN
 		case UMODE_CH_NETADMIN:
