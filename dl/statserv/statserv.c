@@ -269,7 +269,7 @@ bot_cmd ss_commands[]=
 bot_setting ss_settings[]=
 {
 	{"HTML",		&StatServ.html,		SET_TYPE_BOOLEAN,	0, 0,	"HTML_Enabled",		NULL,		ss_help_set },
-	{"HTMLPATH",	&StatServ.htmlpath,	SET_TYPE_STRING,	0, 0,	"HTML_Path",		NULL,		NULL },
+	{"HTMLPATH",	&StatServ.htmlpath,	SET_TYPE_STRING,	0, 255,	"HTML_Path",		NULL,		NULL },
 	{"MSGTHROTTLE",	&StatServ.interval,	SET_TYPE_INT,		1, 99,	"Wallop_Throttle",	"seconds",	NULL },
 	{"LAGWALLOP",	&StatServ.lag,		SET_TYPE_INT,		1, 99,	"Lag",				"seconds",	NULL },
 	{NULL,			NULL,				0,					0, 0,	NULL,				NULL,		NULL },
