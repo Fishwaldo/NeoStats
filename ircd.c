@@ -31,7 +31,7 @@
 #include "log.h"
 #include "services.h"
 
-static UmodeStringBuf[64];
+static char UmodeStringBuf[64];
 
 /** @brief UmodeMaskToString
  *
@@ -65,6 +65,7 @@ UmodeMaskToString(long Umode)
 long
 UmodeStringToMask(char* UmodeString)
 {
+	return(0);
 }
 
 /** @brief init_bot_modes
@@ -311,7 +312,7 @@ parse (char *line)
 	User *u;
 	char origin[64], cmd[64], *coreLine;
 	int cmdptr = 0;
-	int I = 0;
+	int i = 0;
 	int ac;
 	char **av;
 	ModUser *mod_usr;
@@ -443,11 +444,11 @@ parse (char *line)
 
 	/* now, Parse the Command to the Internal Functions... */
 	SET_SEGV_LOCATION();
-	for (I = 0; I < ircd_srv.cmdcount; I++) {
-		if (!strcmp (cmd_list[I].name, cmd)) {
-			if (cmd_list[I].srvmsg == cmdptr) {
-				cmd_list[I].function (origin, av, ac);
-				cmd_list[I].usage++;
+	for (i = 0; i < ircd_srv.cmdcount; i++) {
+		if (!strcmp (cmd_list[i].name, cmd) ) {
+			if (cmd_list[i].srvmsg == cmdptr) {
+				cmd_list[i].function (origin, av, ac);
+				cmd_list[i].usage++;
 				break;
 			}
 		}
