@@ -42,7 +42,7 @@ aCtab cFlagTab[] = {
 };
 
 
-
+#ifdef ULTIMATE3
 Oper_Modes usr_mds[] = {
 				 {UMODE_OPER, 'o', 50},
                                  {UMODE_LOCOP, 'O', 40},
@@ -58,7 +58,7 @@ Oper_Modes usr_mds[] = {
 		 		 {UMODE_SBOT, 'b', 0},
 	   			 {UMODE_DEAF,    'd',0},
                                  {UMODE_ADMIN, 'z',70},
-                                 {UMODE_NETADMIN, 'N',185},
+                                 {UMODE_NETADMIN, 't',185},
 				 {UMODE_TECHADMIN, 'T',190},
                                  {UMODE_CLIENT, 'c',0},
                                  {UMODE_FLOOD, 'f',0},
@@ -71,6 +71,34 @@ Oper_Modes usr_mds[] = {
 				 {UMODE_DEAF, 'd', 0},
                                  {0, 0, 0 }
 };
+#elif ULTIMATE
+                                 {UMODE_OPER, 'o', 50},
+                                 {UMODE_LOCOP, 'O', 40},
+                                 {UMODE_INVISIBLE, 'i', 0},
+                                 {UMODE_WALLOP, 'w', 0},
+                                 {UMODE_FAILOP, 'g', 0},
+                                 {UMODE_HELPOP, 'h', 30},
+                                 {UMODE_SERVNOTICE, 's',0},
+                                 {UMODE_KILLS, 'k',0},
+                                 {UMODE_SERVICES, 'S',200},
+                                 {UMODE_SERVICESADMIN, 'P',100},
+                                 {UMODE_RBOT, 'B',0},
+                                 {UMODE_SBOT, 'b', 0},
+                                 {UMODE_DEAF,    'd',0},
+                                 {UMODE_ADMIN, 'z',70},
+                                 {UMODE_NETADMIN, 'N',185},
+                                 {UMODE_TECHADMIN, 'T',190},
+                                 {UMODE_CLIENT, 'c',0},
+                                 {UMODE_FLOOD, 'f',0},
+                                 {UMODE_REGNICK, 'r',0},
+                                 {UMODE_HIDE,    'x',0},
+                                 {UMODE_WATCHER, 'W',0},
+                                 {UMODE_SERVICESOPER, 'a', 100},
+                                 {UMODE_SUPER, 'p', 40},
+                                 {UMODE_IRCADMIN, 'Z', 100},
+                                 {UMODE_DEAF, 'd', 0},
+                                 {0, 0, 0 }
+#endif
 
 
 
