@@ -340,8 +340,8 @@ ChangeChanUserMode (Chans * c, User * u, int add, long mode)
  * @returns c the newly created channel record
  * @todo Dynamically resizable channel hashes
 */
-Chans *
-new_chan (char *chan)
+static Chans *
+new_chan (const char *chan)
 {
 	Chans *c;
 	hnode_t *cn;
@@ -622,7 +622,7 @@ change_user_nick (Chans * c, char *newnick, char *oldnick)
 
 
 void
-join_chan (char* nick, char *chan)
+join_chan (const char* nick, const char *chan)
 {
 	User* u;
 	Chans *c;
@@ -826,7 +826,7 @@ ChanDump (char *chan)
 
 
 Chans *
-findchan (char *chan)
+findchan (const char *chan)
 {
 	Chans *c;
 	hnode_t *cn;

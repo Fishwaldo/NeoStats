@@ -88,6 +88,11 @@
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
 
+/* SecureServ wants CHANADMIN but only a few ircds support it so we have to "fake" it */
+#ifndef CMODE_CHANADMIN
+#define CMODE_CHANADMIN CMODE_CHANOP
+#endif
+
 /* Temp for backwards compatibility */
 #define MODE_CHANOP CMODE_CHANOP
 #define MODE_CHANADMIN CMODE_CHANADMIN
@@ -548,7 +553,7 @@ int UserLevel (User *u);
 Server *findserver (const char *name);
 
 /* chans.c */
-Chans *findchan (char *chan);
+Chans *findchan (const char *chan);
 int CheckChanMode (Chans * c, long mode);
 int IsChanMember(Chans *c, User *u);
 
@@ -567,3 +572,5 @@ typedef void (transfer_callback) (void *data, int returncode, char *body, int bo
 void transfer_status();
 int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback);
 #endif
+
+int join_bot_to_chan (const char *who, const char *chan, unsigned long chflag);

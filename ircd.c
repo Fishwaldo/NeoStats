@@ -1016,3 +1016,14 @@ skick_cmd (const char *who, const char *target, const char *chan, const char *re
 	return 1;
 }
 
+int 
+join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
+{
+#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID)
+	sjoin_cmd(who, chan, chflag);
+#else
+	sjoin_cmd(who, chan);
+	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN)
+		schmode_cmd(who, chan, "+o", who);
+#endif
+}

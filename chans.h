@@ -26,7 +26,7 @@
 
 void ChanDump (char *chan);
 void part_chan (User * u, char *chan);
-void join_chan (char* nick, char *chan);
+void join_chan (const char* nick, const char *chan);
 void change_user_nick (Chans * c, char *newnick, char *oldnick);
 int ChanMode (char *origin, char **av, int ac);
 void ChanTopic (char *, char* chan, time_t t, char *);
