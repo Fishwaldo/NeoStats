@@ -638,7 +638,7 @@ static void
 Usr_Quit (char *origin, char **argv, int argc)
 {
 	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
+	tmpbuf = joinbuf(argv, argc, 0);
 	UserQuit (origin, tmpbuf);
 	free(tmpbuf);
 }
