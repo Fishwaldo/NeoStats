@@ -420,3 +420,80 @@ static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
 }
+
+/* Override the core splitbuf and parse functions until 
+ * IRCU support is complete
+ */
+
+int
+splitbuf (char *buf, char ***argv, int colon_special)
+{
+	int argvsize = 8;
+	int argc;
+	char *s;
+
+	SET_SEGV_LOCATION();
+	*argv = calloc (sizeof (char *) * argvsize, 1);
+	argc = 0;
+	while (*buf) {
+		if (argc == argvsize) {
+			argvsize += 8;
+			*argv = realloc (*argv, sizeof (char *) * argvsize);
+		}
+		s = strpbrk (buf, " ");
+		if (s) {
+			*s++ = 0;
+			while (isspace (*s))
+				s++;
+		} else {
+			s = buf + strnlen (buf, BUFSIZE);
+		}
+		if (*buf == 0) {
+			buf++;
+		}
+		(*argv)[argc++] = buf;
+		buf = s;
+	}
+	return argc;
+}
+
+void
+parse (char *line)
+{
+	char origin[64], cmd[64], *coreLine;
+	int cmdptr = 0;
+	int ac;
+	char **av;
+
+	SET_SEGV_LOCATION();
+	strip (line);
+	strlcpy (recbuf, line, BUFSIZE);
+	if (!(*line))
+		return;
+	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
+	if (!*line)
+		return;
+	coreLine = strpbrk (line, " ");
+	if (coreLine) {
+		*coreLine = 0;
+		while (isspace (*++coreLine));
+	} else
+		coreLine = line + strlen (line);
+	if ((!strcasecmp(line, "SERVER")) || (!strcasecmp(line, "PASS"))) {
+		strlcpy(cmd, line, sizeof(cmd));
+		ac = splitbuf(coreLine, &av, 1);
+		cmdptr = 0;
+	} else {
+		strlcpy(origin, line, sizeof(origin));	
+		cmdptr = 1;
+		line = strpbrk (coreLine, " ");
+		if (line) {
+			*line = 0;
+			while (isspace (*++line));
+		} else
+			coreLine = line + strlen (line);
+		ac = splitbuf(line, &av, 0);
+	}
+	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
+	free (av);
+}

@@ -193,10 +193,11 @@ send_server (const char *name, const int numeric, const char *infoline)
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
-#if 0
-	sts ("%s TOKEN SJOIN", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
+/* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 */
+#ifdef SJOIN
+	sts ("%s TOKEN NICKv2 SJOIN SJOIN2 UMODE2", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 #else
-	sts ("%s TOKEN UMODE2 NICKv2", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
+	sts ("%s TOKEN NICKv2 UMODE2", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 #endif
 	sts ("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
 	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
@@ -471,10 +472,7 @@ m_server (char *origin, char **argv, int argc, int srv)
 static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	SquitServer (argv[0], tmpbuf);
-	free(tmpbuf);
+	SquitServer (argv[0], argv[1]);
 }
 
 /* m_quit
@@ -483,10 +481,7 @@ m_squit (char *origin, char **argv, int argc, int srv)
 static void
 m_quit (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 0);
-	UserQuit (origin, tmpbuf);
-	free(tmpbuf);
+	UserQuit (origin, argv[0]);
 }
 
 /* m_svsmode
@@ -500,7 +495,11 @@ m_svsmode (char *origin, char **argv, int argc, int srv)
 	if (argv[0][0] == '#') {
 		ChanMode (origin, argv, argc);
 	} else {
-		UserMode (argv[0], argv[1]);
+		if (argv[2] && isdigit(*argv[2])) {
+			SetUserServicesTS(argv[0], argv[2]); 
+		} else {
+			UserMode (argv[0], argv[1]);
+		}
 	}
 }
 
@@ -541,10 +540,7 @@ m_umode2 (char *origin, char **argv, int argc, int srv)
 static void
 m_kill (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	KillUser (argv[0], tmpbuf);
-	free(tmpbuf);
+	KillUser (argv[0], argv[1]);
 }
 static void
 m_vhost (char *origin, char **argv, int argc, int srv)
@@ -568,15 +564,7 @@ m_pong (char *origin, char **argv, int argc, int srv)
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
-	char *buf;
-
-	if (argc > 0) {
-		buf = joinbuf (argv, argc, 0);
-		UserAway (origin, buf);
-		free (buf);
-	} else {
-		UserAway (origin, NULL);
-	}
+	UserAway (origin, (argc > 0) ? argv[0] : NULL);
 }
 
 /* m_nick
@@ -602,17 +590,12 @@ static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
-		char *realname;
 #ifdef NICKV2	
-		realname = joinbuf (argv, argc, 7);
-		AddUser (argv[0], argv[3], argv[4], realname, argv[5], NULL, argv[2]);
-		free (realname);
+		AddUser (argv[0], argv[3], argv[4], argv[9], argv[5], NULL, argv[2]);
 		UserMode (argv[0], argv[7]);
 		SetUserVhost(argv[0], argv[8]);
 #else
-		realname = joinbuf (argv, argc, 7);
-		AddUser (argv[0], argv[3], argv[4], realname, argv[5], NULL, argv[2]);
-		free (realname);
+		AddUser (argv[0], argv[3], argv[4], argv[7], argv[5], NULL, argv[2]);
 #endif
 	} else {
 		UserNick (origin, argv[0], NULL);
@@ -631,11 +614,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	char *buf;
-
-	buf = joinbuf (argv, argc, 3);
-	ChanTopic (argv[1], argv[0], argv[2], buf);
-	free (buf);
+	ChanTopic (argv[1], argv[0], argv[2], argv[3]);
 }
 
 /* m_kick
@@ -646,10 +625,7 @@ m_topic (char *origin, char **argv, int argc, int srv)
 static void
 m_kick (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 2);
-	kick_chan(argv[0], argv[1], origin, tmpbuf);
-	free(tmpbuf);
+	kick_chan(argv[0], argv[1], origin, argv[2]);
 }
 
 /* m_join
@@ -669,10 +645,7 @@ m_join (char *origin, char **argv, int argc, int srv)
 static void
 m_part (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	part_chan (finduser (origin), argv[0], tmpbuf);
-	free(tmpbuf);
+	part_chan (finduser (origin), argv[0], argv[1]);
 }
 
 /* m_ping
@@ -698,12 +671,9 @@ m_ping (char *origin, char **argv, int argc, int srv)
 static void
 m_netinfo (char *origin, char **argv, int argc, int srv)
 {
-	char *buf;
 	ircd_srv.uprot = atoi (argv[2]);
 	strlcpy (ircd_srv.cloak, argv[3], 10);
-	buf = joinbuf (argv, argc, 7);
-	strlcpy (me.netname, buf, MAXPASS);
-	free (buf);
+	strlcpy (me.netname, argv[7], MAXPASS);
 	send_netinfo ();
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");

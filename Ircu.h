@@ -58,6 +58,11 @@
 /* we don't have automatic host cloaking support via Umode */
 #undef GOTUMODECLOAKING
 
+/* Override NeoStats core splitbuf function */
+#define IRCD_SPLITBUF
+/* Override NeoStats core parse function */
+#define IRCD_PARSE
+
 /* buffer sizes */
 #define MAXHOST			(63 + 1)
 #define MAXPASS			(32 + 1)

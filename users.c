@@ -702,3 +702,12 @@ UserSMode (const char *nick, const char *modes)
 	nlog (LOG_DEBUG1, LOG_CORE, "UserSMode: smode for %s is now %p", u->nick, (int *)u->Smode);
 }
 #endif
+
+void SetUserServicesTS(char* nick, char* ts) 
+{
+	User* u;
+	u = finduser(nick);
+	if(u) {
+		u->servicesstamp = strtoul(ts, NULL, 10);
+	}
+}

@@ -42,6 +42,11 @@ static char SmodeStringBuf[64];
 #endif
 static long services_bot_umode= 0;
 
+/* Fully split buffer */
+#ifdef NEW_STYLE_SPLITBUF
+static char privmsgbuffer[BUFSIZE];
+#endif
+
 static int signon_newbot (const char *nick, const char *user, const char *host, const char *rname, long Umode);
 
 /** @brief init_ircd
@@ -232,7 +237,12 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 		sjoin_cmd (nick, me.chan);
 		schmode_cmd (me.name, me.chan, "+a", nick);
 #elif defined(UNREAL)
+#ifdef SJOIN
 		ssjoin_cmd(nick, me.chan, CMODE_CHANOP);
+#else
+		sjoin_cmd (nick, me.chan);
+		schmode_cmd (me.name, me.chan, "+o", nick);
+#endif
 #endif
 	}
 	return NS_SUCCESS;
@@ -376,29 +386,25 @@ CloakHost (ModUser *bot_ptr)
  *
  * @return 
  */
+#ifndef IRCD_SPLITBUF
 #ifdef NEW_STYLE_SPLITBUF
 int
-split_buf (char *buf, char ***argv, int colon_special)
+splitbuf (char *buf, char ***argv, int colon_special)
 {
 	int argvsize = 8;
 	int argc;
 	char *s;
-#ifndef IRCU
 	int colcount = 0;
-#endif
 	SET_SEGV_LOCATION();
 	*argv = calloc (sizeof (char *) * argvsize, 1);
 	argc = 0;
-#ifndef IRCU
 	if (*buf == ':')
 		buf++;
-#endif
 	while (*buf) {
 		if (argc == argvsize) {
 			argvsize += 8;
 			*argv = realloc (*argv, sizeof (char *) * argvsize);
 		}
-#ifndef IRCU
 		if ((*buf == ':') && (colcount < 1)) {
 			buf++;
 			colcount++;
@@ -407,7 +413,6 @@ split_buf (char *buf, char ***argv, int colon_special)
 				break;
 			}
 		}
-#endif
 		s = strpbrk (buf, " ");
 		if (s) {
 			*s++ = 0;
@@ -425,6 +430,10 @@ split_buf (char *buf, char ***argv, int colon_special)
 	return argc;
 }
 #else
+#define splitbuf split_buf
+#endif
+#endif
+
 int
 split_buf (char *buf, char ***argv, int colon_special)
 {
@@ -468,7 +477,6 @@ split_buf (char *buf, char ***argv, int colon_special)
 	}
 	return argc;
 }
-#endif
 
 /** @brief joinbuf 
  *
@@ -514,6 +522,10 @@ joinbuf (char **av, int ac, int from)
 static void
 m_privmsg (int cmdptr, char* origin, char **av, int ac)
 {
+#ifdef NEW_STYLE_SPLITBUF
+	int argc;
+	char **argv;
+#endif
 	char target[64];
 	User *u;
 	ModUser *mod_usr;
@@ -526,12 +538,19 @@ m_privmsg (int cmdptr, char* origin, char **av, int ac)
 		strlcpy (target, av[0], 64);
 		av[0] = strtok (target, "@");
 	}
+
 	if (!strcasecmp (s_Services, av[0])) {
 		if (flood (finduser (origin))) {
 			return;
 		}
 		/* its to the Internal Services Bot */
+#ifdef NEW_STYLE_SPLITBUF
+		argc = split_buf (privmsgbuffer, &argv, 1);
+		servicesbot (origin, argv, argc);
+		free (argv);
+#else
 		servicesbot (origin, av, ac);
+#endif
 		return;
 	} else {
 		mod_usr = findbot (av[0]);
@@ -553,21 +572,39 @@ m_privmsg (int cmdptr, char* origin, char **av, int ac)
 			SET_SEGV_INMODULE(mod_usr->modname);
 			if (setjmp (sigvbuf) == 0) {
 				if(mod_usr->function) {
+#ifdef NEW_STYLE_SPLITBUF
+					argc = split_buf (privmsgbuffer, &argv, 1);
+					mod_usr->function (origin, argv, argc);
+					free (argv);
+#else
 					mod_usr->function (origin, av, ac);
+#endif
 				}
 				else {
 					u = finduser (origin);
 					if (!u) {
 						nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", origin, mod_usr->nick);
-						return;
+					} else {
+#ifdef NEW_STYLE_SPLITBUF
+						argc = split_buf (privmsgbuffer, &argv, 1);
+						run_bot_cmd(mod_usr, u, argv, argc);
+						free (argv);
+#else
+						run_bot_cmd(mod_usr, u, av, ac);
+#endif
 					}
-					run_bot_cmd(mod_usr, u, av, ac);
 				}
 			}
 			CLEAR_SEGV_INMODULE();
 			return;
 		} else {
+#ifdef NEW_STYLE_SPLITBUF
+			argc = split_buf (privmsgbuffer, &argv, 1);
+			bot_chan_message (origin, argv, argc);
+			free (argv);
+#else
 			bot_chan_message (origin, av, ac);
+#endif
 			return;
 		}
 	}
@@ -623,6 +660,7 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
  *
  * @return none
  */
+#ifndef IRCD_PARSE
 void
 parse (char *line)
 {
@@ -637,7 +675,6 @@ parse (char *line)
 	if (!(*line))
 		return;
 	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
-#ifndef IRCU
 	if (*line == ':') {
 		coreLine = strpbrk (line, " ");
 		if (!coreLine)
@@ -651,40 +688,24 @@ parse (char *line)
 		cmdptr = 0;
 		*origin = 0;
 	}
-#endif
 	if (!*line)
 		return;
 	coreLine = strpbrk (line, " ");
 	if (coreLine) {
 		*coreLine = 0;
 		while (isspace (*++coreLine));
-	} else
-		coreLine = line + strlen (line);
-#ifdef IRCU
-	if ((!strcasecmp(line, "SERVER")) || (!strcasecmp(line, "PASS"))) {
-		strlcpy(cmd, line, sizeof(cmd));
-		ac = split_buf(coreLine, &av, 1);
-		cmdptr = 0;
 	} else {
-		strlcpy(origin, line, sizeof(origin));	
-		cmdptr = 1;
-		line = strpbrk (coreLine, " ");
-		if (line) {
-			*line = 0;
-			while (isspace (*++line));
-		} else
-			coreLine = line + strlen (line);
-		ac = split_buf(line, &av, 0);
+		coreLine = line + strlen (line);
 	}
-
-#else 
 	strlcpy (cmd, line, sizeof (cmd)); 
-	ac = split_buf (coreLine, &av, 1);
+#ifdef NEW_STYLE_SPLITBUF
+	strlcpy (privmsgbuffer, coreLine, BUFSIZE);
 #endif
-
+	ac = splitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	free (av);
 }
+#endif
 
 /** @brief init_services_bot
  *

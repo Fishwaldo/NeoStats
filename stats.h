@@ -367,6 +367,7 @@ typedef struct User {
 	list_t *chans;
 	struct in_addr ipaddr;
 	time_t TS;
+	time_t servicesstamp;
 	long Smode;
 	void *moddata[NUM_MODULES];
 	long flags;
