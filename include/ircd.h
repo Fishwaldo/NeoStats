@@ -116,6 +116,7 @@ EXPORTFUNC void _m_kick( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_away( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_kill( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_squit( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_mode( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_globops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_wallops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_chatops( char *origin, char **argv, int argc, int srv );

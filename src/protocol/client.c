@@ -29,7 +29,6 @@
 
 static void m_private (char* origin, char **av, int ac, int cmdptr);
 static void m_notice (char* origin, char **av, int ac, int cmdptr);
-static void m_mode (char *origin, char **argv, int argc, int srv);
 static void m_nick (char *origin, char **argv, int argc, int srv);
 static void m_topic (char *origin, char **argv, int argc, int srv);
 static void m_kick (char *origin, char **argv, int argc, int srv);
@@ -65,7 +64,7 @@ ircd_cmd cmd_list[] = {
 	{"376", 0, m_emotd, 0},
 	{MSG_SETHOST, 0, m_vhost, 0},
 	{MSG_QUIT, 0, _m_quit, 0},
-	{MSG_MODE, 0, m_mode, 0},
+	{MSG_MODE, 0, _m_mode, 0},
 	{MSG_KILL, 0, _m_kill, 0},
 	{MSG_PONG, 0, _m_pong, 0},
 	{MSG_AWAY, 0, _m_away, 0},
@@ -281,27 +280,6 @@ void
 send_globops (const char *source, const char *buf)
 {
 	send_cmd (":%s %s :%s", source, MSG_GLOBOPS, buf);
-}
-
-/* m_mode 
- *  argv[0] - channel
-
- * m_umode
- * argv[0] - username to change mode for
- * argv[1] - modes to change
- */
-/*  MODE
- *  :nick MODE nick :+modestring 
- *  :servername MODE #channel +modes parameter list TS 
- */
-static void
-m_mode (char *origin, char **argv, int argc, int srv)
-{
-	if (argv[0][0] == '#') {
-		do_mode_channel (origin, argv, argc);
-	} else {
-		do_mode_user (argv[0], argv[1]);
-	}
 }
 
 static void

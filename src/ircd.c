@@ -756,6 +756,40 @@ void _m_squit( char *origin, char **argv, int argc, int srv )
 	do_squit( argv[0], argv[argc-1] );
 }
 
+/** @brief _m_mode
+ *
+ *  process MODE command
+ *	 argv[0] - channel
+ *
+ *  m_umode
+ *   argv[0] - username to change mode for
+ *   argv[1] - modes to change
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+/*  MODE
+ *  :nick MODE nick :+modestring 
+ *  :servername MODE #channel +modes parameter list TS 
+ */
+
+void _m_mode( char *origin, char **argv, int argc, int srv )
+{
+	if( argv[0][0] == '#' )
+	{
+		do_mode_channel( origin, argv, argc );
+	}
+	else
+	{
+		do_mode_user( argv[0], argv[1] );
+	}
+}
+
+
 /** @brief _m_notice
  *
  *  process NOTICE command

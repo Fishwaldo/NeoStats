@@ -26,7 +26,6 @@
 #include "ircd.h"
 
 static void m_server (char *origin, char **argv, int argc, int srv);
-static void m_mode (char *origin, char **argv, int argc, int srv);
 static void m_nick (char *origin, char **argv, int argc, int srv);
 static void m_svinfo (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
@@ -66,7 +65,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_SERVER, 0, m_server, 0},
 	{MSG_SQUIT, 0, _m_squit, 0},
 	{MSG_QUIT, 0, _m_quit, 0},
-	{MSG_MODE, 0, m_mode, 0},
+	{MSG_MODE, 0, _m_mode, 0},
 	{MSG_KILL, 0, _m_kill, 0},
 	{MSG_PONG, 0, _m_pong, 0},
 	{MSG_AWAY, 0, _m_away, 0},
@@ -353,15 +352,6 @@ m_server (char *origin, char **argv, int argc, int srv)
 	do_server (argv[0], origin, argv[1], NULL, argv[2], srv);
 }
 
-static void
-m_mode (char *origin, char **argv, int argc, int srv)
-{
-	if (argv[0][0] == '#') {
-		do_mode_channel (origin, argv, argc);
-	} else {
-		do_mode_user (argv[0], argv[1]);
-	}
-}
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {

@@ -29,7 +29,6 @@
 #include "services.h"
 
 static void m_server (char *origin, char **argv, int argc, int srv);
-static void m_mode (char *origin, char **argv, int argc, int srv);
 static void m_svsmode (char *origin, char **argv, int argc, int srv);
 static void m_nick (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
@@ -70,7 +69,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_SERVER, TOK_SERVER, m_server, 0},
 	{MSG_SQUIT, TOK_SQUIT, _m_squit, 0},
 	{MSG_QUIT, TOK_QUIT, _m_quit, 0},
-	{MSG_MODE, TOK_MODE, m_mode, 0},
+	{MSG_MODE, TOK_MODE, _m_mode, 0},
 	{MSG_SVSMODE, TOK_SVSMODE, m_svsmode, 0},
 	{MSG_KILL, TOK_KILL, _m_kill, 0},
 	{MSG_PONG, TOK_PONG, _m_pong, 0},
@@ -359,15 +358,6 @@ m_svsmode (char *origin, char **argv, int argc, int srv)
 		do_svsmode_channel (origin, argv, argc);
 	} else {
 		do_svsmode_user (argv[0], argv[1], NULL);
-	}
-}
-static void
-m_mode (char *origin, char **argv, int argc, int srv)
-{
-	if (argv[0][0] == '#') {
-		do_mode_channel (origin, argv, argc);
-	} else {
-		do_mode_user (argv[0], argv[1]);
 	}
 }
 
