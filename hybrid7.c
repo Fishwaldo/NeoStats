@@ -95,7 +95,7 @@ int squit_cmd(const char *who, const char *quitmsg) {
 }
 
 int spart_cmd(const char *who, const char *chan) {
-	sts("%s %s %s", who, MSG_PART, chan);
+	sts(":%s %s %s", who, MSG_PART, chan);
 	part_chan(finduser(who), (char *)chan);
 	return 1;
 }
