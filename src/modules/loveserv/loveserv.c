@@ -31,14 +31,13 @@ static int ls_kiss(CmdParams* cmdparams);
 static int ls_tonsil(CmdParams* cmdparams);
 static int ls_hug(CmdParams* cmdparams);
 static int ls_admirer(CmdParams* cmdparams);
-static int ls_choco(CmdParams* cmdparams);
+static int ls_chocolate(CmdParams* cmdparams);
 static int ls_candy(CmdParams* cmdparams);
 static int ls_lovenote(CmdParams* cmdparams);
 static int ls_apology(CmdParams* cmdparams);
 static int ls_thankyou(CmdParams* cmdparams);
 
 static Bot *ls_bot;
-static Module* ls_module;
 
 ModuleInfo module_info = {
 	"LoveServ",
@@ -69,7 +68,7 @@ static bot_cmd ls_commands[]=
 	{"TONSIL",		ls_tonsil,		1, 	0,	ls_help_tonsil,		ls_help_tonsil_oneline },
 	{"HUG",			ls_hug,			1, 	0,	ls_help_hug,		ls_help_hug_oneline },
 	{"ADMIRER",		ls_admirer,		1, 	0,	ls_help_admirer,	ls_help_admirer_oneline },
-	{"CHOCOLATE",	ls_choco,		1, 	0,	ls_help_chocolate,	ls_help_chocolate_oneline },
+	{"CHOCOLATE",	ls_chocolate,	1, 	0,	ls_help_chocolate,	ls_help_chocolate_oneline },
 	{"CANDY",		ls_candy,		1, 	0,	ls_help_candy,		ls_help_candy_oneline },
 	{"LOVENOTE",	ls_lovenote,	2, 	0,	ls_help_lovenote,	ls_help_lovenote_oneline },
 	{"APOLOGY",		ls_apology,		2, 	0,	ls_help_apology,	ls_help_apology_oneline },
@@ -88,7 +87,8 @@ static bot_setting ls_settings[]=
 
 static int ls_event_online(CmdParams* cmdparams)
 {
-	ls_bot = init_bot(ls_module, &ls_botinfo, services_bot_modes, BOT_FLAG_DEAF, ls_commands, ls_settings);
+	ls_bot = init_bot(&ls_botinfo, services_bot_modes, 
+		BOT_FLAG_DEAF, ls_commands, ls_settings);
 	return 1;
 };
 
@@ -99,7 +99,7 @@ ModuleEvent module_events[] = {
 
 int ModInit(Module* mod_ptr)
 {
-	ModuleConfig(ls_module, ls_settings);
+	ModuleConfig(ls_settings);
 	return 1;
 }
 
@@ -116,8 +116,8 @@ static int ls_rose(CmdParams* cmdparams)
 	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, "Your rose has been sent to %s!",
-		target_nick);
+	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
+		"Rose has been sent to %s", target_nick);
 	prefmsg(target_nick, ls_bot->nick,
 		"%s has sent you this beautiful rose! 3--<--<--<{4@",
 		cmdparams->source.user->nick);
@@ -133,7 +133,8 @@ static int ls_kiss(CmdParams* cmdparams)
 	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, "You have virtually kissed %s!", target_nick);
+	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
+		"You have virtually kissed %s", target_nick);
 	prefmsg(target_nick, ls_bot->nick, "%s has virtually kissed you!", cmdparams->source.user->nick);
 	return 1;
 }
@@ -148,7 +149,7 @@ static int ls_tonsil(CmdParams* cmdparams)
 		return 0;
 	}
 	prefmsg(cmdparams->source.user->nick, ls_bot->nick,
-		"You have virtually tonsilly kissed %s!", target_nick);
+		"You have virtually tonsil kissed %s", target_nick);
 	prefmsg(target_nick, ls_bot->nick,
 		"%s would like to send a SLoW..LoNG..DeeP..PeNeTRaTiNG..ToNSiL-TiCKLiNG.. HaiR STRaiGHTeNiNG..Toe-CuRLiNG..NeRVe-JaNGLiNG..LiFe-aLTeRiNG.. FaNTaSY-CauSiNG..i JuST SaW GoD!..GoSH, DiD MY CLoTHeS FaLL oFF?.. YeS, i'M GLaD i CaMe oN iRC..KiSS oN Da LiPS!!!",
 		cmdparams->source.user->nick);
@@ -164,7 +165,8 @@ static int ls_hug(CmdParams* cmdparams)
 	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, "%s has received your hug! :)", target_nick);
+	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
+		"You have hugged %s", target_nick);
 	prefmsg(target_nick, ls_bot->nick, "%s has sent you a *BIG WARM HUG*!", cmdparams->source.user->nick);
 	return 1;
 }
@@ -178,12 +180,13 @@ static int ls_admirer(CmdParams* cmdparams)
 	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, "Secret admirer sent to %s :)", target_nick);
+	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
+		"Secret admirer sent to %s", target_nick);
 	prefmsg(target_nick, ls_bot->nick, "You have a secret admirer! ;)");
 	return 1;
 }
 
-static int ls_choco(CmdParams* cmdparams)
+static int ls_chocolate(CmdParams* cmdparams)
 {
 	char *target_nick;
 
@@ -193,7 +196,7 @@ static int ls_choco(CmdParams* cmdparams)
 		return 0;
 	}
 	prefmsg(cmdparams->source.user->nick, ls_bot->nick,
-		"A box of cholocates has been sent to %s :)", target_nick);
+		"Cholocates sent to %s", target_nick);
 	prefmsg(target_nick, ls_bot->nick,
 		"%s would like you to have this YUMMY box of chocolates!",
 		cmdparams->source.user->nick);
@@ -210,7 +213,7 @@ static int ls_candy(CmdParams* cmdparams)
 		return 0;
 	}
 	prefmsg(cmdparams->source.user->nick, ls_bot->nick,
-		"A bag of yummy heart shaped candies has been sent to %s :)", target_nick);
+		"Candy sent to %s", target_nick);
 	prefmsg(target_nick, ls_bot->nick,
 		"%s would like you to have this big YUMMY bag of heart shaped candies!",
 		cmdparams->source.user->nick);
@@ -229,9 +232,10 @@ static int ls_lovenote(CmdParams* cmdparams)
 	}
 	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
 	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
-		"Your lovenote to %s has been sent! :)", target_nick);
+		"Love note sent to %s", target_nick);
 	prefmsg(target_nick, ls_bot->nick,
-		"%s has sent you a LoveNote which reads: \2%s\2", cmdparams->source.user->nick, message);
+		"%s has sent you a love note which reads: \2%s\2", 
+		cmdparams->source.user->nick, message);
 	free(message);
 	return 1;
 }
@@ -247,8 +251,8 @@ static int ls_apology(CmdParams* cmdparams)
 		return 0;
 	}
 	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, "Your apology has been sent to %s",
-		target_nick);
+	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
+		"Apology sent to %s", target_nick);
 	prefmsg(target_nick, ls_bot->nick,
 		"%s is sorry, and would like to apologise for \2%s\2",
 		cmdparams->source.user->nick, message);
@@ -267,8 +271,8 @@ static int ls_thankyou(CmdParams* cmdparams)
 		return 0;
 	}
 	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, "Your Thank You has been sent to %s",
-		target_nick);
+	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
+		"Thank you sent to %s", target_nick);
 	prefmsg(target_nick, ls_bot->nick, "%s wishes to thank you for \2%s\2",
 		cmdparams->source.user->nick, message);
 	free(message);

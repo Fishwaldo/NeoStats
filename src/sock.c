@@ -212,9 +212,9 @@ read_loop ()
 				++me.cursocks;
 			} else {
 				/* its a poll interface, setup for select instead */
-				SET_SEGV_INMODULE(sock->moduleptr->info->name);
+				SET_RUN_LEVEL(sock->moduleptr);
 				j = sock->beforepoll (sock->data, ufds);
-				CLEAR_SEGV_INMODULE();
+				RESET_RUN_LEVEL();
 				/* if we don't have any socks, just continue */
 				if (j == -1)
 					continue;
@@ -329,7 +329,7 @@ restartsql:
 				while ((sn = hash_scan_next (&ss)) != NULL) {
 					pollflag = 0;
 					sock = hnode_get (sn);
-					SET_SEGV_INMODULE(sock->moduleptr->info->name);
+					SET_RUN_LEVEL(sock->moduleptr);
 					if (sock->socktype == SOCK_STANDARD) {
 						if (FD_ISSET (sock->sock_no, &readfds)) {
 							nlog (LOG_DEBUG3, "Running module %s readsock function for %s", sock->moduleptr->info->name, sock->name);
@@ -367,8 +367,8 @@ restartsql:
 							sock->afterpoll(sock->data, ufds, pollsize);
 						}
 					}
-				}
-				CLEAR_SEGV_INMODULE();
+					RESET_RUN_LEVEL();
+				}				
 				continue;
 			}
 		} else if (SelectResult == 0) {
@@ -466,12 +466,14 @@ recvlog (char *line)
  *         NS_FAILURE if unsuccessful
  */
 int
-sock_connect (Module* moduleptr, int socktype, unsigned long ipaddr, int port, char *name, socket_function func_read, socket_function func_write, socket_function func_error)
+sock_connect (int socktype, unsigned long ipaddr, int port, char *name, socket_function func_read, socket_function func_write, socket_function func_error)
 {
 	struct sockaddr_in sa;
 	int s;
 	int i;
+	Module* moduleptr;
 
+	moduleptr = GET_CUR_MODULE();
 	/* socktype = SOCK_STREAM */
 	if ((s = socket (AF_INET, socktype, 0)) < 0)
 		return NS_FAILURE;
@@ -506,7 +508,7 @@ sock_connect (Module* moduleptr, int socktype, unsigned long ipaddr, int port, c
 		}
 	}
 
-	add_socket (moduleptr, func_read, func_write, func_error, name, s);
+	add_socket (func_read, func_write, func_error, name, s);
 	return s;
 }
 
@@ -844,8 +846,10 @@ int InitSocks (void)
 {
 	me.maxsocks = getmaxsock ();
 	sockh = hash_create (me.maxsocks, 0, 0);
-	if(!sockh)
+	if(!sockh) {
+		nlog (LOG_CRITICAL, "Unable to create socks hash");
 		return NS_FAILURE;
+	}
 	return NS_SUCCESS;
 }
 
@@ -917,11 +921,13 @@ findsock (char *sock_name)
  * @return pointer to socket if found, NULL if not found
 */
 int
-add_socket (Module* moduleptr, socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum)
+add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum)
 {
 	Sock *sock;
+	Module* moduleptr;
 
 	SET_SEGV_LOCATION();
+	moduleptr = GET_CUR_MODULE();
 	if (!readfunc) {
 		nlog (LOG_WARNING, "add_socket: read socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
 		return NS_FAILURE;
@@ -958,11 +964,13 @@ add_socket (Module* moduleptr, socket_function readfunc, socket_function writefu
  * @return pointer to socket if found, NULL if not found
 */
 int
-add_sockpoll (Module* moduleptr, before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, void *data)
+add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, void *data)
 {
 	Sock *sock;
+	Module* moduleptr;
 
 	SET_SEGV_LOCATION();
+	moduleptr = GET_CUR_MODULE();
 	if (!beforepoll) {
 		nlog (LOG_WARNING, "add_sockpoll: read socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
 		return NS_FAILURE;

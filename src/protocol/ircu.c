@@ -60,7 +60,6 @@ static void m_end_of_burst (char *origin, char **argv, int argc, int srv);
 void send_end_of_burst_ack(void);
 void send_end_of_burst(void);
 
-const char ircd_version[] = "(IRCu)";
 const char services_bot_modes[]= "+iok";
 
 /* this is the command list and associated functions to run */

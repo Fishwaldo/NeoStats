@@ -62,10 +62,8 @@ static void m_snetinfo (char *origin, char **argv, int argc, int srv);
 static void m_vctrl (char *origin, char **argv, int argc, int srv);
 
 #ifdef ULTIMATE3
-const char ircd_version[] = "(UL3)";
 const char services_bot_modes[]= "+oS";
 #else
-const char ircd_version[] = "(UL)";
 const char services_bot_modes[]= "+oS";
 #endif
 

@@ -4,8 +4,6 @@
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
 **
-**  Portions Copyright (c) 1999 Johnathan George net@lite.net
-**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -34,7 +32,7 @@
 #include "sqlsrv/rta.h"
 #endif
 
-hash_t *sh;
+static hash_t *sh;
 
 static Server *
 new_server (const char *name)
@@ -47,12 +45,12 @@ new_server (const char *name)
 	strlcpy (s->name, name, MAXHOST);
 	sn = hnode_create (s);
 	if (!sn) {
-		nlog (LOG_WARNING, "Server hash broken\n");
+		nlog (LOG_WARNING, "Server hash broken");
 		free (s);
 		return NULL;
 	}
 	if (hash_isfull (sh)) {
-		nlog (LOG_WARNING, "Server hash full\n");
+		nlog (LOG_WARNING, "Server hash full");
 		free (s);
 		return NULL;
 	} else {
@@ -295,7 +293,7 @@ InitServers (void)
 {
 	sh = hash_create (S_TABLE_SIZE, 0, 0);
 	if (!sh) {
-		nlog (LOG_CRITICAL, "Create Server Hash Failed\n");
+		nlog (LOG_CRITICAL, "Unable to create server hash");
 		return NS_FAILURE;
 	}
 	AddServer (me.name, NULL, 0, NULL, me.infoline);
@@ -345,4 +343,18 @@ FiniServers (void)
 		free (s);
 	}
 	hash_destroy(sh);
+}
+
+void GetServerList(ServerListHandler handler)
+{
+	hnode_t *node;
+	hscan_t scan;
+	Server *ss;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin(&scan, sh);
+	while ((node = hash_scan_next(&scan)) != NULL) {
+		ss = hnode_get(node);
+		handler(ss);
+	}
 }

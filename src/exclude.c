@@ -60,8 +60,7 @@ int InitExcludes(void)
 	exclude_list = list_create(-1);
 	if (GetTableData("Exclusions", &row) > 0) {
 		for (i = 0; row[i] != NULL; i++) {
-			e = malloc(sizeof(excludes));
-			bzero(e, sizeof(excludes));
+			e = scalloc(sizeof(excludes));
 			if (GetData((void *)&tmp, CFGSTR, "Exclusions", row[i], "Pattern") > 0) {
 				strlcpy(e->pattern, tmp, MAXHOST);
 			} else {

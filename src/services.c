@@ -4,8 +4,6 @@
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
 **
-**  Portions Copyright (c) 1999 Johnathan George net@lite.net
-**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -75,7 +73,7 @@ ModuleInfo ns_module_info = {
 	0,
 };
 
-static Module ns_module = {
+Module ns_module = {
 	&ns_module_info
 };
 
@@ -125,10 +123,17 @@ init_services_bot (void)
 	unsigned int flags;
 
 	SET_SEGV_LOCATION();
+	/* if all bots should join the chan */
+	if (GetConf ((void *) &me.allbots, CFGINT, "AllBotsJoinChan") <= 0) {
+		me.allbots = 0;
+	}
+	if (GetConf ((void *) &me.pingtime, CFGINT, "PingServerTime") <= 0) {
+		me.pingtime = 120;
+	}
 	ircsnprintf (ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick);
 	flags = me.onlyopers ? BOT_FLAG_ONLY_OPERS : 0;
 	flags |= BOT_FLAG_DEAF;
-	ns_botptr = init_bot (&ns_module, &ns_botinfo, services_bot_modes, flags, ns_commands, NULL);
+	ns_botptr = init_bot (&ns_botinfo, services_bot_modes, flags, ns_commands, NULL);
 	me.onchan = 1;
 	SendAllModuleEvent (EVENT_ONLINE, NULL);
 	return NS_SUCCESS;
@@ -138,9 +143,7 @@ init_services_bot (void)
  *
  *  maintain global exclusion list, which modules can take advantage off
  *   
- *  @param u user
- *  @param av list of arguments
- *  @param ac number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 
@@ -149,20 +152,18 @@ ns_exclude (CmdParams* cmdparams)
 {
 	if (!ircstrcasecmp(cmdparams->av[0], "ADD")) {
 		if (cmdparams->ac < 3) {
-			prefmsg(cmdparams->source.user->nick, ns_botptr->nick, "Syntax error. /msg %s help exclude", ns_botptr->nick);
-			return NS_FAILURE;
+			return NS_ERR_NEED_MORE_PARAMS;
 		}
 		ns_do_exclude_add(cmdparams->source.user, cmdparams->av[0], cmdparams->av[1]);
 	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
 		if (cmdparams->ac < 2) {
-			prefmsg(cmdparams->source.user->nick, ns_botptr->nick, "Syntax error. /msg %s help exclude", ns_botptr->nick);
-			return NS_FAILURE;
+			return NS_ERR_NEED_MORE_PARAMS;
 		}
 		ns_do_exclude_del(cmdparams->source.user, cmdparams->av[1]);
 	} else if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
 		ns_do_exclude_list(cmdparams->source.user, ns_botptr->nick);
 	} else {
-		prefmsg(cmdparams->source.user->nick, ns_botptr->nick, "Syntax error. /msg %s help exclude", ns_botptr->nick);
+		return NS_ERR_SYNTAX_ERROR;
 	}
 	return NS_SUCCESS;
 }
@@ -170,9 +171,7 @@ ns_exclude (CmdParams* cmdparams)
  *
  *  Shutdown NeoStats
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 static int
@@ -192,9 +191,7 @@ ns_shutdown (CmdParams* cmdparams)
  *
  *  Reload NeoStats
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 static int
@@ -214,9 +211,7 @@ ns_reload (CmdParams* cmdparams)
  *
  *  Jupiter a server
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 static int
@@ -237,9 +232,7 @@ ns_jupe (CmdParams* cmdparams)
  *
  *  Set debug mode on/off 
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 static int
@@ -255,9 +248,7 @@ ns_set_debug (CmdParams* cmdparams)
 		globops (me.name, "\2DEBUG MODE\2 disabled by %s", cmdparams->source.user->nick);
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Debug mode disabled");
 	} else {
-		prefmsg(cmdparams->source.user->nick, ns_botptr->nick,
-			"Syntax Error: /msg %s HELP DEBUG for more info", ns_botptr->nick);
-		   	return NS_FAILURE;
+	   	return NS_ERR_SYNTAX_ERROR;
 	}
    	return NS_SUCCESS;
 }
@@ -266,9 +257,7 @@ ns_set_debug (CmdParams* cmdparams)
  *
  *  Dump user list
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 static int
@@ -279,13 +268,7 @@ ns_userdump (CmdParams* cmdparams)
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
-	if(cmdparams->ac < 1) {
-		chanalert (ns_botptr->nick, "\2DEBUG\2 %s requested a user dump", cmdparams->source.user->nick);
-		UserDump (NULL);
-	} else {
-		chanalert (ns_botptr->nick, "\2DEBUG\2 %s requested a user dump for %s", cmdparams->source.user->nick, cmdparams->av[0]);
-		UserDump (cmdparams->av[0]);
-	}
+	UserDump ((cmdparams->ac < 1)? NULL : cmdparams->av[0]);
    	return NS_SUCCESS;
 }
 
@@ -293,9 +276,7 @@ ns_userdump (CmdParams* cmdparams)
  *
  *  Dump server list
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 static int
@@ -306,13 +287,7 @@ ns_serverdump (CmdParams* cmdparams)
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
-	if(cmdparams->ac < 1) {
-		chanalert (ns_botptr->nick, "\2DEBUG\2 %s requested a server dump", cmdparams->source.user->nick);
-		ServerDump (NULL);
-	} else {
-		chanalert (ns_botptr->nick, "\2DEBUG\2 %s requested a server dump for %s", cmdparams->source.user->nick, cmdparams->av[0]);
-		ServerDump (cmdparams->av[0]);
-	}
+	ServerDump ((cmdparams->ac < 1)? NULL : cmdparams->av[0]);
    	return NS_SUCCESS;
 }
 
@@ -320,9 +295,7 @@ ns_serverdump (CmdParams* cmdparams)
  *
  *  Dump channel list
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 static int
@@ -333,13 +306,7 @@ ns_chandump (CmdParams* cmdparams)
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "\2Error:\2 debug mode disabled");
 	   	return NS_FAILURE;
 	}
-	if(cmdparams->ac < 1) {
-		chanalert (ns_botptr->nick, "\2DEBUG\2 %s requested a channel dump", cmdparams->source.user->nick);
-		ChanDump (NULL);
-	} else {
-		chanalert (ns_botptr->nick, "\2DEBUG\2 %s requested a channel dump for %s", cmdparams->source.user->nick, cmdparams->av[0]);
-		ChanDump (cmdparams->av[0]);
-	}
+	ChanDump ((cmdparams->ac < 1)? NULL : cmdparams->av[0]);
    	return NS_SUCCESS;
 }
 
@@ -347,9 +314,7 @@ ns_chandump (CmdParams* cmdparams)
  *
  *  Display NeoStats status
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 static int 
@@ -384,9 +349,7 @@ ns_status (CmdParams* cmdparams)
  *
  *  Display user level
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 static int 
@@ -398,9 +361,11 @@ ns_level (CmdParams* cmdparams)
 	} else {
 		User * otheruser;
 		otheruser = finduser(cmdparams->av[0]);
-		if(otheruser) {
-			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "User level for %s is %d", otheruser->nick, UserLevel (otheruser));
+		if(!otheruser) {
+			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "User %s not found", cmdparams->av[0]);
+			return NS_FAILURE;
 		}
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "User level for %s is %d", otheruser->nick, UserLevel (otheruser));
 	}
 	return NS_SUCCESS;
 }
@@ -409,9 +374,7 @@ ns_level (CmdParams* cmdparams)
  *
  *  Load module
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 static int 
@@ -430,9 +393,7 @@ ns_load (CmdParams* cmdparams)
  *
  *  Unload module
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 static int 
@@ -449,9 +410,7 @@ ns_unload (CmdParams* cmdparams)
  *
  *  issue a RAW command
  *   
- *  @param user
- *  @param list of arguments
- *  @param number of arguments
+ *  @param cmdparams structure with command information
  *  @returns none
  */
 #ifdef USE_RAW

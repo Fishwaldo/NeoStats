@@ -35,7 +35,6 @@ static BotInfo ms_botinfo =
 	"", 
 	"Network morale service",
 };
-static Module* ms_module;
 
 static int ms_hail(CmdParams* cmdparams);
 static int ms_ode(CmdParams* cmdparams);
@@ -61,14 +60,14 @@ ModuleInfo module_info = {
 
 static bot_cmd ms_commands[]=
 {
-	{"HAIL",		ms_hail,		2, 	0,	ms_help_hail,		ms_help_hail_oneline },
-	{"ODE",			ms_ode,			2, 	0,	ms_help_ode,		ms_help_ode_oneline },
 	{"LAPDANCE",	ms_lapdance,	1, 	0,	ms_help_lapdance,	ms_help_lapdance_oneline },
-	{"POEM",		ms_poem,		2, 	0,	ms_help_poem,		ms_help_poem_oneline },
 	{"REDNECK",		ms_redneck,		1, 	0,	ms_help_redneck,	ms_help_redneck_oneline },
 	{"CHEERUP",		ms_cheerup,		1, 	0,	ms_help_cheerup,	ms_help_cheerup_oneline },
 	{"BEHAPPY",		ms_behappy,		1, 	0,	ms_help_behappy,	ms_help_behappy_oneline },
 	{"WONDERFUL",	ms_wonderful,	1, 	0,	ms_help_wonderful,	ms_help_wonderful_oneline },
+	{"HAIL",		ms_hail,		2, 	0,	ms_help_hail,		ms_help_hail_oneline },
+	{"ODE",			ms_ode,			2, 	0,	ms_help_ode,		ms_help_ode_oneline },
+	{"POEM",		ms_poem,		2, 	0,	ms_help_poem,		ms_help_poem_oneline },
 	{NULL,			NULL,			0, 	0,	NULL, 				NULL}
 };
 
@@ -83,7 +82,8 @@ static bot_setting ms_settings[]=
 
 static int ms_event_online(CmdParams* cmdparams)
 {
-	ms_bot = init_bot (ms_module, &ms_botinfo, services_bot_modes, BOT_FLAG_DEAF, ms_commands, ms_settings);
+	ms_bot = init_bot (&ms_botinfo, services_bot_modes, 
+		BOT_FLAG_DEAF, ms_commands, ms_settings);
 	return 1;
 };
 
@@ -94,7 +94,7 @@ ModuleEvent module_events[] = {
 
 int ModInit(Module* mod_ptr)
 {
-	ModuleConfig(ms_module, ms_settings);
+	ModuleConfig(ms_settings);
 	return 1;
 }
 
@@ -133,6 +133,8 @@ static int ms_lapdance(CmdParams* cmdparams)
 	if(!is_target_valid(ms_bot->nick, cmdparams->source.user, target_nick)) {
 		return 0;
 	}
+	prefmsg(cmdparams->source.user->nick, ms_bot->nick, 
+		"Lap dance sent to %s!", target_nick);
 	prefmsg(target_nick, ms_bot->nick,
 		"*%s Seductively walks up to %s and gives %s a sly look*",
 		ms_bot->nick, target_nick, target_nick);
@@ -157,7 +159,7 @@ static int ms_ode(CmdParams* cmdparams)
 		return 0;
 	}
 	prefmsg(cmdparams->source.user->nick, ms_bot->nick,
-		"Your ODE to %s has been sent to %s!", about_nick, target_nick);
+		"Ode to %s sent to %s!", about_nick, target_nick);
 	prefmsg(target_nick, ms_bot->nick, "Courtesy of your friend %s:", cmdparams->source.user->nick);
 	prefmsg(target_nick, ms_bot->nick, "*recites*");
 	prefmsg(target_nick, ms_bot->nick, "How I wish to be a %s,", about_nick);
@@ -181,7 +183,7 @@ static int ms_poem(CmdParams* cmdparams)
 		return 0;
 	}
 	prefmsg(cmdparams->source.user->nick, ms_bot->nick,
-		"Your POEM about %s has been sent to %s!", about_nick, target_nick);
+		"Poem about %s sent to %s!", about_nick, target_nick);
 	prefmsg(target_nick, ms_bot->nick, "Courtesy of your friend %s:", cmdparams->source.user->nick);
 	prefmsg(target_nick, ms_bot->nick, "*recites*");
 	prefmsg(target_nick, ms_bot->nick, "I wish I was a %s,", about_nick);
@@ -203,7 +205,7 @@ static int ms_redneck(CmdParams* cmdparams)
 		return 0;
 	}
 	prefmsg(cmdparams->source.user->nick, ms_bot->nick,
-		"Your redneck message has been sent to %s!", target_nick);
+		"Redneck message sent to %s!", target_nick);
 	prefmsg(target_nick, ms_bot->nick, "Courtesy of your friend %s:", cmdparams->source.user->nick);
 	prefmsg(target_nick, ms_bot->nick, "*recites*");
 	prefmsg(target_nick, ms_bot->nick,
@@ -237,6 +239,8 @@ static int ms_behappy(CmdParams* cmdparams)
 	if(!is_target_valid(ms_bot->nick, cmdparams->source.user, target_nick)) {
 		return 0;
 	}
+	prefmsg(cmdparams->source.user->nick, ms_bot->nick, 
+		"Behappy sent to %s!", target_nick);
 	prefmsg(target_nick, ms_bot->nick, "%s thinks that you're a little sad.....",
 		cmdparams->source.user->nick);
 	prefmsg(target_nick, ms_bot->nick, "*starts singing*");
@@ -291,7 +295,10 @@ static int ms_wonderful(CmdParams* cmdparams)
 	if(!is_target_valid(ms_bot->nick, cmdparams->source.user, target_nick)) {
 		return 0;
 	}
-	prefmsg(target_nick, ms_bot->nick, "Courtesy of your friend %s:", cmdparams->source.user->nick);
+	prefmsg(cmdparams->source.user->nick, ms_bot->nick, 
+		"wonderful sent to %s!", target_nick);
+	prefmsg(target_nick, ms_bot->nick, "Courtesy of your friend %s:", 
+		cmdparams->source.user->nick);
 	prefmsg(target_nick, ms_bot->nick, "*starts singing*");
 	prefmsg(target_nick, ms_bot->nick,
 		"So excuse me forgetting but these things I do");

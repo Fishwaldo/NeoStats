@@ -36,13 +36,9 @@ new_ban (const char *mask)
 	hnode_t *bansnode;
 
 	SET_SEGV_LOCATION();
-	ban = calloc (sizeof (Ban), 1);
-	bzero(ban, sizeof(Ban));
+	ban = scalloc (sizeof (Ban));
 	strlcpy (ban->mask, mask, MAXHOST);
 	bansnode = hnode_create (ban);
-	if (!bansnode) {
-		nlog (LOG_WARNING, "bans hash is broken\n");
-	}
 	if (hash_isfull (banshash)) {
 		nlog (LOG_WARNING, "bans hash is full!\n");
 	} else {
@@ -259,7 +255,7 @@ InitBans (void)
 {
 	banshash = hash_create (-1, 0, 0);
 	if (!banshash) {
-		nlog (LOG_CRITICAL, "Create bans hash failed\n");
+		nlog (LOG_CRITICAL, "Unable to create bans hash");
 		return NS_FAILURE;
 	}
 #ifdef SQLSRV

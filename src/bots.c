@@ -144,6 +144,34 @@ del_chan_bot (char *bot, char *chan)
 	}
 }
 
+/** @brief dump list of module bots and channels
+ *
+ * @param u
+ * 
+ * @return none
+ */
+int
+list_bot_chans (CmdParams* cmdparams)
+{
+	hscan_t hs;
+	hnode_t *hn;
+	lnode_t *ln;
+	ChanBot *mod_chan_bot;
+
+	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "BotChanDump:");
+	hash_scan_begin (&hs, bch);
+	while ((hn = hash_scan_next (&hs)) != NULL) {
+		mod_chan_bot = hnode_get (hn);
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "%s:--------------------------------", mod_chan_bot->chan);
+		ln = list_first (mod_chan_bot->bots);
+		while (ln) {
+			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Bot Name: %s", (char *)lnode_get (ln));
+			ln = list_next (mod_chan_bot->bots, ln);
+		}
+	}
+	return 0;
+}
+
 int process_origin(CmdParams * cmdparams, char* origin)
 {
 	cmdparams->source.user = finduser (origin);
@@ -293,34 +321,6 @@ void bot_chan_private (char *origin, char **av, int ac)
 		}
 	}
 	free (cmdparams);
-}
-
-/** @brief dump list of module bots and channels
- *
- * @param u
- * 
- * @return none
- */
-int
-list_bot_chans (CmdParams* cmdparams)
-{
-	hscan_t hs;
-	hnode_t *hn;
-	lnode_t *ln;
-	ChanBot *mod_chan_bot;
-
-	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "BotChanDump:");
-	hash_scan_begin (&hs, bch);
-	while ((hn = hash_scan_next (&hs)) != NULL) {
-		mod_chan_bot = hnode_get (hn);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "%s:--------------------------------", mod_chan_bot->chan);
-		ln = list_first (mod_chan_bot->bots);
-		while (ln) {
-			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Bot Name: %s", (char *)lnode_get (ln));
-			ln = list_next (mod_chan_bot->bots, ln);
-		}
-	}
-	return 0;
 }
 
 /** @brief create a new bot
@@ -516,14 +516,16 @@ int	del_bots (Module *mod_ptr)
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-Bot * init_bot (Module* modptr, BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list)
+Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list)
 {
 	Bot * botptr; 
 	User *u;
 	long Umode;
 	char* nick;
+	Module* modptr;
 
 	SET_SEGV_LOCATION();
+	modptr = GET_CUR_MODULE();
 	nick = botinfo->nick;
 	u = finduser (nick);
 	if (u) {
@@ -559,10 +561,7 @@ Bot * init_bot (Module* modptr, BotInfo* botinfo, const char* modes, unsigned in
 		sumode_cmd (nick, nick, UMODE_DEAF);
 	}
 #endif
-	/* restore segv_inmodule from SIGNON */
-	if(modptr) {
-		SET_SEGV_INMODULE(modptr->info->name);
-	}
+	SET_RUN_LEVEL(modptr);
 	botptr->flags = flags;
 	if (bot_cmd_list) {
 		add_bot_cmd_list (botptr, bot_cmd_list);

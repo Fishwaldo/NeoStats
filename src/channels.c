@@ -44,9 +44,9 @@ typedef struct Chanmem {
 	void *moddata[NUM_MODULES];
 } Chanmem;
 
-hash_t *ch;
+static hash_t *ch;
 
-extern char quitreason[BUFSIZE];
+static char quitreason[BUFSIZE];
 
 static void
 ChanPartHandler (list_t * list, lnode_t * node, void *v)
@@ -54,8 +54,13 @@ ChanPartHandler (list_t * list, lnode_t * node, void *v)
 	part_chan ((User *)v, lnode_get (node), quitreason[0] != 0 ? quitreason : NULL);
 }
 
-void PartAllChannels (User* u)
+void PartAllChannels (User* u, const char* reason)
 {
+	bzero(quitreason, BUFSIZE);
+	if(reason) {
+		strlcpy(quitreason, reason, BUFSIZE);
+		strip_mirc_codes(quitreason);
+	}
 	list_process (u->chans, u, ChanPartHandler);
 }
 
@@ -675,7 +680,7 @@ join_chan (const char* nick, const char *chan)
 	if (!ircstrcasecmp ("0", chan)) {
 		/* join 0 is actually part all chans */
 		nlog (LOG_DEBUG2, "join_chan: parting %s from all channels", u->nick);
-		PartAllChannels (u);
+		PartAllChannels (u, NULL);
 		return;
 	}
 	c = findchan (chan);
@@ -1096,12 +1101,33 @@ int
 InitChannels ()
 {
 	ch = hash_create (C_TABLE_SIZE, 0, 0);
-	if(!ch)	
+	if(!ch)	{
+		nlog (LOG_CRITICAL, "Unable to create channel hash");
 		return NS_FAILURE;
+	}
 #ifdef SQLSRV
 	/* add the server hash to the sql library */
 	neo_chans.address = ch;
 	rta_add_table(&neo_chans);
 #endif
 	return NS_SUCCESS;
+}
+
+void FiniChannels (void)
+{
+	hash_destroy(ch);
+}
+
+void GetChannelList(ChannelListHandler handler)
+{
+	hnode_t *node;
+	hscan_t scan;
+	Channel *c;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin(&scan, ch);
+	while ((node = hash_scan_next(&scan)) != NULL) {
+		c = hnode_get(node);
+		handler(c);
+	}
 }

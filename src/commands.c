@@ -476,10 +476,9 @@ run_bot_cmd (CmdParams * cmdparams)
 			nlog (LOG_NORMAL, "%s used %s", cmdparams->source.user->nick, cmdparams->param);
 			/* call handler */
 			if (setjmp (sigvbuf) == 0) {
-				if(cmdparams->dest.bot->moduleptr)
-					SET_SEGV_INMODULE(cmdparams->dest.bot->moduleptr->info->name);
+				SET_RUN_LEVEL(cmdparams->dest.bot->moduleptr);
 				cmdret = cmd_ptr->handler(cmdparams);
-				CLEAR_SEGV_INMODULE();
+				RESET_RUN_LEVEL();
 			}
 			switch(cmdret) {
 				case NS_ERR_SYNTAX_ERROR:

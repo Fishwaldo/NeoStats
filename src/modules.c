@@ -34,6 +34,8 @@
  * 
  */
 static Module *ModList[NUM_MODULES];
+Module* RunModule[10];
+int RunLevel = 0;
 
 int del_all_bot_cmds(Bot* bot_ptr);
 
@@ -78,7 +80,7 @@ void *display_module_builddate (void *tbl, char *col, char *sql, void *row)
 
 void *display_core_info (void *tbl, char *col, char *sql, void *row) 
 {
-	ircsnprintf(sqlbuf, BUFSIZE, "%s", me.versionfull);
+	ircsnprintf(sqlbuf, BUFSIZE, "%s", me.version);
 	return sqlbuf;	
 }
 
@@ -167,8 +169,10 @@ InitModules ()
 {
 	SET_SEGV_LOCATION();
 	mh = hash_create (NUM_MODULES, 0, 0);
-	if(!mh)
+	if(!mh) {
+		nlog (LOG_CRITICAL, "Unable to create module hash");
 		return NS_FAILURE;
+	}
 
 #ifdef SQLSRV
         /* add the module hash to the sql library */
@@ -211,9 +215,9 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Bot* bot)
 					nlog (LOG_DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
 					SET_SEGV_LOCATION();
 					if (setjmp (sigvbuf) == 0) {
-						SET_SEGV_INMODULE(module_ptr->info->name);
+						SET_RUN_LEVEL(module_ptr);
 						ev_list->function (cmdparams);
-						CLEAR_SEGV_INMODULE();
+						RESET_RUN_LEVEL();
 					} else {
 						nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->name);
 					}
@@ -254,9 +258,9 @@ SendAllModuleEvent (Event event, CmdParams* cmdparams)
 					nlog (LOG_DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
 					SET_SEGV_LOCATION();
 					if (setjmp (sigvbuf) == 0) {
-						SET_SEGV_INMODULE(module_ptr->info->name);
+						SET_RUN_LEVEL(module_ptr);
 						ev_list->function (cmdparams);
-						CLEAR_SEGV_INMODULE();
+						RESET_RUN_LEVEL();
 					} else {
 						nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->name);
 					}
@@ -415,14 +419,14 @@ load_module (char *modfilename, User * u)
 	} else {
 		int err;
 		SET_SEGV_LOCATION();
-		SET_SEGV_INMODULE(mod_ptr->info->name);
+		SET_RUN_LEVEL(mod_ptr);
 		err = (*ModInit) (mod_ptr);
 		if (err < 1) {
 			nlog (LOG_NORMAL, "Unable to load module: %s. See %s.log for further information.", mod_ptr->info->name, mod_ptr->info->name);
 			unload_module(mod_ptr->info->name, NULL);
 			return NULL;
 		}
-		CLEAR_SEGV_INMODULE();
+		RESET_RUN_LEVEL();
 		SET_SEGV_LOCATION();
 	}
 
@@ -432,9 +436,9 @@ load_module (char *modfilename, User * u)
 			if (event_ptr->event == EVENT_ONLINE) {
 				AddStringToList (&av, me.s->name, &ac);
 				SET_SEGV_LOCATION();
-				SET_SEGV_INMODULE(mod_ptr->info->name);
+				SET_RUN_LEVEL(mod_ptr);
 				event_ptr->function (NULL);
-				CLEAR_SEGV_INMODULE();
+				RESET_RUN_LEVEL();
 				SET_SEGV_LOCATION();
 				free (av);
 				break;
@@ -456,72 +460,6 @@ load_module (char *modfilename, User * u)
  * @return
  */
 int
-get_dl_handle (const char *mod_name)
-{
-	Module *mod_ptr;
-	hnode_t *mn;
-
-	mn = hash_lookup (mh, mod_name);
-	if (mn) {
-		mod_ptr = hnode_get (mn);
-		return (int) mod_ptr->dl_handle;
-	}
-	return 0;
-}
-
-/** @brief 
- *
- * @param 
- * 
- * @return
- */
-int
-get_mod_num (const char *mod_name)
-{
-	int i;
-
-	for (i = 0; i < NUM_MODULES; i++) {
-		if (ModList[i] != NULL) {
-			if (!ircstrcasecmp (ModList[i]->info->name, mod_name)) {
-				return i;
-			}
-		}
-	}
-	/* if we get here, it wasn't found */
-	nlog (LOG_DEBUG1, "get_mod_num: can't find %s in module number list", mod_name);
-	return NS_FAILURE;
-}
-
-/** @brief 
- *
- * @param 
- * 
- * @return
- */
-Module *
-get_mod_ptr (const char *mod_name)
-{
-	int i;
-
-	for (i = 0; i < NUM_MODULES; i++) {
-		if (ModList[i] != NULL) {
-			if (!ircstrcasecmp (ModList[i]->info->name, mod_name)) {
-				return ModList[i];
-			}
-		}
-	}
-	/* if we get here, it wasn't found */
-	nlog (LOG_DEBUG1, "get_mod_ptr: can't find %s in module number list", mod_name);
-	return NULL;
-}
-
-/** @brief 
- *
- * @param 
- * 
- * @return
- */
-int
 list_modules (CmdParams* cmdparams)
 {
 	Module *mod_ptr = NULL;
@@ -534,7 +472,7 @@ list_modules (CmdParams* cmdparams)
 		mod_ptr = hnode_get (mn);
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module: %s (%s)", mod_ptr->info->name, mod_ptr->info->version);
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Description: %s", mod_ptr->info->description);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Number: %d", get_mod_num (mod_ptr->info->name));
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Number: %d", mod_ptr->modnum);
 	}
 	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "End of Module List");
 	return 0;
@@ -564,11 +502,11 @@ unload_module (const char *modname, User * u)
 		}
 		return NS_FAILURE;
 	}
-	i = get_mod_num (modname);
 	mod_ptr = hnode_get (modnode);
+	i = mod_ptr->modnum;
 	chanalert (ns_botptr->nick, "Unloading module %s", modname);
 	/* canx any DNS queries used by this module */
-	canx_dns (modname);
+	canx_dns (mod_ptr);
 	/* Delete any timers used by this module */
 	del_timers (mod_ptr);
 	/* Delete any sockets used by this module */
@@ -582,9 +520,9 @@ unload_module (const char *modname, User * u)
 	/* call ModFini (replacement for library __fini() call */
 	ModFini = ns_dlsym ((int *) mod_ptr->dl_handle, "ModFini");
 	if (ModFini) {
-		SET_SEGV_INMODULE(modname);
+		SET_RUN_LEVEL(mod_ptr);
 		(*ModFini) ();
-		CLEAR_SEGV_INMODULE();
+		RESET_RUN_LEVEL();
 	}
 	/* Delete any bots used by this module. Done after ModFini, so the bot 
 	 * can still send messages during ModFini 
@@ -592,11 +530,11 @@ unload_module (const char *modname, User * u)
 	del_bots (mod_ptr);
 	hnode_destroy (modnode);
 	/* Close module */
-	SET_SEGV_INMODULE(modname);
+	SET_RUN_LEVEL(mod_ptr);
 #ifndef VALGRIND
 	ns_dlclose (mod_ptr->dl_handle);
 #endif
-	CLEAR_SEGV_INMODULE();
+	RESET_RUN_LEVEL();
 	/* free the module number */
 	if (i >= 0) {
 		nlog (LOG_DEBUG1, "Free %d from Module Numbers", i);
@@ -635,11 +573,11 @@ void unload_modules(void)
  * @return
  */
 int
-ModuleConfig(Module* moduleptr, bot_setting* set_ptr)
+ModuleConfig(bot_setting* set_ptr)
 {
 	char *temp = NULL;
 
-	SET_SEGV_INMODULE(moduleptr->info->name);
+	SET_SEGV_LOCATION();
 	while(set_ptr->option)
 	{
 		switch(set_ptr->type) {
@@ -681,6 +619,5 @@ ModuleConfig(Module* moduleptr, bot_setting* set_ptr)
 		}
 		set_ptr++;
 	}
-	CLEAR_SEGV_INMODULE();
 	return NS_SUCCESS;
 }

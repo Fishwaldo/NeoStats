@@ -2,8 +2,6 @@
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
-**  Portions Copyright (c) 2000-2001 ^Enigma^
-**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -27,36 +25,41 @@
  *  You can copy this file as a template for writing your own modules
  */
 
-#include "neostats.h"	/* Neostats API */
+/* neostats.h is the only required include for your module to access the 
+ * NeoStats module API. You should not need to include any other NeoStats
+ * files in order to develop your module.
+ */
+#include "neostats.h"	/* NeoStats API */
 
 /** When we create a a bot, we must store the handle returned to us for use
  *  when calling API bot functions
  */
 static Bot *template_bot;
 
-/** When a module loads, it is passed a handle that must be used when calling 
- *  API functions.
+/** When a module loads, it is passed a handle that includes information
+ *  we might need later so you should store this.
  */
 static Module* template_module;
 
 /** Define information about our bot
  */
-BotInfo template_bot_info = {
+BotInfo template_bot_info = 
+{
 	/* REQUIRED: 
 	 * nick */
-	"TemplateBot",
+	"changeme",
 	/* OPTIONAL: 
 	 * altnick, use "" if not needed */
-	"",
+	"altnick",
 	/* REQUIRED: 
 	 * user */
-	"user",
+	"changeme",
 	/* REQUIRED: 
 	 * host */
 	"",
 	/* REQUIRED: 
 	 * realname */
-	"Real Name",
+	"Example NeoStats module",
 };
 
 /** 
@@ -129,7 +132,7 @@ ModuleInfo module_info = {
 static int tm_event_online(CmdParams* cmdparams)
 {
 	/* Introduce a bot onto the network saving the bot handle */
-	template_bot = init_bot ( template_module, &template_bot_info, "-x", 0, NULL, NULL);
+	template_bot = init_bot ( &template_bot_info, "-x", 0, NULL, NULL);
 	return 1;
 };
 
@@ -149,7 +152,7 @@ ModuleEvent module_events[] = {
  */
 int ModInit(Module* mod_ptr)
 {
-	/* Save our module handle so we can use API functions */
+	/* Save our module handle */
 	template_module = mod_ptr;
 	return 1;
 }

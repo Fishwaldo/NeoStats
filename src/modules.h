@@ -28,16 +28,12 @@ extern jmp_buf sigvbuf;
 
 int InitModules (void);
 int FiniModules (void);
-void SendAllModuleEvent (Event event, CmdParams* cmdparams);
-void SendModuleEvent (Event event, CmdParams* cmdparams, Bot* bot);
 Module *load_module (char *path, User * u);
 int unload_module (const char *module_name, User * u);
-int list_modules (CmdParams* cmdparams);
-int get_dl_handle (const char *mod_name);
-int get_mod_num (const char *mod_name);
-Module *get_mod_ptr (const char *mod_name);
 void unload_modules(void);
-
+int list_modules (CmdParams* cmdparams);
 void ModulesVersion (const char* nick, const char *remoteserver);
+void SendAllModuleEvent (Event event, CmdParams* cmdparams);
+void SendModuleEvent (Event event, CmdParams* cmdparams, Bot* bot);
 
 #endif /* _MODULES_H_ */

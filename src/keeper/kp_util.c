@@ -70,8 +70,8 @@ static char *kp_tmpname = NULL;
 /* String array containing the base path of the different sections */
 static char *kp_basedirs[KPDB_NUMDBS];
 
-#define GLOBALDIR "kpconf"	/* Default global database path */
-#define LOCALDIR  "kpdata"	/* Local database path */
+#define GLOBALDIR "data/kpconf"	/* Default global database path */
+#define LOCALDIR  "data/kpdata"	/* Local database path */
 #define USERSUBDIR "kplang"	/* Default user database dir */
 #define LOCKFILE ":lock:"	/* Lock file name */
 

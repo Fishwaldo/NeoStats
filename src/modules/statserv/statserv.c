@@ -44,11 +44,52 @@ static int ss_netstats(CmdParams* cmdparams);
 static int ss_clientversions(CmdParams* cmdparams);
 static int ss_forcehtml(CmdParams* cmdparams);
 
+static int ss_event_ctcpversion(CmdParams* cmdparams);
+static int ss_event_online(CmdParams* cmdparams);
+static int ss_event_pong(CmdParams* cmdparams);
+static int ss_event_away(CmdParams* cmdparams);
+static int ss_event_server(CmdParams* cmdparams);
+static int ss_event_squit(CmdParams* cmdparams);
+static int ss_event_nickip(CmdParams* cmdparams);
+static int ss_event_signon(CmdParams* cmdparams);
+static int ss_event_quit(CmdParams* cmdparams);
+static int ss_event_mode(CmdParams* cmdparams);
+static int ss_event_kill(CmdParams* cmdparams);
+static int ss_event_newchan(CmdParams* cmdparams);
+static int ss_event_delchan(CmdParams* cmdparams);
+static int ss_event_join(CmdParams* cmdparams);
+static int ss_event_part(CmdParams* cmdparams);
+static int ss_event_topic(CmdParams* cmdparams);
+static int ss_event_kick(CmdParams* cmdparams);
+
+static User* listu;
+static int listindex = 0;
 Bot *ss_bot;
 static Module* ss_module;
 
+ModuleEvent module_events[] = {
+	{EVENT_ONLINE,		ss_event_online},
+	{EVENT_PONG,		ss_event_pong},
+	{EVENT_SERVER,		ss_event_server},
+	{EVENT_SQUIT,		ss_event_squit},
+	{EVENT_SIGNON,		ss_event_signon},
+	{EVENT_GOTNICKIP,	ss_event_nickip},
+	{EVENT_UMODE,		ss_event_mode},
+	{EVENT_QUIT,		ss_event_quit},
+	{EVENT_AWAY,		ss_event_away},
+	{EVENT_KILL,		ss_event_kill},
+	{EVENT_NEWCHAN,		ss_event_newchan},
+	{EVENT_DELCHAN,		ss_event_delchan},
+	{EVENT_JOIN,		ss_event_join},
+	{EVENT_PART,		ss_event_part},
+	{EVENT_KICK,		ss_event_kick},
+	{EVENT_TOPIC,		ss_event_topic},
+	{EVENT_CTCPVERSION,	ss_event_ctcpversion},
+	{EVENT_NULL,		NULL}
+};
+
 ModuleInfo module_info = {
-	"statserv",
+	"StatServ",
 	"Network statistical service",
 	ns_copyright,
 	ss_about,
@@ -105,104 +146,44 @@ static bot_setting ss_settings[]=
 	{NULL,			NULL,					0,					0, 0,			0,				 NULL,			NULL,		NULL },
 };
 
-int ss_event_online(CmdParams* cmdparams)
+static int ss_event_online(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	ss_bot = init_bot (ss_module, &ss_botinfo, services_bot_modes, BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, ss_commands, ss_settings);
+	ss_bot = init_bot (&ss_botinfo, services_bot_modes, 
+		BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, ss_commands, ss_settings);
 	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */
-	add_timer (ss_module, SaveStats, "SaveStats", DBSAVETIME);
-	add_timer (ss_module, ss_html, "ss_html", 3600);
+	add_timer (SaveStats, "SaveStats", DBSAVETIME);
+	add_timer (ss_html, "ss_html", 3600);
 	/* also add a timer to check if its midnight (to reset the daily stats */
-	add_timer (ss_module, StatsMidnight, "StatsMidnight", 60);
-	add_timer (ss_module, DelOldChan, "DelOldChan", 3600);
+	add_timer (StatsMidnight, "StatsMidnight", 60);
+	add_timer (DelOldChan, "DelOldChan", 3600);
 	return 1;
 }
 
 int ModInit(Module* mod_ptr)
 {
-	Server *ss;
-	User *u;
-	hnode_t *node;
-	hscan_t scan;
 #ifdef SQLSRV
 	lnode_t *lnode;
 #endif
-	int count, i;
-	Channel *c;
-	char **av;
-	int ac = 0;
-	char *chan;
-	lnode_t *chanmem;
 
 	SET_SEGV_LOCATION();
-
 	ss_module = mod_ptr;
 	StatServ.onchan = 0;
 	StatServ.shutdown = 0;
 	/* we want nickip messages */
-	me.want_nickip = 1;
-
-	ModuleConfig(ss_module, ss_settings);
+	me.want_nickip = 1; 
+	ModuleConfig(ss_settings);
 	if (StatServ.html && StatServ.htmlpath[0] == 0) {
-		nlog(LOG_NOTICE,
-		     "StatServ HTML stats disabled as HTML_PATH is not set");
+		nlog(LOG_NOTICE, "HTML stats disabled as HTML_PATH is not set");
 		StatServ.html = 0;
 	}
-	init_tld();
+	InitTLD();
 	LoadStats();
-	Vhead = list_create(-1);
-	hash_scan_begin(&scan, sh);
-	while ((node = hash_scan_next(&scan)) != NULL) {
-		ss = hnode_get(node);
-		ac = 0;
-		AddStringToList(&av, ss->name, &ac);
-		ss_event_server(av, ac);
-		free(av);
-		ac = 0;
-		nlog(LOG_DEBUG2, "Added Server %s to StatServ List", ss->name);
-	}
-	hash_scan_begin(&scan, uh);
-	while ((node = hash_scan_next(&scan)) != NULL) {
-		u = hnode_get(node);
-		ac = 0;
-		AddStringToList(&av, u->nick, &ac);
-		ss_event_signon(av, ac);
-		AddStringToList(&av, u->modes, &ac);
-		ss_event_mode(av, ac);
-		free(av);
-		ac = 0;
-		nlog(LOG_DEBUG2, "Add user %s to StatServ List", u->nick);
-	}
-	hash_scan_begin(&scan, ch);
-	while ((node = hash_scan_next(&scan)) != NULL) {
-		c = hnode_get(node);
-		count = list_count(c->chanmembers);
-		chanmem = list_first(c->chanmembers);
-		chan = lnode_get(chanmem);
-		ac = 0;
-		AddStringToList(&av, c->name, &ac);
-		ss_event_newchan(av, ac);
-		free(av);
-		ac = 0;
-		for (i = 1; i <= count; i++) {
-			nlog(LOG_DEBUG2, "Chanjoin %s", c->name);
-			ac = 0;
-			AddStringToList(&av, c->name, &ac);
-			AddStringToList(&av, chan, &ac);
-			ss_event_join(av, ac);
-			free(av);
-			ac = 0;
-			if (i < count) {
-				chanmem = list_next(c->chanmembers, chanmem);
-				chan = lnode_get(chanmem);
-			}
-		}
-	}
+	InitStats();
 
 #ifdef SQLSRV
 	/* ok, now export the server and chan data into the sql emulation layers */
-
 	/* for the network and daily stats, we use a fake list, so we can easily import into rta */
 
 	fakedaily = list_create(-1);
@@ -238,8 +219,11 @@ int ModInit(Module* mod_ptr)
 void ModFini()
 {
 	StatServ.shutdown = 1;
+	chanalert(ss_bot->nick, "Saving StatServ Database. this *could* take a while");
 	SaveStats();
-	fini_tld();
+	chanalert(ss_bot->nick, "Done");
+	FiniStats();
+	FiniTLD();
 	save_client_versions();
 #if SQLSRV
 	list_destroy_nodes(fakedaily);
@@ -248,6 +232,130 @@ void ModFini()
 #ifdef USE_BERKELEY
 	DBCloseDatabase();
 #endif      
+}
+
+static int ss_event_server(CmdParams* cmdparams)
+{
+	SET_SEGV_LOCATION();
+	StatsAddServer(cmdparams->source.server);
+	return 1;
+}
+
+static int ss_event_squit(CmdParams* cmdparams)
+{
+	StatsDelServer(cmdparams->source.server);
+	return 1;
+}
+
+static int ss_event_newchan(CmdParams* cmdparams)
+{
+	StatsAddChan(cmdparams->channel);
+	return 1;
+}
+
+static int ss_event_delchan(CmdParams* cmdparams)
+{
+	StatsDelChan(cmdparams->channel);
+	return 1;
+}
+
+static int ss_event_join(CmdParams* cmdparams)
+{										   
+	if (StatServ.exclusions && (IsExcluded(cmdparams->channel) || IsExcluded(cmdparams->source.user))) {
+		return 0;
+	}
+	StatsJoinChan(cmdparams->source.user, cmdparams->channel);
+	return 1;
+}
+
+static int ss_event_part(CmdParams* cmdparams)
+{
+	if (StatServ.exclusions && (IsExcluded(cmdparams->channel) || IsExcluded(cmdparams->source.user))) {
+		return 0;
+	}
+	StatsPartChan(cmdparams->source.user, cmdparams->channel);
+	return 1;
+}
+
+static int ss_event_topic(CmdParams* cmdparams)
+{
+	if (StatServ.exclusions && IsExcluded(cmdparams->channel)) {
+		return 1;
+	}
+	StatsChanTopic(cmdparams->channel);
+	return 1;
+}
+
+static int ss_event_kick(CmdParams* cmdparams)
+{
+	if (StatServ.exclusions && IsExcluded(cmdparams->channel)) {
+		return 1;
+	}
+	StatsChanKick(cmdparams->channel);
+	return 1;
+}
+
+int ss_event_ctcpversion(CmdParams* cmdparams)
+{
+	StatsAddCTCPVersion(cmdparams->av[1]);
+	return 1;
+}
+
+static int ss_event_kill(CmdParams* cmdparams)
+{
+	if (StatServ.exclusions && IsExcluded(cmdparams->source.user)) {
+		return 0;
+	}
+	StatsKillUser(cmdparams->source.user);
+	return 1;
+}
+
+static int ss_event_mode(CmdParams* cmdparams)
+{
+	if (StatServ.exclusions && IsExcluded(cmdparams->source.user)) {
+		return 0;
+	}
+	StatsUserMode(cmdparams->source.user, cmdparams->av[1]);
+	return 1;
+}
+
+static int ss_event_quit(CmdParams* cmdparams)
+{
+	if (StatServ.exclusions && IsExcluded(cmdparams->source.user)) {
+		return 0;
+	}
+	StatsDelUser(cmdparams->source.user);
+	return 1;
+}
+
+static int ss_event_away(CmdParams* cmdparams)
+{
+	if (StatServ.exclusions && IsExcluded(cmdparams->source.user)) {
+		return 0;
+	}
+	StatsUserAway(cmdparams->source.user);
+	return 1;
+}
+
+static int ss_event_nickip(CmdParams* cmdparams)
+{
+	AddTLD(cmdparams->source.user);
+	return 1;
+}
+
+static int ss_event_signon(CmdParams* cmdparams)
+{
+	if (StatServ.exclusions && IsExcluded(cmdparams->source.user)) {
+		return 0;
+	}
+	StatsAddUser(cmdparams->source.user);
+	return 1;
+}
+
+static int ss_event_pong(CmdParams* cmdparams)
+{
+	StatsServerPong(cmdparams->source.server);
+	return 1;
 }
 
 int topchan(const void *key1, const void *key2)
@@ -287,37 +395,13 @@ int topversions(const void *key1, const void *key2)
 
 static int ss_clientversions(CmdParams* cmdparams)
 {
-	CVersions *cv;
-	lnode_t *cn;
-	int i;
 	int num;
 
-	chanalert(ss_bot->nick, "%s Wanted to see the Client Version List", cmdparams->source.user->nick);
 	num = cmdparams->ac > 2 ? atoi(cmdparams->av[2]) : 10;
 	if (num < 10) {
 		num = 10;
 	}
-	if (list_count(Vhead) == 0) {
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "No Stats Available.");
-		return 0;
-	}
-	if (!list_is_sorted(Vhead, topversions)) {
-		list_sort(Vhead, topversions);
-	}
-	cn = list_first(Vhead);
-	cv = lnode_get(cn);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Top%d Client Versions:", num);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "======================");
-	for (i = 0; i <= num; i++) {
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "%d) %d ->  %s", i, cv->count, cv->name);
-		cn = list_next(Vhead, cn);
-		if (cn) {
-			cv = lnode_get(cn);
-		} else {
-			break;
-		}
-	}
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List.");
+	list_client_versions(cmdparams->source.user, num);
 	return 1;
 }
 
@@ -327,7 +411,6 @@ static int ss_chans(CmdParams* cmdparams)
 	lnode_t *cn;
 	int i;
 
-	chanalert(ss_bot->nick, "%s Wanted to see Channel Statistics", cmdparams->source.user->nick);
 	if (!cmdparams->av[2]) {
 		/* they want the top10 Channels online atm */
 		if (!list_is_sorted(Chead, topchan)) {
@@ -493,17 +576,13 @@ static int ss_chans(CmdParams* cmdparams)
 static int ss_tld_map(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	chanalert(ss_bot->nick, "%s Wanted to see a Country Breakdown", cmdparams->source.user->nick);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Top Level Domain Statistics:");
 	DisplayTLDmap(cmdparams->source.user);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List");
 	return 1;
 }
 
 static int ss_netstats(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	chanalert(ss_bot->nick, "%s Wanted to see the NetStats ", cmdparams->source.user->nick);
 	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Network Statistics:-----");
 	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Current Users: %ld", stats_network.users);
 	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum Users: %ld [%s]",
@@ -527,7 +606,6 @@ static int ss_netstats(CmdParams* cmdparams)
 static int ss_daily(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	chanalert(ss_bot->nick, "%s Wanted to see the Daily NetStats ", cmdparams->source.user->nick);
 	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Daily Network Statistics:");
 	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum Servers: %-2d %s",
 		daily.servers, sftime(daily.t_servers));
@@ -546,6 +624,7 @@ static int ss_daily(CmdParams* cmdparams)
 
 static void makemap(char *uplink, User * u, int level)
 {
+#if 0
 	hscan_t hs;
 	hnode_t *sn;
 	Server *s;
@@ -556,7 +635,7 @@ static void makemap(char *uplink, User * u, int level)
 	hash_scan_begin(&hs, sh);
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
-		ss = findstats(s->name);
+		ss = findserverstats(s->name);
 		if ((level == 0) && (s->uplink[0] == 0)) {
 			/* its the root server */
 			if (StatServ.exclusions && IsExcluded(s)) {
@@ -583,12 +662,12 @@ static void makemap(char *uplink, User * u, int level)
 			makemap(s->name, u, level + 1);
 		}
 	}
+#endif
 }
 
 static int ss_map(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	chanalert(ss_bot->nick, "%s Wanted to see the Current Network MAP", cmdparams->source.user->nick);
 	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "%-40s      %-10s %-10s %-10s",
 		"\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2", "\2[LAG/MAX]\2");
 	makemap("", cmdparams->source.user, 0);
@@ -605,9 +684,7 @@ static int ss_server(CmdParams* cmdparams)
 	char *server;
 
 	SET_SEGV_LOCATION();
-	server =  cmdparams->av[2];
-	chanalert(ss_bot->nick, "%s requested server information on %s", 
-		cmdparams->source.user->nick, cmdparams->av[2]);
+	server = cmdparams->av[2];
 	if (!server) {
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Server listing:");
 		hash_scan_begin(&hs, Shead);
@@ -625,7 +702,7 @@ static int ss_server(CmdParams* cmdparams)
 	}
 
 	/* ok, found the Server, lets do some Statistics work now ! */
-	ss = findstats(server);
+	ss = findserverstats(server);
 	s = findserver(server);
 	if (!ss) {
 		nlog(LOG_CRITICAL, "Unable to find server statistics for %s", server);
@@ -662,7 +739,7 @@ static int ss_server(CmdParams* cmdparams)
 	}
 	if (ss->numsplits >= 1) {
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, 
-			"%s has split from the network %d time%s",
+			"%s has split from the network %d time %s",
 			ss->name, ss->numsplits, (ss->numsplits == 1) ? "" : "s");
 	} else {
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick,"%s has never split from the network.", 
@@ -672,90 +749,74 @@ static int ss_server(CmdParams* cmdparams)
 	return 1;
 }
 
+static int operlistaway = 0;
+static char* operlistserver;
+
+static void operlist(User* u)
+{
+	if (!is_oper(u))
+		return;
+	if (operlistaway && u->is_away)
+		return;
+	if (!operlistserver) {
+		listindex++;
+		prefmsg(listu->nick, ss_bot->nick, "[%2d] %-15s %-15s %-10d", listindex, 
+			u->nick, u->server->name, UserLevel(u));
+	} else {
+		if (ircstrcasecmp(operlistserver, u->server->name))
+			return;
+		listindex++;
+		prefmsg(listu->nick, ss_bot->nick, "[%2d] %-15s %-15s %-10d", listindex, 
+			u->nick, u->server->name, UserLevel(u));
+	}
+}
+
 static int ss_operlist(CmdParams* cmdparams)
 {
-	register int j = 0;
-	int away = 0;
-	register User *testuser;
-	int ulevel = 0;
-	hscan_t scan;
-	hnode_t *node;
 	char *flags;
-	char *server;
 
 	SET_SEGV_LOCATION();
-
+	operlistaway = 0;
+	listindex = 0;
 	if (cmdparams->ac == 2) {
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Online IRCops:");
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "ID  %-15s %-15s %-10s", 
 			"Nick", "Server", "Level");
-		chanalert(ss_bot->nick, "%s requested operlist", cmdparams->source.user->nick);
 	}
-
 	flags = cmdparams->av[2];
-	server = cmdparams->av[3];
+	operlistserver = cmdparams->av[3];
 	if (flags && !ircstrcasecmp(flags, "NOAWAY")) {
-		away = 1;
+		operlistaway = 1;
 		flags = NULL;
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Online IRCops (not away):");
-		chanalert(ss_bot->nick, "%s requested operlist (not away)", cmdparams->source.user->nick);
 	}
-	if (!away && flags && strchr(flags, '.')) {
-		server = flags;
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Online IRCops on server %s", server);
-		chanalert(ss_bot->nick, "%s requested operlist on server %s",
-			  cmdparams->source.user->nick, server);
+	if (!operlistaway && flags && strchr(flags, '.')) {
+		operlistserver = flags;
+		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Online IRCops on server %s", operlistserver);
 	}
-	hash_scan_begin(&scan, uh);
-	while ((node = hash_scan_next(&scan)) != NULL) {
-		testuser = hnode_get(node);
-		if (!is_oper(testuser))
-			continue;
-		ulevel = UserLevel(testuser);
-		if (ulevel < NS_ULEVEL_OPER)
-			continue;
-		if (away && testuser->is_away)
-			continue;
-		if (!ircstrcasecmp(testuser->server->name, me.services_name))
-			continue;
-		if (!server) {
-			j++;
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "[%2d] %-15s %-15s %-10d", j, 
-				testuser->nick, testuser->server->name, ulevel);
-			continue;
-		} else {
-			if (ircstrcasecmp(server, testuser->server->name))
-				continue;
-			j++;
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "[%2d] %-15s %-15s %-10d", j, 
-				testuser->nick, testuser->server->name, ulevel);
-			continue;
-		}
-	}
+	listu = cmdparams->source.user;
+	GetUserList(operlist);
 	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of Listing.");
 	return 1;
 }
 
 #ifdef GOTBOTMODE
+static void botlist(User* u)
+{
+	if is_bot(u) { 
+		listindex++;
+		prefmsg(listu->nick, ss_bot->nick,"[%2d] %-15s %s", listindex, 
+			u->nick, u->server->name);
+	}
+}
+
 static int ss_botlist(CmdParams* cmdparams)
 {
-	register int j = 0;
-	register User *testuser;
-	hscan_t scan;
-	hnode_t *node;
-
 	SET_SEGV_LOCATION();
-	chanalert(ss_bot->nick, "%s Wanted to see the Bot List", cmdparams->source.user->nick);
+	listindex = 0;
 	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "On-Line Bots:");
-	hash_scan_begin(&scan, uh);
-	while ((node = hash_scan_next(&scan)) != NULL) {
-		testuser = hnode_get(node);
-		if is_bot(testuser) { 
-			j++;
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick,"[%2d] %-15s %s", j, 
-				testuser->nick, testuser->server->name);
-		}
-	}
+	listu = cmdparams->source.user;
+	GetUserList(botlist);
 	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of Listing.");
 	return 1;
 }
@@ -787,7 +848,7 @@ static int ss_stats(CmdParams* cmdparams)
 				ss_bot->nick);
 			return 0;
 		}
-		st = findstats(cmdparams->av[3]);
+		st = findserverstats(cmdparams->av[3]);
 		if (!st) {
 			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "%s is not in the database", cmdparams->av[3]);
 			return 0;
@@ -821,11 +882,11 @@ static int ss_stats(CmdParams* cmdparams)
 				" <newname>", ss_bot->nick);
 			return 0;
 		}
-		st = findstats(cmdparams->av[4]);
+		st = findserverstats(cmdparams->av[4]);
 		if (st)
 			free(st);
 
-		st = findstats(cmdparams->av[3]);
+		st = findserverstats(cmdparams->av[3]);
 		if (!st) {
 			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "%s is not in the database", 
 				cmdparams->av[3]);
@@ -853,8 +914,6 @@ static int ss_forcehtml(CmdParams* cmdparams)
 {
 	nlog(LOG_NOTICE, "%s!%s@%s forced an update of the HTML file.",
 		    cmdparams->source.user->nick, cmdparams->source.user->username, cmdparams->source.user->hostname);
-	chanalert(ss_bot->nick, "%s forced an update of the HTML file.",
-			cmdparams->source.user->nick);
 	ss_html();
 	return 1;
 }

@@ -42,8 +42,10 @@ void run_mod_timers (void);
 int InitTimers (void)
 {
 	th = hash_create (T_TABLE_SIZE, 0, 0);
-	if(!th)
+	if(!th) {
+		nlog (LOG_CRITICAL, "Unable to create timer hash");
 		return NS_FAILURE;
+	}
 	return NS_SUCCESS;
 }
 
@@ -161,11 +163,13 @@ findtimer (char *name)
  * @return NS_SUCCESS if added, NS_FAILURE if not 
 */
 int
-add_timer (Module* moduleptr, timer_function func_name, char *name, int interval)
+add_timer (timer_function func_name, char *name, int interval)
 {
 	Timer *timer;
+	Module* moduleptr;
 
 	SET_SEGV_LOCATION();
+	moduleptr = GET_CUR_MODULE();
 	if (func_name == NULL) {
 		nlog (LOG_WARNING, "%s: Timer %s Function doesn't exist", moduleptr->info->name, name);
 		return NS_FAILURE;
@@ -311,7 +315,7 @@ run_mod_timers (void)
 		timer = hnode_get (tn);
 		if (me.now - timer->lastrun > timer->interval) {
 			if (setjmp (sigvbuf) == 0) {
-				SET_SEGV_INMODULE(timer->moduleptr->info->name);
+				SET_RUN_LEVEL(timer->moduleptr);
 				nlog(LOG_DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name);
 				if (timer->function () < 0) {
 					nlog(LOG_DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name);
@@ -321,7 +325,7 @@ run_mod_timers (void)
 				} else {
 					timer->lastrun = (int) me.now;
 				}
-				CLEAR_SEGV_INMODULE();
+				RESET_RUN_LEVEL();
 			} else {
 				nlog (LOG_CRITICAL, "run_mod_timers: setjmp() failed, can't call module %s\n", timer->moduleptr->info->name);
 			}

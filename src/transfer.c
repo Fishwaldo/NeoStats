@@ -29,17 +29,6 @@
 #include "transfer.h"
 #include "curl.h"
 
-void testcallback(void *data, int status, char *body, int bodysize) {
-if (status == NS_FAILURE) {
-	printf("gotcallback for %s\n", (char *)data);
-	printf("Error: %s\n", body);
-} else {
-	printf("got good callback for %s\n", (char *)data);
-	printf("Body:(%d - %d)\n%s\n", bodysize, strlen(body),body);
-}
-}
-
-
 int InitCurl(void) 
 {
 	/* global curl init */
@@ -67,7 +56,8 @@ int InitCurl(void)
 	return NS_SUCCESS;
 }
 
-static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, void *stream) {
+static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, void *stream) 
+{
 	size_t writesize;
 	int rembuffer;
 	char *newbuf;
@@ -106,10 +96,10 @@ static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, vo
 }
 
 
-int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback) {
+int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback) 
+{
 	int ret;
 	neo_transfer *newtrans;
-	
 
 	/* sanity check the input first */
 	if (url[0] == 0) {
@@ -121,8 +111,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		return NS_FAILURE;
 	}
 
-	newtrans = malloc(sizeof(neo_transfer));
-	bzero(newtrans, sizeof(neo_transfer));
+	newtrans = scalloc(sizeof(neo_transfer));
 	switch (savetofileormemory) {
 		case NS_FILE:
 			/* if we don't have a filename, bail out */
@@ -197,7 +186,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	}	
 
 	/* setup the user agent */
-	ircsnprintf(newtrans->useragent, MAXURL, "NeoStats %s (%s)", me.versionfull, segv_inmodule); 
+	ircsnprintf(newtrans->useragent, MAXURL, "NeoStats %s (%s)", me.version, GET_CUR_MODNAME()); 
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_USERAGENT, newtrans->useragent)) != 0) {
 		nlog(LOG_WARNING, "Curl Set useragent failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
@@ -269,8 +258,8 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	return NS_SUCCESS;
 }
 
-
-void transfer_status() {
+void transfer_status(void) 
+{
 	CURLMsg *msg;
 	int msg_left;
 	neo_transfer *neotrans;
@@ -294,7 +283,6 @@ void transfer_status() {
 			/* check if it failed etc */
 			if (msg->data.result != 0) {
 				/* it failed for whatever reason */
-				/* XXX TODO... Callback with a failure */
 				nlog(LOG_NOTICE, "Transfer %s Failed. Error was: %s", neotrans->url, neotrans->curlerror);
 				neotrans->callback(neotrans->data, NS_FAILURE, neotrans->curlerror, strlen(neotrans->curlerror));
 			} else {
@@ -302,7 +290,6 @@ void transfer_status() {
 				/* success, so we must callback with success */
 				neotrans->callback(neotrans->data, NS_SUCCESS, neotrans->savefileormem == NS_MEMORY ? neotrans->savemem : NULL, neotrans->savememsize);
 			}
-			CLEAR_SEGV_INMODULE();
 			/* regardless, clean up the transfer */
 			curl_multi_remove_handle(curlmultihandle, neotrans->curleasyhandle);
 			curl_easy_cleanup(neotrans->curleasyhandle);

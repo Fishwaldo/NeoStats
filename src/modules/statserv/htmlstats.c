@@ -61,7 +61,7 @@ int ss_html()
 	if (StatServ.html) {
 		if (StatServ.htmlpath[0] == 0) {
 			nlog(LOG_WARNING,
-			     "Can't do HTML Writout as html path is not defined");
+				"Unable to write HTML: html path is not defined");
 			return 1;
 		}
 	} else {
@@ -172,7 +172,7 @@ int ss_html()
 		if (buf1) {
 			startstr = strlen(buf) - strlen(buf1);
 			fwrite(buf, startstr, 1, opf);
-			fputs(me.versionfull, opf);
+			fputs(me.version, opf);
 			buf = buf1 + strlen("!VERSION!");
 		}
 		buf1 = strstr(buf, "!TITLE!");
@@ -575,6 +575,7 @@ void get_chantops()
 
 void get_map(char *uplink, int level)
 {
+#if 0
 	hscan_t hs;
 	hnode_t *sn;
 	Server *s;
@@ -584,7 +585,7 @@ void get_map(char *uplink, int level)
 	hash_scan_begin(&hs, sh);
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
-		ss = findstats(s->name);
+		ss = findserverstats(s->name);
 
 		if ((level == 0) && (strlen(s->uplink) <= 0)) {
 			/* its the root server */
@@ -612,4 +613,5 @@ void get_map(char *uplink, int level)
 			get_map(s->name, level + 1);
 		}
 	}
+#endif
 }

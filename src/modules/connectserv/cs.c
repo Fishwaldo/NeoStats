@@ -110,7 +110,7 @@ static Module* cs_module;
 
 ModuleInfo module_info = {
 	"ConnectServ",
-	"Connection monitoring service", 	
+	"Connection monitoring service",
 	ns_copyright,
 	cs_about,
 	NEOSTATS_VERSION,
@@ -132,7 +132,7 @@ static bot_setting cs_settings[]=
 	{"ALTNICK",		&cs_botinfo.altnick,SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, (void*)"ConnectServ" },
 	{"USER",		&cs_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, (void*)"CS" },
 	{"HOST",		&cs_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, (void*)"" },
-	{"REALNAME",	&cs_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"" },
+	{"REALNAME",	&cs_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"Connection monitoring service" },
 	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "SignWatch",	NULL,	cs_help_set_signwatch, NULL, (void*)1 },
 	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "KillWatch",	NULL,	cs_help_set_killwatch, NULL, (void*)1 },
 	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ModeWatch",	NULL,	cs_help_set_modewatch, NULL, (void*)1 },
@@ -160,7 +160,7 @@ ModuleEvent module_events[] = {
 int ModInit(Module* mod_ptr)
 {
 	cs_module = mod_ptr;
-	ModuleConfig(cs_module, cs_settings);
+	ModuleConfig(cs_settings);
 	return 1;
 }
 
@@ -171,8 +171,8 @@ void ModFini()
 
 static int cs_event_online(CmdParams* cmdparams)
 {
-	cs_bot = init_bot (cs_module, &cs_botinfo, services_bot_modes, BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
-		cs_commands, cs_settings);
+	cs_bot = init_bot (&cs_botinfo, services_bot_modes, 
+		BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, cs_commands, cs_settings);
 	cs_online = 1;
 	return 1;
 };

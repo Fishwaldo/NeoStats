@@ -207,9 +207,6 @@ SmodeStringToMask(const char* SmodeString, long Smode)
 int 
 join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 {
-	char savemod[SEGV_INMODULE_BUFSIZE];
-
-	strlcpy(savemod, segv_inmodule, SEGV_INMODULE_BUFSIZE);
 #ifdef GOTSJOIN
 	ssjoin_cmd(who, chan, chflag);
 #else
@@ -222,7 +219,6 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 #endif
 
 #endif
-	SET_SEGV_INMODULE(savemod);
 	return NS_SUCCESS;
 }
 
@@ -627,7 +623,7 @@ void
 do_version (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
-	numeric (RPL_VERSION, nick, "%s :%s -> %s %s", me.versionfull, me.name, ns_module_info.build_date, ns_module_info.build_time);
+	numeric (RPL_VERSION, nick, "%s :%s -> %s %s", me.version, me.name, ns_module_info.build_date, ns_module_info.build_time);
 	ModulesVersion (nick, remoteserver);
 }
 
@@ -649,7 +645,7 @@ do_motd (const char* nick, const char *remoteserver)
 		numeric (ERR_NOMOTD, nick, ":- MOTD file Missing");
 	} else {
 		numeric (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
-		numeric (RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2004 The NeoStats Group", me.versionfull);
+		numeric (RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2004 The NeoStats Group", me.version);
 		numeric (RPL_MOTD, nick, ":-");
 
 		while (fgets (buf, sizeof (buf), fp)) {
@@ -679,7 +675,7 @@ do_admin (const char* nick, const char *remoteserver)
 		numeric (ERR_NOADMININFO, nick, "%s :No administrative info available", me.name);
 	} else {
 		numeric (RPL_ADMINME, nick, ":%s :Administrative info", me.name);
-		numeric (RPL_ADMINME, nick, ":%s.  Copyright (c) 1999 - 2004 The NeoStats Group", me.versionfull);
+		numeric (RPL_ADMINME, nick, ":%s.  Copyright (c) 1999 - 2004 The NeoStats Group", me.version);
 		while (fgets (buf, sizeof (buf), fp)) {
 			buf[strnlen (buf, BUFSIZE) - 1] = 0;
 			numeric (RPL_ADMINLOC1, nick, ":- %s", buf);
@@ -699,7 +695,7 @@ void
 do_credits (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
-	numeric (RPL_VERSION, nick, ":- NeoStats %s Credits ", me.versionfull);
+	numeric (RPL_VERSION, nick, ":- NeoStats %s Credits ", me.version);
 	numeric (RPL_VERSION, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
 	numeric (RPL_VERSION, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
 	numeric (RPL_VERSION, nick, ":- irc.irc-chat.net #NeoStats");
@@ -920,8 +916,8 @@ numeric (const int numeric, const char *target, const char *data, ...)
 void
 unsupported_cmd(const char* cmd)
 {
-	chanalert (ns_botptr->nick, "Warning, %s tried to %s which is not supported", ((segv_inmodule[0] != 0)? segv_inmodule : ""), cmd);
-	nlog (LOG_NOTICE, "Warning, %s tried to %s, which is not supported", ((segv_inmodule[0] != 0)? segv_inmodule : ""), cmd);
+	chanalert (ns_botptr->nick, "Warning, %s tried to %s which is not supported", GET_CUR_MODNAME(), cmd);
+	nlog (LOG_NOTICE, "Warning, %s tried to %s, which is not supported", GET_CUR_MODNAME(), cmd);
 }
 
 int

@@ -242,9 +242,9 @@ static int hs_event_signon(CmdParams* cmdparams)
 
 static int hs_event_online(CmdParams* cmdparams)
 {
-	hs_bot = init_bot(hs_module, &hs_botinfo, services_bot_modes, BOT_FLAG_DEAF, 
+	hs_bot = init_bot(&hs_botinfo, services_bot_modes, BOT_FLAG_DEAF, 
 		hs_commands, hs_settings);
-	add_timer (hs_module, CleanupHosts, "CleanupHosts", 7200);
+	add_timer (CleanupHosts, "CleanupHosts", 7200);
 	LoadHosts();
 	return 1;
 };
@@ -268,7 +268,7 @@ int ModInit(Module* mod_ptr)
 		nlog(LOG_CRITICAL, "Error, can't create vhosts hash");
 		return -1;
 	}
-	ModuleConfig(hs_module, hs_settings);
+	ModuleConfig(hs_settings);
 	LoadConfig();
 	return 1;
 }

@@ -58,8 +58,10 @@ typedef struct _cfgoption {
 
 /* general configuration items */
 struct config {
+	/* log level */
+	unsigned int loglevel;
 	/* debug level */
-	unsigned int debug;
+	unsigned int debuglevel;
 	/* enable recv.log */
 	unsigned int recvlog:1;
 	/* dont load modules on startup */

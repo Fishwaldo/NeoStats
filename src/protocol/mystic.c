@@ -53,7 +53,6 @@ static void m_svsnick (char *origin, char **argv, int argc, int srv);
 static void m_protoctl (char *origin, char **argv, int argc, int srv);
 static void m_vctrl (char *origin, char **argv, int argc, int srv);
 
-const char ircd_version[] = "(M)";
 const char services_bot_modes[]= "+oS";
 
 ircd_cmd cmd_list[] = {

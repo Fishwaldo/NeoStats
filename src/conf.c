@@ -101,13 +101,6 @@ ConfLoad ()
 		return NS_FAILURE;
 	}
 	printf ("Sucessfully loaded config file, booting NeoStats\n");
-	/* if all bots should join the chan */
-	if (GetConf ((void *) &me.allbots, CFGINT, "AllBotsJoinChan") <= 0) {
-		me.allbots = 0;
-	}
-	if (GetConf ((void *) &me.pingtime, CFGINT, "PingServerTime") <= 0) {
-		me.pingtime = 120;
-	}
 	return NS_SUCCESS;
 }
 

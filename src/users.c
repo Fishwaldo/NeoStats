@@ -4,8 +4,6 @@
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
 **
-**  Portions Copyright (c) 1999 Johnathan George net@lite.net
-**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -41,9 +39,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-hash_t *uh;
-
-char quitreason[BUFSIZE];
+static hash_t *uh;
 
 static User *
 new_user (const char *nick)
@@ -194,17 +190,12 @@ KillUser (const char *nick, const char *reason)
 		nlog (LOG_WARNING, "KillUser: %s failed!", nick);
 		return;
 	}
-	bzero(quitreason, BUFSIZE);
-	if(reason) {
-		strlcpy(quitreason, reason, BUFSIZE);
-		strip_mirc_codes(quitreason);
-	}
-	PartAllChannels (u);
+	PartAllChannels (u, reason);
 	/* run the event to delete a user */
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.user = u;
 	if(reason) {
-		cmdparams->param = (char*)quitreason;
+		cmdparams->param = (char*)reason;
 	}
 	SendAllModuleEvent (EVENT_KILL, cmdparams);
 	/* if its one of our bots inform the module */
@@ -229,17 +220,12 @@ QuitUser (const char *nick, const char *reason)
 		nlog (LOG_WARNING, "QuitUser: %s failed!", nick);
 		return;
 	}
-	bzero(quitreason, BUFSIZE);
-	if(reason) {
-		strlcpy(quitreason, reason, BUFSIZE);
-		strip_mirc_codes(quitreason);
-	}
-	PartAllChannels (u);
+	PartAllChannels (u, reason);
 	/* run the event to delete a user */
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.user = u;
 	if(reason) {
-		cmdparams->param = (char*)quitreason;
+		cmdparams->param = (char*)reason;
 	}
 	SendAllModuleEvent (EVENT_QUIT, cmdparams);
 	deluser(u);
@@ -578,8 +564,10 @@ int
 InitUsers ()
 {
 	uh = hash_create (U_TABLE_SIZE, 0, 0);
-	if(!uh)	
+	if(!uh)	{
+		nlog (LOG_CRITICAL, "Unable to create user hash");
 		return NS_FAILURE;
+	}
 
 #ifdef SQLSRV
 	/* add the server hash to the sql library */
@@ -768,7 +756,7 @@ void FiniUsers (void)
 	hash_scan_begin(&hs, uh);
 	while ((un = hash_scan_next(&hs)) != NULL) {
 		u = hnode_get (un);
-		PartAllChannels (u);
+		PartAllChannels (u, NULL);
 		/* something is wrong if its our bots */
 		if ( IsMe(u) ) {
 			nlog (LOG_NOTICE, "FiniUsers called with a neostats bot online: %s", u->nick);
@@ -779,5 +767,18 @@ void FiniUsers (void)
 		free (u);
 	}
 	hash_destroy(uh);
-	hash_destroy(ch);
+}
+
+void GetUserList(UserListHandler handler)
+{
+	User *u;
+	hscan_t scan;
+	hnode_t *node;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin(&scan, uh);
+	while ((node = hash_scan_next(&scan)) != NULL) {
+		u = hnode_get(node);
+		handler(u);
+	}
 }

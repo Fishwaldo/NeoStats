@@ -445,7 +445,7 @@ COLDEF statserv_versionscols[] = {
 		"statserv_versions",
 		"name",
 		RTA_STR,
-		MAX_CLIENT_VERSION_NAME,
+		BUFSIZE,
 		offsetof(struct irc_client_version, name),
 		RTA_READONLY,
 		NULL,

@@ -273,7 +273,6 @@ src/modules/statserv/database.c -text
 src/modules/statserv/global.h -text
 src/modules/statserv/html/index.tpl -text
 src/modules/statserv/htmlstats.c -text
-src/modules/statserv/m_stats.h -text
 src/modules/statserv/md5.c -text
 src/modules/statserv/md5.h -text
 src/modules/statserv/sqlstats.h -text

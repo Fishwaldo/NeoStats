@@ -57,7 +57,6 @@ static void m_vctrl (char *origin, char **argv, int argc, int srv);
 static void m_client (char *origin, char **argv, int argc, int srv);
 static void m_smode (char *origin, char **argv, int argc, int srv);
 
-const char ircd_version[] = "(Q)";
 const char services_bot_modes[]= "+oS";
 
 ircd_cmd cmd_list[] = {

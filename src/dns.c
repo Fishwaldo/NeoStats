@@ -2,8 +2,6 @@
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
-**
-**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -36,21 +34,20 @@
 #include "dns.h"
 #include "services.h"
 
-adns_state ads;
+#define DNS_DATA_SIZE	255
 
-/** @brief DNS lookup Struct
- * structure containing all pending DNS lookups and the callback functions 
- */
-struct dnslookup_struct {
+typedef struct DnsLookup {
 	adns_query q;	/**< the ADNS query */
 	adns_answer *a;	/**< the ADNS result if we have completed */
 	adns_rrtype type; /**< the type we are looking for, only populated if we add to a queue */
-	char data[255];	/**< the User data based to the callback */
+	char data[DNS_DATA_SIZE];	/**< the User data based to the callback */
 	char lookupdata[255]; /**< the look up data, only populated if we add to a queue */
 	void (*callback) (char *data, adns_answer * a);
 						      /**< a function pointer to call when we have a result */
-	char mod_name[MAX_MOD_NAME];
-};
+	Module* modptr;
+} DnsLookup;
+
+adns_state ads;
 
 struct DNSStats {
 	int totalq;
@@ -60,21 +57,15 @@ struct DNSStats {
 	int failure;
 } DNSStats;
 
-
-/** @brief DNS structures
-  */
-typedef struct dnslookup_struct DnsLookup;
-
 /** @brief List of DNS queryies
  *  Contains DnsLookup entries 
  */
-list_t *dnslist;
+static list_t *dnslist;
 
 /** @brief list of DNS queries that are queued up
  * 
  */
 list_t *dnsqueue;
-
 
 void dns_check_queue();
 
@@ -90,9 +81,7 @@ void dns_check_queue();
  * 
  * @return returns 1 on success, 0 on failure (to add the lookup, not a successful lookup
 */
-
-int
-dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data)
+int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data)
 {
 	lnode_t *dnsnode;
 	DnsLookup *dnsdata;
@@ -109,14 +98,8 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 		return 0;
 	}
 	/* set the module name */
-	/* This is a bad bad hack... */
-	if (segv_inmodule[0]) {
-		/* why MAXHOST? because thats the size of mod_name!?!? */
-		strlcpy(dnsdata->mod_name, segv_inmodule, MAX_MOD_NAME);
-	} else {
-		strlcpy(dnsdata->mod_name, "NeoStats", MAX_MOD_NAME);
-	}
-	strlcpy (dnsdata->data, data, 254);
+	dnsdata->modptr = GET_CUR_MODULE();
+	strlcpy (dnsdata->data, data, DNS_DATA_SIZE);
 	dnsdata->callback = callback;
 	dnsdata->type = type;
 	
@@ -155,23 +138,22 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 	return 1;
 }
 
-
 /** @brief sets up DNS subsystem
  *
  * configures ADNS for use with NeoStats.
  *
  * @return returns 1 on success, 0 on failure
 */
-
-int
-InitDns ()
+int InitDns (void)
 {
 	int adnsstart;
 
 	SET_SEGV_LOCATION();
 	dnslist = list_create (DNS_QUEUE_SIZE);
-	if (!dnslist)
+	if (!dnslist) {
+		nlog (LOG_CRITICAL, "Unable to create DNS list");
 		return NS_FAILURE;
+	}
 	/* dnsqueue is unlimited. */
 	dnsqueue = list_create(-1);
 	if (!dnsqueue) 
@@ -182,7 +164,6 @@ InitDns ()
 	adnsstart = adns_init (&ads, adns_if_debug | adns_if_noautosys, 0);
 #endif
 	if (adnsstart) {
-		printf ("ADNS init failed: %s\n", strerror (adnsstart));
 		nlog (LOG_CRITICAL, "ADNS init failed: %s", strerror (adnsstart));
 		return NS_FAILURE;
 	}
@@ -193,14 +174,12 @@ InitDns ()
 /* @brief Clean up ADNS data when we shutdown 
  *
  */
-void 
-FiniDns (void) 
+void FiniDns (void) 
 {
 	lnode_t *dnsnode;
 	DnsLookup *dnsdata;
 
 	SET_SEGV_LOCATION();
-
 	dnsnode = list_first (dnslist);
 	while (dnsnode) {
 		dnsdata = lnode_get(dnsnode);
@@ -222,17 +201,16 @@ FiniDns (void)
  * @param module name
  * @return Nothing
  */
-void 
-canx_dns(const char *modname) {
+void canx_dns(Module* modptr) 
+{
 	lnode_t *dnsnode, *lnode2;
 	DnsLookup *dnsdata;
 
 	SET_SEGV_LOCATION();
-	
 	dnsnode = list_first (dnslist);
 	while (dnsnode) {
 		dnsdata = lnode_get(dnsnode);
-		if (!ircstrcasecmp(dnsdata->mod_name, modname)) {
+		if (dnsdata->modptr == modptr) {
 			adns_cancel(dnsdata->q);
 			free (dnsdata->a);
 			free (dnsdata);
@@ -245,7 +223,7 @@ canx_dns(const char *modname) {
 	dnsnode = list_first(dnsqueue);
 	while (dnsnode) {
 		dnsdata = lnode_get(dnsnode);
-		if (!ircstrcasecmp(dnsdata->mod_name, modname)) {
+		if (dnsdata->modptr == modptr) {
 			free(dnsdata);
 			lnode2 = list_next(dnsqueue, dnsnode);
 			list_delete(dnsqueue, dnsnode);
@@ -257,8 +235,6 @@ canx_dns(const char *modname) {
 	dns_check_queue();
 }
 
-
-
 /** @brief Checks for Completed DNS queries
  *
  *  Goes through the dnslist of pending queries and calls the callback function for each lookup
@@ -267,9 +243,7 @@ canx_dns(const char *modname) {
  *
  * @return Nothing
 */
-
-void
-do_dns ()
+void do_dns (void)
 {
 	lnode_t *dnsnode, *dnsnode1;
 	int status;
@@ -297,12 +271,11 @@ do_dns ()
 		if (status) {
 			nlog (LOG_CRITICAL, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror (status));
 			chanalert (ns_botptr->nick, "Bad Error on DNS lookup. Please check logfile");
+			SET_RUN_LEVEL(dnsdata->modptr);
 			DNSStats.failure++;
-			/* set this so nlog works good */
-			SET_SEGV_INMODULE(dnsdata->mod_name);
 			/* call the callback function with answer set to NULL */
 			dnsdata->callback (dnsdata->data, NULL);
-			CLEAR_SEGV_INMODULE();
+			RESET_RUN_LEVEL();
 			/* delete from list */
 			dnsnode1 = list_delete (dnslist, dnsnode);
 			dnsnode = list_next (dnslist, dnsnode1);
@@ -311,12 +284,12 @@ do_dns ()
 			lnode_destroy (dnsnode1);
 			break;
 		}
-		nlog (LOG_DEBUG1, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->mod_name);
+		nlog (LOG_DEBUG1, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->modptr->info->name);
 		DNSStats.success++;
-		SET_SEGV_INMODULE(dnsdata->mod_name);
+		SET_RUN_LEVEL(dnsdata->modptr);
 		/* call the callback function */
 		dnsdata->callback (dnsdata->data, dnsdata->a);
-		CLEAR_SEGV_INMODULE();
+		RESET_RUN_LEVEL();
 		/* delete from list */
 		dnsnode1 = list_delete (dnslist, dnsnode);
 		dnsnode = list_next (dnslist, dnsnode1);
@@ -374,7 +347,6 @@ void dns_check_queue() {
 	/* isempty */
 	}
 }
-
 
 void do_dns_stats_Z(User *u) {
 	numeric (RPL_MEMSTATS, u->nick, "Active DNS queries: %d", (int) list_count(dnslist));

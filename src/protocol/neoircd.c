@@ -49,7 +49,6 @@ static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 static void m_tburst (char *origin, char **argv, int argc, int srv);
 
-const char ircd_version[] = "(N)";
 const char services_bot_modes[]= "+oS";
 
 /* this is the command list and associated functions to run */

@@ -46,7 +46,6 @@
 #endif
 
 char segv_location[SEGV_LOCATION_BUFSIZE];
-char segv_inmodule[SEGV_INMODULE_BUFSIZE];
 
 /*! Date when we were compiled */
 const char version_date[] = __DATE__;
@@ -126,6 +125,7 @@ static int InitCore(void)
 	if (InitCurl () != NS_SUCCESS)
 		return NS_FAILURE;
 	InitIrcd ();
+	nlog (LOG_DEBUG1, "Core init successful");
 	return NS_SUCCESS;
 }
 
@@ -145,8 +145,6 @@ main (int argc, char *argv[])
 
 	/* initialise version */
 	strlcpy(me.version, NEOSTATS_VERSION, VERSIONSIZE);
-	strlcpy(me.versionfull, NEOSTATS_VERSION, VERSIONSIZE);
-	strlcat(me.versionfull, ircd_version, VERSIONSIZE);
 	/* get our commandline options */
 	if(get_options (argc, argv)!=NS_SUCCESS)
 		return EXIT_FAILURE;
@@ -159,15 +157,16 @@ main (int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 #endif
+	/* Init run level to NeoStats core */
+	RunModule[0]=&ns_module;
 	/* before we do anything, make sure logging is setup */
 	if(InitLogs () != NS_SUCCESS)
 		return EXIT_FAILURE;
 	/* our crash trace variables */
 	SET_SEGV_LOCATION();
-	CLEAR_SEGV_INMODULE();
 	/* keep quiet if we are told to :) */
 	if (!config.quiet) {
-		printf ("NeoStats %s Loading...\n", me.versionfull);
+		printf ("NeoStats %s Loading...\n", me.version);
 		printf ("-----------------------------------------------\n");
 		printf ("Copyright: NeoStats Group. 2000-2004\n");
 		printf ("Justin Hammond (fish@neostats.net)\n");
@@ -199,7 +198,7 @@ main (int argc, char *argv[])
 			fclose (fp);
 			if (!config.quiet) {
 				printf ("\n");
-				printf ("NeoStats %s Successfully Launched into Background\n", me.versionfull);
+				printf ("NeoStats %s Successfully Launched into Background\n", me.version);
 				printf ("PID: %i - Wrote to %s\n", forked, PID_FILENAME);
 			}
 			return EXIT_SUCCESS; /* parent exits */ 
@@ -215,7 +214,7 @@ main (int argc, char *argv[])
 		}
 	}
 #endif
-	nlog (LOG_NOTICE, "NeoStats started (Version %s).", me.versionfull);
+	nlog (LOG_NOTICE, "NeoStats \"%s\" started.", NEOSTATS_VERSION);
 
 	/* Load modules after we fork. This fixes the load->fork-exit->call 
 	   _fini problems when we fork */
@@ -238,31 +237,34 @@ static int
 get_options (int argc, char **argv)
 {
 	int c;
-	int dbg;
+	int level;
 
 	/* set some defaults first */
 #ifdef DEBUG
-	config.debug = 10;
+	config.loglevel = LOG_INFO;
+	config.debuglevel = DEBUG10;
 	config.foreground = 1;
 #else
-	config.debug = 5;
+	config.loglevel = LOG_NORMAL;
+	config.debuglevel = 0;
 	config.foreground = 0;
 #endif
 
-	while ((c = getopt (argc, argv, "hvrd:nqf")) != -1) {
+	while ((c = getopt (argc, argv, "hvrd:l:nqf")) != -1) {
 		switch (c) {
 		case 'h':
 			printf ("NeoStats: Usage: \"neostats [options]\"\n");
 			printf ("     -h (Show this screen)\n");
 			printf ("	  -v (Show version number)\n");
 			printf ("	  -r (Enable recv.log)\n");
-			printf ("	  -d 1-10 (Enable debugging output 1= lowest, 10 = highest)\n");
+			printf ("	  -d 1-10 (Debug log output level 1= lowest, 10 = highest)\n");
+			printf ("	  -l 1-10 (Log output level 1= lowest, 6 = highest)\n");
 			printf ("	  -n (Do not load any modules on startup)\n");
 			printf ("	  -q (Quiet start - for cron scripts)\n");
 			printf ("     -f (Do not fork into background\n");
 			return NS_FAILURE;
 		case 'v':
-			printf ("NeoStats Version %s\n", me.versionfull);
+			printf ("NeoStats Version %s\n", me.version);
 			printf ("Compiled: %s at %s\n", ns_module_info.build_date, ns_module_info.build_time);
 			printf ("Flag after version number indicates what IRCd NeoStats is compiled for:\n");
 			printf ("(U31)- Unreal 3.1.x IRCd\n");
@@ -279,8 +281,17 @@ get_options (int argc, char **argv)
 			printf ("\nNeoStats: http://www.neostats.net\n");
 			return NS_FAILURE;
 		case 'r':
-			printf ("recv.log enabled. Watch your DiskSpace\n");
+			printf ("recv.log enabled. Watch your disk space\n");
 			config.recvlog = 1;
+			break;
+		case 'd':
+			printf ("debug.log enabled. Watch your disk space\n");
+			level = atoi (optarg);
+			if ((level > DEBUGMAX - 1) || (level < 1)) {
+				printf ("Invalid debug level %d\n", level);
+				return NS_FAILURE;
+			}
+			config.debuglevel = level;
 			break;
 		case 'n':
 			config.modnoload = 1;
@@ -288,13 +299,13 @@ get_options (int argc, char **argv)
 		case 'q':
 			config.quiet = 1;
 			break;
-		case 'd':
-			dbg = atoi (optarg);
-			if ((dbg > 10) || (dbg < 1)) {
-				printf ("Invalid Debug Level %d\n", dbg);
+		case 'l':
+			level = atoi (optarg);
+			if ((level > LOG_LEVELMAX - 1) || (level < 1)) {
+				printf ("Invalid level %d\n", level);
 				return NS_FAILURE;
 			}
-			config.debug = dbg;
+			config.loglevel = level;
 			break;
 		case 'f':
 			config.foreground = 1;
@@ -348,6 +359,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		sleep(1);
 		/* now free up the users and servers memory */
 		FiniUsers();
+		FiniChannels();
 		FiniServers();
 		FiniBans();
 		FiniDns();

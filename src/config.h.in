@@ -121,12 +121,14 @@
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 #undef TM_IN_SYS_TIME
 
+/* IRCd protocol */
+#undef NS_PROTOCOL
+
 /* 'Enable Ultimate Support' */
 #undef ULTIMATE
 
 /* 'Enable Ultimate Support' */
 #undef ULTIMATE3
-
 
 /* 'Enable Unreal Support' */
 #undef UNREAL

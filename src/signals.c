@@ -116,12 +116,12 @@ void do_backtrace(void)
 #endif
 }
 
-void report_segfault(char* modulename)
+void report_segfault(const char* modulename)
 {
 	segfault = fopen ("segfault.log", "a");
 	if(modulename) {
-		globops (me.name, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
-		nlog (LOG_CRITICAL, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
+		globops (me.name, "Segmentation fault in %s. Refer to segfault.log for details.", GET_CUR_MODNAME());
+		nlog (LOG_CRITICAL, "Segmentation fault in %s. Refer to segfault.log for details.", GET_CUR_MODNAME());
 	} else {
 		globops (me.name, "Segmentation fault. Server terminating. Refer to segfault.log.");
 		nlog (LOG_CRITICAL, "Segmentation fault. Server terminating. Refer to segfault.log.");
@@ -129,9 +129,9 @@ void report_segfault(char* modulename)
 	fprintf (segfault, "------------------------SEGFAULT REPORT-------------------------\n");
 	fprintf (segfault, "Please view the README for how to submit a bug report\n");
 	fprintf (segfault, "and include this segfault report in your submission.\n");
-	fprintf (segfault, "Version:  %s\n", me.versionfull);
+	fprintf (segfault, "Version:  %s\n", me.version);
 	if (modulename) {
-		fprintf (segfault, "Module:   %s\n", segv_inmodule);
+		fprintf (segfault, "Module:   %s\n", GET_CUR_MODNAME());
 	}
 	fprintf (segfault, "Location: %s\n", segv_location);
 	fprintf (segfault, "recbuf:   %s\n", recbuf);
@@ -149,10 +149,10 @@ serv_segv ()
 	/** segv happened inside a module, so unload and try to restore the stack 
 	 *  to location before we jumped into the module and continue
 	 */
-	if (strcasecmp (segv_inmodule, "neostats") != 0) {
-		report_segfault (segv_inmodule);
-		strlcpy (name, segv_inmodule, MAX_MOD_NAME);
-		CLEAR_SEGV_INMODULE();
+	if (RunLevel > 0) {
+		report_segfault (GET_CUR_MODNAME());
+		strlcpy (name, GET_CUR_MODNAME(), MAX_MOD_NAME);
+		RunLevel = 0;
 		unload_module (name, NULL);
 		chanalert (ns_botptr->nick, "Restoring Stack to before Crash");
 		/* flush the logs out */

@@ -4,6 +4,26 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - StatServ: Optimise database save to further reduce code required and get 
+   back a little CPU.
+ - StatServ: Adjust exclusions so that counts are accurate. The exclusions 
+   produced cases where the current channel count was greater than the network 
+   record! (M)
+ - IRCd version suffix now handled by configure rather than code. (M)
+ - Introduce new debug.log system to store all current messages and debug info
+   to avoid corrupting main system logs when in debug mode and allow users to 
+   submit this file for support rather than multiple ones from modules plus 
+   core. (M)
+ - StatServ: reorganised code so stats code is encapsulated from module 
+   specifics and introduced new burst request system during init. (M)
+ - Begin implementing "burst" request interface for modules to get current
+   user/channel/server etc lists. (M)
+ - Homogenize init error messages. (M)
+ - Update core support functions to use new run level system to determine 
+   current module removing the need for modules to pass their module pointer 
+   when adding bots/timers/socks etc. (M)
+ - Replace old segv_module system with new run level system. (M)
+ - Keeper subdirs are now subdirs of main data dir. (M)
  - ConnectServ: reverse colour define so default is disabled. (M)
  - Core modules now use core config loading system (M)
  - All socket code now in socks.c for easier upgrade (M)

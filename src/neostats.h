@@ -53,16 +53,9 @@
 /*#define USE_BERKELEY*/
 #endif
 
-/* Temp disable for upcoming release until all external modules 
- * have been released with warnings fixed
- */
-#if 0
-#define __attribute__(x)  /* NOTHING */
-#else
 /* If we're not using GNU C, elide __attribute__ */
 #ifndef __GNUC__
 #define __attribute__(x)  /* NOTHING */
-#endif
 #endif
 
 /* 
@@ -106,9 +99,9 @@
 #endif
 
 #ifdef NEOSTATS_REVISION
-#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION " (" NEOSTATS_REVISION ")"
+#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION " (" NEOSTATS_REVISION ")" NS_PROTOCOL
 #else
-#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION
+#define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION NS_PROTOCOL
 #endif
 #define CORE_MODULE_VERSION NEOSTATS_VERSION
 
@@ -296,28 +289,9 @@ typedef enum NS_TRANSFER {
 #define CLEAR_SEGV_LOCATION() segv_location[0]='\0';
 #endif
 
-#define SEGV_INMODULE_BUFSIZE	MAX_MOD_NAME
-#define SET_SEGV_INMODULE(module_name) strlcpy(segv_inmodule,(module_name),SEGV_INMODULE_BUFSIZE);
-#define CLEAR_SEGV_INMODULE() segv_inmodule[0]='\0';
-
-/* macros to provide a couple missing string functions for code legibility 
- * and to ensure we perform these operations in a standard and optimal manner
- */
-/* set a string to NULL */
-#define strsetnull(str) (str)[0] = 0
-/* test a string for NULL */
-#define strisnull(str)  ((str) && (str)[0] == 0)
-
-#define ARRAY_COUNT (a) ((sizeof ((a)) / sizeof ((a)[0]))
-
 extern char recbuf[BUFSIZE];
 extern const char services_bot_modes[];
 extern char segv_location[SEGV_LOCATION_BUFSIZE];
-extern char segv_inmodule[SEGV_INMODULE_BUFSIZE];
-
-extern hash_t *sh;
-extern hash_t *uh;
-extern hash_t *ch;
 
 /* this is the dns structure */
 extern adns_state ads;
@@ -388,7 +362,6 @@ struct me {
 	int sqlport;
 #endif
 	char version[VERSIONSIZE];
-	char versionfull[VERSIONSIZE];
 } me;
 
 /** @brief Bans structure
@@ -696,6 +669,21 @@ typedef struct Module {
 	unsigned int modnum;
 }Module;
 
+extern Module* RunModule[10];
+extern int RunLevel;
+
+/* Simple stack to manage run level replacing original segv_module stuff 
+ * which will hopefully make it easier to determine where we are running
+ * and avoid the need for modules to ever manage this and the core to
+ * have to set/reset when a module calls a core function which triggers
+ * other modules to run (e.g. init_bot)
+ */
+#define SET_RUN_LEVEL(moduleptr) {if(RunLevel<10 && RunModule[RunLevel] != moduleptr){RunLevel++;RunModule[RunLevel] = moduleptr;}}
+#define RESET_RUN_LEVEL() {if(RunLevel>0){RunLevel--;}}
+#define GET_CUR_MODULE() RunModule[RunLevel]
+#define GET_CUR_MODNUM() RunModule[RunLevel]->modnum
+#define GET_CUR_MODNAME() RunModule[RunLevel]->info->name
+
 /** @brief Module socket list structure
  * 
  */
@@ -781,25 +769,25 @@ typedef struct _Bot {
 	unsigned int set_ulevel;
 }_Bot;
 
-int ModuleConfig(Module* moduleptr, bot_setting* bot_settings);
+int ModuleConfig(bot_setting* bot_settings);
 
-int add_timer (Module* moduleptr, timer_function func, char* name, int interval);
+int add_timer (timer_function func, char* name, int interval);
 int del_timer (char *timer_name);
 int set_timer_interval (char *timer_name, int interval);
 Timer *findtimer(char *timer_name);
 
-int add_socket (Module* moduleptr, socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum);
-int add_sockpoll (Module* moduleptr, before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, void *data);
+int add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum);
+int add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, void *data);
 int del_socket (char *name);
 Sock *findsock (char *sock_name);
 
-Bot * init_bot (Module* modptr, BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list);
+Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list);
 int del_bot (Bot *botptr, char * reason);
 Bot *findbot (char * bot_name);
 int bot_nick_change (char * oldnick, char *newnick);
 
 /* sock.c */
-int sock_connect (Module* moduleptr, int socktype, unsigned long ipaddr, int port, char *module, socket_function func_read, socket_function func_write, socket_function func_error);
+int sock_connect (int socktype, unsigned long ipaddr, int port, char *module, socket_function func_read, socket_function func_write, socket_function func_error);
 int sock_disconnect (char *name);
 
 /* conf.c */
@@ -958,12 +946,13 @@ typedef enum LOG_LEVEL {
 	LOG_DEBUG2,		/* more debug notices that are usefull */
 	LOG_DEBUG3,		/* even more stuff, that would be useless to most normal people */
 	LOG_DEBUG4,		/* are you insane? */
+	LOG_LEVELMAX,		/* are you insane? */
 } LOG_LEVEL;
 
 /* define debug levels */
 
 typedef enum DEBUG_LEVEL {
-	DEBUG1,
+	DEBUG1=1,
 	DEBUG2,
 	DEBUG3,
 	DEBUG4,
@@ -972,6 +961,8 @@ typedef enum DEBUG_LEVEL {
 	DEBUG7,
 	DEBUG8,
 	DEBUG9,
+	DEBUG10,
+	DEBUGMAX,
 } DEBUG_LEVEL;
 
 /* this is for the neostats assert replacement. */
@@ -1006,6 +997,13 @@ void nlog (LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3)));
 #include "conf.h"
 
 int CloakHost (Bot *bot_ptr);
+
+typedef void (*ChannelListHandler) (Channel * c);
+void GetChannelList(ChannelListHandler handler);
+typedef void (*UserListHandler) (User * u);
+void GetUserList(UserListHandler handler);
+typedef void (*ServerListHandler) (Server * s);
+void GetServerList(ServerListHandler handler);
 
 /* 
  * Module Interface 

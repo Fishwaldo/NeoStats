@@ -35,12 +35,7 @@ GetConf (void **data, int type, const char *item)
 	char keypath[255];
 	int i = 0;
 
-	/* determine if its a module setting */
-	if (segv_inmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "g/%s:/%s", segv_inmodule, item);
-	} else {
-		ircsnprintf (keypath, 255, "g/core:/%s", item);
-	}
+	ircsnprintf (keypath, 255, "g/%s:/%s", GET_CUR_MODNAME(), item);
 
 	switch (type) {
 	case CFGSTR:
@@ -76,12 +71,7 @@ GetDir (char *item, char ***data)
 	char keypath[255];
 	char **data1;
 
-	/* determine if its a module setting */
-	if (segv_inmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "g/%s:/%s", segv_inmodule, item);
-	} else {
-		ircsnprintf (keypath, 255, "g/core:/%s", item);
-	}
+	ircsnprintf (keypath, 255, "g/%s:/%s", GET_CUR_MODNAME(), item);
 	i = kp_get_dir (keypath, &data1, NULL);
 	if (i == 0) {
 		*data = data1;
@@ -103,12 +93,7 @@ SetConf (void *data, int type, char *item)
 	char keypath[255];
 	int i = 0;
 
-	/* determine if its a module setting */
-	if (segv_inmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "g/%s:/%s", segv_inmodule, item);
-	} else {
-		ircsnprintf (keypath, 255, "g/core:/%s", item);
-	}
+	ircsnprintf (keypath, 255, "g/%s:/%s", GET_CUR_MODNAME(), item);
 
 	switch (type) {
 	case CFGSTR:
@@ -148,11 +133,7 @@ DelConf (char *item)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (segv_inmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "g/%s:/%s", segv_inmodule, item);
-	} else {
-		ircsnprintf (keypath, 255, "g/core:/%s", item);
-	}
+	ircsnprintf (keypath, 255, "g/%s:/%s", GET_CUR_MODNAME(), item);
 	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
 	/* check for errors */
 	if (i != 0) {
@@ -172,11 +153,7 @@ GetData (void **data, int type, const char *table, const char *row, const char *
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (segv_inmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "l/%s:/%s/%s/%s", segv_inmodule, table, row, field);
-	} else {
-		ircsnprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
-	}
+	ircsnprintf (keypath, 255, "l/%s:/%s/%s/%s", GET_CUR_MODNAME(), table, row, field);
 	switch (type) {
 	case CFGSTR:
 		i = kp_get_string (keypath, (char **) *&data);
@@ -212,11 +189,7 @@ GetTableData (char *table, char ***data)
 	char **data1;
 
 	/* determine if its a module setting */
-	if (segv_inmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "l/%s:/%s", segv_inmodule, table);
-	} else {
-		ircsnprintf (keypath, 255, "l/core:/%s", table);
-	}
+	ircsnprintf (keypath, 255, "l/%s:/%s", GET_CUR_MODNAME(), table);
 	i = kp_get_dir (keypath, &data1, NULL);
 	if (i == 0) {
 		*data = data1;
@@ -238,12 +211,7 @@ SetData (void *data, int type, char *table, char *row, char *field)
 	char keypath[255];
 	int i = 0;
 
-	/* determine if its a module setting */
-	if (segv_inmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "l/%s:/%s/%s/%s", segv_inmodule, table, row, field);
-	} else {
-		ircsnprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
-	}
+	ircsnprintf (keypath, 255, "l/%s:/%s/%s/%s", GET_CUR_MODNAME(), table, row, field);
 	switch (type) {
 	case CFGSTR:
 		i = kp_set_string (keypath, (char *) data);
@@ -282,11 +250,7 @@ DelRow (char *table, char *row)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (segv_inmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "l/%s:/%s/%s", segv_inmodule, table, row);
-	} else {
-		ircsnprintf (keypath, 255, "l/core:/%s/%s", table, row);
-	}
+	ircsnprintf (keypath, 255, "l/%s:/%s/%s", GET_CUR_MODNAME(), table, row);
 	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
 	/* check for errors */
 	if (i != 0) {
@@ -305,11 +269,7 @@ DelTable (char *table)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (segv_inmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "l/%s:/%s", segv_inmodule, table);
-	} else {
-		ircsnprintf (keypath, 255, "l/core:/%s", table);
-	}
+	ircsnprintf (keypath, 255, "l/%s:/%s", GET_CUR_MODNAME(), table);
 	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
 	/* check for errors */
 	if (i != 0) {

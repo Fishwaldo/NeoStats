@@ -185,6 +185,7 @@ AC_ARG_ENABLE(unreal31, [ --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Unreal 3.1")
 	PROTOCOL="unreal"
 	AC_MSG_RESULT(yes)
 	;;
@@ -199,6 +200,7 @@ AC_ARG_ENABLE(unreal32, [ --enable-unreal32 - enable Unreal 3.2.x IRCD Support],
   yes)  
 	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
 	AC_DEFINE(UNREAL32, 1, 'Enable Unreal 3.2.x Support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Unreal 3.2")
 	PROTOCOL="unreal"
 	AC_MSG_RESULT(yes)
 	;;
@@ -214,6 +216,7 @@ AC_ARG_ENABLE(ultimate2, [ --enable-ultimate2 - enable Ultimate 2.x.x IRCD Suppo
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate Support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Ultimate 2.x.x")
 	PROTOCOL="ultimate"
 	AC_MSG_RESULT(yes)
 	;;
@@ -229,6 +232,7 @@ AC_ARG_ENABLE(ultimate3, [ --enable-ultimate3 - enable Ultimate 3.x.x IRCD Suppo
   yes)  
 	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate 2.x.x Support')
 	AC_DEFINE(ULTIMATE3, 1, "Enable Ultimate 3.x.x Support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Ultimate 3.x.x")
 	PROTOCOL="ultimate"
 	AC_MSG_RESULT(yes)
 	;;
@@ -244,6 +248,7 @@ AC_ARG_ENABLE(hybrid7, [ --enable-hybrid7 - enable Hybrid7 IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(HYBRID7, 1, 'Enable hybrid7 IRCD support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Hybrid 7")
 	PROTOCOL="hybrid7"
 	AC_MSG_CHECKING(Auto-Enabling ServiceRoots Authentication Module)
 	do_serviceroots=yes
@@ -265,6 +270,7 @@ AC_ARG_ENABLE(neoircd, [ --enable-neoircd - enable NeoIRCd IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(NEOIRCD, 1, 'Enable NeoIRCd IRCD support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "NeoIRCd")
 	PROTOCOL="neoircd"
 	AC_MSG_RESULT(yes)
 	;;
@@ -281,6 +287,7 @@ AC_ARG_ENABLE(quantum, [ --enable-quantum - enable Quantum IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(QUANTUM, 1, 'Enable Quantum Support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Quantum")
 	PROTOCOL="quantum"
 	AC_MSG_RESULT(yes)
 	;;
@@ -296,6 +303,7 @@ AC_ARG_ENABLE(mystic, [ --enable-mystic - enable Mystic IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(MYSTIC, 1, 'Enable Mystic Support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Mystic")
 	PROTOCOL="mystic"
 	AC_MSG_RESULT(yes)
 	;;
@@ -311,6 +319,7 @@ AC_ARG_ENABLE(bahamut, [ --enable-bahamut - enable Bahamut IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(BAHAMUT, 1, 'Enable Bahamut Support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Bahamut")
 	PROTOCOL="bahamut"
 	AC_MSG_RESULT(yes)
 	;;
@@ -327,6 +336,7 @@ AC_ARG_ENABLE(ircu, [ --enable-ircu - enable IRCu IRCD Support],
   yes)  
 dnl	AC_MSG_ERROR('Sorry IRCu support isnt complete yet')
 	AC_DEFINE(IRCU, 1, 'Enable IRCu Support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "IRCu")
 	PROTOCOL="ircu"
 	AC_MSG_RESULT(yes)
 	;;
@@ -342,6 +352,7 @@ AC_ARG_ENABLE(liquid, [ --enable-liquid - enable Liquid IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(LIQUID, 1, 'Enable Liquid IRCd Support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Liquid")
 	PROTOCOL="liquid"
 	AC_MSG_RESULT(yes)
 	;;
@@ -358,6 +369,7 @@ AC_ARG_ENABLE(viagra, [ --enable-viagra - enable Viagra IRCD Support],
 [ case "$enableval" in
   yes)  
 	AC_DEFINE(VIAGRA, 1, 'Enable Viagra IRCd Support')
+    AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Viagra")
 	PROTOCOL="viagra"
 	AC_MSG_RESULT(yes)
 	;;

@@ -41,15 +41,8 @@ int DBOpenDatabase(void)
 {
 	int index;
 	nlog(LOG_DEBUG1, "DBOpenDatabase");
-
-	index = get_mod_num (segv_inmodule);
-
-	if (index == NS_FAILURE) {
-		return -1;
-	}
-
-	ircsnprintf(db_list[index].dbname, MAXPATH, "data/%s.db", segv_inmodule);
-
+	index = GET_CUR_MODNUM();
+	ircsnprintf(db_list[index].dbname, MAXPATH, "data/%s.db", GET_CUR_MODNAME());
 	if ((dbret = db_create(&db_list[index].dbp, NULL, 0)) != 0) {
 		nlog(LOG_DEBUG1, "db_create: %s", db_strerror(dbret));
 		return -1;
@@ -66,7 +59,7 @@ void DBCloseDatabase(void)
 	int index;
 
 	nlog(LOG_DEBUG1, "DBCloseDatabase");
-	index = get_mod_num (segv_inmodule);
+	index = GET_CUR_MODNUM();
 	db_list[index].dbp->close(db_list[index].dbp, 0); 
 }
 
@@ -75,7 +68,7 @@ void* DBGetData(char* key)
 	int index;
 
 	nlog(LOG_DEBUG1, "DBGetData %s", key);
-	index = get_mod_num (segv_inmodule);
+	index = GET_CUR_MODNUM();
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.data = key;
@@ -94,7 +87,7 @@ void DBSetData(char* key, void* data, int size)
 	int index;
 
 	nlog(LOG_DEBUG1, "DBSetData %s %s", key, data);
-	index = get_mod_num (segv_inmodule);
+	index = GET_CUR_MODNUM();
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.data = key;

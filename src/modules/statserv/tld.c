@@ -32,11 +32,13 @@
 #include "GeoIP.h"
 #include "GeoIPCity.h"
 
+list_t *Thead;
 GeoIP *gi;
 
 void _setup_dbfilename();
 
-void ResetTLD() {
+void ResetTLD() 
+{
 	lnode_t *tn, *tn2;
 	TLD *t;
 	
@@ -70,10 +72,12 @@ int sortusers(const void *v, const void *v2) {
 	return (t2->users - t->users);
 }
 
-void DisplayTLDmap(User *u) {
+void DisplayTLDmap(User *u) 
+{
 	TLD *t;
 	lnode_t *tn;
 	
+	prefmsg(u->nick, ss_bot->nick, "Top Level Domain Statistics:");
 	list_sort(Thead, sortusers);
 	tn = list_first(Thead);
 	while (tn) {
@@ -81,11 +85,11 @@ void DisplayTLDmap(User *u) {
 		prefmsg(u->nick, ss_bot->nick,
 			"%3s \2%3d\2 (%2.0f%%) -> %s ---> Daily Total: %d",
 			t->tld, t->users,
-			(float) t->users /
-			(float) stats_network.users * 100,
+			((float) t->users / (float) stats_network.users) * 100,
 			t->country, t->daily_users);
 		tn = list_next(Thead, tn);
 	}
+	prefmsg(u->nick, ss_bot->nick, "End of List");
 }
 
 void DelTLD(User * u)
@@ -94,8 +98,8 @@ void DelTLD(User * u)
 	const char *ipaddr;
 	lnode_t *tn;
 	TLD *t = NULL;
-	SET_SEGV_LOCATION();
 	
+	SET_SEGV_LOCATION();
 	if (!gi) {
 		return;
 	}
@@ -124,11 +128,9 @@ void AddTLD(User * u)
 
 	if (!gi) {
 		return;
-	}
-	
+	}	
 	ipaddr = inet_ntoa(u->ipaddr);
 	country_code = GeoIP_country_code_by_addr(gi, ipaddr);
-
 	if (country_code) {
 		tn = list_find(Thead, country_code, findcc);
 	} else {
@@ -151,16 +153,16 @@ void AddTLD(User * u)
 	return;
 }
 
-void init_tld()
+void InitTLD(void)
 {
 	TLD *t;
 	lnode_t *tn;
 	SET_SEGV_LOCATION();
 
+	Thead = list_create(-1);
 	gi = NULL;
 	/* setup the GeoIP db filenames */
-	_setup_dbfilename();
-	
+	_setup_dbfilename();	
 	StatServ.GeoDBtypes = -1;
 	/* now open the various DB's */
 	if (GeoIP_db_avail(GEOIP_COUNTRY_EDITION)) {
@@ -173,17 +175,15 @@ void init_tld()
 	} else {
 		nlog(LOG_WARNING, "GeoIP Database is not available. TLD stats will not be available");
 	}
-	Thead = list_create(-1);
-	t = malloc(sizeof(TLD));
-	bzero(t, sizeof(TLD));
+	t = scalloc(sizeof(TLD));
 	ircsnprintf(t->tld, 5, "???");
 	strlcpy(t->country, "Unknown", 8);
 	tn = lnode_create(t);
 	list_append(Thead, tn);
-
 }
 
-void fini_tld() {
+void FiniTLD(void) 
+{
 	TLD *t;
 	lnode_t *tn;
 

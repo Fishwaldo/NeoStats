@@ -48,6 +48,19 @@ const char *loglevels[10] = {
 	"INSANE"
 };
 
+const char *dloglevels[10] = {
+	"DEBUG1",
+	"DEBUG2",
+	"DEBUG3",
+	"DEBUG4",
+	"DEBUG5",
+	"DEBUG6",
+	"DEBUG7",
+	"DEBUG8",
+	"DEBUG9",
+	"DEBUG10",
+};
+
 static char log_buf[BUFSIZE];
 static char log_fmttime[TIMEBUFSIZE];
 
@@ -140,6 +153,42 @@ void make_log_filename(char* modname, char *logname)
 	ircsnprintf (logname, MAXPATH, "logs/%s%s.log", modname, log_fmttime);
 }
 
+static void
+debuglog (const char* time, const char* level, const char *line)
+{
+	FILE *logfile;
+
+	if ((logfile = fopen ("logs/debug.log", "a")) == NULL)
+		return;
+	if (logfile) {
+		fprintf (logfile, "%s %s %s\n", time, level, line);
+		fclose (logfile);
+	}
+}
+
+/** @Configurable logging function
+ */
+void
+dlog (DEBUG_LEVEL level, char *fmt, ...)
+{
+	va_list ap;
+	
+	if (level <= config.debuglevel) {
+		/* we update me.now here, because some functions might be busy and not call the loop a lot */
+		me.now = time(NULL);
+		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%ld", me.now);
+		strftime (log_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime (&me.now));
+		va_start (ap, fmt);
+		ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
+		va_end (ap);
+#ifndef DEBUG
+		if (config.foreground)
+#endif
+			printf ("%s %s - %s\n", dloglevels[level - 1], GET_CUR_MODNAME(), log_buf);
+		debuglog (log_fmttime, dloglevels[level - 1], log_buf);
+	}
+}
+
 /** @Configurable logging function
  */
 void
@@ -149,12 +198,8 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 	hnode_t *hn;
 	struct logs_ *logentry;
 	
-	if (level <= config.debug) {
-		if (segv_inmodule[0]!= 0) {
-			hn = hash_lookup (logs, segv_inmodule);
-		} else {
-			hn = hash_lookup (logs, CoreLogFileName);
-		}
+	if (level <= config.loglevel) {
+		hn = hash_lookup (logs, GET_CUR_MODNAME());
 		if (hn) {
 			/* we found our log entry */
 			logentry = hnode_get (hn);
@@ -162,7 +207,7 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 				logentry->logfile = fopen (logentry->logname, "a");
 		} else {
 			logentry = malloc (sizeof (struct logs_));
-			strlcpy (logentry->name, segv_inmodule[0] == 0 ? CoreLogFileName : segv_inmodule , MAX_MOD_NAME);
+			strlcpy (logentry->name, GET_CUR_MODNAME() , MAX_MOD_NAME);
 			make_log_filename(logentry->name, logentry->logname);
 			logentry->logfile = fopen (logentry->logname, "a");
 			logentry->flush = 0;
@@ -176,20 +221,24 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 			do_exit (NS_EXIT_NORMAL, NULL);
 		}
 #endif
-		/* we update me.now here, becase some functions might be busy and not call the loop a lot */
+		/* we update me.now here, because some functions might be busy and not call the loop a lot */
 		me.now = time(NULL);
 		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%ld", me.now);
 		strftime (log_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime (&me.now));
 		va_start (ap, fmt);
 		ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
 		va_end (ap);
-
-		fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], segv_inmodule[0] == 0 ? "CORE" : segv_inmodule, log_buf);
-		logentry->flush = 1;
+		if(level <= LOG_INFO) {
+			fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
+			logentry->flush = 1;
+		}
 #ifndef DEBUG
 		if (config.foreground)
 #endif
-			printf ("%s %s - %s\n", loglevels[level - 1], segv_inmodule[0] == 0 ? "CORE" : segv_inmodule, log_buf);
+			printf ("%s %s - %s\n", loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
+	}
+	if (config.debuglevel) {
+		debuglog (log_fmttime, loglevels[level - 1], log_buf);
 	}
 }
 

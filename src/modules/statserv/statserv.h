@@ -27,10 +27,6 @@
 #define STATSERV_H
 
 #include "neostats.h"
-#include "m_stats.h"
-
-/* this is the max number of statserv channels our database can hold... */
-#define SS_CHAN_SIZE -1
 
 /* this is the how often to save a portion of the DB. Don't alter this unless you need to */
 /* DO NOT set PROGCHANTIME less than ((DBSAVETIME + (DBSAVETIME/2)) * 4) otherwise you will not have the enitre database progressively saved! */
@@ -41,17 +37,11 @@
 #define PROGCHANTIME 3600
 
 extern Bot *ss_bot;
-extern ModuleInfo module_info;
 
-typedef struct tld_ TLD;
-typedef struct region_ Region;
-typedef struct server_stats SStats;
-typedef struct chan_stats CStats;
-typedef struct irc_client_version CVersions;
-hash_t *Shead;
-list_t *Chead;
-list_t *Thead;
-list_t *Vhead;
+extern hash_t *Shead;
+extern list_t *Chead;
+extern list_t *Thead;
+extern list_t *Vhead;
 
 struct stats_network_ {
 	long opers;
@@ -78,7 +68,6 @@ struct StatServ {
 	int html; 
 	char htmlpath[MAXPATH]; 
 	int onchan; 
-	int newdb; 
 	int msginterval; 
 	int msglimit; 
 	int shutdown; 
@@ -87,8 +76,7 @@ struct StatServ {
 } StatServ;
 
 
-struct server_stats {
-	SStats *next, *prev;
+typedef struct SStats {
 	char name[MAXHOST];
 	unsigned int users;
 	int opers;
@@ -107,16 +95,14 @@ struct server_stats {
 	unsigned int serverkills;
 	long totusers;
 	long daily_totusers;
-};
+}SStats;
 
-#define MAX_CLIENT_VERSION_NAME	512
-
-struct irc_client_version {
-	char name[MAX_CLIENT_VERSION_NAME];
+typedef struct CVersions {
+	char name[BUFSIZE];
 	int count;
-};
+}CVersions;
 
-struct chan_stats {
+typedef struct CStats {
 	char name[CHANLEN];
 	long members;
 	long topics;
@@ -135,7 +121,7 @@ struct chan_stats {
 	long maxjoins;
 	time_t t_maxjoins;
 	time_t lastsave;
-};
+}CStats;
 
 struct daily_ {
 	int servers;
@@ -149,41 +135,56 @@ struct daily_ {
 	time_t t_chans;
 } daily;
 
-struct tld_ {
+typedef struct TLD {
 	char tld[5];
 	char country[32];
 	int users;
 	int daily_users;
 	/* for region/isp edition of GeoIP */
 	list_t *rl;
-};
+}TLD;
 
-struct region_ {
+typedef struct Region {
 	char *region;
 	int users;
 	int daily_users;
-};
+}Region;
 
 int StatsMidnight(void);
 /* statserv.c */
-void statserv(char *);
 int topchan(const void *key1, const void *key2);
 int topjoin(const void *key1, const void *key2);
 int topkick(const void *key1, const void *key2);
 int toptopics(const void *key1, const void *key2);
 int topversions(const void *key1, const void *key2);
 /* stats.c */
+void list_client_versions(User* u, int num);
 int load_client_versions(void);
 int save_client_versions(void);
-void AddStats(Server *);
-SStats *findstats(char *);
-int SaveStats();
-void LoadStats();
-CStats *findchanstats(char *);
-#if 0
-CStats *AddChanStats(char *);
-#endif
-int DelOldChan();
+void StatsAddServer(Server* s);
+void StatsDelServer(Server* s);
+void StatsServerPong(Server* s);
+SStats *findserverstats(char *name);
+void StatsAddCTCPVersion(char* version);
+void StatsAddUser(User* u);
+void StatsDelUser(User* u);
+void StatsKillUser(User* u);
+void StatsUserMode(User* u, char *modes);
+void StatsUserAway(User* u);
+void InitStats(void);
+void FiniStats(void);
+
+int SaveStats(void);
+void LoadStats(void);
+
+CStats *findchanstats(char *name);
+void StatsAddChan(Channel* c);
+void StatsDelChan(Channel* c);
+void StatsJoinChan(User* u, Channel* c);
+void StatsPartChan(User* u, Channel* c);
+void StatsChanTopic(Channel* c);
+void StatsChanKick(Channel* c);
+int DelOldChan(void);
 
 /* database.c */
 void save_chan(CStats *c);
@@ -236,8 +237,8 @@ int sortusers(const void *v, const void *v2);
 void ResetTLD();
 void DisplayTLDmap(User *u);
 void AddTLD(User *);
-void init_tld();
-void fini_tld();
+void InitTLD(void);
+void FiniTLD(void);
 /* htmlstats.c */
 int ss_html(void);
 

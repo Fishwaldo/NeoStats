@@ -25,6 +25,7 @@
 #define _SERVICES_H_
 
 extern ModuleInfo ns_module_info;
+extern Module ns_module;
 extern BotInfo ns_botinfo;
 extern Bot* ns_botptr;
 
