@@ -71,7 +71,6 @@ logs/.keepme -text
 /makeconf -text
 /ns_help.c -text
 /server.c -text
-/servers.c -text
 /services.c -text
 /sock.c -text
 /ss_help.c -text
