@@ -443,26 +443,7 @@ m_credits (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	char* s = NULL;
-	/* server desc is in argv[3] but so is some other stuff
-	 * so we need to strip protocol, flags and numeric.
-	 */
-#if 0
-	if(argc > 2) {
-		s = argv[3];
-		while(*s != ' ')
-			s++;
-		s++;
-	}
-#else
-	if(argc > 2) {
-		s = argv[3];
-	} else {
-		s = argv[2];
-	}
-#endif
-
-	do_server (argv[0], origin, argv[1], argv[2], s, srv);
+	do_server (argv[0], origin, argv[1], argv[2], argv[3], srv);
 }
 
 /* m_squit
