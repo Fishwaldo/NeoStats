@@ -239,9 +239,12 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 #elif defined(ULTIMATE3) || defined(QUANTUM)
 		sjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
 		schmode_cmd (nick, me.chan, "+a", nick);
-#elif defined(HYBRID7) || defined(IRCU)
+#elif defined(HYBRID7) 
 		sjoin_cmd (nick, me.chan);
 		schmode_cmd (me.name, me.chan, "+o", nick);
+#elif defined(IRCU)
+		sjoin_cmd (nick, me.chan);
+		schmode_cmd (me.name, me.chan, "+o", getnumfromnick(nick));
 #elif defined(ULTIMATE) || defined(MYSTIC)
 		sjoin_cmd (nick, me.chan);
 		schmode_cmd (nick, me.chan, "+o", nick);
