@@ -23,6 +23,7 @@
 
 #include "neostats.h"
 
+#if 0 /* Temp since berkeley is causing too many problems */
 #ifndef WIN32 /* Temp since open call no longer compiles */
 #ifdef HAVE_DB_H
 #include <db.h>
@@ -102,3 +103,4 @@ void DBSetData(char* key, void* data, int size)
 
 #endif /* HAVE_DB_H */
 #endif /* WIN32 */
+#endif /* 0 */

@@ -26,6 +26,7 @@
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
+#if 0 /* Temp since berkeley is causing too many problems */
 #ifdef HAVE_DB_H
 #include <db.h>
 #endif
@@ -456,3 +457,13 @@ void LANGfini()
 	}
 }
 #endif
+#else
+#include "lang.h"
+void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc) 
+{
+}
+
+void LANGfini() 
+{
+}
+#endif /* 0 */
