@@ -33,13 +33,13 @@
 #include "chans.h"
 #include "users.h"
 
-static void Usr_Version (char *origin, char **argv, int argc, int srv, int srv);
-static void Usr_MOTD (char *origin, char **argv, int argc, int srv, int srv);
-static void Usr_Admin (char *origin, char **argv, int argc, int srv, int srv);
-static void Usr_Server (char *origin, char **argv, int argc, int srv, int srv);
-static void Usr_Squit (char *origin, char **argv, int argc, int srv, int srv);
-static void Usr_Quit (char *origin, char **argv, int argc, int srv, int srv);
-static void Usr_Mode (char *origin, char **argv, int argc, int srv, int srv);
+static void Usr_Version (char *origin, char **argv, int argc, int srv);
+static void Usr_MOTD (char *origin, char **argv, int argc, int srv);
+static void Usr_Admin (char *origin, char **argv, int argc, int srv);
+static void Usr_Server (char *origin, char **argv, int argc, int srv);
+static void Usr_Squit (char *origin, char **argv, int argc, int srv);
+static void Usr_Quit (char *origin, char **argv, int argc, int srv);
+static void Usr_Mode (char *origin, char **argv, int argc, int srv);
 static void Usr_Svsmode (char *origin, char **argv, int argc, int srv);
 static void Usr_Kill (char *origin, char **argv, int argc, int srv);
 static void Usr_Pong (char *origin, char **argv, int argc, int srv);
