@@ -5962,3 +5962,4 @@ echo "(*----------------------------------------------------------*)"
 echo "(| Now that Configure is complete, just type "make" to        |)"
 echo "(| compile the program                                      |)"
 echo "(*----------------------------------------------------------*)"
+echo $host
