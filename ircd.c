@@ -548,7 +548,7 @@ void init_ServBot()
 	
 }
 
-
+#ifdef ULTIMATE3
 void Srv_Sjoin(char *origin, char **argv, int argc) {
 	char nick[MAXNICK];
 	long mode = 0;
@@ -592,6 +592,7 @@ void Srv_Burst(char *origin, char **argv, int argc) {
 	}
 	
 }
+#endif
 void Srv_Connect(char *origin, char **argv, int argc) {
 	int i;
 
