@@ -28,6 +28,7 @@
 #ifdef HAVE_SYS_POLL_H 
 #include <poll.h>
 #endif
+#include <fcntl.h>                   
 
 int sys_mkdir (const char *filename, mode_t mode)
 {

@@ -126,6 +126,7 @@ AC_CHECK_FUNCS( socket \
                 inet_addr \
                 inet_ntoa \
                 inet_pton \
+                inet_ntop \
                 tcsetattr \
                 tcgetattr \
                 perror \
