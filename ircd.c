@@ -939,6 +939,7 @@ do_credits (const char* nick, const char *remoteserver)
 	numeric (RPL_VERSION, nick, ":- Blud - Giving us patches for Mystic IRCd");
 	numeric (RPL_VERSION, nick, ":- herrohr - Giving us patches for Liquid IRCd support");
 	numeric (RPL_VERSION, nick, ":- OvErRiTe - Giving us patches for Viagra IRCd support");
+	numeric (RPL_VERSION, nick, ":- Reed Loden - Contributions to IRCu support");
 }
 
 /** @brief 
