@@ -127,9 +127,11 @@ void report_segfault( const char* modulename )
 	fprintf( segfault, "Please view the README for how to submit a bug report\n" );
 	fprintf( segfault, "and include this segfault report in your submission.\n" );
 	fprintf (segfault, "(%s)\n", segfault_fmttime);
-	fprintf( segfault, "Version:  %s\n", me.version );
+	fprintf( segfault, "NeoStats Version:  %s\n", me.version );
+	fprintf( segfault, "Protocol:  %s\n", me.protocol );
 	if( modulename ) {
-		fprintf( segfault, "Module:   %s\n", GET_CUR_MODNAME() );
+		fprintf( segfault, "Module:           %s\n", GET_CUR_MODNAME() );
+		fprintf( segfault, "Module Version:   %s\n", GET_CUR_MODVERSION() );
 	}
 	fprintf( segfault, "Location: %s\n", segv_location );
 	fprintf( segfault, "recbuf:   %s\n", recbuf );

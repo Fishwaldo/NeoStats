@@ -12,7 +12,7 @@ AC_CACHE_LOAD
 #Standard Defines for autoconf here
 x_maj=3
 x_min='0'
-x_rev="prealpha3-dev"
+x_rev="a1-dev"
 x_package='NeoStats'
 MODULES="connectserv hostserv loveserv moraleserv statserv ircdauth extauth"
 #dont edit anything after this line!
@@ -332,3 +332,7 @@ AC_CONFIG_FILES([Makefile
 
 AC_CACHE_SAVE
 AC_OUTPUT
+clear
+echo "Configuration complete."
+echo "Run 'make' (or 'gmake' on some systems) to compile NeoStats."
+echo "If you require support, see the README file."

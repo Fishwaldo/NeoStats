@@ -1557,7 +1557,7 @@ fi
 #Standard Defines for autoconf here
 x_maj=3
 x_min='0'
-x_rev="prealpha3-dev"
+x_rev="a1-dev"
 x_package='NeoStats'
 MODULES="connectserv hostserv loveserv moraleserv statserv ircdauth extauth"
 #dont edit anything after this line!
@@ -32613,3 +32613,7 @@ if test "$no_create" != yes; then
   $ac_cs_success || { (exit 1); exit 1; }
 fi
 
+clear
+echo "Configuration complete."
+echo "Run 'make' (or 'gmake' on some systems) to compile NeoStats."
+echo "If you require support, see the README file."

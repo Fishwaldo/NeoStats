@@ -382,8 +382,8 @@ run_intrinsic_cmds( const char *cmd, CmdParams *cmdparams )
 	/* Handle intrinsic commands */
 	cmd_ptr = intrinsic_commands;
 	while( cmd_ptr->cmd ) {
-		if( !ircstrcasecmp( cmd, cmd_ptr->cmd  ) ) {
-			intrinsic_handler( cmdparams, cmd_ptr->handler  );
+		if( !ircstrcasecmp( cmd, cmd_ptr->cmd ) ) {
+			intrinsic_handler( cmdparams, cmd_ptr->handler );
 			return NS_SUCCESS;
 		}
 		cmd_ptr++;
@@ -426,10 +426,10 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 		/* Process command list */
 		cmd_ptr = ( bot_cmd * ) hnode_find( cmdparams->bot->botcmds, av[0] );
 		if( cmd_ptr ) {
-			if( ischancmd && ( cmd_ptr->flags & CMD_FLAG_PRIVMSGONLY  ) ) {
+			if( ischancmd && ( cmd_ptr->flags & CMD_FLAG_PRIVMSGONLY ) ) {
 				dlog( DEBUG2, "dropping channel command %s since it is flagged privmsg only ", cmdparams->cmd );
 				cmdret = NS_FAILURE;
-			} else if( !ischancmd && ( cmd_ptr->flags & CMD_FLAG_CHANONLY  ) ) {
+			} else if( !ischancmd && ( cmd_ptr->flags & CMD_FLAG_CHANONLY ) ) {
 				dlog( DEBUG2, "dropping privmsg command %s since it is flagged channel only ", cmdparams->cmd );
 				cmdret = NS_FAILURE;
 			} else {
@@ -438,7 +438,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 				if( userlevel < cmdlevel ) {
 					msg_permission_denied( cmdparams, NULL );
 				/* Check parameter count */
-				} else if( cmdparams->ac < cmd_ptr->minparams  ) {		
+				} else if( cmdparams->ac < cmd_ptr->minparams ) {		
 					msg_error_need_more_params( cmdparams );
 				} else {
 					/* Seems OK so report the command call so modules do not have to */
@@ -508,7 +508,7 @@ bot_cmd_help_set( CmdParams *cmdparams, int userlevel )
  *
  *  @return none
  */
-static void bot_cmd_help_on_help( CmdParams *cmdparams  )
+static void bot_cmd_help_on_help( CmdParams *cmdparams )
 {
 	/* Generate help on help footer text */
 	irc_prefmsg( cmdparams->bot, cmdparams->source, " " );
@@ -615,7 +615,7 @@ bot_cmd_help( CmdParams *cmdparams )
 					break;
 			}
 		}
-		bot_cmd_help_on_help( cmdparams  );
+		bot_cmd_help_on_help( cmdparams );
 		return NS_SUCCESS;
 	}
 	if( nsconfig.cmdreport ) {
@@ -689,7 +689,7 @@ Client * FindValidUser( Bot* botptr, Client * sourceuser, const char *target_nic
  */
 static int bot_cmd_about( CmdParams *cmdparams )
 {
-	if( cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->about_text  ) {
+	if( cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->about_text ) {
 		irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmdparams->bot->moduleptr->info->about_text );
 	}
 	return NS_SUCCESS;
@@ -714,7 +714,7 @@ static int bot_cmd_version( CmdParams *cmdparams )
  */
 static int bot_cmd_credits( CmdParams *cmdparams )
 {
-	if( cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->copyright  ) {
+	if( cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->copyright ) {
 		irc_prefmsg_list( cmdparams->bot, cmdparams->source, 
 			cmdparams->bot->moduleptr->info->copyright );
 	}
@@ -733,7 +733,7 @@ static int bot_cmd_levels( CmdParams *cmdparams )
 	if( cmdparams->ac < 1 ) {
 		return NS_ERR_NEED_MORE_PARAMS;
 	}
-	if( !cmdparams->bot->botcmds  )
+	if( !cmdparams->bot->botcmds )
 	{
 		irc_prefmsg( cmdparams->bot, cmdparams->source, "No commands found." );
 		return NS_SUCCESS;

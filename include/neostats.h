@@ -900,6 +900,7 @@ EXPORTVAR extern int RunLevel;
 #define GET_CUR_MODULE() RunModule[RunLevel]
 #define GET_CUR_MODNUM() RunModule[RunLevel]->modnum
 #define GET_CUR_MODNAME() RunModule[RunLevel]->info->name
+#define GET_CUR_MODVERSION() RunModule[RunLevel]->info->version
 
 /** @brief Module socket list structure
  * 

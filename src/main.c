@@ -390,7 +390,7 @@ int main( int argc, char *argv[] )
 	}
 #endif  /* !DEBUG */
 #endif /* !WIN32 */
-	nlog( LOG_NOTICE, "NeoStats \"%s\" started.", VERSION );
+	nlog( LOG_NOTICE, "NeoStats \"%s\" started.", me.version );
 #ifdef WIN32
 	/* override pcre lib malloc calls with our own version */
 	old_malloc = pcre_malloc;
@@ -437,7 +437,7 @@ void do_reconnect( void )
 /** @brief do_exit
  *
  *  Exit routine. Cleans up systems and flushes data files
- *  then exits cleanly. During a segfaul data is not saved.
+ *  then exits cleanly. During a segfault data is not saved.
  *  NeoStats core use only.
  *
  *  @param exitcode reason for exit
