@@ -24,10 +24,6 @@
 */
 
 #include "neostats.h"
-#ifndef WIN32
-#include <arpa/inet.h>
-#endif
-
 #include "statserv.h"
 #include "GeoIP.h"
 #include "GeoIPCity.h"
@@ -103,7 +99,6 @@ void DisplayTLDmap(Client *u)
 void DelTLD(Client * u)
 {
 	const char *country_code;
-	const char *ipaddr;
 	lnode_t *tn;
 	TLD *t = NULL;
 	
@@ -111,8 +106,7 @@ void DelTLD(Client * u)
 	if (!gi) {
 		return;
 	}
-	ipaddr = inet_ntoa(u->ipaddr);
-	country_code = GeoIP_country_code_by_addr(gi, ipaddr);
+	country_code = GeoIP_country_code_by_addr(gi, u->hostip);
 	if (country_code) {
 		tn = list_find(Thead, country_code, findcc);
 	} else {
@@ -136,16 +130,14 @@ void AddTLD(Client * u)
 {
 	const char *country_name;
 	const char *country_code;
-	const char *ipaddr;
 	lnode_t *tn;
 	TLD *t = NULL;
+	
 	SET_SEGV_LOCATION();
-
 	if (!gi) {
 		return;
 	}	
-	ipaddr = inet_ntoa(u->ipaddr);
-	country_code = GeoIP_country_code_by_addr(gi, ipaddr);
+	country_code = GeoIP_country_code_by_addr(gi, u->hostip);
 	if (country_code) {
 		tn = list_find(Thead, country_code, findcc);
 	} else {
@@ -156,7 +148,7 @@ void AddTLD(Client * u)
 		t->users++;
 		t->daily_users++;
 	} else {
-		country_name = GeoIP_country_name_by_addr(gi, ipaddr);
+		country_name = GeoIP_country_name_by_addr(gi, u->hostip);
 		t = smalloc(sizeof(TLD));
 		strlcpy(t->tld, country_code, 5);
 		strlcpy(t->country, country_name, 32);

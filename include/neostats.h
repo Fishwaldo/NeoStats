@@ -301,6 +301,8 @@ EXPORTFUNC const char * GetSmodeDesc (const unsigned int mask);
 #define MAXTOPICLEN		(307 + 1)
 #define CLOAKKEYLEN		(40 + 1)
 
+#define HOSTIPLEN		15	/* Size of IP address in dotted quad */
+
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
 #define MAXCMDSIZE		15
@@ -492,7 +494,8 @@ typedef struct _Client {
 	unsigned int flags;
 	void *moddata[NUM_MODULES];
 	time_t tsconnect;
-	struct in_addr ipaddr;
+	struct in_addr ip;
+	char hostip[HOSTIPLEN];
 } _Client; 
 
 /** @brief me structure

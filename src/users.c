@@ -69,7 +69,7 @@ static void lookupnickip(char *data, adns_answer *a)
 	
 	u = find_user((char *)data);
 	if (a && a->nrrs > 0 && u && a->status == adns_s_ok) {
-		u->ipaddr.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
+		u->ip.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
 		cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 		cmdparams->source = u;	
 		SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
@@ -127,7 +127,8 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	u->user->server = find_server (server);
 	u->user->tslastmsg = me.now;
 	u->user->chans = list_create (MAXJOINCHANS);
-	u->ipaddr.s_addr = htonl (ipaddress);
+	u->ip.s_addr = htonl (ipaddress);
+	strlcpy(u->hostip, inet_ntoa (u->ip), HOSTIPLEN);
 	if (IsMe(u->user->server)) {
 		u->flags |= NS_FLAGS_ME;
 	}
@@ -575,7 +576,7 @@ dumpuser (Client * u)
 	} else {
 		irc_chanalert (ns_botptr, "User:     %s!%s@%s", u->name, u->user->username, u->user->hostname);
 	}
-	irc_chanalert (ns_botptr, "IP:       %s", inet_ntoa(u->ipaddr));
+	irc_chanalert (ns_botptr, "IP:       %s", u->hostip));
 	irc_chanalert (ns_botptr, "Vhost:    %s", u->user->vhost);
 	irc_chanalert (ns_botptr, "Flags:    0x%x", u->flags);
 	irc_chanalert (ns_botptr, "Modes:    %s (0x%x)", UmodeMaskToString(u->user->Umode), u->user->Umode);
