@@ -130,7 +130,7 @@ cb_Module (char *arg, int configtype)
 			}
 		}
 		load_mods[i] = sstrdup (arg);
-		nlog (LOG_DEBUG1, LOG_CORE, "Added Module %d :%s", i, load_mods[i]);
+		nlog (LOG_DEBUG1, LOG_CORE, "Added Module %d :%s", i, (char *)load_mods[i]);
 	}
 }
 
@@ -151,12 +151,12 @@ ConfLoadModules ()
 	SET_SEGV_LOCATION();
 	nlog (LOG_NORMAL, LOG_CORE, "Loading configured modules"); 
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
-		nlog (LOG_DEBUG1, LOG_CORE, "Loading Module %s", load_mods[i]);
+		nlog (LOG_DEBUG1, LOG_CORE, "Loading Module %s", (char *)load_mods[i]);
 		rval = load_module (load_mods[i], NULL);
 		if (rval == NS_SUCCESS) {
-			nlog (LOG_NORMAL, LOG_CORE, "Successfully Loaded Module %s", load_mods[i]);
+			nlog (LOG_NORMAL, LOG_CORE, "Successfully Loaded Module %s", (char *)load_mods[i]);
 		} else {
-			nlog (LOG_WARNING, LOG_CORE, "Could Not Load Module %s, Please check above error Messages", load_mods[i]);
+			nlog (LOG_WARNING, LOG_CORE, "Could Not Load Module %s, Please check above error Messages", (char *)load_mods[i]);
 		}
 	}
 	nlog (LOG_NORMAL, LOG_CORE, "Completed loading configured modules"); 

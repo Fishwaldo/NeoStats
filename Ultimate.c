@@ -457,7 +457,7 @@ sjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 	}
 	
 	/* NO TS SUPPORT. BAAAAAAD. need to port the Bahumat TS stuff to all IRCd's and test */
-	sts (":%s %s %d %s + :%c%s", me.name, MSG_SJOIN, time(NULL), chan, flag, who);
+	sts (":%s %s %ld %s + :%c%s", me.name, MSG_SJOIN, (long)time(NULL), chan, flag, who);
 	join_chan (finduser (who), (char *) chan);
 	ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", chan, mode, who);
 	ac = split_buf (ircd_buf, &av, 0);
@@ -566,7 +566,7 @@ spong_cmd (const char *reply)
 int
 snetinfo_cmd ()
 {
-	sts (":%s %s 0 %d %d %s 0 0 0 :%s", me.name, MSG_SNETINFO, me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname);
+	sts (":%s %s 0 %ld %d %s 0 0 0 :%s", me.name, MSG_SNETINFO, (long)me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname);
 	return 1;
 }
 
@@ -614,7 +614,7 @@ int
 snick_cmd (const char *oldnick, const char *newnick)
 {
 	Change_User (finduser (oldnick), newnick);
-	sts (":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, me.now);
+	sts (":%s %s %s %ld", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, (long)me.now);
 	return 1;
 }
 
@@ -629,7 +629,7 @@ sswhois_cmd (const char *target, const char *swhois)
 int
 ssvsnick_cmd (const char *target, const char *newnick)
 {
-	sts ("%s %s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, me.now);
+	sts ("%s %s %s :%ld", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, (long)me.now);
 	return 1;
 }
 
@@ -703,7 +703,7 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
 #ifdef ULTIMATE3
-	sts (":%s %s %s %s %d %s %d :%s", me.name, (me.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, me.now, ircd_buf);
+	sts (":%s %s %s %s %d %s %ld :%s", me.name, (me.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, (long)me.now, ircd_buf);
 #elif ULTIMATE
 	sts (":%s %s %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, me.now + length, me.now, setby, ircd_buf);
 #endif
@@ -726,7 +726,7 @@ srakill_cmd (const char *host, const char *ident)
 int
 ssvinfo_cmd ()
 {
-	sts ("SVINFO 5 3 0 :%d", me.now);
+	sts ("SVINFO 5 3 0 :%ld", (long)me.now);
 	return 1;
 }
 

@@ -97,7 +97,7 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 	 * For now we verify help during processing since it is not critical. */
 	/* No command, we cannot recover from this */
 	if(!cmd_ptr->cmd) {
-		nlog (LOG_ERROR, LOG_MOD, "Missing command, command %s not added");
+		nlog (LOG_ERROR, LOG_MOD, "Missing command, command (unknown) not added");
 		return NS_FAILURE;
 	}
 	/* No handler, we cannot recover from this */
@@ -538,7 +538,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				case SET_TYPE_RNAME:
 				case SET_TYPE_CUSTOM:
 					prefmsg(u->nick, bot_ptr->nick, "%s: %s",
-						set_ptr->option, *(char*)set_ptr->varptr);
+						set_ptr->option, (char*)set_ptr->varptr);
 					break;
 			}
 			set_ptr++;

@@ -64,7 +64,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *serve
 	User *u;
 	int i;
 
-	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): %s (%s@%s)(%lu) -> %s at %lu", nick, user, host, htonl (ipaddr), server, TS);
+	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): %s (%s@%s)(%d) -> %s at %lu", nick, user, host, htonl (ipaddr), server, TS);
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (u) {
@@ -427,9 +427,9 @@ UserMode (const char *nick, const char *modes, int smode)
 		tmpmode = *modes++;
 	}
 	if (smode > 0) {
-		nlog (LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p", u->nick, u->Smode);
+		nlog (LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p", u->nick, (int *)u->Smode);
 	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, u->Umode);
+		nlog (LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, (int *)u->Umode);
 	}
 	free (av);
 }

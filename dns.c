@@ -179,7 +179,7 @@ do_dns ()
 		status = adns_check (ads, &dnsdata->q, &dnsdata->a, NULL);
 		/* if status == eagain, the lookup hasn't completed yet */
 		if (status == EAGAIN) {
-			nlog (LOG_DEBUG2, LOG_CORE, "DNS: Lookup hasn't completed for %s", &dnsdata->data);
+			nlog (LOG_DEBUG2, LOG_CORE, "DNS: Lookup hasn't completed for %s",(char *) &dnsdata->data);
 			dnsnode = list_next (dnslist, dnsnode);
 			break;
 		}

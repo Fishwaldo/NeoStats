@@ -475,7 +475,7 @@ kick_chan (User * u, char *chan, User * k)
 		} else {
 			lnode_destroy (list_delete (u->chans, un));
 		}
-		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
+		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
 		if (c->cur_users <= 0) {
 			AddStringToList (&av, c->name, &ac);
 			ModuleEvent (EVENT_DELCHAN, av, ac);
@@ -563,7 +563,7 @@ part_chan (User * u, char *chan)
 		} else {
 			lnode_destroy (list_delete (u->chans, un));
 		}
-		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
+		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
 		if (c->cur_users <= 0) {
 			AddStringToList (&av, c->name, &ac);
 			ModuleEvent (EVENT_DELCHAN, av, ac);
@@ -694,7 +694,7 @@ join_chan (User * u, char *chan)
 	AddStringToList (&av, u->nick, &ac);
 	ModuleEvent (EVENT_JOINCHAN, av, ac);
 	free (av);
-	nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
+	nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
 	if (findbot (u->nick)) {
 		nlog(LOG_DEBUG3, LOG_CORE, "Joining bot %s to Channel %s", u->nick, c->name);
 		add_bot_to_chan (u->nick, c->name);
@@ -728,7 +728,7 @@ ChanDump (char *chan)
 
 	SET_SEGV_LOCATION();
 	if (!chan) {
-		debugtochannel("Channels %d", hash_count (ch));
+		debugtochannel("Channels %d", (int)hash_count (ch));
 		hash_scan_begin (&sc, ch);
 		while ((cn = hash_scan_next (&sc)) != NULL) {
 			c = hnode_get (cn);
@@ -740,8 +740,8 @@ ChanDump (char *chan)
 					mode[++j] = cFlagTab[i].flag;
 				}
 			}
-			debugtochannel("Channel: %s Members: %d (List %d) Flags %s tstime %d", c->name, c->cur_users, list_count (c->chanmembers), mode, c->tstime);
-			debugtochannel("       Topic Owner %s, TopicTime: %d, Topic %s", c->topicowner, c->topictime, c->topic);
+			debugtochannel("Channel: %s Members: %ld (List %d) Flags %s tstime %ld", c->name, c->cur_users, (int)list_count (c->chanmembers), mode, (long)c->tstime);
+			debugtochannel("       Topic Owner %s, TopicTime: %ld, Topic %s", c->topicowner, (long)c->topictime, c->topic);
 			debugtochannel("PubChan?: %d", is_pub_chan (c));
 			cmn = list_first (c->modeparms);
 			while (cmn) {
@@ -765,7 +765,7 @@ ChanDump (char *chan)
 						mode[++j] = cFlagTab[i].flag;
 					}
 				}
-				debugtochannel("Members: %s Modes %s Joined %d", cm->nick, mode, cm->joint);
+				debugtochannel("Members: %s Modes %s Joined %ld", cm->nick, mode, (long)cm->joint);
 				cmn = list_next (c->chanmembers, cmn);
 			}
 		}
@@ -782,8 +782,8 @@ ChanDump (char *chan)
 					mode[++j] = cFlagTab[i].flag;
 				}
 			}
-			debugtochannel("Channel: %s Members: %d (List %d) Flags %s tstime %d", c->name, c->cur_users, list_count (c->chanmembers), mode, c->tstime);
-			debugtochannel("       Topic Owner %s, TopicTime: %d Topic %s", c->topicowner, c->topictime, c->topic);
+			debugtochannel("Channel: %s Members: %ld (List %d) Flags %s tstime %ld", c->name, c->cur_users, (int)list_count (c->chanmembers), mode, (long)c->tstime);
+			debugtochannel("       Topic Owner %s, TopicTime: %ld Topic %s", c->topicowner, (long)c->topictime, c->topic);
 			debugtochannel("PubChan?: %d", is_pub_chan (c));
 			cmn = list_first (c->modeparms);
 			while (cmn) {
@@ -806,7 +806,7 @@ ChanDump (char *chan)
 						mode[++j] = cFlagTab[i].flag;
 					}
 				}
-				debugtochannel("Members: %s Modes %s Joined: %d", cm->nick, mode, cm->joint);
+				debugtochannel("Members: %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->joint);
 				cmn = list_next (c->chanmembers, cmn);
 			}
 		}

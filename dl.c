@@ -259,7 +259,7 @@ list_timers (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_tmr->modname);
 		prefmsg (u->nick, s_Services, "Module Timer Name: %s", mod_tmr->timername);
 		prefmsg (u->nick, s_Services, "Module Interval: %d", mod_tmr->interval);
-		prefmsg (u->nick, s_Services, "Time till next Run: %d", mod_tmr->interval - (me.now - mod_tmr->lastrun));
+		prefmsg (u->nick, s_Services, "Time till next Run: %ld", mod_tmr->interval - (me.now - mod_tmr->lastrun));
 	}
 	prefmsg (u->nick, s_Services, "End of Module timer List");
 	return 0;
@@ -320,7 +320,7 @@ new_sock (char *sock_name)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "New Socket: %mod_sock", sock_name);
+	nlog (LOG_DEBUG2, LOG_CORE, "New Socket: %s", sock_name);
 	mod_sock = smalloc (sizeof (ModSock));
 	strlcpy (mod_sock->sockname, sock_name, MAX_MOD_NAME);
 	sn = hnode_create (mod_sock);
@@ -482,7 +482,7 @@ list_sockets (User * u, char **av, int ac)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	prefmsg (u->nick, s_Services, "Sockets List: (%d)", hash_count (sockh));
+	prefmsg (u->nick, s_Services, "Sockets List: (%d)", (int)hash_count (sockh));
 	hash_scan_begin (&ss, sockh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		mod_sock = hnode_get (sn);
@@ -631,7 +631,7 @@ list_bot_chans (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_chan_bot->chan);
 		ln = list_first (mod_chan_bot->bots);
 		while (ln) {
-			prefmsg (u->nick, s_Services, "Bot Name: %s", lnode_get (ln));
+			prefmsg (u->nick, s_Services, "Bot Name: %s", (char *)lnode_get (ln));
 			ln = list_next (mod_chan_bot->bots, ln);
 		}
 	}
