@@ -69,7 +69,6 @@
 #define COSERVERADMIN_MODE 'C'
 #define SERVERADMIN_MODE 'A'
 #define NETADMIN_MODE 'N'
-#define TECHADMIN_MODE 'T'
 #define SERVICESADMIN_MODE 'a'
 #define NETSERVICE_MODE 'S'
 #define INVISIBLE_MODE 'I'
@@ -378,7 +377,6 @@
 #define UMODE_HIDE	 0x8000	/* Hide from Nukes */
 #define UMODE_NETADMIN  0x10000	/* Network Admin */
 #define UMODE_EYES      0x20000	/* Mode to see server stuff */
-#define UMODE_TECHADMIN 0x40000	/* Tech Admin */
 #define UMODE_COADMIN   0x80000	/* Co Admin */
 #define UMODE_WHOIS    0x100000	/* gets notice on /whois */
 #define UMODE_KIX      0x200000	/* usermode +q 

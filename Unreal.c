@@ -273,8 +273,6 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN}
 	,
-	{UMODE_TECHADMIN, 'T', 190}
-	,
 	{UMODE_CLIENT, 'c', 0}
 	,
 	{UMODE_FLOOD, 'f', 0}
