@@ -1459,6 +1459,9 @@ load_module (char *modfilename, User * u)
 	ModList[i] = mod_ptr;
 	nlog (LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, mod_ptr->info->module_name);
 
+	/* Module side user authentication for SecureServ helpers */
+	mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "__ModInit");
+
 	/* call __ModInit (replacement for library __init() call */
 	ModInit = ns_dlsym ((int *) dl_handle, "__ModInit");
 	if (ModInit) {
@@ -1544,6 +1547,29 @@ get_mod_num (char *mod_name)
 	/* if we get here, it wasn't found */
 	nlog (LOG_DEBUG1, LOG_CORE, "get_mod_num: can't find %s in module number list", mod_name);
 	return NS_FAILURE;
+}
+
+/** @brief 
+ *
+ * @param 
+ * 
+ * @return
+ */
+Module *
+get_mod_ptr (char *mod_name)
+{
+	int i;
+
+	for (i = 0; i < NUM_MODULES; i++) {
+		if (ModList[i] != NULL) {
+			if (!ircstrcasecmp (ModList[i]->info->module_name, mod_name)) {
+				return ModList[i];
+			}
+		}
+	}
+	/* if we get here, it wasn't found */
+	nlog (LOG_DEBUG1, LOG_CORE, "get_mod_ptr: can't find %s in module number list", mod_name);
+	return NULL;
 }
 
 /** @brief 

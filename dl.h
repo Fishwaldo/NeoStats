@@ -191,6 +191,8 @@ typedef struct ModuleInfo {
 	char *module_build_time;
 }ModuleInfo;
 
+typedef int (*mod_auth) (User * u);
+
 /** @brief Module structure
  * 
  */
@@ -198,6 +200,7 @@ typedef struct Module {
 	ModuleInfo *info;
 	Functions *function_list;
 	EventFnList *event_list;
+	mod_auth mod_auth_cb;
 	void *dl_handle;
 	/* temp flag to distinguish new style module API which allows 
 	 * us access to additional information from the core.
@@ -243,6 +246,7 @@ int bot_message (char *origin, char **av, int ac);
 
 int list_bot_chans (User * u, char **av, int ac);
 int get_mod_num (char *mod_name);
+Module *get_mod_ptr (char *mod_name);
 void unload_modules(void);
 int bot_nick_change (char * oldnick, char *newnick);
 void verify_hashes(void);
@@ -261,6 +265,7 @@ void ModulesVersion (const char* nick, const char *remoteserver);
  */
 int __ModInit(int modnum, int apiver);
 void __ModFini(void);
+int ModuleAuth (User * u);
 int __BotMessage(char *origin, char **av, int ac);
 /* temp define while rename propogates */
 #define __Bot_Message __BotMessage

@@ -21,6 +21,7 @@
 ** $Id$
 */
 
+#include <arpa/inet.h> 
 #include "stats.h"
 #include "dl.h"
 #include "log.h"
@@ -145,7 +146,24 @@ validate_host (char* host)
 	return NS_SUCCESS;
 }
 
+int
+validate_channel (char* channel)
+{
+	char* ptr;
 
+	ptr = channel;
+	if(!IsChanPrefix(*ptr)) {
+		return NS_FAILURE;
+	}
+	ptr ++;
+	while(*ptr) {
+		if(!IsChanChar(*ptr)) {
+			return NS_FAILURE;
+		}
+		ptr++;
+	}
+	return NS_SUCCESS;
+}
 
 /** @brief calc_cmd_ulevel calculate cmd ulevel
  *  done as a function so we can support potentially complex  
@@ -162,6 +180,36 @@ static int calc_cmd_ulevel(bot_cmd* cmd_ptr)
 	}
 	/* use cmd entry directly */
 	return(cmd_ptr->ulevel);
+}
+
+/** @brief getuserlevel calculate ulevel
+ *  Quick and dirty module side auth system for Secureserv
+ *
+ *  @param pointer to command structure
+ *  @return command user level requires
+ */
+static int getuserlevel(ModUser* bot_ptr, User* u)
+{
+	int ulevel = 0;
+	int modlevel = 0;
+	Module * Mod;
+
+	/* Generally we just want the standard user level */
+	ulevel = UserLevel(u);
+
+	/* If less than a locop see if the module can give us a user level */
+	if(ulevel < NS_ULEVEL_LOCOPER) {
+		Mod = get_mod_ptr(bot_ptr->modname);
+		if(Mod) {
+			if(Mod->mod_auth_cb) {
+				modlevel = Mod->mod_auth_cb(u);
+				if(modlevel > ulevel) {
+					ulevel = modlevel;
+				}
+			}
+		}
+	}
+	return ulevel;
 }
 
 /** @brief add_bot_cmd adds a single command to the command hash
@@ -320,7 +368,7 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	char* parambuf; 
 
 	SET_SEGV_LOCATION();
-	userlevel = UserLevel (u);
+	userlevel = getuserlevel (bot_ptr, u);
 	/* Check user authority to use this command set */
 	if (( (bot_ptr->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
 		( (bot_ptr->flags & BOT_FLAG_ONLY_OPERS) && me.onlyopers && (userlevel < NS_ULEVEL_OPER) )){
@@ -412,7 +460,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	int userlevel;
 	int cmdlevel;
 
-	userlevel = UserLevel(u);
+	userlevel = getuserlevel (bot_ptr, u);
 
 	/* If no parameter to help, generate main help text */
 	if (ac < 3) {
@@ -493,7 +541,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	if (cmdnode) {
 		cmd_ptr = hnode_get(cmdnode);
 		cmdlevel = calc_cmd_ulevel(cmd_ptr);
-		if (UserLevel (u) < cmdlevel) {
+		if (userlevel < cmdlevel) {
 			prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
 			return 1;
 		}		
@@ -578,7 +626,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 		return 1;
 	} 
 
-	userlevel = UserLevel(u);
+	userlevel = getuserlevel (bot_ptr, u);
 	if( userlevel < bot_ptr->set_ulevel) {
 		prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
 		chanalert (bot_ptr->nick, "%s tried to use SET, but is not authorised", u->nick);
@@ -614,7 +662,8 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 					case SET_TYPE_USER:
 					case SET_TYPE_HOST:
 					case SET_TYPE_REALNAME:
-					case SET_TYPE_IPV4:						
+					case SET_TYPE_IPV4:	
+					case SET_TYPE_CHANNEL:							
 						prefmsg(u->nick, bot_ptr->nick, "%s: %s",
 							set_ptr->option, (char*)set_ptr->varptr);
 						break;
@@ -723,6 +772,21 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				"%s set to %d", set_ptr->option, intval);
 			break;
 		case SET_TYPE_STRING:
+			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
+			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
+			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
+				set_ptr->option, av[3], u->nick);
+			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
+			prefmsg(u->nick, bot_ptr->nick,
+				"%s set to %s", set_ptr->option, av[3]);
+			break;
+		case SET_TYPE_CHANNEL:							
+			if(validate_channel (av[3]) == NS_FAILURE) {
+				prefmsg(u->nick, bot_ptr->nick,
+					"%s contains invalid characters", av[3]);
+				break;
+			}
 			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
 			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 

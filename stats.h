@@ -546,6 +546,7 @@ typedef enum SET_TYPE {
 	SET_TYPE_USER,		/* valid user */
 	SET_TYPE_HOST,		/* valid host name */
 	SET_TYPE_REALNAME,	/* valid realname */
+	SET_TYPE_CHANNEL,	/* valid channel */
 	SET_TYPE_IPV4,		/* valid IPv4 dotted quad */
 #if 0
 /* For future expansion */
