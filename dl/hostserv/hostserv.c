@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.22 2002/12/27 15:03:50 fishwaldo Exp $
+** $Id: hostserv.c,v 1.23 2002/12/29 21:52:57 shmad Exp $
 */
 
 #include <stdio.h>
@@ -142,7 +142,7 @@ int __Bot_Message(char *origin, char **av, int ac)
         if (ac <= 2) {
             privmsg_list(u->nick, s_HostServ, hs_help); 
             return 1;
-        } else if (!strcasecmp(av[2], "ADD") && (UserLevel(u) >= 100)) {
+        } else if (!strcasecmp(av[2], "ADD") && (UserLevel(u) >= 40)) {
             privmsg_list(u->nick, s_HostServ, hs_help_add);
             return 1;
         } else if (!strcasecmp(av[2], "DEL") && (UserLevel(u) >= 100)) {
@@ -151,7 +151,7 @@ int __Bot_Message(char *origin, char **av, int ac)
         } else if (!strcasecmp(av[2], "LIST") && (UserLevel(u) >= 40)) {
             privmsg_list(u->nick, s_HostServ, hs_help_list);
             return 1;
-	} else if (!strcasecmp(av[2], "VIEW") && (UserLevel(u) >= 100)) {
+	} else if (!strcasecmp(av[2], "VIEW") && (UserLevel(u) >= 40)) {
 	    privmsg_list(u->nick, s_HostServ, hs_help_view);
 	    return 1;
 	} else if (!strcasecmp(av[2], "LOGIN")) {
@@ -166,7 +166,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 
     if (!strcasecmp(av[1], "ABOUT")) {
                 privmsg_list(u->nick, s_HostServ, hs_help_about);
-    } else if (!strcasecmp(av[1], "ADD") && (UserLevel(u) >= 100)) {
+    } else if (!strcasecmp(av[1], "ADD") && (UserLevel(u) >= 40)) {
                 if (ac < 6) {
                     prefmsg(u->nick, s_HostServ, "Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>", s_HostServ);
                     prefmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
@@ -188,7 +188,7 @@ int __Bot_Message(char *origin, char **av, int ac)
                 hs_del(u, t);
     } else if (!strcasecmp(av[1], "LIST") && (UserLevel(u) >= 40)) {
                 hs_list(u);
-    } else if (!strcasecmp(av[1], "VIEW") && (UserLevel(u) >= 100)) {
+    } else if (!strcasecmp(av[1], "VIEW") && (UserLevel(u) >= 40)) {
 		if (!av[2]) {
 		    prefmsg(u->nick, s_HostServ, "Syntax: /msg %s VIEW #", s_HostServ);
 		    prefmsg(u->nick, s_HostServ, "The users # is got from /msg %s LIST", s_HostServ);

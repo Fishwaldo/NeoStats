@@ -2,6 +2,8 @@ HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
 * Version 2.2 * Fish * December 26th, 2002
++ Due to massive bitching by people who use HostServ opers can
+  ADD/LIST/VIEW now and only admins and higher can DEL
 + Fixed a problem with Permissions and a typo in the help file
 
 * Version 2.1 * Shmad * October 20, 2002
