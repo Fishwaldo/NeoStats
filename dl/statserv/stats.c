@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.44 2003/09/11 14:16:01 fishwaldo Exp $
+** $Id: stats.c,v 1.45 2003/09/12 03:24:15 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -64,72 +64,78 @@ CVersions *findversions(char *name)
 	return cv;
 }
 
-#define ATTR_CTCP '\001'
-#define ATTR_BOLD '\002'
-#define ATTR_COLOR '\003'
-#define ATTR_BEEP '\007'
-#define ATTR_RESET '\017'
-#define ATTR_REVERSE '\026'
-#define ATTR_ESCAPE '\033'
-#define ATTR_UNDERLINE '\037'
-#define ATTR_STAR '*'
-#define ATTR_QUESTION '?'
-
-/* this came form X-Chat if I remember correctly. Credit due where Credit Due */
-/* was modified by Unreal Team */
-unsigned char *
-Strip_Colors (unsigned char *text, int len, unsigned char *outbuf, int *newlen)
+/* this came from eggdrop sources */
+/* Remove the color control codes that mIRC,pIRCh etc use to make
+ * their client seem so fecking cool! (Sorry, Khaled, you are a nice
+ * guy, but when you added this feature you forced people to either
+ * use your *SHAREWARE* client or face screenfulls of crap!)
+ */
+static void strip_mirc_codes(char *text)
 {
-	int nc = 0;
-	int i = 0;
-	int col = -1;
-	unsigned char *new_str;
+  char *dd = text;
 
-	if (outbuf == NULL)
-		new_str = malloc (len + 2);
-	else
-		new_str = outbuf;
-
-	while (len > 0) {
-		if ((col && isdigit(*text) && nc < 2) || (col && *text == ',' && nc < 3)) {
-			nc++;
-			if (*text == ',')
-				nc = 0;
-		}
-		else {
-			if (col)
-				col = 0;
-			if (*text == '\003') {
-				col = 1;
-				nc = 0;
-			}
-			if ((*text != '\007') || (*text != '\017') || (*text != '\026') || (*text != '\037')) {
-				new_str[i] = *text;
-				i++;
-			}
-		}
-		text++;
-		len--;
+  while (*text) {
+    switch (*text) {
+    case 2:			/* Bold text */
+	text++;
+	continue;
+      break;
+    case 3:			/* mIRC colors? */
+	if (isdigit(text[1])) {	/* Is the first char a number? */
+	  text += 2;		/* Skip over the ^C and the first digit */
+	  if (isdigit(*text))
+	    text++;		/* Is this a double digit number? */
+	  if (*text == ',') {	/* Do we have a background color next? */
+	    if (isdigit(text[1]))
+	      text += 2;	/* Skip over the first background digit */
+	    if (isdigit(*text))
+	      text++;		/* Is it a double digit? */
+	  }
+	continue;
+      }
+      break;
+    case 7:
+	text++;
+	continue;
+      break;
+    case 0x16:			/* Reverse video */
+	text++;
+	continue;
+      break;
+    case 0x1f:			/* Underlined text */
+	text++;
+	continue;
+      break;
+    case 033:
+	text++;
+	if (*text == '[') {
+	  text++;
+	  while ((*text == ';') || isdigit(*text))
+	    text++;
+	  if (*text)
+	    text++;		/* also kill the following char */
 	}
-	new_str[i] = 0;
-	return new_str;
-
+	continue;
+      break;
+    }
+    *dd++ = *text++;		/* Move on to the next char */
+  }
+  *dd = 0;
 }
 
 int s_client_version(char **av, int ac)
 {
 	lnode_t *node;
 	CVersions *clientv;
-	char *nocols;
+	char *nocols = av[1];
 
-	nocols = Strip_Colors(av[1], strlen(av[1]), NULL, NULL);
+	strip_mirc_codes(nocols);
 	
 	clientv = findversions(nocols);
 	if (clientv) {
 		nlog(LOG_DEBUG2, LOG_MOD, "Found Client Version Node %s",
 		     nocols);
 		clientv->count++;
-		free(nocols);
 		return 1;
 	}
 	clientv = malloc(sizeof(CVersions));
@@ -139,7 +145,6 @@ int s_client_version(char **av, int ac)
 	list_append(Vhead, node);
 	nlog(LOG_DEBUG2, LOG_MOD, "Added Version to List %s",
 	     clientv->name);
-	free(nocols);
 	return 1;
 }
 
