@@ -333,7 +333,6 @@ int bot_nick_change (char * oldnick, char *newnick);
 
 /* timer.c */
 void chk (void);
-void TimerReset (void);
 void TimerPings (void);
 void TimerMidnight (void);
 int is_midnight (void);

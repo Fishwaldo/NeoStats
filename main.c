@@ -160,7 +160,6 @@ main (int argc, char *argv[])
 	}
 
 	/* initialize the rest of the subsystems */
-	TimerReset ();
 	if(init_dns () != NS_SUCCESS)
 		return EXIT_FAILURE;
 	if(init_server_hash () != NS_SUCCESS)
