@@ -138,7 +138,7 @@ static int InitMe( void )
 	/* set some defaults before we parse the config file */
 	memset( &me, 0, sizeof( me ) );
 	/* initialise version */
-	strlcpy( me.version, VERSION, VERSIONSIZE );
+	strlcpy( me.version, NEOSTATS_VERSION, VERSIONSIZE );
 	/* our default lang is always -1 */
 	me.lang = -1;
 	me.numeric = 1;
