@@ -334,9 +334,12 @@ send_cmode (const char *sender, const char *who, const char *chan, const char *m
 void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
+	char IPAddress[32];
 	char nicknumbuf[6];
-	
-	send_cmd ("%s %s %s 1 %lu %s %s %s %sAA%c :%s", neonumericbuf, TOK_NICK, nick, ts, ident, host, newmode, neonumericbuf, (neonickcount+'A'), realname);
+
+	inttobase64(IPAddress, htonl (inet_addr (server)), 6);
+
+	send_cmd ("%s %s %s 1 %lu %s %s %s %sAA%c :%s", neonumericbuf, TOK_NICK, nick, ts, ident, host, newmode, IPAddress, (neonickcount+'A'), realname);
 	snprintf(nicknumbuf, 6, "%sAA%c", neonumericbuf, (neonickcount+'A'));
 	setnickbase64 (nick, nicknumbuf);
 	neonickcount ++;
