@@ -446,12 +446,13 @@ RECONNECT_TIME $NEOCONN
 #####################################
 
 # LOAD_MODULE <module name> [OPTIONAL]
-#    what module to load at start-up. Multiple instances of LOAD_MODULE 
-#    may be specified e.g. 
+#    What modules to load at start-up. e.g. 
 #        
 #        LOAD_MODULE statserv
 #    
 #    Will load up StatServ at boot
+#    
+#    Multiple instances of LOAD_MODULE may be specified 
 
 # this loads the Spam Module
 #LOAD_MODULE spam
@@ -467,11 +468,11 @@ RECONNECT_TIME $NEOCONN
 #LOAD_MODULE hostserv
 
 # MoraleServ. A fun module to cheer people up.
-#LOAD_MODULE ms
+#LOAD_MODULE moraleserv
 
 # ConnectServ will watch all connections to the network and can report them
 # to the services channel. It can also watch and report Nickname changes.
-#LOAD_MODULE cs
+#LOAD_MODULE connectserv
 
 
 ########################################
