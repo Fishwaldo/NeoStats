@@ -6,6 +6,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - make the ping time configurable. 
  - Make Timers deletable from inside the timer function!
  - Added DelConf to the keeper interface
+ - Maybe fixed a problem with usercounts on the neostats server
 
 * NeoStats * Fish * Version 2.5.4 Pre2
  - Fixed a problem with statserv and the HTML settings

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hs_help.c,v 1.13 2003/06/13 14:49:32 fishwaldo Exp $
+** $Id: hs_help.c,v 1.14 2003/08/05 13:14:43 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -31,7 +31,7 @@ const char *hs_help[] = {
 	"COMMANDS:",
 	"     ABOUT     LOGIN     ADD",
 	"     DEL       LIST      VIEW",
-	"     CHPASS    LISTBAN   LEVELS",
+	"     CHPASS    BANS      LEVELS",
 	"",
 	"Only Network Admins can use the DEL function",
 	"",

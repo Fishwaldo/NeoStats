@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.c,v 1.26 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: conf.c,v 1.27 2003/08/05 13:14:43 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -123,7 +123,7 @@ ConfLoad ()
 #endif
 
 	/* if all bots should join the chan */
-	if (GetConf ((void *) &me.allbots, CFGBOOL, "AllBotsJoinChan") <= 0) {
+	if (GetConf ((void *) &me.allbots, CFGINT, "AllBotsJoinChan") <= 0) {
 		me.allbots = 0;
 	}
 	if (GetConf ((void *) &me.pingtime, CFGINT, "PingServerTime") <= 0) {

@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.48 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: chans.c,v 1.49 2003/08/05 13:14:43 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -429,24 +429,6 @@ kick_chan (User * u, char *chan, User * k)
 			ac = 0;
 			c->cur_users--;
 		}
-		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
-		if (c->cur_users <= 0) {
-			AddStringToList (&av, c->name, &ac);
-			Module_Event ("DELCHAN", av, ac);
-			free (av);
-			ac = 0;
-			del_chan (c);
-		}
-		un = list_find (u->chans, c->name, comparef);
-		if (!un) {
-			nlog (LOG_WARNING, LOG_CORE, "Kick:Hu, User %s claims not to be part of Chan %s", u->nick, chan);
-			if (me.coder_debug) {
-				chanalert (s_Services, "Kick: Hu, User %s claims not to be part of Chan %s", u->nick, chan);
-				chandump (c->name);
-				UserDump (u->nick);
-			}
-			return;
-		}
 		if (findbot (u->nick)) {
 			/* its one of our bots, so add it to the botchan list */
 			del_bot_from_chan (u->nick, c->name);
@@ -457,7 +439,25 @@ kick_chan (User * u, char *chan, User * k)
 			ac = 0;
 
 		}
-		lnode_destroy (list_delete (u->chans, un));
+		un = list_find (u->chans, c->name, comparef);
+		if (!un) {
+			nlog (LOG_WARNING, LOG_CORE, "Kick:Hu, User %s claims not to be part of Chan %s", u->nick, chan);
+			if (me.coder_debug) {
+				chanalert (s_Services, "Kick: Hu, User %s claims not to be part of Chan %s", u->nick, chan);
+				chandump (c->name);
+				UserDump (u->nick);
+			}
+		} else {
+			lnode_destroy (list_delete (u->chans, un));
+		}
+		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
+		if (c->cur_users <= 0) {
+			AddStringToList (&av, c->name, &ac);
+			Module_Event ("DELCHAN", av, ac);
+			free (av);
+			ac = 0;
+			del_chan (c);
+		}
 	}
 
 }
@@ -519,14 +519,14 @@ part_chan (User * u, char *chan)
 //                      FreeList(av, ac);
 			c->cur_users--;
 		}
-		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
-		if (c->cur_users <= 0) {
+		if (findbot (u->nick)) {
+			/* its one of our bots, so add it to the botchan list */
+			del_bot_from_chan (u->nick, c->name);
 			AddStringToList (&av, c->name, &ac);
-			Module_Event ("DELCHAN", av, ac);
+			AddStringToList (&av, u->nick, &ac);
+			Module_Event ("PARTBOT", av, ac);
 			free (av);
 			ac = 0;
-//                      FreeList(av, ac);
-			del_chan (c);
 		}
 		un = list_find (u->chans, c->name, comparef);
 		if (!un) {
@@ -537,17 +537,18 @@ part_chan (User * u, char *chan)
 				UserDump (u->nick);
 			}
 			return;
+		} else {
+			lnode_destroy (list_delete (u->chans, un));
 		}
-		if (findbot (u->nick)) {
-			/* its one of our bots, so add it to the botchan list */
-			del_bot_from_chan (u->nick, c->name);
+		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
+		if (c->cur_users <= 0) {
 			AddStringToList (&av, c->name, &ac);
-			AddStringToList (&av, u->nick, &ac);
-			Module_Event ("KICKBOT", av, ac);
+			Module_Event ("DELCHAN", av, ac);
 			free (av);
 			ac = 0;
+//                      FreeList(av, ac);
+			del_chan (c);
 		}
-		lnode_destroy (list_delete (u->chans, un));
 	}
 }
 
