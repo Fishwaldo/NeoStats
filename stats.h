@@ -298,5 +298,6 @@ extern void join_chan(User *u, char *chan);
 extern void change_user_nick(Chans *c, char *newnick, char *oldnick);
 extern Chans *findchan(char *chan);
 void ChanMode(char *origin, char **av, int ac);
+extern void Change_Topic(char *, Chans *, char *);
 #endif
 

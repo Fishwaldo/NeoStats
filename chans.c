@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.10 2002/03/12 13:34:20 fishwaldo Exp $
+** $Id: chans.c,v 1.11 2002/03/13 10:20:33 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -22,6 +22,12 @@ void init_chan_hash()
 	if (usr_mds);	
 
 	
+}
+
+extern void Change_Topic(char *owner, Chans *c, char *topic) {
+
+	strncpy(c->topic, topic, BUFSIZE);
+	strncpy(c->topicowner, owner, BUFSIZE);
 }
 
 void ChanMode(char *origin, char **av, int ac) {
@@ -126,6 +132,7 @@ void del_chan(Chans *c) {
 		log("Hu, Deleting a Non Existand Channel?");
 		return;
 	} else {
+		log("Deleting Channel %s", c->name);
 		hash_delete(ch, cn);
 		hnode_destroy(cn);
 		free(c);
@@ -166,6 +173,7 @@ void part_chan(User *u, char *chan) {
 			lnode_destroy(list_delete(c->chanmembers, un));
 			c->cur_users--;
 		}
+		log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
 		if (c->cur_users <= 0) {
 			del_chan(c);
 		}
@@ -226,6 +234,7 @@ void join_chan(User *u, char *chan) {
 #endif
 		c = new_chan(chan);
 		c->chanmembers = list_create(CHAN_MEM_SIZE);
+		c->cur_users =0;
 	} 
 	/* add this users details to the channel members hash */	
 	cm = malloc(sizeof(Chanmem));
@@ -257,6 +266,8 @@ void join_chan(User *u, char *chan) {
 	} else {
 		list_append(u->chans, un); 
 	}
+		log("Cur Users %s %d (list %d)", c->name, c->cur_users, list_count(c->chanmembers));
+
 }
 
 void chandump(char *chan) {
@@ -282,6 +293,7 @@ void chandump(char *chan) {
 				}
 			}
 			sendcoders("Channel: %s Members: %d (List %d) Flags %s", c->name, c->cur_users, list_count(c->chanmembers), mode);
+			sendcoders("       Topic Owner %s, Topic %s", c->topicowner, c->topic);
 			cmn = list_first(c->chanmembers);
 			while (cmn) {
 				cm = lnode_get(cmn);
@@ -307,6 +319,7 @@ void chandump(char *chan) {
 				}
 			}
 			sendcoders("Channel: %s Members: %d (List %d) Flags %s", c->name, c->cur_users, list_count(c->chanmembers), mode);
+			sendcoders("       Topic Owner %s, Topic %s", c->topicowner, c->topic);
 			cmn = list_first(c->chanmembers);
 			while (cmn) {
 				cm = lnode_get(cmn);

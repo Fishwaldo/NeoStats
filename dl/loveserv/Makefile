@@ -72,8 +72,8 @@ DEPDIR = .deps
 DLLTOOL = @DLLTOOL@
 ECHO = echo
 INSTALL_STRIP_PROGRAM = ${SHELL} $(install_sh) -c -s
-IRCD_FILES_OBJS = 
-IRCD_FILES_SRC = 
+IRCD_FILES_OBJS = Unreal.o
+IRCD_FILES_SRC = Unreal.c
 LIBS = -ldl 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
@@ -113,7 +113,7 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-CFLAGS = -g -O2 -O2 -Wall
+CFLAGS = -g -O2 -O2 -Wall -ggdb
 DIST_SOURCES = $(loveserv_so_SOURCES)
 DIST_COMMON = ChangeLog Makefile.am Makefile.in TODO
 SOURCES = $(loveserv_so_SOURCES)
