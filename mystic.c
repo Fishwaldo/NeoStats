@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: mystic.c,v 1.3 2003/07/01 12:02:33 fishwaldo Exp $
+** $Id: mystic.c,v 1.4 2003/07/02 09:48:55 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -35,59 +35,115 @@ IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
 	{MSG_STATS, Usr_Stats, 1, 0}
 	,
+	{TOK_STATS, Usr_Stats, 1, 0}
+	,
 	{MSG_SETHOST, Usr_Vhost, 1, 0}
+	,
+	{TOK_SETHOST, Usr_Vhost, 1, 0}
 	,
 	{MSG_VERSION, Usr_Version, 1, 0}
 	,
+	{TOK_VERSION, Usr_Version, 1, 0}
+	,
 	{MSG_MOTD, Usr_ShowMOTD, 1, 0}
+	,
+	{TOK_MOTD, Usr_ShowMOTD, 1, 0}
 	,
 	{MSG_CREDITS, Usr_Showcredits, 1, 0}
 	,
+	{TOK_CREDITS, Usr_Showcredits, 1, 0}
+	,
 	{MSG_SERVER, Usr_AddServer, 1, 0}
+	,
+	{TOK_SERVER, Usr_AddServer, 1, 0}
 	,
 	{MSG_SQUIT, Usr_DelServer, 1, 0}
 	,
+	{TOK_SQUIT, Usr_DelServer, 1, 0}
+	,
 	{MSG_QUIT, Usr_DelUser, 1, 0}
+	,
+	{TOK_QUIT, Usr_DelUser, 1, 0}
 	,
 	{MSG_MODE, Usr_Mode, 1, 0}
 	,
+	{TOK_MODE, Usr_Mode, 1, 0}
+	,
 	{MSG_SVSMODE, Usr_Smode, 1, 0}
+	,
+	{TOK_SVSMODE, Usr_Smode, 1, 0}
 	,
 	{MSG_KILL, Usr_Kill, 1, 0}
 	,
+	{TOK_KILL, Usr_Kill, 1, 0}
+	,
 	{MSG_PONG, Usr_Pong, 1, 0}
+	,
+	{TOK_PONG, Usr_Pong, 1, 0}
 	,
 	{MSG_AWAY, Usr_Away, 1, 0}
 	,
+	{TOK_AWAY, Usr_Away, 1, 0}
+	,
 	{MSG_NICK, Usr_Nick, 1, 0}
+	,
+	{TOK_NICK, Usr_Nick, 1, 0}
 	,
 	{MSG_TOPIC, Usr_Topic, 1, 0}
 	,
+	{TOK_TOPIC, Usr_Topic, 1, 0}
+	,
 	{MSG_KICK, Usr_Kick, 1, 0}
+	,
+	{TOK_KICK, Usr_Kick, 1, 0}
 	,
 	{MSG_JOIN, Usr_Join, 1, 0}
 	,
+	{TOK_JOIN, Usr_Join, 1, 0}
+	,
 	{MSG_PART, Usr_Part, 1, 0}
+	,
+	{TOK_PART, Usr_Part, 1, 0}
 	,
 	{MSG_PING, Srv_Ping, 0, 0}
 	,
+	{TOK_PING, Srv_Ping, 0, 0}
+	,
 	{MSG_SNETINFO, Srv_Netinfo, 0, 0}
+	,
+	{TOK_SNETINFO, Srv_Netinfo, 0, 0}
 	,
 	{MSG_VCTRL, Srv_Vctrl, 0, 0}
 	,
+	{TOK_VCTRL, Srv_Vctrl, 0, 0}
+	,
 	{MSG_PASS, Srv_Pass, 0, 0}
+	,
+	{TOK_PASS, Srv_Pass, 0, 0}
 	,
 	{MSG_SERVER, Srv_Server, 0, 0}
 	,
+	{TOK_SERVER, Srv_Server, 0, 0}
+	,
 	{MSG_SQUIT, Srv_Squit, 0, 0}
+	,
+	{TOK_SQUIT, Srv_Squit, 0, 0}
 	,
 	{MSG_NICK, Srv_Nick, 0, 0}
 	,
+	{TOK_NICK, Srv_Nick, 0, 0}
+	,
 	{MSG_SVSNICK, Srv_Svsnick, 0, 0}
+	,
+	{TOK_SVSNICK, Srv_Svsnick, 0, 0}
 	,
 	{MSG_KILL, Srv_Kill, 0, 0}
 	,
+	{TOK_KILL, Srv_Kill, 0, 0}
+	,
 	{MSG_PROTOCTL, Srv_Connect, 0, 0}
+	,
+	{TOK_PROTOCTL, Srv_Connect, 0, 0}
 	,
 	{NULL, NULL, 0, 0}
 };
@@ -206,41 +262,41 @@ void init_ircd()
 int sserver_cmd(const char *name, const int numeric, const char *infoline)
 {
 	sts(":%s %s %s %d :%s", me.name,
-	    MSG_SERVER, name, numeric, infoline);
+	    (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 	return 1;
 }
 
 int slogin_cmd(const char *name, const int numeric, const char *infoline,
 	       const char *pass)
 {
-	sts("%s %s", MSG_PASS, pass);
-	sts("%s %s %d :%s", MSG_SERVER, name,
+	sts("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
+	sts("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name,
 	    numeric, infoline);
 	return 1;
 }
 
 int ssquit_cmd(const char *server)
 {
-	sts("%s %s", MSG_SQUIT, server);
+	sts("%s %s", (me.token ? TOK_SQUIT : MSG_SQUIT), server);
 	return 1;
 }
 
 int sprotocol_cmd(const char *option)
 {
-	sts("%s %s", MSG_PROTOCTL, option);
+	sts("%s %s", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL), option);
 	return 1;
 }
 
 int squit_cmd(const char *who, const char *quitmsg)
 {
-	sts(":%s %s :%s", who, MSG_QUIT, quitmsg);
+	sts(":%s %s :%s", who, (me.token ? TOK_QUIT : MSG_QUIT), quitmsg);
 	DelUser(who);
 	return 1;
 }
 
 int spart_cmd(const char *who, const char *chan)
 {
-	sts(":%s %s %s", who, MSG_PART, chan);
+	sts(":%s %s %s", who, (me.token ? TOK_PART : MSG_PART), chan);
 	part_chan(finduser(who), (char *) chan);
 	return 1;
 }
@@ -248,7 +304,7 @@ int spart_cmd(const char *who, const char *chan)
 
 int sjoin_cmd(const char *who, const char *chan)
 {
-	sts(":%s %s %s", who, MSG_JOIN, chan);
+	sts(":%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
 	join_chan(finduser(who), (char *) chan);
 	return 1;
 }
@@ -261,10 +317,10 @@ int schmode_cmd(const char *who, const char *chan, const char *mode,
 	char tmp[512];
 
 	sts(":%s %s %s %s %s %lu", me.name,
-	    MSG_MODE, chan, mode, args,
+	    (me.token ? TOK_MODE : MSG_MODE), chan, mode, args,
 	    time(NULL));
 	snprintf(tmp, 512, "%s %s %s", chan, mode, args);
-	ac = split_buf(tmp, &av, 0);
+	ac = split_buf(tmp, &av, &ac);
 	ChanMode("", av, ac);
 	free(av);
 	return 1;
@@ -273,7 +329,7 @@ int schmode_cmd(const char *who, const char *chan, const char *mode,
 int snewnick_cmd(const char *nick, const char *ident, const char *host,
 		 const char *realname)
 {
-	sts("%s %s 1 %lu %s %s %s 0 :%s", MSG_NICK,
+	sts("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK),
 	    nick, time(NULL), ident, host, me.name, realname);
 	AddUser(nick, ident, host, me.name, 0, time(NULL));
 	return 1;
@@ -281,7 +337,7 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host,
 
 int sping_cmd(const char *from, const char *reply, const char *to)
 {
-	sts(":%s %s %s :%s", from, MSG_PING, reply,
+	sts(":%s %s %s :%s", from, (me.token ? TOK_PING : MSG_PING), reply,
 	    to);
 	return 1;
 }
@@ -300,7 +356,7 @@ int sumode_cmd(const char *who, const char *target, long mode)
 
 	}
 	newmode[j] = '\0';
-	sts(":%s %s %s :%s", who, MSG_MODE, target,
+	sts(":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target,
 	    newmode);
 	UserMode(target, newmode, 0);
 	return 1;
@@ -320,7 +376,7 @@ int snumeric_cmd(const int numeric, const char *target, const char *data,
 
 int spong_cmd(const char *reply)
 {
-	sts("%s %s", MSG_PONG, reply);
+	sts("%s %s", (me.token ? TOK_PONG : MSG_PONG), reply);
 	return 1;
 }
 
@@ -345,7 +401,7 @@ int skill_cmd(const char *from, const char *target, const char *reason,
 	char buf[512];
 	va_start(ap, reason);
 	vsnprintf(buf, 512, reason, ap);
-	sts(":%s %s %s :%s", from, MSG_KILL,
+	sts(":%s %s %s :%s", from, (me.token ? TOK_KILL : MSG_KILL),
 	    target, buf);
 	va_end(ap);
 	DelUser(target);
@@ -364,8 +420,6 @@ int ssvskill_cmd(const char *who, const char *reason, ...)
 	return 1;
 }
 
-
-
 int ssmo_cmd(const char *from, const char *umodetarget, const char *msg)
 {
 	notice(s_Services,
@@ -380,7 +434,7 @@ int ssmo_cmd(const char *from, const char *umodetarget, const char *msg)
 int snick_cmd(const char *oldnick, const char *newnick)
 {
 	Change_User(finduser(oldnick), newnick);
-	sts(":%s %s %s %d", oldnick, MSG_NICK,
+	sts(":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK),
 	    newnick, time(NULL));
 	return 1;
 }
@@ -396,21 +450,21 @@ int sswhois_cmd(const char *target, const char *swhois)
 }
 int ssvsnick_cmd(const char *target, const char *newnick)
 {
-	sts("%s %s %s :%d", MSG_SVSNICK, target,
+	sts("%s %s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target,
 	    newnick, time(NULL));
 	return 1;
 }
 
 int ssvsjoin_cmd(const char *target, const char *chan)
 {
-	sts("%s %s %s", MSG_SVSJOIN, target,
+	sts("%s %s %s", (me.token ? TOK_SVSJOIN : MSG_SVSJOIN), target,
 	    chan);
 	return 1;
 }
 
 int ssvspart_cmd(const char *target, const char *chan)
 {
-	sts("%s %s %s", MSG_SVSPART, target,
+	sts("%s %s %s", (me.token ? TOK_SVSPART : MSG_SVSPART), target,
 	    chan);
 	return 1;
 }
@@ -418,7 +472,7 @@ int ssvspart_cmd(const char *target, const char *chan)
 int skick_cmd(const char *who, const char *target, const char *chan,
 	      const char *reason)
 {
-	sts(":%s %s %s %s :%s", who, MSG_KICK,
+	sts(":%s %s %s %s :%s", who, (me.token ? TOK_KICK : MSG_KICK),
 	    chan, target, (reason ? reason : "No Reason Given"));
 	part_chan(finduser(target), (char *) chan);
 	return 1;
@@ -429,7 +483,7 @@ int swallops_cmd(const char *who, const char *msg, ...)
 	char buf[512];
 	va_start(ap, msg);
 	vsnprintf(buf, 512, msg, ap);
-	sts(":%s %s :%s", who, MSG_WALLOPS,
+	sts(":%s %s :%s", who, (me.token ? TOK_WALLOPS : MSG_WALLOPS),
 	    buf);
 	va_end(ap);
 	return 1;
@@ -456,17 +510,14 @@ int sakill_cmd(const char *host, const char *ident, const char *setby,
 	char buf[512];
 	va_start(ap, reason);
 	vsnprintf(buf, 512, reason, ap);
-	sts(":%s %s %s %s %d %s %d :%s", me.name,
-	    MSG_AKILL, host, ident, length, setby,
-	    time(NULL), buf);
+	sts(":%s %s %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, time(NULL) + length, time(NULL), setby, buf);
 	va_end(ap);
 	return 1;
 }
 
 int srakill_cmd(const char *host, const char *ident)
 {
-	sts(":%s %s %s %s", me.name, MSG_RAKILL,
-	    host, ident);
+	chanalert(s_Services, "Warning, MysticIRCd doesn't support removing Glines");
 	return 1;
 }
 
