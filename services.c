@@ -56,9 +56,6 @@ static int ns_unload (User * u, char **av, int ac);
 static char quitmsg[BUFSIZE];
 static char no_reason[]="no reason given";
 
-#undef NS_ULEVEL_ROOT
-#define NS_ULEVEL_ROOT 0
-
 static bot_cmd ns_commands[]=
 {
 	{"LEVEL",		ns_level,		0, 	0,					ns_help_level, 		ns_help_level_oneline},

@@ -591,7 +591,6 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 
-	printf("%s\n",cmd);
 	for (i = 0; i < ircd_cmdcount; i++) {
 		if (!strcmp (cmd_list[i].name, cmd)
 #ifdef GOTTOKENSUPPORT
