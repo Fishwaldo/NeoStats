@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.21 2003/03/04 12:47:30 fishwaldo Exp $
+** $Id: cs.c,v 1.22 2003/04/12 06:21:30 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -28,6 +28,8 @@
 #include "stats.h"
 #include "cs_help.c"
 #include "cs.h"
+#include "log.h"
+#include "conf.h"
 
 const char csversion_date[] = __DATE__;
 const char csversion_time[] = __TIME__;
@@ -52,7 +54,6 @@ int kill_watch;
 int mode_watch;
 int nick_watch;
 
-void cslog(char *, ...);
 void SaveSettings();
 void Loadconfig();
 
@@ -70,7 +71,7 @@ int cs_online = 0;
 Module_Info my_info[] = { {
     "ConnectServ",
     "Network Connection & Mode Monitoring Service",
-    "1.5"
+    "1.6"
 } };
 
 int new_m_version(char *origin, char **av, int ac) {
@@ -137,13 +138,38 @@ int __Bot_Message(char *origin, char **av, int ac)
 }
 
 int Online(char **av, int ac) {
+	char *user;
+	char *host;
+	char *rname;
+	
+	if (GetConf((void *)&s_ConnectServ, CFGSTR, "Nick") < 0) {
+	printf("hu?\n");
+		s_ConnectServ = "ConnectServ";
+	}
+	if (GetConf((void *)&user, CFGSTR, "User") < 0) {
+		user = malloc(MAXUSER);
+		snprintf(user, MAXUSER, "CS");
+	}
+	if (GetConf((void *)&host, CFGSTR, "Host") < 0) {
+		host = malloc(MAXHOST);
+		snprintf(host, MAXHOST, me.name);
+	}
+	if (GetConf((void *)&rname, CFGSTR, "RealName") < 0) {
+		rname = malloc(MAXHOST);
+		snprintf(rname, MAXHOST, "Connection Monitoring Service");
+	}
+    Loadconfig();
 
-    if (init_bot(s_ConnectServ,"CS",me.name,"Network Connection & Mode Monitoring Service", "+oikSwgleq-x", my_info[0].module_name) == -1 ) {
+
+    if (init_bot(s_ConnectServ,user, host, rname, "+oikSwgleq-x", my_info[0].module_name) == -1 ) {
         /* Nick was in use */
         s_ConnectServ = strcat(s_ConnectServ, "_");
-        init_bot(s_ConnectServ,"CS",me.name,"Network Connection & Mode Monitoring Service", "+oikSwgleq-x", my_info[0].module_name);
+        init_bot(s_ConnectServ,user, host, rname, "+oikSwgleq-x", my_info[0].module_name);
     }
     cs_online = 1;
+    free(user);
+    free(host);
+    free(rname);
     return 1;
 };
 
@@ -174,10 +200,6 @@ EventFnList *__module_get_events() {
 
 
 void _init() {
-    Loadconfig();
-
-    s_ConnectServ = "ConnectServ";
-
 }
 
 void _fini() {
@@ -185,41 +207,6 @@ void _fini() {
 };
 
 
-/* Routine for logging items with the 'cslog' */
-void cslog(char *fmt, ...)
-{
-        va_list ap;
-        FILE *csfile = fopen("logs/ConnectServ.log", "a");
-        char buf[512], fmtime[80];
-        time_t tmp = time(NULL);
-
-        va_start(ap, fmt);
-        vsnprintf(buf, 512, fmt, ap);
-
-        strftime(fmtime, 80, "%H:%M[%m/%d/%Y]", localtime(&tmp));
-
-        if (!csfile) {
-        log("Unable to open logs/ConnectServ.log for writing.");
-        return;
-        }
-
-    fprintf(csfile, "(%s) %s\n", fmtime, buf);
-        va_end(ap);
-        fclose(csfile);
-
-}
-
-
-/* Routine for saving settings to connect.db */
-void SaveSettings()
-{
-        FILE *fp = fopen("data/connect.db", "w");
-        fprintf(fp, ":SIGNWATCH %i\n", sign_watch);
-        fprintf(fp, ":KILLWATCH %i\n", kill_watch);
-        fprintf(fp, ":MODEWATCH %i\n", mode_watch);
-	fprintf(fp, ":NICKWATCH %i\n", nick_watch);
-        fclose(fp);
-}
 
 
 /* Routine for SIGNON message to be echoed */
@@ -292,7 +279,7 @@ int cs_user_modes(char **av, int ac) {
 
     u = finduser(av[0]);
     if (!u) {
-        cslog("Changing modes for unknown user: %s", u->nick);
+        nlog(LOG_WARNING, LOG_MOD, "Changing modes for unknown user: %s", u->nick);
         return -1;
     }
   
@@ -416,7 +403,7 @@ int cs_user_smodes(char **av, int ac) {
 
     u = finduser(av[0]);
     if (!u) {
-        cslog("Changing modes for unknown user: %s", u->nick);
+        nlog(LOG_WARNING, LOG_MOD, "Changing modes for unknown user: %s", u->nick);
         return -1;
     }
   
@@ -532,14 +519,14 @@ static void cs_nickwatch(User *u)
     if (!nick_watch) {
         nick_watch = 1;
         if (cs_online) chanalert(s_ConnectServ, "\2NICK WATCH\2 Activated by %s",u->nick);
-        cslog("%s!%s@%s Activated NICK WATCH", u->nick, u->username, u->hostname);
-        SaveSettings();
+        nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Activated NICK WATCH", u->nick, u->username, u->hostname);
+	SetConf((void *)1, CFGBOOL, "NickWatch");
         prefmsg(u->nick, s_ConnectServ, "\2NICK WATCH\2 Activated");
    } else {
         nick_watch = 0;
         if (cs_online) chanalert(s_ConnectServ, "\2NICK WATCH\2 Deactivated by %s",u->nick);
-        cslog("%s!%s@%s Deactivated NICK WATCH", u->nick, u->username, u->hostname);
-        SaveSettings();
+        nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Deactivated NICK WATCH", u->nick, u->username, u->hostname);
+	SetConf(0, CFGBOOL, "NickWatch");
         prefmsg(u->nick, s_ConnectServ, "\2NICK WATCH\2 Deactivated");
     }
 
@@ -561,14 +548,14 @@ static void cs_signwatch(User *u)
     if (!sign_watch) {
         sign_watch = 1;
         if (cs_online) chanalert(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated by %s",u->nick);
-        cslog("%s!%s@%s Activated SIGNON/SIGNOFF WATCH", u->nick, u->username, u->hostname);
-        SaveSettings();
+        nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Activated SIGNON/SIGNOFF WATCH", u->nick, u->username, u->hostname);
+	SetConf((void *)1, CFGBOOL, "SignWatch");
         prefmsg(u->nick, s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated");
    } else {
         sign_watch = 0;
         if (cs_online) chanalert(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated by %s",u->nick);
-        cslog("%s!%s@%s Deactivated SIGNON/SIGNOFF WATCH", u->nick, u->username, u->hostname);
-        SaveSettings();
+        nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Deactivated SIGNON/SIGNOFF WATCH", u->nick, u->username, u->hostname);
+	SetConf(0, CFGBOOL, "SignWatch");
         prefmsg(u->nick, s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated");
     }
 
@@ -589,14 +576,14 @@ static void cs_killwatch(User *u)
     if (!kill_watch) {
         kill_watch = 1;
         if (cs_online) chanalert(s_ConnectServ, "\2KILL WATCH\2 Activated by %s",u->nick);
-        cslog("%s!%s@%s Activated KILL WATCH", u->nick, u->username, u->hostname);
-        SaveSettings();
+        nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Activated KILL WATCH", u->nick, u->username, u->hostname);
+	SetConf((void *)1, CFGBOOL, "KillWatch");
         prefmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 Activated");
    } else {
         kill_watch = 0;
         if (cs_online) chanalert(s_ConnectServ, "\2KILL WATCH\2 Deactivated by %s",u->nick);
-        cslog("%s!%s@%s Deactivated KILL WATCH", u->nick, u->username, u->hostname);
-        SaveSettings();
+        nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Deactivated KILL WATCH", u->nick, u->username, u->hostname);
+	SetConf(0, CFGBOOL, "KillWatch");
         prefmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 Deactivated");
     }
 
@@ -617,14 +604,14 @@ static void cs_modewatch(User *u)
     if (!mode_watch) {
         mode_watch = 1;
         if (cs_online) chanalert(s_ConnectServ, "\2MODE WATCH\2 Activated by %s",u->nick);
-        cslog("%s!%s@%s Activated MODE WATCH", u->nick, u->username, u->hostname);
-        SaveSettings();    
+        nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Activated MODE WATCH", u->nick, u->username, u->hostname);
+	SetConf((void *)1, CFGBOOL, "ModeWatch");
         prefmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 Activated");
    } else {
         mode_watch = 0;
         if (cs_online) chanalert(s_ConnectServ, "\2MODE WATCH\2 Deactivated by %s",u->nick);
-        cslog("%s!%s@%s Deactivated MODE WATCH", u->nick, u->username, u->hostname);
-        SaveSettings();
+        nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s Deactivated MODE WATCH", u->nick, u->username, u->hostname);
+	SetConf(0, CFGBOOL, "ModeWatch");
         prefmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 Deactivated");
     }
 
@@ -676,33 +663,16 @@ static void cs_status(User *u)
 /* Load ConnectServ Config file and set defaults if does not exist */
 void Loadconfig()
 {
-    FILE *fp = fopen("data/connect.db", "r");
-    char buf[BUFSIZE];
-    strcpy(segv_location, "cs_Loadconfig");
+    	strcpy(segv_location, "cs_Loadconfig");
 
-	if (fp) {
-        while (fgets(buf, BUFSIZE, fp)) {
-            strip(buf);
-            ConfigCount = split_buf(buf, &Config, 0);
-
-            if (!strcasecmp(Config[0], "SIGNWATCH")) {
-                sign_watch = atoi(Config[1]);
-            } else if (!strcasecmp(Config[0], "KILLWATCH")) {
-                                kill_watch = atoi(Config[1]);
-            } else if (!strcasecmp(Config[0], "MODEWATCH")) {
-                                mode_watch = atoi(Config[1]);
-	    } else if (!strcasecmp(Config[0], "NICKWATCH")) {
-				nick_watch = atoi(Config[1]);
-            } else {
-                cslog("%s is not a valid connect.db option!", Config[0]);
-                if (cs_online) chanalert(s_Services, "%s is not a valid connect.db option! Please check your data/connect.db file!", Config[0]);
-            }
-    }
-        fclose(fp);
-    } else {
-        if (cs_online) chanalert(s_Services, "No Database Found! Creating one with Defaults!");
+	/* some defaults */
         sign_watch=1;
         kill_watch=1;
         mode_watch=1; 
-    }
+	nick_watch=1;
+
+	GetConf((void *)&sign_watch, CFGBOOL, "SignWatch");
+	GetConf((void *)&kill_watch, CFGBOOL, "KillWatch");
+	GetConf((void *)&mode_watch, CFGBOOL, "ModeWatch");
+	GetConf((void *)&nick_watch, CFGBOOL, "NickWatch");
 }

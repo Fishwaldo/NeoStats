@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.49 2003/04/11 09:26:30 fishwaldo Exp $
+** $Id: dl.c,v 1.50 2003/04/12 06:21:29 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -490,6 +490,7 @@ int load_module(char *path1, User *u) {
 		do_msg = 1;
 	}
 	snprintf(path, 255, "%s.so", path1);
+
 	dl_handle = dlopen(path, RTLD_NOW || RTLD_GLOBAL); 
 	if (!dl_handle) {
 		snprintf(p, 255, "%s/%s", me.modpath, path);
@@ -578,7 +579,11 @@ int load_module(char *path1, User *u) {
 		while (event_fn_ptr->cmd_name != NULL ) {
 			if (!strcasecmp(event_fn_ptr->cmd_name, "ONLINE")) {
 				AddStringToList(&av, me.s->name, &ac);
+				strcpy(segv_location, mod_ptr->info->module_name);
+				strcpy(segvinmodule, mod_ptr->info->module_name);
 				event_fn_ptr->function(av, ac);
+				strcpy(segv_location, "AfterDLLoadOnline");
+				strcpy(segvinmodule, "");
 				free(av);
 //				FreeList(av, ac);
 				break;

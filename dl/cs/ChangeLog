@@ -1,5 +1,7 @@
 ConnectServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma^
+* Version 1.6 * Mar 11th, 2002
+- Moved ConnectServ to new Logging and Config Interface
 
 * Version 1.5 * September 12th, 2002
 - Fixed cosmetic bug reported by eggy (Shmad)

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: services.c,v 1.52 2003/04/11 09:26:30 fishwaldo Exp $
+** $Id: services.c,v 1.53 2003/04/12 06:21:29 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -396,7 +396,7 @@ static void ns_raw(User *u, char *message)
 	strcat (message, "\n");
         sent = write (servsock, message, strlen (message));
         if (sent == -1) {
-        	log("Write error.");
+        	nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
                 do_exit(0);
         }
         me.SendM++;
