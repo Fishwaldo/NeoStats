@@ -390,7 +390,7 @@ join_chan (const char* nick, const char *chan)
 		c = new_chan (chan);
 	}
 	/* add this users details to the channel members hash */
-	cm = ns_malloc (sizeof (Chanmem));
+	cm = ns_calloc (sizeof (Chanmem));
 	strlcpy (cm->nick, u->name, MAXNICK);
 	cm->tsjoin = me.now;
 	cm->flags = 0;

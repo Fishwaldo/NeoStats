@@ -194,7 +194,7 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 			if(!logentry->logfile)
 				logentry->logfile = fopen (logentry->logname, "a");
 		} else {
-			logentry = ns_malloc (sizeof (LogEntry));
+			logentry = ns_calloc (sizeof (LogEntry));
 			strlcpy (logentry->name, GET_CUR_MODNAME() , MAX_MOD_NAME);
 			make_log_filename(logentry->name, logentry->logname);
 			logentry->logfile = fopen (logentry->logname, "a");

@@ -532,7 +532,7 @@ int ChanModeHandler (Channel* c, char *modes, int j, char **av, int ac)
 						mn = list_next (c->modeparms, mn);
 					}
 					if (modeexists != 1) {
-						m = ns_malloc (sizeof (ModesParm));
+						m = ns_calloc (sizeof (ModesParm));
 						m->mask = mask;
 						strlcpy (m->param, av[j], PARAMSIZE);
 						if (list_isfull (c->modeparms)) {

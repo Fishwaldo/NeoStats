@@ -90,7 +90,7 @@ void ns_do_exclude_add(Client *u, char *type, char *pattern)
 	static char tmp[BUFSIZE];
 	
 	/* we dont do any checking to see if a similar entry already exists... oh well, thats upto the user */
-	e = ns_malloc(sizeof(excludes));
+	e = ns_calloc (sizeof(excludes));
 	strlcpy(e->addedby, u->name, MAXNICK);
 	e->addedon = me.now;
 	if (!ircstrcasecmp("HOST", type)) {

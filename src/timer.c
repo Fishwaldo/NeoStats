@@ -116,7 +116,7 @@ new_timer (const char *name)
 		return NULL;
 	}
 	dlog (DEBUG2, "new_timer: %s", name);
-	timer = ns_malloc (sizeof (Timer));
+	timer = ns_calloc (sizeof (Timer));
 	strlcpy (timer->name, name, MAX_MOD_NAME);
 	hnode_create_insert (timerhash, timer, name);
 	return timer;

@@ -96,7 +96,7 @@ static void LoadAccessList(void)
 	accesshash = hash_create(-1, 0, 0);
 	if (GetDir("AccessList", &data) > 0) {
 		for (i = 0; data[i] != NULL; i++) {	
-			access = malloc(sizeof(AccessEntry));
+			access = ns_calloc(sizeof(AccessEntry));
 			strlcpy(access->nick, data[i], MAXNICK);
 			ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s/mask", access->nick);
 			if (GetConf((void *)&tmp, CFGSTR, buf) <= 0) {
@@ -149,7 +149,7 @@ static int AccessAdd (CmdParams* cmdparams)
 		irc_prefmsg(NULL, cmdparams->source, "Level out of range. Valid values range from 0 to 200.");
 		return NS_ERR_PARAM_OUT_OF_RANGE;
 	}
-	access = malloc(sizeof(AccessEntry));
+	access = ns_calloc(sizeof(AccessEntry));
 	strlcpy(access->nick, cmdparams->av[1], MAXNICK);
 	strlcpy(access->mask, cmdparams->av[2], MAXHOST);
 	access->level = level;

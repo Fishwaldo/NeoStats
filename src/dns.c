@@ -87,7 +87,7 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 	struct sockaddr_in sa;
 
 	SET_SEGV_LOCATION();
-	dnsdata = ns_malloc (sizeof (DnsLookup));
+	dnsdata = ns_calloc (sizeof (DnsLookup));
 	DNSStats.totalq++;
 	if (!dnsdata) {
 		nlog (LOG_CRITICAL, "DNS: Out of Memory");

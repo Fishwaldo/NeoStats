@@ -364,7 +364,7 @@ getmaxsock (void)
 	struct rlimit *lim;
 	int ret;
 
-	lim = ns_malloc (sizeof (struct rlimit));
+	lim = ns_calloc (sizeof (struct rlimit));
 	getrlimit (RLIMIT_NOFILE, lim);
 	ret = lim->rlim_max;
 	ns_free (lim);
@@ -526,8 +526,8 @@ int InitSocks (void)
 		nlog (LOG_CRITICAL, "Unable to create socks hash");
 		return NS_FAILURE;
 	}
-	TimeOut = ns_malloc (sizeof (struct timeval));
-	ufds = ns_malloc((sizeof *ufds) *  me.maxsocks);
+	TimeOut = ns_calloc (sizeof (struct timeval));
+	ufds = ns_calloc ((sizeof *ufds) *  me.maxsocks);
 	return NS_SUCCESS;
 }
 
@@ -560,7 +560,7 @@ new_sock (const char *sock_name)
 		return NULL;
 	}
 	dlog(DEBUG2, "new_sock: %s", sock_name);
-	sock = ns_malloc (sizeof (Sock));
+	sock = ns_calloc (sizeof (Sock));
 	strlcpy (sock->name, sock_name, MAX_MOD_NAME);
 	hnode_create_insert (sockethash, sock, sock->name);
 	return sock;

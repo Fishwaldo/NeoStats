@@ -182,7 +182,7 @@ CStats *load_chan(char *name)
 		nlog (LOG_CRITICAL, "StatServ channel hash full");
 		return NULL;
 	}
-	c = ns_malloc (sizeof (CStats));
+	c = ns_calloc (sizeof (CStats));
 #ifdef USE_BERKELEY
 	if ((data = DBGetData(name)) != NULL) {
 		memcpy (c, data, sizeof(CStats));
