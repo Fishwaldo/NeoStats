@@ -418,7 +418,10 @@ Usr_Squit (char *origin, char **argv, int argc)
 static void
 Usr_Quit (char *origin, char **argv, int argc)
 {
-	UserQuit (origin, NULL);
+	char *tmpbuf;
+	tmpbuf = joinbuf(argv, argc, 0);
+	UserQuit (origin, tmpbuf);
+	free(tmpbuf);
 }
 
 static void
