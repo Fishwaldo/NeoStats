@@ -14,6 +14,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Ported NeoStats to NeoIRCD, but still needs a lot of work (It links, modules not tested/ported yet) (F)
  - Fixed a mode problem on unreal reported by [Apache]
  - Fixed the fix for the fix of the mode problem 
+ - We only enable recv.log if in debug mode now... Neo is pretty stable as to not need this anymore. 
 
 * NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 1
  - Fixed problem where NeoStats (Or the bots) were not signing onto the network with Hyrbid7 IRCD (F)

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.61 2002/10/20 16:44:33 shmad Exp $
+** $Id: stats.h,v 1.62 2002/10/24 14:32:48 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -62,9 +62,9 @@
 
 
 /* Define this to enable Recived Line Logging - Only enable if Coders ask you to! */
-
+#ifdef DEBUG
 #define RECVLOG 
-
+#endif
 /* this is a security hack to give the coders the right levels to debug a NeoStats. Don't define unless we ask you to */
 
 #undef CODERHACK
