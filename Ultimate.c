@@ -382,10 +382,20 @@ void prefmsg(char *to, const char *from, char *fmt, ...)
 
 	va_start(ap, fmt);
 	vsnprintf(buf2, sizeof(buf2), fmt, ap);
-	if (me.want_privmsg)
+	if (me.want_privmsg) {
+                  if (findbot(to)) {
+                        chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+                        return;
+                }
 		sprintf(buf, ":%s PRIVMSG %s :%s", from, to, buf2);
-	else
+	} else {
+                  if (findbot(to)) {
+                        chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+                        return;
+                }
+
 		sprintf(buf, ":%s NOTICE %s :%s", from, to, buf2);
+	}
 	sts("%s", buf);
 	va_end(ap);
 }
@@ -393,6 +403,11 @@ void privmsg(char *to, const char *from, char *fmt, ...)
 {
 	va_list ap;
 	char buf[512], buf2[512];
+
+        if (findbot(to)) {
+                chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+                return;
+        }
 
 	va_start(ap, fmt);
 	vsnprintf(buf2, sizeof(buf2), fmt, ap);
@@ -405,6 +420,11 @@ void notice(char *to, const char *from, char *fmt, ...)
 {
 	va_list ap;
 	char buf[512], buf2[512];
+
+        if (findbot(to)) {
+                chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+                return;
+        }
 
 	va_start(ap, fmt);
 	vsnprintf(buf2, sizeof(buf2), fmt, ap);

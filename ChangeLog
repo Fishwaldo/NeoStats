@@ -1,6 +1,7 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
 * NeoStats * Fish & Shmad * Version 2.5.0-Beta3
+ - Fixed that ANNOYING GHOST bug if a service Messages or Notices itself. fun fun stuff (Shmad).
  - Missed some Locking code.. removed it all now (Shmad)
  - Fought with sourceforge CVS for awhile.. (Shmad)
  - StatServ wont flood records now - hehe
