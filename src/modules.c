@@ -462,7 +462,7 @@ unload_module (const char *modname, Client * u)
 	DelModuleBots (mod_ptr);
 	hnode_destroy (modnode);
 	/* Close module */
-	irc_globops (NULL, _("%s Module Unloaded"), modname);
+	irc_globops (NULL, _("%s Module unloaded"), modname);
 	SET_RUN_LEVEL(mod_ptr);
 	if (mod_ptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
 	{

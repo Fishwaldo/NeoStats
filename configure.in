@@ -86,6 +86,7 @@ AC_CHECK_HEADERS(
         setjmp.h \
         string.h \
         sys/file.h \
+        sys/dir.h \
 	inttypes.h \ 
 	stdint.h \
 	poll.h \

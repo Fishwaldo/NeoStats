@@ -36,6 +36,8 @@ int InitExcludes( void );
 void FiniExcludes( void );
 int InitModExcludes( Module *mod_ptr );
 void FiniModExcludes( Module *mod_ptr );
+bot_cmd *GetModExcludeCommands( Module *mod_ptr );
+
 void ns_do_exclude_chan( Channel *c );
 void ns_do_exclude_server( Client *s );
 void ns_do_exclude_user( Client *u );

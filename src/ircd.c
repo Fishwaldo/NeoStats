@@ -1633,8 +1633,8 @@ int irc_squit( const char *server, const char *quitmsg )
 
 void do_synch_neostats( void )
 {
-	irc_globops( NULL, _( "Link with Network \2Complete!\2" ) );
 	init_services_bot();
+	irc_globops( NULL, _( "Link with Network \2Complete!\2" ) );
 }
 
 /** @brief do_ping

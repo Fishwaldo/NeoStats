@@ -20005,6 +20005,7 @@ fi
 
 
 
+
 for ac_header in sys/types.h \
         sys/time.h \
         sys/select.h \
@@ -20044,6 +20045,7 @@ for ac_header in sys/types.h \
         setjmp.h \
         string.h \
         sys/file.h \
+        sys/dir.h \
 	inttypes.h \
 	stdint.h \
 	poll.h \
