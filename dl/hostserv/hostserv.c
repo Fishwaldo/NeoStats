@@ -1041,9 +1041,9 @@ static void LoadConfig(void)
 	GetConf((void *) &hs_cfg.list, CFGINT, "ListLevel");
 	if ((hs_cfg.list > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
 		hs_cfg.list = 40;
-	GetConf((void *) &hs_cfg.old, CFGINT, "ExpireDays");
-	if ((hs_cfg.old > 99) || (hs_cfg.old < 0))
+	if(GetConf((void *) &hs_cfg.old, CFGINT, "ExpireDays") < 0) {
 		hs_cfg.old = 60;
+	}
 	GetConf((void *) &hs_cfg.regnick, CFGINT, "UnetVhosts");
 	if (hs_cfg.regnick < 0) {
 		 hs_cfg.regnick = 0;
