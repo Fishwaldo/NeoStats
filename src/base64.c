@@ -37,10 +37,6 @@
  *  - Extend base64 support to IRCds other than IRCu, e.g. Unreal.
  */
 
-/** @brief base64 lookup tables for fast conversion
- */
-static char base64tochar[65];
-static unsigned int base64toint[256];
 
 /** @brief set_server_base64
  *

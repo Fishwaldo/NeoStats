@@ -22,6 +22,9 @@
 */
 
 #include "neostats.h"
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
 #include "modules.h"
 #include "commands.h"
 
@@ -56,7 +59,6 @@ static int DCCChatConnect(Client *dcc, int port)
 	OS_SOCKET socketfd;
 	int flags = 1;
 	struct in_addr ip;
-	int err = 0;
 
 	os_memset((void *) &dccaddr, 0, sizeof(struct sockaddr_in));
 	ip.s_addr = inet_addr(dcc->user->hostname);

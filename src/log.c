@@ -39,8 +39,6 @@ typedef struct LogEntry {
 	unsigned int flush;
 } LogEntry;
 
-/* Name used for core logs */
-static const char *CoreLogFileName = "NeoStats";
 /* Format string for log file names */
 char LogFileNameFormat[MAX_LOGFILENAME] = "-%m-%d";
 /* Log level strings */

@@ -327,8 +327,8 @@ int ss_cmd_channel( CmdParams *cmdparams )
 		irc_prefmsg( ss_bot, cmdparams->source, "Total Joins today: %d (Max %d on %s)",
 			cs->joins.daily.runningtotal, cs->joins.alltime.max, sftime( cs->joins.alltime.ts_max ) );
 		irc_prefmsg( ss_bot,cmdparams->source, "Total Topic Changes %d (Today %d)", 
-			cs->topics, cs->topics.daily.runningtotal );
-		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks: %d", cs->kicks );
+			cs->topics.day, cs->topics.daily.runningtotal );
+		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks: %d", cs->kicks.alltime.runningtotal );
 		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks today %d (Max %d on %s)",
 			cs->kicks.daily.max, cs->kicks.alltime.max, sftime( cs->kicks.alltime.ts_max ) );
 		if( !cs->c )

@@ -155,7 +155,7 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 {
 	send_cmd ("%s %s", MSG_PASS, pass);
 	send_cmd ("%s %s", MSG_NICK, "NeoStats");
-	send_cmd ("%s %s %d %d :%s", MSG_USER, "user", me.now, me.now, "real name");
+	send_cmd ("%s %s %d %d :%s", MSG_USER, "user", (int) me.now, (int) me.now, "real name");
 }
 
 void 

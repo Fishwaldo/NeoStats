@@ -217,13 +217,10 @@ EXTRA_DIST = err.c event.h event-internal.h evsignal.h \
 	kqueue.c epoll_sub.c epoll.c select.c rtsig.c poll.c signal.c \
 	devpoll.c \
 	compat/err.h compat/sys/queue.h compat/sys/tree.h compat/sys/_time.h \
-	WIN32-Code WIN32-Code/config.h WIN32-Code/misc.c \
+	WIN32-Code/config.h WIN32-Code/misc.c \
 	WIN32-Code/win32.c WIN32-Code/misc.h \
-	WIN32-Prj WIN32-Prj/event_test WIN32-Prj/event_test/event_test.dsp \
-	WIN32-Prj/event_test/test.txt WIN32-Prj/libevent.dsp \
-	WIN32-Prj/libevent.dsw WIN32-Prj/signal_test \
-	WIN32-Prj/signal_test/signal_test.dsp WIN32-Prj/time_test \
-	WIN32-Prj/time_test/time_test.dsp
+	WIN32-Prj/libevent.dsp \
+	WIN32-Prj/libevent.dsw 
 
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -354,7 +351,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/../../autotools $(distdir)/WIN32-Code $(distdir)/WIN32-Prj $(distdir)/WIN32-Prj/event_test $(distdir)/WIN32-Prj/signal_test $(distdir)/WIN32-Prj/time_test $(distdir)/compat $(distdir)/compat/sys
+	$(mkdir_p) $(distdir)/../../autotools $(distdir)/WIN32-Code $(distdir)/WIN32-Prj $(distdir)/compat $(distdir)/compat/sys
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -602,16 +599,6 @@ install-libLTLIBRARIES: $(lib_LTLIBRARIES)
    	if test "x#" != "x@USECCDV@"; then echo "Installing $$f"; fi; \
 	  else :; fi; \
 	done
-
-select.o:	select.c
-devpoll.o:	devpoll.c
-epoll.o:	epoll.c
-epoll_sub.o:	epoll_sub.c
-err.o:		err.c
-kqueue.o:	kqueue.c
-poll.o:		poll.c
-rtsig.o:	rtsig.c
-signal.o:	signal.c
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

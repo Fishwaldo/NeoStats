@@ -227,7 +227,7 @@ dist_data_DATA = neostats.motd
 docdir = @prefix@/doc
 dist_doc_DATA = doc/FAQ doc/README.sqlsrv doc/USERMAN
 DISTCLEANFILES = ccdv
-EXTRA_DIST = ccdv.c CREDITS INSTNOTES RELNOTES
+EXTRA_DIST = ccdv.c CREDITS INSTNOTES RELNOTES autotools/shtool
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 

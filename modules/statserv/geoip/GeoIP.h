@@ -137,6 +137,8 @@ GEOIP_API unsigned char GeoIP_database_edition (GeoIP* gi);
 GEOIP_API unsigned int _seek_record (GeoIP *gi, unsigned long ipnum);
 GEOIP_API unsigned long _addr_to_num (const char *addr);
 
+GEOIP_API void _setup_dbfilename();
+
 #ifdef BSD
 #define memcpy(dest, src, n) bcopy(src, dest, n)
 #endif

@@ -315,7 +315,6 @@ int DBACloseTable( char *table )
 int DBAFetch( char *table, char *key, void *data, int size )
 {
 	tableentry *tbe;
-	void *dptr = NULL;
 
 	dlog( DEBUG1, "DBAFetch %s %s", table, key );
 	tbe = DBAFetchTableEntry( table );

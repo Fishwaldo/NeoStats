@@ -212,7 +212,7 @@ static void makemap(char *uplink, Client * u, int level)
 				makemap(s->name, u, level);
 			}
 			irc_prefmsg (ss_bot, u,
-				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %d/%d ]",
+				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
 				ss->name, s->server->users, (int)ss->users.alltime.max,
 				ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
 			makemap(s->name, u, level + 1);
@@ -226,7 +226,7 @@ static void makemap(char *uplink, Client * u, int level)
 				strlcat (buf, "     |", 256);
 			}
 			irc_prefmsg (ss_bot, u,
-				"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%d ]",
+				"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
 				buf, ss->name, s->server->users, (int)ss->users.alltime.max,
 				ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
 			makemap(s->name, u, level + 1);

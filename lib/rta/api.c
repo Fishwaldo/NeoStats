@@ -21,6 +21,7 @@
 #include <syslog.h>
 #endif
 #include <time.h>
+#include "neostats.h"
 #include "rta.h"                /* for various constants */
 #include "do_sql.h"             /* for LOC */
 

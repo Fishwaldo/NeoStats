@@ -10,7 +10,7 @@ dist_doc_DATA		= doc/FAQ doc/README.sqlsrv doc/USERMAN
 
 DISTCLEANFILES		= ccdv
 
-EXTRA_DIST		= ccdv.c CREDITS INSTNOTES RELNOTES
+EXTRA_DIST		= ccdv.c CREDITS INSTNOTES RELNOTES autotools/shtool
 
 all-local:
 		if test ! -f .message; then \
