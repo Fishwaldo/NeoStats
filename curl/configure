@@ -11078,9 +11078,9 @@ test -n "$YACC" || YACC="yacc"
 
 echo "$as_me:$LINENO: checking whether to enable debug options" >&5
 echo $ECHO_N "checking whether to enable debug options... $ECHO_C" >&6
-# Check whether --enable-debug or --disable-debug was given.
-if test "${enable_debug+set}" = set; then
-  enableval="$enable_debug"
+# Check whether --enable-curldebug or --disable-curldebug was given.
+if test "${enable_curldebug+set}" = set; then
+  enableval="$enable_curldebug"
    case "$enableval" in
   no)
        echo "$as_me:$LINENO: result: no" >&5

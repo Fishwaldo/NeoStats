@@ -963,7 +963,7 @@ dnl ************************************************************
 dnl lame option to switch on debug options
 dnl
 AC_MSG_CHECKING([whether to enable debug options])
-AC_ARG_ENABLE(debug,
+AC_ARG_ENABLE(curldebug,
 AC_HELP_STRING([--enable-curldebug],[Enable pedantic debug options])
 AC_HELP_STRING([--disable-curldebug],[Disable debug options]),
 [ case "$enableval" in

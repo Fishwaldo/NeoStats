@@ -31,10 +31,10 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Lots of cleanups in IRCd code and fixes for ADMIN command which was missing on some IRCds (M)
  - Some DOC updates for changes to commands (M)
  - Added FRENCH README doc/README.french (was bored and had time) (Shmad)
+ - Fixed Hybrid Topic Crash? (BugID: 86) (F)
 
 * NeoStats * Fish (F) * Version 2.5.10
  - Fix a problem with Umode +T being reintroduced on Unreal Beta19 as a normal usermode. 
-   
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.9
  - import of libpcre into core (M)

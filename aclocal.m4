@@ -4216,10 +4216,10 @@ AC_DEFUN(NEO_SUBDIR_CONFIG, [
     test -d $1 || $MKDIR $1
     cd $1
 
-    changequote(, )dnl
+    #changequote(, )dnl
     # A "../" for each directory in /$config_subdirs.
-    ac_dots=`echo $apr_config_subdirs|sed -e 's%^\./%%' -e 's%[^/]$%&/%' -e 's%[^/]*/%../%g'`
-    changequote([, ])dnl
+    #ac_dots=`echo $apr_config_subdirs|sed -e 's%^\./%%' -e 's%[^/]$%&/%' -e 's%[^/]*/%../%g'`
+    #changequote([, ])dnl
 
     # Make the cache file name correct relative to the subdirectory.
     case "$cache_file" in

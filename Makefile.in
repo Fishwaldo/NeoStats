@@ -26,7 +26,7 @@ INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h Unreal.h \
 		Ircu.h mystic.h QuantumIRCd.h sock.h ircd.h \
 		support.h ircstring.h events.h liquidircd.h numeric.h pcre.h \
 		dns.h services.h transfer.h
-BUILDFILES = configure *.in adns/Makefile adns/config.h.in dl/Makefile \
+BUILDFILES = configure config.sub config.guess *.in adns/Makefile adns/config.h.in dl/Makefile \
 		dl/modules.txt RELNOTES install-sh neoircd.c neoircd.h \
 		hybrid7.c hybrid7.h Ultimate.c Ultimate.h Unreal.c Unreal.h \
 		makeconf cronchk tools/Makefile.in tools/cfgtool/Makefile \
@@ -38,8 +38,9 @@ DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) \
 		$(BUILDFILES) $(TOOLFILES) keeper/*.c keeper/*.h adns/*.c \
 		adns/adns.h adns/dlist.h  adns/internal.h  adns/tvarith.h \
 		ns_help.h timer.h users.h chans.h server.h pcre/*.c pcre/*.h \
-		pcre/*.in pcre/README pcre/COPYING
-
+		pcre/*.in pcre/README pcre/COPYING curl/*.in curl/*.h \
+		curl/*.c curl/*.m4 curl/configure curl/config.sub curl/COPYING \
+		curl/depcomp curl/*.y curl/README curl/RELEASE-NOTES
  
 distdir = @PACKAGE@-@VERSION@
 SUBDIRS = doc doc/old data adns logs keeper tools tools/cfgtool \

@@ -6877,8 +6877,10 @@ rm -f confcache
     test -d curl || $MKDIR curl
     cd curl
 
-        # A "../" for each directory in /$config_subdirs.
-    ac_dots=`echo $apr_config_subdirs|sed -e 's%^\./%%' -e 's%[^/]$%&/%' -e 's%[^/]*/%../%g'`
+    #changequote(, )dnl
+    # A "../" for each directory in /$config_subdirs.
+    #ac_dots=`echo $apr_config_subdirs|sed -e 's%^\./%%' -e 's%[^/]$%&/%' -e 's%[^/]*/%../%g'`
+    #changequote([, ])dnl
 
     # Make the cache file name correct relative to the subdirectory.
     case "$cache_file" in

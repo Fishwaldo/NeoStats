@@ -263,7 +263,7 @@ spart_cmd (const char *who, const char *chan)
 int
 sjoin_cmd (const char *who, const char *chan)
 {
-	sts (":%s %s 0 %s + :%s", me.name, MSG_SJOIN, chan, who);
+	sts (":%s %s %d %s + :%s", me.name, MSG_SJOIN, me.now, chan, who);
 	join_chan (finduser (who), (char *) chan);
 	return 1;
 }
@@ -839,7 +839,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 	Chans *c;
 	c = findchan (argv[0]);
 	if (c) {
-		buf = joinbuf (argv, argc, 2);
+		buf = joinbuf (argv, argc, 1);
 		ChangeTopic (origin, c, me.now, buf);
 		free (buf);
 	} else {
