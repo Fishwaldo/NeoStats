@@ -68,6 +68,13 @@ const char *ss_help_set_htmlpath[] = {
 	NULL
 };
 
+const char *ss_help_set_exclusions[] = {
+	"\2USEEXCLUSIONS <on/off>\2",
+	"Should statserv use the global exclusions when calculating",
+	"and displaying statistical data?",
+	NULL
+};
+
 const char *ss_help_set_html[] = {
 	"\2HTML <ON/OFF>\2",
 	"Enable or disable HTML statistics generation.",

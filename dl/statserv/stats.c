@@ -25,6 +25,7 @@
 
 #include "statserv.h"
 #include "log.h"
+#include "exclude.h"
 
 static char announce_buf[BUFSIZE];
 
@@ -147,7 +148,13 @@ int s_client_version(char **av, int ac)
 int s_chan_new(char **av, int ac)
 {
 	long count;
+
 	IncreaseChans();
+	/* only check exclusions after increasing channel count */
+	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
+		printf("skipping %s\n", av[0]);
+		return 1;
+	}
 	count = hash_count(ch);
 	if (count > stats_network.maxchans) {
 		stats_network.maxchans = count;
@@ -166,7 +173,13 @@ int s_chan_del(char **av, int ac)
 {
 	CStats *cs;
 	lnode_t *ln;
+	
 	DecreaseChans();
+	/* only check exclusions after increasing channel count */
+	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
+		printf("skipping %s\n", av[0]);
+		return 1;
+	}
 	ln = list_find(Chead, av[0], comparef);
 	if (ln) {
 		cs = lnode_get(ln);
@@ -183,6 +196,13 @@ int s_chan_del(char **av, int ac)
 int s_chan_join(char **av, int ac)
 {
 	CStats *cs;
+
+	/* only check exclusions after increasing channel count */
+	if (StatServ.exclusions && (Is_Excluded(findchan(av[0]))|| Is_Excluded(finduser(av[1])))) {
+		printf("skipping %s %s\n", av[0], av[1]);
+		return 1;
+	}
+
 	cs = findchanstats(av[0]);
 	if (cs) {
 		Increasemems(cs);
@@ -211,6 +231,11 @@ int s_chan_join(char **av, int ac)
 int s_chan_part(char **av, int ac)
 {
 	CStats *cs;
+	/* only check exclusions after increasing channel count */
+	if (StatServ.exclusions && (Is_Excluded(findchan(av[0]))|| Is_Excluded(finduser(av[1])))) {
+		printf("skipping %s %s\n", av[0], av[1]);
+		return 1;
+	}
 	cs = findchanstats(av[0]);
 	if (cs) {
 		Decreasemems(cs);
@@ -221,6 +246,11 @@ int s_chan_part(char **av, int ac)
 int s_topic_change(char **av, int ac)
 {
 	CStats *cs;
+	/* only check exclusions after increasing channel count */
+	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
+		printf("skipping %s\n", av[0]);
+		return 1;
+	}
 	cs = findchanstats(av[0]);
 	if (cs) {
 		IncreaseTops(cs);
@@ -230,6 +260,13 @@ int s_topic_change(char **av, int ac)
 int s_chan_kick(char **av, int ac)
 {
 	CStats *cs;
+
+	/* only check exclusions after increasing channel count */
+	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
+		printf("skipping %s\n", av[0]);
+		return 1;
+	}
+
 	cs = findchanstats(av[0]);
 	if (cs) {
 		IncreaseKicks(cs);
@@ -301,11 +338,14 @@ int s_new_server(char **av, int ac)
 		return 0;
 	AddStats(s);
 	IncreaseServers();
+	
 	if (stats_network.maxservers < stats_network.servers) {
 		stats_network.maxservers = stats_network.servers;
 		stats_network.t_maxservers = me.now;
-		announce_record("\2NEW SERVER RECORD\2 Wow, there are now %ld Servers on the Network",
-			stats_network.servers);
+		if (!(StatServ.exclusions && Is_Excluded(s))) {
+			announce_record("\2NEW SERVER RECORD\2 Wow, there are now %ld Servers on the Network",
+				stats_network.servers);
+		}
 	}
 	if (stats_network.servers > daily.servers) {
 		daily.servers = stats_network.servers;
@@ -344,6 +384,10 @@ int s_user_kill(char **av, int ac)
 	u = finduser(av[0]);
 	if (!u)
 		return 0;
+
+	if (StatServ.exclusions && Is_Excluded(u)) {
+		return 0;
+	}
 	s = findstats(u->server->name);
 	if (is_oper(u)) {
 		nlog(LOG_DEBUG2, LOG_MOD, "Decreasing OperCount on %s due to kill", u->server->name);
@@ -381,6 +425,9 @@ int s_user_modes(char **av, int ac)
 	SET_SEGV_LOCATION();
 	u = finduser(av[0]);
 	if (!u) {
+		return -1;
+	}
+	if (StatServ.exclusions && Is_Excluded(u)) {
 		return -1;
 	}
 	s = findstats(u->server->name);
@@ -450,8 +497,12 @@ int s_del_user(char **av, int ac)
 	if (!u)
 		return 0;
 
-	s = findstats(u->server->name);
+	if (StatServ.exclusions && Is_Excluded(u)) {
+		return 0;
+	}
 
+	s = findstats(u->server->name);
+	
 	if (!u->modes)
 		return -1;
 	if (is_oper(u)) {
@@ -470,8 +521,14 @@ int s_user_away(char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	u = finduser(av[0]);
+		
 	if (!u)
 		return 0;
+
+	if (StatServ.exclusions && Is_Excluded(u)) {
+		return 0;
+	}
+
 	if (u->is_away == 1) {
 		stats_network.away = stats_network.away + 1;
 	} else {
@@ -493,6 +550,11 @@ int s_new_user(char **av, int ac)
 	if (!u)
 		return 0;
 
+	/* ignore them if they are excluded */
+	if (StatServ.exclusions && Is_Excluded(u)) {
+		return 0;
+	}
+	
 	if (u->server->name == me.name)
 		return 0;
 
@@ -540,6 +602,11 @@ int pong(char **av, int ac)
 	/* we don't want negative pings! */
 	if (s->ping < 0)
 		return -1;
+
+
+	if (StatServ.exclusions && Is_Excluded(s)) {
+		return -1;
+	}
 
 	ss = findstats(s->name);
 	if (!ss)

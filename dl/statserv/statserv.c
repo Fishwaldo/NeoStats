@@ -116,6 +116,9 @@ static void ss_Config(void)
 	if (GetConf((void *) &StatServ.lagtime, CFGINT, "LagTime") < 0) {
 		StatServ.lagtime = 30;
 	}
+	if (GetConf((void *) &StatServ.exclusions, CFGINT, "Exclusions") < 0) {
+		StatServ.exclusions = 0;
+	}
 	if (GetConf((void *) &StatServ.lagalert, CFGINT, "LagAlert") < 0) {
 		StatServ.lagalert = 1;
 	}
@@ -287,6 +290,7 @@ bot_setting ss_settings[]=
 	{"LAGTIME",		&StatServ.lagtime,		SET_TYPE_INT,		1, 256,		NS_ULEVEL_ADMIN,	"LagTime",			"seconds",	ss_help_set_lagtime },
 	{"LAGALERT",	&StatServ.lagalert,		SET_TYPE_INT,		0, 3, 		NS_ULEVEL_ADMIN,	"LagAlert",			NULL,		ss_help_set_lagalert },
 	{"RECORDALERT", &StatServ.recordalert,	SET_TYPE_INT,		0, 3, 		NS_ULEVEL_ADMIN,	"RecordAlert",		NULL,		ss_help_set_recordalert },
+	{"USEEXCLUSIONS", &StatServ.exclusions, SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN,	"Exclusions",		NULL,		ss_help_set_exclusions },
 	{NULL,			NULL,					0,					0, 0,		0,					NULL,				NULL,		NULL },
 };
 

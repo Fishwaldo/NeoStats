@@ -86,6 +86,7 @@ struct StatServ {
 	int msginterval;
 	int msglimit;
 	int shutdown;
+	int exclusions;
 } StatServ;
 
 
@@ -221,6 +222,7 @@ extern const char *ss_help_forcehtml[];
 extern const char *ss_help_chan[];
 extern const char *ss_help_set_htmlpath[];
 extern const char *ss_help_set_html[];
+extern const char *ss_help_set_exclusions[];
 extern const char *ss_help_set_msginterval[];
 extern const char *ss_help_set_msglimit[];
 extern const char *ss_help_set_lagtime[];
