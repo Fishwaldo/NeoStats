@@ -1205,6 +1205,9 @@ EXPORTFUNC int new_transfer( char *url, char *params, NS_TRANSFER savetofileorme
 /* Has NeoStats issued a SETHOST for this user? */
 #define IsUserSetHosted(x)  ((x) && ((x)->flags & CLIENT_FLAG_SETHOST))
 
+/* Is the client marked away? */
+#define IsAway(x) ( ( x ) && ( x->user->is_away ) )
+
 EXPORTFUNC int ValidateNick( char *nick );
 EXPORTFUNC int ValidateUser( char *username );
 EXPORTFUNC int ValidateHost( char *hostname );
@@ -1301,9 +1304,9 @@ extern void nassert_fail( const char *expr, const char *file, const int line, co
 EXPORTFUNC void nlog( LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC void dlog( DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
-typedef int (*ChannelListHandler) (Channel *c, void *v );
+typedef int (*ChannelListHandler) ( Channel *c, void *v );
 EXPORTFUNC int GetChannelList( ChannelListHandler handler, void *v );
-typedef int (*ChannelMemberHandler) (Channel *c, ChannelMember *m, void *v );
+typedef int (*ChannelMemberHandler) ( Channel *c, ChannelMember *m, void *v );
 EXPORTFUNC int GetChannelMembers( Channel *c, ChannelMemberHandler handler, void *v );
 
 typedef int (*UserListHandler) ( Client *u, void *v );
@@ -1395,7 +1398,7 @@ MODULEFUNC void ModFini( void );
 MODULEVAR extern ModuleEvent module_events[];  
 /* Module Auth Interface */
 MODULEFUNC int ModAuthUser( Client *u );
-
+/* Module Exclude Interface */
 EXPORTFUNC int ModIsServerExcluded( Client *s );
 EXPORTFUNC int ModIsUserExcluded( Client *u );
 EXPORTFUNC int ModIsChannelExcluded( Channel *c );

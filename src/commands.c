@@ -53,7 +53,6 @@ char *help_level_title[]=
 };
 
 /*  Intrinsic commands 
- *  (Work in progress, not yet operation)
  *  These are all automatically added to a bot for handling 
  *  by the core. A module can override these by defining them
  *  in it's local bot command array.

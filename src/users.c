@@ -180,9 +180,9 @@ static void deluser (Client *u)
 	hash_delete (userhash, un);
 	hnode_destroy (un);
 	list_destroy (u->user->chans);
-	if (u->uplink)
+	if( u->uplink )
 		u->uplink->server->users--;
-	if ((u->user->is_away == 1)) {
+	if( IsAway( u ) ) {
 		me.awaycount--;
 		if (u->uplink)
 			u->uplink->server->awaycount--;
@@ -303,11 +303,11 @@ void UserAway (const char *nick, const char *awaymsg)
 	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;
-	if ((u->user->is_away == 1) && (!awaymsg)) {
+	if( IsAway( u ) && ( !awaymsg ) ) {
 		u->user->is_away = 0;
 		me.awaycount--;
 		u->uplink->server->awaycount--;
-	} else if ((u->user->is_away == 0) && (awaymsg)) {
+	} else if( !IsAway( u ) && ( awaymsg ) ) {
 		u->user->is_away = 1;
 		me.awaycount++;
 		u->uplink->server->awaycount++;
@@ -406,7 +406,7 @@ static int dumpuser (Client *u, void* v)
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Flags:    0x%x", cmdparams->source), u->flags);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Modes:    %s (0x%x)", cmdparams->source), UmodeMaskToString(u->user->Umode), u->user->Umode);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Smodes:   %s (0x%x)", cmdparams->source), SmodeMaskToString(u->user->Smode), u->user->Smode);
-	if (u->user->is_away) {
+	if( IsAway( u ) ) {
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Away:     %s", cmdparams->source), u->user->awaymsg);
 	}
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Version:  %s", cmdparams->source), u->version);

@@ -132,7 +132,7 @@ static int operlist(Client *u, void * v)
 	listu = (Client *)v;
 	if (!IsOper(u))
 		return NS_FALSE;
-	if (operlistaway && u->user->is_away)
+	if( operlistaway && IsAway( u ) )
 		return NS_FALSE;
 	if (!operlistserver) {
 		irc_prefmsg (ss_bot, listu, "%-15s %-15s %-10d",
