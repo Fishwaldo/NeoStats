@@ -292,6 +292,7 @@ extern const char version_date[], version_time[];
 typedef struct Server {
 	char name[MAXHOST];
 	int hops;
+	int numeric;
 	time_t connected_since;
 	int ping;
 	char uplink[MAXHOST];

@@ -423,8 +423,7 @@ m_admin (char *origin, char **argv, int argc, int srv)
 	ns_usr_admin (origin, argv, argc);
 }
 
-/*
- * m_credits
+/*m_credits
  *   argv[0] = servername
  */
 static void
@@ -457,12 +456,12 @@ m_server (char *origin, char **argv, int argc, int srv)
 
 	if(!srv) {
 		if (*origin == 0) {
-			me.s = AddServer (argv[0], me.name, argv[1], s);
+			me.s = AddServer (argv[0], me.name, argv[1], argv[2], s);
 		} else {
-			me.s = AddServer (argv[0], origin, argv[1], s);
+			me.s = AddServer (argv[0], origin, argv[1], argv[2], s);
 		}
 	} else {
-		AddServer (argv[0], origin, argv[1], s);
+		AddServer (argv[0], origin, argv[1], argv[2], s);
 	}
 }
 

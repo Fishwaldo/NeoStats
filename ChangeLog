@@ -41,6 +41,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Main services bot is not a mod_usr which tidies up command processing and let's NeoStats 
    show up in bot channel lists (M)
  - Optimise core CTCP checks to avoid unnecessary processing (M)
+ - Add numeric support to server structures (M)
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database

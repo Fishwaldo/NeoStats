@@ -58,7 +58,7 @@ new_server (const char *name)
 }
 
 Server *
-AddServer (const char *name, const char *uplink, const char* hops, const char *infoline)
+AddServer (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline)
 {
 	Server *s;
 	char **av;
@@ -68,18 +68,17 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *i
 	s = new_server (name);
 	if(hops) {
 		s->hops = atoi (hops);
-	} else {
-		s->hops = 0;
 	}
-	s->connected_since = me.now;
 	if (uplink) {
 		strlcpy (s->uplink, uplink, MAXHOST);
 	}
-	s->ping = 0;
-	s->flags = 0;
 	if(infoline) {
 		strlcpy (s->infoline, infoline, MAXINFO);
 	}
+	if(numeric) {
+		s->numeric =  atoi(numeric);
+	}
+	s->connected_since = me.now;
 
 	/* run the module event for a new server. */
 	AddStringToList (&av, s->name, &ac);
@@ -256,7 +255,7 @@ init_server_hash (void)
 		nlog (LOG_CRITICAL, LOG_CORE, "Create Server Hash Failed\n");
 		return NS_FAILURE;
 	}
-	AddServer (me.name, NULL, 0, NULL);
+	AddServer (me.name, me.uplink, 0, NULL, me.infoline);
 #ifdef SQLSRV
 	/* add the server hash to the sql library */
 	neo_servers.address = sh;

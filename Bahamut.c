@@ -361,12 +361,12 @@ m_server (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 		if (*origin == 0) {
-			me.s = AddServer (argv[0], me.name, argv[1], NULL);
+			me.s = AddServer (argv[0], me.name, argv[1], NULL, NULL);
 		} else {
-			me.s = AddServer (argv[0], origin, argv[1], NULL);
+			me.s = AddServer (argv[0], origin, argv[1], NULL, NULL);
 		}
 	} else {
-		AddServer (argv[0], origin, argv[1], NULL);
+		AddServer (argv[0], origin, argv[1], NULL, NULL);
 	}
 }
 
