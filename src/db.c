@@ -47,7 +47,7 @@ int DBOpenDatabase(void)
 		dlog(DEBUG1, "db_create: %s", db_strerror(dbret));
 		return -1;
 	}
-	if ((dbret = db_list[index].dbp->open(db_list[index].dbp, NULL, db_list[index].dbname, NULL, DB_BTREE, DB_CREATE, 0664)) != 0) {
+	if ((dbret = db_list[index].dbp->open(db_list[index].dbp, db_list[index].dbname, "Data", DB_BTREE, DB_CREATE, 0664)) != 0) {
 		dlog(DEBUG1, "dbp->open: %s", db_strerror(dbret));
 		return -1;
 	}
@@ -86,7 +86,7 @@ void DBSetData(char* key, void* data, int size)
 {
 	int index;
 
-	dlog(DEBUG1, "DBSetData %s %s", key, data);
+	dlog(DEBUG1, "DBSetData %s %s", key, (char *)data);
 	index = GET_CUR_MODNUM();
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
