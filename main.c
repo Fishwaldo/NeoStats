@@ -22,6 +22,9 @@
 #include "stats.h"
 #include "signal.h"
 #include "dl.h"
+#ifdef HAVE_BACKTRACE
+#include <execinfo.h>
+#endif
 
 char s_Debug[MAXNICK] = "Stats_Debug";
 char s_Services[MAXNICK] = "NeoStats";
@@ -137,14 +140,31 @@ RETSIGTYPE conf_rehash() {
 
 RETSIGTYPE serv_segv() {
 	char name[30];
-
+#ifdef HAVE_BACKTRACE
+ 	void *array[50];
+     	size_t size;
+        char **strings;
+        size_t i;
+/* thanks to gnulibc libary for letting me find this usefull function */
+	size = backtrace (array, 10);
+	strings = backtrace_symbols (array, size);
+#endif
 	if (strlen(segvinmodule) > 1) {
-		log("Uh Oh, Segmentation Fault in Modules Code %s", segvinmodule);
-		log("Location could be %s", segv_location);
-		log("Unloading Module and restoring stacks");
 		globops(me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
 		chanalert(s_Services, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
-		chanalert(s_Services, "Location *could* be %s", segv_location);
+		log("Uh Oh, Segmentation Fault in Modules Code %s", segvinmodule);
+		log("Location could be %s", segv_location);
+		log("Unloading Module and restoring stacks. Doing Backtrace:");
+		chanalert(s_Services, "Location *could* be %s. Doing Backtrace:", segv_location);
+#ifdef HAVE_BACKTRACE
+		for (i = 0; i < size; i++) {
+			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
+			log("BackTrace(%d): %s", i, strings[i]);
+		}
+#else 
+		chanalert(s_Services, "Backtrace not available on this platform");
+		log("Backtrace not available on this platform");
+#endif
 		strcpy(name, segvinmodule);
 		strcpy(segvinmodule, "");
 		unload_module(name, NULL);
@@ -155,11 +175,19 @@ RETSIGTYPE serv_segv() {
 		/* Thanks to Stskeeps and Unreal for this stuff :) */
 		log("Uh Oh, Segmentation Fault.. Server Terminating");
 		log("Details: Buffer: %s", recbuf);
-		log("Approx Location: %s", segv_location);
+		log("Approx Location: %s Backtrace:", segv_location);
 		/* Broadcast it out! */
 		globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
-		chanalert(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
-		globops(me.name,"Dumped Core to netstats.debug, Please Read the Readme file to find out what to do with it!");
+		chanalert(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s Backtrace:", recbuf, segv_location);
+#ifdef HAVE_BACKTRACE
+		for (i = 0; i < size; i++) {
+			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
+			log("BackTrace(%d): %s", i, strings[i]);
+		}
+#else 
+		chanalert(s_Services, "Backtrace not available on this platform");
+		log("Backtrace not available on this platform");
+#endif
 		sleep(2);
 		kill(forked, 3);
 		kill(forked, 9);
