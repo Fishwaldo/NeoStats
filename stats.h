@@ -263,7 +263,6 @@ struct me {
 	unsigned int client:1;
 #endif
 	int action;
-	char message[BUFSIZE];
 	char chan[BUFSIZE];
 	unsigned int onchan:1;
 	unsigned int synced:1;

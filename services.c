@@ -83,7 +83,7 @@ bot_cmd ns_commands[]=
 	{"USERDUMP",	ns_user_dump,	0, 	NS_ULEVEL_ROOT,  	ns_userdump_help, 	1,	ns_userdump_help_oneline},
 	{"CHANDUMP",	ns_chan_dump,	0, 	NS_ULEVEL_ROOT,  	ns_chandump_help, 	1,	ns_chandump_help_oneline},
 	{"SERVERDUMP",	ns_server_dump,	0, 	NS_ULEVEL_ROOT,  	ns_serverdump_help, 1,	ns_serverdump_help_oneline},
-	{"\0",			NULL,			0, 	0,			NULL, 			0,	"\0"}
+	{NULL,			NULL,			0, 	0,			NULL, 			0,	NULL}
 };
 
 int 
