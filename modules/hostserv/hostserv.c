@@ -702,9 +702,13 @@ static int hs_cmd_add (CmdParams *cmdparams)
 			return NS_SUCCESS;
 		}
 	}
-	if (validate_host (cmdparams->av[2]) == NS_FAILURE) {
+	if (validate_host (cmdparams->av[2]) == NS_FAILURE || !index(cmdparams->av[2], '.')) {
 		irc_prefmsg (hs_bot, cmdparams->source, 
 			"%s is an invalid host", cmdparams->av[2]);
+		return NS_SUCCESS;
+	}
+	if (!ircstrcasecmp (cmdparams->av[1], "*")) {
+		irc_prefmsg (hs_bot, cmdparams->source, "* is too general a wildcard for realhost");
 		return NS_SUCCESS;
 	}
 	if (list_find (vhost_list, cmdparams->av[0], findnick)) {
