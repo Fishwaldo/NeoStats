@@ -211,8 +211,8 @@ verify_select_list(char *buf, int *nbuf)
     for (i = 0; i < ncols; i++)
     {
       if (cmd.cols[i])
-        free(cmd.cols[i]);
-      cmd.cols[i] = malloc(strlen(coldefs[i].name) + 1);
+        ns_free(cmd.cols[i]);
+      cmd.cols[i] = ns_malloc(strlen(coldefs[i].name) + 1);
       if (cmd.cols[i] == (void *) 0)
       {
         rtastat.nsyserr++;

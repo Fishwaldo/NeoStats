@@ -431,7 +431,7 @@ static int cs_event_server (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	irc_chanalert (cs_bot, "\2SERVER\2 %s has joined the network at %s",
-		cmdparams->source->name, cmdparams->source->uplink);
+		cmdparams->source->name, cmdparams->source->uplink->name);
 	return NS_SUCCESS;
 }
 
@@ -439,7 +439,7 @@ static int cs_event_squit (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	irc_chanalert (cs_bot, "\2SERVER\2 %s has left the network at %s for %s",
-		cmdparams->source->name, cmdparams->source->uplink, 
+		cmdparams->source->name, cmdparams->source->uplink->name, 
 		cmdparams->param ? cmdparams->param : "reason unknown");
 	return NS_SUCCESS;
 }

@@ -805,7 +805,7 @@ YY_RULE_SETUP
 					int i;
 					for (i=0; i<MXPARSESTR; i++) {
 						if (parsestr[i] == (char *) NULL) {
-							parsestr[i] = strdup(yytext);
+							parsestr[i] = sstrdup(yytext);
 							break;
 						}
 					}
@@ -837,7 +837,7 @@ YY_RULE_SETUP
 					int i;
 					for (i=0; i<MXPARSESTR; i++) {
 						if (parsestr[i] == (char *) NULL) {
-							parsestr[i] = strdup(yytext);
+							parsestr[i] = sstrdup(yytext);
 							break;
 						}
 					}
@@ -869,7 +869,7 @@ YY_RULE_SETUP
 					int i;
 					for (i=0; i<MXPARSESTR; i++) {
 						if (parsestr[i] == (char *) NULL) {
-							parsestr[i] = strdup(yytext);
+							parsestr[i] = sstrdup(yytext);
 							break;
 						}
 					}
@@ -1802,7 +1802,7 @@ static void *yy_flex_alloc( size )
 yy_size_t size;
 #endif
 	{
-	return (void *) malloc( size );
+	return (void *) ns_malloc( size );
 	}
 
 #ifdef YY_USE_PROTOS
@@ -1830,7 +1830,7 @@ static void yy_flex_free( ptr )
 void *ptr;
 #endif
 	{
-	free( ptr );
+	ns_free( ptr );
 	}
 
 #if YY_MAIN

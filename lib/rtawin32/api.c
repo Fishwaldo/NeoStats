@@ -348,7 +348,7 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int connid)
         }
         else
         {
-          conn = calloc(1, sizeof(EpgConn));
+          conn = ns_calloc(sizeof(EpgConn));
           snprintf(conn->cmd, 1000, "Authenticating");
           snprintf((char *) conn->username, 32, "%s", &buf[72]);
           conn->id = connid;
@@ -390,7 +390,8 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int connid)
         /* pass before username (and thus conn?) Bah */
         return (RTA_CLOSE);
       }
-      snprintf((char *) conn->password, 32, "%s", &buf[4]);
+#if 0
+	  snprintf((char *) conn->password, 32, "%s", &buf[4]);
       nreply = MX_LN_SZ;
       snprintf(line, MX_LN_SZ,
         "select * from pg_user where usename=\"%s\" and passwd = \"%s\"",
@@ -422,7 +423,7 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int connid)
 
         return (RTA_CLOSE);
       }
-
+#endif
       /* XXX validate it */
       *nin -= length;
       out[0] = 'R';
@@ -499,7 +500,7 @@ deldbconnection(int connid)
  	if (conn->id == connid) {
  		list_delete(pgconn, lnode);
  		lnode_destroy(lnode);
- 		free(conn);
+ 		ns_free(conn);
  		return;
  	}
  	lnode = list_next(pgconn, lnode);	
