@@ -394,12 +394,18 @@ void get_map(char *uplink, int level)
 
 		if ((level == 0) && (s->uplinkname[0] == 0)) {
 			/* its the root server */
+			if (StatServ.exclusions && IsExcluded(s)) {
+				get_map(s->name, level);
+			}
 			fprintf (opf, "<table border=0><tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Ping/Max</th></tr>");
 			fprintf (opf, "<tr><td>%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
 				s->server->ping, (int)ss->highest_ping);
 			get_map(s->name, level + 1);
 		} else if ((level > 0) && !ircstrcasecmp(uplink, s->uplinkname)) {
+			if (StatServ.exclusions && IsExcluded(s)) {
+				get_map(s->name, level);
+			}
 			/* its not the root server */
 			buf[0]='\0';
 			for (i = 1; i < level; i++) {
