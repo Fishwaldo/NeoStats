@@ -92,12 +92,12 @@ static int flood_test( Client *u )
 	if( UserLevel( u ) >= NS_ULEVEL_OPER )	
 		return NS_FALSE;
 	/* calculate and test flood values */
-	if( (me.now - u->user->tslastmsg ) > me.msgsampletime ) {
+	if( (me.now - u->user->tslastmsg ) > nsconfig.msgsampletime ) {
 		u->user->tslastmsg = me.now;
 		u->user->flood = 0;
 		return NS_FALSE;
 	}
-	if( u->user->flood >= me.msgthreshold ) {
+	if( u->user->flood >= nsconfig.msgthreshold ) {
 		nlog( LOG_NORMAL, "FLOODING: %s!%s@%s", u->name, u->user->username, u->user->hostname );
 		irc_svskill( ns_botptr, u, _("%s!%s( Flooding Services. )" ), me.name, ns_botptr->name );
 		return NS_TRUE;
@@ -206,8 +206,8 @@ static int bot_chan_event( Event event, CmdParams *cmdparams )
 	hash_scan_begin( &bs, bothash );
 	while( ( bn = hash_scan_next( &bs ) ) != NULL ) {
 		botptr = hnode_get( bn );
-		cm = list_first( botptr->u->user->chans );
 		if( !(botptr->u->user->Umode & UMODE_DEAF ) ) {
+			cm = list_first( botptr->u->user->chans );
 			while( cm ) {	
 				chan = ( char * ) lnode_get( cm );
 				cmdparams->bot = botptr;
@@ -463,11 +463,10 @@ int ns_cmd_botlist( CmdParams *cmdparams )
 		botptr = hnode_get( bn );
 		if( ( botptr->flags & 0x80000000 ) ) {
 			irc_prefmsg( ns_botptr, cmdparams->source, __("NeoStats", cmdparams->source ) );
-			irc_prefmsg( ns_botptr, cmdparams->source, __("Bot: %s", cmdparams->source ), botptr->name );
 		} else {
 			irc_prefmsg( ns_botptr, cmdparams->source, __("Module: %s", cmdparams->source ), botptr->moduleptr->info->name );
-			irc_prefmsg( ns_botptr, cmdparams->source, __("Bot: %s", cmdparams->source ), botptr->name );
 		}
+		irc_prefmsg( ns_botptr, cmdparams->source, __("Bot: %s", cmdparams->source ), botptr->name );
 		cm = list_first( botptr->u->user->chans );
 		i = 0;
 		while( cm ) {
