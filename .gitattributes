@@ -474,6 +474,7 @@ src/win32/neostats.aps -text
 src/win32/neostats.bmp -text
 src/win32/neostats.rc -text
 src/win32/resource.h -text
+src/win32/winmain.c -text
 tools/Makefile.in -text
 tools/README.kptool -text
 tools/cfgtool/Makefile -text
