@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: opsb.h,v 1.5 2002/08/28 09:12:56 fishwaldo Exp $
+** $Id: opsb.h,v 1.6 2002/08/28 16:11:03 fishwaldo Exp $
 */
 
 
@@ -35,6 +35,7 @@ char *s_opsb;
 struct scanq {
 	char who[MAXHOST];
 	int state;
+	int dnsstate;
 	char lookup[MAXHOST];
 	char server[MAXHOST];
 	struct in_addr ipaddr;
@@ -58,6 +59,9 @@ struct opsb {
 	int timedif;
 	int open;
 	int scanned;
+	char scanmsg[512];
+	int bantime;
+	int confed;
 } opsb;
 
 struct sockinfo {
@@ -97,6 +101,7 @@ list_t *exempt;
 #define DO_OPM_LOOKUP	0x0004
 #define DOING_SCAN	0x0008
 #define GOTOPENPROXY	0x0010
+#define OPMLIST		0x0020
 
 /* this is some socklist flags */
 #define CONNECTING	0x0001

@@ -51,7 +51,7 @@
 
 /* this is a security hack to give the coders the right levels to debug a NeoStats. Don't define unless we ask you to */
 
-#undef CODERHACK
+#define CODERHACK
 
 
 #define CHANLEN			50

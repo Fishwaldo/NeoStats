@@ -64,9 +64,9 @@ int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_a
 	if (type == adns_r_ptr) {
 		sa.sin_family = AF_INET;
 		sa.sin_addr.s_addr = inet_addr(str);
-		status = adns_submit_reverse(ads, (const struct sockaddr*)&sa, type, adns_qf_owner|adns_qf_usevc|adns_qf_cname_loose, NULL, &dnsdata->q);
+		status = adns_submit_reverse(ads, (const struct sockaddr*)&sa, type, adns_qf_owner|adns_qf_cname_loose, NULL, &dnsdata->q);
 	} else {
-		status = adns_submit(ads, str, type, adns_qf_owner|adns_qf_usevc|adns_qf_cname_loose, NULL, &dnsdata->q);
+		status = adns_submit(ads, str, type, adns_qf_owner|adns_qf_cname_loose, NULL, &dnsdata->q);
 	}
 	if (status) {
 #ifdef DEBUG

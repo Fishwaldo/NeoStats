@@ -2,7 +2,7 @@
 *
 ** Module:  opsb
 ** Author: Fish
-** $Id: opsb_help.c,v 1.1 2002/08/22 13:53:08 fishwaldo Exp $
+** $Id: opsb_help.c,v 1.2 2002/08/28 16:11:03 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -21,7 +21,7 @@ NULL
 
 const char *opsb_help_oper[] = {
 "OPERTATOR COMMANDS:",
-"     CHECK    STATUS    SET",
+"     CHECK    STATUS    SET    EXCLUDE",
 "",
 NULL
 };
@@ -95,6 +95,26 @@ const char *opsb_help_set[] = {
 "                        (when two servers link together)",
 "    \2SCANMSG\2       - This is the message sent to a user when we scan their hosts",
 "    \2BANTIME\2       - This is how long the user will be banned from the network for",
+"",
+NULL
+};
+
+const char *opsb_help_exclude[] = {
+"Usage: \2EXCLUDE <LIST/ADD/DEL>\2",
+"",
+"This command lets you view or manipulate the exception list.",
+"Exception lists are used to exclude users, or servers from scanning",
+"You should at least add a server entry for your services irc name, to stop",
+"OPSB from scanning Nickserv, Chanserv etc",
+"The Options are:",
+"    \2LIST\2         - This will list the current exceptions and the positions in the list",
+"                       If you wish to remove a entry, you must exaime the list position first",
+"    \2ADD <hostname> <1/0>\2",
+"                     - This option will add a entry of <hostname> to the exception list",
+"                       a Value of 1 after the hostname indicates a Servername (eg, services.irc-chat.net)",
+"                       a Value of 0 after the hostname indicates a hostname (eg, *.adsl.home.com)",
+"                       Wildcards such as * and ? may be used in the hostname portion",
+"    \2DEL <NUM>\2    - This will delete entry numbered <NUM> in the list from the exclusions"
 "",
 NULL
 };

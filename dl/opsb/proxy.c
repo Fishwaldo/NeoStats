@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: proxy.c,v 1.5 2002/08/28 09:11:47 fishwaldo Exp $
+** $Id: proxy.c,v 1.6 2002/08/28 16:11:03 fishwaldo Exp $
 */
 
 
@@ -72,6 +72,7 @@ void cleanlist() {
 		/* savescan is a flag if we should save this entry into the cache file */
 		savescan = 1;	
 		
+		if (scandata->dnsstate == OPMLIST) savescan = 0;
 		/* if this is not valid, exit */
 		if (!scandata->socks) break;
 		/* check for open sockets */
@@ -81,18 +82,24 @@ void cleanlist() {
 			sockdata = lnode_get(socknode);
 			/* if it was a open proxy, don't save the cache */
 			if (sockdata->flags == OPENPROXY) savescan = 0;
-			if (((sockdata->flags != UNCONNECTED) && (sockdata->flags != OPENPROXY)) && (timedout == 1))  {
-				/* it still has open socks */
-				snprintf(sockname, 64, "%s %d", scandata->who, sockdata->type);
-				sockdata->flags = UNCONNECTED;
-#ifdef DEBUG
-				log("Closing Socket %s in cleanlist function for timeout()", sockname);
-#endif
-				sock_disconnect(sockname);
-				free(sockdata);
-			}  else
-				finished = 0;
-			
+
+			/* if this still has sockets connected, set finished flaged to 0 to not delete scans */
+			if ((sockdata->flags == SOCKCONNECTED) || (sockdata->flags == CONNECTING)) finished = 0;
+			if (timedout == 1) {
+				if ((sockdata->flags == SOCKCONNECTED) || (sockdata->flags == CONNECTING))  {
+					/* it still has open socks */
+					snprintf(sockname, 64, "%s %d", scandata->who, sockdata->type);
+					sockdata->flags = UNCONNECTED;
+#ifdef DEBUG	
+					log("Closing Socket %s in cleanlist function for timeout()", sockname);
+#endif	
+					if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "Timeout Connecting to Proxy %s on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
+		
+					sock_disconnect(sockname);
+					free(sockdata);
+				}
+			}  
+	
 			socknode = list_next(scandata->socks, socknode);
 		}
 
@@ -138,7 +145,7 @@ void send_status(User *u) {
 		else 
 			prefmsg(u->nick, s_opsb, "Scanning %s (%s)", scandata->lookup, inet_ntoa(scandata->ipaddr));
 		
-		switch(scandata->state) {
+		switch(scandata->dnsstate) {
 			case REPORT_DNS:
 					prefmsg(u->nick, s_opsb, "Looking up IP Address");
 					break;
@@ -148,6 +155,10 @@ void send_status(User *u) {
 			case DO_OPM_LOOKUP:
 					prefmsg(u->nick, s_opsb, "Looking up DNS blacklist");
 					break;
+			default:
+					prefmsg(u->nick, s_opsb, "Unknown State (DNS)");
+		}
+		switch(scandata->state) {
 			case DOING_SCAN:
 					prefmsg(u->nick, s_opsb, "Scanning for Open Proxies");
 					break;
@@ -155,7 +166,7 @@ void send_status(User *u) {
 					prefmsg(u->nick, s_opsb, "Contains a Open Proxy");
 					break;
 			default:
-					prefmsg(u->nick, s_opsb, "Unknown State");
+					prefmsg(u->nick, s_opsb, "Unknown State (Scan)");
 		}
 		socknode = list_first(scandata->socks);
 		while (socknode) {
@@ -207,8 +218,8 @@ void start_proxy_scan(lnode_t *scannode) {
 			/* its ok */
 			sockdata = malloc(sizeof(socklist));
 			sockdata->sock = j;
-			sockdata->flags = CONNECTING;
 			sockdata->function = proxy_list[i].scan;
+			sockdata->flags = CONNECTING;
 			sockdata->type = i;
 			sockdata->bytes = 0;
 			socknode = lnode_create(sockdata);
