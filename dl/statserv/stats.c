@@ -549,8 +549,9 @@ int s_new_user(char **av, int ac)
 		return 0;
 	}
 	
-	if (u->server->name == me.name)
+	if (IsMe(u)) {
 		return 0;
+	}
 
 	s = findstats(u->server->name);
 	IncreaseUsers(s);
