@@ -1033,7 +1033,7 @@ int
 snick_cmd (const char *oldnick, const char *newnick)
 {
 	UserNick (oldnick, newnick);
-	send_nick (oldnick, newnick);
+	send_nickchange (oldnick, newnick);
 	return 1;
 }
 
@@ -1242,50 +1242,50 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 		tstime = c->tstime;
 	}
 	switch (chflag) {
-#ifdef CMODE_CHANOP
+#ifdef CMODE_FL_CHANOP
 	case CMODE_CHANOP:
 		flag = CMODE_FL_CHANOP;
 		mode= CMODE_CH_CHANOP;
 		break;
 #endif
-#ifdef CMODE_VOICE
+#ifdef CMODE_FL_VOICE
 	case CMODE_VOICE:
 		flag = CMODE_FL_VOICE;
 		mode= CMODE_CH_VOICE;
 		break;
 #endif
-#ifdef CMODE_CHANOWNER
+#ifdef CMODE_FL_CHANOWNER
     case CMODE_CHANOWNER:
         flag = CMODE_FL_CHANOWNER;
         mode= CMODE_CH_CHANOWNER;
         break;
 #endif
-#ifdef CMODE_CHANPROT
+#ifdef CMODE_FL_CHANPROT
     case CMODE_CHANPROT:
         flag = CMODE_FL_CHANPROT;
         mode= CMODE_CH_CHANPROT;
         break;
 #endif
-#ifdef CMODE_VIP
+#ifdef CMODE_FL_VIP
     case CMODE_VIP:
 		flag = CMODE_FL_VIP;
 		mode= CMODE_CH_VIP;
 		break;
 #endif
-#ifdef CMODE_HALFOP
+#ifdef CMODE_FL_HALFOP
     case CMODE_HALFOP:
         flag = CMODE_FL_HALFOP;
         mode= CMODE_CH_HALFOP;
         break;
 #endif
-#ifdef CMODE_UOP
+#ifdef CMODE_FL_UOP
     case CMODE_UOP:
         flag = CMODE_FL_UOP;
         mode= CMODE_CH_UOP;
         break;
 #endif
 #ifndef FAKE_CMODE_CHANADMIN
-#ifdef CMODE_CHANADMIN
+#ifdef CMODE_FL_CHANADMIN
 	case CMODE_CHANADMIN:
 		flag = CMODE_FL_CHANADMIN;
 		mode= CMODE_CH_CHANADMIN;
@@ -1293,7 +1293,7 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 #endif
 #endif
 #ifdef CMODE_SILENCE
-	case CMODE_SILENCE:
+	case CMODE_FL_SILENCE:
 		flag = CMODE_FL_SILENCE;
 		mode= CMODE_CH_SILENCE;
 		break;
@@ -1310,3 +1310,58 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 	free (av);
 	return 1;
 }
+
+/* temp until SecureServ 1.1 */
+#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID)
+#else
+int
+sjoin_cmd (const char *who, const char *chan)
+{
+	send_join (who, chan);
+	join_chan (who, chan);
+	return 1;
+}
+#endif
+
+int
+sping_cmd (const char *from, const char *reply, const char *to)
+{
+	send_ping (from, reply, to);
+	return 1;
+}
+
+int
+spong_cmd (const char *reply)
+{
+	send_pong (reply);
+	return 1;
+}
+
+int
+sserver_cmd (const char *name, const int numeric, const char *infoline)
+{
+	send_server (name, numeric, infoline);
+	return 1;
+}
+
+int
+ssquit_cmd (const char *server, const char *quitmsg)
+{
+	send_squit (server, quitmsg);
+	return 1;
+}
+
+int
+snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
+{
+	char* newmode;
+	
+	newmode = UmodeMaskToString(mode);
+	send_nick(nick, ident, host, realname, newmode, me.now);
+	AddUser (nick, ident, host, realname, me.name, 0, me.now);
+#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(HYBRID7) || defined(IRCU) || defined(NEOIRCD) || defined(QUANTUM) || defined(LIQUID)
+	UserMode (nick, newmode);
+#endif
+	return 1;
+}
+

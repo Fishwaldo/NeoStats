@@ -167,11 +167,10 @@ const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
-int
-sserver_cmd (const char *name, const int numeric, const char *infoline)
+void
+send_server (const char *name, const int numeric, const char *infoline)
 {
 	sts (":%s %s %s %d :%s", me.name, (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
-	return 1;
 }
 
 int
@@ -183,11 +182,10 @@ slogin_cmd (const char *name, const int numeric, const char *infoline, const cha
 	return 1;
 }
 
-int
-ssquit_cmd (const char *server, const char *quitmsg)
+void
+send_squit (const char *server, const char *quitmsg)
 {
 	sts ("%s %s :%s", (me.token ? TOK_SQUIT : MSG_SQUIT), server, quitmsg);
-	return 1;
 }
 
 void 
@@ -202,12 +200,10 @@ send_part (const char *who, const char *chan)
 	sts (":%s %s %s", who, (me.token ? TOK_PART : MSG_PART), chan);
 }
 
-int
-sjoin_cmd (const char *who, const char *chan)
+void 
+send_join (const char *who, const char *chan)
 {
 	sts (":%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
-	join_chan (who, chan);
-	return 1;
 }
 
 void 
@@ -216,19 +212,16 @@ send_cmode (const char *who, const char *chan, const char *mode, const char *arg
 	sts (":%s %s %s %s %s %lu", me.name, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args, me.now);
 }
 
-int
-snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
+void
+send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime)
 {
-	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, me.now, ident, host, me.name, realname);
-	AddUser (nick, ident, host, realname, me.name, 0, me.now);
-	return 1;
+	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, tstime, ident, host, me.name, realname);
 }
 
-int
-sping_cmd (const char *from, const char *reply, const char *to)
+void
+send_ping (const char *from, const char *reply, const char *to)
 {
 	sts (":%s %s %s :%s", from, (me.token ? TOK_PING : MSG_PING), reply, to);
-	return 1;
 }
 
 void 
@@ -243,18 +236,16 @@ send_numeric (const int numeric, const char *target, const char *buf)
 	sts (":%s %d %s :%s", me.name, numeric, target, buf);
 }
 
-int
-spong_cmd (const char *reply)
+void
+send_pong (const char *reply)
 {
 	sts ("%s %s", (me.token ? TOK_PONG : MSG_PONG), reply);
-	return 1;
 }
 
-int
-snetinfo_cmd ()
+void
+send_netinfo (void)
 {
 	sts (":%s %s 0 %d %d %s 0 0 0 :%s", me.name, MSG_SNETINFO, (int)me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname);
-	return 1;
 }
 
 int
@@ -277,7 +268,7 @@ send_svskill (const char *target, const char *reason)
 }
 
 void 
-send_nick (const char *oldnick, const char *newnick)
+send_nickchange (const char *oldnick, const char *newnick)
 {
 	sts (":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, (int)me.now);
 }
@@ -522,7 +513,7 @@ Usr_Part (char *origin, char **argv, int argc)
 static void
 Srv_Ping (char *origin, char **argv, int argc)
 {
-	spong_cmd (argv[0]);
+	send_pong (argv[0]);
 }
 
 static void

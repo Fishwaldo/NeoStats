@@ -86,8 +86,10 @@ void send_globops (char *from, char *buf);
 void send_wallops (char *from, char *buf);
 void send_numeric (const int numeric, const char *target, const char *buf);
 void send_umode (const char *who, const char *target, const char *mode);
+void send_join (const char *who, const char *chan);
+void send_sjoin (const char *who, const char *chan, const char flag, time_t tstime);
 void send_part (const char *who, const char *chan);
-void send_nick (const char *oldnick, const char *newnick);
+void send_nickchange (const char *oldnick, const char *newnick);
 void send_cmode (const char *who, const char *chan, const char *mode, const char *args);
 void send_quit (const char *who, const char *quitmsg);
 void send_kill (const char *from, const char *target, const char *reason);
@@ -119,7 +121,11 @@ void send_smo (const char *from, const char *umodetarget, const char *msg);
 #endif
 void send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason);
 void send_rakill (const char *host, const char *ident);
-void send_sjoin (const char *who, const char *chan, const char flag, time_t tstime);
+void send_ping (const char *from, const char *reply, const char *to);
+void send_pong (const char *reply);
+void send_server (const char *name, const int numeric, const char *infoline);
+void send_squit (const char *server, const char *quitmsg);
+void send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime);
 
 int sserver_cmd (const char *name, const int numeric, const char *infoline);
 int slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass);

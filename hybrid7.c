@@ -156,11 +156,10 @@ seob_cmd (const char *server)
 }
 
 
-int
-sserver_cmd (const char *name, const int numeric, const char *infoline)
+void
+send_server (const char *name, const int numeric, const char *infoline)
 {
 	sts (":%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
-	return 1;
 }
 
 int
@@ -172,11 +171,10 @@ slogin_cmd (const char *name, const int numeric, const char *infoline, const cha
 	return 1;
 }
 
-int
-ssquit_cmd (const char *server, const char *quitmsg)
+void
+send_squit (const char *server, const char *quitmsg)
 {
 	sts ("%s %s :%s", MSG_SQUIT, server, quitmsg);
-	return 1;
 }
 
 void 
@@ -191,12 +189,10 @@ send_part (const char *who, const char *chan)
 	sts (":%s %s %s", who, MSG_PART, chan);
 }
 
-int
-sjoin_cmd (const char *who, const char *chan)
+void 
+send_join (const char *who, const char *chan)
 {
 	sts (":%s %s %d %s + :%s", me.name, MSG_SJOIN, (int)me.now, chan, who);
-	join_chan (who, chan);
-	return 1;
 }
 
 void 
@@ -205,23 +201,16 @@ send_cmode (const char *who, const char *chan, const char *mode, const char *arg
 	sts (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, me.now);
 }
 
-int
-snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
+void
+send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime)
 {
-	char* newmode;
-	
-	newmode = UmodeMaskToString(mode);
-	sts ("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, me.now, newmode, ident, host, me.name, realname);
-	AddUser (nick, ident, host, realname, me.name, 0, me.now);
-	UserMode (nick, newmode);
-	return 1;
+	sts ("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, tstime, newmode, ident, host, me.name, realname);
 }
 
-int
-sping_cmd (const char *from, const char *reply, const char *to)
+void
+send_ping (const char *from, const char *reply, const char *to)
 {
 	sts (":%s %s %s :%s", from, MSG_PING, reply, to);
-	return 1;
 }
 
 void 
@@ -236,11 +225,10 @@ send_numeric (const int numeric, const char *target, const char *buf)
 	sts (":%s %d %s :%s", me.name, numeric, target, buf);
 }
 
-int
-spong_cmd (const char *reply)
+void
+send_pong (const char *reply)
 {
 	sts ("%s %s", MSG_PONG, reply);
-	return 1;
 }
 
 void 
@@ -250,7 +238,7 @@ send_kill (const char *from, const char *target, const char *reason)
 }
 
 void 
-send_nick (const char *oldnick, const char *newnick)
+send_nickchange (const char *oldnick, const char *newnick)
 {
 	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int)me.now);
 }
@@ -567,7 +555,7 @@ Usr_Part (char *origin, char **argv, int argc)
 static void
 Srv_Ping (char *origin, char **argv, int argc)
 {
-	spong_cmd (argv[0]);
+	send_pong (argv[0]);
 }
 
 static void

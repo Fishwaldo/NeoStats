@@ -248,11 +248,10 @@ const int ircd_smodecount = ((sizeof (user_smodes) / sizeof (user_smodes[0])));
 #endif
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
-int
-sserver_cmd (const char *name, const int numeric, const char *infoline)
+void
+send_server (const char *name, const int numeric, const char *infoline)
 {
 	sts (":%s %s %s %d :%s", me.name, (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
-	return 1;
 }
 
 int
@@ -270,11 +269,10 @@ slogin_cmd (const char *name, const int numeric, const char *infoline, const cha
 	return 1;
 }
 
-int
-ssquit_cmd (const char *server, const char *quitmsg)
+void
+send_squit (const char *server, const char *quitmsg)
 {
 	sts ("%s %s :%s", (me.token ? TOK_SQUIT : MSG_SQUIT), server, quitmsg);
-	return 1;
 }
 
 void 
@@ -290,53 +288,18 @@ send_part (const char *who, const char *chan)
 }
 
 #ifdef ULTIMATE3
-int
-sjoin_cmd (const char *who, const char *chan, unsigned long chflag)
+void 
+send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
 {
-	char flag;
-	char mode;
-	char **av;
-	int ac;
-
-	switch (chflag) {
-	case CMODE_CHANOP:
-		flag = '@';
-		mode= '0';
-		break;
-	case CMODE_HALFOP:
-		flag = '%';
-		mode= 'h';
-		break;
-	case CMODE_VOICE:
-		flag = '+';
-		mode= 'v';
-		break;
-	case CMODE_CHANADMIN:
-		flag = '!';
-		mode= 'a';
-		break;
-	default:
-		flag = ' ';
-		mode= '\0';
-	}
-	
-	/* NO TS SUPPORT. BAAAAAAD. need to port the Bahumat TS stuff to all IRCd's and test */
-	sts (":%s %s %ld %s + :%c%s", me.name, MSG_SJOIN, (long)time(NULL), chan, flag, who);
-	join_chan (who, chan);
-	ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", chan, mode, who);
-	ac = split_buf (ircd_buf, &av, 0);
-	ChanMode (me.name, av, ac);
-	free (av);
-
+	sts (":%s %s %ld %s + :%c%s", me.name, MSG_SJOIN, tstime, chan, flag, who);
+}
 #else
-int
-sjoin_cmd (const char *who, const char *chan)
+void 
+send_join (const char *who, const char *chan)
 {
 	sts (":%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
-	join_chan (who, chan);
-#endif
-	return 1;
 }
+#endif
 
 void 
 send_cmode (const char *who, const char *chan, const char *mode, const char *args)
@@ -344,31 +307,20 @@ send_cmode (const char *who, const char *chan, const char *mode, const char *arg
 	sts (":%s %s %s %s %s %lu", who, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args, me.now);
 }
 
+void
+send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime)
+{
 #ifndef ULTIMATE3
-int
-snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
-{
-	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, me.now, ident, host, me.name, realname);
-	AddUser (nick, ident, host, realname, me.name, 0, me.now);
+	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, tstime, ident, host, me.name, realname);
 #else
-int
-snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
-{
-	char* newmode;
-	
-	newmode = UmodeMaskToString(mode);
-	sts ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, me.now, newmode, ident, host, me.name, me.now, realname);
-	AddUser (nick, ident, host, realname, me.name, 0, me.now);
-	UserMode (nick, newmode);
+	sts ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, tstime, newmode, ident, host, me.name, tstime, realname);
 #endif
-	return 1;
 }
 
-int
-sping_cmd (const char *from, const char *reply, const char *to)
+void
+send_ping (const char *from, const char *reply, const char *to)
 {
 	sts (":%s %s %s :%s", from, (me.token ? TOK_PING : MSG_PING), reply, to);
-	return 1;
 }
 
 void 
@@ -383,18 +335,16 @@ send_numeric (const int numeric, const char *target, const char *buf)
 	sts (":%s %d %s :%s", me.name, numeric, target, buf);
 }
 
-int
-spong_cmd (const char *reply)
+void
+send_pong (const char *reply)
 {
 	sts ("%s %s", (me.token ? TOK_PONG : MSG_PONG), reply);
-	return 1;
 }
 
-int
-snetinfo_cmd ()
+void
+send_netinfo (void)
 {
 	sts (":%s %s 0 %ld %d %s 0 0 0 :%s", me.name, MSG_SNETINFO, (long)me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname);
-	return 1;
 }
 
 int
@@ -417,7 +367,7 @@ send_svskill (const char *target, const char *reason)
 }
 
 void 
-send_nick (const char *oldnick, const char *newnick)
+send_nickchange (const char *oldnick, const char *newnick)
 {
 	sts (":%s %s %s %ld", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, (long)me.now);
 }
@@ -790,10 +740,10 @@ Usr_Part (char *origin, char **argv, int argc)
 static void
 Srv_Ping (char *origin, char **argv, int argc)
 {
-	spong_cmd (argv[0]);
+	send_pong (argv[0]);
 #ifdef ULTIMATE3
 	if (ircd_srv.burst) {
-		sping_cmd (me.name, argv[0], argv[0]);
+		send_ping (me.name, argv[0], argv[0]);
 	}
 #endif
 }

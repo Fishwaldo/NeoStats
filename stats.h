@@ -529,8 +529,10 @@ int numeric (const int numeric, const char *target, const char *data, ...) __att
 #define snumeric_cmd numeric
 
 /* function declarations */
+int ssjoin_cmd (const char *who, const char *chan, unsigned long chflag);
+/* temp until SecureServ 1.1 */
 #if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID)
-int sjoin_cmd (const char *who, const char *chan, unsigned long chflag);
+#define sjoin_cmd ssjoin_cmd 
 #else
 int sjoin_cmd (const char *who, const char *chan);
 #endif

@@ -264,6 +264,6 @@ PingServers (void)
 			s->ping = 0;
 			continue;
 		}
-		sping_cmd (me.name, me.name, s->name);
+		send_ping (me.name, me.name, s->name);
 	}
 }
