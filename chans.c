@@ -282,7 +282,7 @@ ChanMode (char *origin, char **av, int ac)
 									lnode_destroy (mn);
 									free (m);
 
-									if (!(chan_modes[i].mode == CMODE_LIMIT || chan_modes[i].mode == CMODE_KEY))
+									if (!(chan_modes[i].mode == CMODE_LIMIT))
 										j++;
 								}
 							} else {

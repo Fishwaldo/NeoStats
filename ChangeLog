@@ -80,6 +80,9 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Add Berkeley support for statserv (M)
  - Add basic support for module side auth to use within SecureServ (M)
  - Fix for bug 117 (Buffer overflow) (M)
+ - Add selection of rotuines to determine channel status e.g. is_chanop (M)
+ - StatServ now saves and loads client version records (M)
+ - Fix mode tracking for -k (Key) (M)
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database
