@@ -143,6 +143,9 @@ void do_swhois (char *who, char *swhois);
 #ifdef MSG_TKL
 void do_tkl(const char *add, const char *type, const char *user, const char *host, const char *setby, const char *tsexpire, const char *tsset, const char *reason);
 #endif
+#ifdef MSG_EOS
+void do_eos(const char *name);
+#endif
 
 /* Defined in ircd specific files but common to all */
 void init_ircd (void);

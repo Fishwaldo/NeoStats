@@ -140,9 +140,9 @@ then
   AC_DEFINE(NEED_UNDERSCORE_PREFIX)
 fi
 
-dnl check for berkely db.h support
-AC_CHECK_HEADERS(db.h)
-
+dnl check for berkeley db support
+AC_CHECK_HEADER(db.h, AC_DEFINE(HAVE_DB_H, 1, [Define to 1 if you have the <db.h> header file.])
+				AC_CHECK_LIB(db, db_create, LIBDB="-ldb"))
 
 PCRE_MAJOR=4
 PCRE_MINOR=3
@@ -540,6 +540,7 @@ else
   AC_DEFINE_UNQUOTED(NEO_PREFIX, "${prefix}")
 fi
 
+AC_SUBST(LIBDB)
 AC_SUBST(MAKEDEPENDENCIES)
 AC_SUBST(DIRINST)
 AC_SUBST(CFLAGS)

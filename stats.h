@@ -47,6 +47,12 @@
 #include <setjmp.h>
 #include <assert.h>
 
+#include "config.h"
+
+#ifdef HAVE_DB_H
+/*#define USE_BERKELEY*/
+#endif
+
 /* Temp disable for upcoming release until all external modules 
  * have been released with warnings fixed
  */
@@ -65,7 +71,6 @@
 #include "pcre.h"
 #include "list.h"
 #include "hash.h"
-#include "config.h"
 #include "support.h"
 #include "ircstring.h"
 #include "events.h"
@@ -250,7 +255,8 @@
 /* these defines are for the flags for users, channels and servers */
 #define NS_FLAGS_EXCLUDED	0x00000001 /* this entry matched a exclusion */
 #define NS_FLAGS_ME			0x00000002 /* indicates the server/user is a NeoStats one */
-
+#define NS_FLAGS_SYNCHED	0x00000004 /* indicates the server is now synched */
+#define NS_FLAGS_NETJOIN	0x00000008 /* indicates the user is on a net join */
 
 /* Specific errors beyond SUCCESS/FAILURE so that functions can handle errors 
  * Treat as unsigned with top bit set to give us a clear distinction from 
@@ -366,7 +372,7 @@ struct me {
 	char local[MAXHOST];
 	char user[MAXUSER];			/* bot user */
 	char host[MAXHOST];			/* bot host */
-	char rname[MAXREALNAME];	/* bot real name */
+	char realname[MAXREALNAME];	/* bot real name */
 	time_t t_start;
 	unsigned int allbots;
 	unsigned int maxsocks;
@@ -528,26 +534,28 @@ typedef struct bot_cmd {
 #define BOT_FLAG_DEAF	0x00000004
 
 /* SET Comand handling */
-/* (Work in progress) */
 
 typedef enum SET_TYPE {
-	SET_TYPE_BOOLEAN,
-	SET_TYPE_INT,
-	SET_TYPE_STRING,
-	SET_TYPE_NICK,
-	SET_TYPE_USER,
-	SET_TYPE_HOST,
-	SET_TYPE_REALNAME,
+	SET_TYPE_BOOLEAN,	/* ON or OFF */
+	SET_TYPE_INT,		/* valid integer */
+	SET_TYPE_STRING,	/* single string */
+	SET_TYPE_MSG,		/* multiple strings to be treated as a message and stored in one field */
+	SET_TYPE_NICK,		/* valid nick */
+	SET_TYPE_USER,		/* valid user */
+	SET_TYPE_HOST,		/* valid host name */
+	SET_TYPE_REALNAME,	/* valid realname */
+	SET_TYPE_IPV4,		/* valid IPv4 dotted quad */
 #if 0
 /* For future expansion */
 	SET_TYPE_INTRANGE,
 	SET_TYPE_STRINGRANGE,
 #endif
-	SET_TYPE_CUSTOM,
+	SET_TYPE_CUSTOM,	/* handled by module */
 }SET_TYPE;
 
-/* "TESTSTRING", &teststring, TYPE_STRING, 0,string_buffer_size 
-   "TESTINT",    &testint, TYPE_INT 0, 200 */ 
+/** @brief bot_setting structure
+ *  defines SET list for bots
+ */
 typedef struct bot_setting {
 	char			*option;	/* option string */
 	void*			varptr;		/* pointer to var */
@@ -594,7 +602,7 @@ int flood (User * u);
 int join_bot_to_chan (const char *who, const char *chan, unsigned long chflag);
 
 /* (M) For backwards compatibility only, bots are moving to a new interface */
-int init_bot (char * nick, char * user, char * host, char * rname, const char *modes, char * modname);
+int init_bot (char * nick, char * user, char * host, char * realname, const char *modes, char * modname);
 int del_bot (char * nick, char * reason);
 void privmsg_list (char *to, char *from, const char **text);
 void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
@@ -662,10 +670,16 @@ void transfer_status();
 int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback);
 
 /* exclude */
-#define IsExcluded(x) ((x) && (x->flags & NS_FLAGS_EXCLUDED))
+#define IsExcluded(x) ((x) && ((x)->flags & NS_FLAGS_EXCLUDED))
 
 /* Is the user or server a NeoStats one? */
-#define IsMe(x) ((x) && (x->flags & NS_FLAGS_ME))
+#define IsMe(x) ((x) && ((x)->flags & NS_FLAGS_ME))
+
+/* Is the user or server synched? */
+#define IsSynched(x) ((x) && ((x)->flags & NS_FLAGS_SYNCHED))
+
+/* Mark server as synched */
+#define SynchServer(x) (((x)->flags |= NS_FLAGS_SYNCHED))
 
 /* Some standard text help messages */
 extern const char *ns_help_set_nick[];
@@ -676,6 +690,13 @@ extern const char *ns_help_set_realname[];
 int validate_nick (char* nick);
 int validate_user (char* user);
 int validate_host (char* host);
+
+#ifdef USE_BERKELEY
+void DBOpenDatabase(void);
+void DBCloseDatabase(void);
+char* DBGetData(char* key);
+void DBSetData(char* key, char * data);
+#endif
 
 #endif
 

@@ -607,12 +607,14 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 								prefmsg(u->nick, bot_ptr->nick, "%s: %d",
 									set_ptr->option, *(int*)set_ptr->varptr);
 							}
-						break;
+						break;				
+					case SET_TYPE_MSG:
 					case SET_TYPE_STRING:
 					case SET_TYPE_NICK:
 					case SET_TYPE_USER:
 					case SET_TYPE_HOST:
 					case SET_TYPE_REALNAME:
+					case SET_TYPE_IPV4:						
 						prefmsg(u->nick, bot_ptr->nick, "%s: %s",
 							set_ptr->option, (char*)set_ptr->varptr);
 						break;
@@ -730,6 +732,22 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			prefmsg(u->nick, bot_ptr->nick,
 				"%s set to %s", set_ptr->option, av[3]);
 			break;
+		case SET_TYPE_MSG:
+			{
+				char *buf;
+
+				buf = joinbuf(av, ac, 3);
+				strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
+				SetConf((void *)buf, CFGSTR, set_ptr->confitem);
+				chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
+					set_ptr->option, buf, u->nick);
+				nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+					u->nick, u->username, u->hostname, set_ptr->option, buf);
+				prefmsg(u->nick, bot_ptr->nick,
+					"%s set to %s", set_ptr->option, buf);
+				free(buf);
+			}
+			break;
 		case SET_TYPE_NICK:
 			if(validate_nick (av[3]) == NS_FAILURE) {
 				prefmsg(u->nick, bot_ptr->nick,
@@ -761,6 +779,11 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				"%s set to %s", set_ptr->option, av[3]);
 			break;
 		case SET_TYPE_HOST:
+			if (!index(av[3], '.')) {
+				prefmsg(u->nick, bot_ptr->nick,
+					"%s is an invalid hostname", av[3]);
+				break;
+			}
 			if(validate_host (av[3]) == NS_FAILURE) {
 				prefmsg(u->nick, bot_ptr->nick,
 					"%s contains invalid characters", av[3]);
@@ -791,6 +814,21 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				free(buf);
 			}
 			break;
+		case SET_TYPE_IPV4:
+			if (!inet_addr(av[3])) {
+				prefmsg(u->nick, bot_ptr->nick,
+					"Invalid IPV4 format. Should be dotted quad, e.g. 1.2.3.4");
+				return 0;
+			}
+			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
+			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
+			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
+				set_ptr->option, av[3], u->nick);
+			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
+			prefmsg(u->nick, bot_ptr->nick,
+				"%s set to %s", set_ptr->option, av[3]);
+			break;			
 		case SET_TYPE_CUSTOM:
 			if(set_ptr->handler) {
 				set_ptr->handler(u, av, ac);
@@ -804,6 +842,12 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			prefmsg(u->nick, bot_ptr->nick,"Unsupported SET type %d for %s %s", 
 				set_ptr->type, set_ptr->option, av[3]);
 			break;
+	}
+	/* Call back after SET so that a module can "react" to a change in a setting */
+	if(set_ptr->type != SET_TYPE_CUSTOM) {
+		if(set_ptr->handler) {
+			set_ptr->handler(u, av, ac);
+		}
 	}
 	return 1;
 }

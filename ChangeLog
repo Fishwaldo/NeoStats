@@ -75,6 +75,9 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - TLDmap for statserv now works on IRCd's that don't send a IP address in the connect Message (Unreal etc) (F)
  - Core will now lookup ip addresses of users connecting to the network if the IRCd doesn't specify it, and a module says it wants it (StatServ, and port OPSB over as well) (F)
  - StatServ now exports the TLD data to SqlSrv (F)
+ - Added more types to core command set processor - NICK, USER, HOST, REALNAME, IPV4 and MSG (for multiple strings) (M)
+ - Add Unreal EOS support for server synchs (M)
+ - Add Berkeley support for statserv (M)
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database

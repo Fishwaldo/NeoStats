@@ -250,7 +250,7 @@ void verify_hashes(void);
 int add_bot_cmd_list(ModUser *bot_ptr, bot_cmd *bot_cmd_list);
 int del_bot_cmd_list(ModUser *bot_ptr, bot_cmd *bot_cmd_list);
 int run_bot_cmd (ModUser *bot_ptr, User *u, char **av, int ac);
-ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname, const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list, char * modname);
+ModUser * init_mod_bot (char * nick, char * user, char * host, char * realname, const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list, char * modname);
 int CloakHost (ModUser *bot_ptr);
 int del_mod_bot (ModUser *bot_ptr, char * reason);
 void finiModuleHash();

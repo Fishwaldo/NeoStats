@@ -684,7 +684,7 @@ m_netinfo (char *origin, char **argv, int argc, int srv)
 static void 
 m_eos (char *origin, char **argv, int argc, int srv)
 {
-    
+	do_eos (origin);
 }
 #endif
     

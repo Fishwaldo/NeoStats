@@ -653,7 +653,7 @@ ModUser *ss_bot;
 int Online(char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	ss_bot = init_mod_bot(s_StatServ, StatServ.user, StatServ.host, StatServ.rname,
+	ss_bot = init_mod_bot(s_StatServ, StatServ.user, StatServ.host, StatServ.realname,
 		 services_bot_modes, BOT_FLAG_ONLY_OPERS|BOT_FLAG_DEAF, ss_commands, ss_settings, __module_info.module_name);
 
 	StatServ.onchan = 1;

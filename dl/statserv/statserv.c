@@ -103,10 +103,10 @@ static void ss_Config(void)
 		free(tmp);
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "RealName") < 0) {
-		ircsnprintf(StatServ.rname, MAXREALNAME, "/msg %s help",
+		ircsnprintf(StatServ.realname, MAXREALNAME, "/msg %s help",
 			 s_StatServ);
 	} else {
-		strlcpy(StatServ.rname, tmp, MAXREALNAME);
+		strlcpy(StatServ.realname, tmp, MAXREALNAME);
 		free(tmp);
 	}
 	if (GetConf((void *) &StatServ.lagtime, CFGINT, "LagTime") < 0) {
@@ -255,7 +255,9 @@ int __ModInit(int modnum, int apiver)
 	rta_add_table(&statserv_daily);
 
 #endif
-	OpenDatabase();
+#ifdef USE_BERKELEY
+	DBOpenDatabase();
+#endif
 	return 1;
 }
 
@@ -269,7 +271,9 @@ void __ModFini()
 	list_destroy_nodes(fakedaily);
 	list_destroy_nodes(fakenetwork);
 #endif
-	CloseDatabase();
+#ifdef USE_BERKELEY
+	DBCloseDatabase();
+#endif
 
 }
 
@@ -298,7 +302,7 @@ bot_setting ss_settings[]=
 	{"NICK",		&s_StatServ,			SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
 	{"USER",		&StatServ.user,			SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
 	{"HOST",		&StatServ.host,			SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
-	{"REALNAME",	&StatServ.rname,		SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
+	{"REALNAME",	&StatServ.realname,		SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
 	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN,	"HTML_Enabled",		NULL,		ss_help_set_html},
 	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,		NS_ULEVEL_ADMIN,	"HTML_Path",		NULL,		ss_help_set_htmlpath },
 	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN,	"MsgInterval",		"seconds",	ss_help_set_msginterval },

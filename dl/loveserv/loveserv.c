@@ -32,7 +32,7 @@ static ModUser *ls_bot;
 struct ls_cfg { 
 	char user[MAXUSER];
 	char host[MAXHOST];
-	char rname[MAXREALNAME];
+	char realname[MAXREALNAME];
 } ls_cfg;
 
 static int ls_rose(User * u, char **av, int ac);
@@ -78,12 +78,12 @@ static bot_setting ls_settings[]=
 	{"NICK",		&s_LoveServ,		SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
 	{"USER",		&ls_cfg.user,		SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
 	{"HOST",		&ls_cfg.host,		SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
-	{"REALNAME",	&ls_cfg.rname,		SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
+	{"REALNAME",	&ls_cfg.realname,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
 };
 
 static int Online(char **av, int ac)
 {
-	ls_bot = init_mod_bot(s_LoveServ, ls_cfg.user, ls_cfg.host, ls_cfg.rname, 
+	ls_bot = init_mod_bot(s_LoveServ, ls_cfg.user, ls_cfg.host, ls_cfg.realname, 
 		services_bot_modes, BOT_FLAG_DEAF, ls_commands, ls_settings, __module_info.module_name);
 	return 1;
 };
@@ -123,10 +123,10 @@ int __ModInit(int modnum, int apiver)
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "RealName") < 0) {
-		strlcpy(ls_cfg.rname, "Network Love Service", MAXREALNAME);
+		strlcpy(ls_cfg.realname, "Network Love Service", MAXREALNAME);
 	}
 	else {
-		strlcpy(ls_cfg.rname, temp, MAXREALNAME);
+		strlcpy(ls_cfg.realname, temp, MAXREALNAME);
 		free(temp);
 	}
 	return 1;

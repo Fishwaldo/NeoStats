@@ -54,7 +54,7 @@ static char privmsgbuffer[BUFSIZE];
 /* Temp flag for backward compatibility in new splitbuf system */
 static int SkipModuleFunction = 0;
 
-static int signon_newbot (const char *nick, const char *user, const char *host, const char *rname, long Umode);
+static int signon_newbot (const char *nick, const char *user, const char *host, const char *realname, long Umode);
 
 /** @brief init_ircd
  *
@@ -238,9 +238,9 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int
-signon_newbot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
+signon_newbot (const char *nick, const char *user, const char *host, const char *realname, long Umode)
 {
-	snewnick_cmd (nick, user, host, rname, Umode);
+	snewnick_cmd (nick, user, host, realname, Umode);
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
 #ifdef GOTSJOIN
 		ssjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
@@ -264,7 +264,7 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int
-init_bot (char *nick, char *user, char *host, char *rname, const char *modes, char *mod_name)
+init_bot (char *nick, char *user, char *host, char *realname, const char *modes, char *mod_name)
 {
 	User *u;
 	long Umode;
@@ -280,7 +280,7 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
 		return NS_FAILURE;
 	}
 	Umode = UmodeStringToMask(modes, 0);
-	signon_newbot (nick, user, host, rname, Umode);
+	signon_newbot (nick, user, host, realname, Umode);
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
 	return NS_SUCCESS;
@@ -292,7 +292,7 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname, 
+ModUser * init_mod_bot (char * nick, char * user, char * host, char * realname, 
 						const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, 
 						bot_setting *bot_setting_list, char * mod_name)
 {
@@ -312,7 +312,7 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 		return NULL;
 	}
 	Umode = UmodeStringToMask(modes, 0);
-	signon_newbot (nick, user, host, rname, Umode);
+	signon_newbot (nick, user, host, realname, Umode);
 #ifdef UMODE_DEAF
 	if(flags&BOT_FLAG_DEAF) {
 		sumode_cmd (nick, nick, UMODE_DEAF);
@@ -703,9 +703,9 @@ init_services_bot (void)
 		/* nick already exists on the network */
 		strlcat (s_Services, "1", MAXNICK);
 	}
-	ircsnprintf (me.rname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
+	ircsnprintf (me.realname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
 	Umode = UmodeStringToMask(services_bot_modes, 0);
-	signon_newbot (s_Services, me.user, me.host, me.rname, Umode);
+	signon_newbot (s_Services, me.user, me.host, me.realname, Umode);
 #ifdef UMODE_DEAF
 	sumode_cmd (s_Services, s_Services, UMODE_DEAF);
 #endif
@@ -1816,6 +1816,22 @@ do_tkl(const char *add, const char *type, const char *user, const char *host, co
 		AddBan(type, user, host, mask, reason, setby, tsset, tsexpire);
 	} else {
 		DelBan(type, user, host, mask, reason, setby, tsset, tsexpire);
+	}
+}
+#endif
+
+#ifdef MSG_EOS
+void 
+do_eos (const char *name)
+{
+	Server *s;
+
+	s = findserver (name);
+	if(s) {
+		SynchServer(s);
+		nlog (LOG_DEBUG1, LOG_CORE, "do_eos: server %s is now synched", name);
+	} else {
+		nlog (LOG_WARNING, LOG_CORE, "do_eos: server %s not found", name);
 	}
 }
 #endif

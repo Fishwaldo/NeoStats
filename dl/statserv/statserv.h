@@ -74,7 +74,7 @@ struct stats_network_ {
 struct StatServ { 
 	char user[MAXUSER]; 
 	char host[MAXHOST]; 
-	char rname[MAXREALNAME]; 
+	char realname[MAXREALNAME]; 
 	int lagtime; 
 	int lagalert; 
 	int recordalert; 
@@ -205,8 +205,6 @@ int s_chan_kick(char **av, int ac);
 /* database.c */
 void save_chan(CStats *c);
 CStats *load_chan(char *name);
-void OpenDatabase(void);
-void CloseDatabase(void);
 
 /* ss_help.c */
 extern const char *ss_help_about[];

@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LEX LEXLIB LEX_OUTPUT_ROOT YACC RANLIB ac_ct_RANLIB CPP EGREP sqlsrvbuild buildsqlsrv GTK_CONFIG build_configtool MAKEDEPENDENCIES DIRINST MODLDFLAGS LINK_SIZE MATCH_LIMIT NEWLINE PCRE_MAJOR PCRE_MINOR PCRE_DATE PCRE_VERSION PCRE_LIB_VERSION PCRE_POSIXLIB_VERSION POSIX_MALLOC_THRESHOLD UTF8 IRCD_FILES_SRC IRCD_FILES_OBJS IRCD_FILES_INC MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LEX LEXLIB LEX_OUTPUT_ROOT YACC RANLIB ac_ct_RANLIB CPP EGREP sqlsrvbuild buildsqlsrv GTK_CONFIG build_configtool LIBDB MAKEDEPENDENCIES DIRINST MODLDFLAGS LINK_SIZE MATCH_LIMIT NEWLINE PCRE_MAJOR PCRE_MINOR PCRE_DATE PCRE_VERSION PCRE_LIB_VERSION PCRE_POSIXLIB_VERSION POSIX_MALLOC_THRESHOLD UTF8 IRCD_FILES_SRC IRCD_FILES_OBJS IRCD_FILES_INC MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -5817,22 +5817,18 @@ _ACEOF
 
 fi
 
-
-for ac_header in db.h
-do
-as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
-if eval "test \"\${$as_ac_Header+set}\" = set"; then
-  echo "$as_me:$LINENO: checking for $ac_header" >&5
-echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6
-if eval "test \"\${$as_ac_Header+set}\" = set"; then
+if test "${ac_cv_header_db_h+set}" = set; then
+  echo "$as_me:$LINENO: checking for db.h" >&5
+echo $ECHO_N "checking for db.h... $ECHO_C" >&6
+if test "${ac_cv_header_db_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Header'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_Header'}'`" >&6
+echo "$as_me:$LINENO: result: $ac_cv_header_db_h" >&5
+echo "${ECHO_T}$ac_cv_header_db_h" >&6
 else
   # Is the header compilable?
-echo "$as_me:$LINENO: checking $ac_header usability" >&5
-echo $ECHO_N "checking $ac_header usability... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking db.h usability" >&5
+echo $ECHO_N "checking db.h usability... $ECHO_C" >&6
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -5841,7 +5837,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 $ac_includes_default
-#include <$ac_header>
+#include <db.h>
 _ACEOF
 rm -f conftest.$ac_objext
 if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
@@ -5867,8 +5863,8 @@ echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
 echo "${ECHO_T}$ac_header_compiler" >&6
 
 # Is the header present?
-echo "$as_me:$LINENO: checking $ac_header presence" >&5
-echo $ECHO_N "checking $ac_header presence... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking db.h presence" >&5
+echo $ECHO_N "checking db.h presence... $ECHO_C" >&6
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -5876,7 +5872,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <$ac_header>
+#include <db.h>
 _ACEOF
 if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
   (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
@@ -5909,10 +5905,10 @@ echo "${ECHO_T}$ac_header_preproc" >&6
 # So?  What about this header?
 case $ac_header_compiler:$ac_header_preproc in
   yes:no )
-    { echo "$as_me:$LINENO: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&5
-echo "$as_me: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&2;}
-    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the preprocessor's result" >&5
-echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: db.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: db.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: db.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: db.h: proceeding with the preprocessor's result" >&2;}
     (
       cat <<\_ASBOX
 ## ------------------------------------ ##
@@ -5923,12 +5919,12 @@ _ASBOX
       sed "s/^/$as_me: WARNING:     /" >&2
     ;;
   no:yes )
-    { echo "$as_me:$LINENO: WARNING: $ac_header: present but cannot be compiled" >&5
-echo "$as_me: WARNING: $ac_header: present but cannot be compiled" >&2;}
-    { echo "$as_me:$LINENO: WARNING: $ac_header: check for missing prerequisite headers?" >&5
-echo "$as_me: WARNING: $ac_header: check for missing prerequisite headers?" >&2;}
-    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the preprocessor's result" >&5
-echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: db.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: db.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: db.h: check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: db.h: check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: db.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: db.h: proceeding with the preprocessor's result" >&2;}
     (
       cat <<\_ASBOX
 ## ------------------------------------ ##
@@ -5939,25 +5935,82 @@ _ASBOX
       sed "s/^/$as_me: WARNING:     /" >&2
     ;;
 esac
-echo "$as_me:$LINENO: checking for $ac_header" >&5
-echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6
-if eval "test \"\${$as_ac_Header+set}\" = set"; then
+echo "$as_me:$LINENO: checking for db.h" >&5
+echo $ECHO_N "checking for db.h... $ECHO_C" >&6
+if test "${ac_cv_header_db_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  eval "$as_ac_Header=$ac_header_preproc"
+  ac_cv_header_db_h=$ac_header_preproc
 fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Header'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_Header'}'`" >&6
+echo "$as_me:$LINENO: result: $ac_cv_header_db_h" >&5
+echo "${ECHO_T}$ac_cv_header_db_h" >&6
 
 fi
-if test `eval echo '${'$as_ac_Header'}'` = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
+if test $ac_cv_header_db_h = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_DB_H 1
 _ACEOF
 
+				echo "$as_me:$LINENO: checking for db_create in -ldb" >&5
+echo $ECHO_N "checking for db_create in -ldb... $ECHO_C" >&6
+if test "${ac_cv_lib_db_db_create+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ldb  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char db_create ();
+int
+main ()
+{
+db_create ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_db_db_create=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_db_db_create=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_db_db_create" >&5
+echo "${ECHO_T}$ac_cv_lib_db_db_create" >&6
+if test $ac_cv_lib_db_db_create = yes; then
+  LIBDB="-ldb"
 fi
 
-done
+fi
 
 
 
@@ -6697,6 +6750,7 @@ fi
 
 
 
+
 cat >>confdefs.h <<\_ACEOF
 #define POSIX_MALLOC_THRESHOLD 10
 _ACEOF
@@ -7367,6 +7421,7 @@ s,@sqlsrvbuild@,$sqlsrvbuild,;t t
 s,@buildsqlsrv@,$buildsqlsrv,;t t
 s,@GTK_CONFIG@,$GTK_CONFIG,;t t
 s,@build_configtool@,$build_configtool,;t t
+s,@LIBDB@,$LIBDB,;t t
 s,@MAKEDEPENDENCIES@,$MAKEDEPENDENCIES,;t t
 s,@DIRINST@,$DIRINST,;t t
 s,@MODLDFLAGS@,$MODLDFLAGS,;t t

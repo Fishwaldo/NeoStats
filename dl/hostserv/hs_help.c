@@ -157,6 +157,6 @@ const char *hs_help_set_hiddenhost[] = {
 const char *hs_help_set_hostname[] = {
 	"\2SET HOSTNAME <hostname>\2",
 	"The hidden host you want to set on users.",
-	"Users will then be set to <user>.<hostname>.",
+	"Users will then be set to nick.<hostname>.",
 	NULL
 };

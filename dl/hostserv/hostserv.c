@@ -66,7 +66,7 @@ struct hs_cfg {
 	int modnum;
 	char user[MAXUSER];
 	char host[MAXHOST];
-	char rname[MAXREALNAME];
+	char realname[MAXREALNAME];
 } hs_cfg;
 
 #ifdef UMODE_REGNICK
@@ -141,7 +141,7 @@ static bot_setting hs_settings[]=
 	{"NICK",		&s_HostServ,		SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
 	{"USER",		&hs_cfg.user,		SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
 	{"HOST",		&hs_cfg.host,		SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
-	{"REALNAME",	&hs_cfg.rname,		SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
+	{"REALNAME",	&hs_cfg.realname,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
 	{"EXPIRE",		&hs_cfg.old,		SET_TYPE_INT,		0, 99, 	NS_ULEVEL_ADMIN,	"ExpireDays",	"days",	hs_help_set_expire	},
 	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN,	"UnetVhosts",	NULL,	hs_help_set_hiddenhost	},
 	{"HOSTNAME",	&hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN,	"UnetDomain",	NULL,	hs_help_set_hostname	},
@@ -243,7 +243,7 @@ static int hs_sign_on(char **av, int ac)
 
 static int Online(char **av, int ac)
 {
-	hs_bot = init_mod_bot(s_HostServ, hs_cfg.user, hs_cfg.host, hs_cfg.rname, 
+	hs_bot = init_mod_bot(s_HostServ, hs_cfg.user, hs_cfg.host, hs_cfg.realname, 
 		services_bot_modes, BOT_FLAG_DEAF, hs_commands, hs_settings, __module_info.module_name);
 	add_mod_timer("CleanupHosts", "Cleanup_Old_Vhosts",
 		      __module_info.module_name, 7200);
@@ -1005,10 +1005,10 @@ static void LoadConfig(void)
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "RealName") < 0) {
-		strlcpy(hs_cfg.rname, "Network Virtual Host Service", MAXREALNAME);
+		strlcpy(hs_cfg.realname, "Network Virtual Host Service", MAXREALNAME);
 	}
 	else {
-		strlcpy(hs_cfg.rname, temp, MAXREALNAME);
+		strlcpy(hs_cfg.realname, temp, MAXREALNAME);
 		free(temp);
 	}
 

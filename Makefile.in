@@ -68,7 +68,7 @@ buildversion:
 	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
 
 neostats: buildversion $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) @sqlsrvbuild@ $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(EXTRA_LDFLAGS) -o $@
+	$(CC) $(LDFLAGS) $(OBJS) @sqlsrvbuild@ $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a @LIBDB@ $(EXTRA_LDFLAGS) -o $@
 
 # include dependency info 
 @MAKEDEPENDENCIES@
