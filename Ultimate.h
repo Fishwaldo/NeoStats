@@ -39,6 +39,8 @@
 #define GOTSVSJOIN
 /* we don't have svsmode */
 #undef GOTSVSMODE
+/* we have svsnick */
+#define GOTSVSNICK
 /* we don't have bot mode support */
 #undef GOTBOTMODE
 /* we do have user smode support */
@@ -58,8 +60,8 @@
 #undef GOTSVSMODE
 /* we have svspart */
 #define GOTSVSPART
-/* we have svsjoin */
-#define GOTSVSJOIN
+/* we have svsnick */
+#define GOTSVSNICK
 /* we don't have smo */
 #undef GOTSMO
 /* we don't have swhois */

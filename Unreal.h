@@ -58,14 +58,14 @@
 #define GOTTOKENSUPPORT
 /* we have vhost support */
 #define GOTSVSHOST 
-/* we have svsjoin */
-#define GOTSVSJOIN
 /* we have svsmode */
 #define GOTSVSMODE
 /* we have svspart */
 #define GOTSVSPART
 /* we have svsjoin */
 #define GOTSVSJOIN
+/* we have svsnick */
+#define GOTSVSNICK
 /* we have smo */
 #define GOTSMO
 /* we have swhois */

@@ -39,8 +39,8 @@
 #undef GOTSVSMODE
 /* we don't have svspart */
 #undef GOTSVSPART
-/* we don't have svsjoin */
-#undef GOTSVSJOIN
+/* we have svsnick */
+#define GOTSVSNICK
 /* we don't have smo */
 #undef GOTSMO
 /* we don't have swhois */
