@@ -621,7 +621,7 @@ do_select(char *buf, int *nbuf)
       if (cmd.offset)
       {
         cmd.offset--;
-        continue;
+        goto increment;
       }
       if (npr >= cmd.limit)
       {
@@ -741,6 +741,7 @@ do_select(char *buf, int *nbuf)
       }
       npr++;
     }
+increment:
     if (cmd.ptbl->tabletype == TBL_LIST)
     {
       node = list_next((list_t *) cmd.ptbl->address, node);

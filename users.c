@@ -278,7 +278,7 @@ COLDEF neo_userscols[] = {
 		RTA_STR,
 		MAXNICK,
 		offsetof(struct User, nick),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"The nickname of the user"
@@ -289,7 +289,7 @@ COLDEF neo_userscols[] = {
 		RTA_STR,
 		MAXHOST,
 		offsetof(struct User, hostname),
-		0,
+		RTA_READONLY,
 		NULL, 
 		NULL,
 		"The real Hostname of the user"
@@ -300,7 +300,7 @@ COLDEF neo_userscols[] = {
 		RTA_STR,
 		MAXUSER,
 		offsetof(struct User, username),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"The ident portion of the users connection"
@@ -311,7 +311,7 @@ COLDEF neo_userscols[] = {
 		RTA_STR,
 		MAXREALNAME,
 		offsetof(struct User, realname),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"The users realname/info message"
@@ -322,7 +322,7 @@ COLDEF neo_userscols[] = {
 		RTA_STR,
 		MAXHOST,
 		offsetof(struct User, vhost),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"The users Vhost, if the IRCd supports VHOSTS"
@@ -333,7 +333,7 @@ COLDEF neo_userscols[] = {
 		RTA_INT,
 		sizeof(int),
 		offsetof(struct User, is_away),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"Boolean variable indiciating if the user is away"
@@ -344,7 +344,7 @@ COLDEF neo_userscols[] = {
 		RTA_STR,
 		64, 				/* as defined in ircd.c */
 		offsetof(struct User, Umode),
-		0,
+		RTA_READONLY,
 		display_umode,
 		NULL,
 		"the users umodes. Does not include SMODES."
@@ -355,7 +355,7 @@ COLDEF neo_userscols[] = {
 		RTA_STR,
 		64,
 		offsetof(struct User, Smode),
-		0,
+		RTA_READONLY,
 		display_smode,
 		NULL,
 		"the users Smodes, if the IRCd supports it.  Does not include UMODES."
@@ -366,7 +366,7 @@ COLDEF neo_userscols[] = {
 		RTA_INT,
 		sizeof(int),
 		offsetof(struct User, TS),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"When the User Connected"
@@ -377,7 +377,7 @@ COLDEF neo_userscols[] = {
 		RTA_STR,
 		MAXHOST,
 		offsetof(struct User, server),
-		0,
+		RTA_READONLY,
 		display_server,
 		NULL,
 		"the users Smodes, if the IRCd supports it.  Does not include UMODES."
@@ -388,7 +388,7 @@ COLDEF neo_userscols[] = {
 		RTA_STR,
 		MAXCHANLIST,
 		offsetof(struct User, chans),
-		0,
+		RTA_READONLY,
 		display_chans,
 		NULL,
 		"the users Smodes, if the IRCd supports it.  Does not include UMODES."

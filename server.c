@@ -167,7 +167,7 @@ COLDEF neo_serverscols[] = {
 		RTA_STR,
 		MAXHOST,
 		offsetof(struct Server, name),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"The name of the server linked to the IRC network"
@@ -178,7 +178,7 @@ COLDEF neo_serverscols[] = {
 		RTA_INT,
 		sizeof(int),
 		offsetof(struct Server, hops),
-		0,
+		RTA_READONLY,
 		NULL, 
 		NULL,
 		"The Number of hops away from the NeoStats Server"
@@ -189,7 +189,7 @@ COLDEF neo_serverscols[] = {
 		RTA_INT,
 		sizeof(int),
 		offsetof(struct Server, connected_since),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"The time the server connected to the IRC network"
@@ -200,7 +200,7 @@ COLDEF neo_serverscols[] = {
 		RTA_INT,
 		sizeof(int),
 		offsetof(struct Server, ping),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"The last ping time to this server from the NeoStats Server"
@@ -211,7 +211,7 @@ COLDEF neo_serverscols[] = {
 		RTA_STR,
 		MAXHOST,
 		offsetof(struct Server, uplink),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"The uplink Server this server is connected to. if it = self, means the NeoStats Server"

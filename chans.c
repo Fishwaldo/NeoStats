@@ -944,7 +944,7 @@ COLDEF neo_chanscols[] = {
 		RTA_STR,
 		CHANLEN,
 		offsetof(struct Chans, name),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"The name of the channel"
@@ -955,7 +955,7 @@ COLDEF neo_chanscols[] = {
 		RTA_INT,
 		sizeof(int),
 		offsetof(struct Chans, cur_users),
-		0,
+		RTA_READONLY,
 		NULL, 
 		NULL,
 		"The no of users in the channel"
@@ -966,7 +966,7 @@ COLDEF neo_chanscols[] = {
 		RTA_STR,
 		BUFSIZE,
 		offsetof(struct Chans, modes),
-		0,
+		RTA_READONLY,
 		display_chanmodes,
 		NULL,
 		"The modes of the channel"
@@ -977,7 +977,7 @@ COLDEF neo_chanscols[] = {
 		RTA_STR,
 		BUFSIZE*10,
 		offsetof(struct Chans, chanmembers),
-		0,
+		RTA_READONLY,
 		display_chanusers,
 		NULL,
 		"The users of the channel"
@@ -988,7 +988,7 @@ COLDEF neo_chanscols[] = {
 		RTA_STR,
 		BUFSIZE,
 		offsetof(struct Chans, topic),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"The topic of the channel"
@@ -999,7 +999,7 @@ COLDEF neo_chanscols[] = {
 		RTA_STR,
 		MAXHOST,
 		offsetof(struct Chans, topicowner),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"Who set the topic"
@@ -1010,7 +1010,7 @@ COLDEF neo_chanscols[] = {
 		RTA_INT,
 		sizeof(int),
 		offsetof(struct Chans, topictime),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"When the topic was set"
@@ -1021,7 +1021,7 @@ COLDEF neo_chanscols[] = {
 		RTA_INT,
 		sizeof(int),
 		offsetof(struct Chans, tstime),
-		0,
+		RTA_READONLY,
 		NULL,
 		NULL,
 		"when the channel was created"
