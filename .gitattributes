@@ -127,6 +127,8 @@ doc/read-userman -text
 /list.c -text
 /list.h -text
 logs/.keepme -text
+logs/Makefile.am -text
+logs/Makefile.in -text
 /ltmain.sh -text
 /main.c -text
 /makeconf -text
