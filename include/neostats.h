@@ -430,7 +430,15 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 #define CLIENT_FLAG_SYNCHED		0x00000004 /* client is synched */
 #define CLIENT_FLAG_SETHOST		0x00000008 /* client is synched */
 
-#define NS_FLAGS_NETJOIN	0x00000008 /* client is on a net join */
+#define CHANNEL_FLAG_EXCLUDED	NS_FLAG_EXCLUDED /* channel is excluded */
+#define CHANNEL_FLAG_ME			0x00000002 /* channel is services channel */
+
+#define IsServicesChannel(x) ((x)->flags & CHANNEL_FLAG_ME)
+
+#define NS_FLAGS_NETJOIN		0x00000010 /* client is on a net join */
+
+#define IsNetSplit(x) ((x)->flags & NS_FLAGS_NETJOIN)
+
 
 /* Specific errors beyond SUCCESS/FAILURE so that functions can handle errors 
  * Treat as unsigned with top bit set to give us a clear distinction from 
@@ -553,8 +561,9 @@ typedef struct Client {
  */
 typedef struct tme {
 	char name[MAXHOST];
-	int numeric; /* For Unreal and any other server that needs a numeric */
+	int numeric; 
 	char protocol[MAXHOST];
+	char dbm[MAXHOST];
 	char uplink[MAXHOST];
 	char infoline[MAXHOST];
 	char netname[MAXPASS];
@@ -1010,26 +1019,6 @@ EXPORTFUNC int sock_disconnect (const char *name);
 EXPORTFUNC Bot *AddBot (BotInfo *botinfo);
 EXPORTFUNC Bot *find_bot (const char *bot_name);
 
-/* keeper interface */
-
-#define CFGSTR   1
-#define CFGINT   2
-#define CFGFLOAT 3
-#define CFGBOOL  4
-
-#define CONFBUFSIZE 256
-
-EXPORTFUNC int GetConf (void **data, int type, const char *item);
-EXPORTFUNC int SetConf (void *data, int type, char *item);
-EXPORTFUNC int GetDir (char *item, char ***data);
-EXPORTFUNC int DelConf (char *item);
-EXPORTFUNC int DelRow (char *table, char *row);
-EXPORTFUNC int DelTable(char *table);
-EXPORTFUNC int SetData (void *data, int type, char *table, char *row, char *field);
-EXPORTFUNC int GetTableData (char *table, char ***data);
-EXPORTFUNC int GetData (void **data, int type, const char *table, const char *row, const char *field);
-EXPORTFUNC void flush_keeper();
-
 /* main.c */
 void do_exit (NS_EXIT_TYPE exitcode, char *quitmsg) __attribute__((noreturn));
 EXPORTFUNC void fatal_error(char *file, int line, char *func, char *error_text) __attribute__((noreturn));;
@@ -1044,6 +1033,7 @@ EXPORTFUNC void _ns_free (void **ptr);
 #define ns_free(ptr) _ns_free ((void **) &(ptr));
 
 /* misc.c */
+EXPORTFUNC unsigned hrand(unsigned upperbound, unsigned lowerbound);
 EXPORTFUNC void strip (char *line);
 EXPORTFUNC char *sstrdup (const char *s);
 char *strlwr (char *s);
@@ -1142,6 +1132,7 @@ EXPORTFUNC Channel *find_channel (const char *chan);
 EXPORTFUNC int CheckChanMode (Channel *c, const unsigned int mode);
 EXPORTFUNC int IsChannelMember (Channel *c, Client *u);
 EXPORTFUNC int test_cumode (char *chan, char *nick, int flag);
+EXPORTFUNC Channel *GetRandomChan(void);
 
 #define IsChanOp(chan, nick)		test_cumode(chan, nick, CUMODE_CHANOP)
 #define IsChanHalfOp(chan, nick)	test_cumode(chan, nick, CUMODE_HALFOP)
@@ -1162,6 +1153,11 @@ EXPORTFUNC int add_services_cmd_list (bot_cmd* bot_cmd_list);
 EXPORTFUNC int add_services_set_list (bot_setting *bot_setting_list);
 EXPORTFUNC int del_services_cmd_list (bot_cmd* bot_cmd_list);
 EXPORTFUNC int del_services_set_list (bot_setting *bot_setting_list);
+EXPORTFUNC int add_bot_cmd_list (Bot *bot_ptr, bot_cmd *bot_cmd_list);
+EXPORTFUNC int del_bot_cmd_list (Bot *bot_ptr, bot_cmd *bot_cmd_list);
+EXPORTFUNC int add_bot_setting_list (Bot *bot_ptr, bot_setting *bot_setting_list);
+EXPORTFUNC int del_bot_setting_list (Bot *bot_ptr, bot_setting *bot_setting_list);
+
 EXPORTFUNC Client *find_valid_user(Bot* botptr, Client *u, const char *target_nick);
 
 /* transfer.c stuff */
@@ -1190,12 +1186,34 @@ EXPORTFUNC int validate_host (char *hostname);
 EXPORTFUNC int validate_url (char *url);
 EXPORTFUNC int validate_channel (char *channel_name);
 
-#ifdef HAVE_DB_H
-EXPORTFUNC int DBOpenDatabase(void);
-EXPORTFUNC void DBCloseDatabase(void);
-EXPORTFUNC void *DBGetData(char *key);
-EXPORTFUNC void DBSetData(char *key, void *data, int size);
-#endif
+#define CONFIG_TABLE	"config"
+
+typedef void (*DBRowHandler) (void *data);
+
+/* DB API */
+EXPORTFUNC int DBAOpenDatabase (void);
+EXPORTFUNC int DBACloseDatabase (void);
+EXPORTFUNC int DBAOpenTable (char *table);
+EXPORTFUNC int DBACloseTable (char *table);
+EXPORTFUNC int DBAStore (char *table, char *key, void *data, int size);
+EXPORTFUNC int DBAFetch (char *table, char *key, void *data, int size);
+EXPORTFUNC int DBADelete (char *table, char * key);
+EXPORTFUNC int DBAFetchRows (char * table, DBRowHandler handler);
+
+/* DB API Macros to wrap certain types */
+#define DBAStoreBool(table, key, data) DBAStore (table, key, (void*)data, sizeof (int))
+#define DBAStoreInt(table, key, data) DBAStore (table, key, (void*)data, sizeof (int))
+#define DBAStoreStr(table, key, data, size) DBAStore (table, key, (void*)data, size)
+#define DBAFetchBool(table, key, data) DBAFetch (table, key, (void*)data, sizeof (int))
+#define DBAFetchInt(table, key, data) DBAFetch (table, key, (void*)data, sizeof (int))
+#define DBAFetchStr(table, key, data, size) DBAFetch (table, key, (void*)data, size)
+
+#define DBAStoreConfigBool(key, data) DBAStoreBool(CONFIG_TABLE, key, data)
+#define DBAStoreConfigInt(key, data) DBAStoreInt(CONFIG_TABLE, key, data)
+#define DBAStoreConfigStr(key, data, size) DBAStoreStr(CONFIG_TABLE, key, data, size)
+#define DBAFetchConfigBool(key, data)	DBAFetchBool(CONFIG_TABLE, key, data)
+#define DBAFetchConfigInt(key, data) DBAFetchInt(CONFIG_TABLE, key, data)
+#define DBAFetchConfigStr(key, data, size) DBAFetchStr(CONFIG_TABLE, key, data, size)
 
 /* log.c API export */
 /* define the log levels */
@@ -1273,8 +1291,8 @@ EXPORTFUNC hash_t *GetModuleHash (void);
 
 EXPORTFUNC int HaveFeature (int mask);
 
-EXPORTFUNC void RegisterEvent (ModuleEvent *event);
-EXPORTFUNC void RegisterEventList (ModuleEvent *event);
+EXPORTFUNC void AddEvent (ModuleEvent *event);
+EXPORTFUNC void AddEventList (ModuleEvent *event);
 EXPORTFUNC void DeleteEvent (Event event);
 EXPORTFUNC void DeleteEventList (ModuleEvent *event);
 EXPORTFUNC void SetAllEventFlags (unsigned int flag, unsigned int enable);

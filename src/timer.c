@@ -61,7 +61,6 @@ CheckTimers (void)
 	SET_SEGV_LOCATION();
 	if (me.now - ping.last_sent > nsconfig.pingtime) {
 		PingServers ();
-		flush_keeper ();
 		ping.last_sent = me.now;
 		/* flush log files */
 		fflush (NULL);

@@ -32,24 +32,9 @@
 #include "version.h"
 #include "tld.h"
 
-#define STATNAMESIZE 64
 #define WEEKNUM(t) (((t)->tm_yday + 7 - ((t)->tm_wday)) / 7)
 
-void SaveStatisticEntry (statisticentry *stat, char *table, char *row, char *field, char* entry)
-{
-	static char fullstatname[STATNAMESIZE];
-
-	ircsnprintf (fullstatname, STATNAMESIZE, "%s%srunningtotal", field, entry);
-	SetData ((void *)stat->runningtotal, CFGINT, table, row, fullstatname);
-	ircsnprintf (fullstatname, STATNAMESIZE, "%s%saverage", field, entry);
-	SetData ((void *)stat->average, CFGINT, table, row, fullstatname);
-	ircsnprintf (fullstatname, STATNAMESIZE, "%s%smax", field, entry);
-	SetData ((void *)stat->max, CFGINT, table, row, fullstatname);
-	ircsnprintf (fullstatname, STATNAMESIZE, "%s%sts_max", field, entry);
-	SetData ((void *)stat->ts_max, CFGINT, table, row, fullstatname);
-}
-
-void SaveStatistic (statistic *stat, char *table, char *row, char *field)
+void PreSaveStatistic (statistic *stat)
 {
 	struct tm *ltm;
 
@@ -57,52 +42,25 @@ void SaveStatistic (statistic *stat, char *table, char *row, char *field)
 	stat->month = ltm->tm_mon;
 	stat->week = WEEKNUM(ltm);
 	stat->day = ltm->tm_yday;	
-	SetData ((void *)stat->day, CFGINT, table, row, "day");
-	SetData ((void *)stat->week, CFGINT, table, row, "week");
-	SetData ((void *)stat->month, CFGINT, table, row, "month");
-	SaveStatisticEntry (&stat->daily, table, row, field, "daily");
-	SaveStatisticEntry (&stat->weekly, table, row, field, "weekly");
-	SaveStatisticEntry (&stat->monthly, table, row, field, "monthly");
-	SaveStatisticEntry (&stat->alltime, table, row, field, "alltime");
 }
 
-void LoadStatisticEntry (statisticentry *stat, char *table, char *row, char *field, char* entry)
-{
-	static char fullstatname[STATNAMESIZE];
-
-	ircsnprintf (fullstatname, STATNAMESIZE, "%s%srunningtotal", field, entry);
-	GetData ((void *)&stat->runningtotal, CFGINT, table, row, fullstatname);
-	ircsnprintf (fullstatname, STATNAMESIZE, "%s%saverage", field, entry);
-	GetData ((void *)&stat->average, CFGINT, table, row, fullstatname);
-	ircsnprintf (fullstatname, STATNAMESIZE, "%s%smax", field, entry);
-	GetData ((void *)&stat->max, CFGINT, table, row, fullstatname);
-	ircsnprintf (fullstatname, STATNAMESIZE, "%s%sts_max", field, entry);
-	GetData ((void *)&stat->ts_max, CFGINT, table, row, fullstatname);
-}
-
-void LoadStatistic (statistic *stat, char *table, char *row, char *field)
+void PostLoadStatistic (statistic *stat)
 {
 	struct tm *ltm;
-	int day, week, month;
 
 	ltm = localtime (&me.now);
-	GetData ((void *)&day, CFGINT, table, row, "day");
-	GetData ((void *)&week, CFGINT, table, row, "week");
-	GetData ((void *)&month, CFGINT, table, row, "month");
-	/* Only load daily stats if day not changed */
-	if (day == ltm->tm_yday) {
-		LoadStatisticEntry (&stat->daily, table, row, field, "daily");
+	stat->current = 0;
+	if (stat->day != ltm->tm_yday) {
+		ResetStatisticEntry (&stat->daily, stat->current);
 	}
 	/* Only load weekly stats if week not changed */
-	if (week == WEEKNUM(ltm)) {
-		LoadStatisticEntry (&stat->weekly, table, row, field, "weekly");
+	if (stat->week != WEEKNUM(ltm)) {
+		ResetStatisticEntry (&stat->weekly, stat->current);
 	}
 	/* Only load monthly stats if month not changed */
-	if (month == ltm->tm_mon) {
-		LoadStatisticEntry (&stat->monthly, table, row, field, "monthly");
+	if (stat->month != ltm->tm_mon) {
+		ResetStatisticEntry (&stat->monthly, stat->current);
 	}
-	LoadStatisticEntry (&stat->alltime, table, row, field, "alltime");
-	stat->current = 0;
 }
 
 void AverageStatisticEntry (statisticentry *stat, unsigned int current)

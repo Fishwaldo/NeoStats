@@ -359,7 +359,7 @@ void adns__procdgram(adns_state ads, const byte *dgram, int dglen,
 			      qu->typei->type, qu->flags);
     if (st) { adns__query_fail(qu,st); return; }
     
-    newquery= realloc(qu->query_dgram,qu->vb.used);
+    newquery= adns_realloc(qu->query_dgram,qu->vb.used);
     if (!newquery) { adns__query_fail(qu,adns_s_nomemory); return; }
     
     qu->query_dgram= newquery;

@@ -243,6 +243,16 @@ cat > $CONF << __EOF__
 
 #PROTOCOL "unreal32"
 
+# DBM <dbm> [REQUIRED]
+#    Specifies the database manager module to use.
+#    Valid options are:
+#          gdbm
+#
+#          PROTOCOL "gdbm"
+#      
+
+PROTOCOL "gdbm"
+
 # SERVER_NAME <hostname> [REQUIRED]
 #    Specifies the name of the NeoStats Server as it will appear on 
 #    the network. e.g. 

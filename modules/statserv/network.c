@@ -150,23 +150,24 @@ int ss_cmd_daily (CmdParams *cmdparams)
 
 void LoadNetworkStats(void) 
 {
-	LoadStatistic (&networkstats.servers, NETWORK_TABLE, "Global", "servers");
-	LoadStatistic (&networkstats.channels, NETWORK_TABLE, "Global", "channels");
-	LoadStatistic (&networkstats.users, NETWORK_TABLE, "Global", "users");
-	LoadStatistic (&networkstats.opers, NETWORK_TABLE, "Global", "opers");
-	LoadStatistic (&networkstats.kills, NETWORK_TABLE, "Global", "kills");
+	if (DBAFetch (NETWORK_TABLE, NETWORK_TABLE, &networkstats, sizeof (networkstats)) == NS_SUCCESS) 
+	{
+		PostLoadStatistic (&networkstats.servers);
+		PostLoadStatistic (&networkstats.channels);
+		PostLoadStatistic (&networkstats.users);
+		PostLoadStatistic (&networkstats.opers);
+		PostLoadStatistic (&networkstats.kills);
+	}
 }
 
 void SaveNetworkStats(void)
 {
-	/* clear the old database */
-	DelTable(NETWORK_TABLE);
-	/* save stats */
-	SaveStatistic (&networkstats.servers, NETWORK_TABLE, "Global", "servers");
-	SaveStatistic (&networkstats.channels, NETWORK_TABLE, "Global", "channels");
-	SaveStatistic (&networkstats.users, NETWORK_TABLE, "Global", "users");
-	SaveStatistic (&networkstats.opers, NETWORK_TABLE, "Global", "opers");
-	SaveStatistic (&networkstats.kills, NETWORK_TABLE, "Global", "kills");
+	DBAStore (NETWORK_TABLE, NETWORK_TABLE, &networkstats, sizeof(networkstats));
+	PreSaveStatistic (&networkstats.servers);
+	PreSaveStatistic (&networkstats.channels);
+	PreSaveStatistic (&networkstats.users);
+	PreSaveStatistic (&networkstats.opers);
+	PreSaveStatistic (&networkstats.kills);
 }
 
 void InitNetworkStats (void)

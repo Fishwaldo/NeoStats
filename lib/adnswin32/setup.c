@@ -67,8 +67,8 @@ static void addserver(adns_state ads, struct in_addr addr) {
 }
 
 static void freesearchlist(adns_state ads) {
-  if (ads->nsearchlist) free(*ads->searchlist);
-  free(ads->searchlist);
+  if (ads->nsearchlist) adns_free(*ads->searchlist);
+  adns_free(ads->searchlist);
 }
 
 static void saveerr(adns_state ads, int en) {
@@ -130,8 +130,8 @@ static void ccf_search(adns_state ads, const char *fn, int lno, const char *buf)
   tl= 0;
   while (nextword(&bufp,&word,&l)) { count++; tl += l+1; }
 
-  newptrs= malloc(sizeof(char*)*count);  if (!newptrs) { saveerr(ads,errno); return; }
-  newchars= malloc(tl);  if (!newchars) { saveerr(ads,errno); free(newptrs); return; }
+  newptrs= adns_malloc(sizeof(char*)*count);  if (!newptrs) { saveerr(ads,errno); return; }
+  newchars= adns_malloc(tl);  if (!newchars) { saveerr(ads,errno); adns_free(newptrs); return; }
 
   bufp= buf;
   pp= newptrs;
@@ -477,7 +477,7 @@ static int init_begin(adns_state *ads_r, adns_initflags flags, FILE *diagfile) {
   int err;
 #endif
     
-  ads= malloc(sizeof(*ads)); if (!ads) return errno;
+  ads= adns_malloc(sizeof(*ads)); if (!ads) return errno;
 
   ads->iflags= flags;
   ads->diagfile= diagfile;
@@ -545,7 +545,7 @@ static int init_finish(adns_state ads) {
  x_closeudp:
   adns_socket_close(ads->udpsocket);
  x_free:
-  free(ads);
+  adns_free(ads);
 #ifdef WIN32
   WSACleanup();
 #endif /* WIN32 */
@@ -554,10 +554,10 @@ static int init_finish(adns_state ads) {
 
 static void init_abort(adns_state ads) {
   if (ads->nsearchlist) {
-    free(ads->searchlist[0]);
-    free(ads->searchlist);
+    adns_free(ads->searchlist[0]);
+    adns_free(ads->searchlist);
   }
-  free(ads);
+  adns_free(ads);
 #ifdef WIN32
   WSACleanup();
 #endif /* WIN32 */
@@ -684,7 +684,7 @@ void adns_finish(adns_state ads) {
   adns__vbuf_free(&ads->tcpsend);
   adns__vbuf_free(&ads->tcprecv);
   freesearchlist(ads);
-  free(ads);
+  adns_free(ads);
 #ifdef WIN32
   WSACleanup();
 #endif /* WIN32 */

@@ -127,6 +127,9 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 		return NULL;
 	}
 	u->tsconnect = TS ? strtoul (TS, NULL, 10) : me.now;
+	if (time(NULL) - u->tsconnect > nsconfig.splittime) {
+		u->flags |= NS_FLAGS_NETJOIN;
+	}
 	strlcpy (u->user->hostname, host, MAXHOST);
 	strlcpy (u->user->vhost, host, MAXHOST);
 	strlcpy (u->user->username, user, MAXUSER);
@@ -225,6 +228,7 @@ void KillUser (const char* source, const char *nick, const char *reason)
 	}
 	/* if its one of our bots inform the module */
 	if (IsMe(u)) {
+		cmdparams->bot = u->user->bot;
 		nlog (LOG_NOTICE, "KillUser: deleting bot %s as it was killed", u->name);
 		SendModuleEvent (EVENT_BOTKILL, cmdparams, u->user->bot->moduleptr);
 	}

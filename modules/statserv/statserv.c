@@ -157,8 +157,6 @@ int ModInit (Module *mod_ptr)
 {
 	SET_SEGV_LOCATION();
 	StatServ.shutdown = 0;
-	/* we want nickip messages */
-	me.want_nickip = 1; 
 	ModuleConfig(ss_settings);
 	if (StatServ.html && StatServ.htmlpath[0] == 0) {
 		nlog(LOG_NOTICE, "HTML stats disabled as HTML_PATH is not set");
@@ -171,7 +169,7 @@ int ModInit (Module *mod_ptr)
 	InitTLDStatistics ();	
 	InitUserStats ();	
 #ifdef USE_BERKELEY
-	DBOpenDatabase();
+	DBAOpenTable();
 #endif
 	
 	return NS_SUCCESS;
@@ -234,7 +232,7 @@ void ModFini (void)
 	FiniRTAStats();
 	FiniNetworkStats();
 #ifdef USE_BERKELEY
-	DBCloseDatabase();
+	DBACloseTable();
 #endif      
 }
 

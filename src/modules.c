@@ -311,7 +311,7 @@ load_module (const char *modfilename, Client * u)
 	event_ptr = ns_dlsym (dl_handle, "module_events");
 	if(event_ptr) {
 		SET_RUN_LEVEL(mod_ptr);
-		RegisterEventList (event_ptr);
+		AddEventList (event_ptr);
 		RESET_RUN_LEVEL();
 	}
     /* For Auth modules, register auth function */
@@ -336,6 +336,7 @@ load_module (const char *modfilename, Client * u)
 
 	SET_SEGV_LOCATION();
 	SET_RUN_LEVEL(mod_ptr);
+	DBAOpenDatabase ();
 	err = (*ModInit) (mod_ptr); 
 	RESET_RUN_LEVEL();
 	if (err < 1 || mod_ptr->error) {
@@ -448,6 +449,7 @@ unload_module (const char *modname, Client * u)
 	irc_globops (NULL, _("%s Module Unloaded"), modname);
 #ifndef VALGRIND
 	SET_RUN_LEVEL(mod_ptr);
+	DBACloseDatabase ();
 	ns_dlclose (mod_ptr->dl_handle);
 	RESET_RUN_LEVEL();
 #endif
@@ -509,16 +511,18 @@ ModuleConfig(bot_setting* set_ptr)
 		if(set_ptr->confitem) {
 			switch(set_ptr->type) {
 				case SET_TYPE_BOOLEAN:
-					if (GetConf((void *)set_ptr->varptr, CFGBOOL, set_ptr->confitem) <= 0) {
+					if (DBAFetchConfigBool (set_ptr->confitem, set_ptr->varptr) != NS_SUCCESS) {
 						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
+						DBAStoreConfigBool (set_ptr->confitem, set_ptr->varptr);
 					}
 					if(set_ptr->handler) {
 						set_ptr->handler(NULL, SET_LOAD);
 					}
 					break;
 				case SET_TYPE_INT:
-					if (GetConf((void *)set_ptr->varptr, CFGINT, set_ptr->confitem) <= 0) {
+					if (DBAFetchConfigInt (set_ptr->confitem, set_ptr->varptr) != NS_SUCCESS) {
 						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
+						DBAStoreConfigInt(set_ptr->confitem, set_ptr->varptr);
 					}
 					if(set_ptr->handler) {
 						set_ptr->handler(NULL, SET_LOAD);
@@ -532,12 +536,9 @@ ModuleConfig(bot_setting* set_ptr)
 				case SET_TYPE_HOST:
 				case SET_TYPE_REALNAME:
 				case SET_TYPE_IPV4:
-					if(GetConf((void *) &temp, CFGSTR, set_ptr->confitem) > 0) {
-						strlcpy(set_ptr->varptr, temp, set_ptr->max);
-						ns_free(temp);
-					} else {
+					if(	DBAFetchConfigStr (set_ptr->confitem, set_ptr->varptr, set_ptr->max) != NS_SUCCESS) {
 						strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
-						
+						DBAStoreConfigStr (set_ptr->confitem, set_ptr->varptr, set_ptr->max);
 					}
 					if(set_ptr->handler) {
 						set_ptr->handler(NULL, SET_LOAD);
@@ -565,13 +566,17 @@ ModuleConfig(bot_setting* set_ptr)
  *
  * @return none
  */
-void RegisterEvent (ModuleEvent* event)
+void AddEvent (ModuleEvent* event)
 {
 	Module* mod_ptr;
 
 	mod_ptr = GET_CUR_MODULE();
 	if (!mod_ptr->event_list) {
 		mod_ptr->event_list = ns_calloc ( sizeof(ModuleEvent) * EVENT_COUNT );
+	}
+	if (event->event == EVENT_NICKIP)
+	{
+		me.want_nickip = 1; 		
 	}
 	mod_ptr->event_list[event->event] = event;
 }
@@ -582,7 +587,7 @@ void RegisterEvent (ModuleEvent* event)
  *
  * @return none
  */
-void RegisterEventList (ModuleEvent *event_ptr)
+void AddEventList (ModuleEvent *event_ptr)
 {
 	Module* mod_ptr;
 

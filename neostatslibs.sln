@@ -19,6 +19,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rta", "lib\rtawin32\rta.vcp
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gdbm", "lib\gdbm\gdbm.vcproj", "{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -41,6 +45,10 @@ Global
 		{934FCDE5-D077-4619-B79C-A62580EA1E4A}.Debug.Build.0 = Debug|Win32
 		{934FCDE5-D077-4619-B79C-A62580EA1E4A}.Release.ActiveCfg = Release|Win32
 		{934FCDE5-D077-4619-B79C-A62580EA1E4A}.Release.Build.0 = Release|Win32
+		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Debug.ActiveCfg = Debug|Win32
+		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Debug.Build.0 = Debug|Win32
+		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Release.ActiveCfg = Release|Win32
+		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Release.Build.0 = Release|Win32
 		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Debug.ActiveCfg = Debug|Win32
 		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Debug.Build.0 = Debug|Win32
 		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Release.ActiveCfg = Release|Win32

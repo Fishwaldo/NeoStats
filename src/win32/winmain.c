@@ -112,6 +112,7 @@ int WINAPI WinMain
     MSG  msg;
     HWND hDialog = 0;
 	
+	_fmode = _O_BINARY;
 	hInstance = hInst;
 
 	if (WSAStartup (MAKEWORD(1, 1), &WSAData) != 0)

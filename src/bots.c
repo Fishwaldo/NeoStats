@@ -676,7 +676,7 @@ void handle_dead_channel (Channel *c)
 
 	SET_SEGV_LOCATION();
 	/* If services channel ignore it */
-	if (ircstrcasecmp (c->name, me.serviceschan) == 0) {
+	if (IsServicesChannel( c )) {
 		return;
 	}
 	/* If channel has persistent bot(s) ignore it */

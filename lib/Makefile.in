@@ -159,7 +159,7 @@ target_alias = @target_alias@
 
 @BUILD_CURL_TRUE@CURLDIR = curl
 
-SUBDIRS = adns keeper $(CURLDIR) $(PCREDIR) rta
+SUBDIRS = adns keeper $(CURLDIR) $(PCREDIR) rta gdbm
 LINK = @echo "Linking $@"; $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
@@ -177,7 +177,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	check-recursive installcheck-recursive
 DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk \
 	Makefile.am
-DIST_SUBDIRS = adns keeper curl pcre rta
+DIST_SUBDIRS = adns keeper curl pcre rta gdbm
 all: all-recursive
 
 .SUFFIXES:

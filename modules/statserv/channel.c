@@ -304,7 +304,6 @@ void SaveChanStats(void)
  
 channelstat *load_chan(char *name) 
 {
-	char *data;
 	channelstat *c;
 
 	SET_SEGV_LOCATION();
@@ -313,20 +312,12 @@ channelstat *load_chan(char *name)
 		return NULL;
 	}
 	c = ns_calloc (sizeof (channelstat));
-#ifdef USE_BERKELEY
-	if ((data = DBGetData (name)) != NULL) {
-		memcpy (c, data, sizeof(channelstat));
+	if (DBAFetch (CHANNEL_TABLE, name, c, (sizeof (channelstat))) == NS_SUCCESS) {
+		PostLoadStatistic (&c->joins);
+		PostLoadStatistic (&c->kicks);
+		PostLoadStatistic (&c->topics);
+		PostLoadStatistic (&c->users);
 		dlog (DEBUG2, "Loading channel %s", c->name);
-#else
-	strlcpy (c->name, name, MAXCHANLEN);	
-	if (GetData ((void *)&data, CFGSTR, CHANNEL_TABLE, c->name, "ChanData") > 0) {
-		dlog (DEBUG2, "Loading channel %s", c->name);
-		LoadStatistic (&c->users, CHANNEL_TABLE, c->name, "users");
-		LoadStatistic (&c->kicks, CHANNEL_TABLE, c->name, "kicks");
-		LoadStatistic (&c->topics, CHANNEL_TABLE, c->name, "topics");
-		LoadStatistic (&c->joins, CHANNEL_TABLE, c->name, "joins");
-		ns_free (data);
-#endif
 	} else {
 		dlog (DEBUG2, "Creating channel %s", c->name);
 		strlcpy (c->name, name, MAXCHANLEN);	
@@ -351,19 +342,11 @@ channelstat *load_chan(char *name)
  
 void save_chan(channelstat *c) 
 {
-#ifdef USE_BERKELEY
-	char data[BUFSIZE];
-
-	memcpy (data, c, sizeof(channelstat));
-	DBSetData (c->name, data, sizeof(channelstat));
-#else
-	/* we keep this seperate so we can easily delete old channels */
-	SetData ((void *)c->ts_lastseen, CFGINT, CHANNEL_TABLE, c->name, "ts_lastseen");
-	SaveStatistic (&c->users, CHANNEL_TABLE, c->name, "users");
-	SaveStatistic (&c->kicks, CHANNEL_TABLE, c->name, "kicks");
-	SaveStatistic (&c->topics, CHANNEL_TABLE, c->name, "topics");
-	SaveStatistic (&c->joins, CHANNEL_TABLE, c->name, "joins");
-#endif
+	PreSaveStatistic (&c->joins);
+	PreSaveStatistic (&c->kicks);
+	PreSaveStatistic (&c->topics);
+	PreSaveStatistic (&c->users);
+	DBAStore (CHANNEL_TABLE, c->name, (void *)c, sizeof(channelstat));
 	c->lastsave = me.now;
 }
 
@@ -375,34 +358,25 @@ void save_chan(channelstat *c)
  * @returns nothing
  */
 
+static void del_chan (void *data)
+{
+	channelstat *cs;
+	
+	cs = (channelstat *)data;
+	if (((me.now - cs->ts_lastseen) > 604800) && (!find_channel(cs->name))) {
+		dlog (DEBUG1, "Deleting Channel %s", cs->name);
+		DBADelete (CHANNEL_TABLE, cs->name);
+	}
+}
+
 int DelOldChan(void)
 {
-	char **row;
-	int count = 0;
-	time_t ts_lastseen;
 	time_t start;
-	
+
 	start = time (NULL);
 	dlog (DEBUG1, "Deleting old channels");
-	if (GetTableData (CHANNEL_TABLE, &row) > 0) {
-		for (count = 0; row[count] != NULL; count++) {
-			if (GetData ((void *)&ts_lastseen, CFGINT, CHANNEL_TABLE, row[count], "ts_lastseen") > 0) {
-				/* delete it if its old and not online 
-				 * use find_channel, instead of findchanstats, and find_channel is based on hashes, so its faster 
-				 */
-				if (((me.now - ts_lastseen) > 604800) && (!find_channel(row[count]))) {
-					dlog (DEBUG1, "Deleting Channel %s", row[count]);
-					DelRow(CHANNEL_TABLE, row[count]);
-				}
-			} else {
-				/* database corruption? */
-				nlog (LOG_WARNING, "Channel %s corrupted: deleting record", row[count]);
-				DelRow (CHANNEL_TABLE, row[count]);
-			}
-		}
-	}
-	ns_free (row);
-	dlog (DEBUG1, "DelOldChan: %d seconds %d channels", (int)(time(NULL) - start), count);
+	DBAFetchRows (CHANNEL_TABLE, del_chan);
+	dlog (DEBUG1, "DelOldChan: %d seconds", (int)(time(NULL) - start));
 	return NS_SUCCESS;
 }
 

@@ -231,6 +231,15 @@ const char *ns_help_set_joinserviceschan[] = {
 	NULL
 };
 
+const char *ns_help_set_splittime[] = {
+	"\SPLITTIME <timediff>\2",
+	"This is used to determine if users connecting to the network",
+	"are part of a net join (when two servers link together)",
+	"This setting should not be changed unless you know the",
+	"effects in full",
+	NULL
+};
+
 const char *ns_help_set_pingtime[] = {
 	"\2PINGTIME <seconds>\2",
 	"Set ping interval at which NeoStats pings servers",

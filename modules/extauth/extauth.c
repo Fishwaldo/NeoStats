@@ -1,11 +1,11 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c)1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
-**  (at your option) any later version.
+**  (at your option)any later version.
 **
 **  This program is distributed in the hope that it will be useful,
 **  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,23 +28,27 @@
  *  User authentication based on nick!user@host masking
  */
 
+static int ea_cmd_access( CmdParams* cmdparams );
 
 /** Access list struct */
-typedef struct AccessEntry{
+typedef struct AccessEntry
+{
 	char nick[MAXNICK];
 	char mask[MAXHOST];
 	int level;
 }AccessEntry;
 
 /** Copyright info */
-static const char *extauth_copyright[] = {
-	"Copyright (c) 1999-2004, NeoStats",
+static const char *extauth_copyright[] = 
+{
+	"Copyright (c)1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
 
 /** Help text */
-const char *ea_help_access[] = {
+const char *ea_help_access[] = 
+{
 	"Syntax: \2ACCESS ADD <nick> <mask> <level>\2",
 	"        \2ACCESS DEL <nick>\2",
 	"        \2ACCESS LIST\2",
@@ -58,7 +62,8 @@ const char *ea_help_access[] = {
 const char ea_help_access_oneline[] = "Manage NeoStats user access list";
 
 /** Module info */
-ModuleInfo module_info = {
+ModuleInfo module_info = 
+{
 	"ExtAuth",
 	"Access List Authentication Module",
 	extauth_copyright,
@@ -74,8 +79,31 @@ ModuleInfo module_info = {
 
 /** hash for storing access list */
 static hash_t *accesshash;
-/** temporary buffer */
-static char buf[CONFBUFSIZE];
+
+/** Bot comand table */
+bot_cmd extauth_commands[] =
+{
+	{"ACCESS",	ea_cmd_access,	0,	NS_ULEVEL_ROOT, ea_help_access,	ea_help_access_oneline},
+	{NULL,		NULL,			0, 	0,				NULL, 			NULL}
+};
+
+/** @brief dbaccesslisthandler
+ *
+ *  Table load handler
+ *
+ *  @param pointer to table row data
+ *
+ *  @return none
+ */
+
+static void dbaccesslisthandler (void *data)
+{
+	AccessEntry *access;
+	
+	access = ns_calloc( sizeof( AccessEntry ) );
+	os_memcpy( access, data, sizeof( AccessEntry ) );
+	hnode_create_insert( accesshash, access, access->nick );
+}
 
 /** @brief LoadAccessList
  *
@@ -86,36 +114,10 @@ static char buf[CONFBUFSIZE];
  *  @return none
  */
 
-static void LoadAccessList(void) 
+static void LoadAccessList( void )
 {
-	AccessEntry *access;
-	char **data, *tmp;
-	int i;
-	
-	SET_SEGV_LOCATION();
-	accesshash = hash_create(-1, 0, 0);
-	if (GetDir("AccessList", &data) > 0) {
-		for (i = 0; data[i] != NULL; i++) {	
-			access = ns_calloc(sizeof(AccessEntry));
-			strlcpy(access->nick, data[i], MAXNICK);
-			ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s/mask", access->nick);
-			if (GetConf((void *)&tmp, CFGSTR, buf) <= 0) {
-				free(access);
-			} else {
-				strlcpy(access->mask, tmp, MAXHOST);
-				free(tmp);
-				ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s/level", access->nick);
-				if (GetConf((void *)&access->level, CFGINT, buf) <= 0) {
-					free(access);
-				} else {
-					hnode_create_insert (accesshash, access, access->nick);
-				}
-			}
-		}
-		if(*data) {
-			free(data);
-		}
-	}	
+	accesshash = hash_create( -1, 0, 0 );
+	DBAFetchRows( "AccessList", dbaccesslisthandler );
 }
 
 /** @brief AccessAdd
@@ -127,39 +129,36 @@ static void LoadAccessList(void)
  *  @return NS_SUCCESS if suceeds else result of command
  */
 
-static int AccessAdd (CmdParams* cmdparams) 
+static int AccessAdd( CmdParams* cmdparams )
 {
 	int level = 0;
 	AccessEntry *access;
 	
 	SET_SEGV_LOCATION();
-	if (cmdparams->ac < 3) {
+	if ( cmdparams->ac < 3 ) {
 		return NS_ERR_NEED_MORE_PARAMS;
 	}
-	if (hash_lookup(accesshash, cmdparams->av[1])) {
-		irc_prefmsg(NULL, cmdparams->source, "Entry for %s already exists", cmdparams->av[1]);
+	if ( hash_lookup( accesshash, cmdparams->av[1] ) ) {
+		irc_prefmsg( NULL, cmdparams->source, "Entry for %s already exists", cmdparams->av[1] );
 		return NS_SUCCESS;
 	}
-	if (strstr(cmdparams->av[2], "!")&& !strstr(cmdparams->av[2], "@")) {
-		irc_prefmsg(NULL, cmdparams->source, "Invalid format for hostmask. Must be of the form nick!user@host.");
+	if ( strstr( cmdparams->av[2], "!" ) && !strstr( cmdparams->av[2], "@" ) ) {
+		irc_prefmsg( NULL, cmdparams->source, "Invalid format for hostmask. Must be of the form nick!user@host." );
 		return NS_ERR_SYNTAX_ERROR;
 	}
-	level = atoi(cmdparams->av[3]);
+	level = atoi( cmdparams->av[3] );
 	if(level < 0 || level > NS_ULEVEL_ROOT) {
-		irc_prefmsg(NULL, cmdparams->source, "Level out of range. Valid values range from 0 to 200.");
+		irc_prefmsg( NULL, cmdparams->source, "Level out of range. Valid values range from 0 to 200." );
 		return NS_ERR_PARAM_OUT_OF_RANGE;
 	}
-	access = ns_calloc(sizeof(AccessEntry));
-	strlcpy(access->nick, cmdparams->av[1], MAXNICK);
-	strlcpy(access->mask, cmdparams->av[2], MAXHOST);
+	access = ns_calloc( sizeof(AccessEntry) );
+	strlcpy( access->nick, cmdparams->av[1], MAXNICK );
+	strlcpy( access->mask, cmdparams->av[2], MAXHOST );
 	access->level = level;
- 	hnode_create_insert (accesshash, access, access->nick);
+ 	hnode_create_insert( accesshash, access, access->nick );
 	/* save the entry */
-	ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s/mask", access->nick);
-	SetConf((void *)access->mask, CFGSTR, buf);
-	ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s/level", access->nick);
-	SetConf((void *)access->level, CFGINT, buf);
-	irc_prefmsg(NULL, cmdparams->source, "Successfully added %s for host %s with level %d to access list", access->nick, access->mask, access->level);
+	DBAStore( "AccessList", access->nick, (void *)access, sizeof(AccessEntry) );
+	irc_prefmsg( NULL, cmdparams->source, "Successfully added %s for host %s with level %d to access list", access->nick, access->mask, access->level );
 	return NS_SUCCESS;
 }
 
@@ -172,24 +171,23 @@ static int AccessAdd (CmdParams* cmdparams)
  *  @return NS_SUCCESS if suceeds else result of command
  */
 
-static int AccessDel(CmdParams* cmdparams) 
+static int AccessDel( CmdParams *cmdparams )
 {
 	hnode_t *node;
 
 	SET_SEGV_LOCATION();
-	if (cmdparams->ac < 1) {
+	if ( cmdparams->ac < 1 ) {
 		return NS_ERR_SYNTAX_ERROR;
 	}
-	node = hash_lookup(accesshash, cmdparams->av[1]);
-	if (node) {
-		ns_free(hnode_get(node));
-		hash_delete(accesshash, node);
-		hnode_destroy(node);
-		ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s", cmdparams->av[1]);
-		DelConf(buf);
-		irc_prefmsg(NULL, cmdparams->source, "Deleted %s from Access List", cmdparams->av[1]);
+	node = hash_lookup( accesshash, cmdparams->av[1] );
+	if ( node) {
+		ns_free( hnode_get( node ) );
+		hash_delete( accesshash, node );
+		hnode_destroy( node );
+		DBADelete ("AccessList", cmdparams->av[1] );
+		irc_prefmsg( NULL, cmdparams->source, "Deleted %s from Access List", cmdparams->av[1] );
 	} else {
-		irc_prefmsg(NULL, cmdparams->source, "Error, Could not find %s in access list.", cmdparams->av[1]);
+		irc_prefmsg( NULL, cmdparams->source, "Error, Could not find %s in access list.", cmdparams->av[1] );
 	}
 	return NS_SUCCESS;
 }
@@ -203,20 +201,20 @@ static int AccessDel(CmdParams* cmdparams)
  *  @return NS_SUCCESS if suceeds else result of command
  */
 
-static int AccessList(CmdParams* cmdparams) 
+static int AccessList( CmdParams *cmdparams )
 {
 	hscan_t accessscan;
 	hnode_t *node;
 	AccessEntry *access;
 
 	SET_SEGV_LOCATION();	
-	irc_prefmsg(NULL, cmdparams->source, "Access List (%d):", (int)hash_count(accesshash));
-	hash_scan_begin(&accessscan, accesshash);
-	while ((node = hash_scan_next(&accessscan)) != NULL) {
-		access = hnode_get(node);
-		irc_prefmsg(NULL, cmdparams->source, "%s %s (%d)", access->nick, access->mask, access->level);
+	irc_prefmsg( NULL, cmdparams->source, "Access List (%d):", (int)hash_count( accesshash ) );
+	hash_scan_begin( &accessscan, accesshash );
+	while ((node = hash_scan_next( &accessscan ) )!= NULL) {
+		access = hnode_get( node );
+		irc_prefmsg( NULL, cmdparams->source, "%s %s (%d)", access->nick, access->mask, access->level );
 	}
-	irc_prefmsg(NULL, cmdparams->source, "End of list.");	
+	irc_prefmsg( NULL, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
 
@@ -229,26 +227,19 @@ static int AccessList(CmdParams* cmdparams)
  *  @return NS_SUCCESS if suceeds else result of command
  */
 
-static int ea_cmd_access(CmdParams* cmdparams)
+static int ea_cmd_access( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if (!ircstrcasecmp(cmdparams->av[0], "add")) {
-		return AccessAdd(cmdparams);
-	} else if (!ircstrcasecmp(cmdparams->av[0], "del")) {
-		return AccessDel(cmdparams);
-	} else if (!ircstrcasecmp(cmdparams->av[0], "list")) {
-		return AccessList(cmdparams);
+	if ( !ircstrcasecmp( cmdparams->av[0], "add" ) ) {
+		return AccessAdd( cmdparams );
+	} else if ( !ircstrcasecmp( cmdparams->av[0], "del" ) ) {
+		return AccessDel( cmdparams );
+	} else if ( !ircstrcasecmp( cmdparams->av[0], "list" ) ) {
+		return AccessList( cmdparams );
 	}
-	irc_prefmsg(NULL, cmdparams->source, "Invalid Syntax.");
+	irc_prefmsg( NULL, cmdparams->source, "Invalid Syntax." );
 	return NS_ERR_SYNTAX_ERROR;
 }
-
-/** Bot comand table */
-bot_cmd extauth_commands[]=
-{
-	{"ACCESS",	ea_cmd_access,	0,	NS_ULEVEL_ROOT, ea_help_access,	ea_help_access_oneline},
-	{NULL,		NULL,			0, 	0,				NULL, 			NULL}
-};
 
 /** @brief ModInit
  *
@@ -259,7 +250,7 @@ bot_cmd extauth_commands[]=
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModInit (Module *modptr)
+int ModInit( Module *modptr )
 {
 	LoadAccessList();
 	return NS_SUCCESS;
@@ -274,9 +265,9 @@ int ModInit (Module *modptr)
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModSynch (void)
+int ModSynch( void )
 {
-	if (add_services_cmd_list (extauth_commands) != NS_SUCCESS) {
+	if ( add_services_cmd_list( extauth_commands )!= NS_SUCCESS ) {
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
@@ -291,9 +282,9 @@ int ModSynch (void)
  *  @return none
  */
 
-void ModFini (void)
+void ModFini( void )
 {
-	del_services_cmd_list (extauth_commands);
+	del_services_cmd_list( extauth_commands );
 }
 
 /** @brief ModAuthUser
@@ -305,17 +296,17 @@ void ModFini (void)
  *  @return authentication level for user
  */
 
-int ModAuthUser (Client * u)
+int ModAuthUser( Client *u )
 {
 	static char hostmask[MAXHOST];
 	AccessEntry *access;
 
-	dlog (DEBUG2, "ModAuthUser for %s", u->name);
-	access = (AccessEntry *)hnode_find (accesshash, u->name);
-	if (access) {
-		ircsnprintf (hostmask, MAXHOST, "%s@%s", u->user->username, u->user->hostname);
-		if ((match (access->mask, hostmask))) {
-			return(access->level);		
+	dlog( DEBUG2, "ModAuthUser for %s", u->name );
+	access = (AccessEntry *)hnode_find( accesshash, u->name );
+	if ( access) {
+		ircsnprintf( hostmask, MAXHOST, "%s@%s", u->user->username, u->user->hostname );
+		if ( match( access->mask, hostmask ) ) {
+			return access->level;		
 		}
 	}		
 	return 0;

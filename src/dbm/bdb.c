@@ -22,61 +22,55 @@
 */
 
 #include "neostats.h"
-
-#if 0 /* Temp since berkeley is causing too many problems */
-#ifndef WIN32 /* Temp since open call no longer compiles */
-#ifdef HAVE_DB_H
+#include "nsdbm.h"
 #include <db.h>
 
 static DBT dbkey;
 static DBT dbdata;
-static int dbret;
 
-typedef struct db_entry {
-	DB* dbp;
-	char dbname[MAXPATH];
-}db_entry;
-
-db_entry db_list[NUM_MODULES];
-
-int DBOpenDatabase(void)
+void *DBMOpenTable (const char *name)
 {
-	int index;
+	static char filename[MAXPATH];
+	int dbret;
+	DB *dbp;
 
-	dlog(DEBUG1, "DBOpenDatabase");
-	index = GET_CUR_MODNUM();
-	ircsnprintf(db_list[index].dbname, MAXPATH, "data/%s.db", GET_CUR_MODNAME());
-	if ((dbret = db_create(&db_list[index].dbp, NULL, 0)) != 0) {
+	dlog (DEBUG1, "DBMOpenTable");
+	ircsprintf (filename, "%s.bdb", name);
+	if ((dbret = db_create(&dbp, NULL, 0)) != 0) {
 		dlog(DEBUG1, "db_create: %s", db_strerror(dbret));
-		return -1;
+		return NULL;
 	}
-	if ((dbret = db_list[index].dbp->open(db_list[index].dbp, db_list[index].dbname, "Data", DB_BTREE, DB_CREATE, 0664)) != 0) {
+#if 0 /* Temp since it does not compile */
+	if ((dbret = dbp->open(dbp, filename, "Data", DB_BTREE, DB_CREATE, 0664)) != 0) {
 		dlog(DEBUG1, "dbp->open: %s", db_strerror(dbret));
-		return -1;
+		return NULL;
 	}
-	return 1;
+	return (void *)dbp;
+#else
+	return NULL;
+#endif
 }
 
-void DBCloseDatabase(void)
+int DBMCloseTable (void *handle)
 {
-	int index;
+	DB *dbp = (DB *)handle;
 
-	dlog(DEBUG1, "DBCloseDatabase");
-	index = GET_CUR_MODNUM();
-	db_list[index].dbp->close(db_list[index].dbp, 0); 
+	dlog(DEBUG1, "DBACloseTable");
+	dbp->close(dbp, 0); 
+	return NS_SUCCESS;
 }
 
-void* DBGetData(char* key)
+void* DBMGetData (void *handle, char *key)
 {
-	int index;
+	int dbret;
+	DB *dbp = (DB *)handle;
 
-	dlog(DEBUG1, "DBGetData %s", key);
-	index = GET_CUR_MODNUM();
+	dlog(DEBUG1, "DBAFetch %s", key);
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.data = key;
 	dbkey.size = strlen(key);
-	if ((dbret = db_list[index].dbp->get(db_list[index].dbp, NULL, &dbkey, &dbdata, 0)) == 0)
+	if ((dbret = dbp->get(dbp, NULL, &dbkey, &dbdata, 0)) == 0)
 	{
 		return dbdata.data;
 	}
@@ -84,23 +78,33 @@ void* DBGetData(char* key)
 	return NULL;
 }
 
-void DBSetData(char* key, void* data, int size)
+int DBMSetData (void *handle, char *key, void *data, int size)
 {
-	int index;
+	int dbret;
+	DB *dbp = (DB *)handle;
 
-	dlog(DEBUG1, "DBSetData %s %s", key, (char *)data);
-	index = GET_CUR_MODNUM();
+	dlog(DEBUG1, "DBAStore %s %s", key, (char *)data);
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.data = key;
 	dbkey.size = strlen(key);
 	dbdata.data = data;
 	dbdata.size = size;
-	if ((dbret = db_list[index].dbp->put(db_list[index].dbp, NULL, &dbkey, &dbdata, 0)) != 0) {
+	if ((dbret = dbp->put(dbp, NULL, &dbkey, &dbdata, 0)) != 0) {
 		dlog(DEBUG1, "dbp->put: %s", db_strerror(dbret));
+		return NS_FAILURE;
 	}
+	return NS_SUCCESS;
 }
 
-#endif /* HAVE_DB_H */
-#endif /* WIN32 */
-#endif /* 0 */
+int DBMGetTableRows (void *handle, DBRowHandler handler)
+{
+	/* TODO */
+	return NS_SUCCESS;
+}
+
+int DBMDelData (void *handle, char * key)
+{
+	/* TODO */
+	return NS_SUCCESS;
+}

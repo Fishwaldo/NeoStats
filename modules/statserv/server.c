@@ -413,13 +413,12 @@ int ss_cmd_stats (CmdParams *cmdparams)
 static void SaveServer (serverstat *ss)
 {
 	dlog (DEBUG1, "Writing statistics to database for %s", ss->name);
-	SetData ((void *)ss->ts_start, CFGINT, SERVER_TABLE, ss->name, "ts_start");
-	SetData ((void *)ss->ts_lastseen, CFGINT, SERVER_TABLE, ss->name, "ts_lastseen");
-	SaveStatistic (&ss->users, SERVER_TABLE, ss->name, "users");
-	SaveStatistic (&ss->opers, SERVER_TABLE, ss->name, "opers");
-	SaveStatistic (&ss->operkills, SERVER_TABLE, ss->name, "operkills");
-	SaveStatistic (&ss->serverkills, SERVER_TABLE, ss->name, "serverkills");
-	SaveStatistic (&ss->splits, SERVER_TABLE, ss->name, "splits");
+	PreSaveStatistic (&ss->users);
+	PreSaveStatistic (&ss->opers);
+	PreSaveStatistic (&ss->operkills);
+	PreSaveStatistic (&ss->serverkills);
+	PreSaveStatistic (&ss->splits);
+	DBAStore (SERVER_TABLE, ss->name, (void *)ss, sizeof (serverstat));
 }
 
 void SaveServerStats(void)
@@ -428,8 +427,6 @@ void SaveServerStats(void)
 	hnode_t *sn;
 	hscan_t hs;
 
-	/* clear the old database */
-	DelTable (SERVER_TABLE);
 	/* run through stats and save them */
 	hash_scan_begin (&hs, serverstathash);
 	while ((sn = hash_scan_next (&hs))) {
@@ -438,40 +435,25 @@ void SaveServerStats(void)
 	}
 }
 
-void LoadServerStats(void) 
+void LoadServerStats(void *data) 
 {
 	serverstat *ss;
-	char **row;
-	int count;
 
-	if (GetTableData (SERVER_TABLE, &row) > 0) {
-		for (count = 0; row[count] != NULL; count++) {
-			if (hash_isfull (serverstathash)) {
-				nlog (LOG_CRITICAL, "StatServ server hash full");
-				break;
-			}
-			ss = ns_calloc (sizeof(serverstat));
-			strlcpy (ss->name, row[count], MAXHOST);
-			GetData ((void *)&ss->ts_start, CFGINT, SERVER_TABLE, ss->name, "ts_start");
-			GetData ((void *)&ss->ts_lastseen, CFGINT, SERVER_TABLE, ss->name, "ts_lastseen");
-
-			LoadStatistic (&ss->users, SERVER_TABLE, ss->name, "users");
-			LoadStatistic (&ss->opers, SERVER_TABLE, ss->name, "opers");
-			LoadStatistic (&ss->operkills, SERVER_TABLE, ss->name, "operkills");
-			LoadStatistic (&ss->serverkills, SERVER_TABLE, ss->name, "serverkills");
-			LoadStatistic (&ss->splits, SERVER_TABLE, ss->name, "numsplits");
-
-			dlog (DEBUG1, "Loaded statistics for %ss", ss->name);
-			hnode_create_insert (serverstathash, ss, ss->name);
-		}
-	}       
-	ns_free(row);                                 
+	ss = ns_calloc (sizeof(serverstat));
+	os_memcpy (ss, data, sizeof(serverstat));
+	dlog (DEBUG1, "Loaded statistics for %ss", ss->name);
+	hnode_create_insert (serverstathash, ss, ss->name);
+	PostLoadStatistic (&ss->users);
+	PostLoadStatistic (&ss->opers);
+	PostLoadStatistic (&ss->operkills);
+	PostLoadStatistic (&ss->serverkills);
+	PostLoadStatistic (&ss->splits);
 }
 
 void InitServerStats (void)
 {
 	serverstathash = hash_create (-1, 0, 0);
-	LoadServerStats ();
+	DBAFetchRows (SERVER_TABLE, LoadServerStats);
 	GetServerList (AddServerStat, NULL);
 }
 

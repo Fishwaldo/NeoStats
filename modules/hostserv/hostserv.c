@@ -163,7 +163,7 @@ int findnick (const void *key1, const void *key2)
 
 static void del_vhost (vhostentry *vhost) 
 {
-	DelRow ("Vhosts", vhost->nick);
+	DBADelete ("vhosts", vhost->nick);
 	ns_free (vhost);
 }
 
@@ -200,6 +200,15 @@ int ExpireOldHosts (void)
 	return NS_SUCCESS;
 }
 
+void new_dbvhost (void *data)
+{
+	vhostentry *vhe;
+
+	vhe = ns_calloc(sizeof(vhostentry));
+	os_memcpy (vhe, data, sizeof(vhostentry));
+	lnode_create_append (vhost_list, vhe);
+}
+
 /** @brief LoadHosts
  *
  *  Load vhosts
@@ -211,37 +220,7 @@ int ExpireOldHosts (void)
 
 static void LoadHosts (void)
 {
-	vhostentry *vhe;
-	char *tmp;
-	int i;
-	char **data;
-
-	if (GetTableData ("Vhosts", &data) > 0) {
-		for (i = 0; data[i] != NULL; i++) {
-			vhe = ns_calloc (sizeof(vhostentry));
-			strlcpy (vhe->nick, data[i], MAXNICK);
-			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Host") > 0) {
-				strlcpy (vhe->host, tmp, MAXHOST);
-				ns_free (tmp);
-			}
-			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Vhost") > 0) {
-				strlcpy (vhe->vhost, tmp, MAXHOST);
-				ns_free (tmp);
-			}
-			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Passwd") > 0) {
-				strlcpy (vhe->passwd, tmp, MAXPASS);
-				ns_free (tmp);
-			}
-			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Added") > 0) {
-				strlcpy (vhe->added, tmp, MAXNICK);
-				ns_free (tmp);
-			}
-			GetData ((void *)&vhe->tslastused, CFGINT, "Vhosts", vhe->nick, "LastUsed");
-			lnode_create_append (vhost_list, vhe);
-			dlog (DEBUG1, "Loaded %s (%s) into Vhosts", vhe->nick, vhe->vhost);
-		}
-	}			
-	ns_free (data);
+	DBAFetchRows ("vhosts", new_dbvhost);
 	list_sort (vhost_list, findnick);
 }
 
@@ -257,11 +236,7 @@ static void LoadHosts (void)
 static void SaveVhost (vhostentry *vhe) 
 {
 	vhe->tslastused = me.now;
-	SetData ((void *)vhe->host, CFGSTR, "Vhosts", vhe->nick, "Host");
-	SetData ((void *)vhe->vhost, CFGSTR, "Vhosts", vhe->nick , "Vhost");
-	SetData ((void *)vhe->passwd, CFGSTR, "Vhosts", vhe->nick , "Passwd");
-	SetData ((void *)vhe->added, CFGSTR, "Vhosts", vhe->nick , "Added");
-	SetData ((void *)vhe->tslastused, CFGINT, "Vhosts", vhe->nick , "LastUsed");
+	DBAStore ("vhosts", vhe->nick, (void *)vhe, sizeof (vhostentry));
 	list_sort (vhost_list, findnick);
 }
 
@@ -276,8 +251,7 @@ static void SaveVhost (vhostentry *vhe)
 
 static void SaveBan (banentry *ban)
 {
-	SetData ((void *)ban->who, CFGSTR, "Ban", ban->host, "Who");
-	SetData ((void *)ban->reason, CFGSTR, "Ban", ban->host, "Reason");
+	DBAStore ("bans", ban->host, (void *)ban, sizeof (ban));
 }
 
 /** @brief LoadBans
@@ -289,29 +263,18 @@ static void SaveBan (banentry *ban)
  *  @return none
  */
 
+static void new_ban (void *data)
+{
+	banentry *ban;
+
+	ban = ns_calloc (sizeof (banentry));
+	os_memcpy (ban, data, sizeof (banentry));
+	hnode_create_insert (banhash, ban, ban->host);
+}
+
 static void LoadBans (void)
 {
-	char *tmp;
-	banentry *ban;
-	int i;
-	char **data;
-
-	if (GetTableData ("Ban", &data) > 0) {
-		for (i = 0; data[i] != NULL; i++) {
-			ban = ns_calloc (sizeof (banentry));
-			strlcpy (ban->host, data[i], MAXHOST);
-			if (GetData ((void *)&tmp, CFGSTR, "Ban", ban->host, "Who") > 0) {
-				strlcpy (ban->who, tmp, MAXNICK);
-				ns_free (tmp);
-			}
-			if (GetData ((void *)&tmp, CFGSTR, "Ban", ban->host, "Reason") > 0) {
-				strlcpy (ban->reason, tmp, MAXREASON);
-				ns_free (tmp);
-			}
-			hnode_create_insert (banhash, ban, ban->host);
-		}
-	}
-	ns_free (data);
+	DBAFetchRows ("ban", new_ban);
 }
 
 /** @brief hs_set_regnick_cb
@@ -423,8 +386,10 @@ static int hs_event_umode (CmdParams *cmdparams)
 					dlog (DEBUG2, "Regnick Mode on %s", cmdparams->av[0]);
 					ircsnprintf(vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom);
 					irc_svshost (hs_bot, cmdparams->source, vhost);
-					irc_prefmsg (hs_bot, cmdparams->source, 
-						"Setting your host to %s", vhost);
+					irc_prefmsg (hs_bot, cmdparams->source, "Setting your host to %s", vhost);
+					irc_chanalert (hs_bot, "\2VHOST\2 registered nick %s now using vhost %s", 
+						cmdparams->source->name, vhost);
+
 				}
 			}
 			break;
@@ -632,7 +597,7 @@ static int hs_cmd_bans_del (CmdParams *cmdparams)
 			nlog (LOG_NOTICE, "%s deleted %s from the banned vhost list",
 				cmdparams->source->name, cmdparams->av[1]);
 			hnode_destroy (hn);
-			DelRow ("Ban", ban->host);
+			DBADelete ("bans", ban->host);
 			ns_free (ban);
 			return NS_SUCCESS;
 		}
@@ -931,7 +896,7 @@ static int hs_cmd_login (CmdParams *cmdparams)
 				"Your vhost %s has been set.", vhe->vhost);
 			nlog (LOG_NORMAL, "%s used LOGIN to obtain vhost of %s",
 			    cmdparams->source->name, vhe->vhost);
-			irc_chanalert (hs_bot, "%s used login to get vhost %s", 
+			irc_chanalert (hs_bot, "\2VHOST\2 %s login to vhost %s", 
 				cmdparams->source->name, vhe->vhost);
 			SaveVhost (vhe);
 			return NS_SUCCESS;

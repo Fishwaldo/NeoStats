@@ -62,6 +62,7 @@ static config_option options[] = {
 	{"SET_SERVER_TIMES", ARG_STR, cb_Server, 16},
 	{"SERVICE_ROOT", ARG_STR, cb_Server, 17},
 	{"PROTOCOL", ARG_STR, cb_Server, 18},
+	{"DBM", ARG_STR, cb_Server, 19},
 };
 
 /** @brief Load configuration file
@@ -241,5 +242,7 @@ cb_Server (char *arg, int configtype)
 		}
 	} else if (configtype == 18) {
 		strlcpy(me.protocol,arg,MAXHOST);
+	} else if (configtype == 19) {
+		strlcpy(me.dbm,arg,MAXHOST);
 	}
 }

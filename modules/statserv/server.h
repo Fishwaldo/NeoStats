@@ -54,7 +54,6 @@ int ss_cmd_server (CmdParams *cmdparams);
 int ss_cmd_stats (CmdParams *cmdparams);
 void InitServerStats (void);
 void FiniServerStats (void);
-void LoadServerStats (void);
 void SaveServerStats (void);
 void AddServerUser (Client *u);
 void DelServerUser (Client *u);

@@ -22,7 +22,9 @@
 */
 
 /*  TODO:
- *  - 
+ *  - Change member lists to user Client struct pointers rather than nicks to
+ *    save a little CPU by reducing string ops and removing the need to process
+ *    channel nick changes. Also change to use a hash rather than a list.
  */
 
 #include "neostats.h"
@@ -142,6 +144,10 @@ static Channel *new_chan (const char *chan)
 	}
 	c = ns_calloc (sizeof (Channel));
 	strlcpy (c->name, chan, MAXCHANLEN);
+	if (ircstrcasecmp (me.serviceschan, chan) == 0)
+	{
+		c->flags |= CHANNEL_FLAG_ME;
+	}
 	hnode_create_insert (channelhash, c, c->name);
 	c->members = list_create (CHANNEL_MEM_SIZE);
 	c->modeparms = list_create (CHANNEL_MAXMODES);
@@ -200,18 +206,18 @@ del_chan (Channel *c)
  *
  * @returns Nothing
 */
-void del_chan_user (Channel *c, Client *u)
+void del_channel_user (Channel *c, Client *u)
 {
 	lnode_t *un;
 
 	c->users--;
 	un = list_find (u->user->chans, c->name, comparef);
 	if (!un) {
-		nlog (LOG_WARNING, "del_chan_user: %s not found in channel %s", u->name, c->name);
+		nlog (LOG_WARNING, "del_channel_user: %s not found in channel %s", u->name, c->name);
 	} else {
 		lnode_destroy (list_delete (u->user->chans, un));
 	}
-	dlog (DEBUG3, "del_chan_user: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->members));
+	dlog (DEBUG3, "del_channel_user: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->members));
 	if (c->users <= 0) {
 		del_chan (c);
 	} else if (c->neousers > 0 && c->neousers == c->users) {
@@ -220,18 +226,18 @@ void del_chan_user (Channel *c, Client *u)
 	}
 }
 
-/** @brief Remove ChannelMemberber
+/** @brief Remove Channel Member
  *
  *
  */
-int del_ChannelMemberber (Channel *c, Client *user)
+int del_channel_member (Channel *c, Client *u)
 {
 	ChannelMember *cm;
 	lnode_t *un;
 	
-	un = list_find (c->members, user->name, comparef);
+	un = list_find (c->members, u->name, comparef);
 	if (!un) {
-		nlog (LOG_WARNING, "%s isn't a member of channel %s", user->name, c->name);
+		nlog (LOG_WARNING, "%s isn't a member of channel %s", u->name, c->name);
 		return NS_FAILURE;
 	}
 	cm = lnode_get (un);
@@ -269,7 +275,7 @@ KickChannel (const char *kickby, const char *chan, const char *kicked, const cha
 		nlog (LOG_WARNING, "KickChannel: channel %s not found", chan);
 		return;
 	} 
-	if (del_ChannelMemberber (c, u) != NS_SUCCESS) {
+	if (del_channel_member (c, u) != NS_SUCCESS) {
 		return;
 	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
@@ -288,7 +294,7 @@ KickChannel (const char *kickby, const char *chan, const char *kicked, const cha
 	}
 	/* If PROTOCOL_KICKPART then we will also get part so DO NOT REMOVE USER */
 	if (!(ircd_srv.protocol & PROTOCOL_KICKPART)) {
-		del_chan_user (c, u);
+		del_channel_user (c, u);
 	}
 	ns_free (cmdparams);
 }
@@ -322,7 +328,7 @@ void PartChannel (Client * u, const char *chan, const char *reason)
 		nlog (LOG_WARNING, "PartChannel: channel %s not found", chan);
 		return;
 	}
-	if (del_ChannelMemberber (c, u) != NS_SUCCESS) {
+	if (del_channel_member (c, u) != NS_SUCCESS) {
 		return;
 	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
@@ -335,7 +341,7 @@ void PartChannel (Client * u, const char *chan, const char *reason)
 		SendModuleEvent (EVENT_PARTBOT, cmdparams, u->user->bot->moduleptr);
 		c->neousers --;
 	}
-	del_chan_user (c, u);
+	del_channel_user (c, u);
 	ns_free (cmdparams);
 }
 
@@ -606,6 +612,28 @@ int InitChannels (void)
 void FiniChannels (void)
 {
 	hash_destroy(channelhash);
+}
+
+Channel *GetRandomChan(void) 
+{
+	hscan_t cs;
+	hnode_t *cn;
+	int randno, curno;
+	
+	curno = 0;
+	randno = hrand(hash_count(channelhash), 1);	
+	if (randno == -1) {
+		return NULL;
+	}
+	hash_scan_begin(&cs, channelhash);
+	while ((cn = hash_scan_next(&cs)) != NULL) {
+		if (curno == randno) {
+			return((Channel *)hnode_get(cn));
+		}
+		curno++;
+	}
+	nlog (LOG_WARNING, "GetRandomChan() ran out of channels?");
+	return NULL;
 }
 
 void GetChannelList (ChannelListHandler handler, void *v)

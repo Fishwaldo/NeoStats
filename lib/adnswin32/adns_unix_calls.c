@@ -96,10 +96,6 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 #ifdef ADNS_DLL
 
-#undef malloc
-#undef realloc
-#undef free
-
 void *adns_malloc(const size_t bytes)
 {
 	return malloc(bytes);

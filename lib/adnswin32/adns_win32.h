@@ -146,12 +146,6 @@ ADNS_API int adns_getpid();
 #define inet_aton(ap, inp) adns_inet_aton(ap, inp)
 #define getpid() adns_getpid()
 
-#ifdef ADNS_DLL
-# define malloc(bytes) adns_malloc(bytes)
-# define realloc(ptr, bytes) adns_realloc(ptr, bytes)
-# define free(ptr) adns_free(ptr)
-#endif
-
 /* ---------------- END OF C HEADER -------------- */
 #ifdef __cplusplus 
 }

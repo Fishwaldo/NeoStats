@@ -71,6 +71,7 @@ extern const char *ns_help_set_user[];
 extern const char *ns_help_set_host[];
 extern const char *ns_help_set_realname[];
 extern const char *ns_help_set_joinserviceschan[];
+extern const char *ns_help_set_splittime[];
 extern const char *ns_help_set_pingtime[];
 extern const char *ns_help_set_versionscan[];
 extern const char *ns_help_set_servicecmode[];

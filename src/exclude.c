@@ -31,7 +31,7 @@
 
 static list_t *exclude_list;
 
-typedef struct excludes {
+typedef struct exclude {
 	enum type {
 		NS_EXCLUDE_HOST	= 0x1,
 		NS_EXCLUDE_SERVER = 0x2,
@@ -40,8 +40,17 @@ typedef struct excludes {
 	char pattern[MAXHOST]; /* becuase hostname is the biggest this can get */
 	char addedby[MAXNICK];
 	time_t addedon;
-} excludes;
+} exclude;
 
+void new_exclude (void *data)
+{
+	exclude *e;
+
+	e = ns_calloc(sizeof(exclude));
+	os_memcpy (e, data, sizeof(exclude));
+	lnode_create_append (exclude_list, e);
+	dlog(DEBUG2, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
+}
 
 /* @brief initilize the exlusion list
  * 
@@ -49,33 +58,8 @@ typedef struct excludes {
  */
 int InitExcludes(void) 
 {
-	char **row;
-	int i;
-	excludes *e;
-	char *tmp;
-	
 	exclude_list = list_create(-1);
-	if (GetTableData("Exclusions", &row) > 0) {
-		for (i = 0; row[i] != NULL; i++) {
-			e = ns_calloc(sizeof(excludes));
-			if (GetData((void *)&tmp, CFGSTR, "Exclusions", row[i], "Pattern") > 0) {
-				strlcpy(e->pattern, tmp, MAXHOST);
-				ns_free (tmp);
-			} else {
-				nlog(LOG_WARNING, "Exclusions: Can't add entry %s, Pattern invalid", row[i]);
-				continue;
-			}
-			if (GetData((void *)&tmp, CFGSTR, "Exclusions", row[i], "AddedBy") > 0) {
-				strlcpy(e->addedby, tmp, MAXNICK);
-				ns_free (tmp);
-			}
-			e->addedon = atoi(row[i]);
-			GetData((void *)&e->type, CFGINT, "Exclusions", row[i], "Type");
-			dlog(DEBUG2, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
-			lnode_create_append (exclude_list, e);
-		}
-	}
-	ns_free (row);
+	DBAFetchRows ("exclusions", new_exclude);
 	return NS_SUCCESS;
 } 
 
@@ -93,14 +77,14 @@ void FiniExcludes(void)
  */
 int ns_cmd_exclude_add(CmdParams* cmdparams) 
 {
-	excludes *e;
+	exclude *e;
 	static char tmp[BUFSIZE];
 	
 	if (cmdparams->ac < 3) {
 		return NS_ERR_NEED_MORE_PARAMS;
 	}
 	/* we dont do any checking to see if a similar entry already exists... oh well, thats upto the user */
-	e = ns_calloc (sizeof(excludes));
+	e = ns_calloc (sizeof(exclude));
 	strlcpy(e->addedby, cmdparams->source->name, MAXNICK);
 	e->addedon = me.now;
 	if (!ircstrcasecmp("HOST", cmdparams->av[1])) {
@@ -139,9 +123,7 @@ int ns_cmd_exclude_add(CmdParams* cmdparams)
 
 	/* now save the exclusion list */
 	ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
-	SetData((void *)e->type, CFGINT, "Exclusions", tmp, "Type");
-	SetData((void *)e->addedby, CFGSTR, "Exclusions", tmp, "AddedBy");
-	SetData((void *)e->pattern, CFGSTR, "Exclusions", tmp, "Pattern");
+	DBAStore ("Exclusions", tmp, (void *)e, sizeof (exclude));
 	return NS_SUCCESS;
 } 
 
@@ -154,7 +136,7 @@ int ns_cmd_exclude_add(CmdParams* cmdparams)
 int ns_cmd_exclude_del(CmdParams* cmdparams) 
 {
 	lnode_t *en;
-	excludes *e;
+	exclude *e;
 	int i, pos;
 	static char tmp[BUFSIZE];
 	
@@ -171,7 +153,7 @@ int ns_cmd_exclude_del(CmdParams* cmdparams)
 		if (i == pos) {
 			e = lnode_get(en);
 			ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
-			DelRow("Exclusions", tmp);
+			DBADelete ("Exclusions", tmp);
 			irc_prefmsg(ns_botptr, cmdparams->source, __("Deleted %s out of exclusion list",cmdparams->source), e->pattern);
 			ns_free(e);
 			list_delete(exclude_list, en);
@@ -195,7 +177,7 @@ int ns_cmd_exclude_del(CmdParams* cmdparams)
 int ns_cmd_exclude_list(CmdParams* cmdparams) 
 {
 	lnode_t *en;
-	excludes *e;
+	exclude *e;
 	int i = 0;
 	static char tmp[BUFSIZE];
 	
@@ -239,7 +221,7 @@ int ns_cmd_exclude_list(CmdParams* cmdparams)
 void ns_do_exclude_user(Client *u) 
 {
 	lnode_t *en;
-	excludes *e;
+	exclude *e;
 	
 	/* first thing we check is the server flag. if the server
 	 * is excluded, then the user is excluded as well
@@ -276,7 +258,7 @@ void ns_do_exclude_user(Client *u)
 void ns_do_exclude_server(Client *s) 
 {
 	lnode_t *en;
-	excludes *e;
+	exclude *e;
 	
 	en = list_first(exclude_list);
 	while (en != NULL) {
@@ -305,7 +287,7 @@ void ns_do_exclude_server(Client *s)
 void ns_do_exclude_chan(Channel *c) 
 {
 	lnode_t *en;
-	excludes *e;
+	exclude *e;
 	
 	en = list_first(exclude_list);
 	while (en != NULL) {

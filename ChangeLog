@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.prealpha2-dev
+ - Add support for GDBM as an alternative to BDB. (M)
+ - New DB interface to replace keeper calls. (M)
  - Lots of AutoMake updates so that distros work again and external modules
    have includes available. (M)
  - StatServ: complete rewrite of statistics systems. (M)

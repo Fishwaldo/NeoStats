@@ -153,7 +153,7 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-SUBDIRS = protocol
+SUBDIRS = dbm protocol
 
 bin_PROGRAMS = neostats
 

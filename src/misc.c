@@ -27,6 +27,24 @@
 #include "services.h"
 #include "ircstring.h"
 
+/* @brief hrand
+ * 
+ * 
+ * 
+ * @params upperbound
+ * @params lowerbound
+ *
+ * @returns result
+ */
+
+unsigned hrand(unsigned upperbound, unsigned lowerbound) 
+{
+	if ((upperbound < 1)) {
+		return -1;
+	}
+	return ((unsigned)(rand()%((int)(upperbound-lowerbound+1))-((int)(lowerbound-1))));
+}
+
 /* @brief Make the name of a file safe for a filename
  * 
  * given a name, make sure its a safe name for a filename

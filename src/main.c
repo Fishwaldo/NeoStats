@@ -42,6 +42,7 @@
 #include "timer.h"
 #include "signals.h"
 #include "lang.h"
+#include "nsdba.h"
 
 #define PID_FILENAME	"neostats.pid"
 
@@ -97,6 +98,8 @@ static int InitCore(void)
 	ircsnprintf(dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX);
 	LANGinit(1, dbpath, NULL);
 	/* initialize Module subsystem */
+	if (InitDBA () != NS_SUCCESS)
+		return NS_FAILURE;
 	if (InitModules () != NS_SUCCESS)
 		return NS_FAILURE;
 	if (InitAuth() != NS_SUCCESS)
@@ -353,6 +356,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 	if (exitcode != NS_EXIT_SEGFAULT) {
 		rtaserv_fini ();
 		unload_modules();
+		DBACloseDatabase ();
 		if(quitmsg)
 		{
 			irc_quit (ns_botptr, quitmsg);
@@ -381,9 +385,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 			}
 		}
 	}
-
-	kp_flush();
-	kp_exit();
+	FiniDBA ();
 	FiniLogs ();
 	LANGfini();
 	if ((exitcode == NS_EXIT_RECONNECT && nsconfig.r_time > 0) || exitcode == NS_EXIT_RELOAD) {

@@ -51,6 +51,7 @@ typedef struct config {
 	unsigned int error:1;
 	unsigned int onlyopers:1;
 	int setservertimes;
+	int splittime;
 	unsigned int versionscan;
 	int r_time;
 	char pass[MAXPASS];

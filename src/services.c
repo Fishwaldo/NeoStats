@@ -121,6 +121,7 @@ static bot_cmd ns_commands[]=
 /** Bot setting table */
 static bot_setting ns_settings[]=
 {
+	{"SPLITTIME",		&nsconfig.splittime,	SET_TYPE_INT,		0,	1000,		NS_ULEVEL_ADMIN, "splittime",	NULL,	ns_help_set_splittime, NULL, (void *)300 },
 	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,		0, 0, 	NS_ULEVEL_ADMIN, "joinserviceschan",	NULL,	ns_help_set_joinserviceschan, NULL, (void*)1 },
 	{"PINGTIME",		&nsconfig.pingtime,	SET_TYPE_INT,		0, 0, 	NS_ULEVEL_ADMIN, "pingtime",	NULL,	ns_help_set_pingtime, NULL, (void*)120 },
 	{"VERSIONSCAN",		&nsconfig.versionscan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL, (void*)1 },
@@ -179,8 +180,9 @@ static int services_event_ctcpversion (CmdParams *cmdparams)
 void InitServices(void)
 {
 	/* if all bots should join the chan */
-	if (GetConf ((void *) &nsconfig.allbots, CFGINT, "AllBotsJoinChan") <= 0) {
+	if (DBAFetchConfigInt ("AllBotsJoinChan", &nsconfig.allbots) != NS_SUCCESS) {
 		nsconfig.allbots = 0;
+		DBAStoreConfigInt ("AllBotsJoinChan", &nsconfig.allbots);
 	}
 	/* */
 	ModuleConfig(ns_settings);
@@ -201,7 +203,7 @@ init_services_bot (void)
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
 	ns_module.insynch = 1;
 	ns_botptr = AddBot (&ns_botinfo);
-	RegisterEventList (neostats_events);
+	AddEventList (neostats_events);
 	/*DeleteEventList (neostats_events);*/
 	ns_module.synched = 1;
 	me.synched = 1;

@@ -54,8 +54,8 @@ void DecStatisticEntry (statisticentry *stat, unsigned int current);
 void DecStatistic (statistic *stat);
 int SetStatisticEntry (statisticentry *stat, unsigned int current, unsigned int diff);
 int SetStatistic (statistic *stat, int current);
-void SaveStatistic (statistic *stat, char *table, char *row, char *field);
-void LoadStatistic (statistic *stat, char *table, char *row, char *field);
+void PreSaveStatistic (statistic *stat);
+void PostLoadStatistic (statistic *stat);
 
 int GetAllTimePercent (statistic *stat);
 int GetDailyPercent (statistic *stat);

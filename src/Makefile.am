@@ -1,4 +1,4 @@
-SUBDIRS		= protocol
+SUBDIRS		= dbm protocol
 
 bin_PROGRAMS = neostats
 

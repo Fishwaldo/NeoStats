@@ -183,38 +183,23 @@ void SaveTLDStats (void)
 	tn = list_first(tldstatlist);
 	while (tn != NULL) {
 		t = lnode_get(tn);
-		SetData((void *)t->country, CFGSTR, TLD_TABLE, t->tld, "country");
-		SaveStatistic (&t->users, TLD_TABLE, t->tld, "users");
+		DBAStore (TLD_TABLE, t->tld, (void *)t, sizeof(TLD));
 		tn = list_next(tldstatlist, tn);
 	}
 }
 
-void LoadTLDStats (void)
+void new_tld (void *data)
 {
 	TLD *t;
-	int i;
-	char **data;
-	char *tmp;
 
-	if (GetTableData (TLD_TABLE, &data) > 0) {
-		for (i = 0; data[i] != NULL; i++) {
-			if (strncmp (data[i], "???", 3) != 0)
-			{
-				t = ns_calloc (sizeof (TLD));
-				strlcpy (t->tld, data[i], 5);
-				if (GetData((void *)&tmp, CFGSTR, TLD_TABLE, t->tld, "country") > 0) {
-					strlcpy(t->country, tmp, MAXHOST);
-					ns_free (tmp);
-				} else {
-					strlcpy(t->country, "???", MAXHOST);
-					continue;
-				}
-				LoadStatistic (&t->users, TLD_TABLE, t->tld, "users");
-				lnode_create_append (tldstatlist, t);
-			}
-		}
-	}
-	ns_free (data);
+	t = ns_calloc (sizeof (TLD));
+	os_memcpy (t, data, sizeof(TLD));
+	lnode_create_append (tldstatlist, t);
+}
+
+void LoadTLDStats (void)
+{
+	DBAFetchRows ("TLD", new_tld);
 }
 
 /** @brief InitTLDStatistics
@@ -249,7 +234,6 @@ void InitTLDStatistics (void)
 	ircsnprintf(t->tld, 5, UNKNOWN_COUNTRY_CODE);
 	strlcpy(t->country, "Unknown", 8);
 	lnode_create_append (tldstatlist, t);
-	LoadStatistic (&t->users, TLD_TABLE, "???", "users");
 	LoadTLDStats ();
 }
 
