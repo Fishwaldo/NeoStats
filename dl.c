@@ -449,8 +449,8 @@ run_mod_timers (void)
 		mod_tmr = hnode_get (tn);
 		if (me.now - mod_tmr->lastrun > mod_tmr->interval) {
 			strlcpy (segv_location, mod_tmr->modname, SEGV_LOCATION_BUFSIZE);
-			SET_SEGV_INMODULE(mod_tmr->modname);
 			if (setjmp (sigvbuf) == 0) {
+				SET_SEGV_INMODULE(mod_tmr->modname);
 				if (mod_tmr->function () < 0) {
 					nlog(LOG_DEBUG2, LOG_CORE, "run_mod_timers: Deleting Timer %s for Module %s as requested", mod_tmr->timername, mod_tmr->modname);
 					hash_scan_delete(th, tn);
@@ -459,10 +459,10 @@ run_mod_timers (void)
 				} else {
 					mod_tmr->lastrun = (int) me.now;
 				}
+				CLEAR_SEGV_INMODULE();
 			} else {
 				nlog (LOG_CRITICAL, LOG_CORE, "run_mod_timers: setjmp() failed, can't call module %s\n", mod_tmr->modname);
 			}
-			CLEAR_SEGV_INMODULE();
 		}
 	}
 }
@@ -840,18 +840,17 @@ bot_message (char *origin, char **av, int ac)
 	nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s", mod_usr->nick);
 
 	SET_SEGV_LOCATION();
-	SET_SEGV_INMODULE(mod_usr->modname);
 	if (setjmp (sigvbuf) == 0) {
+		SET_SEGV_INMODULE(mod_usr->modname);
 		if(mod_usr->function) {
 			mod_usr->function (origin, av, ac);
-		}
-		else {
+		} else {
 			/* Trap CTCP commands and silently drop them to avoid unknown command errors 
-			* Why bother? Well we might be able to use some of them in the future
-			* so this is mainly a test and we may want to pass some of this onto
-			* SecureServ for a quick trojan check so log attempts to give an indication 
-			* of usage.
-			*/
+			 * Why bother? Well we might be able to use some of them in the future
+			 * so this is mainly a test and we may want to pass some of this onto
+			 * SecureServ for a quick trojan check so log attempts to give an indication 
+			 * of usage.
+			 */
 			if (av[1][0] == '\1') {
 				char* buf;
 				buf = joinbuf(av, ac, 1);
@@ -862,15 +861,11 @@ bot_message (char *origin, char **av, int ac)
 			if (!u) {
 				nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", origin, mod_usr->nick);
 			} else {
-				/* this is a hack, so we can load out of core, not NeoStats */
-				if (!ircstrcasecmp(mod_usr->modname, s_Services)) {
-					CLEAR_SEGV_INMODULE();
-				}
 				run_bot_cmd(mod_usr, u, av, ac);
 			}
 		}
+		CLEAR_SEGV_INMODULE();
 	}
-	CLEAR_SEGV_INMODULE();
 	return;
 }
 
@@ -975,7 +970,11 @@ add_neostats_mod_user (char *nick)
 	/* add a brand new user */
 	mod_usr = new_bot (nick);
 	if(mod_usr) {
+#if 0
 		strlcpy (mod_usr->modname, "NeoStats", MAX_MOD_NAME);
+#else
+		mod_usr->modname[0] = 0;
+#endif
 		mod_usr->function = NULL;
 		mod_usr->chanfunc = NULL;
 		mod_usr->botcmds = hash_create(-1, 0, 0);
@@ -1141,13 +1140,13 @@ ModuleEvent (char *event, char **av, int ac)
 				if (!ircstrcasecmp (ev_list->cmd_name, event)) {
 					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Command %s -> %s", module_ptr->info->module_name, event, ev_list->cmd_name);
 					SET_SEGV_LOCATION();
-					SET_SEGV_INMODULE(module_ptr->info->module_name);
 					if (setjmp (sigvbuf) == 0) {
-						if (ev_list->function) ev_list->function (av, ac);
+						SET_SEGV_INMODULE(module_ptr->info->module_name);
+						ev_list->function (av, ac);
+						CLEAR_SEGV_INMODULE();
 					} else {
 						nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
 					}
-					CLEAR_SEGV_INMODULE();
 					SET_SEGV_LOCATION();
 #ifndef VALGRIND
 					break;
@@ -1185,11 +1184,11 @@ ModuleFunction (int cmdptr, char *cmd, char* origin, char **av, int ac)
 					if (!strcmp (fn_list->cmd_name, cmd)) {
 						nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
 						SET_SEGV_LOCATION();
-						SET_SEGV_INMODULE(module_ptr->info->module_name);
 						if (setjmp (sigvbuf) == 0) {
+							SET_SEGV_INMODULE(module_ptr->info->module_name);
 							fn_list->function (origin, av, ac);
+							CLEAR_SEGV_INMODULE();
 						}
-						CLEAR_SEGV_INMODULE();
 						SET_SEGV_LOCATION();
 						break;
 					}
@@ -1270,7 +1269,6 @@ load_module (char *modfilename, User * u)
 	strlwr (loadmodname);
 	ircsnprintf (path, 255, "%s/%s.so", MOD_PATH, loadmodname);
 	dl_handle = dlopen (path, RTLD_NOW || RTLD_GLOBAL);
-	CLEAR_SEGV_INMODULE();
 	if (!dl_handle) {
 		dl_error = dlerror ();
 		if (do_msg) {
@@ -1400,9 +1398,8 @@ load_module (char *modfilename, User * u)
 			unload_module(mod_ptr->info->module_name, NULL);
 			return NS_FAILURE;
 		}
-		SET_SEGV_LOCATION();
 		CLEAR_SEGV_INMODULE();
-
+		SET_SEGV_LOCATION();
 	}
 
 	/* Let this module know we are online if we are! */
@@ -1413,8 +1410,8 @@ load_module (char *modfilename, User * u)
 				SET_SEGV_LOCATION();
 				SET_SEGV_INMODULE(mod_ptr->info->module_name);
 				event_fn_ptr->function (av, ac);
-				SET_SEGV_LOCATION();
 				CLEAR_SEGV_INMODULE();
+				SET_SEGV_LOCATION();
 				free (av);
 				break;
 			}
@@ -1538,14 +1535,14 @@ unload_module (char *module_name, User * u)
 		i = get_mod_num (module_name);
 
 		mod_ptr = hnode_get (modnode);
-		SET_SEGV_INMODULE(module_name);
 		
 		/* call __ModFini (replacement for library __fini() call */
 		ModFini = dlsym ((int *) mod_ptr->dl_handle, "__ModFini");
 		if (ModFini) {
+			SET_SEGV_INMODULE(module_name);
 			(*ModFini) ();
+			CLEAR_SEGV_INMODULE();
 		}
-		CLEAR_SEGV_INMODULE();
 		/* now, see if this Module has any bots with it 
 		 * we delete the modules *after* we call ModFini, so the bot 
 		 * can still send messages generated from ModFini calls */

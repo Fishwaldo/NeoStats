@@ -201,20 +201,11 @@ del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list)
 	if(bot_ptr->botcmds == NULL) {
 		return NS_FAILURE;
 	}
-	/* set the module */
-	/* this is a hack, so we can load out of core, not NeoStats */
-	if (!ircstrcasecmp(bot_ptr->modname, s_Services)) {
-		CLEAR_SEGV_INMODULE();
-	} else {
-		SET_SEGV_INMODULE(bot_ptr->modname);
-	}
-
 	/* Cycle through command list and delete them */
 	while(bot_cmd_list->cmd) {
 		del_bot_cmd(bot_ptr->botcmds, bot_cmd_list);
 		bot_cmd_list++;
 	}
-	CLEAR_SEGV_INMODULE();
 	return NS_SUCCESS;
 }
 
@@ -232,13 +223,6 @@ del_all_bot_cmds(ModUser* bot_ptr)
 	if(bot_ptr->botcmds == NULL) {
 		return NS_FAILURE;
 	}
-	/* set the module */
-	/* this is a hack, so we can load out of core, not NeoStats */
-	if (!ircstrcasecmp(bot_ptr->modname, s_Services)) {
-		CLEAR_SEGV_INMODULE();
-	} else {
-		SET_SEGV_INMODULE(bot_ptr->modname);
-	}
 	/* Cycle through command hash and delete each command */
 	hash_scan_begin(&hs, bot_ptr->botcmds);
 	while ((cmdnode = hash_scan_next(&hs)) != NULL) {
@@ -248,7 +232,6 @@ del_all_bot_cmds(ModUser* bot_ptr)
 	/* Destroy command */
 	hash_destroy(bot_ptr->botcmds);
 	bot_ptr->botcmds = NULL;
-	CLEAR_SEGV_INMODULE();
 	return NS_SUCCESS;
 }
 

@@ -203,6 +203,9 @@ SmodeStringToMask(const char* SmodeString, long Smode)
 int 
 join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 {
+	char savemod[SEGV_INMODULE_BUFSIZE];
+
+	strlcpy(savemod, segv_inmodule, SEGV_INMODULE_BUFSIZE);
 #if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID)
 	sjoin_cmd(who, chan, chflag);
 #else
@@ -210,6 +213,7 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN)
 		schmode_cmd(who, chan, "+o", who);
 #endif
+	SET_SEGV_INMODULE(savemod);
 	return NS_SUCCESS;
 }
 

@@ -190,7 +190,6 @@ do_dns ()
 
 			/* set this so nlog works good */
 			SET_SEGV_INMODULE(dnsdata->mod_name);
-
 			/* call the callback function with answer set to NULL */
 			dnsdata->callback (dnsdata->data, NULL);
 			CLEAR_SEGV_INMODULE();
