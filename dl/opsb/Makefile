@@ -2,8 +2,8 @@ include ../../Makefile.inc
 
 INCLUDES = -I../.. -Iares/ -I../../adns
 
-SOURCES= opsb.c proxy.c
-OBJECTS= opsb.o proxy.o
+SOURCES= opsb.c proxy.c opsb_help.c
+OBJECTS= opsb.o proxy.o opsb_help.o
 TARGET= opsb.so
 
 all:	opsb

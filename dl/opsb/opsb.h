@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: opsb.h,v 1.2 2002/08/22 07:57:37 fishwaldo Exp $
+** $Id: opsb.h,v 1.3 2002/08/22 13:53:08 fishwaldo Exp $
 */
 
 
@@ -18,13 +18,15 @@ char *s_opsb;
 #define MAX_SCANS 100
 /* max queue is the max amount of scans that may be concurrent and queued. */
 #define MAX_QUEUE MAX_SCANS * 100
-
+/* max no of exempt entries */
+#define MAX_EXEMPTS 20
 
 
 struct scanq {
-	char who[MAXNICK];
+	char who[MAXHOST];
 	int state;
 	char lookup[MAXHOST];
+	char server[MAXHOST];
 	struct in_addr ipaddr;
 	User *u;
 	int doreport;
@@ -41,6 +43,11 @@ struct opsb {
 	char lookforstring[512];
 	int targetport;
 	int maxbytes;
+	int timeout;
+	int socks;
+	int timedif;
+	int open;
+	int scanned;
 } opsb;
 
 struct sockinfo {
@@ -60,6 +67,19 @@ list_t *opsbq;
 list_t *opsbl;
 
 
+/* this is a list of cached scans */
+list_t *cache;
+
+struct exempts {
+	char host[MAXHOST];
+	int server;
+};
+
+typedef struct exempts exemptinfo;
+
+/* this is the list of exempted hosts/servers */
+
+list_t *exempt;
 
 /* these are some state flags */
 #define REPORT_DNS 	0x0001
@@ -81,7 +101,7 @@ void do_ban(scaninfo *scandata);
 
 /* proxy.c */
 void start_proxy_scan(lnode_t *scannode);
-
+void send_status(User *u);
 
 
 #endif /* OPSB_H */

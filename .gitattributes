@@ -122,6 +122,7 @@ dl/opsb/ares/ares_strerror.c -text
 dl/opsb/ares/ares_timeout.c -text
 dl/opsb/opsb.c -text
 dl/opsb/opsb.h -text
+dl/opsb/opsb_help.c -text
 dl/opsb/proxy.c -text
 dl/spam/Makefile -text
 dl/spam/spam.c -text

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: proxy.c,v 1.2 2002/08/22 07:57:37 fishwaldo Exp $
+** $Id: proxy.c,v 1.3 2002/08/22 13:53:08 fishwaldo Exp $
 */
 
 
@@ -20,6 +20,7 @@
 
 int http_proxy(int sock);
 int sock4_proxy(int sock);
+int sock5_proxy(int sock);
 int cisco_proxy(int sock);
 int wingate_proxy(int sock);
 int proxy_connect(unsigned long ipaddr, int port, char *who);
@@ -34,13 +35,16 @@ typedef struct proxy_types {
 
 proxy_types proxy_list[] = {
 	{"http", 	80, 	http_proxy, 	0,	0},
+	{"http",	8080,	http_proxy,	0,	0},
+	{"http",	3128,	http_proxy, 	0,	0},
 	{"socks4",	1080,	sock4_proxy,	0,	0},
+	{"socks5",	1080,	sock5_proxy,	0,	0},
 	{"Cisco",	23,	cisco_proxy, 	0,	0},
 	{"Wingate",	23,	wingate_proxy,	0,	0},
 	{NULL,		0,	NULL,		0,	0}
 };
 
-#define NUM_PROXIES 4
+#define NUM_PROXIES 7
 
 
 
@@ -59,6 +63,68 @@ scaninfo *find_scandata(char *sockname) {
 }
 
 
+void send_status(User *u) {
+	int i;
+	lnode_t *node, *socknode;
+	scaninfo *scandata;
+	socklist *sockinfo;
+	prefmsg(u->nick, s_opsb, "Proxy Results:");
+	prefmsg(u->nick, s_opsb, "Hosts Scanned: %d Hosts found Open: %d Exceptions %d", opsb.scanned, opsb.open, list_count(exempt));
+	for (i = 0; i < NUM_PROXIES; i++) {
+		prefmsg(u->nick, s_opsb, "Proxy %s (%d) Found %d Open %d", proxy_list[i].type, proxy_list[i].port, proxy_list[i].nofound, proxy_list[i].noopen);
+	}
+	prefmsg(u->nick, s_opsb, "Currently Scanning %d Proxies (%d in queue):", list_count(opsbl), list_count(opsbq));
+	node = list_first(opsbl);
+	while (node) {
+		scandata = lnode_get(node);
+		if (scandata->u) 
+			prefmsg(u->nick, s_opsb, "Scanning %s by request of %s", scandata->lookup, scandata->u->nick);
+		else 
+			prefmsg(u->nick, s_opsb, "Scanning %s", scandata->lookup);
+		
+		switch(scandata->state) {
+			case REPORT_DNS:
+					prefmsg(u->nick, s_opsb, "Looking up IP Address");
+					break;
+			case GET_NICK_IP:
+					prefmsg(u->nick, s_opsb, "Looking up IP address for Scan");
+					break;
+			case DO_OPM_LOOKUP:
+					prefmsg(u->nick, s_opsb, "Looking up DNS blacklist");
+					break;
+			case DOING_SCAN:
+					prefmsg(u->nick, s_opsb, "Scanning for Open Proxies");
+					break;
+			case GOTOPENPROXY:
+					prefmsg(u->nick, s_opsb, "Contains a Open Proxy");
+					break;
+			default:
+					prefmsg(u->nick, s_opsb, "Unknown State");
+		}
+		socknode = list_first(scandata->socks);
+		while (socknode) {
+			sockinfo = lnode_get(socknode);
+			switch (sockinfo->flags) {
+				case CONNECTING:
+						prefmsg(u->nick, s_opsb, "    %s(%d) - Connecting", proxy_list[sockinfo->type].type, proxy_list[sockinfo->type].port);
+						break;
+				case SOCKCONNECTED:
+						prefmsg(u->nick, s_opsb, "    %s(%d) - Connected", proxy_list[sockinfo->type].type, proxy_list[sockinfo->type].port);
+						break;
+				case UNCONNECTED:
+						prefmsg(u->nick, s_opsb, "    %s(%d) - Disconnected", proxy_list[sockinfo->type].type, proxy_list[sockinfo->type].port);
+						break;
+				case OPENPROXY:
+						prefmsg(u->nick, s_opsb, "    %s(%d) - Open Proxy", proxy_list[sockinfo->type].type, proxy_list[sockinfo->type].port);
+						break;
+				default:
+						prefmsg(u->nick, s_opsb, "    %s(%d) - Unknown", proxy_list[sockinfo->type].type, proxy_list[sockinfo->type].port);
+			}
+			socknode = list_next(scandata->socks, socknode);
+		}
+	node = list_next(opsbl, node);
+	}
+}
 
 
 void start_proxy_scan(lnode_t *scannode) {
@@ -69,10 +135,9 @@ void start_proxy_scan(lnode_t *scannode) {
 
 
 	scandata = lnode_get(scannode);
-	chanalert(s_opsb, "Starting proxy scan on %s (%s) (%ld)", scandata->who, scandata->lookup, scandata->ipaddr.s_addr);
+	if (scandata->u) chanalert(s_opsb, "Starting proxy scan on %s (%s) by Request of %s", scandata->who, scandata->lookup, scandata->u->nick);
 	scandata->socks = list_create(NUM_PROXIES);
 	for (i = 0; i <  NUM_PROXIES; i++) {
-		log("doing scan on %s %d", proxy_list[i].type, proxy_list[i].port);
 		j = proxy_connect(scandata->ipaddr.s_addr, proxy_list[i].port, scandata->who);
 		if (j > 0) {
 			/* its ok */
@@ -105,9 +170,67 @@ int http_proxy(int sock) {
 
 
 int sock4_proxy(int sock) {
-
-return 0;
+	struct in_addr addr;
+	unsigned long laddr;
+	char *buf;
+	int len;
+ 
+	if (inet_aton(opsb.targethost, &addr) == 0) {
+		log("OPSB socks4_proxy() : %s is not a valid IP",
+		    opsb.targethost);
+	    	return 0;
+	}
+    
+	laddr = htonl(addr.s_addr);
+ 	buf = malloc(512);
+	len = snprintf(buf, 512, "%c%c%c%c%c%c%c%c%c",  4, 1,
+	    (((unsigned short) opsb.targetport) >> 8) & 0xFF,
+	    (((unsigned short) opsb.targetport) & 0xff),
+	    (char) (laddr >> 24) & 0xFF, (char) (laddr >> 16) & 0xFF,
+	    (char) (laddr >> 8) & 0xFF, (char) laddr & 0xFF, 0);
+	
+	len = send(sock, buf, len, MSG_NOSIGNAL);
+	free(buf);
+	return(len);
 }
+
+int sock5_proxy(int sock) {
+        struct in_addr addr;
+        unsigned long laddr;
+        int len;
+        char *buf;
+
+        if (inet_aton(opsb.targethost, &addr) == 0) {
+                log("OPSB socks5_proxy() : %s is not a valid IP",
+                    opsb.targethost);
+        }
+
+        laddr = htonl(addr.s_addr);
+	buf = malloc(512);
+        /* Form authentication string */
+        /* Version 5, 1 number of methods, 0 method (no auth). */
+        len = snprintf(buf, 512, "%c%c%c", 5, 1, 0);
+        len = send(sock, buf, len, MSG_NOSIGNAL);
+	if (len < 0) {
+		free(buf);
+		return len;
+	}
+        /* Form request string */
+
+        len = snprintf(buf, 512, "%c%c%c%c%c%c%c%c%c%c", 5, 1, 0, 1,
+            (char) (laddr >> 24) & 0xFF, (char) (laddr >> 16) & 0xFF,
+            (char) (laddr >> 8) & 0xFF, (char) laddr & 0xFF,
+            (((unsigned short) opsb.targetport) >> 8) & 0xFF,
+            (((unsigned short) opsb.targetport) & 0xFF)
+                      );
+
+        len = send(sock, buf, len, MSG_NOSIGNAL);
+        return(len);
+
+
+
+}
+
 
 int cisco_proxy(int sock) {
 	char *buf;
@@ -170,6 +293,7 @@ int proxy_read(int socknum, char *sockname) {
 #ifdef DEBUG
 		log("OPSB proxy_read(): %d has the following error: %s", socknum, strerror(errno));
 #endif
+		if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
 		close(socknum);
 		del_socket(sockname);
 		sockdata->flags = UNCONNECTED;
@@ -185,6 +309,7 @@ int proxy_read(int socknum, char *sockname) {
 #ifdef DEBUG
 				log("closing socket %d due to ok HTTP server", socknum);
 #endif
+				if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No Open %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
 				sockdata->flags = UNCONNECTED;
 				close(socknum);
 				del_socket(sockname);
@@ -194,6 +319,7 @@ int proxy_read(int socknum, char *sockname) {
 	
 			/* this looks for the ban string */
 			if (strstr(buf, opsb.lookforstring)) {
+				if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "Open %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
 				++proxy_list[sockdata->type].noopen;
 				scandata->state = GOTOPENPROXY;
 				sockdata->flags = OPENPROXY;
@@ -209,6 +335,7 @@ int proxy_read(int socknum, char *sockname) {
 #ifdef DEBUG
 				log("OPSB proxy_read(): Closing %d due to too much data", socknum);
 #endif
+				if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No Open %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
 				close(socknum);
 				del_socket(sockname);
 				sockdata->flags = UNCONNECTED;
@@ -258,13 +385,14 @@ int proxy_write(int socknum, char *sockname) {
 #ifdef DEBUG
 			log("OPSB proxy_write(): %d has the following error: %s", socknum, strerror(errno));
 #endif
+			if (scandata->u) prefmsg(scandata->u->nick, s_opsb, "No %s Proxy Server on port %d", proxy_list[sockdata->type].type, proxy_list[sockdata->type].port);
 			close(socknum);
 			del_socket(sockname);
 			sockdata->flags = UNCONNECTED;
 			return -1;
 		} else {
+			if (sockdata->flags != SOCKCONNECTED) ++proxy_list[sockdata->type].nofound;
 			sockdata->flags = SOCKCONNECTED;
-			++proxy_list[sockdata->type].nofound;
 		}
 	}
 	return 1;
