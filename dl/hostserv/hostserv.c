@@ -209,7 +209,7 @@ static int hs_sign_on(char **av, int ac)
 	if (!u)
 		return 1;
 
-	if (u->server->name == me.name)
+	if (IsMe(u)) 
 		return 1;
 
 	/* is this user excluded via a global exclusion? */
