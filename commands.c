@@ -535,7 +535,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 		prefmsg(u->nick, bot_ptr->nick, " ");
 		prefmsg(u->nick, bot_ptr->nick, "To use a command, type");
 		prefmsg(u->nick, bot_ptr->nick, "    \2/msg %s command\2", bot_ptr->nick);
-		prefmsg(u->nick, bot_ptr->nick, "For for more information on a command, type");
+		prefmsg(u->nick, bot_ptr->nick, "For more information on a command, type");
 		prefmsg(u->nick, bot_ptr->nick, "    \2/msg %s HELP command\2.", bot_ptr->nick);
 		return 1;
 	}
