@@ -85,6 +85,13 @@
 #define MAXREALNAME		50
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
+
+/* MAX_MOD_NAME
+   ModuleInfo will allow any length since it is merely a char *
+   functions displaying ModuleInfo contents will display the full string.
+   NeoStats core will truncate to this length for use internally. 
+*/
+#define MAX_MOD_NAME	32
 /* doesn't have to be so big atm */
 #define NUM_MODULES		20
 #define S_TABLE_SIZE	-1
@@ -138,7 +145,7 @@ int	ns_snprintf(char *string, size_t size, const char *format, ...);
 #define CLEAR_SEGV_LOCATION() segv_location[0]='\0';
 #endif
 
-#define SEGV_INMODULE_BUFSIZE	30
+#define SEGV_INMODULE_BUFSIZE	MAX_MOD_NAME
 #define SET_SEGV_INMODULE(module_name) strncpy(segv_inmodule,(module_name),SEGV_INMODULE_BUFSIZE);
 #define CLEAR_SEGV_INMODULE() segv_inmodule[0]='\0';
 
