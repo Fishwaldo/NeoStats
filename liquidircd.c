@@ -105,10 +105,14 @@ IntCommands cmd_list[] = {
 };
 
 ChanModes chan_modes[] = {
+/* CMODE_DECHANOWNER */
+/* CMODE_DECHANPROT	*/
+/* CMODE_DEOPPED */
+/* CMODE_DEHALFOPPED */
+/* CMODE_DEUOP	*/
 	{CMODE_CHANOWNER, 'q', 1, 0, '!'},
 	{CMODE_CHANPROT, 'a', 1, 0, '*'},
 	{CMODE_CHANOP, 'o', 1, 0, '@'},
-	{CMODE_VIP, 'V', 1, 0, '='},
 	{CMODE_HALFOP, 'h', 1, 0, '%'},
 	{CMODE_VOICE, 'v', 1, 0, '+'},
 	{CMODE_UOP, 'u', 1, 0, '-'},
@@ -122,12 +126,14 @@ ChanModes chan_modes[] = {
 	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
 	{CMODE_NONICKCHANGE, 'N', 0, 0, 0},
 	{CMODE_PRIVATE, 'p', 0, 0, 0},
-	{CMODE_RGSTR, 'r', 0, 0, 0},
-	{CMODE_RGSTRONLY, 'R', 0, 0, 0},
+	{CMODE_REGISTERED, 'r', 0, 0, 0},
+	{CMODE_REGONLY, 'R', 0, 0, 0},
 	{CMODE_SECRET, 's', 0, 0, 0},
 	{CMODE_STRIP, 'S', 0, 0, 0},
 	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
 	{CMODE_OPERONLY, 'O', 0, 0, 0},
+/* CMODE_MODREG */
+/* CMODE_AUDITORIUM */
 };
 
 UserModes user_umodes[] = {
@@ -140,17 +146,29 @@ UserModes user_umodes[] = {
 	{UMODE_REGNICK, 'r', NS_ULEVEL_REG},
 	{UMODE_INVISIBLE, 'i', 0},
 	{UMODE_WALLOP, 'w', 0},
-	{UMODE_FAILOP, 'g', 0},
+	{UMODE_GLOBOPS, 'g', 0},
 	{UMODE_HELPOP, 'h', 0},
 	{UMODE_SERVNOTICE, 's', 0},
 	{UMODE_KILLS, 'k', 0},
 	{UMODE_CLIENT, 'c', 0},
 	{UMODE_FLOOD, 'f', 0},
-	{UMODE_REGONLY, 'R', 0},
+	{UMODE_RGSTRONLY, 'R', 0},
 	{UMODE_KIX, 'q', 0},
 	{UMODE_BOT, 'B', 0},
 	{UMODE_HIDE, 'z', 0},
 	{UMODE_WHOIS, 'W', 0},
+	{UMODE_y, 'y', 0},
+	{UMODE_DEBUG, 'd', 0},
+	{UMODE_CHATOPS, 'b', 0},
+	{UMODE_n, 'n', 0},
+	{UMODE_m, 'm', 0},
+	{UMODE_e, 'e', 0},
+	{UMODE_x, 'x', 0},
+	{UMODE_E, 'D', 0},
+	{UMODE_F, 'F', 0},
+	{UMODE_j, 'j', 0},
+	{UMODE_K, 'K', 0},
+	{UMODE_C, 'C', 0},
 };
 
 UserModes user_smodes[] = {
