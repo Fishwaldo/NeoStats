@@ -363,72 +363,80 @@ conf_rehash ()
  *
  */
 
-RETSIGTYPE
-serv_segv ()
+static char backtrace_unavailable[]="Backtrace not available on this platform";
+
+static 
+void do_backtrace(void)
 {
-	char name[30];
 #ifdef HAVE_BACKTRACE
 	void *array[50];
 	size_t size;
 	char **strings;
-	size_t i;
-/* thanks to gnulibc libary for letting me find this usefull function */
+	int i;
+
+	nlog (LOG_CRITICAL, LOG_CORE, "Backtrace:");
+	chanalert (s_Services, "Backtrace:", segv_location);
 	size = backtrace (array, 10);
 	strings = backtrace_symbols (array, size);
+	for (i = 1; i < size; i++) {
+		chanalert (s_Services, "Backtrace(%d): %s", i, strings[i]);
+		nlog (LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s", i - 1, strings[i]);
+	}
+	free (strings);
+#else
+	chanalert (s_Services, backtrace_unavailable);
+	nlog (LOG_CRITICAL, LOG_CORE, backtrace_unavailable);
 #endif
+}
+
+RETSIGTYPE
+serv_segv ()
+{
+	char name[MAX_MOD_NAME];
 	/** if the segv happened while we were inside a module, unload and try to restore 
 	 *  the stack to where we were before we jumped into the module
 	 *  and continue on
 	 */
 	if (segvinmodule[0] != 0) {
-		globops (me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
-		chanalert (s_Services, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
-		nlog (LOG_CRITICAL, LOG_CORE, "Uh Oh, Segmentation Fault in Modules Code %s", segvinmodule);
-		nlog (LOG_CRITICAL, LOG_CORE, "Location could be %s", segv_location);
-		nlog (LOG_CRITICAL, LOG_CORE, "Unloading Module and restoring stacks. Doing Backtrace:");
-		chanalert (s_Services, "Location *could* be %s. Doing Backtrace:", segv_location);
-#ifdef HAVE_BACKTRACE
-		for (i = 1; i < size; i++) {
-			chanalert (s_Services, "Backtrace(%d): %s", i, strings[i]);
-			nlog (LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s", i - 1, strings[i]);
-		}
-#else
-		chanalert (s_Services, "Backtrace not available on this platform");
-		nlog (LOG_CRITICAL, LOG_CORE, "Backtrace not available on this platform");
-#endif
+		globops (me.name, "Segmentation Fault in %s. Refer to log file for details.", segvinmodule);
+		chanalert (s_Services, "Segmentation Fault in %s. Refer to log file for details.", segvinmodule);
+		nlog (LOG_CRITICAL, LOG_CORE, "------------------------SEGFAULT REPORT-------------------------");
+		nlog (LOG_CRITICAL, LOG_CORE, "Please view the README for how to submit a bug report");
+		nlog (LOG_CRITICAL, LOG_CORE, "and include this segfault report in your submission.");
+		nlog (LOG_CRITICAL, LOG_CORE, "Module:   %s", segvinmodule);
+		nlog (LOG_CRITICAL, LOG_CORE, "Location: %s", segv_location);
+		nlog (LOG_CRITICAL, LOG_CORE, "recbuf:   %s", recbuf);
+		nlog (LOG_CRITICAL, LOG_CORE, "Unloading Module and restoring stacks. Backtrace:");
+		chanalert (s_Services, "Location *could* be %s.", segv_location);
+		do_backtrace();
+		nlog (LOG_CRITICAL, LOG_CORE, "-------------------------END OF REPORT--------------------------");
 		strlcpy (name, segvinmodule, MAX_MOD_NAME);
 		CLEAR_SEGV_INMODULE();
 		unload_module (name, NULL);
 		chanalert (s_Services, "Restoring Stack to before Crash");
 		longjmp (sigvbuf, -1);
 		chanalert (s_Services, "Done");
-#ifdef HAVE_BACKTRACE
-		free (strings);
-#endif
-	} else {
-		/** The segv happened in our core, damn it */
-		/* Thanks to Stskeeps and Unreal for this stuff :) */
-		nlog (LOG_CRITICAL, LOG_CORE, "Uh Oh, Segmentation Fault.. Server Terminating");
-		nlog (LOG_CRITICAL, LOG_CORE, "Details: Buffer: %s", recbuf);
-		nlog (LOG_CRITICAL, LOG_CORE, "Approx Location: %s Backtrace:", segv_location);
-		/* Broadcast it out! */
-		globops (me.name, "Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
-		chanalert (s_Services, "Damn IT, Server Terminating (%d%d%d%s), Segmentation Fault. Buffer: %s, Approx Location: %s Backtrace:", MAJOR, MINOR, REV, ircd_version, recbuf, segv_location);
-#ifdef HAVE_BACKTRACE
-		for (i = 1; i < size; i++) {
-			chanalert (s_Services, "Backtrace(%d): %s", i, strings[i]);
-			nlog (LOG_CRITICAL, LOG_CORE, "BackTrace(%d): %s", i - 1, strings[i]);
-		}
-#else
-		chanalert (s_Services, "Backtrace not available on this platform");
-		nlog (LOG_CRITICAL, LOG_CORE, "Backtrace not available on this platform");
-#endif
-		sleep (2);
-		kill (forked, 3);
-		kill (forked, 9);
-		/* clean up */
-		do_exit (NS_EXIT_SEGFAULT, NULL);
+		return;
 	}
+	/** The segv happened in our core, damn it */
+	/* Thanks to Stskeeps and Unreal for this stuff :) */
+	/* Broadcast it out! */
+	globops (me.name, "Segmentation Fault. Server Terminating. Refer to log file for details.");
+	chanalert (s_Services, "Segmentation Fault. Server Terminating. Refer to log file for details.");
+	globops (me.name, "Buffer: %s, Approx Location %s", recbuf, segv_location);
+	chanalert (s_Services, "NeoStats (%d%d%d%s) Buffer: %s, Approx Location: %s Backtrace:", MAJOR, MINOR, REV, ircd_version, recbuf, segv_location);
+	nlog (LOG_CRITICAL, LOG_CORE, "------------------------SEGFAULT REPORT-------------------------");
+	nlog (LOG_CRITICAL, LOG_CORE, "Please view the README for how to submit a bug report");
+	nlog (LOG_CRITICAL, LOG_CORE, "and include this segfault report in your submission.");
+	nlog (LOG_CRITICAL, LOG_CORE, "Location: %s", segv_location);
+	nlog (LOG_CRITICAL, LOG_CORE, "recbuf:   %s", recbuf);
+	do_backtrace();
+	nlog (LOG_CRITICAL, LOG_CORE, "-------------------------END OF REPORT--------------------------");
+	sleep (2);
+	kill (forked, 3);
+	kill (forked, 9);
+	/* clean up */
+	do_exit (NS_EXIT_SEGFAULT, NULL);
 }
 
 /** @brief Sets up the signal handlers
