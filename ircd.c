@@ -119,9 +119,9 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
  */
 ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname, 
 						const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, 
-						char * mod_name)
+						bot_setting *bot_setting_list, char * mod_name)
 {
-	ModUser * bot_ptr;
+	ModUser * bot_ptr; 
 	User *u;
 	char **av;
 	int ac = 0;
@@ -150,7 +150,7 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 	SET_SEGV_INMODULE(mod_name);
 	bot_ptr->flags = flags;
 	add_bot_cmd_list(bot_ptr, bot_cmd_list);
-	
+	bot_ptr->bot_settings = bot_setting_list;	
 	return bot_ptr;
 }
 

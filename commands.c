@@ -24,8 +24,10 @@
 #include "stats.h"
 #include "dl.h"
 #include "log.h"
+#include "conf.h"
 
 static int bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac);
+static int bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac);
 
 /* hash for services bot command list */
 static hash_t *botcmds = NULL;
@@ -59,8 +61,8 @@ static const char *cmd_help_help[] = {
  */
 static bot_cmd intrinsic_commands[]=
 {
-	{"HELP",	NULL,	0, 	0,	cmd_help_help, 	1, 	cmd_help_oneline},
-	{NULL,		NULL,	0, 	0,	NULL, 			0,	NULL}
+	{"HELP",	NULL,	0, 	0,	cmd_help_help, 	cmd_help_oneline},
+	{NULL,		NULL,	0, 	0,	NULL, 			NULL}
 };
 
 
@@ -104,8 +106,7 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 			cmd_ptr->cmd);
 		return NS_FAILURE;
 	}
-
-	/* Add the command */
+	/* Seems OK, add the command */
 	cmdnode = hnode_create(cmd_ptr);
 	if (cmdnode) {
 		hash_insert(cmd_hash, cmdnode, cmd_ptr->cmd);
@@ -323,6 +324,11 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 		bot_cmd_help(bot_ptr, u, av, ac);
 		return 1;
 	}
+	/* Handle SET if we have it */
+	if (bot_ptr->bot_settings && !strcasecmp(av[1], "SET") ) {
+		bot_cmd_set(bot_ptr, u, av, ac);
+		return 1;
+	}
 
 	/* We have run out of commands so report failure */
 	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[1]);
@@ -363,6 +369,10 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 			if(!hash_lookup(bot_ptr->botcmds, cmd_ptr->cmd))
 				prefmsg(u->nick, bot_ptr->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
 			cmd_ptr++;
+		}
+		/* Do we have a set command? */
+		if(bot_ptr->bot_settings) {
+			prefmsg(u->nick, bot_ptr->nick, "SET                 Configure %s", bot_ptr->nick);
 		}
 		restartlevel:
 		hash_scan_begin(&hs, bot_ptr->botcmds);
@@ -439,7 +449,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	/* Handle intrinsic commands */
 	cmd_ptr = intrinsic_commands;
 	while(cmd_ptr->cmd) {
-		if (!strcasecmp(av[1],cmd_ptr->cmd)) {
+		if (!strcasecmp(av[1], cmd_ptr->cmd)) {
 			privmsg_list (u->nick, bot_ptr->nick, cmd_ptr->helptext);
 			return 1;
 		}
@@ -472,3 +482,104 @@ int is_target_valid(char* bot_name, User* u, char* target_nick)
 	return 1;
 }
 
+/** @brief bot_cmd_help process bot set command
+ *	work in progress
+ *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+static int 
+bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
+{
+	bot_setting* set_ptr;
+
+	if (ac < 3) {
+		prefmsg(u->nick, bot_ptr->nick,
+			"Invalid Syntax. /msg %s HELP SET for more info", 
+			bot_ptr->nick);
+		return 1;
+	} 
+
+	if(!strcasecmp(av[2], "LIST"))
+	{
+		prefmsg(u->nick, bot_ptr->nick, "Current %s settings:", bot_ptr->nick);
+		set_ptr = bot_ptr->bot_settings;
+		while(set_ptr->option)
+		{
+			switch(set_ptr->type) {
+				case SET_TYPE_BOOLEAN:
+					prefmsg(u->nick, bot_ptr->nick, "%s: %s",
+						set_ptr->option, *(int*)set_ptr->varptr ? "Enabled" : "Disabled");
+					break;
+				case SET_TYPE_INT:
+				case SET_TYPE_INTRANGE:
+					prefmsg(u->nick, bot_ptr->nick, "%s: %d",
+						set_ptr->option, *(int*)set_ptr->varptr);
+					break;
+				case SET_TYPE_STRING:
+				case SET_TYPE_STRINGRANGE:
+				case SET_TYPE_NICK:
+				case SET_TYPE_USER:
+				case SET_TYPE_HOST:
+				case SET_TYPE_RNAME:
+				case SET_TYPE_CUSTOM:
+					prefmsg(u->nick, bot_ptr->nick, "%s: %s",
+						set_ptr->option, *(char*)set_ptr->varptr);
+					break;
+			}
+			set_ptr++;
+		}
+		return 1;
+	}
+
+	set_ptr = bot_ptr->bot_settings;
+	while(set_ptr->option)
+	{
+		if(!strcasecmp(av[2], set_ptr->option))
+			break;
+		set_ptr++;
+	}
+	if(!set_ptr->option) {
+		prefmsg(u->nick, bot_ptr->nick,
+			"Unknown set option. /msg %s HELP SET for more info",
+			bot_ptr->nick);
+		return 1;
+	}
+	switch(set_ptr->type) {
+		case SET_TYPE_BOOLEAN:
+			if (!strcasecmp(av[3], "ON")) {
+				*(int*)set_ptr->varptr = 1;
+				SetConf((void *) 1, CFGBOOL, set_ptr->confitem);
+				chanalert(bot_ptr->nick, "%s enabled by \2%s\2", 
+					set_ptr->option, u->nick);
+				nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s enabled %s",
+					u->nick, u->username, u->hostname, set_ptr->option);
+				prefmsg(u->nick, bot_ptr->nick,
+					"\2%s\2 enabled", set_ptr->option);
+			} else if (!strcasecmp(av[3], "OFF")) {
+				*(int*)set_ptr->varptr = 0;
+				SetConf(0, CFGBOOL, set_ptr->confitem);
+				chanalert(bot_ptr->nick, "%s disabled by \2%s\2", 
+					set_ptr->option, u->nick);
+				nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s disabled %s ", 
+					u->nick, u->username, u->hostname, set_ptr->option);
+				prefmsg(u->nick, bot_ptr->nick,
+					"\2%s\2 disabled", set_ptr->option);
+			} else {
+				prefmsg(u->nick, bot_ptr->nick,
+					"Invalid Syntax. /msg %s HELP SET for more info",
+					bot_ptr->nick);
+				return 1;
+			}
+			break;
+		case SET_TYPE_INT:
+		case SET_TYPE_INTRANGE:
+		case SET_TYPE_STRING:
+		case SET_TYPE_STRINGRANGE:
+		case SET_TYPE_NICK:
+		case SET_TYPE_USER:
+		case SET_TYPE_HOST:
+		case SET_TYPE_RNAME:
+		case SET_TYPE_CUSTOM:
+			break;
+	}
+	return 1;
+}

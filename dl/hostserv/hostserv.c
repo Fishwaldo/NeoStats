@@ -289,17 +289,17 @@ Functions __module_functions[] = {
 
 static bot_cmd hs_commands[]=
 {
-	{"ABOUT",		hs_about,		0, 	0,					hs_help_about,			1,	hs_help_about_oneline },
-	{"ADD",			hs_add,			0,	(int)&hs_cfg.add,	hs_help_add,			1,	hs_help_add_oneline },
-	{"DEL",			hs_del,			0, 	(int)&hs_cfg.del,	hs_help_del,			1,	hs_help_del_oneline },
-	{"LIST",		hs_list,		0, 	(int)&hs_cfg.list,	hs_help_list,			1,	hs_help_list_oneline },
-	{"BANS",		hs_bans,		0,  NS_ULEVEL_ADMIN,	hs_help_bans,			1,	hs_help_bans_oneline },
-	{"LEVELS",		hs_levels,		0, 	NS_ULEVEL_OPER,		hs_help_levels,			1,	hs_help_levels_oneline },
-	{"VIEW",		hs_view,		0, 	(int)&hs_cfg.view,	hs_help_view,			1,	hs_help_view_oneline },
-	{"LOGIN",		hs_login,		0, 	0,					hs_help_login,			1,	hs_help_login_oneline },
-	{"CHPASS",		hs_chpass,		0, 	0,					hs_help_chpass,			1,	hs_help_chpass_oneline },
-	{"SET",			hs_set,			0, 	NS_ULEVEL_ADMIN,	hs_help_set,			1,	hs_help_set_oneline },
-	{NULL,			NULL,			0, 	0,			NULL, 	0,	NULL}
+	{"ABOUT",	hs_about,	0, 	0,					hs_help_about,	hs_help_about_oneline },
+	{"ADD",		hs_add,		0,	(int)&hs_cfg.add,	hs_help_add,	hs_help_add_oneline },
+	{"DEL",		hs_del,		0, 	(int)&hs_cfg.del,	hs_help_del,	hs_help_del_oneline },
+	{"LIST",	hs_list,	0, 	(int)&hs_cfg.list,	hs_help_list,	hs_help_list_oneline },
+	{"BANS",	hs_bans,	0,  NS_ULEVEL_ADMIN,	hs_help_bans,	hs_help_bans_oneline },
+	{"LEVELS",	hs_levels,	0, 	NS_ULEVEL_OPER,		hs_help_levels,	hs_help_levels_oneline },
+	{"VIEW",	hs_view,	0, 	(int)&hs_cfg.view,	hs_help_view,	hs_help_view_oneline },
+	{"LOGIN",	hs_login,	0, 	0,					hs_help_login,	hs_help_login_oneline },
+	{"CHPASS",	hs_chpass,	0, 	0,					hs_help_chpass,	hs_help_chpass_oneline },
+	{"SET",		hs_set,		0, 	NS_ULEVEL_ADMIN,	hs_help_set,	hs_help_set_oneline },
+	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
 };
 
 static int hs_set(User * u, char **av, int ac)
@@ -383,7 +383,7 @@ int Online(char **av, int ac)
 	}
 
 	hs_bot = init_mod_bot(s_HostServ, user, host, rname, 
-		services_bot_modes, 0, hs_commands, __module_info.module_name);
+		services_bot_modes, 0, hs_commands, NULL, __module_info.module_name);
 
 	if(user)
 		 free(user);

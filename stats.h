@@ -345,9 +345,7 @@ struct ping {
 /** @brief flags for command list
  *  flags to provide more information on a command to the core
  */
-#define CMD_FLAG_NORMAL	0x00000001
-#define CMD_FLAG_SET	0x00000002
-#define CMD_FLAG_HELP	0x00000004
+#define CMD_FLAG_SET	0x00000001
 
 /** @brief bot_cmd_handler type
  *  defines handler function definition
@@ -363,8 +361,7 @@ typedef struct bot_cmd {
 	int				minparams;	/* min num params */
 	unsigned int	ulevel;		/* min user level */
 	const char**	helptext;	/* pointer to help text */
-	int 			internal;	/* is this a internal function? */
-	const char* 	onelinehelp;	/* single line help for generic help function */
+	const char* 	onelinehelp;/* single line help for generic help function */
 }bot_cmd;
 
 /** @brief flags for bots
@@ -373,11 +370,13 @@ typedef struct bot_cmd {
  */
 
 /* Restrict module bot to only respond to oper requests
- * when ONLY_OPERS is set in the config file
+ * when ONLY_OPERS is set in the config file 
+ * E.g. StatServ
  */
 #define BOT_FLAG_ONLY_OPERS		0x00000001
 /* Restrict module bot to only respond to oper requests
  * regardless of ONLY_OPERS setting in the config file
+ * E.g. Connectserv
  */
 #define BOT_FLAG_RESTRICT_OPERS	0x00000002
 
@@ -399,16 +398,19 @@ typedef enum SET_TYPE {
 
 /* "TESTSTRING", &teststring, TYPE_STRING, 0,string_buffer_size 
    "TESTINT",    &testint, TYPE_INT 0, 200 */ 
-typedef struct bot_settings {
-	const char		*option;	/* option string */
+typedef struct bot_setting {
+	char			*option;	/* option string */
 	void*			varptr;		/* pointer to var */
 	SET_TYPE		type;		/* type of var */
 	unsigned int	min;		/* min value */
 	unsigned int	max;		/* max value */
-	const char		*confitem;	/* config string for kptool */
+	char			*confitem;	/* config string for kptool */
+#if 0   /* Work in progress */
 	const char		*desc;		/* description of setting for messages */
 	bot_cmd_handler	handler;	/* handler for custom/post-set processing */
-}bot_settings;
+	const char**	helptext;	/* pointer to help text */
+#endif
+}bot_setting;
 
 /* sock.c */
 int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);

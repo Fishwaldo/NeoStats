@@ -1,8 +1,9 @@
 ConnectServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma^
 ==============================================================================
-* Version 1.11 * Mark (M) * November 13, 2003
+* Version 1.11 * Mark (M) * December 2, 2003
  - Use core bot message handler to process commands (M)
+ - Use core bot set handler (M)
 
 * Version 1.10 * Mark (M) * November 13, 2003
  - Moved mode defines to ircd header files (M)

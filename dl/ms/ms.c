@@ -74,23 +74,23 @@ Functions __module_functions[] = {
 
 static bot_cmd ms_commands[]=
 {
-	{"HAIL",		ms_hail,		2, 	0,	ms_help_hail,		1,	ms_help_hail_oneline },
-	{"ODE",			ms_ode,			2, 	0,	ms_help_ode,		1,	ms_help_ode_oneline },
-	{"LAPDANCE",	ms_lapdance,	1, 	0,	ms_help_lapdance,	1,	ms_help_lapdance_oneline },
-	{"VERSION",		ms_version,		0, 	0,	ms_help_version,	1,	ms_help_version_oneline },
-	{"ABOUT",		ms_about,		0, 	0,	ms_help_about,		1,	ms_help_about_oneline },
-	{"POEM",		ms_poem,		2, 	0,	ms_help_poem,		1,	ms_help_poem_oneline },
-	{"REDNECK",		ms_redneck,		1, 	0,	ms_help_redneck,	1,	ms_help_redneck_oneline },
-	{"CHEERUP",		ms_cheerup,		1, 	0,	ms_help_cheerup,	1,	ms_help_cheerup_oneline },
-	{"BEHAPPY",		ms_behappy,		1, 	0,	ms_help_behappy,	1,	ms_help_behappy_oneline },
-	{"WONDERFUL",	ms_wonderful,	1, 	0,	ms_help_wonderful,	1,	ms_help_wonderful_oneline },
-	{NULL,			NULL,			0, 	0,			NULL, 		0,	NULL}
+	{"HAIL",		ms_hail,		2, 	0,	ms_help_hail,		ms_help_hail_oneline },
+	{"ODE",			ms_ode,			2, 	0,	ms_help_ode,		ms_help_ode_oneline },
+	{"LAPDANCE",	ms_lapdance,	1, 	0,	ms_help_lapdance,	ms_help_lapdance_oneline },
+	{"VERSION",		ms_version,		0, 	0,	ms_help_version,	ms_help_version_oneline },
+	{"ABOUT",		ms_about,		0, 	0,	ms_help_about,		ms_help_about_oneline },
+	{"POEM",		ms_poem,		2, 	0,	ms_help_poem,		ms_help_poem_oneline },
+	{"REDNECK",		ms_redneck,		1, 	0,	ms_help_redneck,	ms_help_redneck_oneline },
+	{"CHEERUP",		ms_cheerup,		1, 	0,	ms_help_cheerup,	ms_help_cheerup_oneline },
+	{"BEHAPPY",		ms_behappy,		1, 	0,	ms_help_behappy,	ms_help_behappy_oneline },
+	{"WONDERFUL",	ms_wonderful,	1, 	0,	ms_help_wonderful,	ms_help_wonderful_oneline },
+	{NULL,			NULL,			0, 	0,			NULL, 		NULL}
 };
 
 int Online(char **av, int ac)
 {
 	ms_bot = init_mod_bot(s_MoraleServ, "MS", me.name, "A Network Morale Service",
-		services_bot_modes, 0, ms_commands, __module_info.module_name);
+		services_bot_modes, 0, ms_commands, NULL, __module_info.module_name);
 	return 1;
 };
 

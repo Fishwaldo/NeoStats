@@ -77,25 +77,25 @@ Functions __module_functions[] = {
 
 static bot_cmd ls_commands[]=
 {
-	{"ABOUT",		ls_about,		0, 	0,	ls_help_about,		1,	ls_help_about_oneline },
-	{"ROSE",		ls_rose,		1, 	0,	ls_help_rose,		1,	ls_help_rose_oneline },
-	{"KISS",		ls_kiss,		1, 	0,	ls_help_kiss,		1,	ls_help_kiss_oneline },
-	{"TONSIL",		ls_tonsil,		1, 	0,	ls_help_tonsil,		1,	ls_help_tonsil_oneline },
-	{"HUG",			ls_hug,			1, 	0,	ls_help_hug,		1,	ls_help_hug_oneline },
-	{"ADMIRER",		ls_admirer,		1, 	0,	ls_help_admirer,	1,	ls_help_admirer_oneline },
-	{"CHOCOLATE",	ls_choco,		1, 	0,	ls_help_chocolate,	1,	ls_help_chocolate_oneline },
-	{"CANDY",		ls_candy,		1, 	0,	ls_help_candy,		1,	ls_help_candy_oneline },
-	{"LOVENOTE",	ls_lovenote,	2, 	0,	ls_help_lovenote,	1,	ls_help_lovenote_oneline },
-	{"APOLOGY",		ls_apology,		2, 	0,	ls_help_apology,	1,	ls_help_apology_oneline },
-	{"THANKYOU",	ls_thankyou,	2, 	0,	ls_help_thankyou,	1,	ls_help_thankyou_oneline },
-	{"VERSION",		ls_version,		0, 	0,	ls_help_version,	1,	ls_help_version_oneline },
-	{NULL,			NULL,			0, 	0,	NULL, 				0,	NULL}
+	{"ABOUT",		ls_about,		0, 	0,	ls_help_about,		ls_help_about_oneline },
+	{"ROSE",		ls_rose,		1, 	0,	ls_help_rose,		ls_help_rose_oneline },
+	{"KISS",		ls_kiss,		1, 	0,	ls_help_kiss,		ls_help_kiss_oneline },
+	{"TONSIL",		ls_tonsil,		1, 	0,	ls_help_tonsil,		ls_help_tonsil_oneline },
+	{"HUG",			ls_hug,			1, 	0,	ls_help_hug,		ls_help_hug_oneline },
+	{"ADMIRER",		ls_admirer,		1, 	0,	ls_help_admirer,	ls_help_admirer_oneline },
+	{"CHOCOLATE",	ls_choco,		1, 	0,	ls_help_chocolate,	ls_help_chocolate_oneline },
+	{"CANDY",		ls_candy,		1, 	0,	ls_help_candy,		ls_help_candy_oneline },
+	{"LOVENOTE",	ls_lovenote,	2, 	0,	ls_help_lovenote,	ls_help_lovenote_oneline },
+	{"APOLOGY",		ls_apology,		2, 	0,	ls_help_apology,	ls_help_apology_oneline },
+	{"THANKYOU",	ls_thankyou,	2, 	0,	ls_help_thankyou,	ls_help_thankyou_oneline },
+	{"VERSION",		ls_version,		0, 	0,	ls_help_version,	ls_help_version_oneline },
+	{NULL,			NULL,			0, 	0,	NULL, 				NULL}
 };
 
 int Online(char **av, int ac)
 {
 	ls_bot = init_mod_bot(s_LoveServ, "love", me.name, "Network Love Service",
-		services_bot_modes, 0, ls_commands, __module_info.module_name);
+		services_bot_modes, 0, ls_commands, NULL, __module_info.module_name);
 	return 1;
 };
 

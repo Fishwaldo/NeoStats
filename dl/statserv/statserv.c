@@ -248,24 +248,24 @@ void __ModFini()
 
 bot_cmd ss_commands[]=
 {
-	{"ABOUT",			ss_about,		0, 	NS_ULEVEL_OPER,	ss_help_about, 		1, 		ss_help_about_oneline},
-	{"VERSION",			ss_version,		0, 	NS_ULEVEL_OPER,	ss_help_version, 	1, 		ss_help_version_oneline},
-	{"SERVER",			ss_server,		0, 	NS_ULEVEL_OPER,	ss_help_server,		1, 		ss_help_server_oneline},
-	{"MAP",				ss_map,			0, 	NS_ULEVEL_OPER,	ss_help_map, 		1, 		ss_help_map_oneline},
-	{"CHAN",			ss_chans,		0, 	NS_ULEVEL_OPER,	ss_help_chan, 		1, 		ss_help_chan_oneline},
-	{"NETSTATS",		ss_netstats,	0, 	NS_ULEVEL_OPER,	ss_help_netstats, 	1, 		ss_help_netstats_oneline},
-	{"DAILY",			ss_daily,		0, 	NS_ULEVEL_OPER,	ss_help_daily, 		1, 		ss_help_daily_oneline},
-	{"TLD",				ss_tld,			1, 	NS_ULEVEL_OPER,	ss_help_tld, 		1, 		ss_help_tld_oneline},
-	{"TLDMAP",			ss_tld_map,		0, 	NS_ULEVEL_OPER,	ss_help_tldmap, 	1, 		ss_help_tldmap_oneline},
-	{"OPERLIST",		ss_operlist,	0, 	NS_ULEVEL_OPER,	ss_help_operlist, 	1, 		ss_help_operlist_oneline},
-#ifdef HAVE_BOT_MODE																		
-	{"BOTLIST",			ss_botlist,		0, 	NS_ULEVEL_OPER,	ss_help_botlist, 	1, 		ss_help_botlist_oneline},
+	{"ABOUT",			ss_about,		0, 	NS_ULEVEL_OPER,		ss_help_about, 		 	ss_help_about_oneline},
+	{"VERSION",			ss_version,		0, 	NS_ULEVEL_OPER,		ss_help_version, 	 	ss_help_version_oneline},
+	{"SERVER",			ss_server,		0, 	NS_ULEVEL_OPER,		ss_help_server,		 	ss_help_server_oneline},
+	{"MAP",				ss_map,			0, 	NS_ULEVEL_OPER,		ss_help_map, 		 	ss_help_map_oneline},
+	{"CHAN",			ss_chans,		0, 	NS_ULEVEL_OPER,		ss_help_chan, 		 	ss_help_chan_oneline},
+	{"NETSTATS",		ss_netstats,	0, 	NS_ULEVEL_OPER,		ss_help_netstats, 	 	ss_help_netstats_oneline},
+	{"DAILY",			ss_daily,		0, 	NS_ULEVEL_OPER,		ss_help_daily, 		 	ss_help_daily_oneline},
+	{"TLD",				ss_tld,			1, 	NS_ULEVEL_OPER,		ss_help_tld, 		 	ss_help_tld_oneline},
+	{"TLDMAP",			ss_tld_map,		0, 	NS_ULEVEL_OPER,		ss_help_tldmap, 	 	ss_help_tldmap_oneline},
+	{"OPERLIST",		ss_operlist,	0, 	NS_ULEVEL_OPER,		ss_help_operlist, 	 	ss_help_operlist_oneline},
+#ifdef HAVE_BOT_MODE																	
+	{"BOTLIST",			ss_botlist,		0, 	NS_ULEVEL_OPER,		ss_help_botlist, 	 	ss_help_botlist_oneline},
 #endif																						
-	{"CLIENTVERSIONS",	ss_clientversions,0,NS_ULEVEL_OPER,	ss_help_clientversions,1, 	ss_help_clientversions_oneline},
-	{"SET",				ss_set,			1, 	NS_ULEVEL_ADMIN,ss_help_set, 		1,		ss_help_set_oneline},
-	{"FORCEHTML",		ss_forcehtml,	0, 	NS_ULEVEL_ADMIN,ss_help_forcehtml, 	1,		ss_help_forcehtml_oneline},
-	{"STATS",			ss_stats,		1, 	NS_ULEVEL_ADMIN,ss_help_stats, 		1,		ss_help_stats_oneline},
-	{NULL,				NULL,			0, 	0,					NULL, 				0,		NULL}
+	{"CLIENTVERSIONS",	ss_clientversions,0,NS_ULEVEL_OPER,		ss_help_clientversions, ss_help_clientversions_oneline},
+	{"SET",				ss_set,			1, 	NS_ULEVEL_ADMIN,	ss_help_set, 			ss_help_set_oneline},
+	{"FORCEHTML",		ss_forcehtml,	0, 	NS_ULEVEL_ADMIN,	ss_help_forcehtml, 		ss_help_forcehtml_oneline},
+	{"STATS",			ss_stats,		1, 	NS_ULEVEL_ADMIN,	ss_help_stats, 			ss_help_stats_oneline},
+	{NULL,				NULL,			0, 	0,					NULL, 					NULL}
 };
 
 static int ss_set(User * u, char **av, int ac)

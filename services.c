@@ -57,28 +57,28 @@ static char no_reason[]="no reason given";
 
 static bot_cmd ns_commands[]=
 {
-	{"LEVEL",		ns_level,		0, 	0,					ns_help_level, 		1, 	ns_help_level_oneline},
-	{"INFO",		ns_info,		0, 	0,					ns_help_info, 		1, 	ns_help_info_oneline},
-	{"VERSION",		ns_version,		0, 	0,					ns_help_version, 	1, 	ns_help_version_oneline},
-	{"SHUTDOWN",	ns_shutdown,	0, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown, 	1, 	ns_help_shutdown_oneline},
-	{"RELOAD",		ns_reload,		0, 	NS_ULEVEL_ADMIN, 	ns_help_reload,		1, 	ns_help_reload_oneline},
-	{"LOGS",		ns_logs,		0, 	NS_ULEVEL_OPER, 	ns_help_logs,		1, 	ns_help_logs_oneline},
-	{"MODLIST",		list_modules,	0, 	NS_ULEVEL_ADMIN,  	ns_help_modlist, 	1,	ns_help_modlist_oneline},
-	{"LOAD",		ns_load,	1, 	NS_ULEVEL_ADMIN, 	ns_help_load, 		1, 	ns_help_load_oneline},
-	{"UNLOAD",		ns_unload,1, NS_ULEVEL_ADMIN, 	ns_help_unload, 	1, 	ns_help_unload_oneline},
-	{"JUPE",		ns_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_help_jupe,		1, 	ns_help_jupe_oneline},
+	{"LEVEL",		ns_level,		0, 	0,					ns_help_level, 		ns_help_level_oneline},
+	{"INFO",		ns_info,		0, 	0,					ns_help_info, 		ns_help_info_oneline},
+	{"VERSION",		ns_version,		0, 	0,					ns_help_version, 	ns_help_version_oneline},
+	{"SHUTDOWN",	ns_shutdown,	0, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown, 	ns_help_shutdown_oneline},
+	{"RELOAD",		ns_reload,		0, 	NS_ULEVEL_ADMIN, 	ns_help_reload,		ns_help_reload_oneline},
+	{"LOGS",		ns_logs,		0, 	NS_ULEVEL_OPER, 	ns_help_logs,		ns_help_logs_oneline},
+	{"MODLIST",		list_modules,	0, 	NS_ULEVEL_ADMIN,  	ns_help_modlist, 	ns_help_modlist_oneline},
+	{"LOAD",		ns_load,		1, 	NS_ULEVEL_ADMIN, 	ns_help_load, 		ns_help_load_oneline},
+	{"UNLOAD",		ns_unload,		1,	NS_ULEVEL_ADMIN, 	ns_help_unload, 	ns_help_unload_oneline},
+	{"JUPE",		ns_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_help_jupe,		ns_help_jupe_oneline},
 #ifdef USE_RAW																
-	{"RAW",			ns_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_help_raw, 		1, 	ns_help_raw_oneline},
-#endif																		
-	{"DEBUG",		ns_set_debug,	1, 	NS_ULEVEL_ROOT,  	ns_help_debug,		1,	ns_help_debug_oneline},
-	{"BOTLIST",		list_bots,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist,	1,	ns_help_botlist_oneline},
-	{"SOCKLIST",	list_sockets,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist, 	1,	ns_help_socklist_oneline},
-	{"TIMERLIST",	list_timers,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist, 	1,	ns_help_timerlist_oneline},
-	{"BOTCHANLIST",	list_bot_chans,	0, 	NS_ULEVEL_ROOT,  	ns_help_botchanlist,1,	ns_help_botchanlist_oneline},
-	{"USERDUMP",	ns_userdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_userdump, 	1,	ns_help_userdump_oneline},
-	{"CHANDUMP",	ns_chandump,	0, 	NS_ULEVEL_ROOT,  	ns_help_chandump, 	1,	ns_help_chandump_oneline},
-	{"SERVERDUMP",	ns_serverdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverdump, 1,	ns_help_serverdump_oneline},
-	{NULL,			NULL,			0, 	0,			NULL, 			0,	NULL}
+	{"RAW",			ns_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_help_raw, 		ns_help_raw_oneline},
+#endif																	
+	{"DEBUG",		ns_set_debug,	1, 	NS_ULEVEL_ROOT,  	ns_help_debug,		ns_help_debug_oneline},
+	{"BOTLIST",		list_bots,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist,	ns_help_botlist_oneline},
+	{"SOCKLIST",	list_sockets,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist, 	ns_help_socklist_oneline},
+	{"TIMERLIST",	list_timers,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist, 	ns_help_timerlist_oneline},
+	{"BOTCHANLIST",	list_bot_chans,	0, 	NS_ULEVEL_ROOT,  	ns_help_botchanlist,ns_help_botchanlist_oneline},
+	{"USERDUMP",	ns_userdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_userdump, 	ns_help_userdump_oneline},
+	{"CHANDUMP",	ns_chandump,	0, 	NS_ULEVEL_ROOT,  	ns_help_chandump, 	ns_help_chandump_oneline},
+	{"SERVERDUMP",	ns_serverdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverdump, ns_help_serverdump_oneline},
+	{NULL,			NULL,			0, 	0,					NULL, 				NULL}
 };
 
 /** @brief init services

@@ -179,10 +179,19 @@ Functions __module_functions[] = {
 
 static bot_cmd cs_commands[]=
 {
-	{"SET",			cs_set,			1, 	NS_ULEVEL_ADMIN,	cs_help_set, 	1, 	cs_help_set_oneline },
-	{"ABOUT",		cs_about,		0, 	NS_ULEVEL_ADMIN,	cs_help_about, 	1, 	cs_help_about_oneline },
-	{"VERSION",		cs_version,		0, 	NS_ULEVEL_ADMIN,	cs_help_version,1, 	cs_help_version_oneline },
-	{NULL,			NULL,			0, 	0,			NULL, 			0,	NULL}
+/*	{"SET",		cs_set,		1, 	NS_ULEVEL_ADMIN,	cs_help_set, 	cs_help_set_oneline },*/
+	{"ABOUT",	cs_about,	0, 	NS_ULEVEL_ADMIN,	cs_help_about, 	cs_help_about_oneline },
+	{"VERSION",	cs_version,	0, 	NS_ULEVEL_ADMIN,	cs_help_version,cs_help_version_oneline },
+	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
+};
+
+static bot_setting cs_settings[]=
+{
+	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, "SignWatch"	},
+	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, "KillWatch"	},
+	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, "ModeWatch"	},
+	{"NICKWATCH",	&cs_cfg.nick_watch,	SET_TYPE_BOOLEAN,	0, 0, "NickWatch"	},
+	{NULL,			NULL,				0,					0, 0, NULL,			},
 };
 
 static int cs_about(User * u, char **av, int ac)
@@ -226,7 +235,7 @@ static int cs_set(User * u, char **av, int ac)
 static int Online(char **av, int ac)
 {
 	cs_bot = init_mod_bot(s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.rname, 
-		services_bot_modes, BOT_FLAG_RESTRICT_OPERS, cs_commands, __module_info.module_name);
+		services_bot_modes, BOT_FLAG_RESTRICT_OPERS, cs_commands, cs_settings, __module_info.module_name);
 	if(cs_bot)
 		cs_online = 1;
 	return 1;
