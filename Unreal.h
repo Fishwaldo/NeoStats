@@ -18,13 +18,19 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.7 2002/03/05 08:39:26 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.8 2002/03/05 11:57:03 fishwaldo Exp $
  */
 
 
 #ifndef UNREAL_H
 
 #define UNREAL_H
+
+
+
+
+
+
 
 
 /* Shamelessly Stolen from Unreal2.1.7 for Token Support!  - Fish*/
@@ -343,14 +349,57 @@
 #define UMODE_DEAF     0x8000000 /* User can't here anything in channel */
 
 
-struct Oper_Modes {
+
+struct ircd_srv_ {
+	int uprot;
+	char cloak[10];
+} ircd_srv;
+
+
+typedef struct {
 	long umodes;
 	char mode;
 	int level;
-};
+} Oper_Modes;
+
+static Oper_Modes usr_mds[] = {
+				 {UMODE_OPER, 'o', 50},
+                                 {UMODE_LOCOP, 'O', 40},
+                                 {UMODE_INVISIBLE, 'i', 0},
+                                 {UMODE_WALLOP, 'w', 0},
+                                 {UMODE_FAILOP, 'g', 0},
+                                 {UMODE_HELPOP, 'h', 30},
+                                 {UMODE_SERVNOTICE, 's',0},
+                                 {UMODE_KILLS, 'k',0},
+                                 {UMODE_SERVICES, 'S',200},
+                                 {UMODE_SADMIN, 'a',100},
+				 {UMODE_COADMIN, 'C',60},
+				 {UMODE_EYES,	'e',0},
+				 {UMODE_KIX, 'q',0},
+				 {UMODE_BOT, 'B',0},
+				 {UMODE_FCLIENT, 'F',0},
+	   			 {UMODE_DEAF,    'd',0},
+   				 {UMODE_HIDING,  'I',0},
+                                 {UMODE_ADMIN, 'A',70},
+                                 {UMODE_NETADMIN, 'N',185},
+				 {UMODE_TECHADMIN, 'T',190},
+                                 {UMODE_CLIENT, 'c',0},
+                                 {UMODE_FLOOD, 'f',0},
+                                 {UMODE_REGNICK, 'r',0},
+                                 {UMODE_HIDE,    'x',0},
+                                 {UMODE_CHATOP, 'b',0},
+				 {UMODE_WHOIS, 'W',0},
+                                 {0, 0, 0 }
+	};;
+
+
+
+
+
 
 
 /* function declarations */
+extern void init_ircd();
 extern void notice(char *,char *, ...);
 extern int sserver_cmd(const char *, const int numeric, const char *);
 extern int slogin_cmd(const char *, const int numeric, const char *, const char *);
@@ -362,7 +411,7 @@ extern int sjoin_cmd(const char *, const char *);
 extern int schmode_cmd(const char *, const char *, const char *, const char *);
 extern int snick_cmd(const char *, const char *, const char *, const char *);
 extern int sping_cmd(const char *from, const char *reply, const char *to);
-extern int sumode_cmd(const char *who, const char *target, const char *mode);
+/* extern int sumode_cmd(const char *who, const char *target, unsigned long mode); */
 
 
 #endif  /* UNREAL_H Define */

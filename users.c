@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.14 2002/03/05 08:13:45 fishwaldo Exp $
+** $Id: users.c,v 1.15 2002/03/05 11:57:03 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -15,37 +15,6 @@
 
 int fnmatch(const char *, const char *, int flags);
 
-struct Oper_Modes usr_mds[]      = { 
-				 {UMODE_OPER, 'o', 50},
-                                 {UMODE_LOCOP, 'O', 40},
-                                 {UMODE_INVISIBLE, 'i', 0},
-                                 {UMODE_WALLOP, 'w', 0},
-                                 {UMODE_FAILOP, 'g', 0},
-                                 {UMODE_HELPOP, 'h', 30},
-                                 {UMODE_SERVNOTICE, 's',0},
-                                 {UMODE_KILLS, 'k',0},
-                                 {UMODE_SERVICES, 'S',200},
-#ifdef UNREAL
-                                 {UMODE_SADMIN, 'a',100},
-				 {UMODE_COADMIN, 'C',60},
-				 {UMODE_EYES,	'e',0},
-				 {UMODE_KIX, 'q',0},
-				 {UMODE_BOT, 'B',0},
-				 {UMODE_FCLIENT, 'F',0},
-	   			 {UMODE_DEAF,    'd',0},
-   				 {UMODE_HIDING,  'I',0},
-#endif
-                                 {UMODE_ADMIN, 'A',70},
-                                 {UMODE_NETADMIN, 'N',185},
-				 {UMODE_TECHADMIN, 'T',190},
-                                 {UMODE_CLIENT, 'c',0},
-                                 {UMODE_FLOOD, 'f',0},
-                                 {UMODE_REGNICK, 'r',0},
-                                 {UMODE_HIDE,    'x',0},
-                                 {UMODE_CHATOP, 'b',0},
-				 {UMODE_WHOIS, 'W',0},
-                                 {0, 0, 0 }
-};
 
 
 
@@ -246,23 +215,24 @@ void UserMode(char *nick, char *modes)
 	log("Modes: %s", modes);
 #endif
 	strcpy(u->modes, modes);
-	while (*modes++) {
 	tmpmode = *(modes);
-	switch(tmpmode) {
-		case '+'	: add = 1; break;
-		case '-'	: add = 0; break;
-		default		: for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 
-					if (usr_mds[i].mode == tmpmode) {
-						if (add) {
-							u->Umode |= usr_mds[i].umodes;
-							break;
-						} else { 
-							u->Umode &= ~usr_mds[i].umodes;
-							break;
-						}				
-					}
-				 }
-			}
+	while (tmpmode) {
+		switch(tmpmode) {
+			case '+'	: add = 1; break;
+			case '-'	: add = 0; break;
+			default		: for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 
+						if (usr_mds[i].mode == tmpmode) {
+							if (add) {
+								u->Umode |= usr_mds[i].umodes;
+								break;
+							} else { 
+								u->Umode &= ~usr_mds[i].umodes;
+								break;
+							}				
+						}
+				 	}
+		}
+	tmpmode = *modes++;
 	}
 #ifdef DEBUG
 	log("Modes for %s are now %p", u->nick, u->Umode);

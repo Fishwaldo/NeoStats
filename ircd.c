@@ -13,6 +13,7 @@
 #include "stats.h"
 #include "dl.h"
 
+
 extern const char version_date[], version_time[];
 extern const char protocol_version[];
 
@@ -195,6 +196,7 @@ IntCommands cmd_list[] = {
 int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char *mod_name)
 {
 	User *u;
+	char cmd[63];
 	segv_location = sstrdup("init_bot");
 	u = finduser(nick);
 	if (u) {
@@ -203,9 +205,10 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	}
 	add_mod_user(nick, mod_name);
 	snick_cmd(nick, user, host, rname);
-	sumode_cmd(nick, nick, modes);
+	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
 	sjoin_cmd(nick, me.chan);
-	schmode_cmd(me.name, me.chan, "+oa", nick);
+	sprintf(cmd, "%s %s", nick, nick);
+	schmode_cmd(me.name, me.chan, "+oa", cmd);
 	Module_Event("SIGNON", finduser(nick));
 	return 1;
 }
@@ -401,9 +404,10 @@ void init_ServBot()
 
 	sprintf(rname, "/msg %s \2HELP\2", s_Services);
 	snick_cmd(s_Services, Servbot.user, Servbot.host, rname);
-	sumode_cmd(s_Services, s_Services, "+Sqd");
+	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
 	sjoin_cmd(s_Services, me.chan);
-	schmode_cmd(me.name, me.chan, "+oa", s_Services);
+	sprintf(rname, "%s %s", s_Services, s_Services);
+	schmode_cmd(me.name, me.chan, "+oa", rname);
 	me.onchan = 1;
 	Module_Event("SIGNON", finduser(s_Services));
 }
@@ -626,12 +630,21 @@ void Srv_Netinfo(char *origin, char *coreLine) {
 			cmd = strtok(NULL, " ");
 			cmd = strtok(NULL, " ");
 		        me.onchan = 1;
-			sts(":%s NETINFO 0 %d %s 0 0 0 0 :%s",me.name,time(NULL),cmd,me.netname);
+#ifdef UNREAL
+			ircd_srv.uprot = atoi(cmd);
+			strcpy(ircd_srv.cloak, strtok(NULL, " "));
+			cmd = strtok(NULL, " ");
+			cmd = strtok(NULL, " ");
+			cmd = strtok(NULL, " ");
+			strcpy(me.netname, strtok(NULL, " "));
+#endif
+
+			sts(":%s NETINFO 0 %d %d %s 0 0 0 %s",me.name,time(NULL),ircd_srv.uprot, ircd_srv.cloak,me.netname);
 			globops(me.name,"Link with Network \2Complete!\2");
 			#ifdef DEBUG
         			ns_debug_to_coders("");
         		#endif
-			if (atoi(cmd) == 2109) {
+			if (ircd_srv.uprot == 2109) {
 				me.usesmo = 1;
 			} 
 			Module_Event("NETINFO", coreLine); 

@@ -210,6 +210,7 @@ void start()
 	TimerReset();
 	init_server_hash();
 	init_user_hash();
+	init_ircd();
 /* 
 	init_tld();
 */

@@ -14,6 +14,9 @@
 
 void sts(char *fmt,...);
 
+void init_ircd() {
+};
+
 
 int sserver_cmd(const char *name, const int numeric, const char *infoline) {
 	sts("%s %s %s %d :%s", me.name, (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
@@ -68,10 +71,19 @@ int sping_cmd(const char *from, const char *reply, const char *to) {
 	return 1;
 }
 
-int sumode_cmd(const char *who, const char *target, const char *mode) { 
-	sts(":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, mode);
+int sumode_cmd(const char *who, const char *target, long mode) {
+	int i;
+	char newmode[20];
+	newmode[0] = '+';
+	newmode[1] = '\0';
+	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1); i++) {
+		if (mode & usr_mds[i].umodes) {
+			sprintf(newmode, "%s%c", newmode, usr_mds[i].mode);
+		}
+	}
+	sts(":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, newmode);
 /* TODO usermode is broken (expects mode to start with :) fix it! */
-	UserMode(target, mode);
+	UserMode(target, newmode);
 	return 1;
 }
 

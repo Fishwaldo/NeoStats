@@ -75,6 +75,7 @@ typedef struct chans_ Chans;
 typedef struct config_mod_ Config_Mod;
 
 
+
 struct me {
 	char name[MAXHOST];
 	char modpath[BUFSIZE];
