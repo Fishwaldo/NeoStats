@@ -562,6 +562,10 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 							}
 						break;
 					case SET_TYPE_STRING:
+					case SET_TYPE_NICK:
+					case SET_TYPE_USER:
+					case SET_TYPE_HOST:
+					case SET_TYPE_REALNAME:
 						prefmsg(u->nick, bot_ptr->nick, "%s: %s",
 							set_ptr->option, (char*)set_ptr->varptr);
 						break;
@@ -670,6 +674,9 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				"%s set to %d", set_ptr->option, intval);
 			break;
 		case SET_TYPE_STRING:
+		case SET_TYPE_NICK:
+		case SET_TYPE_USER:
+		case SET_TYPE_HOST:
 			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
 			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
@@ -678,6 +685,22 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
 			prefmsg(u->nick, bot_ptr->nick,
 				"%s set to %s", set_ptr->option, av[3]);
+			break;
+		case SET_TYPE_REALNAME:
+			{
+				char *buf;
+
+				buf = joinbuf(av, ac, 3);
+				strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
+				SetConf((void *)buf, CFGSTR, set_ptr->confitem);
+				chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
+					set_ptr->option, buf, u->nick);
+				nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+					u->nick, u->username, u->hostname, set_ptr->option, buf);
+				prefmsg(u->nick, bot_ptr->nick,
+					"%s set to %s", set_ptr->option, buf);
+				free(buf);
+			}
 			break;
 		case SET_TYPE_CUSTOM:
 			if(set_ptr->handler) {

@@ -1151,8 +1151,13 @@ list_bots (User * u, char **av, int ac)
 	hash_scan_begin (&bs, bh);
 	while ((bn = hash_scan_next (&bs)) != NULL) {
 		mod_usr = hnode_get (bn);
-		prefmsg (u->nick, s_Services, "Module: %s", mod_usr->modname);
-		prefmsg (u->nick, s_Services, "Module Bots: %s", mod_usr->nick);
+		if(mod_usr->modname[0] == 0) {
+			prefmsg (u->nick, s_Services, "NeoStats");
+			prefmsg (u->nick, s_Services, "Bots: %s", mod_usr->nick);
+		} else {
+			prefmsg (u->nick, s_Services, "Module: %s", mod_usr->modname);
+			prefmsg (u->nick, s_Services, "Module Bots: %s", mod_usr->nick);
+		}
 	}
 	prefmsg (u->nick, s_Services, "End of Module Bot List");
 	return 0;
