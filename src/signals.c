@@ -108,6 +108,8 @@ static void do_backtrace( void )
 
 void report_segfault( const char* modulename )
 {
+	static char segfault_fmttime[TIMEBUFSIZE];
+
 	segfault = fopen( "segfault.log", "a" );
 	if( modulename ) {
 		irc_globops( NULL, _( "Segmentation fault in %s. Refer to segfault.log for details." ), GET_CUR_MODNAME() );
@@ -116,9 +118,14 @@ void report_segfault( const char* modulename )
 		irc_globops( NULL, _( "Segmentation fault. Server terminating. Refer to segfault.log." ) );
 		nlog( LOG_CRITICAL, "Segmentation fault. Server terminating. Refer to segfault.log." );
 	}
+
+	me.now = time(NULL);
+	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", me.now);
+	strftime (segfault_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime (&me.now));
 	fprintf( segfault, "------------------------SEGFAULT REPORT-------------------------\n" );
 	fprintf( segfault, "Please view the README for how to submit a bug report\n" );
 	fprintf( segfault, "and include this segfault report in your submission.\n" );
+	fprintf (segfault, "(%s)\n", segfault_fmttime);
 	fprintf( segfault, "Version:  %s\n", me.version );
 	if( modulename ) {
 		fprintf( segfault, "Module:   %s\n", GET_CUR_MODNAME() );
