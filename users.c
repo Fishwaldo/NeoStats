@@ -121,7 +121,7 @@ void
 UserJoin (const char* nick, const char* chanlist)
 {
 	char *s, *t;
-	t = chanlist;
+	t = (char*)chanlist;
 	while (*(s = t)) {
 		t = s + strcspn (s, ",");
 		if (*t)
@@ -169,7 +169,7 @@ doDelUser (const char *nick, int killflag, const char *reason)
 	/* run the event to delete a user */
 	AddStringToList (&av, u->nick, &ac);
 	if(reason) {
-		AddStringToList (&av, reason, &ac);
+		AddStringToList (&av, (char*)reason, &ac);
 	}
 	if (killflag == 0) {
 		ModuleEvent (EVENT_SIGNOFF, av, ac);
