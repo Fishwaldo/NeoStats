@@ -1160,6 +1160,8 @@ int irc_join( const Bot *botptr, const char *chan, const char *mode )
 		JoinChannel( botptr->u->name, chan );
 		/* Increment number of persistent users if needed */
 		if( botptr->flags & BOT_FLAG_PERSIST ) {
+			if( !c )
+				c = FindChannel( chan );
 			c->persistentusers ++;
 		}
 		if( mode ) {
