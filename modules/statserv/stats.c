@@ -431,6 +431,22 @@ void StatsServerPong(Client *s)
 	}
 }
 
+void StatsQuitUser(Client * u)
+{
+	SStats *s;
+
+	s = findserverstats(u->user->server->name);
+	if (is_oper(u)) {
+		dlog(DEBUG2, "Decreasing OperCount on %s due to signoff", u->user->server->name);
+		DecreaseOpers(s);
+	}
+	if (u->user->is_away == 1) {
+		stats_network.away = stats_network.away - 1;
+	}
+	DecreaseUsers(s);
+	DelTLD(u);
+}
+
 void StatsKillUser(Client * u)
 {
 	SStats *s;
@@ -438,16 +454,8 @@ void StatsKillUser(Client * u)
 	char *rbuf, *cmd, *who;
 
 	SET_SEGV_LOCATION();
-	s = findserverstats(u->user->server->name);
-	if (is_oper(u)) {
-		dlog(DEBUG2, "Decreasing OperCount on %s due to kill", u->user->server->name);
-		DecreaseOpers(s);
-	}
-	if (u->user->is_away == 1) {
-		stats_network.away --;
-	}
-	DecreaseUsers(s);
-	DelTLD(u);
+	/* Treat as a quit for stats */
+	StatsQuitUser (u);
 	rbuf = sstrdup(recbuf);
 	cmd = rbuf;
 	who = strtok(cmd, " ");
@@ -559,22 +567,6 @@ void StatsAddUser(Client * u)
 	}
 }
 
-void StatsDelUser(Client * u)
-{
-	SStats *s;
-
-	s = findserverstats(u->user->server->name);
-	if (is_oper(u)) {
-		dlog(DEBUG2, "Decreasing OperCount on %s due to signoff", u->user->server->name);
-		DecreaseOpers(s);
-	}
-	if (u->user->is_away == 1) {
-		stats_network.away = stats_network.away - 1;
-	}
-	DecreaseUsers(s);
-	DelTLD(u);
-}
-
 int StatsMidnight(void)
 {
 	struct tm *ltm = localtime(&me.now);
@@ -638,5 +630,6 @@ void FiniStats(void)
 		sfree(c);
 		cn = list_next(Chead, cn);
 	}
-	list_destroy_nodes(Chead);
+	list_destroy_nodes (Chead);
+	list_destroy (Chead);
 }

@@ -221,15 +221,17 @@ int ModInit(Module* mod_ptr)
 void ModFini()
 {
 	StatServ.shutdown = 1;
-	irc_chanalert(ss_bot, "Saving StatServ Database. this *could* take a while");
-	SaveStats();
-	irc_chanalert(ss_bot, "Done");
-	FiniStats();
-	FiniTLD();
-	save_client_versions();
+	irc_chanalert (ss_bot, "Saving StatServ Database. this *could* take a while");
+	SaveStats ();
+	irc_chanalert (ss_bot, "Done");
+	FiniStats ();
+	FiniTLD ();
+	save_client_versions ();
 #if SQLSRV
-	list_destroy_nodes(fakedaily);
-	list_destroy_nodes(fakenetwork);
+	list_destroy_nodes (fakedaily);
+	list_destroy (fakedaily);
+	list_destroy_nodes (fakenetwork);
+	list_destroy (fakenetwork);
 #endif
 #ifdef USE_BERKELEY
 	DBCloseDatabase();
@@ -326,7 +328,7 @@ static int ss_event_quit(CmdParams* cmdparams)
 	if (StatServ.exclusions && IsExcluded(cmdparams->source)) {
 		return 0;
 	}
-	StatsDelUser(cmdparams->source);
+	StatsQuitUser(cmdparams->source);
 	return 1;
 }
 

@@ -167,7 +167,7 @@ void StatsServerPong(Client *s);
 SStats *findserverstats(char *name);
 void StatsAddCTCPVersion(char* version);
 void StatsAddUser(Client * u);
-void StatsDelUser(Client * u);
+void StatsQuitUser(Client * u);
 void StatsKillUser(Client * u);
 void StatsUserMode(Client * u, char *modes);
 void StatsUserAway(Client * u);

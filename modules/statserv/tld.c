@@ -92,6 +92,14 @@ void DisplayTLDmap(Client *u)
 	irc_prefmsg(ss_bot, u, "End of List");
 }
 
+/** @brief DelTLD
+ *
+ *  Delete a TLD from the current stats
+ *
+ *  @param client to delete from TLD list
+ *
+ *  @return none
+ */
 void DelTLD(Client * u)
 {
 	const char *country_code;
@@ -116,7 +124,14 @@ void DelTLD(Client * u)
 	} 
 }
 
-
+/** @brief AddTLD
+ *
+ *  Add a TLD to the current stats
+ *
+ *  @param client to add to TLD list
+ *
+ *  @return none
+ */
 void AddTLD(Client * u)
 {
 	const char *country_name;
@@ -153,6 +168,14 @@ void AddTLD(Client * u)
 	return;
 }
 
+/** @brief InitTLD
+ *
+ *  Init TLD lists
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 void InitTLD(void)
 {
 	TLD *t;
@@ -182,20 +205,27 @@ void InitTLD(void)
 	list_append(Thead, tn);
 }
 
+/** @brief FiniTLD
+ *
+ *  Clean up TLD lists
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 void FiniTLD(void) 
 {
-	TLD *t;
 	lnode_t *tn;
 
 	if (gi) {
-		GeoIP_delete(gi);
+		GeoIP_delete (gi);
+		gi = NULL;
 	}
-	tn = list_first(Thead);
+	tn = list_first (Thead);
 	while (tn != NULL) {
-		t = lnode_get(tn);
-		sfree(t);
-		tn = list_next(Thead, tn);
+		sfree (lnode_get (tn));
+		tn = list_next (Thead, tn);
 	}
-	list_destroy_nodes(Thead);
-	gi = NULL;
+	list_destroy_nodes (Thead);	
+	list_destroy (Thead);	
 }

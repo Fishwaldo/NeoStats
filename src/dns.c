@@ -186,13 +186,15 @@ void FiniDns (void)
 		sfree (dnsdata->a);
 		sfree (dnsdata);
 	}
-	list_destroy_nodes(dnslist);
+	list_destroy_nodes (dnslist);
+	list_destroy (dnslist);
 	dnsnode = list_first(dnsqueue);
 	while (dnsnode) {
 		dnsdata = lnode_get(dnsnode);
 		sfree(dnsdata);
 	}
-	list_destroy_nodes(dnsqueue);
+	list_destroy_nodes (dnsqueue);
+	list_destroy (dnsqueue);
 	free(ads);
 }
 /** @brief Canx any DNS queries for modules we might be unloading

@@ -119,7 +119,7 @@ EXPORTFUNC	int comparef (const void *, const void *);
 
 	list_t *list_init (list_t *, listcount_t);
 EXPORTFUNC	list_t *list_create (listcount_t);
-	void list_destroy (list_t *);
+EXPORTFUNC	void list_destroy (list_t *);
 EXPORTFUNC	void list_destroy_nodes (list_t *);
 	void list_return_nodes (list_t *, lnodepool_t *);
 
@@ -142,7 +142,7 @@ EXPORTFUNC	void list_ins_before (list_t *, lnode_t *, lnode_t *);
 	lnode_t *list_del_last (list_t *);
 EXPORTFUNC	lnode_t *list_delete (list_t *, lnode_t *);
 
-	void list_process (list_t *, void *, void (*)(list_t *, lnode_t *, void *));
+EXPORTFUNC	void list_process (list_t *, void *, void (*)(list_t *, lnode_t *, void *));
 
 	int list_verify (list_t *);
 
