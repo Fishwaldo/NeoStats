@@ -19,6 +19,7 @@
 /aclocal.m4 -text
 autotools/acinclude.m4 -text
 autotools/aclocal.m4 -text
+autotools/ax_maintainer_mode_auto_silent.m4 -text
 autotools/compile -text
 autotools/config.guess -text
 autotools/config.sub -text
