@@ -111,7 +111,7 @@ static ModeDesc SmodeDesc[] = {
 unsigned int
 BuildModeTable (char *mode_char_map, mode_data * dest, mode_init * src, unsigned int flagall)
 {
-	unsigned int maskall;
+	unsigned int maskall = 0;
 
 	while(src->mode) 
 	{
@@ -641,10 +641,10 @@ ChanUserMode (const char *chan, const char *nick, int add, const unsigned int ma
 		return;
 	}
 	if (add) {
-		dlog(DEBUG2, "ChanUserMode: Adding mode %ld to Channel %s User %s", mask, c->name, u->name);
+		dlog(DEBUG2, "ChanUserMode: Adding mode %x to Channel %s User %s", mask, c->name, u->name);
 		cm->flags |= mask;
 	} else {
-		dlog(DEBUG2, "ChanUserMode: Deleting Mode %ld to Channel %s User %s", mask, c->name, u->name);
+		dlog(DEBUG2, "ChanUserMode: Deleting Mode %x to Channel %s User %s", mask, c->name, u->name);
 		cm->flags &= ~mask;
 	}
 }

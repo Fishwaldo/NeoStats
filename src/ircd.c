@@ -1067,7 +1067,7 @@ irc_invite (const Bot *botptr, const char *to, const char *chan)
 }
 
 int 
-irc_svstime (const time_t ts)
+irc_svstime (const Bot *botptr, Client *target, const time_t ts)
 {
 	if (irc_send_svstime) {
 		irc_send_svstime(me.name, (unsigned long)ts);
@@ -1079,7 +1079,7 @@ irc_svstime (const time_t ts)
 }
 
 int
-irc_svskill (Client *target, const char *reason, ...)
+irc_svskill (const Bot *botptr, Client *target, const char *reason, ...)
 {
 	va_list ap;
 
@@ -1098,7 +1098,7 @@ irc_svskill (Client *target, const char *reason, ...)
 }
 
 int
-irc_svsmode (Client *target, const char *modes)
+irc_svsmode (const Bot *botptr, Client *target, const char *modes)
 {
 	if (irc_send_svsmode) {
 		irc_send_svsmode(me.name, target->name, modes);
@@ -1110,7 +1110,7 @@ irc_svsmode (Client *target, const char *modes)
 }
 
 int
-irc_svshost (Client *target, const char *vhost)
+irc_svshost (const Bot *botptr, Client *target, const char *vhost)
 {
 	if (irc_send_svshost) {
 		strlcpy (target->user->vhost, vhost, MAXHOST);
@@ -1122,7 +1122,7 @@ irc_svshost (Client *target, const char *vhost)
 }
 
 int
-irc_svsjoin (Client *target, const char *chan)
+irc_svsjoin (const Bot *botptr, Client *target, const char *chan)
 {
 	if (irc_send_svsjoin) {
 		irc_send_svsjoin (me.name, target->name, chan);
@@ -1133,7 +1133,7 @@ irc_svsjoin (Client *target, const char *chan)
 }
 
 int
-irc_svspart (Client *target, const char *chan)
+irc_svspart (const Bot *botptr, Client *target, const char *chan)
 {
 	if (irc_send_svspart) {
 		irc_send_svspart (me.name, target->name, chan);
@@ -1155,7 +1155,7 @@ irc_swhois (const char *target, const char *swhois)
 }
 
 int
-irc_svsnick (Client *target, const char *newnick)
+irc_svsnick (const Bot *botptr, Client *target, const char *newnick)
 {
 	if (irc_send_svsnick) {
 		irc_send_svsnick (me.name, target->name, newnick, me.now);

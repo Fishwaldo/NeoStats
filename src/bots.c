@@ -96,7 +96,7 @@ flood_test (Client * u)
 	}
 	if (u->user->flood >= 5) {
 		nlog (LOG_NORMAL, "FLOODING: %s!%s@%s", u->name, u->user->username, u->user->hostname);
-		irc_svskill (u, "%s!%s (Flooding Services.)", me.name, ns_botptr->name);
+		irc_svskill (ns_botptr, u, "%s!%s (Flooding Services.)", me.name, ns_botptr->name);
 		return NS_TRUE;
 	}
 	u->user->flood++;

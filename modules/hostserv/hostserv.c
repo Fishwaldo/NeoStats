@@ -213,7 +213,7 @@ static int hs_event_signon (CmdParams* cmdparams)
 	if (map) {
 		dlog(DEBUG1, "Checking %s against %s", map->host, cmdparams->source->user->hostname);
 		if (match(map->host, cmdparams->source->user->hostname)) {
-			irc_svshost(cmdparams->source, map->vhost);
+			irc_svshost(hs_bot, cmdparams->source, map->vhost);
 			irc_prefmsg(hs_bot, cmdparams->source, 
 				"Automatically setting your hidden host to %s", map->vhost);
 			map->lused = me.now;
@@ -321,7 +321,7 @@ int hs_event_mode (CmdParams* cmdparams)
 					}
 					dlog(DEBUG2, "Regnick Mode on %s", cmdparams->av[0]);
 					ircsnprintf(vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom);
-					irc_svshost(cmdparams->source, vhost);
+					irc_svshost(hs_bot, cmdparams->source, vhost);
 					irc_prefmsg(hs_bot, cmdparams->source, 
 						"Automatically setting your hidden host to %s", vhost);
 					set_moddata(cmdparams->source);
@@ -620,7 +620,7 @@ static int hs_add(CmdParams* cmdparams)
 	if ((nu = find_user(cmd)) != NULL) {
 		if (!IsMe(nu)) {
 			if (match(m, nu->user->hostname)) {
-				irc_svshost(nu, h);
+				irc_svshost(hs_bot, nu, h);
 				irc_prefmsg(hs_bot, cmdparams->source, 
 					"%s is online now, setting vhost to %s",
 					cmd, h);
@@ -829,7 +829,7 @@ static int hs_login(CmdParams* cmdparams)
 	map = lnode_find (vhosts, login, findnick);
 	if (map) {
 		if (!ircstrcasecmp(map->passwd, pass)) {
-			irc_svshost(cmdparams->source, map->vhost);
+			irc_svshost(hs_bot, cmdparams->source, map->vhost);
 			map->lused = me.now;
 			irc_prefmsg(hs_bot, cmdparams->source, 
 				"Your vhost %s has been set.", map->vhost);

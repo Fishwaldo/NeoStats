@@ -684,7 +684,7 @@ UserMode (const char *nick, const char *modes)
 			strlcpy(u->user->vhost, u->user->hostname, MAXHOST);
 		}
 	}
-	dlog(DEBUG1, "UserMode: modes for %s is now %x", u->name, u->user->Umode);
+	dlog(DEBUG1, "UserMode: modes for %s now %x", u->name, u->user->Umode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source = u;	
 	cmdparams->param = (char*)modes;

@@ -36,7 +36,6 @@ static int midnight = 0;
 static int lastservertimesync = 0;
 
 static int is_midnight (void);
-static void TimerMidnight (void);
 static void run_mod_timers (int ismidnight);
 
 int InitTimers (void)
@@ -71,7 +70,7 @@ CheckTimers (void)
 			/* The above check does not need to be exact, but 
 			   setting times ought to be so reset me.now */
 			me.now = time (NULL);
-			irc_svstime (me.now);
+			irc_svstime (ns_botptr, NULL, me.now);
 			lastservertimesync = me.now;
 		}
 	}

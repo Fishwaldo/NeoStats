@@ -1058,13 +1058,13 @@ int irc_pong (const char *reply);
 /*  SVS functions 
  *  these operate from the server rather than a bot 
  */
-EXPORTFUNC int irc_svsnick (Client *target, const char *newnick);
-EXPORTFUNC int irc_svsjoin (Client *target, const char *chan);
-EXPORTFUNC int irc_svspart (Client *target, const char *chan);
-EXPORTFUNC int irc_svshost (Client *target, const char *vhost);
-EXPORTFUNC int irc_svsmode (Client *target, const char *modes);
-EXPORTFUNC int irc_svskill (Client *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC int irc_svstime (const time_t ts);
+EXPORTFUNC int irc_svsnick (const Bot *botptr, Client *target, const char *newnick);
+EXPORTFUNC int irc_svsjoin (const Bot *botptr, Client *target, const char *chan);
+EXPORTFUNC int irc_svspart (const Bot *botptr, Client *target, const char *chan);
+EXPORTFUNC int irc_svshost (const Bot *botptr, Client *target, const char *vhost);
+EXPORTFUNC int irc_svsmode (const Bot *botptr, Client *target, const char *modes);
+EXPORTFUNC int irc_svskill (const Bot *botptr, Client *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC int irc_svstime (const Bot *botptr, Client *target, const time_t ts);
 
 /*  CTCP functions to correctly format CTCP requests and replies
  */
