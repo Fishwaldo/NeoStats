@@ -123,7 +123,7 @@ void ss_html() {
 #endif
 		}
 		if (strstr(buf, "!TLDMAP!")) {
-			strnrepl(buf, 10240, "!TLDMAP", get_tldmap());
+			strnrepl(buf, 10240, "!TLDMAP!", get_tldmap());
 		}
 		if (strstr(buf, "!VERSION!")) {
 			strnrepl(buf, 10240, "!VERSION!", version);
