@@ -12,6 +12,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - added command handler support function is_target_valid to validate a user (M)
  - added __attribute__((format(printf,x,y))) and __attribute__((noreturn)) to header files (M)
  - early version of bot set handler introduced (M)
+ - libcurl integration into NeoStats to handle FTP/HTTP (and future XML-RPC) transfers (F)
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.9
  - import of libpcre into core (M)
