@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: serviceroots.c,v 1.6 2002/11/19 11:09:40 fishwaldo Exp $
+** $Id: serviceroots.c,v 1.7 2002/12/13 11:19:48 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -131,7 +131,7 @@ extern int __do_auth(User *u, int curlvl) {
 		while (un) {
 			if (!strcasecmp(u->nick, lnode_get(un))) {
 				if (srconf.auth == 1) {
-					return (0);
+					return (200);
 				} else {
 					return (200);
 				}

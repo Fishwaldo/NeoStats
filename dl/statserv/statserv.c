@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.54 2002/12/13 10:50:09 fishwaldo Exp $
+** $Id: statserv.c,v 1.55 2002/12/13 11:19:49 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -258,8 +258,6 @@ int __Bot_Message(char *origin, char **av, int ac)
 
 	stats_network.requests++;
 
-	if (flood(u))
-		return -1;
 	log("%s received message from %s: %s", s_StatServ, u->nick, av[1]);
 
 	if (me.onlyopers && UserLevel(u) < 40) {
