@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.86 2003/04/11 09:26:30 fishwaldo Exp $
+** $Id: main.c,v 1.87 2003/04/11 10:02:29 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -419,6 +419,9 @@ static	void	setup_signals()
 	act.sa_handler = serv_die;
 	(void)sigaddset(&act.sa_mask, SIGTERM);
 	(void)sigaction(SIGTERM, &act, NULL);
+	(void)sigaddset(&act.sa_mask, SIGINT);
+	(void)sigaction(SIGINT, &act, NULL);
+	
 /* handling of SIGSEGV as well -sts */
 	act.sa_handler = serv_segv;
 	(void)sigaddset(&act.sa_mask, SIGSEGV);
@@ -428,6 +431,7 @@ static	void	setup_signals()
 	(void)signal(SIGHUP, conf_rehash);
 	(void)signal(SIGTERM, serv_die); 
 	(void)signal(SIGSEGV, serv_segv);
+	(void)signal(SIGINT, serv_die);
 }
 
 /** @brief Connects to IRC and starts the main loop

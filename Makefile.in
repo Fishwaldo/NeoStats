@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.37 2003/04/10 09:32:01 fishwaldo Exp $
+# $Id: Makefile.in,v 1.38 2003/04/11 10:02:29 fishwaldo Exp $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
@@ -40,6 +40,7 @@ libkeeper.a:
 
 utils:
 	(cd tools; $(MAKE) $@)
+
 
 clean:
 	(cd dl; $(MAKE) $@)
@@ -105,21 +106,21 @@ dist:
 # Catch any changes in compilation options at the top of this file
 $(OBJS): Makefile
 
-dotconf.o:	dotconf.c	stats.h		config.h	dotconf.h	Makefile.inc
-services.o:	services.c	stats.h		config.h	dl.h		Unreal.h  	Ultimate.h	Makefile.inc
-main.o:		main.c		stats.h 	config.h	dl.h		Makefile.inc
-sock.o:		sock.c		stats.h		config.h	dl.h		Makefile.inc
-conf.o:		conf.c		stats.h		config.h	dotconf.h	dl.h		Makefile.inc
-ircd.o:		ircd.c		stats.h		config.h	dl.h	 	Unreal.h 	Ultimate.h	Makefile.inc
-timer.o:	timer.c		stats.h		config.h	dl.h		Makefile.inc
-users.o:	users.c		stats.h		config.h	Makefile.inc
-ns_help.o:	ns_help.c	stats.h		config.h	Makefile.inc
-dl.o:		dl.c		stats.h		config.h	dl.h		Makefile.inc
-list.o:		list.c		list.h		Makefile.inc
-hash.o:		hash.c		hash.h		Makefile.inc
-server.o:	server.c	stats.h		hash.h		hash.c	 	config.h	Makefile.inc
-Ultimate.o:	Ultimate.c	stats.h		Ultimate.h	Makefile.inc
-Unreal.o:	Unreal.c	stats.h		Unreal.h	Makefile.inc
-chans.o:	hash.c		stats.h		Makefile.inc
-hybrid7.o:	hybrid7.c	stats.h		hybrid7.h	Makefile.inc
-neoircd.o:	neoircd.c	stats.h		neoircd.h	Makefile.inc
+dns.o: dns.c stats.h adns/adns.h list.h hash.h config.h neoircd.h log.h
+chans.o: chans.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h log.h
+dotconf.o: dotconf.c dotconf.h
+services.o: services.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h log.h
+main.o: main.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h conf.h log.h
+sock.o: sock.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h conf.h log.h
+conf.o: conf.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dotconf.h conf.h dl.h log.h
+ircd.o: ircd.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h log.h
+timer.o: timer.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h log.h
+users.o: users.c stats.h adns/adns.h list.h hash.h config.h neoircd.h dl.h log.h
+ns_help.o: ns_help.c stats.h adns/adns.h list.h hash.h config.h neoircd.h
+dl.o: dl.c dl.h hash.h stats.h adns/adns.h list.h config.h neoircd.h log.h
+list.o: list.c list.h
+hash.o: hash.c hash.h
+server.o: server.c stats.h adns/adns.h list.h hash.h config.h neoircd.h log.h
+keeper.o: keeper.c stats.h adns/adns.h list.h hash.h config.h neoircd.h keeper/keeper.h conf.h log.h
+log.o: log.c stats.h adns/adns.h list.h hash.h config.h neoircd.h conf.h log.h
+neoircd.o: neoircd.c stats.h adns/adns.h list.h hash.h config.h neoircd.h hybrid7.h dl.h log.h

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.c,v 1.2 2003/04/10 15:26:57 fishwaldo Exp $
+** $Id: log.c,v 1.3 2003/04/11 10:02:29 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -59,7 +59,6 @@ void init_logs() {
 		/* if this fails, no need to call do_exit, as this is the first thing that runs... so nothing to do! */
 		exit(-1);
 	}
-	config.debug = 5;
 }
 /** @brief Occasionally flush log files out 
  */

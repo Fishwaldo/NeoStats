@@ -19,7 +19,15 @@ clean:
 
 install: 
 
+depend:
+	$(CC) -MM $(INCLUDES) $(CFLAGS) $(KP_SOURCES) > .depend
 
 
 
 $(OBJECTS): Makefile ../Makefile.inc
+
+gkeeper.o: gkeeper.c gkeeper.h ../../config.h ../../keeper/keeper.h
+tree.o: tree.c gkeeper.h ../../config.h ../../keeper/keeper.h pixmaps/folder_open.xpm pixmaps/folder_closed.xpm pixmaps/book_open.xpm pixmaps/book_closed.xpm pixmaps/string.xpm pixmaps/data.xpm pixmaps/float.xpm pixmaps/num.xpm
+edit.o: edit.c gkeeper.h ../../config.h ../../keeper/keeper.h
+menu.o: menu.c gkeeper.h ../../config.h ../../keeper/keeper.h
+dialog.o: dialog.c gkeeper.h ../../config.h ../../keeper/keeper.h pixmaps/warning.xpm

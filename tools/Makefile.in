@@ -20,12 +20,13 @@ clean:
 	(cd cfgtool; $(MAKE) $@)
 	/bin/rm -rf *.o *.lo *.so *.a kptool Makefile
 
+
 install: 
 
 
 
 
 $(OBJECTS): Makefile ../Makefile.inc
-kp_exp.c:	../keeper/libkeeper.a ../config.h
-kp_imp.c:	../keeper/libkeeper.a ../config.h
-kptool.c:	../keeper/libkeeper.a ../config.h
+kp_exp.o: kp_exp.c kptool.h ../config.h ../keeper/keeper.h
+kp_imp.o: kp_imp.c kptool.h ../config.h ../keeper/keeper.h
+kptool.o: kptool.c kptool.h ../config.h ../keeper/keeper.h

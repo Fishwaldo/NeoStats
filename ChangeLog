@@ -17,6 +17,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Started the new logging function, nlog
  - Added a function, do_exit, that should be called when exiting NeoStats to flush and close the logs and perform any cleanup that should be done. Hopefully one day we can get rid of the execve code!
  - Converted over all log functions to nlog in the core
+ - Catch SigINT signal as well, so we can flush log files
 
 * NeoStats * Fish * Version 2.5.1
  - ConnectServ's username was too long for NeoIRCd, fixed

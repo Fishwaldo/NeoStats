@@ -17,6 +17,10 @@ libadns.a: $(OBJECTS)
 clean:
 	/bin/rm -rf *.o *.lo *.so *.a
 
+depend:
+	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SOURCES) > .depend
+
+
 install: 
 
 
@@ -24,12 +28,12 @@ install:
 
 $(OBJECTS): Makefile ../Makefile.inc
 
-event.o:	internal.h	tvarith.h	adns.h	dlist.h config.h
-check.o:	internal.h	adns.h	dlist.h config.h
-general.o:	internal.h	adns.h  dlist.h config.h
-parse.o:	internal.h	adns.h  dlist.h config.h
-query.o:	internal.h	adns.h  dlist.h config.h
-reply.o:	internal.h	adns.h  dlist.h config.h
-setup.o:	internal.h	adns.h  dlist.h config.h
-transmit.o:	internal.h	tvarith.h	adns.h  dlist.h config.h
-types.o:	internal.h	adns.h  dlist.h config.h
+check.o: check.c internal.h config.h adns.h dlist.h
+event.o: event.c internal.h config.h adns.h dlist.h tvarith.h
+general.o: general.c internal.h config.h adns.h dlist.h
+parse.o: parse.c internal.h config.h adns.h dlist.h
+query.o: query.c internal.h config.h adns.h dlist.h
+reply.o: reply.c internal.h config.h adns.h dlist.h
+setup.o: setup.c internal.h config.h adns.h dlist.h
+transmit.o: transmit.c internal.h config.h adns.h dlist.h tvarith.h
+types.o: types.c internal.h config.h adns.h dlist.h
