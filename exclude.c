@@ -234,7 +234,7 @@ void ns_do_exclude_user(User *u) {
 	/* first thing we check is the server flag. if the server
 	 * is excluded, then the user is excluded as well
 	 */
-	 if (u->server->flags && NS_FLAGS_EXCLUDED) {
+	 if (u->server->flags & NS_FLAGS_EXCLUDED) {
 	 	u->flags |= NS_FLAGS_EXCLUDED;
 	 	return;
 	 }
@@ -266,7 +266,6 @@ void ns_do_exclude_user(User *u) {
 void ns_do_exclude_server(Server *s) {
 	lnode_t *en;
 	excludes *e;
-	
 	en = list_first(exclude_list);
 	while (en != NULL) {
 		e = lnode_get(en);
@@ -280,6 +279,7 @@ void ns_do_exclude_server(Server *s) {
 	}
 	/* if we are here, there is no match */
 	s->flags &= ~NS_FLAGS_EXCLUDED;
+
 }
 
 
