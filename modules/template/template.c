@@ -256,7 +256,7 @@ ModuleEvent module_events[] =
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
-int ModInit( Module *mod_ptr )
+int ModInit( void )
 {
 	return NS_SUCCESS;
 }
@@ -288,10 +288,11 @@ int ModSynch( void )
  *
  *  @param none
  *
- *  @return none
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-void ModFini( void )
+int ModFini (void)
 {
+	return NS_SUCCESS;
 }
 

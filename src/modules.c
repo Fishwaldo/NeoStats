@@ -255,7 +255,7 @@ load_module (const char *modfilename, Client * u)
 	ModuleInfo *info_ptr = NULL;
 	ModuleEvent *event_ptr = NULL;
 	Module *mod_ptr = NULL;
-	int (*ModInit) (Module *module_ptr);
+	int (*ModInit) (void);
 	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();
@@ -339,7 +339,7 @@ load_module (const char *modfilename, Client * u)
 	SET_SEGV_LOCATION();
 	SET_RUN_LEVEL(mod_ptr);
 	DBAOpenDatabase ();
-	err = (*ModInit) (mod_ptr); 
+	err = (*ModInit) (); 
 	RESET_RUN_LEVEL();
 	if (err < 1 || mod_ptr->error) {
 		load_module_error (u, __("Unable to load module: %s. See %s.log for further information.",u), mod_ptr->info->name, mod_ptr->info->name);
@@ -410,7 +410,7 @@ unload_module (const char *modname, Client * u)
 	Module *mod_ptr;
 	hnode_t *modnode;
 	int moduleindex;
-	void (*ModFini) ();
+	int (*ModFini) ( void );
 	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();

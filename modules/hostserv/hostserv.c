@@ -410,12 +410,12 @@ static int hs_event_umode (CmdParams *cmdparams)
  *
  *  Init handler
  *
- *  @param pointer to my module
+ *  @param none
  *
  *  @return NS_SUCCESS if succeeds else NS_FAILURE
  */
 
-int ModInit (Module *mod_ptr)
+int ModInit( void )
 {
 	vhost_list = list_create(-1);
 	if (!vhost_list) {
@@ -465,10 +465,10 @@ int ModSynch (void)
  *
  *  @param none
  *
- *  @return none
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-void ModFini (void)
+int ModFini (void)
 {
 	banentry *ban;
 	hnode_t *hn;
@@ -483,6 +483,7 @@ void ModFini (void)
 	}
 	hash_destroy(banhash);
 	list_destroy_auto (vhost_list);
+	return NS_SUCCESS;
 }
 
 /** @brief new_vhost
@@ -548,6 +549,8 @@ static int hs_cmd_bans_list (CmdParams *cmdparams)
  *  Command handler for BANS ADD
  *
  *  @param cmdparams
+ *    cmdparams->av[1] = ban host mask
+ *    cmdparams->av[2 - cmdparams->ac-1] = reason
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -583,6 +586,7 @@ static int hs_cmd_bans_add (CmdParams *cmdparams)
  *  Command handler for BANS DEL
  *
  *  @param cmdparams
+ *    cmdparams->av[1] = ban host mask
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -619,6 +623,7 @@ static int hs_cmd_bans_del (CmdParams *cmdparams)
  *  Command handler for BANS
  *
  *  @param cmdparams
+ *    cmdparams->av[0] = sub command
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -646,6 +651,9 @@ static int hs_cmd_bans (CmdParams *cmdparams)
  *  Command handler for CHPASS
  *
  *  @param cmdparams
+ *    cmdparams->av[0] = login
+ *    cmdparams->av[1] = old password
+ *    cmdparams->av[2] = new password
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -669,7 +677,6 @@ static int hs_cmd_chpass (CmdParams *cmdparams)
 			CommandReport(hs_bot, "%s changed the password for %s",
 					cmdparams->source->name, vhe->nick);
 			SaveVhost (vhe);
-			return NS_SUCCESS;
 		}
 		return NS_SUCCESS;
 	}
@@ -686,6 +693,10 @@ static int hs_cmd_chpass (CmdParams *cmdparams)
  *  Command handler for ADD
  *
  *  @param cmdparams
+ *    cmdparams->av[0] = login
+ *    cmdparams->av[1] = real host mask
+ *    cmdparams->av[2] = vhost
+ *    cmdparams->av[3] = password
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -756,6 +767,7 @@ static int hs_cmd_add (CmdParams *cmdparams)
  *  Command handler for LIST
  *
  *  @param cmdparams
+ *    cmdparams->av[0] = optionally max number to display
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -816,6 +828,7 @@ static int hs_cmd_list (CmdParams *cmdparams)
  *  Command handler for VIEW
  *
  *  @param cmdparams
+ *    cmdparams->av[0] = login to view
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -847,6 +860,7 @@ static int hs_cmd_view (CmdParams *cmdparams)
 /** @brief hs_cmd_del
  *
  *  Command handler for DEL
+ *    cmdparams->av[0] = login to delete
  *
  *  @param cmdparams
  *
@@ -882,6 +896,8 @@ static int hs_cmd_del (CmdParams *cmdparams)
  *  Command handler for LOGIN
  *
  *  @param cmdparams
+ *    cmdparams->av[0] = login
+ *    cmdparams->av[1] = password
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -889,19 +905,15 @@ static int hs_cmd_del (CmdParams *cmdparams)
 static int hs_cmd_login (CmdParams *cmdparams)
 {
 	vhostentry *vhe;
-	char *login;
-	char *pass;
 
 	SET_SEGV_LOCATION();
-	login = cmdparams->av[0];
-	pass = cmdparams->av[1];
 	/* Check HostName Against Data Contained in vhosts.data */
-	vhe = lnode_find (vhost_list, login, findnick);
+	vhe = lnode_find (vhost_list, cmdparams->av[0], findnick);
 	if (vhe) {
-		if (!ircstrcasecmp (vhe->passwd, pass)) {
+		if (!ircstrcasecmp (vhe->passwd, cmdparams->av[1])) {
 			irc_svshost (hs_bot, cmdparams->source, vhe->vhost);
 			irc_prefmsg (hs_bot, cmdparams->source, 
-				"Your vhost %s has been set.", vhe->vhost);
+				"Your vhost has been set to %s", vhe->vhost);
 			nlog (LOG_NORMAL, "%s used LOGIN to obtain vhost of %s",
 			    cmdparams->source->name, vhe->vhost);
 			if( hs_cfg.verbose ) {

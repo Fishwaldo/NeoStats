@@ -498,7 +498,7 @@ ModuleInfo module_info = {
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModInit (Module *modptr)
+int ModInit (void)
 {
 	ModuleConfig (rta_settings);
 	if (InitRTAServ () != NS_SUCCESS) {
@@ -530,12 +530,13 @@ int ModSynch (void)
  *
  *  @param none
  *
- *  @return none
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-void ModFini (void)
+int ModFini (void)
 {
 	del_services_set_list (rta_settings);
+	return NS_SUCCESS;
 }
 #else
 

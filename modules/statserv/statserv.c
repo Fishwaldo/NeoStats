@@ -148,12 +148,12 @@ int SaveStats(void)
  *
  *  Init handler
  *
- *  @param pointer to my module
+ *  @param none
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModInit (Module *mod_ptr)
+int ModInit( void )
 {
 	SET_SEGV_LOCATION();
 	StatServ.shutdown = 0;
@@ -220,10 +220,10 @@ int ModSynch (void)
  *
  *  @param none
  *
- *  @return none
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-void ModFini (void)
+int ModFini (void)
 {
 	StatServ.shutdown = 1;
 	FiniServerStats ();
@@ -235,6 +235,7 @@ void ModFini (void)
 #ifdef USE_BERKELEY
 	DBACloseTable();
 #endif      
+	return NS_SUCCESS;
 }
 
 static int ss_set_html_cb (CmdParams *cmdparams, SET_REASON reason)

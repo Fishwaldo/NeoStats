@@ -141,11 +141,11 @@ configuration and starting databases.
  *
  *  Init module
  *
- *  @param pointer to our module structure
+ *  @param none
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
-int ModInit (Module *mod_ptr)
+int ModInit( void )
 {
 	return NS_SUCCESS;
 }
@@ -165,7 +165,7 @@ where you would init a bot if you wanted one.
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModSynch (void)
+int ModSynch( void )
 {
 	/* Introduce a bot onto the network saving the bot handle */
 	template_bot = AddBot (&template_bot_info);
@@ -184,11 +184,12 @@ databases.
  *
  *  @param none
  *
- *  @return none
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-void ModFini (void)
+int ModFini (void)
 {
+	return NS_SUCCESS;
 }
 
 NeoStats provides an API to send commands over IRC. These are designed

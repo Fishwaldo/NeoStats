@@ -204,12 +204,12 @@ ModeDef OperSmodes[] =
  *  Init handler
  *  Loads connectserv configuration
  *
- *  @param pointer to my module
+ *  @param none
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModInit( Module *mod_ptr )
+int ModInit( void )
 {
 	/* Load stored configuration */
 	ModuleConfig( cs_settings );
@@ -244,11 +244,12 @@ int ModSynch( void )
  *
  *  @param none
  *
- *  @return none
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-void ModFini( void )
+int ModFini (void)
 {
+	return NS_SUCCESS;
 }
 
 /** @brief cs_report

@@ -59,12 +59,12 @@ ModuleInfo module_info =
  *
  *  Init handler
  *
- *  @param pointer to my module
+ *  @param none
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModInit( Module *modptr )
+int ModInit( void )
 {
 	return NS_SUCCESS;
 }
@@ -92,8 +92,9 @@ int ModSynch( void )
  *  @return none
  */
 
-void ModFini( void )
+int ModFini (void)
 {
+	return NS_SUCCESS;
 }
 
 /** @brief ModAuthUser

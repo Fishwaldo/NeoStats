@@ -3,7 +3,10 @@ NeoStats 3.x ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
-* NeoStats * Version 3.0.prealpha3-dev
+* NeoStats * Version 3.0.a1-dev
+ - Add ModFini return value so modules can return errors if required. (M)
+ - Remove ModInit parameter since it is now redundant. (M)
+ - Command processor code split up. (M)
  - Add SET_VALIDATE stage to allow a module to override core SET validation and
    to potentially react to the previous setting prior to SET_CHANGE. (M)
  - Command processor code split up. (M)

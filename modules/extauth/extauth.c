@@ -259,12 +259,12 @@ static int ea_cmd_access( CmdParams *cmdparams )
  *
  *  Init handler
  *
- *  @param pointer to my module
+ *  @param none
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModInit( Module *modptr )
+int ModInit( void )
 {
 	LoadAccessList();
 	return NS_SUCCESS;
@@ -294,12 +294,13 @@ int ModSynch( void )
  *
  *  @param none
  *
- *  @return none
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-void ModFini( void )
+int ModFini (void)
 {
 	del_services_cmd_list( extauth_commands );
+	return NS_SUCCESS;
 }
 
 /** @brief ModAuthUser

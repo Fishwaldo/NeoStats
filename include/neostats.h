@@ -1388,9 +1388,9 @@ EXPORTFUNC void os_free( void *ptr );
  */
 /* Module Basic Interface */
 MODULEVAR extern ModuleInfo module_info;   
-MODULEFUNC int ModInit( Module *mod_ptr );
+MODULEFUNC int ModInit( void );
 MODULEFUNC int ModSynch( void );
-MODULEFUNC void ModFini( void );
+MODULEFUNC int ModFini( void );
 /* Module Event Interface */
 MODULEVAR extern ModuleEvent module_events[];  
 /* Module Auth Interface */
