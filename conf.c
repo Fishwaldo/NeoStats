@@ -50,7 +50,7 @@ void strip(char *line)
 void ConfLoad() {
 /* Read in the Config File */
 printf("Reading the Config File. Please wait.....\n");
-if (!config_read("stats.cfg", options) == 0 ) {
+if (!config_read("neostats.cfg", options) == 0 ) {
 	printf("***************************************************\n");
 	printf("*                  Error!                         *\n");
 	printf("*                                                 *\n");

@@ -3,7 +3,7 @@
 
 TIME=`date +"%H:%M:%S %Z"`
 DATE=`date +"%a, %b %e %Y"`
-STATSCONF="stats.cfg"
+STATSCONF="neostats.cfg"
 SERVNAME="stats.somenet.net"
 COMMENT="NeoStats 2.5B1 IRC Statistical Server!"
 LINKPORT="6667"
@@ -415,14 +415,14 @@ chmod 700 $STATSCONF
                 echo ""
                 echo "*------------------------------------------------*"
 		echo "| Thanks for choosing NeoStats. Have a nice day. |"
-		echo "| Please check stats.cfg for any errors.         |"
+		echo "| Please check neostats.cfg for any errors.      |"
                 echo "*------------------------------------------------*"
 		echo "| Also make sure modules are compiled and in the |"
-		echo "| stats.cfg properly for them to work :)         |"
+		echo "| neostats.cfg properly for them to work :)      |"
 		echo "*------------------------------------------------*"
 		echo "| If you configured with --enable-auth==sr       |"
-		echo "| Edit stats.cfg and edit the proper section to  |"
-		echo "| enable Service ROOTS.                          |"
+		echo "| Edit neostats.cfg and edit the proper section  |"
+		echo "| to enable Service ROOTS.                       |"
 		echo "*------------------------------------------------*"
                 echo ""
 		exit 1

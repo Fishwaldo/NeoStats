@@ -302,7 +302,7 @@ static void ns_reload(User *u, char *reason)
 	squit_cmd(s_Services, quitmsg);
 	ssquit_cmd(me.name);
 	sleep(5);
-	execve("./stats", NULL, NULL);
+	execve("./neostats", NULL, NULL);
 }
 
 

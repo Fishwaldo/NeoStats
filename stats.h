@@ -53,7 +53,7 @@
 
 #define CHANLEN			50
 #define BUFSIZE			512
-#define CONFIG_NAME		"stats.cfg"
+#define CONFIG_NAME		"neostats.cfg"
 #define MAXHOST			63
 #define MAXPASS			32
 #define MAXNICK			32
