@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hybrid7.c,v 1.6 2002/09/04 08:40:26 fishwaldo Exp $
+** $Id: hybrid7.c,v 1.7 2002/09/16 03:31:46 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -86,7 +86,7 @@ int sserver_cmd(const char *name, const int numeric, const char *infoline) {
 
 int slogin_cmd(const char *name, const int numeric, const char *infoline, const char *pass) {
 	sts("%s %s :TS", MSG_PASS, pass);
-	sts("CAPAB TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS MX");
+	sts("CAPAB :TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS MX");
 	sts("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
 	return 1;
 }
