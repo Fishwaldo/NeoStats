@@ -18,8 +18,8 @@ dl/icq/Makefile -text
 dl/icq/icq.c -text
 dl/icq/icqlib.c -text
 dl/icq/icqlib.h -text
-dl/icqlib.h -text
 dl/modules.txt -text
+dl/services/DOESNOTCOMPILE -text
 dl/services/Makefile -text
 dl/services/build -text
 dl/services/services.c -text
@@ -27,7 +27,6 @@ dl/services/services.lo -text svneol=unset#unset
 dl/spam/Makefile -text
 dl/spam/spam.c -text
 dl/statserv/Makefile -text
-dl/statserv/build -text
 dl/statserv/m_stats.h -text
 dl/statserv/ss_help.c -text
 dl/statserv/stats.c -text
