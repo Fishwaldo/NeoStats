@@ -619,7 +619,7 @@ ssvshost_cmd (const char *who, const char *vhost)
 #ifdef ULTIMATE3
 		sts (":%s %s %s %s", me.name, (me.token ? TOK_SETHOST : MSG_SETHOST), who, vhost);
 #elif ULTIMATE
-		sts (":%s CHGHOST %s %s", me.name, who, vhost);
+		sts (":%s %s %s %s", me.name, (me.token ? TOK_CHGHOST : MSG_CHGHOST), who, vhost);
 #endif
 		return 1;
 	}
@@ -627,7 +627,7 @@ ssvshost_cmd (const char *who, const char *vhost)
 
 int 
 sinvite_cmd (const char *from, const char *to, const char *chan) {
-	sts (":%s %s %s %s", from, MSG_INVITE, to, chan);
+	sts (":%s %s %s %s", from, (me.token ? TOK_INVITE : MSG_INVITE), to, chan);
 	return 1;
 }
 

@@ -444,7 +444,7 @@ ssvshost_cmd (const char *who, const char *vhost)
 		return 0;
 	}
 	strlcpy (u->vhost, vhost, MAXHOST);
-	sts (":%s CHGHOST %s %s", me.name, who, vhost);
+	sts (":%s %s %s %s", me.name, MSG_CHGHOST, who, vhost);
 	return 1;
 }
 int 

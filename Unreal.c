@@ -462,7 +462,7 @@ ssvshost_cmd (const char *who, const char *vhost)
 
 int 
 sinvite_cmd (const char *from, const char *to, const char *chan) {
-	sts (":%s %s %s %s", from, MSG_INVITE, to, chan);
+	sts (":%s %s %s %s", from, (me.token ? TOK_INVITE : MSG_INVITE), to, chan);
 	return 1;
 }
 
