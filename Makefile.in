@@ -83,10 +83,10 @@ install: neostats modules
 	$(INSTALL) -m 755 -d @prefix@/data
 	$(INSTALL) -m 750 -d @prefix@/logs
 	$(INSTALL) -m 755 $(PROGS) @prefix@
-	$(INSTALL) -m 644 $(CONF) @prefix@
+	$(INSTALL) -C -m 644 $(CONF) @prefix@
 	$(INSTALL) -m 644 $(DOCS) @prefix@/doc
 	$(INSTALL) -m 755 $(DOCS_PROGS) @prefix@/doc
-	$(INSTALL) -m 644 $(DATA) @prefix@/data
+	$(INSTALL) -C -m 644 $(DATA) @prefix@/data
 	$(INSTALL) -m 644 $(INCLUDES) @prefix@/include
 	(cd dl; $(MAKE) $@)
 	(cd tools; $(MAKE) $@)

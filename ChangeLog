@@ -21,11 +21,12 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Change module list by removing redundant structure and just having a list of pointers (M)
  - Event functions now use #defines rather than hard coded strings (M)
  - added the ability to call functions that externally set up FD's to read. Why did I use Poll? because eventually all the socket stuff is going to get re-written, and the pollfds stuct is a lot better for flexibility than select! (F)
- - This *could* be 2.5.8. Update version
- - replaced all calls to time(NULL) with me.now, which is updated a couple of times each loop. Should reduce the number of system calls a bit. 
- - StatServ has had big performance improvements with regards to the database. Now progressively saves channel data, and only loads channel data when required. Should stop some of those mysterious 8 hour pingouts on large networks and reduce memory overhead !
- - dont do assertion checking by default anymore. We are pretty stable. pass --enable-debug to configure to enable if you have weird crashes now
- - Some Memory Leak cleanups
+ - This *could* be 2.5.8. Update version (F)
+ - replaced all calls to time(NULL) with me.now, which is updated a couple of times each loop. Should reduce the number of system calls a bit. (F)
+ - StatServ has had big performance improvements with regards to the database. Now progressively saves channel data, and only loads channel data when required. Should stop some of those mysterious 8 hour pingouts on large networks and reduce memory overhead ! (F)
+ - dont do assertion checking by default anymore. We are pretty stable. pass --enable-debug to configure to enable if you have weird crashes now (F)
+ - Some Memory Leak cleanups (F)
+ - install -C will not overwrite existing files... 
 
 * NeoStats * Fish (F) & Mark (M)*  Version 2.5.7
  - Update parse() and splitbuf to suport IRCu (F)
