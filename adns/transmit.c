@@ -127,9 +127,10 @@ adns_status adns__mkquery(adns_state ads, vbuf * vb, int *id_r,
 				if (ctype_digit(p[0])) {
 					if (ctype_digit(p[1])
 					    && ctype_digit(p[2])) {
-						c = (*p++ - '0') * 100 +
-						    (*p++ - '0') * 10 +
-						    (*p++ - '0');
+						c = (p[0] - '0') * 100 +
+						    (p[1] - '0') * 10 +
+						    (p[2] - '0');
+						p += 3;
 						if (c >= 256)
 							return
 							    adns_s_querydomaininvalid;
