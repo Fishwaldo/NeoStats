@@ -53,7 +53,6 @@ const char version_date[] = __DATE__;
 /*! Time we were compiled */
 const char version_time[] = __TIME__;
 
-static void Connect (void);
 static int get_options (int argc, char **argv);
 
 /*! have we forked */
@@ -77,7 +76,6 @@ void InitMe(void)
 #endif
 	me.r_time = 10;
 	me.numeric = 1;
-	me.maxsocks = getmaxsock ();
 #ifdef SQLSRV
 	me.sqlport = 8888;
 #endif
@@ -308,32 +306,6 @@ get_options (int argc, char **argv)
 	return NS_SUCCESS;
 }
 
-/** @brief Connects to IRC and starts the main loop
- *
- * Connects to the IRC server and attempts to login
- * If it connects and logs in, then starts the main program loop
- * if control is returned to this function, restart
- * 
- * @return Nothing
- *
- * @todo make the restart code nicer so it doesn't go mad when we can't connect
- */
-static void
-Connect (void)
-{
-	SET_SEGV_LOCATION();
-	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, me.port);
-	servsock = ConnectTo (me.uplink, me.port);
-	if (servsock <= 0) {
-		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
-	} else {
-		/* Call the IRC specific function send_server_connect to login as a server to IRC */
-		send_server_connect (me.name, me.numeric, me.infoline, me.pass, (unsigned long)me.t_start, (unsigned long)me.now);
-		read_loop ();
-	}
-	do_exit (NS_EXIT_RECONNECT, NULL);
-}
-
 /** @brief before exiting call this function. It flushes log files and tidy's up.
  *
  *  Cleans up before exiting 
@@ -374,18 +346,6 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 			ssquit_cmd (me.name, quitmsg);
 		}
 		sleep(1);
-		if (servsock > 0)
-			close (servsock);
-		if (exitcode == NS_EXIT_RECONNECT) {
-			if(me.r_time>0) {
-				nlog (LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
-				sleep (me.r_time);
-			}
-			else {
-				nlog (LOG_NOTICE, "Reconnect time is zero, shutting down");
-			}
-		}
-
 		/* now free up the users and servers memory */
 		FiniUsers();
 		FiniServers();
@@ -395,6 +355,15 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		FiniSocks();
 		FiniBots();
 		FiniTimers();
+		if (exitcode == NS_EXIT_RECONNECT) {
+			if(me.r_time>0) {
+				nlog (LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
+				sleep (me.r_time);
+			}
+			else {
+				nlog (LOG_NOTICE, "Reconnect time is zero, shutting down");
+			}
+		}
 	}
 
 	kp_flush();

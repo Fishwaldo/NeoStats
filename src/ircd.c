@@ -238,17 +238,7 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 {
 	snewnick_cmd (nick, user, host, realname, Umode);
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-#ifdef GOTSJOIN
-		ssjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
-#else
-		sjoin_cmd (nick, me.chan);
-#if defined(IRCU)
-		scmode_op(nick, me.chan, "+o", nick);
-#else
-		schmode_cmd(nick, me.chan, "+o", nick);
-#endif
-
-#endif
+		join_bot_to_chan(nick, me.chan, CMODE_CHANADMIN);
 	}
 	return NS_SUCCESS;
 }
@@ -513,9 +503,6 @@ parse (char *line)
 	char **av;
 
 	SET_SEGV_LOCATION();
-
-	strip (line);
-	strlcpy (recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
 	nlog (LOG_DEBUG1, "--------------------------BEGIN PARSE---------------------------");
@@ -548,8 +535,8 @@ parse (char *line)
 	nlog (LOG_DEBUG1, "args  : %s", coreLine);
 	ac = splitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	nlog (LOG_DEBUG1, "---------------------------END PARSE----------------------------");
 	free (av);
+	nlog (LOG_DEBUG1, "---------------------------END PARSE----------------------------");
 }
 #endif
 

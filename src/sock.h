@@ -26,18 +26,12 @@
 #ifndef SOCK_H
 #define SOCK_H
 
-extern int servsock;
-
-int ConnectTo (char * host, int port);
-void read_loop (void);
-int getmaxsock (void);
-void sts (const char *buf, const int buflen);
-
-int check_sql_sock();
-
-int list_sockets (CmdParams* cmdparams);
 int InitSocks (void);
 int FiniSocks (void);
+int list_sockets (CmdParams* cmdparams);
 int del_sockets (Module *mod_ptr);
+void Connect (void);
+void sts (const char *buf, const int buflen);
+int check_sql_sock();
 
 #endif

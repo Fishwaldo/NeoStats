@@ -72,23 +72,11 @@ static config_option options[] = {
 #endif
 };
 
-/** @brief initialize the configuration parser
+/** @brief Load configuration file
  *
- * Currently does nothing
+ * Parses the configuration file
  *
- * @return Nothing
- */
-
-void
-init_conf ()
-{
-}
-
-/** @brief Load the Config file
- *
- * Parses the Configuration File and optionally loads the external authentication libary
- *
- * @returns Nothing
+ * @returns nothing
  */
 
 int
@@ -108,13 +96,11 @@ ConfLoad ()
 		return NS_FAILURE;
 	}
 	if (me.die) {
-		printf ("\n-----> ERROR: Read the README file then edit %s! <-----\n\n",CONFIG_NAME);
+		printf ("\n-----> ERROR: Read the README file then edit %s <-----\n\n",CONFIG_NAME);
 		nlog (LOG_CRITICAL, "Read the README file then edit %s",CONFIG_NAME);
 		return NS_FAILURE;
 	}
-
-	printf ("Sucessfully Loaded Config File, Now Booting NeoStats\n");
-
+	printf ("Sucessfully loaded config file, booting NeoStats\n");
 	/* if all bots should join the chan */
 	if (GetConf ((void *) &me.allbots, CFGINT, "AllBotsJoinChan") <= 0) {
 		me.allbots = 0;

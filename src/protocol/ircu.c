@@ -827,8 +827,6 @@ parse (char *line)
 	char **av = NULL;
 
 	SET_SEGV_LOCATION();
-	strip (line);
-	strlcpy (recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
 	nlog (LOG_DEBUG1, "--------------------------BEGIN PARSE---------------------------");
@@ -871,12 +869,10 @@ parse (char *line)
 		}
 		nlog (LOG_DEBUG1, "0 %d", ac);
 	}
-
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	nlog (LOG_DEBUG1, "---------------------------END PARSE----------------------------");
 	if(av) free (av);
+	nlog (LOG_DEBUG1, "---------------------------END PARSE----------------------------");
 }
-
 
 static void 
 ircu_m_private (char *origin, char **argv, int argc, int srv)

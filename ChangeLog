@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - All socket code now in socks.c for easier upgrade (M)
  - Early support for module semi auto config designed to perform loading of 
    module config settings or set defaults without the module having to code it. 
    Due to the need for custom set values, we will likely have to call the core 

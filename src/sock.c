@@ -45,6 +45,7 @@
 #include "sqlsrv/rta.h"
 #endif
 #include "services.h"
+#include "ircd.h"
 
 static void recvlog (char *line);
 
@@ -52,10 +53,9 @@ static struct sockaddr_in lsa;
 static int dobind;
 /* @brief Module Socket List hash */
 static hash_t *sockh;
-
-int servsock;
+/* @brief server socket */
+static int servsock;
 char recbuf[BUFSIZE];
-
 
 #ifdef SQLSRV
 
@@ -87,8 +87,6 @@ int check_sql_sock();
 
 #endif 
 
-
-
 /** @brief Connect to a server
  *
  *  also setups the SQL listen socket if defined 
@@ -99,7 +97,7 @@ int check_sql_sock();
  * @return socket connected to on success
  *         NS_FAILURE on failure 
  */
-int
+static int
 ConnectTo (char *host, int port)
 {
 	int ret;
@@ -161,7 +159,7 @@ ConnectTo (char *host, int port)
  * 
  * @return none
  */
-void
+static void
 read_loop ()
 {
 	register int i, j, SelectResult;
@@ -314,6 +312,8 @@ restartsql:
 							me.lastmsg = me.now;
 							if (config.recvlog)
 								recvlog (buf);
+							strip (buf);
+							strlcpy (recbuf, buf, BUFSIZE);
 							parse (buf);
 							break;
 						}
@@ -388,14 +388,40 @@ restartsql:
 	nlog (LOG_NORMAL, "hu, how did we get here");
 }
 
+/** @brief Connects to IRC and starts the main loop
+ *
+ * Connects to the IRC server and attempts to login
+ * If it connects and logs in, then starts the main program loop
+ * if control is returned to this function, restart
+ * 
+ * @return Nothing
+ *
+ * @todo make the restart code nicer so it doesn't go mad when we can't connect
+ */
+void
+Connect (void)
+{
+	SET_SEGV_LOCATION();
+	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, me.port);
+	servsock = ConnectTo (me.uplink, me.port);
+	if (servsock <= 0) {
+		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
+	} else {
+		/* Call the IRC specific function send_server_connect to login as a server to IRC */
+		send_server_connect (me.name, me.numeric, me.infoline, me.pass, (unsigned long)me.t_start, (unsigned long)me.now);
+		read_loop ();
+	}
+	do_exit (NS_EXIT_RECONNECT, NULL);
+}
+
 /** @brief get max available sockets
  *
  * @param none
  * 
  * @return returns the max available socket 
  */
-int
-getmaxsock ()
+static int
+getmaxsock (void)
 {
 	struct rlimit *lim;
 	int ret;
@@ -816,6 +842,7 @@ sql_handle_ui_output(lnode_t *sqlnode)
 
 int InitSocks (void)
 {
+	me.maxsocks = getmaxsock ();
 	sockh = hash_create (me.maxsocks, 0, 0);
 	if(!sockh)
 		return NS_FAILURE;
@@ -824,6 +851,8 @@ int InitSocks (void)
 
 int FiniSocks (void) 
 {
+	if (servsock > 0)
+		close (servsock);
 	hash_destroy(sockh);
 	return NS_SUCCESS;
 }
