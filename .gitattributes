@@ -189,12 +189,10 @@ lib/adns/tvarith.h -text
 lib/adns/types.c -text
 lib/adnswin32/Makefile.in -text
 lib/adnswin32/adns.h -text
-lib/adnswin32/adns.make -text
 lib/adnswin32/adns.vcproj -text
 lib/adnswin32/adns_unix_calls.c -text
 lib/adnswin32/adns_win32.h -text
 lib/adnswin32/check.c -text
-lib/adnswin32/config.h.in -text
 lib/adnswin32/configwin32.h -text
 lib/adnswin32/dlist.h -text
 lib/adnswin32/event.c -text
