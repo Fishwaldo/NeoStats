@@ -1241,7 +1241,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 	
 	newmode = UmodeMaskToString(mode);
 	AddUser (nick, ident, host, realname, me.name, NULL, NULL, NULL);
-	send_nick (nick, (unsigned long)me.now, newmode, ident, host!=0?host:me.name, me.name, realname);
+	send_nick (nick, (unsigned long)me.now, newmode, ident, host, me.name, realname);
 	UserMode (nick, newmode);
 	return NS_SUCCESS;
 }
