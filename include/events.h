@@ -31,6 +31,24 @@ typedef enum Event {
  */
 	EVENT_NULL = -1,
 
+/*  NeoStats events 
+ *    Generated in response to neostats specific events
+ */
+
+/*  EVENT_MODULELOAD
+ *    Called when a module is loaded. 
+ *    parameters:
+ *      module name in cmdparams->param
+ */
+	EVENT_MODULELOAD,
+
+/*  EVENT_MODULEUNLOAD
+ *    Called when a module is unloaded. 
+ *    parameters:
+ *      module name in cmdparams->param
+ */
+	EVENT_MODULEUNLOAD,
+
 /*  Server events 
  *    Generated in response to server events
  */
@@ -40,7 +58,7 @@ typedef enum Event {
  *    parameters:
  *      server in cmdparams->source
  */
-	EVENT_SERVER = 0,
+	EVENT_SERVER,
 
 /*  EVENT_SQUIT 
  *    Called when a server squits the network 

@@ -498,6 +498,38 @@ void _m_topic (char *origin, char **argv, int argc, int srv)
 	do_topic (argv[0], argv[1], argv[2], argv[3]);
 }
 
+/** @brief process AWAY
+ *
+ * _m_away
+ *	argv[0] = away message
+ */
+void _m_away (char *origin, char **argv, int argc, int srv)
+{
+	do_away (origin, (argc > 0) ? argv[0] : NULL);
+}
+
+/** @brief process KILL
+ *
+ * _m_kill
+ *	argv[0] = kill victim(s) - comma separated list
+ *	argv[1] = kill path
+ */
+void _m_kill (char *origin, char **argv, int argc, int srv)
+{
+	do_kill (origin, argv[0], argv[1]);
+}
+
+/** @brief process SQUIT
+ *
+ * _m_squit
+ *	argv[0] = server name
+ *	argv[argc-1] = comment
+ */
+void _m_squit (char *origin, char **argv, int argc, int srv)
+{
+	do_squit (argv[0], argv[argc-1]);
+}
+
 /** @brief process notice
  *
  * 

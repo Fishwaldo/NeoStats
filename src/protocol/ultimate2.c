@@ -29,11 +29,8 @@
 #include "services.h"
 
 static void m_server (char *origin, char **argv, int argc, int srv);
-static void m_squit (char *origin, char **argv, int argc, int srv);
 static void m_mode (char *origin, char **argv, int argc, int srv);
 static void m_svsmode (char *origin, char **argv, int argc, int srv);
-static void m_kill (char *origin, char **argv, int argc, int srv);
-static void m_away (char *origin, char **argv, int argc, int srv);
 static void m_nick (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
 static void m_svsnick (char *origin, char **argv, int argc, int srv);
@@ -71,13 +68,13 @@ ircd_cmd cmd_list[] = {
 	{MSG_ADMIN,     0,		_m_admin,     0},
 	{MSG_CREDITS,   0,		_m_credits,   0},
 	{MSG_SERVER,    0,		m_server,	0},
-	{MSG_SQUIT,     0,		m_squit,		0},
+	{MSG_SQUIT,     0,		_m_squit,		0},
 	{MSG_QUIT,      0,		_m_quit,		0},
 	{MSG_MODE,      TOK_MODE,      m_mode,		0},
 	{MSG_SVSMODE,   0,   m_svsmode,   0},
-	{MSG_KILL,      0,      m_kill,      0},
+	{MSG_KILL,      0,      _m_kill,      0},
 	{MSG_PONG,      0,      _m_pong,      0},
-	{MSG_AWAY,      TOK_AWAY,      m_away,      0},
+	{MSG_AWAY,      TOK_AWAY,      _m_away,      0},
 	{MSG_NICK,      TOK_NICK,      m_nick,      0},
 	{MSG_TOPIC,     TOK_TOPIC,     _m_topic,     0},
 	{MSG_KICK,      0,      _m_kick,      0},
@@ -363,12 +360,6 @@ m_server (char *origin, char **argv, int argc, int srv)
 }
 
 static void
-m_squit (char *origin, char **argv, int argc, int srv)
-{
-	do_squit (argv[0], argv[1]);
-}
-
-static void
 m_svsmode (char *origin, char **argv, int argc, int srv)
 {
 	if (argv[0][0] == '#') {
@@ -387,20 +378,11 @@ m_mode (char *origin, char **argv, int argc, int srv)
 	}
 }
 static void
-m_kill (char *origin, char **argv, int argc, int srv)
-{
-	do_kill (origin, argv[0], argv[1]);
-}
-static void
 m_vhost (char *origin, char **argv, int argc, int srv)
 {
 	do_vhost (origin, argv[0]);
 }
-static void
-m_away (char *origin, char **argv, int argc, int srv)
-{
-	do_away (origin, (argc > 0) ? argv[0] : NULL);
-}
+
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {

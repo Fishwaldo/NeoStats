@@ -256,6 +256,7 @@ load_module (const char *modfilename, Client * u)
 	ModuleEvent *event_ptr = NULL;
 	Module *mod_ptr = NULL;
 	int (*ModInit) (Module *module_ptr);
+	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();
 	if (hash_isfull (modulehash)) {
@@ -360,6 +361,10 @@ load_module (const char *modfilename, Client * u)
 			return NULL;
 		}
 	}
+	cmdparams = ns_calloc (sizeof(CmdParams));
+	cmdparams->param = (char*)info_ptr->name;
+	SendAllModuleEvent(EVENT_MODULELOAD, cmdparams);
+	ns_free(cmdparams);
 	if (u) {
 		irc_prefmsg (ns_botptr, u, __("Module %s loaded, %s",u), info_ptr->name, info_ptr->description);
 		irc_globops (NULL, _("Module %s loaded"), info_ptr->name);
@@ -404,6 +409,7 @@ unload_module (const char *modname, Client * u)
 	hnode_t *modnode;
 	int moduleindex;
 	void (*ModFini) ();
+	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();
 	/* Check to see if module is loaded */
@@ -478,6 +484,10 @@ unload_module (const char *modname, Client * u)
 	if (fchannelmoddata & (1 << moduleindex)) {
 		CleanupChannelModdata (moduleindex);
 	}
+	cmdparams = ns_calloc (sizeof(CmdParams));
+	cmdparams->param = (char*)modname;
+	SendAllModuleEvent(EVENT_MODULEUNLOAD, cmdparams);
+	ns_free(cmdparams);
 	return NS_SUCCESS;
 }
 

@@ -30,8 +30,6 @@
 static void m_private (char* origin, char **av, int ac, int cmdptr);
 static void m_notice (char* origin, char **av, int ac, int cmdptr);
 static void m_mode (char *origin, char **argv, int argc, int srv);
-static void m_kill (char *origin, char **argv, int argc, int srv);
-static void m_away (char *origin, char **argv, int argc, int srv);
 static void m_nick (char *origin, char **argv, int argc, int srv);
 static void m_topic (char *origin, char **argv, int argc, int srv);
 static void m_kick (char *origin, char **argv, int argc, int srv);
@@ -68,9 +66,9 @@ ircd_cmd cmd_list[] = {
 	{MSG_SETHOST, 0, m_vhost, 0},
 	{MSG_QUIT, 0, _m_quit, 0},
 	{MSG_MODE, 0, m_mode, 0},
-	{MSG_KILL, 0, m_kill, 0},
+	{MSG_KILL, 0, _m_kill, 0},
 	{MSG_PONG, 0, _m_pong, 0},
-	{MSG_AWAY, 0, m_away, 0},
+	{MSG_AWAY, 0, _m_away, 0},
 	{MSG_NICK, 0, m_nick, 0},
 	{MSG_TOPIC, 0, m_topic, 0},
 	{MSG_KICK, 0, m_kick, 0},
@@ -153,21 +151,11 @@ mode_init user_umodes[] = {
 };
 
 void
-send_server (const char *source, const char *name, const int numeric, const char *infoline)
-{
-}
-
-void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
 {
 	send_cmd ("%s %s", MSG_PASS, pass);
-	send_cmd ("%s %s %d :%s", MSG_NICK, "NeoStats", numeric, infoline);
-	send_cmd ("%s %s %s %s :%s", MSG_USER, "user", "host", "server", "real name");
-}
-
-void
-send_squit (const char *server, const char *quitmsg)
-{
+	send_cmd ("%s %s", MSG_NICK, "NeoStats");
+	send_cmd ("%s %s %d %d :%s", MSG_USER, "user", me.now, me.now, "real name");
 }
 
 void 
@@ -337,28 +325,10 @@ m_mode (char *origin, char **argv, int argc, int srv)
 	}
 }
 
-/* m_kill
- *	argv[0] = kill victim(s) - comma separated list
- *	argv[1] = kill path
- */
-static void
-m_kill (char *origin, char **argv, int argc, int srv)
-{
-	do_kill (origin, argv[0], argv[1]);
-}
 static void
 m_vhost (char *origin, char **argv, int argc, int srv)
 {
 	do_vhost (origin, argv[0]);
-}
-
-/* m_away
- *  argv[0] = away message
- */
-static void
-m_away (char *origin, char **argv, int argc, int srv)
-{
-	do_away (origin, (argc > 0) ? argv[0] : NULL);
 }
 
 /* m_nick
@@ -458,8 +428,14 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 
 void m_private (char* origin, char **av, int ac, int cmdptr)
 {
+	char *p;
+	char nick[MAXNICK];
+	
+	strlcpy(nick, origin, MAXNICK);
+	p = strchr(nick, '!');
+	*p = 0;
 	AddFakeUser(origin);
-	_m_private (origin, av, ac, cmdptr);
+	_m_private (nick, av, ac, cmdptr);
 	DelFakeUser(origin);
 }
 

@@ -113,6 +113,9 @@ EXPORTFUNC void _m_topic (char *origin, char **argv, int argc, int srv);
 EXPORTFUNC void _m_join (char *origin, char **argv, int argc, int srv);
 EXPORTFUNC void _m_part (char *origin, char **argv, int argc, int srv);
 EXPORTFUNC void _m_kick (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_away (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_kill (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_squit (char *origin, char **argv, int argc, int srv);
 
 EXPORTFUNC void do_synch_neostats (void);
 EXPORTFUNC void do_motd (const char *nick, const char *remoteserver);

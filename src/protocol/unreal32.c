@@ -28,12 +28,9 @@
 #include "ircd.h"
 
 static void m_server (char *origin, char **argv, int argc, int srv);
-static void m_squit (char *origin, char **argv, int argc, int srv);
 static void m_mode (char *origin, char **argv, int argc, int srv);
 static void m_umode2 (char *origin, char **argv, int argc, int srv);
 static void m_svsmode (char *origin, char **argv, int argc, int srv);
-static void m_kill (char *origin, char **argv, int argc, int srv);
-static void m_away (char *origin, char **argv, int argc, int srv);
 static void m_nick (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
 static void m_eos (char *origin, char **argv, int argc, int srv);
@@ -79,15 +76,15 @@ ircd_cmd cmd_list[] = {
 	{MSG_ADMIN, TOK_ADMIN, _m_admin, 0},
 	{MSG_CREDITS, TOK_CREDITS, _m_credits, 0},
 	{MSG_SERVER, TOK_SERVER, m_server, 0},
-	{MSG_SQUIT, TOK_SQUIT, m_squit, 0},
+	{MSG_SQUIT, TOK_SQUIT, _m_squit, 0},
 	{MSG_QUIT, TOK_QUIT, _m_quit, 0},
 	{MSG_MODE, TOK_MODE, m_mode, 0},
 	{MSG_UMODE2, TOK_UMODE2, m_umode2, 0},
 	{MSG_SVSMODE, TOK_SVSMODE, m_svsmode, 0},
 	{MSG_SVS2MODE, TOK_SVS2MODE, m_svsmode, 0},
-	{MSG_KILL, TOK_KILL, m_kill, 0},
+	{MSG_KILL, TOK_KILL, _m_kill, 0},
 	{MSG_PONG, TOK_PONG, _m_pong, 0},
-	{MSG_AWAY, TOK_AWAY, m_away, 0},
+	{MSG_AWAY, TOK_AWAY, _m_away, 0},
 	{MSG_NICK, TOK_NICK, m_nick, 0},
 	{MSG_TOPIC, TOK_TOPIC, _m_topic, 0},
 	{MSG_KICK, TOK_KICK, _m_kick, 0},
@@ -579,16 +576,6 @@ m_server (char *origin, char **argv, int argc, int srv)
 	
 }
 
-/* m_squit
- *	argv[0] = server name
- *	argv[argc-1] = comment
- */
-static void
-m_squit (char *origin, char **argv, int argc, int srv)
-{
-	do_squit (argv[0], argv[1]);
-}
-
 /* m_svsmode
  *  argv[0] - username to change mode for
  *  argv[1] - modes to change
@@ -634,28 +621,10 @@ m_umode2 (char *origin, char **argv, int argc, int srv)
 	do_mode_user (origin, argv[0]);
 }
 
-/* m_kill
- *	argv[0] = kill victim(s) - comma separated list
- *	argv[1] = kill path
- */
-static void
-m_kill (char *origin, char **argv, int argc, int srv)
-{
-	do_kill (origin, argv[0], argv[1]);
-}
 static void
 m_vhost (char *origin, char **argv, int argc, int srv)
 {
 	do_vhost (origin, argv[0]);
-}
-
-/* m_away
- *  argv[0] = away message
- */
-static void
-m_away (char *origin, char **argv, int argc, int srv)
-{
-	do_away (origin, (argc > 0) ? argv[0] : NULL);
 }
 
 /* m_nick

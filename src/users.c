@@ -180,10 +180,12 @@ static void deluser (Client *u)
 	hash_delete (userhash, un);
 	hnode_destroy (un);
 	list_destroy (u->user->chans);
-	u->uplink->server->users--;
+	if (u->uplink)
+		u->uplink->server->users--;
 	if ((u->user->is_away == 1)) {
 		me.awaycount--;
-		u->uplink->server->awaycount--;
+		if (u->uplink)
+			u->uplink->server->awaycount--;
 	}
 	ns_free (u->user);
 	ns_free (u);
