@@ -422,8 +422,6 @@ m_nick (char *origin, char **argv, int argc, int srv)
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	char *buf;
-
 	/*
 	** Hybrid uses two different formats for the topic change protocol... 
 	** :user TOPIC channel :topic 

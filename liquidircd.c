@@ -451,8 +451,6 @@ m_pong (char *origin, char **argv, int argc, int srv)
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
-	char *buf;
-
 	if (argc > 0) {
 		UserAway (origin, argv[0]);
 	} else {
