@@ -50,10 +50,7 @@ static int ss_map(User *u, char **av, int ac);
 static int ss_netstats(User *u, char **av, int ac);
 static int ss_clientversions(User * u, char **av, int ac);
 static int ss_forcehtml(User * u, char **av, int ac);
-
-void ss_html(void);
-
-static void ss_Config();
+static void ss_Config(void);
 
 char s_StatServ[MAXNICK];
 
@@ -85,7 +82,7 @@ EventFnList __module_events[] = {
 	{NULL, NULL}
 };
 
-void ss_Config()
+static void ss_Config(void)
 {
 	char *tmp;
 
@@ -133,9 +130,9 @@ void ss_Config()
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "HTML_Path") < 0) {
 		StatServ.html = 0;
+		StatServ.htmlpath[0] = 0;
 	} else {
 		/* assume that html is enabled if we don't have a setting for it */
-		StatServ.html = 1;
 		if (GetConf((void *) &StatServ.html, CFGINT, "HTML_Enabled") < 0) {
 			StatServ.html = 1;
 		}
@@ -165,19 +162,15 @@ int __ModInit(int modnum, int apiver)
 	StatServ.onchan = 0;
 	StatServ.shutdown = 0;
 	ss_Config();
-	if (StatServ.html) {
-		if (StatServ.htmlpath[0] == 0) {
-			nlog(LOG_NOTICE, LOG_MOD,
-			     "StatServ HTML stats is disabled, as HTML_PATH is not set in the config file");
-			StatServ.html = 0;
-		}
+	if (StatServ.html && StatServ.htmlpath[0] == 0) {
+		nlog(LOG_NOTICE, LOG_MOD,
+		     "StatServ HTML stats is disabled, as HTML_PATH is not set in the config file");
+		StatServ.html = 0;
 	}
 	LoadTLD();
 	init_tld();
 	LoadStats();
 	Vhead = list_create(-1);
-
-
 	hash_scan_begin(&scan, sh);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		ss = hnode_get(node);
@@ -253,9 +246,6 @@ int __ModInit(int modnum, int apiver)
 	rta_add_table(&statserv_network);
 	statserv_daily.address = fakedaily;
 	rta_add_table(&statserv_daily);
-	
-
-
 
 #endif
 	return 1;
@@ -265,7 +255,6 @@ void __ModFini()
 {
 	StatServ.shutdown = 1;
 	SaveStats();
-
 }
 
 bot_cmd ss_commands[]=
@@ -306,26 +295,29 @@ int topchan(const void *key1, const void *key2)
 	const CStats *chan1 = key1;
 	const CStats *chan2 = key2;
 	return (chan2->members - chan1->members);
-
 }
+
 int topjoin(const void *key1, const void *key2)
 {
 	const CStats *chan1 = key1;
 	const CStats *chan2 = key2;
 	return (chan2->totmem - chan1->totmem);
 }
+
 int topkick(const void *key1, const void *key2)
 {
 	const CStats *chan1 = key1;
 	const CStats *chan2 = key2;
 	return (chan2->kicks - chan1->kicks);
 }
+
 int toptopics(const void *key1, const void *key2)
 {
 	const CStats *chan1 = key1;
 	const CStats *chan2 = key2;
 	return (chan2->topics - chan1->topics);
 }
+
 int topversions(const void *key1, const void *key2)
 {
 	const CVersions *ver1 = key1;
@@ -624,6 +616,7 @@ static int ss_netstats(User * u, char **av, int ac)
 	prefmsg(u->nick, s_StatServ, "--- End of List ---");
 	return 1;
 }
+
 static int ss_daily(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
@@ -872,7 +865,6 @@ static int ss_operlist(User * u, char **av, int ac)
 	return 1;
 }
 
-
 #ifdef GOTBOTMODE
 static int ss_botlist(User * u, char **av, int ac)
 {
@@ -1006,4 +998,3 @@ static int ss_forcehtml(User * u, char **av, int ac)
 	ss_html();
 	return 1;
 }
-

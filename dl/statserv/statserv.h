@@ -249,6 +249,7 @@ extern const char ss_help_stats_oneline[];
 /* tld.c */
 void DelTLD(User * u);
 
-
+/* htmlstats.c */
+void ss_html(void);
 
 #endif
