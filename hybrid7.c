@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hybrid7.c,v 1.7 2002/09/16 03:31:46 fishwaldo Exp $
+** $Id: hybrid7.c,v 1.8 2003/01/13 07:20:53 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -245,6 +245,7 @@ int swallops_cmd(const char *who, const char *msg,...) {
 int ssvshost_cmd(const char *who, const char *vhost) {
 	notice(s_Services, "Warning Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
 	log("Warning. Module %s tried to SVSHOST, which is not supported in Hybrid", segvinmodule);
+	return 1;
 }
 int ssvinfo_cmd() {
 	sts("SVINFO 5 3 0 :%d", time(NULL));

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.h,v 1.6 2002/10/27 05:55:31 fishwaldo Exp $
+** $Id: cs.h,v 1.7 2003/01/13 07:20:53 fishwaldo Exp $
 */
 
 
@@ -45,7 +45,7 @@
 ** If we are compiled to Use Ultimate 2.8.x use these modes and flags
 */
   #define LOCOP_MODE 'O'
-  #define OPER_MODE, 'o'
+  #define OPER_MODE 'o'
   #define GUESTADMIN_MODE '7'		/* Set to a number as we dont use */
   #define COSERVERADMIN_MODE 'J'
   #define SERVERADMIN_MODE 'A'

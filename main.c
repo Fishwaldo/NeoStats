@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.77 2003/01/06 12:07:25 fishwaldo Exp $
+** $Id: main.c,v 1.78 2003/01/13 07:20:53 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -129,7 +129,6 @@ int main()
 	init_server_hash();
 	init_user_hash();
 	init_chan_hash();
-
 /** This section ALWAYS craps out so we ignore it-- for now */
 	if (init_modules()) {
 /*		printf("WARNING: Some Modules Failed to Load"); */

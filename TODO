@@ -7,19 +7,6 @@ Shmad:
 
 
 
-HostServ TODO:
---------------
-
-- make CHPASSWD.  In order for a user to change a password their nick, host and password all have to match.
-  This is how we get around just anyone changing passwords to "GROUP" vhosts.
-Syntax: /msg HostServ CHPASS NICK OLDPASS NEWPASS
-
-
-<JH> btw another suggest Fish... banned hosts.. or banned masks
-<JH> like i could ban *.mil
-<JH> and *.gov
-<JH> and then it just doesn't let a vhost added like that
-<JH> and you could ban *fbi* too
 
 Fish:
 -----
@@ -31,16 +18,33 @@ save u 3x a table lookup)
 
 fnmatch is Baaaad news... find a good ircmatch function and port it over... 
 
+join 0 is really broken atm :)
+
+"make dist" option. 
 
 2.6.0 Series - Yep, I'm already thinking about this....
 ------------
 
-Channel Based Logging... Means we can get rid of the #ifdef DEBUG, log(... 
+Channel (Not IRC Channels, Event Channels)  Based Logging... Means we can get rid of the #ifdef DEBUG, log(... 
 stuff, and define what gets logged when.
 
-Module Config File Support improvements. (I got ideas :)
+Module Config File Support improvements. (I got ideas - Find Keeper Config libary for more info:)
 
-Re-Do the send/recv code... Its Horrible..
+Re-Do the send/recv code... Its Horrible.. (Backup Server links etc can
+then be implemented)
 
 Move all the stuff in ircd.c into relevent ircd support files. ircd.c is
-getting just way to hard to manage now
+getting just way to hard to manage now and will get worse as
+we add aditional IRCd support.
+
+"Driver" modules??? (eg, Unreal, Ultimate are drivers. So is DB/SQL
+or WebServer)
+
+Redo Config files. I pretty much got Bison/Flex figured out... 
+
+libwebserver module :)
+
+make NeoStats Bot commands list based, so it can be extended via other
+modules
+
+DCC chat interface???

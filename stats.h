@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.65 2003/01/06 15:03:19 fishwaldo Exp $
+** $Id: stats.h,v 1.66 2003/01/13 07:20:53 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -305,6 +305,7 @@ extern void Change_User(User *, const char *);
 extern void sendcoders(char *message,...);
 extern User *finduser(const char *);
 extern void UserDump(char *);
+extern void part_u_chan(list_t *, lnode_t *, void *);
 #ifdef ULTIMATE3
 extern void UserMode(const char *, const char *, int);
 #else

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Unreal.c,v 1.31 2002/09/16 04:27:20 fishwaldo Exp $
+** $Id: Unreal.c,v 1.32 2003/01/13 07:20:53 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -287,6 +287,7 @@ int ssvsmode_cmd(const char *target, const char *modes) {
 		sts(":%s %s %s %s", me.name, (me.token ? TOK_SVSMODE : MSG_SVSMODE), target, modes);
 		UserMode(target, modes);
 	}
+	return 1;
 }
 
 int ssvskill_cmd(const char *target, const char *reason, ...) {

@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.h,v 1.2 2002/10/16 03:13:59 fishwaldo Exp $
+** $Id: neoircd.h,v 1.3 2003/01/13 07:20:53 fishwaldo Exp $
 */
 
 
@@ -281,6 +281,7 @@ extern int sswhois_cmd(const char *target, const char *swhois);
 extern int ssvsnick_cmd(const char *target, const char *newnick);
 extern int ssvsjoin_cmd(const char *target, const char *chan);
 extern int ssvspart_cmd(const char *target, const char *chan);
+extern int ssvshost_cmd(const char *who, const char *vhost);
 extern int skick_cmd(const char *who, const char *target, const char *chan, const char *reason);
 extern int swallops_cmd(const char *who, const char *msg,...);
 extern int vctrl_cmd();

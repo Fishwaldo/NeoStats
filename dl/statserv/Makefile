@@ -11,7 +11,6 @@ all:	statserv
 
 .c.o:
 	$(CC) -c $< $(CFLAGS) $(INCLUDES) 
-	$(CC) -c $< $(CFLAGS) $(INCLUDES)
 
 statserv: $(OBJECTS)
 	ld $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)

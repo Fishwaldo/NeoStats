@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoserv.c,v 1.6 2002/10/27 05:55:31 fishwaldo Exp $
+** $Id: neoserv.c,v 1.7 2003/01/13 07:20:53 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -246,8 +246,11 @@ int Online(char **av, int ac) {
         s_NeoServ = strcat(s_NeoServ, "_");
         init_bot(s_NeoServ,"NeoServ",me.name,"Network NeoStats Help Service", "+Sqd-x", my_info[0].module_name);
     }
-
+#ifdef ULTIMATE3
+    sjoin_cmd(s_NeoServ, "#NeoStats", MODE_CHANOP);
+#else
     sjoin_cmd(s_NeoServ, "#NeoStats");
+#endif
     return 1;
 };
 

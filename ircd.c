@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.105 2003/01/07 13:23:13 fishwaldo Exp $
+** $Id: ircd.c,v 1.106 2003/01/13 07:20:53 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -280,7 +280,9 @@ void init_main() {
 int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char *mod_name)
 {
 	User *u;
+#ifndef ULTIMATE3
 	char cmd[63];
+#endif
 	char **av;
 	int ac = 0;
 	strcpy(segv_location, "init_bot");
@@ -937,7 +939,11 @@ void Usr_Mode(char *origin, char **argv, int argc) {
 #ifdef DEBUG
 		log("Mode: UserMode: %s",argv[0]);
 #endif
+#ifdef ULTIMATE3
 		UserMode(argv[0], argv[1], 0);
+#else
+		UserMode(argv[0], argv[1]);
+#endif
 		AddStringToList(&av, argv[0], &ac);
 		AddStringToList(&av, argv[1], &ac);
 		Module_Event("UMODE", av, ac);

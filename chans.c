@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.37 2002/12/26 15:15:04 fishwaldo Exp $
+** $Id: chans.c,v 1.38 2003/01/13 07:20:53 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -436,6 +436,14 @@ void join_chan(User *u, char *chan) {
 		log("ehhh, Joining a Unknown user to %s: %s", chan, recbuf);
 		return;
 	} 
+	if (!strcasecmp("0", chan)) {
+		/* join 0 is actually part all chans */
+#ifdef DEBUG
+		log("join_chan() -> Parting all chans %s", u->nick);
+#endif
+		list_process(u->chans, u, part_u_chan);
+		return;
+	}
 	c = findchan(chan);
 	if (!c) {
 		/* its a new Channel */

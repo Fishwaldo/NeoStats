@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.h,v 1.15 2003/01/06 12:25:04 fishwaldo Exp $
+** $Id: Ultimate.h,v 1.16 2003/01/13 07:20:53 fishwaldo Exp $
 */
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
@@ -426,7 +426,7 @@ typedef struct {
 
 
 typedef struct {
-	long umodes;
+	unsigned long umodes;
 	char mode;
 	int level;
 } Oper_Modes;
@@ -474,6 +474,7 @@ extern int sswhois_cmd(const char *target, const char *swhois);
 extern int ssvsnick_cmd(const char *target, const char *newnick);
 extern int ssvsjoin_cmd(const char *target, const char *chan);
 extern int ssvspart_cmd(const char *target, const char *chan);
+extern int ssvshost_cmd(const char *who, const char *vhost);
 extern int skick_cmd(const char *who, const char *target, const char *chan, const char *reason);
 extern int swallops_cmd(const char *who, const char *msg,...);
 extern int vctrl_cmd();
