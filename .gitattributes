@@ -179,7 +179,6 @@ lib/adns/event.c -text
 lib/adns/general.c -text
 lib/adns/internal.h -text
 lib/adns/parse.c -text
-lib/adns/poll.c -text
 lib/adns/query.c -text
 lib/adns/reply.c -text
 lib/adns/setup.c -text
