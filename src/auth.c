@@ -31,10 +31,19 @@
  *  modules. 
  */
 
-
-/** Do not enable unless you are asked to by the development team */
+/** This will hard code root access to a nick agreed with the 
+ *  development team and is should only ever be enabled on 
+ *  request by us on the networks of our testers to help 
+ *  fix bugs in NeoStats where there is no other way to provide
+ *  the necessary access.
+ *  For security reasons, a nick will be agreed between us and
+ *  the test network so at no point will this be a known nick to
+ *  other users.
+ *  Do not enable unless you are asked to by the development team.
+ *  See function AuthUser for where this is used.
+*/
 #ifdef DEBUG
-/* #define CODERHACK */
+/* #define CODERHACK "WeWillTellYouWhatToPutHere" */
 #endif /* DEBUG */
 
 /** List of registered authentication modules 
@@ -80,13 +89,8 @@ int AuthUser( Client *u )
 	
 #ifdef DEBUG
 #ifdef CODERHACK
-	/* this is only cause I dun have the right O lines on some of my "Beta" 
-	   Networks, so I need to hack this in :) */
-	if( !ircstrcasecmp( u->name, "FISH" ) ) {
-		return NS_ULEVEL_ROOT;
-	} else if( !ircstrcasecmp( u->name, "SHMAD" ) ) {
-		return NS_ULEVEL_ROOT;
-	} else if( !ircstrcasecmp( u->name, "MARK" ) ) {
+	/* See comments at top of file */
+	if( !ircstrcasecmp( u->name, CODERHACK ) ) {
 		return NS_ULEVEL_ROOT;
 	} else
 #endif /* CODERHACK */

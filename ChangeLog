@@ -4,6 +4,10 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.prealpha3-dev
+ - CODERHACK changed to a more secure format. Users will now be required to set
+   CODERHACK to a nick agreed between the network and the developent team so 
+   that even when we need to use this, the remains secure from a rogue user
+   knowing the usual access nick (M)
  - API improvements fixing naming conventions and additional macro support. (M)
  - StatServ: Add option to configure old channel time. (M)
  - Add options to configure message flood sample time and threshold. (M)
