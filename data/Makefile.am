@@ -1,1 +1,0 @@
-data_DATA=niconfig.db tlds.nfo

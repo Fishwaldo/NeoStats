@@ -25,8 +25,6 @@
 /config.sub -text
 /configure -text
 /configure.in -text
-data/Makefile.am -text
-data/Makefile.in -text
 data/niconfig.db -text
 data/nstats.db -text
 data/stats.db -text
@@ -86,8 +84,6 @@ dl/statserv/statserv.h -text
 dl/version/Makefile -text
 dl/version/version.c -text
 doc/FAQ -text
-doc/Makefile.am -text
-doc/Makefile.in -text
 doc/USERMAN -text
 doc/read-faq -text
 doc/read-userman -text
@@ -101,8 +97,6 @@ doc/read-userman -text
 /list.c -text
 /list.h -text
 logs/.keepme -text
-logs/Makefile.am -text
-logs/Makefile.in -text
 /main.c -text
 /makeconf -text
 /ns_help.c -text
