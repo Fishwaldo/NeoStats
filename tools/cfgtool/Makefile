@@ -1,6 +1,6 @@
 include ../../Makefile.inc
 
-TOOLSCFLAGS = $(CFLAGS) $(INSTALLDIR) -DHAVE_CONFIG_H 
+TOOLSCFLAGS = $(CFLAGS) -DHAVE_CONFIG_H 
 
 INCLUDES = -I../.. -I../../keeper/ -Ipixmaps
 GCFLAGS = `gtk-config --cflags`

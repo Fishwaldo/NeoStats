@@ -1,7 +1,7 @@
 # Makefile for NeoStats
 include Makefile.inc 
 
-NEOCFLAGS = $(CFLAGS) $(INSTALLDIR)
+NEOCFLAGS = $(CFLAGS)
 EXTRA_LDFLAGS = `curl/mycurl-config --libs`
 
 PROGS = neostats cronchk makeconf
@@ -65,7 +65,7 @@ utils:
 	(cd tools; $(MAKE) $@)
 
 buildversion: 
-	(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
+	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
 
 neostats: buildversion $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) @sqlsrvbuild@ $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(EXTRA_LDFLAGS) -o $@

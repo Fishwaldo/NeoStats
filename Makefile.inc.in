@@ -1,6 +1,5 @@
 CC=@CC@
 CFLAGS =@CFLAGS@ 
-INSTALLDIR = -DNEO_PREFIX=\"@prefix@\" 
 LD=ld
 RM=/bin/rm -rf
 LDFLAGS = @LDFLAGS@ @LIBS@
