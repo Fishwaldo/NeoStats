@@ -610,6 +610,9 @@ src/protocol/Makefile.in -text
 src/protocol/bahamut.c eol=lf
 src/protocol/bahamut.h eol=lf
 src/protocol/bahamut.vcproj -text
+src/protocol/bahamut18.c -text
+src/protocol/bahamut18.h -text
+src/protocol/bahamut18.vcproj -text
 src/protocol/client.c -text
 src/protocol/client.h -text
 src/protocol/client.vcproj -text
@@ -628,6 +631,9 @@ src/protocol/mystic.vcproj -text
 src/protocol/neoircd.c eol=lf
 src/protocol/neoircd.h eol=lf
 src/protocol/neoircd.vcproj -text
+src/protocol/plexus.c -text
+src/protocol/plexus.h -text
+src/protocol/plexus.vcproj -text
 src/protocol/protocol.txt -text
 src/protocol/quantum.c eol=lf
 src/protocol/quantum.h eol=lf

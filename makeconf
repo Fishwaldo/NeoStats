@@ -156,17 +156,19 @@ echo "*----------------------------------------*"
 # select IRCd
 validselection=0
 echo "Which IRC server do you use?"
-echo "     1) Unreal 3.1.x IRCD"
-echo "     2) Unreal 3.2.x IRCD"
-echo "     3) Ultimate 2.x.x IRCD"
-echo "     4) Ultimate 3.x.x IRCD"
-echo "     5) Hybrid7 IRCD"
-echo "     6) NeoIRCd IRCD"
-echo "     7) Bahamut IRCD"
-echo "     8) Mystic IRCD"
-echo "     9) Quantum IRCD"
-echo "     10) Viagra IRCD"
-echo "     11) IRCu P10 (Experimental)"
+echo "     1) Unreal 3.1.x"
+echo "     2) Unreal 3.2.x"
+echo "     3) Ultimate 2.x.x"
+echo "     4) Ultimate 3.x.x"
+echo "     5) Hybrid7"
+echo "     6) NeoIRCd"
+echo "     7) Bahamut 1.4/1.6"
+echo "     8) Bahamut 1.8"
+echo "     9) Mystic"
+echo "     10) Quantum"
+echo "     11) Viagra"
+echo "     12) Plexus"
+echo "     13) IRCu P10 (Experimental)"
 while [ $validselection -eq 0 ] ; do
 	echo $n " [$IRCD_DEFAULT] -> $c"
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
@@ -208,18 +210,26 @@ while [ $validselection -eq 0 ] ; do
 			validselection=1
 			;;
 		8)
-			IRCD="mystic"
+			IRCD="bahamut18"
 			validselection=1
 			;;
 		9)
-			IRCD="quantum"
+			IRCD="mystic"
 			validselection=1
 			;;
 		10)
-			IRCD="viagra"
+			IRCD="quantum"
 			validselection=1
 			;;
 		11)
+			IRCD="viagra"
+			validselection=1
+			;;
+		12)
+			IRCD="plexus"
+			validselection=1
+			;;
+		13)
 			IRCD="ircup10"
 			validselection=1
 			;;
@@ -365,8 +375,8 @@ cat > $CONF << __EOF__
 # PROTOCOL <protocol> [REQUIRED]
 #    Specifies the protocol module to use.
 #    Valid protocol options are:
-#          bahamut client hybrid7 ircup10 
-#          liquid mystic neoircd quantum 
+#          bahamut bahamut18 client hybrid7 ircup10 
+#          liquid mystic neoircd quantum plexus
 #          ultimate2 ultimate3 unreal31 unreal32 
 #          viagra
 #
