@@ -194,7 +194,7 @@ int ss_cmd_channel (CmdParams *cmdparams)
 		irc_prefmsg(ss_bot, cmdparams->source, "Top 10 Online Channels:");
 		irc_prefmsg(ss_bot, cmdparams->source, "======================");
 		cn = list_first(channelstatlist);
-		for (i = 0; i <= 10 && cn; i++) {
+		for (i = 0; i < 10 && cn; i++) {
 			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(cs->c)
@@ -217,7 +217,7 @@ int ss_cmd_channel (CmdParams *cmdparams)
 		irc_prefmsg(ss_bot, cmdparams->source, "Top 10 Channels (Ever):");
 		irc_prefmsg(ss_bot, cmdparams->source, "======================");
 		cn = list_first(channelstatlist);
-		for (i = 0; i <= 10 && cn; i++) {
+		for (i = 0; i < 10 && cn; i++) {
 			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(cs->c)
@@ -239,7 +239,7 @@ int ss_cmd_channel (CmdParams *cmdparams)
 		irc_prefmsg(ss_bot,cmdparams->source, "Top 10 Most un-welcome Channels (Ever):");
 		irc_prefmsg(ss_bot,cmdparams->source, "======================================");
 		cn = list_first(channelstatlist);
-		for (i = 0; i <= 10 && cn; i++) {
+		for (i = 0; i < 10 && cn; i++) {
 			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(cs->c)
@@ -261,7 +261,7 @@ int ss_cmd_channel (CmdParams *cmdparams)
 		irc_prefmsg(ss_bot, cmdparams->source, "Top 10 Most undecisive Channels (Ever):");
 		irc_prefmsg(ss_bot, cmdparams->source, "======================================");
 		cn = list_first(channelstatlist);
-		for (i = 0; i <= 10 && cn; i++) {
+		for (i = 0; i < 10 && cn; i++) {
 			cs = lnode_get(cn);
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(cs->c)

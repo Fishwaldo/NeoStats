@@ -264,7 +264,7 @@ void get_chantop10()
 	}
 	fprintf (opf, "<table border = 0><tr><th>Channel</th><th align=right>Members</th></tr>");
 	cn = list_first(channelstatlist);
-	for (i = 0; i <= 10 && cn; i++) {
+	for (i = 0; i < 10 && cn; i++) {
 		cs = lnode_get(cn);
 		/* only show hidden chans to operators */
 		if (is_hidden_chan(cs->c)) {
@@ -290,7 +290,7 @@ void get_chantop10eva()
 	}
 	fprintf (opf, "<table border = 0><tr><th>Channel</th><th align=right>Total Joins</th></tr>");
 	cn = list_first(channelstatlist);
-	for (i = 0; i <= 10 && cn; i++) {
+	for (i = 0; i < 10 && cn; i++) {
 		cs = lnode_get(cn);
 		/* only show hidden chans to operators */
 		if (is_hidden_chan(cs->c)) {
@@ -314,7 +314,7 @@ void get_clientstats()
 	}
 	cn = list_first(versionstatlist);
 	fprintf (opf, "<table border = 0><tr><th>Version</th><th align=right>Count</th></tr>");
-	for (i = 0; i <= 10 && cn; i++) {
+	for (i = 0; i < 10 && cn; i++) {
 		cv = lnode_get(cn);
 		fprintf (opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 			cv->name, cv->users.current);
@@ -346,7 +346,7 @@ void get_unwelcomechan()
 	}
 	fprintf (opf, "<table border = 0><tr><th>Channel</th><th>Total Kicks</th></tr>");
 	cn = list_first(channelstatlist);
-	for (i = 0; i <= 10 && cn; i++) {
+	for (i = 0; i < 10 && cn; i++) {
 		cs = lnode_get(cn);
 		/* only show hidden chans to operators */
 		if (is_hidden_chan(cs->c)) {
@@ -372,7 +372,7 @@ void get_chantops()
 	}
 	fprintf (opf, "<table border = 0><tr><th>Channel</th><th>Total Topics</th></tr>");
 	cn = list_first(channelstatlist);
-	for (i = 0; i <= 10 && cn; i++) {
+	for (i = 0; i < 10 && cn; i++) {
 		cs = lnode_get(cn);
 		/* only show hidden chans to operators */
 		if (is_hidden_chan(cs->c)) {

@@ -106,7 +106,7 @@ int ss_cmd_userversion(CmdParams *cmdparams)
 	irc_prefmsg (ss_bot, cmdparams->source, "Top %d Client Versions:", num);
 	irc_prefmsg (ss_bot, cmdparams->source, "======================");
 	cn = list_first (versionstatlist);
-	for (i = 0; i <= num && cn; i++) {
+	for (i = 0; i < num && cn; i++) {
 		cv = lnode_get (cn);
 		irc_prefmsg (ss_bot, cmdparams->source, "%d) %d ->  %s", i, cv->users.current, cv->name);
 		cn = list_next (versionstatlist, cn);
