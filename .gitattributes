@@ -43,7 +43,6 @@ adns/types.c -text
 /configure -text
 /configure.in -text
 /cronchk -text
-data/niconfig.db -text
 data/tlds.nfo -text
 /dl.c -text
 /dl.h -text
@@ -112,9 +111,6 @@ dl/statserv/tld.c -text
 dl/version/Makefile -text
 dl/version/version.c -text
 /dns.c -text
-doc/FAQ -text
-doc/FAQ.pt -text
-doc/USERMAN -text
 doc/read-faq -text
 doc/read-userman -text
 /dotconf.c -text
