@@ -13,7 +13,6 @@
 #include "dl.h"
 #include "stats.h"
 #include "statserv.h"
-#include "ss_help.c"
 
 SStats *Shead;
 TLD *tldhead;
@@ -42,7 +41,7 @@ static int s_user_modes(User *);
 static int s_user_kill(User *);
 /* int s_bot_kill(char *); */
 static void ss_cb_Config(char *, int);
-static int new_m_version(char *av, char *tmp);
+static int new_m_version(char *origin, char **av, int ac);
 static void DelTLD(User *u);
 static void ss_notices(User *u);
 static void ss_htmlsettings(User *u, char *cmd, char *m);
@@ -62,7 +61,8 @@ Module_Info Statserv_Info[] = { {
 } };
 
 Functions StatServ_fn_list[] = { 
-    { "VERSION",    new_m_version,    1 },
+    { MSG_VERSION,    new_m_version,    1 },
+    { TOK_VERSION,    new_m_version,    1 },
     { NULL,        NULL,     0}
 };
 
@@ -102,9 +102,9 @@ static config_option options[] = {
 };
 
 
-int new_m_version(char *av, char *tmp) {
+int new_m_version(char *origin, char **av, int ac) {
     strcpy(segv_location, "StatServ-new_m_version");
-    snumeric_cmd(351, av, "Module StatServ Loaded, Version: %s %s %s",Statserv_Info[0].module_version,version_date,version_time);
+    snumeric_cmd(351, origin, "Module StatServ Loaded, Version: %s %s %s",Statserv_Info[0].module_version,version_date,version_time);
     return 0;
 }
 

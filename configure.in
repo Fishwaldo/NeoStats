@@ -1,10 +1,19 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(dl.c)
-AC_CONFIG_HEADER(config.h)
-
+AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(stats, 2.5)
 PACKAGE=NeoStats
 VERSION=2.5.0
 AC_PREFIX_DEFAULT(~/NeoStats/)
+bindir='${exec_prefix}'
+libdir='${exec_prefix}dl/'
+datadir='${exec_prefix}data/'
+sysconfdir='${exec_prefix}'
+infodir='${exec_prefix}doc/'
+AM_DISABLE_STATIC 
+AC_LIBTOOL_DLOPEN
+AC_PROG_LIBTOOL
+
 CFLAGS="$CFLAGS -O2 -Wall"
 
 dnl Checks for programs.
@@ -37,7 +46,7 @@ AC_ARG_ENABLE(debug,
 [ --enable-debug - Enable Debuging],
 [ case "$enableval" in
   yes)
-	AC_DEFINE(DEBUG)
+	AC_DEFINE(DEBUG, 1, 'Enable Debugging')
 	CFLAGS="$CFLAGS -ggdb"
 	AC_MSG_RESULT(yes - Watch your Log Files)
 	;;
@@ -53,10 +62,11 @@ AC_MSG_CHECKING(Whether to Enable Unreal IRCD Support...)
 AC_ARG_ENABLE(unreal, [ --enable-unreal - enable Unreal IRCD Support],
 [ case "$enableval" in
   yes)  
-	AC_DEFINE(UNREAL)
+	AC_DEFINE(UNREAL, 1, 'Enable Unreal Support')
 	IRCD_FILES_SRC="Unreal.c"
 	IRCD_FILES_OBJS="Unreal.o"
 	AC_MSG_RESULT(yes)
+	AM_CONDITIONAL(UNREAL, true)
 	;;
   *)
 	AC_MSG_RESULT(no)
@@ -69,10 +79,11 @@ AC_MSG_CHECKING(Whether to Enable Ultimate IRCD Support...)
 AC_ARG_ENABLE(ultimate, [ --enable-ultimate - enable Ultimate IRCD Support],
 [ case "$enableval" in
   yes)  
-	AC_DEFINE(ULTIMATE)
+	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate Support')
 	IRCD_FILES_SRC="Ultimate.c"
 	IRCD_FILES_OBJS="Ultimate.o"
 	AC_MSG_RESULT(yes)
+	AM_CONDITIONAL(ULTIMATE, true)
 	;;
   *)
 	AC_MSG_RESULT(no)
@@ -82,17 +93,13 @@ AC_MSG_RESULT(no)
 )
 dnl check to see what type of authentication to use
 AC_MSG_CHECKING(What type of Authentication to use...)
-AC_ARG_ENABLE(auth, [ --enable-auth==TYPE - what type of Authentication to use. Options are IRCD, or ROOT or EXT],
+AC_ARG_ENABLE(auth, [ --enable-auth==TYPE - what type of Authentication to use. Options are IRCD, or EXT],
 [ case "$enableval" in
   IRCD)  
-	AC_DEFINE(IRCDAUTH)
+	AC_DEFINE(IRCDAUTH, 1, 'Use IRCD Authentication')
 	AC_MSG_RESULT(IRCD)
 	;;
-  ROOT)
-	AC_DEFINE(SHMADAUTH)
-	AC_MSG_RESULT(ROOT)
-	;;
-  EXT)	AC_DEFINE(EXTAUTH)
+  EXT)	AC_DEFINE(EXTAUTH, 1, 'Use External Authentication')
 	AC_MSG_RESULT(EXT)
 	;;
   *)
@@ -231,6 +238,7 @@ AC_SUBST(IRCD_FILES_OBJS)
 AC_SUBST(MODULES)
 AC_SUBST(LIBS)
 AC_OUTPUT(dl/statserv/Makefile dl/services/Makefile dl/icq/Makefile dl/version/Makefile dl/Makefile dl/spam/Makefile dl/netinfo/Makefile Makefile dl/services/Makefile dl/loveserv/Makefile)
+AC_OUTPUT(dl/cs/Makefile dl/hostserv/Makefile dl/ms/Makefile dl/neoserv/Makefile data/Makefile doc/Makefile)
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"
 echo "(*----------------------------------------------------------*)"

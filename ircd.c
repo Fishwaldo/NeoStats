@@ -51,7 +51,6 @@ static void ShowMOTD(char *);
 static void ShowADMIN(char *);
 static void Showcredits(char *);
 
-char *coreLine;
 
 
 struct int_commands {
@@ -567,7 +566,7 @@ void Usr_AddServer(char *origin, char **argv, int argc){
 	Module_Event("NEWSERVER", findserver(argv[0]));
 }
 void Usr_DelServer(char *origin, char **argv, int argc){
-	Module_Event("DELSERVER", argv[0]);
+	Module_Event("DELSERVER", findserver(argv[0]));
 	DelServer(argv[0]);
 }
 void Usr_DelUser(char *origin, char **argv, int argc) {
@@ -686,7 +685,7 @@ void Srv_Netinfo(char *origin, char **argv, int argc) {
 			if (ircd_srv.uprot == 2109) {
 				me.usesmo = 1;
 			} 
-			Module_Event("NETINFO", coreLine); 
+			Module_Event("NETINFO", NULL); 
 }
 void Srv_Pass(char *origin, char **argv, int argc) {
 }
@@ -722,7 +721,7 @@ void Srv_Svsnick(char *origin, char **argv, int argc) {
 
 			u = finduser(argv[0]);
 			Change_User(u, argv[1]);
-			Module_Event("NICK_CHANGE",coreLine);
+			Module_Event("NICK_CHANGE",argv[1]);
 
 }		
 void Srv_Kill(char *origin, char **argv, int argc) {

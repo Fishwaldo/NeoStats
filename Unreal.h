@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.12 2002/03/08 14:18:08 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.13 2002/03/12 13:34:20 fishwaldo Exp $
  */
 
 
@@ -417,37 +417,9 @@ typedef struct {
 	int level;
 } Oper_Modes;
 
-static Oper_Modes usr_mds[] = {
-				 {UMODE_OPER, 'o', 50},
-                                 {UMODE_LOCOP, 'O', 40},
-                                 {UMODE_INVISIBLE, 'i', 0},
-                                 {UMODE_WALLOP, 'w', 0},
-                                 {UMODE_FAILOP, 'g', 0},
-                                 {UMODE_HELPOP, 'h', 30},
-                                 {UMODE_SERVNOTICE, 's',0},
-                                 {UMODE_KILLS, 'k',0},
-                                 {UMODE_SERVICES, 'S',200},
-                                 {UMODE_SADMIN, 'a',100},
-				 {UMODE_COADMIN, 'C',60},
-				 {UMODE_EYES,	'e',0},
-				 {UMODE_KIX, 'q',0},
-				 {UMODE_BOT, 'B',0},
-				 {UMODE_FCLIENT, 'F',0},
-	   			 {UMODE_DEAF,    'd',0},
-   				 {UMODE_HIDING,  'I',0},
-                                 {UMODE_ADMIN, 'A',70},
-                                 {UMODE_NETADMIN, 'N',185},
-				 {UMODE_TECHADMIN, 'T',190},
-                                 {UMODE_CLIENT, 'c',0},
-                                 {UMODE_FLOOD, 'f',0},
-                                 {UMODE_REGNICK, 'r',0},
-                                 {UMODE_HIDE,    'x',0},
-                                 {UMODE_CHATOP, 'b',0},
-				 {UMODE_WHOIS, 'W',0},
-                                 {0, 0, 0 }
-};
 
-
+aCtab cFlagTab[33];
+Oper_Modes usr_mds[27];
 
 
 

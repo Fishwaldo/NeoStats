@@ -11,10 +11,74 @@
  
 #include "stats.h"
 #include "Unreal.h"
-
 void sts(char *fmt,...);
 
 
+aCtab cFlagTab[] = {
+	{MODE_LIMIT, 'l', 0, 1},
+	{MODE_VOICE, 'v', 1, 1},
+	{MODE_HALFOP, 'h', 1, 1},
+	{MODE_CHANOP, 'o', 1, 1},
+	{MODE_PRIVATE, 'p', 0, 0},
+	{MODE_SECRET, 's', 0, 0},
+	{MODE_MODERATED, 'm', 0, 0},
+	{MODE_NOPRIVMSGS, 'n', 0, 0},
+	{MODE_TOPICLIMIT, 't', 0, 0},
+	{MODE_INVITEONLY, 'i', 0, 0},
+	{MODE_KEY, 'k', 0, 1},
+	{MODE_RGSTR, 'r', 0, 0},
+	{MODE_RGSTRONLY, 'R', 0, 0},
+	{MODE_NOCOLOR, 'c', 0, 0},
+	{MODE_CHANPROT, 'a', 1, 1},
+	{MODE_CHANOWNER, 'q', 1, 1},
+	{MODE_OPERONLY, 'O', 0, 0},
+	{MODE_ADMONLY, 'A', 0, 0},
+	{MODE_LINK, 'L', 0, 1},
+	{MODE_NOKICKS, 'Q', 0, 0},
+	{MODE_BAN, 'b', 0, 1},
+	{MODE_STRIP, 'S', 0, 0},	/* works? */
+	{MODE_EXCEPT, 'e', 0, 0},	/* exception ban */
+	{MODE_NOKNOCK, 'K', 0, 0},	/* knock knock (no way!) */
+	{MODE_NOINVITE, 'V', 0, 0},	/* no invites */
+	{MODE_FLOODLIMIT, 'f', 0, 1},	/* flood limiter */
+	{MODE_NOHIDING, 'H', 0, 0},	/* no +I joiners */
+	{MODE_STRIPBADWORDS, 'G', 0, 0},	/* no badwords */
+	{MODE_NOCTCP, 'C', 0, 0},	/* no CTCPs */
+	{MODE_AUDITORIUM, 'u', 0, 0},
+	{MODE_ONLYSECURE, 'z', 0, 0},
+	{MODE_NONICKCHANGE, 'N', 0, 0},
+	{0x0, 0x0, 0x0}
+};
+
+Oper_Modes usr_mds[] = {
+				 {UMODE_OPER, 'o', 50},
+                                 {UMODE_LOCOP, 'O', 40},
+                                 {UMODE_INVISIBLE, 'i', 0},
+                                 {UMODE_WALLOP, 'w', 0},
+                                 {UMODE_FAILOP, 'g', 0},
+                                 {UMODE_HELPOP, 'h', 30},
+                                 {UMODE_SERVNOTICE, 's',0},
+                                 {UMODE_KILLS, 'k',0},
+                                 {UMODE_SERVICES, 'S',200},
+                                 {UMODE_SADMIN, 'a',100},
+				 {UMODE_COADMIN, 'C',60},
+				 {UMODE_EYES,	'e',0},
+				 {UMODE_KIX, 'q',0},
+				 {UMODE_BOT, 'B',0},
+				 {UMODE_FCLIENT, 'F',0},
+	   			 {UMODE_DEAF,    'd',0},
+   				 {UMODE_HIDING,  'I',0},
+                                 {UMODE_ADMIN, 'A',70},
+                                 {UMODE_NETADMIN, 'N',185},
+				 {UMODE_TECHADMIN, 'T',190},
+                                 {UMODE_CLIENT, 'c',0},
+                                 {UMODE_FLOOD, 'f',0},
+                                 {UMODE_REGNICK, 'r',0},
+                                 {UMODE_HIDE,    'x',0},
+                                 {UMODE_CHATOP, 'b',0},
+				 {UMODE_WHOIS, 'W',0},
+                                 {0, 0, 0 }
+};
 
 
 

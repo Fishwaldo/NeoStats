@@ -125,6 +125,8 @@ extern const char *ns_userdump_help[];
 extern const char *ns_chandump_help[];
 extern const char *ns_serverdump_help[];
 extern const char *icq_help[];
-
+extern const char *ss_htmlstats_help[];
+extern const char *ss_forcehtml_help[];
+extern const char *ss_notices_help[];
 
 #endif

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.9 2002/03/12 07:56:02 fishwaldo Exp $
+** $Id: chans.c,v 1.10 2002/03/12 13:34:20 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -13,7 +13,6 @@
 #include "stats.h"
 #include "hash.h"
 
-#include "UnrealModes.h"
 
 void ChangeChanUserMode(Chans *c, User *u, int add, long mode);
 
@@ -51,7 +50,9 @@ void ChanMode(char *origin, char **av, int ac) {
 								} else {	
 									c->modes |= cFlagTab[i].mode;
 									if (cFlagTab[i].parameters) {
-										printf("Mode Param: %s\n", av[j]);
+#ifdef DEBUG
+										log("Mode Param: %s\n", av[j]);
+#endif
 										j++;
 									}
 								}
@@ -62,7 +63,9 @@ void ChanMode(char *origin, char **av, int ac) {
 								} else {	
 									c->modes &= ~cFlagTab[i].mode;
 									if (cFlagTab[i].parameters) {
-										printf("removeparam\n");
+#ifdef DEBUG
+										log("removeparam\n");
+#endif
 									}
 								}
 							}
@@ -199,7 +202,6 @@ void change_user_nick(Chans *c, char *newnick, char *oldnick) {
 #endif
 		cml = lnode_get(cm);
 		strcpy(cml->nick, newnick);
-		chandump(c->name);
 	}		
 }
 
