@@ -1177,7 +1177,7 @@ int irc_join( const Bot *botptr, const char *chan, const char *mode )
 		return NS_SUCCESS;
 	}
 	/* sjoin not available so use normal join */	
-	irc_send_join( botptr->u->name, chan, NULL, me.now );
+	irc_send_join( botptr->u->name, chan, NULL, ( unsigned long )me.now );
 	JoinChannel( botptr->u->name, chan );
 	if( mode ) {
 		irc_chanusermode( botptr, chan, mode, botptr->u->name );
@@ -1227,7 +1227,7 @@ int irc_nickchange( const Bot *botptr, const char *newnick )
 		nlog( LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", botptr->name, newnick );
 		return NS_FAILURE;
 	}
-	irc_send_nickchange( botptr->name, newnick, me.now );
+	irc_send_nickchange( botptr->name, newnick, ( unsigned long )me.now );
 	UserNickChange( botptr->name, newnick, NULL );
 	return NS_SUCCESS;
 }
@@ -1290,7 +1290,7 @@ int irc_cmode( const Bot *botptr, const char *chan, const char *mode, const char
 	char **av;
 	int ac;
 
-	irc_send_cmode( me.name, botptr->u->name, chan, mode, args, me.now );
+	irc_send_cmode( me.name, botptr->u->name, chan, mode, args, ( unsigned long )me.now );
 	ircsnprintf( ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args );
 	ac = split_buf( ircd_buf, &av, 0 );
 	ChanMode( me.name, av, ac );
@@ -1306,9 +1306,9 @@ int irc_cmode( const Bot *botptr, const char *chan, const char *mode, const char
 int irc_chanusermode( const Bot *botptr, const char *chan, const char *mode, const char *target )
 {
 	if( ( ircd_srv.protocol & PROTOCOL_B64NICK ) ) {
-		irc_send_cmode( me.name, botptr->u->name, chan, mode, nick_to_base64( target ), me.now );
+		irc_send_cmode( me.name, botptr->u->name, chan, mode, nick_to_base64( target ), ( unsigned long )me.now );
 	} else {
-		irc_send_cmode( me.name, botptr->u->name, chan, mode, target, me.now );
+		irc_send_cmode( me.name, botptr->u->name, chan, mode, target, ( unsigned long )me.now );
 	}
 	ChanUserMode( chan, target, 1, CmodeStringToMask( mode ) );
 	return NS_SUCCESS;
@@ -1510,7 +1510,7 @@ int irc_svsnick( const Bot *botptr, Client *target, const char *newnick )
 		unsupported_cmd( "SVSNICK" );
 		return NS_FAILURE;
 	}
-	irc_send_svsnick( me.name, target->name, newnick, me.now );
+	irc_send_svsnick( me.name, target->name, newnick, ( unsigned long )me.now );
 	return NS_SUCCESS;
 }
 
@@ -1545,7 +1545,7 @@ int irc_akill( const Bot *botptr, const char *host, const char *ident, const uns
 	va_start( ap, reason );
 	ircvsnprintf( ircd_buf, BUFSIZE, reason, ap );
 	va_end( ap );
-	irc_send_akill( me.name, host, ident, botptr->name, length, ircd_buf, me.now );
+	irc_send_akill( me.name, host, ident, botptr->name, length, ircd_buf, ( unsigned long )me.now );
 	return NS_SUCCESS;
 }
 
@@ -1962,7 +1962,7 @@ void do_netinfo( const char* maxglobalcnt, const char* tsendsync, const char* pr
 	ircd_srv.uprot = atoi( prot );
 	strlcpy( ircd_srv.cloak, cloak, CLOAKKEYLEN );
 	strlcpy( me.netname, netname, MAXPASS );
-	irc_send_netinfo( me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now );
+	irc_send_netinfo( me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, ( unsigned long )me.now );
 	do_synch_neostats();
 }
 
@@ -1980,7 +1980,7 @@ void do_snetinfo( const char* maxglobalcnt, const char* tsendsync, const char* p
 	ircd_srv.uprot = atoi( prot );
 	strlcpy( ircd_srv.cloak, cloak, CLOAKKEYLEN );
 	strlcpy( me.netname, netname, MAXPASS );
-	irc_send_snetinfo( me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now );
+	irc_send_snetinfo( me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, ( unsigned long )me.now );
 	do_synch_neostats();
 }
 

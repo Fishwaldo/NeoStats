@@ -33,6 +33,7 @@
 
 extern int neostats();
 extern void read_loop();
+extern void do_exit( int exitcode, char *quitmsg );
 
 static char* szNeoStatsErrorTitle="NeoStats for Windows Error";
 HINSTANCE hInstance = 0;
@@ -41,19 +42,19 @@ HANDLE hNeoStatsThread = 0;
 #ifndef NDEBUG
 void InitDebugConsole( void )
 {
-	long lStdHandle;
+	HANDLE lStdHandle;
 	int hConHandle;
 	FILE *fp;
 
 	AllocConsole();        
 	SetConsoleTitle( "NeoStats Debug Window" );
-	lStdHandle =( long )GetStdHandle( STD_OUTPUT_HANDLE );
-	hConHandle = _open_osfhandle( lStdHandle, _O_TEXT );
+	lStdHandle = GetStdHandle( STD_OUTPUT_HANDLE );
+	hConHandle = _open_osfhandle( (intptr_t)lStdHandle, _O_TEXT );
 	fp = _fdopen( hConHandle, "w" );
 	*stdout = *fp;
 	setvbuf( stdout, NULL, _IONBF, 0 );
-	lStdHandle =( long )GetStdHandle( STD_ERROR_HANDLE );
-	hConHandle = _open_osfhandle( lStdHandle, _O_TEXT );
+	lStdHandle = GetStdHandle( STD_ERROR_HANDLE );
+	hConHandle = _open_osfhandle( (intptr_t)lStdHandle, _O_TEXT );
 	fp = _fdopen( hConHandle, "w" );
 	*stderr = *fp;
 	setvbuf( stderr, NULL, _IONBF, 0 );
@@ -70,7 +71,7 @@ void ErrorMessageBox( char* error )
 	MessageBox( NULL, error, szNeoStatsErrorTitle, MB_ICONEXCLAMATION | MB_OK );
 }
 
-BOOL CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
+INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
     switch( message )
     {
@@ -155,5 +156,5 @@ int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPrevInst, char * cmdParam, int c
             DispatchMessage( &msg );
         }
     }
-    return msg.wParam;
+    return (int) msg.wParam;
 }

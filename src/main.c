@@ -474,11 +474,13 @@ void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg )
 	pcre_malloc = old_malloc;
 	pcre_free = old_free;
 #endif /* WIN32 */
+#ifndef WIN32
 	if( ( exitcode == NS_EXIT_RECONNECT && nsconfig.r_time > 0 ) || exitcode == NS_EXIT_RELOAD ) {
 		sleep( nsconfig.r_time );
 		execve( "./neostats", NULL, NULL );
 		return_code = EXIT_FAILURE;	/* exit code to error */
 	}
+#endif /* !WIN32 */
 	remove( PID_FILENAME );
 	exit( return_code );
 }

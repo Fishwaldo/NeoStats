@@ -318,7 +318,6 @@ int os_mkstemp( char *ftemplate )
 int os_write_temp_file( char *ftemplate, const void *buffer, unsigned int count )
 {
 #ifdef WIN32
-	int retval;
 	char *name;
 
 	name = mktemp( ftemplate );
