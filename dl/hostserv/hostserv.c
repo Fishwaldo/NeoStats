@@ -87,10 +87,7 @@ static int hs_sign_on(char **av, int ac) {
               return 1;
            }
        }
-hslog("end of routine");
     }
-
-
 return 1;
 }
 
