@@ -623,7 +623,7 @@ do_pong (const char* origin, const char* destination)
 	if (s) {
 		s->ping = me.now - ping.last_sent;
 		if (ping.ulag > 1)
-			s->ping -= (float) ping.ulag;
+			s->ping -= ping.ulag;
 		if (!strcmp (me.s->name, s->name))
 			ping.ulag = me.s->ping;
 		cmdparams = (CmdParams*)scalloc (sizeof(CmdParams));
