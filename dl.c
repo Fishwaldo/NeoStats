@@ -1309,9 +1309,9 @@ unload_module (char *module_name, User * u)
 			(*ModFini) ();
 		}
 		CLEAR_SEGV_INMODULE();
-		/* we delete the modules *after* we call ModFini, so the bot can still send messages generated from ModFini calls */
-		/* (M) Temporarily changed this back to how it was since it causes segfaults during module unloading */
-		/* now, see if this Module has any bots with it */
+		/* now, see if this Module has any bots with it 
+		 * we delete the modules *after* we call ModFini, so the bot 
+		 * can still send messages generated from ModFini calls */
 		del_bots(module_name);
 
 		/* Remove hash */

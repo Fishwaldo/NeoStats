@@ -931,3 +931,53 @@ numeric (const int numeric, const char *target, const char *data, ...)
 	send_numeric (numeric, target, ircd_buf);
 	return 1;
 }
+
+int
+sumode_cmd (const char *who, const char *target, long mode)
+{
+	char* newmode;
+	
+	newmode = UmodeMaskToString(mode);
+	send_umode (who, target, newmode);
+	UserMode (target, newmode);
+	return 1;
+}
+
+int
+spart_cmd (const char *who, const char *chan)
+{
+	send_part(who, chan);
+	part_chan (finduser (who), (char *) chan);
+	return 1;
+}
+
+int
+snick_cmd (const char *oldnick, const char *newnick)
+{
+	UserNick (oldnick, newnick);
+	send_nick (oldnick, newnick);
+	return 1;
+}
+
+int
+schmode_cmd (const char *who, const char *chan, const char *mode, const char *args)
+{
+	char **av;
+	int ac;
+
+	send_cmode (who, chan, mode, args);
+	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
+	ac = split_buf (ircd_buf, &av, 0);
+	ChanMode ("", av, ac);
+	free (av);
+	return 1;
+}
+
+int
+squit_cmd (const char *who, const char *quitmsg)
+{
+	send_quit (who, quitmsg);
+	UserQuit (who, quitmsg);
+	return 1;
+}
+

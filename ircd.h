@@ -85,6 +85,10 @@ void send_notice (char *to, const char *from, char *buf);
 void send_globops (char *from, char *buf);
 void send_wallops (char *from, char *buf);
 void send_numeric (const int numeric, const char *target, const char *buf);
-
+void send_umode (const char *who, const char *target, const char *mode);
+void send_part (const char *who, const char *chan);
+void send_nick (const char *oldnick, const char *newnick);
+void send_cmode (const char *who, const char *chan, const char *mode, const char *args);
+void send_quit (const char *who, const char *quitmsg);
 
 #endif

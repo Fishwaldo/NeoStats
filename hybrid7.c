@@ -176,42 +176,30 @@ sprotocol_cmd (const char *option)
 	return 1;
 }
 
-int
-squit_cmd (const char *who, const char *quitmsg)
+void 
+send_quit (const char *who, const char *quitmsg)
 {
 	sts (":%s %s :%s", who, MSG_QUIT, quitmsg);
-	UserQuit (who, quitmsg);
-	return 1;
 }
 
-int
-spart_cmd (const char *who, const char *chan)
+void 
+send_part (const char *who, const char *chan)
 {
 	sts (":%s %s %s", who, MSG_PART, chan);
-	part_chan (finduser (who), (char *) chan);
-	return 1;
 }
 
 int
 sjoin_cmd (const char *who, const char *chan)
 {
 	sts (":%s %s %d %s + :%s", me.name, MSG_SJOIN, (int)me.now, chan, who);
-	join_chan (finduser (who), (char *) chan);
+	join_chan (who, chan);
 	return 1;
 }
 
-int
-schmode_cmd (const char *who, const char *chan, const char *mode, const char *args)
+void 
+send_cmode (const char *who, const char *chan, const char *mode, const char *args)
 {
-	char **av;
-	int ac;
-
 	sts (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, me.now);
-	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
-	ac = split_buf (ircd_buf, &av, 0);
-	ChanMode ("", av, ac);
-	free (av);
-	return 1;
 }
 
 int
@@ -233,15 +221,10 @@ sping_cmd (const char *from, const char *reply, const char *to)
 	return 1;
 }
 
-int
-sumode_cmd (const char *who, const char *target, long mode)
+void 
+send_umode (const char *who, const char *target, const char *mode)
 {
-	char* newmode;
-	
-	newmode = UmodeMaskToString(mode);
-	sts (":%s %s %s :%s", who, MSG_MODE, target, newmode);
-	UserMode (target, newmode);
-	return 1;
+	sts (":%s %s %s :%s", who, MSG_MODE, target, mode);
 }
 
 void 
@@ -293,12 +276,10 @@ ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
 	return 1;
 }
 
-int
-snick_cmd (const char *oldnick, const char *newnick)
+void 
+send_nick (const char *oldnick, const char *newnick)
 {
-	UserNick (oldnick, newnick);
 	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int)me.now);
-	return 1;
 }
 
 int
@@ -441,7 +422,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 	}
 
 	if (*modes == '#') {
-		join_chan (finduser (argv[4]), modes);
+		join_chan (argv[4], modes);
 		return;
 	}
 	tl = list_create (10);
@@ -488,7 +469,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 			ok = 0;
 			break;
 		}
-		join_chan (finduser (nick), argv[1]);
+		join_chan (nick, argv[1]);
 		ChangeChanUserMode (findchan (argv[1]), finduser (nick), 1, mode);
 		j++;
 		ok = 1;
@@ -621,7 +602,7 @@ static void
 Usr_Topic (char *origin, char **argv, int argc)
 {
 	char *buf;
-	Chans *c;
+
 	/*
 	** Hybrid uses two different formats for the topic change protocol... 
 	** :user TOPIC channel :topic 
@@ -630,23 +611,17 @@ Usr_Topic (char *origin, char **argv, int argc)
 	** Both forms must be accepted.
 	** - Hwy
 	*/	
-	c = findchan (argv[0]);
-	if (c) {
-		if (finduser(origin)) {
-			buf = joinbuf (argv, argc, 1);
-			ChangeTopic (origin, c, me.now, buf);
-			free (buf);
-		} else if (findserver(origin)) {
-			buf = joinbuf (argv, argc, 3);
-			ChangeTopic (argv[1], c, atoi(argv[2]), buf);
-			free (buf);
-		} else {
-			nlog(LOG_WARNING, LOG_CORE, "Ehhh, Can't find Topic Setter %s/%s", origin, argv[1]); 
-		}
+	if (finduser(origin)) {
+		buf = joinbuf (argv, argc, 1);
+		ChanTopic (origin, argv[0], me.now, buf);
+		free (buf);
+	} else if (findserver(origin)) {
+		buf = joinbuf (argv, argc, 3);
+		ChanTopic (argv[1], argv[0], atoi(argv[2]), buf);
+		free (buf);
 	} else {
-		nlog (LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);
+		nlog(LOG_WARNING, LOG_CORE, "Ehhh, Can't find Topic Setter %s/%s", origin, argv[1]); 
 	}
-
 }
 
 static void
@@ -663,7 +638,7 @@ Usr_Join (char *origin, char **argv, int argc)
 		t = s + strcspn (s, ",");
 		if (*t)
 			*t++ = 0;
-		join_chan (finduser (origin), s);
+		join_chan (origin, s);
 	}
 }
 static void

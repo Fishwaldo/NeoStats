@@ -81,11 +81,18 @@ ChangeChanTS (Chans * c, time_t tstime)
  * @return Nothing
 */
 
-extern void
-ChangeTopic (char *owner, Chans * c, time_t time, char *topic)
+void
+ChanTopic (char *owner, char* chan, time_t time, char *topic)
 {
 	char **av;
 	int ac = 0;
+	Chans *c;
+
+	c = findchan (chan);
+	if (!c) {
+		nlog (LOG_WARNING, LOG_CORE, "Can't find Channel %s", chan);
+		return;
+	}
 	if(topic) {
 		strlcpy (c->topic, topic, BUFSIZE);
 	} else {
@@ -98,7 +105,7 @@ ChangeTopic (char *owner, Chans * c, time_t time, char *topic)
 	if(topic) {
 		AddStringToList (&av, topic, &ac);
 	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "ChangeTopic: NULL topic");
+		nlog (LOG_DEBUG1, LOG_CORE, "ChanTopic: NULL topic");
 	}
 	ModuleEvent (EVENT_TOPICCHANGE, av, ac);
 	free (av);
@@ -615,16 +622,19 @@ change_user_nick (Chans * c, char *newnick, char *oldnick)
 
 
 void
-join_chan (User * u, char *chan)
+join_chan (char* nick, char *chan)
 {
+	User* u;
 	Chans *c;
 	lnode_t *un, *cn;
 	Chanmem *cm;
 	char **av;
 	int ac = 0;
+	
 	SET_SEGV_LOCATION();
+	u = finduser (nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "ehhh, Joining an Unknown user to %s: %s", chan, recbuf);
+		nlog (LOG_WARNING, LOG_CORE, "Tried to joining an unknown user to %s: %s", chan, recbuf);
 		return;
 	}
 	if (!strcasecmp ("0", chan)) {
