@@ -110,7 +110,7 @@ int Online(char **av, int ac)
  * see modules.txt for a list of all events available
  */
 EventFnList __module_events[] = {
-	{"ONLINE", Online},
+	{EVENT_ONLINE, Online},
 	{NULL, NULL}
 };
 

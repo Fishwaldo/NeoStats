@@ -37,10 +37,10 @@ GetConf (void **data, int type, const char *item)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (strlen (segvinmodule) > 0) {
-		snprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
+	if (segvinmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
 	} else {
-		snprintf (keypath, 255, "g/core:/%s", item);
+		ircsnprintf (keypath, 255, "g/core:/%s", item);
 	}
 
 	switch (type) {
@@ -78,10 +78,10 @@ GetDir (char *item, char ***data)
 	char **data1;
 
 	/* determine if its a module setting */
-	if (strlen (segvinmodule) > 0) {
-		snprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
+	if (segvinmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
 	} else {
-		snprintf (keypath, 255, "g/core:/%s", item);
+		ircsnprintf (keypath, 255, "g/core:/%s", item);
 	}
 	i = kp_get_dir (keypath, &data1, NULL);
 	if (i == 0) {
@@ -105,10 +105,10 @@ SetConf (void *data, int type, char *item)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (strlen (segvinmodule) > 0) {
-		snprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
+	if (segvinmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
 	} else {
-		snprintf (keypath, 255, "g/core:/%s", item);
+		ircsnprintf (keypath, 255, "g/core:/%s", item);
 	}
 
 	switch (type) {
@@ -149,10 +149,10 @@ DelConf (char *item)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (strlen (segvinmodule) > 0) {
-		snprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
+	if (segvinmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
 	} else {
-		snprintf (keypath, 255, "g/core:/%s", item);
+		ircsnprintf (keypath, 255, "g/core:/%s", item);
 	}
 	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
 	/* check for errors */
@@ -173,10 +173,10 @@ GetData (void **data, int type, const char *table, const char *row, const char *
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (strlen (segvinmodule) > 0) {
-		snprintf (keypath, 255, "l/%s:/%s/%s/%s", segvinmodule, table, row, field);
+	if (segvinmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "l/%s:/%s/%s/%s", segvinmodule, table, row, field);
 	} else {
-		snprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
+		ircsnprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
 	}
 	switch (type) {
 	case CFGSTR:
@@ -213,10 +213,10 @@ GetTableData (char *table, char ***data)
 	char **data1;
 
 	/* determine if its a module setting */
-	if (strlen (segvinmodule) > 0) {
-		snprintf (keypath, 255, "l/%s:/%s", segvinmodule, table);
+	if (segvinmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "l/%s:/%s", segvinmodule, table);
 	} else {
-		snprintf (keypath, 255, "l/core:/%s", table);
+		ircsnprintf (keypath, 255, "l/core:/%s", table);
 	}
 	i = kp_get_dir (keypath, &data1, NULL);
 	if (i == 0) {
@@ -240,10 +240,10 @@ SetData (void *data, int type, char *table, char *row, char *field)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (strlen (segvinmodule) > 0) {
-		snprintf (keypath, 255, "l/%s:/%s/%s/%s", segvinmodule, table, row, field);
+	if (segvinmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "l/%s:/%s/%s/%s", segvinmodule, table, row, field);
 	} else {
-		snprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
+		ircsnprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
 	}
 
 	switch (type) {
@@ -284,10 +284,10 @@ DelRow (char *table, char *row)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (strlen (segvinmodule) > 0) {
-		snprintf (keypath, 255, "l/%s:/%s/%s", segvinmodule, table, row);
+	if (segvinmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "l/%s:/%s/%s", segvinmodule, table, row);
 	} else {
-		snprintf (keypath, 255, "l/core:/%s/%s", table, row);
+		ircsnprintf (keypath, 255, "l/core:/%s/%s", table, row);
 	}
 	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
 	/* check for errors */
@@ -307,10 +307,10 @@ DelTable (char *table)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (strlen (segvinmodule) > 0) {
-		snprintf (keypath, 255, "l/%s:/%s", segvinmodule, table);
+	if (segvinmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "l/%s:/%s", segvinmodule, table);
 	} else {
-		snprintf (keypath, 255, "l/core:/%s", table);
+		ircsnprintf (keypath, 255, "l/core:/%s", table);
 	}
 	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
 	/* check for errors */

@@ -15,7 +15,6 @@ all:	statserv
 
 statserv: $(OBJECTS)
 	ld $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
-	/bin/cp $(TARGET) ../
 
 clean:
 	/bin/rm -rf ../$(TARGET)

@@ -14,7 +14,6 @@ all:	version
 
 version: $(OBJECTS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
-	/bin/cp $(TARGET) ../
 
 clean:
 	/bin/rm -rf ../$(TARGET)

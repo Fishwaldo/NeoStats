@@ -71,7 +71,7 @@ int __Chan_Message(char *origin, char *chan, char **argv, int argc)
 		if (fort) {
 			fortune = malloc(255);
 			while ((fortune = fgets(fortune, 255, fort))) {
-				privmsg(chan, s_Spam, "%s", fortune);
+				privmsg(chan, s_Spam, fortune);
 			}
 			free(fortune);
 			pclose(fort);
@@ -119,15 +119,15 @@ int Online(char **av, int ac)
 	}
 	if (GetConf((void *) &user, CFGSTR, "User") < 0) {
 		user = malloc(MAXUSER);
-		snprintf(user, MAXUSER, "please");
+		strlcpy(user, "please", MAXUSER);
 	}
 	if (GetConf((void *) &host, CFGSTR, "Host") < 0) {
 		host = malloc(MAXHOST);
-		snprintf(host, MAXHOST, me.name);
+		strlcpy(host, me.name, MAXHOST);
 	}
 	if (GetConf((void *) &rname, CFGSTR, "RealName") < 0) {
-		rname = malloc(MAXHOST);
-		snprintf(rname, MAXHOST, "Chat to me");
+		rname = malloc(MAXREALNAME);
+		strlcpy(rname, "Chat to me", MAXREALNAME);
 	}
 
 
@@ -147,7 +147,7 @@ int Online(char **av, int ac)
 
 
 EventFnList __module_events[] = {
-	{"ONLINE", Online}
+	{EVENT_ONLINE, Online}
 	,
 	{NULL, NULL}
 };

@@ -37,13 +37,10 @@
 #include "config.h"
 #include "log.h"
 
-/** @brief Module num structure
+/** @brief Module list
  * 
  */
-struct {
-	Module *mod;
-	int used;
-}ModNum[NUM_MODULES];
+Module *ModList[NUM_MODULES];
 
 /** @brief Initialise module list hashes
  *
@@ -93,15 +90,15 @@ new_timer (char *timer_name)
 	nlog (LOG_DEBUG2, LOG_CORE, "New Timer: %s", timer_name);
 	t = malloc (sizeof (Mod_Timer));
 	if (!timer_name)
-		timer_name = "";
-	strncpy (t->timername, timer_name, MAXHOST);
+		strsetnull (t->timername);
+	else
+		strlcpy (t->timername, timer_name, MAX_MOD_NAME);
 	tn = hnode_create (t);
 	if (hash_isfull (th)) {
 		nlog (LOG_WARNING, LOG_CORE, "new_timer(): Couldn't add new Timer, Hash is Full!");
 		return NULL;
-	} else {
-		hash_insert (th, tn, timer_name);
 	}
+	hash_insert (th, tn, timer_name);
 	return t;
 }
 
@@ -133,7 +130,7 @@ findtimer (char *timer_name)
  * @param mod_name the name of module registering the timer
  * @param interval the interval at which the timer triggers in seconds
  * 
- * @return pointer to timer if found, NULL if not found
+ * @return NS_SUCCESS if added, NS_FAILURE if not 
 */
 int
 add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
@@ -143,19 +140,18 @@ add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 	SET_SEGV_LOCATION();
 	if (dlsym ((int *) get_dl_handle (mod_name), func_name) == NULL) {
 		nlog (LOG_WARNING, LOG_CORE, "Oh Oh, The Timer Function doesn't exist");
-		return -1;
+		return NS_FAILURE;
 	}
 	Mod_timer_list = new_timer (timer_name);
 	if (Mod_timer_list) {
 		Mod_timer_list->interval = interval;
-		Mod_timer_list->lastrun = time (NULL);
-		strncpy (Mod_timer_list->modname, mod_name, MAXHOST);
+		Mod_timer_list->lastrun = me.now;
+		strlcpy (Mod_timer_list->modname, mod_name, MAX_MOD_NAME);
 		Mod_timer_list->function = dlsym ((int *) get_dl_handle (mod_name), func_name);
 		nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with timer for Function %s", mod_name, func_name);
-		return 1;
-	} else {
-		return -1;
+		return NS_SUCCESS;
 	}
+	return NS_FAILURE;
 }
 
 /** @brief delete a timer from the timer list
@@ -164,7 +160,7 @@ add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
  *
  * @param timer_name the name of timer to delete
  * 
- * @return 1 if deleted, -1 if not found
+ * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
 int
 del_mod_timer (char *timer_name)
@@ -180,9 +176,9 @@ del_mod_timer (char *timer_name)
 		hash_delete (th, tn);
 		hnode_destroy (tn);
 		free (list);
-		return 1;
+		return NS_SUCCESS;
 	}
-	return -1;
+	return NS_FAILURE;
 }
 
 /** @brief list timers in use
@@ -208,7 +204,7 @@ list_module_timer (User * u)
 		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_ptr->modname);
 		prefmsg (u->nick, s_Services, "Module Timer Name: %s", mod_ptr->timername);
 		prefmsg (u->nick, s_Services, "Module Interval: %d", mod_ptr->interval);
-		prefmsg (u->nick, s_Services, "Time till next Run: %d", mod_ptr->interval - (time (NULL) - mod_ptr->lastrun));
+		prefmsg (u->nick, s_Services, "Time till next Run: %d", mod_ptr->interval - (me.now - mod_ptr->lastrun));
 	}
 	prefmsg (u->nick, s_Services, "End of Module timer List");
 }
@@ -231,15 +227,15 @@ new_sock (char *sock_name)
 	nlog (LOG_DEBUG2, LOG_CORE, "New Socket: %s", sock_name);
 	s = smalloc (sizeof (Sock_List));
 	if (!sock_name)
-		sock_name = "";
-	strncpy (s->sockname, sock_name, MAXHOST);
+		strsetnull (s->sockname);
+	else
+		strlcpy (s->sockname, sock_name, MAX_MOD_NAME);
 	sn = hnode_create (s);
 	if (hash_isfull (sockh)) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Eeek, SocketHash is full, can not add a new socket");
 		return NULL;
-	} else {
-		hash_insert (sockh, sn, s->sockname);
 	}
+	hash_insert (sockh, sn, s->sockname);
 	return s;
 }
 
@@ -284,29 +280,70 @@ add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int
 	if (readfunc) {
 		if (dlsym ((int *) get_dl_handle (mod_name), readfunc) == NULL) {
 			nlog (LOG_WARNING, LOG_CORE, "oh oh, the Read socket function doesn't exist = %s (%s)", readfunc, mod_name);
-			return -1;
+			return NS_FAILURE;
 		}
 	}
 	if (writefunc) {
 		if (dlsym ((int *) get_dl_handle (mod_name), writefunc) == NULL) {
 			nlog (LOG_WARNING, LOG_CORE, "oh oh, the Write socket function doesn't exist = %s (%s)", writefunc, mod_name);
-			return -1;
+			return NS_FAILURE;
 		}
 	}
 	if (errfunc) {
 		if (dlsym ((int *) get_dl_handle (mod_name), errfunc) == NULL) {
 			nlog (LOG_WARNING, LOG_CORE, "oh oh, the Error socket function doesn't exist = %s (%s)", errfunc, mod_name);
-			return -1;
+			return NS_FAILURE;
 		}
 	}
 	Sockets_mod_list = new_sock (sock_name);
 	Sockets_mod_list->sock_no = socknum;
-	strncpy (Sockets_mod_list->modname, mod_name, MAXHOST);
+	strlcpy (Sockets_mod_list->modname, mod_name, MAX_MOD_NAME);
 	Sockets_mod_list->readfnc = dlsym ((int *) get_dl_handle (mod_name), readfunc);
 	Sockets_mod_list->writefnc = dlsym ((int *) get_dl_handle (mod_name), writefunc);
 	Sockets_mod_list->errfnc = dlsym ((int *) get_dl_handle (mod_name), errfunc);
-	nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with Socket functions %s", mod_name, Sockets_mod_list->sockname);
-	return 1;
+	Sockets_mod_list->socktype = SOCK_STANDARD;
+	
+	nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with Standard Socket functions %s", mod_name, Sockets_mod_list->sockname);
+	return NS_SUCCESS;
+}
+
+/** @brief add a poll interface to the socket list
+ *
+ * For core use. Adds a socket with the given functions to the socket list
+ *
+ * @param beforepoll the name of function to call before we select
+ * @param afterpoll the name of the function to call after we select
+ * @param sock_name the name of socket to register
+ * @param mod_name the name of module registering the socket
+ * 
+ * @return pointer to socket if found, NULL if not found
+*/
+int
+add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name, void *data)
+{
+	Sock_List *Sockets_mod_list;
+
+	SET_SEGV_LOCATION();
+	if (beforepoll) {
+		if (dlsym ((int *) get_dl_handle (mod_name), beforepoll) == NULL) {
+			nlog (LOG_WARNING, LOG_CORE, "oh oh, the Read socket function doesn't exist = %s (%s)", beforepoll, mod_name);
+			return NS_FAILURE;
+		}
+	}
+	if (afterpoll) {
+		if (dlsym ((int *) get_dl_handle (mod_name), afterpoll) == NULL) {
+			nlog (LOG_WARNING, LOG_CORE, "oh oh, the Write socket function doesn't exist = %s (%s)", afterpoll, mod_name);
+			return NS_FAILURE;
+		}
+	}
+	Sockets_mod_list = new_sock (sock_name);
+	strlcpy (Sockets_mod_list->modname, mod_name, MAX_MOD_NAME);
+	Sockets_mod_list->socktype = SOCK_POLL;
+	Sockets_mod_list->beforepoll = dlsym ((int *) get_dl_handle (mod_name), beforepoll);
+	Sockets_mod_list->afterpoll = dlsym ((int *) get_dl_handle (mod_name), afterpoll);
+	Sockets_mod_list->data = data;
+	nlog (LOG_DEBUG2, LOG_CORE, "Registered Module %s with Poll Socket functions %s", mod_name, Sockets_mod_list->sockname);
+	return NS_SUCCESS;
 }
 
 /** @brief delete a socket from the socket list
@@ -315,7 +352,7 @@ add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int
  *
  * @param socket_name the name of socket to delete
  * 
- * @return 1 if deleted, -1 if not found
+ * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
 int
 del_socket (char *sock_name)
@@ -331,9 +368,9 @@ del_socket (char *sock_name)
 		hash_scan_delete (sockh, sn);
 		hnode_destroy (sn);
 		free (list);
-		return 1;
+		return NS_SUCCESS;
 	}
-	return -1;
+	return NS_FAILURE;
 }
 
 /** @brief list sockets in use
@@ -358,7 +395,11 @@ list_sockets (User * u)
 		mod_ptr = hnode_get (sn);
 		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_ptr->modname);
 		prefmsg (u->nick, s_Services, "Socket Name: %s", mod_ptr->sockname);
-		prefmsg (u->nick, s_Services, "Socket Number: %d", mod_ptr->sock_no);
+		if (mod_ptr->socktype == SOCK_STANDARD) {
+			prefmsg (u->nick, s_Services, "Socket Number: %d", mod_ptr->sock_no);
+		} else {
+			prefmsg (u->nick, s_Services, "Poll Interface");
+		}
 	}
 	prefmsg (u->nick, s_Services, "End of Socket List");
 }
@@ -381,7 +422,7 @@ add_bot_to_chan (char *bot, char *chan)
 	cbn = hash_lookup (bch, chan);
 	if (!cbn) {
 		bc = malloc (sizeof (Chan_Bot));
-		strncpy (bc->chan, chan, CHANLEN);
+		strlcpy (bc->chan, chan, CHANLEN);
 		bc->bots = list_create (B_TABLE_SIZE);
 		cbn = hnode_create (bc);
 		if (hash_isfull (bch)) {
@@ -517,16 +558,16 @@ new_bot (char *bot_name)
 	nlog (LOG_DEBUG2, LOG_CORE, "New Bot: %s", bot_name);
 	u = malloc (sizeof (Mod_User));
 	if (!bot_name)
-		bot_name = "";
-	strncpy (u->nick, bot_name, MAXNICK);
+		strsetnull (u->nick);
+	else
+		strlcpy (u->nick, bot_name, MAXNICK);
 	u->chanlist = hash_create (C_TABLE_SIZE, 0, 0);
 	bn = hnode_create (u);
 	if (hash_isfull (bh)) {
 		chanalert (s_Services, "Warning ModuleBotlist is full");
 		return NULL;
-	} else {
-		hash_insert (bh, bn, bot_name);
 	}
+	hash_insert (bh, bn, bot_name);
 	return u;
 }
 
@@ -546,18 +587,18 @@ add_mod_user (char *nick, char *mod_name)
 	SET_SEGV_LOCATION();
 	Mod_Usr_list = new_bot (nick);
 	/* add a brand new user */
-	strncpy (Mod_Usr_list->nick, nick, MAXNICK);
-	strncpy (Mod_Usr_list->modname, mod_name, MAXHOST);
+	strlcpy (Mod_Usr_list->nick, nick, MAXNICK);
+	strlcpy (Mod_Usr_list->modname, mod_name, MAX_MOD_NAME);
 
 	mn = hash_lookup (mh, mod_name);
 	if (mn) {
 		list_ptr = hnode_get (mn);
 		Mod_Usr_list->function = dlsym (list_ptr->dl_handle, "__Bot_Message");
 		Mod_Usr_list->chanfunc = dlsym (list_ptr->dl_handle, "__Chan_Message");
-		return 1;
+		return NS_SUCCESS;
 	}
 	nlog (LOG_WARNING, LOG_CORE, "add_mod_user(): Couldn't Add ModuleBot to List");
-	return 0;
+	return NS_FAILURE;
 }
 
 /** @brief 
@@ -598,9 +639,9 @@ del_mod_user (char *bot_name)
 		list = hnode_get (bn);
 		hnode_destroy (bn);
 		free (list);
-		return 1;
+		return NS_SUCCESS;
 	}
-	return -1;
+	return NS_FAILURE;
 }
 
 /** @brief 
@@ -620,7 +661,7 @@ bot_nick_change (char *oldnick, char *newnick)
 	u = finduser (oldnick);
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "A non-registered bot(%s) attempted to change its nick to %s", oldnick, newnick);
-		return -1;
+		return NS_FAILURE;
 	}
 	u = finduser (newnick);
 	if (!u) {
@@ -629,18 +670,18 @@ bot_nick_change (char *oldnick, char *newnick)
 			mod_tmp = new_bot (newnick);
 
 			/* add a brand new user */ 
-			strncpy (mod_tmp->nick, newnick, MAXNICK);
-			strncpy (mod_tmp->modname, mod_ptr->modname, MAXHOST);
+			strlcpy (mod_tmp->nick, newnick, MAXNICK);
+			strlcpy (mod_tmp->modname, mod_ptr->modname, MAX_MOD_NAME);
 			mod_tmp->function = mod_ptr->function;
 
 			/* Now Delete the Old bot nick */   
 			del_mod_user (oldnick);
 			snick_cmd (oldnick, newnick);
-			return 1;
+			return NS_SUCCESS;
 		}
 	}
 	nlog (LOG_NOTICE, LOG_CORE, "Couldn't find Bot Nick %s in Bot list", oldnick);
-	return -1;
+	return NS_FAILURE;
 }
 
 /** @brief 
@@ -684,6 +725,7 @@ load_module (char *modfilename, User * u)
 	void *dl_handle;
 	int do_msg;
 	char path[255];
+	char loadmodname[255];
 	char **av;
 	int ac = 0;
 	int i = 0;
@@ -705,7 +747,9 @@ load_module (char *modfilename, User * u)
 	} else {
 		do_msg = 1;
 	}
-	snprintf (path, 255, "%s/%s.so", MOD_PATH, modfilename);
+	strlcpy (loadmodname, modfilename, 255);
+	strlwr (loadmodname);
+	ircsnprintf (path, 255, "%s/%s.so", MOD_PATH, loadmodname);
 	dl_handle = dlopen (path, RTLD_NOW || RTLD_GLOBAL);
 	CLEAR_SEGV_INMODULE();
 	if (!dl_handle) {
@@ -714,7 +758,7 @@ load_module (char *modfilename, User * u)
 			prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
 		}
 		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
-		return -1;
+		return NS_FAILURE;
 	}
 
 	/* new system */
@@ -734,13 +778,13 @@ load_module (char *modfilename, User * u)
 			}
 			nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
 			dlclose (dl_handle);
-			return -1;
+			return NS_FAILURE;
 		}
 		mod_info_ptr = (*mod_get_info) ();
 		if (mod_info_ptr == NULL) {
 			dlclose (dl_handle);
 			nlog (LOG_WARNING, LOG_CORE, "Module has no info structure: %s", path);
-			return -1;
+			return NS_FAILURE;
 		}
 	}
 #else /* OLD_MODULE_EXPORT_SUPPORT */
@@ -755,7 +799,7 @@ load_module (char *modfilename, User * u)
 		}
 		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
 		dlclose (dl_handle);
-		return -1;
+		return NS_FAILURE;
 	}
 #endif /* OLD_MODULE_EXPORT_SUPPORT */
 	/* new system */
@@ -775,13 +819,13 @@ load_module (char *modfilename, User * u)
 			}
 			nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
 			dlclose (dl_handle);
-			return -1;
+			return NS_FAILURE;
 		}
 		mod_funcs_ptr = (*mod_get_funcs) ();
 		if (mod_funcs_ptr == NULL) {
 			dlclose (dl_handle);
 			nlog (LOG_WARNING, LOG_CORE, "Module has no function structure: %s", path);
-			return -1;
+			return NS_FAILURE;
 		}
 	}
 #else /* OLD_MODULE_EXPORT_SUPPORT */
@@ -796,7 +840,7 @@ load_module (char *modfilename, User * u)
 		}
 		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
 		dlclose (dl_handle);
-		return -1;
+		return NS_FAILURE;
 	}
 #endif /* OLD_MODULE_EXPORT_SUPPORT */
 
@@ -819,7 +863,7 @@ load_module (char *modfilename, User * u)
 		dlclose (dl_handle);
 		if (do_msg)
 			prefmsg (u->nick, s_Services, "Module %s already Loaded, Can't Load 2 Copies", mod_info_ptr->module_name);
-		return -1;
+		return NS_FAILURE;
 	}
 
 	mod_ptr = (Module *) smalloc (sizeof (Module));
@@ -832,7 +876,7 @@ load_module (char *modfilename, User * u)
 		}
 		dlclose (dl_handle);
 		free (mod_ptr);
-		return -1;
+		return NS_FAILURE;
 	} else {
 		hash_insert (mh, mn, mod_info_ptr->module_name);
 	}
@@ -846,12 +890,11 @@ load_module (char *modfilename, User * u)
 
 	/* assign a module number to this module */
 	i = 0;
-	while (ModNum[i].used != 0)
+	while (ModList[i] != NULL)
 		i++;
 	/* no need to check for overflow of NUM_MODULES, as its done above */
-	ModNum[i].used = 1;
-	ModNum[i].mod = mod_ptr;
-	nlog (LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, ModNum[i].mod->info->module_name);
+	ModList[i] = mod_ptr;
+	nlog (LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, mod_ptr->info->module_name);
 
 	/* call __ModInit (replacement for library __init() call */
 	doinit = dlsym ((int *) dl_handle, "__ModInit");
@@ -859,8 +902,9 @@ load_module (char *modfilename, User * u)
 		SET_SEGV_LOCATION();
 		SET_SEGV_INMODULE(mod_ptr->info->module_name);
 		if ((*doinit) (i, API_VER) < 1) {
-			unload_module(ModNum[i].mod->info->module_name, NULL);
-			return -1;
+			nlog (LOG_NORMAL, LOG_CORE, "Unable to load module %s. See %s.log for further information.", mod_ptr->info->module_name, mod_ptr->info->module_name);
+			unload_module(mod_ptr->info->module_name, NULL);
+			return NS_FAILURE;
 		}
 		SET_SEGV_LOCATION();
 		CLEAR_SEGV_INMODULE();
@@ -870,7 +914,7 @@ load_module (char *modfilename, User * u)
 	/* Let this module know we are online if we are! */
 	if (me.onchan == 1) {
 		while (event_fn_ptr->cmd_name != NULL) {
-			if (!strcasecmp (event_fn_ptr->cmd_name, "ONLINE")) {
+			if (!strcasecmp (event_fn_ptr->cmd_name, EVENT_ONLINE)) {
 				AddStringToList (&av, me.s->name, &ac);
 				SET_SEGV_LOCATION();
 				SET_SEGV_INMODULE(mod_ptr->info->module_name);
@@ -887,7 +931,7 @@ load_module (char *modfilename, User * u)
 		prefmsg (u->nick, s_Services, "Module %s Loaded, Description: %s", mod_info_ptr->module_name, mod_info_ptr->module_description);
 		globops (me.name, "%s Module Loaded", mod_info_ptr->module_name);
 	}
-	return 0;
+	return NS_SUCCESS;
 }
 
 /** @brief 
@@ -922,15 +966,15 @@ get_mod_num (char *mod_name)
 	int i;
 
 	for (i = 0; i < NUM_MODULES; i++) {
-		if (ModNum[i].used > 0) {
-			if (!strcasecmp (ModNum[i].mod->info->module_name, mod_name)) {
+		if (ModList[i] != NULL) {
+			if (!strcasecmp (ModList[i]->info->module_name, mod_name)) {
 				return i;
 			}
 		}
 	}
 	/* if we get here, it wasn't found */
 	nlog (LOG_DEBUG1, LOG_CORE, "Can't find %s in module number list", mod_name);
-	return -1;
+	return NS_FAILURE;
 }
 
 /** @brief 
@@ -984,9 +1028,8 @@ unload_module (char *module_name, User * u)
 		if (u) {
 			prefmsg (u->nick, s_Services, "Couldn't Find Module %s Loaded, Try /msg %s modlist", module_name, s_Services);
 			chanalert (s_Services, "%s tried to Unload %s but its not loaded", u->nick, module_name);
-			return -1;
 		}
-		return -1;
+		return NS_FAILURE;
 	}
 
 	/* Check to see if this Module has any timers registered....  */
@@ -1008,15 +1051,17 @@ unload_module (char *module_name, User * u)
 		}
 	}
 
-	/* now, see if this Module has any bots with it */
-	hash_scan_begin (&hscan, bh);
-	while ((modnode = hash_scan_next (&hscan)) != NULL) {
-		mod_ptr = hnode_get (modnode);
-		if (!strcasecmp (mod_ptr->modname, module_name)) {
-			nlog (LOG_DEBUG1, LOG_CORE, "Module %s had bot %s Registered. Deleting..", module_name, mod_ptr->nick);
-			del_bot (mod_ptr->nick, "Module Unloaded");
+		/* we delete the modules *after* we call ModFini, so the bot can still send messages generated from ModFini calls */
+	    /* (M) Temporarily changed this back to how it was since it causes segfaults during module unloading */
+		/* now, see if this Module has any bots with it */
+		hash_scan_begin (&hscan, bh);
+		while ((modnode = hash_scan_next (&hscan)) != NULL) {
+			mod_ptr = hnode_get (modnode);
+			if (!strcasecmp (mod_ptr->modname, module_name)) {
+				nlog (LOG_DEBUG1, LOG_CORE, "Module %s had bot %s Registered. Deleting..", module_name, mod_ptr->nick);
+				del_bot (mod_ptr->nick, "Module Unloaded");
+			}
 		}
-	}
 
 	/* Remove module....  */
 	modnode = hash_lookup (mh, module_name);
@@ -1035,6 +1080,7 @@ unload_module (char *module_name, User * u)
 			(*dofini) ();
 		}
 		CLEAR_SEGV_INMODULE();
+
 		/* Remove hash */
 		hash_delete (mh, modnode);
 		hnode_destroy (modnode);
@@ -1046,13 +1092,12 @@ unload_module (char *module_name, User * u)
 		if (i >= 0) {
 			nlog (LOG_DEBUG1, LOG_CORE, "Freeing %d from Module Numbers", i);
 			/* free the module number */
-			ModNum[i].mod = NULL;
-			ModNum[i].used = 0;
+			ModList[i] = NULL;
 		}
 		free (list);
-		return 1;
+		return NS_SUCCESS;
 	}
-	return -1;
+	return NS_FAILURE;
 }
 
 /** @brief unload all loaded modules
@@ -1063,7 +1108,7 @@ unload_module (char *module_name, User * u)
  * 
  * @return none
 */
-void unload_modules(User * u)
+void unload_modules(void)
 {
 	Module *mod_ptr;
 	hscan_t ms;
@@ -1072,12 +1117,6 @@ void unload_modules(User * u)
 	hash_scan_begin (&ms, mh);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		mod_ptr = hnode_get (mn);
-		if(u) {
-			chanalert (s_Services, "Module %s Unloaded by %s", mod_ptr->info->module_name, u->nick);
-			unload_module (mod_ptr->info->module_name, u);
-		}
-		else {
-			unload_module (mod_ptr->info->module_name, finduser (s_Services));
-		}
+		unload_module (mod_ptr->info->module_name, NULL);
 	}
 }

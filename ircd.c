@@ -30,6 +30,12 @@
 #include "dl.h"
 #include "log.h"
 
+/** @brief init_bot
+ *
+ * 
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
 int
 init_bot (char *nick, char *user, char *host, char *rname, char *modes, char *mod_name)
 {
@@ -41,14 +47,13 @@ init_bot (char *nick, char *user, char *host, char *rname, char *modes, char *mo
 	long Umode;
 	char tmpmode;
 
-
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (u) {
 		nlog (LOG_WARNING, LOG_CORE, "Attempting to Login with a Nickname that already Exists: %s", nick);
-		return -1;
+		return NS_FAILURE;
 	}
-	if (strlen (user) > 8) {
+	if (strnlen (user, MAXUSER) > MAXUSERWARN) {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, %s bot %s has an username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
 	}
 	add_mod_user (nick, mod_name);
@@ -79,32 +84,42 @@ init_bot (char *nick, char *user, char *host, char *rname, char *modes, char *mo
 	}
 	SignOn_NewBot (nick, user, host, rname, Umode);
 	AddStringToList (&av, nick, &ac);
-	Module_Event ("SIGNON", av, ac);
+	Module_Event (EVENT_SIGNON, av, ac);
 	free (av);
-	/* restore segvinmodule from SIGNON */
+	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
-	return 1;
+	return NS_SUCCESS;
 }
 
+/** @brief del_bot
+ *
+ * 
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
 int
 del_bot (char *nick, char *reason)
 {
 	User *u;
+
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	nlog (LOG_DEBUG1, LOG_CORE, "Killing %s for %s", nick, reason);
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "Attempting to Logoff with a Nickname that does not Exists: %s", nick);
-		return -1;
+		return NS_FAILURE;
 	}
 	squit_cmd (nick, reason);
 	del_mod_user (nick);
-	return 1;
+	return NS_SUCCESS;
 }
 
-
-
-
+/** @brief Module_Event
+ *
+ * 
+ *
+ * @return none
+ */
 void
 Module_Event (char *event, char **av, int ac)
 {
@@ -140,23 +155,20 @@ Module_Event (char *event, char **av, int ac)
 			}
 		}
 	}
-
 }
 
-
-/* Taken from Epona - Thanks! */
-
-/*************************************************************************/
-
-/* split_buf:  Split a buffer into arguments and store the arguments in an
- *             argument vector pointed to by argv (which will be malloc'd
- *             as necessary); return the argument count.  If colon_special
- *             is non-zero, then treat a parameter with a leading ':' as
- *             the last parameter of the line, per the IRC RFC.  Destroys
- *             the buffer by side effect.
+/** @brief split_buf
+ * Taken from Epona - Thanks! 
+ * Split a buffer into arguments and store the arguments in an
+ * argument vector pointed to by argv (which will be malloc'd
+ * as necessary); return the argument count.  If colon_special
+ * is non-zero, then treat a parameter with a leading ':' as
+ * the last parameter of the line, per the IRC RFC.  Destroys
+ * the buffer by side effect. 
+ *
+ * @return 
  */
-
-extern int
+int
 split_buf (char *buf, char ***argv, int colon_special)
 {
 	int argvsize = 8;
@@ -190,7 +202,7 @@ split_buf (char *buf, char ***argv, int colon_special)
 			while (isspace (*s))
 				s++;
 		} else {
-			s = buf + strlen (buf);
+			s = buf + strnlen (buf, BUFSIZE);
 		}
 		if (*buf == 0) {
 			buf++;
@@ -201,23 +213,33 @@ split_buf (char *buf, char ***argv, int colon_special)
 	return argc - flag;
 }
 
-extern char *
+/** @brief joinbuf 
+ *
+ * 
+ *
+ * @return 
+ */
+char *
 joinbuf (char **av, int ac, int from)
 {
 	int i;
 	char *buf;
-	char buf1[512];
 
-	buf = malloc (512);
-	snprintf (buf, 512, "%s", av[from]);
+	buf = malloc (BUFSIZE);
+	strlcpy (buf, av[from], BUFSIZE);
 	for (i = from + 1; i < ac; i++) {
-		snprintf (buf1, 512, "%s %s", buf, av[i]);
-		strncpy (buf, buf1, 512);
+		strlcat (buf, " ", BUFSIZE);
+		strlcat (buf, av[i], BUFSIZE);
 	}
 	return (char *) buf;
 }
 
-
+/** @brief parse
+ *
+ * 
+ *
+ * @return none
+ */
 void
 parse (char *line)
 {
@@ -234,7 +256,7 @@ parse (char *line)
 
 	SET_SEGV_LOCATION();
 	strip (line);
-	strncpy (recbuf, line, BUFSIZE);
+	strlcpy (recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
 	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
@@ -245,8 +267,8 @@ parse (char *line)
 			return;
 		*coreLine = 0;
 		while (isspace (*++coreLine));
-		strncpy (origin, line + 1, sizeof (origin));
-		memmove (line, coreLine, strlen (coreLine) + 1);
+		strlcpy (origin, line + 1, sizeof (origin));
+		memmove (line, coreLine, strnlen (coreLine, BUFSIZE) + 1);
 		cmdptr = 1;
 	} else {
 		cmdptr = 0;
@@ -293,10 +315,10 @@ parse (char *line)
 
 		/* its a privmsg, now lets see who too... */
 		if (strstr (av[0], "!")) {
-			strncpy (cmd, av[0], 64);
+			strlcpy (cmd, av[0], 64);
 			av[0] = strtok (cmd, "!");
 		} else if (strstr (av[0], "@")) {
-			strncpy (cmd, av[0], 64);
+			strlcpy (cmd, av[0], 64);
 			av[0] = strtok (cmd, "@");
 		}
 		if (!strcasecmp (s_Services, av[0])) {
@@ -321,7 +343,9 @@ parse (char *line)
 				}
 
 				/* Check to make sure there are no blank spaces so we dont crash */
-				if (strlen (av[1]) >= 350) {
+				/* Use strnlen so long lines do not just DOS the server by tying us up
+				   in strlen */
+				if (strnlen (av[1], MAX_CMD_LINE_LENGTH) >= MAX_CMD_LINE_LENGTH) {
 					prefmsg (origin, s_Services, "command line too long!");
 					notice (s_Services, "%s tried to send a very LARGE command, we told them to shove it!", origin);
 					free (av);
@@ -383,65 +407,72 @@ parse (char *line)
 	free (av);
 }
 
-
-
-
-
-
-
-
-
-/* Here are the Following Internal Functions.
-they should update the internal Structures */
-
+/** @brief init_ServBot
+ *
+ * 
+ *
+ * @return none
+ */
 void
 init_ServBot (void)
 {
-	char rname[63];
+	char rname[MAXREALNAME];
 	char **av;
 	int ac = 0;
+
 	SET_SEGV_LOCATION();
-	if (finduser (s_Services))
+	if (finduser (s_Services)) {
 		/* nick already exists on the network */
-		snprintf (s_Services, MAXNICK, "NeoStats1");
-	snprintf (rname, 63, "/msg %s \2HELP\2", s_Services);
+		strlcat (s_Services, "1", MAXNICK);
+	}
+	ircsnprintf (rname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
 	SignOn_NewBot (s_Services, Servbot.user, Servbot.host, rname, UMODE_SERVICES);
 	me.onchan = 1;
 	AddStringToList (&av, me.uplink, &ac);
-	Module_Event ("ONLINE", av, ac);
+	Module_Event (EVENT_ONLINE, av, ac);
 	free (av);
 	ac = 0;
 	AddStringToList (&av, s_Services, &ac);
-	Module_Event ("SIGNON", av, ac);
+	Module_Event (EVENT_SIGNON, av, ac);
 	free (av);
-
 }
 
+/** @brief dopong
+ *
+ * 
+ *
+ * @return none
+ */
 void
 dopong (Server * s)
 {
 	char **av;
 	int ac = 0;
+	
 	if (s) {
-		s->ping = time (NULL) - ping.last_sent;
+		s->ping = me.now - ping.last_sent;
 		if (ping.ulag > 1)
 			s->ping -= (float) ping.ulag;
 		if (!strcmp (me.s->name, s->name))
 			ping.ulag = me.s->ping;
 		AddStringToList (&av, s->name, &ac);
-		Module_Event ("PONG", av, ac);
+		Module_Event (EVENT_PONG, av, ac);
 		free (av);
 	} else {
 		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", recbuf);
 	}
 }
 
-
-
+/** @brief flood
+ *
+ * 
+ *
+ * @return 
+ */
 int
 flood (User * u)
 {
-	time_t current = time (NULL);
+	time_t current = me.now;
 
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, Can't find user for FLOODcheck");
@@ -450,7 +481,7 @@ flood (User * u)
 	if (UserLevel (u) >= 40)	/* locop or higher */
 		return 0;
 	if (current - u->t_flood > 10) {
-		u->t_flood = time (NULL);
+		u->t_flood = me.now;
 		u->flood = 0;
 		return 0;
 	}
@@ -464,22 +495,28 @@ flood (User * u)
 	return 0;
 }
 
-/* Display our MOTD Message of the Day from the external neostats.motd file */
+/** @brief Display our MOTD Message of the Day from the external neostats.motd file 
+ *
+ * 
+ *
+ * @return 
+ */
 void
 ShowMOTD (char *nick)
 {
 	FILE *fp;
 	char buf[BUFSIZE];
+
 	SET_SEGV_LOCATION();
 	snumeric_cmd (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
-	snumeric_cmd (RPL_MOTD, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
+	snumeric_cmd (RPL_MOTD, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
 	snumeric_cmd (RPL_MOTD, nick, ":-");
 
-	fp = fopen ("neostats.motd", "r");
+	fp = fopen (MOTD_FILENAME, "r");
 
 	if (fp) {
 		while (fgets (buf, sizeof (buf), fp)) {
-			buf[strlen (buf) - 1] = 0;
+			buf[strnlen (buf, BUFSIZE) - 1] = 0;
 			snumeric_cmd (RPL_MOTD, nick, ":- %s", buf);
 		}
 		fclose (fp);
@@ -489,8 +526,12 @@ ShowMOTD (char *nick)
 	snumeric_cmd (RPL_ENDOFMOTD, nick, ":End of /MOTD command.");
 }
 
-
-/* Display the ADMIN Message from the external stats.admin file */
+/** @brief Display the ADMIN Message from the external stats.admin file
+ *
+ * 
+ *
+ * @return 
+ */
 void
 ShowADMIN (char *nick)
 {
@@ -499,13 +540,13 @@ ShowADMIN (char *nick)
 	SET_SEGV_LOCATION();
 
 	snumeric_cmd (RPL_ADMINME, nick, ":- %s NeoStats Admins -", me.name);
-	snumeric_cmd (RPL_ADMINME, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
+	snumeric_cmd (RPL_ADMINME, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
 
-	fp = fopen ("stats.admin", "r");
+	fp = fopen (ADMIN_FILENAME, "r");
 
 	if (fp) {
 		while (fgets (buf, sizeof (buf), fp)) {
-			buf[strlen (buf) - 1] = 0;
+			buf[strnlen (buf, BUFSIZE) - 1] = 0;
 			snumeric_cmd (RPL_ADMINLOC1, nick, ":- %s", buf);
 		}
 		fclose (fp);
@@ -513,12 +554,17 @@ ShowADMIN (char *nick)
 	snumeric_cmd (RPL_ADMINLOC2, nick, ":End of /ADMIN command.");
 }
 
-
+/** @brief 
+ *
+ * 
+ *
+ * @return 
+ */
 void
 Showcredits (char *nick)
 {
 	SET_SEGV_LOCATION();
-	snumeric_cmd (RPL_VERSION, nick, ":- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, version);
+	snumeric_cmd (RPL_VERSION, nick, ":- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, ircd_version);
 	snumeric_cmd (RPL_VERSION, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
 	snumeric_cmd (RPL_VERSION, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
 	snumeric_cmd (RPL_VERSION, nick, ":- irc.irc-chat.net #NeoStats");
@@ -540,6 +586,12 @@ Showcredits (char *nick)
 	snumeric_cmd (RPL_VERSION, nick, ":- Blud - Giving us patches for Mystic IRCd");
 }
 
+/** @brief 
+ *
+ * 
+ *
+ * @return 
+ */
 void
 ShowStats (char *what, User * u)
 {
@@ -557,7 +609,7 @@ ShowStats (char *what, User * u)
 	SET_SEGV_LOCATION();
 	if (!strcasecmp (what, "u")) {
 		/* server uptime - Shmad */
-		int uptime = time (NULL) - me.t_start;
+		int uptime = me.now - me.t_start;
 		snumeric_cmd (RPL_STATSUPTIME, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 	} else if (!strcasecmp (what, "c")) {
 		/* Connections */
@@ -576,8 +628,8 @@ ShowStats (char *what, User * u)
 			snumeric_cmd (RPL_STATSOLINE, u->nick, "Operators think they are God, but you and I know they are not!");
 	} else if (!strcasecmp (what, "l")) {
 		/* Port Lists */
-		tmp = time (NULL) - me.lastmsg;
-		tmp2 = time (NULL) - me.t_start;
+		tmp = me.now - me.lastmsg;
+		tmp2 = me.now - me.t_start;
 		snumeric_cmd (RPL_STATSLINKINFO, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
 		snumeric_cmd (RPL_STATSLLINE, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes, me.RcveM, me.RcveBytes, tmp2, tmp);
 	} else if (!strcasecmp (what, "M")) {

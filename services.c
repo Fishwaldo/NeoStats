@@ -28,12 +28,15 @@
 #include "stats.h"
 #include "dl.h"
 #include "log.h"
+#include "sock.h"
 
+static char quitmsg[BUFSIZE];
+static char no_reason[]="no reason given";
 
 static void ns_reload (User * u, char *reason);
 static void ns_logs (User * u);
 static void ns_jupe (User * u, char * server);
-void ns_debug_to_coders (char * u);
+void ns_set_debug (char * u);
 #ifdef USE_RAW
 static void ns_raw (User * u, char * message);
 #endif
@@ -95,13 +98,13 @@ servicesbot (char *nick, char **av, int ac)
 			 && (UserLevel (u) >= 180))
 			privmsg_list (nick, s_Services, ns_modlist_help);
 		else if (!strcasecmp (av[2], "USERDUMP")
-			 && (UserLevel (u) >= 180) && (me.coder_debug))
+			 && (UserLevel (u) >= 180) && (me.debug_mode))
 			privmsg_list (nick, s_Services, ns_userdump_help);
 		else if (!strcasecmp (av[2], "CHANDUMP")
-			 && (UserLevel (u) >= 180) && (me.coder_debug))
+			 && (UserLevel (u) >= 180) && (me.debug_mode))
 			privmsg_list (nick, s_Services, ns_chandump_help);
 		else if (!strcasecmp (av[2], "SERVERDUMP")
-			 && (UserLevel (u) >= 180) && (me.coder_debug))
+			 && (UserLevel (u) >= 180) && (me.debug_mode))
 			privmsg_list (nick, s_Services, ns_serverdump_help);
 		else if (!strcasecmp (av[2], "JUPE")
 			 && (UserLevel (u) >= 180))
@@ -140,7 +143,7 @@ servicesbot (char *nick, char **av, int ac)
 			return;
 		}
 		rval = load_module (av[2], u);
-		if (rval > -1) {
+		if (rval == NS_SUCCESS) {
 			chanalert (s_Services, "%s Loaded Module %s", u->nick, av[2]);
 		} else {
 			chanalert (s_Services, "%s Tried to Load Module %s, but Failed", u->nick, av[2]);
@@ -254,9 +257,9 @@ servicesbot (char *nick, char **av, int ac)
 			prefmsg (u->nick, s_Services, "Permission Denied, you need to be authorised to Enable Debug Mode!");
 			return;
 		}
-		ns_debug_to_coders (u->nick);
+		ns_set_debug (u->nick);
 	} else if (!strcasecmp (av[1], "USERDUMP")) {
-		if (!me.coder_debug) {
+		if (!me.debug_mode) {
 			prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 			return;
 		}
@@ -266,7 +269,7 @@ servicesbot (char *nick, char **av, int ac)
 			ns_user_dump (u, av[2]);
 		}
 	} else if (!strcasecmp (av[1], "CHANDUMP")) {
-		if (!me.coder_debug) {
+		if (!me.debug_mode) {
 			prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 			return;
 		}
@@ -276,7 +279,7 @@ servicesbot (char *nick, char **av, int ac)
 			ns_chan_dump (u, av[2]);
 		}
 	} else if (!strcasecmp (av[1], "SERVERDUMP")) {
-		if (!me.coder_debug) {
+		if (!me.debug_mode) {
 			prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 			return;
 		}
@@ -302,40 +305,28 @@ servicesbot (char *nick, char **av, int ac)
 	}
 }
 
-
 void
 ns_shutdown (User * u, char *reason)
 {
-	char quitmsg[255];
-	char *no_reason="no reason given";
-
 	SET_SEGV_LOCATION();
-	globops (s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, (reason ? reason : no_reason));
-	snprintf (quitmsg, 255, "%s requested SHUTDOWN: %s", u->nick, (reason ? reason : no_reason));
-	nlog (LOG_NOTICE, LOG_CORE, "%s [%s](%s) requested SHUTDOWN for %s.", u->nick, u->username, u->hostname,(reason ? reason : no_reason));
-	unload_modules(u);
-	squit_cmd (s_Services, quitmsg);
-	ssquit_cmd (me.name);
-	sleep (1);
-	close (servsock);
-	do_exit (NS_EXIT_NORMAL);
+	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
+		u->nick, u->username, u->hostname,(reason ? reason : no_reason));
+	globops (s_Services, quitmsg);
+	nlog (LOG_NOTICE, LOG_CORE, quitmsg);
+
+	do_exit (NS_EXIT_NORMAL, quitmsg);
 }
 
 static void
 ns_reload (User * u, char *reason)
 {
-	char quitmsg[255];
-
 	SET_SEGV_LOCATION();
-	globops (s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
-	snprintf (quitmsg, 255, "%s requested RELOAD: %s", u->nick, reason);
-	nlog (LOG_NOTICE, LOG_CORE, "%s requested RELOAD. -> reason", u->nick);
-	unload_modules(u);
-	squit_cmd (s_Services, quitmsg);
-	ssquit_cmd (me.name);
-	sleep (5);
-	close (servsock);
-	do_exit (NS_EXIT_RESTART);
+	ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested RELOAD for %s.", 
+		u->nick, u->username, u->hostname, (reason ? reason : no_reason));
+	globops (s_Services, quitmsg);
+	nlog (LOG_NOTICE, LOG_CORE, quitmsg);
+
+	do_exit (NS_EXIT_RELOAD, quitmsg);
 }
 
 static void
@@ -345,7 +336,7 @@ ns_logs (User * u)
 	prefmsg (u->nick, s_Services, "This command is disabled while in DEBUG.");
 #else
 	FILE *fp;
-	char buf[512];
+	char buf[BUFSIZE];
 
 	SET_SEGV_LOCATION();
 	fp = fopen ("logs/NeoStats.log", "r");
@@ -353,9 +344,9 @@ ns_logs (User * u)
 		prefmsg (u->nick, s_Services, "Unable to open neostats.log");
 		return;
 	}
-	while (fgets (buf, sizeof (buf), fp)) {
+	while (fgets (buf, BUFSIZE, fp)) {
 		buf[strlen (buf)] = '\0';
-		prefmsg (u->nick, s_Services, "%s", buf);
+		prefmsg (u->nick, s_Services, buf);
 	}
 	fclose (fp);
 #endif
@@ -366,7 +357,7 @@ ns_jupe (User * u, char *server)
 {
 	char infoline[255];
 	SET_SEGV_LOCATION();
-	snprintf (infoline, 255, "[Jupitered by %s]", u->nick);
+	ircsnprintf (infoline, 255, "[Jupitered by %s]", u->nick);
 	sserver_cmd (server, 1, infoline);
 	nlog (LOG_NOTICE, LOG_CORE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, server);
 	chanalert (s_Services, "%s Wants to JUPE this Server %s", u->nick, server);
@@ -374,11 +365,11 @@ ns_jupe (User * u, char *server)
 }
 
 void
-ns_debug_to_coders (char *u)
+ns_set_debug (char *u)
 {
 	SET_SEGV_LOCATION();
-	if (!me.coder_debug) {
-		me.coder_debug = 1;
+	if (!me.debug_mode) {
+		me.debug_mode = 1;
 		if (u) {
 			globops (me.name, "\2DEBUG MODE\2 Activated by %s", u);
 			prefmsg (u, s_Services, "Debuging Mode Enabled!");
@@ -386,7 +377,7 @@ ns_debug_to_coders (char *u)
 			globops (me.name, "\2DEBUG MODE\3 Active");
 		}
 	} else {
-		me.coder_debug = 0;
+		me.debug_mode = 0;
 		if (!u) {
 			globops (me.name, "\2DEBUG MODE\2 Deactivated by %s", u);
 			prefmsg (u, s_Services, "Debuging Mode Disabled");
@@ -400,18 +391,10 @@ ns_debug_to_coders (char *u)
 static void
 ns_raw (User * u, char *message)
 {
-	int sent;
 	SET_SEGV_LOCATION();
 	chanalert (s_Services, "\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)", u->nick, message);
 	nlog (LOG_INFO, LOG_CORE, "RAW COMMAND %sIssued a Raw Command!(%s)", u->nick, message);
-	strcat (message, "\n");
-	sent = write (servsock, message, strlen (message));
-	if (sent == -1) {
-		nlog (LOG_CRITICAL, LOG_CORE, "Write error.");
-		do_exit (NS_EXIT_NORMAL);
-	}
-	me.SendM++;
-	me.SendBytes = me.SendBytes + sent;
+	sts(message);
 }
 #endif
 static void
@@ -450,7 +433,7 @@ ns_chan_dump (User * u, char *chan)
 static void
 ns_uptime (User * u)
 {
-	int uptime = time (NULL) - me.t_start;
+	int uptime = me.now - me.t_start;
 
 	SET_SEGV_LOCATION();
 	prefmsg (u->nick, s_Services, "%s Information:", s_Services);
@@ -468,7 +451,7 @@ ns_uptime (User * u)
 	prefmsg (u->nick, s_Services, "Reconnect Time: %d", me.r_time);
 	prefmsg (u->nick, s_Services, "Statistic Requests: %d", me.requests);
 	prefmsg (u->nick, s_Services, "Max Sockets: %d (in use: %d)", me.maxsocks, me.cursocks);
-	if (me.coder_debug)
+	if (me.debug_mode)
 		prefmsg (u->nick, s_Services, "Debugging Mode is \2ON!\2");
 	else
 		prefmsg (u->nick, s_Services, "Debugging Mode is Disabled!");
@@ -479,6 +462,6 @@ ns_version (User * u)
 {
 	SET_SEGV_LOCATION();
 	prefmsg (u->nick, s_Services, "\2NeoStats Version Information\2");
-	prefmsg (u->nick, s_Services, "NeoStats Version: %d.%d.%d%s", MAJOR, MINOR, REV, version);
+	prefmsg (u->nick, s_Services, "NeoStats Version: %d.%d.%d%s", MAJOR, MINOR, REV, ircd_version);
 	prefmsg (u->nick, s_Services, "http://www.neostats.net");
 }

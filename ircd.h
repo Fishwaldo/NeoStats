@@ -23,6 +23,8 @@
 #ifndef IRCD_H
 #define IRCD_H
 
+#define MAX_CMD_LINE_LENGTH		350
+
 typedef struct {
 	char *name;
 	void (*function) (char *origin, char **argv, int argc);

@@ -1,15 +1,17 @@
-# Makefile for GeoStats
-# GeoStats CVS Identification
+# Makefile for NeoStats
+# NeoStats CVS Identification
 # $Id: Makefile.in 581 2003-09-20 08:44:59Z Fish $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
 
 OBJS =	dns.o chans.o dotconf.o services.o main.o sock.o conf.o ircd.o timer.o \
-		 users.o ns_help.o dl.o list.o hash.o server.o keeper.o log.o \
+		 users.o ns_help.o dl.o list.o hash.o server.o keeper.o log.o misc.o \
+		 support.o ircstring.o \
 		 @IRCD_FILES_OBJS@
 SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
-		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c \
+		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
+		support.c ircstring.c \
 		@IRCD_FILES_SRC@
 
 PROGS = neostats cronchk makeconf
@@ -20,7 +22,8 @@ DOCS_PROGS = doc/read-faq doc/read-userman
 DATA = data/tlds.nfo
 INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h Unreal.h \
 		adns/adns.h hybrid7.h neoircd.h conf.h log.h Bahamut.h \
-		Ircu.h mystic.h QuantumIRCd.h sock.h ircd.h
+		Ircu.h mystic.h QuantumIRCd.h sock.h ircd.h \
+		support.h ircstring.h events.h
 BUILDFILES = configure *.in adns/Makefile adns/config.h.in dl/Makefile \
 		dl/modules.txt RELNOTES install-sh neoircd.c neoircd.h \
 		hybrid7.c hybrid7.h Ultimate.c Ultimate.h Unreal.c Unreal.h \
@@ -70,7 +73,9 @@ neostats: $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) adns/libadns.a keeper/libkeeper.a -o $@
 
 install: neostats modules
-	#@rm -rf @prefix@/dl/*.so
+	@rm -rf @prefix@/dl/cs.so
+	@rm -rf @prefix@/dl/ms.so
+	@rm -rf @prefix@/dl/SecureServ.so
 	$(INSTALL) -m 755 -d @prefix@
 	$(INSTALL) -m 755 -d @prefix@/dl
 	$(INSTALL) -m 755 -d @prefix@/include

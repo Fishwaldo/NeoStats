@@ -59,7 +59,6 @@ static config_option options[] = {
 	{"SERVER_NUMERIC", ARG_STR, cb_Server, 15},
 };
 
-
 /** @brief initialize the configuration parser
  *
  * Currently does nothing
@@ -72,32 +71,12 @@ init_conf ()
 {
 }
 
-/** @brief strip newlines carriage returns
- *
- * removes newlines and carriage returns from a string
- *
- * @param line the line to strip (warning, Modfied!)
- * @retval line the stripped line
- */
-
-void
-strip (char *line)
-{
-	char *c;
-	if ((c = strchr (line, '\n')))
-		*c = '\0';
-	if ((c = strchr (line, '\r')))
-		*c = '\0';
-}
-
-
 /** @brief Load the Config file
  *
  * Parses the Configuration File and optionally loads the external authentication libary
  *
  * @returns Nothing
  */
-
 
 int
 ConfLoad ()
@@ -144,6 +123,7 @@ void
 cb_Module (char *arg, int configtype)
 {
 	int i;
+
 	SET_SEGV_LOCATION();
 	if (!config.modnoload) {
 		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
@@ -165,7 +145,7 @@ cb_Module (char *arg, int configtype)
  */
 
 int
-init_modules ()
+ConfLoadModules ()
 {
 	int i;
 	int rval;
@@ -175,7 +155,7 @@ init_modules ()
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
 		nlog (LOG_DEBUG1, LOG_CORE, "Loading Module %s", load_mods[i]);
 		rval = load_module (load_mods[i], NULL);
-		if (rval > -1) {
+		if (rval == NS_SUCCESS) {
 			nlog (LOG_NORMAL, LOG_CORE, "Successfully Loaded Module %s", load_mods[i]);
 		} else {
 			nlog (LOG_WARNING, LOG_CORE, "Could Not Load Module %s, Please check above error Messages", load_mods[i]);
@@ -194,49 +174,49 @@ init_modules ()
  * @param configtype the index of the variable being called now
  * @returns Nothing
  */
+
 void
 cb_Server (char *arg, int configtype)
 {
-
 	if (configtype == 0) {
 		/* Server name */
-		memcpy (me.name, arg, sizeof (me.name));
+		strlcpy (me.name, arg, sizeof (me.name));
 	} else if (configtype == 1) {
 		/* Server Port */
 		me.port = atoi (arg);
 	} else if (configtype == 2) {
 		/* Connect To */
-		memcpy (me.uplink, arg, sizeof (me.uplink));
+		strlcpy (me.uplink, arg, sizeof (me.uplink));
 	} else if (configtype == 3) {
 		/* Connect Pass */
-		memcpy (me.pass, arg, sizeof (me.pass));
+		strlcpy (me.pass, arg, sizeof (me.pass));
 	} else if (configtype == 4) {
 		/* Server InfoLine */
-		memcpy (me.infoline, arg, sizeof (me.infoline));
+		strlcpy (me.infoline, arg, sizeof (me.infoline));
 	} else if (configtype == 5) {
 		/* NetName */
-		memcpy (me.netname, arg, sizeof (me.netname));
+		strlcpy (me.netname, arg, sizeof (me.netname));
 	} else if (configtype == 6) {
 		/* Reconnect time */
 		me.r_time = atoi (arg);
 	} else if (configtype == 7) {
 		/* NeoStat Host */
-		memcpy (Servbot.host, arg, sizeof (Servbot.host));
+		strlcpy (Servbot.host, arg, sizeof (Servbot.host));
 	} else if (configtype == 8) {
 		/* NeoStat User */
-		memcpy (Servbot.user, arg, sizeof (Servbot.user));
+		strlcpy (Servbot.user, arg, sizeof (Servbot.user));
 	} else if (configtype == 9) {
 		me.want_privmsg = 1;
 	} else if (configtype == 10) {
-		memcpy (me.chan, arg, sizeof (me.chan));
+		strlcpy (me.chan, arg, sizeof (me.chan));
 	} else if (configtype == 11) {
 		me.onlyopers = 1;
 	} else if (configtype == 12) {
 		me.die = 1;
 	} else if (configtype == 13) {
-		memcpy (me.local, arg, sizeof (me.local));
+		strlcpy (me.local, arg, sizeof (me.local));
 	} else if (configtype == 14) {
-		strncpy(LogFileNameFormat,arg,MAX_LOGFILENAME);
+		strlcpy(LogFileNameFormat,arg,MAX_LOGFILENAME);
 	} else if (configtype == 15) {
 		me.numeric = atoi (arg);
 		/* limit value - really need to print error and quit */
@@ -247,7 +227,6 @@ cb_Server (char *arg, int configtype)
 	}
 
 }
-
 
 /** @brief Rehash Function
  *

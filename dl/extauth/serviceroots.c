@@ -130,16 +130,16 @@ void sr_cb_config(char *arg, int configtype)
 				user = strtok(NULL, "@");
 				host = strtok(NULL, "");
 				sru = malloc(sizeof(users));
-				strncpy(sru->nick, nick, MAXNICK);
-				strncpy(sru->ident, user, MAXUSER);
-				strncpy(sru->host, host, MAXHOST);
+				strlcpy(sru->nick, nick, MAXNICK);
+				strlcpy(sru->ident, user, MAXUSER);
+				strlcpy(sru->host, host, MAXHOST);
 				sru->lvl = 200;
 			} else {
 				/* old format... Warn, but keep going */
 				sru = malloc(sizeof(users));
-				strncpy(sru->nick, arg, MAXNICK);
-				strncpy(sru->ident, "*", MAXUSER);
-				strncpy(sru->host, "*", MAXHOST);
+				strlcpy(sru->nick, arg, MAXNICK);
+				strlcpy(sru->ident, "*", MAXUSER);
+				strlcpy(sru->host, "*", MAXHOST);
 				sru->lvl = 200;
 				nlog(LOG_WARNING, LOG_CORE,
 				     "Old ServiceRoots Entry Detected. Suggest you upgrade ASAP to <nick>!<ident>@<host> (WildCards are allowed)");

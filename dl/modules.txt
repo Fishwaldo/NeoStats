@@ -129,7 +129,7 @@ We also have a table for any events on IRC that we wish to process. This
 is optional.
 
 EventFnList __module_events[] = {
-	{ "ONLINE", 	Online},
+	{ EVENT_ONLINE, 	Online},
 	{ NULL, 	NULL}
 };
 

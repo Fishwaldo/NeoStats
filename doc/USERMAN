@@ -959,7 +959,7 @@ KISS        Give someone on IRC a kiss
 TONSIL      Give someone on IRC a tonsil kiss
 HUG         Give someone on IRC a hug
 ADMIRER     Tell someone on IRC they have a secret admirer
-CHOCOLATE   Give someone on chocolate
+CHOCOLATE   Give someone on IRC chocolate
 CANDY       Give someone on IRC candy
 LOVENOTE    Give someone on IRC a love note
 APOLOGY     Give someone on IRC an apology
@@ -994,7 +994,7 @@ Example:
 Syntax: 
     /msg LoveServ KISS <nick>
 Description: 
-Send a kiss to that special someone on IRC.
+    Send a kiss to that special someone on IRC.
 Example: 
     /msg LoveServ KISS Angel
 

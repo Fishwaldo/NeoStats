@@ -26,6 +26,7 @@
 */
 
 #include <fcntl.h>
+#include <sys/poll.h>
 #include "stats.h"
 #include "dl.h"
 #include <adns.h>
@@ -42,7 +43,8 @@ static int dobind;
  * @param host to connect to
  * @param port on remote host to connect to
  * 
- * @return the socket connected to on success, or -1 on failure 
+ * @return socket connected to on success
+ *         NS_FAILURE on failure 
  */
 int
 ConnectTo (char *host, int port)
@@ -54,7 +56,7 @@ ConnectTo (char *host, int port)
 	dobind = 0;
 	/* bind to a local ip */
 	memset (&lsa, 0, sizeof (lsa));
-	if (strlen (me.local) > 1) {
+	if (me.local[0] != 0) {
 		if ((hp = gethostbyname (me.local)) == NULL) {
 			nlog (LOG_WARNING, LOG_CORE, "Warning, Couldn't bind to IP address %s", me.local);
 		} else {
@@ -64,20 +66,17 @@ ConnectTo (char *host, int port)
 		}
 	}
 
-
-
 	if ((hp = gethostbyname (host)) == NULL) {
-		return (-1);
+		return NS_FAILURE;
 	}
 
 	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0)
-		return (-1);
+		return NS_FAILURE;
 	if (dobind > 0) {
 		if (bind (s, (struct sockaddr *) &lsa, sizeof (lsa)) < 0) {
 			nlog (LOG_WARNING, LOG_CORE, "bind(): Warning, Couldn't bind to IP address %s", strerror (errno));
 		}
 	}
-
 
 	bzero (&sa, sizeof (sa));
 	sa.sin_family = AF_INET;
@@ -86,7 +85,7 @@ ConnectTo (char *host, int port)
 
 	if (connect (s, (struct sockaddr *) &sa, sizeof (sa)) < 0) {
 		close (s);
-		return (-1);
+		return NS_FAILURE;
 	}
 
 	return s;
@@ -107,31 +106,57 @@ read_loop ()
 	char c;
 	char buf[BUFSIZE];
 	Sock_List *mod_sock;
+	struct pollfd *ufds;
+	int pollsize, pollflag;
 	hscan_t ss;
 	hnode_t *sn;
 
 	TimeOut = malloc (sizeof (struct timeval));
+	ufds = malloc((sizeof *ufds) *  getmaxsock());
 
 	while (1) {
 		SET_SEGV_LOCATION();
 		memset (buf, '\0', BUFSIZE);
+		me.now = time(NULL);
 		CheckTimers ();
 		SET_SEGV_LOCATION();
+		me.now = time(NULL);
 		FD_ZERO (&readfds);
 		FD_ZERO (&writefds);
 		FD_ZERO (&errfds);
+		memset(ufds, 0, (sizeof *ufds) * me.maxsocks);
+		pollsize = 0;
 		FD_SET (servsock, &readfds);
 		hash_scan_begin (&ss, sockh);
 		me.cursocks = 1;	/* always one socket for ircd */
 		while ((sn = hash_scan_next (&ss)) != NULL) {
 			mod_sock = hnode_get (sn);
-			if (mod_sock->readfnc)
-				FD_SET (mod_sock->sock_no, &readfds);
-			if (mod_sock->writefnc)
-				FD_SET (mod_sock->sock_no, &writefds);
-			if (mod_sock->errfnc)
-				FD_SET (mod_sock->sock_no, &errfds);
-			++me.cursocks;
+			if (mod_sock->socktype == SOCK_STANDARD) {
+				if (mod_sock->readfnc)
+					FD_SET (mod_sock->sock_no, &readfds);
+				if (mod_sock->writefnc)
+					FD_SET (mod_sock->sock_no, &writefds);
+				if (mod_sock->errfnc)
+					FD_SET (mod_sock->sock_no, &errfds);
+				++me.cursocks;
+			} else {
+				/* its a poll interface, setup for select instead */
+				j = mod_sock->beforepoll (mod_sock->data, ufds);
+				if (j > pollsize) pollsize = j;
+				/* run through the ufds set and translate to select FDSET's */
+				for (i = 0; i < j; i++) {
+					if (ufds[i].events & POLLIN) {
+						FD_SET (ufds[i].fd, &readfds);
+					}
+					if (ufds[i].events & POLLOUT) {
+						FD_SET (ufds[i].fd, &writefds);
+					}
+					if (ufds[i].events & POLLERR) {
+						FD_SET (ufds[i].fd, &errfds);
+					}
+					++me.cursocks;
+				}
+			}
 		}
 		/* adns stuff... whats its interested in */
 		adns_beforeselect (ads, &me.maxsocks, &readfds, &writefds, &errfds, &TimeOut, &tvbuf, 0);
@@ -139,11 +164,13 @@ read_loop ()
 		TimeOut->tv_sec = 1;
 		TimeOut->tv_usec = 0;
 		SelectResult = select (FD_SETSIZE, &readfds, &writefds, &errfds, TimeOut);
+		me.now = time(NULL);
 		if (SelectResult > 0) {
 			adns_afterselect (ads, me.maxsocks, &readfds, &writefds, &errfds, 0);
 
-			/* do and dns related callbacks now */
+			/* do any dns related callbacks now */
 			do_dns ();
+
 			if (FD_ISSET (servsock, &readfds)) {
 				for (j = 0; j < BUFSIZE; j++) {
 					i = read (servsock, &c, 1);
@@ -152,7 +179,7 @@ read_loop ()
 						buf[j] = c;
 						if ((c == '\n') || (c == '\r')) {
 							me.RcveM++;
-							me.lastmsg = time (NULL);
+							me.lastmsg = me.now;
 							if (config.recvlog)
 								recvlog (buf);
 							parse (buf);
@@ -166,37 +193,57 @@ read_loop ()
 			} else {
 				/* this checks if there is any data waiting on a socket for a module */
 				hash_scan_begin (&ss, sockh);
+				pollflag = 0;
 				while ((sn = hash_scan_next (&ss)) != NULL) {
 					mod_sock = hnode_get (sn);
 					SET_SEGV_INMODULE(mod_sock->modname);
-					if (FD_ISSET (mod_sock->sock_no, &readfds)) {
-						nlog (LOG_DEBUG3, LOG_CORE, "Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
-						if (mod_sock->readfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
-							continue;
-					}
-					if (FD_ISSET (mod_sock->sock_no, &writefds)) {
-						nlog (LOG_DEBUG3, LOG_CORE, "Running module %s writesock function for %s", mod_sock->modname, mod_sock->sockname);
-						if (mod_sock->writefnc (mod_sock->sock_no, mod_sock->sockname) < 0)
-							continue;
-					}
-					if (FD_ISSET (mod_sock->sock_no, &errfds)) {
-						nlog (LOG_DEBUG3, LOG_CORE, "Running module %s errorsock function for %s", mod_sock->modname, mod_sock->sockname);
-						if (mod_sock->errfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
-							continue;
+					if (mod_sock->socktype == SOCK_STANDARD) {
+						if (FD_ISSET (mod_sock->sock_no, &readfds)) {
+							nlog (LOG_DEBUG3, LOG_CORE, "Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
+							if (mod_sock->readfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
+								continue;
+						}
+						if (FD_ISSET (mod_sock->sock_no, &writefds)) {
+							nlog (LOG_DEBUG3, LOG_CORE, "Running module %s writesock function for %s", mod_sock->modname, mod_sock->sockname);
+							if (mod_sock->writefnc (mod_sock->sock_no, mod_sock->sockname) < 0)
+								continue;
+						}
+						if (FD_ISSET (mod_sock->sock_no, &errfds)) {
+							nlog (LOG_DEBUG3, LOG_CORE, "Running module %s errorsock function for %s", mod_sock->modname, mod_sock->sockname);
+							if (mod_sock->errfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
+								continue;
+						}
+					} else {
+						if (pollflag != 1) {
+							for (i = 0; i < pollsize; i++) {
+								if (FD_ISSET(ufds[i].fd, &readfds)) {
+									ufds[i].revents |= POLLIN;
+									pollflag = 1;
+								} 
+								if (FD_ISSET(ufds[i].fd, &writefds)) {
+									ufds[i].revents |= POLLOUT;
+									pollflag = 1;
+								} 
+								if (FD_ISSET(ufds[i].fd, &errfds)) {
+									ufds[i].revents |= POLLERR;
+									pollflag = 1;
+								}
+							}
+						}
+						if (pollflag == 1) {
+							mod_sock->afterpoll(mod_sock->data, ufds, pollsize);
+						}
 					}
 				}
 				CLEAR_SEGV_INMODULE();
 				continue;
 			}
 		} else if (SelectResult == 0) {
-			if ((time (NULL) - me.lastmsg) > 180) {
+			if ((me.now - me.lastmsg) > 180) {
 				/* if we havnt had a message for 3 minutes, more than likely, we are on a zombie server */
 				/* disconnect and try to reconnect */
-				unload_modules(NULL);
-				close (servsock);
-				sleep (5);
 				nlog (LOG_WARNING, LOG_CORE, "Eeek, Zombie Server, Reconnecting");
-				do_exit (NS_EXIT_RESTART);
+				return;
 			}
 		} else if (SelectResult == -1) {
 			if (errno != EINTR) {
@@ -219,6 +266,7 @@ getmaxsock ()
 {
 	struct rlimit *lim;
 	int ret;
+
 	lim = malloc (sizeof (struct rlimit));
 	getrlimit (RLIMIT_NOFILE, lim);
 	ret = lim->rlim_max;
@@ -236,10 +284,11 @@ static void
 recvlog (char *line)
 {
 	FILE *logfile;
+
 	if ((logfile = fopen (RECV_LOG, "a")) == NULL)
 		return;
 	if (logfile)
-		fprintf (logfile, "%s", line);
+		fprintf (logfile, line);
 	fclose (logfile);
 }
 
@@ -254,7 +303,8 @@ recvlog (char *line)
  * @param func_write write socket function
  * @param func_error socket error function
  * 
- * @return socket number if connect successful, -1 if unsuccessful
+ * @return socket number if connect successful
+ *         NS_FAILURE if unsuccessful
  */
 int
 sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error)
@@ -262,11 +312,10 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
 	struct sockaddr_in sa;
 	int s;
 	int i;
-/* socktype = SOCK_STREAM */
 
+	/* socktype = SOCK_STREAM */
 	if ((s = socket (AF_INET, socktype, 0)) < 0)
-		return (-1);
-
+		return NS_FAILURE;
 
 	/* bind to an IP address */
 	if (dobind > 0) {
@@ -284,7 +333,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
 
 	if ((i = fcntl (s, F_SETFL, O_NONBLOCK)) < 0) {
 		nlog (LOG_CRITICAL, LOG_CORE, "can't set socket %s(%s) non-blocking: %s", sockname, module, strerror (i));
-		return (-1);
+		return NS_FAILURE;
 	}
 
 	if ((i = connect (s, (struct sockaddr *) &sa, sizeof (sa))) < 0) {
@@ -294,7 +343,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
 		default:
 			nlog (LOG_WARNING, LOG_CORE, "Socket %s(%s) cant connect %s", sockname, module, strerror (errno), i);
 			close (s);
-			return (-1);
+			return NS_FAILURE;
 		}
 	}
 
@@ -306,7 +355,8 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
  *
  * @param name of socket to disconnect
  * 
- * @return 1 if disconnect successful, -1 if unsuccessful
+ * @return NS_SUCCESS if disconnect successful
+ *         NS_FAILURE if unsuccessful
  */
 int
 sock_disconnect (char *sockname)
@@ -319,11 +369,10 @@ sock_disconnect (char *sockname)
 	sock = findsock (sockname);
 	if (!sock) {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, Can not find Socket %s in list", sockname);
-		return (-1);
+		return NS_FAILURE;
 	}
 
 	/* the following code makes sure its a valid file descriptor */
-
 	FD_ZERO (&fds);
 	FD_SET (sock->sock_no, &fds);
 	tv.tv_sec = 0;
@@ -331,12 +380,12 @@ sock_disconnect (char *sockname)
 	i = select (1, &fds, NULL, NULL, &tv);
 	if (!i && errno == EBADF) {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, Bad File Descriptor %s in list", sockname);
-		return (-1);
+		return NS_FAILURE;
 	}
 	nlog (LOG_DEBUG3, LOG_CORE, "Closing Socket %s with Number %d", sockname, sock->sock_no);
 	close (sock->sock_no);
 	del_socket (sockname);
-	return (1);
+	return NS_SUCCESS;
 }
 
 /** @brief send to socket
@@ -349,24 +398,27 @@ void
 sts (char *fmt, ...)
 {
 	va_list ap;
-	char buf[512];
+	char buf[BUFSIZE];
 	int sent;
+	int buflen;
+
 	va_start (ap, fmt);
-	vsnprintf (buf, 512, fmt, ap);
+	ircvsnprintf (buf, BUFSIZE, fmt, ap);
+	va_end (ap);
 
 	nlog (LOG_DEBUG2, LOG_CORE, "SENT: %s", buf);
-	if(strlen (buf) < (512-2)) { 
-		strncat (buf, "\n", 512); 
-	} else { 
-		buf[512-1]=0; 
-		buf[512-2]='\n'; 
-	} 
-	sent = write (servsock, buf, strlen (buf));
+	if(strnlen (buf, BUFSIZE) < BUFSIZE - 2) {
+		strlcat (buf, "\n", BUFSIZE);
+	} else {
+		buf[BUFSIZE - 1] = 0;
+		buf[BUFSIZE - 2] = '\n';
+	}
+	buflen = strnlen (buf, BUFSIZE);
+	sent = write (servsock, buf, buflen);
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Write error: %s", strerror(errno));
-		do_exit (NS_EXIT_NORMAL);
+		do_exit (NS_EXIT_ERROR, NULL);
 	}
 	me.SendM++;
 	me.SendBytes = me.SendBytes + sent;
-	va_end (ap);
 }

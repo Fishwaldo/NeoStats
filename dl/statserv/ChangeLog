@@ -3,6 +3,12 @@ StatServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish (M) denotes Mark
+
+* Revision 791 * Oct 30th, 2003 (F)
+ - Channel stats are now dynamically loaded, and saved as needed. Not loaded into
+   memory at boot time. Should help large networks with lots of channels
+   that experience pingouts every 8 hours!
+
 * Version 3.10 * Sep 11th, 2003 (F)
  - Added clientstats to html output (F)
  - strip colors/underlines etc from client versions (F)

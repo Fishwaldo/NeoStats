@@ -1,7 +1,11 @@
 ConnectServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma^
 ==============================================================================
-* Version 1.8 * August 29, 2003
+* Version 1.9 * Mark (M) * November 1, 2003
+ - Message system cleanup (M)
+ - Nick change messages now include user@host for spotting nick flooders (M)
+
+* Version 1.8 * Fish (F) & Mark (M) * August 29, 2003
  - Colorized Output thanks to MrAllThat (F)
  - Now only compiles for Modes that are relevent (F)
  - Help text cleanup (M)

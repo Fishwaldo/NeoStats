@@ -47,6 +47,9 @@
 #include "list.h"
 #include "hash.h"
 #include "config.h"
+#include "support.h"
+#include "ircstring.h"
+#include "events.h"
 
 #if UNREAL == 1
 #include "Unreal.h"
@@ -100,18 +103,35 @@
   */
 #undef CODERHACK
 
-#define CHANLEN			50
-#define BUFSIZE			512
 #define CONFIG_NAME		"neostats.cfg"
 #define MOD_PATH		"dl"
 #define RECV_LOG		"logs/recv.log"
+#define MOTD_FILENAME	"neostats.motd"
+#define ADMIN_FILENAME	"stats.admin"
+#define PID_FILENAME	"neostats.pid"
+
+#define CHANLEN			50
+#define BUFSIZE			512
 #define MAXHOST			128
 #define MAXPASS			32
 #define MAXNICK			32
 #define MAXUSER			15
+#define MAXUSERWARN		8
 #define MAXREALNAME		50
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
+
+/* MAXPATH 
+ * used to determine buffer sizes for file system operations
+ */
+#ifndef MAXPATH
+#define MAXPATH			1024
+#endif /* MAXPATH */
+
+/* TIMEBUFSIZE
+ * used to determine buffer sizes for time formatting buffers
+ */
+#define TIMEBUFSIZE		80
 
 /* MAX_MOD_NAME
    ModuleInfo will allow any length since it is merely a char *
@@ -151,10 +171,12 @@
 #define NS_ERROR_xxx		-2
 
 /* do_exit call exit type definitions */
-enum {
+typedef enum {
 	NS_EXIT_NORMAL=0,
+	NS_EXIT_RELOAD,
+	NS_EXIT_RECONNECT,
+	NS_EXIT_ERROR,
 	NS_EXIT_SEGFAULT,
-	NS_EXIT_RESTART,
 }NS_EXIT_TYPE;
 
 #define SEGV_LOCATION_BUFSIZE	255
@@ -163,24 +185,34 @@ enum {
 #define SET_SEGV_LOCATION_EXTRA(debug_text)
 #define CLEAR_SEGV_LOCATION()
 #else
-#define SET_SEGV_LOCATION() snprintf(segv_location,SEGV_LOCATION_BUFSIZE,"%s %d %s", __FILE__, __LINE__, __PRETTY_FUNCTION__); 
-#define SET_SEGV_LOCATION_EXTRA(debug_text) snprintf(segv_location,SEGV_LOCATION_BUFSIZE,"%s %d %s %s", __FILE__, __LINE__, __PRETTY_FUNCTION__,(debug_text)); 
+#define SET_SEGV_LOCATION() ircsnprintf(segv_location,SEGV_LOCATION_BUFSIZE,"%s %d %s", __FILE__, __LINE__, __PRETTY_FUNCTION__); 
+#define SET_SEGV_LOCATION_EXTRA(debug_text) ircsnprintf(segv_location,SEGV_LOCATION_BUFSIZE,"%s %d %s %s", __FILE__, __LINE__, __PRETTY_FUNCTION__,(debug_text)); 
 #define CLEAR_SEGV_LOCATION() segv_location[0]='\0';
 #endif
 
 #define SEGV_INMODULE_BUFSIZE	MAX_MOD_NAME
-#define SET_SEGV_INMODULE(module_name) strncpy(segv_inmodule,(module_name),SEGV_INMODULE_BUFSIZE);
+#define SET_SEGV_INMODULE(module_name) strlcpy(segv_inmodule,(module_name),SEGV_INMODULE_BUFSIZE);
 #define CLEAR_SEGV_INMODULE() segv_inmodule[0]='\0';
 
 /* temporary define while module settings are ported to macro system */
 #define segvinmodule segv_inmodule
 
+/* macros to provide a couple missing string functions for code legibility 
+ * and to ensure we perform these operations in a standard and optimal manner
+ */
+/* set a string to NULL */
+#define strsetnull(str) (str)[0] = 0
+/* test a string for NULL */
+#define strisnull(str)  ((str) && (str)[0] == 0)
+
+#define ARRAY_COUNT (a) ((sizeof ((a)) / sizeof ((a)[0]))
+
 int servsock;
 extern char s_Services[MAXNICK];
-extern const char version[];
+extern const char ircd_version[];
 char recbuf[BUFSIZE];
 char segv_location[SEGV_LOCATION_BUFSIZE];
-char segvinmodule[SEGV_INMODULE_BUFSIZE];
+char segv_inmodule[SEGV_INMODULE_BUFSIZE];
 jmp_buf sigvbuf;
 
 hash_t *sh;
@@ -193,12 +225,22 @@ adns_state ads;
 /* version info */
 extern const char version_date[], version_time[];
 
-typedef struct server_ Server;
-typedef struct user_ User;
-typedef struct chans_ Chans;
-typedef struct chanmem_ Chanmem;
-typedef struct modeparms_ ModesParm;
+/** @brief Server structure
+ *  structure containing all details of a server
+ */
+typedef struct Server {
+	char name[MAXHOST];
+	int hops;
+	long hash;
+	time_t connected_since;
+	int ping;
+	char uplink[MAXHOST];
+	void *moddata[NUM_MODULES];
+} Server;
 
+/** @brief me structure
+ *  structure containing information about the neostats core
+ */
 struct me {
 	char name[MAXHOST];
 	int port;
@@ -221,7 +263,7 @@ struct me {
 	unsigned int die:1;
 	unsigned int collisions;
 	unsigned int enable_proxy:1;
-	unsigned int coder_debug:1;
+	unsigned int debug_mode:1;
 	unsigned int noticelag:1;
 	unsigned int token:1;
 #if defined(ULTIMATE3) || defined(QUANTUM)
@@ -240,27 +282,21 @@ struct me {
 	long RcveBytes;
 	time_t lastmsg;
 	int pingtime;
+	time_t now;
 } me;
 
-
+/** @brief Servbot structure
+ *  
+ */
 struct Servbot {
 	char user[MAXUSER];
 	char host[MAXHOST];
 } Servbot;
 
-
-
-struct server_ {
-	char name[MAXHOST];
-	int hops;
-	long hash;
-	time_t connected_since;
-	int ping;
-	char uplink[MAXHOST];
-	void *moddata[NUM_MODULES];
-};
-
-struct user_ {
+/** @brief User structure
+ *  
+ */
+typedef struct User {
 	char nick[MAXNICK];
 	char hostname[MAXHOST];
 	char username[MAXUSER];
@@ -279,41 +315,40 @@ struct user_ {
 	time_t TS;
 	long Smode;
 	void *moddata[NUM_MODULES];
-};
+} User;
 
-struct chans_ {
+/** @brief Chans structure
+ *  
+ */
+typedef struct Chans {
 	char name[CHANLEN];
 	long cur_users;
 	long modes;
 	list_t *chanmembers;
 	list_t *modeparms;
 	char topic[BUFSIZE];
-	char topicowner[MAXHOST];	/* becuase a "server" can be a topic owner */
+	char topicowner[MAXHOST];	/* because a "server" can be a topic owner */
 	time_t topictime;
 	void *moddata[NUM_MODULES];
 	time_t tstime;
-} chans_;
+} Chans;
 
-struct chanmem_ {
-	char nick[MAXNICK];
-	time_t joint;
-	long flags;
-	void *moddata[NUM_MODULES];
-} chanmem_;
-
-struct modeparms_ {
+/** @brief ModesParm structure
+ *  
+ */
+typedef struct ModesParm {
 	long mode;
 	char param[PARAMSIZE];
 	void *moddata[NUM_MODULES];
-} modeparms_;
+} ModesParm;
 
-
+/** @brief ping structure
+ *  
+ */
 struct ping {
 	time_t last_sent;
 	int ulag;
 } ping;
-
-
 
 /* sock.c */
 int ConnectTo (char * host, int port);
@@ -323,21 +358,28 @@ int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, 
 int sock_disconnect (char *sockname);
 
 /* conf.c */
-void strip (char * line);
 int ConfLoad (void);
 void rehash (void);
-int init_modules (void);
+int ConfLoadModules (void);
 
 /* main.c */
-void do_exit (int exitcode);
+void do_exit (NS_EXIT_TYPE exitcode, char* quitmsg);
+void fatal_error(char* file, int line, char* func, char* error_text);
+#define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__,(error_text)); 
+
+
+/* misc.c */
+void strip (char * line);
 void *smalloc (long size);
 char *sstrdup (const char * s);
 char *strlower (char * s);
+char *strlwr (char * s);
 void AddStringToList (char ***List, char S[], int *C);
 void FreeList (char **List, int C);
 void strip_mirc_codes(char *text);
 char *sctime (time_t t);
 char *sftime (time_t t);
+void debugtochannel(char *message, ...);
 
 /* ircd.c */
 void parse (char* line);
@@ -366,7 +408,6 @@ void AddUser (const char *nick, const char *user, const char *host, const char *
 void DelUser (const char *nick);
 void AddRealName (const char *nick, const char *realname);
 void Change_User (User *u, const char * newnick);
-void sendcoders (char *message, ...);
 User *finduser (const char *nick);
 void UserDump (char *nick);
 void part_u_chan (list_t *list, lnode_t *node, void *v);
@@ -412,7 +453,7 @@ extern const char *ns_info_help[];
 
 /* services.c */
 void servicesbot (char *nick, char **av, int ac);
-void ns_debug_to_coders (char *u);
+void ns_set_debug (char *u);
 void ns_shutdown (User * u, char *reason);
 
 /* chans.c */

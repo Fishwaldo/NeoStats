@@ -31,6 +31,10 @@
 #include "statserv.h"
 #include "log.h"
 
+/* define this if you want the old database format.... but beware, its slow */
+#undef OLDDATABASE
+
+
 void LoadOldStats();
 
 void SaveStats()
@@ -40,6 +44,7 @@ void SaveStats()
 	hnode_t *sn;
 	lnode_t *cn;
 	hscan_t ss;
+	int count, limit;
 	SET_SEGV_LOCATION();
 
 	if (StatServ.newdb == 1) {
@@ -47,9 +52,12 @@ void SaveStats()
 		StatServ.newdb = 0;
 	}
 
+	if (StatServ.shutdown == 1) {
+		chanalert(s_Services, "Saving StatServ Database. this *could* take a while");
+	}
 	/* first thing we do is clear the old database */
 	DelTable("ServerStats");
-	DelTable("ChanStats");
+	//DelTable("ChanStats");
 	DelTable("NetStats");
 	
 	/* ok, run through the server stats, and save them */
@@ -71,22 +79,30 @@ void SaveStats()
 	}
 
 	/* ok, Now Channel Stats */
-
+	count = 0;
+	/* we want to only do 25% each progressive save */
+	limit = (list_count(Chead)/4);
 	cn = list_first(Chead);
 	while (cn) {
 		c = lnode_get(cn);
+		/* we are not shutting down, so do progressive save if we have more than 100 channels */
+		if (StatServ.shutdown == 0 && (limit > 25)) {
+			if (count > limit) {
+				break;
+			}
+			/* calc is we save the entire database in the savedb interval plus 1/2 */
+			if ((me.now - c->lastsave) < PROGCHANTIME) {
+				cn = list_next(Chead, cn);
+				continue;
+			}
+			count++;
+		}
+/* we need to squeze as much performance out of this as we can */
+#if 0
 		nlog(LOG_DEBUG1, LOG_MOD,
-		     "Writting Statistics to database for %s", c->name);
-		SetData((void *)c->topics, CFGINT, "ChanStats", c->name, "Topics");
-		SetData((void *)c->totmem, CFGINT, "ChanStats", c->name, "TotalMems");
-		SetData((void *)c->kicks, CFGINT, "ChanStats", c->name, "Kicks");
-		SetData((void *)c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
-		SetData((void *)c->maxmems, CFGINT, "ChanStats", c->name, "MaxMems");
-		SetData((void *)c->t_maxmems, CFGINT, "ChanStats", c->name, "MaxMemsTime");
-		SetData((void *)c->maxkicks, CFGINT, "ChanStats", c->name, "MaxKicks");
-		SetData((void *)c->t_maxkicks, CFGINT, "ChanStats", c->name, "MaxKicksTime");
-		SetData((void *)c->maxjoins, CFGINT, "ChanStats", c->name, "MaxJoins");
-		SetData((void *)c->t_maxjoins, CFGINT, "ChanStats", c->name, "MaxJoinsTime");
+		     "Writting Statistics to database for %s (%d)", c->name, count);
+#endif
+		save_chan(c);
 		cn = list_next(Chead, cn);
 	}
 
@@ -101,17 +117,18 @@ void SaveStats()
 	SetData((void *)stats_network.totusers, CFGINT, "NetStats", "Global", "TotalUsers");
 	SetData((void *)stats_network.maxchans, CFGINT, "NetStats", "Global", "MaxChans");
 	SetData((void *)stats_network.t_chans, CFGINT, "NetStats", "Global", "MaxChansTime");
+	if (StatServ.shutdown == 1) {
+		chanalert(s_Services, "Done");
+	}
 }
 
 void LoadStats() {
 	SStats *s;
-	CStats *c;
-	char *name;
 	char **row;
 
 	hnode_t *sn;
-	lnode_t *cn;
 	int count;
+	
 	SET_SEGV_LOCATION();
 	Chead = list_create(SS_CHAN_SIZE);
 	Shead = hash_create(S_TABLE_SIZE, 0, 0);
@@ -138,7 +155,7 @@ void LoadStats() {
 		for (count = 0; row[count] != NULL; count++) {
 			s = malloc(sizeof(SStats));
 			bzero(s, sizeof(SStats));
-			name = strncpy(s->name, row[count], MAXHOST);
+			strlcpy(s->name, row[count], MAXHOST);
 			GetData((void *)&s->numsplits, CFGINT, "ServerStats", s->name, "Splits");
 			GetData((void *)&s->maxusers, CFGINT, "ServerStats", s->name, "MaxUsers");
 			GetData((void *)&s->t_maxusers, CFGINT, "ServerStats", s->name, "MaxUsersTime");
@@ -165,12 +182,16 @@ void LoadStats() {
 			}
 		}
 	}                                        
-				
+/* we now load channel data dynamically. */
 	/* ok, and now the channel stats. */
+#if 0
 	if (GetTableData("ChanStats", &row) > 0) {
 		for (count = 0; row[count] != NULL; count++) {
+			load_chan(row[count]);
+		}
+	}
 			c = malloc(sizeof(CStats));
-			strncpy(c->name, row[count], CHANLEN);	
+			strlcpy(c->name, row[count], CHANLEN);	
 			GetData((void *)&c->topics, CFGINT, "ChanStats", c->name, "Topics");
 			GetData((void *)&c->totmem, CFGINT, "ChanStats", c->name, "TotalMems");
 			GetData((void *)&c->kicks, CFGINT, "ChanStats", c->name, "Kicks");
@@ -191,7 +212,7 @@ void LoadStats() {
 			} else {
 				nlog(LOG_DEBUG2, LOG_MOD,
 				     "Loading %s Channel Data", c->name);
-				if ((time(NULL) - c->lastseen) < 604800) {
+				if ((me.now - c->lastseen) < 604800) {
 					list_append(Chead, cn);
 				} else {
 					nlog(LOG_DEBUG1, LOG_MOD,
@@ -202,7 +223,155 @@ void LoadStats() {
 			}
 		}
 	}
+#endif
 	StatServ.newdb = 0;
+}
+
+/* @brief load the info for a specific channel from the database 
+ * or return null a blank if it does not exist. 
+ * 
+ * @params name the channel name to load
+ * 
+ * @returns a CStats struct that contains info for the channel. If its a new Channel, contains the name and thats it.
+ */
+ 
+CStats *load_chan(char *name) {
+	lnode_t *cn;
+	SET_SEGV_LOCATION();
+	char *data;
+
+	CStats *c;
+
+
+	c = malloc(sizeof(CStats));
+	strlcpy(c->name, name, CHANLEN);	
+	data = malloc(BUFSIZE);
+	if (GetData((void *)&data, CFGSTR, "ChanStats", c->name, "ChanData") > 0) {
+		/* its the new database format... Good */
+		sscanf(data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins);		
+		GetData((void *)&c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
+		free(data);
+	} else if (GetData((void *)&c->topics, CFGINT, "ChanStats", c->name, "Topics") > 0) {
+		GetData((void *)&c->totmem, CFGINT, "ChanStats", c->name, "TotalMems");
+		GetData((void *)&c->kicks, CFGINT, "ChanStats", c->name, "Kicks");
+		GetData((void *)&c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
+		GetData((void *)&c->maxmems, CFGINT, "ChanStats", c->name, "MaxMems");
+		GetData((void *)&c->t_maxmems, CFGINT, "ChanStats", c->name, "MaxMemsTime");
+		GetData((void *)&c->maxkicks, CFGINT, "ChanStats", c->name, "MaxKicks");
+		GetData((void *)&c->t_maxkicks, CFGINT, "ChanStats", c->name, "MaxKicksTime");
+		GetData((void *)&c->maxjoins, CFGINT, "ChanStats", c->name, "MaxJoins");
+		GetData((void *)&c->t_maxjoins, CFGINT, "ChanStats", c->name, "MaxJoinsTime");
+		/* delete so when we save, we only save relevent information */
+		DelRow("ChanStats", c->name);
+	} else {
+		c->topics = 0;
+		c->kicks = 0;
+		c->lastseen = 0;
+		c->maxmems = 0;
+		c->t_maxmems = me.now;
+		c->maxkicks = 0;
+		c->t_maxkicks = c->t_maxmems;
+		c->maxjoins = 0;
+		c->t_maxjoins = c->t_maxmems;
+	}
+	c->topicstoday = 0;
+	c->joinstoday = 0;
+	c->members = 0;
+	c->lastsave = me.now;
+	cn = lnode_create(c);
+	if (list_isfull(Chead)) {
+		nlog(LOG_CRITICAL, LOG_MOD, "Eeek, StatServ Channel Hash is Full!");
+	} else {
+		nlog(LOG_DEBUG2, LOG_MOD, "Loading %s Channel Data", c->name);
+		if ((me.now - c->lastseen) > 604800) {
+			nlog(LOG_DEBUG1, LOG_MOD,
+			     "Resetting Old Channel %s", c->name);
+			c->topics = 0;
+			c->kicks = 0;
+			c->lastseen = 0;
+			c->maxmems = 0;
+			c->t_maxmems = me.now;
+			c->maxkicks = 0;
+			c->t_maxkicks = c->t_maxmems;
+			c->maxjoins = 0;
+			c->t_maxjoins = c->t_maxmems;
+		}
+	}
+	list_append(Chead, cn);
+	return c;
+}
+
+/* @brief save the info for a specific channel to the database 
+ *  
+ * 
+ * @params c the CStats struct to save
+ * 
+ * @returns nothing
+ */
+ 
+void save_chan(CStats *c) {
+#ifndef OLDDATABASE
+	char data[BUFSIZE];
+
+	SET_SEGV_LOCATION();
+
+	ircsnprintf(data, BUFSIZE, "%d %d %d %d %d %d %d %d %d", c->topics, c->totmem, c->kicks, c->maxmems, c->t_maxmems, c->maxkicks, c->t_maxkicks, c->maxjoins, c->t_maxjoins);
+	SetData((void *)data, CFGSTR, "ChanStats", c->name, "ChanData");
+	/* we keep this seperate so we can easily delete old channels */
+	SetData((void *)c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
+	
+#else 
+	SET_SEGV_LOCATION();
+	
+	SetData((void *)c->topics, CFGINT, "ChanStats", c->name, "Topics");
+	SetData((void *)c->totmem, CFGINT, "ChanStats", c->name, "TotalMems");
+	SetData((void *)c->kicks, CFGINT, "ChanStats", c->name, "Kicks");
+	SetData((void *)c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
+	SetData((void *)c->maxmems, CFGINT, "ChanStats", c->name, "MaxMems");
+	SetData((void *)c->t_maxmems, CFGINT, "ChanStats", c->name, "MaxMemsTime");
+	SetData((void *)c->maxkicks, CFGINT, "ChanStats", c->name, "MaxKicks");
+	SetData((void *)c->t_maxkicks, CFGINT, "ChanStats", c->name, "MaxKicksTime");
+	SetData((void *)c->maxjoins, CFGINT, "ChanStats", c->name, "MaxJoins");
+	SetData((void *)c->t_maxjoins, CFGINT, "ChanStats", c->name, "MaxJoinsTime");
+#endif
+	c->lastsave = me.now;
+}
+
+/* @brief run through database deleting old channels 
+ *  
+ * 
+ * @params nothing
+ * 
+ * @returns nothing
+ */
+
+void DelOldChan()
+{
+	char **row;
+	int count = 0;
+	time_t lastseen;
+	time_t start;
+	
+	start = time(NULL);
+	nlog(LOG_DEBUG1, LOG_MOD, "Starting To Clean Channel Database");
+	if (GetTableData("ChanStats", &row) > 0) {
+		for (count = 0; row[count] != NULL; count++) {
+			if (GetData((void *)&lastseen, CFGINT, "ChanStats", row[count], "LastSeen") > 0) {
+				/* delete it if its old and not online 
+				 * use findchan, instead of findchanstats, and findchan is based on hashes, so its faster 
+				 */
+				if (((me.now - lastseen) > 604800) && (!findchan(row[count]))) {
+					nlog(LOG_DEBUG1, LOG_MOD, "Deleting Channel %s", row[count]);
+					DelRow("ChanStats", row[count]);
+				}
+			} else {
+				/* database corruption? */
+				nlog(LOG_WARNING, LOG_MOD, "Hrm, Database Corruption for Channel %s?. Deleting Record", row[count]);
+				DelRow("ChanStats", row[count]);
+			}
+		}
+	}
+	nlog(LOG_INFO, LOG_MOD, "Took %d seconds to clean %d channel stats", time(NULL) - start, count);
 }
 
 
@@ -224,7 +393,6 @@ void LoadOldStats()
 
 
 	hnode_t *sn;
-	lnode_t *cn;
 	int count;
 	SET_SEGV_LOCATION();
 
@@ -251,7 +419,7 @@ void LoadOldStats()
 				nlog(LOG_NOTICE, LOG_MOD,
 				     "Detected Old version (3.0) of Network Database, Upgrading");
 				stats_network.maxchans = 0;
-				stats_network.t_chans = time(NULL);
+				stats_network.t_chans = me.now;
 			} else {
 				stats_network.maxchans = atol(tmp);
 				tmp = strtok(NULL, "");
@@ -336,7 +504,7 @@ void LoadOldStats()
 			   topics, totmem, kicks, lastseen, maxmems,
 			   t_maxmems, maxkicks, t_maxkicks, maxjoins,
 			   t_maxjoins);
-		strncpy(c->name, name, CHANLEN);
+		strlcpy(c->name, name, CHANLEN);
 		c->topics = atol(topics);
 		c->totmem = atol(totmem);
 		c->kicks = atol(kicks);
@@ -350,6 +518,12 @@ void LoadOldStats()
 		c->topicstoday = 0;
 		c->joinstoday = 0;
 		c->members = 0;
+		/* how this works now, is that we just save it into keeper and not into the hash */
+		if ((me.now - c->lastseen) < 604800) {
+			save_chan(c);
+		}
+		free(c);
+#if 0		
 		cn = lnode_create(c);
 		if (list_isfull(Chead)) {
 			nlog(LOG_CRITICAL, LOG_MOD,
@@ -357,7 +531,7 @@ void LoadOldStats()
 		} else {
 			nlog(LOG_DEBUG2, LOG_MOD,
 			     "Loading %s Channel Data", c->name);
-			if ((time(NULL) - c->lastseen) < 604800) {
+			if ((me.now - c->lastseen) < 604800) {
 				list_append(Chead, cn);
 			} else {
 				nlog(LOG_DEBUG1, LOG_MOD,
@@ -366,6 +540,7 @@ void LoadOldStats()
 				free(c);
 			}
 		}
+#endif
 	}
 	free(name);
 	free(topics);

@@ -36,6 +36,13 @@
 /* this is the max number of statserv channels our database can hold... */
 #define SS_CHAN_SIZE -1
 
+/* this is the how often to save a portion of the DB. Don't alter this unless you need to */
+/* DO NOT set PROGCHANTIME less than ((DBSAVETIME + (DBSAVETIME/2)) * 4) otherwise you will not have the enitre database progressively saved! */
+
+/* try a save every 10 minutes */
+#define DBSAVETIME 600
+/* but only save data older than 1 hour! */
+#define PROGCHANTIME 3600
 
 char *s_StatServ;
 
@@ -70,13 +77,14 @@ struct stats_network_ {
 struct StatServ {
 	char user[MAXUSER];
 	char host[MAXHOST];
-	char rname[MAXHOST];
+	char rname[MAXREALNAME];
 	int lag;
 	int html;
 	char htmlpath[255];
 	int onchan;
 	int newdb;
 	int interval;
+	int shutdown;
 } StatServ;
 
 
@@ -102,8 +110,10 @@ struct server_stats {
 	long daily_totusers;
 };
 
+#define MAX_CLIENT_VERSION_NAME	512
+
 struct irc_client_version {
-	char name[512];
+	char name[MAX_CLIENT_VERSION_NAME];
 	int count;
 };
 
@@ -125,6 +135,7 @@ struct chan_stats {
 	time_t t_maxkicks;
 	long maxjoins;
 	time_t t_maxjoins;
+	time_t lastsave;
 };
 
 struct daily_ {
@@ -180,12 +191,17 @@ int s_chan_del(char **av, int ac);
 int s_chan_join(char **av, int ac);
 int s_chan_part(char **av, int ac);
 CStats *findchanstats(char *);
+#if 0
 CStats *AddChanStats(char *);
+#endif
 void DelOldChan();
 int s_topic_change(char **av, int ac);
 int s_chan_kick(char **av, int ac);
 int ok_to_wallop();
 
+/* database.c */
+void save_chan(CStats *c);
+CStats *load_chan(char *name);
 
 /* ss_help.c */
 extern const char *ss_help[];

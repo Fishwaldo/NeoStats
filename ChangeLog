@@ -1,5 +1,31 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
-==============================================================================
+=====================================================================================
+* NeoStats * Fish (F) & Mark (M)* Version 2.5.8
+   (For my reference, Branched at 698)
+ - strncpy replaced by strlcpy - faster and safer (M)
+ - Replaced redundant strlen calls with faster and safer alternatives (M)
+ - Created optimised irc[v]s[n]printf functions to replace [v]s[n]printf (M)
+ - Created ircstr[n]casecmp functions to replace str[n]casecmp for IRC strings (M)
+ - Loading modules from IRC and config is now case insensitive. But filenames in dl directory must be all lower case (M)
+ - All files used by NeoStats are now #defines in stats.h to allow easy updates/changes (M)
+ - IRCD specific version strings are now stored in the ircd specific files (M)
+ - RAW command now uses sts rather than custom write code (M)
+ - More typo fixes and general cleanups (M)
+ - Removed large stack based buffers for better security and performance (M)
+ - References to coders are now depreciated and work differently so:
+       sendtocoders() renamed to debugtochannel() since that is what it actually does 
+       ns_debug_to_coders() renamed to ns_set_debug() 
+       me.coder_debug renamed to me/debug_mode (M)
+ - Began reworking do_exit code (M)
+ - Introduced FATAL_ERROR system for modules to call in the event an error is encountered which requires NeoStats to terminate (M)
+ - Change module list by removing redundant structure and just having a list of pointers (M)
+ - Event functions now use #defines rather than hard coded strings (M)
+ - added the ability to call functions that externally set up FD's to read. Why did I use Poll? because eventually all the socket stuff is going to get re-written, and the pollfds stuct is a lot better for flexibility than select! (F)
+ - This *could* be 2.5.8. Update version
+ - replaced all calls to time(NULL) with me.now, which is updated a couple of times each loop. Should reduce the number of system calls a bit. 
+ - StatServ has had big performance improvements with regards to the database. Now progressively saves channel data, and only loads channel data when required. Should stop some of those mysterious 8 hour pingouts on large networks and reduce memory overhead !
+ - dont do assertion checking by default anymore. We are pretty stable. pass --enable-debug to configure to enable if you have weird crashes now
+
 * NeoStats * Fish (F) & Mark (M)*  Version 2.5.7
  - Update parse() and splitbuf to suport IRCu (F)
  - DCC exploit fix which should also address other segfaults with long messages to connected bots (M)

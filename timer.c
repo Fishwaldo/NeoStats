@@ -37,7 +37,7 @@ void
 CheckTimers (void)
 {
 	Mod_Timer *mod_ptr = NULL;
-	time_t current = time (NULL);
+	time_t current = me.now;
 	hscan_t ts;
 	hnode_t *tn;
 
@@ -47,7 +47,7 @@ CheckTimers (void)
 		SET_SEGV_LOCATION();
 		mod_ptr = hnode_get (tn);
 		if (current - mod_ptr->lastrun > mod_ptr->interval) {
-			strncpy (segv_location, mod_ptr->modname, SEGV_LOCATION_BUFSIZE);
+			strlcpy (segv_location, mod_ptr->modname, SEGV_LOCATION_BUFSIZE);
 			SET_SEGV_INMODULE(mod_ptr->modname);
 			if (setjmp (sigvbuf) == 0) {
 				if (mod_ptr->function () < 0) {
@@ -56,7 +56,7 @@ CheckTimers (void)
 					hnode_destroy(tn);
 					free(mod_ptr);
 				} else {
-					mod_ptr->lastrun = (int) time (NULL);
+					mod_ptr->lastrun = (int) me.now;
 				}
 			} else {
 				nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", mod_ptr->modname);
@@ -68,7 +68,8 @@ CheckTimers (void)
 	if (current - ping.last_sent > me.pingtime) {
 		TimerPings ();
 		flush_keeper();
-		ping.last_sent = time (NULL);
+		ping.last_sent = me.now;
+#ifdef DEBUG
 		if (hash_verify (sockh) == 0) {
 			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the socket hash");
 		}
@@ -81,6 +82,7 @@ CheckTimers (void)
 		if (hash_verify (th) == 0) {
 			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Corruption of the Timer hash");
 		}
+#endif
 		/* flush log files */
 		fflush (NULL);
 	}
@@ -96,14 +98,14 @@ CheckTimers (void)
 void
 TimerMidnight (void)
 {
-	nlog (LOG_DEBUG1, LOG_CORE, "Its midnight!!! -> %s", sctime (time (NULL)));
+	nlog (LOG_DEBUG1, LOG_CORE, "Its midnight!!! -> %s", sctime (me.now));
 	reset_logs ();
 }
 
 static int
 is_midnight (void)
 {
-	time_t current = time (NULL);
+	time_t current = me.now;
 	struct tm *ltm = localtime (&current);
 
 	if (ltm->tm_hour == 0)

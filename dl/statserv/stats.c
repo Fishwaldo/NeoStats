@@ -37,11 +37,11 @@ int ok_to_wallop()
 	/* -1 means all wallops disabled */
 	if (StatServ.interval == -1)
 		return -1;
-	if (time(NULL) - lasttime < StatServ.interval) {
+	if (me.now - lasttime < StatServ.interval) {
 		if (++count > 5)
 			return -1;
 	} else {
-		lasttime = time(NULL);
+		lasttime = me.now;
 		count = 0;
 	}
 	return 1;
@@ -80,7 +80,7 @@ int s_client_version(char **av, int ac)
 		return 1;
 	}
 	clientv = malloc(sizeof(CVersions));
-	strncpy(clientv->name, nocols, 512);
+	strlcpy(clientv->name, nocols, MAX_CLIENT_VERSION_NAME);
 	clientv->count = 1;
 	node = lnode_create(clientv);
 	list_append(Vhead, node);
@@ -96,7 +96,7 @@ int s_chan_new(char **av, int ac)
 	count = hash_count(ch);
 	if (count > stats_network.maxchans) {
 		stats_network.maxchans = count;
-		stats_network.t_chans = time(NULL);
+		stats_network.t_chans = me.now;
 		if (ok_to_wallop() > 0)
 			swallops_cmd(s_StatServ,
 				     "\2NEW CHANNEL RECORD\2 Wow, there is now %d Channels on the Network",
@@ -104,14 +104,26 @@ int s_chan_new(char **av, int ac)
 	}
 	if (count > daily.chans) {
 		daily.chans = count;
-		daily.t_chans = time(NULL);
+		daily.t_chans = me.now;
 	}
 	return 1;
 }
 
 int s_chan_del(char **av, int ac)
 {
+	CStats *cs;
+	lnode_t *ln;
 	DecreaseChans();
+	ln = list_find(Chead, av[0], comparef);
+	if (ln) {
+		cs = lnode_get(ln);
+		save_chan(cs);
+		list_delete(Chead, ln);
+		lnode_destroy(ln);
+		free(cs);
+	} else {
+		nlog(LOG_WARNING, LOG_MOD, "Ehhh, Couldn't find channel %s when deleting out of stats", av[0]);
+	}
 	return 1;
 }
 
@@ -123,23 +135,23 @@ int s_chan_join(char **av, int ac)
 		Increasemems(cs);
 		if (cs->maxmemtoday < cs->members) {
 			cs->maxmemtoday = cs->members;
-			cs->t_maxmemtoday = time(NULL);
+			cs->t_maxmemtoday = me.now;
 		}
 		if (cs->maxmems < cs->maxmemtoday) {
 			cs->maxmems = cs->members;
-			cs->t_maxmems = time(NULL);
+			cs->t_maxmems = me.now;
 		}
 		if (cs->maxjoins < cs->joinstoday) {
 			cs->maxjoins = cs->joinstoday;
-			cs->t_maxjoins = time(NULL);
+			cs->t_maxjoins = me.now;
 		}
 	} else {
-		cs = AddChanStats(av[0]);
+		cs = load_chan(av[0]);
 		Increasemems(cs);
 		cs->maxmemtoday++;
-		cs->t_maxmemtoday = time(NULL);
+		cs->t_maxmemtoday = me.now;
 		cs->maxmems++;
-		cs->t_maxmems = time(NULL);
+		cs->t_maxmems = me.now;
 	}
 	return 1;
 }
@@ -170,7 +182,7 @@ int s_chan_kick(char **av, int ac)
 		IncreaseKicks(cs);
 		if (cs->maxkicks < cs->maxkickstoday) {
 			cs->maxkicks = cs->maxkickstoday;
-			cs->t_maxkicks = time(NULL);
+			cs->t_maxkicks = me.now;
 		}
 	}
 	return 1;
@@ -192,38 +204,14 @@ CStats *findchanstats(char *name)
 	return cs;
 }
 
-void DelOldChan()
-{
-	lnode_t *cn, *cn1;
-	CStats *c;
-	cn = list_first(Chead);
-	while (cn) {
-		c = lnode_get(cn);
-		if ((c->members <= 0)
-		    && ((time(NULL) - c->lastseen) < 604800)) {
-			if (!findchan(c->name)) {
-				nlog(LOG_DEBUG1, LOG_MOD,
-				     "StatServ: Deleting Old Channel %s",
-				     c->name);
-				cn1 = cn;
-				cn = list_next(Chead, cn);
-				list_delete(Chead, cn1);
-				lnode_destroy(cn1);
-				free(c);
-				continue;
-			}
-		}
-		cn = list_next(Chead, cn);
-	}
-}
-
+#if 0
 CStats *AddChanStats(char *name)
 {
 	CStats *cs;
 	lnode_t *cn;
 
 	cs = malloc(sizeof(CStats));
-	strncpy(cs->name, name, CHANLEN);
+	strlcpy(cs->name, name, CHANLEN);
 	cs->members = 0;
 	cs->topics = 0;
 	cs->totmem = 0;
@@ -239,7 +227,7 @@ CStats *AddChanStats(char *name)
 	cs->t_maxkicks = 0;
 	cs->maxjoins = 0;
 	cs->t_maxjoins = 0;
-	cs->lastseen = time(NULL);
+	cs->lastseen = me.now;
 	cn = lnode_create(cs);
 	if (list_isfull(Chead)) {
 		nlog(LOG_CRITICAL, LOG_MOD,
@@ -249,7 +237,7 @@ CStats *AddChanStats(char *name)
 	}
 	return cs;
 }
-
+#endif
 int s_new_server(char **av, int ac)
 {
 	Server *s;
@@ -262,7 +250,7 @@ int s_new_server(char **av, int ac)
 	IncreaseServers();
 	if (stats_network.maxservers < stats_network.servers) {
 		stats_network.maxservers = stats_network.servers;
-		stats_network.t_maxservers = time(NULL);
+		stats_network.t_maxservers = me.now;
 		if (ok_to_wallop() > 0)
 			swallops_cmd(s_StatServ,
 				     "\2NEW SERVER RECORD\2 Wow, there are now %d Servers on the Network",
@@ -270,7 +258,7 @@ int s_new_server(char **av, int ac)
 	}
 	if (stats_network.servers > daily.servers) {
 		daily.servers = stats_network.servers;
-		daily.t_servers = time(NULL);
+		daily.t_servers = me.now;
 	}
 	if (ok_to_wallop() > 0)
 		chanalert(s_StatServ,
@@ -388,7 +376,7 @@ int s_user_modes(char **av, int ac)
 					stats_network.maxopers =
 					    stats_network.opers;
 					stats_network.t_maxopers =
-					    time(NULL);
+					    me.now;
 					if (ok_to_wallop() > 0)
 						swallops_cmd(s_StatServ,
 							     "\2Oper Record\2 The Network has reached a New Record for Opers at %d",
@@ -397,7 +385,7 @@ int s_user_modes(char **av, int ac)
 				}
 				if (s->maxopers < s->opers) {
 					s->maxopers = s->opers;
-					s->t_maxopers = time(NULL);
+					s->t_maxopers = me.now;
 					if (ok_to_wallop() > 0)
 						swallops_cmd(s_StatServ,
 							     "\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers",
@@ -406,7 +394,7 @@ int s_user_modes(char **av, int ac)
 				}
 				if (s->opers > daily.opers) {
 					daily.opers = s->opers;
-					daily.t_opers = time(NULL);
+					daily.t_opers = me.now;
 				}
 			} else {
 				if (is_oper(u)) {
@@ -493,7 +481,7 @@ int s_new_user(char **av, int ac)
 	if (s->maxusers < s->users) {
 		/* New User Record */
 		s->maxusers = s->users;
-		s->t_maxusers = time(NULL);
+		s->t_maxusers = me.now;
 		if (ok_to_wallop() > 0)
 			swallops_cmd(s_StatServ,
 				     "\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!",
@@ -503,7 +491,7 @@ int s_new_user(char **av, int ac)
 
 	if (stats_network.maxusers < stats_network.users) {
 		stats_network.maxusers = stats_network.users;
-		stats_network.t_maxusers = time(NULL);
+		stats_network.t_maxusers = me.now;
 		if (ok_to_wallop() > 0)
 			swallops_cmd(s_StatServ,
 				     "\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %d users!",
@@ -512,7 +500,7 @@ int s_new_user(char **av, int ac)
 
 	if (stats_network.users > daily.users) {
 		daily.users = stats_network.users;
-		daily.t_users = time(NULL);
+		daily.t_users = me.now;
 	}
 
 
@@ -548,11 +536,11 @@ int pong(char **av, int ac)
 
 	if (s->ping > ss->highest_ping) {
 		ss->highest_ping = s->ping;
-		ss->t_highest_ping = time(NULL);
+		ss->t_highest_ping = me.now;
 	}
 	if (s->ping < ss->lowest_ping) {
 		ss->lowest_ping = s->ping;
-		ss->t_lowest_ping = time(NULL);
+		ss->t_lowest_ping = me.now;
 	}
 
 	/* ok, updated the statistics, now lets see if this server is "lagged out" */
@@ -574,13 +562,13 @@ int Online(char **av, int ac)
 		 "+oS", SSMNAME);
 	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */
-	add_mod_timer("SaveStats", "Save_Stats_DB", SSMNAME, 28800);
+	add_mod_timer("SaveStats", "Save_Stats_DB", SSMNAME, DBSAVETIME);
 
 	add_mod_timer("ss_html", "TimerWeb", SSMNAME, 3600);
 
 	/* also add a timer to check if its midnight (to reset the daily stats */
 	add_mod_timer("Is_Midnight", "Daily_Stats_Reset", SSMNAME, 60);
-	add_mod_timer("DelOldChan", "DelOldStatServChans", SSMNAME, 3600);
+	add_mod_timer("DelOldChan", "DelOldStatServChans", SSMNAME, 60);
 
 
 	return 1;
@@ -598,21 +586,21 @@ extern SStats *new_stats(const char *name)
 
 	if (!s) {
 		nlog(LOG_CRITICAL, LOG_MOD, "Out of memory.");
-		exit(0);
+		FATAL_ERROR("Out of memory.")
 	}
 
 	memcpy(s->name, name, MAXHOST);
 	s->numsplits = 0;
 	s->maxusers = 0;
-	s->t_maxusers = time(NULL);
-	s->t_maxopers = time(NULL);
+	s->t_maxusers = me.now;
+	s->t_maxopers = me.now;
 	s->maxopers = 0;
 	s->totusers = 0;
 	s->daily_totusers = 0;
-	s->lastseen = time(NULL);
-	s->starttime = time(NULL);
-	s->t_highest_ping = time(NULL);
-	s->t_lowest_ping = time(NULL);
+	s->lastseen = me.now;
+	s->starttime = me.now;
+	s->t_highest_ping = me.now;
+	s->t_lowest_ping = me.now;
 	s->lowest_ping = 0;
 	s->highest_ping = 0;
 	s->users = 0;
@@ -639,7 +627,7 @@ void AddStats(Server * s)
 	if (!st) {
 		st = new_stats(s->name);
 	} else {
-		st->lastseen = time(NULL);
+		st->lastseen = me.now;
 	}
 }
 
@@ -663,7 +651,7 @@ SStats *findstats(char *name)
 
 void Is_Midnight()
 {
-	time_t current = time(NULL);
+	time_t current = me.now;
 	struct tm *ltm = localtime(&current);
 	TLD *t;
 	lnode_t *cn;
@@ -678,13 +666,13 @@ void Is_Midnight()
 			nlog(LOG_DEBUG1, LOG_MOD,
 			     "Resetting Daily Statistics");
 			daily.servers = stats_network.servers;
-			daily.t_servers = time(NULL);
+			daily.t_servers = me.now;
 			daily.users = stats_network.users;
-			daily.t_users = time(NULL);
+			daily.t_users = me.now;
 			daily.opers = stats_network.opers;
-			daily.t_opers = time(NULL);
+			daily.t_opers = me.now;
 			daily.chans = stats_network.chans;
-			daily.t_chans = time(NULL);
+			daily.t_chans = me.now;
 			for (t = tldhead; t; t = t->next)
 				t->daily_users = 0;
 			cn = list_first(Chead);
@@ -694,7 +682,7 @@ void Is_Midnight()
 				c->joinstoday = 0;
 				c->maxkickstoday = 0;
 				c->topicstoday = 0;
-				c->t_maxmemtoday = time(NULL);
+				c->t_maxmemtoday = me.now;
 				cn = list_next(Chead, cn);
 			}
 

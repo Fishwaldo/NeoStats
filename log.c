@@ -47,6 +47,11 @@ const char *loglevels[10] = {
 	"INSANE"
 };
 
+static char log_buf[BUFSIZE];
+static char log_fmttime[TIMEBUFSIZE];
+static char oldname[MAXPATH];
+static char logname[MAXPATH];
+
 struct logs_ {
 	FILE *logfile;
 	char name[30];
@@ -101,16 +106,15 @@ void
 nlog (int level, int scope, char *fmt, ...)
 {
 	va_list ap;
-	char buf[512], fmttime[80];
 	int gotlog;
 	hnode_t *hn;
 	struct logs_ *logentry;
-	time_t ts = time (NULL);
 
+	
 	if (level <= config.debug) {
 		/* if scope is > 0, then log to a diff file */
 		if (scope > 0) {
-			if (strlen (segvinmodule) > 1) {
+			if (segvinmodule[0] != 0) {
 				hn = hash_lookup (logs, segvinmodule);
 			} else {
 				nlog (LOG_ERROR, LOG_CORE, "Warning, nlog called with LOG_MOD, but segvinmodule is blank! Logging to Core");
@@ -125,7 +129,7 @@ nlog (int level, int scope, char *fmt, ...)
 			gotlog = 1;
 		} else {
 			/* log file not found */
-			if ((strlen (segvinmodule) <= 1) && (scope > 0)) {
+			if (segvinmodule[0] == 0 && (scope > 0)) {
 #ifdef DEBUG
 				printf ("segvinmodule is blank, but scope is for Modules!\n");
 #endif
@@ -133,9 +137,9 @@ nlog (int level, int scope, char *fmt, ...)
 				scope = 0;
 			}
 			logentry = malloc (sizeof (struct logs_));
-			strncpy (logentry->name, scope > 0 ? segvinmodule : CoreLogFileName, 30);
-			snprintf (buf, 40, "logs/%s.log", logentry->name);
-			logentry->logfile = fopen (buf, "a");
+			strlcpy (logentry->name, scope > 0 ? segvinmodule : CoreLogFileName, 30);
+			ircsnprintf (logname, MAXPATH, "logs/%s.log", logentry->name);
+			logentry->logfile = fopen (logname, "a");
 			logentry->flush = 0;
 			hn = hnode_create (logentry);
 			hash_insert (logs, hn, logentry->name);
@@ -144,20 +148,22 @@ nlog (int level, int scope, char *fmt, ...)
 #ifdef DEBUG
 		if (!logentry->logfile) {
 			printf ("%s\n", strerror (errno));
-			do_exit (NS_EXIT_NORMAL);
+			do_exit (NS_EXIT_NORMAL, NULL);
 		}
 #endif
-		strftime (fmttime, 80, "%d/%m/%Y[%H:%M]", localtime (&ts));
+		/* we update me.now here, becase some functions might be busy and not call the loop a lot */
+		me.now = time(NULL);
+		strftime (log_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M]", localtime (&me.now));
 		va_start (ap, fmt);
-		vsnprintf (buf, 512, fmt, ap);
+		ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
+		va_end (ap);
 
-		fprintf (logentry->logfile, "(%s) %s %s - %s\n", fmttime, loglevels[level - 1], scope > 0 ? segvinmodule : "CORE", buf);
+		fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], scope > 0 ? segvinmodule : "CORE", log_buf);
 		logentry->flush = 1;
 #ifndef DEBUG
 		if (config.foreground)
 #endif
-			printf ("%s %s - %s\n", loglevels[level - 1], scope > 0 ? segvinmodule : "CORE", buf);
-		va_end (ap);
+			printf ("%s %s - %s\n", loglevels[level - 1], scope > 0 ? segvinmodule : "CORE", log_buf);
 	}
 }
 
@@ -166,12 +172,10 @@ nlog (int level, int scope, char *fmt, ...)
 void
 reset_logs ()
 {
-	char tmp[255], tmp2[255];
-	time_t t = time (NULL);
+	time_t t = me.now;
 	hscan_t hs;
 	hnode_t *hn;
 	struct logs_ *logentry;
-
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin (&hs, logs);
@@ -186,11 +190,11 @@ reset_logs ()
 			fclose (logentry->logfile);
 			
 			/* rename log file and open new file */
-			strftime (tmp2, 255, LogFileNameFormat, localtime (&t));
-			snprintf (tmp, 255, "logs/%s%s.log", logentry->name, tmp2);
-			snprintf (tmp2, 255, "logs/%s.log", logentry->name);
-			rename (tmp2, tmp);
-			logentry->logfile = fopen (tmp2, "a");		
+			strftime (log_fmttime, TIMEBUFSIZE, LogFileNameFormat, localtime (&t));
+			ircsnprintf (oldname, MAXPATH, "logs/%s%s.log", logentry->name, log_fmttime);
+			ircsnprintf (logname, MAXPATH, "logs/%s.log", logentry->name);
+			rename (logname, oldname);
+			logentry->logfile = fopen (logname, "a");		
 		}
 	}
 }

@@ -56,7 +56,7 @@ void ss_html()
 	char startstr = 0;
 	int gothtml = 0;
 	if (StatServ.html) {
-		if (strlen(StatServ.htmlpath) <= 0) {
+		if (StatServ.htmlpath[0] == 0) {
 			nlog(LOG_WARNING, LOG_MOD,
 			     "Can't do HTML Writout as html path is not defined");
 			return;
@@ -171,7 +171,7 @@ void ss_html()
 		if (buf1) {
 			startstr = strlen(buf) - strlen(buf1);
 			fwrite(buf, startstr, 1, opf);
-			fputs(version, opf);
+			fputs(ircd_version, opf);
 			buf = buf1 + strlen("!VERSION!");
 		}
 		buf1 = strstr(buf, "!TITLE!");
@@ -584,7 +584,7 @@ void get_map(char *uplink, int level)
 			/* its not the root server */
 			buf[0]='\0';
 			for (i = 1; i < level; i++) {
-				snprintf(buf,256,
+				ircsnprintf(buf,256,
 					"%s&nbsp&nbsp&nbsp&nbsp&nbsp|",
 					buf);
 			}

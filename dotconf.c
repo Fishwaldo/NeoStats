@@ -54,7 +54,8 @@
 #include <ctype.h>
 
 #include "dotconf.h"
-
+#include "support.h"
+#include "ircstring.h"
 static int word_count;		/* no. of option arguments */
 static char name[CFG_MAX_OPTION + 1];	/* option name */
 static char values[CFG_VALUES][CFG_MAX_VALUE + 1];	/* holds the arguments */
@@ -140,7 +141,7 @@ config_substitute_env (char *str)
 	}
 	*cp2 = '\0';		/* terminate buffer */
 
-	strncpy (str, tmp_value, CFG_MAX_VALUE + 1);
+	strlcpy (str, tmp_value, CFG_MAX_VALUE + 1);
 }
 
 void
@@ -238,7 +239,7 @@ config_parse (FILE * config)
 				here_doc = malloc (finfo.st_size + 1);	/* allocate  buffer memory */
 				bzero (here_doc, finfo.st_size + 1);
 
-				strncpy (here_limit, cp3 + 2, 8);	/*   copy here-delimiter */
+				strlcpy (here_limit, cp3 + 2, 8);	/*   copy here-delimiter */
 				while (fgets (buffer, CFG_BUFSIZE, config)) {
 					if (!strncmp (here_limit, buffer, strlen (here_limit))) {
 						here_string = 0;
@@ -391,11 +392,11 @@ config_read (char *fname, config_option * options)
 	bzero (dotconf_file, CFG_MAX_FILENAME + 1);
 	bzero (dotconf_includepath, CFG_MAX_FILENAME + 1);
 
-	strncpy (dotconf_file, fname, CFG_MAX_FILENAME);	/* fill fname buffer */
+	strlcpy (dotconf_file, fname, CFG_MAX_FILENAME);	/* fill fname buffer */
 
 	/* take includepath from environment if present */
 	if ((dc_env = getenv (CFG_INCLUDEPATH_ENV)) != NULL)
-		strncpy (dotconf_includepath, dc_env, CFG_MAX_FILENAME);
+		strlcpy (dotconf_includepath, dc_env, CFG_MAX_FILENAME);
 
 	config_register_options (dotconf_options);	/* internal options */
 	config_register_options (options);	/* register main options */
@@ -418,7 +419,7 @@ dotconf_cb_include (char *str)
 	char old_fname[CFG_MAX_FILENAME];
 
 	bzero (&old_fname, CFG_MAX_FILENAME);
-	strncpy (old_fname, dotconf_file, CFG_MAX_FILENAME);
+	strlcpy (old_fname, dotconf_file, CFG_MAX_FILENAME);
 	if (str[0] != '/' && dotconf_includepath[0] != '\0') {
 		/* relative file AND include path is used */
 
@@ -428,20 +429,20 @@ dotconf_cb_include (char *str)
 			return;
 		}
 
-		snprintf (dotconf_file, CFG_MAX_FILENAME + 1, "%s/%s", dotconf_includepath, str);
+		ircsnprintf (dotconf_file, CFG_MAX_FILENAME + 1, "%s/%s", dotconf_includepath, str);
 	} else			/* fully qualified, or no includepath */
-		strncpy (dotconf_file, str, CFG_MAX_FILENAME);
+		strlcpy (dotconf_file, str, CFG_MAX_FILENAME);
 
 	if (access (dotconf_file, R_OK)) {
 		fprintf (stderr, "Error in %s line %d: Cannot open %s for inclusion\n", old_fname, dotconf_line, dotconf_file);
-		strncpy (dotconf_file, old_fname, CFG_MAX_FILENAME);	/* restore settings */
+		strlcpy (dotconf_file, old_fname, CFG_MAX_FILENAME);	/* restore settings */
 		return;
 	}
 
 	config = fopen (dotconf_file, "r");
 	config_parse (config);
 	fclose (config);
-	strncpy (dotconf_file, old_fname, CFG_MAX_FILENAME);
+	strlcpy (dotconf_file, old_fname, CFG_MAX_FILENAME);
 }
 
 void
@@ -449,5 +450,5 @@ dotconf_cb_includepath (char *str)
 {
 	char *env = getenv ("DC_INCLUDEPATH");
 	if (!env)		/* environment overrides configuration file setting */
-		strncpy (dotconf_includepath, str, CFG_MAX_FILENAME - 1);
+		strlcpy (dotconf_includepath, str, CFG_MAX_FILENAME);
 }

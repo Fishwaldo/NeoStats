@@ -94,9 +94,9 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 	/* This is a bad bad hack... */
 	if (segv_inmodule[0]) {
 		/* why MAXHOST? because thats the size of mod_name!?!? */
-		strncpy(dnsdata->mod_name, segv_inmodule, MAX_MOD_NAME);
+		strlcpy(dnsdata->mod_name, segv_inmodule, MAX_MOD_NAME);
 	}
-	strncpy (dnsdata->data, data, 254);
+	strlcpy (dnsdata->data, data, 254);
 	dnsdata->callback = callback;
 	if (type == adns_r_ptr) {
 		sa.sin_family = AF_INET;

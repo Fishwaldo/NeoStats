@@ -42,8 +42,9 @@ new_user (const char *nick)
 	SET_SEGV_LOCATION();
 	u = smalloc (sizeof (User));
 	if (!nick)
-		nick = "";
-	strncpy (u->nick, nick, MAXNICK);
+		strsetnull (u->nick);
+	else
+		strlcpy (u->nick, nick, MAXNICK);
 	un = hnode_create (u);
 	if (hash_isfull (uh)) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Hash is full");
@@ -68,12 +69,12 @@ AddUser (const char *nick, const char *user, const char *host, const char *serve
 	}
 
 	u = new_user (nick);
-	strncpy (u->hostname, host, MAXHOST);
-	strncpy (u->username, user, MAXUSER);
+	strlcpy (u->hostname, host, MAXHOST);
+	strlcpy (u->username, user, MAXUSER);
 	/* its empty for the moment */
-	strncpy (u->realname, "", MAXREALNAME);
+	strsetnull (u->realname);
 	u->server = findserver (server);
-	u->t_flood = time (NULL);
+	u->t_flood = me.now;
 	u->flood = 0;
 	u->is_away = 0;
 	u->Umode = 0;
@@ -104,9 +105,9 @@ AddRealName (const char *nick, const char *realname)
 		return;
 	}
 	nlog (LOG_DEBUG2, LOG_CORE, "RealName(%s): %s", nick, realname);
-	strncpy (u->realname, realname, MAXREALNAME);
+	strlcpy (u->realname, realname, MAXREALNAME);
 	AddStringToList (&av, u->nick, &ac);
-	Module_Event ("SIGNON", av, ac);
+	Module_Event (EVENT_SIGNON, av, ac);
 	free (av);
 }
 
@@ -154,9 +155,9 @@ doDelUser (const char *nick, int i)
 	/* run the event to delete a user */
 	AddStringToList (&av, u->nick, &ac);
 	if (i == 0) {
-		Module_Event ("SIGNOFF", av, ac);
+		Module_Event (EVENT_SIGNOFF, av, ac);
 	} else if (i == 1) {
-		Module_Event ("KILL", av, ac);
+		Module_Event (EVENT_KILL, av, ac);
 	}
 	free (av);
 
@@ -182,11 +183,11 @@ Do_Away (User * u, const char *awaymsg)
 		AddStringToList (&av, u->nick, &ac);
 		if ((u->is_away == 1) && (!awaymsg)) {
 			u->is_away = 0;
-			Module_Event ("AWAY", av, ac);
+			Module_Event (EVENT_AWAY, av, ac);
 		} else if ((u->is_away == 0) && (awaymsg)) {
 			u->is_away = 1;
 			AddStringToList (&av, (char *) awaymsg, &ac);
-			Module_Event ("AWAY", av, ac);
+			Module_Event (EVENT_AWAY, av, ac);
 		}
 		free (av);
 	}
@@ -216,31 +217,15 @@ Change_User (User * u, const char *newnick)
 	SET_SEGV_LOCATION();
 	hash_delete (uh, un);
 	oldnick = malloc (MAXNICK);
-	strncpy (oldnick, u->nick, MAXNICK);
+	strlcpy (oldnick, u->nick, MAXNICK);
 	AddStringToList (&av, oldnick, &ac);
-	strncpy (u->nick, newnick, MAXNICK);
+	strlcpy (u->nick, newnick, MAXNICK);
 	hash_insert (uh, un, u->nick);
 
 	AddStringToList (&av, u->nick, &ac);
-	Module_Event ("NICK_CHANGE", av, ac);
+	Module_Event (EVENT_NICKCHANGE, av, ac);
 	free (av);
 	free (oldnick);
-}
-
-void
-sendcoders (char *message, ...)
-{
-	va_list ap;
-	char tmp[512];
-	SET_SEGV_LOCATION();
-	va_start (ap, message);
-	vsnprintf (tmp, 512, message, ap);
-#ifndef DEBUG
-	if (!me.coder_debug)
-		return;
-#endif
-	chanalert (s_Services, tmp);
-	va_end (ap);
 }
 
 User *
@@ -278,14 +263,14 @@ UserDump (char *nick)
 	hscan_t us;
 	SET_SEGV_LOCATION();
 	if (!nick) {
-		sendcoders ("Users======================");
+		debugtochannel("Users======================");
 		hash_scan_begin (&us, uh);
 		while ((un = hash_scan_next (&us)) != NULL) {
 			u = hnode_get (un);
-			sendcoders ("User: %s", u->nick);
+			debugtochannel("User: %s", u->nick);
 			cm = list_first (u->chans);
 			while (cm) {
-				sendcoders ("     Chans: %s", (char *) lnode_get (cm));
+				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
 				cm = list_next (u->chans, cm);
 			}
 		}
@@ -293,14 +278,14 @@ UserDump (char *nick)
 		un = hash_lookup (uh, nick);
 		if (un) {
 			u = hnode_get (un);
-			sendcoders ("User: %s", u->nick);
+			debugtochannel("User: %s", u->nick);
 			cm = list_first (u->chans);
 			while (cm) {
-				sendcoders ("     Chans: %s", (char *) lnode_get (cm));
+				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
 				cm = list_next (u->chans, cm);
 			}
 		} else {
-			sendcoders ("Can't find user %s", nick);
+			debugtochannel("Can't find user %s", nick);
 		}
 	}
 }
@@ -389,15 +374,15 @@ UserMode (const char *nick, const char *modes, int smode)
 		nlog (LOG_DEBUG1, LOG_CORE, "Modes: %s", modes);
 
 	if (smode == 0)
-		strncpy (u->modes, modes, MODESIZE);
+		strlcpy (u->modes, modes, MODESIZE);
 
 	AddStringToList (&av, u->nick, &ac);
 	AddStringToList (&av, (char *) modes, &ac);
 
 	if (smode > 0) {
-		Module_Event ("SMODE", av, ac);
+		Module_Event (EVENT_SMODE, av, ac);
 	} else {
-		Module_Event ("UMODE", av, ac);
+		Module_Event (EVENT_UMODE, av, ac);
 	}
 
 

@@ -32,13 +32,15 @@
 #include "log.h"
 #include "conf.h"
 
-
-
 /* hostserv doesn't work on Hybrid, Echo an error and exit the compile */
 #ifndef GOTSVSVHOST
 #error "Error: This IRCd doesn't support changing a users host. This module will not compile"
 #endif
 
+#define MAXPASSWORD	30
+
+#define BANBUFSIZE	4096
+static char ban_buf[BANBUFSIZE];
 
 
 char s_HostServ[MAXNICK];
@@ -46,7 +48,7 @@ typedef struct hs_map_ {
 	char nnick[MAXNICK];
 	char host[MAXHOST];
 	char vhost[MAXHOST];
-	char passwd[30];
+	char passwd[MAXPASSWORD];
 	char added[MAXNICK];
 	time_t lused;
 } hs_map;
@@ -74,7 +76,6 @@ typedef struct hs_user {
 	hs_map *vhe;
 } hs_user;
 #endif
-char nnick[255];
 
 extern const char *hs_help[];
 static int hs_sign_on(char **av, int ac);
@@ -108,7 +109,7 @@ int ListArryCount = 0;
 ModuleInfo __module_info = {
 	 "HostServ",
 	 "Network User Virtual Host Service",
-	 "3.0",
+	 "3.1",
 	__DATE__,
 	__TIME__
 };
@@ -164,6 +165,7 @@ void hs_Config()
 	char *host2;
 	hnode_t *hn;
 	char *ban2;
+	int hostlen;
 
 	SET_SEGV_LOCATION();
 	GetConf((void *) &hs_cfg.view, CFGINT, "ViewLevel");
@@ -173,7 +175,7 @@ void hs_Config()
 	GetConf((void *) &hs_cfg.old, CFGINT, "ExpireDays");
 	if (GetConf((void *) &hs_cfg.regnick, CFGINT, "UnetVhosts") > 0) {
 		if (GetConf((void *) &ban, CFGSTR, "UnetDomain") > 0) {
-			strncpy(hs_cfg.vhostdom, ban, MAXHOST);
+			strlcpy(hs_cfg.vhostdom, ban, MAXHOST);
 		} else {
 			hs_cfg.vhostdom[0] = '\0';
 		}
@@ -198,19 +200,17 @@ void hs_Config()
 	ban2 = ban;
 	if (ban) {
 		host = strtok(ban, ";");
-		if (host) {
-			host2 = malloc(strlen(host));
-			strncpy(host2, host, strlen(host));
-			host2[strlen(host)] = '\0';
+		while (host != NULL) {
+			/* limit host to MAXHOST and avoid unterminated/huge strings */
+			hostlen = strnlen(host, MAXHOST);
+			/* If less than MAXHOST allocate an extra byte for NULL */
+			if(hostlen < MAXHOST)
+				hostlen++;
+			host2 = malloc(hostlen);
+			strlcpy(host2, host, hostlen);
 			hn = hnode_create(host2);
 			hash_insert(bannedvhosts, hn, host2);
-		}
-		while ((host = strtok(NULL, ";")) != NULL) {
-			host2 = malloc(strlen(host));
-			strncpy(host2, host, strlen(host));
-			host2[strlen(host)] = '\0';
-			hn = hnode_create(host2);
-			hash_insert(bannedvhosts, hn, host2);
+			host = strtok(NULL, ";");
 		}
 	}
 	free(ban2);
@@ -260,7 +260,7 @@ static int hs_sign_on(char **av, int ac)
 			prefmsg(u->nick, s_HostServ,
 				"Automatically setting your Virtual Host to %s",
 				map->vhost);
-			map->lused = time(NULL);
+			map->lused = me.now;
 			save_vhost(map);
 #ifdef UMODE_REGNICK
 			set_moddata(u);
@@ -292,7 +292,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 	if (!strcasecmp(av[1], "HELP")) {
 		if (ac <= 2) {
 			privmsg_list(u->nick, s_HostServ, hs_help);
-			if (UserLevel(u) >= 150)
+			if (UserLevel(u) >= 40)
 				privmsg_list(u->nick, s_HostServ, hs_user_help);
 			privmsg_list(u->nick, s_HostServ, hs_help_on_help);
 			return 1;
@@ -328,12 +328,13 @@ int __Bot_Message(char *origin, char **av, int ac)
 		} else if (!strcasecmp(av[2], "ABOUT")) {
 			privmsg_list(u->nick, s_HostServ, hs_help_about);
 			return 1;
-		} else if (!strcasecmp(av[2], "SET") && (UserLevel(u) > 185)) {
+		} else if (!strcasecmp(av[2], "SET") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_HostServ, hs_help_set);
 			return 1;
 		} else
 			prefmsg(u->nick, s_HostServ,
 				"Unknown Help Topic: \2%s\2", av[2]);
+				return 1;
 	}
 
 	if (!strcasecmp(av[1], "ABOUT")) {
@@ -569,7 +570,7 @@ static void hs_set(User * u, char **av, int ac)
 			return;
 		} else {
 			hs_cfg.regnick = 1;
-			strncpy(hs_cfg.vhostdom, av[3], MAXHOST);
+			strlcpy(hs_cfg.vhostdom, av[3], MAXHOST);
 			SetConf((void *)1, CFGINT, "UnetVhosts");
 			SetConf((void *)av[3], CFGSTR, "UnetDomain");
 			prefmsg(u->nick, s_HostServ, "Undernet Style Hidden Hosts enabled for Registered Users");
@@ -583,25 +584,25 @@ static void hs_set(User * u, char **av, int ac)
 }
 int Online(char **av, int ac)
 {
-	char *user;
-	char *host;
-	char *rname;
+	char *user = NULL;
+	char *host = NULL;
+	char *rname = NULL;
 
 	if (GetConf((void *) &s_HostServ, CFGSTR, "Nick") < 0) {
 /*		s_HostServ = malloc(MAXNICK); */
-		snprintf(s_HostServ, MAXNICK, "HostServ");
+		strlcpy(s_HostServ, "HostServ", MAXNICK);
 	}
 	if (GetConf((void *) &user, CFGSTR, "User") < 0) {
 		user = malloc(MAXUSER);
-		snprintf(user, MAXUSER, "HS");
+		strlcpy(user, "HS", MAXUSER);
 	}
 	if (GetConf((void *) &host, CFGSTR, "Host") < 0) {
 		host = malloc(MAXHOST);
-		snprintf(host, MAXHOST, me.name);
+		strlcpy(host, me.name, MAXHOST);
 	}
 	if (GetConf((void *) &rname, CFGSTR, "RealName") < 0) {
-		rname = malloc(MAXHOST);
-		snprintf(rname, MAXHOST, "Network Virtual Host Service");
+		rname = malloc(MAXREALNAME);
+		strlcpy(rname, "Network Virtual Host Service", MAXREALNAME);
 	}
 
 
@@ -609,13 +610,16 @@ int Online(char **av, int ac)
 	    (s_HostServ, user, host, rname, "+oS",
 	     __module_info.module_name) == -1) {
 		/* Nick was in use */
-		snprintf(s_HostServ, MAXNICK, "%s_", s_HostServ);
+		strlcat(s_HostServ, "_", MAXNICK);
 		init_bot(s_HostServ, user, host, rname, "+oS",
 			 __module_info.module_name);
 	}
-	free(user);
-	free(host);
-	free(rname);
+	if(user)
+		 free(user);
+	if(host)
+		free(host);
+	if(rname)
+		free(rname);
 	chanalert(s_HostServ,
 		  "Configured Levels: Add: %d, Del: %d, List: %d, View: %d",
 		  hs_cfg.add, hs_cfg.del, hs_cfg.list, hs_cfg.view);
@@ -628,16 +632,16 @@ int Online(char **av, int ac)
 };
 
 EventFnList __module_events[] = {
-	{"ONLINE", Online}
+	{EVENT_ONLINE, Online}
 	,
-	{"SIGNON", hs_sign_on}
+	{EVENT_SIGNON, hs_sign_on}
 	,
 #ifdef UMODE_REGNICK
-	{"UMODE", hs_mode}
+	{EVENT_UMODE, hs_mode}
 	, 
-	{"SIGNOFF", del_moddata}
+	{EVENT_SIGNOFF, del_moddata}
 	,
-	{"KILL", del_moddata}
+	{EVENT_KILL, del_moddata}
 	,
 #endif
 	{NULL, NULL}
@@ -700,7 +704,7 @@ int hs_mode(char **av, int ac) {
 			return -1;
 		}
 		nlog(LOG_DEBUG2, LOG_MOD, "Regnick Mode on %s", av[0]);
-		snprintf(vhost, MAXHOST, "%s.%s", av[0], hs_cfg.vhostdom);
+		ircsnprintf(vhost, MAXHOST, "%s.%s", av[0], hs_cfg.vhostdom);
 		ssvshost_cmd(av[0], vhost);
 		prefmsg(av[0], s_HostServ,
 			"Automatically setting your Hidden Host to %s", vhost);
@@ -717,12 +721,12 @@ void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 	hs_map *map;
 
 	map = malloc(sizeof(hs_map));
-	strncpy(map->nnick, nick, MAXNICK);
-	strncpy(map->host, host, MAXHOST);
-	strncpy(map->vhost, vhost, MAXHOST);
-	strncpy(map->passwd, pass, 30);
-	strncpy(map->added, who, MAXNICK);
-	map->lused = time(NULL);
+	strlcpy(map->nnick, nick, MAXNICK);
+	strlcpy(map->host, host, MAXHOST);
+	strlcpy(map->vhost, vhost, MAXHOST);
+	strlcpy(map->passwd, pass, MAXPASSWORD);
+	strlcpy(map->added, who, MAXNICK);
+	map->lused = me.now;
 	hn = lnode_create(map);
 	list_append(vhosts, hn);
 	save_vhost(map);
@@ -746,10 +750,16 @@ static void hs_addban(User * u, char *ban)
 {
 	hnode_t *hn;
 	char *host;
+	int hostlen;
 
+	/* limit host to MAXHOST and avoid unterminated/huge strings */
+	hostlen = strnlen(ban, MAXHOST);
+	/* If less than MAXHOST allocate an extra byte for NULL */
+	if(hostlen < MAXHOST)
+		hostlen++;
 
-	host = malloc(strlen(ban));
-	strncpy(host, ban, strlen(ban) + 1);
+	host = malloc(hostlen);
+	strlcpy(host, ban, hostlen);
 	if (hash_lookup(bannedvhosts, host) != NULL) {
 		prefmsg(u->nick, s_HostServ,
 			"%s already exists in the banned vhost list", ban);
@@ -808,14 +818,14 @@ static void SaveBans()
 {
 	hnode_t *hn;
 	hscan_t hs;
-	char bans[4096];
-	bzero(bans, 4096);
+
+	bzero(ban_buf, BANBUFSIZE);
 	hash_scan_begin(&hs, bannedvhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
-		strncat(bans, (char *) hnode_get(hn), 4096 - strlen(bans));
-		strncat(bans, ";", 4096 - strlen(bans));
+		strlcat(ban_buf, (char *) hnode_get(hn), BANBUFSIZE);
+		strlcat(ban_buf, ";", BANBUFSIZE);
 	}
-	SetConf((void *) bans, CFGSTR, "BannedVhosts");
+	SetConf((void *) ban_buf, CFGSTR, "BannedVhosts");
 }
 
 
@@ -830,13 +840,13 @@ static void hs_chpass(User * u, char *nick, char *oldpass, char *newpass)
 		if ((fnmatch(map->host, u->hostname, 0) == 0)
 		    || (UserLevel(u) >= 100)) {
 			if (!strcasecmp(map->passwd, oldpass)) {
-				strncpy(map->passwd, newpass, 30);
+				strlcpy(map->passwd, newpass, MAXPASSWORD);
 				prefmsg(u->nick, s_HostServ,
 					"Password Successfully changed");
 				chanalert(s_HostServ,
 					  "%s changed the password for %s",
 					  u->nick, map->nnick);
-				map->lused = time(NULL);
+				map->lused = me.now;
 				save_vhost(map);
 				return;
 			}
@@ -1020,7 +1030,7 @@ void Loadhosts()
 {
 	hs_map *map;
 	lnode_t *hn;
-	char buf[512];
+	char buf[BUFSIZE];
 	char *tmp;
 	int count;
 	char **LoadArry;
@@ -1030,29 +1040,28 @@ void Loadhosts()
 	/* if fp is valid, means we need to upgrade the database */
 	if (fp) {
 		load_synch = 1;
-		while (fgets(buf, 512, fp)) {
+		while (fgets(buf, BUFSIZE, fp)) {
 			strip(buf);
 			LoadArryCount = split_buf(buf, &LoadArry, 0);
 			if (!list_find(vhosts, LoadArry[0], findnick)) {
 				map = malloc(sizeof(hs_map));
-				strncpy(map->nnick, LoadArry[0], MAXNICK);
-				strncpy(map->host, LoadArry[1], MAXHOST);
-				strncpy(map->vhost, LoadArry[2], MAXHOST);
+				strlcpy(map->nnick, LoadArry[0], MAXNICK);
+				strlcpy(map->host, LoadArry[1], MAXHOST);
+				strlcpy(map->vhost, LoadArry[2], MAXHOST);
 				if (LoadArryCount > 3) {	/* Check for upgrades from earlier versions */
-					strncpy(map->passwd, LoadArry[3],
-						50);
+					strlcpy(map->passwd, LoadArry[3],
+						MAXPASSWORD);
 				} else	/* Upgrading from earlier version, no passwds exist */
-					strncpy(map->passwd, NULL, 50);
+					strlcpy(map->passwd, NULL, MAXPASSWORD);
 				if (LoadArryCount > 4) {	/* Does who set it exist? Yes? go ahead */
-					strncpy(map->added, LoadArry[4],
+					strlcpy(map->added, LoadArry[4],
 						MAXNICK);
 				} else	/* We have no information on who set it so its null */
-					strcpy(map->added, "\0");
+					map->added[0] = 0;
 				if (LoadArryCount > 5) {
 					map->lused = atoi(LoadArry[5]);
 				} else
-					map->lused = time(NULL);
-				map->nnick[strlen(map->nnick)] = '\0';
+					map->lused = me.now;
 				/* add it to the hash */
 				hn = lnode_create(map);
 				list_append(vhosts, hn);
@@ -1073,15 +1082,15 @@ void Loadhosts()
 		load_synch = 1;
 		for (count = 0; LoadArry[count] != NULL; count++) {
 			map = malloc(sizeof(hs_map));
-			strncpy(map->nnick, LoadArry[count], MAXNICK);
+			strlcpy(map->nnick, LoadArry[count], MAXNICK);
 			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Host") > 0) 
-				strncpy(map->host, tmp, MAXHOST);
+				strlcpy(map->host, tmp, MAXHOST);
 			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Vhost") > 0) 
-				strncpy(map->vhost, tmp, MAXHOST);
+				strlcpy(map->vhost, tmp, MAXHOST);
 			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Passwd") > 0) 
-				strncpy(map->passwd, tmp, 30);
+				strlcpy(map->passwd, tmp, MAXPASSWORD);
 			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Added") > 0)
-				strncpy(map->added, tmp, MAXNICK);
+				strlcpy(map->added, tmp, MAXNICK);
 			GetData((void *)&map->lused, CFGINT, "Vhosts", map->nnick, "LastUsed");
 			hn = lnode_create(map);
 			list_append(vhosts, hn);
@@ -1148,7 +1157,7 @@ static void hs_login(User * u, char *login, char *pass)
 		map = lnode_get(hn);
 		if (!strcasecmp(map->passwd, pass)) {
 			ssvshost_cmd(u->nick, map->vhost);
-			map->lused = time(NULL);
+			map->lused = me.now;
 			prefmsg(u->nick, s_HostServ,
 				"Your VHOST %s has been set.", map->vhost);
 			nlog(LOG_NORMAL, LOG_MOD,
@@ -1179,7 +1188,7 @@ void CleanupHosts()
 	hn = list_first(vhosts);
 	while (hn != NULL) {
 		map = lnode_get(hn);
-		if (map->lused < (time(NULL) - (hs_cfg.old * 86400))) {
+		if (map->lused < (me.now - (hs_cfg.old * 86400))) {
 			nlog(LOG_NOTICE, LOG_MOD,
 			     "Old Vhost Automatically removed: %s for %s",
 			     map->vhost, map->nnick);

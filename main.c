@@ -39,41 +39,18 @@
 
 /* this is the name of the services bot */
 char s_Services[MAXNICK] = "NeoStats";
-
-/*! depending on what IRCD is selected, we change the version string */
-#ifdef UNREAL
-const char version[] = "(U)";
-#elif ULTIMATE3
-const char version[] = "(UL3)";
-#elif ULTIMATE
-const char version[] = "(UL)";
-#elif HYBRID7
-const char version[] = "(H)";
-#elif NEOIRCD
-const char version[] = "(N)";
-#elif MYSTIC
-const char version[] = "(M)";
-#elif QUANTUM
-const char version[] = "(Q)";
-#elif IRCU
-const char version[] = "(IRCU)";
-#elif BAHAMUT
-const char version[] = "(B)";
-#endif
-
 /*! Date when we were compiled */
 const char version_date[] = __DATE__;
 /*! Time we were compiled */
 const char version_time[] = __TIME__;
 
-static void login (void);
 static void start (void);
 static void setup_signals (void);
 static int get_options (int argc, char **argv);
 
 /*! have we forked */
 int forked = 0;
-
+static int attempts = 0;
 
 /** @brief Main Entry point into program
  *
@@ -111,7 +88,7 @@ main (int argc, char *argv[])
 	me.onchan = 0;
 	/* keep quiet if we are told to :) */
 	if (!config.quiet) {
-		printf ("NeoStats %d.%d.%d%s Loading...\n", MAJOR, MINOR, REV, version);
+		printf ("NeoStats %d.%d.%d%s Loading...\n", MAJOR, MINOR, REV, ircd_version);
 		printf ("-----------------------------------------------\n");
 		printf ("Copyright: NeoStats Group. 2000-2003\n");
 		printf ("Justin Hammond (fish@neostats.net)\n");
@@ -120,15 +97,15 @@ main (int argc, char *argv[])
 		printf ("-----------------------------------------------\n\n");
 	}
 	/* set some defaults before we parse the config file */
-	me.t_start = time (NULL);
+	me.t_start = me.now;
 	me.want_privmsg = 0;
 	me.die = 0;
 	me.local[0] = '\0';
-	me.coder_debug = 0;
+	me.debug_mode = 0;
 	me.noticelag = 0;
 	me.r_time = 10;
 	me.numeric = 1;
-	me.lastmsg = time (NULL);
+	me.lastmsg = me.now;
 	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
 	me.synced = 0;
 	me.onchan = 0;
@@ -186,13 +163,13 @@ main (int argc, char *argv[])
 		/* we are the parent */ 
 		if (forked>0) { 
 			/* write out our PID */
-			fp = fopen ("neostats.pid", "w");
+			fp = fopen (PID_FILENAME, "w");
 			fprintf (fp, "%i", forked);
 			fclose (fp);
 			if (!config.quiet) {
 				printf ("\n");
-				printf ("NeoStats %d.%d.%d%s Successfully Launched into Background\n", MAJOR, MINOR, REV, version);
-				printf ("PID: %i - Wrote to neostats.pid\n", forked);
+				printf ("NeoStats %d.%d.%d%s Successfully Launched into Background\n", MAJOR, MINOR, REV, ircd_version);
+				printf ("PID: %i - Wrote to %s\n", forked, PID_FILENAME);
 			}
 			return EXIT_SUCCESS; /* parent exits */ 
 		}
@@ -207,10 +184,10 @@ main (int argc, char *argv[])
 		}
 	}
 #endif
-	nlog (LOG_NOTICE, LOG_CORE, "NeoStats started (NeoStats %d.%d.%d%s).", MAJOR, MINOR, REV, version);
+	nlog (LOG_NOTICE, LOG_CORE, "NeoStats started (NeoStats %d.%d.%d%s).", MAJOR, MINOR, REV, ircd_version);
 
 	/* don't init_modules till after we fork. This fixes the load->fork-exit->call _fini problems when we fork */
-	init_modules ();
+	ConfLoadModules ();
 
 	/* we are ready to start now Duh! */
 	start ();
@@ -255,7 +232,7 @@ get_options (int argc, char **argv)
 			printf ("     -f (Do not fork into background\n");
 			return NS_FAILURE;
 		case 'v':
-			printf ("NeoStats Version %d.%d.%d%s\n", MAJOR, MINOR, REV, version);
+			printf ("NeoStats Version %d.%d.%d%s\n", MAJOR, MINOR, REV, ircd_version);
 			printf ("Compiled: %s at %s\n", version_date, version_time);
 			printf ("Flag after version number indicates what IRCd NeoStats is compiled for:\n");
 			printf ("(U)  - Unreal IRCd\n");
@@ -380,7 +357,7 @@ serv_segv ()
 	 *  the stack to where we were before we jumped into the module
 	 *  and continue on
 	 */
-	if (strlen (segvinmodule) > 1) {
+	if (segvinmodule[0] != 0) {
 		globops (me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
 		chanalert (s_Services, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
 		nlog (LOG_CRITICAL, LOG_CORE, "Uh Oh, Segmentation Fault in Modules Code %s", segvinmodule);
@@ -396,7 +373,7 @@ serv_segv ()
 		chanalert (s_Services, "Backtrace not available on this platform");
 		nlog (LOG_CRITICAL, LOG_CORE, "Backtrace not available on this platform");
 #endif
-		strncpy (name, segvinmodule, 30);
+		strlcpy (name, segvinmodule, MAX_MOD_NAME);
 		CLEAR_SEGV_INMODULE();
 		unload_module (name, NULL);
 		chanalert (s_Services, "Restoring Stack to before Crash");
@@ -413,7 +390,7 @@ serv_segv ()
 		nlog (LOG_CRITICAL, LOG_CORE, "Approx Location: %s Backtrace:", segv_location);
 		/* Broadcast it out! */
 		globops (me.name, "Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
-		chanalert (s_Services, "Damn IT, Server Terminating (%d%d%d%s), Segmentation Fault. Buffer: %s, Approx Location: %s Backtrace:", MAJOR, MINOR, REV, version, recbuf, segv_location);
+		chanalert (s_Services, "Damn IT, Server Terminating (%d%d%d%s), Segmentation Fault. Buffer: %s, Approx Location: %s Backtrace:", MAJOR, MINOR, REV, ircd_version, recbuf, segv_location);
 #ifdef HAVE_BACKTRACE
 		for (i = 1; i < size; i++) {
 			chanalert (s_Services, "Backtrace(%d): %s", i, strings[i]);
@@ -427,7 +404,7 @@ serv_segv ()
 		kill (forked, 3);
 		kill (forked, 9);
 		/* clean up */
-		do_exit (NS_EXIT_SEGFAULT);
+		do_exit (NS_EXIT_SEGFAULT, NULL);
 	}
 }
 
@@ -491,50 +468,21 @@ setup_signals (void)
 static void
 start (void)
 {
-	static int attempts = 0;
-
 	SET_SEGV_LOCATION();
 	nlog (LOG_NOTICE, LOG_CORE, "Connecting to %s:%d", me.uplink, me.port);
-	if (servsock > 0)
-		close (servsock);
 
 	servsock = ConnectTo (me.uplink, me.port);
 
 	if (servsock <= 0) {
 		nlog (LOG_WARNING, LOG_CORE, "Unable to connect to %s", me.uplink);
 	} else {
-		login ();
+		/* Call the IRC specific function slogin_cmd to login as a server to IRC */
+		slogin_cmd (me.name, me.numeric, me.infoline, me.pass);
+		sprotocol_cmd ("TOKEN CLIENT");
 		read_loop ();
-		close (servsock);
 	}
 
-	unload_modules(NULL);
-
-	if(me.r_time>0) {
-		nlog (LOG_NOTICE, LOG_CORE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
-		sleep (me.r_time);
-		do_exit (NS_EXIT_RESTART);
-	}
-	else {
-		nlog (LOG_NOTICE, LOG_CORE, "Reconnect time is zero, shutting down");
-		do_exit (NS_EXIT_NORMAL);
-	}
-}
-
-/** @brief Login to IRC
- *
- * Calls the IRC specific function slogin_cmd to login as a server to IRC
- * 
- * @return Nothing
- *
- */
-
-static void
-login (void)
-{
-	SET_SEGV_LOCATION();
-	slogin_cmd (me.name, me.numeric, me.infoline, me.pass);
-	sprotocol_cmd ("TOKEN CLIENT");
+	do_exit (NS_EXIT_RECONNECT, NULL);
 }
 
 /** @brief before exiting call this function. It flushes log files and tidy's up.
@@ -544,262 +492,63 @@ login (void)
  *  if 1, we don't prompt to save data
  */
 void
-do_exit (int segv)
+do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 {
 	/* Initialise exit code to OK */
-	int exit_code=EXIT_SUCCESS;
+	int return_code=EXIT_SUCCESS;
 
-	switch (segv) {
+	switch (exitcode) {
 	case NS_EXIT_NORMAL:
 		nlog (LOG_CRITICAL, LOG_CORE, "Normal shut down subsystems");
 		break;
-	case NS_EXIT_RESTART:
+	case NS_EXIT_RELOAD:
+		nlog (LOG_CRITICAL, LOG_CORE, "Reloading NeoStats");
+		break;
+	case NS_EXIT_RECONNECT:
 		nlog (LOG_CRITICAL, LOG_CORE, "Restarting NeoStats subsystems");
 		break;
+	case NS_EXIT_ERROR:
+		nlog (LOG_CRITICAL, LOG_CORE, "Exiting due to error");
+		return_code=EXIT_FAILURE;	/* exit code to error */
+		break;		
 	case NS_EXIT_SEGFAULT:
 		nlog (LOG_CRITICAL, LOG_CORE, "Shutting down subsystems without saving data due to core");
-		exit_code=EXIT_FAILURE;	/* exit code to error */
+		return_code=EXIT_FAILURE;	/* exit code to error */
 		break;
 	}
+
+	if (exitcode != NS_EXIT_SEGFAULT) {
+		unload_modules();
+		if(quitmsg)
+		{
+			squit_cmd (s_Services, quitmsg);
+			ssquit_cmd (me.name);
+		}
+		if (servsock > 0)
+			close (servsock);
+		if (exitcode == NS_EXIT_RECONNECT) {
+			if(me.r_time>0) {
+				nlog (LOG_NOTICE, LOG_CORE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
+				sleep (me.r_time);
+			}
+			else {
+				nlog (LOG_NOTICE, LOG_CORE, "Reconnect time is zero, shutting down");
+			}
+		}
+	}
+
 	kp_flush();
 	close_logs ();
-	if (segv == NS_EXIT_RESTART) {
+	if (exitcode == NS_EXIT_RECONNECT || exitcode == NS_EXIT_RELOAD) {
 		execve ("./neostats", NULL, NULL);
-		exit_code=EXIT_FAILURE;	/* exit code to error */
+		return_code=EXIT_FAILURE;	/* exit code to error */
 	}
-	remove ("neostats.pid");
-	exit (exit_code);
+	remove (PID_FILENAME);
+	exit (return_code);
 }
 
-/* @todo Everything below here wants moving into a different file */
-
-/** @brief Our Own implementation of Malloc.
- *
- * Allocates memory for internal variables. Usefull for Memory Debugging
- * if enough memory can't be malloced, exit the program 
- *
- * @param size The amount of memory to Malloc
- *
- * @returns size bytes of memory or NULL on malloc error
- *
- * @todo move this to a util type file, as it being in main is crazy
- */
-
-void *
-smalloc (long size)
+void fatal_error(char* file, int line, char* func, char* error_text)
 {
-	void *buf;
-
-	if (!size) {
-		nlog (LOG_WARNING, LOG_CORE, "smalloc(): illegal attempt to allocate 0 bytes!");
-		size = 1;
-	}
-	buf = malloc (size);
-	if (!buf) {
-		nlog (LOG_CRITICAL, LOG_CORE, "smalloc(): out of memory.");
-		do_exit (NS_EXIT_SEGFAULT);
-	}
-	return buf;
+	nlog (LOG_CRITICAL, LOG_CORE, "Fatal Error: %s %d %s %s", file, line, func, error_text);
+	do_exit (NS_EXIT_ERROR, "Fatal Error - check log file");
 }
-
-/** @brief Duplicate a string
- *
- * make a copy of a string, with memory allocated for the new string
- *
- * @param s a pointer to the string to duplicate
- *
- * @returns a pointer to the new string
- *
- * @deprecated  Try not to use this function, it will go away one day
- *
- */
-
-char *
-sstrdup (const char *s)
-{
-	char *t = strdup (s);
-	if (!t) {
-		nlog (LOG_CRITICAL, LOG_CORE, "sstrdup(): out of memory.");
-		do_exit (NS_EXIT_SEGFAULT);
-	}
-	return t;
-}
-
-/** @brief Create a HASH from a string
- *
- * Makes a hash of a string for a table
- *
- * @param name The string to use as the base for the hash
- *
- * @param size_of_table The size of the hash table
- *
- * @returns unsigned long of the hash
- *
- * @deprecated  Try not to use this function, it will go away one day
- *
- */
-
-unsigned long
-HASH (const unsigned char *name, int size_of_table)
-{
-	unsigned long h = 0, g;
-
-	while (*name) {
-		h = (h << 4) + *name++;
-		if ((g = h & 0xF0000000))
-			h ^= g >> 24;
-		h &= ~g;
-	}
-	return h % size_of_table;
-}
-
-/** @brief convert a string to lowercase
- *
- * makes a string lowercase
- *
- * @param s the string to convert to lowercase. WARNING: the result overwrites this variable
- *
- * @returns pointer to the lowercase version of s
- *
- */
-
-char *
-strlower (char *s)
-{
-	char *t;
-	t = malloc (strlen (s));
-	strncpy (t, s, strlen (s));
-	while (*t) {
-		*t++ = tolower (*t);
-	}
-	return t;
-}
-
-/** @brief Adds a string to an array of strings
- *
- * used for the event functions, adds a string to an array of string pointers to pass to modules
- *
- * @param List the array you wish to append S to 
- * @param S the string you wish to append
- * @param C the current size of the array
- * 
- * @returns Nothing
- *
- */
-
-void
-AddStringToList (char ***List, char S[], int *C)
-{
-	if (*C == 0) {
-		*List = calloc (sizeof (char *) * 8, 1);
-	}
-	++*C;
-	(*List)[*C - 1] = S;
-}
-
-/** @brief Frees a list created with AddStringToList
- *
- * Frees the memory used for a string array used with AddStringToList
- *
- * @param List the array you wish to delete
- * @param C the current size of the array as returned by AddStringToList
- * 
- * @returns Nothing
- *
- */
-void
-FreeList (char **List, int C)
-{
-	int i;
-	for (i = 0; i == C; i++)
-		free (List[i]);
-	C = 0;
-}
-
-/* this came from eggdrop sources */
-/* Remove the color control codes that mIRC,pIRCh etc use to make
- * their client seem so fecking cool! (Sorry, Khaled, you are a nice
- * guy, but when you added this feature you forced people to either
- * use your *SHAREWARE* client or face screenfulls of crap!)
- */
-void strip_mirc_codes(char *text)
-{
-  char *dd = text;
-
-  while (*text) {
-    switch (*text) {
-    case 1:
-    	text++;			/* ctcp stuff */
-    	continue;
-      break;
-    case 2:			/* Bold text */
-	text++;
-	continue;
-      break;
-    case 3:			/* mIRC colors? */
-	if (isdigit(text[1])) {	/* Is the first char a number? */
-	  text += 2;		/* Skip over the ^C and the first digit */
-	  if (isdigit(*text))
-	    text++;		/* Is this a double digit number? */
-	  if (*text == ',') {	/* Do we have a background color next? */
-	    if (isdigit(text[1]))
-	      text += 2;	/* Skip over the first background digit */
-	    if (isdigit(*text))
-	      text++;		/* Is it a double digit? */
-	  }
-	continue;
-      }
-      break;
-    case 7:
-	text++;
-	continue;
-      break;
-    case 0x16:			/* Reverse video */
-	text++;
-	continue;
-      break;
-    case 0x1f:			/* Underlined text */
-	text++;
-	continue;
-      break;
-    case 033:
-	text++;
-	if (*text == '[') {
-	  text++;
-	  while ((*text == ';') || isdigit(*text))
-	    text++;
-	  if (*text)
-	    text++;		/* also kill the following char */
-	}
-	continue;
-      break;
-    }
-    *dd++ = *text++;		/* Move on to the next char */
-  }
-  *dd = 0;
-}
-
-char *
-sctime (time_t stuff)
-{
-	char *s, *c;
-
-	s = ctime (&stuff);
-	if ((c = strchr (s, '\n')))
-		*c = '\0';
-
-	return s;
-}
-
-static char fmtime[80];
-
-char *
-sftime (time_t stuff)
-{
-	struct tm *ltm = localtime (&stuff);
-
-	strftime (fmtime, 80, "[%b (%a %d) %Y  %I:%M [%p/%Z]]", ltm);
-
-	return fmtime;
-}
-

@@ -82,9 +82,13 @@
 #endif
 extern void nassert_fail (const char *expr, const char *file, const int line, const char *infunk);
 
+#ifndef NDEBUG
 #define nassert(expr) \
   (__ASSERT_VOID_CAST ((expr) ? 0 :                                           \
 	(nassert_fail(__STRING(expr), __FILE__, __LINE__, __NASSERT_FUNCTION), 0)))
+#else
+#define nassert(expr) (__ASSERT_VOID_CAST (0))
+#endif
 
 extern void nlog (int level, int scope, char *fmt, ...);
 void *close_logs ();

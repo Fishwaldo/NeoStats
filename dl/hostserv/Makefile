@@ -7,15 +7,13 @@ OBJECTS= hostserv.o
 TARGET= hostserv.so
 DISTFILES = $(SOURCES) hs_help.c Makefile README ChangeLog
 
-all:	hostserv
-
+all:	hostserv 
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 hostserv: $(OBJECTS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
-	/bin/cp $(TARGET) ../
 
 clean:
 	/bin/rm -rf ../$(TARGET) 

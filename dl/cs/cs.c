@@ -36,6 +36,76 @@
 */
 /*#define DISABLE_COLOUR_SUPPORT*/
 
+#ifdef DISABLE_COLOUR_SUPPORT
+char msg_nickchange[]="\2NICK\2 %s (%s@%s) Changed their nick to %s";
+char msg_signon[]="\2SIGNON\2 %s (%s@%s) has signed on at %s";
+char msg_localkill[]="\2LOCAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";
+char msg_globalkill[]="\2GLOBAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2";
+char msg_serverkill[]="\2SERVER KILL\2 %s was Killed by the Server %s - Reason sighted: \2%s\2";  
+char msg_signoff[]="\2SIGNOFF\2 %s (%s@%s) has signed off at %s - %s";
+char msg_netadmin[]="\2NETADMIN\2 %s is Now a Network Administrator (+%c)";
+char msg_netadminoff[]="\2NETADMIN\2 %s is No Longer a Network Administrator (-%c)";
+char msg_conetadmin[]="\2CO-NETADMIN\2 %s is Now a Co-Network Administrator (+%c)";
+char msg_conetadminoff[]="\2CO-NETADMIN\2 %s is No Longer a Co-Network Administrator (-%c)";
+char msg_techadmin[]="\2TECHADMIN\2 %s is Now a Network Technical Administrator (+%c)";
+char msg_techadminoff[]="\2TECHADMIN\2 %s is No Longer a Network Technical Administrator (-%c)";
+char msg_cotechadmin[]="\2CO-TECHADMIN\2 %s is Now a Network Co-Technical Administrator (+%c)";
+char msg_cotechadminoff[]="\2CO-TECHADMIN\2 %s is No Longer a Network Co-Technical Administrator (-%c)";
+char msg_serveradmin[]="\2SERVERADMIN\2 %s is Now a Server Administrator (+%c) on %s";
+char msg_serveradminoff[]="\2SERVERADMIN\2 %s is No Longer a Server Administrator (-%c) on %s";
+char msg_coserveradmin[]="\2CO-SERVERADMIN\2 %s is Now a Co-Server Administrator (+%c) on %s";
+char msg_coserveradminoff[]="\2CO-SERVERADMIN\2 %s is No Longer a Co-Server Administrator (-%c) on %s";
+char msg_guestadmin[]="\2GUESTADMIN\2 %s is Now a Guest Administrator on (+%c) %s";
+char msg_guestadminoff[]="\2GUESTADMIN\2 %s is No Longer a Guest Administrator (-%c) on %s";
+char msg_servicesadmin[]="\2SERVICESADMIN\2 %s is Now a Services Administrator (+%c)";
+char msg_servicesadminoff[]="\2SERVICESADMIN\2 %s is No Longer a Services Administrator (-%c)";
+char msg_globop[]="\2OPER\2 %s is Now a global operator (+%c) on %s";
+char msg_globopoff[]="\2OPER\2 %s is No Longer an global operator (-%c) on %s";
+char msg_locop[]="\2LOCALOPER\2 %s is Now a local operator (+%c) on %s";
+char msg_locopoff[]="\2LOCALOPER\2 %s is No Longer a local operator (-%c) on %s";
+char msg_netservice[]="\2SERVICES\2 %s is Now a Network Service (+%c)";
+char msg_netserviceoff[]="\2SERVICES\2 %s is No Longer a Network Service (-%c)";
+char msg_bot[]="\2BOT\2 %s is Now a Bot (+%c)";
+char msg_botoff[]="\2BOT\2 %s is No Longer a Bot (-%c)";
+char msg_invisible[]="\2INVISIBLE\2 %s Is Using \2Invisible Mode\2 (+%c)";
+char msg_invisibleoff[]="\2INVISIBLE\2 %s Is no longer using \2Invisible Mode\2 (-%c)";
+#else
+char msg_nickchange[]="\2\0037Nick Change\2 user: \2%s\2 (%s@%s) Changed their nick to \2%s\2\003"; 
+char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s) at: \2%s\2\003";
+char msg_localkill[]="\2LOCAL KILL\2 user: \2%s\2 (%s@%s) was Killed by: \2%s\2 - Reason sighted: \2%s\2";
+char msg_globalkill[]="\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2\003";
+char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
+char msg_signoff[]="\2\0033Signed Off\2 user: %s (%s@%s) at: %s - %s\003";
+char msg_netadmin[]="\2\00313%s\2 is \2Now\2 a \2Network Administrator\2 (+%c)\003";
+char msg_netadminoff[]="\02\00313%s\2 is \2No Longer\2 a \2Network Administrator\2 (-%c)\003";
+char msg_conetadmin[]="\2\00313%s\2 is \2Now\2 a \2Co-Network Administrator\2 (+%c)\003";
+char msg_conetadminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Co-Network Administrator\2 (-%c)\003";
+char msg_techadmin[]="\2\00313%s\2 is \2Now\2 a \2Network Technical Administrator\2 (+%c)\003";
+char msg_techadminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Network Technical Administrator\2 (-%c)\003";
+char msg_cotechadmin[]="\2\00313%s\2 is \2Now\2 a \2Network Co-Technical Administrator\2 (+%c)\003";
+char msg_cotechadminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Network Co-Technical Administrator\2 (-%c)\003";
+char msg_serveradmin[]="\2\00313%s\2 is \2Now\2 a \2Server Administrator\2 (+%c) on \2%s\2\003";
+char msg_serveradminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Server Administrator\2 (-%c) on \2%s\2\003";
+char msg_coserveradmin[]="\2\00313%s\2 is \2Now\2 a \2Co-Server Administrator\2 (+%c) on \2%s\2\003";
+char msg_coserveradminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Co-Server Administrator\2 (-%c) on \2%s\2\003";
+char msg_guestadmin[]="\2\00313%s\2 is \2Now\2 a \2Guest Administrator\2 (+%c) on \2%s\2\003";
+char msg_guestadminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Guest Administrator\2 (-%c) on \2%s\2\003";
+char msg_servicesadmin[]="\2\00313%s\2 is \2Now\2 a \2Services Administrator\2 (+%c)\003";
+char msg_servicesadminoff[]="\2\00313%s\2 is \2No Longer\2 a \2Services Administrator\2 (-%c)\003";
+char msg_globop[]="\2\00313%s\2 is \2Now\2 a \2Global Operator\2 (+%c) on \2%s\2\003";
+char msg_globopoff[]="\2\00313%s\2 is \2No Longer\2 a \2Global Operator\2 (-%c) on \2%s\2\003";
+char msg_locop[]="\2\00313%s\2 is \2Now\2 a \2Local Operator\2 (+%c) on \2%s\2\003";
+char msg_locopoff[]="\2\00313%s\2 is \2No Longer\2 a \2Local Operator\2 (-%c) on \2%s\2\003";
+char msg_netservice[]="\2\00313%s\2 is \2Now\2 a \2Network Service\2 (+%c)\003";
+char msg_netserviceoff[]="\2\00313%s\2 is \2No Longer\2 a \2Network Service\2 (-%c)\003";
+char msg_bot[]="\2\00313%s\2 is \2Now\2 a \2Bot\2 (+%c)\003";
+char msg_botoff[]="\2\00313%s\2 is \2No Longer\2 a \2Bot\2 (-%c)\003";
+char msg_invisible[]="\2%s\2 Is Using \2Invisible Mode\2 (+%c)";
+char msg_invisibleoff[]="\2%s\2 Is no longer using \2Invisible Mode\2 (-%c)";
+#endif
+
+
+
 char *s_ConnectServ;
 
 int cs_new_user(char **av, int ac);
@@ -64,7 +134,7 @@ static int cs_online = 0;
 ModuleInfo __module_info = {
 	"ConnectServ",
 	"Network Connection & Mode Monitoring Service",
-	"1.8",
+	"1.9",
 	__DATE__,
 	__TIME__
 };
@@ -167,24 +237,24 @@ void do_set(User * u, char **av, int ac)
 
 int Online(char **av, int ac)
 {
-	char *user;
-	char *host;
-	char *rname;
+	char *user = NULL;
+	char *host = NULL;
+	char *rname = NULL;
 
 	if (GetConf((void *) &s_ConnectServ, CFGSTR, "Nick") < 0) {
 		s_ConnectServ = "ConnectServ";
 	}
 	if (GetConf((void *) &user, CFGSTR, "User") < 0) {
 		user = malloc(MAXUSER);
-		snprintf(user, MAXUSER, "CS");
+		strlcpy(user, "CS", MAXUSER);
 	}
 	if (GetConf((void *) &host, CFGSTR, "Host") < 0) {
 		host = malloc(MAXHOST);
-		snprintf(host, MAXHOST, me.name);
+		strlcpy(host, me.name, MAXHOST);
 	}
 	if (GetConf((void *) &rname, CFGSTR, "RealName") < 0) {
-		rname = malloc(MAXHOST);
-		snprintf(rname, MAXHOST, "Connection Monitoring Service");
+		rname = malloc(MAXREALNAME);
+		strlcpy(rname, "Connection Monitoring Service", MAXREALNAME);
 	}
 
 
@@ -192,33 +262,36 @@ int Online(char **av, int ac)
 	    (s_ConnectServ, user, host, rname, "+oS",
 	     __module_info.module_name) == -1) {
 		/* Nick was in use */
-		s_ConnectServ = strcat(s_ConnectServ, "_");
+		strlcat(s_ConnectServ, "_", MAXREALNAME);
 		init_bot(s_ConnectServ, user, host, rname, "+oS",
 			 __module_info.module_name);
 	}
 	cs_online = 1;
+	if(user)
 	free(user);
+	if(host)
 	free(host);
+	if(rname)
 	free(rname);
 	return 1;
 };
 
 EventFnList __module_events[] = {
-	{"ONLINE", Online}
+	{EVENT_ONLINE, Online}
 	,
-	{"SIGNON", cs_new_user}
+	{EVENT_SIGNON, cs_new_user}
 	,
-	{"UMODE", cs_user_modes}
+	{EVENT_UMODE, cs_user_modes}
 	,
 #ifdef ULTIMATE3
-	{"SMODE", cs_user_smodes}
+	{EVENT_SMODE, cs_user_smodes}
 	,
 #endif
-	{"SIGNOFF", cs_del_user}
+	{EVENT_SIGNOFF, cs_del_user}
 	,
-	{"KILL", cs_user_kill}
+	{EVENT_KILL, cs_user_kill}
 	,
-	{"NICK_CHANGE", cs_user_nick}
+	{EVENT_NICKCHANGE, cs_user_nick}
 	,
 	{NULL, NULL}
 };
@@ -274,12 +347,7 @@ int cs_new_user(char **av, int ac)
 
 	/* Print Connection Notice */
 	if (u && sign_watch) {
-		chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-			"\2SIGNON\2 %s (%s@%s) has signed on at %s",
-#else
-			"\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s) at: \2%s\2\003",
-#endif
+		chanalert(s_ConnectServ, msg_signon,
 			  u->nick, u->username, u->hostname,
 			  u->server->name);
 	}
@@ -326,11 +394,7 @@ int cs_del_user(char **av, int ac)
 			LocalCount = split_buf(lcl, &Local, 0);
 			KillMsg = joinbuf(Local, LocalCount, 7);
 			chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-				  "\2LOCAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2",
-#else
-				  "\2LOCAL KILL\2 user: \2%s\2 (%s@%s) was Killed by: \2%s\2 - Reason sighted: \2%s\2",
-#endif
+				  msg_localkill,
 				  u->nick, u->username, u->hostname,
 				  Local[6], KillMsg);
 			free(KillMsg);
@@ -345,11 +409,7 @@ int cs_del_user(char **av, int ac)
 	/* Print Disconnection Notice */
 	if (sign_watch) {
 		chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-			"\2SIGNOFF\2 %s (%s@%s) has signed off at %s - %s",
-#else
-			"\2\0033Signed Off\2 user: %s (%s@%s) at: %s - %s\003",
-#endif
+			msg_signoff,
 			  u->nick, u->username, u->hostname,
 			  u->server->name, QuitMsg);
 	}
@@ -403,19 +463,11 @@ int cs_user_modes(char **av, int ac)
 		case NETADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2NetAdmin\2 %s is Now a Network Administrator (+%c)",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Network Administrator\2 (+%c)\003",
-#endif
+					msg_netadmin,
 					  u->nick, NETADMIN_MODE);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					 "\2NetAdmin\2 %s is No Longer a Network Administrator (-%c)",
-#else
-					"\02\00313%s\2 is \2No Longer\2 a \2Network Administrator\2 (-%c)\003",
-#endif
+					msg_netadminoff,
 					  u->nick, NETADMIN_MODE);
 			}
 			break;
@@ -424,19 +476,11 @@ int cs_user_modes(char **av, int ac)
 		case CONETADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Co-NetAdmin\2 %s is Now a Co-Network Administrator (+%c)",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Co-Network Administrator\2 (+%c)\003",
-#endif
+					msg_conetadmin,
 					  u->nick, CONETADMIN_MODE);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Co-NetAdmin\2 %s is No Longer a Co-Network Administrator (-%c)",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Co-Network Administrator\2 (-%c)\003",
-#endif
+					msg_conetadminoff,
 					  u->nick, CONETADMIN_MODE);
 			}
 			break;
@@ -445,19 +489,11 @@ int cs_user_modes(char **av, int ac)
 		case TECHADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					 "\2TechAdmin\2 %s is Now a Network Technical Administrator (+%c)",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Network Technical Administrator\2 (+%c)\003",
-#endif
+					msg_techadmin,
 					  u->nick, TECHADMIN_MODE);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2TechAdmin\2 %s is No Longer a Network Technical Administrator (-%c)",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Network Technical Administrator\2 (-%c)\003",
-#endif
+					msg_techadminoff,
 					  u->nick, TECHADMIN_MODE);
 			}
 			break;
@@ -466,19 +502,11 @@ int cs_user_modes(char **av, int ac)
 		case SERVERADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2ServerAdmin\2 %s is Now a Server Administrator (+%c) on %s",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Server Administrator\2 (+%c) on \2%s\2\003",
-#endif
+					msg_serveradmin,
 					  u->nick, SERVERADMIN_MODE, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2ServerAdmin\2 %s is No Longer a Server Administrator (-%c) on %s",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Server Administrator\2 (-%c) on \2%s\2\003",
-#endif
+					msg_serveradminoff,
 					  u->nick, SERVERADMIN_MODE, u->server->name);
 			}
 			break;
@@ -487,19 +515,11 @@ int cs_user_modes(char **av, int ac)
 		case COSERVERADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator (+%c) on %s",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Co-Server Administrator\2 (+%c) on \2%s\2\003",
-#endif
+					msg_coserveradmin,
 					  u->nick, COSERVERADMIN_MODE, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator (-%c) on %s",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Co-Server Administrator\2 (-%c) on \2%s\2\003",
-#endif
+					msg_coserveradminoff,
 					  u->nick, COSERVERADMIN_MODE, u->server->name);
 			}
 			break;
@@ -508,19 +528,11 @@ int cs_user_modes(char **av, int ac)
 		case GUESTADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2GuestAdmin\2 %s is Now a Guest Administrator on (+%c) %s",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Guest Administrator\2 (+%c) on \2%s\2\003",
-#endif
+					msg_guestadmin,
 					  u->nick, GUESTADMIN_MODE, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2GuestAdmin\2 %s is No Longer a Guest Administrator (-%c) on %s",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Guest Administrator\2 (-%c) on \2%s\2\003",
-#endif
+					msg_guestadminoff,
 					  u->nick, GUESTADMIN_MODE, u->server->name);
 			}
 			break;
@@ -530,19 +542,11 @@ int cs_user_modes(char **av, int ac)
 		case BOT_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Bot\2 %s is Now a Bot (+%c)",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Bot\2 (+%c)\003",
-#endif
+					msg_bot,
 					  u->nick, BOT_MODE);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Bot\2 %s is No Longer a Bot (-%c)",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Bot\2 (-%c)\003",
-#endif
+					msg_botoff,
 					  u->nick, BOT_MODE);
 			}
 			break;
@@ -550,12 +554,10 @@ int cs_user_modes(char **av, int ac)
 #ifdef INVISIBLE_MODE
 		case INVISIBLE_MODE:
 			if (add) {
-				globops(s_ConnectServ,
-					"\2%s\2 Is Using \2Invisible Mode\2 (+%c)",
+				globops(s_ConnectServ,msg_invisible,
 					u->nick, INVISIBLE_MODE);
 			} else {
-				globops(s_ConnectServ,
-					"\2%s\2 Is no longer using \2Invisible Mode\2 (-%c)",
+				globops(s_ConnectServ,msg_invisibleoff,
 					u->nick, INVISIBLE_MODE);
 			}
 			break;
@@ -565,19 +567,11 @@ int cs_user_modes(char **av, int ac)
 		case SERVICESADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2ServicesAdmin\2 %s is Now a Services Administrator (+%c)",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Services Administrator\2 (+%c)\003",
-#endif
+					msg_servicesadmin,
 					  u->nick, SERVICESADMIN_MODE);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2ServicesAdmin\2 %s is No Longer a Services Administrator (-%c)",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Services Administrator\2 (-%c)\003",
-#endif
+					msg_servicesadminoff,
 					  u->nick, SERVICESADMIN_MODE);
 			}
 			break;
@@ -586,19 +580,11 @@ int cs_user_modes(char **av, int ac)
 		case OPER_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Oper\2 %s is Now an Oper (+%c) on %s",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Global Operator\2 (+%c) on \2%s\2\003",
-#endif
+					msg_globop,
 					  u->nick, OPER_MODE, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Oper\2 %s is No Longer an Oper (-%c) on %s",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Global Operator\2 (-%c) on \2%s\2\003",
-#endif
+					msg_globopoff,
 					  u->nick, OPER_MODE, u->server->name);
 			}
 			break;
@@ -607,19 +593,11 @@ int cs_user_modes(char **av, int ac)
 		case LOCOP_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2LocalOper\2 %s is Now a Local Oper (+%c) on %s",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Local Operator\2 (+%c) on \2%s\2\003",
-#endif
+					msg_locop,
 					  u->nick, LOCOP_MODE, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2LocalOper\2 %s is No Longer a Local Oper (-%c) on %s",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Local Operator\2 (-%c) on \2%s\2\003",
-#endif
+					msg_locopoff,
 					  u->nick, LOCOP_MODE, u->server->name);
 			}
 			break;
@@ -628,19 +606,11 @@ int cs_user_modes(char **av, int ac)
 		case NETSERVICE_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Services\2 %s is Now a Network Service (+%c)",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Network Service\2 (+%c)\003",
-#endif
+					msg_netservice,
 					  u->nick, NETSERVICE_MODE);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Services\2 %s is No Longer a Network Service (-%c)",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Network Service\2 (-%c)\003",
-#endif
+					msg_netserviceoff,
 					  u->nick, NETSERVICE_MODE);
 			}
 			break;
@@ -691,19 +661,11 @@ int cs_user_smodes(char **av, int ac)
 		case NETADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2NetAdmin\2 %s is Now a Network Administrator (+%c)",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Network Administrator\2 (+%c)\003",
-#endif
+					msg_netadmin,
 					  u->nick, NETADMIN_MODE);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2NetAdmin\2 %s is No Longer a Network Administrator (-%c)",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Network Administrator\2 (-%c)\003",
-#endif
+					msg_netadminoff,
 					  u->nick, NETADMIN_MODE);
 			}
 			break;
@@ -712,19 +674,11 @@ int cs_user_smodes(char **av, int ac)
 		case CONETADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Co-NetAdmin\2 %s is Now a Co-Network Administrator (+%c)",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Co-Network Administrator\2 (+%c)\003",
-#endif
+					msg_conetadmin,
 					  u->nick, CONETADMIN_MODE);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Co-NetAdmin\2 %s is No Longer a Co-Network Administrator (-%c)",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Co-Network Administrator\2 (-%c)\003",
-#endif
+					msg_conetadminoff,
 					  u->nick, CONETADMIN_MODE);
 			}
 			break;
@@ -733,19 +687,11 @@ int cs_user_smodes(char **av, int ac)
 		case TECHADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2TechAdmin\2 %s is Now a Network Technical Administrator (+%c)",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Network Technical Administrator\2 (+%c)\003",
-#endif
+					msg_techadmin,
 					  u->nick, TECHADMIN_MODE);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2TechAdmin\2 %s is No Longer a Network Technical Administrator (-%c)",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Network Technical Administrator\2 (-%c)\003",
-#endif
+					msg_techadminoff,
 					  u->nick, TECHADMIN_MODE);
 			}
 			break;
@@ -754,19 +700,11 @@ int cs_user_smodes(char **av, int ac)
 		case COTECHADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Co-TechAdmin\2 %s is Now a Network Co-Technical Administrator (+%c)",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Network Co-Technical Administrator\2 (+%c)\003",
-#endif
+					msg_cotechadmin,
 					  u->nick, COTECHADMIN_MODE);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Co-TechAdmin\2 %s is No Longer a Network Co-Technical Administrator (-%c)",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Network Co-Technical Administrator\2 (-%c)\003",
-#endif
+					msg_cotechadminoff,
 					  u->nick, COTECHADMIN_MODE);
 			}
 			break;
@@ -775,19 +713,11 @@ int cs_user_smodes(char **av, int ac)
 		case SERVERADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2ServerAdmin\2 %s is Now a Server Administrator (+%c) on %s",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Server Administrator\2 (+%c) on \2%s\2\003",
-#endif
+					msg_serveradmin,
 					  u->nick, SERVERADMIN_MODE, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2ServerAdmin\2 %s is No Longer a Server Administrator (-%c) on %s",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Server Administrator\2 (-%c) on \2%s\2\003",
-#endif
+					msg_serveradminoff,
 					  u->nick, SERVERADMIN_MODE, u->server->name);
 			}
 			break;
@@ -796,19 +726,11 @@ int cs_user_smodes(char **av, int ac)
 		case COSERVERADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator (+%c) on %s",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Co-Server Administrator\2 (+%c) on \2%s\2\003",
-#endif
+					msg_coserveradmin,
 					  u->nick,COSERVERADMIN_MODE,  u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator (-%c) on %s",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Co-Server Administrator\2 (-%c) on \2%s\2\003",
-#endif
+					msg_coserveradminoff,
 					  u->nick, COSERVERADMIN_MODE, u->server->name);
 			}
 			break;
@@ -817,19 +739,11 @@ int cs_user_smodes(char **av, int ac)
 		case GUESTADMIN_MODE:
 			if (add) {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2GuestAdmin\2 %s is Now a Guest Administrator on (+%c) %s",
-#else
-					"\2\00313%s\2 is \2Now\2 a \2Guest Administrator\2 (+%c) on \2%s\2\003",
-#endif
+					msg_guestadmin,
 					  u->nick, GUESTADMIN_MODE, u->server->name);
 			} else {
 				chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-					"\2GuestAdmin\2 %s is No Longer a Guest Administrator (-%c) on %s",
-#else
-					"\2\00313%s\2 is \2No Longer\2 a \2Guest Administrator\2 (-%c) on \2%s\2\003",
-#endif
+					msg_guestadminoff,
 					  u->nick, GUESTADMIN_MODE, u->server->name);
 			}
 			break;
@@ -875,21 +789,13 @@ int cs_user_kill(char **av, int ac)
 		/* it was a User who was killed */
 		if (kill_watch)
 			chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-			"\2GLOBAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2",
-#else
-			"\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2\003",
-#endif
+			      msg_globalkill,
 				  u->nick, u->username, u->hostname,
 				  Kill[0], GlobalMsg);
 	} else if (findserver(Kill[2])) {
 		if (kill_watch)
 			chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-				"\2SERVER KILL\2 %s was Killed by the Server %s - Reason sighted: \2%s\2",  
-#else
-				"\2SERVER KILL\2 user: \2%s\2 was Killed by the Server \2%s\2 - Reason sighted: \2%s\2",
-#endif
+				msg_serverkill,
 				  u->nick, Kill[0], GlobalMsg);
 	}
 	free(GlobalMsg);
@@ -917,12 +823,8 @@ int cs_user_nick(char **av, int ac)
 			return 1;
 		}
 		chanalert(s_ConnectServ,
-#ifdef DISABLE_COLOUR_SUPPORT
-			"\2NICK\2 %s Changed their nick to %s",
-#else
-			"\2\0037Nick Change\2 user: \2%s\2 Changed their nick to \2%s\2\003", 
-#endif
-			  av[0], av[1]);
+			msg_nickchange,
+			  av[0], u->username, u->hostname, av[1]);
 	}
 	return 1;
 }

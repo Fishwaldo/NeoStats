@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <sys/poll.h>
 #include "hash.h"
 #include "stats.h"
 
@@ -54,6 +55,23 @@
 #define RTLD_GLOBAL 0
 #endif
 
+/* socket interface type */
+#define SOCK_POLL 1
+#define SOCK_STANDARD 2
+
+/** @brief Message function types
+ * 
+ */
+typedef int (*message_function) (char *origin, char **av, int ac);
+typedef int (*chan_message_function) (char *origin, char *chan, char **av, int ac);
+
+/** @brief Socket function types
+ * 
+ */
+typedef int (*socket_function) (int sock_no, char *sockname);
+typedef int (*before_poll_function) (void *data, struct pollfd *);
+typedef void (*after_poll_function) (void *data, struct pollfd *, unsigned int);
+
 /** @brief Module socket list structure
  * 
  */
@@ -63,15 +81,25 @@ typedef struct Sock_List {
 	/** Socket number */
 	int sock_no;
 	/** Socket name */
-	char sockname[MAXHOST];
+	char sockname[MAX_MOD_NAME];
+	/** socket interface (poll or standard) type */
+	int socktype;
+	/** if socktype = SOCK_POLL, before poll function */
+	/** Socket before poll function */
+	before_poll_function beforepoll;
+	/** Socket after poll function */
+	after_poll_function afterpoll;
+	/** data */
+	void *data;
+	/* if socktype = SOCK_STANDARD, function calls */
 	/** Socket read function */
-	int (*readfnc) (int sock_no, char *sockname);
+	socket_function readfnc;
 	/** Socket write function */
-	int (*writefnc) (int sock_no, char *sockname);
+	socket_function writefnc;
 	/** Socket error function */
-	int (*errfnc) (int sock_no, char *sockname);
+	socket_function errfnc;
 	/** Module name */
-	char modname[MAXHOST];
+	char modname[MAX_MOD_NAME];
 	/** rmsgs */
 	long rmsgs;
 	/** rbytes */
@@ -90,9 +118,9 @@ typedef struct Mod_Timer {
 	/** Hash code */
 	long hash;
 	/** Module name */
-	char modname[MAXHOST];
+	char modname[MAX_MOD_NAME];
 	/** Timer name */
-	char timername[MAXHOST];
+	char timername[MAX_MOD_NAME];
 	/** Timer interval */
 	int interval;
 	/** Time last run */
@@ -112,11 +140,11 @@ typedef struct {
 	/** Nick */
 	char nick[MAXNICK];
 	/** Module name */
-	char modname[MAXHOST];
+	char modname[MAX_MOD_NAME];
 	/** function */
-	int (*function) (char *origin, char **av, int ac);
+	message_function function;
 	/** function */
-	int (*chanfunc) (char *origin, char *chan, char **av, int ac);
+	chan_message_function chanfunc;
 	/** channel list */
 	hash_t *chanlist;
 }Mod_User;
@@ -140,7 +168,7 @@ hash_t *bch;
  */
 typedef struct {
 	char *cmd_name;
-	int (*function) (char *origin, char **av, int ac);
+	message_function function;
 	int srvmsg;
 }Functions;
 
@@ -200,6 +228,7 @@ int del_mod_timer (char *timer_name);
 Mod_Timer *findtimer(char *timer_name);
 void list_module_timer (User * u);
 int add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name);
+int add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name, void *data);
 int del_socket (char *sockname);
 void list_sockets (User * u);
 Sock_List *findsock (char *sock_name);
@@ -210,7 +239,7 @@ void del_bot_from_chan (char *bot, char *chan);
 void bot_chan_message (char *origin, char *chan, char **av, int ac);
 void botchandump (User * u);
 int get_mod_num (char *mod_name);
-void unload_modules(User * u);
+void unload_modules(void);
 /* 
  * Module Interface 
  */

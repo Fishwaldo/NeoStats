@@ -271,7 +271,7 @@ int Online(char **av, int ac)
 
 
 EventFnList __module_events[] = {
-	{"ONLINE", Online}
+	{EVENT_ONLINE, Online}
 	,
 	{NULL, NULL}
 };

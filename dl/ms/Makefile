@@ -6,6 +6,7 @@ SOURCES= ms.c
 OBJECTS= ms.o
 TARGET= moraleserv.so
 DISTFILES = $(SOURCES) Makefile ChangeLog ms_help.c
+
 all:	ms
 
 .c.o:
@@ -13,7 +14,6 @@ all:	ms
 
 ms: $(OBJECTS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
-	/bin/cp $(TARGET) ../
 
 clean:
 	/bin/rm -rf ../$(TARGET)

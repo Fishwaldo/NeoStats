@@ -53,7 +53,7 @@ void ss_html();
 ModuleInfo __module_info = {
 	 SSMNAME,
 	 "Statistical Bot For NeoStats",
-	 "3.10",
+	 "$Rev$",
 	__DATE__,
 	__TIME__
 };
@@ -67,22 +67,22 @@ Functions __module_functions[] = {
 };
 
 EventFnList __module_events[] = {
-	{"ONLINE", Online},
-	{"PONG", pong},
-	{"NEWSERVER", s_new_server},
-	{"SQUIT", s_del_server},
-	{"SIGNON", s_new_user},
-	{"UMODE", s_user_modes},
-	{"SIGNOFF", s_del_user},
-	{"AWAY", s_user_away},
-	{"KILL", s_user_kill},
-	{"NEWCHAN", s_chan_new},
-	{"DELCHAN", s_chan_del},
-	{"JOINCHAN", s_chan_join},
-	{"PARTCHAN", s_chan_part},
-	{"KICK", s_chan_kick},
-	{"TOPICCHANGE", s_topic_change},
-	{"CLIENTVERSION", s_client_version},
+	{EVENT_ONLINE, Online},
+	{EVENT_PONG, pong},
+	{EVENT_NEWSERVER, s_new_server},
+	{EVENT_SQUIT, s_del_server},
+	{EVENT_SIGNON, s_new_user},
+	{EVENT_UMODE, s_user_modes},
+	{EVENT_SIGNOFF, s_del_user},
+	{EVENT_AWAY, s_user_away},
+	{EVENT_KILL, s_user_kill},
+	{EVENT_NEWCHAN, s_chan_new},
+	{EVENT_DELCHAN, s_chan_del},
+	{EVENT_JOINCHAN, s_chan_join},
+	{EVENT_PARTCHAN, s_chan_part},
+	{EVENT_KICK, s_chan_kick},
+	{EVENT_TOPICCHANGE, s_topic_change},
+	{EVENT_CLIENTVERSION, s_client_version},
 	{NULL, NULL}
 };
 
@@ -94,25 +94,25 @@ void ss_Config()
 
 	if (GetConf((void *) &s_StatServ, CFGSTR, "Nick") < 0) {
 		s_StatServ = malloc(MAXNICK);
-		snprintf(s_StatServ, MAXNICK, "StatServ");
+		strlcpy(s_StatServ, "StatServ", MAXNICK);
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "User") < 0) {
-		snprintf(StatServ.user, MAXUSER, "SS");
+		strlcpy(StatServ.user, "SS", MAXUSER);
 	} else {
-		snprintf(StatServ.user, MAXUSER, "%s", tmp);
+		strlcpy(StatServ.user, tmp, MAXUSER);
 		free(tmp);
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "Host") < 0) {
-		snprintf(StatServ.host, MAXHOST, me.name);
+		strlcpy(StatServ.host, me.name, MAXHOST);
 	} else {
-		snprintf(StatServ.host, MAXHOST, "%s", tmp);
+		strlcpy(StatServ.host, tmp, MAXHOST);
 		free(tmp);
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "Rname") < 0) {
-		snprintf(StatServ.rname, MAXHOST, "/msg %s help",
+		ircsnprintf(StatServ.rname, MAXREALNAME, "/msg %s help",
 			 s_StatServ);
 	} else {
-		snprintf(StatServ.rname, MAXHOST, "%s", tmp);
+		strlcpy(StatServ.rname, tmp, MAXREALNAME);
 		free(tmp);
 	}
 	if (GetConf((void *) &StatServ.lag, CFGINT, "Lag") < 0) {
@@ -126,7 +126,7 @@ void ss_Config()
 		if (GetConf((void *) &StatServ.html, CFGINT, "HTML_Enabled") < 0) {
 			StatServ.html = 1;
 		}
-		snprintf(StatServ.htmlpath, 255, "%s", tmp);
+		strlcpy(StatServ.htmlpath, tmp, 255);
 		free(tmp);
 	}
 	if (GetConf((void *) &StatServ.interval, CFGINT, "Wallop_Throttle")
@@ -164,9 +164,10 @@ int __ModInit(int modnum, int apiver)
 	SET_SEGV_LOCATION();
 
 	StatServ.onchan = 0;
+	StatServ.shutdown = 0;
 	ss_Config();
 	if (StatServ.html) {
-		if (strlen(StatServ.htmlpath) < 1) {
+		if (StatServ.htmlpath[0] == 0) {
 			nlog(LOG_NOTICE, LOG_MOD,
 			     "StatServ HTML stats is disabled, as HTML_PATH is not set in the config file");
 			StatServ.html = 0;
@@ -233,6 +234,7 @@ int __ModInit(int modnum, int apiver)
 
 void __ModFini()
 {
+	StatServ.shutdown = 1;
 	SaveStats();
 
 }
@@ -507,7 +509,7 @@ static void ss_set(User * u, char **av, int ac)
 				s_StatServ);
 			return;
 		}
-		snprintf(StatServ.htmlpath, 255, "%s", av[3]);
+		strlcpy(StatServ.htmlpath, av[3], 255);
 		prefmsg(u->nick, s_StatServ, "HTML path now set to %s",
 			StatServ.htmlpath);
 		chanalert(s_StatServ, "%s changed the HTML path to %s",
@@ -896,7 +898,7 @@ static void makemap(char *uplink, User * u, int level)
 			/* its not the root server */
 			buf[0]='\0';
 			for (i = 1; i < level; i++) {
-				strncat(buf, "     |", 256);
+				strlcat (buf, "     |", 256);
 			}
 			prefmsg(u->nick, s_StatServ,
 				"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
@@ -1022,7 +1024,7 @@ static void ss_tld(User * u, char *tld)
 		prefmsg(u->nick, s_StatServ,
 			"Top Level Domain \2%s\2 does not exist.", tld);
 	else
-		prefmsg(u->nick, s_StatServ, "%s", tmp->country);
+		prefmsg(u->nick, s_StatServ, tmp->country);
 }
 
 static void ss_operlist(User * origuser, char *flags, char *server)

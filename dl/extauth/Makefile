@@ -7,7 +7,6 @@ OBJECTS= $(extauth_objs)
 TARGET= extauth.so
 DISTFILES = serviceroots.c Makefile
 
-
 all:	extauth
 
 .c.o:
@@ -15,7 +14,6 @@ all:	extauth
 
 extauth: $(OBJECTS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
-	/bin/cp $(TARGET) ../
 
 clean:
 	/bin/rm -rf ../$(TARGET)

@@ -39,8 +39,9 @@ new_server (char *name)
 
 	s = calloc (sizeof (Server), 1);
 	if (!name)
-		name = "";
-	memcpy (s->name, name, MAXHOST);
+		strsetnull (s->name);
+	else
+		strlcpy (s->name, name, MAXHOST);
 	sn = hnode_create (s);
 	if (!sn) {
 		nlog (LOG_WARNING, LOG_CORE, "Eeek, Hash is broken\n");
@@ -63,19 +64,19 @@ AddServer (char *name, char *uplink, int hops)
 	nlog (LOG_DEBUG1, LOG_CORE, "New Server: %s", name);
 	s = new_server (name);
 	s->hops = hops;
-	s->connected_since = time (NULL);
+	s->connected_since = me.now;
 	/* this is kinda useless right ? */
-/*	s->last_announce = time(NULL); */
+/*	s->last_announce = me.now; */
 	if (uplink) {
-		memcpy (s->uplink, uplink, MAXHOST);
+		strlcpy (s->uplink, uplink, MAXHOST);
 	} else {
-		s->uplink[0]='\0';
+		strsetnull (s->uplink);
 	}
 	s->ping = 0;
 
 	/* run the module event for a new server. */
 	AddStringToList (&av, s->name, &ac);
-	Module_Event ("NEWSERVER", av, ac);
+	Module_Event (EVENT_NEWSERVER, av, ac);
 	free (av);
 
 }
@@ -100,7 +101,7 @@ DelServer (char *name)
 
 	/* run the event for delete server */
 	AddStringToList (&av, s->name, &ac);
-	Module_Event ("SQUIT", av, ac);
+	Module_Event (EVENT_SQUIT, av, ac);
 	free (av);
 
 	hash_delete (sh, sn);
@@ -131,14 +132,14 @@ ServerDump ()
 	hscan_t ss;
 	hnode_t *sn;
 
-	sendcoders ("Server Listing:");
+	debugtochannel("Server Listing:");
 
 	hash_scan_begin (&ss, sh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		sendcoders ("Server Entry: %s", s->name);
+		debugtochannel("Server Entry: %s", s->name);
 	}
-	sendcoders ("End of Listing.");
+	debugtochannel("End of Listing.");
 }
 
 int 

@@ -28,6 +28,10 @@
 #include "dl.h"
 #include "log.h"
 
+static char ircd_buf[BUFSIZE];
+
+const char ircd_version[] = "(IRCU)";
+
 /* this is the command list and associated functions to run */
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -179,7 +183,6 @@ seob_cmd (const char *server)
 	return 1;
 }
 
-
 int
 sserver_cmd (const char *name, const int numeric, const char *infoline)
 {
@@ -238,11 +241,10 @@ schmode_cmd (const char *who, const char *chan, const char *mode, const char *ar
 {
 	char **av;
 	int ac;
-	char tmp[512];
 
-	sts (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, time (NULL));
-	snprintf (tmp, 512, "%s %s %s", chan, mode, args);
-	ac = split_buf (tmp, &av, 0);
+	sts (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, me.now);
+	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
+	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode ("", av, ac);
 	free (av);
 	return 1;
@@ -253,6 +255,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 {
 	int i, j;
 	char newmode[20];
+
 	newmode[0] = '+';
 	j = 1;
 	for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
@@ -263,8 +266,8 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 
 	}
 	newmode[j] = '\0';
-	sts ("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, time (NULL), newmode, ident, host, me.name, realname);
-	AddUser (nick, ident, host, me.name, 0, time (NULL));
+	sts ("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, me.now, newmode, ident, host, me.name, realname);
+	AddUser (nick, ident, host, me.name, 0, me.now);
 	UserMode (nick, newmode, 0);
 	return 1;
 }
@@ -281,6 +284,7 @@ sumode_cmd (const char *who, const char *target, long mode)
 {
 	int i, j;
 	char newmode[20];
+
 	newmode[0] = '+';
 	j = 1;
 	for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
@@ -300,11 +304,11 @@ int
 snumeric_cmd (const int numeric, const char *target, const char *data, ...)
 {
 	va_list ap;
-	char buf[512];
+
 	va_start (ap, data);
-	vsnprintf (buf, 512, data, ap);
-	sts (":%s %d %s :%s", me.name, numeric, target, buf);
+	ircvsnprintf (ircd_buf, BUFSIZE, data, ap);
 	va_end (ap);
+	sts (":%s %d %s :%s", me.name, numeric, target, ircd_buf);
 	return 1;
 }
 
@@ -315,16 +319,15 @@ spong_cmd (const char *reply)
 	return 1;
 }
 
-
 int
 skill_cmd (const char *from, const char *target, const char *reason, ...)
 {
 	va_list ap;
-	char buf[512];
+
 	va_start (ap, reason);
-	vsnprintf (buf, 512, reason, ap);
-	sts (":%s %s %s :%s", from, MSG_KILL, target, buf);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
+	sts (":%s %s %s :%s", from, MSG_KILL, target, ircd_buf);
 	DelUser (target);
 	return 1;
 }
@@ -333,11 +336,11 @@ int
 ssvskill_cmd (const char *who, const char *reason, ...)
 {
 	va_list ap;
-	char buf[512];
+
 	va_start (ap, reason);
-	vsnprintf (buf, 512, reason, ap);
-	sts (":%s %s %s :%s", me.name, MSG_KILL, who, buf);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
+	sts (":%s %s %s :%s", me.name, MSG_KILL, who, ircd_buf);
 /* hybrid doesn't have svskill, so this is handled just like a normal kill */
 	DelUser (who);
 	return 1;
@@ -355,7 +358,7 @@ int
 snick_cmd (const char *oldnick, const char *newnick)
 {
 	Change_User (finduser (oldnick), newnick);
-	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, time (NULL));
+	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, me.now);
 	return 1;
 }
 
@@ -403,11 +406,11 @@ int
 swallops_cmd (const char *who, const char *msg, ...)
 {
 	va_list ap;
-	char buf[512];
+
 	va_start (ap, msg);
-	vsnprintf (buf, 512, msg, ap);
-	sts (":%s %s :%s", who, MSG_WALLOPS, buf);
+	ircvsnprintf (ircd_buf, BUFSIZE, msg, ap);
 	va_end (ap);
+	sts (":%s %s :%s", who, MSG_WALLOPS, ircd_buf);
 	return 1;
 }
 
@@ -422,7 +425,7 @@ ssvshost_cmd (const char *who, const char *vhost)
 int
 ssvinfo_cmd ()
 {
-	sts ("SVINFO 5 3 0 :%d", time (NULL));
+	sts ("SVINFO 5 3 0 :%d", me.now);
 	return 1;
 }
 
@@ -444,18 +447,17 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 	hscan_t ss;
 	hnode_t *sn;
 	Server *s;
-
 	va_list ap;
-	char buf[512];
+
 	va_start (ap, reason);
-	vsnprintf (buf, 512, reason, ap);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
+	va_end (ap);
 
 	hash_scan_begin (&ss, sh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		sts (":%s %s %s %lu %s %s :%s", setby, MSG_KLINE, s->name, length, ident, host, buf);
+		sts (":%s %s %s %lu %s %s :%s", setby, MSG_KLINE, s->name, length, ident, host, ircd_buf);
 	}
-	va_end (ap);
 	return 1;
 }
 
@@ -468,48 +470,44 @@ srakill_cmd (const char *host, const char *ident)
 
 
 void
-chanalert (char *who, char *buf, ...)
+chanalert (char *who, char *fmt, ...)
 {
 	va_list ap;
-	char tmp[512];
-	char out[512];
-	va_start (ap, buf);
-	vsnprintf (tmp, 512, buf, ap);
 
-	if (me.onchan) {
-		snprintf (out, 512, ":%s PRIVMSG %s :%s", who, me.chan, tmp);
-		nlog (LOG_DEBUG3, LOG_CORE, "SENT: %s", out);
-		sts ("%s", out);
-	}
+	if (!me.onchan)
+		return;
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
+	nlog (LOG_DEBUG3, LOG_CORE, "SENT: :%s PRIVMSG %s :%s", who, me.chan, ircd_buf);
+	sts (":%s PRIVMSG %s :%s", who, me.chan, ircd_buf);
 }
 
 void
 prefmsg (char *to, const char *from, char *fmt, ...)
 {
 	va_list ap;
-	char buf[512], buf2[512];
 
-	va_start (ap, fmt);
-	vsnprintf (buf2, sizeof (buf2), fmt, ap);
 	if (findbot (to)) {
 		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
 		return;
 	}
-	if (me.want_privmsg) {
-		snprintf (buf, 512, ":%s PRIVMSG %s :%s", from, to, buf2);
-	} else {
-		snprintf (buf, 512, ":%s NOTICE %s :%s", from, to, buf2);
-	}
-	sts ("%s", buf);
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
+	if (me.want_privmsg) {
+		sts (":%s PRIVMSG %s :%s", from, to, ircd_buf);
+	} else {
+		sts (":%s NOTICE %s :%s", from, to, ircd_buf);
+	}
 }
 
 void
 privmsg (char *to, const char *from, char *fmt, ...)
 {
 	va_list ap;
-	char buf[512], buf2[512];
 
 	if (findbot (to)) {
 		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
@@ -517,17 +515,15 @@ privmsg (char *to, const char *from, char *fmt, ...)
 	}
 
 	va_start (ap, fmt);
-	vsnprintf (buf2, sizeof (buf2), fmt, ap);
-	snprintf (buf, 512, ":%s PRIVMSG %s :%s", from, to, buf2);
-	sts ("%s", buf);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
+	sts (":%s PRIVMSG %s :%s", from, to, ircd_buf);
 }
 
 void
 notice (char *to, const char *from, char *fmt, ...)
 {
 	va_list ap;
-	char buf[512], buf2[512];
 
 	if (findbot (to)) {
 		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
@@ -535,10 +531,9 @@ notice (char *to, const char *from, char *fmt, ...)
 	}
 
 	va_start (ap, fmt);
-	vsnprintf (buf2, sizeof (buf2), fmt, ap);
-	snprintf (buf, 512, ":%s NOTICE %s :%s", from, to, buf2);
-	sts ("%s", buf);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
+	sts (":%s NOTICE %s :%s", from, to, ircd_buf);
 }
 
 
@@ -547,7 +542,7 @@ privmsg_list (char *to, char *from, const char **text)
 {
 	while (*text) {
 		if (**text)
-			prefmsg (to, from, "%s", *text);
+			prefmsg (to, from, (char*)*text);
 		else
 			prefmsg (to, from, " ");
 		text++;
@@ -559,21 +554,16 @@ void
 globops (char *from, char *fmt, ...)
 {
 	va_list ap;
-	char buf[512], buf2[512];
 
 	va_start (ap, fmt);
-	vsnprintf (buf2, sizeof (buf2), fmt, ap);
-
-/* Shmad - have to get rid of nasty term echos :-) */
-
-/* Fish - now that was crackhead coding! */
-	if (me.onchan) {
-		snprintf (buf, 512, ":%s GLOBOPS :%s", from, buf2);
-		sts ("%s", buf);
-	} else {
-		nlog (LOG_NORMAL, LOG_CORE, "%s", buf2);
-	}
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
+
+	if (me.onchan) {
+		sts (":%s GLOBOPS :%s", from, ircd_buf);
+	} else {
+		nlog (LOG_NORMAL, LOG_CORE, ircd_buf);
+	}
 }
 
 void
@@ -609,13 +599,13 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 				if (cFlagTab[i].parameters) {
 					m = smalloc (sizeof (ModesParm));
 					m->mode = cFlagTab[i].mode;
-					strncpy (m->param, argv[j], PARAMSIZE);
+					strlcpy (m->param, argv[j], PARAMSIZE);
 					mn = lnode_create (m);
 					if (!list_isfull (tl)) {
 						list_append (tl, mn);
 					} else {
 						nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
-						do_exit (NS_EXIT_NORMAL);
+						do_exit (NS_EXIT_ERROR, "List full - see log file");
 					}
 					j++;
 				} else {
@@ -638,7 +628,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 					}
 				}
 			}
-			strncpy (nick, modes, MAXNICK);
+			strlcpy (nick, modes, MAXNICK);
 			ok = 0;
 			break;
 		}
@@ -655,7 +645,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 		} else {
 			/* eeeeeeek, list is full! */
 			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
-			do_exit (NS_EXIT_NORMAL);
+			do_exit (NS_EXIT_ERROR, "List full - see log file");
 		}
 	}
 	list_destroy (tl);
@@ -706,7 +696,7 @@ Usr_Stats (char *origin, char **argv, int argc)
 void
 Usr_Version (char *origin, char **argv, int argc)
 {
-	snumeric_cmd (RPL_VERSION, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, version, me.name, version_date, version_time);
+	snumeric_cmd (RPL_VERSION, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, ircd_version, me.name, version_date, version_time);
 }
 
 void
@@ -783,7 +773,7 @@ Usr_Vhost (char *origin, char **argv, int argc)
 	User *u;
 	u = finduser (origin);
 	if (u) {
-		strncpy (u->vhost, argv[0], MAXHOST);
+		strlcpy (u->vhost, argv[0], MAXHOST);
 	}
 }
 void
@@ -835,7 +825,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 	c = findchan (argv[0]);
 	if (c) {
 		buf = joinbuf (argv, argc, 2);
-		Change_Topic (origin, c, time (NULL), buf);
+		Change_Topic (origin, c, me.now, buf);
 		free (buf);
 	} else {
 		nlog (LOG_WARNING, LOG_CORE, "Ehhh, Can't find Channel %s", argv[0]);
@@ -848,7 +838,7 @@ Usr_Kick (char *origin, char **argv, int argc)
 {
 	User *u, *k;
 	u = finduser (argv[1]);
-	k = finduser(argv[0]);
+	k = finduser (origin);
 	if (u) {
 		kick_chan (u, argv[0], k);
 	} else {
@@ -890,11 +880,11 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 {
 	me.onchan = 1;
 	ircd_srv.uprot = atoi (argv[2]);
-	strncpy (ircd_srv.cloak, argv[3], 10);
-	strncpy (me.netname, argv[7], MAXPASS);
+	strlcpy (ircd_srv.cloak, argv[3], 10);
+	strlcpy (me.netname, argv[7], MAXPASS);
 	init_ServBot ();
 	globops (me.name, "Link with Network \2Complete!\2");
-	Module_Event ("NETINFO", NULL, 0);
+	Module_Event (EVENT_NETINFO, NULL, 0);
 	me.synced = 1;
 }
 
@@ -923,7 +913,7 @@ Srv_Squit (char *origin, char **argv, int argc)
 	if (s) {
 		DelServer (argv[0]);
 	} else {
-		nlog (LOG_WARNING, LOG_CORE, "Waring, Squit from Unknown Server %s", argv[0]);
+		nlog (LOG_WARNING, LOG_CORE, "Warning, Squit from Unknown Server %s", argv[0]);
 	}
 
 }

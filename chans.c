@@ -27,6 +27,16 @@
 #include "hash.h"
 #include "log.h"
 
+/** @brief Chanmem structure
+ *  
+ */
+typedef struct Chanmem {
+	char nick[MAXNICK];
+	time_t joint;
+	long flags;
+	void *moddata[NUM_MODULES];
+} Chanmem;
+
 /** @brief initialize the channel data
  *
  * initializes the channel data and channel hash ch.
@@ -84,13 +94,13 @@ Change_Topic (char *owner, Chans * c, time_t time, char *topic)
 {
 	char **av;
 	int ac = 0;
-	strncpy (c->topic, topic, BUFSIZE);
-	strncpy (c->topicowner, owner, MAXHOST);
+	strlcpy (c->topic, topic, BUFSIZE);
+	strlcpy (c->topicowner, owner, MAXHOST);
 	c->topictime = time;
 	AddStringToList (&av, c->name, &ac);
 	AddStringToList (&av, owner, &ac);
 	AddStringToList (&av, topic, &ac);
-	Module_Event ("TOPICCHANGE", av, ac);
+	Module_Event (EVENT_TOPICCHANGE, av, ac);
 	free (av);
 //      FreeList(av, ac);
 }
@@ -204,12 +214,12 @@ ChanMode (char *origin, char **av, int ac)
 									m = lnode_get (mn);
 									/* mode limit and mode key replace current values */
 									if ((m->mode == MODE_LIMIT) && (cFlagTab[i].mode == MODE_LIMIT)) {
-										strncpy (m->param, av[j], PARAMSIZE);
+										strlcpy (m->param, av[j], PARAMSIZE);
 										j++;
 										modeexists = 1;
 										break;
 									} else if ((m->mode == MODE_KEY) && (cFlagTab[i].mode == MODE_KEY)) {
-										strncpy (m->param, av[j], PARAMSIZE);
+										strlcpy (m->param, av[j], PARAMSIZE);
 										j++;
 										modeexists = 1;
 										break;
@@ -224,11 +234,11 @@ ChanMode (char *origin, char **av, int ac)
 								if (modeexists != 1) {
 									m = smalloc (sizeof (ModesParm));
 									m->mode = cFlagTab[i].mode;
-									strncpy (m->param, av[j], PARAMSIZE);
+									strlcpy (m->param, av[j], PARAMSIZE);
 									mn = lnode_create (m);
 									if (list_isfull (c->modeparms)) {
 										nlog (LOG_CRITICAL, LOG_CORE, "Eeek, Can't add additional Modes to Channel %s. Modelist is full", c->name);
-										do_exit (NS_EXIT_NORMAL);
+										do_exit (NS_EXIT_ERROR, "List full - see log file");
 									} else {
 										list_append (c->modeparms, mn);
 									}
@@ -297,7 +307,7 @@ ChangeChanUserMode (Chans * c, User * u, int add, long mode)
 	}
 	cmn = list_find (c->chanmembers, u->nick, comparef);
 	if (!cmn) {
-		if (me.coder_debug) {
+		if (me.debug_mode) {
 			chanalert (s_Services, "ChangeChanUserMode() %s doesn't seem to be in the Chan %s", u->nick, c->name);
 			chandump (c->name);
 			UserDump (u->nick);
@@ -332,7 +342,7 @@ new_chan (char *chan)
 
 	SET_SEGV_LOCATION();
 	c = smalloc (sizeof (Chans));
-	strncpy (c->name, chan, CHANLEN);
+	strlcpy (c->name, chan, CHANLEN);
 	cn = hnode_create (c);
 	if (hash_isfull (ch)) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Eeek, Channel Hash is full");
@@ -400,7 +410,7 @@ kick_chan (User * u, char *chan, User * k)
 	SET_SEGV_LOCATION();
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to kick_chan u=NULL, chan=%s: %s", chan, recbuf);
-		if (me.coder_debug) {
+		if (me.debug_mode) {
 			chanalert (s_Services, "NULL user passed to kick_chan u=NULL, chan=%s: %s", chan, recbuf);
 			chandump (chan);
 		}
@@ -408,7 +418,7 @@ kick_chan (User * u, char *chan, User * k)
 	}
 	if (!k) {
 		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to kick_chan k=NULL, chan=%s: %s", chan, recbuf);
-		if (me.coder_debug) {
+		if (me.debug_mode) {
 			chanalert (s_Services, "NULL user passed to kick_chan k=NULL, chan=%s: %s", chan, recbuf);
 			chandump (chan);
 		}
@@ -423,7 +433,7 @@ kick_chan (User * u, char *chan, User * k)
 		un = list_find (c->chanmembers, u->nick, comparef);
 		if (!un) {
 			nlog (LOG_WARNING, LOG_CORE, "Kick: hu, User %s isn't a member of this channel %s", u->nick, chan);
-			if (me.coder_debug) {
+			if (me.debug_mode) {
 				chanalert (s_Services, "Kick: hu, User %s isn't a member of this channel %s", u->nick, chan);
 				chandump (c->name);
 				UserDump (u->nick);
@@ -434,7 +444,7 @@ kick_chan (User * u, char *chan, User * k)
 			free (cm);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			Module_Event ("KICK", av, ac);
+			Module_Event (EVENT_KICK, av, ac);
 			free (av);
 			ac = 0;
 			c->cur_users--;
@@ -444,7 +454,7 @@ kick_chan (User * u, char *chan, User * k)
 			del_bot_from_chan (u->nick, c->name);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			Module_Event ("KICKBOT", av, ac);
+			Module_Event (EVENT_KICKBOT, av, ac);
 			free (av);
 			ac = 0;
 
@@ -452,7 +462,7 @@ kick_chan (User * u, char *chan, User * k)
 		un = list_find (u->chans, c->name, comparef);
 		if (!un) {
 			nlog (LOG_WARNING, LOG_CORE, "Kick:Hu, User %s claims not to be part of Chan %s", u->nick, chan);
-			if (me.coder_debug) {
+			if (me.debug_mode) {
 				chanalert (s_Services, "Kick: Hu, User %s claims not to be part of Chan %s", u->nick, chan);
 				chandump (c->name);
 				UserDump (u->nick);
@@ -463,7 +473,7 @@ kick_chan (User * u, char *chan, User * k)
 		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
 		if (c->cur_users <= 0) {
 			AddStringToList (&av, c->name, &ac);
-			Module_Event ("DELCHAN", av, ac);
+			Module_Event (EVENT_DELCHAN, av, ac);
 			free (av);
 			ac = 0;
 			del_chan (c);
@@ -496,7 +506,7 @@ part_chan (User * u, char *chan)
 	SET_SEGV_LOCATION();
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to part_chan u=NULL, chan=%s: %s", chan, recbuf);
-		if (me.coder_debug) {
+		if (me.debug_mode) {
 			chanalert (s_Services, "NULL user passed to part_chan u=NULL, chan=%s: %s", chan, recbuf);
 			chandump (chan);
 		}
@@ -511,7 +521,7 @@ part_chan (User * u, char *chan)
 		un = list_find (c->chanmembers, u->nick, comparef);
 		if (!un) {
 			nlog (LOG_WARNING, LOG_CORE, "hu, User %s isn't a member of this channel %s", u->nick, chan);
-			if (me.coder_debug) {
+			if (me.debug_mode) {
 				chanalert (s_Services, "hu, User %s isn't a member of this channel %s", u->nick, chan);
 				chandump (c->name);
 				UserDump (u->nick);
@@ -522,7 +532,7 @@ part_chan (User * u, char *chan)
 			free (cm);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			Module_Event ("PARTCHAN", av, ac);
+			Module_Event (EVENT_PARTCHAN, av, ac);
 			free (av);
 			ac = 0;
 //                      FreeList(av, ac);
@@ -533,14 +543,14 @@ part_chan (User * u, char *chan)
 			del_bot_from_chan (u->nick, c->name);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			Module_Event ("PARTBOT", av, ac);
+			Module_Event (EVENT_PARTBOT, av, ac);
 			free (av);
 			ac = 0;
 		}
 		un = list_find (u->chans, c->name, comparef);
 		if (!un) {
 			nlog (LOG_WARNING, LOG_CORE, "Hu, User %s claims not to be part of Chan %s", u->nick, chan);
-			if (me.coder_debug) {
+			if (me.debug_mode) {
 				chanalert (s_Services, "Hu, User %s claims not to be part of Chan %s", u->nick, chan);
 				chandump (c->name);
 				UserDump (u->nick);
@@ -552,7 +562,7 @@ part_chan (User * u, char *chan)
 		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
 		if (c->cur_users <= 0) {
 			AddStringToList (&av, c->name, &ac);
-			Module_Event ("DELCHAN", av, ac);
+			Module_Event (EVENT_DELCHAN, av, ac);
 			free (av);
 			ac = 0;
 //                      FreeList(av, ac);
@@ -582,7 +592,7 @@ change_user_nick (Chans * c, char *newnick, char *oldnick)
 	cm = list_find (c->chanmembers, oldnick, comparef);
 	if (!cm) {
 		nlog (LOG_WARNING, LOG_CORE, "change_user_nick() %s isn't a member of %s", oldnick, c->name);
-		if (me.coder_debug) {
+		if (me.debug_mode) {
 			chanalert (s_Services, "change_user_nick() %s isn't a member of %s", oldnick, c->name);
 			chandump (c->name);
 			UserDump (oldnick);
@@ -591,7 +601,7 @@ change_user_nick (Chans * c, char *newnick, char *oldnick)
 	} else {
 		nlog (LOG_DEBUG3, LOG_CORE, "Change_User_Nick(): NewNick %s, OldNick %s", newnick, oldnick);
 		cml = lnode_get (cm);
-		strncpy (cml->nick, newnick, MAXNICK);
+		strlcpy (cml->nick, newnick, MAXNICK);
 	}
 }
 
@@ -641,20 +651,20 @@ join_chan (User * u, char *chan)
 		c->modes = 0;
 		c->tstime = 0;
 		AddStringToList (&av, c->name, &ac);
-		Module_Event ("NEWCHAN", av, ac);
+		Module_Event (EVENT_NEWCHAN, av, ac);
 		free (av);
 		ac = 0;
 	}
 	/* add this users details to the channel members hash */
 	cm = smalloc (sizeof (Chanmem));
-	strncpy (cm->nick, u->nick, MAXNICK);
-	cm->joint = time (NULL);
+	strlcpy (cm->nick, u->nick, MAXNICK);
+	cm->joint = me.now;
 	cm->flags = 0;
 	cn = lnode_create (cm);
 	nlog (LOG_DEBUG2, LOG_CORE, "adding usernode %s to Channel %s", u->nick, chan);
 	if (list_find (c->chanmembers, u->nick, comparef)) {
 		nlog (LOG_WARNING, LOG_CORE, "Adding %s to Chan %s when he is already a member?", u->nick, chan);
-		if (me.coder_debug) {
+		if (me.debug_mode) {
 			chanalert (s_Services, "Adding %s to Chan %s when he is already a member?", u->nick, chan);
 			chandump (c->name);
 			UserDump (u->nick);
@@ -679,7 +689,7 @@ join_chan (User * u, char *chan)
 	}
 	AddStringToList (&av, c->name, &ac);
 	AddStringToList (&av, u->nick, &ac);
-	Module_Event ("JOINCHAN", av, ac);
+	Module_Event (EVENT_JOINCHAN, av, ac);
 	free (av);
 	nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
 	if (findbot (u->nick)) {
@@ -715,11 +725,11 @@ chandump (char *chan)
 
 	SET_SEGV_LOCATION();
 	if (!chan) {
-		sendcoders ("Channels %d", hash_count (ch));
+		debugtochannel("Channels %d", hash_count (ch));
 		hash_scan_begin (&sc, ch);
 		while ((cn = hash_scan_next (&sc)) != NULL) {
 			c = hnode_get (cn);
-			sendcoders ("====================");
+			debugtochannel("====================");
 			bzero (mode, 10);
 			mode[0] = '+';
 			for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
@@ -727,15 +737,15 @@ chandump (char *chan)
 					mode[++j] = cFlagTab[i].flag;
 				}
 			}
-			sendcoders ("Channel: %s Members: %d (List %d) Flags %s tstime %d", c->name, c->cur_users, list_count (c->chanmembers), mode, c->tstime);
-			sendcoders ("       Topic Owner %s, TopicTime: %d, Topic %s", c->topicowner, c->topictime, c->topic);
-			sendcoders ("PubChan?: %d", is_pub_chan (c));
+			debugtochannel("Channel: %s Members: %d (List %d) Flags %s tstime %d", c->name, c->cur_users, list_count (c->chanmembers), mode, c->tstime);
+			debugtochannel("       Topic Owner %s, TopicTime: %d, Topic %s", c->topicowner, c->topictime, c->topic);
+			debugtochannel("PubChan?: %d", is_pub_chan (c));
 			cmn = list_first (c->modeparms);
 			while (cmn) {
 				m = lnode_get (cmn);
 				for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
 					if (m->mode & cFlagTab[i].mode) {
-						sendcoders ("        Modes: %c Parms %s", cFlagTab[i].flag, m->param);
+						debugtochannel("        Modes: %c Parms %s", cFlagTab[i].flag, m->param);
 					}
 				}
 
@@ -752,14 +762,14 @@ chandump (char *chan)
 						mode[++j] = cFlagTab[i].flag;
 					}
 				}
-				sendcoders ("Members: %s Modes %s Joined %d", cm->nick, mode, cm->joint);
+				debugtochannel("Members: %s Modes %s Joined %d", cm->nick, mode, cm->joint);
 				cmn = list_next (c->chanmembers, cmn);
 			}
 		}
 	} else {
 		c = findchan (chan);
 		if (!c) {
-			sendcoders ("Can't find Channel %s", chan);
+			debugtochannel("Can't find Channel %s", chan);
 		} else {
 			bzero (mode, 10);
 			j = 0;
@@ -769,15 +779,15 @@ chandump (char *chan)
 					mode[++j] = cFlagTab[i].flag;
 				}
 			}
-			sendcoders ("Channel: %s Members: %d (List %d) Flags %s tstime %d", c->name, c->cur_users, list_count (c->chanmembers), mode, c->tstime);
-			sendcoders ("       Topic Owner %s, TopicTime: %d Topic %s", c->topicowner, c->topictime, c->topic);
-			sendcoders ("PubChan?: %d", is_pub_chan (c));
+			debugtochannel("Channel: %s Members: %d (List %d) Flags %s tstime %d", c->name, c->cur_users, list_count (c->chanmembers), mode, c->tstime);
+			debugtochannel("       Topic Owner %s, TopicTime: %d Topic %s", c->topicowner, c->topictime, c->topic);
+			debugtochannel("PubChan?: %d", is_pub_chan (c));
 			cmn = list_first (c->modeparms);
 			while (cmn) {
 				m = lnode_get (cmn);
 				for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
 					if (m->mode & cFlagTab[i].mode) {
-						sendcoders ("        Modes: %c Parms %s", cFlagTab[i].flag, m->param);
+						debugtochannel("        Modes: %c Parms %s", cFlagTab[i].flag, m->param);
 					}
 				}
 				cmn = list_next (c->modeparms, cmn);
@@ -793,7 +803,7 @@ chandump (char *chan)
 						mode[++j] = cFlagTab[i].flag;
 					}
 				}
-				sendcoders ("Members: %s Modes %s Joined: %d", cm->nick, mode, cm->joint);
+				debugtochannel("Members: %s Modes %s Joined: %d", cm->nick, mode, cm->joint);
 				cmn = list_next (c->chanmembers, cmn);
 			}
 		}
@@ -838,8 +848,8 @@ findchan (char *chan)
 */
 
 int 
-IsChanMember(Chans *c, User *u) {
-
+IsChanMember(Chans *c, User *u) 
+{
 	if (!u) {
 		return 0;
 	}
@@ -848,7 +858,6 @@ IsChanMember(Chans *c, User *u) {
 	}
 	if (list_find (c->chanmembers, u->nick, comparef)) {
 		return 1;
-	} else {
-		return 0;
 	}
+	return 0;
 }
