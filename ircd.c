@@ -256,6 +256,7 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 		while(bot_setting_list->option != NULL) {
 			if(bot_setting_list->ulevel < bot_ptr->set_ulevel)
 				bot_ptr->set_ulevel = bot_setting_list->ulevel;
+			bot_setting_list++;
 		}
 	} else {
 		bot_ptr->bot_settings = NULL;	
