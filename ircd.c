@@ -826,7 +826,7 @@ swallops_cmd (const char *who, const char *msg, ...)
 	va_start (ap, msg);
 	ircvsnprintf (ircd_buf, BUFSIZE, msg, ap);
 	va_end (ap);
-	send_wallops (who, ircd_buf);
+	send_wallops (who, (char*)ircd_buf);
 	return 1;
 }
 
