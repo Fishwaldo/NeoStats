@@ -335,7 +335,6 @@ int s_user_kill(char **av, int ac)
 		ss = findstats(who);
 		ss->serverkills = ss->serverkills + 1;
 	}
-	free(cmd);
 	return 1;
 }
 
