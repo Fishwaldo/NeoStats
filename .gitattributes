@@ -81,6 +81,7 @@ include/lang.h -text
 include/list.h eol=lf
 include/log.h eol=lf
 include/modes.h -text
+include/modexclude.h -text
 include/modules.h -text
 include/neostats.h -text
 include/ns_help.h eol=lf
@@ -509,6 +510,7 @@ src/main.c eol=lf
 src/match.c -text
 src/misc.c eol=lf
 src/modes.c -text
+src/modexclude.c -text
 src/modules.c -text
 src/neostats.vcproj -text
 src/ns_help.c eol=lf
