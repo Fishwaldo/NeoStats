@@ -324,4 +324,10 @@ struct Oper_Modes {
 };
 
 
+/* function declarations */
+extern void sts(char *, ...);
+extern void notice(char *,char *, ...);
+
+
+
 #endif

@@ -257,6 +257,7 @@ extern void ns_shutdown(User *u, char *reason)
 	Module *mod_ptr = NULL;
 	hscan_t ms;
 	hnode_t *mn;
+	char quitmsg[255];
 
 	segv_location = sstrdup("ns_shutdown");
 	if (strcasecmp(u->nick, s_Services)) {
@@ -276,8 +277,9 @@ extern void ns_shutdown(User *u, char *reason)
 
 
 	globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
-	sts(":%s QUIT :%s Sent SHUTDOWN: %s",s_Services,u->nick,reason);
-	sts("SQUIT %s",me.name);
+	sprintf(quitmsg, "%s Set SHUTDOWN: %s", u->nick, (reason ? reason : "No Reason"));
+	squit_cmd(s_Services, quitmsg);
+	ssquit_cmd(me.name);
 	sleep(1);
 	close(servsock);
 	remove("stats.pid");
@@ -288,49 +290,37 @@ extern void ns_shutdown(User *u, char *reason)
 
 static void ns_reload(User *u, char *reason)
 {
+	char quitmsg[255];
 	segv_location = sstrdup("ns_reload");
-		if (!(UserLevel(u) >= 190)) {
-				log("Access Denied (RELOAD) to %s", u->nick);
-				privmsg(u->nick, s_Services, "Access Denied.");
-				return;
-		}
-		if (reason != NULL) {
-				globops(s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
-			log("%s requested RELOAD.", u->nick);
-
-		sts("SQUIT %s :Reload", me.name);
-
-		sts(":%s QUIT :%s Sent RELOAD: %s",s_Services,u->nick,reason);
-	} else {
-			globops(s_Services, "%s requested \2RELOAD\2 for no Reason!", u->nick, reason);
-			log("%s requested RELOAD.", u->nick);
-
-		sts("SQUIT %s :Reload", me.name);
-
-		sts(":%s QUIT :%s Sent RELOAD",s_Services,u->nick,reason);
+	if (!(UserLevel(u) >= 190)) {
+			log("Access Denied (RELOAD) to %s", u->nick);
+			privmsg(u->nick, s_Services, "Access Denied.");
+			return;
 	}
+	globops(s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
+	log("%s requested RELOAD.", u->nick);
+	sprintf(quitmsg, "%s Sent RELOAD: %s", u->nick, (reason ? reason : "No reason"));
+	squit_cmd(s_Services, quitmsg);
+	ssquit_cmd(me.name);
 	sleep(1);
+	close(servsock);
+	init_server_hash(); 
+	init_user_hash();  
+	me.onchan = 0;
+	log("Connecting to %s:%d", me.uplink, me.port);
+	if (servsock > 0)
 		close(servsock);
-		init_server_hash(); 
-		init_user_hash();  
-/*		init_tld();
-*/
-
-		me.onchan = 0;
-		log("Connecting to %s:%d", me.uplink, me.port);
-		if (servsock > 0)
-				close(servsock);
 		
-		servsock = ConnectTo(me.uplink, me.port);
+	servsock = ConnectTo(me.uplink, me.port);
 		
-		if (servsock <= 0) {
-				log("Unable to connect to %s", me.uplink);
-		} else {
-					login();
-				read_loop();
-		}
-		log("Reconnecting to the server in %d seconds", me.r_time);
-		sleep(me.r_time);
+	if (servsock <= 0) {
+		log("Unable to connect to %s", me.uplink);
+	} else {
+		login();
+		read_loop();
+	}
+	log("Reconnecting to the server in %d seconds", me.r_time);
+	sleep(me.r_time);
 
 }
 
@@ -365,6 +355,7 @@ static void ns_logs(User *u)
 
 static void ns_jupe(User *u, char *server)
 {
+	char infoline[255];
 	segv_location = sstrdup("ns_jupe");
 	if (!(UserLevel(u) >= 190)) {
 		privmsg(u->nick, s_Services, "Access Denied.");
@@ -375,7 +366,8 @@ static void ns_jupe(User *u, char *server)
 		s_Services);
 		return;
 	}
-	sts(":%s SERVER %s 1 :[Jupitered] by %s", me.name, server, u->nick);
+	sprintf(infoline, "[Jupitered by %s]", u->nick);
+	sserver_cmd(server, 1, infoline);
 	log("%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, server);
 }
 
@@ -394,14 +386,15 @@ static void ns_JOIN(User *u, char *chan)
 	}
 	globops(s_Services, "JOINING CHANNEL -\2(%s)\2- Thanks to %s!%s@%s)", chan, u->nick, u->username, u->hostname);
 	privmsg(me.chan, s_Services, "%s Asked me to Join %s, So, I'm Leaving %s", u->nick, chan, me.chan);
-	sts(":%s part %s", s_Services, me.chan);
+	spart_cmd(s_Services, me.chan);
 	log("%s!%s@%s Asked me to Join %s, I was on %s", u->nick, u->username, u->hostname, chan, me.chan);
 	sprintf(me.chan,"%s",chan);
-	sts(":%s JOIN %s",s_Services,chan);
-	sts(":%s MODE %s +o %s",me.name,chan,s_Services);
+	sjoin_cmd(s_Services, chan);
+	schmode_cmd(me.name, chan, "+o", s_Services);
 }
 void ns_debug_to_coders(char *u)
 {
+	char realname[63];
 	segv_location = sstrdup("ns_debug_to_coders");
 	if (!me.coder_debug) {
 		me.coder_debug = 1;
@@ -412,8 +405,8 @@ void ns_debug_to_coders(char *u)
 			globops(me.name, "\2DEBUG MODE\3 Active");
 		}
 		if (me.usesmo) {
-			sts("NICK %s 1 1 %s %s %s 0 :/msg %s \2HELP\2", s_Debug, Servbot.user, Servbot.host, me.name, s_Services);
-        		AddUser(s_Debug, Servbot.user, Servbot.host, me.name);
+			sprintf(realname, "/msg %s \2HELP\2", s_Services);
+			snick_cmd(s_Debug, Servbot.user, Servbot.host, realname);
      		}
         } else {
         	me.coder_debug = 0;
@@ -424,8 +417,8 @@ void ns_debug_to_coders(char *u)
         		globops(me.name, "\2DEBUG MODE\2 Deactivated");
         	}
 		if (me.usesmo) {
-			sts(":%s QUIT :Debug Mode Deactivated by %s",s_Debug,u);
-			DelUser(s_Debug);
+			sprintf("Debug Mode Deactivated by %s", u);
+			squit_cmd(s_Debug, realname);
 		}
 	}
 }										  

@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.5 2002/03/05 06:59:06 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.6 2002/03/05 08:13:45 fishwaldo Exp $
  */
 
 
@@ -351,12 +351,15 @@ struct Oper_Modes {
 
 
 /* function declarations */
-extern void sts(char *, ...);
 extern void notice(char *,char *, ...);
-
-
-
-
-
-
+extern int sserver_cmd(const char *, const int numeric, const char *);
+extern int slogin_cmd(const char *, const int numeric, const char *, const char *);
+extern int ssquit_cmd(const char *);
+extern int sprotocol_cmd(const char *);
+extern int squit_cmd(const char *, const char *);
+extern int spart_cmd(const char *, const char *);
+extern int sjoin_cmd(const char *, const char *);
+extern int schmode_cmd(const char *, const char *, const char *, const char *);
+extern int snick_cmd(const char *, const char *, const char *, const char *);
+extern int sping_cmd(const char *from, const char *reply, const char *to);
 #endif  /* UNREAL_H Define */

@@ -95,6 +95,7 @@ struct me {
 	unsigned int enable_proxy : 1;
 	unsigned int coder_debug : 1;
 	unsigned int noticelag : 1;
+	unsigned int token : 1;
 	int action;
 	char message[BUFSIZE];
 	char chan[BUFSIZE];
@@ -179,7 +180,6 @@ struct ping {
 /* sock.c */
 extern int ConnectTo(char *, int);
 extern void read_loop();
-extern void sts(char *, ...);
 extern void log(char *, ...);
 extern void ResetLogs();
 extern char *sctime(time_t);
@@ -201,7 +201,7 @@ extern void init_ServBot();
 extern void *smalloc(long);
 extern char *sstrdup(const char *);
 extern unsigned long HASH(const unsigned char *, int);
-extern char *strlower(char *);
+extern char *strlower(const char *);
 
 /* ircd.c */
 extern void parse();
@@ -231,18 +231,18 @@ extern Chans *findchan(char *);
 extern void ChanMode(char *, char *);
 extern void ChanTopic(char *, char *, char *);
 extern void DelChan(char *);
-extern void AddUser(char *, char *, char *, char *);
-extern void DelUser(char *);
+extern void AddUser(const char *, const char *, const char *, const char *);
+extern void DelUser(const char *);
 extern void Change_User(User *, char *);
 extern void sendcoders(char *message,...);
-extern User *finduser(char *);
+extern User *finduser(const char *);
 extern void UserDump();
 extern void UserMode(char *, char *);
 extern void init_user_hash();
 extern void init_chan_hash();
 extern void AddServer(char *, char *,int);
 extern void DelServer(char *);
-extern Server *findserver(char *);
+extern Server *findserver(const char *);
 extern void ServerDump();
 extern void ChanDump();
 extern void init_server_hash();

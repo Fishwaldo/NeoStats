@@ -94,7 +94,7 @@ RETSIGTYPE serv_die() {
 	u = finduser(s_Services);
 	log("Sigterm Recieved, Shuting Down Server!!!!");
 	ns_shutdown(u,"SigTerm Recieved");
-	sts("SQUIT %s",me.name);
+	ssquit_cmd(me.name);
 
 }
 
@@ -143,7 +143,7 @@ RETSIGTYPE serv_segv() {
 		kill(forked, 3);
 		kill(forked, 9);
 		exit(-1);
-	        sts("SQUIT %s",me.name);
+	        ssquit_cmd(me.name);
 	}
 }
 
@@ -242,10 +242,8 @@ void start()
 void login()
 	{
 	segv_location = sstrdup("login");
-	sts("PASS %s", me.pass);
-	sts("SERVER %s 1 :%s", me.name,me.infoline);
-	sts("PROTOCTL TOKEN");
-
+	slogin_cmd(me.name, 1, me.infoline, me.pass);
+	sprotocol_cmd("TOKEN");
 }
 
 
@@ -290,7 +288,7 @@ unsigned long HASH(const unsigned char *name, int size_of_table)
 	return h % size_of_table;
 }
 
-char *strlower(char *s)
+char *strlower(const char *s)
 {
 /*	char *t = s;
 	while ((*t++ = tolower(*t)))

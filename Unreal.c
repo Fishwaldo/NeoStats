@@ -12,6 +12,64 @@
 #include "stats.h"
 #include "Unreal.h"
 
+void sts(char *fmt,...);
+
+
+int sserver_cmd(const char *name, const int numeric, const char *infoline) {
+	sts("%s %s %s %d :%s", me.name, (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	return 1;
+}
+
+int slogin_cmd(const char *name, const int numeric, const char *infoline, const char *pass) {
+	sts("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	sts("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
+	return 1;
+}
+
+int ssquit_cmd(const char *server) {
+	sts("%s %s", (me.token ? TOK_SQUIT : MSG_SQUIT), server);
+	return 1;
+}
+
+int sprotocol_cmd(const char *option) {
+	sts("%s %s", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL), option);
+	return 1;
+}
+
+int squit_cmd(const char *who, const char *quitmsg) {
+	sts("%s %s :%s", who, (me.token ? TOK_QUIT : MSG_QUIT), quitmsg);
+	DelUser(who);
+	return 1;
+}
+
+int spart_cmd(const char *who, const char *chan) {
+	sts("%s %s %s", who, (me.token ? TOK_PART : MSG_PART), chan);
+	return 1;
+}
+
+int sjoin_cmd(const char *who, const char *chan) {
+	sts("%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
+	return 1;
+}
+
+int schmode_cmd(const char *who, const char *chan, const char *mode, const char *args) {
+	sts(":%s %s %s %s %s", who, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args);
+	return 1;
+}
+
+int snick_cmd(const char *nick, const char *ident, const char *host, const char *realname) {
+	sts("%s %s 1 1 %s %s %s %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, ident, host, me.name, time(NULL), realname);
+	AddUser(nick,ident, host, me.name);
+	return 1;
+}  
+
+int sping_cmd(const char *from, const char *reply, const char *to) {
+	sts(":%s %s %s :%s", from, (me.token ? TOK_NICK : MSG_NICK), reply, to);
+	return 1;
+}
+
+
+
 void sts(char *fmt,...)
 {
 	va_list ap;

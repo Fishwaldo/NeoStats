@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: server.c,v 1.3 2002/02/27 13:30:59 fishwaldo Exp $
+** $Id: server.c,v 1.4 2002/03/05 08:13:45 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -82,7 +82,7 @@ void DelServer(char *name)
 	free(s);
 }
 
-Server *findserver(char *name)
+Server *findserver(const char *name)
 {
 	Server *s;
 	hnode_t *sn;

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.13 2002/02/27 16:36:40 fishwaldo Exp $
+** $Id: users.c,v 1.14 2002/03/05 08:13:45 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -54,13 +54,13 @@ struct Oper_Modes usr_mds[]      = {
 
 MyUser *myuhead;
 
-static User *new_user(char *);
+static User *new_user(const char *);
 
 
 hash_t *uh;
 
 
-User *new_user(char *nick)
+User *new_user(const char *nick)
 {
 	User *u;
 	hnode_t *un;
@@ -84,7 +84,7 @@ User *new_user(char *nick)
 	return(u);
 }
 
-void AddUser(char *nick, char *user, char *host, char *server)
+void AddUser(const char *nick, const char *user, const char *host, const char *server)
 {
 	User *u;
 
@@ -110,7 +110,7 @@ void AddUser(char *nick, char *user, char *host, char *server)
 
 }
 
-void DelUser(char *nick)
+void DelUser(const char *nick)
 {
 	User *u;
 	hnode_t *un;
@@ -173,7 +173,7 @@ void sendcoders(char *message,...)
 	va_end (ap);	
 }
 
-User *finduser(char *nick)
+User *finduser(const char *nick)
 {
 	User *u;
 	hnode_t *un;
