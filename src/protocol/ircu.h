@@ -268,10 +268,10 @@
 #define UMODE_ACCOUNT			0x1000	/* */
 #define UMODE_HIDE				0x2000	/* */
 #ifdef NEFARIOUS
-#define UMODE_SETHOST			0x4000	/* */
-#define UMODE_BOT				0x8000	/* */
+#define UMODE_BOT				0x4000	/* */
 #endif
 #if ( defined NEFARIOUS ) || (defined ASUKA )
+#define UMODE_SETHOST			0x8000	/* */
 #define UMODE_ACCOUNTONLY		0x10000	/* */
 #define UMODE_XTRAOP			0x20000	/* */
 #define UMODE_NOCHAN			0x40000	/* */

@@ -1792,7 +1792,7 @@ do_svsmode_user (const char* nick, const char* modes, const char* ts)
 		}
 		/* We need to strip the d from the mode string */
 		pNewModes = modebuf;
-		pModes = modebuf;
+		pModes = modes;
 		while(*pModes) {
 			if(*pModes != 'd') {
 				*pNewModes = *pModes;
