@@ -4,4 +4,6 @@ libadns_la_SOURCES	= adns.h check.c dlist.h event.c general.c internal.h \
 			types.c
 include_HEADERS		=	adns.h
 
+AM_CFLAGS 	= -I../pcre
+
 include $(top_srcdir)/autotools/rules.mk

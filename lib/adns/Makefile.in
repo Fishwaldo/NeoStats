@@ -211,6 +211,7 @@ libadns_la_SOURCES = adns.h check.c dlist.h event.c general.c internal.h \
 			types.c
 
 include_HEADERS = adns.h
+AM_CFLAGS = -I../pcre
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 

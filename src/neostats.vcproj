@@ -293,9 +293,6 @@
 				RelativePath="..\include\conf.h">
 			</File>
 			<File
-				RelativePath="..\include\config.h">
-			</File>
-			<File
 				RelativePath="..\include\config.h.in">
 			</File>
 			<File

@@ -40,6 +40,8 @@
 #include "config.h"
 #endif
 
+#include "neostats.h"
+
 typedef unsigned char byte;
 
 #include <stddef.h>
