@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.44 2003/06/13 13:11:48 fishwaldo Exp $
+** $Id: chans.c,v 1.45 2003/06/30 14:56:25 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -275,6 +275,12 @@ void ChangeChanUserMode(Chans * c, User * u, int add, long mode)
 {
 	lnode_t *cmn;
 	Chanmem *cm;
+	if (!u) {
+		nlog(LOG_WARNING, LOG_CORE, "Can't find user for ChangeChanUserMode");
+#ifdef DEBUG
+		return;
+#endif		
+	}
 	cmn = list_find(c->chanmembers, u->nick, comparef);
 	if (!cmn) {
 		if (me.coder_debug) {
@@ -645,6 +651,7 @@ void chandump(char *chan)
 	Chanmem *cm;
 	char mode[10];
 	int i;
+	int j = 0;
 	ModesParm *m;
 
 	strcpy(segv_location, "chandump");
@@ -654,14 +661,14 @@ void chandump(char *chan)
 		while ((cn = hash_scan_next(&sc)) != NULL) {
 			c = hnode_get(cn);
 			sendcoders("====================");
-			strcpy(mode, "+");
+			bzero(mode, 10);
+			mode[0] = '+';
 			for (i = 0;
 			     i <
 			     ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -
 			      1); i++) {
 				if (c->modes & cFlagTab[i].mode) {
-					snprintf(mode, 10, "%s%c", mode,
-						 cFlagTab[i].flag);
+					mode[++j] = cFlagTab[i].flag;
 				}
 			}
 			sendcoders
@@ -691,15 +698,15 @@ void chandump(char *chan)
 			cmn = list_first(c->chanmembers);
 			while (cmn) {
 				cm = lnode_get(cmn);
-				strcpy(mode, "+");
+				bzero(mode, 10);
+				j = 0;
+				mode[0] = '+';
 				for (i = 0;
 				     i <
 				     ((sizeof(cFlagTab) /
 				       sizeof(cFlagTab[0])) - 1); i++) {
 					if (cm->flags & cFlagTab[i].mode) {
-						snprintf(mode, 10, "%s%c",
-							 mode,
-							 cFlagTab[i].flag);
+						mode[++j] = cFlagTab[i].flag;
 					}
 				}
 				sendcoders
@@ -713,14 +720,15 @@ void chandump(char *chan)
 		if (!c) {
 			sendcoders("Can't find Channel %s", chan);
 		} else {
-			strcpy(mode, "+");
+			bzero(mode, 10);
+			j = 0;
+			mode[0] = '+';
 			for (i = 0;
 			     i <
 			     ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -
 			      1); i++) {
 				if (c->modes & cFlagTab[i].mode) {
-					snprintf(mode, 10, "%s%c", mode,
-						 cFlagTab[i].flag);
+					mode[++j] = cFlagTab[i].flag;
 				}
 			}
 			sendcoders
@@ -749,15 +757,15 @@ void chandump(char *chan)
 			cmn = list_first(c->chanmembers);
 			while (cmn) {
 				cm = lnode_get(cmn);
-				strcpy(mode, "+");
+				bzero(mode, 10);
+				mode[0] = '+';
+				j = 0;
 				for (i = 0;
 				     i <
 				     ((sizeof(cFlagTab) /
 				       sizeof(cFlagTab[0])) - 1); i++) {
 					if (cm->flags & cFlagTab[i].mode) {
-						snprintf(mode, 10, "%s%c",
-							 mode,
-							 cFlagTab[i].flag);
+						mode[++j] = cFlagTab[i].flag;
 					}
 				}
 				sendcoders

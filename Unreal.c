@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Unreal.c,v 1.47 2003/06/26 06:00:43 fishwaldo Exp $
+** $Id: Unreal.c,v 1.48 2003/06/30 14:56:25 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -441,7 +441,6 @@ int skill_cmd(const char *from, const char *target, const char *reason,
 	DelUser(target);
 	return 1;
 }
-
 int ssmo_cmd(const char *from, const char *umodetarget, const char *msg)
 {
 	sts(":%s %s %s :%s", from, (me.token ? TOK_SMO : MSG_SMO),
@@ -538,8 +537,6 @@ int ssvsmode_cmd(const char *target, const char *modes)
 int ssvskill_cmd(const char *target, const char *reason, ...)
 {
 	User *u;
-	char **av;
-	int ac = 0;
 	va_list ap;
 	char buf[512];
 	u = finduser(target);
@@ -763,6 +760,7 @@ void Usr_Mode(char *origin, char **argv, int argc)
 }
 void Usr_Kill(char *origin, char **argv, int argc)
 {
+	User *u;
 	u = finduser(argv[0]);
 	if (u) {
 		KillUser(argv[0]);

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.129 2003/06/26 06:00:43 fishwaldo Exp $
+** $Id: ircd.c,v 1.130 2003/06/30 14:56:25 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -476,6 +476,10 @@ int flood(User * u)
 {
 	time_t current = time(NULL);
 
+	if (!u) {
+		nlog(LOG_WARNING, LOG_CORE, "Warning, Can't find user for FLOODcheck");
+		return 0;
+	}
 	if (UserLevel(u) >= 40)	/* locop or higher */
 		return 0;
 	if (current - u->t_flood > 10) {
@@ -486,12 +490,9 @@ int flood(User * u)
 	if (u->flood >= 5) {
 		nlog(LOG_NORMAL, LOG_CORE, "FLOODING: %s!%s@%s", u->nick,
 		     u->username, u->hostname);
-		skill_cmd(s_Services, u->nick,
+		ssvskill_cmd(u->nick,
 			  "%s!%s (Flooding Services.)", Servbot.host,
 			  s_Services);
-#if 0
-		DelUser(u->nick);
-#endif
 		return 1;
 	} else {
 		u->flood++;

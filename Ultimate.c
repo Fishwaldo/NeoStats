@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.53 2003/06/26 06:00:43 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.54 2003/06/30 14:56:25 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -494,7 +494,7 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host,
 
 	}
 	newmode[j] = '\0';
-	sts("%s %s 1 %lu +%s %s %s %s 0 %lu :%s",
+	sts("%s %s 1 %lu %s %s %s %s 0 %lu :%s",
 	    (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), newmode,
 	    ident, host, me.name, time(NULL), realname);
 	AddUser(nick, ident, host, me.name, 0, time(NULL));
@@ -576,9 +576,21 @@ int skill_cmd(const char *from, const char *target, const char *reason,
 	return 1;
 }
 
+int ssvskill_cmd(const char *who, const char *reason, ...)
+{
+	va_list ap;
+	char buf[512];
+	va_start(ap, reason);
+	vsnprintf(buf, 512, reason, ap);
+	sts(":%s %s %s :%s", me.name, MSG_SVSKILL,
+	    who, buf);
+	va_end(ap);
+	return 1;
+}
+
 int ssmo_cmd(const char *from, const char *umodetarget, const char *msg)
 {
-	notice(s_Services,
+	chanalert(s_Services,
 	       "Warning, Module %s tried to SMO, which is not supported in Ultimate",
 	       segvinmodule);
 	nlog(LOG_NOTICE, LOG_CORE,
@@ -596,7 +608,7 @@ int snick_cmd(const char *oldnick, const char *newnick)
 }
 int sswhois_cmd(const char *target, const char *swhois)
 {
-	notice(s_Services,
+	chanalert(s_Services,
 	       "Warning Module %s tried to SWHOIS, which is not supported in Ultimate",
 	       segvinmodule);
 	nlog(LOG_NOTICE, LOG_CORE,
@@ -878,12 +890,15 @@ void Srv_Sjoin(char *origin, char **argv, int argc)
 					if (*modes == cFlagTab[i].sjoin) {
 						mode |= cFlagTab[i].mode;
 						modes++;
+						i = -1;
 					}
+				} else {
+					/* sjoin's should be at the top of the list */
+					ok = 0;
+					strncpy(nick, modes, MAXNICK);
+					break;
 				}
 			}
-			strncpy(nick, modes, MAXNICK);
-			ok = 0;
-			break;
 		}
 		join_chan(finduser(nick), argv[1]);
 		ChangeChanUserMode(findchan(argv[1]), finduser(nick), 1,

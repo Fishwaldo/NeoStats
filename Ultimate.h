@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.h,v 1.22 2003/06/26 05:14:16 fishwaldo Exp $
+** $Id: Ultimate.h,v 1.23 2003/06/30 14:56:25 fishwaldo Exp $
 */
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
@@ -482,6 +482,7 @@ extern int sburst_cmd(int b);
 extern int sakill_cmd(const char *host, const char *ident, const char *setby, const int length, const char *reason,...);
 extern int srakill_cmd(const char *host, const char *ident);
 extern int ssvshost_cmd(const char *who, const char *vhost);
+extern int ssvskill_cmd(const char *who, const char *reason, ...);
 
 void Usr_Version(char *, char **, int argc);
 void Usr_ShowMOTD(char *, char **, int argc);

@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hybrid7.c,v 1.20 2003/06/26 06:00:43 fishwaldo Exp $
+** $Id: hybrid7.c,v 1.21 2003/06/30 14:56:25 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -317,6 +317,19 @@ int skill_cmd(const char *from, const char *target, const char *reason,
 	sts(":%s %s %s :%s", from, MSG_KILL, target, buf);
 	va_end(ap);
 	DelUser(target);
+	return 1;
+}
+int ssvskill_cmd(const char *who, const char *reason, ...)
+{
+	va_list ap;
+	char buf[512];
+	va_start(ap, reason);
+	vsnprintf(buf, 512, reason, ap);
+	sts(":%s %s %s :%s", me.name, MSG_KILL,
+	    who, buf);
+	va_end(ap);
+/* hybrid doesn't have svskill, so this is handled just like a normal kill */
+	DelUser(who);
 	return 1;
 }
 

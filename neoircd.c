@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.20 2003/06/26 06:00:43 fishwaldo Exp $
+** $Id: neoircd.c,v 1.21 2003/06/30 14:56:26 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -92,6 +92,7 @@ IntCommands cmd_list[] = {
 	,
 	{NULL, NULL, 0, 0}
 };
+
 
 
 aCtab cFlagTab[] = {
@@ -332,6 +333,21 @@ int skill_cmd(const char *from, const char *target, const char *reason,
 	DelUser(target);
 	return 1;
 }
+
+int ssvskill_cmd(const char *who, const char *reason, ...)
+{
+	va_list ap;
+	char buf[512];
+	va_start(ap, reason);
+	vsnprintf(buf, 512, reason, ap);
+	sts(":%s %s %s :%s", me.name, MSG_KILL,
+	    who, buf);
+	va_end(ap);
+/* neoircd doesn't have svskill, so this is handled just like a normal kill */
+	DelUser(who);
+	return 1;
+}
+
 
 int ssmo_cmd(const char *from, const char *umodetarget, const char *msg)
 {
