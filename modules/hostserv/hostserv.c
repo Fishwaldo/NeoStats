@@ -52,15 +52,8 @@ struct hs_cfg {
 	int operhosts;
 } hs_cfg;
 
-typedef struct hs_user {
-	int vhostset;
-	vhostentry *vhe;
-} hs_user;
-
 static int hs_event_signon (CmdParams *cmdparams);
 static int hs_event_mode (CmdParams *cmdparams);
-static int hs_event_quit (CmdParams *cmdparams);
-static int hs_event_kill (CmdParams *cmdparams);
 
 static int hs_levels (CmdParams *cmdparams);
 static int hs_bans (CmdParams *cmdparams);
@@ -71,15 +64,18 @@ static int hs_list (CmdParams *cmdparams);
 static int hs_view (CmdParams *cmdparams);
 static int hs_del (CmdParams *cmdparams);
 
+static int hs_set_regnick_cb (CmdParams* cmdparams, SET_REASON reason);
+
 static void hs_listban (CmdParams *cmdparams);
 static void hs_addban (CmdParams *cmdparams);
 static void hs_delban (CmdParams *cmdparams);
 
-static void SaveBans(void);
+static void SaveBans (void);
 static void new_vhost (char *nick, char *host, char *vhost, char *pass, char *who);
-int CleanupHosts(void);
-static void LoadHosts(void);
-static void LoadConfig(void);
+int CleanupHosts (void);
+static void LoadHosts (void);
+static void LoadBans (void);
+static void LoadConfig (void);
 
 /** Bot pointer */
 Bot *hs_bot;
@@ -147,10 +143,18 @@ static BotInfo hs_botinfo =
 ModuleEvent module_events[] = {
 	{EVENT_SIGNON,	hs_event_signon,	EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE},
 	{EVENT_UMODE,	hs_event_mode,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE}, 
-	{EVENT_QUIT,	hs_event_quit,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE},
-	{EVENT_KILL,	hs_event_kill,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE},
 	{EVENT_NULL,	NULL}
 };
+
+static int hs_set_regnick_cb (CmdParams* cmdparams, SET_REASON reason)
+{
+	if (hs_cfg.regnick) {
+		EnableEvent (EVENT_UMODE);
+	} else {
+		DisableEvent (EVENT_UMODE);
+	}
+	return NS_SUCCESS;
+}
 
 int findnick(const void *key1, const void *key2)
 {
@@ -158,13 +162,14 @@ int findnick(const void *key1, const void *key2)
 	return (ircstrcasecmp(vhost->nick, (char *)key2));
 }
 
-void save_vhost(vhostentry *vhost) 
+void save_vhost(vhostentry *vhe) 
 {
-	SetData((void *)vhost->host, CFGSTR, "Vhosts", vhost->nick, "Host");
-	SetData((void *)vhost->vhost, CFGSTR, "Vhosts", vhost->nick , "Vhost");
-	SetData((void *)vhost->passwd, CFGSTR, "Vhosts", vhost->nick , "Passwd");
-	SetData((void *)vhost->added, CFGSTR, "Vhosts", vhost->nick , "Added");
-	SetData((void *)vhost->tslastused, CFGINT, "Vhosts", vhost->nick , "LastUsed");
+	vhe->tslastused = me.now;
+	SetData((void *)vhe->host, CFGSTR, "Vhosts", vhe->nick, "Host");
+	SetData((void *)vhe->vhost, CFGSTR, "Vhosts", vhe->nick , "Vhost");
+	SetData((void *)vhe->passwd, CFGSTR, "Vhosts", vhe->nick , "Passwd");
+	SetData((void *)vhe->added, CFGSTR, "Vhosts", vhe->nick , "Added");
+	SetData((void *)vhe->tslastused, CFGINT, "Vhosts", vhe->nick , "LastUsed");
 	list_sort(vhosts, findnick);
 }
 
@@ -175,43 +180,6 @@ void del_vhost(vhostentry *vhost)
 	/* no need to list sort here, because its already sorted */
 }
 
-void set_moddata(Client *u) 
-{
-	hs_user *hs;
-
-	if (!get_user_moddata (u)) {
-		hs = ns_malloc(sizeof(hs_user));
-		hs->vhostset = 1;
-		set_user_moddata (u, hs);
-	}
-}
-
-static int hs_event_quit(CmdParams *cmdparams) 
-{
-	hs_user *hs;
-
-	hs = get_user_moddata (cmdparams->source);
-	if (hs) {
-		dlog(DEBUG2, "hs_event_quit: free module data");
-		ns_free(hs);
-		clear_user_moddata (cmdparams->source);
-	}
-	return NS_SUCCESS;
-}
-	
-static int hs_event_kill(CmdParams *cmdparams) 
-{
-	hs_user *hs;
-
-	hs = get_user_moddata (cmdparams->target);
-	if (hs) {
-		dlog(DEBUG2, "hs_event_kill: free module data");
-		ns_free(hs);
-		clear_user_moddata (cmdparams->target);
-	}
-	return NS_SUCCESS;
-}
-	
 /* Routine For Setting the vhost */
 static int hs_event_signon (CmdParams *cmdparams)
 {
@@ -223,14 +191,10 @@ static int hs_event_signon (CmdParams *cmdparams)
 	if (vhe) {
 		dlog(DEBUG1, "Checking %s against %s", vhe->host, cmdparams->source->user->hostname);
 		if (match(vhe->host, cmdparams->source->user->hostname)) {
-			irc_svshost(hs_bot, cmdparams->source, vhe->vhost);
+			irc_svshost (hs_bot, cmdparams->source, vhe->vhost);
 			irc_prefmsg (hs_bot, cmdparams->source, 
 				"Automatically setting your hidden host to %s", vhe->vhost);
-			vhe->tslastused = me.now;
 			save_vhost(vhe);
-			if (HaveUmodeRegNick()) {
-				set_moddata(cmdparams->source);
-			}
 		}
 	}
 	return NS_SUCCESS;
@@ -259,6 +223,7 @@ int ModInit (Module *mod_ptr)
 	}
 	ModuleConfig(hs_settings);
 	LoadConfig();
+	LoadBans();
 	LoadHosts();
 	return NS_SUCCESS;
 }
@@ -282,8 +247,6 @@ int ModSynch (void)
 	if (!HaveUmodeRegNick()) 
 	{
 		DisableEvent (EVENT_UMODE);
-		DisableEvent (EVENT_QUIT);
-		DisableEvent (EVENT_KILL);
 	}
 	return NS_SUCCESS;
 }
@@ -308,10 +271,6 @@ int hs_event_mode (CmdParams *cmdparams)
 	char *modes;
 	char vhost[MAXHOST];
 
-	/* bail out if its not enabled */
-	if (hs_cfg.regnick != 1) 
-		return -1;
-
 	if (is_oper(cmdparams->source) && hs_cfg.operhosts == 0) 
 		return NS_SUCCESS;
 		
@@ -328,16 +287,15 @@ int hs_event_mode (CmdParams *cmdparams)
 		default:
 			if (*modes == UmodeChRegNick) {
 				if (add) {
-					if (get_user_moddata (cmdparams->source) != NULL) {
+					if (IsUserSetHosted (cmdparams->source)) {
 						dlog(DEBUG2, "not setting hidden host on %s", cmdparams->av[0]);
 						return -1;
 					}
 					dlog(DEBUG2, "Regnick Mode on %s", cmdparams->av[0]);
 					ircsnprintf(vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom);
-					irc_svshost(hs_bot, cmdparams->source, vhost);
+					irc_svshost (hs_bot, cmdparams->source, vhost);
 					irc_prefmsg (hs_bot, cmdparams->source, 
 						"Setting your host to %s", vhost);
-					set_moddata(cmdparams->source);
 				}
 			}
 			break;
@@ -358,7 +316,6 @@ static void new_vhost (char *nick, char *host, char *vhost, char *pass, char *wh
 	strlcpy(vhe->vhost, vhost, MAXHOST);
 	strlcpy(vhe->passwd, pass, MAXPASS);
 	strlcpy(vhe->added, who, MAXNICK);
-	vhe->tslastused = me.now;
 	lnode_create_append (vhosts, vhe);
 	save_vhost(vhe);
 }
@@ -471,7 +428,7 @@ static void hs_addban (CmdParams *cmdparams)
 	hnode_create_insert (bannedvhosts, host, host);
 	irc_prefmsg (hs_bot, cmdparams->source, 
 		"%s added to the banned vhosts list", cmdparams->av[1]);
-	irc_chanalert(hs_bot, "%s added %s to the banned vhosts list",
+	irc_chanalert (hs_bot, "%s added %s to the banned vhosts list",
 		  cmdparams->source->name, cmdparams->av[1]);
 	SaveBans();
 }
@@ -530,17 +487,16 @@ static int hs_chpass(CmdParams *cmdparams)
 				strlcpy(vhe->passwd, cmdparams->av[2], MAXPASS);
 				irc_prefmsg (hs_bot, cmdparams->source, 
 					"Password Successfully changed");
-				irc_chanalert(hs_bot,
+				irc_chanalert (hs_bot,
 					  "%s changed the password for %s",
 					  cmdparams->source->name, vhe->nick);
-				vhe->tslastused = me.now;
 				save_vhost(vhe);
 				return NS_SUCCESS;
 			}
 		} else {
 			irc_prefmsg (hs_bot, cmdparams->source,  
 				"Error, Hostname Mis-Match");
-			irc_chanalert(hs_bot,
+			irc_chanalert (hs_bot,
 				  "%s tried to change the password for %s, but the hosts do not match (%s->%s)",
 				  cmdparams->source->name, vhe->nick, cmdparams->source->user->hostname,
 				  vhe->host);
@@ -553,7 +509,7 @@ static int hs_chpass(CmdParams *cmdparams)
 
 	irc_prefmsg (hs_bot, cmdparams->source, 
 		"Invalid Username or Password. Access Denied");
-	irc_chanalert(hs_bot,
+	irc_chanalert (hs_bot,
 		  "%s tried to change the password for %s, but got it wrong",
 		  cmdparams->source->name, cmdparams->av[0]);
 	return NS_SUCCESS;
@@ -574,7 +530,7 @@ static int hs_add(CmdParams *cmdparams)
 			irc_prefmsg (hs_bot, cmdparams->source, 
 				"%s has been matched against the vhost ban %s",
 				cmdparams->av[2], (char *) hnode_get(hn));
-			irc_chanalert(hs_bot, "%s tried to add a banned vhost %s",
+			irc_chanalert (hs_bot, "%s tried to add a banned vhost %s",
 				  cmdparams->source->name, cmdparams->av[2]);
 			return NS_SUCCESS;
 		}
@@ -598,14 +554,14 @@ static int hs_add(CmdParams *cmdparams)
 	irc_prefmsg (hs_bot, cmdparams->source, 
 		"%s has sucessfully been registered under realhost: %s vhost: %s and password: %s",
 		cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3]);
-	irc_chanalert(hs_bot,
+	irc_chanalert (hs_bot,
 		"%s added a vhost %s for %s with realhost %s",
 		cmdparams->source->name, cmdparams->av[2], cmdparams->av[0], cmdparams->av[1]);
 	/* Apply The New Hostname If The User Is Online */
 	if ((nu = find_user(cmdparams->av[0])) != NULL) {
 		if (!IsMe(nu)) {
 			if (match(cmdparams->av[1], nu->user->hostname)) {
-				irc_svshost(hs_bot, nu, cmdparams->av[2]);
+				irc_svshost (hs_bot, nu, cmdparams->av[2]);
 				irc_prefmsg (hs_bot, cmdparams->source, 
 					"%s is online now, setting vhost to %s",
 					cmdparams->av[0], cmdparams->av[2]);
@@ -615,8 +571,6 @@ static int hs_add(CmdParams *cmdparams)
 				irc_prefmsg (hs_bot, nu, 
 					"For security, you should change your vhost password. See /msg %s help chpass",
 					hs_bot->name);
-				if (HaveUmodeRegNick()) 
-					set_moddata(nu);
 			}
 		}
 	}
@@ -668,7 +622,7 @@ static int hs_list(CmdParams *cmdparams)
 		hn = list_next(vhosts, hn);
 	}
 	irc_prefmsg (hs_bot, cmdparams->source, 
-		"For more information on someone use /msg %s VIEW #",
+		"For more information on someone use /msg %s VIEW <nick>",
 		hs_bot->name);
 	irc_prefmsg (hs_bot, cmdparams->source,  "End of list.");
 	if (vhostcount >= i) 
@@ -723,14 +677,12 @@ static void LoadHosts()
 				strlcpy(vhe->added, tmp, MAXNICK);
 			GetData((void *)&vhe->tslastused, CFGINT, "Vhosts", vhe->nick, "LastUsed");
 			lnode_create_append (vhosts, vhe);
-			dlog(DEBUG1, "Loaded %s (%s) into Vhosts",
-			     vhe->nick, vhe->vhost);
+			dlog(DEBUG1, "Loaded %s (%s) into Vhosts", vhe->nick, vhe->vhost);
 		}
 	}			
 	ns_free(LoadArray);
 	list_sort(vhosts, findnick);
 }
-
 
 /* Routine for HostServ to delete the given information */
 static int hs_del(CmdParams *cmdparams)
@@ -753,7 +705,7 @@ static int hs_del(CmdParams *cmdparams)
 		vhe->nick, vhe->vhost);
 	nlog (LOG_NOTICE, "%s removed the vhost %s for %s", 
 			cmdparams->source->name, vhe->vhost, vhe->nick);
-	irc_chanalert(hs_bot, "%s removed vhost %s for %s",
+	irc_chanalert (hs_bot, "%s removed vhost %s for %s",
 			cmdparams->source->name, vhe->vhost, vhe->nick);
 	del_vhost(vhe);
 	list_delete(vhosts, hn);
@@ -776,16 +728,13 @@ static int hs_login(CmdParams *cmdparams)
 	vhe = lnode_find (vhosts, login, findnick);
 	if (vhe) {
 		if (!ircstrcasecmp(vhe->passwd, pass)) {
-			irc_svshost(hs_bot, cmdparams->source, vhe->vhost);
-			vhe->tslastused = me.now;
+			irc_svshost (hs_bot, cmdparams->source, vhe->vhost);
 			irc_prefmsg (hs_bot, cmdparams->source, 
 				"Your vhost %s has been set.", vhe->vhost);
 			nlog (LOG_NORMAL, "%s used LOGIN to obtain vhost of %s",
 			    cmdparams->source->name, vhe->vhost);
-			irc_chanalert(hs_bot, "%s used login to get vhost %s", 
+			irc_chanalert (hs_bot, "%s used login to get vhost %s", 
 				cmdparams->source->name, vhe->vhost);
-			if (HaveUmodeRegNick()) 
-				set_moddata(cmdparams->source);
 			save_vhost(vhe);
 			return NS_SUCCESS;
 		}
@@ -795,7 +744,7 @@ static int hs_login(CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-int CleanupHosts()
+int CleanupHosts (void)
 {
 	lnode_t *hn, *hn2;
 	vhostentry *vhe;
@@ -811,15 +760,35 @@ int CleanupHosts()
 			nlog (LOG_NOTICE, "Expiring old vhost: %s for %s",
 			     vhe->vhost, vhe->nick);
 			del_vhost(vhe);
-			hn2 = list_next(vhosts, hn);
-			list_delete(vhosts, hn);
-			lnode_destroy(hn);
+			hn2 = list_next (vhosts, hn);
+			list_delete (vhosts, hn);
+			lnode_destroy (hn);
 			hn = hn2;
 		} else {
-			hn = list_next(vhosts, hn);
+			hn = list_next (vhosts, hn);
 		}
 	}
 	return NS_SUCCESS;
+}
+
+static void LoadBans(void)
+{
+	char *temp = NULL;
+	char *host;
+	char *host2;
+
+	/* banned vhosts */
+	if (GetConf((void *) &temp, CFGSTR, "BannedVhosts") >= 0) {
+		host = strtok(temp, ";");
+		while (host != NULL) {
+			/* limit host to MAXHOST and avoid unterminated/huge strings */
+			host2 = ns_malloc(MAXHOST);
+			strlcpy(host2, host, MAXHOST);
+			hnode_create_insert (bannedvhosts, host2, host2);
+			host = strtok(NULL, ";");
+		}
+		ns_free(temp);
+	}
 }
 
 /* 
@@ -827,10 +796,6 @@ int CleanupHosts()
  */
 static void LoadConfig(void)
 {
-	char *temp = NULL;
-	char *host;
-	char *host2;
-
 	SET_SEGV_LOCATION();
 
 	GetConf((void *) &hs_cfg.view, CFGINT, "ViewLevel");
@@ -845,16 +810,4 @@ static void LoadConfig(void)
 	GetConf((void *) &hs_cfg.list, CFGINT, "ListLevel");
 	if ((hs_cfg.list > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
 		hs_cfg.list = 40;
-	/* banned vhosts */
-	if (GetConf((void *) &temp, CFGSTR, "BannedVhosts") >= 0) {
-		host = strtok(temp, ";");
-		while (host != NULL) {
-			/* limit host to MAXHOST and avoid unterminated/huge strings */
-			host2 = ns_malloc(MAXHOST);
-			strlcpy(host2, host, MAXHOST);
-			hnode_create_insert (bannedvhosts, host2, host2);
-			host = strtok(NULL, ";");
-		}
-		ns_free(temp);
-	}
 }

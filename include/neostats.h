@@ -426,6 +426,8 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 #define CLIENT_FLAG_EXCLUDED	NS_FLAG_EXCLUDED /* client is excluded */
 #define CLIENT_FLAG_ME			0x00000002 /* client is a NeoStats one */
 #define CLIENT_FLAG_SYNCHED		0x00000004 /* client is synched */
+#define CLIENT_FLAG_SETHOST		0x00000008 /* client is synched */
+
 #if 0
 #define NS_FLAGS_NETJOIN	0x00000008 /* client is on a net join */
 #endif
@@ -1190,6 +1192,9 @@ EXPORTFUNC int new_transfer(char *url, char *params, NS_TRANSFER savetofileormem
 
 /* Mark server as synched */
 #define SynchServer(x) (((x)->flags |= CLIENT_FLAG_SYNCHED))
+
+/* Has NeoStats issued a SETHOST for this user? */
+#define IsUserSetHosted(x)  ((x) && ((x)->flags & CLIENT_FLAG_SETHOST))
 
 EXPORTFUNC int validate_nick (char *nick);
 EXPORTFUNC int validate_user (char *username);

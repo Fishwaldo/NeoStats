@@ -1206,7 +1206,8 @@ irc_svshost (const Bot *botptr, Client *target, const char *vhost)
 		return NS_FAILURE;
 	}
 	strlcpy (target->user->vhost, vhost, MAXHOST);
-	irc_send_svshost(me.name, target->name, vhost);
+	target->flags |= CLIENT_FLAG_SETHOST;
+	irc_send_svshost (me.name, target->name, vhost);
 	return NS_SUCCESS;
 }
 
