@@ -322,6 +322,8 @@ src/ns_help.h eol=lf
 src/numeric.h -text
 src/pcre/COPYING -text
 src/pcre/Makefile -text
+src/pcre/Makefile.am -text
+src/pcre/Makefile.in -text
 src/pcre/README -text
 src/pcre/dftables.c eol=lf
 src/pcre/get.c eol=lf
