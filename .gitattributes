@@ -339,6 +339,9 @@ tools/kp_exp.c -text
 tools/kp_imp.c -text
 tools/kptool.c -text
 tools/kptool.h -text
+tools/sqlphp/README -text
+tools/sqlphp/rta_tables.php -text
+tools/sqlphp/rta_view.php -text
 /transfer.c -text
 /transfer.h -text
 /users.c eol=lf

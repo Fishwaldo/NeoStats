@@ -1,0 +1,12 @@
+These files are sample files that come from the RTA library that we use for
+the postgresql emulation. 
+They are only usefull to demonstrate what data is available via PHP for
+inclusion into your website. 
+To get them working, you should edit each file, and change the configuration
+information contained near the top of the file (Such as pg_connect function,
+with correct username/password information)
+
+I'm looking for someone to write a PHP interface to NeoStats using this
+information. If your interested, drop a note to devel@lists.neostats.net
+about your plans, just to make sure that no one else is already working on
+it. 
