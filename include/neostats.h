@@ -435,7 +435,7 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 #define CLIENT_FLAG_ME			0x00000002 /* client is a NeoStats one */
 #define CLIENT_FLAG_SYNCHED		0x00000004 /* client is synched */
 #define CLIENT_FLAG_SETHOST		0x00000008 /* client is synched */
-#define CLIENT_FLAG_DCC			0x00000010 /* client is connected via DCC */
+#define CLIENT_FLAG_DCC			0x00000020 /* client is connected via DCC */
 
 #define CHANNEL_FLAG_EXCLUDED	NS_FLAG_EXCLUDED /* channel is excluded */
 #define CHANNEL_FLAG_ME			0x00000002 /* channel is services channel */

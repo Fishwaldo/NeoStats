@@ -797,9 +797,9 @@ irc_prefmsg (const Bot *botptr, const Client *target, const char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	/*if (target->flags & CLIENT_FLAG_DCC) {
+	if (target->flags & CLIENT_FLAG_DCC) {
 		dcc_send_msg (target, ircd_buf);
-	} else*/ if (nsconfig.want_privmsg) {
+	} else if (nsconfig.want_privmsg) {
 		irc_send_privmsg (botptr->u->name, target->name, ircd_buf);
 	} else {
 		irc_send_notice (botptr?botptr->u->name:ns_botptr->u->name, target->name, ircd_buf);
