@@ -1,0 +1,1 @@
+sysconf_DATA= FAQ read-faq read-userman USERMAN
