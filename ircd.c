@@ -244,18 +244,14 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
 #ifdef GOTSJOIN
 		ssjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
-#elif defined(HYBRID7) 
+#else
 		sjoin_cmd (nick, me.chan);
-		schmode_cmd (me.name, me.chan, "+o", nick);
-#elif defined(IRCU)
-		sjoin_cmd (nick, me.chan);
-		schmode_cmd (me.name, me.chan, "+o", getnumfromnick(nick));
-#elif defined(ULTIMATE) || defined(MYSTIC)
-		sjoin_cmd (nick, me.chan);
-		schmode_cmd (nick, me.chan, "+o", nick);
-#elif defined(NEOIRCD)
-		sjoin_cmd (nick, me.chan);
-		schmode_cmd (me.name, me.chan, "+a", nick);
+#if defined(IRCU)
+		schmode_cmd(nick, chan, "+o", getnumfromnick(nick));
+#else
+		schmode_cmd(nick, chan, "+o", nick);
+#endif
+
 #endif
 	}
 	return NS_SUCCESS;
@@ -319,11 +315,7 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 	signon_newbot (nick, user, host, rname, Umode);
 #ifdef UMODE_DEAF
 	if(flags&BOT_FLAG_DEAF) {
-#ifdef IRCU
 		sumode_cmd (nick, nick, UMODE_DEAF);
-#else
-		sumode_cmd (nick, nick, UMODE_DEAF);
-#endif
 	}
 #endif
 	/* restore segv_inmodule from SIGNON */
@@ -708,11 +700,7 @@ init_services_bot (void)
 	Umode = UmodeStringToMask(services_bot_modes, 0);
 	signon_newbot (s_Services, me.user, me.host, me.rname, Umode);
 #ifdef UMODE_DEAF
-#ifdef IRCU
 	sumode_cmd (s_Services, s_Services, UMODE_DEAF);
-#else
-	sumode_cmd (s_Services, s_Services, UMODE_DEAF);
-#endif
 #endif
 	me.onchan = 1;
 	AddStringToList (&av, me.uplink, &ac);
