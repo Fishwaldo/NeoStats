@@ -26,9 +26,8 @@
 #include "neostats.h"
 #include "hostserv.h"
 
-#define BANBUFSIZE	4096
+#define PAGESIZE	20
 #define MAXREASON	128
-static char ban_buf[BANBUFSIZE];
 
 typedef struct vhostentry {
 	char nick[MAXNICK];
@@ -69,14 +68,8 @@ static int hs_cmd_bans_del (CmdParams *cmdparams);
 static int hs_set_regnick_cb (CmdParams* cmdparams, SET_REASON reason);
 static int hs_set_expire_cb (CmdParams* cmdparams, SET_REASON reason);
 
-static void new_vhost (char *nick, char *host, char *vhost, char *pass, char *who);
-static void LoadHosts (void);
-static void LoadBans (void);
-static void SaveBans (void);
-int ExpireOldHosts (void);
-
-static list_t *vhosts;
-static hash_t *bannedvhosts;
+static list_t *vhost_list;
+static hash_t *banhash;
 
 /** Bot pointer */
 static Bot *hs_bot;
@@ -146,6 +139,194 @@ ModuleEvent module_events[] = {
 	{EVENT_NULL,	NULL}
 };
 
+/** @brief findnick
+ *
+ *  list sorting helper
+ *
+ *  @param key1
+ *  @param key2
+ *
+ *  @return results of strcmp
+ */
+
+int findnick (const void *key1, const void *key2)
+{
+	const vhostentry *vhost = key1;
+	return (ircstrcasecmp (vhost->nick, (char *)key2));
+}
+
+/** @brief del_vhost
+ *
+ *  Delete a vhost entry
+ *
+ *  @param pointer to vhost entry to delete
+ *
+ *  @return none
+ */
+
+static void del_vhost (vhostentry *vhost) 
+{
+	DelRow ("Vhosts", vhost->nick);
+	ns_free (vhost);
+}
+
+/** @brief ExpireOldHosts
+ *
+ *  Timer function to expire old hosts
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+int ExpireOldHosts (void)
+{
+	lnode_t *hn, *hn2;
+	vhostentry *vhe;
+
+	SET_SEGV_LOCATION();
+	hn = list_first (vhost_list);
+	while (hn != NULL) {
+		vhe = lnode_get(hn);
+		if (vhe->tslastused < (me.now - (hs_cfg.expire * 86400))) {
+			nlog (LOG_NOTICE, "Expiring old vhost: %s for %s",
+			     vhe->vhost, vhe->nick);
+			del_vhost (vhe);
+			hn2 = list_next (vhost_list, hn);
+			list_delete (vhost_list, hn);
+			lnode_destroy (hn);
+			hn = hn2;
+		} else {
+			hn = list_next (vhost_list, hn);
+		}
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief LoadHosts
+ *
+ *  Load vhosts
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+static void LoadHosts (void)
+{
+	vhostentry *vhe;
+	char *tmp;
+	int i;
+	char **data;
+
+	if (GetTableData ("Vhosts", &data) > 0) {
+		for (i = 0; data[i] != NULL; i++) {
+			vhe = ns_malloc (sizeof(vhostentry));
+			strlcpy (vhe->nick, data[i], MAXNICK);
+			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Host") > 0) {
+				strlcpy (vhe->host, tmp, MAXHOST);
+				ns_free (tmp);
+			}
+			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Vhost") > 0) {
+				strlcpy (vhe->vhost, tmp, MAXHOST);
+				ns_free (tmp);
+			}
+			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Passwd") > 0) {
+				strlcpy (vhe->passwd, tmp, MAXPASS);
+				ns_free (tmp);
+			}
+			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Added") > 0) {
+				strlcpy (vhe->added, tmp, MAXNICK);
+				ns_free (tmp);
+			}
+			GetData ((void *)&vhe->tslastused, CFGINT, "Vhosts", vhe->nick, "LastUsed");
+			lnode_create_append (vhost_list, vhe);
+			dlog (DEBUG1, "Loaded %s (%s) into Vhosts", vhe->nick, vhe->vhost);
+		}
+	}			
+	ns_free (data);
+	list_sort (vhost_list, findnick);
+}
+
+/** @brief SaveVhost
+ *
+ *  Save a vhost entry
+ *
+ *  @param pointer to vhost entry to save
+ *
+ *  @return none
+ */
+
+static void SaveVhost (vhostentry *vhe) 
+{
+	vhe->tslastused = me.now;
+	SetData ((void *)vhe->host, CFGSTR, "Vhosts", vhe->nick, "Host");
+	SetData ((void *)vhe->vhost, CFGSTR, "Vhosts", vhe->nick , "Vhost");
+	SetData ((void *)vhe->passwd, CFGSTR, "Vhosts", vhe->nick , "Passwd");
+	SetData ((void *)vhe->added, CFGSTR, "Vhosts", vhe->nick , "Added");
+	SetData ((void *)vhe->tslastused, CFGINT, "Vhosts", vhe->nick , "LastUsed");
+	list_sort (vhost_list, findnick);
+}
+
+/** @brief SaveBan
+ *
+ *  Save banned vhost
+ *
+ *  @param pointer to ban to save
+ *
+ *  @return none
+ */
+
+static void SaveBan (banentry *ban)
+{
+	SetData ((void *)ban->who, CFGSTR, "Ban", ban->host, "Who");
+	SetData ((void *)ban->reason, CFGSTR, "Ban", ban->host, "Reason");
+}
+
+/** @brief LoadBans
+ *
+ *  Load banned vhosts
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+static void LoadBans (void)
+{
+	char *tmp;
+	banentry *ban;
+	int i;
+	char **data;
+
+	if (GetTableData ("Ban", &data) > 0) {
+		for (i = 0; data[i] != NULL; i++) {
+			ban = ns_malloc (sizeof (banentry));
+			strlcpy (ban->host, data[i], MAXHOST);
+			if (GetData ((void *)&tmp, CFGSTR, "Ban", ban->host, "Who") > 0) {
+				strlcpy (ban->who, tmp, MAXNICK);
+				ns_free (tmp);
+			}
+			if (GetData ((void *)&tmp, CFGSTR, "Ban", ban->host, "Reason") > 0) {
+				strlcpy (ban->reason, tmp, MAXREASON);
+				ns_free (tmp);
+			}
+			hnode_create_insert (banhash, ban, ban->host);
+		}
+		free(data);
+	}
+}
+
+/** @brief hs_set_regnick_cb
+ *
+ *  SET REGNICK callback
+ *
+ *  @param cmdparams
+ *  @param reason
+ *
+ *  @return NS_SUCCESS 
+ */
+
 static int hs_set_regnick_cb (CmdParams* cmdparams, SET_REASON reason)
 {
 	if (hs_cfg.regnick) {
@@ -155,6 +336,16 @@ static int hs_set_regnick_cb (CmdParams* cmdparams, SET_REASON reason)
 	}
 	return NS_SUCCESS;
 }
+
+/** @brief hs_set_expire_cb
+ *
+ *  SET EXPIRE callback
+ *
+ *  @param cmdparams
+ *  @param reason
+ *
+ *  @return NS_SUCCESS 
+ */
 
 static int hs_set_expire_cb (CmdParams* cmdparams, SET_REASON reason)
 {
@@ -170,46 +361,79 @@ static int hs_set_expire_cb (CmdParams* cmdparams, SET_REASON reason)
 	return NS_SUCCESS;
 }
 
-int findnick (const void *key1, const void *key2)
-{
-	const vhostentry *vhost = key1;
-	return (ircstrcasecmp (vhost->nick, (char *)key2));
-}
+/** @brief hs_event_signon
+ *
+ *  Event handler for signon to automatically set a user's host
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
 
-void save_vhost (vhostentry *vhe) 
-{
-	vhe->tslastused = me.now;
-	SetData ((void *)vhe->host, CFGSTR, "Vhosts", vhe->nick, "Host");
-	SetData ((void *)vhe->vhost, CFGSTR, "Vhosts", vhe->nick , "Vhost");
-	SetData ((void *)vhe->passwd, CFGSTR, "Vhosts", vhe->nick , "Passwd");
-	SetData ((void *)vhe->added, CFGSTR, "Vhosts", vhe->nick , "Added");
-	SetData ((void *)vhe->tslastused, CFGINT, "Vhosts", vhe->nick , "LastUsed");
-	list_sort (vhosts, findnick);
-}
-
-void del_vhost (vhostentry *vhost) 
-{
-	DelRow ("Vhosts", vhost->nick);
-	ns_free (vhost);
-	/* no need to list sort here, because its already sorted */
-}
-
-/* Routine For Setting the vhost */
 static int hs_event_signon (CmdParams *cmdparams)
 {
 	vhostentry *vhe;
 
 	SET_SEGV_LOCATION();
 	/* Check HostName Against Data Contained in vhosts.data */
-	vhe = lnode_find (vhosts, cmdparams->source->name, findnick);
+	vhe = lnode_find (vhost_list, cmdparams->source->name, findnick);
 	if (vhe) {
 		dlog (DEBUG1, "Checking %s against %s", vhe->host, cmdparams->source->user->hostname);
 		if (match (vhe->host, cmdparams->source->user->hostname)) {
 			irc_svshost (hs_bot, cmdparams->source, vhe->vhost);
 			irc_prefmsg (hs_bot, cmdparams->source, 
 				"Automatically setting your hidden host to %s", vhe->vhost);
-			save_vhost (vhe);
+			SaveVhost (vhe);
 		}
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief hs_event_mode
+ *
+ *  Event handler for umode to set a user's host on regnick
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+static int hs_event_mode (CmdParams *cmdparams) 
+{
+	int add = 0;
+	char *modes;
+	char vhost[MAXHOST];
+
+	if (is_oper(cmdparams->source) && hs_cfg.operhosts == 0) 
+		return NS_SUCCESS;
+		
+	/* first, find if its a regnick mode */
+	modes = cmdparams->av[1];
+	while (*modes) {
+		switch (*modes) {
+		case '+':
+			add = 1;
+			break;
+		case '-':
+			add = 0;
+			break;
+		default:
+			if (*modes == UmodeChRegNick) {
+				if (add) {
+					if (IsUserSetHosted (cmdparams->source)) {
+						dlog (DEBUG2, "not setting hidden host on %s", cmdparams->av[0]);
+						return -1;
+					}
+					dlog (DEBUG2, "Regnick Mode on %s", cmdparams->av[0]);
+					ircsnprintf(vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom);
+					irc_svshost (hs_bot, cmdparams->source, vhost);
+					irc_prefmsg (hs_bot, cmdparams->source, 
+						"Setting your host to %s", vhost);
+				}
+			}
+			break;
+		}
+		modes++;
 	}
 	return NS_SUCCESS;
 }
@@ -225,14 +449,14 @@ static int hs_event_signon (CmdParams *cmdparams)
 
 int ModInit (Module *mod_ptr)
 {
-	vhosts = list_create(-1);
-	if (!vhosts) {
-		nlog (LOG_CRITICAL, "Unable to create vhosts list");
+	vhost_list = list_create(-1);
+	if (!vhost_list) {
+		nlog (LOG_CRITICAL, "Unable to create vhost list");
 		return -1;
 	}
-	bannedvhosts = hash_create(-1, 0, 0);
-	if (!bannedvhosts) {
-		nlog (LOG_CRITICAL, "Unable to create bannedvhosts hash");
+	banhash = hash_create(-1, 0, 0);
+	if (!banhash) {
+		nlog (LOG_CRITICAL, "Unable to create ban hash");
 		return -1;
 	}
 	ModuleConfig(hs_settings);
@@ -277,50 +501,22 @@ int ModSynch (void)
 
 void ModFini (void)
 {
-	list_destroy_auto (vhosts);
+	list_destroy_auto (vhost_list);
 }
 
-int hs_event_mode (CmdParams *cmdparams) 
-{
-	int add = 0;
-	char *modes;
-	char vhost[MAXHOST];
+/** @brief new_vhost
+ *
+ *  Allocate new vhost
+ *
+ *  @param nick
+ *  @param host
+ *  @param vhost
+ *  @param pass
+ *  @param who set it
+ *
+ *  @return none
+ */
 
-	if (is_oper(cmdparams->source) && hs_cfg.operhosts == 0) 
-		return NS_SUCCESS;
-		
-	/* first, find if its a regnick mode */
-	modes = cmdparams->av[1];
-	while (*modes) {
-		switch (*modes) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			if (*modes == UmodeChRegNick) {
-				if (add) {
-					if (IsUserSetHosted (cmdparams->source)) {
-						dlog (DEBUG2, "not setting hidden host on %s", cmdparams->av[0]);
-						return -1;
-					}
-					dlog (DEBUG2, "Regnick Mode on %s", cmdparams->av[0]);
-					ircsnprintf(vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom);
-					irc_svshost (hs_bot, cmdparams->source, vhost);
-					irc_prefmsg (hs_bot, cmdparams->source, 
-						"Setting your host to %s", vhost);
-				}
-			}
-			break;
-		}
-		modes++;
-	}
-	return NS_SUCCESS;
-}
-
-/* Routine for registrations with the 'vhosts.db' file */
 static void new_vhost (char *nick, char *host, char *vhost, char *pass, char *who)
 {
 	vhostentry *vhe;
@@ -331,9 +527,18 @@ static void new_vhost (char *nick, char *host, char *vhost, char *pass, char *wh
 	strlcpy (vhe->vhost, vhost, MAXHOST);
 	strlcpy (vhe->passwd, pass, MAXPASS);
 	strlcpy (vhe->added, who, MAXNICK);
-	lnode_create_append (vhosts, vhe);
-	save_vhost (vhe);
+	lnode_create_append (vhost_list, vhe);
+	SaveVhost (vhe);
 }
+
+/** @brief hs_cmd_bans
+ *
+ *  Command handler for BANS
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
 
 static int hs_cmd_bans (CmdParams *cmdparams)
 {
@@ -353,6 +558,15 @@ static int hs_cmd_bans (CmdParams *cmdparams)
 	return NS_ERR_SYNTAX_ERROR;
 }
 
+/** @brief hs_cmd_bans_list
+ *
+ *  Command handler for BANS LIST
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
 static int hs_cmd_bans_list (CmdParams *cmdparams)
 {
 	banentry *ban;
@@ -360,11 +574,11 @@ static int hs_cmd_bans_list (CmdParams *cmdparams)
 	hscan_t hs;
 	int i = 1;
 
-	if (hash_count (bannedvhosts) == 0) {
+	if (hash_count (banhash) == 0) {
 		irc_prefmsg (hs_bot, cmdparams->source, "No bans are defined.");
 		return NS_SUCCESS;
 	}
-	hash_scan_begin (&hs, bannedvhosts);
+	hash_scan_begin (&hs, banhash);
 	irc_prefmsg (hs_bot, cmdparams->source, "Banned vhosts");
 	while ((hn = hash_scan_next (&hs)) != NULL) {
 		ban = ((banentry *)hnode_get (hn));
@@ -375,12 +589,21 @@ static int hs_cmd_bans_list (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
+/** @brief hs_cmd_bans_add
+ *
+ *  Command handler for BANS ADD
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
 static int hs_cmd_bans_add (CmdParams *cmdparams)
 {
 	banentry *ban;
 	char *buf;
 
-	if (hash_lookup(bannedvhosts, cmdparams->av[1]) != NULL) {
+	if (hash_lookup(banhash, cmdparams->av[1]) != NULL) {
 		irc_prefmsg (hs_bot, cmdparams->source, 
 			"%s already exists in the banned vhost list", cmdparams->av[1]);
 		return NS_SUCCESS;
@@ -392,14 +615,23 @@ static int hs_cmd_bans_add (CmdParams *cmdparams)
 	strlcpy(ban->reason, buf, MAXREASON);
 	free(buf);
 
-	hnode_create_insert (bannedvhosts, ban, ban->host);
+	hnode_create_insert (banhash, ban, ban->host);
 	irc_prefmsg (hs_bot, cmdparams->source, 
 		"%s added to the banned vhosts list", cmdparams->av[1]);
 	irc_chanalert (hs_bot, "%s added %s to the banned vhosts list",
 		  cmdparams->source->name, cmdparams->av[1]);
-	SaveBans ();
+	SaveBan (ban);
 	return NS_SUCCESS;
 }
+
+/** @brief hs_cmd_bans_del
+ *
+ *  Command handler for BANS DEL
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
 
 static int hs_cmd_bans_del (CmdParams *cmdparams)
 {
@@ -407,11 +639,11 @@ static int hs_cmd_bans_del (CmdParams *cmdparams)
 	hnode_t *hn;
 	hscan_t hs;
 
-	hash_scan_begin (&hs, bannedvhosts);
+	hash_scan_begin (&hs, banhash);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
 		ban = (banentry *)hnode_get (hn);
 		if (ircstrcasecmp (ban->host, cmdparams->av[1]) == 0) {
-			hash_scan_delete (bannedvhosts, hn);
+			hash_scan_delete (banhash, hn);
 			irc_prefmsg (hs_bot, cmdparams->source, 
 				"Deleted %s from the banned vhost list", cmdparams->av[1]);
 			irc_chanalert (hs_bot, "%s deleted %s from the banned vhost list",
@@ -421,7 +653,6 @@ static int hs_cmd_bans_del (CmdParams *cmdparams)
 			hnode_destroy (hn);
 			DelRow ("Ban", ban->host);
 			ns_free (ban);
-			SaveBans ();
 			return NS_SUCCESS;
 		}
 	}
@@ -429,11 +660,20 @@ static int hs_cmd_bans_del (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
+/** @brief hs_cmd_chpass
+ *
+ *  Command handler for CHPASS
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
 static int hs_cmd_chpass (CmdParams *cmdparams)
 {
 	vhostentry *vhe;
 
-	vhe = lnode_find (vhosts, cmdparams->av[0], findnick);
+	vhe = lnode_find (vhost_list, cmdparams->av[0], findnick);
 	if (!vhe) {
 		irc_prefmsg (hs_bot, cmdparams->source, "No vhost for that user.");
 		irc_chanalert (hs_bot, "%s tried to change the password for %s, but there is no user with that name",
@@ -447,7 +687,7 @@ static int hs_cmd_chpass (CmdParams *cmdparams)
 			irc_prefmsg (hs_bot, cmdparams->source, "Password changed");
 			irc_chanalert (hs_bot, "%s changed the password for %s",
 					cmdparams->source->name, vhe->nick);
-			save_vhost (vhe);
+			SaveVhost (vhe);
 			return NS_SUCCESS;
 		}
 		return NS_SUCCESS;
@@ -460,7 +700,15 @@ static int hs_cmd_chpass (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-/* Routine for ADD */
+/** @brief hs_cmd_add
+ *
+ *  Command handler for ADD
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
 static int hs_cmd_add (CmdParams *cmdparams)
 {
 	banentry *ban;
@@ -469,7 +717,7 @@ static int hs_cmd_add (CmdParams *cmdparams)
 	Client *u;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin (&hs, bannedvhosts);
+	hash_scan_begin (&hs, banhash);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
 		ban = (banentry *) hnode_get (hn);
 		if (match (ban->host, cmdparams->av[2])) {
@@ -486,7 +734,7 @@ static int hs_cmd_add (CmdParams *cmdparams)
 			"%s is an invalid host", cmdparams->av[2]);
 		return NS_SUCCESS;
 	}
-	if (list_find (vhosts, cmdparams->av[0], findnick)) {
+	if (list_find (vhost_list, cmdparams->av[0], findnick)) {
 		irc_prefmsg (hs_bot, cmdparams->source, 
 			"%s already has a vhost entry", cmdparams->av[0]);
 		return NS_SUCCESS;
@@ -518,7 +766,15 @@ static int hs_cmd_add (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-/* Routine for 'HostServ' to print out its data */
+/** @brief hs_cmd_list
+ *
+ *  Command handler for LIST
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
 static int hs_cmd_list (CmdParams *cmdparams)
 {
 	int i;
@@ -531,7 +787,7 @@ static int hs_cmd_list (CmdParams *cmdparams)
 	if (cmdparams->ac == 1) {
 		start = atoi(cmdparams->av[0]);
 	}
-	vhostcount = list_count(vhosts);
+	vhostcount = list_count(vhost_list);
 	if (vhostcount == 0) {
 		irc_prefmsg (hs_bot, cmdparams->source, "No vhosts are defined.");
 		return NS_SUCCESS;
@@ -542,41 +798,50 @@ static int hs_cmd_list (CmdParams *cmdparams)
 	}		
 	i = 1;
 	irc_prefmsg (hs_bot, cmdparams->source, "Current vhost list: ");
-	irc_prefmsg (hs_bot, cmdparams->source, "Showing %d to %d entries of %d vhosts", start+1, start+20, (int)vhostcount);
+	irc_prefmsg (hs_bot, cmdparams->source, "Showing %d to %d entries of %d vhosts", start+1, start+PAGESIZE, (int)vhostcount);
 	irc_prefmsg (hs_bot, cmdparams->source, "%-5s %-12s %-30s", "Num", "Nick", "Vhost");
-	hn = list_first(vhosts);
+	hn = list_first (vhost_list);
 	while (hn != NULL) {
 		if (i <= start) {
 			i++;
-			hn = list_next(vhosts, hn);
+			hn = list_next (vhost_list, hn);
 			continue;
 		}
 		vhe = lnode_get(hn);
 		irc_prefmsg (hs_bot, cmdparams->source, "%-5d %-12s %-30s", i,
 			vhe->nick, vhe->vhost);
 		i++;
-		/* limit to x entries per screen */
-		if (i > start + 20) 
+		/* limit to PAGESIZE entries per screen */
+		if (i > start + PAGESIZE) 
 			break;
-		hn = list_next(vhosts, hn);
+		hn = list_next (vhost_list, hn);
 	}
 	irc_prefmsg (hs_bot, cmdparams->source, 
-		"For more information on someone use /msg %s VIEW <nick>",
+		"For detailed information on a vhost use /msg %s VIEW <nick>",
 		hs_bot->name);
 	irc_prefmsg (hs_bot, cmdparams->source, "End of list.");
-	if (vhostcount >= i) 
-		irc_prefmsg (hs_bot, cmdparams->source, "Type \2/msg %s list %d\2 to see next page", hs_bot->name, i-1);
+	if (vhostcount >= i) {
+		irc_prefmsg (hs_bot, cmdparams->source, "Type \2/msg %s list %d\2 to see next %d", hs_bot->name, i-1, PAGESIZE);
+	}
 	return NS_SUCCESS;
 }
 
-/* Routine for VIEW */
+/** @brief hs_cmd_view
+ *
+ *  Command handler for VIEW
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
 static int hs_cmd_view (CmdParams *cmdparams)
 {
 	vhostentry *vhe;
 	char ltime[80];
 
 	SET_SEGV_LOCATION();
-	vhe = lnode_find (vhosts, cmdparams->av[0], findnick);
+	vhe = lnode_find (vhost_list, cmdparams->av[0], findnick);
 	if (!vhe) {
 		irc_prefmsg (hs_bot, cmdparams->source, "No vhost for user %s", cmdparams->av[0]);
 		return NS_SUCCESS;
@@ -594,43 +859,22 @@ static int hs_cmd_view (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-/* Routine For Loading The Hosts into Array */
-static void LoadHosts()
-{
-	vhostentry *vhe;
-	char *tmp;
-	int count;
-	char **LoadArray;
+/** @brief hs_cmd_del
+ *
+ *  Command handler for DEL
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
 
-	if (GetTableData("Vhosts", &LoadArray) > 0) {
-		for (count = 0; LoadArray[count] != NULL; count++) {
-			vhe = ns_malloc (sizeof(vhostentry));
-			strlcpy (vhe->nick, LoadArray[count], MAXNICK);
-			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Host") > 0) 
-				strlcpy (vhe->host, tmp, MAXHOST);
-			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Vhost") > 0) 
-				strlcpy (vhe->vhost, tmp, MAXHOST);
-			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Passwd") > 0) 
-				strlcpy (vhe->passwd, tmp, MAXPASS);
-			if (GetData ((void *)&tmp, CFGSTR, "Vhosts", vhe->nick, "Added") > 0)
-				strlcpy (vhe->added, tmp, MAXNICK);
-			GetData ((void *)&vhe->tslastused, CFGINT, "Vhosts", vhe->nick, "LastUsed");
-			lnode_create_append (vhosts, vhe);
-			dlog (DEBUG1, "Loaded %s (%s) into Vhosts", vhe->nick, vhe->vhost);
-		}
-	}			
-	ns_free (LoadArray);
-	list_sort (vhosts, findnick);
-}
-
-/* Routine for HostServ to delete the given information */
 static int hs_cmd_del (CmdParams *cmdparams)
 {
 	lnode_t *hn;
 	vhostentry *vhe;
 
 	SET_SEGV_LOCATION();
-	hn = list_find (vhosts, cmdparams->av[0], findnick);
+	hn = list_find (vhost_list, cmdparams->av[0], findnick);
 	if (!hn) {
 		irc_prefmsg (hs_bot, cmdparams->source, "No vhost for user %s", cmdparams->av[0]);
 		return NS_SUCCESS;
@@ -647,12 +891,20 @@ static int hs_cmd_del (CmdParams *cmdparams)
 	irc_chanalert (hs_bot, "%s removed vhost %s for %s",
 			cmdparams->source->name, vhe->vhost, vhe->nick);
 	del_vhost (vhe);
-	list_delete (vhosts, hn);
+	list_delete (vhost_list, hn);
 	lnode_destroy (hn);
 	return NS_SUCCESS;
 }
 
-/* Routine to allow users to login and get their vhosts */
+/** @brief hs_cmd_login
+ *
+ *  Command handler for LOGIN
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
 static int hs_cmd_login (CmdParams *cmdparams)
 {
 	vhostentry *vhe;
@@ -663,7 +915,7 @@ static int hs_cmd_login (CmdParams *cmdparams)
 	login = cmdparams->av[0];
 	pass = cmdparams->av[1];
 	/* Check HostName Against Data Contained in vhosts.data */
-	vhe = lnode_find (vhosts, login, findnick);
+	vhe = lnode_find (vhost_list, login, findnick);
 	if (vhe) {
 		if (!ircstrcasecmp (vhe->passwd, pass)) {
 			irc_svshost (hs_bot, cmdparams->source, vhe->vhost);
@@ -673,7 +925,7 @@ static int hs_cmd_login (CmdParams *cmdparams)
 			    cmdparams->source->name, vhe->vhost);
 			irc_chanalert (hs_bot, "%s used login to get vhost %s", 
 				cmdparams->source->name, vhe->vhost);
-			save_vhost (vhe);
+			SaveVhost (vhe);
 			return NS_SUCCESS;
 		}
 	}
@@ -682,80 +934,3 @@ static int hs_cmd_login (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-int ExpireOldHosts (void)
-{
-	lnode_t *hn, *hn2;
-	vhostentry *vhe;
-
-	SET_SEGV_LOCATION();
-	hn = list_first(vhosts);
-	while (hn != NULL) {
-		vhe = lnode_get(hn);
-		if (vhe->tslastused < (me.now - (hs_cfg.expire * 86400))) {
-			nlog (LOG_NOTICE, "Expiring old vhost: %s for %s",
-			     vhe->vhost, vhe->nick);
-			del_vhost (vhe);
-			hn2 = list_next (vhosts, hn);
-			list_delete (vhosts, hn);
-			lnode_destroy (hn);
-			hn = hn2;
-		} else {
-			hn = list_next (vhosts, hn);
-		}
-	}
-	return NS_SUCCESS;
-}
-
-/* 
- * Save HostServ bans
- */
-static void SaveBans (void)
-{
-	static char ban_buf[CONFBUFSIZE];
-	banentry *ban;
-	hnode_t *hn;
-	hscan_t hs;
-
-	hash_scan_begin (&hs, bannedvhosts);
-	while ((hn = hash_scan_next (&hs)) != NULL) {
-		ban = (banentry *) hnode_get (hn);
-		SetData ((void *)ban->who, CFGSTR, "Ban", ban->host, "Who");
-		SetData ((void *)ban->reason, CFGSTR, "Ban", ban->host, "Reason");
-	}
-}
-
-/* 
- * Load HostServ bans
- */
-static void LoadBans (void)
-{
-	char *tmp;
-	static char ban_buf[CONFBUFSIZE];
-	banentry *ban;
-	int i;
-	char **data;
-
-	if (GetTableData ("Ban", &data) > 0) {
-		for (i = 0; data[i] != NULL; i++) {
-			ban = ns_malloc (sizeof (banentry));
-			strlcpy (ban->host, data[i], MAXHOST);
-
-			if (GetData ((void *)&tmp, CFGSTR, "Ban", ban->host, "Who") <= 0) {
-				ns_free (ban);
-				continue;
-			} else {
-				strlcpy (ban->who, tmp, MAXNICK);
-				ns_free (tmp);
-			}
-			if (GetData ((void *)&tmp, CFGSTR, "Ban", ban->host, "Reason") <= 0) {
-				ns_free (ban);
-				continue;
-			} else {
-				strlcpy (ban->reason, tmp, MAXREASON);
-				ns_free (tmp);
-			}
-			hnode_create_insert (bannedvhosts, ban, ban->host);
-		}
-		free(data);
-	}
-}
