@@ -45,7 +45,7 @@ void *display_server_ping (void *tbl, char *col, char *sql, void *row)
 void *display_server_uplink(void *tbl, char *col, char *sql, void *row) 
 {
 	Client *data = row;
-	return &data->uplink->name;
+	return data->uplink->name;
 }                        
 
 COLDEF neo_serverscols[] = {

@@ -115,6 +115,7 @@ protocol_entry protocol_list[] =
 	{"NOQUIT",	PROTOCOL_NOQUIT},
 	{"NICKIP",	PROTOCOL_NICKIP},
 	{"NICKv2",	PROTOCOL_NICKv2},
+	{"SJ3",		PROTOCOL_SJ3},	
 	{NULL, 0}
 };
 
