@@ -100,6 +100,8 @@ close_logs ()
 		hnode_destroy (hn);
 		free (logentry);
 	}
+	/* for some reason, the logs are not getting flushed correctly */
+	sleep(5);
 }
 
 void make_log_filename(char* modname, char *logname)

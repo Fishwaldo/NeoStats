@@ -428,6 +428,8 @@ serv_segv ()
 		CLEAR_SEGV_INMODULE();
 		unload_module (name, NULL);
 		chanalert (s_Services, "Restoring Stack to before Crash");
+		/* flush the logs out */
+		close_logs(); 
 		longjmp (sigvbuf, -1);
 		chanalert (s_Services, "Done");
 		return;
@@ -446,9 +448,7 @@ serv_segv ()
 	nlog (LOG_CRITICAL, LOG_CORE, "recbuf:   %s", recbuf);
 	do_backtrace();
 	nlog (LOG_CRITICAL, LOG_CORE, "-------------------------END OF REPORT--------------------------");
-	sleep (2);
-	kill (forked, 3);
-	kill (forked, 9);
+	close_logs();
 	/* clean up */
 	do_exit (NS_EXIT_SEGFAULT, NULL);
 }
