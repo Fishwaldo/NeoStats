@@ -251,6 +251,7 @@ SmodeStringToMask(const char* SmodeString, long Smode)
 int 
 join_bot_to_chan (const char *who, const char *chan, const char *mode)
 {
+	/* Use sjoin if available */
 	if(ircd_srv.protocol & PROTOCOL_SJOIN) {
 		time_t ts;
 		Channel *c;
@@ -268,6 +269,7 @@ join_bot_to_chan (const char *who, const char *chan, const char *mode)
 			ChanUserMode(chan, who, 1, UmodeStringToMask(mode,0));
 		}
 	} else {
+		/* sjoin not available so use normal join */
 		send_join (me.name, who, chan, me.now);
 		join_chan (who, chan);
 		if(mode) {
@@ -1663,7 +1665,7 @@ servertobase64 (const char* name)
 	}
 	return NULL;
 }
-#ifdef IRCUP10
+
 char* 
 base64toserver (const char* num)
 {
@@ -1722,5 +1724,4 @@ base64tonick (const char* num)
 	}
 	return NULL;
 }
-#endif
 
