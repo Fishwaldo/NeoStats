@@ -344,6 +344,12 @@ int main( int argc, char *argv[] )
 		return EXIT_FAILURE;
 	}
 #endif
+
+#ifndef WIN32
+    /* make sure any files we create are not group/world readable (password info?) */
+    umask(077);
+#endif
+
 	/* Init run level to NeoStats core */
 	RunModule[0] = &ns_module;
 	/* before we do anything, make sure logging is setup */

@@ -473,6 +473,12 @@ int ss_html( void )
 	}
 	os_fclose( tpl );
 	os_fclose( opf );
+#ifndef WIN32
+    /* update the umode so others can read it */
+    chmod(StatServ.htmlpath, S_IRUSR|S_IRGRP|S_IROTH);
+#endif
+
+
 	return NS_SUCCESS;
 }
 
