@@ -823,17 +823,13 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 				arg);
 			return;
 		}
-		if (arg == me.name) {
-			prefmsg(u->nick, s_StatServ, "%s is me! You cant delete me!!!",
-				arg);
-			return;
-		}
 		sn = hash_lookup(Shead, arg);
 		if (sn) {
 			hash_delete(Shead, sn);
 			st = hnode_get(sn);
 			hnode_destroy(sn);
 			free(st);
+			s_new_server(arg, 1);
 		}
 		prefmsg(u->nick, s_StatServ, "Removed %s from the database.", arg);
 		log("%s requested STATS DEL %s", u->nick, arg);
