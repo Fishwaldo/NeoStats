@@ -197,6 +197,8 @@ UserPart (list_t * list, lnode_t * node, void *v)
 void
 DelUser (const char *nick, int killflag, const char *reason)
 {
+	char killnick[MAXNICK];
+	int botflag = 0;
 	User *u;
 	hnode_t *un;
 	char **av;
@@ -241,10 +243,8 @@ DelUser (const char *nick, int killflag, const char *reason)
 	if (findbot (u->nick)) {
 		if (killflag == 1) {
 			nlog (LOG_NOTICE, LOG_CORE, "doDelUser: deleting bot %s as it was killed", u->nick);
-			ac = 0;
-			AddStringToList (&av, u->nick, &ac);
-			ModuleEvent (EVENT_BOTKILL, av, ac);
-			free (av);
+			strlcpy(killnick,u->nick,MAXNICK);
+			botflag = 1;
 		}
 		del_mod_user (u->nick);
 	}
@@ -253,6 +253,12 @@ DelUser (const char *nick, int killflag, const char *reason)
 	hnode_destroy (un);
 	list_destroy (u->chans);
 	free (u);
+	if(botflag) {
+		ac = 0;
+		AddStringToList (&av, killnick, &ac);
+		ModuleEvent (EVENT_BOTKILL, av, ac);
+		free (av);
+	}
 }
 
 void
