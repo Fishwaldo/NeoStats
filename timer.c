@@ -53,8 +53,11 @@ CheckTimers (void)
 		fflush (NULL);
 	}
 #ifdef GOTSVSTIME
-	if (me.setservertimes) {
+	if (me.synced && me.setservertimes) {
 		if((me.now - lastservertimesync) > me.setservertimes) {
+			/* The above check does not need to be exact, but 
+			   setting times ought to be so reset me.now */
+			me.now = time(NULL);
 			ssvstime_cmd (me.now);
 			lastservertimesync = me.now;
 		}

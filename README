@@ -530,7 +530,9 @@ SETSERVERTIMES <INTERVAL> [OPTIONAL]
     Cause NeoStats to sync server times every 24 hours
     If not present, NeoStats will not sync times.
     This option only works on Unreal servers and defaults to 
-    a sync interval of 24 hours
+    a sync interval of 24 hours. Enabling this option will also
+    cause NeoStats to sync servers when it first joins the 
+    network.
 
 Module Configuration Options
 ----------------------------
