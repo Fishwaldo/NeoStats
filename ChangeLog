@@ -68,6 +68,9 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Add support for Unreal TKL bans (M)
  - New bot flag so bots can ignore channel messages when they do not need them (M)
  - Fix IRCu parsing and begin merging back to core (M)
+ - Changed debug dump outputs to be more readable and make helper functions for 
+   each dump type instead of having the dump code written twice (M)
+ - SERVERDUMP now takes an optional parameter of server name to work like chan/userdump (M)
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database

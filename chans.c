@@ -751,7 +751,6 @@ dumpchan (Chans* c)
 	char mode[10];
 	int i;
 	int j = 0;
-	int k = 0;
 	ModesParm *m;
 
 	bzero (mode, 10);
@@ -800,13 +799,6 @@ ChanDump (const char *chan)
 	hnode_t *cn;
 	hscan_t sc;
 	Chans *c;
-
-	lnode_t *cmn;
- 	Chanmem *cm;
-	char mode[10];
-	int i;
-	int j = 0;
-	ModesParm *m;
 
 	SET_SEGV_LOCATION();
 	debugtochannel("================CHANDUMP================");
