@@ -884,7 +884,7 @@ void *display_chanmodes (void *tbl, char *col, char *sql, void *row)
 		m = lnode_get (cmn);
 		for (i = 0; i < ircd_cmodecount; i++) {
 			if (m->mode & chan_modes[i].mode) {
-				ircsnprintf(tmp, BUFSIZE, "+%c %s", chan_modes[i].flag, m->param);
+				ircsnprintf(tmp, BUFSIZE, " +%c %s", chan_modes[i].flag, m->param);
 				strlcat(chanmodes, tmp, BUFSIZE);
 			}
 		}
