@@ -270,6 +270,7 @@ ns_show_level (User * u, char **av, int ac)
 static void 
 ns_do_help (User * u, char **av, int ac)
 {
+	bot_cmd_help (u, av, ac);
 }
 
 static void 

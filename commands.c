@@ -172,7 +172,7 @@ servicesbot (char *nick, char **av, int ac)
 }
 
 void 
-ns_do_help (User * u, char **av, int ac)
+bot_cmd_help (User * u, char **av, int ac)
 {
 	bot_cmd* cmd_ptr;
 	int curlevel, lowlevel;

@@ -419,6 +419,7 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 int init_services();
 int add_services_cmd_list(bot_cmd* cmd_list);
 int del_services_cmd_list(bot_cmd* cmd_list);
+void bot_cmd_help (User * u, char **av, int ac);
 
 
 #endif
