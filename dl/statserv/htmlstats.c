@@ -193,7 +193,9 @@ void ss_html() {
 
 		
 		fputs(buf, opf);
+		free(buf1);
 	}
+	free(buf);
 	if (!gothtml) {
 		put_copyright();
 	}
