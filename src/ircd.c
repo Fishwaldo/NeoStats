@@ -192,7 +192,7 @@ InitIrcdProtocol ()
 		return NS_FAILURE;	
 	}
 	if (protocol_info->minprotocol & PROTOCOL_CLIENTMODE) {
-		config.singlebotmode = 1;
+		nsconfig.singlebotmode = 1;
 	}
 	strlcpy (me.servicescmode, protocol_info->services_cmode, MODESIZE);
 	strlcpy (me.servicesumode, protocol_info->services_umode, MODESIZE);
@@ -711,7 +711,7 @@ irc_prefmsg (const Bot *botptr, const Client *target, const char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	if (config.want_privmsg) {
+	if (nsconfig.want_privmsg) {
 		irc_send_privmsg (botptr->u->name, target->name, ircd_buf);
 	} else {
 		irc_send_notice (botptr?botptr->u->name:ns_botptr->u->name, target->name, ircd_buf);

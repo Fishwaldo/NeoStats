@@ -59,15 +59,15 @@ void
 CheckTimers (void)
 {
 	SET_SEGV_LOCATION();
-	if (me.now - ping.last_sent > config.pingtime) {
+	if (me.now - ping.last_sent > nsconfig.pingtime) {
 		PingServers ();
 		flush_keeper ();
 		ping.last_sent = me.now;
 		/* flush log files */
 		fflush (NULL);
 	}
-	if (is_synched && config.setservertimes) {
-		if((me.now - lastservertimesync) > config.setservertimes) {
+	if (is_synched && nsconfig.setservertimes) {
+		if((me.now - lastservertimesync) > nsconfig.setservertimes) {
 			/* The above check does not need to be exact, but 
 			   setting times ought to be so reset me.now */
 			me.now = time (NULL);

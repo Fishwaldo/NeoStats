@@ -88,10 +88,12 @@ extern const char cmd_help_oneline[];
 extern const char cmd_help_about_oneline[];
 extern const char cmd_help_credits_oneline[];
 extern const char cmd_help_version_oneline[];
+extern const char cmd_help_levels_oneline[];
 extern const char *cmd_help_help[];
 extern const char *cmd_help_about[];
 extern const char *cmd_help_credits[];
 extern const char *cmd_help_version[];
+extern const char *cmd_help_levels[];
 extern const char *cmd_help_set[];
 
 #endif /* _NS_HELP_H_ */

@@ -231,7 +231,7 @@ read_loop ()
 						if ((c == '\n') || (c == '\r')) {
 							me.RcveM++;
 							me.lastmsg = me.now;
-							if (config.recvlog)
+							if (nsconfig.recvlog)
 								recvlog (buf);
 							strip (buf);
 							strlcpy (recbuf, buf, BUFSIZE);
@@ -340,7 +340,7 @@ Connect (void)
 		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
 	} else {
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
-		irc_connect (me.name, me.numeric, me.infoline, config.pass, (unsigned long)me.t_start, (unsigned long)me.now);
+		irc_connect (me.name, me.numeric, me.infoline, nsconfig.pass, (unsigned long)me.t_start, (unsigned long)me.now);
 #ifndef WIN32
 		read_loop ();
 #endif

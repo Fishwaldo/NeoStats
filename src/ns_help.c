@@ -48,6 +48,7 @@ const char cmd_help_oneline[]="Online help";
 const char cmd_help_about_oneline[] = "Display About info";
 const char cmd_help_credits_oneline[] = "Display credits";
 const char cmd_help_version_oneline[] = "Display version";
+const char cmd_help_levels_oneline[] = "Change command user level";
 
 const char *ns_help_level[] = {
 	"Syntax: \2LEVEL [nick]\2",
@@ -366,6 +367,14 @@ const char *cmd_help_version[] = {
 	"Syntax: \2VERSION\2",
 	"",
 	"Show version information",
+	NULL
+};
+
+const char *cmd_help_levels[] = {
+	"Syntax: \2LEVELS <command> <level>\2",
+	"",
+	"Change minimum user level for a command.",
+	"<level> must be between 0 and 200.",
 	NULL
 };
 

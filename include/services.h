@@ -32,7 +32,7 @@ typedef struct neoroot {
 } neoroot;
 
 /* general configuration items */
-typedef struct tconfig {
+typedef struct config {
 	/* log level */
 	LOG_LEVEL	loglevel;
 	/* debug level */
@@ -63,10 +63,11 @@ typedef struct tconfig {
 	char debugmodule[MAX_MOD_NAME];
 	unsigned int singlebotmode;
 	unsigned int cmdreport;
+	unsigned int unauthreport;
 	unsigned char cmdchar[2];
-} tconfig;
+} config;
 
-extern tconfig config;
+extern config nsconfig;
 
 extern ModuleInfo ns_module_info;
 extern Module ns_module;

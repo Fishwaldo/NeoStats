@@ -4,6 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - HostServ: LEVELS command removed since core now handles this. (M)
+ - All commands now have a configurable minimum user level using the command
+   /msg botname LEVELS. (M)
  - HostServ: moddata use removed in favour of a simple flag in the core wrt
    user SETHOST from NeoStats. (M)
  - HostServ: BANS DEL now takes host as a parameter not an index. (M)

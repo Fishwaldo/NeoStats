@@ -137,9 +137,9 @@ debuglog (const char* time, const char* level, const char *line)
 		fprintf (logfile, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line);
 		fclose (logfile);
 	}
-	if(config.debugtochan&&!chanflag) {
+	if(nsconfig.debugtochan&&!chanflag) {
 		chanflag = 1;
-		irc_chanprivmsg(ns_botptr, config.debugchan, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line);
+		irc_chanprivmsg(ns_botptr, nsconfig.debugchan, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line);
 		chanflag = 0;
 	}
 }
@@ -152,9 +152,9 @@ dlog (DEBUG_LEVEL level, char *fmt, ...)
 	va_list ap;
 	
 #ifndef WIN32
-	if (level <= config.debuglevel) {
+	if (level <= nsconfig.debuglevel) {
 		/* Support for module specific only debug info */
-		if(ircstrcasecmp(config.debugmodule, "all")== 0 || ircstrcasecmp(config.debugmodule, GET_CUR_MODNAME()) ==0)
+		if(ircstrcasecmp(nsconfig.debugmodule, "all")== 0 || ircstrcasecmp(nsconfig.debugmodule, GET_CUR_MODNAME()) ==0)
 		{
 #endif
 			/* we update me.now here, because some functions might be busy and not call the loop a lot */
@@ -167,7 +167,7 @@ dlog (DEBUG_LEVEL level, char *fmt, ...)
 #ifdef WIN32
 			printf ("%s %s - %s\n", dloglevels[level - 1], GET_CUR_MODNAME(), log_buf);
 #else
-			if (config.foreground) {
+			if (nsconfig.foreground) {
 				printf ("%s %s - %s\n", dloglevels[level - 1], GET_CUR_MODNAME(), log_buf);
 			}
 #endif
@@ -186,7 +186,7 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 	va_list ap;
 	LogEntry *logentry;
 	
-	if (level <= config.loglevel) {
+	if (level <= nsconfig.loglevel) {
 		logentry = (LogEntry *)hnode_find (logs, GET_CUR_MODNAME());
 		if (logentry) {
 			/* we found our log entry */
@@ -216,12 +216,12 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 		va_end (ap);
 		fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
 		logentry->flush = 1;
-		if (config.foreground) {
+		if (nsconfig.foreground) {
 			printf ("%s %s - %s\n", loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
 		}
 	}
 #ifndef WIN32
-	if (config.debuglevel) {
+	if (nsconfig.debuglevel) {
 #endif
 		debuglog (log_fmttime, loglevels[level - 1], log_buf);
 #ifndef WIN32

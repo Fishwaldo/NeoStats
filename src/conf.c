@@ -87,12 +87,12 @@ ConfLoad ()
 		printf ("***************************************************\n");
 		return NS_FAILURE;
 	}
-	if (config.die) {
+	if (nsconfig.die) {
 		printf ("\n-----> ERROR: Read the README file then edit %s <-----\n\n",CONFIG_NAME);
 		nlog (LOG_CRITICAL, "Read the README file then edit %s",CONFIG_NAME);
 		return NS_FAILURE;
 	}
-	if (config.error) {
+	if (nsconfig.error) {
 		printf ("\n-----> CONFIG ERROR: Check log file for more information then edit %s <-----\n\n",CONFIG_NAME);
 		nlog (LOG_CRITICAL, "CONFIG ERROR: Check log file for more information then edit %s",CONFIG_NAME);
 		return NS_FAILURE;
@@ -116,7 +116,7 @@ cb_Module (char *arg, int configtype)
 	int i;
 
 	SET_SEGV_LOCATION();
-	if (!config.modnoload) {
+	if (!nsconfig.modnoload) {
 		for (i = 0; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
 			if (!ircstrcasecmp (load_mods[i], arg)) {
 				return;
@@ -183,7 +183,7 @@ cb_Server (char *arg, int configtype)
 		strlcpy (me.uplink, arg, sizeof (me.uplink));
 	} else if (configtype == 3) {
 		/* Connect Pass */
-		strlcpy (config.pass, arg, sizeof (config.pass));
+		strlcpy (nsconfig.pass, arg, sizeof (nsconfig.pass));
 	} else if (configtype == 4) {
 		/* Server InfoLine */
 		strlcpy (me.infoline, arg, sizeof (me.infoline));
@@ -192,15 +192,15 @@ cb_Server (char *arg, int configtype)
 		strlcpy (me.netname, arg, sizeof (me.netname));
 	} else if (configtype == 6) {
 		/* Reconnect time */
-		config.r_time = atoi (arg);
+		nsconfig.r_time = atoi (arg);
 	} else if (configtype == 9) {
-		config.want_privmsg = 1;
+		nsconfig.want_privmsg = 1;
 	} else if (configtype == 10) {
 		strlcpy (me.serviceschan, arg, sizeof (me.serviceschan));
 	} else if (configtype == 11) {
-		config.onlyopers = 1;
+		nsconfig.onlyopers = 1;
 	} else if (configtype == 12) {
-		config.die = 1;
+		nsconfig.die = 1;
 	} else if (configtype == 13) {
 		strlcpy (me.local, arg, sizeof (me.local));
 	} else if (configtype == 14) {
@@ -213,12 +213,12 @@ cb_Server (char *arg, int configtype)
 		if(me.numeric>254)
 			me.numeric=254;
 	} else if (configtype == 16) {
-		config.setservertimes = atoi (arg);
+		nsconfig.setservertimes = atoi (arg);
 		/* Convert hours input to seconds */
-		config.setservertimes = config.setservertimes * 60 * 60;
+		nsconfig.setservertimes = nsconfig.setservertimes * 60 * 60;
 		/* limit value - really need to print error and quit */
-		if(config.setservertimes <= 0) {
-			config.setservertimes = (24 * 60 * 60);
+		if(nsconfig.setservertimes <= 0) {
+			nsconfig.setservertimes = (24 * 60 * 60);
 		}
 	} else if (configtype == 17) {
 		char *nick;
@@ -229,15 +229,15 @@ cb_Server (char *arg, int configtype)
 			nlog(LOG_WARNING, 
 				"Invalid SERVICEROOT. Must be of the form nick!user@host, was %s",
 				arg);
-			config.error = 1;
+			nsconfig.error = 1;
 		} else {
 			nick = strtok(arg, "!");
 			user = strtok(NULL, "@");
 			host = strtok(NULL, "");
-			strlcpy(config.rootuser.nick, nick, MAXNICK);
-			strlcpy(config.rootuser.user, user, MAXUSER);
-			strlcpy(config.rootuser.host, host, MAXHOST);
-			config.rootuser.level = NS_ULEVEL_ROOT;
+			strlcpy(nsconfig.rootuser.nick, nick, MAXNICK);
+			strlcpy(nsconfig.rootuser.user, user, MAXUSER);
+			strlcpy(nsconfig.rootuser.host, host, MAXHOST);
+			nsconfig.rootuser.level = NS_ULEVEL_ROOT;
 		}
 	} else if (configtype == 18) {
 		strlcpy(me.protocol,arg,MAXHOST);

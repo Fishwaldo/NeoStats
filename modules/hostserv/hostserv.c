@@ -42,10 +42,6 @@ list_t *vhosts;
 hash_t *bannedvhosts;
 
 struct hs_cfg {
-	int view;
-	int list;
-	int del;
-	int add;
 	int expire;
 	int regnick;
 	char vhostdom[MAXHOST];
@@ -55,7 +51,6 @@ struct hs_cfg {
 static int hs_event_signon (CmdParams *cmdparams);
 static int hs_event_mode (CmdParams *cmdparams);
 
-static int hs_levels (CmdParams *cmdparams);
 static int hs_bans (CmdParams *cmdparams);
 static int hs_login (CmdParams *cmdparams);
 static int hs_chpass (CmdParams *cmdparams);
@@ -75,7 +70,6 @@ static void new_vhost (char *nick, char *host, char *vhost, char *pass, char *wh
 int CleanupHosts (void);
 static void LoadHosts (void);
 static void LoadBans (void);
-static void LoadConfig (void);
 
 /** Bot pointer */
 Bot *hs_bot;
@@ -105,12 +99,11 @@ ModuleInfo module_info = {
 /** Bot comand table */
 static bot_cmd hs_commands[]=
 {
-	{"ADD",		hs_add,		4,	(int)&hs_cfg.add,	hs_help_add,	hs_help_add_oneline },
-	{"DEL",		hs_del,		1, 	(int)&hs_cfg.del,	hs_help_del,	hs_help_del_oneline },
-	{"LIST",	hs_list,	0, 	(int)&hs_cfg.list,	hs_help_list,	hs_help_list_oneline },
+	{"ADD",		hs_add,		4,	NS_ULEVEL_LOCOPER,	hs_help_add,	hs_help_add_oneline },
+	{"DEL",		hs_del,		1, 	NS_ULEVEL_LOCOPER,	hs_help_del,	hs_help_del_oneline },
+	{"LIST",	hs_list,	0, 	NS_ULEVEL_LOCOPER,	hs_help_list,	hs_help_list_oneline },
 	{"BANS",	hs_bans,	1,  NS_ULEVEL_ADMIN,	hs_help_bans,	hs_help_bans_oneline },
-	{"LEVELS",	hs_levels,	0, 	NS_ULEVEL_OPER,		hs_help_levels,	hs_help_levels_oneline },
-	{"VIEW",	hs_view,	1, 	(int)&hs_cfg.view,	hs_help_view,	hs_help_view_oneline },
+	{"VIEW",	hs_view,	1, 	NS_ULEVEL_OPER,		hs_help_view,	hs_help_view_oneline },
 	{"LOGIN",	hs_login,	2, 	0,					hs_help_login,	hs_help_login_oneline },
 	{"CHPASS",	hs_chpass,	3, 	0,					hs_help_chpass,	hs_help_chpass_oneline },
 	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
@@ -222,7 +215,6 @@ int ModInit (Module *mod_ptr)
 		return -1;
 	}
 	ModuleConfig(hs_settings);
-	LoadConfig();
 	LoadBans();
 	LoadHosts();
 	return NS_SUCCESS;
@@ -318,64 +310,6 @@ static void new_vhost (char *nick, char *host, char *vhost, char *pass, char *wh
 	strlcpy(vhe->added, who, MAXNICK);
 	lnode_create_append (vhosts, vhe);
 	save_vhost(vhe);
-}
-
-static int hs_levels(CmdParams *cmdparams)
-{
-	int t;	
-
-	if (cmdparams->ac == 0) {
-		irc_prefmsg (hs_bot, cmdparams->source, 
-			"Configured Levels: ADD: %d, DEL: %d, LIST: %d, VIEW: %d",
-			hs_cfg.add, hs_cfg.del, hs_cfg.list,hs_cfg.view);
-			return NS_SUCCESS;
-	} else if (cmdparams->ac == 1) {
-		if (UserLevel(cmdparams->source) >= NS_ULEVEL_ADMIN) {
-			if (!ircstrcasecmp(cmdparams->av[0], "RESET")) {
-				hs_cfg.add = 40;
-				SetConf((void *) &hs_cfg.add, CFGINT, "AddLevel");
-				hs_cfg.del = 40;
-				SetConf((void *) &hs_cfg.del, CFGINT, "DelLevel");
-				hs_cfg.list = 40;
-				SetConf((void *) &hs_cfg.list, CFGINT, "ListLevel");
-				hs_cfg.view = 100;
-				SetConf((void *) &hs_cfg.view, CFGINT, "ViewLevel");
-				return NS_SUCCESS;
-			}
-		}
-		return NS_ERR_NO_PERMISSION;
-	} else if (cmdparams->ac == 2) {
-		if (UserLevel(cmdparams->source) >= NS_ULEVEL_ADMIN) {
-			t = atoi(cmdparams->av[1]);
-			if ((t <= 0) || (t > NS_ULEVEL_ROOT)) {
-				irc_prefmsg (hs_bot, cmdparams->source, 
-					"Invalid Level. Must be between 1 and %d", NS_ULEVEL_ROOT);
-				return NS_ERR_SYNTAX_ERROR;
-			}
-			if (!ircstrcasecmp(cmdparams->av[0], "ADD")) {
-				hs_cfg.add = t;
-				SetConf((void *) t, CFGINT, "AddLevel");
-			} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
-				hs_cfg.del = t;
-				SetConf((void *) t, CFGINT, "DelLevel");
-			} else if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
-				hs_cfg.list = t;
-				SetConf((void *) t, CFGINT, "ListLevel");
-			} else if (!ircstrcasecmp(cmdparams->av[0], "VIEW")) {
-				hs_cfg.view = t;
-				SetConf((void *) t, CFGINT, "ViewLevel");
-			} else {
-				irc_prefmsg (hs_bot, cmdparams->source, 
-					"Invalid Level. /msg %s help levels", hs_bot->name);
-				return NS_SUCCESS;
-			}
-			irc_prefmsg (hs_bot, cmdparams->source, 
-				"Level for %s set to %d", cmdparams->av[0], t);
-			return NS_SUCCESS;
-		}
-		return NS_ERR_NO_PERMISSION;
-	}
-	return NS_ERR_SYNTAX_ERROR;
 }
 
 static int hs_bans (CmdParams *cmdparams)
@@ -771,6 +705,9 @@ int CleanupHosts (void)
 	return NS_SUCCESS;
 }
 
+/* 
+ * Load HostServ bans
+ */
 static void LoadBans(void)
 {
 	char *temp = NULL;
@@ -789,25 +726,4 @@ static void LoadBans(void)
 		}
 		ns_free(temp);
 	}
-}
-
-/* 
- * Load HostServ Configuration file and set defaults if does not exist
- */
-static void LoadConfig(void)
-{
-	SET_SEGV_LOCATION();
-
-	GetConf((void *) &hs_cfg.view, CFGINT, "ViewLevel");
-	if ((hs_cfg.view > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
-		hs_cfg.view = 100;
-	GetConf((void *) &hs_cfg.add, CFGINT, "AddLevel");
-	if ((hs_cfg.add > NS_ULEVEL_ROOT) || (hs_cfg.view <= 0))
-		hs_cfg.add = 40;
-	GetConf((void *) &hs_cfg.del, CFGINT, "DelLevel");
-	if ((hs_cfg.del > NS_ULEVEL_ROOT) || (hs_cfg.del <= 0))
-		hs_cfg.del = 40;
-	GetConf((void *) &hs_cfg.list, CFGINT, "ListLevel");
-	if ((hs_cfg.list > NS_ULEVEL_ROOT) || (hs_cfg.list <= 0))
-		hs_cfg.list = 40;
 }

@@ -55,9 +55,9 @@ static int IsServiceRoot (Client *u)
 {
 	/* match client nick!user@host against the service root 
 	 * nick!user@host */
-	if ((match (config.rootuser.nick, u->name))
-		&& (match (config.rootuser.user, u->user->username))
-		&& (match (config.rootuser.host, u->user->hostname))) {
+	if ((match (nsconfig.rootuser.nick, u->name))
+		&& (match (nsconfig.rootuser.user, u->user->username))
+		&& (match (nsconfig.rootuser.host, u->user->hostname))) {
 		return NS_TRUE;
 	}
 	return NS_FALSE;

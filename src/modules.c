@@ -39,8 +39,6 @@ static Module *ModList[NUM_MODULES];
 Module* RunModule[10];
 int RunLevel = 0;
 
-int del_all_bot_cmds(Bot* bot_ptr);
-
 /* @brief Module hash list */
 static hash_t *modulehash;
 
@@ -61,8 +59,6 @@ InitModules ()
 		nlog (LOG_CRITICAL, "Unable to create module hash");
 		return NS_FAILURE;
 	}
-
-
 	return NS_SUCCESS;
 }
 

@@ -117,19 +117,19 @@ static bot_cmd ns_commands[]=
 /** Bot setting table */
 static bot_setting ns_settings[]=
 {
-	{"JOINSERVICESCHAN",&config.joinserviceschan, SET_TYPE_BOOLEAN,		0, 0, 	NS_ULEVEL_ADMIN, "joinserviceschan",	NULL,	ns_help_set_joinserviceschan, NULL, (void*)1 },
-	{"PINGTIME",		&config.pingtime,	SET_TYPE_INT,		0, 0, 	NS_ULEVEL_ADMIN, "pingtime",	NULL,	ns_help_set_pingtime, NULL, (void*)120 },
-	{"VERSIONSCAN",		&config.versionscan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL, (void*)1 },
+	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,		0, 0, 	NS_ULEVEL_ADMIN, "joinserviceschan",	NULL,	ns_help_set_joinserviceschan, NULL, (void*)1 },
+	{"PINGTIME",		&nsconfig.pingtime,	SET_TYPE_INT,		0, 0, 	NS_ULEVEL_ADMIN, "pingtime",	NULL,	ns_help_set_pingtime, NULL, (void*)120 },
+	{"VERSIONSCAN",		&nsconfig.versionscan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL, (void*)1 },
 	{"SERVICECMODE",	&me.servicescmode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicescmode",	NULL,	ns_help_set_servicecmode, NULL, NULL },
 	{"SERVICEUMODE",	&me.servicesumode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicesumode",	NULL,	ns_help_set_serviceumode, NULL, NULL },
-	{"CMDCHAR",			&config.cmdchar,	SET_TYPE_STRING,	0, 2, 	NS_ULEVEL_ADMIN, "cmdchar",	NULL,	ns_help_set_cmdchar, NULL, (void*)"!" },
-	{"CMDREPORT",		&config.cmdreport,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "cmdreport",	NULL,	ns_help_set_cmdreport, NULL, (void*)1 },
-	{"LOGLEVEL",		&config.loglevel,	SET_TYPE_INT,		1, 6, 	NS_ULEVEL_ADMIN, "loglevel",	NULL,	ns_help_set_loglevel, NULL, (void*)5 },
-	{"DEBUG",			&config.debug,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debug, NULL, (void*)0 },
-	{"DEBUGLEVEL",		&config.debuglevel,	SET_TYPE_INT,		1, 10, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debuglevel, NULL, (void*)0 },
-	{"DEBUGCHAN",		&config.debugchan,	SET_TYPE_STRING,	0, MAXCHANLEN, 	NS_ULEVEL_ADMIN, "debugchan",	NULL,	ns_help_set_debugchan, NULL, (void*)"#debug" },
-	{"DEBUGTOCHAN",		&config.debugtochan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugtochan, NULL, (void*)0 },
-	{"DEBUGMODULE",		&config.debugmodule,SET_TYPE_STRING,	0, MAX_MOD_NAME, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugmodule, NULL, (void*)"all" },
+	{"CMDCHAR",			&nsconfig.cmdchar,	SET_TYPE_STRING,	0, 2, 	NS_ULEVEL_ADMIN, "cmdchar",	NULL,	ns_help_set_cmdchar, NULL, (void*)"!" },
+	{"CMDREPORT",		&nsconfig.cmdreport,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "cmdreport",	NULL,	ns_help_set_cmdreport, NULL, (void*)1 },
+	{"LOGLEVEL",		&nsconfig.loglevel,	SET_TYPE_INT,		1, 6, 	NS_ULEVEL_ADMIN, "loglevel",	NULL,	ns_help_set_loglevel, NULL, (void*)5 },
+	{"DEBUG",			&nsconfig.debug,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debug, NULL, (void*)0 },
+	{"DEBUGLEVEL",		&nsconfig.debuglevel,	SET_TYPE_INT,		1, 10, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debuglevel, NULL, (void*)0 },
+	{"DEBUGCHAN",		&nsconfig.debugchan,	SET_TYPE_STRING,	0, MAXCHANLEN, 	NS_ULEVEL_ADMIN, "debugchan",	NULL,	ns_help_set_debugchan, NULL, (void*)"#debug" },
+	{"DEBUGTOCHAN",		&nsconfig.debugtochan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugtochan, NULL, (void*)0 },
+	{"DEBUGMODULE",		&nsconfig.debugmodule,SET_TYPE_STRING,	0, MAX_MOD_NAME, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugmodule, NULL, (void*)"all" },
 	{NULL,				NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
 
@@ -157,8 +157,8 @@ BotInfo ns_botinfo = {
 void InitServices(void)
 {
 	/* if all bots should join the chan */
-	if (GetConf ((void *) &config.allbots, CFGINT, "AllBotsJoinChan") <= 0) {
-		config.allbots = 0;
+	if (GetConf ((void *) &nsconfig.allbots, CFGINT, "AllBotsJoinChan") <= 0) {
+		nsconfig.allbots = 0;
 	}
 	/* */
 	ModuleConfig(ns_settings);
@@ -175,7 +175,7 @@ init_services_bot (void)
 {
 	SET_SEGV_LOCATION();
 	ircsnprintf (ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick);
-	if(config.onlyopers) 
+	if(nsconfig.onlyopers) 
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
 	ns_module.insynch = 1;
 	ns_botptr = AddBot (&ns_botinfo);
@@ -279,7 +279,7 @@ ns_cmd_userlist (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
-	if (!config.debug) {
+	if (!nsconfig.debug) {
 		irc_prefmsg (ns_botptr, cmdparams->source, __("\2Error:\2 debug mode disabled", cmdparams->source));
 	   	return NS_FAILURE;
 	}
@@ -300,7 +300,7 @@ ns_cmd_serverlist (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
-	if (!config.debug) {
+	if (!nsconfig.debug) {
 		irc_prefmsg (ns_botptr, cmdparams->source, __("\2Error:\2 debug mode disabled", cmdparams->source));
 	   	return NS_FAILURE;
 	}
@@ -321,7 +321,7 @@ ns_cmd_chanlist (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
-	if (!config.debug) {
+	if (!nsconfig.debug) {
 		irc_prefmsg (ns_botptr, cmdparams->source, __("\2Error:\2 debug mode disabled", cmdparams->source));
 	   	return NS_FAILURE;
 	}
@@ -342,7 +342,7 @@ ns_cmd_banlist (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
-	if (!config.debug) {
+	if (!nsconfig.debug) {
 		irc_prefmsg (ns_botptr, cmdparams->source, __("\2Error:\2 debug mode disabled", cmdparams->source));
 	   	return NS_FAILURE;
 	}
@@ -376,10 +376,10 @@ ns_cmd_status (CmdParams* cmdparams)
 	}
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Sent %ld messages, %ld bytes", cmdparams->source), me.SendM, me.SendBytes);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Received %ld messages, %ld Bytes", cmdparams->source), me.RcveM, me.RcveBytes);
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Reconnect time: %d", cmdparams->source), config.r_time);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Reconnect time: %d", cmdparams->source), nsconfig.r_time);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Requests: %d",cmdparams->source), me.requests);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Max sockets: %d (in use: %d)", cmdparams->source), me.maxsocks, me.cursocks);
-	if (config.debug)
+	if (nsconfig.debug)
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Debugging mode enabled", cmdparams->source));
 	else
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Debugging mode disabled", cmdparams->source));

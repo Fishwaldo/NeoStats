@@ -32,7 +32,6 @@ const char hs_help_add_oneline[] ="Add a vhost";
 const char hs_help_del_oneline[] ="Delete a vhost";
 const char hs_help_list_oneline[] ="List vhosts";
 const char hs_help_view_oneline[] ="Detailed vhost list";
-const char hs_help_levels_oneline[] ="Levels to manage HostServ";
 
 const char *hs_about[] = {
 	"\2HostServ\2 allows users to use their own unique host",
@@ -114,23 +113,6 @@ const char *hs_help_bans[] = {
 	"",
 	"\2DEL\2 delete a banned vhost.",
 	"hostname must match the one used to add the vhost.",
-	NULL
-};
-
-const char *hs_help_levels[] = {
-	"Syntax: \2LEVELS\2",
-	"        \2LEVELS ADD <level>\2",
-	"        \2LEVELS LIST <level>\2",
-	"        \2LEVELS DEL <level>\2",
-	"        \2LEVELS VIEW <level>\2",
-	"        \2LEVELS RESET\2",
-	"",
-	"\2LEVELS\2 without any parameters will lists the levels",
-	"required to perform certain HostServ functions.",
-	"",
-	"Service Roots can modify these levels.",
-	"LEVEL must be between 1 and 200",
-	"RESET will restore the levels to original settings.",
 	NULL
 };
 

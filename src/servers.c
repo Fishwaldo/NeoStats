@@ -33,7 +33,7 @@
 
 #define SERVER_TABLE_SIZE	-1
 
-tconfig config;
+config nsconfig;
 static hash_t *serverhash;
 
 static Client *

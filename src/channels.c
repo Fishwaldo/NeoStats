@@ -475,7 +475,7 @@ void ListChannels (CmdParams* cmdparams, const char *chan)
 	Channel *c;
 
 #ifndef DEBUG
-	if (!config.debug)
+	if (!nsconfig.debug)
 		return;
 #endif
 	SET_SEGV_LOCATION();

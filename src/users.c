@@ -149,7 +149,7 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	}
 	ns_free (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
-	if (is_synched && config.versionscan && !IsExcluded(u) && !IsMe(u)) {
+	if (is_synched && nsconfig.versionscan && !IsExcluded(u) && !IsMe(u)) {
 		irc_ctcp_version_req (ns_botptr, u);
 	}
 	return u;
@@ -413,7 +413,7 @@ void UserDump (CmdParams *cmdparams, const char *nick)
 	hscan_t us;
 
 #ifndef DEBUG
-	if (!config.debug)
+	if (!nsconfig.debug)
 		return;
 #endif
 	SET_SEGV_LOCATION();

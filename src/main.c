@@ -71,9 +71,9 @@ void InitMe(void)
 	me.now = time(NULL);
 	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
 #ifdef DEBUG
-	config.debug = 1;
+	nsconfig.debug = 1;
 #endif
-	config.r_time = 10;
+	nsconfig.r_time = 10;
 	me.numeric = 1;
 }
 
@@ -86,7 +86,7 @@ static int InitCore(void)
 	char dbpath[MAXPATH];
 	InitMe();
 	/* if we are doing recv.log, remove the previous version */
-	if (config.recvlog)
+	if (nsconfig.recvlog)
 		remove (RECV_LOG);
 	/* prepare to catch errors */
 	InitSignals ();
@@ -173,7 +173,7 @@ neostats ()
 	/* our crash trace variables */
 	SET_SEGV_LOCATION();
 	/* keep quiet if we are told to :) */
-	if (!config.quiet) {
+	if (!nsconfig.quiet) {
 		printf ("NeoStats %s Loading...\n", me.version);
 		printf ("-----------------------------------------------\n");
 		printf ("Copyright: NeoStats Group. 2000-2004\n");
@@ -189,7 +189,7 @@ neostats ()
 #ifndef WIN32
 #ifndef DEBUG
 	/* if we are compiled with debug, or forground switch was specified, DONT FORK */
-	if (!config.foreground) {
+	if (!nsconfig.foreground) {
 		/* fix the double log message problem by closing logs prior to fork() */ 
 		CloseLogs (); 
 		forked = fork ();
@@ -206,7 +206,7 @@ neostats ()
 			fp = fopen (PID_FILENAME, "w");
 			fprintf (fp, "%i", forked);
 			fclose (fp);
-			if (!config.quiet) {
+			if (!nsconfig.quiet) {
 				printf ("\n");
 				printf (_("NeoStats %s Successfully Launched into Background\n"), me.version);
 				printf (_("PID: %i - Wrote to %s\n"), forked, PID_FILENAME);
@@ -253,9 +253,9 @@ static int
 get_options (int argc, char **argv)
 {
 #ifdef WIN32
-	config.debug = 1;
-	config.loglevel = LOG_INFO;
-	config.debuglevel = DEBUG10;
+	nsconfig.debug = 1;
+	nsconfig.loglevel = LOG_INFO;
+	nsconfig.debuglevel = DEBUG10;
 #else
 	int c;
 	int level;
@@ -264,12 +264,12 @@ get_options (int argc, char **argv)
 	memset(&config, 0 , sizeof(config));
 	/* Debug mode overrides */
 #ifdef DEBUG
-	config.loglevel = LOG_INFO;
-	config.debuglevel = DEBUG10;
-	config.foreground = 1;
+	nsconfig.loglevel = LOG_INFO;
+	nsconfig.debuglevel = DEBUG10;
+	nsconfig.foreground = 1;
 #endif
 	/* default debugmodule to all */
-	strlcpy(config.debugmodule, "all", MAX_MOD_NAME);
+	strlcpy(nsconfig.debugmodule, "all", MAX_MOD_NAME);
 
 	while ((c = getopt (argc, argv, "hvrd:nqf")) != -1) {
 		switch (c) {
@@ -290,7 +290,7 @@ get_options (int argc, char **argv)
 			return NS_FAILURE;
 		case 'r':
 			printf ("recv.log enabled. Watch your disk space\n");
-			config.recvlog = 1;
+			nsconfig.recvlog = 1;
 			break;
 		case 'd':
 			level = atoi (optarg);
@@ -299,16 +299,16 @@ get_options (int argc, char **argv)
 				return NS_FAILURE;
 			}
 			printf ("debug.log enabled at level %d. Watch your disk space\n", level);
-			config.debuglevel = level;
+			nsconfig.debuglevel = level;
 			break;
 		case 'n':
-			config.modnoload = 1;
+			nsconfig.modnoload = 1;
 			break;
 		case 'q':
-			config.quiet = 1;
+			nsconfig.quiet = 1;
 			break;
 		case 'f':
-			config.foreground = 1;
+			nsconfig.foreground = 1;
 			break;
 		default:
 			printf ("Unknown command line switch %c\n", optopt);
@@ -369,9 +369,9 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		FiniBots();
 		FiniTimers();
 		if (exitcode == NS_EXIT_RECONNECT) {
-			if(config.r_time>0) {
-				nlog (LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", config.r_time, attempts);
-				sleep (config.r_time);
+			if(nsconfig.r_time>0) {
+				nlog (LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", nsconfig.r_time, attempts);
+				sleep (nsconfig.r_time);
 			}
 			else {
 				nlog (LOG_NOTICE, "Reconnect time is zero, shutting down");
@@ -383,7 +383,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 	kp_exit();
 	FiniLogs ();
 	LANGfini();
-	if ((exitcode == NS_EXIT_RECONNECT && config.r_time > 0) || exitcode == NS_EXIT_RELOAD) {
+	if ((exitcode == NS_EXIT_RECONNECT && nsconfig.r_time > 0) || exitcode == NS_EXIT_RELOAD) {
 		execve ("./neostats", NULL, NULL);
 		return_code=EXIT_FAILURE;	/* exit code to error */
 	}

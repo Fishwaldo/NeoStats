@@ -197,7 +197,7 @@ static int bot_chan_event (Event event, CmdParams *cmdparams)
 	char *chan;
 
 	SET_SEGV_LOCATION();
-	if (cmdparams->param[0] == config.cmdchar[0]) {
+	if (cmdparams->param[0] == nsconfig.cmdchar[0]) {
 		/* skip over command char */
 		cmdparams->param ++;
 		cmdflag = 1;
@@ -587,12 +587,12 @@ static void ConnectBot (Bot *botptr)
 	if (botptr->flags&BOT_FLAG_SERVICEBOT) {
 		irc_nick (botptr->name, botptr->u->user->username, botptr->u->user->hostname, botptr->u->info, me.servicesumode);
 		UserMode (botptr->name, me.servicesumode);
-		if (config.joinserviceschan) {
+		if (nsconfig.joinserviceschan) {
 			irc_join (botptr, me.serviceschan, me.servicescmode);
 		}
 	} else {
 		irc_nick (botptr->name, botptr->u->user->username, botptr->u->user->hostname, botptr->u->info, "");
-		if ((config.allbots > 0)) {
+		if ((nsconfig.allbots > 0)) {
 			irc_join (botptr, me.serviceschan, me.servicescmode);
 		}
 	}	
@@ -631,7 +631,7 @@ Bot *AddBot (BotInfo *botinfo)
 		return NULL;
 	}
 	/* In single bot mode, just add all commands and settings to main bot */
-	if (config.singlebotmode && ns_botptr) {
+	if (nsconfig.singlebotmode && ns_botptr) {
 		add_bot_cmd_list (ns_botptr, botinfo->bot_cmd_list);
 		add_bot_setting_list (ns_botptr, botinfo->bot_setting_list);
 		return(ns_botptr);
@@ -653,10 +653,8 @@ Bot *AddBot (BotInfo *botinfo)
 	botptr->u->user->bot = botptr;
 	botptr->flags = botinfo->flags;
 	ConnectBot (botptr);
-	SET_RUN_LEVEL(GET_CUR_MODULE());
 	add_bot_cmd_list (botptr, botinfo->bot_cmd_list);
 	add_bot_setting_list (botptr, botinfo->bot_setting_list);
-	RESET_RUN_LEVEL();
 	add_bot_info_settings (botptr, botinfo);
 	return botptr;
 }
