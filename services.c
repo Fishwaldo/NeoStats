@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: services.c,v 1.56 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: services.c,v 1.57 2003/08/07 12:31:43 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -131,9 +131,8 @@ servicesbot (char *nick, char **av, int ac)
 			return;
 		}
 		rval = load_module (av[2], u);
-		if (!rval) {
+		if (rval > -1) {
 			chanalert (s_Services, "%s Loaded Module %s", u->nick, av[2]);
-
 		} else {
 			chanalert (s_Services, "%s Tried to Load Module %s, but Failed", u->nick, av[2]);
 		}

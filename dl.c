@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.62 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: dl.c,v 1.63 2003/08/07 12:31:43 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -530,6 +530,8 @@ load_module (char *path1, User * u)
 	EventFnList *event_fn_ptr = NULL;
 	Module *mod_ptr = NULL;
 	hnode_t *mn;
+	int (*doinit) (int modnum, int apiver);
+
 
 	strcpy (segv_location, "load_module");
 
@@ -648,6 +650,20 @@ load_module (char *path1, User * u)
 	nlog (LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, ModNum[i].mod->info->module_name);
 
 
+	doinit = dlsym ((int *) dl_handle, "__ModInit");
+	if (doinit) {
+		strcpy (segv_location, mod_ptr->info->module_name);
+		strcpy (segvinmodule, mod_ptr->info->module_name);
+		if ((*doinit) (i, API_VER) < 1) {
+			unload_module(ModNum[i].mod->info->module_name, NULL);
+			return -1;
+		}
+		strcpy (segv_location, "AfterModInitOnline");
+		strcpy (segvinmodule, "");
+
+	}
+
+
 
 
 	/* Let this module know we are online if we are! */
@@ -734,6 +750,8 @@ unload_module (char *module_name, User * u)
 	hnode_t *modnode;
 	hscan_t hscan;
 	int i;
+	void (*dofini) ();
+
 
 	strcpy (segv_location, "unload_module");
 	/* Check to see if this Module has any timers registered....  */
@@ -785,6 +803,13 @@ unload_module (char *module_name, User * u)
 		i = get_mod_num (module_name);
 
 		list = hnode_get (modnode);
+		dofini = dlsym ((int *) list->dl_handle, "__ModFini");
+		if (dofini) {
+			(*dofini) ();
+		}
+
+
+
 		hash_delete (mh, modnode);
 		hnode_destroy (modnode);
 		/* set segv in module */

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.h,v 1.28 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: dl.h,v 1.29 2003/08/07 12:31:43 fishwaldo Exp $
 */
 
 
@@ -38,6 +38,10 @@
 #include <time.h>
 #include "hash.h"
 #include "stats.h"
+
+
+#define API_VER 1
+
 
 #ifndef RTLD_NOW
 #define RTLD_NOW RTLD_LAZY	/* openbsd deficiency */
