@@ -55,9 +55,9 @@ strip (char *line)
  * Allocates memory for internal variables. Useful for memory debugging
  * if enough memory can't be malloced, exit the program 
  *
- * @param size The amount of memory to Malloc
+ * @param size The amount of memory to alloc
  *
- * @returns size bytes of memory or NULL on malloc error
+ * @returns size bytes of memory or NULL on error
  */
 
 void *
@@ -72,6 +72,33 @@ smalloc (long size)
 	buf = malloc (size);
 	if (!buf) {
 		nlog (LOG_CRITICAL, "smalloc(): out of memory.");
+		do_exit (NS_EXIT_ERROR, "Out of memory");
+	}
+	return buf;
+}
+
+/** @brief NeoStats implementation of calloc.
+ *
+ * Allocates memory for internal variables. Useful for memory debugging
+ * if enough memory can't be malloced, exit the program 
+ *
+ * @param size The amount of memory to alloc
+ *
+ * @returns size bytes of memory or NULL on error
+ */
+
+void *
+scalloc (long size)
+{
+	void *buf;
+
+	if (!size) {
+		nlog (LOG_WARNING, "scalloc(): illegal attempt to allocate 0 bytes!");
+		size = 1;
+	}
+	buf = calloc (1, size);
+	if (!buf) {
+		nlog (LOG_CRITICAL, "scalloc(): out of memory.");
 		do_exit (NS_EXIT_ERROR, "Out of memory");
 	}
 	return buf;
@@ -105,7 +132,6 @@ sstrdup (const char *s)
  * Makes a hash of a string for a table
  *
  * @param name The string to use as the base for the hash
- *
  * @param size_of_table The size of the hash table
  *
  * @returns unsigned long of the hash

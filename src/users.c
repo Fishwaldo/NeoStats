@@ -40,8 +40,6 @@
 
 hash_t *uh;
 
-static User *new_user (const char *nick);
-
 static char quitreason[BUFSIZE];
 
 static User *
@@ -51,8 +49,7 @@ new_user (const char *nick)
 	hnode_t *un;
 
 	SET_SEGV_LOCATION();
-	u = smalloc (sizeof (User));
-	bzero(u, sizeof(User));
+	u = scalloc (sizeof (User));
 	if (!nick) {
 		nlog (LOG_CRITICAL, "new_user: trying to add user with NULL nickname");
 		return NULL;
@@ -629,13 +626,13 @@ dumpuser (User* u)
 #endif
 	debugtochannel("IP:       %s", inet_ntoa(u->ipaddr));
 	debugtochannel("Vhost:    %s", u->vhost);
+	debugtochannel("Flags:    0x%lx", u->flags);
+	debugtochannel("Modes:    %s (0x%lx)", UmodeMaskToString(u->Umode), u->Umode);
 #ifdef GOTUSERSMODES
-	debugtochannel("Flags:    0x%lx Modes: %s (0x%lx) Smodes: %lx", u->flags, UmodeMaskToString(u->Umode), u->Umode, u->Smode);
-#else
-	debugtochannel("Flags:    0x%lx Modes: %s (0x%lx)", u->flags, UmodeMaskToString(u->Umode), u->Umode);
+	debugtochannel("Smodes:   %s (0x%lx)", SmodeMaskToString(u->Smode), u->Smode);
 #endif
 	if(u->is_away) {
-		debugtochannel("Away:     %s ", u->awaymsg);
+		debugtochannel("Away:     %s", u->awaymsg);
 	}
 
 	cm = list_first (u->chans);

@@ -787,6 +787,7 @@ void fatal_error(char* file, int line, char* func, char* error_text) __attribute
 /* misc.c */
 void strip (char * line);
 void *smalloc (long size);
+void *scalloc (long size);
 char *sstrdup (const char * s);
 char *strlwr (char * s);
 void AddStringToList (char ***List, char S[], int *C);

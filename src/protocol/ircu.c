@@ -129,9 +129,9 @@ ChanModes chan_modes[] = {
 };
 
 UserModes user_umodes[] = {
-	{UMODE_DEBUG,       'g', NS_ULEVEL_ROOT},
 	{UMODE_OPER,		'o', NS_ULEVEL_ADMIN},
 	{UMODE_LOCOP,		'O', NS_ULEVEL_OPER},
+	{UMODE_DEBUG,       'g', 0},
 	{UMODE_INVISIBLE,	'i', 0},
 	{UMODE_WALLOP,		'w', 0},
 	{UMODE_SERVNOTICE,	's', 0},
