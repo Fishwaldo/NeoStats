@@ -50,7 +50,7 @@ static int ls_about(User * u, char **av, int ac);
 
 ModuleInfo __module_info = {
 	"LoveServ",
-	"A Network Love Service",
+	"Network love service",
 	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__

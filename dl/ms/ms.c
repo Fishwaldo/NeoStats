@@ -48,7 +48,7 @@ static int ms_wonderful(User * u, char **av, int ac);
 
 ModuleInfo __module_info = {
 	"MoraleServ",
-	"A Network Morale Service",
+	"Network morale service",
 	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__

@@ -105,7 +105,7 @@ static ModUser *cs_bot;
 
 ModuleInfo __module_info = {
 	"ConnectServ",
-	"Network Connection & Mode Monitoring Service",
+	"Network connection and mode monitoring service",
 	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__

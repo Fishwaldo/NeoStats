@@ -116,7 +116,7 @@ ModUser *hs_bot;
 
 ModuleInfo __module_info = {
 	"HostServ",
-	"Network User Virtual Host Service",
+	"Network virtual host service",
 	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__

@@ -24,30 +24,30 @@
 */
 
 /** template.c 
- * You can copy this file as a template for writing your own modules
+ *  You can copy this file as a template for writing your own modules
  */
 
 #include "neostats.h"	/* Neostats API */
 
 /** 
- * A string to hold the name of our bot
+ *  A string to hold the name of our bot
  */
 char s_module_bot_name[MAXNICK];
 
 /** Module Info definition 
- * version information about our module
- * This structure is required for your module to load and run on NeoStats
+ *  Information about our module
+ *  This structure is required for your module to load and run on NeoStats
  */
 ModuleInfo __module_info = {
 	"Template",
-	"Template Module Description",
-	"Version 1.0",
+	"Put your brief module description here",
+	"1.0",
 	__DATE__,
 	__TIME__
 };
 
 /** Module function list
- * A list of IRCd (server) commands that we will respond to
+ *  A list of IRCd (server) commands that we will respond to
 ******************************** WARNING ********************************
 This table is optional but depreciated. You should respond to module 
 events to be portable across all ircds and only use this table as a
@@ -61,8 +61,8 @@ Functions __module_functions[] = {
 };
 
 /** Channel message processing
- * What do we do with messages in channels
- * This is required if you want your module to respond to channel messages
+ *  What do we do with messages in channels
+ *  This is required if you want your module to respond to channel messages
  */
 int __ChanMessage(char *origin, char **argv, int argc)
 {
@@ -91,15 +91,18 @@ int __BotMessage(char *origin, char **argv, int argc)
 		return -1;
 	}
 	buf = joinbuf(argv, argc, 1);
+	/* Example of how we send a globops */
 	globops(me.name, "Bot received %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
+	/* Example of how we send an alert to the services channel */
 	chanalert(s_module_bot_name, "Bot received %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
+	/* Example of how we log a message to our log file */
 	nlog(LOG_NORMAL, LOG_MOD, "Bot received %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
 	free(buf);
 	return 1;
 }
 
 /** Online event processing
- * What we do when we first come online
+ *  What we do when we first come online
  */
 static int Online(char **av, int ac)
 {
@@ -113,9 +116,9 @@ static int Online(char **av, int ac)
 };
 
 /** Module event list
- * What events we will act on
- * This is required if you want your module to respond to events on IRC
- * see events.h for a list of all events available
+ *  What events we will act on
+ *  This is required if you want your module to respond to events on IRC
+ *  see events.h for a list of all events available
  */
 EventFnList __module_events[] = {
 	{EVENT_ONLINE, Online},
@@ -123,8 +126,8 @@ EventFnList __module_events[] = {
 };
 
 /** Init module
- * This is required if you need to do initialisation of your module when
- * first loaded
+ *  Required if you need to do initialisation of your module when
+ *  first loaded
  */
 int __ModInit(int modnum, int apiver)
 {
@@ -137,7 +140,7 @@ int __ModInit(int modnum, int apiver)
 }
 
 /** Init module
- * This is required if you need to do cleanup of your module when it ends
+ *  Required if you need to do cleanup of your module when it ends
  */
 void __ModFini()
 {
