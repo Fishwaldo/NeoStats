@@ -22,7 +22,7 @@ void start_proxy_scan(lnode_t *scannode);
 Module_Info my_info[] = { {
 	"OPSB",
 	"A Open Proxy Scanning Bot",
-	"$Revision: 1.6 $";"
+	"$Revision: 1.7 $"
 } };
 
 
