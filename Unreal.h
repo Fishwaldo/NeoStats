@@ -1,3 +1,29 @@
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
+** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+** http://www.neostats.net/
+**
+**  Portions Copyright (c) 2000-2001 ^Enigma^
+**
+**  This program is free software; you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation; either version 2 of the License, or
+**  (at your option) any later version.
+**
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with this program; if not, write to the Free Software
+**  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+**  USA
+**
+**  Portions borrowed from Unreal. Original Header follows:
+*/
+
+
+
 /**********************************************************************t
 *
  *   IRC - Internet Relay Chat, include/msg.h
@@ -18,7 +44,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.22 2002/09/01 13:05:22 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.23 2002/09/04 08:40:26 fishwaldo Exp $
  */
 
 
@@ -32,9 +58,6 @@
 #define HAVE_TOKEN_SUP
 
 
-
-
-/* Shamelessly Stolen from Unreal2.1.7 for Token Support!  - Fish*/
 
 /*
  * The tokens are in the ascii character range of 33-127, and we start

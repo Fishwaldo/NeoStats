@@ -1,39 +1,27 @@
-/*
-$Id: icqlib.c,v 1.2 2000/03/02 01:31:24 fishwaldo Exp $
-$Log: icqlib.c,v $
-Revision 1.2  2000/03/02 01:31:24  fishwaldo
-Lots and Lots of Bug fixes, and New Socket API for Modules
-a Working ICQServ
-
-Revision 1.1  2000/02/18 02:10:29  fishwaldo
-Changed Module Layout, and Makefiles
-
-Revision 1.1.1.1  2000/02/03 23:45:58  fishwaldo
-Initial Import of NeoStats Version 2.0
-
-Revision 1.16  1998/12/08 16:00:59  denis
-Cleaned up a little before releasing
-
-Revision 1.15  1998/11/25 19:18:16  denis
-Added close icq_ProxySok in icq_Disconnect
-
-Revision 1.14  1998/11/25 09:48:49  denis
-icq_GetProxySok and icq_HandleProxyResponse methods added
-Connection terminated support added
-
-Revision 1.13  1998/11/19 12:22:48  denis
-SOCKS support cleaned a little
-icq_RecvUrl renamed to icq_RecvURL
-icq_ProxyAuth added for Username/Password Authentication
-URL/Description order inverted
-icq_Quit splitted to icq_Logout and icq_Disconnect
-icq_ProxyName and icq_ProxyPass range checking added
-
-Revision 1.12  1998/11/18 16:21:29  denis
-Fixed SOCKS5 proxy support
-
- */
-
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
+** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+** http://www.neostats.net/
+**
+**  Portions Copyright (c) 2000-2001 ^Enigma^
+**
+**  This program is free software; you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation; either version 2 of the License, or
+**  (at your option) any later version.
+**
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with this program; if not, write to the Free Software
+**  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+**  USA
+**
+** NeoStats CVS Identification
+** $Id: icqlib.c,v 1.3 2002/09/04 08:40:28 fishwaldo Exp $
+*/
 #include "icqlib.h"
 #include "icq.h"
 

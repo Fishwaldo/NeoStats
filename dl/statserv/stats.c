@@ -1,12 +1,26 @@
 /* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
-** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
-*
-** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
-*
-** NeoStats Identification:
-** ID:      stats.c, 
-** Version: 3.1
-** Date:    08/03/2002
+** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+** http://www.neostats.net/
+**
+**  Portions Copyright (c) 2000-2001 ^Enigma^
+**
+**  This program is free software; you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation; either version 2 of the License, or
+**  (at your option) any later version.
+**
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with this program; if not, write to the Free Software
+**  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+**  USA
+**
+** NeoStats CVS Identification
+** $Id: stats.c,v 1.24 2002/09/04 08:40:29 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -105,7 +119,7 @@ CStats *findchanstats(char *name) {
 	return cs;
 }
 void DelOldChan() {
-	lnode_t *cn;
+	lnode_t *cn, *cn1;
 	CStats *c;
 	cn = list_first(Chead);
 	while (cn) {
@@ -115,10 +129,12 @@ void DelOldChan() {
 #ifdef DEBUG
 				log("Deleting Old Channel %s", c->name);
 #endif
-				list_delete(Chead, cn);
-				lnode_destroy(cn);
+				cn1 = cn;
+				cn = list_next(Chead, cn);
+				list_delete(Chead, cn1);
+				lnode_destroy(cn1);
 				free(c);
-				return;
+				break;
 			}
 		}
 		cn = list_next(Chead, cn);

@@ -1,21 +1,28 @@
 /* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
-** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
-*
-** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
-*
+** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+** http://www.neostats.net/
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-** See the file called 'LICENSE' for more details.
+**  Portions Copyright (c) 2000-2001 ^Enigma^
+**
+**  Portions Copyright (c) 1999 Johnathan George net@lite.net
+**
+**  This program is free software; you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation; either version 2 of the License, or
+**  (at your option) any later version.
+**
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with this program; if not, write to the Free Software
+**  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+**  USA
+**
+** NeoStats CVS Identification
+** $Id: main.c,v 1.67 2002/09/04 08:40:27 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -171,8 +178,8 @@ RETSIGTYPE serv_segv() {
 		log("Unloading Module and restoring stacks. Doing Backtrace:");
 		chanalert(s_Services, "Location *could* be %s. Doing Backtrace:", segv_location);
 #ifdef HAVE_BACKTRACE
-		for (i = 2; i < size; i++) {
-			chanalert(s_Services, "Backtrace(%d): %s", i-1, strings[i]);
+		for (i = 1; i < size; i++) {
+			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
 			log("BackTrace(%d): %s", i-1, strings[i]);
 		}
 #else 
@@ -197,8 +204,8 @@ RETSIGTYPE serv_segv() {
 		globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 		chanalert(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s Backtrace:", recbuf, segv_location);
 #ifdef HAVE_BACKTRACE
-		for (i = 2; i < size; i++) {
-			chanalert(s_Services, "Backtrace(%d): %s", i-1, strings[i]);
+		for (i = 1; i < size; i++) {
+			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
 			log("BackTrace(%d): %s", i-1, strings[i]);
 		}
 #else 

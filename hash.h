@@ -1,3 +1,26 @@
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
+** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+** http://www.neostats.net/
+**
+**  Portions Copyright (c) 2000-2001 ^Enigma^
+**
+**  This program is free software; you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation; either version 2 of the License, or
+**  (at your option) any later version.
+**
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with this program; if not, write to the Free Software
+**  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+**  USA
+**
+**  Portions borrowed from kazlib. Original Header follows:
+*/
 /*
  * Hash Table Data Type
  * Copyright (C) 1997 Kaz Kylheku <kaz@ashi.footprints.net>
@@ -14,7 +37,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: hash.h,v 1.1 2002/02/27 11:19:15 fishwaldo Exp $
+ * $Id: hash.h,v 1.2 2002/09/04 08:40:26 fishwaldo Exp $
  * $Name:  $
  */
 
