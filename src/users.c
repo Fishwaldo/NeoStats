@@ -156,6 +156,10 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 		SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
 	}
 	free (cmdparams);
+	/* Send CTCP VERSION request if we are configured to do so */
+	if(me.versionscan && !IsExcluded(u)) {
+		privmsg(u->nick, ns_botptr->nick, "\1VERSION\1");
+	}
 }
 
 static void deluser(User* u)

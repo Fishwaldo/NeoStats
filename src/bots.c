@@ -235,7 +235,11 @@ void bot_notice (char *origin, char **av, int ac)
 			SendModuleEvent (EVENT_NOTICE, cmdparams, NULL);
 		}
 	}
+	if (!strncasecmp(av[ac - 1], "\1version", 8)) {
+ 		SendModuleEvent (EVENT_CLIENTVERSION, cmdparams, NULL);
+	}
 	free (cmdparams);
+
 }
 
 /** @brief send a message to a bot

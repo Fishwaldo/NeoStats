@@ -136,6 +136,7 @@ init_services_bot (void)
 	if (GetConf ((void *) &me.pingtime, CFGINT, "PingServerTime") <= 0) {
 		me.pingtime = 120;
 	}
+	ModuleConfig(ns_settings);
 	ircsnprintf (ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick);
 	flags = me.onlyopers ? BOT_FLAG_ONLY_OPERS : 0;
 	flags |= BOT_FLAG_DEAF;
