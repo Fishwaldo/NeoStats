@@ -610,7 +610,6 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 		list_transfer(c->modeparms, tl, list_first(tl));
 	}
 	list_destroy(tl);
-	chandump(argv[1]);
 }
 void Srv_Burst(char *origin, char **argv, int argc) {
 	if (argc > 0) {
@@ -885,10 +884,17 @@ void Srv_Squit(char *origin, char **argv, int argc) {
 void Srv_Nick(char *origin, char **argv, int argc) {
 #ifndef ULTIMATE3
 			AddUser(argv[0], argv[3], argv[4], argv[5]);
+			Module_Event("SIGNON", finduser(argv[0]));
 #else
 			AddUser(argv[0], argv[4], argv[5], argv[6]);
+#ifdef DEBUG
+			log("Mode: UserMode: %s",argv[3]);
 #endif
+			UserMode(argv[0], argv[3]);
 			Module_Event("SIGNON", finduser(argv[0]));
+			Module_Event("UMODE", finduser(argv[0]));
+			
+#endif
 }
 void Srv_Svsnick(char *origin, char **argv, int argc) {
 			User *u;
