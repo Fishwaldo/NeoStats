@@ -261,9 +261,10 @@
 #define TOK_ADG     	"!&"	/* 33 + 38 */
 #define MSG_NMON	"NMON"	/* NMON */
 #define TOK_NMON	"!'"	/* 33 + 39 */
-#define MSG_DALINFO	"DALINFO"	/* DALnet Credits */
-#define TOK_DALINFO	"!("	/* 33 + 40 */
-#define MSG_CREDITS	"CREDITS"	/* MysticIRCd Credits and "Thanks To" */
+
+/* 33 + 40 */
+
+#define MSG_CREDITS	"CREDITS"	/* UltimateIRCd Credits and "Thanks To" */
 #define TOK_CREDITS	"!)"	/* 33 + 41 */
 #define MSG_OPERMOTD    "OPERMOTD"	/* OPERMOTD */
 #define TOK_OPERMOTD    "!*"	/* 33 + 42 */
@@ -289,8 +290,9 @@
 #define TOK_SAJOIN 	"!5"	/* 33 + 53 */
 #define MSG_SDESC       "SDESC"	/* SDESC */
 #define TOK_SDESC       "!6"	/* 33 + 54 */
-#define MSG_UNREALINFO	"UNREALINFO"	/* Unreal Info */
-#define TOK_UNREALINFO	"!7"	/* 33 + 55 */
+
+/* 33 + 55 */
+
 #define MSG_SETHOST 	"SETHOST"	/* sethost */
 #define TOK_SETHOST 	"!8"	/* 33 + 56 */
 #define MSG_SETIDENT 	"SETIDENT"	/* set ident */
@@ -331,13 +333,8 @@
 #define TOK_UPTIME	"!L"	/* 33 + 76 */
 #define MSG_FAILOPS	"FAILOPS"	/* FAILOPS */
 #define TOK_FAILOPS	"!M"	/* 33 + 77 */
-
-#define MSG_RPING	"RPING"	/* RPING */
-#define TOK_RPING       "!P"	/* 33 + 80 */
-#define MSG_RPONG       "RPONG"	/* RPONG */
-#define TOK_RPONG       "!Q"	/* 33 + 81 */
-#define MSG_UPING       "UPING"	/* UPING */
-#define TOK_UPING       "!R"	/* 33 + 82 */
+#define MSG_IRCDHELP    "IRCDHELP"      /* IRCDHELP */
+#define TOK_IRCDHELP	"!H"	/* 33 + 8* */
 #define MSG_COPYRIGHT	"COPYRIGHT"	/* Copyright */
 #define TOK_COPYRIGHT	"!S"	/* 33 + 83 */
 #define MSG_BOTSERV	"BOTSERV"	/* BOTSERV */
@@ -346,12 +343,17 @@
 #define MSG_ROOTSERV	"ROOTSERV"	/* ROOTSERV */
 #define MSG_RS		"RS"
 #define TOK_ROOTSERV	"!U"	/* 33 + 85 */
-#define MSG_SVINFO	"SVINFO"
-#define MSG_CAPAB	"CAPAB"
-#define MSG_BURST	"BURST"
-#define MSG_SJOIN	"SJOIN"
-#define MSG_CLIENT	"CLIENT"
-#define MSG_SMODE	"SMODE"
+#define MSG_ADMINSERV	"ADMINSERV"	/* ADMINSERV */
+#define MSG_AS		"AS"
+#define TOK_ADMINSERV	"!P"	/* 33 + 86 */
+#define MSG_HOSTSERV	"HOSTSERV"	/* HOSTSERV */
+#define TOK_HOSTSERV	"!V"	/* 33 + 87 */
+#define MSG_NEOSTATS	"NEOSTATS"	/* NEOSTATS */
+#define TOK_NEOSTATS	"!W"	/* 33 + 88 */
+#define MSG_SECURESERV	"SECURESERV"	/* SECURESERV */
+#define TOK_SECURESERV	"!X"	/* 33 + 89 */
+#define MSG_LOVESERV	"LOVESERV"	/* LOVESERV */
+#define TOK_LOVESERV	"!Y"	/* 33 + 90 */
 
 /* message macros */
 #define is_privmsg(msg) ( !strcmp (MSG_PRIVATE, (msg)) || !strcmp ("!", (msg)) )
