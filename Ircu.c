@@ -394,7 +394,11 @@ send_kick (const char *who, const char *chan, const char *target, const char *re
 void 
 send_wallops (const char *who, const char *buf)
 {
-//send_cmd ("%s %s :%s", <function to get user or server numeric>(who), TOK_WALLUSERS, buf);
+	if(nicktobase64 (who)) {
+		send_cmd ("%s %s :%s", nicktobase64 (who), TOK_WALLUSERS, buf);
+	} else if(servertobase64 (who)) {
+		send_cmd ("%s %s :%s", servertobase64 (who), TOK_WALLUSERS, buf);
+	}
 }
 
 
@@ -456,7 +460,11 @@ send_notice (const char *from, const char *to, const char *buf)
 void
 send_globops (const char *from, const char *buf)
 {
-//send_cmd ("%s %s :%s", <function to get user or server numeric>(from), TOK_WALLOPS, buf);
+	if(nicktobase64 (from)) {
+		send_cmd ("%s %s :%s", nicktobase64 (from), TOK_WALLOPS, buf);
+	} else if(servertobase64 (from)) {
+		send_cmd ("%s %s :%s", servertobase64 (from), TOK_WALLOPS, buf);
+	}
 }
 
 
