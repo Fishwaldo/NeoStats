@@ -46,8 +46,8 @@ const char sr_help_list_oneline[] = "ServiceRoots List";
 
 bot_cmd extauth_commands[]=
 {
-	{"SRLIST", ext_auth_list, 0, NS_ULEVEL_OPER, sr_help_list, 0, sr_help_list_oneline},
-	{"\0",			NULL,			0, 	0,			NULL, 			0,	"\0"}
+	{"SRLIST",		ext_auth_list,	0,	NS_ULEVEL_OPER, sr_help_list,	0,	sr_help_list_oneline},
+	{"\0",			NULL,			0, 	0,				NULL, 			0,	"\0"}
 };
 
 ModuleInfo __module_info = {
@@ -202,7 +202,7 @@ int __list_auth(User * u)
 	return 1;
 }
 
-void ext_auth_list(User *u, char **av, int ac) {
+int ext_auth_list(User *u, char **av, int ac) {
 	lnode_t *un;
 	users *sru;
 	
@@ -215,5 +215,5 @@ void ext_auth_list(User *u, char **av, int ac) {
 			     sru->host, sru->lvl);
 		un = list_next(srconf.ul, un);
 	}
-	return;
+	return 1;
 }	
