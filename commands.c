@@ -527,7 +527,6 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 						set_ptr->option, *(int*)set_ptr->varptr ? "Enabled" : "Disabled");
 					break;
 				case SET_TYPE_INT:
-				case SET_TYPE_INTRANGE:
 					if(set_ptr->desc) {
 							prefmsg(u->nick, bot_ptr->nick, "%s: %d %s",
 								set_ptr->option, *(int*)set_ptr->varptr, set_ptr->desc);
@@ -537,14 +536,12 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 						}
 					break;
 				case SET_TYPE_STRING:
-				case SET_TYPE_STRINGRANGE:
-				case SET_TYPE_NICK:
-				case SET_TYPE_USER:
-				case SET_TYPE_HOST:
-				case SET_TYPE_RNAME:
-				case SET_TYPE_CUSTOM:
 					prefmsg(u->nick, bot_ptr->nick, "%s: %s",
 						set_ptr->option, (char*)set_ptr->varptr);
+					break;
+				default:
+					prefmsg(u->nick, bot_ptr->nick, "%s: uses an unsupported type",
+						set_ptr->option);
 					break;
 			}
 			set_ptr++;
@@ -644,13 +641,13 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			prefmsg(u->nick, bot_ptr->nick,
 				"%s set to %s", set_ptr->option, av[3]);
 			break;
-		case SET_TYPE_INTRANGE:
-		case SET_TYPE_STRINGRANGE:
-		case SET_TYPE_NICK:
-		case SET_TYPE_USER:
-		case SET_TYPE_HOST:
-		case SET_TYPE_RNAME:
-		case SET_TYPE_CUSTOM:
+		default:
+			chanalert(bot_ptr->nick, "Unsupported SET type %d requested by %s for %s %s", 
+				set_ptr->type, u->nick, set_ptr->option, av[3]);
+			nlog(LOG_NORMAL, LOG_MOD, "Unsupported SET type %d requested by %s for %s %s", 
+				set_ptr->type, u->nick, set_ptr->option, av[3]);
+			prefmsg(u->nick, bot_ptr->nick,"Unsupported SET type %d for %s %s", 
+				set_ptr->type, set_ptr->option, av[3]);
 			break;
 	}
 	return 1;

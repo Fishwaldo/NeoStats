@@ -398,14 +398,17 @@ typedef struct bot_cmd {
 typedef enum SET_TYPE {
 	SET_TYPE_BOOLEAN,
 	SET_TYPE_INT,
-	SET_TYPE_INTRANGE,
 	SET_TYPE_STRING,
+#if 0
+/* For future expansion */
+	SET_TYPE_INTRANGE,
 	SET_TYPE_STRINGRANGE,
 	SET_TYPE_NICK,
 	SET_TYPE_USER,
 	SET_TYPE_HOST,
 	SET_TYPE_RNAME,
 	SET_TYPE_CUSTOM,
+#endif
 }SET_TYPE;
 
 /* "TESTSTRING", &teststring, TYPE_STRING, 0,string_buffer_size 
