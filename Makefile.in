@@ -223,7 +223,7 @@ AM_MAKEFLAGS = -s
 dist_bin_SCRIPTS = makeconf
 dist_data_DATA = neostats.motd
 docdir = @prefix@/doc
-dist_doc_DATA = doc/FAQ doc/FAQ README.sqlsrv USERMAN
+dist_doc_DATA = doc/FAQ doc/FAQ doc/README.sqlsrv doc/USERMAN
 DISTCLEANFILES = ccdv
 EXTRA_DIST = ccdv.c CREDITS INSTNOTES README.win32 RELNOTES
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
