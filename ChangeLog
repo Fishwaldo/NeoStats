@@ -63,6 +63,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Port core modules to use neostats.h and tidy up includes (M)
  - Add SVSTIME support so NeoStats can resolve TS problems - currently Unreal only (M)
  - Add IRCu P10 support (M)
+ - Add support for Unreal's SWHOIS (M)
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database
