@@ -130,6 +130,7 @@ dl/version/version.c -text
 doc/FAQ -text
 doc/FAQ.pt -text
 doc/USERMAN -text
+doc/USERMAN.xml -text
 doc/old/FAQ.pt -text
 doc/old/INSTALL.pt -text
 doc/old/README.pt -text
