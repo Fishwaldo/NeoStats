@@ -102,7 +102,7 @@ static void ss_Config(void)
 		strlcpy(StatServ.host, tmp, MAXHOST);
 		free(tmp);
 	}
-	if (GetConf((void *) &tmp, CFGSTR, "Rname") < 0) {
+	if (GetConf((void *) &tmp, CFGSTR, "RealName") < 0) {
 		ircsnprintf(StatServ.rname, MAXREALNAME, "/msg %s help",
 			 s_StatServ);
 	} else {
