@@ -586,6 +586,11 @@ int ChanMode (char *origin, char **av, int ac)
 	}	
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
+	cmdparams->source = FindUser( origin );
+	if( !cmdparams->source )
+	{
+		cmdparams->source = FindServer( origin );
+	}
 	AddStringToList(&cmdparams->av, origin, &cmdparams->ac);
 	for (i = 0; i < ac; i++) {
 		AddStringToList(&cmdparams->av, av[i], &cmdparams->ac);	
