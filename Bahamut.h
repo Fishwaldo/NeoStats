@@ -164,12 +164,32 @@
 #define UMODE_CH_ADMIN 'a'
 
 /* Umodes */
-#define	UMODE_INVISIBLE  	0x0001	/* makes user invisible */
-#define	UMODE_OPER       	0x0002	/* Operator */
-#define UMODE_REGONLY		0x0010	/* only registered nicks may PM */
-#define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
-#define UMODE_SERVADMIN		0x0040	/* server admin */
-#define UMODE_SERVICESADMIN	0x0080	/* Marks the client as a Services Administrator */
+#define UMODE_OPER     0x00001	/* umode +o - Oper */
+#define UMODE_LOCOP     0x00002	/* umode +O - Local Oper */
+#define UMODE_INVISIBLE     0x00004	/* umode +i - Invisible */
+#define UMODE_WALLOP     0x00008	/* umode +w - Get wallops */
+#define UMODE_SERVNOTICE     0x00010	/* umode +s - Server notices */
+#define UMODE_CLIENT     0x00020	/* umode +c - Client connections/exits */
+#define UMODE_REGNICK     0x00040	/* umode +r - registered nick */
+#define UMODE_KILLS     0x00080	/* umode +k - Server kill messages */
+#define UMODE_FLOOD     0x00100	/* umode +f - Server flood messages */
+#define UMODE_y     0x00200	/* umode +y - Stats/links */
+#define UMODE_DEBUG     0x00400	/* umode +d - Debug info */
+#define UMODE_GLOBOPS     0x01000	/* umode +g - Globops */
+#define UMODE_CHATOPS     0x02000	/* umode +b - Chatops */
+#define UMODE_SADMIN     0x04000	/* umode +a - Services Admin */
+#define UMODE_ADMIN     0x08000     /* umode +A - Server Admin */
+#define UMODE_n     0x10000	/* umode +n - Routing Notices */
+#define UMODE_HELPOP     0x20000     /* umode +h - Helper */
+#define UMODE_m     0x40000     /* umode +m - spambot notices */
+#define UMODE_REGONLY     0x80000     /* unmode +R - No non registered msgs */
+#define UMODE_e     0x100000    /* umode +e - oper notices for the above +D */
+#define UMODE_x     0x200000    /* umode +x - Squelch with notice */
+#define UMODE_X     0x400000    /* umode +X - Squelch without notice */
+#define UMODE_D     0x800000    /* umode +D - Hidden dccallow umode */
+#define UMODE_F     0x1000000   /* umode +F - no cptr->since message rate throttle */
+#define UMODE_j	    0x2000000   /* umode +j - client rejection notices */
+#define UMODE_K     0x4000000   /* umode +K - U: lined server kill messages */
 
 /* Cmode chars */
 #define CMODE_CH_CHANOP 'o'
@@ -180,22 +200,24 @@
 #define CMODE_FL_VOICE	'+'
 
 /* Cmodes */
-#define CMODE_CHANOP	0x0001
-#define	CMODE_VOICE	0x0004
-#define	CMODE_PRIVATE	0x0008
-#define	CMODE_SECRET	0x0010
+#define CMODE_CHANOP	 0x0001
+#define	CMODE_VOICE		 0x0002
+#define	CMODE_DEOPPED	 0x0004
+#define	CMODE_PRIVATE	 0x0008
+#define	CMODE_SECRET	 0x0010
 #define	CMODE_MODERATED  0x0020
 #define	CMODE_TOPICLIMIT 0x0040
 #define	CMODE_INVITEONLY 0x0080
 #define	CMODE_NOPRIVMSGS 0x0100
-#define	CMODE_KEY	0x0200
-#define	CMODE_BAN	0x0800
-#define CMODE_LIMIT	0x1000
-#define CMODE_RGSTR	0x2000
-#define CMODE_RGSTRONLY  0x4000
+#define	CMODE_KEY		 0x0200
+#define	CMODE_BAN		 0x0400
+#define CMODE_LIMIT		 0x0800
+#define CMODE_RGSTR		 0x1000
+#define CMODE_RGSTRONLY  0x2000
+#define CMODE_NOCOLOR	 0x4000
 #define CMODE_OPERONLY   0x8000
-#define CMODE_LINK	0x20000
-#define CMODE_NOCOLOR	0x40000
+#define CMODE_MODREG     0x10000
+#define CMODE_LISTED	 0x20000
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))

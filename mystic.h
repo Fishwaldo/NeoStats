@@ -388,7 +388,7 @@
 #define UMODE_MAGICK   		0x800000	/* Allows Opers To See +s and +p Channels */
 #define UMODE_WATCHER		0x4000000	/* Recive Monitor Globals */
 #define UMODE_NETMON		0x8000000	/* Marks the client as an Network Monitor */
-#define UMODE_SERVADMIN		0x40000000	/* Marks the client as a Server Admin */
+#define UMODE_ADMIN		0x40000000	/* Marks the client as a Server Admin */
 #define UMODE_TECHADMIN		0x80000000	/* Marks the client as a Technical Admin */
 #define UMODE_DEAF		0x100000000	/* client is deaf on channels */
 #define	UMODE_SERVNOTICE 	0x0100	/* server notices such as kill */
@@ -401,7 +401,7 @@
 #define UMODE_HIDE	 	0x8000	/* Hide from Nukes */
 #define UMODE_WHOIS    		0x200000	/* Lets Opers see when people do a /WhoIs on them */
 #define UMODE_IRCADMIN 		0x1000000	/* Marks the client as an IRC Administrator */
-#define UMODE_SERVICESADMIN	0x2000000	/* Marks the client as a Services Administrator */
+#define UMODE_SADMIN	0x2000000	/* Marks the client as a Services Administrator */
 
 /* Cmodes */
 #define CMODE_CHANOP	0x0001

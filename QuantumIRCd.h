@@ -397,7 +397,7 @@
 #define UMODE_HIDE	 	0x8000	/* Hide from Nukes */
 #define UMODE_WHOIS    		0x200000	/* Lets Opers see when people do a /WhoIs on them */
 #define UMODE_IRCADMIN 		0x1000000	/* Marks the client as an IRC Administrator */
-#define UMODE_SERVICESADMIN	0x2000000	/* Marks the client as a Services Administrator */
+#define UMODE_SADMIN	0x2000000	/* Marks the client as a Services Administrator */
 
 /* Smodes */
 #define SMODE_SSL		0x1	/* ssl client */

@@ -197,8 +197,8 @@
 #define UMODE_WALLOP            0x0008  /* */
 #define UMODE_REGONLY		0x0010	/* only registered nicks may PM */
 #define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
-#define UMODE_SERVADMIN		0x0040	/* server admin */
-#define UMODE_SERVICESADMIN	0x0080	/* Marks the client as a Services Administrator */
+#define UMODE_ADMIN		0x0040	/* server admin */
+#define UMODE_SADMIN	0x0080	/* Marks the client as a Services Administrator */
 #define UMODE_FAILOP            0x0100  /* */
 #define UMODE_HELPOP            0x0200  /* */
 #define UMODE_SERVNOTICE        0x0400  /* */

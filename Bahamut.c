@@ -36,7 +36,6 @@
 static void Usr_Version (char *origin, char **argv, int argc);
 static void Usr_MOTD (char *origin, char **argv, int argc);
 static void Usr_Admin (char *origin, char **argv, int argc);
-/*static void Usr_Credits (char *origin, char **argv, int argc);*/
 static void Usr_Server (char *origin, char **argv, int argc);
 static void Usr_Squit (char *origin, char **argv, int argc);
 static void Usr_Quit (char *origin, char **argv, int argc);
@@ -77,7 +76,6 @@ IntCommands cmd_list[] = {
 	{MSG_VERSION, Usr_Version, 1, 0},
 	{MSG_MOTD, Usr_MOTD, 1, 0},
 	{MSG_ADMIN, Usr_Admin, 1, 0},
-/*	{MSG_CREDITS, Usr_Credits, 1, 0}, */
 	{MSG_SERVER, Usr_Server, 1, 0},
 	{MSG_SQUIT, Usr_Squit, 1, 0},
 	{MSG_QUIT, Usr_Quit, 1, 0},
@@ -107,28 +105,51 @@ IntCommands cmd_list[] = {
 ChanModes chan_modes[] = {
 	{CMODE_CHANOP, 'o', 1, 0, '@'},
 	{CMODE_VOICE, 'v', 1, 0, '+'},
-	{CMODE_BAN, 'b', 0, 1, 0},
-	{CMODE_INVITEONLY, 'i', 0, 0, 0},
-	{CMODE_KEY, 'k', 0, 1, 0},
-	{CMODE_LIMIT, 'l', 0, 1, 0},
-	{CMODE_MODERATED, 'm', 0, 0, 0},
-	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
+ /* CMODE_DEOPPED */
 	{CMODE_PRIVATE, 'p', 0, 0, 0},
-	{CMODE_RGSTR, 'r', 0, 0, 0},
 	{CMODE_SECRET, 's', 0, 0, 0},
+	{CMODE_MODERATED, 'm', 0, 0, 0},
 	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
+	{CMODE_INVITEONLY, 'i', 0, 0, 0},
+	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
+	{CMODE_KEY, 'k', 0, 1, 0},
+	{CMODE_BAN, 'b', 0, 1, 0},
+	{CMODE_LIMIT, 'l', 0, 1, 0},
+	{CMODE_RGSTR, 'M', 0, 0, 0},
+	{CMODE_RGSTRONLY, 'R', 0, 0, 0},
 	{CMODE_NOCOLOR, 'x', 0, 0, 0},
 	{CMODE_OPERONLY, 'O', 0, 0, 0},
-	{CMODE_RGSTRONLY, 'R', 0, 0, 0},
+/* CMODE_MODREG */
+	{CMODE_LISTED, 'L', 0, 0, 0},
 };
 
 UserModes user_umodes[] = {
-	{UMODE_SERVICESADMIN, 'a', NS_ULEVEL_ROOT},
-	{UMODE_SERVADMIN, 'A', NS_ULEVEL_ADMIN},
+	{UMODE_SADMIN, 'a', NS_ULEVEL_ROOT},
+	{UMODE_ADMIN, 'A', NS_ULEVEL_ADMIN},
+	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
 	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
 	{UMODE_REGNICK, 'r', NS_ULEVEL_REG},
 	{UMODE_INVISIBLE, 'i', 0},
+	{UMODE_WALLOP, 'w', 0},
+	{UMODE_SERVNOTICE, 's', 0},
+	{UMODE_CLIENT, 'c', 0},
+	{UMODE_KILLS, 'k', 0},
+	{UMODE_FLOOD, 'f', 0},
+	{UMODE_y, 'y', 0},
+	{UMODE_DEBUG, 'd', 0},
+	{UMODE_GLOBOPS, 'g', 0},
+	{UMODE_CHATOPS, 'b', 0},
+	{UMODE_n, 'n', 0},
+	{UMODE_HELPOP, 'h', 0},
+	{UMODE_m, 'm', 0},
 	{UMODE_REGONLY, 'R', 0},
+	{UMODE_e, 'e', 0},
+	{UMODE_x, 'x', 0},
+	{UMODE_X, 'X', 0},
+	{UMODE_D, 'D', 0},
+	{UMODE_F, 'F', 0},
+	{UMODE_j, 'j', 0},
+	{UMODE_K, 'K', 0},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
@@ -345,12 +366,6 @@ Usr_Admin (char *origin, char **argv, int argc)
 {
 	ns_usr_admin (origin, argv, argc);
 }
-
-/*static void
-Usr_Credits (char *origin, char **argv, int argc)
-{
-	ns_usr_credits (origin, argv, argc);
-}*/
 
 static void
 Usr_Server (char *origin, char **argv, int argc)
