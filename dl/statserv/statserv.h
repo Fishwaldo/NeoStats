@@ -125,30 +125,34 @@ struct tld_ {
 };
 
 /* statserv.c */
-extern void statserv(char *);
-extern void re_init_bot();
+ void statserv(char *);
+ void re_init_bot();
+int topchan(const void *key1, const void *key2);
+int topjoin(const void *key1, const void *key2);
+int topkick(const void *key1, const void *key2);
+int toptopics(const void *key1, const void *key2);
 
 /* stats.c */
-extern TLD *tldhead;
-extern TLD *findtld(char *);
-extern TLD *AddTLD(User *);
-extern void LoadTLD();
-extern void init_tld();
-extern void AddStats(Server *);
-extern SStats *findstats(char *);
-extern void SaveStats();
-extern void LoadStats();
-extern int Online(void *);
-extern int pong(Server *);
-extern int s_user_away(User *);
-extern int s_new_server(Server *);
-extern int s_del_server(Server *);
-extern int s_new_user(User *);
-extern int s_del_user(User *);
-extern int s_user_modes(User *);
-extern int s_user_kill(User *);
-extern void s_chan_new(Chans *);
-extern void s_chan_del(Chans *);
+ TLD *tldhead;
+ TLD *findtld(char *);
+ TLD *AddTLD(User *);
+ void LoadTLD();
+ void init_tld();
+ void AddStats(Server *);
+ SStats *findstats(char *);
+ void SaveStats();
+ void LoadStats();
+ int Online(void *);
+ int pong(Server *);
+ int s_user_away(User *);
+ int s_new_server(Server *);
+ int s_del_server(Server *);
+ int s_new_user(User *);
+ int s_del_user(User *);
+ int s_user_modes(User *);
+ int s_user_kill(User *);
+ void s_chan_new(Chans *);
+ void s_chan_del(Chans *);
 void s_chan_join(Chans *);
 void s_chan_part(Chans *);
 CStats *findchanstats(char *);
@@ -185,7 +189,7 @@ extern const char *ss_forcehtml_help[];
 extern const char *ss_notices_help[];
 
 /* tld.c */
-extern void DelTLD(User *u);
+ void DelTLD(User *u);
 
 
 
