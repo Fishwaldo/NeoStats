@@ -471,15 +471,14 @@ m_admin (char *origin, char **argv, int argc, int srv)
 
 /* m_server
  *
- * argv[0] = sender prefix
- * argv[1] = servername
- * argv[2] = hopcount
- * argv[3] = start timestamp
- * argv[4] = link timestamp
- * argv[5] = major protocol version: P10/P11
- * argv[6] = YMM, YMMM or YYMMM; where 'YY' is the server numeric and
+ * argv[0] = servername
+ * argv[1] = hopcount
+ * argv[2] = start timestamp
+ * argv[3] = link timestamp
+ * argv[4] = major protocol version: P10/P11
+ * argv[5] = YMM, YMMM or YYMMM; where 'YY' is the server numeric and
  *      "MMM" is the numeric nick mask of this server.
- * argv[7] = 0 (not used yet, mandatory unsigned int after u2.10.06)
+ * argv[6] = 0 (not used yet, mandatory unsigned int after u2.10.06)
  * argv[argc-1] = serverinfo
  * NumServ(sptr) SERVER name hop 0 TSL PROT YxxCap 0 :info
  */
