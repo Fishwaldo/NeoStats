@@ -4,6 +4,7 @@ Shmad & ^Enigma & Fish^
 (F) denotes Fish
 
 * Version 3.42 * September 3rd, 2002 (S)
+ - Fixed make insall now copies the template too 
  - RESET now just tells you how to properly reset Server Statistics database.
  - Can ONLY delete stats if the server IS NOT Online.
  - Changed all levels from 190 to 185 since Unreal users just cant seem to install SR in any
