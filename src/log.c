@@ -259,7 +259,7 @@ static void dlog_write( const char *time, const char *level, const char *line )
 	static int chanflag = 0;
 	FILE *logfile;
 
-	logfile = fopen( "logs/debug.log", "a" );
+	logfile = os_fopen( "logs/debug.log", "a" );
 	if( logfile ) {
 		os_fprintf( logfile, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line );
 		fclose( logfile );
@@ -323,7 +323,7 @@ static void nlog_write( const char *time, const char *level, const char *line )
 	if( !logentry )
 		logentry = new_logentry();
 	if( !logentry->logfile )
-		logentry->logfile = fopen( logentry->logname, "a" );
+		logentry->logfile = os_fopen( logentry->logname, "a" );
 	if( !logentry->logfile ) {
 #ifdef DEBUG
 		printf( "%s\n", strerror( errno ) );
