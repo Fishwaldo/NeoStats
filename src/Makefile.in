@@ -80,6 +80,7 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LIBDB = @LIBDB@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -165,7 +166,7 @@ AM_CFLAGS = -I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/keeper \
 		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE
 
 neostats_LDADD = -ldl $(top_srcdir)/lib/keeper/libkeeper.a \
-		$(top_srcdir)/lib/adns/libadns.la @PCRE_LIBS@ @CURL_LIBS@ -ldb
+		$(top_srcdir)/lib/adns/libadns.la @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
 LINK = @echo "Linking $@"; $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \

@@ -93,7 +93,7 @@ static int InitCore(void)
 		return NS_FAILURE;
 	/* initialize Lang Subsystem */
 	ircsnprintf(dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX);
-	LANGinit(0, dbpath, NULL);
+	LANGinit(1, dbpath, NULL);
 	/* initialize Module subsystem */
 	if (InitModules () != NS_SUCCESS)
 		return NS_FAILURE;

@@ -10,7 +10,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 AM_CFLAGS = -I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/keeper \
 		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE
 neostats_LDADD = -ldl $(top_srcdir)/lib/keeper/libkeeper.a \
-		$(top_srcdir)/lib/adns/libadns.la @PCRE_LIBS@ @CURL_LIBS@ -ldb
+		$(top_srcdir)/lib/adns/libadns.la @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@
 neostats_LDFLAGS = --export-dynamic -rdynamic
 
 include $(top_srcdir)/autotools/rules.mk 

@@ -22,6 +22,7 @@
 ** $Id: lang.c 12 2004-08-10 12:47:20Z Fish $
 */
 
+#include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
