@@ -587,10 +587,12 @@ Srv_Ping (char *origin, char **argv, int argc)
 static void
 Srv_Netinfo (char *origin, char **argv, int argc)
 {
+	char *buf;
 	ircd_srv.uprot = atoi (argv[2]);
 	strlcpy (ircd_srv.cloak, argv[3], 10);
-	strlcpy (me.netname, argv[7], MAXPASS);
-
+	buf = joinbuf (argv, argc, 7);
+	strlcpy (me.netname, buf, MAXPASS);
+	free (buf);
 	snetinfo_cmd ();
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
