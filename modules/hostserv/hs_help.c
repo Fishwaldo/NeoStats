@@ -117,7 +117,7 @@ const char *hs_help_bans[] = {
 };
 
 const char *hs_help_set_expire[] = {
-	"\2SET EXPIRE <TIME>\2",
+	"\2EXPIRE <TIME>\2",
 	"How long before unused HostServ entries should be",
 	"automatically deleted. A value of 0 makes all vhosts",
 	"permanent",
@@ -125,28 +125,28 @@ const char *hs_help_set_expire[] = {
 };
 
 const char *hs_help_set_hiddenhost[] = {
-	"\2SET HIDDENHOST <ON/OFF>\2",
+	"\2HIDDENHOST <ON/OFF>\2",
 	"Turns on undernet style hidden hosts when users identify to nickserv.",
 	"You will also need to set HOSTNAME to the host you want to use",
 	NULL
 };
 
 const char *hs_help_set_hostname[] = {
-	"\2SET HOSTNAME <hostname>\2",
+	"\2HOSTNAME <hostname>\2",
 	"The hidden host you want to set on users.",
 	"Users will then be set to nick.<hostname>.",
 	NULL
 };
 
 const char *hs_help_set_operhosts[] = {
-	"\2SET OPERHOSTS <ON/OFF>\2",
+	"\2OPERHOSTS <ON/OFF>\2",
 	"Whether HostServ will set oper vhosts or not. If your IRCd does",
 	"not provide oper hosts, you might want to use this option.",
 	NULL
 };
 
 const char *hs_help_set_verbose[] = {
-	"\2SET VERBOSE <ON/OFF>\2",
+	"\2VERBOSE <ON/OFF>\2",
 	"Control HostServ verbosity",
 	NULL
 };

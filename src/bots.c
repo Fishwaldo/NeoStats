@@ -92,14 +92,14 @@ static int flood_test( Client *u )
 	if( UserLevel( u ) >= NS_ULEVEL_OPER )	
 		return NS_FALSE;
 	/* calculate and test flood values */
-	if( (me.now - u->user->tslastmsg ) > nsconfig.msgsampletime ) {
+	if( ( me.now - u->user->tslastmsg ) > nsconfig.msgsampletime ) {
 		u->user->tslastmsg = me.now;
 		u->user->flood = 0;
 		return NS_FALSE;
 	}
 	if( u->user->flood >= nsconfig.msgthreshold ) {
 		nlog( LOG_NORMAL, "FLOODING: %s!%s@%s", u->name, u->user->username, u->user->hostname );
-		irc_svskill( ns_botptr, u, _("%s!%s( Flooding Services. )" ), me.name, ns_botptr->name );
+		irc_svskill( ns_botptr, u, _( "%s!%s (Flooding Services)" ), me.name, ns_botptr->name );
 		return NS_TRUE;
 	}
 	u->user->flood++;
@@ -170,7 +170,7 @@ static int process_target_user( CmdParams *cmdparams, const char *target )
 
 static int process_target_chan( CmdParams *cmdparams, const char *target )
 {
-	cmdparams->channel = FindChannel(target );
+	cmdparams->channel = FindChannel( target );
 	if( cmdparams->channel ) {
 		return NS_TRUE;
 	}
@@ -206,16 +206,19 @@ static int bot_chan_event( Event event, CmdParams *cmdparams )
 	hash_scan_begin( &bs, bothash );
 	while( ( bn = hash_scan_next( &bs ) ) != NULL ) {
 		botptr = hnode_get( bn );
-		if( !(botptr->u->user->Umode & UMODE_DEAF ) ) {
+		/* Use an internal flag for handling DEAF so we can fake support
+		 * on IRCd's which do not have the mode natively
+		 */
+		if( !( botptr->flags & BOT_FLAG_DEAF ) ) {
 			cm = list_first( botptr->u->user->chans );
 			while( cm ) {	
 				chan = ( char * ) lnode_get( cm );
 				cmdparams->bot = botptr;
 				if( ircstrcasecmp( cmdparams->channel->name, chan ) == 0 ) {
 					if( !cmdflag || run_bot_cmd( cmdparams, cmdflag ) != NS_SUCCESS ) {
-						if( cmdflag ) {
+						/* Reset message if we have stripped cmdchar */
+						if( cmdflag )
 							cmdparams->param --;
-						}
 						SendModuleEvent( event, cmdparams, botptr->moduleptr );
 					}
 				}
@@ -243,7 +246,7 @@ void bot_notice( char *origin, char **av, int ac )
 	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();
-	cmdparams = ( CmdParams* ) ns_calloc( sizeof(CmdParams ) );
+	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
 	/* Check origin validity */
 	if( process_origin( cmdparams, origin ) ) {
 		/* Find target bot */
@@ -426,7 +429,7 @@ int BotNickChange( const Bot *botptr, const char *newnick )
 	SET_SEGV_LOCATION();
 	bn = hash_lookup( bothash, botptr->name );
 	if( !bn ) {
-		nlog( LOG_NOTICE, "Couldn't find bot %s in bot list", botptr->name );
+		nlog( LOG_NOTICE, "BotNickChange: Couldn't find bot %s in bot list", botptr->name );
 		return NS_FAILURE;
 	}
 	/* remove old hash entry */
@@ -450,36 +453,31 @@ int BotNickChange( const Bot *botptr, const char *newnick )
 
 int ns_cmd_botlist( CmdParams *cmdparams )
 {
-	int i;
 	lnode_t *cm;
 	Bot *botptr;
 	hnode_t *bn;
 	hscan_t bs;
 
 	SET_SEGV_LOCATION();
-	irc_prefmsg( ns_botptr, cmdparams->source, __("Module Bot List:", cmdparams->source ) );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Module Bot List:", cmdparams->source ) );
 	hash_scan_begin( &bs, bothash );
 	while( ( bn = hash_scan_next( &bs ) ) != NULL ) {
 		botptr = hnode_get( bn );
 		if( ( botptr->flags & 0x80000000 ) ) {
-			irc_prefmsg( ns_botptr, cmdparams->source, __("NeoStats", cmdparams->source ) );
+			irc_prefmsg( ns_botptr, cmdparams->source, __( "NeoStats", cmdparams->source ) );
 		} else {
-			irc_prefmsg( ns_botptr, cmdparams->source, __("Module: %s", cmdparams->source ), botptr->moduleptr->info->name );
+			irc_prefmsg( ns_botptr, cmdparams->source, __( "Module: %s", cmdparams->source ), botptr->moduleptr->info->name );
 		}
-		irc_prefmsg( ns_botptr, cmdparams->source, __("Bot: %s", cmdparams->source ), botptr->name );
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "Bot: %s", cmdparams->source ), botptr->name );
 		cm = list_first( botptr->u->user->chans );
-		i = 0;
+		irc_chanalert( ns_botptr, _( "Channels:" ) );
 		while( cm ) {
-			if( i==0 ) {
-				irc_chanalert( ns_botptr, _("Channels: %s" ),( char * ) lnode_get( cm ) );
-			} else {
-				irc_chanalert( ns_botptr, "          %s",( char * ) lnode_get( cm ) );
+				irc_chanalert( ns_botptr, "    %s", ( char * ) lnode_get( cm ) );
 			}
 			cm = list_next( botptr->u->user->chans, cm );
-			i++;
 		}
 	}
-	irc_prefmsg( ns_botptr, cmdparams->source, __("End of Module Bot List", cmdparams->source ) );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "End of Module Bot List", cmdparams->source ) );
 	return NS_SUCCESS;
 }
 
@@ -504,7 +502,7 @@ void DelModuleBots( Module *mod_ptr )
 		botptr = hnode_get( modnode );
 		if( botptr->moduleptr == mod_ptr ) {
 			dlog( DEBUG1, "Deleting module %s bot %s", mod_ptr->info->name, botptr->name );
-			irc_quit( botptr, _("Module Unloaded" ) );
+			irc_quit( botptr, _( "Module Unloaded" ) );
 		}
 	}
 	return;
@@ -584,7 +582,7 @@ static char *GetBotNick( BotInfo *botinfo, char *nickbuf )
 
 static void ConnectBot( Bot *botptr )
 {
-	if( botptr->flags&BOT_FLAG_SERVICEBOT ) {
+	if( botptr->flags & BOT_FLAG_SERVICEBOT ) {
 		irc_nick( botptr->name, botptr->u->user->username, botptr->u->user->hostname, botptr->u->info, me.servicesumode );
 		UserMode( botptr->name, me.servicesumode );
 		if( nsconfig.joinserviceschan ) {
@@ -597,9 +595,6 @@ static void ConnectBot( Bot *botptr )
 		if( HaveUmodeDeaf() ) {
 			/* Set deaf mode at IRCd level */
 			irc_umode( botptr, botptr->name, UMODE_DEAF );
-		} else {
-			/* No ircd support, so fake it internally */
-			botptr->u->user->Umode |= UMODE_DEAF;
 		}
 	}
 }
@@ -646,7 +641,7 @@ Bot *AddBot( BotInfo *botinfo )
 	botptr->set_ulevel = NS_ULEVEL_ROOT;
 	/* For more efficient transversal of bot/user lists, link 
 	 * associated user struct to bot and link bot into user struct */
-	botptr->u = AddUser( botptr->name, botinfo->user,( (*botinfo->host ) == 0 ? me.name : botinfo->host ), botinfo->realname, me.name, NULL, NULL, NULL );
+	botptr->u = AddUser( botptr->name, botinfo->user, ( (*botinfo->host ) == 0 ? me.name : botinfo->host ), botinfo->realname, me.name, NULL, NULL, NULL );
 	botptr->u->user->bot = botptr;
 	botptr->flags = botinfo->flags;
 	ConnectBot( botptr );
@@ -655,7 +650,7 @@ Bot *AddBot( BotInfo *botinfo )
 		add_bot_cmd_list( botptr, botinfo->bot_cmd_list );
 		add_bot_setting_list( botptr, botinfo->bot_setting_list );
 		/* Do not add set botinfo options for root bot */
-		if( !(botptr->flags & 0x80000000 ) ) {
+		if( !( botptr->flags & 0x80000000 ) ) {
 			add_bot_info_settings( botptr, botinfo );
 		}
 		if( botptr->moduleptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES ) {
@@ -688,7 +683,7 @@ void handle_dead_channel( Channel *c )
 	if( IsServicesChannel ( c ) ) {
 		return;
 	}
-	/* If channel has persistent bot(s ) ignore it */
+	/* If channel has persistent bot(s) ignore it */
 	if( c->persistentusers ) {
 		return;
 	}

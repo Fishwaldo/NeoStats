@@ -191,7 +191,7 @@ void FiniBans( void )
 	hscan_t hs;
 
 	hash_scan_begin( &hs, banhash );
-	while( ( bansnode = hash_scan_next(&hs ) ) != NULL  ) {
+	while( ( bansnode = hash_scan_next( &hs ) ) != NULL  ) {
 		ban = hnode_get( bansnode );
 		hash_delete( banhash, bansnode );
 		hnode_destroy( bansnode );

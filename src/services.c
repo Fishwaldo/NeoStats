@@ -47,7 +47,7 @@ static int ns_cmd_raw (CmdParams* cmdparams);
 #endif
 static int ns_cmd_userlist (CmdParams* cmdparams);
 static int ns_cmd_serverlist (CmdParams* cmdparams);
-static int ns_cmd_chanlist (CmdParams* cmdparams);
+static int ns_cmd_channellist (CmdParams* cmdparams);
 static int ns_cmd_banlist (CmdParams* cmdparams);
 static int ns_cmd_status (CmdParams* cmdparams);
 static int ns_cmd_level (CmdParams* cmdparams);
@@ -111,7 +111,7 @@ static bot_cmd ns_commands[]=
 	{"SOCKLIST",	ns_cmd_socklist,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist, 	ns_help_socklist_oneline},
 	{"TIMERLIST",	ns_cmd_timerlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist, 	ns_help_timerlist_oneline},
 	{"USERLIST",	ns_cmd_userlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_userlist, 	ns_help_userlist_oneline},
-	{"CHANLIST",	ns_cmd_chanlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_chanlist, 	ns_help_chanlist_oneline},
+	{"CHANNELLIST",	ns_cmd_channellist,	0, 	NS_ULEVEL_ROOT,  	ns_help_channellist, ns_help_channellist_oneline},
 	{"SERVERLIST",	ns_cmd_serverlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverlist, ns_help_serverlist_oneline},
 	{"BANLIST",		ns_cmd_banlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_banlist,	ns_help_banlist_oneline},
 	{NULL,			NULL,			0, 	0,					NULL, 				NULL}
@@ -319,7 +319,7 @@ ns_cmd_serverlist (CmdParams* cmdparams)
    	return NS_SUCCESS;
 }
 
-/** @brief CHANLIST command handler
+/** @brief CHANNELLIST command handler
  *
  *  Dump channel list
  *   
@@ -327,7 +327,7 @@ ns_cmd_serverlist (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_cmd_chanlist (CmdParams* cmdparams)
+ns_cmd_channellist (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG

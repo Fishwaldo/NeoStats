@@ -32,7 +32,7 @@ extern const char *ns_help_exclude[];
 extern const char *ns_help_raw[];
 #endif
 extern const char *ns_help_userlist[];
-extern const char *ns_help_chanlist[];
+extern const char *ns_help_channellist[];
 extern const char *ns_help_serverlist[];
 extern const char *ns_help_banlist[];
 extern const char *ns_help_load[];
@@ -61,7 +61,7 @@ extern const char ns_help_socklist_oneline[];
 extern const char ns_help_timerlist_oneline[];
 extern const char ns_help_modlist_oneline[];
 extern const char ns_help_userlist_oneline[];
-extern const char ns_help_chanlist_oneline[];
+extern const char ns_help_channellist_oneline[];
 extern const char ns_help_serverlist_oneline[];
 extern const char ns_help_banlist_oneline[];
 

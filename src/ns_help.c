@@ -40,12 +40,12 @@ const char ns_help_botlist_oneline[]="List module bots";
 const char ns_help_socklist_oneline[]="List module sockets";
 const char ns_help_timerlist_oneline[]="List module timers";
 const char ns_help_modlist_oneline[]="List loaded modules";
-const char ns_help_userlist_oneline[]="Dump user table";
-const char ns_help_chanlist_oneline[]="Dump channel table";
-const char ns_help_serverlist_oneline[]="Dump server table";
-const char ns_help_banlist_oneline[]="Dump ban table";
+const char ns_help_userlist_oneline[]="List users";
+const char ns_help_channellist_oneline[]="List channels";
+const char ns_help_serverlist_oneline[]="List servers";
+const char ns_help_banlist_oneline[]="List bans";
 const char cmd_help_oneline[]="Online help";
-const char cmd_help_about_oneline[] = "Display About info";
+const char cmd_help_about_oneline[] = "Display About text";
 const char cmd_help_credits_oneline[] = "Display credits";
 const char cmd_help_version_oneline[] = "Display version";
 const char cmd_help_levels_oneline[] = "Change command user level";
@@ -71,16 +71,17 @@ const char *ns_help_jupe[] = {
 };
 
 const char *ns_help_exclude[] = {
-	"Syntax: \2EXCLUDE <ADD> <HOST|SERVER|CHANNEL> <pattern> <reason>\2",
-	"        \2EXCLUDE <DEL> <pattern>\2",
-	"        \2EXCLUDE <LIST>\2",
+	"Syntax: \2EXCLUDE ADD <HOST|SERVER|CHANNEL> <pattern> <reason>\2",
+	"        \2EXCLUDE DEL <pattern>\2",
+	"        \2EXCLUDE LIST\2",
 	"",
 	"Maintain the exclusion list which is used to exclude channels,",
 	"users and servers from certain scans and events.",
 	"",
 	"\2ADD\2 Add a new exclusion to the list. Reason allows",
 	"you to set a reason for the exclusion for future reference.",
-	"Wildcards such as * and ? may be used in the pattern.",
+	"<pattern> is the host, server or channel name and may include",
+	"wildcards such as * and ?.",
 	"",
 	"\2DEL\2 Delete a entry from the exclusion list.",
 	"",
@@ -148,7 +149,7 @@ const char *ns_help_userlist[] = {
 	"        \2USERLIST <name>\2",
 	"",
 	"Display list of users on the network.",	
-	"Optional parameter name limits display to that user.",	
+	"Optional name parameter limits display to that user.",	
 	"This command is only available in debug mode and is only",
 	"useful for debugging Neostats.",
 	NULL
@@ -174,9 +175,9 @@ const char *ns_help_banlist[] = {
 	NULL
 };
 
-const char *ns_help_chanlist[] = {
-	"Syntax: \2CHANLIST\2",
-	"        \2CHANLIST <name>\2",
+const char *ns_help_channellist[] = {
+	"Syntax: \2CHANNELLIST\2",
+	"        \2CHANNELLIST <name>\2",
 	"",
 	"Display list of channels on the network.",	
 	"Optional parameter name limits display to that channel.",	

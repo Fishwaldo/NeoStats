@@ -55,7 +55,6 @@ Contents
         2.3.17 BOTLIST
         2.3.18 SOCKLIST
         2.3.19 TIMERLIST
-        2.3.20 BOTCHANLIST
 3.  StatServ 
     3.1 About StatServ
     3.2 Available Commands
@@ -264,24 +263,22 @@ Example:
 2.3.5 SHUTDOWN
 --------------
 Syntax: 
-    /msg NeoStats SHUTDOWN [reason]
+    /msg NeoStats SHUTDOWN <reason>
 Description: 
     Force NeoStats to exit immediately.
     This command should be used wisely.
-    reason is optional.
 Example:
     /msg NeoStats SHUTDOWN upgrade
 
 2.3.6 RELOAD
 ------------
 Syntax: 
-    /msg NeoStats RELOAD [reason]
+    /msg NeoStats RELOAD <reason>
 Description: 
     Force NeoStats to reload.
-    This command will cause NeoStats to split from the network, reload 
-    data files and connect. 
+    This command will cause NeoStats to disconnect from the network, 
+    reload data files and reconnect. 
     This command SHOULD be used wisely. 
-    reason is optional.
 Example:
     /msg NeoStats RELOAD Lagged
 
@@ -291,7 +288,6 @@ Syntax:
     /msg NeoStats LOAD <module>
 Description: 
     Allows you to load a module while NeoStats is running. 
-    Some modules can not be loaded at runtime, and will return an error.
 Example:
     /msg NeoStats LOAD statserv
 
@@ -300,8 +296,7 @@ Example:
 Syntax: 
     /msg NeoStats UNLOAD <module>
 Description: 
-    Allows you to unload a module while NeoStats is running
-    Some modules can not be unloaded at runtime, and will return an error
+    Allows you to unload a module while NeoStats is running	.
 Example:
     /msg NeoStats UNLOAD statserv
 
@@ -422,17 +417,6 @@ Description:
     timer functions being used on the network by each module.
 Example:
     /msg NeoStats TIMERLIST
-
-2.3.20 BOTCHANLIST
-------------------
-Syntax: 
-    /msg NeoStats BOTCHANLIST
-Description: 
-    NeoStats will send you by notice a list of the current bots
-    and the channels they are using for each module.
-Example:
-    /msg NeoStats BOTCHANLIST
-
 
 -----------------------------------<>-----------------------------------
 
@@ -1246,6 +1230,5 @@ configuration.
 -----------------------------------<>-----------------------------------
 
 ************************************************************************
-** This document was last updated on December 11, 2004 by M and is    **
-** based on documents originally created by Shmad and Fish.           **
+** This document was last updated on October 29, 2004 by M            **
 ************************************************************************

@@ -26,45 +26,44 @@
 #include "neostats.h"
 
 const char *cs_about[] = {
-	"\2ConnectServ\2 is designed to track users signing on and",
-	"off, killing of users, modes that the operators are using",
-	"and nickname changes. These events can be optionally",
-	"reported to the services channel and can optionally be",
-	"logged.",
+	"\2ConnectServ\2 tracks users signing on and off the network,",
+	"kills, operator modes and nickname changes.",
+	"These events can be reported to the services channel and",
+	"can optionally be logged.",
 	NULL
 };
 
 const char *cs_help_set_signwatch[] = {
 	"SIGNWATCH <ON/OFF>",
-	"Report signon/signoff events to the services channel.",
+	"Report signon/signoff of users to the services channel.",
 	NULL
 };
 
 const char *cs_help_set_exclusions[] = {
 	"EXCLUSIONS <ON/OFF>",
-	"Use the global exclusions before displaying events",
+	"Use the global exclusions before displaying reports",
 	NULL
 };
 
 const char *cs_help_set_logging[] = {
 	"LOGGING <ON/OFF>",
-	"Log events reported by connectserv",
+	"Log connectserv reports",
 	NULL
 };
 
 const char *cs_help_set_killwatch[] = {
 	"KILLWATCH <ON/OFF>",
-	"Report kill events to the services channel.",
+	"Report kills to the services channel.",
 	NULL
 };
 const char *cs_help_set_modewatch[] = {
 	"MODEWATCH <ON/OFF>",
-	"Report operator modes events to the services channel.",
+	"Report operator mode changes to the services channel.",
 	NULL
 };
 const char *cs_help_set_nickwatch[] = {
 	"NICKWATCH <ON/OFF>",
-	"Report nick changes events to the services channel.",
+	"Report nick changes to the services channel.",
 	NULL
 };
 const char *cs_help_set_servwatch[] = {
