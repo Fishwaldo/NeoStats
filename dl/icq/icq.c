@@ -336,7 +336,7 @@ int icq_start() {
     
     memcpy(IcqServ.user, Servbot.user, 8);
     memcpy(IcqServ.host, Servbot.host, MAXHOST);
-    if (!config_read("stats.cfg", options) == 0) {
+    if (!config_read("neostats.cfg", options) == 0) {
     	log("Error, IcqServ could not be configured");
 	return -1;
     }    

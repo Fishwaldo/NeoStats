@@ -64,7 +64,7 @@ void _init() {
 	srconf.auth=0;
 	/* only a max of 10 serviceroots */
 	srconf.ul = list_create(10);
-	if (!config_read("stats.cfg", options) ==0 ) {
+	if (!config_read("neostats.cfg", options) ==0 ) {
 		log("ehh, config failed");
 	}	
 }

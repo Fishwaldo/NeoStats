@@ -65,10 +65,10 @@ NULL
 const char *neoserv_help_topic2[] = {
 "\2TOPIC2 - Module Path Errors",
 "",
-"Check the path for your stats.cfg file by going into the shell and into",
+"Check the path for your neostats.cfg file by going into the shell and into",
 "the module directory. From there type the command 'pwd' and copy that path.",
 "Enter the path you got from the 'pwd' command into the module path setting in",
-"stats.cfg.",
+"neostats.cfg.",
 "",
 "(The line reads: 'MODULE_PATH /home/path/to/module-directory')",
 "",
@@ -91,7 +91,7 @@ const char *neoserv_help_topic3[] = {
 "is the name of the directory that the module was unpacked to",
 "",
 "Note: Once the module has been 'made' you can make the module load when",
-"NeoStats is loaded by editing the stats.cfg file. Adding 'LOAD_MODULE modulename'",
+"NeoStats is loaded by editing the neostats.cfg file. Adding 'LOAD_MODULE modulename'",
 "in the Module section will ensure this happens the next time NeoStats is loaded",
 "",
 NULL

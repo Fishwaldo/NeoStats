@@ -148,7 +148,7 @@ void _init() {
 	memcpy(StatServ.host, Servbot.host, MAXHOST);
 	StatServ.lag = 0;
 	StatServ.html = 0;
-	if (!config_read("stats.cfg", options) == 0) {
+	if (!config_read("neostats.cfg", options) == 0) {
 		log("Error, Statserv could not be configured");
 		chanalert(s_Services, "Error, Statserv could not be configured");
 		return;
