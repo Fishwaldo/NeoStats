@@ -447,12 +447,16 @@ m_server (char *origin, char **argv, int argc, int srv)
 	/* server desc is in argv[3] but so is some other stuff
 	 * so we need to strip protocol, flags and numeric.
 	 */
+#if 0
 	if(argc > 2) {
 		s = argv[3];
 		while(*s != ' ')
 			s++;
 		s++;
 	}
+#else
+	s = argv[3];
+#endif
 
 	if(!srv) {
 		if (*origin == 0) {
