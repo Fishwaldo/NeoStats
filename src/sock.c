@@ -821,8 +821,6 @@ read_sock_activity(int fd, short what, void *data) {
 	size_t howmuch = READBUFSIZE;
 #ifdef WIN32
 	DWORD dwBytesRead;
-#else
-#error Mark, you need to write the win32 support functions for reading here. if any. Justin, Erm isn't there already a read function???
 #endif
 
 	if (what & EV_READ) { 	

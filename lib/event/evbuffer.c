@@ -95,7 +95,9 @@ bufferevent_readcb(int fd, short event, void *arg)
 
 	res = evbuffer_read(bufev->input, fd, -1);
 	if (res == -1) {
+#ifdef WIN32
 		errno = WSAGetLastError();
+#endif
 		if (errno == EAGAIN || errno == EINTR)
 			goto reschedule;
 		/* error case */
