@@ -135,7 +135,7 @@ cb_Module (char *arg, int configtype)
 	SET_SEGV_LOCATION();
 	if (!config.modnoload) {
 		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
-			if (!strcasecmp (load_mods[i], arg)) {
+			if (!ircstrcasecmp (load_mods[i], arg)) {
 				return;
 			}
 		}

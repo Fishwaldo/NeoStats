@@ -40,8 +40,8 @@
 #include "dns.h"
 #include "transfer.h"
 #include "curl.h"
+#include "ircstring.h"
 #ifdef SQLSRV
-#include <fnmatch.h>
 #include "sqlsrv/rta.h"
 #endif
 
@@ -679,7 +679,7 @@ sql_accept_conn(int srvfd)
   else
   {
     inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
-    if (fnmatch(me.sqlhost, tmp, 0)) {
+    if (match(me.sqlhost, tmp)) {
     	/* we didnt get a match, bye bye */
 	nlog(LOG_NOTICE, LOG_CORE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
 	close(newui->fd);

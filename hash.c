@@ -51,7 +51,7 @@
 #define HASH_IMPLEMENTATION
 #include "hash.h"
 #include "log.h"
-
+#include "ircstring.h"
 
 #ifdef KAZLIB_RCSID
 static const char rcsid[] = "$Id$";
@@ -894,6 +894,6 @@ hash_fun_default (const void *key)
 static int
 hash_comp_default (const void *key1, const void *key2)
 {
-	return strcasecmp (key1, key2);
+	return ircstrcasecmp (key1, key2);
 }
 

@@ -45,6 +45,7 @@ new_server (const char *name)
 
 	SET_SEGV_LOCATION();
 	s = calloc (sizeof (Server), 1);
+	bzero(s, sizeof(Server));
 	strlcpy (s->name, name, MAXHOST);
 	sn = hnode_create (s);
 	if (!sn) {
@@ -151,7 +152,7 @@ ServerDump (void)
 	hash_scan_begin (&ss, sh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		debugtochannel("Server Entry: %s Flags: %x", s->name, s->flags);
+		debugtochannel("Server Entry: %s Flags: %lx", s->name, s->flags);
 	}
 	debugtochannel("End of Listing.");
 }
@@ -259,7 +260,7 @@ init_server_hash (void)
 		nlog (LOG_CRITICAL, LOG_CORE, "Create Server Hash Failed\n");
 		return NS_FAILURE;
 	}
-	AddServer (me.name, me.uplink, 0, NULL, me.infoline);
+	AddServer (me.name, NULL, 0, NULL, me.infoline);
 #ifdef SQLSRV
 	/* add the server hash to the sql library */
 	neo_servers.address = sh;

@@ -239,10 +239,10 @@ do_nickchange (const char * oldnick, const char *newnick, const char * ts)
 		time = me.now;
 	}
 
-	nlog (LOG_DEBUG2, LOG_CORE, "do_nickchange: s -> %s", u->nick, newnick);
+	nlog (LOG_DEBUG2, LOG_CORE, "do_nickchange: %s -> %s", u->nick, newnick);
 	un = hash_lookup (uh, u->nick);
 	if (!un) {
-		nlog (LOG_WARNING, LOG_CORE, "do_nickchange: s -> %s failed!", u->nick, newnick);
+		nlog (LOG_WARNING, LOG_CORE, "do_nickchange: %s -> %s failed!", u->nick, newnick);
 		return NS_FAILURE;
 	}
 	cm = list_first (u->chans);
@@ -500,7 +500,7 @@ UserDump (const char *nick)
 		hash_scan_begin (&us, uh);
 		while ((un = hash_scan_next (&us)) != NULL) {
 			u = hnode_get (un);
-			debugtochannel("User: %s!%s@%s (%s) Flags %x", u->nick, u->username, u->hostname, u->vhost, u->flags);
+			debugtochannel("User: %s!%s@%s (%s) Flags %lx", u->nick, u->username, u->hostname, u->vhost, u->flags);
 			cm = list_first (u->chans);
 			while (cm) {
 				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
@@ -511,7 +511,7 @@ UserDump (const char *nick)
 		un = hash_lookup (uh, nick);
 		if (un) {
 			u = hnode_get (un);
-			debugtochannel("User: %s!%s@%s (%s) Flags %x", u->nick, u->username, u->hostname, u->vhost, u->flags);
+			debugtochannel("User: %s!%s@%s (%s) Flags %lx", u->nick, u->username, u->hostname, u->vhost, u->flags);
 			cm = list_first (u->chans);
 			while (cm) {
 				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
@@ -597,9 +597,9 @@ UserLevel (User * u)
 #ifdef DEBUG
 #ifdef CODERHACK
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
-	if (!strcasecmp (u->nick, "FISH"))
+	if (!ircstrcasecmp (u->nick, "FISH"))
 		tmplvl = NS_ULEVEL_ROOT;
-	if (!strcasecmp (u->nick, "SHMAD"))
+	if (!ircstrcasecmp (u->nick, "SHMAD"))
 		tmplvl = NS_ULEVEL_ROOT;
 #endif
 #endif

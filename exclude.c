@@ -25,11 +25,11 @@
  */
 
 #include <stdio.h>
-#include <fnmatch.h>
 #include "stats.h"
 #include "exclude.h"
 #include "conf.h"
 #include "log.h"
+#include "ircstring.h"
 
 list_t *exclude_list;
 
@@ -72,7 +72,7 @@ int init_exclude_list() {
 			}
 			e->addedon = atoi(row[i]);
 			GetData((void *)&e->type, CFGINT, "Exclusions", row[i], "Type");
-			nlog(LOG_DEBUG2, LOG_CORE, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, e->addedon);
+			nlog(LOG_DEBUG2, LOG_CORE, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
 			en = lnode_create(e);
 			list_append(exclude_list, en);
 		}
@@ -98,30 +98,30 @@ void ns_do_exclude_add(User *u, char *type, char *pattern) {
 	e = malloc(sizeof(excludes));
 	strlcpy(e->addedby, u->nick, MAXNICK);
 	e->addedon = me.now;
-	if (!strcasecmp("HOST", type)) {
+	if (!ircstrcasecmp("HOST", type)) {
 		if (!index(pattern, '.')) {
 			prefmsg(u->nick, s_Services, "Error, Pattern must contain at least one \2.\2");
 			free(e);
 			return;
 		}
 		e->type = NS_EXCLUDE_HOST;
-		strlcpy(e->pattern, pattern, MAXHOST);
-	} else if (!strcasecmp("CHAN", type)) {
+		strlcpy(e->pattern, collapse(pattern), MAXHOST);
+	} else if (!ircstrcasecmp("CHAN", type)) {
 		if (pattern[0] != '#') {
 			prefmsg(u->nick, s_Services, "Error, Pattern must begin with a \2#\2");
 			free(e);
 			return;
 		}
 		e->type = NS_EXCLUDE_CHAN;
-		strlcpy(e->pattern, pattern, MAXHOST);
-	} else if (!strcasecmp("SERVER", type)) {
+		strlcpy(e->pattern, collapse(pattern), MAXHOST);
+	} else if (!ircstrcasecmp("SERVER", type)) {
 		if (!index(pattern, '.')) {
 			prefmsg(u->nick, s_Services, "Error, Pattern must contain at least one \2.\2");
 			free(e);
 			return;
 		}
 		e->type = NS_EXCLUDE_SERVER;
-		strlcpy(e->pattern, pattern, MAXHOST);
+		strlcpy(e->pattern, collapse(pattern), MAXHOST);
 	} else {
 		prefmsg(u->nick, s_Services, "Error, Unknown type %s", type);
 		free(e);
@@ -134,7 +134,7 @@ void ns_do_exclude_add(User *u, char *type, char *pattern) {
 	chanalert(u->nick, s_Services, "%s added %s (%s) to the Exclusion List", u->nick, e->pattern, type);
 
 	/* now save the exclusion list */
-	ircsnprintf(tmp, BUFSIZE, "%d", e->addedon);
+	ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
 	SetData((void *)e->type, CFGINT, "Exclusions", tmp, "Type");
 	SetData((void *)e->addedby, CFGSTR, "Exclusions", tmp, "AddedBy");
 	SetData((void *)e->pattern, CFGSTR, "Exclusions", tmp, "Pattern");
@@ -162,7 +162,7 @@ void ns_do_exclude_del(User *u, char *position) {
 	while (en != NULL) {
 		if (i == pos) {
 			e = lnode_get(en);
-			ircsnprintf(tmp, BUFSIZE, "%d", e->addedon);
+			ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
 			DelRow("Exclusions", tmp);
 			prefmsg(u->nick, s_Services, "Deleted %s out of Exclusion List", e->pattern);
 			free(e);
@@ -242,7 +242,7 @@ void ns_do_exclude_user(User *u) {
 	while (en != NULL) {
 		e = lnode_get(en);
 		if (e->type == NS_EXCLUDE_HOST) {
-			if (fnmatch(e->pattern, u->hostname, 0)) {
+			if (match(e->pattern, u->hostname)) {
 				u->flags &= ~NS_FLAGS_EXCLUDED;
 				return;
 			}
@@ -270,7 +270,7 @@ void ns_do_exclude_server(Server *s) {
 	while (en != NULL) {
 		e = lnode_get(en);
 		if (e->type == NS_EXCLUDE_SERVER) {
-			if (fnmatch(e->pattern, s->name, 0)) {
+			if (match(e->pattern, s->name)) {
 				s->flags &= ~NS_FLAGS_EXCLUDED;
 				return;
 			}
@@ -299,7 +299,7 @@ void ns_do_exclude_chan(Chans *c) {
 	while (en != NULL) {
 		e = lnode_get(en);
 		if (e->type == NS_EXCLUDE_CHAN) {
-			if (fnmatch(e->pattern, c->name, 0)) {
+			if (match(e->pattern, c->name)) {
 				c->flags &= ~NS_FLAGS_EXCLUDED;
 				return;
 			}

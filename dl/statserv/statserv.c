@@ -27,6 +27,7 @@
 #include "dl.h"
 #include "stats.h"
 #include "statserv.h"
+#include "exclude.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #include "sqlstats.h"
@@ -116,7 +117,7 @@ static void ss_Config(void)
 	if (GetConf((void *) &StatServ.lagtime, CFGINT, "LagTime") < 0) {
 		StatServ.lagtime = 30;
 	}
-	if (GetConf((void *) &StatServ.exclusions, CFGINT, "Exclusions") < 0) {
+	if (GetConf((void *) &StatServ.exclusions, CFGBOOL, "Exclusions") < 0) {
 		StatServ.exclusions = 0;
 	}
 	if (GetConf((void *) &StatServ.lagalert, CFGINT, "LagAlert") < 0) {
@@ -653,6 +654,9 @@ static void makemap(char *uplink, User * u, int level)
 	hash_scan_begin(&hs, sh);
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
+		if (StatServ.exclusions && Is_Excluded(s)) {
+			makemap(s->name, u, level);
+		}
 		ss = findstats(s->name);
 		if ((level == 0) && (s->uplink[0] == 0)) {
 			/* its the root server */

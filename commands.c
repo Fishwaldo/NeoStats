@@ -204,7 +204,7 @@ del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list)
 	}
 	/* set the module */
 	/* this is a hack, so we can load out of core, not NeoStats */
-	if (!strcasecmp(bot_ptr->modname, s_Services)) {
+	if (!ircstrcasecmp(bot_ptr->modname, s_Services)) {
 		CLEAR_SEGV_INMODULE();
 	} else {
 		SET_SEGV_INMODULE(bot_ptr->modname);
@@ -235,7 +235,7 @@ del_all_bot_cmds(ModUser* bot_ptr)
 	}
 	/* set the module */
 	/* this is a hack, so we can load out of core, not NeoStats */
-	if (!strcasecmp(bot_ptr->modname, s_Services)) {
+	if (!ircstrcasecmp(bot_ptr->modname, s_Services)) {
 		CLEAR_SEGV_INMODULE();
 	} else {
 		SET_SEGV_INMODULE(bot_ptr->modname);
@@ -294,7 +294,7 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	/* this is a hack, so we can load out of core, not NeoStats */
-	if (!strcasecmp(bot_ptr->modname, s_Services)) {
+	if (!ircstrcasecmp(bot_ptr->modname, s_Services)) {
 		CLEAR_SEGV_INMODULE();
 	} else {
 		SET_SEGV_INMODULE(bot_ptr->modname);
@@ -349,13 +349,13 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 
 	/* Handle intrinsic commands */
 	/* Help */
-	if (!strcasecmp(av[1], "HELP")) {
+	if (!ircstrcasecmp(av[1], "HELP")) {
 		bot_cmd_help(bot_ptr, u, av, ac);
 		CLEAR_SEGV_INMODULE();
 		return NS_SUCCESS;
 	}
 	/* Handle SET if we have it */
-	if (bot_ptr->bot_settings && !strcasecmp(av[1], "SET") ) {
+	if (bot_ptr->bot_settings && !ircstrcasecmp(av[1], "SET") ) {
 		bot_cmd_set(bot_ptr, u, av, ac);
 		CLEAR_SEGV_INMODULE();
 		return NS_SUCCESS;
@@ -363,14 +363,14 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 
 #if 0
 	/* About */
-	if (!strcasecmp(av[1], "ABOUT")) {
+	if (!ircstrcasecmp(av[1], "ABOUT")) {
 		bot_cmd_about(bot_ptr, u, av, ac);
 		CLEAR_SEGV_INMODULE();
 		return NS_SUCCESS;
 	}
 
 	/* Version */
-	if (!strcasecmp(av[1], "VERSION")) {
+	if (!ircstrcasecmp(av[1], "VERSION")) {
 		bot_cmd_version(bot_ptr, u, av, ac);
 		CLEAR_SEGV_INMODULE();
 		return NS_SUCCESS;
@@ -497,14 +497,14 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	/* Handle intrinsic commands */
 	cmd_ptr = intrinsic_commands;
 	while(cmd_ptr->cmd) {
-		if (!strcasecmp(av[2], cmd_ptr->cmd)) {
+		if (!ircstrcasecmp(av[2], cmd_ptr->cmd)) {
 			privmsg_list (u->nick, bot_ptr->nick, cmd_ptr->helptext);
 			return 1;
 		}
 		cmd_ptr++;
 	}
 	/* Handle SET if we have it */
-	if (bot_ptr->bot_settings && userlevel >= bot_ptr->set_ulevel && !strcasecmp(av[2], "SET") ) {
+	if (bot_ptr->bot_settings && userlevel >= bot_ptr->set_ulevel && !ircstrcasecmp(av[2], "SET") ) {
 		bot_setting* set_ptr;
 		set_ptr = bot_ptr->bot_settings;
 		/* Display HELP SET intro text and LIST command */
@@ -533,7 +533,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 int is_target_valid(char* bot_name, User* u, char* target_nick)
 {
 	/* Check for message to self */
-	if (!strcasecmp(target_nick, bot_name)) {
+	if (!ircstrcasecmp(target_nick, bot_name)) {
 		prefmsg(u->nick, bot_name,
 			"Surely we have better things to do with our time than make a service message itself!");
 		return 0;
@@ -574,7 +574,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 		return 1;
 	}
 
-	if(!strcasecmp(av[2], "LIST"))
+	if(!ircstrcasecmp(av[2], "LIST"))
 	{
 		prefmsg(u->nick, bot_ptr->nick, "Current %s settings:", bot_ptr->nick);
 		set_ptr = bot_ptr->bot_settings;
@@ -621,7 +621,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 	set_ptr = bot_ptr->bot_settings;
 	while(set_ptr->option)
 	{
-		if(!strcasecmp(av[2], set_ptr->option))
+		if(!ircstrcasecmp(av[2], set_ptr->option))
 			break;
 		set_ptr++;
 	}
@@ -639,7 +639,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 	}
 	switch(set_ptr->type) {
 		case SET_TYPE_BOOLEAN:
-			if (!strcasecmp(av[3], "ON")) {
+			if (!ircstrcasecmp(av[3], "ON")) {
 				*(int*)set_ptr->varptr = 1;
 				SetConf((void *) 1, CFGBOOL, set_ptr->confitem);
 				chanalert(bot_ptr->nick, "%s enabled by \2%s\2", 
@@ -648,7 +648,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 					u->nick, u->username, u->hostname, set_ptr->option);
 				prefmsg(u->nick, bot_ptr->nick,
 					"\2%s\2 enabled", set_ptr->option);
-			} else if (!strcasecmp(av[3], "OFF")) {
+			} else if (!ircstrcasecmp(av[3], "OFF")) {
 				*(int*)set_ptr->varptr = 0;
 				SetConf(0, CFGBOOL, set_ptr->confitem);
 				chanalert(bot_ptr->nick, "%s disabled by \2%s\2", 

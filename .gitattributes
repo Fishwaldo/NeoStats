@@ -279,6 +279,7 @@ keeper/kp_util.h -text
 logs/.keepme -text
 /main.c eol=lf
 /makeconf -text
+/match.c -text
 /misc.c eol=lf
 /mystic.c eol=lf
 /mystic.h eol=lf

@@ -44,6 +44,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Add numeric support to server structures (M)
  - Added a "Global" exclusion list to NeoStats so we can maintain a single exclusion list, instead of multiple ones like we have now with opsb, and SecureServ.
  - Added strnow to me structure. This is a string version of me.now. (M)
+ - don't add a uplink to the NeoStats server struct, as this breaks statserv map (F)
 
  
 * NeoStats * Fish (F) * Version 2.5.14

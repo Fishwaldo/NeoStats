@@ -482,7 +482,7 @@ parse (char *line)
 		while (isspace (*++coreLine));
 	} else
 		coreLine = line + strlen (line);
-	if ((!strcasecmp(line, "SERVER")) || (!strcasecmp(line, "PASS"))) {
+	if ((!ircstrcasecmp(line, "SERVER")) || (!ircstrcasecmp(line, "PASS"))) {
 		strlcpy(cmd, line, sizeof(cmd));
 		ac = splitbuf(coreLine, &av, 1);
 		cmdptr = 0;

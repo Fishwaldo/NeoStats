@@ -242,7 +242,7 @@ ChanMode (char *origin, char **av, int ac)
 										j++;
 										modeexists = 1;
 										break;
-									} else if (((int *) m->mode == (int *) chan_modes[i].mode) && !strcasecmp (m->param, av[j])) {
+									} else if (((int *) m->mode == (int *) chan_modes[i].mode) && !ircstrcasecmp (m->param, av[j])) {
 										nlog (LOG_INFO, LOG_CORE, "ChanMode: Mode %c (%s) already exists, not adding again", chan_modes[i].flag, av[j]);
 										j++;
 										modeexists = 1;
@@ -549,9 +549,9 @@ part_chan (User * u, const char *chan, const char *reason)
 	int ac = 0;
 	SET_SEGV_LOCATION();
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "part_chan: trying to part NULL user from s", chan);
+		nlog (LOG_WARNING, LOG_CORE, "part_chan: trying to part NULL user from %s", chan);
 		if (me.debug_mode) {
-			chanalert (s_Services, "part_chan: trying to part NULL user from s", chan);
+			chanalert (s_Services, "part_chan: trying to part NULL user from %s", chan);
 			ChanDump (chan);
 		}
 		return;
@@ -684,7 +684,7 @@ join_chan (const char* nick, const char *chan)
 		nlog (LOG_WARNING, LOG_CORE, "join_chan: tried to join unknown user %s to channel %s", nick, chan);
 		return;
 	}
-	if (!strcasecmp ("0", chan)) {
+	if (!ircstrcasecmp ("0", chan)) {
 		/* join 0 is actually part all chans */
 		nlog (LOG_DEBUG2, LOG_CORE, "join_chan: parting %s from all channels", u->nick);
 		list_process (u->chans, u, UserPart);
@@ -779,7 +779,7 @@ ChanDump (const char *chan)
 			debugtochannel("Channel: %s Members: %ld (List %d) Flags %s tstime %ld", c->name, c->cur_users, (int)list_count (c->chanmembers), mode, (long)c->tstime);
 			debugtochannel("       Topic Owner %s, TopicTime: %ld, Topic %s", c->topicowner, (long)c->topictime, c->topic);
 			debugtochannel("PubChan?: %d", is_pub_chan (c));
-			debugtochannel("Channel Flags %x", c->flags);
+			debugtochannel("Channel Flags %lx", c->flags);
 			cmn = list_first (c->modeparms);
 			while (cmn) {
 				m = lnode_get (cmn);
@@ -822,7 +822,7 @@ ChanDump (const char *chan)
 			debugtochannel("Channel: %s Members: %ld (List %d) Flags %s tstime %ld", c->name, c->cur_users, (int)list_count (c->chanmembers), mode, (long)c->tstime);
 			debugtochannel("       Topic Owner %s, TopicTime: %ld Topic %s", c->topicowner, (long)c->topictime, c->topic);
 			debugtochannel("PubChan?: %d", is_pub_chan (c));
-			debugtochannel("Channel Flags %x", c->flags);
+			debugtochannel("Channel Flags %lx", c->flags);
 			cmn = list_first (c->modeparms);
 			while (cmn) {
 				m = lnode_get (cmn);

@@ -119,19 +119,19 @@ init_services(void)
 static int
 ns_exclude (User *u, char **av, int ac) 
 {
-	if (!strcasecmp(av[2], "ADD")) {
+	if (!ircstrcasecmp(av[2], "ADD")) {
 		if (ac < 5) {
 			prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
 			return NS_FAILURE;
 		}
 		ns_do_exclude_add(u, av[3], av[4]);
-	} else if (!strcasecmp(av[2], "DEL")) {
+	} else if (!ircstrcasecmp(av[2], "DEL")) {
 		if (ac < 4) {
 			prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
 			return NS_FAILURE;
 		}
 		ns_do_exclude_del(u, av[3]);
-	} else if (!strcasecmp(av[2], "LIST")) {
+	} else if (!ircstrcasecmp(av[2], "LIST")) {
 		ns_do_exclude_list(u, s_Services);
 	} else {
 		prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
@@ -268,11 +268,11 @@ static int
 ns_set_debug (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	if ((!strcasecmp(av[2], "YES")) || (!strcasecmp(av[2], "ON"))) {
+	if ((!ircstrcasecmp(av[2], "YES")) || (!ircstrcasecmp(av[2], "ON"))) {
 		me.debug_mode = 1;
 		globops (me.name, "\2DEBUG MODE\2 Activated by %s", u->nick);
 		prefmsg (u->nick, s_Services, "Debuging Mode Enabled!");
-	} else if ((!strcasecmp(av[2], "NO")) || (!strcasecmp(av[2], "OFF"))) {
+	} else if ((!ircstrcasecmp(av[2], "NO")) || (!ircstrcasecmp(av[2], "OFF"))) {
 		me.debug_mode = 0;
 		globops (me.name, "\2DEBUG MODE\2 Deactivated by %s", u->nick);
 		prefmsg (u->nick, s_Services, "Debuging Mode Disabled");

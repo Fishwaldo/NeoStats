@@ -908,15 +908,15 @@ do_stats (const char* nick, const char *what)
 		nlog (LOG_WARNING, LOG_CORE, "do_stats: message from unknown user %s", nick);
 		return;
 	}
-	if (!strcasecmp (what, "u")) {
+	if (!ircstrcasecmp (what, "u")) {
 		/* server uptime - Shmad */
 		int uptime = me.now - me.t_start;
 		numeric (RPL_STATSUPTIME, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
-	} else if (!strcasecmp (what, "c")) {
+	} else if (!ircstrcasecmp (what, "c")) {
 		/* Connections */
 		numeric (RPL_STATSNLINE, u->nick, "N *@%s * * %d 50", me.uplink, me.port);
 		numeric (RPL_STATSCLINE, u->nick, "C *@%s * * %d 50", me.uplink, me.port);
-	} else if (!strcasecmp (what, "o")) {
+	} else if (!ircstrcasecmp (what, "o")) {
 		/* Operators */
 #ifdef EXTAUTH
 		dl = get_dl_handle ("extauth");
@@ -927,13 +927,13 @@ do_stats (const char* nick, const char *what)
 		} else
 #endif
 			numeric (RPL_STATSOLINE, u->nick, "Operators think they are God, but you and I know they are not!");
-	} else if (!strcasecmp (what, "l")) {
+	} else if (!ircstrcasecmp (what, "l")) {
 		/* Port Lists */
 		tmp = me.now - me.lastmsg;
 		tmp2 = me.now - me.t_start;
 		numeric (RPL_STATSLINKINFO, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
 		numeric (RPL_STATSLLINE, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, (int)me.SendM, (int)me.SendBytes, (int)me.RcveM, (int)me.RcveBytes, (int)tmp2, (int)tmp);
-	} else if (!strcasecmp (what, "M")) {
+	} else if (!ircstrcasecmp (what, "M")) {
 		for (i = 0; i < ircd_cmdcount; i++) {
 			if (cmd_list[i].usage > 0)
 				numeric (RPL_STATSCOMMANDS, u->nick, "Command %s Usage %d", cmd_list[i].name, cmd_list[i].usage);
@@ -951,17 +951,17 @@ do_protocol (char *origin, char **argv, int argc)
 	ircd_srv.unkline = 0;
 	for (i = 0; i < argc; i++) {
 #ifdef GOTTOKENSUPPORT
-		if (!strcasecmp ("TOKEN", argv[i])) {
+		if (!ircstrcasecmp ("TOKEN", argv[i])) {
 			me.token = 1;
 		}
 #endif
 #ifdef GOTCLIENTSUPPORT
-		if (!strcasecmp ("CLIENT", argv[i])) {
+		if (!ircstrcasecmp ("CLIENT", argv[i])) {
 			me.client = 1;
 		}
 #endif
 #if defined(HYBRID7)
-		if (!strcasecmp ("UNKLN", argv[i])) {
+		if (!ircstrcasecmp ("UNKLN", argv[i])) {
 			ircd_srv.unkline = 1;
 		}
 #endif

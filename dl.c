@@ -365,7 +365,7 @@ del_mod_timers (char *module_name)
 	hash_scan_begin (&hscan, th);
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		mod_tmr = hnode_get (modnode);
-		if (!strcasecmp (mod_tmr->modname, module_name)) {
+		if (!ircstrcasecmp (mod_tmr->modname, module_name)) {
 			nlog (LOG_DEBUG1, LOG_CORE, "del_mod_timers: Module %s has timer %s Registered. Deleting..", module_name, mod_tmr->timername);
 			del_mod_timer (mod_tmr->timername);
 		}
@@ -646,7 +646,7 @@ del_sockets (char *module_name)
 	hash_scan_begin (&hscan, sockh);
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		mod_sock = hnode_get (modnode);
-		if (!strcasecmp (mod_sock->modname, module_name)) {
+		if (!ircstrcasecmp (mod_sock->modname, module_name)) {
 			nlog (LOG_DEBUG1, LOG_CORE, "del_sockets: Module %s had Socket %s Registered. Deleting..", module_name, mod_sock->sockname);
 			del_socket (mod_sock->sockname);
 		}
@@ -1105,7 +1105,7 @@ int	del_bots (char* module_name)
 	hash_scan_begin (&hscan, bh);
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		mod_usr = hnode_get (modnode);
-		if (!strcasecmp (mod_usr->modname, module_name)) {
+		if (!ircstrcasecmp (mod_usr->modname, module_name)) {
 			nlog (LOG_DEBUG1, LOG_CORE, "Module %s had bot %s Registered. Deleting..", module_name, mod_usr->nick);
 			del_bot (mod_usr->nick, "Module Unloaded");
 		}
@@ -1134,7 +1134,7 @@ ModuleEvent (char *event, char **av, int ac)
 		if (ev_list) {
 			while (ev_list->cmd_name != NULL) {
 				/* This goes through each Command */
-				if (!strcasecmp (ev_list->cmd_name, event)) {
+				if (!ircstrcasecmp (ev_list->cmd_name, event)) {
 					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Command %s -> %s", module_ptr->info->module_name, event, ev_list->cmd_name);
 					SET_SEGV_LOCATION();
 					SET_SEGV_INMODULE(module_ptr->info->module_name);
@@ -1404,7 +1404,7 @@ load_module (char *modfilename, User * u)
 	/* Let this module know we are online if we are! */
 	if (me.onchan == 1) {
 		while (event_fn_ptr->cmd_name != NULL) {
-			if (!strcasecmp (event_fn_ptr->cmd_name, EVENT_ONLINE)) {
+			if (!ircstrcasecmp (event_fn_ptr->cmd_name, EVENT_ONLINE)) {
 				AddStringToList (&av, me.s->name, &ac);
 				SET_SEGV_LOCATION();
 				SET_SEGV_INMODULE(mod_ptr->info->module_name);
@@ -1457,7 +1457,7 @@ get_mod_num (char *mod_name)
 
 	for (i = 0; i < NUM_MODULES; i++) {
 		if (ModList[i] != NULL) {
-			if (!strcasecmp (ModList[i]->info->module_name, mod_name)) {
+			if (!ircstrcasecmp (ModList[i]->info->module_name, mod_name)) {
 				return i;
 			}
 		}
