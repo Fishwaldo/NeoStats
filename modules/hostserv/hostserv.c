@@ -367,7 +367,7 @@ static int hs_event_umode (CmdParams *cmdparams)
 	char *modes;
 	char vhost[MAXHOST];
 
-	if (is_oper(cmdparams->source) && hs_cfg.operhosts == 0) 
+	if (IsOper(cmdparams->source) && hs_cfg.operhosts == 0) 
 		return NS_SUCCESS;
 	/* first, find if its a regnick mode */
 	modes = cmdparams->param;

@@ -279,8 +279,8 @@ EXPORTVAR extern unsigned int ircd_supported_cumodes;
 #define HaveUmodeDeaf() ( ircd_supported_umodes & UMODE_DEAF )
 
 /* Umode macros */
-#define is_oper(x) ( ( x ) && ( (x->user->Umode & (UMODE_OPER|UMODE_LOCOP ) ) ) )
-#define is_bot(x) ( ( x ) && ( x->user->Umode & UMODE_BOT ) )
+#define IsOper(x) ( ( x ) && ( (x->user->Umode & (UMODE_OPER|UMODE_LOCOP ) ) ) )
+#define IsBot(x) ( ( x ) && ( x->user->Umode & UMODE_BOT ) )
 
 #define BOTMODE		0x00000001
 #define OPERMODE	0x00000002

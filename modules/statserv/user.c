@@ -55,7 +55,7 @@ int ss_event_mode(CmdParams *cmdparams)
 				AddNetworkOper ();
 				AddServerOper (cmdparams->source);
 			} else {
-				if (is_oper(cmdparams->source)) {
+				if (IsOper(cmdparams->source)) {
 					dlog(DEBUG1, "Decreasing OperCount for %s", ss->name);
 					DelNetworkOper ();
 					DelServerOper (cmdparams->source);
@@ -81,7 +81,7 @@ static int AddUser (Client *u, void *v)
 
 static void DelUser (Client *u)
 {
-	if (is_oper(u)) {
+	if (IsOper(u)) {
 		dlog(DEBUG2, "Decreasing OperCount on %s due to signoff", u->uplink->name);
 		DelServerOper (u);
 	}
@@ -130,7 +130,7 @@ static int operlist(Client *u, void * v)
 	Client *listu;
 
 	listu = (Client *)v;
-	if (!is_oper(u))
+	if (!IsOper(u))
 		return NS_FALSE;
 	if (operlistaway && u->user->is_away)
 		return NS_FALSE;
@@ -181,7 +181,7 @@ static int botlist(Client *u, void * v)
 	Client *listu;
 
 	listu = (Client *)v;
-	if is_bot(u) { 
+	if IsBot(u) { 
 		irc_prefmsg (ss_bot, listu, "%-15s %s", u->name, u->uplink->name);
 	}
 	return NS_FALSE;
