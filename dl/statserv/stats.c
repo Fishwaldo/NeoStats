@@ -152,7 +152,6 @@ int s_chan_new(char **av, int ac)
 	IncreaseChans();
 	/* only check exclusions after increasing channel count */
 	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
-		printf("skipping %s\n", av[0]);
 		return 1;
 	}
 	count = hash_count(ch);
@@ -177,7 +176,6 @@ int s_chan_del(char **av, int ac)
 	DecreaseChans();
 	/* only check exclusions after increasing channel count */
 	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
-		printf("skipping %s\n", av[0]);
 		return 1;
 	}
 	ln = list_find(Chead, av[0], comparef);
@@ -199,7 +197,6 @@ int s_chan_join(char **av, int ac)
 
 	/* only check exclusions after increasing channel count */
 	if (StatServ.exclusions && (Is_Excluded(findchan(av[0]))|| Is_Excluded(finduser(av[1])))) {
-		printf("skipping %s %s\n", av[0], av[1]);
 		return 1;
 	}
 
@@ -233,7 +230,6 @@ int s_chan_part(char **av, int ac)
 	CStats *cs;
 	/* only check exclusions after increasing channel count */
 	if (StatServ.exclusions && (Is_Excluded(findchan(av[0]))|| Is_Excluded(finduser(av[1])))) {
-		printf("skipping %s %s\n", av[0], av[1]);
 		return 1;
 	}
 	cs = findchanstats(av[0]);
@@ -248,7 +244,6 @@ int s_topic_change(char **av, int ac)
 	CStats *cs;
 	/* only check exclusions after increasing channel count */
 	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
-		printf("skipping %s\n", av[0]);
 		return 1;
 	}
 	cs = findchanstats(av[0]);
@@ -263,7 +258,6 @@ int s_chan_kick(char **av, int ac)
 
 	/* only check exclusions after increasing channel count */
 	if (StatServ.exclusions && Is_Excluded(findchan(av[0]))) {
-		printf("skipping %s\n", av[0]);
 		return 1;
 	}
 
