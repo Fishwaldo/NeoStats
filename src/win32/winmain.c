@@ -112,11 +112,18 @@ int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPrevInst, char * cmdParam, int c
 	_fmode = _O_BINARY;
 	hInstance = hInst;
 
-	if( WSAStartup( MAKEWORD( 1, 1 ), &WSAData ) != 0 )
+	if( WSAStartup( MAKEWORD( 2, 0 ), &WSAData ) != 0 )
    	{
         ErrorMessageBox( "Unable to initialize WinSock" );
+		WSACleanup();
         return FALSE;
 	}
+	if (LOBYTE( WSAData.wVersion ) != 2 || HIBYTE( WSAData.wVersion ) != 0 ) {
+        ErrorMessageBox( "Unable to initialize WinSock, need version 2.0 or higher" );
+		WSACleanup();
+        return FALSE;
+	}
+
 #ifndef NDEBUG
 	InitDebugConsole();
 #endif
@@ -125,12 +132,14 @@ int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPrevInst, char * cmdParam, int c
     {
         wsprintf( szMsg, "Error x%x", GetLastError() );
         ErrorMessageBox( szMsg );
+		WSACleanup();
         return FALSE;
     }
 
 	if( neostats() != 0 )
 	{
 		ErrorMessageBox( "NeoStats init failed" );
+		WSACleanup();
 		return FALSE;
 	}
 
@@ -146,6 +155,8 @@ int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPrevInst, char * cmdParam, int c
  	if( hNeoStatsThread == NULL ) 
 	{	
 		ErrorMessageBox( "CreateThread failed." );
+		WSACleanup();
+		return FALSE;
 	}
 
     while( ( GetMessage( &msg, NULL, 0, 0 ) ) != 0 )
@@ -156,5 +167,6 @@ int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPrevInst, char * cmdParam, int c
             DispatchMessage( &msg );
         }
     }
+	WSACleanup();
     return (int) msg.wParam;
 }

@@ -1460,14 +1460,16 @@ EXPORTFUNC struct tm* os_localtime( const time_t *timer );
 /* Socket functions */
 EXPORTFUNC int os_sock_close( OS_SOCKET sock );
 EXPORTFUNC int os_sock_write( OS_SOCKET s, const char *buf, int len );
+EXPORTFUNC int os_sock_sendto( OS_SOCKET s, const char* buf, int len, int flags, const struct sockaddr* to, int tolen );
 EXPORTFUNC int os_sock_read( OS_SOCKET s, char *buf, int len );
 EXPORTFUNC int os_sock_set_nonblocking( OS_SOCKET s );
-int os_sock_connect( OS_SOCKET s, const struct sockaddr* name, int namelen );
-OS_SOCKET os_sock_socket(int socket_family, int socket_type, int protocol );
-int os_sock_bind(OS_SOCKET s, const struct sockaddr* name, int namelen );
-int os_sock_listen( OS_SOCKET s, int backlog );
-int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char* optval, int optlen );
-int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp );
+EXPORTFUNC int os_sock_connect( OS_SOCKET s, const struct sockaddr* name, int namelen );
+EXPORTFUNC OS_SOCKET os_sock_socket(int socket_family, int socket_type, int protocol );
+EXPORTFUNC int os_sock_bind(OS_SOCKET s, const struct sockaddr* name, int namelen );
+EXPORTFUNC int os_sock_listen( OS_SOCKET s, int backlog );
+EXPORTFUNC int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char* optval, int optlen );
+EXPORTFUNC int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp );
+EXPORTVAR int os_sock_errno;
 
 /* Memory functions */
 EXPORTFUNC void *os_memset( void *dest, int c, size_t count );

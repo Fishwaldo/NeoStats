@@ -313,6 +313,33 @@ int os_sock_write( OS_SOCKET s, const char* buf, int len )
 }
 
 /*
+ *  Wrapper function for sendto
+ */
+
+int os_sock_sendto( OS_SOCKET s, const char* buf, int len, int flags, const struct sockaddr* to, int tolen )
+{
+	int ret;
+
+	/* reset local errno implementation */
+	os_sock_errno = 0;
+	ret = sendto( s, buf, len, flags, to, tolen );
+#ifdef WIN32
+	if( ret == SOCKET_ERROR )
+	{
+		os_sock_errno = WSAGetLastError();
+		nlog( LOG_ERROR, "os_sock_sendto: failed for socket %d with error %d %s", s, os_sock_errno, WinSockErrToString( os_sock_errno ) );
+	}
+#else
+	if( ret < 0 )
+	{
+		os_sock_errno = errno;
+		nlog( LOG_ERROR, "os_sock_sendto: failed for socket %d with error %s", s, strerror( errno ) );
+	}
+#endif
+	return ret;
+}
+
+/*
  *  Wrapper function for sock_read
  */
 
@@ -335,6 +362,33 @@ int os_sock_read( OS_SOCKET s, char* buf, int len )
 	{
 		os_sock_errno = errno;
 		nlog( LOG_ERROR, "os_sock_read: failed for socket %d with error %s", s, strerror( errno ) );
+	}
+#endif
+	return ret;
+}
+
+/*
+ *  Wrapper function for recvfrom
+ */
+
+int os_sock_recvfrom( SOCKET s, char* buf, int len, int flags, struct sockaddr* from, int* fromlen )
+{
+	int ret;
+
+	/* reset local errno implementation */
+	os_sock_errno = 0;
+	ret = recvfrom( s, buf, len, flags, from, fromlen );
+#ifdef WIN32
+	if( ret == SOCKET_ERROR )
+	{
+		os_sock_errno = WSAGetLastError();
+		nlog( LOG_ERROR, "os_sock_recvfrom: failed for socket %d with error %d %s", s, os_sock_errno, WinSockErrToString( os_sock_errno ) );
+	}
+#else
+	if( ret < 0 )
+	{
+		os_sock_errno = errno;
+		nlog( LOG_ERROR, "os_sock_recvfrom: failed for socket %d with error %s", s, strerror( errno ) );
 	}
 #endif
 	return ret;
@@ -394,6 +448,7 @@ int os_sock_connect( OS_SOCKET s, const struct sockaddr* name, int namelen )
 		switch( os_sock_errno )
 		{
 			case WSAEWOULDBLOCK:
+			case WSAEINPROGRESS:
 				return 0;
 		}
 		nlog( LOG_ERROR, "os_sock_connect: %s failed for socket %d with error %d %s", GET_CUR_MODNAME(), s, os_sock_errno, WinSockErrToString( os_sock_errno ) );
