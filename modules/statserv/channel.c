@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2005 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -30,9 +30,6 @@
 #define CHANNEL_TABLE	"Channel"
 
 list_t *channelstatlist;
-
-void save_chan( channelstat *c );
-channelstat *load_chan( char *name );
 
 void AverageChannelStatistics( void )
 {
@@ -105,13 +102,68 @@ int toptopicrunningtotalchannel( const void *key1, const void *key2 )
 	return( chan2->topics.alltime.runningtotal - chan1->topics.alltime.runningtotal );
 }
 
+/* @brief load the info for a specific channel from the database 
+ * or return null a blank if it does not exist. 
+ * 
+ * @params name the channel name to load
+ * 
+ * @returns a channelstat struct that contains info for the channel. If its a new Channel, contains the name and thats it.
+ */
+ 
+static channelstat *LoadChannel( char *name ) 
+{
+	channelstat *cs;
+
+	SET_SEGV_LOCATION();
+	if( list_isfull( channelstatlist ) ) {
+		nlog( LOG_CRITICAL, "StatServ channel hash full" );
+		return NULL;
+	}
+	cs = ns_calloc( sizeof( channelstat ) );
+	if( DBAFetch( CHANNEL_TABLE, name, cs, sizeof( channelstat ) ) == NS_SUCCESS ) {
+		dlog( DEBUG2, "Loading channel %s", cs->name );
+		PostLoadStatistic( &cs->joins );
+		PostLoadStatistic( &cs->kicks );
+		PostLoadStatistic( &cs->topics );
+		PostLoadStatistic( &cs->users );
+		if( ( me.now - cs->ts_lastseen ) > StatServ.channeltime ) {
+			dlog( DEBUG1, "Reset old channel %s", cs->name );
+			cs->ts_lastseen = me.now;
+		}
+	} else {
+		dlog( DEBUG2, "Creating channel %s", cs->name );
+		strlcpy( cs->name, name, MAXCHANLEN );	
+	}
+	cs->lastsave = me.now;
+	lnode_create_append( channelstatlist, cs );
+	return cs;
+}
+
+/* @brief save the info for a specific channel to the database 
+ *  
+ * 
+ * @params cs the channelstat struct to save
+ * 
+ * @returns nothing
+ */
+ 
+static void SaveChannel( channelstat *cs ) 
+{
+	PreSaveStatistic( &cs->joins );
+	PreSaveStatistic( &cs->kicks );
+	PreSaveStatistic( &cs->topics );
+	PreSaveStatistic( &cs->users );
+	DBAStore( CHANNEL_TABLE, cs->name, ( void * )cs, sizeof( channelstat ) );
+	cs->lastsave = me.now;
+}
+
 static int AddChannel( Channel* c, void *v )
 {
 	channelstat *cs;
 
-	cs = load_chan( c->name );
+	cs = LoadChannel( c->name );
 	AddNetworkChannel();
-    SetChannelModValue( c,( void * )cs );
+    SetChannelModValue( c, ( void * )cs );
 	cs->c = c;
 	return NS_FALSE;
 }
@@ -135,7 +187,7 @@ int ss_event_delchan( CmdParams *cmdparams )
 		return NS_SUCCESS;
 	}
 	cs = lnode_get( ln );
-	save_chan( cs );
+	SaveChannel( cs );
 	list_delete( channelstatlist, ln );
 	lnode_destroy( ln );
 	ns_free( cs );
@@ -204,6 +256,7 @@ int ss_event_kick( CmdParams *cmdparams )
 static void top10membershandler( channelstat *cs, void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
+
 	irc_prefmsg( ss_bot,cmdparams->source, "Channel %s Members %d", 
 		cs->name, cs->c->users );
 }
@@ -211,6 +264,7 @@ static void top10membershandler( channelstat *cs, void *v )
 static void top10joinshandler( channelstat *cs, void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
+
 	irc_prefmsg( ss_bot, cmdparams->source, "Channel %s Joins %d", 
 		cs->name, cs->users.alltime.runningtotal );
 }
@@ -218,6 +272,7 @@ static void top10joinshandler( channelstat *cs, void *v )
 static void top10kickshandler( channelstat *cs, void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
+
 	irc_prefmsg( ss_bot, cmdparams->source, "Channel %s Kicks %d", 
 		cs->name, cs->kicks.alltime.runningtotal );
 }
@@ -225,6 +280,7 @@ static void top10kickshandler( channelstat *cs, void *v )
 static void top10topicshandler( channelstat *cs, void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
+
 	irc_prefmsg( ss_bot, cmdparams->source, "Channel %s Topics %d",
 		cs->name, cs->topics.alltime.runningtotal );
 }
@@ -234,28 +290,24 @@ int ss_cmd_channel( CmdParams *cmdparams )
 	channelstat *cs;
 
 	if( cmdparams->ac == 0 ) {
-		/* they want the top 10 Channels online atm */
 		irc_prefmsg( ss_bot, cmdparams->source, "Top 10 Online Channels:" );
-		irc_prefmsg( ss_bot, cmdparams->source, "======================" );
-		GetChannelStats( top10membershandler, CHANNEL_SORT_MEMBERS, 10,( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ),( void * )cmdparams );
+		irc_prefmsg( ss_bot, cmdparams->source, "=======================" );
+		GetChannelStats( top10membershandler, CHANNEL_SORT_MEMBERS, 10, ( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ), ( void * )cmdparams );
 		irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	} else if( !ircstrcasecmp( cmdparams->av[0], "POP" ) ) {
-		/* they want the top 10 Popular Channels( based on joins ) */
-		irc_prefmsg( ss_bot, cmdparams->source, "Top 10 Channels( Ever ):" );
-		irc_prefmsg( ss_bot, cmdparams->source, "======================" );
-		GetChannelStats( top10joinshandler, CHANNEL_SORT_JOINS, 10,( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ),( void * )cmdparams );
+		irc_prefmsg( ss_bot, cmdparams->source, "Top 10 Join Channels (Ever):" );
+		irc_prefmsg( ss_bot, cmdparams->source, "============================" );
+		GetChannelStats( top10joinshandler, CHANNEL_SORT_JOINS, 10, ( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ), ( void * )cmdparams );
 		irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	} else if( !ircstrcasecmp( cmdparams->av[0], "KICKS" ) ) {
-		/* they want the top 10 most unwelcome channels( based on kicks ) */
-		irc_prefmsg( ss_bot,cmdparams->source, "Top 10 Most un-welcome Channels( Ever ):" );
-		irc_prefmsg( ss_bot,cmdparams->source, "======================================" );
-		GetChannelStats( top10kickshandler, CHANNEL_SORT_KICKS, 10,( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ),( void * )cmdparams );
+		irc_prefmsg( ss_bot,cmdparams->source, "Top 10 Kick Channels (Ever):" );
+		irc_prefmsg( ss_bot,cmdparams->source, "============================" );
+		GetChannelStats( top10kickshandler, CHANNEL_SORT_KICKS, 10, ( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ), ( void * )cmdparams );
 		irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	} else if( !ircstrcasecmp( cmdparams->av[0], "TOPICS" ) ) {
-		/* they want the top 10 most undecisive channels( based on topics ) */
-		irc_prefmsg( ss_bot, cmdparams->source, "Top 10 Most undecisive Channels( Ever ):" );
-		irc_prefmsg( ss_bot, cmdparams->source, "======================================" );
-		GetChannelStats( top10topicshandler, CHANNEL_SORT_TOPICS, 10,( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ),( void * )cmdparams );
+		irc_prefmsg( ss_bot, cmdparams->source, "Top 10 Topic Channels (Ever):" );
+		irc_prefmsg( ss_bot, cmdparams->source, "=============================" );
+		GetChannelStats( top10topicshandler, CHANNEL_SORT_TOPICS, 10, ( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ), ( void * )cmdparams );
 		irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	} else {
 		cs = findchanstats( cmdparams->av[0] );
@@ -264,23 +316,23 @@ int ss_cmd_channel( CmdParams *cmdparams )
 				"No statistics for %s", cmdparams->av[0] );
 			return NS_SUCCESS;
 		}
-		irc_prefmsg( ss_bot, cmdparams->source, "\2Channel Information for %s (%s)\2", 
-			cmdparams->av[0],( FindChannel( cmdparams->av[0] ) ? "Online" : "Offline" ) );
-		irc_prefmsg( ss_bot, cmdparams->source, "Current Members: %d( Max %d on %s )",
+		irc_prefmsg( ss_bot, cmdparams->source, "\2Channel statistics for %s (%s)\2", 
+			cmdparams->av[0], cs->c ? "Online" : "Offline" );
+		irc_prefmsg( ss_bot, cmdparams->source, "Current Members: %d (Max %d on %s)",
 			cs->c->users, cs->users.alltime.max, sftime( cs->users.alltime.ts_max ) );
 		irc_prefmsg( ss_bot,cmdparams->source, "Max Members today: %d at %s", 
 			cs->users.daily.max, sftime( cs->users.daily.ts_max ) );
-		irc_prefmsg( ss_bot,cmdparams->source, "Total Number of Channel Joins: %d", 
+		irc_prefmsg( ss_bot,cmdparams->source, "Total Channel Joins: %d", 
 			cs->users.alltime.runningtotal );
-		irc_prefmsg( ss_bot, cmdparams->source, "Total Member Joins today: %d( Max %d on %s )",
+		irc_prefmsg( ss_bot, cmdparams->source, "Total Joins today: %d (Max %d on %s)",
 			cs->joins.daily.runningtotal, cs->joins.alltime.max, sftime( cs->joins.alltime.ts_max ) );
-		irc_prefmsg( ss_bot,cmdparams->source, "Total Topic Changes %d( Today %d )", 
+		irc_prefmsg( ss_bot,cmdparams->source, "Total Topic Changes %d (Today %d)", 
 			cs->topics, cs->topics.daily.runningtotal );
 		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks: %d", cs->kicks );
-		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks today %d( Max %d on %s )",
+		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks today %d (Max %d on %s)",
 			cs->kicks.daily.max, cs->kicks.alltime.max, sftime( cs->kicks.alltime.ts_max ) );
-		if( !FindChannel( cmdparams->av[0] ) )
-			irc_prefmsg( ss_bot, cmdparams->source, "Channel was last seen at %s",
+		if( !cs->c )
+			irc_prefmsg( ss_bot, cmdparams->source, "Channel last seen at %s",
 				sftime( cs->ts_lastseen ) );
 	}
 	return NS_SUCCESS;
@@ -288,87 +340,31 @@ int ss_cmd_channel( CmdParams *cmdparams )
 
 void SaveChanStats( void )
 {
-	channelstat *c;
+	channelstat *cs;
 	lnode_t *cn;
 	int limit;
     int count = 0;
 
 	/* we want to only do 25% each progressive save */
-	limit = ( list_count( channelstatlist )/4 );
+	limit = ( list_count( channelstatlist ) /4 );
 	cn = list_first( channelstatlist );
 	while( cn ) {
-		c = lnode_get( cn );
+		cs = lnode_get( cn );
 		/* we are not shutting down, so do progressive save if we have more than 100 channels */
-		if( StatServ.shutdown == 0 &&( limit > 25 ) ) {
+		if( StatServ.shutdown == 0 && ( limit > 25 ) ) {
 			if( count > limit ) {
 				break;
 			}
 			/* calc is we save the entire database in the savedb interval plus 1/2 */
-			if( ( me.now - c->lastsave ) < PROGCHANTIME ) {
+			if( ( me.now - cs->lastsave ) < PROGCHANTIME ) {
 				cn = list_next( channelstatlist, cn );
 				continue;
 			}
 			count++;
 		}
-		save_chan( c );
+		SaveChannel( cs );
 		cn = list_next( channelstatlist, cn );
 	}
-}
-
-/* @brief load the info for a specific channel from the database 
- * or return null a blank if it does not exist. 
- * 
- * @params name the channel name to load
- * 
- * @returns a channelstat struct that contains info for the channel. If its a new Channel, contains the name and thats it.
- */
- 
-channelstat *load_chan( char *name ) 
-{
-	channelstat *c;
-
-	SET_SEGV_LOCATION();
-	if( list_isfull( channelstatlist ) ) {
-		nlog( LOG_CRITICAL, "StatServ channel hash full" );
-		return NULL;
-	}
-	c = ns_calloc( sizeof( channelstat ) );
-	if( DBAFetch( CHANNEL_TABLE, name, c,( sizeof( channelstat ) ) ) == NS_SUCCESS ) {
-		PostLoadStatistic( &c->joins );
-		PostLoadStatistic( &c->kicks );
-		PostLoadStatistic( &c->topics );
-		PostLoadStatistic( &c->users );
-		dlog( DEBUG2, "Loading channel %s", c->name );
-	} else {
-		dlog( DEBUG2, "Creating channel %s", c->name );
-		strlcpy( c->name, name, MAXCHANLEN );	
-	}
-	c->lastsave = me.now;
-	if( ( me.now - c->ts_lastseen ) > StatServ.channeltime ) {
-		dlog( DEBUG1, "Reset old channel %s", c->name );
-		c->ts_lastseen = me.now;
-		c->lastsave = me.now;
-	}
-	lnode_create_append( channelstatlist, c );
-	return c;
-}
-
-/* @brief save the info for a specific channel to the database 
- *  
- * 
- * @params c the channelstat struct to save
- * 
- * @returns nothing
- */
- 
-void save_chan( channelstat *c ) 
-{
-	PreSaveStatistic( &c->joins );
-	PreSaveStatistic( &c->kicks );
-	PreSaveStatistic( &c->topics );
-	PreSaveStatistic( &c->users );
-	DBAStore( CHANNEL_TABLE, c->name, ( void * )c, sizeof( channelstat ) );
-	c->lastsave = me.now;
 }
 
 /* @brief run through database deleting old channels 
@@ -384,7 +380,7 @@ static int del_chan( void *data )
 	channelstat *cs;
 	
 	cs = ( channelstat * )data;
-	if( ( ( me.now - cs->ts_lastseen ) > StatServ.channeltime ) && ( !FindChannel( cs->name ) ) ) {
+	if( ( ( me.now - cs->ts_lastseen ) > StatServ.channeltime ) && ( !cs->c ) ) {
 		dlog( DEBUG1, "Deleting Channel %s", cs->name );
 		DBADelete( CHANNEL_TABLE, cs->name );
 		/* Delete only one channel per loop */
@@ -400,7 +396,7 @@ int DelOldChan( void )
 	start = time( NULL );
 	dlog( DEBUG1, "Deleting old channels" );
 	DBAFetchRows( CHANNEL_TABLE, del_chan );
-	dlog( DEBUG1, "DelOldChan: %d seconds",( int )( time( NULL ) - start ) );
+	dlog( DEBUG1, "DelOldChan: %d seconds", ( int )( time( NULL ) - start ) );
 	return NS_SUCCESS;
 }
 
@@ -427,7 +423,7 @@ void FiniChannelStats( void )
 	list_destroy( channelstatlist );
 }
 
-void GetChannelStats( ChannelStatHandler handler, channelsort sortstyle, int maxcount, int ignorehidden, void *v )
+void GetChannelStats( ChannelStatHandler handler, CHANNEL_SORT sortstyle, int maxcount, int ignorehidden, void *v )
 {
 	int i = 0;
 	lnode_t *ln;
@@ -435,24 +431,20 @@ void GetChannelStats( ChannelStatHandler handler, channelsort sortstyle, int max
 
 	switch( sortstyle ) {
 		case CHANNEL_SORT_MEMBERS:
-			if( !list_is_sorted( channelstatlist, topcurrentchannel ) ) {
+			if( !list_is_sorted( channelstatlist, topcurrentchannel ) )
 				list_sort( channelstatlist, topcurrentchannel );
-			}
 			break;
 		case CHANNEL_SORT_JOINS:
-			if( !list_is_sorted( channelstatlist, topjoinrunningtotalchannel ) ) {
+			if( !list_is_sorted( channelstatlist, topjoinrunningtotalchannel ) )
 				list_sort( channelstatlist, topjoinrunningtotalchannel );
-			}
 			break;
 		case CHANNEL_SORT_KICKS:
-			if( !list_is_sorted( channelstatlist, topkickrunningtotalchannel ) ) {
+			if( !list_is_sorted( channelstatlist, topkickrunningtotalchannel ) )
 				list_sort( channelstatlist, topkickrunningtotalchannel );
-			}
 			break;
 		case CHANNEL_SORT_TOPICS:
-			if( !list_is_sorted( channelstatlist, toptopicrunningtotalchannel ) ) {
+			if( !list_is_sorted( channelstatlist, toptopicrunningtotalchannel ) )
 				list_sort( channelstatlist, toptopicrunningtotalchannel );
-			}
 			break;
 		default:
 			break;

@@ -1,6 +1,6 @@
 ************************************************************************
 ** NeoStats - IRC Statistical Services                                **
-** Copyright (c) 1999-2004 NeoStats Group. All Rights Reserved.       **
+** Copyright (c) 1999-2005 NeoStats Group. All Rights Reserved.       **
 ** This program and all associated documentation is free but          **
 ** copyrighted software; see the file COPYING for details.            **
 ** Homepage: http://www.neostats.net/                                 **

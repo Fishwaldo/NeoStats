@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2005 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -259,7 +259,7 @@ char *LANGgettext( const char *string, int mylang );
 #define UMODE_RGSTRONLY		0x00040000	/* only registered nicks may PM */
 
 /* Other user modes available on IRCds cannot be easily supported so 
- * should be defined locally beginning at 0x00000080
+ * should be defined locally beginning at 0x00080000
  */
 
 /* Smodes */
