@@ -25,6 +25,11 @@
 #ifndef IRCU_H
 #define IRCU_H
 
+/* we support server names as base 64 numerics */
+#define BASE64SERVERNAME
+/* we support nick names as base 64 numerics */
+#define BASE64NICKNAME
+
 /* Feature support for use by modules to determine whether
  * certain functionality is available
  */

@@ -627,6 +627,8 @@ splitbuf (char *buf, char ***argv, int colon_special)
 	return argc;
 }
 
+/* :<source> <command> <param1> <paramN> :<last parameter> */
+/* <source> <command> <param1> <paramN> :<last parameter> */
 void
 parse (char *line)
 {

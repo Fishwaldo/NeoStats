@@ -25,6 +25,11 @@
 #ifndef HYBRID7_H
 #define HYBRID7_H
 
+/* we don't support server names as base 64 numerics */
+#undef BASE64SERVERNAME
+/* we don't support nick names as base 64 numerics */
+#undef BASE64NICKNAME
+
 /* Feature support for use by modules to determine whether
  * certain functionality is available
  */
