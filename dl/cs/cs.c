@@ -34,7 +34,7 @@
 /* Uncomment this line to disable colours in ConnectServ 
    channel messages
 */
-/*#define DISABLE_COLOUR_SUPPORT */
+/* #define DISABLE_COLOUR_SUPPORT */
 
 #ifdef DISABLE_COLOUR_SUPPORT
 char msg_nickchange[]="\2NICK\2 %s (%s@%s) Changed their nick to %s";
