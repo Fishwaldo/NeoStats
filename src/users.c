@@ -327,7 +327,7 @@ int UserNickChange (const char * oldnick, const char *newnick, const char * ts)
 	u = (Client *) hnode_get (un);
 	cm = list_first (u->user->chans);
 	while (cm) {
-		ChannelNickChange (find_chan (lnode_get (cm)), (char *) newnick, u->name);
+		ChannelNickChange (find_channel (lnode_get (cm)), (char *) newnick, u->name);
 		cm = list_next (u->user->chans, cm);
 	}
 	SET_SEGV_LOCATION();

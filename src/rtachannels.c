@@ -36,12 +36,12 @@ void *display_chanusers (void *tbl, char *col, char *sql, void *row)
  	ChannelMember *cm;
 	
 	chanusers[0] = '\0';
-	cmn = list_first (c->ChannelMemberbers);
+	cmn = list_first (c->members);
 	while (cmn) {
 		cm = lnode_get (cmn);
 		ircsnprintf(final, BUFSIZE*2, "%s %s%s,", CmodeMaskToString (cm->flags), CmodeMaskToPrefixString (cm->flags), cm->nick);
 		strlcat(chanusers, final, BUFSIZE*10);
-		cmn = list_next (c->ChannelMemberbers, cmn);
+		cmn = list_next (c->members, cmn);
 	}
 	return chanusers;
 }
@@ -107,7 +107,7 @@ COLDEF neo_chanscols[] = {
 		"users",
 		RTA_STR,
 		BUFSIZE*10,
-		offsetof(struct Channel, ChannelMemberbers),
+		offsetof(struct Channel, members),
 		RTA_READONLY,
 		display_chanusers,
 		NULL,

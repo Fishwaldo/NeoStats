@@ -169,7 +169,7 @@ static int process_target_user (CmdParams *cmdparams, const char *target)
 
 static int process_target_chan (CmdParams *cmdparams, const char *target)
 {
-	cmdparams->channel = find_chan(target);
+	cmdparams->channel = find_channel(target);
 	if (cmdparams->channel) {
 		return NS_TRUE;
 	}

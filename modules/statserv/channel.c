@@ -283,7 +283,7 @@ int ss_cmd_channel (CmdParams *cmdparams)
 			return NS_SUCCESS;
 		}
 		irc_prefmsg(ss_bot, cmdparams->source, "\2Channel Information for %s (%s)\2", 
-			cmdparams->av[0], (find_chan(cmdparams->av[0]) ? "Online" : "Offline"));
+			cmdparams->av[0], (find_channel(cmdparams->av[0]) ? "Online" : "Offline"));
 		irc_prefmsg(ss_bot, cmdparams->source, "Current Members: %ld (Max %ld on %s)",
 			cs->c->users, cs->users.alltime.max, sftime(cs->users.alltime.ts_max));
 		irc_prefmsg(ss_bot,cmdparams->source, "Max Members today: %ld at %s", 
@@ -297,7 +297,7 @@ int ss_cmd_channel (CmdParams *cmdparams)
 		irc_prefmsg(ss_bot, cmdparams->source, "Total Kicks: %ld", cs->kicks);
 		irc_prefmsg(ss_bot, cmdparams->source, "Total Kicks today %ld (Max %ld on %s)",
 			cs->kicks.daily.max, cs->kicks.alltime.max, sftime(cs->kicks.alltime.ts_max));
-		if (!find_chan(cmdparams->av[0]))
+		if (!find_channel(cmdparams->av[0]))
 			irc_prefmsg(ss_bot, cmdparams->source, "Channel was last seen at %s",
 				sftime(cs->ts_lastseen));
 	}
@@ -427,9 +427,9 @@ int DelOldChan(void)
 		for (count = 0; row[count] != NULL; count++) {
 			if (GetData ((void *)&ts_lastseen, CFGINT, CHANNEL_TABLE, row[count], "ts_lastseen") > 0) {
 				/* delete it if its old and not online 
-				 * use find_chan, instead of findchanstats, and find_chan is based on hashes, so its faster 
+				 * use find_channel, instead of findchanstats, and find_channel is based on hashes, so its faster 
 				 */
-				if (((me.now - ts_lastseen) > 604800) && (!find_chan(row[count]))) {
+				if (((me.now - ts_lastseen) > 604800) && (!find_channel(row[count]))) {
 					dlog (DEBUG1, "Deleting Channel %s", row[count]);
 					DelRow(CHANNEL_TABLE, row[count]);
 				}

@@ -103,7 +103,7 @@ void ChannelTopic (const char* chan, const char *owner, const char* ts, const ch
 	CmdParams *cmdparams;
 	Channel *c;
 
-	c = find_chan (chan);
+	c = find_channel (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "ChannelTopic: can't find channel %s", chan);
 		return;
@@ -143,7 +143,7 @@ static Channel *new_chan (const char *chan)
 	c = ns_calloc (sizeof (Channel));
 	strlcpy (c->name, chan, MAXCHANLEN);
 	hnode_create_insert (channelhash, c, c->name);
-	c->ChannelMemberbers = list_create (CHANNEL_MEM_SIZE);
+	c->members = list_create (CHANNEL_MEM_SIZE);
 	c->modeparms = list_create (CHANNEL_MAXMODES);
 	c->creationtime = me.now;
 	/* XXX TODO: Set the channel language */
@@ -186,7 +186,7 @@ del_chan (Channel *c)
 	SendAllModuleEvent (EVENT_DELCHAN, cmdparams);
 	ns_free (cmdparams);
 	list_destroy_auto (c->modeparms);
-	list_destroy (c->ChannelMemberbers);
+	list_destroy (c->members);
 	hash_delete (channelhash, cn);
 	hnode_destroy (cn);
 	ns_free (c);
@@ -211,7 +211,7 @@ void del_chan_user (Channel *c, Client *u)
 	} else {
 		lnode_destroy (list_delete (u->user->chans, un));
 	}
-	dlog (DEBUG3, "del_chan_user: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->ChannelMemberbers));
+	dlog (DEBUG3, "del_chan_user: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->members));
 	if (c->users <= 0) {
 		del_chan (c);
 	} else if (c->neousers > 0 && c->neousers == c->users) {
@@ -229,13 +229,13 @@ int del_ChannelMemberber (Channel *c, Client *user)
 	ChannelMember *cm;
 	lnode_t *un;
 	
-	un = list_find (c->ChannelMemberbers, user->name, comparef);
+	un = list_find (c->members, user->name, comparef);
 	if (!un) {
 		nlog (LOG_WARNING, "%s isn't a member of channel %s", user->name, c->name);
 		return NS_FAILURE;
 	}
 	cm = lnode_get (un);
-	lnode_destroy (list_delete (c->ChannelMemberbers, un));
+	lnode_destroy (list_delete (c->members, un));
 	ns_free (cm);
 	return NS_SUCCESS;
 }
@@ -264,7 +264,7 @@ KickChannel (const char *kickby, const char *chan, const char *kicked, const cha
 		nlog (LOG_WARNING, "KickChannel: user %s not found", kicked);
 		return;
 	}
-	c = find_chan (chan);
+	c = find_channel (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "KickChannel: channel %s not found", chan);
 		return;
@@ -316,7 +316,7 @@ void PartChannel (Client * u, const char *chan, const char *reason)
 		nlog (LOG_WARNING, "PartChannel: trying to part NULL user from %s", chan);
 		return;
 	}
-	c = find_chan (chan);
+	c = find_channel (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "PartChannel: channel %s not found", chan);
 		return;
@@ -356,7 +356,7 @@ ChannelNickChange (Channel *c, const char *newnick, const char *oldnick)
 	ChannelMember *cml;
 
 	SET_SEGV_LOCATION();
-	cml = lnode_find (c->ChannelMemberbers, oldnick, comparef);
+	cml = lnode_find (c->members, oldnick, comparef);
 	if (!cml) {
 		nlog (LOG_WARNING, "ChannelNickChange: %s isn't a member of %s", oldnick, c->name);
 		return;
@@ -397,18 +397,18 @@ JoinChannel (const char* nick, const char *chan)
 		PartAllChannels (u, NULL);
 		return;
 	}
-	c = find_chan (chan);
+	c = find_channel (chan);
 	if (!c) {
 		/* its a new Channel */
 		dlog (DEBUG2, "JoinChannel: new channel %s", chan);
 		c = new_chan (chan);
 	}
 	/* add this users details to the channel members hash */
-	if (list_find (c->ChannelMemberbers, u->name, comparef)) {
+	if (list_find (c->members, u->name, comparef)) {
 		nlog (LOG_WARNING, "JoinChannel: tried to add %s to channel %s but they are already a member", u->name, chan);
 		return;
 	}
-	if (list_isfull (c->ChannelMemberbers)) {
+	if (list_isfull (c->members)) {
 		nlog (LOG_CRITICAL, "JoinChannel: channel %s member list is full", c->name);
 		return;
 	}
@@ -417,7 +417,7 @@ JoinChannel (const char* nick, const char *chan)
 	strlcpy (cm->nick, u->name, MAXNICK);
 	cm->tsjoin = me.now;
 	cm->flags = 0;
-	lnode_create_append (c->ChannelMemberbers, cm);
+	lnode_create_append (c->members, cm);
 	c->users++;
 	if (list_isfull (u->user->chans)) {
 		nlog (LOG_CRITICAL, "JoinChannel: user %s member list is full", u->name);
@@ -433,7 +433,7 @@ JoinChannel (const char* nick, const char *chan)
 	}
 	SendAllModuleEvent (EVENT_JOIN, cmdparams);
 	ns_free (cmdparams);
-	dlog (DEBUG3, "JoinChannel: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->ChannelMemberbers));
+	dlog (DEBUG3, "JoinChannel: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->members));
 }
 
 /** @brief Dump Channel information
@@ -451,12 +451,12 @@ static void ListChannelMembers (CmdParams* cmdparams, Channel *c)
  	ChannelMember *cm;
 	lnode_t *cmn;
 
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Members:    %d (List %d)", cmdparams->source), c->users, (int)list_count (c->ChannelMemberbers));
-	cmn = list_first (c->ChannelMemberbers);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Members:    %d (List %d)", cmdparams->source), c->users, (int)list_count (c->members));
+	cmn = list_first (c->members);
 	while (cmn) {
 		cm = lnode_get (cmn);
 		irc_prefmsg (ns_botptr, cmdparams->source, __("            %s Modes %s Joined: %ld", cmdparams->source), cm->nick, CmodeMaskToString (cm->flags), (long)cm->tsjoin);
-		cmn = list_next (c->ChannelMemberbers, cmn);
+		cmn = list_next (c->members, cmn);
 	}
 }
 
@@ -492,7 +492,7 @@ void ListChannels (CmdParams* cmdparams, const char *chan)
 			ListChannel (cmdparams, c);
 		}
 	} else {
-		c = find_chan (chan);
+		c = find_channel (chan);
 		if (c) {
 			ListChannel (cmdparams, c);
 		} else {
@@ -501,7 +501,7 @@ void ListChannels (CmdParams* cmdparams, const char *chan)
 	}
 }
 
-/** @brief find_chan
+/** @brief find_channel
  *
  *  Finds the channel structure for the channel named chan
  *
@@ -510,13 +510,13 @@ void ListChannels (CmdParams* cmdparams, const char *chan)
  *  @returns channel structure for chan, or NULL if it can't be found.
 */
 
-Channel *find_chan (const char *chan)
+Channel *find_channel (const char *chan)
 {
 	Channel *c;
 
 	c = (Channel *)hnode_find (channelhash, chan);
 	if (!c) {
-		dlog (DEBUG3, "find_chan: %s not found", chan);
+		dlog (DEBUG3, "find_channel: %s not found", chan);
 	}
 	return c;
 }
@@ -536,7 +536,7 @@ int IsChannelMember (Channel *c, Client *u)
 	if (!u || !c) {
 		return NS_FALSE;
 	}
-	if (list_find (c->ChannelMemberbers, u->name, comparef)) {
+	if (list_find (c->members, u->name, comparef)) {
 		return NS_TRUE;
 	}
 	return NS_FALSE;
@@ -559,11 +559,11 @@ int test_cumode (char* chan, char* nick, int flag)
  	ChannelMember *cm;
 
 	u = find_user(nick);
-	c = find_chan(chan);
+	c = find_channel(chan);
 	if (!u || !c) {
 		return NS_FALSE;
 	}
-	cm = lnode_find (c->ChannelMemberbers, nick, comparef);
+	cm = lnode_find (c->members, nick, comparef);
 	if (cm) {
 		if (cm->flags & flag) {
 			return NS_TRUE;

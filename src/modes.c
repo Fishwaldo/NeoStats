@@ -579,7 +579,7 @@ int ChanMode (char *origin, char **av, int ac)
 	CmdParams * cmdparams;
 	int i, j = 2;
 
-	c = find_chan (av[0]);
+	c = find_channel (av[0]);
 	if (!c) {
 		return 0;
 	}	
@@ -620,12 +620,12 @@ ChanUserMode (const char *chan, const char *nick, int add, const unsigned int ma
 		nlog (LOG_WARNING, "ChanUserMode: can't find user %s", nick);
 		return;
 	}
-	c = find_chan(chan);
+	c = find_channel(chan);
 	if (!c) {
 		nlog (LOG_WARNING, "ChanUserMode: can't find channel %s", chan);
 		return;
 	}
-	cm = lnode_find (c->ChannelMemberbers, u->name, comparef);
+	cm = lnode_find (c->members, u->name, comparef);
 	if (!cm) {
 		nlog (LOG_WARNING, "ChanUserMode: %s is not a member of channel %s", u->name, c->name);
 		return;

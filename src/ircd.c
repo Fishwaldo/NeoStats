@@ -962,7 +962,7 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
 	time_t ts;
 	Channel *c;
 
-	c = find_chan (chan);
+	c = find_channel (chan);
 	ts = (!c) ? me.now : c->creationtime;
 	/* Use sjoin if available */
 	if ((ircd_srv.protocol & PROTOCOL_SJOIN) && irc_send_sjoin) {
@@ -1004,7 +1004,7 @@ irc_part (const Bot *botptr, const char *chan)
 		unsupported_cmd ("PART");
 		return NS_FAILURE;
 	}
-	c = find_chan (chan);
+	c = find_channel (chan);
 	/* Decrement number of persistent users if needed 
 	 * Must be BEFORE we part the channel in order to trigger
 	 * empty channel processing for other bots
@@ -1174,13 +1174,13 @@ irc_kick (const Bot *botptr, const char *chan, const char *target, const char *r
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int 
-irc_invite (const Bot *botptr, const char *to, const char *chan) 
+irc_invite (const Bot *botptr, const Client *target, const char *chan) 
 {
 	if (!irc_send_invite) {
 		unsupported_cmd ("INVITE");
 		return NS_FAILURE;
 	}
-	irc_send_invite (botptr->u->name, to, chan);
+	irc_send_invite (botptr->u->name, target->name, chan);
 	return NS_SUCCESS;
 }
 
@@ -1266,7 +1266,7 @@ irc_svsjoin (const Bot *botptr, Client *target, const char *chan)
 {
 	if (!irc_send_svsjoin) {
 		unsupported_cmd ("SVSJOIN");
-		return NS_FAILURE;
+		return irc_invite (botptr, target, chan);
 	}
 	irc_send_svsjoin (me.name, target->name, chan);
 	return NS_SUCCESS;
@@ -1705,7 +1705,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		paramidx++;
 		ok = 1;
 	}
-	c = find_chan (channame);
+	c = find_channel (channame);
 	if (c) {
 		/* update the TS time */
 		c->creationtime = atoi (tstime);

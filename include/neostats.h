@@ -430,9 +430,7 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 #define CLIENT_FLAG_SYNCHED		0x00000004 /* client is synched */
 #define CLIENT_FLAG_SETHOST		0x00000008 /* client is synched */
 
-#if 0
 #define NS_FLAGS_NETJOIN	0x00000008 /* client is on a net join */
-#endif
 
 /* Specific errors beyond SUCCESS/FAILURE so that functions can handle errors 
  * Treat as unsigned with top bit set to give us a clear distinction from 
@@ -627,7 +625,7 @@ typedef struct Channel {
 	unsigned int persistentusers;
 	int lang;
 	unsigned int modes;
-	list_t *ChannelMemberbers;
+	list_t *members;
 	char topic[BUFSIZE];
 	char topicowner[MAXHOST];	/* because a "server" can be a topic owner */
 	time_t topictime;
@@ -1088,7 +1086,7 @@ EXPORTFUNC int irc_quit (const Bot *botptr, const char *quitmsg);
 EXPORTFUNC int irc_join (const Bot *botptr, const char *chan, const char *chanmodes);
 EXPORTFUNC int irc_part (const Bot *botptr, const char *chan);
 EXPORTFUNC int irc_kick (const Bot *botptr, const char *chan, const char *target, const char *reason);
-EXPORTFUNC int irc_invite (const Bot *botptr, const char *target, const char *chan);
+EXPORTFUNC int irc_invite (const Bot *botptr, const Client *target, const char *chan);
 EXPORTFUNC int irc_cloakhost (const Bot *botptr);
 EXPORTFUNC int irc_setname (const Bot *botptr, const char *realname);
 
@@ -1140,7 +1138,7 @@ EXPORTFUNC int UserLevel (Client *u);
 EXPORTFUNC Client *find_server (const char *name);
 
 /* chans.c */
-EXPORTFUNC Channel *find_chan (const char *chan);
+EXPORTFUNC Channel *find_channel (const char *chan);
 EXPORTFUNC int CheckChanMode (Channel *c, const unsigned int mode);
 EXPORTFUNC int IsChannelMember (Channel *c, Client *u);
 EXPORTFUNC int test_cumode (char *chan, char *nick, int flag);
