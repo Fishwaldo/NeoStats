@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.26 2002/12/13 10:50:09 fishwaldo Exp $
+** $Id: stats.c,v 1.27 2002/12/18 14:17:30 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -146,15 +146,12 @@ void DelOldChan() {
 		c = lnode_get(cn);
 		if ((time(NULL) - c->lastseen) < 604800) {
 			if (!findchan(c->name)) {
-#ifdef DEBUG
-				log("Deleting Old Channel %s", c->name);
-#endif
+				log("StatServ: Deleting Old Channel %s", c->name);
 				cn1 = cn;
 				cn = list_next(Chead, cn);
 				list_delete(Chead, cn1);
-				lnode_destroy(cn1);
+        			lnode_destroy(cn1);
 				free(c);
-				break;
 			}
 		}
 		cn = list_next(Chead, cn);
