@@ -461,5 +461,3 @@ tools/misc.c -text
 tools/sqlphp/README -text
 tools/sqlphp/rta_tables.php -text
 tools/sqlphp/rta_view.php -text
-win32/README -text
-win32/nswin32.sln -text
