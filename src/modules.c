@@ -29,6 +29,9 @@
 #include "modules.h"
 #include "bots.h"
 #include "dns.h"
+#ifdef SQLSRV
+#include "sqlsrv/rta.h"
+#endif
 
 /** @brief Module list
  * 
