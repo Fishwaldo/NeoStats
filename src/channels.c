@@ -447,7 +447,7 @@ dumpchanmembers (CmdParams* cmdparams, Channel* c)
  	Chanmem *cm;
 	lnode_t *cmn;
 
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Members:    %ld (List %d)", cmdparams->source), c->users, (int)list_count (c->chanmembers));
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Members:    %d (List %d)", cmdparams->source), c->users, (int)list_count (c->chanmembers));
 	cmn = list_first (c->chanmembers);
 	while (cmn) {
 		cm = lnode_get (cmn);

@@ -373,13 +373,13 @@ ns_status (CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	irc_prefmsg (ns_botptr, cmdparams->source, __("%s status:", cmdparams->source), ns_botptr->name);
 	if (uptime > 86400) {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%d\2 day%s, \2%02d:%02d\2", cmdparams->source), ns_botptr->name, uptime / 86400, (uptime / 86400 == 1) ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60);
+		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%ld\2 day%s, \2%02ld:%02ld\2", cmdparams->source), ns_botptr->name, uptime / 86400, (uptime / 86400 == 1) ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60);
 	} else if (uptime > 3600) {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%d hour%s, %d minute%s\2", cmdparams->source), ns_botptr->name, uptime / 3600, uptime / 3600 == 1 ? "" : "s", (uptime / 60) % 60, (uptime / 60) % 60 == 1 ? "" : "s");
+		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%ld hour%s, %ld minute%s\2", cmdparams->source), ns_botptr->name, uptime / 3600, uptime / 3600 == 1 ? "" : "s", (uptime / 60) % 60, (uptime / 60) % 60 == 1 ? "" : "s");
 	} else if (uptime > 60) {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%d minute%s, %d second%s\2", cmdparams->source), ns_botptr->name, uptime / 60, uptime / 60 == 1 ? "" : "s", uptime % 60, uptime % 60 == 1 ? "" : "s");
+		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%ld minute%s, %ld second%s\2", cmdparams->source), ns_botptr->name, uptime / 60, uptime / 60 == 1 ? "" : "s", uptime % 60, uptime % 60 == 1 ? "" : "s");
 	} else {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%d second%s\2", cmdparams->source), ns_botptr->name, uptime, uptime == 1 ? "" : "s");
+		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%d second%s\2", cmdparams->source), ns_botptr->name, (init)uptime, uptime == 1 ? "" : "s");
 	}
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Sent %ld messages, %ld bytes", cmdparams->source), me.SendM, me.SendBytes);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Received %ld messages, %ld Bytes", cmdparams->source), me.RcveM, me.RcveBytes);

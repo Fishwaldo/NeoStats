@@ -605,7 +605,7 @@ do_stats (const char* nick, const char *what)
 	if (!ircstrcasecmp (what, "u")) {
 		/* server uptime - Shmad */
 		time_t uptime = me.now - me.t_start;
-		irc_numeric (RPL_STATSUPTIME, u->name, __("Statistical Server up %d days, %d:%02d:%02d", u), uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
+		irc_numeric (RPL_STATSUPTIME, u->name, __("Statistical Server up %ld days, %ld:%02ld:%02ld", u), uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 	} else if (!ircstrcasecmp (what, "c")) {
 		/* Connections */
 		irc_numeric (RPL_STATSNLINE, u->name, "N *@%s * * %d 50", me.uplink, me.port);
