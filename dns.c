@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dns.c,v 1.8 2002/12/26 14:15:07 fishwaldo Exp $
+** $Id: dns.c,v 1.9 2002/12/26 15:15:04 fishwaldo Exp $
 */
 
 
@@ -34,15 +34,25 @@
 #include "stats.h"
 #include <adns.h>
 
+
+
+/** @brief DNS lookup Struct
+ * structure containing all pending DNS lookups and the callback functions 
+ */
 struct dnslookup_struct {
-	adns_query q;
-	adns_answer *a;
-	char data[255];
-	void (*callback)(char *data, adns_answer *a);
+	adns_query q;	/**< the ADNS query */
+	adns_answer *a; /**< the ADNS result if we have completed */
+	char data[255]; /**< the User data based to the callback */
+	void (*callback)(char *data, adns_answer *a); /**< a function pointer to call when we have a result */
 };
 
+/** @brief DNS structures
+  */
 typedef struct dnslookup_struct DnsLookup;
 
+/** @brief List of DNS queryies
+ *  Contains DnsLookup entries 
+ */
 list_t *dnslist;
 
 
@@ -104,14 +114,11 @@ int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_a
 }
 
 
-/* init_dns
-** inputs	- Nothing
-**
-** outputs 	- integer saying if the dns init was successfull (1 = yes, 0 = no)
-** 
-** side effects - Initilizes the dns lookup list_t
-**
-** use this function to initilize the dns functions
+/** @brief sets up DNS subsystem
+ *
+ * configures ADNS for use with NeoStats.
+ *
+ * @return returns 1 on success, 0 on failure
 */
 
 int init_dns() {
@@ -135,16 +142,13 @@ int init_dns() {
 
 }
 
-/* do_dns
-** inputs 	- Nothing
-** 
-** outputs 	- Nothing
-** 
-** side effects - Goes through the dnslist of pending queries and calls the callback function for each lookup
-** 		  with the adns_answer set. Always calls the callback function even if the lookup was unsuccessfull
-** 		  its upto the callback function to make check the answer struct to see if it failed or not
-** 
-** This function is called each loop. 
+/** @brief Checks for Completed DNS queries
+ *
+ *  Goes through the dnslist of pending queries and calls the callback function for each lookup
+ *  with the adns_answer set. Always calls the callback function even if the lookup was unsuccessfull
+*  its upto the callback function to make check the answer struct to see if it failed or not
+ *
+ * @return Nothing
 */
 
 void do_dns() {

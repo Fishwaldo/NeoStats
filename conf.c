@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.c,v 1.16 2002/10/20 16:44:33 shmad Exp $
+** $Id: conf.c,v 1.17 2002/12/26 15:15:04 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -44,16 +44,29 @@ static config_option options[] =
 { "NEOSTAT_HOST", ARG_STR, cb_Server, 7},
 { "NEOSTAT_USER", ARG_STR, cb_Server, 8},
 { "WANT_PRIVMSG", ARG_STR, cb_Server, 9},
-{ "SERVICES_CHAN", ARG_STR, cb_Server, 10},
 { "LOAD_MODULE", ARG_STR, cb_Module, 0},
 { "ONLY_OPERS", ARG_STR, cb_Server, 11},
 { "NO_LOAD", ARG_STR, cb_Server, 12}
 };
 
 
+/** @brief Initilize the configuration parser
+ *
+ * Currently does nothing
+ *
+ * @return Nothing
+ */
+
 void init_conf() {
-	if (usr_mds);
 }
+
+/** @brief strip newlines carriage returns
+ *
+ * removes newlines and carriage returns from a string
+ *
+ * @param line the line to strip (warning, Modfied!)
+ * @retval line the stripped line
+ */
 
 void strip(char *line)
 {
@@ -62,28 +75,45 @@ void strip(char *line)
 	if ((c = strchr(line, '\r')))	*c = '\0';
 }
 
+
+/** @brief Load the Config file
+ *
+ * Parses the Configuration File and optionally loads the external authentication libary
+ *
+ * @returns Nothing
+ */
+
+
 void ConfLoad() {
-/* Read in the Config File */
-printf("Reading the Config File. Please wait.....\n");
-if (!config_read("neostats.cfg", options) == 0 ) {
-	printf("***************************************************\n");
-	printf("*                  Error!                         *\n");
-	printf("*                                                 *\n");
-	printf("* Config File not found, or Unable to Open        *\n");
-	printf("* Please check its Location, and try again        *\n");
-	printf("*                                                 *\n");
-	printf("*             NeoStats NOT Started                *\n");
-	printf("***************************************************\n");
-	exit(0);
+	/* Read in the Config File */
+	printf("Reading the Config File. Please wait.....\n");
+	if (!config_read("neostats.cfg", options) == 0 ) {
+		printf("***************************************************\n");
+		printf("*                  Error!                         *\n");
+		printf("*                                                 *\n");
+		printf("* Config File not found, or Unable to Open        *\n");
+		printf("* Please check its Location, and try again        *\n");
+		printf("*                                                 *\n");
+		printf("*             NeoStats NOT Started                *\n");
+		printf("***************************************************\n");
+		exit(0);
+	}
+	printf("Sucessfully Loaded Config File, Now Booting NeoStats\n");
+	#ifdef EXTAUTH
+		load_module("extauth", NULL);
+	#endif
+	done_mods = 0;
 }
-printf("Sucessfully Loaded Config File, Now Booting NeoStats\n");
-#ifdef EXTAUTH
-	load_module("extauth", NULL);
-#endif
 
-done_mods = 0;
-}
 
+/** @brief prepare Modules defined in the config file
+ *
+ * When the config file encounters directives to Load Modules, it calls this function which prepares to load the modules (but doesn't actually load them)
+ *
+ * @param arg the module name in this case
+ * @param configtype a index of what config item is currently being processed. Ignored
+ * @returns Nothing
+ */
 
 void cb_Module(char *arg, int configtype) {
 	int i;
@@ -96,6 +126,14 @@ void cb_Module(char *arg, int configtype) {
 		load_mods[i] = sstrdup(arg);
 		log("Added Module %d :%s", i, load_mods[i]);
 }
+
+/** @brief Load the modules 
+ *
+ * Actually load the modules that were found in the config file
+ *
+ * @returns 1 on success, -1 when a module failed to load
+ * @bugs if a single module fails to load, it stops trying to load any other modules
+ */
 
 int init_modules() {
 	int i;
@@ -115,8 +153,18 @@ int init_modules() {
 			return -1;
 		}
 	}
-return 1;
+	return 1;
 }
+
+
+/** @brief Process config file items
+ *
+ * Processes the config file and sets up the variables. No Error Checking is performed :(
+ *
+ * @param arg the variable value as a string
+ * @param configtype the index of the variable being called now
+ * @returns Nothing
+ */
 void cb_Server(char *arg, int configtype) {
 
 		if (configtype == 0) {
@@ -157,6 +205,14 @@ void cb_Server(char *arg, int configtype) {
 		}
 
 }
+
+
+/** @brief Rehash Function
+ *
+ * Called when we recieve a rehash signal. Does nothing atm
+ *
+ * @returns Nothing
+ */
 
 void rehash()
 {

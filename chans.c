@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.36 2002/12/14 09:58:37 fishwaldo Exp $
+** $Id: chans.c,v 1.37 2002/12/26 15:15:04 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -28,15 +28,31 @@
 #include "dl.h"
 #include "hash.h"
 
+/** @brief initilize the channel data
+ *
+ * Initilizes the channel data and channel hash ch.
+ *
+ * @return Nothing
+*/
 
 
 void init_chan_hash()
 {
 	ch = hash_create(C_TABLE_SIZE, 0, 0);
-	if (usr_mds);	
-
 	
 }
+/** @brief Process a Topic Change
+ *
+ * Processes a Channel topic Change for particular channel and updates internals
+ * Also triggers off a TOPICCHANGE event for modules
+ *
+ * @param owner Char of who changed the topic. Can't be a userstruct as the user might not be online anymore
+ * @param c Channel Struct of channel who's topic is being changed
+ * @param time when the topic was changed (might have been in the past 
+ * @param topic the new topic
+ *
+ * @return Nothing
+*/
 
 extern void Change_Topic(char *owner, Chans *c, time_t time, char *topic) {
 	char **av;
@@ -50,6 +66,15 @@ extern void Change_Topic(char *owner, Chans *c, time_t time, char *topic) {
 	Module_Event("TOPICCHANGE",av, ac);
 	FreeList(av, ac);
 }
+/** @brief Compare channel modes from the channel hash
+ *
+ * used in ChanMode to compare modes (list_find argument)
+ *
+ * @param v actually its a ModeParm struct
+ * @param mode is the mode as a long
+ *
+ * @return 0 on match, 1 otherwise.
+*/
 
 int comparemode(const void *v, const void *mode) {
 	ModesParm *m = (void *)v;
@@ -60,6 +85,16 @@ int comparemode(const void *v, const void *mode) {
 	}
 }
 
+/** @brief Process a mode change on a channel
+ *
+ * process a mode change on a channel adding and deleting modes as required
+ *
+ * @param origin usually the server that sent the mode change. Not used
+ * @param av array of variables to pass
+ * @param ac number of variables n av
+ *
+ * @return 0 on error, number of modes processed on success.
+*/
 
 int ChanMode(char *origin, char **av, int ac) {
 	char *modes;
@@ -163,6 +198,18 @@ return j;
 
 }
 
+/** @brief Process a mode change that affects a user on a channel
+ *
+ * process a mode change on a channel that affects a user
+ *
+ * @param c Channel Struct of channel mode being changed
+ * @param u User struct of user that mode is affecting
+ * @param add 1 means add, 0 means remove mode
+ * @param mode is the long int of the mode
+ *
+ * @return Nothing
+*/
+
 void ChangeChanUserMode(Chans *c, User *u, int add, long mode) {
 	lnode_t *cmn;
 	Chanmem *cm;
@@ -188,6 +235,17 @@ void ChangeChanUserMode(Chans *c, User *u, int add, long mode) {
 		cm->flags &= ~mode;
 	}
 }
+
+/** @brief Create a new channel record
+ *
+ * And insert it into the hash, mallocing required memory for it and so on
+ * also check that the channel hash is not full
+ *
+ * @param chan name of the channel to create
+ *
+ * @returns c the newly created channel record
+ * @todo Dynamically resizable channel hashes
+*/
 Chans *new_chan(char *chan) {
 	Chans *c;
 	hnode_t *cn;
@@ -203,6 +261,16 @@ Chans *new_chan(char *chan) {
 	}
 	return c;	
 }
+
+/** @brief Deletes a channel record
+ *
+ * frees any memory associated with the record and removes it from the channel hash
+ *
+ * @param c the corrosponding channel structure you wish to delete
+ *
+ * @returns Nothing
+*/
+
 void del_chan(Chans *c) {
 	hnode_t *cn;
 	lnode_t *cm;
@@ -228,6 +296,18 @@ void del_chan(Chans *c) {
 		free(c);
 	}
 }
+
+/** @brief Parts a user from a channel
+ *
+ * Parts a user from a channel and raises events if required
+ * Events raised are PARTCHAN and DELCHAN
+ * if its one of our bots, also update bot channel lists
+ *
+ * @param u the User structure corrosponding to the user that left the channel
+ * @param chan the channel to part them from
+ *
+ * @returns Nothing
+*/
 
 
 void part_chan(User *u, char *chan) {
@@ -296,6 +376,18 @@ void part_chan(User *u, char *chan) {
 	}
 }			
 
+/** @brief Change channel records when a nick change occurs
+ *
+ * goes through the channel members list, changing users nicks after a nickname change occurs
+ *
+ * @param c the channel to check (as called by the user functions)
+ * @param newnick the New Nickname of the client
+ * @param oldnick the old nickname of the client
+ *
+ * @returns Nothing
+ * @todo What happens if one of our bots change their nick?
+*/
+
 void change_user_nick(Chans *c, char *newnick, char *oldnick) {
 	lnode_t *cm;
 	Chanmem *cml;
@@ -319,6 +411,18 @@ void change_user_nick(Chans *c, char *newnick, char *oldnick) {
 }
 
 
+
+/** @brief Process a user joining a channel
+ *
+ * joins a user to a channel and raises JOINCHAN event and if required NEWCHAN events
+ * if the channel is new, a new channel record is requested and defaults are set
+ * if its one of our bots, also update the botchanlist
+ *
+ * @param u The User structure of the user joining the channel
+ * @param chan the channel name
+ *
+ * @returns Nothing
+*/
 
 
 void join_chan(User *u, char *chan) {
@@ -389,6 +493,18 @@ void join_chan(User *u, char *chan) {
 		add_bot_to_chan(u->nick, c->name);
 	}
 }
+
+
+/** @brief Dump Channel information
+ *
+ * dump either the entire channel list, or a single channel detail. Used for debugging
+ * sends the output to the services channel
+ *
+ * @param chan the channel name to dump, or NULL for all channels
+ *
+ * @returns Nothing
+*/
+
 
 void chandump(char *chan) {
 	hnode_t *cn;
@@ -477,6 +593,17 @@ void chandump(char *chan) {
 		}
 	}
 }
+
+
+/** @brief Find a channel
+ *
+ * Finds the channel structure for the channel named chan, or NULL if it can't be found
+ *
+ * @param chan the channel name to find
+ *
+ * @returns The Channel structure for chan, or NULL if it can't be found.
+*/
+
 
 Chans *findchan(char *chan) {
 	Chans *c;
