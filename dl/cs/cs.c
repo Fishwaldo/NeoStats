@@ -55,7 +55,7 @@ static char msg_signon[]="\2SIGNON\2 %s (%s@%s) has signed on at %s";
 static char msg_signoff[]="\2SIGNOFF\2 %s (%s@%s) has signed off at %s - %s";
 static char msg_localkill[]="\2LOCAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";
 static char msg_globalkill[]="\2GLOBAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";
-static char msg_serverkill[]="\2SERVER KILL\2 %s was killed by the server %s - Reason sighted: \2%s\2";  
+static char msg_serverkill[]="\2SERVER KILL\2 %s (%s@%s) was killed by the server %s - Reason sighted: \2%s\2";  
 static char msg_mode[]="\2MODE\2 %s is %s a %s (%c%c)";
 static char msg_mode_serv[]="\2MODE\2 %s is %s a %s (%c%c) on %s";
 static char msg_bot[]="\2BOT\2 %s is %s a Bot (%c%c)";
@@ -65,7 +65,7 @@ static char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s) at: \2%s\2\003
 static char msg_signoff[]="\2\0033Signed Off\2 user: %s (%s@%s) at: %s - %s\003";
 static char msg_localkill[]="\2LOCAL KILL\2 user: \2%s\2 (%s@%s) was Killed by: \2%s\2 - Reason sighted: \2%s\2";
 static char msg_globalkill[]="\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2\003";
-static char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
+static char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 (%s@%s) was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
 static char msg_mode[]="\200313%s\2 is \2%s\2 a \2%s\2 (%c%c)\003";
 static char msg_mode_serv[]="\200313%s\2 is \2%s\2 a \2%s\2 (%c%c) on \2%s\2\003";
 static char msg_bot[]="\2\00313%s\2 is \2%s\2 a \2Bot\2 (%c%c)\003";
@@ -505,7 +505,8 @@ static int cs_user_kill(char **av, int ac)
 			Kill[0], GlobalMsg);
 	} else if (findserver(Kill[2])) {
 		chanalert(s_ConnectServ, msg_serverkill,
-		u->nick, Kill[0], GlobalMsg);
+			u->nick, u->username, u->hostname,
+			Kill[0], GlobalMsg);
 	}
 	free(GlobalMsg);
 	return 1;

@@ -4,6 +4,7 @@ Shmad & ^Enigma^
 * Version 1.13 * Mark (M) * January 9, 2004
  - New SERVWATCH option to track server joins/quits (M)
  - Tidy up message strings (M)
+ - Add user@host to server kills (M)
 
 * Version 1.12 * Fish (F) * December 28, 2003
  - Gecos is echoed in signon/signoff now (F)
