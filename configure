@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LEX LEXLIB LEX_OUTPUT_ROOT YACC RANLIB ac_ct_RANLIB CPP EGREP sqlsrvbuild buildsqlsrv GTK_CONFIG build_configtool DIRINST LINK_SIZE MATCH_LIMIT NEWLINE PCRE_MAJOR PCRE_MINOR PCRE_DATE PCRE_VERSION PCRE_LIB_VERSION PCRE_POSIXLIB_VERSION POSIX_MALLOC_THRESHOLD UTF8 IRCD_FILES_SRC IRCD_FILES_OBJS MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LEX LEXLIB LEX_OUTPUT_ROOT YACC RANLIB ac_ct_RANLIB CPP EGREP sqlsrvbuild buildsqlsrv GTK_CONFIG build_configtool DIRINST MODLDFLAGS LINK_SIZE MATCH_LIMIT NEWLINE PCRE_MAJOR PCRE_MINOR PCRE_DATE PCRE_VERSION PCRE_LIB_VERSION PCRE_POSIXLIB_VERSION POSIX_MALLOC_THRESHOLD UTF8 IRCD_FILES_SRC IRCD_FILES_OBJS MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -6420,6 +6420,7 @@ echo "${ECHO_T}$MODULES" >&6
 
 
 
+
 cat >>confdefs.h <<\_ACEOF
 #define POSIX_MALLOC_THRESHOLD 10
 _ACEOF
@@ -7088,6 +7089,7 @@ s,@buildsqlsrv@,$buildsqlsrv,;t t
 s,@GTK_CONFIG@,$GTK_CONFIG,;t t
 s,@build_configtool@,$build_configtool,;t t
 s,@DIRINST@,$DIRINST,;t t
+s,@MODLDFLAGS@,$MODLDFLAGS,;t t
 s,@LINK_SIZE@,$LINK_SIZE,;t t
 s,@MATCH_LIMIT@,$MATCH_LIMIT,;t t
 s,@NEWLINE@,$NEWLINE,;t t

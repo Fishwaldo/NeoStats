@@ -45,8 +45,10 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Added a "Global" exclusion list to NeoStats so we can maintain a single exclusion list, instead of multiple ones like we have now with opsb, and SecureServ.
  - Added strnow to me structure. This is a string version of me.now. (M)
  - don't add a uplink to the NeoStats server struct, as this breaks statserv map (F)
+ - StatServ now uses GeoIP database from maxmind. More accurate now that previous, as we can calculate location based on IP address and not DNS (F)
  - Fix the exclusion macro, & not && (M)
  - New IsMe macro and associated user and server flags. We can now detect NeoStats users/servers without a string compare (M)
+
 
  
 * NeoStats * Fish (F) * Version 2.5.14
