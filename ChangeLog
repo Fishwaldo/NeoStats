@@ -1,7 +1,6 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 =====================================================================================
-* NeoStats * Fish (F) & Mark (M)* Version 2.5.10
- - Added FRENCH README doc/README.french (was bored and had time) (Shmad)
+* NeoStats * Fish (F) & Mark (M)* Version 2.5.11
  - removed unused "hash" entry from structures (M)
  - new files to handle command related functions for new bot message system (M)
  - introduced flags field into ModUser structure (M)
@@ -31,6 +30,10 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
    support more efficient (M)
  - Lots of cleanups in IRCd code and fixes for ADMIN command which was missing on some IRCds (M)
  - Some DOC updates for changes to commands (M)
+ - Added FRENCH README doc/README.french (was bored and had time) (Shmad)
+
+* NeoStats * Fish (F) * Version 2.5.10
+ - Fix a problem with Umode +T being reintroduced on Unreal Beta19 as a normal usermode. 
    
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.9
