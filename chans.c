@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.33 2002/10/16 03:13:58 fishwaldo Exp $
+** $Id: chans.c,v 1.34 2002/10/18 04:50:00 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -92,7 +92,11 @@ int ChanMode(char *origin, char **av, int ac) {
 										modeexists = 0;
 										while (mn) {
 											m = lnode_get(mn);
-											if (((int *)m->mode == (int *)cFlagTab[i].mode) && !strcasecmp(m->param, av[j])) {
+											if ((int *)m->mode == (int *)cFlagTab[i].mode && (cFlagTab[i].mode == MODE_LIMIT || cFlagTab[i].mode == MODE_KEY)) {
+												strcpy(m->param, av[j]);
+												modeexists = 1;
+												j++;
+											} else if (((int *)m->mode == (int *)cFlagTab[i].mode) && !strcasecmp(m->param, av[j])) {
 #ifdef DEBUG
 						 						log("Mode %c (%s) already exists, not adding again", cFlagTab[i].flag, av[j]);
 #endif
