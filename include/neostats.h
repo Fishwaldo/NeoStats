@@ -1307,6 +1307,7 @@ EXPORTFUNC void DisableEvent (Event event);
 
 /* File system functions */
 #define FILE_MODE_APPEND	0x00000001
+#define FILE_MODE_READ		0x00000002
 
 #define FILE_HANDLE FILE*
 
@@ -1314,8 +1315,11 @@ EXPORTFUNC int sys_mkdir (const char *filename, mode_t mode);
 EXPORTFUNC int sys_check_create_dir (const char* dirname);
 EXPORTFUNC FILE_HANDLE sys_file_open (const char * filename, int filemode);
 EXPORTFUNC int sys_file_close (FILE_HANDLE handle);
+EXPORTFUNC int sys_file_seek (FILE_HANDLE handle, long offset, int origin);
+EXPORTFUNC long sys_file_tell (FILE_HANDLE handle);
 EXPORTFUNC int sys_file_printf (FILE_HANDLE handle, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC int sys_file_read (void *buffer, size_t size, size_t count, FILE_HANDLE handle);
+EXPORTFUNC char* sys_file_gets (char *string, int n, FILE_HANDLE handle);
 EXPORTFUNC int sys_file_write (const void *buffer, size_t size, size_t count, FILE_HANDLE handle);
 EXPORTFUNC int sys_file_flush (FILE_HANDLE handle);
 EXPORTFUNC int sys_file_rename (const char* oldname, const char* newname);

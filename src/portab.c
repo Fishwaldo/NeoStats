@@ -79,6 +79,9 @@ FILE_HANDLE sys_file_open (const char * filename, int filemode)
 		case FILE_MODE_APPEND:
 			return fopen (filename, "a");
 			break;
+		case FILE_MODE_READ:
+			return fopen (filename, "r");
+			break;
 		default:
 			break;
 	}
@@ -88,6 +91,16 @@ FILE_HANDLE sys_file_open (const char * filename, int filemode)
 int sys_file_close (FILE_HANDLE handle)
 {
 	return fclose (handle);
+}
+
+int sys_file_seek (FILE_HANDLE handle, long offset, int origin)
+{
+	return fseek (handle, offset, origin);
+}
+
+long sys_file_tell (FILE_HANDLE handle)
+{
+	return ftell(handle);
 }
 
 int sys_file_printf (FILE_HANDLE handle, char *fmt, ...)
@@ -105,6 +118,10 @@ int sys_file_read (void *buffer, size_t size, size_t count, FILE_HANDLE handle)
 	return fread (buffer, size, count, handle);
 }
 
+char* sys_file_gets (char *string, int n, FILE_HANDLE handle)
+{
+	return fgets (string, n, handle);
+}
 int sys_file_write (const void *buffer, size_t size, size_t count, FILE_HANDLE handle)
 {
 	return fwrite (buffer, size, count, handle);
