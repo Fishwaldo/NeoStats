@@ -54,135 +54,135 @@
 #define RTLD_GLOBAL 0
 #endif
 
-/* 
- * Module socket list structure
+/** @brief Module socket list structure
+ * 
  */
-struct _Sock_List {
-	long hash;
+typedef struct Sock_List {
+	/** Hash code */
+	long hash;					
+	/** Socket number */
 	int sock_no;
+	/** Socket name */
 	char sockname[MAXHOST];
+	/** Socket read function */
 	int (*readfnc) (int sock_no, char *sockname);
+	/** Socket write function */
 	int (*writefnc) (int sock_no, char *sockname);
+	/** Socket error function */
 	int (*errfnc) (int sock_no, char *sockname);
+	/** Module name */
 	char modname[MAXHOST];
+	/** rmsgs */
 	long rmsgs;
+	/** rbytes */
 	long rbytes;
-};
+}Sock_List;
 
-typedef struct _Sock_List Sock_List;
-
-/* 
- * Module Socket List hash
+/* @brief Module Socket List hash
+ * 
  */
 hash_t *sockh;
 
-/* 
- * Module Timer structure
+/** @brief Module Timer structure
+ * 
  */
-struct _Mod_Timer {
+typedef struct Mod_Timer {
+	/** Hash code */
 	long hash;
+	/** Module name */
 	char modname[MAXHOST];
+	/** Timer name */
 	char timername[MAXHOST];
+	/** Timer interval */
 	int interval;
+	/** Time last run */
 	time_t lastrun;
+	/** Timer function */
 	int (*function) ();
-};
-typedef struct _Mod_Timer Mod_Timer;
+}Mod_Timer;
+
 hash_t *th;
 
-/* 
- *
+/** @brief Module User structure
+ * 
  */
-struct _Mod_User {
+typedef struct {
+	/** Hash code */
 	long hash;
+	/** Nick */
 	char nick[MAXNICK];
+	/** Module name */
 	char modname[MAXHOST];
+	/** function */
 	int (*function) (char *origin, char **av, int ac);
+	/** function */
 	int (*chanfunc) (char *origin, char *chan, char **av, int ac);
+	/** channel list */
 	hash_t *chanlist;
-};
+}Mod_User;
 
-typedef struct _Mod_User Mod_User;
 hash_t *bh;
 
-/* 
- *
+/** @brief Channel bot structure
+ * 
  */
-struct _Chan_Bot {
+typedef struct {
+	/** channel name */
 	char chan[CHANLEN];
+	/** bot list */
 	list_t *bots;
-};
+}Chan_Bot;
 
-typedef struct _Chan_Bot Chan_Bot;
 hash_t *bch;
 
-/* 
- *
+/** @brief Module functions structure
+ * 
  */
-struct _Functions {
+typedef struct {
 	char *cmd_name;
 	int (*function) (char *origin, char **av, int ac);
 	int srvmsg;
-};
+}Functions;
 
-typedef struct _Functions Functions;
-
-/* 
- *
+/** @brief Module Event functions structure
+ * 
  */
-struct _EventFnList {
+typedef struct {
 	char *cmd_name;
 	int (*function) (char **av, int ac);
-};
+}EventFnList;
 
-typedef struct _EventFnList EventFnList;
-
-/* 
- *
+/** @brief Module Info structure (old style)
+ * 
  */
-struct _Module_Info {
+typedef struct {
 	char *module_name;
 	char *module_description;
 	char *module_version;
-};
+}Module_Info;
 
-typedef struct _Module_Info Module_Info;
-
-/* 
- * New module info structure
+/** @brief Module Info structure (new style)
+ * 
  */
-struct _ModuleInfo {
+typedef struct {
 	char *module_name;
 	char *module_description;
 	char *module_version;
 	char *module_build_date;
 	char *module_build_time;
-};
+}ModuleInfo;
 
-typedef struct _ModuleInfo ModuleInfo;
-
-/* 
- *
+/** @brief Module structure
+ * 
  */
-struct _Module {
+typedef struct {
 	Module_Info *info;
 	Functions *function_list;
 	EventFnList *other_funcs;
 	void *dl_handle;
-};
-
-typedef struct _Module Module;
+}Module ;
 
 hash_t *mh;
-
-/* 
- *
- */
-struct mod_num {
-	Module *mod;
-	int used;
-};
-struct mod_num ModNum[NUM_MODULES];
 
 /* 
  * Prototypes

@@ -101,7 +101,7 @@
 #define is_synced		me.synced
 
 /* 	Buffer overrun protection */
-#define BUFFER_OVERRUN_PROTECTION
+/*#define BUFFER_OVERRUN_PROTECTION*/
 #ifdef BUFFER_OVERRUN_PROTECTION
 /*  Note, this is considered a short term solution for 2.5.6 to avoid
     lots of MAX-1 in the code and without rewriting everything immediately

@@ -30,8 +30,6 @@
 #include "dl.h"
 #include "log.h"
 
-extern IntCommands cmd_list[];
-
 int
 init_bot (char *nick, char *user, char *host, char *rname, char *modes, char *mod_name)
 {

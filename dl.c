@@ -23,6 +23,10 @@
 ** $Id$
 */
 
+/** @file dl.c 
+ *  @brief module functions
+ */ 
+
 #include <dlfcn.h>
 #include <stdio.h>
 #include <string.h>
@@ -32,6 +36,14 @@
 #include "stats.h"
 #include "config.h"
 #include "log.h"
+
+/** @brief Module num structure
+ * 
+ */
+struct {
+	Module *mod;
+	int used;
+}ModNum[NUM_MODULES];
 
 /** @brief Initialise module list hashes
  *
@@ -220,14 +232,14 @@ new_sock (char *sock_name)
 	return s;
 }
 
-/** @brief find socket
+/** \fn @brief find socket
  *
  * For core use only, finds a socket in the current list of socket
  *
  * @param sock_name the name of socket to find
  * 
  * @return pointer to socket if found, NULL if not found
-*/
+ */
 Sock_List *
 findsock (char *sock_name)
 {
@@ -340,8 +352,12 @@ list_sockets (User * u)
 	prefmsg (u->nick, s_Services, "End of Socket List");
 }
 
-/* 
+/** @brief Add a bot to a channel
  *
+ * @param bot string containing bot name
+ * @param chan string containing channel name
+ * 
+ * @return none
  */
 void
 add_bot_to_chan (char *bot, char *chan)
@@ -375,8 +391,12 @@ add_bot_to_chan (char *bot, char *chan)
 	return;
 }
 
-/* 
+/** @brief delete a bot from a channel
  *
+ * @param bot string containing bot name
+ * @param chan string containing channel name
+ * 
+ * @return none
  */
 void
 del_bot_from_chan (char *bot, char *chan)
@@ -408,8 +428,14 @@ del_bot_from_chan (char *bot, char *chan)
 	}
 }
 
-/* 
+/** @brief send a message to a channel bot
  *
+ * @param origin 
+ * @param chan string containing channel name
+ * @param av
+ * @param ac
+ * 
+ * @return none
  */
 void
 bot_chan_message (char *origin, char *chan, char **av, int ac)
@@ -437,8 +463,11 @@ bot_chan_message (char *origin, char *chan, char **av, int ac)
 	}
 }
 
-/* 
+/** @brief dump list of module bots and channels
  *
+ * @param u
+ * 
+ * @return none
  */
 void
 botchandump (User * u)
@@ -461,8 +490,11 @@ botchandump (User * u)
 	}
 }
 
-/* 
+/** @brief create a new bot
  *
+ * @param bot_name string containing bot name
+ * 
+ * @return none
  */
 static Mod_User *
 new_bot (char *bot_name)
@@ -487,8 +519,11 @@ new_bot (char *bot_name)
 	return u;
 }
 
-/* 
+/** @brief 
  *
+ * @param 
+ * 
+ * @return
  */
 int
 add_mod_user (char *nick, char *mod_name)
@@ -514,8 +549,11 @@ add_mod_user (char *nick, char *mod_name)
 	return 0;
 }
 
-/* 
+/** @brief 
  *
+ * @param 
+ * 
+ * @return
  */
 Mod_User *
 findbot (char *bot_name)
@@ -530,8 +568,11 @@ findbot (char *bot_name)
 	return NULL;
 }
 
-/* 
+/** @brief 
  *
+ * @param 
+ * 
+ * @return
  */
 int
 del_mod_user (char *bot_name)
@@ -551,8 +592,11 @@ del_mod_user (char *bot_name)
 	return -1;
 }
 
-/* 
+/** @brief 
  *
+ * @param 
+ * 
+ * @return
  */
 int
 bot_nick_change (char *oldnick, char *newnick)
@@ -588,8 +632,11 @@ bot_nick_change (char *oldnick, char *newnick)
 	return -1;
 }
 
-/* 
+/** @brief 
  *
+ * @param 
+ * 
+ * @return
  */
 void
 list_module_bots (User * u)
@@ -609,8 +656,11 @@ list_module_bots (User * u)
 	prefmsg (u->nick, s_Services, "End of Module Bot List");
 }
 
-/* 
+/** @brief 
  *
+ * @param 
+ * 
+ * @return
  */
 int
 load_module (char *modfilename, User * u)
@@ -626,9 +676,11 @@ load_module (char *modfilename, User * u)
 	char **av;
 	int ac = 0;
 	int i = 0;
+#ifdef OLD_MODULE_EXPORT_SUPPORT
 	Module_Info *(*mod_get_info) () = NULL;
 	Functions *(*mod_get_funcs) () = NULL;
 	EventFnList *(*mod_get_events) () = NULL;
+#endif /* OLD_MODULE_EXPORT_SUPPORT */
 	Module_Info *mod_info_ptr = NULL;
 	Functions *mod_funcs_ptr = NULL;
 	EventFnList *event_fn_ptr = NULL;
@@ -827,8 +879,11 @@ load_module (char *modfilename, User * u)
 	return 0;
 }
 
-/* 
+/** @brief 
  *
+ * @param 
+ * 
+ * @return
  */
 int
 get_dl_handle (char *mod_name)
@@ -844,8 +899,11 @@ get_dl_handle (char *mod_name)
 	return 0;
 }
 
-/* 
+/** @brief 
  *
+ * @param 
+ * 
+ * @return
  */
 int
 get_mod_num (char *mod_name)
@@ -862,10 +920,13 @@ get_mod_num (char *mod_name)
 	/* if we get here, it wasn't found */
 	nlog (LOG_DEBUG1, LOG_CORE, "Can't find %s in module number list", mod_name);
 	return -1;
-};
+}
 
-/* 
+/** @brief 
  *
+ * @param 
+ * 
+ * @return
  */
 void
 list_module (User * u)
@@ -885,8 +946,11 @@ list_module (User * u)
 	prefmsg (u->nick, s_Services, "End of Module List");
 }
 
-/* 
+/** @brief 
  *
+ * @param 
+ * 
+ * @return
  */
 int
 unload_module (char *module_name, User * u)
@@ -907,7 +971,7 @@ unload_module (char *module_name, User * u)
 		chanalert (s_Services, "Unloading Module %s", module_name);
 	} else {
 		if (u) {
-			prefmsg (u->nick, s_Services, "Couldn't Find Module  %s Loaded, Try /msg %s modlist", module_name, s_Services);
+			prefmsg (u->nick, s_Services, "Couldn't Find Module %s Loaded, Try /msg %s modlist", module_name, s_Services);
 			chanalert (s_Services, "%s tried to Unload %s but its not loaded", u->nick, module_name);
 			return -1;
 		}
@@ -980,9 +1044,17 @@ unload_module (char *module_name, User * u)
 	return -1;
 }
 
+/** @brief unload all loaded modules
+ *
+ * For core use only, unloads all loaded modules
+ *
+ * @param user pointer to user unloading modules or NULL if system unload
+ * 
+ * @return none
+*/
 void unload_modules(User * u)
 {
-	Module *mod_ptr = NULL;
+	Module *mod_ptr;
 	hscan_t ms;
 	hnode_t *mn;
 	/* Unload the Modules */

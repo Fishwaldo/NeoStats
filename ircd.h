@@ -23,14 +23,14 @@
 #ifndef IRCD_H
 #define IRCD_H
 
-struct _IntCommands {
+typedef struct {
 	char *name;
 	void (*function) (char *origin, char **argv, int argc);
 	int srvmsg;		/* Should this be a Server Message(1), or a User Message?(0) */
 	int usage;
-};
+}IntCommands;
 
-typedef struct _IntCommands IntCommands;
+extern IntCommands cmd_list[];
 
 void init_ServBot (void);
 void ShowMOTD (char *nick);
