@@ -320,7 +320,7 @@ static int ss_event_mode(CmdParams* cmdparams)
 	if (StatServ.exclusions && IsExcluded(cmdparams->source.user)) {
 		return 0;
 	}
-	StatsUserMode(cmdparams->source.user, cmdparams->av[1]);
+	StatsUserMode(cmdparams->source.user, cmdparams->av[0]);
 	return 1;
 }
 
