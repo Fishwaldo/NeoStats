@@ -121,14 +121,29 @@
 #define ADMIN_FILENAME	"neostats.admin"
 #define PID_FILENAME	"neostats.pid"
 
-#define CHANLEN			50
 #define BUFSIZE			512
+#ifndef MAXHOST
 #define MAXHOST			128
+#endif
+#ifndef MAXPASS
 #define MAXPASS			32
+#endif
+#ifndef MAXNICK
 #define MAXNICK			32
+#endif
+#ifndef MAXUSER
 #define MAXUSER			15
-#define MAXUSERWARN		8
+#endif
+#ifndef MAXREALNAME
 #define MAXREALNAME		50
+#endif
+#ifndef CHANLEN
+#define CHANLEN			50
+#endif
+#ifndef TOPICLEN
+#define TOPICLEN		307
+#endif
+#define MAXUSERWARN		8
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
 #define MAXCMDSIZE		15

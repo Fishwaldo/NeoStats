@@ -54,6 +54,15 @@
 /* we have svskill support */
 #define GOTSVSKILL
 
+/* IRCD specific buffer sizes */
+#define MAXHOST			63
+#define MAXPASS			63
+#define MAXNICK			30
+#define MAXUSER			10
+#define MAXREALNAME		50
+#define CHANLEN			32
+#define TOPICLEN		307
+
 /* IRCD Specific mode chars */
 #define UMODE_CH_LOCOP 'O'
 #define UMODE_CH_OPER 'o'

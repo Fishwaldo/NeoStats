@@ -77,6 +77,15 @@
 
 #endif /* ULTIMATE3 */
 
+/* IRCD specific buffer sizes */
+#define MAXHOST			128
+#define MAXPASS			32
+#define MAXNICK			32
+#define MAXUSER			15
+#define MAXREALNAME		50
+#define CHANLEN			50
+#define TOPICLEN		512
+
 /* IRCD Specific mode chars */
 #ifdef ULTIMATE3
 #define UMODE_CH_LOCOP 'O'
