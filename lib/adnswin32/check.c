@@ -31,7 +31,8 @@
 
 #include "internal.h"
 
-void adns_checkconsistency(adns_state ads, adns_query qu) {
+void adns_checkconsistency(adns_state ads, adns_query qu)
+{
   adns__consistency(ads,qu,cc_user);
 }
 
@@ -80,7 +81,8 @@ void adns_checkconsistency(adns_state ads, adns_query qu) {
     }										\
   } while(0)
 
-static void checkc_query_alloc(adns_state ads, adns_query qu) {
+static void checkc_query_alloc(adns_state ads, adns_query qu)
+{
   allocnode *an;
 
 
@@ -88,28 +90,34 @@ static void checkc_query_alloc(adns_state ads, adns_query qu) {
   });
 }
 
-static void checkc_query(adns_state ads, adns_query qu) {
+static void checkc_query(adns_state ads, adns_query qu)
+{
   adns_query child;
 
   assert(qu->udpnextserver < ads->nservers);
   assert(!(qu->udpsent & (~0UL << ads->nservers)));
   assert(qu->search_pos <= ads->nsearchlist);
-  if (qu->parent) DLIST_ASSERTON(qu, child, qu->parent->children, siblings.);
+	if (qu->parent)
+		DLIST_ASSERTON(qu, child, qu->parent->children, siblings.);
 }
 
-static void checkc_notcpbuf(adns_state ads) {
+static void checkc_notcpbuf(adns_state ads)
+{
   assert(!ads->tcpsend.used);
   assert(!ads->tcprecv.used);
   assert(!ads->tcprecv_skip);
 }
 
-static void checkc_global(adns_state ads) {
+static void checkc_global(adns_state ads)
+{
   int i;
   
   assert(ads->udpsocket >= 0);
 
   for (i=0; i<ads->nsortlist; i++)
-    assert(!(ads->sortlist[i].base.s_addr & ~ads->sortlist[i].mask.s_addr));
+		assert(!
+		       (ads->sortlist[i].base.s_addr & ~ads->sortlist[i].
+			mask.s_addr));
 
   assert(ads->tcpserver >= 0 && ads->tcpserver < ads->nservers);
   
@@ -134,7 +142,8 @@ static void checkc_global(adns_state ads) {
   assert(ads->searchlist || !ads->nsearchlist);
 }
 
-static void checkc_queue_udpw(adns_state ads) {
+static void checkc_queue_udpw(adns_state ads)
+{
   adns_query qu;
   
   DLIST_CHECK1(ads->udpw, qu, {
@@ -147,7 +156,8 @@ static void checkc_queue_udpw(adns_state ads) {
   });
 }
 
-static void checkc_queue_tcpw(adns_state ads) {
+static void checkc_queue_tcpw(adns_state ads)
+{
   adns_query qu;
   
   DLIST_CHECK1(ads->tcpw, qu, {
@@ -159,7 +169,8 @@ static void checkc_queue_tcpw(adns_state ads) {
   });
 }
 
-static void checkc_queue_childw(adns_state ads) {
+static void checkc_queue_childw(adns_state ads)
+{
   adns_query parent, child;
 
   DLIST_CHECK1(ads->childw, parent, {
@@ -174,7 +185,8 @@ static void checkc_queue_childw(adns_state ads) {
   });
 }
 
-static void checkc_queue_output(adns_state ads) {
+static void checkc_queue_output(adns_state ads)
+{
   adns_query qu;
   
   DLIST_CHECK1(ads->output, qu, {
@@ -186,17 +198,22 @@ static void checkc_queue_output(adns_state ads) {
   });
 }
 
-void adns__consistency(adns_state ads, adns_query qu, consistency_checks cc) {
+void adns__consistency(adns_state ads, adns_query qu,
+		       consistency_checks cc)
+{
   adns_query search;
   
   switch (cc) {
   case cc_user:
     break;
   case cc_entex:
-    if (!(ads->iflags & adns_if_checkc_entex)) return;
+		if (!(ads->iflags & adns_if_checkc_entex))
+			return;
     break;
   case cc_freq:
-    if ((ads->iflags & adns_if_checkc_freq) != adns_if_checkc_freq) return;
+		if ((ads->iflags & adns_if_checkc_freq) !=
+		    adns_if_checkc_freq)
+			return;
     break;
   default:
     abort();

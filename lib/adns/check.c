@@ -125,7 +125,9 @@ static void checkc_queue_udpw(adns_state ads)
 		    assert(qu->retries <= UDPMAXRETRIES);
 		    assert(qu->udpsent);
 		    assert(!qu->children.head && !qu->children.tail);
-		    checkc_query(ads, qu); checkc_query_alloc(ads, qu);});
+    checkc_query(ads,qu);
+    checkc_query_alloc(ads,qu);
+  });
 }
 
 static void checkc_queue_tcpw(adns_state ads)
@@ -136,7 +138,9 @@ static void checkc_queue_tcpw(adns_state ads)
 		    assert(qu->state == query_tcpw);
 		    assert(!qu->children.head && !qu->children.tail);
 		    assert(qu->retries <= ads->nservers + 1);
-		    checkc_query(ads, qu); checkc_query_alloc(ads, qu);});
+    checkc_query(ads,qu);
+    checkc_query_alloc(ads,qu);
+  });
 }
 
 static void checkc_queue_childw(adns_state ads)
@@ -148,9 +152,11 @@ static void checkc_queue_childw(adns_state ads)
 		    assert(parent->children.head);
 		    DLIST_CHECK(parent->children, child, siblings., {
 				assert(child->parent == parent);
-				assert(child->state != query_done);});
+      assert(child->state != query_done);
+    });
 		    checkc_query(ads, parent);
-		    checkc_query_alloc(ads, parent);});
+    checkc_query_alloc(ads,parent);
+  });
 }
 
 static void checkc_queue_output(adns_state ads)
@@ -162,7 +168,8 @@ static void checkc_queue_output(adns_state ads)
 		    assert(!qu->children.head && !qu->children.tail);
 		    assert(!qu->parent);
 		    assert(!qu->allocations.head && !qu->allocations.tail);
-		    checkc_query(ads, qu);});
+    checkc_query(ads,qu);
+  });
 }
 
 void adns__consistency(adns_state ads, adns_query qu,
