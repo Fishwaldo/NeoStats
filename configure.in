@@ -140,6 +140,10 @@ then
   AC_DEFINE(NEED_UNDERSCORE_PREFIX)
 fi
 
+dnl check for berkely db.h support
+AC_CHECK_HEADERS(db.h)
+
+
 PCRE_MAJOR=4
 PCRE_MINOR=3
 PCRE_DATE=21-May-2003
