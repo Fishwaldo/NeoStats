@@ -194,21 +194,21 @@ int ModSynch (void)
 		return NS_FAILURE;
 	}
 	/* Timer to save the database */
-	add_timer (TIMER_TYPE_INTERVAL, SaveStats, "SaveStats", DBSAVETIME);
+	AddTimer (TIMER_TYPE_INTERVAL, SaveStats, "SaveStats", DBSAVETIME);
 	/* Timer to output html */
 	if (StatServ.html) {
-		add_timer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime);
+		AddTimer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime);
 		/* Initial output at load */
 		ss_html ();
 	}
 	/* Timer to reset timeslice stats */
-	add_timer (TIMER_TYPE_MIDNIGHT, ResetStatistics, "ResetStatistics", 0);
+	AddTimer (TIMER_TYPE_MIDNIGHT, ResetStatistics, "ResetStatistics", 0);
 	/* Timer to average stats */
-	add_timer (TIMER_TYPE_INTERVAL, AverageStatistics, "AverageStatistics", 3600);
+	AddTimer (TIMER_TYPE_INTERVAL, AverageStatistics, "AverageStatistics", 3600);
 	/* Initial average at load */
 	AverageStatistics();
 	/* Timer to delete old channels */
-	add_timer (TIMER_TYPE_INTERVAL, DelOldChan, "DelOldChan", 3600);
+	AddTimer (TIMER_TYPE_INTERVAL, DelOldChan, "DelOldChan", 3600);
 	return NS_SUCCESS;
 }
 
@@ -248,9 +248,9 @@ static int ss_set_html_cb (CmdParams *cmdparams, SET_REASON reason)
 		return NS_SUCCESS;
 	}
 	if (StatServ.html) {
-		add_timer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime);
+		AddTimer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime);
 	} else {
-		del_timer ("ss_html");
+		DelTimer ("ss_html");
 	}
 	return NS_SUCCESS;
 }
@@ -280,7 +280,7 @@ static int ss_set_htmltime_cb (CmdParams *cmdparams, SET_REASON reason)
 	if (reason != SET_CHANGE) {
 		return NS_SUCCESS;
 	}
-	set_timer_interval ("ss_html", StatServ.htmltime);
+	SetTimerInterval ("ss_html", StatServ.htmltime);
 	return NS_SUCCESS;
 }
 

@@ -601,6 +601,8 @@ typedef struct tme {
 	char version[VERSIONSIZE];
 	int dobind;
 	struct sockaddr_in lsa;
+	time_t tslastping;
+	int ulag;
 } tme;
 
 EXPORTVAR extern tme me;
@@ -671,14 +673,6 @@ typedef struct CmdParams {
 	char **av;
 	int ac;
 } CmdParams; 
-
-/** @brief ping structure
- *  
- */
-struct ping {
-	time_t last_sent;
-	int ulag;
-} ping;
 
 /* Comand list handling */
 
@@ -1029,14 +1023,10 @@ typedef struct _Bot {
 
 EXPORTFUNC int ModuleConfig( bot_setting *bot_settings );
 
-EXPORTFUNC int add_timer( TIMER_TYPE type, timer_function func, const char *name, int interval );
-EXPORTFUNC int del_timer( const char *timer_name );
-EXPORTFUNC int set_timer_interval( const char *timer_name, int interval );
-EXPORTFUNC Timer *find_timer( const char *timer_name );
-#define AddTimer add_timer
-#define DelTimer del_timer
-#define SetTimerInterval set_timer_interval
-#define FindTimer find_timer
+EXPORTFUNC int AddTimer( TIMER_TYPE type, timer_function func, const char *name, int interval );
+EXPORTFUNC int DelTimer( const char *timer_name );
+EXPORTFUNC int SetTimerInterval( const char *timer_name, int interval );
+EXPORTFUNC Timer *FindTimer( const char *timer_name );
 
 EXPORTFUNC int add_sock( const char *sock_name, int socknum, sock_func readfunc, sock_func writefunc, sock_func errfunc );
 EXPORTFUNC int add_sockpoll( const char *sock_name, void *data, before_poll_func beforepoll, after_poll_func afterpoll );
@@ -1046,8 +1036,7 @@ EXPORTFUNC int sock_connect( int socktype, unsigned long ipaddr, int port, const
 EXPORTFUNC int sock_disconnect( const char *name );
 
 EXPORTFUNC Bot *AddBot( BotInfo *botinfo );
-EXPORTFUNC Bot *find_bot( const char *bot_name );
-#define FindBot find_bot
+EXPORTFUNC Bot *FindBot( const char *bot_name );
 
 /* main.c */
 void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg) __attribute__((noreturn));
@@ -1078,7 +1067,7 @@ EXPORTFUNC int split_buf( char *buf, char ***argv, int colon_special );
 /*  For use by modules to report command information channel which 
  *  takes account of neostats reporting options
  */
-EXPORTFUNC void command_report( const Bot *botptr, const char *fmt, ... );
+EXPORTFUNC void CommandReport( const Bot *botptr, const char *fmt, ... );
 
 /* IRC interface for modules 
  *  Modules use these functions to perform actions on IRC
@@ -1156,14 +1145,14 @@ EXPORTFUNC int irc_ctcp_finger_req( Bot *botptr, Client *target );
 EXPORTFUNC int irc_ctcp_action_req( Bot *botptr, Client *target, const char *action );
 
 /* users.c */
-EXPORTFUNC Client *find_user( const char *nick );
+EXPORTFUNC Client *FindUser( const char *nick );
 EXPORTFUNC int UserLevel( Client *u );
 
 /* server.c */
-EXPORTFUNC Client *find_server( const char *name );
+EXPORTFUNC Client *FindServer( const char *name );
 
 /* chans.c */
-EXPORTFUNC Channel *find_channel( const char *chan );
+EXPORTFUNC Channel *FindChannel( const char *chan );
 EXPORTFUNC int CheckChanMode( Channel *c, const unsigned int mode );
 EXPORTFUNC int IsChannelMember( Channel *c, Client *u );
 EXPORTFUNC int test_cumode( char *chan, char *nick, int flag );
@@ -1215,11 +1204,11 @@ EXPORTFUNC int new_transfer( char *url, char *params, NS_TRANSFER savetofileorme
 /* Has NeoStats issued a SETHOST for this user? */
 #define IsUserSetHosted(x)  ((x) && ((x)->flags & CLIENT_FLAG_SETHOST))
 
-EXPORTFUNC int validate_nick( char *nick );
-EXPORTFUNC int validate_user( char *username );
-EXPORTFUNC int validate_host( char *hostname );
-EXPORTFUNC int validate_url( char *url );
-EXPORTFUNC int validate_channel( char *channel_name );
+EXPORTFUNC int ValidateNick( char *nick );
+EXPORTFUNC int ValidateUser( char *username );
+EXPORTFUNC int ValidateHost( char *hostname );
+EXPORTFUNC int ValidateURL( char *url );
+EXPORTFUNC int ValidateChannel( char *channel_name );
 
 #define CONFIG_TABLE_NAME	"config"
 

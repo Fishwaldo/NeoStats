@@ -144,7 +144,7 @@ void dcc_parse(Client *dcc, char *line)
 		cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 		cmdparams->source = dcc;
 		if (cmdparams->source) {
-			cmdparams->target = find_user (buf+1);
+			cmdparams->target = FindUser (buf+1);
 			if (cmdparams->target) {
 				cmdparams->bot = cmdparams->target->user->bot;
 				if (!cmdparams->bot) {

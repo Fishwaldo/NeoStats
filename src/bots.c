@@ -119,14 +119,14 @@ static int flood_test( Client *u )
 
 static int process_origin( CmdParams *cmdparams, const char *origin )
 {
-	cmdparams->source = find_user( origin );
+	cmdparams->source = FindUser( origin );
 	if( cmdparams->source ) {
 		if( flood_test( cmdparams->source ) ) {
 			return NS_FALSE;
 		}
 		return NS_TRUE;
 	}
-	cmdparams->source = find_server( origin );
+	cmdparams->source = FindServer( origin );
 	if( cmdparams->source ) {
 		return NS_TRUE;
 	}
@@ -146,7 +146,7 @@ static int process_origin( CmdParams *cmdparams, const char *origin )
 
 static int process_target_user( CmdParams *cmdparams, const char *target )
 {
-	cmdparams->target = find_user( target );
+	cmdparams->target = FindUser( target );
 	if( cmdparams->target ) {
 		cmdparams->bot = cmdparams->target->user->bot;
 		if( cmdparams->bot ) {
@@ -170,7 +170,7 @@ static int process_target_user( CmdParams *cmdparams, const char *target )
 
 static int process_target_chan( CmdParams *cmdparams, const char *target )
 {
-	cmdparams->channel = find_channel(target );
+	cmdparams->channel = FindChannel(target );
 	if( cmdparams->channel ) {
 		return NS_TRUE;
 	}
@@ -357,7 +357,7 @@ void bot_chan_private( char *origin, char **av, int ac )
 	ns_free( cmdparams );
 }
 
-/** @brief find_bot
+/** @brief FindBot
  *
  *  find bot
  *
@@ -366,14 +366,14 @@ void bot_chan_private( char *origin, char **av, int ac )
  *  @return pointer to bot or NULL if not found
  */
 
-Bot *find_bot( const char *bot_name )
+Bot *FindBot( const char *bot_name )
 {
 	Bot* bot;
 
 	SET_SEGV_LOCATION(); 
 	bot = ( Bot * ) hnode_find( bothash, bot_name );
 	if( !bot ) {
-		dlog( DEBUG3, "find_bot: %s not found", bot_name );
+		dlog( DEBUG3, "FindBot: %s not found", bot_name );
 	}
 	return bot;
 }
@@ -553,12 +553,12 @@ static char *GetBotNick( BotInfo *botinfo, char *nickbuf )
 
 	/* Check primary nick */
 	nick = botinfo->nick;
-	if( find_user( nick ) ) {
+	if( FindUser( nick ) ) {
 		nlog( LOG_WARNING, "Bot nick %s already in use", nick );
 		/* Check alternate nick */
 		if( botinfo->altnick ) {
 			nick = botinfo->altnick;
-			if( find_user( nick ) ) {
+			if( FindUser( nick ) ) {
 				nlog( LOG_WARNING, "Bot alt nick %s already in use", nick );
 				/* TODO: try and find a free nick */
 				return NULL;
@@ -592,9 +592,6 @@ static void ConnectBot( Bot *botptr )
 		}
 	} else {
 		irc_nick( botptr->name, botptr->u->user->username, botptr->u->user->hostname, botptr->u->info, "" );
-		if( (nsconfig.allbots > 0 ) ) {
-			irc_join( botptr, me.serviceschan, me.servicescmode );
-		}
 	}	
 	if( botptr->flags & BOT_FLAG_DEAF ) {
 		if( HaveUmodeDeaf() ) {

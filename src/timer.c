@@ -59,9 +59,9 @@ void
 CheckTimers (void)
 {
 	SET_SEGV_LOCATION();
-	if (me.now - ping.last_sent > nsconfig.pingtime) {
+	if (me.now - me.tslastping > nsconfig.pingtime) {
 		PingServers ();
-		ping.last_sent = me.now;
+		me.tslastping = me.now;
 		/* flush log files */
 		fflush (NULL);
 	}
@@ -131,13 +131,13 @@ new_timer (const char *name)
  * @return pointer to timer if found, NULL if not found
 */
 Timer *
-find_timer (const char *name)
+FindTimer (const char *name)
 {
 	Timer *t;
 
 	t = (Timer *)hnode_find (timerhash, name);
 	if (!t) {
-		dlog (DEBUG3, "find_timer: %s not found", name);
+		dlog (DEBUG3, "FindTimer: %s not found", name);
 	}
 	return t;
 }
@@ -154,7 +154,7 @@ find_timer (const char *name)
  * @return NS_SUCCESS if added, NS_FAILURE if not 
 */
 int
-add_timer (TIMER_TYPE type, timer_function func_name, const char *name, int interval)
+AddTimer (TIMER_TYPE type, timer_function func_name, const char *name, int interval)
 {
 	Timer *timer;
 	Module* moduleptr;
@@ -165,7 +165,7 @@ add_timer (TIMER_TYPE type, timer_function func_name, const char *name, int inte
 		nlog (LOG_WARNING, "Module %s timer %s does not exist", moduleptr->info->name, name);
 		return NS_FAILURE;
 	}
-	if (find_timer (name)) {
+	if (FindTimer (name)) {
 		nlog (LOG_WARNING, "Module %s timer %s already exists. Not adding.", moduleptr->info->name, name);
 		return NS_FAILURE;
 	}
@@ -176,7 +176,7 @@ add_timer (TIMER_TYPE type, timer_function func_name, const char *name, int inte
 		timer->lastrun = me.now;
 		timer->moduleptr = moduleptr;
 		timer->function = func_name;
-		dlog (DEBUG2, "add_timer: Module %s added timer %s", moduleptr->info->name, name);
+		dlog (DEBUG2, "AddTimer: Module %s added timer %s", moduleptr->info->name, name);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -191,7 +191,7 @@ add_timer (TIMER_TYPE type, timer_function func_name, const char *name, int inte
  * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
 int
-del_timer (const char *name)
+DelTimer (const char *name)
 {
 	Timer *timer;
 	hnode_t *tn;
@@ -200,7 +200,7 @@ del_timer (const char *name)
 	tn = hash_lookup (timerhash, name);
 	if (tn) {
 		timer = hnode_get (tn);
-		dlog(DEBUG2, "del_timer: removed timer %s for module %s", name, timer->moduleptr->info->name);
+		dlog(DEBUG2, "DelTimer: removed timer %s for module %s", name, timer->moduleptr->info->name);
 		hash_delete (timerhash, tn);
 		hnode_destroy (tn);
 		ns_free (timer);
@@ -246,7 +246,7 @@ del_timers (Module *mod_ptr)
  * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
 int
-set_timer_interval (const char *name, int interval)
+SetTimerInterval (const char *name, int interval)
 {
 	Timer *timer;
 
@@ -254,7 +254,7 @@ set_timer_interval (const char *name, int interval)
 	timer = (Timer *)hnode_find (timerhash, name);
 	if (timer) {
 		timer->interval = interval;
-		dlog (DEBUG2, "set_timer_interval: timer interval for %s (%s) set to %d", name, timer->moduleptr->info->name, interval);
+		dlog (DEBUG2, "SetTimerInterval: timer interval for %s (%s) set to %d", name, timer->moduleptr->info->name, interval);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;

@@ -393,7 +393,7 @@ char* sftime (time_t stuff)
 	return fmtime;
 }
 
-/** @brief validate_nick
+/** @brief ValidateNick
  *  
  *  Check that passed string is a valid nick
  *  
@@ -401,7 +401,7 @@ char* sftime (time_t stuff)
  *  
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int validate_nick (char* nick)
+int ValidateNick (char* nick)
 {
 	char* ptr;
 
@@ -415,7 +415,7 @@ int validate_nick (char* nick)
 	return NS_SUCCESS;
 }
 
-/** @brief validate_user
+/** @brief ValidateUser
  *  
  *  Check that passed string is a valid username
  *  
@@ -423,7 +423,7 @@ int validate_nick (char* nick)
  *  
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int validate_user (char* username)
+int ValidateUser (char* username)
 {
 	char* ptr;
 
@@ -437,7 +437,7 @@ int validate_user (char* username)
 	return NS_SUCCESS;
 }
 
-/** @brief validate_host
+/** @brief ValidateHost
  *  
  *  Check that passed string is a valid hostname
  *  
@@ -445,7 +445,7 @@ int validate_user (char* username)
  *  
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int validate_host (char* hostname)
+int ValidateHost (char* hostname)
 {
 	char* ptr;
 
@@ -459,7 +459,7 @@ int validate_host (char* hostname)
 	return NS_SUCCESS;
 }
 
-/** @brief validate_url
+/** @brief ValidateURL
  *  
  *  Check that passed string is a valid url
  *  
@@ -467,7 +467,7 @@ int validate_host (char* hostname)
  *  
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int validate_url (char* url)
+int ValidateURL (char* url)
 {
 	char* ptr;
 
@@ -484,7 +484,7 @@ int validate_url (char* url)
 	return NS_SUCCESS;
 }
 
-/** @brief validate_channel
+/** @brief ValidateChannel
  *  
  *  Check that passed string is a valid channel name
  *  
@@ -492,7 +492,7 @@ int validate_url (char* url)
  *  
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int validate_channel (char* channel_name)
+int ValidateChannel (char* channel_name)
 {
 	char* ptr;
 

@@ -414,7 +414,7 @@ ns_cmd_level (CmdParams* cmdparams)
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Your level is %d", cmdparams->source), UserLevel (cmdparams->source));
 	} else {
 		Client * otheruser;
-		otheruser = find_user(cmdparams->av[0]);
+		otheruser = FindUser(cmdparams->av[0]);
 		if(!otheruser) {
 			irc_prefmsg (ns_botptr, cmdparams->source, __("User %s not found", cmdparams->source), cmdparams->av[0]);
 			return NS_FAILURE;

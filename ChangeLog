@@ -9,7 +9,7 @@ Fish (F), Mark (M)
    combined with server command. (M)
  - Add DCC support to NeoStats, you can now have a DCC chat with neostats and
    issue commands via this interface. (M)
- - Add command_report function for use by modules to report command information
+ - Add CommandReport function for use by modules to report command information
    and take account of reporting options. (M)
  - Change NeoStats root user to use a config file nickname. This is for future
    use in multiple NeoStats incarnations running in a shared environment. (M)

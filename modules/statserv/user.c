@@ -70,7 +70,7 @@ int ss_event_mode(CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-static int AddUser (Client * u, void *v)
+static int AddUser (Client *u, void *v)
 {
 	SET_SEGV_LOCATION();
 	AddServerUser (u);
@@ -79,7 +79,7 @@ static int AddUser (Client * u, void *v)
 	return NS_FALSE;
 }
 
-static void DelUser (Client * u)
+static void DelUser (Client *u)
 {
 	if (is_oper(u)) {
 		dlog(DEBUG2, "Decreasing OperCount on %s due to signoff", u->uplink->name);
@@ -125,9 +125,9 @@ int ss_event_signon(CmdParams *cmdparams)
 static int operlistaway = 0;
 static char* operlistserver;
 
-static int operlist(Client * u, void * v)
+static int operlist(Client *u, void * v)
 {
-	Client * listu;
+	Client *listu;
 
 	listu = (Client *)v;
 	if (!is_oper(u))
@@ -176,9 +176,9 @@ int ss_cmd_operlist(CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-static int botlist(Client * u, void * v)
+static int botlist(Client *u, void * v)
 {
-	Client * listu;
+	Client *listu;
 
 	listu = (Client *)v;
 	if is_bot(u) { 

@@ -245,7 +245,7 @@ int ss_cmd_channel (CmdParams *cmdparams)
 			return NS_SUCCESS;
 		}
 		irc_prefmsg(ss_bot, cmdparams->source, "\2Channel Information for %s (%s)\2", 
-			cmdparams->av[0], (find_channel(cmdparams->av[0]) ? "Online" : "Offline"));
+			cmdparams->av[0], (FindChannel(cmdparams->av[0]) ? "Online" : "Offline"));
 		irc_prefmsg(ss_bot, cmdparams->source, "Current Members: %d (Max %d on %s)",
 			cs->c->users, cs->users.alltime.max, sftime(cs->users.alltime.ts_max));
 		irc_prefmsg(ss_bot,cmdparams->source, "Max Members today: %d at %s", 
@@ -259,7 +259,7 @@ int ss_cmd_channel (CmdParams *cmdparams)
 		irc_prefmsg(ss_bot, cmdparams->source, "Total Kicks: %d", cs->kicks);
 		irc_prefmsg(ss_bot, cmdparams->source, "Total Kicks today %d (Max %d on %s)",
 			cs->kicks.daily.max, cs->kicks.alltime.max, sftime(cs->kicks.alltime.ts_max));
-		if (!find_channel(cmdparams->av[0]))
+		if (!FindChannel(cmdparams->av[0]))
 			irc_prefmsg(ss_bot, cmdparams->source, "Channel was last seen at %s",
 				sftime(cs->ts_lastseen));
 	}
@@ -364,7 +364,7 @@ static void del_chan (void *data)
 	channelstat *cs;
 	
 	cs = (channelstat *)data;
-	if (((me.now - cs->ts_lastseen) > 604800) && (!find_channel(cs->name))) {
+	if (((me.now - cs->ts_lastseen) > 604800) && (!FindChannel(cs->name))) {
 		dlog (DEBUG1, "Deleting Channel %s", cs->name);
 		DBADelete (CHANNEL_TABLE, cs->name);
 	}

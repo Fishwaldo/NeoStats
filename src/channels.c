@@ -22,7 +22,8 @@
 */
 
 /*  TODO:
- *  - 
+ *  - Since IRCu sends kick and part when a user is kicked, bots will be 
+ *    unable to rejoin from the kick event
  */
 
 #include "neostats.h"
@@ -110,7 +111,7 @@ void ChannelTopic (const char* chan, const char *owner, const char* ts, const ch
 	CmdParams *cmdparams;
 	Channel *c;
 
-	c = find_channel (chan);
+	c = FindChannel (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "ChannelTopic: can't find channel %s", chan);
 		return;
@@ -271,12 +272,12 @@ KickChannel (const char *kickby, const char *chan, const char *kicked, const cha
 
 	SET_SEGV_LOCATION();
 	dlog (DEBUG2, "KickChannel: %s kicked %s from %s for %s", kickby, kicked, chan, kickreason ? kickreason : "no reason");
-	u = find_user (kicked);
+	u = FindUser (kicked);
 	if (!u) {
 		nlog (LOG_WARNING, "KickChannel: user %s not found", kicked);
 		return;
 	}
-	c = find_channel (chan);
+	c = FindChannel (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "KickChannel: channel %s not found", chan);
 		return;
@@ -289,9 +290,9 @@ KickChannel (const char *kickby, const char *chan, const char *kicked, const cha
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->target = u;
 	cmdparams->channel = c;
-	cmdparams->source = find_user (kickby);
+	cmdparams->source = FindUser (kickby);
 	if (!cmdparams->source) {
-		cmdparams->source = find_server (kickby);
+		cmdparams->source = FindServer (kickby);
 	}
 	cmdparams->param = (char*)kickreason;
 	SendAllModuleEvent (EVENT_KICK, cmdparams);
@@ -327,7 +328,7 @@ void PartChannel (Client * u, const char *chan, const char *reason)
 		nlog (LOG_WARNING, "PartChannel: trying to part NULL user from %s", chan);
 		return;
 	}
-	c = find_channel (chan);
+	c = FindChannel (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "PartChannel: channel %s not found", chan);
 		return;
@@ -368,7 +369,7 @@ JoinChannel (const char* nick, const char *chan)
 	ChannelMember *cm;
 	
 	SET_SEGV_LOCATION();
-	u = find_user (nick);
+	u = FindUser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "JoinChannel: tried to join unknown user %s to channel %s", nick, chan);
 		return;
@@ -379,7 +380,7 @@ JoinChannel (const char* nick, const char *chan)
 		PartAllChannels (u, NULL);
 		return;
 	}
-	c = find_channel (chan);
+	c = FindChannel (chan);
 	if (!c) {
 		/* its a new Channel */
 		dlog (DEBUG2, "JoinChannel: new channel %s", chan);
@@ -396,7 +397,7 @@ JoinChannel (const char* nick, const char *chan)
 	}
 	dlog (DEBUG2, "JoinChannel: adding usernode %s to channel %s", u->name, chan);
 	cm = ns_calloc (sizeof (ChannelMember));
-	cm->u = find_user(nick);
+	cm->u = FindUser(nick);
 	cm->tsjoin = me.now;
 	cm->flags = 0;
 	lnode_create_append (c->members, cm);
@@ -474,7 +475,7 @@ void ListChannels (CmdParams* cmdparams, const char *chan)
 			ListChannel (cmdparams, c);
 		}
 	} else {
-		c = find_channel (chan);
+		c = FindChannel (chan);
 		if (c) {
 			ListChannel (cmdparams, c);
 		} else {
@@ -483,7 +484,7 @@ void ListChannels (CmdParams* cmdparams, const char *chan)
 	}
 }
 
-/** @brief find_channel
+/** @brief FindChannel
  *
  *  Finds the channel structure for the channel named chan
  *
@@ -492,13 +493,13 @@ void ListChannels (CmdParams* cmdparams, const char *chan)
  *  @returns channel structure for chan, or NULL if it can't be found.
 */
 
-Channel *find_channel (const char *chan)
+Channel *FindChannel (const char *chan)
 {
 	Channel *c;
 
 	c = (Channel *)hnode_find (channelhash, chan);
 	if (!c) {
-		dlog (DEBUG3, "find_channel: %s not found", chan);
+		dlog (DEBUG3, "FindChannel: %s not found", chan);
 	}
 	return c;
 }
@@ -540,8 +541,8 @@ int test_cumode (char* chan, char* nick, int flag)
 	Channel *c;
  	ChannelMember *cm;
 
-	u = find_user(nick);
-	c = find_channel(chan);
+	u = FindUser(nick);
+	c = FindChannel(chan);
 	if (!u || !c) {
 		return NS_FALSE;
 	}

@@ -811,7 +811,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 static void
 m_end_of_burst (char *origin, char **argv, int argc, int srv)
 {
-	if (strcmp (base64_to_server (origin), me.uplink) == 0) {
+	if( ircstrcasecmp( base64_to_server( origin ), me.uplink ) == 0 ) {
 		send_end_of_burst_ack ();
 	}
 }

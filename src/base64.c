@@ -57,7 +57,7 @@ int set_server_base64( const char *name, const char* base64name )
 {
 	Client *s;
 
-	s = find_server( name );
+	s = FindServer( name );
 	if( !s ) {
 		dlog( DEBUG1, "set_server_base64: cannot find %s for %s", name, base64name );
 		return NS_FAILURE;
@@ -82,7 +82,7 @@ char *server_to_base64( const char* name )
 	Client *s;
 
 	dlog( DEBUG1, "server_to_base64: scanning for %s", name );
-	s = find_server( name );
+	s = FindServer( name );
 	if( s ) {
 		return s->name64;
 	}
@@ -128,7 +128,7 @@ int set_nick_base64( const char *nick, const char* base64name )
 {
 	Client *u;
 
-	u = find_user( nick );
+	u = FindUser( nick );
 	if( !u ) {
 		dlog( DEBUG1, "set_nick_base64: cannot find %s for %s", nick, base64name );
 		return NS_FAILURE;
@@ -153,7 +153,7 @@ char *nick_to_base64( const char* nick )
 	Client *u;
 
 	dlog( DEBUG1, "nick_to_base64: scanning for %s", nick );
-	u = find_user( nick );
+	u = FindUser( nick );
 	if( u ) {
 		return u->name64;
 	}

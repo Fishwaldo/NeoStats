@@ -314,9 +314,9 @@ static int hs_set_expire_cb (CmdParams* cmdparams, SET_REASON reason)
 		return NS_SUCCESS;
 	}
 	if (hs_cfg.expire) {
-		add_timer (TIMER_TYPE_INTERVAL, ExpireOldHosts, "ExpireOldHosts", 7200);
+		AddTimer (TIMER_TYPE_INTERVAL, ExpireOldHosts, "ExpireOldHosts", 7200);
 	} else {
-		del_timer ("ExpireOldHosts");
+		DelTimer ("ExpireOldHosts");
 	}
 	return NS_SUCCESS;
 }
@@ -442,7 +442,7 @@ int ModSynch (void)
 		return NS_FAILURE;
 	}
 	if (hs_cfg.expire) {
-		add_timer (TIMER_TYPE_INTERVAL, ExpireOldHosts, "ExpireOldHosts", 7200);
+		AddTimer (TIMER_TYPE_INTERVAL, ExpireOldHosts, "ExpireOldHosts", 7200);
 	}
 	if (!HaveUmodeRegNick()) 
 	{
@@ -564,7 +564,7 @@ static int hs_cmd_bans_add (CmdParams *cmdparams)
 	hnode_create_insert (banhash, ban, ban->host);
 	irc_prefmsg (hs_bot, cmdparams->source, 
 		"%s added to the banned vhosts list", cmdparams->av[1]);
-	command_report(hs_bot, "%s added %s to the banned vhosts list",
+	CommandReport(hs_bot, "%s added %s to the banned vhosts list",
 		  cmdparams->source->name, cmdparams->av[1]);
 	SaveBan (ban);
 	return NS_SUCCESS;
@@ -592,7 +592,7 @@ static int hs_cmd_bans_del (CmdParams *cmdparams)
 			hash_scan_delete (banhash, hn);
 			irc_prefmsg (hs_bot, cmdparams->source, 
 				"Deleted %s from the banned vhost list", cmdparams->av[1]);
-			command_report(hs_bot, "%s deleted %s from the banned vhost list",
+			CommandReport(hs_bot, "%s deleted %s from the banned vhost list",
 				cmdparams->source->name, cmdparams->av[1]);
 			nlog (LOG_NOTICE, "%s deleted %s from the banned vhost list",
 				cmdparams->source->name, cmdparams->av[1]);
@@ -658,7 +658,7 @@ static int hs_cmd_chpass (CmdParams *cmdparams)
 		if (!ircstrcasecmp (vhe->passwd, cmdparams->av[1])) {
 			strlcpy (vhe->passwd, cmdparams->av[2], MAXPASS);
 			irc_prefmsg (hs_bot, cmdparams->source, "Password changed");
-			command_report(hs_bot, "%s changed the password for %s",
+			CommandReport(hs_bot, "%s changed the password for %s",
 					cmdparams->source->name, vhe->nick);
 			SaveVhost (vhe);
 			return NS_SUCCESS;
@@ -702,7 +702,7 @@ static int hs_cmd_add (CmdParams *cmdparams)
 			return NS_SUCCESS;
 		}
 	}
-	if (validate_host (cmdparams->av[2]) == NS_FAILURE || !index(cmdparams->av[2], '.')) {
+	if (ValidateHost (cmdparams->av[2]) == NS_FAILURE || !index(cmdparams->av[2], '.')) {
 		irc_prefmsg (hs_bot, cmdparams->source, 
 			"%s is an invalid host", cmdparams->av[2]);
 		return NS_SUCCESS;
@@ -722,10 +722,10 @@ static int hs_cmd_add (CmdParams *cmdparams)
 	irc_prefmsg (hs_bot, cmdparams->source, 
 		"%s has successfully been registered under realhost: %s vhost: %s and password: %s",
 		cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3]);
-	command_report(hs_bot, "%s added a vhost %s for %s with realhost %s",
+	CommandReport(hs_bot, "%s added a vhost %s for %s with realhost %s",
 		cmdparams->source->name, cmdparams->av[2], cmdparams->av[0], cmdparams->av[1]);
 	/* Apply The New Hostname If The User Is Online */
-	u = find_user(cmdparams->av[0]);
+	u = FindUser(cmdparams->av[0]);
 	if (u && !IsMe(u)) {
 		if (match (cmdparams->av[1], u->user->hostname)) {
 			irc_svshost (hs_bot, u, cmdparams->av[2]);
@@ -861,7 +861,7 @@ static int hs_cmd_del (CmdParams *cmdparams)
 		vhe->nick, vhe->vhost);
 	nlog (LOG_NOTICE, "%s removed the vhost %s for %s", 
 			cmdparams->source->name, vhe->vhost, vhe->nick);
-	command_report(hs_bot, "%s removed vhost %s for %s",
+	CommandReport(hs_bot, "%s removed vhost %s for %s",
 			cmdparams->source->name, vhe->vhost, vhe->nick);
 	del_vhost (vhe);
 	list_delete (vhost_list, hn);

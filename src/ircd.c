@@ -606,10 +606,9 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	ircd_cmd_ptr = cmd_list;
-	while (ircd_cmd_ptr->name) {
-		if (!strcmp (ircd_cmd_ptr->name, cmd)
-			||((ircd_srv.protocol & PROTOCOL_TOKEN) && ircd_cmd_ptr->token && !strcmp (ircd_cmd_ptr->token, cmd))
-			) {
+	while( ircd_cmd_ptr->name ) {
+		if( !ircstrcasecmp( ircd_cmd_ptr->name, cmd ) || 
+		  ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && ircd_cmd_ptr->token && !ircstrcasecmp( ircd_cmd_ptr->token, cmd ) ) ) {
 			if (ircd_cmd_ptr->function) {
 				dlog (DEBUG3, "process_ircd_cmd: running command %s", ircd_cmd_ptr->name);
 				ircd_cmd_ptr->function (origin, av, ac, cmdptr);
@@ -624,8 +623,8 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 	
 	ircd_cmd_ptr = numeric_cmd_list;	
 	/* Process numeric replies */
-	while (ircd_cmd_ptr->name) {
-		if (!strcmp (ircd_cmd_ptr->name, cmd)) {
+	while( ircd_cmd_ptr->name ) {
+		if ( !ircstrcasecmp( ircd_cmd_ptr->name, cmd ) ) {
 			if (ircd_cmd_ptr->function) {
 				dlog (DEBUG3, "process_ircd_cmd: running command %s", ircd_cmd_ptr->name);
 				ircd_cmd_ptr->function (origin, av, ac, cmdptr);
@@ -998,7 +997,7 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
 	time_t ts;
 	Channel *c;
 
-	c = find_channel (chan);
+	c = FindChannel (chan);
 	ts = (!c) ? me.now : c->creationtime;
 	/* Use sjoin if available */
 	if ((ircd_srv.protocol & PROTOCOL_SJOIN) && irc_send_sjoin) {
@@ -1040,7 +1039,7 @@ irc_part (const Bot *botptr, const char *chan, const char *quitmsg)
 		unsupported_cmd ("PART");
 		return NS_FAILURE;
 	}
-	c = find_channel (chan);
+	c = FindChannel (chan);
 	/* Decrement number of persistent users if needed 
 	 * Must be BEFORE we part the channel in order to trigger
 	 * empty channel processing for other bots
@@ -1065,7 +1064,7 @@ irc_nickchange (const Bot *botptr, const char *newnick)
 		return NS_FAILURE;
 	}
 	/* Check newnick is not in use */
-	if (find_user (newnick)) {
+	if (FindUser (newnick)) {
 		nlog (LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", botptr->name, newnick);
 		return NS_FAILURE;
 	}
@@ -1204,7 +1203,7 @@ irc_kick (const Bot *botptr, const char *chan, const char *target, const char *r
 		return NS_FAILURE;
 	}
 	irc_send_kick (botptr->u->name, chan, target, reason);
-	PartChannel (find_user (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
+	PartChannel (FindUser (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
 	return NS_SUCCESS;
 }
 
@@ -1506,13 +1505,13 @@ do_pong (const char* origin, const char* destination)
 	Client *s;
 	CmdParams * cmdparams;
 
-	s = find_server (origin);
+	s = FindServer (origin);
 	if (s) {
-		s->server->ping = me.now - ping.last_sent;
-		if (ping.ulag > 1)
-			s->server->ping -= ping.ulag;
-		if (!strcmp (me.s->name, s->name))
-			ping.ulag = me.s->server->ping;
+		s->server->ping = me.now - me.tslastping;
+		if (me.ulag > 1)
+			s->server->ping -= me.ulag;
+		if( IsMe( s ) )
+			me.ulag = me.s->server->ping;
 		cmdparams = (CmdParams*)ns_calloc (sizeof(CmdParams));
 		cmdparams->source = s;
 		SendAllModuleEvent (EVENT_PONG, cmdparams);
@@ -1645,7 +1644,7 @@ do_stats (const char* nick, const char *what)
 	Client *u;
 
 	SET_SEGV_LOCATION();
-	u = find_user (nick);
+	u = FindUser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "do_stats: message from unknown user %s", nick);
 		return;
@@ -1744,7 +1743,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		paramidx++;
 		ok = 1;
 	}
-	c = find_channel (channame);
+	c = FindChannel (channame);
 	if (c) {
 		/* update the TS time */
 		c->creationtime = atoi (tstime);
@@ -1791,7 +1790,7 @@ do_join (const char* nick, const char* chanlist, const char* keys)
 void 
 do_part (const char* nick, const char* chan, const char* reason)
 {
-	PartChannel (find_user (nick), chan, reason);
+	PartChannel (FindUser (nick), chan, reason);
 }
 
 void 
@@ -1981,7 +1980,7 @@ void
 do_swhois (char *who, char *swhois)
 {
 	Client * u;
-	u = find_user(who);
+	u = FindUser(who);
 	if (u) {
 		strlcpy(u->user->swhois, swhois, MAXHOST);
 	}
@@ -2005,7 +2004,7 @@ do_eos (const char *name)
 {
 	Client *s;
 
-	s = find_server (name);
+	s = FindServer (name);
 	if (s) {
 		SynchServer(s);
 		dlog (DEBUG1, "do_eos: server %s is now synched", name);
@@ -2018,7 +2017,7 @@ void do_setname (const char* nick, const char* realname)
 {
 	Client *u;
 
-	u = find_user(nick);
+	u = FindUser(nick);
 	if (u) {
 		dlog (DEBUG1, "do_setname: setting realname of user %s to %s", nick, realname);
 		strlcpy(u->info, (char*)realname, MAXHOST);
@@ -2031,7 +2030,7 @@ void do_sethost (const char* nick, const char* host)
 {
 	Client *u;
 
-	u = find_user(nick);
+	u = FindUser(nick);
 	if (u) {
 		dlog (DEBUG1, "do_sethost: setting host of user %s to %s", nick, host);
 		strlcpy(u->user->hostname, (char*)host, MAXHOST);
@@ -2044,7 +2043,7 @@ void do_setident (const char* nick, const char* ident)
 {
 	Client *u;
 
-	u = find_user(nick);
+	u = FindUser(nick);
 	if (u) {
 		dlog (DEBUG1, "do_setident: setting ident of user %s to %s", nick, ident);
 		strlcpy(u->user->username, (char*)ident, MAXHOST);
@@ -2086,7 +2085,7 @@ static void m_numeric351 (char *origin, char **argv, int argc, int srv)
 {
 	Client *s;
 
-	s = find_server(origin);
+	s = FindServer(origin);
 	if (s) {
 		strlcpy(s->version, argv[1], MAXHOST);
 	}
@@ -2101,7 +2100,7 @@ static void m_numeric242 (char *origin, char **argv, int argc, int srv)
 {
 	Client *s;
 
-	s = find_server(origin);
+	s = FindServer(origin);
 	if (s) {
 		/* Convert "Server Up 6 days, 23:52:55" to seconds*/
 		char *ptr;

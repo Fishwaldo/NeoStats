@@ -579,7 +579,7 @@ int ChanMode (char *origin, char **av, int ac)
 	CmdParams * cmdparams;
 	int i, j = 2;
 
-	c = find_channel (av[0]);
+	c = FindChannel (av[0]);
 	if (!c) {
 		return 0;
 	}	
@@ -615,12 +615,12 @@ ChanUserMode (const char *chan, const char *nick, int add, const unsigned int ma
 	Channel *c;
 	Client *u;
 
-	u = find_user(nick);
+	u = FindUser(nick);
 	if (!u) {
 		nlog (LOG_WARNING, "ChanUserMode: can't find user %s", nick);
 		return;
 	}
-	c = find_channel(chan);
+	c = FindChannel(chan);
 	if (!c) {
 		nlog (LOG_WARNING, "ChanUserMode: can't find channel %s", chan);
 		return;

@@ -23,7 +23,6 @@
 
 /*  TODO:
  *  - More error processing
- *  - Make SET options use a hash to speed up lookups?
  */
 
 #include "neostats.h"
@@ -64,12 +63,12 @@ char *help_level_title[]=
  */
 static bot_cmd intrinsic_commands[]=
 {
-	{"HELP",	NULL,	0, 	0,	cmd_help_help, 		cmd_help_oneline},	
-	{"VERSION",	NULL,	0, 	0,	cmd_help_version,	cmd_help_version_oneline},
-	{"ABOUT",	NULL,	0, 	0,	cmd_help_about, 	cmd_help_about_oneline },
-	{"CREDITS",	NULL,	0, 	0,	cmd_help_credits, 	cmd_help_credits_oneline },
-	{"LEVELS",	NULL,	0, 	0,	cmd_help_levels, 	cmd_help_levels_oneline },
-	{NULL,		NULL,	0, 	0,	NULL, 				NULL}
+	{"HELP",	bot_cmd_help,	0, 	0,	cmd_help_help, 		cmd_help_oneline},	
+	{"VERSION",	bot_cmd_version,0, 	0,	cmd_help_version,	cmd_help_version_oneline},
+	{"ABOUT",	bot_cmd_about,	0, 	0,	cmd_help_about, 	cmd_help_about_oneline },
+	{"CREDITS",	bot_cmd_credits,0, 	0,	cmd_help_credits, 	cmd_help_credits_oneline },
+	{"LEVELS",	bot_cmd_levels,	0, 	0,	cmd_help_levels, 	cmd_help_levels_oneline },
+	{NULL,		NULL,			0, 	0,	NULL, 				NULL}
 };
 
 /** @brief calc_cmd_ulevel calculate cmd ulevel
@@ -116,7 +115,7 @@ static int getuserlevel(CmdParams *cmdparams)
 }
 
 /** common message handlers */
-void command_report (const Bot *botptr, const char *fmt, ...)
+void CommandReport (const Bot *botptr, const char *fmt, ...)
 {
 	static char buf[BUFSIZE];
 	va_list ap;
@@ -374,36 +373,21 @@ intrinsic_handler (CmdParams *cmdparams, bot_cmd_handler handler)
 int
 run_intrinsic_cmds (const char *cmd, CmdParams *cmdparams)
 {
-	/* Handle intrinsic commands */
-	/* Help */
-	if (!ircstrcasecmp (cmd, "HELP")) {
-		intrinsic_handler (cmdparams, bot_cmd_help);
-		return NS_SUCCESS;
-	}
+	bot_cmd *cmd_ptr;
+
 	/* Handle SET if we have it */
 	if (cmdparams->bot->botsettings && !ircstrcasecmp (cmd, "SET") ) {
 		intrinsic_handler (cmdparams, bot_cmd_set);
 		return NS_SUCCESS;
 	}
-	/* About */
-	if (!ircstrcasecmp (cmd, "ABOUT") && cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->about_text ) {
-		intrinsic_handler (cmdparams, bot_cmd_about);
-		return NS_SUCCESS;
-	}
-	/* Version */
-	if (!ircstrcasecmp (cmd, "VERSION")) {
-		intrinsic_handler (cmdparams, bot_cmd_version);
-		return NS_SUCCESS;
-	}
-	/* Credits */
-	if (!ircstrcasecmp (cmd, "CREDITS") && cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->copyright ) {
-		intrinsic_handler (cmdparams, bot_cmd_credits);
-		return NS_SUCCESS;
-	}
-	/* Level */
-	if (!ircstrcasecmp (cmd, "LEVELS")) {
-		intrinsic_handler (cmdparams, bot_cmd_levels);
-		return NS_SUCCESS;
+	/* Handle intrinsic commands */
+	cmd_ptr = intrinsic_commands;
+	while (cmd_ptr->cmd) {
+		if( !ircstrcasecmp( cmd, cmd_ptr->cmd ) ) {
+			intrinsic_handler ( cmdparams, cmd_ptr->handler );
+			return NS_SUCCESS;
+		}
+		cmd_ptr++;
 	}
 	return NS_FAILURE;
 }
@@ -675,7 +659,7 @@ Client * find_valid_user(Bot* botptr, Client * sourceuser, const char *target_ni
 	Client * target;
 	
 	/* Check target user is on IRC */
-	target = find_user(target_nick);
+	target = FindUser(target_nick);
 	if (!target) {
 		irc_prefmsg (botptr, sourceuser, 
 			__("%s cannot be found on IRC, message not sent.", sourceuser), target_nick);
@@ -796,7 +780,7 @@ bot_cmd_set_int (CmdParams *cmdparams, bot_setting* set_ptr)
 
 	intval = atoi(cmdparams->av[1]);	
 	/* atoi will return 0 for a string instead of a digit so check it! */
-	if (intval == 0 && (strcmp(cmdparams->av[1],"0")!=0)) {
+	if ( intval == 0 && ( ircstrcasecmp( cmdparams->av[1], "0" ) !=0 ) ) {
 		irc_prefmsg (cmdparams->bot, cmdparams->source, 
 			__("%s invalid setting for %s", cmdparams->source), cmdparams->av[1], set_ptr->option);
 		irc_prefmsg (cmdparams->bot, cmdparams->source, 
@@ -834,7 +818,7 @@ bot_cmd_set_string (CmdParams *cmdparams, bot_setting* set_ptr)
 static int 
 bot_cmd_set_channel (CmdParams *cmdparams, bot_setting* set_ptr)
 {
-	if (validate_channel (cmdparams->av[1]) == NS_FAILURE) {
+	if (ValidateChannel (cmdparams->av[1]) == NS_FAILURE) {
 		irc_prefmsg (cmdparams->bot, cmdparams->source, 
 			__("%s contains invalid characters", cmdparams->source), cmdparams->av[1]);
 		return NS_ERR_SYNTAX_ERROR;
@@ -865,7 +849,7 @@ bot_cmd_set_msg (CmdParams *cmdparams, bot_setting* set_ptr)
 static int 
 bot_cmd_set_nick (CmdParams *cmdparams, bot_setting* set_ptr)
 {
-	if (validate_nick (cmdparams->av[1]) == NS_FAILURE) {
+	if (ValidateNick (cmdparams->av[1]) == NS_FAILURE) {
 		irc_prefmsg (cmdparams->bot, cmdparams->source, 
 			__("%s contains invalid characters", cmdparams->source), cmdparams->av[1]);
 		return NS_ERR_SYNTAX_ERROR;
@@ -881,7 +865,7 @@ bot_cmd_set_nick (CmdParams *cmdparams, bot_setting* set_ptr)
 static int 
 bot_cmd_set_user (CmdParams *cmdparams, bot_setting* set_ptr)
 {
-	if (validate_user (cmdparams->av[1]) == NS_FAILURE) {
+	if (ValidateUser (cmdparams->av[1]) == NS_FAILURE) {
 		irc_prefmsg (cmdparams->bot, cmdparams->source, 
 			__("%s contains invalid characters", cmdparams->source), cmdparams->av[1]);
 		return NS_ERR_SYNTAX_ERROR;
@@ -902,7 +886,7 @@ bot_cmd_set_host (CmdParams *cmdparams, bot_setting* set_ptr)
 			__("%s is an invalid hostname", cmdparams->source), cmdparams->av[1]);
 		return NS_ERR_SYNTAX_ERROR;
 	}
-	if (validate_host (cmdparams->av[1]) == NS_FAILURE) {
+	if (ValidateHost (cmdparams->av[1]) == NS_FAILURE) {
 		irc_prefmsg (cmdparams->bot, cmdparams->source, 
 			__("%s contains invalid characters", cmdparams->source), cmdparams->av[1]);
 		return NS_ERR_SYNTAX_ERROR;
@@ -1027,7 +1011,9 @@ bot_cmd_set (CmdParams *cmdparams)
  */
 static int bot_cmd_about (CmdParams *cmdparams)
 {
-	irc_prefmsg_list (cmdparams->bot, cmdparams->source, cmdparams->bot->moduleptr->info->about_text);
+	if( cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->about_text ) {
+		irc_prefmsg_list (cmdparams->bot, cmdparams->source, cmdparams->bot->moduleptr->info->about_text);
+	}
 	return NS_SUCCESS;
 }
 
@@ -1050,8 +1036,10 @@ static int bot_cmd_version (CmdParams *cmdparams)
  */
 static int bot_cmd_credits (CmdParams *cmdparams)
 {
-	irc_prefmsg_list (cmdparams->bot, cmdparams->source, 
-		cmdparams->bot->moduleptr->info->copyright);
+	if( cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->copyright ) {
+		irc_prefmsg_list (cmdparams->bot, cmdparams->source, 
+			cmdparams->bot->moduleptr->info->copyright);
+	}
 	return NS_SUCCESS;
 }
 

@@ -70,7 +70,7 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	}
 	if (uplink) {
 		strlcpy (s->uplinkname, uplink, MAXHOST);
-		s->uplink = find_server (uplink);
+		s->uplink = FindServer (uplink);
 	}
 	if (infoline) {
 		strlcpy (s->info, infoline, MAXINFO);
@@ -162,7 +162,7 @@ find_server_base64 (const char *num)
 }
 
 Client *
-find_server (const char *name)
+FindServer (const char *name)
 {
 	hnode_t *sn;
 
@@ -170,7 +170,7 @@ find_server (const char *name)
 	if (sn) {
 		return (Client *) hnode_get (sn);
 	}
-	dlog(DEBUG3, "find_server: %s not found!", name);
+	dlog(DEBUG3, "FindServer: %s not found!", name);
 	return NULL;
 }
 
@@ -207,7 +207,7 @@ ListServers (const char *name)
 			dumpserver (s);
 		}
 	} else {
-		s = find_server (name);
+		s = FindServer (name);
 		if (s) {
 			dumpserver (s);
 		} else {
@@ -241,11 +241,11 @@ PingServers (void)
 	if(!is_synched)
 		return;
 	dlog(DEBUG3, "Sending pings...");
-	ping.ulag = 0;
+	me.ulag = 0;
 	hash_scan_begin (&ss, serverhash);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		if (!strcmp (me.name, s->name)) {
+		if( IsMe( s ) ) {
 			s->server->ping = 0;
 			continue;
 		}
@@ -296,7 +296,7 @@ void RequestServerUptimes (void)
 	hash_scan_begin (&ss, serverhash);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		if (strcmp (me.name, s->name)) {
+		if( !IsMe( s ) ) {
 			send_cmd(":%s STATS u %s", ns_botptr->u->name, s->name);
 		}
 	}

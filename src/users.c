@@ -69,7 +69,7 @@ static void lookupnickip (char *data, adns_answer *a)
 	CmdParams *cmdparams;
 	Client *u;
 	
-	u = find_user ((char *)data);
+	u = FindUser ((char *)data);
 	if (a && a->nrrs > 0 && u && a->status == adns_s_ok) {
 		u->ip.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
 		if (u->ip.s_addr > 0) {
@@ -111,7 +111,7 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	Client *u;
 
 	SET_SEGV_LOCATION();
-	u = find_user (nick);
+	u = FindUser (nick);
 	if (u) {
 		nlog (LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick);
 		return NULL;
@@ -135,7 +135,7 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	strlcpy (u->user->username, user, MAXUSER);
 	strlcpy (u->info, realname, MAXREALNAME);
 	u->user->ulevel = -1;
-	u->uplink = find_server (server);
+	u->uplink = FindServer (server);
 	u->uplink->server->users++;
 	u->user->tslastmsg = me.now;
 	u->user->chans = list_create (MAXJOINCHANS);
@@ -203,7 +203,7 @@ void KillUser (const char* source, const char *nick, const char *reason)
 
 	SET_SEGV_LOCATION();
 	dlog (DEBUG2, "KillUser: %s", nick);
-	u = find_user (nick);
+	u = FindUser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "KillUser: %s failed!", nick);
 		return;
@@ -216,7 +216,7 @@ void KillUser (const char* source, const char *nick, const char *reason)
 	ac = split_buf (killbuf, &av, 0);
 	killreason = joinbuf (av, ac, 1);
 	cmdparams->param = killreason;
-	cmdparams->source = find_user (source);
+	cmdparams->source = FindUser (source);
 	if (cmdparams->source)
 	{
 		SendAllModuleEvent (EVENT_KILL, cmdparams);
@@ -224,7 +224,7 @@ void KillUser (const char* source, const char *nick, const char *reason)
 	}
 	else
 	{
-		cmdparams->source = find_server (source);
+		cmdparams->source = FindServer (source);
 		SendAllModuleEvent (EVENT_KILL, cmdparams);
 		SendAllModuleEvent (EVENT_SERVERKILL, cmdparams); 		
 	}
@@ -248,7 +248,7 @@ void QuitUser (const char *nick, const char *reason)
 
 	SET_SEGV_LOCATION();
 	dlog (DEBUG2, "QuitUser: %s", nick);
-	u = find_user (nick);
+	u = FindUser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "QuitUser: %s failed!", nick);
 		return;
@@ -274,7 +274,7 @@ void QuitUser (const char *nick, const char *reason)
 		killbuf = sstrdup (cmdparams->param);
 		ac = split_buf (killbuf, &av, 0);
 		killreason = joinbuf(av, ac, 5);
-		cmdparams->source = find_user (av[4]);
+		cmdparams->source = FindUser (av[4]);
 		cmdparams->target = u;
 		cmdparams->param = killreason;
 		SendAllModuleEvent (EVENT_LOCALKILL, cmdparams);
@@ -291,7 +291,7 @@ void UserAway (const char *nick, const char *awaymsg)
 	CmdParams *cmdparams;
 	Client *u;
 
-	u = find_user (nick);
+	u = FindUser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "UserAway: unable to find user %s for away", nick);
 		return;
@@ -367,13 +367,13 @@ Client *find_user_base64 (const char *num)
 	return NULL;
 }
 
-Client *find_user (const char *nick)
+Client *FindUser (const char *nick)
 {
 	Client *u;
 
 	u = (Client *)hnode_find (userhash, nick);
 	if (!u) {
-		dlog (DEBUG3, "find_user: %s not found", nick);
+		dlog (DEBUG3, "FindUser: %s not found", nick);
 	}
 	return u;
 }
@@ -438,7 +438,7 @@ void ListUsers (CmdParams *cmdparams, const char *nick)
 	if (!nick) {
 		GetUserList (dumpuser, cmdparams);
 	} else {
-		u = find_user (nick);
+		u = FindUser (nick);
 		if (u) {
 			dumpuser (u, (void *)cmdparams);
 		} else {
@@ -463,7 +463,7 @@ void SetUserVhost (const char *nick, const char *vhost)
 {
 	Client *u;
 
-	u = find_user (nick);
+	u = FindUser (nick);
 	dlog (DEBUG1, "Vhost %s", vhost);
 	if (u) {
 		strlcpy (u->user->vhost, vhost, MAXHOST);
@@ -484,7 +484,7 @@ void UserMode (const char *nick, const char *modes)
 
 	SET_SEGV_LOCATION();
 	dlog (DEBUG1, "UserMode: user %s modes %s", nick, modes);
-	u = find_user (nick);
+	u = FindUser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "UserMode: mode change for unknown user %s %s", nick, modes);
 		return;
@@ -515,7 +515,7 @@ void UserSMode (const char *nick, const char *modes)
 
 	SET_SEGV_LOCATION();
 	dlog (DEBUG1, "UserSMode: user %s smodes %s", nick, modes);
-	u = find_user (nick);
+	u = FindUser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "UserSMode: smode change for unknown user %s %s", nick, modes);
 		return;
@@ -535,7 +535,7 @@ void SetUserServicesTS (const char *nick, const char *ts)
 {
 	Client *u;
 
-	u = find_user (nick);
+	u = FindUser (nick);
 	if (u) {
 		u->user->servicestamp = strtoul(ts, NULL, 10);
 	}
@@ -615,7 +615,7 @@ void AddFakeUser (const char *mask)
 	nick = strtok (maskcopy, "!");
 	user = strtok (NULL, "@");
 	host = strtok (NULL, "");
-	u = find_user (nick);
+	u = FindUser (nick);
 	if (u) {
 		nlog (LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick);
 		return;
@@ -646,7 +646,7 @@ void DelFakeUser (const char *mask)
 	nick = strtok (maskcopy, "!");
 	user = strtok (NULL, "@");
 	host = strtok (NULL, "");
-	u = find_user (nick);
+	u = FindUser (nick);
 	deluser (u);
 }
 
