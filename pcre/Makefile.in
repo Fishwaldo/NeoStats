@@ -22,7 +22,10 @@ chartables.c:   dftables
 	./dftables >./chartables.c
 
 clean:
-	 $(RM) *.o Makefile dftables ../pcre.h chartables.c config.h
+	 $(RM) *.o Makefile dftables ../pcre.h chartables.c config.h *.exe
+
+distclean:
+	 $(RM) *.o Makefile dftables ../pcre.h chartables.c config.h *.exe
 
 install: 
 

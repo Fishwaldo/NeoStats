@@ -28,7 +28,10 @@ $(TARGET): $(OBJS)
 
 # How to clean up files created by the build process
 clean:
-	$(RM) *.o *.lo *.so *.d
+	$(RM) *.o *.lo *.so *.d *.dll
+
+distclean:
+	$(RM) *.o *.lo *.so *.d *.dll
 
 # How to install this module
 # TARGET will be that defined for building in the Module makefile

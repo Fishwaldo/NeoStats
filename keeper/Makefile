@@ -14,6 +14,9 @@ all:	$(OBJS)
 clean:
 	$(RM) *.o *.lo *.so *.a
 
+distclean:
+	$(RM) *.o *.lo *.so *.a
+
 depend:
 	$(CC) -MM $(INCLUDES) $(KEEPERCFLAGS) $(SRCS) > .depend
 

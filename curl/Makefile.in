@@ -27,7 +27,10 @@ redoparser:
 	 mv -f y.tab.c getdate.c
 
 clean:
-	 /bin/rm -rf *.o config.h Makefile mycurl-config
+	 /bin/rm -rf *.o config.h Makefile mycurl-config *.a *.log
+
+distclean:
+	 /bin/rm -rf *.o config.h Makefile mycurl-config *.a *.log config.status configure.lineno
 
 install: 
 

@@ -21,6 +21,9 @@ configtool:	$(OBJS)
 clean:
 	$(RM) *.o *.lo *.so *.a configtool
 
+distclean:
+	$(RM) *.o *.lo *.so *.a configtool
+
 install: 
 
 depend:

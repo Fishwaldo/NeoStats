@@ -22,8 +22,11 @@ configtool:
 
 clean:
 	(cd cfgtool; $(MAKE) $@)
-	$(RM) *.o *.lo *.so *.a kptool Makefile
+	$(RM) *.o *.lo *.so *.a kptool Makefile *.exe
 
+distclean:
+	(cd cfgtool; $(MAKE) $@)
+	$(RM) *.o *.lo *.so *.a kptool Makefile *.exe
 
 install: 
 	$(INSTALL_PROGRAM) kptool @prefix@

@@ -75,7 +75,17 @@ clean:
 	(cd pcre; $(MAKE) $@)
 	(cd curl; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
-	$(RM) *.o neostats *.cache Makefile config.h  Makefile.inc *.log *.a
+	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc *.log *.a *.d *.exe
+
+distclean:
+	(cd dl; $(MAKE) $@)
+	(cd adns; $(MAKE) $@)
+	(cd keeper; $(MAKE) $@)
+	(cd tools; $(MAKE) $@)
+	(cd pcre; $(MAKE) $@)
+	(cd curl; $(MAKE) $@)
+	(cd sqlsrv; $(MAKE) $@)
+	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc *.log *.a *.d *.exe config.status
 
 neostats: $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(EXTRA_LDFLAGS) -o $@
@@ -149,23 +159,3 @@ dist:
 
 # Catch any changes in compilation options at the top of this file
 $(OBJS): Makefile Makefile.inc
-
-dns.o: dns.c stats.h adns/adns.h list.h hash.h config.h log.h
-chans.o: chans.c stats.h adns/adns.h list.h hash.h config.h dl.h log.h
-dotconf.o: dotconf.c dotconf.h
-services.o: services.c stats.h adns/adns.h list.h hash.h config.h dl.h log.h
-main.o: main.c stats.h adns/adns.h list.h hash.h config.h dl.h conf.h log.h
-sock.o: sock.c stats.h adns/adns.h list.h hash.h config.h dl.h conf.h log.h
-conf.o: conf.c stats.h adns/adns.h list.h hash.h config.h dotconf.h conf.h dl.h log.h
-ircd.o: ircd.c stats.h adns/adns.h list.h hash.h config.h dl.h log.h
-timer.o: timer.c stats.h adns/adns.h list.h hash.h config.h dl.h log.h
-users.o: users.c stats.h adns/adns.h list.h hash.h config.h dl.h log.h
-ns_help.o: ns_help.c stats.h adns/adns.h list.h hash.h config.h 
-dl.o: dl.c dl.h hash.h stats.h adns/adns.h list.h config.h log.h
-list.o: list.c list.h
-hash.o: hash.c hash.h
-server.o: server.c stats.h adns/adns.h list.h hash.h config.h log.h
-keeper.o: keeper.c stats.h adns/adns.h list.h hash.h config.h keeper/keeper.h conf.h log.h
-log.o: log.c stats.h adns/adns.h list.h hash.h config.h conf.h log.h
-transfer.o: transfer.c transfer.h stats.h list.h
-exclude.o: exclude.c exclude.h

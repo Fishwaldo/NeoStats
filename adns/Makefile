@@ -11,7 +11,10 @@ all: $(OBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 clean:
-	$(RM) *.o *.lo *.so *.a
+	$(RM) *.o *.lo *.so *.a  *.exe config.h
+
+distclean:
+	$(RM) *.o *.lo *.so *.a  *.exe config.h
 
 depend:
 	$(CC) -MM $(INCLUDES) $(CFLAGS) $(SRCS) > .depend

@@ -55,5 +55,8 @@ dist:
 	done
 
 clean: 
-	rm -rf *.o lib* parse.output parse.save
+	rm -rf *.o lib* Makefile parse.output parse.save
+
+distclean:
+	rm -rf *.o lib* Makefile parse.output parse.save
 
