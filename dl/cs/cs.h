@@ -53,7 +53,7 @@
   #define CONETADMIN_MODE '8'		/* Set to a number we dont use */
   #define NETADMIN_MODE 'N'
   #define TECHADMIN_MODE 'T'
-  #define SERVICESADMIN_MODE 'A'
+  #define SERVICESADMIN_MODE 'a'
   #define NETSERVICE_MODE 'S'
   #define INVISIBLE_MODE 'I'
   #define BOT_MODE 'B'
