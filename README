@@ -157,7 +157,7 @@ Debugging:
 
 Most users will never look at this option. It compiles NeoStats 
 with debugging turned on. I would only suggest using this if you 
-have problems and are about to fill out a bug form.
+have problems and are about to make a bug report.
 
         --enable-debug        Enables Debugging
 
@@ -175,7 +175,7 @@ us for support of the RAW command.
 1.4 Compiling NeoStats
 ----------------------
 
-Ok, you should now be back at a shell prompt, type:
+You should now be back at a shell prompt, type:
 
         make
 
@@ -267,7 +267,7 @@ change to the directory where NeoStats in installed e.g.
 
 Then to run NeoStats type:
 
-        ./bin/neostats
+        ./neostats
 
 It should link and sync with your server in a matter of seconds.
 
@@ -383,6 +383,10 @@ all the documentation provided. You should then check the web site bug list
 and search the forums to see if your problem has already been reported and if 
 a solution has been posted. 
 
+Read the log files. NeoStats tries to log problems it encounters and the log
+file should tell you what went wrong. If the error in the log file does not 
+help you, you still need to tell us what it says.
+
 Before sending us a suggestion, you should check the forums carefully to see 
 if your suggestion has already been made and if the NeoStats team have decided 
 to implement it or not. 
@@ -391,6 +395,10 @@ You do not have to read all the messages to find out if your issue has
 already been discussed. The use of the "Search" feature on the forums is a 
 great way to quickly get answers to your problem if other users have already 
 encountered the issue. 
+
+Read the post entitled Bug Reporting Guidelines in the forum before posting.
+This is at the top of all the support forums. It reminds you what 
+information you must provide to get support.
 
 NeoStats Group are only able to help with issues affecting NeoStats. We are 
 not able to help set up your IRC Server or Services on your network (including 
@@ -413,12 +421,10 @@ You can get support for NeoStats in a number of different ways so choose
 the one that suits you best.
 
 * Bug reporting system
-A new bug reporting section has been introduced and you can check this  
-to see if there are any known bugs in NeoStats and find out when they 
-are fixed. Soon you will be able to report bugs using this system. 
-For the bug tracking system, visit:
+You can check this to see if there are any known bugs in NeoStats and 
+find out when they are fixed. For the bug tracking system, visit:
 
-        http://bugs.neostats.net/index.php 
+        http://bugs.neostats.net/
 
 * Message boards available at:
 
@@ -446,19 +452,28 @@ the following information:
     module, the version of the module (found via /msg neostats modlist)
     The type of IRCD you are attempting to connect to (and version 
     number)
-
+    NeoStats will generate a file called segfault.log if it crashes. If
+    this file exists, you must send it to us.
+    
 We may request that you enable debugging and submit us the results of 
-debugging. To enable Debugging, use the following command to start 
+debugging. To enable debugging, use the following command to start 
 NeoStats:
 
         ./bin/neostats -d10
 
-When it crashes, or the bug has been reproduced, send us:
+When it crashes, or the bug has been reproduced, send the following 
+files:
         
+        segfault.log 
         logs/debug.log
 
 This will help us to be able to reproduce the bug and create a fix for 
 it.
+
+Remember you cannot give us too much information about your system and
+setup, but if you do not give us enough, we cannot help you and if we 
+have to keep asking you to provide more information, that is less time
+we are spending fixing and developing NeoStats.
 
 -----------------------------------<>-----------------------------------
 

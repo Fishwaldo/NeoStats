@@ -32613,7 +32613,6 @@ if test "$no_create" != yes; then
   $ac_cs_success || { (exit 1); exit 1; }
 fi
 
-clear
 echo "Configuration complete."
 read -p "Press Enter key to read the release notes"
 clear

@@ -22,3 +22,10 @@ section on support or your entry will be removed.
 NeoStats 3.0 will co exist with an existing 2.5 series installation so you
 can run both together for testing this version if you wish.
 
+Known issues that we are aware of and should not be reported:
+
+* You may get a warning during compilation similar to:
+*  api.c: In function `dbcommand':
+*  api.c:351: warning: assignment makes pointer from integer without a cast
+* If you get errors when building tranfer.o, try the following then rebuild:
+* ./configure --with-curl=no 

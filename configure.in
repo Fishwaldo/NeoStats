@@ -332,7 +332,6 @@ AC_CONFIG_FILES([Makefile
 
 AC_CACHE_SAVE
 AC_OUTPUT
-clear
 echo "Configuration complete."
 read -p "Press Enter key to read the release notes"
 clear
