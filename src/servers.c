@@ -71,7 +71,7 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	if (uplink) {
 		strlcpy (s->uplinkname, uplink, MAXHOST);
 		s->uplink = FindServer (uplink);
-	}
+	} 
 	if (infoline) {
 		strlcpy (s->info, infoline, MAXINFO);
 	}
@@ -188,7 +188,7 @@ dumpserver (Client *s)
 	irc_chanalert (ns_botptr, _("Version: %s"), s->version);
 	irc_chanalert (ns_botptr, _("Uptime:  %ld day%s, %02ld:%02ld:%02ld"), (uptime / 86400), (uptime / 86400 == 1) ? "" : "s", ((uptime / 3600) % 24), ((uptime / 60) % 60), (uptime % 60) );
 	irc_chanalert (ns_botptr, _("Flags:   %x"), s->flags);
-	irc_chanalert (ns_botptr, _("Uplink:  %s"), s->uplink->name);
+	irc_chanalert (ns_botptr, _("Uplink:  %s"), s->uplink ? s->uplink->name : "");
 	irc_chanalert (ns_botptr, "========================================");
 }
 

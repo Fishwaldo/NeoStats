@@ -201,10 +201,10 @@ static void makemap(char *uplink, Client * u, int level)
 	Client *s;
 	serverstat *ss;
 	int i;
-
 	hash_scan_begin (&hs, GetServerHash ());
 	while ((sn = hash_scan_next (&hs))) {
 		s = hnode_get (sn);
+		printf("%d %s %s (%s)\n", level, s->name, s->uplink ? s->uplink->name : "", uplink);
 		ss = (serverstat *) GetServerModValue (s);
 		if ((level == 0) && (s->uplinkname[0] == 0)) {
 			/* its the root server */
@@ -215,7 +215,8 @@ static void makemap(char *uplink, Client * u, int level)
 				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %d/%d ]",
 				ss->name, s->server->users, (int)ss->users.alltime.max,
 				ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
-		} else if ((level > 0) && !ircstrcasecmp (uplink, s->uplinkname)) {
+			makemap(s->name, u, level + 1);
+		} else if ((level > 0) && (s->uplink) &&  !ircstrcasecmp (s->uplink->name, uplink)) {
 			if (StatServ.exclusions && IsExcluded(s)) {
 				makemap(s->name, u, level);
 			}
@@ -228,8 +229,8 @@ static void makemap(char *uplink, Client * u, int level)
 				"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%d ]",
 				buf, ss->name, s->server->users, (int)ss->users.alltime.max,
 				ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
+			makemap(s->name, u, level + 1);
 		}
-		makemap(s->name, u, level + 1);
 	}
 }
 
