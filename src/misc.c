@@ -40,6 +40,7 @@
 unsigned hrand(unsigned upperbound, unsigned lowerbound) 
 {
 	if ((upperbound < 1)) {
+		nlog (LOG_WARNING, "hrand() invalid value for upperbound");
 		return -1;
 	}
 	return ((unsigned)(rand()%((int)(upperbound-lowerbound+1))-((int)(lowerbound-1))));
