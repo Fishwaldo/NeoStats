@@ -471,25 +471,26 @@ send_globops (const char *from, const char *buf)
 static void
 m_stats (char *origin, char **argv, int argc, int srv)
 {
-	do_stats (origin, argv[0]);
+	do_stats (base64tonick (origin), argv[0]);
 }
 
+/* ABAAB V :Bj */
 static void
 m_version (char *origin, char **argv, int argc, int srv)
 {
-	do_version (origin, argv[0]);
+	do_version (base64tonick (origin), base64toserver (argv[0]));
 }
 
 static void
 m_motd (char *origin, char **argv, int argc, int srv)
 {
-	do_motd (origin, argv[0]);
+	do_motd (base64tonick (origin), base64toserver (argv[0]));
 }
 
 static void
 m_admin (char *origin, char **argv, int argc, int srv)
 {
-	do_admin (origin, argv[0]);
+	do_admin (base64tonick (origin), base64toserver (argv[0]));
 }
 
 /* m_server
@@ -505,7 +506,10 @@ m_admin (char *origin, char **argv, int argc, int srv)
  * argv[argc-1] = serverinfo
  * NumServ(sptr) SERVER name hop 0 TSL PROT YxxCap 0 :info
  */
-/* SERVER mark.local.org 1 1076002125 1076012166 J10 ABAP] + :me */
+/*
+SERVER srvname hop TSBoot TSLink Prot numcap modes :desc
+AB S srvname hop TSBoot TSLink Prot numcap modes :desc
+*/
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
