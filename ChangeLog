@@ -15,6 +15,11 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fix a off by one error in quit messages (F)
  - Temp fix for kick_chan when its a server performing the kick (BugID 108) (F)
  - Increaes Storage Size for AddStringToList (F)
+ - Update all ircd channel modes, user modes, messages and tokens (M)
+ - Change ircd command processing to be more efficient and easier to maintain (M)
+ - Add support for storing server info line (M)
+ - Add support for hostmasking (M)
+ - Improve TS processing (M)
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database

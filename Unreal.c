@@ -399,6 +399,11 @@ m_stats (char *origin, char **argv, int argc, int srv)
 	ns_usr_stats (origin, argv, argc);
 }
 
+/*
+ * m_version
+ *	parv[0] = sender prefix
+ *	parv[1] = remote server
+ */
 static void
 m_version (char *origin, char **argv, int argc, int srv)
 {
@@ -411,18 +416,35 @@ m_motd (char *origin, char **argv, int argc, int srv)
 	ns_usr_motd (origin, argv, argc);
 }
 
+/* m_admin
+ *	parv[0] = sender prefix
+ *	parv[1] = servername
+ */
 static void
 m_admin (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_admin (origin, argv, argc);
 }
 
+/*
+ * m_credits
+ *      parv[0] = sender prefix
+ *      parv[1] = servername
+ */
 static void
 m_credits (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_credits (origin, argv, argc);
 }
 
+/* m_server
+ *	parv[0] = sender prefix
+ *	parv[1] = servername
+ *  parv[2] = hopcount
+ *  parv[3] = numeric
+ *  parv[4] = serverinfo
+ * on old protocols, serverinfo is parv[3], and numeric is left out
+ */
 /*SERVER servername hopcount :U<protocol>-flags-numeric serverdesc*/
 static void
 m_server (char *origin, char **argv, int argc, int srv)
@@ -450,6 +472,11 @@ m_server (char *origin, char **argv, int argc, int srv)
 	}
 }
 
+/* m_squit
+ *	parv[0] = sender prefix
+ *	parv[1] = server name
+ *	parv[parc-1] = comment
+ */
 static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
@@ -459,6 +486,10 @@ m_squit (char *origin, char **argv, int argc, int srv)
 	free(tmpbuf);
 }
 
+/* m_quit
+ *	parv[0] = sender prefix
+ *	parv[1] = comment
+ */
 static void
 m_quit (char *origin, char **argv, int argc, int srv)
 {
@@ -468,6 +499,12 @@ m_quit (char *origin, char **argv, int argc, int srv)
 	free(tmpbuf);
 }
 
+/* m_svsmode
+ *  parv[0] - sender
+ *  parv[1] - username to change mode for
+ *  parv[2] - modes to change
+ *  parv[3] - Service Stamp (if mode == d)
+ */
 static void
 m_svsmode (char *origin, char **argv, int argc, int srv)
 {
@@ -480,6 +517,10 @@ m_svsmode (char *origin, char **argv, int argc, int srv)
 	}
 }
 
+/* m_mode 
+ *  parv[0] - sender
+ *  parv[1] - channel
+ */
 /*  MODE
  *  :nick MODE nick :+modestring 
  *  :servername MODE #channel +modes parameter list TS 
@@ -493,6 +534,12 @@ m_mode (char *origin, char **argv, int argc, int srv)
 		ChanMode (origin, argv, argc);
 	}
 }
+
+/* m_kill
+ *	parv[0] = sender prefix
+ *	parv[1] = kill victim(s) - comma separated list
+ *	parv[2] = kill path
+ */
 static void
 m_kill (char *origin, char **argv, int argc, int srv)
 {
@@ -506,11 +553,22 @@ m_vhost (char *origin, char **argv, int argc, int srv)
 {
 	SetUserVhost(origin, argv[0]);
 }
+
+/* m_pong
+ *  parv[0] = sender prefix
+ *  parv[1] = origin
+ *  parv[2] = destination
+ */
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_pong (origin, argv, argc);
 }
+
+/* m_away
+ *  parv[0] = sender prefix
+ *  parv[1] = away message
+ */
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
@@ -524,6 +582,27 @@ m_away (char *origin, char **argv, int argc, int srv)
 		UserAway (origin, NULL);
 	}
 }
+
+/* m_nick
+ *  parv[0] = sender prefix
+ *  parv[1] = nickname
+ * if from new client
+ *  parv[2] = nick password
+ * if from server:
+ *  parv[2] = hopcount
+ *  parv[3] = timestamp
+ *  parv[4] = username
+ *  parv[5] = hostname
+ *  parv[6] = servername
+ * if NICK version 1:
+ *  parv[7] = servicestamp
+ *  parv[8] = info
+ * if NICK version 2:
+ *  parv[7] = servicestamp
+ *  parv[8] = umodes
+ *  parv[9] = virthost, * if none
+ *  parv[10] = info
+ */
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
@@ -538,6 +617,16 @@ m_nick (char *origin, char **argv, int argc, int srv)
 	}
 }
 
+/* m_topic
+ *  parv[0] = sender prefix
+ *  parv[1] = topic text
+ * For servers using TS:
+ *  parv[0] = sender prefix
+ *  parv[1] = channel name
+ *  parv[2] = topic nickname
+ *  parv[3] = topic time
+ *  parv[4] = topic text
+ */
 /* TOPIC #channel ownder TS :topic */
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
@@ -549,6 +638,12 @@ m_topic (char *origin, char **argv, int argc, int srv)
 	free (buf);
 }
 
+/* m_kick
+ *	parv[0] = sender prefix
+ *	parv[1] = channel
+ *	parv[2] = client to kick
+ *	parv[3] = kick comment
+ */
 static void
 m_kick (char *origin, char **argv, int argc, int srv)
 {
@@ -557,11 +652,23 @@ m_kick (char *origin, char **argv, int argc, int srv)
 	kick_chan(argv[0], argv[1], origin, tmpbuf);
 	free(tmpbuf);
 }
+
+/* m_join
+ *	parv[0] = sender prefix
+ *	parv[1] = channel
+ *	parv[2] = channel password (key)
+ */
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
 	UserJoin (origin, argv[0]);
 }
+
+/* m_part
+ *	parv[0] = sender prefix
+ *	parv[1] = channel
+ *	parv[2] = comment
+ */
 static void
 m_part (char *origin, char **argv, int argc, int srv)
 {
@@ -571,21 +678,27 @@ m_part (char *origin, char **argv, int argc, int srv)
 	free(tmpbuf);
 }
 
+/* m_ping
+ *	parv[0] = sender prefix
+ *	parv[1] = origin
+ *	parv[2] = destination
+ */
 static void
 m_ping (char *origin, char **argv, int argc, int srv)
 {
 	send_pong (argv[0]);
 }
 
-/*  NETINFO 
- *  argv[0] global_max 
- *  argv[1] TStime 
- *  argv[2] UnrealProtocol 
- *  argv[3] CLOAK_KEYCRC 
- *  argv[4] 0 
- *  argv[5] 0 
- *  argv[6] 0 
- *  argv[7] :netname
+/* m_netinfo
+ *  parv[0] = sender prefix
+ *  parv[1] = max global count
+ *  parv[2] = time of end sync
+ *  parv[3] = unreal protocol using (numeric)
+ *  parv[4] = cloak-crc (> u2302)
+ *  parv[5] = free(**)
+ *  parv[6] = free(**)
+ *  parv[7] = free(**)
+ *  parv[8] = ircnet
  */
 static void
 m_netinfo (char *origin, char **argv, int argc, int srv)
@@ -614,6 +727,23 @@ m_eos (char *origin, char **argv, int argc, int srv)
 }
 #endif
     
+/* m_sjoin  
+ *  parv[0] = sender prefix
+ *  parv[1]	aChannel *chptr;
+ *    char *parv[], pvar[MAXMODEPARAMS][MODEBUFLEN + 3];
+ *    = channel timestamp
+ *  parv[2] = channel name
+ * if (parc == 3) 
+ *  parv[3] = nick names + modes - all in one parameter
+ * if (parc == 4)
+ *  parv[3] = channel modes
+ *  parv[4] = nick names + modes - all in one parameter
+ * if (parc > 4)
+ *  parv[3] = channel modes
+ *  parv[4 to parc - 2] = mode parameters
+ *  parv[parc - 1] = nick names + modes
+ */
+
 /*    MSG_SJOIN creationtime chname    modebuf parabuf :member list */
 /* R: ~         1073861298   #services +       <none>  :Mark */
 static void
@@ -622,17 +752,33 @@ m_sjoin (char *origin, char **argv, int argc, int srv)
 	handle_sjoin (argv[1], argv[0], argv[2], 4, origin, argv, argc);
 }
 
+/*
+ * m_pass
+ *	parv[0] = sender prefix
+ *	parv[1] = password
+ */
 static void
 m_pass (char *origin, char **argv, int argc, int srv)
 {
 }
 
+/*
+ * m_svsnick
+ *  parv[0] = sender
+ *  parv[1] = old nickname
+ *  parv[2] = new nickname
+ *  parv[3] = timestamp
+ */
 static void
 m_svsnick (char *origin, char **argv, int argc, int srv)
 {
-	UserNick (argv[0], argv[1], NULL);
+	UserNick (argv[0], argv[1], argv[2]);
 }
 
+/* m_whois
+ *	parv[0] = sender prefix
+ *	parv[1] = nickname masklist
+ */
 static void
 m_whois (char *origin, char **argv, int argc, int srv)
 {

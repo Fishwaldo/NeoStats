@@ -742,7 +742,6 @@
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
 #define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
 
-#define NEW_STYLE_IRCDCMDS
 //#define NEW_STYLE_SPLITBUF
 
 #endif /* UNREAL_H Define */

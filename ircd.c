@@ -514,8 +514,6 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 	int i;
 
 	SET_SEGV_LOCATION();
-	/* temporary define while ircd commands are ported to new system */
-#ifdef NEW_STYLE_IRCDCMDS
 	for (i = 0; i < ircd_cmdcount; i++) {
 		if (!strcmp (cmd_list[i].name, cmd)
 #ifdef GOTTOKENSUPPORT
@@ -527,21 +525,6 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 			break;
 		}
 	}
-#else
-	for (i = 0; i < ircd_cmdcount; i++) {
-		if (cmd_list[i].srvmsg == cmdptr) {
-			if (!strcmp (cmd_list[i].name, cmd)
-#ifdef GOTTOKENSUPPORT
-				||(me.token && cmd_list[i].token && !strcmp (cmd_list[i].token, cmd))
-#endif
-				) {
-				cmd_list[i].function (origin, av, ac, cmdptr);
-				cmd_list[i].usage++;
-				break;
-			}
-		}
-	}
-#endif
 #if 1
 	if(i >= ircd_cmdcount) {
 		nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);

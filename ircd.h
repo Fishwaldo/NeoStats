@@ -33,9 +33,6 @@ typedef struct IrcdCommands{
 	const char *token;
 #endif
 	ircd_cmd_handler function;
-#ifndef NEW_STYLE_IRCDCMDS
-	int srvmsg;		/* Should this be a Server Message(1), or a User Message?(0) */
-#endif
 	int usage;
 }IrcdCommands;
 
