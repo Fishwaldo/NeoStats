@@ -650,7 +650,7 @@ static void makemap(char *uplink, User * u, int level)
 	char buf[256];
 	int i;
 
-	hash_scan_begin(&hs, sh);
+	hash_scan_begin(&hs, GetServerHash());
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
 		ss = findstats(s->name);
