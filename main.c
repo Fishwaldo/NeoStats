@@ -25,7 +25,7 @@
 
 char s_Debug[MAXNICK] = "Stats_Debug";
 char s_Services[MAXNICK] = "NeoStats";
-const char version[] = "NeoStats-2.5_Alpha4.6";
+const char version[] = "NeoStats-2.5_Alpha4.7";
 const char version_date[] = __DATE__;
 const char version_time[] = __TIME__;
 
@@ -59,7 +59,9 @@ int main()
 	me.r_time=10;
 	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
 	RemoveLock();
-
+#ifdef RECVLOG
+	remove("logs/recv.log");
+#endif
 	__init_mod_list();
 	setup_signals();
 	ConfLoad();

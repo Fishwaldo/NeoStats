@@ -23,7 +23,7 @@ static void ns_jupe(User *, char *);
 static void ns_JOIN(User *, char *);
 void ns_debug_to_coders(char *);
 static void ns_raw(User *, char *);
-static void ns_user_dump(User *);
+static void ns_user_dump(User *, char *);
 static void ns_server_dump(User *);
 static void ns_chan_dump(User *, char *);
 static void ns_uptime(User *);
@@ -219,7 +219,11 @@ void servicesbot(char *nick, char **av, int ac) {
 			privmsg(u->nick,s_Services,"\2Error:\2 Debug Mode Disabled");
 			return;
 		}
-		ns_user_dump(u);
+		if (ac <= 2) {
+			ns_user_dump(u, NULL);
+		} else {
+			ns_user_dump(u, av[2]);
+		}
 	} else if (!strcasecmp(av[1], "CHANDUMP")) {
 		if (!me.coder_debug) {
 			privmsg(u->nick,s_Services,"\2Error:\2 Debug Mode Disabled");
@@ -403,7 +407,7 @@ static void ns_raw(User *u, char *message)
         me.SendM++;
         me.SendBytes = me.SendBytes + sent;
 }	
-static void ns_user_dump(User *u)
+static void ns_user_dump(User *u, char *nick)
 {
 	strcpy(segv_location, "ns_user_dump");
 	if (!(UserLevel(u) >= 180)) {
@@ -411,7 +415,7 @@ static void ns_user_dump(User *u)
 		return;
 	}		
 	notice(s_Services,"\2DEBUG\2 \2%s\2 Requested a UserDump!",u->nick);
-	UserDump();
+	UserDump(nick);
 }
 static void ns_server_dump(User *u)
 {
@@ -432,7 +436,7 @@ static void ns_chan_dump(User *u, char *chan)
 		return;
 	}		
 	notice(s_Services,"\2DEBUG\2 \2%s\2 Requested a ChannelDump!",u->nick);
-	chandump(u, chan);
+	chandump(chan);
 }
 static void ns_uptime(User *u)
 {

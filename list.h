@@ -14,7 +14,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: list.h,v 1.1 2002/02/27 11:19:15 fishwaldo Exp $
+ * $Id: list.h,v 1.2 2002/03/11 06:55:04 fishwaldo Exp $
  * $Name:  $
  */
 
@@ -90,6 +90,9 @@ lnode_t *lnode_borrow(lnodepool_t *, void *);
 void lnode_return(lnodepool_t *, lnode_t *);
 int lnode_pool_isempty(lnodepool_t *);
 int lnode_pool_isfrom(lnodepool_t *, lnode_t *);
+
+int comparef(const void *, const void *);
+
 
 list_t *list_init(list_t *, listcount_t);
 list_t *list_create(listcount_t);

@@ -5,13 +5,17 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.14 2002/03/08 11:46:08 fishwaldo Exp $
+** $Id: sock.c,v 1.15 2002/03/11 06:55:04 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "dl.h"
 
 fd_set readfds, nullfds;
+
+#ifdef RECVLOG
+void recvlog(char *line);
+#endif
 
 void init_sock() {
 	if (usr_mds);
@@ -77,6 +81,9 @@ void read_loop()
 						if ((c == '\n') || (c == '\r')) {
 							me.RcveM++;
 							me.lastmsg = time(NULL);
+#ifdef RECVLOG
+							recvlog(buf);
+#endif
 							parse(buf);
 							break;
 						}
@@ -103,7 +110,16 @@ void read_loop()
 	}
  log("hu, how did we get here");
 }
-
+#ifdef RECVLOG
+void recvlog(char *line)
+{
+	FILE *logfile;
+	if ((logfile = fopen("logs/recv.log", "a")) == NULL) return;
+	if (logfile)
+		fprintf(logfile, "%s", line);
+	fclose(logfile);
+}
+#endif
 
 void log(char *fmt, ...)
 {

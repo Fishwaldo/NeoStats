@@ -14,7 +14,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: list.c,v 1.1 2002/02/27 11:19:15 fishwaldo Exp $
+ * $Id: list.c,v 1.2 2002/03/11 06:55:04 fishwaldo Exp $
  * $Name:  $
  */
 
@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <assert.h>
+#include <string.h>
 #define LIST_IMPLEMENTATION
 #include "list.h"
 
@@ -44,7 +45,7 @@
 #define lnode_prev(N)		((N)->prev)
 
 #ifdef KAZLIB_RCSID
-static const char rcsid[] = "$Id: list.c,v 1.1 2002/02/27 11:19:15 fishwaldo Exp $";
+static const char rcsid[] = "$Id: list.c,v 1.2 2002/03/11 06:55:04 fishwaldo Exp $";
 #endif
 
 /*
@@ -771,6 +772,13 @@ int list_verify(list_t *list)
     return 1;
 }
 
+int comparef(const void *key1, const void *key2)
+{
+    return strcasecmp(key1, key2);
+}
+
+
+
 #ifdef KAZLIB_TEST_MAIN
 
 #include <stdio.h>
@@ -807,10 +815,6 @@ static int tokenize(char *string, ...)
     return tokcount;
 }
 
-static int comparef(const void *key1, const void *key2)
-{
-    return strcmp(key1, key2);
-}
 
 static char *dupstring(char *str)
 {

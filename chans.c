@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.6 2002/03/08 14:18:08 fishwaldo Exp $
+** $Id: chans.c,v 1.7 2002/03/11 06:55:04 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -76,22 +76,26 @@ void ChanMode(char *origin, char **av, int ac) {
 }
 
 void ChangeChanUserMode(Chans *c, User *u, int add, long mode) {
-	hnode_t *cmn;
+	lnode_t *cmn;
 	Chanmem *cm;
-	cmn = hash_lookup(c->chanmembers, u->nick);
+	cmn = list_find(c->chanmembers, u->nick, comparef);
 	if (!cmn) {
-		log("ChangeChanUserMode() %s doesn't seem to be in the Chan %s", u->nick, c->name);
+		if (me.coder_debug) {
+			notice("ChangeChanUserMode() %s doesn't seem to be in the Chan %s", u->nick, c->name);
+			chandump(c->name);
+			UserDump(u->nick);
+		}
 		return;
 	}
-	cm = hnode_get(cmn);
+	cm = lnode_get(cmn);
 	if (add) {
 #ifdef DEBUG
-		log("Adding mode %ld to Channel %s User %s\n", mode, c->name, u->nick);
+		log("Adding mode %ld to Channel %s User %s", mode, c->name, u->nick);
 #endif
 		cm->flags |= mode;
 	} else {
 #ifdef DEBUG
-		log("Deleting Mode %ld to Channel %s User %s\n", mode, c->name, u->nick);
+		log("Deleting Mode %ld to Channel %s User %s", mode, c->name, u->nick);
 #endif
 		cm->flags &= ~mode;
 	}
@@ -128,46 +132,66 @@ void del_chan(Chans *c) {
 
 void part_chan(User *u, char *chan) {
 	Chans *c;
-	hnode_t *un;
+	lnode_t *un;
 	strcpy(segv_location, "part_chan");
 	if (!u) {
-		log("Ehh, Parting a Unknown User from Chan %s: %s", chan, recbuf);
+		log("Ehh, Parting a Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
+		if (me.coder_debug) {
+			notice("Ehh, Parting a Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
+			chandump(chan);
+			UserDump(u->nick);
+		}
 		return;
 	}
 	c = findchan(chan);
 	if (!c) {
-		log("Hu, Parting a Non existant Channel?");
+		log("Hu, Parting a Non existant Channel? %s", chan);
 		return;
 	} else {
-		un = hash_lookup(c->chanmembers, u->nick);
+		un = list_find(c->chanmembers, u->nick, comparef);
 		if (!un) {
 			log("hu, User %s isn't a member of this channel %s", u->nick, chan);
+			if (me.coder_debug) {
+				notice("hu, User %s isn't a member of this channel %s", u->nick, chan);
+				chandump(c->name);
+				UserDump(u->nick);
+			}
 		} else {
-			hash_delete(c->chanmembers, un);
+			lnode_destroy(list_delete(c->chanmembers, un));
 			c->cur_users--;
 		}
 		if (c->cur_users <= 0) {
 			del_chan(c);
 		}
-		un = hash_lookup(u->chans, chan);
+		un = list_find(u->chans, c->name, comparef);
 		if (!un) {
 			log("Hu, User %s claims not to be part of Chan %s", u->nick, chan);
+			if (me.coder_debug) {
+				notice("Hu, User %s claims not to be part of Chan %s", u->nick, chan);
+				chandump(c->name);
+				UserDump(u->nick);
+			}
 			return;
 		}
-		hash_delete(u->chans, un);
+		lnode_destroy(list_delete(u->chans, un));
 	}
 }			
 
 void change_user_nick(Chans *c, char *newnick, char *oldnick) {
-	hnode_t *cm;
+	lnode_t *cm;
 	strcpy(segv_location, "change_user_nick");
-	cm = hash_lookup(c->chanmembers, oldnick);
+	cm = list_find(c->chanmembers, oldnick, comparef);
 	if (!cm) {
 		log("change_user_nick() %s isn't a member of %s", oldnick, c->name);
+		if (me.coder_debug) {
+			notice("change_user_nick() %s isn't a member of %s", oldnick, c->name);
+			chandump(c->name);
+			UserDump(oldnick);
+		}
 		return;
 	} else {
-		hash_delete(c->chanmembers, cm);
-		hash_insert(c->chanmembers, cm, newnick);
+		lnode_destroy(list_delete(c->chanmembers, cm));
+		list_append(c->chanmembers, lnode_create(newnick));
 	}		
 }
 
@@ -176,7 +200,7 @@ void change_user_nick(Chans *c, char *newnick, char *oldnick) {
 
 void join_chan(User *u, char *chan) {
 	Chans *c;
-	hnode_t *un;
+	lnode_t *un;
 	Chanmem *cm;
 	strcpy(segv_location, "join_chan");
 	if (!u) {
@@ -191,30 +215,36 @@ void join_chan(User *u, char *chan) {
 		log("join_chan() -> New Channel %s", chan);
 #endif
 		c = new_chan(chan);
-		c->chanmembers = hash_create(CHAN_MEM_SIZE, 0, 0);
+		c->chanmembers = list_create(CHAN_MEM_SIZE);
 	} 
 	/* add this users details to the channel members hash */	
 	cm = malloc(sizeof(Chanmem));
-	cm->u = u;
+	strcpy(cm->nick, u->nick);
 	cm->joint = time(NULL);
 	cm->flags = 0;
-	un = hnode_create(cm);	
+	un = lnode_create(cm);	
 #ifdef DEBUG
 	log("adding usernode %s to Channel %s", u->nick, chan);
 #endif
-	if (hash_lookup(c->chanmembers, u->nick)) {
+	if (list_find(c->chanmembers, u->nick, comparef)) {
 		log("Adding %s to Chan %s when he is already a member?", u->nick, chan);
+		if (me.coder_debug) {
+			notice("Adding %s to Chan %s when he is already a member?", u->nick, chan);
+			chandump(c->name);
+			UserDump(u->nick);
+		}
 		return;
 	}
-	hash_insert(c->chanmembers, un, u->nick);
+	list_prepend(c->chanmembers, un);
 	c->cur_users++;
-	un = hnode_create(c->name);
-	hash_insert(u->chans, un, c->name); 
+	un = lnode_create(c->name);
+	list_prepend(u->chans, un); 
 }
 
-void chandump(User *u, char *chan) {
-	hnode_t *cn, *cmn;
-	hscan_t sc, scm;
+void chandump(char *chan) {
+	hnode_t *cn;
+	lnode_t *cmn;
+	hscan_t sc;
 	Chans *c;
 	Chanmem *cm;
 	char mode[10];
@@ -233,17 +263,18 @@ void chandump(User *u, char *chan) {
 					sprintf(mode, "%s%c", mode, cFlagTab[i].flag);
 				}
 			}
-			sendcoders("Channel: %s Members: %d (Hash %d) Flags %s", c->name, c->cur_users, hash_count(c->chanmembers), mode);
-			hash_scan_begin(&scm, c->chanmembers);
-			while ((cmn = hash_scan_next(&scm)) != NULL) {
-				cm = hnode_get(cmn);
+			sendcoders("Channel: %s Members: %d (List %d) Flags %s", c->name, c->cur_users, list_count(c->chanmembers), mode);
+			cmn = list_first(c->chanmembers);
+			while (cmn) {
+				cm = lnode_get(cmn);
 				strcpy(mode, "+");
 				for (i = 0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1); i++) {
 					if (cm->flags & cFlagTab[i].mode) {
 						sprintf(mode, "%s%c", mode, cFlagTab[i].flag);
 					}
 				}
-				sendcoders("Members: %s Modes %s Joined %d", cm->u->nick, mode, cm->joint);
+				sendcoders("Members: %s Modes %s Joined %d", cm->nick, mode, cm->joint);
+				cmn = list_next(c->chanmembers, cmn);
 			}
 		}
 	} else {
@@ -257,17 +288,18 @@ void chandump(User *u, char *chan) {
 					sprintf(mode, "%s%c", mode, cFlagTab[i].flag);
 				}
 			}
-			sendcoders("Channel: %s Members: %d (Hash %d) Flags %s", c->name, c->cur_users, hash_count(c->chanmembers), mode);
-			hash_scan_begin(&scm, c->chanmembers);
-			while ((cmn = hash_scan_next(&scm)) != NULL) {
-				cm = hnode_get(cmn);
+			sendcoders("Channel: %s Members: %d (List %d) Flags %s", c->name, c->cur_users, list_count(c->chanmembers), mode);
+			cmn = list_first(c->chanmembers);
+			while (cmn) {
+				cm = lnode_get(cmn);
 				strcpy(mode, "+");
 				for (i = 0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1); i++) {
 					if (cm->flags & cFlagTab[i].mode) {
 						sprintf(mode, "%s%c", mode, cFlagTab[i].flag);
 					}
 				}
-				sendcoders("Members: %s Modes %s Joined: %d", cm->u->nick, mode, cm->joint);
+				sendcoders("Members: %s Modes %s Joined: %d", cm->nick, mode, cm->joint);
+				cmn = list_next(c->chanmembers, cmn);
 			}
 		}
 	}

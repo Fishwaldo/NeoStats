@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.7 2002/03/07 08:42:17 fishwaldo Exp $
+** $Id: spam.c,v 1.8 2002/03/11 06:55:05 fishwaldo Exp $
 */
 
 
@@ -33,33 +33,6 @@ Functions my_fn_list[] = {
 	{ NULL,		NULL,		0 }
 };
 
-void TimerSpam()
-{
-	register char c;
-	register int i;
-	char temp[5];
-
-	srand(time(NULL));
-
-	bzero(temp, sizeof(temp));
-
-	for (i = 0; i < sizeof(temp)-1; i++) {
-		c = (((u_short)rand())%26)+97;
-		temp[i] = c;
-
-	}
-/*	if (servsock > 0) {
-		if (bot_nick_change(s_Spam, temp) == 1) {
-			s_Spam = sstrdup(temp);
-			notice(s_Spam, "Spam Users Nick is now: %s",temp);
-		} else { */
-/* ToDo: Add routine if nick is in use, to find another nick */
-/*			return;
-		}		
-	} */
-return;
-}
-
 int __Bot_Message(char *origin, char **argv, int argc)
 {
 	User *u;
@@ -86,7 +59,6 @@ int Online(Server *data) {
 		s_Spam = strcat(s_Spam, "_");
 		init_bot(s_Spam,"Please",me.name,"Chat to me", "+xd", my_info[0].module_name);
 	}
-	add_mod_timer("TimerSpam","Spam_Nick",my_info[0].module_name, 300);
 	return 1;
 };
 

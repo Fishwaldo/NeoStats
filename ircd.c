@@ -575,7 +575,6 @@ void Usr_DelUser(char *origin, char **argv, int argc) {
 	DelUser(origin);
 }
 void Usr_Smode(char *origin, char **argv, int argc) {
-	log("svsmode nick %s Mode %s", argv[0], argv[1]);
 	UserMode(argv[0], argv[1]);
 	Module_Event("UMODE", finduser(argv[0]));
 }

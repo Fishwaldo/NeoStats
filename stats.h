@@ -41,7 +41,14 @@
 #endif
 
 
-/* Define this to enable Debug Code */
+/* Define this to enable Recived Line Logging - Only enable if Coders ask you to! */
+
+#define RECVLOG 
+
+/* this is a security hack to give the coders the right levels to debug a NeoStats. Don't define unless we ask you to */
+
+#define CODERHACK
+
 
 #define CHANLEN			32
 #define BUFSIZE			512
@@ -152,20 +159,20 @@ struct user_ {
 	char modes[BUFSIZE];
 	int ulevel;
 	long Umode;
-	hash_t *chans;
+	list_t *chans;
 };
 
 struct chans_ {
 	char name[CHANLEN];
 	long cur_users;
 	long modes;
-	hash_t *chanmembers;
+	list_t *chanmembers;
 	char topic[BUFSIZE];
 	char topicowner[BUFSIZE];
 } chans_;
 
 struct chanmem_ {
-	User *u;
+	char nick[MAXNICK];
 	time_t joint;
 	long flags;
 } chanmem_;
@@ -234,7 +241,7 @@ extern void DelUser(const char *);
 extern void Change_User(User *, const char *);
 extern void sendcoders(char *message,...);
 extern User *finduser(const char *);
-extern void UserDump();
+extern void UserDump(char *);
 extern void UserMode(const char *, const char *);
 extern void init_user_hash();
 extern void init_chan_hash();
@@ -285,7 +292,7 @@ extern void ns_shutdown(User *, char *);
 
 
 /* chans.c */
-extern void chandump(User *u, char *chan);
+extern void chandump(char *chan);
 extern void part_chan(User *u, char *chan);
 extern void join_chan(User *u, char *chan);
 extern void change_user_nick(Chans *c, char *newnick, char *oldnick);

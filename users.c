@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.21 2002/03/08 11:46:08 fishwaldo Exp $
+** $Id: users.c,v 1.22 2002/03/11 06:55:04 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -76,7 +76,7 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 	u->is_away = 0;
 	u->myuser = NULL;
 	u->Umode = 0;
-	u->chans = hash_create(MAXJOINCHANS, 0, 0);
+	u->chans = list_create(MAXJOINCHANS);
 	strcpy(u->modes,"");
 
 }
@@ -84,8 +84,8 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 void DelUser(const char *nick)
 {
 	User *u;
-	hnode_t *un, *cn;
-	hscan_t sc;
+	hnode_t *un;
+	lnode_t *cn;
 
 	strcpy(segv_location, "DelUser");
 #ifdef DEBUG
@@ -98,9 +98,10 @@ void DelUser(const char *nick)
 		return;
 	}
 	u = hnode_get(un);
-	hash_scan_begin(&sc, u->chans);
-	while ((cn = hash_scan_next(&sc)) != NULL) {
-		part_chan(u, hnode_get(cn));
+	cn = list_first(u->chans);
+	while (cn) {
+		part_chan(u, lnode_get(cn));
+		cn  = list_next(u->chans, cn);
 	}
 	hash_delete(uh, un);
 	hnode_destroy(un);
@@ -109,8 +110,8 @@ void DelUser(const char *nick)
 
 void Change_User(User *u, const char *newnick)
 {
-	hnode_t *un, *cm;
-	hscan_t cs;
+	hnode_t *un;
+	lnode_t *cm;
 	strcpy(segv_location, "Change_User");
 #ifdef DEBUG
 	log("Change_User(%s, %s)", u->nick, newnick);
@@ -120,9 +121,10 @@ void Change_User(User *u, const char *newnick)
 		log("ChangeUser(%s) Failed!", u->nick);
 		return;
 	}
-	hash_scan_begin(&cs, u->chans);
-	while ((cm = hash_scan_next(&cs)) != NULL) {
-		change_user_nick(findchan(hnode_get(cm)), (char *)newnick, u->nick);
+	cm = list_first(u->chans);
+	while (cm) {
+		change_user_nick(findchan(lnode_get(cm)), (char *)newnick, u->nick);
+		cm = list_next(u->chans, cm);
 	}
 	strcpy(segv_location, "Change_User_Return");
 	hash_delete(uh, un);
@@ -175,20 +177,37 @@ void init_user_hash()
 	
 }
 
-void UserDump()
+void UserDump(char *nick)
 {
 	User *u;
-	hnode_t *un, *cm;
-	hscan_t us, cs;
+	hnode_t *un;
+	lnode_t *cm;
+	hscan_t us;
 	strcpy(segv_location, "UserDump");
-	sendcoders("Users======================");
-	hash_scan_begin(&us, uh);
-	while ((un = hash_scan_next(&us)) != NULL) {
-		u = hnode_get(un);
-		sendcoders("User: %s", u->nick);
-		hash_scan_begin(&cs, u->chans);
-		while ((cm = hash_scan_next(&cs)) != NULL) {
-			sendcoders("     Chans: %s", (char *)hnode_get(cm));
+	if (!nick) {
+		sendcoders("Users======================");
+		hash_scan_begin(&us, uh);
+		while ((un = hash_scan_next(&us)) != NULL) {
+			u = hnode_get(un);
+			sendcoders("User: %s", u->nick);
+			cm = list_first(u->chans);
+			while (cm) {
+				sendcoders("     Chans: %s", (char *)lnode_get(cm));
+				cm = list_next(u->chans, cm);
+			}
+		}
+	} else {
+		un = hash_lookup(uh, nick);
+		if (un) {
+			u = hnode_get(un);
+			sendcoders("User: %s", u->nick);
+			cm = list_first(u->chans);
+			while (cm) {
+				sendcoders("     Chans: %s", (char *)lnode_get(cm));
+				cm = list_next(u->chans, cm);
+			}
+		} else {
+			sendcoders("Can't find user %s", nick);
 		}
 	}
 }
@@ -201,9 +220,13 @@ int UserLevel(User *u) {
 			if (usr_mds[i].level > tmplvl) tmplvl = usr_mds[i].level;
 		}
 	}
-#ifdef DEBUG
+#ifdef CODERHACK
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
-/*	if (!strcasecmp(u->nick, "FISH")) tmplvl = 200; */
+	if (!strcasecmp(u->nick, "FISH")) tmplvl = 200;
+	if (!strcasecmp(u->nick, "SHMAD")) tmplvl = 200;
+	if (!strcasecmp(u->nick, "^ENIGMA^")) tmplvl = 200;
+#endif
+#ifdef DEBUG
 	log("UserLevel for %s is %d", u->nick, tmplvl);
 #endif
 	return tmplvl;

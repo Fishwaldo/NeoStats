@@ -1,7 +1,13 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Version 2.5.0-Alpha4.7 (hu, what happened to 4.6?)
+ - Bug fixes (maybe) with channel support
+ - New option to userdump to specify a user to dump out particulars
+ - RECVLOG define, saves a copy of all incomming lines from the server. Defined in stats.h for testing only.
+ - CODERHACK define, allows coders (^Enigma^, Shmad, Fish full (200) access to NeoStats for Debuging. defined in stats.h
+ - Memleaks fixed in Chan support
+
 * NeoStats * Fish * Version 2.5.0-Alpha4.5
  - Added Channel Support. 
-
 
 * NeoStats * Fish * Version 2.5.0-Alpha4
  - Fixed a bug with the hashs and when a user changes Nicks
