@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.h,v 1.10 2003/07/23 10:35:47 fishwaldo Exp $
+** $Id: cs.h,v 1.11 2003/08/18 15:29:22 fishwaldo Exp $
 */
 
 
@@ -42,6 +42,23 @@
   #define INVISIBLE_MODE '8'		/* Set to a number as we dont use */
   #define BOT_MODE '9'			/* Set to a number as we dont use */
 #elif ULTIMATE
+/*
+** If we are compiled to Use Ultimate 2.8.x use these modes and flags
+*/
+  #define LOCOP_MODE 'O'
+  #define OPER_MODE 'o'
+  #define GUESTADMIN_MODE '7'		/* Set to a number as we dont use */
+  #define COSERVERADMIN_MODE 'J'
+  #define SERVERADMIN_MODE 'A'
+  #define CONETADMIN_MODE 't'
+  #define NETADMIN_MODE 'N'
+  #define TECHADMIN_MODE 'T'
+  #define SERVICESADMIN_MODE 'P'
+  #define NETSERVICE_MODE 'S'
+  #define INVISIBLE_MODE '8'            /* Set to a number as we dont use */
+  #define BOT_MODE 'B'
+#endif
+#ifdef MYSTIC
 /*
 ** If we are compiled to Use Ultimate 2.8.x use these modes and flags
 */

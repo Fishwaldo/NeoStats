@@ -5165,6 +5165,9 @@ if test "${enable_ircu+set}" = set; then
   enableval="$enable_ircu"
    case "$enableval" in
   yes)
+	{ { echo "$as_me:$LINENO: error: 'Sorry IRCu support isnt complete yet'" >&5
+echo "$as_me: error: 'Sorry IRCu support isnt complete yet'" >&2;}
+   { (exit 1); exit 1; }; }
 
 cat >>confdefs.h <<\_ACEOF
 #define IRCU 1
