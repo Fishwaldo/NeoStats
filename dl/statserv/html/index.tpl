@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
 
-<title>NeoStats Documentation</title>
+<title>Network Statistics by NeoStats</title>
 <style type="text/css">
 <!--
 
