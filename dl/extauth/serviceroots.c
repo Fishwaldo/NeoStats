@@ -42,6 +42,14 @@ const char *sr_help_list[] = {
 	NULL
 };
 
+const char sr_help_list_oneline[] = "ServiceRoots List";
+
+bot_cmd extauth_commands[]=
+{
+	{"SRLIST", ext_auth_list, 0, NS_ULEVEL_OPER, sr_help_list, 0, sr_help_list_oneline},
+	{"\0",			NULL,			0, 	0,			NULL, 			0,	"\0"}
+};
+
 ModuleInfo __module_info = {
 	"extauth",
 	"ServiceRoots Authentication Module",
@@ -97,7 +105,7 @@ int __ModInit(int modnum, int apiver)
 		     "ServiceRoots: ehh, config failed");
 		/* we can't unload the extauth module so don't return -1 */
 	}
-	add_services_cmd("SRLIST", ext_auth_list, 0, NS_ULEVEL_OPER, sr_help_list, "ServiceRoots List");
+	add_services_cmd("SRLIST", ext_auth_list, 0, NS_ULEVEL_OPER, sr_help_list, sr_help_list_oneline);
 	return 1;
 }
 
