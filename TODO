@@ -5,5 +5,6 @@ NeoStats - TODO Log:
 Shmad:
 ------
 
-- Horrible crash bug when trying to delete statservs own stats for itself as a server
+- STATS DEL crashbug (fixed) must make it regen stats now.
+- RESET (statserv again) doesnt work at all lol!
 - Just Bug fixes right now.
