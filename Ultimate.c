@@ -170,7 +170,6 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 	EM = split_buf(tmp, 0);
 	ChanMode("", EM->av, EM->ac);
 	FreeList(EM->av, EM->ac);
-	free(EM->data);
 	free(EM);
 	free(tmp);
 	return 1;

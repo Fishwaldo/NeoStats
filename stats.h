@@ -140,10 +140,10 @@ struct EvntMsg_ {
 		Server *s;
 		User *u;
 	};
-	char *origin;
+	char origin[64];
 	int  isserv;
-	char *cmd;
-	char *data;
+	char cmd[64];
+	char data[512];
 	char **av;
 	int  ac;
 	void *fndata[10];
