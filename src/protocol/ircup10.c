@@ -588,7 +588,7 @@ m_kill (char *origin, char **argv, int argc, int srv)
 {
 	char* num = base64tonick(argv[0]);
 	if(num) {
-		do_kill (num, argv[1]);
+		do_kill (origin, num, argv[1]);
 	}
 }
 
