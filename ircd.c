@@ -535,15 +535,19 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 	int argc = 0;
 	int i;
 	User* u;
+	User* ud;
 
 	u = finduser(origin);
-	if(u) {
-		AddStringToList (&argv, u->nick, &argc);
+	ud = finduser(av[0]);
+	if(u && ud) {
+		AddStringToList (&argv, ud->nick, &argc);
 		for(i = 1; i < ac; i++) {
 			AddStringToList (&argv, av[i], &argc);
 		}
-		ModuleFunction (cmdptr, MSG_NOTICE, origin, argv, argc);
+		ModuleFunction (cmdptr, MSG_NOTICE, u->nick, argv, argc);
 		free(argv);
+	} else {
+		nlog (LOG_DEBUG1, LOG_CORE, "m_notice: skipping %s %s", origin, av[0]);
 	}
 #endif
 	SkipModuleFunction = 1;
