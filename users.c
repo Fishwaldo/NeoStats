@@ -123,6 +123,11 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	for (i = 0; i < NUM_MODULES; i++) {
 		u->moddata[i] = NULL;
 	}
+
+	if (!ircstrcasecmp(server, me.name)) {
+		u->flags |= NS_FLAGS_ME;
+	}
+
 	/* check if the user is excluded */
 	ns_do_exclude_user(u);
 

@@ -82,6 +82,10 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	}
 	s->connected_since = me.now;
 
+	if (!ircstrcasecmp(name, me.name)) {
+		s->flags |= NS_FLAGS_ME;
+	}
+
 	/* check exclusions */
 	ns_do_exclude_server(s);
 
