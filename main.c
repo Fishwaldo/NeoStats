@@ -49,9 +49,6 @@ const char version_time[] = __TIME__;
 static void start();
 static void setup_signals();
 
-#ifdef HAVE_FCLOSEALL
-int fcloseall(void);
-#endif
 
 int forked = 0;
 
@@ -92,7 +89,11 @@ int main()
 	setup_signals();
 	ConfLoad();
 	TimerReset();
+#ifndef DEBUG
 	adnsstart = adns_init(&ads, adns_if_noerrprint|adns_if_noautosys, 0);
+#else 
+	adnsstart = adns_init(&ads, adns_if_debug|adns_if_noautosys, 0);
+#endif
 	if (adnsstart) {
 		printf("ADNS init failed: %s\n", strerror(adnsstart));
 		exit(-1);

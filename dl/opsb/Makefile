@@ -3,19 +3,16 @@ include ../../Makefile.inc
 INCLUDES = -I../.. -Iares/ -I../../adns
 
 SOURCES= opsb.c
-OBJECTS= opsb.o libares.a
+OBJECTS= opsb.o 
 TARGET= opsb.so
 
-all:	opsb ares
+all:	opsb
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-libares.a:	
-	(cd ares; $(MAKE) $@)
-
 opsb: $(OBJECTS)
-	$(LD) $(MODLDFLAGS) -o $(TARGET) ares/libares.a $(LIBS) $(OBJECTS)
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
 	/bin/cp $(TARGET) ../
 
 clean:

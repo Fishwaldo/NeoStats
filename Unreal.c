@@ -397,9 +397,9 @@ void prefmsg(char *to, const char *from, char *fmt, ...)
 		sprintf(buf, ":%s PRIVMSG %s :%s", from, to, buf2);
 	} else {
 		sprintf(buf, ":%s NOTICE %s :%s", from, to, buf2);
+	}
 	sts("%s", buf);
 	va_end(ap);
-	}
 }
 
 void privmsg_list(char *to, char *from, const char **text)
