@@ -569,7 +569,7 @@ int pong(char **av, int ac)
 	}
 
 	/* ok, updated the statistics, now lets see if this server is "lagged out" */
-	if (s->ping > StatServ.lag) {
+	if (s->ping > StatServ.lagtime) {
 		announce_lag("\2%s\2 is Lagged out with a ping of %d",
 			s->name, s->ping);
 	}

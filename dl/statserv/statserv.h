@@ -76,7 +76,6 @@ struct StatServ {
 	char user[MAXUSER];
 	char host[MAXHOST];
 	char rname[MAXREALNAME];
-	int lag;
 	int lagtime;
 	int lagalert;
 	int recordalert;
