@@ -47,7 +47,7 @@ int InitCurl(void)
 	/* init the multi interface for curl */
 	curlmultihandle = curl_multi_init();
 	if (!curlmultihandle) {
-		nlog(LOG_WARNING, "LibCurl Refused to initilize...  Could be problems");
+		nlog(LOG_WARNING, "LibCurl Refused to initialize...  Could be problems");
 		return NS_FAILURE;
 	}
 	/* init the internal list to track downloads */
@@ -59,7 +59,7 @@ int InitCurl(void)
 static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, void *stream) 
 {
 	size_t writesize;
-	int rembuffer;
+	size_t rembuffer;
 	char *newbuf;
 	neo_transfer *neotrans = (neo_transfer *)stream;
 
@@ -72,7 +72,7 @@ static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, vo
 			break;
 		case NS_MEMORY:
 			size *= nmemb;
-			rembuffer = neotrans->savememsize - neotrans->savemempos; /* the remianing buffer size */
+			rembuffer = neotrans->savememsize - neotrans->savemempos; /* the remaining buffer size */
 			if (size > rembuffer) {
 				newbuf = srealloc(neotrans->savemem, neotrans->savememsize + (size - rembuffer));
 				if (newbuf == NULL) {

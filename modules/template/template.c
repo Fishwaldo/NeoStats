@@ -41,33 +41,13 @@ static Bot *template_bot;
  */
 static Module* template_module;
 
-/** Define information about our bot
- */
-BotInfo template_bot_info = 
-{
-	/* REQUIRED: 
-	 * nick */
-	"changeme",
-	/* OPTIONAL: 
-	 * altnick, use "" if not needed */
-	"altnick",
-	/* REQUIRED: 
-	 * user */
-	"changeme",
-	/* REQUIRED: 
-	 * host */
-	"",
-	/* REQUIRED: 
-	 * realname */
-	"Example NeoStats module",
-};
-
 /** 
  *  Example copyright text
  */
 const char* template_copyright[] = 
 {
 	"Copyright (c) 1999-2004, NeoStats",
+	"http://www.neostats.net/",
 	NULL
 };
 
@@ -145,8 +125,8 @@ ModuleInfo module_info = {
 static int template_hello_world(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	chanalert(template_bot->nick, "%s says \"Hello World!\"",
-		cmdparams->source.user->nick);
+	irc_chanalert (template_bot, "%s says \"Hello World!\"",
+		cmdparams->source->name);
 	return 1;
 }
 
@@ -166,12 +146,31 @@ static bot_cmd template_commands[]=
  */
 static bot_setting template_settings[]=
 {
-	{"NICK",		&template_bot_info.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, (void*)"changeme" },
-	{"ALTNICK",		&template_bot_info.altnick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, (void*)"altnick" },
-	{"USER",		&template_bot_info.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, (void*)"changeme" },
-	{"HOST",		&template_bot_info.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, (void*)"" },
-	{"REALNAME",	&template_bot_info.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"Example NeoStats module" },
 	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
+};
+
+/** Define information about our bot
+ */
+BotInfo template_bot_info = 
+{
+	/* REQUIRED: 
+	 * nick */
+	"changeme",
+	/* OPTIONAL: 
+	 * altnick, use "" if not needed */
+	"altnick",
+	/* REQUIRED: 
+	 * user */
+	"changeme",
+	/* REQUIRED: 
+	 * host */
+	BOT_COMMON_HOST,
+	/* REQUIRED: 
+	 * realname */
+	"Example NeoStats module",
+	0, 
+	template_commands, 
+	template_settings,
 };
 
 /** Online event processing
@@ -180,20 +179,7 @@ static bot_setting template_settings[]=
 static int tm_event_online(CmdParams* cmdparams)
 {
 	/* Introduce a bot onto the network saving the bot handle */
-	template_bot = init_bot (
-		&template_bot_info,		/* REQUIRED: pointer to bot info */
-		"-x",					/* OPTIONAL: user modes we want 
-								 * for the bot, use "" for none */
-		0,						/* OPTIONAL: flags affecting our bot
-								 * use 0 for none
-								 */
-		template_commands,		/* OPTIONAL: pointer to command list
-								 * use NULL for none
-								 */
-		template_settings		/* OPTIONAL: pointer to set command list
-								 * use NULL for none
-								 */
-		);
+	template_bot = init_bot (&template_bot_info);
 	return 1;
 };
 

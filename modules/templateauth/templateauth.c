@@ -2,8 +2,6 @@
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
-**  Portions Copyright (c) 2000-2001 ^Enigma^
-**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -23,13 +21,26 @@
 ** $Id: serviceroots.c 1721 2004-04-09 22:17:19Z Mark $
 */
 
-#include <stdio.h>
+/** templateauth.c 
+ *  You can copy this file as a template for writing your own auth modules
+ */
+
+/* neostats.h is the only required include for your module to access the 
+ * NeoStats module API. You should not need to include any other NeoStats
+ * files in order to develop your module.
+ */
 #include "neostats.h"
+
+const char *template_copyright[] = {
+	"Copyright (c) 1999-2004, NeoStats",
+	"http://www.neostats.net/",
+	NULL
+};
 
 ModuleInfo module_info = {
 	"TemplateAuth",
 	"Template Authentication Module",
-	ns_copyright,
+	template_copyright,
 	NULL,
 	NEOSTATS_VERSION,
 	CORE_MODULE_VERSION,
@@ -48,13 +59,12 @@ void ModFini()
 {
 }
 
-int ModAuthUser(User * u, int curlvl)
+int ModAuthUser(Client * u)
 {
-	return curlvl;
+	return 0;
 }
 
-int ModAuthList(User * u)
+int ModAuthList(Client * u)
 {
 	return 1;
 }
-

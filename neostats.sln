@@ -103,6 +103,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "statserv", "modules\statser
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "template", "modules\template\template.vcproj", "{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "templateauth", "modules\templateauth\templateauth.vcproj", "{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -193,6 +201,14 @@ Global
 		{46CEA1C0-DA36-4E6A-B9B6-6799FC1407E3}.Debug.Build.0 = Debug|Win32
 		{46CEA1C0-DA36-4E6A-B9B6-6799FC1407E3}.Release.ActiveCfg = Release|Win32
 		{46CEA1C0-DA36-4E6A-B9B6-6799FC1407E3}.Release.Build.0 = Release|Win32
+		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Debug.ActiveCfg = Debug|Win32
+		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Debug.Build.0 = Debug|Win32
+		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Release.ActiveCfg = Release|Win32
+		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Release.Build.0 = Release|Win32
+		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Debug.ActiveCfg = Debug|Win32
+		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Debug.Build.0 = Debug|Win32
+		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Release.ActiveCfg = Release|Win32
+		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
