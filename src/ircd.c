@@ -797,9 +797,9 @@ irc_prefmsg (const Bot *botptr, const Client *target, const char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	if (target->flags & CLIENT_FLAG_DCC) {
+	/*if (target->flags & CLIENT_FLAG_DCC) {
 		dcc_send_msg (target, ircd_buf);
-	} else if (nsconfig.want_privmsg) {
+	} else*/ if (nsconfig.want_privmsg) {
 		irc_send_privmsg (botptr->u->name, target->name, ircd_buf);
 	} else {
 		irc_send_notice (botptr?botptr->u->name:ns_botptr->u->name, target->name, ircd_buf);
@@ -899,7 +899,7 @@ irc_globops (const Bot *botptr, const char *fmt, ...)
 		}
 		irc_send_globops ((botptr?botptr->u->name:me.name), ircd_buf);
 	} else {
-		nlog (LOG_NORMAL, ircd_buf);
+		nlog(LOG_NOTICE, "globops before sync: %s", ircd_buf);
 	}
 	return NS_SUCCESS;
 }
