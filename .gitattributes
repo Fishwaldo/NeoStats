@@ -520,13 +520,6 @@ modules/statserv/geoip/GeoIPBitReader.h -text
 modules/statserv/geoip/GeoIPCity.c -text
 modules/statserv/geoip/GeoIPCity.h -text
 modules/statserv/geoip/global.h -text
-modules/statserv/geoipwin32/GeoIP.c -text
-modules/statserv/geoipwin32/GeoIP.h -text
-modules/statserv/geoipwin32/GeoIPBitReader.c -text
-modules/statserv/geoipwin32/GeoIPBitReader.h -text
-modules/statserv/geoipwin32/GeoIPCity.c -text
-modules/statserv/geoipwin32/GeoIPCity.h -text
-modules/statserv/geoipwin32/global.h -text
 modules/statserv/html/index.tpl -text
 modules/statserv/htmlstats.c -text
 modules/statserv/htmlstats.h -text
