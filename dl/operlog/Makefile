@@ -1,29 +1,7 @@
-include ../../Makefile.inc
+SRCS = operlog.c
+TARGET = operlog.so
+DISTFILES = $(SRCS) Makefile ChangeLog
 
-INCLUDES = -I../.. -I../../adns
+include ../Makefile.inc
 
-SOURCES= operlog.c
-OBJECTS= operlog.o
-TARGET= operlog.so
-
-all:	operlog
-
-.c.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<
-
-operlog: $(OBJECTS)
-	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
-	/bin/cp $(TARGET) ../
-
-clean:
-	/bin/rm -rf ../$(TARGET)
-	/bin/rm -rf *.o *.lo *.so
-
-install: operlog
-	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
-
-
-
-
-$(OBJECTS): Makefile
 operlog.o:		operlog.c	ol_help.c

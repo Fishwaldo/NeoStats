@@ -169,6 +169,7 @@ data/tlds.nfo -text
 /dl.h eol=lf
 dl/.indent.pro -text
 dl/Makefile -text
+dl/Makefile.inc -text
 dl/README -text
 dl/cs/.indent.pro -text
 dl/cs/ChangeLog -text
