@@ -104,8 +104,11 @@ static BotInfo ss_botinfo =
 	"StatServ", 
 	"StatServ", 
 	"SS", 
-	"", 
+	BOT_COMMON_HOST, 
 	"Statistics service", 
+	BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
+	ss_commands, 
+	ss_settings,
 };
 
 static bot_cmd ss_commands[]=
@@ -126,11 +129,6 @@ static bot_cmd ss_commands[]=
 
 static bot_setting ss_settings[]=
 {
-	{"NICK",		&ss_botinfo.nick,		SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",		NULL,		ns_help_set_nick, NULL, (void*)"StatServ" },
-	{"ALTNICK",		&ss_botinfo.altnick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",		NULL,		ns_help_set_altnick, NULL, (void*)"StatServ" },
-	{"USER",		&ss_botinfo.user,		SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",		NULL,		ns_help_set_user, NULL, (void*)"SS" },
-	{"HOST",		&ss_botinfo.host,		SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",		NULL,		ns_help_set_host, NULL, (void*)"" },
-	{"REALNAME",	&ss_botinfo.realname,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",	NULL,		ns_help_set_realname, NULL, (void*)"Statistics service" },
 	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, "HTML_Enabled",NULL,		ss_help_set_html},
 	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,		NS_ULEVEL_ADMIN, "HTML_Path",	NULL,		ss_help_set_htmlpath },
 	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, "MsgInterval",	"seconds",	ss_help_set_msginterval },
@@ -145,8 +143,7 @@ static bot_setting ss_settings[]=
 static int ss_event_online(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	ss_bot = init_bot (&ss_botinfo, me.servicesumode, 
-		BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, ss_commands, ss_settings);
+	ss_bot = init_bot (&ss_botinfo);
 	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */
 	add_timer (SaveStats, "SaveStats", DBSAVETIME);
