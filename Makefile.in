@@ -70,6 +70,7 @@ neostats: $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) adns/libadns.a keeper/libkeeper.a -o $@
 
 install: neostats modules
+	@rm -rf @prefix@/dl/*.so
 	$(INSTALL) -m 755 -d @prefix@
 	$(INSTALL) -m 755 -d @prefix@/dl
 	$(INSTALL) -m 755 -d @prefix@/include
