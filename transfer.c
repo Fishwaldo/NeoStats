@@ -264,11 +264,10 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		free(newtrans);
 		return NS_FAILURE;
 	}
-#if 0
-	if (curl_easy_perform(newtrans->curleasyhandle)) {
-		printf("%s\n", newtrans->curlerror);
+	/* we have to do this at least once to get things going */
+	while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curlmultihandle, &ret)) {
 	}
-#endif
+
 	return NS_SUCCESS;
 }
 
