@@ -25,25 +25,6 @@
 #ifndef NEOIRCD_H
 #define NEOIRCD_H
 
-/* Feature support for use by modules to determine whether
- * certain functionality is available
- */
-
-#define FEATURES FEATURE_SVSHOST \
-	| FEATURE_SVSJOIN \
-	| FEATURE_SVSPART \
-	| FEATURE_SVSNICK 
-
-
-/* buffer sizes */
-#define MAXHOST			(128 + 1)
-#define MAXPASS			(32 + 1)
-#define MAXNICK			(32 + 1)
-#define MAXUSER			(15 + 1)
-#define MAXREALNAME		(50 + 1)
-#define CHANLEN			(50 + 1)
-#define TOPICLEN		(512 + 1)
-
 /* Messages/Tokens */
 #define MSG_EOB		"EOB"	/* end of burst */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
@@ -201,12 +182,11 @@
 /* Umodes */
 #define UMODE_ADMIN	0x0080	/* admin flag */
 #define UMODE_BOTS	0x4000	/* shows bots */
-#define UMODE_CCONN	0x0008	/* shows client connections */
+#define UMODE_CLIENT	0x80000	/* shows client connections */
 #define UMODE_DEBUG	0x0010	/* show debug info */
 #define UMODE_FULL	0x0020	/* show full messages */
 #define UMODE_CALLERID	0x0040	/* client has callerid enabled */
 #define UMODE_SKILL	0x0100	/* client see's server kills */
-#define UMODE_LOCOP	0x0200	/* client is localop */
 #define UMODE_NCHANGE	0x0400	/* client can see nick change notices */
 #define UMODE_REJ	0x0800	/* client is registered */
 #define UMODE_SERVNOTICE	0x1000	/* client can see server notices */
@@ -215,8 +195,6 @@
 #define UMODE_SPY	0x10000	/* client can spy on user commands */
 #define UMODE_OPERWALL	0x20000	/* client gets operwalls */
 #define UMODE_SERVICES	0x40000	/* client is services */
-#define UMODE_REGNICK	0x80000	/* registered nickname */
-
 /* Cmodes */
 #define CMODE_HIDEOPS	0x02000000
 #define CMODE_INVEX		0x04000000

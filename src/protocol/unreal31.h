@@ -24,31 +24,7 @@
 #ifndef UNREAL_H
 #define UNREAL_H
 
-/* Feature support for use by modules to determine whether
- * certain functionality is available
- */
 
-#define FEATURES FEATURE_SVSHOST \
-	| FEATURE_SMO \
-	| FEATURE_SWHOIS \
-	| FEATURE_SVSTIME \
-	| FEATURE_SVSJOIN \
-	| FEATURE_SVSPART \
-	| FEATURE_SVSMODE \
-	| FEATURE_SVSNICK \
-	| FEATURE_SVSKILL \
-	| FEATURE_BOTMODES \
-	| FEATURE_UMODECLOAK
-
-
-/* buffer sizes */
-#define MAXHOST			(128 + 1)
-#define MAXPASS			(32 + 1)
-#define MAXNICK			(30 + 1)
-#define MAXUSER			(10 + 1)
-#define MAXREALNAME		(50 + 1)
-#define CHANLEN			(32 + 1)
-#define TOPICLEN		(307 + 1)
 
 /* Messages/Tokens */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
@@ -331,34 +307,30 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_FAILOP		0x00000008	/* Shows some global messages */
-#define UMODE_HELPOP		0x00000010	/* Help system operator */
-#define UMODE_REGNICK		0x00000020	/* Nick set by services as registered */
-#define UMODE_SADMIN		0x00000040	/* Services Admin */
-#define UMODE_ADMIN			0x00000080	/* Admin */
-#define UMODE_SERVNOTICE	0x00000100	/* server notices such as kill */
-#define UMODE_LOCOP			0x00000200	/* Local operator -- SRB */
-#define UMODE_KILLS			0x00000400	/* Show server-kills... */
-#define UMODE_CLIENT		0x00000800	/* Show client information */
-#define UMODE_FLOOD			0x00001000	/* Receive flood warnings */
-#define UMODE_JUNK			0x00002000	/* can junk */
-#define UMODE_SERVICES		0x00004000	/* services */
-#define UMODE_HIDE			0x00008000	/* Hide from Nukes */
-#define UMODE_NETADMIN		0x00010000	/* Network Admin */
-#define UMODE_EYES			0x00020000	/* Mode to see server stuff */
+#define UMODE_FAILOP		0x00000080	/* Shows some global messages */
+#define UMODE_HELPOP		0x00000100	/* Help system operator */
+#define UMODE_SADMIN		0x00000200	/* Services Admin */
+#define UMODE_ADMIN			0x00000400	/* Admin */
+#define UMODE_SERVNOTICE	0x00000800	/* server notices such as kill */
+#define UMODE_KILLS			0x00001000	/* Show server-kills... */
+#define UMODE_CLIENT		0x00002000	/* Show client information */
+#define UMODE_FLOOD			0x00004000	/* Receive flood warnings */
+#define UMODE_JUNK			0x00008000	/* can junk */
+#define UMODE_SERVICES		0x00010000	/* services */
+#define UMODE_NETADMIN		0x00020000	/* Network Admin */
+#define UMODE_EYES			0x00040000	/* Mode to see server stuff */
 #define UMODE_COADMIN		0x00080000	/* Co Admin */
 #define UMODE_WHOIS			0x00100000	/* gets notice on /whois */
 #define UMODE_KIX			0x00200000	/* usermode +q 
-										cannot be kicked from any channel 
-										except by U:Lines */
+										   cannot be kicked from any channel 
+										   except by U:Lines */
 #define UMODE_BOT			0x00400000	/* User is a bot */
 #define UMODE_SECURE		0x00800000	/* User is a secure connect */
 #define UMODE_FCLIENT		0x01000000	/* recieve client on far connects.. */
 
-#define UMODE_VICTIM		0x08000000	/* Intentional Victim */
-#define UMODE_DEAF			0x10000000
-#define UMODE_HIDEOPER		0x20000000	/* Hide oper mode */
-#define UMODE_SETHOST		0x40000000	/* used sethost */
+#define UMODE_VICTIM		0x01000000	/* Intentional Victim */
+#define UMODE_HIDEOPER		0x02000000	/* Hide oper mode */
+#define UMODE_SETHOST		0x04000000	/* used sethost */
 #define UMODE_STRIPBADWORDS 0x80000000	/* */
 
 /* Cmodes */

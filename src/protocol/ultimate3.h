@@ -25,26 +25,6 @@
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
 
-/* Feature support for use by modules to determine whether
- * certain functionality is available
- */
-
-#define FEATURES FEATURE_SVSHOST \
-	| FEATURE_SMODES \
-	| FEATURE_NICKIP \
-	| FEATURE_SVSJOIN \
-	| FEATURE_SVSNICK \
-	| FEATURE_SVSKILL 
-
-/* buffer sizes */
-#define MAXHOST			(128 + 1)
-#define MAXPASS			(32 + 1)
-#define MAXNICK			(32 + 1)
-#define MAXUSER			(15 + 1)
-#define MAXREALNAME		(50 + 1)
-#define CHANLEN			(50 + 1)
-#define TOPICLEN		(512 + 1)
-
 /* Messages/Tokens */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"	/* 33 */
@@ -349,10 +329,8 @@
 #define SMODE_CH_TECHADMIN 'T'		/* Set to a number as we dont use */
 
 /* Umodes */
-#define UMODE_LOCOP     	0x00000008	/* umode +O - Local Oper */
 #define UMODE_SERVNOTICE     	0x00000010	/* umode +s - Server notices */
 #define UMODE_CLIENT     	0x00000020	/* umode +c - Client connections/exits */
-#define UMODE_REGNICK     	0x00000040	/* umode +r - registered nick - Should be moved to smode if possible without breaking services compat*/
 #define UMODE_KILLS     	0x00000080	/* umode +k - Server kill messages */
 #define UMODE_FLOOD     	0x00000100	/* umode +f - Server flood messages */
 #define UMODE_SPY		0x00000200	/* umode +y - Stats/links */
@@ -364,7 +342,6 @@
 #define UMODE_ROUTE     	0x00010000	/* umode +n - Routing Notices */
 #define UMODE_HELPOP     	0x00020000	/* umode +h - Helper */
 #define UMODE_SPAM     	0x00040000	/* umode +m - spambot notices */
-#define UMODE_HIDE     	0x00080000	/* umode +x - hidden hostname */
 #define UMODE_SRA		0x01000000	/* umode +Z - Services Root Admin - Should be moved to smode */
 #define UMODE_SADMIN		0x02000000	/* umode +P - Services Admin - Should be moved to smode */
 #define UMODE_SERVICES		0x04000000	/* umode +S - Services Client - Should be moved to smode if possible without breaking services compat */

@@ -23,9 +23,9 @@
 ** $Id$
 */
 
+#include "liquid.h"
 #include "neostats.h"
 #include "ircd.h"
-#include "liquid.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
@@ -53,11 +53,29 @@ static void m_svinfo (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 
-const int ircd_minprotocol = PROTOCOL_SJOIN;
-const int ircd_optprotocol = 0;
-const int ircd_features = 0;
-const char services_umode[]= "+oS";
-const char services_cmode[]= "+o";
+/* buffer sizes */
+const int proto_maxhost		= (128 + 1);
+const int proto_maxpass		= (32 + 1);
+const int proto_maxnick		= (32 + 1);
+const int proto_maxuser		= (10 + 1);
+const int proto_maxrealname	= (50 + 1);
+const int proto_chanlen		= (32 + 1);
+const int proto_topiclen	= (307 + 1);
+
+ProtocolInfo protocol_info = {
+	/* Protocol options required by this IRCd */
+	PROTOCOL_SJOIN,
+	/* Protocol options negotiated at link by this IRCd */
+	0,
+	/* Features supported by this IRCd */
+	FEATURE_SVSHOST \
+		| FEATURE_SVSNICK \
+		| FEATURE_SVSKILL \
+		| FEATURE_SMODES \
+		| FEATURE_NICKIP ,
+	"+oS",
+	"+o",
+};
 
 ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -88,6 +106,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_SJOIN, 0, m_sjoin, 0},
 	{MSG_PASS, 0, m_pass, 0},
 	{MSG_SVSNICK, 0, m_svsnick, 0},
+	{0, 0, 0, 0},
 };
 
 cumode_init chan_umodes[] = {
@@ -166,8 +185,6 @@ umode_init user_umodes[] = {
 umode_init user_smodes[] = {
 	{'s', SMODE_SSL},
 };
-
-const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)

@@ -28,14 +28,14 @@
 #include <stdio.h>
 
 /* [v]s[n]printf replacements */
-int ircsprintf(char *buf, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int ircvsprintf(char *buf, const char *fmt, va_list args);
 int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args);
-int ircsnprintf(char *buf, size_t size, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int ircsprintf(char *buf, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC int ircsnprintf(char *buf, size_t size, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 
 /* str[n]casecmp replacements */
-int ircstrcasecmp(const char *s1, const char *s2);
-int ircstrncasecmp(const char *s1, const char *s2, size_t size);
+EXPORTFUNC int ircstrcasecmp(const char *s1, const char *s2);
+EXPORTFUNC int ircstrncasecmp(const char *s1, const char *s2, size_t size);
 
 /*
  * match - compare name with mask, mask may contain * and ? as wildcards
@@ -44,7 +44,7 @@ int ircstrncasecmp(const char *s1, const char *s2, size_t size);
  * match_esc - compare with support for escaping chars
  * match_cidr - compares u!h@addr with u!h@addr/cidr
  */
-extern int match(const char *mask, const char *name);
+EXPORTFUNC extern int match(const char *mask, const char *name);
 extern int match_esc(const char *mask, const char *name);
 extern int match_cidr(const char *mask, const char *name);
 

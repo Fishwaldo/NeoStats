@@ -25,26 +25,6 @@
 #ifndef QUANTUM_H
 #define QUANTUM_H
 
-/* Feature support for use by modules to determine whether
- * certain functionality is available
- */
-
-#define FEATURES FEATURE_SVSHOST \
-	| FEATURE_SMODES \
-	| FEATURE_NICKIP \
-	| FEATURE_SVSPART \
-	| FEATURE_SVSNICK \
-	| FEATURE_SVSKILL 
-
-/* buffer sizes */
-#define MAXHOST			(128 + 1)
-#define MAXPASS			(32 + 1)
-#define MAXNICK			(32 + 1)
-#define MAXUSER			(15 + 1)
-#define MAXREALNAME		(50 + 1)
-#define CHANLEN			(50 + 1)
-#define TOPICLEN		(512 + 1)
-
 /* Messages/Tokens */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"	/* 33 */
@@ -347,9 +327,8 @@
 #define UMODE_CH_SERVICES 'S'
 
 /* Umodes */
-#define UMODE_FAILOP	 	0x0008	/* Shows some global messages */
+#define UMODE_FAILOP	 	0x8000	/* Shows some global messages */
 #define UMODE_HELPOP	 	0x0010	/* Help system operator */
-#define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
 #define UMODE_SERVICESOPER	0x0040	/* Services Oper */
 #define UMODE_SPY		0x0080	/* Oper Spy */
 #define UMODE_DCC		0x10000	/* Oper DCC Notices */
@@ -362,13 +341,11 @@
 #define UMODE_DEBUG		0x4000000	/* see debug notices */
 #define UMODE_DCCWARN		0x8000000	/* see DCC warnings */
 #define UMODE_SERVNOTICE 	0x0100	/* server notices such as kill */
-#define UMODE_LOCOP      	0x0200	/* Local operator -- SRB */
 #define UMODE_KILLS	 	0x0400	/* Show server-kills... */
 #define UMODE_CLIENT	 	0x0800	/* Show client information */
 #define UMODE_FLOOD	 	0x1000	/* Receive flood warnings */
 #define UMODE_CHATOP	 	0x2000	/* can receive chatops */
 #define UMODE_SERVICES   	0x4000	/* services */
-#define UMODE_HIDE	 	0x8000	/* Hide from Nukes */
 #define UMODE_WHOIS    		0x200000	/* Lets Opers see when people do a /WhoIs on them */
 #define UMODE_IRCADMIN 		0x1000000	/* Marks the client as an IRC Administrator */
 #define UMODE_SADMIN	0x2000000	/* Marks the client as a Services Administrator */

@@ -21,9 +21,9 @@
 ** $Id$
 */
 
+#include "neoircd.h"
 #include "neostats.h"
 #include "ircd.h"
-#include "neoircd.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
@@ -49,11 +49,28 @@ static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 static void m_tburst (char *origin, char **argv, int argc, int srv);
 
-const int ircd_minprotocol = 0;
-const int ircd_optprotocol = 0;
-const int ircd_features = 0;
-const char services_umode[]= "+oS";
-const char services_cmode[]= "+a";
+/* buffer sizes */
+const int proto_maxhost		= (128 + 1);
+const int proto_maxpass		= (32 + 1);
+const int proto_maxnick		= (32 + 1);
+const int proto_maxuser		= (15 + 1);
+const int proto_maxrealname	= (50 + 1);
+const int proto_chanlen		= (50 + 1);
+const int proto_topiclen	= (512 + 1);
+
+ProtocolInfo protocol_info = {
+	/* Protocol options required by this IRCd */
+	0,
+	/* Protocol options negotiated at link by this IRCd */
+	0,
+	/* Features supported by this IRCd */
+	FEATURE_SVSHOST \
+		| FEATURE_SVSJOIN \
+		| FEATURE_SVSPART \
+		| FEATURE_SVSNICK ,
+	"+oS",
+	"+a",
+};
 
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
@@ -83,6 +100,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_EOB, 0, m_burst, 0},
 	{MSG_SJOIN, 0, m_sjoin, 0},
 	{MSG_TBURST, 0, m_tburst, 0},
+	{0, 0, 0, 0},
 };
 
 cumode_init chan_umodes[] = {
@@ -108,7 +126,7 @@ cmode_init chan_modes[] = {
 	{'I', CMODE_INVEX, MODEPARAM},
 	{'r', CMODE_RGSTR, 0},
 	{'O', CMODE_OPERONLY, 0},
-	{0, 0, 0, 0, 0},
+	{0, 0, 0},
 };
 
 umode_init user_umodes[] = {
@@ -137,8 +155,6 @@ umode_init user_umodes[] = {
 umode_init user_smodes[] = {
 	{0, '0'},
 };
-
-const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 
 void
 send_eob (const char *server)

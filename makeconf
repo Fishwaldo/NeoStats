@@ -258,6 +258,19 @@ cat > $CONF << __EOF__
 # IRCd Linking Configuration #
 ##############################
 
+# PROTOCOL <protocol> [REQUIRED]
+#    Specifies the protocol module to use.
+#    Valid protocol options are:
+#          bahamut client hybrid7 ircup10 
+#          liquid mystic neoircd quantum 
+#          ultimate2 ultimate3 unreal31 unreal32 
+#          viagra
+#
+#          PROTOCOL "unreal32"
+#      
+
+#PROTOCOL "unreal32"
+
 # SERVER_NAME <hostname> [REQUIRED]
 #    Specifies the name of the NeoStats Server as it will appear on 
 #    the network. e.g. 

@@ -32,7 +32,7 @@ typedef struct neoroot {
 } neoroot;
 
 /* general configuration items */
-struct config {
+typedef struct tconfig {
 	/* log level */
 	unsigned int loglevel;
 	/* debug level */
@@ -57,17 +57,19 @@ struct config {
 	char pass[MAXPASS];
 	unsigned int debug;
 	int debugtochan;
-	char debugchan[CHANLEN];
+	char debugchan[MAXCHANLEN];
 	int pingtime;
 	neoroot rootuser;
 	char debugmodule[MAX_MOD_NAME];
 	unsigned int singlebotmode;
-} config;
+} tconfig;
+
+extern tconfig config;
 
 extern ModuleInfo ns_module_info;
 extern Module ns_module;
 extern BotInfo ns_botinfo;
-extern Bot* ns_botptr;
+EXPORTVAR extern Bot* ns_botptr;
 
 void InitServices(void);
 int IsServiceRoot(User* u);

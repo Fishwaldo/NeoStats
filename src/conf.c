@@ -70,6 +70,7 @@ static config_option options[] = {
 	{"SERVER_NUMERIC", ARG_STR, cb_Server, 15},
 	{"SETSERVERTIMES", ARG_STR, cb_Server, 16},
 	{"SERVICEROOT", ARG_STR, cb_Server, 18},
+	{"PROTOCOL", ARG_STR, cb_Server, 19},
 #ifdef SQLSRV
 	{"SQLSRV_AUTH", ARG_STR, cb_SqlConf, 0},
 	{"SQLSRV_PORT", ARG_STR, cb_SqlConf, 1},
@@ -323,6 +324,8 @@ cb_Server (char *arg, int configtype)
 			strlcpy(config.rootuser.host, host, MAXHOST);
 			config.rootuser.level = NS_ULEVEL_ROOT;
 		}
+	} else if (configtype == 19) {
+		strlcpy(me.protocol,arg,MAXHOST);
 	}
 }
 

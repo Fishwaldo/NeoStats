@@ -21,9 +21,9 @@
 ** $Id$
 */
 
+#include "hybrid7.h"
 #include "neostats.h"
 #include "ircd.h"
-#include "hybrid7.h"
 #include "services.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
@@ -50,11 +50,25 @@ static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 static void m_protoctl (char *origin, char **argv, int argc, int srv);
 
-const int ircd_minprotocol = 0;
-const int ircd_optprotocol = 0;
-const int ircd_features = 0;
-const char services_umode[]= "+o";
-const char services_cmode[]= "+o";
+/* buffer sizes */
+const int proto_maxhost		= (128 + 1);
+const int proto_maxpass		= (32 + 1);
+const int proto_maxnick		= (32 + 1);
+const int proto_maxuser		= (10 + 1);
+const int proto_maxrealname	= (50 + 1);
+const int proto_chanlen		= (200 + 1);
+const int proto_topiclen	= (512 + 1);
+
+ProtocolInfo protocol_info = {
+	/* Protocol options required by this IRCd */
+	0,
+	/* Protocol options negotiated at link by this IRCd */
+	PROTOCOL_UNKLN,
+	/* Features supported by this IRCd */
+	0,
+	"+o",
+	"+o",
+};
 
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
@@ -84,6 +98,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_EOB, 0, m_burst, 0},
 	{MSG_SJOIN, 0, m_sjoin, 0},
 	{MSG_CAPAB, 0, m_protoctl, 0},
+	{0, 0, 0, 0},
 };
 
 cumode_init chan_umodes[] = {
@@ -136,8 +151,6 @@ umode_init user_umodes[] = {
 umode_init user_smodes[] = {
 	{0, '0'},
 };
-
-const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 
 void
 send_eob (const char *server)
@@ -287,7 +300,7 @@ send_akill (const char *sender, const char *host, const char *ident, const char 
 void 
 send_rakill (const char *sender, const char *host, const char *ident)
 {
-	if (ircd_srv.unkline) {
+	if (ircd_srv.protocol&PROTOCOL_UNKLN) {
 		send_cmd(":%s %s %s %s", sender, MSG_UNKLINE, ident, host);
 	} else {
 		chanalert (ns_botptr->nick, "Please Manually remove KLINES using /unkline on each server");

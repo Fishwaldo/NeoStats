@@ -25,25 +25,6 @@
 #ifndef LIQUIDIRCD_H
 #define LIQUIDIRCD_H
 
-/* Feature support for use by modules to determine whether
- * certain functionality is available
- */
-
-#define FEATURES FEATURE_SVSHOST \
-	| FEATURE_SVSNICK \
-	| FEATURE_SVSKILL \
-	| FEATURE_SMODES \
-	| FEATURE_NICKIP 
-
-/* buffer sizes */
-#define MAXHOST			(128 + 1)
-#define MAXPASS			(32 + 1)
-#define MAXNICK			(32 + 1)
-#define MAXUSER			(10 + 1)
-#define MAXREALNAME		(50 + 1)
-#define CHANLEN			(32 + 1)
-#define TOPICLEN		(307 + 1)
-
 /* Messages/Tokens */
 #define MSG_PRIVATE  "PRIVMSG"		/* PRIV */
 #define MSG_WHO      "WHO"	      	/* WHO  -> WHOC */
@@ -166,10 +147,8 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_LOCOP     0x00008	/* umode +O - Local Oper */
 #define UMODE_SERVNOTICE     0x00010	/* umode +s - Server notices */
-#define UMODE_CLIENT     0x00020	/* umode +c - Client connections/exits */
-#define UMODE_REGNICK     0x00040	/* umode +r - registered nick */
+#define UMODE_CLIENT     0x4000000	/* umode +c - Client connections/exits */
 #define UMODE_KILLS     0x00080	/* umode +k - Server kill messages */
 #define UMODE_FLOOD     0x00100	/* umode +f - Server flood messages */
 #define UMODE_SPY     0x00200	/* umode +y - Stats/links */
@@ -189,7 +168,6 @@
 #define UMODE_THROTTLE     0x800000   /* umode +F - no cptr->since message rate throttle */
 #define UMODE_REJ	    0x1000000   /* umode +j - client rejection notices */
 #define UMODE_ULINEKILL     0x2000000   /* umode +K - U: lined server kill messages */
-#define UMODE_HIDE    0x4000000	/* umode +z - Hostmasking */
 #define UMODE_NETADMIN	    0x8000000   /* Network Administrator */
 #define UMODE_TECHADMIN     0x10000000  /* Technical Administrator */
 #define UMODE_CODER     0x20000000  /* */

@@ -25,25 +25,6 @@
 #ifndef BAHAMUT_H
 #define BAHAMUT_H
 
-/* Feature support for use by modules to determine whether
- * certain functionality is available
- */
-
-#define FEATURES FEATURE_NICKIP \
-	| FEATURE_SVSNICK \
-	| FEATURE_SVSKILL 
-
-
-
-/* buffer sizes */
-#define MAXHOST			(128 + 1)
-#define MAXPASS			(63 + 1)
-#define MAXNICK			(30 + 1)
-#define MAXUSER			(10 + 1)
-#define MAXREALNAME		(50 + 1)
-#define CHANLEN			(32 + 1)
-#define TOPICLEN		(307 + 1)
-
 /* Messages/Tokens */
 #define MSG_PRIVATE  "PRIVMSG"		/* PRIV */
 #define MSG_WHO      "WHO"	      	/* WHO  -> WHOC */
@@ -143,10 +124,8 @@
 #define UMODE_CH_ADMIN 'a'
 
 /* Umodes */
-#define UMODE_LOCOP     0x00008	/* umode +O - Local Oper */
-#define UMODE_SERVNOTICE     0x00010	/* umode +s - Server notices */
+#define UMODE_SERVNOTICE	0x00000080	/* umode +s - Server notices */
 #define UMODE_CLIENT     0x00020	/* umode +c - Client connections/exits */
-#define UMODE_REGNICK     0x00040	/* umode +r - registered nick */
 #define UMODE_KILLS     0x00080	/* umode +k - Server kill messages */
 #define UMODE_FLOOD     0x00100	/* umode +f - Server flood messages */
 #define UMODE_SPY     0x00200	/* umode +y - Stats/links */
@@ -158,8 +137,8 @@
 #define UMODE_ROUTE     0x10000	/* umode +n - Routing Notices */
 #define UMODE_HELPOP     0x20000     /* umode +h - Helper */
 #define UMODE_SPAM     0x40000     /* umode +m - spambot notices */
-#define UMODE_REGONLY     0x80000     /* unmode +R - No non registered msgs */
-#define UMODE_OPERNOTICE     0x100000    /* umode +e - oper notices for the above +D */
+#define UMODE_RGSTRONLY     0x80000     /* unmode +R - No non registered msgs */
+#define UMODE_OPERNOTICE	0x100000    /* umode +e - oper notices for the above +D */
 #define UMODE_SQUELCH     0x200000    /* umode +x - Squelch with notice */
 #define UMODE_SQUELCHN     0x400000    /* umode +X - Squelch without notice */
 #define UMODE_HIDDENDCC     0x800000    /* umode +D - Hidden dccallow umode */

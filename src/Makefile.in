@@ -180,8 +180,8 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c
 
-AM_CFLAGS = @PCRE_CFLAGS@ -I$(top_srcdir)/lang -Iadns -Ikeeper @INCLTDL@ @CURL_CFLAGS@
-neostats_LDADD = protocol/libprotocol.a keeper/libkeeper.a \
+AM_CFLAGS = @PCRE_CFLAGS@ -I$(top_srcdir)/lang -Iadns -Ikeeper @INCLTDL@ @CURL_CFLAGS@ -DNEOSTATSCORE
+neostats_LDADD = keeper/libkeeper.a \
 		adns/libadns.la libltdl/libltdlc.la @PCRE_LIBS@ @CURL_LIBS@
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
@@ -204,8 +204,8 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	support.$(OBJEXT) timer.$(OBJEXT) transfer.$(OBJEXT) \
 	users.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
-neostats_DEPENDENCIES = protocol/libprotocol.a keeper/libkeeper.a \
-	adns/libadns.la libltdl/libltdlc.la
+neostats_DEPENDENCIES = keeper/libkeeper.a adns/libadns.la \
+	libltdl/libltdlc.la
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp

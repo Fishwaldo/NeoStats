@@ -44,14 +44,17 @@ char *ns_dlerrormsg;
 void *ns_dlsym (void *handle, const char *name)
 {
 #ifdef WIN32
-	return NULL;
+	void* ret;
+
+	ret = (void*)GetProcAddress((HMODULE)handle, name);
+	return ret;
 #else
 #ifdef NEED_UNDERSCORE_PREFIX
 	static char sym[128];
 	void* ret;
 
 	/* reset error */
-	ns_dlerrormsg[0] = 0;
+	ns_dlerrormsg = 0;
 	ret = dlsym ((int *) handle, name);
 	/* Check with underscore prefix */
 	if (ret == NULL) {
@@ -77,12 +80,21 @@ void *ns_dlsym (void *handle, const char *name)
 void *ns_dlopen (const char *file, int mode)
 {
 #ifdef WIN32
-	return NULL;
+	void* ret;
+
+	/* reset error */
+	ns_dlerrormsg = 0;
+	ret = (void*)LoadLibrary(file);
+	/* Check for error */
+	if(ret == NULL)
+	{
+	}
+	return ret;
 #else
 	void* ret;
 
 	/* reset error */
-	ns_dlerrormsg[0] = 0;
+	ns_dlerrormsg = 0;
 	ret = dlopen (file, mode);
 	/* Check for error */
 #ifndef HAVE_LIBDL
@@ -100,6 +112,7 @@ void *ns_dlopen (const char *file, int mode)
 int ns_dlclose (void *handle)
 {
 #ifdef WIN32
+	FreeLibrary((HMODULE)handle);
 	return 0;
 #else
 	return (dlclose (handle));

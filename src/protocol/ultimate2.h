@@ -25,24 +25,6 @@
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
 
-/* Feature support for use by modules to determine whether
- * certain functionality is available
- */
-
-#define FEATURES FEATURE_SVSHOST \
-	| FEATURE_SVSPART \
-	| FEATURE_SVSNICK \
-	| FEATURE_BOTMODES
-
-/* buffer sizes */
-#define MAXHOST			(128 + 1)
-#define MAXPASS			(32 + 1)
-#define MAXNICK			(32 + 1)
-#define MAXUSER			(15 + 1)
-#define MAXREALNAME		(50 + 1)
-#define CHANLEN			(50 + 1)
-#define TOPICLEN		(512 + 1)
-
 /* Messages/Tokens */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"	/* 33 */
@@ -346,19 +328,16 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_FAILOP	 	0x0008	/* Shows some global messages */
+#define UMODE_FAILOP	 	0x0020	/* Shows some global messages */
 #define UMODE_HELPOP	 	0x0010	/* Help system operator */
-#define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
 #define UMODE_SERVICESOPER	0x0040	/* Services Oper */
 #define UMODE_ALTADMIN	 	0x0080	/* Admin */
 #define UMODE_SERVNOTICE 	0x0100	/* server notices such as kill */
-#define UMODE_LOCOP      	0x0200	/* Local operator -- SRB */
 #define UMODE_KILLS	 	0x0400	/* Show server-kills... */
 #define UMODE_CLIENT	 	0x0800	/* Show client information */
 #define UMODE_FLOOD	 	0x1000	/* Receive flood warnings */
 #define UMODE_CHATOP	 	0x2000	/* can receive chatops */
 #define UMODE_SERVICES   	0x4000	/* services */
-#define UMODE_HIDE	 	0x8000	/* Hide from Nukes */
 #define UMODE_NETADMIN  	0x10000	/* Network Admin */
 #define UMODE_SUPER		0x20000	/* Oper Is Protected from Kick's and Kill's */
 #define UMODE_RBOT      	0x40000	/* Marks the client as a Registered Bot */

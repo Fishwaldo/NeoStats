@@ -35,6 +35,7 @@
 #include "sqlsrv/rta.h"
 #endif
 
+tconfig config;
 static hash_t *serverhash;
 
 static Server *
@@ -342,7 +343,7 @@ PingServers (void)
 			s->ping = 0;
 			continue;
 		}
-		send_ping (me.name, me.name, s->name);
+		irc_send_ping (me.name, me.name, s->name);
 	}
 }
 

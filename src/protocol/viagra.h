@@ -25,29 +25,6 @@
 #ifndef VIAGRA_H
 #define VIAGRA_H
 
-/* Feature support for use by modules to determine whether
- * certain functionality is available
- */
-
-#define FEATURES FEATURE_SVSHOST \
-	| FEATURE_BOTMODES \
-	| FEATURE_SVSJOIN \
-	| FEATURE_SVSPART \
-	| FEATURE_SVSMODE \
-	| FEATURE_SVSNICK \
-	| FEATURE_SVSKILL \
-	| FEATURE_UMODECLOAK
-
-
-/* buffer sizes */
-#define MAXHOST			(128 + 1)
-#define MAXPASS			(63 + 1)
-#define MAXNICK			(30 + 1)
-#define MAXUSER			(10 + 1)
-#define MAXREALNAME		(50 + 1)
-#define CHANLEN			(32 + 1)
-#define TOPICLEN		(307 + 1)
-
 /* Messages/Tokens */
 #define MSG_PRIVATE  "PRIVMSG"		/* PRIV */
 #define MSG_WHO      "WHO"	      	/* WHO  -> WHOC */
@@ -167,20 +144,16 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_REGONLY		0x0010	/* only registered nicks may PM */
-#define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
-#define UMODE_ADMIN		0x0040	/* server admin */
-#define UMODE_SADMIN	0x0080	/* Marks the client as a Services Administrator */
-#define UMODE_HIDE              0x8000  /* cloak host*/
-#define UMODE_HELPOP	 	0x0010	/* Help system operator */
-#define UMODE_ALTADMIN	 	0x0080	/* Admin */
-#define UMODE_NETADMIN  	0x10000	/* Network Admin */
-#define UMODE_TECHADMIN		0x80000000	/* Marks the client as a Technical Admin */
-#define UMODE_DEAF			0x10000000	/* client is deaf on channels */
-#define UMODE_LOCOP      	0x0200	/* Local operator -- SRB */
-#define UMODE_WHOIS    		0x200000	/* Lets Opers see when people do a /WhoIs on them */
-#define UMODE_CLIENT	 	0x0800	/* Show client information */
-#define UMODE_GLOBCON		0x800000	/* Global Connect notices */
+#define UMODE_RGSTRONLY		0x00000080 /* only registered nicks may PM */
+#define UMODE_ADMIN			0x00000100 /* server admin */
+#define UMODE_SADMIN		0x00000200 /* Marks the client as a Services Administrator */
+#define UMODE_HELPOP	 	0x00000400 /* Help system operator */
+#define UMODE_ALTADMIN	 	0x00000800 /* Admin */
+#define UMODE_NETADMIN  	0x00001000 /* Network Admin */
+#define UMODE_TECHADMIN		0x00002000 /* Marks the client as a Technical Admin */
+#define UMODE_WHOIS    		0x00004000 /* Lets Opers see when people do a /WhoIs on them */
+#define UMODE_CLIENT	 	0x00008000 /* Show client information */
+#define UMODE_GLOBCON		0x00010000 /* Global Connect notices */
 
 /* Cmodes */
 

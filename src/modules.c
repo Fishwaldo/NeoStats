@@ -329,7 +329,11 @@ load_module (const char *modfilename, User * u)
 	}
 	strlcpy (loadmodname, modfilename, 255);
 	strlwr (loadmodname);
+#ifdef WIN32
+	ircsnprintf (path, 255, "%s/%s.dll", MOD_PATH, loadmodname);
+#else
 	ircsnprintf (path, 255, "%s/%s.so", MOD_PATH, loadmodname);
+#endif
 	dl_handle = ns_dlopen (path, RTLD_NOW || RTLD_GLOBAL);
 	if (!dl_handle) {
 		if (do_msg) {

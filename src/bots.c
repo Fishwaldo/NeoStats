@@ -26,13 +26,14 @@
 #include "ircd.h"
 #include "services.h"
 #include "commands.h"
+#include "bots.h"
 
 /** @brief Channel bot structure
  * 
  */
 typedef struct ChanBot {
 	/** channel name */
-	char chan[CHANLEN];
+	char chan[MAXCHANLEN];
 	/** bot list */
 	list_t *bots;
 }ChanBot;
@@ -88,7 +89,7 @@ add_chan_bot (const char *bot, const char *chan)
 			return;
 		}
 		chanbot = smalloc (sizeof (ChanBot));
-		strlcpy (chanbot->chan, chan, CHANLEN);
+		strlcpy (chanbot->chan, chan, MAXCHANLEN);
 		chanbot->bots = list_create (B_TABLE_SIZE);
 		cbn = hnode_create (chanbot);
 		hash_insert (botchanhash, cbn, chanbot->chan);
@@ -572,11 +573,9 @@ Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd
 	if ((Umode & service_umode_mask)) {
 		flags |= BOT_FLAG_SERVICEBOT;
 	}
-#ifdef UMODE_DEAF
-	if (flags&BOT_FLAG_DEAF) {
+	if (HaveUmodeDeaf()&&flags&BOT_FLAG_DEAF) {
 		sumode_cmd (nick, nick, UMODE_DEAF);
 	}
-#endif
 	botptr->flags = flags;
 	SET_RUN_LEVEL(modptr);
 	if (bot_cmd_list) {

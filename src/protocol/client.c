@@ -21,8 +21,9 @@
 ** $Id$
 */
 
-#include "neostats.h"
 #include "client.h"
+#include "neostats.h"
+#include "bots.h"
 #include "ircd.h"
 
 static void client_private (char* origin, char **av, int ac, int cmdptr);
@@ -43,11 +44,25 @@ static void m_vhost (char *origin, char **argv, int argc, int srv);
 static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_emotd (char *origin, char **argv, int argc, int srv);
 
-const int ircd_minprotocol = 0;
-const int ircd_optprotocol = 0;
-const int ircd_features = 0;
-const char services_umode[]= "+oSq";
-const char services_cmode[]= "+o";
+/* buffer sizes */
+const int proto_maxhost		= (128 + 1);
+const int proto_maxpass		= (32 + 1);
+const int proto_maxnick		= (30 + 1);
+const int proto_maxuser		= (10 + 1);
+const int proto_maxrealname	= (50 + 1);
+const int proto_chanlen		= (32 + 1);
+const int proto_topiclen	= (307 + 1);
+
+ProtocolInfo protocol_info = {
+	/* Protocol options required by this IRCd */
+	0,
+	/* Protocol options negotiated at link by this IRCd */
+	0,
+	/* Features supported by this IRCd */
+	0,
+	"+oSq",
+	"+o",
+};
 
 ircd_cmd cmd_list[] = {
 	/*Message	Token	Function	usage */
@@ -67,6 +82,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_JOIN, 0, m_join, 0},
 	{MSG_PART, 0, m_part, 0},
 	{MSG_PING, 0, m_ping, 0},
+	{0, 0, 0, 0},
 };
 
 cumode_init chan_umodes[] = {
@@ -144,8 +160,6 @@ umode_init user_umodes[] = {
 umode_init user_smodes[] = {
 	{0, '0'},
 };
-
-const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)

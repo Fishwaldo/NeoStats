@@ -32,6 +32,7 @@
 #ifndef __GNUC__
 #define __attribute__(x)  /* NOTHING */
 #endif
+#include "neostats.h"
 #include "ircstring.h"
 #ifdef WIN32
 #define vsnprintf _vsnprintf

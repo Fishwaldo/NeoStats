@@ -25,6 +25,12 @@
 #include "neostats.h"
 #include "services.h"
 
+const char *ns_copyright[] = {
+	"Copyright (c) 1999-2004, NeoStats",
+	"http://www.neostats.net/",
+	NULL
+};
+
 const char *ea_help_access[] = {
 	"Syntax: \2ACCESS ADD <nick> <mask> <level>\2",
 	"        \2ACCESS DEL <nick>\2",
@@ -218,7 +224,6 @@ static int ea_event_online(CmdParams* cmdparams)
 	return 1;
 };
 
-#ifdef UMODE_REGNICK
 static int ea_event_mode(CmdParams* cmdparams) 
 {
 	int add = 0;
@@ -254,13 +259,10 @@ static int ea_event_mode(CmdParams* cmdparams)
 	}
 	return 1;
 }
-#endif
 
 ModuleEvent module_events[] = {
 	{EVENT_ONLINE,	ea_event_online},
-#ifdef UMODE_REGNICK
 	{EVENT_UMODE,	ea_event_mode}, 
-#endif
 	{EVENT_NULL,	NULL}
 };
 

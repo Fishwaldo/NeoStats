@@ -53,8 +53,23 @@
 
 #ifdef WIN32
 #include "configwin32.h"
+#ifdef NEOSTATSCORE
+#define EXPORTFUNC __declspec(dllexport)
+#define EXPORTVAR __declspec(dllexport)
+#define MODULEFUNC 
+#define MODULEVAR 
+#else
+#define EXPORTVAR __declspec(dllimport)
+#define EXPORTFUNC __declspec(dllimport)
+#define MODULEFUNC __declspec(dllexport)
+#define MODULEVAR __declspec(dllexport)
+#endif
 #else
 #include "config.h"
+#define MODULEFUNC 
+#define MODULEVAR 
+#define EXPORTVAR
+#define EXPORTFUNC
 #endif
 
 #ifdef HAVE_DB_H
@@ -101,6 +116,7 @@
 #define PROTOCOL_CLIENT		0x00001000  /* CLIENT */
 #define PROTOCOL_B64SERVER	0x00002000  /* Server names use Base 64 */
 #define PROTOCOL_B64NICK	0x00004000  /* Nick names use Base 64 */
+#define PROTOCOL_UNKLN		0x00008000  /*  */
 
 #define FEATURE_SWHOIS		0x00000001	/* SWHOIS */
 #define FEATURE_SVSTIME		0x00000002	/* SVSTIME */
@@ -115,6 +131,7 @@
 #define FEATURE_SMODES		0x00000400	/* Smode field */
 #define FEATURE_BOTMODES	0x00000800	/* Umodes for bots available */
 #define FEATURE_SMO			0x00001000	/* SMO */
+#define FEATURE_USERSMODES	0x00002000	/* User Smodes */
 
 /* cumodes are channel modes which affect a user */
 #define CUMODE_CHANOP		0x00000001
@@ -165,43 +182,24 @@
 #define UMODE_OPER			0x00000002	/* Operator */
 #define UMODE_WALLOP		0x00000004	/* send wallops to them */
 
-#ifdef CLIENT
-#include "protocol/client.h"
-#elif defined UNREAL31
-#include "protocol/unreal31.h"
-#elif defined UNREAL32
-#include "protocol/unreal32.h"
-#elif defined ULTIMATE2
-#include "protocol/ultimate2.h"
-#elif defined ULTIMATE3
-#include "protocol/ultimate3.h"
-#elif defined HYBRID7	
-#include "protocol/hybrid7.h"
-#elif defined NEOIRCD
-#include "protocol/neoircd.h"
-#elif defined MYSTIC
-#include "protocol/mystic.h" 
-#elif defined IRCUP10
-#include "protocol/ircup10.h"
-#elif defined BAHAMUT
-#include "protocol/bahamut.h"
-#elif defined QUANTUM
-#include "protocol/quantum.h"
-#elif defined LIQUID
-#include "protocol/liquid.h"
-#elif defined VIAGRA 
-#include "protocol/viagra.h"
-#else
-#error Error, you must select an IRCD to use. See ./configure --help for more information
-#endif
+/* User modes available on most IRCds */
+#define UMODE_LOCOP			0x00000008	/* Local operator -- SRB */
+#define UMODE_REGNICK		0x00000010	/* umode +r - registered nick */
+#define UMODE_DEAF          0x00000020	/* Dont see chan msgs */
+#define UMODE_HIDE          0x00000040	/* Hide from Nukes */
+
+/* Other user modes available on IRCds cannot be easily supported so 
+ * should be defined locally beginning at 0x00000080
+ */
+
+EXPORTVAR extern unsigned int ircd_supported_umodes;
+EXPORTVAR extern unsigned int ircd_supported_smodes;
+#define HaveUmodeRegNick() (ircd_supported_umodes&UMODE_REGNICK)
+#define HaveUmodeDeaf() (ircd_supported_umodes&UMODE_DEAF)
 
 /* Umode macros */
 /* ifdef checks for macros until umodes updated */
-#ifdef UMODE_LOCOP
 #define is_oper(x) ((x) && ((x->Umode & (UMODE_OPER|UMODE_LOCOP))))
-#else
-#define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
-#endif
 #ifdef UMODE_BOT
 #define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
 #else
@@ -264,27 +262,15 @@
 #endif
 
 #define BUFSIZE			512
-#ifndef MAXHOST
-#define MAXHOST			128
-#endif
-#ifndef MAXPASS
-#define MAXPASS			32
-#endif
-#ifndef MAXNICK
-#define MAXNICK			32
-#endif
-#ifndef MAXUSER
-#define MAXUSER			15
-#endif
-#ifndef MAXREALNAME
-#define MAXREALNAME		50
-#endif
-#ifndef CHANLEN
-#define CHANLEN			50
-#endif
-#ifndef TOPICLEN
-#define TOPICLEN		307
-#endif
+
+#define MAXHOST			(128 + 1)
+#define MAXPASS			(32 + 1)
+#define MAXNICK			(32 + 1)
+#define MAXUSER			(15 + 1)
+#define MAXREALNAME		(50 + 1)
+#define MAXCHANLEN		(50 + 1)
+#define MAXTOPICLEN		(307 + 1)
+
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
 #define MAXCMDSIZE		15
@@ -293,10 +279,10 @@
 
 #define KEYLEN		(32 + 1)
 
-/* MAXCHANLIST
+/* MAXCHANLENLIST
  * the max length a string can be that holds channel lists 
  */
-#define MAXCHANLIST		1024 
+#define MAXCHANLENLIST		1024 
 
 /* MAXPATH 
  * used to determine buffer sizes for file system operations
@@ -410,10 +396,8 @@ typedef enum NS_TRANSFER {
 #define CLEAR_SEGV_LOCATION() segv_location[0]='\0';
 #endif
 
-extern char recbuf[BUFSIZE];
-extern const char services_umode[];
-extern const char services_cmode[];
-extern char segv_location[SEGV_LOCATION_BUFSIZE];
+extern EXPORTVAR char recbuf[BUFSIZE];
+extern EXPORTVAR char segv_location[SEGV_LOCATION_BUFSIZE];
 
 /* this is the dns structure */
 extern adns_state ads;
@@ -441,9 +425,10 @@ typedef struct Server {
 /** @brief me structure
  *  structure containing information about the neostats core
  */
-struct me {
+typedef struct tme {
 	char name[MAXHOST];
 	int numeric; /* For Unreal and any other server that needs a numeric */
+	char protocol[MAXHOST];
 	char uplink[MAXHOST];
 	char infoline[MAXHOST];
 	char netname[MAXPASS];
@@ -454,7 +439,7 @@ struct me {
 	unsigned int want_nickip:1;
 	char servicescmode[64];
 	char servicesumode[64];
-	char serviceschan[CHANLEN];
+	char serviceschan[MAXCHANLEN];
 	unsigned int onchan:1;
 	unsigned int synced:1;
 	Server *s;
@@ -471,7 +456,9 @@ struct me {
 	int sqlport;
 #endif
 	char version[VERSIONSIZE];
-} me;
+} tme;
+
+extern EXPORTVAR tme me;
 
 /** @brief Bans structure
  *  
@@ -523,7 +510,7 @@ typedef struct User {
  *  
  */
 typedef struct Channel {
-	char name[CHANLEN];
+	char name[MAXCHANLEN];
 	char name64[B64SIZE];
 	long users;
 	long modes;
@@ -911,26 +898,26 @@ typedef struct _Bot {
 	User* u;
 }_Bot;
 
-int ModuleConfig(bot_setting* bot_settings);
+EXPORTFUNC int ModuleConfig(bot_setting* bot_settings);
 
-int add_timer (timer_function func, const char* name, int interval);
-int del_timer (const char *timer_name);
-int set_timer_interval (const char *timer_name, int interval);
-Timer *findtimer(const char *timer_name);
+EXPORTFUNC int add_timer (timer_function func, const char* name, int interval);
+EXPORTFUNC int del_timer (const char *timer_name);
+EXPORTFUNC int set_timer_interval (const char *timer_name, int interval);
+EXPORTFUNC Timer *findtimer(const char *timer_name);
 
-int add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, const char *sock_name, int socknum);
-int add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, const char *sock_name, void *data);
-int del_socket (const char *name);
-Sock *findsock (const char *sock_name);
+EXPORTFUNC int add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, const char *sock_name, int socknum);
+EXPORTFUNC int add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, const char *sock_name, void *data);
+EXPORTFUNC int del_socket (const char *name);
+EXPORTFUNC Sock *findsock (const char *sock_name);
 
-Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list);
-int del_bot (Bot *botptr, const char * reason);
-Bot *findbot (const char * bot_name);
-int bot_nick_change (const char * oldnick, const char *newnick);
+EXPORTFUNC Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list);
+EXPORTFUNC int del_bot (Bot *botptr, const char * reason);
+EXPORTFUNC Bot *findbot (const char * bot_name);
+EXPORTFUNC int bot_nick_change (const char * oldnick, const char *newnick);
 
 /* sock.c */
-int sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, socket_function func_read, socket_function func_write, socket_function func_error);
-int sock_disconnect (const char *name);
+EXPORTFUNC int sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, socket_function func_read, socket_function func_write, socket_function func_error);
+EXPORTFUNC int sock_disconnect (const char *name);
 
 /* keeper interface */
 
@@ -941,16 +928,16 @@ int sock_disconnect (const char *name);
 
 #define CONFBUFSIZE 256
 
-int GetConf (void **data, int type, const char *item);
-int SetConf (void *data, int type, char *item);
-int GetDir (char *item, char ***data);
-int DelConf (char *item);
-int DelRow (char *table, char *row);
-int DelTable(char *table);
-int SetData (void *data, int type, char *table, char *row, char *field);
-int GetTableData (char *table, char ***data);
-int GetData (void **data, int type, const char *table, const char *row, const char *field);
-void flush_keeper();
+EXPORTFUNC int GetConf (void **data, int type, const char *item);
+EXPORTFUNC int SetConf (void *data, int type, char *item);
+EXPORTFUNC int GetDir (char *item, char ***data);
+EXPORTFUNC int DelConf (char *item);
+EXPORTFUNC int DelRow (char *table, char *row);
+EXPORTFUNC int DelTable(char *table);
+EXPORTFUNC int SetData (void *data, int type, char *table, char *row, char *field);
+EXPORTFUNC int GetTableData (char *table, char ***data);
+EXPORTFUNC int GetData (void **data, int type, const char *table, const char *row, const char *field);
+EXPORTFUNC void flush_keeper();
 
 /* main.c */
 void do_exit (NS_EXIT_TYPE exitcode, char* quitmsg) __attribute__((noreturn));
@@ -959,32 +946,32 @@ void fatal_error(char* file, int line, char* func, char* error_text) __attribute
 
 /* misc.c */
 void strip (char * line);
-void *smalloc ( const int size );
-void *scalloc ( const int size );
-void *srealloc ( void* ptr, const int size );
-void sfree ( void *buf );
-char *sstrdup (const char * s);
+EXPORTFUNC void *smalloc ( const int size );
+EXPORTFUNC void *scalloc ( const int size );
+EXPORTFUNC void *srealloc ( void* ptr, const int size );
+EXPORTFUNC void sfree ( void *buf );
+EXPORTFUNC char *sstrdup (const char * s);
 char *strlwr (char * s);
-void AddStringToList (char ***List, char S[], int *C);
-void strip_mirc_codes(char *text);
+EXPORTFUNC void AddStringToList (char ***List, char S[], int *C);
+EXPORTFUNC void strip_mirc_codes(char *text);
 char *sctime (time_t t);
 char *sftime (time_t t);
 
 /* ircd.c */
-char *joinbuf (char **av, int ac, int from);
-int split_buf (char *buf, char ***argv, int colon_special);
+EXPORTFUNC char *joinbuf (char **av, int ac, int from);
+EXPORTFUNC int split_buf (char *buf, char ***argv, int colon_special);
 
-void privmsg_list (char *to, char *from, const char **text);
-void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-void privmsg (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-void notice (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-void globops (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-void chanalert (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-void wallops (const char *from, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-void numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void privmsg_list (char *to, char *from, const char **text);
+EXPORTFUNC void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void privmsg (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void notice (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void globops (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void chanalert (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void wallops (const char *from, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 
-int join_bot_to_chan (const char *who, const char *chan, const char *modes);
-int part_bot_from_chan (const char *who, const char *chan);
+EXPORTFUNC int join_bot_to_chan (const char *who, const char *chan, const char *modes);
+EXPORTFUNC int part_bot_from_chan (const char *who, const char *chan);
 
 /* function declarations */
 int squit_cmd (const char *who, const char *quitmsg);
@@ -1000,7 +987,7 @@ int sswhois_cmd (const char *target, const char *swhois);
 int ssvsnick_cmd (const char *target, const char *newnick);
 int ssvsjoin_cmd (const char *target, const char *chan);
 int ssvspart_cmd (const char *target, const char *chan);
-int ssvshost_cmd (const char *target, const char *vhost);
+EXPORTFUNC int ssvshost_cmd (const char *target, const char *vhost);
 int ssvsmode_cmd (const char *target, const char *modes);
 int ssvskill_cmd (const char *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...);
@@ -1009,17 +996,17 @@ int ssvstime_cmd (const time_t ts);
 int schanusermode_cmd (const char *who, const char *chan, const char *mode, const char *bot);
 
 /* users.c */
-User *finduser (const char *nick);
-int UserLevel (User *u);
+EXPORTFUNC User *finduser (const char *nick);
+EXPORTFUNC int UserLevel (User *u);
 
 /* server.c */
-Server *findserver (const char *name);
+EXPORTFUNC Server *findserver (const char *name);
 
 /* chans.c */
-Channel *findchan (const char *chan);
-int CheckChanMode (Channel * c, long mode);
-int IsChanMember(Channel *c, User *u);
-int test_chan_user_mode(char* chan, char* nick, int flag);
+EXPORTFUNC Channel *findchan (const char *chan);
+EXPORTFUNC int CheckChanMode (Channel * c, long mode);
+EXPORTFUNC int IsChanMember(Channel *c, User *u);
+EXPORTFUNC int test_chan_user_mode(char* chan, char* nick, int flag);
 
 #define is_chanop(chan, nick)		test_chan_user_mode(chan, nick, CUMODE_CHANOP)
 #define is_chanhalfop(chan, nick)	test_chan_user_mode(chan, nick, CUMODE_HALFOP)
@@ -1029,17 +1016,17 @@ int test_chan_user_mode(char* chan, char* nick, int flag);
 #define is_chanadmin(chan, nick)	test_chan_user_mode(chan, nick, CUMODE_CHANADMIN)
 
 /* dns.c */
-int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);
+EXPORTFUNC int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);
 
 /* services.c */
-int add_services_cmd_list(bot_cmd* bot_cmd_list);
-int del_services_cmd_list(bot_cmd* bot_cmd_list);
-int is_target_valid(char* bot_name, User* u, char* target_nick);
+EXPORTFUNC int add_services_cmd_list(bot_cmd* bot_cmd_list);
+EXPORTFUNC int del_services_cmd_list(bot_cmd* bot_cmd_list);
+EXPORTFUNC int is_target_valid(char* bot_name, User* u, char* target_nick);
 
 /* transfer.c stuff */
 typedef void (transfer_callback) (void *data, int returncode, char *body, int bodysize);
-void transfer_status(void);
-int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback);
+EXPORTFUNC void transfer_status(void);
+EXPORTFUNC int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback);
 
 /* exclude */
 #define IsExcluded(x) ((x) && ((x)->flags & NS_FLAGS_EXCLUDED))
@@ -1054,23 +1041,23 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 #define SynchServer(x) (((x)->flags |= NS_FLAGS_SYNCHED))
 
 /* Some standard text help messages */
-extern const char *ns_help_set_nick[];
-extern const char *ns_help_set_altnick[];
-extern const char *ns_help_set_user[];
-extern const char *ns_help_set_host[];
-extern const char *ns_help_set_realname[];
+extern EXPORTVAR const char *ns_help_set_nick[];
+extern EXPORTVAR const char *ns_help_set_altnick[];
+extern EXPORTVAR const char *ns_help_set_user[];
+extern EXPORTVAR const char *ns_help_set_host[];
+extern EXPORTVAR const char *ns_help_set_realname[];
 
 extern const char *ns_copyright[];
 
-int validate_nick (char* nick);
-int validate_user (char* user);
-int validate_host (char* host);
+EXPORTFUNC int validate_nick (char* nick);
+EXPORTFUNC int validate_user (char* user);
+EXPORTFUNC int validate_host (char* host);
 
 #ifdef USE_BERKELEY
-int DBOpenDatabase(void);
-void DBCloseDatabase(void);
-void* DBGetData(char* key);
-void DBSetData(char* key, void * data, int size);
+EXPORTFUNC int DBOpenDatabase(void);
+EXPORTFUNC void DBCloseDatabase(void);
+EXPORTFUNC void* DBGetData(char* key);
+EXPORTFUNC void DBSetData(char* key, void * data, int size);
 #endif
 
 /* log.c API export */
@@ -1129,8 +1116,8 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 #define nassert(expr) (__ASSERT_VOID_CAST (0))
 #endif
 
-void nlog (LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-void dlog (DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void nlog (LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void dlog (DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
 int CloakHost (Bot *bot_ptr);
 
@@ -1144,12 +1131,12 @@ void GetServerList(ServerListHandler handler);
 /* 
  * Module Interface 
  */
-int ModInit(Module* mod_ptr);
-void ModFini(void);
-int ModAuth (User * u);
-int ModAuthUser(User * u, int curlvl);
-int ModAuthList(User * u);
-extern ModuleInfo module_info;   
-extern ModuleEvent module_events[];  
+int MODULEFUNC ModInit(Module* mod_ptr);
+void MODULEFUNC ModFini(void);
+int MODULEFUNC ModAuth (User * u);
+int MODULEFUNC ModAuthUser(User * u, int curlvl);
+int MODULEFUNC ModAuthList(User * u);
+extern MODULEVAR ModuleInfo module_info;   
+extern MODULEVAR ModuleEvent module_events[];  
 
 #endif /* NEOSTATS_H */

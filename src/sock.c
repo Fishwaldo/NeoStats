@@ -172,7 +172,7 @@ ConnectTo (char *host, int port)
  * 
  * @return none
  */
-#if (!defined WIN32 || defined _CONSOLE)
+#ifndef WIN32
 static void
 #else
 void
@@ -424,12 +424,12 @@ Connect (void)
 		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
 	} else {
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
-		send_server_connect (me.name, me.numeric, me.infoline, config.pass, (unsigned long)me.t_start, (unsigned long)me.now);
-#if (!defined WIN32 || defined _CONSOLE)
+		irc_send_server_connect (me.name, me.numeric, me.infoline, config.pass, (unsigned long)me.t_start, (unsigned long)me.now);
+#ifndef WIN32
 		read_loop ();
 #endif
 	}
-#if (!defined WIN32 || defined _CONSOLE)
+#ifndef WIN32
 	do_exit (NS_EXIT_RECONNECT, NULL);
 #endif
 }

@@ -499,7 +499,7 @@
 #define NEO_PREFIX "/home/Mark/NeoStats3.0"
 
 /* "Operating System Host" */
-#define NS_HOST "cygwin"
+#define NS_HOST "Win32"
 
 /* "IRCd Protocol we are compiled with" */
 #define NS_PROTOCOL "Client"

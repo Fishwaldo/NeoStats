@@ -24,8 +24,8 @@
 */
 
 #include <stdio.h>
-#include <fnmatch.h>
 #include "neostats.h"
+#include <fnmatch.h>
 #include "hostserv.h"
 
 #define MAXPASSWORD	30
@@ -52,24 +52,18 @@ struct hs_cfg {
 	int add;
 	int old;
 	int expire;
-#ifdef UMODE_REGNICK
 	int regnick;
 	char vhostdom[MAXHOST];
-#endif
 	int modnum;
 } hs_cfg;
 
-#ifdef UMODE_REGNICK
 typedef struct hs_user {
 	int vhostset;
 	hs_map *vhe;
 } hs_user;
-#endif
 
 static int hs_event_signon(CmdParams* cmdparams);
-#ifdef UMODE_REGNICK
 static int hs_event_mode(CmdParams* cmdparams);
-#endif
 static int hs_levels(CmdParams* cmdparams);
 static int hs_bans(CmdParams* cmdparams);
 static int hs_login(CmdParams* cmdparams);
@@ -109,6 +103,12 @@ static BotInfo hs_botinfo =
 };
 static Module* hs_module;
 
+const char *ns_copyright[] = {
+	"Copyright (c) 1999-2004, NeoStats",
+	"http://www.neostats.net/",
+	NULL
+};
+
 ModuleInfo module_info = {
 	"HostServ",
 	"Network virtual host service",
@@ -134,6 +134,35 @@ static bot_cmd hs_commands[]=
 	{"LOGIN",	hs_login,	2, 	0,					hs_help_login,	hs_help_login_oneline },
 	{"CHPASS",	hs_chpass,	3, 	0,					hs_help_chpass,	hs_help_chpass_oneline },
 	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
+};
+
+const char *ns_help_set_nick[] = {
+	"\2NICK <newnick>\2 Change bot nickname",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_altnick[] = {
+	"\2ALTNICK <newnick>\2 Change bot alternate nickname",
+	NULL
+};
+
+const char *ns_help_set_user[] = {
+	"\2USER <username>\2 Change bot username",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_host[] = {
+	"\2HOST <host>\2 Change bot host",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_realname[] = {
+	"\2REALNAME <realname>\2 Change bot realname",
+	"(requires restart to take effect).",
+	NULL
 };
 
 static bot_setting hs_settings[]=
@@ -185,6 +214,9 @@ void set_moddata(User* u)
 
 static int hs_event_quit(CmdParams* cmdparams) 
 {
+	if(!HaveUmodeRegNick()) 
+		return -1;
+
 	if (cmdparams->source.user->moddata[hs_module->modnum]) {
 		dlog(DEBUG2, "hs_event_quit: free module data");
 		sfree(cmdparams->source.user->moddata[hs_module->modnum]);
@@ -227,9 +259,9 @@ static int hs_event_signon(CmdParams* cmdparams)
 				map->vhost);
 			map->lused = me.now;
 			save_vhost(map);
-#ifdef UMODE_REGNICK
-			set_moddata(cmdparams->source.user);
-#endif
+			if(HaveUmodeRegNick()) {
+				set_moddata(cmdparams->source.user);
+			}
 			return 1;
 		}
 	}
@@ -248,16 +280,15 @@ static int hs_event_online(CmdParams* cmdparams)
 ModuleEvent module_events[] = {
 	{EVENT_ONLINE,	hs_event_online},
 	{EVENT_SIGNON,	hs_event_signon},
-#ifdef UMODE_REGNICK
 	{EVENT_UMODE,	hs_event_mode}, 
 	{EVENT_QUIT,	hs_event_quit},
 	{EVENT_KILL,	hs_event_quit},
-#endif
 	{EVENT_NULL,	NULL}
 };
 
 int ModInit(Module* mod_ptr)
 {
+	hs_module = mod_ptr;
 	vhosts = list_create(-1);
 	bannedvhosts = hash_create(-1, 0, 0);
 	if (!vhosts) {
@@ -281,12 +312,14 @@ void ModFini()
 	list_destroy_nodes(vhosts);
 }
 
-#ifdef UMODE_REGNICK
 int hs_event_mode(CmdParams* cmdparams) 
 {
 	int add = 0;
 	char *modes;
 	char vhost[MAXHOST];
+
+	if(!HaveUmodeRegNick()) 
+		return -1;
 
 	/* bail out if its not enabled */
 	if (hs_cfg.regnick != 1) 
@@ -334,7 +367,6 @@ int hs_event_mode(CmdParams* cmdparams)
 	}
 	return 1;
 }
-#endif
 
 /* Routine for registrations with the 'vhosts.db' file */
 static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
@@ -639,9 +671,8 @@ static int hs_add(CmdParams* cmdparams)
 				prefmsg(cmd, hs_bot->nick,
 					"For security, you should change your vhost password. See /msg %s help chpass",
 					hs_bot->nick);
-#ifdef UMODE_REGNICK
-				set_moddata(nu);
-#endif
+				if(HaveUmodeRegNick()) 
+					set_moddata(nu);
 				return 1;
 			}
 		}
@@ -853,9 +884,8 @@ static int hs_login(CmdParams* cmdparams)
 			    cmdparams->source.user->nick, map->vhost);
 			chanalert(hs_bot->nick, "%s used login to get vhost %s", 
 				cmdparams->source.user->nick, map->vhost);
-#ifdef UMODE_REGNICK
-			set_moddata(cmdparams->source.user);
-#endif
+			if(HaveUmodeRegNick()) 
+				set_moddata(cmdparams->source.user);
 			save_vhost(map);
 			return 1;
 		}

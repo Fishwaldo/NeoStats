@@ -150,10 +150,12 @@ dlog (DEBUG_LEVEL level, char *fmt, ...)
 {
 	va_list ap;
 	
+#ifndef WIN32
 	if (level <= config.debuglevel) {
 		/* Support for module specific only debug info */
 		if(ircstrcasecmp(config.debugmodule, "all")== 0 || ircstrcasecmp(config.debugmodule, GET_CUR_MODNAME()) ==0)
 		{
+#endif
 			/* we update me.now here, because some functions might be busy and not call the loop a lot */
 			me.now = time(NULL);
 			ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", me.now);
@@ -161,12 +163,18 @@ dlog (DEBUG_LEVEL level, char *fmt, ...)
 			va_start (ap, fmt);
 			ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
 			va_end (ap);
+#ifdef WIN32
+			printf ("%s %s - %s\n", dloglevels[level - 1], GET_CUR_MODNAME(), log_buf);
+#else
 			if (config.foreground) {
 				printf ("%s %s - %s\n", dloglevels[level - 1], GET_CUR_MODNAME(), log_buf);
 			}
+#endif
 			debuglog (log_fmttime, dloglevels[level - 1], log_buf);
+#ifndef WIN32
 		}
 	}
+#endif
 }
 
 /** @Configurable logging function
@@ -214,9 +222,13 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 			printf ("%s %s - %s\n", loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
 		}
 	}
+#ifndef WIN32
 	if (config.debuglevel) {
+#endif
 		debuglog (log_fmttime, loglevels[level - 1], log_buf);
+#ifndef WIN32
 	}
+#endif
 }
 
 /** rotate logs, called at midnight

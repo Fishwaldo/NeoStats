@@ -130,8 +130,8 @@ static int InitCore(void)
 		return NS_FAILURE;	
 	if (InitCurl () != NS_SUCCESS)
 		return NS_FAILURE;
-	InitServices();
 	InitIrcd ();
+	InitServices();
 	dlog(DEBUG1, "Core init successful");
 	return NS_SUCCESS;
 }
@@ -145,7 +145,7 @@ static int InitCore(void)
  *
  * @todo Close STDIN etc correctly
  */
-#if (!defined WIN32 || defined _CONSOLE)
+#ifndef WIN32
 int
 main (int argc, char *argv[])
 #else
@@ -157,7 +157,7 @@ neostats ()
 
 	/* initialise version */
 	strlcpy(me.version, VERSION, VERSIONSIZE);
-#if (!defined WIN32 || defined _CONSOLE)
+#ifndef WIN32
 	/* get our commandline options */
 	if(get_options (argc, argv)!=NS_SUCCESS)
 		return EXIT_FAILURE;
@@ -242,7 +242,7 @@ neostats ()
 	/* We should never reach here but the compiler does not realise and may
 	   complain about not all paths control returning values without the return 
 	   Since it should never happen, treat as an error condition! */
-#if (!defined WIN32 || defined _CONSOLE)
+#ifndef WIN32
 	return EXIT_FAILURE;
 #else
 	return 0;
@@ -268,6 +268,11 @@ get_options (int argc, char **argv)
 	config.loglevel = LOG_INFO;
 	config.debuglevel = DEBUG10;
 	config.foreground = 1;
+#endif
+#ifdef WIN32
+	config.debug = 1;
+	config.loglevel = LOG_INFO;
+	config.debuglevel = DEBUG10;
 #endif
 	/* default debugmodule to all */
 	strlcpy(config.debugmodule, "all", MAX_MOD_NAME);

@@ -39,6 +39,12 @@ static int ls_thankyou(CmdParams* cmdparams);
 
 static Bot *ls_bot;
 
+const char *ns_copyright[] = {
+	"Copyright (c) 1999-2004, NeoStats",
+	"http://www.neostats.net/",
+	NULL
+};
+
 ModuleInfo module_info = {
 	"LoveServ",
 	"Network love service",
@@ -74,6 +80,35 @@ static bot_cmd ls_commands[]=
 	{"APOLOGY",		ls_apology,		2, 	0,	ls_help_apology,	ls_help_apology_oneline },
 	{"THANKYOU",	ls_thankyou,	2, 	0,	ls_help_thankyou,	ls_help_thankyou_oneline },
 	{NULL,			NULL,			0, 	0,	NULL, 				NULL}
+};
+
+const char *ns_help_set_nick[] = {
+	"\2NICK <newnick>\2 Change bot nickname",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_altnick[] = {
+	"\2ALTNICK <newnick>\2 Change bot alternate nickname",
+	NULL
+};
+
+const char *ns_help_set_user[] = {
+	"\2USER <username>\2 Change bot username",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_host[] = {
+	"\2HOST <host>\2 Change bot host",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_realname[] = {
+	"\2REALNAME <realname>\2 Change bot realname",
+	"(requires restart to take effect).",
+	NULL
 };
 
 static bot_setting ls_settings[]=

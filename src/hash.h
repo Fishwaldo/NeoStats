@@ -209,15 +209,15 @@ extern "C" {
 #endif
 	} hscan_t;
 
-	extern hash_t *hash_create (hashcount_t, hash_comp_t, hash_fun_t);
+EXPORTFUNC 	extern hash_t *hash_create (hashcount_t, hash_comp_t, hash_fun_t);
 	extern void hash_set_allocator (hash_t *, hnode_alloc_t, hnode_free_t, void *);
 	extern void hash_destroy (hash_t *);
 	extern void hash_free_nodes (hash_t *);
 	extern void hash_free (hash_t *);
 	extern hash_t *hash_init (hash_t *, hashcount_t, hash_comp_t, hash_fun_t, hnode_t **, hashcount_t);
-	extern void hash_insert (hash_t *, hnode_t *, const void *);
-	extern hnode_t *hash_lookup (hash_t *, const void *);
-	extern hnode_t *hash_delete (hash_t *, hnode_t *);
+EXPORTFUNC 	extern void hash_insert (hash_t *, hnode_t *, const void *);
+EXPORTFUNC 	extern hnode_t *hash_lookup (hash_t *, const void *);
+EXPORTFUNC 	extern hnode_t *hash_delete (hash_t *, hnode_t *);
 	extern int hash_alloc_insert (hash_t *, const void *, void *);
 	extern void hash_delete_free (hash_t *, hnode_t *);
 
@@ -230,16 +230,16 @@ extern "C" {
 	extern int hash_isfull (hash_t *);
 	extern int hash_isempty (hash_t *);
 
-	extern void hash_scan_begin (hscan_t *, hash_t *);
-	extern hnode_t *hash_scan_next (hscan_t *);
-	extern hnode_t *hash_scan_delete (hash_t *, hnode_t *);
+EXPORTFUNC 	extern void hash_scan_begin (hscan_t *, hash_t *);
+EXPORTFUNC 	extern hnode_t *hash_scan_next (hscan_t *);
+EXPORTFUNC	extern hnode_t *hash_scan_delete (hash_t *, hnode_t *);
 	extern void hash_scan_delfree (hash_t *, hnode_t *);
 
 	extern int hash_verify (hash_t *);
 
-	extern hnode_t *hnode_create (void *);
+EXPORTFUNC 	extern hnode_t *hnode_create (void *);
 	extern hnode_t *hnode_init (hnode_t *, void *);
-	extern void hnode_destroy (hnode_t *);
+EXPORTFUNC 	extern void hnode_destroy (hnode_t *);
 
 #if defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG)
 #ifdef KAZLIB_SIDEEFFECT_DEBUG

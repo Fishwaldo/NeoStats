@@ -33,6 +33,12 @@ typedef struct UserAuthModes{
 	int level;
 } UserAuthModes;
 
+const char *ns_copyright[] = {
+	"Copyright (c) 1999-2004, NeoStats",
+	"http://www.neostats.net/",
+	NULL
+};
+
 const char *auth_help_authmodelist[] = {
 	"Syntax: \2AUTHMODELIST\2",
 	"",
@@ -101,14 +107,11 @@ UserAuthModes user_auth_modes[] = {
 #ifdef UMODE_LOCOP
 	{"Local operator",	UMODE_LOCOP,	NS_ULEVEL_LOCOPER},
 #endif
-#ifdef UMODE_REGNICK
 	{"Registered nick",	UMODE_REGNICK,	NS_ULEVEL_REG},
-#endif
 };
 
 const int user_auth_mode_count = ((sizeof (user_auth_modes) / sizeof (user_auth_modes[0])));
 
-#if (FEATURES&FEATURE_USERSMODES)
 UserAuthModes user_auth_smodes[] = {
 #ifdef SMODE_NETADMIN
 	{"Network admin",	SMODE_NETADMIN, 190},
@@ -131,10 +134,10 @@ UserAuthModes user_auth_smodes[] = {
 #ifdef SMODE_COADMIN
 	{"Co-admin",		SMODE_COADMIN, 75},
 #endif
+	0
 };
 
 const int user_auth_smode_count = ((sizeof (user_auth_smodes) / sizeof (user_auth_smodes[0])));
-#endif
 
 static int auth_cmd_authmodelist(CmdParams* cmdparams)
 {
@@ -193,21 +196,21 @@ int ModAuthUser(User * u, int curlvl)
 	dlog(DEBUG1, "UmodeAuth: umode level for %s is %d", u->nick, tmplvl);
 	if(tmplvl > curlvl)
 		curlvl = tmplvl;
-#if (FEATURES&FEATURE_USERSMODES)
-	/* Check smodes */
-	tmplvl = 0;
-	for (i = 0; i < user_auth_mode_count; i++) {
-		if(user_auth_modes[i].level == 0)
-			break;
-		if (u->Smode & user_auth_modes[i].umode) {
-			tmplvl = user_auth_modes[i].level;
-			break;
+	if (0){//protocol_info.features&FEATURE_USERSMODES) {
+		/* Check smodes */
+		tmplvl = 0;
+		for (i = 0; i < user_auth_mode_count; i++) {
+			if(user_auth_modes[i].level == 0)
+				break;
+			if (u->Smode & user_auth_modes[i].umode) {
+				tmplvl = user_auth_modes[i].level;
+				break;
+			}
 		}
+		dlog(DEBUG1, "UmodeAuth: smode level for %s is %d", u->nick, tmplvl);
+		if(tmplvl > curlvl)
+			curlvl = tmplvl;
 	}
-	dlog(DEBUG1, "UmodeAuth: smode level for %s is %d", u->nick, tmplvl);
-	if(tmplvl > curlvl)
-		curlvl = tmplvl;
-#endif
 	/* Return new level */
 	return curlvl;
 }

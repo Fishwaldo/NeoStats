@@ -49,8 +49,8 @@
 #include <string.h>
 #include <ctype.h>
 #define HASH_IMPLEMENTATION
-#include "hash.h"
 #include "neostats.h"
+#include "hash.h"
 
 #ifdef KAZLIB_RCSID
 static const char rcsid[] = "$Id$";

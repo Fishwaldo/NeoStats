@@ -4,6 +4,22 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Update makeconf to generate a PROTOCOL line. (M)
+ - Update automake files for core and protocol to observe new protocol module
+   generation. (M)
+ - Win32: Add debug console to GUI version with redirects of STDOUT and STDERR
+   which depreciates the console version. (M)
+ - Win32: Add fnmatch to core since it does not exist on Win32. (M)
+ - Win32: Create protocol DLL files. (M)
+ - Protocol system is now modular and required loading of a protocol module via
+   neostats.cfg. (M)
+ - Win32: Macros for modules/core exports for DLL compatibility. (M)
+ - Win32: Create Win32 compatible dl_xxxx system for modules. (M)
+ - Win32: Generate core export library for use by modules. (M)
+ - New macro MSGTOK to use in protocol modules for MSG_*/TOK_* selection. (M)
+ - Core no longer depends on protocol specific headers. (M)
+ - Change protocol files to be more modular. Support functions accessed via
+   pointers. (M)
  - Win32: Run NeoStats main code on a thread. (M)
  - Win32: Add very basic GUI. (M)
  - Win32: Disable fork. Windows handles processes differently. (M)

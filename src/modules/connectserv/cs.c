@@ -53,9 +53,7 @@ static char msg_globalkill[]="\2GLOBAL KILL\2 %s (%s@%s) was killed by %s - Reas
 static char msg_serverkill[]="\2SERVER KILL\2 %s (%s@%s) was killed by the server %s - Reason sighted: \2%s\2";  
 static char msg_mode[]="\2MODE\2 %s is %s a %s (%c%c)";
 static char msg_mode_serv[]="\2MODE\2 %s is %s a %s (%c%c) on %s";
-#ifdef UMODE_CH_BOT
 static char msg_bot[]="\2BOT\2 %s is %s a Bot (%c%c)";
-#endif
 #else
 static char msg_nickchange[]="\2\0037NICK CHANGE\2 user: \2%s\2 (%s@%s) Changed their nick to \2%s\2\003"; 
 static char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s - %s) at: \2%s\2\003";
@@ -65,9 +63,7 @@ static char msg_globalkill[]="\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Kil
 static char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 (%s@%s) was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
 static char msg_mode[]="\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c)\003";
 static char msg_mode_serv[]="\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c) on \2%s\2\003";
-#ifdef UMODE_CH_BOT
 static char msg_bot[]="\2\00313%s\2 is \2%s\2 a \2Bot\2 (%c%c)\003";
-#endif
 #endif
 
 static int cs_event_online(CmdParams* cmdparams);
@@ -93,11 +89,7 @@ static int cs_online = 0;
 static Bot *cs_bot;
 static BotInfo cs_botinfo = 
 {
-#ifdef HYBRID7
-	"CS", 
-#else
 	"ConnectServ", 
-#endif
 	"ConnectServ", 
 	"CS", 
 	"", 
@@ -106,10 +98,16 @@ static BotInfo cs_botinfo =
 
 static Module* cs_module;
 
+const char *cs_copyright[] = {
+	"Copyright (c) 1999-2004, NeoStats",
+	"http://www.neostats.net/",
+	NULL
+};
+
 ModuleInfo module_info = {
 	"ConnectServ",
 	"Connection monitoring service",
-	ns_copyright,
+	cs_copyright,
 	cs_about,
 	NEOSTATS_VERSION,
 	CORE_MODULE_VERSION,
@@ -124,13 +122,42 @@ static bot_cmd cs_commands[]=
 	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
 };
 
+const char *cs_help_set_nick[] = {
+	"\2NICK <newnick>\2 Change bot nickname",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *cs_help_set_altnick[] = {
+	"\2ALTNICK <newnick>\2 Change bot alternate nickname",
+	NULL
+};
+
+const char *cs_help_set_user[] = {
+	"\2USER <username>\2 Change bot username",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *cs_help_set_host[] = {
+	"\2HOST <host>\2 Change bot host",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *cs_help_set_realname[] = {
+	"\2REALNAME <realname>\2 Change bot realname",
+	"(requires restart to take effect).",
+	NULL
+};
+
 static bot_setting cs_settings[]=
 {
-	{"NICK",		&cs_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, (void*)"ConnectServ" },
-	{"ALTNICK",		&cs_botinfo.altnick,SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, (void*)"ConnectServ" },
-	{"USER",		&cs_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, (void*)"CS" },
-	{"HOST",		&cs_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, (void*)"" },
-	{"REALNAME",	&cs_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"Connection monitoring service" },
+	{"NICK",		&cs_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	cs_help_set_nick, NULL, (void*)"ConnectServ" },
+	{"ALTNICK",		&cs_botinfo.altnick,SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	cs_help_set_altnick, NULL, (void*)"ConnectServ" },
+	{"USER",		&cs_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	cs_help_set_user, NULL, (void*)"CS" },
+	{"HOST",		&cs_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	cs_help_set_host, NULL, (void*)"" },
+	{"REALNAME",	&cs_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	cs_help_set_realname, NULL, (void*)"Connection monitoring service" },
 	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "SignWatch",	NULL,	cs_help_set_signwatch, NULL, (void*)1 },
 	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "KillWatch",	NULL,	cs_help_set_killwatch, NULL, (void*)1 },
 	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ModeWatch",	NULL,	cs_help_set_modewatch, NULL, (void*)1 },

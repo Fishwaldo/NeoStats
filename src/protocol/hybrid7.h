@@ -25,21 +25,6 @@
 #ifndef HYBRID7_H
 #define HYBRID7_H
 
-/* Feature support for use by modules to determine whether
- * certain functionality is available
- */
-
-#define FEATURES 0
-
-/* buffer sizes */
-#define MAXHOST			(128 + 1)
-#define MAXPASS			(32 + 1)
-#define MAXNICK			(32 + 1)
-#define MAXUSER			(10 + 1)
-#define MAXREALNAME		(50 + 1)
-#define CHANLEN			(200 + 1)
-#define TOPICLEN		(512 + 1)
-
 /* Messages/Tokens */
 #define MSG_EOB		"EOB"	/* end of burst */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
@@ -196,7 +181,7 @@
 
 /* Umodes */
 #define UMODE_SERVNOTICE   0x0400 /* server notices such as kill */
-#define UMODE_CCONN        0x20000 /* Client Connections */
+#define UMODE_CLIENT        0x20000 /* Client Connections */
 #define UMODE_REJ          0x0100 /* Bot Rejections */
 #define UMODE_SKILL        0x0008 /* Server Killed */
 #define UMODE_FULL         0x0010 /* Full messages */
@@ -208,7 +193,6 @@
 #define UMODE_EXTERNAL     0x1000 /* show servers introduced and splitting */
 #define UMODE_CALLERID     0x4000 /* block unless caller id's */
 #define UMODE_UNAUTH       0x8000 /* show unauth connects here */
-#define UMODE_LOCOP       0x10000 /* show locops */
 #define UMODE_ADMIN        0x40000 /* Admin on server */
  
 /* Channel Visibility macros */

@@ -22,8 +22,8 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 		keeper.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c
-AM_CFLAGS = @PCRE_CFLAGS@ -I$(top_srcdir)/lang -Iadns -Ikeeper @INCLTDL@ @CURL_CFLAGS@
-neostats_LDADD = protocol/libprotocol.a keeper/libkeeper.a \
+AM_CFLAGS = @PCRE_CFLAGS@ -I$(top_srcdir)/lang -Iadns -Ikeeper @INCLTDL@ @CURL_CFLAGS@ -DNEOSTATSCORE
+neostats_LDADD = keeper/libkeeper.a \
 		adns/libadns.la libltdl/libltdlc.la @PCRE_LIBS@ @CURL_LIBS@
 neostats_LDFLAGS = --export-dynamic -rdynamic
 

@@ -21,10 +21,10 @@
 ** $Id$
 */
 
+#include "ircup10.h"
 #include "neostats.h"
 #include "ircd.h"
 #include "sock.h"
-#include "ircup10.h"
 #include "users.h"
 #include "servers.h"
 #include "channels.h"
@@ -32,8 +32,8 @@
 #include <arpa/inet.h>
 #endif
 
-void process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac);
-int splitbuf (char *buf, char ***argv, int colon_special);
+EXPORTFUNC void process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac);
+EXPORTFUNC int splitbuf (char *buf, char ***argv, int colon_special);
 
 static void ircu_m_private (char *origin, char **argv, int argc, int srv);
 static void ircu_m_notice (char *origin, char **argv, int argc, int srv);
@@ -62,11 +62,25 @@ static void m_end_of_burst (char *origin, char **argv, int argc, int srv);
 void send_end_of_burst_ack(void);
 void send_end_of_burst(void);
 
-const int ircd_minprotocol = PROTOCOL_TOKEN|PROTOCOL_NOQUIT|PROTOCOL_B64SERVER|PROTOCOL_B64NICK;
-const int ircd_optprotocol = 0;
-const int ircd_features = 0;
-const char services_umode[]= "+iok";
-const char services_cmode[]= "+o";
+/* buffer sizes */
+const int proto_maxhost		= (63 + 1);
+const int proto_maxpass		= (32 + 1);
+const int proto_maxnick		= (32 + 1);
+const int proto_maxuser		= (10 + 1);
+const int proto_maxrealname	= (50 + 1);
+const int proto_chanlen		= (50 + 1);
+const int proto_topiclen	= (250 + 1);
+
+ProtocolInfo protocol_info = {
+	/* Protocol options required by this IRCd */
+	PROTOCOL_TOKEN|PROTOCOL_NOQUIT|PROTOCOL_B64SERVER|PROTOCOL_B64NICK,
+	/* Protocol options negotiated at link by this IRCd */
+	0,
+	/* Features supported by this IRCd */
+	FEATURE_NICKIP,
+	"+iok",
+	"+o",
+};
 
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
@@ -96,6 +110,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_PASS, TOK_PASS, m_pass, 0},
 	{MSG_BURST, TOK_BURST, m_burst, 0},
 	{MSG_END_OF_BURST, TOK_END_OF_BURST, m_end_of_burst, 0},
+	{0, 0, 0, 0},
 };
 
 cumode_init chan_umodes[] = {
@@ -165,8 +180,6 @@ umode_init user_umodes[] = {
 umode_init user_smodes[] = {
 	{0, '0'},
 };
-
-const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 
 /* Temporary buffers for numeric conversion */
 char neostatsbase64[3] = "\0";

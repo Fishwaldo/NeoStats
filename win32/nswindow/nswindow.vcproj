@@ -19,8 +19,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\src;..\..\src\adnswin32;..\..\src\keeper;..\..\src\curl;..\..\src\pcre"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ADNS_MAP_UNIXAPI"
+				AdditionalIncludeDirectories="..\..\src;..\..\src\adnswin32;..\..\src\keeper;..\..\src\curl;..\..\src\pcre;..\..\src\win32"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ADNS_MAP_UNIXAPI;NEOSTATSCORE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
@@ -33,7 +33,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curl.lib pcre.lib adns.lib"
-				OutputFile="$(OutDir)/nswindow.exe"
+				OutputFile="$(OutDir)/neostats.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\adns\Debug;..\pcre\Debug;..\curl\Debug"
 				GenerateDebugInformation="TRUE"
@@ -337,6 +337,12 @@
 			<Filter
 				Name="win32">
 				<File
+					RelativePath="..\..\src\win32\fnmatch.c">
+				</File>
+				<File
+					RelativePath="..\..\src\win32\fnmatch.h">
+				</File>
+				<File
 					RelativePath="..\..\src\win32\getopt.c">
 				</File>
 				<File
@@ -383,15 +389,6 @@
 				</File>
 				<File
 					RelativePath="..\..\src\keeper\Makefile">
-				</File>
-			</Filter>
-			<Filter
-				Name="protocol">
-				<File
-					RelativePath="..\..\src\protocol\unreal32.c">
-				</File>
-				<File
-					RelativePath="..\..\src\protocol\unreal32.h">
 				</File>
 			</Filter>
 		</Filter>

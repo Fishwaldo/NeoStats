@@ -60,7 +60,6 @@ new_user (const char *nick)
 	return u;
 }
 
-#if !(FEATURES&FEATURE_NICKIP)
 static void lookupnickip(char *data, adns_answer *a) 
 {
 	CmdParams * cmdparams;
@@ -75,7 +74,6 @@ static void lookupnickip(char *data, adns_answer *a)
 		sfree (cmdparams);
 	}
 }
-#endif
 
 void
 AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric)
@@ -83,10 +81,6 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	CmdParams * cmdparams;
 	unsigned long ipaddress = 0;
 	User *u;
-#if !(FEATURES&FEATURE_NICKIP)
-	struct in_addr *ipad;
-	int res;
-#endif
 
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
@@ -96,8 +90,10 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	}
 	if(ip) {
 		ipaddress = strtoul (ip, NULL, 10);
-#if !(FEATURES&FEATURE_NICKIP)
-	} else if (me.want_nickip == 1) {
+	} else if (!(protocol_info->features&FEATURE_NICKIP) && me.want_nickip == 1) {
+		struct in_addr *ipad;
+		int res;
+
 		/* first, if the u->host is a ip address, just convert it */
 		ipad = smalloc(sizeof(struct in_addr));
 		res = inet_aton(host, ipad);
@@ -110,7 +106,6 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 			dns_lookup((char *)host, adns_r_addr, lookupnickip, (void *)nick);
 			ipaddress = 0;
 		}		
-#endif
 	}
 	dlog(DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, (int)htonl (ipaddress), server, TS);
 	u = new_user (nick);
@@ -343,15 +338,15 @@ void *display_umode(void *tbl, char *col, char *sql, void *row)
 void *display_vhost(void *tbl, char *col, char *sql, void *row) 
 {
 	User *u = row;
-#ifdef UMODE_HIDE
-	/* Do we have a hidden host? */
-	if(u->Umode & UMODE_HIDE) {
-		return u->vhost;
+
+	if (protocol_info->features&FEATURE_UMODECLOAK) {
+		/* Do we have a hidden host? */
+		if(u->Umode & UMODE_HIDE) {
+			return u->vhost;
+		}
+		return "*";	
 	}
-	return "*";	
-#else
 	return u->hostname;
-#endif
 }
 
 void *display_smode(void *tbl, char *col, char *sql, void *row) 
@@ -360,7 +355,7 @@ void *display_smode(void *tbl, char *col, char *sql, void *row)
 	return SmodeMaskToString(data->Smode);
 }
 
-static char userschannellist[MAXCHANLIST];
+static char userschannellist[MAXCHANLENLIST];
 
 void *display_chans(void *tbl, char *col, char *sql, void *row) 
 {
@@ -369,8 +364,8 @@ void *display_chans(void *tbl, char *col, char *sql, void *row)
 	userschannellist[0] = '\0';
 	cn = list_first(data->chans);
 	while (cn != NULL) {
-		strlcat(userschannellist, lnode_get(cn), MAXCHANLIST);
-		strlcat(userschannellist, " ", MAXCHANLIST);
+		strlcat(userschannellist, lnode_get(cn), MAXCHANLENLIST);
+		strlcat(userschannellist, " ", MAXCHANLENLIST);
 		cn = list_next(data->chans, cn);
 	}
 	return userschannellist;
@@ -502,7 +497,7 @@ COLDEF neo_userscols[] = {
 		"users",
 		"channels",
 		RTA_STR,
-		MAXCHANLIST,
+		MAXCHANLENLIST,
 		offsetof(struct User, chans),
 		RTA_READONLY,
 		display_chans,
@@ -657,12 +652,12 @@ SetUserVhost(const char* nick, const char* vhost)
 	dlog(DEBUG1, "Vhost %s", vhost);
 	if (u) {
 		strlcpy (u->vhost, vhost, MAXHOST);
-	/* sethost on Unreal doesn't send +xt, but /umode +x sends +x 
-	 * so, we will never be 100% sure about +t 
-	 */
-#ifdef UMODE_HIDE
-		u->Umode |= UMODE_HIDE;
-#endif
+		/* sethost on Unreal doesn't send +xt, but /umode +x sends +x 
+		* so, we will never be 100% sure about +t 
+		*/
+		if (protocol_info->features&FEATURE_UMODECLOAK) {
+			u->Umode |= UMODE_HIDE;
+		}
 	}
 }
 
@@ -683,12 +678,12 @@ UserMode (const char *nick, const char *modes)
 	strlcpy (u->modes, modes, MODESIZE);
 	oldmode = u->Umode;
 	u->Umode = UmodeStringToMask(modes, u->Umode);
-#ifdef UMODE_HIDE
-	/* Do we have a hidden host any more? */
-	if((oldmode & UMODE_HIDE) && (!(u->Umode & UMODE_HIDE))) {
-		strlcpy(u->vhost, u->hostname, MAXHOST);
+	if (protocol_info->features&FEATURE_UMODECLOAK) {
+		/* Do we have a hidden host any more? */
+		if((oldmode & UMODE_HIDE) && (!(u->Umode & UMODE_HIDE))) {
+			strlcpy(u->vhost, u->hostname, MAXHOST);
+		}
 	}
-#endif
 	dlog(DEBUG1, "UserMode: modes for %s is now %x", u->nick, u->Umode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.user = u;	
@@ -797,7 +792,7 @@ int IsServiceRoot(User* u)
 	return (0);
 }
 
-void
+EXPORTFUNC void
 AddFakeUser(const char *mask)
 {
 	char maskcopy[MAXHOST];
@@ -829,7 +824,7 @@ AddFakeUser(const char *mask)
 	u->chans = list_create (MAXJOINCHANS);
 }
 
-void
+EXPORTFUNC void
 DelFakeUser(const char *mask)
 {
 	char maskcopy[MAXHOST];

@@ -45,6 +45,12 @@ static int ms_cheerup(CmdParams* cmdparams);
 static int ms_behappy(CmdParams* cmdparams);
 static int ms_wonderful(CmdParams* cmdparams);
 
+const char *ns_copyright[] = {
+	"Copyright (c) 1999-2004, NeoStats",
+	"http://www.neostats.net/",
+	NULL
+};
+
 ModuleInfo module_info = {
 	"MoraleServ",
 	"Network morale service",
@@ -69,6 +75,35 @@ static bot_cmd ms_commands[]=
 	{"ODE",			ms_ode,			2, 	0,	ms_help_ode,		ms_help_ode_oneline },
 	{"POEM",		ms_poem,		2, 	0,	ms_help_poem,		ms_help_poem_oneline },
 	{NULL,			NULL,			0, 	0,	NULL, 				NULL}
+};
+
+const char *ns_help_set_nick[] = {
+	"\2NICK <newnick>\2 Change bot nickname",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_altnick[] = {
+	"\2ALTNICK <newnick>\2 Change bot alternate nickname",
+	NULL
+};
+
+const char *ns_help_set_user[] = {
+	"\2USER <username>\2 Change bot username",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_host[] = {
+	"\2HOST <host>\2 Change bot host",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_realname[] = {
+	"\2REALNAME <realname>\2 Change bot realname",
+	"(requires restart to take effect).",
+	NULL
 };
 
 static bot_setting ms_settings[]=

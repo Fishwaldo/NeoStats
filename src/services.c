@@ -55,6 +55,8 @@ static int ns_level (CmdParams* cmdparams);
 static int ns_load (CmdParams* cmdparams);
 static int ns_unload (CmdParams* cmdparams);
 
+tme me;
+
 static char quitmsg[BUFSIZE];
 
 static const char *ns_about[] = {
@@ -108,12 +110,12 @@ static bot_setting ns_settings[]=
 {
 	{"PINGTIME",		&config.pingtime,	SET_TYPE_INT,		0, 0, 	NS_ULEVEL_ADMIN, "pingtime",	NULL,	ns_help_set_pingtime, NULL, (void*)120 },
 	{"VERSIONSCAN",		&config.versionscan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL, (void*)1 },
-	{"SERVICECMODE",	&me.servicescmode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicescmode",	NULL,	ns_help_set_servicecmode, NULL, (void*)services_cmode },
-	{"SERVICEUMODE",	&me.servicesumode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicesumode",	NULL,	ns_help_set_serviceumode, NULL, (void*)services_umode },
+//	{"SERVICECMODE",	&me.servicescmode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicescmode",	NULL,	ns_help_set_servicecmode, NULL, (void*)services_cmode },
+//	{"SERVICEUMODE",	&me.servicesumode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicesumode",	NULL,	ns_help_set_serviceumode, NULL, (void*)services_umode },
 	{"LOGLEVEL",		&config.loglevel,	SET_TYPE_INT,		1, 6, 	NS_ULEVEL_ADMIN, "loglevel",	NULL,	ns_help_set_loglevel, NULL, (void*)5 },
 	{"DEBUG",			&config.debug,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debug, NULL, (void*)0 },
 	{"DEBUGLEVEL",		&config.debuglevel,	SET_TYPE_INT,		1, 10, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debuglevel, NULL, (void*)0 },
-	{"DEBUGCHAN",		&config.debugchan,	SET_TYPE_STRING,	0, CHANLEN, 	NS_ULEVEL_ADMIN, "debugchan",	NULL,	ns_help_set_debugchan, NULL, (void*)"#debug" },
+	{"DEBUGCHAN",		&config.debugchan,	SET_TYPE_STRING,	0, MAXCHANLEN, 	NS_ULEVEL_ADMIN, "debugchan",	NULL,	ns_help_set_debugchan, NULL, (void*)"#debug" },
 	{"DEBUGTOCHAN",		&config.debugtochan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugtochan, NULL, (void*)0 },
 	{"DEBUGMODULE",		&config.debugmodule,SET_TYPE_STRING,	0, MAX_MOD_NAME, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugmodule, NULL, (void*)"all" },
 	{NULL,				NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},

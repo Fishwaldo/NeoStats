@@ -32,25 +32,9 @@
 /* #define NEFARIOUS */
 /* #define ASUKA */
 
-#define FEATURES FEATURE_NICKIP
-
-/* Feature support for use by modules to determine whether
- * certain functionality is available
- */
-/* The following defines might not be correct for IRCu but are used to 
- * ensure NeoStats compiles correctly until we get updated files */
 
 /* Override NeoStats core parse function */
 #define IRCD_PARSE
-
-/* buffer sizes */
-#define MAXHOST			(63 + 1)
-#define MAXPASS			(32 + 1)
-#define MAXNICK			(32 + 1)
-#define MAXUSER			(10 + 1)
-#define MAXREALNAME		(50 + 1)
-#define CHANLEN			(50 + 1)
-#define TOPICLEN		(250 + 1)
 
 #define BASE64SERVERSIZE	2
 #define BASE64NICKSIZE		5
@@ -219,13 +203,10 @@
 #define UMODE_CH_OPER 'o'
 
  /* User modes: */
-#define UMODE_LOCOP				0x0008	/* Local oper */
-#define UMODE_SERVNOTICE        0x0010	/* See server notices */
-#define UMODE_DEAF              0x0020	/* Dont see chan msgs */
+#define UMODE_SERVNOTICE        0x2000	/* See server notices */
 #define UMODE_CHSERV            0x0040	/* Unkickable/-o able */
 #define UMODE_DEBUG             0x0080	/* See hack notices */
 #define UMODE_ACCOUNT			0x1000	/* */
-#define UMODE_HIDE				0x2000	/* */
 #ifdef NEFARIOUS
 #define UMODE_BOT				0x4000	/* */
 #endif
@@ -238,16 +219,16 @@
 #endif
 
 /* Cmodes */
-#define CMODE_SENDTS	0x0800	
+#define CMODE_SENDTS		0x02000000
 #ifdef ASUKA
-#define CMODE_DELJOINS 0x1000
-#define CMODE_WASDELJOIN 0x400000
+#define CMODE_DELJOINS		0x04000000
+#define CMODE_WASDELJOIN	0x08000000
 #endif
-#define CMODE_LISTED	0x10000
+#define CMODE_LISTED		0x10000000
 #if ( defined NEFARIOUS ) || (defined ASUKA )
-#define CMODE_NOCTCP	0x80000
-#define CMODE_NONOTICE	0x100000
-#define CMODE_NOQUITPARTS	0x200000
+#define CMODE_NOCTCP		0x20000000
+#define CMODE_NONOTICE		0x40000000
+#define CMODE_NOQUITPARTS	0x80000000
 #endif
 #ifdef NEFARIOUS
 #define CMODE_ONLYSECURE 0x800000

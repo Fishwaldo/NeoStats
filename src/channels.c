@@ -373,7 +373,7 @@ new_chan (const char *chan)
 		return NULL;
 	}
 	c = scalloc (sizeof (Channel));
-	strlcpy (c->name, chan, CHANLEN);
+	strlcpy (c->name, chan, MAXCHANLEN);
 	cn = hnode_create (c);
 	hash_insert (channelhash, cn, c->name);
 	c->chanmembers = list_create (CHAN_MEM_SIZE);
@@ -963,7 +963,7 @@ COLDEF neo_chanscols[] = {
 		"chans",
 		"name",
 		RTA_STR,
-		CHANLEN,
+		MAXCHANLEN,
 		offsetof(struct Channel, name),
 		RTA_READONLY,
 		NULL,

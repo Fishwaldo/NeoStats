@@ -26,16 +26,16 @@
 
 int InitBots(void);
 int FiniBots(void);
-Bot* add_ns_bot (Module* modptr, char *nick);
+Bot* add_ns_bot (Module* modptr, const char *nick);
 int list_bots (CmdParams* cmdparams);
 int del_ns_bot (const char *nick);
 void add_chan_bot (const char *bot, const char *chan);
 void del_chan_bot (const char *bot, const char *chan);
 int list_bot_chans (CmdParams* cmdparams);
-void bot_private (char *origin, char **av, int ac);
-void bot_notice (char *origin, char **av, int ac);
-void bot_chan_private (char *origin, char **av, int ac);
-void bot_chan_notice (char *origin, char **av, int ac);
+EXPORTFUNC void bot_private (char *origin, char **av, int ac);
+EXPORTFUNC void bot_notice (char *origin, char **av, int ac);
+EXPORTFUNC void bot_chan_private (char *origin, char **av, int ac);
+EXPORTFUNC void bot_chan_notice (char *origin, char **av, int ac);
 int del_bots (Module *mod_ptr);
 
 #endif /* _BOTS_H_ */

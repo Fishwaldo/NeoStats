@@ -21,6 +21,9 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <process.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <io.h>
 
 #include "resource.h"
 
@@ -39,9 +42,11 @@ BOOL CALLBACK DialogProc (HWND hwnd,
 			return 0;
 		case WM_DESTROY:
 			PostQuitMessage(0);
+			FreeConsole();
 			return TRUE;
 		case WM_CLOSE:
 			DestroyWindow (hwnd);
+			FreeConsole();
 			return TRUE;
     }
     return FALSE;
@@ -62,8 +67,26 @@ int WINAPI WinMain
 	WSADATA WSAData;
     MSG  msg;
     HWND hDialog = 0;
-
+	long lStdHandle;
+	int hConHandle;
+	FILE *fp;
+	
 	hInstance = hInst;
+
+	AllocConsole();        
+	SetConsoleTitle("NeoStats Debug Window");
+	lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
+	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+	fp = _fdopen( hConHandle, "w" );
+	*stdout = *fp;
+	setvbuf( stdout, NULL, _IONBF, 0 );
+	lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
+	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+	fp = _fdopen( hConHandle, "w" );
+	*stderr = *fp;
+	setvbuf( stderr, NULL, _IONBF, 0 );
+
+
 	if (WSAStartup(MAKEWORD(1, 1), &WSAData) != 0)
    	{
         MessageBox(NULL, "Unable to initialize WinSock", "NeoStats for Windows Error", MB_OK);

@@ -23,9 +23,9 @@
 ** $Id$
 */
 
+#include "ultimate3.h"
 #include "neostats.h"
 #include "ircd.h"
-#include "ultimate3.h"
 #include "services.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
@@ -58,11 +58,30 @@ static void m_client (char *origin, char **argv, int argc, int srv);
 static void m_smode (char *origin, char **argv, int argc, int srv);
 static void m_vctrl (char *origin, char **argv, int argc, int srv);
 
-const int ircd_minprotocol = PROTOCOL_SJOIN;
-const int ircd_optprotocol = PROTOCOL_CLIENT;
-const int ircd_features = 0;
-const char services_umode[]= "+oS";
-const char services_cmode[]= "+a";
+/* buffer sizes */
+const int proto_maxhost		= (128 + 1);
+const int proto_maxpass		= (32 + 1);
+const int proto_maxnick		= (32 + 1);
+const int proto_maxuser		= (15 + 1);
+const int proto_maxrealname	= (50 + 1);
+const int proto_chanlen		= (50 + 1);
+const int proto_topiclen	= (512 + 1);
+
+ProtocolInfo protocol_info = {
+	/* Protocol options required by this IRCd */
+	PROTOCOL_SJOIN,
+	/* Protocol options negotiated at link by this IRCd */
+	PROTOCOL_CLIENT,
+	/* Features supported by this IRCd */
+	FEATURE_SVSHOST \
+		| FEATURE_SMODES \
+		| FEATURE_NICKIP \
+		| FEATURE_SVSJOIN \
+		| FEATURE_SVSNICK \
+		| FEATURE_SVSKILL ,
+	"+oS",
+	"+a",
+};
 
 /* Ultimate 2 does support these 5 tokens so may need to add them back 
  * in at some point
@@ -103,6 +122,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_PASS,      0,      m_pass,      0},
 	{MSG_SVSNICK,   0,   m_svsnick,   0},
 	{MSG_PROTOCTL,  0,  m_protoctl,  0},
+	{0, 0, 0, 0},
 };
 
 cumode_init chan_umodes[] = {
@@ -183,8 +203,6 @@ umode_init user_smodes[] = {
 	{0, 0},
 };
 
-const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
-
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
@@ -232,7 +250,7 @@ send_join (const char *sender, const char *who, const char *chan, const unsigned
 void 
 send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts)
 {
-	send_cmd (":%s %s %s %s %s %lu", who, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_MODE : MSG_MODE), chan, mode, args, ts);
+	send_cmd (":%s %s %s %s %s %lu", who, MSGTOK(MODE), chan, mode, args, ts);
 }
 
 void
@@ -250,7 +268,7 @@ send_ping (const char *from, const char *reply, const char *to)
 void 
 send_umode (const char *who, const char *target, const char *mode)
 {
-	send_cmd (":%s %s %s :%s", who, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_MODE : MSG_MODE), target, mode);
+	send_cmd (":%s %s %s :%s", who, MSGTOK(MODE), target, mode);
 }
 
 void 
@@ -298,7 +316,7 @@ send_svskill (const char *sender, const char *target, const char *reason)
 void 
 send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %lu", oldnick, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NICK : MSG_NICK), newnick, ts);
+	send_cmd (":%s %s %s %lu", oldnick, MSGTOK(NICK), newnick, ts);
 }
 
 void 

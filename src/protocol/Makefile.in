@@ -164,25 +164,95 @@ sharedstatedir = @sharedstatedir@
 sqlsrvbuild = @sqlsrvbuild@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-noinst_LIBRARIES = libprotocol.a
-libprotocol_a_SOURCES = @PROTOCOL@.c @PROTOCOL@.h
+pkglib_LTLIBRARIES = bahamut.la client.la hybrid7.la ircup10.la liquid.la \
+						mystic.la neoircd.la quantum.la ultimate2.la \
+						ultimate3.la unreal31.la unreal32.la viagra.la
+
+bahamut_la_SOURCES = bahamut.c bahamut.h
+client_la_SOURCES = client.c client.h
+hybrid7_la_SOURCES = hybrid7.c hybrid7.h
+ircup10_la_SOURCES = ircup10.c ircup10.h
+liquid_la_SOURCES = liquid.c liquid.h
+mystic_la_SOURCES = mystic.c mystic.h
+neoircd_la_SOURCES = neoircd.c neoircd.h
+quantum_la_SOURCES = quantum.c quantum.h
+ultimate2_la_SOURCES = ultimate2.c ultimate2.h
+ultimate3_la_SOURCES = ultimate3.c ultimate3.h
+unreal31_la_SOURCES = unreal31.c unreal31.h
+unreal32_la_SOURCES = unreal32.c unreal32.h
+viagra_la_SOURCES = viagra.c viagra.h
+AM_LDFLAGS = -module -avoid-version -no-undefined
 AM_CFLAGS = -I.. -I../../include -I../pcre -I../adns
 subdir = src/protocol
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
+LTLIBRARIES = $(pkglib_LTLIBRARIES)
 
-libprotocol_a_AR = $(AR) cru
-libprotocol_a_LIBADD =
-am_libprotocol_a_OBJECTS = @PROTOCOL@.$(OBJEXT)
-libprotocol_a_OBJECTS = $(am_libprotocol_a_OBJECTS)
+bahamut_la_LDFLAGS =
+bahamut_la_LIBADD =
+am_bahamut_la_OBJECTS = bahamut.lo
+bahamut_la_OBJECTS = $(am_bahamut_la_OBJECTS)
+client_la_LDFLAGS =
+client_la_LIBADD =
+am_client_la_OBJECTS = client.lo
+client_la_OBJECTS = $(am_client_la_OBJECTS)
+hybrid7_la_LDFLAGS =
+hybrid7_la_LIBADD =
+am_hybrid7_la_OBJECTS = hybrid7.lo
+hybrid7_la_OBJECTS = $(am_hybrid7_la_OBJECTS)
+ircup10_la_LDFLAGS =
+ircup10_la_LIBADD =
+am_ircup10_la_OBJECTS = ircup10.lo
+ircup10_la_OBJECTS = $(am_ircup10_la_OBJECTS)
+liquid_la_LDFLAGS =
+liquid_la_LIBADD =
+am_liquid_la_OBJECTS = liquid.lo
+liquid_la_OBJECTS = $(am_liquid_la_OBJECTS)
+mystic_la_LDFLAGS =
+mystic_la_LIBADD =
+am_mystic_la_OBJECTS = mystic.lo
+mystic_la_OBJECTS = $(am_mystic_la_OBJECTS)
+neoircd_la_LDFLAGS =
+neoircd_la_LIBADD =
+am_neoircd_la_OBJECTS = neoircd.lo
+neoircd_la_OBJECTS = $(am_neoircd_la_OBJECTS)
+quantum_la_LDFLAGS =
+quantum_la_LIBADD =
+am_quantum_la_OBJECTS = quantum.lo
+quantum_la_OBJECTS = $(am_quantum_la_OBJECTS)
+ultimate2_la_LDFLAGS =
+ultimate2_la_LIBADD =
+am_ultimate2_la_OBJECTS = ultimate2.lo
+ultimate2_la_OBJECTS = $(am_ultimate2_la_OBJECTS)
+ultimate3_la_LDFLAGS =
+ultimate3_la_LIBADD =
+am_ultimate3_la_OBJECTS = ultimate3.lo
+ultimate3_la_OBJECTS = $(am_ultimate3_la_OBJECTS)
+unreal31_la_LDFLAGS =
+unreal31_la_LIBADD =
+am_unreal31_la_OBJECTS = unreal31.lo
+unreal31_la_OBJECTS = $(am_unreal31_la_OBJECTS)
+unreal32_la_LDFLAGS =
+unreal32_la_LIBADD =
+am_unreal32_la_OBJECTS = unreal32.lo
+unreal32_la_OBJECTS = $(am_unreal32_la_OBJECTS)
+viagra_la_LDFLAGS =
+viagra_la_LIBADD =
+am_viagra_la_OBJECTS = viagra.lo
+viagra_la_OBJECTS = $(am_viagra_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/@PROTOCOL@.Po
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/bahamut.Plo ./$(DEPDIR)/client.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/hybrid7.Plo ./$(DEPDIR)/ircup10.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/liquid.Plo ./$(DEPDIR)/mystic.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/neoircd.Plo ./$(DEPDIR)/quantum.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/ultimate2.Plo ./$(DEPDIR)/ultimate3.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/unreal31.Plo ./$(DEPDIR)/unreal32.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/viagra.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -190,10 +260,15 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(libprotocol_a_SOURCES)
+DIST_SOURCES = $(bahamut_la_SOURCES) $(client_la_SOURCES) \
+	$(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) \
+	$(liquid_la_SOURCES) $(mystic_la_SOURCES) $(neoircd_la_SOURCES) \
+	$(quantum_la_SOURCES) $(ultimate2_la_SOURCES) \
+	$(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) \
+	$(unreal32_la_SOURCES) $(viagra_la_SOURCES)
 DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk \
 	Makefile.am
-SOURCES = $(libprotocol_a_SOURCES)
+SOURCES = $(bahamut_la_SOURCES) $(client_la_SOURCES) $(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) $(liquid_la_SOURCES) $(mystic_la_SOURCES) $(neoircd_la_SOURCES) $(quantum_la_SOURCES) $(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) $(unreal32_la_SOURCES) $(viagra_la_SOURCES)
 
 all: all-am
 
@@ -204,13 +279,50 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/autotool
 	  $(AUTOMAKE) --gnu  src/protocol/Makefile
 Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
+pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libprotocol.a: $(libprotocol_a_OBJECTS) $(libprotocol_a_DEPENDENCIES) 
-	-rm -f libprotocol.a
-	$(libprotocol_a_AR) libprotocol.a $(libprotocol_a_OBJECTS) $(libprotocol_a_LIBADD)
-	$(RANLIB) libprotocol.a
+uninstall-pkglibLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(pkglib_LTLIBRARIES)'; for p in $$list; do \
+	    p="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(pkglibdir)/$$p"; \
+	  $(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(pkglibdir)/$$p; \
+	done
+
+clean-pkglibLTLIBRARIES:
+	-test -z "$(pkglib_LTLIBRARIES)" || rm -f $(pkglib_LTLIBRARIES)
+	@list='$(pkglib_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" = "$$p" && dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+bahamut.la: $(bahamut_la_OBJECTS) $(bahamut_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(bahamut_la_LDFLAGS) $(bahamut_la_OBJECTS) $(bahamut_la_LIBADD) $(LIBS)
+client.la: $(client_la_OBJECTS) $(client_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(client_la_LDFLAGS) $(client_la_OBJECTS) $(client_la_LIBADD) $(LIBS)
+hybrid7.la: $(hybrid7_la_OBJECTS) $(hybrid7_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(hybrid7_la_LDFLAGS) $(hybrid7_la_OBJECTS) $(hybrid7_la_LIBADD) $(LIBS)
+ircup10.la: $(ircup10_la_OBJECTS) $(ircup10_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(ircup10_la_LDFLAGS) $(ircup10_la_OBJECTS) $(ircup10_la_LIBADD) $(LIBS)
+liquid.la: $(liquid_la_OBJECTS) $(liquid_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(liquid_la_LDFLAGS) $(liquid_la_OBJECTS) $(liquid_la_LIBADD) $(LIBS)
+mystic.la: $(mystic_la_OBJECTS) $(mystic_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(mystic_la_LDFLAGS) $(mystic_la_OBJECTS) $(mystic_la_LIBADD) $(LIBS)
+neoircd.la: $(neoircd_la_OBJECTS) $(neoircd_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(neoircd_la_LDFLAGS) $(neoircd_la_OBJECTS) $(neoircd_la_LIBADD) $(LIBS)
+quantum.la: $(quantum_la_OBJECTS) $(quantum_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(quantum_la_LDFLAGS) $(quantum_la_OBJECTS) $(quantum_la_LIBADD) $(LIBS)
+ultimate2.la: $(ultimate2_la_OBJECTS) $(ultimate2_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(ultimate2_la_LDFLAGS) $(ultimate2_la_OBJECTS) $(ultimate2_la_LIBADD) $(LIBS)
+ultimate3.la: $(ultimate3_la_OBJECTS) $(ultimate3_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(ultimate3_la_LDFLAGS) $(ultimate3_la_OBJECTS) $(ultimate3_la_LIBADD) $(LIBS)
+unreal31.la: $(unreal31_la_OBJECTS) $(unreal31_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(unreal31_la_LDFLAGS) $(unreal31_la_OBJECTS) $(unreal31_la_LIBADD) $(LIBS)
+unreal32.la: $(unreal32_la_OBJECTS) $(unreal32_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(unreal32_la_LDFLAGS) $(unreal32_la_OBJECTS) $(unreal32_la_LIBADD) $(LIBS)
+viagra.la: $(viagra_la_OBJECTS) $(viagra_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(viagra_la_LDFLAGS) $(viagra_la_OBJECTS) $(viagra_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -218,7 +330,19 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/@PROTOCOL@.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bahamut.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hybrid7.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircup10.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liquid.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mystic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neoircd.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/quantum.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ultimate2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ultimate3.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unreal31.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unreal32.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/viagra.Plo@am__quote@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -318,9 +442,10 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LTLIBRARIES)
 
 installdirs:
+	$(mkinstalldirs) $(DESTDIR)$(pkglibdir)
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -347,7 +472,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
+clean-am: clean-generic clean-libtool clean-pkglibLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -366,7 +491,7 @@ info-am:
 
 install-data-am:
 
-install-exec-am:
+install-exec-am: install-pkglibLTLIBRARIES
 
 install-info: install-info-am
 
@@ -392,18 +517,20 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am
+uninstall-am: uninstall-info-am uninstall-pkglibLTLIBRARIES
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-noinstLIBRARIES ctags distclean \
+	clean-libtool clean-pkglibLTLIBRARIES ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am info info-am install \
 	install-am install-data install-data-am install-exec \
 	install-exec-am install-info install-info-am install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool pdf \
-	pdf-am ps ps-am tags uninstall uninstall-am uninstall-info-am
+	install-pkglibLTLIBRARIES install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-info-am \
+	uninstall-pkglibLTLIBRARIES
 
 .c.o:
 			@echo "Building $@"
