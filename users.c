@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.55 2003/07/11 14:06:45 fishwaldo Exp $
+** $Id: users.c,v 1.56 2003/07/15 10:34:23 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -153,6 +153,11 @@ void doDelUser(const char *nick, int i)
 		return;
 	}
 	u = hnode_get(un);
+
+	list_process(u->chans, u, part_u_chan);
+
+
+
 	/* run the event to delete a user */
 	AddStringToList(&av, u->nick, &ac);
 	if (i == 0) {
@@ -161,9 +166,6 @@ void doDelUser(const char *nick, int i)
 		Module_Event("KILL", av, ac);
 	}
 	free(av);
-
-	list_process(u->chans, u, part_u_chan);
-
 
 	hash_delete(uh, un);
 	hnode_destroy(un);

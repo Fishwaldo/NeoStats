@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.40 2003/06/13 14:49:33 fishwaldo Exp $
+** $Id: stats.c,v 1.41 2003/07/15 10:34:24 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -312,6 +312,7 @@ int s_user_kill(char **av, int ac)
 
 	s = findstats(u->server->name);
 	if (is_oper(u)) {
+		nlog(LOG_DEBUG2, LOG_MOD, "Decreasing OperCount on %s due to kill", u->server->name);
 		DecreaseOpers(s);
 	}
 	DecreaseUsers(s);
@@ -349,9 +350,17 @@ int s_user_modes(char **av, int ac)
 		     "Changing modes for unknown user: %s", u->nick);
 		return -1;
 	}
+#if 0
+/* old code, lets try the new code */
 	if (!u->modes)
 		return -1;
 	modes = u->modes;
+#endif
+	if (ac < 2) {
+		nlog(LOG_WARNING, LOG_MOD, "Didn't get mode for Umode Event");
+		return -1;
+	}
+	modes = av[1];
 	while (*modes) {
 		switch (*modes) {
 		case '+':
@@ -363,6 +372,7 @@ int s_user_modes(char **av, int ac)
 		case 'O':
 		case 'o':
 			if (add) {
+				nlog(LOG_DEBUG1, LOG_MOD, "Increasing OperCount for %s", u->server->name);
 				IncreaseOpers(findstats(u->server->name));
 				s = findstats(u->server->name);
 				if (stats_network.maxopers <
@@ -392,6 +402,7 @@ int s_user_modes(char **av, int ac)
 				}
 			} else {
 				if (is_oper(u)) {
+					nlog(LOG_DEBUG1, LOG_MOD, "Decreasing OperCount for %s", u->server->name);
 					DecreaseOpers(findstats
 						      (u->server->name));
 				}
@@ -426,6 +437,7 @@ int s_del_user(char **av, int ac)
 	if (!u->modes)
 		return -1;
 	if (is_oper(u)) {
+		nlog(LOG_DEBUG2, LOG_MOD, "Decreasing OperCount on %s due to signoff", u->server->name);
 		DecreaseOpers(s);
 	}
 	DecreaseUsers(s);
@@ -553,13 +565,8 @@ int Online(char **av, int ac)
 
 	strcpy(segv_location, "StatServ-Online");
 
-#ifdef ULTIMATE3
 	init_bot(s_StatServ, StatServ.user, StatServ.host, StatServ.rname,
 		 "+oS", SSMNAME);
-#else
-	init_bot(s_StatServ, StatServ.user, StatServ.host, StatServ.rname,
-		 "+oS", SSMNAME);
-#endif
 	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */
 	add_mod_timer("SaveStats", "Save_Stats_DB", SSMNAME, 600);

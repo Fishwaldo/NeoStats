@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.131 2003/07/15 09:16:15 fishwaldo Exp $
+** $Id: ircd.c,v 1.132 2003/07/15 10:34:23 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -101,8 +101,6 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes,
 int del_bot(char *nick, char *reason)
 {
 	User *u;
-	char **av;
-	int ac = 0;
 	strcpy(segv_location, "del_bot");
 	u = finduser(nick);
 	nlog(LOG_DEBUG1, LOG_CORE, "Killing %s for %s", nick, reason);

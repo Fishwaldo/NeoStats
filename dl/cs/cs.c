@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.25 2003/06/13 13:07:56 fishwaldo Exp $
+** $Id: cs.c,v 1.26 2003/07/15 10:34:23 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -344,7 +344,7 @@ int cs_del_user(char **av, int ac)
 int cs_user_modes(char **av, int ac)
 {
 	int add = 1;
-	char *modes;
+	char *modes, *modes1;
 	User *u;
 
 	/* Approximate Segfault Location */
@@ -366,7 +366,8 @@ int cs_user_modes(char **av, int ac)
 	if (!u->modes)
 		return -1;
 	modes = u->modes;
-	switch (*av[1]) {
+	modes1 = (char *)(av[1]);
+	switch (*modes1) {
 	case '+':
 		add = 1;
 		break;
@@ -375,8 +376,8 @@ int cs_user_modes(char **av, int ac)
 		break;
 	}
 
-	while (*av[1]++) {
-		switch (*av[1]) {
+	while (*modes1++) {
+		switch (*modes1) {
 		case '+':
 			add = 1;
 			break;
@@ -528,10 +529,10 @@ int cs_user_modes(char **av, int ac)
 
 #ifdef ULTIMATE3
 /* smode support for Ultimate3 */
-int cs_user_smodes(char **av, int ac)
+int cs_user_smodes(const char **av, const int ac)
 {
 	int add = 1;
-	char *modes;
+	char *modes, *modes1;
 	User *u;
 
 	/* Approximate Segfault Location */
@@ -550,7 +551,8 @@ int cs_user_smodes(char **av, int ac)
 	if (!u->modes)
 		return -1;
 	modes = u->modes;
-	switch (*av[1]) {
+	modes1 = (char *)(av[1]);
+	switch (*modes1) {
 	case '+':
 		add = 1;
 		break;
@@ -559,8 +561,8 @@ int cs_user_smodes(char **av, int ac)
 		break;
 	}
 
-	while (*av[1]++) {
-		switch (*av[1]) {
+	while (*modes1++) {
+		switch (*modes1) {
 		case '+':
 			add = 1;
 			break;
