@@ -105,7 +105,7 @@ int ss_event_serverkill(CmdParams *cmdparams)
 	serverstat *ss;
 
 	DelUser (cmdparams->target);
-	ss = GetServerModValue (cmdparams->target);
+	ss = GetServerModValue (cmdparams->source);
 	IncStatistic (&ss->serverkills);
 	return NS_SUCCESS;
 }
