@@ -210,7 +210,7 @@ static int cs_new_user(char **av, int ac)
 	if (cs_cfg.use_exc && Is_Excluded(u)) 
 		return 1;
 
-	if (!strcasecmp(u->server->name, me.name)) {
+	if (!ircstrcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
 	}
@@ -247,7 +247,7 @@ static int cs_del_user(char **av, int ac)
 
 	if (cs_cfg.use_exc && Is_Excluded(u)) 
 		return 1;
-	if (!strcasecmp(u->server->name, me.name)) {
+	if (!ircstrcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
 	}
@@ -336,7 +336,7 @@ static int cs_user_modes(char **av, int ac)
 	if (cs_cfg.use_exc && Is_Excluded(u)) 
 		return 1;
 
-	if (!strcasecmp(u->server->name, me.name)) {
+	if (!ircstrcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
 	}
@@ -435,7 +435,7 @@ static int cs_user_smodes(char **av, int ac)
 	if (cs_cfg.use_exc && Is_Excluded(u)) 
 		return 1;
 
-	if (!strcasecmp(u->server->name, me.name)) {
+	if (!ircstrcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
 	}
@@ -516,7 +516,7 @@ static int cs_user_kill(char **av, int ac)
 	if (cs_cfg.use_exc && Is_Excluded(u)) 
 		return 1;
 
-	if (!strcasecmp(u->server->name, me.name)) {
+	if (!ircstrcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
 	}
@@ -559,7 +559,7 @@ static int cs_user_nick(char **av, int ac)
 	if (cs_cfg.use_exc && Is_Excluded(u)) 
 		return 1;
 
-	if (!strcasecmp(u->server->name, me.name)) {
+	if (!ircstrcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
 	}
