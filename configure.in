@@ -32,6 +32,8 @@ case "$host_os" in
 esac
 
 case "$host_os" in
+*openbsd*)
+	MAKEDEPENDENCIES=" ";;
 *freebsd*)
 	MAKEDEPENDENCIES=" ";;
 *)
