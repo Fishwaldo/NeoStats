@@ -459,10 +459,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		realname = joinbuf (argv, argc, 9);
 		AddUser (argv[0], argv[4], argv[5], realname, argv[7], NULL, argv[2]);
 		free (realname);
-		u = finduser (argv[0]);
-		if (u) {
-			strlcpy (u->vhost, argv[6], MAXHOST);
-		}
+		SetUserVhost(argv[0], argv[6]);
 		UserMode (argv[0], argv[3]);
 	} else {
 		UserNick (origin, argv[0], NULL);
