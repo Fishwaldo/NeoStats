@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.5 2000/02/18 00:42:24 fishwaldo Exp $
+** $Id: ircd.c,v 1.6 2000/02/18 02:10:29 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -304,12 +304,14 @@ void Usr_Mode(char *origin, char *coreLine) {
 				log("Mode: UserMode: %s",cmd);
 				cmd = strtok(NULL, "");
 				UserMode(origin, cmd);
-				Module_Event("UMODE", coreLine);
+				Module_Event("UMODE", finduser(origin));
 			} else {
+/*
 				log("Mode: ChanMode: %s",cmd);
 				rest = strtok(NULL, "");
 				ChanMode(cmd, rest);
 				Module_Event("CMODE", coreLine);
+*/
 			}	
 }	
 void Usr_Kill(char *origin, char *coreLine) {
@@ -358,12 +360,12 @@ void Usr_Topic(char *origin, char *coreLine) {
 void Usr_Kick(char *origin, char *coreLine) {
 }
 void Usr_Join(char *origin, char *coreLine) {
-	char *cmd, *temp = NULL;
+/*	char *cmd, *temp = NULL;
 			User *u = finduser(origin);
 			cmd = strtok(coreLine, " ");
 			if (*cmd == ':')
 				cmd++;
-			if (strcasecmp(",",cmd)) { /*Oh Oh, Multiple Channels, lets split em up.... this is farqed. */
+			if (strcasecmp(",",cmd)) {
 				log("double chan");
 				temp = strtok(cmd,",");
 			}
@@ -382,6 +384,7 @@ void Usr_Join(char *origin, char *coreLine) {
 					}
 				}
 			}
+*/
 }
 void Usr_Part(char *origin, char *coreLine) {
 }
@@ -496,7 +499,7 @@ int flood(User *u)
 {
 	time_t current = time(NULL);
 
-	if (u->Umode & UMODE_OPER) 
+	if (UserLevel(u) >= 40) /* locop or higher */
 		return 0;
 	if (current - u->t_flood > 10) {
 		u->t_flood = time(NULL);

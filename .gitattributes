@@ -14,6 +14,11 @@ data/tlds.nfo -text
 /dl.h -text
 dl/build -text
 dl/icq.c -text
+dl/icq/DOESNOTCOMPILE -text
+dl/icq/Makefile -text
+dl/icq/icq.c -text
+dl/icq/icqlib.c -text
+dl/icq/icqlib.h -text
 dl/icqlib.c -text
 dl/icqlib.h -text
 dl/modules.txt -text
@@ -22,6 +27,9 @@ dl/services/build -text
 dl/services/services.c -text
 dl/services/services.lo -text svneol=unset#unset
 dl/spam.c -text
+dl/spam/Makefile -text
+dl/spam/spam.c -text
+dl/statserv/Makefile -text
 dl/statserv/build -text
 dl/statserv/m_stats.h -text
 dl/statserv/ss_help.c -text
@@ -29,6 +37,8 @@ dl/statserv/stats.c -text
 dl/statserv/statserv.c -text
 dl/statserv/statserv.h -text
 dl/version.c -text
+dl/version/Makefile -text
+dl/version/version.c -text
 doc/FAQ -text
 doc/USERMAN -text
 doc/read-faq -text

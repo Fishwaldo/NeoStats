@@ -1,8 +1,8 @@
 INCLUDES = -I../..
 
-SOURCES= services.c
-OBJECTS= services.lo
-TARGET= services.so
+SOURCES= version.c
+OBJECTS= version.lo
+TARGET= version.so
 
 CC=gcc
 CFLAGS=-O2 -Wall -ggdb -fPIC

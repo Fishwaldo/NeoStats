@@ -1,8 +1,8 @@
 INCLUDES = -I../..
 
-SOURCES= services.c
-OBJECTS= services.lo
-TARGET= services.so
+SOURCES= statserv.c
+OBJECTS= statserv.lo
+TARGET= statserv.so
 
 CC=gcc
 CFLAGS=-O2 -Wall -ggdb -fPIC

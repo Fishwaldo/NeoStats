@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.c,v 1.6 2000/02/18 00:42:25 fishwaldo Exp $
+** $Id: statserv.c,v 1.7 2000/02/18 02:10:29 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -25,6 +25,7 @@ static int Online(Server *);
 static int pong(Server *);
 static int s_new_server(Server *);
 static int s_new_user(User *);
+static int s_user_modes(User *);
 static void ss_cb_Config(char *, int);
 static int new_m_version(char *av, char *tmp);
 
@@ -48,6 +49,7 @@ EventFnList StatServ_Event_List[] = {
 	{"PONG", 	pong},
 	{"NEWSERVER",	s_new_server},
 	{"SIGNON", 	s_new_user},
+	{"UMODE", 	s_user_modes},
 	{ NULL, 	NULL}
 };
 
@@ -103,16 +105,17 @@ static int s_new_server(Server *s) {
 }
 
 static int s_user_modes(User *u) {
-	User *u = finduser(nick);
 	int add = 0;
+	char *modes;
 
 	if (!u) {
-		log("Changing modes for unknown user: %s", nick);
-		return;
+		log("Changing modes for unknown user: %s", u->nick);
+		return -1;
 	}
 #ifdef DEBUG
-	log("Modes for %s are: %s",nick,modes);
+	log("Modes for %s are: %s",u->nick,u->modes);
 #endif
+	modes = u->modes;
 	while (*modes++) {
 
 		switch(*modes) {
@@ -120,96 +123,94 @@ static int s_user_modes(User *u) {
 			case '-': add = 0;	break;
 			case 'N':
 				if (add) {
-					u->is_netmin = 1;
+					notice(s_StatServ, "\2NetAdmin\2 %s is Now a Network Administrator (+N)", u->nick);
 				} else {
-					u->is_netmin = 0;
+					notice(s_StatServ, "\2NetAdmin\2 %s is No Longer a Network Administrator (-N)", u->nick);
 				}
 				break;
 			case 'S':
 				if (add) {
-					u->is_serv = 1;
+					notice(s_StatServ, "\2Services\2 %s is Now a Network Service (+S)", u->nick);
 				} else {
-					u->is_serv = 0;
+					notice(s_StatServ, "\2Services\2 %s is No Longer a Network Service (-S)", u->nick);
 				}
 				break;
 			case '1':
 				if (add) {
-					u->is_coder = 1;
+					notice(s_StatServ, "\2Coder\2 %s is Now a Network Coder (+1)", u->nick);
 				} else {
-					u->is_coder = 0;
+					notice(s_StatServ, "\2Coder\2 %s is No Longer a Network Coder (-1)", u->nick);
 				}
 				break;
 			case 'q':
 				if (add) {
-					u->is_prot = 1;
-					globops(me.name,"\2%s\2 Has been Marked As Protected (+q)",nick);
+					globops(me.name,"\2%s\2 Has been Marked As Protected (+q)",u->nick);
 				} else {
-					u->is_prot = 0;
-					globops(me.name,"\2%s\2 Has been Un-Marked As Protected (-q)",nick);
+					globops(me.name,"\2%s\2 Has been Un-Marked As Protected (-q)",u->nick);
 				}
 				break;
 			case 'T':
 				if (add) {
-					u->is_tecmin = 1;
+					notice(s_StatServ, "\2TechAdmin\2 %s is Now a Network Technical Administrator (+T)", u->nick);
 				} else {
-					u->is_tecmin = 0;
+					notice(s_StatServ, "\2TechAdmin\2 %s is No Longer a Network Technical Administrator (-T)", u->nick);
 				}
 				break;
 			case 'A':
 				if (add) {
-					u->is_admin = 1;
+					notice(s_StatServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s (+A)", u->nick, u->server->name);
 				} else {
-					u->is_admin = 0;
+					notice(s_StatServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s (-A)", u->nick, u->server->name);
 				}
 				break;
 			case 'a':
 				if (add) {
-					u->is_svsmin = 1;
+					notice(s_StatServ, "\2ServicesAdmin\2 %s is Now a Services Administrator (+a)", u->nick);
 				} else {
-					u->is_svsmin = 0;
+					notice(s_StatServ, "\2ServicesAdmin\2 %s is No Longer a Services Administrator (-a)", u->nick);
 				}
 				break;
 			case 'C':
 				if (add) {
-					u->is_comin = 1;
+					notice(s_StatServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s (+C)", u->nick, u->server->name);
 				} else {
-					u->is_comin = 0;
+					notice(s_StatServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s (-C)", u->nick, u->server->name);
 				}
 				break;
 			case 'B':
 				if (add) {
-					u->is_bot = 1;
+					notice(s_StatServ, "\2Bot\2 %s is Now a Bot (+B)", u->nick);
 				} else {
-					u->is_bot = 0;
+					notice(s_StatServ, "\2Bot\2 %s is No Longer a Bot (-B)", u->nick);
 				}
 				break;
 			case 'I':
 				if (add) {
-					u->is_invis = 1;
-					globops(me.name,"\2%s\2 Is Using \2Invisible Mode\2 (+I)",nick);
+					globops(me.name,"\2%s\2 Is Using \2Invisible Mode\2 (+I)",u->nick);
 				} else {
-					u->is_invis = 0;
-					globops(me.name,"\2%s\2 Is no longer using \2Invisible Mode\2 (-I)",nick);
+					globops(me.name,"\2%s\2 Is no longer using \2Invisible Mode\2 (-I)",u->nick);
 				}
 				break;
 			case 'o':
 				if (add) {
-					u->is_oper = 1;
+					notice(s_StatServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
 				} else {
-					u->is_oper = 0;
+					notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (+o)", u->nick, u->server->name);
 				}
 				break;
 			case 'O':
 				if (add) {
-					u->is_oper = 1;
+					notice(s_StatServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
 				} else {
-					u->is_oper = 0;
+					notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (+o)", u->nick, u->server->name);
 				}
 				break;
 			default:
 				break;
 		}
+		return 1;
 	}
+	return 1;
 }
 
 
@@ -351,7 +352,7 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 
 	log("%s received message from %s: %s", s_StatServ, u->nick, coreLine);
  
-	if (me.onlyopers && !u->is_oper) {
+	if (me.onlyopers && UserLevel(u) >= 50) {
 		privmsg(u->nick, s_StatServ,
 			"This service is only available to IRCops.");
 		notice ("%s Requested %s, but he is Not a Operator!", u->nick, coreLine);
@@ -364,15 +365,15 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 		notice(s_StatServ,"%s is a Dummy and wanted help on %s",u->nick, coreLine);
 		if (!coreLine) {
 			privmsg_list(u->nick, s_StatServ, ss_help);
-			if (u->is_tecmin)
+			if (UserLevel(u) >= 150)
 				privmsg_list(u->nick, s_StatServ, ss_myuser_help);
 		} else if (!strcasecmp(coreLine, "SERVER"))
 			privmsg_list(u->nick, s_StatServ, ss_server_help);
-                else if (!strcasecmp(coreLine, "RESET") && u->is_tecmin)
+                else if (!strcasecmp(coreLine, "RESET") && UserLevel(u) >= 190)
                         privmsg_list(u->nick, s_StatServ, ss_reset_help);
 		else if (!strcasecmp(coreLine, "MAP"))
 			privmsg_list(u->nick, s_StatServ, ss_map_help);
-		else if (!strcasecmp(coreLine, "JOIN") && u->is_tecmin)
+		else if (!strcasecmp(coreLine, "JOIN") && UserLevel(u) >= 190)
 			privmsg_list(u->nick, s_StatServ, ss_join_help);
 		else if (!strcasecmp(coreLine, "NETSTATS"))
 			privmsg_list(u->nick, s_StatServ, ss_netstats_help);
@@ -388,7 +389,7 @@ int __Bot_Message(char *origin, char *coreLine, int type)
                         privmsg_list(u->nick, s_StatServ, ss_botlist_help);
                 else if (!strcasecmp(coreLine, "VERSION"))
                         privmsg_list(u->nick, s_StatServ, ss_version_help);
-		else if (!strcasecmp(coreLine, "STATS") && u->is_tecmin)
+		else if (!strcasecmp(coreLine, "STATS") && UserLevel(u) >= 190)
 			privmsg_list(u->nick, s_StatServ, ss_stats_help);
 		else
 			privmsg(u->nick, s_StatServ, "Unknown Help Topic: \2%s\2",
@@ -563,23 +564,23 @@ static void ss_operlist(User *origuser, char *flags, char *server)
 		for (u = userlist[i]; u; u = u->next) {
 			if (away && u->is_away)
 				continue;
-			if (tech && u->is_tecmin == 0)
+			if (tech && UserLevel(u) == 190)
 				continue;
-			if (net && u->is_netmin == 0)
+			if (net && UserLevel(u) == 150)
 				continue;
 			if (!strcasecmp(u->server->name, me.services_name))
 				continue;
-			if (u->is_oper != 1)
+			if (UserLevel(u) < 40)
 				continue;
 			if (!server) {
-				if (u->is_oper != 1)	continue;
+				if (UserLevel(u) < 40)	continue;
 				j++;
 				privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %s",j, u->nick,
 					u->server->name);
 				continue;
 			} else {
 				if (strcasecmp(server, u->server->name))	continue;
-				if (u->is_oper != 1)	continue;
+				if (UserLevel(u) < 40)	continue;
 				j++;
 				privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %s",j, u->nick,
 					u->server->name);
@@ -600,7 +601,7 @@ static void ss_botlist(User *origuser)
         notice(s_StatServ,"%s Reqested a Bot List",origuser->nick);
         for (i = 0; i < U_TABLE_SIZE; i++) {
                 for (u = userlist[i]; u; u = u->next) {
-                        if (bot && u->is_bot ==0)
+                        if (bot && UserLevel(u) == 10)
                                 continue;
                                 j++;
                                 privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %s",j, u->nick,
@@ -719,7 +720,7 @@ static void ss_reset(User *u)
 */
 static void ss_JOIN(User *u, char *chan)
 {
-	if (!u->is_tecmin) {
+	if (UserLevel(u) >= 190) {
 		log("Access Denied (JOIN) to %s", u->nick);
 		privmsg(u->nick, s_StatServ, "Access Denied.");
 		notice(s_StatServ,"%s Requested JOIN, but is not a god!",u->nick);
@@ -1014,3 +1015,4 @@ void LoadStats()
 	}
 	fclose(fp);
 }
+

@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile,v 1.2 2000/02/18 00:42:24 fishwaldo Exp $
+# $Id: Makefile,v 1.3 2000/02/18 02:10:29 fishwaldo Exp $
 # makefile originally created by Andy Church.
  
 CC=gcc
@@ -17,10 +17,13 @@ SRCS =	dotconf.c services.c main.c sock.c conf.c ircd.c timer.c users.c \
 	$(CC) $(CFLAGS) -c $<
 
 
-all: stats
+all: 
+	stats
+	(cd dl; $(MAKE) $@)
 
 clean:
 	/bin/rm -rf *.o stats
+	(cd dl; $(MAKE) $@)
 ########
 
 
