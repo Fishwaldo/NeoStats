@@ -67,11 +67,6 @@
  *	server name
  */
 #define EVENT_NEWSERVER		"NEWSERVER"
-/*  DELSERVER is called when a server leaves the network. 
- *  DELSERVER parameters are:
- *	
- */
-#define EVENT_DELSERVER		"DELSERVER"
 /*  SQUIT is called when a server squits the network 
  *           (ED: what's the diff with above?)
  *  SQUIT parameters are:
