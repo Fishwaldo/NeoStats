@@ -65,7 +65,7 @@ AC_CACHE_SAVE
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(sys/time.h unistd.h limits.h)
+AC_CHECK_HEADERS(sys/time.h unistd.h limits.h sys/poll.h)
 AC_CACHE_SAVE
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -80,7 +80,7 @@ AC_FUNC_FNMATCH
 AC_TYPE_SIGNAL
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS(strlcpy strlcat strnlen)
-AC_CHECK_FUNCS(socket strdup)
+AC_CHECK_FUNCS(socket strdup poll)
 AC_CHECK_FUNCS(strndup)
 AC_CHECK_FUNCS(bcopy memmove strerror)
 
@@ -524,9 +524,7 @@ AC_SUBST(EXTAUTH_SRC)
 AC_SUBST(EXTAUTH_OBJS)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
-AC_CONFIG_HEADER(src/adns/config.h)
-AC_CONFIG_HEADER(src/pcre/config.h)
-AC_OUTPUT(src/Makefile.inc src/Makefile src/protocol/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile src/pcre/Makefile src/pcre.h:src/pcre/pcre.in)
+AC_OUTPUT(src/Makefile.inc src/Makefile src/protocol/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile src/pcre.h:src/pcre/pcre.in)
 NEO_SUBDIR_CONFIG(src/curl, [--disable-thread --disable-ipv6 --enable-nonblocking --without-ssl])
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"

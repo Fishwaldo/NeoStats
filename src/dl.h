@@ -34,7 +34,6 @@
 #include <dlfcn.h>
 #include <stdio.h>
 #include <time.h>
-#include <sys/poll.h>
 
 /* 
  *   Ensure RTLD flags correctly defined

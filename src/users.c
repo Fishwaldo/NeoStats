@@ -36,8 +36,6 @@
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 
 static hash_t *uh;

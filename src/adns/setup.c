@@ -30,18 +30,10 @@
  * - management of global state
  */
 
-#include <stdlib.h>
-#include <errno.h>
-#include <limits.h>
-#include <unistd.h>
-#include <fcntl.h>
-
-#include <netdb.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
 #include "internal.h"
+#include <limits.h>
+#include <fcntl.h>
+#include <arpa/inet.h>
 
 static void readconfig(adns_state ads, const char *filename,
 		       int warnmissing);

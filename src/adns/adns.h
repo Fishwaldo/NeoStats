@@ -35,11 +35,7 @@
 
 #include <stdio.h>
 
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <sys/types.h>
-#include <sys/time.h>
-#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {			/* I really dislike this - iwj. */

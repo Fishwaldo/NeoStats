@@ -29,14 +29,11 @@
  * - RR-type-specific code, and the machinery to call it
  */
 
+#include "internal.h"
 #include <stdlib.h>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "internal.h"
 
 #define R_NOMEM           return adns_s_nomemory
 #define CSP_ADDSTR(s)     do { if (!adns__vbuf_appendstr(vb,(s))) R_NOMEM; } while (0)

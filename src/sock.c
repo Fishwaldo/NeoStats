@@ -25,13 +25,10 @@
 ** $Id$
 */
 
+#include "neostats.h"
 #include <fcntl.h>
-#include <sys/poll.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
                      
-#include "neostats.h"
 #include "dl.h"
 #include "adns.h"
 #include "conf.h"

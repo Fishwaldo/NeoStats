@@ -35,17 +35,13 @@
 #define ADNS_INTERNAL_H_INCLUDED
 
 #include "neostats.h"
-#include "config.h"
 typedef unsigned char byte;
 
 #include <stdarg.h>
 #include <assert.h>
-#include <unistd.h>
 #include <signal.h>
 #include <errno.h>
 #include <string.h>
-
-#include <sys/time.h>
 
 #include "adns.h"
 #include "dlist.h"

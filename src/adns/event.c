@@ -31,18 +31,9 @@
  * - user-visible check/wait and event-loop-related functions
  */
 
-#include <errno.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include <sys/types.h>
-#include <sys/time.h>
-#include <netdb.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include "internal.h"
 #include <arpa/inet.h>
 
-#include "internal.h"
 #include "tvarith.h"
 
 /* TCP connection management. */

@@ -51,7 +51,6 @@ src/adns/.indent.pro -text
 src/adns/Makefile -text
 src/adns/adns.h -text
 src/adns/check.c -text
-src/adns/config.h.in -text
 src/adns/dlist.h -text
 src/adns/event.c -text
 src/adns/general.c -text
@@ -288,7 +287,7 @@ src/ns_help.c eol=lf
 src/ns_help.h eol=lf
 src/numeric.h -text
 src/pcre/COPYING -text
-src/pcre/Makefile.in eol=lf
+src/pcre/Makefile -text
 src/pcre/README -text
 src/pcre/config.h.in eol=lf
 src/pcre/dftables.c eol=lf
