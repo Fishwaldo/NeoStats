@@ -22,9 +22,7 @@
 */
 
 /*	TODO:
- *		- Finish off error processing
- *		- Make command logging optional
- *		- Make command alerts optional
+ *	- More error processing
  */
 
 #include "neostats.h"
@@ -108,6 +106,23 @@ validate_host (char* host)
 	ptr = host;
 	while(*ptr) {
 		if(!IsHostChar(*ptr)) {
+			return NS_FAILURE;
+		}
+		ptr++;
+	}
+	return NS_SUCCESS;
+}
+
+int validate_url (char* url)
+{
+	char* ptr;
+
+	if (ircstrncasecmp (url, "http://", 7) !=0)
+		return NS_FAILURE;
+	ptr = url;
+	ptr += 7;
+	while(*ptr) {
+		if(!IsURLChar(*ptr)) {
 			return NS_FAILURE;
 		}
 		ptr++;
@@ -212,8 +227,10 @@ void msg_unknown_command (CmdParams * cmdparams)
 {
 	irc_prefmsg (cmdparams->bot, cmdparams->source, __("Syntax error: unknown command: \2%s\2", cmdparams->source), 
 		cmdparams->param);
-	irc_chanalert (cmdparams->bot, _("%s requested %s, but that is an unknown command"),
-		cmdparams->source->name, cmdparams->param);
+	if (config.cmdreport) {
+		irc_chanalert (cmdparams->bot, _("%s requested %s, but that is an unknown command"),
+			cmdparams->source->name, cmdparams->param);
+	}
 }
 
 void msg_only_opers (CmdParams * cmdparams)
@@ -497,7 +514,9 @@ run_bot_cmd (CmdParams * cmdparams)
 				return NS_SUCCESS;
 			}
 			/* Seems OK so report the command call so modules do not have to */
-			irc_chanalert (cmdparams->bot, _("%s used %s"), cmdparams->source->name, cmd_ptr->cmd);
+			if (config.cmdreport) {
+				irc_chanalert (cmdparams->bot, _("%s used %s"), cmdparams->source->name, cmd_ptr->cmd);
+			}
 			/* Log command message */
 			nlog (LOG_NORMAL, "%s used %s", cmdparams->source->name, cmdparams->param);
 			/* call handler */
@@ -572,7 +591,9 @@ bot_cmd_help (CmdParams * cmdparams)
 	if (cmdparams->ac < 1) {
 		lowlevel = 0;
 		curlevel = 30;
-		irc_chanalert (cmdparams->bot, _("%s requested %s help"), cmdparams->source->name, cmdparams->bot->name);
+		if (config.cmdreport) {
+			irc_chanalert (cmdparams->bot, _("%s requested %s help"), cmdparams->source->name, cmdparams->bot->name);
+		}
 		nlog (LOG_NORMAL, "%s requested %s help", cmdparams->source->name, cmdparams->bot->name);
 		irc_prefmsg(cmdparams->bot, cmdparams->source, __("\2The following commands can be used with %s:\2",cmdparams->source), cmdparams->bot->name);
 
@@ -652,7 +673,9 @@ bot_cmd_help (CmdParams * cmdparams)
 		irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2/msg %s HELP command\2", cmdparams->bot->name);
 		return NS_SUCCESS;
 	}
-	irc_chanalert (cmdparams->bot, _("%s requested %s help on %s"), cmdparams->source->name, cmdparams->bot->name, cmdparams->av[0]);
+	if (config.cmdreport) {
+		irc_chanalert (cmdparams->bot, _("%s requested %s help on %s"), cmdparams->source->name, cmdparams->bot->name, cmdparams->av[0]);
+	}
 	nlog (LOG_NORMAL, "%s requested %s help on %s", cmdparams->source->name, cmdparams->bot->name, cmdparams->av[0]);
 
 	/* Process command list */
@@ -729,7 +752,6 @@ bot_cmd_set_list (CmdParams * cmdparams)
 
 	irc_prefmsg(cmdparams->bot, cmdparams->source, __("Current %s settings:", cmdparams->source), cmdparams->bot->name);
 	userlevel = getuserlevel (cmdparams);
-
 	hash_scan_begin(&hs, cmdparams->bot->botsettings);
 	while ((setnode = hash_scan_next(&hs)) != NULL) {
 		set_ptr = hnode_get(setnode);
@@ -779,8 +801,10 @@ bot_cmd_set_list (CmdParams * cmdparams)
 static int 
 bot_cmd_set_report (CmdParams * cmdparams, bot_setting* set_ptr, char* new_setting)
 {
-	irc_chanalert(cmdparams->bot, _("%s set to %s by \2%s\2"), 
-		set_ptr->option, new_setting, cmdparams->source->name);
+	if (config.cmdreport) {
+		irc_chanalert(cmdparams->bot, _("%s set to %s by \2%s\2"), 
+			set_ptr->option, new_setting, cmdparams->source->name);
+	}
 	nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
 		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, set_ptr->option, new_setting);
 	irc_prefmsg(cmdparams->bot, cmdparams->source, 

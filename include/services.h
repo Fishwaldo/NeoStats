@@ -62,6 +62,7 @@ typedef struct tconfig {
 	neoroot rootuser;
 	char debugmodule[MAX_MOD_NAME];
 	unsigned int singlebotmode;
+	unsigned int cmdreport;
 	unsigned char cmdchar[2];
 } tconfig;
 

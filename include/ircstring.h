@@ -89,6 +89,7 @@ extern const unsigned int CharAttrs[];
 #define EOL_C    0x4000
 
 #define IsHostChar(c)   (CharAttrs[(unsigned char)(c)] & HOST_C)
+#define IsURLChar(c)   (IsHostChar(c) || ((c) == '/'))
 #define IsUserChar(c)   (CharAttrs[(unsigned char)(c)] & USER_C)
 #define IsChanPrefix(c) (CharAttrs[(unsigned char)(c)] & CHANPFX_C)
 #define IsChanChar(c)   (CharAttrs[(unsigned char)(c)] & CHAN_C)

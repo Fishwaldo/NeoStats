@@ -731,7 +731,7 @@ del_sockets (Module *mod_ptr)
  * @return none
 */
 int
-list_sockets (CmdParams* cmdparams)
+ns_cmd_socklist (CmdParams* cmdparams)
 {
 	Sock *sock = NULL;
 	hscan_t ss;

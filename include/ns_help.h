@@ -77,6 +77,7 @@ extern const char *ns_help_set_servicecmode[];
 extern const char *ns_help_set_serviceumode[];
 extern const char *ns_help_set_loglevel[];
 extern const char *ns_help_set_cmdchar[];
+extern const char *ns_help_set_cmdreport[];
 extern const char *ns_help_set_debug[];
 extern const char *ns_help_set_debuglevel[];
 extern const char *ns_help_set_debugchan[];

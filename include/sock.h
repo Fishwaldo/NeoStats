@@ -28,7 +28,7 @@
 
 int InitSocks (void);
 int FiniSocks (void);
-int list_sockets (CmdParams* cmdparams);
+int ns_cmd_socklist (CmdParams* cmdparams);
 int del_sockets (Module *mod_ptr);
 void Connect (void);
 void sts (const char *buf, const int buflen);

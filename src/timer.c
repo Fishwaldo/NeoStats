@@ -265,7 +265,7 @@ set_timer_interval (const char *name, int interval)
  * @return none
 */
 int
-list_timers (CmdParams* cmdparams)
+ns_cmd_timerlist (CmdParams* cmdparams)
 {
 	Timer *timer = NULL;
 	hscan_t ts;

@@ -1213,6 +1213,7 @@ EXPORTFUNC int new_transfer(char *url, char *params, NS_TRANSFER savetofileormem
 EXPORTFUNC int validate_nick (char* nick);
 EXPORTFUNC int validate_user (char* user);
 EXPORTFUNC int validate_host (char* host);
+EXPORTFUNC int validate_url (char* url);
 
 #ifdef HAVE_DB_H
 EXPORTFUNC int DBOpenDatabase(void);

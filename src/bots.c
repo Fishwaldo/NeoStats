@@ -22,8 +22,7 @@
 */
 
 /*	TODO:
- *		- find free nick for bots if NICK and ALTNICK are in use
- *		- CTCP handler
+ *	- find free nick for bots if NICK and ALTNICK are in use
  */
 
 #include "neostats.h"
@@ -169,9 +168,9 @@ int process_target_chan(CmdParams * cmdparams, char* target)
 	return NS_FALSE;
 }
 
-/** @brief list_bots
+/** @brief bot_chan_event
  *
- *  list all neostats bots
+ *  
  *
  *  @param cmdparams pointer to command parameters
  *
@@ -460,7 +459,7 @@ bot_nick_change (const Bot *botptr, const char *newnick)
 	return NS_SUCCESS;
 }
 
-/** @brief list_bots
+/** @brief ns_cmd_botlist
  *
  *  list all neostats bots
  *
@@ -469,7 +468,7 @@ bot_nick_change (const Bot *botptr, const char *newnick)
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int
-list_bots (CmdParams* cmdparams)
+ns_cmd_botlist (CmdParams* cmdparams)
 {
 	int i;
 	lnode_t *cm;

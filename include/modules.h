@@ -31,7 +31,7 @@ int FiniModules (void);
 Module *load_module (const char *path, Client * u);
 int unload_module (const char *module_name, Client * u);
 void unload_modules(void);
-int list_modules (CmdParams* cmdparams);
+int ns_cmd_modlist (CmdParams* cmdparams);
 void ModulesVersion (const char* nick, const char *remoteserver);
 void SendAllModuleEvent (Event event, CmdParams* cmdparams);
 void SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr);

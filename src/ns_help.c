@@ -250,6 +250,12 @@ const char *ns_help_set_cmdchar[] = {
 	NULL
 };
 
+const char *ns_help_set_cmdreport[] = {
+	"\2CMDREPORT <ON|OFF>\2",
+	"Whether command usage is reported to services channel",
+	NULL
+};
+
 const char *ns_help_set_debug[] = {
 	"\2DEBUG <ON|OFF>\2",
 	"When enabled, debugging information is sent to debug.log",

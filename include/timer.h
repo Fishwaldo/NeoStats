@@ -26,7 +26,7 @@
 
 int InitTimers (void);
 int FiniTimers (void);
-int list_timers (CmdParams* cmdparams);
+int ns_cmd_timerlist (CmdParams* cmdparams);
 void CheckTimers (void);
 int del_timers (Module *mod_ptr);
 

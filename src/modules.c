@@ -372,7 +372,7 @@ load_module (const char *modfilename, Client * u)
  * @return
  */
 int
-list_modules (CmdParams* cmdparams)
+ns_cmd_modlist (CmdParams* cmdparams)
 {
 	Module *mod_ptr = NULL;
 	hnode_t *mn;

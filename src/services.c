@@ -38,21 +38,21 @@
 #include "services.h"
 #include "bans.h"
 
-static int ns_shutdown (CmdParams* cmdparams);
-static int ns_reload (CmdParams* cmdparams);
-static int ns_jupe (CmdParams* cmdparams);
-static int ns_exclude (CmdParams* cmdparams);
+static int ns_cmd_shutdown (CmdParams* cmdparams);
+static int ns_cmd_reload (CmdParams* cmdparams);
+static int ns_cmd_jupe (CmdParams* cmdparams);
+static int ns_cmd_exclude (CmdParams* cmdparams);
 #ifdef USE_RAW
-static int ns_raw (CmdParams* cmdparams);
+static int ns_cmd_raw (CmdParams* cmdparams);
 #endif
-static int ns_userdump (CmdParams* cmdparams);
-static int ns_serverdump (CmdParams* cmdparams);
-static int ns_chandump (CmdParams* cmdparams);
-static int ns_bandump (CmdParams* cmdparams);
-static int ns_status (CmdParams* cmdparams);
-static int ns_level (CmdParams* cmdparams);
-static int ns_load (CmdParams* cmdparams);
-static int ns_unload (CmdParams* cmdparams);
+static int ns_cmd_userdump (CmdParams* cmdparams);
+static int ns_cmd_serverdump (CmdParams* cmdparams);
+static int ns_cmd_chandump (CmdParams* cmdparams);
+static int ns_cmd_bandump (CmdParams* cmdparams);
+static int ns_cmd_status (CmdParams* cmdparams);
+static int ns_cmd_level (CmdParams* cmdparams);
+static int ns_cmd_load (CmdParams* cmdparams);
+static int ns_cmd_unload (CmdParams* cmdparams);
 
 tme me;
 
@@ -92,25 +92,25 @@ Module ns_module = {
 /** Bot comand table */
 static bot_cmd ns_commands[]=
 {
-	{"LEVEL",		ns_level,		0, 	0,					ns_help_level, 		ns_help_level_oneline},
-	{"STATUS",		ns_status,		0, 	0,					ns_help_status, 	ns_help_status_oneline},
-	{"SHUTDOWN",	ns_shutdown,	1, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown, 	ns_help_shutdown_oneline},
-	{"RELOAD",		ns_reload,		1, 	NS_ULEVEL_ADMIN, 	ns_help_reload,		ns_help_reload_oneline},
-	{"MODLIST",		list_modules,	0, 	NS_ULEVEL_ADMIN,  	ns_help_modlist, 	ns_help_modlist_oneline},
-	{"LOAD",		ns_load,		1, 	NS_ULEVEL_ADMIN, 	ns_help_load, 		ns_help_load_oneline},
-	{"UNLOAD",		ns_unload,		1,	NS_ULEVEL_ADMIN, 	ns_help_unload, 	ns_help_unload_oneline},
-	{"JUPE",		ns_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_help_jupe,		ns_help_jupe_oneline},
-	{"EXCLUDE",		ns_exclude,		1,	NS_ULEVEL_ADMIN,	ns_help_exclude,	ns_help_exclude_oneline},
+	{"LEVEL",		ns_cmd_level,		0, 	0,					ns_help_level, 		ns_help_level_oneline},
+	{"STATUS",		ns_cmd_status,		0, 	0,					ns_help_status, 	ns_help_status_oneline},
+	{"SHUTDOWN",	ns_cmd_shutdown,	1, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown, 	ns_help_shutdown_oneline},
+	{"RELOAD",		ns_cmd_reload,		1, 	NS_ULEVEL_ADMIN, 	ns_help_reload,		ns_help_reload_oneline},
+	{"MODLIST",		ns_cmd_modlist,		0, 	NS_ULEVEL_ADMIN,  	ns_help_modlist, 	ns_help_modlist_oneline},
+	{"LOAD",		ns_cmd_load,		1, 	NS_ULEVEL_ADMIN, 	ns_help_load, 		ns_help_load_oneline},
+	{"UNLOAD",		ns_cmd_unload,		1,	NS_ULEVEL_ADMIN, 	ns_help_unload, 	ns_help_unload_oneline},
+	{"JUPE",		ns_cmd_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_help_jupe,		ns_help_jupe_oneline},
+	{"EXCLUDE",		ns_cmd_exclude,		1,	NS_ULEVEL_ADMIN,	ns_help_exclude,	ns_help_exclude_oneline},
 #ifdef USE_RAW																
-	{"RAW",			ns_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_help_raw, 		ns_help_raw_oneline},
+	{"RAW",			ns_cmd_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_help_raw, 		ns_help_raw_oneline},
 #endif																	
-	{"BOTLIST",		list_bots,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist,	ns_help_botlist_oneline},
-	{"SOCKLIST",	list_sockets,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist, 	ns_help_socklist_oneline},
-	{"TIMERLIST",	list_timers,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist, 	ns_help_timerlist_oneline},
-	{"USERDUMP",	ns_userdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_userdump, 	ns_help_userdump_oneline},
-	{"CHANDUMP",	ns_chandump,	0, 	NS_ULEVEL_ROOT,  	ns_help_chandump, 	ns_help_chandump_oneline},
-	{"SERVERDUMP",	ns_serverdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverdump, ns_help_serverdump_oneline},
-	{"BANDUMP",		ns_bandump,		0, 	NS_ULEVEL_ROOT,  	ns_help_bandump,	ns_help_bandump_oneline},
+	{"BOTLIST",		ns_cmd_botlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist,	ns_help_botlist_oneline},
+	{"SOCKLIST",	ns_cmd_socklist,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist, 	ns_help_socklist_oneline},
+	{"TIMERLIST",	ns_cmd_timerlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist, 	ns_help_timerlist_oneline},
+	{"USERDUMP",	ns_cmd_userdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_userdump, 	ns_help_userdump_oneline},
+	{"CHANDUMP",	ns_cmd_chandump,	0, 	NS_ULEVEL_ROOT,  	ns_help_chandump, 	ns_help_chandump_oneline},
+	{"SERVERDUMP",	ns_cmd_serverdump,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverdump, ns_help_serverdump_oneline},
+	{"BANDUMP",		ns_cmd_bandump,		0, 	NS_ULEVEL_ROOT,  	ns_help_bandump,	ns_help_bandump_oneline},
 	{NULL,			NULL,			0, 	0,					NULL, 				NULL}
 };
 
@@ -123,6 +123,7 @@ static bot_setting ns_settings[]=
 	{"SERVICECMODE",	&me.servicescmode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicescmode",	NULL,	ns_help_set_servicecmode, NULL, NULL },
 	{"SERVICEUMODE",	&me.servicesumode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicesumode",	NULL,	ns_help_set_serviceumode, NULL, NULL },
 	{"CMDCHAR",			&config.cmdchar,	SET_TYPE_STRING,	0, 2, 	NS_ULEVEL_ADMIN, "cmdchar",	NULL,	ns_help_set_cmdchar, NULL, (void*)"!" },
+	{"CMDREPORT",		&config.cmdreport,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "cmdreport",	NULL,	ns_help_set_cmdreport, NULL, (void*)1 },
 	{"LOGLEVEL",		&config.loglevel,	SET_TYPE_INT,		1, 6, 	NS_ULEVEL_ADMIN, "loglevel",	NULL,	ns_help_set_loglevel, NULL, (void*)5 },
 	{"DEBUG",			&config.debug,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debug, NULL, (void*)0 },
 	{"DEBUGLEVEL",		&config.debuglevel,	SET_TYPE_INT,		1, 10, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debuglevel, NULL, (void*)0 },
@@ -194,7 +195,7 @@ init_services_bot (void)
  */
 
 static int
-ns_exclude (CmdParams* cmdparams) 
+ns_cmd_exclude (CmdParams* cmdparams) 
 {
 	if (!ircstrcasecmp(cmdparams->av[0], "ADD")) {
 		if (cmdparams->ac < 3) {
@@ -221,7 +222,7 @@ ns_exclude (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_shutdown (CmdParams* cmdparams)
+ns_cmd_shutdown (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	irc_chanalert (ns_botptr, _("%s requested SHUTDOWN for %s"), cmdparams->source->name, cmdparams->av[cmdparams->ac-1]);
@@ -241,7 +242,7 @@ ns_shutdown (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_reload (CmdParams* cmdparams)
+ns_cmd_reload (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	irc_chanalert (ns_botptr, _("%s requested RELOAD for %s"), cmdparams->source->name, cmdparams->av[cmdparams->ac - 1]);
@@ -261,7 +262,7 @@ ns_reload (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_jupe (CmdParams* cmdparams)
+ns_cmd_jupe (CmdParams* cmdparams)
 {
 	static char infoline[255];
 
@@ -282,7 +283,7 @@ ns_jupe (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_userdump (CmdParams* cmdparams)
+ns_cmd_userdump (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
@@ -303,7 +304,7 @@ ns_userdump (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_serverdump (CmdParams* cmdparams)
+ns_cmd_serverdump (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
@@ -324,7 +325,7 @@ ns_serverdump (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_chandump (CmdParams* cmdparams)
+ns_cmd_chandump (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
@@ -345,7 +346,7 @@ ns_chandump (CmdParams* cmdparams)
  *  @returns none
  */
 static int
-ns_bandump (CmdParams* cmdparams)
+ns_cmd_bandump (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
@@ -366,7 +367,7 @@ ns_bandump (CmdParams* cmdparams)
  *  @returns none
  */
 static int 
-ns_status (CmdParams* cmdparams)
+ns_cmd_status (CmdParams* cmdparams)
 {
 	time_t uptime = me.now - me.t_start;
 
@@ -401,7 +402,7 @@ ns_status (CmdParams* cmdparams)
  *  @returns none
  */
 static int 
-ns_level (CmdParams* cmdparams)
+ns_cmd_level (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	if(cmdparams->ac < 1) {
@@ -426,7 +427,7 @@ ns_level (CmdParams* cmdparams)
  *  @returns none
  */
 static int 
-ns_load (CmdParams* cmdparams)
+ns_cmd_load (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	if (load_module (cmdparams->av[0], cmdparams->source)) {
@@ -445,7 +446,7 @@ ns_load (CmdParams* cmdparams)
  *  @returns none
  */
 static int 
-ns_unload (CmdParams* cmdparams)
+ns_cmd_unload (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	if (unload_module (cmdparams->av[0], cmdparams->source) > 0) {
@@ -463,7 +464,7 @@ ns_unload (CmdParams* cmdparams)
  */
 #ifdef USE_RAW
 static int
-ns_raw (CmdParams* cmdparams)
+ns_cmd_raw (CmdParams* cmdparams)
 {
 	char *message;
 
