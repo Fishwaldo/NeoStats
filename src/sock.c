@@ -58,7 +58,6 @@ char recbuf[BUFSIZE];
 static struct timeval *TimeOut;
 static struct pollfd *ufds;
 
-typedef void (*rta_hook_func) (fd_set *read_fd_set, fd_set *write_fd_set);
 rta_hook_func rta_hook_1 = NULL;
 rta_hook_func rta_hook_2 = NULL;
 
