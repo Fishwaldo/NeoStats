@@ -114,7 +114,7 @@ is_midnight (void)
  * @return pointer to new timer on success, NULL on error
 */
 static Timer *
-new_timer (char *name)
+new_timer (const char *name)
 {
 	Timer *timer;
 	hnode_t *tn;
@@ -141,13 +141,15 @@ new_timer (char *name)
  * @return pointer to timer if found, NULL if not found
 */
 Timer *
-findtimer (char *name)
+findtimer (const char *name)
 {
 	hnode_t *tn;
 
 	tn = hash_lookup (timerhash, name);
-	if (tn)
+	if (tn) {
 		return (Timer *) hnode_get (tn);
+	}
+	nlog (LOG_DEBUG3, "findtimer: %s not found", name);
 	return NULL;
 }
 
@@ -163,7 +165,7 @@ findtimer (char *name)
  * @return NS_SUCCESS if added, NS_FAILURE if not 
 */
 int
-add_timer (timer_function func_name, char *name, int interval)
+add_timer (timer_function func_name, const char *name, int interval)
 {
 	Timer *timer;
 	Module* moduleptr;
@@ -195,7 +197,7 @@ add_timer (timer_function func_name, char *name, int interval)
  * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
 int
-del_timer (char *name)
+del_timer (const char *name)
 {
 	Timer *timer;
 	hnode_t *tn;
@@ -248,7 +250,7 @@ del_timers (Module *mod_ptr)
  * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
 int
-set_timer_interval (char *name, int interval)
+set_timer_interval (const char *name, int interval)
 {
 	Timer *timer;
 	hnode_t *tn;
@@ -332,4 +334,3 @@ run_mod_timers (void)
 		}
 	}
 }
-

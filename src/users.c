@@ -38,7 +38,7 @@
 #endif
 #include <arpa/inet.h>
 
-static hash_t *uh;
+static hash_t *userhash;
 
 static User *
 new_user (const char *nick)
@@ -47,14 +47,14 @@ new_user (const char *nick)
 	hnode_t *un;
 
 	SET_SEGV_LOCATION();
-	if (hash_isfull (uh)) {
+	if (hash_isfull (userhash)) {
 		nlog (LOG_CRITICAL, "new_user: user hash is full");
 		return NULL;
 	}
 	u = scalloc (sizeof (User));
 	strlcpy (u->nick, nick, MAXNICK);
 	un = hnode_create (u);
-	hash_insert (uh, un, u->nick);
+	hash_insert (userhash, un, u->nick);
 	return u;
 }
 #ifndef GOTNICKIP
@@ -79,7 +79,6 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 {
 	CmdParams * cmdparams;
 	unsigned long ipaddress = 0;
-	unsigned long time;
 	User *u;
 #ifndef GOTNICKIP
 	struct in_addr *ipad;
@@ -115,16 +114,15 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 		}		
 #endif
 	}
-	if(TS) {
-		time = strtoul (TS, NULL, 10);
-	} else {
-		time = me.now;
-	}
-	nlog (LOG_DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %lu", nick, user, host, realname, (int)htonl (ipaddress), server, (unsigned long)time);
-
+	nlog (LOG_DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, (int)htonl (ipaddress), server, TS);
 	u = new_user (nick);
 	if (!u) {
 		return;
+	}
+	if(TS) {
+		u->TS = strtoul (TS, NULL, 10);
+	} else {
+		u->TS = me.now;
 	}
 	strlcpy (u->hostname, host, MAXHOST);
 	strlcpy (u->vhost, host, MAXHOST);
@@ -134,7 +132,6 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	u->tslastmsg = me.now;
 	u->chans = list_create (MAXJOINCHANS);
 	u->ipaddr.s_addr = htonl (ipaddress);
-	u->TS = time;
 	if (IsMe(u->server)) {
 		u->flags |= NS_FLAGS_ME;
 	}
@@ -154,7 +151,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	}
 	sfree (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
-	if(me.versionscan && !IsExcluded(u)) {
+	if(me.versionscan && !IsExcluded(u) && !IsMe(u)) {
 		privmsg(u->nick, ns_botptr->nick, "\1VERSION\1");
 	}
 }
@@ -163,7 +160,7 @@ static void deluser(User* u)
 {
 	hnode_t *un;
 
-	un = hash_lookup (uh, u->nick);
+	un = hash_lookup (userhash, u->nick);
 	if (!un) {
 		nlog (LOG_WARNING, "deluser: %s failed!", u->nick);
 		return;
@@ -172,7 +169,7 @@ static void deluser(User* u)
 	if ( IsMe(u) ) {
 		del_ns_bot (u->nick);
 	}
-	hash_delete (uh, un);
+	hash_delete (userhash, un);
 	hnode_destroy (un);
 	list_destroy (u->chans);
 	sfree (u);
@@ -269,31 +266,27 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	User * u;
 
 	SET_SEGV_LOCATION();
-	u = finduser (oldnick);
-	if (!u) {
+	nlog (LOG_DEBUG2, "UserNick: %s -> %s", oldnick, newnick);
+	un = hash_lookup (userhash, oldnick);
+	if (!un) {
 		nlog (LOG_WARNING, "UserNick: can't find user %s", oldnick);
 		return NS_FAILURE;
 	}
-	nlog (LOG_DEBUG2, "UserNick: %s -> %s", u->nick, newnick);
-	un = hash_lookup (uh, u->nick);
-	if (!un) {
-		nlog (LOG_WARNING, "UserNick: %s -> %s failed!", u->nick, newnick);
-		return NS_FAILURE;
-	}
+	u = (User *) hnode_get (un);
 	cm = list_first (u->chans);
 	while (cm) {
 		ChanNickChange (findchan (lnode_get (cm)), (char *) newnick, u->nick);
 		cm = list_next (u->chans, cm);
 	}
 	SET_SEGV_LOCATION();
-	hash_delete (uh, un);
+	hash_delete (userhash, un);
 	strlcpy (u->nick, newnick, MAXNICK);
 	if(ts) {
 		u->TS = atoi (ts);
 	} else {
 		u->TS = me.now;
 	}
-	hash_insert (uh, un, u->nick);
+	hash_insert (userhash, un, u->nick);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.user = u;
 	cmdparams->param = (char *)oldnick;
@@ -310,7 +303,7 @@ finduserbase64 (const char *num)
 	hnode_t *un;
 	hscan_t us;
 
-	hash_scan_begin (&us, uh);
+	hash_scan_begin (&us, userhash);
 	while ((un = hash_scan_next (&us)) != NULL) {
 		u = hnode_get (un);
 		if(strncmp(u->nick64, num, BASE64NICKSIZE) == 0) {
@@ -326,13 +319,11 @@ finduserbase64 (const char *num)
 User *
 finduser (const char *nick)
 {
-	User *u;
 	hnode_t *un;
 
-	un = hash_lookup (uh, nick);
+	un = hash_lookup (userhash, nick);
 	if (un != NULL) {
-		u = hnode_get (un);
-		return u;
+		return (User *) hnode_get (un);
 	}
 	nlog (LOG_DEBUG3, "finduser: %s not found", nick);
 	return NULL;
@@ -343,17 +334,20 @@ finduser (const char *nick)
 /* @brief Returns the users server in text form that they are connected too
 */
 
-void *display_server(void *tbl, char *col, char *sql, void *row) {
-        User *data = row;
+void *display_server(void *tbl, char *col, char *sql, void *row) 
+{
+	User *data = row;
 	return data->server->name;                        
 }                        
 
-void *display_umode(void *tbl, char *col, char *sql, void *row) {
+void *display_umode(void *tbl, char *col, char *sql, void *row) 
+{
 	User *data = row;
 	return UmodeMaskToString(data->Umode);
 }
 
-void *display_vhost(void *tbl, char *col, char *sql, void *row) {
+void *display_vhost(void *tbl, char *col, char *sql, void *row) 
+{
 	User *u = row;
 #ifdef UMODE_HIDE
 	/* Do we have a hidden host? */
@@ -367,7 +361,8 @@ void *display_vhost(void *tbl, char *col, char *sql, void *row) {
 }
 
 #ifdef GOTUSERSMODES
-void *display_smode(void *tbl, char *col, char *sql, void *row) {
+void *display_smode(void *tbl, char *col, char *sql, void *row) 
+{
 	User *data = row;
 	return SmodeMaskToString(data->Smode);
 }
@@ -375,7 +370,8 @@ void *display_smode(void *tbl, char *col, char *sql, void *row) {
 
 static char userschannellist[MAXCHANLIST];
 
-void *display_chans(void *tbl, char *col, char *sql, void *row) {
+void *display_chans(void *tbl, char *col, char *sql, void *row) 
+{
 	User *data = row;
 	lnode_t *cn;
 	userschannellist[0] = '\0';
@@ -562,17 +558,17 @@ TBLDEF neo_users = {
 #endif /* SQLSRV */
 
 int
-InitUsers ()
+InitUsers (void)
 {
-	uh = hash_create (U_TABLE_SIZE, 0, 0);
-	if(!uh)	{
+	userhash = hash_create (U_TABLE_SIZE, 0, 0);
+	if(!userhash)	{
 		nlog (LOG_CRITICAL, "Unable to create user hash");
 		return NS_FAILURE;
 	}
 
 #ifdef SQLSRV
 	/* add the server hash to the sql library */
-	neo_users.address = uh;
+	neo_users.address = userhash;
 	rta_add_table(&neo_users);
 #endif
 	return NS_SUCCESS;
@@ -623,13 +619,13 @@ UserDump (const char *nick)
 	SET_SEGV_LOCATION();
 	debugtochannel("================USERDUMP================");
 	if (!nick) {
-		hash_scan_begin (&us, uh);
+		hash_scan_begin (&us, userhash);
 		while ((un = hash_scan_next (&us)) != NULL) {
 			u = hnode_get (un);
 			dumpuser (u);
 		}
 	} else {
-		un = hash_lookup (uh, nick);
+		un = hash_lookup (userhash, nick);
 		if (un) {
 			u = hnode_get (un);
 			dumpuser (u);
@@ -690,7 +686,6 @@ UserMode (const char *nick, const char *modes)
 		nlog (LOG_WARNING, "UserMode: mode change for unknown user %s %s", nick, modes);
 		return;
 	}
-	nlog (LOG_DEBUG1, "Modes: %s", modes);
 	strlcpy (u->modes, modes, MODESIZE);
 	oldmode = u->Umode;
 	u->Umode = UmodeStringToMask(modes, u->Umode);
@@ -716,13 +711,12 @@ UserSMode (const char *nick, const char *modes)
 	User *u;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG1, "UserSMode: user %s modes %s", nick, modes);
+	nlog (LOG_DEBUG1, "UserSMode: user %s smodes %s", nick, modes);
 	u = finduser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, "UserSMode: smode change for unknown user %s %s", nick, modes);
 		return;
 	}
-	nlog (LOG_DEBUG1, "Smodes: %s", modes);
 	u->Smode = SmodeStringToMask(modes, u->Smode);
 	nlog (LOG_DEBUG1, "UserSMode: smode for %s is now %p", u->nick, (int *)u->Smode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
@@ -753,7 +747,7 @@ void FiniUsers (void)
 	hscan_t hs;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin(&hs, uh);
+	hash_scan_begin(&hs, userhash);
 	while ((un = hash_scan_next(&hs)) != NULL) {
 		u = hnode_get (un);
 		PartAllChannels (u, NULL);
@@ -761,12 +755,12 @@ void FiniUsers (void)
 		if ( IsMe(u) ) {
 			nlog (LOG_NOTICE, "FiniUsers called with a neostats bot online: %s", u->nick);
 		}
-		hash_scan_delete (uh, un);
+		hash_scan_delete (userhash, un);
 		hnode_destroy (un);
 		list_destroy (u->chans);
 		sfree (u);
 	}
-	hash_destroy(uh);
+	hash_destroy(userhash);
 }
 
 void GetUserList(UserListHandler handler)
@@ -776,7 +770,7 @@ void GetUserList(UserListHandler handler)
 	hnode_t *node;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin(&scan, uh);
+	hash_scan_begin(&scan, userhash);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		u = hnode_get(node);
 		handler(u);

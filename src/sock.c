@@ -461,7 +461,7 @@ recvlog (char *line)
  *         NS_FAILURE if unsuccessful
  */
 int
-sock_connect (int socktype, unsigned long ipaddr, int port, char *name, socket_function func_read, socket_function func_write, socket_function func_error)
+sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, socket_function func_read, socket_function func_write, socket_function func_error)
 {
 	struct sockaddr_in sa;
 	int s;
@@ -515,7 +515,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *name, socket_f
  *         NS_FAILURE if unsuccessful
  */
 int
-sock_disconnect (char *name)
+sock_disconnect (const char *name)
 {
 	Sock *sock;
 	fd_set fds;
@@ -869,7 +869,7 @@ int FiniSocks (void)
  * @return pointer to created socket on success, NULL on error
 */
 static Sock *
-new_sock (char *sock_name)
+new_sock (const char *sock_name)
 {
 	Sock *sock;
 	hnode_t *sn;
@@ -896,7 +896,7 @@ new_sock (char *sock_name)
  * @return pointer to socket if found, NULL if not found
  */
 Sock *
-findsock (char *sock_name)
+findsock (const char *sock_name)
 {
 	hnode_t *sn;
 
@@ -920,7 +920,7 @@ findsock (char *sock_name)
  * @return pointer to socket if found, NULL if not found
 */
 int
-add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum)
+add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, const char *sock_name, int socknum)
 {
 	Sock *sock;
 	Module* moduleptr;
@@ -963,7 +963,7 @@ add_socket (socket_function readfunc, socket_function writefunc, socket_function
  * @return pointer to socket if found, NULL if not found
 */
 int
-add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, void *data)
+add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, const char *sock_name, void *data)
 {
 	Sock *sock;
 	Module* moduleptr;
@@ -997,7 +997,7 @@ add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, ch
  * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
 int
-del_socket (char *sock_name)
+del_socket (const char *sock_name)
 {
 	Sock *sock;
 	hnode_t *sn;

@@ -142,13 +142,11 @@ findserverbase64 (const char *num)
 Server *
 findserver (const char *name)
 {
-	Server *s;
 	hnode_t *sn;
 
 	sn = hash_lookup (serverhash, name);
 	if (sn) {
-		s = hnode_get (sn);
-		return s;
+		return (Server *) hnode_get (sn);
 	}
 	nlog (LOG_DEBUG3, "findserver: %s not found!", name);
 	return NULL;

@@ -831,13 +831,11 @@ void ChanDump (const char *chan)
 Channel *
 findchan (const char *chan)
 {
-	Channel *c;
 	hnode_t *cn;
 
 	cn = hash_lookup (channelhash, chan);
 	if (cn) {
-		c = hnode_get (cn);
-		return c;
+		return (Channel *) hnode_get (cn);
 	}
 	nlog (LOG_DEBUG3, "findchan: %s not found", chan);
 	return NULL;

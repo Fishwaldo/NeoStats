@@ -74,7 +74,7 @@ int FiniBots (void)
  * @return none
  */
 void
-add_chan_bot (char *bot, char *chan)
+add_chan_bot (const char *bot, const char *chan)
 {
 	hnode_t *cbn;
 	ChanBot *chanbot;
@@ -113,7 +113,7 @@ add_chan_bot (char *bot, char *chan)
  * @return none
  */
 void
-del_chan_bot (char *bot, char *chan)
+del_chan_bot (const char *bot, const char *chan)
 {
 	hnode_t *cbn;
 	ChanBot *chanbot;
@@ -336,7 +336,7 @@ void bot_chan_private (char *origin, char **av, int ac)
  * @return none
  */
 static Bot *
-new_bot (char *bot_name)
+new_bot (const char *bot_name)
 {
 	Bot *botptr;
 	hnode_t *bn;
@@ -361,7 +361,7 @@ new_bot (char *bot_name)
  * @return
  */
 Bot *
-add_ns_bot (Module* modptr, char *nick)
+add_ns_bot (Module* modptr, const char *nick)
 {
 	Bot *botptr;
 
@@ -386,7 +386,7 @@ add_ns_bot (Module* modptr, char *nick)
  * @return
  */
 Bot *
-findbot (char *bot_name)
+findbot (const char *bot_name)
 {
 	hnode_t *bn;
 
@@ -405,7 +405,7 @@ findbot (char *bot_name)
  * @return
  */
 int
-del_ns_bot (char *bot_name)
+del_ns_bot (const char *bot_name)
 {
 	Bot *botptr;
 	hnode_t *bn;
@@ -430,7 +430,7 @@ del_ns_bot (char *bot_name)
  * @return
  */
 int
-bot_nick_change (char *oldnick, char *newnick)
+bot_nick_change (const char *oldnick, const char *newnick)
 {
 	User *u;
 	Bot *botptr;
@@ -585,7 +585,7 @@ Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int
-del_bot (Bot *botptr, char *reason)
+del_bot (Bot *botptr, const char *reason)
 {
 	User *u;
 

@@ -772,24 +772,24 @@ typedef struct _Bot {
 
 int ModuleConfig(bot_setting* bot_settings);
 
-int add_timer (timer_function func, char* name, int interval);
-int del_timer (char *timer_name);
-int set_timer_interval (char *timer_name, int interval);
-Timer *findtimer(char *timer_name);
+int add_timer (timer_function func, const char* name, int interval);
+int del_timer (const char *timer_name);
+int set_timer_interval (const char *timer_name, int interval);
+Timer *findtimer(const char *timer_name);
 
-int add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, char *sock_name, int socknum);
-int add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, char *sock_name, void *data);
-int del_socket (char *name);
-Sock *findsock (char *sock_name);
+int add_socket (socket_function readfunc, socket_function writefunc, socket_function errfunc, const char *sock_name, int socknum);
+int add_sockpoll (before_poll_function beforepoll, after_poll_function afterpoll, const char *sock_name, void *data);
+int del_socket (const char *name);
+Sock *findsock (const char *sock_name);
 
 Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list);
-int del_bot (Bot *botptr, char * reason);
-Bot *findbot (char * bot_name);
-int bot_nick_change (char * oldnick, char *newnick);
+int del_bot (Bot *botptr, const char * reason);
+Bot *findbot (const char * bot_name);
+int bot_nick_change (const char * oldnick, const char *newnick);
 
 /* sock.c */
-int sock_connect (int socktype, unsigned long ipaddr, int port, char *module, socket_function func_read, socket_function func_write, socket_function func_error);
-int sock_disconnect (char *name);
+int sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, socket_function func_read, socket_function func_write, socket_function func_error);
+int sock_disconnect (const char *name);
 
 /* conf.c */
 int ConfLoad (void);
