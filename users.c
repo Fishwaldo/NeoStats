@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.12 2002/02/27 13:30:59 fishwaldo Exp $
+** $Id: users.c,v 1.13 2002/02/27 16:36:40 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -25,25 +25,25 @@ struct Oper_Modes usr_mds[]      = {
                                  {UMODE_SERVNOTICE, 's',0},
                                  {UMODE_KILLS, 'k',0},
                                  {UMODE_SERVICES, 'S',200},
+#ifdef UNREAL
                                  {UMODE_SADMIN, 'a',100},
+				 {UMODE_COADMIN, 'C',60},
+				 {UMODE_EYES,	'e',0},
+				 {UMODE_KIX, 'q',0},
+				 {UMODE_BOT, 'B',0},
+				 {UMODE_FCLIENT, 'F',0},
+	   			 {UMODE_DEAF,    'd',0},
+   				 {UMODE_HIDING,  'I',0},
+#endif
                                  {UMODE_ADMIN, 'A',70},
                                  {UMODE_NETADMIN, 'N',185},
 				 {UMODE_TECHADMIN, 'T',190},
                                  {UMODE_CLIENT, 'c',0},
-				 {UMODE_COADMIN, 'C',60},
                                  {UMODE_FLOOD, 'f',0},
                                  {UMODE_REGNICK, 'r',0},
                                  {UMODE_HIDE,    'x',0},
-				 {UMODE_EYES,	'e',0},
                                  {UMODE_CHATOP, 'b',0},
 				 {UMODE_WHOIS, 'W',0},
-				 {UMODE_KIX, 'q',0},
-				 {UMODE_BOT, 'B',0},
-				 {UMODE_FCLIENT, 'F',0},
-   				 {UMODE_HIDING,  'I',0},
-/*             			 {UMODE_AGENT,   'Z',200},
-				 {UMODE_CODER, '1',200}, */
-	   			 {UMODE_DEAF,    'd',0},
                                  {0, 0, 0 }
 };
 
@@ -147,14 +147,16 @@ void sendcoders(char *message,...)
 {
 	va_list ap;
 	char tmp[512];
+#ifdef UNREAL
 	User *u;
 	hscan_t us;
 	hnode_t *un;
-
+#endif
 	va_start(ap, message);
 	vsnprintf (tmp, 512, message, ap);
 	if (!me.coder_debug) 
 		return;
+#ifdef UNREAL
 	if (!me.usesmo) {
 		hash_scan_begin(&us, uh);
 		while ((un = hash_scan_next(&us)) != NULL) {
@@ -165,6 +167,9 @@ void sendcoders(char *message,...)
 	} else {		
 		sts(":%s SMO 1 :%s Debuging: %s ",me.name,s_Services, tmp);
 	}
+#elif ULTIMATE
+	notice(s_Services, "Debuging: %s", tmp);
+#endif
 	va_end (ap);	
 }
 

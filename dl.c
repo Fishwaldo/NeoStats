@@ -622,6 +622,7 @@ int unload_module(char *module_name, User *u) {
 
 	segv_location = sstrdup("unload_module");
 	/* Check to see if this Module has any timers registered....  */
+	notice(s_Services, "Unloading Module %s", module_name);
 	for (j = 0; j < T_TABLE_SIZE; j++ ) {
 		for (mod_tmr = module_timer_lists[j]; mod_tmr; mod_tmr = mod_tmr->next) {
 #ifdef DEBUG
@@ -665,8 +666,10 @@ int unload_module(char *module_name, User *u) {
 		}
 		list = list->next;
 	}
-	privmsg(u->nick,s_Services,"Couldn't Find Module  %s Loaded, Try /msg %s modlist",module_name,s_Services);
-	notice(s_Services,"%s tried to Unload %s but its not loaded",u->nick,module_name);
+	if (u) {
+		privmsg(u->nick,s_Services,"Couldn't Find Module  %s Loaded, Try /msg %s modlist",module_name,s_Services);
+		notice(s_Services,"%s tried to Unload %s but its not loaded",u->nick,module_name);
+	}
 	return -1;
 }
 

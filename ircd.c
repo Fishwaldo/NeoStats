@@ -5,9 +5,10 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.17 2002/02/27 13:59:39 fishwaldo Exp $
+** $Id: ircd.c,v 1.18 2002/02/27 16:36:40 fishwaldo Exp $
 */
  
+#include <setjmp.h>
 #include "stats.h"
 #include "dl.h"
 
@@ -46,6 +47,8 @@ void Srv_Connect();
 static void ShowMOTD(char *);
 static void Showcredits(char *);
 
+
+
 struct int_commands {
 	char *name;
 	void (*function)(char *origin, char *coreLine);
@@ -61,6 +64,7 @@ if "srvmsg" is defined, it means that the command must be prefixed by ":" indica
 */
 typedef struct int_commands IntCommands;
  
+#ifdef UNREAL
 IntCommands cmd_list[] = {
 	/* Command	Function		srvmsg*/
 	{MSG_STATS,	Usr_Stats, 		1},
@@ -121,6 +125,67 @@ IntCommands cmd_list[] = {
 	{TOK_PROTOCTL,	Srv_Connect,		0},
 	{NULL,		NULL,			0}
 };
+#endif
+#ifdef ULTIMATE
+IntCommands cmd_list[] = {
+	/* Command	Function		srvmsg*/
+	{MSG_STATS,	Usr_Stats, 		1},
+	{TOK_STATS,	Usr_Stats,		1},
+	{MSG_SETHOST, 	Usr_Vhost,		1},
+	{TOK_SETHOST, 	Usr_Vhost, 		1},
+	{MSG_VERSION,	Usr_Version,		1},
+	{TOK_VERSION,	Usr_Version,		1},
+	{MSG_MOTD,	Usr_ShowMOTD,		1},
+	{TOK_MOTD,	Usr_ShowMOTD,		1},
+	{MSG_CREDITS,	Usr_Showcredits,	1},
+	{TOK_CREDITS,	Usr_Showcredits,	1},
+	{MSG_SERVER,	Usr_AddServer,		1},
+	{TOK_SERVER,	Usr_AddServer,		1},
+	{MSG_SQUIT,	Usr_DelServer,		1},
+	{TOK_SQUIT,	Usr_DelServer,		1},
+	{MSG_QUIT,	Usr_DelUser,		1},
+	{TOK_QUIT,	Usr_DelUser,		1},
+	{MSG_MODE,	Usr_Mode,		1},
+	{TOK_MODE,	Usr_Mode,		1},
+	{MSG_SVSMODE,	Usr_Smode,		1},
+	{TOK_SVSMODE,	Usr_Smode,		1},
+	{MSG_KILL,	Usr_Kill,		1},
+	{TOK_KILL,	Usr_Kill,		1},
+	{MSG_PONG,	Usr_Pong,		1},
+	{TOK_PONG,	Usr_Pong,		1},
+	{MSG_AWAY,	Usr_Away,		1},
+	{TOK_AWAY,	Usr_Away,		1},
+	{MSG_NICK,	Usr_Nick,		1},
+	{TOK_NICK,	Usr_Nick,		1},
+	{MSG_TOPIC,	Usr_Topic,		1},
+	{TOK_TOPIC,	Usr_Topic,		1},
+	{MSG_KICK,	Usr_Kick,		1},
+	{TOK_KICK,	Usr_Kick,		1},
+	{MSG_JOIN,	Usr_Join,		1},
+	{TOK_JOIN,	Usr_Join,		1},
+	{MSG_PART,	Usr_Part,		1},
+	{TOK_PART,	Usr_Part,		1},
+	{MSG_PING,	Srv_Ping,		0},
+	{TOK_PING,	Srv_Ping,		0},
+	{MSG_NETINFO,	Srv_Netinfo,		0},
+	{TOK_NETINFO,	Srv_Netinfo,		0},
+	{MSG_PASS,	Srv_Pass,		0},
+	{TOK_PASS,	Srv_Pass,		0},
+	{MSG_SERVER,	Srv_Server,		0},
+	{TOK_SERVER,	Srv_Server,		0},
+	{MSG_SQUIT,	Srv_Squit,		0},
+	{TOK_SQUIT,	Srv_Squit,		0},
+	{MSG_NICK,	Srv_Nick,		0},
+	{TOK_NICK,	Srv_Nick,		0},
+	{MSG_SVSNICK,	Srv_Svsnick,		0},
+	{TOK_SVSNICK,	Srv_Svsnick,		0},
+	{MSG_KILL,	Srv_Kill,		0},
+	{TOK_KILL,	Srv_Kill,		0},
+	{MSG_PROTOCTL, 	Srv_Connect, 		0},
+	{TOK_PROTOCTL,	Srv_Connect,		0},
+	{NULL,		NULL,			0}
+};
+#endif
 
 int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char *mod_name)
 {
@@ -184,7 +249,14 @@ void Module_Event(char *event, void *data) {
 					log("Running Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
 #endif
 					segv_location = sstrdup(module_ptr->info->module_name);
-					ev_list->function(data);			
+					strcpy(segvinmodule, module_ptr->info->module_name);
+printf("%s\n", segvinmodule);
+					if (setjmp(sigvbuf) == 0) {
+						ev_list->function(data);			
+					} else {
+						log("setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
+					}
+					strcpy(segvinmodule, "");
 					segv_location = sstrdup("Module_Event_Return");
 					break;
 			}
@@ -244,18 +316,23 @@ void parse(char *line)
 #endif
 				/* Check to make sure there are no blank spaces so we dont crash */
 				corelen = smalloc(strlen(coreLine));
-        if (strlen(coreLine) >= 350) {
-                privmsg(origin, s_Services, "command line too long!");
-                notice (s_Services,"%s tried to send a very LARGE command, we told them to shove it!", origin);
-                return;
-        }
+			        if (strlen(coreLine) >= 350) {
+			                privmsg(origin, s_Services, "command line too long!");
+			                notice (s_Services,"%s tried to send a very LARGE command, we told them to shove it!", origin);
+			                return;
+			        }
 
 				strcpy(corelen, coreLine);
 				if ((strtok(corelen, " ")) == NULL) {
 					return;
 				}
                                 segv_location = sstrdup(list->modname);
-				list->function(origin, coreLine);
+				strcpy(segvinmodule, list->modname);
+				if (setjmp(sigvbuf) == 0) {
+					list->function(origin, coreLine);
+				}
+				strcpy(segvinmodule, "");
+				segv_location = sstrdup("Return from Module Message");
 				free(corelen);
 				return;
 			}
@@ -288,7 +365,11 @@ void parse(char *line)
 					log("Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
 #endif
 					segv_location = sstrdup(module_ptr->info->module_name);
-					fn_list->function(origin, coreLine);			
+					strcpy(segvinmodule, module_ptr->info->module_name);
+					if (setjmp(sigvbuf) == 0) {
+						fn_list->function(origin, coreLine);			
+					}
+					strcpy(segvinmodule, "");
 					segv_location = sstrdup("Parse_Return_Module");
 					break;
 					log("Should never get here-Parse");

@@ -19,6 +19,7 @@
 ** See the file called 'LICENSE' for more details.
 */
 
+#include <setjmp.h>
 #include "stats.h"
 #include "signal.h"
 #include "dl.h"
@@ -37,6 +38,7 @@ int main()
 {
 	FILE *fp;
 	segv_location = sstrdup("main");
+	strcpy(segvinmodule, "");
 	me.onchan = 0;
 	printf("%s Loading...\n", version);
 	printf("-----------------------------------------------\n");
@@ -108,22 +110,33 @@ RETSIGTYPE conf_rehash() {
 }
 
 RETSIGTYPE serv_segv() {
+	char name[30];
 
-	/* Thanks to Stskeeps and Unreal for this stuff :) */
-	log("Uh Oh, Segmentation Fault.. Server Terminating");
-	log("Details: Buffer: %s", recbuf);
-	log("Approx Location: %s", segv_location);
-	/* Broadcast it out! */
-	globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
-	notice(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
-	globops(me.name,"Dumped Core to netstats.debug, Please Read the Readme file to find out what to do with it!");
-/*	sts("SQUIT %s",me.name); */
-	
-	sleep(2);
-	kill(forked, 3);
-	kill(forked, 9);
-	exit(-1);
-        sts("SQUIT %s",me.name);
+	if (segvinmodule) {
+		log("Uh Oh, Segmentation Fault in Modules Code %s", segvinmodule);
+		log("Unloading Module and restoring stacks");
+		globops(me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
+		notice(me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
+		strcpy(name, segvinmodule);
+		strcpy(segvinmodule, "");
+		unload_module(name, NULL);
+		longjmp(sigvbuf, -1);
+	} else {	
+		/* Thanks to Stskeeps and Unreal for this stuff :) */
+		log("Uh Oh, Segmentation Fault.. Server Terminating");
+		log("Details: Buffer: %s", recbuf);
+		log("Approx Location: %s", segv_location);
+		/* Broadcast it out! */
+		globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
+		notice(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
+		globops(me.name,"Dumped Core to netstats.debug, Please Read the Readme file to find out what to do with it!");
+		
+		sleep(2);
+		kill(forked, 3);
+		kill(forked, 9);
+		exit(-1);
+	        sts("SQUIT %s",me.name);
+	}
 }
 
 

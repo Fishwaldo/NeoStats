@@ -3,7 +3,8 @@
 #undef DEBUG
 
 /* Define the IRCD Support you want */
-#define IRCD UNREAL
+#undef UNREAL
+#undef ULTIMATE
 
 /* Define to empty if the keyword does not work.  */
 #undef const

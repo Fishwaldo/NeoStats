@@ -4,12 +4,11 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: services.c,v 1.13 2002/02/27 11:15:16 fishwaldo Exp $
+** $Id: services.c,v 1.14 2002/02/27 16:36:40 fishwaldo Exp $
 */
  
 #include "stats.h"
 #include "dl.h"
-#include "Unreal.h"
 
 
 extern const char version_date[], version_time[];

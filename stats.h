@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.15 2002/02/27 11:15:16 fishwaldo Exp $
+** $Id: stats.h,v 1.16 2002/02/27 16:36:40 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -26,9 +26,18 @@
 #include <ctype.h>
 #include <sys/stat.h>
 #include <sys/resource.h>
+#include <setjmp.h>
 
-#include "Unreal.h"
 #include "config.h"
+
+#if UNREAL == 1
+#include "Unreal.h"
+#elif ULTIMATE == 1
+#include "Ultimate.h"
+#else
+#error Error, you must select a IRCD to use. See ./configure --help for more information
+#endif
+
 
 /* Define this to enable Debug Code */
 
@@ -55,6 +64,8 @@ int times;
 extern char s_Debug[MAXNICK], s_Services[MAXNICK];
 extern const char version[];
 char recbuf[BUFSIZE], *segv_location;
+char segvinmodule[30];
+jmp_buf sigvbuf;
 
 typedef struct server_ Server;
 typedef struct user_ User;
