@@ -139,24 +139,22 @@ const char *hs_help_levels[] = {
 	NULL
 };
 
-const char *hs_help_set[] = {
-	"Syntax: \2SET LIST\2",
-	"        \2SET EXPIRE <TIME>\2",
-	"        \2SET HIDDENHOST <ON/OFF>\2",
-	"        \2SET HOSTNAME <hostname>\2",
-	"",
-	"\2SET LIST\2",
-	"Lists the current settings for HostServ.",
-	"",
+const char *hs_help_set_expire[] = {
 	"\2SET EXPIRE <TIME>\2",
 	"How long before unused HostServ entries should be",
 	"automatically deleted. A value of 0 makes all vhosts",
 	"permanent",
-	"",
+	NULL
+};
+
+const char *hs_help_set_hiddenhost[] = {
 	"\2SET HIDDENHOST <ON/OFF>\2",
 	"Turns on undernet style hidden hosts when users identify to nickserv.",
 	"You will also need to set HOSTNAME to the host you want to use",
-	"",
+	NULL
+};
+
+const char *hs_help_set_hostname[] = {
 	"\2SET HOSTNAME <hostname>\2",
 	"The hidden host you want to set on users.",
 	"Users will then be set to <user>.<hostname>.",
