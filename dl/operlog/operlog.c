@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: operlog.c,v 1.3 2002/09/04 08:40:29 fishwaldo Exp $
+** $Id: operlog.c,v 1.4 2002/10/14 01:06:22 shmad Exp $
 */
 
 #include <stdio.h>
@@ -138,10 +138,10 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 
 int Online(Server *data) {
 
-    if (init_bot(s_OperLog,"OperLog",me.name,"Network Command Logging Service", "+oikSNdwgleq-x", my_info[0].module_name) == -1 ) {
+    if (init_bot(s_OperLog,"OperLog",me.name,"Network Command Logging Service", "+oikSNwgleq-x", my_info[0].module_name) == -1 ) {
         /* Nick was in use */
         s_OperLog = strcat(s_OperLog, "_");
-        init_bot(s_OperLog,"OperLog",me.name,"Network Command Logging Service", "+oikSNdwgleq-x", my_info[0].module_name);
+        init_bot(s_OperLog,"OperLog",me.name,"Network Command Logging Service", "+oikSNwgleq-x", my_info[0].module_name);
     }
     return 1;
 };

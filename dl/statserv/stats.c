@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.24 2002/09/04 08:40:29 fishwaldo Exp $
+** $Id: stats.c,v 1.25 2002/10/14 01:06:23 shmad Exp $
 */
 
 #include "statserv.h"
@@ -300,7 +300,7 @@ void re_init_bot() {
 	strcpy(segv_location, "StatServ-re_init_bot");
 
 	chanalert(s_Services, "Re-Initilizing %s Bot", s_StatServ);
-	init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oikSdwgle", SSMNAME);
+	init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oikSwgle", SSMNAME);
 }
 int s_del_user(char **av, int ac) {
 	SStats *s;
@@ -422,8 +422,11 @@ int Online(char **av, int ac) {
 
 	strcpy(segv_location, "StatServ-Online");
 
-
-   init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oikSdwgle", SSMNAME);
+   #ifdef ULTIMATE3
+	   init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oikSwgle", SSMNAME);
+   #else
+	   init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oikSdwgle", SSMNAME);
+   #endif
    StatServ.onchan = 1;
    /* now that we are online, setup the timer to save the Stats database every so often */
    add_mod_timer("SaveStats", "Save_Stats_DB", SSMNAME, 600);

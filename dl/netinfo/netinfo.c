@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: netinfo.c,v 1.8 2002/09/04 08:40:28 fishwaldo Exp $
+** $Id: netinfo.c,v 1.9 2002/10/14 01:06:21 shmad Exp $
 */
 
 #include <stdio.h>
@@ -336,10 +336,10 @@ int checktld(char *data) {
 }
 
 int Online(char **av, int ac) {
-	if (init_bot(s_Netinfo,"Service",me.name,"Network Information Service", "+SAd", my_info[0].module_name) == -1 ) {
+	if (init_bot(s_Netinfo,"Service",me.name,"Network Information Service", "+SA", my_info[0].module_name) == -1 ) {
 		/* Nick was in use!!!! */
 		s_Netinfo = strcat(s_Netinfo, "_");
-		init_bot(s_Netinfo,"Service",me.name,"Network Information Service", "+SAd", my_info[0].module_name);
+		init_bot(s_Netinfo,"Service",me.name,"Network Information Service", "+SA", my_info[0].module_name);
 	}
 	return 1;
 };

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: loveserv.c,v 1.8 2002/09/04 08:40:28 fishwaldo Exp $
+** $Id: loveserv.c,v 1.9 2002/10/14 01:06:21 shmad Exp $
 */
 
 
@@ -210,10 +210,10 @@ int __Bot_Message(char *origin, char **av, int ac)
 
 
 int Online(char **av, int ac) {
-    if (init_bot(s_LoveServ,"love",me.name,"Network Love Service", "+Sqd-x", my_info[0].module_name) == -1 ) {
+    if (init_bot(s_LoveServ,"love",me.name,"Network Love Service", "+Sq-x", my_info[0].module_name) == -1 ) {
         /* Nick was in use!!!! */
         s_LoveServ = strcat(s_LoveServ, "_");
-        init_bot(s_LoveServ,"love",me.name,"Network Love Service", "+Sqd-x", my_info[0].module_name);
+        init_bot(s_LoveServ,"love",me.name,"Network Love Service", "+Sq-x", my_info[0].module_name);
     }
     return 1;
 };

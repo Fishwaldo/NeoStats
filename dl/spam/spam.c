@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: spam.c,v 1.18 2002/09/04 08:40:29 fishwaldo Exp $
+** $Id: spam.c,v 1.19 2002/10/14 01:06:23 shmad Exp $
 */
 
 
@@ -99,10 +99,10 @@ int __Bot_Message(char *origin, char **argv, int argc)
 
 int Online(char **av, int ac) {
 
-	if (init_bot(s_Spam,"please",me.name,"Chat to me", "+xd", my_info[0].module_name) == -1 ) {
+	if (init_bot(s_Spam,"please",me.name,"Chat to me", "+S-x", my_info[0].module_name) == -1 ) {
 		/* Nick was in use!!!! */
 		s_Spam = strcat(s_Spam, "_");
-		init_bot(s_Spam,"Please",me.name,"Chat to me", "+xd", my_info[0].module_name);
+		init_bot(s_Spam,"Please",me.name,"Chat to me", "+S-x", my_info[0].module_name);
 	}
 	return 1;
 };

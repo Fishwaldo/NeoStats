@@ -156,10 +156,10 @@ int __Bot_Message(char *origin, char **av, int ac)
 
 int Online(Server *data) {
 
-    if (init_bot(s_OperMe,"OperMe",me.name,"Network-wide OPERing Service", "+oikSdwgleq-x", my_info[0].module_name) == -1 ) {
+    if (init_bot(s_OperMe,"OperMe",me.name,"Network-wide OPERing Service", "+oikSwgleq-x", my_info[0].module_name) == -1 ) {
         /* Nick was in use */
         s_OperMe = strcat(s_OperMe, "_");
-        init_bot(s_OperMe,"OperMe",me.name,"Network-wide OPERing Service", "+oikSdwgleq-x", my_info[0].module_name);
+        init_bot(s_OperMe,"OperMe",me.name,"Network-wide OPERing Service", "+oikSwgleq-x", my_info[0].module_name);
     }
     return 1;
 };
