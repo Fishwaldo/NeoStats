@@ -180,8 +180,13 @@ doDelUser (const char *nick, int killflag, const char *reason)
 
 	/* if its one of our bots, remove it from the modlist */
 	if (findbot (u->nick)) {
-		if (killflag == 1)
+		if (killflag == 1) {
 			nlog (LOG_NOTICE, LOG_CORE, "Deleting Bot %s as it was killed", u->nick);
+			ac = 0;
+			AddStringToList (&av, u->nick, &ac);
+			ModuleEvent (EVENT_BOTKILL, av, ac);
+			free (av);
+		}
 		del_mod_user (u->nick);
 	}
 

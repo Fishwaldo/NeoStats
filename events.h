@@ -62,7 +62,7 @@
 /*  BOTKILL	is called if one of the NeoStats bots gets killed. You would 
  *  use it to reinitialize the bot.
  *  BOTKILL parameters are:
- *	
+ *	botnick
  */
 #define EVENT_BOTKILL		"BOTKILL"
 
