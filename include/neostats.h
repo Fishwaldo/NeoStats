@@ -985,7 +985,7 @@ typedef struct Sock {
 		} listenmode;
 		struct standmode {
 			sockfunccb readfunc;
-			sockfunccb writefunc;
+			sockcb writefunc;
 		} standmode;
 	} sfunc;		
 } Sock;
@@ -1080,9 +1080,10 @@ EXPORTFUNC int SetTimerInterval( const char *timer_name, int interval );
 /* Find timer from name */
 EXPORTFUNC Timer *FindTimer( const char *timer_name );
 
-EXPORTFUNC Sock *add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockfunccb writefunc, void *data);
+EXPORTFUNC Sock *add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv);
+EXPORTFUNC int update_sock(Sock *sock, short what, short reset, struct timeval *tv);
 EXPORTFUNC int add_sockpoll( const char *sock_name, void *data, before_poll_func beforepoll, after_poll_func afterpoll );
-EXPORTFUNC int del_sock( const char *sock_name );
+EXPORTFUNC int del_sock(Sock *sock);
 EXPORTFUNC Sock *find_sock( const char *sock_name );
 EXPORTFUNC int sock_connect( int socktype, unsigned long ipaddr, int port, const char *name, sock_func func_read, sock_func func_write, sock_func func_error );
 EXPORTFUNC int sock_disconnect( const char *name );

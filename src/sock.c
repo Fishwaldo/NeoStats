@@ -463,6 +463,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 	return s;
 }
 
+#if 0
 /** @brief disconnect socket
  *
  * @param name of socket to disconnect
@@ -499,7 +500,7 @@ sock_disconnect (const char *name)
 	del_sock (name);
 	return NS_SUCCESS;
 }
-
+#endif
 /** @brief send to socket
  *
  * @param buf the text we want to send to the IRC Server
@@ -521,9 +522,7 @@ send_to_ircd_socket (const char *buf, const int buflen)
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
 		/* Try to close socket then reset the servsock value to avoid cyclic calls */
-		bufferevent_free(me.servsock->event.buffered);
-		del_sock(me.servsock->name);
-		os_sock_close (me.servsock->sock_no);
+		del_sock(me.servsock);
 		me.servsock = NULL;
 		/* XXX really exit? */
 		do_exit (NS_EXIT_ERROR, NULL);
@@ -567,9 +566,7 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 			 */
 			if ((len + thisock->sfunc.linemode.readbufsize) > thisock->sfunc.linemode.recvq) {
 				nlog(LOG_ERROR, "RecvQ for %s(%s) exceeded. Dropping Connection", thisock->name, thisock->moduleptr?thisock->moduleptr->info->name:"N/A");
-				bufferevent_free(bufferevent);
-				del_sock(thisock->name);
-				os_sock_close (thisock->sock_no);
+				del_sock(thisock);
 				/* XXX really exit? */
 				do_exit (NS_EXIT_ERROR, NULL);
 			}
@@ -660,9 +657,7 @@ error_from_ircd_socket(struct bufferevent *bufferevent, short what, void *arg) {
 			break;
 	}
 #warning this needs to be cleaned up so we can exit cleanly.
-	bufferevent_free(bufferevent);
-	del_sock(me.servsock->name);
-	os_sock_close (me.servsock->sock_no);
+	del_sock(me.servsock);
 	me.servsock = NULL;
 	/* XXX really exit? */
 	do_exit (NS_EXIT_ERROR, NULL);
@@ -704,9 +699,7 @@ void FiniSocks (void)
 	ns_free(ufds);
 #warning we should actually scan for any existing sockets still registered here
 	if (me.servsock) {
-		bufferevent_free(me.servsock->event.buffered);
-		del_sock(me.servsock->name);
-		os_sock_close (me.servsock->sock_no);
+		del_sock(me.servsock);
 		me.servsock = NULL;
 	}
 	hash_destroy(sockethash);
@@ -834,12 +827,12 @@ add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuf
 	sock->event.buffered = bufferevent_new(sock->sock_no, readcb, writecb, errcb, sock);
 	if (!sock->event.buffered) {
 		nlog(LOG_WARNING, "bufferevent_new() failed");
-		del_sock(sock_name);
+		del_sock(sock);
 		return NULL;
 	}	
 	bufferevent_enable(sock->event.buffered, EV_READ|EV_WRITE);	
 	bufferevent_setwatermark(sock->event.buffered, EV_READ|EV_WRITE, 0, 0);
-	dlog(DEBUG3, "add_sock: Registered Module %s with Standard Socket functions %s", moduleptr?moduleptr->info->name:"core", sock->name);
+	dlog(DEBUG3, "add_buffered_sock: Registered Module %s with Standard Socket functions %s", moduleptr?moduleptr->info->name:"core", sock->name);
 	return sock;
 }
 
@@ -868,9 +861,7 @@ listen_accept_sock(int fd, short what, void *arg) {
 		return;
 	} else {
 		dlog(DEBUG1, "Deleting Listen Socket %d port %d (%s)", sock->sock_no, sock->sfunc.listenmode.port, sock->name);
-		event_del(sock->event.event);
-		os_sock_close (sock->sock_no);
-		del_sock(sock->name);
+		del_sock(sock);
 	}
 }
 
@@ -955,9 +946,9 @@ add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb
  */
 
 void
-read_sock(int fd, short what, void *data) {
+read_sock_activity(int fd, short what, void *data) {
 	Sock *sock = (Sock *)data;
-	u_char *p;
+	u_char *p = NULL;
 	int n;
 	size_t howmuch = READBUFSIZE;
 #ifdef WIN32
@@ -965,74 +956,110 @@ read_sock(int fd, short what, void *data) {
 	DWORD dwBytesRead;
 #endif
 
+	if (what & EV_READ) { 	
 #ifdef FIONREAD
-	if (ioctl(sock->sock_no, FIONREAD, &howmuch) == -1)
-		howmuch = READBUFSIZE;
+			if (ioctl(sock->sock_no, FIONREAD, &howmuch) == -1)
+				howmuch = READBUFSIZE;
 #else 
 #warning FIONREAD not available
 #endif	
-	p = os_malloc(howmuch);
+			if (howmuch > 0) {
+				p = os_malloc(howmuch);
+			}
+#if SOCKDEBUG
+printf("read called with %d bytes %d\n", howmuch, what);
+#endif
 
 #ifndef WIN32
-	n = read(sock->sock_no, p, howmuch);
-	if (n == -1) {
-		dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
-		sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
-		event_del(sock->event.event);
-		os_sock_close (sock->sock_no);
-		del_sock(sock->name);
-		return;
-	}
-	if (n == 0)
-		/* if we didn't read anything, just reschedule */
-		return;
+			n = read(sock->sock_no, p, howmuch);
+			if (n == -1) {
+				dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
+				sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
+				del_sock(sock);
+				return;
+			}
+			if (n == 0) {
+				dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
+				sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
+				del_sock(sock);
+				return;
+			}
 #else
-	n = ReadFile((HANDLE)sock->sock_no, p, howmuch, &dwBytesRead, NULL);
-	if (n == 0) {
-		dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
-		sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
-		event_del(sock->event.event);
-		os_sock_close (sock->sock_no);
-		del_sock(sock->name);
-		return;
-	}
-	if (dwBytesRead == 0)
-		return;
-	n = dwBytesRead;
+			n = ReadFile((HANDLE)sock->sock_no, p, howmuch, &dwBytesRead, NULL);
+			if (n == 0) {
+				dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
+				sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
+				del_sock(sock);
+				return;
+			}
+			if (dwBytesRead == 0)
+				return;
+			n = dwBytesRead;
 #endif
-	dlog(DEBUG1, "sock_read: Read %d bytes from fd %d (%s)", n, sock->sock_no, sock->name);
-	sock->rbytes += n;
-	/* rmsgs is just a counter for how many times we read in the standard sockets */
-	sock->rmsgs++;
-	if (sock->sfunc.standmode.readfunc(sock->data, p, n) == NS_FAILURE) {
-		dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
-		event_del(sock->event.event);
-		os_sock_close (sock->sock_no);
-		del_sock(sock->name);
-		return;
-	}			
-
-
+			dlog(DEBUG1, "sock_read: Read %d bytes from fd %d (%s)", n, sock->sock_no, sock->name);
+			sock->rbytes += n;
+			/* rmsgs is just a counter for how many times we read in the standard sockets */
+			sock->rmsgs++;
+			if (sock->sfunc.standmode.readfunc(sock->data, p, n) == NS_FAILURE) {
+				dlog(DEBUG1, "sock_read_activity: Read Callback failed, Closing Socket on fd %d (%s)", sock->sock_no, sock->name);
+				del_sock(sock);
+				return;
+			}			
+	} else if (what & EV_WRITE) {
+			if ((sock->sfunc.standmode.writefunc(fd, sock->data)) == NS_FAILURE) {
+				dlog(DEBUG1, "sock_read: Write Callback Failed, Closing Socket on fd %d (%s)", sock->sock_no, sock->name);
+				del_sock(sock);
+				return;
+			}			
+	} else if (what & EV_TIMEOUT) {
+			dlog(DEBUG1, "sock_read_activity: Timeout on %d (%s)", sock->sock_no, sock->name);
+			if (sock->sfunc.standmode.readfunc(sock->data, NULL, -2) == NS_FAILURE) {
+				dlog(DEBUG1, "sock_read: Timeout Read Callback Failed, Closing Socket on fd %d (%s)", sock->sock_no, sock->name);
+				del_sock(sock);
+				return;
+			}			
+	} else {
+			nlog(LOG_WARNING, "Error, Unknown State in sock_read_activity %d", what);
+			sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
+			del_sock(sock);
+	}							
+			
 }
 
-/** @brief Called when a socket is ready for writing
+/** @brief update the read/write calls for this socket
  *
- * This function is called when a socket is ready for writing data to. It is not used to actually write data, but calls a 
- * callback to the user telling them the socket is ready to be written to.
+ * Updates the event subsystem if we want to signal we are now interested
+ * in new events 
  *
- * @param fd the socket number
- * @param what ignored
- * @param data pointer to the Sock Structure for the the socket thats being read currently
+ * @param sock The socket structure we want to update
+ * @param what the new events we want to monitor 
  * 
- * @return Nothing
- */
+ * @return success or failure
+*/
+int 
+update_sock(Sock *sock, short what, short reset, struct timeval *tv) {
 
-void
-write_sock(int fd, short what, void *data) {
-#warning change this name, its misleading.
-printf("write\n");
+	if (reset) {
+		dlog(DEBUG1, "Event for fd %d (%s) has been reset", sock->sock_no, sock->name);
+		event_del(sock->event.event);
+	}
+	if ((!sock->sfunc.standmode.readfunc) && (what & EV_READ)) {
+		nlog (LOG_WARNING, "update_sock: read socket function doesn't exist = %s (%s)", sock->name, sock->moduleptr->info->name);
+		return NS_FAILURE;
+	}
+	if ((!sock->sfunc.standmode.writefunc) && (what & EV_WRITE)) {
+		nlog (LOG_WARNING, "update_sock: write socket function doesn't exist = %s (%s)", sock->name, sock->moduleptr->info->name);
+		return NS_FAILURE;
+	}
+	if ((!tv) && (what & EV_TIMEOUT)) {
+		nlog(LOG_WARNING, "update_sock: Timeout wanted but not specified on %s (%s)", sock->name, sock->moduleptr->info->name);
+		return NS_FAILURE;
+	}
+	event_set(sock->event.event, sock->sock_no, what, read_sock_activity, (void*) sock);
+	event_add(sock->event.event, tv);
+	dlog(DEBUG1, "Updated Socket Info %s with new event %d", sock->name, what);
+	return NS_SUCCESS;
 }
-
 /** @brief add a socket to the socket list as a "Standard" socket
  *
  * For core use. Adds a socket with the given functions to the socket list
@@ -1046,19 +1073,23 @@ printf("write\n");
  * @return pointer to socket if found, NULL if not found
 */
 Sock *
-add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockfunccb writefunc, void *data)
+add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv)
 {
 	Sock *sock;
 	Module* moduleptr;
 
 	SET_SEGV_LOCATION();
 	moduleptr = GET_CUR_MODULE();
-	if (!readfunc) {
+	if ((!readfunc) && (what & EV_READ)) {
 		nlog (LOG_WARNING, "add_sock: read socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
 		return NULL;
 	}
-	if (!writefunc) {
+	if ((!writefunc) && (what & EV_WRITE)) {
 		nlog (LOG_WARNING, "add_sock: write socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
+		return NULL;
+	}
+	if ((!tv) && (what & EV_TIMEOUT)) {
+		nlog(LOG_WARNING, "add_sock: Timeout wanted but not specified on %s (%s)", sock_name, moduleptr->info->name);
 		return NULL;
 	}
 	sock = new_sock (sock_name);
@@ -1069,11 +1100,10 @@ add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockfunccb wr
 	sock->sfunc.standmode.writefunc = writefunc;
 	sock->socktype = SOCK_STANDARD;
 
-	event_set(sock->event.event, sock->sock_no, EV_READ|EV_PERSIST, read_sock, (void*) sock);
-	event_set(sock->event.event, sock->sock_no, EV_WRITE|EV_PERSIST, write_sock, (void*) sock);
+	sock->event.event = os_malloc(sizeof(struct event));
+	event_set(sock->event.event, sock->sock_no, what, read_sock_activity, (void*) sock);
+	event_add(sock->event.event, tv);
 
-	event_add(sock->event.event, NULL);
-	
 	dlog(DEBUG2, "add_sock: Registered Module %s with Standard Socket functions %s", moduleptr->info->name, sock->name);
 	return sock;
 }
@@ -1124,16 +1154,31 @@ add_sockpoll (const char *sock_name, void *data, before_poll_func beforepoll, af
  * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
 int
-del_sock (const char *sock_name)
+del_sock (Sock *sock)
 {
-	Sock *sock;
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	sn = hash_lookup (sockethash, sock_name);
+	switch (sock->socktype) {
+		case SOCK_STANDARD:
+		case SOCK_LISTEN:
+				event_del(sock->event.event);
+				/* needed? */
+				os_free(sock->event.event);
+				os_sock_close (sock->sock_no);
+				break;
+		case SOCK_LINEMODE:
+				os_free(sock->sfunc.linemode.readbuf);
+		case SOCK_BUFFERED:
+				bufferevent_free(sock->event.buffered);
+				os_sock_close (sock->sock_no);
+				break;
+	}				
+	
+	sn = hash_lookup (sockethash, sock->name);
 	if (sn) {
 		sock = hnode_get (sn);
-		dlog(DEBUG2, "del_sock: Unregistered Socket function %s from Module %s", sock_name, sock->moduleptr->info->name);
+		dlog(DEBUG2, "del_sock: Unregistered Socket function %s from Module %s", sock->name, sock->moduleptr->info->name);
 		hash_scan_delete (sockethash, sn);
 		hnode_destroy (sn);
 		ns_free (sock);
@@ -1162,7 +1207,7 @@ del_sockets (Module *mod_ptr)
 		sock = hnode_get (modnode);
 		if (sock->moduleptr == mod_ptr) {
 			dlog(DEBUG1, "del_sockets: deleting socket %s from module %s.", sock->name, mod_ptr->info->name);
-			del_sock (sock->name);
+			del_sock (sock);
 		}
 	}
 	return NS_SUCCESS;

@@ -394,9 +394,10 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int connid)
       snprintf((char *) conn->password, 32, "%s", &buf[4]);
       nreply = MX_LN_SZ;
       snprintf(line, MX_LN_SZ,
-        "select * from pg_user where usename=\"%s\" and passwd = \"%s\"",
+        "select * from pg_user where username=\"%s\" and passwd = \"%s\"",
         conn->username, conn->password);
       SQL_string(line, reply, &nreply);
+#if 0
       if (nreply != 1279)
       {
         /* SQL command failed! Report error */
@@ -423,7 +424,7 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int connid)
 
         return (RTA_CLOSE);
       }
-
+#endif
       /* XXX validate it */
       *nin -= length;
       out[0] = 'R';

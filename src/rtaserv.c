@@ -24,6 +24,7 @@
 #include "neostats.h"
 #include "rta.h"
 #include "rtaserv.h"
+#include "event.h"
 #include <fcntl.h>
 #ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
@@ -44,6 +45,7 @@ typedef struct Sql_Conn {
 	int cmdpos;
 	int cmd[1000];
 	Sock *sock;
+	lnode_t *node;
 } Sql_Conn;
 
 OS_SOCKET sqlListenSock = -1;
@@ -53,11 +55,12 @@ char rtauser[MAXUSER];
 char rtapass[MAXPASS];
 char rtahost[MAXHOST];
 int rtaport;
+struct timeval rtatimeout;
+Sock *listensock;
 
 static int sql_accept_conn(int, void *);
-static OS_SOCKET sqllisten_on_port(int port);
-static int sql_handle_ui_request(lnode_t *sqlnode);
-static int sql_handle_ui_output(lnode_t *sqlnode);
+static int sql_handle_ui_request(void *arg, void *data , size_t len);
+static int sql_handle_ui_output(int fd, void *arg);
 int check_sql_sock();
 
 /* this is for sqlserver logging callback */
@@ -89,7 +92,7 @@ int InitRTAServ (void)
 	/* init the sql Listen Socket now as well */
 	sqlconnections = list_create(MAXSQLCON);
 	
-	if (add_listen_sock("RTAServ", rtaport, SOCK_STREAM, sql_accept_conn, NULL) == NULL) {
+	if ((listensock = add_listen_sock("RTAServ", rtaport, SOCK_STREAM, sql_accept_conn, NULL)) == NULL) {
 		nlog(LOG_CRITICAL, "Failed to Setup Sql Port. SQL not available");
 		return NS_FAILURE;
 	}
@@ -126,6 +129,11 @@ const char *rta_help_set_rtaport[] = {
 	NULL
 };
 
+const char *rta_help_set_rtatimeout[] = {
+	"RTATIMEOUT ",
+	NULL
+};
+
 static int rta_set_rtauser_cb (CmdParams* cmdparams, SET_REASON reason)
 {
 	rta_change_auth(rtauser, rtapass);
@@ -148,12 +156,18 @@ static int rta_set_rtaport_cb (CmdParams* cmdparams, SET_REASON reason)
 	return NS_SUCCESS;
 }
 
+static int rta_set_rtatimeout_cb (CmdParams *cmdparams, SET_REASON reason)
+{
+#warning TODO
+	return NS_SUCCESS;
+}
 static bot_setting rta_settings[]=
 {
 	{"RTAUSER",	rtauser,	SET_TYPE_STRING,	0, MAXUSER, NS_ULEVEL_ADMIN, NULL,	rta_help_set_rtauser, rta_set_rtauser_cb, (void*)"user" },
 	{"RTAPASS",	rtapass,	SET_TYPE_STRING,	0, MAXPASS, NS_ULEVEL_ADMIN, NULL,	rta_help_set_rtapass, rta_set_rtapass_cb, (void*)"pass" },
 	{"RTAHOST",	rtahost,	SET_TYPE_HOST,		0, MAXHOST, NS_ULEVEL_ADMIN, NULL,	rta_help_set_rtahost, rta_set_rtahost_cb, (void*)"127.0.0.1" },
 	{"RTAPORT",	&rtaport,	SET_TYPE_INT,		0, 0, 		NS_ULEVEL_ADMIN, NULL,	rta_help_set_rtaport, rta_set_rtaport_cb, (void*)8888 },
+	{"RTATIMEOUT",  &rtatimeout.tv_sec,	SET_TYPE_INT,		1, 1000,	NS_ULEVEL_ADMIN, NULL,  rta_help_set_rtatimeout, rta_set_rtatimeout_cb, (void*)300},
 	{NULL,		NULL,		0,					0, 0, 		0,				 NULL,	NULL	},
 };
 
@@ -167,6 +181,7 @@ static bot_setting rta_settings[]=
 /* rehash handler */
 int check_sql_sock() 
 {
+#if 0
 	if (sqlListenSock < 1) {
 		dlog(DEBUG1, "Rehashing SQL sock");
 		sqlListenSock = sqllisten_on_port(rtaport);
@@ -175,55 +190,9 @@ int check_sql_sock()
 			return NS_FAILURE;
 		}
 	}
+#endif
 	return NS_SUCCESS;
 }                                       
-
-/***************************************************************
- * listen_on_port(int port): -  Open a socket to listen for
- * incoming TCP connections on the port given.  Return the file
- * descriptor if OK, and -1 on any error.  The calling routine
- * can handle any error condition.
- *
- * Input:        The interger value of the port number to bind to
- * Output:       The file descriptor of the socket
- * Effects:      none
- ***************************************************************/
-OS_SOCKET
-sqllisten_on_port(int port)
-{
-	OS_SOCKET srvfd;      /* FD for our listen server socket */
-	struct sockaddr_in srvskt;
-	int      adrlen;
-
-	adrlen = sizeof(struct sockaddr_in);
-	(void) memset((void *) &srvskt, 0, (size_t) adrlen);
-	srvskt.sin_family = AF_INET;
-	/* bind to the local IP */
-	if (me.dobind) {
-		srvskt.sin_addr = me.lsa.sin_addr;
-	} else {
-		srvskt.sin_addr.s_addr = INADDR_ANY;
-	}
-	srvskt.sin_port = htons(rtaport);
-	if ((srvfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-	{
-		nlog(LOG_CRITICAL, "rtaserv: Unable to get socket for port %d.", port);
-		return -1;
-	}
-	os_sock_set_nonblocking (srvfd);
-	if (bind(srvfd, (struct sockaddr *) &srvskt, adrlen) < 0)
-	{
-		nlog(LOG_CRITICAL, "Unable to bind to port %d", port);
-		return -1;
-	}
-	if (listen(srvfd, 1) < 0)
-	{
-		nlog(LOG_CRITICAL, "Unable to listen on port %d", port);
-		return -1;
-	}
-	return (srvfd);
-}
-
 /***************************************************************
  * accept_ui_session(): - Accept a new UI/DB/manager session.
  * This routine is called when a user interface program such
@@ -248,6 +217,7 @@ sql_accept_conn(int srvfd, void *data)
 	int      adrlen;     /* length of an inet socket address */
 	Sql_Conn *newui;
 	char     tmp[16];
+	char 	 tmpname[BUFSIZE];
 
 	/* if we reached our max connection, just exit */
 	if (list_count(sqlconnections) > 5) {
@@ -281,16 +251,19 @@ sql_accept_conn(int srvfd, void *data)
 			return NS_SUCCESS;
 		}
 		/* inc number ui, then init new ui */
-		os_sock_set_nonblocking (srvfd);
+		os_sock_set_nonblocking (newui->fd);
 		newui->cmdpos = 0;
 		newui->responsefree = 50000; /* max response packetsize if 50000 */
 		newui->nbytein = 0;
 		newui->nbyteout = 0;
-		lnode_create_append (sqlconnections, newui);
+		newui->node = lnode_create(newui);
+		list_append(sqlconnections, newui->node);
 	    	inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
 		dlog(DEBUG1, "New SqlConnection from %s", tmp);
+
+		ircsnprintf(tmpname, BUFSIZE, "RTAConn%d", newui->fd);
 		
-#warning add socket code here
+		add_sock(tmpname, newui->fd, sql_handle_ui_request, sql_handle_ui_output, EV_READ|EV_PERSIST|EV_TIMEOUT, newui, &rtatimeout);		
 		return NS_SUCCESS;
 	}
 }
@@ -310,40 +283,31 @@ sql_accept_conn(int srvfd, void *data)
  * Effects:      many, many side effects via table callbacks
  ***************************************************************/
 int 
-sql_handle_ui_request(lnode_t *sqlnode)
+sql_handle_ui_request(void *arg, void *data , size_t len)
 {
-	int      ret;        /* a return value */
 	int      dbstat;     /* a return value */
 	int      t;          /* a temp int */
-	Sql_Conn *sqlconn;
-
-   	dlog (DEBUG1, "sql_handle_ui_request");
-	if ((sqlconn = lnode_get(sqlnode)) == NULL) {
-		nlog(LOG_WARNING, "Got a Sql Handle without a valid node");
-		return NS_SUCCESS;
-	}
-
-	/* We read data from the connection into the buffer in the ui struct. 
-       Once we've read all of the data we can, we call the DB routine to
-       parse out the SQL command and to execute it. */
-	ret = os_sock_read (sqlconn->fd,
-		(char *)&(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos));
-
-	/* shutdown manager conn on error or on zero bytes read */
-	if (ret <= 0)
-	{
-		/* log this since a normal close is with an 'X' command from the
-		   client program? */
-		dlog(DEBUG1, "Disconnecting SqlClient for failed read");
+	Sql_Conn *sqlconn = (Sql_Conn *)arg;
+	if (len == -1) {
+		/* a error occured */
 		deldbconnection(sqlconn->fd);
-		os_sock_close (sqlconn->fd);
-		list_delete(sqlconnections, sqlnode);
-		lnode_destroy(sqlnode);
+		list_delete(sqlconnections, sqlconn->node);
+		lnode_destroy(sqlconn->node);
 		ns_free(sqlconn);
 		return NS_FAILURE;
 	}
-	sqlconn->cmdpos += ret;
-	sqlconn->nbytein += ret;
+	if (len == -2) {
+		dlog(DEBUG1, "SQL Timeout");
+		list_delete(sqlconnections, sqlconn->node);
+		lnode_destroy(sqlconn->node);
+		deldbconnection(sqlconn->fd);
+		ns_free(sqlconn);
+		return NS_FAILURE;
+	}		
+	memmove((sqlconn->cmd + sqlconn->cmdpos), data, len);
+
+	sqlconn->cmdpos += len;
+	sqlconn->nbytein += len;
 
 	/* The commands are in the buffer. Call the DB to parse and execute
 	   them */
@@ -357,13 +321,16 @@ sql_handle_ui_request(lnode_t *sqlnode)
 		/* move any trailing SQL cmd text up in the buffer */
 		(void) memmove(sqlconn->cmd, &sqlconn->cmd[t], t);
 	} while (dbstat == RTA_SUCCESS);
-	if (dbstat == RTA_ERROR) {
-		deldbconnection(sqlconn->fd);
-	}
+
 	/* the command is done (including side effects).  Send any reply back 
        to the UI */
-	if (sql_handle_ui_output(sqlnode) == NS_FAILURE)
+	if (sql_handle_ui_output(sqlconn->fd, sqlconn) == NS_FAILURE) {
+		list_delete(sqlconnections, sqlconn->node);
+		lnode_destroy(sqlconn->node);
+		deldbconnection(sqlconn->fd);
+		ns_free(sqlconn);
 		return NS_FAILURE;
+	}
 	return NS_SUCCESS;
 }
 
@@ -377,17 +344,11 @@ sql_handle_ui_request(lnode_t *sqlnode)
  * Effects:      none
  ***************************************************************/
 int 
-sql_handle_ui_output(lnode_t *sqlnode)
+sql_handle_ui_output(int fd, void *arg)
 {
 	int      ret;        /* write() return value */
-	Sql_Conn *sqlconn;
+	Sql_Conn *sqlconn = (Sql_Conn *)arg;
  
-   	dlog (DEBUG1, "sql_handle_ui_output");
-	if ((sqlconn = lnode_get(sqlnode)) == NULL) {
-		nlog(LOG_WARNING, "Got a Sql write Handle without a valid node");
-		return NS_SUCCESS;
-	}
-  
 	if (sqlconn->responsefree < 50000)
 	{
 		ret = os_sock_write (sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree));
@@ -395,9 +356,8 @@ sql_handle_ui_output(lnode_t *sqlnode)
 		{
 			nlog(LOG_WARNING, "Got a write error when attempting to return data to the SQL Server");
 			deldbconnection(sqlconn->fd);
-			os_sock_close (sqlconn->fd);
-			list_delete(sqlconnections, sqlnode);
-			lnode_destroy(sqlnode);
+			list_delete(sqlconnections, sqlconn->node);
+			lnode_destroy(sqlconn->node);
 			ns_free(sqlconn);
 			return NS_FAILURE;
 		}
@@ -413,69 +373,11 @@ sql_handle_ui_output(lnode_t *sqlnode)
 			(50000 - sqlconn->responsefree - ret));
 			sqlconn->responsefree += ret;
 			sqlconn->nbyteout += ret;  /* # bytes sent on conn */
+			/* schedule a new write callback - Onshot, not persistant */
+			update_sock(sqlconn->sock, EV_WRITE|EV_TIMEOUT, 0, &rtatimeout);
 		}
 	}
 	return NS_SUCCESS;
-}
-
-//from read_loop
-void rta_hook_1 (fd_set *read_fd_set, fd_set *write_fd_set)
-{
-	lnode_t *sqlnode;
-	Sql_Conn *sqldata;
-	
-	if (!rta_active) {
-		return ;
-	}
-	/* if we have sql support, add the Listen Socket to the fds */
-	if (sqlListenSock > 0)
-		FD_SET(sqlListenSock, read_fd_set);
-	/* if we have any existing connections, add them of course */
-	if (list_count(sqlconnections) > 0) {
-		sqlnode = list_first(sqlconnections);
-		while (sqlnode != NULL) {
-			sqldata = lnode_get(sqlnode);
-			if (sqldata->responsefree < 50000) {
-				FD_SET(sqldata->fd, write_fd_set);
-			} else {
-				FD_SET(sqldata->fd, read_fd_set);			
-			}
-			sqlnode = list_next(sqlconnections, sqlnode);
-		}
-	}
-}
-
-void rta_hook_2 (fd_set *read_fd_set, fd_set *write_fd_set)
-{
-#if 0
-	lnode_t *sqlnode;
-	Sql_Conn *sqldata;
-
-	if (!rta_active) {
-		return ;
-	}
-	/* did we get a connection to the SQL listen sock */
-	if ((sqlListenSock > 0) && (FD_ISSET(sqlListenSock, read_fd_set)))
-		sql_accept_conn(sqlListenSock);
-	/* don't bother checking the sql connections if we dont have any active connections! */
-restart:
-	if (list_count(sqlconnections) > 0) {
-		sqlnode = list_first(sqlconnections);
-		while (sqlnode != NULL) {
-			sqldata = lnode_get(sqlnode);
-			if (FD_ISSET(sqldata->fd, read_fd_set)) {
-				if (sql_handle_ui_request(sqlnode) == NS_FAILURE) {
-					goto restart;
-				}
-			} else if (FD_ISSET(sqldata->fd, write_fd_set)) {
-				if (sql_handle_ui_output(sqlnode) == NS_FAILURE) {
-					goto restart;
-				}
-			}
-			sqlnode = list_next(sqlconnections, sqlnode);
-		}
-	}
-#endif
 }
 
 #if 0
@@ -565,6 +467,7 @@ void rtaserv_fini (void)
 	list_destroy_auto (sqlconnections);
 	rta_active = 1;
 	del_services_set_list (rta_settings);
+	del_sock(listensock);
 	rta_exit();
 }
 
