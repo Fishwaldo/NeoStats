@@ -172,7 +172,11 @@ ConnectTo (char *host, int port)
  * 
  * @return none
  */
+#if (!defined WIN32 || defined _CONSOLE)
 static void
+#else
+void
+#endif
 read_loop ()
 {
 	register int i, j, SelectResult;
@@ -421,9 +425,13 @@ Connect (void)
 	} else {
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
 		send_server_connect (me.name, me.numeric, me.infoline, config.pass, (unsigned long)me.t_start, (unsigned long)me.now);
+#if (!defined WIN32 || defined _CONSOLE)
 		read_loop ();
+#endif
 	}
+#if (!defined WIN32 || defined _CONSOLE)
 	do_exit (NS_EXIT_RECONNECT, NULL);
+#endif
 }
 
 /** @brief get max available sockets

@@ -145,16 +145,23 @@ static int InitCore(void)
  *
  * @todo Close STDIN etc correctly
  */
+#if (!defined WIN32 || defined _CONSOLE)
 int
 main (int argc, char *argv[])
+#else
+int
+neostats ()
+#endif
 {
 	FILE *fp;
 
 	/* initialise version */
 	strlcpy(me.version, VERSION, VERSIONSIZE);
+#if (!defined WIN32 || defined _CONSOLE)
 	/* get our commandline options */
 	if(get_options (argc, argv)!=NS_SUCCESS)
 		return EXIT_FAILURE;
+#endif
 #if 0
 	/* Change to the working Directory */
 	if (chdir (NEO_PREFIX) < 0) {
@@ -235,7 +242,11 @@ main (int argc, char *argv[])
 	/* We should never reach here but the compiler does not realise and may
 	   complain about not all paths control returning values without the return 
 	   Since it should never happen, treat as an error condition! */
+#if (!defined WIN32 || defined _CONSOLE)
 	return EXIT_FAILURE;
+#else
+	return 0;
+#endif
 }
 
 /** @brief Process Commandline Options

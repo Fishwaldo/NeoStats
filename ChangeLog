@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Win32: Run NeoStats main code on a thread. (M)
+ - Win32: Add very basic GUI. (M)
  - Win32: Disable fork. Windows handles processes differently. (M)
  - Win32: Disable unsupported signal processing. (M)
  - Win32: ADNS Win32 compatible library import. (M)
