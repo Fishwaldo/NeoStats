@@ -235,8 +235,10 @@ EXPORTVAR extern unsigned int ircd_supported_smodes;
 EXPORTFUNC int IsOperMode(const char mode);
 EXPORTFUNC int IsOperSMode(const char mode);
 EXPORTFUNC int IsBotMode(const char mode);
-EXPORTFUNC int GetModeMask(const char mode);
-EXPORTFUNC int GetSModeMask(const char mode);
+EXPORTFUNC int GetUmodeMask(const char mode);
+EXPORTFUNC const char * GetUmodeDesc (const unsigned int mask);
+EXPORTFUNC int GetSmodeMask(const char mode);
+EXPORTFUNC const char * GetSmodeDesc (const unsigned int mask);
 
 #ifndef NEOSTATS_PACKAGE_VERSION
 #define NEOSTATS_PACKAGE_VERSION PACKAGE
@@ -1103,7 +1105,9 @@ typedef enum LOG_LEVEL {
 /* define debug levels */
 
 typedef enum DEBUG_LEVEL {
-	DEBUG1=1,	/* debug notices about important functions that are going on */
+	DEBUGRX=1,
+	DEBUGTX,
+	DEBUG1,	/* debug notices about important functions that are going on */
 	DEBUG2,		/* more debug notices that are usefull */
 	DEBUG3,		/* even more stuff, that would be useless to most normal people */
 	DEBUG4,		/* are you insane? */

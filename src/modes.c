@@ -38,6 +38,51 @@ ChanModes ircd_cmodes[MODE_TABLE_SIZE];
 UserModes ircd_umodes[MODE_TABLE_SIZE];
 UserModes ircd_smodes[MODE_TABLE_SIZE];
 
+typedef struct ModeDesc {
+	unsigned int mask;
+	const char * desc;
+} ModeDesc;
+
+static ModeDesc UmodeDesc[] = {
+#ifdef UMODE_DEBUG
+	{UMODE_DEBUG,		"Debug"},
+#endif
+	{UMODE_TECHADMIN,	"Technical Administrator"},
+#ifdef UMODE_SERVICESOPER
+	{UMODE_SERVICESOPER,"Services operator"},
+#endif
+#ifdef UMODE_IRCADMIN
+	{UMODE_IRCADMIN,	"IRC admin"},
+#endif
+#ifdef UMODE_SUPER
+	{UMODE_SUPER,		"Super"},
+#endif
+#ifdef UMODE_SRA
+	{UMODE_SRA,			"Services root"},
+#endif
+	{UMODE_SERVICES,	"Network Service"},
+	{UMODE_NETADMIN,	"Network Administrator"},
+	{UMODE_SADMIN,		"Services Administrator"},
+	{UMODE_ADMIN,		"Server Administrator"},
+	{UMODE_COADMIN,		"Co-Server Administrator"},
+	{UMODE_OPER,		"Global Operator"},
+	{UMODE_LOCOP,		"Local Operator"},
+	{UMODE_REGNICK,		"Registered nick"},
+	{UMODE_BOT,			"Bot"},
+	{0, 0},
+};
+
+static ModeDesc SmodeDesc[] = {
+	{SMODE_NETADMIN,	"Network Administrator"},
+	{SMODE_CONETADMIN,	"Co-Network Administrator"},
+	{SMODE_TECHADMIN,	"Technical Administrator"},
+	{SMODE_COTECHADMIN,	"Co-Technical Administrator"},
+	{SMODE_ADMIN,		"Server Administrator"},
+	{SMODE_GUESTADMIN,	"Guest Administrator"},
+	{SMODE_COADMIN,		"Co-Server Administrator"},
+	{0, 0},
+};
+
 /** @brief InitIrcdModes
  *
  *  Build internal mode tables by translating the protocol information
@@ -126,7 +171,7 @@ UmodeMaskToString(const long Umode)
 		}
 	}
 	UmodeStringBuf[j] = '\0';
-	return(UmodeStringBuf);
+	return UmodeStringBuf;
 }
 
 /** @brief UmodeStringToMask
@@ -162,7 +207,7 @@ UmodeStringToMask(const char* UmodeString, long Umode)
 		}
 		tmpmode++;
 	}
-	return(Umode);
+	return Umode;
 }
 
 /** @brief SmodeMaskToString
@@ -185,7 +230,7 @@ SmodeMaskToString(const long Smode)
 		}
 	}
 	SmodeStringBuf[j] = '\0';
-	return(SmodeStringBuf);
+	return SmodeStringBuf;
 }
 
 /** @brief SmodeStringToMask
@@ -221,7 +266,7 @@ SmodeStringToMask(const char* SmodeString, long Smode)
 		}
 		tmpmode++;
 	}
-	return(Smode);
+	return Smode;
 }
 
 /** @brief CUmodeStringToMask
@@ -231,7 +276,7 @@ SmodeStringToMask(const char* SmodeString, long Smode)
  * @return 
  */
 long
-CUmodeStringToMask(const char* UmodeString, long Umode)
+CUmodeStringToMask (const char* UmodeString, long Umode)
 {
 	int add = 0;
 	char* tmpmode;
@@ -257,23 +302,52 @@ CUmodeStringToMask(const char* UmodeString, long Umode)
 		}
 		tmpmode++;
 	}
-	return(Umode);
+	return Umode;
 }
 
-int IsBotMode(const char mode)
+int IsBotMode (const char mode)
 {
 	if(ircd_umodes[(int)mode].umode & UMODE_BOT) {
-		return 1;
+		return NS_TRUE;
 	}
-	return 0;
+	return NS_FALSE;
 }
 
-int GetModeMask(const char mode)
+int GetUmodeMask (const char mode)
 {
 	return ircd_umodes[(int)mode].umode;
 }
 
-int GetSModeMask(const char mode)
+int GetSmodeMask (const char mode)
 {
 	return ircd_smodes[(int)mode].umode;
 }
+
+const char * GetUmodeDesc (const unsigned int mask)
+{
+	ModeDesc* entry;
+
+	entry = UmodeDesc;
+	while(entry->mask) {
+		if (entry->mask == mask) {
+			return entry->desc;
+		}
+		entry ++;
+	}
+	return NULL;
+}
+
+const char * GetSmodeDesc (const unsigned int mask)
+{
+	ModeDesc* entry;
+
+	entry = SmodeDesc;
+	while(entry->mask) {
+		if (entry->mask == mask) {
+			return entry->desc;
+		}
+		entry ++;
+	}
+	return NULL;
+}
+

@@ -344,14 +344,14 @@ static int hs_levels(CmdParams* cmdparams)
 {
 	int t;	
 
-	if (cmdparams->ac == 2) {
+	if (cmdparams->ac == 0) {
 		irc_prefmsg(hs_bot, cmdparams->source, 
 			"Configured Levels: ADD: %d, DEL: %d, LIST: %d, VIEW: %d",
 			hs_cfg.add, hs_cfg.del, hs_cfg.list,hs_cfg.view);
 			return NS_SUCCESS;
-	} else if (cmdparams->ac == 3) {
+	} else if (cmdparams->ac == 1) {
 		if (UserLevel(cmdparams->source) >= NS_ULEVEL_ADMIN) {
-			if (!ircstrcasecmp(cmdparams->av[2], "RESET")) {
+			if (!ircstrcasecmp(cmdparams->av[0], "RESET")) {
 				hs_cfg.add = 40;
 				SetConf((void *) &hs_cfg.add, CFGINT, "AddLevel");
 				hs_cfg.del = 40;
@@ -364,24 +364,24 @@ static int hs_levels(CmdParams* cmdparams)
 			}
 		}
 		return NS_ERR_NO_PERMISSION;
-	} else if (cmdparams->ac == 4) {
+	} else if (cmdparams->ac == 2) {
 		if (UserLevel(cmdparams->source) >= NS_ULEVEL_ADMIN) {
-			t = atoi(cmdparams->av[3]);
+			t = atoi(cmdparams->av[1]);
 			if ((t <= 0) || (t > NS_ULEVEL_ROOT)) {
 				irc_prefmsg(hs_bot, cmdparams->source, 
 					"Invalid Level. Must be between 1 and %d", NS_ULEVEL_ROOT);
 				return NS_ERR_SYNTAX_ERROR;
 			}
-			if (!ircstrcasecmp(cmdparams->av[2], "ADD")) {
+			if (!ircstrcasecmp(cmdparams->av[0], "ADD")) {
 				hs_cfg.add = t;
 				SetConf((void *) t, CFGINT, "AddLevel");
-			} else if (!ircstrcasecmp(cmdparams->av[2], "DEL")) {
+			} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
 				hs_cfg.del = t;
 				SetConf((void *) t, CFGINT, "DelLevel");
-			} else if (!ircstrcasecmp(cmdparams->av[2], "LIST")) {
+			} else if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
 				hs_cfg.list = t;
 				SetConf((void *) t, CFGINT, "ListLevel");
-			} else if (!ircstrcasecmp(cmdparams->av[2], "VIEW")) {
+			} else if (!ircstrcasecmp(cmdparams->av[0], "VIEW")) {
 				hs_cfg.view = t;
 				SetConf((void *) t, CFGINT, "ViewLevel");
 			} else {
@@ -390,7 +390,7 @@ static int hs_levels(CmdParams* cmdparams)
 				return 1;
 			}
 			irc_prefmsg(hs_bot, cmdparams->source, 
-				"Level for %s set to %d", cmdparams->av[2], t);
+				"Level for %s set to %d", cmdparams->av[0], t);
 			return NS_SUCCESS;
 		}
 		return NS_ERR_NO_PERMISSION;
@@ -400,16 +400,16 @@ static int hs_levels(CmdParams* cmdparams)
 
 static int hs_bans(CmdParams* cmdparams)
 {
-	if (cmdparams->ac == 2) {
+	if (cmdparams->ac == 0) {
 		hs_listban(cmdparams->source);
 		return NS_SUCCESS;
-	} else if (cmdparams->ac == 4) {
+	} else if (cmdparams->ac == 2) {
 		if (UserLevel(cmdparams->source) >= NS_ULEVEL_ADMIN) {
-			if (!ircstrcasecmp(cmdparams->av[2], "ADD")) {
-				hs_addban(cmdparams->source, cmdparams->av[3]);
+			if (!ircstrcasecmp(cmdparams->av[0], "ADD")) {
+				hs_addban(cmdparams->source, cmdparams->av[1]);
 				return NS_SUCCESS;
-			} else if (!ircstrcasecmp(cmdparams->av[2], "DEL")) {
-				hs_delban(cmdparams->source, cmdparams->av[3]);
+			} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
+				hs_delban(cmdparams->source, cmdparams->av[1]);
 				return NS_SUCCESS;
 			}
 		} else {
@@ -515,9 +515,9 @@ static int hs_chpass(CmdParams* cmdparams)
 	char *oldpass;
 	char *newpass;
 
-	nick = cmdparams->av[2];
-	oldpass = cmdparams->av[3];
-	newpass = cmdparams->av[4];
+	nick = cmdparams->av[0];
+	oldpass = cmdparams->av[1];
+	newpass = cmdparams->av[2];
 
 	hn = list_find(vhosts, nick, findnick);
 	if (hn) {
@@ -570,10 +570,10 @@ static int hs_add(CmdParams* cmdparams)
 	char *h; 
 	char *p;
 
-	cmd = cmdparams->av[2];
-	m = cmdparams->av[3];
-	h = cmdparams->av[4]; 
-	p = cmdparams->av[5];
+	cmd = cmdparams->av[0];
+	m = cmdparams->av[1];
+	h = cmdparams->av[2]; 
+	p = cmdparams->av[3];
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin(&hs, bannedvhosts);
@@ -643,10 +643,10 @@ static int hs_list(CmdParams* cmdparams)
 	int vhostcount;
 
 	SET_SEGV_LOCATION();
-	if (cmdparams->ac == 2) {
+	if (cmdparams->ac == 0) {
 		start = 0;
-	} else if (cmdparams->ac == 3) {
-		start = atoi(cmdparams->av[2]);
+	} else if (cmdparams->ac == 1) {
+		start = atoi(cmdparams->av[0]);
 	}
 
 	vhostcount = list_count(vhosts);
@@ -695,7 +695,7 @@ static int hs_view(CmdParams* cmdparams)
 	int tmpint;
 
 	SET_SEGV_LOCATION();
-	tmpint = atoi(cmdparams->av[2]);
+	tmpint = atoi(cmdparams->av[0]);
 	if (!tmpint) {
 		irc_prefmsg(hs_bot, cmdparams->source, 
 			"Syntax: /msg %s VIEW #", hs_bot->name);
@@ -775,7 +775,7 @@ static int hs_del(CmdParams* cmdparams)
 	int tmpint;
 
 	SET_SEGV_LOCATION();
-	tmpint = atoi(cmdparams->av[2]);
+	tmpint = atoi(cmdparams->av[0]);
 	if (!tmpint) {
 		irc_prefmsg(hs_bot, cmdparams->source, 
 			"Syntax: /msg %s DEL #", hs_bot->name);
@@ -820,8 +820,8 @@ static int hs_login(CmdParams* cmdparams)
 	char *pass;
 
 	SET_SEGV_LOCATION();
-	login = cmdparams->av[2];
-	pass = cmdparams->av[3];
+	login = cmdparams->av[0];
+	pass = cmdparams->av[1];
 	/* Check HostName Against Data Contained in vhosts.data */
 	hn = list_find(vhosts, login, findnick);
 	if (hn) {

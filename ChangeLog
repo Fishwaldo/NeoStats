@@ -4,6 +4,10 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - New debug levels of DEBUGRX and DEBUGTX to identify incoming and outgoing
+   messages. (M)
+ - Mode descriptions now handled core side so modules can share the information
+   rather than define local variants. (M)
  - ConnectServ: mode reports now run from a table. (M)
  - More core side UMODE support. (M)
  - Add support for online bot realname, host and ident changes. (M)

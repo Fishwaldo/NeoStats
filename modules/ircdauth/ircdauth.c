@@ -27,7 +27,6 @@
 static int auth_cmd_authmodelist(CmdParams* cmdparams);
 
 typedef struct UserAuthModes{
-	char* modename;
 	unsigned long umode;
 	int level;
 } UserAuthModes;
@@ -68,42 +67,41 @@ ModuleInfo module_info = {
 
 UserAuthModes user_auth_modes[] = {
 #ifdef UMODE_DEBUG
-	{"Debug",			UMODE_DEBUG, NS_ULEVEL_ROOT},
+	{UMODE_DEBUG,		NS_ULEVEL_ROOT},
 #endif
-	{"Technical admin",	UMODE_TECHADMIN, NS_ULEVEL_ADMIN},
+	{UMODE_TECHADMIN,	NS_ULEVEL_ADMIN},
 #ifdef UMODE_SERVICESOPER
-	{"Services operator",	UMODE_SERVICESOPER, NS_ULEVEL_OPER},
+	{UMODE_SERVICESOPER,NS_ULEVEL_OPER},
 #endif
 #ifdef UMODE_IRCADMIN
-	{"IRC admin",		UMODE_IRCADMIN, NS_ULEVEL_OPER},
+	{UMODE_IRCADMIN,	NS_ULEVEL_OPER},
 #endif
 #ifdef UMODE_SUPER
-	{"Super",			UMODE_SUPER, NS_ULEVEL_OPER},
+	{UMODE_SUPER,		NS_ULEVEL_OPER},
 #endif
 #ifdef UMODE_SRA
-	{"Services root",	UMODE_SRA, NS_ULEVEL_ROOT},
+	{UMODE_SRA,			NS_ULEVEL_ROOT},
 #endif
-	{"Services",		UMODE_SERVICES,	NS_ULEVEL_ROOT},
-	{"Network admin",	UMODE_NETADMIN,	NS_ULEVEL_ADMIN},
-	{"Services admin",	UMODE_SADMIN,	NS_ULEVEL_ADMIN},
-	{"Server admin",	UMODE_ADMIN,	NS_ULEVEL_OPER},
-	{"Co-admin",		UMODE_COADMIN,	NS_ULEVEL_OPER},
-	{"IRC operator",	UMODE_OPER,		NS_ULEVEL_OPER},
-	{"Local operator",	UMODE_LOCOP,	NS_ULEVEL_LOCOPER},
-	{"Registered nick",	UMODE_REGNICK,	NS_ULEVEL_REG},
+	{UMODE_SERVICES,	NS_ULEVEL_ROOT},
+	{UMODE_NETADMIN,	NS_ULEVEL_ADMIN},
+	{UMODE_SADMIN,		NS_ULEVEL_ADMIN},
+	{UMODE_ADMIN,		NS_ULEVEL_OPER},
+	{UMODE_COADMIN,		NS_ULEVEL_OPER},
+	{UMODE_OPER,		NS_ULEVEL_OPER},
+	{UMODE_LOCOP,		NS_ULEVEL_LOCOPER},
+	{UMODE_REGNICK,		NS_ULEVEL_REG},
 };
 
 const int user_auth_mode_count = ((sizeof (user_auth_modes) / sizeof (user_auth_modes[0])));
 
 UserAuthModes user_auth_smodes[] = {
-	{"Network admin",	SMODE_NETADMIN,		NS_ULEVEL_ADMIN},
-	{"Co-netadmin",		SMODE_CONETADMIN,		175},
-	{"Technical admin",	SMODE_TECHADMIN,	150},
-	{"Co-techadmin",	SMODE_COTECHADMIN,		125},
-	{"Server admin",	SMODE_ADMIN,	100},
-	{"Guest admin",		SMODE_GUESTADMIN,	100},
-	{"Co-admin",		SMODE_COADMIN,		NS_ULEVEL_OPER},
-	0
+	{SMODE_NETADMIN,	NS_ULEVEL_ADMIN},
+	{SMODE_CONETADMIN,	175},
+	{SMODE_TECHADMIN,	150},
+	{SMODE_COTECHADMIN,	125},
+	{SMODE_ADMIN,		100},
+	{SMODE_GUESTADMIN,	100},
+	{SMODE_COADMIN,		NS_ULEVEL_OPER},
 };
 
 const int user_auth_smode_count = ((sizeof (user_auth_smodes) / sizeof (user_auth_smodes[0])));
@@ -112,16 +110,16 @@ static int auth_cmd_authmodelist(CmdParams* cmdparams)
 {
 	int i;
 
-	irc_prefmsg(NULL, cmdparams->source, 
+	irc_prefmsg (NULL, cmdparams->source, 
 		"User mode auth levels:");
 	for (i = 0; i < user_auth_mode_count; i++) {
-		irc_prefmsg(NULL, cmdparams->source, "%s: %d", 
-			user_auth_modes[i].modename, user_auth_modes[i].level);
+		irc_prefmsg (NULL, cmdparams->source, "%s: %d", 
+			GetUmodeDesc (user_auth_modes[i].umode), user_auth_modes[i].level);
 	}
 	if (HaveFeature (FEATURE_USERSMODES)) {
 		for (i = 0; i < user_auth_smode_count; i++) {
-			irc_prefmsg(NULL, cmdparams->source, "%s: %d", 
-				user_auth_smodes[i].modename, user_auth_smodes[i].level);
+			irc_prefmsg (NULL, cmdparams->source, "%s: %d", 
+				GetSmodeDesc (user_auth_smodes[i].umode), user_auth_smodes[i].level);
 		}
 	}
 	return NS_SUCCESS;

@@ -849,7 +849,7 @@ parse (char *line)
 	if (!(*line))
 		return;
 	dlog(DEBUG1, "------------------------BEGIN PARSE-------------------------");
-	dlog(DEBUG1, "RX: %s", line);
+	dlog(DEBUGRX, "%s", line);
 	coreLine = strpbrk (line, " ");
 	if (coreLine) {
 		*coreLine = 0;

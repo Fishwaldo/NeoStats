@@ -51,6 +51,8 @@ const char *loglevels[LOG_LEVELMAX] = {
 };
 
 const char *dloglevels[DEBUGMAX] = {
+	"DEBUGRX",
+	"DEBUGTX",
 	"DEBUG1",
 	"DEBUG2",
 	"DEBUG3",

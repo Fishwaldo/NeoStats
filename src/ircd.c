@@ -735,7 +735,7 @@ irc_prefmsg (const Bot *botptr, const Client *target, const char *fmt, ...)
 	if (config.want_privmsg) {
 		irc_send_privmsg (botptr->u->name, target->name, ircd_buf);
 	} else {
-		irc_send_notice (botptr->u->name, target->name, ircd_buf);
+		irc_send_notice (botptr?botptr->u->name:ns_botptr->u->name, target->name, ircd_buf);
 	}
 }
 
@@ -1675,7 +1675,7 @@ send_cmd (char *fmt, ...)
 	ircvsnprintf (buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 
-	dlog(DEBUG2, "TX: %s", buf);
+	dlog(DEBUGTX, "%s", buf);
 	if(strnlen (buf, BUFSIZE) < BUFSIZE - 2) {
 		strlcat (buf, "\n", BUFSIZE);
 	} else {

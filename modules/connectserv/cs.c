@@ -31,19 +31,6 @@
 */
 /* #define ENABLE_COLOUR_SUPPORT */
 
-static const char mode_netadmin[]="network administrator";
-static const char mode_conetadmin[]="co network administrator";
-static const char mode_techadmin[]="network technical administrator";
-static const char mode_cotechadmin[]="network co technical administrator";
-static const char mode_serveradmin[]="server administrator";
-static const char mode_coserveradmin[]="co server administrator";
-static const char mode_guestadmin[]="guest administrator";
-static const char mode_servicesadmin[]="services administrator";
-static const char mode_globop[]="global operator";
-static const char mode_locop[]="local operator";
-static const char mode_netservice[]="network service";
-static const char mode_bot[]="bot";
-
 #ifndef ENABLE_COLOUR_SUPPORT
 static char msg_nickchange[]="\2NICK\2 %s (%s@%s) changed their nick to %s";
 static char msg_signon[]="\2SIGNON\2 %s (%s@%s - %s) has signed on at %s";
@@ -144,35 +131,34 @@ ModuleEvent module_events[] = {
 	{EVENT_NULL,	NULL}
 };
 
-typedef struct ModeDesc {
+typedef struct ModeDef {
 	unsigned int mask;
 	unsigned int serverflag;
-	const char* desc;
-}ModeDesc;
+}ModeDef;
 
-ModeDesc OperUmodes[]=
+ModeDef OperUmodes[]=
 {
-	{UMODE_NETADMIN, 0, mode_netadmin},
-	{UMODE_TECHADMIN, 0, mode_techadmin},
-	{UMODE_ADMIN, 1, mode_serveradmin},
-	{UMODE_COADMIN, 1, mode_coserveradmin},
-	{UMODE_SADMIN, 0, mode_servicesadmin},
-	{UMODE_OPER, 1, mode_globop},
-	{UMODE_LOCOP, 1, mode_locop},
-	{UMODE_SERVICES, 0, mode_netservice},
-	{0, 0, 0},
+	{UMODE_NETADMIN,	0},
+	{UMODE_TECHADMIN,	0},
+	{UMODE_ADMIN,		1},
+	{UMODE_COADMIN,		1},
+	{UMODE_SADMIN,		0},
+	{UMODE_OPER,		1},
+	{UMODE_LOCOP,		1},
+	{UMODE_SERVICES,	0},
+	{0, 0},
 };
 
-ModeDesc OperSmodes[]=
+ModeDef OperSmodes[]=
 {
-	{SMODE_NETADMIN, 0, mode_netadmin},
-	{SMODE_CONETADMIN, 0, mode_conetadmin},
-	{SMODE_TECHADMIN, 0, mode_techadmin},
-	{SMODE_COTECHADMIN, 0, mode_cotechadmin},
-	{SMODE_ADMIN, 1, mode_serveradmin},
-	{SMODE_COADMIN, 1, mode_coserveradmin},
-	{SMODE_GUESTADMIN, 1, mode_guestadmin},
-	{0, 0, 0},
+	{SMODE_NETADMIN,	0},
+	{SMODE_CONETADMIN,	0},
+	{SMODE_TECHADMIN,	0},
+	{SMODE_COTECHADMIN, 0},
+	{SMODE_ADMIN,		1},
+	{SMODE_COADMIN,		1},
+	{SMODE_GUESTADMIN,	1},
+	{0, 0},
 };
 
 int ModInit(Module* mod_ptr)
@@ -278,30 +264,18 @@ static int cs_event_quit(CmdParams* cmdparams)
  * report mode change
  */
 
-static int cs_report_mode (ModeDesc* desclist, Client * u, int mask, int add, char mode)
+static int cs_report_mode (const char* modedesc, int serverflag, Client * u, int mask, int add, char mode)
 {
-	ModeDesc* desc;
-
-	desc = desclist;
-	while(desc->mask) {
-		if(desc->mask == mask) 
-			break;
-		desc ++;
-	}
-	if(desc->mask == 0) {
-		return 0;
-	}
-    
-	if(desc->serverflag) {
+	if(serverflag) {
 		irc_chanalert(cs_bot, msg_mode_serv, u->name, 
 			add?"now":"no longer", 
-			desc->desc,
+			modedesc,
 			add?'+':'-',
 			mode, u->user->server->name);
 	} else {
 		irc_chanalert(cs_bot, msg_mode, u->name, 
 			add?"now":"no longer", 
-			desc->desc,
+			modedesc,
 			add?'+':'-',
 			mode);
 	}
@@ -316,6 +290,7 @@ static int cs_event_umode(CmdParams* cmdparams)
 	int mask;
 	int add = 1;
 	char *modes;
+	ModeDef* def;
 
 	SET_SEGV_LOCATION();
 	if (!cs_module->synched || !cs_cfg.mode_watch) {
@@ -338,12 +313,20 @@ static int cs_event_umode(CmdParams* cmdparams)
 			add = 0;
 			break;
 		default:
-			mask = GetModeMask (*modes);
+			mask = GetUmodeMask (*modes);
 			if (mask == UMODE_BOT) {
 				irc_chanalert (cs_bot, msg_bot, cmdparams->source->name, 
 					add?"now":"no longer", add?'+':'-', *modes);			
 			} else {
-				cs_report_mode (OperUmodes, cmdparams->source, mask, add, *modes);
+				def = OperUmodes;
+				while(def->mask) {
+					if(def->mask == mask) 
+					{
+						cs_report_mode(GetUmodeDesc(def->mask), def->serverflag, cmdparams->source, mask, add, *modes);
+						break;
+					}
+					def ++;
+				}
 			}
 			break;
 		}
@@ -358,6 +341,7 @@ static int cs_event_smode(CmdParams* cmdparams)
 	int mask;
 	int add = 1;
 	char *modes;
+	ModeDef* def;
 
 	SET_SEGV_LOCATION();
 	if (!cs_module->synched || !cs_cfg.mode_watch) {
@@ -380,8 +364,17 @@ static int cs_event_smode(CmdParams* cmdparams)
 				add = 0;
 				break;
 			default:
-				mask = GetSModeMask (*modes);
-				cs_report_mode (OperSmodes, cmdparams->source, mask, add, *modes);
+				mask = GetSmodeMask (*modes);
+				def = OperSmodes;
+				while(def->mask) {
+					if(def->mask == mask) 
+					{
+						cs_report_mode(GetSmodeDesc(def->mask), def->serverflag, cmdparams->source, mask, add, *modes);
+						break;
+					}
+					def ++;
+				}
+
 				break;
 		}
 		modes++;
