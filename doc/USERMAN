@@ -926,7 +926,7 @@ Example:
 -------------
 
 Syntax: 
-    /msg HostServ SET <EXPIRE/HIDDENHOST> <option>
+    /msg HostServ SET <LIST|<EXPIRE/HIDDENHOST> <option>>
 Description: 
     This command can manipulate or view the current HostServ Settings
     The Following Options are only available to Network Administration:

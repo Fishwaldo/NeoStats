@@ -140,12 +140,12 @@ const char *hs_help_levels[] = {
 };
 
 const char *hs_help_set[] = {
-	"Syntax: \2SET\2",
+	"Syntax: \2SET LIST\2",
 	"        \2SET EXPIRE <TIME>\2",
 	"        \2SET HIDDENHOST <OFF/host>\2",
 	"",
-	"\2SET\2",
-	"This lists the current settings for HostServ.",
+	"\2SET LIST\2",
+	"Lists the current settings for HostServ.",
 	"",
 	"\2SET EXPIRE <TIME>\2",
 	"How long before unused HostServ entries should be",

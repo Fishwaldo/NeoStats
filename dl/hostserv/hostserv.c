@@ -290,15 +290,15 @@ Functions __module_functions[] = {
 static bot_cmd hs_commands[]=
 {
 	{"ABOUT",	hs_about,	0, 	0,					hs_help_about,	hs_help_about_oneline },
-	{"ADD",		hs_add,		0,	(int)&hs_cfg.add,	hs_help_add,	hs_help_add_oneline },
-	{"DEL",		hs_del,		0, 	(int)&hs_cfg.del,	hs_help_del,	hs_help_del_oneline },
+	{"ADD",		hs_add,		4,	(int)&hs_cfg.add,	hs_help_add,	hs_help_add_oneline },
+	{"DEL",		hs_del,		1, 	(int)&hs_cfg.del,	hs_help_del,	hs_help_del_oneline },
 	{"LIST",	hs_list,	0, 	(int)&hs_cfg.list,	hs_help_list,	hs_help_list_oneline },
 	{"BANS",	hs_bans,	0,  NS_ULEVEL_ADMIN,	hs_help_bans,	hs_help_bans_oneline },
 	{"LEVELS",	hs_levels,	0, 	NS_ULEVEL_OPER,		hs_help_levels,	hs_help_levels_oneline },
-	{"VIEW",	hs_view,	0, 	(int)&hs_cfg.view,	hs_help_view,	hs_help_view_oneline },
-	{"LOGIN",	hs_login,	0, 	0,					hs_help_login,	hs_help_login_oneline },
-	{"CHPASS",	hs_chpass,	0, 	0,					hs_help_chpass,	hs_help_chpass_oneline },
-	{"SET",		hs_set,		0, 	NS_ULEVEL_ADMIN,	hs_help_set,	hs_help_set_oneline },
+	{"VIEW",	hs_view,	1, 	(int)&hs_cfg.view,	hs_help_view,	hs_help_view_oneline },
+	{"LOGIN",	hs_login,	2, 	0,					hs_help_login,	hs_help_login_oneline },
+	{"CHPASS",	hs_chpass,	3, 	0,					hs_help_chpass,	hs_help_chpass_oneline },
+	{"SET",		hs_set,		1, 	NS_ULEVEL_ADMIN,	hs_help_set,	hs_help_set_oneline },
 	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
 };
 
@@ -310,7 +310,7 @@ static int hs_set(User * u, char **av, int ac)
 		chanalert(s_HostServ, "%s tried set, but permission was denied", u->nick);
 		return 1;
 	}
-	if (ac <= 2) {
+	if (!strcasecmp(av[2], "LIST")) {
 		prefmsg(u->nick, s_HostServ, "Current Settings:");
 		prefmsg(u->nick, s_HostServ, "Expire Time: %d (Days)", hs_cfg.old);
 		prefmsg(u->nick, s_HostServ, "Undernet Style Hidden Hosts: %s", hs_cfg.regnick ? hs_cfg.vhostdom : "Disabled");
@@ -705,16 +705,6 @@ static int hs_chpass(User * u, char **av, int ac)
 	char *oldpass;
 	char *newpass;
 
-	if (ac < 4) {
-		prefmsg(u->nick, s_HostServ,
-			"Syntax: /msg %s CHPASS <nick> <oldpass> <newpass>",
-			s_HostServ);
-		prefmsg(u->nick, s_HostServ,
-			"For additional help: /msg %s HELP CHPASS",
-			s_HostServ);
-		return 1;
-	}
-
 	nick = av[2];
 	oldpass = av[3];
 	newpass = av[4];
@@ -771,14 +761,6 @@ static int hs_add(User * u, char **av, int ac)
 	char *h; 
 	char *p;
 
-	if (ac < 6) {
-		prefmsg(u->nick, s_HostServ,
-			"Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>",
-			s_HostServ);
-		prefmsg(u->nick, s_HostServ,
-			"For additional help: /msg %s HELP",
-			s_HostServ);
-	}
 	cmd = av[2];
 	m = av[3];
 	h = av[4]; 
@@ -899,15 +881,6 @@ static int hs_view(User * u, char **av, int ac)
 	int tmpint;
 
 	SET_SEGV_LOCATION();
-
-	if (!av[2]) {
-		prefmsg(u->nick, s_HostServ,
-			"Syntax: /msg %s VIEW #", s_HostServ);
-		prefmsg(u->nick, s_HostServ,
-			"The users # is got from /msg %s LIST",
-			s_HostServ);
-		return 1;
-	}
 	tmpint = atoi(av[2]);
 	if (!tmpint) {
 		prefmsg(u->nick, s_HostServ,
@@ -1034,14 +1007,6 @@ static int hs_del(User * u, char **av, int ac)
 	int tmpint;
 
 	SET_SEGV_LOCATION();
-	if (!av[2]) {
-		prefmsg(u->nick, s_HostServ,
-			"Syntax: /msg %s DEL #", s_HostServ);
-		prefmsg(u->nick, s_HostServ,
-			"The users # is got from /msg %s LIST",
-			s_HostServ);
-		return 1;
-	}
 	tmpint = atoi(av[2]);
 	if (!tmpint) {
 		prefmsg(u->nick, s_HostServ,
@@ -1091,17 +1056,6 @@ static int hs_login(User * u, char **av, int ac)
 	char *pass;
 
 	SET_SEGV_LOCATION();
-
-	if (!av[3]) {
-		prefmsg(u->nick, s_HostServ,
-			"Syntax: /msg %s LOGIN <NICK> <PASSWORD>",
-			s_HostServ);
-		prefmsg(u->nick, s_HostServ,
-			"For additional help: /msg %s HELP LOGIN",
-			s_HostServ);
-		return 1;
-	}
-
 	login = av[2];
 	pass = av[3];
 	/* Check HostName Against Data Contained in vhosts.data */
