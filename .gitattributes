@@ -137,7 +137,6 @@ logs/.keepme -text
 /server.c -text
 /services.c -text
 /sock.c -text
-/ss_help.c -text
 /stats.h -text
 /timer.c -text
 /users.c -text
