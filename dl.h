@@ -213,7 +213,6 @@ void ModuleEvent (char * event, char **av, int ac);
 void ModuleFunction (int cmdptr, char *cmd, char* origin, char **av, int ac);
 int load_module (char *path, User * u);
 int unload_module (char *module_name, User * u);
-int add_ld_path (char *path);
 void list_modules (User * u, char **av, int ac);
 void list_bots (User * u, char **av, int ac);
 int add_mod_user (char *nick, char *mod_name);
