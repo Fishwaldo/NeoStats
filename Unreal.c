@@ -218,8 +218,8 @@ aCtab cFlagTab[] = {
 	,			/* no invites */
 	{MODE_FLOODLIMIT, 'f', 0, 1}
 	,			/* flood limiter */
-	{MODE_NOHIDING, 'H', 0, 0}
-	,			/* no +I joiners */
+	{MODE_MODREG, 'M', 0, 0}
+	,			/* need umode +r to talk */
 	{MODE_STRIPBADWORDS, 'G', 0, 0}
 	,			/* no badwords */
 	{MODE_NOCTCP, 'C', 0, 0}
@@ -249,38 +249,48 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_SERVNOTICE, 's', 0}
 	,
+#ifndef UNREAL32
 	{UMODE_KILLS, 'k', 0}
 	,
+#endif
 	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT}
 	,
 	{UMODE_SADMIN, 'a', 100}
 	,
 	{UMODE_COADMIN, 'C', 60}
 	,
+#ifndef UNREAL32
 	{UMODE_EYES, 'e', 0}
 	,
+#endif
 	{UMODE_KIX, 'q', 0}
 	,
 	{UMODE_BOT, 'B', 0}
 	,
+#ifndef UNREAL32
 	{UMODE_FCLIENT, 'F', 0}
 	,
+#endif
 	{UMODE_DEAF, 'd', 0}
 	,
 	{UMODE_ADMIN, 'A', 70}
 	,
 	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN}
 	,
+#ifndef UNREAL32
 	{UMODE_CLIENT, 'c', 0}
 	,
+#endif
+#ifndef UNREAL32
 	{UMODE_FLOOD, 'f', 0}
 	,
+#endif
 	{UMODE_REGNICK, 'r', 0}
 	,
 	{UMODE_HIDE, 'x', 0}
 	,
-	{UMODE_CHATOP, 'b', 0}
-	,
+	/*{UMODE_CHATOP, 'b', 0}
+	,*/
 	{UMODE_WHOIS, 'W', 0}
 	,
 	{0, 0, 0}
@@ -913,8 +923,6 @@ Srv_Squit (char *origin, char **argv, int argc)
 	}
 
 }
-
-/* BE REALLY CAREFULL ABOUT THE ORDER OF THESE ifdef's */
 
 void
 Srv_Nick (char *origin, char **argv, int argc)

@@ -355,41 +355,68 @@
 #define MSG_TKL           "TKL"
 #define TOK_TKL   "BD"
 
+#ifdef UNREAL32
+#define	UMODE_INVISIBLE		0x0001	
+#define	UMODE_OPER			0x0002	
+#define	UMODE_WALLOP		0x0004	
+#define UMODE_FAILOP		0x0008	
+#define UMODE_HELPOP		0x0010	
+#define UMODE_REGNICK		0x0020	
+#define UMODE_SADMIN		0x0040	
+#define UMODE_ADMIN			0x0080	
+#define	UMODE_SERVNOTICE	0x0100	
+#define	UMODE_LOCOP			0x0200	
+#define UMODE_RGSTRONLY		0x0400	
+#define UMODE_NOCTCP		0x0800	
+#define UMODE_WEBTV			0x1000	
+#define UMODE_SERVICES		0x2000	
+#define UMODE_HIDE			0x4000	
+#define UMODE_NETADMIN		0x8000	
+#define UMODE_COADMIN		0x10000	
+#define UMODE_WHOIS			0x20000	
+#define UMODE_KIX			0x40000
+#define UMODE_BOT			0x80000	
+#define UMODE_SECURE		0x100000
+#define UMODE_VICTIM		0x200000
+#define UMODE_DEAF			0x400000
+#define UMODE_HIDEOPER		0x800000
+#define UMODE_SETHOST		0x1000000
+#define UMODE_STRIPBADWORDS	0x2000000
+#define UMODE_HIDEWHOIS		0x4000000
+#else  /* UNREAL32 */		
+#define	UMODE_INVISIBLE		0x0001	/* makes user invisible */
+#define	UMODE_OPER			0x0002	/* Operator */
+#define	UMODE_WALLOP		0x0004	/* send wallops to them */
+#define UMODE_FAILOP		0x0008	/* Shows some global messages */
+#define UMODE_HELPOP		0x0010	/* Help system operator */
+#define UMODE_REGNICK		0x0020	/* Nick set by services as registered */
+#define UMODE_SADMIN		0x0040	/* Services Admin */
+#define UMODE_ADMIN			0x0080	/* Admin */
+#define	UMODE_SERVNOTICE	0x0100	/* server notices such as kill */
+#define	UMODE_LOCOP			0x0200	/* Local operator -- SRB */
+#define UMODE_KILLS			0x0400	/* Show server-kills... */
+#define UMODE_CLIENT		0x0800	/* Show client information */
+#define UMODE_FLOOD			0x1000	/* Receive flood warnings */
+#define UMODE_JUNK			0x2000	/* can junk */
+#define UMODE_SERVICES		0x4000	/* services */
+#define UMODE_HIDE			0x8000	/* Hide from Nukes */
+#define UMODE_NETADMIN		0x10000	/* Network Admin */
+#define UMODE_EYES			0x20000	/* Mode to see server stuff */
+#define UMODE_COADMIN		0x80000	/* Co Admin */
+#define UMODE_WHOIS			0x100000	/* gets notice on /whois */
+#define UMODE_KIX			0x200000	/* usermode +q 
+										cannot be kicked from any channel 
+										except by U:Lines */
+#define UMODE_BOT			0x400000	/* User is a bot */
+#define UMODE_SECURE		0x800000	/* User is a secure connect */
+#define UMODE_FCLIENT		0x1000000	/* recieve client on far connects.. */
 
-
-#define	UMODE_INVISIBLE  0x0001	/* makes user invisible */
-#define	UMODE_OPER       0x0002	/* Operator */
-#define	UMODE_WALLOP     0x0004	/* send wallops to them */
-#define UMODE_FAILOP	 0x0008	/* Shows some global messages */
-#define UMODE_HELPOP	 0x0010	/* Help system operator */
-#define UMODE_REGNICK	 0x0020	/* Nick set by services as registered */
-#define UMODE_SADMIN	 0x0040	/* Services Admin */
-#define UMODE_ADMIN	 0x0080	/* Admin */
-
-#define	UMODE_SERVNOTICE 0x0100	/* server notices such as kill */
-#define	UMODE_LOCOP      0x0200	/* Local operator -- SRB */
-#define UMODE_KILLS	 0x0400	/* Show server-kills... */
-#define UMODE_CLIENT	 0x0800	/* Show client information */
-#define UMODE_FLOOD	 0x1000	/* Receive flood warnings */
-#define UMODE_CHATOP	 0x2000	/* can receive chatops */
-#define UMODE_SERVICES   0x4000	/* services */
-#define UMODE_HIDE	 0x8000	/* Hide from Nukes */
-#define UMODE_NETADMIN  0x10000	/* Network Admin */
-#define UMODE_EYES      0x20000	/* Mode to see server stuff */
-#define UMODE_COADMIN   0x80000	/* Co Admin */
-#define UMODE_WHOIS    0x100000	/* gets notice on /whois */
-#define UMODE_KIX      0x200000	/* usermode +q 
-				   cannot be kicked from any channel 
-				   except by U:Lines
-				 */
-#define UMODE_BOT       0x400000	/* User is a bot */
-#define UMODE_CODER	0x800000	/* User is a network coder */
-#define UMODE_FCLIENT  0x1000000	/* recieve client on far connects.. */
-#define UMODE_HIDING   0x2000000	/* Totally invisible .. */
-#define UMODE_AGENT    0x4000000	/* Is an IRCd Agent local only */
-#define UMODE_DEAF     0x8000000	/* User can't here anything in channel */
-
-
+#define	UMODE_VICTIM		0x8000000	/* Intentional Victim */
+#define UMODE_DEAF			0x10000000
+#define UMODE_HIDEOPER		0x20000000	/* Hide oper mode */
+#define UMODE_SETHOST		0x40000000	/* used sethost */
+#define UMODE_STRIPBADWORDS 0x80000000	/* */
+#endif /* UNREAL32 */
 
 #define	MODE_CHANOP		0x0001
 #define	MODE_VOICE		0x0002
@@ -417,7 +444,7 @@
 #define MODE_NOKNOCK		0x800000
 #define MODE_NOINVITE  		0x1000000
 #define MODE_FLOODLIMIT		0x2000000
-#define MODE_NOHIDING		0x4000000
+#define MODE_MODREG		0x4000000
 #define MODE_STRIPBADWORDS	0x8000000
 #define MODE_NOCTCP		0x10000000
 #define MODE_AUDITORIUM		0x20000000
