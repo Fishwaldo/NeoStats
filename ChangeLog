@@ -1,6 +1,7 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
 * NeoStats * Shmad & Fish * Version ????
+ - Fixed Ultimate2 CHGHOST for vhosts.. ugh im going insane..tested & working (S)
  - Misc. Module updates (S)
  - Ultimate 2 uses CHGHOST not SETHOST, updated internals to reflect this. (S)
  - Ported NeoStats to NeoIRCD, but still needs a lot of work (It links, modules not tested/ported yet) (F)
