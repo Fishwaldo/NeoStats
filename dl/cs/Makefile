@@ -5,18 +5,18 @@ OBJS = ${SRCS:.c=.o}
 TARGET = connectserv.so
 DISTFILES = $(SRCS) cs.h Makefile ChangeLog
 
-all:	cs
+all:	$(TARGET)
 
 .c.o:
 	$(CC) $(CFLAGS) $(MODINCLUDES) -c $<
 
-cs: $(OBJS)
+$(TARGET): $(OBJS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:
 	$(RM) *.o *.lo *.so
 
-install: cs
+install: $(TARGET)
 	$(INSTALL_MOD) $(TARGET) $(DIRECTORY)/dl
 
 dist: 	$(DISTFILES)

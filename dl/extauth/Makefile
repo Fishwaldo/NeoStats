@@ -7,12 +7,12 @@ OBJS= $(extauth_objs)
 TARGET= extauth.so
 DISTFILES = serviceroots.c Makefile
 
-all:	extauth
+all: $(TARGET)
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-extauth: $(OBJS)
+$(TARGET): $(OBJS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:

@@ -5,18 +5,18 @@ OBJS= ${SRCS:.c=.o}
 TARGET= moraleserv.so
 DISTFILES = $(SRCS) ms.h Makefile ChangeLog
 
-all:	ms
+all:	$(TARGET)
 
 .c.o:
 	$(CC) $(CFLAGS) $(MODINCLUDES) -c $<
 
-ms: $(OBJS)
+$(TARGET): $(OBJS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:
 	$(RM) *.o *.lo *.so
 
-install: ms
+install: $(TARGET)
 	$(INSTALL_MOD) $(TARGET) $(DIRECTORY)/dl
 
 dist:	$(DISTFILES)

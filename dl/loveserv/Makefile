@@ -5,12 +5,12 @@ OBJS= ${SRCS:.c=.o}
 TARGET= loveserv.so
 DISTFILES = $(SRCS) loveserv.h Makefile ChangeLog 
 
-all:	loveserv
+all: $(TARGET)
 
 .c.o:
 	$(CC) $(CFLAGS) $(MODINCLUDES) -c $<
 
-loveserv: $(OBJS)
+$(TARGET): $(OBJS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:

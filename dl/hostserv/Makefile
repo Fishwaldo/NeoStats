@@ -7,12 +7,12 @@ OBJS= ${SRCS:.c=.o}
 TARGET= hostserv.so
 DISTFILES = $(SRCS) hostserv.h Makefile README ChangeLog
 
-all:	hostserv 
+all: $(TARGET)
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-hostserv: $(OBJS)
+$(TARGET): $(OBJS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
 
 clean:
