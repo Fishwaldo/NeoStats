@@ -24,7 +24,6 @@
 #include "neostats.h"
 #include "ircd.h"
 #include "conf.h"
-#include "keeper.h"
 #include "log.h"
 #include "sock.h"
 #include "users.h"
