@@ -33,9 +33,7 @@ const char ss_help_daily_oneline[]="Daily Network Statistics";
 const char ss_help_tld_oneline[]="Show what country a TLD represents";
 const char ss_help_tldmap_oneline[]="Statistics on TLD's";
 const char ss_help_operlist_oneline[]="Show a listing of on-line IRCops";
-#ifdef GOTBOTMODE
 const char ss_help_botlist_oneline[]="Show a listing of on-line BOTS";
-#endif
 const char ss_help_clientversions_oneline[]="Shows you a list of Client Versions";
 const char ss_help_forcehtml_oneline[]="Force an update of the HTML output file";
 const char ss_help_stats_oneline[]="Modify Statistic Entries.";
@@ -189,7 +187,6 @@ const char *ss_help_operlist[] = {
 	NULL
 };
 
-#ifdef GOTBOTMODE
 const char *ss_help_botlist[] = {
 	"Syntax: \2BOTLIST\2",
 	"",
@@ -197,7 +194,6 @@ const char *ss_help_botlist[] = {
 	"(umode +B users)",
 	NULL
 };
-#endif
 
 const char *ss_help_stats[] = {
 	"Syntax: \2STATS LIST\2",

@@ -74,6 +74,35 @@
 #include "ircstring.h"
 #include "events.h"
 
+#define PROTOCOL_NOQUIT		0x00000001	/* NOQUIT */
+#define PROTOCOL_TOKEN		0x00000002	/* TOKEN */
+#define PROTOCOL_SJOIN		0x00000004	/* SJOIN */
+#define PROTOCOL_NICKv2		0x00000008	/* NICKv2 */
+#define PROTOCOL_SJOIN2		0x00000010	/* SJOIN2 */
+#define PROTOCOL_UMODE2		0x00000020	/* UMODE2 */
+#define PROTOCOL_NS			0x00000040	/* NS */
+#define PROTOCOL_ZIP		0x00000080	/* ZIP - not actually supported by NeoStats */
+#define PROTOCOL_VL			0x00000100	/* VL */
+#define PROTOCOL_SJ3		0x00000200	/* SJ3 */
+#define PROTOCOL_VHP		0x00000400	/* Send hostnames in NICKv2 even if not sethosted */
+#define PROTOCOL_SJB64		0x00000800  /* */
+#define PROTOCOL_CLIENT		0x00001000  /* CLIENT */
+#define PROTOCOL_B64SERVER	0x00002000  /* Server names use Base 64 */
+#define PROTOCOL_B64NICK	0x00004000  /* Nick names use Base 64 */
+
+#define FEATURE_SWHOIS		0x00000001	/* SWHOIS */
+#define FEATURE_SVSTIME		0x00000002	/* SVSTIME */
+#define FEATURE_SVSHOST		0x00000004	/* SVSHOST */
+#define FEATURE_SVSJOIN		0x00000008	/* SVSJOIN */
+#define FEATURE_SVSMODE		0x00000010	/* SVSMODE */
+#define FEATURE_SVSPART		0x00000020	/* SVSPART */
+#define FEATURE_SVSNICK		0x00000040	/* SVSNICK */
+#define FEATURE_SVSKILL		0x00000080	/* SVSKILL */
+#define FEATURE_UMODECLOAK  0x00000100	/* auto cloak host with umode */
+#define FEATURE_NICKIP		0x00000200	/* NICK passes IP address */
+#define FEATURE_SMODES		0x00000400	/* Smode field */
+#define FEATURE_BOTMODES	0x00000800	/* Umodes for bots available */
+
 #if UNREAL == 1
 #include "protocol/unreal.h"
 #elif ULTIMATE == 1
@@ -127,24 +156,6 @@
 
 #endif /* TS_MIN */
 
-#define PROTOCOL_NOQUIT	0x00000001	/* NOQUIT */
-#define PROTOCOL_TOKEN	0x00000002	/* TOKEN */
-#define PROTOCOL_SJOIN	0x00000004	/* SJOIN */
-#define PROTOCOL_NICKv2	0x00000008	/* NICKv2 */
-#define PROTOCOL_SJOIN2	0x00000010	/* SJOIN2 */
-#define PROTOCOL_UMODE2	0x00000020	/* UMODE2 */
-#define PROTOCOL_NS		0x00000040	/* NS */
-#define PROTOCOL_ZIP	0x00000080	/* ZIP - not actually supported by NeoStats */
-#define PROTOCOL_VL		0x00000100	/* VL */
-#define PROTOCOL_SJ3	0x00000200	/* SJ3 */
-#define PROTOCOL_VHP	0x00000400	/* Send hostnames in NICKv2 even if not sethosted */
-#define PROTOCOL_SJB64	0x00000800  /* */
-#define PROTOCOL_CLIENT	0x00001000  /* CLIENT */
-#define PROTOCOL_B64SERVER	0x00002000  /* Server names use Base 64 */
-#define PROTOCOL_B64NICK	0x00004000  /* Nick names use Base 64 */
-
-#define FEATURE_SVSTIME	0x00000001	/* SVSTIME */
-
 #include "numeric.h"
 
 #define CONFIG_NAME		"neostats.cfg"
@@ -153,6 +164,13 @@
 #define MOTD_FILENAME	"neostats.motd"
 #define ADMIN_FILENAME	"neostats.admin"
 #define PID_FILENAME	"neostats.pid"
+
+#ifndef BASE64SERVERSIZE
+#define BASE64SERVERSIZE	2
+#endif
+#ifndef BASE64NICKSIZE
+#define BASE64NICKSIZE		5
+#endif
 
 #define BUFSIZE			512
 #ifndef MAXHOST
@@ -633,6 +651,7 @@ typedef struct ModuleEvent {
 
 typedef int ModuleFlags;
 typedef int ModuleProtocol;
+typedef int ModuleFeatures;
 
 /** @brief Module Info structure
  *	This describes the module to the NeoStats core and provides information
@@ -674,12 +693,16 @@ typedef struct ModuleInfo {
 	 * use 0 if not needed */
 	const ModuleFlags flags;
 	/* OPTIONAL: 
-	 * Protocol flags for required protocol specfic features e.g. SETHOST
+	 * Protocol flags for required protocol specfic features e.g. NICKIP
 	 * use 0 if not needed */
 	const ModuleProtocol protocol;
+	/* OPTIONAL: 
+	 * Protocol flags for required protocol specfic features e.g. SETHOST
+	 * use 0 if not needed */
+	const ModuleFeatures features;
 	/* DO NOT USE: 
 	 * Reserved for future expansion */
-	const int padding[6];	
+	const int padding[5];	
 }ModuleInfo;
 
 typedef int (*mod_auth) (User * u);

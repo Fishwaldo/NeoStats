@@ -108,7 +108,7 @@ UserAuthModes user_auth_modes[] = {
 
 const int user_auth_mode_count = ((sizeof (user_auth_modes) / sizeof (user_auth_modes[0])));
 
-#ifdef GOTUSERSMODES
+#if (FEATURES&FEATURE_USERSMODES)
 UserAuthModes user_auth_smodes[] = {
 #ifdef SMODE_NETADMIN
 	{"Network admin",	SMODE_NETADMIN, 190},
@@ -193,7 +193,7 @@ int ModAuthUser(User * u, int curlvl)
 	dlog(DEBUG1, "UmodeAuth: umode level for %s is %d", u->nick, tmplvl);
 	if(tmplvl > curlvl)
 		curlvl = tmplvl;
-#ifdef GOTUSERSMODES
+#if (FEATURES&FEATURE_USERSMODES)
 	/* Check smodes */
 	tmplvl = 0;
 	for (i = 0; i < user_auth_mode_count; i++) {

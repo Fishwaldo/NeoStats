@@ -80,7 +80,7 @@ announce_record(const char *msg, ...)
 {
 	va_list ap;
 
-	if(StatServ.recordalert < 0 || check_interval() < 0) {
+	if(StatServ.recordalert <= 0 || check_interval() < 0) {
 		return;
 	}
 	va_start (ap, msg);
@@ -94,7 +94,7 @@ announce_lag(const char *msg, ...)
 {
 	va_list ap;
 
-	if(StatServ.lagalert < 0 || check_interval() < 0) {
+	if(StatServ.lagalert <= 0 || check_interval() < 0) {
 		return;
 	}
 	va_start (ap, msg);

@@ -32,36 +32,13 @@
 /* #define NEFARIOUS */
 /* #define ASUKA */
 
+#define FEATURES FEATURE_NICKIP
+
 /* Feature support for use by modules to determine whether
  * certain functionality is available
  */
 /* The following defines might not be correct for IRCu but are used to 
  * ensure NeoStats compiles correctly until we get updated files */
-
-/* we don't have vhost support */
-#undef GOTSVSHOST 
-/* we don't have svsjoin */
-#undef GOTSVSJOIN
-/* we don't have svsmode */
-#undef GOTSVSMODE
-/* we don't have svspart */
-#undef GOTSVSPART
-/* we don't have svsnick */
-#undef GOTSVSNICK
-/* we don't have smo */
-#undef GOTSMO
-/* we don't have swhois */
-#undef GOTSWHOIS
-/* we don't have bot mode support */
-#undef GOTBOTMODE
-/* we don't have user smode support */
-#undef GOTUSERSMODES
-/* we don't have svskill support */
-#undef GOTSVSKILL
-/* we don't have automatic host cloaking support via Umode */
-#undef GOTUMODECLOAKING
-/* we have nickip support */
-#define GOTNICKIP
 
 /* Override NeoStats core parse function */
 #define IRCD_PARSE

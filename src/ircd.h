@@ -40,6 +40,12 @@ typedef struct ChanModes {
 	char sjoin;
 } ChanModes;
 
+typedef struct ChanUserModes {
+	long mode;
+	char flag;
+	char sjoin;
+} ChanUserModes;
+
 typedef struct {
 	unsigned long umode;
 	char mode;
@@ -60,13 +66,12 @@ typedef struct ircd_server {
 } ircd_server;
 
 extern UserModes user_umodes[];
-#ifdef GOTUSERSMODES
 extern UserModes user_smodes[];
-#endif
 
 extern ircd_server ircd_srv;
 extern ircd_cmd cmd_list[];
 extern ChanModes chan_modes[];
+extern ChanUserModes chan_user_modes[];
 extern const int ircd_cmdcount;
 extern const int ircd_umodecount;
 extern const int ircd_smodecount;
@@ -108,7 +113,7 @@ void do_nick (const char *nick, const char *hopcount, const char *TS,
 		const char *user, const char *host, const char *server, 
 		const char *ip, const char *servicestamp, const char *modes, 
 		const char *vhost, const char *realname, const char *numeric
-#ifdef GOTUSERSMODES
+#if (FEATURES&FEATURE_USERSMODES)
 		, const char *smodes
 #endif
 		 );

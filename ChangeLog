@@ -4,6 +4,12 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Remove hard coded protocol/feature references in StatServ and HostServ. 
+   These are depreciated by the new soft protocol design and will use the new
+   protocol/feature references in the ModuleInfo struct where required. (M)
+ - Begin replacing old #define GOTFEATURE with new FEATURE and PROTOCOL systems
+   as part of soft protocol support. Currently it is still "hard" coded but 
+   will eventually move to the soft support system (M)
  - Replace spart_cmd with part_bot_from_chan function (M)
  - Add BANDUMP command to display ban table (M)
  - Remove debugtochannel and optimise code path of functions using it (M)

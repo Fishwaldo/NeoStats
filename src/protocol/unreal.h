@@ -28,32 +28,17 @@
  * certain functionality is available
  */
 
-/* we have vhost support */
-#define GOTSVSHOST 
-/* we have svsmode */
-#define GOTSVSMODE
-/* we have svspart */
-#define GOTSVSPART
-/* we have svsjoin */
-#define GOTSVSJOIN
-/* we have svsnick */
-#define GOTSVSNICK
-/* we have smo */
-#define GOTSMO
-/* we have swhois */
-#define GOTSWHOIS
-/* we have bot mode support */
-#define GOTBOTMODE
-/* we don't have user smode support */
-#undef GOTUSERSMODES
-/* we have svskill support */
-#define GOTSVSKILL
-/* we have automatic host cloaking support via Umode */
-#define GOTUMODECLOAKING
-/* we dont have a nickip field in the nick message */
-#undef GOTNICKIP
-
-
+#define FEATURES FEATURE_SVSHOST \
+	| FEATURE_SMO \
+	| FEATURE_SWHOIS \
+	| FEATURE_SVSTIME \
+	| FEATURES_SVSJOIN \
+	| FEATURES_SVSPART \
+	| FEATURES_SVSMODE \
+	| FEATURES_SVSNICK \
+	| FEATURES_SVSKILL \
+	| FEATURE_BOTMODES \
+	| FEATURE_UMODECLOAK
 
 
 /* buffer sizes */

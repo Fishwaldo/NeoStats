@@ -40,11 +40,16 @@
 
 ircd_server ircd_srv;
 
+#if !(FEATURES&FEATURE_SMODES)
+const int ircd_smodecount = 0;
+UserModes user_smodes[] = {
+	{0, '0'},
+};
+#endif
+
 static char ircd_buf[BUFSIZE];
 static char UmodeStringBuf[64];
-#ifdef GOTUSERSMODES
 static char SmodeStringBuf[64];
-#endif
 long service_umode_mask= 0;
 
 /** @brief InitIrcd
@@ -128,7 +133,6 @@ UmodeStringToMask(const char* UmodeString, long Umode)
 	return(Umode);
 }
 
-#ifdef GOTUSERSMODES
 /** @brief SmodeMaskToString
  *
  *  Translate a smode mask to the string equivalent
@@ -192,7 +196,6 @@ SmodeStringToMask(const char* SmodeString, long Smode)
 	}
 	return(Smode);
 }
-#endif
 
 /** @brief join_bot_to_chan
  *
@@ -274,7 +277,7 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 int 
 CloakHost (Bot *bot_ptr)
 {
-#ifdef GOTUMODECLOAKING
+#if (FEATURES&FEATURE_UMODECLOAK)
 	sumode_cmd (bot_ptr->nick, bot_ptr->nick, UMODE_HIDE);
 	return NS_SUCCESS;	
 #else
@@ -1015,7 +1018,7 @@ ssvskill_cmd (const char *target, const char *reason, ...)
 	va_start (ap, reason);
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
-#ifdef GOTSVSKILL
+#if (FEATURES&FEATURE_SVSKILL)
 	send_svskill (me.name, target, ircd_buf);
 #else
 	send_kill (me.name, target, ircd_buf);
@@ -1027,12 +1030,12 @@ ssvskill_cmd (const char *target, const char *reason, ...)
 int 
 ssvstime_cmd (const time_t ts)
 {
-	if(ircd_features & FEATURE_SVSTIME) {
-		send_svstime(me.name, (unsigned long)ts);
-		nlog (LOG_NOTICE, "ssvstime_cmd: synching server times to %lu", ts);
-	} else {
-		unsupported_cmd("SVSTIME");
-	}
+#if(FEATURES & FEATURE_SVSTIME) 
+	send_svstime(me.name, (unsigned long)ts);
+	nlog (LOG_NOTICE, "ssvstime_cmd: synching server times to %lu", ts);
+#else
+	unsupported_cmd("SVSTIME");
+#endif
 	return NS_SUCCESS;
 }
 
@@ -1054,7 +1057,7 @@ sinvite_cmd (const char *from, const char *to, const char *chan)
 int
 ssvsmode_cmd (const char *target, const char *modes)
 {
-#ifdef GOTSVSMODE
+#if (FEATURES&FEATURE_SVSMODE)
 	User *u;
 
 	u = finduser (target);
@@ -1073,7 +1076,7 @@ ssvsmode_cmd (const char *target, const char *modes)
 int
 ssvshost_cmd (const char *target, const char *vhost)
 {
-#ifdef GOTSVSHOST 
+#if (FEATURES & FEATURE_SVSHOST)
 	User *u;
 
 	u = finduser (target);
@@ -1093,7 +1096,7 @@ ssvshost_cmd (const char *target, const char *vhost)
 int
 ssvsjoin_cmd (const char *target, const char *chan)
 {
-#ifdef GOTSVSJOIN 
+#if (FEATURES&FEATURE_SVSJOIN)
 	send_svsjoin (me.name, target, chan);
 #else
 	unsupported_cmd("SVSJOIN");
@@ -1104,7 +1107,7 @@ ssvsjoin_cmd (const char *target, const char *chan)
 int
 ssvspart_cmd (const char *target, const char *chan)
 {
-#ifdef GOTSVSPART
+#if (FEATURES&FEATURE_SVSPART)
 	send_svspart (me.name, target, chan);
 #else
 	unsupported_cmd("SVSPART");
@@ -1115,7 +1118,7 @@ ssvspart_cmd (const char *target, const char *chan)
 int
 sswhois_cmd (const char *target, const char *swhois)
 {
-#ifdef GOTSWHOIS
+#if (FEATURES&FEATURE_SWHOIS)
 	send_swhois (me.name, target, swhois);
 #else
 	unsupported_cmd("SWHOIS");
@@ -1126,7 +1129,7 @@ sswhois_cmd (const char *target, const char *swhois)
 int
 ssvsnick_cmd (const char *target, const char *newnick)
 {
-#ifdef GOTSVSNICK
+#if (FEATURES&FEATURE_SVSNICK)
 	send_svsnick (me.name, target, newnick, me.now);
 #else
 	unsupported_cmd("SVSNICK");
@@ -1137,7 +1140,7 @@ ssvsnick_cmd (const char *target, const char *newnick)
 int
 ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
 {
-#ifdef GOTSMO
+#if(FEATURES & FEATURE_SMO) 
 	send_smo (from, umodetarget, msg);
 #else
 	unsupported_cmd("SMO");
@@ -1360,7 +1363,7 @@ do_nick (const char *nick, const char *hopcount, const char* TS,
 		 const char *user, const char *host, const char *server, 
 		 const char *ip, const char *servicestamp, const char *modes, 
 		 const char *vhost, const char *realname, const char *numeric
-#ifdef GOTUSERSMODES
+#if (FEATURES&FEATURE_USERSMODES)
 		 , const char *smodes
 #endif
 		 )
@@ -1376,7 +1379,7 @@ do_nick (const char *nick, const char *hopcount, const char* TS,
 	if(vhost) {
 		SetUserVhost(nick, vhost);
 	}
-#ifdef GOTUSERSMODES
+#if (FEATURES&FEATURE_USERSMODES)
 	if(smodes) {
 		UserSMode (nick, smodes);
 	}
@@ -1401,11 +1404,9 @@ do_client (const char *nick, const char *arg1, const char *TS,
 	if(vhost) {
 		SetUserVhost(nick, vhost);
 	}
-#ifdef GOTUSERSMODES
 	if(smodes) {
 		UserSMode (nick, smodes);
 	}
-#endif		
 }
 
 void
@@ -1453,13 +1454,11 @@ do_vctrl (const char* uprot, const char* nicklen, const char* modex, const char*
 }
 #endif
 
-#ifdef GOTUSERSMODES
 void 
 do_smode (const char* nick, const char* modes)
 {
 	UserSMode (nick, modes);
 }
-#endif
 
 void 
 do_mode_user (const char* nick, const char* modes)

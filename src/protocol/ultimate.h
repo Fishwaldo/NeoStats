@@ -31,49 +31,19 @@
 
 #ifdef ULTIMATE3
 
-/* we have vhost support */
-#define GOTSVSHOST 
-/* we have svsjoin from a30 onwards */
-#define GOTSVSJOIN
-/* we don't have svsmode */
-#undef GOTSVSMODE
-/* we have svsnick */
-#define GOTSVSNICK
-/* we don't have bot mode support */
-#undef GOTBOTMODE
-/* we do have user smode support */
-#define GOTUSERSMODES
-/* we have svskill support */
-#define GOTSVSKILL
-/* we don't have automatic host cloaking support via Umode */
-#undef GOTUMODECLOAKING
-/* we dont have a nickip field in the nick message */
-#define GOTNICKIP
+#define FEATURES FEATURE_SVSHOST \
+	| FEATURE_SMODES \
+	| FEATURE_NICKIP \
+	| FEATURES_SVSJOIN \
+	| FEATURES_SVSNICK \
+	| FEATURES_SVSKILL 
 
 #else /* !ULTIMATE3 */
 
-/* we have vhost support */
-#define GOTSVSHOST 
-/* old Ultimate2 doesn't have svsjoin */
-#undef GOTSVSJOIN
-/* we don't have svsmode */
-#undef GOTSVSMODE
-/* we have svspart */
-#define GOTSVSPART
-/* we have svsnick */
-#define GOTSVSNICK
-/* we don't have smo */
-#undef GOTSMO
-/* we don't have swhois */
-#undef GOTSWHOIS
-/* we have bot mode support */
-#define GOTBOTMODE
-/* we don't have user smode support */
-#undef GOTUSERSMODES
-/* we don't have automatic host cloaking support via Umode */
-#undef GOTUMODECLOAKING
-/* we dont have a nickip field in the nick message */
-#undef GOTNICKIP
+#define FEATURES FEATURE_SVSHOST \
+	| FEATURES_SVSPART \
+	| FEATURES_SVSNICK \
+	| FEATURE_BOTMODES
 
 #endif /* ULTIMATE3 */
 
@@ -441,7 +411,7 @@
 #define UMODE_HELPOP	 	0x0010	/* Help system operator */
 #define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
 #define UMODE_SERVICESOPER	0x0040	/* Services Oper */
-#define UMODE_ADMIN	 	0x0080	/* Admin */
+#define UMODE_ALTADMIN	 	0x0080	/* Admin */
 #define UMODE_SERVNOTICE 	0x0100	/* server notices such as kill */
 #define UMODE_LOCOP      	0x0200	/* Local operator -- SRB */
 #define UMODE_KILLS	 	0x0400	/* Show server-kills... */

@@ -35,9 +35,7 @@ static int ss_daily(CmdParams* cmdparams);
 static int ss_stats(CmdParams* cmdparams);
 static int ss_tld_map(CmdParams* cmdparams);
 static int ss_operlist(CmdParams* cmdparams);
-#ifdef GOTBOTMODE
 static int ss_botlist(CmdParams* cmdparams);
-#endif
 static int ss_server(CmdParams* cmdparams);
 static int ss_map(CmdParams* cmdparams);
 static int ss_netstats(CmdParams* cmdparams);
@@ -119,9 +117,7 @@ static bot_cmd ss_commands[]=
 	{"DAILY",			ss_daily,		0, 	0,		ss_help_daily, 		 	ss_help_daily_oneline},
 	{"TLDMAP",			ss_tld_map,		0, 	0,		ss_help_tldmap, 	 	ss_help_tldmap_oneline},
 	{"OPERLIST",		ss_operlist,	0, 	0,		ss_help_operlist, 	 	ss_help_operlist_oneline},
-#ifdef GOTBOTMODE																	
 	{"BOTLIST",			ss_botlist,		0, 	0,		ss_help_botlist, 	 	ss_help_botlist_oneline},
-#endif																						
 	{"CLIENTVERSIONS",	ss_clientversions,	0,	0,		ss_help_clientversions, ss_help_clientversions_oneline},
 	{"FORCEHTML",		ss_forcehtml,	0, 	NS_ULEVEL_ADMIN,	ss_help_forcehtml, 		ss_help_forcehtml_oneline},
 	{"STATS",			ss_stats,		1, 	NS_ULEVEL_ADMIN,	ss_help_stats, 			ss_help_stats_oneline},
@@ -808,7 +804,6 @@ static int ss_operlist(CmdParams* cmdparams)
 	return 1;
 }
 
-#ifdef GOTBOTMODE
 static void botlist(User* u)
 {
 	if is_bot(u) { 
@@ -828,7 +823,6 @@ static int ss_botlist(CmdParams* cmdparams)
 	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of Listing.");
 	return 1;
 }
-#endif
 
 static int ss_stats(CmdParams* cmdparams)
 {

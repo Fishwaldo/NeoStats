@@ -73,9 +73,7 @@ static char msg_bot[]="\2\00313%s\2 is \2%s\2 a \2Bot\2 (%c%c)\003";
 static int cs_event_online(CmdParams* cmdparams);
 static int cs_event_signon(CmdParams* cmdparams);
 static int cs_event_umode(CmdParams* cmdparams);
-#ifdef GOTUSERSMODES
 static int cs_event_smode(CmdParams* cmdparams);
-#endif
 static int cs_event_quit(CmdParams* cmdparams);
 static int cs_event_kill(CmdParams* cmdparams);
 static int cs_event_nick(CmdParams* cmdparams);
@@ -146,9 +144,7 @@ ModuleEvent module_events[] = {
 	{EVENT_ONLINE,	cs_event_online},
 	{EVENT_SIGNON,	cs_event_signon},
 	{EVENT_UMODE,	cs_event_umode},
-#ifdef GOTUSERSMODES
 	{EVENT_SMODE,	cs_event_smode},
-#endif
 	{EVENT_QUIT,	cs_event_quit},
 	{EVENT_KILL,	cs_event_kill},
 	{EVENT_NICK,	cs_event_nick},
@@ -371,8 +367,7 @@ static int cs_event_umode(CmdParams* cmdparams)
 	return 1;
 }
 
-#ifdef GOTUSERSMODES
-/* smode support for Ultimate3 */
+/* smode support */
 static int cs_event_smode(CmdParams* cmdparams)
 {
 	int add = 1;
@@ -440,7 +435,6 @@ static int cs_event_smode(CmdParams* cmdparams)
 	}
 	return 1;
 }
-#endif
 
 /* 
  * Echo kills

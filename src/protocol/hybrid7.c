@@ -24,6 +24,7 @@
 #include "neostats.h"
 #include "ircd.h"
 #include "hybrid7.h"
+#include "services.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);

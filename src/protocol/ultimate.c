@@ -223,7 +223,7 @@ UserModes user_umodes[] = {
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
-#ifdef GOTUSERSMODES
+#ifdef ULTIMATE3
 const int ircd_smodecount = ((sizeof (user_smodes) / sizeof (user_smodes[0])));
 #endif
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));

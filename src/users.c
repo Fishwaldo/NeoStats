@@ -57,7 +57,8 @@ new_user (const char *nick)
 	hash_insert (userhash, un, u->nick);
 	return u;
 }
-#ifndef GOTNICKIP
+
+#if !(FEATURES&FEATURE_NICKIP)
 static void lookupnickip(char *data, adns_answer *a) 
 {
 	CmdParams * cmdparams;
@@ -80,7 +81,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	CmdParams * cmdparams;
 	unsigned long ipaddress = 0;
 	User *u;
-#ifndef GOTNICKIP
+#if !(FEATURES&FEATURE_NICKIP)
 	struct in_addr *ipad;
 	int res;
 #endif
@@ -93,7 +94,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	}
 	if(ip) {
 		ipaddress = strtoul (ip, NULL, 10);
-#ifndef GOTNICKIP
+#if !(FEATURES&FEATURE_NICKIP)
 	} else if (me.want_nickip == 1) {
 		/* first, if the u->host is a ip address, just convert it */
 		ipad = smalloc(sizeof(struct in_addr));
@@ -351,13 +352,11 @@ void *display_vhost(void *tbl, char *col, char *sql, void *row)
 #endif
 }
 
-#ifdef GOTUSERSMODES
 void *display_smode(void *tbl, char *col, char *sql, void *row) 
 {
 	User *data = row;
 	return SmodeMaskToString(data->Smode);
 }
-#endif
 
 static char userschannellist[MAXCHANLIST];
 
@@ -453,7 +452,6 @@ COLDEF neo_userscols[] = {
 		NULL,
 		"the users umodes. Does not include SMODES."
 	},
-#ifdef GOTUSERSMODES
 	{	
 		"users",
 		"smodes",
@@ -465,7 +463,6 @@ COLDEF neo_userscols[] = {
 		NULL,
 		"the users Smodes, if the IRCd supports it.  Does not include UMODES."
 	},
-#endif
 	{	
 		"users",
 		"connected",
@@ -580,9 +577,7 @@ dumpuser (User* u)
 	chanalert (ns_botptr->nick, "Vhost:    %s", u->vhost);
 	chanalert (ns_botptr->nick, "Flags:    0x%lx", u->flags);
 	chanalert (ns_botptr->nick, "Modes:    %s (0x%lx)", UmodeMaskToString(u->Umode), u->Umode);
-#ifdef GOTUSERSMODES
 	chanalert (ns_botptr->nick, "Smodes:   %s (0x%lx)", SmodeMaskToString(u->Smode), u->Smode);
-#endif
 	if(u->is_away) {
 		chanalert (ns_botptr->nick, "Away:     %s", u->awaymsg);
 	}
@@ -700,7 +695,6 @@ UserMode (const char *nick, const char *modes)
 	sfree (cmdparams);
 }
 
-#ifdef GOTUSERSMODES
 void
 UserSMode (const char *nick, const char *modes)
 {
@@ -718,11 +712,10 @@ UserSMode (const char *nick, const char *modes)
 	dlog(DEBUG1, "UserSMode: smode for %s is now %p", u->nick, (int *)u->Smode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.user = u;	
-	cmdparams->param = modes;
+	cmdparams->param = (char*)modes;
 	SendAllModuleEvent (EVENT_SMODE, cmdparams);
 	sfree (cmdparams);
 }
-#endif
 
 void SetUserServicesTS(const char* nick, const char* ts) 
 {

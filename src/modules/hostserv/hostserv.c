@@ -28,11 +28,6 @@
 #include "neostats.h"
 #include "hostserv.h"
 
-/* hostserv doesn't work on Hybrid, Echo an error and exit the compile */
-#ifndef GOTSVSHOST 
-#error "Error: This IRCd doesn't support changing a users host. This module will not compile"
-#endif
-
 #define MAXPASSWORD	30
 
 #define BANBUFSIZE	4096
@@ -125,6 +120,7 @@ ModuleInfo module_info = {
 	__TIME__,
 	0,
 	0,
+	FEATURE_SVSHOST,
 };
 
 static bot_cmd hs_commands[]=

@@ -199,9 +199,7 @@ extern const char *ss_help_daily[];
 extern const char *ss_help_tld[];
 extern const char *ss_help_tldmap[];
 extern const char *ss_help_operlist[];
-#ifdef GOTBOTMODE
 extern const char *ss_help_botlist[];
-#endif
 extern const char *ss_help_stats[];
 extern const char *ss_help_htmlstats[];
 extern const char *ss_help_forcehtml[];
@@ -224,9 +222,7 @@ extern const char ss_help_daily_oneline[];
 extern const char ss_help_tld_oneline[];
 extern const char ss_help_tldmap_oneline[];
 extern const char ss_help_operlist_oneline[];
-#ifdef GOTBOTMODE
 extern const char ss_help_botlist_oneline[];
-#endif
 extern const char ss_help_clientversions_oneline[];
 extern const char ss_help_forcehtml_oneline[];
 extern const char ss_help_stats_oneline[];

@@ -33,9 +33,7 @@ void SetUserVhost (const char* nick, const char* vhost);
 void SetUserServicesTS (const char* nick, const char* ts);
 int UserNick (const char * oldnick, const char * newnick, const char * ts);
 void UserMode (const char *nick, const char *modes);
-#ifdef GOTUSERSMODES
 void UserSMode (const char *nick, const char *modes);
-#endif
 void UserAway (const char *nick, const char *awaymsg);
 User *finduserbase64 (const char *num);
 void UserDump (const char *nick);
