@@ -2,7 +2,7 @@ SUBDIRS = dbm protocol
 
 bin_PROGRAMS = neostats
 
-neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
+neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c nsdba.c \
 		dl.c dns.c dotconf.c exclude.c hash.c ircd.c ircstring.c \
 		keeper.c lang.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
