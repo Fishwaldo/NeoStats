@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Change module processing so we can have debug versions of DLLs. (M)
  - New Client struct introduced which contains common elememts of Server and
    User structs. Server and User specifics remain as substructs of Client. This
    makes for simpler coding for the more common elements and allows us to 

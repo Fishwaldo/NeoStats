@@ -333,7 +333,7 @@ load_module (const char *modfilename, Client * u)
 	}
 	strlcpy (loadmodname, modfilename, 255);
 	strlwr (loadmodname);
-	ircsnprintf (path, 255, "%s/%s.%s", MOD_PATH, loadmodname, MOD_EXT);
+	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_EXT);
 	dl_handle = ns_dlopen (path, RTLD_NOW || RTLD_GLOBAL);
 	if (!dl_handle) {
 		if (do_msg) {

@@ -114,7 +114,7 @@ InitIrcdSymbols (void)
 {
 	static char protocol_name[MAXHOST];
   
-	ircsnprintf (protocol_name, 255, "%s/%s.%s", MOD_PATH, me.protocol,MOD_EXT);
+	ircsnprintf (protocol_name, 255, "%s/%s%s", MOD_PATH, me.protocol,MOD_EXT);
 	protocol_module_handle = ns_dlopen(protocol_name, RTLD_NOW || RTLD_GLOBAL);
 	if(!protocol_module_handle) {
 		printf ("\nERROR: Unable to load protocol module %s\n", protocol_name);

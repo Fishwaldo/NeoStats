@@ -51,9 +51,14 @@
 #endif
 
 #ifdef WIN32
-#define MOD_EXT	"dll"
+#ifndef NDEBUG
+/* The extra d in debug mode uses debug versions of DLLs */
+#define MOD_EXT	"d.dll"
 #else
-#define MOD_EXT	"so"
+#define MOD_EXT	".dll"
+#endif
+#else
+#define MOD_EXT	".so"
 #endif
 
 /* 
