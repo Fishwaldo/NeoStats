@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.63 2003/08/07 12:31:43 fishwaldo Exp $
+** $Id: dl.c,v 1.64 2003/08/18 15:20:21 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -321,7 +321,8 @@ bot_chan_message (char *origin, char *chan, char **av, int ac)
 	Mod_User *u;
 	cbn = hash_lookup (bch, chan);
 	if (!cbn) {
-		nlog (LOG_WARNING, LOG_CORE, "eeeh, Can't find channel %s for BotChanMessage", chan);
+		/* this isn't bad, just means our bot parted the channel? */
+		nlog (LOG_DEBUG1, LOG_CORE, "eeeh, Can't find channel %s for BotChanMessage", chan);
 		return;
 	}
 	bc = hnode_get (cbn);

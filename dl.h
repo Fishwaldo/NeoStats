@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.h,v 1.29 2003/08/07 12:31:43 fishwaldo Exp $
+** $Id: dl.h,v 1.30 2003/08/18 15:20:21 fishwaldo Exp $
 */
 
 
@@ -163,4 +163,5 @@ extern void add_bot_to_chan (char *, char *);
 extern void del_bot_from_chan (char *, char *);
 extern void bot_chan_message (char *origin, char *chan, char **av, int ac);
 extern void botchandump (User * u);
+extern int get_mod_num (char *);
 #endif /* !_dl_h_ */

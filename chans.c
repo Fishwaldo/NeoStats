@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.50 2003/08/07 15:08:55 fishwaldo Exp $
+** $Id: chans.c,v 1.51 2003/08/18 15:20:21 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -635,7 +635,6 @@ join_chan (User * u, char *chan)
 		Module_Event ("NEWCHAN", av, ac);
 		free (av);
 		ac = 0;
-//              FreeList(av, ac);
 	}
 	/* add this users details to the channel members hash */
 	cm = smalloc (sizeof (Chanmem));
@@ -673,9 +672,9 @@ join_chan (User * u, char *chan)
 	AddStringToList (&av, u->nick, &ac);
 	Module_Event ("JOINCHAN", av, ac);
 	free (av);
-//      FreeList(av, ac);
 	nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %d (list %d)", c->name, c->cur_users, list_count (c->chanmembers));
 	if (findbot (u->nick)) {
+		nlog(LOG_DEBUG3, LOG_CORE, "Joining bot %s to Channel %s", u->nick, c->name);
 		add_bot_to_chan (u->nick, c->name);
 	}
 }
