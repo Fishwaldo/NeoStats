@@ -580,7 +580,12 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 					m->mode = cFlagTab[i].mode;
 					strcpy(m->param, argv[j]);										
 					mn = lnode_create(m);
-					list_append(tl, mn);
+					if (!list_isfull(tl)) {
+						list_append(tl, mn);
+					} else {
+						log("Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
+						assert(0);
+					}
 					j++;
 				} else {
 					mode1 |= cFlagTab[i].mode;
@@ -618,7 +623,13 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 	c = findchan(argv[1]);
 	c->modes = mode1;
 	if (!list_isempty(tl)) {
-		list_transfer(c->modeparms, tl, list_first(tl));
+		if (!list_isfull(c->modeparms)) {
+			list_transfer(c->modeparms, tl, list_first(tl));
+		} else {
+			/* eeeeeeek, list is full! */
+			log("Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
+			assert(0);
+		}
 	}
 	list_destroy(tl);
 }

@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <sys/resource.h>
 #include <setjmp.h>
+#include <assert.h>
 #include "list.h"
 #include "hash.h"
 #include "config.h"
@@ -67,7 +68,7 @@
 #define MAXJOINCHANS	1000
 #define T_TABLE_SIZE	100 /* Number of Timers */
 #define B_TABLE_SIZE	100 /* Number of Bots */
-#define MAXMODES	50
+#define MAXMODES	CHAN_MEM_SIZE
 #define bzero(x, y)		memset(x, '\0', y);
 
 int servsock;

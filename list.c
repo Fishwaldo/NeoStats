@@ -14,7 +14,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: list.c,v 1.4 2002/03/17 12:54:16 fishwaldo Exp $
+ * $Id: list.c,v 1.5 2002/05/21 04:57:36 fishwaldo Exp $
  * $Name:  $
  */
 
@@ -45,7 +45,7 @@
 #define lnode_prev(N)		((N)->prev)
 
 #ifdef KAZLIB_RCSID
-static const char rcsid[] = "$Id: list.c,v 1.4 2002/03/17 12:54:16 fishwaldo Exp $";
+static const char rcsid[] = "$Id: list.c,v 1.5 2002/05/21 04:57:36 fishwaldo Exp $";
 #endif
 
 /*
@@ -754,20 +754,23 @@ int list_verify(list_t *list)
     lnode_t *node = list_first_priv(list), *nil = list_nil(list);
     listcount_t count = list_count(list);
 
-    if (node->prev != nil)
+    if (node->prev != nil) {
 	return 0;
-
-    if (count > list->maxcount)
+    }
+    if (count > list->maxcount) {
 	return 0;
+    }
 
     while (node != nil && count--) {
-	if (node->next->prev != node)
+	if (node->next->prev != node) {
 	    return 0;
+        }
 	node = node->next;
     }
 
-    if (count != 0 || node != nil)
+    if (count != 0 || node != nil) {
 	return 0;
+    }
     
     return 1;
 }
