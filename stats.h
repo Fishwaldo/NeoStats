@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.92 2003/09/18 12:21:32 fishwaldo Exp $
+** $Id: stats.h 581 2003-09-20 08:44:59Z Fish $
 */
 
 #ifndef STATS_H

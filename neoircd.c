@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.24 2003/09/17 14:49:55 fishwaldo Exp $
+** $Id: neoircd.c 581 2003-09-20 08:44:59Z Fish $
 */
 
 #include "stats.h"

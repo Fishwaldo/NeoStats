@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.141 2003/09/18 12:21:32 fishwaldo Exp $
+** $Id: ircd.c 581 2003-09-20 08:44:59Z Fish $
 */
 #include <setjmp.h>
 #include "stats.h"

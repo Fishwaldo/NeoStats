@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.h,v 1.3 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: ircd.h 581 2003-09-20 08:44:59Z Fish $
 */
 #ifndef IRCD_H
 #define IRCD_H

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: mystic.h,v 1.5 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: mystic.h 581 2003-09-20 08:44:59Z Fish $
 */
 #ifndef MYSTIC_H
 #define MYSTIC_H

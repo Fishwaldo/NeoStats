@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.62 2003/09/18 12:21:32 fishwaldo Exp $
+** $Id: users.c 581 2003-09-20 08:44:59Z Fish $
 */
 
 #include <fnmatch.h>

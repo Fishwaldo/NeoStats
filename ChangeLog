@@ -12,6 +12,9 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Some Cleanups suggested by Mark
  - Update Config script
  - Fixed ConnectServ nickwatch being Fubar (BugID 49)
+ - We now moved to SubVersion and moved the repository to http://svn.neostats.net/ Check the homepage out for more details
+ - Removed OperMe from svn repository
+ - Updated Keeper to make sure it only writes files out that are readable by us
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number
