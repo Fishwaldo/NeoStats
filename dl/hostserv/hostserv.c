@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.20 2002/10/22 06:22:16 shmad Exp $
+** $Id: hostserv.c,v 1.21 2002/10/24 20:53:55 shmad Exp $
 */
 
 #include <stdio.h>
@@ -116,7 +116,7 @@ static int hs_sign_on(char **av, int ac) {
           tmp = strlower(map->host);
 	  tmp2 = strlower(u->hostname);
 		  if (fnmatch(tmp, tmp2, 0) == 0) {
-              ssvshost_cmd(u->nick, map->host);
+              ssvshost_cmd(u->nick, map->vhost);
               return 1;
            }
        }
