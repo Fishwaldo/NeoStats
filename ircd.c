@@ -1035,6 +1035,13 @@ do_protocol (char *origin, char **argv, int argc)
 			ircd_srv.noquit = 1;
 		}
 #endif
+#if 0
+#ifdef UNREAL32
+		if (!ircstrcasecmp ("NICKIP", argv[i])) {
+			ircd_srv.nickip = 1;
+		}
+#endif
+#endif
 	}
 }
 
@@ -1659,7 +1666,7 @@ do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, co
 	ircd_srv.maxglobalcnt = atoi (maxglobalcnt);
 	ircd_srv.tsendsync = atoi (tsendsync);
 	ircd_srv.uprot = atoi (prot);
-	strlcpy (ircd_srv.cloak, cloak, 35);
+	strlcpy (ircd_srv.cloak, cloak, CLOAKKEYLEN);
 	strlcpy (me.netname, netname, MAXPASS);
 	send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
@@ -1674,7 +1681,7 @@ void
 do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname)
 {
 	ircd_srv.uprot = atoi (prot);
-	strlcpy (ircd_srv.cloak, cloak, 35);
+	strlcpy (ircd_srv.cloak, cloak, CLOAKKEYLEN);
 	strlcpy (me.netname, netname, MAXPASS);
 	send_snetinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();

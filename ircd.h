@@ -55,8 +55,9 @@ typedef struct ircd_server {
 	int modex;
 	int nicklen;
 	int gc;
+	int nickip;
 	/* unreal cloak keys are md5, so we need at least 34+1 */
-	char cloak[35];
+	char cloak[CLOAKKEYLEN];
 	int maxglobalcnt;
 	int tsendsync;
 	unsigned int token:1;

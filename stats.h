@@ -189,6 +189,9 @@
 #define MAXCMDSIZE		15
 #define MAXINFO			128
 #define B64SIZE			16
+#ifndef CLOAKKEYLEN		
+#define CLOAKKEYLEN		40
+#endif
 
 
 /* MAXCHANLIST

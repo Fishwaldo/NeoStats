@@ -585,14 +585,22 @@ m_away (char *origin, char **argv, int argc, int srv)
  *  argv[7] = umodes
  *  argv[8] = virthost, * if none
  *  argv[9] = info
+ * if NICKIP
+ *  argv[9] = nickip
+ *  argv[10] = info
  */
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 #ifdef NICKV2	
-		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
-			NULL, argv[6], argv[7], argv[8], argv[9], NULL);
+		if (ircd_srv.nickip) {
+			do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+				NULL /* NICKIP */, argv[6], argv[7], argv[8], argv[9], NULL);
+		} else {
+			do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+				NULL, argv[6], argv[7], argv[8], argv[9], NULL);
+		}		
 #else
 		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
 			NULL, argv[6], NULL, NULL, argv[9], NULL);
