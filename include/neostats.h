@@ -62,7 +62,7 @@
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
-#if 1
+#ifndef WIN32
 #include <sys/resource.h>
 #endif
 #ifdef HAVE_TIME_H
@@ -110,10 +110,6 @@
 #define EXPORTVAR
 #define EXPORTFUNC
 #include "version.h"
-#endif
-
-#ifdef HAVE_DB_H
-/*#define USE_BERKELEY*/
 #endif
 
 /* so our defines for _(x) are not active */
@@ -1213,7 +1209,7 @@ EXPORTFUNC int validate_nick (char* nick);
 EXPORTFUNC int validate_user (char* user);
 EXPORTFUNC int validate_host (char* host);
 
-#ifdef USE_BERKELEY
+#ifdef HAVE_DB_H
 EXPORTFUNC int DBOpenDatabase(void);
 EXPORTFUNC void DBCloseDatabase(void);
 EXPORTFUNC void* DBGetData(char* key);

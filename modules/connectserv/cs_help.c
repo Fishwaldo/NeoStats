@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-#include <stdio.h>
+#include "neostats.h"
 
 const char *cs_about[] = {
 	"\2ConnectServ\2 is designed to track users signing on and",

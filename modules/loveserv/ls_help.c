@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-#include <stdio.h>
+#include "neostats.h"
 
 const char ls_help_rose_oneline[]="Give someone a rose";
 const char ls_help_kiss_oneline[]="Give someone a kiss";

@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-#include <stdio.h>
+#include "neostats.h"
 
 const char hs_help_login_oneline[] ="Login to HostServ";
 const char hs_help_chpass_oneline[] ="Change password for a vhost";

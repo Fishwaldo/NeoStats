@@ -23,7 +23,7 @@
 
 #include "neostats.h"
 
-#ifdef USE_BERKELEY
+#ifdef HAVE_DB_H
 #include <db.h>
 
 static DBT dbkey;
@@ -99,4 +99,4 @@ void DBSetData(char* key, void* data, int size)
 	}
 }
 
-#endif /* USE_BERKELEY */
+#endif /* HAVE_DB_H */

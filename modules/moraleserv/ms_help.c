@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-#include <stdio.h>
+#include "neostats.h"
 
 const char ms_help_hail_oneline[]="Hail someone on IRC";
 const char ms_help_ode_oneline[]="Send an ODE to someone on IRC";
