@@ -325,7 +325,7 @@ int del_all_bot_cmds (Bot* bot_ptr)
  */
 int add_services_cmd_list (bot_cmd *bot_cmd_list) 
 {
-	if (!GET_CUR_MODULE()->synched)
+	if (!GET_CUR_MODULE()->insynch)
 	{
 		GET_CUR_MODULE()->error = 1;
 		return NS_FAILURE;

@@ -1127,6 +1127,9 @@ irc_chanusermode (const Bot *botptr, const char *chan, const char *mode, const c
 int
 irc_quit (const Bot * botptr, const char *quitmsg)
 {
+	if (!botptr) {
+		return NS_FAILURE;
+	}
 	irc_send_quit (botptr->u->name, quitmsg);
 	do_quit (botptr->u->name, quitmsg);
 	return NS_SUCCESS;
