@@ -49,6 +49,13 @@ static char quitreason[BUFSIZE];
 
 static unsigned int moddatacnt[NUM_MODULES];
 
+int comparechanmember (const void *key1, const void *key2)
+{
+	ChannelMember *cm = (ChannelMember *) key1;
+	return ircstrcasecmp (cm->u->name, key2);
+}
+
+
 /** @brief ChanPartHandler
  *
  *  list handler for channel parts
@@ -235,7 +242,7 @@ int del_channel_member (Channel *c, Client *u)
 	ChannelMember *cm;
 	lnode_t *un;
 	
-	un = list_find (c->members, u->name, comparef);
+	un = list_find (c->members, u->name, comparechanmember);
 	if (!un) {
 		nlog (LOG_WARNING, "%s isn't a member of channel %s", u->name, c->name);
 		return NS_FAILURE;
@@ -384,7 +391,7 @@ JoinChannel (const char* nick, const char *chan)
 		c = new_chan (chan);
 	}
 	/* add this users details to the channel members hash */
-	if (list_find (c->members, u->name, comparef)) {
+	if (list_find (c->members, u->name, comparechanmember)) {
 		nlog (LOG_WARNING, "JoinChannel: tried to add %s to channel %s but they are already a member", u->name, chan);
 		return;
 	}
@@ -516,7 +523,7 @@ int IsChannelMember (Channel *c, Client *u)
 	if (!u || !c) {
 		return NS_FALSE;
 	}
-	if (list_find (c->members, u->name, comparef)) {
+	if (list_find (c->members, u->name, comparechanmember)) {
 		return NS_TRUE;
 	}
 	return NS_FALSE;
@@ -543,7 +550,7 @@ int test_cumode (char* chan, char* nick, int flag)
 	if (!u || !c) {
 		return NS_FALSE;
 	}
-	cm = lnode_find (c->members, nick, comparef);
+	cm = lnode_find (c->members, nick, comparechanmember);
 	if (cm) {
 		if (cm->flags & flag) {
 			return NS_TRUE;

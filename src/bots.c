@@ -650,9 +650,12 @@ Bot *AddBot (BotInfo *botinfo)
 	botptr->u->user->bot = botptr;
 	botptr->flags = botinfo->flags;
 	ConnectBot (botptr);
-	add_bot_cmd_list (botptr, botinfo->bot_cmd_list);
-	add_bot_setting_list (botptr, botinfo->bot_setting_list);
-	add_bot_info_settings (botptr, botinfo);
+	/* Only add commands and settings for service bots */
+	if (botptr->flags & BOT_FLAG_SERVICEBOT) {
+		add_bot_cmd_list (botptr, botinfo->bot_cmd_list);
+		add_bot_setting_list (botptr, botinfo->bot_setting_list);
+		add_bot_info_settings (botptr, botinfo);
+	}
 	return botptr;
 }
 

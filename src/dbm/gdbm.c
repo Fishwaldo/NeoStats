@@ -93,11 +93,14 @@ int DBMSetData (void *handle, char *key, void *data, int size)
 
 int DBMGetTableRows (void *handle, DBRowHandler handler)
 {
+	int rowcount = 0;
+
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey = gdbm_firstkey ((gdbm_file_info *)handle);
 	while (dbkey.dptr != NULL)
 	{
+		rowcount ++;
 		dlog (DEBUG1, "DBMGetTableRows: key %s", dbkey.dptr);
 		dbdata = gdbm_fetch ((gdbm_file_info *)handle, dbkey);
 		handler (dbdata.dptr);
@@ -106,7 +109,7 @@ int DBMGetTableRows (void *handle, DBRowHandler handler)
 		free (dbkey.dptr);
 		dbkey = dbdata;
 	}
-	return NS_SUCCESS;
+	return rowcount;
 }
 
 int DBMDelData (void *handle, char * key)

@@ -258,17 +258,16 @@ int DBAStore (char *table, char *key, void *data, int size)
 	return NS_SUCCESS;
 }
 
-int DBAFetchRows (char * table, DBRowHandler handler)
+int DBAFetchRows (char *table, DBRowHandler handler)
 {
 	tableentry *tbe;
 
 	dlog (DEBUG1, "DBAFetchRows %s", table);
 	tbe = DBAFetchTableEntry (table);
 	if (!tbe) {
-		return NS_FAILURE;
+		return 0;
 	}
-	DBMGetTableRows (tbe->handle, handler);	
-	return NS_SUCCESS;
+	return DBMGetTableRows (tbe->handle, handler);	
 }
 
 int DBADelete (char *table, char * key)

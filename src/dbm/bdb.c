@@ -102,8 +102,10 @@ int DBMSetData (void *handle, char *key, void *data, int size)
 
 int DBMGetTableRows (void *handle, DBRowHandler handler)
 {
+	int rowcount = 0;
+
 	/* TODO */
-	return NS_SUCCESS;
+	return rowcount;
 }
 
 int DBMDelData (void *handle, char * key)
@@ -135,7 +137,10 @@ int DBMSetData (void *handle, char *key, void *data, int size)
 
 int DBMGetTableRows (void *handle, DBRowHandler handler)
 {
-	return NS_FAILURE;
+	int rowcount = 0;
+
+	/* TODO */
+	return rowcount;
 }
 
 int DBMDelData (void *handle, char * key)
