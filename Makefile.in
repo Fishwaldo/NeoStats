@@ -85,7 +85,7 @@ clean:
 	(cd pcre; $(MAKE) $@)
 	(cd curl; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
-	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc dl/Makefile.inc *.log *.a *.d *.exe
+	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc dl/Makefile.inc *.log *.a *.d *.exe version.h
 
 distclean:
 	(cd dl; $(MAKE) $@)
@@ -95,7 +95,7 @@ distclean:
 	(cd pcre; $(MAKE) $@)
 	(cd curl; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
-	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc dl/Makefile.inc *.log *.a *.d *.exe config.status
+	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc dl/Makefile.inc *.log *.a *.d *.exe config.status version.h
 
 install: neostats
 	@echo "Installing ..."
@@ -115,6 +115,7 @@ install: neostats
 	$(INSTALL) -m 755 $(DOCS_PROGS) @prefix@/doc
 	$(INSTALL_DATA) $(DATA) @prefix@/data
 	$(INSTALL_DATA) $(INCLUDES) @prefix@/include
+	$(INSTALL_DATA) version.h @prefix@/include
 	$(INSTALL_DATA) @IRCD_FILES_INC@ @prefix@/include
 	(cd adns; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
