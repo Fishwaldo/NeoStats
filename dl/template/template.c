@@ -44,7 +44,7 @@ char s_module_bot_name[MAXNICK];
 ModuleInfo __module_info = {
 	"example",
 	"example Module Description",
-	"version 1.0"
+	"version 1.0",
 	__DATE__,
 	__TIME__
 };
