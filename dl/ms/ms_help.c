@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ms_help.c,v 1.4 2003/01/04 04:56:03 fishwaldo Exp $
+** $Id: ms_help.c,v 1.5 2003/02/17 09:03:38 fishwaldo Exp $
 */
 
 const char *ms_help[] = {
@@ -29,7 +29,7 @@ const char *ms_help[] = {
 "Commands:",
 "     HAIL     ODE     POEM     LAPDANCE     REDNECK",
 "",
-"     CHEERUP      BEHAPPY      WONDERFUL      MSG",
+"     CHEERUP      BEHAPPY      WONDERFUL",
 "",
 "     VERSION",
 "",
@@ -45,7 +45,7 @@ const char *ms_help_tech[] = {
 "Commands:",
 "     HAIL     ODE     POEM     LAPDANCE     REDNECK",
 "",
-"     CHEERUP      BEHAPPY      WONDERFUL      MSG",
+"     CHEERUP      BEHAPPY      WONDERFUL",
 "",
 "     VERSION",
 "",
@@ -109,14 +109,6 @@ const char *ms_help_redneck[] = {
 NULL
 };
 
-const char *ms_help_msg[] = {
-"\2MoraleServ Help : MSG",
-"Usage: \2MSG <PERSON OR CHAN TO MESSAGE> <MESSAGE>\2",
-"",
-"Have me say something to a Channel/User",
-"",
-NULL
-};
 
 const char *ms_help_cheerup[] = {
 "\2MoraleServ Help : CHEERUP",

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ms.c,v 1.10 2003/01/21 13:09:24 fishwaldo Exp $
+** $Id: ms.c,v 1.11 2003/02/17 09:03:37 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -38,7 +38,6 @@ static void ms_lapdance(User *u, char *cmd);
 static void ms_version(User *u);
 static void ms_poem(User *u, char *cmd, char *m);
 static void ms_redneck(User *u, char *cmd);
-static void ms_msg(User *u, char *cmd, char *m);
 static void ms_cheerup(User *u, char *cmd);
 static void ms_behappy(User *u, char *cmd);
 static void ms_wonderful(User *u, char *cmd);
@@ -99,9 +98,6 @@ int __Bot_Message(char *origin, char **av, int ac)
         } else if (!strcasecmp(av[2], "REDNECK")) {
             privmsg_list(u->nick, s_MoraleServ, ms_help_redneck);
             return 1;
-        } else if (!strcasecmp(av[2], "MSG")) {
-            privmsg_list(u->nick, s_MoraleServ, ms_help_msg);
-            return 1;
         } else if (!strcasecmp(av[2], "CHEERUP")) {
             privmsg_list(u->nick, s_MoraleServ, ms_help_cheerup);        
             return 1;
@@ -153,15 +149,6 @@ int __Bot_Message(char *origin, char **av, int ac)
                     return -1;
                 }
 				ms_redneck(u, av[2]);
-    } else if (!strcasecmp(av[1], "MSG")) {
-                if (ac < 4) {
-                    prefmsg(u->nick, s_MoraleServ, "Syntax: /msg %s MSG <PERSON OR CHAN TO MESSAGE> <MESSAGE>", s_MoraleServ);
-                    prefmsg(u->nick, s_MoraleServ, "For addtional help: /msg %s HELP", s_MoraleServ);
-					return -1;
-                }
-				cmd = joinbuf(av, ac, 3);
-                ms_msg(u, av[2], cmd);
-                free(cmd);
     } else if (!strcasecmp(av[1], "CHEERUP")) {
                 if (ac < 3) {
                     prefmsg(u->nick, s_MoraleServ, "Syntax: /msg %s CHEERUP <NICK>", s_MoraleServ);
@@ -403,39 +390,6 @@ static void ms_redneck(User *u, char *cmd) {
 
 }
 
-
-/* Routine for 'MoraleServ' to MSG a user/channel */
-static void ms_msg(User *u, char *cmd, char *m) {
-        strcpy(segv_location, "ms_msg");
-        if (!strcasecmp(cmd, s_MoraleServ)) {
-            prefmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service message itself?");
-            chanalert(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
-            return;
-        }
-/*
-        if ((strchr(cmd, '#') != NULL) && (!findchan(cmd))) {
-            prefmsg(u->nick, s_MoraleServ, "That channel cannot be found. As a result, your message was not sent. Please check the spelling and try again!");
-            return;
-        }
-        if ((strchr(cmd, '#') == NULL) && (!finduser(cmd))) {
-            prefmsg(u->nick, s_MoraleServ, "That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-            return;
-        }
-*/
-        /* The user has passed the minimum requirements for input */
-    
-    mslog("%s made %s MSG '%s' to %s",u->nick, s_MoraleServ, m, cmd);
-    chanalert(s_MoraleServ, "%s made %s MSG '%s' to %s", u->nick, s_MoraleServ, m, cmd);
-
-    if (UserLevel(u) >= 185) {
-        prefmsg(cmd, s_MoraleServ, "%s", m);
-        return;
-    } else {
-        prefmsg(cmd, s_MoraleServ, "%s [message issued by %s]", m, u->nick);
-        return;
-    }
-
-}
 
 
 static void ms_cheerup(User *u, char *cmd) {
