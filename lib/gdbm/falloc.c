@@ -28,7 +28,11 @@
 
 
 /* include system configuration before all else. */
+#ifdef WIN32
+#include "autoconfwin32.h"
+#else
 #include "autoconf.h"
+#endif
 
 #include "gdbmdefs.h"
 
