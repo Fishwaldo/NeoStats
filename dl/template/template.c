@@ -64,8 +64,7 @@ int new_m_version(char *origin, char **av, int ac)
 /** Module function list
  * A list of IRCd (server) commands that we will respond to
  * e.g. VERSION
- * This table is required for your module to load and run on NeoStats
- * but you do not have to have any functions in it
+ * This table is optional 
  */
 Functions __module_functions[] = {
 	{MSG_VERSION, new_m_version, 1},
