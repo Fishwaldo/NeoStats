@@ -247,6 +247,8 @@ get_options (int argc, char **argv)
 	config.debuglevel = DEBUG10;
 	config.foreground = 1;
 #endif
+	/* default debugmodule to all */
+	strlcpy(config.debugmodule, "all");
 
 	while ((c = getopt (argc, argv, "hvrd:nqf")) != -1) {
 		switch (c) {
