@@ -333,7 +333,6 @@ int s_new_user(char **av, int ac) {
 	strcpy(segv_location, "StatServ-s_new_user");
 
 	s = findstats(u->server->name);
-
 	IncreaseUsers(s); 
 
 #ifdef DEBUG

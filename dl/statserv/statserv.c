@@ -168,6 +168,7 @@ void _init() {
 	hash_scan_begin(&scan, sh);
 	while ((node = hash_scan_next(&scan)) != NULL ) {
 	   	ss = hnode_get(node);
+		ac = 0;
 		AddStringToList(&av, ss->name, &ac);
 		s_new_server(av, ac);
 		FreeList(av, ac);
