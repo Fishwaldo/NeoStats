@@ -149,3 +149,36 @@ strlcat(char *dst, const char *src, size_t size)
 	return copycount;
 }
 #endif /* HAVE_STRLCAT */
+
+#ifndef HAVE_STRNDUP
+/* @brief allocate RAM and duplicate the passed string into the created buffer. 
+ *  Always NULL terminates the new string.
+ *  Suitable for partial string copies.
+ *  Returned string will be count + 1 in length
+ *
+ * @return pointer to new string or NULL if failed to allocate
+ *
+ */
+char *strndup(const char *src, size_t count)
+{
+	char *dup;
+	
+	/* validate inputs */
+	if ((src == NULL) || (count < 0)) {
+		return NULL;
+	}
+	
+	/* Allocate count plus one for trailing NULL */
+	dup = (char*)malloc(count+1);
+	if (!dup) {
+		return NULL;
+	}
+	
+	/* Copy string into created buffer */
+	memcpy(dup, src, count);
+	dup[count] = 0;
+	
+	/* Return pointer to duplicated string */
+	return dup;
+}
+#endif
