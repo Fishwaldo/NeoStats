@@ -301,7 +301,6 @@ struct me {
 	char name[MAXHOST];
 	int port;
 	int r_time;
-	int lag_time;
 	int numeric; /* For Unreal and any other server that needs a numeric */
 	char uplink[MAXHOST];
 	char pass[MAXPASS];
@@ -317,13 +316,9 @@ struct me {
 	unsigned int maxsocks;
 	unsigned int cursocks;
 	unsigned int want_privmsg:1;
-	unsigned int send_extreme_lag_notices:1;
 	unsigned int onlyopers:1;
 	unsigned int die:1;
-	unsigned int collisions;
-	unsigned int enable_proxy:1;
 	unsigned int debug_mode:1;
-	unsigned int noticelag:1;
 	unsigned int token:1;
 #if defined(ULTIMATE3) || defined(QUANTUM)
 	unsigned int client:1;

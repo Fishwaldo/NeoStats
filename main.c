@@ -112,7 +112,6 @@ main (int argc, char *argv[])
 	me.die = 0;
 	me.local[0] = '\0';
 	me.debug_mode = 0;
-	me.noticelag = 0;
 	me.r_time = 10;
 	me.numeric = 1;
 	me.lastmsg = me.now;
