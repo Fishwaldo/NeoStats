@@ -172,48 +172,48 @@ while [ $validselection -eq 0 ] ; do
 			echo "correctly."
 			;;
 		1)
- 			IRCD="--enable-unreal31"
+ 			IRCD="unreal31"
 			validselection=1
 			;;
 		2)
- 			IRCD="--enable-unreal32"
+ 			IRCD="unreal32"
 			validselection=1
 			;;
 		3)
-			IRCD="--enable-ultimate2"
+			IRCD="ultimate2"
 			validselection=1
 			;;
 		4)
-			IRCD="--enable-ultimate3"
+			IRCD="ultimate3"
 			validselection=1
 			;;
 		5)
-			IRCD="--enable-hybrid7"
+			IRCD="hybrid7"
 			MEXTAUTHALLOWED=0
 			validselection=1
 			;;
 		6)
-			IRCD="--enable-neoircd"
+			IRCD="neoircd"
 			validselection=1
 			;;
 		7)
-			IRCD="--enable-bahamut"
+			IRCD="bahamut"
 			validselection=1
 			;;
 		8)
-			IRCD="--enable-mystic"
+			IRCD="mystic"
 			validselection=1
 			;;
 		9)
-			IRCD="--enable-quantum"
+			IRCD="quantum"
 			validselection=1
 			;;
 		10)
-			IRCD="--enable-viagra"
+			IRCD="viagra"
 			validselection=1
 			;;
 		11)
-			IRCD="--enable-ircup10"
+			IRCD="ircup10"
 			validselection=1
 			;;
 		*)
