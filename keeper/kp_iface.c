@@ -25,8 +25,6 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-/* Lock for cache access operations */
-KP_MUTEX(kp_main_lock);
 
 /* ------------------------------------------------------------------------- 
  * Checks the key-path for correct syntax
@@ -104,9 +102,7 @@ static int kp_get(const char *keypath, kp_key *ck, kpval_t type)
         if(iskeyfile && !keyname[0])
             res = KPERR_BADKEY;
         else {
-            KP_LOCK(kp_main_lock);
             res = _kp_cache_get(&kpp, keyname, type, ck);
-            KP_UNLOCK(kp_main_lock);
         }
         free(kpp.path);
         keypath ++;
@@ -244,9 +240,7 @@ static int kp_get_subkeys(const char *keypath, struct key_array *keys)
     while(keypath[0] != '\0' && keypath[0] != '/') {
         res = _kp_get_path(keypath, &kpp, &keyname, &iskeyfile);
         if(res == 0) {
-            KP_LOCK(kp_main_lock);
             _kp_cache_get_subkeys(&kpp, keyname, iskeyfile, keys);
-            KP_UNLOCK(kp_main_lock);
             free(kpp.path);
         }
         keypath ++;
@@ -300,9 +294,7 @@ int kp_get_type(const char *keypath, kpval_t *typep)
         if(res != 0)
             return res;
 
-        KP_LOCK(kp_main_lock);
         res = _kp_cache_get_type(&kpp, keyname, iskeyfile, typep);
-        KP_UNLOCK(kp_main_lock);
         free(kpp.path);
         keypath ++;
     } while(res == KPERR_NOKEY);
@@ -332,9 +324,7 @@ static int kp_set(const char *keypath, kp_key *ck)
         res = KPERR_BADKEY;
     else {
         ck->name = strdup_check(keyname);
-        KP_LOCK(kp_main_lock);
         res = _kp_cache_set(&kpp, ck);
-        KP_UNLOCK(kp_main_lock);
     }
     free(kpp.path);
 
@@ -433,9 +423,7 @@ int kp_flush()
 {
     int res;
 
-    KP_LOCK(kp_main_lock);
     res = _kp_cache_flush();
-    KP_UNLOCK(kp_main_lock);
 
     return res;
 }

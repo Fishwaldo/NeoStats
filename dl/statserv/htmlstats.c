@@ -20,11 +20,12 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: htmlstats.c,v 1.22 2002/12/13 10:50:09 fishwaldo Exp $
+** $Id: htmlstats.c,v 1.23 2003/04/17 13:48:23 fishwaldo Exp $
 */
 
 #include "statserv.h"
 #include "hash.h"
+#include "log.h"
 #include <fcntl.h>
 
 
@@ -54,7 +55,7 @@ void ss_html() {
 	int gothtml = 0;
 	if (StatServ.html) {
 		if (strlen(StatServ.htmlpath) <= 0) {
-			log("Can't do HTML Writout as html path is not defined");
+			nlog(LOG_WARNING, LOG_MOD, "Can't do HTML Writout as html path is not defined");
 			return;
 		}
 	} else {
@@ -65,13 +66,13 @@ void ss_html() {
 		tpl = fopen("data/index.tpl", "r");
 	}
 	if (!tpl) {
-		log("can't open StatServ HTML template");
+		nlog(LOG_WARNING, LOG_MOD, "can't open StatServ HTML template");
 		chanalert(s_StatServ, "Can't Open StatServ HTML Template");
 		return;
 	}
 	opf = fopen(StatServ.htmlpath, "w");
 	if (!opf) {
-		log("Can't open StatServ HTML output file - Check Permissions");
+		nlog(LOG_WARNING, LOG_MOD, "Can't open StatServ HTML output file - Check Permissions");
 		chanalert(s_StatServ, "Can't open StatServ HTML output file - Check Permissions");
 		return;
 	}
@@ -87,9 +88,6 @@ void ss_html() {
 			get_map("", 0);
 			fputs("</TABLE>\n", opf);
 			buf = buf1+strlen("!MAP!");
-#ifdef DEBUG
-			log("gotmap");
-#endif
 		}
 		buf1 = strstr(buf, "!SRVLIST!");
 		if (buf1) {
@@ -97,9 +95,6 @@ void ss_html() {
 			fwrite(buf, startstr, 1, opf);
 			get_srvlist();
 			buf = buf1+strlen("!SRVLIST!");
-#ifdef DEBUG
-			log("gotsrvlist");
-#endif
 		}
 		buf1 = strstr(buf, "!SRVLISTDET!");
 		if (buf1) {
@@ -108,9 +103,6 @@ void ss_html() {
 			get_srvlistdet();
 			buf = buf1+strlen("!SRVLISTDET!");
 
-#ifdef DEBUG
-			log("gotsrvlistdet");
-#endif
 		}
 		buf1 = strstr(buf, "</HTML>");
 		if (buf1) {
@@ -119,9 +111,6 @@ void ss_html() {
 			put_copyright();
 			buf = buf1;
 			gothtml = 1;
-#ifdef DEBUG
-			log("gotcopyright");
-#endif
 		}
 		buf1 = strstr(buf, "!NETSTATS!");
 		if (buf1) {
@@ -129,9 +118,6 @@ void ss_html() {
 			fwrite(buf, startstr, 1, opf);
 			get_netstats();
 			buf = buf1 + strlen("!NETSTATS!");
-#ifdef DEBUG
-			log("gotnetstats");
-#endif
 		}
 		buf1 = strstr(buf, "!DAILYSTATS!");
 		if (buf1) {
@@ -139,9 +125,6 @@ void ss_html() {
 			fwrite(buf, startstr, 1, opf);
 			get_dailystats();
 			buf = buf1 + strlen("!DAILYSTATS!");
-#ifdef DEBUG
-			log("gotdailystats");
-#endif
 		}
 		buf1 = strstr(buf, "!DAILYTOPCHAN!");
 		if (buf1) {
@@ -149,9 +132,6 @@ void ss_html() {
 			fwrite(buf, startstr, 1, opf);
 			get_chantop10();
 			buf = buf1 + strlen("!DAILYTOPCHAN!");
-#ifdef DEBUG
-			log("gotdailytopchan");
-#endif
 		}
 		buf1 = strstr(buf, "!TOP10CHAN!");
 		if (buf1) {
@@ -159,9 +139,6 @@ void ss_html() {
 			fwrite(buf, startstr, 1, opf);
 			get_chantop10eva();
 			buf = buf1 + strlen("!TOP10CHAN!");
-#ifdef DEBUG
-			log("gottop10");
-#endif
 		}
 		buf1 = strstr(buf, "!TOP10KICKS!");
 		if (buf1) {
@@ -169,9 +146,6 @@ void ss_html() {
 			fwrite(buf, startstr, 1, opf);
 			get_unwelcomechan();
 			buf = buf1 + strlen("!TOP10KICKS!");
-#ifdef DEBUG
-			log("gotdailykicks");
-#endif
 		}
 		buf1 = strstr(buf, "!TOP10TOPICS!");
 		if (buf1) {
@@ -179,9 +153,6 @@ void ss_html() {
 			fwrite(buf, startstr, 1, opf);
 			get_chantops();
 			buf = buf1 + strlen("!TOP10TOPICS!");
-#ifdef DEBUG
-			log("gotdailytopics");
-#endif
 		}
 		buf1 = strstr(buf, "!TLDMAP!");
 		if (buf1) {

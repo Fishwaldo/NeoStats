@@ -20,26 +20,10 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ms_help.c,v 1.5 2003/02/17 09:03:38 fishwaldo Exp $
+** $Id: ms_help.c,v 1.6 2003/04/17 13:48:20 fishwaldo Exp $
 */
 
 const char *ms_help[] = {
-"\2MoraleServ Help\2",
-"",
-"Commands:",
-"     HAIL     ODE     POEM     LAPDANCE     REDNECK",
-"",
-"     CHEERUP      BEHAPPY      WONDERFUL",
-"",
-"     VERSION",
-"",
-"For Additional Help on each command type:",
-"EXAMPLE: /msg MoraleServ HELP HAIL",
-"",
-NULL
-};
-
-const char *ms_help_tech[] = {
 "\2MoraleServ Help\2",
 "",
 "Commands:",

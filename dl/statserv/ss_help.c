@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ss_help.c,v 1.6 2002/09/04 08:40:29 fishwaldo Exp $
+** $Id: ss_help.c,v 1.7 2003/04/17 13:48:24 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -50,12 +50,35 @@ const char *ss_myuser_help[] = {
 "",
 "*** Additional Commands For Net & Tech Admins:***",
 "",
+"\2SET\2        Change StatServ Settings",
 "\2FORCEHTML\2  Force an update of the HTML ouput file",
-"\2RESET\2      DELETES data files and starts stats over new!",
-"\2JOIN\2       Join a Channel.",
 "\2STATS\2      Modify Statistic Entries.",
-"\2NOTICES\2    Enable/Disable 'User requested to see...' Notices.",
 "End of Help",
+NULL
+};
+
+const char *ss_set_help[] = {
+"*** Configuration: \2SET\2 Help ***",
+""
+"Usage: \2Set <option> [<value>]\2",
+""
+"Available Options are:",
+"\2HTMLPATH <path>\2",
+"Set the Pathname (including filename) to write HTML statistics to",
+"if HTML Statistics are enabled",
+"",
+"\2HTML\2", 
+"Toggle HTML Statistics Generation on/off",
+"",
+"\2MSGTHROTTLE <seconds>\2",
+"if <seconds> is greater than 0, then set 5 Wallops per <seconds> throttle",
+"if <seconds> is equal to 0, then disable Wallop Throttling",
+"",
+"\2LAGWALLOP <seconds>\2",
+"if <seconds> is greater than 0, then when servers are lagged by this many seconds, issue a warning",
+"if <seconds> is equal to 0, then disable Lag Monitoring",
+"",
+"If you specify \2SET\2 without any options, the current settings are disabled",
 NULL
 };
 
@@ -183,19 +206,6 @@ const char *ss_version_help[] = {
 NULL
 };
 
-const char *ss_reset_help[] = {
-"*** Statistics: \2RESET\2 Help ***",
-"Usage: \2RESET\2",
-"",
-"Force NeoStats to DELETE datafiles and",
-"re-connect to the network.  Note: this",
-"will reset all statistics.",
-"EVIL EVIL command ;)",
-"",
-"End of Help.",
-NULL
-};
-
 const char *ss_stats_help[] = {
 "*** Statistics: \2STATS\2 Help ***",
 "Usage: \2STATS \37[DEL|LIST|COPY]\37\2",
@@ -203,17 +213,6 @@ const char *ss_stats_help[] = {
 "\2LIST\2  List all database entries.",
 "\2DEL \37name\37\2  Remove an entry.",
 "\2COPY \37name newname\37\2  Copy an entry.",
-"",
-"End of Help.",
-NULL
-};
-
-const char *ss_join_help[] = {
-"*** Statistics: \2JOIN\2 Help ***",
-"Usage: \2JOIN <Channel>\2",
-"",
-"Get StatServ to Join a Channel",
-"It will then Echo Events as they happen to that Channel, So it Shouldn't Join Public Channels",
 "",
 "End of Help.",
 NULL

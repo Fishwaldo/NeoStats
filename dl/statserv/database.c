@@ -22,12 +22,13 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: database.c,v 1.12 2003/01/23 10:53:38 fishwaldo Exp $
+** $Id: database.c,v 1.13 2003/04/17 13:48:23 fishwaldo Exp $
 */
 
 
 #include "stats.h"
 #include "statserv.h"
+#include "log.h"
 
 
 void SaveStats()
@@ -42,7 +43,7 @@ void SaveStats()
 
 
     if (!fp) {
-        log("Unable to open stats.db for writing.");
+        nlog(LOG_WARNING, LOG_MOD, "Unable to open stats.db for writing.");
         return;
     }
     if (StatServ.newdb == 1) {
@@ -52,9 +53,7 @@ void SaveStats()
     hash_scan_begin(&ss, Shead);
     while ((sn = hash_scan_next(&ss))) {
     	s=hnode_get(sn);
-#ifdef DEBUG
-    log("Writing statistics to database for %s", s->name);
-#endif
+    	nlog(LOG_DEBUG1, LOG_MOD, "Writing statistics to database for %s", s->name);
         fprintf(fp, "%s %d %ld %ld %d %ld %ld %ld %d %d %ld\n", s->name,
             s->numsplits, s->maxusers, s->t_maxusers, s->maxopers,
             s->t_maxopers, s->lastseen, s->starttime, s->operkills,
@@ -62,21 +61,19 @@ void SaveStats()
     }
     fclose(fp);
     if ((fp = fopen("data/cstats.db", "w")) == NULL) {
-    	log("Unable to open cstats.db for writting.");
+    	nlog(LOG_WARNING, LOG_MOD, "Unable to open cstats.db for writting.");
     	return;
     }
     cn = list_first(Chead);
     while (cn) {
     	c = lnode_get(cn);
-#ifdef DEBUG
-	log("Writting Statistics to database for %s", c->name);
-#endif
+	nlog(LOG_DEBUG1, LOG_MOD, "Writting Statistics to database for %s", c->name);
 	fprintf(fp, "%s %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld\n", c->name, c->topics, c->totmem, c->kicks, (long)c->lastseen, c->maxmems, (long)c->t_maxmems, c->maxkicks, (long)c->t_maxkicks, c->maxjoins, (long)c->t_maxjoins);
 	cn = list_next(Chead, cn);
     }
     fclose(fp);
     if ((fp = fopen("data/nstats.db", "w")) == NULL) {
-        log("Unable to open nstats.db for writing.");
+        nlog(LOG_WARNING, LOG_MOD, "Unable to open nstats.db for writing.");
         return;
     }
     fprintf(fp, "%d %ld %d %ld %ld %ld %ld %ld %ld\n", stats_network.maxopers, stats_network.maxusers, stats_network.maxservers, stats_network.t_maxopers, stats_network.t_maxusers, stats_network.t_maxservers, stats_network.totusers, stats_network.maxchans, stats_network.t_chans);
@@ -93,7 +90,7 @@ void LoadStats()
     char *name, *numsplits, *maxusers, *t_maxusers,
         *maxopers, *t_maxopers, *lastseen, *starttime,
         *operkills, *serverkills, *totusers;
-    char *topics, *totmem, *kicks, *joins, *maxmems, *t_maxmems, *maxkicks, *t_maxkicks, *maxjoins, *t_maxjoins; 
+    char *topics, *totmem, *kicks,  *maxmems, *t_maxmems, *maxkicks, *t_maxkicks, *maxjoins, *t_maxjoins; 
 
 
     hnode_t *sn;
@@ -121,7 +118,7 @@ void LoadStats()
         	}
         	tmp = strtok(NULL, " ");
         	if (tmp == NULL) {
-           		log("Detected Old version (3.0) of Network Database, Upgrading");
+           		nlog(LOG_NOTICE, LOG_MOD, "Detected Old version (3.0) of Network Database, Upgrading");
            		stats_network.maxchans = 0;
 	   		stats_network.t_chans = time(NULL);
         	} else {
@@ -168,17 +165,14 @@ void LoadStats()
         s->daily_totusers = 0;
         if (totusers==NULL) {
             s->totusers = 0;
-            fprintf(stderr, "Detected Old Version of Server Database, Upgrading\n");
         } else {
             s->totusers = atol(totusers);
         }
 
-#ifdef DEBUG
-    log("LoadStats(): Loaded statistics for %s", s->name);
-#endif
+    	nlog(LOG_DEBUG1, LOG_MOD, "LoadStats(): Loaded statistics for %s", s->name);
 	sn = hnode_create(s);
 	if (hash_isfull(Shead)) {
-		log("Eeek, StatServ Server Hash is Full!");
+		nlog(LOG_CRITICAL, LOG_MOD, "Eeek, StatServ Server Hash is Full!");
 	} else {
 		hash_insert(Shead, sn, s->name);
 	}
@@ -218,15 +212,13 @@ void LoadStats()
 	c->members = 0;
 	cn = lnode_create(c);
 	if (list_isfull(Chead)) {
-		log("Eeek, StatServ Channel Hash is Full!");
+		nlog(LOG_CRITICAL, LOG_MOD, "Eeek, StatServ Channel Hash is Full!");
 	} else {
-#ifdef DEBUG
-		log("Loading %s Channel Data", c->name);
-#endif
+		nlog(LOG_DEBUG2, LOG_MOD, "Loading %s Channel Data", c->name);
 		if ((time(NULL) - c->lastseen) <  604800) {
 			list_append(Chead, cn);
 		} else {
-			log("Deleting Old Channel %s", c->name);
+			nlog(LOG_DEBUG1, LOG_MOD, "Deleting Old Channel %s", c->name);
 			lnode_destroy(cn);
 			free(c);
 		}

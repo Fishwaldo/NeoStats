@@ -20,10 +20,11 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.34 2003/03/28 10:30:48 fishwaldo Exp $
+** $Id: stats.c,v 1.35 2003/04/17 13:48:25 fishwaldo Exp $
 */
 
 #include "statserv.h"
+#include "log.h"
 
 int ok_to_wallop() {
 	static int lasttime;
@@ -132,9 +133,7 @@ CStats *findchanstats(char *name) {
 	if (cn) {
 		cs = lnode_get(cn);
 	} else {
-#ifdef DEBUG
-		log("findchanstats(%s) -> NOT FOUND", name);
-#endif
+		nlog(LOG_DEBUG2, LOG_MOD, "findchanstats(%s) -> NOT FOUND", name);
 		return NULL;
 	}
 	return cs;
@@ -147,9 +146,7 @@ void DelOldChan() {
 		c = lnode_get(cn);
 		if ((c->members <= 0 ) && ((time(NULL) - c->lastseen) < 604800)) {
 			if (!findchan(c->name)) {
-#ifdef DEBUG
-				log("StatServ: Deleting Old Channel %s", c->name);
-#endif
+				nlog(LOG_DEBUG1, LOG_MOD, "StatServ: Deleting Old Channel %s", c->name);
 				cn1 = cn;
 				cn = list_next(Chead, cn);
 				list_delete(Chead, cn1);
@@ -186,7 +183,7 @@ CStats *AddChanStats(char *name) {
 	cs->lastseen = time(NULL);
 	cn = lnode_create(cs);
 	if (list_isfull(Chead)) {
-		log("Eeek, Can't add Channel to Statserv Channel Hash. Has is full");
+		nlog(LOG_CRITICAL, LOG_MOD, "Eeek, Can't add Channel to Statserv Channel Hash. Has is full");
 	} else {
 		list_append(Chead, cn);
 	}	
@@ -237,9 +234,6 @@ int s_user_kill(char **av, int ac) {
 	User *u;
 	u = finduser(av[0]);
 	if (!u) return 0;
-#ifdef DEBUG
-	log(" Server %s", u->server->name);
-#endif
 
 	strcpy(segv_location, "StatServ-s_user_kill");
 
@@ -277,7 +271,7 @@ int s_user_modes(char **av, int ac) {
 
 	u = finduser(av[0]);
 	if (!u) {
-		log("Changing modes for unknown user: %s", u->nick);
+		nlog(LOG_WARNING, LOG_MOD, "Changing modes for unknown user: %s", u->nick);
 		return -1;
 	}
 	if (!u->modes) return -1; 
@@ -331,9 +325,6 @@ int s_del_user(char **av, int ac) {
 	u = finduser(av[0]);
 	if (!u) return 0;
 
-#ifdef DEBUG
-	log(" Server %s", u->server->name);
-#endif
 	s=findstats(u->server->name);
 
 	if (!u->modes) return -1; 
@@ -375,9 +366,7 @@ int s_new_user(char **av, int ac) {
 	s = findstats(u->server->name);
 	IncreaseUsers(s); 
 
-#ifdef DEBUG
-	log("added a User %s to stats, now at %d", u->nick, s->users);
-#endif
+	nlog(LOG_DEBUG2, LOG_MOD, "added a User %s to stats, now at %d", u->nick, s->users);
 
 	if (s->maxusers < s->users) {
 		/* New User Record */
@@ -449,18 +438,15 @@ int Online(char **av, int ac) {
 	strcpy(segv_location, "StatServ-Online");
 
    #ifdef ULTIMATE3
-	   init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oikSwgle", SSMNAME);
+	   init_bot(s_StatServ, StatServ.user,StatServ.host,StatServ.rname, "+oikSwgle", SSMNAME);
    #else
-	   init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oikSdwgle", SSMNAME);
+	   init_bot(s_StatServ, StatServ.user,StatServ.host,StatServ.rname, "+oikSdwgle", SSMNAME);
    #endif
    StatServ.onchan = 1;
    /* now that we are online, setup the timer to save the Stats database every so often */
    add_mod_timer("SaveStats", "Save_Stats_DB", SSMNAME, 600);
 
-   /* Add a timer for HTML writeouts */
-   if (StatServ.html) {
-	   add_mod_timer("ss_html", "TimerWeb", SSMNAME, 3600);
-   }
+   add_mod_timer("ss_html", "TimerWeb", SSMNAME, 3600);
 
    /* also add a timer to check if its midnight (to reset the daily stats */
    add_mod_timer("Is_Midnight", "Daily_Stats_Reset", SSMNAME, 60);
@@ -477,15 +463,13 @@ extern SStats *new_stats(const char *name)
 	hnode_t *sn;
 	SStats *s = calloc(sizeof(SStats), 1);
 
-#ifdef DEBUG
-	log("new_stats(%s)", name);
-#endif
+	nlog(LOG_DEBUG2, LOG_MOD, "new_stats(%s)", name);
 
 	strcpy(segv_location, "StatServ-SStats");
 
 
 	if (!s) {
-		log("Out of memory.");
+		nlog(LOG_CRITICAL, LOG_MOD, "Out of memory.");
 		exit(0);
 	}
 
@@ -509,7 +493,7 @@ extern SStats *new_stats(const char *name)
 	s->serverkills = 0;
 	sn = hnode_create(s);
 	if (hash_isfull(Shead)) {
-		log("Eeek, StatServ Server hash is full!");
+		nlog(LOG_CRITICAL, LOG_MOD, "Eeek, StatServ Server hash is full!");
 	} else {
 		hash_insert(Shead, sn, s->name);
 	}
@@ -522,9 +506,7 @@ void AddStats(Server *s)
 	strcpy(segv_location, "StatServ-AddStats");
 
 
-#ifdef DEBUG
-	log("AddStats(%s)", s->name);
-#endif
+	nlog(LOG_DEBUG2, LOG_MOD, "AddStats(%s)", s->name);
 
 	if (!st) {
 		st = new_stats(s->name);
@@ -536,9 +518,8 @@ void AddStats(Server *s)
 SStats *findstats(char *name)
 {
 	hnode_t *sn;
-#ifdef DEBUG
-	log("findstats(%s)", name);
-#endif
+
+	nlog(LOG_DEBUG2, LOG_MOD, "findstats(%s)", name);
 	strcpy(segv_location, "StatServ-findstats");
 
 	sn = hash_lookup(Shead, name);
@@ -565,7 +546,7 @@ void Is_Midnight() {
 		if (ltm->tm_min == 0) {
 			/* its Midnight! */
 			chanalert(s_StatServ, "Reseting Daily Statistics - Its Midnight here!");
-			log("Resetting Daily Statistics");
+			nlog(LOG_NORMAL, LOG_MOD, "Resetting Daily Statistics");
 			daily.servers = stats_network.servers;
 			daily.t_servers = time(NULL);
 			daily.users = stats_network.users;

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: keeper.c,v 1.5 2003/04/17 00:16:26 fishwaldo Exp $
+** $Id: keeper.c,v 1.6 2003/04/17 13:48:13 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -31,9 +31,9 @@
 /** @brief Gets Config Data of Type
  */
 int GetConf(void **data, int type, const char *item) {
-char keypath[255];
-int i = 0;
-
+	char keypath[255];
+	int i = 0;
+	
 	/* determine if its a module setting */
 	if (strlen(segvinmodule) > 0) {
 		snprintf(keypath, 255, "g/%s:/%s", segvinmodule, item);

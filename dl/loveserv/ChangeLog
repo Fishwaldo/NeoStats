@@ -1,5 +1,7 @@
 Program: LoveServ Module for NeoStats 2.x ChangeLog
 Author:  Shmad <shmad@neostats.net>
+* Version 1.7 * April 17th, 2003
+- Updated with new Logging functions
 
 * Version 1.6 * July 25, 2002
 - Updated for new handlers

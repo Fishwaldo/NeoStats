@@ -27,9 +27,6 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-/* Lock for initialization */
-KP_MUTEX(kp_init_lock);
-
 /* Initialization is done */
 static volatile int kp_inited = 0;
 
@@ -157,7 +154,6 @@ static void kp_init(int dbindex)
     if(kp_local_inited && dbindex == KPDB_LOCAL)
         return;
 
-    KP_LOCK(kp_init_lock);
     if(!kp_inited) {
         kp_init_tmpname();
         kp_basedirs[KPDB_LOCAL]  = kp_init_localdb();
@@ -166,7 +162,6 @@ static void kp_init(int dbindex)
         kp_basedirs[KPDB_GLOBAL] = kp_init_globaldb();
         kp_inited = 1;
     }
-    KP_UNLOCK(kp_init_lock);
 }
 
 #ifdef ALLOC_CHECK

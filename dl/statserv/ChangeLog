@@ -2,6 +2,9 @@ StatServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish
+* Version 3.7 * April 17th, 2003 (F)
+ - Moved to new logging and conf API
+
 * Version 3.6 * March 28th, 2003 (F)
  - Fix a problem with oper counts... something got messed up somewhere
 

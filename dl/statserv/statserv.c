@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.61 2003/04/03 14:45:50 fishwaldo Exp $
+** $Id: statserv.c,v 1.62 2003/04/17 13:48:25 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -28,14 +28,14 @@
 #include "dl.h"
 #include "stats.h"
 #include "statserv.h"
+#include "log.h"
+#include "conf.h"
 
 
 extern const char version_date[], version_time[];
 static void ss_chans(User *u, char *chan);
 static void ss_daily(User *u);
-static void ss_reset(User *u);
 static void ss_stats(User *u, char *cmd, char *arg, char *arg2);
-static void ss_JOIN(User *u, char *chan);
 static void ss_tld(User *u, char *tld);
 static void ss_tld_map(User *u) ;
 static void ss_operlist(User *origuser, char *flags, char *server);
@@ -44,17 +44,16 @@ static void ss_version(User *u);
 static void ss_server(User *u, char *server);
 static void ss_map(User *);
 static void ss_netstats(User *);
+static void ss_set(User *, char **, int);
 /* int s_bot_kill(char *); */
-static void ss_cb_Config(char *, int);
+static void ss_Config();
 static int new_m_version(char *origin, char **av, int ac);
 void ss_html();
-
-char s_StatServ[MAXNICK] = "StatServ";
 
 Module_Info Statserv_Info[] = { {
 	SSMNAME,
 	"Statistical Bot For NeoStats",
-	"3.6"
+	"3.7"
 } };
 
 
@@ -100,42 +99,47 @@ EventFnList *__module_get_events() {
 	return StatServ_Event_List;
 };
 
-static config_option options[] = {
-{ "STATSERV_NICK", ARG_STR, ss_cb_Config, 0},
-{ "STATSERV_USER", ARG_STR, ss_cb_Config, 1},
-{ "STATSERV_HOST", ARG_STR, ss_cb_Config, 2},
-{ "STATSERV_LAG", ARG_STR, ss_cb_Config, 3},
-{ "HTML_STATS", ARG_STR, ss_cb_Config, 4},
-{ "HTML_PATH", ARG_STR, ss_cb_Config, 5},
-{ "WALLOP_INTERVAL", ARG_STR, ss_cb_Config, 6} 
-};
+void ss_Config() {
+	char *tmp;
 
-
-void ss_cb_Config(char *arg, int configtype) {
-
-	strcpy(segv_location, "StatServ-ss_cb_Config");
-
-	if (configtype == 0) {
-		/* Nick */
-		memcpy(StatServ.nick, arg, MAXNICK);
-		memcpy(s_StatServ, StatServ.nick, MAXNICK);
-	} else if (configtype == 1) {
-		/* User */
-		memcpy(StatServ.user, arg, 8);
-	} else if (configtype == 2) {
-		/* host */
-		memcpy(StatServ.host, arg, MAXHOST);
-	} else if (configtype == 3) {
-		/* lag */
-		StatServ.lag = atoi(arg);
-	} else if (configtype == 4) {
-		/* htmlstats? */
+	strcpy(segv_location, "StatServ-ss_Config");
+	
+	if (GetConf((void *)&s_StatServ, CFGSTR, "Nick") < 0) {
+		s_StatServ = malloc(MAXNICK);
+		snprintf(s_StatServ, MAXNICK, "StatServ");
+	}
+	if (GetConf((void *)&tmp, CFGSTR, "User") < 0) {
+		snprintf(StatServ.user, MAXUSER, "SS");
+	} else {
+		snprintf(StatServ.user, MAXUSER, "%s", tmp);
+		free(tmp);
+	}
+	if (GetConf((void *)&tmp, CFGSTR, "Host") < 0) {
+		snprintf(StatServ.host, MAXHOST, me.name);
+	} else {
+		snprintf(StatServ.host, MAXHOST, "%s", tmp);
+		free(tmp);
+	}
+	if (GetConf((void *)&tmp, CFGSTR, "Rname") < 0) {
+		snprintf(StatServ.rname, MAXHOST, "/msg %s help", s_StatServ);
+	} else {
+		snprintf(StatServ.rname, MAXHOST, "%s", tmp);
+		free(tmp);
+	}
+	if (GetConf((void *)&StatServ.lag, CFGINT, "Lag") < 0) {
+		StatServ.lag = 0;
+	}
+	if (GetConf((void *)&tmp, CFGSTR, "HTML_Path") < 0) {
+		StatServ.html = 0;
+	} else {
+		/* assume that html is enabled if we don't have a setting for it */
 		StatServ.html = 1;
-	} else if (configtype == 5) {
-		/* htmlpath */
-		strcpy(StatServ.htmlpath, arg);
-	} else if (configtype == 6) {
-		StatServ.interval = atoi(arg);
+		GetConf((void *)StatServ.html, CFGSTR, "HTML_Enabled");
+		snprintf(StatServ.htmlpath, 255, "%s", tmp);
+		free(tmp);
+	}
+	if (GetConf((void *)&StatServ.interval, CFGINT, "Wallop_Throttle") < 0) {
+		StatServ.interval = 0;
 	}
 	
 }
@@ -162,21 +166,13 @@ void _init() {
 	lnode_t *chanmem;
 
 	strcpy(segv_location, "StatServ-_init");
+	strcpy(segvinmodule, SSMNAME);
+	
 	StatServ.onchan = 0;
-	memcpy(StatServ.user, Servbot.user, 8);
-	memcpy(StatServ.host, Servbot.host, MAXHOST);
-	StatServ.lag = 0;
-	StatServ.html = 0;
-	StatServ.interval = 0;
-	if (!config_read("neostats.cfg", options) == 0) {
-		log("Error, Statserv could not be configured");
-		chanalert(s_Services, "Error, Statserv could not be configured");
-		return;
-	}
-
-		if (StatServ.html) {
+	ss_Config();
+	if (StatServ.html) {
 		if (strlen(StatServ.htmlpath) < 1) {
-			log("StatServ HTML stats is disabled, as HTML_PATH is not set in the config file");
+			nlog(LOG_NOTICE, LOG_MOD, "StatServ HTML stats is disabled, as HTML_PATH is not set in the config file");
 			StatServ.html = 0;
 		}
 	}
@@ -194,10 +190,7 @@ void _init() {
 		s_new_server(av, ac);
 		free(av);
 		ac = 0;
-//		FreeList(av, ac);
-#ifdef DEBUG
-		log("Added Server %s to StatServ List", ss->name);
-#endif
+		nlog(LOG_DEBUG2, LOG_CORE, "Added Server %s to StatServ List", ss->name);
 	}
 	hash_scan_begin(&scan, uh);
 	while ((node = hash_scan_next(&scan)) != NULL ) {
@@ -209,10 +202,7 @@ void _init() {
 		s_user_modes(av, ac);
 		free(av);
 		ac = 0;
-//		FreeList(av, ac);
-#ifdef DEBUG
-			log("Adduser user %s to StatServ List", u->nick);
-#endif
+		nlog(LOG_DEBUG2, LOG_CORE, "Adduser user %s to StatServ List", u->nick);
 	}
 	hash_scan_begin(&scan, ch);
 	while ((node = hash_scan_next(&scan)) != NULL ) {
@@ -223,20 +213,16 @@ void _init() {
 		ac = 0;
 		AddStringToList(&av, c->name, &ac);
 		s_chan_new(av, ac);
-//		FreeList(av, ac);
 		free(av);
 		ac = 0;	
 		for (i = 1; i <= count; i++) {
-#ifdef DEBUG
-			log("Chanjoin %s", c->name);
-#endif
+			nlog(LOG_DEBUG2, LOG_CORE, "Chanjoin %s", c->name);
 			ac = 0;
 			AddStringToList(&av, c->name, &ac);
 			AddStringToList(&av, chan, &ac);
 			s_chan_join(av, ac);
 			free(av);
 			ac = 0;
-//			FreeList(av, ac);
 			if (i < count) {
 				chanmem = list_next(c->chanmembers, chanmem);
 				chan = lnode_get(chanmem);
@@ -259,13 +245,13 @@ int __Bot_Message(char *origin, char **av, int ac)
 
 	u = finduser(origin);
 	if (!u) {
-		log("Unable to finduser %s (statserv)", origin);
+		nlog(LOG_WARNING, LOG_CORE, "Unable to finduser %s (statserv)", origin);
 		return -1;
 	}
 
 	stats_network.requests++;
 
-	log("%s received message from %s: %s", s_StatServ, u->nick, av[1]);
+	nlog(LOG_NORMAL, LOG_MOD, "%s received message from %s: %s", s_StatServ, u->nick, av[1]);
 
 	if (me.onlyopers && UserLevel(u) < 40) {
 		prefmsg(u->nick, s_StatServ,
@@ -288,12 +274,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 			privmsg_list(u->nick, s_StatServ, ss_server_help);
 		else if (!strcasecmp(av[2], "CHAN")) 
 			privmsg_list(u->nick, s_StatServ, ss_chan_help);
-		else if (!strcasecmp(av[2], "RESET") && UserLevel(u) >= 185)
-			privmsg_list(u->nick, s_StatServ, ss_reset_help);
 		else if (!strcasecmp(av[2], "MAP"))
 			privmsg_list(u->nick, s_StatServ, ss_map_help);
-		else if (!strcasecmp(av[2], "JOIN") && UserLevel(u) >= 185)
-			privmsg_list(u->nick, s_StatServ, ss_join_help);
 		else if (!strcasecmp(av[2], "NETSTATS"))
 			privmsg_list(u->nick, s_StatServ, ss_netstats_help);
 		else if (!strcasecmp(av[2], "DAILY"))
@@ -312,6 +294,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 			privmsg_list(u->nick, s_StatServ, ss_version_help);
 		else if (!strcasecmp(av[2], "STATS") && UserLevel(u) >= 185)
 			privmsg_list(u->nick, s_StatServ, ss_stats_help);
+		else if (!strcasecmp(av[2], "SET") && UserLevel(u) >= 185)
+			privmsg_list(u->nick, s_StatServ, ss_set_help);
 		else
 			prefmsg(u->nick, s_StatServ, "Unknown Help Topic: \2%s\2", av[2]);
 	} else if (!strcasecmp(av[1], "CHAN")) {
@@ -321,11 +305,17 @@ int __Bot_Message(char *origin, char **av, int ac)
 			ss_chans(u, av[2]);
 		}
 		chanalert(s_StatServ, "%s Wanted to see Channel Statistics", u->nick);
+	} else if (!strcasecmp(av[1], "SET")) {
+		if (UserLevel(u) >= 185) {
+			ss_set(u, av, ac);
+		} else {
+			prefmsg(u->nick, s_StatServ, "Permission Denied");
+			chanalert(s_StatServ, "%s tried to set, but don't have access", u->nick);
+		}
+		return 1;
 	} else if (!strcasecmp(av[1], "SERVER")) {
 		ss_server(u, av[2]);
 		chanalert(s_StatServ,"%s Wanted Server Information on %s",u->nick, av[2]);
-	} else if (!strcasecmp(av[1], "JOIN") && (UserLevel(u) >= 185)) {
-		ss_JOIN(u, av[2]);
 	} else if (!strcasecmp(av[1], "MAP")) {
 		ss_map(u);
 		chanalert(s_StatServ,"%s Wanted to see the Current Network MAP",u->nick);
@@ -339,7 +329,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 		ss_daily(u);
 		chanalert(s_StatServ,"%s Wanted to see the Daily NetStats ",u->nick);
 	} else if (!strcasecmp(av[1], "FORCEHTML") && (UserLevel(u) >= 185)) {
-		log("%s!%s@%s Forced an update of the NeoStats Statistics HTML file with the most current statistics", u->nick, u->username, u->hostname);
+		nlog(LOG_NOTICE, LOG_MOD, "%s!%s@%s Forced an update of the NeoStats Statistics HTML file with the most current statistics", u->nick, u->username, u->hostname);
 		chanalert(s_StatServ,"%s Forced the NeoStats Statistics HTML file to be updated with the most current statistics",u->nick);
 		ss_html();
 	} else if (!strcasecmp(av[1], "TLD")) {
@@ -358,28 +348,98 @@ int __Bot_Message(char *origin, char **av, int ac)
 		ss_botlist(u);
 		chanalert(s_StatServ,"%s Wanted to see the Bot List",u->nick);
 	} else if (!strcasecmp(av[1], "STATS") && (UserLevel(u) >= 185)) {
-/*
-
-FISH: We do use less than 5 sometimes, I commented this out.. each section does checking.
-- Shmad
-
-		if (ac < 5) {
-			prefmsg(u->nick, s_StatServ, "Incorrect Syntax: /msg %s HELP STATS", s_StatServ);
-		}
-*/
 		ss_stats(u, av[2], av[3], av[4]);
 		if (ac < 3) { 
 			chanalert(s_StatServ,"%s Wants to Look at my Stats!! 34/24/34",u->nick);
 		}
-	} else if (!strcasecmp(av[1], "RESET") && (UserLevel(u) >= 185)) {
-		chanalert(s_StatServ,"%s Wants me to RESET the databases.. here goes..",u->nick);
-		ss_reset(u);
 	} else {
 		prefmsg(u->nick, s_StatServ, "Unknown Command: \2%s\2", av[1]);
 		chanalert(s_StatServ,"%s Reqested %s, but that is a Unknown Command",u->nick,av[1]);
 	}
 	return 1;
 }
+
+static void ss_set(User *u, char **av, int ac) {
+
+	if (ac == 2) {
+		prefmsg(u->nick, s_StatServ, "Current Settings are:");
+		prefmsg(u->nick, s_StatServ, "HTML Statistics: %s", StatServ.html > 0 ? "Enabled" : "Disabled");
+		if (StatServ.html > 0) prefmsg(u->nick, s_StatServ, "HTML Path: %s", StatServ.htmlpath);
+		prefmsg(u->nick, s_StatServ, "Wallop Throttling: %d (0 = Disabled)", StatServ.interval);
+		prefmsg(u->nick, s_StatServ, "Lag Warnings: %d (0 = Disabled)", StatServ.lag);
+		return;
+	}	
+	if (!strcasecmp(av[2], "HTML")) {
+		if (StatServ.html == 0) {
+			/* its disabled, enable it */
+			if (strlen(StatServ.htmlpath) > 0) {
+				StatServ.html = 1;
+				chanalert(s_StatServ, "%s Enabled HTML output", u->nick);
+				prefmsg(u->nick, s_StatServ, "HTML output is now enabled to: %s", StatServ.htmlpath);
+				SetConf((void *)1, CFGINT, "HTML_Enabled");
+			} else {
+				prefmsg(u->nick, s_StatServ, "Error, No Path Defined for HTML output, can not enable");
+				prefmsg(u->nick, s_StatServ, "Please see /msg %s help set", s_StatServ);
+ 			}
+ 		} else {
+ 			/* its enabled, disable it */
+ 			StatServ.html = 0;
+ 			chanalert(s_StatServ, "%s Disabled HTML output",u->nick);
+ 			prefmsg(u->nick, s_StatServ, "HTML output is now disabled");
+			SetConf((void *)0, CFGINT, "HTML_Enabled");
+ 		}
+ 		return;
+ 	} else if (!strcasecmp(av[2], "MSGTHROTTLE")) {
+ 		if (ac != 4) {
+ 			/* wrong number of arguments */
+ 			prefmsg(u->nick, s_StatServ, "Invalid Syntax. /msg %s help set for more info", s_StatServ);
+ 			return;
+ 		}
+ 		StatServ.interval = atoi(av[3]);
+		if (StatServ.interval <= 0) {
+	 		prefmsg(u->nick, s_StatServ, "Wallop Throttles are disabled");
+	 		chanalert(s_StatServ, "%s disabled Wallop Throttling", u->nick);
+	 		StatServ.interval = 0;
+	 	} else {
+	 		prefmsg(u->nick, s_StatServ, "Wallop Throttle is now set to 5 messages per %d Seconds", StatServ.interval);
+	 		chanalert(s_StatServ, "%s set Wallop Throttle to 5 messages per %d Seconds", u->nick, StatServ.interval);
+	 	}
+	 	SetConf((void *)StatServ.interval, CFGINT, "Wallop_Throttle");
+	 	return;
+	 } else if (!strcasecmp(av[2], "HTMLPATH")) {
+	 	if (ac != 4) {
+	 		/* wrong number of params */
+	 		prefmsg(u->nick, s_StatServ, "Invalid Syntax. /msg %s help set for more info", s_StatServ);
+	 		return;
+	 	}
+	 	snprintf(StatServ.htmlpath, 255, "%s", av[3]);
+	 	prefmsg(u->nick, s_StatServ, "HTML path now set to %s", StatServ.htmlpath);
+	 	chanalert(s_StatServ, "%s changed the HTML path to %s", u->nick, StatServ.htmlpath);
+	 	SetConf((void *)StatServ.htmlpath, CFGSTR, "HTML_Path");
+	 	return;
+	 } else if (!strcasecmp(av[2], "LAGWALLOP")) {
+	 	if (ac != 4) {
+	 		/* wrong number of params */
+	 		prefmsg(u->nick, s_StatServ, "Invalid Syntax. /msg %s help set for more info", s_StatServ);
+	 		return;
+	 	}
+	 	StatServ.lag = atoi(av[3]);
+	 	if (StatServ.lag <= 0) {
+	 		prefmsg(u->nick, s_StatServ, "Lag Warnings are now disabled");
+	 		chanalert(s_StatServ, "%s Disabled Lag Warnings", u->nick);
+	 	} else {
+			prefmsg(u->nick, s_StatServ, "Server Lag Warnings now set to %d seconds", StatServ.lag);
+			chanalert(u->nick, s_StatServ, "%s changed Server Lag Warning threshold to %d", u->nick, StatServ.lag);
+		}	 		
+		SetConf((void *)StatServ.lag, CFGINT, "Lag");
+		return;
+	} else {
+		prefmsg(u->nick, s_StatServ, "Invalid Syntax. /msg %s help set for more info", s_StatServ);
+		return;
+	}
+}
+
+
 int topchan(const void *key1, const void *key2) {
 	const CStats *chan1 = key1;
 	const CStats *chan2 = key2;
@@ -668,7 +728,7 @@ static void ss_server(User *u, char *server) {
 	ss = findstats(server);
 	s=findserver(server);
 	if (!ss) {
-		log("Wups, Problem, Cant find Server Statistics for Server %s", server);
+		nlog(LOG_CRITICAL, LOG_CORE, "Wups, Problem, Cant find Server Statistics for Server %s", server);
 		prefmsg(u->nick, s_StatServ, "Internal Error! Please Consult the Log file");
 		return;
 	}
@@ -819,7 +879,7 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 
 
 	if (UserLevel(u) < 185) {
-		log("Access Denied (STATS) to %s", u->nick);
+		nlog(LOG_NORMAL, LOG_MOD, "Access Denied (STATS) to %s", u->nick);
 		prefmsg(u->nick, s_StatServ, "Access Denied.");
 		return;
 	}
@@ -841,7 +901,7 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 			i++;
 		}
 		prefmsg(u->nick, s_StatServ, "End of List.");
-		log("%s requested STATS LIST.", u->nick);
+		nlog(LOG_NOTICE, LOG_MOD, "%s requested STATS LIST.", u->nick);
 	} else if (!strcasecmp(cmd, "DEL")) {
 		if (!arg) {
 			prefmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS DEL <name>",
@@ -864,12 +924,12 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 			hnode_destroy(node); 
 			free(st);
 		        prefmsg(u->nick, s_StatServ, "Removed %s from the database.", arg);
-                	log("%s requested STATS DEL %s", u->nick, arg);
+                	nlog(LOG_NOTICE, LOG_MOD, "%s requested STATS DEL %s", u->nick, arg);
 			return;
 			}
 		} else {
 			prefmsg(u->nick, s_StatServ, "Cannot remove %s from the database, it is online!!", arg);
-			log("%s requested STATS DEL %s, but that server is online!!", u->nick, arg);
+			nlog(LOG_WARNING, LOG_MOD, "%s requested STATS DEL %s, but that server is online!!", u->nick, arg);
 			return;
 		}
 
@@ -900,61 +960,10 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 		memcpy(st->name, arg2, sizeof(st->name));
 		prefmsg(u->nick, s_StatServ, "Moved database entry for %s to %s",
 			arg, arg2);
-		log("%s requested STATS COPY %s -> %s", u->nick, arg, arg2);
+		nlog(LOG_NOTICE, LOG_MOD, "%s requested STATS COPY %s -> %s", u->nick, arg, arg2);
 	} else {
 		prefmsg(u->nick, s_StatServ, "Invalid Argument.");
 		prefmsg(u->nick, s_StatServ, "For help, /msg %s HELP", s_StatServ);
 	}
 }
-
-static void ss_reset(User *u)
-{
-
-	strcpy(segv_location, "StatServ-ss_reset");
-
-
-		if (UserLevel(u) < 185) {
-				log("Access Denied (RELOAD) to %s", u->nick);
-				prefmsg(u->nick, s_StatServ, "Access Denied.");
-				return;
-		}
-/*		remove("data/nstats.db");
-		remove("data/stats.db");
-		globops(s_StatServ, "%s requested \2RESET\2 databases.", u->nick);
-		log("%s requested RESET.", u->nick);
-		globops(s_StatServ, "Rebuilding Statistics DataBase after RESET...");
-	prefmsg(u->nick, s_StatServ, "Databases Reset! I hope you wanted to really do that!");
-	LoadStats(); */
-	prefmsg(u->nick, s_StatServ, "This command is depreciated.");
-	prefmsg(u->nick, s_StatServ, "To RESET server databases, unload StatServ and remove stats.db in the data directory!");
-}
-
-static void ss_JOIN(User *u, char *chan)
-{
-
-	strcpy(segv_location, "StatServ-ss_JOIN");
-
-
-	if (UserLevel(u) < 185) {
-		log("Access Denied (JOIN) to %s", u->nick);
-		prefmsg(u->nick, s_StatServ, "Access Denied.");
-		chanalert(s_StatServ,"%s Requested JOIN, but is not a god!",u->nick);
-		return;
-	}
-	if (!chan) {
-		prefmsg(u->nick, s_StatServ, "Syntax: /msg %s JOIN <chan>",s_StatServ);
-		return;
-	}
-	globops(s_StatServ, "JOINING CHANNEL -\2(%s)\2- Thanks to %s!%s@%s)", chan, u->nick, u->username, u->hostname);
-	prefmsg(me.chan, s_StatServ, "%s Asked me to Join %s, So, I'm Leaving %s", u->nick, chan, me.chan);
-	spart_cmd(s_StatServ, me.chan);
-	log("%s!%s@%s Asked me to Join %s, I was on %s", u->nick, u->username, u->hostname, chan, me.chan);
-#ifdef ULTIMATE3
-	sjoin_cmd(s_StatServ, chan, MODE_CHANADMIN);
-#else 
-	sjoin_cmd(s_StatServ, chan);
-	schmode_cmd(me.name, chan, "+o", s_StatServ);
-#endif
-}
-
 

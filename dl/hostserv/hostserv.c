@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.40 2003/04/17 00:16:27 fishwaldo Exp $
+** $Id: hostserv.c,v 1.41 2003/04/17 13:48:15 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -427,6 +427,7 @@ void _init() {
     hs_lvl.view = 100;
     hs_lvl.old = 60;
     hs_Config();
+
 }
 
 void _fini() {
@@ -689,14 +690,9 @@ void Loadhosts()
     if (fp) {
     	load_synch = 1;
 		while (fgets(buf, 512, fp)) {
-printf("fget\n");
         	    strip(buf); 
-        	    printf("buf\n");
         	    LoadArryCount = split_buf(buf, &LoadArry, 0);
-        	    printf("split\n");
 		    if (!hash_lookup(vhosts, LoadArry[0])) {
-#if 1
-		    	printf("adding %s %d\n", LoadArry[0], sizeof(hs_map));
 		            map = malloc(sizeof(hs_map));
 		            strncpy(map->nnick, LoadArry[0], MAXNICK);
         		    strncpy(map->host, LoadArry[1], MAXHOST);
@@ -718,14 +714,11 @@ printf("fget\n");
 			    hn = hnode_create(map);
 			    hash_insert(vhosts, hn, map->nnick);
 			    nlog(LOG_DEBUG1, LOG_CORE, "Loaded %s (%s) into Vhosts", map->nnick, map->vhost);
-#endif
-printf("next\n");
 		    } else {
 	    		    nlog(LOG_NOTICE, LOG_CORE, "HostServ: db entry for %s already exists", LoadArry[0]);
 	    	    }
 	            free(LoadArry);		
 	    	}
-	    	printf("close\n");
     	fclose(fp);
     }
 }

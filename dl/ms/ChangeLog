@@ -1,4 +1,7 @@
 MoraleServ ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* MoraleServ * Fish * Version 2.20
+ - Moved to new Logging Functions
+
 * MoraleServ * Fish * Version 2.19
  - Removed a lot of crap that should have never been in MoraleServ (Like SVSJOIN? Log Viewers?)
 

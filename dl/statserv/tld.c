@@ -20,11 +20,11 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: tld.c,v 1.3 2002/09/04 08:40:29 fishwaldo Exp $
+** $Id: tld.c,v 1.4 2003/04/17 13:48:26 fishwaldo Exp $
 */
 
 #include "statserv.h"
-
+#include "log.h"
 
 
 void DelTLD(User *u) {
@@ -49,7 +49,7 @@ void DelTLD(User *u) {
     }
 
     if (!t) {
-        log("Unable to find TLD entry for %s (%s), damn vhosts!", u->nick, m);
+        nlog(LOG_NORMAL, LOG_MOD, "Unable to find TLD entry for %s (%s), damn vhosts!", u->nick, m);
         return;
     }
     t->users--;
@@ -93,7 +93,7 @@ TLD *AddTLD(User *u)
     }
 
     if (!t) {
-        log("Unable to find TLD entry for %s (%s), damn vhosts!", u->nick, m);
+        nlog(LOG_NORMAL, LOG_MOD, "Unable to find TLD entry for %s (%s), damn vhosts!", u->nick, m);
         return NULL;
     }
     t->users++;
@@ -114,7 +114,7 @@ void LoadTLD()
 
 
     if ((fp = fopen("data/tlds.nfo", "r")) == NULL) {
-        log("Top Level Domain Statistics not loaded: file not found.");
+        nlog(LOG_WARNING, LOG_MOD, "Top Level Domain Statistics not loaded: file not found.");
         return;
     }
 

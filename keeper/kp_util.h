@@ -26,10 +26,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_PTHREAD_MUTEX
-#define _REENTRANT
-#include <pthread.h>
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,31 +45,6 @@ extern void  _iafree(void *ptr, int id);
 #define SEP2 '='
 
 #define ROUND_TO(x, r) (((x) + ((r) - 1)) & ~((r) - 1))
-
-#ifdef HAVE_PTHREAD_MUTEX
-#define KP_MUTEX(name) static pthread_mutex_t name = PTHREAD_MUTEX_INITIALIZER
-#define KP_LOCK(name)   pthread_mutex_lock(&name)
-#define KP_UNLOCK(name) pthread_mutex_unlock(&name)
-#else
-/* ------------------------------------------------------------------------- 
- * Pseudo locking function that can (sometimes) detect lock violation in
- * case the proper locking was not compied into keeper
- * ------------------------------------------------------------------------- */
-static inline int kp_check_lock(int l)
-{
-    if(l != 0) {
-        fprintf(stderr,
-                "keeper: Error: Locking violation. Please recompile keeper\n"
-                "               library with pthread support enabled\n");
-        abort();
-    }
-    return 1;
-}
-
-#define KP_MUTEX(name)  static volatile int name = 0
-#define KP_LOCK(name)   name = kp_check_lock(name)
-#define KP_UNLOCK(name) name = 0
-#endif
 
 /* Key list element used to store keys in the cache */
 typedef struct _kp_key {
@@ -194,8 +165,6 @@ extern int   _kp_get_path(const char *keypath, kp_path *kpp, char **keynamep,
                          int *iskeyfile);
 extern int   _kp_errno_to_kperr(int en);
 extern char *_kp_get_line(FILE *fp, char **valuep);
-extern int   _kp_lock_file(int dbindex, int iswrite);
-extern void  _kp_unlock_file(int lockfd);
 extern int   _kp_get_ibeg(int dbindex);
 extern char *_kp_get_tmpfile(int dbindex);
 extern void  _kp_add_subkey_check(struct key_array *keys, char *name);

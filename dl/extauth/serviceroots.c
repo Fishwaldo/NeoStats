@@ -20,13 +20,16 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: serviceroots.c,v 1.9 2003/01/06 12:25:04 fishwaldo Exp $
+** $Id: serviceroots.c,v 1.10 2003/04/17 13:48:14 fishwaldo Exp $
 */
 
 #include <stdio.h>
+#include <fnmatch.h>
 #include "dl.h"
 #include "stats.h"
 #include "dotconf.h"
+#include "log.h"
+#include "conf.h"
 
 extern const char version_date[], version_time[];
 
@@ -36,7 +39,7 @@ void sr_cb_config(char *arg, int configtype);
 Module_Info extauth_Info[] = { {
     "extauth",
     "ServiceRoots Authentication Module",
-    "1.0"
+    "1.1"
 } };
 
 Functions ServiceRoots_fn_list[] = { 
@@ -57,9 +60,7 @@ Functions *__module_get_functions() {
 };
 
 static config_option options[] = {
-{ "SERVICE_ROOTS", ARG_STR, sr_cb_config, 0},
-{ "SERVICE_ROOTS_AUTH", ARG_STR, sr_cb_config, 1}
-
+{ "SERVICE_ROOTS", ARG_STR, sr_cb_config, 0}
 };
 
 
@@ -67,6 +68,13 @@ struct srconf {
 	list_t *ul;
 	int auth;
 } srconf;
+
+struct users {
+	char nick[MAXNICK];
+	char ident[MAXUSER];
+	char host[MAXHOST];
+	int lvl;
+} users;
 
 
 
@@ -81,7 +89,7 @@ void _init() {
 	/* only a max of 10 serviceroots */
 	srconf.ul = list_create(10);
 	if (!config_read("neostats.cfg", options) ==0 ) {
-		log("ehh, config failed");
+		nlog(LOG_WARNING, LOG_CORE, "ServiceRoots: ehh, config failed");
 	}	
 }
 
@@ -98,50 +106,56 @@ void _fini() {
 void sr_cb_config(char *arg, int configtype) {
 	lnode_t *un;
 	char *nick;
-	nick = malloc(strlen(arg)+1);
-	bzero(nick, strlen(arg)+1);
+	char *user;
+	char *host;
+	struct users *sru;
+	
+	
 	strcpy(segv_location, "StatServ-ss_cb_Config");
 	if (configtype == 0) {
 		if (list_isfull(srconf.ul)) {
-			log("Exceded Maxium Number of ServiceRoots(10)");
+			nlog(LOG_WARNING, LOG_CORE, "Exceded Maxium Number of ServiceRoots(10)");
 			return;
 		} else {
-			strncpy(nick, arg, strlen(arg));
-			if (list_find(srconf.ul, nick, comparef)) {
-				return;
+			/* new code to do hostname. ident lookups */
+			if (strstr(arg, "!")) {
+				if (!strstr(arg, "@")) {
+					nlog(LOG_WARNING, LOG_CORE, "Invalid ServiceRoots Entry. Must be of the form nick!ident@host, was %s", arg);
+					return;
+				}
+				nick = strtok(arg, "!");
+				user = strtok(NULL, "@");
+				host = strtok(NULL, "");
+				sru = malloc(sizeof(users));
+				strncpy(sru->nick, nick, MAXNICK);
+				strncpy(sru->ident, user, MAXUSER);
+				strncpy(sru->host, host, MAXHOST);
+				sru->lvl = 200;				
+			} else {
+				/* old format... Warn, but keep going */
+				sru = malloc(sizeof(users));
+				strncpy(sru->nick, arg, MAXNICK);
+				strncpy(sru->ident, "*", MAXUSER);
+				strncpy(sru->host, "*", MAXHOST);
+				sru->lvl = 200;
+				nlog(LOG_WARNING, LOG_CORE, "Old ServiceRoots Entry Detected. Suggest you upgrade ASAP to <nick>!<ident>@<host> (WildCards are allowed)");
 			}
-			un = lnode_create(nick);
+			un = lnode_create(sru);
 			list_append(srconf.ul, un);
 		}	
-	} else if (configtype == 1) {
-		/* ServiceRootsAuth */
-		srconf.auth=1;
 	}
 }
 	
 extern int __do_auth(User *u, int curlvl) {
 	lnode_t *un;
-#ifndef HYBRID7
-	if (u->Umode & UMODE_REGNICK) {
-#else
-	/* this is *baaaaaaaaaaad* */
-	if (1) {
-#endif
-		un = list_first(srconf.ul);
-		while (un) {
-			if (!strcasecmp(u->nick, lnode_get(un))) {
-				if (srconf.auth == 1) {
-					return (200);
-				} else {
-					return (200);
-				}
-			}
-			un = list_next(srconf.ul, un);
+	struct users *sru;
+	un = list_first(srconf.ul);
+	while (un) {
+		sru = lnode_get(un);
+		if ((!fnmatch(sru->nick, u->nick, 0)) && (!fnmatch(sru->ident, u->username, 0)) && (!fnmatch(sru->host, u->hostname, 0))) {
+			return (sru->lvl);
 		}
-	} else {
-		if (srconf.auth == 1) {
-			curlvl = 0;
-		}
+		un = list_next(srconf.ul, un);
 	}
 	return curlvl;
 }
@@ -149,9 +163,11 @@ extern int __do_auth(User *u, int curlvl) {
 extern int __list_auth(User *u) {
 
 	lnode_t *un;
+	struct users *sru;
 	un = list_first(srconf.ul);
 	while (un) {
-		snumeric_cmd(243, u->nick, "O *@* %s S", (char *) lnode_get(un));
+		sru = lnode_get(un);
+		snumeric_cmd(243, u->nick, "O %s@%s %s %d", sru->ident, sru->host, sru->nick, sru->lvl);
 		un = list_next(srconf.ul, un);
 	}
 	return 1;

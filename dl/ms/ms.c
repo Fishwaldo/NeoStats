@@ -20,12 +20,13 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ms.c,v 1.12 2003/03/28 10:05:54 fishwaldo Exp $
+** $Id: ms.c,v 1.13 2003/04/17 13:48:18 fishwaldo Exp $
 */
 
 #include <stdio.h>
 #include "dl.h"
 #include "stats.h"
+#include "log.h"
 #include "ms_help.c"
 
 const char msversion_date[] = __DATE__;
@@ -43,13 +44,11 @@ static void ms_behappy(User *u, char *cmd);
 static void ms_wonderful(User *u, char *cmd);
 static int new_m_version(char *origin, char **av, int ac);
 
-void mslog(char *, ...);
-void lovelogs(char *, ...);
 
 Module_Info my_info[] = { {
     "MoraleServ",
     "A Network Morale Service",
-    "2.19"
+    "2.20"
 } };
 
 
@@ -74,10 +73,7 @@ int __Bot_Message(char *origin, char **av, int ac)
     u = finduser(origin);
 
     if (!strcasecmp(av[1], "HELP")) {
-        if (ac <= 2 && (UserLevel(u) >= 185)) {
-            privmsg_list(u->nick, s_MoraleServ, ms_help_tech);
-            return 1;
-        } else if (ac <= 2) {
+        if (ac <= 2) {
             privmsg_list(u->nick, s_MoraleServ, ms_help);
             return 1;
         } else if (!strcasecmp(av[2], "HAIL")) {
@@ -217,31 +213,6 @@ void _fini() {
 };
 
 
-/* Routine for logging items with the 'mslog' */
-void mslog(char *fmt, ...)
-{
-        va_list ap;
-        FILE *msfile = fopen("logs/MoraleServ.log", "a");
-        char buf[512], fmtime[80];
-        time_t tmp = time(NULL);
-
-        va_start(ap, fmt);
-        vsnprintf(buf, 512, fmt, ap);
-
-        strftime(fmtime, 80, "%H:%M[%m/%d/%Y]", localtime(&tmp));
-
-        if (!msfile) {
-        log("Unable to open logs/MoraleServ.log for writing.");
-        return;
-    }
-
-    fprintf(msfile, "(%s) %s\n", fmtime, buf);
-        va_end(ap);
-        fclose(msfile);
-
-}
-
-
 /* Routine for HAIL */
 static void ms_hail(User *u, char *cmd, char *m) {
         strcpy(segv_location, "ms_hail");
@@ -260,7 +231,7 @@ static void ms_hail(User *u, char *cmd, char *m) {
     chanalert(s_Services, "%s Wanted %s to be hailed by sending the song to %s", u->nick,cmd,m);
     prefmsg(m, s_MoraleServ, "Courtesy of your friend %s:",u->nick);
     prefmsg(m, s_MoraleServ, "*sings* Hail to the %s, they're the %s and they need hailing, hail to the %s so you better all hail like crazy...",cmd,cmd,cmd);
-    mslog("%s sent a HAIL to the %s song to %s",u->nick,cmd,m);
+    nlog(LOG_NORMAL, LOG_MOD,"%s sent a HAIL to the %s song to %s",u->nick,cmd,m);
 
 }
 
@@ -283,7 +254,7 @@ static void ms_lapdance(User *u, char *cmd) {
     prefmsg(cmd, s_MoraleServ, "*%s Sits across %s's legs and gives %s the best Lap Dance of their life*",s_MoraleServ,cmd,cmd);
     prefmsg(cmd, s_MoraleServ, "*I Think we both need a cold shower now*... *wink*",s_MoraleServ,cmd);
     chanalert(s_Services, "%s Wanted a LAPDANCE to be preformed on %s", u->nick,cmd);
-    mslog("%s Wanted a LAPDANCE to be preformed on %s",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD,"%s Wanted a LAPDANCE to be preformed on %s",u->nick,cmd);
 
 }
 
@@ -316,7 +287,7 @@ static void ms_ode(User *u, char *cmd, char *m) {
     prefmsg(m, s_MoraleServ, "For if I was a %s,",cmd);
     prefmsg(m, s_MoraleServ, "I'd watch the network hail thee.",cmd);
     prefmsg(m, s_MoraleServ, "*bows*",u->nick);
-    mslog("%s sent an ODE to %s to be recited to %s",u->nick,cmd,m);
+    nlog(LOG_NORMAL, LOG_MOD,"%s sent an ODE to %s to be recited to %s",u->nick,cmd,m);
 
 }
 
@@ -361,7 +332,7 @@ static void ms_poem(User *u, char *cmd, char *m) {
     prefmsg(m, s_MoraleServ, "Coz how can you be grumpy,");
     prefmsg(m, s_MoraleServ, "When the sun shines out your bum.");
     prefmsg(m, s_MoraleServ, "*bows*");
-    mslog("%s sent a POEM about %s to %s",u->nick,cmd,m);
+    nlog(LOG_NORMAL, LOG_MOD,"%s sent a POEM about %s to %s",u->nick,cmd,m);
 
 }
 
@@ -386,7 +357,7 @@ static void ms_redneck(User *u, char *cmd) {
     prefmsg(cmd, s_MoraleServ, "*recites*",u->nick);
     prefmsg(cmd, s_MoraleServ, "I dub thee \"Redneck\", May you enjoy your coons and over sexation and many hours of wierd contemplation. If its dead you eat it, ifs living kill it than eat it. This is the redneck way. Country Music all the time no rap no jive no rock no hop this is the redneck way, now go forth into a redneck world and don't forget your boots.",u->nick);
     prefmsg(cmd, s_MoraleServ, "*bows*",u->nick);
-    mslog("%s sent a REDNECK \"dubbing\" to %s",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD,"%s sent a REDNECK \"dubbing\" to %s",u->nick,cmd);
 
 }
 
@@ -408,7 +379,7 @@ static void ms_cheerup(User *u, char *cmd) {
     prefmsg(cmd, s_MoraleServ, "Cheer up %s .....",cmd);
     prefmsg(cmd, s_MoraleServ, "All of us on the network love you! 3--<--<--<{4@",u->nick);
     chanalert(s_Services, "%s Wanted %s to CHEERUP", u->nick,cmd);
-    mslog("%s Wanted %s to CHEERUP",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD,"%s Wanted %s to CHEERUP",u->nick,cmd);
 
 }
 
@@ -455,7 +426,7 @@ static void ms_behappy(User *u, char *cmd) {
     prefmsg(cmd, s_MoraleServ, "Don't Worry - Be Happy, I'm not worried, I'm happy . . . .",u->nick);
 
     chanalert(s_Services, "%s Wanted %s to BEHAPPY", u->nick,cmd);
-    mslog("%s Wanted %s to BEHAPPY",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD,"%s Wanted %s to BEHAPPY",u->nick,cmd);
 
 }
 
@@ -486,7 +457,7 @@ static void ms_wonderful(User *u, char *cmd) {
     prefmsg(cmd, s_MoraleServ, "How wonderful life is while %s is in the world",cmd);
 
     chanalert(s_Services, "%s Wanted to express how WONDERFUL %s is", u->nick,cmd);
-    mslog("%s Wanted to express how WONDERFUL %s is",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD,"%s Wanted to express how WONDERFUL %s is",u->nick,cmd);
 
 }
 

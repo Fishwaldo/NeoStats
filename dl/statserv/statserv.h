@@ -23,7 +23,7 @@
 #define SS_CHAN_SIZE 10240
 
 
-extern char s_StatServ[MAXNICK];
+char *s_StatServ;
 
 typedef struct tld_ TLD;
 typedef struct server_stats SStats;
@@ -56,12 +56,12 @@ struct stats_network_ {
 
 
 struct StatServ {
-	char nick[MAXNICK];
 	char user[MAXUSER];
 	char host[MAXHOST];
+	char rname[MAXHOST];
 	int lag;
 	int html;
-	char htmlpath[BUFSIZE];
+	char htmlpath[255];
 	int onchan;
 	int newdb;
 	int interval;
@@ -195,6 +195,7 @@ extern const char *ss_htmlstats_help[];
 extern const char *ss_forcehtml_help[];
 extern const char *ss_notices_help[];
 extern const char *ss_chan_help[];
+extern const char *ss_set_help[];
 /* tld.c */
  void DelTLD(User *u);
 

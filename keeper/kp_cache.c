@@ -198,7 +198,6 @@ static int kp_get_file(kp_path *kpp, kp_fil **fp, int *isdirp)
     kp_fil *fil;
     int res;
     struct stat stbuf;
-    int lockfd;
     time_t now;
 
     *fp = NULL;
@@ -240,7 +239,6 @@ static int kp_get_file(kp_path *kpp, kp_fil **fp, int *isdirp)
         /* Clean up old cached files */
         kp_clean_up_cache(now);
 
-        lockfd = _kp_lock_file(kpp->dbindex, 0);
         res = stat(kpp->path, &stbuf);
         if(res != 0)
             res = _kp_errno_to_kperr(errno);
@@ -259,7 +257,6 @@ static int kp_get_file(kp_path *kpp, kp_fil **fp, int *isdirp)
                 }
             }
         }
-        _kp_unlock_file(lockfd);
 
         /* We cache nonexistent files also */
         if(res != 0 && res != KPERR_NOKEY)
@@ -491,12 +488,9 @@ int _kp_cache_get_subkeys(kp_path *kpp, const char *keypath, int iskeyfile,
                           struct key_array *keys)
 {
     int res;
-    int lockfd;
 
     if(!iskeyfile) {
-        lockfd = _kp_lock_file(kpp->dbindex, 0);
         res = _kp_get_subkeys_dir(kpp->path, keys);
-        _kp_unlock_file(lockfd);
     }
     else
         res = kp_get_subkeys_file(kpp, keypath, keys);
@@ -512,13 +506,10 @@ int _kp_cache_flush()
     int res;
     int finalres = 0;
     kp_fil *fil;
-    int lockfd;
 
     for(fil = kp_cachef; fil != NULL; fil = fil->next) {
         if(fil->dirty) {
-            lockfd = _kp_lock_file(fil->kpp.dbindex, 1);
             res = _kp_write_file(&fil->kpp, fil->keys);
-            _kp_unlock_file(lockfd);
 
             /* The return value of the flush will be the value of the
                last error that occured */

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: spam.c,v 1.22 2003/04/12 06:21:30 fishwaldo Exp $
+** $Id: spam.c,v 1.23 2003/04/17 13:48:21 fishwaldo Exp $
 */
 
 
@@ -108,15 +108,15 @@ int Online(char **av, int ac) {
 	}
 	if (GetConf((void *)&user, CFGSTR, "User") < 0) {
 		user = malloc(MAXUSER);
-		strncat(user, "please", MAXUSER);
+		snprintf(user, MAXUSER, "please");
 	}
 	if (GetConf((void *)&host, CFGSTR, "Host") < 0) {
 		host = malloc(MAXHOST);
-		strncat(host, me.name, MAXHOST);
+		snprintf(host,MAXHOST, me.name);
 	}
 	if (GetConf((void *)&rname, CFGSTR, "RealName") < 0) {
 		rname = malloc(MAXHOST);
-		strncat(rname, "Chat to me", MAXHOST);
+		snprintf(rname, MAXHOST, "Chat to me");
 	}
 	
 

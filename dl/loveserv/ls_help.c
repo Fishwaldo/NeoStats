@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ls_help.c,v 1.4 2002/09/04 08:40:28 fishwaldo Exp $
+** $Id: ls_help.c,v 1.5 2003/04/17 13:48:17 fishwaldo Exp $
 */
 
 const char *ls_help[] = {
@@ -33,14 +33,6 @@ const char *ls_help[] = {
 "",
 "For Additional Help on each command type:",
 "EXAMPLE: /msg LoveServ HELP ROSE",
-"",
-NULL
-};
-
-const char *ls_help_admin[] = {
-"\2Additional Commands for Net and Tech Admins",
-"",
-"     VIEWLOGS",
 "",
 NULL
 };
@@ -133,12 +125,3 @@ const char *ls_help_version[] = {
 NULL
 };
 
-const char *ls_help_viewlogs[] = {
-"\2Net/Tech Admin Command: VIEWLOGS",
-"View the LoveServ LOGFILE.  Please be forewarned",
-"That this \2CAN\2 and \2MAY\2 flood you off the",
-"Network.  Use at your own risk!",
-"\2SYNTAX:\2 /msg LoveServ VIEWLOGS",
-"",
-NULL
-};

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: loveserv.c,v 1.11 2003/01/21 13:15:33 fishwaldo Exp $
+** $Id: loveserv.c,v 1.12 2003/04/17 13:48:16 fishwaldo Exp $
 */
 
 
@@ -28,6 +28,7 @@
 #include "dl.h"
 #include "stats.h"
 #include "ls_help.c"
+#include "log.h"
 
 const char loveversion_date[] = __DATE__;
 const char loveversion_time[] = __TIME__;
@@ -44,7 +45,6 @@ static void ls_lovenote(User *u, char *cmd, char *m);
 static void ls_apology(User *u, char *cmd, char *m);
 static void ls_thankyou(User *u, char *cmd, char *m);
 static void ls_version(User *u);
-static void ls_viewlogs(User *u);
 static int new_m_version(char *origin, char **av, int ac);
 
 void lslog(char *, ...);
@@ -52,7 +52,7 @@ void lslog(char *, ...);
 Module_Info my_info[] = { {
     "LoveServ",
     "A Network Love Service",
-    "1.5"
+    "1.7"
 } };
 
 int new_m_version(char *origin, char **av, int ac) {
@@ -76,11 +76,7 @@ int __Bot_Message(char *origin, char **av, int ac)
     u = finduser(origin);
 
     if (!strcasecmp(av[1], "HELP")) {
-        if (ac <= 2 && (UserLevel(u) >= 185)) {
-            privmsg_list(u->nick, s_LoveServ, ls_help);
-            privmsg_list(u->nick, s_LoveServ, ls_help_admin);
-            return 1;
-        } else if (ac <= 2) {
+        if (ac <= 2) {
             privmsg_list(u->nick, s_LoveServ, ls_help);
             return 1;
         } else if (!strcasecmp(av[2], "ROSE")) {
@@ -115,9 +111,6 @@ int __Bot_Message(char *origin, char **av, int ac)
             return 1;
         } else if (!strcasecmp(av[2], "VERSION")) {
             privmsg_list(u->nick, s_LoveServ, ls_help_version);
-            return 1;
-        } else if (!strcasecmp(av[2], "VIEWLOGS") && (UserLevel(u) >= 180)) {
-            privmsg_list(u->nick, s_LoveServ, ls_help_viewlogs);
             return 1;
         } else 
             prefmsg(u->nick, s_LoveServ, "Unknown Help Topic: \2%s\2", av[2]);
@@ -201,9 +194,6 @@ int __Bot_Message(char *origin, char **av, int ac)
                 free(cmd);
     } else if (!strcasecmp(av[1], "VERSION")) {
                 ls_version(u);
-    } else if (!strcasecmp(av[1], "VIEWLOGS") && (UserLevel(u) >= 180)) {
-                chanalert(s_LoveServ,"%s Requested to Look at Loveserv's Logs", u->nick);
-               ls_viewlogs(u);
     } else {
         prefmsg(u->nick, s_LoveServ, "Unknown Command: \2%s\2, maybe you love me?", av[1]);
     }
@@ -251,29 +241,6 @@ void _fini() {
 };
 
 
-void lslog(char *fmt, ...)
-{
-		va_list ap;
-        FILE *lovefile = fopen("logs/loveserv.log", "a");
-        char buf[512], fmtime[80];
-        time_t tmp = time(NULL);
-
-        va_start(ap, fmt);
-        vsnprintf(buf, 512, fmt, ap);
-
-        strftime(fmtime, 80, "%H:%M[%m/%d/%Y]", localtime(&tmp));
-
-        if (!lovefile) {
-        log("Unable to open loveserv.log for writing.");
-        return;
-    }
-
-    fprintf(lovefile, "(%s) %s\n", fmtime, buf);
-        va_end(ap);
-        fclose(lovefile);
-}
-
-
 static void ls_rose(User *u, char *cmd) {
     strcpy(segv_location, "ls_rose");
 	if (!strcasecmp(cmd, s_LoveServ)) {
@@ -287,7 +254,7 @@ static void ls_rose(User *u, char *cmd) {
 
     prefmsg(u->nick, s_LoveServ, "Your rose has been sent to %s!",cmd);
     prefmsg(cmd, s_LoveServ, "%s has sent you this beautiful rose! 3--<--<--<{4@",u->nick);
-    lslog("%s sent a ROSE to %s",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD, "%s sent a ROSE to %s",u->nick,cmd);
 }
 
 
@@ -304,7 +271,7 @@ static void ls_kiss(User *u, char *cmd) {
 
     prefmsg(u->nick, s_LoveServ, "You have virtually kissed %s!",cmd);
     prefmsg(cmd, s_LoveServ, "%s has virtually kissed you!",u->nick);
-    lslog("%s sent a KISS to %s",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD, "%s sent a KISS to %s",u->nick,cmd);
 }
 
 
@@ -321,7 +288,7 @@ static void ls_tonsil(User *u, char *cmd) {
 
     prefmsg(u->nick, s_LoveServ, "You have virtually tonsilly kissed %s!",cmd);
     prefmsg(cmd, s_LoveServ, "%s would like to send a SLoW..LoNG..DeeP..PeNeTRaTiNG..ToNSiL-TiCKLiNG.. HaiR STRaiGHTeNiNG..Toe-CuRLiNG..NeRVe-JaNGLiNG..LiFe-aLTeRiNG.. FaNTaSY-CauSiNG..i JuST SaW GoD!..GoSH, DiD MY CLoTHeS FaLL oFF?.. YeS, i'M GLaD i CaMe oN iRC..KiSS oN Da LiPS!!!",u->nick);
-    lslog("%s sent a TONSIL KISS to %s",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD, "%s sent a TONSIL KISS to %s",u->nick,cmd);
 }
 
 
@@ -338,7 +305,7 @@ static void ls_hug(User *u, char *cmd) {
 
     prefmsg(u->nick, s_LoveServ, "%s has received your hug! :)",cmd);
     prefmsg(cmd, s_LoveServ, "%s has sent you a *BIG WARM HUG*!",u->nick);
-    lslog("%s sent a HUG to %s",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD, "%s sent a HUG to %s",u->nick,cmd);
 }
 
 
@@ -355,7 +322,7 @@ static void ls_admirer(User *u, char *cmd) {
 
     prefmsg(u->nick, s_LoveServ, "Anonymous admire sent to %s :)",cmd);
     prefmsg(cmd, s_LoveServ, "You have a secret admirer! ;)");
-    lslog("%s sent a ADMIRER to %s",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD, "%s sent a ADMIRER to %s",u->nick,cmd);
 }
 
 
@@ -372,7 +339,7 @@ static void ls_choco(User *u, char *cmd) {
 
     prefmsg(u->nick, s_LoveServ, "A box of cholocates has been sent to %s :)",cmd);
     prefmsg(cmd, s_LoveServ, "%s would like you to have this YUMMY box of chocolates!",u->nick);
-    lslog("%s sent a Box of Chocolates to %s",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD, "%s sent a Box of Chocolates to %s",u->nick,cmd);
 }
 
 
@@ -389,7 +356,7 @@ static void ls_candy(User *u, char *cmd) {
 
     prefmsg(u->nick, s_LoveServ, "A bag of yummy heart shaped candies has been sent to %s :)",cmd);
     prefmsg(cmd, s_LoveServ, "%s would like you to have this big YUMMY bag of heart shaped candies!",u->nick);
-    lslog("%s sent a BAG OF HEART SHAPED CANDIES to %s",u->nick,cmd);
+    nlog(LOG_NORMAL, LOG_MOD, "%s sent a BAG OF HEART SHAPED CANDIES to %s",u->nick,cmd);
 }
 
 
@@ -406,7 +373,7 @@ static void ls_lovenote(User *u, char *cmd, char *m) {
 
     prefmsg(u->nick, s_LoveServ, "Your lovenote to %s has been sent! :)", cmd);
     prefmsg(cmd, s_LoveServ, "%s has sent you a LoveNote which reads: \2%s\2", u->nick, m);
-    lslog("%s sent a LOVE NOTE to %s which reads %s", u->nick, cmd, m);
+    nlog(LOG_NORMAL, LOG_MOD, "%s sent a LOVE NOTE to %s which reads %s", u->nick, cmd, m);
 }
 
 
@@ -423,7 +390,7 @@ static void ls_apology(User *u, char *cmd, char *m) {
 
     prefmsg(u->nick, s_LoveServ, "Your apology has been sent to %s", cmd);
     prefmsg(cmd, s_LoveServ, "%s is sorry, and would like to apologise for \2%s\2", u->nick, m);
-    lslog("%s sent an APOLOGY to %s for %s", u->nick, cmd, m);
+    nlog(LOG_NORMAL, LOG_MOD, "%s sent an APOLOGY to %s for %s", u->nick, cmd, m);
 }
 
 
@@ -440,7 +407,7 @@ static void ls_thankyou(User *u, char *cmd, char *m) {
 
     prefmsg(u->nick, s_LoveServ, "Your Thank You has been sent to %s", cmd);
     prefmsg(cmd, s_LoveServ, "%s wishes to thank you for \2%s\2", u->nick, m);
-    lslog("%s sent a THANKYOU to %s for %s", u->nick, cmd, m);
+    nlog(LOG_NORMAL, LOG_MOD, "%s sent a THANKYOU to %s for %s", u->nick, cmd, m);
 }
 
 
@@ -454,28 +421,4 @@ static void ls_version(User *u)
 
 }
 
-
-static void ls_viewlogs(User *u)
-{
-    FILE *fp;
-    char buf[512];
-
-    strcpy(segv_location, "ls_viewlogs");
-    if (!(UserLevel(u) >= 180)) {
-        lslog("Access Denied (LOGS) to %s", u->nick);
-        prefmsg(u->nick, s_LoveServ, "Access Denied.");
-        return;
-    }
-    fp = fopen("logs/loveserv.log", "r");
-    if (!fp) {
-        prefmsg(u->nick, s_LoveServ, "Unable to open logs/loveserv.log");
-        return;
-    }
-    while (fgets(buf, sizeof(buf), fp)) {
-        buf[strlen(buf)] = '\0';
-        prefmsg(u->nick, s_LoveServ, "%s", buf);
-    }
-    fclose(fp);
-    lslog("%s viewed LoveServ's logs", u->nick);
-}
 
