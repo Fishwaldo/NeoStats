@@ -23,7 +23,13 @@ AC_CHECK_LIB(dl, dlopen)
 ADNS_C_GETFUNC(socket,socket)
 ADNS_C_GETFUNC(inet_ntoa,nsl)
 
-AC_CHECK_FUNC(backtrace, AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available'))
+AC_CHECK_FUNC(backtrace, 
+[AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available')
+LIBS="-g $LIBS"]
+)
+
+
+
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT

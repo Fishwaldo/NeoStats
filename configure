@@ -1285,9 +1285,9 @@ cat >>confdefs.h <<\_ACEOF
 #define REV 4
 _ACEOF
 
-VERSION=2.5.4
+VERSION=2.5.4-Pre2
 
-CFLAGS="$CFLAGS -O2"
+CFLAGS="$CFLAGS -O2 -g"
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3022,7 +3022,12 @@ cat >>confdefs.h <<\_ACEOF
 #define HAVE_BACKTRACE 1
 _ACEOF
 
+LIBS="-g $LIBS"
+
 fi
+
+
+
 
 
 echo "$as_me:$LINENO: checking for egrep" >&5

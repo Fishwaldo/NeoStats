@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.133 2003/07/15 11:21:45 fishwaldo Exp $
+** $Id: ircd.c,v 1.134 2003/07/22 11:50:51 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -289,7 +289,7 @@ void parse(char *line)
 
 
 	/* First, check if its a privmsg, and if so, handle it in the correct Function */
-	if (!strcasecmp("PRIVMSG", cmd) || (!strcasecmp("!", cmd))) {
+	if (!strcmp("PRIVMSG", cmd) || (!strcmp("!", cmd))) {
 
 
 
@@ -384,7 +384,7 @@ void parse(char *line)
 		fn_list = module_ptr->function_list;
 		while (fn_list->cmd_name != NULL) {
 			/* This goes through each Command */
-			if (!strcasecmp(fn_list->cmd_name, cmd)) {
+			if (!strcmp(fn_list->cmd_name, cmd)) {
 				if (fn_list->srvmsg == cmdptr) {
 					nlog(LOG_DEBUG1, LOG_CORE,
 					     "Running Module %s for Function %s",
