@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.97 2002/10/16 03:13:59 fishwaldo Exp $
+** $Id: ircd.c,v 1.98 2002/12/09 11:38:51 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -451,6 +451,7 @@ extern char *joinbuf(char **av, int ac, int from) {
 void parse(char *line)
 {
 	char origin[64], cmd[64], *coreLine;
+	char *nick;
 	int cmdptr = 0;
 	int I = 0;
 	int ac;
@@ -504,15 +505,31 @@ void parse(char *line)
  	if (!strcasecmp("PRIVMSG",cmd) || (!strcasecmp("!",cmd))) {
  		/* its a privmsg, now lets see who too... */       
 
-		if (!strcasecmp(s_Services,av[0])) {
+
+	
+		if (strstr(av[0], "!")) {
+			strncpy(cmd, av[0], 64);
+			nick = strtok(cmd, "!");
+		} else if (strstr(av[0], "@")) {
+			strncpy(cmd, av[0], 64);
+			nick = strtok(cmd, "@");
+		} else {
+			nick = malloc(64);
+			strncpy(nick, av[0], 64);
+			I = 1;
+		}
+	
+		if (!strcasecmp(s_Services,nick)) {
 			/* its to the Internal Services Bot */
 			strcpy(segv_location, "servicesbot");
 			servicesbot(origin,av, ac);
 			strcpy(segv_location, "ServicesBot_return");
+		 	if (I == 1) free(nick);	
+
 			free(av);
 			return;
 		} else {
-			list = findbot(av[0]);
+			list = findbot(nick);
 			/* Check to see if any of the Modules have this nick Registered */
 			if (list) {
 #ifdef DEBUG
@@ -535,10 +552,14 @@ void parse(char *line)
 				strcpy(segvinmodule, "");
 				strcpy(segv_location, "Return from Module Message");
 				free(av);
+			 	if (I == 1) free(nick);	
 				return;
 			} else {
 				bot_chan_message(origin, av[0], av, ac);
-			}
+			 	if (I == 1) free(nick);	
+				free(av);
+				return;
+				}
 		}
         }	
         	
