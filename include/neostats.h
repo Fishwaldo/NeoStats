@@ -771,7 +771,6 @@ typedef struct bot_setting {
 	int				min;		/* min value */
 	int				max;		/* max value */
 	int				ulevel;		/* min user level */
-	char			*fieldname;	/* field name for config storage */
 	const char		*desc;		/* description of setting for messages e.g. seconds, days*/
 	const char		**helptext;	/* pointer to help text */
 	bot_set_handler	handler;	/* handler for custom/post-set processing */

@@ -92,6 +92,7 @@ int SynchModule (Module* module_ptr)
 		err = (*ModSynch) (); 
 		RESET_RUN_LEVEL();
 	}
+	SET_SEGV_LOCATION();
 	module_ptr->synched = 1;
 	return err;
 }
@@ -346,6 +347,7 @@ load_module (const char *modfilename, Client * u)
 		unload_module(mod_ptr->info->name, NULL);
 		return NULL;
 	}
+	SET_SEGV_LOCATION();
 	SET_RUN_LEVEL(mod_ptr);
 	if (info_ptr->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
 	{
@@ -458,6 +460,7 @@ unload_module (const char *modname, Client * u)
 		SET_RUN_LEVEL(mod_ptr);
 		(*ModFini) ();
 		RESET_RUN_LEVEL();
+		SET_SEGV_LOCATION();
 	}
 	/* Delete any bots used by this module. Done after ModFini, so the bot 
 	 * can still send messages during ModFini 
@@ -529,54 +532,52 @@ ModuleConfig(bot_setting* set_ptr)
 	SET_SEGV_LOCATION();
 	while(set_ptr->option)
 	{
-		if(set_ptr->fieldname) {
-			switch(set_ptr->type) {
-				case SET_TYPE_BOOLEAN:
-					if (DBAFetchConfigBool (set_ptr->fieldname, set_ptr->varptr) != NS_SUCCESS) {
-						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
-						DBAStoreConfigBool (set_ptr->fieldname, set_ptr->varptr);
+		switch(set_ptr->type) {
+			case SET_TYPE_BOOLEAN:
+				if (DBAFetchConfigBool (set_ptr->option, set_ptr->varptr) != NS_SUCCESS) {
+					*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
+					DBAStoreConfigBool (set_ptr->option, set_ptr->varptr);
+				}
+				if(set_ptr->handler) {
+					set_ptr->handler(NULL, SET_LOAD);
+				}
+				break;
+			case SET_TYPE_INT:
+				if (DBAFetchConfigInt (set_ptr->option, set_ptr->varptr) != NS_SUCCESS) {
+					*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
+					DBAStoreConfigInt(set_ptr->option, set_ptr->varptr);
+				}
+				if(set_ptr->handler) {
+					set_ptr->handler(NULL, SET_LOAD);
+				}
+				break;
+			case SET_TYPE_STRING:
+			case SET_TYPE_CHANNEL:							
+			case SET_TYPE_MSG:
+			case SET_TYPE_NICK:
+			case SET_TYPE_USER:
+			case SET_TYPE_HOST:
+			case SET_TYPE_REALNAME:
+			case SET_TYPE_IPV4:
+				if(	DBAFetchConfigStr (set_ptr->option, set_ptr->varptr, set_ptr->max) != NS_SUCCESS) {
+					if( set_ptr->defaultval ) {
+						strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
 					}
-					if(set_ptr->handler) {
-						set_ptr->handler(NULL, SET_LOAD);
-					}
-					break;
-				case SET_TYPE_INT:
-					if (DBAFetchConfigInt (set_ptr->fieldname, set_ptr->varptr) != NS_SUCCESS) {
-						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
-						DBAStoreConfigInt(set_ptr->fieldname, set_ptr->varptr);
-					}
-					if(set_ptr->handler) {
-						set_ptr->handler(NULL, SET_LOAD);
-					}
-					break;
-				case SET_TYPE_STRING:
-				case SET_TYPE_CHANNEL:							
-				case SET_TYPE_MSG:
-				case SET_TYPE_NICK:
-				case SET_TYPE_USER:
-				case SET_TYPE_HOST:
-				case SET_TYPE_REALNAME:
-				case SET_TYPE_IPV4:
-					if(	DBAFetchConfigStr (set_ptr->fieldname, set_ptr->varptr, set_ptr->max) != NS_SUCCESS) {
-						if( set_ptr->defaultval ) {
-							strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
-						}
-						DBAStoreConfigStr (set_ptr->fieldname, set_ptr->varptr, set_ptr->max);
-					}
-					if(set_ptr->handler) {
-						set_ptr->handler(NULL, SET_LOAD);
-					}
-					break;			
-				case SET_TYPE_CUSTOM:
-					if(set_ptr->handler) {
-						set_ptr->handler(NULL, SET_LOAD);
-					}
-					break;
-				default:
-					nlog(LOG_WARNING, "Unsupported SET type %d in ModuleConfig %s", 
-						set_ptr->type, set_ptr->option);
-					break;
-			}
+					DBAStoreConfigStr (set_ptr->option, set_ptr->varptr, set_ptr->max);
+				}
+				if(set_ptr->handler) {
+					set_ptr->handler(NULL, SET_LOAD);
+				}
+				break;			
+			case SET_TYPE_CUSTOM:
+				if(set_ptr->handler) {
+					set_ptr->handler(NULL, SET_LOAD);
+				}
+				break;
+			default:
+				nlog(LOG_WARNING, "Unsupported SET type %d in ModuleConfig %s", 
+					set_ptr->type, set_ptr->option);
+				break;
 		}
 		set_ptr++;
 	}

@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.a2-dev
+ - Remove fieldname from settings structure since option already provides a 
+   unique string for storage. (M)
  - Add validate and random channel key functions. (M)
  - Remove RELOAD command from Win32. (M)
  - Fix RELOAD command not working reported by DNB. (M)

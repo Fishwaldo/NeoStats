@@ -43,7 +43,6 @@ typedef struct config {
 	unsigned int quiet:1;
 	/* dont detach into background */
 	unsigned int foreground:1;
-	unsigned int allbots;
 	unsigned int want_privmsg:1;
 	unsigned int die:1;
 	unsigned int error:1;
@@ -76,6 +75,7 @@ extern BotInfo ns_botinfo;
 EXPORTVAR extern Bot* ns_botptr;
 
 void InitServices( void );
+void FiniServices( void );
 int init_services_bot( void );
 
 #endif /* _SERVICES_H_ */

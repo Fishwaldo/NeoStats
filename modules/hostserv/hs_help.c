@@ -34,9 +34,9 @@ const char hs_help_list_oneline[] ="List vhosts";
 const char hs_help_view_oneline[] ="Detailed vhost list";
 
 const char *hs_about[] = {
-	"\2HostServ\2 allows users to have a unique virtual host",
-	"while on the network. Virtual hosts are set automatically",
-	"when you join the network or by using the LOGIN command",
+	"\2HostServ\2 provides users with a unique virtual host while",
+	"on the network. Virtual hosts are set automatically when",
+	"users join the network or by using the LOGIN command.",
 	"",
 	"If you find your host is not working, it may have been",
 	"removed due to abuse and you should contact an operator.",
@@ -48,11 +48,10 @@ const char *hs_help_add[] = {
 	"",
 	"Register a vhost with hostserv. e.g. vhost.com.",
 	"HOSTNAME is the host the user is connecting from",
-	"such as realhost.com and can include wildcards",
-	"such as *.realhost.com.",
-	"Users can also get their vhost with the LOGIN",
-	"command. This allows them use of the vhost from"
-	"multiple hosts or multiple users to share a vhost.",
+	"and can include wildcards e.g. *.realhost.com.",
+	"Users can also set their vhost with the LOGIN command.",
+	"This allows them use of the vhost from multiple hosts or",
+	"multiple users to share a vhost.",
 	NULL
 };
 
@@ -74,12 +73,10 @@ const char *hs_help_list[] = {
 	"Syntax: \2LIST\2",
 	"        \2LIST <startpos>\2",
 	"",
-	"Lists the current vhosts stored in the database.",
-	"For more descriptive info on a vhost see \2HELP VIEW\2",
-	"",
-	"A maximum 20 vhosts are displayed at one time, in order",
-	"to view other vhosts, the <startpos> parameter allows",
-	"listing from that position",
+	"Lists the vhosts stored in the database.",
+	"For detailed information on a vhost see \2HELP VIEW\2",
+	"20 vhosts are displayed at a time. To view other vhosts the",
+	"<startpos> parameter allows listing from that position.",
 	NULL
 };
 
@@ -87,7 +84,7 @@ const char *hs_help_login[] = {
 	"Syntax: \2LOGIN <NICK> <PASSWORD>\2",
 	"",
 	"Sets your vhost if it was not set when you connect to IRC,",
-	"or you are connecting from a different host, or you share a.",
+	"or you are connecting from a different host, or share a",
 	"vhost with other users.",
 	NULL
 };
@@ -118,30 +115,28 @@ const char *hs_help_bans[] = {
 
 const char *hs_help_set_expire[] = {
 	"\2EXPIRE <TIME>\2",
-	"How long before unused HostServ entries should be",
-	"automatically deleted. A value of 0 makes all vhosts",
-	"permanent",
+	"How long before unused HostServ entries should be deleted",
+	"A value of 0 makes all vhosts permanent",
 	NULL
 };
 
 const char *hs_help_set_hiddenhost[] = {
 	"\2HIDDENHOST <ON/OFF>\2",
-	"Turns on undernet style hidden hosts when users identify to nickserv.",
-	"You will also need to set HOSTNAME to the host you want to use",
+	"Undernet style hidden hosts set when users identify to",
+	"nickserv using HOSTNAME",
 	NULL
 };
 
 const char *hs_help_set_hostname[] = {
 	"\2HOSTNAME <hostname>\2",
-	"The hidden host you want to set on users.",
-	"Users will then be set to nick.<hostname>.",
+	"Hidden host to set on users in the style nick.<hostname>.",
 	NULL
 };
 
 const char *hs_help_set_operhosts[] = {
 	"\2OPERHOSTS <ON/OFF>\2",
-	"Whether HostServ will set oper vhosts or not. If your IRCd does",
-	"not provide oper hosts, you might want to use this option.",
+	"Whether HostServ will set oper vhosts or not. Useful if",
+	"your IRCd does not provide oper hosts.",
 	NULL
 };
 

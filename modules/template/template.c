@@ -192,8 +192,6 @@ static bot_setting template_settings[]=
 	0, 	
 	/* Minimum user level for this set command */
 	NS_ULEVEL_ADMIN, 
-	/* Name for use in config storage, must be unique */
-	"example",	
 	/* Description of value e.g. seconds, only valid for certain types */
 	NULL,	
 	/* pointer to help text */

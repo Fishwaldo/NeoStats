@@ -122,23 +122,28 @@ static bot_cmd ns_commands[]=
 /** Bot setting table */
 static bot_setting ns_settings[]=
 {
-	{"MSGSAMPLETIME",	&nsconfig.msgsampletime,SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, "msgsampletime",	NULL,	ns_help_set_msgsampletime, NULL,( void * )10 },
-	{"MSGTHRESHOLD",	&nsconfig.msgthreshold,	SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, "msgthreshold",	NULL,	ns_help_set_msgthreshold, NULL,( void * )5 },
-	{"SPLITTIME",		&nsconfig.splittime,	SET_TYPE_INT,		0,	1000,		NS_ULEVEL_ADMIN, "splittime",	NULL,	ns_help_set_splittime, NULL,( void * )300 },
-	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,		0, 0, 	NS_ULEVEL_ADMIN, "joinserviceschan",	NULL,	ns_help_set_joinserviceschan, NULL,( void* )1 },
-	{"PINGTIME",		&nsconfig.pingtime,	SET_TYPE_INT,		0, 0, 	NS_ULEVEL_ADMIN, "pingtime",	NULL,	ns_help_set_pingtime, NULL,( void* )120 },
-	{"VERSIONSCAN",		&nsconfig.versionscan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL,( void* )1 },
-	{"SERVICECMODE",	me.servicescmode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicescmode",	NULL,	ns_help_set_servicecmode, NULL, NULL },
-	{"SERVICEUMODE",	me.servicesumode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicesumode",	NULL,	ns_help_set_serviceumode, NULL, NULL },
-	{"CMDCHAR",			nsconfig.cmdchar,	SET_TYPE_STRING,	0, 2, 	NS_ULEVEL_ADMIN, "cmdchar",	NULL,	ns_help_set_cmdchar, NULL,( void* )"!" },
-	{"CMDREPORT",		&nsconfig.cmdreport,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "cmdreport",	NULL,	ns_help_set_cmdreport, NULL,( void* )1 },
-	{"LOGLEVEL",		&nsconfig.loglevel,	SET_TYPE_INT,		1, 6, 	NS_ULEVEL_ADMIN, "loglevel",	NULL,	ns_help_set_loglevel, NULL,( void* )5 },
-	{"DEBUG",			&nsconfig.debug,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debug, NULL,( void* )0 },
-	{"DEBUGLEVEL",		&nsconfig.debuglevel,	SET_TYPE_INT,		1, 10, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debuglevel, NULL,( void* )0 },
-	{"DEBUGCHAN",		nsconfig.debugchan,	SET_TYPE_STRING,	0, MAXCHANLEN, 	NS_ULEVEL_ADMIN, "debugchan",	NULL,	ns_help_set_debugchan, NULL,( void* )"#debug" },
-	{"DEBUGTOCHAN",		&nsconfig.debugtochan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugtochan, NULL,( void* )0 },
-	{"DEBUGMODULE",		nsconfig.debugmodule,SET_TYPE_STRING,	0, MAX_MOD_NAME, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugmodule, NULL,( void* )"all" },
-	{NULL,				NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
+	{"MSGSAMPLETIME",	&nsconfig.msgsampletime,	SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_msgsampletime, NULL,( void * )10 },
+	{"MSGTHRESHOLD",	&nsconfig.msgthreshold,		SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_msgthreshold, NULL,( void * )5 },
+	{"SPLITTIME",		&nsconfig.splittime,		SET_TYPE_INT,		0,	1000,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_splittime, NULL,( void * )300 },
+	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_joinserviceschan, NULL,( void* )1 },
+	{"PINGTIME",		&nsconfig.pingtime,			SET_TYPE_INT,		0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_pingtime, NULL,( void* )120 },
+	{"VERSIONSCAN",		&nsconfig.versionscan,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_versionscan, NULL,( void* )1 },
+	{"SERVICECMODE",	me.servicescmode,			SET_TYPE_STRING,	0, 64, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_servicecmode, NULL, NULL },
+	{"SERVICEUMODE",	me.servicesumode,			SET_TYPE_STRING,	0, 64, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_serviceumode, NULL, NULL },
+	{"CMDCHAR",			nsconfig.cmdchar,			SET_TYPE_STRING,	0, 2, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_cmdchar, NULL,( void* )"!" },
+	{"CMDREPORT",		&nsconfig.cmdreport,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_cmdreport, NULL,( void* )1 },
+	{"LOGLEVEL",		&nsconfig.loglevel,			SET_TYPE_INT,		1, 6, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_loglevel, NULL,( void* )5 },
+	{"DEBUGLEVEL",		&nsconfig.debuglevel,		SET_TYPE_INT,		1, 10, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debuglevel, NULL,( void* )0 },
+	{"DEBUGCHAN",		nsconfig.debugchan,			SET_TYPE_STRING,	0, MAXCHANLEN, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugchan, NULL,( void* )"#debug" },
+	{"DEBUGTOCHAN",		&nsconfig.debugtochan,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugtochan, NULL,( void* )0 },
+	{NULL,				NULL,						0,					0, 0, 			0,				 NULL,	NULL	},
+};
+
+static bot_setting ns_debugsettings[]=
+{
+	{"DEBUG",			&nsconfig.debug,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debug, NULL,( void* )0 },
+	{"DEBUGMODULE",		nsconfig.debugmodule,		SET_TYPE_STRING,	0, MAX_MOD_NAME,NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugmodule, NULL,( void* )"all" },
+	{NULL,				NULL,						0,					0, 0, 			0,				 NULL,	NULL	},
 };
 
 /** Bot pointer */
@@ -182,13 +187,18 @@ static int services_event_ctcpversion( CmdParams *cmdparams )
  */
 void InitServices( void )
 {
-	/* if all bots should join the chan */
-	if( DBAFetchConfigInt( "AllBotsJoinChan", &nsconfig.allbots ) != NS_SUCCESS ) {
-		nsconfig.allbots = 0;
-		DBAStoreConfigInt( "AllBotsJoinChan", &nsconfig.allbots );
-	}
-	/* */
 	ModuleConfig( ns_settings );
+}
+
+/** @brief FiniServices
+ *
+ *  fini NeoStats core
+ *
+ * @return none
+ */
+void FiniServices( void )
+{
+	del_services_set_list (ns_debugsettings);
 }
 
 /** @brief init_services_bot
@@ -207,6 +217,7 @@ int init_services_bot( void )
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
 	ns_module.insynch = 1;
 	ns_botptr = AddBot( &ns_botinfo );
+	add_services_set_list (ns_debugsettings);
 	AddEventList( neostats_events );
 	ns_module.synched = 1;
 	me.synched = 1;
