@@ -115,7 +115,6 @@ cellspacing="0" border="1">
 			<tr>
 				<td class="row1" align="center">
 				<a name=netstats>!NETSTATS!
-				(*) indicates channel is active at the moment
 			</td>
 			</tr>
 	
