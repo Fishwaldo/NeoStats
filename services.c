@@ -33,7 +33,8 @@ static void ns_roots(User *);
 void servicesbot(char *nick, char **av, int ac) {
 	User *u;
 	int rval;
-		
+	char *tmp;
+			
 	u = finduser(nick);
 	if (!u) {
 		log("Unable to finduser %s (%s)", nick,s_Services);
@@ -157,7 +158,9 @@ void servicesbot(char *nick, char **av, int ac) {
 			return;
 				}
 		notice(s_Services,"%s Wants me to Go to BED!!! Good Night!",u->nick);
-		ns_shutdown(u,joinbuf(av,ac, 1));
+		tmp = joinbuf(av, ac, 2);
+		ns_shutdown(u,tmp);
+		free(tmp);
 	} else if (!strcasecmp(av[1], "VERSION")) {
 		ns_version(u);
 		notice(s_Services,"%s Wanted to know our version number ",u->nick);
@@ -171,7 +174,9 @@ void servicesbot(char *nick, char **av, int ac) {
 			return;
 		}
 		notice(s_Services,"%s Wants me to RELOAD! Be back in a few!",u->nick);
-		ns_reload(u,joinbuf(av,ac, 1));
+		tmp = joinbuf(av, ac, 2);
+		ns_reload(u,tmp);
+		free(tmp);
 	} else if (!strcasecmp(av[1], "LOGS")) {
 		if (!(UserLevel(u) >= 180)) {
 			privmsg(nick,s_Services,"Permission Denied");
@@ -233,7 +238,9 @@ void servicesbot(char *nick, char **av, int ac) {
 			notice(s_Services,"%s Tried to use RAW, but is not a Techadmin",nick);
 			return;
 		}
-		ns_raw(u,joinbuf(av,ac, 1));
+		tmp = joinbuf(av, ac, 1);
+		ns_raw(u);
+		free(tmp);
 	} else {
 		privmsg(nick, s_Services, "Unknown Command: \2%s\2", av[1]);
 		notice(s_Services,"%s Reqested %s, but that is a Unknown Command",u->nick,av[1]);
