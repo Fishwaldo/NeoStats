@@ -53,9 +53,6 @@ static void Usr_Part (char *origin, char **argv, int argc);
 static void Usr_Stats (char *origin, char **argv, int argc);
 static void Usr_Vhost (char *origin, char **argv, int argc);
 static void Srv_Ping (char *origin, char **argv, int argc);
-#ifndef ULTIMATE3
-static void Srv_Netinfo (char *origin, char **argv, int argc);
-#endif
 static void Srv_Pass (char *origin, char **argv, int argc);
 static void Srv_Server (char *origin, char **argv, int argc);
 static void Srv_Squit (char *, char **, int argc);
@@ -67,12 +64,12 @@ static void Srv_Protocol (char *, char **, int argc);
 static void Srv_Svinfo (char *, char **, int argc);
 static void Srv_Burst (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
-#endif
-static void Srv_Vctrl (char *origin, char **argv, int argc);
-#ifdef ULTIMATE3
 static void Srv_Client (char *origin, char **argv, int argc);
 static void Srv_Smode (char *origin, char **argv, int argc);
+#else
+static void Srv_Netinfo (char *origin, char **argv, int argc);
 #endif
+static void Srv_Vctrl (char *origin, char **argv, int argc);
 static void send_vctrl (void);
 
 static struct ircd_srv_ {   
@@ -84,11 +81,11 @@ static struct ircd_srv_ {
 	int burst;   
 } ircd_srv;                                                    
 
-#ifndef ULTIMATE3
-const char ircd_version[] = "(UL)";
+#ifdef ULTIMATE3
+const char ircd_version[] = "(UL3)";
 const char services_bot_modes[]= "+oS";
 #else
-const char ircd_version[] = "(UL3)";
+const char ircd_version[] = "(UL)";
 const char services_bot_modes[]= "+oS";
 #endif
 long services_bot_umode= 0;
@@ -115,9 +112,6 @@ IntCommands cmd_list[] = {
 	{MSG_JOIN,      /*TOK_JOIN,      */Usr_Join,      1, 0},
 	{MSG_PART,      /*TOK_PART,      */Usr_Part,      1, 0},
 	{MSG_PING,      /*TOK_PING,      */Srv_Ping,      0, 0},
-#ifndef ULTIMATE3					 
-	{MSG_SNETINFO,  /*TOK_SNETINFO,  */Srv_Netinfo,   0, 0},
-#endif
 #ifdef ULTIMATE3
 	{MSG_SVINFO,    /*NULL,          */Srv_Svinfo,    0, 0},
 	{MSG_CAPAB,     /*NULL,          */Srv_Protocol,   0, 0},
@@ -125,6 +119,8 @@ IntCommands cmd_list[] = {
 	{MSG_SJOIN,     /*NULL,          */Srv_Sjoin,     1, 0},
 	{MSG_CLIENT,    /*NULL,          */Srv_Client,    0, 0},
 	{MSG_SMODE,     /*NULL,          */Srv_Smode,     1, 0},
+#else
+	{MSG_SNETINFO,  /*TOK_SNETINFO,  */Srv_Netinfo,   0, 0},
 #endif
 	{MSG_VCTRL,     /*TOK_VCTRL,     */Srv_Vctrl,     0, 0},
 	{MSG_PASS,      /*TOK_PASS,      */Srv_Pass,      0, 0},
@@ -253,14 +249,14 @@ send_server (const char *name, const int numeric, const char *infoline)
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
-#ifndef ULTIMATE3
-	sts ("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
-	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
-	sts ("%s TOKEN CLIENT", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
-#else
+#ifdef ULTIMATE3
 	sts ("%s %s :TS", (me.token ? TOK_PASS : MSG_PASS), pass);
 	sts ("CAPAB TS5 BURST SSJ5 NICKIP CLIENT");
 	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+#else
+	sts ("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
+	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	sts ("%s TOKEN CLIENT", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 #endif
 }
 
@@ -309,10 +305,10 @@ send_cmode (const char *who, const char *chan, const char *mode, const char *arg
 void
 send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime)
 {
-#ifndef ULTIMATE3
-	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, tstime, ident, host, me.name, realname);
-#else
+#ifdef ULTIMATE3
 	sts ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, tstime, newmode, ident, host, me.name, tstime, realname);
+#else
+	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, tstime, ident, host, me.name, realname);
 #endif
 }
 
@@ -477,9 +473,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 {
 	handle_sjoin (argv[1], argv[0], ((argc <= 2) ? argv[1] : argv[2]), 3, origin, argv, argc);
 }
-#endif
 
-#ifdef ULTIMATE3
 static void
 Srv_Burst (char *origin, char **argv, int argc)
 {
@@ -730,7 +724,7 @@ Srv_Nick (char *origin, char **argv, int argc)
 {
 	char *realname;
 
-#if ULTIMATE3
+#ifdef ULTIMATE3
 	realname = joinbuf (argv, argc, 9);
 	AddUser (argv[0], argv[4], argv[5], realname, argv[6], strtoul (argv[8], NULL, 10), strtoul (argv[2], NULL, 10));
 	free (realname);

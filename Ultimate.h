@@ -419,21 +419,7 @@
 #define UMODE_HELPOP	 	0x0010	/* Help system operator */
 #define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
 #define UMODE_SERVICESOPER	0x0040	/* Services Oper */
-#ifndef ULTIMATE3
-#define UMODE_ADMIN	 	0x0080	/* Admin */
-#define UMODE_NETADMIN  	0x10000	/* Network Admin */
-#define	UMODE_SUPER		0x20000	/* Oper Is Protected from Kick's and Kill's */
-#define UMODE_RBOT      	0x40000	/* Marks the client as a Registered Bot */
-#define UMODE_SBOT      	0x80000	/* Marks the client as a Server Bot */
-#define UMODE_NGLOBAL  		0x100000	/* See Network Globals */
-#define UMODE_NETINFO  		0x400000	/* Server link, Delink Notces etc. */
-#define UMODE_MAGICK   		0x800000	/* Allows Opers To See +s and +p Channels */
-#define UMODE_WATCHER		0x4000000	/* Recive Monitor Globals */
-#define UMODE_NETMON		0x8000000	/* Marks the client as an Network Monitor */
-#define UMODE_ADMIN		0x40000000	/* Marks the client as a Server Admin */
-#define UMODE_TECHADMIN		0x80000000	/* Marks the client as a Technical Admin */
-#define UMODE_DEAF		0x100000000	/* client is deaf on channels */
-#else
+#ifdef ULTIMATE3
 #define UMODE_SPY		0x0080	/* Oper Spy */
 #define UMODE_DCC		0x10000	/* Oper DCC Notices */
 #define UMODE_GLOBOPS		0x20000	/* send/recv global notices */
@@ -444,6 +430,20 @@
 #define UMODE_GLOBCON		0x800000	/* Global Connect notices */
 #define UMODE_DEBUG		0x4000000	/* see debug notices */
 #define UMODE_DCCWARN		0x8000000	/* see DCC warnings */
+#else
+#define UMODE_ADMIN	 	0x0080	/* Admin */
+#define UMODE_NETADMIN  	0x10000	/* Network Admin */
+#define	UMODE_SUPER		0x20000	/* Oper Is Protected from Kick's and Kill's */
+#define UMODE_RBOT      	0x40000	/* Marks the client as a Registered Bot */
+#define UMODE_SBOT      	0x80000	/* Marks the client as a Server Bot */
+#define UMODE_NGLOBAL  		0x100000	/* See Network Globals */
+#define UMODE_NETINFO  		0x400000	/* Server link, Delink Notces etc. */
+#define UMODE_MAGICK   		0x800000	/* Allows Opers To See +s and +p Channels */
+#define UMODE_WATCHER		0x4000000	/* Recive Monitor Globals */
+#define UMODE_NETMON		0x8000000	/* Marks the client as an Network Monitor */
+#define UMODE_SERVADMIN		0x40000000	/* Marks the client as a Server Admin */
+#define UMODE_TECHADMIN		0x80000000	/* Marks the client as a Technical Admin */
+#define UMODE_DEAF		0x100000000	/* client is deaf on channels */
 #endif
 
 #define	UMODE_SERVNOTICE 	0x0100	/* server notices such as kill */
