@@ -537,6 +537,7 @@ sts (const char *buf, const int buflen)
 	sent = write (servsock, buf, buflen);
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Write error: %s", strerror(errno));
+		servsock = -1;
 		do_exit (NS_EXIT_ERROR, NULL);
 	}
 	me.SendM++;
