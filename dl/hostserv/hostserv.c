@@ -103,7 +103,7 @@ static void hs_delban(User * u, char *ban);
 static int new_m_version(char *origin, char **av, int ac);
 static void SaveBans(void);
 static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who);
-static void CleanupHosts(void);
+void CleanupHosts(void);
 static void LoadHosts(void);
 static void LoadConfig(void);
 

@@ -169,7 +169,7 @@ add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 
 	SET_SEGV_LOCATION();
 	if (dlsym ((int *) get_dl_handle (mod_name), func_name) == NULL) {
-		nlog (LOG_WARNING, LOG_CORE, "%s:, Timer Function %s doesn't exist", mod_name, func_name);
+		nlog (LOG_WARNING, LOG_CORE, "%s: Timer %s Function %s doesn't exist", mod_name, timer_name, func_name);
 		return NS_FAILURE;
 	}
 	mod_tmr = new_timer (timer_name);
