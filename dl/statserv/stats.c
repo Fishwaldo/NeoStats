@@ -364,7 +364,6 @@ int s_user_modes(char **av, int ac)
 	}
 	modes = av[1];
 	while (*modes) {
-printf("%c\n", *modes);
 		switch (*modes) {
 		case '+':
 			add = 1;
