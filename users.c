@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.4 2000/02/23 05:39:24 fishwaldo Exp $
+** $Id: users.c,v 1.5 2000/03/03 06:03:42 fishwaldo Exp $
 */
 #include <fnmatch.h>
  
@@ -414,6 +414,7 @@ void AddUser(char *nick, char *user, char *host, char *server)
 	u->is_away = 0;
 	u->myuser = NULL;
 	u->Umode = 0;
+	u->modes = NULL;
 }
 
 void DelUser(char *nick)
@@ -554,8 +555,7 @@ void UserMode(char *nick, char *modes)
 		log("Warning, Changing Modes for a Unknown User %s!", nick);
 		return;
 	}
-
-	strcpy(u->modes, modes);	
+	u->modes = sstrdup(modes);
 	while (*modes++) {
 	tmpmode = *(modes);
 	switch(tmpmode) {

@@ -50,6 +50,7 @@ int main()
 	me.noticelag=0;
 	me.usesmo=0;
 	me.r_time=10;
+	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
 	__init_mod_list();
 	setup_signals();
 	ConfLoad();
@@ -197,7 +198,7 @@ void login()
 	segv_location = "login";
 	sts("PASS %s", me.pass);
 	sts("SERVER %s 1 :%s", me.name,me.infoline);
-	sts("PROTOCTL :TOKEN");
+	sts("PROTOCTL TOKEN");
 	init_ServBot();
 
 }
@@ -213,7 +214,8 @@ void init_ServBot()
 	sts(":%s JOIN %s",s_Services ,me.chan);
 	sts(":%s MODE %s +o %s",me.name,me.chan,s_Services);
 	sts(":%s MODE %s +a %s",s_Services,me.chan,s_Services);
-/*	UserMode(s_Services, "+Sqd"); */
+	UserMode(s_Services, ":+Sqd"); 
+
 #ifdef DEBUG
 	log ("Return from Mode");
 #endif

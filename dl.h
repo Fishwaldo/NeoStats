@@ -22,6 +22,8 @@ struct sock_list_struct {
 	char *sockname;
 	int (*function)();
 	char *modname;
+	long rmsgs;
+	long rbytes;
 };
 typedef struct sock_list_struct Sock_List;
 Sock_List *Socket_lists[MAX_SOCKS];

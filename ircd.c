@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.9 2000/02/29 07:28:53 fishwaldo Exp $
+** $Id: ircd.c,v 1.10 2000/03/03 06:03:42 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -30,6 +30,7 @@ void Usr_Topic(char *, char *);
 void Usr_Kick(char *, char *);
 void Usr_Join(char *, char *);
 void Usr_Part(char *, char *);
+void Usr_Stats(char *, char *);
 void Srv_Ping(char *, char *);
 void Srv_Netinfo(char *, char *);
 void Srv_Pass(char *, char *);
@@ -61,6 +62,8 @@ typedef struct int_commands IntCommands;
  
 IntCommands cmd_list[] = {
 	/* Command	Function		srvmsg*/
+	{MSG_STATS,	Usr_Stats, 		1},
+	{TOK_STATS,	Usr_Stats,		1},
 	{MSG_VERSION,	Usr_Version,		1},
 	{TOK_VERSION,	Usr_Version,		1},
 	{MSG_MOTD,	Usr_ShowMOTD,		1},
@@ -117,6 +120,7 @@ IntCommands cmd_list[] = {
 int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char *mod_name)
 {
 	User *u;
+	char tmp[512];
 	segv_location = "init_bot";
 	u = finduser(nick);
 	if (u) {
@@ -127,10 +131,12 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	add_mod_user(nick, mod_name);
 	sts("NICK %s 1 %d %s %s %s 0 :%s", nick, time(NULL), user, host, me.name, rname);
 	AddUser(nick, user, host, me.name);
-	sts(":%s MODE %s %s", nick, nick,modes);
+	sts(":%s MODE %s :%s", nick, nick,modes);
 	sts(":%s JOIN %s",nick ,me.chan);
 	sts(":%s MODE %s +o %s",me.name,me.chan,nick);
 	sts(":%s MODE %s +a %s",nick,me.chan,nick);
+	sprintf(tmp, ":%s", modes);
+	UserMode(nick, tmp);
 	return 1;
 }
 
@@ -278,6 +284,37 @@ void parse(char *line)
 /* Here are the Following Internal Functions.
 they should update the internal Structures */
 
+void Usr_Stats(char *origin, char *coreLine) {
+	User *u;
+	char *stats;
+	time_t tmp;
+	time_t tmp2;
+		
+	u=finduser(origin);
+	if (!u) {
+		log("Recieved a Message from a Unknown User! (%s)", origin);
+	}
+	stats = strtok(coreLine, " ");
+	if (!strcasecmp(stats, "u")) {
+		/* uptime */
+	} else if (!strcasecmp(stats, "c")) {
+		/* Connections */
+		sts(":%s 214 %s N *@%s * * %d 50", me.name, u->nick, me.uplink, me.port);
+		sts(":%s 213 %s C *@%s * * %d 50", me.name, u->nick, me.uplink, me.port);
+	} else if (!strcasecmp(stats, "o")) {
+		/* Operators */
+		sts(":%s 243 %s %s :Operators think they are God, but you and I know they are not!", me.name, u->nick, stats);
+	} else if (!strcasecmp(stats, "l")) {
+		/* Port Lists */
+		tmp = time(NULL) - me.lastmsg; 
+		tmp2 = time(NULL) - me.t_start;
+		sts(":%s 211 %s l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE", me.name, u->nick);
+		sts(":%s 241 %s %s 0 %d %d %d %d %d 0 :%d", me.name, u->nick, me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
+	}
+	sts(":%s 219 %s %s :End of /STATS report", me.name, u->nick, stats);
+	notice(s_Services,"%s Requested Stats %s", u->nick, stats);
+}
+
 void Usr_Version(char *origin, char *coreLine) {
 	sts(":%s 351 %s %s :%s -> %s %s", me.name, origin, version, me.name, version_date, version_time);
 }
@@ -332,8 +369,21 @@ void Usr_Mode(char *origin, char *coreLine) {
 }	
 void Usr_Kill(char *origin, char *coreLine) {
 	char *cmd;
+	User *u;
+	Mod_User *mod_ptr;
+	
 	cmd = strtok(coreLine, " ");
-	DelUser(cmd);
+	mod_ptr = findbot(cmd);
+	if (mod_ptr) { /* Oh Oh, one of our Bots has been Killed off! */
+		Module_Event("BOTKILL", cmd);
+		DelUser(cmd);
+		return;
+	}
+	u = finduser(cmd);
+	if (u) {
+		Module_Event("KILL", u);
+		DelUser(cmd);
+	}
 }
 void Usr_Pong(char *origin, char *coreLine) {
 			Server *s;

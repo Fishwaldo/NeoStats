@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.9 2000/03/02 01:31:24 fishwaldo Exp $
+** $Id: stats.h,v 1.10 2000/03/03 06:03:42 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -90,6 +90,11 @@ struct me {
 	unsigned int usesmo : 1;
 	Server *s;
 	int requests;
+	long SendM;
+	long SendBytes;
+	long RcveM;
+	long RcveBytes;
+	time_t lastmsg;
 } me;
 
 

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.4 2000/03/02 01:31:24 fishwaldo Exp $
+** $Id: sock.c,v 1.5 2000/03/03 06:03:42 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -67,9 +67,12 @@ void read_loop()
 			for (j = 0; j < BUFSIZE; j++) {
 				if (FD_ISSET(servsock, &readfds)) {
 					i = read(servsock, &c, 1);
+					me.RcveBytes++;
 					if (i >= 0) {
 						buf[j] = c;
 						if ((c == '\n') || (c == '\r')) {
+							me.RcveM++;
+							me.lastmsg = time(NULL);
 							parse(buf);
 							break;
 						}
@@ -103,6 +106,7 @@ void notice(char *who, char *buf,...)
 	va_list ap;
 	char tmp[512];
 	char out[512];
+	int sent;
 	va_start (ap, buf);
 	vsnprintf (tmp, 512, buf, ap);
 
@@ -113,12 +117,14 @@ void notice(char *who, char *buf,...)
 #endif
 
 		strcat (out, "\n");
-
-		if ((write (servsock, out, strlen (out))) == -1) {
+		sent = write(servsock, out, strlen (out));
+		if (sent == -1) {
 			me.onchan = 0;
 			log("Write error.");
 			exit(0);
 		}
+		me.SendM++;
+		me.SendBytes = me.SendBytes + sent;
 	}
 	va_end (ap);
 
@@ -128,7 +134,7 @@ void sts(char *fmt,...)
 {
 	va_list ap;
 	char buf[512];
-
+	int sent;
 	va_start (ap, fmt);
 	vsnprintf (buf, 512, fmt, ap);
 
@@ -136,12 +142,13 @@ void sts(char *fmt,...)
 	log("SENT: %s", buf);
 #endif
 	strcat (buf, "\n");
-
-	if ((write (servsock, buf, strlen (buf))) == -1) {
+	sent = write (servsock, buf, strlen (buf));
+	if (sent == -1) {
 		log("Write error.");
 		exit(0);
 	}
-
+	me.SendM++;
+	me.SendBytes = me.SendBytes + sent;
 	va_end (ap);
 }
 

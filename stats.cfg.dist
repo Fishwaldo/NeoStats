@@ -5,7 +5,7 @@
 ###############################################################################
 
 # The server name that we appear as.
-SERVER_NAME stats.yournetwork.net
+SERVER_NAME stats.dynam.ac
 
 # The port to connect to.
 SERVER_PORT 6667
@@ -14,13 +14,13 @@ SERVER_PORT 6667
 CONNECT_TO 127.0.0.1
 
 # Password that we send in order to connect.
-CONNECT_PASS yourpass
+CONNECT_PASS bla
 
 # Infoline Displayed in /links for this server
 SERVER_INFOLINE Network Statistical Server
 
 # Your network name (fx: irc.dreaming.org put Dreaming, etc refer to your Unreal network file)
-STATSERV_NETNAME Dreaming
+STATSERV_NETNAME ROXnet
 
 # This is the Apparent Host that NeoStats is connecting from.. Some people
 # like to make it the same as your Services host (eg, services.global-irc.net)
@@ -48,8 +48,8 @@ RECONNECT_TIME 10
 # Please read carefully here, as you can stuff everything up
 #
 # First, The Path that we try to find the Modules in
-MODULE_PATH /home/directory/NeoStats/Modules/
-
+#MODULE_PATH /home/directory/NeoStats/Modules/
+MODULE_PATH /root/cvs/2.0/dl/
 # Now for each Module we want to load at boot time, we specify the following
 # this loads the Spam Module
 LOAD_MODULE spam
@@ -81,6 +81,28 @@ LOAD_MODULE statserv
 # before it is considered Laged. A non value, or value of 0, disables Lag
 # Notifications
 LAG_NOTICE 60
+
+############################
+# ICQSERV CONFIG FOLLOWS:  #
+############################
+# This is the nickname that IcqServ uses, if not specified, defaults to
+# ICQserv
+#ICQSERV_NICK IcqServ
+
+# This is the User portion that IcqServ uses, if not specified, it uses
+# whatever NeoStats is configured to use
+#ICQSERV_USER Stats
+
+# This is the Host that IcqServ appears to come from, if not specified, it
+# uses whatever NeoStats is configured to use
+#ICQSERV_HOST my.stats.irc.net
+
+ICQSERV_UIN 57082361
+#ICQSERV_UIN 57150676
+ICQSERV_PASSWORD global
+ICQSERV_SERVER 205.188.179.42
+
+
 
 ###############################################################################
 ## End of Configuration                                                      ##

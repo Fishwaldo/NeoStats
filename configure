@@ -1599,7 +1599,7 @@ esac
 else
   echo "$ac_t""no" 1>&6
 
-]fi
+fi
 
 	
 echo $ac_n "checking Whether to Enable Version Module?""... $ac_c" 1>&6

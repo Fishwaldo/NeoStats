@@ -378,7 +378,7 @@ int bot_nick_change(char *oldnick, char *newnick)
 	u = finduser(newnick);
 	if (!u) { 
 		mod_ptr = findbot(oldnick);
-		if (!u) {
+		 if (!u) {
 #ifdef DEBUG
 			log("Bot %s Changed its nick to %s", oldnick, newnick);
 #endif

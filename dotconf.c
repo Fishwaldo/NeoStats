@@ -178,10 +178,10 @@ int config_parse(FILE *config)
 			
 			if (opt.name[0] == 0)
 				{
-					/* cannot find it */
+					/* cannot find it 
 					fprintf(stderr, "Unknown Config-Option: '%s' in %s:%d\n",
 									name, dotconf_file, dotconf_line);
-					continue;           /* move on to the next line immediately */
+					continue;            move on to the next line immediately */
 				}
 			else if (opt.type == ARG_RAW)
 				{

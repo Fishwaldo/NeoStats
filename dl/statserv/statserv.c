@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.c,v 1.9 2000/02/23 05:39:25 fishwaldo Exp $
+** $Id: statserv.c,v 1.10 2000/03/03 06:03:42 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -29,6 +29,7 @@ static int s_new_server(Server *);
 static int s_new_user(User *);
 static int s_del_user(User *);
 static int s_user_modes(User *);
+int s_bot_kill(char *);
 static void ss_cb_Config(char *, int);
 static int new_m_version(char *av, char *tmp);
 
@@ -55,6 +56,7 @@ EventFnList StatServ_Event_List[] = {
 	{"SIGNON", 	s_new_user},
 	{"UMODE", 	s_user_modes},
 	{"SIGNOFF", 	s_del_user},
+	{"BOTKILL", 	s_bot_kill},
 	{ NULL, 	NULL}
 };
 
@@ -121,9 +123,12 @@ static int s_user_modes(User *u) {
 		log("Changing modes for unknown user: %s", u->nick);
 		return -1;
 	}
+/* 	if (!u->modes) return -1; */
 	modes = u->modes;
+	log("s_modes %s", modes); 
 	/* Don't bother if we are not synceded yet */
 	while (*modes++) {
+		log("Doing Modes %c", *modes);
 		switch(*modes) {
 			case '+': add = 1;	break;
 			case '-': add = 0;	break;
@@ -215,6 +220,7 @@ static int s_user_modes(User *u) {
 				} else {
 					if (synced) notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
 					DecreaseOpers(findstats(u->server->name));
+					log("Decrease Opers");
 				}
 				break;
 			case 'O':
@@ -235,6 +241,7 @@ static int s_user_modes(User *u) {
 				} else {
 					if (synced) notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
 					DecreaseOpers(findstats(u->server->name));
+					log("Decrease Opers");
 				}
 				break;
 			default:
@@ -243,10 +250,35 @@ static int s_user_modes(User *u) {
 	}
 	return 1;
 }
+int s_bot_kill(char *nick) {
+	User *u;
+	SStats *s;
+	
+	u=finduser(nick);
+	log("Oh Oh, the StatServ Bot Got Killed! - Re-Initializing");
+	s=findstats(u->server->name);
+	if (UserLevel(u) >= 40) {
+		DecreaseOpers(s);
+	}
+	DecreaseUsers(s);
+	/* we have to remove it from our List */
+	del_mod_user(nick);	
+	/* then we set up a timer to re-init it */
+   	add_mod_timer("re_init_bot", "Re-Initilize the Bot", Statserv_Info[0].module_name, 10);
+	return 1;
+
+}
+void re_init_bot() {
+	notice(s_Services, "Re-Initilizing %s Bot", s_StatServ);
+	init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oikSdwgle", Statserv_Info[0].module_name);
+	del_mod_timer("Re-Initilize the Bot");
+}
 static int s_del_user(User *u) {
 	SStats *s;
 	char *cmd;
+#ifdef DEBUG
 	log(" Server %s", u->server->name);
+#endif
 	s=findstats(u->server->name);
 	if (UserLevel(u) >= 40) {
 		DecreaseOpers(s);
@@ -604,7 +636,6 @@ static void ss_operlist(User *origuser, char *flags, char *server)
 	int away = 0;
 	register User *u;
 	int tech = 0;
-	int net = 0;
 
 	if (!flags) {
 		privmsg(origuser->nick, s_StatServ, "On-Line IRCops:");
@@ -617,28 +648,15 @@ static void ss_operlist(User *origuser, char *flags, char *server)
 		privmsg(origuser->nick, s_StatServ, "On-Line IRCops (Not Away):");
 		notice(s_StatServ,"%s Reqested Operlist of Non-Away Opers",origuser->nick);
 	}
-	if (flags && !strcasecmp(flags, "tech")) {
-		tech = 1;
-		flags = NULL;
-		privmsg(origuser->nick, s_StatServ, "On-Line Tech Admins:");
-		notice(s_StatServ,"%s Reqested a Technical Administrator List",origuser->nick);
-	}
-	if (flags && !strcasecmp(flags, "net")) {
-		net = 1;
-		flags = NULL;
-		privmsg(origuser->nick, s_StatServ, "On-Line Net Admins:");
-		notice(s_StatServ,"%s Reqested a Network Administrator List",origuser->nick);
-	}	
-	if (!away && flags && strchr(flags, '.'))
+	if (!away && flags && strchr(flags, '.')) {
 		server = flags;
-
+		privmsg(origuser->nick, s_StatServ, "On-Line IRCops on Server %s", server);
+		notice(s_StatServ,"%s Reqested Operlist on Server %s",origuser->nick, server);
+	}
 	for (i = 0; i < U_TABLE_SIZE; i++) {
 		for (u = userlist[i]; u; u = u->next) {
+			tech = UserLevel(u);
 			if (away && u->is_away)
-				continue;
-			if (tech && UserLevel(u) == 190)
-				continue;
-			if (net && UserLevel(u) == 150)
 				continue;
 			if (!strcasecmp(u->server->name, me.services_name))
 				continue;
@@ -647,15 +665,15 @@ static void ss_operlist(User *origuser, char *flags, char *server)
 			if (!server) {
 				if (UserLevel(u) < 40)	continue;
 				j++;
-				privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s",j, u->nick,u->modes,
-					u->server->name);
+				privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s %-10d",j, u->nick,u->modes,
+					u->server->name, tech);
 				continue;
 			} else {
 				if (strcasecmp(server, u->server->name))	continue;
 				if (UserLevel(u) < 40)	continue;
 				j++;
-				privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s",j, u->nick,u->modes,
-					u->server->name);
+				privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s %-10d",j, u->nick,u->modes,
+					u->server->name, tech);
 				continue;
 			}
 		}
