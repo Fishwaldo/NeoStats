@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.110 2003/01/30 11:49:55 fishwaldo Exp $
+** $Id: ircd.c,v 1.111 2003/02/13 14:54:59 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -450,11 +450,13 @@ extern int split_buf(char *buf, char ***argv, int colon_special)
 extern char *joinbuf(char **av, int ac, int from) {
 	int i;
 	char *buf;
+	char buf1[512];
 
 	buf = malloc(512);
 	snprintf(buf, 512, "%s", av[from]);
 	for (i = from+1; i < ac; i++) {
-		snprintf(buf, 512, "%s %s", buf, av[i]);
+		snprintf(buf1, 512, "%s %s", buf, av[i]);
+		strncpy(buf, buf1, 512);
 	}
 	return (char *)buf;
 }
