@@ -1,8 +1,8 @@
-/* NeoStats - IRC Statistical Services Copryight (c) 1999-2001 NeoStats Group.
+/* NeoStats - IRC Statistical Services Copryight (c) 1999-2002 NeoStats Group.
 *
 ** Module: ConnectServ
 ** Description: Network Connection & Mode Monitoring Service
-** Version: 1.0
+** Version: 1.3
 ** Authors: ^Enigma^ & Shmad
 */
 

@@ -1,6 +1,9 @@
 ConnectServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma^
 
+* Version 1.3 * February 12th, 2002
+- Code overhaul for NeoStats-2.5 core.
+
 * Version 1.2 * November 18th, 2001
 - Add u->mode check for Local Kills (^Enigma^)
 - Changed LOCAL KILL format to same as GLOBAL format (much nicer..) (Shmad)
