@@ -32,10 +32,7 @@
 #endif
 
 const char* CoreLogFileName="NeoStats";
-/*Original NeoStats logging format*/
 char LogFileNameFormat[MAX_LOGFILENAME]="-%m-%d";
-/*test logging format*/
-/*char LogFileNameFormat[MAX_LOGFILENAME]="%Y%M%d";*/
 
 const char *loglevels[10] = {
 	"CRITICAL",
@@ -49,6 +46,7 @@ const char *loglevels[10] = {
 	"DEBUG3",
 	"INSANE"
 };
+
 struct logs_ {
 	FILE *logfile;
 	char name[30];
@@ -56,8 +54,6 @@ struct logs_ {
 } logs_;
 
 hash_t *logs;
-
-void *close_logs ();
 
 /** @brief initialize the logging functions 
  */
@@ -75,8 +71,6 @@ init_logs ()
 
 /** @brief Occasionally flush log files out 
  */
-
-
 void *
 close_logs ()
 {
@@ -100,7 +94,6 @@ close_logs ()
 	}
 	return NULL;
 }
-
 
 /** @Configurable logging function
  */
@@ -167,6 +160,9 @@ nlog (int level, int scope, char *fmt, ...)
 		va_end (ap);
 	}
 }
+
+/** rotate logs, called at midnight
+ */
 void
 reset_logs ()
 {
@@ -199,10 +195,8 @@ reset_logs ()
 	}
 }
 
-
-
 /* this is for printing out details during an assertion failure */
-extern void
+void
 nassert_fail (const char *expr, const char *file, const int line, const char *infunk)
 {
 #ifdef HAVE_BACKTRACE
