@@ -227,7 +227,7 @@ echo ""
 ####
 
 ###########################################################################
-# select IRCd
+# select datbase
 DATABASE_DEFAULT="gdbm"
 DATABASE=
 validselection=0
@@ -242,7 +242,7 @@ while [ $validselection -eq 0 ] ; do
 	fi
 	case $INPUT in
 		no\ default)
-			echo "You must specify your IRC server type in order for NeoStats to function"
+			echo "You must specify a database type in order for NeoStats to function"
 			echo "correctly."
 			;;
 		1)
