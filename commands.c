@@ -192,7 +192,6 @@ add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list)
 		add_bot_cmd(bot_ptr->botcmds, bot_cmd_list);
 		bot_cmd_list++;
 	}
-	CLEAR_SEGV_INMODULE();
 	return NS_SUCCESS;
 }
 
