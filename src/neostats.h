@@ -764,7 +764,6 @@ int split_buf (char *buf, char ***argv, int colon_special);
 int flood (User * u);
 int join_bot_to_chan (const char *who, const char *chan, unsigned long chflag);
 
-/* (M) For backwards compatibility only, bots are moving to a new interface */
 void privmsg_list (char *to, char *from, const char **text);
 void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 void privmsg (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
@@ -773,8 +772,6 @@ void globops (char * from, char * fmt, ...) __attribute__((format(printf,2,3)));
 void chanalert (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int wallops (const char *from, const char *msg, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-/* Temp for backwards compatibility */
-#define snumeric_cmd numeric
 
 /* function declarations */
 #ifdef GOTSJOIN
