@@ -34,28 +34,25 @@ const char hs_help_list_oneline[] ="List vhosts";
 const char hs_help_view_oneline[] ="Detailed vhost list";
 
 const char *hs_about[] = {
-	"\2HostServ\2 allows users to use their own unique host",
-	"while on the Network. IRC Operators add them to the",
-	"database and upon connection the user gets their vhost.",
+	"\2HostServ\2 allows users to have a unique virtual host",
+	"while on the network. Virtual hosts are set automatically",
+	"when you join the network or by using the LOGIN command",
 	"",
-	"If you find your host is not working, it could have been",
-	"removed due to abuse, or the fact you are connecting from",
-	"a different ISP or have a numerical address.",
-	"Contact an admin.",
+	"If you find your host is not working, it may have been",
+	"removed due to abuse and you should contact an operator.",
 	NULL
 };
 
 const char *hs_help_add[] = {
 	"Syntax: \2ADD <NICK> <HOSTNAME> <VHOST> <PASSWORD>\2",
 	"",
-	"Register a vhost with hostserv. e.g. my-host.com.",
-	"HOSTNAME must be where the user is connecting from",
-	"\2without the @\2",
-	"HOSTNAME can include wildcards e.g. *.myhost.com",
-	"Users can also get their vhost by typing the command:",
-	"    \2/msg HostServ LOGIN nick password\2",
-	"This allows them to use the vhost from any host and for",
-	"multiple users to share one vhost",
+	"Register a vhost with hostserv. e.g. vhost.com.",
+	"HOSTNAME is the host the user is connecting from",
+	"such as realhost.com and can include wildcards",
+	"such as *.realhost.com.",
+	"Users can also get their vhost with the LOGIN",
+	"command. This allows them use of the vhost from"
+	"multiple hosts or multiple users to share a vhost.",
 	NULL
 };
 
@@ -80,15 +77,18 @@ const char *hs_help_list[] = {
 	"Lists the current vhosts stored in the database.",
 	"For more descriptive info on a vhost see \2HELP VIEW\2",
 	"",
-	"Optional startpos will start listing from that position",
+	"A maximum 20 vhosts are displayed at one time, in order",
+	"to view other vhosts, the <startpos> parameter allows",
+	"listing from that position",
 	NULL
 };
 
 const char *hs_help_login[] = {
 	"Syntax: \2LOGIN <NICK> <PASSWORD>\2",
 	"",
-	"Sets your vhost if it was not set when you connect to IRC",
-	"or you are connecting from a different host.",
+	"Sets your vhost if it was not set when you connect to IRC,",
+	"or you are connecting from a different host, or you share a.",
+	"vhost with other users.",
 	NULL
 };
 
@@ -101,7 +101,7 @@ const char *hs_help_chpass[] = {
 
 const char *hs_help_bans[] = {
 	"Syntax: \2BANS LIST\2",
-	"        \2BANS ADD <hostname>\2",
+	"        \2BANS ADD <hostname> <reason>\2",
 	"        \2BANS DEL <hostname>\2",
 	"",
 	"Maintain the list of banned vhosts.",

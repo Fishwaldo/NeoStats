@@ -52,7 +52,7 @@ struct hs_cfg {
 } hs_cfg;
 
 static int hs_event_signon (CmdParams *cmdparams);
-static int hs_event_mode (CmdParams *cmdparams);
+static int hs_event_umode (CmdParams *cmdparams);
 
 static int hs_cmd_bans (CmdParams *cmdparams);
 static int hs_cmd_login (CmdParams *cmdparams);
@@ -61,9 +61,6 @@ static int hs_cmd_add (CmdParams *cmdparams);
 static int hs_cmd_list (CmdParams *cmdparams);
 static int hs_cmd_view (CmdParams *cmdparams);
 static int hs_cmd_del (CmdParams *cmdparams);
-static int hs_cmd_bans_list (CmdParams *cmdparams);
-static int hs_cmd_bans_add (CmdParams *cmdparams);
-static int hs_cmd_bans_del (CmdParams *cmdparams);
 
 static int hs_set_regnick_cb (CmdParams* cmdparams, SET_REASON reason);
 static int hs_set_expire_cb (CmdParams* cmdparams, SET_REASON reason);
@@ -135,7 +132,7 @@ static BotInfo hs_botinfo =
 /** Module Events */
 ModuleEvent module_events[] = {
 	{EVENT_SIGNON,	hs_event_signon,	EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE},
-	{EVENT_UMODE,	hs_event_mode,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE}, 
+	{EVENT_UMODE,	hs_event_umode,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE}, 
 	{EVENT_NULL,	NULL}
 };
 
@@ -389,7 +386,7 @@ static int hs_event_signon (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-/** @brief hs_event_mode
+/** @brief hs_event_umode
  *
  *  Event handler for umode to set a user's host on regnick
  *
@@ -398,7 +395,7 @@ static int hs_event_signon (CmdParams *cmdparams)
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_event_mode (CmdParams *cmdparams) 
+static int hs_event_umode (CmdParams *cmdparams) 
 {
 	int add = 0;
 	char *modes;
@@ -406,7 +403,6 @@ static int hs_event_mode (CmdParams *cmdparams)
 
 	if (is_oper(cmdparams->source) && hs_cfg.operhosts == 0) 
 		return NS_SUCCESS;
-		
 	/* first, find if its a regnick mode */
 	modes = cmdparams->av[1];
 	while (*modes) {
@@ -531,33 +527,6 @@ static void new_vhost (char *nick, char *host, char *vhost, char *pass, char *wh
 	SaveVhost (vhe);
 }
 
-/** @brief hs_cmd_bans
- *
- *  Command handler for BANS
- *
- *  @param cmdparams
- *
- *  @return NS_SUCCESS if succeeds, else NS_FAILURE
- */
-
-static int hs_cmd_bans (CmdParams *cmdparams)
-{
-	if (!ircstrcasecmp (cmdparams->av[0], "LIST")) {
-		return hs_cmd_bans_list (cmdparams);
-	} else if (!ircstrcasecmp (cmdparams->av[0], "ADD")) {
-		if (cmdparams->ac < 3) {
-			return NS_ERR_NEED_MORE_PARAMS;
-		}
-		return hs_cmd_bans_add (cmdparams);
-	} else if (!ircstrcasecmp (cmdparams->av[0], "DEL")) {
-		if (cmdparams->ac < 2) {
-			return NS_ERR_NEED_MORE_PARAMS;
-		}
-		return hs_cmd_bans_del (cmdparams);
-	}
-	return NS_ERR_SYNTAX_ERROR;
-}
-
 /** @brief hs_cmd_bans_list
  *
  *  Command handler for BANS LIST
@@ -658,6 +627,33 @@ static int hs_cmd_bans_del (CmdParams *cmdparams)
 	}
 	irc_prefmsg (hs_bot, cmdparams->source, "No entry for %s", cmdparams->av[1]);
 	return NS_SUCCESS;
+}
+
+/** @brief hs_cmd_bans
+ *
+ *  Command handler for BANS
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+static int hs_cmd_bans (CmdParams *cmdparams)
+{
+	if (!ircstrcasecmp (cmdparams->av[0], "LIST")) {
+		return hs_cmd_bans_list (cmdparams);
+	} else if (!ircstrcasecmp (cmdparams->av[0], "ADD")) {
+		if (cmdparams->ac < 3) {
+			return NS_ERR_NEED_MORE_PARAMS;
+		}
+		return hs_cmd_bans_add (cmdparams);
+	} else if (!ircstrcasecmp (cmdparams->av[0], "DEL")) {
+		if (cmdparams->ac < 2) {
+			return NS_ERR_NEED_MORE_PARAMS;
+		}
+		return hs_cmd_bans_del (cmdparams);
+	}
+	return NS_ERR_SYNTAX_ERROR;
 }
 
 /** @brief hs_cmd_chpass
