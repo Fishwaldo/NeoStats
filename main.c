@@ -37,8 +37,7 @@
 #include "keeper.h"
 #include "log.h"
 
-
-/*! this is the name of the services bot */
+/* this is the name of the services bot */
 char s_Services[MAXNICK] = "NeoStats";
 
 /*! depending on what IRCD is selected, we change the version string */
@@ -174,9 +173,17 @@ main (int argc, char *argv[])
 #ifndef DEBUG
 	/* if we are compiled with debug, or forground switch was specified, DONT FORK */
 	if (!config.foreground) {
+		/* fix the double log message problem by closing logs prior to fork() */ 
+		close_logs(); 
 		forked = fork ();
+		/* Error check fork() */ 
+		if (forked<0) { 
+			perror("fork"); 
+			exit(1); /* fork error */ 
+		} 
 #endif
-		if (forked) {
+		/* we are the parent */ 
+		if (forked>0) { 
 			/* write out our PID */
 			fp = fopen ("neostats.pid", "w");
 			fprintf (fp, "%i", forked);
@@ -186,9 +193,12 @@ main (int argc, char *argv[])
 				printf ("NeoStats %d.%d.%d%s Successfully Launched into Background\n", MAJOR, MINOR, REV, version);
 				printf ("PID: %i - Wrote to neostats.pid\n", forked);
 			}
-			return 0;
+			exit(0); /* parent exits */ 
 		}
 #ifndef DEBUG
+		/* child (daemon) continues */ 
+		/* reopen logs for child */ 
+		init_logs (); 
 		/* detach from parent process */
 		if (setpgid (0, 0) < 0) {
 			nlog (LOG_WARNING, LOG_CORE, "setpgid() failed");
@@ -210,7 +220,7 @@ main (int argc, char *argv[])
  *
  * Processes commandline options
 */
-void
+static void
 get_options (int argc, char **argv)
 {
 	int c;
@@ -298,13 +308,13 @@ serv_die ()
 {
 #ifdef VALGRIND
 	exit(1);
-#endif
+#else /* VALGRIND */
 	User *u;
 	u = finduser (s_Services);
 	nlog (LOG_CRITICAL, LOG_CORE, "Sigterm Recieved, Shuting Down Server!!!!");
 	ns_shutdown (u, "SigTerm Recieved");
-	ssquit_cmd (me.name);
-
+	ssquit_cmd (me.name);  
+#endif /* VALGRIND */
 }
 
 /** @brief Sighup Signal handler
@@ -471,7 +481,7 @@ setup_signals ()
  *
  * @todo make the restart code nicer so it doesn't go mad when we can't connect
  */
-void
+static void
 start ()
 {
 	static int attempts = 0;
@@ -493,7 +503,10 @@ start ()
 		login ();
 		read_loop ();
 	}
-	nlog (LOG_NOTICE, LOG_CORE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
+	if(me.r_time>0)
+		nlog (LOG_NOTICE, LOG_CORE, "Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
+	else
+		nlog (LOG_NOTICE, LOG_CORE, "Reconnect time is zero, shutting down");
 	close (servsock);
 
 	/* Unload the Modules */
@@ -502,8 +515,12 @@ start ()
 		mod_ptr = hnode_get (mn);
 		unload_module (mod_ptr->info->module_name, finduser (s_Services));
 	}
-	sleep (5);
-	do_exit (2);
+	if(me.r_time>0) {
+		sleep (5);
+		do_exit (2);
+	}
+	else
+		do_exit (0);
 }
 
 /** @brief Login to IRC

@@ -53,6 +53,7 @@ new_timer (char *timer_name)
 {
 	Mod_Timer *t;
 	hnode_t *tn;
+
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "New Timer: %s", timer_name);
 	t = malloc (sizeof (Mod_Timer));
@@ -533,11 +534,12 @@ load_module (char *path1, User * u)
 	dl_handle = dlopen (p, RTLD_NOW || RTLD_GLOBAL);
 	strcpy (segvinmodule, "");
 	if (!dl_handle) {
+		dl_error = dlerror ();
 		if (do_msg) {
 			prefmsg (u->nick, s_Services, "Error, Couldn't Load Module");
-			prefmsg (u->nick, s_Services, "%s", dlerror ());
+			prefmsg (u->nick, s_Services, "%s", dl_error);
 		}
-		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dlerror ());
+		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dl_error);
 		nlog (LOG_WARNING, LOG_CORE, "Module was %s", p);
 		return -1;
 	}
@@ -585,7 +587,7 @@ load_module (char *path1, User * u)
 	if (mod_info_ptr == NULL || mod_funcs_ptr == NULL) {
 		dlclose (dl_handle);
 		nlog (LOG_WARNING, LOG_CORE, "%s: Could not load dynamic library %s!\n", __PRETTY_FUNCTION__, path);
-		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dlerror ());
+		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", p);
 		return -1;
 	}
 
@@ -732,8 +734,9 @@ unload_module (char *module_name, User * u)
 
 
 	SET_SEGV_LOCATION();
-	/* Check to see if this Module has any timers registered....  */
+	
 
+	/* Check to see if this Module is loaded....  */
 	modnode = hash_lookup (mh, module_name);
 	if (modnode) {
 		chanalert (s_Services, "Unloading Module %s", module_name);
@@ -746,6 +749,7 @@ unload_module (char *module_name, User * u)
 		return -1;
 	}
 
+	/* Check to see if this Module has any timers registered....  */
 	hash_scan_begin (&hscan, th);
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		mod_tmr = hnode_get (modnode);
@@ -773,6 +777,8 @@ unload_module (char *module_name, User * u)
 			del_bot (mod_ptr->nick, "Module Unloaded");
 		}
 	}
+
+	/* Remove module....  */
 	modnode = hash_lookup (mh, module_name);
 	if (modnode) {
 		nlog (LOG_DEBUG1, LOG_CORE, "Deleting Module %s from ModHash", module_name);
