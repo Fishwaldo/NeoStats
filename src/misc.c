@@ -225,7 +225,7 @@ char* strlwr (char *s)
  * @return 
  */
 
-int ircsplitbuf (char *buf, char ***argv, int colon_special)
+EXPORTFUNC int ircsplitbuf (char *buf, char ***argv, int colon_special)
 {
 	int argvsize = 8;
 	int argc;
