@@ -116,11 +116,6 @@ init_services_bot (void)
 	flags = me.onlyopers ? BOT_FLAG_ONLY_OPERS : 0;
 	flags |= BOT_FLAG_DEAF;
 	ns_botptr = init_bot (NULL, &ns_botinfo, services_bot_modes, flags, ns_commands, NULL);
-#ifdef EXTAUTH
-	/* load extauth if we need to */
-	load_module ("extauth", NULL);
-	InitExtAuth();
-#endif
 	me.onchan = 1;
 	AddStringToList (&av, me.uplink, &ac);
 	SendModuleEvent (EVENT_ONLINE, av, ac);
@@ -464,7 +459,7 @@ static int
 ns_load (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	if (load_module (av[1], u) == NS_SUCCESS) {
+	if (load_module (av[1], u)) {
 		chanalert (ns_botptr->nick, "%s loaded module %s", u->nick, av[1]);
 	} else {
 		chanalert (ns_botptr->nick, "%s tried to load module %s, but load failed", u->nick, av[1]);

@@ -741,10 +741,6 @@ do_stats (const char* nick, const char *what)
 	time_t tmp;
 	time_t tmp2;
 	int i;
-#ifdef EXTAUTH
-	int dl;
-	int (*listauth) (User * u);
-#endif
 	User *u;
 
 	SET_SEGV_LOCATION();
@@ -763,15 +759,7 @@ do_stats (const char* nick, const char *what)
 		numeric (RPL_STATSCLINE, u->nick, "C *@%s * * %d 50", me.uplink, me.port);
 	} else if (!ircstrcasecmp (what, "o")) {
 		/* Operators */
-#ifdef EXTAUTH
-		dl = get_dl_handle ("extauth");
-		if (dl > 0) {
-			listauth = ns_dlsym ((int *) dl, "__list_auth");
-			if (listauth)
-				(*listauth) (u);
-		} else
-#endif
-			numeric (RPL_STATSOLINE, u->nick, "Operators think they are God, but you and I know they are not!");
+		ListAuth(u);
 	} else if (!ircstrcasecmp (what, "l")) {
 		/* Port Lists */
 		tmp = me.now - me.lastmsg;

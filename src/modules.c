@@ -254,7 +254,7 @@ ModulesVersion (const char* nick, const char *remoteserver)
  * 
  * @return
  */
-int
+Module *
 load_module (char *modfilename, User * u)
 {
 #ifndef HAVE_LIBDL
@@ -291,7 +291,7 @@ load_module (char *modfilename, User * u)
 			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s %s", dl_error, path);
 		}
 		nlog (LOG_WARNING, "Unable to load module: %s %s", dl_error, path);
-		return NS_FAILURE;
+		return NULL;
 	}
 
 	info_ptr = ns_dlsym (dl_handle, "module_info");
@@ -306,13 +306,13 @@ load_module (char *modfilename, User * u)
 		}
 		nlog (LOG_WARNING, "Unable to load module: %s %s", dl_error, path);
 		ns_dlclose (dl_handle);
-		return NS_FAILURE;
+		return NULL;
 	}
 	/* Check module was built for this version of NeoStats */
 	if(	ircstrncasecmp (NEOSTATS_VERSION, info_ptr->neostats_version, VERSIONSIZE) !=0 ) {
 		nlog (LOG_WARNING, "Unable to load module: %s was built with an old version of NeoStats and must be rebuilt.", mod_ptr->info->name);
 		ns_dlclose (dl_handle);
-		return NS_FAILURE;
+		return NULL;
 	}
 	/* Check that the Module hasn't already been loaded */
 	if (hash_lookup (mh, info_ptr->name)) {
@@ -321,7 +321,7 @@ load_module (char *modfilename, User * u)
 			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s already loaded", info_ptr->name);
 		}
 		nlog (LOG_WARNING, "Unable to load module: %s already loaded", info_ptr->name);
-		return NS_FAILURE;
+		return NULL;
 	}
 	/* Extract pointer to event list */
 	event_ptr = ns_dlsym (dl_handle, "module_events");
@@ -336,7 +336,7 @@ load_module (char *modfilename, User * u)
 		}
 		ns_dlclose (dl_handle);
 		free (mod_ptr);
-		return NS_FAILURE;
+		return NULL;
 	} 
 	hash_insert (mh, mn, info_ptr->name);
 	nlog (LOG_DEBUG1, "Module Internal name: %s", info_ptr->name);
@@ -363,7 +363,7 @@ load_module (char *modfilename, User * u)
 		}
 		ns_dlclose (dl_handle);
 		free (mod_ptr);
-		return NS_FAILURE;
+		return NULL;
 	} else {
 		int err;
 		SET_SEGV_LOCATION();
@@ -372,7 +372,7 @@ load_module (char *modfilename, User * u)
 		if (err < 1) {
 			nlog (LOG_NORMAL, "Unable to load module: %s. See %s.log for further information.", mod_ptr->info->name, mod_ptr->info->name);
 			unload_module(mod_ptr->info->name, NULL);
-			return NS_FAILURE;
+			return NULL;
 		}
 		CLEAR_SEGV_INMODULE();
 		SET_SEGV_LOCATION();
@@ -398,7 +398,7 @@ load_module (char *modfilename, User * u)
 		prefmsg (u->nick, ns_botptr->nick, "Module %s loaded, %s", info_ptr->name, info_ptr->description);
 		globops (me.name, "Module %s loaded", info_ptr->name);
 	}
-	return NS_SUCCESS;
+	return mod_ptr;
 }
 
 /** @brief 

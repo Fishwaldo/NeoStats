@@ -119,6 +119,9 @@ int InitCore(void)
 	/* initilze our Module subsystem */
 	if(InitModules () != NS_SUCCESS)
 		return NS_FAILURE;
+
+	InitAuth();
+
 	if(InitTimers() != NS_SUCCESS)
 		return NS_FAILURE;
 	if(InitBots() != NS_SUCCESS)

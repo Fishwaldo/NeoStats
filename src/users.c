@@ -676,89 +676,22 @@ UserDump (const char *nick)
 	}
 }
 
-/* Do dl lookups in advance to speed up UserLevel processing 
- *
- */
-#ifdef EXTAUTH
-int (*getauth) (User *, int curlvl);
-int InitExtAuth(void)
-{
-	int i;
-	i = get_dl_handle ("extauth");
-	if (i > 0) {
-		getauth = ns_dlsym ((int *) i, "__do_auth");
-		return NS_SUCCESS;
-	} 
-	return NS_FAILURE;
-}
-#endif
-
-int UmodeAuth(User * u)
-{
-	int i, tmplvl = 0;
-	/* Note, tables have been reordered highest to lowest so the 
-	 * first hit will give the highest level for a given umode
-	 * combination so we can just set it without checking against
-	 * the current level 
-	 * we can also quit on the first occurrence of 0
-	 * should be a lot faster!
-	 */
-	for (i = 0; i < ircd_umodecount; i++) {
-		if(user_umodes[i].level == 0)
-			break;
-		if (u->Umode & user_umodes[i].umode) {
-			tmplvl = user_umodes[i].level;
-			break;
-		}
-	}
-	nlog (LOG_DEBUG1, "UmodeAuth: umode level for %s is %d", u->nick, tmplvl);
-
-/* I hate SMODEs damn it */
-#ifdef GOTUSERSMODES
-	/* hey, smode can equal 0 as well you know */
-	/* see umode comments above */
-	for (i = 0; i < ircd_smodecount; i++) {
-		if(user_smodes[i].level == 0)
-			break;
-		if (u->Smode & user_smodes[i].umode) {
-			/* only if the smode level is higher than standard, do we alter tmplvl */
-			if (user_smodes[i].level > tmplvl) 
-				tmplvl = user_smodes[i].level;
-			break;
-		}
-	}
-	nlog (LOG_DEBUG1, "UmodeAuth: smode level for %s is %d", u->nick, tmplvl);
-#endif
-	return tmplvl;
-}
-
 int
 UserLevel (User * u)
 {
-	int i = 0;
-	int tmplvl = 0;
-	tmplvl = UmodeAuth(u);
-
-#ifdef EXTAUTH
-	if (getauth)
-		i = (*getauth) (u, tmplvl);
-	/* if tmplvl is greater than 1000, then extauth is authoritive */
-	if (i > tmplvl)
-		tmplvl = i;
-#endif
-
+	int ulevel = 0;
+	ulevel = UserAuth(u);
 #ifdef DEBUG
 #ifdef CODERHACK
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
 	if (!ircstrcasecmp (u->nick, "FISH"))
-		tmplvl = NS_ULEVEL_ROOT;
+		ulevel = NS_ULEVEL_ROOT;
 	if (!ircstrcasecmp (u->nick, "SHMAD"))
-		tmplvl = NS_ULEVEL_ROOT;
+		ulevel = NS_ULEVEL_ROOT;
 #endif
 #endif
-
-	nlog (LOG_DEBUG1, "UserLevel for %s is %d (%d)", u->nick, tmplvl, i);
-	return tmplvl;
+	nlog (LOG_DEBUG1, "UserLevel for %s is %d", u->nick, ulevel);
+	return ulevel;
 }
 
 void

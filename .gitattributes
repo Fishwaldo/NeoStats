@@ -63,6 +63,8 @@ src/adns/setup.c -text
 src/adns/transmit.c -text
 src/adns/tvarith.h -text
 src/adns/types.c -text
+src/auth.c -text
+src/auth.h -text
 src/bans.c -text
 src/bans.h -text
 src/bots.c -text

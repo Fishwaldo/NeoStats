@@ -3,6 +3,7 @@ NeoStats ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 ===============================================================================
 * NeoStats * Fish (F) & Mark (M) * Version 3.0.genesis
+ - seperate auth system from main core so we can add new auth hooks (M)
  - send_sjoin bug fix where user has no modes (M)
  - Segfault reports are now directed to segfault.log rather than the main log
    files for easier submission (M)

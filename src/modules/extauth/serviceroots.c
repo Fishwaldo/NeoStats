@@ -76,6 +76,18 @@ typedef struct users {
 	int lvl;
 } users;
 
+static int Online(char **av, int ac)
+{
+	add_services_cmd_list(extauth_commands);
+	return 1;
+};
+
+ModuleEvent module_events[] = {
+	{EVENT_ONLINE,		Online},
+	{NULL, NULL}
+};
+
+
 int __ModInit(int modnum, int apiver)
 {
 	srconf.auth = 0;
@@ -85,7 +97,6 @@ int __ModInit(int modnum, int apiver)
 		nlog(LOG_WARNING, "ServiceRoots: config failed");
 		/* we can't unload the extauth module so don't return -1 */
 	}
-	add_services_cmd_list(extauth_commands);
 	return 1;
 }
 

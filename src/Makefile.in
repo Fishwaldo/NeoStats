@@ -15,14 +15,14 @@ OBJS = ${SRCS:.c=.o}
 SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
 		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
 		support.c ircstring.c commands.c transfer.c exclude.c match.c bans.c \
-		bots.c modules.c
+		bots.c modules.c auth.c
 
 INCLUDES = config.h dl.h dotconf.h hash.h list.h neostats.h \
 		conf.h log.h support.h ircstring.h events.h numeric.h pcre.h \
 		transfer.h
 COREINCS = dns.h services.h sock.h ircd.h exclude.h \
 		ns_help.h timer.h users.h chans.h server.h bans.h \
-		bots.h modules.h commands.h 
+		bots.h modules.h commands.h auth.h
 BUILDFILES = *.in modules/Makefile modules/Makefile.inc.in
 
 DISTFILES = $(INCLUDES) $(COREINCS) $(SRCS) $(BUILDFILES) 

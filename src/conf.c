@@ -204,7 +204,6 @@ int
 ConfLoadModules ()
 {
 	int i;
-	int rval;
 
 	SET_SEGV_LOCATION();
 	if(load_mods[1] == 0) {
@@ -214,8 +213,7 @@ ConfLoadModules ()
 	nlog (LOG_NORMAL, "Loading configured modules"); 
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
 		nlog (LOG_DEBUG1, "ConfLoadModules: Loading Module %s", (char *)load_mods[i]);
-		rval = load_module (load_mods[i], NULL);
-		if (rval == NS_SUCCESS) {
+		if (load_module (load_mods[i], NULL)) {
 			nlog (LOG_NORMAL, "Successfully Loaded Module %s", (char *)load_mods[i]);
 		} else {
 			nlog (LOG_WARNING, "Could Not Load Module %s, Please check above error Messages", (char *)load_mods[i]);

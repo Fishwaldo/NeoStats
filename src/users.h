@@ -37,7 +37,6 @@ void UserSMode (const char *nick, const char *modes);
 int InitUsers (void);
 void UserAway (const char *nick, const char *awaymsg);
 void DelUser (const char *nick, int killflag, const char *reason);
-int InitExtAuth(void);
 void FreeUsers();
 #ifdef BASE64NICKNAME
 User *finduserbase64 (const char *num);
