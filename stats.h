@@ -546,13 +546,11 @@ int sping_cmd (const char *from, const char *reply, const char *to);
 int spong_cmd (const char *reply);
 int snick_cmd (const char *oldnick, const char *newnick);
 int sswhois_cmd (const char *target, const char *swhois);
-int ssvskill_cmd (const char *who, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int ssvsnick_cmd (const char *target, const char *newnick);
 int ssvsjoin_cmd (const char *target, const char *chan);
 int ssvspart_cmd (const char *target, const char *chan);
 int ssvshost_cmd (const char *who, const char *vhost);
 int ssvsmode_cmd (const char *target, const char *modes);
-int ssvshost_cmd (const char *who, const char *vhost);
 int ssvskill_cmd (const char *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...);
 int srakill_cmd (const char *host, const char *ident);
