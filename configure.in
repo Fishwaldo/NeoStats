@@ -45,9 +45,6 @@ ADNS_C_GCCATTRIB
 AC_CHECK_HEADERS(sys/select.h)
 
 
-
-
-
 AC_MSG_CHECKING(for INADDR_LOOPBACK)
 AC_CACHE_VAL(adns_cv_decl_inaddrloopback,[
  AC_TRY_COMPILE([
@@ -81,7 +78,7 @@ dnl Checks for library functions.
 AC_FUNC_FNMATCH
 AC_TYPE_SIGNAL
 AC_FUNC_STRFTIME
-AC_CHECK_FUNCS(regcomp select socket strdup)
+AC_CHECK_FUNCS(regcomp select socket strdup fcloseall)
 
 dnl check if we are running with Debug....
 AC_MSG_CHECKING(Whether to Enable Debuging...)

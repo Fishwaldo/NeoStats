@@ -49,8 +49,9 @@ const char version_time[] = __TIME__;
 static void start();
 static void setup_signals();
 
+#ifdef HAVE_FCLOSEALL
 int fcloseall(void);
-
+#endif
 
 int forked = 0;
 
@@ -122,7 +123,13 @@ int main()
 		return 0;
 	}
 #ifndef DEBUG
+#ifdef HAVE_FCLOSEALL
 	fcloseall();
+#else
+	fclose(0);
+	fclose(1);
+	fclose(2);
+#endif
 #endif
 	log("Statistics Started (%s).", version);
 	start();
