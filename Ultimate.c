@@ -299,6 +299,10 @@ send_join (const char *who, const char *chan)
 {
 	sts (":%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
 }
+void 
+send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
+{
+}
 #endif
 
 void 

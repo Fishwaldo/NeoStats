@@ -207,6 +207,11 @@ send_join (const char *who, const char *chan)
 }
 
 void 
+send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
+{
+}
+
+void 
 send_cmode (const char *who, const char *chan, const char *mode, const char *args)
 {
 	sts (":%s %s %s %s %s %lu", me.name, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args, me.now);
