@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.16 2002/02/27 11:15:16 fishwaldo Exp $
+** $Id: ircd.c,v 1.17 2002/02/27 13:59:39 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -40,7 +40,7 @@ void Srv_Squit(char *, char *);
 void Srv_Nick(char *, char *);
 void Srv_Svsnick(char *, char *);
 void Srv_Kill(char *, char *);
-
+void Srv_Connect();
 
 
 static void ShowMOTD(char *);
@@ -117,6 +117,8 @@ IntCommands cmd_list[] = {
 	{TOK_SVSNICK,	Srv_Svsnick,		0},
 	{MSG_KILL,	Srv_Kill,		0},
 	{TOK_KILL,	Srv_Kill,		0},
+	{MSG_PROTOCTL, 	Srv_Connect, 		0},
+	{TOK_PROTOCTL,	Srv_Connect,		0},
 	{NULL,		NULL,			0}
 };
 
@@ -300,8 +302,36 @@ void parse(char *line)
 
 }
 
+
+
+
 /* Here are the Following Internal Functions.
 they should update the internal Structures */
+
+void init_ServBot()
+{
+	segv_location = sstrdup("init_ServBot");
+	sts("NICK %s 1 %d %s %s %s 0 :/msg %s \2HELP\2", s_Services, time(NULL),
+		Servbot.user, Servbot.host, me.name, s_Services);
+	AddUser(s_Services, Servbot.user, Servbot.host, me.name);
+	sts(":%s MODE %s +Sqd", s_Services, s_Services);
+	sts(":%s JOIN %s",s_Services ,me.chan);
+	sts(":%s MODE %s +o %s",me.name,me.chan,s_Services);
+	sts(":%s MODE %s +a %s",s_Services,me.chan,s_Services);
+	UserMode(s_Services, ":+Sqd"); 
+	Module_Event("SIGNON", finduser(s_Services));
+}
+
+
+
+
+void Srv_Connect() {
+	init_ServBot();
+}
+
+
+
+
 
 void Usr_Stats(char *origin, char *coreLine) {
 	User *u;
@@ -514,7 +544,7 @@ void Srv_Netinfo(char *origin, char *coreLine) {
 			#ifdef DEBUG
         			ns_debug_to_coders("");
         		#endif
-			if (atoi(cmd) >= 2109) {
+			if (atoi(cmd) == 2109) {
 				me.usesmo = 1;
 			} 
 			Module_Event("NETINFO", coreLine); 

@@ -201,23 +201,9 @@ void login()
 	sts("PASS %s", me.pass);
 	sts("SERVER %s 1 :%s", me.name,me.infoline);
 	sts("PROTOCTL TOKEN");
-	init_ServBot();
 
 }
 
-void init_ServBot()
-{
-	segv_location = sstrdup("init_ServBot");
-	sts("NICK %s 1 %d %s %s %s 0 :/msg %s \2HELP\2", s_Services, time(NULL),
-		Servbot.user, Servbot.host, me.name, s_Services);
-	AddUser(s_Services, Servbot.user, Servbot.host, me.name);
-	sts(":%s MODE %s +Sqd", s_Services, s_Services);
-	sts(":%s JOIN %s",s_Services ,me.chan);
-	sts(":%s MODE %s +o %s",me.name,me.chan,s_Services);
-	sts(":%s MODE %s +a %s",s_Services,me.chan,s_Services);
-	UserMode(s_Services, ":+Sqd"); 
-	Module_Event("SIGNON", finduser(s_Services));
-}
 
 void *smalloc(long size)
 {
