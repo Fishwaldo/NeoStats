@@ -342,6 +342,14 @@ modules/operlog/ChangeLog -text
 modules/operlog/Makefile -text
 modules/operlog/ol_help.c -text
 modules/operlog/operlog.c -text
+modules/sqlsrv/rtabans.c -text
+modules/sqlsrv/rtachannels.c -text
+modules/sqlsrv/rtamodules.c -text
+modules/sqlsrv/rtaservers.c -text
+modules/sqlsrv/rtausers.c -text
+modules/sqlsrv/sqlsrv.c -text
+modules/sqlsrv/sqlsrv.h -text
+modules/sqlsrv/sqlsrv.vcproj -text
 modules/statserv/.indent.pro -text
 modules/statserv/GeoIP.dat -text
 modules/statserv/Makefile.am -text
