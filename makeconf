@@ -52,6 +52,8 @@ fi
 
 if [ -r config.h ]; then
 	echo "Here we go.. "
+else if [ -r include/config.h ]; then
+	echo "Here we go.. "
 else
 	echo "Hmm, you need to run configure first!"
 	echo "Type ./configure"
@@ -60,7 +62,7 @@ else
 	echo "you ran it from."
 	exit 1
 fi
-
+fi
 CONF=$STATSCONF
 
 if [ -r "$CONF" ]; then
