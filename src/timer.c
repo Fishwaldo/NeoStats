@@ -339,9 +339,11 @@ run_mod_timers (int ismidnight)
 						continue;
 					break;
 				case TIMER_TYPE_COUNTDOWN:
-					timer->interval--;
-					if( timer->interval > 0)
-						continue;
+					if (me.now - timer->lastrun < timer->interval) {
+						timer->interval -= (me.now - timer->lastrun);
+						timer->lastrun = me.now;
+ 						continue;
+					}
 					deleteme = 1;
 					break;
 			}
