@@ -80,7 +80,7 @@ static bot_setting ms_settings[]=
 static int Online(char **av, int ac)
 {
 	ms_bot = init_mod_bot(s_MoraleServ, ms_cfg.user, ms_cfg.host, ms_cfg.rname, 
-		services_bot_modes, BOT_FLAG_DEAF, ms_commands, NULL, __module_info.module_name);
+		services_bot_modes, BOT_FLAG_DEAF, ms_commands, ms_settings, __module_info.module_name);
 	return 1;
 };
 
