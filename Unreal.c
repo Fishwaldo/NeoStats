@@ -455,7 +455,11 @@ m_server (char *origin, char **argv, int argc, int srv)
 		s++;
 	}
 #else
-	s = argv[3];
+	if(argc > 2) {
+		s = argv[3];
+	} else {
+		s = argv[2];
+	}
 #endif
 
 	if(!srv) {
