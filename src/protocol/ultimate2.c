@@ -49,8 +49,8 @@ static void m_stats (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
 static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_pass (char *origin, char **argv, int argc, int srv);
-static void m_svsnick (char *, char **, int argc, int srv);
-static void m_protoctl (char *, char **, int argc, int srv);
+static void m_svsnick (char *origin, char **argv, int argc, int srv);
+static void m_protoctl (char *origin, char **argv, int argc, int srv);
 static void m_snetinfo (char *origin, char **argv, int argc, int srv);
 static void m_vctrl (char *origin, char **argv, int argc, int srv);
 
@@ -69,7 +69,7 @@ ProtocolInfo protocol_info = {
 	/* Protocol options negotiated at link by this IRCd */
 	0,
 	/* Features supported by this IRCd */
-	FEATURE_BOTMODES,
+	0,
 	"+oS",
 	"+a",
 };
@@ -151,6 +151,7 @@ umode_init user_umodes[] = {
 	{'a', UMODE_SERVICESOPER},
 	{'Z', UMODE_IRCADMIN},
 	{'z', UMODE_ADMIN},
+	{'i', UMODE_ALTADMIN},
 	{'o', UMODE_OPER},
 	{'p', UMODE_SUPER},
 	{'O', UMODE_LOCOP},

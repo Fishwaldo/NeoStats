@@ -33,7 +33,6 @@ int bufsize;
 
 void get_map();
 void get_top10chan();
-char *strnrepl(char *, int size, const char *old, const char *new);
 void put_copyright();
 void get_srvlist();
 void get_srvlistdet();

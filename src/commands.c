@@ -521,14 +521,14 @@ bot_cmd_help_set (CmdParams * cmdparams, int userlevel)
 	bot_setting* set_ptr;
 
 	/* Display HELP SET intro text and LIST command */
-	irc_privmsg_list (cmdparams->bot, cmdparams->source, cmd_help_set);
+	irc_prefmsg_list (cmdparams->bot, cmdparams->source, cmd_help_set);
 	/* Display option specific text for current user level */
 	hash_scan_begin(&hs, cmdparams->bot->botsettings);
 	while ((setnode = hash_scan_next(&hs)) != NULL) {
 		set_ptr = hnode_get(setnode);
 		if(set_ptr->helptext && userlevel >= set_ptr->ulevel)
 		{
-			irc_privmsg_list (cmdparams->bot, cmdparams->source, set_ptr->helptext);
+			irc_prefmsg_list (cmdparams->bot, cmdparams->source, set_ptr->helptext);
 			irc_prefmsg(cmdparams->bot, cmdparams->source, " ");
 		}
 	}
@@ -651,7 +651,7 @@ bot_cmd_help (CmdParams * cmdparams)
 			if(!cmd_ptr->helptext) {
 				irc_privmsg (cmdparams->bot, cmdparams->source, "Missing help text for command");
 			} else {
-				irc_privmsg_list (cmdparams->bot, cmdparams->source, cmd_ptr->helptext);
+				irc_prefmsg_list (cmdparams->bot, cmdparams->source, cmd_ptr->helptext);
 			}
 			return NS_SUCCESS;
 		}
@@ -661,7 +661,7 @@ bot_cmd_help (CmdParams * cmdparams)
 	cmd_ptr = intrinsic_commands;
 	while(cmd_ptr->cmd) {
 		if (!ircstrcasecmp(cmdparams->av[0], cmd_ptr->cmd)) {
-			irc_privmsg_list (cmdparams->bot, cmdparams->source, cmd_ptr->helptext);
+			irc_prefmsg_list (cmdparams->bot, cmdparams->source, cmd_ptr->helptext);
 			return NS_SUCCESS;
 		}
 		cmd_ptr++;
@@ -1040,7 +1040,7 @@ bot_cmd_set (CmdParams * cmdparams)
  */
 static int bot_cmd_about (CmdParams * cmdparams)
 {
-	irc_privmsg_list (cmdparams->bot, cmdparams->source, cmdparams->bot->moduleptr->info->about_text);
+	irc_prefmsg_list (cmdparams->bot, cmdparams->source, cmdparams->bot->moduleptr->info->about_text);
 	return NS_SUCCESS;
 }
 
@@ -1063,7 +1063,7 @@ static int bot_cmd_version (CmdParams * cmdparams)
  */
 static int bot_cmd_credits (CmdParams * cmdparams)
 {
-	irc_privmsg_list (cmdparams->bot, cmdparams->source, 
+	irc_prefmsg_list (cmdparams->bot, cmdparams->source, 
 		cmdparams->bot->moduleptr->info->copyright);
 	return NS_SUCCESS;
 }

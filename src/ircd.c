@@ -673,10 +673,10 @@ irc_connect (const char *name, const int numeric, const char *infoline, const ch
 }
 
 void
-irc_privmsg_list (const Bot *botptr, const Client * target, const char **text)
+irc_prefmsg_list (const Bot *botptr, const Client * target, const char **text)
 {
 	if (IsMe(target)) {
-		nlog (LOG_NOTICE, "Dropping irc_privmsg_list from bot (%s) to bot (%s)", botptr->u->name, target->name);
+		nlog (LOG_NOTICE, "Dropping irc_prefmsg_list from bot (%s) to bot (%s)", botptr->u->name, target->name);
 		return;
 	}
 	while (*text) {
@@ -688,6 +688,24 @@ irc_privmsg_list (const Bot *botptr, const Client * target, const char **text)
 		text++;
 	}
 }
+
+void
+irc_privmsg_list (const Bot *botptr, const Client * target, const char **text)
+{
+	if (IsMe(target)) {
+		nlog (LOG_NOTICE, "Dropping irc_privmsg_list from bot (%s) to bot (%s)", botptr->u->name, target->name);
+		return;
+	}
+	while (*text) {
+		if (**text) {
+			irc_privmsg (botptr, target, (char*)*text);
+		} else {
+			irc_privmsg (botptr, target, " ");
+		}
+		text++;
+	}
+}
+
 
 void
 irc_chanalert (const Bot *botptr, const char *fmt, ...)
@@ -1156,7 +1174,7 @@ ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
 }
 
 int
-irc_akill (const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, ...)
+irc_akill (const Bot *botptr, const char *host, const char *ident, const unsigned long length, const char *reason, ...)
 {
 	va_list ap;
 
@@ -1164,7 +1182,7 @@ irc_akill (const char *host, const char *ident, const char *setby, const unsigne
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
 	if(irc_send_akill) {
-		irc_send_akill(me.name, host, ident, setby, length, ircd_buf, me.now);
+		irc_send_akill(me.name, host, ident, botptr->name, length, ircd_buf, me.now);
 	} else {
 		unsupported_cmd("AKILL");
 	}
@@ -1172,7 +1190,7 @@ irc_akill (const char *host, const char *ident, const char *setby, const unsigne
 }
 
 int
-irc_rakill (const char *host, const char *ident)
+irc_rakill (const Bot *botptr, const char *host, const char *ident)
 {
 	if(irc_send_rakill) {
 		irc_send_rakill (me.name, host, ident);

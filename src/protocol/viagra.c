@@ -132,6 +132,7 @@ cmode_init chan_modes[] = {
 umode_init user_umodes[] = {
 	{'a', UMODE_SADMIN},
 	{'A', UMODE_ADMIN},
+	{'i', UMODE_ALTADMIN},
 	{'o', UMODE_OPER},
 	{'r', UMODE_REGNICK},
 	{'i', UMODE_INVISIBLE},

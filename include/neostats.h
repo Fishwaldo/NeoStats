@@ -959,21 +959,31 @@ EXPORTFUNC char *sftime (time_t t);
 EXPORTFUNC char *joinbuf (char **av, int ac, int from);
 EXPORTFUNC int split_buf (char *buf, char ***argv, int colon_special);
 
+/* IRC interface for modules 
+ *  Modules use these functions to perform actions on IRC
+ *  They use a similar naming convention to the same actions as IRC commands 
+ *  issued by users from an IRC client.
+ */
+
 /*  Messaging functions to send messages to users and channels
  */
-EXPORTFUNC void irc_privmsg_list (const Bot *botptr, const Client *target, const char **text);
 EXPORTFUNC void irc_prefmsg (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void irc_prefmsg_list (const Bot *botptr, const Client *target, const char **text);
 EXPORTFUNC void irc_privmsg (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void irc_privmsg_list (const Bot *botptr, const Client *target, const char **text);
 EXPORTFUNC void irc_notice (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 EXPORTFUNC void irc_chanprivmsg (const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 EXPORTFUNC void irc_channotice (const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+
+/*  Specialised messaging functions for global messages, services channel 
+ *  alerts and numeric responses
+ */
 EXPORTFUNC void irc_chanalert (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC void irc_numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 EXPORTFUNC void irc_globops (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC void irc_wallops (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void irc_numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 
 /*  General irc actions for join/part channels etc
- *  Require a bot to operate
  */
 EXPORTFUNC int irc_nickchange (const Bot *botptr, const char *newnick);
 EXPORTFUNC int irc_quit (const Bot *botptr, const char *quitmsg);
@@ -983,11 +993,8 @@ EXPORTFUNC int irc_kick (const Bot *botptr, const char *chan, const char *target
 EXPORTFUNC int irc_invite (const Bot *botptr, const char *target, const char *chan);
 EXPORTFUNC int irc_cloakhost (const Bot *botptr);
 EXPORTFUNC int irc_setname (const Bot *botptr, const char* realname);
-EXPORTFUNC int irc_sethost (const Bot *botptr, const char* host);
-EXPORTFUNC int irc_setident (const Bot *botptr, const char* ident);
 
 /*  Mode functions
- *  Require a bot to operate
  */
 EXPORTFUNC int irc_usermode (const Bot *botptr, const char *target, long mode);
 EXPORTFUNC int irc_chanmode (const Bot *botptr, const char *chan, const char *mode, const char *args);
@@ -997,9 +1004,11 @@ EXPORTFUNC int irc_chanusermode (const Bot *botptr, const char *chan, const char
  *  Require an opered bot to operate
  */
 EXPORTFUNC int irc_kill (const Bot *botptr, const char *target, const char *reason, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC int irc_akill (const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, ...);
-EXPORTFUNC int irc_rakill (const char *host, const char *ident);
+EXPORTFUNC int irc_akill (const Bot *botptr, const char *host, const char *ident, const unsigned long length, const char *reason, ...);
+EXPORTFUNC int irc_rakill (const Bot *botptr, const char *host, const char *ident);
 EXPORTFUNC int irc_swhois (const char *target, const char *swhois);
+EXPORTFUNC int irc_sethost (const Bot *botptr, const char* host);
+EXPORTFUNC int irc_setident (const Bot *botptr, const char* ident);
 
 int irc_ping (const char *source, const char *reply, const char *to);
 int irc_pong (const char *reply);

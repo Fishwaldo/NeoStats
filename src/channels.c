@@ -98,17 +98,11 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
 {
 	CmdParams * cmdparams;
 	Channel *c;
-	time_t time;
 
 	c = find_chan (chan);
 	if (!c) {
 		nlog (LOG_WARNING, "ChanTopic: can't find channel %s", chan);
 		return;
-	}
-	if(ts) {
-		time = atoi (ts);
-	} else {
-		time = me.now;
 	}
 	if(topic) {
 		strlcpy (c->topic, topic, BUFSIZE);
@@ -116,7 +110,7 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
 		c->topic[0] = 0;
 	}
 	strlcpy (c->topicowner, owner, MAXHOST);
-	c->topictime = time;
+	c->topictime = (ts) ? atoi (ts) : me.now;
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->channel = c;
 	AddStringToList (&cmdparams->av, (char*)owner, &cmdparams->ac);

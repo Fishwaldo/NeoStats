@@ -33,11 +33,11 @@
 #include "sqlsrv/rta.h"
 #endif
 
-static void cb_Server (char *, int);
-static void cb_Module (char *, int);
-static void cb_AuthModule (char *, int);
+static void cb_Server (char *arg, int configtype);
+static void cb_Module (char *arg, int configtype);
+static void cb_AuthModule (char *arg, int configtype);
 #ifdef SQLSRV
-static void cb_SqlConf (char *, int);
+static void cb_SqlConf (char *arg, int configtype);
 #endif
 
 /** @brief The list of modules to load
