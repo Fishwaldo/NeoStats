@@ -407,6 +407,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 	char **av;
 	int ac = 0;
 	int i;
+	int processed = 0;
 
 	SET_SEGV_LOCATION();
 	strlcpy( privmsgbuffer, cmdparams->param, BUFSIZE );
@@ -419,52 +420,68 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 	userlevel = getuserlevel( cmdparams ); 
 	/* Check user authority to use this command set */
 	if( ( ( cmdparams->bot->flags & BOT_FLAG_RESTRICT_OPERS ) && ( userlevel < NS_ULEVEL_OPER ) ) ||
-		( ( cmdparams->bot->flags & BOT_FLAG_ONLY_OPERS ) && nsconfig.onlyopers && ( userlevel < NS_ULEVEL_OPER ) ) ) {
+		( ( cmdparams->bot->flags & BOT_FLAG_ONLY_OPERS ) && nsconfig.onlyopers && ( userlevel < NS_ULEVEL_OPER ) ) ) 
+	{
 		msg_only_opers( cmdparams );
 		cmdret = NS_SUCCESS;
-	} else if( cmdparams->bot->botcmds ) {
+	} 
+	else if( cmdparams->bot->botcmds ) 
+	{
 		/* Process command list */
 		cmd_ptr = ( bot_cmd * ) hnode_find( cmdparams->bot->botcmds, av[0] );
-		if( cmd_ptr ) {
-			if( ischancmd && ( cmd_ptr->flags & CMD_FLAG_PRIVMSGONLY ) ) {
+		if( cmd_ptr ) 
+		{
+			processed = 1;
+			if( ischancmd && ( cmd_ptr->flags & CMD_FLAG_PRIVMSGONLY ) ) 
+			{
 				dlog( DEBUG2, "dropping channel command %s since it is flagged privmsg only ", cmdparams->cmd );
 				cmdret = NS_FAILURE;
-			} else if( !ischancmd && ( cmd_ptr->flags & CMD_FLAG_CHANONLY ) ) {
+			} 
+			else if( !ischancmd && ( cmd_ptr->flags & CMD_FLAG_CHANONLY ) ) 
+			{
 				dlog( DEBUG2, "dropping privmsg command %s since it is flagged channel only ", cmdparams->cmd );
 				cmdret = NS_FAILURE;
-			} else {
+			} 
+			else 
+			{
 				cmdlevel = calc_cmd_ulevel( cmd_ptr );
 				/* Is user authorised to issue this command? */
-				if( userlevel < cmdlevel ) {
+				if( userlevel < cmdlevel ) 
+				{
 					msg_permission_denied( cmdparams, NULL );
+				} 
 				/* Check parameter count */
-				} else if( cmdparams->ac < cmd_ptr->minparams ) {		
+				else if( cmdparams->ac < cmd_ptr->minparams ) 
+				{
 					msg_error_need_more_params( cmdparams );
-				} else {
+				} 
+				else 
+				{
 					/* Seems OK so report the command call so modules do not have to */
 					SET_RUN_LEVEL( cmd_ptr->modptr );
-					if( nsconfig.cmdreport ) {
+					if( nsconfig.cmdreport )
 						irc_chanalert( cmdparams->bot, _( "%s used %s" ), cmdparams->source->name, cmd_ptr->cmd );
-					}
 					/* Log command message */
 					nlog( LOG_NORMAL, "%s used %s", cmdparams->source->name, cmdparams->param );
 					/* call handler */
-					if( setjmp( sigvbuf ) == 0 ) {
+					if( setjmp( sigvbuf ) == 0 )
 						cmdret = cmd_ptr->handler( cmdparams );
-					}
 					check_cmd_result( cmdparams, cmdret, NULL );
 					RESET_RUN_LEVEL();
 				}
 				cmdret = NS_SUCCESS;
 			}
-		} else {
-			cmdret = run_intrinsic_cmds( av[0], cmdparams );
-			if( cmdret != NS_SUCCESS ) {
-				/* We have run out of commands so report failure */
-				if( !ischancmd )
-					msg_unknown_command( cmdparams );
-				cmdret = NS_FAILURE;
-			}
+		}
+	} 
+	if( !processed ) 
+	{
+		cmdret = run_intrinsic_cmds( av[0], cmdparams );
+		if( cmdret != NS_SUCCESS ) 
+		{
+			/* We have run out of commands so report failure */
+			if( !ischancmd )
+				msg_unknown_command( cmdparams );
+			cmdret = NS_FAILURE;
 		}
 	}
 	if( ac )
