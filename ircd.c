@@ -1178,8 +1178,8 @@ scmode_op (const char *who, const char *chan, const char *mode, const char *bot)
 	char **av;
 	int ac;
 
-	send_cmode (me.name, who, chan, mode, args, me.now);
-	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
+	send_cmode (me.name, who, chan, mode, bot, me.now);
+	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, bot);
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
 	free (av);
