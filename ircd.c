@@ -753,14 +753,21 @@ void Usr_Smode(char *origin, char **argv, int argc) {
 	char **av;
 	int ac = 0;
 	AddStringToList(&av, argv[0], &ac);
+
+	if (!strchr(argv[0], '#')) {
+	/* its user svsmode change */
 #ifdef ULTIMATE3
-	AddStringToList(&av, argv[2], &ac);
-	UserMode(argv[0], argv[2]);
+		AddStringToList(&av, argv[2], &ac);
+		UserMode(argv[0], argv[2]);
 #else
-	AddStringToList(&av, argv[1], &ac);
-	UserMode(argv[0], argv[1]);
+		AddStringToList(&av, argv[1], &ac);
+		UserMode(argv[0], argv[1]);
 #endif
-	Module_Event("UMODE", av, ac);
+		Module_Event("UMODE", av, ac);
+	} else {
+	/* its a channel svsmode change */
+		ChanMode(origin, argv, argc);
+	}
 	FreeList(av, ac);
 }
 void Usr_Mode(char *origin, char **argv, int argc) {
