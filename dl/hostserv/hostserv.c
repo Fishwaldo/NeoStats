@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.26 2003/01/05 07:21:02 shmad Exp $
+** $Id: hostserv.c,v 1.27 2003/01/05 07:24:07 shmad Exp $
 */
 
 #include <stdio.h>
@@ -448,7 +448,10 @@ void Loadhosts()
             strcpy(map->nnick, LoadArry[0]);
             strcpy(map->host, LoadArry[1]);
             strcpy(map->vhost, LoadArry[2]);
-	    strcpy(map->passwd, LoadArry[3]);
+	    if (LoadArry[3]) { /* Check for upgrades from earlier versions */
+		strcpy(map->passwd, LoadArry[3]);
+	    } else /* Upgrading from earlier version, no passwds exist */
+		strcpy(map->passwd, "0");
 	    if (LoadArry[4]) { /* Does who set it exist? Yes? go ahead */
 	    	strcpy(map->added, LoadArry[4]);
 	    } else /* We have no information on who set it so its null */

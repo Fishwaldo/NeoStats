@@ -6,6 +6,7 @@ Shmad <shmad@neostats.net>
 + Write to DB who added the record.
 + VIEW # now shows also who added the record.
 + hostserv.h now contains defines for access for each function.
++ Fixed a segfault when upgrading from earlier versions if a passwd field wasnt present.
 
 
 * Version 2.2 * Fish * December 26th, 2002
