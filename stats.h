@@ -108,6 +108,13 @@
 #define bzero(x, y)		memset(x, '\0', y);
 #define is_synced		me.synced
 
+/* do_exit call exit type definitions */
+enum {
+	NS_EXIT_NORMAL=0,
+	NS_EXIT_SEGFAULT,
+	NS_EXIT_RESTART,
+}NS_EXIT_TYPE;
+
 #define SEGV_LOCATION_BUFSIZE	255
 #ifdef LEAN_AND_MEAN
 #define SET_SEGV_LOCATION()

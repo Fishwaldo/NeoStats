@@ -615,7 +615,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 						list_append (tl, mn);
 					} else {
 						nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
-						do_exit (0);
+						do_exit (NS_EXIT_NORMAL);
 					}
 					j++;
 				} else {
@@ -655,7 +655,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 		} else {
 			/* eeeeeeek, list is full! */
 			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
-			do_exit (0);
+			do_exit (NS_EXIT_NORMAL);
 		}
 	}
 	list_destroy (tl);

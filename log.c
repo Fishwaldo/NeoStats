@@ -151,7 +151,7 @@ nlog (int level, int scope, char *fmt, ...)
 #ifdef DEBUG
 		if (!logentry->logfile) {
 			printf ("%s\n", strerror (errno));
-			do_exit (0);
+			do_exit (NS_EXIT_NORMAL);
 		}
 #endif
 		strftime (fmttime, 80, "%d/%m/%Y[%H:%M]", localtime (&ts));

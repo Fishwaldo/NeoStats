@@ -425,7 +425,7 @@ serv_segv ()
 		kill (forked, 3);
 		kill (forked, 9);
 		/* clean up */
-		do_exit (1);
+		do_exit (NS_EXIT_SEGFAULT);
 	}
 }
 
@@ -512,10 +512,10 @@ start (void)
 
 	if(me.r_time>0) {
 		sleep (me.r_time);
-		do_exit (2);
+		do_exit (NS_EXIT_RESTART);
 	}
 	else
-		do_exit (0);
+		do_exit (NS_EXIT_NORMAL);
 }
 
 /** @brief Login to IRC
@@ -558,7 +558,7 @@ smalloc (long size)
 	buf = malloc (size);
 	if (!buf) {
 		nlog (LOG_CRITICAL, LOG_CORE, "smalloc(): out of memory.");
-		do_exit (1);
+		do_exit (NS_EXIT_SEGFAULT);
 	}
 	return buf;
 }
@@ -581,7 +581,7 @@ sstrdup (const char *s)
 	char *t = strdup (s);
 	if (!t) {
 		nlog (LOG_CRITICAL, LOG_CORE, "sstrdup(): out of memory.");
-		do_exit (1);
+		do_exit (NS_EXIT_SEGFAULT);
 	}
 	return t;
 }

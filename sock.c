@@ -198,7 +198,7 @@ read_loop ()
 				close (servsock);
 				sleep (5);
 				nlog (LOG_WARNING, LOG_CORE, "Eeek, Zombie Server, Reconnecting");
-				do_exit (2);
+				do_exit (NS_EXIT_RESTART);
 			}
 		} else if (SelectResult == -1) {
 			if (errno != EINTR) {
@@ -361,7 +361,7 @@ sts (char *fmt, ...)
 	sent = write (servsock, buf, strlen (buf));
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Write error: %s", strerror(errno));
-		do_exit (0);
+		do_exit (NS_EXIT_NORMAL);
 	}
 	me.SendM++;
 	me.SendBytes = me.SendBytes + sent;

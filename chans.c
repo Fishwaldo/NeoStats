@@ -226,7 +226,7 @@ ChanMode (char *origin, char **av, int ac)
 									mn = lnode_create (m);
 									if (list_isfull (c->modeparms)) {
 										nlog (LOG_CRITICAL, LOG_CORE, "Eeek, Can't add additional Modes to Channel %s. Modelist is full", c->name);
-										do_exit (0);
+										do_exit (NS_EXIT_NORMAL);
 									} else {
 										list_append (c->modeparms, mn);
 									}

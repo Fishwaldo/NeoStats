@@ -318,7 +318,7 @@ ns_shutdown (User * u, char *reason)
 	ssquit_cmd (me.name);
 	sleep (1);
 	close (servsock);
-	do_exit (0);
+	do_exit (NS_EXIT_NORMAL);
 }
 
 static void
@@ -335,7 +335,7 @@ ns_reload (User * u, char *reason)
 	ssquit_cmd (me.name);
 	sleep (5);
 	close (servsock);
-	do_exit (2);
+	do_exit (NS_EXIT_RESTART);
 }
 
 static void
@@ -408,7 +408,7 @@ ns_raw (User * u, char *message)
 	sent = write (servsock, message, strlen (message));
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Write error.");
-		do_exit (0);
+		do_exit (NS_EXIT_NORMAL);
 	}
 	me.SendM++;
 	me.SendBytes = me.SendBytes + sent;

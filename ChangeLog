@@ -45,6 +45,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Don't set hidden hosts for opers (F)
  - Statserv HTML fix for clientversions when its empty (F)
  - Added support for numeric to config file (M)
+ - Added defines for parameter used in do_exit and ported calls accordingly (M)
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number

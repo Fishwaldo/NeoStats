@@ -154,7 +154,7 @@ init_server_hash ()
 	sh = hash_create (S_TABLE_SIZE, 0, 0);
 	if (!sh) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Create Server Hash Failed\n");
-		do_exit (1);
+		do_exit (NS_EXIT_SEGFAULT);
 	}
 	AddServer (me.name, NULL, 0);
 }
