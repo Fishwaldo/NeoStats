@@ -764,8 +764,8 @@ int decode_ip(char *buf)
 	ia = *( struct in_addr *)targ;
 	if (len == 8)  /* IPv4 */
 		return ia.s_addr;
+	return 0;
 }
-
 
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
