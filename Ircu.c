@@ -285,7 +285,7 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 void
 send_squit (const char *server, const char *quitmsg)
 {
-	send_cmd ("%s %s 0 :%s", TOK_SQUIT, server, quitmsg);
+	send_cmd ("%s %s %s 0 :%s", neonumericbuf, TOK_SQUIT, server, quitmsg);
 }
 
 void 
