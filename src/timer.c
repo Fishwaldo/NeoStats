@@ -225,15 +225,17 @@ int
 del_timers (Module *mod_ptr)
 {
 	Timer *timer;
-	hnode_t *modnode;
+	hnode_t *tn;
 	hscan_t hscan;
 
 	hash_scan_begin (&hscan, timerhash);
-	while ((modnode = hash_scan_next (&hscan)) != NULL) {
-		timer = hnode_get (modnode);
+	while ((tn = hash_scan_next (&hscan)) != NULL) {
+		timer = hnode_get (tn);
 		if (timer->moduleptr == mod_ptr) {
 			dlog(DEBUG1, "del_timers: deleting timer %s from module %s.", timer->name, mod_ptr->info->name);
-			del_timer (timer->name);
+			hash_delete (timerhash, tn);
+			hnode_destroy (tn);
+			sfree (timer);
 		}
 	}
 	return NS_SUCCESS;

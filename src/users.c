@@ -576,7 +576,7 @@ dumpuser (Client * u)
 	} else {
 		irc_chanalert (ns_botptr, "User:     %s!%s@%s", u->name, u->user->username, u->user->hostname);
 	}
-	irc_chanalert (ns_botptr, "IP:       %s", u->hostip));
+	irc_chanalert (ns_botptr, "IP:       %s", u->hostip);
 	irc_chanalert (ns_botptr, "Vhost:    %s", u->user->vhost);
 	irc_chanalert (ns_botptr, "Flags:    0x%x", u->flags);
 	irc_chanalert (ns_botptr, "Modes:    %s (0x%x)", UmodeMaskToString(u->user->Umode), u->user->Umode);

@@ -237,6 +237,8 @@ lib/curl/version.c -text
 lib/keeper/.indent.pro -text
 lib/keeper/Makefile.am -text
 lib/keeper/Makefile.in -text
+lib/keeper/dirent.c -text
+lib/keeper/dirent.h -text
 lib/keeper/keeper.h -text
 lib/keeper/keeper.vcproj -text
 lib/keeper/kp_cache.c -text

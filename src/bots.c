@@ -553,13 +553,17 @@ Bot *init_bot (BotInfo* botinfo)
 		irc_usermode (botptr, nick, UMODE_DEAF);
 	}
 	botptr->flags = botinfo->flags;
-	SET_RUN_LEVEL(modptr);
 	if (botinfo->bot_cmd_list) {
+		SET_RUN_LEVEL(modptr);
 		add_bot_cmd_list (botptr, botinfo->bot_cmd_list);
+		RESET_RUN_LEVEL();
 	}
 	if (botinfo->bot_setting_list) {
+		SET_RUN_LEVEL(modptr);
 		add_bot_setting_list (botptr, botinfo->bot_setting_list);
+		RESET_RUN_LEVEL();
 	}
+	SET_RUN_LEVEL(modptr);
 	add_bot_info_settings (botptr, botinfo);
 	RESET_RUN_LEVEL();
 	return botptr;

@@ -449,7 +449,6 @@ void StatsQuitUser(Client * u)
 
 void StatsKillUser(Client * u)
 {
-	SStats *s;
 	SStats *ss;
 	char *rbuf, *cmd, *who;
 
@@ -619,9 +618,9 @@ void FiniStats(void)
 	hash_scan_begin(&ss, Shead);
 	while ((sn = hash_scan_next(&ss))) {
 		s = hnode_get(sn);
-		sfree(s);
 		hash_scan_delete(Shead, sn);
 		hnode_destroy(sn);
+		sfree(s);
 	}
 	hash_destroy(Shead);
 	cn = list_first(Chead);

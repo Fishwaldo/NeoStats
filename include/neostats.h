@@ -805,7 +805,7 @@ extern int RunLevel;
  * have to set/reset when a module calls a core function which triggers
  * other modules to run (e.g. init_bot)
  */
-#define SET_RUN_LEVEL(moduleptr) {if(RunLevel<10 && RunModule[RunLevel] != moduleptr){RunLevel++;RunModule[RunLevel] = moduleptr;}}
+#define SET_RUN_LEVEL(moduleptr) {if(RunLevel<10){RunLevel++;RunModule[RunLevel] = moduleptr;}}
 #define RESET_RUN_LEVEL() {if(RunLevel>0){RunLevel--;}}
 #define GET_CUR_MODULE() RunModule[RunLevel]
 #define GET_CUR_MODNUM() RunModule[RunLevel]->modnum

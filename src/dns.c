@@ -272,9 +272,9 @@ void do_dns (void)
 		if (status) {
 			nlog (LOG_CRITICAL, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror (status));
 			irc_chanalert (ns_botptr, "Bad Error on DNS lookup. Please check logfile");
-			SET_RUN_LEVEL(dnsdata->modptr);
 			DNSStats.failure++;
 			/* call the callback function with answer set to NULL */
+			SET_RUN_LEVEL(dnsdata->modptr);
 			dnsdata->callback (dnsdata->data, NULL);
 			RESET_RUN_LEVEL();
 			/* delete from list */
@@ -287,8 +287,8 @@ void do_dns (void)
 		}
 		dlog(DEBUG1, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->modptr->info->name);
 		DNSStats.success++;
-		SET_RUN_LEVEL(dnsdata->modptr);
 		/* call the callback function */
+		SET_RUN_LEVEL(dnsdata->modptr);
 		dnsdata->callback (dnsdata->data, dnsdata->a);
 		RESET_RUN_LEVEL();
 		/* delete from list */

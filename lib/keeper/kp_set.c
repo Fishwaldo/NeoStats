@@ -29,9 +29,7 @@
 
 #include "kp_util.h"
 
-#ifndef WIN32
 #include <dirent.h>
-#endif
 #include <fcntl.h>
 
 /* ------------------------------------------------------------------------- 

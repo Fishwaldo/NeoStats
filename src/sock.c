@@ -343,23 +343,33 @@ restartsql:
 				/* this checks if there is any data waiting on a socket for a module */
 				hash_scan_begin (&ss, sockethash);
 				while ((sn = hash_scan_next (&ss)) != NULL) {
+					int err;
+
 					pollflag = 0;
 					sock = hnode_get (sn);
-					SET_RUN_LEVEL(sock->moduleptr);
 					if (sock->socktype == SOCK_STANDARD) {
 						if (FD_ISSET (sock->sock_no, &readfds)) {
 							dlog(DEBUG3, "Running module %s readsock function for %s", sock->moduleptr->info->name, sock->name);
-							if (sock->readfnc (sock->sock_no, sock->name) < 0)
+							SET_RUN_LEVEL(sock->moduleptr);
+							err = sock->readfnc (sock->sock_no, sock->name);
+							RESET_RUN_LEVEL();
+							if(err < 0)
 								continue;
 						}
 						if (FD_ISSET (sock->sock_no, &writefds)) {
 							dlog(DEBUG3, "Running module %s writesock function for %s", sock->moduleptr->info->name, sock->name);
-							if (sock->writefnc (sock->sock_no, sock->name) < 0)
+							SET_RUN_LEVEL(sock->moduleptr);
+							err = sock->writefnc (sock->sock_no, sock->name);
+							RESET_RUN_LEVEL();
+							if(err < 0)
 								continue;
 						}
 						if (FD_ISSET (sock->sock_no, &errfds)) {
 							dlog(DEBUG3, "Running module %s errorsock function for %s", sock->moduleptr->info->name, sock->name);
-							if (sock->errfnc (sock->sock_no, sock->name) < 0)
+							SET_RUN_LEVEL(sock->moduleptr);
+							err = sock->errfnc (sock->sock_no, sock->name);
+							RESET_RUN_LEVEL();
+							if(err < 0)
 								continue;
 						}
 					} else {
@@ -380,10 +390,11 @@ restartsql:
 							}
 						}
 						if (pollflag == 1) {
+							SET_RUN_LEVEL(sock->moduleptr);
 							sock->afterpoll(sock->data, ufds, pollsize);
+							RESET_RUN_LEVEL();
 						}
 					}
-					RESET_RUN_LEVEL();
 				}				
 				continue;
 			}

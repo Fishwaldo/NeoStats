@@ -29,9 +29,7 @@
 
 #include "kp_util.h"
 
-#ifndef WIN32
 #include <dirent.h>
-#endif
 
 /* ------------------------------------------------------------------------- 
  * Decode the type of a key
@@ -365,7 +363,6 @@ static int kp_is_singleval(const char *path)
  * ------------------------------------------------------------------------- */
 int _kp_get_subkeys_dir(char *path, struct key_array *keys)
 {
-#ifndef WIN32
 	DIR *dirp;
 	struct dirent *dirent;
 	struct stat stbuf;
@@ -417,7 +414,6 @@ int _kp_get_subkeys_dir(char *path, struct key_array *keys)
 	} while (dirent != NULL);
 
 	closedir(dirp);
-#endif
 	return 0;
 }
 

@@ -262,7 +262,7 @@ void ModFini()
 	hn = list_first(vhosts);
 	while (hn != NULL) {
 		sfree (lnode_get(hn));
-		hn = list_next vhosts, hn);
+		hn = list_next (vhosts, hn);
 	}
 	list_destroy_nodes (vhosts);
 	list_destroy (vhosts);

@@ -744,7 +744,7 @@ static int ss_server(CmdParams* cmdparams)
 			"%s has split from the network %d time %s",
 			ss->name, ss->numsplits, (ss->numsplits == 1) ? "" : "s");
 	} else {
-		irc_prefmsg(ss_bot,"%cmdparams->source, s has never split from the network.", 
+		irc_prefmsg(ss_bot, cmdparams->source, "%s has never split from the network.", 
 			ss->name);
 	}
 	irc_prefmsg(ss_bot, cmdparams->source, "***** End of Statistics *****");

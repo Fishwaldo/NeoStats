@@ -308,6 +308,7 @@ ModulesVersion (const char* nick, const char *remoteserver)
 Module *
 load_module (const char *modfilename, Client * u)
 {
+	int err;
 	void *dl_handle;
 	int do_msg = 0;
 	char path[255];
@@ -409,12 +410,13 @@ load_module (const char *modfilename, Client * u)
 
 	SET_SEGV_LOCATION();
 	SET_RUN_LEVEL(mod_ptr);
-	if (((*ModInit) (mod_ptr)) < 1) {
+	err = (*ModInit) (mod_ptr); 
+	RESET_RUN_LEVEL();
+	if (err < 1) {
 		nlog (LOG_NORMAL, "Unable to load module: %s. See %s.log for further information.", mod_ptr->info->name, mod_ptr->info->name);
 		unload_module(mod_ptr->info->name, NULL);
 		return NULL;
 	}
-	RESET_RUN_LEVEL();
 	SET_SEGV_LOCATION();
 
 	/* Let this module know we are online if we are! */
