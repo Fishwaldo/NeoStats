@@ -68,7 +68,7 @@ neostats: $(NEOOBJS)
 	$(CC) $(LDFLAGS) $(NEOOBJS) $(ADNS_OBJS) $(KEEPER_OBJS) $(PCRE_OBJS) curl/libcurl.a $(EXTRA_LDFLAGS) -o $@
 
 # include dependency info 
--include $(OBJS:.o=.d)
+-include $(NEOOBJS:.o=.d)
 
 .c.o:
 	$(CC) $(NEOCFLAGS) $(NEOINCLUDES) -c $< 
@@ -164,4 +164,4 @@ dist:
 	@echo "Tar file $(DISTDIR).tar.gz created. Freshmeat time!"
 
 # Catch any changes in compilation options at the top of this file
-$(OBJS): Makefile Makefile.inc
+$(NEOOBJS): Makefile Makefile.inc
