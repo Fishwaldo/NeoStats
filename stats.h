@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.6 2000/02/22 03:32:32 fishwaldo Exp $
+** $Id: stats.h,v 1.7 2000/02/23 05:39:24 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -153,7 +153,7 @@ struct server_ {
 	time_t connected_since;
 	time_t last_announce;
 	int ping;
-	Server *uplink;
+	char uplink[MAXHOST];
 };
 
 struct user_ {
@@ -250,7 +250,7 @@ extern void UserDump();
 extern void UserMode(char *, char *);
 extern void init_user_hash();
 extern void init_chan_hash();
-extern void AddServer(char *, int);
+extern void AddServer(char *, char *,int);
 extern void DelServer(char *);
 extern Server *findserver(char *);
 extern void ServerDump();

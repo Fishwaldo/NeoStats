@@ -5,11 +5,11 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.3 2000/02/22 03:32:32 fishwaldo Exp $
+** $Id: users.c,v 1.4 2000/02/23 05:39:24 fishwaldo Exp $
 */
+#include <fnmatch.h>
  
 #include "stats.h"
-#include <fnmatch.h>
 
 struct Oper_Modes usr_mds[]      = { 
 				 {UMODE_OPER, 'o', 50},
@@ -592,7 +592,7 @@ static Server *new_server(char *name)
 	return s;
 }
 
-void AddServer(char *name, int hops)
+void AddServer(char *name,char *uplink, int hops)
 {
 	Server *s;
 
@@ -604,7 +604,8 @@ void AddServer(char *name, int hops)
 	s->hops = hops;
 	s->connected_since = time(NULL);
 	s->last_announce = time(NULL);
-	s->ping = -1;
+	memcpy(s->uplink,uplink, MAXHOST);
+	s->ping = 0;
 }
 
 void DelServer(char *name)
@@ -672,6 +673,6 @@ void init_server_hash()
 		serverlist[i] = NULL;
 	}
 	bzero((char *)serverlist, sizeof(serverlist));
-	AddServer(me.name, 0);
+	AddServer(me.name,me.name, 0);
 }
 

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.h,v 1.4 2000/02/18 00:42:25 fishwaldo Exp $
+** $Id: statserv.h,v 1.5 2000/02/23 05:39:25 fishwaldo Exp $
 */
 
 #ifndef STATSERV_H
@@ -29,6 +29,7 @@ struct stats_network_ {
 	long users;
 	long totusers;
 	long maxusers;
+	long away;
 	int servers;
 	int maxservers;
 	time_t t_maxopers;

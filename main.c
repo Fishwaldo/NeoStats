@@ -207,6 +207,7 @@ void login()
 
 void init_ServBot()
 {
+	User *u;
 	segv_location = "init_ServBot";
 	sts("NICK %s 1 %d %s %s %s 0 :/msg %s \2HELP\2", s_Services, time(NULL),
 		Servbot.user, Servbot.host, me.name, s_Services);
@@ -215,6 +216,7 @@ void init_ServBot()
 	sts(":%s JOIN %s",s_Services ,me.chan);
 	sts(":%s MODE %s +o %s",me.name,me.chan,s_Services);
 	sts(":%s MODE %s +a %s",s_Services,me.chan,s_Services);
+	UserMode(s_Services, "+Sqd");
 }
 
 void *smalloc(long size)

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.7 2000/02/22 03:32:32 fishwaldo Exp $
+** $Id: ircd.c,v 1.8 2000/02/23 05:39:24 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -21,6 +21,7 @@ void Usr_AddServer(char *, char *);
 void Usr_DelServer(char *, char *);
 void Usr_DelUser(char *, char *);
 void Usr_Mode(char *, char *);
+void Usr_Smode(char *, char *);
 void Usr_Kill(char *, char *);
 void Usr_Pong(char *, char *);
 void Usr_Away(char *, char *);
@@ -74,8 +75,8 @@ IntCommands cmd_list[] = {
 	{TOK_QUIT,	Usr_DelUser,		1},
 	{MSG_MODE,	Usr_Mode,		1},
 	{TOK_MODE,	Usr_Mode,		1},
-	{MSG_SVSMODE,	Usr_Mode,		1},
-	{TOK_SVSMODE,	Usr_Mode,		1},
+	{MSG_SVSMODE,	Usr_Smode,		1},
+	{TOK_SVSMODE,	Usr_Smode,		1},
 	{MSG_SVS2MODE,	Usr_Mode,		1},
 	{TOK_SVS2MODE,	Usr_Mode,		1},
 	{MSG_KILL,	Usr_Kill,		1},
@@ -221,16 +222,14 @@ void parse(char *line)
 			servicesbot(origin,coreLine);
 			return;
 		} else {
-			list = module_bot_lists;
+			list = findbot(cmd);
 			/* Check to see if any of the Modules have this nick Registered */
-			while (list != NULL ) {
-			log("nicks: %s", list->nick);
-				if (!strcasecmp(list->nick,cmd)) {
-					segv_location = list->modname;
-					list->function(origin, coreLine);
-					return;
-				}
-			list=list->next;
+			if (list) {
+#ifdef DEBUG
+				log("nicks: %s", list->nick);
+#endif
+				segv_location = list->modname;
+				list->function(origin, coreLine);
 			}
 			log("Recieved a Message for %s, but that user is not registered with us!!!", cmd);
 		}
@@ -285,24 +284,34 @@ void Usr_Showcredits(char *origin, char *coreLine) {
 void Usr_AddServer(char *origin, char *coreLine){
 	char *cmd;
 	cmd = strtok(coreLine, " ");
-	AddServer(cmd,1);
+	AddServer(cmd,origin,1);
 	Module_Event("NEWSERVER", findserver(cmd));
 }
 void Usr_DelServer(char *origin, char *coreLine){
 	char *cmd;
 	cmd = strtok(coreLine, " ");
-	DelServer(cmd);
 	Module_Event("DELSERVER", coreLine);
+	DelServer(cmd);
 }
 void Usr_DelUser(char *origin, char *coreLine) {
+	Module_Event("SIGNOFF", finduser(origin));
 	DelUser(origin);
-	Module_Event("SIGNOFF", coreLine);
+}
+void Usr_Smode(char *origin, char *coreLine) {
+	char *cmd, *mode;
+	cmd = strtok(coreLine, " ");
+	mode = strtok(NULL, "");
+	UserMode(cmd, mode);
+	Module_Event("UMODE", finduser(cmd));
+
 }
 void Usr_Mode(char *origin, char *coreLine) {
-			char *rest, *cmd;
+			char *cmd;
 			cmd = strtok(coreLine, " ");
 			if (!strchr(cmd, '#')) {
+#ifdef DEBUG
 				log("Mode: UserMode: %s",cmd);
+#endif
 				cmd = strtok(NULL, "");
 				UserMode(origin, cmd);
 				Module_Event("UMODE", finduser(origin));
@@ -413,7 +422,7 @@ void Srv_Pass(char *origin, char *coreLine) {
 }
 void Srv_Server(char *origin, char *coreLine) {
 			Server *s;
-			AddServer(strtok(coreLine, " "), 1);
+			AddServer(strtok(coreLine, " "),origin, 1);
 			s = findserver(coreLine);
 			me.s = s;
 			Module_Event("ONLINE", s);

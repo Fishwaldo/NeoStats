@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.2 2000/02/05 04:54:00 fishwaldo Exp $
+** $Id: sock.c,v 1.3 2000/02/23 05:39:24 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -92,6 +92,10 @@ void notice(char *who, char *buf,...)
 
 	if (me.onchan) {
 		sprintf(out,":%s PRIVMSG %s :%s",who, me.chan, tmp);
+#ifdef DEBUG
+		log("SENT: %s", out);
+#endif
+
 		strcat (out, "\n");
 
 		if ((write (servsock, out, strlen (out))) == -1) {
