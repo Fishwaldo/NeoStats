@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.49 2003/06/24 14:12:47 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.50 2003/06/26 05:14:16 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -1139,7 +1139,7 @@ void Srv_Kill(char *origin, char **argv, int argc)
 
 
 
-extern int SignOn_NewBot(const char *nick, const char *user,
+int SignOn_NewBot(const char *nick, const char *user,
 			 const char *host, const char *rname, long Umode)
 {
 
@@ -1158,4 +1158,5 @@ extern int SignOn_NewBot(const char *nick, const char *user,
 		schmode_cmd(nick, me.chan, "+a", nick);
 		/* all bots join */
 	}
+	return 1;
 }

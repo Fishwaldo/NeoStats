@@ -44,7 +44,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.29 2003/06/10 13:20:59 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.30 2003/06/26 05:14:16 fishwaldo Exp $
  */
 
 
@@ -513,8 +513,7 @@ void Srv_Connect(char *, char **, int argc);
 void Srv_Svinfo(char *, char **, int argc);
 void Srv_Burst(char *origin, char **argv, int argc);
 void Srv_Sjoin(char *origin, char **argv, int argc);
-void Srv_Tburst(char *origin, char **argv, int argc);
-
+int SignOn_NewBot(const char *, const char *, const char *, const char *, long);
 
 
 #endif  /* UNREAL_H Define */

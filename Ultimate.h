@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.h,v 1.21 2003/06/24 14:12:47 fishwaldo Exp $
+** $Id: Ultimate.h,v 1.22 2003/06/26 05:14:16 fishwaldo Exp $
 */
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
@@ -519,7 +519,7 @@ void Srv_Tburst(char *origin, char **argv, int argc);
 void Srv_Vctrl(char *origin, char **argv, int argc);
 void Srv_Client(char *origin, char **argv, int argc);
 void Srv_Smode(char *origin, char **argv, int argc);
-
+int SignOn_NewBot(const char *, const char *, const char *, const char *, long);
 
 
 #endif

@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hybrid7.h,v 1.9 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: hybrid7.h,v 1.10 2003/06/26 05:14:16 fishwaldo Exp $
 */
 
 
@@ -175,6 +175,7 @@
 #define MSG_CAPAB	"CAPAB"
 #define MSG_BURST	"BURST"
 #define MSG_SJOIN	"SJOIN"
+#define MSG_TBURST	"TBURST"
 
 
 
@@ -227,6 +228,7 @@ struct ircd_srv_ {
 	int gc;	
 	char cloak[25];
 	int burst;
+	int cmdcount;
 } ircd_srv;
 
 typedef struct {
@@ -234,6 +236,7 @@ typedef struct {
 	char flag;
 	unsigned  nickparam : 1;		/* 1 = yes 0 = no */
 	unsigned  parameters : 1; 
+	char sjoin;
 } aCtab;
 
 
@@ -249,7 +252,7 @@ typedef struct {
 
 aCtab cFlagTab[33];
 Oper_Modes usr_mds[20];
-
+Oper_Modes susr_mds[0];
 
 
 
@@ -286,4 +289,41 @@ extern int sburst_cmd(int b);
 extern int seob_cmd(const char *server);
 extern int sakill_cmd(const char *host, const char *ident, const char *setby, const int length, const char *reason,...);
 extern int srakill_cmd(const char *host, const char *ident);
+
+
+void Usr_Version(char *, char **, int argc);
+void Usr_ShowMOTD(char *, char **, int argc);
+void Usr_ShowADMIN(char *, char **, int argc);
+void Usr_Showcredits(char *, char **, int argc);
+void Usr_AddServer(char *, char **, int argc);
+void Usr_DelServer(char *, char **, int argc);
+void Usr_DelUser(char *, char **, int argc);
+void Usr_Mode(char *, char **, int argc);
+void Usr_Smode(char *, char **, int argc);
+void Usr_Kill(char *, char **, int argc);
+void Usr_Pong(char *, char **, int argc);
+void Usr_Away(char *, char **, int argc);
+void Usr_Nick(char *, char **, int argc);
+void Usr_Topic(char *, char **, int argc);
+void Usr_Kick(char *, char **, int argc);
+void Usr_Join(char *, char **, int argc);
+void Usr_Part(char *, char **, int argc);
+void Usr_Stats(char *, char **, int argc);
+void Usr_Vhost(char *, char **, int argc);
+void Srv_Topic(char *, char **, int argc);
+void Srv_Ping(char *, char **, int argc);
+void Srv_Netinfo(char *, char **, int argc);
+void Srv_Pass(char *, char **, int argc);
+void Srv_Server(char *, char **, int argc);
+void Srv_Squit(char *, char **, int argc);
+void Srv_Nick(char *, char **, int argc);
+void Srv_Svsnick(char *, char **, int argc);
+void Srv_Kill(char *, char **, int argc);
+void Srv_Connect(char *, char **, int argc);
+void Srv_Svinfo(char *, char **, int argc);
+void Srv_Burst(char *origin, char **argv, int argc);
+void Srv_Sjoin(char *origin, char **argv, int argc);
+void Srv_Tburst(char *origin, char **argv, int argc);
+int SignOn_NewBot(const char *, const char *, const char *, const char *, long);
+
 #endif

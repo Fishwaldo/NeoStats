@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.16 2003/06/24 14:12:47 fishwaldo Exp $
+** $Id: neoircd.c,v 1.17 2003/06/26 05:14:16 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -207,7 +207,7 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host,
 	sts("%s %s 1 %lu %s %s %s * %s 0 :%s", MSG_NICK, nick, time(NULL),
 	    newmode, ident, host, me.name, realname);
 	AddUser(nick, ident, host, me.name, 0, time(NULL));
-	UserMode(nick, newmode);
+	UserMode(nick, newmode, 0);
 	return 1;
 }
 
@@ -232,7 +232,7 @@ int sumode_cmd(const char *who, const char *target, long mode)
 	}
 	newmode[j] = '\0';
 	sts(":%s %s %s :%s", who, MSG_MODE, target, newmode);
-	UserMode(target, newmode);
+	UserMode(target, newmode, 0);
 	return 1;
 }
 
@@ -691,7 +691,7 @@ void Usr_Smode(char *origin, char **argv, int argc)
 {
 	if (!strchr(argv[0], '#')) {
 		/* its user svsmode change */
-		UserMode(argv[0], argv[1]);
+		UserMode(argv[0], argv[1], 0);
 	} else {
 		/* its a channel svsmode change */
 		ChanMode(origin, argv, argc);
@@ -750,7 +750,7 @@ void Usr_Pong(char *origin, char **argv, int argc)
 		dopong(s);
 	} else {
 		nlog(LOG_NOTICE, LOG_CORE,
-		     "Recieved PONG from unknown Server ");
+		     "Recieved PONG from unknown Server %s", argv[0]);
 	}
 }
 void Usr_Away(char *origin, char **argv, int argc)
@@ -786,7 +786,7 @@ void Usr_Topic(char *origin, char **argv, int argc)
 	Chans *c;
 	c = findchan(argv[0]);
 	if (c) {
-		buf = joinbuf(argv, argc, 3);
+		buf = joinbuf(argv, argc, 2);
 		Change_Topic(argv[1], c, atoi(argv[2]), buf);
 		free(buf);
 	} else {
@@ -891,7 +891,7 @@ void Srv_Nick(char *origin, char **argv, int argc)
 		strncpy(u->vhost, argv[6], MAXHOST);
 	}
 	nlog(LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[3]);
-	UserMode(argv[0], argv[3]);
+	UserMode(argv[0], argv[3], 0);
 }
 
 void Srv_Svsnick(char *origin, char **argv, int argc)

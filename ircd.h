@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.h,v 1.1 2003/06/10 12:51:56 fishwaldo Exp $
+** $Id: ircd.h,v 1.2 2003/06/26 05:14:16 fishwaldo Exp $
 */
 #ifndef IRCD_H
 #define IRCD_H
@@ -39,5 +39,8 @@ void ShowMOTD(char *);
 void ShowADMIN(char *);
 void Showcredits(char *);
 void ShowStats(char *, User *);
+void dopong(Server *);
+
+
 
 #endif
