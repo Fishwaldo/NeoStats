@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.96 2002/10/15 19:30:38 shmad Exp $
+** $Id: ircd.c,v 1.97 2002/10/16 03:13:59 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -68,7 +68,9 @@ void Srv_Sjoin(char *origin, char **argv, int argc);
 #ifdef ULTIMATE
 void Srv_Vctrl(char *, char **, int argc);
 #endif
-
+#ifdef NEOIRCD
+void Srv_Tburst(char *origin, char **argv, int argc);
+#endif
 
 
 static void ShowMOTD(char *);
@@ -189,6 +191,9 @@ IntCommands cmd_list[] = {
 	{MSG_KILL,	Srv_Kill,		0, 	0},
 	{MSG_EOB, 	Srv_Burst, 		1,	0},
 	{MSG_SJOIN,	Srv_Sjoin,		1,	0},
+#ifdef NEOIRCD
+	{MSG_TBURST, 	Srv_Tburst,		1,	0},
+#endif
 	{NULL,		NULL,			0,	0}
 };
 #endif
@@ -1165,6 +1170,25 @@ void Srv_Kill(char *origin, char **argv, int argc) {
 }
 
 
+#ifdef NEOIRCD
+/* Topic Bursting for NeoIRCD */
+/* R: :fish.dynam.ac TBURST 1034639893 #ircop 1034652780 ChanServ!services@neostats.net :NeoIRCd Test Oper Channel */
+
+void Srv_Tburst(char *origin, char **argv, int argc) {
+	char *buf;
+	Chans *c;
+	c = findchan(argv[1]);
+	if (c) {
+		buf = joinbuf(argv, argc, 4);
+		Change_Topic(argv[3], c, atoi(argv[2]), buf);
+		free(buf);
+	} else {
+		log("TopicBurst: Ehhh, Can't find Channel %s", argv[1]);
+	}
+
+
+}
+#endif
 int flood(User *u)
 {
 	time_t current = time(NULL);

@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.h,v 1.1 2002/10/14 05:44:39 fishwaldo Exp $
+** $Id: neoircd.h,v 1.2 2002/10/16 03:13:59 fishwaldo Exp $
 */
 
 
@@ -175,6 +175,7 @@
 #define MSG_CAPAB	"CAPAB"
 #define MSG_BURST	"BURST"
 #define MSG_SJOIN	"SJOIN"
+#define MSG_TBURST	"TBURST"
 
 
 

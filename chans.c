@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.32 2002/10/14 09:37:00 fishwaldo Exp $
+** $Id: chans.c,v 1.33 2002/10/16 03:13:58 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -126,13 +126,16 @@ int ChanMode(char *origin, char **av, int ac) {
 									if (cFlagTab[i].parameters) {
 										mn = list_find(c->modeparms, (int *)cFlagTab[i].mode, comparemode);
 										if (!mn) {
+#ifdef DEBUG
 											log("Can't find Mode %c for Chan %s", *modes, c->name);
+#endif
 										} else {
 											list_delete(c->modeparms, mn);
 											m = lnode_get(mn);
 											lnode_destroy(mn);
 											free(m);
-										j++;
+											if (!(cFlagTab[i].mode == MODE_LIMIT || cFlagTab[i].mode == MODE_KEY)) 
+												j++;
 										}
 									} else {
 										c->modes &= ~cFlagTab[i].mode;

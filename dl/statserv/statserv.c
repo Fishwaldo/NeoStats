@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.52 2002/09/04 08:40:29 fishwaldo Exp $
+** $Id: statserv.c,v 1.53 2002/10/16 03:13:59 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -781,7 +781,7 @@ static void ss_botlist(User *origuser)
 				if (u->Umode & UMODE_BOT) {
 #elif ULTIMATE
 		if ((u->Umode & UMODE_RBOT) || (u->Umode & UMODE_SBOT)) {
-#elif HYBRID7
+#else
 		if (0) {
 #endif
 					j++;
