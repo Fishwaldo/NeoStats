@@ -830,6 +830,7 @@ Optional Features:
  --enable-hybrid7 - enable Hybrid7 IRCD Support
  --enable-neoircd - enable NeoIRCd IRCD Support
  --enable-auth==TYPE - what type of Authentication to use. See Readme File
+ --enable-raw - Enable Raw command
  --enable-modules="MODULES" - space seperated list of modules to compile
 
 Some influential environment variables:
@@ -4925,6 +4926,32 @@ echo "${ECHO_T}IRCD" >&6
 
 fi;
 
+echo "$as_me:$LINENO: checking To Enable Raw command?" >&5
+echo $ECHO_N "checking To Enable Raw command?... $ECHO_C" >&6
+# Check whether --enable-raw or --disable-raw was given.
+if test "${enable_raw+set}" = set; then
+  enableval="$enable_raw"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_RAW 1
+_ACEOF
+
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
+
 echo "$as_me:$LINENO: checking Any other modules to compile?" >&5
 echo $ECHO_N "checking Any other modules to compile?... $ECHO_C" >&6
 # Check whether --enable-modules or --disable-modules was given.
@@ -5993,7 +6020,4 @@ echo "(|           http://www.sf.net/projects/neostats/           |)"
 echo "(*----------------------------------------------------------*)"
 echo "(| Now that Configure is complete, just type "make" to        |)"
 echo "(| compile the program                                      |)"
-echo "(|                                                          |)"
-echo "(| Take note, if you use HostServ the old DB for it will    |)"
-echo "(| not work with the new version cuz of Password fields.    |)"
 echo "(*----------------------------------------------------------*)"

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: services.c,v 1.46 2002/09/04 08:40:27 fishwaldo Exp $
+** $Id: services.c,v 1.47 2002/11/18 14:03:37 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -38,7 +38,9 @@ static void ns_reload(User *u, char *reason);
 static void ns_logs(User *);
 static void ns_jupe(User *, char *);
 void ns_debug_to_coders(char *);
+#ifdef USE_RAW
 static void ns_raw(User *, char *);
+#endif
 static void ns_user_dump(User *, char *);
 static void ns_server_dump(User *);
 static void ns_chan_dump(User *, char *);
@@ -99,8 +101,10 @@ void servicesbot(char *nick, char **av, int ac) {
 			privmsg_list(nick, s_Services, ns_serverdump_help);
 		else if (!strcasecmp(av[2], "JUPE") && (UserLevel(u) >= 180))
 			privmsg_list(nick, s_Services, ns_jupe_help);
+#ifdef USE_RAW
 		else if (!strcasecmp(av[2], "RAW") && (UserLevel(u) >= 180))
 			privmsg_list(nick, s_Services, ns_raw_help);
+#endif
 		else if (!strcasecmp(av[2], "LEVEL"))
 			privmsg_list(nick, s_Services, ns_level_help);
 		else
@@ -260,9 +264,15 @@ void servicesbot(char *nick, char **av, int ac) {
 			chanalert(s_Services,"%s Tried to use RAW, but is not a Techadmin",nick);
 			return;
 		}
+#ifdef USE_RAW
 		tmp = joinbuf(av, ac, 2);
 		ns_raw(u, tmp);
 		free(tmp);
+		return;
+#else
+		prefmsg(nick, s_Services, "Raw is disabled");
+		return;
+#endif	
 	} else {
 		prefmsg(nick, s_Services, "Unknown Command: \2%s\2", av[1]);
 		chanalert(s_Services,"%s Reqested %s, but that is a Unknown Command",u->nick,av[1]);
