@@ -613,88 +613,19 @@ Usr_Eos (char *origin, char **argv, int argc)
 static void
 Srv_Sjoin (char *origin, char **argv, int argc)
 {
-	char nick[MAXNICK];
-	long mode = 0;
-	long mode1 = 0;
+	char* channame;
+	char* tstime;
 	char *modes;
-	int ok = 1, i, j = 4;
-	ModesParm *m;
-	Chans *c;
-	lnode_t *mn = NULL;
-	list_t *tl;
+	int offset = 4;
 
+	channame = argv[1];
+	tstime = argv[0];
 	if (argc > 4) {
 		modes = argv[2];
 	} else {
 		modes = argv[1];
 	}
-	if (*modes == '#') {
-		join_chan (origin, modes);
-		return;
-	}
-	tl = list_create (10);
-	if (*modes == '+') {
-		while (*modes) {
-			for (i = 0; i < ircd_cmodecount; i++) {
-				if (*modes == chan_modes[i].flag) {
-					if (chan_modes[i].parameters) {
-						m = smalloc (sizeof (ModesParm));
-						m->mode = chan_modes[i].mode;
-						strlcpy (m->param, argv[j], PARAMSIZE);
-						mn = lnode_create (m);
-						if (!list_isfull (tl)) {
-							list_append (tl, mn);
-						} else {
-							nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
-							do_exit (NS_EXIT_ERROR, "List full - see log file");
-						}
-						j++;
-					} else {
-						mode1 |= chan_modes[i].mode;
-					}
-				}
-			}
-			modes++;
-		}
-	}
-	while (argc > j) {
-		modes = argv[j];
-		mode = 0;
-		while (ok == 1) {
-			for (i = 0; i < ircd_cmodecount; i++) {
-				if (chan_modes[i].sjoin != 0) {
-					if (*modes == chan_modes[i].sjoin) {
-						mode |= chan_modes[i].mode;
-						modes++;
-						i = -1;
-					}
-				} else {
-					/* sjoin's should be at the top of the list */
-					ok = 0;
-					strlcpy (nick, modes, MAXNICK);
-					break;
-				}
-			}
-		}
-		join_chan (nick, argv[1]);
-		ChangeChanUserMode (argv[1], nick, 1, mode);
-		j++;
-		ok = 1;
-	}
-	c = findchan (argv[1]);
-	/* update the TS time */
-	ChangeChanTS (c, atoi (argv[0]));
-	c->modes |= mode1;
-	if (!list_isempty (tl)) {
-		if (!list_isfull (c->modeparms)) {
-			list_transfer (c->modeparms, tl, list_first (tl));
-		} else {
-			/* eeeeeeek, list is full! */
-			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
-			do_exit (NS_EXIT_ERROR, "List full - see log file");
-		}
-	}
-	list_destroy (tl);
+	server_sjoin (channame, tstime, modes, offset, origin, argv, argc);
 }
 
 static void
@@ -744,14 +675,3 @@ Srv_Kill (char *origin, char **argv, int argc)
 	nlog (LOG_WARNING, LOG_CORE, "Got Srv_Kill, but its un-handled (%s)", recbuf);
 }
 
-int
-SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
-{
-	snewnick_cmd (nick, user, host, rname, Umode);
-	sumode_cmd (nick, nick, Umode);
-	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-		ssjoin_cmd(nick, me.chan, CMODE_CHANOP);
-
-	}
-	return 1;
-}

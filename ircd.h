@@ -76,9 +76,9 @@ void ns_usr_stats (char *origin, char **argv, int argc);
 void ns_usr_pong (char *origin, char **argv, int argc);
 void ns_usr_version (char *origin, char **argv, int argc);
 void ns_srv_protocol(char *origin, char **argv, int argc);
+void server_sjoin (char* channame, char* tstime, char *modes, int offset, char *origin, char **argv, int argc);
 
 /* Defined in ircd specific files but common to all */
-int SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode);
 void init_ircd (void);
 void send_privmsg (char *to, const char *from, char *buf);
 void send_notice (char *to, const char *from, char *buf);

@@ -596,14 +596,3 @@ Srv_Kill (char *origin, char **argv, int argc)
 	nlog (LOG_WARNING, LOG_CORE, "Got Srv_Kill, but its un-handled (%s)", recbuf);
 }
 
-int
-SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
-{
-	snewnick_cmd (nick, user, host, rname, Umode);
-	sumode_cmd (nick, nick, Umode);
-	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-		sjoin_cmd (nick, me.chan);
-		schmode_cmd (nick, me.chan, "+o", nick);
-	}
-	return 1;
-}

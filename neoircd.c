@@ -405,24 +405,24 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 					if (*modes == chan_modes[i].sjoin) {
 						mode |= chan_modes[i].mode;
 						modes++;
+						i = -1;
 					}
+				} else {
+					/* sjoin's should be at the top of the list */
+					ok = 0;
+					strlcpy (nick, modes, MAXNICK);
+					break;
 				}
 			}
-			
-			ok = 0;
-			strlcpy (nick, modes, MAXNICK);
-			break;
-		}	
-		
-		
+		}			
 		join_chan (nick, argv[1]);
 		ChangeChanUserMode (argv[1], nick, 1, mode);
 		j++;
 		ok = 1;
 	}
 	c = findchan (argv[1]);
-
-
+	/* update the TS time */
+	ChangeChanTS (c, atoi (argv[0]));
 	c->modes |= mode1;
 	if (!list_isempty (tl)) {
 		if (!list_isfull (c->modeparms)) {
@@ -658,14 +658,3 @@ Srv_Tburst (char *origin, char **argv, int argc)
 
 }
 
-int
-SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
-{
-	snewnick_cmd (nick, user, host, rname, Umode);
-
-	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-		sjoin_cmd (nick, me.chan);
-		schmode_cmd (me.name, me.chan, "+a", nick);
-	}
-	return 1;
-}

@@ -39,6 +39,8 @@ static char UmodeStringBuf[64];
 static char SmodeStringBuf[64];
 #endif
 
+static int signon_newbot (const char *nick, const char *user, const char *host, const char *rname, long Umode);
+
 /** @brief init_ircd
  *
  *  ircd initialisation
@@ -200,26 +202,41 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 	return NS_SUCCESS;
 }
 
-/** @brief SignOn_NewBot
+/** @brief signon_newbot
  *
  *  work in progress to replace ircd specific routines
  *  needs sjoin fix to complete
  *
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-#if 0
 int
-SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
+signon_newbot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
 {
 	snewnick_cmd (nick, user, host, rname, Umode);
+#if (defined(ULTIMATE) && !defined(ULTIMATE3) ) || defined(UNREAL) || defined(MYSTIC)
 	sumode_cmd (nick, nick, Umode);
+#endif
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
+#if defined(BAHAMUT) || defined(LIQUID)
+		sjoin_cmd (nick, me.chan, CMODE_CHANOP);	
+#elif defined(ULTIMATE3) || defined(QUANTUM)
+		sjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
+		schmode_cmd (nick, me.chan, "+a", nick);
+#elif defined(HYBRID7) || defined(IRCU)
 		sjoin_cmd (nick, me.chan);
 		schmode_cmd (me.name, me.chan, "+o", nick);
+#elif defined(ULTIMATE) || defined(MYSTIC)
+		sjoin_cmd (nick, me.chan);
+		schmode_cmd (nick, me.chan, "+o", nick);
+#elif defined(NEOIRCD)
+		sjoin_cmd (nick, me.chan);
+		schmode_cmd (me.name, me.chan, "+a", nick);
+#elif defined(UNREAL)
+		ssjoin_cmd(nick, me.chan, CMODE_CHANOP);
+#endif
 	}
 	return NS_SUCCESS;
 }
-#endif
 
 /** @brief init_bot
  *
@@ -247,7 +264,7 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
 		return NS_FAILURE;
 	}
 	Umode = UmodeStringToMask(modes, 0);
-	SignOn_NewBot (nick, user, host, rname, Umode);
+	signon_newbot (nick, user, host, rname, Umode);
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
 	return NS_SUCCESS;
@@ -282,7 +299,7 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 		return NULL;
 	}
 	Umode = UmodeStringToMask(modes, 0);
-	SignOn_NewBot (nick, user, host, rname, Umode);
+	signon_newbot (nick, user, host, rname, Umode);
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
 	bot_ptr->flags = flags;
@@ -638,7 +655,7 @@ init_services_bot (void)
 	}
 	ircsnprintf (me.rname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
 	Umode = UmodeStringToMask(services_bot_modes, 0);
-	SignOn_NewBot (s_Services, me.user, me.host, me.rname, Umode);
+	signon_newbot (s_Services, me.user, me.host, me.rname, Umode);
 	me.onchan = 1;
 	AddStringToList (&av, me.uplink, &ac);
 	ModuleEvent (EVENT_ONLINE, av, ac);
@@ -1357,7 +1374,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 	char* newmode;
 	
 	newmode = UmodeMaskToString(mode);
-	send_nick(nick, ident, host, realname, newmode, me.now);
+	send_nick (nick, ident, host, realname, newmode, me.now);
 	AddUser (nick, ident, host, realname, me.name, 0, me.now);
 #if defined(ULTIMATE3) || defined(BAHAMUT) || defined(HYBRID7) || defined(IRCU) || defined(NEOIRCD) || defined(QUANTUM) || defined(LIQUID)
 	UserMode (nick, newmode);
@@ -1365,3 +1382,83 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 	return 1;
 }
 
+void 
+server_sjoin (char* channame, char* tstime, char *modes, int offset, char *origin, char **argv, int argc)
+{
+	char nick[MAXNICK];
+	long mode = 0;
+	long mode1 = 0;
+	int ok = 1, i;
+	ModesParm *m;
+	Chans *c;
+	lnode_t *mn = NULL;
+	list_t *tl; 
+
+	if (*modes == '#') {
+		join_chan (origin, modes);
+		return;
+	}
+	tl = list_create (10);
+	if (*modes == '+') {
+		while (*modes) {
+			for (i = 0; i < ircd_cmodecount; i++) {
+				if (*modes == chan_modes[i].flag) {
+					if (chan_modes[i].parameters) {
+						m = smalloc (sizeof (ModesParm));
+						m->mode = chan_modes[i].mode;
+						strlcpy (m->param, argv[offset], PARAMSIZE);
+						mn = lnode_create (m);
+						if (!list_isfull (tl)) {
+							list_append (tl, mn);
+						} else {
+							nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
+							do_exit (NS_EXIT_ERROR, "List full - see log file");
+						}
+						offset++;
+					} else {
+						mode1 |= chan_modes[i].mode;
+					}
+				}
+			}
+			modes++;
+		}
+	}
+	while (argc > offset) {
+		modes = argv[offset];
+		mode = 0;
+		while (ok == 1) {
+			for (i = 0; i < ircd_cmodecount; i++) {
+				if (chan_modes[i].sjoin != 0) {
+					if (*modes == chan_modes[i].sjoin) {
+						mode |= chan_modes[i].mode;
+						modes++;
+						i = -1;
+					}
+				} else {
+					/* sjoin's should be at the top of the list */
+					ok = 0;
+					strlcpy (nick, modes, MAXNICK);
+					break;
+				}
+			}
+		}
+		join_chan (nick, channame); 
+		ChangeChanUserMode (channame, nick, 1, mode);
+		offset++;
+		ok = 1;
+	}
+	c = findchan (channame);
+	/* update the TS time */
+	ChangeChanTS (c, atoi (tstime)); 
+	c->modes |= mode1;
+	if (!list_isempty (tl)) {
+		if (!list_isfull (c->modeparms)) {
+			list_transfer (c->modeparms, tl, list_first (tl));
+		} else {
+			/* eeeeeeek, list is full! */
+			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
+			do_exit (NS_EXIT_ERROR, "List full - see log file");
+		}
+	}
+	list_destroy (tl);
+}

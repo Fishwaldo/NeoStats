@@ -550,8 +550,8 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 		ok = 1;
 	}
 	c = findchan (argv[1]);
-
-
+	/* update the TS time */
+	ChangeChanTS (c, atoi (argv[0]));
 	c->modes |= mode1;
 	if (!list_isempty (tl)) {
 		if (!list_isfull (c->modeparms)) {
@@ -870,28 +870,3 @@ Srv_Kill (char *origin, char **argv, int argc)
 	nlog (LOG_WARNING, LOG_CORE, "Got Srv_Kill, but its un-handled (%s)", recbuf);
 }
 
-#ifdef ULTIMATE3
-int
-SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
-{
-	snewnick_cmd (nick, user, host, rname, Umode);
-
-	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-		sjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
-		schmode_cmd (nick, me.chan, "+a", nick);
-	}
-	return 1;
-}
-#else /* ulitmate3 */
-int
-SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
-{
-	snewnick_cmd (nick, user, host, rname, Umode);
-	sumode_cmd (nick, nick, Umode);
-	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-		sjoin_cmd (nick, me.chan);
-		schmode_cmd (nick, me.chan, "+o", nick);
-	}
-	return 1;
-}
-#endif
