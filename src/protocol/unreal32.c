@@ -393,7 +393,7 @@ send_svskill (const char *sender, const char *target, const char *reason)
 
 /* akill is gone in the latest Unreals, so we set Glines instead */
 void 
-send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, unsigned long ts)
+send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned int length, const char *reason, unsigned long ts)
 {
 	send_cmd (":%s %s + G %s %s %s %lu %lu :%s", sender, MSGTOK(TKL), ident, host, setby, (ts + length), ts, reason);
 }

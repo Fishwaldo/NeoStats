@@ -292,7 +292,7 @@ send_svinfo (const int tscurrent, const int tsmin, const unsigned long tsnow)
 
 /* there isn't an akill on Hybrid, so we send a kline to all servers! */
 void 
-send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
+send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned int length, const char *reason, const unsigned long ts)
 {
 	send_cmd (":%s %s * %d %s %s :%s", setby, MSG_KLINE, length, ident, host, reason);
 }

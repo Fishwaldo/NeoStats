@@ -204,7 +204,7 @@ MODULEFUNC void send_svspart (const char *sender, const char *target, const char
 MODULEFUNC void send_svsnick (const char *sender, const char *target, const char *newnick, const unsigned long ts);
 MODULEFUNC void send_swhois (const char *sender, const char *target, const char *swhois);
 MODULEFUNC void send_smo (const char *from, const char *umodetarget, const char *msg);
-MODULEFUNC void send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, unsigned long ts);
+MODULEFUNC void send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned int length, const char *reason, unsigned long ts);
 MODULEFUNC void send_rakill (const char *sender, const char *host, const char *ident);
 MODULEFUNC void send_ping (const char *from, const char *reply, const char *to);
 MODULEFUNC void send_pong (const char *reply);
@@ -243,7 +243,7 @@ extern void (*irc_send_svspart) (const char *sender, const char *target, const c
 extern void (*irc_send_svsnick) (const char *sender, const char *target, const char *newnick, const unsigned long ts);
 extern void (*irc_send_swhois) (const char *sender, const char *target, const char *swhois);
 extern void (*irc_send_smo) (const char *from, const char *umodetarget, const char *msg);
-extern void (*irc_send_akill) (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, unsigned long ts);
+extern void (*irc_send_akill) (const char *sender, const char *host, const char *ident, const char *setby, const unsigned int length, const char *reason, unsigned long ts);
 extern void (*irc_send_rakill) (const char *sender, const char *host, const char *ident);
 extern void (*irc_send_ping) (const char *from, const char *reply, const char *to);
 extern void (*irc_send_pong) (const char *reply);

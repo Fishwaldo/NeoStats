@@ -280,7 +280,7 @@ send_wallops (const char *who, const char *buf)
 }
 
 void 
-send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
+send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned int length, const char *reason, const unsigned long ts)
 {
 	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, MSG_AKILL, host, ident, length, setby, ts, reason);
 }
