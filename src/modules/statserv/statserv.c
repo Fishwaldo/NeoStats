@@ -161,6 +161,7 @@ int ModInit(Module* mod_ptr)
 
 	SET_SEGV_LOCATION();
 
+	ss_module = mod_ptr;
 	StatServ.onchan = 0;
 	StatServ.shutdown = 0;
 	/* we want nickip messages */

@@ -43,6 +43,7 @@
 extern BotInfo ss_botinfo;
 extern Bot *ss_bot;
 extern ModuleInfo module_info;
+extern Module* ss_module;
 
 typedef struct tld_ TLD;
 typedef struct region_ Region;

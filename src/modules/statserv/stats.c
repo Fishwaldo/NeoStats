@@ -651,7 +651,7 @@ BotInfo ss_botinfo =
 	"", 
 	"", 
 };
-static Module* ss_module;
+Module* ss_module;
 
 int Online(char **av, int ac)
 {
