@@ -190,7 +190,9 @@ void fini_tld() {
 	TLD *t;
 	lnode_t *tn;
 
-	GeoIP_delete(gi);
+	if (gi) {
+		GeoIP_delete(gi);
+	}
 	tn = list_first(Thead);
 	while (tn != NULL) {
 		t = lnode_get(tn);
