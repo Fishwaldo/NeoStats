@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.h,v 1.12 2002/09/04 08:40:26 fishwaldo Exp $
+** $Id: Ultimate.h,v 1.13 2002/12/30 12:09:38 fishwaldo Exp $
 */
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
@@ -421,7 +421,11 @@ extern int ssquit_cmd(const char *);
 extern int sprotocol_cmd(const char *);
 extern int squit_cmd(const char *, const char *);
 extern int spart_cmd(const char *, const char *);
+#ifdef ULTIMATE3
+extern int sjoin_cmd(const char *, const char *, unsigned long flag);
+#else
 extern int sjoin_cmd(const char *, const char *);
+#endif
 extern int schmode_cmd(const char *, const char *, const char *, const char *);
 #ifndef ULTIMATE3
 extern int snewnick_cmd(const char *, const char *, const char *, const char *);

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.c,v 1.17 2002/12/26 15:15:04 fishwaldo Exp $
+** $Id: conf.c,v 1.18 2002/12/30 12:09:38 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -29,9 +29,17 @@
 
 static void cb_Server(char *, int);
 static void cb_Module(char *, int);
+/** @brief The list of modules to load
+ */
 static void *load_mods[NUM_MODULES];
+/** @brief Hrm?
+ */
 static int done_mods;
 
+/** @brief Core Configuration Items
+ * 
+ * Contains Configuration Items for the Core NeoStats service
+ */
 static config_option options[] =
 { 
 { "SERVER_NAME", ARG_STR, cb_Server, 0},
@@ -44,6 +52,7 @@ static config_option options[] =
 { "NEOSTAT_HOST", ARG_STR, cb_Server, 7},
 { "NEOSTAT_USER", ARG_STR, cb_Server, 8},
 { "WANT_PRIVMSG", ARG_STR, cb_Server, 9},
+{ "SERVICES_CHAN", ARG_STR, cb_Server, 10},
 { "LOAD_MODULE", ARG_STR, cb_Module, 0},
 { "ONLY_OPERS", ARG_STR, cb_Server, 11},
 { "NO_LOAD", ARG_STR, cb_Server, 12}

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.31 2002/10/20 15:46:43 shmad Exp $
+** $Id: Ultimate.c,v 1.32 2002/12/30 12:09:38 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -167,10 +167,41 @@ int spart_cmd(const char *who, const char *chan) {
 	part_chan(finduser(who), (char *)chan);
 	return 1;
 }
+#ifdef ULTIMATE3
+int sjoin_cmd(const char *who, const char *chan, unsigned long chflag) {
+	char flag;
+	char mode[2]; 
+	char **av;
+	int ac;
+	char tmp[512];
+	switch (chflag) {
+		case MODE_CHANOP:	flag = '@';
+					strcpy(mode, "0");
+					break;
+		case MODE_HALFOP:	flag = '%';
+					strcpy(mode, "h");
+					break;
+		case MODE_VOICE:	flag = '+';
+					strcpy(mode, "v");
+					break;
+		case MODE_CHANADMIN:	flag = '!';
+					strcpy(mode, "a");
+					break;
+		default:		flag = ' ';
+					strcpy(mode, "");
+	}
+	sts(":%s %s 0 %s + :%c%s", me.name, MSG_SJOIN, chan, flag, who);
+	join_chan(finduser(who), (char *)chan);
+	sprintf(tmp, "%s +%s %s", chan, mode, who);
+	ac = split_buf(tmp, &av, 0);
+	ChanMode(me.name, av, ac);
+	free(av);
 
+#else 
 int sjoin_cmd(const char *who, const char *chan) {
 	sts(":%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
 	join_chan(finduser(who), (char *)chan);
+#endif
 	return 1;
 }
 
@@ -179,7 +210,7 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 	int ac;	
 	char tmp[512];
 
-	sts(":%s %s %s %s %s %lu", who, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args, time(NULL));
+	sts(":%s %s %s %s %s %lu", me.name, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args, time(NULL));
 	sprintf(tmp, "%s %s %s", chan, mode, args);
 	ac = split_buf(tmp, &av, 0);
 	ChanMode("", av, ac);

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.45 2002/09/04 08:40:26 fishwaldo Exp $
+** $Id: dl.c,v 1.46 2002/12/30 12:09:38 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -608,6 +608,7 @@ int load_module(char *path1, User *u) {
 		}
 	}
 	if (do_msg) prefmsg(u->nick,s_Services,"Module %s Loaded, Description: %s",mod_info_ptr->module_name,mod_info_ptr->module_description);
+	if (do_msg) globops(me.name, "%s Module Loaded", mod_info_ptr->module_name);
 	return 0;
 
 
@@ -689,6 +690,7 @@ int unload_module(char *module_name, User *u) {
 #ifdef DEBUG
 		log("Deleting Module %s from ModHash", module_name);
 #endif
+		globops(me.name, "%s Module Unloaded", module_name);
 		list = hnode_get(modnode);
 		hash_delete(mh, modnode);
 		hnode_destroy(modnode);

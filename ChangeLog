@@ -13,6 +13,10 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - ./configure --enable-bignet support for more than 2000 users
  - Started Documenting internal functions for DoxyGen (About time I did this)
  - Created 2.6.0 branch in CVS
+ - Module Loading global messages are now handled by core, not Modules
+ - Ultimate3 now uses SJOIN to join channels
+ - Fixed a bug with RELOAD
+ - StatServ updates 
 
 * NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 2 
  - Misc. Updates (S)

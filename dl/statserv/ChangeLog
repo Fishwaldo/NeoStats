@@ -8,6 +8,8 @@ Shmad & ^Enigma & Fish^
 	set WALLOP_INTERVAL in neostats.cfg to the interval time
  - Some Stats that we were collecting was never displayed, added it to the output and html display
  - DelOldChan was only deleting 1 chan per hour, and could delete chans that were older than 1 day, but still had members. Fixed. 
+ - Fixed the ok_to_wallops stuff
+ - Fixed up OperList
 
 * Version 3.42 * September 3rd, 2002 (S)
  - Fixed make insall now copies the template too 

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.55 2002/12/13 11:19:49 fishwaldo Exp $
+** $Id: statserv.c,v 1.56 2002/12/30 12:09:38 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -163,7 +163,6 @@ void _init() {
 
 	strcpy(segv_location, "StatServ-_init");
 	StatServ.onchan = 0;
-	globops(me.name, "StatServ Module Loaded");	
 	memcpy(StatServ.user, Servbot.user, 8);
 	memcpy(StatServ.host, Servbot.host, MAXHOST);
 	StatServ.lag = 0;
@@ -239,7 +238,6 @@ void _init() {
 
 void _fini() {
 	SaveStats();
-	if (StatServ.onchan) globops(me.name, "StatServ Module Unloaded");
 	
 }
 	
@@ -342,7 +340,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 		ss_tld_map(u);
 		chanalert(s_StatServ,"%s Wanted to see a Country Breakdown",u->nick);
 	} else if (!strcasecmp(av[1], "OPERLIST")) {
-		if (ac < 4) {
+		if (ac < 2) {
 			prefmsg(u->nick, s_StatServ, "OperList Syntax Not Valid");
 			prefmsg(u->nick, s_StatServ, "For Help: /msg %s HELP OPERLIST", s_StatServ);
 		}
@@ -726,6 +724,7 @@ static void ss_operlist(User *origuser, char *flags, char *server)
 
 	if (!flags) {
 		prefmsg(origuser->nick, s_StatServ, "On-Line IRCops:");
+		prefmsg(origuser->nick, s_StatServ, "ID  %-15s %-15s %-10s", "Nick", "Server", "Level");
 		chanalert (s_StatServ, "%s Requested OperList",origuser->nick);
 	}		
 
@@ -743,6 +742,8 @@ static void ss_operlist(User *origuser, char *flags, char *server)
 	hash_scan_begin(&scan, uh);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 			u = hnode_get(node);
+			if (!is_oper(u)) 
+				continue;
 			tech = UserLevel(u);
 			if (away && u->is_away)
 				continue;
@@ -751,16 +752,14 @@ static void ss_operlist(User *origuser, char *flags, char *server)
 			if (tech < 40)
 				continue;
 			if (!server) {
-				if (UserLevel(u) < 40)	continue;
 				j++;
-				prefmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s %-10d",j, u->nick,u->modes,
+				prefmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-10d",j, u->nick,
 					u->server->name, tech);
 				continue;
 			} else {
 				if (strcasecmp(server, u->server->name))	continue;
-				if (UserLevel(u) < 40)	continue;
 				j++;
-				prefmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s %-10d",j, u->nick,u->modes,
+				prefmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-10d",j, u->nick,
 					u->server->name, tech);
 				continue;
 			}

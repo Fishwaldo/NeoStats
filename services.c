@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: services.c,v 1.47 2002/11/18 14:03:37 fishwaldo Exp $
+** $Id: services.c,v 1.48 2002/12/30 12:09:38 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -59,9 +59,6 @@ void servicesbot(char *nick, char **av, int ac) {
 	}
 
 	me.requests++;
-
-	if (flood(u))
-		return;
 
 	if (me.onlyopers && (UserLevel(u) < 40)) {
 		prefmsg(u->nick, s_Services,
@@ -202,8 +199,12 @@ void servicesbot(char *nick, char **av, int ac) {
 			chanalert(s_Services,"%s Tried to RELOAD, but is not a Techadmin",nick);
 			return;
 		}
-		chanalert(s_Services,"%s Wants me to RELOAD! Be back in a few!",u->nick);
+		if (ac <= 2) {
+			prefmsg(nick, s_Services, "You must supply a Reason to Reload");
+			return;
+		}
 		tmp = joinbuf(av, ac, 2);
+		chanalert(s_Services,"%s Wants me to RELOAD! for %s",u->nick, tmp);
 		ns_reload(u,tmp);
 		free(tmp);
 	} else if (!strcasecmp(av[1], "LOGS")) {
@@ -317,8 +318,8 @@ static void ns_reload(User *u, char *reason)
 	char quitmsg[255];
 	strcpy(segv_location, "ns_reload");
 	globops(s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
-	log("%s requested RELOAD.", u->nick);
-	sprintf(quitmsg, "%s Sent RELOAD: %s", u->nick, (reason ? reason : "No reason"));
+	log("%s requested RELOAD. -> reason", u->nick);
+	sprintf(quitmsg, "%s Sent RELOAD: %s", u->nick, reason);
 	hash_scan_begin(&ms, mh);
 	while ((mn = hash_scan_next(&ms)) != NULL) {
 		mod_ptr = hnode_get(mn);
@@ -384,7 +385,8 @@ void ns_debug_to_coders(char *u)
         		globops(me.name, "\2DEBUG MODE\2 Deactivated");
         	}
 	}
-}										  
+}		
+#ifdef USE_RAW									  
 static void ns_raw(User *u, char *message)
 {
 	int sent;
@@ -402,6 +404,7 @@ static void ns_raw(User *u, char *message)
         me.SendM++;
         me.SendBytes = me.SendBytes + sent;
 }	
+#endif		
 static void ns_user_dump(User *u, char *nick)
 {
 	strcpy(segv_location, "ns_user_dump");

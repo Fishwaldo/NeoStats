@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.102 2002/12/15 04:02:08 fishwaldo Exp $
+** $Id: ircd.c,v 1.103 2002/12/30 12:09:38 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -305,17 +305,19 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif
 #endif
+#ifdef ULTIMATE3
+	sjoin_cmd(nick, me.chan, MODE_CHANADMIN);
+#else /* ulitmate3 */
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
 #ifndef HYBRID7
 #ifdef NEOIRCD
-
 	schmode_cmd(me.name, me.chan, "+a", cmd);
-#else
+#else /* neoircd */
 	schmode_cmd(nick, me.chan, "+oa", cmd);
-#endif
-#else
-#endif
+#endif /* neoircd */
+#endif /* hybrid7 */
+#endif /* ultimate3 */
 	AddStringToList(&av, nick, &ac);
 	Module_Event("SIGNON", av, ac);
 	FreeList(av, ac);
@@ -652,6 +654,9 @@ void init_ServBot()
 #endif
 #endif
 
+#ifdef ULTIMATE3
+	sjoin_cmd(s_Services, me.chan, MODE_CHANADMIN);
+#else
 	sjoin_cmd(s_Services, me.chan);
 	sprintf(rname, "%s %s", s_Services, s_Services);
 #if !defined(HYBRID7)
@@ -664,6 +669,7 @@ void init_ServBot()
 #else
 	schmode_cmd(s_Services, me.chan, "+o", rname);
 #endif
+#endif /* ultimate3 */
 	me.onchan = 1;
 	AddStringToList(&av, me.uplink, &ac);
 	Module_Event("ONLINE", av, ac);
