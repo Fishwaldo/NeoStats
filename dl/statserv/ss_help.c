@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ss_help.c,v 1.8 2003/05/05 14:42:16 fishwaldo Exp $
+** $Id: ss_help.c,v 1.9 2003/05/16 15:26:48 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -31,18 +31,32 @@ const char *ss_help[] = {
 "*** Statistics Help ***",
 "",
 "Commands:",
-"\2SERVER\2     Request information about a server.",
-"\2MAP\2        Show the network map.",
-"\2CHAN\2       Channel Information.",
-"\2NETSTATS\2   General Network Statistics.",
-"\2DAILY\2      Daily Network Statistics.",
-"\2TLD\2        Show what country a TLD represents.",
-"\2TLDMAP\2     Statistics on TLD's.",
-"\2OPERLIST\2   Show a listing of on-line IRCops.",
-"\2BOTLIST\2    Show a listing of on-line BOTS.",
-"\2VERSION\2    Shows you the current StatServ Version.",
+"\2SERVER\2          Request information about a server.",
+"\2MAP\2             Show the network map.",
+"\2CHAN\2            Channel Information.",
+"\2NETSTATS\2        General Network Statistics.",
+"\2DAILY\2           Daily Network Statistics.",
+"\2TLD\2             Show what country a TLD represents.",
+"\2TLDMAP\2          Statistics on TLD's.",
+"\2OPERLIST\2        Show a listing of on-line IRCops.",
+"\2BOTLIST\2         Show a listing of on-line BOTS.",
+"\2CLIENTVERSIONS\2  Shows you a list of Client Versions.",
+"\2VERSION\2         Shows you the current StatServ Version.",
 "",
 "End of Help.",
+NULL
+};
+
+const char *ss_clientversions_help[] = {
+"*** Statistics: \2CLIENTVERSIONS\2 Help ***",
+"",
+"Usage: \2CLIENTVERSIONS \37<limit>\37\2",
+"",
+"Provides Statistics on the Client Versions found",
+"The list will only be active if you have SecureServ installed and Active",
+"<limit> Specifies how many results to show. Results are sorted by",
+"Most Popular to Least Popular",
+"End of Help",
 NULL
 };
 

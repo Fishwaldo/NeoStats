@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.36 2003/05/05 14:42:18 fishwaldo Exp $
+** $Id: stats.c,v 1.37 2003/05/16 15:26:48 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -48,7 +48,38 @@ int ok_to_wallop() {
 
 }
 
+CVersions *findversions(char *name) {
+	CVersions *cv;
+	lnode_t *cn;
+	cn = list_find(Vhead, name, comparef);
+	if (cn) {
+		cv = lnode_get(cn);
+	} else {
+		nlog(LOG_DEBUG2, LOG_MOD, "findversions(%s) -> NOT FOUND", name);
+		return NULL;
+	}
+	return cv;
+}
 
+
+int s_client_version(char **av, int ac) {
+	lnode_t *node;
+	CVersions *clientv;
+	
+	clientv = findversions(av[1]);
+	if (clientv) {
+		nlog(LOG_DEBUG2, LOG_MOD, "Found Client Version Node %s", av[1]);
+		clientv->count++;
+		return 1;
+	} 
+	clientv = malloc(sizeof(CVersions));
+	strncpy(clientv->name, av[1], 512);
+	clientv->count = 1;
+	node = lnode_create(clientv);
+	list_append(Vhead, node);
+	nlog(LOG_DEBUG2, LOG_MOD, "Added Version to List %s", clientv->name);
+	return 1;
+}
 
 int s_chan_new(char **av, int ac) {
 	long count;

@@ -20,7 +20,7 @@
 #define SSMNAME "statserv"
 
 /* this is the max number of statserv channels our database can hold... */
-#define SS_CHAN_SIZE 10240
+#define SS_CHAN_SIZE -1
 
 
 char *s_StatServ;
@@ -28,10 +28,11 @@ char *s_StatServ;
 typedef struct tld_ TLD;
 typedef struct server_stats SStats;
 typedef struct chan_stats CStats;
+typedef struct irc_client_version CVersions;
 hash_t *Shead;
 list_t *Chead;
 TLD *tldhead;
-
+list_t *Vhead;
 
 
 extern const char version_date[], version_time[];
@@ -90,6 +91,11 @@ struct server_stats {
 	long daily_totusers;
 };
 
+struct irc_client_version {
+	char name[512];
+	int count;
+};
+
 struct chan_stats {
 	char name[CHANLEN];
 	long members;
@@ -144,6 +150,7 @@ int toptopics(const void *key1, const void *key2);
  TLD *AddTLD(User *);
  void LoadTLD();
  void init_tld();
+ int s_client_version(char **av, int ac);
  void AddStats(Server *);
  SStats *findstats(char *);
  void SaveStats();
@@ -196,6 +203,7 @@ extern const char *ss_forcehtml_help[];
 extern const char *ss_notices_help[];
 extern const char *ss_chan_help[];
 extern const char *ss_set_help[];
+extern const char *ss_clientversions_help[];
 /* tld.c */
  void DelTLD(User *u);
 

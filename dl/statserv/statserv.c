@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.64 2003/05/09 13:29:02 fishwaldo Exp $
+** $Id: statserv.c,v 1.65 2003/05/16 15:26:49 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -45,6 +45,7 @@ static void ss_server(User *u, char *server);
 static void ss_map(User *);
 static void ss_netstats(User *);
 static void ss_set(User *, char **, int);
+static void ss_versions (User *u, int num);
 /* int s_bot_kill(char *); */
 static void ss_Config();
 static int new_m_version(char *origin, char **av, int ac);
@@ -82,6 +83,7 @@ EventFnList StatServ_Event_List[] = {
 	{ "PARTCHAN", 	s_chan_part},
 	{ "KICK", 	s_chan_kick},
 	{ "TOPICCHANGE", s_topic_change},
+	{ "CLIENTVERSION", s_client_version},
 	{ NULL,	 NULL}
 };
 
@@ -178,7 +180,7 @@ void _init() {
 	LoadTLD();
 	init_tld();
 	LoadStats();
-
+	Vhead = list_create(-1);
 
 
 	hash_scan_begin(&scan, sh);
@@ -273,6 +275,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 			privmsg_list(u->nick, s_StatServ, ss_server_help);
 		else if (!strcasecmp(av[2], "CHAN")) 
 			privmsg_list(u->nick, s_StatServ, ss_chan_help);
+		else if (!strcasecmp(av[2], "CLIENTVERSIONS")) 
+			privmsg_list(u->nick, s_StatServ, ss_clientversions_help);
 		else if (!strcasecmp(av[2], "MAP"))
 			privmsg_list(u->nick, s_StatServ, ss_map_help);
 		else if (!strcasecmp(av[2], "NETSTATS"))
@@ -315,6 +319,9 @@ int __Bot_Message(char *origin, char **av, int ac)
 	} else if (!strcasecmp(av[1], "SERVER")) {
 		ss_server(u, av[2]);
 		chanalert(s_StatServ,"%s Wanted Server Information on %s",u->nick, av[2]);
+	} else if (!strcasecmp(av[1], "CLIENTVERSIONS")) {
+		ss_versions(u, ac > 2 ? atoi(av[2]) : 10);
+		chanalert(s_StatServ, "%s Wanted to see the Client Version List", u->nick);
 	} else if (!strcasecmp(av[1], "MAP")) {
 		ss_map(u);
 		chanalert(s_StatServ,"%s Wanted to see the Current Network MAP",u->nick);
@@ -467,7 +474,41 @@ int toptopics(const void *key1, const void *key2) {
 	const CStats *chan2 = key2;
 	return (chan2->topics - chan1->topics);
 }
+int topversions(const void *key1, const void *key2) {
+	const CVersions *ver1 = key1;
+	const CVersions *ver2 = key2;
+	return (ver2->count - ver1->count);
+}
 
+static void ss_versions (User *u, int num) {
+	CVersions *cv;
+	lnode_t *cn;
+	int i;
+	if (num < 10) {
+		num = 10;
+	}
+	if (list_count(Vhead) == 0) {
+		prefmsg(u->nick, s_StatServ, "No Stats Available.");
+		return;
+	}
+	if (!list_is_sorted(Vhead, topversions)) {
+			list_sort(Vhead, topversions);
+	} 
+	cn = list_first(Vhead);
+	cv = lnode_get(cn);
+	prefmsg(u->nick, s_StatServ, "Top%d Client Versions:", num);
+	prefmsg(u->nick, s_StatServ, "======================");
+	for (i = 0; i <= num; i++) {
+		prefmsg(u->nick, s_StatServ, "%d) %d ->  %s",i, cv->count, cv->name);
+		cn = list_next(Vhead, cn);
+		if (cn) {
+			cv = lnode_get(cn);
+		} else {
+			break;
+		}
+	}
+	prefmsg(u->nick, s_StatServ, "End of List.");
+}
 
 static void ss_chans(User *u, char *chan) {
 	CStats *cs;

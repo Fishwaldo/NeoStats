@@ -4,6 +4,7 @@ Shmad & ^Enigma & Fish^
 (F) denotes Fish
 * Version 3.8 * May 9th, 2003 (F)
  - Fixed TLDCount for Daily users for Unresolved Domains
+ - Added the ability to recieve client versions from SecureServ and record them.
 
 * Version 3.7 * April 17th, 2003 (F)
  - Moved to new logging and conf API
