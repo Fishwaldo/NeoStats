@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: tvarith.h,v 1.2 2003/05/26 09:18:29 fishwaldo Exp $
+** $Id: tvarith.h,v 1.3 2003/06/13 14:44:36 fishwaldo Exp $
 */
 /*
  * tvarith.h
@@ -50,14 +50,18 @@
 #ifndef ADNS_TVARITH_H_INCLUDED
 #define ADNS_TVARITH_H_INCLUDED
 
-static inline void timevaladd(struct timeval *tv_io, long ms) {
-  struct timeval tmp;
-  assert(ms>=0);
-  tmp= *tv_io;
-  tmp.tv_usec += (ms%1000)*1000;
-  tmp.tv_sec += ms/1000;
-  if (tmp.tv_usec >= 1000000) { tmp.tv_sec++; tmp.tv_usec -= 1000000; }
-  *tv_io= tmp;
+static inline void timevaladd(struct timeval *tv_io, long ms)
+{
+	struct timeval tmp;
+	assert(ms >= 0);
+	tmp = *tv_io;
+	tmp.tv_usec += (ms % 1000) * 1000;
+	tmp.tv_sec += ms / 1000;
+	if (tmp.tv_usec >= 1000000) {
+		tmp.tv_sec++;
+		tmp.tv_usec -= 1000000;
+	}
+	*tv_io = tmp;
 }
 
 #endif

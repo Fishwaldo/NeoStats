@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: kp_recur.c,v 1.2 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id: kp_recur.c,v 1.3 2003/06/13 14:44:37 fishwaldo Exp $
 */
 /*
  * KEEPER: A configuration reading and writing library
@@ -52,44 +52,44 @@
  * then the last error encountered is retured. 
  * ------------------------------------------------------------------------- */
 int kp_recursive_do(const char *key, kp_func func, int stop_on_err,
-                    void *user_data)
+		    void *user_data)
 {
-    kpval_t type;
-    int res;
-    int finalres;
+	kpval_t type;
+	int res;
+	int finalres;
 
-    res = kp_get_type(key, &type);
-    if(res != 0)
-        return res;
+	res = kp_get_type(key, &type);
+	if (res != 0)
+		return res;
 
-    finalres = 0;
-    if(type != KPVAL_DIR) {
-        finalres = (*func) (key, user_data);
-    }
-    else {
-        char **keys;
-        char **kp;
-        KPDIR *dir;
+	finalres = 0;
+	if (type != KPVAL_DIR) {
+		finalres = (*func) (key, user_data);
+	} else {
+		char **keys;
+		char **kp;
+		KPDIR *dir;
 
-        res = kp_get_dir(key, &keys, NULL);
-        if(res != 0)
-            return res;
+		res = kp_get_dir(key, &keys, NULL);
+		if (res != 0)
+			return res;
 
-        dir = kp_dir_open(key);
-        for(kp = keys; *kp != NULL; kp++) {
-            res = kp_recursive_do(KP_P(dir, *kp), func, stop_on_err,
-                                  user_data);
-            if(res != 0) {
-                finalres = res;
-                if(stop_on_err)
-                    break;
-            }
-        }
-        kp_dir_close(dir);
-        free(keys);
-    }
+		dir = kp_dir_open(key);
+		for (kp = keys; *kp != NULL; kp++) {
+			res =
+			    kp_recursive_do(KP_P(dir, *kp), func,
+					    stop_on_err, user_data);
+			if (res != 0) {
+				finalres = res;
+				if (stop_on_err)
+					break;
+			}
+		}
+		kp_dir_close(dir);
+		free(keys);
+	}
 
-    return finalres;
+	return finalres;
 }
 
 /* End of kp_recur.c */

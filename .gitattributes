@@ -18,6 +18,7 @@
 /Unreal.h -text
 /acconfig.h -text
 /aclocal.m4 -text
+adns/.indent.pro -text
 adns/Makefile -text
 adns/adns.h -text
 adns/check.c -text
@@ -131,6 +132,7 @@ doc/read-userman -text
 /ircd.c -text
 /ircd.h -text
 /keeper.c -text
+keeper/.indent.pro -text
 keeper/Makefile -text
 keeper/keeper.h -text
 keeper/kp_cache.c -text

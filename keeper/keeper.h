@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: keeper.h,v 1.2 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id: keeper.h,v 1.3 2003/06/13 14:44:37 fishwaldo Exp $
 */
 /*
  * KEEPER: A configuration reading and writing library
@@ -46,22 +46,22 @@
 #define _KEEPER_H
 
 typedef enum {
-    KPVAL_UNKNOWN = -1,
-    KPVAL_DIR,
-    KPVAL_DATA,
-    KPVAL_STRING,
-    KPVAL_INT,
-    KPVAL_FLOAT
+	KPVAL_UNKNOWN = -1,
+	KPVAL_DIR,
+	KPVAL_DATA,
+	KPVAL_STRING,
+	KPVAL_INT,
+	KPVAL_FLOAT
 } kpval_t;
 
 typedef enum {
-    KPERR_OK,        /* OK                     */
-    KPERR_NOKEY,     /* Key does not exist     */
-    KPERR_NOACCES,   /* Access denied          */
-    KPERR_BADKEY,    /* Bad key                */
-    KPERR_BADTYPE,   /* Bad type               */
-    KPERR_BADDB,     /* Bad database           */
-    KPERR_NOSPACE    /* Not enough resources   */
+	KPERR_OK,		/* OK                     */
+	KPERR_NOKEY,		/* Key does not exist     */
+	KPERR_NOACCES,		/* Access denied          */
+	KPERR_BADKEY,		/* Bad key                */
+	KPERR_BADTYPE,		/* Bad type               */
+	KPERR_BADDB,		/* Bad database           */
+	KPERR_NOSPACE		/* Not enough resources   */
 } kperr_t;
 
 #ifdef __cplusplus
@@ -71,52 +71,55 @@ extern "C" {
 /* ==== Basic functions ==== */
 
 /* Get functions */
-int   kp_get_string  (const char *keypath, char **stringp);
-int   kp_get_int     (const char *keypath, int *intp);
-int   kp_get_float   (const char *keypath, double *floatp);
-int   kp_get_data    (const char *keypath, void **datap, unsigned int *lenp);
-int   kp_get_dir     (const char *keypath, char ***keysp, unsigned int *nump);
+	int kp_get_string(const char *keypath, char **stringp);
+	int kp_get_int(const char *keypath, int *intp);
+	int kp_get_float(const char *keypath, double *floatp);
+	int kp_get_data(const char *keypath, void **datap,
+			unsigned int *lenp);
+	int kp_get_dir(const char *keypath, char ***keysp,
+		       unsigned int *nump);
 
 /* Set functions */
-int   kp_set_string  (const char *keypath, const char *string);
-int   kp_set_int     (const char *keypath, int intval);
-int   kp_set_float   (const char *keypath, double floatval);
-int   kp_set_data    (const char *keypath, const void *data, unsigned int len);
+	int kp_set_string(const char *keypath, const char *string);
+	int kp_set_int(const char *keypath, int intval);
+	int kp_set_float(const char *keypath, double floatval);
+	int kp_set_data(const char *keypath, const void *data,
+			unsigned int len);
 
 /* Misc functions */
-int   kp_remove      (const char *keypath);
-int   kp_flush       (void);
-int   kp_get_type    (const char *keypath, kpval_t *typep);
-char *kp_strerror    (int kperr);
+	int kp_remove(const char *keypath);
+	int kp_flush(void);
+	int kp_get_type(const char *keypath, kpval_t * typep);
+	char *kp_strerror(int kperr);
 
 
 /* ==== Utility functions ==== */
 
 /* Directory utils */
-typedef struct _KPDIR KPDIR;
+	typedef struct _KPDIR KPDIR;
 #define KP_P(kpdir, subkey) kp_dir_getpath(kpdir, subkey)
 
-KPDIR      *kp_dir_open    (const char *keypath);
-const char *kp_dir_getpath (KPDIR *kpdir, const char *subkey);
-void        kp_dir_close   (KPDIR *kpdir);
+	KPDIR *kp_dir_open(const char *keypath);
+	const char *kp_dir_getpath(KPDIR * kpdir, const char *subkey);
+	void kp_dir_close(KPDIR * kpdir);
 
 /* Enum utils */
-int   kp_get_enum    (const char *keypath, const char *names[], int *valp);
-int   kp_set_enum    (const char *keypath, const char *names[], int val);
+	int kp_get_enum(const char *keypath, const char *names[],
+			int *valp);
+	int kp_set_enum(const char *keypath, const char *names[], int val);
 
-int   kp_get_bool    (const char *keypath, int *boolp);
-int   kp_set_bool    (const char *keypath, int boolval);
+	int kp_get_bool(const char *keypath, int *boolp);
+	int kp_set_bool(const char *keypath, int boolval);
 
 /* Sort keys in alphabetical order */
-void  kp_sort_keys   (char **keys, unsigned int numkeys);
+	void kp_sort_keys(char **keys, unsigned int numkeys);
 
 /* Do a function on all subkeys*/
-typedef int (*kp_func) (const char *key, void *user_data);
-int   kp_recursive_do(const char *key, kp_func func, int stop_on_err,
-                      void *user_data);
+	typedef int (*kp_func) (const char *key, void *user_data);
+	int kp_recursive_do(const char *key, kp_func func, int stop_on_err,
+			    void *user_data);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _KEEPER_H */
+#endif				/* _KEEPER_H */

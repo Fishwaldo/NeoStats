@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: kp_util.h,v 1.3 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id: kp_util.h,v 1.4 2003/06/13 14:44:37 fishwaldo Exp $
 */
 /*
  * KEEPER: A configuration reading and writing library
@@ -57,7 +57,7 @@
 #ifdef ALLOC_CHECK
 extern void *_iamalloc(size_t size, int id);
 extern void *_iarealloc(void *ptr, size_t size, int id);
-extern void  _iafree(void *ptr, int id);
+extern void _iafree(void *ptr, int id);
 #define malloc(size)        _iamalloc(size, 4)
 #define free(ptr)           _iafree(ptr, 4)
 #define realloc(ptr, size)  _iarealloc(ptr, size, 4)
@@ -70,32 +70,32 @@ extern void  _iafree(void *ptr, int id);
 
 /* Key list element used to store keys in the cache */
 typedef struct _kp_key {
-    kpval_t type;
-    unsigned int len;
-    void *data;
+	kpval_t type;
+	unsigned int len;
+	void *data;
 
-    char *name;
-    int  flags;
-    struct _kp_key *next;
+	char *name;
+	int flags;
+	struct _kp_key *next;
 } kp_key;
 
 /* Path of a database file, and the section that it belongs to */
 typedef struct {
-    char *path;
-    int dbindex;
+	char *path;
+	int dbindex;
 } kp_path;
 
 /* Key name array used to collect subkeys in a key directory */
 struct key_array {
-    char **array;
-    unsigned int num;
-    unsigned int strsize;
+	char **array;
+	unsigned int num;
+	unsigned int strsize;
 };
 
 /* Flags for cached keys */
-#define KPFL_DIRTY   (1 << 0)  /* key was modified */
-#define KPFL_REMOVED (1 << 1)  /* key was removed (negative) */
-#define KPFL_BADDB   (1 << 2)  /* database contained an error for this key */
+#define KPFL_DIRTY   (1 << 0)	/* key was modified */
+#define KPFL_REMOVED (1 << 1)	/* key was removed (negative) */
+#define KPFL_BADDB   (1 << 2)	/* database contained an error for this key */
 
 /* ------------------------------------------------------------------------- 
  * This function check if an allocation was successful. If not it aborts
@@ -106,11 +106,11 @@ struct key_array {
  * ------------------------------------------------------------------------- */
 static inline void *check_ptr(void *ptr)
 {
-    if(ptr == NULL) {
-        fprintf(stderr, "keeper: Out of Memory!\n");
-        abort();
-    }
-    return ptr;
+	if (ptr == NULL) {
+		fprintf(stderr, "keeper: Out of Memory!\n");
+		abort();
+	}
+	return ptr;
 }
 
 /* ------------------------------------------------------------------------- 
@@ -118,7 +118,7 @@ static inline void *check_ptr(void *ptr)
  * ------------------------------------------------------------------------- */
 static inline void *malloc_check(size_t size)
 {
-    return check_ptr(malloc(size ? size : 1));
+	return check_ptr(malloc(size ? size : 1));
 }
 
 /* ------------------------------------------------------------------------- 
@@ -126,40 +126,40 @@ static inline void *malloc_check(size_t size)
  * ------------------------------------------------------------------------- */
 static inline char *strdup_check(const char *s)
 {
-    return strcpy((char *) check_ptr(malloc(strlen(s) + 1)), s);
+	return strcpy((char *) check_ptr(malloc(strlen(s) + 1)), s);
 }
 
 /* ------------------------------------------------------------------------- 
  * Create a new key list element, and allocate space for the value data
  * ------------------------------------------------------------------------- */
-static inline void kp_value_new(kp_key *ck, kpval_t type,
-                                unsigned int len, const void *data)
+static inline void kp_value_new(kp_key * ck, kpval_t type,
+				unsigned int len, const void *data)
 {
-    ck->type = type;
-    ck->len  = len;
-    if(type != KPVAL_UNKNOWN)
-        ck->data = malloc_check(ck->len+1);
-    else
-        ck->data = NULL;
+	ck->type = type;
+	ck->len = len;
+	if (type != KPVAL_UNKNOWN)
+		ck->data = malloc_check(ck->len + 1);
+	else
+		ck->data = NULL;
 
-    ck->flags = 0;
-    ck->name = NULL;
-    ck->next = NULL;
+	ck->flags = 0;
+	ck->name = NULL;
+	ck->next = NULL;
 
-    if(data != NULL)
-        memcpy(ck->data, data, ck->len);
+	if (data != NULL)
+		memcpy(ck->data, data, ck->len);
 }
 
 /* ------------------------------------------------------------------------- 
  * Free allocated data in the key list element. Doesn't free the element
  * itself
  * ------------------------------------------------------------------------- */
-static inline void kp_value_destroy(kp_key *ck)
+static inline void kp_value_destroy(kp_key * ck)
 {
-    if(ck->data != NULL)
-        free(ck->data);
-    if(ck->name != NULL)
-        free(ck->name);
+	if (ck->data != NULL)
+		free(ck->data);
+	if (ck->name != NULL)
+		free(ck->name);
 }
 
 /* ------------------------------------------------------------------------- 
@@ -168,38 +168,37 @@ static inline void kp_value_destroy(kp_key *ck)
  * ------------------------------------------------------------------------- */
 static inline int kp_is_subkey(char *key, char *subkey)
 {
-    unsigned int keylen = strlen(key);
+	unsigned int keylen = strlen(key);
 
-    if(keylen == 0)
-        return 1;
+	if (keylen == 0)
+		return 1;
 
-    if(strlen(subkey) > keylen &&
-       strncmp(subkey, key, keylen) == 0 &&
-       subkey[keylen] == '/')
-        return 1;
+	if (strlen(subkey) > keylen &&
+	    strncmp(subkey, key, keylen) == 0 && subkey[keylen] == '/')
+		return 1;
 
-    return 0;
+	return 0;
 }
 
 /* Internal functions that are used across modules */
 extern kpval_t _kp_type_from_code(int c);
-extern int   _kp_get_path(const char *keypath, kp_path *kpp, char **keynamep,
-                         int *iskeyfile);
-extern int   _kp_errno_to_kperr(int en);
-extern char *_kp_get_line(FILE *fp, char **valuep);
-extern int   _kp_get_ibeg(int dbindex);
+extern int _kp_get_path(const char *keypath, kp_path * kpp,
+			char **keynamep, int *iskeyfile);
+extern int _kp_errno_to_kperr(int en);
+extern char *_kp_get_line(FILE * fp, char **valuep);
+extern int _kp_get_ibeg(int dbindex);
 extern char *_kp_get_tmpfile(int dbindex);
-extern void  _kp_add_subkey_check(struct key_array *keys, char *name);
-extern int   _kp_read_file(char *path, kp_key **ksp);
-extern int   _kp_get_subkeys_dir(char *path, struct key_array *keys);
-extern int   _kp_write_file(kp_path *kpp, kp_key *keys);
-extern int   _kp_cache_get(kp_path *kpp, const char *keyname, kpval_t type,
-                           kp_key *ck);
-extern int   _kp_cache_get_type(kp_path *kpp, char *keyname, int iskeyfile,
-                                kpval_t *tp);
-extern int   _kp_cache_get_subkeys(kp_path *kpp, const char *keypath,
-                                   int iskeyfile, struct key_array *keys);
-extern int   _kp_cache_set(kp_path *kpp, kp_key *ck);
-extern int   _kp_cache_flush(void);
+extern void _kp_add_subkey_check(struct key_array *keys, char *name);
+extern int _kp_read_file(char *path, kp_key ** ksp);
+extern int _kp_get_subkeys_dir(char *path, struct key_array *keys);
+extern int _kp_write_file(kp_path * kpp, kp_key * keys);
+extern int _kp_cache_get(kp_path * kpp, const char *keyname, kpval_t type,
+			 kp_key * ck);
+extern int _kp_cache_get_type(kp_path * kpp, char *keyname, int iskeyfile,
+			      kpval_t * tp);
+extern int _kp_cache_get_subkeys(kp_path * kpp, const char *keypath,
+				 int iskeyfile, struct key_array *keys);
+extern int _kp_cache_set(kp_path * kpp, kp_key * ck);
+extern int _kp_cache_flush(void);
 
 /* End of kp_util.h */

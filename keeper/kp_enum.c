@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: kp_enum.c,v 1.2 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id: kp_enum.c,v 1.3 2003/06/13 14:44:37 fishwaldo Exp $
 */
 /*
  * KEEPER: A configuration reading and writing library
@@ -50,25 +50,25 @@
  * ------------------------------------------------------------------------- */
 int kp_get_enum(const char *keypath, const char *names[], int *valp)
 {
-    int res;
-    int i;
-    char *str = NULL;
+	int res;
+	int i;
+	char *str = NULL;
 
-    res = kp_get_string(keypath, &str);
-    if(res != 0)
-        return res;
+	res = kp_get_string(keypath, &str);
+	if (res != 0)
+		return res;
 
-    for(i = 0; names[i] != NULL; i++) {
-        if(strcmp(str, names[i]) == 0) {
-            *valp = i;
-            free(str);
-            return 0;
-        }
-    }
+	for (i = 0; names[i] != NULL; i++) {
+		if (strcmp(str, names[i]) == 0) {
+			*valp = i;
+			free(str);
+			return 0;
+		}
+	}
 
-    free(str);
+	free(str);
 
-    return KPERR_BADTYPE;
+	return KPERR_BADTYPE;
 }
 
 /* ------------------------------------------------------------------------- 
@@ -76,15 +76,15 @@ int kp_get_enum(const char *keypath, const char *names[], int *valp)
  * ------------------------------------------------------------------------- */
 int kp_set_enum(const char *keypath, const char *names[], int val)
 {
-    int i;
+	int i;
 
-    if(val >= 0) {
-        for(i = 0; names[i] != NULL; i++)
-            if(i == val)
-                return kp_set_string(keypath, names[val]);
-    }
+	if (val >= 0) {
+		for (i = 0; names[i] != NULL; i++)
+			if (i == val)
+				return kp_set_string(keypath, names[val]);
+	}
 
-    return KPERR_BADTYPE;
+	return KPERR_BADTYPE;
 }
 
 static const char *kp_boolnames[] = { "FALSE", "TRUE", NULL };
@@ -94,7 +94,7 @@ static const char *kp_boolnames[] = { "FALSE", "TRUE", NULL };
  * ------------------------------------------------------------------------- */
 int kp_get_bool(const char *keypath, int *boolp)
 {
-    return kp_get_enum(keypath, kp_boolnames, boolp);
+	return kp_get_enum(keypath, kp_boolnames, boolp);
 }
 
 /* ------------------------------------------------------------------------- 
@@ -102,7 +102,7 @@ int kp_get_bool(const char *keypath, int *boolp)
  * ------------------------------------------------------------------------- */
 int kp_set_bool(const char *keypath, int boolval)
 {
-    return kp_set_enum(keypath, kp_boolnames, boolval ? 1 : 0);
+	return kp_set_enum(keypath, kp_boolnames, boolval ? 1 : 0);
 }
 
 /* End of kp_enum.c */

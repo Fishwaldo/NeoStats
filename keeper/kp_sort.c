@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: kp_sort.c,v 1.2 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id: kp_sort.c,v 1.3 2003/06/13 14:44:37 fishwaldo Exp $
 */
 /*
  * KEEPER: A configuration reading and writing library
@@ -51,10 +51,10 @@
  * ------------------------------------------------------------------------- */
 static int kp_string_compare(const void *ptr1, const void *ptr2)
 {
-    const char **s1 = (const char **) ptr1;
-    const char **s2 = (const char **) ptr2;
+	const char **s1 = (const char **) ptr1;
+	const char **s2 = (const char **) ptr2;
 
-    return strcmp(*s1, *s2);
+	return strcmp(*s1, *s2);
 }
 
 /* ------------------------------------------------------------------------- 
@@ -62,7 +62,7 @@ static int kp_string_compare(const void *ptr1, const void *ptr2)
  * ------------------------------------------------------------------------- */
 void kp_sort_keys(char **keys, unsigned int numkeys)
 {
-    qsort(keys, numkeys, sizeof(char *), kp_string_compare);
+	qsort(keys, numkeys, sizeof(char *), kp_string_compare);
 }
 
 /* End of kp_sort.c */

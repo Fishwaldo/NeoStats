@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: kp_dir.c,v 1.2 2003/05/26 09:18:30 fishwaldo Exp $
+** $Id: kp_dir.c,v 1.3 2003/06/13 14:44:37 fishwaldo Exp $
 */
 /*
  * KEEPER: A configuration reading and writing library
@@ -47,50 +47,50 @@
 /* Structure containing the key path of the opened directory, and 
    the last returned subkey path. This structure is opaque to the user */
 struct _KPDIR {
-    char *basepath;
-    char *retpath;
+	char *basepath;
+	char *retpath;
 };
 
 /* ------------------------------------------------------------------------- 
  * Open a key directory
  * ------------------------------------------------------------------------- */
-KPDIR * kp_dir_open    (const char *keypath)
+KPDIR *kp_dir_open(const char *keypath)
 {
-    KPDIR *kpdir;
+	KPDIR *kpdir;
 
-    kpdir = (KPDIR *) malloc_check(sizeof(KPDIR));
-    kpdir->basepath = strdup_check(keypath);
-    kpdir->retpath = NULL;
+	kpdir = (KPDIR *) malloc_check(sizeof(KPDIR));
+	kpdir->basepath = strdup_check(keypath);
+	kpdir->retpath = NULL;
 
-    return kpdir;
+	return kpdir;
 }
 
 /* ------------------------------------------------------------------------- 
  * Append the subkey name to the base diretory, and return it. Free
  * the previously used return string. 
  * ------------------------------------------------------------------------- */
-const char * kp_dir_getpath (KPDIR *kpdir, const char *subkey)
+const char *kp_dir_getpath(KPDIR * kpdir, const char *subkey)
 {
-    if(kpdir != NULL) {
-        free(kpdir->retpath);
-        kpdir->retpath = (char *) malloc_check(strlen(kpdir->basepath)+1
-                                               +strlen(subkey)+1);
-        sprintf(kpdir->retpath, "%s/%s", kpdir->basepath, subkey);
+	if (kpdir != NULL) {
+		free(kpdir->retpath);
+		kpdir->retpath =
+		    (char *) malloc_check(strlen(kpdir->basepath) + 1 +
+					  strlen(subkey) + 1);
+		sprintf(kpdir->retpath, "%s/%s", kpdir->basepath, subkey);
 
-        return kpdir->retpath;
-    }
-    else
-        return subkey;
+		return kpdir->retpath;
+	} else
+		return subkey;
 }
 
 /* ------------------------------------------------------------------------- 
  * Free all allocated space in this KPDIR structure
  * ------------------------------------------------------------------------- */
-void    kp_dir_close   (KPDIR *kpdir)
+void kp_dir_close(KPDIR * kpdir)
 {
-    free(kpdir->retpath);
-    free(kpdir->basepath);
-    free(kpdir);
+	free(kpdir->retpath);
+	free(kpdir->basepath);
+	free(kpdir);
 }
 
 /* End of kp_dir.c */
