@@ -1,7 +1,7 @@
 BUILT_SOURCES=version.h
 CLEANFILES = version.h
 
-include_HEADERS		=	neostats.h config.h \
+include_HEADERS		=	neostats.h config.h version.h \
 						list.h hash.h support.h events.h numeric.h 
 
 noinst_HEADERS		=	commands.h  dns.h servers.h users.h conf.h \

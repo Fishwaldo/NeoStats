@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.prealpha2-dev
+ - Lots of AutoMake updates so that distros work again and external modules
+   have includes available. (M)
  - StatServ: complete rewrite of statistics systems. (M)
  - Very basic stats added to core for debug, reported in STATUS command. (M)
  - Fix up memory leaks and missing list/hash clean ups. (M)
