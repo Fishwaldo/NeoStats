@@ -447,7 +447,7 @@ bot_nick_change (const Bot *botptr, const char *newnick)
 	/* remove old hash entry */
 	hash_delete (bothash, bn);
 	dlog(DEBUG3, "Bot %s changed nick to %s", botptr->name, newnick);
-	strlcpy (botptr->name, newnick, MAXNICK);
+	strlcpy ((char*)botptr->name, newnick, MAXNICK);
 	/* insert new hash entry */
 	hash_insert (bothash, bn, botptr->name);
 	return NS_SUCCESS;
