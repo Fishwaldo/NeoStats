@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.c,v 1.28 2003/08/07 12:31:43 fishwaldo Exp $
+** $Id: conf.c,v 1.29 2003/09/18 12:21:32 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -146,7 +146,7 @@ void
 cb_Module (char *arg, int configtype)
 {
 	int i;
-	strcpy (segv_location, "cb_Module");
+	SET_SEGV_LOCATION();
 	if (!config.modnoload) {
 		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
 			if (!strcasecmp (load_mods[i], arg)) {
@@ -172,8 +172,7 @@ init_modules ()
 	int i;
 	int rval;
 
-	strcpy (segv_location, "init_modules");
-
+	SET_SEGV_LOCATION();
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
 		nlog (LOG_DEBUG1, LOG_CORE, "Loading Module %s", load_mods[i]);
 		rval = load_module (load_mods[i], NULL);

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.91 2003/08/25 07:30:23 fishwaldo Exp $
+** $Id: stats.h,v 1.92 2003/09/18 12:21:32 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -77,8 +77,6 @@
 /* this is a security hack to give the coders the right levels to debug a NeoStats. Don't define unless we ask you to */
 
 #undef CODERHACK
-
-
 #define CHANLEN			50
 #define BUFSIZE			512
 #define CONFIG_NAME		"neostats.cfg"
@@ -107,6 +105,7 @@
 #define is_synced	me.synced
 
 
+#define SET_SEGV_LOCATION() sprintf(segv_location,"%s %d %s", __FILE__, __LINE__, __PRETTY_FUNCTION__); 
 
 int servsock;
 int times;

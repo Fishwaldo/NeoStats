@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: services.c,v 1.57 2003/08/07 12:31:43 fishwaldo Exp $
+** $Id: services.c,v 1.58 2003/09/18 12:21:32 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -59,7 +59,7 @@ servicesbot (char *nick, char **av, int ac)
 		nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", nick, s_Services);
 		return;
 	}
-
+	SET_SEGV_LOCATION();
 	me.requests++;
 
 	if (me.onlyopers && (UserLevel (u) < 40)) {
@@ -298,7 +298,7 @@ ns_shutdown (User * u, char *reason)
 	hnode_t *mn;
 	char quitmsg[255];
 
-	strcpy (segv_location, "ns_shutdown");
+	SET_SEGV_LOCATION();
 	/* Unload the Modules */
 	hash_scan_begin (&ms, mh);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
@@ -326,7 +326,7 @@ ns_reload (User * u, char *reason)
 	hscan_t ms;
 	hnode_t *mn;
 	char quitmsg[255];
-	strcpy (segv_location, "ns_reload");
+	SET_SEGV_LOCATION();
 	globops (s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
 	nlog (LOG_NOTICE, LOG_CORE, "%s requested RELOAD. -> reason", u->nick);
 	snprintf (quitmsg, 255, "%s Sent RELOAD: %s", u->nick, reason);
@@ -352,8 +352,7 @@ ns_logs (User * u)
 	FILE *fp;
 	char buf[512];
 
-	strcpy (segv_location, "ns_logs");
-
+	SET_SEGV_LOCATION();
 	fp = fopen ("logs/NeoStats.log", "r");
 	if (!fp) {
 		prefmsg (u->nick, s_Services, "Unable to open neostats.log");
@@ -371,7 +370,7 @@ static void
 ns_jupe (User * u, char *server)
 {
 	char infoline[255];
-	strcpy (segv_location, "ns_jupe");
+	SET_SEGV_LOCATION();
 	snprintf (infoline, 255, "[Jupitered by %s]", u->nick);
 	sserver_cmd (server, 1, infoline);
 	nlog (LOG_NOTICE, LOG_CORE, "%s!%s@%s jupitered %s", u->nick, u->username, u->hostname, server);
@@ -380,7 +379,7 @@ ns_jupe (User * u, char *server)
 void
 ns_debug_to_coders (char *u)
 {
-	strcpy (segv_location, "ns_debug_to_coders");
+	SET_SEGV_LOCATION();
 	if (!me.coder_debug) {
 		me.coder_debug = 1;
 		if (u) {
@@ -405,7 +404,7 @@ static void
 ns_raw (User * u, char *message)
 {
 	int sent;
-	strcpy (segv_location, "ns_raw");
+	SET_SEGV_LOCATION();
 	chanalert (s_Services, "\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)", u->nick, message);
 	nlog (LOG_INFO, LOG_CORE, "RAW COMMAND %sIssued a Raw Command!(%s)", u->nick, message);
 	strcat (message, "\n");
@@ -421,7 +420,7 @@ ns_raw (User * u, char *message)
 static void
 ns_user_dump (User * u, char *nick)
 {
-	strcpy (segv_location, "ns_user_dump");
+	SET_SEGV_LOCATION();
 	if (!(UserLevel (u) >= 180)) {
 		prefmsg (u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
 		return;
@@ -432,7 +431,7 @@ ns_user_dump (User * u, char *nick)
 static void
 ns_server_dump (User * u)
 {
-	strcpy (segv_location, "ns_server_dump");
+	SET_SEGV_LOCATION();
 	if (!(UserLevel (u) >= 180)) {
 		prefmsg (u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
 		return;
@@ -443,7 +442,7 @@ ns_server_dump (User * u)
 static void
 ns_chan_dump (User * u, char *chan)
 {
-	strcpy (segv_location, "ns_chan_dump");
+	SET_SEGV_LOCATION();
 	if (!(UserLevel (u) >= 180)) {
 
 		prefmsg (u->nick, s_Services, "Permission Denied, you need to be at least a NetAdmin to Enable Debug Mode!");
@@ -456,8 +455,8 @@ static void
 ns_uptime (User * u)
 {
 	int uptime = time (NULL) - me.t_start;
-	strcpy (segv_location, "ns_uptime");
 
+	SET_SEGV_LOCATION();
 	prefmsg (u->nick, s_Services, "Statistics Information:");
 	if (uptime > 86400) {
 		prefmsg (u->nick, s_Services, "Statistics up \2%ld\2 day%s, \2%02ld:%02ld\2", uptime / 86400, (uptime / 86400 == 1) ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60);
@@ -483,7 +482,7 @@ ns_uptime (User * u)
 static void
 ns_version (User * u)
 {
-	strcpy (segv_location, "ns_version");
+	SET_SEGV_LOCATION();
 	prefmsg (u->nick, s_Services, "\2NeoStats Version Information\2");
 	prefmsg (u->nick, s_Services, "NeoStats Version: %d.%d.%d%s", MAJOR, MINOR, REV, version);
 	prefmsg (u->nick, s_Services, "http://www.neostats.net");

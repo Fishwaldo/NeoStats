@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.69 2003/09/18 11:39:16 fishwaldo Exp $
+** $Id: dl.c,v 1.70 2003/09/18 12:21:32 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -40,8 +40,7 @@ void
 __init_mod_list ()
 {
 
-	strcpy (segv_location, "__init_mod_list");
-
+	SET_SEGV_LOCATION();
 	mh = hash_create (NUM_MODULES, 0, 0);
 	bh = hash_create (B_TABLE_SIZE, 0, 0);
 	th = hash_create (T_TABLE_SIZE, 0, 0);
@@ -54,7 +53,7 @@ new_timer (char *timer_name)
 {
 	Mod_Timer *t;
 	hnode_t *tn;
-	strcpy (segv_location, "Mod_Timer");
+	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "New Timer: %s", timer_name);
 	t = malloc (sizeof (Mod_Timer));
 	if (!timer_name)
@@ -75,7 +74,6 @@ findtimer (char *timer_name)
 {
 	hnode_t *tn;
 
-	strcpy (segv_location, "findtimer");
 	tn = hash_lookup (th, timer_name);
 	if (tn)
 		return (Mod_Timer *) hnode_get (tn);
@@ -87,8 +85,7 @@ add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 {
 	Mod_Timer *Mod_timer_list;
 
-	strcpy (segv_location, "add_mod_timer");
-
+	SET_SEGV_LOCATION();
 
 	if (dlsym ((int *) get_dl_handle (mod_name), func_name) == NULL) {
 		nlog (LOG_WARNING, LOG_CORE, "Oh Oh, The Timer Function doesn't exist");
@@ -112,8 +109,7 @@ del_mod_timer (char *timer_name)
 {
 	Mod_Timer *list;
 	hnode_t *tn;
-	strcpy (segv_location, "del_mod_timer");
-
+	SET_SEGV_LOCATION();
 	tn = hash_lookup (th, timer_name);
 	if (tn) {
 		list = hnode_get (tn);
@@ -133,7 +129,7 @@ list_module_timer (User * u)
 	hscan_t ts;
 	hnode_t *tn;
 
-	strcpy (segv_location, "list_module_timer");
+	SET_SEGV_LOCATION();
 	prefmsg (u->nick, s_Services, "Module timer List:");
 	hash_scan_begin (&ts, th);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
@@ -152,7 +148,7 @@ new_sock (char *sock_name)
 	Sock_List *s;
 	hnode_t *sn;
 
-	strcpy (segv_location, "Sock_List");
+	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "New Socket: %s", sock_name);
 	s = smalloc (sizeof (Sock_List));
 	if (!sock_name)
@@ -172,7 +168,6 @@ Sock_List *
 findsock (char *sock_name)
 {
 	hnode_t *sn;
-	strcpy (segv_location, "findsock");
 	sn = hash_lookup (sockh, sock_name);
 	if (sn)
 		return hnode_get (sn);
@@ -184,7 +179,7 @@ add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int
 {
 	Sock_List *Sockets_mod_list;
 
-	strcpy (segv_location, "add_Socket");
+	SET_SEGV_LOCATION();
 	if (readfunc) {
 		if (dlsym ((int *) get_dl_handle (mod_name), readfunc) == NULL) {
 			nlog (LOG_WARNING, LOG_CORE, "oh oh, the Read socket function doesn't exist = %s (%s)", readfunc, mod_name);
@@ -218,8 +213,7 @@ del_socket (char *sock_name)
 {
 	Sock_List *list;
 	hnode_t *sn;
-	strcpy (segv_location, "del_mod_timer");
-
+	SET_SEGV_LOCATION();
 	sn = hash_lookup (sockh, sock_name);
 	if (sn) {
 		list = hnode_get (sn);
@@ -240,7 +234,7 @@ list_sockets (User * u)
 	hscan_t ss;
 	hnode_t *sn;
 
-	strcpy (segv_location, "list_sockets");
+	SET_SEGV_LOCATION();
 	prefmsg (u->nick, s_Services, "Sockets List: (%d)", hash_count (sockh));
 	hash_scan_begin (&ss, sockh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
@@ -365,7 +359,7 @@ new_bot (char *bot_name)
 {
 	Mod_User *u;
 	hnode_t *bn;
-	strcpy (segv_location, "Mod_User");
+	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "New Bot: %s", bot_name);
 	u = malloc (sizeof (Mod_User));
 	if (!bot_name)
@@ -389,9 +383,7 @@ add_mod_user (char *nick, char *mod_name)
 	Module *list_ptr;
 	hnode_t *mn;
 
-	strcpy (segv_location, "add_mod_user");
-
-
+	SET_SEGV_LOCATION();
 	Mod_Usr_list = new_bot (nick);
 	/* add a brand new user */
 	strncpy (Mod_Usr_list->nick, nick, MAXNICK);
@@ -414,7 +406,7 @@ findbot (char *bot_name)
 {
 	hnode_t *bn;
 
-	strcpy (segv_location, "findbot");
+	SET_SEGV_LOCATION();
 	bn = hash_lookup (bh, bot_name);
 	if (bn) {
 		return (Mod_User *) hnode_get (bn);
@@ -428,8 +420,7 @@ del_mod_user (char *bot_name)
 	Mod_User *list;
 	hnode_t *bn;
 
-	strcpy (segv_location, "del_mod_user");
-
+	SET_SEGV_LOCATION();
 	bn = hash_lookup (bh, bot_name);
 	if (bn) {
 		hash_delete (bh, bn);
@@ -451,8 +442,7 @@ bot_nick_change (char *oldnick, char *newnick)
 	User *u;
 	Mod_User *mod_tmp, *mod_ptr;
 
-	strcpy (segv_location, "bot_nick_change");
-
+	SET_SEGV_LOCATION();
 	/* First, try to find out if the newnick is unique! */
 	u = finduser (oldnick);
 	if (!u) {
@@ -491,8 +481,7 @@ list_module_bots (User * u)
 	Mod_User *mod_ptr;
 	hnode_t *bn;
 	hscan_t bs;
-	strcpy (segv_location, "list_module_bots");
-
+	SET_SEGV_LOCATION();
 	prefmsg (u->nick, s_Services, "Module Bot List:");
 	hash_scan_begin (&bs, bh);
 	while ((bn = hash_scan_next (&bs)) != NULL) {
@@ -534,7 +523,7 @@ load_module (char *path1, User * u)
 	int (*doinit) (int modnum, int apiver);
 
 
-	strcpy (segv_location, "load_module");
+	SET_SEGV_LOCATION();
 	if (u == NULL) {
 		do_msg = 0;
 	} else {
@@ -644,13 +633,13 @@ load_module (char *path1, User * u)
 
 	doinit = dlsym ((int *) dl_handle, "__ModInit");
 	if (doinit) {
-		strcpy (segv_location, mod_ptr->info->module_name);
+		SET_SEGV_LOCATION();
 		strcpy (segvinmodule, mod_ptr->info->module_name);
 		if ((*doinit) (i, API_VER) < 1) {
 			unload_module(ModNum[i].mod->info->module_name, NULL);
 			return -1;
 		}
-		strcpy (segv_location, "AfterModInitOnline");
+		SET_SEGV_LOCATION();
 		strcpy (segvinmodule, "");
 
 	}
@@ -663,10 +652,10 @@ load_module (char *path1, User * u)
 		while (event_fn_ptr->cmd_name != NULL) {
 			if (!strcasecmp (event_fn_ptr->cmd_name, "ONLINE")) {
 				AddStringToList (&av, me.s->name, &ac);
-				strcpy (segv_location, mod_ptr->info->module_name);
+				SET_SEGV_LOCATION();
 				strcpy (segvinmodule, mod_ptr->info->module_name);
 				event_fn_ptr->function (av, ac);
-				strcpy (segv_location, "AfterDLLoadOnline");
+				SET_SEGV_LOCATION();
 				strcpy (segvinmodule, "");
 				free (av);
 				break;
@@ -687,9 +676,6 @@ get_dl_handle (char *mod_name)
 {
 	Module *list_ptr;
 	hnode_t *mn;
-	strcpy (segv_location, "get_dl_handle");
-
-
 	mn = hash_lookup (mh, mod_name);
 	if (mn) {
 		list_ptr = hnode_get (mn);
@@ -721,7 +707,7 @@ list_module (User * u)
 	hnode_t *mn;
 	hscan_t hs;
 
-	strcpy (segv_location, "list_module");
+	SET_SEGV_LOCATION();
 	hash_scan_begin (&hs, mh);
 	while ((mn = hash_scan_next (&hs)) != NULL) {
 		mod_ptr = hnode_get (mn);
@@ -745,7 +731,7 @@ unload_module (char *module_name, User * u)
 	void (*dofini) ();
 
 
-	strcpy (segv_location, "unload_module");
+	SET_SEGV_LOCATION();
 	/* Check to see if this Module has any timers registered....  */
 
 	modnode = hash_lookup (mh, module_name);

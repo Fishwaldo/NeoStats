@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.51 2003/08/18 15:20:21 fishwaldo Exp $
+** $Id: chans.c,v 1.52 2003/09/18 12:21:32 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -328,7 +328,7 @@ new_chan (char *chan)
 	Chans *c;
 	hnode_t *cn;
 
-	strcpy (segv_location, "new_chan");
+	SET_SEGV_LOCATION();
 	c = smalloc (sizeof (Chans));
 	strncpy (c->name, chan, CHANLEN);
 	cn = hnode_create (c);
@@ -355,7 +355,7 @@ del_chan (Chans * c)
 	hnode_t *cn;
 	lnode_t *cm;
 
-	strcpy (segv_location, "del_chan");
+	SET_SEGV_LOCATION();
 	cn = hash_lookup (ch, c->name);
 	if (!cn) {
 		nlog (LOG_WARNING, LOG_CORE, "Hu, Deleting a Non Existand Channel?");
@@ -394,7 +394,7 @@ kick_chan (User * u, char *chan, User * k)
 	Chans *c;
 	Chanmem *cm;
 	lnode_t *un;
-	strcpy (segv_location, "part_chan");
+	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "%s Kicking %s from %s", k->nick, u->nick, chan);
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "Ehh, KIcking a Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
@@ -483,7 +483,7 @@ part_chan (User * u, char *chan)
 	char **av;
 	Chanmem *cm;
 	int ac = 0;
-	strcpy (segv_location, "part_chan");
+	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "Parting %s from %s", u->nick, chan);
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "Ehh, Parting a Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
@@ -569,7 +569,7 @@ change_user_nick (Chans * c, char *newnick, char *oldnick)
 {
 	lnode_t *cm;
 	Chanmem *cml;
-	strcpy (segv_location, "change_user_nick");
+	SET_SEGV_LOCATION();
 	cm = list_find (c->chanmembers, oldnick, comparef);
 	if (!cm) {
 		nlog (LOG_WARNING, LOG_CORE, "change_user_nick() %s isn't a member of %s", oldnick, c->name);
@@ -609,7 +609,7 @@ join_chan (User * u, char *chan)
 	Chanmem *cm;
 	char **av;
 	int ac = 0;
-	strcpy (segv_location, "join_chan");
+	SET_SEGV_LOCATION();
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "ehhh, Joining a Unknown user to %s: %s", chan, recbuf);
 		return;
@@ -704,7 +704,7 @@ chandump (char *chan)
 	int j = 0;
 	ModesParm *m;
 
-	strcpy (segv_location, "chandump");
+	SET_SEGV_LOCATION();
 	if (!chan) {
 		sendcoders ("Channels %d", hash_count (ch));
 		hash_scan_begin (&sc, ch);
@@ -807,7 +807,7 @@ findchan (char *chan)
 {
 	Chans *c;
 	hnode_t *cn;
-	strcpy (segv_location, "findchan");
+	SET_SEGV_LOCATION();
 	cn = hash_lookup (ch, chan);
 	if (cn) {
 		c = hnode_get (cn);

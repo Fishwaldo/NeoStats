@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.c,v 1.12 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: log.c,v 1.13 2003/09/18 12:21:32 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -58,6 +58,7 @@ void *close_logs ();
 void
 init_logs ()
 {
+	SET_SEGV_LOCATION();
 	logs = hash_create (-1, 0, 0);
 	if (!logs) {
 		printf ("ERROR: Can't Initilize Log SubSystem. Exiting!");
@@ -77,6 +78,7 @@ close_logs ()
 	hnode_t *hn;
 	struct logs_ *logentry;
 
+	SET_SEGV_LOCATION();
 	hash_scan_begin (&hs, logs);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
 		logentry = hnode_get (hn);
@@ -170,7 +172,7 @@ ResetLogs ()
 	struct logs_ *logentry;
 
 
-	strcpy (segv_location, "ResetLogs");
+	SET_SEGV_LOCATION();
 	hash_scan_begin (&hs, logs);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
 		logentry = hnode_get (hn);

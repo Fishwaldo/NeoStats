@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.140 2003/09/17 14:57:29 fishwaldo Exp $
+** $Id: ircd.c,v 1.141 2003/09/18 12:21:32 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -46,7 +46,7 @@ init_bot (char *nick, char *user, char *host, char *rname, char *modes, char *mo
 	char tmpmode;
 
 
-	strcpy (segv_location, "init_bot");
+	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (u) {
 		nlog (LOG_WARNING, LOG_CORE, "Attempting to Login with a Nickname that already Exists: %s", nick);
@@ -94,7 +94,7 @@ int
 del_bot (char *nick, char *reason)
 {
 	User *u;
-	strcpy (segv_location, "del_bot");
+	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	nlog (LOG_DEBUG1, LOG_CORE, "Killing %s for %s", nick, reason);
 	if (!u) {
@@ -117,7 +117,7 @@ Module_Event (char *event, char **av, int ac)
 	hscan_t ms;
 	hnode_t *mn;
 
-	strcpy (segv_location, "Module_Event");
+	SET_SEGV_LOCATION();
 	hash_scan_begin (&ms, mh);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
@@ -127,7 +127,7 @@ Module_Event (char *event, char **av, int ac)
 				/* This goes through each Command */
 				if (!strcasecmp (ev_list->cmd_name, event)) {
 					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Comamnd %s -> %s", module_ptr->info->module_name, event, ev_list->cmd_name);
-					strcpy (segv_location, module_ptr->info->module_name);
+					SET_SEGV_LOCATION();
 					strcpy (segvinmodule, module_ptr->info->module_name);
 					if (setjmp (sigvbuf) == 0) {
 						if (ev_list->function) ev_list->function (av, ac);
@@ -135,7 +135,7 @@ Module_Event (char *event, char **av, int ac)
 						nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
 					}
 					strcpy (segvinmodule, "");
-					strcpy (segv_location, "Module_Event_Return");
+					SET_SEGV_LOCATION();
 #ifndef VALGRIND
 					break;
 #endif
@@ -169,6 +169,7 @@ split_buf (char *buf, char ***argv, int colon_special)
 	int flag = 0;
 	int colcount = 0;
 
+	SET_SEGV_LOCATION();
 	*argv = calloc (sizeof (char *) * argvsize, 1);
 	argc = 0;
 	if (*buf == ':')
@@ -230,8 +231,7 @@ parse (char *line)
 	hscan_t ms;
 	hnode_t *mn;
 
-	strcpy (segv_location, "parse");
-
+	SET_SEGV_LOCATION();
 	strip (line);
 	strncpy (recbuf, line, BUFSIZE);
 	if (!(*line))
@@ -284,9 +284,9 @@ parse (char *line)
 				return;
 			}
 			/* its to the Internal Services Bot */
-			strcpy (segv_location, "servicesbot");
+			SET_SEGV_LOCATION();
 			servicesbot (origin, av, ac);
-			strcpy (segv_location, "ServicesBot_return");
+			SET_SEGV_LOCATION();
 			free (av);
 			return;
 		} else {
@@ -307,13 +307,13 @@ parse (char *line)
 					return;
 				}
 
-				strcpy (segv_location, list->modname);
+				SET_SEGV_LOCATION();
 				strcpy (segvinmodule, list->modname);
 				if (setjmp (sigvbuf) == 0) {
 					list->function (origin, av, ac);
 				}
 				strcpy (segvinmodule, "");
-				strcpy (segv_location, "Return from Module Message");
+				SET_SEGV_LOCATION();
 				free (av);
 				return;
 			} else {
@@ -325,11 +325,10 @@ parse (char *line)
 	}
 
 	/* now, Parse the Command to the Internal Functions... */
-	strcpy (segv_location, "Parse - Internal Functions");
+	SET_SEGV_LOCATION();
 	for (I = 0; I < ircd_srv.cmdcount; I++) {
 		if (!strcmp (cmd_list[I].name, cmd)) {
 			if (cmd_list[I].srvmsg == cmdptr) {
-				strcpy (segv_location, cmd_list[I].name);
 				cmd_list[I].function (origin, av, ac);
 				cmd_list[I].usage++;
 				break;
@@ -337,7 +336,7 @@ parse (char *line)
 		}
 	}
 	/* K, now Parse it to the Module functions */
-	strcpy (segv_location, "Parse - Module Functions");
+	SET_SEGV_LOCATION();
 	hash_scan_begin (&ms, mh);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
@@ -347,13 +346,13 @@ parse (char *line)
 			if (!strcmp (fn_list->cmd_name, cmd)) {
 				if (fn_list->srvmsg == cmdptr) {
 					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
-					strcpy (segv_location, module_ptr->info->module_name);
+					SET_SEGV_LOCATION();
 					strcpy (segvinmodule, module_ptr->info->module_name);
 					if (setjmp (sigvbuf) == 0) {
 						fn_list->function (origin, av, ac);
 					}
 					strcpy (segvinmodule, "");
-					strcpy (segv_location, "Parse_Return_Module");
+					SET_SEGV_LOCATION();
 					break;
 				}
 			}
@@ -380,7 +379,7 @@ init_ServBot ()
 	char rname[63];
 	char **av;
 	int ac = 0;
-	strcpy (segv_location, "init_ServBot");
+	SET_SEGV_LOCATION();
 	if (finduser (s_Services))
 		/* nick already exists on the network */
 		snprintf (s_Services, MAXNICK, "NeoStats1");
@@ -450,7 +449,7 @@ ShowMOTD (char *nick)
 {
 	FILE *fp;
 	char buf[BUFSIZE];
-
+	SET_SEGV_LOCATION();
 	snumeric_cmd (375, nick, ":- %s Message of the Day -", me.name);
 	snumeric_cmd (372, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
 	snumeric_cmd (372, nick, ":-");
@@ -476,6 +475,7 @@ ShowADMIN (char *nick)
 {
 	FILE *fp;
 	char buf[BUFSIZE];
+	SET_SEGV_LOCATION();
 
 	snumeric_cmd (256, nick, ":- %s NeoStats Admins -", me.name);
 	snumeric_cmd (256, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
@@ -496,6 +496,7 @@ ShowADMIN (char *nick)
 void
 Showcredits (char *nick)
 {
+	SET_SEGV_LOCATION();
 	snumeric_cmd (351, nick, ":- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, version);
 	snumeric_cmd (351, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
 	snumeric_cmd (351, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
@@ -532,6 +533,7 @@ ShowStats (char *what, User * u)
 	if (!u) {
 		return;
 	}
+	SET_SEGV_LOCATION();
 	if (!strcasecmp (what, "u")) {
 		/* server uptime - Shmad */
 		int uptime = time (NULL) - me.t_start;

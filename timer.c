@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: timer.c,v 1.26 2003/09/15 10:39:39 fishwaldo Exp $
+** $Id: timer.c,v 1.27 2003/09/18 12:21:32 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -45,7 +45,7 @@ chk ()
 /* First, lets see if any modules have a function that is due to run..... */
 	hash_scan_begin (&ts, th);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
-		strcpy (segv_location, "chk");
+		SET_SEGV_LOCATION();
 		mod_ptr = hnode_get (tn);
 		if (current - mod_ptr->lastrun > mod_ptr->interval) {
 			strcpy (segv_location, mod_ptr->modname);
@@ -65,7 +65,7 @@ chk ()
 			strcpy (segvinmodule, "");
 		}
 	}
-
+	SET_SEGV_LOCATION();
 	if (current - ping.last_sent > me.pingtime) {
 		TimerPings ();
 		flush_keeper();

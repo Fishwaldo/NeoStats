@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.61 2003/09/09 11:38:56 fishwaldo Exp $
+** $Id: users.c,v 1.62 2003/09/18 12:21:32 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -55,7 +55,7 @@ new_user (const char *nick)
 	User *u;
 	hnode_t *un;
 
-	strcpy (segv_location, "new_user");
+	SET_SEGV_LOCATION();
 	u = smalloc (sizeof (User));
 	if (!nick)
 		nick = "";
@@ -76,7 +76,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *serve
 	int i;
 
 	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): %s (%s@%s)(%lu) -> %s at %lu", nick, user, host, htonl (ipaddr), server, TS);
-	strcpy (segv_location, "AddUser");
+	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (u) {
 		nlog (LOG_WARNING, LOG_CORE, "trying to add a user that already exists? (%s)", nick);
@@ -154,7 +154,7 @@ doDelUser (const char *nick, int i)
 	char **av;
 	int ac = 0;
 
-	strcpy (segv_location, "DelUser");
+	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "DelUser(%s)", nick);
 
 	un = hash_lookup (uh, nick);
@@ -218,7 +218,7 @@ Change_User (User * u, const char *newnick)
 	int ac = 0;
 	char *oldnick;
 
-	strcpy (segv_location, "Change_User");
+	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "Change_User(%s, %s)", u->nick, newnick);
 	un = hash_lookup (uh, u->nick);
 	if (!un) {
@@ -230,7 +230,7 @@ Change_User (User * u, const char *newnick)
 		change_user_nick (findchan (lnode_get (cm)), (char *) newnick, u->nick);
 		cm = list_next (u->chans, cm);
 	}
-	strcpy (segv_location, "Change_User_Return");
+	SET_SEGV_LOCATION();
 	hash_delete (uh, un);
 	oldnick = malloc (MAXNICK);
 	strncpy (oldnick, u->nick, MAXNICK);
@@ -249,7 +249,7 @@ sendcoders (char *message, ...)
 {
 	va_list ap;
 	char tmp[512];
-	strcpy (segv_location, "sendcoders");
+	SET_SEGV_LOCATION();
 	va_start (ap, message);
 	vsnprintf (tmp, 512, message, ap);
 #ifndef DEBUG
@@ -265,7 +265,6 @@ finduser (const char *nick)
 {
 	User *u;
 	hnode_t *un;
-	strcpy (segv_location, "finduser");
 	un = hash_lookup (uh, nick);
 	if (un != NULL) {
 		u = hnode_get (un);
@@ -292,7 +291,7 @@ UserDump (char *nick)
 	hnode_t *un;
 	lnode_t *cm;
 	hscan_t us;
-	strcpy (segv_location, "UserDump");
+	SET_SEGV_LOCATION();
 	if (!nick) {
 		sendcoders ("Users======================");
 		hash_scan_begin (&us, uh);
@@ -329,7 +328,7 @@ UserLevel (User * u)
 	int (*getauth) (User *, int curlvl);
 #endif
 
-	strcpy (segv_location, "UserLevel");
+	
 	for (i = 0; i < ((sizeof (usr_mds) / sizeof (usr_mds[0])) - 1); i++) {
 		if (u->Umode & usr_mds[i].umodes) {
 			if (usr_mds[i].level > tmplvl)
@@ -391,7 +390,7 @@ UserMode (const char *nick, const char *modes, int smode)
 	char **av;
 	int ac = 0;
 
-	strcpy (segv_location, "UserMode");
+	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, Changing Modes for a Unknown User %s!", nick);

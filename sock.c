@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.41 2003/09/17 14:49:55 fishwaldo Exp $
+** $Id: sock.c,v 1.42 2003/09/18 12:21:32 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -103,10 +103,10 @@ read_loop ()
 	TimeOut = malloc (sizeof (struct timeval));
 
 	while (1) {
-		strcpy (segv_location, "Read_Loop");
+		SET_SEGV_LOCATION();
 		memset (buf, '\0', BUFSIZE);
 		chk ();
-		strcpy (segv_location, "Read_Loop2");
+		SET_SEGV_LOCATION();
 		FD_ZERO (&readfds);
 		FD_ZERO (&writefds);
 		FD_ZERO (&errfds);

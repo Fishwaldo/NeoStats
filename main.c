@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.102 2003/09/17 14:57:29 fishwaldo Exp $
+** $Id: main.c,v 1.103 2003/09/18 12:21:32 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -107,7 +107,7 @@ main (int argc, char *argv[])
 	init_logs ();
 
 	/* our crash trace variables */
-	strcpy (segv_location, "main");
+	SET_SEGV_LOCATION();
 	strcpy (segvinmodule, "");
 	/* for modules, let them know we are not ready */
 	me.onchan = 0;
@@ -479,9 +479,7 @@ start ()
 	hscan_t ms;
 	hnode_t *mn;
 
-	strcpy (segv_location, "start");
-
-
+	SET_SEGV_LOCATION();
 	nlog (LOG_NOTICE, LOG_CORE, "Connecting to %s:%d", me.uplink, me.port);
 	if (servsock > 0)
 		close (servsock);
@@ -519,7 +517,7 @@ start ()
 void
 login ()
 {
-	strcpy (segv_location, "login");
+	SET_SEGV_LOCATION();
 	slogin_cmd (me.name, 1, me.infoline, me.pass);
 	sprotocol_cmd ("TOKEN CLIENT");
 }
@@ -541,7 +539,6 @@ smalloc (long size)
 {
 	void *buf;
 
-	strcpy (segv_location, "smalloc");
 	if (!size) {
 		nlog (LOG_WARNING, LOG_CORE, "smalloc(): illegal attempt to allocate 0 bytes!");
 		size = 1;
