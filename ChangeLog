@@ -9,6 +9,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Some of statserv stats were never displayed, fixed that
  - Fix a adns compile error and remove the warnings
  - -Wall is only set when compiling with debug mode support. No need for the make.log file anymore
+ - ./configure --enable-bignet support for more than 2000 users
 
 * NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 2 
  - Misc. Updates (S)

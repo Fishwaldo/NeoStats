@@ -14,9 +14,15 @@ Core:
 	to Ensure that people read their config file before running!
 	UltimateIRCD Version 3.0.0.a26 (Current at release time) is the only 
 	version of Ultimate thats supported)
+
 	If you use the Raw command (Bad IRCOP, Bad!) then you have to 
 	explicitly enable it via the configure interface
 	recv.log is no longer enabled on production builds. No more eating up 
 	Disk Space!
+
+	If you are on a large network (usercount goes over 2000 users)
+	then you should configure with --enable-bignet (this
+	brings the limit upto 4000 users, if you need more contact us on 
+	the boards).
 
 Read the ChangeLog for a complete description of what has changed

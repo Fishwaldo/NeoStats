@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.62 2002/10/24 14:32:48 fishwaldo Exp $
+** $Id: stats.h,v 1.63 2002/12/14 10:23:28 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -78,6 +78,20 @@
 #define MAXNICK			32
 #define MAXUSER			10
 #define NUM_MODULES		255
+
+
+#ifdef BIGNET
+#define S_TABLE_SIZE	200
+#define U_TABLE_SIZE	3999
+#define D_TABLE_SIZE	3999
+#define C_TABLE_SIZE	3999
+#define CHAN_MEM_SIZE	3000
+#define MAXJOINCHANS	3000
+#define T_TABLE_SIZE	300 /* Number of Timers */
+#define B_TABLE_SIZE	100 /* Number of Bots */
+#define MAXMODES	CHAN_MEM_SIZE
+#define DNS_QUEUE_SIZE  100 /* number on concurrent DNS lookups */
+#else
 #define S_TABLE_SIZE	97
 #define U_TABLE_SIZE	1999
 #define D_TABLE_SIZE	1999
@@ -88,7 +102,7 @@
 #define B_TABLE_SIZE	100 /* Number of Bots */
 #define MAXMODES	CHAN_MEM_SIZE
 #define DNS_QUEUE_SIZE  100 /* number on concurrent DNS lookups */
-
+#endif
 
 #define bzero(x, y)		memset(x, '\0', y);
 #define is_synced	me.synced
