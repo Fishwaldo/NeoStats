@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.34 2003/01/24 17:08:20 fishwaldo Exp $
+** $Id: hostserv.c,v 1.35 2003/01/27 02:33:59 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -115,25 +115,25 @@ void hs_cb_Config(char *arg, int configtype) {
 	if (configtype == 0) {
 		/* View */
 		lvl = atoi(arg);
-		if (lvl > 200)
+		if ((lvl > 200) || (lvl <= 0))
 			return;
 		hs_lvl.view = lvl;
 	} else if (configtype == 1) {
 		/* Add */
 		lvl = atoi(arg);
-		if (lvl > 200)
+		if ((lvl > 200) || (lvl <= 0))
 			return;
 		hs_lvl.add = lvl;
 	} else if (configtype == 2) {
 		/* del */
 		lvl = atoi(arg);
-		if (lvl > 200)
+		if ((lvl > 200) || (lvl <= 0))
 			return;
 		hs_lvl.del = lvl;
 	} else if (configtype == 3) {
 		/* list */
 		lvl = atoi(arg);
-		if (lvl > 200)
+		if ((lvl > 200) || (lvl <= 0))
 			return;
 		hs_lvl.list = lvl;
 	} else if (configtype == 4) {
@@ -299,6 +299,7 @@ int Online(char **av, int ac) {
         s_HostServ = strcat(s_HostServ, "_");
         init_bot(s_HostServ,"HostServ",me.name,"Network User Virtual Host Service", "+oikSwgleq-x", HostServ_info[0].module_name);
     }
+    chanalert(s_HostServ, "Configured Levels: Add: %d, Del: %d, List: %d, View: %d", hs_lvl.add, hs_lvl.del, hs_lvl.list, hs_lvl.view);
     return 1;
 };
 
