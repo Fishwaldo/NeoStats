@@ -34,7 +34,7 @@ static int ea_cmd_access( CmdParams* cmdparams );
 typedef struct AccessEntry
 {
 	char nick[MAXNICK];
-	char mask[MAXHOST];
+	char mask[USERHOSTLEN];
 	int level;
 }AccessEntry;
 
@@ -158,7 +158,7 @@ static int AccessAdd( CmdParams* cmdparams )
 	}
 	access = ns_calloc( sizeof( AccessEntry) );
 	strlcpy( access->nick, cmdparams->av[1], MAXNICK );
-	strlcpy( access->mask, cmdparams->av[2], MAXHOST );
+	strlcpy( access->mask, cmdparams->av[2], USERHOSTLEN );
 	access->level = level;
  	hnode_create_insert( accesshash, access, access->nick );
 	/* save the entry */
@@ -314,14 +314,14 @@ int ModFini( void)
 
 int ModAuthUser( Client *u )
 {
-	static char hostmask[MAXHOST];
+	static char hostmask[USERHOSTLEN];
 	AccessEntry *access;
 
 	dlog( DEBUG2, "ModAuthUser for %s", u->name );
 	access =( AccessEntry *)hnode_find( accesshash, u->name );
 	if( access) 
 	{
-		ircsnprintf( hostmask, MAXHOST, "%s@%s", u->user->username, u->user->hostname );
+		ircsnprintf( hostmask, USERHOSTLEN, "%s@%s", u->user->username, u->user->hostname );
 		if( match( access->mask, hostmask ) ) 
 		{
 			return access->level;		

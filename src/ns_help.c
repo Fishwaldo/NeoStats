@@ -71,7 +71,7 @@ const char *ns_help_jupe[] = {
 };
 
 const char *ns_help_exclude[] = {
-	"Syntax: \2EXCLUDE ADD <HOST|SERVER|CHANNEL> <pattern> <reason>\2",
+	"Syntax: \2EXCLUDE ADD <HOST|SERVER|CHANNEL|USERHOST> <pattern> <reason>\2",
 	"        \2EXCLUDE DEL <pattern>\2",
 	"        \2EXCLUDE LIST\2",
 	"",
@@ -79,8 +79,8 @@ const char *ns_help_exclude[] = {
 	"users and servers from certain scans and events.",
 	"",
 	"\2ADD\2 Add a new exclusion to the list of the requested type.",
-	"<pattern> is the host, server or channel name and may include",
-	"wildcards such as * and ?.",
+	"<pattern> is the userhost mask, host, server or channel name and",
+	"may include wildcards such as * and ?.",
 	"<reason> is the reason for the exclusion",
 	"",
 	"\2DEL\2 Delete an entry from the exclusion list.",

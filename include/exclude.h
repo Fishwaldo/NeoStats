@@ -26,7 +26,7 @@
 
 typedef struct Exclude {
 	NS_EXCLUDE type;
-	char pattern[MAXHOST];
+	char pattern[USERHOSTLEN];
 	char addedby[MAXNICK];
 	char reason[MAXREASON];
 	time_t addedon;

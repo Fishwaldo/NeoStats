@@ -49,6 +49,7 @@ const char* ExcludeDesc[NS_EXCLUDE_MAX] = {
 	"Host",
 	"Server",
 	"Channel",
+	"Userhost"
 };
 
 bot_cmd mod_exclude_commands[]=
@@ -152,6 +153,12 @@ static int do_exclude_add(list_t *elist, CmdParams* cmdparams)
 			return NS_SUCCESS;
 		}
 		type = NS_EXCLUDE_SERVER;
+	} else if (!ircstrcasecmp("USERHOST", cmdparams->av[1])) {
+		if (!index(cmdparams->av[2], '!') || !index(cmdparams->av[2], '@')) {
+			irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid userhost mask");
+			return NS_SUCCESS;
+		}
+		type = NS_EXCLUDE_USERHOST;
 	} else {
 		irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid exclude type");
 		return NS_SUCCESS;
@@ -315,8 +322,16 @@ void ns_do_exclude_user(Client *u)
 	en = list_first(exclude_list);
 	while (en != NULL) {
 		e = lnode_get(en);
-		if (e->type == NS_EXCLUDE_HOST) {
+		if (e->type == NS_EXCLUDE_HOST) 
+		{
 			if (match(e->pattern, u->user->hostname)) {
+				u->flags |= NS_FLAG_EXCLUDED;
+				return;
+			}
+		}
+		else if (e->type == NS_EXCLUDE_USERHOST) 
+		{
+			if (match(e->pattern, u->user->userhostmask)) {
 				u->flags |= NS_FLAG_EXCLUDED;
 				return;
 			}
