@@ -68,7 +68,7 @@ static void Srv_Tburst (char *origin, char **argv, int argc);
 static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(H)";
-const char services_bot_modes[]= "+oS";
+const char services_bot_modes[]= "+o";
 
 /* this is the command list and associated functions to run */
 IntCommands cmd_list[] = {
