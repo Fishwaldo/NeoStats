@@ -55,6 +55,7 @@ static char logname[MAXPATH];
 struct logs_ {
 	FILE *logfile;
 	char name[MAX_MOD_NAME];
+	char logname[MAXPATH];
 	unsigned int flush;
 } logs_;
 
@@ -99,6 +100,13 @@ close_logs ()
 	}
 }
 
+void make_log_filename(char* modname, char *logname)
+{
+	time_t t = time(NULL);
+	strftime (log_fmttime, TIMEBUFSIZE, LogFileNameFormat, localtime (&t));
+	ircsnprintf (logname, MAXPATH, "logs/%s%s.log", modname, log_fmttime);
+}
+
 /** @Configurable logging function
  */
 void
@@ -123,6 +131,8 @@ nlog (int level, int scope, char *fmt, ...)
 		if (hn) {
 			/* we found our log entry */
 			logentry = hnode_get (hn);
+			if(!logentry->logfile)
+				logentry->logfile = fopen (logentry->logname, "a");
 		} else {
 			/* log file not found */
 			if (segvinmodule[0] == 0 && (scope > 0)) {
@@ -134,8 +144,8 @@ nlog (int level, int scope, char *fmt, ...)
 			}
 			logentry = malloc (sizeof (struct logs_));
 			strlcpy (logentry->name, scope > 0 ? segvinmodule : CoreLogFileName, MAX_MOD_NAME);
-			ircsnprintf (logname, MAXPATH, "logs/%s.log", logentry->name);
-			logentry->logfile = fopen (logname, "a");
+			make_log_filename(logentry->name, logentry->logname);
+			logentry->logfile = fopen (logentry->logname, "a");
 			logentry->flush = 0;
 			hn = hnode_create (logentry);
 			hash_insert (logs, hn, logentry->name);
@@ -168,7 +178,6 @@ nlog (int level, int scope, char *fmt, ...)
 void
 reset_logs ()
 {
-	time_t t = me.now;
 	hscan_t hs;
 	hnode_t *hn;
 	struct logs_ *logentry;
@@ -177,21 +186,20 @@ reset_logs ()
 	hash_scan_begin (&hs, logs);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
 		logentry = hnode_get (hn);
-		if (logentry->flush > 0) {
-			fflush (logentry->logfile);
-			logentry->flush = 0;
-#ifdef DEBUG
-			printf ("Closing Logfile %s (%s)\n", logentry->name, (char *) hnode_getkey (hn));
-#endif
-			fclose (logentry->logfile);
-			
-			/* rename log file and open new file */
-			strftime (log_fmttime, TIMEBUFSIZE, LogFileNameFormat, localtime (&t));
-			ircsnprintf (oldname, MAXPATH, "logs/%s%s.log", logentry->name, log_fmttime);
-			ircsnprintf (logname, MAXPATH, "logs/%s.log", logentry->name);
-			rename (logname, oldname);
-			logentry->logfile = fopen (logname, "a");		
+		/* If file handle is vald we must have used the log */
+		if(logentry->logfile) {
+			if (logentry->flush > 0) {
+				fflush (logentry->logfile);
+			}
+			fclose (logentry->logfile);		
+			logentry->logfile = NULL;
 		}
+		logentry->flush = 0;
+#ifdef DEBUG
+		printf ("Closing Logfile %s (%s)\n", logentry->name, (char *) hnode_getkey (hn));
+#endif
+		/* make new file name but do not open until needed to avoid 0 length files*/
+		make_log_filename(logentry->name, logentry->logname);
 	}
 }
 
