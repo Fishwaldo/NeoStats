@@ -34,6 +34,8 @@
 #include "log.h"
 #include "timer.h"
 #include "dns.h"
+#include "transfer.h"
+#include "curl.h"
 
 static void recvlog (char *line);
 
@@ -111,6 +113,7 @@ read_loop ()
 	register int i, j, SelectResult;
 	struct timeval *TimeOut, tvbuf;
 	fd_set readfds, writefds, errfds;
+	int maxfdsunused;
 	char c;
 	char buf[BUFSIZE];
 	ModSock *mod_sock;
@@ -173,13 +176,22 @@ read_loop ()
 		/* adns may change this, but we tell it to go away!!! */
 		TimeOut->tv_sec = 1;
 		TimeOut->tv_usec = 0;
+
+		/* add the fds for the curl library as well */
+		/* XXX Should this be a pollsize or maxfdsunused... not sure yet */ 
+		curl_multi_fdset(curlmultihandle, &readfds, &writefds, &errfds, &pollsize);
+
 		SelectResult = select (FD_SETSIZE, &readfds, &writefds, &errfds, TimeOut);
 		me.now = time(NULL);
 		if (SelectResult > 0) {
+			/* check ADNS fds */
 			adns_afterselect (ads, me.maxsocks, &readfds, &writefds, &errfds, 0);
 
 			/* do any dns related callbacks now */
 			do_dns ();
+
+			/* check CURL fds */
+			curl_multi_perform(curlmultihandle, &maxfdsunused);
 
 			if (FD_ISSET (servsock, &readfds)) {
 				for (j = 0; j < BUFSIZE; j++) {
@@ -352,7 +364,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char
 		case EINPROGRESS:
 			break;
 		default:
-			nlog (LOG_WARNING, LOG_CORE, "Socket %s(%s) cant connect %s", sockname, module, strerror (errno), i);
+			nlog (LOG_WARNING, LOG_CORE, "Socket %s(%s) cant connect %s", sockname, module, strerror (errno));
 			close (s);
 			return NS_FAILURE;
 		}

@@ -221,6 +221,7 @@ extern hash_t *ch;
 /* this is the dns structure */
 extern adns_state ads;
 
+
 /* version info */
 extern const char version_date[], version_time[];
 

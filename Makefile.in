@@ -8,11 +8,11 @@ PCRE_OBJS = pcre/pcre.o pcre/get.o pcre/study.o
 CURL_LDFLAGS = `curl/mycurl-config --libs`
 OBJS =	dns.o chans.o dotconf.o services.o main.o sock.o conf.o ircd.o timer.o \
 		 users.o ns_help.o dl.o list.o hash.o server.o keeper.o log.o misc.o \
-		 support.o ircstring.o commands.o \
+		 support.o ircstring.o commands.o transfer.o\
 		 @IRCD_FILES_OBJS@
 SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
 		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
-		support.c ircstring.c commands.c \
+		support.c ircstring.c commands.c transfer.c\
 		@IRCD_FILES_SRC@
 
 PROGS = neostats cronchk makeconf
@@ -25,7 +25,7 @@ INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h Unreal.h \
 		adns/adns.h hybrid7.h neoircd.h conf.h log.h Bahamut.h \
 		Ircu.h mystic.h QuantumIRCd.h sock.h ircd.h \
 		support.h ircstring.h events.h liquidircd.h numeric.h pcre.h \
-		dns.h services.h
+		dns.h services.h transfer.h
 BUILDFILES = configure *.in adns/Makefile adns/config.h.in dl/Makefile \
 		dl/modules.txt RELNOTES install-sh neoircd.c neoircd.h \
 		hybrid7.c hybrid7.h Ultimate.c Ultimate.h Unreal.c Unreal.h \

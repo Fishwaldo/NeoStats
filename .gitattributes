@@ -329,5 +329,7 @@ tools/kp_exp.c -text
 tools/kp_imp.c -text
 tools/kptool.c -text
 tools/kptool.h -text
+/transfer.c -text
+/transfer.h -text
 /users.c eol=lf
 /users.h eol=lf

@@ -41,7 +41,7 @@
 #include "server.h"
 #include "chans.h"
 #include "dns.h"
-
+#include "transfer.h"
 /* this is the name of the services bot */
 char s_Services[MAXNICK] = "NeoStats";
 /*! Date when we were compiled */
@@ -124,6 +124,7 @@ main (int argc, char *argv[])
 	if (config.recvlog)
 		remove (RECV_LOG);
 
+		
 	/* initilze our Module subsystem */
 	if(InitModuleHash () != NS_SUCCESS)
 		return EXIT_FAILURE;
@@ -159,6 +160,9 @@ main (int argc, char *argv[])
 	if(init_user_hash () != NS_SUCCESS)
 		return EXIT_FAILURE;
 	if(init_chan_hash () != NS_SUCCESS)
+		return EXIT_FAILURE;
+	/* initilize out transfer subsystem */
+	if (init_curl () != NS_SUCCESS)
 		return EXIT_FAILURE;
 	init_ircd ();
 
