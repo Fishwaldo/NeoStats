@@ -25,7 +25,9 @@
 #include "rta.h"
 #include "rtaserv.h"
 #include <fcntl.h>
-
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
 void rta_exit(void);
 
 static int rta_active = 0;
@@ -41,6 +43,7 @@ typedef struct Sql_Conn {
 	int responsefree;
 	int cmdpos;
 	int cmd[1000];
+	Sock *sock;
 } Sql_Conn;
 
 OS_SOCKET sqlListenSock = -1;
@@ -51,7 +54,7 @@ char rtapass[MAXPASS];
 char rtahost[MAXHOST];
 int rtaport;
 
-static void sql_accept_conn(OS_SOCKET srvfd);
+static int sql_accept_conn(int, void *);
 static OS_SOCKET sqllisten_on_port(int port);
 static int sql_handle_ui_request(lnode_t *sqlnode);
 static int sql_handle_ui_output(lnode_t *sqlnode);
@@ -85,8 +88,8 @@ int InitRTAServ (void)
 
 	/* init the sql Listen Socket now as well */
 	sqlconnections = list_create(MAXSQLCON);
-	sqlListenSock = sqllisten_on_port(rtaport);
-	if (sqlListenSock == -1) {
+	
+	if (add_listen_sock("RTAServ", rtaport, SOCK_STREAM, sql_accept_conn, NULL) == NULL) {
 		nlog(LOG_CRITICAL, "Failed to Setup Sql Port. SQL not available");
 		return NS_FAILURE;
 	}
@@ -234,8 +237,13 @@ sqllisten_on_port(int port)
  * Output:       none
  * Effects:      manager connection table (ui)
  ***************************************************************/
-void
-sql_accept_conn(OS_SOCKET srvfd)
+#if 0
+int
+sql_accept_conn(OS_SOCKET srvfd, void *data)
+#endif
+int
+sql_accept_conn(int srvfd, void *data)
+
 {
 	int      adrlen;     /* length of an inet socket address */
 	Sql_Conn *newui;
@@ -244,8 +252,8 @@ sql_accept_conn(OS_SOCKET srvfd)
 	/* if we reached our max connection, just exit */
 	if (list_count(sqlconnections) > 5) {
 		nlog(LOG_NOTICE, "Can not accept new SQL connection. Full");
-		os_sock_close (srvfd);
-		return;
+		/* we return ns_success as we want to keep looking for new connections */
+		return NS_SUCCESS;
 	}
 
 	/* We have a new UI/DB/manager connection request.  So make a free
@@ -260,18 +268,17 @@ sql_accept_conn(OS_SOCKET srvfd)
 	{
 		nlog(LOG_WARNING, "rtaserv: Manager accept() error (%s).", strerror(errno));
 		ns_free(newui);
-		os_sock_close (srvfd);
-		return;
+		return NS_SUCCESS;
 	}
 	else
 	{
 		inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
 		if (!match(rtahost, tmp)) {
-    	/* we didnt get a match, bye bye */
+		    	/* we didnt get a match, bye bye */
 			nlog(LOG_NOTICE, "rtaserv: Rejecting SQL Connection from %s", tmp);
 			os_sock_close (newui->fd);
 			ns_free(newui);
-			return;
+			return NS_SUCCESS;
 		}
 		/* inc number ui, then init new ui */
 		os_sock_set_nonblocking (srvfd);
@@ -280,8 +287,11 @@ sql_accept_conn(OS_SOCKET srvfd)
 		newui->nbytein = 0;
 		newui->nbyteout = 0;
 		lnode_create_append (sqlconnections, newui);
-	    inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
+	    	inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
 		dlog(DEBUG1, "New SqlConnection from %s", tmp);
+		
+#warning add socket code here
+		return NS_SUCCESS;
 	}
 }
 
@@ -437,6 +447,7 @@ void rta_hook_1 (fd_set *read_fd_set, fd_set *write_fd_set)
 
 void rta_hook_2 (fd_set *read_fd_set, fd_set *write_fd_set)
 {
+#if 0
 	lnode_t *sqlnode;
 	Sql_Conn *sqldata;
 
@@ -464,6 +475,7 @@ restart:
 			sqlnode = list_next(sqlconnections, sqlnode);
 		}
 	}
+#endif
 }
 
 #if 0

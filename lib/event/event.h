@@ -241,6 +241,7 @@ int bufferevent_enable(struct bufferevent *bufev, short event);
 int bufferevent_disable(struct bufferevent *bufev, short event);
 void bufferevent_settimeout(struct bufferevent *bufev,
     int timeout_read, int timeout_write);
+void bufferevent_setwatermark(struct bufferevent *bufev, short events, size_t lowmark, size_t highmark);
 
 #define EVBUFFER_LENGTH(x)	(x)->off
 #define EVBUFFER_DATA(x)	(x)->buffer
@@ -259,7 +260,6 @@ int evbuffer_write(struct evbuffer *, int);
 int evbuffer_read(struct evbuffer *, int, int);
 u_char *evbuffer_find(struct evbuffer *, u_char *, size_t);
 void evbuffer_setcb(struct evbuffer *, void (*)(struct evbuffer *, size_t, size_t, void *), void *);
-
 #ifdef __cplusplus
 }
 #endif

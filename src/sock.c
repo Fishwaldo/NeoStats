@@ -456,7 +456,10 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 		}
 	}
 
+#warning TODO
+#if 0
 	add_sock (name, s, func_read, func_write, func_error);
+#endif
 	return s;
 }
 
@@ -550,7 +553,7 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 			/* firstly, if what we have read plus our existing buffer size exceeds our recvq
 			 * we should drop the connection
 			 */
-			if ((len + thisock->linemode->readbufsize) > thisock->linemode->recvq) {
+			if ((len + thisock->sfunc.linemode.readbufsize) > thisock->sfunc.linemode.recvq) {
 				nlog(LOG_ERROR, "RecvQ for %s(%s) exceeded. Dropping Connection", thisock->name, thisock->moduleptr?thisock->moduleptr->info->name:"N/A");
 				bufferevent_free(bufferevent);
 				del_sock(thisock->name);
@@ -567,31 +570,31 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 				 */
 				if ((buf[bufpos] == '\n') || (buf[bufpos] == '\r')) {
 					/* only process if we have something to do. This might be a trailing NL or CR char*/
-					if (thisock->linemode->readbufsize > 0) {
+					if (thisock->sfunc.linemode.readbufsize > 0) {
 						/* update some stats */
 						thisock->rmsgs++;
 #if 0
 						me.lastmsg = me.now;
 #endif
 						/* make sure its null terminated */
-						thisock->linemode->readbuf[thisock->linemode->readbufsize++] = '\0';
+						thisock->sfunc.linemode.readbuf[thisock->sfunc.linemode.readbufsize++] = '\0';
 						/* copy it to our recbuf for debugging */
-						strlcpy(recbuf, thisock->linemode->readbuf, BUFSIZE);
+						strlcpy(recbuf, thisock->sfunc.linemode.readbuf, BUFSIZE);
 						/* parse the buffer */
 #ifdef SOCKDEBUG
-						printf("line:|%s| %d %d\n", thisock->linemode->readbuf, thisock->linemode->readbufsize, bufpos);
+						printf("line:|%s| %d %d\n", thisock->sfunc.linemode.readbuf, thisock->sfunc.linemode.readbufsize, bufpos);
 #endif
-						thisock->linemode->funccb(thisock->linemode->readbuf);
+						thisock->sfunc.linemode.funccb(thisock->sfunc.linemode.readbuf);
 						/* ok, reset the recbuf */
-						thisock->linemode->readbufsize = 0;
+						thisock->sfunc.linemode.readbufsize = 0;
 					}
 				} else {
 					/* add it to our static buffer */
-					thisock->linemode->readbuf[thisock->linemode->readbufsize] = buf[bufpos];
-					thisock->linemode->readbufsize++;
+					thisock->sfunc.linemode.readbuf[thisock->sfunc.linemode.readbufsize] = buf[bufpos];
+					thisock->sfunc.linemode.readbufsize++;
 				}
 			}
-			thisock->linemode->readbuf[thisock->linemode->readbufsize] = '\0';
+			thisock->sfunc.linemode.readbuf[thisock->sfunc.linemode.readbufsize] = '\0';
 		}
 	}
 }
@@ -706,11 +709,10 @@ add_linemode_socket(const char *sock_name, int socknum, linemodecb readcb, evbuf
 		if (nsconfig.recvq < 1024) {
 			nsconfig.recvq = 1024;
 		}
-		sock->linemode = os_malloc(sizeof(struct linemode));
-		sock->linemode->readbuf = os_malloc(nsconfig.recvq);
-		sock->linemode->recvq = nsconfig.recvq;
-		sock->linemode->funccb = readcb;
-		sock->linemode->readbufsize = 0;
+		sock->sfunc.linemode.readbuf = os_malloc(nsconfig.recvq);
+		sock->sfunc.linemode.recvq = nsconfig.recvq;
+		sock->sfunc.linemode.funccb = readcb;
+		sock->sfunc.linemode.readbufsize = 0;
 		sock->socktype = SOCK_LINEMODE;
 		dlog(DEBUG3, "add_linemode_socket: Added a new Linemode Socket called %s (%s)", sock_name, sock->moduleptr?sock->moduleptr->info->name:"N/A");
 	}
@@ -753,6 +755,138 @@ add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuf
 	return sock;
 }
 
+void
+listen_accept_sock(int fd, short what, void *arg) {
+	Sock *sock = (Sock *)arg;
+	
+	SET_SEGV_LOCATION();
+	dlog(DEBUG1, "Got Activity on Listen Socket %d port %d (%s)", sock->sock_no, sock->sfunc.listenmode.port, sock->name);
+	if (sock->sfunc.listenmode.funccb(sock->sock_no, sock->data) == NS_SUCCESS) {
+		/* re-add this listen socket if the acceptcb succeeds */
+		event_add(sock->event.event, NULL);
+		return;
+	} else {
+		dlog(DEBUG1, "Deleting Listen Socket %d port %d (%s)", sock->sock_no, sock->sfunc.listenmode.port, sock->name);
+		event_del(sock->event.event);
+		os_sock_close (sock->sock_no);
+		del_sock(sock->name);
+	}
+}
+
+Sock *
+add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb, void *data) {
+	OS_SOCKET srvfd;      /* FD for our listen server socket */
+	struct sockaddr_in srvskt;
+	int      adrlen;
+	Sock *sock;
+	Module *moduleptr;
+	
+	SET_SEGV_LOCATION();
+	moduleptr = GET_CUR_MODULE();
+	
+	adrlen = sizeof(struct sockaddr_in);
+	(void) memset((void *) &srvskt, 0, (size_t) adrlen);
+	srvskt.sin_family = AF_INET;
+	/* bind to the local IP */
+	if (me.dobind) {
+		srvskt.sin_addr = me.lsa.sin_addr;
+	} else {
+		srvskt.sin_addr.s_addr = INADDR_ANY;
+	}
+	srvskt.sin_port = htons(port);
+	if ((srvfd = socket(AF_INET, type, 0)) < 0)
+	{
+		nlog(LOG_CRITICAL, "Unable to get socket for port %d. (%s)", port, moduleptr->info->name);
+		return NULL;
+	}
+	os_sock_set_nonblocking (srvfd);
+	if (bind(srvfd, (struct sockaddr *) &srvskt, adrlen) < 0)
+	{
+		nlog(LOG_CRITICAL, "Unable to bind to port %d (%s)", port, moduleptr->info->name);
+		return NULL;
+	}
+	if (listen(srvfd, 1) < 0)
+	{
+		nlog(LOG_CRITICAL, "Unable to listen on port %d (%s)", port, moduleptr->info->name);
+		return NULL;
+	}
+	sock = new_sock(sock_name);
+	sock->sock_no = srvfd;
+	sock->moduleptr = moduleptr;
+	sock->socktype = SOCK_LISTEN;
+	sock->data = data;
+	sock->sfunc.listenmode.port = port;
+	sock->sfunc.listenmode.funccb = acceptcb;
+	sock->event.event = os_malloc(sizeof(struct event));
+	
+	event_set(sock->event.event, sock->sock_no, EV_READ, listen_accept_sock, (void*) sock);
+	event_add(sock->event.event, NULL);
+	
+	return (sock);
+
+}
+
+void
+read_sock(int fd, short what, void *data) {
+	Sock *sock = (Sock *)data;
+	u_char *p;
+	int n;
+	size_t howmuch = READBUFSIZE;
+#ifdef WIN32
+#error Mark, you need to write the win32 support functions for reading here. if any.
+	DWORD dwBytesRead;
+#endif
+
+#ifdef FIONREAD
+	if (ioctl(sock->sock_no, FIONREAD, &howmuch) == -1)
+		howmuch = READBUFSIZE;
+#else 
+#warning FIONREAD not available
+#endif	
+	p = os_malloc(howmuch);
+
+#ifndef WIN32
+	n = read(sock->sock_no, p, howmuch);
+	if (n == -1) {
+		dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
+		sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
+		event_del(sock->event.event);
+		os_sock_close (sock->sock_no);
+		del_sock(sock->name);
+		return;
+	}
+	if (n == 0)
+		/* if we didn't read anything, just reschedule */
+		return;
+#else
+	n = ReadFile((HANDLE)sock->sock_no, p, howmuch, &dwBytesRead, NULL);
+	if (n == 0) {
+		dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
+		sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
+		event_del(sock->event.event);
+		os_sock_close (sock->sock_no);
+		del_sock(sock->name);
+		return;
+	}
+	if (dwBytesRead == 0)
+		return;
+	n = dwBytesRead;
+#endif
+	dlog(DEBUG1, "sock_read: Read %d bytes from fd %d (%s)", n, sock->sock_no, sock->name);
+	if (sock->sfunc.standmode.readfunc(sock->data, p, n) == NS_FAILURE) {
+		dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
+		event_del(sock->event.event);
+		os_sock_close (sock->sock_no);
+		del_sock(sock->name);
+		return;
+	}			
+}
+
+void
+write_sock(int fd, short what, void *data) {
+printf("write\n");
+}
+
 /** @brief add a socket to the socket list
  *
  * For core use. Adds a socket with the given functions to the socket list
@@ -766,8 +900,8 @@ add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuf
  * 
  * @return pointer to socket if found, NULL if not found
 */
-int
-add_sock (const char *sock_name, int socknum, sock_func readfunc, sock_func writefunc, sock_func errfunc)
+Sock *
+add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockfunccb writefunc, void *data)
 {
 	Sock *sock;
 	Module* moduleptr;
@@ -776,26 +910,27 @@ add_sock (const char *sock_name, int socknum, sock_func readfunc, sock_func writ
 	moduleptr = GET_CUR_MODULE();
 	if (!readfunc) {
 		nlog (LOG_WARNING, "add_sock: read socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
-		return NS_FAILURE;
+		return NULL;
 	}
 	if (!writefunc) {
 		nlog (LOG_WARNING, "add_sock: write socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
-		return NS_FAILURE;
-	}
-	if (!errfunc) {
-		nlog (LOG_WARNING, "add_sock: error socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
-		return NS_FAILURE;
+		return NULL;
 	}
 	sock = new_sock (sock_name);
 	sock->sock_no = socknum;
 	sock->moduleptr = moduleptr;
-	sock->readfnc = readfunc;
-	sock->writefnc = writefunc;
-	sock->errfnc = errfunc;
+	sock->data = data;
+	sock->sfunc.standmode.readfunc = readfunc;
+	sock->sfunc.standmode.writefunc = writefunc;
 	sock->socktype = SOCK_STANDARD;
+
+	event_set(sock->event.event, sock->sock_no, EV_READ|EV_PERSIST, read_sock, (void*) sock);
+	event_set(sock->event.event, sock->sock_no, EV_WRITE|EV_PERSIST, write_sock, (void*) sock);
+
+	event_add(sock->event.event, NULL);
 	
 	dlog(DEBUG2, "add_sock: Registered Module %s with Standard Socket functions %s", moduleptr->info->name, sock->name);
-	return NS_SUCCESS;
+	return sock;
 }
 
 /** @brief add a poll interface to the socket list
@@ -922,7 +1057,7 @@ ns_cmd_socklist (CmdParams* cmdparams)
 				break;
 			case SOCK_LINEMODE:
 				irc_prefmsg (ns_botptr, cmdparams->source, __("LineMode Socket - fd: %d", cmdparams->source), sock->sock_no);
-				irc_prefmsg (ns_botptr, cmdparams->source, __("RecieveQ Set: %d Current: %d", cmdparams->source), sock->linemode->recvq, sock->linemode->readbufsize);	
+				irc_prefmsg (ns_botptr, cmdparams->source, __("RecieveQ Set: %d Current: %d", cmdparams->source), sock->sfunc.linemode.recvq, sock->sfunc.linemode.readbufsize);	
 				break;
 			default:
 				irc_prefmsg (ns_botptr, cmdparams->source, __("Uknown (Error!)", cmdparams->source));
