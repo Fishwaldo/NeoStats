@@ -541,9 +541,9 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 	AddStringToList (&argv, av[0], &argc);
 	AddStringToList (&argv, privmsgbuffer, &argc);
 	if(av[0][0] == '#') {
-		ModuleEvent (EVENT_CNOTICE, argv, argc);
+		SendModuleEvent (EVENT_CNOTICE, argv, argc);
 	} else {
-		ModuleEvent (EVENT_NOTICE, argv, argc);
+		SendModuleEvent (EVENT_NOTICE, argv, argc);
 	}
 	free (argv);
 }
@@ -599,9 +599,9 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 		AddStringToList (&argv, av[0], &argc);
 		AddStringToList (&argv, privmsgbuffer, &argc);
 		if(av[0][0] == '#') {
-			ModuleEvent (EVENT_CPRIVATE, argv, argc);
+			SendModuleEvent (EVENT_CPRIVATE, argv, argc);
 		} else {
-			ModuleEvent (EVENT_PRIVATE, argv, argc);
+			SendModuleEvent (EVENT_PRIVATE, argv, argc);
 		}
 		free (argv);
 	}
@@ -730,7 +730,7 @@ init_services_bot (void)
 #endif
 	me.onchan = 1;
 	AddStringToList (&av, me.uplink, &ac);
-	ModuleEvent (EVENT_ONLINE, av, ac);
+	SendModuleEvent (EVENT_ONLINE, av, ac);
 	free (av);
 	return NS_SUCCESS;
 }
@@ -773,7 +773,7 @@ do_pong (const char* origin, const char* destination)
 		if (!strcmp (me.s->name, s->name))
 			ping.ulag = me.s->ping;
 		AddStringToList (&av, s->name, &ac);
-		ModuleEvent (EVENT_PONG, av, ac);
+		SendModuleEvent (EVENT_PONG, av, ac);
 		free (av);
 	} else {
 		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", origin);
@@ -1630,7 +1630,7 @@ do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, co
 	send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
-	ModuleEvent (EVENT_NETINFO, NULL, 0);
+	SendModuleEvent (EVENT_NETINFO, NULL, 0);
 	me.synced = 1;
 }
 #endif
@@ -1645,7 +1645,7 @@ do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, c
 	send_snetinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
-	ModuleEvent (EVENT_NETINFO, NULL, 0);
+	SendModuleEvent (EVENT_NETINFO, NULL, 0);
 	me.synced = 1;
 }
 #endif

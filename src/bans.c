@@ -76,7 +76,7 @@ void AddBan(const char* type, const char* user, const char* host, const char* ma
 	AddStringToList (&av, (char*)setby, &ac);
 	AddStringToList (&av, (char*)tsset, &ac);
 	AddStringToList (&av, (char*)tsexpires, &ac);
-	ModuleEvent (EVENT_ADDBAN, av, ac);
+	SendModuleEvent (EVENT_ADDBAN, av, ac);
 	free (av);
 }
 
@@ -105,7 +105,7 @@ DelBan(const char* type, const char* user, const char* host, const char* mask,
 	AddStringToList (&av, (char*)setby, &ac);
 	AddStringToList (&av, (char*)tsset, &ac);
 	AddStringToList (&av, (char*)tsexpires, &ac);
-	ModuleEvent (EVENT_DELBAN, av, ac);
+	SendModuleEvent (EVENT_DELBAN, av, ac);
 	free (av);
 
 	hash_delete (banshash, bansnode);

@@ -24,7 +24,6 @@
 */
 
 #include "neostats.h"
-#include "dl.h"
 #include "conf.h"
 #include "server.h"
 

@@ -996,8 +996,6 @@ add_mod_user (char *nick, char *mod_name)
 			mod_usr = new_bot (nick);
 			if(mod_usr) {
 				strlcpy (mod_usr->modname, mod_name, MAX_MOD_NAME);
-				mod_usr->function = ns_dlsym (mod_ptr->dl_handle, "__BotMessage");
-				mod_usr->chanfunc = ns_dlsym (mod_ptr->dl_handle, "__ChanMessage");
 				mod_usr->botcmds = NULL;
 				return mod_usr;
 			}
@@ -1173,17 +1171,17 @@ int	del_bots (char* module_name)
 	}
 	return NS_SUCCESS;
 }
-/** @brief ModuleEvent
+/** @brief SendModuleEvent
  *
  * 
  *
  * @return none
  */
 void
-ModuleEvent (char *event, char **av, int ac)
+SendModuleEvent (char *event, char **av, int ac)
 {
 	Module *module_ptr;
-	EventFnList *ev_list;
+	ModuleEvent *ev_list;
 	hscan_t ms;
 	hnode_t *mn;
 
@@ -1262,7 +1260,7 @@ load_module (char *modfilename, User * u)
 	int ac = 0;
 	int i = 0;
 	ModuleInfo *mod_info_ptr = NULL;
-	EventFnList *event_fn_ptr = NULL;
+	ModuleEvent *event_fn_ptr = NULL;
 	Module *mod_ptr = NULL;
 	hnode_t *mn;
 	int (*ModInit) (int modnum, int apiver);
@@ -1286,7 +1284,7 @@ load_module (char *modfilename, User * u)
 		return NS_FAILURE;
 	}
 
-	mod_info_ptr = ns_dlsym (dl_handle, "__module_info");
+	mod_info_ptr = ns_dlsym (dl_handle, "module_info");
 #ifndef HAVE_LIBDL
 	if(mod_info_ptr == NULL) {
 		dl_error = ns_dlerror ();
@@ -1301,7 +1299,7 @@ load_module (char *modfilename, User * u)
 		return NS_FAILURE;
 	}
 
-	event_fn_ptr = ns_dlsym (dl_handle, "__module_events");
+	event_fn_ptr = ns_dlsym (dl_handle, "module_events");
 
 	/* Check that the Module hasn't already been loaded */
 	if (hash_lookup (mh, mod_info_ptr->module_name)) {
@@ -1341,10 +1339,10 @@ load_module (char *modfilename, User * u)
 	nlog (LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, mod_ptr->info->module_name);
 
 	/* Module side user authentication for SecureServ helpers */
-	mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "__ModuleAuth");
+	mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "ModuleAuth");
 
-	/* call __ModInit (replacement for library __init() call */
-	ModInit = ns_dlsym ((int *) dl_handle, "__ModInit");
+	/* call ModInit (replacement for library __init() call */
+	ModInit = ns_dlsym ((int *) dl_handle, "ModInit");
 	if (ModInit) {
 		int err;
 		SET_SEGV_LOCATION();
@@ -1527,8 +1525,8 @@ unload_module (char *module_name, User * u)
 		hash_delete (mh, modnode);
 
 		
-		/* call __ModFini (replacement for library __fini() call */
-		ModFini = ns_dlsym ((int *) mod_ptr->dl_handle, "__ModFini");
+		/* call ModFini (replacement for library __fini() call */
+		ModFini = ns_dlsym ((int *) mod_ptr->dl_handle, "ModFini");
 		if (ModFini) {
 			SET_SEGV_INMODULE(module_name);
 			(*ModFini) ();

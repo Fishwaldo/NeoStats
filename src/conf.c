@@ -26,7 +26,6 @@
 #include "neostats.h"
 #include "dotconf.h"
 #include "conf.h"
-#include "dl.h"
 #include "log.h"
 #include "services.h"
 #ifdef SQLSRV

@@ -28,7 +28,6 @@
 #include "neostats.h"
 #include "ircd.h"
 #include "hash.h"
-#include "dl.h"
 #include "users.h"
 #include "chans.h"
 #include "exclude.h"
@@ -80,7 +79,7 @@ lookupnickip(char *data, adns_answer *a) {
 	if (a && a->nrrs > 0 && u && a->status == adns_s_ok) {
 		u->ipaddr.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
 		AddStringToList (&av, u->nick, &ac);
-		ModuleEvent (EVENT_GOTNICKIP, av, ac);
+		SendModuleEvent (EVENT_GOTNICKIP, av, ac);
 	}
 }
 #endif
@@ -175,10 +174,10 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 #endif
 
 	AddStringToList (&av, u->nick, &ac);
-	ModuleEvent (EVENT_SIGNON, av, ac);
+	SendModuleEvent (EVENT_SIGNON, av, ac);
 	if (me.want_nickip == 1 && ipaddress != 0) {
 		/* only fire this event if we have the nickip and some module wants it */
-		ModuleEvent (EVENT_GOTNICKIP, av, ac);
+		SendModuleEvent (EVENT_GOTNICKIP, av, ac);
 	}
 	free (av);
 }
@@ -228,9 +227,9 @@ DelUser (const char *nick, int killflag, const char *reason)
 		AddStringToList (&av, (char*)quitreason, &ac);
 	}
 	if (killflag == 0) {
-		ModuleEvent (EVENT_SIGNOFF, av, ac);
+		SendModuleEvent (EVENT_SIGNOFF, av, ac);
 	} else if (killflag == 1) {
-		ModuleEvent (EVENT_KILL, av, ac);
+		SendModuleEvent (EVENT_KILL, av, ac);
 	}
 	free (av);
 
@@ -251,7 +250,7 @@ DelUser (const char *nick, int killflag, const char *reason)
 	if(botflag) {
 		ac = 0;
 		AddStringToList (&av, killnick, &ac);
-		ModuleEvent (EVENT_BOTKILL, av, ac);
+		SendModuleEvent (EVENT_BOTKILL, av, ac);
 		free (av);
 	}
 }
@@ -273,12 +272,12 @@ UserAway (const char *nick, const char *awaymsg)
 		AddStringToList (&av, u->nick, &ac);
 		if ((u->is_away == 1) && (!awaymsg)) {
 			u->is_away = 0;
-			ModuleEvent (EVENT_AWAY, av, ac);
+			SendModuleEvent (EVENT_AWAY, av, ac);
 			free (av);
 		} else if ((u->is_away == 0) && (awaymsg)) {
 			u->is_away = 1;
 			AddStringToList (&av, (char *) awaymsg, &ac);
-			ModuleEvent (EVENT_AWAY, av, ac);
+			SendModuleEvent (EVENT_AWAY, av, ac);
 			free (av);
 		}
 	} else {
@@ -334,7 +333,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	if(ts) {
 		AddStringToList (&av, (char*)ts, &ac);
 	}
-	ModuleEvent (EVENT_NICKCHANGE, av, ac);
+	SendModuleEvent (EVENT_NICKCHANGE, av, ac);
 	free (av);
 	return NS_SUCCESS;
 }
@@ -801,7 +800,7 @@ UserMode (const char *nick, const char *modes)
 	strlcpy (u->modes, modes, MODESIZE);
 	AddStringToList (&av, u->nick, &ac);
 	AddStringToList (&av, (char *) modes, &ac);
-	ModuleEvent (EVENT_UMODE, av, ac);
+	SendModuleEvent (EVENT_UMODE, av, ac);
 	free (av);
 	oldmode = u->Umode;
 	u->Umode = UmodeStringToMask(modes, u->Umode);
@@ -835,7 +834,7 @@ UserSMode (const char *nick, const char *modes)
 	nlog (LOG_DEBUG1, LOG_CORE, "Smodes: %s", modes);
 	AddStringToList (&av, u->nick, &ac);
 	AddStringToList (&av, (char *) modes, &ac);
-	ModuleEvent (EVENT_SMODE, av, ac);
+	SendModuleEvent (EVENT_SMODE, av, ac);
 	free (av);
 	u->Smode = SmodeStringToMask(modes, u->Smode);
 	nlog (LOG_DEBUG1, LOG_CORE, "UserSMode: smode for %s is now %p", u->nick, (int *)u->Smode);

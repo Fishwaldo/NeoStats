@@ -48,6 +48,8 @@ bot_cmd extauth_commands[]=
 ModuleInfo __module_info = {
 	"ExtAuth",
 	"ServiceRoots Authentication Module",
+	"NeoStats",
+	NEOSTATS_VERSION,
 	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__

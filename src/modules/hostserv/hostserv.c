@@ -114,9 +114,11 @@ int ListArryCount = 0;
 
 ModUser *hs_bot;
 
-ModuleInfo __module_info = {
+ModuleInfo module_info = {
 	"HostServ",
 	"Network virtual host service",
+	"NeoStats",
+	NEOSTATS_VERSION,
 	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__
@@ -244,14 +246,14 @@ static int hs_sign_on(char **av, int ac)
 static int Online(char **av, int ac)
 {
 	hs_bot = init_mod_bot(s_HostServ, hs_cfg.user, hs_cfg.host, hs_cfg.realname, 
-		services_bot_modes, BOT_FLAG_DEAF, hs_commands, hs_settings, __module_info.module_name);
+		services_bot_modes, BOT_FLAG_DEAF, hs_commands, hs_settings, module_info.module_name);
 	add_mod_timer("CleanupHosts", "Cleanup_Old_Vhosts",
-		      __module_info.module_name, 7200);
+		      module_info.module_name, 7200);
 	LoadHosts();
 	return 1;
 };
 
-EventFnList __module_events[] = {
+ModuleEvent module_events[] = {
 	{EVENT_ONLINE, Online},
 	{EVENT_SIGNON, hs_sign_on},
 #ifdef UMODE_REGNICK
@@ -262,7 +264,7 @@ EventFnList __module_events[] = {
 	{NULL, NULL}
 };
 
-int __ModInit(int modnum, int apiver)
+int ModInit(int modnum, int apiver)
 {
 	/* Check that our compiled version if compatible with the calling version of NeoStats */
 	if(	ircstrncasecmp (me.version, NEOSTATS_VERSION, VERSIONSIZE) !=0) {
@@ -281,7 +283,7 @@ int __ModInit(int modnum, int apiver)
 	return 1;
 }
 
-void __ModFini()
+void ModFini()
 {
 	lnode_t *hn;
 	hn = list_first(vhosts);

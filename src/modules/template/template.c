@@ -38,54 +38,15 @@ char s_module_bot_name[MAXNICK];
  *  Information about our module
  *  This structure is required for your module to load and run on NeoStats
  */
-ModuleInfo __module_info = {
+ModuleInfo module_info = {
 	"Template",
 	"Put your brief module description here",
+	"NeoStats",
+	NEOSTATS_VERSION,
 	"1.0",
 	__DATE__,
 	__TIME__
 };
-
-/** Channel message processing
- *  What do we do with messages in channels
- *  This is required if you want your module to respond to channel messages
- */
-int __ChanMessage(char *origin, char **argv, int argc)
-{
-	char *chan = argv[0];
-	return 1;
-}
-
-/** Bot message processing
- *  What do we do with messages sent to our bot with /msg
- *  This is required if you want your module to respond to /msg
- *  Parameters:
- *      origin - who sent the message to you. It could be a user nickname 
- *               or could be a server message
- *      argv[0] - Your bot name;
- *      argv[1] .. argv[argc] - the parameters sent in the message
- *      argc - The count of arguments received
- */
-int __BotMessage(char *origin, char **argv, int argc)
-{
-	User *u;
-	char *buf;
-
-	u = finduser(origin);
-	if (!u) {
-		nlog(LOG_WARNING, LOG_CORE, "Unable to find user %s ", origin);
-		return -1;
-	}
-	buf = joinbuf(argv, argc, 1);
-	/* Example of how we send a globops */
-	globops(me.name, "Bot received %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
-	/* Example of how we send an alert to the services channel */
-	chanalert(s_module_bot_name, "Bot received %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
-	/* Example of how we log a message to our log file */
-	nlog(LOG_NORMAL, LOG_MOD, "Bot received %s from (%s!%s@%s)", buf, u->nick, u->username, u->hostname);
-	free(buf);
-	return 1;
-}
 
 /** Online event processing
  *  What we do when we first come online
@@ -94,7 +55,7 @@ static int Online(char **av, int ac)
 {
 	/* Introduce a bot onto the network */
 	if (init_bot(s_module_bot_name, "user", me.name, "Real Name", "-x",
-		__module_info.module_name) == -1) {
+		module_info.module_name) == -1) {
 			/* Nick was in use */
 			return 0;
 	}
@@ -106,7 +67,7 @@ static int Online(char **av, int ac)
  *  This is required if you want your module to respond to events on IRC
  *  see events.h for a list of all events available
  */
-EventFnList __module_events[] = {
+ModuleEvent module_events[] = {
 	{EVENT_ONLINE, Online},
 	{NULL, NULL}
 };
@@ -115,7 +76,7 @@ EventFnList __module_events[] = {
  *  Required if you need to do initialisation of your module when
  *  first loaded
  */
-int __ModInit(int modnum, int apiver)
+int ModInit(int modnum, int apiver)
 {
 	/* Check that our compiled version if compatible with the calling version of NeoStats */
 	if(	ircstrncasecmp (me.version, NEOSTATS_VERSION, VERSIONSIZE) !=0) {
@@ -128,7 +89,7 @@ int __ModInit(int modnum, int apiver)
 /** Init module
  *  Required if you need to do cleanup of your module when it ends
  */
-void __ModFini()
+void ModFini()
 {
 
 };

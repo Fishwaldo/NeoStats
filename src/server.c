@@ -26,7 +26,6 @@
 */
 
 #include "neostats.h"
-#include "dl.h"
 #include "hash.h"
 #include "ircd.h"
 #include "exclude.h"
@@ -94,7 +93,7 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	AddStringToList (&av, (char*)hops, &ac);
 	AddStringToList (&av, (char*)numeric, &ac);
 	AddStringToList (&av, (char*)infoline, &ac);
-	ModuleEvent (EVENT_SERVER, av, ac);
+	SendModuleEvent (EVENT_SERVER, av, ac);
 	free (av);
 	return(s);
 }
@@ -122,7 +121,7 @@ DelServer (const char *name, const char* reason)
 	if(reason) {
 		AddStringToList (&av, (char*)reason, &ac);
 	}
-	ModuleEvent (EVENT_SQUIT, av, ac);
+	SendModuleEvent (EVENT_SQUIT, av, ac);
 	free (av);
 
 	hash_delete (sh, sn);

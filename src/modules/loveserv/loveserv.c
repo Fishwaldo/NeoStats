@@ -48,9 +48,11 @@ static int ls_thankyou(User * u, char **av, int ac);
 static int ls_version(User * u, char **av, int ac);
 static int ls_about(User * u, char **av, int ac);
 
-ModuleInfo __module_info = {
+ModuleInfo module_info = {
 	"LoveServ",
 	"Network love service",
+	"NeoStats",
+	NEOSTATS_VERSION,
 	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__
@@ -84,16 +86,16 @@ static bot_setting ls_settings[]=
 static int Online(char **av, int ac)
 {
 	ls_bot = init_mod_bot(s_LoveServ, ls_cfg.user, ls_cfg.host, ls_cfg.realname, 
-		services_bot_modes, BOT_FLAG_DEAF, ls_commands, ls_settings, __module_info.module_name);
+		services_bot_modes, BOT_FLAG_DEAF, ls_commands, ls_settings, module_info.module_name);
 	return 1;
 };
 
-EventFnList __module_events[] = {
+ModuleEvent module_events[] = {
 	{EVENT_ONLINE, Online},
 	{NULL, NULL}
 };
 
-int __ModInit(int modnum, int apiver)
+int ModInit(int modnum, int apiver)
 {
  	char *temp = NULL;
 
@@ -132,7 +134,7 @@ int __ModInit(int modnum, int apiver)
 	return 1;
 }
 
-void __ModFini()
+void ModFini()
 {
 };
 
@@ -309,7 +311,7 @@ static int ls_version(User * u, char **av, int ac)
 	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_LoveServ, "\2%s Version Information\2", s_LoveServ);
 	prefmsg(u->nick, s_LoveServ, "%s Version: %s Compiled %s at %s", s_LoveServ, 
-		__module_info.module_version, __module_info.module_build_date, __module_info.module_build_time);
+		module_info.module_version, module_info.module_build_date, module_info.module_build_time);
 	prefmsg(u->nick, s_LoveServ, "%s Author: Shmad <shmad@neostats.net>", s_LoveServ);
 	prefmsg(u->nick, s_LoveServ, "http://www.neostats.net");
 	return 1;

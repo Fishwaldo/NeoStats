@@ -33,7 +33,6 @@
 #include <execinfo.h>
 #endif
 #include "signal.h"
-#include "dl.h"
 #include "conf.h"
 #include "keeper.h"
 #include "log.h"

@@ -49,15 +49,19 @@ static void ss_Config(void);
 
 char s_StatServ[MAXNICK];
 
-ModuleInfo __module_info = {
+ModuleInfo 	"NeoStats",
+	NEOSTATS_VERSION,
+module_info = {
 	"statserv",
 	"Network statistical service",
+	"NeoStats",
+	NEOSTATS_VERSION,
 	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__
 };
 
-EventFnList __module_events[] = {
+ModuleEvent module_events[] = {
 	{EVENT_ONLINE, Online},
 	{EVENT_PONG, pong},
 	{EVENT_SERVER, s_new_server},
@@ -140,7 +144,7 @@ static void ss_Config(void)
 	}
 }
 
-int __ModInit(int modnum, int apiver)
+int ModInit(int modnum, int apiver)
 {
 	Server *ss;
 	User *u;
@@ -260,7 +264,7 @@ int __ModInit(int modnum, int apiver)
 	return 1;
 }
 
-void __ModFini()
+void ModFini()
 {
 	StatServ.shutdown = 1;
 	SaveStats();
@@ -569,7 +573,7 @@ static int ss_version(User * u, char **av, int ac)
 	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_StatServ, "\2%s Version Information\2", s_StatServ);
 	prefmsg(u->nick, s_StatServ, "%s Version: %s Compiled %s at %s", s_StatServ,
-		__module_info.module_version, __module_info.module_build_date, __module_info.module_build_time);
+		module_info.module_version, module_info.module_build_date, module_info.module_build_time);
 	prefmsg(u->nick, s_StatServ, "http://www.neostats.net");
 	return 1;
 }

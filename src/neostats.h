@@ -65,6 +65,12 @@
 #endif
 #endif
 
+/* 
+ * NeoStats core API version.
+ * A module should check this when loaded to ensure compatibility
+ */
+#define API_VER 3
+
 #include "version.h"
 
 #include "adns.h"
@@ -706,7 +712,154 @@ void* DBGetData(char* key);
 void DBSetData(char* key, void * data, int size);
 #endif
 
-#include "dl.h"
+/* socket interface type */
+#define SOCK_POLL 1
+#define SOCK_STANDARD 2
+
+/** @brief Message function types
+ * 
+ */
+typedef int (*message_function) (char *origin, char **av, int ac);
+typedef int (*timer_function) (void);
+
+/** @brief Socket function types
+ * 
+ */
+typedef int (*socket_function) (int sock_no, char *sockname);
+typedef int (*before_poll_function) (void *data, struct pollfd *);
+typedef void (*after_poll_function) (void *data, struct pollfd *, unsigned int);
+
+/** @brief Module socket list structure
+ * 
+ */
+typedef struct ModSock {
+	/** Socket number */
+	int sock_no;
+	/** Socket name */
+	char sockname[MAX_MOD_NAME];
+	/** socket interface (poll or standard) type */
+	int socktype;
+	/** if socktype = SOCK_POLL, before poll function */
+	/** Socket before poll function */
+	before_poll_function beforepoll;
+	/** Socket after poll function */
+	after_poll_function afterpoll;
+	/** data */
+	void *data;
+	/* if socktype = SOCK_STANDARD, function calls */
+	/** Socket read function */
+	socket_function readfnc;
+	/** Socket write function */
+	socket_function writefnc;
+	/** Socket error function */
+	socket_function errfnc;
+	/** Module name */
+	char modname[MAX_MOD_NAME];
+	/** rmsgs */
+	long rmsgs;
+	/** rbytes */
+	long rbytes;
+}ModSock;
+
+/** @brief Module Timer structure
+ * 
+ */
+typedef struct ModTimer {
+	/** Module name */
+	char modname[MAX_MOD_NAME];
+	/** Timer name */
+	char timername[MAX_MOD_NAME];
+	/** Timer interval */
+	int interval;
+	/** Time last run */
+	time_t lastrun;
+	/** Timer function */
+	timer_function function;
+}ModTimer;
+
+/** @brief Module User structure
+ * 
+ */
+
+typedef struct ModUser {
+	/** Nick */
+	char nick[MAXNICK];
+	/** Module name */
+	char modname[MAX_MOD_NAME];
+	/* bot flags */
+	unsigned int flags;
+	/* hash for command list */
+	hash_t *botcmds;
+	/* hash for settings */
+	bot_setting *bot_settings;
+	/* min ulevel for settings */
+	unsigned int set_ulevel;
+	/** bot message function */
+	message_function function;
+	/** channel message function */
+	message_function chanfunc;
+}ModUser;
+
+/** @brief Channel bot structure
+ * 
+ */
+typedef struct ModChanBot {
+	/** channel name */
+	char chan[CHANLEN];
+	/** bot list */
+	list_t *bots;
+}ModChanBot;
+
+/** @brief ModuleEvent functions structure
+ * 
+ */
+typedef int (*event_function) (char **av, int ac);
+
+typedef struct ModuleEvent {
+	char *cmd_name;
+	event_function function;
+}ModuleEvent;
+
+/** @brief Module Info structure
+ * 
+ */
+typedef struct ModuleInfo {
+	char *module_name;
+	char *module_description;
+	char *module_author;
+	char *module_neostats_version;
+	char *module_version;
+	char *module_build_date;
+	char *module_build_time;
+	char *reserved;
+}ModuleInfo;
+
+typedef int (*mod_auth) (User * u);
+
+/** @brief Module structure
+ * 
+ */
+typedef struct Module {
+	ModuleInfo *info;
+	ModuleEvent *event_list;
+	mod_auth mod_auth_cb;
+	void *dl_handle;
+}Module;
+
+int add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval);
+int del_mod_timer (char *timer_name);
+int change_mod_timer_interval (char *timer_name, int interval);
+ModTimer *findtimer(char *timer_name);
+int add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name);
+int add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name, void *data);
+int del_socket (char *sockname);
+ModSock *findsock (char *sock_name);
+void add_bot_to_chan (char *bot, char *chan);
+void del_bot_from_chan (char *bot, char *chan);
+void bot_chan_message (char *origin, char **av, int ac);
+int bot_message (char *origin, char **av, int ac);
+ModUser *findbot (char * bot_name);
+int bot_nick_change (char * oldnick, char *newnick);
 
 /* log.c API export */
 /* define the log levels */
@@ -762,5 +915,14 @@ void nlog (int level, int scope, char *fmt, ...) __attribute__((format(printf,3,
 
 
 #include "conf.h"
+
+/* 
+ * Module Interface 
+ */
+int ModInit(int modnum, int apiver);
+void ModFini(void);
+int ModAuth (User * u);
+extern ModuleInfo module_info;   
+extern ModuleEvent module_events[];  
 
 #endif /* NEOSTATS_H */

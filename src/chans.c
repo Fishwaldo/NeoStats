@@ -24,7 +24,6 @@
 
 #include "neostats.h"
 #include "ircd.h"
-#include "dl.h"
 #include "hash.h"
 #include "users.h"
 #include "chans.h"
@@ -108,7 +107,7 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
 	} else {
 		AddStringToList (&av, "", &ac);
 	}
-	ModuleEvent (EVENT_TOPICCHANGE, av, ac);
+	SendModuleEvent (EVENT_TOPICCHANGE, av, ac);
 	free (av);
 }
 
@@ -204,7 +203,7 @@ ChanMode (char *origin, char **av, int ac)
 	for (i = 0; i < ac; i++) {
 		AddStringToList(&data, av[i], &datasize);	
 	}
-	ModuleEvent(EVENT_CHANMODE, data, datasize);
+	SendModuleEvent(EVENT_CHANMODE, data, datasize);
 	free(data);	
 
 	modes = av[1];
@@ -384,7 +383,7 @@ new_chan (const char *chan)
 	/* check exclusions */
 	ns_do_exclude_chan(c);
 	AddStringToList (&av, c->name, &ac);
-	ModuleEvent (EVENT_NEWCHAN, av, ac);
+	SendModuleEvent (EVENT_NEWCHAN, av, ac);
 	free (av);
 	return c;
 }
@@ -479,7 +478,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 			if (kickreason != NULL) {
 				AddStringToList (&av, (char*)kickreason, &ac);
 			}
-			ModuleEvent (EVENT_KICK, av, ac);
+			SendModuleEvent (EVENT_KICK, av, ac);
 			free (av);
 			ac = 0;
 			c->users--;
@@ -493,7 +492,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 			if (kickreason != NULL) {
 				AddStringToList (&av, (char*)kickreason, &ac);
 			}
-			ModuleEvent (EVENT_KICKBOT, av, ac);
+			SendModuleEvent (EVENT_KICKBOT, av, ac);
 			free (av);
 			ac = 0;
 		}
@@ -511,7 +510,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 		nlog (LOG_DEBUG3, LOG_CORE, "kick_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 		if (c->users <= 0) {
 			AddStringToList (&av, c->name, &ac);
-			ModuleEvent (EVENT_DELCHAN, av, ac);
+			SendModuleEvent (EVENT_DELCHAN, av, ac);
 			free (av);
 			ac = 0;
 			del_chan (c);
@@ -572,7 +571,7 @@ part_chan (User * u, const char *chan, const char *reason)
 			if (reason != NULL) {
 				AddStringToList (&av, (char*)reason, &ac);
 			}
-			ModuleEvent (EVENT_PARTCHAN, av, ac);
+			SendModuleEvent (EVENT_PARTCHAN, av, ac);
 			free (av);
 			ac = 0;
 			c->users--;
@@ -585,7 +584,7 @@ part_chan (User * u, const char *chan, const char *reason)
 			if (reason != NULL) {
 				AddStringToList (&av, (char*)reason, &ac);
 			}
-			ModuleEvent (EVENT_PARTBOT, av, ac);
+			SendModuleEvent (EVENT_PARTBOT, av, ac);
 			free (av);
 			ac = 0;
 		}
@@ -604,7 +603,7 @@ part_chan (User * u, const char *chan, const char *reason)
 		nlog (LOG_DEBUG3, LOG_CORE, "part_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 		if (c->users <= 0) {
 			AddStringToList (&av, c->name, &ac);
-			ModuleEvent (EVENT_DELCHAN, av, ac);
+			SendModuleEvent (EVENT_DELCHAN, av, ac);
 			free (av);
 			ac = 0;
 			del_chan (c);
@@ -723,7 +722,7 @@ join_chan (const char* nick, const char *chan)
 	}
 	AddStringToList (&av, c->name, &ac);
 	AddStringToList (&av, u->nick, &ac);
-	ModuleEvent (EVENT_JOINCHAN, av, ac);
+	SendModuleEvent (EVENT_JOINCHAN, av, ac);
 	free (av);
 	nlog (LOG_DEBUG3, LOG_CORE, "join_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 	if (findbot (u->nick)) {

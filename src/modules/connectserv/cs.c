@@ -103,9 +103,11 @@ static char s_ConnectServ[MAXNICK];
 static int cs_online = 0;
 static ModUser *cs_bot;
 
-ModuleInfo __module_info = {
+ModuleInfo module_info = {
 	"ConnectServ",
 	"Network connection and mode monitoring service",
+	"NeoStats",
+	NEOSTATS_VERSION,
 	NEOSTATS_VERSION,
 	__DATE__,
 	__TIME__
@@ -142,13 +144,13 @@ static int cs_about(User * u, char **av, int ac)
 static int Online(char **av, int ac)
 {
 	cs_bot = init_mod_bot(s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.realname, 
-		services_bot_modes, BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, cs_commands, cs_settings, __module_info.module_name);
+		services_bot_modes, BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, cs_commands, cs_settings, module_info.module_name);
 	if(cs_bot)
 		cs_online = 1;
 	return 1;
 };
 
-EventFnList __module_events[] = {
+ModuleEvent module_events[] = {
 	{EVENT_ONLINE,		Online},
 	{EVENT_SIGNON,		cs_new_user},
 	{EVENT_UMODE,		cs_user_modes},
@@ -163,7 +165,7 @@ EventFnList __module_events[] = {
 	{NULL, NULL}
 };
 
-int __ModInit(int modnum, int apiver)
+int ModInit(int modnum, int apiver)
 {
 	/* Check that our compiled version if compatible with the calling version of NeoStats */
 	if(	ircstrncasecmp (me.version, NEOSTATS_VERSION, VERSIONSIZE) !=0) {
@@ -173,7 +175,7 @@ int __ModInit(int modnum, int apiver)
 	return 1;
 }
 
-void __ModFini()
+void ModFini()
 {
 
 };
@@ -185,8 +187,8 @@ static int cs_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_ConnectServ, "\2%s Version Information\2", s_ConnectServ);
-	prefmsg(u->nick, s_ConnectServ, "%s Version: %s Compiled %s at %s", __module_info.module_name,
-		__module_info.module_version, __module_info.module_build_date, __module_info.module_build_time);
+	prefmsg(u->nick, s_ConnectServ, "%s Version: %s Compiled %s at %s", module_info.module_name,
+		module_info.module_version, module_info.module_build_date, module_info.module_build_time);
 	prefmsg(u->nick, s_ConnectServ, "http://www.neostats.net");
 	return 1;
 }
