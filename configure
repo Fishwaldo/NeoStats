@@ -1293,7 +1293,7 @@ cat >>confdefs.h <<\_ACEOF
 #define REV 15
 _ACEOF
 
-VERSION=2.5.15
+VERSION=${MAJOR}.${MINOR}.${REV}
 
 MODLDFLAGS="-shared"
 

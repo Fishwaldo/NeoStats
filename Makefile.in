@@ -23,8 +23,7 @@ SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
 		@IRCD_FILES_SRC@
 IRCDSRC=Ultimate.c Unreal.c hybrid7.c neoircd.c Bahamut.c \
 		Ircu.c mystic.c QuantumIRCd.c liquidircd.c Viagra.c
-IRCDINC=Ultimate.h Unreal.h hybrid7.h neoircd.h Bahamut.h \
-		Ircu.h mystic.h QuantumIRCd.h liquidircd.h Viagra.h
+IRCDINC=${IRCDSRC:.c=.h}
 
 INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h \
 		conf.h log.h support.h ircstring.h events.h numeric.h pcre.h \
