@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.35 2002/10/24 05:45:56 fishwaldo Exp $
+** $Id: chans.c,v 1.36 2002/12/14 09:58:37 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -347,7 +347,7 @@ void join_chan(User *u, char *chan) {
 		AddStringToList(&av, c->name, &ac);
 		Module_Event("NEWCHAN", av, ac);
 		FreeList(av, ac);
-	} 
+	}
 	/* add this users details to the channel members hash */	
 	cm = smalloc(sizeof(Chanmem));
 	strcpy(cm->nick, u->nick);

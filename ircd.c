@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.100 2002/12/13 11:24:49 fishwaldo Exp $
+** $Id: ircd.c,v 1.101 2002/12/14 09:58:37 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -697,7 +697,6 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 	tl = list_create(10);
 
 	if (*modes != '+') {
-		j++;
 		goto nomodes;
 	}
 	while (*modes) {
@@ -722,7 +721,6 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 		}
 	modes++;
 	}	
-
 	nomodes:
 	while (argc > j) {
 		modes = argv[j];
@@ -765,7 +763,7 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 		ok = 1;
 	}
 	c = findchan(argv[1]);
-	c->modes = mode1;
+	c->modes |= mode1;
 	if (!list_isempty(tl)) {
 		if (!list_isfull(c->modeparms)) {
 			list_transfer(c->modeparms, tl, list_first(tl));
