@@ -26,7 +26,7 @@ BUILDFILES = configure *.in adns/Makefile adns/config.h.in dl/Makefile \
 		hybrid7.c hybrid7.h Ultimate.c Ultimate.h Unreal.c Unreal.h \
 		makeconf cronchk tools/Makefile.in tools/cfgtool/Makefile \
 		keeper/Makefile doc/old/* Bahamut.c Ircu.c mystic.c \
-		QuantumIRCd.c
+		QuantumIRCd.c Config
 TOOLFILES = tools/*.c tools/*.h tools/cfgtool/*.h tools/cfgtool/*.c \
 		tools/cfgtool/pixmaps/*.xpm
 DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) \
