@@ -27,7 +27,7 @@
 #include <execinfo.h>
 #endif
 
-char s_Services[MAXNICK] = "NeoStats1";
+char s_Services[MAXNICK] = "NeoStats";
 
 #ifdef UNREAL
 const char version[] = "NeoStats-2.5_Beta5(U)";
