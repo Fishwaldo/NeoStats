@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.c,v 1.4 2000/02/05 04:54:00 fishwaldo Exp $
+** $Id: statserv.c,v 1.5 2000/02/06 07:12:46 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -19,7 +19,8 @@ static void ss_botlist(User *origuser);
 static void ss_version(User *u);
 static void ss_server(User *u, char *server);
 static int Online(Server *);
-static int pong(char *);
+static int pong(Server *);
+static int s_new_server(Server *);
 static void ss_cb_Config(char *, int);
 static int new_m_version(char *av, char *tmp);
 
@@ -41,6 +42,7 @@ Functions StatServ_fn_list[] = {
 EventFnList StatServ_Event_List[] = {
 	{"ONLINE", 	Online},
 	{"PONG", 	pong},
+	{"NEWSERVER",	s_new_server},
 	{ NULL, 	NULL}
 };
 
@@ -59,7 +61,8 @@ EventFnList *__module_get_events() {
 static config_option options[] = {
 { "STATSERV_NICK", ARG_STR, ss_cb_Config, 0},
 { "STATSERV_USER", ARG_STR, ss_cb_Config, 1},
-{ "STATSERV_HOST", ARG_STR, ss_cb_Config, 2}
+{ "STATSERV_HOST", ARG_STR, ss_cb_Config, 2},
+{ "STATSERV_LAG", ARG_STR, ss_cb_Config, 3}
 };
 
 
@@ -81,9 +84,46 @@ void _fini() {
 	sts(":%s GLOBOPS :StatServ Module Unloaded", me.name);
 	
 }
+static int s_new_server(Server *s) {
 
-int pong(char *coreLine) {
-	log("got pong %s", coreLine);
+	AddStats(s);
+	return 1;
+
+}
+
+int pong(Server *s) {
+	SStats *ss;
+	/* we don't want negative pings! */
+	if (s->ping < 0) return -1; 
+	
+	ss = findstats(s->name);
+	if (!ss) return -1;
+	
+	/* this is a tidy up from old versions of StatServ that used to have negative pings! */
+	if (ss->lowest_ping < 0) {
+		ss->lowest_ping = 0; 
+	}
+	if (ss->highest_ping < 0) {
+		ss->highest_ping = 0;
+	}
+
+	log("ping %d", s->ping);
+	log("hping %d", ss->highest_ping);
+
+	if (s->ping > ss->highest_ping) {
+		ss->highest_ping = s->ping;
+		ss->t_highest_ping = time(NULL);
+	}
+	if (s->ping < ss->lowest_ping) {
+		ss->lowest_ping = s->ping;
+		ss->t_lowest_ping = time(NULL);
+	}
+/* ok, updated the statistics, now lets see if this server is "lagged out" */
+	if (StatServ.lag > 0) {
+		if (s->ping > StatServ.lag) {
+			globops(s_StatServ, "\2%s\2 is Lagged out with a ping of %d", s->name, s->ping);
+		}
+	}
 	return 1;
 }
 int Online(Server *s) {
@@ -93,7 +133,7 @@ int Online(Server *s) {
 
    memcpy(StatServ.user, Servbot.user, 8);
    memcpy(StatServ.host, Servbot.host, MAXHOST);
-
+   StatServ.lag = 0;
    if (!config_read("stats.cfg", options) == 0) {
    	log("Error, Statserv could not be configured");
    	notice(s_Services, "Error, Statserv could not be configured");
@@ -102,6 +142,8 @@ int Online(Server *s) {
 	   init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+Sd", Statserv_Info[0].module_name);
    }
 
+/* now that we are online, setup the timer to save the Stats database every so often */
+   add_mod_timer("SaveStats", "Save_Stats_DB", Statserv_Info[0].module_name, 600);
 
    return 1;
    
@@ -119,6 +161,9 @@ void ss_cb_Config(char *arg, int configtype) {
 	} else if (configtype == 2) {
 		/* host */
 		memcpy(StatServ.host, arg, MAXHOST);
+	} else if (configtype == 3) {
+		/* lag */
+		StatServ.lag = atoi(arg);
 	}
 }
 	
@@ -255,12 +300,9 @@ static void ss_server(User *u, char *server) {
 		privmsg(u->nick, s_StatServ, "Error, the Syntax is Incorrect. Please Specify a Server");
 		privmsg(u->nick, s_StatServ, "Server Listing:");
 		for (ss = Shead; ss; ss = ss->next) {
-			log("test");
 			if (findserver(ss->name)) {
-				log("found");
 				privmsg(u->nick, s_StatServ, "Server: %s (*)", ss->name);
 			} else {
-				log("notfound");
 				privmsg(u->nick, s_StatServ, "Server: %s",ss->name);
 			}
 		}		
@@ -277,7 +319,7 @@ static void ss_server(User *u, char *server) {
 	}
 	privmsg(u->nick, s_StatServ, "Statistics for %s since %s", ss->name, sftime(ss->starttime));
 	if (!s) privmsg(u->nick, s_StatServ, "Server Last Seen: %s", sftime(ss->lastseen));
-	/* if (s) privmsg(u->nick, s_StatServ, "Current Users %-3ld (%s.0f%%)", ss->users, (float)ss->users / (float)me.users * 100); */
+	if (s) privmsg(u->nick, s_StatServ, "Current Users %-3ld (%s.0f%%)", ss->users, (float)ss->users / (float)stats_network.users * 100);
 	privmsg(u->nick, s_StatServ, "Maximum Users: %-3ld at %s", ss->maxusers, sftime(ss->t_maxusers));
 	if (s) privmsg(u->nick, s_StatServ, "Current Opers: %-3ld", ss->opers);
 	privmsg(u->nick, s_StatServ, "Maximum Opers: %-3ld at %s", ss->maxopers, sftime(ss->t_maxopers));
@@ -291,9 +333,6 @@ static void ss_server(User *u, char *server) {
 	else
 		privmsg(u->nick, s_StatServ, "%s has never split from the Network.", ss->name);
 	privmsg(u->nick, s_StatServ, "***** End of Statistics *****");	
-
-
-
 }
 static void ss_tld(User *u, char *tld)
 {

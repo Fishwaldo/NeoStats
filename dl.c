@@ -69,19 +69,34 @@ int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interva
 	
 	bzero(Mod_timer_list, sizeof(Mod_Timer));
 
-	while (module_timer_lists->next != NULL) module_timer_lists = module_timer_lists->next;
+	if(module_timer_lists->timername == NULL ) {
+		log("addnew");
+		module_timer_lists->interval = interval;
+		module_timer_lists->lastrun = time(NULL);
+		module_timer_lists->modname = sstrdup(mod_name);
+		module_timer_lists->timername = sstrdup(timer_name);
+	} else {
+		while (module_timer_lists->next != NULL) {
+			log("modstimer: %s", module_timer_lists->timername);
+			module_timer_lists = module_timer_lists->next;
+		}
 
-
-	module_timer_lists->next = Mod_timer_list;
-	Mod_timer_list->prev = module_timer_lists;
-	Mod_timer_list->interval = interval;
-	Mod_timer_list->lastrun = time(NULL);
-	Mod_timer_list->modname = sstrdup(mod_name);
-	Mod_timer_list->timername = sstrdup(timer_name);
-		
+		module_timer_lists->next = Mod_timer_list;
+		Mod_timer_list->prev = module_timer_lists;
+		Mod_timer_list->interval = interval;
+		Mod_timer_list->lastrun = time(NULL);
+		Mod_timer_list->modname = sstrdup(mod_name);
+		Mod_timer_list->timername = sstrdup(timer_name);
+	}		
 	list_ptr = module_list->next;
 	while (list_ptr != NULL) {
 		if (!strcasecmp(list_ptr->info->module_name, mod_name)) {
+			/* Check to see if the function exists */
+			if (dlsym(list_ptr->dl_handle, func_name) == NULL) {
+				log("Oh Oh, the Timer function doesn't exist");
+				del_mod_timer(Mod_timer_list->timername);
+				return -1;
+			}
 			Mod_timer_list->function = dlsym(list_ptr->dl_handle, func_name);
 			log("Registered Module %s with timer for Function %s", list_ptr->info->module_name, func_name);
 			return 1;
@@ -95,7 +110,7 @@ int del_mod_timer(char *timer_name) {
 	Mod_Timer *list;
 
 	segv_location = "del_mod_timer";
-	list = module_timer_lists->next;
+	list = module_timer_lists;
 	while (list != NULL) {
 		if (!strcasecmp(list->timername, timer_name)) {
 			log("Unregistered Timer function %s from Module %s", timer_name, list->modname);
@@ -117,7 +132,7 @@ int del_mod_timer(char *timer_name) {
 void list_module_timer(User *u) {
 	Mod_Timer *mod_ptr = NULL;
 	segv_location = "list_module_timer";
-	mod_ptr = module_timer_lists->next;
+	mod_ptr = module_timer_lists;
 	privmsg(u->nick,s_Services,"Module timer List:");
 	while(mod_ptr != NULL) {
 		privmsg(u->nick,s_Services,"%s:--------------------------------",mod_ptr->modname);

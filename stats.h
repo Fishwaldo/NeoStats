@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.3 2000/02/05 02:51:50 fishwaldo Exp $
+** $Id: stats.h,v 1.4 2000/02/06 07:12:46 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -27,7 +27,6 @@
 #include <sys/stat.h>
 #include <sys/resource.h>
 
-#include "m_stats.h"
 #include "Unreal.h"
 
 #define  DEBUG

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.3 2000/02/05 02:51:50 fishwaldo Exp $
+** $Id: ircd.c,v 1.4 2000/02/06 07:12:46 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -168,8 +168,6 @@ void Module_Event(char *event, void *data) {
 			if (!strcasecmp(ev_list->cmd_name, event)) {
 					segv_location = module_ptr->info->module_name;
 					ev_list->function(data);			
-					break;
-					log("should never get here-Parse");
 			}
 		ev_list++;
 		}	
@@ -286,7 +284,7 @@ void Usr_AddServer(char *origin, char *coreLine){
 	char *cmd;
 	cmd = strtok(coreLine, " ");
 	AddServer(cmd,1);
-	Module_Event("NEWSERVER", coreLine);
+	Module_Event("NEWSERVER", findserver(cmd));
 }
 void Usr_DelServer(char *origin, char *coreLine){
 	char *cmd;
@@ -330,10 +328,11 @@ void Usr_Pong(char *origin, char *coreLine) {
 					s->ping -= (float) ping.ulag;
 				if (!strcmp(me.s->name, s->name))
 					ping.ulag = me.s->ping;
+				Module_Event("PONG", s);
+
 			} else {
 				log("Received PONG from unknown server: %s", cmd);
 			}
-			Module_Event("PONG", coreLine);
 }
 void Usr_Away(char *origin, char *coreLine) {
 			User *u = finduser(origin);
@@ -413,6 +412,7 @@ void Srv_Server(char *origin, char *coreLine) {
 			s = findserver(coreLine);
 			me.s = s;
 			Module_Event("ONLINE", s);
+			Module_Event("NEWSERVER", s);
 }
 void Srv_Squit(char *origin, char *coreLine) {
 			Server *s;

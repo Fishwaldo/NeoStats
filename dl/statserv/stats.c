@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.c,v 1.2 2000/02/05 04:54:00 fishwaldo Exp $
+** $Id: stats.c,v 1.3 2000/02/06 07:12:46 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -108,9 +108,9 @@ void init_tld()
 	}
 }
 
-/* static Stats *new_stats(const char *name)
+static SStats *new_stats(const char *name)
 {
-	Stats *s = calloc(sizeof(Stats), 1);
+	SStats *s = calloc(sizeof(SStats), 1);
 
 #ifdef DEBUG
 	log("new_stats(%s)", name);
@@ -131,20 +131,31 @@ void init_tld()
 	s->daily_totusers = 0;
 	s->lastseen = time(NULL);
 	s->starttime = time(NULL);
+	s->t_highest_ping = time(NULL);
+	s->t_lowest_ping = time(NULL);
+	s->lowest_ping = 0;
+	s->highest_ping = 0;
+	s->users = 0;
+	s->opers = 0;
+	s->operkills = 0;
+	s->serverkills = 0;
+	
 
-	if (!shead) {
-		shead = s;
-		shead->next = NULL;
+
+
+	if (!Shead) {
+		Shead = s;
+		Shead->next = NULL;
 	} else {
-		s->next = shead;
-		shead = s;
+		s->next = Shead;
+		Shead = s;
 	}
 	return s;
 }
 
-void AddStats(SStats *s)
+void AddStats(Server *s)
 {
-	Stats *st = findstats(s->name);
+	SStats *st = findstats(s->name);
 
 #ifdef DEBUG
 	log("AddStats(%s)", s->name);
@@ -152,13 +163,10 @@ void AddStats(SStats *s)
 
 	if (!st) {
 		st = new_stats(s->name);
-		s->stats = st;
 	} else {
-		s->stats = st;
 		st->lastseen = time(NULL);
 	}
 }
-*/
 
 SStats *findstats(char *name)
 {
@@ -173,19 +181,19 @@ SStats *findstats(char *name)
 	return NULL;
 }
 
-/*
+
 
 void SaveStats()
 {
 	FILE *fp = fopen("data/stats.db", "w");
-	Stats *s;
+	SStats *s;
 
 	if (!fp) {
 		log("Unable to open stats.db for writing.");
 		return;
 	}
 
-	for (s = shead; s; s = s->next) {
+	for (s = Shead; s; s = s->next) {
 #ifdef DEBUG
 	log("Writing statistics to database for %s", s->name);
 #endif
@@ -203,7 +211,7 @@ void SaveStats()
 		stats_network.maxservers, stats_network.t_maxopers, stats_network.t_maxusers, stats_network.t_maxservers, stats_network.totusers);
 	fclose(fp);
 }
-*/
+
 void LoadStats()
 {
 	FILE *fp = fopen("data/nstats.db", "r");
