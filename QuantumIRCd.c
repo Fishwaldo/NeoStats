@@ -492,7 +492,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 		do_nick (argv[0], argv[1], argv[2], argv[4], argv[5],
-			argv[6], argv[8], NULL, argv[3], NULL, argv[9], NULL);
+			argv[6], argv[8], NULL, argv[3], NULL, argv[9], NULL, NULL);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}

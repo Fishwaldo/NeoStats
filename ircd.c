@@ -1453,7 +1453,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 	char* newmode;
 	
 	newmode = UmodeMaskToString(mode);
-	AddUser (nick, ident, host, realname, me.name, NULL, NULL);
+	AddUser (nick, ident, host, realname, me.name, NULL, NULL, NULL);
 	send_nick (nick, (unsigned long)me.now, newmode, ident, host, me.name, realname);
 #if defined(ULTIMATE3) || defined(BAHAMUT) || defined(HYBRID7) || defined(IRCU) || defined(NEOIRCD) || defined(QUANTUM) || defined(LIQUID)
 	UserMode (nick, newmode);
@@ -1619,13 +1619,13 @@ void
 do_nick (const char *nick, const char *hopcount, const char* TS, 
 		 const char *user, const char *host, const char *server, 
 		 const char *ip, const char *servicestamp, const char *modes, 
-		 const char *vhost, const char *realname
+		 const char *vhost, const char *realname, const char *numeric
 #ifdef GOTUSERSMODES
 		 , const char *smodes
 #endif
 		 )
 {
-	AddUser (nick, user, host, realname, server, ip, TS);
+	AddUser (nick, user, host, realname, server, ip, TS, numeric);
 	if(modes) {
 		UserMode (nick, modes);
 	}
@@ -1646,7 +1646,7 @@ do_client (const char *nick, const char *arg1, const char *TS,
 		const char *server, const char *arg9, 
 		const char *ip, const char *realname)
 {
-	AddUser (nick, user, host, realname, server, ip, TS);
+	AddUser (nick, user, host, realname, server, ip, TS, NULL);
 	if(modes) {
 		UserMode (nick, modes);
 	}

@@ -98,7 +98,7 @@ void do_part (const char* nick, const char* chan, const char* reason);
 void do_nick (const char *nick, const char *hopcount, const char *TS, 
 		const char *user, const char *host, const char *server, 
 		const char *ip, const char *servicestamp, const char *modes, 
-		const char *vhost, const char *realname
+		const char *vhost, const char *realname, const char *numeric
 #ifdef GOTUSERSMODES
 		, const char *smodes
 #endif

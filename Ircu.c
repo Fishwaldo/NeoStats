@@ -585,9 +585,8 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		char *realname;
 		realname = joinbuf (argv, argc, (argc - 1));
         do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
-			argv[6], NULL, NULL, NULL, NULL, realname);
+			argv[6], NULL, NULL, NULL, NULL, realname, argv[argc-2]);
 		free (realname);
-		setusernumeric (argv[0], argv[argc-2]);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}

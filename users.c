@@ -69,7 +69,7 @@ new_user (const char *nick)
 }
 
 void
-AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS)
+AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric)
 {
 	unsigned long ipaddress;
 	unsigned long time;
@@ -131,6 +131,11 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	/* check if the user is excluded */
 	ns_do_exclude_user(u);
 
+#ifdef BASE64NICKNAME
+	if(numeric) {
+		setusernumeric (u->nick, argv[argc-2]);
+	}
+#endif
 
 	AddStringToList (&av, u->nick, &ac);
 	ModuleEvent (EVENT_SIGNON, av, ac);

@@ -24,7 +24,7 @@
 #ifndef _USERS_H_
 #define _USERS_H_
 
-void AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS);
+void AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric);
 int UserNick (const char * oldnick, const char * newnick, const char * ts);
 void UserDump (const char *nick);
 void UserPart (list_t *list, lnode_t *node, void *v);
