@@ -709,7 +709,6 @@ m_eos (char *origin, char **argv, int argc, int srv)
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
-	nlog (LOG_INFO, LOG_CORE, "SJOIN: %s", recbuf);
 	do_sjoin (argv[0], argv[1], ((argc <= 2) ? argv[1] : argv[2]), origin, argv, argc);
 }
 
