@@ -275,6 +275,7 @@ int ModInit(Module* modptr)
 
 void ModFini()
 {
+	del_services_cmd_list(extauth_commands);
 }
 
 int ModAuthUser(Client * u)

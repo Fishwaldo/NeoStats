@@ -97,7 +97,7 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	return(s);
 }
 
-static void del_server_leaves(Client * hub)
+static void del_server_leaves (Client * hub)
 {
 	Client *s;
 	hscan_t ss;
@@ -107,9 +107,9 @@ static void del_server_leaves(Client * hub)
 	hash_scan_begin (&ss, serverhash);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		if(ircstrcasecmp(hub->name, s->uplink) == 0) {
-			dlog(DEBUG1, "del_server_leaves: del child %s", s->name);
-			DelServer(s->name, hub->name);
+		if(ircstrcasecmp (hub->name, s->uplink) == 0) {
+			dlog(DEBUG1, "del_server_leaves: server %s had uplink %s", s->name, hub->name);
+			DelServer (s->name, hub->name);
 		}
 	}
 }
@@ -128,7 +128,7 @@ DelServer (const char *name, const char* reason)
 		return;
 	}
 	s = hnode_get (sn);
-	del_server_leaves(s);
+	del_server_leaves (s);
 	if(ircd_srv.protocol & PROTOCOL_NOQUIT) {
 		QuitServerUsers (s);
 	}

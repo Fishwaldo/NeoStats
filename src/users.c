@@ -788,7 +788,7 @@ void QuitServerUsers (Client *s)
 		u = hnode_get (un);
 		if(u->user->server == s) 
 		{
-			dlog (DEBUG1, "QuitServerUsers: deleting %s for %s", u->name, s->name);
+			dlog (DEBUG1, "QuitServerUsers: deleting %s from %s", u->name, s->name);
 			QuitUser(u->name, s->name);
 		}
 	}

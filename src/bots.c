@@ -40,6 +40,12 @@
 /* @brief Module Bot hash list */
 static hash_t *bothash;
 
+/** @brief InitBots 
+ *
+ *  initialise bot systems
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 int InitBots (void)
 {
 	bothash = hash_create (B_TABLE_SIZE, 0, 0);
@@ -50,80 +56,116 @@ int InitBots (void)
 	return NS_SUCCESS;
 }
 
+/** @brief FiniBots
+ *
+ *  cleanup bot systems
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 int FiniBots (void)
 {
 	hash_destroy(bothash);
 	return NS_SUCCESS;
 }
 
-/** @brief flood
+/** @brief flood_test
  *
- * 
+ *  Check whether client is flooding NeoStats
  *
- * @return 
+ *  @param pointer to client to test
+ *
+ *  @return NS_TRUE if client flooded, NS_FALSE if not 
  */
 int
-flood (Client * u)
+flood_test (Client * u)
 {
+	/* sanity test */
 	if (!u) {
-		nlog (LOG_WARNING, "flood: can't find user");
-		return 0;
+		nlog (LOG_WARNING, "flood_test: NULL user");
+		return NS_FALSE;
 	}
-	if (UserLevel (u) >= NS_ULEVEL_OPER)	/* locop or higher */
-		return 0;
+	/* locop or higher are expempt from flood checks */
+	if (UserLevel (u) >= NS_ULEVEL_OPER)	
+		return NS_FALSE;
+	/* calculate and test flood values */
 	if ((me.now - u->user->tslastmsg) > 10) {
 		u->user->tslastmsg = me.now;
 		u->user->flood = 0;
-		return 0;
+		return NS_FALSE;
 	}
 	if (u->user->flood >= 5) {
 		nlog (LOG_NORMAL, "FLOODING: %s!%s@%s", u->name, u->user->username, u->user->hostname);
 		irc_svskill (u, "%s!%s (Flooding Services.)", me.name, ns_botptr->name);
-		return 1;
+		return NS_TRUE;
 	}
 	u->user->flood++;
-	return 0;
+	return NS_FALSE;
 }
 
+/** @brief process_origin
+ *
+ *  validate message origin and populate cmdparams structure
+ *
+ *  @param cmdparam structure to populate 
+ *  @param origin nick or server name 
+ *
+ *  @return NS_TRUE if valid, NS_FALSE if not 
+ */
 int process_origin(CmdParams * cmdparams, char* origin)
 {
 	cmdparams->source = find_user (origin);
 	if(cmdparams->source) {
-		if (flood (cmdparams->source)) {
-			return 0;
+		if (flood_test (cmdparams->source)) {
+			return NS_FALSE;
 		}
-		else {
-			return 1;
-		}
+		return NS_TRUE;
 	}
 	cmdparams->source = find_server (origin);
 	if(cmdparams->source) {
-		return 1;
+		return NS_TRUE;
 	}
-	return 0;
+	return NS_FALSE;
 }
 
+/** @brief process_target_user
+ *
+ *  validate message target and populate cmdparams structure
+ *
+ *  @param cmdparam structure to populate 
+ *  @param target nick
+ *
+ *  @return NS_TRUE if valid, NS_FALSE if not 
+ */
 int process_target_user(CmdParams * cmdparams, char* target)
 {
 	cmdparams->target = find_user (target);
 	if(cmdparams->target) {
 		cmdparams->bot = cmdparams->target->user->bot;
 		if(cmdparams->bot) {
-			return 1;
+			return NS_TRUE;
 		}
 	}
 	dlog(DEBUG1, "process_target_user: user %s not found", target);
-	return 0;
+	return NS_FALSE;
 }
 
+/** @brief process_target_chan
+ *
+ *  validate message target and populate cmdparams structure
+ *
+ *  @param cmdparam structure to populate 
+ *  @param target channel
+ *
+ *  @return NS_TRUE if valid, NS_FALSE if not 
+ */
 int process_target_chan(CmdParams * cmdparams, char* target)
 {
 	cmdparams->channel = find_chan(target);
 	if(cmdparams->channel) {
-		return 1;
+		return NS_TRUE;
 	}
 	dlog(DEBUG1, "cmdparams->channel: chan %s not found", target);
-	return 0;
+	return NS_FALSE;
 }
 
 /** @brief send a message to a bot

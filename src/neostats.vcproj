@@ -327,6 +327,12 @@
 		<File
 			RelativePath="..\ChangeLog">
 		</File>
+		<File
+			RelativePath="..\modules\modules.txt">
+		</File>
+		<File
+			RelativePath=".\protocol\protocol.txt">
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
