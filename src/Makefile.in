@@ -18,7 +18,7 @@ SRCS =	dns.c channels.c dotconf.c services.c main.c sock.c conf.c ircd.c \
 		bans.c bots.c modules.c auth.c signals.c
 
 INCLUDES = config.h dl.h dotconf.h hash.h list.h neostats.h \
-		conf.h log.h support.h ircstring.h events.h numeric.h pcre.h \
+		conf.h log.h support.h ircstring.h events.h numeric.h pcre/pcre.h \
 		transfer.h
 COREINCS = dns.h services.h sock.h ircd.h exclude.h \
 		ns_help.h timer.h users.h channels.h servers.h bans.h \
