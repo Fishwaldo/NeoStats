@@ -7,10 +7,12 @@
 /ChangeLog -text
 /ChangeLog.old -text
 /Config -text
+/INSTALL -text
 /INSTNOTES -text
 /INSTNOTES.svn -text
 /Makefile.am -text
 /Makefile.in -text
+/NEWS -text
 /README -text
 /RELNOTES -text
 /TODO -text
