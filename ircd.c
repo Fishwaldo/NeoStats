@@ -632,9 +632,6 @@ init_services_bot (void)
 	long Umode;
 
 	SET_SEGV_LOCATION();
-	AddStringToList (&av, me.uplink, &ac);
-	ModuleEvent (EVENT_ONLINE, av, ac);
-	free (av);
 	if (finduser (s_Services)) {
 		/* nick already exists on the network */
 		strlcat (s_Services, "1", MAXNICK);
@@ -642,6 +639,9 @@ init_services_bot (void)
 	ircsnprintf (me.rname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
 	Umode = UmodeStringToMask(services_bot_modes, 0);
 	SignOn_NewBot (s_Services, me.user, me.host, me.rname, Umode);
+	AddStringToList (&av, me.uplink, &ac);
+	ModuleEvent (EVENT_ONLINE, av, ac);
+	free (av);
 	me.onchan = 1;
 	return NS_SUCCESS;
 }
