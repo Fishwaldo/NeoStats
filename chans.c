@@ -424,12 +424,16 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 	Chans *c;
 	Chanmem *cm;
 	lnode_t *un;
-	User *u, *k;
+	User *u;
 
 	SET_SEGV_LOCATION();
 	u = finduser (kicked);
+	/* kickby can be a server as well */
+#if 0
 	k = finduser (kickby);
 	if (!u||!k) {
+#endif
+	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
 		if (me.debug_mode) {
 			chanalert (s_Services, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
@@ -437,7 +441,7 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 		}
 		return;
 	}
-	nlog (LOG_DEBUG2, LOG_CORE, "kick_chan: %s kicking %s from %s for %s", k->nick, u->nick, chan, kickreason ? kickreason : "no reason");
+	nlog (LOG_DEBUG2, LOG_CORE, "kick_chan: %s kicking %s from %s for %s", kickby, u->nick, chan, kickreason ? kickreason : "no reason");
 	c = findchan (chan);
 	if (!c) {
 		nlog (LOG_WARNING, LOG_CORE, "kick_chan: channel %s not found", chan);
@@ -457,7 +461,7 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 			free (cm);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			AddStringToList (&av, k->nick, &ac);
+			AddStringToList (&av, (char *)kickby, &ac);
 			if (kickreason != NULL) {
 				AddStringToList (&av, kickreason, &ac);
 			}
@@ -471,7 +475,7 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 			del_bot_from_chan (u->nick, c->name);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			AddStringToList (&av, k->nick, &ac);
+			AddStringToList (&av, (char *)kickby, &ac);
 			if (kickreason != NULL) {
 				AddStringToList (&av, kickreason, &ac);
 			}
