@@ -1100,7 +1100,12 @@ static void LoadConfig(void)
 		cs_cfg.nick_watch = 1;
 	}
 	if(GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
+#if !defined(HYBRID7)
 		strlcpy(s_ConnectServ , "ConnectServ", MAXNICK);
+#else
+		/* just to be safe on hyrbid, keep connectservs nick less than 9 */
+		strlcpy(s_ConnectServ, "CS", MAXNICK);
+#endif
 	}
 	else {
 		strlcpy(s_ConnectServ, temp, MAXNICK);
