@@ -4,8 +4,8 @@ AC_CONFIG_HEADER(config.h)
 PACKAGE=NeoStats
 AC_DEFINE(MAJOR, 2)
 AC_DEFINE(MINOR, 5)
-AC_DEFINE(REV, 3)
-VERSION=2.5.3
+AC_DEFINE(REV, 4)
+VERSION=2.5.4
 AC_PREFIX_DEFAULT(~/NeoStats)
 CFLAGS="$CFLAGS -O2"
 
@@ -331,14 +331,12 @@ echo "(| further information on that option                       |)"
 echo "(*----------------------------------------------------------*)"
 echo "(| For Support please visit:                                |)"
 echo "(|    IRC:                   /server irc.irc-chat.net       |)"
-echo "(|                           /server irc.neostats.net       |)"
 echo "(|                                   #neostats channel      |)"
-echo "(|    WWW:   http://www.neostats.net/cgi-bin/forum.cgi      |)"
-echo "(|           http://www.sf.net/projects/neostats/           |)"
+echo "(|    WWW:   http://www.neostats.net/boards/                |)"
 echo "(*----------------------------------------------------------*)"
 echo "(| Now that Configure is complete, just type 'make' to      |)"
 echo "(| compile the program                                      |)"
 echo "(*----------------------------------------------------------*)"
 read -p "Press Enter Key to Read the Release Notes"
 clear
-more ./RelNotes.txt
+more ./RELNOTES

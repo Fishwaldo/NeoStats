@@ -1,0 +1,15 @@
+* NeoStats * Shmad & Fish * Version 2.5.4
+==============================================================================
+Important Changes you should know: (READ THIS!)
+==============================================================================
+RedHat 9.0 Users:
+	There have been some changes to the RedHat 9 Kernel that affects
+	NeoStats. If you are running RedHat 9.0 please read
+	http://www.neostats.net/boards/viewtopic.php?t=391
+
+Updated Documentation:
+	M (mark at ctcp dot net) has kindly updated all our documentation to
+	be current now. I suggest you read the README and doc/USERMAN files 
+	now, as they are very complete and upto date.
+
+Read the ChangeLog for a complete description of what has changed

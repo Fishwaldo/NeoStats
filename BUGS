@@ -1,5 +1,5 @@
-Bug Lists that I've found, but not started working on:
-======================================================
-"/msg NeoStats raw :test nick test" strips out all : in the line
+For a list of known bugs and progress reports please use our bug 
+tracking system at:
 
-sending umodes for Bots is kinda broken. (Esp for Ultimate)
+	http://bugs.neostats.net/index.php 
+

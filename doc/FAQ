@@ -1,166 +1,255 @@
-NeoStats - Frequently Asked Questions (FAQ)
--------------------------------------------
-http://www.neostats.net
+************************************************************************
+** NeoStats - IRC Statistical Services                                **
+** Copyright (c) 1999-2003 NeoStats Group. All Rights Reserved.       **
+** This program and all associated documentation is free but          **
+** copyrighted software; see the file COPYING for details.            **
+** Homepage: http://www.neostats.net/                                 **
+************************************************************************
 
+Frequently Asked Questions (FAQ)
+--------------------------------
 
-*************************************************************************
-* NeoStats is based off of GeoStats by Johnathan George net@lite.net.   *
-* NeoStats is IRC Statistical Services that keep track of user records, *
-* server splits, current users/opers online, and many more things.      *
-*************************************************************************
+1 General questions
+	1.1 What is NeoStats?
+	1.2 Will there ever be a Windows Version of NeoStats?
+	1.3 What IRCD does the team recommend?
+	1.4 What Services package does the team recommend?
+	1.5 What Operating System does NeoStats Run on?
+	1.6 How do I uncompress the NeoStats-x.x.x.tar.gz file?
+2 Compiling, configuring and installation questions
+	2.1 When I type compile nothing happens, whats wrong?
+	2.2 Typing stats says no file/directory, how do I load it?
+	2.3 Typing neostats says no file/directory, how do I load it?
+	2.4 When NeoStats tries to connect it says "No N Line!" How do I add one?
+3 Module questions
+	3.1 I upgraded NeoStats and now it crashes when it loads modules 
+	    like OPSB.
+	3.2 When I started NeoStats for the first time it flooded me with 
+	    new records. Why does it do this? 
+	3.3 How do I install modules I downloaded from your website?
+	3.4 How do I load modules I downloaded and installed from your 
+	    website?
+	3.5 When I compile modules I get a Pointer Type Error HELP!
+	3.6 What is 'sumyungguy'
+	3.7 When I try to LOAD or UNLOAD modules I get an ACCEDD DENIED 
+	    msg! why?
+	3.8 Will the modules with NeoStats 2.5.0 work on older versions?
+4 Coding questions
+	4.1 Does NeoStats API support multiple Nicks?
+5 Bugs, suggestions, contributions
+	5.1 I have a really good idea for a module, will you make it?
+	5.2 Can I send you guys some money for this?
 
+-----------------------------------<>-----------------------------------
+1. General Questions
+-----------------------------------<>-----------------------------------
 
+1.1 What is NeoStats?
 
-Q: I can't figure out how to uncompress the NeoStats-x.x.x.tar.gz file how do I do ti?
+	NeoStats is based on GeoStats by Johnathan George net@lite.net. 
+	NeoStats is a set of IRC Statistical Services that keep track of 
+	user records, server splits, current users/opers online, and many 
+	more things.   
 
-A: in your shell type: tar xvfz NeoStats-x.x.x.tar.gz
+-----------------------------------<>-----------------------------------
 
+1.2 Will there ever be a Windows Version of NeoStats?
 
-Q: I'm typing compile in the directory but it isn't working, whats wrong?
+	The NeoStats team has considered porting a windows platform of 
+	NeoStats on many occasions. At this stage the code needs a number 
+	of changes so although we one day hope to provide a Windows version,
+	don't be surprised if this is some time away. Once we have the 
+	remaining bugs ironed out, a windows version has a 50% chance of 
+	happening.
 
-A: You have to type "make" without the quotes.
+-----------------------------------<>-----------------------------------
 
+1.3 What IRCD does the team recommend?
 
-Q: I am typing stats but it says no file/directory, how do I load it?
+	The NeoStats Team recommend that you use a supported IRCd package.
+	NeoStats currently supports Unreal, Ultimate 2.x.x, Ultimate 3.x.x,
+	Hybrid7 and our own NeoIRCd.
 
-A: One some systems you can't just type "stats" you need to start it with "./stats"
-   without the quotes.
+	Check ./configure --help for more information.
 
+-----------------------------------<>-----------------------------------
 
-Q: Ok I've ran it, but when it tries to connect to my server I get a message saying
-   "No N Line!"  How do I add one?
+1.4 What Services package does the team recommend?
 
-A: edit your ircd.conf file and and add C/N lines for StatServ, also add U: lines for
-   it while your there.  If you can't figure out how to add them refer to the documentation
-   that came with your IRCd.
+	We recommend Epona Services, however NeoStats will also
+	function with other services such as Daylight II and IRC Services.
+	Other Services packages may also work with NeoStats.
 
+-----------------------------------<>-----------------------------------
 
-Q: When I started NeoStats for the first time it flooded me with new records.  Why does it
-   do this? It scared the bajesus outa me!
+1.5 What Operating System does NeoStats Run on?
 
-A: When you first install it, there are no Statistics so it creates them when it is first ran
-   That is what you are experiencing.
+	NeoStats runs best under any Linux/Unix Based Environment.
+	NeoStats now runs fine on BSD system.
+	NeoStats DOES NOT RUN UNDER MACINTOSH OR WINDOWS!!!
 
+-----------------------------------<>-----------------------------------
 
-Q: How do I install modules I downloaded from your website?
+1.6 How do I uncompress the NeoStats-x.x.x.tar.gz file?
 
-A: ** NOTE: Currently Modules Listed on the WEBSITE will NOT function with
-      NeoStats 2.5.0 Beta copies.
-   Upload the module file into the \2module\2 directory
-   Type either:
-   a) 'tar xvfz Module-x.x.tar.gz'",
-   or",
-   b) 'gzip -d Module-x.x.tar.gz' Followed by 'tar xvf Module-x.x.tar'
-   Once This is done enter the directory the files were unpacked to
-   type 'make' (Ignore any 'errors' that appear)
-   In an IRC window type '/msg NeoStats load modulename' where 'modulename'
-   is the name of the directory that the module was unpacked to
+	In your shell type: 
+	
+		tar xvfz NeoStats-x.x.x.tar.gz
 
-   Note: Once the module has been 'made' you can make the module load when
-   NeoStats is loaded by editing the stats.cfg file. Adding 'LOAD_MODULE modulename
-   in the Module section will ensure this happens the next time NeoStats is loaded
+	The filename will vary depending on the version you run of NeoStats. 
+	Change the x.x.x to match your filename e.g. NeoStats2.5.3.tar.gz.
 
+	On systems that run an old version of tar you should use:
+	
+		gzip -d NeoStats-x.x.x.tar.gz
+		tar xvf NeoStats-x.x.x.tar.gz
 
-Q: When I compile modules I get a Pointer Type Error HELP!
+-----------------------------------<>-----------------------------------
+2. Compiling, configuring and installation questions
+-----------------------------------<>-----------------------------------
 
-A: The solution to this problem is to simply ignore the message
-   the message does not affect the running of the module or NeoStats.
+2.1 When I type compile nothing happens, whats wrong?
 
+	You have to type "make" without the quotes.
 
-Q: What is 'sumyungguy'
+-----------------------------------<>-----------------------------------
 
-A: sumyungguy is the spam module. It no longer changes its name...
-   rather, it sits and waits for a user to spam it before it echos
-   the spammer's message, nick & hostname information.
+2.2 Typing stats says no file/directory, how do I load it?
 
+	stats is the way you used to load older versions of NeoStats. Current 
+	versions use neostats.
 
-Q: What IRCD and Services Does The Team Reccomend?
+-----------------------------------<>-----------------------------------
 
-A: The NeoStats Team Recommends Unreal IRCd and Ultimate IRCd,
-   as those are the only two currently supported IRCds.  Check
-   ./configure --help for more information.
-   We also recommend Epona Services, however NeoStats will also
-   function with other services such as Daylight II.
-   Further IRCd support includes Hybrid, Bahamut and ircu.
+2.3 Typing neostats says no file/directory, how do I load it?
 
+	On some systems you can't just type "neostats" you need to start it 
+	with "./neostats" without the quotes.
 
-Q: What Operating System does NeoStats Run on?
+-----------------------------------<>-----------------------------------
 
-A: NeoStats runs best under any Linux/Unix Based Enivornment.
-   NeoStats now runs fine on BSD system.
-   NeoStats DOES NOT RUN UNDER MACINTOSH OR WINDOWS!!!
+2.4 When NeoStats tries to connect it says "No N Line!" How do I add one?
 
+	Edit your ircd.conf file and and add C/N lines for StatServ, also 
+	add U: lines for it while your there.  If you can't figure out how 
+	to add them refer to the documentation that came with your IRCd. 
+	We cannot help you to set up your IRCd.
 
-Q: Does NeoStats API support multiple Nicks?
+-----------------------------------<>-----------------------------------
+3. Module questions
+-----------------------------------<>-----------------------------------
 
-A: The short answer to this question is 'yes'. Some time
-   back development started on the NeoStats Channel Services
-   to replace the Epona services currently used and be fully
-   intergrated with NeoStats. During this design a module with
-   multiple nick's was deisgned and so was a patch to the API
-   which enabled this feature. At this stage there are no plans
-   to release the multiple nicks API, but rather intergate it
-   into the NeoStats-2.5 release.
+3.1 I upgraded NeoStats and it crashes when it loads modules like OPSB.
 
+	You should rebuild and reinstall modules when you upgrade NeoStats. 
+	See the README file for more information on upgrading and 
+	installing.
 
-Q: I have a really good idea for a module, will you make it?
+-----------------------------------<>-----------------------------------
 
-A: It really depends on what the module is for... but we will
-   take suggestions and comments and probably end up doing them :P
-   A good example of this is the HTML stats output in StatServ and
-   the design of HostServ.
-   TO MAKE SUGGESTIONS: http://www.neostats.net/boards
+3.2 When I started NeoStats for the first time it flooded me with new 
+	records. Why does it do this? 
 
+	When you first install it, there are no Statistics so it creates 
+	them when it is first run. That is what you are experiencing. Once 
+	StatServ has generated statistics for the network, these messages 
+	will stop and you will only see them when new records are made. 
 
-Q: When I try to LOAD or UNLOAD modules I get an ACCEDD DENIED msg! why?
+-----------------------------------<>-----------------------------------
 
-A: To operate NeoStats you must have either Tech-Admin or Net-Admin
-   privileges. You may want to check that you have those flags
-   before you try the command.
+3.3 How do I install modules I downloaded from your website?
 
-   The old standard for NeoStats was 'Tech Admin' or higher...
-   this flag is fading away and in the newer versions of NeoStats,
-   the new standard is 'Net Admin' or higher.
+	Refer to the instructions that come with the module to configure, 
+	build and install the module.
 
+-----------------------------------<>-----------------------------------
 
+3.4 How do I load modules I downloaded and installed from your website?
 
-Q: Will there ever be a Windows Version of NeoStats?
+	To load the module, from an IRC client type '/msg NeoStats load 
+	modulename' where 'modulename' is the name of the new module or 
+	add 'LOAD_MODULE modulename' in the Module section of the 
+	neostats.cfg file then restart NeoStats.
 
-A: The NeoStats team has considered porting a windows platform
-   of NeoStats on many occasions. At this stage we feel that
-   we will create a windows version from the release that is
-   due out shortly (NeoStats-2.5). We are currently in the  
-   process of fine-tuning and debugging the new and old code   
-   of NeoStats. However, don't be surprised if no windows
-   version is available until a few releases later. Once we
-   have the remaining bugs ironed out, a windows version has a
-   50% chance of happening.
+-----------------------------------<>-----------------------------------
 
+3.5 When I compile modules I get a Pointer Type Error HELP!
 
-Q: Will the modules with NeoStats 2.5.0 work on older versions?
+	The solution to this problem is to simply ignore the message
+	the message does not affect the running of the module or NeoStats.
 
-A: NO!  These modules are for this version ONLY.  They will NOT
-   function with older versions of NeoStats.  Make sure you are using
-   ONLY the most current modules from our Website.
-   ** NOTE: Beta Users DO NOT DOWNLOAD MODULES FROM OUR SITE THEY
-            ARE FOR NEOSTATS 2.0.13 AND WILL NOT WORK WITH NEOSTATS 2.5.0
+-----------------------------------<>-----------------------------------
 
-   The team decided to make a large number of changes to NeoStats,
-   causing the development version NeoStats-2.1 to be incremented 
-   to NeoStats-2.5. In doing this, code used for the modules was 
-   slightly modified and therefore the older modules will not work
-   on the new version of NeoStats. And vice versa. 
+3.6 What is 'sumyungguy'
 
+	sumyungguy is the spam module. It no longer changes its name and 
+	just it sits and waits for a user to spam it before it echos
+	the spammer's message, nick & hostname information.
 
+-----------------------------------<>-----------------------------------
 
-Q: Can I send you guys some money for this?
+3.7 Why do I get ACCESS denied when I try to LOAD or UNLOAD modules?
 
-A: Yes, in small unmarked bills. ;)
+	To operate NeoStats you must have the correct access privileges. 
+	You should check your oline flags before you try the command.
 
+	The old standard for NeoStats was 'Tech Admin' or higher but as
+	this flag is fading away, newer versions of NeoStats use 'Net 
+	Admin' or higher.
 
+-----------------------------------<>-----------------------------------
 
+3.8 Will the modules with NeoStats 2.5.0 work on older versions?
 
+	NO! Modules on the website are for this version ONLY.  They will 
+	NOT function with older versions of NeoStats.  Make sure you are 
+	using ONLY the most current modules from our Website. We also 
+	recommend you upgrade to the latest version of NeoStats.
 
-NeoStats FAQ - Last Updated - March 28, 2002 7:32 AM PST - Author Shmad
-(c) 1999-2002 Codeworks.  All Rights Reserved.
-http://www.neostats.net
+	The team decided to make a large number of changes to NeoStats,
+	causing the development version NeoStats-2.1 to be incremented 
+	to NeoStats-2.5. In doing this, code used for the modules was 
+	slightly modified and therefore the older modules will not work
+	on the new version of NeoStats. And vice versa. 
+
+-----------------------------------<>-----------------------------------
+4. Coding questions
+-----------------------------------<>-----------------------------------
+
+4.1 Does NeoStats API support multiple Nicks?
+
+	The short answer to this question is 'yes'. Some time back 
+	development started on the NeoStats Channel Services to replace 
+	the Epona services currently used and be fully intergrated with 
+	NeoStats. During this design a module with multiple nick's was 
+	designed and so was a patch to the API which enabled this feature. 
+	At this stage there are no plans to release the multiple nicks API, 
+	but rather intergate it into the NeoStats-2.5 release.
+
+-----------------------------------<>-----------------------------------
+5. Bugs, suggestions, contributions
+-----------------------------------<>-----------------------------------
+
+5.1 I have a really good idea for a module, will you make it?
+
+	It really depends on what the module is for... but we will take 
+	suggestions and comments and probably end up doing them :P A good 
+	example of this is the HTML stats output in StatServ and the design 
+	of HostServ.
+	
+	To make suggestions visit http://www.neostats.net/boards. Please
+	search the board first to see if your suggestion has already been
+	made.
+
+-----------------------------------<>-----------------------------------
+
+5.2 Can I send you guys some money for this?
+
+	Yes, in small unmarked bills. ;)
+
+-----------------------------------<>-----------------------------------
+
+************************************************************************
+** This document was last updated on May 27, 2003 by M and is         **
+** based on documents originally created by Shmad and Fish.           **
+************************************************************************

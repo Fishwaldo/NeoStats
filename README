@@ -1,778 +1,593 @@
-NeoStats 2.5.0
-~~~~~~~~~~~~~~~
+************************************************************************
+** NeoStats - IRC Statistical Services                                **
+** Copyright (c) 1999-2003 NeoStats Group. All Rights Reserved.       **
+** This program and all associated documentation is free but          **
+** copyrighted software; see the file COPYING for details.            **
+** Homepage: http://www.neostats.net/                                 **
+************************************************************************
 
----------------------------------------
-PLEASE READ THE 'BETA' FILE NOW
----------------------------------------
+Thank you for downloading NeoStats. 
 
-Thanks for Downloading NeoStats. NeoStats is a powerfull and extendable set
-of *services* for IRC. By Services, we do not mean NickServ/Chanserv etc 
-(although those are being developed) but additional services. Things like
-StatServ which give you information on the number of users/operators/channels/
-servers... basically IRC statistics, or MoraleServ, which is a *fun* module, 
-to send funny messages to users, to utility modules. Some modules have a 
-usefull function on your network, other modules are developed for fun, and to
-make your IRC network more attractive to users (thats whats it all about 
-right?, IRC users?)
-With the release of 2.5 series of NeoStats, several changes have taken place 
-compared to the old version of NeoStats 2.0 series (don't ask me what happened
-to versions 2.1, 2.2, 2.3 or 2.4, I don't know!)
-A detailed list of changes can be found in the ChangeLog file, but a brief 
-summary is:
+NeoStats is a powerful and extendable set of *services* for IRC. By 
+Services, we do not mean NickServ/Chanserv etc (although those are 
+being developed) but additional services. Things like StatServ which 
+give you information on the number of users/operators/channels/servers 
+basically IRC statistics, or MoraleServ, which is a *fun* module, to 
+send funny messages to users, and utility modules. Some modules have a 
+useful function on your network, other modules are developed for fun, 
+and to make your IRC network more attractive to users (thats whats it 
+all about right?, IRC users?)
+
+Version 2.x releases allow Modules to be programmed and added into 
+NeoStats to increase functionalility and to customize the look and feel 
+of your network and your copy of NeoStats.                   
+
+With the release of 2.5 series of NeoStats, several changes have taken 
+place compared to the old version of NeoStats 2.0 series (don't ask me 
+what happened to versions 2.1, 2.2, 2.3 or 2.4, I don't know!)
+
+A detailed list of changes can be found in the ChangeLog file, but a 
+brief summary is:
 	-ServiceRoots support
 	-External MOTD files
 	-Module Segfault protection
-	-CrossIRCD support. We now support Other IRCD's apart from just Unreal
-	-StatServ supports dumping Statistics to a HTML file for output (the 
-	 output of the HTML file is based on a template)
+	-CrossIRCD support. Support for more IRCD's than just Unreal
+	-StatServ supports dumping Statistics to a HTML file for output 
+	 (the output of the HTML file is based on a template)
 	-Changes to the ModuleAPI that make it nicer
 	-Channel Support!
 	-StatServ supports Channel Statistics now!
 	-Many bugfixes and changes to the internal NeoStats core
 	-Many updates to the various Modules
 
-Anyway, enough ranting, its time to move on....
+Visit http://www.neostats.net for the latest news and NeoStats updates.
 
-Table of Contents:
+Please read all documentation included with NeoStats carefully. The 
+documents contain all the information you need to get NeoStats running
+on your network.
 
-[1] Installation
-	[1.1] Getting Started.
-	[1.2] Running configure
-	[1.3] Compiling NeoStats
-	[1.4] Installing NeoStats
-	[1.5] Setting up the neostats.cfg file
-	[1.6] Finished!
-[2] NeoStats Bot Help
-	[2.1] neostats.cfg options
-	[2.2] Available commands
-	[2.3] 	INFO
-	[2.4] 	VERSION
-	[2.5] 	LEVEL
-	[2.6] 	SHUTDOWN	
-	[2.7] 	RELOAD
-	[2.8] 	LOGS
-	[2.9] 	LOAD
-	[2.10]	UNLOAD
-	[2.11]	MODLIST
-	[2.12]	JUPE
-	[2.13]	RAW
-[3] StatServ Bot Help
-	[3.1] neostats.cfg options
-	[3.2] Available Commands
-	[3.3]		SERVER
-	[3.4]	 	MAP
-	[3.5]	 	NETSTATS
-	[3.6]	 	DAILY
-	[3.7]	 	TLD
-	[3.8]	 	TLDMAP
-	[3.9]	 	OPERLIST
-	[3.10]	BOTLIST
-	[3.11]	VERSION
-	[3.12]	FORCEHTML
-	[3.13]	RESET
-	[3.14]	STATS
-	[3.15] HTML Template Syntax
-[4] Support Information
-	[4.1] Where to get support
-	[4.2] What information you should provide for support
+All documentation applies to version 2.5.3 and higher. For older 
+versions consult the documentation with that version or consider 
+upgrading. New versions of NeoStats have many new features and bug 
+fixes. We are not able to provide support for older versions of
+NeoStats. 
 
+Following is a quick guide to the main NeoStats documentation:
 
+README -        This file. Contains NeoStats Installation and 
+                configuration information and support information.
+DOCS/USERMAN - 	Manual for run time operation of NeoStats. You should 
+		        read this when you have NeoStats running for information
+		        on how to use NeoStats.
+DOCS/FAQ -      Frequently asked questions about NeoStats.
+RELNOTES -      Release notes about the current version. This is 
+		        displayed during the installation process but you
+		        should refer to it if you have problems.
+                
+-----------------------------------<>-----------------------------------
 
-[1] Installation:
--------------
+Contents
+--------
 
-	[1.1] Getting Started.
-
-		First off, you're going to want to uncompress NeoStats to do
-		this type the following:
-
-		tar xvfz NeoStats2.0.tar.gz (this may vary depending on the
-			version you run of Neo change the NeoStats2.0.tar.gz
-			to match your filename )
-
-		** Note: For some systems that don't run a new version of tar
-		you may have to do this:
-			 gzip -d NeoStats2.0.tar.gz
-			 tar xvf NeoStats2.0.tar
+1. Installing and configuring NeoStats
+	1.1 General notes
+	1.2 Getting Started.
+	1.3 Running configure
+	1.4 Compiling NeoStats
+	1.5 Installing NeoStats
+	1.6 Setting up the neostats.cfg file
+	1.7 Compiling additional modules
+	1.8 Running NeoStats
+	1.9 Notes for upgraders
+2. Support Information
+	2.1 Before contacting support
+	2.2 Where to get support
+	2.3 What to provide when requesting support.
+3. Contributions
 
 
-	[1.2] Running configure
-		The configure script has been changed compared to the old 2.0.x 
-		releases and you must now make sure you supply the right
-		arguments to configure.
+1. Installing and configuring NeoStats
+--------------------------------------
 
-		What is required:
-		-----------------
-		IRCD Support:
-		    To specify the IRCD you are compiling for. eg:
-		      --enable-unreal		for UnrealIRCD
-		      --enable-ultimate2 	for UltimateIRCD 2.x.x Series
-		      --enable-ultimate3	for UltimateIRCD 3.x.x Series 
-		      (Note, at the time of release of this version of NeoStats
-		       Ultimate 3.x.x was still in alpha, it is possible that 
-		       Ultimate3 compatibility might break in future releases 
-		       of Ultimate as it matures)
+This section explains how to install and configure NeoStats. We 
+recommend that  you read this section in full before trying to 
+install NeoStats.
 
-		What is optional:
-		-----------------
-		Privledge System:
-			Originally, NeoStats was based on Operator Flags on a 
-			network. If you had TechAdmin on Unreal, you were 
-			basically allowed full control to Neostats. Now though,
-			you can enable what is called External Authentication.
-			This allows different ways of the NeoStats Privledge
-			system.
-			The Currently available options are:
-			--enable-auth=sr 	This Enables a ServiceRoots 
-			    option, which a user must be identified to services
-			    (with the +r flag) and they will have full access
-			    to NeoStats.
-			if you do not specify --enable-auth then it uses IRCD
-			flags for access to NeoStats Default is IRCD This 
-			reverts back to the old NeoStats Privledge system,
-			where Authenication is based on the users flags
-			(+oOANs etc etc)
+If you have any problems NOT addressed in this or other documents,
+please see the Support section for how to contact us for help.
 
-		Modules Support:
-			NeoStats has a expanding set of modules. Some Modules
-			have their own --enable options, while other modules
-			do not.
-			To enable a module at compile time (or multi modules)
-			use the following option:
-			--enable-modules="statserv spam"
-			   (this would enable the statserv and spam modules).
+1.1 General notes
+-----------------
+
+	All commands and filenames are case sensitive. This means
+	that NeoStats, neostats and NEOSTATS are all different things.
+	When typing commands you should use the same case as provided 
+	in this file or things will not work correctly.
+
+1.2 Getting Started
+-------------------
+
+	First, you need to uncompress NeoStats. To do this type the 
+	following:
+
+		tar xvfz NeoStats2.5.x.tar.gz 
+
+	This will vary depending on the version you run of NeoStats. 
+	Change the x in NeoStats2.5.x.tar.gz to match your filename 
+	e.g. NeoStats2.5.3.tar.gz
+
+	** Note: For some systems that don't run a new version of tar
+	you need to do this:
+
+		gzip -d NeoStats2.5.x.tar.gz
+		tar xvf NeoStats2.5.x.tar
+
+1.3 Running configure
+---------------------
+
+	The configure script has been changed compared to older 
+	releases and you must now make sure you supply the right
+	arguments to configure.
+
+	To run configure this, you must first change to the directory 
+	where you uncompressed NeoStats. e.g.
+
+	cd ~/NeoStats2.5.3
+
+	Your prompt should look something like:
+	[user@host NeoStats2.5.3]
+
+	Now type:
+	./configure [options]
+	
+	You should read below for the options you need to pass to 
+	configure.
+
+	Required settings:
+	------------------
+	IRCD Support:
+		To specify the IRCD you are compiling for. eg:
+		    --enable-unreal - enable Unreal IRCD Support
+		    --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support
+		    --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support
+		    --enable-hybrid7 - enable Hybrid7 IRCD Support
+		    --enable-neoircd - enable NeoIRCd IRCD Support
+		    (Note, at the time of release of this version of NeoStats
+		    Ultimate 3.x.x was still in alpha, it is possible that 
+		    Ultimate3 compatibility might break in future releases 
+		    of Ultimate as it matures)
+
+	Optional settings:
+	------------------
+	Privledge System:
+		Originally, NeoStats was based on Operator Flags on a 
+		network. If you had TechAdmin on Unreal, you were 
+		basically allowed full control to Neostats. Now though,
+		you can enable what is called External Authentication.
+		This allows different ways of the NeoStats Privledge
+		system.
+		The Currently available options are:
+		--enable-auth=sr 	This Enables a ServiceRoots 
+			option, which a user must be identified to services
+			(with the +r flag) and they will have full access
+			to NeoStats.
+		if you do not specify --enable-auth then it uses IRCD
+		flags for access to NeoStats Default. This 	reverts back 
+		to the old NeoStats Privledge system, where 
+		Authenication is based on the users flags (+oOANs etc)
+
+	Modules Support:
+		NeoStats has an expanding set of modules. Some Modules
+		have their own --enable options, while other modules
+		do not.
+		
+		To enable a module at compile time (or multiple modules)
+		use the following option:
+			--enable-modules="modulenames"
+	
+		By Default, no modules are compiled. 
+		
+		NeoStats ships with the following modules:
+		
+			ConnectServ		--enable-modules="cs"
+			HostServ		--enable-modules="hostserv"
+			LoveServ		--enable-modules="loveserv"
+			MoraleServ		--enable-modules="ms"
+			spam			--enable-modules="spam"
+			StatServ		--enable-modules="statserv"
+			Version 		--enable-modules="version"
+
+		To compile multiple modules	combine the enable-modules 
+		options together as follows:
 			
-			Defaults are no modules are compiled. NeoStats ships 
-			by default with StatServ and Spam modules (as well as 
-			the version module, which is really a useless module. 
-			Its a example of the API for module coders to use.
+			--enable-modules="statserv spam"
+			(this would enable the statserv and spam modules).
+		
+		The version module is really an example of the API 
+		for module coders to use.
 
-			if you have downloaded additional modules from the 
-			NeoStats website, DO NOT specify them in the 
-			enable-modules option. Each module has its own 
-			configure script, and must be configured and 
-			installed after NeoStats is installed.
+		If you have downloaded additional modules from the 
+		NeoStats website, DO NOT specify them in the 
+		enable-modules option. Each module has its own 
+		configure script, and must be configured and 
+		installed after NeoStats is installed. (See section
+		6 and the documentation with the module).
 
-		Debuging:
-			Most users will never look at this option. It compiles
-			NeoStats with debuging turned on. I would only suggest
-			using this if you have problems are are about to fill
-			out a bug form.
-			--enable-debug		Enables Debugging
+	Debuging:
+		Most users will never look at this option. It compiles
+		NeoStats with debuging turned on. I would only suggest
+		using this if you have problems are are about to fill
+		out a bug form.
+		--enable-debug		Enables Debugging
 
-	[1.3] Compiling NeoStats
+	XWindows Config Tool:
+		To enable building of the configtool program (Needs X windows)
+		--enable-configtool
+	
+	Enabling RAW command:
+		We strongly recommend against the use of this option.
+		Use of RAW commands can cause desync on your network 
+		and badly formatted commands can crash your network.
+		If you do enable this option, we will not provide any 
+		support for your use of this command. Please
+		do contact us for support of the RAW command.
+	 	--enable-raw 
 
-		Ok, you should now be back at a shell prompt, now type:
+	This script will check to see if all necessary programs to run 
+	NeoStats are installed on your system. A small note here, for 
+	those of you who have emailed me paranoid, NeoStats DOES NOT 
+	actually check your back account balance, nor can it.
 
-		make
+1.4 Compiling NeoStats
+----------------------
 
-		it will go through the source and compile it into an
-		executable binary file.	If you get some warnings, please
-		ignore them -- we are working on the warnings.
+	Ok, you should now be back at a shell prompt, type:
 
-		[1.4] Installing NeoStats
+	make
 
-		with version 2.5.0 and higher, NeoStats now needs to be 
-		"installed" into its own directory if you wish to use 
-		additional modules. By default NeoStats will install into
-		~/NeoStats/ (in your home directory, eg, /home/fish/NeoStats/)
-		if you wish to change the install location, please see the
-		section 2.
-
-		To install NeoStats type:
-
-		make install
-
-		This will create the necessary files, and copy them to the
-		installation directory. 
-
-
-
-	[1.5] Setting up the neostats.cfg file
-
-		Now you should change to the installation directory
-		(~/NeoStats/, or whatever you specified in ./configure)
-
-		once in this directory, you need to create a configuration
-		file. You can run the makeconf script (./makeconf) or edit
-		the template provided called neostats.cfg.dist then copy 
-		this file to neostats.cfg and edit the file. All the
-		options are pretty self explainatory. if you have a question
-		please feel free to ask me.. Once you are done editting the
-		file save it.
-
-		NOTE: some additional modules, like StatServ or scriptserv
-		have additional configuration options that must be specified
-		in the neostats.cfg file. Please see the documentation for
-		the individual modules on available configuration options
-
-		The available options are:
-		SERVER_NAME	- Specifies the name of the NeoStats Server
-				  as it will apear on the network. 
-			eg: SERVER_NAME stats.neostats.net		
-			-When it links, it will apear as stats.neostats.net.
-		SERVER_PORT	- Specifies the port to connect to on the
-		                  IRC Server
-			eg: SERVER_PORT 6667		
-			-When connecting, NeoStats will connect to port 6667
-		CONNECT_TO	- Specifies the IP address to connect to.
-			eg: CONNECT_TO 127.0.0.1	
-			- This will force stats to connect to 127.0.0.1
-		CONNECT_PASS	-Specifies the password used to connect. 
-				This must match your CN lines in your 
-				IRCD configuration
-			eg:	CONNECT_PASS linkpass	- Send "linkpass"
-				as the password to connect
-		SERVER_INFOLINE	-Specify the description of the server that
-				 appears when you do /links
-			eg: SERVER_INFOLINE Network Auxilurary Services	
-		SERVICES_CHAN	-Specify the channel that all bots on NeoStats
-				 will automatically join, and echo out any
-				 important information
-			eg: SERVICES_CHAN #services	-Makes NeoStats, and
-			    all the other bots join #services channel on
-			    startup/load.
-		WANT_PRIVMSG		-Specify if the bots should send all
-			   messages as privmsg's or as notices (Most Services
-			   use notice)
-			eg: WANT_PRIVMSG	- if present, will send all
-			    messages as Privmsg's (if commented out, it will
-			    send as Notices)
-		NO_LOAD	- If this is in the neostats.cfg your NeoStats WILL
-			NOT START UP.  To disable this simply comment this
-			line out.  
-			eg: NO_LOAD  <- NeoStats will not load.
-			eg2: #NO_LOAD <- NeoStats will load.
-		RECONNECT_TIME	-If NeoStats server gets split from the
-			network, how long to wait before attempting to
-			reconnect to the network
-			eg: RECONNECT_TIME 10	-Specifies wait 10 seconds
-			    before trying to reconnect
-		LOAD_MODULE	-what module to load at startup. Multiple
-			instances of LOAD_MODULE may be specified
-			eg: LOAD_MODULE statserv
-				-Will load up StatServ at boot
-
-		if you have enabled the ServiceRoots authentication module,
-		the the additional configuration options are available:
-
-		SERVICE_ROOTS	-Who should get access to NeoStats regardless
-			of their O line flags (apart from having the Umode +r,
-			which means they identified to Nickserver) You can
-			specify this option upto 10 times to specify different
-			nicks who will be allowed this priveledge.
-			eg: SERVICE_ROOTS fish	-Will give "fish" access to
-			NeoStats privledged commands if fish has Umode +r
-		SERVICE_ROOTS_AUTH	-Should we only give access to
-			NeoStats privledged command to the nicks listed
-			in SERVICE_ROOTS and ignore users O line flags?
-			eg: SERVICE_ROOTS_AUTH 1	-Enable, and only let
-			    fish access NeoStats, regardless of O line flags
+	it will go through the source and compile it into an
+	executable binary file.	If you get some warnings, please
+	ignore them -- we are working on the warnings.
 
 
-	[1.6] Finished!
+1.5 Installing NeoStats
+-----------------------
 
-		Ok, your all done now. 
-		** Note: Make sure your server(S) have U: lines for your stats
-			 server. Please Please Please! Remember to add the
-			 proper C & N lines on your server as well!
+	If you are upgrading a working version of NeoStats. Please
+	read section 1.9 Notes for Upgraders now.
+	
+	With version 2.5.0 and higher, NeoStats needs to be 
+	"installed" into its own directory if you wish to use 
+	additional modules. By default NeoStats will install into
+	~/NeoStats/ (in your home directory, eg, /home/fish/NeoStats/)
+	if you wish to change the install location, please see the
+	section 2.
 
-		Once your C/N/U lines are setup, you need to start stats.
-		That is as simple as ./neostats
+	To install NeoStats type:
 
-		If anything goes wrong, there *might* be a error message in
-		the log files. Have a look in ~/NeoStats/logs/stats.log it
-		might give you a clue to whats wrong!
+	make install
 
+	This will create the necessary files, and copy them to the
+	installation directory. 
+	
+	
 
-		** FINAL NOTICE ** ** FINAL NOTICE ** ** FINAL NOTICE **
-		I WILL NOT ASSIST YOU WITH ADDING C: N: AND U: LINES TO
-		YOUR SERVER, YOU SHOULD READ THE IRCd's DOCUMENTATION IF
-		YOU DO NOT KNOW HOW TO DO IT!!!
+1.6 Setting up the neostats.cfg file
+------------------------------------
 
-[2] NeoStats Bot Help
-	[2.1] neostats.cfg options
-	The following options are available for NeoStats bot in neostats.cfg:
-	NEOSTATS_HOST	- Specifies the Hostname that NeoStats comes from
+	Now you should change to the installation directory
+	(~/NeoStats/, or whatever you specified in ./configure)
+
+	Once in this directory, you need to create a configuration
+	file. You should run the makeconf script (./makeconf) and
+	answer the questions. You must edit neostats.cfg to check 
+	that everything is set the way you want it before NeoStats
+	will run. You can do this with:
+	
+	pico neostats.cfg
+
+	All the options are pretty self explanatory. if you have a 
+	question please feel free to ask me. Once you are done 
+	editting the file save it. 
+	
+	If using pico as in the previous example, press Ctrl-X then 
+	hit Y and enter to save the file.
+
+	NOTE: some additional modules have additional configuration 
+	options that must be specified 	in the neostats.cfg file. 
+	Please see the documentation for the individual modules on 
+	available configuration options for the main NeoStats 
+	distribution are:
+
+	The available options are:
+	SERVER_NAME	- Specifies the name of the NeoStats Server
+				as it will apear on the network. 
+		eg: SERVER_NAME stats.neostats.net		
+		-When it links, it will apear as stats.neostats.net.
+	SERVER_PORT	- Specifies the port to connect to on the
+		                IRC Server
+		eg: SERVER_PORT 6667		
+		-When connecting, NeoStats will connect to port 6667
+	CONNECT_TO	- Specifies the IP address to connect to.
+		eg: CONNECT_TO 127.0.0.1	
+		- This will force stats to connect to 127.0.0.1
+	CONNECT_PASS	-Specifies the password used to connect. 
+			This must match your CN lines in your 
+			IRCD configuration
+		eg:	CONNECT_PASS linkpass	- Send "linkpass"
+			as the password to connect
+	SERVER_INFOLINE	-Specify the description of the server that
+				appears when you do /links
+		eg: SERVER_INFOLINE Network Auxilurary Services	
+	SERVICES_CHAN	-Specify the channel that all bots on NeoStats
+				will automatically join, and echo out any
+				important information
+		eg: SERVICES_CHAN #services	-Makes NeoStats, and
+			all the other bots join #services channel on
+			startup/load.
+	STATSERV_NETNAME - Your network name
+		e.g. for irc.irc-chat.net put irc-chat, if unknown 
+		refer to your network file
+	NEOSTAT_HOST - Specifies the Hostname that NeoStats comes from
+		Some people like to make it the same as the Services host 
+		(eg, services.irc-chat.net) or one just for NeoStats 
+		(eg, stats.irc-chat.net)
 		eg: NEOSTATS_HOST stats.neostats.net	
 		 -Means the bot will apear as NeoStats!user@stats.neostats.net
-	NEOSTATS_USER	- Specifies the User/ident of the NeoStats Bot:
+	NEOSTAT_USER - Specifies the User/ident of the NeoStats Bot
+		(the part before the @host)
 		eg: NEOSTATS_USER neo	
 		 - Means the bot will apear as NeoStats!neo@Host
+	ONLY_OPERS - Restrict NeoStats and StatServ to opers use only.
+		If not specified, users will have some acesss to NeoStats
+		and StatServ commands. 
+	BINDTO - Make NeoStats bind to a particular IP Address. If not
+		specified NeoStats will attempt to find this address
+		itself.
+	WANT_PRIVMSG		-Specify if the bots should send all
+			messages as privmsg's or as notices (Most Services
+			use notice)
+		eg: WANT_PRIVMSG	- if present, will send all
+			messages as Privmsg's (if commented out, it will
+			send as Notices)
+	NO_LOAD	- If this is in the neostats.cfg your NeoStats WILL
+		NOT START UP.  To disable this simply comment this
+		line out.  
+		eg: NO_LOAD  <- NeoStats will not load.
+		eg2: #NO_LOAD <- NeoStats will load.
+	RECONNECT_TIME	-If NeoStats server gets split from the
+		network, how long to wait before attempting to
+		reconnect to the network
+		eg: RECONNECT_TIME 10	-Specifies wait 10 seconds
+			before trying to reconnect
+	LOAD_MODULE	-what module to load at startup. Multiple
+		instances of LOAD_MODULE may be specified
+		eg: LOAD_MODULE statserv
+			-Will load up StatServ at boot
 
-	[2.2] Available Commands
-		Available to Everyone regardless of access levels
-		INFO		-Displays Basic information about NeoStats
-				 and its uptime
-		VERSION	-Display NeoStats Version information
-		LEVEL		-Display your Permissions level as far as
-				NeoStats is concerned. 0 is the lowest, 200
-				is the highest access level.
+	if you have enabled the ServiceRoots authentication module,
+	the the additional configuration options are available:
 
-		Available to ServiceRoots (Level 180 or higher users)
-		SHUTDOWN	 -Allows you to shutdown NeoStats
-		RELOAD		 -Reload NeoStats. It unloads all modules,
-				  and squits, and re-connects
-		LOGS		-Display NeoStats log file 
-				 (~/NeoStats/logs/stats.log)
-		LOAD		-Load a module
-		UNLOAD		-Unload a Module
-		MODLIST		-List Loaded Modules
-		JUPE		-Jupiter a Server
-		RAW		-Send a raw command from NeoStats
+	SERVICE_ROOTS	-Who should get access to NeoStats regardless
+		of their O line flags (apart from having the Umode +r,
+		which means they identified to Nickserver) You can
+		specify this option upto 10 times to specify different
+		nicks who will be allowed this priveledge.
+		eg: SERVICE_ROOTS fish	-Will give "fish" access to
+		NeoStats privledged commands if fish has Umode +r
+	SERVICE_ROOTS_AUTH	-Should we only give access to
+		NeoStats privledged command to the nicks listed
+		in SERVICE_ROOTS and ignore users O line flags?
+		eg: SERVICE_ROOTS_AUTH 1	-Enable, and only let
+			fish access NeoStats, regardless of O line flags
 
-		Other commands are available, but only really usefull for
-		Debuging, use the source luke, to find them out!
+1.7 Compiling additional modules
+--------------------------------
 
-	[2.3] INFO command
-		/msg neostats info
-			Returns:
-			  =NeoStats= Statistics Information:
-			  =NeoStats= Statistics up 1 minute, 48 seconds
-			  =NeoStats= Sent 49 Messages Totaling 2526 Bytes
-			  =NeoStats= Recieved 69 Messages, Totaling 1887 Bytes
-			  =NeoStats= Reconnect Time: 10
-			  =NeoStats= Statistic Requests: 4
-			  =NeoStats= Use SMO for Debug?: Disabled
-			  =NeoStats= Debugging Mode is Disabled!
-			  =NeoStats= End of Information.
-	[2.4] Version Command
-		/msg neostats version
-			Returns:
-				 =NeoStats= NeoStats Version Information
-				 =NeoStats= NeoStats Version: NeoStats-2.5_RC2
-				 =NeoStats= http://www.neostats.net
-	[2.5] Level Command
-		/msg neostats level
-			Returns:
-				=NeoStats= Your Level is 185
-	[2.6] Shutdown Command
-		/msg neostats shutdown for upgade
-			Returns:
-				 =Server.IRC.net= *** Global -- from 
-				 stats.dynam.ac: StatServ Module Unloaded
-				 =Server.IRC.net= *** Global -- from NeoStats:
-				 Fish requested SHUTDOWN for for upgrade
-				 =Server.IRC.net= *** LocOps -- Received SQUIT
-				 stats.dynam.ac from stats.dynam.ac[127.0.0.1]
-				 (stats.dynam.ac)
+	If you have downloaded other NeoStats modules e.g. OPSB,
+	you should now install them. If you upgrading NeoStats,
+	you must rebuild all other seperate modules to work with
+	the new version of NeoStats. See the documentation with
+	these modules for instructions on building and installing
+	them. 
 
-	[2.7] Reload Command
-		/msg neostats reload Your lagged out
-			Returns:
-				 =Server.IRC.net= *** Global -- from NeoStats:
-				 Fish requested RELOAD for your lagged out
-				 =Server.IRC.net= *** Global -- from
-				 stats.dynam.ac: StatServ Module Unloaded
-				 =Server.IRC.net= *** LocOps -- Received SQUIT
-				 stats.dynam.ac from stats.dynam.ac[127.0.0.1]
-				 (stats.dynam.ac)
-				 =Server.IRC.net= *** Notice -- (link)
-				 Link Server.IRC.net -> 
-				 stats.dynam.ac[@127.0.0.1.54872] established
-				 =Server.IRC.net= *** Notice -- Link
-				 stats.dynam.ac -> Server.IRC.net is now
-				 synced [secs: 0 recv: 0.1015 sent: 1.431]
-				 =Server.IRC.net= *** Global -- from 
-				 stats.dynam.ac: Link with Network Complete!
+1.8 Running NeoStats
+--------------------
 
-	[2.8] Log Command
-		/msg neostats logs
-			Returns:
-				 =NeoStats= (11:02[03/21/2002]) RemoveLock()
-				  called: We must be segging!
-				 =NeoStats= (11:02[03/21/2002]) Statistics
-				  Started (NeoStats-2.5_Alpha6).
-				 =NeoStats= (11:02[03/21/2002]) New Server:
-				  stats.dynam.ac
-				 =NeoStats= (11:02[03/21/2002]) Connecting
-				  to 127.0.0.1:6001
-				 =NeoStats= (11:02[03/21/2002]) Sendings
-				  pings...
-				 (etc)
+	NeoStats is now configured and installed. 
 
-	[2.9] Load Command
-		/msg neostats load <module>
-			Returns:
-				*** StatServ (Neo@NeoStats.net) has joined
-				    #services
-				*** Mode change [+oa StatServ StatServ] on
-				    #services by stats.dynam.ac
-				 =NeoStats= Module statserv Loaded, 
-				    Description: Statistical Bot For NeoStats
-				 <NeoStats> Fish Loaded Module statserv				
+	Before running NeoStats you must make sure that your server(s) 
+	have C: N: and U: lines for your NeoStats server. 
+	I WILL NOT ASSIST YOU WITH ADDING C: N: AND U: LINES TO
+	YOUR SERVER, YOU SHOULD READ THE IRCd's DOCUMENTATION IF
+	YOU DO NOT KNOW HOW TO DO IT!!! DO NOT CONTACT US ABOUT
+	C: N: and U: Lines
+
+	Once your C/N/U lines are setup, you need to start NeoStats. You
+	should change to the directory where NeoStats in installed e.g.
+
+	cd ~/NeoStats
 	
-	[2.10] Unload Command
-		/msg neostats unload <module>
-			Returns:
-				 <NeoStats> Unloading Module statserv
-				 <NeoStats> Module statserv has timer
-				   DelOldStatServChans Registered. Deleting..
-				 <NeoStats> Module statserv has timer 
-				   Save_Stats_DB Registered. Deleting..
-				 <NeoStats> Module statserv has timer
-				   Daily_Stats_Reset Registered. Deleting..
-				 <NeoStats> Module statserv has timer
-				   TimerWeb Registered. Deleting..
-				 <NeoStats> Module statserv had bot StatServ
-				   Registered. Deleting..
-				*** StatServ (Neo@NeoStats.net) has left
-				   IRC [Module Unloaded]
-				 <NeoStats> Fish Unloaded Module statserv
-
-	[2.11] ModList Command
-		/msg neostats modlist
-			Returns:
-				 =NeoStats= Module: statserv (3.1)
-				 =NeoStats= Module Description: Statistical
-				    Bot For NeoStats
-				 =NeoStats= End of Module List
-
-	[2.12] JUPE Command
-		/msg neostats jupe <servername>
-			Returns:
-				 <NeoStats> Fish Wants to JUPE this Server
-				   haha.com
-
-	[2.13] Raw command
-		/msg neostats raw <raw command>
-			Returns:
-				 <NeoStats> RAW COMMAND Fish Issued a Raw
-				   Command!(:neostats invite fish #blah)
-				*** NeoStats (Neo@NeoStats.net) invites you
-				   to #blah
-
-[3]	StatServ Help
-	[3.1] neoStats.cfg config options
-		STATSERV_NICK	-Sets the nickname of the StatServ bot. If
-			         not specified, defaults to statserv
-			eg: STATSERV_NICK stats	-Set statserv bot to appear
-			    as 'stats'
-		STATSERV_USER	-Sets the username portion of the statserv bot
-			eg: STATSERV_USER stats	-Sets the statserv bot to have
-				       the username/ident portion set to stats
-		STATSERV_HOST	-Sets the hostname that statserv appears to
-				 come from
-			eg:	STATSERV_HOST stats.microsoft.com	
-				-sets the statserv bot to apear to connect from
-				 stats.microsoft.com
-		LAG_NOTICE	 -Specifies if a server is lagged out longer
-				  than this period, to broadcast a message
-			eg: LAG_NOTICE 60	-Any server that doesn't
-				  respond to a ping within 60 seconds gets
-				  broadcast out that its lagging
-		HTML_STATS	-Enable StatServ to output a HTML file to the
-				 filesystem with some statistics
-			eg HTML_STATS	-If define, enables this option
-		HTML_PATH	-Where to write the HTML file to. Include path
-				 and filename. Make sure you have permissions
-				 to write to this directory/file
-			eg: HTML_PATH /var/www/html/stats/index.html
-				-Write the statistics file to this location.
-
-	[3.2] Available Commands
-		SERVER	-Display a list of all servers that statserv has ever
-			 known about, or individual server information
-		MAP		-Display a Network map of all connect servers
-		NETSTATS	-Display Statistics about the network
-		DAILY		-Display Statistics about the network today
-		TLD		-Find out what country a TLD represents
-		TLDMAP		-Display a breakdown of users and what
-				 countries they come from
-		OPERLIST	-Display a list of operators
-		BOTLIST		-Display a list of online bots (only if your
-				 IRCD supports a BOT flag)
-		VERSION	-Display the version of the currently running statserv
-		
-		Commands available to Administrators:
-		FORCEHTML	-Force a update of the HTML file
-		RESET		-Delete all stats, and start from scratch
-		STATS			-Delete/copy server information
-
-	[3.3] Server Command
-		/msg statserv server
-			Returns:
-			 =StatServ= Error, the Syntax is Incorrect. Please
-			  Specify a Server
-			 =StatServ= Server Listing:
-			 =StatServ= Server: stats.dynam.ac (*)
-			 =StatServ= Server: services.dynam.ac (*)
-			 =StatServ= Server: Server.IRC.net (*)
-			 =StatServ= Server: blha.com (*)
-			 =StatServ= Server: Server2.IRC.net (*)
-			 =StatServ= ***** End of List (* indicates Server is
-			  online at the moment) *****
-
-		/msg statserv server <servername>
-			Returns:
-			 =StatServ= Statistics for services.dynam.ac since
-			  [Mar (Thu 21) 2002  08:47 [PM/SGT]]
-			 =StatServ= Current Users: 7   (70%)
-			 =StatServ= Maximum Users: 7   at [Mar (Thu 21) 2002
-			  08:47 [PM/SGT]]
-			 =StatServ= Current Opers: 5
-			 =StatServ= Maximum Opers: 5   at [Mar (Thu 21) 2002
-			  08:47 [PM/SGT]]
-			 =StatServ= IRCop Kills: 0
-			 =StatServ= Server Kills: 0
-			 =StatServ= Lowest Ping: 0   at [Jan (Thu 01) 1970
-			  07:30 [AM/SGT]]
-			 =StatServ= Higest Ping: 0   at [Jan (Thu 01) 1970
-			  07:30 [AM/SGT]]
-			 =StatServ= Current Ping: 0
-			 =StatServ= services.dynam.ac has never split from
-			  the Network.
-			 =StatServ= ***** End of Statistics *****
-
-	[3.4] Map Command
-		/msg statserv map
-			Returns:
-			 =StatServ= [NAME] [USERS/MAX] [OPERS/MAX] [LAG/MAX]
-			 =StatServ= stats.dynam.ac [2/2] [0/0] [0/0]
-			 =StatServ=   \_Server.IRC.net [1/1] [0/1] [0/0]
-			 =StatServ=    | \_services.dynam.ac [7/7] [5/5] [0/0]
-			 =StatServ=    |     | \_blha.com [0/0] [0/0] [0/1]
-			 =StatServ=    | \_Server2.IRC.net [0/0] [0/0] [0/1]
-			 =StatServ= --- End of Listing ---
-
-	[3.5] Netstats Command
-		/msg statserv netstats
-			 Returns:
-			 =StatServ= Network Statistics:-----
-			 =StatServ= Current Users: 10
-			 =StatServ= Maximum Users: 10 [[Mar (Thu 21) 2002
-			  08:47 [PM/SGT]]]
-			 =StatServ= Current Channels 0
-			 =StatServ= Maximum Channels 2 [[Mar (Fri 22) 2002
-			  09:46 [PM/SGT]]]
-			 =StatServ= Current Opers: 5
-			 =StatServ= Maximum Opers: 6 [[Mar (Thu 21) 2002
-			  08:47 [PM/SGT]]]
-			 =StatServ= Users Set Away: 0
-			 =StatServ= Current Servers: 5
-			 =StatServ= Maximum Servers: 5 [[Mar (Thu 21) 2002
-			  08:47 [PM/SGT]]]
-			 =StatServ= --- End of List ---
-
-	[3.6] Daily Command
-		/msg statserv daily
-			Returns:
-			 =StatServ= Daily Network Statistics:
-			 =StatServ= Maximum Servers: 5  [Mar (Wed 27) 2002
-			  12:31 [PM/SGT]]
-			 =StatServ= Maximum Users: 10 [Mar (Wed 27) 2002
-			  12:31 [PM/SGT]]
-			 =StatServ= Maximum Chans: 0  [Jan (Thu 01) 1970
-			  07:30 [AM/SGT]]
-			 =StatServ= Maximum Opers: 5  [Mar (Wed 27) 2002
-			  12:31 [PM/SGT]]
-			 =StatServ= All Daily Statistics are reset at Midnight
-			 =StatServ= End of Information.
-
-	[3.7] Tld Command
-		/msg statserv tld <domain>
-			Returns:
-			 ->  *statserv* tld sg
-			 =StatServ= Singapore (sg)
-
-	[3.8]  Tldmap Command
-		/msg statserv tldmap
-			Returns:
-			 =StatServ= Top Level Domain Statistics:
-			 =StatServ= net   9 (90%) -> Generic Top Level Domain
-			  (net) ---> Daily Total: 33
-			 =StatServ= num   1 (10%) -> UnResolved (num) --->
-			  Daily Total: 25
-			 =StatServ= End of List
-
-	[3.9] OperList Command
-		/msg statserv operlist
-			Returns:
-			 =StatServ= For Help: /msg StatServ HELP OPERLIST
-			 =StatServ= On-Line IRCops:
-			 =StatServ= [ 1] OperServ        +ioSqd          
-			  services.dynam.ac 200
-			 =StatServ= [ 2] SS              +iSqd           
-			  services.dynam.ac 200
-			 =StatServ= [ 3] ChanServ        +oSqd           
-			  services.dynam.ac 200
-			 =StatServ= [ 4] StatServ        +d              
-			  stats.dynam.ac  200
-			 =StatServ= [ 5] HelpServ        +Sqd            
-			  services.dynam.ac 200
-			 =StatServ= [ 6] MemoServ        +oSqd           
-			  services.dynam.ac 200
-			 =StatServ= [ 7] NeoStats        +d              
-			  stats.dynam.ac  200
-			 =StatServ= [ 8] Global          +ioSqd          
-			  services.dynam.ac 200
-			 =StatServ= [ 9] NickServ        +oSqd           
-			  services.dynam.ac 200
-			 =StatServ= [10] Fish            -a              
-			 Server.IRC.net  185
-			 =StatServ= End of Listing.
-
-		/msg statserv operlist noaway
-			Returns:
-			=StatServ= On-Line IRCops (Not Away):
-			 =StatServ= [ 1] OperServ        +ioSqd
-			  services.dynam.ac 200
-			 =StatServ= [ 2] SS              +iSqd
-			  services.dynam.ac 200
-			 =StatServ= [ 3] ChanServ        +oSqd
-			  services.dynam.ac 200
-			 =StatServ= [ 4] StatServ        +d
-			  stats.dynam.ac  200
-			 =StatServ= [ 5] HelpServ        +Sqd
-			  services.dynam.ac 200
-			 =StatServ= [ 6] MemoServ        +oSqd
-			  services.dynam.ac 200
-			 =StatServ= [ 7] NeoStats        +d
-			  stats.dynam.ac  200
-			 =StatServ= [ 8] Global          +ioSqd
-			  services.dynam.ac 200
-			 =StatServ= [ 9] NickServ        +oSqd
-			  services.dynam.ac 200
-			 =StatServ= End of Listing.
-
-		/msg statserv operlist <server>
-			Returns:
-			 =StatServ= On-Line IRCops on Server server.irc.net
-			 =StatServ= [ 1] Fish            -a              
-			  Server.IRC.net  185
-			 =StatServ= End of Listing.
-
-
-	[3.10] BotList Command
-		/msg statserv botlist
-			Returns:
-				=StatServ= On-Line Bots:
-				=StatServ= End of Listing.
-
-	[3.11] Version Command
-		/msg statserv version
-			Returns:
-				=StatServ= StatServ Version Information
-				=StatServ= ----------------------------
-				=StatServ= StatServ Version: 3.1 Compiled
-				 Mar 27 2002 at 12:22:27
-				=StatServ= http://www.neostats.net
-				=StatServ= ----------------------------
-				=StatServ= HTML Stats is: /web/stat/index.html
-
-	[3.12] Forcehtml Command
-		/msg statserv forcehtml
-			Returns:
-				<StatServ> Fish Forced the NeoStats Statistics
-				 HTML file to be updated with the most current
-				 statistics
-
-	[3.13] Reset Command
-		/msg statserv reset
-			Returns:
-				<StatServ> Fish Wants me to RESET the
-				 databases.. here goes..
-
-	[3.14] Stats Command
-		/msg statserv stats list
-			Returns:
-				=StatServ= Statistics Database:
-				 =StatServ= [1 ] stats.dynam.ac
-				 =StatServ= [2 ] services.dynam.ac
-				 =StatServ= [3 ] Server.IRC.net
-				 =StatServ= [4 ] blha.com
-				 =StatServ= [5 ] Server2.IRC.net
-				 =StatServ= End of List.
-
-		/msg statserv stats del <servername>
-			Returns:
-				=StatServ= Removed blha.com from the database.
-
-		/msg statserv stats copy <name> <newname>
-				=StatServ= Copied Server data from <name>
-				 to <newname>
-
+	Then to run NeoStats type:
 	
-	[3.15] HTML Syntax
-		By Default, StatServ uses a file called index.tpl in your data
-		directory as the template for your output. Currently, the
-		template system is very basic, and will output tables
-		containing the information requested. All Template variables
-		are enclosed by "!" The available template variables are:
-			!MAP!		-Outputs a network Map similar to 
-					 /msg statserv map in a table format
-			!SRVLIST!	-Outputs a complete list of servers 
-					 that StatServ has ever seen, which 
-					 are linked to detailed server 
-					 information provided by the template
-					 variable !SRVLISTDET!
-			!NETSTATS!	-Outputs Network Statistics similar to
-					 /msg statserv netstats
-			!DAILYSTATS!	-Outputs the Daily Statistics similar
-					 to /msg statserv daily
-			!DAILYTOPCHAN!	-Outputs the top10 channels based on
-					 number of members
-			!TOP10CHAN!	-Outputs the top10 channels ever based
-					 on number of joins
-			!TOP10KICKS!	-Outputs the top10 kicking channels
-			!TOP10TOPICS!	-Outputs the top10 topic changing
-					 channels
-			!VERSION!	-Outputs the version of NeoStats
+	./neostats
 
-		StatServ also puts out some information on when the page was
-		created, and what software created it by default at the end 
-		of your HTML page. This option can not be disabled. (Sorry,
-		but its our little advertisment for all the hard work we have
-		done to create NeoStats for you to use!) 
-		A example template is provided for you so you don't have to
-		waste time getting your own template ready. If you wish to 
-		create your own template, replace the index.tpl file in the
-		data directory with your version.
+	It should link and sync with your server in a matter of seconds.
+	
+	Please now read USERMAN for details on how to operate NeoStats 
+	from an IRC Client.
+
+	If anything goes wrong, there *might* be a error message in
+	the log files. Have a look in ~/NeoStats/logs/stats.log it
+	might give you a clue to whats wrong! NeoStats might also 
+	send a wallops to the network about what went wrong. Check the
+	status window of your IRC client. 
 
 
-[4] Support Information
+1.9 Notes for upgraders
+-----------------------
 
-	[4.1] Where to get support
-		You can get Support for NeoStats a number of different ways.
-		First way is via our message boards available at:
-				http://www.neostats.net/boards/
-		You can also try our IRC channel, 
-		irc://irc.neostats.net/neostats but be warned that we are not
-		always available on the channel to help you. There is a bot
-		there called neoserv that contains the latest bugs/support
-		information (duplicated from the NeoStats board)
-		Finally, you can email support@neostats.net
+	If you are upgrading from an older version we recommend
+	that you backup the current version first. 
+	
+	If you are running crontab for NeoStats, we recommend that you
+	disable this before making the upgrade. 
+	
+	Make sure that NeoStats is not running. In an IRC client 
+	connected to your network type:
+	
+	/msg NeoStats shutdown
+	
+	NeoStats will save important information so wait for this to
+	finish. 
+	
+	To make the backup go to your home directory and type:
+	
+	cp NeoStats NeoStatsBackup -r
+	
+	If you fail to perform this backup and the upgrade causes you
+	problems, you might lose all NeoStats information. 
+	
+	We also recommend rebuilding any additional modules after upgrading
+	NeoStats. You may not need to upgrade the additional module, just
+	rebuild and reinstall it after the make install in Step 1.4 above.
+	
+	If after upgrading, NeoStats crashes when loading one of your 
+	modules e.g. OPSB, this usually means that you did not rebuild the
+	module for the latest version of NeoStats. 
 
-	[4.2] What to provide when requesting support.
-		It always helps to provide as much information about your
-		enviroment when asking for help. Please make sure you
-		include the following information:
-			Operating system version (ie, Redhat, Mandrake etc)
-			gcc version (found via gcc -v)
-			Version of NeoStats you are using and if the problem
-			is with a module, the version of the module (found 
-			via /msg neostats modlist)
-			The type of IRCD you are attempting to connect to
-			(and version number)
-		We may request that you enable debugging and submit us the
-		results of debugging. if this is the case, we need you to
-		re-run configure with the following option:
-		./configure --enable-debug (any other options you need,
-		  like IRCD type and module lists)
-		"make"
-		./neostats
-		When it crashes, or the bug has been reproduced, send us:
-		logs/stats.log
-		logs/recv.log
+	If you do run into problems upgrading and need to restore your 
+	backup, you can do so by going to your home directory and typing:
 
-		and it will help us to be able to reproduce the bug
+	cp NeoStatsBackup NeoStats -r
+	
+	Your old modules will also be restored along with the old version of
+	NeoStats so there is no need to rebuild them for a restore. 
 
-Anyway, thats it for the Manual, Thanks for taking the time to read it 
-(took me a few hours to make!) and enjoy NeoStats. If you would like to
-submit a feature request, please go to our forums at
-http://www.neostats.net/boards/
 
-The NeoStats Team is:
-Shmad (Shmad@neostats.net)	(Current Developer)
-Fish (fish@neostats.net)	(Current Developer)
-^Enigma^ (enigma@neostats.net)	(Past Developer)
+-----------------------------------<>-----------------------------------
+
+2 Support Information
+---------------------
+
+2.1 Before contacting support
+-----------------------------
+
+** IMPORTANT - PLEASE READ BEFORE CONTACTING US **
+
+In order that we can dedicate time tp developing NeoStats and can address 
+support issues quickly, there are some ways you can help to reduce the 
+unnecssary support calls to the NeoStats team. 
+
+First, check you are using the latest release version of NeoStats as 
+found on the NeoStats download page. It could be that your problem is 
+fixed or your suggestion implemented in the latest version. We are not 
+able to provide support for older versions of NeoStats than the 
+current release. 
+
+We provide no support for CVS snapshots whether released on the web 
+site or not. If you have downloaded a CVS snapshot and are having 
+problems, you should revert back to your previous working version or
+if this is your first installation, the current release build as indicated
+on the web site. Please do not contact us about problems with CVS
+versions.
+
+Before contacting us with a problem or a bug, please make sure you have 
+read all the documentation provided. You should then check the web site 
+bug list and search the forums to see if your problem has already been 
+reported and if a solution has been posted. 
+
+Before sending us a suggestion, you should check the forums carefully to 
+see if your suggestion has already been made and if the NeoStats team 
+have decided to implement it or not. 
+
+You do not have to read all the messages to find out if your issue has 
+already been discussed. The message board has a search function so 
+you can quickly check to see if there is a discussion on your problem. 
+
+NeoStats Group are only able to help with issues affecting NeoStats. 
+We are not able to help set up your IRC Server or Services on 
+your network (including the setup of C: N: and U: lines) so please
+don't ask us. If you have a question about your IRC Server or Services 
+package, please check the documentation that came with them and contact 
+their team if you still need assistance. 
+
+The RAW command is an usupported command. If you need help using it,
+you should probably not be using it. Please do not ask us for help
+on the RAW command.
+
+Thank you. 
+
+
+2.1 Where to get support
+------------------------
+
+You can get support for NeoStats in a number of different ways so choose
+the one that suits you best.
+
+* Bug reporting system
+  A new bug reporting section has been introduced and you can check this  
+  to see if there are any known bugs in NeoStats and find out when they 
+  are fixed. Soon you will be able to report bugs using this system. 
+  Visit http://bugs.neostats.net/index.php for the bug tracking system
+
+* Message boards available at http://www.neostats.net/boards/
+
+* The NeoStats IRC support channel at irc.irc-chat.net #neostats
+  Be warned that we are not always available on the channel to help you. 
+  There is a bot there called neoserv that contains the latest bugs and
+  support information (duplicated from the NeoStats board)
+
+* Email us at support@neostats.net
+
+2.2 What to provide when requesting support
+-------------------------------------------
+
+It always helps to provide as much information as possible about 
+your environment when asking for help. Please make sure you
+include at least the following information:
+	Operating system version (ie, Redhat 7.0, Mandrake 9.1 etc)
+	gcc version (found via gcc -v)
+	Version of NeoStats you are using and if the problem
+	is with a module, the version of the module (found 
+	via /msg neostats modlist)
+	The type of IRCD you are attempting to connect to
+	(and version number)
+We may request that you enable debugging and submit us the
+results of debugging. if this is the case, we need you to
+re-run configure with the following option:
+./configure --enable-debug (any other options you need,
+	like IRCD type and module lists)
+"make"
+./neostats
+When it crashes, or the bug has been reproduced, send us:
+logs/stats.log
+logs/recv.log
+and it will help us to be able to reproduce the bug
+
+-----------------------------------<>-----------------------------------
+
+3. Contributions
+----------------
+
+Want to Help us?
+
+We are always looking for help.
+
+Currently, what we really are looking for is people to help us out 
+with translating our documentation and of course, other people that 
+can code in C to help us with development.
+
+We hope to shortly provide a Module Programers Guide to help those 
+people out there take advantage of NeoStats and write their own 
+extensions (or Modules) for NeoStats.
+
+If you would like to help out, See Support Information above for 
+details on how to contact us.
+
+-----------------------------------<>-----------------------------------
+
+************************************************************************
+** This document was last updated on May 27, 2003 by M and is         **
+** based on documents originally created by Shmad and Fish.           **
+************************************************************************

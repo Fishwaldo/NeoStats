@@ -1,0 +1,162 @@
+NeoStats - Perguntas Mais Frequentes (FAQ)
+-------------------------------------------
+http://www.neostats.net
+
+
+**********************************************************************
+* O NeoStats é baseado no GeoStats por Johnathan George net@lite.net *
+* O NeoStats é um conjunto de serviços estatísticos de IRC que       *
+* monitorizam os recordes de utilizadores, netsplit de servidores    *
+* o número de utilizadores/operadores online e muito mais            *
+**********************************************************************
+
+
+
+P: Não consigo descobrir como descomprimir o ficheiro NeoStats-x.x.x.tar.gz, como é que eu faço?
+
+R: Na sua shell escreva: tar xvfz NeoStats-x.x.x.tar.gz
+
+
+Q: Escrevo compile no directório mas não está a funcionar, qual é o problema?
+
+A: Tem que escrever "make" (sem as aspas).
+
+
+Q: Escrevo stats mas ele diz "no such file or directory", como é que eu o inicio?
+
+A: Em alguns sistemas não pode escrever só "stats", tem que ser "./stats" (sem as aspas).
+
+
+Q: Ok, iniciei-o, mas quando ele se tenta ligar ao meu servidor, aparece uma mensagem a dizer
+   "No N Line!". Como é que eu adiciono uma?
+
+A: Edite o ficheiro ircd.conf  e adicione as C/N-Lines para o StatServ. Adicione também U-Lines
+   Se não conseguir descobrir como as adicionar, por favor veja a documentação que veio com o seu IRCd.
+
+
+Q: Quando iniciei o NeoStats pela primeira vez, ele "inundou-me" de novos recordes. Porque é que ele faz isto?
+
+A: Quando o instala pela primeira vez não existem estatísticas, por isso ele cria-as quando é iniciado pela primeira vez.
+   
+
+Q: Como é que eu instalo os módulos os quais fiz o download do vosso site?
+
+A: ** NOTE: De momento os módulos listados no WEBSITE NÃO funcionarão com o
+      NeoStats 2.5.0 Beta.
+   Faça o upload do módulo no directório \2module\2
+   Escreva:
+   a) "tar xvfz Module-x.x.tar.gz"
+   OU
+   b) "gzip -d Module-x.x.tar.gz" seguido de "tar xvf Module-x.x.tar"
+   Uma vez feito, entre no directório onde os ficheiros foram descomprimidos
+   escreva "make" (Ignore quaisquer erros que apareçam)
+   Numa janela de IRC escreva "/msg NeoStats load modulename" onde "modulename"
+   é o nome do directório para o qual o módulo foi descomprimido.
+
+   Nota: Uma vez que o módulo tenha sido "feito", pode fazer com que o módulo carregue automáticamente
+   quando o NeoStats é carregado, editando o ficheiro stats.cfg. Adicionando "LOAD_MODULE modulename"
+   na secção dos módulos irá assegurar que isto aconteça, da próxima vez que o NeoStats for carregado.
+
+
+Q: Quando faço a compilação de módulos, aparece um erro "Pointer Type Error". AJUDA!
+
+A: A solução para este problema é simplesmente ignorar a mensagem,
+   ela não afecta o bom funcionamento do módulo ou do NeoStats.
+
+
+Q: O que é o "sumyungguy"
+
+A: O "sumyungguy" é o módulo de spam. Já não muda o seu nome...
+   Em vez disso, ele espera que um utilizador lhe envie spam,
+   e reproduz a mensagem do spammer, informação de nickname e hostname.
+
+
+Q: Que IRCd e serviços é que a equipa NeoStats recomenta ?
+
+A: A equipa NeoStats recomenda o Unreal IRCd e o Ultimate IRCd,
+   pois estes são os únicos IRCd's suportados. Veja
+   ./configure --help para mais informação.
+   Também recomendamos os serviços epona, apesar do NeoStats também funcionar
+   com outros serviços, como é o caso dos serviços Daylight II.
+   Posterior suporte para IRCd's inclui Hybrid, Bahamut e IRCu.
+
+
+Q: Em que sistemas operativos corre o NeoStats?
+
+A: O NeoStats corre melhor em qualquer ambiente Linux/Unix.
+   O NeoStats corre agora correctamente em sistemas BSD.
+   O NeoStats NÃO CORRE EM MACINTOSH OU WINDOWS!!!
+
+
+Q: O API do NeoStats suporta múltiplos nicks?
+
+A: A resposta curta para esta pergunta é "sim". Há algum tempo atrás
+   o desenvolvimento iniciou-se no Serviço de canais do NeoStats
+   para substituir os serviços epona, de momento utilizado e totalmente
+   suportado pelo NeoStats. Durante este design, um módulo com múltiplos
+   nicks foi desenhado assim como uma patch para o API, que activava esta
+   função. Nesta altura não existem planos para criar um API para múltiplos
+   nick, mas sim integrá-la no NeoStats-2.5.
+
+
+Q: Tenho uma ideia excelente para um módulo, irão fazê-lo?
+
+A: Isso depende realmente na função do módulo... mas aceitamos
+   sugestões e comentário, e provavelmente acabaremos por fazê-los :P
+   Um bom exemplo disto é o output das estatísticas no StatServ para
+   um ficheiro HTML, e o design do HostServ.
+   PARA FAZER SUGESTÕES: http://www.neostats.net/boards
+
+
+Q: Quando tento fazer o LOAD ou o UNLOAD de módulos, recebo uma mensagem a dizer "ACCEDD DENIED"! Porquê?
+
+A: Para controlar o NeoStats você tem de ter previlégios de Tech-Admin ou Net-Admin
+   Pode querer verificar essas flags antes de usar o comando.
+
+   Os antigos standards para o NeoStats era "Tech Admin" ou superior...
+   Esta flag está a desaparecer e nas novas versões do NeoStats,
+   o novo standard é "Net Admin" ou superior.
+
+
+Q: Irá haver uma versão Windows do NeoStats?
+
+A: A equipa NeoStats tem considerado portar o NeoStats para
+   a plataforma Windows por diversas vezes. Nesta altura
+   achamos que vamos criar uma versão Windows da versão que
+   sairá em breve (NeoStats-2.5). Estamos, de momento, no
+   processo de sintonia fina e debugging do novo e antigo
+   código do NeoStats. De qualquer maneira, não se surpreenda
+   se não houver uma versão Windows disponível até alguns
+   releases posteriores. Uma vez tendo os bugs restantes
+   irradicados, uma versão para Windows tem 50% de hipóteses
+   de existir.
+   
+
+Q: Os módulos que vêm com o NeoStats 2.5.0 funcionam em versões anteriores?
+
+A: NÃO! Estes módulos são EXCLUSIVAMENTE para esta versão. Eles NÃO irão
+   funcionar com versões anteriores do NeoStats. Certifique-se que está a
+   user APENAS os módulos mais actuais do nosso website.
+   ** NOTA: Utilizadores da versão Beta NÃO FAÇAM O DOWNLOAD DOS MÓDULOS
+            DO NOSSO SITE, ELES SÃO PARA O NEOSTATS 2.0.13 E NÃO IRÃO
+            FUNCIONAR COM O NEOSTATS 2.5.0
+
+   A equipa decidiu fazer um grande número de mudanças no NeoStats,
+   provocando o desenvolvimento da versão NeoStats-2.1 ser incrementado
+   para o NeoStats-2.5. Fazendo isto, o código usado para os módulos
+   foi ligeiramente modificado e por isso os módulos antigos não irão
+   funcionar na nova versão do NeoStats. E vice-versa.
+
+
+Q: Posso enviar-lhes algum dinheiro por isto?
+
+A: Sim, em pequenas notas não marcadas. ;)
+
+
+
+
+
+NeoStats FAQ - Última actualização - Março 28, 2002 7:32 AM PST - Autor: Shmad
+Traduzido por ErroR|51
+(c) 1999-2002 Codeworks.  All Rights Reserved.
+http://www.neostats.net
