@@ -389,7 +389,7 @@ send_globops (const char *from, const char *buf)
 void 
 send_svstime (const time_t ts)
 {
-	send_cmd(":%s %s SVSTIME %ld", me.name, (me.token ? TOK_TSCTL : MSG_TSCTL), (long)ts);
+	sts (":%s %s SVSTIME %ld", me.name, (me.token ? TOK_TSCTL : MSG_TSCTL), (long)ts);
 }
 
 

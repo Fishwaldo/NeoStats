@@ -363,6 +363,7 @@ struct me {
 #if defined(ULTIMATE3) || defined(QUANTUM)
 	unsigned int client:1;
 #endif
+	unsigned int setservertimes;
 	int action;
 	char chan[BUFSIZE];
 	unsigned int onchan:1;
@@ -592,6 +593,7 @@ int ssvsmode_cmd (const char *target, const char *modes);
 int ssvskill_cmd (const char *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...);
 int srakill_cmd (const char *host, const char *ident);
+int ssvstime_cmd (const time_t ts);
 
 /* users.c */
 User *finduser (const char *nick);

@@ -65,6 +65,7 @@ static config_option options[] = {
 	{"BINDTO", ARG_STR, cb_Server, 13},
 	{"LOGFILENAMEFORMAT", ARG_STR, cb_Server, 14},
 	{"SERVER_NUMERIC", ARG_STR, cb_Server, 15},
+	{"SETSERVERTIMES", ARG_STR, cb_Server, 16},
 #ifdef SQLSRV
 	{"SQLSRV_AUTH", ARG_STR, cb_SqlConf, 0},
 	{"SQLSRV_PORT", ARG_STR, cb_SqlConf, 1},
@@ -279,6 +280,13 @@ cb_Server (char *arg, int configtype)
 			me.numeric=1;
 		if(me.numeric>254)
 			me.numeric=254;
+	} else if (configtype == 16) {
+		me.setservertimes = atoi (arg);
+		/* Convert hours input to seconds */
+		me.setservertimes = me.setservertimes * 60 * 60;
+		/* limit value - really need to print error and quit */
+		if(me.setservertimes <=0)
+			me.setservertimes =24;
 	}
 
 }

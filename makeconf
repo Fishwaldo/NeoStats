@@ -18,6 +18,7 @@ NEOCONN="10"
 NEOREC="10"
 BINDIP="127.0.0.1"
 LOGFNAMEFORMAT="-%m-%d"
+SETSERVERTIMES="24"
 
 # these are so I can use stuff like $1 without it replacing it...like by
 # using $dlrsgn$uno for $1
@@ -451,6 +452,21 @@ RECONNECT_TIME $NEOCONN
 #    "-%m-%d" i.e. NeoStats-09-30.log
 
 #LOGFILENAMEFORMAT $LOGFNAMEFORMAT
+
+# SETSERVERTIMES <INTERVAL> [OPTIONAL]
+#    Cause NeoStats to sync server times at the given interval
+#    INTERVAL is an integer representing the number of hours
+#        
+#    Examples
+#        
+#        SETSERVERTIMES 24
+#    
+#    Cause NeoStats to sync server times every 24 hours
+#    If not present, NeoStats will not sync times.
+#    This option only works on Unreal servers and defaults to 
+#    a sync interval of 24 hours
+
+SETSERVERTIMES 24
 
 #####################################
 # Module Configurations and Loading #

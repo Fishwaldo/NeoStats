@@ -1166,6 +1166,14 @@ ssvskill_cmd (const char *target, const char *reason, ...)
 	return NS_SUCCESS;
 }
 
+int 
+ssvstime_cmd (const time_t ts)
+{
+	send_svstime(ts);
+	nlog (LOG_NOTICE, LOG_CORE, "ssvstime_cmd: synching server times to %ld", (int)ts);
+	return NS_SUCCESS;
+}
+
 int
 skick_cmd (const char *who, const char *chan, const char *target, const char *reason)
 {

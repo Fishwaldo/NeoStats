@@ -30,6 +30,9 @@
 #include "server.h"
 
 static int midnight = 0;
+#ifdef GOTSVSTIME
+static int lastservertimesync = 0;
+#endif
 
 static int is_midnight (void);
 static void TimerMidnight (void);
@@ -49,6 +52,14 @@ CheckTimers (void)
 		/* flush log files */
 		fflush (NULL);
 	}
+#ifdef GOTSVSTIME
+	if (me.setservertimes) {
+		if((me.now - lastservertimesync) > me.setservertimes) {
+			ssvstime_cmd (me.now);
+			lastservertimesync = me.now;
+		}
+	}
+#endif
 	if (is_midnight () == 1 && midnight == 0) {
 		TimerMidnight ();
 		midnight = 1;

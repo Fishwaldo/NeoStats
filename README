@@ -519,6 +519,19 @@ LOGFILENAMEFORMAT <format> [OPTIONAL]
     
     If not defined, default is "-%m-%d" i.e. NeoStats-09-30.log
 
+SETSERVERTIMES <INTERVAL> [OPTIONAL]
+    Cause NeoStats to sync server times at the given interval
+    INTERVAL is an integer representing the number of hours
+        
+    Examples
+        
+        SETSERVERTIMES 24
+    
+    Cause NeoStats to sync server times every 24 hours
+    If not present, NeoStats will not sync times.
+    This option only works on Unreal servers and defaults to 
+    a sync interval of 24 hours
+
 Module Configuration Options
 ----------------------------
     
