@@ -69,7 +69,7 @@ static bot_cmd ls_commands[]=
 
 static int Online(char **av, int ac)
 {
-	ls_bot = init_mod_bot(s_LoveServ, "love", me.name, "Network Love Service",
+	ls_bot = init_mod_bot(s_LoveServ, "LS", me.name, "Network Love Service",
 		services_bot_modes, 0, ls_commands, NULL, __module_info.module_name);
 	return 1;
 };
