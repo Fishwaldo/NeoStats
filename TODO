@@ -11,6 +11,8 @@ Shmad:
 Fish:
 -----
 
+Somehow connectserv on NeoIRCd thinks people are opering up (0.9.6) but not
+
 
 fnmatch is Baaaad news... find a good ircmatch function and port it over... 
 

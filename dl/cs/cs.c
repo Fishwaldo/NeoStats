@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.20 2003/02/14 13:15:24 fishwaldo Exp $
+** $Id: cs.c,v 1.21 2003/03/04 12:47:30 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -138,10 +138,10 @@ int __Bot_Message(char *origin, char **av, int ac)
 
 int Online(char **av, int ac) {
 
-    if (init_bot(s_ConnectServ,"ConnectServ",me.name,"Network Connection & Mode Monitoring Service", "+oikSwgleq-x", my_info[0].module_name) == -1 ) {
+    if (init_bot(s_ConnectServ,"CS",me.name,"Network Connection & Mode Monitoring Service", "+oikSwgleq-x", my_info[0].module_name) == -1 ) {
         /* Nick was in use */
         s_ConnectServ = strcat(s_ConnectServ, "_");
-        init_bot(s_ConnectServ,"ConnectServ",me.name,"Network Connection & Mode Monitoring Service", "+oikSwgleq-x", my_info[0].module_name);
+        init_bot(s_ConnectServ,"CS",me.name,"Network Connection & Mode Monitoring Service", "+oikSwgleq-x", my_info[0].module_name);
     }
     cs_online = 1;
     return 1;

@@ -1,20 +1,9 @@
-* NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 3
+* NeoStats * Shmad & Fish * Version 2.5.0
 ==============================================================================
 Important Changes you should know: (READ THIS!)
 ==============================================================================
-HostServ: 
-	HostServ now records the Oper that added the entry. 
-	Old DB's might cause segfaults, if this is the case, delete
-	your old HostServ DB's
-
-	HostServ now can have a list of "Banned" vhosts, and
-	wont let any opers add a vhost that matches the banned string.
-	Read the HostServ ChangeLog for more details
 Core:
-	UltimateIRCD Version 3.0.0.a28 (Current at release time) is the only 
+	UltimateIRCD Version 3.0.0.a28 or Higher are the only 
 	version of Ultimate3 thats supported
-
-	NeoStats now dynamically allocates memory for users, and has
-	no hard limit. (apart from available memory on your host)
 
 Read the ChangeLog for a complete description of what has changed
