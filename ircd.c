@@ -1104,6 +1104,13 @@ numeric (const int numeric, const char *target, const char *data, ...)
 	return NS_SUCCESS;
 }
 
+void
+unsupported_cmd(const char* cmd)
+{
+	chanalert (s_Services, "Warning, Module %s tried to %s which is not supported", segvinmodule, cmd);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to %s, which is not supported", segvinmodule, cmd);
+}
+
 int
 sumode_cmd (const char *who, const char *target, long mode)
 {
@@ -1140,7 +1147,7 @@ schmode_cmd (const char *who, const char *chan, const char *mode, const char *ar
 	send_cmode (me.name, who, chan, mode, args, me.now);
 	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
 	ac = split_buf (ircd_buf, &av, 0);
-	ChanMode ("", av, ac);
+	ChanMode (me.name, av, ac);
 	free (av);
 	return NS_SUCCESS;
 }
@@ -1222,8 +1229,7 @@ ssvsmode_cmd (const char *target, const char *modes)
 	send_svsmode(me.name, target, modes);
 	UserMode (target, modes);
 #else
-	chanalert (s_Services, "Warning, Module %s tried to SVSMODE which is not supported", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to SVSMODE, which is not supported", segvinmodule);
+	unsupported_cmd("SVSMODE");
 #endif
 	return NS_SUCCESS;
 }
@@ -1242,10 +1248,8 @@ ssvshost_cmd (const char *who, const char *vhost)
 
 	strlcpy (u->vhost, vhost, MAXHOST);
 	send_svshost(me.name, who, vhost);
-	return NS_SUCCESS;
 #else
-	chanalert (s_Services, "Warning Module %s tried to SVSHOST, which is not supported", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSHOST, which is not supported", segvinmodule);
+	unsupported_cmd("SVSHOST");
 #endif
 	return NS_SUCCESS;
 }
@@ -1256,8 +1260,7 @@ ssvsjoin_cmd (const char *target, const char *chan)
 #ifdef GOTSVSJOIN 
 	send_svsjoin (me.name, target, chan);
 #else
-	chanalert (s_Services, "Warning Module %s tried to SVSJOIN, which is not supported", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSJOIN, which is not supported", segvinmodule);
+	unsupported_cmd("SVSJOIN");
 #endif
 	return NS_SUCCESS;
 }
@@ -1268,8 +1271,7 @@ ssvspart_cmd (const char *target, const char *chan)
 #ifdef GOTSVSPART
 	send_svspart (me.name, target, chan);
 #else
-	chanalert (s_Services, "Warning Module %s tried to SVSPART, which is not supported", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSPART, which is not supported", segvinmodule);
+	unsupported_cmd("SVSPART");
 #endif
 	return NS_SUCCESS;
 }
@@ -1280,8 +1282,7 @@ sswhois_cmd (const char *target, const char *swhois)
 #ifdef GOTSWHOIS
 	send_swhois (me.name, target, swhois);
 #else
-	chanalert (s_Services, "Warning Module %s tried to SWHOIS, which is not supported", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SWHOIS, which is not supported", segvinmodule);
+	unsupported_cmd("SWHOIS");
 #endif
 	return NS_SUCCESS;
 }
@@ -1304,8 +1305,7 @@ ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
 #ifdef GOTSMO
 	send_smo (from, umodetarget, msg);
 #else
-	chanalert (s_Services, "Warning, Module %s tried to SMO, which is not supported", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to SMO, which is not supported", segvinmodule);
+	unsupported_cmd("SMO");
 #endif
 	return NS_SUCCESS;
 }
