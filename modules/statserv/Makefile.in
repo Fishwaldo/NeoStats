@@ -162,7 +162,7 @@ statserv_la_SOURCES = database.c stats.c statserv.c htmlstats.c \
 			geoip/global.h geoip/md5.c geoip/md5.h 
 
 statserv_la_LDFLAGS = -module -avoid-version -no-undefined
-AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/lib/keeper/ -I$(top_srcdir)/lib/adns/ -Igeoip -DGEOIPDATADIR=\"$(datadir)\" \
+AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/lib/keeper/ -I$(top_srcdir)/lib/rta/ -I$(top_srcdir)/lib/adns/ -Igeoip -DGEOIPDATADIR=\"$(datadir)\" \
 			-DSYSCONFDIR=\"$(sysconfdir)\"
 
 dist_data_DATA = GeoIP.dat html/index.tpl
