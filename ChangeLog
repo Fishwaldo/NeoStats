@@ -13,8 +13,10 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - added tldmap to html output of statserv (fish)
  - Fix for stats thinking it was connected to a zombie server, and restarting over and over again when you first start it up
  - Heaps and heaps of other fixes that I can't remember now. (fish)
- - This version should *be* a lot more stable than Beta1 (unless you have a large network. If you start getting "smalloc" crashes, then email fish for more info) (fish)
+ - This version should *be* a lot more stable than Beta1 (fish)
  - Moved apartments and lost my Linux Laptop HDD, hence why the updates have taken so long (fish)
+ - Fixed a bug with channel modes limited to 50. This was bad, as some channels voice/op a lot more than 50 users! increased max to the max channel membership list (currently 1000) (fish)
+ - Fixed a bug with the html stats in statserv. Fixes a HUGE problem with large networks, and seeminly random crashs after 1 hour (1 hour, becauses thats when the html pages are updated!) (Fish)
 
 * NeoStats * Fish * Version 2.5.0-Beta1
  - Fixed makeconf for new stats.cfg options (Shmad)
