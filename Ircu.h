@@ -230,8 +230,8 @@
 #define UMODE_CHSERV            0x0040	/* Unkickable/-o able */
 #define UMODE_DEBUG             0x0080	/* See hack notices */
 #define UMODE_HELPER            0x0100	/* Afternets +h cs override mode */
-#define UMODE_ACCOUNT			0x1100	/* */
-#define UMODE_HIDE				0x2100	/* */
+#define UMODE_ACCOUNT			0x1000	/* */
+#define UMODE_HIDE				0x2000	/* */
 
 /* Cmodes */
 #define CMODE_CHANOP	0x0001
