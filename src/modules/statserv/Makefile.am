@@ -1,0 +1,10 @@
+lib_LTLIBRARIES		= statserv.la
+statserv_la_SOURCES	= database.c GeoIPCity.c global.h md5.c stats.c \
+			GeoIPBitReader.c GeoIPCity.h md5.h statserv.c \
+			GeoIPBitReader.h htmlstats.c sqlstats.h \
+			statserv.h GeoIP.c GeoIP.h ss_help.c tld.c
+statserv_la_LDFLAGS	= -module -avoid-version -no-undefined
+AM_CFLAGS		= -I../.. -I../../pcre -I../../curl -I../../adns \
+			-DGEOIPDATADIR=\"$(DATADIRECTORY)\" \
+			-DSYSCONFDIR=\"$(DATADIRECTORY)\"
+include $(top_srcdir)/autotools/rules.mk

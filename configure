@@ -17405,7 +17405,7 @@ _ACEOF
 
 
 
-                                                                                                              ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/curl/Makefile src/keeper/Makefile src/adns/Makefile src/pcre/Makefile src/libltdl/Makefile src/modules/Makefile src/modules/connectserv/Makefile"
+                                                                                                                                                                                              ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/curl/Makefile src/keeper/Makefile src/adns/Makefile src/pcre/Makefile src/libltdl/Makefile src/modules/Makefile src/modules/connectserv/Makefile src/modules/extauth/Makefile src/modules/hostserv/Makefile src/modules/ircdauth/Makefile src/modules/loveserv/Makefile src/modules/moraleserv/Makefile src/modules/statserv/Makefile src/modules/template/Makefile src/modules/templateauth/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -18045,6 +18045,14 @@ do
   "src/libltdl/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/libltdl/Makefile" ;;
   "src/modules/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/modules/Makefile" ;;
   "src/modules/connectserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/modules/connectserv/Makefile" ;;
+  "src/modules/extauth/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/modules/extauth/Makefile" ;;
+  "src/modules/hostserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/modules/hostserv/Makefile" ;;
+  "src/modules/ircdauth/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/modules/ircdauth/Makefile" ;;
+  "src/modules/loveserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/modules/loveserv/Makefile" ;;
+  "src/modules/moraleserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/modules/moraleserv/Makefile" ;;
+  "src/modules/statserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/modules/statserv/Makefile" ;;
+  "src/modules/template/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/modules/template/Makefile" ;;
+  "src/modules/templateauth/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/modules/templateauth/Makefile" ;;
   "$ac_config_libobj_dir/fnmatch.h" ) CONFIG_LINKS="$CONFIG_LINKS $ac_config_libobj_dir/fnmatch.h:$ac_config_libobj_dir/fnmatch_.h" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "include/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config.h" ;;

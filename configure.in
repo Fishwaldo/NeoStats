@@ -669,7 +669,15 @@ AC_CONFIG_FILES([Makefile include/Makefile src/Makefile
 		src/protocol/Makefile src/curl/Makefile
 		src/keeper/Makefile src/adns/Makefile
 		src/pcre/Makefile src/libltdl/Makefile
-		src/modules/Makefile src/modules/connectserv/Makefile])
+		src/modules/Makefile src/modules/connectserv/Makefile
+		src/modules/extauth/Makefile
+		src/modules/hostserv/Makefile
+		src/modules/ircdauth/Makefile
+		src/modules/loveserv/Makefile
+		src/modules/moraleserv/Makefile
+		src/modules/statserv/Makefile
+		src/modules/template/Makefile
+		src/modules/templateauth/Makefile])
 
 AC_CACHE_SAVE
 AC_OUTPUT
