@@ -522,6 +522,8 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 {
 	int argc;
 	char **argv;
+
+	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], privmsgbuffer);
 	argc = split_buf (privmsgbuffer, &argv, 1);
 	ModuleFunction (cmdptr, MSG_NOTICE, origin, argv, argc);
@@ -530,7 +532,11 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 	AddStringToList (&argv, origin, &argc);
 	AddStringToList (&argv, av[0], &argc);
 	AddStringToList (&argv, privmsgbuffer, &argc);
-	ModuleEvent (EVENT_PRIVATE, argv, argc);
+	if(av[0][0] == '#') {
+		ModuleEvent (EVENT_CNOTICE, argv, argc);
+	} else {
+		ModuleEvent (EVENT_NOTICE, argv, argc);
+	}
 	free (argv);
 	SkipModuleFunction = 1;
 }
@@ -548,7 +554,8 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 	char **argv;
 	char target[64];
 
-	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], privmsgbuffer);
+	SET_SEGV_LOCATION();
+	nlog (LOG_DEBUG1, LOG_CORE, "m_private: from %s, to %s : %s", origin, av[0], privmsgbuffer);
 	/* its a privmsg, now lets see who too... */
 	if (strstr (av[0], "!")) {
 		strlcpy (target, av[0], 64);
@@ -569,7 +576,11 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 	AddStringToList (&argv, origin, &argc);
 	AddStringToList (&argv, av[0], &argc);
 	AddStringToList (&argv, privmsgbuffer, &argc);
-	ModuleEvent (EVENT_PRIVATE, argv, argc);
+	if(av[0][0] == '#') {
+		ModuleEvent (EVENT_CPRIVATE, argv, argc);
+	} else {
+		ModuleEvent (EVENT_PRIVATE, argv, argc);
+	}
 	free (argv);
 	return;
 }
