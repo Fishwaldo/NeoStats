@@ -95,9 +95,6 @@ ConfLoad ()
 		return NS_FAILURE;
 	}
 	printf ("Sucessfully Loaded Config File, Now Booting NeoStats\n");
-#ifdef EXTAUTH
-	load_module ("extauth", NULL);
-#endif
 
 	/* if all bots should join the chan */
 	if (GetConf ((void *) &me.allbots, CFGINT, "AllBotsJoinChan") <= 0) {

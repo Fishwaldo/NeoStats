@@ -131,13 +131,18 @@ main (int argc, char *argv[])
 	/* prepare to catch errors */
 	setup_signals ();
 
-	/* this has to be done before we load modules */
-	if(init_services () != NS_SUCCESS)
-		return EXIT_FAILURE;
-
 	/* load the config files */
 	if(ConfLoad () != NS_SUCCESS)
 		return EXIT_FAILURE;
+
+	/* init NeoStats bot */
+	if(init_services () != NS_SUCCESS)
+		return EXIT_FAILURE;
+
+#ifdef EXTAUTH
+	/* load extauth if we need to */
+	load_module ("extauth", NULL);
+#endif
 
 	if (me.die) {
 		printf ("\n-----> ERROR: Read the README file then edit %s! <-----\n\n",CONFIG_NAME);

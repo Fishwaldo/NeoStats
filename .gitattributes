@@ -41,6 +41,7 @@ adns/tvarith.h -text
 adns/types.c -text
 /chans.c eol=lf
 /chans.h eol=lf
+/commands.c -text
 /conf.c eol=lf
 /conf.h eol=lf
 /config.guess -text

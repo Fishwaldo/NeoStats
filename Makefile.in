@@ -8,11 +8,11 @@ PCRE_OBJS = pcre/pcre.o pcre/get.o pcre/study.o
 
 OBJS =	dns.o chans.o dotconf.o services.o main.o sock.o conf.o ircd.o timer.o \
 		 users.o ns_help.o dl.o list.o hash.o server.o keeper.o log.o misc.o \
-		 support.o ircstring.o \
+		 support.o ircstring.o commands.o \
 		 @IRCD_FILES_OBJS@
 SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c \
 		users.c ns_help.c dl.c list.c hash.c server.c keeper.c log.c misc.c \
-		support.c ircstring.c \
+		support.c ircstring.c commands.c \
 		@IRCD_FILES_SRC@
 
 PROGS = neostats cronchk makeconf
