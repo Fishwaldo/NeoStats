@@ -64,6 +64,8 @@
 #define GOTBOTMODE
 /* we don't have user smode support */
 #undef GOTUSERSMODES
+/* we have svskill support */
+#define GOTSVSKILL
 
 /* IRCD Specific mode chars */
 #define UMODE_CH_LOCOP 'O'

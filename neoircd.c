@@ -247,33 +247,11 @@ spong_cmd (const char *reply)
 }
 
 
-int
-skill_cmd (const char *from, const char *target, const char *reason, ...)
+void 
+send_kill (const char *from, const char *target, const char *reason)
 {
-	va_list ap;
-
-	va_start (ap, reason);
-	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
-	va_end (ap);
-	sts (":%s %s %s :%s", from, MSG_KILL, target, ircd_buf);
-	UserQuit (target, ircd_buf);
-	return 1;
+	sts (":%s %s %s :%s", from, MSG_KILL, target, reason);
 }
-
-int
-ssvskill_cmd (const char *who, const char *reason, ...)
-{
-	va_list ap;
-
-	va_start (ap, reason);
-	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
-	va_end (ap);
-	sts (":%s %s %s :%s", me.name, MSG_KILL, who, ircd_buf);
-/* neoircd doesn't have svskill, so this is handled just like a normal kill */
-	UserQuit (who, ircd_buf);
-	return 1;
-}
-
 
 int
 ssmo_cmd (const char *from, const char *umodetarget, const char *msg)

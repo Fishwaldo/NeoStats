@@ -981,3 +981,32 @@ squit_cmd (const char *who, const char *quitmsg)
 	return 1;
 }
 
+int
+skill_cmd (const char *from, const char *target, const char *reason, ...)
+{
+	va_list ap;
+
+	va_start (ap, reason);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
+	va_end (ap);
+	send_kill (from, target, ircd_buf);
+	UserQuit (target, ircd_buf);
+	return 1;
+}
+
+int
+ssvskill_cmd (const char *target, const char *reason, ...)
+{
+	va_list ap;
+
+	va_start (ap, reason);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
+	va_end (ap);
+#ifdef GOTSVSKILL
+	send_svskill (target, ircd_buf);
+#else
+	send_kill (me.name, target, ircd_buf);
+	UserQuit (target, ircd_buf);
+#endif
+	return 1;
+}

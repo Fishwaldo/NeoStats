@@ -90,5 +90,7 @@ void send_part (const char *who, const char *chan);
 void send_nick (const char *oldnick, const char *newnick);
 void send_cmode (const char *who, const char *chan, const char *mode, const char *args);
 void send_quit (const char *who, const char *quitmsg);
+void send_kill (const char *from, const char *target, const char *reason);
+void send_svskill (const char *target, const char *reason);
 
 #endif

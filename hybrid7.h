@@ -37,6 +37,10 @@
 #undef GOTSVSJOIN 
 /* we don't have bot mode support */
 #undef GOTBOTMODE
+/* we don't have user smode support */
+#undef GOTUSERSMODES
+/* we don't have svskill support */
+#undef GOTSVSKILL
 
 /* IRCD Specific mode chars */
 #define UMODE_CH_LOCOP 'O'

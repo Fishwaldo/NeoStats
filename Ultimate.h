@@ -41,6 +41,8 @@
 #undef GOTBOTMODE
 /* we do have user smode support */
 #define GOTUSERSMODES
+/* we have svskill support */
+#define GOTSVSKILL
 
 #else /* !ULTIMATE3 */
 
