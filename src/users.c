@@ -602,3 +602,8 @@ DelFakeUser(const char *mask)
 	u = find_user (nick);
 	deluser(u);
 }
+
+hash_t *GetUserHash (void)
+{
+	return userhash;
+}

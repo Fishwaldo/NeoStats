@@ -350,6 +350,12 @@ load_module (const char *modfilename, Client * u)
 		irc_prefmsg (ns_botptr, u, "Module %s loaded, %s", info_ptr->name, info_ptr->description);
 		irc_globops (NULL, "Module %s loaded", info_ptr->name);
 	}
+/*
+  TEMP while moving sqlsrv to module API
+*/
+	rta_hook_1 = ns_dlsym (dl_handle, "rta_hook_1");
+	rta_hook_2 = ns_dlsym (dl_handle, "rta_hook_2");
+
 	return mod_ptr;
 }
 
@@ -678,4 +684,9 @@ void EnableEvent (Event event)
 void DisableEvent (Event event)
 {
 	GET_CUR_MODULE()->event_list[event]->flags |= EVENT_FLAG_DISABLED;
+}
+
+hash_t *GetModuleHash (void)
+{
+	return modulehash;
 }

@@ -594,3 +594,7 @@ void GetChannelList(ChannelListHandler handler)
 		handler(c);
 	}
 }
+hash_t *GetChannelHash (void)
+{
+	return channelhash;
+}

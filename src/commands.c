@@ -1169,6 +1169,18 @@ int del_all_bot_settings (Bot *bot_ptr)
 	return NS_SUCCESS;
 }
 
+int add_services_set_list (bot_setting *bot_setting_list)
+{
+	add_bot_setting_list (ns_botptr, bot_setting_list);
+	return NS_SUCCESS;
+}
+
+int del_services_set_list (bot_setting *bot_setting_list)
+{
+	del_bot_setting_list (ns_botptr, bot_setting_list);
+	return NS_SUCCESS;
+}
+
 int bot_set_nick_cb(CmdParams* cmdparams, SET_REASON reason)
 {
 	/* Ignore bootup callback */

@@ -50,8 +50,6 @@ struct pollfd { int fd; short events; short revents; };
 
 static void recvlog (char *line);
 
-static struct sockaddr_in lsa;
-static int dobind;
 /* @brief Module Socket List hash */
 static hash_t *sockethash;
 /* @brief server socket */
@@ -60,6 +58,9 @@ char recbuf[BUFSIZE];
 static struct timeval *TimeOut;
 static struct pollfd *ufds;
 
+typedef void (*rta_hook_func) (fd_set *read_fd_set, fd_set *write_fd_set);
+rta_hook_func rta_hook_1 = NULL;
+rta_hook_func rta_hook_2 = NULL;
 
 /** @brief Connect to a server
  *
@@ -79,16 +80,16 @@ ConnectTo (char *host, int port)
 	struct sockaddr_in sa;
 	int s;
 
-	dobind = 0;
+	me.dobind = 0;
 	/* bind to a local ip */
-	memset (&lsa, 0, sizeof (lsa));
+	memset (&me.lsa, 0, sizeof (me.lsa));
 	if (me.local[0] != 0) {
 		if ((hp = gethostbyname (me.local)) == NULL) {
 			nlog (LOG_WARNING, "Warning, Couldn't bind to IP address %s", me.local);
 		} else {
-			memcpy ((char *) &lsa.sin_addr, hp->h_addr, hp->h_length);
-			lsa.sin_family = hp->h_addrtype;
-			dobind = 1;
+			memcpy ((char *) &me.lsa.sin_addr, hp->h_addr, hp->h_length);
+			me.lsa.sin_family = hp->h_addrtype;
+			me.dobind = 1;
 		}
 	}
 	if ((hp = gethostbyname (host)) == NULL) {
@@ -99,8 +100,8 @@ ConnectTo (char *host, int port)
 		sfree(hp);
 		return NS_FAILURE;
 	}
-	if (dobind > 0) {
-		if (bind (s, (struct sockaddr *) &lsa, sizeof (lsa)) < 0) {
+	if (me.dobind > 0) {
+		if (bind (s, (struct sockaddr *) &me.lsa, sizeof (me.lsa)) < 0) {
 			nlog (LOG_WARNING, "bind(): Warning, Couldn't bind to IP address %s", strerror (errno));
 		}
 	}
@@ -211,7 +212,9 @@ read_loop ()
 		/* add the fds for the curl library as well */
 		/* XXX Should this be a pollsize or maxfdsunused... not sure yet */ 
 		curl_multi_fdset(curlmultihandle, &readfds, &writefds, &errfds, &maxfdsunused);
-
+		if (rta_hook_1) {
+			rta_hook_1 (&readfds, &writefds);
+		}  
 		SelectResult = select (FD_SETSIZE, &readfds, &writefds, &errfds, TimeOut);
 		me.now = time(NULL);
 		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
@@ -226,6 +229,9 @@ read_loop ()
 			while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curlmultihandle, &maxfdsunused)) {
 			}
 			transfer_status();
+			if (rta_hook_2) {
+				rta_hook_2 (&readfds, &writefds);
+			}
 			if (FD_ISSET (servsock, &readfds)) {
 				for (j = 0; j < BUFSIZE; j++) {
 #ifdef WIN32
@@ -429,8 +435,8 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 		return NS_FAILURE;
 
 	/* bind to an IP address */
-	if (dobind > 0) {
-		if (bind (s, (struct sockaddr *) &lsa, sizeof (lsa)) < 0) {
+	if (me.dobind > 0) {
+		if (bind (s, (struct sockaddr *) &me.lsa, sizeof (me.lsa)) < 0) {
 			nlog (LOG_WARNING, "sock_connect(): Warning, Couldn't bind to IP address %s", strerror (errno));
 		}
 	}
@@ -470,7 +476,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 		}
 	}
 
-	add_sock (func_read, func_write, func_error, name, s);
+	add_sock (name, s, func_read, func_write, func_error);
 	return s;
 }
 
@@ -637,7 +643,7 @@ find_sock (const char *sock_name)
  * @return pointer to socket if found, NULL if not found
 */
 int
-add_sock (sock_func readfunc, sock_func writefunc, sock_func errfunc, const char *sock_name, int socknum)
+add_sock (const char *sock_name, int socknum, sock_func readfunc, sock_func writefunc, sock_func errfunc)
 {
 	Sock *sock;
 	Module* moduleptr;
@@ -680,7 +686,7 @@ add_sock (sock_func readfunc, sock_func writefunc, sock_func errfunc, const char
  * @return pointer to socket if found, NULL if not found
 */
 int
-add_sockpoll (before_poll_func beforepoll, after_poll_func afterpoll, const char *sock_name, void *data)
+add_sockpoll (const char *sock_name, void *data, before_poll_func beforepoll, after_poll_func afterpoll)
 {
 	Sock *sock;
 	Module* moduleptr;

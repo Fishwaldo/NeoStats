@@ -25,21 +25,21 @@
 #include "modules.h"
 #include "services.h"
 
-static hash_t *banshash;
+static hash_t *banhash;
 
 static Ban *
 new_ban (const char *mask)
 {
 	Ban *ban;
 
-	if (hash_isfull (banshash)) {
+	if (hash_isfull (banhash)) {
 		nlog (LOG_CRITICAL, "new_ban: bans hash is full");
 		return NULL;
 	}
 	dlog(DEBUG2, "new_ban: %s", mask);
 	ban = scalloc (sizeof (Ban));
 	strlcpy (ban->mask, mask, MAXHOST);
-	hnode_create_insert (banshash, ban, ban->mask);
+	hnode_create_insert (banhash, ban, ban->mask);
 	return ban;
 }
 
@@ -88,7 +88,7 @@ DelBan(const char* type, const char* user, const char* host, const char* mask,
 	hnode_t *bansnode;
 
 	SET_SEGV_LOCATION();
-	bansnode = hash_lookup (banshash, mask);
+	bansnode = hash_lookup (banhash, mask);
 	if (!bansnode) {
 		nlog (LOG_WARNING, "DelBan: unknown ban %s", mask);
 		return;
@@ -109,7 +109,7 @@ DelBan(const char* type, const char* user, const char* host, const char* mask,
 	sfree (cmdparams->av);
 	sfree (cmdparams);
 
-	hash_delete (banshash, bansnode);
+	hash_delete (banhash, bansnode);
 	hnode_destroy (bansnode);
 	sfree (ban);
 }
@@ -122,7 +122,7 @@ BanDump (void)
 	hnode_t *bansnode;
 
 	irc_chanalert (ns_botptr, "Ban Listing:");
-	hash_scan_begin (&ss, banshash);
+	hash_scan_begin (&ss, banhash);
 	while ((bansnode = hash_scan_next (&ss)) != NULL) {
 		ban = hnode_get (bansnode);
 		irc_chanalert (ns_botptr, "Ban: %s ", ban->mask);
@@ -136,25 +136,29 @@ void FiniBans (void)
 	hnode_t *bansnode;
 	hscan_t hs;
 
-	hash_scan_begin(&hs, banshash);
+	hash_scan_begin(&hs, banhash);
 	while ((bansnode = hash_scan_next(&hs)) != NULL ) {
 		ban = hnode_get (bansnode);
-		hash_delete (banshash, bansnode);
+		hash_delete (banhash, bansnode);
 		hnode_destroy (bansnode);
 		sfree (ban);
 	}
-	hash_destroy(banshash);
+	hash_destroy(banhash);
 }
 
 
 int 
 InitBans (void)
 {
-	banshash = hash_create (-1, 0, 0);
-	if (!banshash) {
+	banhash = hash_create (-1, 0, 0);
+	if (!banhash) {
 		nlog (LOG_CRITICAL, "Unable to create bans hash");
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
 }
 
+hash_t *GetBanHash (void)
+{
+	return banhash;
+}

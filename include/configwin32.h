@@ -325,7 +325,7 @@
 /*#define HAVE_STRLCPY 1*/
 
 /* Define to 1 if you have the `strndup' function. */
-#define HAVE_STRNDUP 1
+/*#define HAVE_STRNDUP 1*/
 
 /* Define to 1 if you have the `strnlen' function. */
 /*#define HAVE_STRNLEN 1*/

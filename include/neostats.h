@@ -513,10 +513,10 @@ typedef struct _Client {
 	char info[MAXREALNAME];
 	char version[MAXHOST];
 	unsigned int flags;
-	void *moddata[NUM_MODULES];
 	time_t tsconnect;
 	struct in_addr ip;
 	char hostip[HOSTIPLEN];
+	void *moddata[NUM_MODULES];
 } _Client; 
 
 /** @brief me structure
@@ -550,6 +550,8 @@ typedef struct tme {
 	time_t now;
 	char strnow[STR_TIME_T_SIZE];
 	char version[VERSIONSIZE];
+	int dobind;
+	struct sockaddr_in lsa;
 } tme;
 
 EXPORTVAR extern tme me;
@@ -744,6 +746,14 @@ typedef int (*sock_func) (int sock_no, char *name);
 typedef int (*before_poll_func) (void *data, struct pollfd *);
 typedef void (*after_poll_func) (void *data, struct pollfd *, unsigned int);
 
+/*
+  TEMP while moving sqlsrv to module API
+*/
+#ifdef NEOSTATSCORE
+typedef void (*rta_hook_func) (fd_set *read_fd_set, fd_set *write_fd_set);
+extern rta_hook_func rta_hook_1;
+extern rta_hook_func rta_hook_2;
+#endif
 
 /* socket interface type */
 #define SOCK_POLL 1
@@ -961,24 +971,22 @@ typedef struct _Bot {
 	Client * u;
 }_Bot;
 
-EXPORTFUNC int ModuleConfig(bot_setting* bot_settings);
+EXPORTFUNC int ModuleConfig(bot_setting *bot_settings);
 
 EXPORTFUNC int add_timer (TIMER_TYPE type, timer_function func, const char* name, int interval);
 EXPORTFUNC int del_timer (const char *timer_name);
 EXPORTFUNC int set_timer_interval (const char *timer_name, int interval);
 EXPORTFUNC Timer *find_timer(const char *timer_name);
 
-EXPORTFUNC int add_sock (sock_func readfunc, sock_func writefunc, sock_func errfunc, const char *sock_name, int socknum);
-EXPORTFUNC int add_sockpoll (before_poll_func beforepoll, after_poll_func afterpoll, const char *sock_name, void *data);
-EXPORTFUNC int del_sock (const char *name);
+EXPORTFUNC int add_sock (const char *sock_name, int socknum, sock_func readfunc, sock_func writefunc, sock_func errfunc);
+EXPORTFUNC int add_sockpoll (const char *sock_name, void *data, before_poll_func beforepoll, after_poll_func afterpoll);
+EXPORTFUNC int del_sock (const char *sock_name);
 EXPORTFUNC Sock *find_sock (const char *sock_name);
-
-EXPORTFUNC Bot * init_bot (BotInfo *botinfo);
-EXPORTFUNC Bot *find_bot (const char *bot_name);
-
-/* sock.c */
 EXPORTFUNC int sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, sock_func func_read, sock_func func_write, sock_func func_error);
 EXPORTFUNC int sock_disconnect (const char *name);
+
+EXPORTFUNC Bot *init_bot (BotInfo *botinfo);
+EXPORTFUNC Bot *find_bot (const char *bot_name);
 
 /* keeper interface */
 
@@ -1126,7 +1134,9 @@ EXPORTFUNC int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *
 
 /* services.c */
 EXPORTFUNC int add_services_cmd_list (bot_cmd* bot_cmd_list);
+EXPORTFUNC int add_services_set_list (bot_setting *bot_setting_list);
 EXPORTFUNC int del_services_cmd_list (bot_cmd* bot_cmd_list);
+EXPORTFUNC int del_services_set_list (bot_setting *bot_setting_list);
 EXPORTFUNC Client * find_valid_user(Bot* botptr, Client * u, const char* target_nick);
 
 /* transfer.c stuff */
@@ -1225,7 +1235,11 @@ EXPORTFUNC void GetUserList(UserListHandler handler);
 typedef void (*ServerListHandler) (Client * s);
 EXPORTFUNC void GetServerList(ServerListHandler handler);
 
-EXPORTFUNC hash_t * GetServerHash(void);
+EXPORTFUNC hash_t *GetServerHash (void);
+EXPORTFUNC hash_t *GetBanHash (void);
+EXPORTFUNC hash_t *GetChannelHash (void);
+EXPORTFUNC hash_t *GetUserHash (void);
+EXPORTFUNC hash_t *GetModuleHash (void);
 
 EXPORTFUNC int HaveFeature (int mask);
 

@@ -294,7 +294,7 @@ void RequestServerUptimes (void)
 	}
 }
 
-hash_t * GetServerHash (void)
+hash_t *GetServerHash (void)
 {
 	return serverhash;
 }
