@@ -119,7 +119,6 @@ EXPORTFUNC void _m_squit( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_globops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_wallops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_chatops( char *origin, char **argv, int argc, int srv );
-EXPORTFUNC void _m_locops( char *origin, char **argv, int argc, int srv );
 
 EXPORTFUNC void do_synch_neostats( void );
 EXPORTFUNC void do_motd( const char *nick, const char *remoteserver );
@@ -172,6 +171,10 @@ EXPORTFUNC void do_eos( const char *name );
 EXPORTFUNC void do_setname( const char *nick, const char *realname );
 EXPORTFUNC void do_sethost( const char *nick, const char *host );
 EXPORTFUNC void do_setident( const char *nick, const char *ident );
+
+EXPORTFUNC void do_globops( char *origin, char *message );
+EXPORTFUNC void do_wallops( char *origin, char *message );
+EXPORTFUNC void do_chatops( char *origin, char *message );
 
 /* Defined in ircd specific files */
 MODULEFUNC void send_privmsg( const char *source, const char *target, const char *buf );

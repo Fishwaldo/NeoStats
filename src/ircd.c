@@ -346,7 +346,7 @@ int InitIrcd( void )
 
 void _m_globops( char* origin, char **av, int ac, int cmdptr )
 {
-	
+	do_globops( origin, av[0] );	
 }
 
 /** @brief _m_wallops
@@ -366,7 +366,7 @@ void _m_globops( char* origin, char **av, int ac, int cmdptr )
 
 void _m_wallops( char* origin, char **av, int ac, int cmdptr )
 {
-	
+	do_wallops( origin, av[0] );	
 }
 
 /** @brief _m_chatops
@@ -386,27 +386,7 @@ void _m_wallops( char* origin, char **av, int ac, int cmdptr )
 
 void _m_chatops( char* origin, char **av, int ac, int cmdptr )
 {
-	
-}
-
-/** @brief _m_locops
- *
- *  process LOCOPS command
- *  RX: :Mark LOCOPS :test locops
- *  CHATOPS :message
- *	argv[0] = message
- *
- *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
- *
- *  @return none
- */
-
-void _m_locops( char* origin, char **av, int ac, int cmdptr )
-{
-	
+	do_chatops( origin, av[0] );	
 }
 
 /** @brief _m_pass
@@ -1700,6 +1680,99 @@ int irc_squit( const char *server, const char *quitmsg )
 	}
 	irc_send_squit( server, quitmsg );
 	return NS_SUCCESS;
+}
+
+/** @brief do_globops
+ *
+ * 
+ *
+ *  @param origin
+ *  @param message
+ *
+ *  @return none
+ */
+
+void do_globops( char *origin, char *message )
+{
+	Client *c;
+	CmdParams * cmdparams;
+
+	dlog( DEBUG1, "GLOBOPS: %s %s", origin, message );
+	c = FindServer( origin );
+	if( !c ) 
+	{
+		c = FindUser( origin );
+		if( c )
+		{
+			cmdparams =( CmdParams* )ns_calloc( sizeof( CmdParams ) );
+			cmdparams->source = c;
+			cmdparams->param = message;
+			SendAllModuleEvent( EVENT_GLOBOPS, cmdparams );
+			ns_free( cmdparams );
+		}
+	}
+}
+
+/** @brief do_wallops
+ *
+ * 
+ *
+ *  @param origin
+ *  @param message
+ *
+ *  @return none
+ */
+
+void do_wallops( char *origin, char *message )
+{
+	Client *c;
+	CmdParams * cmdparams;
+
+	dlog( DEBUG1, "WALLOPS: %s %s", origin, message );
+	c = FindServer( origin );
+	if( !c ) 
+	{
+		c = FindUser( origin );
+		if( c )
+		{
+			cmdparams =( CmdParams* )ns_calloc( sizeof( CmdParams ) );
+			cmdparams->source = c;
+			cmdparams->param = message;
+			SendAllModuleEvent( EVENT_WALLOPS, cmdparams );
+			ns_free( cmdparams );
+		}
+	}
+}
+
+/** @brief do_chatops
+ *
+ * 
+ *
+ *  @param origin
+ *  @param message
+ *
+ *  @return none
+ */
+
+void do_chatops( char *origin, char *message )
+{
+	Client *c;
+	CmdParams * cmdparams;
+
+	dlog( DEBUG1, "CHATOPS: %s %s", origin, message );
+	c = FindServer( origin );
+	if( !c ) 
+	{
+		c = FindUser( origin );
+		if( c )
+		{
+			cmdparams =( CmdParams* )ns_calloc( sizeof( CmdParams ) );
+			cmdparams->source = c;
+			cmdparams->param = message;
+			SendAllModuleEvent( EVENT_CHATOPS, cmdparams );
+			ns_free( cmdparams );
+		}
+	}
 }
 
 /** @brief do_synch_neostats

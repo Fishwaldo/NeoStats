@@ -594,18 +594,18 @@ SET_SERVER_TIMES 24
 # StatServ, maintain and report various networks statistics
 #LOAD_MODULE statserv
 
-# LoveServ, send a rose, hug, kiss, etc to that special IRC somebody
-#LOAD_MODULE loveserv
-
 # HostServ, vhost services for users
 #LOAD_MODULE hostserv
 
-# MoraleServ, fun module to cheer people up.
-#LOAD_MODULE moraleserv
+# TextServ, text messaging service
+#LOAD_MODULE textserv
 
 # ConnectServ, monitor connections to the network: user connections, oper 
 # modes, server connections and nick changes.
 #LOAD_MODULE connectserv
+
+# Operlog, operator command logging service
+#LOAD_MODULE operlog
 
 # IRCdauth, authenticate users based on their user modes.
 #LOAD_MODULE ircdauth
@@ -624,6 +624,15 @@ SET_SERVER_TIMES 24
 
 # TriviaServ. You must download and install TriviaServ first.
 #LOAD_MODULE triviaserv
+
+# WarServ. You must download and install WarServ first.
+#LOAD_MODULE warserv
+
+# GameServ. You must download and install GameServ first.
+#LOAD_MODULE gameserv
+
+# YahzteeServ. You must download and install YahzteeServ first.
+#LOAD_MODULE yahtzeeserv
 
 ########################################
 # NeoStats ROOT user                   #

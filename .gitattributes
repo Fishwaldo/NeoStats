@@ -494,10 +494,12 @@ modules/ircdauth/Makefile.in -text
 modules/ircdauth/ircdauth.c -text
 modules/ircdauth/ircdauth.vcproj -text
 modules/modules.txt -text
-modules/operlog/ChangeLog -text
-modules/operlog/Makefile -text
-modules/operlog/ol_help.c -text
-modules/operlog/operlog.c -text
+modules/operlog/Makefile.am -text
+modules/operlog/Makefile.in -text
+modules/operlog/help.c -text
+modules/operlog/main.c -text
+modules/operlog/operlog.h -text
+modules/operlog/operlog.vcproj -text
 modules/statserv/.indent.pro -text
 modules/statserv/GeoIP.dat -text
 modules/statserv/Makefile.am -text

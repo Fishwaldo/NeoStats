@@ -61,7 +61,7 @@ ProtocolInfo protocol_info = {
 	PROTOCOL_TOKEN | PROTOCOL_NICKIP | PROTOCOL_NICKv2 | PROTOCOL_SJ3,
 	/* Features supported by this IRCd */
 	FEATURE_UMODECLOAK,
-	"+oSq",
+	"+OwoSq",
 	"+o",
 };
 
@@ -107,7 +107,6 @@ ircd_cmd cmd_list[] = {
 	{MSG_GLOBOPS, TOK_GLOBOPS, _m_globops, 0},
 	{MSG_WALLOPS, TOK_WALLOPS, _m_wallops, 0},
 	{MSG_CHATOPS, TOK_CHATOPS, _m_chatops, 0},
-	{MSG_LOCOPS, TOK_LOCOPS, _m_locops, 0},
 	{0, 0, 0, 0},
 };
 
