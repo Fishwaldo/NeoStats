@@ -167,6 +167,7 @@ curl/urldata.h -text
 curl/version.c -text
 data/niconfig.db -text
 data/tlds.nfo -text
+/db.c -text
 /dl.c eol=lf
 /dl.h eol=lf
 dl/.indent.pro -text
