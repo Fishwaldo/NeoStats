@@ -681,7 +681,9 @@ m_burst (char *origin, char **argv, int argc, int srv)
 static void
 m_end_of_burst (char *origin, char **argv, int argc, int srv)
 {
-	send_end_of_burst_ack();
+	if(strcmp(origin, getnumfromserver (me.uplink)) ==0) {
+		send_end_of_burst_ack();
+	}
 }
 
 extern char privmsgbuffer[BUFSIZE];
@@ -719,6 +721,13 @@ parse (char *line)
 		ac = splitbuf(coreLine, &av, 1);
 		cmdptr = 0;
 		nlog (LOG_DEBUG1, LOG_CORE, "0 %d", ac);
+		/* really needs to be in AddServer since this is a NeoStats wide bug
+		 if config uplink name does not match our uplinks server name we can
+		 never find the uplink!
+		*/
+		if(strcmp(cmd, "SERVER") ==0) {
+			strlcpy(me.uplink, av[0], MAXHOST);
+		}
 	} else {
 		strlcpy(origin, line, sizeof(origin));	
 		cmdptr = 0;
