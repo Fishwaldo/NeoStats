@@ -139,7 +139,7 @@ EXPORTFUNC void do_client (const char *nick, const char *arg1, const char *TS,
 		const char *server, const char *arg9, 
 		const char *ip, const char *realname);
 EXPORTFUNC void do_quit (const char *target, const char *quitmsg);
-EXPORTFUNC void do_kill (const char *target, const char *killmsg);
+EXPORTFUNC void do_kill (const char *source, const char *target, const char *killmsg);
 EXPORTFUNC void do_squit (const char *name, const char* reason);
 EXPORTFUNC void do_kick (const char *kickby, const char *chan, const char *kicked, const char *kickreason);
 EXPORTFUNC void do_svinfo (void);

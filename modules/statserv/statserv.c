@@ -48,7 +48,8 @@ static int ss_event_nickip(CmdParams* cmdparams);
 static int ss_event_signon(CmdParams* cmdparams);
 static int ss_event_quit(CmdParams* cmdparams);
 static int ss_event_mode(CmdParams* cmdparams);
-static int ss_event_kill(CmdParams* cmdparams);
+static int ss_event_globalkill(CmdParams* cmdparams);
+static int ss_event_serverkill(CmdParams* cmdparams);
 static int ss_event_newchan(CmdParams* cmdparams);
 static int ss_event_delchan(CmdParams* cmdparams);
 static int ss_event_join(CmdParams* cmdparams);
@@ -76,7 +77,8 @@ ModuleEvent module_events[] = {
 	{EVENT_UMODE,		ss_event_mode,		EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_QUIT,		ss_event_quit,		EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_AWAY,		ss_event_away,		EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_KILL,		ss_event_kill,		EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_GLOBALKILL,	ss_event_globalkill,EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_SERVERKILL,	ss_event_serverkill,EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_NEWCHAN,		ss_event_newchan,	EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_DELCHAN,		ss_event_delchan,	EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_JOIN,		ss_event_join,		EVENT_FLAG_IGNORE_SYNCH},
@@ -313,12 +315,21 @@ int ss_event_ctcpversion(CmdParams* cmdparams)
 	return NS_SUCCESS;
 }
 
-static int ss_event_kill(CmdParams* cmdparams)
+static int ss_event_globalkill(CmdParams* cmdparams)
 {
 	if (StatServ.exclusions && IsExcluded(cmdparams->source)) {
 		return NS_SUCCESS;
 	}
-	StatsKillUser(cmdparams->source);
+	StatsGlobalKill(cmdparams->source);
+	return NS_SUCCESS;
+}
+
+static int ss_event_serverkill(CmdParams* cmdparams)
+{
+	if (StatServ.exclusions && IsExcluded(cmdparams->source)) {
+		return NS_SUCCESS;
+	}
+	StatsServerKill(cmdparams->source);
 	return NS_SUCCESS;
 }
 

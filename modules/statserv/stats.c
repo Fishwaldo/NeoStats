@@ -430,31 +430,20 @@ void StatsQuitUser(Client * u)
 	DelTLD(u);
 }
 
-void StatsKillUser(Client * u)
+void StatsGlobalKill(Client * u)
 {
-	SStats *ss;
-	char *rbuf, *cmd, *who;
-
-	SET_SEGV_LOCATION();
 	/* Treat as a quit for stats */
 	StatsQuitUser (u);
-	rbuf = sstrdup(recbuf);
-	cmd = rbuf;
-	who = strtok(cmd, " ");
-	cmd = strtok(NULL, " ");
-	cmd = strtok(NULL, " ");
-	cmd = strtok(NULL, "");
-	cmd++;
-	who++;
-	if (find_user(who)) {
-		/* it was a User that killed the target */
-		ss = findserverstats(u->uplink->name);
-		ss->operkills ++;
-	} else if (find_server(who)) {
-		ss = findserverstats(who);
-		ss->serverkills ++;
-	}
-	ns_free(rbuf);
+	ss = findserverstats(u->uplink->name);
+	ss->operkills ++;
+}
+
+void StatsServerKill(Client * u)
+{
+	/* Treat as a quit for stats */
+	StatsQuitUser (u);
+	ss = findserverstats(u->name);
+	ss->serverkills ++;
 }
 
 void StatsUserMode(Client * u, char *modes)

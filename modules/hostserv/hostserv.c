@@ -61,6 +61,7 @@ typedef struct hs_user {
 static int hs_event_signon (CmdParams* cmdparams);
 static int hs_event_mode (CmdParams* cmdparams);
 static int hs_event_quit (CmdParams* cmdparams);
+static int hs_event_kill (CmdParams* cmdparams);
 
 static int hs_levels (CmdParams* cmdparams);
 static int hs_bans (CmdParams* cmdparams);
@@ -148,7 +149,7 @@ ModuleEvent module_events[] = {
 	{EVENT_SIGNON,	hs_event_signon,	EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE},
 	{EVENT_UMODE,	hs_event_mode,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE}, 
 	{EVENT_QUIT,	hs_event_quit,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE},
-	{EVENT_KILL,	hs_event_quit,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE},
+	{EVENT_KILL,	hs_event_kill,		EVENT_FLAG_EXCLUDE_ME | EVENT_FLAG_USE_EXCLUDE},
 	{EVENT_NULL,	NULL}
 };
 
@@ -195,6 +196,19 @@ static int hs_event_quit(CmdParams* cmdparams)
 		dlog(DEBUG2, "hs_event_quit: free module data");
 		ns_free(hs);
 		set_user_moddata (cmdparams->source, NULL);
+	}
+	return NS_SUCCESS;
+}
+	
+static int hs_event_kill(CmdParams* cmdparams) 
+{
+	hs_user *hs;
+
+	hs = get_user_moddata (cmdparams->target);
+	if (hs) {
+		dlog(DEBUG2, "hs_event_kill: free module data");
+		ns_free(hs);
+		set_user_moddata (cmdparams->target, NULL);
 	}
 	return NS_SUCCESS;
 }

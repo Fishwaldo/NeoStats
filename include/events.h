@@ -106,21 +106,45 @@ typedef enum Event {
 	EVENT_GOTNICKIP,
 
 /*  EVENT_KILL 
- *    Called when a user is killed on the network. the user 
- *    nick is passed as a parameter, so you can see who
- *    was killed (You would have to use the recbuf global 
- *    variable to see who killed them though)
+ *    Called when a user is killed.
  *    parameters:
- *      user in cmdparams->source
+ *      user who was killed in cmdparams->target
  *      reason in cmdparams->param
  */
 	EVENT_KILL,
+
+/*  EVENT_LOCALKILL 
+ *    Called when a user is killed by an operator.
+ *    parameters:
+ *      operator that issued kill in cmdparams->source
+ *      user who was killed in cmdparams->target
+ *      reason in cmdparams->param
+ */
+	EVENT_LOCALKILL,
+
+/*  EVENT_GLOBALKILL 
+ *    Called when a user is killed by an operator.
+ *    parameters:
+ *      operator that issued kill in cmdparams->source
+ *      user who was killed in cmdparams->target
+ *      reason in cmdparams->param
+ */
+	EVENT_GLOBALKILL,
+
+/*  EVENT_SERVERKILL 
+ *    Called when a user is killed by a server.
+ *    parameters:
+ *      server that issued kill in cmdparams->source
+ *      user who was killed in cmdparams->target
+ *      reason in cmdparams->param
+ */
+	EVENT_SERVERKILL,
 
 /*  EVENT_BOTKILL 
  *    is called if one of the NeoStats bots gets killed. You would 
  *    use it to reinitialize the bot.
  *    parameters:
- *      user in cmdparams->source
+ *      user who was killed in cmdparams->target
  *      reason in cmdparams->param
  */
 	EVENT_BOTKILL,

@@ -451,7 +451,7 @@ m_mode (char *origin, char **argv, int argc, int srv)
 static void
 m_kill (char *origin, char **argv, int argc, int srv)
 {
-	do_kill (argv[0], argv[1]);
+	do_kill (origin, [0], argv[1]);
 }
 static void
 m_vhost (char *origin, char **argv, int argc, int srv)

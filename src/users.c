@@ -169,8 +169,12 @@ static void deluser(Client * u)
 }
 
 void 
-KillUser (const char *nick, const char *reason)
+KillUser (const char* source, const char *nick, const char *reason)
 {
+	char *killbuf;
+	char *killreason;
+	char** av;
+	int ac = 0;
 	CmdParams * cmdparams;
 	Client *u;
 
@@ -184,17 +188,32 @@ KillUser (const char *nick, const char *reason)
 	PartAllChannels (u, reason);
 	/* run the event to delete a user */
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	cmdparams->source = u;
-	if(reason) {
-		cmdparams->param = (char*)reason;
+	cmdparams->target = u;
+	killbuf = sstrdup(reason);
+	ac = split_buf (killbuf, &av, 0);
+	killreason = joinbuf (av, ac, 1);
+	cmdparams->param = killreason;
+	cmdparams->source = find_user (source);
+	if (cmdparams->source)
+	{
+		SendAllModuleEvent (EVENT_KILL, cmdparams);
+		SendAllModuleEvent (EVENT_GLOBALKILL, cmdparams);
 	}
-	SendAllModuleEvent (EVENT_KILL, cmdparams);
+	else
+	{
+		cmdparams->source = find_server (source);
+		SendAllModuleEvent (EVENT_KILL, cmdparams);
+		SendAllModuleEvent (EVENT_SERVERKILL, cmdparams); 		
+	}
 	/* if its one of our bots inform the module */
 	if ( IsMe(u) ) {
 		nlog (LOG_NOTICE, "KillUser: deleting bot %s as it was killed", u->name);
 		SendModuleEvent (EVENT_BOTKILL, cmdparams, u->user->bot->moduleptr);
 	}
 	deluser(u);
+	ns_free (killbuf);
+	ns_free (killreason);
+	ns_free (av);
 	ns_free (cmdparams);
 }
 
@@ -219,6 +238,27 @@ QuitUser (const char *nick, const char *reason)
 		cmdparams->param = (char*)reason;
 	}
 	SendAllModuleEvent (EVENT_QUIT, cmdparams);
+	/* RX: :m , :[irc.foonet.com] Local kill by Mark (testing) */
+	if (strstr (reason, "Local kill by") && 
+		strstr (reason, "[") && 
+		strstr (reason, "]"))
+	{
+		char *killbuf;
+		char *killreason;
+		char** av;
+		int ac = 0;
+
+		killbuf = sstrdup(cmdparams->param);
+		ac = split_buf (killbuf, &av, 0);
+		killreason = joinbuf(av, ac, 5);
+		cmdparams->source = find_user (av[4]);
+		cmdparams->target = u;
+		cmdparams->param = killreason;
+		SendAllModuleEvent (EVENT_LOCALKILL, cmdparams);
+		ns_free (killbuf);
+		ns_free (killreason);
+		ns_free (av);
+	}
 	deluser(u);
 	ns_free (cmdparams);
 }

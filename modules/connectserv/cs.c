@@ -74,7 +74,9 @@ static int cs_event_signon (CmdParams* cmdparams);
 static int cs_event_umode (CmdParams* cmdparams);
 static int cs_event_smode (CmdParams* cmdparams);
 static int cs_event_quit (CmdParams* cmdparams);
-static int cs_event_kill (CmdParams* cmdparams);
+static int cs_event_localkill (CmdParams* cmdparams);
+static int cs_event_globalkill (CmdParams* cmdparams);
+static int cs_event_serverkill (CmdParams* cmdparams);
 static int cs_event_nick (CmdParams* cmdparams);
 static int cs_event_server (CmdParams* cmdparams);
 static int cs_event_squit (CmdParams* cmdparams);
@@ -138,15 +140,17 @@ static BotInfo cs_botinfo =
 
 /** Module Events */
 ModuleEvent module_events[] = {
-	{EVENT_SIGNON,	cs_event_signon,	EVENT_FLAG_EXCLUDE_ME},
-	{EVENT_UMODE,	cs_event_umode,		EVENT_FLAG_EXCLUDE_ME},
-	{EVENT_SMODE,	cs_event_smode,		EVENT_FLAG_EXCLUDE_ME},
-	{EVENT_QUIT,	cs_event_quit,		EVENT_FLAG_EXCLUDE_ME},
-	{EVENT_KILL,	cs_event_kill,		EVENT_FLAG_EXCLUDE_ME},
-	{EVENT_NICK,	cs_event_nick,		EVENT_FLAG_EXCLUDE_ME},
-	{EVENT_SERVER,	cs_event_server,	EVENT_FLAG_EXCLUDE_ME},
-	{EVENT_SQUIT,	cs_event_squit,		EVENT_FLAG_EXCLUDE_ME},
-	{EVENT_NULL,	NULL}
+	{EVENT_SIGNON,		cs_event_signon,	EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_UMODE,		cs_event_umode,		EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_SMODE,		cs_event_smode,		EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_QUIT,		cs_event_quit,		EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_LOCALKILL,	cs_event_localkill,	EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_GLOBALKILL,	cs_event_globalkill,EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_SERVERKILL,	cs_event_serverkill,EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_NICK,		cs_event_nick,		EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_SERVER,		cs_event_server,	EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_SQUIT,		cs_event_squit,		EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_NULL,		NULL}
 };
 
 ModeDef OperUmodes[]=
@@ -220,6 +224,31 @@ void ModFini (void)
 {
 }
 
+/** @brief cs_report
+ *
+ *  Handle reporting of event
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void cs_report (const char *fmt, ...)
+{
+	static char buf[BUFSIZE];
+	va_list ap;
+
+	if (!is_synched)
+		return;
+	va_start (ap, fmt);
+	ircvsnprintf (buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	irc_chanalert (cs_bot, buf);
+	if (cs_cfg.logging) {
+		nlog (LOG_NORMAL, buf);
+	}
+}
+
 /* 
  * Echo signon
  */
@@ -227,16 +256,10 @@ static int cs_event_signon (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	/* Print Connection Notice */
-	irc_chanalert(cs_bot, msg_signon,
+	cs_report (msg_signon,
 		cmdparams->source->name, cmdparams->source->user->username, 
 		cmdparams->source->user->hostname, cmdparams->source->info,
 		cmdparams->source->uplink->name);
-	if (cs_cfg.logging) {
-		nlog (LOG_NORMAL, msg_signon,
-			cmdparams->source->name, cmdparams->source->user->username, 
-			cmdparams->source->user->hostname, cmdparams->source->info,
-			cmdparams->source->uplink->name);
-	}
 	return NS_SUCCESS;
 }
 
@@ -245,57 +268,61 @@ static int cs_event_signon (CmdParams* cmdparams)
  */
 static int cs_event_quit (CmdParams* cmdparams)
 {
-	char *cmd, *lcl, *QuitMsg, *KillMsg;
-	char **Quit;
-	char **Local;
-	int QuitCount = 0;
-	int LocalCount = 0;
-
 	SET_SEGV_LOCATION();
-	cmd = sstrdup(recbuf);
-	lcl = sstrdup(recbuf);
-	QuitCount = split_buf(cmd, &Quit, 0);
-	QuitMsg = joinbuf(Quit, QuitCount, 2);
-	/* Local Kill Watch For Signoff */
-	if (cs_cfg.kill_watch) {
-		if (strstr(cmd, "Local kill by") && strstr(cmd, "[")
-		    && strstr(cmd, "]")) {
-			LocalCount = split_buf(lcl, &Local, 0);
-			KillMsg = joinbuf(Local, LocalCount, 7);
-			irc_chanalert(cs_bot, msg_localkill,
-				cmdparams->source->name, cmdparams->source->user->username, 
-				cmdparams->source->user->hostname,
-				Local[6], KillMsg);
-			if (cs_cfg.logging) {
-				nlog (LOG_NORMAL, msg_localkill,
-					cmdparams->source->name, cmdparams->source->user->username, 
-					cmdparams->source->user->hostname,
-					Local[6], KillMsg);
-			}
-			ns_free(KillMsg);
-			ns_free(QuitMsg);
-			ns_free(cmd);
-			ns_free(lcl);
-			return NS_SUCCESS;
-		}
-	}
 	/* Print Disconnection Notice */
 	if (cs_cfg.sign_watch) {
-		irc_chanalert(cs_bot, msg_signoff,
+		cs_report (msg_signoff,
 			cmdparams->source->name, cmdparams->source->user->username, 
 			cmdparams->source->user->hostname, cmdparams->source->info,
-			cmdparams->source->uplink->name, QuitMsg);
-		if (cs_cfg.logging) {
-			nlog (LOG_NORMAL, msg_signoff,
-				cmdparams->source->name, cmdparams->source->user->username, 
-				cmdparams->source->user->hostname, cmdparams->source->info,
-				cmdparams->source->uplink->name, QuitMsg);
-		}
+			cmdparams->source->uplink->name, cmdparams->param);
 	}
-	ns_free(QuitMsg);
-	ns_free(cmd);
-	ns_free(lcl);
-	ns_free(Quit);
+	return NS_SUCCESS;
+}
+
+/* 
+ * Echo signoff
+ */
+static int cs_event_localkill (CmdParams* cmdparams)
+{
+	SET_SEGV_LOCATION();
+	/* Local Kill Watch For Signoff */
+	if (cs_cfg.kill_watch) {
+		cs_report (msg_localkill, cmdparams->target->name, 
+			cmdparams->target->user->username, cmdparams->target->user->hostname,
+			cmdparams->source->name, cmdparams->param);
+	}
+	return NS_SUCCESS;
+}
+
+/* 
+ * Echo signoff
+ */
+static int cs_event_globalkill (CmdParams* cmdparams)
+{
+	SET_SEGV_LOCATION();
+	/* Local Kill Watch For Signoff */
+	if (cs_cfg.kill_watch) {
+		cs_report (msg_globalkill,
+			cmdparams->target->name, cmdparams->target->user->username, 
+			cmdparams->target->user->hostname,
+			cmdparams->source->name, cmdparams->param);
+	}
+	return NS_SUCCESS;
+}
+
+/* 
+ * Echo signoff
+ */
+static int cs_event_serverkill (CmdParams* cmdparams)
+{
+	SET_SEGV_LOCATION();
+	/* Local Kill Watch For Signoff */
+	if (cs_cfg.kill_watch) {
+		cs_report (msg_serverkill,
+			cmdparams->target->name, cmdparams->target->user->username, 
+			cmdparams->target->user->hostname,
+			cmdparams->source->name, cmdparams->param);
+	}
 	return NS_SUCCESS;
 }
 
@@ -306,31 +333,17 @@ static int cs_event_quit (CmdParams* cmdparams)
 static int cs_report_mode (const char* modedesc, int serverflag, Client * u, int mask, int add, char mode)
 {
 	if(serverflag) {
-		irc_chanalert(cs_bot, msg_mode_serv, u->name, 
+		cs_report (msg_mode_serv, u->name, 
 			add?"now":"no longer", 
 			modedesc,
 			add?'+':'-',
 			mode, u->uplink->name);
-		if (cs_cfg.logging) {
-			nlog (LOG_NORMAL, msg_mode_serv, u->name, 
-				add?"now":"no longer", 
-				modedesc,
-				add?'+':'-',
-				mode, u->uplink->name);
-		}
 	} else {
-		irc_chanalert(cs_bot, msg_mode, u->name, 
+		cs_report (msg_mode, u->name, 
 			add?"now":"no longer", 
 			modedesc,
 			add?'+':'-',
 			mode);
-		if (cs_cfg.logging) {
-			nlog (LOG_NORMAL, msg_mode, u->name, 
-				add?"now":"no longer", 
-				modedesc,
-				add?'+':'-',
-				mode);
-		}
 	}
 	return NS_SUCCESS;
 }
@@ -358,12 +371,8 @@ static int cs_event_umode (CmdParams* cmdparams)
 		default:
 			mask = UmodeCharToMask (*modes);
 			if (mask == UMODE_BOT) {
-				irc_chanalert (cs_bot, msg_bot, cmdparams->source->name, 
+				cs_report (msg_bot, cmdparams->source->name, 
 					add?"now":"no longer", add?'+':'-', *modes);			
-				if (cs_cfg.logging) {
-					nlog (LOG_NORMAL, msg_bot, cmdparams->source->name, 
-							add?"now":"no longer", add?'+':'-', *modes);			
-				}
 			} else {
 				def = OperUmodes;
 				while(def->mask) {
@@ -420,87 +429,31 @@ static int cs_event_smode (CmdParams* cmdparams)
 }
 
 /* 
- * Echo kills
- */
-static int cs_event_kill (CmdParams* cmdparams)
-{
-	char *cmd, *GlobalMsg;
-	char **Kill;
-	int KillCount = 0;
-
-	SET_SEGV_LOCATION();
-	cmd = sstrdup(recbuf);
-	KillCount = split_buf(cmd, &Kill, 0);
-	GlobalMsg = joinbuf(Kill, KillCount, 4);
-	if (find_user(Kill[2])) {
-		/* it was a User who was killed */
-		irc_chanalert(cs_bot, msg_globalkill,
-			cmdparams->source->name, cmdparams->source->user->username, 
-			cmdparams->source->user->hostname,
-			Kill[0], GlobalMsg);
-		if (cs_cfg.logging) {
-			nlog (LOG_NORMAL, msg_globalkill,
-			cmdparams->source->name, cmdparams->source->user->username, 
-			cmdparams->source->user->hostname,
-			Kill[0], GlobalMsg);
-		}
-	} else if (find_server(Kill[2])) {
-		irc_chanalert(cs_bot, msg_serverkill,
-			cmdparams->source->name, cmdparams->source->user->username, 
-			cmdparams->source->user->hostname,
-			Kill[0], GlobalMsg);
-		if (cs_cfg.logging) {
-			nlog (LOG_NORMAL, msg_serverkill,
-			cmdparams->source->name, cmdparams->source->user->username, 
-			cmdparams->source->user->hostname,
-			Kill[0], GlobalMsg);
-		}
-	}
-	ns_free(cmd);
-	ns_free(GlobalMsg);
-	return NS_SUCCESS;
-}
-
-/* 
  * Echo nick changes
  */
 static int cs_event_nick (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	irc_chanalert(cs_bot, msg_nickchange, cmdparams->param, 
+	cs_report (msg_nickchange, cmdparams->param, 
 		cmdparams->source->user->username, cmdparams->source->user->hostname, 
 		cmdparams->source->name);
-	if (cs_cfg.logging) {
-		nlog (LOG_NORMAL, msg_nickchange, cmdparams->param, 
-		cmdparams->source->user->username, cmdparams->source->user->hostname, 
-		cmdparams->source->name);
-	}
 	return NS_SUCCESS;
 }
 
 static int cs_event_server (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	irc_chanalert (cs_bot, "\2SERVER\2 %s has joined the network at %s",
+	cs_report ("\2SERVER\2 %s has joined the network at %s",
 		cmdparams->source->name, cmdparams->source->uplink->name);
-	if (cs_cfg.logging) {
-		nlog (LOG_NORMAL, "\2SERVER\2 %s has joined the network at %s",
-		cmdparams->source->name, cmdparams->source->uplink->name);
-	}
 	return NS_SUCCESS;
 }
 
 static int cs_event_squit (CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	irc_chanalert (cs_bot, "\2SERVER\2 %s has left the network at %s for %s",
+	cs_report ("\2SERVER\2 %s has left the network at %s for %s",
 		cmdparams->source->name, cmdparams->source->uplink->name, 
 		cmdparams->param ? cmdparams->param : "reason unknown");
-	if (cs_cfg.logging) {
-		nlog (LOG_NORMAL, "\2SERVER\2 %s has left the network at %s for %s",
-		cmdparams->source->name, cmdparams->source->uplink->name, 
-		cmdparams->param ? cmdparams->param : "reason unknown");
-	}
 	return NS_SUCCESS;
 }
 
@@ -525,9 +478,11 @@ static int cs_set_sign_watch_cb (CmdParams* cmdparams, SET_REASON reason)
 static int cs_set_kill_watch_cb (CmdParams* cmdparams, SET_REASON reason)
 {
 	if (cs_cfg.kill_watch) {
-		EnableEvent (EVENT_KILL);
+		EnableEvent (EVENT_GLOBALKILL);
+		EnableEvent (EVENT_SERVERKILL);
 	} else {
-		DisableEvent (EVENT_KILL);
+		DisableEvent (EVENT_GLOBALKILL);
+		DisableEvent (EVENT_SERVERKILL);
 	}
 	return NS_SUCCESS;
 }

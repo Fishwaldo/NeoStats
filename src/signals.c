@@ -21,15 +21,15 @@
 ** $Id$
 */
 
-#include <signal.h>
 #include "neostats.h"
-#include "services.h"
-#include "log.h"
-#include "modules.h"
-/* this needs to come after neostats.h as we need the config.h define */
+#include <signal.h>
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #endif
+#include "services.h"
+#include "log.h"
+#include "modules.h"
+#include "sock.h"
 
 /*! File handle for segfault report */
 static FILE *segfault;

@@ -496,7 +496,6 @@ typedef enum NS_TRANSFER {
 #define CLEAR_SEGV_LOCATION() segv_location[0]='\0';
 #endif
 
-EXPORTVAR extern char recbuf[BUFSIZE];
 EXPORTVAR extern char segv_location[SEGV_LOCATION_BUFSIZE];
 
 /* this is the dns structure */

@@ -1390,9 +1390,9 @@ do_client (const char *nick, const char *arg1, const char *TS,
 }
 
 void
-do_kill (const char *nick, const char *reason)
+do_kill (const char *source, const char *nick, const char *reason)
 {
-	KillUser (nick, reason);
+	KillUser (source, nick, reason);
 }
 
 void

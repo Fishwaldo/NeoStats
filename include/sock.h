@@ -34,4 +34,6 @@ void Connect (void);
 void sts (const char *buf, const int buflen);
 int check_sql_sock();
 
+extern char recbuf[BUFSIZE];
+
 #endif
