@@ -34,9 +34,9 @@ static ModUser fake_bot;
 /* help title strings for different user levels */
 char * help_level_title[]=
 {
-	"\2Operators\2",
-	"\2Service Admins\2",
-	"\2Service Roots\2",
+	"Operators",
+	"Service Admins",
+	"Service Roots",
 };
 
 /* Intrinsic commands 
@@ -291,7 +291,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 			cmd_ptr = hnode_get(cmdnode);
 			if ((cmd_ptr->ulevel < curlevel) && (cmd_ptr->ulevel >= lowlevel)) {
 				if(curlevelmsg && !donemsg) {
-					prefmsg(u->nick, bot_ptr->nick, "\2Additional Commands for %s :\2", curlevelmsg);
+					prefmsg(u->nick, bot_ptr->nick, "\2Additional commands available to %s:\2", curlevelmsg);
 					donemsg = 1;
 				}
 				prefmsg(u->nick, bot_ptr->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
