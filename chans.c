@@ -57,16 +57,10 @@ hash_t *ch;
  *
  */
 void
-ChangeChanTS (Chans * c, time_t tstime)
+SetChanTS (Chans * c, time_t tstime)
 {
-	if (!c) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Called Change_Change_Ts with null channel");
-		return;
-	}
 	c->tstime = tstime;
 }
-
-
 
 /** @brief Process a Topic Change
  *
@@ -121,7 +115,7 @@ ChanTopic (const char *owner, const char* chan, time_t time, const char *topic)
  * @returns 1 on match, 0 on no match, -1 on error
  *
 */
-extern int
+int
 CheckChanMode (Chans * c, long mode)
 {
 	ModesParm *m;
@@ -158,7 +152,7 @@ CheckChanMode (Chans * c, long mode)
  * @return 0 on match, 1 otherwise.
 */
 
-int
+static int
 comparemode (const void *v, const void *mode)
 {
 	ModesParm *m = (void *) v;
@@ -221,7 +215,7 @@ ChanMode (char *origin, char **av, int ac)
 				if (*modes == chan_modes[i].flag) {
 					if (add) {
 						if (chan_modes[i].nickparam) {
-							ChangeChanUserMode (av[0], av[j], 1, chan_modes[i].mode);
+							ChanUserMode (av[0], av[j], 1, chan_modes[i].mode);
 							j++;
 						} else {
 							if (chan_modes[i].parameters) {
@@ -267,7 +261,7 @@ ChanMode (char *origin, char **av, int ac)
 						}
 					} else {
 						if (chan_modes[i].nickparam) {
-							ChangeChanUserMode (av[0], av[j], 0, chan_modes[i].mode);
+							ChanUserMode (av[0], av[j], 0, chan_modes[i].mode);
 							j++;
 						} else {
 							if (chan_modes[i].parameters) {
@@ -310,7 +304,7 @@ ChanMode (char *origin, char **av, int ac)
 */
 
 void
-ChangeChanUserMode (const char* chan, const char* nick, int add, long mode)
+ChanUserMode (const char* chan, const char* nick, int add, long mode)
 {
 	lnode_t *cmn;
 	Chanmem *cm;
@@ -319,18 +313,18 @@ ChangeChanUserMode (const char* chan, const char* nick, int add, long mode)
 
 	u = finduser(nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "ChangeChanUserMode: can't find user %s", nick);
+		nlog (LOG_WARNING, LOG_CORE, "ChanUserMode: can't find user %s", nick);
 		return;
 	}
 	c = findchan(chan);
 	if (!c) {
-		nlog (LOG_WARNING, LOG_CORE, "ChangeChanUserMode: can't find channel %s", chan);
+		nlog (LOG_WARNING, LOG_CORE, "ChanUserMode: can't find channel %s", chan);
 		return;
 	}
 	cmn = list_find (c->chanmembers, u->nick, comparef);
 	if (!cmn) {
 		if (me.debug_mode) {
-			chanalert (s_Services, "ChangeChanUserMode: %s is not a member of channel %s", u->nick, c->name);
+			chanalert (s_Services, "ChanUserMode: %s is not a member of channel %s", u->nick, c->name);
 			ChanDump (c->name);
 			UserDump (u->nick);
 		}
@@ -338,10 +332,10 @@ ChangeChanUserMode (const char* chan, const char* nick, int add, long mode)
 	}
 	cm = lnode_get (cmn);
 	if (add) {
-		nlog (LOG_DEBUG2, LOG_CORE, "ChangeChanUserMode: Adding mode %ld to Channel %s User %s", mode, c->name, u->nick);
+		nlog (LOG_DEBUG2, LOG_CORE, "ChanUserMode: Adding mode %ld to Channel %s User %s", mode, c->name, u->nick);
 		cm->flags |= mode;
 	} else {
-		nlog (LOG_DEBUG2, LOG_CORE, "ChangeChanUserMode: Deleting Mode %ld to Channel %s User %s", mode, c->name, u->nick);
+		nlog (LOG_DEBUG2, LOG_CORE, "ChanUserMode: Deleting Mode %ld to Channel %s User %s", mode, c->name, u->nick);
 		cm->flags &= ~mode;
 	}
 }
@@ -368,7 +362,7 @@ new_chan (const char *chan)
 	strlcpy (c->name, chan, CHANLEN);
 	cn = hnode_create (c);
 	if (hash_isfull (ch)) {
-		nlog (LOG_CRITICAL, LOG_CORE, "Eeek, Channel Hash is full");
+		nlog (LOG_CRITICAL, LOG_CORE, "new_chan: channel hash is full");
 	} else {
 		hash_insert (ch, cn, c->name);
 	}
@@ -396,7 +390,7 @@ del_chan (Chans * c)
 		nlog (LOG_WARNING, LOG_CORE, "del_chan: channel %s not found.", c->name);
 		return;
 	} else {
-		nlog (LOG_DEBUG2, LOG_CORE, "Deleting Channel %s", c->name);
+		nlog (LOG_DEBUG2, LOG_CORE, "del_chan: deleting channel %s", c->name);
 		cm = list_first (c->modeparms);
 		while (cm) {
 			free (lnode_get (cm));
@@ -505,7 +499,6 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 			del_chan (c);
 		}
 	}
-
 }
 
 /** @brief Parts a user from a channel
@@ -521,7 +514,6 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
  * @returns Nothing
 */
 
-
 void
 part_chan (User * u, const char *chan, char *partreason)
 {
@@ -532,14 +524,14 @@ part_chan (User * u, const char *chan, char *partreason)
 	int ac = 0;
 	SET_SEGV_LOCATION();
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "NULL user passed to part_chan u=NULL, chan=%s: %s", chan, recbuf);
+		nlog (LOG_WARNING, LOG_CORE, "part_chan: trying to part NULL user from s", chan);
 		if (me.debug_mode) {
-			chanalert (s_Services, "NULL user passed to part_chan u=NULL, chan=%s: %s", chan, recbuf);
+			chanalert (s_Services, "part_chan: trying to part NULL user from s", chan);
 			ChanDump (chan);
 		}
 		return;
 	}
-	nlog (LOG_DEBUG2, LOG_CORE, "Parting %s from %s", u->nick, chan);
+	nlog (LOG_DEBUG2, LOG_CORE, "part_chan: parting %s from %s", u->nick, chan);
 	c = findchan (chan);
 	if (!c) {
 		nlog (LOG_WARNING, LOG_CORE, "part_chan: channel %s not found", chan);
@@ -591,7 +583,7 @@ part_chan (User * u, const char *chan, char *partreason)
 		} else {
 			lnode_destroy (list_delete (u->chans, un));
 		}
-		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
+		nlog (LOG_DEBUG3, LOG_CORE, "part_chan: cur users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
 		if (c->cur_users <= 0) {
 			AddStringToList (&av, c->name, &ac);
 			ModuleEvent (EVENT_DELCHAN, av, ac);
@@ -615,22 +607,22 @@ part_chan (User * u, const char *chan, char *partreason)
 */
 
 void
-change_user_nick (Chans * c, const char *newnick, const char *oldnick)
+ChanNickChange (Chans * c, const char *newnick, const char *oldnick)
 {
 	lnode_t *cm;
 	Chanmem *cml;
 	SET_SEGV_LOCATION();
 	cm = list_find (c->chanmembers, oldnick, comparef);
 	if (!cm) {
-		nlog (LOG_WARNING, LOG_CORE, "change_user_nick() %s isn't a member of %s", oldnick, c->name);
+		nlog (LOG_WARNING, LOG_CORE, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
 		if (me.debug_mode) {
-			chanalert (s_Services, "change_user_nick() %s isn't a member of %s", oldnick, c->name);
+			chanalert (s_Services, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
 			ChanDump (c->name);
 			UserDump (oldnick);
 		}
 		return;
 	} else {
-		nlog (LOG_DEBUG3, LOG_CORE, "Change_User_Nick(): NewNick %s, OldNick %s", newnick, oldnick);
+		nlog (LOG_DEBUG3, LOG_CORE, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
 		cml = lnode_get (cm);
 		strlcpy (cml->nick, newnick, MAXNICK);
 	}
@@ -665,7 +657,6 @@ join_chan (const char* nick, const char *chan)
 	u = finduser (nick);
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "join_chan: tried to join unknown user %s to channel %s", nick, chan);
-		nlog (LOG_WARNING, LOG_CORE, "join_chan: recbuf - %s", recbuf);
 		return;
 	}
 	if (!strcasecmp ("0", chan)) {
@@ -699,9 +690,9 @@ join_chan (const char* nick, const char *chan)
 	cn = lnode_create (cm);
 	nlog (LOG_DEBUG2, LOG_CORE, "join_chan: adding usernode %s to channel %s", u->nick, chan);
 	if (list_find (c->chanmembers, u->nick, comparef)) {
-		nlog (LOG_WARNING, LOG_CORE, "join_chan: Tried to add %s to channel %s but they are already a member", u->nick, chan);
+		nlog (LOG_WARNING, LOG_CORE, "join_chan: tried to add %s to channel %s but they are already a member", u->nick, chan);
 		if (me.debug_mode) {
-			chanalert (s_Services, "join_chan: Tried to add %s to channel %s but they are already a member", u->nick, chan);
+			chanalert (s_Services, "join_chan: tried to add %s to channel %s but they are already a member", u->nick, chan);
 			ChanDump (c->name);
 			UserDump (u->nick);
 		}
@@ -734,7 +725,6 @@ join_chan (const char* nick, const char *chan)
 	}
 }
 
-
 /** @brief Dump Channel information
  *
  * dump either the entire channel list, or a single channel detail. Used for debugging
@@ -744,7 +734,6 @@ join_chan (const char* nick, const char *chan)
  *
  * @returns Nothing
 */
-
 
 void
 ChanDump (const char *chan)
@@ -868,7 +857,7 @@ findchan (const char *chan)
 		c = hnode_get (cn);
 		return c;
 	} else {
-		nlog (LOG_DEBUG3, LOG_CORE, "FindChan(%s) -> Not Found", chan);
+		nlog (LOG_DEBUG3, LOG_CORE, "FindChan: %s not found", chan);
 		return NULL;
 	}
 }
@@ -886,10 +875,7 @@ findchan (const char *chan)
 int 
 IsChanMember(Chans *c, User *u) 
 {
-	if (!u) {
-		return 0;
-	}
-	if (!c) {
+	if (!u || !c) {
 		return 0;
 	}
 	if (list_find (c->chanmembers, u->nick, comparef)) {
@@ -1104,7 +1090,6 @@ TBLDEF neo_chans = {
  * @return Nothing
 */
 
-
 int 
 init_chan_hash ()
 {
@@ -1119,42 +1104,3 @@ init_chan_hash ()
 
 	return NS_SUCCESS;
 }
-
-/* Begin moving sjoin code out of IRCd 
- * work in progress
- */
-#if 0
-long 
-sjoin_add_modes_to_list(list_t *tl, char* modes, char **argv)
-{
-	int i;
-	int j = 3;
-	long mode1 = 0;
-	ModesParm *m;
-	lnode_t *mn = NULL;
-
-	while (*modes) {
-		for (i = 0; i < ircd_cmodecount; i++) {
-			if (*modes == chan_modes[i].flag) {
-				if (chan_modes[i].parameters) {
-					m = smalloc (sizeof (ModesParm));
-					m->mode = chan_modes[i].mode;
-					strlcpy (m->param, argv[j], PARAMSIZE);
-					mn = lnode_create (m);
-					if (!list_isfull (tl)) {
-						list_append (tl, mn);
-					} else {
-						nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
-						do_exit (NS_EXIT_ERROR, "List full - see log file");
-					}
-					j++;
-				} else {
-					mode1 |= chan_modes[i].mode;
-				}
-			}
-		}
-		modes++;
-	}
-	return mode1;
-}
-#endif

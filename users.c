@@ -59,7 +59,7 @@ new_user (const char *nick)
 		strlcpy (u->nick, nick, MAXNICK);
 	un = hnode_create (u);
 	if (hash_isfull (uh)) {
-		nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, Hash is full");
+		nlog (LOG_CRITICAL, LOG_CORE, "new_user: user hash is full");
 	} else {
 		hash_insert (uh, un, u->nick);
 	}
@@ -75,10 +75,10 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	int i;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): %s (%s@%s) %s (%d) -> %s at %lu", nick, user, host, realname, (int)htonl (ipaddr), server, (unsigned long)TS);
+	nlog (LOG_DEBUG2, LOG_CORE, "AddUser: %s (%s@%s) %s (%d) -> %s at %lu", nick, user, host, realname, (int)htonl (ipaddr), server, (unsigned long)TS);
 	u = finduser (nick);
 	if (u) {
-		nlog (LOG_WARNING, LOG_CORE, "trying to add a user that already exists? (%s)", nick);
+		nlog (LOG_WARNING, LOG_CORE, "AddUser: trying to add a user that already exists %s", nick);
 		return;
 	}
 
@@ -152,11 +152,11 @@ doDelUser (const char *nick, int killflag, const char *reason)
 	int ac = 0;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "UserQuit(%s)", nick);
+	nlog (LOG_DEBUG2, LOG_CORE, "doDelUser: %s", nick);
 
 	un = hash_lookup (uh, nick);
 	if (!un) {
-		nlog (LOG_WARNING, LOG_CORE, "UserQuit(%s) failed!", nick);
+		nlog (LOG_WARNING, LOG_CORE, "doDelUser: %s failed!", nick);
 		return;
 	}
 	u = hnode_get (un);
@@ -181,7 +181,7 @@ doDelUser (const char *nick, int killflag, const char *reason)
 	/* if its one of our bots, remove it from the modlist */
 	if (findbot (u->nick)) {
 		if (killflag == 1) {
-			nlog (LOG_NOTICE, LOG_CORE, "Deleting Bot %s as it was killed", u->nick);
+			nlog (LOG_NOTICE, LOG_CORE, "doDelUser: deleting bot %s as it was killed", u->nick);
 			ac = 0;
 			AddStringToList (&av, u->nick, &ac);
 			ModuleEvent (EVENT_BOTKILL, av, ac);
@@ -217,7 +217,7 @@ UserAway (const char *nick, const char *awaymsg)
 			free (av);
 		}
 	} else {
-		nlog (LOG_NOTICE, LOG_CORE, "Warning, Unable to find User %s for Away", nick);
+		nlog (LOG_WARNING, LOG_CORE, "UserAway: unable to find user %s for away", nick);
 	}
 }
 
@@ -236,15 +236,15 @@ UserNick (const char * oldnick, const char *newnick)
 		nlog (LOG_WARNING, LOG_CORE, "UserNick: can't find user %s", oldnick);
 		return NS_FAILURE;
 	}
-	nlog (LOG_DEBUG2, LOG_CORE, "UserNick(%s, %s)", u->nick, newnick);
+	nlog (LOG_DEBUG2, LOG_CORE, "UserNick: s -> %s", u->nick, newnick);
 	un = hash_lookup (uh, u->nick);
 	if (!un) {
-		nlog (LOG_WARNING, LOG_CORE, "UserNick(%s) Failed!", u->nick);
+		nlog (LOG_WARNING, LOG_CORE, "UserNick: s -> %s failed!", u->nick, newnick);
 		return NS_FAILURE;
 	}
 	cm = list_first (u->chans);
 	while (cm) {
-		change_user_nick (findchan (lnode_get (cm)), (char *) newnick, u->nick);
+		ChanNickChange (findchan (lnode_get (cm)), (char *) newnick, u->nick);
 		cm = list_next (u->chans, cm);
 	}
 	SET_SEGV_LOCATION();
@@ -268,7 +268,7 @@ finduser (const char *nick)
 		u = hnode_get (un);
 		return u;
 	}
-	nlog (LOG_DEBUG2, LOG_CORE, "FindUser(%s) -> NOTFOUND", nick);
+	nlog (LOG_DEBUG2, LOG_CORE, "finduser: %s not found", nick);
 	return NULL;
 }
 
@@ -549,7 +549,7 @@ int UmodeAuth(User * u)
 			break;
 		}
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "Umode Level for %s is %d", u->nick, tmplvl);
+	nlog (LOG_DEBUG1, LOG_CORE, "UmodeAuth: umode level for %s is %d", u->nick, tmplvl);
 
 /* I hate SMODEs damn it */
 #ifdef GOTUSERSMODES
@@ -565,7 +565,7 @@ int UmodeAuth(User * u)
 			break;
 		}
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "Smode Level for %s is %d", u->nick, tmplvl);
+	nlog (LOG_DEBUG1, LOG_CORE, "UmodeAuth: smode level for %s is %d", u->nick, tmplvl);
 #endif
 	return tmplvl;
 }

@@ -1439,21 +1439,23 @@ handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoin
 			}
 		}
 		join_chan (nick, channame); 
-		ChangeChanUserMode (channame, nick, 1, mode);
+		ChanUserMode (channame, nick, 1, mode);
 		offset++;
 		ok = 1;
 	}
 	c = findchan (channame);
-	/* update the TS time */
-	ChangeChanTS (c, atoi (tstime)); 
-	c->modes |= mode1;
-	if (!list_isempty (tl)) {
-		if (!list_isfull (c->modeparms)) {
-			list_transfer (c->modeparms, tl, list_first (tl));
-		} else {
-			/* eeeeeeek, list is full! */
-			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
-			do_exit (NS_EXIT_ERROR, "List full - see log file");
+	if(c) {
+		/* update the TS time */
+		SetChanTS (c, atoi (tstime)); 
+		c->modes |= mode1;
+		if (!list_isempty (tl)) {
+			if (!list_isfull (c->modeparms)) {
+				list_transfer (c->modeparms, tl, list_first (tl));
+			} else {
+				/* eeeeeeek, list is full! */
+				nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
+				do_exit (NS_EXIT_ERROR, "List full - see log file");
+			}
 		}
 	}
 	list_destroy (tl);
