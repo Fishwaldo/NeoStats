@@ -131,11 +131,6 @@ main (int argc, char *argv[])
 	if (config.recvlog)
 		remove (RECV_LOG);
 
-		
-	/* initilze our Module subsystem */
-	if(InitModuleHash () != NS_SUCCESS)
-		return EXIT_FAILURE;
-
 	/* prepare to catch errors */
 	setup_signals ();
 
@@ -143,6 +138,10 @@ main (int argc, char *argv[])
 #ifdef SQLSRV
 	rta_init(sqlsrvlog);
 #endif
+		
+	/* initilze our Module subsystem */
+	if(InitModuleHash () != NS_SUCCESS)
+		return EXIT_FAILURE;
 
 	/* load the config files */
 	if(ConfLoad () != NS_SUCCESS)

@@ -35,6 +35,9 @@
 #include "hash.h"
 #include "config.h"
 #include "log.h"
+#ifdef SQLSRV
+#include "sqlsrv/rta.h"
+#endif
 
 /** @brief Module list
  * 
@@ -56,6 +59,129 @@ static hash_t *th;
 static hash_t *bh;
 /* @brief Module Chan Bot hash list */
 static hash_t *bch;
+
+#ifdef SQLSRV
+
+char sqlbuf[BUFSIZE];
+
+
+void *display_module_name (void *tbl, char *col, char *sql, void *row) {
+	Module *mod_ptr = row;
+	
+	strlcpy(sqlbuf, mod_ptr->info->module_name, MAX_MOD_NAME);
+	return sqlbuf;	
+}
+
+void *display_module_desc (void *tbl, char *col, char *sql, void *row) {
+	Module *mod_ptr = row;
+	
+	strlcpy(sqlbuf, mod_ptr->info->module_description, BUFSIZE);
+	return sqlbuf;
+}
+
+void *display_module_version (void *tbl, char *col, char *sql, void *row) {
+	Module *mod_ptr = row;
+	
+	if (mod_ptr->isnewstyle == 1) {
+		strlcpy(sqlbuf, mod_ptr->info->module_version, BUFSIZE);
+		return sqlbuf;
+	} else {
+		bzero(sqlbuf, BUFSIZE);
+		return sqlbuf;
+	}
+}
+
+void *display_module_builddate (void *tbl, char *col, char *sql, void *row) {
+	Module *mod_ptr = row;
+	
+	if (mod_ptr->isnewstyle == 1) {
+		ircsnprintf(sqlbuf, BUFSIZE, "%s - %s", mod_ptr->info->module_build_date, mod_ptr->info->module_build_time);
+		return sqlbuf;
+	} else {
+		bzero(sqlbuf, BUFSIZE);
+		return sqlbuf;
+	}
+}
+
+void *display_core_info (void *tbl, char *col, char *sql, void *row) {
+	ircsnprintf(sqlbuf, BUFSIZE, "%d.%d.%d - %s", MAJOR, MINOR, REV, ircd_version);
+	return sqlbuf;	
+}
+
+COLDEF neo_modulecols[] = {
+	{
+		"modules",
+		"name",
+		RTA_STR,
+		MAX_MOD_NAME,
+		offsetof(struct Module, info),
+		RTA_READONLY,
+		display_module_name,
+		NULL,
+		"The name of the Module"
+	},
+	{
+		"modules",
+		"description",
+		RTA_STR,
+		BUFSIZE,
+		offsetof(struct Module, info),
+		RTA_READONLY,
+		display_module_desc, 
+		NULL,
+		"The Module Description"
+	},
+	{
+		"modules",
+		"version",
+		RTA_STR,
+		BUFSIZE,
+		offsetof(struct Module, info),
+		RTA_READONLY,
+		display_module_version,
+		NULL,
+		"The module version"
+	},
+	{
+		"modules",
+		"builddate",
+		RTA_STR,
+		BUFSIZE,
+		offsetof(struct Module, info),
+		RTA_READONLY,
+		display_module_builddate,
+		NULL,
+		"The module build date"
+	},
+	{
+		"modules",
+		"coreinfo",
+		RTA_STR,
+		BUFSIZE,
+		offsetof(struct Module, info),
+		RTA_READONLY,
+		display_core_info,
+		NULL,
+		"The NeoStats core Version"
+	},
+};
+
+TBLDEF neo_modules = {
+	"modules",
+	NULL, 	/* for now */
+	sizeof(struct Module),
+	0,
+	TBL_HASH,
+	neo_modulecols,
+	sizeof(neo_modulecols) / sizeof(COLDEF),
+	"",
+	"The list of Modules loaded by NeoStats"
+};
+#endif /* SQLSRV */
+
+
+
+
 
 /** @brief Initialise module list hashes
  *
@@ -84,6 +210,14 @@ InitModuleHash ()
 	sockh = hash_create (me.maxsocks, 0, 0);
 	if(!sockh)
 		return NS_FAILURE;
+
+#ifdef SQLSRV
+        /* add the module hash to the sql library */
+	neo_modules.address = mh;
+	rta_add_table(&neo_modules);
+#endif
+	                        
+
 	return NS_SUCCESS;
 }
 

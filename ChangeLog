@@ -57,6 +57,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - This should fix up the SQL emulation a bit. the RTA library needs to be re-written anyway, so this is a temp solution. 
  - Introduce flags structure to users/chans/servers. For upcomming "Global Exclude" list (BugID 98)
  - Fix bug in unreal netinfo netname processing (M)
+ - Fix some potential bugs with statserv channel stats found by Trystan
+ - Export loaded modules via SQL emulation
 
 * NeoStats * Fish (F) * Version 2.5.10
  - Fix a problem with Umode +T being reintroduced on Unreal Beta19 as a normal usermode. 
