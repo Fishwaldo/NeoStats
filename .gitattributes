@@ -234,6 +234,7 @@ dl/version/version.c -text
 doc/FAQ -text
 doc/FAQ.pt -text
 doc/README.french -text
+doc/README.sqlsrv -text
 doc/USERMAN -text
 doc/USERMAN.xml -text
 doc/old/FAQ.pt -text
