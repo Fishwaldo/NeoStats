@@ -209,7 +209,7 @@ send_server (const char *sender, const char *name, const int numeric, const char
 }
 
 void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
 {
 	send_cmd ("%s %s :TS", MSG_PASS, pass);
 	send_cmd ("CAPAB TS5 BURST SSJ5 NICKIP CLIENT");
@@ -247,7 +247,7 @@ send_join (const char *sender, const char *who, const char *chan, const unsigned
 }
 
 void 
-send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts)
+send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
 	send_cmd (":%s %s %s %s %s %lu", who, MSGTOK(MODE), chan, mode, args, ts);
 }

@@ -29,6 +29,7 @@
 #include "modules.h"
 #include "bots.h"
 #include "dns.h"
+#include "ircd.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -329,11 +330,7 @@ load_module (const char *modfilename, User * u)
 	}
 	strlcpy (loadmodname, modfilename, 255);
 	strlwr (loadmodname);
-#ifdef WIN32
-	ircsnprintf (path, 255, "%s/%s.dll", MOD_PATH, loadmodname);
-#else
-	ircsnprintf (path, 255, "%s/%s.so", MOD_PATH, loadmodname);
-#endif
+	ircsnprintf (path, 255, "%s/%s.%s", MOD_PATH, loadmodname, MOD_EXT);
 	dl_handle = ns_dlopen (path, RTLD_NOW || RTLD_GLOBAL);
 	if (!dl_handle) {
 		if (do_msg) {
@@ -365,6 +362,15 @@ load_module (const char *modfilename, User * u)
 			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s already loaded", info_ptr->name);
 		}
 		nlog (LOG_WARNING, "Unable to load module: %s already loaded", info_ptr->name);
+		return NULL;
+	}
+	/* Check we have require PROTOCOL/FEATURE support for module */
+	if((info_ptr->features & protocol_info->features) != info_ptr->features) {
+		nlog (LOG_WARNING, "Unable to load module: %s Required module features not available on this IRCd.", modfilename);
+		if (do_msg) {
+			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s Required module features not available on this IRCd.", modfilename);
+		}
+		ns_dlclose (dl_handle);
 		return NULL;
 	}
 	/* Extract pointer to event list */

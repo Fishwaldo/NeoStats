@@ -26,58 +26,50 @@
 #include "dl.h"
 #include "services.h"
 
-typedef int (*getauthfunc) (User *, int curlvl);
+typedef int (*userauthfunc) (User *u);
 typedef int (*listauthfunc) (User * u);
 
 typedef struct AuthModule {
 	Module* module_ptr;
-	getauthfunc getauth;
+	userauthfunc userauth;
 	listauthfunc listauth;
 }AuthModule;
 
 extern void *load_auth_mods[NUM_MODULES];
 
 static AuthModule AuthModList[NUM_MODULES];
-
 static int AuthModuleCount = 0;
-
-/* Do dl lookups in advance to speed up UserLevel processing 
- *
- */
 
 int UserAuth(User * u)
 {
-	int tmplvl = 0;
+	int newauthlvl = 0;
 	int authlvl = 0;
 	int i;
 	
-	if(IsServiceRoot(u)) {
-		return(NS_ULEVEL_ROOT);
-	}
 	for(i = 0; i < AuthModuleCount; i ++)
 	{
-		if (AuthModList[i].getauth) {
-			authlvl = AuthModList[i].getauth (u, tmplvl);
-			/* if authlvl is greater than tmplvl, then auth is authoritive */
-			if (authlvl > tmplvl) {
-				tmplvl = authlvl;
+		if (AuthModList[i].userauth) {
+			authlvl = AuthModList[i].userauth (u);
+			/* if authlvl is greater than newauthlvl, then auth is authoritive */
+			if (authlvl > newauthlvl) {
+				newauthlvl = authlvl;
 			}
 		}
 	}
-	return tmplvl;
+	return newauthlvl;
 }
 
 static void load_auth_module(const char* name)
 {
-	AuthModule* newauth;
+	AuthModule* auth_module;
 	
-	newauth = &AuthModList[AuthModuleCount];
-	newauth->module_ptr = load_module (name, NULL);
-	if(newauth->module_ptr) {
-		newauth->getauth = 
-			ns_dlsym (newauth->module_ptr->dl_handle, "ModAuthUser");
-		newauth->listauth = 
-			ns_dlsym (newauth->module_ptr->dl_handle, "ModAuthList");
+	auth_module = &AuthModList[AuthModuleCount];
+	auth_module->module_ptr = load_module (name, NULL);
+	if(auth_module->module_ptr) {
+		auth_module->userauth = 
+			ns_dlsym (auth_module->module_ptr->dl_handle, "ModAuthUser");
+		auth_module->listauth = 
+			ns_dlsym (auth_module->module_ptr->dl_handle, "ModAuthList");
 		AuthModuleCount ++;
 	}
 }

@@ -67,6 +67,11 @@ extern const char ns_help_chandump_oneline[];
 extern const char ns_help_serverdump_oneline[];
 extern const char ns_help_bandump_oneline[];
 
+extern const char *ns_help_set_nick[];
+extern const char *ns_help_set_altnick[];
+extern const char *ns_help_set_user[];
+extern const char *ns_help_set_host[];
+extern const char *ns_help_set_realname[];
 extern const char *ns_help_set_pingtime[];
 extern const char *ns_help_set_versionscan[];
 extern const char *ns_help_set_servicecmode[];
@@ -77,5 +82,15 @@ extern const char *ns_help_set_debuglevel[];
 extern const char *ns_help_set_debugchan[];
 extern const char *ns_help_set_debugtochan[];
 extern const char *ns_help_set_debugmodule[];
+
+extern const char cmd_help_oneline[];
+extern const char cmd_help_about_oneline[];
+extern const char cmd_help_credits_oneline[];
+extern const char cmd_help_version_oneline[];
+extern const char *cmd_help_help[];
+extern const char *cmd_help_about[];
+extern const char *cmd_help_credits[];
+extern const char *cmd_help_version[];
+extern const char *cmd_help_set[];
 
 #endif /* _NS_HELP_H_ */

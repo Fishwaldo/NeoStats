@@ -54,6 +54,7 @@ struct hs_cfg {
 	int regnick;
 	char vhostdom[MAXHOST];
 	int modnum;
+	int operhosts;
 } hs_cfg;
 
 typedef struct hs_user {
@@ -82,27 +83,10 @@ int CleanupHosts(void);
 static void LoadHosts(void);
 static void LoadConfig(void);
 
-int data_synch;
-int load_synch;
-
-char **DelArry;
-char **ListArry;
-int LoadArryCount = 0;
-int DelArryCount = 0;
-int ListArryCount = 0;
-
 Bot *hs_bot;
-static BotInfo hs_botinfo = 
-{
-	"HostServ", 
-	"HostServ", 
-	"HS", 
-	"", 
-	"Network virtual host service",
-};
 static Module* hs_module;
 
-const char *ns_copyright[] = {
+const char *hs_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
@@ -111,7 +95,7 @@ const char *ns_copyright[] = {
 ModuleInfo module_info = {
 	"HostServ",
 	"Network virtual host service",
-	ns_copyright,
+	hs_copyright,
 	hs_about,
 	NEOSTATS_VERSION,
 	CORE_MODULE_VERSION,
@@ -135,46 +119,25 @@ static bot_cmd hs_commands[]=
 	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
 };
 
-const char *ns_help_set_nick[] = {
-	"\2NICK <newnick>\2 Change bot nickname",
-	"(requires restart to take effect).",
-	NULL
-};
-
-const char *ns_help_set_altnick[] = {
-	"\2ALTNICK <newnick>\2 Change bot alternate nickname",
-	NULL
-};
-
-const char *ns_help_set_user[] = {
-	"\2USER <username>\2 Change bot username",
-	"(requires restart to take effect).",
-	NULL
-};
-
-const char *ns_help_set_host[] = {
-	"\2HOST <host>\2 Change bot host",
-	"(requires restart to take effect).",
-	NULL
-};
-
-const char *ns_help_set_realname[] = {
-	"\2REALNAME <realname>\2 Change bot realname",
-	"(requires restart to take effect).",
-	NULL
-};
-
 static bot_setting hs_settings[]=
 {
-	{"NICK",		&hs_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, (void*)"HostServ" },
-	{"ALTNICK",		&hs_botinfo.altnick,SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, (void*)"HostServ" },
-	{"USER",		&hs_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, (void*)"HS" },
-	{"HOST",		&hs_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, (void*)"" },
-	{"REALNAME",	&hs_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"Network virtual host service" },
 	{"EXPIRE",		&hs_cfg.old,		SET_TYPE_INT,		0, 99, 			NS_ULEVEL_ADMIN, "ExpireDays","days",hs_help_set_expire, NULL, (void*)60 },
 	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, "UnetVhosts",NULL,	hs_help_set_hiddenhost, NULL, (void*)0 },
 	{"HOSTNAME",	&hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN, "UnetDomain",NULL,	hs_help_set_hostname, NULL, (void*)"" },
+	{"OPERHOSTS",	&hs_cfg.operhosts,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, "operhosts",NULL,	hs_help_set_operhosts, NULL, (void*)0 },
 	{NULL,			NULL,				0,					0, 0, 			0,				 NULL,		  NULL,	NULL	},
+};
+
+static BotInfo hs_botinfo = 
+{
+	"HostServ", 
+	"HostServ1", 
+	"HS", 
+	BOT_COMMON_HOST, 
+	"Network virtual host service",
+	BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
+	hs_commands, 
+	hs_settings,
 };
 
 int findnick(const void *key1, const void *key2)
@@ -232,7 +195,7 @@ static int hs_event_signon(CmdParams* cmdparams)
 
 	SET_SEGV_LOCATION();
 
-	if (!is_synced)
+	if (!is_synched)
 		return 0;
 
 	if (IsMe(cmdparams->source.user)) 
@@ -242,11 +205,7 @@ static int hs_event_signon(CmdParams* cmdparams)
 	if (IsExcluded(cmdparams->source.user)) 
 		return 1;
 
-	if (!load_synch)
-		return 1;
-
 	/* Check HostName Against Data Contained in vhosts.data */
-
 	hn = list_find(vhosts, cmdparams->source.user->nick, findnick);
 	if (hn) {
 		map = lnode_get(hn);
@@ -254,14 +213,12 @@ static int hs_event_signon(CmdParams* cmdparams)
 		if (match(map->host, cmdparams->source.user->hostname)) {
 			ssvshost_cmd(cmdparams->source.user->nick, map->vhost);
 			prefmsg(cmdparams->source.user->nick, hs_bot->nick,
-				"Automatically setting your Virtual Host to %s",
-				map->vhost);
+				"Automatically setting your hidden host to %s", map->vhost);
 			map->lused = me.now;
 			save_vhost(map);
 			if(HaveUmodeRegNick()) {
 				set_moddata(cmdparams->source.user);
 			}
-			return 1;
 		}
 	}
 	return 1;
@@ -269,10 +226,8 @@ static int hs_event_signon(CmdParams* cmdparams)
 
 static int hs_event_online(CmdParams* cmdparams)
 {
-	hs_bot = init_bot(&hs_botinfo, me.servicesumode, BOT_FLAG_DEAF, 
-		hs_commands, hs_settings);
+	hs_bot = init_bot(&hs_botinfo);
 	add_timer (CleanupHosts, "CleanupHosts", 7200);
-	LoadHosts();
 	return 1;
 };
 
@@ -296,6 +251,7 @@ int ModInit(Module* mod_ptr)
 	}
 	ModuleConfig(hs_settings);
 	LoadConfig();
+	LoadHosts();
 	return 1;
 }
 
@@ -317,6 +273,10 @@ int hs_event_mode(CmdParams* cmdparams)
 	char *modes;
 	char vhost[MAXHOST];
 
+	/* bail if we are not synched */
+	if (!is_synched)
+		return 0;
+		
 	if(!HaveUmodeRegNick()) 
 		return -1;
 
@@ -324,12 +284,7 @@ int hs_event_mode(CmdParams* cmdparams)
 	if (hs_cfg.regnick != 1) 
 		return -1;
 
-	/* bail if we are not synced */
-	if (!is_synced || !load_synch)
-		return 0;
-		
-	if (is_oper(cmdparams->source.user)) 
-		/* don't set a opers vhost. Most likely already done */
+	if (is_oper(cmdparams->source.user) && hs_cfg.operhosts == 0) 
 		return 1;
 		
 	if (IsExcluded(cmdparams->source.user)) 
@@ -345,21 +300,21 @@ int hs_event_mode(CmdParams* cmdparams)
 		case '-':
 			add = 0;
 			break;
-		case 'r':
-			if (add) {
-				if (cmdparams->source.user->moddata[hs_module->modnum] != NULL) {
-					dlog(DEBUG2, "not setting hidden host on %s", cmdparams->av[0]);
-					return -1;
-				}
-				dlog(DEBUG2, "Regnick Mode on %s", cmdparams->av[0]);
-				ircsnprintf(vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom);
-				ssvshost_cmd(cmdparams->av[0], vhost);
-				prefmsg(cmdparams->av[0], hs_bot->nick,
-					"Automatically setting your hidden host to %s", vhost);
-				set_moddata(cmdparams->source.user);
-			}
-			break;
 		default:
+			if(*modes == UmodeChRegNick) {
+				if (add) {
+					if (cmdparams->source.user->moddata[hs_module->modnum] != NULL) {
+						dlog(DEBUG2, "not setting hidden host on %s", cmdparams->av[0]);
+						return -1;
+					}
+					dlog(DEBUG2, "Regnick Mode on %s", cmdparams->av[0]);
+					ircsnprintf(vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom);
+					ssvshost_cmd(cmdparams->source.user->nick, vhost);
+					prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+						"Automatically setting your hidden host to %s", vhost);
+					set_moddata(cmdparams->source.user);
+				}
+			}
 			break;
 		}
 		modes++;
@@ -419,20 +374,16 @@ static int hs_levels(CmdParams* cmdparams)
 			}
 			if (!ircstrcasecmp(cmdparams->av[2], "ADD")) {
 				hs_cfg.add = t;
-				SetConf((void *) t, CFGINT,
-					"AddLevel");
+				SetConf((void *) t, CFGINT, "AddLevel");
 			} else if (!ircstrcasecmp(cmdparams->av[2], "DEL")) {
 				hs_cfg.del = t;
-				SetConf((void *) t, CFGINT,
-					"DelLevel");
+				SetConf((void *) t, CFGINT, "DelLevel");
 			} else if (!ircstrcasecmp(cmdparams->av[2], "LIST")) {
 				hs_cfg.list = t;
-				SetConf((void *) t, CFGINT,
-					"ListLevel");
+				SetConf((void *) t, CFGINT, "ListLevel");
 			} else if (!ircstrcasecmp(cmdparams->av[2], "VIEW")) {
 				hs_cfg.view = t;
-				SetConf((void *) t, CFGINT,
-					"ViewLevel");
+				SetConf((void *) t, CFGINT, "ViewLevel");
 			} else {
 				prefmsg(cmdparams->source.user->nick, hs_bot->nick,
 					"Invalid Level. /msg %s help levels", hs_bot->nick);
@@ -512,7 +463,7 @@ static void hs_delban(User* u, char *ban)
 	int j = 0;
 
 	i = atoi(ban);
-	if ((i < 1) || (i > hash_count(bannedvhosts))) {
+	if ((i < 1) || (i > (int)hash_count(bannedvhosts))) {
 		prefmsg(u->nick, hs_bot->nick,
 			"Invalid Entry. /msg %s bans for the list",
 			hs_bot->nick);
@@ -644,21 +595,24 @@ static int hs_add(CmdParams* cmdparams)
 		return 1;
 	}
 
-	if (!list_find(vhosts, cmd, findnick)) {
-		hsdat(cmd, m, h, p, cmdparams->source.user->nick);
-		nlog(LOG_NOTICE,
-		     "%s added a vhost for %s with realhost %s vhost %s and password %s",
-		     cmdparams->source.user->nick, cmd, m, h, p);
+	if (list_find(vhosts, cmd, findnick)) {
 		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
-			"%s has sucessfully been registered under realhost: %s vhost: %s and password: %s",
-			cmd, m, h, p);
-		chanalert(hs_bot->nick,
-			  "%s added a vhost %s for %s with realhost %s",
-			  cmdparams->source.user->nick, h, cmd, m);
-		/* Apply The New Hostname If The User Is Online */
-		if ((nu = finduser(cmd)) != NULL) {
-			if (IsMe(nu)) 
-				return 1;
+			"%s already has a vhost entry", cmd);
+		return 1;
+	}
+	hsdat(cmd, m, h, p, cmdparams->source.user->nick);
+	nlog(LOG_NOTICE,
+		    "%s added a vhost for %s with realhost %s vhost %s and password %s",
+		    cmdparams->source.user->nick, cmd, m, h, p);
+	prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+		"%s has sucessfully been registered under realhost: %s vhost: %s and password: %s",
+		cmd, m, h, p);
+	chanalert(hs_bot->nick,
+			"%s added a vhost %s for %s with realhost %s",
+			cmdparams->source.user->nick, h, cmd, m);
+	/* Apply The New Hostname If The User Is Online */
+	if ((nu = finduser(cmd)) != NULL) {
+		if (!IsMe(nu)) {
 			if (match(m, nu->hostname)) {
 				ssvshost_cmd(nu->nick, h);
 				prefmsg(cmdparams->source.user->nick, hs_bot->nick,
@@ -672,12 +626,8 @@ static int hs_add(CmdParams* cmdparams)
 					hs_bot->nick);
 				if(HaveUmodeRegNick()) 
 					set_moddata(nu);
-				return 1;
 			}
 		}
-	} else {
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
-			"%s already has a vhost entry", cmd);
 	}
 	return 1;
 }
@@ -690,6 +640,7 @@ static int hs_list(CmdParams* cmdparams)
 	lnode_t *hn;
 	hs_map *map;
 	int start = 0;
+	int vhostcount;
 
 	SET_SEGV_LOCATION();
 	if (cmdparams->ac == 2) {
@@ -698,14 +649,16 @@ static int hs_list(CmdParams* cmdparams)
 		start = atoi(cmdparams->av[2]);
 	}
 
-	if (start >= list_count(vhosts)) {
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,  "Value out of range. There are only %d entries", (int)list_count(vhosts));
+	vhostcount = list_count(vhosts);
+
+	if (start >= vhostcount) {
+		prefmsg(cmdparams->source.user->nick, hs_bot->nick,  "Value out of range. There are only %d entries", (int)vhostcount);
 		return 1;
 	}
 		
 	i = 1;
 	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Current vhost list: ");
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Showing %d to %d entries of %d vhosts", start+1, start+20, (int)list_count(vhosts));
+	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Showing %d to %d entries of %d vhosts", start+1, start+20, (int)vhostcount);
 	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "%-5s %-12s %-30s", "Num", "Nick", "Vhost");
 	hn = list_first(vhosts);
 	while (hn != NULL) {
@@ -727,8 +680,8 @@ static int hs_list(CmdParams* cmdparams)
 		"For more information on someone use /msg %s VIEW #",
 		hs_bot->nick);
 	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "--- End of List ---");
-	if (list_count(vhosts) >= i) 
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Type \2/msg %s list %d\2 to see next page", hs_bot->nick, i-1);
+	if (vhostcount >= i) 
+		prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Type \2/msg %s list %d\2 to see next page", hs_bot->nick, i-1);
 	return 1;
 }
 
@@ -787,13 +740,12 @@ static void LoadHosts()
 	lnode_t *hn;
 	char *tmp;
 	int count;
-	char **LoadArry;
+	char **LoadArray;
 
-	if (GetTableData("Vhosts", &LoadArry) > 0) {
-		load_synch = 1;
-		for (count = 0; LoadArry[count] != NULL; count++) {
+	if (GetTableData("Vhosts", &LoadArray) > 0) {
+		for (count = 0; LoadArray[count] != NULL; count++) {
 			map = smalloc(sizeof(hs_map));
-			strlcpy(map->nnick, LoadArry[count], MAXNICK);
+			strlcpy(map->nnick, LoadArray[count], MAXNICK);
 			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Host") > 0) 
 				strlcpy(map->host, tmp, MAXHOST);
 			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Vhost") > 0) 
@@ -809,7 +761,7 @@ static void LoadHosts()
 			     map->nnick, map->vhost);
 		}
 	}			
-	sfree(LoadArry);
+	sfree(LoadArray);
 	list_sort(vhosts, findnick);
 }
 

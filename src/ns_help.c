@@ -45,6 +45,10 @@ const char ns_help_userdump_oneline[]="Dump user table";
 const char ns_help_chandump_oneline[]="Dump channel table";
 const char ns_help_serverdump_oneline[]="Dump server table";
 const char ns_help_bandump_oneline[]="Dump ban table";
+const char cmd_help_oneline[]="Online help";
+const char cmd_help_about_oneline[] = "Display About info";
+const char cmd_help_credits_oneline[] = "Display credits";
+const char cmd_help_version_oneline[] = "Display version";
 
 const char *ns_help_level[] = {
 	"Syntax: \2LEVEL [nick]\2",
@@ -330,5 +334,44 @@ const char *ns_help_set_serviceumode[] = {
 const char *ns_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
+	NULL
+};
+
+const char *cmd_help_help[] = {
+	"Syntax: \2HELP [command]\2",
+	"",
+	"Provides help on the bot commands",
+	NULL
+};
+
+const char *cmd_help_about[] = {
+	"Syntax: \2ABOUT\2",
+	"",
+	"Provides information about the module",
+	NULL
+};
+
+const char *cmd_help_credits[] = {
+	"Syntax: \2CREDITS\2",
+	"",
+	"Show credits",
+	NULL
+};
+
+const char *cmd_help_version[] = {
+	"Syntax: \2VERSION\2",
+	"",
+	"Show version information",
+	NULL
+};
+
+const char *cmd_help_set[] = {
+	"Syntax: \2SET LIST\2",
+	"        \2SET <option> [<value>]\2",
+	"",
+	"LIST    display the current settings",
+	"",
+	"Available Options are:",
+	"",
 	NULL
 };

@@ -122,12 +122,17 @@ static bot_setting ns_settings[]=
 };
 
 Bot* ns_botptr = NULL;
+
 BotInfo ns_botinfo = {
 	"NeoStats",
-	"NeoStats-",
+	"NeoStats1",
+	"Neo",
+	BOT_COMMON_HOST,
 	"",
-	"",
-	"",
+	/* 0x80000000 is a "hidden" flag to identify the core bot */
+	0x80000000|BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
+	ns_commands, 
+	ns_settings,
 };
 
 /** @brief InitServices
@@ -155,17 +160,15 @@ void InitServices(void)
 int 
 init_services_bot (void)
 {
-	unsigned int flags;
-
 	SET_SEGV_LOCATION();
 	ircsnprintf (ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick);
-	flags = config.onlyopers ? BOT_FLAG_ONLY_OPERS : 0;
-	flags |= BOT_FLAG_DEAF;
-	ns_botptr = init_bot (&ns_botinfo, me.servicesumode, flags, ns_commands, ns_settings);
+	if(config.onlyopers) 
+		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
+	ns_botinfo.flags |= BOT_FLAG_DEAF;
+	ns_botptr = init_bot (&ns_botinfo);
 	me.onchan = 1;
 	SendAllModuleEvent (EVENT_ONLINE, NULL);
 	RequestServerUptimes();	
-
 	return NS_SUCCESS;
 }
 

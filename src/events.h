@@ -94,7 +94,7 @@ typedef enum Event {
 	EVENT_SQUIT,
 
 /*  EVENT_NETINFO 
- *    Called when the connection to the network is synced. 
+ *    Called when the connection to the network is synched. 
  *    parameters:
  *      av[0] none
  */

@@ -39,7 +39,7 @@ static int ls_thankyou(CmdParams* cmdparams);
 
 static Bot *ls_bot;
 
-const char *ns_copyright[] = {
+const char *ls_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
@@ -48,7 +48,7 @@ const char *ns_copyright[] = {
 ModuleInfo module_info = {
 	"LoveServ",
 	"Network love service",
-	ns_copyright, //Shmad <shmad@neostats.net>"
+	ls_copyright,
 	ls_about,
 	NEOSTATS_VERSION,
 	CORE_MODULE_VERSION,
@@ -56,15 +56,6 @@ ModuleInfo module_info = {
 	__TIME__,
 	0,
 	0,
-};
-
-static BotInfo ls_botinfo = 
-{
-	"LoveServ", 
-	"LoveServ", 
-	"LS", 
-	"", 
-	"Network love service",
 };
 
 static bot_cmd ls_commands[]=
@@ -82,48 +73,21 @@ static bot_cmd ls_commands[]=
 	{NULL,			NULL,			0, 	0,	NULL, 				NULL}
 };
 
-const char *ns_help_set_nick[] = {
-	"\2NICK <newnick>\2 Change bot nickname",
-	"(requires restart to take effect).",
-	NULL
-};
-
-const char *ns_help_set_altnick[] = {
-	"\2ALTNICK <newnick>\2 Change bot alternate nickname",
-	NULL
-};
-
-const char *ns_help_set_user[] = {
-	"\2USER <username>\2 Change bot username",
-	"(requires restart to take effect).",
-	NULL
-};
-
-const char *ns_help_set_host[] = {
-	"\2HOST <host>\2 Change bot host",
-	"(requires restart to take effect).",
-	NULL
-};
-
-const char *ns_help_set_realname[] = {
-	"\2REALNAME <realname>\2 Change bot realname",
-	"(requires restart to take effect).",
-	NULL
-};
-
-static bot_setting ls_settings[]=
+static BotInfo ls_botinfo = 
 {
-	{"NICK",	&ls_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, (void*)"LoveServ" },
-	{"ALTNICK",	&ls_botinfo.altnick,SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, (void*)"LoveServ" },
-	{"USER",	&ls_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, (void*)"LS" },
-	{"HOST",	&ls_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, (void*)"" },
-	{"REALNAME",&ls_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, (void*)"Network love service" },
+	"LoveServ", 
+	"LoveServ1", 
+	"LS", 
+	BOT_COMMON_HOST, 
+	"Network love service",
+	BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
+	ls_commands, 
+	NULL,
 };
 
 static int ls_event_online(CmdParams* cmdparams)
 {
-	ls_bot = init_bot(&ls_botinfo, me.servicesumode, 
-		BOT_FLAG_DEAF, ls_commands, ls_settings);
+	ls_bot = init_bot(&ls_botinfo);
 	return 1;
 };
 
@@ -134,7 +98,6 @@ ModuleEvent module_events[] = {
 
 int ModInit(Module* mod_ptr)
 {
-	ModuleConfig(ls_settings);
 	return 1;
 }
 

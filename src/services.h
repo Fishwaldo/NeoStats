@@ -34,7 +34,7 @@ typedef struct neoroot {
 /* general configuration items */
 typedef struct tconfig {
 	/* log level */
-	unsigned int loglevel;
+	LOG_LEVEL	loglevel;
 	/* debug level */
 	unsigned int debuglevel;
 	/* enable recv.log */

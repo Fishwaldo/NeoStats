@@ -23,7 +23,6 @@
 
 #include <stdio.h>
 #include "neostats.h"
-#include "services.h"
 
 static int auth_cmd_authmodelist(CmdParams* cmdparams);
 
@@ -143,10 +142,10 @@ static int auth_cmd_authmodelist(CmdParams* cmdparams)
 {
 	int i;
 
-	prefmsg(cmdparams->source.user->nick, ns_botptr->nick,
+	prefmsg(cmdparams->source.user->nick, NULL,
 		"User mode auth levels:");
 	for (i = 0; i < user_auth_mode_count; i++) {
-		prefmsg(cmdparams->source.user->nick, ns_botptr->nick, "%s: %d", 
+		prefmsg(cmdparams->source.user->nick, NULL, "%s: %d", 
 			user_auth_modes[i].modename, user_auth_modes[i].level);
 	}
 	return 1;
@@ -179,38 +178,31 @@ void ModFini()
 	del_services_cmd_list(auth_commands);
 }
 
-int ModAuthUser(User * u, int curlvl)
+int ModAuthUser(User * u)
 {
-	int i, tmplvl;
+	int i, authlevel;
 
 	/* Check umodes */
-	tmplvl = 0;
+	authlevel = 0;
 	for (i = 0; i < user_auth_mode_count; i++) {
-		if(user_auth_modes[i].level == 0)
-			break;
 		if (u->Umode & user_auth_modes[i].umode) {
-			tmplvl = user_auth_modes[i].level;
-			break;
-		}
-	}
-	dlog(DEBUG1, "UmodeAuth: umode level for %s is %d", u->nick, tmplvl);
-	if(tmplvl > curlvl)
-		curlvl = tmplvl;
-	if (0){//protocol_info.features&FEATURE_USERSMODES) {
-		/* Check smodes */
-		tmplvl = 0;
-		for (i = 0; i < user_auth_mode_count; i++) {
-			if(user_auth_modes[i].level == 0)
-				break;
-			if (u->Smode & user_auth_modes[i].umode) {
-				tmplvl = user_auth_modes[i].level;
-				break;
+			if(user_auth_modes[i].level > authlevel) {
+				authlevel = user_auth_modes[i].level;
 			}
 		}
-		dlog(DEBUG1, "UmodeAuth: smode level for %s is %d", u->nick, tmplvl);
-		if(tmplvl > curlvl)
-			curlvl = tmplvl;
+	}
+	dlog(DEBUG1, "UmodeAuth: umode level for %s is %d", u->nick, authlevel);
+	if (HaveFeature (FEATURE_USERSMODES)) {
+		/* Check smodes */
+		for (i = 0; i < user_auth_mode_count; i++) {
+			if (u->Smode & user_auth_modes[i].umode) {
+				if(user_auth_modes[i].level > authlevel) {
+					authlevel = user_auth_modes[i].level;
+				}
+			}
+		}
+		dlog(DEBUG1, "UmodeAuth: smode level for %s is %d", u->nick, authlevel);
 	}
 	/* Return new level */
-	return curlvl;
+	return authlevel;
 }

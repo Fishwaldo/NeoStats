@@ -4,6 +4,27 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - makeconf updated to reflect changes and some tidy ups (M)
+ - Depreciate some useless config items from neostats.cfg:
+   STATSERV_NETNAME - we do not use this and overwrite it when we get netinfo
+   NEOSTAT_HOST - Default to servername as host and allow online config
+   NEOSTAT_USER - Default to Neo and allow online config
+   This makes configuration easier (M)
+ - Extend BotInfo structure and simplify init_bot function to use extended 
+   structure. (M)
+ - Add synched field to Module structure so modules can tell when they are 
+   online without having to maintain local variables and can be taken offline
+   easily by the core. (M)
+ - Add automatic bot_info SET options. (M)
+ - Core command processor now uses a hash for SET options to speed up option
+   processing. (M)
+ - Add feature check to load modules so that modules will not load if the 
+   selected protocol does not support a required feature. e.g. HostServ
+   required SVSHOST support. (M)
+ - Update auth modules so that they just calculate a level and leave the core
+   to decide whether it overrides a current level. (M)
+ - Reg nick support might not use mode +r so calculate the correct char when 
+   loading IRCd and use variable for checking it. (M)
  - Optimise UserLevel processing so after a user level is calculated it is then
    a lookup rather than needing to recalculate every time. (M)
  - Send STATS u request to incoming servers so we can store uptime info for 

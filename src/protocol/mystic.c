@@ -187,7 +187,7 @@ send_server (const char *sender, const char *name, const int numeric, const char
 }
 
 void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
 {
 	send_cmd ("%s %s", MSGTOK(PASS), pass);
 	send_cmd ("%s %s %d :%s", MSGTOK(SERVER), name, numeric, infoline);

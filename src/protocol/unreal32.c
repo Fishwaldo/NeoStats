@@ -212,7 +212,7 @@ static const char Base64[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static const char Pad64 = '=';
 
-int b64_decode(char const *src, unsigned char *target, size_t targsize)
+int b64_decode(char const *src, unsigned char *target, int targsize)
 {
 	int tarindex, state, ch;
 	char *pos;
@@ -234,18 +234,18 @@ int b64_decode(char const *src, unsigned char *target, size_t targsize)
 		switch (state) {
 		case 0:
 			if (target) {
-				if ((size_t)tarindex >= targsize)
+				if (tarindex >= targsize)
 					return (-1);
-				target[tarindex] = (pos - Base64) << 2;
+				target[tarindex] = (unsigned char)(pos - Base64) << 2;
 			}
 			state = 1;
 			break;
 		case 1:
 			if (target) {
-				if ((size_t)tarindex + 1 >= targsize)
+				if (tarindex + 1 >= targsize)
 					return (-1);
 				target[tarindex]   |=  (pos - Base64) >> 4;
-				target[tarindex+1]  = ((pos - Base64) & 0x0f)
+				target[tarindex+1]  = (unsigned char)((pos - Base64) & 0x0f)
 							<< 4 ;
 			}
 			tarindex++;
@@ -253,10 +253,10 @@ int b64_decode(char const *src, unsigned char *target, size_t targsize)
 			break;
 		case 2:
 			if (target) {
-				if ((size_t)tarindex + 1 >= targsize)
+				if (tarindex + 1 >= targsize)
 					return (-1);
 				target[tarindex]   |=  (pos - Base64) >> 2;
-				target[tarindex+1]  = ((pos - Base64) & 0x03)
+				target[tarindex+1]  = (unsigned char)((pos - Base64) & 0x03)
 							<< 6;
 			}
 			tarindex++;
@@ -264,7 +264,7 @@ int b64_decode(char const *src, unsigned char *target, size_t targsize)
 			break;
 		case 3:
 			if (target) {
-				if ((size_t)tarindex >= targsize)
+				if (tarindex >= targsize)
 					return (-1);
 				target[tarindex] |= (pos - Base64);
 			}
@@ -337,7 +337,7 @@ send_server (const char *sender, const char *name, const int numeric, const char
 }
 
 void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
 {
 /* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 TKLEXT NICKIP CHANMODES=be,kfL,l,psmntirRcOAQKVGCuzNSMT */
 	send_cmd ("%s TOKEN NICKv2 VHP SJOIN SJOIN2 SJ3 UMODE2 NICKIP", MSGTOK(PROTOCTL));
@@ -376,7 +376,7 @@ send_sjoin (const char *sender, const char *who, const char *chan, const unsigne
 }
 
 void 
-send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts)
+send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
 	send_cmd (":%s %s %s %s %s %lu", who, MSGTOK(MODE), chan, mode, args, ts);
 }
@@ -523,7 +523,7 @@ send_svskill (const char *sender, const char *target, const char *reason)
 
 /* akill is gone in the latest Unreals, so we set Glines instead */
 void 
-send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, unsigned long ts)
+send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
 {
 	send_cmd (":%s %s + G %s %s %s %lu %lu :%s", sender, MSGTOK(TKL), ident, host, setby, (ts + length), ts, reason);
 }

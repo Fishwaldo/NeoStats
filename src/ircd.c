@@ -46,6 +46,8 @@ long service_umode_mask = 0;
 unsigned int ircd_supported_umodes = 0;
 unsigned int ircd_supported_smodes = 0;
 
+unsigned char UmodeChRegNick = 'r';
+
 ChanModes ircd_cmodes[MODE_TABLE_SIZE];
 UserModes ircd_umodes[MODE_TABLE_SIZE];
 UserModes ircd_smodes[MODE_TABLE_SIZE];
@@ -121,11 +123,7 @@ InitIrcdCalls (void)
 {
 	static char protocol_name[MAXHOST];
   
-#ifdef WIN32
-	ircsnprintf (protocol_name, 255, "%s/%s.dll", MOD_PATH, me.protocol);
-#else
-	ircsnprintf (protocol_name, 255, "%s/%s.so", MOD_PATH, me.protocol);
-#endif
+	ircsnprintf (protocol_name, 255, "%s/%s.%s", MOD_PATH, me.protocol,MOD_EXT);
 	protocol_module_handle= ns_dlopen(protocol_name, RTLD_NOW || RTLD_GLOBAL);
 	protocol_info = ns_dlsym( protocol_module_handle, "protocol_info");
 	services_umode = protocol_info->services_umode;
@@ -221,11 +219,14 @@ InitIrcdModes (void)
 	memset(&ircd_umodes, 0, sizeof(ircd_umodes));
 	umodes = user_umodes;
 	while(umodes->modechar) 
-	{
+	{	
 		dlog(DEBUG4, "Adding user mode %c", umodes->modechar);
 		ircd_umodes[(int)umodes->modechar].umode = umodes->umode;
 		/* Build supported modes mask */
 		ircd_supported_umodes |= umodes->umode;
+		if(umodes->umode&UMODE_REGNICK) {
+			UmodeChRegNick = umodes->modechar;
+		}
 		umodes ++;
 	}
 	/* build smode lookup table */
@@ -1062,40 +1063,52 @@ privmsg_list (char *to, char *from, const char **text)
 void
 chanalert (char *from, char *fmt, ...)
 {
+	char* source;
 	va_list ap;
 
 	if (!me.onchan)
 		return;
 
+	source = from;
+	if(source == NULL) {
+		source = ns_botptr->nick;
+	}
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_privmsg (from, me.serviceschan, ircd_buf);
+	irc_send_privmsg (source, me.serviceschan, ircd_buf);
 }
 
 void
 prefmsg (char *to, const char *from, char *fmt, ...)
 {
+	char* source;
 	va_list ap;
 
 	if (findbot (to)) {
 		chanalert (ns_botptr->nick, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
 		return;
+	}
+
+	source = (char*)from;
+	if(source == NULL) {
+		source = ns_botptr->nick;
 	}
 
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 	if (config.want_privmsg) {
-		irc_send_privmsg (from, to, ircd_buf);
+		irc_send_privmsg (source, to, ircd_buf);
 	} else {
-		irc_send_notice (from, to, ircd_buf);
+		irc_send_notice (source, to, ircd_buf);
 	}
 }
 
 void
 privmsg (char *to, const char *from, char *fmt, ...)
 {
+	char* source;
 	va_list ap;
 
 	if (findbot (to)) {
@@ -1103,15 +1116,20 @@ privmsg (char *to, const char *from, char *fmt, ...)
 		return;
 	}
 
+	source = (char*)from;
+	if(source == NULL) {
+		source = ns_botptr->nick;
+	}
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_privmsg (from, to, ircd_buf);
+	irc_send_privmsg (source, to, ircd_buf);
 }
 
 void
 notice (char *to, const char *from, char *fmt, ...)
 {
+	char* source;
 	va_list ap;
 
 	if (findbot (to)) {
@@ -1119,23 +1137,32 @@ notice (char *to, const char *from, char *fmt, ...)
 		return;
 	}
 
+	source = (char*)from;
+	if(source == NULL) {
+		source = ns_botptr->nick;
+	}
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_notice (from, to, ircd_buf);
+	irc_send_notice (source, to, ircd_buf);
 }
 
 void
 globops (char *from, char *fmt, ...)
 {
+	char* source;
 	va_list ap;
 
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 
+	source = from;
+	if(source == NULL) {
+		source = ns_botptr->nick;
+	}
 	if (me.onchan) {
-		irc_send_globops(from, ircd_buf);
+		irc_send_globops(source, ircd_buf);
 	} else {
 		nlog (LOG_NORMAL, ircd_buf);
 	}
@@ -1144,12 +1171,17 @@ globops (char *from, char *fmt, ...)
 void
 wallops (const char *from, const char *fmt, ...)
 {
+	char* source;
 	va_list ap;
 
+	source = (char*)from;
+	if(source == NULL) {
+		source = ns_botptr->nick;
+	}
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_wallops ((char*)from, (char*)ircd_buf);
+	irc_send_wallops ((char*)source, (char*)ircd_buf);
 }
 
 void
@@ -1546,7 +1578,7 @@ do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, co
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 	SendAllModuleEvent (EVENT_NETINFO, NULL);
-	me.synced = 1;
+	me.synched = 1;
 }
 
 void 
@@ -1559,7 +1591,7 @@ do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, c
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 	SendAllModuleEvent (EVENT_NETINFO, NULL);
-	me.synced = 1;
+	me.synched = 1;
 }
 
 void
@@ -1767,7 +1799,7 @@ do_burst (char *origin, char **argv, int argc)
 		if (ircd_srv.burst == 1) {
 			irc_send_burst (0);
 			ircd_srv.burst = 0;
-			me.synced = 1;
+			me.synched = 1;
 			init_services_bot ();
 		}
 	} else {
@@ -1972,5 +2004,10 @@ static void m_numeric242 (char *origin, char **argv, int argc, int srv)
 
 		s->uptime = secs;
 	}
+}
+
+int HaveFeature (int mask)
+{
+	return (protocol_info->features&mask);
 }
 

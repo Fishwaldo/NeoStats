@@ -21,10 +21,17 @@
 ** $Id$
 */
 
+/*	TODO:
+ *		- Finish off error processing
+ *		- Make command logging optional
+ *		- Make command alerts optional
+ */
+
 #ifndef WIN32
 #include <arpa/inet.h>
 #endif
 #include "neostats.h"
+#include "ns_help.h"
 #include "modules.h"
 #include "services.h"
 
@@ -48,48 +55,6 @@ char * help_level_title[]=
  *  by the core. A module can override these by defining them
  *  in it's local bot command array.
  */
-static const char cmd_help_oneline[]="Online help";
-static const char *cmd_help_help[] = {
-	"Syntax: \2HELP [command]\2",
-	"",
-	"Provides help on the bot commands",
-	NULL
-};
-
-const char cmd_help_about_oneline[] = "About Module";
-const char *cmd_help_about[] = {
-	"Syntax: \2ABOUT\2",
-	"",
-	"Provides information about the module",
-	NULL
-};
-
-const char cmd_help_credits_oneline[] = "Display credits";
-const char *cmd_help_credits[] = {
-	"Syntax: \2CREDITS\2",
-	"",
-	"Show credits",
-	NULL
-};
-
-const char cmd_help_version_oneline[] = "Display version";
-const char *cmd_help_version[] = {
-	"Syntax: \2VERSION\2",
-	"",
-	"Show version information",
-	NULL
-};
-
-static const char *cmd_help_set[] = {
-	"Syntax: \2SET LIST\2",
-	"        \2SET <option> [<value>]\2",
-	"",
-	"LIST    display the current settings",
-	"",
-	"Available Options are:",
-	"",
-	NULL
-};
 
 /*  Simplified command table for handling intrinsic commands.
  *  We do not require all entries since we only use a few for
@@ -228,6 +193,12 @@ void msg_error_need_more_params (CmdParams * cmdparams)
 	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "/msg %s HELP %s for more information", cmdparams->dest.bot->nick, cmdparams->param);
 }
 
+void msg_error_param_out_of_range (CmdParams * cmdparams)
+{
+	prefmsg(cmdparams->source.user->nick, NULL, "Parameter out of range.");
+	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "/msg %s HELP %s for more information", cmdparams->dest.bot->nick, cmdparams->param);
+}
+
 void msg_syntax_error (CmdParams * cmdparams)
 {
 	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Syntax error");
@@ -245,6 +216,28 @@ void msg_only_opers (CmdParams * cmdparams)
 	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "This service is only available to IRC operators.");
 	chanalert (cmdparams->dest.bot->nick, "%s requested %s, but is not an operator.", cmdparams->source.user->nick, cmdparams->param);
 	nlog (LOG_NORMAL, "%s requested %s, but is not an operator.", cmdparams->source.user->nick, cmdparams->param);
+}
+
+void check_cmd_result(CmdParams * cmdparams, int cmdret, char* extra)
+{
+	switch(cmdret) {
+		case NS_ERR_SYNTAX_ERROR:
+			msg_syntax_error (cmdparams);
+			break;
+		case NS_ERR_NEED_MORE_PARAMS:
+			msg_error_need_more_params (cmdparams);
+			break;				
+		case NS_ERR_PARAM_OUT_OF_RANGE:
+			msg_error_param_out_of_range (cmdparams);
+			break;				
+		case NS_ERR_UNKNOWN_COMMAND:
+		case NS_ERR_NO_PERMISSION:
+			break;				
+		case NS_FAILURE:
+		case NS_SUCCESS:
+		default:
+			break;
+	}
 }
 
 /** @brief add_bot_cmd adds a single command to the command hash
@@ -390,30 +383,36 @@ del_services_cmd_list(bot_cmd* bot_cmd_list)
 int
 run_intrinsic_cmds (const char* cmd, CmdParams * cmdparams)
 {
+	int cmdret;
 	/* Handle intrinsic commands */
 	/* Help */
 	if (!ircstrcasecmp(cmd, "HELP")) {
-		bot_cmd_help(cmdparams);
+		cmdret = bot_cmd_help(cmdparams);
+		check_cmd_result(cmdparams, cmdret, NULL);
 		return NS_SUCCESS;
 	}
 	/* Handle SET if we have it */
-	if (cmdparams->dest.bot->bot_settings && !ircstrcasecmp(cmd, "SET") ) {
-		bot_cmd_set(cmdparams);
+	if (cmdparams->dest.bot->botsettings && !ircstrcasecmp(cmd, "SET") ) {
+		cmdret = bot_cmd_set(cmdparams);
+		check_cmd_result(cmdparams, cmdret, NULL);
 		return NS_SUCCESS;
 	}
 	/* About */
 	if (!ircstrcasecmp(cmd, "ABOUT") && cmdparams->dest.bot->moduleptr && cmdparams->dest.bot->moduleptr->info->about_text ) {
-		bot_cmd_about(cmdparams);
+		cmdret = bot_cmd_about(cmdparams);
+		check_cmd_result(cmdparams, cmdret, NULL);
 		return NS_SUCCESS;
 	}
 	/* Version */
 	if (!ircstrcasecmp(cmd, "VERSION")) {
-		bot_cmd_version(cmdparams);
+		cmdret = bot_cmd_version(cmdparams);
+		check_cmd_result(cmdparams, cmdret, NULL);
 		return NS_SUCCESS;
 	}
 	/* Credits */
 	if (!ircstrcasecmp(cmd, "CREDITS") && cmdparams->dest.bot->moduleptr && cmdparams->dest.bot->moduleptr->info->copyright ) {
-		bot_cmd_credits(cmdparams);
+		cmdret = bot_cmd_credits(cmdparams);
+		check_cmd_result(cmdparams, cmdret, NULL);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -481,26 +480,14 @@ run_bot_cmd (CmdParams * cmdparams)
 				cmdret = cmd_ptr->handler(cmdparams);
 				RESET_RUN_LEVEL();
 			}
-			switch(cmdret) {
-				case NS_ERR_SYNTAX_ERROR:
-					msg_syntax_error (cmdparams);
-					break;
-				case NS_ERR_NEED_MORE_PARAMS:
-					msg_error_need_more_params (cmdparams);
-					break;				
-				case NS_ERR_NO_PERMISSION:
-					break;				
-				case NS_FAILURE:
-				case NS_SUCCESS:
-				default:
-					break;
-			}
+			check_cmd_result(cmdparams, cmdret, NULL);
 			sfree (av);
 			sfree (cmdparams->av);
 			return NS_SUCCESS;
 		}
 	}
-	if(run_intrinsic_cmds (av[0], cmdparams) == NS_SUCCESS) {
+	cmdret = run_intrinsic_cmds (av[0], cmdparams);
+	if(cmdret == NS_SUCCESS) {
 		sfree (av);
 		sfree (cmdparams->av);
 		return NS_SUCCESS;
@@ -512,6 +499,32 @@ run_bot_cmd (CmdParams * cmdparams)
 	return NS_FAILURE;
 }
 
+/** @brief bot_cmd_help_set process bot help command
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+static int 
+bot_cmd_help_set (CmdParams * cmdparams, int userlevel)
+{
+	hnode_t *setnode;
+	hscan_t hs;
+	bot_setting* set_ptr;
+
+	/* Display HELP SET intro text and LIST command */
+	privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmd_help_set);
+	/* Display option specific text for current user level */
+	hash_scan_begin(&hs, cmdparams->dest.bot->botsettings);
+	while ((setnode = hash_scan_next(&hs)) != NULL) {
+		set_ptr = hnode_get(setnode);
+		if(set_ptr->helptext && userlevel >= set_ptr->ulevel)
+		{
+			privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, set_ptr->helptext);
+			prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, " ");
+		}
+	}
+	return NS_SUCCESS;
+}
+	
 /** @brief bot_cmd_help process bot help command
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
@@ -547,7 +560,7 @@ bot_cmd_help (CmdParams * cmdparams)
 			cmd_ptr++;
 		}
 		/* Do we have a set command? */
-		if(cmdparams->dest.bot->bot_settings && userlevel >= cmdparams->dest.bot->set_ulevel) {
+		if(cmdparams->dest.bot->botsettings && userlevel >= cmdparams->dest.bot->set_ulevel) {
 			prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    %-20s Configure %s", "SET", cmdparams->dest.bot->nick);
 		}
 		while(1) {
@@ -638,22 +651,9 @@ bot_cmd_help (CmdParams * cmdparams)
 		}
 		cmd_ptr++;
 	}
-	/* Handle SET if we have it */
-	if (cmdparams->dest.bot->bot_settings && userlevel >= cmdparams->dest.bot->set_ulevel && !ircstrcasecmp(cmdparams->av[0], "SET") ) {
-		bot_setting* set_ptr;
-		set_ptr = cmdparams->dest.bot->bot_settings;
-		/* Display HELP SET intro text and LIST command */
-		privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmd_help_set);
-		/* Display option specific text for current user level */
-		while(set_ptr->option)
-		{
-			if(set_ptr->helptext && userlevel >= set_ptr->ulevel)
-			{
-				privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, set_ptr->helptext);
-				prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, " ");
-			}
-			set_ptr++;
-		}
+	/* Handle SET if we have it */	
+	if (cmdparams->dest.bot->botsettings && userlevel >= cmdparams->dest.bot->set_ulevel && !ircstrcasecmp(cmdparams->av[0], "SET") ) {
+		bot_cmd_help_set (cmdparams, userlevel);		
 		return NS_SUCCESS;
 	}
 
@@ -688,14 +688,17 @@ int is_target_valid(char* bot_name, User* u, char* target_nick)
 static int 
 bot_cmd_set_list (CmdParams * cmdparams)
 {
+	hnode_t *setnode;
+	hscan_t hs;
 	bot_setting* set_ptr;
 	int userlevel;
 
 	prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Current %s settings:", cmdparams->dest.bot->nick);
 	userlevel = getuserlevel (cmdparams);
-	set_ptr = cmdparams->dest.bot->bot_settings;
-	while(set_ptr->option)
-	{
+
+	hash_scan_begin(&hs, cmdparams->dest.bot->botsettings);
+	while ((setnode = hash_scan_next(&hs)) != NULL) {
+		set_ptr = hnode_get(setnode);
 		/* Only list authorised SETTINGS */
 		if( userlevel >= set_ptr->ulevel) {
 			switch(set_ptr->type) {
@@ -966,6 +969,7 @@ static bot_cmd_set_handler bot_cmd_set_handlers[] =
 static int 
 bot_cmd_set (CmdParams * cmdparams)
 {
+	hnode_t *setnode;
 	bot_cmd_set_handler set_handler;
 	bot_setting* set_ptr;
 	int userlevel;
@@ -988,34 +992,29 @@ bot_cmd_set (CmdParams * cmdparams)
 		msg_syntax_error (cmdparams);
 		return NS_ERR_SYNTAX_ERROR;
 	} 
-	set_ptr = cmdparams->dest.bot->bot_settings;
-	while(set_ptr->option)
-	{
-		if(!ircstrcasecmp(cmdparams->av[0], set_ptr->option))
-			break;
-		set_ptr++;
-	}
-	if(!set_ptr->option) {
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
-			"Unknown set option. /msg %s HELP SET for more info",
-			cmdparams->dest.bot->nick);
-		return NS_ERR_UNKNOWN_OPTION;
-	}
-	if( userlevel < set_ptr->ulevel) {
-		msg_permission_denied(cmdparams, cmdparams->av[0]);
-		return NS_ERR_NO_PERMISSION;
-	}
-	set_handler = bot_cmd_set_handlers[set_ptr->type];
-	if(set_handler (cmdparams, set_ptr)!=NS_SUCCESS) {
-		return NS_FAILURE;
-	}
-	/* Call back after SET so that a module can "react" to a change in a setting */
-	if(set_ptr->type != SET_TYPE_CUSTOM) {
-		if(set_ptr->handler) {
-			set_ptr->handler(cmdparams);
+	setnode = hash_lookup(cmdparams->dest.bot->botsettings, cmdparams->av[0]);
+	if(setnode) {
+		set_ptr = hnode_get(setnode);
+		if( userlevel < set_ptr->ulevel) {
+			msg_permission_denied(cmdparams, cmdparams->av[0]);
+			return NS_ERR_NO_PERMISSION;
 		}
+		set_handler = bot_cmd_set_handlers[set_ptr->type];
+		if(set_handler (cmdparams, set_ptr)!=NS_SUCCESS) {
+			return NS_FAILURE;
+		}
+		/* Call back after SET so that a module can "react" to a change in a setting */
+		if(set_ptr->type != SET_TYPE_CUSTOM) {
+			if(set_ptr->handler) {
+				set_ptr->handler(cmdparams);
+			}
+		}
+		return NS_SUCCESS;
 	}
-	return NS_SUCCESS;
+	prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		"Unknown set option. /msg %s HELP SET for more info",
+		cmdparams->dest.bot->nick);
+	return NS_ERR_UNKNOWN_OPTION;
 }
 
 /** @brief bot_cmd_about process bot about command
@@ -1047,22 +1046,136 @@ static int bot_cmd_credits (CmdParams * cmdparams)
 	return NS_SUCCESS;
 }
 
-int add_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list)
+/** @brief add_bot_setting adds a single set option 
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+static int 
+add_bot_setting (hash_t* set_hash, bot_setting* set_ptr) 
 {
-	bot_ptr->bot_settings = bot_setting_list;	
+	hnode_t *setnode;
+	
+	setnode = hnode_create(set_ptr);
+	if (setnode) {
+		hash_insert(set_hash, setnode, set_ptr->option);
+		dlog(DEBUG3, "add_bot_setting: added a new set option %s", set_ptr->option);
+		return NS_SUCCESS;
+	}
+	return NS_FAILURE;
+}
+
+/** @brief del_bot_setting delete a single set option 
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+static int 
+del_bot_setting (hash_t* set_hash, bot_setting* set_ptr) 
+{
+	hnode_t *setnode;
+	
+	setnode = hash_lookup(set_hash, set_ptr->option);
+	if (setnode) {
+		hash_delete(set_hash, setnode);
+		hnode_destroy(setnode);
+		return NS_SUCCESS;
+	}
+	return NS_FAILURE;
+}
+
+/** @brief add_bot_setting_list adds a list of set options
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+int 
+add_bot_setting_list (Bot* bot_ptr, bot_setting* set_ptr) 
+{
+	/* If no hash create */
+	if(bot_ptr->botsettings == NULL) {
+		bot_ptr->botsettings = hash_create(-1, 0, 0);
+	}
 	/* Default SET to ROOT only */
 	bot_ptr->set_ulevel = NS_ULEVEL_ROOT;
 	/* Now calculate minimum defined user level */
-	while(bot_setting_list->option != NULL) {
-		if(bot_setting_list->ulevel < bot_ptr->set_ulevel) {
-			bot_ptr->set_ulevel = bot_setting_list->ulevel;
+	while(set_ptr->option != NULL) {
+		if(set_ptr->ulevel < bot_ptr->set_ulevel) {
+			bot_ptr->set_ulevel = set_ptr->ulevel;
 		}
-		bot_setting_list++;
+		add_bot_setting(bot_ptr->botsettings, set_ptr);
+		set_ptr++;
 	}
 	return NS_SUCCESS;
 }
 
-int del_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list)
+/** @brief del_bot_setting_list delete a list of set options
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+int 
+del_bot_setting_list (Bot* bot_ptr, bot_setting* set_ptr) 
 {
+	/* If no hash return failure */
+	if(bot_ptr->botsettings == NULL) {
+		return NS_FAILURE;
+	}
+	/* Cycle through command list and delete them */
+	while(set_ptr->option) {
+		del_bot_setting(bot_ptr->botsettings, set_ptr);
+		set_ptr++;
+	}
+	return NS_SUCCESS;
+}
+
+int del_all_bot_settings (Bot *bot_ptr)
+{
+	hnode_t *setnode;
+	hscan_t hs;
+
+	/* Check we have a command hash */
+	if(bot_ptr->botsettings == NULL) {
+		return NS_FAILURE;
+	}
+	/* Cycle through command hash and delete each command */
+	hash_scan_begin(&hs, bot_ptr->botsettings);
+	while ((setnode = hash_scan_next(&hs)) != NULL) {
+		hash_delete(bot_ptr->botsettings, setnode);
+		hnode_destroy(setnode);
+	}
+	/* Destroy command */
+	hash_destroy(bot_ptr->botsettings);
+	bot_ptr->botsettings = NULL;
+	return NS_SUCCESS;
+}
+
+static bot_setting bot_info_settings[]=
+{
+	{"NICK",	NULL,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick, NULL, NULL },
+	{"ALTNICK",	NULL,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	ns_help_set_altnick, NULL, NULL },
+	{"USER",	NULL,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user, NULL, NULL },
+	{"HOST",	NULL,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host, NULL, NULL },
+	{"REALNAME",NULL,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname, NULL, NULL },
+	{NULL,		NULL,	0,					0, 0, 			0,				 NULL,		NULL,	NULL,				NULL,	NULL },
+};
+
+int add_bot_info_settings (Bot *bot_ptr, BotInfo* botinfo)
+{
+	bot_ptr->bot_info_settings = smalloc(sizeof(bot_info_settings));
+	if(bot_ptr->bot_info_settings) {
+		memcpy(bot_ptr->bot_info_settings, bot_info_settings, sizeof(bot_info_settings));
+		bot_ptr->bot_info_settings[0].varptr = &botinfo->nick;
+		bot_ptr->bot_info_settings[1].varptr = &botinfo->altnick;
+		bot_ptr->bot_info_settings[2].varptr = &botinfo->user;
+		bot_ptr->bot_info_settings[3].varptr = &botinfo->host;
+		bot_ptr->bot_info_settings[4].varptr = &botinfo->realname;
+		ModuleConfig(bot_ptr->bot_info_settings);
+		add_bot_setting_list (bot_ptr, bot_ptr->bot_info_settings);
+	}
+	return NS_SUCCESS;
+}
+
+int del_bot_info_settings (Bot *bot_ptr)
+{
+	if(bot_ptr->bot_info_settings) {
+		sfree(bot_ptr->bot_info_settings);
+	}
 	return NS_SUCCESS;
 }

@@ -85,16 +85,7 @@ struct cs_cfg {
 	int use_exc;
 } cs_cfg;
 
-static int cs_online = 0;
 static Bot *cs_bot;
-static BotInfo cs_botinfo = 
-{
-	"ConnectServ", 
-	"ConnectServ", 
-	"CS", 
-	"", 
-	"Connection monitoring service", 	
-};
 
 static Module* cs_module;
 
@@ -117,47 +108,8 @@ ModuleInfo module_info = {
 	0,
 };
 
-static bot_cmd cs_commands[]=
-{
-	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
-};
-
-const char *cs_help_set_nick[] = {
-	"\2NICK <newnick>\2 Change bot nickname",
-	"(requires restart to take effect).",
-	NULL
-};
-
-const char *cs_help_set_altnick[] = {
-	"\2ALTNICK <newnick>\2 Change bot alternate nickname",
-	NULL
-};
-
-const char *cs_help_set_user[] = {
-	"\2USER <username>\2 Change bot username",
-	"(requires restart to take effect).",
-	NULL
-};
-
-const char *cs_help_set_host[] = {
-	"\2HOST <host>\2 Change bot host",
-	"(requires restart to take effect).",
-	NULL
-};
-
-const char *cs_help_set_realname[] = {
-	"\2REALNAME <realname>\2 Change bot realname",
-	"(requires restart to take effect).",
-	NULL
-};
-
 static bot_setting cs_settings[]=
 {
-	{"NICK",		&cs_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	cs_help_set_nick, NULL, (void*)"ConnectServ" },
-	{"ALTNICK",		&cs_botinfo.altnick,SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "AltNick",	NULL,	cs_help_set_altnick, NULL, (void*)"ConnectServ" },
-	{"USER",		&cs_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	cs_help_set_user, NULL, (void*)"CS" },
-	{"HOST",		&cs_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	cs_help_set_host, NULL, (void*)"" },
-	{"REALNAME",	&cs_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	cs_help_set_realname, NULL, (void*)"Connection monitoring service" },
 	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "SignWatch",	NULL,	cs_help_set_signwatch, NULL, (void*)1 },
 	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "KillWatch",	NULL,	cs_help_set_killwatch, NULL, (void*)1 },
 	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ModeWatch",	NULL,	cs_help_set_modewatch, NULL, (void*)1 },
@@ -165,6 +117,18 @@ static bot_setting cs_settings[]=
 	{"SERVWATCH",	&cs_cfg.serv_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ServWatch",	NULL,	cs_help_set_servwatch, NULL, (void*)1 },
 	{"EXCLUSIONS",	&cs_cfg.use_exc,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "Exclusions",	NULL,	cs_help_set_exclusions, NULL, (void*)1 },
 	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
+};
+
+static BotInfo cs_botinfo = 
+{
+	"ConnectServ", 
+	"ConnectServ1", 
+	"CS", 
+	BOT_COMMON_HOST, 
+	"Connection monitoring service", 	
+	BOT_FLAG_SERVICEBOT|BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
+	NULL, 
+	cs_settings,
 };
 
 ModuleEvent module_events[] = {
@@ -194,9 +158,7 @@ void ModFini()
 
 static int cs_event_online(CmdParams* cmdparams)
 {
-	cs_bot = init_bot (&cs_botinfo, me.servicesumode, 
-		BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, cs_commands, cs_settings);
-	cs_online = 1;
+	cs_bot = init_bot (&cs_botinfo);
 	return 1;
 };
 
@@ -206,7 +168,7 @@ static int cs_event_online(CmdParams* cmdparams)
 static int cs_event_signon(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_online || !cs_cfg.sign_watch) {
+	if (!cs_module->synched || !cs_cfg.sign_watch) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
@@ -236,7 +198,7 @@ static int cs_event_quit(CmdParams* cmdparams)
 	int LocalCount = 0;
 
 	SET_SEGV_LOCATION();
-	if (!cs_online) {
+	if (!cs_module->synched) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
@@ -312,7 +274,7 @@ static int cs_event_umode(CmdParams* cmdparams)
 	char *modes;
 
 	SET_SEGV_LOCATION();
-	if (!cs_online || !cs_cfg.mode_watch) {
+	if (!cs_module->synched || !cs_cfg.mode_watch) {
 		return -1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
@@ -401,7 +363,7 @@ static int cs_event_smode(CmdParams* cmdparams)
 	char *modes;
 
 	SET_SEGV_LOCATION();
-	if (!cs_online || !cs_cfg.mode_watch) {
+	if (!cs_module->synched || !cs_cfg.mode_watch) {
 		return -1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
@@ -473,7 +435,7 @@ static int cs_event_kill(CmdParams* cmdparams)
 	int KillCount = 0;
 
 	SET_SEGV_LOCATION();
-	if (!cs_online || !cs_cfg.kill_watch) {
+	if (!cs_module->synched || !cs_cfg.kill_watch) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
@@ -509,7 +471,7 @@ static int cs_event_kill(CmdParams* cmdparams)
 static int cs_event_nick(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_online || !cs_cfg.nick_watch) {
+	if (!cs_module->synched || !cs_cfg.nick_watch) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
@@ -528,7 +490,7 @@ static int cs_event_nick(CmdParams* cmdparams)
 static int cs_event_server(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_online || !cs_cfg.serv_watch) {
+	if (!cs_module->synched || !cs_cfg.serv_watch) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.server)) {
@@ -542,7 +504,7 @@ static int cs_event_server(CmdParams* cmdparams)
 static int cs_event_squit(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!cs_online || !cs_cfg.serv_watch) {
+	if (!cs_module->synched || !cs_cfg.serv_watch) {
 		return 1;
 	}
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.server)) {

@@ -57,8 +57,6 @@ static config_option options[] = {
 	{"SERVER_INFOLINE", ARG_STR, cb_Server, 4},
 	{"STATSERV_NETNAME", ARG_STR, cb_Server, 5},
 	{"RECONNECT_TIME", ARG_STR, cb_Server, 6},
-	{"NEOSTAT_HOST", ARG_STR, cb_Server, 7},
-	{"NEOSTAT_USER", ARG_STR, cb_Server, 8},
 	{"WANT_PRIVMSG", ARG_STR, cb_Server, 9},
 	{"SERVICES_CHAN", ARG_STR, cb_Server, 10},
 	{"LOAD_MODULE", ARG_STR, cb_Module, 0},
@@ -272,12 +270,6 @@ cb_Server (char *arg, int configtype)
 	} else if (configtype == 6) {
 		/* Reconnect time */
 		config.r_time = atoi (arg);
-	} else if (configtype == 7) {
-		/* NeoStat Host */
-		strlcpy (ns_botinfo.host, arg, MAXHOST);
-	} else if (configtype == 8) {
-		/* NeoStat User */
-		strlcpy (ns_botinfo.user, arg, MAXUSER);
 	} else if (configtype == 9) {
 		config.want_privmsg = 1;
 	} else if (configtype == 10) {

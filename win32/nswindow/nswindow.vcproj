@@ -70,7 +70,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\src;..\..\src\adnswin32;..\..\src\keeper;..\..\src\curl;..\..\src\pcre"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;ADNS_MAP_UNIXAPI"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;ADNS_MAP_UNIXAPI;NEOSTATSCORE"
 				RuntimeLibrary="4"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -174,12 +174,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\conf.h">
-			</File>
-			<File
-				RelativePath="..\..\src\config.h">
-			</File>
-			<File
-				RelativePath="..\..\src\config.h.in">
 			</File>
 			<File
 				RelativePath="..\..\src\configwin32.h">
@@ -331,23 +325,8 @@
 			<File
 				RelativePath="..\..\src\users.h">
 			</File>
-			<File
-				RelativePath="..\..\src\version.h">
-			</File>
 			<Filter
 				Name="win32">
-				<File
-					RelativePath="..\..\src\win32\fnmatch.c">
-				</File>
-				<File
-					RelativePath="..\..\src\win32\fnmatch.h">
-				</File>
-				<File
-					RelativePath="..\..\src\win32\getopt.c">
-				</File>
-				<File
-					RelativePath="..\..\src\win32\getopt.h">
-				</File>
 				<File
 					RelativePath="..\..\src\win32\winmain.c">
 				</File>
@@ -392,6 +371,9 @@
 				</File>
 			</Filter>
 		</Filter>
+		<File
+			RelativePath="..\..\ChangeLog">
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

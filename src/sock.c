@@ -127,7 +127,7 @@ ConnectTo (char *host, int port)
 		return NS_FAILURE;
 	}
 
-	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0) {
+	if ((s = (int)socket (AF_INET, SOCK_STREAM, 0)) < 0) {
 		sfree(hp);
 		return NS_FAILURE;
 	}
@@ -501,7 +501,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 
 	moduleptr = GET_CUR_MODULE();
 	/* socktype = SOCK_STREAM */
-	if ((s = socket (AF_INET, socktype, 0)) < 0)
+	if ((s = (int)socket (AF_INET, socktype, 0)) < 0)
 		return NS_FAILURE;
 
 	/* bind to an IP address */

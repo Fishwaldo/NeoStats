@@ -328,7 +328,7 @@ EXPORTVAR extern unsigned int ircd_supported_smodes;
 #define MAX_TRANSFERS	10	/* number of curl transfers */
 
 #define bzero(x, y)		memset(x, '\0', y);
-#define is_synced		me.synced
+#define is_synched		me.synched
 
 /* Early creation of unified return values and error system */
 /* These are program exit codes usually defined in stdlib.h but 
@@ -445,7 +445,7 @@ typedef struct tme {
 	char servicesumode[64];
 	char serviceschan[MAXCHANLEN];
 	unsigned int onchan:1;
-	unsigned int synced:1;
+	unsigned int synched:1;
 	Server *s;
 	int requests;
 	long SendM;
@@ -630,7 +630,7 @@ typedef struct bot_cmd {
 	const char		*cmd;		/* command string */
 	bot_cmd_handler	handler;	/* handler */
 	int				minparams;	/* min num params */
-	unsigned int	ulevel;		/* min user level */
+	int				ulevel;		/* min user level */
 	const char**	helptext;	/* pointer to help text */
 	const char* 	onelinehelp;/* single line help for generic help function */
 }bot_cmd;
@@ -660,6 +660,12 @@ typedef struct bot_cmd {
  * E.g. Connectserv
  */
 #define BOT_FLAG_SERVICEBOT	0x00000008
+
+/* This defines a "NULL" string for the purpose of BotInfo structures that 
+ * want to inherit the main host used by NeoStats and still make the info
+ * readable
+ */
+#define BOT_COMMON_HOST	""
 
 /* SET Comand handling */
 
@@ -694,9 +700,9 @@ typedef struct bot_setting {
 	char			*option;	/* option string */
 	void*			varptr;		/* pointer to var */
 	SET_TYPE		type;		/* type of var */
-	unsigned int	min;		/* min value */
-	unsigned int	max;		/* max value */
-	unsigned int	ulevel;		/* min user level */
+	int				min;		/* min value */
+	int				max;		/* max value */
+	int				ulevel;		/* min user level */
 	char			*confitem;	/* config string for kptool */
 	const char		*desc;		/* description of setting for messages e.g. seconds, days*/
 	const char**	helptext;	/* pointer to help text */
@@ -799,6 +805,7 @@ typedef struct Module {
 	mod_auth mod_auth_cb;
 	void *dl_handle;
 	unsigned int modnum;
+	unsigned int synched;
 }Module;
 
 extern Module* RunModule[10];
@@ -880,6 +887,12 @@ typedef struct BotInfo {
 	char host[MAXHOST];
 	/* REQUIRED: realname */
 	char realname[MAXREALNAME];
+	/* OPTIONAL: flags */
+	unsigned int flags;
+	/* OPTIONAL: bot command list pointer */
+	bot_cmd *bot_cmd_list;
+	/* OPTIONAL: bot command setting pointer */
+	bot_setting *bot_setting_list;
 } BotInfo;
 
 /** @brief Bot structure
@@ -896,9 +909,11 @@ typedef struct _Bot {
 	/* hash for command list */
 	hash_t *botcmds;
 	/* hash for settings */
-	bot_setting *bot_settings;
+	hash_t *botsettings;
+	/* hash for bot_info settings */
+	bot_setting *bot_info_settings;
 	/* min ulevel for settings */
-	unsigned int set_ulevel;
+	int set_ulevel;
 	/* Link back to user struct associated with this bot*/
 	User* u;
 }_Bot;
@@ -915,7 +930,7 @@ EXPORTFUNC int add_sockpoll (before_poll_function beforepoll, after_poll_functio
 EXPORTFUNC int del_socket (const char *name);
 EXPORTFUNC Sock *findsock (const char *sock_name);
 
-EXPORTFUNC Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list);
+EXPORTFUNC Bot * init_bot (BotInfo* botinfo);
 EXPORTFUNC int del_bot (Bot *botptr, const char * reason);
 EXPORTFUNC Bot *findbot (const char * bot_name);
 EXPORTFUNC int bot_nick_change (const char * oldnick, const char *newnick);
@@ -1020,6 +1035,8 @@ EXPORTFUNC int test_chan_user_mode(char* chan, char* nick, int flag);
 #define is_chanprot(chan, nick)		test_chan_user_mode(chan, nick, CUMODE_CHANPROT)
 #define is_chanadmin(chan, nick)	test_chan_user_mode(chan, nick, CUMODE_CHANADMIN)
 
+EXPORTVAR unsigned char UmodeChRegNick;
+
 /* dns.c */
 EXPORTFUNC int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);
 
@@ -1044,13 +1061,6 @@ EXPORTFUNC int new_transfer(char *url, char *params, NS_TRANSFER savetofileormem
 
 /* Mark server as synched */
 #define SynchServer(x) (((x)->flags |= NS_FLAGS_SYNCHED))
-
-/* Some standard text help messages */
-extern EXPORTVAR const char *ns_help_set_nick[];
-extern EXPORTVAR const char *ns_help_set_altnick[];
-extern EXPORTVAR const char *ns_help_set_user[];
-extern EXPORTVAR const char *ns_help_set_host[];
-extern EXPORTVAR const char *ns_help_set_realname[];
 
 extern const char *ns_copyright[];
 
@@ -1133,13 +1143,15 @@ void GetUserList(UserListHandler handler);
 typedef void (*ServerListHandler) (Server * s);
 void GetServerList(ServerListHandler handler);
 
+EXPORTFUNC int HaveFeature (int mask);
+
 /* 
  * Module Interface 
  */
 int MODULEFUNC ModInit(Module* mod_ptr);
 void MODULEFUNC ModFini(void);
 int MODULEFUNC ModAuth (User * u);
-int MODULEFUNC ModAuthUser(User * u, int curlvl);
+int MODULEFUNC ModAuthUser(User * u);
 int MODULEFUNC ModAuthList(User * u);
 extern MODULEVAR ModuleInfo module_info;   
 extern MODULEVAR ModuleEvent module_events[];  

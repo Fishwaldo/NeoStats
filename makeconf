@@ -1,21 +1,17 @@
 #!/bin/sh
-# makeconf v 1.0 2001/02/11 15:21:32 Shmad
+# makeconf $Id
 
 TIME=`date +"%H:%M:%S %Z"`
 DATE=`date +"%a, %b %e %Y"`
 STATSCONF="neostats.cfg"
 SERVNAME="stats.somenet.net"
 SERVNUMERIC="1"
-COMMENT="NeoStats 3.0 IRC Statistical and Alternative Services"
+COMMENT="NeoStats 3.0 IRC Services"
 LINKPORT="6667"
 LINKSERVER="127.0.0.1"
 LINKPASS="LinkPass"
-NETNAME="SomeNet-IRC"
-NEOHOST="NeoStats.Net"
-NEOUSER="Neo"
 NEOCHAN="#services"
 NEOCONN="10"
-NEOREC="10"
 BINDIP="127.0.0.1"
 LOGFNAMEFORMAT="-%m-%d"
 SETSERVERTIMES="24"
@@ -187,30 +183,6 @@ if [ ! -z "$cc" ]; then
 fi
 
 echo " "
-echo "Network name? (refer to your networks file.  ie: CyberChat-IRC)"
-echo $n " [$NETNAME] -> $c"
-read cc
-if [ ! -z "$cc" ]; then
-        NETNAME="$cc"
-fi
-
-echo " "
-echo "The host NeoStats is connecting from, most people use services.theirnetwork.net"
-echo $n " [$NEOHOST] -> $c"
-read cc
-if [ ! -z "$cc" ]; then
-        NEOHOST="$cc"
-fi
-
-echo " "
-echo "NeoStats User? (This is the part before @yourhost.net)"
-echo $n " [$NEOUSER] -> $c"
-read cc
-if [ ! -z "$cc" ]; then
-        NEOUSER="$cc"
-fi
-
-echo " "
 echo "What channel should NeoStats join on IRC?"
 echo $n " [$NEOCHAN] -> $c"
 read cc
@@ -327,40 +299,9 @@ SERVER_INFOLINE "$COMMENT"
 
 SERVER_NUMERIC "$SERVNUMERIC"
 
-# STATSERV_NETNAME <network name> [REQUIRED]
-#    Your network name, if unknown refer to your network file. Does not 
-#    apply to all IRCDs e.g. 
-#    
-#        STATSERV_NETNAME neostats
-#        
-#    For irc.neostats.net
-
-STATSERV_NETNAME $NETNAME
-
 ##########################
 # NeoStats Configuration #
 ##########################
-
-# NEOSTAT_HOST <host> [REQUIRED]
-#    Specifies the Hostname that NeoStats comes from. Some people like to 
-#    make it the same as the Services host (e.g., services.neostats.net) 
-#    or one just for NeoStats (e.g., stats.neostats.net) e.g.
-#    
-#        NEOSTATS_HOST stats.neostats.net    
-#    
-#    The bot will appear as NeoStats!user@stats.neostats.net
-
-NEOSTAT_HOST $NEOHOST
-
-# NEOSTAT_USER <user> [REQUIRED]
-#    Specifies the User/ident of the NeoStats Bot (the part before the 
-#    @host) e.g.
-#    
-#        NEOSTATS_USER neo    
-#            
-#    The bot will apear as NeoStats!neo@Host
-
-NEOSTAT_USER $NEOUSER
 
 # SERVICES_CHAN #<channel name> [REQUIRED]
 #    Specify the channel that all bots on NeoStats

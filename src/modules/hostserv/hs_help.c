@@ -159,3 +159,10 @@ const char *hs_help_set_hostname[] = {
 	"Users will then be set to nick.<hostname>.",
 	NULL
 };
+
+const char *hs_help_set_operhosts[] = {
+	"\2SET OPERHOSTS <ON/OFF>\2",
+	"Whether HostServ will set oper vhosts or not. If your IRCd does",
+	"not provide oper hosts, you might want to use this option.",
+	NULL
+};

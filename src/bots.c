@@ -21,6 +21,11 @@
 ** $Id$
 */
 
+/*	TODO:
+ *		- find free nick for bots if NICK and ALTNICK are in use
+ *		- CTCP handler
+ */
+
 #include "neostats.h"
 #include "modules.h"
 #include "ircd.h"
@@ -345,7 +350,7 @@ new_bot (const char *bot_name)
 
 	SET_SEGV_LOCATION();
 	dlog(DEBUG2, "new_bot: %s", bot_name);
-	botptr = smalloc (sizeof (Bot));
+	botptr = scalloc (sizeof (Bot));
 	strlcpy (botptr->nick, bot_name, MAXNICK);
 	bn = hnode_create (botptr);
 	if (hash_isfull (bothash)) {
@@ -372,8 +377,6 @@ add_ns_bot (Module* modptr, const char *nick)
 	botptr = new_bot (nick);
 	if(botptr) {
 		botptr->moduleptr = modptr;
-		botptr->botcmds = NULL;
-		botptr->bot_settings = NULL;	
 		botptr->set_ulevel = NS_ULEVEL_ROOT;
 		return botptr;
 	}
@@ -418,6 +421,8 @@ del_ns_bot (const char *bot_name)
 		hash_delete (bothash, bn);
 		botptr = hnode_get (bn);
 		del_all_bot_cmds(botptr);
+		del_all_bot_settings(botptr);
+		del_bot_info_settings(botptr);
 		hnode_destroy (bn);
 		sfree (botptr);
 		return NS_SUCCESS;
@@ -482,7 +487,7 @@ list_bots (CmdParams* cmdparams)
 	hash_scan_begin (&bs, bothash);
 	while ((bn = hash_scan_next (&bs)) != NULL) {
 		botptr = hnode_get (bn);
-		if(botptr->moduleptr == 0) {
+		if((botptr->flags & 0x80000000)) {
 			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "NeoStats");
 			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Bots: %s", botptr->nick);
 		} else {
@@ -521,13 +526,14 @@ int	del_bots (Module *mod_ptr)
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list)
+Bot *init_bot (BotInfo* botinfo)
 {
 	Bot * botptr; 
 	User *u;
 	long Umode;
 	char* nick;
 	Module* modptr;
+	char* host;
 
 	SET_SEGV_LOCATION();
 	/* When we are using single bot mode, for example in client mode where we
@@ -535,8 +541,8 @@ Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd
 	 * commands and settings to it 
 	 */
 	if(config.singlebotmode && ns_botptr) {
-		add_bot_cmd_list (ns_botptr, bot_cmd_list);
-		add_bot_settings (ns_botptr, bot_setting_list);
+		add_bot_cmd_list (ns_botptr, botinfo->bot_cmd_list);
+		add_bot_setting_list (ns_botptr, botinfo->bot_setting_list);
 		return(ns_botptr);
 	}
 	modptr = GET_CUR_MODULE();
@@ -564,27 +570,28 @@ Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd
 		nlog (LOG_WARNING, "add_ns_bot failed for module %s bot %s", modptr->info->name, nick);
 		return NULL;
 	}
-	Umode = UmodeStringToMask(modes, 0);
-	signon_newbot (nick, botinfo->user, ((*botinfo->host)==0?me.name:botinfo->host), 
-		botinfo->realname, modes, Umode);
+	host = ((*botinfo->host)==0?me.name:botinfo->host);
+	if(botinfo->flags&BOT_FLAG_SERVICEBOT) {
+		Umode = UmodeStringToMask(me.servicesumode, 0);
+		signon_newbot (nick, botinfo->user, host, botinfo->realname, me.servicesumode, Umode);
+	} else {
+		signon_newbot (nick, botinfo->user, host, botinfo->realname, "", 0);
+	}
 	u = finduser (nick);
 	/* set our link back to user struct for bot */
 	botptr->u = u;
-	/* Mark bot as services bot if needed */
-	if ((Umode & service_umode_mask)) {
-		flags |= BOT_FLAG_SERVICEBOT;
-	}
-	if (HaveUmodeDeaf()&&flags&BOT_FLAG_DEAF) {
+	if (HaveUmodeDeaf()&&(botinfo->flags&BOT_FLAG_DEAF)) {
 		sumode_cmd (nick, nick, UMODE_DEAF);
 	}
-	botptr->flags = flags;
+	botptr->flags = botinfo->flags;
 	SET_RUN_LEVEL(modptr);
-	if (bot_cmd_list) {
-		add_bot_cmd_list (botptr, bot_cmd_list);
+	if (botinfo->bot_cmd_list) {
+		add_bot_cmd_list (botptr, botinfo->bot_cmd_list);
 	}
-	if (bot_setting_list) {
-		add_bot_settings (botptr, bot_setting_list);
+	if (botinfo->bot_setting_list) {
+		add_bot_setting_list (botptr, botinfo->bot_setting_list);
 	}
+	add_bot_info_settings (botptr, botinfo);
 	RESET_RUN_LEVEL();
 	return botptr;
 }

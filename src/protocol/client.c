@@ -167,7 +167,7 @@ send_server (const char *sender, const char *name, const int numeric, const char
 }
 
 void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
 {
 	send_cmd ("%s %s", MSG_PASS, pass);
 	send_cmd ("%s %s %d :%s", MSG_NICK, "NeoStats", numeric, infoline);
@@ -204,7 +204,7 @@ send_sjoin (const char *sender, const char *who, const char *chan, const unsigne
 }
 
 void 
-send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts)
+send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
 	send_cmd (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, ts);
 }
@@ -338,7 +338,7 @@ send_svskill (const char *sender, const char *target, const char *reason)
 
 /* akill is gone in the latest Unreals, so we set Glines instead */
 void 
-send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, unsigned long ts)
+send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
 {
 	send_cmd (":%s %s + G %s %s %s %lu %lu :%s", sender, MSG_TKL, ident, host, setby, (ts + length), ts, reason);
 }

@@ -22,9 +22,6 @@
 */
 
 #include "neostats.h"
-#ifdef WIN32
-#include "win32/getopt.h"
-#endif
 #include "ircd.h"
 #include "conf.h"
 #include "keeper.h"
@@ -258,6 +255,11 @@ neostats ()
 static int
 get_options (int argc, char **argv)
 {
+#ifdef WIN32
+	config.debug = 1;
+	config.loglevel = LOG_INFO;
+	config.debuglevel = DEBUG10;
+#else
 	int c;
 	int level;
 
@@ -268,11 +270,6 @@ get_options (int argc, char **argv)
 	config.loglevel = LOG_INFO;
 	config.debuglevel = DEBUG10;
 	config.foreground = 1;
-#endif
-#ifdef WIN32
-	config.debug = 1;
-	config.loglevel = LOG_INFO;
-	config.debuglevel = DEBUG10;
 #endif
 	/* default debugmodule to all */
 	strlcpy(config.debugmodule, "all", MAX_MOD_NAME);
@@ -320,6 +317,7 @@ get_options (int argc, char **argv)
 			printf ("Unknown command line switch %c\n", optopt);
 		}
 	}
+#endif
 	return NS_SUCCESS;
 }
 

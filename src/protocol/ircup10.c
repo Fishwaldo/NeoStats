@@ -331,7 +331,7 @@ send_server (const char *sender, const char *name, const int numeric, const char
 -1 <description of new server>
 */
 void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
 {
 	/* Reset our numeric buffer */
 	memset(neonicknumerics, 0 , sizeof(neonicknumerics));
@@ -465,12 +465,12 @@ send_wallops (const char *who, const char *buf)
 void
 send_end_of_burst_ack(void)
 {
-	if (!me.synced) {
+	if (!me.synched) {
 		init_services_bot ();
 		send_end_of_burst ();
 	}
 	send_cmd ("%s %s", neostatsbase64, TOK_END_OF_BURST_ACK);
-	me.synced = 1;
+	me.synched = 1;
 }
 
 void

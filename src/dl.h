@@ -50,6 +50,12 @@
 #define RTLD_GLOBAL 0
 #endif
 
+#ifdef WIN32
+#define MOD_EXT	"dll"
+#else
+#define MOD_EXT	"so"
+#endif
+
 /* 
  * Prototypes
  */

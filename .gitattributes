@@ -437,8 +437,6 @@ src/transfer.c -text
 src/transfer.h -text
 src/users.c eol=lf
 src/users.h eol=lf
-src/win32/getopt.c -text
-src/win32/getopt.h -text
 src/win32/neostats.aps -text
 src/win32/neostats.bmp -text
 src/win32/neostats.rc -text

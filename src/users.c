@@ -143,7 +143,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	}
 	sfree (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
-	if(is_synced && config.versionscan && !IsExcluded(u) && !IsMe(u)) {
+	if(is_synched && config.versionscan && !IsExcluded(u) && !IsMe(u)) {
 		privmsg(u->nick, ns_botptr->nick, "\1VERSION\1");
 	}
 }
@@ -647,7 +647,11 @@ UserLevel (User * u)
 	else
 #endif
 #endif
-	ulevel = UserAuth(u);
+	if(IsServiceRoot(u)) {
+		ulevel = NS_ULEVEL_ROOT;
+	} else {
+		ulevel = UserAuth(u);
+	}
 
 	/* Set user level so we no longer need to calculate */
 	/* TODO: Under what circumstances do we reset this e.g. nick change? */
