@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.33 2003/04/11 09:26:31 fishwaldo Exp $
+** $Id: sock.c,v 1.34 2003/04/30 15:00:28 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -245,17 +245,6 @@ void log(char *fmt, ...)
 }
 
 #endif
-
-void ResetLogs()
-{
-	char tmp[25];
-	time_t t = time(NULL);
-	
-	strcpy(segv_location, "ResetLogs");
-	strftime(tmp, 25, "logs/neostats-%m-%d.log", localtime(&t));
-	rename("logs/neostats.log", tmp);
-	nlog(LOG_NORMAL, LOG_CORE, "Started fresh logfile.");
-}
 
 char *sctime(time_t stuff)
 {

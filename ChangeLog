@@ -21,6 +21,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - fixed a typo with unloading modules
  - strtolower sucks arse man... :(
  - ServiceRoots now prefers and uses the syntax <nick>!<ident>@<host>. Wildcards are permitted.
+ - all Logfiles are not rotated at midnight
 
 * NeoStats * Fish * Version 2.5.1
  - ConnectServ's username was too long for NeoIRCd, fixed

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.c,v 1.5 2003/04/17 00:16:26 fishwaldo Exp $
+** $Id: log.c,v 1.6 2003/04/30 15:00:28 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -152,3 +152,37 @@ void nlog(int level, int scope, char *fmt, ...) {
 		va_end(ap);
 	}
 }		
+void ResetLogs()
+{
+	char tmp[255], tmp2[255];
+	time_t t = time(NULL);
+	hscan_t hs;
+	hnode_t *hn;
+	struct logs_ *logentry;
+	
+
+	strcpy(segv_location, "ResetLogs");
+	hash_scan_begin(&hs, logs);
+	while ((hn = hash_scan_next(&hs)) != NULL) {
+		logentry = hnode_get(hn);
+		if (logentry->flush > 0) {
+			fflush(logentry->logfile);
+			logentry->flush = 0;
+		}
+#ifdef DEBUG
+		printf("Closing Logfile %s (%s)\n", logentry->name, (char *)hnode_getkey(hn));
+#endif
+		fclose(logentry->logfile);
+		if (!strcasecmp(logentry->name, "core")) {
+			strftime(tmp, 255, "logs/NeoStats-%m-%d.log", localtime(&t));
+			rename("logs/NeoStats.log", tmp);
+			logentry->logfile = fopen("logs/NeoStats.log", "a");
+		} else {
+			strftime(tmp2, 255, "%m-%d.log", localtime(&t));
+			snprintf(tmp, 255, "logs/%s-%s", logentry->name, tmp2);
+			snprintf(tmp2, 255, "logs/%s.log", logentry->name);
+			rename(tmp2, tmp);
+			logentry->logfile = fopen(tmp2, "a");
+		}
+	}
+}
