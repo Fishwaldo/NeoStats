@@ -8,6 +8,8 @@
 /CREDITS -text
 /ChangeLog -text
 /Config -text
+/INSTNOTES -text
+/INSTNOTES.svn -text
 /Ircu.c eol=lf
 /Ircu.h eol=lf
 /Makefile.in -text

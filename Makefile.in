@@ -118,6 +118,8 @@ install: neostats modules
 	(cd dl; $(MAKE) $@)
 	(cd tools; $(MAKE) $@)
 	@echo "Done."
+	@cat INSTNOTES 
+	@if test -f INSTNOTES.svn ; then cat INSTNOTES.svn ; fi 
 
 dist: 	
 	@echo -n "Creating Directories"
