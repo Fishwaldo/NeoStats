@@ -34,137 +34,166 @@
  * int ranges from 
  *    -2,147,483,647 to 2,147,483,647 signed
  *    0 to 4,294,967,295 unsigned
- * so buffer size is 10+1+1 (digits+sign+NULL)
+ * so buffer size is 10 + 1 + 1 ( digits + sign + NULL )
  */
-#define SCRATCHPAD_SIZE	(10+1+1)
+#define SCRATCHPAD_SIZE	( 10 + 1 + 1 )
 
 static char scratchpad[SCRATCHPAD_SIZE] = 
 { 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
 };
 
-static char nullstring[]="(null)";
+static char nullstring[] = "(null)";
 
-/* @brief optimised vsnprintf replacement
+/** @brief ircvsnprintf
  *
- * @return 
+ *  vsnprintf replacement optimised for IRC
  *
+ *  @param buf Storage location for output. 
+ *  @param size Maximum number of characters to write.
+ *  @param fmt Format specification. 
+ *  @param args Pointer to list of arguments. 
+ *
+ *  @return number of characters written excluding terminating null
  */
-int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args) 
+
+int ircvsnprintf( char *buf, size_t size, const char *fmt, va_list args ) 
 {
-	va_list saveargs=args;
-	size_t len=0;
+	va_list saveargs = args;
+	size_t len = 0;
 	unsigned int i;
     char *str;
     char c;
-	const char *format=fmt;
+	const char *format = fmt;
 
-	while((c = *format++)!=0 && (len<size) ) {
+	while( ( c = *format++ ) != 0 && ( len < size ) )
+	{
 		/* Is it a format string character? */
-	    if(c == '%') {
-			switch(*format) {
-			/* handle %s (string) */
-			case 's': 
-				str = va_arg(args, char *);
-				/* If NULL string point to our null output string */
-				if(str == NULL) {
-					str = nullstring;
-				}
-				/* copy string to output observing limit */
-				while(*str && len < size) {
-					buf[len++] = *str++;
-				}
-				/* next char... */
-				format++;
-				break;
-			/* handle %c (char) */
-			case 'c':
-				/* copy character to output */
-				buf[len++] = (char) va_arg(args, int);
-				/* next char... */
-				format++;
-				break;
-			/* handle %d (int) */
-			case 'd':
-				i=va_arg(args, int);
-				/* treat as unsigned in then convert to +ve after we output the - */
-				if(i&0x80000000) {
-					buf[len++] = '-'; 
-					i = 0x80000000 - (i & ~0x80000000);
-				}
-				/* generate the number string in temp buffer */
-				str = &scratchpad[SCRATCHPAD_SIZE-1];
-				do {
-					*--str = ('0' + (i%10));
-					i /= 10;
-				} while(i != 0);
-				/* copy number string from temp buffer to output observing limit */
-				while(*str && len < size)
-					buf[len++]=*str++;
-				/* next char... */
-				format++;
-				break;
-			default:
-				/* in the event of an unknown type call lib version of vs[n]printf */
-				return vsnprintf(buf, size, fmt, saveargs);
-				/* avoid compiler warning by having a superfluous break */
-				break;
+	    if( c == '%' ) 
+		{
+			switch( *format ) 
+			{
+				/* handle %s (string) */
+				case 's': 
+					str = va_arg( args, char * );
+					/* If NULL string point to our null output string */
+					if( str == NULL ) {
+						str = nullstring;
+					}
+					/* copy string to output observing limit */
+					while( *str && len < size ) {
+						buf[len++] = *str++;
+					}
+					/* next char... */
+					format++;
+					break;
+				/* handle %c( char ) */
+				case 'c':
+					/* copy character to output */
+					buf[len++] = ( char ) va_arg( args, int );
+					/* next char... */
+					format++;
+					break;
+				/* handle %d( int ) */
+				case 'd':
+					i=va_arg( args, int );
+					/* treat as unsigned in then convert to +ve after we output the - */
+					if( i & 0x80000000 ) {
+						buf[len++] = '-'; 
+						i = 0x80000000 - ( i & ~0x80000000 );
+					}
+					/* generate the number string in temp buffer */
+					str = &scratchpad[SCRATCHPAD_SIZE-1];
+					do {
+						*--str = ( '0' + ( i % 10 ) );
+						i /= 10;
+					} while( i != 0 );
+					/* copy number string from temp buffer to output observing limit */
+					while( *str && len < size )
+						buf[len++] = *str++;
+					/* next char... */
+					format++;
+					break;
+				default:
+					/* in the event of an unknown type call lib version of vs[n]printf */
+					return vsnprintf( buf, size, fmt, saveargs );
+					/* avoid compiler warning by having a superfluous break */
+					break;
 			}
 		}
 		/* just copy char from src */
-		else {
+		else 
+		{
 			buf[len++] = c;
 	    }
 	}
 	/* NULL terminate */
-	if(len < size) {
+	if( len < size ) 
 		buf[len] = 0;
-	} else {
+	else
 		buf[size -1] = 0;
-	}
 	/* return count chars written */
 	return len;
 }
 
-/* @brief optimised vsprintf replacement
+/** @brief ircvsprintf
  *
- * @return 
+ *  vsprintf replacement optimised for IRC
  *
+ *  @param buf Storage location for output. 
+ *  @param fmt Format specification. 
+ *  @param args Pointer to list of arguments. 
+ *
+ *  @return number of characters written excluding terminating null
  */
-int ircvsprintf(char *buf, const char *fmt, va_list args) 
+
+int ircvsprintf( char *buf, const char *fmt, va_list args ) 
 {
-    return ircvsnprintf(buf, 0xffffffffUL, fmt, args);
+    return ircvsnprintf( buf, 0xffffffffUL, fmt, args );
 }
 
-/* @brief optimised sprintf replacement
+/** @brief ircsprintf
  *
- * @return 
+ *  sprintf replacement optimised for IRC
  *
+ *  @param buf Storage location for output. 
+ *  @param fmt Format specification. 
+ *  @param ... to list of arguments. 
+ *
+ *  @return number of characters written excluding terminating null
  */
-int ircsprintf(char *buf, const char *fmt, ...)
+
+int ircsprintf( char *buf, const char *fmt, ... )
 {
     int ret;
     va_list args;
 
-	va_start(args, fmt);
-    ret = ircvsprintf(buf, fmt, args);
-    va_end(args);
+	va_start( args, fmt );
+    ret = ircvsprintf( buf, fmt, args );
+    va_end( args );
     return ret;
 }
 
-/* @brief optimised snprintf replacement
+/** @brief ircsnprintf
  *
- * @return 
+ *  snprintf replacement optimised for IRC
  *
+ *  @param buf Storage location for output. 
+ *  @param size Maximum number of characters to write.
+ *  @param fmt Format specification. 
+ *  @param ... list of arguments. 
+ *
+ *  @return number of characters written excluding terminating null
  */
-int ircsnprintf(char *buf, size_t size, const char *fmt, ...)
+
+int ircsnprintf( char *buf, size_t size, const char *fmt, ... )
 {
     int ret;
     va_list args;
 
-	va_start(args, fmt);
-    ret = ircvsnprintf(buf, size, fmt, args);
-    va_end(args);
+	va_start( args, fmt );
+    ret = ircvsnprintf( buf, size, fmt, args );
+    va_end( args );
     return ret;
 }
 
@@ -176,12 +205,13 @@ int ircsnprintf(char *buf, size_t size, const char *fmt, ...)
  * RFC compliant but may vary between IRCds.
  */
 
-static const unsigned char irctolowertable[256] = {
+static const unsigned char irctolowertable[256] = 
+{
     /*NUL SOH  STX  ETX  EOT  ENQ  ACK  BEL   BS   HT   LF   VT   FF   CR   SO   SI*/
     0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,
     /*DLE DC1  DC2  DC3  DC4  NAK  SYN  ETB   CAN  EM   SUB  ESC  FS   GS   RS   US*/
 	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,
-	/*SPC  !    "    #    $    %    &    '    (    )    *    +    ,    -    .    / */
+	/*SPC  !    "    #    $    %    &    '   (      ) *    +    ,    -    .    / */
 	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f,
 	/*0    1    2    3    4    5    6    7    8    9    :    ;    <    =    >    ? */
     0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,
@@ -214,53 +244,65 @@ static const unsigned char irctolowertable[256] = {
 
 /* IRCTOLOWER macro to perform unsigned char lookup in above table  */
 
-#define IRCTOLOWER(c) irctolowertable[(unsigned char)(c)]
+#define IRCTOLOWER( c ) irctolowertable[( unsigned char )( c )]
 
-/* @brief irc specific strcasecmp replacement
+/** @brief ircstrcasecmp
  *
- * @return 
+ *  strcasecmp replacement optimised for IRC
  *
+ *  @param s1 Null-terminated string to compare
+ *  @param s2 Null-terminated string to compare
+ *
+ *  @return lexicographic relation of s1 to s2.
+ *    < 0 s1 less than s2 
+ *    0   s1 identical to s2 
+ *    > 0 s1 greater than s2 
  */
-int
-ircstrcasecmp(const char *s1, const char *s2)
+
+int ircstrcasecmp( const char *s1, const char *s2 )
 {
 	/* How should we handle nulls... hmmm */
-	if(s1 == 0 || s2 == 0) {
+	if( s1 == 0 || s2 == 0 )
 		return 0;
-	}
-	while (IRCTOLOWER(*s1) == IRCTOLOWER(*s2)) {
-		if(*s1 == 0)
+	while( IRCTOLOWER( *s1 ) == IRCTOLOWER( *s2 ) ) {
+		if( *s1 == 0 )
 			return 0;
 		s1++;
 		s2++;
 	}
-	return IRCTOLOWER(*s1) - IRCTOLOWER(*s2);
+	return IRCTOLOWER( *s1 ) - IRCTOLOWER( *s2 );
 }
 
-/* @brief irc specific strncasecmp replacement
+/** @brief ircstrncasecmp
  *
- * @return 
+ *  strncasecmp replacement optimised for IRC
  *
+ *  @param s1 Null-terminated string to compare
+ *  @param s2 Null-terminated string to compare
+ *  @param size Maximum number of characters to compare.
+ *
+ *  @return lexicographic relation of s1 to s2.
+ *    < 0 s1 less than s2 
+ *    0   s1 identical to s2 
+ *    > 0 s1 greater than s2 
  */
-int 
-ircstrncasecmp(const char *s1, const char *s2, size_t size)
+
+int ircstrncasecmp( const char *s1, const char *s2, size_t size )
 {
 	/* How should we handle nulls... hmmm */
-	if(s1 == 0 || s2 == 0) {
+	if( s1 == 0 || s2 == 0 )
 		return 0;
-	}
-	if (size == 0)
+	if( size == 0 )
 		return 0;
-	while (size && (IRCTOLOWER(*s1) == IRCTOLOWER(*s2)))
+	while( size && ( IRCTOLOWER( *s1 ) == IRCTOLOWER( *s2 ) ) )
 	{
-		if(*s1 == 0)
+		if( *s1 == 0 )
 			return 0;
 		s1++;
 		s2++;
 		size--;
 	}
-	if(size) {
-		return IRCTOLOWER(*s1) - IRCTOLOWER(*s2);
-	}
-	return(0);
+	if( size )
+		return IRCTOLOWER( *s1 ) - IRCTOLOWER( *s2 );
+	return 0;
 }
