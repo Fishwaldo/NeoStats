@@ -58,7 +58,9 @@ const char version_date[] = __DATE__;
 /*! Time we were compiled */
 const char version_time[] = __TIME__;
 
+#ifndef WIN32
 static int get_options (int argc, char **argv);
+#endif
 
 /*! have we forked */
 static int forked = 0;
@@ -159,7 +161,14 @@ neostats ()
 	strlcpy(me.version, VERSION, VERSIONSIZE);
 	/* out default lang is always -1 */
 	me.lang = -1;
-#ifndef WIN32
+#ifdef WIN32
+	nsconfig.debug = 1;
+	nsconfig.loglevel = LOG_INFO;
+	nsconfig.debuglevel = DEBUG10;
+	nsconfig.foreground = 1;
+	/* default debugmodule to all */
+	strlcpy(nsconfig.debugmodule, "all", MAX_MOD_NAME);
+#else
 	/* get our commandline options */
 	if(get_options (argc, argv)!=NS_SUCCESS)
 		return EXIT_FAILURE;
@@ -263,14 +272,10 @@ neostats ()
  *
  * returns 0 on success, -1 on error
 */
+#ifndef WIN32
 static int
 get_options (int argc, char **argv)
 {
-#ifdef WIN32
-	nsconfig.debug = 1;
-	nsconfig.loglevel = LOG_INFO;
-	nsconfig.debuglevel = DEBUG10;
-#else
 	int c;
 	int level;
 
@@ -328,9 +333,9 @@ get_options (int argc, char **argv)
 			printf ("Unknown command line switch %c\n", optopt);
 		}
 	}
-#endif
 	return NS_SUCCESS;
 }
+#endif
 
 /** @brief before exiting call this function. It flushes log files and tidy's up.
  *

@@ -151,12 +151,10 @@ dlog (DEBUG_LEVEL level, char *fmt, ...)
 {
 	va_list ap;
 	
-#ifndef WIN32
 	if (level <= nsconfig.debuglevel) {
 		/* Support for module specific only debug info */
 		if(ircstrcasecmp(nsconfig.debugmodule, "all")== 0 || ircstrcasecmp(nsconfig.debugmodule, GET_CUR_MODNAME()) ==0)
 		{
-#endif
 			/* we update me.now here, because some functions might be busy and not call the loop a lot */
 			me.now = time(NULL);
 			ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", me.now);
@@ -164,18 +162,12 @@ dlog (DEBUG_LEVEL level, char *fmt, ...)
 			va_start (ap, fmt);
 			ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
 			va_end (ap);
-#ifdef WIN32
-			printf ("%s %s - %s\n", dloglevels[level - 1], GET_CUR_MODNAME(), log_buf);
-#else
 			if (nsconfig.foreground) {
 				printf ("%s %s - %s\n", dloglevels[level - 1], GET_CUR_MODNAME(), log_buf);
 			}
-#endif
 			debuglog (log_fmttime, dloglevels[level - 1], log_buf);
-#ifndef WIN32
 		}
 	}
-#endif
 }
 
 /** @Configurable logging function
@@ -186,7 +178,7 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 	va_list ap;
 	LogEntry *logentry;
 	
-	if (level <= nsconfig.loglevel) {
+	if (nsconfig.debuglevel || level <= nsconfig.loglevel) {
 		logentry = (LogEntry *)hnode_find (logs, GET_CUR_MODNAME());
 		if (logentry) {
 			/* we found our log entry */
@@ -214,19 +206,16 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 		va_start (ap, fmt);
 		ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
 		va_end (ap);
-		fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
+		if (level <= nsconfig.loglevel) 
+			fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
 		logentry->flush = 1;
 		if (nsconfig.foreground) {
 			printf ("%s %s - %s\n", loglevels[level - 1], GET_CUR_MODNAME(), log_buf);
 		}
 	}
-#ifndef WIN32
 	if (nsconfig.debuglevel) {
-#endif
 		debuglog (log_fmttime, loglevels[level - 1], log_buf);
-#ifndef WIN32
 	}
-#endif
 }
 
 /** rotate logs, called at midnight

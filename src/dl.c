@@ -59,6 +59,7 @@ void *ns_dlsym (void *handle, const char *name)
 #else /* HAVE_LIBDL */
 	if ((ns_dlerrormsg = ns_dlerror ()) != NULL) {
 #endif /* HAVE_LIBDL */
+		nlog (LOG_ERROR, "dl error %s", ns_dlerrormsg);
 		return NULL;
 	}
 	return ret;
