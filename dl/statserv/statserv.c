@@ -1091,16 +1091,12 @@ static void ss_stats(User * u, char **av, int ac)
 
 static void ss_forcehtml(User * u, char **av, int ac)
 {
-	if(UserLevel(u) < NS_ULEVEL_ADMIN)
-		return;
-	
 	nlog(LOG_NOTICE, LOG_MOD,
 		    "%s!%s@%s Forced an update of the NeoStats Statistics HTML file with the most current statistics",
 		    u->nick, u->username, u->hostname);
 	chanalert(s_StatServ,
 			"%s Forced the NeoStats Statistics HTML file to be updated with the most current statistics",
 			u->nick);
-
 	ss_html();
 }
 
