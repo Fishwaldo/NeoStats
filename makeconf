@@ -228,7 +228,7 @@ echo ""
 
 ###########################################################################
 # select datbase
-DATABASE_DEFAULT="gdbm"
+DATABASE_DEFAULT=1
 DATABASE=
 validselection=0
 echo "Which datbase storage do you wish to use?"
@@ -241,10 +241,6 @@ while [ $validselection -eq 0 ] ; do
 		INPUT=$DATABASE_DEFAULT
 	fi
 	case $INPUT in
-		no\ default)
-			echo "You must specify database type in order for NeoStats to function"
-			echo "correctly."
-			;;
 		1)
  			DATABASE="gdbm"
 			validselection=1
