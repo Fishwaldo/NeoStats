@@ -29,7 +29,6 @@ data/niconfig.db -text
 data/nstats.db -text
 data/stats.db -text
 data/tlds.nfo -text
-/depcomp -text
 /dl.c -text
 /dl.h -text
 dl/Makefile -text
