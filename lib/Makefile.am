@@ -10,6 +10,6 @@ else
 CURLDIR =
 endif
 
-SUBDIRS		= adns keeper $(CURLDIR) $(PCREDIR) rta gdbm
+SUBDIRS		= adns rta gdbm $(CURLDIR) $(PCREDIR)
 
 include $(top_srcdir)/autotools/rules.mk
