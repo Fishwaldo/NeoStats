@@ -442,7 +442,9 @@ send_privmsg (const char *from, const char *to, const char *buf)
 	if(to[0] == '#') {
 		send_cmd (":%s %s %s :%s", from, TOK_PRIVATE, to, buf);
 	} else {
-		send_cmd ("%s %s %s :%s", nicktobase64 (from), TOK_PRIVATE, nicktobase64 (to), buf);
+/*		DOESN'T WORK!
+		send_cmd ("%s %s %s :%s", nicktobase64 (from), TOK_PRIVATE, nicktobase64 (to), buf);*/
+		send_cmd (":%s %s %s :%s", from, TOK_PRIVATE, to, buf);
 	}
 }
 
