@@ -72,6 +72,8 @@
  *  SERVER parameters are:
  *	server name
  *	uplink
+ *	hops
+ *	infoline
  */
 #define EVENT_SERVER		"SERVER"
 
