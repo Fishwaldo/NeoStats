@@ -31,47 +31,47 @@
 #include "ns_help.h"
 
 /* this is the size of the exclude list */
-#define MAX_EXEMPTS		100
+#define MAX_EXCLUDES		100
 
 /* this is the list of excludeed hosts/servers */
 static list_t *excludelists[NUM_MODULES];
 
 static void new_exclude (void *data)
 {
-	Exclude *excludes;
+	Exclude *e;
 
-	excludes = malloc(sizeof(Exclude));
-	os_memcpy (excludes, data, sizeof(Exclude));
-	lnode_create_prepend(excludelists[GET_CUR_MODNUM()], excludes);
-	dlog (DEBUG2, "Adding %s (%d) Set by %s for %s to Exempt List", excludes->pattern, excludes->type, excludes->addedby, excludes->reason);
+	e = malloc(sizeof(Exclude));
+	os_memcpy (e, data, sizeof(Exclude));
+	lnode_create_prepend(excludelists[GET_CUR_MODNUM()], e);
+	dlog (DEBUG2, "Adding %s (%d) Set by %s for %s to Exclude List", e->pattern, e->type, e->addedby, e->reason);
 }
 
-int ModInitExempts(Module *mod_ptr)
+int ModInitExcludes(Module *mod_ptr)
 {
 	SET_SEGV_LOCATION();
 	/* init the exclusions list */
-	excludelists[mod_ptr->modnum] = list_create(MAX_EXEMPTS);
+	excludelists[mod_ptr->modnum] = list_create(MAX_EXCLUDES);
 	DBAFetchRows ("exclusions", new_exclude);
 	return NS_SUCCESS;
 }
 
-int ModFiniExempts(Module *mod_ptr)
+int ModFiniExcludes(Module *mod_ptr)
 {
 	list_destroy_auto (excludelists[mod_ptr->modnum]);
 	return NS_SUCCESS;
 }
 
-int ModIsServerExempt(Client *s)
+int ModIsServerExcluded(Client *s)
 {
 	lnode_t *node;
-	Exclude *exempts;
+	Exclude *e;
 
 	node = list_first(excludelists[GET_CUR_MODNUM()]);
 	while (node) {
-		exempts = lnode_get(node);
-		if (exempts->type == NS_EXCLUDE_SERVER) {
-			if (match(exempts->pattern, s->name)) {
-				dlog (DEBUG1, "Matched server entry %s in Exemptions", exempts->pattern);
+		e = lnode_get(node);
+		if (e->type == NS_EXCLUDE_SERVER) {
+			if (match(e->pattern, s->name)) {
+				dlog (DEBUG1, "Matched server entry %s in Excludeions", e->pattern);
 				return NS_TRUE;
 			}
 		}
@@ -80,30 +80,30 @@ int ModIsServerExempt(Client *s)
 	return NS_FALSE;
 }
 
-int ModIsUserExempt(Client *u) 
+int ModIsUserExcluded(Client *u) 
 {
 	lnode_t *node;
-	Exclude *excludes;
+	Exclude *e;
 
 	SET_SEGV_LOCATION();
 	if (!strcasecmp(u->uplink->name, me.name)) {
-		dlog (DEBUG1, "User %s Exempt. its Me!", u->name);
+		dlog (DEBUG1, "User %s Exclude. its Me!", u->name);
 		return NS_TRUE;
 	}
 	/* don't scan users from a server that is excluded */
 	node = list_first(excludelists[GET_CUR_MODNUM()]);
 	while (node) {
-		excludes = lnode_get(node);
-		if (excludes->type == NS_EXCLUDE_SERVER) {
+		e = lnode_get(node);
+		if (e->type == NS_EXCLUDE_SERVER) {
 			/* match a server */
-			if (match(excludes->pattern, u->uplink->name)) {
-				dlog (DEBUG1, "User %s exclude. Matched server entry %s in Exemptions", u->name, excludes->pattern);
+			if (match(e->pattern, u->uplink->name)) {
+				dlog (DEBUG1, "User %s exclude. Matched server entry %s in Excludeions", u->name, e->pattern);
 				return NS_TRUE;
 			}
-		} else if (excludes->type == NS_EXCLUDE_HOST) {
+		} else if (e->type == NS_EXCLUDE_HOST) {
 			/* match a hostname */
-			if (match(excludes->pattern, u->user->hostname)) {
-				dlog (DEBUG1, "User %s is exclude. Matched Host Entry %s in Exceptions", u->name, excludes->pattern);
+			if (match(e->pattern, u->user->hostname)) {
+				dlog (DEBUG1, "User %s is exclude. Matched Host Entry %s in Exceptions", u->name, e->pattern);
 				return NS_TRUE;
 			}
 		}				
@@ -112,10 +112,10 @@ int ModIsUserExempt(Client *u)
 	return NS_FALSE;
 }
 
-int ModIsChanExempt(Channel *c) 
+int ModIsChannelExcluded(Channel *c) 
 {
 	lnode_t *node;
-	Exclude *excludes;
+	Exclude *e;
 
 	SET_SEGV_LOCATION();
 	if (IsServicesChannel( c )) {
@@ -125,11 +125,11 @@ int ModIsChanExempt(Channel *c)
 	/* don't scan users from a server that is excluded */
 	node = list_first(excludelists[GET_CUR_MODNUM()]);
 	while (node) {
-		excludes = lnode_get(node);
-		if (excludes->type == NS_EXCLUDE_CHANNEL) {
+		e = lnode_get(node);
+		if (e->type == NS_EXCLUDE_CHANNEL) {
 			/* match a channel */
-			if (match(excludes->pattern, c->name)) {
-				dlog (DEBUG1, "Channel %s exclude. Matched Channel entry %s in Exemptions", c->name, excludes->pattern);
+			if (match(e->pattern, c->name)) {
+				dlog (DEBUG1, "Channel %s exclude. Matched Channel entry %s in Excludeions", c->name, e->pattern);
 				return NS_TRUE;
 			}
 		}				
@@ -141,14 +141,14 @@ int ModIsChanExempt(Channel *c)
 static int mod_cmd_exclude_list(CmdParams *cmdparams)
 {
 	lnode_t *node;
-	Exclude *excludes;
+	Exclude *e;
 
 	SET_SEGV_LOCATION();
 	node = list_first(excludelists[GET_CUR_MODNUM()]);
 	irc_prefmsg (cmdparams->bot, cmdparams->source, "Exception List:");
 	while (node) {
-		excludes = lnode_get(node);
-		irc_prefmsg (cmdparams->bot, cmdparams->source, "%s (%s) Added by %s for %s", excludes->pattern, ExcludeDesc[excludes->type], excludes->addedby, excludes->reason);
+		e = lnode_get(node);
+		irc_prefmsg (cmdparams->bot, cmdparams->source, "%s (%s) Added by %s for %s", e->pattern, ExcludeDesc[e->type], e->addedby, e->reason);
 		node = list_next(excludelists[GET_CUR_MODNUM()], node);
 	}
 	irc_prefmsg (cmdparams->bot, cmdparams->source, "End of List.");
@@ -159,7 +159,7 @@ static int mod_cmd_exclude_add(CmdParams *cmdparams)
 {
 	NS_EXCLUDE type;
 	char *buf;
-	Exclude *excludes;
+	Exclude *e;
 
 	SET_SEGV_LOCATION();
 	if (cmdparams->ac < 4) {
@@ -191,27 +191,27 @@ static int mod_cmd_exclude_add(CmdParams *cmdparams)
 		irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid exclude type");
 		return NS_SUCCESS;
 	}
-	excludes = ns_calloc (sizeof(Exclude));
-	excludes->type = type;
-	excludes->addedon = me.now;
-	strlcpy(excludes->pattern, cmdparams->av[2], MAXHOST);
-	strlcpy(excludes->addedby, cmdparams->source->name, MAXNICK);
+	e = ns_calloc (sizeof(Exclude));
+	e->type = type;
+	e->addedon = me.now;
+	strlcpy(e->pattern, cmdparams->av[2], MAXHOST);
+	strlcpy(e->addedby, cmdparams->source->name, MAXNICK);
 	buf = joinbuf(cmdparams->av, cmdparams->ac, 3);
-	strlcpy(excludes->reason, buf, MAXREASON);
+	strlcpy(e->reason, buf, MAXREASON);
 	ns_free (buf);
-	lnode_create_append (excludelists[GET_CUR_MODNUM()], excludes);
-	irc_prefmsg (cmdparams->bot, cmdparams->source, "Added %s (%s) exception to list", excludes->pattern, ExcludeDesc[excludes->type]);
+	lnode_create_append (excludelists[GET_CUR_MODNUM()], e);
+	irc_prefmsg (cmdparams->bot, cmdparams->source, "Added %s (%s) exception to list", e->pattern, ExcludeDesc[e->type]);
 	if (nsconfig.cmdreport) {
-		irc_chanalert (cmdparams->bot, "%s added %s (%s) exception to list", cmdparams->source->name, excludes->pattern, ExcludeDesc[excludes->type]);
+		irc_chanalert (cmdparams->bot, "%s added %s (%s) exception to list", cmdparams->source->name, e->pattern, ExcludeDesc[e->type]);
 	}
-	DBAStore ("exclusions", excludes->pattern, excludes, sizeof(Exclude));
+	DBAStore ("exclusions", e->pattern, e, sizeof(Exclude));
 	return NS_SUCCESS;
 }
 
 static int mod_cmd_exclude_del(CmdParams *cmdparams)
 {
 	lnode_t *node;
-	Exclude *excludes = NULL;
+	Exclude *e = NULL;
 
 	SET_SEGV_LOCATION();
 	if (cmdparams->ac < 2) {
@@ -219,15 +219,15 @@ static int mod_cmd_exclude_del(CmdParams *cmdparams)
 	}
 	node = list_first(excludelists[GET_CUR_MODNUM()]);
 	while (node) {
-		excludes = lnode_get(node);
-		if (ircstrcasecmp (cmdparams->av[1], excludes->pattern) == 0) {
+		e = lnode_get(node);
+		if (ircstrcasecmp (cmdparams->av[1], e->pattern) == 0) {
 			list_delete(excludelists[GET_CUR_MODNUM()], node);
 			lnode_destroy(node);
-			ns_free (excludes);
-			DBADelete ("exclusions", excludes->pattern);
-			irc_prefmsg (cmdparams->bot, cmdparams->source, "Deleted %s %s out of exception list", excludes->pattern, ExcludeDesc[excludes->type]);
+			ns_free (e);
+			DBADelete ("exclusions", e->pattern);
+			irc_prefmsg (cmdparams->bot, cmdparams->source, "Deleted %s %s out of exception list", e->pattern, ExcludeDesc[e->type]);
 			if (nsconfig.cmdreport) {
-				irc_chanalert (cmdparams->bot, "%s deleted %s %s out of exception list", cmdparams->source->name, excludes->pattern, ExcludeDesc[excludes->type]);
+				irc_chanalert (cmdparams->bot, "%s deleted %s %s out of exception list", cmdparams->source->name, e->pattern, ExcludeDesc[e->type]);
 			}
 			return NS_SUCCESS;
 		}

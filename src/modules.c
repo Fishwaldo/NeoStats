@@ -347,7 +347,7 @@ load_module (const char *modfilename, Client * u)
 	}
 	if (info_ptr->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
 	{
-		ModInitExempts(mod_ptr);
+		ModInitExcludes(mod_ptr);
 	}
 	SET_SEGV_LOCATION();
 
@@ -423,7 +423,7 @@ unload_module (const char *modname, Client * u)
 	}
 	if (mod_ptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
 	{
-		ModFiniExempts(mod_ptr);
+		ModFiniExcludes(mod_ptr);
 	}
 	moduleindex = mod_ptr->modnum;
 	/* canx any DNS queries used by this module */

@@ -24,8 +24,8 @@
 #ifndef _MODEXCLUDE_H_
 #define _MODEXCLUDE_H_
 
-int ModInitExempts(Module *mod_ptr);
-int ModFiniExempts(Module *mod_ptr);
+int ModInitExcludes(Module *mod_ptr);
+int ModFiniExcludes(Module *mod_ptr);
 
 extern bot_cmd mod_exclude_commands[];
 
