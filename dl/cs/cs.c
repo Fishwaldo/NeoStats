@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.10 2002/09/04 08:40:27 fishwaldo Exp $
+** $Id: cs.c,v 1.11 2002/09/12 15:42:36 shmad Exp $
 */
 
 #include <stdio.h>
@@ -38,15 +38,18 @@ int cs_new_user(char **av, int ac);
 int cs_user_modes(char **av, int ac);
 int cs_del_user(char **av, int ac);
 int cs_user_kill(char **av, int ac);
+int cs_user_nick(char *nick, char *newnick);
 
 static void cs_status(User *);
 static void cs_signwatch(User *u);
 static void cs_killwatch(User *u);
 static void cs_modewatch(User *u);
+static void cs_nickwatch(User *u);
 
 int sign_watch;
 int kill_watch;
 int mode_watch;
+int nick_watch;
 
 void cslog(char *, ...);
 void SaveSettings();
@@ -64,7 +67,7 @@ int ConfigCount = 0;
 Module_Info my_info[] = { {
     "ConnectServ",
     "Network Connection & Mode Monitoring Service",
-    "1.4"
+    "1.5"
 } };
 
 int new_m_version(char *origin, char **av, int ac) {
@@ -89,6 +92,9 @@ int __Bot_Message(char *origin, char **av, int ac)
         } else if (ac <= 2) {
             privmsg_list(u->nick, s_ConnectServ, cs_help);
             return 1;
+	} else if (!strcasecmp(av[2], "NICKWATCH") && (UserLevel(u) >= 185)) {
+	    privmsg_list(u->nick, s_ConnectServ, cs_help_nickwatch);
+	    return 1;
         } else if (!strcasecmp(av[2], "SIGNWATCH") && (UserLevel(u) >= 185)) {
             privmsg_list(u->nick, s_ConnectServ, cs_help_signwatch);
             return 1;
@@ -110,6 +116,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 	
 	if (!strcasecmp(av[1], "ABOUT")) {
                 privmsg_list(u->nick, s_ConnectServ, cs_help_about);
+    } else if (!strcasecmp(av[1], "NICKWATCH") && (UserLevel(u) >= 185)) {
+                cs_nickwatch(u);
     } else if (!strcasecmp(av[1], "SIGNWATCH") && (UserLevel(u) >= 185)) {
                 cs_signwatch(u);
     } else if (!strcasecmp(av[1], "KILLWATCH") && (UserLevel(u) >= 185)) {
@@ -141,6 +149,7 @@ EventFnList my_event_list[] = {
     { "UMODE", cs_user_modes},
     { "SIGNOFF", cs_del_user},
     { "KILL", cs_user_kill},
+    { "NICK", cs_user_nick},
     { NULL, NULL}
 };
 
@@ -203,6 +212,7 @@ void SaveSettings()
         fprintf(fp, ":SIGNWATCH %i\n", sign_watch);
         fprintf(fp, ":KILLWATCH %i\n", kill_watch);
         fprintf(fp, ":MODEWATCH %i\n", mode_watch);
+	fprintf(fp, ":NICKWATCH %i\n", nick_watch);
         fclose(fp);
 }
 
@@ -400,6 +410,43 @@ int cs_user_kill(char **av, int ac) {
 	return 1;
 }
 
+/* If a user has changed their nick say so */
+int cs_user_nick(char *nick, char *newnick) {
+    /* Approximate Segfault Location */
+    strcpy(segv_location, "cs_user_nick");
+
+    if (nick_watch) if (is_synced) chanalert(s_ConnectServ, "\2NICK\2 %s Changed their nick to %s", nick, newnick);
+    return 1;
+}
+
+
+static void cs_nickwatch(User *u)
+{
+    /* Approximate Segfault Location */
+    strcpy(segv_location, "cs_nickwatch");
+    if (!(UserLevel(u) >= 185)) {
+        prefmsg(u->nick, s_ConnectServ, "Permission Denied, you need to be a TechAdmin or a Network Administrator to do that!");
+        return;
+    }
+    /* The user has passed the minimum requirements for the ENABLE/DISABLE */
+
+    if (!nick_watch) {
+        nick_watch = 1;
+        if (is_synced) chanalert(s_ConnectServ, "\2NICK WATCH\2 Activated by %s",u->nick);
+        cslog("%s!%s@%s Activated NICK WATCH", u->nick, u->username, u->hostname);
+        SaveSettings();
+        prefmsg(u->nick, s_ConnectServ, "\2NICK WATCH\2 Activated");
+   } else {
+        nick_watch = 0;
+        if (is_synced) chanalert(s_ConnectServ, "\2NICK WATCH\2 Deactivated by %s",u->nick);
+        cslog("%s!%s@%s Deactivated NICK WATCH", u->nick, u->username, u->hostname);
+        SaveSettings();
+        prefmsg(u->nick, s_ConnectServ, "\2NICK WATCH\2 Deactivated");
+    }
+
+}
+
+
 
 /* Routine for Signon/Signoff ENABLE or DISABLE */
 static void cs_signwatch(User *u)
@@ -517,6 +564,14 @@ static void cs_status(User *u)
         prefmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 is Currently Active");
     }
 
+    /* NICKWATCH Check */
+    if (!nick_watch) {
+	prefmsg(u->nick, s_ConnectServ, "\2NICK WATCH\2 is Not Currently Active");
+    }
+    if (nick_watch) {
+	prefmsg(u->nick, s_ConnectServ, "\2NICK WATCH\2 is Currently Active");
+    }
+
 }
 
 /* Load ConnectServ Config file and set defaults if does not exist */
@@ -537,6 +592,8 @@ void Loadconfig()
                                 kill_watch = atoi(Config[1]);
             } else if (!strcasecmp(Config[0], "MODEWATCH")) {
                                 mode_watch = atoi(Config[1]);
+	    } else if (!strcasecmp(Config[0], "NICKWATCH")) {
+				nick_watch = atoi(Config[1]);
             } else {
                 cslog("%s is not a valid connect.db option!", Config[0]);
                 if (is_synced) chanalert(s_Services, "%s is not a valid connect.db option! Please check your data/connect.db file!", Config[0]);

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.37 2002/09/04 08:40:27 fishwaldo Exp $
+** $Id: users.c,v 1.38 2002/09/12 15:42:36 shmad Exp $
 */
 
 #include <fnmatch.h>
@@ -147,6 +147,7 @@ void Change_User(User *u, const char *newnick)
 		change_user_nick(findchan(lnode_get(cm)), (char *)newnick, u->nick);
 		cm = list_next(u->chans, cm);
 	}
+	Module_Event("NICK", u->nick, newnick);
 	strcpy(segv_location, "Change_User_Return");
 	hash_delete(uh, un);
 	strcpy(u->nick, newnick);

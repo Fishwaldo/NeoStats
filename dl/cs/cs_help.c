@@ -20,14 +20,14 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs_help.c,v 1.5 2002/09/04 08:40:27 fishwaldo Exp $
+** $Id: cs_help.c,v 1.6 2002/09/12 15:42:37 shmad Exp $
 */
 
 const char *cs_help[] = {
 "\2ConnectServ HELP\2",
 "",
 "COMMANDS:",
-"     SIGNWATCH     KILLWATCH     MODEWATCH",
+"     SIGNWATCH     KILLWATCH     MODEWATCH	NICKWATCH",
 "",
 "     STATUS     ABOUT",
 "",
@@ -82,6 +82,17 @@ const char *cs_help_modewatch[] = {
 "\2Usage:\2 MODEWATCH",
 "",
 "Will enable or disable MODEWATCH. It is reccomended you use the STATUS",
+"command to check if this setting is enabled or disabled before you use",
+"this command.",
+"",
+NULL
+};
+
+const char *cs_help_nickwatch[] = {
+"\2ConnectServ Help : NICKWATCH",
+"\2Usage:\2 NICKWATCH",
+"",
+"Will enable or disable NICKWATCH. It is recommended you use the STATUS",
 "command to check if this setting is enabled or disabled before you use",
 "this command.",
 "",

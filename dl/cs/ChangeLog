@@ -1,5 +1,10 @@
 ConnectServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma^
+
+* Version 1.5 * September 12th, 2002
+- Added NICK watching support for nick changes (Shmad)
+- Fixed other misc bugs.
+
 * Version 1.4 * July 17th, 2002
 - Moved to new Event API (Fish)
 - Stopped it flooding the net when neo starts up (Fish)

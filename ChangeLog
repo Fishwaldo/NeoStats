@@ -1,6 +1,8 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
+
 * NeoStats * Shmad & Fish * Version ????
+ - Modified users.c so we could call NICK changes to events :) (S)
  - fixed 'make install' now copies the html template over (reported by eggy) (S)
  - Changed stats.pid to NeoStats.pid (reported by eggy) (S)
  - StatServ STATS DEL will now only delete OFFLINE servers for sanitys sake (S)
