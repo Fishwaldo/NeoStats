@@ -205,7 +205,7 @@
 #define UMODE_ADMIN	 	0x0080	/* Admin */
 #define UMODE_NETADMIN  	0x10000	/* Network Admin */
 #define UMODE_TECHADMIN		0x80000000	/* Marks the client as a Technical Admin */
-#define UMODE_DEAF		0x100000000	/* client is deaf on channels */
+#define UMODE_DEAF			0x10000000	/* client is deaf on channels */
 #define	UMODE_LOCOP      	0x0200	/* Local operator -- SRB */
 #define UMODE_WHOIS    		0x200000	/* Lets Opers see when people do a /WhoIs on them */
 #define UMODE_CLIENT	 	0x0800	/* Show client information */
