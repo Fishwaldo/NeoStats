@@ -6,7 +6,7 @@ SOURCES= statserv.c ss_help.c database.c tld.c stats.c htmlstats.c
 OBJECTS= statserv.o ss_help.o database.o tld.o stats.o htmlstats.o
 TARGET= statserv.so
 HTML= html/index.tpl
-DISTFILES= $(SOURCES) $(HTML) ChangeLog statserv.h m_stats.h Makefile
+DISTFILES= $(SOURCES) $(HTML) ChangeLog statserv.h m_stats.h Makefile sqlstats.h
 
 all:	statserv
 

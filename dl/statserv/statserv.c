@@ -142,7 +142,9 @@ int __ModInit(int modnum, int apiver)
 	User *u;
 	hnode_t *node;
 	hscan_t scan;
+#ifdef SQLSRV
 	lnode_t *lnode;
+#endif
 	int count, i;
 	Chans *c;
 	char **av;

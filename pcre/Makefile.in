@@ -1,6 +1,6 @@
 #PCRE Makefile
 CC=@CC@
-CFLAGS=-I.. @CFLAGS@
+CFLAGS=-I.. @CFLAGS@ -fPIC -DPIC -DNEO_PREFIX=\"@prefix@\" 
 LDFLAGS= @LDFLAGS@
 INCLUDES=-I.. -I.
 

@@ -35,7 +35,9 @@
 
 static void cb_Server (char *, int);
 static void cb_Module (char *, int);
+#ifdef SQLSRV
 static void cb_SqlConf (char *, int);
+#endif
 
 /** @brief The list of modules to load
  */
