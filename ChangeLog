@@ -1,5 +1,13 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
-* NeoStast * Fish * Version 2.5.0-Alpha5
+* NeoStats * Shmad & Enigma * Version 2.5.0-Alpha5c
+ - Module Unlocking on segfaults now (Shmad)
+ - Moved modules to new core dir (damn you fish) (Shmad)
+ - Cleanup of old lock code (^Enigma^)
+
+* NeoStats * Fish * Version 2.5.0-Alpha5b
+ - Fixes with the autoconf/makefile stuff
+
+* NeoStats * Fish * Version 2.5.0-Alpha5
  - Updated the ./configure/Makefile setup. Full autoconf support now
  - NeoStats now installs into ~/NeoStats
  - Beta skeleton for add on modules to get NeoStats configuration from ~/NeoStats/include/*.h (include files)

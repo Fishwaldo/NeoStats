@@ -361,7 +361,6 @@ int load_module(char *path1, User *u) {
 	char *lock= NULL;
 	FILE *lockmod;
 	FILE *lmfile;
-	FILE *lockdbfile;
 
 	Module_Info * (*mod_get_info)() = NULL;
 	Functions * (*mod_get_funcs)() = NULL;
@@ -477,7 +476,6 @@ int load_module(char *path1, User *u) {
 	}
 
 	/* Lock .so Module File With 555 Permissions */
-	/* Shmad Perscribes 444 Perms */
 	lockmod = fopen("Neo-Lock.tmp","w");
 	fprintf(lockmod, "%s/%s", me.modpath, path);
 	fclose(lockmod);
@@ -493,13 +491,6 @@ int load_module(char *path1, User *u) {
 	remove("Neo-Lock.tmp");
 	chmod(lock, fmode);
 	/* End .so Module 555 Permission Setting */
-
-	/* Create List Of Loaded Modules */
-	/* we already have this in the module hash, do we need another one? */
-	lockdbfile = fopen("data/Lock.db", "a");
-	fprintf(lockdbfile, "%s\n", lock);
-	fclose(lockdbfile);
-	/* End List Creation Process */
 
 	if (do_msg) privmsg(u->nick,s_Services,"Module %s Loaded, Description: %s",mod_info_ptr->module_name,mod_info_ptr->module_description);
 	return 0;
@@ -591,7 +582,6 @@ int unload_module(char *module_name, User *u) {
 	}
 	strcpy(segv_location, "unload_unlock");
 	/* Unlock .so Module File to 755 Permissions */
-	/* Shmad Perscribes 666 */
 	modnme = fopen("Mod-Name.tmp","w");
 	fprintf(modnme, "%s", module_name);
 	fclose(modnme);
@@ -604,7 +594,6 @@ int unload_module(char *module_name, User *u) {
 	fclose(getmname);
 	remove("Mod-Name.tmp");
 
-	/* moduname = module_name; */
 	strlower(moduname);
 	lockmod = fopen("Neo-Lock.tmp","w");
 	fprintf(lockmod, "%s/%s.so", me.modpath, moduname);
@@ -618,10 +607,9 @@ int unload_module(char *module_name, User *u) {
 	fclose(lmfile);
 	remove("Neo-Lock.tmp");
 
-	      /* Set octal perms to 0755 so modules can be read, and wrote to. */
 	fmode = 0755;
 	chmod(lock, fmode);
-	   /* End .so Module 755 Permission Setting */
+	/* End .so Module 755 Permission Setting */
 
 	modnode = hash_lookup(mh, module_name);
 	if (modnode) {

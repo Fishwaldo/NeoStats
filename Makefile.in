@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.16 2002/03/15 12:38:37 fishwaldo Exp $
+# $Id: Makefile.in,v 1.17 2002/03/17 07:00:44 fishwaldo Exp $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
@@ -29,7 +29,7 @@ modules:
 
 clean:
 	(cd dl; $(MAKE) $@)
-	/bin/rm -rf *.o stats *.cache Makefile config.status config.h Makefile.inc
+	/bin/rm -rf *.o stats *.cache Makefile config.status config.h Makefile.inc *.log
 
 
 stats: $(OBJS)

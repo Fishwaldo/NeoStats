@@ -25,7 +25,7 @@
 
 char s_Debug[MAXNICK] = "Stats_Debug";
 char s_Services[MAXNICK] = "NeoStats";
-const char version[] = "NeoStats-2.5_Alpha5b";
+const char version[] = "NeoStats-2.5_Alpha5c";
 const char version_date[] = __DATE__;
 const char version_time[] = __TIME__;
 
@@ -148,7 +148,7 @@ RETSIGTYPE serv_segv() {
 		kill(forked, 3);
 		kill(forked, 9);
 		exit(-1);
-	        ssquit_cmd(me.name);
+		ssquit_cmd(me.name);
 	}
 }
 
@@ -187,23 +187,10 @@ static	void	setup_signals()
 /* Routine For Removing Chmod Lock On Modules */
 void RemoveLock()
 {
-	FILE *lckfile;
-	char buf[512];
 	int fmode;
-
-	strcpy(segv_location, "main_RemoveLock");
-
-	lckfile = fopen("data/Lock.db", "r");
-
-	if (lckfile) {
-	   while (fgets(buf, sizeof(buf), lckfile)) {
-		   buf[strlen(buf)] = '\0';
-	   fmode = 0755;
-	   chmod(buf, fmode);
-	   }
-	fclose(lckfile);
-	remove("data/Lock.db");
-	}
+	fmode = 0755;
+	chmod(me.modpath, fmode);
+	log("RemoveLock() called: We must be segging!");
 }
 
 
