@@ -608,6 +608,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 						"%s invalid setting for %s", av[3], set_ptr->option);
 					prefmsg(u->nick, bot_ptr->nick,
 						"Valid values are %d to %d", set_ptr->min, set_ptr->max);
+					return 1;
 				}
 			}
 			if(set_ptr->min != -1 && intval < set_ptr->min) {
