@@ -66,7 +66,7 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 statserv_la_LIBADD =
 am_statserv_la_OBJECTS = ss_help.lo stats.lo statserv.lo htmlstats.lo \
 	tld.lo channel.lo user.lo network.lo server.lo version.lo \
-	GeoIPCity.lo GeoIPBitReader.lo GeoIP.lo md5.lo
+	GeoIPCity.lo GeoIPBitReader.lo GeoIP.lo
 statserv_la_OBJECTS = $(am_statserv_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include -I$(top_builddir)/lib/gdbm
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
@@ -215,8 +215,7 @@ statserv_la_SOURCES = ss_help.c \
 			server.c server.h version.c version.h \
 			geoip/GeoIPCity.c geoip/GeoIPCity.h \
 			geoip/GeoIPBitReader.c geoip/GeoIPBitReader.h \
-			geoip/GeoIP.c geoip/GeoIP.h \
-			geoip/global.h geoip/md5.c geoip/md5.h 
+			geoip/GeoIP.c geoip/GeoIP.h geoip/global.h 
 
 statserv_la_LDFLAGS = -module -avoid-version -no-undefined
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/lib/keeper/ -I$(top_srcdir)/lib/adns/ -Igeoip -DGEOIPDATADIR=\"$(datadir)\" \
@@ -290,7 +289,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GeoIPCity.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/channel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/htmlstats.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md5.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/network.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ss_help.Plo@am__quote@
@@ -320,13 +318,6 @@ GeoIP.lo: geoip/GeoIP.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='geoip/GeoIP.c' object='GeoIP.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o GeoIP.lo `test -f 'geoip/GeoIP.c' || echo '$(srcdir)/'`geoip/GeoIP.c
-
-md5.lo: geoip/md5.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT md5.lo -MD -MP -MF "$(DEPDIR)/md5.Tpo" -c -o md5.lo `test -f 'geoip/md5.c' || echo '$(srcdir)/'`geoip/md5.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/md5.Tpo" "$(DEPDIR)/md5.Plo"; else rm -f "$(DEPDIR)/md5.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='geoip/md5.c' object='md5.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o md5.lo `test -f 'geoip/md5.c' || echo '$(srcdir)/'`geoip/md5.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -212,12 +212,6 @@
 			<File
 				RelativePath=".\geoipwin32\global.h">
 			</File>
-			<File
-				RelativePath=".\geoipwin32\md5.c">
-			</File>
-			<File
-				RelativePath=".\geoipwin32\md5.h">
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\html\index.tpl">

@@ -7,8 +7,7 @@ statserv_la_SOURCES	= ss_help.c \
 			server.c server.h version.c version.h \
 			geoip/GeoIPCity.c geoip/GeoIPCity.h \
 			geoip/GeoIPBitReader.c geoip/GeoIPBitReader.h \
-			geoip/GeoIP.c geoip/GeoIP.h \
-			geoip/global.h geoip/md5.c geoip/md5.h 
+			geoip/GeoIP.c geoip/GeoIP.h geoip/global.h 
 statserv_la_LDFLAGS	= -module -avoid-version -no-undefined
 AM_CFLAGS		= @PCRE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/lib/keeper/ -I$(top_srcdir)/lib/adns/ -Igeoip -DGEOIPDATADIR=\"$(datadir)\" \
 			-DSYSCONFDIR=\"$(sysconfdir)\"
