@@ -163,13 +163,21 @@ UserModes user_umodes[] = {
 	{UMODE_KIX, 'q', 0},
 	{UMODE_BOT, 'B', 0},
 	{UMODE_DEAF, 'd', 0},
-#ifndef UNREAL32
+#ifdef UNREAL32
+	{UMODE_RGSTRONLY, 'R', 0},
+ 	{UMODE_NOCTCP, 'T', 0},
+	{UMODE_WEBTV, 'V', 0},
+	{UMODE_HIDEWHOIS, 'p', 0},
+#else 
 	{UMODE_KILLS, 'k', 0},
 	{UMODE_EYES, 'e', 0},
 	{UMODE_FCLIENT, 'F', 0},
 	{UMODE_CLIENT, 'c', 0},
 	{UMODE_FLOOD, 'f', 0},
+	{UMODE_JUNK, 'j', 0},
 #endif
+	{UMODE_STRIPBADWORDS, 'G', 0},
+	{UMODE_SETHOST, 't', 0},
 	{UMODE_REGNICK, 'r', 0},
 	{UMODE_HIDE, 'x', 0},
 	/*{UMODE_CHATOP, 'b', 0},*/
