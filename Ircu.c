@@ -114,6 +114,11 @@ const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
+/* Temporary buffers for numeric conversion */
+char servlist[4096][MAXHOST];
+char nicklist[4096][MAXNICK];
+int neonumeric;
+
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
  *
@@ -192,10 +197,13 @@ static const unsigned int convert2n[] = {
 unsigned int base64toint(const char* s)
 {
 	unsigned int i = convert2n[(unsigned char) *s++];
+	nlog (LOG_DEBUG2, LOG_CORE, "base64toint: %s", s);
 	while (*s) {
 		i <<= NUMNICKLOG;
 		i += convert2n[(unsigned char) *s++];
 	}
+	nlog (LOG_DEBUG2, LOG_CORE, "base64toint: %d", i);
+
 	return i;
 }
 
@@ -214,8 +222,23 @@ inttobase64(cli_yxx(c), numeric, 2) */
 
 /* nick
 inttobase64(cli_yxx(cptr), last_nn, 3) */
-
-
+/*
+DEBUG2 CORE - SENT: PASS password
+DEBUG2 CORE - SENT: SERVER stats.mark.net 1 1076012166 1076012166 P10 CD] :[stats.mark.net] NeoStats 2.5 IRC Statistical Server!
+DEBUG3 CORE - Sendings pings...
+DEBUG1 CORE - R: PASS :password
+DEBUG1 CORE - R: SERVER mark.local.org 1 1076002125 1076012166 J10 ABAP] + :me
+DEBUG1 CORE - New Server: mark.local.org
+DEBUG1 CORE - R: AB N Mark 1 1076011621 a 192.168.238.13 DAqO4N ABAAB :M
+DEBUG1 CORE - R: AB EB
+DEBUG1 CORE - R: AB G !1076012256.68240 stats.mark.net 1076012256.68240
+DEBUG3 CORE - Sendings pings...
+DEBUG2 CORE - SENT: :stats.mark.net PING stats.mark.net :mark.local.org
+DEBUG1 CORE - R: AB Z AB :stats.mark.net
+DEBUG1 CORE - R: AB SQ mark.local.org 0 :Ping timeout
+DEBUG3 CORE - Sendings pings...
+DEBUG2 CORE - SENT: :stats.mark.net PING stats.mark.net :mark.local.org
+*/
 
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
@@ -228,8 +251,10 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 {
 	send_cmd ("%s %s", MSG_PASS, pass);
     send_cmd ("%s %s 1 %lu %lu P10 %cD] :[%s] %s\n", MSG_SERVER, name, (unsigned long)time(NULL), (unsigned long)time(NULL), convert2y[numeric], name,  infoline);
+	neonumeric = numeric;
 }
 
+/* R: AB SQ mark.local.org 0 :Ping timeout */
 void
 send_squit (const char *server, const char *quitmsg)
 {
@@ -325,6 +350,12 @@ send_wallops (const char *who, const char *buf)
 }
 
 void
+send_end_of_burst(void)
+{
+	send_cmd ("%c %s", convert2y[neonumeric], TOK_END_OF_BURST);
+}
+
+void
 send_burst (int b)
 {
 	if (b == 0) {
@@ -412,19 +443,26 @@ m_admin (char *origin, char **argv, int argc, int srv)
  * argv[argc-1] = serverinfo
  * NumServ(sptr) SERVER name hop 0 TSL PROT YxxCap 0 :info
  */
-
+/* SERVER mark.local.org 1 1076002125 1076012166 J10 ABAP] + :me */
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
+	char buf[3];
+	nlog (LOG_DEBUG2, LOG_CORE, "m_server: %s", argv[5]);
+	buf[0] = argv[5][0];
+	buf[1] = argv[5][1];
+	buf[2] = '\0';
+	strlcpy(servlist[base64toint(buf)], argv[0], MAXHOST);
 	do_server (argv[0], origin, argv[1], NULL, argv[argc-1], srv);
 }
 
+/* R: AB SQ mark.local.org 0 :Ping timeout */
 static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	do_squit (argv[0], tmpbuf);
+	tmpbuf = joinbuf(argv, argc, 3);
+	do_squit (argv[1], tmpbuf);
 	free(tmpbuf);
 }
 
@@ -472,14 +510,33 @@ m_away (char *origin, char **argv, int argc, int srv)
 		do_away (origin, NULL);
 	}
 }
+
+/*
+1 <nickname>
+2 <hops>
+3 <TS>
+4 <userid>
+5 <host>
+6 [<+modes>]
+7+ [<mode parameters>]
+-3 <base64 IP>
+-2 <numeric>
+-1 <fullname>
+*/
+/* R: AB N Mark 1 1076011621 a xxx.xxx.xxx.xxx DAqO4N ABAAB :M */
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 		char *realname;
-		realname = joinbuf (argv, argc, 7);
-		do_nick (argv[0], argv[1], argv[2], argv[4], argv[5], 
-			argv[6], NULL, NULL, argv[3], NULL, realname);
+		char buf[3];
+		buf[0] = origin[0];
+		buf[1] = origin[1];
+		buf[2] = '\0';
+		realname = joinbuf (argv, argc, (argc - 1));
+		nlog (LOG_DEBUG2, LOG_CORE, "m_nick: %s", buf);
+        do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
+			servlist[base64toint(buf)], NULL, NULL, NULL, NULL, realname);
 		free (realname);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
@@ -531,6 +588,7 @@ m_pass (char *origin, char **argv, int argc, int srv)
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
+	send_end_of_burst();
 }
 
 /* Override the core splitbuf and parse functions until 
@@ -575,7 +633,7 @@ parse (char *line)
 	char origin[64], cmd[64], *coreLine;
 	int cmdptr = 0;
 	int ac;
-	char **av;
+	char **av = NULL;
 
 	SET_SEGV_LOCATION();
 	strip (line);
@@ -583,29 +641,40 @@ parse (char *line)
 	if (!(*line))
 		return;
 	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
-	if (!*line)
-		return;
 	coreLine = strpbrk (line, " ");
 	if (coreLine) {
 		*coreLine = 0;
 		while (isspace (*++coreLine));
 	} else
 		coreLine = line + strlen (line);
+	nlog (LOG_DEBUG1, LOG_CORE, "coreLine %s ", coreLine);
+	nlog (LOG_DEBUG1, LOG_CORE, "line %s", line);
+	nlog (LOG_DEBUG1, LOG_CORE, "====================");
 	if ((!ircstrcasecmp(line, "SERVER")) || (!ircstrcasecmp(line, "PASS"))) {
 		strlcpy(cmd, line, sizeof(cmd));
+		nlog (LOG_DEBUG1, LOG_CORE, "cmd %s", cmd);
+		nlog (LOG_DEBUG1, LOG_CORE, "coreLine %s", coreLine);
 		ac = splitbuf(coreLine, &av, 1);
 		cmdptr = 0;
+		nlog (LOG_DEBUG1, LOG_CORE, "0 %d", ac);
 	} else {
 		strlcpy(origin, line, sizeof(origin));	
-		cmdptr = 1;
+		cmdptr = 0;
 		line = strpbrk (coreLine, " ");
 		if (line) {
 			*line = 0;
 			while (isspace (*++line));
-		} else
-			coreLine = line + strlen (line);
-		ac = splitbuf(line, &av, 0);
+		} /*else
+			coreLine = line + strlen (line);*/
+		strlcpy(cmd, coreLine, sizeof(cmd));
+		nlog (LOG_DEBUG1, LOG_CORE, "origin %s", origin);
+		nlog (LOG_DEBUG1, LOG_CORE, "cmd %s", cmd);
+		nlog (LOG_DEBUG1, LOG_CORE, "line %s", line);
+		if(line) ac = splitbuf(line, &av, 0);
+		nlog (LOG_DEBUG1, LOG_CORE, "0 %d", ac);
 	}
+	nlog (LOG_DEBUG1, LOG_CORE, "====================");
+
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	free (av);
+	if(av) free (av);
 }

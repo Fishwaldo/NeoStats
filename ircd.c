@@ -62,6 +62,10 @@ static int signon_newbot (const char *nick, const char *user, const char *host, 
 void
 init_ircd ()
 {
+#ifdef IRCU
+	/* Temp: force tokens for IRCU */
+	ircd_srv.token = 1;
+#endif
 	services_bot_umode = UmodeStringToMask(services_bot_modes, 0);
 };
 
