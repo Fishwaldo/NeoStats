@@ -14,9 +14,9 @@
 <?php
     // comment this out if your PHP includes postgresql client support
     dl("pgsql.so");
-    $tbl    = htmlentities($_GET[table]);
-    $offset = htmlentities($_GET[offset]);
-    $nrows  = htmlentities($_GET[nrows]);
+    $tbl    = htmlentities($_GET['table']);
+    $offset = htmlentities($_GET['offset']);
+    $nrows  = htmlentities($_GET['nrows']);
     print("<h3><center>$tbl</center></h3>\n");
 
     // Suppress Postgres error messages
