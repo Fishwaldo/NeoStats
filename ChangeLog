@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.prealpha3-dev
+ - Add WEEKLY and MONTHLY options to timer API. (M)
  - HostServ: ban use of "*" as realhost mask since this is a potential security 
    risk. (M)
  - Updated handler systems so that a caller can "break" the list loop. (M)

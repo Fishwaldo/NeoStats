@@ -300,14 +300,16 @@ ns_cmd_timerlist (CmdParams* cmdparams)
 static void
 run_mod_timers (int ismidnight)
 {
+	struct tm *ts;
 	int deleteme = 0;
 	Timer *timer = NULL;
-	hscan_t ts;
+	hscan_t tscan;
 	hnode_t *tn;
 
+	ts = gmtime(&me.now);
 	/* First, lets see if any modules have a function that is due to run..... */
-	hash_scan_begin (&ts, timerhash);
-	while ((tn = hash_scan_next (&ts)) != NULL) {
+	hash_scan_begin (&tscan, timerhash);
+	while ((tn = hash_scan_next (&tscan)) != NULL) {
 		SET_SEGV_LOCATION();
 		timer = hnode_get (tn);
 		/* If a module is not yet synched, reset it's lastrun */
@@ -315,8 +317,21 @@ run_mod_timers (int ismidnight)
 			timer->lastrun = (int) me.now;
 		} else {
 			switch (timer->type) {
+				/* TIMER_TYPE_DAILY */
 				case TIMER_TYPE_MIDNIGHT:
 					if (!ismidnight)
+						continue;
+					break;
+				case TIMER_TYPE_WEEKLY:
+					if (!ismidnight)
+						continue;
+					if (ts->tm_wday != 0)
+						continue;
+					break;
+				case TIMER_TYPE_MONTHLY:
+					if (!ismidnight)
+						continue;
+					if (ts->tm_mday != 1)
 						continue;
 					break;
 				case TIMER_TYPE_INTERVAL:

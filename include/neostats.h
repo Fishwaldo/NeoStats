@@ -791,7 +791,7 @@ typedef struct bot_setting {
 /** @brief Message function types
  * 
  */
-typedef int (*timer_function) (void);
+typedef int (*timer_function) ();
 
 /** @brief Socket function types
  * 
@@ -950,6 +950,9 @@ typedef struct Sock {
 typedef enum TIMER_TYPE {
 	TIMER_TYPE_INTERVAL,
 	TIMER_TYPE_MIDNIGHT,
+	TIMER_TYPE_DAILY = TIMER_TYPE_MIDNIGHT,
+	TIMER_TYPE_WEEKLY,
+	TIMER_TYPE_MONTHLY,
 	TIMER_TYPE_COUNTDOWN,
 } TIMER_TYPE;
 
