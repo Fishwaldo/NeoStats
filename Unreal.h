@@ -63,6 +63,11 @@
 #define GOTSVSKILL
 /* we have automatic host cloaking support via Umode */
 #define GOTUMODECLOAKING
+/* we dont have a nickip field in the nick message */
+#undef GOTNICKIP
+
+
+
 
 /* buffer sizes */
 #define MAXHOST			(128 + 1)

@@ -36,6 +36,11 @@
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
+#ifndef GOTNICKIP
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif                     
 
 hash_t *uh;
 
@@ -68,6 +73,21 @@ new_user (const char *nick)
 	return (u);
 }
 
+static void 
+lookupnickip(char *data, adns_answer *a) {
+	User *u;
+	char **av;
+	int ac = 0;
+	
+	u = finduser((char *)data);
+	if (a && a->nrrs > 0 && u && a->status == adns_s_ok) {
+		u->ipaddr.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
+printf("%s\n", inet_ntoa(u->ipaddr));
+		AddStringToList (&av, u->nick, &ac);
+		ModuleEvent (EVENT_GOTNICKIP, av, ac);
+	}
+}
+
 void
 AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric)
 {
@@ -77,6 +97,10 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	int ac = 0;
 	User *u;
 	int i;
+#ifndef GOTNICKIP
+	struct in_addr *ipad;
+	int res;
+#endif
 
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
@@ -85,10 +109,29 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 		return;
 	}
 
-	if(ip) {
+	if(0) {
 		ipaddress = strtoul (ip, NULL, 10);
 	} else {
-		ipaddress = 0;
+#ifndef GOTNICKIP
+		if (me.want_nickip == 1) {
+			/* first, if the u->host is a ip address, just convert it */
+			ipad = malloc(sizeof(struct in_addr));
+			res = inet_aton(host, ipad);
+			if (res > 0) {
+				/* its valid */
+				ipaddress = ipad->s_addr;
+				free(ipad);
+			} else {		
+				/* kick of a dns reverse lookup for this host */
+				dns_lookup((char *)host, adns_r_addr, lookupnickip, (void *)nick);
+				ipaddress = 0;
+			}		
+		} else {
+			ipaddress = 0;
+		}
+#else
+	ipaddress = 0;
+#endif
 	}
 	if(TS) {
 		time = strtoul (TS, NULL, 10);
@@ -139,6 +182,10 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 
 	AddStringToList (&av, u->nick, &ac);
 	ModuleEvent (EVENT_SIGNON, av, ac);
+	if (me.want_nickip == 1 && ipaddress != 0) {
+		/* only fire this event if we have the nickip and some module wants it */
+		ModuleEvent (EVENT_GOTNICKIP, av, ac);
+	}
 	free (av);
 }
 

@@ -267,3 +267,15 @@
  */
 #define EVENT_DELBAN "DELBAN"
 
+/* EVENT_GOTNICKIP
+ * fired when we get the IP address of a user
+ * only fired if me.want_nickip = 1 and:
+ * the ircd sends the nickip as part of the connect message
+ * or
+ * a dns lookup completes and is successfull
+ * 
+ * Parameters:
+ *	av[0] nick
+ */
+ 
+#define EVENT_GOTNICKIP "NICKIP"

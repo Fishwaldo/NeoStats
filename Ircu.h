@@ -66,6 +66,8 @@
 #undef GOTSVSKILL
 /* we don't have automatic host cloaking support via Umode */
 #undef GOTUMODECLOAKING
+/* we have nickip support */
+#define GOTNICKIP
 
 /* Override NeoStats core splitbuf function */
 /* #define IRCD_SPLITBUF */

@@ -60,6 +60,8 @@
 #define GOTSVSKILL
 /* we don't have automatic host cloaking support via Umode */
 #undef GOTUMODECLOAKING
+/* we dont have a nickip field in the nick message */
+#undef GOTNICKIP
 
 #else /* !ULTIMATE3 */
 
@@ -91,6 +93,8 @@
 #undef GOTUSERSMODES
 /* we don't have automatic host cloaking support via Umode */
 #undef GOTUMODECLOAKING
+/* we dont have a nickip field in the nick message */
+#undef GOTNICKIP
 
 #endif /* ULTIMATE3 */
 

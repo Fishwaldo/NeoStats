@@ -228,7 +228,7 @@
 #define T_TABLE_SIZE	300	/* Number of Timers */
 #define B_TABLE_SIZE	100	/* Number of Bots */
 #define MAXMODES		-1
-#define DNS_QUEUE_SIZE  100	/* number on concurrent DNS lookups */
+#define DNS_QUEUE_SIZE  300	/* number on concurrent DNS lookups */
 #define MAX_TRANSFERS	10	/* number of curl transfers */
 
 #define bzero(x, y)		memset(x, '\0', y);
@@ -375,6 +375,7 @@ struct me {
 	unsigned int onlyopers:1;
 	unsigned int die:1;
 	unsigned int debug_mode:1;
+	unsigned int want_nickip:1;
 #if defined(ULTIMATE3) || defined(QUANTUM)
 	unsigned int client:1;
 #endif

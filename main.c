@@ -121,6 +121,7 @@ main (int argc, char *argv[])
 	me.now = time(NULL);
 	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%ld", (long)me.now);
 	me.want_privmsg = 0;
+	me.want_nickip = 0;
 	me.die = 0;
 	me.local[0] = '\0';
 	me.debug_mode = 0;

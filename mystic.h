@@ -64,6 +64,8 @@
 #define GOTSVSKILL
 /* we don't have automatic host cloaking support via Umode */
 #undef GOTUMODECLOAKING
+/* we dont have nickip */
+#undef GOTNICKIP
 
 /* buffer sizes */
 #define MAXHOST			(75 + 1)
