@@ -6,9 +6,14 @@ Shmad <shmad@neostats.net>
 + Write to DB who added the record.
 + VIEW # now shows also who added the record.
 + hostserv.h now contains defines for access for each function.
-+ Fixed a segfault when upgrading from earlier versions if a passwd field wasnt present.
-+ Made it possible to configure the levels for each command due to different people wanting different levels... :) removed Shmads old hostserv.h
-+ Moved HostServ to use NeoStats hash system to store data. More efficient and nicer than righting and reading and moving files around... 
++ Fixed a segfault when upgrading from earlier versions if a
+  passwd field wasnt present.
++ Made it possible to configure the levels for each command due
+  to different people wanting different levels... :) removed
+  Shmads old hostserv.h
++ Moved HostServ to use NeoStats hash system to store data.
+  More efficient and nicer than righting and reading and 
+  moving files around... 
 + Added Banned Vhost support to HostServ...
 + Added ChangePassword Ability to HostServ
  
