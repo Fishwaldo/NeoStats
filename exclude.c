@@ -63,12 +63,14 @@ int init_exclude_list() {
 			bzero(e, sizeof(excludes));
 			if (GetData((void *)&tmp, CFGSTR, "Exclusions", row[i], "Pattern") > 0) {
 				strlcpy(e->pattern, tmp, MAXHOST);
+				free (tmp);
 			} else {
 				nlog(LOG_WARNING, LOG_CORE, "Exclusions: Can't add entry %s, Pattern invalid", row[i]);
 				continue;
 			}
 			if (GetData((void *)&tmp, CFGSTR, "Exclusions", row[i], "AddedBy") > 0) {
 				strlcpy(e->addedby, tmp, MAXNICK);
+				free (tmp);
 			}
 			e->addedon = atoi(row[i]);
 			GetData((void *)&e->type, CFGINT, "Exclusions", row[i], "Type");
