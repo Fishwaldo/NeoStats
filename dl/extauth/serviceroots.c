@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: serviceroots.c,v 1.7 2002/12/13 11:19:48 fishwaldo Exp $
+** $Id: serviceroots.c,v 1.8 2003/01/06 12:07:26 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -76,7 +76,7 @@ int new_m_version(char *origin, char **av, int ac) {
     return 0;
 }
 
-void _init() {
+static void _init() {
 	srconf.auth=0;
 	/* only a max of 10 serviceroots */
 	srconf.ul = list_create(10);
@@ -85,7 +85,7 @@ void _init() {
 	}	
 }
 
-void _fini() {
+static void _fini() {
 	lnode_t *un;
 	un = list_first(srconf.ul);
 	while (un) {

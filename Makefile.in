@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.29 2002/12/14 09:14:21 fishwaldo Exp $
+# $Id: Makefile.in,v 1.30 2003/01/06 12:07:25 fishwaldo Exp $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
@@ -73,5 +73,5 @@ server.o:	server.c	stats.h		hash.h		hash.c	 	config.h	Makefile.inc
 Ultimate.o:	Ultimate.c	stats.h		Ultimate.h	Makefile.inc
 Unreal.o:	Unreal.c	stats.h		Unreal.h	Makefile.inc
 chans.o:	hash.c		stats.h		Makefile.inc
-hybrid7.c:	hybrid7.c	stats.h		hybrid7.h	Makefile.inc
+hybrid7.o:	hybrid7.c	stats.h		hybrid7.h	Makefile.inc
 neoircd.o:	neoircd.c	stats.h		neoircd.h	Makefile.inc

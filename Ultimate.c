@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.33 2003/01/04 04:46:58 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.34 2003/01/06 12:07:25 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -59,34 +59,49 @@ aCtab cFlagTab[] = {
 
 #ifdef ULTIMATE3
 Oper_Modes usr_mds[] = {
-				 {UMODE_OPER, 'o', 50},
-                                 {UMODE_LOCOP, 'O', 40},
+				 {UMODE_OPER, 'O', 50},
+                                 {UMODE_LOCOP, 'o', 40},
                                  {UMODE_INVISIBLE, 'i', 0},
                                  {UMODE_WALLOP, 'w', 0},
+                                 {UMODE_SERVNOTICE, 's', 0},
+                                 {UMODE_CLIENT, 'c', 0},
+                                 {UMODE_REGNICK, 'r',10},
+                                 {UMODE_KILLS, 'k',0},
                                  {UMODE_FAILOP, 'g', 0},
                                  {UMODE_HELPOP, 'h', 30},
-                                 {UMODE_SERVNOTICE, 's',0},
-                                 {UMODE_KILLS, 'k',0},
-                                 {UMODE_SERVICES, 'S',200},
-                                 {UMODE_SERVICESADMIN, 'P',200},
-				 {UMODE_SERVADMIN, 'A', 100},
-				 {UMODE_RBOT, 'B',0},
-		 		 {UMODE_SBOT, 'b', 0},
-	   			 {UMODE_DEAF,    'd',0},
-                                 {UMODE_ADMIN, 'z',70},
-                                 {UMODE_NETADMIN, 't',185},
-				 {UMODE_TECHADMIN, 'T',190},
-                                 {UMODE_CLIENT, 'c',0},
-                                 {UMODE_FLOOD, 'f',0},
-                                 {UMODE_REGNICK, 'r',0},
-                                 {UMODE_HIDE,    'x',0},
-				 {UMODE_WATCHER, 'W',0},
+				 {UMODE_FLOOD, 'f', 0},
+		 		 {UMODE_SPY, 'y', 0},
+				 {UMODE_DCC, 'D', 0},
+		 		 {UMODE_GLOBOPS, 'g', 0},
+	 	 		 {UMODE_CHATOP, 'c', 0},
 		 		 {UMODE_SERVICESOPER, 'a', 100},
-	 	 		 {UMODE_SUPER, 'p', 40},
-				 {UMODE_IRCADMIN, 'Z', 100},
-				 {UMODE_DEAF, 'd', 0},
-                                 {0, 0, 0 }
+				 {UMODE_REJ, 'j', 0},
+		 		 {UMODE_ROUTE, 'n', 0},
+				 {UMODE_SPAM, 'm', 0},
+                                 {UMODE_HIDE,    'x',0},
+				 {UMODE_IRCADMIN, 'Z', 200},
+                                 {UMODE_SERVICESADMIN, 'P',200},
+                                 {UMODE_SERVICES, 'S',200},
+				 {UMODE_PROT, 'p', 0},
+		 		 {UMODE_GLOBCON, 'F', 0},
+	   			 {UMODE_DEBUG,    'd',0},
+				 {UMODE_DCCWARN, 'd', 0},
+		 		 {UMODE_WHOIS, 'W', 0},
+	 	 		 {0, 0, 0}
 };
+
+Oper_Modes susr_mds[] = {
+				 {SMODE_SSL, 's', 0},
+		 		 {SMODE_COADMIN, 'a', 75},
+	 	 		 {SMODE_SERVADMIN, 'A', 100},
+				 {SMODE_COTECH, 't', 125},
+		 		 {SMODE_TECHADMIN, 'T', 150},
+	 	 		 {SMODE_CONET, 'n', 175},
+				 {SMODE_NETADMIN, 'N', 190},
+		 		 {SMODE_GUEST, 'G', 100},
+				 {0, 0, 0}
+};				
+						
 #elif ULTIMATE
 Oper_Modes usr_mds[] = {
                                  {UMODE_OPER, 'o', 50},
@@ -139,7 +154,7 @@ int slogin_cmd(const char *name, const int numeric, const char *infoline, const 
 	sts("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
 #else
 	sts("%s %s :TS", (me.token ? TOK_PASS : MSG_PASS), pass);
-	sts("CAPAB TS5 BURST SSJ5 NICKIP");
+	sts("CAPAB TS5 BURST SSJ5 NICKIP CLIENT");
 #endif
 	sts("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 	return 1;
@@ -235,7 +250,11 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host, const ch
 	}
 	sts("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), newmode, ident, host, me.name, time(NULL), realname);
 	AddUser(nick,ident, host, me.name, 0, time(NULL));
+#ifdef ULTIMATE3
+	UserMode(nick, newmode, 0);
+#else
 	UserMode(nick, newmode);
+#endif
 #endif
 	return 1;
 }  
@@ -256,7 +275,11 @@ int sumode_cmd(const char *who, const char *target, long mode) {
 		}
 	}
 	sts(":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, newmode);
+#ifdef ULTIMATE3
+	UserMode(target, newmode, 0);
+#else
 	UserMode(target, newmode);
+#endif
 	return 1;
 }
 

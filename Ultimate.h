@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.h,v 1.13 2002/12/30 12:09:38 fishwaldo Exp $
+** $Id: Ultimate.h,v 1.14 2003/01/06 12:07:25 fishwaldo Exp $
 */
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
@@ -313,6 +313,7 @@
 #define MSG_CAPAB	"CAPAB"
 #define MSG_BURST	"BURST"
 #define MSG_SJOIN	"SJOIN"
+#define MSG_CLIENT	"CLIENT"
 
 
 
@@ -323,7 +324,32 @@
 #define UMODE_HELPOP	 	0x0010 /* Help system operator */
 #define UMODE_REGNICK	 	0x0020 /* Nick set by services as registered */
 #define UMODE_SERVICESOPER	0x0040 /* Services Oper */
+#ifndef ULTIMATE3
 #define UMODE_ADMIN	 	0x0080 /* Admin */
+#define UMODE_NETADMIN  	0x10000 /* Network Admin */
+#define	UMODE_SUPER		0x20000 /* Oper Is Protected from Kick's and Kill's */
+#define UMODE_RBOT      	0x40000 /* Marks the client as a Registered Bot */
+#define UMODE_SBOT      	0x80000 /* Marks the client as a Server Bot */
+#define UMODE_NGLOBAL  		0x100000 /* See Network Globals */
+#define UMODE_NETINFO  		0x400000 /* Server link, Delink Notces etc. */
+#define UMODE_MAGICK   		0x800000 /* Allows Opers To See +s and +p Channels */
+#define UMODE_WATCHER		0x4000000 /* Recive Monitor Globals */
+#define UMODE_NETMON		0x8000000 /* Marks the client as an Network Monitor */
+#define UMODE_SERVADMIN		0x40000000 /* Marks the client as a Server Admin */
+#define UMODE_TECHADMIN		0x80000000 /* Marks the client as a Technical Admin */
+#define UMODE_DEAF		0x100000000 /* client is deaf on channels */
+#else
+#define UMODE_SPY		0x0080 /* Oper Spy */
+#define UMODE_DCC		0x10000 /* Oper DCC Notices */
+#define UMODE_GLOBOPS		0x20000 /* send/recv global notices */
+#define UMODE_REJ		0x40000 /* see DCC reject notices */
+#define UMODE_ROUTE		0x80000 /* see Routing Notices */
+#define UMODE_SPAM		0x100000 /* see spambot warnings */
+#define UMODE_PROT		0x400000 /* protected IRC op */
+#define UMODE_GLOBCON		0x800000 /* Global Connect notices */
+#define UMODE_DEBUG		0x4000000 /* see debug notices */
+#define UMODE_DCCWARN		0x8000000 /* see DCC warnings */
+#endif
 
 #define	UMODE_SERVNOTICE 	0x0100 /* server notices such as kill */
 #define	UMODE_LOCOP      	0x0200 /* Local operator -- SRB */
@@ -333,23 +359,23 @@
 #define UMODE_CHATOP	 	0x2000 /* can receive chatops */
 #define UMODE_SERVICES   	0x4000 /* services */
 #define UMODE_HIDE	 	0x8000 /* Hide from Nukes */
-#define UMODE_NETADMIN  	0x10000 /* Network Admin */
-#define	UMODE_SUPER		0x20000 /* Oper Is Protected from Kick's and Kill's */
-#define UMODE_RBOT      	0x40000 /* Marks the client as a Registered Bot */
-#define UMODE_SBOT      	0x80000 /* Marks the client as a Server Bot */
-#define UMODE_NGLOBAL  		0x100000 /* See Network Globals */
 #define UMODE_WHOIS    		0x200000 /* Lets Opers see when people do a /WhoIs on them */
-#define UMODE_NETINFO  		0x400000 /* Server link, Delink Notces etc. */
-#define UMODE_MAGICK   		0x800000 /* Allows Opers To See +s and +p Channels */
 #define UMODE_IRCADMIN 		0x1000000 /* Marks the client as an IRC Administrator */
 #define UMODE_SERVICESADMIN	0x2000000 /* Marks the client as a Services Administrator */
-#define UMODE_WATCHER		0x4000000 /* Recive Monitor Globals */
-#define UMODE_NETMON		0x8000000 /* Marks the client as an Network Monitor */
-#define UMODE_SERVADMIN		0x10000000 /* Marks the client as a Server Admin */
-#define UMODE_TECHADMIN		0x20000000 /* Marks the client as a Technical Admin */
-#define UMODE_DEAF		0x40000000 /* client is deaf on channels */
 
-#define	MODE_CHANOP	0x0001
+
+
+#define SMODE_SSL		0x1 /* ssl client */
+#define SMODE_COADMIN		0x2 /* co admin on a server */
+#define SMODE_SERVADMIN		0x4 /* server admin */
+#define SMODE_COTECH		0x8 /* co-tech admin */
+#define SMODE_TECHADMIN		0x10 /* tech administrator */
+#define SMODE_CONET		0x20 /* Co-Network Admin */
+#define SMODE_NETADMIN		0x40 /* Network Admin */
+#define SMODE_GUEST		0x80 /* Guest Admin */
+
+
+#define MODE_CHANOP	0x0001
 #define MODE_HALFOP	0x0002
 #define	MODE_VOICE	0x0004
 #define	MODE_PRIVATE	0x0008
@@ -407,8 +433,12 @@ typedef struct {
 
 
 aCtab cFlagTab[33];
+#ifdef ULTIMATE3
+Oper_Modes usr_mds[29];
+Oper_Modes susr_mds[9];
+#else
 Oper_Modes usr_mds[27];
-
+#endif
 
 
 

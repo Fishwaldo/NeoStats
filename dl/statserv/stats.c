@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.30 2002/12/30 12:09:38 fishwaldo Exp $
+** $Id: stats.c,v 1.31 2003/01/06 12:07:27 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -37,7 +37,7 @@ int ok_to_wallop() {
 			return -1;
 	} else {
 		lasttime = time(NULL);
-		count = -1;
+		count = 0;
 	}
 	return 1;
 	

@@ -18,6 +18,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Ultimate3 now uses SJOIN to join channels
  - Fixed a bug with RELOAD
  - StatServ updates 
+ - Ultimate Smode (a28) added, but what did I break?
 
 * NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 2 
  - Misc. Updates (S)

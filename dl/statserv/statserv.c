@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.57 2002/12/30 12:12:24 fishwaldo Exp $
+** $Id: statserv.c,v 1.58 2003/01/06 12:07:27 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -173,7 +173,8 @@ void _init() {
 		chanalert(s_Services, "Error, Statserv could not be configured");
 		return;
 	}
-	if (StatServ.html) {
+
+		if (StatServ.html) {
 		if (strlen(StatServ.htmlpath) < 1) {
 			log("StatServ HTML stats is disabled, as HTML_PATH is not set in the config file");
 			StatServ.html = 0;

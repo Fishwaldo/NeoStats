@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.76 2002/12/26 14:15:07 fishwaldo Exp $
+** $Id: main.c,v 1.77 2003/01/06 12:07:25 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -106,6 +106,9 @@ int main()
 	me.synced = 0;
 	me.onchan = 0;
 	me.maxsocks = getmaxsock();
+#ifdef ULTIMATE3
+	me.client = 0;
+#endif
 	strcpy(me.modpath,"dl");
 #ifdef RECVLOG
 	remove("logs/recv.log");
@@ -377,7 +380,7 @@ void login()
 	{
 	strcpy(segv_location, "login");
 	slogin_cmd(me.name, 1, me.infoline, me.pass);
-	sprotocol_cmd("TOKEN");
+	sprotocol_cmd("TOKEN CLIENT");
 }
 
 /** @brief Our Own implementation of Malloc.

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.40 2002/12/13 09:23:55 fishwaldo Exp $
+** $Id: users.c,v 1.41 2003/01/06 12:07:25 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -237,9 +237,23 @@ int UserLevel(User *u) {
 	strcpy(segv_location, "UserLevel");	
 	for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 	
 		if (u->Umode & usr_mds[i].umodes) {
-			if (usr_mds[i].level > tmplvl) tmplvl = usr_mds[i].level;
+			if (usr_mds[i].level > tmplvl) 	tmplvl = usr_mds[i].level;
 		}
 	}
+#ifdef DEBUG
+	log("Umode Level for %s is %d", u->nick, tmplvl);
+#endif
+/* I hate SMODEs damn it */
+#ifdef ULTIMATE3
+	for (i=0; i < ((sizeof(susr_mds) / sizeof(susr_mds[0])) -1); i++) {
+		if (u->Smode & susr_mds[i].umodes) {
+			if (susr_mds[i].level > tmplvl) tmplvl = susr_mds[i].level;
+		}
+	}
+#endif
+#ifdef DEBUG
+	log("Smode Level for %s is %d", u->nick, tmplvl);
+#endif
 #ifdef DEBUG
 #ifdef CODERHACK
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
@@ -269,8 +283,11 @@ int UserLevel(User *u) {
 }
 
 
-
+#ifdef ULTIMATE3
+void UserMode(const char *nick, const char *modes, int smode)
+#else
 void UserMode(const char *nick, const char *modes)
+#endif
 {
 	/* I don't know why, but I spent like 3 hours trying to make this function work and 
 	   I finally got it... what a waste of time... gah, oh well... basically, it sets both the User Flags, and also the User Levels.. 
@@ -289,6 +306,11 @@ void UserMode(const char *nick, const char *modes)
 		return;
 	}
 #ifdef DEBUG
+#ifdef ULTIMATE3
+	if (smode)
+		log("Smodes: %s", modes);
+	else 
+#endif
 	log("Modes: %s", modes);
 #endif
 	strcpy(u->modes, modes);
@@ -297,21 +319,42 @@ void UserMode(const char *nick, const char *modes)
 		switch(tmpmode) {
 			case '+'	: add = 1; break;
 			case '-'	: add = 0; break;
-			default		: for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 
-						if (usr_mds[i].mode == tmpmode) {
-							if (add) {
-								u->Umode |= usr_mds[i].umodes;
-								break;
-							} else { 
-								u->Umode &= ~usr_mds[i].umodes;
-								break;
-							}				
-						}
-				 	}
+			default		: 
+#ifdef ULTIMATE3
+					if (smode) {
+						for (i=0; i < ((sizeof(susr_mds) / sizeof(susr_mds[0])) -1);i++) { 
+							if (susr_mds[i].mode == tmpmode) {
+								if (add) {
+									u->Smode |= susr_mds[i].umodes;
+									break;
+								} else { 
+									u->Smode &= ~susr_mds[i].umodes;
+									break;
+								}				
+							}
+					 	}
+					}
+#endif										
+						for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 
+							if (usr_mds[i].mode == tmpmode) {
+								if (add) {
+									u->Umode |= usr_mds[i].umodes;
+									break;
+								} else { 
+									u->Umode &= ~usr_mds[i].umodes;
+									break;
+								}				
+							}
+				 		}
 		}
 	tmpmode = *modes++;
 	}
 #ifdef DEBUG
+#ifdef ULTIMATE3
+	if (smode)
+		log("SMODE for %s is are now %p", u->nick, u->Smode);
+	else 
+#endif
 	log("Modes for %s are now %p", u->nick, u->Umode);
 #endif
 }

@@ -6,20 +6,20 @@ SOURCES= $(extauth_src)
 OBJECTS= $(extauth_objs)
 TARGET= extauth.so
 
-all:	statserv
+all:	extauth
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-statserv: $(OBJECTS)
-	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
+extauth: $(SOURCES)
+	$(CC) $(MODLDFLAGS) $(INCLUDES) $(CFLAGS) -o $(TARGET) $(LIBS) $(SOURCES)
 	/bin/cp $(TARGET) ../
 
 clean:
 	/bin/rm -rf ../$(TARGET)
 	/bin/rm -rf *.o *.lo *.so
 
-install: statserv
+install: extauth
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
 
 

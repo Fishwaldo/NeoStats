@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.103 2002/12/30 12:09:38 fishwaldo Exp $
+** $Id: ircd.c,v 1.104 2003/01/06 12:07:25 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -71,7 +71,9 @@ void Srv_Vctrl(char *, char **, int argc);
 #ifdef NEOIRCD
 void Srv_Tburst(char *origin, char **argv, int argc);
 #endif
-
+#ifdef ULTIMATE3
+void Srv_Client(char *, char **, int argc);
+#endif
 
 static void ShowMOTD(char *);
 static void ShowADMIN(char *);
@@ -241,12 +243,14 @@ IntCommands cmd_list[] = {
 #ifndef ULTIMATE3
 	{MSG_SNETINFO,	Srv_Netinfo,		0, 	0},
 	{TOK_SNETINFO,	Srv_Netinfo,		0, 	0},
+
 #endif
 #ifdef ULTIMATE3
 	{MSG_SVINFO,	Srv_Svinfo,		0, 	0},
 	{MSG_CAPAB,	Srv_Connect, 		0, 	0},
 	{MSG_BURST,	Srv_Burst, 		0, 	0},
 	{MSG_SJOIN,	Srv_Sjoin,		1,	0},
+	{MSG_CLIENT,	Srv_Client,		0,	0},
 #endif
 	{MSG_VCTRL,	Srv_Vctrl, 		0, 	0},
 	{TOK_VCTRL,	Srv_Vctrl, 		0, 	0},
@@ -289,7 +293,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 
 
 #ifdef ULTIMATE3
-	snewnick_cmd(nick, user, host, rname, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+	snewnick_cmd(nick, user, host, rname, UMODE_SERVICES);
 #elif defined(HYBRID7) 
 	snewnick_cmd(nick, user, host, rname, UMODE_ADMIN);
 #elif defined(NEOIRCD)
@@ -640,7 +644,7 @@ void init_ServBot()
 
 #ifdef ULTIMATE3
 	sburst_cmd(1);
-	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_SERVICES);
 #elif defined(HYBRID7) || defined(NEOIRCD)
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_ADMIN | UMODE_SERVICES);
 #else 
@@ -811,6 +815,11 @@ void Srv_Connect(char *origin, char **argv, int argc) {
 		if (!strcasecmp("TOKEN", argv[i])) {
 			me.token = 1;
 		}
+#ifdef ULTIMATE3
+		if (!strcasecmp("CLIENT", argv[i])) {
+			me.client = 1;
+		}
+#endif
 	}
 }
 
@@ -909,7 +918,7 @@ void Usr_Smode(char *origin, char **argv, int argc) {
 	/* its user svsmode change */
 #ifdef ULTIMATE3
 		AddStringToList(&av, argv[2], &ac);
-		UserMode(argv[0], argv[2]);
+		UserMode(argv[0], argv[2], 0);
 #else
 		AddStringToList(&av, argv[1], &ac);
 		UserMode(argv[0], argv[1]);
@@ -928,7 +937,7 @@ void Usr_Mode(char *origin, char **argv, int argc) {
 #ifdef DEBUG
 		log("Mode: UserMode: %s",argv[0]);
 #endif
-		UserMode(argv[0], argv[1]);
+		UserMode(argv[0], argv[1], 0);
 		AddStringToList(&av, argv[0], &ac);
 		AddStringToList(&av, argv[1], &ac);
 		Module_Event("UMODE", av, ac);
@@ -1160,7 +1169,7 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 #ifdef DEBUG
 			log("Mode: UserMode: %s",argv[3]);
 #endif
-			UserMode(argv[0], argv[3]);
+			UserMode(argv[0], argv[3], 0);
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
 #elif ULTIMATE
@@ -1191,6 +1200,35 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 #endif
 			FreeList(av, ac);
 }
+
+/* Ultimate3 Client Support */
+#ifdef ULTIMATE3
+void Srv_Client(char *origin, char **argv, int argc) {
+			char **av;
+			int ac = 0;
+			AddStringToList(&av, argv[0], &ac);
+			AddUser(argv[0], argv[5], argv[6], argv[8], strtoul(argv[10], NULL, 10), strtoul(argv[2], NULL, 10));
+			Module_Event("SIGNON", av, ac);
+#ifdef DEBUG
+			log("Mode: UserMode: %s",argv[3]);
+#endif
+			UserMode(argv[0], argv[3], 0);
+			AddStringToList(&av, argv[3], &ac);
+			Module_Event("UMODE", av, ac);
+			FreeList(av, ac);
+#ifdef ULTIMATE3
+			AddStringToList(&av, argv[0], &ac);
+#ifdef DEBUG
+			log("Smode: SMode: %s", argv[4]);
+#endif
+			UserMode(argv[0], argv[4], 1);
+			AddStringToList(&av, argv[4], &ac);
+			Module_Event("UMODE", av, ac);
+			FreeList(av, ac);
+#endif
+
+}
+#endif
 void Srv_Svsnick(char *origin, char **argv, int argc) {
 			User *u;
 			char **av;
