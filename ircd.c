@@ -807,11 +807,14 @@ void Usr_Away(char *origin, char **argv, int argc) {
 			}
 }	
 void Usr_Nick(char *origin, char **argv, int argc) {
+			char *tmp;
 			User *u = finduser(origin);
 			if (u) {
 				Change_User(u, argv[0]);
-				Module_Event("NICK_CHANGE",argv[0]);
-
+				tmp = malloc(strlen(origin)+strlen(argv[0])+1);
+				sprintf(tmp, "%s %s", origin, argv[0]);
+				Module_Event("NICK_CHANGE",tmp);
+				free(tmp);
 			}
 }
 void Usr_Topic(char *origin, char **argv, int argc) {

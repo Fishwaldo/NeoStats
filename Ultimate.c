@@ -238,6 +238,24 @@ int vctrl_cmd() {
 	sts("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, ircd_srv.nicklg, ircd_srv.modex, ircd_srv.gc, me.netname);
 	return 1;
 }
+
+int ssvskill_cmd(const char *target, const char *reason, ...) {
+        User *u;
+        va_list ap;
+        char buf[512];
+        u = finduser(target);
+        if (!u) {
+	        log("Cant find user %s for ssvskill_cmd", target);
+                return 0;
+        } else {
+        	va_start(ap, reason);
+                vsnprintf(buf, 512, reason, ap);
+                sts(":%s %s %s :%s", me.name, (me.token ? TOK_SVSKILL : MSG_SVSKILL), target, buf);
+                Module_Event("KILL", u);
+                va_end(ap);
+                return 1;
+        }   
+}
 int skill_cmd(const char *from, const char *target, const char *reason,...) {
 	va_list ap;
 	char buf[512];
@@ -307,6 +325,19 @@ int ssvshost_cmd(const char *who, const char *vhost) {
 		return 1;
 	}
 }
+int ssvsmode_cmd(const char *nick, const char *mode) {
+	User *u;
+	u = finduser(nick);
+	if (!u) {
+		log("Can't Find user %s for ssvsmode_cmd", nick);
+		return 0;
+	} else {
+		sts(":%s %s %s %s", me.name, (me.token ? TOK_SVSMODE : MSG_SVSMODE), nick, mode);
+		UserMode(nick, mode);
+	}
+}
+
+
 int ssvinfo_cmd() {
 	sts("SVINFO 5 3 0 :%d", time(NULL));
 	return 1;
