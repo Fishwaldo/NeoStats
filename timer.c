@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: timer.c,v 1.8 2002/02/27 11:15:16 fishwaldo Exp $
+** $Id: timer.c,v 1.9 2002/02/27 13:09:39 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -55,28 +55,7 @@ void TimerReset()
 }
 
 
-void TimerPings()
-{
-	register int i;
-	Server *s;
 
-#ifdef DEBUG
-	log("Sendings pings...");
-#endif
-	ping.ulag = 0;
-
-	for (i = 0; i < S_TABLE_SIZE; i++) {
-		for (s = serverlist[i]; s; s = s->next) {
-			if (!strcmp(me.name, s->name)) {
-				s->ping = 0;
-				continue;
-			}
-			sts(":%s PING %s :%s", me.name, me.name, s->name);
-		}
-	}
-/* Shmad */
-	free(s);
-}
 
 
 void TimerMidnight()
