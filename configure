@@ -19562,6 +19562,7 @@ fi
 
 
 
+
 for ac_header in sys/types.h \
         sys/time.h \
         sys/select.h \
@@ -19571,6 +19572,7 @@ for ac_header in sys/types.h \
         assert.h \
         ctype.h \
         errno.h \
+        stddef.h \
         stdio.h \
         stdlib.h \
         stdarg.h \

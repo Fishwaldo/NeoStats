@@ -50,6 +50,7 @@ AC_CHECK_HEADERS(
         assert.h \
         ctype.h \
         errno.h \
+        stddef.h \
         stdio.h \
         stdlib.h \
         stdarg.h \

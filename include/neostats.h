@@ -32,8 +32,7 @@
 #include "config.h"
 #endif
 
-/* Temporary since my debian box can't find this via configure even though it has it */
-#if 1 /*def HAVE_STDDEF_H*/
+#ifdef HAVE_STDDEF_H
 #include <stddef.h>
 #endif
 #ifdef HAVE_STDIO_H
