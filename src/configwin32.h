@@ -33,7 +33,7 @@
 #define HAVE_ARGZ_CREATE_SEP 1
 
 /* Define to 1 if you have the <argz.h> header file. */
-#define HAVE_ARGZ_H 1
+/*#define HAVE_ARGZ_H 1*/
 
 /* Define to 1 if you have the `argz_insert' function. */
 #define HAVE_ARGZ_INSERT 1
@@ -77,8 +77,9 @@
 
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */
+/*
 #define HAVE_DIRENT_H 1
-
+*/
 /* disabled non-blocking sockets */
 /* #undef HAVE_DISABLED_NONBLOCKING */
 
@@ -401,7 +402,7 @@
 #define HAVE_UNAME 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#define HAVE_UNISTD_H 1
+/*#define HAVE_UNISTD_H 1*/
 
 /* Define to 1 if you have the `utime' function. */
 #define HAVE_UTIME 1
