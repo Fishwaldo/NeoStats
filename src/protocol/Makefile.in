@@ -1,6 +1,6 @@
 include ../Makefile.inc
 
-INCLUDES = -I.. -I../adns
+INCLUDES = -I.. -I../adns -I../pcre
 
 IRCDSRC = ultimate.c unreal.c hybrid7.c neoircd.c bahamut.c ircu.c mystic.c \
 			quantum.c liquid.c viagra.c

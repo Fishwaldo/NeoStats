@@ -4,6 +4,10 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - configure now checks IRCD first so that if this required option is missed 
+   the user will be told immediately rather than after all other checks.
+ - Build process updates so that at configure time we only do what we need to 
+   and reduce the number of config.h files we need to maintain.
  - New memory allocation wrappers functions scalloc, srealloc and sfree.
  - Add SET VERSIONSCAN option to core for CTCP version scanning.
  - StatServ: Optimise database save to further reduce code required and get 

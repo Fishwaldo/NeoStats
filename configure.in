@@ -13,172 +13,10 @@ AC_PREFIX_DEFAULT(~/NeoStats)
 MODLDFLAGS="-shared"
 AC_DEFINE_UNQUOTED(NEOSTATS_PACKAGE_VERSION, "$VERSION")
 
-dnl Get system type
-AC_CANONICAL_HOST
-MYHOST=$host_os
-case "$host_os" in
-*cygwin)
-	CFLAGS="$CFLAGS -O2 -g"
-	LDFLAGS="$LDFLAGS -export-dynamic";;
-*mingw32)
-	CFLAGS="$CFLAGS -O2 -g -mno-cygwin"
-	LDFLAGS="$LDFLAGS -export-dynamic";;
-*openbsd)
-	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
-	LDFLAGS="-export-dynamic";;
-*)
-	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
-	LDFLAGS="-rdynamic";;	
-esac
-
-case "$host_os" in
-*openbsd*)
-	MAKEDEPENDENCIES="";;
-*freebsd*)
-	MAKEDEPENDENCIES="";;
-*)
-	MAKEDEPENDENCIES="-include \$(OBJS:.o=.d)";;
-esac
-
-dnl Checks for programs.
-AC_PROG_CC
-AC_PROG_INSTALL 
-AC_PROG_LEX
-AC_PROG_YACC
-AC_PROG_RANLIB
-AC_CACHE_SAVE
-
-dnl Checks for libraries.
-dnl Replace `main' with a function in -ldl:
-AC_CHECK_LIB(dl, dlopen)
-
-ADNS_C_GETFUNC(socket,socket)
-ADNS_C_GETFUNC(inet_ntoa,nsl)
-
-AC_CHECK_FUNC(backtrace, 
-[AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available')
-LIBS="-g $LIBS"]
-)
-AC_CACHE_SAVE
-
-
-dnl Checks for header files.
-AC_HEADER_STDC
-AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(sys/time.h unistd.h limits.h sys/poll.h)
-AC_CACHE_SAVE
-
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_TYPE_SIZE_T
-AC_HEADER_TIME
-AC_STRUCT_TM
-AC_CACHE_SAVE
-
-dnl Checks for library functions.
-AC_FUNC_FNMATCH
-AC_TYPE_SIGNAL
-AC_FUNC_STRFTIME
-AC_CHECK_FUNCS(strlcpy strlcat strnlen)
-AC_CHECK_FUNCS(socket strdup poll)
-AC_CHECK_FUNCS(strndup)
-AC_CHECK_FUNCS(bcopy memmove strerror)
-
-
-ADNS_C_GETFUNC(inet_aton,resolv,[
- LIBS="-lresolv $LIBS";
- AC_MSG_WARN([inet_aton is in libresolv, urgh.  Must use -lresolv.])
-])
-
-DPKG_CACHED_TRY_COMPILE(inlines,dpkg_cv_c_inline,,
- [} inline int foo (int x) {],
- AC_MSG_RESULT(yes)
- AC_DEFINE(HAVE_INLINE),
- AC_MSG_RESULT(no))
-
-ADNS_C_GCCATTRIB
-AC_CHECK_HEADERS(sys/select.h)
-
-AC_MSG_CHECKING(for INADDR_LOOPBACK)
-AC_CACHE_VAL(adns_cv_decl_inaddrloopback,[
- AC_TRY_COMPILE([
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
- ],[
-  INADDR_LOOPBACK;
- ],
- adns_cv_decl_inaddrloopback=yes,
- adns_cv_decl_inaddrloopback=no)])
-if test "$adns_cv_decl_inaddrloopback" = yes; then
- AC_MSG_RESULT(found)
-else
- AC_MSG_RESULT([not in standard headers, urgh...])
- AC_CHECK_HEADER(rpc/types.h,[
-  AC_DEFINE(HAVEUSE_RPCTYPES_H)
- ],[
-  AC_MSG_ERROR([cannot find INADDR_LOOPBACK or rpc/types.h])
- ])
-fi
-
-dnl **** Check for underscore on external symbols ****
-
-AC_CACHE_CHECK(whether external symbols need an underscore prefix,
-               ac_cv_c_extern_prefix,
-[saved_libs=$LIBS
-LIBS="conftest_asm.s $LIBS"
-cat > conftest_asm.s <<EOF
-	.globl _ac_test
-_ac_test:
-	.long 0
-EOF
-AC_TRY_LINK([extern int ac_test;],[if (ac_test) return 1],
-            ac_cv_c_extern_prefix="yes",ac_cv_c_extern_prefix="no")
-LIBS=$saved_libs])
-if test "$ac_cv_c_extern_prefix" = "yes"
-then
-  AC_DEFINE(NEED_UNDERSCORE_PREFIX)
-fi
-
-dnl check for berkeley db support
-AC_CHECK_HEADER(db.h, AC_DEFINE(HAVE_DB_H, 1, [Define to 1 if you have the <db.h> header file.])
-				AC_CHECK_LIB(db, db_create, LIBDB="-ldb"))
-
-PCRE_MAJOR=4
-PCRE_MINOR=3
-PCRE_DATE=21-May-2003
-PCRE_VERSION=${PCRE_MAJOR}.${PCRE_MINOR}
-
-dnl Default values for miscellaneous macros
-
-AC_DEFINE(POSIX_MALLOC_THRESHOLD,10)
-
-
-
-dnl check if we are running with Debug....
-AC_MSG_CHECKING(Whether to Enable Debuging...)
-AC_ARG_ENABLE(debug,
-[ --enable-debug - Enable Debuging],
-[ case "$enableval" in
-  yes)
-	AC_DEFINE(DEBUG, 1, 'Enable Debugging')
-	CFLAGS="$CFLAGS -ggdb -Wall"
-	AC_MSG_RESULT(yes - Watch your Log Files)
-	;;
-  *)
-	CFLAGS="$CFLAGS -DNDEBUG"
-	AC_MSG_RESULT(no)
-	;;
-  esac],
-CFLAGS="$CFLAGS -DNDEBUG"
-AC_MSG_RESULT(no)
-)
-
-AC_CACHE_SAVE
-
 do_serviceroots=no
 PROTOCOL=no
 
+dnl check IRCD support first to save time
 dnl check to see if we should enable Unreal IRCD Support
 AC_MSG_CHECKING(Whether to Enable Unreal 3.1.x IRCD Support...)
 AC_ARG_ENABLE(unreal31, [ --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
@@ -388,6 +226,169 @@ else
 	AC_MSG_RESULT(yes)
 fi
 
+dnl Get system type
+AC_CANONICAL_HOST
+MYHOST=$host_os
+case "$host_os" in
+*cygwin)
+	CFLAGS="$CFLAGS -O2 -g"
+	LDFLAGS="$LDFLAGS -export-dynamic";;
+*mingw32)
+	CFLAGS="$CFLAGS -O2 -g -mno-cygwin"
+	LDFLAGS="$LDFLAGS -export-dynamic";;
+*openbsd)
+	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
+	LDFLAGS="-export-dynamic";;
+*)
+	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
+	LDFLAGS="-rdynamic";;	
+esac
+
+case "$host_os" in
+*openbsd*)
+	MAKEDEPENDENCIES="";;
+*freebsd*)
+	MAKEDEPENDENCIES="";;
+*)
+	MAKEDEPENDENCIES="-include \$(OBJS:.o=.d)";;
+esac
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_INSTALL 
+AC_PROG_LEX
+AC_PROG_YACC
+AC_PROG_RANLIB
+AC_CACHE_SAVE
+
+dnl Checks for libraries.
+dnl Replace `main' with a function in -ldl:
+AC_CHECK_LIB(dl, dlopen)
+
+ADNS_C_GETFUNC(socket,socket)
+ADNS_C_GETFUNC(inet_ntoa,nsl)
+
+AC_CHECK_FUNC(backtrace, 
+[AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available')
+LIBS="-g $LIBS"]
+)
+AC_CACHE_SAVE
+
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS(sys/time.h unistd.h limits.h sys/poll.h)
+AC_CACHE_SAVE
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+AC_STRUCT_TM
+AC_CACHE_SAVE
+
+dnl Checks for library functions.
+AC_FUNC_FNMATCH
+AC_TYPE_SIGNAL
+AC_FUNC_STRFTIME
+AC_CHECK_FUNCS(strlcpy strlcat strnlen)
+AC_CHECK_FUNCS(socket strdup poll)
+AC_CHECK_FUNCS(strndup)
+AC_CHECK_FUNCS(bcopy memmove strerror)
+
+
+ADNS_C_GETFUNC(inet_aton,resolv,[
+ LIBS="-lresolv $LIBS";
+ AC_MSG_WARN([inet_aton is in libresolv, urgh.  Must use -lresolv.])
+])
+
+DPKG_CACHED_TRY_COMPILE(inlines,dpkg_cv_c_inline,,
+ [} inline int foo (int x) {],
+ AC_MSG_RESULT(yes)
+ AC_DEFINE(HAVE_INLINE),
+ AC_MSG_RESULT(no))
+
+ADNS_C_GCCATTRIB
+AC_CHECK_HEADERS(sys/select.h)
+
+AC_MSG_CHECKING(for INADDR_LOOPBACK)
+AC_CACHE_VAL(adns_cv_decl_inaddrloopback,[
+ AC_TRY_COMPILE([
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+ ],[
+  INADDR_LOOPBACK;
+ ],
+ adns_cv_decl_inaddrloopback=yes,
+ adns_cv_decl_inaddrloopback=no)])
+if test "$adns_cv_decl_inaddrloopback" = yes; then
+ AC_MSG_RESULT(found)
+else
+ AC_MSG_RESULT([not in standard headers, urgh...])
+ AC_CHECK_HEADER(rpc/types.h,[
+  AC_DEFINE(HAVEUSE_RPCTYPES_H)
+ ],[
+  AC_MSG_ERROR([cannot find INADDR_LOOPBACK or rpc/types.h])
+ ])
+fi
+
+dnl **** Check for underscore on external symbols ****
+
+AC_CACHE_CHECK(whether external symbols need an underscore prefix,
+               ac_cv_c_extern_prefix,
+[saved_libs=$LIBS
+LIBS="conftest_asm.s $LIBS"
+cat > conftest_asm.s <<EOF
+	.globl _ac_test
+_ac_test:
+	.long 0
+EOF
+AC_TRY_LINK([extern int ac_test;],[if (ac_test) return 1],
+            ac_cv_c_extern_prefix="yes",ac_cv_c_extern_prefix="no")
+LIBS=$saved_libs])
+if test "$ac_cv_c_extern_prefix" = "yes"
+then
+  AC_DEFINE(NEED_UNDERSCORE_PREFIX)
+fi
+
+dnl check for berkeley db support
+AC_CHECK_HEADER(db.h, AC_DEFINE(HAVE_DB_H, 1, [Define to 1 if you have the <db.h> header file.])
+				AC_CHECK_LIB(db, db_create, LIBDB="-ldb"))
+
+PCRE_MAJOR=4
+PCRE_MINOR=3
+PCRE_DATE=21-May-2003
+PCRE_VERSION=${PCRE_MAJOR}.${PCRE_MINOR}
+
+dnl Default values for miscellaneous macros
+
+AC_DEFINE(POSIX_MALLOC_THRESHOLD,10)
+
+
+
+dnl check if we are running with Debug....
+AC_MSG_CHECKING(Whether to Enable Debuging...)
+AC_ARG_ENABLE(debug,
+[ --enable-debug - Enable Debuging],
+[ case "$enableval" in
+  yes)
+	AC_DEFINE(DEBUG, 1, 'Enable Debugging')
+	CFLAGS="$CFLAGS -ggdb -Wall"
+	AC_MSG_RESULT(yes - Watch your Log Files)
+	;;
+  *)
+	CFLAGS="$CFLAGS -DNDEBUG"
+	AC_MSG_RESULT(no)
+	;;
+  esac],
+CFLAGS="$CFLAGS -DNDEBUG"
+AC_MSG_RESULT(no)
+)
+
+AC_CACHE_SAVE
+
 if test "$do_serviceroots" = no; then
 	dnl check to see what type of authentication to use
 	AC_MSG_CHECKING(What type of Authentication to use...)
@@ -507,12 +508,6 @@ AC_SUBST(MODLDFLAGS)
 AC_SUBST(LINK_SIZE)
 AC_SUBST(MATCH_LIMIT)
 AC_SUBST(NEWLINE)
-AC_SUBST(PCRE_MAJOR)
-AC_SUBST(PCRE_MINOR)
-AC_SUBST(PCRE_DATE)
-AC_SUBST(PCRE_VERSION)
-AC_SUBST(PCRE_LIB_VERSION)
-AC_SUBST(PCRE_POSIXLIB_VERSION)
 AC_DEFINE(POSIX_MALLOC_THRESHOLD,10)
 AC_SUBST(POSIX_MALLOC_THRESHOLD)
 AC_SUBST(UTF8)
@@ -524,12 +519,12 @@ AC_SUBST(EXTAUTH_SRC)
 AC_SUBST(EXTAUTH_OBJS)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
-AC_OUTPUT(src/Makefile.inc src/Makefile src/protocol/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile src/pcre.h:src/pcre/pcre.in)
+AC_OUTPUT(src/Makefile.inc src/Makefile src/protocol/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile)
 NEO_SUBDIR_CONFIG(src/curl, [--disable-thread --disable-ipv6 --enable-nonblocking --without-ssl])
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"
 echo "(*----------------------------------------------------------*)"
-echo "(| if you just typed ./configure and didnt read the README  |)"
+echo "(| If you just typed ./configure and didnt read the README  |)"
 echo "(| NeoStats may not be configured correctly.                |)"
 echo "(| We suggest you at least type ./configure --help to see   |)"
 echo "(| available options and read the README file for further   |)"

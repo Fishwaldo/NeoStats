@@ -12,7 +12,7 @@ all:	 ${OBJS}
 .c.o:	
 	 $(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-dftables.o: dftables.c maketables.c internal.h ../pcre.h ../config.h Makefile
+dftables.o: dftables.c maketables.c internal.h pcre.h ../config.h Makefile
 	$(CC) $(CFLAGS) $(INCLUDES) -c dftables.c
 
 dftables:       dftables.o
@@ -22,12 +22,13 @@ chartables.c:   dftables
 	./dftables >./chartables.c
 
 clean:
-	 $(RM) *.o dftables ../pcre.h chartables.c *.exe
+	 $(RM) *.o dftables chartables.c *.exe
 
 distclean:
-	 $(RM) *.o dftables ../pcre.h chartables.c *.exe
+	 $(RM) *.o dftables chartables.c *.exe
 
-install: 
+install:
+	$(INSTALL_DATA) pcre.h $(INCDIRECTORY)
 
 DISTFILES =*.c *.h *.in README COPYING
 
@@ -37,7 +38,7 @@ dist:
 	done
 
 $(OBJS): Makefile
-pcre.o:	chartables.c ../pcre.h internal.h ../config.h
-get.o: ../pcre.h internal.h ../config.h
-study.o: ../pcre.h internal.h ../config.h
-dftables.o: ../pcre.h internal.h ../config.h
+pcre.o:	chartables.c pcre.h internal.h ../config.h
+get.o: pcre.h internal.h ../config.h
+study.o: pcre.h internal.h ../config.h
+dftables.o: pcre.h internal.h ../config.h

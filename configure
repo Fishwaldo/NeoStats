@@ -310,7 +310,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LEX LEXLIB LEX_OUTPUT_ROOT YACC RANLIB ac_ct_RANLIB CPP EGREP sqlsrvbuild buildsqlsrv GTK_CONFIG build_configtool LIBDB MAKEDEPENDENCIES DIRINST MODLDFLAGS LINK_SIZE MATCH_LIMIT NEWLINE PCRE_MAJOR PCRE_MINOR PCRE_DATE PCRE_VERSION PCRE_LIB_VERSION PCRE_POSIXLIB_VERSION POSIX_MALLOC_THRESHOLD UTF8 PROTOCOL MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LEX LEXLIB LEX_OUTPUT_ROOT YACC RANLIB ac_ct_RANLIB CPP EGREP sqlsrvbuild buildsqlsrv GTK_CONFIG build_configtool LIBDB MAKEDEPENDENCIES DIRINST MODLDFLAGS LINK_SIZE MATCH_LIMIT NEWLINE POSIX_MALLOC_THRESHOLD UTF8 PROTOCOL MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -845,7 +845,6 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
- --enable-debug - Enable Debuging
  --enable-unreal31 - enable Unreal 3.1.x IRCD Support
  --enable-unreal32 - enable Unreal 3.2.x IRCD Support
  --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support
@@ -858,6 +857,7 @@ Optional Features:
  --enable-ircu - enable IRCu IRCD Support
  --enable-liquid - enable Liquid IRCD Support
  --enable-viagra - enable Viagra IRCD Support
+ --enable-debug - Enable Debuging
  --enable-auth=TYPE - what type of Authentication to use. See Readme File
  --enable-raw - Enable Raw command
  --enable-sqlsrv - Enable Sql Server Emulation
@@ -1336,6 +1336,407 @@ cat >>confdefs.h <<_ACEOF
 #define NEOSTATS_PACKAGE_VERSION "$VERSION"
 _ACEOF
 
+
+do_serviceroots=no
+PROTOCOL=no
+
+echo "$as_me:$LINENO: checking Whether to Enable Unreal 3.1.x IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Unreal 3.1.x IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-unreal31 or --disable-unreal31 was given.
+if test "${enable_unreal31+set}" = set; then
+  enableval="$enable_unreal31"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define UNREAL 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "Unreal 3.1"
+_ACEOF
+
+	PROTOCOL="unreal"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi;
+echo "$as_me:$LINENO: checking Whether to Enable Unreal 3.2.x IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Unreal 3.2.x IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-unreal32 or --disable-unreal32 was given.
+if test "${enable_unreal32+set}" = set; then
+  enableval="$enable_unreal32"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define UNREAL 1
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define UNREAL32 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "Unreal 3.2"
+_ACEOF
+
+	PROTOCOL="unreal"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable Ultimate 2.x.x IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Ultimate 2.x.x IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-ultimate2 or --disable-ultimate2 was given.
+if test "${enable_ultimate2+set}" = set; then
+  enableval="$enable_ultimate2"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define ULTIMATE 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "Ultimate 2.x.x"
+_ACEOF
+
+	PROTOCOL="ultimate"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
+echo "$as_me:$LINENO: checking Whether to Enable Ultimate 3.x.x IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Ultimate 3.x.x IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-ultimate3 or --disable-ultimate3 was given.
+if test "${enable_ultimate3+set}" = set; then
+  enableval="$enable_ultimate3"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define ULTIMATE 1
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ULTIMATE3 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "Ultimate 3.x.x"
+_ACEOF
+
+	PROTOCOL="ultimate"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable Hybrid 7.x.x IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Hybrid 7.x.x IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-hybrid7 or --disable-hybrid7 was given.
+if test "${enable_hybrid7+set}" = set; then
+  enableval="$enable_hybrid7"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define HYBRID7 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "Hybrid 7"
+_ACEOF
+
+	PROTOCOL="hybrid7"
+	echo "$as_me:$LINENO: checking Auto-Enabling ServiceRoots Authentication Module" >&5
+echo $ECHO_N "checking Auto-Enabling ServiceRoots Authentication Module... $ECHO_C" >&6
+	do_serviceroots=yes
+
+cat >>confdefs.h <<\_ACEOF
+#define EXTAUTH 1
+_ACEOF
+
+	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
+	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
+	MODULES="$MODULES extauth"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable NeoIRCd IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable NeoIRCd IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-neoircd or --disable-neoircd was given.
+if test "${enable_neoircd+set}" = set; then
+  enableval="$enable_neoircd"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define NEOIRCD 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "NeoIRCd"
+_ACEOF
+
+	PROTOCOL="neoircd"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable Quantum IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Quantum IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-quantum or --disable-quantum was given.
+if test "${enable_quantum+set}" = set; then
+  enableval="$enable_quantum"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define QUANTUM 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "Quantum"
+_ACEOF
+
+	PROTOCOL="quantum"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable Mystic IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Mystic IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-mystic or --disable-mystic was given.
+if test "${enable_mystic+set}" = set; then
+  enableval="$enable_mystic"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define MYSTIC 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "Mystic"
+_ACEOF
+
+	PROTOCOL="mystic"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable Bahamut IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Bahamut IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-bahamut or --disable-bahamut was given.
+if test "${enable_bahamut+set}" = set; then
+  enableval="$enable_bahamut"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define BAHAMUT 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "Bahamut"
+_ACEOF
+
+	PROTOCOL="bahamut"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable IRCu IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable IRCu IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-ircu or --disable-ircu was given.
+if test "${enable_ircu+set}" = set; then
+  enableval="$enable_ircu"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define IRCU 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "IRCu"
+_ACEOF
+
+	PROTOCOL="ircu"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable Liquid IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Liquid IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-liquid or --disable-liquid was given.
+if test "${enable_liquid+set}" = set; then
+  enableval="$enable_liquid"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define LIQUID 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "Liquid"
+_ACEOF
+
+	PROTOCOL="liquid"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable Viagra IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Viagra IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-viagra or --disable-viagra was given.
+if test "${enable_viagra+set}" = set; then
+  enableval="$enable_viagra"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define VIAGRA 1
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define NS_PROTOCOL "Viagra"
+_ACEOF
+
+	PROTOCOL="viagra"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
+
+echo "$as_me:$LINENO: checking A compatible IRCD is specified" >&5
+echo $ECHO_N "checking A compatible IRCD is specified... $ECHO_C" >&6
+if test "$PROTOCOL" = no; then
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	{ { echo "$as_me:$LINENO: error: 'You must define a IRCD to use. See ./configure --help for more information'" >&5
+echo "$as_me: error: 'You must define a IRCD to use. See ./configure --help for more information'" >&2;}
+   { (exit 1); exit 1; }; }
+else
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+fi
 
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
@@ -6627,407 +7028,6 @@ if diff $cache_file confcache >/dev/null 2>&1; then :; else
 fi
 rm -f confcache
 
-do_serviceroots=no
-PROTOCOL=no
-
-echo "$as_me:$LINENO: checking Whether to Enable Unreal 3.1.x IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Unreal 3.1.x IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-unreal31 or --disable-unreal31 was given.
-if test "${enable_unreal31+set}" = set; then
-  enableval="$enable_unreal31"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define UNREAL 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "Unreal 3.1"
-_ACEOF
-
-	PROTOCOL="unreal"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi;
-echo "$as_me:$LINENO: checking Whether to Enable Unreal 3.2.x IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Unreal 3.2.x IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-unreal32 or --disable-unreal32 was given.
-if test "${enable_unreal32+set}" = set; then
-  enableval="$enable_unreal32"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define UNREAL 1
-_ACEOF
-
-
-cat >>confdefs.h <<\_ACEOF
-#define UNREAL32 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "Unreal 3.2"
-_ACEOF
-
-	PROTOCOL="unreal"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Ultimate 2.x.x IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Ultimate 2.x.x IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-ultimate2 or --disable-ultimate2 was given.
-if test "${enable_ultimate2+set}" = set; then
-  enableval="$enable_ultimate2"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define ULTIMATE 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "Ultimate 2.x.x"
-_ACEOF
-
-	PROTOCOL="ultimate"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
-echo "$as_me:$LINENO: checking Whether to Enable Ultimate 3.x.x IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Ultimate 3.x.x IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-ultimate3 or --disable-ultimate3 was given.
-if test "${enable_ultimate3+set}" = set; then
-  enableval="$enable_ultimate3"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define ULTIMATE 1
-_ACEOF
-
-
-cat >>confdefs.h <<\_ACEOF
-#define ULTIMATE3 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "Ultimate 3.x.x"
-_ACEOF
-
-	PROTOCOL="ultimate"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Hybrid 7.x.x IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Hybrid 7.x.x IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-hybrid7 or --disable-hybrid7 was given.
-if test "${enable_hybrid7+set}" = set; then
-  enableval="$enable_hybrid7"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define HYBRID7 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "Hybrid 7"
-_ACEOF
-
-	PROTOCOL="hybrid7"
-	echo "$as_me:$LINENO: checking Auto-Enabling ServiceRoots Authentication Module" >&5
-echo $ECHO_N "checking Auto-Enabling ServiceRoots Authentication Module... $ECHO_C" >&6
-	do_serviceroots=yes
-
-cat >>confdefs.h <<\_ACEOF
-#define EXTAUTH 1
-_ACEOF
-
-	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
-	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
-	MODULES="$MODULES extauth"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable NeoIRCd IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable NeoIRCd IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-neoircd or --disable-neoircd was given.
-if test "${enable_neoircd+set}" = set; then
-  enableval="$enable_neoircd"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define NEOIRCD 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "NeoIRCd"
-_ACEOF
-
-	PROTOCOL="neoircd"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Quantum IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Quantum IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-quantum or --disable-quantum was given.
-if test "${enable_quantum+set}" = set; then
-  enableval="$enable_quantum"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define QUANTUM 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "Quantum"
-_ACEOF
-
-	PROTOCOL="quantum"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Mystic IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Mystic IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-mystic or --disable-mystic was given.
-if test "${enable_mystic+set}" = set; then
-  enableval="$enable_mystic"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define MYSTIC 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "Mystic"
-_ACEOF
-
-	PROTOCOL="mystic"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Bahamut IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Bahamut IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-bahamut or --disable-bahamut was given.
-if test "${enable_bahamut+set}" = set; then
-  enableval="$enable_bahamut"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define BAHAMUT 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "Bahamut"
-_ACEOF
-
-	PROTOCOL="bahamut"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable IRCu IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable IRCu IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-ircu or --disable-ircu was given.
-if test "${enable_ircu+set}" = set; then
-  enableval="$enable_ircu"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define IRCU 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "IRCu"
-_ACEOF
-
-	PROTOCOL="ircu"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Liquid IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Liquid IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-liquid or --disable-liquid was given.
-if test "${enable_liquid+set}" = set; then
-  enableval="$enable_liquid"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define LIQUID 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "Liquid"
-_ACEOF
-
-	PROTOCOL="liquid"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
-
-echo "$as_me:$LINENO: checking Whether to Enable Viagra IRCD Support..." >&5
-echo $ECHO_N "checking Whether to Enable Viagra IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-viagra or --disable-viagra was given.
-if test "${enable_viagra+set}" = set; then
-  enableval="$enable_viagra"
-   case "$enableval" in
-  yes)
-
-cat >>confdefs.h <<\_ACEOF
-#define VIAGRA 1
-_ACEOF
-
-    cat >>confdefs.h <<_ACEOF
-#define NS_PROTOCOL "Viagra"
-_ACEOF
-
-	PROTOCOL="viagra"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	;;
-  *)
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	;;
-esac
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi;
-
-echo "$as_me:$LINENO: checking A compatible IRCD is specified" >&5
-echo $ECHO_N "checking A compatible IRCD is specified... $ECHO_C" >&6
-if test "$PROTOCOL" = no; then
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	{ { echo "$as_me:$LINENO: error: 'You must define a IRCD to use. See ./configure --help for more information'" >&5
-echo "$as_me: error: 'You must define a IRCD to use. See ./configure --help for more information'" >&2;}
-   { (exit 1); exit 1; }; }
-else
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-fi
-
 if test "$do_serviceroots" = no; then
 		echo "$as_me:$LINENO: checking What type of Authentication to use..." >&5
 echo $ECHO_N "checking What type of Authentication to use...... $ECHO_C" >&6
@@ -7243,12 +7243,6 @@ fi
 
 
 
-
-
-
-
-
-
 cat >>confdefs.h <<\_ACEOF
 #define POSIX_MALLOC_THRESHOLD 10
 _ACEOF
@@ -7263,7 +7257,7 @@ _ACEOF
 
 
 
-                                                                      ac_config_files="$ac_config_files src/Makefile.inc src/Makefile src/protocol/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile src/pcre.h:src/pcre/pcre.in"
+                                                            ac_config_files="$ac_config_files src/Makefile.inc src/Makefile src/protocol/Makefile src/modules/Makefile.inc src/sqlsrv/Makefile src/tools/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -7795,7 +7789,6 @@ do
   "src/modules/Makefile.inc" ) CONFIG_FILES="$CONFIG_FILES src/modules/Makefile.inc" ;;
   "src/sqlsrv/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/sqlsrv/Makefile" ;;
   "src/tools/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/tools/Makefile" ;;
-  "src/pcre.h" ) CONFIG_FILES="$CONFIG_FILES src/pcre.h:src/pcre/pcre.in" ;;
   "src/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -7918,12 +7911,6 @@ s,@MODLDFLAGS@,$MODLDFLAGS,;t t
 s,@LINK_SIZE@,$LINK_SIZE,;t t
 s,@MATCH_LIMIT@,$MATCH_LIMIT,;t t
 s,@NEWLINE@,$NEWLINE,;t t
-s,@PCRE_MAJOR@,$PCRE_MAJOR,;t t
-s,@PCRE_MINOR@,$PCRE_MINOR,;t t
-s,@PCRE_DATE@,$PCRE_DATE,;t t
-s,@PCRE_VERSION@,$PCRE_VERSION,;t t
-s,@PCRE_LIB_VERSION@,$PCRE_LIB_VERSION,;t t
-s,@PCRE_POSIXLIB_VERSION@,$PCRE_POSIXLIB_VERSION,;t t
 s,@POSIX_MALLOC_THRESHOLD@,$POSIX_MALLOC_THRESHOLD,;t t
 s,@UTF8@,$UTF8,;t t
 s,@PROTOCOL@,$PROTOCOL,;t t
@@ -8536,7 +8523,7 @@ fi
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"
 echo "(*----------------------------------------------------------*)"
-echo "(| if you just typed ./configure and didnt read the README  |)"
+echo "(| If you just typed ./configure and didnt read the README  |)"
 echo "(| NeoStats may not be configured correctly.                |)"
 echo "(| We suggest you at least type ./configure --help to see   |)"
 echo "(| available options and read the README file for further   |)"

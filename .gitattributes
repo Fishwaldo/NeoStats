@@ -294,7 +294,7 @@ src/pcre/get.c eol=lf
 src/pcre/internal.h eol=lf
 src/pcre/maketables.c eol=lf
 src/pcre/pcre.c eol=lf
-src/pcre/pcre.in eol=lf
+src/pcre/pcre.h -text
 src/pcre/study.c eol=lf
 src/protocol/Makefile.in -text
 src/protocol/bahamut.c eol=lf
