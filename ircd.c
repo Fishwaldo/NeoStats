@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.88 2002/09/13 15:35:42 fishwaldo Exp $
+** $Id: ircd.c,v 1.89 2002/09/13 15:37:25 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -1097,7 +1097,7 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
 #elif ULTIMATE
-			AddUser(argv[0], argv[3], argv[4], argv[5], 0, time(NULL));
+			AddUser(argv[0], argv[3], argv[4], argv[5], 0, 0);
 			Module_Event("SIGNON", av, ac);
 #elif HYBRID7
 			AddUser(argv[0], argv[4], argv[5], argv[6], strtoul(argv[8], NULL, 10), strtoul(argv[2], NULL, 10));
