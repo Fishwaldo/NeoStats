@@ -204,6 +204,7 @@ void
 run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 {
 	int userlevel;
+	int cmdlevel;
 	bot_cmd* cmd_ptr;
 	hnode_t *cmdnode;
 
@@ -226,7 +227,7 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 		/* Is user authorised to issue this command? */
 		if(cmd_ptr->ulevel > 200) {
 			/* int pointer rather than value */
-			int cmdlevel = *(int*)cmd_ptr->ulevel;
+			cmdlevel = *(int*)cmd_ptr->ulevel;
 			if (userlevel < cmdlevel) {
 				prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
 				chanalert (bot_ptr->nick, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
