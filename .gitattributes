@@ -33,6 +33,7 @@ autotools/ltmain.sh -text
 autotools/missing -text
 autotools/mkinstalldirs -text
 autotools/rules.mk -text
+autotools/shtool -text
 /ccdv.c -text
 /configure -text
 /configure.in -text
