@@ -1107,8 +1107,8 @@ numeric (const int numeric, const char *target, const char *data, ...)
 void
 unsupported_cmd(const char* cmd)
 {
-	chanalert (s_Services, "Warning, Module %s tried to %s which is not supported", segvinmodule, cmd);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to %s, which is not supported", segvinmodule, cmd);
+	chanalert (s_Services, "Warning, %s tried to %s which is not supported", ((segvinmodule[0] != 0)? segvinmodule : ""), cmd);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning, %s tried to %s, which is not supported", ((segvinmodule[0] != 0)? segvinmodule : ""), cmd);
 }
 
 int
