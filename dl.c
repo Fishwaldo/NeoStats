@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.68 2003/09/18 11:22:03 fishwaldo Exp $
+** $Id: dl.c,v 1.69 2003/09/18 11:39:16 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -541,7 +541,6 @@ load_module (char *path1, User * u)
 		do_msg = 1;
 	}
 	snprintf (p, 255, "dl/%s.so", path1);
-printf("trying %s\n", path1);
 	dl_handle = dlopen (p, RTLD_NOW || RTLD_GLOBAL);
 	strcpy (segvinmodule, "");
 	if (!dl_handle) {
@@ -558,10 +557,8 @@ printf("trying %s\n", path1);
 #ifndef HAVE_LIBDL
 	if (mod_get_info == NULL) {
 		dl_error = dlerror ();
-printf("here\n");
 #else
 	if ((dl_error = dlerror ()) != NULL) {
-printf("there\n");
 #endif
 		if (do_msg) {
 			prefmsg (u->nick, s_Services, "Error, Couldn't Load Module");
