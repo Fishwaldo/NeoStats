@@ -162,7 +162,8 @@ UserModes user_umodes[] = {
 	{UMODE_SERVNOTICE, 's', 0},
 	{UMODE_KIX, 'q', 0},
 	{UMODE_BOT, 'B', 0},
-	{UMODE_DEAF, 'd', 0},
+/* temp removal of deaf for SVSMODE Services Stamp */
+/* 	{UMODE_DEAF, 'd', 0},*/
 #ifdef UNREAL32
 	{UMODE_RGSTRONLY, 'R', 0},
  	{UMODE_NOCTCP, 'T', 0},
@@ -505,9 +506,8 @@ m_svsmode (char *origin, char **argv, int argc, int srv)
 	} else {
 		if (argv[2] && isdigit(*argv[2])) {
 			do_svsmode_servicests (argv[0], argv[2]); 
-		} else {
-			do_svsmode_user (argv[0], argv[1]);
 		}
+		do_svsmode_user (argv[0], argv[1]);
 	}
 }
 
