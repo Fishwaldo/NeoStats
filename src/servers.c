@@ -141,7 +141,7 @@ DelServer (const char *name, const char* reason)
 	hnode_destroy (sn);
 	sfree (s);
 }
-#ifdef IRCU
+#ifdef IRCUP10
 Server *
 findserverbase64 (const char *num)
 {

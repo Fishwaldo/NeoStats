@@ -509,7 +509,7 @@ m_private (char* origin, char **av, int ac, int cmdptr)
  *
  * @return none
  */
-#ifdef IRCU
+#ifdef IRCUP10
 void 
 #else
 static void 
@@ -1011,7 +1011,7 @@ scmode_cmd (const char *who, const char *chan, const char *mode, const char *arg
 int
 schanusermode_cmd (const char *who, const char *chan, const char *mode, const char *bot)
 {
-#ifdef IRCU
+#ifdef IRCUP10
 	send_cmode (me.name, who, chan, mode, nicktobase64 (bot), me.now);
 #else
 	send_cmode (me.name, who, chan, mode, bot, me.now);
@@ -1558,7 +1558,7 @@ do_server (const char *name, const char *uplink, const char* hops, const char *n
 	
 }
 
-#ifndef IRCU
+#ifndef IRCUP10
 #ifdef MSG_BURST
 void 
 do_burst (char *origin, char **argv, int argc)
@@ -1663,7 +1663,7 @@ servertobase64 (const char* name)
 	}
 	return NULL;
 }
-#ifdef IRCU
+#ifdef IRCUP10
 char* 
 base64toserver (const char* num)
 {

@@ -133,7 +133,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	}
 	/* check if the user is excluded */
 	ns_do_exclude_user(u);
-#ifdef IRCU
+#ifdef IRCUP10
 	if((ircd_srv.protocol & PROTOCOL_B64SERVER) && numeric) {
 		setnickbase64 (u->nick, numeric);
 	}
@@ -290,7 +290,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	sfree (cmdparams);
 	return NS_SUCCESS;
 }
-#ifdef IRCU
+#ifdef IRCUP10
 User *
 finduserbase64 (const char *num)
 {
