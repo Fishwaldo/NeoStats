@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(bahamut_la_SOURCES) $(bahamut18_la_SOURCES) $(client_la_SOURCES) $(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) $(liquid_la_SOURCES) $(mystic_la_SOURCES) $(neoircd_la_SOURCES) $(plexus_la_SOURCES) $(quantum_la_SOURCES) $(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) $(unreal32_la_SOURCES) $(viagra_la_SOURCES)
+SOURCES = $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) $(client_la_SOURCES) $(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) $(liquid_la_SOURCES) $(mystic_la_SOURCES) $(neoircd_la_SOURCES) $(plexus_la_SOURCES) $(quantum_la_SOURCES) $(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) $(unreal32_la_SOURCES) $(viagra_la_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -62,9 +62,9 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(pkglibdir)"
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
-bahamut_la_LIBADD =
-am_bahamut_la_OBJECTS = bahamut.lo
-bahamut_la_OBJECTS = $(am_bahamut_la_OBJECTS)
+bahamut14_la_LIBADD =
+am_bahamut14_la_OBJECTS = bahamut14.lo
+bahamut14_la_OBJECTS = $(am_bahamut14_la_OBJECTS)
 bahamut18_la_LIBADD =
 am_bahamut18_la_OBJECTS = bahamut18.lo
 bahamut18_la_OBJECTS = $(am_bahamut18_la_OBJECTS)
@@ -116,7 +116,7 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-SOURCES = $(bahamut_la_SOURCES) $(bahamut18_la_SOURCES) \
+SOURCES = $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) \
 	$(client_la_SOURCES) $(hybrid7_la_SOURCES) \
 	$(ircup10_la_SOURCES) $(liquid_la_SOURCES) \
 	$(mystic_la_SOURCES) $(neoircd_la_SOURCES) \
@@ -124,7 +124,7 @@ SOURCES = $(bahamut_la_SOURCES) $(bahamut18_la_SOURCES) \
 	$(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) \
 	$(unreal31_la_SOURCES) $(unreal32_la_SOURCES) \
 	$(viagra_la_SOURCES)
-DIST_SOURCES = $(bahamut_la_SOURCES) $(bahamut18_la_SOURCES) \
+DIST_SOURCES = $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) \
 	$(client_la_SOURCES) $(hybrid7_la_SOURCES) \
 	$(ircup10_la_SOURCES) $(liquid_la_SOURCES) \
 	$(mystic_la_SOURCES) $(neoircd_la_SOURCES) \
@@ -258,11 +258,11 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 wi_PWD = @wi_PWD@
-pkglib_LTLIBRARIES = bahamut.la bahamut18.la client.la hybrid7.la ircup10.la liquid.la \
+pkglib_LTLIBRARIES = bahamut14.la bahamut18.la client.la hybrid7.la ircup10.la liquid.la \
 						mystic.la neoircd.la plexus.la quantum.la ultimate2.la \
 						ultimate3.la unreal31.la unreal32.la viagra.la
 
-bahamut_la_SOURCES = bahamut.c bahamut.h
+bahamut14_la_SOURCES = bahamut14.c bahamut14.h
 bahamut18_la_SOURCES = bahamut18.c bahamut18.h
 client_la_SOURCES = client.c client.h
 hybrid7_la_SOURCES = hybrid7.c hybrid7.h
@@ -332,8 +332,8 @@ clean-pkglibLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-bahamut.la: $(bahamut_la_OBJECTS) $(bahamut_la_DEPENDENCIES) 
-	$(LINK) -rpath $(pkglibdir) $(bahamut_la_LDFLAGS) $(bahamut_la_OBJECTS) $(bahamut_la_LIBADD) $(LIBS)
+bahamut14.la: $(bahamut14_la_OBJECTS) $(bahamut14_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(bahamut14_la_LDFLAGS) $(bahamut14_la_OBJECTS) $(bahamut14_la_LIBADD) $(LIBS)
 bahamut18.la: $(bahamut18_la_OBJECTS) $(bahamut18_la_DEPENDENCIES) 
 	$(LINK) -rpath $(pkglibdir) $(bahamut18_la_LDFLAGS) $(bahamut18_la_OBJECTS) $(bahamut18_la_LIBADD) $(LIBS)
 client.la: $(client_la_OBJECTS) $(client_la_DEPENDENCIES) 
@@ -369,7 +369,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bahamut.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bahamut14.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bahamut18.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hybrid7.Plo@am__quote@

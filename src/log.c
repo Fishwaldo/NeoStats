@@ -261,7 +261,7 @@ static void dlog_write( const char *time, const char *level, const char *line )
 
 	logfile = fopen( "logs/debug.log", "a" );
 	if( logfile ) {
-		fprintf( logfile, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line );
+		os_fprintf( logfile, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line );
 		fclose( logfile );
 	}
 	/* chanflag is used to avoid endless loop when sending debug messages to channel */
@@ -330,7 +330,7 @@ static void nlog_write( const char *time, const char *level, const char *line )
 #endif
 		do_exit( NS_EXIT_NORMAL, NULL );
 	}
-	fprintf( logentry->logfile, "(%s) %s %s - %s\n", time, level, GET_CUR_MODNAME(), line );
+	os_fprintf( logentry->logfile, "(%s) %s %s - %s\n", time, level, GET_CUR_MODNAME(), line );
 	logentry->flush = 1;
 }
 

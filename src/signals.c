@@ -95,15 +95,15 @@ static void do_backtrace( void )
 	char **strings;
 	int i;
 
-	fprintf( segfault, "Backtrace:\n" );
+	os_fprintf( segfault, "Backtrace:\n" );
 	size = backtrace( array, 10 );
 	strings = backtrace_symbols( array, size );
 	for( i = 1; i < size; i++ ) {
-		fprintf( segfault, "BackTrace(%d): %s\n", i - 1, strings[i] );
+		os_fprintf( segfault, "BackTrace(%d): %s\n", i - 1, strings[i] );
 	}
 	free( strings );
 #else
-	fprintf( segfault, "Backtrace not available on this platform\n" );
+	os_fprintf( segfault, "Backtrace not available on this platform\n" );
 #endif
 }
 
@@ -123,20 +123,20 @@ void report_segfault( const char* modulename )
 	me.now = time(NULL);
 	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", me.now);
 	strftime (segfault_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime (&me.now));
-	fprintf( segfault, "------------------------SEGFAULT REPORT-------------------------\n" );
-	fprintf( segfault, "Please view the README for how to submit a bug report\n" );
-	fprintf( segfault, "and include this segfault report in your submission.\n" );
-	fprintf (segfault, "(%s)\n", segfault_fmttime);
-	fprintf( segfault, "NeoStats Version:  %s\n", me.version );
-	fprintf( segfault, "Protocol:  %s\n", me.protocol );
+	os_fprintf( segfault, "------------------------SEGFAULT REPORT-------------------------\n" );
+	os_fprintf( segfault, "Please view the README for how to submit a bug report\n" );
+	os_fprintf( segfault, "and include this segfault report in your submission.\n" );
+	os_fprintf (segfault, "(%s)\n", segfault_fmttime);
+	os_fprintf( segfault, "NeoStats Version:  %s\n", me.version );
+	os_fprintf( segfault, "Protocol:  %s\n", me.protocol );
 	if( modulename ) {
-		fprintf( segfault, "Module:           %s\n", GET_CUR_MODNAME() );
-		fprintf( segfault, "Module Version:   %s\n", GET_CUR_MODVERSION() );
+		os_fprintf( segfault, "Module:           %s\n", GET_CUR_MODNAME() );
+		os_fprintf( segfault, "Module Version:   %s\n", GET_CUR_MODVERSION() );
 	}
-	fprintf( segfault, "Location: %s\n", segv_location );
-	fprintf( segfault, "recbuf:   %s\n", recbuf );
+	os_fprintf( segfault, "Location: %s\n", segv_location );
+	os_fprintf( segfault, "recbuf:   %s\n", recbuf );
 	do_backtrace();
-	fprintf( segfault, "-------------------------END OF REPORT--------------------------\n" );
+	os_fprintf( segfault, "-------------------------END OF REPORT--------------------------\n" );
 	fflush( segfault );
 	fclose( segfault );		
 }

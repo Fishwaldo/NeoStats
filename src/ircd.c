@@ -97,6 +97,12 @@ static void( *irc_send_swhois )( const char *source, const char *target, const c
 static void( *irc_send_smo )( const char *source, const char *umodetarget, const char *msg );
 static void( *irc_send_akill )( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, unsigned long ts );
 static void( *irc_send_rakill )( const char *source, const char *host, const char *ident );
+static void( *irc_send_sqline )( const char *source, const char *mask, const char *reason );
+static void( *irc_send_unsqline )( const char *source, const char *mask );
+static void( *irc_send_sgline )( const char *source, const char *mask, const char *reason );
+static void( *irc_send_unsgline )( const char *source, const char *mask );
+static void( *irc_send_zline )( const char *source, const char *mask, const char *reason );
+static void( *irc_send_unzline )( const char *source, const char *mask );
 static void( *irc_send_ping )( const char *source, const char *reply, const char *to );
 static void( *irc_send_pong )( const char *reply );
 static void( *irc_send_server )( const char *source, const char *name, const int numeric, const char *infoline );
@@ -154,6 +160,10 @@ static ircd_sym ircd_sym_table[] =
 	{( void * )&irc_send_smo, "send_smo", 0, FEATURE_SMO},
 	{( void * )&irc_send_svstime, "send_svstime", 0, FEATURE_SVSTIME},
 	{( void * )&irc_send_akill, "send_akill", 0, 0},
+	{( void * )&irc_send_sqline, "send_sqline", 0, 0},
+	{( void * )&irc_send_unsqline, "send_unsqline", 0, 0},
+	{( void * )&irc_send_zline, "send_zline", 0, 0},
+	{( void * )&irc_send_unzline, "send_unzline", 0, 0},
 	{( void * )&irc_send_rakill, "send_rakill", 0, 0},
 	{( void * )&irc_send_ping, "send_ping", 0, 0},
 	{( void * )&irc_send_pong, "send_pong", 0, 0},
@@ -1619,6 +1629,111 @@ int irc_rakill( const Bot *botptr, const char *host, const char *ident )
 		return NS_FAILURE;
 	}
 	irc_send_rakill( me.name, host, ident );
+	return NS_SUCCESS;
+}
+
+/** @brief irc_sqline
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_sqline( const Bot *botptr, const char *mask, const char *reason, ...)
+{
+	va_list ap;
+
+	if( !irc_send_sqline) {
+		unsupported_cmd( "SQLINE" );
+		return NS_FAILURE;
+	}
+	va_start( ap, reason );
+	ircvsnprintf( ircd_buf, BUFSIZE, reason, ap );
+	va_end( ap );
+	irc_send_sqline( me.name, mask, ircd_buf );
+	return NS_SUCCESS;
+}
+
+/** @brief irc_unsqline
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_unsqline( const Bot *botptr, const char *mask )
+{
+	if( !irc_send_unsqline) {
+		unsupported_cmd( "UNSQLINE" );
+		return NS_FAILURE;
+	}
+	irc_send_unsqline( me.name, mask );
+	return NS_SUCCESS;
+}
+
+/** @brief irc_sgline
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_sgline( const Bot *botptr, const char *mask, const char *reason, ...)
+{
+	va_list ap;
+
+	if( !irc_send_sgline) {
+		unsupported_cmd( "SGLINE" );
+		return NS_FAILURE;
+	}
+	va_start( ap, reason );
+	ircvsnprintf( ircd_buf, BUFSIZE, reason, ap );
+	va_end( ap );
+	irc_send_sgline( me.name, mask, ircd_buf );
+	return NS_SUCCESS;
+}
+
+/** @brief irc_unsgline
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_unsgline( const Bot *botptr, const char *mask )
+{
+	if( !irc_send_unsgline) {
+		unsupported_cmd( "UNSGLINE" );
+		return NS_FAILURE;
+	}
+	irc_send_unsgline( me.name, mask );
+	return NS_SUCCESS;
+}
+
+/** @brief irc_zline
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_zline( const Bot *botptr, const char *mask, const char *reason, ...)
+{
+	va_list ap;
+
+	if( !irc_send_sqline) {
+		unsupported_cmd( "ZLINE" );
+		return NS_FAILURE;
+	}
+	va_start( ap, reason );
+	ircvsnprintf( ircd_buf, BUFSIZE, reason, ap );
+	va_end( ap );
+	irc_send_zline( me.name, mask, ircd_buf );
+	return NS_SUCCESS;
+}
+
+/** @brief irc_unzline
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_unzline( const Bot *botptr, const char *mask )
+{
+	if( !irc_send_unsqline) {
+		unsupported_cmd( "UNZLINE" );
+		return NS_FAILURE;
+	}
+	irc_send_unzline( me.name, mask );
 	return NS_SUCCESS;
 }
 

@@ -4,6 +4,10 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - StatServ: Fix last seen and start timestamps. (M)
+ - Add support framework for SGLINE, SZLINE and SQLINE. (M)
+ - Bahamut protocol module changed to bahamut14 and bahamut18 to allow support
+   for both versions. (M)
  - Add operlog to supported modules. (M)
  - Add support for incoming GLOBOPS, CHATOPS and WALLOPS. (M)
  - HostServ: add nick/host/vhost limits to list command (D)

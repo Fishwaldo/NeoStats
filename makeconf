@@ -162,7 +162,7 @@ echo "     3) Ultimate 2.x.x"
 echo "     4) Ultimate 3.x.x"
 echo "     5) Hybrid7"
 echo "     6) NeoIRCd"
-echo "     7) Bahamut 1.4/1.6"
+echo "     7) Bahamut 1.4"
 echo "     8) Bahamut 1.8"
 echo "     9) Mystic"
 echo "     10) Quantum"
@@ -375,7 +375,7 @@ cat > $CONF << __EOF__
 # PROTOCOL <protocol> [REQUIRED]
 #    Specifies the protocol module to use.
 #    Valid protocol options are:
-#          bahamut bahamut18 client hybrid7 ircup10 
+#          bahamut14 bahamut18 client hybrid7 ircup10 
 #          liquid mystic neoircd quantum plexus
 #          ultimate2 ultimate3 unreal31 unreal32 
 #          viagra

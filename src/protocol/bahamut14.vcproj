@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="bahamut"
+	Name="bahamut14"
 	ProjectGUID="{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\include;..\..\lib\adnswin32;..\..\lib\keeper;..\..\lib\curl;..\..\lib\pcre"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;bahamut_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;bahamut14_EXPORTS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -33,13 +33,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="neostats.lib"
-				OutputFile="../../modules/bahamutd.dll"
+				OutputFile="../../modules/bahamut14d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\debug"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/bahamut.pdb"
+				ProgramDatabaseFile="$(OutDir)/bahamut14.pdb"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)/bahamut.lib"
+				ImportLibrary="$(OutDir)/bahamut14.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -71,7 +71,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include;..\..\lib\adnswin32;..\..\lib\keeper;..\..\lib\curl;..\..\lib\pcre"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;bahamut_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;bahamut14_EXPORTS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -82,14 +82,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="neostats.lib"
-				OutputFile="../../modules/bahamut.dll"
+				OutputFile="../../modules/bahamut14.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../release"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/bahamut.lib"
+				ImportLibrary="$(OutDir)/bahamut14.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -121,7 +121,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="bahamut.c">
+				RelativePath="bahamut14.c">
 			</File>
 		</Filter>
 		<Filter
@@ -129,7 +129,7 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="bahamut.h">
+				RelativePath="bahamut14.h">
 			</File>
 		</Filter>
 		<Filter

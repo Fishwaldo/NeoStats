@@ -1,7 +1,7 @@
-pkglib_LTLIBRARIES	= bahamut.la bahamut18.la client.la hybrid7.la ircup10.la liquid.la \
+pkglib_LTLIBRARIES	= bahamut14.la bahamut18.la client.la hybrid7.la ircup10.la liquid.la \
 						mystic.la neoircd.la plexus.la quantum.la ultimate2.la \
 						ultimate3.la unreal31.la unreal32.la viagra.la
-bahamut_la_SOURCES = bahamut.c bahamut.h
+bahamut14_la_SOURCES = bahamut14.c bahamut14.h
 bahamut18_la_SOURCES = bahamut18.c bahamut18.h
 client_la_SOURCES = client.c client.h
 hybrid7_la_SOURCES = hybrid7.c hybrid7.h

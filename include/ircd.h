@@ -202,6 +202,12 @@ MODULEFUNC void send_swhois( const char *source, const char *target, const char 
 MODULEFUNC void send_smo( const char *source, const char *umodetarget, const char *msg );
 MODULEFUNC void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts );
 MODULEFUNC void send_rakill( const char *source, const char *host, const char *ident );
+MODULEFUNC void send_sqline( const char *source, const char *mask, const char *reason );
+MODULEFUNC void send_unsqline( const char *source, const char *mask );
+MODULEFUNC void send_sgline( const char *source, const char *mask, const char *reason );
+MODULEFUNC void send_unsgline( const char *source, const char *mask );
+MODULEFUNC void send_zline( const char *source, const char *mask, const char *reason );
+MODULEFUNC void send_unzline( const char *source, const char *mask );
 MODULEFUNC void send_ping( const char *source, const char *reply, const char *target );
 MODULEFUNC void send_pong( const char *reply );
 MODULEFUNC void send_server( const char *source, const char *name, const int numeric, const char *infoline );

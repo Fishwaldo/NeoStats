@@ -63,6 +63,7 @@
 #define MSG_MODE     "MODE"	   	/* MODE */
 #define MSG_KICK     "KICK"	   	/* KICK */
 #define MSG_USERHOST "USERHOST"		/* USER -> USRH */
+#define MSG_USERIP   "USERIP"		/* USER -> USRH */
 #define MSG_ISON     "ISON"	   	/* ISON */
 #define MSG_REHASH   "REHASH"	   	/* REHA */
 #define MSG_RESTART  "RESTART"		/* REST */
@@ -79,9 +80,9 @@
 #define MSG_GNOTICE  "GNOTICE"		/* GNOTICE */
 #define MSG_KLINE    "KLINE"	   	/* KLINE */
 #define MSG_UNKLINE  "UNKLINE"		/* UNKLINE */
-#define MSG_HTM      "HTM"	      	/* HTM */
 #define MSG_SET      "SET"	      	/* SET */
 #define MSG_SAMODE   "SAMODE"    	/* SAMODE */
+#define MSG_SAJOIN   "SAJOIN"		/* SAJOIN */
 #define MSG_CHANSERV "CHANSERV"		/* CHANSERV */
 #define MSG_NICKSERV "NICKSERV"		/* NICKSERV */
 #define MSG_MEMOSERV "MEMOSERV"		/* MEMOSERV */
@@ -97,6 +98,7 @@
 #define MSG_SVSNOOP  "SVSNOOP"   	/* SVSNOOP */
 #define MSG_SVSKILL  "SVSKILL"   	/* SVSKILL */
 #define MSG_SVSMODE  "SVSMODE"   	/* SVSMODE */
+#define MSG_SVSHOLD  "SVSHOLD"		/* SVSHOLD */
 #define MSG_AKILL    "AKILL"     	/* AKILL */
 #define MSG_RAKILL   "RAKILL"    	/* RAKILL */
 #define MSG_SILENCE  "SILENCE"   	/* SILENCE */
@@ -115,6 +117,12 @@
 #define MSG_OS	     "OS"            	/* OperServ commands */
 #define MSG_SS	     "SS"            	/* StatServ commands */
 #define MSG_HS	     "HS"            	/* StatServ commands */
+#define MSG_RESYNCH  "RESYNCH"		/* RESYNCH */
+#define MSG_LUSERSLOCK "LUSERSLOCK"     /* Lusers LOCK */
+#define MSG_LINKSCONTROL "LINKSCONTROL" /* LINKSCONTROL */
+#define MSG_MODULE   "MODULE"		/* MODULE */
+#define MSG_RWHO     "RWHO"         /* RWHO */
+#define MSG_SVSCLONE "SVSCLONE"     /* SVSCLONE */
 
 /* Umodes */
 #define UMODE_SERVNOTICE	0x00100000	/* umode +s - Server notices */

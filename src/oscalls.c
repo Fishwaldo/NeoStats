@@ -156,6 +156,19 @@ int os_fprintf( FILE *handle, char *fmt, ... )
 }
 
 /*
+ *  Wrapper function for fputs
+ */
+
+int os_fputs( const char *string, FILE *handle )
+{
+	int retval;
+
+	retval = fputs( string, handle );	
+	os_errno = errno;
+	return retval;
+}
+
+/*
  *  Wrapper function for fread
  */
 

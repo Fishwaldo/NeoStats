@@ -133,7 +133,7 @@ static int AddServerStat (Client *s, void *v)
 	if (!ss) {
 		ss = new_server_stat (s->name);
 	}
-	ss->ts_lastseen = me.now;
+	ss->ts_start = ss->ts_lastseen = me.now;
 	AddNetworkServer ();
 	SetServerModValue (s, (void *)ss);
 	ss->s = s;
@@ -151,6 +151,7 @@ static void DelServerStat (Client* s)
 	serverstat *ss;
 	
 	ss = (serverstat *) GetServerModValue (s);
+	ss->ts_lastseen = me.now;
 	IncStatistic (&ss->splits);
 	ClearServerModValue (s);
 	ss->s = NULL;
@@ -319,7 +320,7 @@ static int ss_server_copy (CmdParams *cmdparams)
 	}
 	memcpy (dest, src, sizeof(serverstat));
 	strlcpy (dest->name, cmdparams->av[2], MAXHOST);
-	irc_prefmsg (ss_bot, cmdparams->source, "Moved database entry for %s to %s", 
+	irc_prefmsg (ss_bot, cmdparams->source, "Copied database entry for %s to %s", 
 		cmdparams->av[1], cmdparams->av[2]);
 	nlog (LOG_NOTICE, "%s requested STATS COPY %s to %s", cmdparams->source->name, 
 		cmdparams->av[1], cmdparams->av[2]);
@@ -328,6 +329,7 @@ static int ss_server_copy (CmdParams *cmdparams)
 
 static int ss_cmd_server_stats (CmdParams *cmdparams)
 {
+	time_t uptime;
 	serverstat *ss;
 	Client *s;
 	char *server;
@@ -349,6 +351,10 @@ static int ss_cmd_server_stats (CmdParams *cmdparams)
 		irc_prefmsg (ss_bot, cmdparams->source, "Server Last Seen: %s", 
 			sftime(ss->ts_lastseen));
 	} else {
+		/* Calculate uptime as uptime from server plus uptime of NeoStats */
+		time_t uptime = s->server->uptime  + (me.now - me.ts_boot);
+		irc_prefmsg (ss_bot, cmdparams->source, "Version: %s", s->version );
+		irc_prefmsg (ss_bot, cmdparams->source, "Uptime:  %ld day%s, %02ld:%02ld:%02ld", (uptime / 86400), (uptime / 86400 == 1) ? "" : "s", ((uptime / 3600) % 24), ((uptime / 60) % 60), (uptime % 60) );
 		irc_prefmsg (ss_bot, cmdparams->source, "Current Users: %-3d (%d%%)", 
 			s->server->users, 
 			(int)((float) s->server->users / (float) networkstats.users.current * 100));

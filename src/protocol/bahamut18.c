@@ -45,9 +45,9 @@ const int proto_topiclen	= (307 + 1);
 
 ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
-	PROTOCOL_SJOIN,
+	PROTOCOL_SJOIN | PROTOCOL_NICKIP,
 	/* Protocol options negotiated at link by this IRCd */
-	PROTOCOL_NICKIP,
+	0,
 	/* Features supported by this IRCd */
 	0,
 	"+oS",

@@ -607,9 +607,9 @@ src/numerics.c -text
 src/oscalls.c -text
 src/protocol/Makefile.am -text
 src/protocol/Makefile.in -text
-src/protocol/bahamut.c eol=lf
-src/protocol/bahamut.h eol=lf
-src/protocol/bahamut.vcproj -text
+src/protocol/bahamut14.c eol=lf
+src/protocol/bahamut14.h eol=lf
+src/protocol/bahamut14.vcproj -text
 src/protocol/bahamut18.c -text
 src/protocol/bahamut18.h -text
 src/protocol/bahamut18.vcproj -text

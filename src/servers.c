@@ -123,8 +123,8 @@ DelServer (const char *name, const char* reason)
 		return;
 	}
 	s = hnode_get (sn);
-	del_server_leaves (s);
 	if(ircd_srv.protocol & PROTOCOL_NOQUIT) {
+		del_server_leaves (s);
 		QuitServerUsers (s);
 	}
 	me.servercount--;
@@ -221,12 +221,15 @@ ListServers (const char *name)
 int 
 InitServers (void)
 {
+	Client* s;
+	
 	serverhash = hash_create (SERVER_TABLE_SIZE, 0, 0);
 	if (!serverhash) {
 		nlog (LOG_CRITICAL, "Unable to create server hash");
 		return NS_FAILURE;
 	}
-	AddServer (me.name, NULL, 0, NULL, me.infoline);
+	s = AddServer (me.name, NULL, 0, NULL, me.infoline);
+	strlcpy( s->version, me.version, VERSIONSIZE );
 	return NS_SUCCESS;
 }
 

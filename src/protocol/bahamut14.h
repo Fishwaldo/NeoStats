@@ -22,8 +22,8 @@
 ** NeoStats CVS Identification
 ** $Id$
 */
-#ifndef BAHAMUT_H
-#define BAHAMUT_H
+#ifndef BAHAMUT14_H
+#define BAHAMUT14_H
 
 /* Messages/Tokens */
 #define MSG_PRIVATE  "PRIVMSG"		/* PRIV */
@@ -140,4 +140,4 @@
 #define CMODE_MODREG	0x02000000
 #define CMODE_LISTED	0x04000000
 
-#endif
+#endif /* BAHAMUT14_H */

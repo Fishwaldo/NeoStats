@@ -24,7 +24,9 @@
 #include "neostats.h"
 #include "rta.h"
 #include "rtaserv.h"
-#include <fcntl.h>
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h> 
+#endif
 
 void rta_exit(void);
 

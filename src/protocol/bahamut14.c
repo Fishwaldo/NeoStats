@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-#include "bahamut.h"
+#include "bahamut14.h"
 #include "neostats.h"
 #include "ircd.h"
 

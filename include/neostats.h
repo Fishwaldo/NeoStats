@@ -1121,6 +1121,12 @@ EXPORTFUNC int irc_chanusermode( const Bot *botptr, const char *chan, const char
 EXPORTFUNC int irc_kill( const Bot *botptr, const char *target, const char *reason, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 EXPORTFUNC int irc_akill( const Bot *botptr, const char *host, const char *ident, const unsigned long length, const char *reason, ...)  __attribute__((format(printf,5,6))); /* 5=format 6=params */
 EXPORTFUNC int irc_rakill( const Bot *botptr, const char *host, const char *ident );
+EXPORTFUNC int irc_sqline( const Bot *botptr, const char *mask, const char *reason, ...)  __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_unsqline( const Bot *botptr, const char *mask );
+EXPORTFUNC int irc_sgline( const Bot *botptr, const char *mask, const char *reason, ...)  __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_unsgline( const Bot *botptr, const char *mask );
+EXPORTFUNC int irc_zline( const Bot *botptr, const char *mask, const char *reason, ...)  __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_unzline( const Bot *botptr, const char *mask );
 EXPORTFUNC int irc_swhois( const char *target, const char *swhois );
 EXPORTFUNC int irc_sethost( const Bot *botptr, const char *host );
 EXPORTFUNC int irc_setident( const Bot *botptr, const char *ident );
@@ -1362,6 +1368,7 @@ EXPORTFUNC int os_fclose( FILE *handle );
 EXPORTFUNC int os_fseek( FILE *handle, long offset, int origin );
 EXPORTFUNC long os_ftell( FILE *handle );
 EXPORTFUNC int os_fprintf( FILE *handle, char *fmt, ...) __attribute__((format(printf,2,3)) ); /* 2=format 3=params */
+EXPORTFUNC int os_fputs( const char *string, FILE *handle );
 EXPORTFUNC int os_fread( void *buffer, size_t size, size_t count, FILE *handle );
 EXPORTFUNC char *os_fgets( char *string, int n, FILE *handle );
 EXPORTFUNC int os_fwrite( const void *buffer, size_t size, size_t count, FILE *handle );
