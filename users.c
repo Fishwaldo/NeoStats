@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.60 2003/08/25 07:30:23 fishwaldo Exp $
+** $Id: users.c,v 1.61 2003/09/09 11:38:56 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -104,7 +104,6 @@ AddUser (const char *nick, const char *user, const char *host, const char *serve
 	
 	/* make sure the module pointers are all null */
 	for (i = 0; i < NUM_MODULES; i++) {
-		printf("clearing module %d\n", i);
 		u->moddata[i] = NULL;
 	}
 }
