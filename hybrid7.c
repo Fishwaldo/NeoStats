@@ -356,7 +356,7 @@ m_credits (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	do_server (argv[0], origin, argv[1], NULL, NULL, srv);
+	do_server (argv[0], origin, argv[1], NULL, argv[2], srv);
 }
 
 static void

@@ -1380,7 +1380,10 @@ MYHOST=$host_os
 case "$host_os" in
 *cygwin)
 	CFLAGS="$CFLAGS -O2 -g"
-	LDFLAGS="-export-dynamic";;
+	LDFLAGS="$LDFLAGS -export-dynamic";;
+*mingw32)
+	CFLAGS="$CFLAGS -O2 -g -mno-cygwin"
+	LDFLAGS="$LDFLAGS -export-dynamic";;
 *openbsd)
 	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
 	LDFLAGS="-export-dynamic";;
@@ -5738,6 +5741,66 @@ fi
 fi
 
 
+
+echo "$as_me:$LINENO: checking whether external symbols need an underscore prefix" >&5
+echo $ECHO_N "checking whether external symbols need an underscore prefix... $ECHO_C" >&6
+if test "${ac_cv_c_extern_prefix+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  saved_libs=$LIBS
+LIBS="conftest_asm.s $LIBS"
+cat > conftest_asm.s <<EOF
+	.globl _ac_test
+_ac_test:
+	.long 0
+EOF
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+extern int ac_test;
+int
+main ()
+{
+if (ac_test) return 1
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_c_extern_prefix="yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_c_extern_prefix="no"
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$saved_libs
+fi
+echo "$as_me:$LINENO: result: $ac_cv_c_extern_prefix" >&5
+echo "${ECHO_T}$ac_cv_c_extern_prefix" >&6
+if test "$ac_cv_c_extern_prefix" = "yes"
+then
+  cat >>confdefs.h <<\_ACEOF
+#define NEED_UNDERSCORE_PREFIX 1
+_ACEOF
+
+fi
 
 PCRE_MAJOR=4
 PCRE_MINOR=3

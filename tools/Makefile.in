@@ -1,6 +1,7 @@
 include ../Makefile.inc
 
-INCLUDES = -I.. -I../keeper/ -I../adns/ -DHAVE_CONFIG_H
+TOOLSCFLAGS = $(CFLAGS) $(INSTALLDIR) -DHAVE_CONFIG_H
+INCLUDES = -I.. -I../keeper/ -I../adns/
 
 KP_SOURCES= kp_exp.c kp_imp.c kptool.c
 KP_OBJECTS= kp_exp.o kp_imp.o kptool.o
@@ -12,7 +13,7 @@ all:	kptool @build_configtool@
 utils:  kptool @build_configtool@
 
 .c.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<
+	$(CC) $(TOOLSCFLAGS) $(INCLUDES) -c $<
 kptool:	$(KP_OBJECTS)
 	$(CC) $(KP_OBJECTS) $(KEEPER_OBJS) -o $@
 

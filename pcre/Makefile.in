@@ -1,7 +1,7 @@
 #PCRE Makefile
 include ../Makefile.inc
 
-INCLUDES=-I.. -I.
+INCLUDES = -I.. -I.
 
 SRCS= get.c pcre.c study.c
 OBJS= ${SRCS:.c=.o}
@@ -10,10 +10,10 @@ DOCS=README.pcre COPYING
 all:	 ${OBJS}
 
 .c.o:	
-	 $(CC) -c $(CFLAGS) $(INCLUDES) $<
+	 $(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 dftables.o: dftables.c maketables.c internal.h ../pcre.h config.h Makefile
-	$(CC) -c $(CFLAGS) $(INCLUDES) dftables.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c dftables.c
 
 dftables:       dftables.o
 	$(CC) $(LDFLAGS) dftables.o -o dftables

@@ -443,14 +443,20 @@ m_credits (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	char* s = NULL;
-	/* server desc is in argv[3] but so is some other stuff
-	 * so we need to strip protocol, flags and numeric.
-	 */
+	char* s = argv[argc-1];
+	if (*origin== 0) {
+		/* server desc from uplink includes extra info so we need to 
+		   strip protocol, flags and numeric. We can use the first
+		   space to do this*/
+		while(*s != ' ')
+			s++;
+		/* Strip the now leading space */
+		s++;
+	}
 	if(argc > 3) {
-		do_server (argv[0], origin, argv[1], argv[2], argv[3], srv);
+		do_server (argv[0], origin, argv[1], argv[2], s, srv);
 	} else {
-		do_server (argv[0], origin, argv[1], NULL, argv[2], srv);
+		do_server (argv[0], origin, argv[1], NULL, s, srv);
 	}
 	
 }

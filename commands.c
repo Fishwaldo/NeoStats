@@ -180,8 +180,6 @@ add_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list)
 	if(bot_ptr->botcmds == NULL) {
 		return NS_FAILURE;
 	}
-	/* set the module */
-	
 	/* Cycle through command list and add them */
 	while(bot_cmd_list->cmd) {
 		add_bot_cmd(bot_ptr->botcmds, bot_cmd_list);
@@ -231,7 +229,7 @@ del_all_bot_cmds(ModUser* bot_ptr)
 	}
 	/* Destroy command */
 	hash_destroy(bot_ptr->botcmds);
-//	bot_ptr->botcmds = NULL;
+	bot_ptr->botcmds = NULL;
 	return NS_SUCCESS;
 }
 

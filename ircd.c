@@ -799,22 +799,26 @@ do_motd (const char* nick, const char *remoteserver)
 	char buf[BUFSIZE];
 
 	SET_SEGV_LOCATION();
-	numeric (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
-	numeric (RPL_MOTD, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
-	numeric (RPL_MOTD, nick, ":-");
-
 	fp = fopen (MOTD_FILENAME, "r");
-
-	if (fp) {
-		while (fgets (buf, sizeof (buf), fp)) {
-			buf[strnlen (buf, BUFSIZE) - 1] = 0;
-			numeric (RPL_MOTD, nick, ":- %s", buf);
-		}
-		fclose (fp);
+	if(!fp) {
+		numeric (ERR_NOMOTD, nick, "MOTD File is missing");
 	} else {
-		numeric (RPL_MOTD, nick, ":- MOTD file Missing");
+		numeric (RPL_MOTDSTART, nick, "- %s Message of the Day -", me.name);
+		numeric (RPL_MOTD, nick, "- %d.%d.%d%s. Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
+		numeric (RPL_MOTD, nick, "-");
+
+
+		if (fp) {
+			while (fgets (buf, sizeof (buf), fp)) {
+				buf[strnlen (buf, BUFSIZE) - 1] = 0;
+				numeric (RPL_MOTD, nick, "- %s", buf);
+			}
+			fclose (fp);
+		} else {
+			numeric (RPL_MOTD, nick, "- MOTD file Missing");
+		}
+		numeric (RPL_ENDOFMOTD, nick, "End of /MOTD command.");
 	}
-	numeric (RPL_ENDOFMOTD, nick, ":End of /MOTD command.");
 }
 
 /** @brief Display the ADMIN Message from the external stats.admin file
@@ -830,19 +834,21 @@ do_admin (const char* nick, const char *remoteserver)
 	char buf[BUFSIZE];
 	SET_SEGV_LOCATION();
 
-	numeric (RPL_ADMINME, nick, ":- %s NeoStats Admins -", me.name);
-	numeric (RPL_ADMINME, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
-
 	fp = fopen (ADMIN_FILENAME, "r");
-
-	if (fp) {
-		while (fgets (buf, sizeof (buf), fp)) {
-			buf[strnlen (buf, BUFSIZE) - 1] = 0;
-			numeric (RPL_ADMINLOC1, nick, ":- %s", buf);
+	if(!fp) {
+		numeric (ERR_NOMOTD, nick, "No administrative info available");
+	} else {
+		numeric (RPL_ADMINME, nick, "- %s NeoStats Admins -", me.name);
+		numeric (RPL_ADMINME, nick, "- %d.%d.%d%s.  Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
+		if (fp) {
+			while (fgets (buf, sizeof (buf), fp)) {
+				buf[strnlen (buf, BUFSIZE) - 1] = 0;
+				numeric (RPL_ADMINLOC1, nick, "- %s", buf);
+			}
+			fclose (fp);
 		}
-		fclose (fp);
+		numeric (RPL_ADMINLOC2, nick, "End of /ADMIN command.");
 	}
-	numeric (RPL_ADMINLOC2, nick, ":End of /ADMIN command.");
 }
 
 /** @brief 
@@ -855,28 +861,28 @@ void
 do_credits (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
-	numeric (RPL_VERSION, nick, ":- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, ircd_version);
-	numeric (RPL_VERSION, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
-	numeric (RPL_VERSION, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
-	numeric (RPL_VERSION, nick, ":- irc.irc-chat.net #NeoStats");
-	numeric (RPL_VERSION, nick, ":- Thanks to:");
-	numeric (RPL_VERSION, nick, ":- Enigma for being part of the dev team");
-	numeric (RPL_VERSION, nick, ":- Stskeeps for Writting the best IRCD ever!");
-	numeric (RPL_VERSION, nick, ":- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)");
-	numeric (RPL_VERSION, nick, ":- monkeyIRCD for the Module Segv Catching code");
-	numeric (RPL_VERSION, nick, ":- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!");
-	numeric (RPL_VERSION, nick, ":- Andy For Ideas");
-	numeric (RPL_VERSION, nick, ":- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies");
-	numeric (RPL_VERSION, nick, ":- sre and Jacob for development systems and access");
-	numeric (RPL_VERSION, nick, ":- Error51 for Translating our FAQ and README files");
-	numeric (RPL_VERSION, nick, ":- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!");
-	numeric (RPL_VERSION, nick, ":- Eggy for proving to use our code still had bugs when we thought it didn't (and all the bug reports!)");
-	numeric (RPL_VERSION, nick, ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
-	numeric (RPL_VERSION, nick, ":- M - Updating lots of Doco and code and providing lots of great feedback");
-	numeric (RPL_VERSION, nick, ":- J Michael Jones - Giving us Patches to support QuantumIRCd");
-	numeric (RPL_VERSION, nick, ":- Blud - Giving us patches for Mystic IRCd");
-	numeric (RPL_VERSION, nick, ":- herrohr - Giving us patches for Liquid IRCd support");
-	numeric (RPL_VERSION, nick, ":- OvErRiTe - Giving us patches for Viagra IRCd support");
+	numeric (RPL_VERSION, nick, "- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, ircd_version);
+	numeric (RPL_VERSION, nick, "- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
+	numeric (RPL_VERSION, nick, "- For Support, you can find ^Enigma^ or Shmad at");
+	numeric (RPL_VERSION, nick, "- irc.irc-chat.net #NeoStats");
+	numeric (RPL_VERSION, nick, "- Thanks to:");
+	numeric (RPL_VERSION, nick, "- Enigma for being part of the dev team");
+	numeric (RPL_VERSION, nick, "- Stskeeps for writing the best IRCD ever!");
+	numeric (RPL_VERSION, nick, "- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)");
+	numeric (RPL_VERSION, nick, "- monkeyIRCD for the Module Segv Catching code");
+	numeric (RPL_VERSION, nick, "- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!");
+	numeric (RPL_VERSION, nick, "- Andy For Ideas");
+	numeric (RPL_VERSION, nick, "- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies");
+	numeric (RPL_VERSION, nick, "- sre and Jacob for development systems and access");
+	numeric (RPL_VERSION, nick, "- Error51 for Translating our FAQ and README files");
+	numeric (RPL_VERSION, nick, "- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!");
+	numeric (RPL_VERSION, nick, "- Eggy for proving to use our code still had bugs when we thought it didn't (and all the bug reports!)");
+	numeric (RPL_VERSION, nick, "- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
+	numeric (RPL_VERSION, nick, "- M - Updating lots of Doco and code and providing lots of great feedback");
+	numeric (RPL_VERSION, nick, "- J Michael Jones - Giving us Patches to support QuantumIRCd");
+	numeric (RPL_VERSION, nick, "- Blud - Giving us patches for Mystic IRCd");
+	numeric (RPL_VERSION, nick, "- herrohr - Giving us patches for Liquid IRCd support");
+	numeric (RPL_VERSION, nick, "- OvErRiTe - Giving us patches for Viagra IRCd support");
 }
 
 /** @brief 
@@ -916,7 +922,7 @@ do_stats (const char* nick, const char *what)
 #ifdef EXTAUTH
 		dl = get_dl_handle ("extauth");
 		if (dl > 0) {
-			listauth = dlsym ((int *) dl, "__list_auth");
+			listauth = ns_dlsym ((int *) dl, "__list_auth");
 			if (listauth)
 				(*listauth) (u);
 		} else

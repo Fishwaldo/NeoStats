@@ -429,11 +429,10 @@ del_chan (Chans * c)
 /** @brief Process a kick from a channel. 
  *
  * In fact, this does nothing special apart from call part_chan, and processing a channel kick
- * @param User u, user structure of user getting kicked
- * @param channel name user being kicked from
- * @param User k, the user doing the kick
+ * @param kickby, the user nick or servername doing the kick
+ * @param chan, channel name user being kicked from
+ * @param kicked, the user nick getting kicked
  * @param kickreason the reason the user was kicked
- * 
  *
  */
 
@@ -449,11 +448,6 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 
 	SET_SEGV_LOCATION();
 	u = finduser (kicked);
-	/* kickby can be a server as well */
-#if 0
-	k = finduser (kickby);
-	if (!u||!k) {
-#endif
 	if (!u) {
 		nlog (LOG_WARNING, LOG_CORE, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
 		if (me.debug_mode) {

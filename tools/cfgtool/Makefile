@@ -1,6 +1,8 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../.. -I../../keeper/ -Ipixmaps -DHAVE_CONFIG_H 
+TOOLSCFLAGS = $(CFLAGS) $(INSTALLDIR) -DHAVE_CONFIG_H 
+
+INCLUDES = -I../.. -I../../keeper/ -Ipixmaps
 GCFLAGS = `gtk-config --cflags`
 GLDFLAGS = `gtk-config --libs`
 KP_SRCS= gkeeper.c tree.c edit.c menu.c dialog.c
@@ -11,7 +13,7 @@ KEEPER_OBJS= ../../keeper/kp_cache.o ../../keeper/kp_dir.o ../../keeper/kp_enum.
 all: 	configtool
 
 .c.o:
-	$(CC) $(GCFLAGS) $(CFLAGS) $(INCLUDES) -c $<
+	$(CC) $(TOOLSCFLAGS) $(GCFLAGS) $(INCLUDES) -c $<
 
 
 configtool:	$(KP_OBJS)

@@ -1,6 +1,6 @@
 #curl Makefile
 CC=@CC@
-CFLAGS= -DHAVE_CONFIG_H @CFLAGS@ @CPPFLAGS@
+CFLAGS= @CFLAGS@ @CPPFLAGS@ -DHAVE_CONFIG_H 
 LDFLAGS= @LDFLAGS@ @LIBS@
 
 SRCS= base64.c easy.c getdate.c http.c if2ip.c md5.c progress.c ssluse.c transfer.c connect.c escape.c getenv.c http_chunks.c \
@@ -17,7 +17,7 @@ libcurl.a: ${OBJS} Makefile
 all: libcurl.a  
 
 .c.o:	
-	 $(CC) -c $(CFLAGS) $<
+	 $(CC) $(CFLAGS) -c $<
 
 getdate.c:
 	 touch getdate.c

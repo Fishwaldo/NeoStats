@@ -1,6 +1,7 @@
 # Makefile for NeoStats
 include Makefile.inc 
 
+NEOCFLAGS = $(CFLAGS) $(INSTALLDIR)
 EXTRA_LDFLAGS = `curl/mycurl-config --libs`
 
 PROGS = neostats cronchk makeconf
@@ -41,7 +42,7 @@ DISTLIBS = adns pcre curl sqlsrv keeper
 DISTMOD = cs extauth hostserv loveserv ms statserv template
 
 .c.o:
-	$(CC) $(NEOINCLUDES) $(CFLAGS) -c $< 
+	$(CC) $(NEOINCLUDES) $(NEOCFLAGS) -c $< 
 
 all: @buildsqlsrv@ libadns libkeeper libpcre libcurl.a neostats modules utils 
 

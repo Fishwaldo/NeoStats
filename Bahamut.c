@@ -360,7 +360,11 @@ m_admin (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	do_server (argv[0], origin, argv[1], NULL, NULL, srv);
+	if(argc > 2) {
+		do_server (argv[0], origin, argv[1], argv[2], NULL, srv);
+	} else {
+		do_server (argv[0], origin, NULL, argv[1], NULL, srv);
+	}
 }
 
 static void

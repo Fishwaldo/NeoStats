@@ -284,5 +284,10 @@ extern ModuleInfo		__module_info;
 extern Functions		__module_functions[];
 extern EventFnList		__module_events[];  
 
+void *ns_dlsym (void *handle, const char *name);
+void *ns_dlopen (const char *file, int mode);
+int ns_dlclose (void *handle);
+char *ns_dlerror (void);
+
 
 #endif /* !_dl_h_ */

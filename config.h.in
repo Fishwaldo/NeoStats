@@ -1,8 +1,11 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
-/* 'Enable Debugging' */
+/* Enable Debugging */
 #undef DEBUG
 
-/* 'Use External Authentication' */
+/* Whether symbols need underscore prefix */
+#undef NEED_UNDERSCORE_PREFIX
+
+/* Use External Authentication */
 #undef EXTAUTH
 
 /* Define to 1 if you have the <db.h> header file. */
@@ -80,7 +83,7 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* 'Use IRCD Authentication' */
+/* Use IRCD Authentication */
 #undef IRCDAUTH
 
 /* Name of package */

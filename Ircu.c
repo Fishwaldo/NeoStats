@@ -55,6 +55,9 @@ const char services_bot_modes[]= "+oS";
 ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
 	{MSG_PRIVATE, m_privmsg, 0},
+	{TOK_PRIVATE, m_privmsg, 0},
+	{MSG_CPRIVMSG, m_privmsg, 0},
+	{TOK_CPRIVMSG, m_privmsg, 0},
 	{MSG_NOTICE, m_notice, 0},
 	{MSG_STATS, m_stats, 0},
 	{MSG_VERSION, m_version, 0},
@@ -292,10 +295,25 @@ m_admin (char *origin, char **argv, int argc, int srv)
 	do_admin (origin, argv[0]);
 }
 
+/* m_server
+ *
+ * argv[0] = sender prefix
+ * argv[1] = servername
+ * argv[2] = hopcount
+ * argv[3] = start timestamp
+ * argv[4] = link timestamp
+ * argv[5] = major protocol version: P10/P11
+ * argv[6] = YMM, YMMM or YYMMM; where 'YY' is the server numeric and
+ *      "MMM" is the numeric nick mask of this server.
+ * argv[7] = 0 (not used yet, mandatory unsigned int after u2.10.06)
+ * argv[argc-1] = serverinfo
+ * NumServ(sptr) SERVER name hop 0 TSL PROT YxxCap 0 :info
+ */
+
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	do_server (argv[0], origin, argv[1], NULL, NULL, srv);
+	do_server (argv[0], origin, argv[1], NULL, argv[argc-1], srv);
 }
 
 static void

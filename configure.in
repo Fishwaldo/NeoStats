@@ -15,7 +15,10 @@ MYHOST=$host_os
 case "$host_os" in
 *cygwin)
 	CFLAGS="$CFLAGS -O2 -g"
-	LDFLAGS="-export-dynamic";;
+	LDFLAGS="$LDFLAGS -export-dynamic";;
+*mingw32)
+	CFLAGS="$CFLAGS -O2 -g -mno-cygwin"
+	LDFLAGS="$LDFLAGS -export-dynamic";;
 *openbsd)
 	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
 	LDFLAGS="-export-dynamic";;
@@ -105,7 +108,24 @@ else
  ])
 fi
 
+dnl **** Check for underscore on external symbols ****
 
+AC_CACHE_CHECK(whether external symbols need an underscore prefix,
+               ac_cv_c_extern_prefix,
+[saved_libs=$LIBS
+LIBS="conftest_asm.s $LIBS"
+cat > conftest_asm.s <<EOF
+	.globl _ac_test
+_ac_test:
+	.long 0
+EOF
+AC_TRY_LINK([extern int ac_test;],[if (ac_test) return 1],
+            ac_cv_c_extern_prefix="yes",ac_cv_c_extern_prefix="no")
+LIBS=$saved_libs])
+if test "$ac_cv_c_extern_prefix" = "yes"
+then
+  AC_DEFINE(NEED_UNDERSCORE_PREFIX)
+fi
 
 PCRE_MAJOR=4
 PCRE_MINOR=3
@@ -513,6 +533,7 @@ AC_DEFINE(POSIX_MALLOC_THRESHOLD,10)
 AC_SUBST(POSIX_MALLOC_THRESHOLD)
 AC_SUBST(UTF8)
 
+AC_SUBST(IRCD_FILES_SRC)
 AC_SUBST(IRCD_FILES_SRC)
 AC_SUBST(IRCD_FILES_OBJS)
 AC_SUBST(IRCD_FILES_INC)

@@ -539,7 +539,7 @@ int InitExtAuth(void)
 	int i;
 	i = get_dl_handle ("extauth");
 	if (i > 0) {
-		getauth = dlsym ((int *) i, "__do_auth");
+		getauth = ns_dlsym ((int *) i, "__do_auth");
 		return NS_SUCCESS;
 	} 
 	return NS_FAILURE;

@@ -182,8 +182,36 @@ TBLDEF neo_modules = {
 #endif /* SQLSRV */
 
 
+void *ns_dlsym (void *handle, const char *name)
+{
+#ifdef NEED_UNDERSCORE_PREFIX
+	char sym[128];
+	void* ret;
+	ret = dlsym ((int *) handle, name);
+	if (ret == NULL) {
+		ircsnprintf(sym, 128, "_%s", name);
+		return (dlsym ((int *) handle, sym));
+	}
+	return ret;
+#else
+	return (dlsym ((int *) handle, name));
+#endif
+}
 
+void *ns_dlopen (const char *file, int mode)
+{
+	return (dlopen (file, mode));
+}
 
+int ns_dlclose (void *handle)
+{
+	return (dlclose (handle));
+}
+
+char *ns_dlerror (void)
+{
+	return (dlerror ());
+}
 
 /** @brief Initialise module list hashes
  *
@@ -311,7 +339,7 @@ add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 	ModTimer *mod_tmr;
 
 	SET_SEGV_LOCATION();
-	if (dlsym ((int *) get_dl_handle (mod_name), func_name) == NULL) {
+	if (ns_dlsym ((int *) get_dl_handle (mod_name), func_name) == NULL) {
 		nlog (LOG_WARNING, LOG_CORE, "%s: Timer %s Function %s doesn't exist", mod_name, timer_name, func_name);
 		return NS_FAILURE;
 	}
@@ -320,7 +348,7 @@ add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 		mod_tmr->interval = interval;
 		mod_tmr->lastrun = me.now;
 		strlcpy (mod_tmr->modname, mod_name, MAX_MOD_NAME);
-		mod_tmr->function = dlsym ((int *) get_dl_handle (mod_name), func_name);
+		mod_tmr->function = ns_dlsym ((int *) get_dl_handle (mod_name), func_name);
 		nlog (LOG_DEBUG2, LOG_CORE, "add_mod_timer: Registered Module %s with timer for Function %s", mod_name, func_name);
 		return NS_SUCCESS;
 	}
@@ -540,19 +568,19 @@ add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int
 
 	SET_SEGV_LOCATION();
 	if (readfunc) {
-		if (dlsym ((int *) get_dl_handle (mod_name), readfunc) == NULL) {
+		if (ns_dlsym ((int *) get_dl_handle (mod_name), readfunc) == NULL) {
 			nlog (LOG_WARNING, LOG_CORE, "add_socket: read socket function doesn't exist = %s (%s)", readfunc, mod_name);
 			return NS_FAILURE;
 		}
 	}
 	if (writefunc) {
-		if (dlsym ((int *) get_dl_handle (mod_name), writefunc) == NULL) {
+		if (ns_dlsym ((int *) get_dl_handle (mod_name), writefunc) == NULL) {
 			nlog (LOG_WARNING, LOG_CORE, "add_socket: write socket function doesn't exist = %s (%s)", writefunc, mod_name);
 			return NS_FAILURE;
 		}
 	}
 	if (errfunc) {
-		if (dlsym ((int *) get_dl_handle (mod_name), errfunc) == NULL) {
+		if (ns_dlsym ((int *) get_dl_handle (mod_name), errfunc) == NULL) {
 			nlog (LOG_WARNING, LOG_CORE, "add_socket: error socket function doesn't exist = %s (%s)", errfunc, mod_name);
 			return NS_FAILURE;
 		}
@@ -560,9 +588,9 @@ add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int
 	mod_sock = new_sock (sock_name);
 	mod_sock->sock_no = socknum;
 	strlcpy (mod_sock->modname, mod_name, MAX_MOD_NAME);
-	mod_sock->readfnc = dlsym ((int *) get_dl_handle (mod_name), readfunc);
-	mod_sock->writefnc = dlsym ((int *) get_dl_handle (mod_name), writefunc);
-	mod_sock->errfnc = dlsym ((int *) get_dl_handle (mod_name), errfunc);
+	mod_sock->readfnc = ns_dlsym ((int *) get_dl_handle (mod_name), readfunc);
+	mod_sock->writefnc = ns_dlsym ((int *) get_dl_handle (mod_name), writefunc);
+	mod_sock->errfnc = ns_dlsym ((int *) get_dl_handle (mod_name), errfunc);
 	mod_sock->socktype = SOCK_STANDARD;
 	
 	nlog (LOG_DEBUG2, LOG_CORE, "add_socket: Registered Module %s with Standard Socket functions %s", mod_name, mod_sock->sockname);
@@ -587,13 +615,13 @@ add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name
 
 	SET_SEGV_LOCATION();
 	if (beforepoll) {
-		if (dlsym ((int *) get_dl_handle (mod_name), beforepoll) == NULL) {
+		if (ns_dlsym ((int *) get_dl_handle (mod_name), beforepoll) == NULL) {
 			nlog (LOG_WARNING, LOG_CORE, "add_sockpoll: read socket function doesn't exist = %s (%s)", beforepoll, mod_name);
 			return NS_FAILURE;
 		}
 	}
 	if (afterpoll) {
-		if (dlsym ((int *) get_dl_handle (mod_name), afterpoll) == NULL) {
+		if (ns_dlsym ((int *) get_dl_handle (mod_name), afterpoll) == NULL) {
 			nlog (LOG_WARNING, LOG_CORE, "add_sockpoll: write socket function doesn't exist = %s (%s)", afterpoll, mod_name);
 			return NS_FAILURE;
 		}
@@ -601,8 +629,8 @@ add_sockpoll (char *beforepoll, char *afterpoll, char *sock_name, char *mod_name
 	mod_sock = new_sock (sock_name);
 	strlcpy (mod_sock->modname, mod_name, MAX_MOD_NAME);
 	mod_sock->socktype = SOCK_POLL;
-	mod_sock->beforepoll = dlsym ((int *) get_dl_handle (mod_name), beforepoll);
-	mod_sock->afterpoll = dlsym ((int *) get_dl_handle (mod_name), afterpoll);
+	mod_sock->beforepoll = ns_dlsym ((int *) get_dl_handle (mod_name), beforepoll);
+	mod_sock->afterpoll = ns_dlsym ((int *) get_dl_handle (mod_name), afterpoll);
 	mod_sock->data = data;
 	nlog (LOG_DEBUG2, LOG_CORE, "add_sockpoll: Registered Module %s with Poll Socket functions %s", mod_name, mod_sock->sockname);
 	return NS_SUCCESS;
@@ -951,8 +979,8 @@ add_mod_user (char *nick, char *mod_name)
 			mod_usr = new_bot (nick);
 			if(mod_usr) {
 				strlcpy (mod_usr->modname, mod_name, MAX_MOD_NAME);
-				mod_usr->function = dlsym (mod_ptr->dl_handle, "__BotMessage");
-				mod_usr->chanfunc = dlsym (mod_ptr->dl_handle, "__ChanMessage");
+				mod_usr->function = ns_dlsym (mod_ptr->dl_handle, "__BotMessage");
+				mod_usr->chanfunc = ns_dlsym (mod_ptr->dl_handle, "__ChanMessage");
 				mod_usr->botcmds = hash_create(-1, 0, 0);
 				return mod_usr;
 			}
@@ -1275,9 +1303,9 @@ load_module (char *modfilename, User * u)
 	strlcpy (loadmodname, modfilename, 255);
 	strlwr (loadmodname);
 	ircsnprintf (path, 255, "%s/%s.so", MOD_PATH, loadmodname);
-	dl_handle = dlopen (path, RTLD_NOW || RTLD_GLOBAL);
+	dl_handle = ns_dlopen (path, RTLD_NOW || RTLD_GLOBAL);
 	if (!dl_handle) {
-		dl_error = dlerror ();
+		dl_error = ns_dlerror ();
 		if (do_msg) {
 			prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
 		}
@@ -1286,28 +1314,28 @@ load_module (char *modfilename, User * u)
 	}
 
 	/* new system */
-	mod_info_ptr = dlsym (dl_handle, "__module_info");
+	mod_info_ptr = ns_dlsym (dl_handle, "__module_info");
 #ifdef OLD_MODULE_EXPORT_SUPPORT
 	if(mod_info_ptr == NULL) {
 		/* old system */
 		isnewstyle = 0;
-		mod_get_info = dlsym (dl_handle, "__module_get_info");
+		mod_get_info = ns_dlsym (dl_handle, "__module_get_info");
 #ifndef HAVE_LIBDL
 		if (mod_get_info == NULL) {
-			dl_error = dlerror ();
+			dl_error = ns_dlerror ();
 #else /* HAVE_LIBDL */
-		if ((dl_error = dlerror ()) != NULL) {
+		if ((dl_error = ns_dlerror ()) != NULL) {
 #endif /* HAVE_LIBDL */
 			if (do_msg) {
 				prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
 			}
 			nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
-			dlclose (dl_handle);
+			ns_dlclose (dl_handle);
 			return NS_FAILURE;
 		}
 		mod_info_ptr = (*mod_get_info) ();
 		if (mod_info_ptr == NULL) {
-			dlclose (dl_handle);
+			ns_dlclose (dl_handle);
 			nlog (LOG_WARNING, LOG_CORE, "Module has no info structure: %s", path);
 			return NS_FAILURE;
 		}
@@ -1315,25 +1343,25 @@ load_module (char *modfilename, User * u)
 #else /* OLD_MODULE_EXPORT_SUPPORT */
 #ifndef HAVE_LIBDL
 	if(mod_info_ptr == NULL) {
-		dl_error = dlerror ();
+		dl_error = ns_dlerror ();
 #else /* HAVE_LIBDL */
-	if ((dl_error = dlerror ()) != NULL) {
+	if ((dl_error = ns_dlerror ()) != NULL) {
 #endif /* HAVE_LIBDL */
 		if (do_msg) {
 			prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
 		}
 		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
-		dlclose (dl_handle);
+		ns_dlclose (dl_handle);
 		return NS_FAILURE;
 	}
 #endif /* OLD_MODULE_EXPORT_SUPPORT */
 
 	/* new system */
-	mod_funcs_ptr = dlsym (dl_handle, "__module_functions");
+	mod_funcs_ptr = ns_dlsym (dl_handle, "__module_functions");
 #ifdef OLD_MODULE_EXPORT_SUPPORT
 	if(mod_funcs_ptr == NULL) {
 		/* old system */
-		mod_get_funcs = dlsym (dl_handle, "__module_get_functions");
+		mod_get_funcs = ns_dlsym (dl_handle, "__module_get_functions");
 		/* no error check here - this one isn't essential to the functioning of the module */
 
 		if (mod_get_funcs) {
@@ -1343,12 +1371,12 @@ load_module (char *modfilename, User * u)
 #endif /* OLD_MODULE_EXPORT_SUPPORT */
 
 	/* new system */
-	event_fn_ptr = dlsym (dl_handle, "__module_events");
+	event_fn_ptr = ns_dlsym (dl_handle, "__module_events");
 #ifdef OLD_MODULE_EXPORT_SUPPORT
 	if(event_fn_ptr == NULL)
 	{
 		/* old system */
-		mod_get_events = dlsym (dl_handle, "__module_get_events");
+		mod_get_events = ns_dlsym (dl_handle, "__module_get_events");
 		/* no error check here - this one isn't essential to the functioning of the module */
 
 		if (mod_get_events)
@@ -1358,7 +1386,7 @@ load_module (char *modfilename, User * u)
 
 	/* Check that the Module hasn't already been loaded */
 	if (hash_lookup (mh, mod_info_ptr->module_name)) {
-		dlclose (dl_handle);
+		ns_dlclose (dl_handle);
 		if (do_msg)
 			prefmsg (u->nick, s_Services, "Module %s already Loaded, Can't Load 2 Copies", mod_info_ptr->module_name);
 		return NS_FAILURE;
@@ -1372,7 +1400,7 @@ load_module (char *modfilename, User * u)
 			chanalert (s_Services, "Module List is Full. Can't Load any more modules");
 			prefmsg (u->nick, s_Services, "Module List is Full, Can't Load any more Modules");
 		}
-		dlclose (dl_handle);
+		ns_dlclose (dl_handle);
 		free (mod_ptr);
 		return NS_FAILURE;
 	} else {
@@ -1396,7 +1424,7 @@ load_module (char *modfilename, User * u)
 	nlog (LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, mod_ptr->info->module_name);
 
 	/* call __ModInit (replacement for library __init() call */
-	ModInit = dlsym ((int *) dl_handle, "__ModInit");
+	ModInit = ns_dlsym ((int *) dl_handle, "__ModInit");
 	if (ModInit) {
 		SET_SEGV_LOCATION();
 		SET_SEGV_INMODULE(mod_ptr->info->module_name);
@@ -1548,7 +1576,7 @@ unload_module (char *module_name, User * u)
 
 		
 		/* call __ModFini (replacement for library __fini() call */
-		ModFini = dlsym ((int *) mod_ptr->dl_handle, "__ModFini");
+		ModFini = ns_dlsym ((int *) mod_ptr->dl_handle, "__ModFini");
 		if (ModFini) {
 			SET_SEGV_INMODULE(module_name);
 			(*ModFini) ();
@@ -1564,7 +1592,7 @@ unload_module (char *module_name, User * u)
 		/* Close module */
 		SET_SEGV_INMODULE(module_name);
 #ifndef VALGRIND
-		dlclose (mod_ptr->dl_handle);
+		ns_dlclose (mod_ptr->dl_handle);
 #endif
 		CLEAR_SEGV_INMODULE();
 

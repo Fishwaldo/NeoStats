@@ -514,7 +514,11 @@ m_credits (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	do_server (argv[0], origin, argv[1], NULL, NULL, srv);
+	if(argc > 2) {
+		do_server (argv[0], origin, argv[1], argv[2], NULL, srv);
+	} else {
+		do_server (argv[0], origin, NULL, argv[1], NULL, srv);
+	}
 }
 
 static void
@@ -636,7 +640,7 @@ m_svinfo (char *origin, char **argv, int argc, int srv)
 static void
 m_snetinfo (char *origin, char **argv, int argc, int srv)
 {
-	do_snetinfo(NULL, NULL, argv[2], argv[3], argv[7]);
+	do_snetinfo(argv[0], argv[1], argv[2], argv[3], argv[7]);
 }
 #endif
 

@@ -53,4 +53,7 @@
 #define	RPL_MOTDSTART        375
 #define	RPL_ENDOFMOTD        376
 
+#define	ERR_NOMOTD           422
+#define	ERR_NOADMININFO      423
+
 #endif /* _NUMERIC_H_ */
