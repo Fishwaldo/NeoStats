@@ -1,0 +1,20 @@
+************************************************************************
+** NeoStats - IRC Statistical Services                                **
+** Copyright (c) 1999-2004 NeoStats Group. All Rights Reserved.       **
+** This program and all associated documentation is free but          **
+** copyrighted software; see the file COPYING for details.            **
+** Homepage: http://www.neostats.net/                                 **
+************************************************************************
+
+How to add a new IRCd protocol to NeoStats
+------------------------------------------
+
+This document explains how to add a new IRCd protocol to NeoStats. 
+
+-----------------------------------<>-----------------------------------
+
+TBA
+
+************************************************************************
+** This document was last updated on March 17th, 2004 by M            **
+************************************************************************

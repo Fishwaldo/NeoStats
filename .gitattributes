@@ -305,6 +305,7 @@ src/protocol/mystic.c eol=lf
 src/protocol/mystic.h eol=lf
 src/protocol/neoircd.c eol=lf
 src/protocol/neoircd.h eol=lf
+src/protocol/protocol.txt -text
 src/protocol/quantum.c eol=lf
 src/protocol/quantum.h eol=lf
 src/protocol/ultimate.c eol=lf
