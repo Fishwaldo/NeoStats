@@ -66,7 +66,11 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *i
 
 	nlog (LOG_DEBUG1, LOG_CORE, "New Server: %s", name);
 	s = new_server (name);
-	s->hops = atoi (hops);
+	if(hops) {
+		s->hops = atoi (hops);
+	} else {
+		s->hops = 0;
+	}
 	s->connected_since = me.now;
 	if (uplink) {
 		strlcpy (s->uplink, uplink, MAXHOST);
