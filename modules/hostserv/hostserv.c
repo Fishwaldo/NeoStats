@@ -30,7 +30,7 @@
 static char ban_buf[BANBUFSIZE];
 
 typedef struct hs_map_ {
-	char nnick[MAXNICK];
+	char nick[MAXNICK];
 	char host[MAXHOST];
 	char vhost[MAXHOST];
 	char passwd[MAXPASS];
@@ -156,22 +156,22 @@ ModuleEvent module_events[] = {
 int findnick(const void *key1, const void *key2)
 {
 	const hs_map *vhost = key1;
-	return (ircstrcasecmp(vhost->nnick, (char *)key2));
+	return (ircstrcasecmp(vhost->nick, (char *)key2));
 }
 
 void save_vhost(hs_map *vhost) 
 {
-	SetData((void *)vhost->host, CFGSTR, "Vhosts", vhost->nnick, "Host");
-	SetData((void *)vhost->vhost, CFGSTR, "Vhosts", vhost->nnick , "Vhost");
-	SetData((void *)vhost->passwd, CFGSTR, "Vhosts", vhost->nnick , "Passwd");
-	SetData((void *)vhost->added, CFGSTR, "Vhosts", vhost->nnick , "Added");
-	SetData((void *)vhost->lused, CFGINT, "Vhosts", vhost->nnick , "LastUsed");
+	SetData((void *)vhost->host, CFGSTR, "Vhosts", vhost->nick, "Host");
+	SetData((void *)vhost->vhost, CFGSTR, "Vhosts", vhost->nick , "Vhost");
+	SetData((void *)vhost->passwd, CFGSTR, "Vhosts", vhost->nick , "Passwd");
+	SetData((void *)vhost->added, CFGSTR, "Vhosts", vhost->nick , "Added");
+	SetData((void *)vhost->lused, CFGINT, "Vhosts", vhost->nick , "LastUsed");
 	list_sort(vhosts, findnick);
 }
 
 void del_vhost(hs_map *vhost) 
 {
-	DelRow("Vhosts", vhost->nnick);
+	DelRow("Vhosts", vhost->nick);
 	ns_free(vhost);
 	/* no need to list sort here, because its already sorted */
 }
@@ -350,7 +350,7 @@ static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 	hs_map *map;
 
 	map = ns_malloc(sizeof(hs_map));
-	strlcpy(map->nnick, nick, MAXNICK);
+	strlcpy(map->nick, nick, MAXNICK);
 	strlcpy(map->host, host, MAXHOST);
 	strlcpy(map->vhost, vhost, MAXHOST);
 	strlcpy(map->passwd, pass, MAXPASS);
@@ -539,7 +539,7 @@ static int hs_chpass(CmdParams* cmdparams)
 					"Password Successfully changed");
 				irc_chanalert(hs_bot,
 					  "%s changed the password for %s",
-					  cmdparams->source->name, map->nnick);
+					  cmdparams->source->name, map->nick);
 				map->lused = me.now;
 				save_vhost(map);
 				return NS_SUCCESS;
@@ -549,11 +549,11 @@ static int hs_chpass(CmdParams* cmdparams)
 				"Error, Hostname Mis-Match");
 			irc_chanalert(hs_bot,
 				  "%s tried to change the password for %s, but the hosts do not match (%s->%s)",
-				  cmdparams->source->name, map->nnick, cmdparams->source->user->hostname,
+				  cmdparams->source->name, map->nick, cmdparams->source->user->hostname,
 				  map->host);
 			nlog(LOG_WARNING,
 			     "%s tried to change the password for %s but the hosts do not match (%s -> %s)",
-			     cmdparams->source->name, map->nnick, cmdparams->source->user->hostname, map->host);
+			     cmdparams->source->name, map->nick, cmdparams->source->user->hostname, map->host);
 			return NS_SUCCESS;
 		}
 	}
@@ -667,7 +667,7 @@ static int hs_list(CmdParams* cmdparams)
 		}
 		map = lnode_get(hn);
 		irc_prefmsg(hs_bot, cmdparams->source,  "%-5d %-12s %-30s", i,
-			map->nnick, map->vhost);
+			map->nick, map->vhost);
 		i++;
 		/* limit to x entries per screen */
 		if (i > start + 20) 
@@ -708,7 +708,7 @@ static int hs_view(CmdParams* cmdparams)
 		if (tmpint == i) {
 			map = lnode_get(hn);
 			irc_prefmsg(hs_bot, cmdparams->source,  "Virtual Host information:");
-			irc_prefmsg(hs_bot, cmdparams->source,  "Nick:      %s", map->nnick);
+			irc_prefmsg(hs_bot, cmdparams->source,  "Nick:      %s", map->nick);
 			irc_prefmsg(hs_bot, cmdparams->source,  "Real host: %s", map->host);
 			irc_prefmsg(hs_bot, cmdparams->source,  "Vhost:     %s", map->vhost);
 			irc_prefmsg(hs_bot, cmdparams->source,  "Password:  %s", map->passwd);
@@ -742,19 +742,19 @@ static void LoadHosts()
 	if (GetTableData("Vhosts", &LoadArray) > 0) {
 		for (count = 0; LoadArray[count] != NULL; count++) {
 			map = ns_malloc(sizeof(hs_map));
-			strlcpy(map->nnick, LoadArray[count], MAXNICK);
-			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Host") > 0) 
+			strlcpy(map->nick, LoadArray[count], MAXNICK);
+			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nick, "Host") > 0) 
 				strlcpy(map->host, tmp, MAXHOST);
-			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Vhost") > 0) 
+			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nick, "Vhost") > 0) 
 				strlcpy(map->vhost, tmp, MAXHOST);
-			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Passwd") > 0) 
+			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nick, "Passwd") > 0) 
 				strlcpy(map->passwd, tmp, MAXPASS);
-			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Added") > 0)
+			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nick, "Added") > 0)
 				strlcpy(map->added, tmp, MAXNICK);
-			GetData((void *)&map->lused, CFGINT, "Vhosts", map->nnick, "LastUsed");
+			GetData((void *)&map->lused, CFGINT, "Vhosts", map->nick, "LastUsed");
 			lnode_create_append (vhosts, map);
 			dlog(DEBUG1, "Loaded %s (%s) into Vhosts",
-			     map->nnick, map->vhost);
+			     map->nick, map->vhost);
 		}
 	}			
 	ns_free(LoadArray);
@@ -786,11 +786,11 @@ static int hs_del(CmdParams* cmdparams)
 		if (i == tmpint) {
 			map = lnode_get(hn);
 			irc_prefmsg(hs_bot, cmdparams->source,  "removed vhost %s for %s",
-				map->nnick, map->vhost);
+				map->nick, map->vhost);
 			nlog(LOG_NOTICE, "%s removed the vhost %s for %s", 
-				 cmdparams->source->name, map->vhost, map->nnick);
+				 cmdparams->source->name, map->vhost, map->nick);
 			irc_chanalert(hs_bot, "%s removed vhost %s for %s",
-				  cmdparams->source->name, map->vhost, map->nnick);
+				  cmdparams->source->name, map->vhost, map->nick);
 			del_vhost(map);
 			list_delete(vhosts, hn);
 			lnode_destroy(hn);
@@ -854,7 +854,7 @@ int CleanupHosts()
 		map = lnode_get(hn);
 		if (map->lused < (me.now - (hs_cfg.old * 86400))) {
 			nlog(LOG_NOTICE, "Expiring old vhost: %s for %s",
-			     map->vhost, map->nnick);
+			     map->vhost, map->nick);
 			del_vhost(map);
 			hn2 = list_next(vhosts, hn);
 			list_delete(vhosts, hn);

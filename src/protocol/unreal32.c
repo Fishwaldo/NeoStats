@@ -62,9 +62,6 @@ static void m_setname (char *origin, char **argv, int argc, int srv);
 static void m_sethost (char *origin, char **argv, int argc, int srv);
 static void m_setident (char *origin, char **argv, int argc, int srv);
 
-#define NICKV2	
-#define NICKIP
-
 /* buffer sizes */
 const int proto_maxhost		= (128 + 1);
 const int proto_maxpass		= (32 + 1);
@@ -78,7 +75,7 @@ ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
 	PROTOCOL_SJOIN,
 	/* Protocol options negotiated at link by this IRCd */
-	PROTOCOL_TOKEN,
+	PROTOCOL_TOKEN | PROTOCOL_NICKIP | PROTOCOL_NICKv2,
 	/* Features supported by this IRCd */
 	FEATURE_UMODECLOAK,
 	"+oSq",
@@ -781,21 +778,27 @@ static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
-#ifdef NICKV2	
-#ifdef NICKIP
-		char ip[25];
+		if (ircd_srv.protocol&PROTOCOL_NICKv2)
+		{
+			if (ircd_srv.protocol&PROTOCOL_NICKIP)
+			{
+				char ip[25];
 
-		ircsnprintf(ip, 25, "%d", decode_ip(argv[9]));
-		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
-			ip, argv[6], argv[7], argv[8], argv[10], NULL, NULL);
-#else
-		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
-			NULL, argv[6], argv[7], argv[8], argv[9], NULL, NULL);
-#endif
-#else
-		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
-			NULL, argv[6], NULL, NULL, argv[9], NULL, NULL);
-#endif
+				ircsnprintf(ip, 25, "%d", decode_ip(argv[9]));
+				do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+					ip, argv[6], argv[7], argv[8], argv[10], NULL, NULL);
+			}
+			else
+			{
+				do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+					NULL, argv[6], argv[7], argv[8], argv[9], NULL, NULL);
+			}
+		}
+		else
+		{
+			do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+				NULL, argv[6], NULL, NULL, argv[9], NULL, NULL);
+		}
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}

@@ -432,6 +432,8 @@ void StatsQuitUser(Client * u)
 
 void StatsGlobalKill(Client * u)
 {
+	SStats *ss;
+
 	/* Treat as a quit for stats */
 	StatsQuitUser (u);
 	ss = findserverstats(u->uplink->name);
@@ -440,6 +442,8 @@ void StatsGlobalKill(Client * u)
 
 void StatsServerKill(Client * u)
 {
+	SStats *ss;
+
 	/* Treat as a quit for stats */
 	StatsQuitUser (u);
 	ss = findserverstats(u->name);

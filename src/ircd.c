@@ -666,6 +666,11 @@ do_protocol (char *origin, char **argv, int argc)
 				ircd_srv.protocol |= PROTOCOL_NICKIP;
 			}			
 		}
+		else if (!ircstrcasecmp ("NICKv2", argv[i])) {
+			if(protocol_info->optprotocol&PROTOCOL_NICKv2) {
+				ircd_srv.protocol |= PROTOCOL_NICKv2;
+			}			
+		}
 	}
 }
 
