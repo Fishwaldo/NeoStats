@@ -159,7 +159,7 @@ aCtab cFlagTab[] = {
 Oper_Modes usr_mds[] = {
 	{UMODE_OPER, 'o', 50}
 	,
-        {UMODE_LOCOP, 'O', 40}
+        {UMODE_LOCOP, 'O', NS_ULEVEL_OPER}
         ,
 	{UMODE_INVISIBLE, 'i', 0}
 	,
@@ -179,11 +179,11 @@ Oper_Modes usr_mds[] = {
         ,
         {UMODE_FLOOD, 'f', 0}
         ,
-	{UMODE_SERVICESADMIN, 'a', 200}
+	{UMODE_SERVICESADMIN, 'a', NS_ULEVEL_ROOT}
 	,
 	{UMODE_SERVADMIN, 'A', 100}
 	,
-        {UMODE_NETADMIN, 'N', 185}
+        {UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN}
         ,
         {UMODE_TECHADMIN, 'T', 190}
         ,
@@ -198,7 +198,7 @@ Oper_Modes usr_mds[] = {
         {UMODE_WHOIS, 'W', 0}
         ,
 	/* this is needed for bot support */
-	{UMODE_SERVICES, 'S', 200}
+	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT}
 	,
 	{0, 0, 0}
 };

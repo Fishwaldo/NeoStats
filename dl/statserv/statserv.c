@@ -256,7 +256,7 @@ int __BotMessage(char *origin, char **av, int ac)
 	nlog(LOG_NORMAL, LOG_MOD, "%s received message from %s: %s",
 	     s_StatServ, u->nick, av[1]);
 
-	if (me.onlyopers && UserLevel(u) < 40) {
+	if (me.onlyopers && UserLevel(u) < NS_ULEVEL_OPER) {
 		prefmsg(u->nick, s_StatServ,
 			"This service is only available to IRCops.");
 		chanalert(s_StatServ,
@@ -630,7 +630,7 @@ static void ss_chans(User * u, char *chan)
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(findchan(cs->name))
-			    && (UserLevel(u) < 40)) {
+			    && (UserLevel(u) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(Chead, cn);
 				if (cn) {
@@ -663,7 +663,7 @@ static void ss_chans(User * u, char *chan)
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(findchan(cs->name))
-			    && (UserLevel(u) < 40)) {
+			    && (UserLevel(u) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(Chead, cn);
 				if (cn) {
@@ -698,7 +698,7 @@ static void ss_chans(User * u, char *chan)
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(findchan(cs->name))
-			    && (UserLevel(u) < 40)) {
+			    && (UserLevel(u) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(Chead, cn);
 				if (cn) {
@@ -733,7 +733,7 @@ static void ss_chans(User * u, char *chan)
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(findchan(cs->name))
-			    && (UserLevel(u) < 40)) {
+			    && (UserLevel(u) < NS_ULEVEL_OPER)) {
 				i--;
 				cn = list_next(Chead, cn);
 				if (cn) {
@@ -1032,7 +1032,7 @@ static void ss_operlist(User * origuser, char *flags, char *server)
 	register int j = 0;
 	int away = 0;
 	register User *u;
-	int tech = 0;
+	int ulevel = 0;
 	hscan_t scan;
 	hnode_t *node;
 
@@ -1067,8 +1067,8 @@ static void ss_operlist(User * origuser, char *flags, char *server)
 		u = hnode_get(node);
 		if (!is_oper(u))
 			continue;
-		tech = UserLevel(u);
-		if (tech < 40)
+		ulevel = UserLevel(u);
+		if (ulevel < NS_ULEVEL_OPER)
 			continue;
 		if (away && u->is_away)
 			continue;
@@ -1078,7 +1078,7 @@ static void ss_operlist(User * origuser, char *flags, char *server)
 			j++;
 			prefmsg(origuser->nick, s_StatServ,
 				"[%2d] %-15s %-15s %-10d", j, u->nick,
-				u->server->name, tech);
+				u->server->name, ulevel);
 			continue;
 		} else {
 			if (strcasecmp(server, u->server->name))
@@ -1086,7 +1086,7 @@ static void ss_operlist(User * origuser, char *flags, char *server)
 			j++;
 			prefmsg(origuser->nick, s_StatServ,
 				"[%2d] %-15s %-15s %-10d", j, u->nick,
-				u->server->name, tech);
+				u->server->name, ulevel);
 			continue;
 		}
 	}

@@ -291,7 +291,7 @@ int __BotMessage(char *origin, char **av, int ac)
 	if (!strcasecmp(av[1], "HELP")) {
 		if (ac <= 2) {
 			privmsg_list(u->nick, s_HostServ, hs_help);
-			if (UserLevel(u) >= 40)
+			if (UserLevel(u) >= NS_ULEVEL_OPER)
 				privmsg_list(u->nick, s_HostServ, hs_user_help);
 			privmsg_list(u->nick, s_HostServ, hs_help_on_help);
 			return 1;
@@ -312,7 +312,7 @@ int __BotMessage(char *origin, char **av, int ac)
 			privmsg_list(u->nick, s_HostServ, hs_help_view);
 			return 1;
 		} else if (!strcasecmp(av[2], "LEVELS")
-			   && (UserLevel(u) >= 40)) {
+			   && (UserLevel(u) >= NS_ULEVEL_OPER)) {
 			privmsg_list(u->nick, s_HostServ, hs_help_levels);
 			return 1;
 		} else if (!strcasecmp(av[2], "LOGIN")) {
