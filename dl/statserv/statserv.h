@@ -158,7 +158,6 @@ struct tld_ {
 
 /* statserv.c */
 void statserv(char *);
-void re_init_bot();
 int topchan(const void *key1, const void *key2);
 int topjoin(const void *key1, const void *key2);
 int topkick(const void *key1, const void *key2);

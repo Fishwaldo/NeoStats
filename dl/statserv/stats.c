@@ -411,13 +411,6 @@ int s_user_modes(char **av, int ac)
 	return 1;
 }
 
-void re_init_bot()
-{
-	SET_SEGV_LOCATION();
-	chanalert(s_Services, "Re-Initilizing %s Bot", __module_info.module_name);
-	init_bot(s_StatServ, StatServ.user, StatServ.host,
-		 "/msg Statserv HELP", services_bot_modes, __module_info.module_name);
-}
 int s_del_user(char **av, int ac)
 {
 	SStats *s;
