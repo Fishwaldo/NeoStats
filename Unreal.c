@@ -602,7 +602,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 	char tmpbuf[25];
 	if(!srv) {
 #ifdef NICKV2	
-		if (ircd_srv.nickip) {
+		if (ircd_srv.nickip && argc == 11 ) {
 			snprintf(tmpbuf, 25, "%d", decode_ip(argv[9]));
 			do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
 				tmpbuf /* NICKIP */, argv[6], argv[7], argv[8], argv[10], NULL);

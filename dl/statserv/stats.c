@@ -720,7 +720,7 @@ extern SStats *new_stats(const char *name)
 
 	if (!s) {
 		nlog(LOG_CRITICAL, LOG_MOD, "Out of memory.");
-		FATAL_ERROR("Out of memory.")
+		FATAL_ERROR((char *)"Out of memory.")
 	}
 
 	memcpy(s->name, name, MAXHOST);
