@@ -147,7 +147,8 @@ doDelUser (const char *nick, int killflag, const char *reason)
 	}
 	u = hnode_get (un);
 
-	strlcpy(quitreason, reason, BUFSIZE);
+	if(reason)
+		strlcpy(quitreason, reason, BUFSIZE);
 	list_process (u->chans, u, UserPart);
 	bzero(quitreason, BUFSIZE);
 
