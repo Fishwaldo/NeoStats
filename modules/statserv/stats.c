@@ -120,6 +120,7 @@ void AverageStatistic (statistic *stat)
 
 void ResetStatisticEntry (statisticentry *stat, unsigned int current)
 {
+	stat->runningtotal = current;
 	stat->max = current;
 	stat->ts_max = me.now;
 }
