@@ -169,7 +169,7 @@ UserModes user_umodes[] = {
 	{UMODE_WALLOP, 'w', 0},
 	{UMODE_SERVNOTICE, 's', 0},
 	{UMODE_CLIENT, 'c', 0},
-	{UMODE_REGNICK, 'r', 0},
+	{UMODE_REGNICK, 'r', 10},
 	{UMODE_KILLS, 'k', 0},
 	{UMODE_FAILOP, 'g', 0},
 	{UMODE_HELPOP, 'h', 0},
@@ -184,8 +184,11 @@ UserModes user_umodes[] = {
 	{UMODE_HIDE, 'x', 0},
 	{UMODE_PROT, 'p', 0},
 	{UMODE_GLOBCON, 'F', 0},
+#if 0
+	/* useless modes, ignore them as services use these modes for services ID */
 	{UMODE_DEBUG, 'd', 0},
 	{UMODE_DCCWARN, 'd', 0},
+#endif
 	{UMODE_WHOIS, 'W', 0},
 };
 
@@ -222,7 +225,7 @@ UserModes user_umodes[] = {
 	{UMODE_SBOT, 'b', 0},
 	{UMODE_CLIENT, 'c', 0},
 	{UMODE_FLOOD, 'f', 0},
-	{UMODE_REGNICK, 'r', 0},
+	{UMODE_REGNICK, 'r', 10},
 	{UMODE_HIDE, 'x', 0},
 	{UMODE_WATCHER, 'W', 0},
 };
