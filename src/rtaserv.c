@@ -258,7 +258,7 @@ sql_accept_conn(OS_SOCKET srvfd)
 
 	if (newui->fd < 0)
 	{
-		nlog(LOG_WARNING, "rtaserv: Manager accept() error (%s). \n", strerror(errno));
+		nlog(LOG_WARNING, "rtaserv: Manager accept() error (%s).", strerror(errno));
 		ns_free(newui);
 		os_sock_close (srvfd);
 		return;

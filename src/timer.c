@@ -360,7 +360,7 @@ run_mod_timers (int ismidnight)
 					ns_free (timer);
 				}
 			} else {
-				nlog (LOG_CRITICAL, "run_mod_timers: setjmp() failed, can't call module %s\n", timer->moduleptr->info->name);
+				nlog (LOG_CRITICAL, "run_mod_timers: setjmp() failed, can't call module %s", timer->moduleptr->info->name);
 			}
 		}
 	}

@@ -83,11 +83,11 @@ InitDBAMSymbols (void)
 	dbm_sym * pdbm_sym;
 
 	ircsnprintf (dbm_path, 255, "%s/%s%s", MOD_PATH, me.dbm, MOD_EXT);
-	dlog (DEBUG1, "DBA init %s", dbm_path);
+	nlog (LOG_NORMAL, "Using dbm module %s", dbm_path);
 	dbm_module_handle = ns_dlopen (dbm_path, RTLD_NOW || RTLD_GLOBAL);
 	if (!dbm_module_handle) {
 		dlog (DEBUG1, "DBA init %s failed!", dbm_path);
-		nlog (LOG_CRITICAL, "Unable to load db module %s\n", dbm_path);
+		nlog (LOG_CRITICAL, "Unable to load dbm module %s", dbm_path);
 		return NS_FAILURE;	
 	}
 	pdbm_sym = dbm_sym_table;

@@ -188,7 +188,7 @@ InitIrcdProtocol ()
 {
 	protocol_info = ns_dlsym (protocol_module_handle, "protocol_info");
 	if (!protocol_info) {
-		nlog (LOG_CRITICAL, "Unable to find protocol_info in protocol module %s\n", protocol_path);
+		nlog (LOG_CRITICAL, "Unable to find protocol_info in protocol module %s", protocol_path);
 		return NS_FAILURE;	
 	}
 	if (protocol_info->minprotocol & PROTOCOL_CLIENTMODE) {
@@ -285,9 +285,10 @@ InitIrcd (void)
 	memset(&ircd_srv, 0, sizeof(ircd_srv));
 	/* Open protocol module */
 	ircsnprintf (protocol_path, 255, "%s/%s%s", MOD_PATH, me.protocol,MOD_EXT);
+	nlog (LOG_NORMAL, "Using protocol module %s", protocol_path);
 	protocol_module_handle = ns_dlopen (protocol_path, RTLD_NOW || RTLD_GLOBAL);
 	if (!protocol_module_handle) {
-		nlog (LOG_CRITICAL, "Unable to load protocol module %s\n", protocol_path);
+		nlog (LOG_CRITICAL, "Unable to load protocol module %s", protocol_path);
 		return NS_FAILURE;	
 	}
 	/* Setup protocol options */

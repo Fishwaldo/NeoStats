@@ -163,7 +163,7 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 				module_ptr->event_list[event]->function (cmdparams);
 				RESET_RUN_LEVEL();
 			} else {
-				nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->name);
+				nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s", module_ptr->info->name);
 			}
 			SET_SEGV_LOCATION();
 		}

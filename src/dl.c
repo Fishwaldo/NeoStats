@@ -94,6 +94,7 @@ void *ns_dlopen (const char *file, int mode)
 #else /* HAVE_LIBDL */
 	if ((ns_dlerrormsg = ns_dlerror ()) != NULL) {
 #endif /* HAVE_LIBDL */
+		nlog (LOG_ERROR, "dl error %s", ns_dlerrormsg);
 		return NULL;
 	}
 	return ret;
