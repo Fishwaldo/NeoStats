@@ -26,6 +26,7 @@
 
 /*  TODO:
  *  - Add check for existing exclusions during add
+ *  - Real time exclusions??? possibly optional.
  */
 
 #include "neostats.h"

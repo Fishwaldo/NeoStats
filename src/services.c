@@ -39,23 +39,22 @@
 #include "bans.h"
 #include "rtaserv.h"
 
-static int ns_cmd_shutdown (CmdParams* cmdparams);
-static int ns_cmd_reload (CmdParams* cmdparams);
-static int ns_cmd_jupe (CmdParams* cmdparams);
+static int ns_cmd_shutdown( CmdParams *cmdparams );
+static int ns_cmd_reload( CmdParams *cmdparams );
+static int ns_cmd_jupe( CmdParams *cmdparams );
 #ifdef USE_RAW
-static int ns_cmd_raw (CmdParams* cmdparams);
+static int ns_cmd_raw( CmdParams *cmdparams );
 #endif
-static int ns_cmd_userlist (CmdParams* cmdparams);
-static int ns_cmd_serverlist (CmdParams* cmdparams);
-static int ns_cmd_channellist (CmdParams* cmdparams);
-static int ns_cmd_banlist (CmdParams* cmdparams);
-static int ns_cmd_status (CmdParams* cmdparams);
-static int ns_cmd_level (CmdParams* cmdparams);
-static int ns_cmd_load (CmdParams* cmdparams);
-static int ns_cmd_unload (CmdParams* cmdparams);
+static int ns_cmd_userlist( CmdParams *cmdparams );
+static int ns_cmd_serverlist( CmdParams *cmdparams );
+static int ns_cmd_channellist( CmdParams *cmdparams );
+static int ns_cmd_banlist( CmdParams *cmdparams );
+static int ns_cmd_status( CmdParams *cmdparams );
+static int ns_cmd_level( CmdParams *cmdparams );
+static int ns_cmd_load( CmdParams *cmdparams );
+static int ns_cmd_unload( CmdParams *cmdparams );
 
-static int services_event_ctcpversion (CmdParams *cmdparams);
-
+static int services_event_ctcpversion( CmdParams *cmdparams );
 
 tme me;
 
@@ -68,7 +67,7 @@ static const char *ns_about[] = {
 
 /** Copyright info */
 static const char *ns_copyright[] = {
-	"Copyright (c) 1999-2005, NeoStats",
+	"Copyright( c ) 1999-2005, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
@@ -120,22 +119,22 @@ static bot_cmd ns_commands[]=
 /** Bot setting table */
 static bot_setting ns_settings[]=
 {
-	{"MSGSAMPLETIME",	&nsconfig.msgsampletime,SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, "msgsampletime",	NULL,	ns_help_set_msgsampletime, NULL, (void *)10 },
-	{"MSGTHRESHOLD",	&nsconfig.msgthreshold,	SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, "msgthreshold",	NULL,	ns_help_set_msgthreshold, NULL, (void *)5 },
-	{"SPLITTIME",		&nsconfig.splittime,	SET_TYPE_INT,		0,	1000,		NS_ULEVEL_ADMIN, "splittime",	NULL,	ns_help_set_splittime, NULL, (void *)300 },
-	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,		0, 0, 	NS_ULEVEL_ADMIN, "joinserviceschan",	NULL,	ns_help_set_joinserviceschan, NULL, (void*)1 },
-	{"PINGTIME",		&nsconfig.pingtime,	SET_TYPE_INT,		0, 0, 	NS_ULEVEL_ADMIN, "pingtime",	NULL,	ns_help_set_pingtime, NULL, (void*)120 },
-	{"VERSIONSCAN",		&nsconfig.versionscan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL, (void*)1 },
+	{"MSGSAMPLETIME",	&nsconfig.msgsampletime,SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, "msgsampletime",	NULL,	ns_help_set_msgsampletime, NULL,( void * )10 },
+	{"MSGTHRESHOLD",	&nsconfig.msgthreshold,	SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, "msgthreshold",	NULL,	ns_help_set_msgthreshold, NULL,( void * )5 },
+	{"SPLITTIME",		&nsconfig.splittime,	SET_TYPE_INT,		0,	1000,		NS_ULEVEL_ADMIN, "splittime",	NULL,	ns_help_set_splittime, NULL,( void * )300 },
+	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,		0, 0, 	NS_ULEVEL_ADMIN, "joinserviceschan",	NULL,	ns_help_set_joinserviceschan, NULL,( void* )1 },
+	{"PINGTIME",		&nsconfig.pingtime,	SET_TYPE_INT,		0, 0, 	NS_ULEVEL_ADMIN, "pingtime",	NULL,	ns_help_set_pingtime, NULL,( void* )120 },
+	{"VERSIONSCAN",		&nsconfig.versionscan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL,( void* )1 },
 	{"SERVICECMODE",	me.servicescmode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicescmode",	NULL,	ns_help_set_servicecmode, NULL, NULL },
 	{"SERVICEUMODE",	me.servicesumode,	SET_TYPE_STRING,	0, 64, 	NS_ULEVEL_ADMIN, "servicesumode",	NULL,	ns_help_set_serviceumode, NULL, NULL },
-	{"CMDCHAR",			nsconfig.cmdchar,	SET_TYPE_STRING,	0, 2, 	NS_ULEVEL_ADMIN, "cmdchar",	NULL,	ns_help_set_cmdchar, NULL, (void*)"!" },
-	{"CMDREPORT",		&nsconfig.cmdreport,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "cmdreport",	NULL,	ns_help_set_cmdreport, NULL, (void*)1 },
-	{"LOGLEVEL",		&nsconfig.loglevel,	SET_TYPE_INT,		1, 6, 	NS_ULEVEL_ADMIN, "loglevel",	NULL,	ns_help_set_loglevel, NULL, (void*)5 },
-	{"DEBUG",			&nsconfig.debug,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debug, NULL, (void*)0 },
-	{"DEBUGLEVEL",		&nsconfig.debuglevel,	SET_TYPE_INT,		1, 10, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debuglevel, NULL, (void*)0 },
-	{"DEBUGCHAN",		nsconfig.debugchan,	SET_TYPE_STRING,	0, MAXCHANLEN, 	NS_ULEVEL_ADMIN, "debugchan",	NULL,	ns_help_set_debugchan, NULL, (void*)"#debug" },
-	{"DEBUGTOCHAN",		&nsconfig.debugtochan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugtochan, NULL, (void*)0 },
-	{"DEBUGMODULE",		nsconfig.debugmodule,SET_TYPE_STRING,	0, MAX_MOD_NAME, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugmodule, NULL, (void*)"all" },
+	{"CMDCHAR",			nsconfig.cmdchar,	SET_TYPE_STRING,	0, 2, 	NS_ULEVEL_ADMIN, "cmdchar",	NULL,	ns_help_set_cmdchar, NULL,( void* )"!" },
+	{"CMDREPORT",		&nsconfig.cmdreport,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "cmdreport",	NULL,	ns_help_set_cmdreport, NULL,( void* )1 },
+	{"LOGLEVEL",		&nsconfig.loglevel,	SET_TYPE_INT,		1, 6, 	NS_ULEVEL_ADMIN, "loglevel",	NULL,	ns_help_set_loglevel, NULL,( void* )5 },
+	{"DEBUG",			&nsconfig.debug,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debug, NULL,( void* )0 },
+	{"DEBUGLEVEL",		&nsconfig.debuglevel,	SET_TYPE_INT,		1, 10, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debuglevel, NULL,( void* )0 },
+	{"DEBUGCHAN",		nsconfig.debugchan,	SET_TYPE_STRING,	0, MAXCHANLEN, 	NS_ULEVEL_ADMIN, "debugchan",	NULL,	ns_help_set_debugchan, NULL,( void* )"#debug" },
+	{"DEBUGTOCHAN",		&nsconfig.debugtochan,SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugtochan, NULL,( void* )0 },
+	{"DEBUGMODULE",		nsconfig.debugmodule,SET_TYPE_STRING,	0, MAX_MOD_NAME, 	NS_ULEVEL_ADMIN, NULL,	NULL,	ns_help_set_debugmodule, NULL,( void* )"all" },
 	{NULL,				NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
 
@@ -165,10 +164,10 @@ ModuleEvent neostats_events[] = {
  *
  * @return none
  */
-static int services_event_ctcpversion (CmdParams *cmdparams)
+static int services_event_ctcpversion( CmdParams *cmdparams )
 {
-	strlcpy (cmdparams->source->version, cmdparams->param, MAXHOST);
-	SendAllModuleEvent (EVENT_CTCPVERSIONRPL, cmdparams);
+	strlcpy( cmdparams->source->version, cmdparams->param, MAXHOST );
+	SendAllModuleEvent( EVENT_CTCPVERSIONRPL, cmdparams );
 	return NS_SUCCESS;
 }
 
@@ -178,15 +177,15 @@ static int services_event_ctcpversion (CmdParams *cmdparams)
  *
  * @return none
  */
-void InitServices(void)
+void InitServices( void )
 {
 	/* if all bots should join the chan */
-	if (DBAFetchConfigInt ("AllBotsJoinChan", &nsconfig.allbots) != NS_SUCCESS) {
+	if( DBAFetchConfigInt( "AllBotsJoinChan", &nsconfig.allbots ) != NS_SUCCESS ) {
 		nsconfig.allbots = 0;
-		DBAStoreConfigInt ("AllBotsJoinChan", &nsconfig.allbots);
+		DBAStoreConfigInt( "AllBotsJoinChan", &nsconfig.allbots );
 	}
 	/* */
-	ModuleConfig(ns_settings);
+	ModuleConfig( ns_settings );
 }
 
 /** @brief init_services_bot
@@ -195,23 +194,21 @@ void InitServices(void)
  *
  * @return none
  */
-int 
-init_services_bot (void)
+int init_services_bot( void )
 {
 	SET_SEGV_LOCATION();
-	strlcpy(ns_botinfo.nick, me.rootnick, MAXNICK);
-	ircsnprintf(ns_botinfo.altnick, MAXNICK, "%s1", me.rootnick);
-	ircsnprintf(ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick);
-	if(nsconfig.onlyopers) 
+	strlcpy( ns_botinfo.nick, me.rootnick, MAXNICK );
+	ircsnprintf( ns_botinfo.altnick, MAXNICK, "%s1", me.rootnick );
+	ircsnprintf( ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick );
+	if( nsconfig.onlyopers ) 
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
 	ns_module.insynch = 1;
-	ns_botptr = AddBot (&ns_botinfo);
-	AddEventList (neostats_events);
-	/*DeleteEventList (neostats_events);*/
+	ns_botptr = AddBot( &ns_botinfo );
+	AddEventList( neostats_events );
 	ns_module.synched = 1;
 	me.synched = 1;
-	rtaserv_init ();
-	SynchAllModules ();
+	rtaserv_init();
+	SynchAllModules();
 	RequestServerUptimes();	
 	return NS_SUCCESS;
 }
@@ -223,16 +220,15 @@ init_services_bot (void)
  *  @param cmdparams structure with command information
  *  @returns none
  */
-static int
-ns_cmd_shutdown (CmdParams* cmdparams)
+static int ns_cmd_shutdown( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	irc_chanalert (ns_botptr, _("%s requested SHUTDOWN for %s"), cmdparams->source->name, cmdparams->av[cmdparams->ac-1]);
-	ircsnprintf (quitmsg, BUFSIZE, _("%s [%s](%s) requested SHUTDOWN for %s."), 
-		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, cmdparams->av[cmdparams->ac-1]);
-	irc_globops (ns_botptr, "%s", quitmsg);
-	nlog (LOG_NOTICE, "%s", quitmsg);
-	do_exit (NS_EXIT_NORMAL, quitmsg);
+	irc_chanalert( ns_botptr, _( "%s requested SHUTDOWN for %s" ), cmdparams->source->name, cmdparams->av[cmdparams->ac-1] );
+	ircsnprintf( quitmsg, BUFSIZE, _( "%s [%s] (%s) requested SHUTDOWN for %s." ), 
+		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, cmdparams->av[cmdparams->ac-1] );
+	irc_globops( ns_botptr, "%s", quitmsg );
+	nlog( LOG_NOTICE, "%s", quitmsg );
+	do_exit( NS_EXIT_NORMAL, quitmsg );
    	return NS_SUCCESS;
 }
 
@@ -243,16 +239,15 @@ ns_cmd_shutdown (CmdParams* cmdparams)
  *  @param cmdparams structure with command information
  *  @returns none
  */
-static int
-ns_cmd_reload (CmdParams* cmdparams)
+static int ns_cmd_reload( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	irc_chanalert (ns_botptr, _("%s requested RELOAD for %s"), cmdparams->source->name, cmdparams->av[cmdparams->ac - 1]);
-	ircsnprintf (quitmsg, BUFSIZE, _("%s [%s](%s) requested RELOAD for %s."), 
-		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, cmdparams->av[cmdparams->ac - 1]);
-	irc_globops (ns_botptr, "%s", quitmsg);
-	nlog (LOG_NOTICE, "%s", quitmsg);
-	do_exit (NS_EXIT_RELOAD, quitmsg);
+	irc_chanalert( ns_botptr, _( "%s requested RELOAD for %s" ), cmdparams->source->name, cmdparams->av[cmdparams->ac - 1] );
+	ircsnprintf( quitmsg, BUFSIZE, _( "%s [%s] (%s) requested RELOAD for %s." ), 
+		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, cmdparams->av[cmdparams->ac - 1] );
+	irc_globops( ns_botptr, "%s", quitmsg );
+	nlog( LOG_NOTICE, "%s", quitmsg );
+	do_exit( NS_EXIT_RELOAD, quitmsg );
    	return NS_SUCCESS;
 }
 
@@ -263,17 +258,16 @@ ns_cmd_reload (CmdParams* cmdparams)
  *  @param cmdparams structure with command information
  *  @returns none
  */
-static int
-ns_cmd_jupe (CmdParams* cmdparams)
+static int ns_cmd_jupe( CmdParams *cmdparams )
 {
 	static char infoline[255];
 
 	SET_SEGV_LOCATION();
-	ircsnprintf (infoline, 255, "[jupitered by %s]", cmdparams->source->name);
-	irc_server (cmdparams->av[0], 1, infoline);
-	nlog (LOG_NOTICE, "%s!%s@%s jupitered %s", cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, cmdparams->av[0]);
-	irc_chanalert (ns_botptr, _("%s jupitered %s"), cmdparams->source->name, cmdparams->av[0]);
-	irc_prefmsg(ns_botptr, cmdparams->source, __("%s has been jupitered", cmdparams->source), cmdparams->av[0]);
+	ircsnprintf( infoline, 255, "[jupitered by %s]", cmdparams->source->name );
+	irc_server( cmdparams->av[0], 1, infoline );
+	nlog( LOG_NOTICE, "%s!%s@%s jupitered %s", cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname, cmdparams->av[0] );
+	irc_chanalert( ns_botptr, _( "%s jupitered %s" ), cmdparams->source->name, cmdparams->av[0] );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "%s has been jupitered", cmdparams->source ), cmdparams->av[0] );
    	return NS_SUCCESS;
 }
 
@@ -284,17 +278,16 @@ ns_cmd_jupe (CmdParams* cmdparams)
  *  @param cmdparams structure with command information
  *  @returns none
  */
-static int
-ns_cmd_userlist (CmdParams* cmdparams)
+static int ns_cmd_userlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
-	if (!nsconfig.debug) {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("\2Error:\2 debug mode disabled", cmdparams->source));
+	if( !nsconfig.debug ) {
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
 	   	return NS_FAILURE;
 	}
 #endif
-	ListUsers (cmdparams, (cmdparams->ac < 1)? NULL : cmdparams->av[0]);
+	ListUsers( cmdparams,( cmdparams->ac < 1 )? NULL : cmdparams->av[0] );
    	return NS_SUCCESS;
 }
 
@@ -305,17 +298,16 @@ ns_cmd_userlist (CmdParams* cmdparams)
  *  @param cmdparams structure with command information
  *  @returns none
  */
-static int
-ns_cmd_serverlist (CmdParams* cmdparams)
+static int ns_cmd_serverlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
-	if (!nsconfig.debug) {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("\2Error:\2 debug mode disabled", cmdparams->source));
+	if( !nsconfig.debug ) {
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
 	   	return NS_FAILURE;
 	}
 #endif
-	ListServers ((cmdparams->ac < 1)? NULL : cmdparams->av[0]);
+	ListServers(( cmdparams->ac < 1 )? NULL : cmdparams->av[0] );
    	return NS_SUCCESS;
 }
 
@@ -326,17 +318,16 @@ ns_cmd_serverlist (CmdParams* cmdparams)
  *  @param cmdparams structure with command information
  *  @returns none
  */
-static int
-ns_cmd_channellist (CmdParams* cmdparams)
+static int ns_cmd_channellist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
-	if (!nsconfig.debug) {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("\2Error:\2 debug mode disabled", cmdparams->source));
+	if( !nsconfig.debug ) {
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
 	   	return NS_FAILURE;
 	}
 #endif
-	ListChannels (cmdparams, (cmdparams->ac < 1)? NULL : cmdparams->av[0]);
+	ListChannels( cmdparams,( cmdparams->ac < 1 )? NULL : cmdparams->av[0] );
    	return NS_SUCCESS;
 }
 
@@ -347,17 +338,16 @@ ns_cmd_channellist (CmdParams* cmdparams)
  *  @param cmdparams structure with command information
  *  @returns none
  */
-static int
-ns_cmd_banlist (CmdParams* cmdparams)
+static int ns_cmd_banlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 #ifndef DEBUG
-	if (!nsconfig.debug) {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("\2Error:\2 debug mode disabled", cmdparams->source));
+	if( !nsconfig.debug ) {
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
 	   	return NS_FAILURE;
 	}
 #endif
-	ListBans ();
+	ListBans();
    	return NS_SUCCESS;
 }
 
@@ -368,34 +358,33 @@ ns_cmd_banlist (CmdParams* cmdparams)
  *  @param cmdparams structure with command information
  *  @returns none
  */
-static int 
-ns_cmd_status (CmdParams* cmdparams)
+static int ns_cmd_status( CmdParams *cmdparams )
 {
 	time_t uptime = me.now - me.ts_boot;
 
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source, __("%s status:", cmdparams->source), ns_botptr->name);
-	if (uptime > 86400) {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%ld\2 day%s, \2%02ld:%02ld\2", cmdparams->source), ns_botptr->name, uptime / 86400, (uptime / 86400 == 1) ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60);
-	} else if (uptime > 3600) {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%ld hour%s, %ld minute%s\2", cmdparams->source), ns_botptr->name, uptime / 3600, uptime / 3600 == 1 ? "" : "s", (uptime / 60) % 60, (uptime / 60) % 60 == 1 ? "" : "s");
-	} else if (uptime > 60) {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%ld minute%s, %ld second%s\2", cmdparams->source), ns_botptr->name, uptime / 60, uptime / 60 == 1 ? "" : "s", uptime % 60, uptime % 60 == 1 ? "" : "s");
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "%s status:", cmdparams->source ), ns_botptr->name );
+	if( uptime > 86400 ) {
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld\2 day%s, \2%02ld:%02ld\2", cmdparams->source ), ns_botptr->name, uptime / 86400,( uptime / 86400 == 1 ) ? "" : "s",( uptime / 3600 ) % 24,( uptime / 60 ) % 60 );
+	} else if( uptime > 3600 ) {
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld hour%s, %ld minute%s\2", cmdparams->source ), ns_botptr->name, uptime / 3600, uptime / 3600 == 1 ? "" : "s",( uptime / 60 ) % 60,( uptime / 60 ) % 60 == 1 ? "" : "s" );
+	} else if( uptime > 60 ) {
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld minute%s, %ld second%s\2", cmdparams->source ), ns_botptr->name, uptime / 60, uptime / 60 == 1 ? "" : "s", uptime % 60, uptime % 60 == 1 ? "" : "s" );
 	} else {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%d second%s\2", cmdparams->source), ns_botptr->name, (int)uptime, uptime == 1 ? "" : "s");
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%d second%s\2", cmdparams->source ), ns_botptr->name,( int )uptime, uptime == 1 ? "" : "s" );
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Sent %ld messages, %ld bytes", cmdparams->source), me.SendM, me.SendBytes);
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Received %ld messages, %ld Bytes", cmdparams->source), me.RcveM, me.RcveBytes);
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Reconnect time: %d", cmdparams->source), nsconfig.r_time);
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Requests: %d",cmdparams->source), me.requests);
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Max sockets: %d (in use: %d)", cmdparams->source), me.maxsocks, me.cursocks);
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Current Servers: %d", cmdparams->source), me.servercount);
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Current Channels: %d", cmdparams->source), me.channelcount);
-	irc_prefmsg (ns_botptr, cmdparams->source, __("Current Users: %d (Away: %d)", cmdparams->source), me.usercount, me.awaycount);
-	if (nsconfig.debug)
-		irc_prefmsg (ns_botptr, cmdparams->source, __("Debugging mode enabled", cmdparams->source));
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Sent %ld messages, %ld bytes", cmdparams->source ), me.SendM, me.SendBytes );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Received %ld messages, %ld bytes", cmdparams->source ), me.RcveM, me.RcveBytes );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Reconnect time: %d", cmdparams->source ), nsconfig.r_time );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Requests: %d",cmdparams->source ), me.requests );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Max sockets: %d( in use: %d )", cmdparams->source ), me.maxsocks, me.cursocks );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Current servers: %d", cmdparams->source ), me.servercount );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Current channels: %d", cmdparams->source ), me.channelcount );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Current users: %d( Away: %d )", cmdparams->source ), me.usercount, me.awaycount );
+	if( nsconfig.debug )
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "Debugging mode enabled", cmdparams->source ) );
 	else
-		irc_prefmsg (ns_botptr, cmdparams->source, __("Debugging mode disabled", cmdparams->source));
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "Debugging mode disabled", cmdparams->source ) );
 	return NS_SUCCESS;
 }
 
@@ -406,20 +395,19 @@ ns_cmd_status (CmdParams* cmdparams)
  *  @param cmdparams structure with command information
  *  @returns none
  */
-static int 
-ns_cmd_level (CmdParams* cmdparams)
+static int ns_cmd_level( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if(cmdparams->ac < 1) {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("Your level is %d", cmdparams->source), UserLevel (cmdparams->source));
+	if( cmdparams->ac < 1 ) {
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "Your level is %d", cmdparams->source ), UserLevel( cmdparams->source ) );
 	} else {
 		Client * otheruser;
-		otheruser = FindUser(cmdparams->av[0]);
-		if(!otheruser) {
-			irc_prefmsg (ns_botptr, cmdparams->source, __("User %s not found", cmdparams->source), cmdparams->av[0]);
+		otheruser = FindUser( cmdparams->av[0] );
+		if( !otheruser ) {
+			irc_prefmsg( ns_botptr, cmdparams->source, __( "User %s not found", cmdparams->source ), cmdparams->av[0] );
 			return NS_FAILURE;
 		}
-		irc_prefmsg (ns_botptr, cmdparams->source, __("User level for %s is %d", cmdparams->source), otheruser->name, UserLevel (otheruser));
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "User level for %s is %d", cmdparams->source ), otheruser->name, UserLevel( otheruser ) );
 	}
 	return NS_SUCCESS;
 }
@@ -431,14 +419,13 @@ ns_cmd_level (CmdParams* cmdparams)
  *  @param cmdparams structure with command information
  *  @returns none
  */
-static int 
-ns_cmd_load (CmdParams* cmdparams)
+static int ns_cmd_load( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if (load_module (cmdparams->av[0], cmdparams->source)) {
-		irc_chanalert (ns_botptr, _("%s loaded module %s"), cmdparams->source->name, cmdparams->av[0]);
+	if( load_module( cmdparams->av[0], cmdparams->source ) ) {
+		irc_chanalert( ns_botptr, _( "%s loaded module %s" ), cmdparams->source->name, cmdparams->av[0] );
 	} else {
-		irc_chanalert (ns_botptr, _("%s tried to load module %s, but load failed"), cmdparams->source->name, cmdparams->av[0]);
+		irc_chanalert( ns_botptr, _( "%s tried to load module %s, but load failed" ), cmdparams->source->name, cmdparams->av[0] );
 	}
    	return NS_SUCCESS;
 }
@@ -450,12 +437,11 @@ ns_cmd_load (CmdParams* cmdparams)
  *  @param cmdparams structure with command information
  *  @returns none
  */
-static int 
-ns_cmd_unload (CmdParams* cmdparams)
+static int ns_cmd_unload( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if (unload_module (cmdparams->av[0], cmdparams->source) > 0) {
-		irc_chanalert (ns_botptr, _("%s unloaded module %s"), cmdparams->source->name, cmdparams->av[0]);
+	if( unload_module( cmdparams->av[0], cmdparams->source ) > 0 ) {
+		irc_chanalert( ns_botptr, _( "%s unloaded module %s" ), cmdparams->source->name, cmdparams->av[0] );
 	}
    	return NS_SUCCESS;
 }
@@ -468,17 +454,16 @@ ns_cmd_unload (CmdParams* cmdparams)
  *  @returns none
  */
 #ifdef USE_RAW
-static int
-ns_cmd_raw (CmdParams* cmdparams)
+static int ns_cmd_raw( CmdParams *cmdparams )
 {
 	char *message;
 
 	SET_SEGV_LOCATION();
-	message = joinbuf (cmdparams->av, cmdparams->ac, 1);
-	irc_chanalert (ns_botptr, _("\2RAW COMMAND\2 \2%s\2 issued a raw command!(%s)"), cmdparams->source->name, message);
-	nlog (LOG_NORMAL, "RAW COMMAND %s issued a raw command!(%s)", cmdparams->source->name, message);
-	send_cmd ("%s", message);
-	ns_free (message);
+	message = joinbuf( cmdparams->av, cmdparams->ac, 1 );
+	irc_chanalert( ns_botptr, _( "\2RAW COMMAND\2 \2%s\2 issued a raw command! (%s)" ), cmdparams->source->name, message );
+	nlog( LOG_NORMAL, "RAW COMMAND %s issued a raw command! (%s)", cmdparams->source->name, message );
+	send_cmd( "%s", message );
+	ns_free( message );
    	return NS_SUCCESS;
 }
 #endif

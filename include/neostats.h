@@ -92,6 +92,7 @@
 #include <assert.h>
 #endif /* HAVE_ASSERT_H */
 
+/* These macros handle DLL imports and exports for win32 module support */
 #ifdef WIN32
 #ifdef NEOSTATSCORE
 #define EXPORTFUNC __declspec(dllexport)
@@ -112,19 +113,18 @@
 #include "version.h"
 #endif /* WIN32 */
 
+/* No language support under win32 */
+#ifndef WIN32
 /* when db stuff is working, change this back */
 /* #ifdef HAVE_DB_H */
 #if 0
 #define USEGETTEXT
-#else 
+#else /* HAVE_DB_H */
 /* so our defines for _(x) are not active */
 #undef USEGETTEXT
-#endif
+#endif /* HAVE_DB_H */
+#endif /* WIN32 */
 
-#ifdef WIN32
-#define _(x) (x)
-#define __(x, y) (x)
-#else /* WIN32 */
 #ifdef USEGETTEXT
 char *LANGgettext( const char *string, int mylang );
 /* our own defines for language support */
@@ -136,7 +136,6 @@ char *LANGgettext( const char *string, int mylang );
 #define _(x) ( x )
 #define __(x, y) ( x )
 #endif /* USEGETTEXT */
-#endif  /* WIN32 */
 
 /* If we're not using GNU C, elide __attribute__ */
 #ifndef __GNUC__
@@ -276,12 +275,12 @@ EXPORTVAR extern unsigned int ircd_supported_umodes;
 EXPORTVAR extern unsigned int ircd_supported_smodes;
 EXPORTVAR extern unsigned int ircd_supported_cmodes;
 EXPORTVAR extern unsigned int ircd_supported_cumodes;
-#define HaveUmodeRegNick() (ircd_supported_umodes&UMODE_REGNICK)
-#define HaveUmodeDeaf() (ircd_supported_umodes&UMODE_DEAF)
+#define HaveUmodeRegNick() ( ircd_supported_umodes & UMODE_REGNICK )
+#define HaveUmodeDeaf() ( ircd_supported_umodes & UMODE_DEAF )
 
 /* Umode macros */
-#define is_oper(x) ((x) && ((x->user->Umode & (UMODE_OPER|UMODE_LOCOP))))
-#define is_bot(x) ((x) && (x->user->Umode & UMODE_BOT))
+#define is_oper(x) ( ( x ) && ( (x->user->Umode & (UMODE_OPER|UMODE_LOCOP ) ) ) )
+#define is_bot(x) ( ( x ) && ( x->user->Umode & UMODE_BOT ) )
 
 #define BOTMODE		0x00000001
 #define OPERMODE	0x00000002
@@ -310,11 +309,9 @@ EXPORTFUNC char CmodePrefixToChar( const char prefix );
 EXPORTFUNC char CmodeMaskToPrefix( const unsigned int mask );
 EXPORTFUNC char CmodeCharToPrefix( const char mode );
 
-
 #ifndef NEOSTATS_PACKAGE_VERSION
 #define NEOSTATS_PACKAGE_VERSION PACKAGE
 #endif /* NEOSTATS_PACKAGE_VERSION */
-
 
 #ifdef NEOSTATS_REVISION
 #define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION " (" NEOSTATS_REVISION ") " NS_HOST
@@ -804,12 +801,16 @@ typedef void (*after_poll_func) ( void *data, struct pollfd *, unsigned int );
 #define SOCK_POLL 1
 #define SOCK_STANDARD 2
 
-#define	EVENT_FLAG_DISABLED			0x00000001
-#define	EVENT_FLAG_IGNORE_SYNCH		0x00000002
-#define	EVENT_FLAG_EXCLUDE_ME		0x00000004
-#define	EVENT_FLAG_EXCLUDE_MODME	0x00000008
-#define	EVENT_FLAG_USE_EXCLUDE		0x00000010
+/* Event system flags */
+#define	EVENT_FLAG_DISABLED			0x00000001	/* Event is disabled */
+#define	EVENT_FLAG_IGNORE_SYNCH		0x00000002	/* Event triggers even if not synched */
+#define	EVENT_FLAG_USE_EXCLUDE		0x00000004  /* Event observes global exclusions */
+#define	EVENT_FLAG_EXCLUDE_ME		0x00000008	/* Event excludes neostats bots and servers */
+#define	EVENT_FLAG_EXCLUDE_MODME	0x00000010	/* Event excludes module bots */
 
+/** @brief Event function types
+ * 
+ */
 typedef int (*event_function) ( CmdParams *cmdparams );
 
 /** @brief ModuleEvent functions structure
@@ -986,7 +987,7 @@ typedef struct Timer {
 typedef struct BotInfo {		
 	/* REQUIRED: nick */
 	char nick[MAXNICK];
-	/* OPTIONAL: altnick, use NULL if not needed */
+	/* OPTIONAL: altnick, use "" if not needed */
 	char altnick[MAXNICK];
 	/* REQUIRED: user */
 	char user[MAXUSER];

@@ -50,23 +50,23 @@ Bot *ss_bot;
 
 /** Module Events */
 ModuleEvent module_events[] = {
-	{EVENT_PONG,		ss_event_pong,		EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_SERVER,		ss_event_server,	EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_SQUIT,		ss_event_squit,		EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_SIGNON,		ss_event_signon,	EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_NICKIP,		ss_event_nickip,	EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_UMODE,		ss_event_mode,		EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_QUIT,		ss_event_quit,		EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_GLOBALKILL,	ss_event_globalkill,EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_SERVERKILL,	ss_event_serverkill,EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_NEWCHAN,		ss_event_newchan,	EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_DELCHAN,		ss_event_delchan,	EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_JOIN,		ss_event_join,		EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_PART,		ss_event_part,		EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_KICK,		ss_event_kick,		EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_TOPIC,		ss_event_topic,		EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_PONG,			ss_event_pong,			EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_SERVER,			ss_event_server,		EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_SQUIT,			ss_event_squit,			EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_SIGNON,			ss_event_signon,		EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_NICKIP,			ss_event_nickip,		EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_UMODE,			ss_event_mode,			EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_QUIT,			ss_event_quit,			EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_GLOBALKILL,		ss_event_globalkill,	EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_SERVERKILL,		ss_event_serverkill,	EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_NEWCHAN,			ss_event_newchan,		EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_DELCHAN,			ss_event_delchan,		EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_JOIN,			ss_event_join,			EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_PART,			ss_event_part,			EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_KICK,			ss_event_kick,			EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_TOPIC,			ss_event_topic,			EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_CTCPVERSIONRPL,	ss_event_ctcpversion,	EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_NULL,		NULL}
+	{EVENT_NULL,			NULL,					NULL}
 };
 
 /** Copyright info */
@@ -95,13 +95,13 @@ static bot_cmd ss_commands[]=
 {
 	{"SERVER",		ss_cmd_server,		0, 	0,		ss_help_server,		 	ss_help_server_oneline},
 	{"MAP",			ss_cmd_map,			0, 	0,		ss_help_map, 		 	ss_help_map_oneline},
-	{"CHANNEL",		ss_cmd_channel,		0, 	0,		ss_help_channel, 		 	ss_help_channel_oneline},
+	{"CHANNEL",		ss_cmd_channel,		0, 	0,		ss_help_channel, 		ss_help_channel_oneline},
 	{"NETSTATS",	ss_cmd_netstats,	0, 	0,		ss_help_netstats, 	 	ss_help_netstats_oneline},
 	{"DAILY",		ss_cmd_daily,		0, 	0,		ss_help_daily, 		 	ss_help_daily_oneline},
 	{"TLDMAP",		ss_cmd_tldmap,		0, 	0,		ss_help_tldmap, 	 	ss_help_tldmap_oneline},
 	{"OPERLIST",	ss_cmd_operlist,	0, 	0,		ss_help_operlist, 	 	ss_help_operlist_oneline},
 	{"BOTLIST",		ss_cmd_botlist,		0, 	0,		ss_help_botlist, 	 	ss_help_botlist_oneline},
-	{"USERVERSION",	ss_cmd_userversion,	0,	0,		ss_help_userversion, ss_help_userversion_oneline},
+	{"USERVERSION",	ss_cmd_userversion,	0,	0,		ss_help_userversion,	ss_help_userversion_oneline},
 	{"FORCEHTML",	ss_cmd_forcehtml,	0, 	NS_ULEVEL_ADMIN,	ss_help_forcehtml, 		ss_help_forcehtml_oneline},
 	{NULL,			NULL,				0, 	0,					NULL, 					NULL}
 };

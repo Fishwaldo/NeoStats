@@ -53,8 +53,8 @@ const char cmd_help_levels_oneline[] = "Change command user level";
 const char *ns_help_level[] = {
 	"Syntax: \2LEVEL [nick]\2",
 	"",
-	"Display permission level for NeoStats.",
-	"This will range from 0 (lowest) to 200 (highest).",
+	"Display permission level for NeoStats in the range",
+	"0 (lowest) to 200 (highest).",
 	"Optional nick parameter allows you to see the level",
 	"for another user",
 	NULL
@@ -63,10 +63,10 @@ const char *ns_help_level[] = {
 const char *ns_help_jupe[] = {
 	"Syntax: \2JUPE <servername>\2",
 	"",
-	"Cause NeoStats to jupiter a server; i.e. create a fake",
-	"\"server\" connected to the NeoStats host which prevents",
-	"any real server of that name from connecting.",
-	"To remove the jupe use the \2/SQUIT\2 command.",
+	"Jupiter a server; i.e. create a fake \"server\" connected",
+	"to the NeoStats host which prevents any real server of",
+	"that name from connecting. To remove the jupe use the",
+	"\2/SQUIT\2 command.",
 	NULL
 };
 
@@ -78,12 +78,12 @@ const char *ns_help_exclude[] = {
 	"Maintain the exclusion list which is used to exclude channels,",
 	"users and servers from certain scans and events.",
 	"",
-	"\2ADD\2 Add a new exclusion to the list. Reason allows",
-	"you to set a reason for the exclusion for future reference.",
+	"\2ADD\2 Add a new exclusion to the list of the requested type.",
 	"<pattern> is the host, server or channel name and may include",
 	"wildcards such as * and ?.",
+	"<reason> is the reason for the exclusion",
 	"",
-	"\2DEL\2 Delete a entry from the exclusion list.",
+	"\2DEL\2 Delete an entry from the exclusion list.",
 	"",
 	"\2LIST\2 List the current exclusions",
 	NULL
@@ -91,7 +91,7 @@ const char *ns_help_exclude[] = {
 
 #ifdef USE_RAW
 const char *ns_help_raw[] = {
-	"Syntax: \2RAW <command>\2",
+	"Syntax: \2RAW <text>\2",
 	"",
 	"Sends a string of raw text directly to the server to which",
 	"NeoStats is connected. Nothing is returned to the user",
@@ -120,8 +120,7 @@ const char *ns_help_unload[] = {
 const char *ns_help_modlist[] = {
 	"Syntax: \2MODLIST\2",
 	"",
-	"Display module names and descriptions of all loaded",
-	"modules.",
+	"Display names and descriptions of all loaded modules.",
 	NULL
 };
 

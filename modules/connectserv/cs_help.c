@@ -27,47 +27,47 @@
 
 const char *cs_about[] = {
 	"\2ConnectServ\2 tracks users signing on and off the network,",
-	"kills, operator modes and nickname changes.",
-	"These events can be reported to the services channel and",
-	"can optionally be logged.",
+	"kills, operator modes, nickname changes, server connects and",
+	"server quits. These events can be reported to the services",
+	"channel and logged.",
 	NULL
 };
 
 const char *cs_help_set_signwatch[] = {
-	"SIGNWATCH <ON/OFF>",
+	"SIGNWATCH <ON|OFF>",
 	"Report signon/signoff of users to the services channel.",
 	NULL
 };
 
 const char *cs_help_set_exclusions[] = {
-	"EXCLUSIONS <ON/OFF>",
+	"EXCLUSIONS <ON|OFF>",
 	"Use the global exclusions before displaying reports",
 	NULL
 };
 
 const char *cs_help_set_logging[] = {
-	"LOGGING <ON/OFF>",
+	"LOGGING <ON|OFF>",
 	"Log connectserv reports",
 	NULL
 };
 
 const char *cs_help_set_killwatch[] = {
-	"KILLWATCH <ON/OFF>",
+	"KILLWATCH <ON|OFF>",
 	"Report kills to the services channel.",
 	NULL
 };
 const char *cs_help_set_modewatch[] = {
-	"MODEWATCH <ON/OFF>",
+	"MODEWATCH <ON|OFF>",
 	"Report operator mode changes to the services channel.",
 	NULL
 };
 const char *cs_help_set_nickwatch[] = {
-	"NICKWATCH <ON/OFF>",
+	"NICKWATCH <ON|OFF>",
 	"Report nick changes to the services channel.",
 	NULL
 };
 const char *cs_help_set_servwatch[] = {
-	"SERVWATCH <ON/OFF>",
+	"SERVWATCH <ON|OFF>",
 	"Report server joins and quits to the services channel.",
 	NULL
 };

@@ -1,6 +1,6 @@
 ************************************************************************
 ** NeoStats - IRC Statistical Services                                **
-** Copyright (c) 1999-2003 NeoStats Group. All Rights Reserved.       **
+** Copyright (c) 1999-2005 NeoStats Group. All Rights Reserved.       **
 ** This program and all associated documentation is free but          **
 ** copyrighted software; see the file COPYING for details.            **
 ** Homepage: http://www.neostats.net/                                 **
@@ -113,21 +113,22 @@ This is optional.
  *  see events.h for a list of all events available
  */
 ModuleEvent module_events[] = {
-	{EVENT_NULL,	NULL}
+	{EVENT_NULL,	NULL, 0}
 };
 
-The table contains the event we want to process (e.g. SIGNON) and the 
-function to call when it happens (e.g. MySignonHandler). Events are 
+The table contains the event we want to process (e.g. SIGNON), the 
+function to call when it happens (e.g. MySignonHandler) and optional
+flags related to event (e.g. EVENT_FLAG_USE_EXCLUDE). Events are 
 raised for both server and user actions.
 
-The table must be NULL terminated with the event field set to EVENT_NULL
-and the function field set to NULL.
+The table must be NULL terminated with the event field set to EVENT_NULL,
+the function field set to NULL and the flags field set to 0.
 
 Descriptions of all available events and their parameters are listed in
 "events.h". The header file is automatically included by "neostats.h" 
 so you do not need to include it in your module.
 
-There are also three specialist functions that a module must define:
+There are three specialist functions that a module must define:
 
 ModInit is called when a module is first loaded so can be used to 
 initialise settings for your module. It must not be used to start
@@ -193,7 +194,7 @@ NeoStats provides an API to send commands over IRC. These are designed
 to mimic the way you send commands on IRC as a user to make them
 intuitive to use but must be sent from a bot you have created.
 
-To create a bot, you must define a definition describing the bot:
+To create a bot, you must first use a definition to describe the bot:
 
 /** Define information about our bot
  */
@@ -227,12 +228,12 @@ BotInfo template_bot_info =
 };
 
 You then pass this structure to NeoStats with the AddBot function 
-call in your ModSynch function:
+call from your ModSynch function:
 
 	/* Introduce a bot onto the network saving the bot handle */
 	template_bot = AddBot (&template_bot_info);
 
-You bot can now issue commands on IRC as if it was a user but using
+Your bot can now issue commands on IRC as if it was a user but using
 the irc_command functions. E.g. if you want your bot to join a 
 channel you would use the irc_join function. 
 
@@ -298,5 +299,5 @@ If you have any questions, comments or suggestions about our module API
 or this document, please post on our message boards at www.neostats.net. 
 
 ************************************************************************
-** This document was last updated on October 20th, 2004 by M and is   **
+** This document was last updated on January 31st, 2005 by M          **
 ************************************************************************

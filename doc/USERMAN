@@ -14,11 +14,12 @@ for the various components. If you are looking for help configuring or
 installing NeoStats or for support information please refer to the 
 README file. For help on downloaded modules, refer to the documentation
 that comes with the module. Typically, after installation, the 
-documentation for the downloaded modules in named "README.<modulename>"
+documentation for the downloaded module is named "README.<modulename>"
 
 Most NeoStats components include online help so you can find out 
 how to use a command while on IRC.
-To access general online help for the Bot use:
+
+To access general online help use:
         
         /msg BotName HELP                         
 
@@ -80,52 +81,54 @@ Contents
     4.3 Command Reference
         4.3.1  HELP
         4.3.2  ABOUT        
-        4.3.3  SET 
-        4.3.4  VERSION
+        4.3.3  VERSION
+        4.3.4  SET 
 5.  HostServ
     5.1 About HostServ
     5.2 Available Commands
     5.3 Command Reference
         5.3.1  HELP
-        5.3.2  ABOUT     
-        5.3.3  LOGIN     
-        5.3.4  ADD
-        5.3.5  DEL       
-        5.3.6  LIST      
+        5.3.2  ABOUT
+        5.3.3  VERSION
+        5.3.4  SET
+        5.3.5  ADD
+        5.3.6  DEL
         5.3.7  VIEW
-        5.3.8  CHPASS    
-        5.3.9  LISTBAN   
-        5.3.10 LEVELS
+        5.3.8  LIST
+        5.3.9  LOGIN
+        5.3.10 CHPASS
+        5.3.11 BANS
 6.  LoveServ
     6.1 About LoveServ
     6.2 Available Commands
     6.3 Command Reference
         6.3.1  HELP
-        6.3.2  ROSE       
-        6.3.3  KISS          
-        6.3.4  TONSIL     
-        6.3.5  HUG       
-        6.3.6  ADMIRER    
-        6.3.7  CHOCOLATE  
-        6.3.8  CANDY      
-        6.3.9  LOVENOTE   
-        6.3.10 APOLOGY    
-        6.3.11 THANKYOU   
-        6.3.12 VERSION
+        6.3.2  VERSION
+        6.3.4  ROSE       
+        6.3.5  KISS          
+        6.3.6  TONSIL     
+        6.3.7  HUG       
+        6.3.8  ADMIRER    
+        6.3.9  CHOCOLATE  
+        6.3.10 CANDY      
+        6.3.11 LOVENOTE   
+        6.3.12 APOLOGY    
+        6.3.13 THANKYOU   
 7.  MoraleServ
     7.1 About MoraleServ
     7.2 Available Commands
     7.3 Command Reference
         7.3.1  HELP
-        7.3.2  HAIL       
-        7.3.3  ODE           
-        7.3.4  POEM     
-        7.3.5  LAPDANCE   
-        7.3.6  REDNECK       
-        7.3.7  CHEERUP    
-        7.3.8  BEHAPPY    
-        7.3.9  WONDERFUL   
-        7.3.10 VERSION
+        7.3.2  VERSION
+        7.3.3  CREDITS
+        7.3.4  HAIL       
+        7.3.5  ODE           
+        7.3.6  POEM     
+        7.3.7  LAPDANCE   
+        7.3.8  REDNECK       
+        7.3.9  CHEERUP    
+        7.3.10 BEHAPPY    
+        7.3.11 WONDERFUL   
 8.  ExtAuth
     8.1 About ExtAuth
 
@@ -191,8 +194,8 @@ privilege levels to users.
 
 HELP           Display help
 STATUS         Stats Info on NeoStats and uptime.
-VERSION        Shows you the current NeoStats Version.
-LEVEL          Show Permission Level for NeoStats.
+VERSION        Display the current NeoStats Version.
+LEVEL          Display Permission Level for NeoStats.
 SHUTDOWN       Shutdown NeoStats.
 RELOAD         Force NeoStats to Reload Itself.
 LOAD           Load a Module.
@@ -226,197 +229,244 @@ Example:
     /msg NeoStats HELP 
     /msg NeoStats HELP STATUS
 
-2.3.2 STATUS
-------------
-Syntax: 
-    /msg NeoStats STATUS
-Description: 
-    Shows the current NeoStats uptime and other info.
-    Available to users if ONLY_OPERS not set
-Example:
-    /msg NeoStats STATUS
-
-2.3.3 VERSION
+2.3.2 VERSION
 -------------
 Syntax: 
-    /msg NeoStats VERSION
+    /msg xxxxxxxx VERSION
 Description: 
-    Shows the current NeoStats version.
-    Available to users if ONLY_OPERS not set
+    Shows the current xxxxxxxx Version.
 Example:
-    /msg NeoStats VERSION
+    /msg xxxxxxxx VERSION
 
-2.3.4 LEVEL
------------
-Syntax: 
-    /msg NeoStats LEVEL [nick]
-Description: 
-    Allows you to see your permissions level with regards NeoStats. 
-    0 is lowest, 200 is highest, you could be anywhere in between!
-    Available to users if ONLY_OPERS not set
-    The optional nick parameter allows you to see the level of another
-    user.
-Example:
-    /msg NeoStats LEVEL
-    /msg NeoStats LEVEL somenick
 
-2.3.5 SHUTDOWN
---------------
-Syntax: 
-    /msg NeoStats SHUTDOWN <reason>
-Description: 
-    Force NeoStats to exit immediately.
-    This command should be used wisely.
-Example:
-    /msg NeoStats SHUTDOWN upgrade
-
-2.3.6 RELOAD
-------------
-Syntax: 
-    /msg NeoStats RELOAD <reason>
-Description: 
-    Force NeoStats to reload.
-    This command will cause NeoStats to disconnect from the network, 
-    reload data files and reconnect. 
-    This command SHOULD be used wisely. 
-Example:
-    /msg NeoStats RELOAD Lagged
-
-2.3.7 LOAD
-----------
-Syntax: 
-    /msg NeoStats LOAD <module>
-Description: 
-    Allows you to load a module while NeoStats is running. 
-Example:
-    /msg NeoStats LOAD statserv
-
-2.3.8 UNLOAD
-------------
-Syntax: 
-    /msg NeoStats UNLOAD <module>
-Description: 
-    Allows you to unload a module while NeoStats is running	.
-Example:
-    /msg NeoStats UNLOAD statserv
-
-2.3.9 MODLIST
+2.3.3 CREDITS
 -------------
 Syntax: 
-    /msg NeoStats MODLIST
+    /msg xxxxxxxx CREDITS
 Description: 
-    Display module names and descriptions of loaded modules
+    Display copyright and credits for xxxxxxxx.
 Example:
-    /msg NeoStats MODLIST
+    /msg xxxxxxxx CREDITS
 
-2.3.10 LOGS
------------
+
+2.3.4 SET
+---------
 Syntax: 
-    /msg NeoStats LOGS
+    /msg xxxxxxxx SET LIST
+    /msg xxxxxxxx SET <option> [<value>]
 Description: 
-    Sends today's log file via PRIVMSG/NOTICE
-Example:
-    /msg NeoStats LOGS
+	SET LIST will show the current settings
+    
+    Available Options are:
 
-2.3.11 RAW
-----------
-Syntax: 
-    /msg NeoStats RAW COMMAND
-Description: 
-    Allow you to send raw IRC commands from this server
-    Nothing is returned to the user after a raw command
-    It is recommended that you never use this command.
-    It can cause desyncs and other problems. No support 
-    will be provided for use of this command.
-    NOTE: Problems with RAW are NOT SUPPORTED. 
-Example:
-    /msg NeoStats RAW COMMAND
 
-2.3.12 JUPE
------------
-Syntax: 
-    /msg NeoStats JUPE Server
-Description: 
-    Allows you to jupe a server on the network
-Example:
-    /msg NeoStats JUPE jupe.com
-
-2.3.13 DEBUG
+2.3.5 LEVELS
 ------------
 Syntax: 
-    /msg NeoStats DEBUG <ON|OFF>
+    /msg xxxxxxxx LEVELS LIST
+    /msg xxxxxxxx LEVELS <command> <level>
 Description: 
-    This toggles the debug command, On a large network, this command 
-    should be used considered dangerous as a large amount of information 
-    may be sent to you and may flood you off the network.
+    List or change minimum user level for a command.
+    <level> must be between 0 and 200.
 Example:
-    /msg NeoStats DEBUG ON
+    /msg NeoStats LEVELS SET 200
 
-2.3.14 USERDUMP
----------------
+2.3.6 xxxxxx
+------------
 Syntax: 
-    /msg NeoStats USERDUMP [nick]
-Description: 
-    When in debug mode, Neostats will echo its user table to
-    the services channel. Only useful for debugging Neostats
-    If nick is passed, only the information of that nick is
-    returned, otherwise the entire user list is dumped.
+    LEVEL [nick]
+Description:
+    Display permission level for NeoStats in the range
+    0 (lowest) to 200 (highest).
+    Optional nick parameter allows you to see the level
+    for another user
 Example:
-    /msg NeoStats USERDUMP
+    /msg NeoStats <command>
+    
+2.3.7 xxxxxx
+------------
+    
+Syntax: 
+    JUPE <servername>
+Description:
+    Jupiter a server; i.e. create a fake "server" connected
+    to the NeoStats host which prevents any real server of
+    that name from connecting. To remove the jupe use the
+    /SQUIT command.
+Example:
+    /msg NeoStats <command>
 
-2.3.15 SERVERDUMP
------------------
+2.3.8 xxxxxx
+------------
 Syntax: 
-    /msg NeoStats SERVERDUMP [name]
-Description: 
-    When in debug mode, Neostats will echo its server table to
-    the services channel. Only useful for debugging Neostats
-	If name is passed, only the information for that server is
-	returned, otherwise the entire server list is dumped.
-Example:
-    /msg NeoStats SERVERDUMP
+    EXCLUDE ADD <HOST|SERVER|CHANNEL> <pattern> <reason>
+    EXCLUDE DEL <pattern>
+    EXCLUDE LIST
+Description:
+    Maintain the exclusion list which is used to exclude channels,
+    users and servers from certain scans and events.
 
-2.3.16 CHANDUMP
----------------
-Syntax: 
-    /msg NeoStats CHANDUMP [channel]
-Description: 
-    When in debug mode, Neostats will echo its channel table to
-    the services channel. Only useful for debugging Neostats
-    If channel is passed, only the information of that nick is
-    returned, otherwise the entire channel list is dumped.
-Example:
-    /msg NeoStats CHANDUMP
+    ADD Add a new exclusion to the list of the requested type.
+    <pattern> is the host, server or channel name and may include
+    wildcards such as * and ?.
+    <reason> is the reason for the exclusion
 
-2.3.17 BOTLIST
---------------
-Syntax: 
-    /msg NeoStats BOTLIST
-Description: 
-    NeoStats will send you by notice a list of the current bots
-    being used on the network for each module.
-Example:
-    /msg NeoStats BOTLIST
+    DEL Delete an entry from the exclusion list.
 
-2.3.18 SOCKLIST
----------------
-Syntax: 
-    /msg NeoStats SOCKLIST
-Description: 
-    NeoStats will send you by notice a list of the current
-    sockets being used on the network for each module.
+    LIST List the current exclusions
 Example:
-    /msg NeoStats SOCKLIST
+    /msg NeoStats <command>
 
-2.3.19 TIMERLIST
-----------------
+2.3.9 xxxxxx
+------------
 Syntax: 
-    /msg NeoStats TIMERLIST
-Description: 
-    NeoStats will send you by notice a list of the current
-    timer functions being used on the network by each module.
+    STATUS
+Description:
+    Display info about NeoStats uptime and other stats.
 Example:
-    /msg NeoStats TIMERLIST
+    /msg NeoStats <command>
+
+2.3.10 xxxxxx
+------------
+Syntax: 
+    LOAD <module name>
+Description:
+    Load a module.
+Example:
+    /msg NeoStats <command>
+
+2.3.11 xxxxxx
+------------
+Syntax: 
+    UNLOAD <module name>
+Description:
+    Unload a module.
+Example:
+    /msg NeoStats <command>
+
+2.3.12 xxxxxx
+------------
+Syntax: 
+    MODLIST
+Description:
+    Display names and descriptions of all loaded modules.
+Example:
+    /msg NeoStats <command>
+
+2.3.13 xxxxxx
+------------
+Syntax: 
+    SHUTDOWN <reason>
+Description:
+    Cause NeoStats to save data files and exit.
+    The reason provided will be broadcast to the services
+    channel and other operators on the network.
+Example:
+    /msg NeoStats <command>
+
+2.3.14 xxxxxx
+------------
+Syntax: 
+    RELOAD <reason>
+Description:
+    Cause NeoStats to leave the network, reload datafiles,
+    then reconnect to the network.
+    The reason provided will be broadcast to the services
+    channel and other operators on the network.
+Example:
+    /msg NeoStats <command>
+
+2.3.15 xxxxxx
+------------
+Syntax: 
+    USERLIST
+    USERLIST <name>
+Description:
+    Display list of users on the network.	
+    Optional name parameter limits display to that user.	
+    This command is only available in debug mode and is only
+    useful for debugging Neostats.
+Example:
+    /msg NeoStats <command>
+
+2.3.16 xxxxxx
+------------
+Syntax: 
+    SERVERLIST
+    SERVERLIST <name>
+Description:
+    Display list of servers on the network.	
+    Optional parameter name limits display to that server.	
+    This command is only available in debug mode and is only
+    useful for debugging Neostats.
+Example:
+    /msg NeoStats <command>
+
+2.3.17 xxxxxx
+------------
+Syntax: 
+    BANLIST
+Description:
+    Display list of bans on the network.	
+    This command is only available in debug mode and is only
+    useful for debugging Neostats.
+Example:
+    /msg NeoStats <command>
+
+2.3.18 xxxxxx
+------------
+Syntax: 
+    CHANNELLIST
+	CHANNELLIST <name>
+Description:
+    Display list of channels on the network.	
+    Optional parameter name limits display to that channel.	
+    This command is only available in debug mode and is only
+    useful for debugging Neostats.
+Example:
+    /msg NeoStats <command>
+
+2.3.19 xxxxxx
+------------
+Syntax: 
+    BOTLIST
+Description:
+    Display list of neostats bots being used on the network.	
+Example:
+    /msg NeoStats <command>
+
+2.3.20 xxxxxx
+------------
+Syntax: 
+    SOCKLIST
+Description:
+    Display list of sockets being used on the network.	
+Example:
+    /msg NeoStats <command>
+
+2.3.21 xxxxxx
+------------
+Syntax: 
+    TIMERLIST
+Description:
+    Display list of timer functions being used on the network.	
+Example:
+    /msg NeoStats <command>
+
+2.3.22 RAW
+----------
+Syntax: 
+    RAW <text>
+Description:
+    Sends a string of raw text directly to the server to which
+    NeoStats is connected. Nothing is returned to the user
+    after a raw command.
+    Raw can cause a number of problems on the network and is
+    used at your own risk. No support of any kind is provided
+    for this command.
+Example:
+    /msg NeoStats <command>
+
 
 -----------------------------------<>-----------------------------------
 
@@ -434,25 +484,24 @@ to a web page of your choice.
 ----------------------
 
 SERVER          Request information about a server.
-MAP             Show the network map.
+MAP             Display the network map.
 CHAN            Channel Information.
 NETSTATS        General Network Statistics.
 DAILY           Daily Network Statistics.
-TLD             Show what country a TLD represents.
+TLD             Display what country a TLD represents.
 TLDMAP          Statistics on TLD's.
-OPERLIST        Show a listing of on-line IRCops.
-BOTLIST         Show a listing of on-line BOTS.
-CLIENTVERSIONS  Shows you a list of Client Versions.
-VERSION         Shows you the current StatServ Version.
+OPERLIST        Display a listing of on-line IRCops.
+BOTLIST         Display a listing of on-line BOTS.
+CLIENTVERSIONS  Display a list of Client Versions.
+VERSION         Display the current StatServ Version.
 SET             Change StatServ Settings
 FORCEUPDATE     Force an update of the HTML output file
 STATS           Modify Statistic Entries.
 
 3.3 Command Reference
 ---------------------
-
-3.3.1. HELP
------------
+3.3.1 HELP
+----------
 Syntax: 
     /msg StatServ HELP [command]
 Description: 
@@ -469,7 +518,7 @@ Syntax:
 Description: 
     Provides Statistics on the Client Versions found
     The list will only be active if you have SecureServ installed and 
-    Active <limit> Specifies how many results to show. Results are 
+    Active <limit> Specifies how many results to display. Results are 
     sorted by Most Popular to Least Popular
 Example:
     /msg StatServ CLIENTVERSIONS
@@ -480,7 +529,7 @@ Syntax:
     /msg StatServ SET LIST
     /msg StatServ SET <option> [<value>]
 Description: 
-	SET LIST will show the current settings
+	SET LIST will display the current settings
     
     Available Options are:
     HTMLPATH <path>
@@ -586,7 +635,7 @@ Example:
 Syntax: 
     /msg StatServ TLDMAP
 Description: 
-    Shows the network map in relation to top level domains.
+    Display the network map in relation to top level domains.
 Example:
     /msg StatServ TLDMAP
 
@@ -595,10 +644,10 @@ Example:
 Syntax: 
     /msg StatServ OPERLIST (options|server_name)
 Description: 
-    Shows a listing of IRCops.
+    Display a listing of IRCops.
     Flags:
-        NOAWAY   Don't show opers that are set away.
-        SERVER   Only show opers on that server.
+        NOAWAY   Don't display opers that are set away.
+        SERVER   Only display opers on that server.
 Example:
     /msg statserv operlist
     /msg statserv operlist noaway
@@ -609,7 +658,7 @@ Example:
 Syntax: 
     /msg StatServ BOTLIST
 Description: 
-    Shows all current bots on the network. (umode +B users if your IRCD
+    Display all current bots on the network. (umode +B users if your IRCD
     supports Umode +B)
 Example:
     /msg StatServ BOTLIST
@@ -620,7 +669,7 @@ Example:
 Syntax: 
     /msg StatServ VERSION
 Description: 
-    Shows the current StatServ Version.
+    Display the current StatServ Version.
 Example:
     /msg StatServ VERSION
 
@@ -700,18 +749,17 @@ version.
 4.1 About ConnectServ
 ---------------------
 
-ConnectServ is designed to echo the signing on/off of users killing of 
-users, modes that the operators are using and nickname changes. These 
-echo types can be customised to be echoed to the services channel or 
-NOT to be echoed at all.
+ConnectServ tracks users signing on and off the network kills, operator 
+modes, nickname changes, server connects and server quits. These events 
+can be reported to the services channel and logged.
 
 4.2 Available Commands
 ----------------------
     
 HELP            Online command help
-ABOUT           Return description of ConnectServ
+ABOUT           Report description of ConnectServ
 SET             Adjust settings for ConnectServ
-VERSION         Shows you the current ConnectServ Version.
+VERSION         Report the current ConnectServ Version.
 
 4.3 Command Reference
 ---------------------
@@ -725,15 +773,14 @@ Description:
     HELP COMMAND will display help for that command.
 Example:
     /msg ConnectServ HELP 
-    /msg ConnectServ HELP STATUS
+    /msg ConnectServ HELP SET
 
 4.3.2 ABOUT
 -----------
 Syntax: 
     /msg ConnectServ ABOUT
 Description: 
-    The ABOUT command will return a description of
-    ConnectServ.
+    Display information about ConnectServ.
 Example: 
     /msg ConnectServ ABOUT
 
@@ -749,19 +796,25 @@ Description:
     e.g.: MODEWATCH is enabled.
     
     SIGNWATCH <ON|OFF> 
-    echo signon/signoff events. 
+    report signon/signoff events. 
     
     KILLWATCH <ON|OFF> 
-    echo kill events.
+    report kill events.
     
     MODEWATCH <ON|OFF> 
-    echo operator mode changes.
+    report operator mode changes.
     
     NICKWATCH <ON|OFF> 
-    echo nickname changes.
+    report nickname changes.
 
     SERVWATCH <ON|OFF> 
-    echo server joins/quits.
+    report server joins/quits.
+    
+    LOGGING <ON|OFF>
+    Log connectserv reports.
+    
+    EXCLUSIONS <ON|OFF>
+    Use the global exclusions before displaying reports.
 
 Example:
     /msg ConnectServ SET NICKWATCH ON
@@ -771,7 +824,7 @@ Example:
 Syntax: 
     /msg ConnectServ VERSION
 Description: 
-    Shows the current ConnectServ version.
+    Display the current ConnectServ version.
 Example:
     /msg ConnectServ VERSION
         
@@ -794,16 +847,16 @@ specified by IRC administrators.
 ----------------------
 
 HELP        Online command help
-ABOUT       Return description of HostServ
-LOGIN       Login to HostServ
+VERSION     Display version
+CREDITS     Display copyright and credits
+SET         Manage HostServ settings.
 ADD         Add a vhost
 DEL         Delete a vhost
 LIST        List vhosts
 VIEW        Detailed vhost list
+LOGIN       Login to HostServ
 CHPASS      Change password
-LISTBAN     List banned vhosts
-LEVELS      Levels to manage HostServ
-SET         Manage Various HostServ Settings.
+BANS		Manage banned vhosts
 
 5.3 Command Reference
 ---------------------
@@ -829,105 +882,7 @@ Description:
 Example: 
     /msg HostServ ABOUT
 
-5.3.3 ADD
----------
-
-Syntax: 
-    /msg HostServ ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>
-Description:
-    Register a host name to be set. e.g.: my-host.com DO NOT INCLUDE AN 
-    @. The <HOST NAME> must be where the user is connecting from WITHOUT 
-    THE @. HostServ supports wildcards such as *.myhost.com in the 
-    <HOST NAME> setting The <PASSWORD> field is new. If a user connects 
-    with a different host They can now /msg HostServ LOGIN nick password
-Example:
-    /msg HostServ ADD neo aol.com coolhost.com mypassword
-
-5.3.4 DEL
----------
-Syntax: 
-    /msg HostServ DEL <ACCESS LIST #>
-Description: 
-    The information needed for this is in the LIST command. To delete 
-    Number 3 use DEL 3 ... its that easy!
-Example: 
-    /msg HostServ DEL 1
-
-5.3.5 VIEW
-----------
-Syntax: 
-    /msg HostServ VIEW <ACCESS LIST #>
-Description: 
-    View Detailed information about the user on the access list # 
-    you selected
-Example: 
-    /msg HostServ VIEW 1
-
-5.3.6 LIST
-----------
-Syntax: 
-    /msg HostServ LIST <start>
-Description: 
-    Lists the people and vhosts in the Database.
-    The list is limited to 20 entries. To view more, specify 
-    a position to start at (eg, /msg HostServ LIST 20)
-    For more descriptive info on a SINGLE vhost see HELP VIEW
-Example: 
-    /msg HostServ LIST 20
-
-5.3.7 LOGIN
------------
-Syntax: 
-    /msg HostServ LOGIN <NICK> <PASSWORD>
-Description: 
-    Login to HostServ with your NICK and PASSWORD and your vhost will be 
-    assigned to your nick on successful login.
-Example: 
-    /msg HostServ LOGIN Angel Password
-
-5.3.8 CHPASS
-------------
-Syntax: 
-    /msg HostServ CHPASS <NICK> <OLDPASS> <NEWPASS>
-Description: 
-    Use this command to change the password assigned to your Vhost 
-    Account. You must supply your current password and a valid account 
-    for it to be successful
-Example: 
-    /msg HostServ CHPASS Angel oldpass newpass
-
-5.3.9 BANS
-----------
-Syntax: 
-    /msg HostServ BANS [[add/del] <option>]
-Description: 
-    Controls the vhost banned list entries:
-    BANS lists current vhosts that are banned by network administration.
-    The following options are only available to Network Administration:
-    BANS add <wildcard>
-        Add a banned vhost to the list
-        Wildcards, like *fbi* are permitted.
-    BANS del #
-        Delete a banned vhost with ID number #
-        You may figure out the ID number by using BANS by itself
-Example: 
-    /msg HostServ BANS add microsoft.com
-    
-5.3.10 LEVELS
--------------
-
-Syntax: 
-    /msg HostServ LEVELS <[add/view/list/del] <level>>
-Description: 
-    This lists the levels required to perform certain functions 
-    with HostServ.
-    The Following Options are only available to Network Administration:
-    LEVELS [add/view/list/del] <level>
-    Change the User Levels required to perform administration functions. 
-    Level must be between 1 and 200
-Example: 
-
-5.3.11 SET
+5.3.3 SET
 -------------
 
 Syntax: 
@@ -951,6 +906,90 @@ Example:
     /msg HostServ SET EXPIRE 10
     /msg HostServ SET HIDDENHOST NeoStats.net
 
+5.3.4 ADD
+---------
+
+Syntax: 
+    /msg HostServ ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>
+Description:
+    Register a host name to be set. e.g.: my-host.com DO NOT INCLUDE AN 
+    @. The <HOST NAME> must be where the user is connecting from WITHOUT 
+    THE @. HostServ supports wildcards such as *.myhost.com in the 
+    <HOST NAME> setting The <PASSWORD> field is new. If a user connects 
+    with a different host They can now /msg HostServ LOGIN nick password
+Example:
+    /msg HostServ ADD neo aol.com coolhost.com mypassword
+
+5.3.5 DEL
+---------
+Syntax: 
+    /msg HostServ DEL <ACCESS LIST #>
+Description: 
+    The information needed for this is in the LIST command. To delete 
+    Number 3 use DEL 3 ... its that easy!
+Example: 
+    /msg HostServ DEL 1
+
+5.3.6 VIEW
+----------
+Syntax: 
+    /msg HostServ VIEW <ACCESS LIST #>
+Description: 
+    View Detailed information about the user on the access list # 
+    you selected
+Example: 
+    /msg HostServ VIEW 1
+
+5.3.7 LIST
+----------
+Syntax: 
+    /msg HostServ LIST <start>
+Description: 
+    Lists the people and vhosts in the Database.
+    The list is limited to 20 entries. To view more, specify 
+    a position to start at (eg, /msg HostServ LIST 20)
+    For more descriptive info on a SINGLE vhost see HELP VIEW
+Example: 
+    /msg HostServ LIST 20
+
+5.3.8 LOGIN
+-----------
+Syntax: 
+    /msg HostServ LOGIN <NICK> <PASSWORD>
+Description: 
+    Login to HostServ with your NICK and PASSWORD and your vhost will be 
+    assigned to your nick on successful login.
+Example: 
+    /msg HostServ LOGIN Angel Password
+
+5.3.9 CHPASS
+------------
+Syntax: 
+    /msg HostServ CHPASS <NICK> <OLDPASS> <NEWPASS>
+Description: 
+    Use this command to change the password assigned to your Vhost 
+    Account. You must supply your current password and a valid account 
+    for it to be successful
+Example: 
+    /msg HostServ CHPASS Angel oldpass newpass
+
+5.3.10 BANS
+----------
+Syntax: 
+    /msg HostServ BANS [[add/del] <option>]
+Description: 
+    Controls the vhost banned list entries:
+    BANS lists current vhosts that are banned by network administration.
+    The following options are only available to Network Administration:
+    BANS add <wildcard>
+        Add a banned vhost to the list
+        Wildcards, like *fbi* are permitted.
+    BANS del #
+        Delete a banned vhost with ID number #
+        You may figure out the ID number by using BANS by itself
+Example: 
+    /msg HostServ BANS add microsoft.com
+    
 -----------------------------------<>-----------------------------------
 
 6. LoveServ
@@ -965,6 +1004,8 @@ on IRC.
 6.2 Available Commands
 ----------------------
 HELP        Online command help
+VERSION     Display version
+CREDITS     Display copyright and credits
 ROSE        Give someone on IRC a rose
 KISS        Give someone on IRC a kiss
 TONSIL      Give someone on IRC a tonsil kiss
@@ -975,7 +1016,6 @@ CANDY       Give someone on IRC candy
 LOVENOTE    Give someone on IRC a love note
 APOLOGY     Give someone on IRC an apology
 THANKYOU    Give someone on IRC a thank you
-VERSION     Display version info
 
 6.3 Command Reference
 ---------------------
@@ -991,7 +1031,25 @@ Example:
     /msg LoveServ HELP 
     /msg LoveServ HELP ROSE
 
-6.3.2 ROSE
+6.3.2 VERSION
+-------------
+Syntax: 
+    /msg LoveServ VERSION
+Description: 
+    Prints current version information via PRIVMSG/NOTICE
+Example:
+    /msg LoveServ VERSION
+
+6.3.3 CREDITS
+-------------
+Syntax: 
+    /msg LoveServ CREDITS
+Description: 
+    Display copyright and credits for LoveServ.
+Example:
+    /msg LoveServ CREDITS
+
+6.3.4 ROSE
 ----------
 Syntax: 
     /msg LoveServ ROSE <nick>
@@ -1000,7 +1058,7 @@ Description:
 Example: 
     /msg LoveServ ROSE Angel
 
-6.3.3 KISS
+6.3.5 KISS
 ----------
 Syntax: 
     /msg LoveServ KISS <nick>
@@ -1009,7 +1067,7 @@ Description:
 Example: 
     /msg LoveServ KISS Angel
 
-6.3.4 TONSIL
+6.3.6 TONSIL
 ------------
 Syntax: 
     /msg LoveServ TONSIL <nick>
@@ -1018,7 +1076,7 @@ Description:
 Example: 
     /msg LoveServ TONSIL Angel
 
-6.3.5 HUG
+6.3.7 HUG
 ---------
 Syntax: 
     /msg LoveServ HUG <nick>
@@ -1027,7 +1085,7 @@ Description:
 Example: 
     /msg LoveServ HUG Angel
 
-6.3.6 ADMIRER
+6.3.8 ADMIRER
 -------------
 Syntax: 
     /msg LoveServ ADMIRER <nick>
@@ -1036,7 +1094,7 @@ Description:
 Example: 
     /msg LoveServ ADMIRER Angel
 
-6.3.7 CHOCOLATE
+6.3.9 CHOCOLATE
 ---------------
 Syntax: 
     /msg LoveServ CHOCOLATE <nick>
@@ -1045,7 +1103,7 @@ Description:
 Example: 
     /msg LoveServ CHOCOLATE Angel
 
-6.3.8 CANDY
+6.3.10 CANDY
 -----------
 Syntax: 
     /msg LoveServ CANDY NICK
@@ -1054,7 +1112,7 @@ Description:
 Example: 
     /msg LoveServ CANDY Angel
 
-6.3.9 LOVENOTE
+6.3.11 LOVENOTE
 --------------
 Syntax: 
     /msg LoveServ LOVENOTE NICK <message>
@@ -1063,7 +1121,7 @@ Description:
 Example: 
     /msg LoveServ LOVENOTE Angel I love you dearly.
 
-6.3.10 APOLOGY
+6.3.12 APOLOGY
 --------------
 Syntax: 
     /msg LoveServ APOLOGY NICK <message>
@@ -1072,7 +1130,7 @@ Description:
 Example: 
     /msg LoveServ APOLOGY Angel deleting all those songs
 
-6.3.11 THANKYOU
+6.3.13 THANKYOU
 ---------------
 Syntax: 
     /msg LoveServ THANKYOU NICK <message>
@@ -1080,15 +1138,6 @@ Description:
     Send a THANKYOU message to someone
 Example: 
     /msg LoveServ THANKYOU Angel uploading those songs
-
-6.3.12 VERSION
---------------
-Syntax: 
-    /msg LoveServ VERSION
-Description: 
-    Show LoveServ's current version
-Example: 
-    /msg LoveServ VERSION
 
 -----------------------------------<>-----------------------------------
 
@@ -1103,15 +1152,16 @@ MoraleServ is a fun module to send cheery messages to friends on IRC.
 7.2 Available Commands
 ----------------------
 HELP        Online command help
+VERSION     Display version
+CREDITS     Display copyright and credits
 HAIL        Hail someone on IRC
 ODE         Send an ODE to someone on IRC
 POEM        Send a poem to someone on IRC
 LAPDANCE    Give someone on IRC a lap dance
 REDNECK     Send a Redneck message.
-CHEERUP     Send an cheer up message to someone on IRC
-BEHAPPY     Send an be happy song to someone on IRC
-WONDERFUL   Send an song to someone on IRC
-VERSION     Display version info
+CHEERUP     Send a cheer up message to someone on IRC
+BEHAPPY     Send a be happy song to someone on IRC
+WONDERFUL   Send a song to someone on IRC
 			
 7.3 Command Reference
 ---------------------
@@ -1127,7 +1177,25 @@ Example:
     /msg MoraleServ HELP
     /msg MoraleServ HELP HAIL
 
-7.3.2 HAIL
+7.3.2 VERSION
+-------------
+Syntax: 
+    /msg MoraleServ VERSION
+Description: 
+    Prints current version information via PRIVMSG/NOTICE
+Example:
+    /msg MoraleServ VERSION
+
+7.3.3 CREDITS
+-------------
+Syntax: 
+    /msg MoraleServ CREDITS
+Description: 
+    Display copyright and credits for MoraleServ.
+Example:
+    /msg MoraleServ CREDITS
+
+7.3.4 HAIL
 ----------
 Syntax: 
     /msg MoraleServ HAIL <hail nick> <send to nick>
@@ -1136,7 +1204,7 @@ Description:
 Example:
     /msg MoraleServ HAIL Angel Devil
 
-7.3.3 ODE
+7.3.5 ODE
 ---------
 Syntax: 
     /msg MoraleServ ODE <about nick> <send to nick>
@@ -1145,7 +1213,7 @@ Description:
 Example:
     /msg MoraleServ ODE Angel Devil
 
-7.3.4 POEM
+7.3.6 POEM
 ----------
 Syntax: 
     /msg MoraleServ POEM <about nick> <send to nick>
@@ -1154,7 +1222,7 @@ Description:
 Example:
     /msg MoraleServ POEM Angel Devil
 
-7.3.5 LAPDANCE
+7.3.7 LAPDANCE
 --------------
 Syntax: 
     /msg MoraleServ LAPDANCE <NICK>
@@ -1164,7 +1232,7 @@ Description:
 Example:
     /msg MoraleServ LAPDANCE YoungGuy
 
-7.3.6 REDNECK
+7.3.8 REDNECK
 -------------
 Syntax: 
     /msg MoraleServ REDNECK <NICK>
@@ -1173,7 +1241,7 @@ Description:
 Example:
     /msg MoraleServ REDNECK Yankee
 
-7.3.7 CHEERUP
+7.3.9 CHEERUP
 -------------
 Syntax: 
     /msg MoraleServ CHEERUP <NICK>
@@ -1182,7 +1250,7 @@ Description:
 Example:
     /msg MoraleServ CHEERUP Morbid
 
-7.3.8 BEHAPPY
+7.3.10 BEHAPPY
 -------------
 Syntax: 
     /msg MoraleServ BEHAPPY <NICK>
@@ -1194,7 +1262,7 @@ Description:
 Example:
     /msg MoraleServ BEHAPPY SadUser
 
-7.3.9 WONDERFUL
+7.3.11 WONDERFUL
 ---------------
 Syntax: 
     /msg MoraleServ WONDERFUL <NICK>
@@ -1204,15 +1272,6 @@ Description:
     lyrics with the target nick in them to the target nick
 Example:
     /msg MoraleServ WONDERFUL Angel
-
-7.3.10 VERSION
---------------
-Syntax: 
-    /msg MoraleServ VERSION
-Description: 
-    Prints current version information via PRIVMSG/NOTICE
-Example:
-    /msg MoraleServ VERSION
 
 -----------------------------------<>-----------------------------------
 

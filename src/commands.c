@@ -23,6 +23,7 @@
 
 /*  TODO:
  *  - More error processing
+ *  - /msg BOTNAME HELP vs /msg BOTNAME HELP COMMAND frees NULL ptr???
  */
 
 #include "neostats.h"
@@ -1059,7 +1060,7 @@ static int bot_cmd_levels (CmdParams *cmdparams)
 		hnode_t *cmdnode;
 		hscan_t hs;
 
-		/* Cycle through command hash and delete each command */
+		/* Cycle through command hash and list each command */
 		hash_scan_begin (&hs, cmdparams->bot->botcmds);
 		while ((cmdnode = hash_scan_next(&hs)) != NULL) {
 			cmd_ptr = ((bot_cmd*)hnode_get(cmdnode));

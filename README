@@ -284,7 +284,7 @@ useful:
 
     -h        will display a help screen showing these options.
     -v        will display the version number
-    -d 1-10   Enable debugging output 1= lowest, 10 = highest
+    -d 1-10   Enable debugging output 1 = lowest, 10 = highest
     -n        Do not load any modules on startup
     -q        Quiet start - for cron scripts
     -f        Do not fork into background (for debugging)
@@ -483,5 +483,5 @@ on how to contact us.
 -----------------------------------<>-----------------------------------
 
 ************************************************************************
-** This document was last updated on October 27th, 2004 by M          **
+** This document was last updated on January 31st, 2005 by M          **
 ************************************************************************
