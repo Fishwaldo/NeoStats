@@ -180,7 +180,7 @@ sock_update (int fd, short what) {
           /* just update */
     } else {
           /* its new */
-          sock = add_sock(tmpname, fd, adns_read, adns_write, what2, sock, NULL, SOCK_NOTIFY);
+          sock = add_sock(tmpname, fd, adns_read, adns_write, what2, sock, NULL, SOCK_NATIVE);
           sock->data = sock;
     }
 

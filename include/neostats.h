@@ -922,17 +922,21 @@ EXPORTVAR extern int RunLevel;
 /** @brief Socket function types
  * 
  */
+#if 0
 typedef int (*sock_func) ( int sock_no, char *name );
+#endif
 
 /* socket interface type */
 #define SOCK_STANDARD 1
 #define SOCK_BUFFERED 2
 #define SOCK_LINEMODE 3
 #define SOCK_LISTEN 4
-#define SOCK_NOTIFY 5
+#define SOCK_NATIVE 5
 
 
+#if 0
 typedef void (*linemodecb)(char *);
+#endif
 typedef int (*sockcb)(int, void *data);
 typedef int (*sockfunccb)(void *, void *, size_t);
 
@@ -952,11 +956,13 @@ typedef struct Sock {
 	void *data;
 	/* if socktype = SOCK_STANDARD, function calls */
 	/** Socket read function */
+#if 0
 	sock_func readfnc;
 	/** Socket write function */
 	sock_func writefnc;
 	/** Socket error function */
 	sock_func errfnc;
+#endif
 	/** rmsgs */
 	long rmsgs;
 	/** rbytes */
@@ -1086,7 +1092,7 @@ EXPORTFUNC int sock_connect (int socktype, struct in_addr ip, int port);
 EXPORTFUNC int sock_disconnect( const char *name );
 EXPORTFUNC Sock *add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb, void *data);
 EXPORTFUNC Sock *add_linemode_socket(const char *sock_name, int socknum, sockfunccb readcb, sockcb errcb, void *arg);
-EXPORTFUNC int send_to_linemode(Sock *sock, const char *buf, const int buflen);
+EXPORTFUNC int send_to_sock(Sock *sock, const char *buf, const int buflen);
 
 /* Add a new bot to NeoStats */
 EXPORTFUNC Bot *AddBot( BotInfo *botinfo );

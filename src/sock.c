@@ -300,7 +300,7 @@ sock_connect (int socktype, struct in_addr ip, int port)
 void
 send_to_ircd_socket (const char *buf, const int buflen)
 {
-	if (send_to_linemode(me.servsock, buf, buflen) == NS_FAILURE) {
+	if (send_to_sock(me.servsock, buf, buflen) == NS_FAILURE) {
 		do_exit(NS_EXIT_ERROR, NULL);
 	}
 }
@@ -316,24 +316,39 @@ send_to_ircd_socket (const char *buf, const int buflen)
  */
 
 int
-send_to_linemode(Sock *sock, const char *buf, const int buflen) {
+send_to_sock(Sock *sock, const char *buf, const int buflen) {
 	int sent;
 
 	if (!sock) {
 		nlog(LOG_WARNING, "Not sending to socket as we have a invalid socket");
 		return NS_FAILURE;
 	}
-	/* the linemode socket is a buffered socket */
-	sent = bufferevent_write(sock->event.buffered, (void *)buf, buflen);
-	if (sent == -1) {
-		nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
-		/* Try to close socket then reset the servsock value to avoid cyclic calls */
-		del_sock(sock);
-		return NS_FAILURE;		
-	}
+	if ((sock->socktype == SOCK_BUFFERED) | (sock->socktype == SOCK_LINEMODE)) {
+    	/* the linemode socket is a buffered socket */
+    	sent = bufferevent_write(sock->event.buffered, (void *)buf, buflen);
+    	if (sent == -1) {
+	    	nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
+	    	/* Try to close socket then reset the servsock value to avoid cyclic calls */
+			sock->sfunc.linemode.errcb(-1, sock->data);	
+    		del_sock(sock);
+	    	return NS_FAILURE;		
+    	}
+    } else if ((sock->socktype == SOCK_NATIVE) | (sock->socktype == SOCK_STANDARD)) {
+        sent = os_write(sock->sock_no, buf, buflen);
+        if (sent == -1) {
+	    	nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
+			sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
+	    	/* Try to close socket then reset the servsock value to avoid cyclic calls */
+    		del_sock(sock);
+	    	return NS_FAILURE;		
+        }
+    } else {
+        nlog(LOG_CRITICAL, "send_to_sock: ehhhh. Tried to write to a sock that doesn't support write: %s", sock->name);
+        return NS_FAILURE;
+    }          
 	sock->smsgs++;
 	sock->sbytes += buflen;
-	return NS_SUCCESS;
+	return sent;
 }
 
 
@@ -417,7 +432,9 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 #ifdef SOCKDEBUG
 						printf("line:|%s| %d %d\n", thisock->sfunc.linemode.readbuf, thisock->sfunc.linemode.readbufsize, bufpos);
 #endif
-						thisock->sfunc.linemode.funccb(thisock->data, thisock->sfunc.linemode.readbuf, thisock->sfunc.linemode.readbufsize);
+						if(thisock->sfunc.linemode.funccb(thisock->data, thisock->sfunc.linemode.readbuf, thisock->sfunc.linemode.readbufsize) == NS_FAILURE) {
+						    del_sock(thisock);
+                        }
 						/* ok, reset the recbuf */
 						thisock->sfunc.linemode.readbufsize = 0;
 					}
@@ -934,8 +951,8 @@ add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writef
 	sock->sfunc.standmode.writefunc = writefunc;
 	if (type == SOCK_STANDARD) {
     	sock->socktype = SOCK_STANDARD;
-    } else if (type == SOCK_NOTIFY) {
-        sock->socktype = SOCK_NOTIFY;
+    } else if (type == SOCK_NATIVE) {
+        sock->socktype = SOCK_NATIVE;
     } else {
       nlog(LOG_ERROR, "wrong socket type for add_sock. Module: %s, Name: %s", moduleptr->info->name, sock->name);
       os_free(sock);
@@ -968,7 +985,7 @@ del_sock (Sock *sock)
 	switch (sock->socktype) {
 		case SOCK_STANDARD:
 		case SOCK_LISTEN:
-		case SOCK_NOTIFY:
+		case SOCK_NATIVE:
 				event_del(sock->event.event);
 				/* needed? */
 				os_free(sock->event.event);
@@ -1059,7 +1076,7 @@ ns_cmd_socklist (CmdParams* cmdparams)
 			case SOCK_STANDARD:
 				irc_prefmsg (ns_botptr, cmdparams->source, __("Standard Socket - fd: %d", cmdparams->source), sock->sock_no);
 				break;
-			case SOCK_NOTIFY:
+			case SOCK_NATIVE:
 				irc_prefmsg (ns_botptr, cmdparams->source, __("Native Socket - fd: %d", cmdparams->source), sock->sock_no);
 				break;
 			case SOCK_BUFFERED:

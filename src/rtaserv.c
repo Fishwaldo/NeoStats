@@ -71,7 +71,7 @@ void rtaservlog(char *logline)
 
 int InitRTAServ (void)
 {
-	rtaport = 8888;
+	rtaport = 8889;
 	rta_init(rtaservlog);
 	/* add the server hash to the sql library */
 	neo_bans.address = GetBanHash();
@@ -262,7 +262,7 @@ sql_accept_conn(int srvfd, void *data)
 
 		ircsnprintf(tmpname, BUFSIZE, "RTAConn%d", newui->fd);
 		
-		add_sock(tmpname, newui->fd, sql_handle_ui_request, sql_handle_ui_output, EV_READ|EV_PERSIST|EV_TIMEOUT, newui, &rtatimeout, SOCK_STANDARD);		
+		newui->sock = add_sock(tmpname, newui->fd, sql_handle_ui_request, sql_handle_ui_output, EV_READ|EV_PERSIST|EV_TIMEOUT, newui, &rtatimeout, SOCK_STANDARD);		
 		return NS_SUCCESS;
 	}
 }
@@ -350,8 +350,8 @@ sql_handle_ui_output(int fd, void *arg)
  
 	if (sqlconn->responsefree < 50000)
 	{
-		ret = os_sock_write (sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree));
-		if (ret < 0)
+	    ret = send_to_sock(sqlconn->sock, sqlconn->response, (50000 - sqlconn->responsefree));
+		if (ret == NS_FAILURE)
 		{
 			nlog(LOG_WARNING, "Got a write error when attempting to return data to the SQL Server");
 			deldbconnection(sqlconn->fd);
