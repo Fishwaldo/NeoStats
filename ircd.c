@@ -694,7 +694,6 @@ parse (char *line)
 	}
 	strlcpy (cmd, line, sizeof (cmd)); 
 	ac = splitbuf (coreLine, &av, 1);
-	strlcpy (privmsgbuffer, av[ac-1], BUFSIZE);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	free (av);
 }
