@@ -48,6 +48,8 @@ AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2 -ggdb -Wall -DCURLDEBUG
+CONVENIENCE_LTDL_FALSE = #
+CONVENIENCE_LTDL_TRUE = 
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
@@ -59,19 +61,25 @@ ECHO_N = -n
 ECHO_T = 
 EGREP = grep -E
 EXEEXT = 
-GTK_CONFIG = 
 INCLTDL = -I${top_srcdir}/libltdl
 INSTALL_DATA = ${INSTALL} -m 644
+INSTALL_LTDL_FALSE = 
+INSTALL_LTDL_TRUE = #
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = ${SHELL} $(install_sh) -c -s
 LDFLAGS = 
+LIBADD_DL = -ldl
 LIBLTDL = ${top_builddir}/libltdl/libltdlc.la
 LIBOBJS = 
 LIBS = -g 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool --quiet
+LIBTOOL_DEPS = autotools/ltmain.sh
 LN_S = ln -s
 LTLIBOBJS = 
+MAINT = #
+MAINTAINER_MODE_FALSE = 
+MAINTAINER_MODE_TRUE = #
 MAKEINFO = ${SHELL} /home/fish/3.0/autotools/missing --run makeinfo
 OBJEXT = o
 PACKAGE = NeoStats
@@ -126,7 +134,6 @@ program_transform_name = s,x,x,
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 sqlsrvbuild = 
-subdirs =  src/libltdl
 sysconfdir = ${prefix}/etc
 target_alias = 
 noinst_LTLIBRARIES = libpcre.la
@@ -178,10 +185,10 @@ all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
-$(srcdir)/Makefile.in:  Makefile.am $(top_srcdir)/autotools/rules.mk $(top_srcdir)/configure.in $(ACLOCAL_M4)
+$(srcdir)/Makefile.in: # Makefile.am $(top_srcdir)/autotools/rules.mk $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
 	  $(AUTOMAKE) --gnu  src/pcre/Makefile
-Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
+Makefile: # $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
 
 clean-noinstLTLIBRARIES:
