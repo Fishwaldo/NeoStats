@@ -7,6 +7,11 @@ RedHat 9.0 / Fedora / Slakware 9.0 Users:
 	affects NeoStats. If you are running RedHat 9.0 or Fedora or Slakware 9.0 please 
 	read http://www.neostats.net/boards/viewtopic.php?t=391
  
+SPAM module GONE!
+	the Spam module is no longer part of the NeoStats distribution.
+	SecureServ does a much better job of getting spammers. Use SecureServ
+	instead. 
+
 Additionally Channel Stats in HTML output:
 	StatServ now outputs channel counts and max counts in the daily and
 	netstat sections of the HTML output. 

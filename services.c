@@ -252,9 +252,10 @@ servicesbot (char *nick, char **av, int ac)
 static void
 ns_shutdown (User * u, char **av, int ac)
 {
+	char *tmp;
+
 	SET_SEGV_LOCATION();
 
-	char *tmp;
 	if (ac <= 2) {
 		ircsnprintf (quitmsg, BUFSIZE, "%s [%s](%s) requested SHUTDOWN for %s.", 
 			u->nick, u->username, u->hostname, no_reason);
@@ -273,9 +274,10 @@ ns_shutdown (User * u, char **av, int ac)
 static void
 ns_reload (User * u, char **av, int ac)
 {
+	char *tmp;
+
 	SET_SEGV_LOCATION();
 
-	char *tmp;
 	if (ac <= 2) {
 		prefmsg (u->nick, s_Services, "You must supply a Reason to Reload");
 		return;
