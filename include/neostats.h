@@ -504,6 +504,9 @@ EXPORTVAR extern const char version_time[];
 typedef struct _Module Module;
 typedef struct _Bot Bot;
 
+/* to avoid warnings for Sock */
+struct Sock;
+
 /** @brief Server structure
  *  Client extension structure for server specifics
  */
@@ -561,10 +564,9 @@ typedef struct Client {
 	void *modvalue[NUM_MODULES];
 	int fd;
 	int port;
+	struct Sock *sock;
 } Client; 
 
-/* to avoid warnings for Sock */
-struct Sock;
 
 /** @brief me structure
  *  structure containing information about the neostats core
@@ -976,7 +978,8 @@ typedef struct Sock {
 		struct linemode {
 			char *readbuf;
 			size_t readbufsize;
-			linemodecb funccb;
+			sockfunccb funccb;
+			sockcb errcb;
 			size_t recvq;
 		} linemode;
 		struct listenmode {
@@ -1085,10 +1088,11 @@ EXPORTFUNC int update_sock(Sock *sock, short what, short reset, struct timeval *
 EXPORTFUNC int add_sockpoll( const char *sock_name, void *data, before_poll_func beforepoll, after_poll_func afterpoll );
 EXPORTFUNC int del_sock(Sock *sock);
 EXPORTFUNC Sock *find_sock( const char *sock_name );
-EXPORTFUNC int sock_connect( int socktype, unsigned long ipaddr, int port, const char *name, sock_func func_read, sock_func func_write, sock_func func_error );
+EXPORTFUNC int sock_connect (int socktype, struct in_addr ip, int port);
 EXPORTFUNC int sock_disconnect( const char *name );
 EXPORTFUNC Sock *add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb, void *data);
-
+EXPORTFUNC Sock *add_linemode_socket(const char *sock_name, int socknum, sockfunccb readcb, sockcb errcb, void *arg);
+EXPORTFUNC int send_to_linemode(Sock *sock, const char *buf, const int buflen);
 
 /* Add a new bot to NeoStats */
 EXPORTFUNC Bot *AddBot( BotInfo *botinfo );
@@ -1227,7 +1231,7 @@ EXPORTVAR unsigned char UmodeChRegNick;
 EXPORTFUNC int IsBotMode( const char mode );
 
 /* dns.c */
-EXPORTFUNC int dns_lookup( char *str, adns_rrtype type, void (*callback) ( char *data, adns_answer * a), char *data );
+EXPORTFUNC int dns_lookup( char *str, adns_rrtype type, void (*callback) ( void *data, adns_answer * a), void *data );
 
 /* services.c */
 EXPORTFUNC int add_services_cmd_list( bot_cmd *bot_cmd_list );

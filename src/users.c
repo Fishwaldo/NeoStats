@@ -64,7 +64,7 @@ static Client *new_user (const char *nick)
 	return u;
 }
 
-static void lookupnickip (char *data, adns_answer *a) 
+static void lookupnickip (void *data, adns_answer *a) 
 {
 	CmdParams *cmdparams;
 	Client *u;

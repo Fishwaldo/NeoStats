@@ -55,8 +55,7 @@ static struct timeval *TimeOut;
 static struct pollfd *ufds;
 
 
-void write_from_ircd_socket (struct bufferevent *bufferevent, void *arg);
-
+static int error_from_ircd_socket(int what, void *data);
 
 /** @brief Connect to a server
  *
@@ -361,7 +360,7 @@ Connect (void)
 	if (mysock <= 0) {
 		nlog (LOG_WARNING, "Unable to connect to %s: %s", me.uplink, strerror(errno));
 	} else {
-		me.servsock=add_linemode_socket("IRCd", mysock, irc_parse, write_from_ircd_socket, error_from_ircd_socket);
+		me.servsock=add_linemode_socket("IRCd", mysock, irc_parse, error_from_ircd_socket, NULL);
 
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
 		irc_connect (me.name, me.numeric, me.infoline, nsconfig.pass, (unsigned long)me.ts_boot, (unsigned long)me.now);
@@ -414,11 +413,12 @@ getmaxsock (void)
  *         NS_FAILURE if unsuccessful
  */
 int
-sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, sock_func func_read, sock_func func_write, sock_func func_error)
+sock_connect (int socktype, struct in_addr ip, int port)
 {
 	struct sockaddr_in sa;
 	int s;
 	int i;
+	int flags = 1;
 	Module* moduleptr;
 
 	moduleptr = GET_CUR_MODULE();
@@ -436,30 +436,27 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 	memset (&sa, 0, sizeof (sa));
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons (port);
-	sa.sin_addr.s_addr = ipaddr;
+	sa.sin_addr.s_addr = ip.s_addr;
 
 	/* set non blocking */
 
 	if ((i = os_sock_set_nonblocking (s)) < 0) {
-		nlog (LOG_CRITICAL, "can't set socket %s(%s) non-blocking: %s", name, moduleptr->info->name, strerror (i));
+		nlog (LOG_CRITICAL, "can't set socket %d(%s) non-blocking: %s", s, moduleptr->info->name, strerror (i));
 		return NS_FAILURE;
 	}
-
+	setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&flags, sizeof(flags));
+	
 	if ((i = connect (s, (struct sockaddr *) &sa, sizeof (sa))) < 0) {
 		switch (errno) {
 		case EINPROGRESS:
 			break;
 		default:
-			nlog (LOG_WARNING, "Socket %s(%s) cant connect %s", name, moduleptr->info->name, strerror (errno));
+			nlog (LOG_WARNING, "Socket %d(%s) cant connect %s", s, moduleptr->info->name, strerror (errno));
 			os_sock_close (s);
 			return NS_FAILURE;
 		}
 	}
 
-#warning TODO
-#if 0
-	add_sock (name, s, func_read, func_write, func_error);
-#endif
 	return s;
 }
 
@@ -511,26 +508,40 @@ sock_disconnect (const char *name)
 void
 send_to_ircd_socket (const char *buf, const int buflen)
 {
+	if (send_to_linemode(me.servsock, buf, buflen) == NS_FAILURE) {
+		do_exit(NS_EXIT_ERROR, NULL);
+	}
+}
+int
+send_to_linemode(Sock *sock, const char *buf, const int buflen) {
 	int sent;
 
-	if (!me.servsock) {
-		nlog(LOG_WARNING, "Not sending to server as we have a invalid socket");
-		return;
+	if (!sock) {
+		nlog(LOG_WARNING, "Not sending to socket as we have a invalid socket");
+		return NS_FAILURE;
 	}
 	/* the ircd socket is a buffered socket */
-	sent = bufferevent_write(me.servsock->event.buffered, (void *)buf, buflen);
+	sent = bufferevent_write(sock->event.buffered, (void *)buf, buflen);
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
+		/* Try to close socket then reset the servsock value to avoid cyclic calls */
+		del_sock(sock);
+		return NS_FAILURE;		
+	}
+	sock->smsgs++;
+	sock->sbytes += buflen;
+	return NS_SUCCESS;
+}
+
+static int 
+error_from_ircd_socket(int what, void *data) {
+		nlog (LOG_CRITICAL, "Error from IRCd Socket: %s", strerror(errno));
 		/* Try to close socket then reset the servsock value to avoid cyclic calls */
 		del_sock(me.servsock);
 		me.servsock = NULL;
 		/* XXX really exit? */
 		do_exit (NS_EXIT_ERROR, NULL);
-	}
-	me.servsock->smsgs++;
-	me.servsock->sbytes += buflen;
 }
-
 #undef SOCKDEBUG 
 
 /** @brief This function actually reads the data from our event buffer and 
@@ -566,9 +577,9 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 			 */
 			if ((len + thisock->sfunc.linemode.readbufsize) > thisock->sfunc.linemode.recvq) {
 				nlog(LOG_ERROR, "RecvQ for %s(%s) exceeded. Dropping Connection", thisock->name, thisock->moduleptr?thisock->moduleptr->info->name:"N/A");
+				thisock->sfunc.linemode.errcb(-1, thisock->data);	
 				del_sock(thisock);
-				/* XXX really exit? */
-				do_exit (NS_EXIT_ERROR, NULL);
+				return;
 			}
 			thisock->rbytes += len;
 
@@ -593,7 +604,7 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 #ifdef SOCKDEBUG
 						printf("line:|%s| %d %d\n", thisock->sfunc.linemode.readbuf, thisock->sfunc.linemode.readbufsize, bufpos);
 #endif
-						thisock->sfunc.linemode.funccb(thisock->sfunc.linemode.readbuf);
+						thisock->sfunc.linemode.funccb(thisock->data, thisock->sfunc.linemode.readbuf, thisock->sfunc.linemode.readbufsize);
 						/* ok, reset the recbuf */
 						thisock->sfunc.linemode.readbufsize = 0;
 					}
@@ -621,7 +632,7 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 
 
 void
-write_from_ircd_socket (struct bufferevent *bufferevent, void *arg) {
+socket_linemode_write_done (struct bufferevent *bufferevent, void *arg) {
 /* NOOP - We require this otherwise the event subsystem segv's */
 }
 
@@ -640,10 +651,8 @@ write_from_ircd_socket (struct bufferevent *bufferevent, void *arg) {
 
 
 void 
-error_from_ircd_socket(struct bufferevent *bufferevent, short what, void *arg) {
-#if 0
+socket_linemode_error(struct bufferevent *bufferevent, short what, void *arg) {
 	Sock *sock = (Sock*)arg;
-#endif	
 	switch (what) {
 		case EVBUFFER_READ:
 		case EVBUFFER_WRITE:
@@ -656,11 +665,8 @@ error_from_ircd_socket(struct bufferevent *bufferevent, short what, void *arg) {
 			nlog(LOG_ERROR, "Unknown Error from IRCd Socket: %d", what);
 			break;
 	}
-#warning this needs to be cleaned up so we can exit cleanly.
-	del_sock(me.servsock);
-	me.servsock = NULL;
-	/* XXX really exit? */
-	do_exit (NS_EXIT_ERROR, NULL);
+	sock->sfunc.linemode.errcb(what, sock->data);	
+	del_sock(sock);
 }	
 	
 
@@ -767,9 +773,9 @@ find_sock (const char *sock_name)
  */
 
 Sock *
-add_linemode_socket(const char *sock_name, int socknum, linemodecb readcb, evbuffercb writecb, everrorcb errcb) {
+add_linemode_socket(const char *sock_name, int socknum, sockfunccb readcb, sockcb errcb, void *arg) {
 	Sock *sock;
-	sock = add_buffered_socket(sock_name, socknum, linemode_read, writecb, errcb);
+	sock = add_buffered_socket(sock_name, socknum, linemode_read, socket_linemode_write_done, socket_linemode_error, arg);
 	if (sock) {
 		if (nsconfig.recvq < 1024) {
 			nsconfig.recvq = 1024;
@@ -777,6 +783,7 @@ add_linemode_socket(const char *sock_name, int socknum, linemodecb readcb, evbuf
 		sock->sfunc.linemode.readbuf = os_malloc(nsconfig.recvq);
 		sock->sfunc.linemode.recvq = nsconfig.recvq;
 		sock->sfunc.linemode.funccb = readcb;
+		sock->sfunc.linemode.errcb = errcb;
 		sock->sfunc.linemode.readbufsize = 0;
 		sock->socktype = SOCK_LINEMODE;
 		dlog(DEBUG3, "add_linemode_socket: Added a new Linemode Socket called %s (%s)", sock_name, sock->moduleptr?sock->moduleptr->info->name:"N/A");
@@ -802,7 +809,7 @@ add_linemode_socket(const char *sock_name, int socknum, linemodecb readcb, evbuf
 
 
 Sock *
-add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuffercb writecb, everrorcb errcb) {
+add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuffercb writecb, everrorcb errcb, void *arg) {
 	Sock *sock;
 	Module *moduleptr;
 
@@ -822,6 +829,7 @@ add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuf
 	sock->sock_no = socknum;
 	sock->moduleptr = moduleptr;
 	sock->socktype = SOCK_BUFFERED;
+	sock->data = arg;
 	
 	/* add the buffered socket to the core event subsystem */
 	sock->event.buffered = bufferevent_new(sock->sock_no, readcb, writecb, errcb, sock);

@@ -818,17 +818,18 @@ m_end_of_burst (char *origin, char **argv, int argc, int srv)
 
 /* :<source> <command> <param1> <paramN> :<last parameter> */
 /* <source> <command> <param1> <paramN> :<last parameter> */
-void
-parse (char *line)
+int
+parse (void *notused, void *rline, size_t len)
 {
 	char origin[64], cmd[64], *coreLine;
+	char *line = (char *)rline;
 	int cmdptr = 0;
 	int ac = 0;
 	char **av = NULL;
 
 	SET_SEGV_LOCATION();
 	if (!(*line))
-		return;
+		return NS_FAILURE;
 	dlog (DEBUG1, "------------------------BEGIN PARSE-------------------------");
 	dlog (DEBUGRX, "%s", line);
 	coreLine = strpbrk (line, " ");
@@ -872,6 +873,7 @@ parse (char *line)
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	ns_free (av);
 	dlog (DEBUG1, "-------------------------END PARSE--------------------------");
+	return NS_SUCCESS;
 }
 
 static void 

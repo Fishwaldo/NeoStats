@@ -39,9 +39,9 @@ typedef struct DnsLookup {
 	adns_query q;	/**< the ADNS query */
 	adns_answer *a;	/**< the ADNS result if we have completed */
 	adns_rrtype type; /**< the type we are looking for, only populated if we add to a queue */
-	char data[DNS_DATA_SIZE];	/**< the User data based to the callback */
+	void *data;
 	char lookupdata[255]; /**< the look up data, only populated if we add to a queue */
-	void (*callback) (char *data, adns_answer * a);
+	void (*callback) (void *data, adns_answer * a);
 						      /**< a function pointer to call when we have a result */
 	Module* modptr;
 } DnsLookup;
@@ -80,7 +80,7 @@ void dns_check_queue();
  * 
  * @return returns 1 on success, 0 on failure (to add the lookup, not a successful lookup
 */
-int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data)
+int dns_lookup (char *str, adns_rrtype type, void (*callback) (void *data, adns_answer * a), void *data)
 {
 	DnsLookup *dnsdata;
 	int status;
@@ -96,7 +96,7 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 	}
 	/* set the module name */
 	dnsdata->modptr = GET_CUR_MODULE();
-	strlcpy (dnsdata->data, data, DNS_DATA_SIZE);
+	dnsdata->data = data;
 	dnsdata->callback = callback;
 	dnsdata->type = type;
 	if (list_isfull (dnslist)) {
@@ -122,7 +122,7 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 		DNSStats.failure++;
 		return 0;
 	}
-	dlog(DEBUG1, "DNS: Added dns query %s to list", data);
+	dlog(DEBUG1, "DNS: Added dns query %s to list", str);
 	/* if we get here, then the submit was successful. Add it to the list of queryies */
 	lnode_create_append (dnslist, dnsdata);
 	return 1;
@@ -273,7 +273,7 @@ void do_dns (void)
 			lnode_destroy (dnsnode1);
 			break;
 		}
-		dlog(DEBUG1, "DNS: Calling callback function with data %s for module %s", dnsdata->data, dnsdata->modptr->info->name);
+		dlog(DEBUG1, "DNS: Calling callback function with for module %s", dnsdata->modptr->info->name);
 		DNSStats.success++;
 		/* call the callback function */
 		SET_RUN_LEVEL(dnsdata->modptr);
@@ -309,7 +309,7 @@ void dns_check_queue()
 		dnsnode = list_first(dnsqueue);
 		while ((dnsnode) && (!list_isfull(dnslist))) {
 			dnsdata = lnode_get(dnsnode);	
-			dlog(DEBUG2, "Moving DNS query %s from queue to active", dnsdata->data);
+			dlog(DEBUG2, "Moving DNS query from queue to active");
 			if (dnsdata->type == adns_r_ptr) {
 				sa.sin_family = AF_INET;
 				sa.sin_addr.s_addr = inet_addr (dnsdata->lookupdata);
@@ -332,7 +332,7 @@ void dns_check_queue()
 			dnsnode = list_next(dnsqueue, dnsnode);
 			list_delete(dnsqueue, dnsnode2);
 			list_append(dnslist, dnsnode2);
-			dlog(DEBUG1, "DNS: Added dns query %s to list", dnsdata->data);
+			dlog(DEBUG1, "DNS: Added dns query to list");
 		/* while loop */
 		}
 	/* isempty */

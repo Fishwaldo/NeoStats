@@ -35,12 +35,8 @@ int del_sockets( Module *mod_ptr );
 void Connect( void );
 int check_sql_sock( void );
 
-Sock *add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuffercb writecb, everrorcb errcb);
-Sock *add_linemode_socket(const char *sock_name, int socknum, linemodecb readcb, evbuffercb writecb, everrorcb errcb);
-void error_from_ircd_socket(struct bufferevent *bufferevent, short what, void *arg);
-void read_from_ircd_socket(struct bufferevent *bufferevent, void *arg);
 void send_to_ircd_socket (const char *buf, const int buflen);
-
+Sock *add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuffercb writecb, everrorcb errcb, void *arg);
 
 extern char recbuf[BUFSIZE];
 
