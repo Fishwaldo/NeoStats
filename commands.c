@@ -708,7 +708,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			break;
 		case SET_TYPE_STRING:
 			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
-			SetConf((void *)av[3], CFGINT, set_ptr->confitem);
+			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
 				set_ptr->option, av[3], u->nick);
 			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
