@@ -46,13 +46,11 @@ void Srv_Nick(char *, char **, int argc);
 void Srv_Svsnick(char *, char **, int argc);
 void Srv_Kill(char *, char **, int argc);
 void Srv_Connect(char *, char **, int argc);
-#ifdef ULTIMATE
-void Srv_Vctrl(char *, char **, int argc);
-#endif
-#ifdef ULTIMATE3
 void Srv_Svinfo(char *, char **, int argc);
 void Srv_Burst(char *origin, char **argv, int argc);
 void Srv_Sjoin(char *origin, char **argv, int argc);
+#ifdef ULTIMATE
+void Srv_Vctrl(char *, char **, int argc);
 #endif
 
 
@@ -141,6 +139,42 @@ IntCommands cmd_list[] = {
 	{TOK_KILL,	Srv_Kill,		0},
 	{MSG_PROTOCTL, 	Srv_Connect, 		0},
 	{TOK_PROTOCTL,	Srv_Connect,		0},
+	{NULL,		NULL,			0}
+};
+#endif
+#ifdef HYBRID7
+IntCommands cmd_list[] = {
+	/* Command	Function		srvmsg*/
+	{MSG_STATS,	Usr_Stats, 		1},
+	{MSG_SETHOST, 	Usr_Vhost,		1},
+	{MSG_VERSION,	Usr_Version,		1},
+	{MSG_MOTD,	Usr_ShowMOTD,		1},
+	{MSG_ADMIN,	Usr_ShowADMIN,		1},
+	{MSG_CREDITS,	Usr_Showcredits,	1},
+	{MSG_SERVER,	Usr_AddServer,		1},
+	{MSG_SQUIT,	Usr_DelServer,		1},
+	{MSG_QUIT,	Usr_DelUser,		1},
+	{MSG_MODE,	Usr_Mode,		1},
+	{MSG_SVSMODE,	Usr_Smode,		1},
+	{MSG_KILL,	Usr_Kill,		1},
+	{MSG_PONG,	Usr_Pong,		1},
+	{MSG_AWAY,	Usr_Away,		1},
+	{MSG_NICK,	Usr_Nick,		1},
+	{MSG_TOPIC,	Usr_Topic,		1},
+	{MSG_TOPIC, 	Usr_Topic, 		0},
+	{MSG_KICK,	Usr_Kick,		1},
+	{MSG_JOIN,	Usr_Join,		1},
+	{MSG_PART,	Usr_Part,		1},
+	{MSG_PING,	Srv_Ping,		0},
+	{MSG_SVINFO,	Srv_Svinfo,		0},
+	{MSG_PASS,	Srv_Pass,		0},
+	{MSG_SERVER,	Srv_Server,		0},
+	{MSG_SQUIT,	Srv_Squit,		0},
+	{MSG_NICK,	Srv_Nick,		0},
+	{MSG_SVSNICK,	Srv_Svsnick,		0},
+	{MSG_KILL,	Srv_Kill,		0},
+	{MSG_EOB, 	Srv_Burst, 		1},
+	{MSG_SJOIN,	Srv_Sjoin,		1},
 	{NULL,		NULL,			0}
 };
 #endif
@@ -233,20 +267,30 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 		return -1;
 	}
 	add_mod_user(nick, mod_name);
-#ifdef UNREAL
-	snewnick_cmd(nick, user, host, rname);
-	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
-#elif ULTIMATE
+
+
 #ifdef ULTIMATE3
 	snewnick_cmd(nick, user, host, rname, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
-#else
+#elif HYBRID7
+	snewnick_cmd(nick, user, host, rname, UMODE_ADMIN);
+#else 
 	snewnick_cmd(nick, user, host, rname);
+	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+#endif
+#ifdef UNREAL
+	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
+#elif !ULTIMATE
+#ifndef HYBRID7
 	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif
 #endif
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
+#ifndef HYBRID
 	schmode_cmd(nick, me.chan, "+oa", cmd);
+#else
+	schmode_cmd(nick, me.chan, "+o", cmd);
+#endif
 	AddStringToList(&av, nick, &ac);
 	Module_Event("SIGNON", av, ac);
 	FreeList(av, ac);
@@ -535,6 +579,8 @@ void init_ServBot()
 #ifdef ULTIMATE3
 	sburst_cmd(1);
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
+#elif HYBRID7
+	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname, UMODE_ADMIN);
 #else 
 	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname);
 #endif
@@ -544,11 +590,18 @@ void init_ServBot()
 	sprintf(rname, "%s %s", s_Services, s_Services);
 	schmode_cmd(s_Services, me.chan, "+oa", rname);
 #elif !ULTIMATE
+#ifndef HYBRID7
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif
+#endif
+
 	sjoin_cmd(s_Services, me.chan);
 	sprintf(rname, "%s %s", s_Services, s_Services);
+#ifndef HYBRID7
 	schmode_cmd(s_Services, me.chan, "+oa", rname);
+#else
+	schmode_cmd(s_Services, me.chan, "+o", rname);
+#endif
 	me.onchan = 1;
 	AddStringToList(&av, s_Services, &ac);
 	Module_Event("SIGNON", av, ac);
@@ -556,7 +609,6 @@ void init_ServBot()
 	
 }
 
-#ifdef ULTIMATE3
 void Srv_Sjoin(char *origin, char **argv, int argc) {
 	char nick[MAXNICK];
 	long mode = 0;
@@ -572,8 +624,13 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 	} else {
 		modes = argv[2];
 	}
+
 	if (*modes == '#') {
+#ifdef HYBRID7
+		join_chan(finduser(argv[4]), modes);
+#else
 		join_chan(finduser(origin), modes);
+#endif
 		return;
 	}		
 	if (*modes != '+') {
@@ -609,9 +666,11 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 			if (*modes == '@') {
 				mode |= MODE_CHANOP;
 				modes++;
+#ifndef HYBRID7
 			} else if (*modes == '*') {
 				mode |= MODE_CHANADMIN;
 				modes++;
+#endif
 			} else if (*modes == '%') {
 				mode |= MODE_HALFOP;
 				modes++;
@@ -652,9 +711,11 @@ void Srv_Burst(char *origin, char **argv, int argc) {
 		ircd_srv.burst = 1;
 		init_ServBot();
 	}
+#ifdef HYBRID7
+	seob_cmd(origin);
+#endif
 	
 }
-#endif
 void Srv_Connect(char *origin, char **argv, int argc) {
 	int i;
 
@@ -875,8 +936,13 @@ void Usr_Topic(char *origin, char **argv, int argc) {
 	Chans *c;
 	c = findchan(argv[0]);
 	if (c) {
+#ifndef HYBRID7
 		buf = joinbuf(argv, argc, 3);
 		Change_Topic(argv[1], c, atoi(argv[2]), buf);
+#else
+		buf = joinbuf(argv, argc, 2);
+		Change_Topic(origin, c, time(NULL), buf);
+#endif
 		free(buf);
 	} else {
 		log("Ehhh, Can't find Channel %s", argv[0]);
@@ -926,11 +992,9 @@ void Srv_Vctrl(char *origin, char **argv, int argc) {
 
 }
 #endif
-#ifdef ULTIMATE3
 void Srv_Svinfo(char *origin, char **argv, int argc) {
 	ssvinfo_cmd();
 }
-#endif
 #ifndef ULTIMATE3
 void Srv_Netinfo(char *origin, char **argv, int argc) {
 		        me.onchan = 1;
@@ -988,19 +1052,33 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			char **av;
 			int ac = 0;
 			AddStringToList(&av, argv[0], &ac);
-#ifndef ULTIMATE3
+#ifdef UNREAL 
 			AddUser(argv[0], argv[3], argv[4], argv[5], 0);
 			Module_Event("SIGNON", av, ac);
-#else
-			/* unreal does seem to send IP addresses, Gah, that sucks */
+#elif ULTIMATE
+			AddUser(argv[0], argv[3], argv[4], argv[5], 0);
+			Module_Event("SIGNON", av, ac);
+#elif ULTIMATE3
 			AddUser(argv[0], argv[4], argv[5], argv[6], strtoul(argv[8], NULL, 10));
+			Module_Event("SIGNON", av, ac);
 #ifdef DEBUG
 			log("Mode: UserMode: %s",argv[3]);
 #endif
-			Module_Event("SIGNON", av, ac);
 			UserMode(argv[0], argv[3]);
 			AddStringToList(&av, argv[3], &ac);
 			Module_Event("UMODE", av, ac);
+#elif HYBRID7
+			AddUser(argv[0], argv[4], argv[5], argv[6], strtoul(argv[3], NULL, 10));
+			Module_Event("SIGNON", av, ac);
+#ifdef DEBUG
+			log("Mode: UserMode: %s",argv[3]);
+#endif
+			UserMode(argv[0], argv[3]);
+			AddStringToList(&av, argv[3], &ac);
+			Module_Event("UMODE", av, ac);
+#endif
+#ifdef DEBUG
+			log("Mode: UserMode: %s",argv[3]);
 #endif
 			FreeList(av, ac);
 }

@@ -1,7 +1,9 @@
-#ifndef ULTIMATE_H
-#define ULTIMATE_H
+#ifndef HYBRID7_H
+#define HYBRID7_H
 
 
+#define MSG_EOB		"EOB"		/* end of burst */
+#define TOK_EOB		"EOB"		/* end of burst */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"		/* 33 */
 #define MSG_WHO		"WHO"		/* WHO  -> WHOC */
@@ -289,38 +291,27 @@
 
 
 
-#define	UMODE_INVISIBLE  	0x0001 /* makes user invisible */
-#define	UMODE_OPER       	0x0002	/* Operator */
-#define	UMODE_WALLOP     	0x0004 /* send wallops to them */
-#define UMODE_FAILOP	 	0x0008 /* Shows some global messages */
-#define UMODE_HELPOP	 	0x0010 /* Help system operator */
-#define UMODE_REGNICK	 	0x0020 /* Nick set by services as registered */
-#define UMODE_SERVICESOPER	0x0040 /* Services Oper */
-#define UMODE_ADMIN	 	0x0080 /* Admin */
 
-#define	UMODE_SERVNOTICE 	0x0100 /* server notices such as kill */
-#define	UMODE_LOCOP      	0x0200 /* Local operator -- SRB */
-#define UMODE_KILLS	 	0x0400 /* Show server-kills... */
-#define UMODE_CLIENT	 	0x0800 /* Show client information */
-#define UMODE_FLOOD	 	0x1000 /* Receive flood warnings */
-#define UMODE_CHATOP	 	0x2000 /* can receive chatops */
-#define UMODE_SERVICES   	0x4000 /* services */
-#define UMODE_HIDE	 	0x8000 /* Hide from Nukes */
-#define UMODE_NETADMIN  	0x10000 /* Network Admin */
-#define	UMODE_SUPER		0x20000 /* Oper Is Protected from Kick's and Kill's */
-#define UMODE_RBOT      	0x40000 /* Marks the client as a Registered Bot */
-#define UMODE_SBOT      	0x80000 /* Marks the client as a Server Bot */
-#define UMODE_NGLOBAL  		0x100000 /* See Network Globals */
-#define UMODE_WHOIS    		0x200000 /* Lets Opers see when people do a /WhoIs on them */
-#define UMODE_NETINFO  		0x400000 /* Server link, Delink Notces etc. */
-#define UMODE_MAGICK   		0x800000 /* Allows Opers To See +s and +p Channels */
-#define UMODE_IRCADMIN 		0x1000000 /* Marks the client as an IRC Administrator */
-#define UMODE_SERVICESADMIN	0x2000000 /* Marks the client as a Services Administrator */
-#define UMODE_WATCHER		0x4000000 /* Recive Monitor Globals */
-#define UMODE_NETMON		0x8000000 /* Marks the client as an Network Monitor */
-#define UMODE_SERVADMIN		0x10000000 /* Marks the client as a Server Admin */
-#define UMODE_TECHADMIN		0x20000000 /* Marks the client as a Technical Admin */
-#define UMODE_DEAF		0x40000000 /* client is deaf on channels */
+#define UMODE_OPER	0x0001	/* oper flag */
+#define UMODE_ADMIN	0x0002	/* admin flag */
+#define UMODE_BOTS	0x0004	/* shows bots */
+#define UMODE_CCONN	0x0008	/* shows client connections */
+#define UMODE_DEBUG	0x0010	/* show debug info */
+#define UMODE_FULL	0x0020	/* show full messages */
+#define UMODE_CALLERID	0x0040	/* client has callerid enabled */
+#define UMODE_INVISIBLE 0x0080	/* client has +i flag */
+#define UMODE_SKILL	0x0100	/* client see's server kills */
+#define UMODE_LOCOPS	0x0200	/* client is localop */
+#define UMODE_NCHANGE	0x0400	/* client can see nick change notices */
+#define UMODE_REJ	0x0800  /* client is registered */
+#define UMODE_SERVNOTICE	0x1000	/* client can see server notices */
+#define UMODE_UNAUTH	0x2000	/* client can see unauthd connections */
+#define UMODE_WALLOP	0x4000	/* client can get wallop messages */
+#define UMODE_EXTERNAL	0x8000	/* client can see server joins/splits */
+#define UMODE_SPY	0x10000	/* client can spy on user commands */
+#define UMODE_OPERWALL	0x20000 /* client gets operwalls */
+
+
 
 #define	MODE_CHANOP	0x0001
 #define MODE_HALFOP	0x0002
@@ -335,18 +326,8 @@
 #define MODE_EXCEPT	0x0400
 #define	MODE_BAN	0x0800
 #define	MODE_LIMIT	0x1000
-#define MODE_RGSTR	0x2000
-#define MODE_RGSTRONLY  0x4000
-#define MODE_OPERONLY   0x8000
-#define MODE_ADMONLY   	0x10000
-#define MODE_LINK	0x20000
-#define MODE_NOCOLOR	0x40000
-#define MODE_STRIP	0x80000
-#define MODE_NOKNOCK	0x100000
-#define MODE_NOINVITE  	0x200000
-#define MODE_FLOODLIMIT 0x400000
-#define MODE_CHANADMIN  0x800000
-
+#define MODE_HIDEOPS	0x2000
+#define MODE_INVEX	0x4000
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
@@ -380,7 +361,7 @@ typedef struct {
 
 
 aCtab cFlagTab[33];
-Oper_Modes usr_mds[27];
+Oper_Modes usr_mds[19];
 
 
 
@@ -396,11 +377,7 @@ extern int squit_cmd(const char *, const char *);
 extern int spart_cmd(const char *, const char *);
 extern int sjoin_cmd(const char *, const char *);
 extern int schmode_cmd(const char *, const char *, const char *, const char *);
-#ifndef ULTIMATE3
-extern int snewnick_cmd(const char *, const char *, const char *, const char *);
-#else
 extern int snewnick_cmd(const char *, const char *, const char *, const char *, long mode);
-#endif
 extern int sping_cmd(const char *from, const char *reply, const char *to);
 extern int sumode_cmd(const char *who, const char *target, long mode);
 extern int snumeric_cmd(const int numeric, const char *target, const char *data,...);

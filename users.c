@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.34 2002/07/18 06:45:04 fishwaldo Exp $
+** $Id: users.c,v 1.35 2002/08/10 06:30:44 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -147,15 +147,7 @@ void sendcoders(char *message,...)
 	if (!me.coder_debug) 
 		return;
 #endif
-#ifdef UNREAL
-	if (!me.usesmo) {
-		chanalert(s_Services, tmp);
-	} else {		
-		ssmo_cmd(me.name, "o", tmp);
-	}
-#elif ULTIMATE
-	chanalert(s_Services, "Debuging: %s", tmp);
-#endif
+	chanalert(s_Services, tmp);
 	va_end (ap);	
 }
 

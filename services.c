@@ -350,14 +350,6 @@ void ns_debug_to_coders(char *u)
 		} else {
 			globops(me.name, "\2DEBUG MODE\3 Active");
 		}
-		if (me.usesmo) {
-			sprintf(realname, "/msg %s \2HELP\2", s_Services);
-#ifdef ULTIMATE3
-			snewnick_cmd(s_Debug, Servbot.user, Servbot.host, realname, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
-#else
-			snewnick_cmd(s_Debug, Servbot.user, Servbot.host, realname);
-#endif
-     		}
         } else {
         	me.coder_debug = 0;
         	if (!u) {
@@ -366,10 +358,6 @@ void ns_debug_to_coders(char *u)
         	} else {
         		globops(me.name, "\2DEBUG MODE\2 Deactivated");
         	}
-		if (me.usesmo) {
-			sprintf("Debug Mode Deactivated by %s", u);
-			squit_cmd(s_Debug, realname);
-		}
 	}
 }										  
 static void ns_raw(User *u, char *message)

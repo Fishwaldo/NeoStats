@@ -10,113 +10,60 @@
 */
  
 #include "stats.h"
-#include "Ultimate.h"
+#include "hybrid7.h"
 #include "dl.h"
 void sts(char *fmt,...);
 
 aCtab cFlagTab[] = {
+		{MODE_SECRET,		's', 0, 0},
+		{MODE_PRIVATE,		'p', 0, 0},
+		{MODE_MODERATED,	'm', 0, 0},
+		{MODE_TOPICLIMIT,	't', 0, 0},
+		{MODE_INVITEONLY,	'i', 0, 0},
+		{MODE_NOPRIVMSGS,	'n', 0, 0},
+		{MODE_HIDEOPS,		'a', 0, 0},
+		{MODE_LIMIT,		'l', 0, 1},
+		{MODE_KEY,		'k', 0, 1},
 		{MODE_BAN,		'b', 0, 1},
 		{MODE_EXCEPT,		'e', 0, 1},
-		{MODE_FLOODLIMIT,	'f', 0, 1}, /* Flood limiter */
 		{MODE_HALFOP,		'h', 1, 0},
-		{MODE_CHANADMIN, 	'a', 1, 0},
-		{MODE_INVITEONLY,	'i', 0, 0},
-		{MODE_KEY,		'k', 0, 1},
-		{MODE_LIMIT,		'l', 0, 1},
-		{MODE_MODERATED,	'm', 0, 0},
-		{MODE_NOPRIVMSGS,	'n', 0, 0},
 		{MODE_CHANOP,		'o', 1, 0},
-		{MODE_PRIVATE,		'p', 0, 0},
-		{MODE_RGSTR,		'r', 0, 0},
-		{MODE_SECRET,		's', 0, 0},
-		{MODE_TOPICLIMIT,	't', 0, 0},
 		{MODE_VOICE,		'v', 1, 0},
-		{MODE_NOCOLOR,		'x', 0, 0},
-		{MODE_ADMONLY,		'A', 0, 0},
-		{MODE_NOINVITE,		'I', 0, 0}, /* no invites */	
-		{MODE_NOKNOCK,	 	'K', 0, 0}, /* knock knock (no way!) */
-		{MODE_LINK,		'L', 0, 1},
-		{MODE_OPERONLY,		'O', 0, 0},
-		{MODE_RGSTRONLY,	'R', 0, 0},
-		{MODE_STRIP,		'S', 0, 0}, /* works? */
+		{MODE_INVEX,		'I', 0, 1},	
 		{0x0, 0x0, 0x0, 0x0}
 };
 
 
-#ifdef ULTIMATE3
 Oper_Modes usr_mds[] = {
-				 {UMODE_OPER, 'o', 50},
-                                 {UMODE_LOCOP, 'O', 40},
-                                 {UMODE_INVISIBLE, 'i', 0},
-                                 {UMODE_WALLOP, 'w', 0},
-                                 {UMODE_FAILOP, 'g', 0},
-                                 {UMODE_HELPOP, 'h', 30},
-                                 {UMODE_SERVNOTICE, 's',0},
-                                 {UMODE_KILLS, 'k',0},
-                                 {UMODE_SERVICES, 'S',200},
-                                 {UMODE_SERVICESADMIN, 'P',100},
-				 {UMODE_RBOT, 'B',0},
-		 		 {UMODE_SBOT, 'b', 0},
-	   			 {UMODE_DEAF,    'd',0},
-                                 {UMODE_ADMIN, 'z',70},
-                                 {UMODE_NETADMIN, 't',185},
-				 {UMODE_TECHADMIN, 'T',190},
-                                 {UMODE_CLIENT, 'c',0},
-                                 {UMODE_FLOOD, 'f',0},
-                                 {UMODE_REGNICK, 'r',0},
-                                 {UMODE_HIDE,    'x',0},
-				 {UMODE_WATCHER, 'W',0},
-		 		 {UMODE_SERVICESOPER, 'a', 100},
-	 	 		 {UMODE_SUPER, 'p', 40},
-				 {UMODE_IRCADMIN, 'Z', 100},
-				 {UMODE_DEAF, 'd', 0},
-                                 {0, 0, 0 }
+				{UMODE_OPER, 'o', 50},
+				{UMODE_ADMIN, 'a', 190},
+				{UMODE_BOTS, 'b', 0},
+				{UMODE_CCONN, 'c', 0},
+		    		{UMODE_DEBUG, 'd', 200},
+	      			{UMODE_FULL,  'f', 0},
+  				{UMODE_CALLERID, 'g', 0},
+    				{UMODE_INVISIBLE, 'i', 0},
+      				{UMODE_SKILL, 'k', 0},
+        			{UMODE_LOCOPS, 'l', 40},
+          			{UMODE_NCHANGE, 'n', 0},
+              			{UMODE_REJ, 'r', 0},
+                		{UMODE_SERVNOTICE, 's', 0},
+                  		{UMODE_UNAUTH, 'u', 0},
+                    		{UMODE_WALLOP, 'w', 0},
+                      		{UMODE_EXTERNAL, 'x', 0},
+                        	{UMODE_SPY, 'y', 0},
+                          	{UMODE_OPERWALL, 'z', 0},
+                                {0, 0, 0 }
 };
-#elif ULTIMATE
-Oper_Modes usr_mds[] = {
-                                 {UMODE_OPER, 'o', 50},
-                                 {UMODE_LOCOP, 'O', 40},
-                                 {UMODE_INVISIBLE, 'i', 0},
-                                 {UMODE_WALLOP, 'w', 0},
-                                 {UMODE_FAILOP, 'g', 0},
-                                 {UMODE_HELPOP, 'h', 30},
-                                 {UMODE_SERVNOTICE, 's',0},
-                                 {UMODE_KILLS, 'k',0},
-                                 {UMODE_SERVICES, 'S',200},
-                                 {UMODE_SERVICESADMIN, 'P',100},
-                                 {UMODE_RBOT, 'B',0},
-                                 {UMODE_SBOT, 'b', 0},
-                                 {UMODE_DEAF,    'd',0},
-                                 {UMODE_ADMIN, 'z',70},
-                                 {UMODE_NETADMIN, 'N',185},
-                                 {UMODE_TECHADMIN, 'T',190},
-                                 {UMODE_CLIENT, 'c',0},
-                                 {UMODE_FLOOD, 'f',0},
-                                 {UMODE_REGNICK, 'r',0},
-                                 {UMODE_HIDE,    'x',0},
-                                 {UMODE_WATCHER, 'W',0},
-                                 {UMODE_SERVICESOPER, 'a', 100},
-                                 {UMODE_SUPER, 'p', 40},
-                                 {UMODE_IRCADMIN, 'Z', 100},
-                                 {UMODE_DEAF, 'd', 0},
-                                 {0, 0, 0 }
-};
-#endif
-
-
-
-
-
-
-
-
-
-
-
 
 void init_ircd() {
 	if (usr_mds);
 };
+
+int seob_cmd(const char *server) {
+	sts(":%s %s", server, (me.token ? TOK_EOB : MSG_EOB));
+	return 1;
+}
 
 
 int sserver_cmd(const char *name, const int numeric, const char *infoline) {
@@ -125,12 +72,8 @@ int sserver_cmd(const char *name, const int numeric, const char *infoline) {
 }
 
 int slogin_cmd(const char *name, const int numeric, const char *infoline, const char *pass) {
-#ifndef ULTIMATE3
-	sts("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
-#else
 	sts("%s %s :TS", (me.token ? TOK_PASS : MSG_PASS), pass);
-	sts("CAPAB TS5 BURST SSJ3 NICKIP");
-#endif
+	sts("CAPAB TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS");
 	sts("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 	return 1;
 }
@@ -141,9 +84,6 @@ int ssquit_cmd(const char *server) {
 }
 
 int sprotocol_cmd(const char *option) {
-#ifndef ULTIMATE3
-	sts("%s %s", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL), option);
-#endif	
 	return 1;
 }
 
@@ -160,7 +100,7 @@ int spart_cmd(const char *who, const char *chan) {
 }
 
 int sjoin_cmd(const char *who, const char *chan) {
-	sts(":%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
+	sts(":%s %s 0 %s + :%s", me.name, MSG_SJOIN, chan, who);
 	join_chan(finduser(who), (char *)chan);
 	return 1;
 }
@@ -177,11 +117,6 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 	free(av);
 	return 1;
 }
-#ifndef ULTIMATE3
-int snewnick_cmd(const char *nick, const char *ident, const char *host, const char *realname) {
-	sts("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), ident, host, me.name, realname);
-	AddUser(nick,ident, host, me.name, 0);
-#else 
 int snewnick_cmd(const char *nick, const char *ident, const char *host, const char *realname, long mode) {
 	int i;
 	char newmode[20];
@@ -192,10 +127,9 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host, const ch
 			sprintf(newmode, "%s%c", newmode, usr_mds[i].mode);
 		}
 	}
-	sts("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), newmode, ident, host, me.name, time(NULL), realname);
+	sts("%s %s 1 %lu %s %s %s %s :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), newmode, ident, host, me.name, realname);
 	AddUser(nick,ident, host, me.name, 0);
 	UserMode(nick, newmode);
-#endif
 	return 1;
 }  
 
