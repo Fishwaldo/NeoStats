@@ -700,8 +700,13 @@ parse (char *line)
 	strlcpy (cmd, line, sizeof (cmd)); 
 #ifdef NEW_STYLE_SPLITBUF
 	strlcpy (privmsgbuffer, coreLine, BUFSIZE);
-#endif
+	if(strcmp(cmd,"NOTICE")==0||strcmp(cmd,"B")==0)
+		ac = split_buf (coreLine, &av, 1);
+	else
+		ac = splitbuf (coreLine, &av, 1);
+#else
 	ac = splitbuf (coreLine, &av, 1);
+#endif
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	free (av);
 }
