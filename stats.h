@@ -256,7 +256,9 @@
 #define NS_FLAGS_EXCLUDED	0x00000001 /* this entry matched a exclusion */
 #define NS_FLAGS_ME			0x00000002 /* indicates the server/user is a NeoStats one */
 #define NS_FLAGS_SYNCHED	0x00000004 /* indicates the server is now synched */
+#if 0
 #define NS_FLAGS_NETJOIN	0x00000008 /* indicates the user is on a net join */
+#endif
 
 /* Specific errors beyond SUCCESS/FAILURE so that functions can handle errors 
  * Treat as unsigned with top bit set to give us a clear distinction from 
