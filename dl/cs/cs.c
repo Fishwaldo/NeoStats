@@ -51,8 +51,8 @@ static const char mode_bot[]="Bot";
 
 #ifdef DISABLE_COLOUR_SUPPORT
 static char msg_nickchange[]="\2NICK\2 %s (%s@%s) changed their nick to %s";
-static char msg_signon[]="\2SIGNON\2 %s (%s@%s) has signed on at %s";
-static char msg_signoff[]="\2SIGNOFF\2 %s (%s@%s) has signed off at %s - %s";
+static char msg_signon[]="\2SIGNON\2 %s (%s@%s - %s) has signed on at %s";
+static char msg_signoff[]="\2SIGNOFF\2 %s (%s@%s - %s) has signed off at %s - %s";
 static char msg_localkill[]="\2LOCAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";
 static char msg_globalkill[]="\2GLOBAL KILL\2 %s (%s@%s) was killed by %s - Reason sighted: \2%s\2";
 static char msg_serverkill[]="\2SERVER KILL\2 %s (%s@%s) was killed by the server %s - Reason sighted: \2%s\2";  
@@ -63,8 +63,8 @@ static char msg_bot[]="\2BOT\2 %s is %s a Bot (%c%c)";
 #endif
 #else
 static char msg_nickchange[]="\2\0037Nick Change\2 user: \2%s\2 (%s@%s) Changed their nick to \2%s\2\003"; 
-static char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s) at: \2%s\2\003";
-static char msg_signoff[]="\2\0033Signed Off\2 user: %s (%s@%s) at: %s - %s\003";
+static char msg_signon[]="\2\0034SIGNED ON\2 user: \2%s\2 (%s@%s - %s) at: \2%s\2\003";
+static char msg_signoff[]="\2\0033Signed Off\2 user: %s (%s@%s - %s) at: %s - %s\003";
 static char msg_localkill[]="\2LOCAL KILL\2 user: \2%s\2 (%s@%s) was Killed by: \2%s\2 - Reason sighted: \2%s\2";
 static char msg_globalkill[]="\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) was Killed by \2%s\2 - Reason sighted: \2%s\2\003";
 static char msg_serverkill[]="\2SERVER KILL\2 user: \2%s\2 (%s@%s) was Killed by the Server \2%s\2 - Reason sighted: \2%s\2";
