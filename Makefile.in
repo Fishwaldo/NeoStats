@@ -5,7 +5,7 @@
 include Makefile.inc 
 
 PCRE_OBJS = pcre/pcre.o pcre/get.o pcre/study.o
-
+CURL_LDFLAGS = `curl/mycurl-config --libs`
 OBJS =	dns.o chans.o dotconf.o services.o main.o sock.o conf.o ircd.o timer.o \
 		 users.o ns_help.o dl.o list.o hash.o server.o keeper.o log.o misc.o \
 		 support.o ircstring.o commands.o \
@@ -43,14 +43,14 @@ DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) \
  
 distdir = @PACKAGE@-@VERSION@
 SUBDIRS = doc doc/old data adns logs keeper tools tools/cfgtool \
-		tools/cfgtool/pixmaps pcre
+		tools/cfgtool/pixmaps pcre curl
 DISTMOD = cs extauth hostserv loveserv ms statserv template
 
 .c.o:
 	$(CC) $(NEOINCLUDES) $(CFLAGS) -c $< 
 
 
-all: 	libadns.a libkeeper.a libpcre neostats modules utils
+all: 	libadns.a libkeeper.a libpcre libcurl.a neostats modules utils 
 
 modules:
 	(cd dl; $(MAKE) $@)
@@ -64,6 +64,9 @@ libkeeper.a:
 libpcre:
 	(cd pcre; $(MAKE))
 
+libcurl.a:
+	(cd curl; $(MAKE))
+
 utils:
 	(cd tools; $(MAKE) $@)
 
@@ -74,11 +77,12 @@ clean:
 	(cd keeper; $(MAKE) $@)
 	(cd tools; $(MAKE) $@)
 	(cd pcre; $(MAKE) $@)
+	(cd curl; $(MAKE) $@)
 	/bin/rm -rf *.o neostats *.cache Makefile config.h  Makefile.inc *.log *.a
 
 
 neostats: $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) adns/libadns.a keeper/libkeeper.a $(PCRE_OBJS) -o $@
+	$(CC) $(LDFLAGS) $(OBJS) adns/libadns.a keeper/libkeeper.a $(PCRE_OBJS) $(CURL_LDFLAGS) curl/libcurl.a -o $@
 
 install: neostats modules
 	@rm -rf @prefix@/dl/cs.so

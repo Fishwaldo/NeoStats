@@ -11,7 +11,9 @@ OBJECTS= ${SOURCES:.c=.o}
 DOCS=README.pcre COPYING
 
 all:	 ${OBJECTS}
-
+	 ar cru libcurl.a ${OBJECTS}
+	 ranlib libcurl.a
+	 chmod +x mycurl-config
 .c.o:	
 	 $(CC) -c $(CFLAGS) $<
 

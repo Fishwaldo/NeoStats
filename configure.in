@@ -455,6 +455,7 @@ AC_SUBST(VERSION)
 AC_CONFIG_HEADER(adns/config.h)
 AC_CONFIG_HEADER(pcre/config.h)
 AC_OUTPUT(Makefile.inc Makefile tools/Makefile pcre/Makefile pcre.h:pcre/pcre.in)
+NEO_SUBDIR_CONFIG(curl, [--disable-thread --disable-ipv6 --enable-nonblocking])
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"
 echo "(*----------------------------------------------------------*)"
