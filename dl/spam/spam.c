@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.8 2002/03/11 06:55:05 fishwaldo Exp $
+** $Id: spam.c,v 1.9 2002/03/12 08:19:06 fishwaldo Exp $
 */
 
 
@@ -23,13 +23,14 @@ Module_Info my_info[] = { {
 } };
 
 
-int new_m_version(char *av, char *tmp) {
-	sts(":%s 351 %s :Module Spam Loaded, Version: %s %s %s",me.name,av,my_info[0].module_version,spamversion_date,spamversion_time);
+int new_m_version(char *origin, char **av, int ac) {
+	snumeric_cmd(351,origin, "Module Spam Loaded, Version: %s %s %s",my_info[0].module_version,spamversion_date,spamversion_time);
 	return 0;
 }
 
 Functions my_fn_list[] = {
-	{ "VERSION",	new_m_version,	1 },
+	{ MSG_VERSION,	new_m_version,	1 },
+	{ TOK_VERSION,	new_m_version,	1 },
 	{ NULL,		NULL,		0 }
 };
 
@@ -84,11 +85,11 @@ EventFnList *__module_get_events() {
 
 void _init() {
 	s_Spam = "sumyungguy";
-	sts(":%s GLOBOPS :Spam Module Loaded",me.name);
+	globops(me.name, "Spam Module Loaded");
 }
 
 
 void _fini() {
-	sts(":%s GLOBOPS :Spam Module Unloaded",me.name);
+	globops(me.name, "Spam Module Unloaded");
 
 };
