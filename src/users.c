@@ -132,6 +132,8 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	}
 	strlcpy (u->user->hostname, host, MAXHOST);
 	strlcpy (u->user->vhost, host, MAXHOST);
+	ircsnprintf( u->user->userhostmask, USERHOSTLEN, "%s!%s@%s", nick, user, host );
+	strlcpy( u->user->uservhostmask, u->user->userhostmask, USERHOSTLEN );
 	strlcpy (u->user->username, user, MAXUSER);
 	strlcpy (u->info, realname, MAXREALNAME);
 	u->user->ulevel = -1;
@@ -467,6 +469,7 @@ void SetUserVhost (const char *nick, const char *vhost)
 	dlog (DEBUG1, "Vhost %s", vhost);
 	if (u) {
 		strlcpy (u->user->vhost, vhost, MAXHOST);
+		ircsnprintf( u->user->uservhostmask, USERHOSTLEN, "%s!%s@%s", nick, u->user->username, vhost );
 		/* sethost on Unreal doesn't send +xt, but /umode +x sends +x 
 		* so, we will never be 100% sure about +t 
 		*/
@@ -629,6 +632,8 @@ void AddFakeUser (const char *mask)
 	strlcpy (u->user->vhost, host, MAXHOST);
 	strlcpy (u->user->username, user, MAXUSER);
 	strlcpy (u->info, "fake user", MAXREALNAME);
+	ircsnprintf( u->user->userhostmask, USERHOSTLEN, "%s!%s@%s", nick, user, host );
+	strlcpy( u->user->uservhostmask, u->user->userhostmask, USERHOSTLEN );
 	u->user->tslastmsg = me.now;
 	u->user->chans = list_create (MAXJOINCHANS);
 }
