@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LEX LEXLIB LEX_OUTPUT_ROOT YACC RANLIB ac_ct_RANLIB CPP EGREP sqlsrvbuild buildsqlsrv GTK_CONFIG build_configtool DIRINST MODLDFLAGS LINK_SIZE MATCH_LIMIT NEWLINE PCRE_MAJOR PCRE_MINOR PCRE_DATE PCRE_VERSION PCRE_LIB_VERSION PCRE_POSIXLIB_VERSION POSIX_MALLOC_THRESHOLD UTF8 IRCD_FILES_SRC IRCD_FILES_OBJS MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LEX LEXLIB LEX_OUTPUT_ROOT YACC RANLIB ac_ct_RANLIB CPP EGREP sqlsrvbuild buildsqlsrv GTK_CONFIG build_configtool DIRINST MODLDFLAGS LINK_SIZE MATCH_LIMIT NEWLINE PCRE_MAJOR PCRE_MINOR PCRE_DATE PCRE_VERSION PCRE_LIB_VERSION PCRE_POSIXLIB_VERSION POSIX_MALLOC_THRESHOLD UTF8 IRCD_FILES_SRC IRCD_FILES_OBJS IRCD_FILES_INC MODULES EXTAUTH_SRC EXTAUTH_OBJS PACKAGE VERSION LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -5847,6 +5847,7 @@ cat >>confdefs.h <<\_ACEOF
 #define UNREAL 1
 _ACEOF
 
+	IRCD_FILES_INC="Unreal.h"
 	IRCD_FILES_SRC="Unreal.c"
 	IRCD_FILES_OBJS="Unreal.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -5878,6 +5879,7 @@ cat >>confdefs.h <<\_ACEOF
 #define UNREAL32 1
 _ACEOF
 
+	IRCD_FILES_INC="Unreal.h"
 	IRCD_FILES_SRC="Unreal.c"
 	IRCD_FILES_OBJS="Unreal.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -5905,6 +5907,7 @@ cat >>confdefs.h <<\_ACEOF
 #define ULTIMATE 1
 _ACEOF
 
+	IRCD_FILES_INC="Ultimate.h"
 	IRCD_FILES_SRC="Ultimate.c"
 	IRCD_FILES_OBJS="Ultimate.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -5937,6 +5940,7 @@ cat >>confdefs.h <<\_ACEOF
 #define ULTIMATE3 1
 _ACEOF
 
+	IRCD_FILES_INC="Ultimate.h"
 	IRCD_FILES_SRC="Ultimate.c"
 	IRCD_FILES_OBJS="Ultimate.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -5965,6 +5969,7 @@ cat >>confdefs.h <<\_ACEOF
 #define HYBRID7 1
 _ACEOF
 
+	IRCD_FILES_INC="hybrid7.h"
 	IRCD_FILES_SRC="hybrid7.c"
 	IRCD_FILES_OBJS="hybrid7.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -5993,6 +5998,7 @@ cat >>confdefs.h <<\_ACEOF
 #define NEOIRCD 1
 _ACEOF
 
+	IRCD_FILES_INC="neoircd.h"
 	IRCD_FILES_SRC="neoircd.c"
 	IRCD_FILES_OBJS="neoircd.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -6021,6 +6027,7 @@ cat >>confdefs.h <<\_ACEOF
 #define QUANTUM 1
 _ACEOF
 
+	IRCD_FILES_INC="QuantumIRCd.h"
 	IRCD_FILES_SRC="QuantumIRCd.c"
 	IRCD_FILES_OBJS="QuantumIRCd.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -6048,6 +6055,7 @@ cat >>confdefs.h <<\_ACEOF
 #define MYSTIC 1
 _ACEOF
 
+	IRCD_FILES_INC="mystic.h"
 	IRCD_FILES_SRC="mystic.c"
 	IRCD_FILES_OBJS="mystic.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -6075,6 +6083,7 @@ cat >>confdefs.h <<\_ACEOF
 #define BAHAMUT 1
 _ACEOF
 
+	IRCD_FILES_INC="Bahamut.h"
 	IRCD_FILES_SRC="Bahamut.c"
 	IRCD_FILES_OBJS="Bahamut.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -6102,6 +6111,7 @@ cat >>confdefs.h <<\_ACEOF
 #define IRCU 1
 _ACEOF
 
+	IRCD_FILES_INC="Ircu.h"
 	IRCD_FILES_SRC="Ircu.c"
 	IRCD_FILES_OBJS="Ircu.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -6129,6 +6139,7 @@ cat >>confdefs.h <<\_ACEOF
 #define LIQUID 1
 _ACEOF
 
+	IRCD_FILES_INC="liquidircd.h"
 	IRCD_FILES_SRC="liquidircd.c"
 	IRCD_FILES_OBJS="liquidircd.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -6157,6 +6168,7 @@ cat >>confdefs.h <<\_ACEOF
 #define VIAGRA 1
 _ACEOF
 
+	IRCD_FILES_INC="Viagra.h"
 	IRCD_FILES_SRC="Viagra.c"
 	IRCD_FILES_OBJS="Viagra.o"
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -6453,6 +6465,7 @@ echo "${ECHO_T}$MODULES" >&6
 cat >>confdefs.h <<\_ACEOF
 #define POSIX_MALLOC_THRESHOLD 10
 _ACEOF
+
 
 
 
@@ -7132,6 +7145,7 @@ s,@POSIX_MALLOC_THRESHOLD@,$POSIX_MALLOC_THRESHOLD,;t t
 s,@UTF8@,$UTF8,;t t
 s,@IRCD_FILES_SRC@,$IRCD_FILES_SRC,;t t
 s,@IRCD_FILES_OBJS@,$IRCD_FILES_OBJS,;t t
+s,@IRCD_FILES_INC@,$IRCD_FILES_INC,;t t
 s,@MODULES@,$MODULES,;t t
 s,@EXTAUTH_SRC@,$EXTAUTH_SRC,;t t
 s,@EXTAUTH_OBJS@,$EXTAUTH_OBJS,;t t
