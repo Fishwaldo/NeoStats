@@ -89,7 +89,9 @@ static int hs_levels(User * u, char **av, int ac);
 static int hs_bans(User * u, char **av, int ac);
 static int hs_login(User * u, char **av, int ac);
 static int hs_chpass(User * u, char **av, int ac);
+#if 0
 static int hs_set(User * u, char **av, int ac);
+#endif
 static int hs_add(User * u, char **av, int ac);
 static int hs_list(User * u, char **av, int ac);
 static int hs_view(User * u, char **av, int ac);
