@@ -172,7 +172,7 @@ int s_new_server(char **av, int ac) {
 	daily.servers = stats_network.servers;
 	daily.t_servers = time(NULL);
 	}
-	if (StatServ.onchan) notice(s_StatServ, "\2SERVER\2 %s has joined the Network at %s", s->name, s->uplink);
+	if (StatServ.onchan) chanalert(s_StatServ, "\2SERVER\2 %s has joined the Network at %s", s->name, s->uplink);
 	return 1;
 
 }
@@ -184,7 +184,7 @@ int s_del_server(char **av, int ac) {
 	s = findserver(av[0]);
 	if (!s) return 0;
 	DecreaseServers();
-	if (StatServ.onchan) notice(s_StatServ, "\2SERVER\2 %s has left the Network at %s", s->name, s->uplink);
+	if (StatServ.onchan) chanalert(s_StatServ, "\2SERVER\2 %s has left the Network at %s", s->name, s->uplink);
 	ss = findstats(s->name);
 	if (s->name != me.uplink)
 	ss->numsplits = ss->numsplits +1;

@@ -2,6 +2,11 @@ StatServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish
+
+
+* Version 3.41 * July 29th, 2002 (S)
+ - Fixed a bug where channel alerts would get dropped notice changed to chanalert()
+
 * Version 3.4 * July 17th, 2002(F)
  - Ported to the new Module Event API
  - Fixed a bug with getting incorrect channel count and channel member count when loaded as a module after neo has already been running
