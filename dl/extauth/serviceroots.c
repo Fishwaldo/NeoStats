@@ -156,9 +156,9 @@ int __do_auth(User * u, int curlvl)
 	un = list_first(srconf.ul);
 	while (un) {
 		sru = lnode_get(un);
-		if ((!match(sru->nick, u->nick))
-		    && (!match(sru->ident, u->username))
-		    && (!match(sru->host, u->hostname))) {
+		if ((match(sru->nick, u->nick))
+		    && (match(sru->ident, u->username))
+		    && (match(sru->host, u->hostname))) {
 			return (sru->lvl);
 		}
 		un = list_next(srconf.ul, un);
