@@ -330,7 +330,7 @@ static int cs_user_modes(char **av, int ac)
 	u = finduser(av[0]);
 	if (!u) {
 		nlog(LOG_WARNING, LOG_MOD,
-		     "Changing modes for unknown user: %s", u->nick);
+			"cs_user_modes: mode change for unknown user %s", u->nick);
 		return -1;
 	}
 	if (!strcasecmp(u->server->name, me.name)) {
@@ -521,7 +521,7 @@ static int cs_user_smodes(char **av, int ac)
 	u = finduser(av[0]);
 	if (!u) {
 		nlog(LOG_WARNING, LOG_MOD,
-		     "Changing modes for unknown user: %s", u->nick);
+			"cs_user_smodes: mode change for unknown user %s", u->nick);
 		return -1;
 	}
 

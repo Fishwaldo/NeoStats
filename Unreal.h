@@ -56,14 +56,13 @@
 #define GOTUMODECLOAKING
 
 /* buffer sizes */
-#define MAXHOST			128
-#define MAXPASS			32
-/* MAXNICK on Unreal is 30, but they allow the full 30 chars so add one for NULL */
+#define MAXHOST			(128 + 1)
+#define MAXPASS			(32 + 1)
 #define MAXNICK			(30 + 1)
-#define MAXUSER			10
-#define MAXREALNAME		50
-#define CHANLEN			32
-#define TOPICLEN		307
+#define MAXUSER			(10 + 1)
+#define MAXREALNAME		(50 + 1)
+#define CHANLEN			(32 + 1)
+#define TOPICLEN		(307 + 1)
 
 /* Messages/Tokens */
 #ifdef UNREAL32

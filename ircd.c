@@ -834,7 +834,7 @@ ns_usr_stats (char *origin, char **argv, int argc)
 	SET_SEGV_LOCATION();
 	u = finduser (origin);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Received a Message from an Unknown User! (%s)", origin);
+		nlog (LOG_WARNING, LOG_CORE, "ns_usr_stats: message from unknown user %s", origin);
 		return;
 	}
 	what = argv[0];

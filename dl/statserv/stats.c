@@ -380,7 +380,7 @@ int s_user_modes(char **av, int ac)
 	u = finduser(av[0]);
 	if (!u) {
 		nlog(LOG_WARNING, LOG_MOD,
-		     "Changing modes for unknown user: %s", u->nick);
+			"s_user_modes: mode change for unknown user %s", u->nick);
 		return -1;
 	}
 #if 0

@@ -82,13 +82,13 @@
 #endif /* ULTIMATE3 */
 
 /* buffer sizes */
-#define MAXHOST			128
-#define MAXPASS			32
-#define MAXNICK			32
-#define MAXUSER			15
-#define MAXREALNAME		50
-#define CHANLEN			50
-#define TOPICLEN		512
+#define MAXHOST			(128 + 1)
+#define MAXPASS			(32 + 1)
+#define MAXNICK			(32 + 1)
+#define MAXUSER			(15 + 1)
+#define MAXREALNAME		(50 + 1)
+#define CHANLEN			(50 + 1)
+#define TOPICLEN		(512 + 1)
 
 /* Messages/Tokens */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */

@@ -660,19 +660,20 @@ join_chan (const char* nick, const char *chan)
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Tried to joining an unknown user to %s: %s", chan, recbuf);
+		nlog (LOG_WARNING, LOG_CORE, "join_chan: tried to join unknown user %s to channel %s", nick, chan);
+		nlog (LOG_WARNING, LOG_CORE, "join_chan: recbuf - %s", recbuf);
 		return;
 	}
 	if (!strcasecmp ("0", chan)) {
 		/* join 0 is actually part all chans */
-		nlog (LOG_DEBUG2, LOG_CORE, "join_chan() -> Parting all chans %s", u->nick);
+		nlog (LOG_DEBUG2, LOG_CORE, "join_chan: parting %s from all channels", u->nick);
 		list_process (u->chans, u, UserPart);
 		return;
 	}
 	c = findchan (chan);
 	if (!c) {
 		/* its a new Channel */
-		nlog (LOG_DEBUG2, LOG_CORE, "join_chan() -> New Channel %s", chan);
+		nlog (LOG_DEBUG2, LOG_CORE, "join_chan: new channel %s", chan);
 		c = new_chan (chan);
 		c->chanmembers = list_create (CHAN_MEM_SIZE);
 		c->modeparms = list_create (MAXMODES);
@@ -692,18 +693,18 @@ join_chan (const char* nick, const char *chan)
 	cm->joint = me.now;
 	cm->flags = 0;
 	cn = lnode_create (cm);
-	nlog (LOG_DEBUG2, LOG_CORE, "adding usernode %s to Channel %s", u->nick, chan);
+	nlog (LOG_DEBUG2, LOG_CORE, "join_chan: adding usernode %s to channel %s", u->nick, chan);
 	if (list_find (c->chanmembers, u->nick, comparef)) {
-		nlog (LOG_WARNING, LOG_CORE, "Adding %s to Chan %s when he is already a member?", u->nick, chan);
+		nlog (LOG_WARNING, LOG_CORE, "join_chan: Tried to add %s to channel %s but they are already a member", u->nick, chan);
 		if (me.debug_mode) {
-			chanalert (s_Services, "Adding %s to Chan %s when he is already a member?", u->nick, chan);
+			chanalert (s_Services, "join_chan: Tried to add %s to channel %s but they are already a member", u->nick, chan);
 			ChanDump (c->name);
 			UserDump (u->nick);
 		}
 		return;
 	}
 	if (list_isfull (c->chanmembers)) {
-		nlog (LOG_CRITICAL, LOG_CORE, "ekk, Channel %s Members list is full", c->name);
+		nlog (LOG_CRITICAL, LOG_CORE, "join_chan: channel %s member list is full", c->name);
 		lnode_destroy (cn);
 		free (cm);
 		return;
@@ -713,7 +714,7 @@ join_chan (const char* nick, const char *chan)
 	c->cur_users++;
 	un = lnode_create (c->name);
 	if (list_isfull (u->chans)) {
-		nlog (LOG_CRITICAL, LOG_CORE, "eek, User %s members list is full", u->nick);
+		nlog (LOG_CRITICAL, LOG_CORE, "join_chan: user %s member list is full", u->nick);
 		lnode_destroy (un);
 	} else {
 		list_append (u->chans, un);
@@ -722,9 +723,9 @@ join_chan (const char* nick, const char *chan)
 	AddStringToList (&av, u->nick, &ac);
 	ModuleEvent (EVENT_JOINCHAN, av, ac);
 	free (av);
-	nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
+	nlog (LOG_DEBUG3, LOG_CORE, "join_chan: cur users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
 	if (findbot (u->nick)) {
-		nlog(LOG_DEBUG3, LOG_CORE, "Joining bot %s to Channel %s", u->nick, c->name);
+		nlog(LOG_DEBUG3, LOG_CORE, "join_chan: joining bot %s to channel %s", u->nick, c->name);
 		add_bot_to_chan (u->nick, c->name);
 	}
 }

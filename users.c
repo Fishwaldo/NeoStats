@@ -614,7 +614,7 @@ UserMode (const char *nick, const char *modes)
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Changing Modes for an Unknown User %s!", nick);
+		nlog (LOG_WARNING, LOG_CORE, "UserMode: modes change for unknown user %s", nick);
 		nlog (LOG_DEBUG1, LOG_CORE, "Recbuf: %s", recbuf);
 		return;
 	}
@@ -625,7 +625,7 @@ UserMode (const char *nick, const char *modes)
 	ModuleEvent (EVENT_UMODE, av, ac);
 	free (av);
 	u->Umode = UmodeStringToMask(modes, u->Umode);
-	nlog (LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, (int *)u->Umode);
+	nlog (LOG_DEBUG1, LOG_CORE, "UserMode: Modes for %s are now %p", u->nick, (int *)u->Umode);
 }
 
 #ifdef GOTUSERSMODES
@@ -639,7 +639,7 @@ UserSMode (const char *nick, const char *modes)
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Changing Modes for an Unknown User %s!", nick);
+		nlog (LOG_WARNING, LOG_CORE, "UserSMode: modes change for unknown user %s", nick);
 		nlog (LOG_DEBUG1, LOG_CORE, "Recbuf: %s", recbuf);
 		return;
 	}
@@ -649,6 +649,6 @@ UserSMode (const char *nick, const char *modes)
 	ModuleEvent (EVENT_SMODE, av, ac);
 	free (av);
 	u->Smode = SmodeStringToMask(modes, u->Smode);
-	nlog (LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p", u->nick, (int *)u->Smode);
+	nlog (LOG_DEBUG1, LOG_CORE, "UserSMode: SMODE for %s is are now %p", u->nick, (int *)u->Smode);
 }
 #endif

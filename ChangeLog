@@ -8,6 +8,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Introduce new ssjoin_cmd for sjoin processing (M)
  - Fix midnight detection in core (M)
  - kick_chan tidyups (M)
+ - Trap and silently drop (but log) CTCP commands send to NeoStats (M)
+ - tidy up of various error messages to help with tracking problems (M)
 
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.13
  - Added a new event for Channel Mode changes (F)

@@ -411,6 +411,20 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	}
 #endif
 
+	/* Trap CTCP commands and silently drop them to avoid unknown command errors 
+	 * Why bother? Well we might be able to use some of them in the future
+	 * so this is mainly a test and we may want to pass some of this onto
+	 * SecureServ for a quick trojan check so log attempts to give an indication 
+	 * of usage.
+	 */
+	if (av[1][0] == '\1') {
+		char* buf;
+		buf = joinbuf(av, ac, 1);
+		nlog (LOG_NORMAL, LOG_MOD, "%s requested CTCP %s", u->nick, buf);
+		free(buf);
+		CLEAR_SEGV_INMODULE();
+		return NS_SUCCESS;
+	}
 	/* We have run out of commands so report failure */
 	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[1]);
 	chanalert (bot_ptr->nick, "%s requested %s, but that is an unknown command", u->nick, av[1]);
