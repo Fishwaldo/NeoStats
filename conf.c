@@ -32,9 +32,8 @@ static config_option options[] =
 { "WANT_PRIVMSG", ARG_STR, cb_Server, 9},
 { "SERVICES_CHAN", ARG_STR, cb_Server, 10},
 { "SERVICES_ROOT", ARG_STR, cb_Server, 11},
-{ "MODULE_PATH", ARG_STR, cb_Server, 12},
 { "LOAD_MODULE", ARG_STR, cb_Module, 0},
-{ "ONLY_OPERS", ARG_STR, cb_Server, 13}
+{ "ONLY_OPERS", ARG_STR, cb_Server, 12}
 };
 
 
@@ -136,59 +135,10 @@ void cb_Server(char *arg, int configtype) {
 		} else if (configtype == 11) {
 			memcpy(me.roots,arg, sizeof(me.roots));
 		} else if (configtype == 12) {
-			memcpy(me.modpath, arg, sizeof(me.modpath));
-		} else if (configtype == 13) {
 			me.onlyopers = 1;
 		}
 
 }
-
-/*		old Config stuff, that will have to be moved to Modules
-		} else if (!strcmp(s, "LAG_NOTICE")) {
-			s = strtok(NULL, "\n");
-			me.lag_time = atoi(s);
-		} else if (!strcmp(s, "ICQ_HOST")) {
-			s = strtok(NULL, "\n");
-			strip(s);
-			memcpy(IcqServ.host, s, sizeof(IcqServ.host));
-		} else if (!strcmp(s, "ICQ_PASSWORD")) {
-			s = strtok(NULL, "\n");
-			strip(s);
-			memcpy(IcqServ.passwd, s, sizeof(IcqServ.passwd));
-		} else if (!strcmp(s, "ICQ_USER")) {
-			s = strtok(NULL, "\n");
-			strip(s);
-			memcpy(IcqServ.user, s, sizeof(IcqServ.user));
-		} else if (!strcmp(s, "ICQ_SERVER")) {
-			s = strtok(NULL, "\n");
-			strip(s);
-			memcpy(IcqServ.server, s, sizeof(IcqServ.server));
-		} else if (!strcmp(s, "ICQ_UIN")) {
-			s = strtok(NULL, "\n");
-			strip(s);
-			IcqServ.uin = atoi(s);
-		} else if (!strcmp(s, "ICQ_PORT")) {
-			s = strtok(NULL, "\n");
-			strip(s);
-			IcqServ.port = atoi(s);
-		} else if (!strncmp(s, "ENABLE_SPAM", 11)) {
-			me.enable_spam = 1;
-		} else if (!strncmp(s, "ONLYOPERS", 9)) {
-			me.onlyopers = 1;
-		} else if (!strcmp(s, "STATSERV_NICK")) {
-			s = strtok(NULL, "\n");
-			strip(s);
-			memcpy(s_StatServ, s, MAXNICK);
-		} else if (!strcmp(s, "SERVICES_NAME")) {
-			s = strtok(NULL, "\n");
-			strip(s);
-			memcpy(me.services_name, s, MAXHOST);
-		} else if (!strcmp(s, "SEND_EXTREME_LAG_NOTICES_TO")) {
-			me.send_extreme_lag_notices = 1;
-		} else if (!strcmp(s, "PUBLISH_LAG")) {
-			me.noticelag = 1;
-
-*/
 
 void rehash()
 {

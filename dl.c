@@ -346,7 +346,8 @@ void list_module_bots(User *u) {
 
 
 int load_module(char *path1, User *u) {
-	char buf[512];
+
+	
 #ifndef HAVE_LIBDL
 	const char *dl_error;
 #else 
@@ -356,12 +357,13 @@ int load_module(char *path1, User *u) {
 	int do_msg;
 	char *path = NULL;
 	char p[255];
-
+#ifndef DEBUG
+	char buf[512];
 	int fmode;
 	char *lock= NULL;
 	FILE *lockmod;
 	FILE *lmfile;
-
+#endif
 	Module_Info * (*mod_get_info)() = NULL;
 	Functions * (*mod_get_funcs)() = NULL;
 	EventFnList * (*mod_get_events)() = NULL;
@@ -474,7 +476,7 @@ int load_module(char *path1, User *u) {
 			event_fn_ptr++;
 		}
 	}
-
+#ifndef DEBUG
 	/* Lock .so Module File With 555 Permissions */
 	lockmod = fopen("Neo-Lock.tmp","w");
 	fprintf(lockmod, "%s/%s", me.modpath, path);
@@ -491,7 +493,7 @@ int load_module(char *path1, User *u) {
 	remove("Neo-Lock.tmp");
 	chmod(lock, fmode);
 	/* End .so Module 555 Permission Setting */
-
+#endif
 	if (do_msg) privmsg(u->nick,s_Services,"Module %s Loaded, Description: %s",mod_info_ptr->module_name,mod_info_ptr->module_description);
 	return 0;
 

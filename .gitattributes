@@ -38,6 +38,8 @@ dl/cs/ChangeLog -text
 dl/cs/Makefile -text
 dl/cs/cs.c -text
 dl/cs/cs_help.c -text
+dl/extauth/Makefile -text
+dl/extauth/extauth.c -text
 dl/hostserv/ChangeLog -text
 dl/hostserv/Makefile -text
 dl/hostserv/README -text

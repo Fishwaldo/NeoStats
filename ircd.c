@@ -253,24 +253,27 @@ void Module_Event(char *event, void *data) {
 	while ((mn = hash_scan_next(&ms)) != NULL) {
 		module_ptr = hnode_get(mn);
 		ev_list = module_ptr->other_funcs;
-		while (ev_list->cmd_name != NULL) {
-			/* This goes through each Command */
-			if (!strcasecmp(ev_list->cmd_name, event)) {
-#ifdef DEBUG
-					log("Running Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
-#endif
-					strcpy(segv_location, module_ptr->info->module_name);
-					strcpy(segvinmodule, module_ptr->info->module_name);
-					if (setjmp(sigvbuf) == 0) {
-						ev_list->function(data);			
-					} else {
-						log("setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
-					}
-					strcpy(segvinmodule, "");
-					strcpy(segv_location, "Module_Event_Return");
-					break;
+		log("Running Module %s",module_ptr->info->module_name);
+		if (ev_list) {
+			while (ev_list->cmd_name != NULL) {
+				/* This goes through each Command */
+				if (!strcasecmp(ev_list->cmd_name, event)) {
+#ifdef DEBUG	
+						log("Running Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
+#endif	
+						strcpy(segv_location, module_ptr->info->module_name);
+						strcpy(segvinmodule, module_ptr->info->module_name);
+						if (setjmp(sigvbuf) == 0) {
+							ev_list->function(data);			
+						} else {
+							log("setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
+						}
+						strcpy(segvinmodule, "");
+						strcpy(segv_location, "Module_Event_Return");
+						break;
+				}
+			ev_list++;
 			}
-		ev_list++;
 		}	
 	}
 

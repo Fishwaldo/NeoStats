@@ -47,9 +47,6 @@ RECONNECT_TIME 10
 # Ok, Here are some new options with regards to the Modules
 # Please read carefully here, as you can stuff everything up
 #
-# First, The Path that we try to find the Modules in
-#MODULE_PATH /home/directory/NeoStats/Modules/
-MODULE_PATH /root/cvs/2.0/dl/
 # Now for each Module we want to load at boot time, we specify the following
 # this loads the Spam Module
 LOAD_MODULE spam

@@ -58,6 +58,7 @@ int main()
 	me.usesmo=0;
 	me.r_time=10;
 	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
+	strcpy(me.modpath,"dl");
 	RemoveLock();
 #ifdef RECVLOG
 	remove("logs/recv.log");
