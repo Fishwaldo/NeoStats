@@ -812,7 +812,6 @@ extern int ssvshost_cmd (const char *who, const char *vhost);
 extern int ssvskill_cmd (const char *target, const char *reason, ...);
 extern int sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...);
 extern int srakill_cmd (const char *host, const char *ident);
-extern int SignOn_NewBot (const char *, const char *, const char *, const char *, long);
 extern int sinvite_cmd (const char *from, const char *to, const char *chan);
 
 void Usr_Version (char *, char **, int argc);
@@ -848,7 +847,6 @@ void Srv_Connect (char *, char **, int argc);
 void Srv_Svinfo (char *, char **, int argc);
 void Srv_Burst (char *origin, char **argv, int argc);
 void Srv_Sjoin (char *origin, char **argv, int argc);
-int SignOn_NewBot (const char *, const char *, const char *, const char *, long);
 
 
 #endif /* UNREAL_H Define */

@@ -330,6 +330,5 @@ void Srv_Svinfo (char *, char **, int argc);
 void Srv_Burst (char *origin, char **argv, int argc);
 void Srv_Sjoin (char *origin, char **argv, int argc);
 void Srv_Tburst (char *origin, char **argv, int argc);
-int SignOn_NewBot (const char *, const char *, const char *, const char *, long);
 
 #endif

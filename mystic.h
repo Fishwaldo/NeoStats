@@ -507,7 +507,6 @@ void Srv_Tburst (char *origin, char **argv, int argc);
 void Srv_Vctrl (char *origin, char **argv, int argc);
 void Srv_Client (char *origin, char **argv, int argc);
 void Srv_Smode (char *origin, char **argv, int argc);
-int SignOn_NewBot (const char *, const char *, const char *, const char *, long);
 
 
 #endif

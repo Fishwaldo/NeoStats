@@ -41,4 +41,7 @@ void Showcredits (char *nick);
 void ShowStats (char * what, User *u);
 void dopong (Server *s);
 
+/* Defined in ircd specific files but common to all */
+int SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode);
+
 #endif
