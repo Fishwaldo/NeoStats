@@ -180,100 +180,61 @@ int ss_event_kick(CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
+static void top10membershandler (channelstat *cs, void *v)
+{
+	CmdParams *cmdparams = (CmdParams *) v;
+	irc_prefmsg(ss_bot,cmdparams->source, "Channel %s Members %ld", 
+		cs->name, cs->c->users);
+}
+
+static void top10joinshandler (channelstat *cs, void *v)
+{
+	CmdParams *cmdparams = (CmdParams *) v;
+	irc_prefmsg(ss_bot, cmdparams->source, "Channel %s Joins %ld", 
+		cs->name, cs->users.alltime.runningtotal);
+}
+
+static void top10kickshandler (channelstat *cs, void *v)
+{
+	CmdParams *cmdparams = (CmdParams *) v;
+	irc_prefmsg(ss_bot, cmdparams->source, "Channel %s Kicks %ld", 
+		cs->name, cs->kicks.alltime.runningtotal);
+}
+
+static void top10topicshandler (channelstat *cs, void *v)
+{
+	CmdParams *cmdparams = (CmdParams *) v;
+	irc_prefmsg(ss_bot, cmdparams->source, "Channel %s Topics %ld",
+		cs->name, cs->topics.alltime.runningtotal);
+}
+
 int ss_cmd_channel (CmdParams *cmdparams)
 {
 	channelstat *cs;
-	lnode_t *cn;
-	int i;
 
 	if (cmdparams->ac == 0) {
 		/* they want the top 10 Channels online atm */
-		if (!list_is_sorted(channelstatlist, topcurrentchannel)) {
-			list_sort(channelstatlist, topcurrentchannel);
-		}
 		irc_prefmsg(ss_bot, cmdparams->source, "Top 10 Online Channels:");
 		irc_prefmsg(ss_bot, cmdparams->source, "======================");
-		cn = list_first(channelstatlist);
-		for (i = 0; i < 10 && cn; i++) {
-			cs = lnode_get(cn);
-			/* only show hidden chans to operators */
-			if (is_hidden_chan(cs->c)
-			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
-				i--;
-				cn = list_next(channelstatlist, cn);
-				continue;
-			}
-			irc_prefmsg(ss_bot,cmdparams->source, 
-				"Channel %s -> %ld Members", cs->name,
-				cs->c->users);
-			cn = list_next(channelstatlist, cn);
-		}
+		GetChannelStats (top10membershandler, CHANNEL_SORT_MEMBERS, 10, (UserLevel(cmdparams->source) < NS_ULEVEL_OPER), (void *)cmdparams);
 		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "POP")) {
 		/* they want the top 10 Popular Channels (based on joins) */
-		if (!list_is_sorted(channelstatlist, topjoinrunningtotalchannel)) {
-			list_sort(channelstatlist, topjoinrunningtotalchannel);
-		}
 		irc_prefmsg(ss_bot, cmdparams->source, "Top 10 Channels (Ever):");
 		irc_prefmsg(ss_bot, cmdparams->source, "======================");
-		cn = list_first(channelstatlist);
-		for (i = 0; i < 10 && cn; i++) {
-			cs = lnode_get(cn);
-			/* only show hidden chans to operators */
-			if (is_hidden_chan(cs->c)
-			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
-				i--;
-				cn = list_next(channelstatlist, cn);
-				continue;
-			}
-			irc_prefmsg(ss_bot, cmdparams->source, "Channel %s -> %ld Joins", 
-				cs->name, cs->users.alltime.runningtotal);
-			cn = list_next(channelstatlist, cn);
-		}
+		GetChannelStats (top10joinshandler, CHANNEL_SORT_JOINS, 10, (UserLevel(cmdparams->source) < NS_ULEVEL_OPER), (void *)cmdparams);
 		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "KICKS")) {
 		/* they want the top 10 most unwelcome channels (based on kicks) */
-		if (!list_is_sorted(channelstatlist, topkickrunningtotalchannel)) {
-			list_sort(channelstatlist, topkickrunningtotalchannel);
-		}
 		irc_prefmsg(ss_bot,cmdparams->source, "Top 10 Most un-welcome Channels (Ever):");
 		irc_prefmsg(ss_bot,cmdparams->source, "======================================");
-		cn = list_first(channelstatlist);
-		for (i = 0; i < 10 && cn; i++) {
-			cs = lnode_get(cn);
-			/* only show hidden chans to operators */
-			if (is_hidden_chan(cs->c)
-			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
-				i--;
-				cn = list_next(channelstatlist, cn);
-				continue;
-			}
-			irc_prefmsg(ss_bot, cmdparams->source, "Channel %s -> %ld Kicks", 
-				cs->name, cs->kicks.alltime.runningtotal);
-			cn = list_next(channelstatlist, cn);
-		}
+		GetChannelStats (top10kickshandler, CHANNEL_SORT_KICKS, 10, (UserLevel(cmdparams->source) < NS_ULEVEL_OPER), (void *)cmdparams);
 		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "TOPICS")) {
 		/* they want the top 10 most undecisive channels (based on topics) */
-		if (!list_is_sorted(channelstatlist, toptopicrunningtotalchannel)) {
-			list_sort(channelstatlist, toptopicrunningtotalchannel);
-		}
 		irc_prefmsg(ss_bot, cmdparams->source, "Top 10 Most undecisive Channels (Ever):");
 		irc_prefmsg(ss_bot, cmdparams->source, "======================================");
-		cn = list_first(channelstatlist);
-		for (i = 0; i < 10 && cn; i++) {
-			cs = lnode_get(cn);
-			/* only show hidden chans to operators */
-			if (is_hidden_chan(cs->c)
-			    && (UserLevel(cmdparams->source) < NS_ULEVEL_OPER)) {
-				i--;
-				cn = list_next(channelstatlist, cn);
-				continue;
-			}
-			irc_prefmsg(ss_bot, cmdparams->source, "Channel %s -> %ld Topics", 
-				cs->name, cs->topics.alltime.runningtotal);
-			cn = list_next(channelstatlist, cn);
-		}
+		GetChannelStats (top10topicshandler, CHANNEL_SORT_TOPICS, 10, (UserLevel(cmdparams->source) < NS_ULEVEL_OPER), (void *)cmdparams);
 		irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	} else {
 		cs = findchanstats(cmdparams->av[0]);
@@ -466,4 +427,49 @@ void FiniChannelStats (void)
 	}
 	list_destroy_nodes (channelstatlist);
 	list_destroy (channelstatlist);
+}
+
+void GetChannelStats (ChannelStatHandler handler, channelsort sortstyle, int maxcount, int ignorehidden, void *v)
+{
+	int i = 0;
+	lnode_t *ln;
+	channelstat *cs;
+
+	switch (sortstyle) {
+		case CHANNEL_SORT_MEMBERS:
+			if (!list_is_sorted(channelstatlist, topcurrentchannel)) {
+				list_sort(channelstatlist, topcurrentchannel);
+			}
+			break;
+		case CHANNEL_SORT_JOINS:
+			if (!list_is_sorted(channelstatlist, topjoinrunningtotalchannel)) {
+				list_sort(channelstatlist, topjoinrunningtotalchannel);
+			}
+			break;
+		case CHANNEL_SORT_KICKS:
+			if (!list_is_sorted(channelstatlist, topkickrunningtotalchannel)) {
+				list_sort(channelstatlist, topkickrunningtotalchannel);
+			}
+			break;
+		case CHANNEL_SORT_TOPICS:
+			if (!list_is_sorted(channelstatlist, toptopicrunningtotalchannel)) {
+				list_sort(channelstatlist, toptopicrunningtotalchannel);
+			}
+			break;
+		default:
+			break;
+	}
+
+	ln = list_first (channelstatlist);
+	while (ln) {
+		cs = (channelstat *)lnode_get (ln);
+		if (i >= maxcount)
+			break;
+		if (!ignorehidden || !is_hidden_chan(cs->c))
+		{
+			i++;
+			handler (cs, v);
+		}
+		ln = list_next (channelstatlist, ln);
+	}
 }

@@ -42,6 +42,10 @@ typedef struct serverstat {
 
 extern hash_t *serverstathash;
 
+typedef void (*ServerStatHandler) (serverstat *cs, void *v);
+
+void GetServerStats (ServerStatHandler handler, void *v);
+
 int ss_event_server (CmdParams *cmdparams);
 int ss_event_squit (CmdParams *cmdparams);
 int ss_event_pong (CmdParams *cmdparams);

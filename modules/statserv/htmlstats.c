@@ -47,10 +47,10 @@ static void html_netstats (void);
 static void html_dailystats (void);
 static void html_weeklystats (void);
 static void html_monthlystats (void);
-static void html_chantop10 (void);
-static void html_chantop10eva (void);
-static void html_unwelcomechan (void);
-static void html_chantops (void);
+static void html_channeltop10members (void);
+static void html_channeltop10joins (void);
+static void html_channeltop10kicks (void);
+static void html_channeltop10topics (void);
 static void html_tldmap (void);
 static void html_version (void);
 static void html_title (void);
@@ -68,10 +68,10 @@ static htmlfunc htmlfuncs[]=
 	{"!DAILYSTATS!", html_dailystats},
 	{"!WEEKLYSTATS!", html_weeklystats},
 	{"!MONTHLYSTATS!", html_monthlystats},
-	{"!DAILYTOPCHAN!", html_chantop10},
-	{"!TOP10CHAN!", html_chantop10eva},
-	{"!TOP10KICKS!", html_unwelcomechan},
-	{"!TOP10TOPICS!", html_chantops},
+	{"!DAILYTOPCHAN!", html_channeltop10members},
+	{"!TOP10CHAN!", html_channeltop10joins},
+	{"!TOP10KICKS!", html_channeltop10kicks},
+	{"!TOP10TOPICS!", html_channeltop10topics},
 	{"!TLDMAP!", html_tldmap},
 	{"!VERSION!", html_version},
 	{"!TITLE!", html_title},
@@ -100,66 +100,60 @@ void put_copyright (void)
 	fprintf (opf, "</center></html>\n");
 }
 
+static void serverlisthandler (serverstat *ss, void *v)
+{
+	fprintf (opf, "<tr><td height=\"4\"></td>\n");
+	fprintf (opf, "<td height=\"4\"><a href=#%s> %s (%s)</a></td></tr>\n",
+		ss->name, ss->name, (ss->s) ? "ONLINE" : "OFFLINE");
+}
+
 static void html_srvlist (void)
 {
-	serverstat *ss;
-	hscan_t hs;
-	hnode_t *sn;
-
 	fprintf (opf, "<table border=0><tr><th colspan = 2>Server name</th></tr>");
-	hash_scan_begin(&hs, serverstathash);
-	while ((sn = hash_scan_next(&hs))) {
-		ss = hnode_get(sn);
-		fprintf (opf, "<tr><td height=\"4\"></td>\n");
-		fprintf (opf, "<td height=\"4\"><a href=#%s> %s (%s)</a></td></tr>\n",
-			ss->name, ss->name, (ss->s) ? "ONLINE" : "OFFLINE");
-	}
+	GetServerStats (serverlisthandler, NULL);
 	fprintf (opf, "</table>");
+}
+
+static void serverlistdetailhandler (serverstat *ss, void *v)
+{
+	fprintf (opf, "<tr><th><a name=%s>Server:</th><th colspan = 2><b>%s</b></th></tr>\n",
+		ss->name, ss->name);
+	if (!ss->s) {
+		fprintf (opf, "<tr><td>Last Seen:</td><td colspan = 2>%s</td></tr>\n",
+			sftime(ss->ts_lastseen));
+	} else {
+		fprintf (opf,"<tr><td>Current Users:</td><td>%d (%d%%)</td><td>Max %ld at %s</td></tr>\n",
+			ss->users.current, (int)(((float) ss->users.current / (float) networkstats.users.current) * 100),
+			ss->users.alltime.max, sftime(ss->users.alltime.ts_max));
+		fprintf (opf,
+			"<tr><td>Current Opers:</td><td>%d (%d%%)</td><td>Max %d at %s</td></tr>\n",
+			ss->opers.current, (int)(((float) ss->opers.current / (float) networkstats.opers.current) * 100),
+			ss->opers.alltime.max, sftime(ss->opers.alltime.ts_max));
+	}
+	fprintf (opf, "<tr><td>Total Users Connected:</td><td colspan = 2>%ld</td></tr>",
+		ss->users.alltime.runningtotal);
+	fprintf (opf, "<tr><td>IrcOp Kills</td><td colspan = 2>%d</td></tr>", 
+		ss->operkills.alltime.runningtotal);
+	fprintf (opf, "<tr><td>Server Kills</td><td colspan = 2>%d</td></tr>",
+		ss->serverkills.alltime.runningtotal);
+	fprintf (opf, "<tr><td>Highest Ping</td><td>%d</td><td>at %s</td></tr>",
+		(int)ss->highest_ping, sftime(ss->t_highest_ping));
+	if (ss->s)
+		fprintf (opf, "<tr><td>Current Ping</td><td colspan = 2>%d</td></tr>",
+			ss->s->server->ping);
+	fprintf (opf, "<tr><td>Server Splits</td><td colspan = 2>%d</td></tr>",
+		ss->splits.alltime.runningtotal);
 }
 
 static void html_srvlistdet (void)
 {
-	serverstat *ss;
-	hscan_t hs;
-	hnode_t *sn;
 	fprintf (opf, "<table border=0>");
-	hash_scan_begin(&hs, serverstathash);
-	while ((sn = hash_scan_next(&hs))) {
-		ss = hnode_get(sn);
-		fprintf (opf, "<tr><th><a name=%s>Server:</th><th colspan = 2><b>%s</b></th></tr>\n",
-			ss->name, ss->name);
-		if (!ss->s) {
-			fprintf (opf, "<tr><td>Last Seen:</td><td colspan = 2>%s</td></tr>\n",
-				sftime(ss->ts_lastseen));
-		} else {
-			fprintf (opf,"<tr><td>Current Users:</td><td>%d (%d%%)</td><td>Max %ld at %s</td></tr>\n",
-				ss->users.current, (int)(((float) ss->users.current / (float) networkstats.users.current) * 100),
-				ss->users.alltime.max, sftime(ss->users.alltime.ts_max));
-			fprintf (opf,
-				"<tr><td>Current Opers:</td><td>%d (%d%%)</td><td>Max %d at %s</td></tr>\n",
-				ss->opers.current, (int)(((float) ss->opers.current / (float) networkstats.opers.current) * 100),
-				ss->opers.alltime.max, sftime(ss->opers.alltime.ts_max));
-		}
-		fprintf (opf, "<tr><td>Total Users Connected:</td><td colspan = 2>%ld</td></tr>",
-			ss->users.alltime.runningtotal);
-		fprintf (opf, "<tr><td>IrcOp Kills</td><td colspan = 2>%d</td></tr>", 
-			ss->operkills.alltime.runningtotal);
-		fprintf (opf, "<tr><td>Server Kills</td><td colspan = 2>%d</td></tr>",
-			ss->serverkills.alltime.runningtotal);
-		fprintf (opf, "<tr><td>Highest Ping</td><td>%d</td><td>at %s</td></tr>",
-			(int)ss->highest_ping, sftime(ss->t_highest_ping));
-		if (ss->s)
-			fprintf (opf, "<tr><td>Current Ping</td><td colspan = 2>%d</td></tr>",
-				ss->s->server->ping);
-		fprintf (opf, "<tr><td>Server Splits</td><td colspan = 2>%d</td></tr>",
-			ss->splits.alltime.runningtotal);
-	}
+	GetServerStats (serverlistdetailhandler, NULL);
 	fprintf (opf, "</table>");
 }
 
 static void html_netstats (void)
 {
-
 	fprintf (opf, "<table border = 0>");
 	fprintf (opf, "<tr><th><b></b></th><th><b>Total</b></th><th><b>Current</b></th><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n");
 	fprintf (opf, "<td>Users:</td>\n");
@@ -299,56 +293,58 @@ static void html_monthlystats (void)
 	fprintf (opf, "</tr></table>\n");
 }
 
-static void html_chantop10 (void)
+static void top10membershandler (channelstat *cs, void *v)
 {
-	channelstat *cs;
-	lnode_t *cn;
-	int i;
-	if (!list_is_sorted(channelstatlist, topcurrentchannel)) {
-		list_sort(channelstatlist, topcurrentchannel);
-	}
+	fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+		cs->name, cs->c->users);
+}
+
+static void html_channeltop10members (void)
+{
 	fprintf (opf, "<table border = 0><tr><th>Channel</th><th align=right>Members</th></tr>");
-	cn = list_first(channelstatlist);
-	for (i = 0; i < 10 && cn; i++) {
-		cs = lnode_get(cn);
-		/* only show hidden chans to operators */
-		if (is_hidden_chan(cs->c)) {
-			i--;
-			cn = list_next(channelstatlist, cn);
-			continue;
-		}
-		if (cs->c->users > 0)
-			fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
-				cs->name, cs->c->users);
-		cn = list_next(channelstatlist, cn);
-	}
+	GetChannelStats (top10membershandler, CHANNEL_SORT_MEMBERS, 10, 1, NULL);
 	fprintf (opf, "</table>");
 }
 
-static void html_chantop10eva (void)
+static void top10joinshandler (channelstat *cs, void *v)
 {
-	channelstat *cs;
-	lnode_t *cn;
-	int i;
-	if (!list_is_sorted(channelstatlist, topjoinrunningtotalchannel)) {
-		list_sort(channelstatlist, topjoinrunningtotalchannel);
-	}
+	fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+		cs->name, cs->users.alltime.runningtotal);
+}
+
+static void html_channeltop10joins (void)
+{
 	fprintf (opf, "<table border = 0><tr><th>Channel</th><th align=right>Total Joins</th></tr>");
-	cn = list_first(channelstatlist);
-	for (i = 0; i < 10 && cn; i++) {
-		cs = lnode_get(cn);
-		/* only show hidden chans to operators */
-		if (is_hidden_chan(cs->c)) {
-			i--;
-			cn = list_next(channelstatlist, cn);
-			continue;
-		}
-		fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
-			cs->name, cs->users.alltime.runningtotal);
-		cn = list_next(channelstatlist, cn);
-	}
+	GetChannelStats (top10joinshandler, CHANNEL_SORT_JOINS, 10, 1, NULL);
 	fprintf (opf, "</table>");
 }
+
+static void top10kickshandler (channelstat *cs, void *v)
+{
+	fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+		cs->name, cs->kicks.alltime.runningtotal);
+}
+
+static void html_channeltop10kicks (void)
+{
+	fprintf (opf, "<table border = 0><tr><th>Channel</th><th>Total Kicks</th></tr>");
+	GetChannelStats (top10kickshandler, CHANNEL_SORT_KICKS, 10, 1, NULL);
+	fprintf (opf, "</table>");
+}
+
+static void top10topicshandler (channelstat *cs, void *v)
+{
+	fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+		cs->name, cs->topics.alltime.runningtotal);
+}
+
+static void html_channeltop10topics (void)
+{
+	fprintf (opf, "<table border = 0><tr><th>Channel</th><th>Total Topics</th></tr>");
+	GetChannelStats (top10topicshandler, CHANNEL_SORT_TOPICS, 10, 1, NULL);
+	fprintf (opf, "</table>");
+}
+
 static void html_clientstats (void)
 {
 	ctcpversionstat *cv;
@@ -380,58 +376,6 @@ static void html_tldmap (void)
 	GetTLDStats (HTMLTLDReport, NULL);
 	fprintf (opf, "</table>");
 }
-
-static void html_unwelcomechan (void)
-{
-	channelstat *cs;
-	lnode_t *cn;
-	int i;
-	if (!list_is_sorted(channelstatlist, topkickrunningtotalchannel)) {
-		list_sort(channelstatlist, topkickrunningtotalchannel);
-	}
-	fprintf (opf, "<table border = 0><tr><th>Channel</th><th>Total Kicks</th></tr>");
-	cn = list_first(channelstatlist);
-	for (i = 0; i < 10 && cn; i++) {
-		cs = lnode_get(cn);
-		/* only show hidden chans to operators */
-		if (is_hidden_chan(cs->c)) {
-			i--;
-			cn = list_next(channelstatlist, cn);
-			continue;
-		}
-		fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
-			cs->name, cs->kicks.alltime.runningtotal);
-		cn = list_next(channelstatlist, cn);
-	}
-	fprintf (opf, "</table>");
-
-}
-
-static void html_chantops (void)
-{
-	channelstat *cs;
-	lnode_t *cn;
-	int i;
-	if (!list_is_sorted(channelstatlist, toptopicrunningtotalchannel)) {
-		list_sort(channelstatlist, toptopicrunningtotalchannel);
-	}
-	fprintf (opf, "<table border = 0><tr><th>Channel</th><th>Total Topics</th></tr>");
-	cn = list_first(channelstatlist);
-	for (i = 0; i < 10 && cn; i++) {
-		cs = lnode_get(cn);
-		/* only show hidden chans to operators */
-		if (is_hidden_chan(cs->c)) {
-			i--;
-			cn = list_next(channelstatlist, cn);
-			continue;
-		}
-		fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
-			cs->name, cs->topics.alltime.runningtotal);
-		cn = list_next(channelstatlist, cn);
-	}
-	fprintf (opf, "</table>");
-}
-
 
 void get_map(char *uplink, int level)
 {

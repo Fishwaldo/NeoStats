@@ -24,6 +24,14 @@
 #ifndef _CHANNEL_H_
 #define _CHANNEL_H_
 
+typedef enum channelsort {
+	CHANNEL_SORT_NONE = 0,
+	CHANNEL_SORT_MEMBERS,
+	CHANNEL_SORT_JOINS,
+	CHANNEL_SORT_KICKS,
+	CHANNEL_SORT_TOPICS,
+}channelsort;
+
 typedef struct channelstat {
 	char name[MAXCHANLEN];
 	Channel *c;
@@ -39,6 +47,10 @@ typedef struct channelstat {
 }channelstat;
 
 extern list_t *channelstatlist;
+
+typedef void (*ChannelStatHandler) (channelstat *cs, void *v);
+
+void GetChannelStats (ChannelStatHandler handler, channelsort sortstyle, int maxcount, int ignorehidden, void *v);
 
 int topcurrentchannel(const void *key1, const void *key2);
 int topjoinrunningtotalchannel(const void *key1, const void *key2);

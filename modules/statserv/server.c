@@ -492,3 +492,16 @@ void FiniServerStats (void)
 	}
 	hash_destroy(serverstathash);
 }
+
+void GetServerStats (ServerStatHandler handler, void *v)
+{
+	serverstat *ss;
+	hnode_t *sn;
+	hscan_t hs;
+
+	hash_scan_begin (&hs, serverstathash);
+	while ((sn = hash_scan_next (&hs))) {
+		ss = hnode_get (sn);
+		handler (ss, v);
+	}
+}
