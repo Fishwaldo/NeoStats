@@ -1380,7 +1380,7 @@ MYHOST=$host_os
 case "$host_os" in
 *cygwin)
 	CFLAGS="$CFLAGS -O2 -g"
-	LDFLAGS="-rdynamic";;
+	LDFLAGS="-export-dynamic";;
 *openbsd)
 	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
 	LDFLAGS="-export-dynamic";;

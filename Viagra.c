@@ -26,41 +26,41 @@
 #include "stats.h"
 #include "ircd.h"
 #include "sock.h"
-#include "Bahamut.h"
+#include "viagra.h"
 #include "dl.h"
 #include "log.h"
 #include "server.h"
 #include "chans.h"
 #include "users.h"
 
-static void Usr_Version (char *origin, char **argv, int argc);
-static void Usr_MOTD (char *origin, char **argv, int argc);
-static void Usr_Admin (char *origin, char **argv, int argc);
-static void Usr_Server (char *origin, char **argv, int argc);
-static void Usr_Squit (char *origin, char **argv, int argc);
-static void Usr_Quit (char *origin, char **argv, int argc);
-static void Usr_Mode (char *origin, char **argv, int argc);
-static void Usr_Smode (char *origin, char **argv, int argc);
-static void Usr_Kill (char *origin, char **argv, int argc);
-static void Usr_Pong (char *origin, char **argv, int argc);
-static void Usr_Away (char *origin, char **argv, int argc);
-static void Usr_Nick (char *origin, char **argv, int argc);
-static void Usr_Topic (char *origin, char **argv, int argc);
-static void Usr_Kick (char *origin, char **argv, int argc);
-static void Usr_Join (char *origin, char **argv, int argc);
-static void Usr_Part (char *origin, char **argv, int argc);
-static void Usr_Stats (char *origin, char **argv, int argc);
-static void Srv_Ping (char *origin, char **argv, int argc);
-static void Srv_Pass (char *origin, char **argv, int argc);
-static void Srv_Server (char *origin, char **argv, int argc);
-static void Srv_Squit (char *origin, char **argv, int argc);
-static void Srv_Nick (char *origin, char **argv, int argc);
-static void Srv_Svsnick (char *origin, char **argv, int argc);
-static void Srv_Kill (char *origin, char **argv, int argc);
-static void Srv_Protocol (char *origin, char **argv, int argc);
-static void Srv_Svinfo (char *origin, char **argv, int argc);
-static void Srv_Burst (char *origin, char **argv, int argc);
-static void Srv_Sjoin (char *origin, char **argv, int argc);
+static void Usr_Version (char *origin, char **argv, int argc, int srv);
+static void Usr_MOTD (char *origin, char **argv, int argc, int srv);
+static void Usr_Admin (char *origin, char **argv, int argc, int srv);
+static void Usr_Server (char *origin, char **argv, int argc, int srv);
+static void Usr_Squit (char *origin, char **argv, int argc, int srv);
+static void Usr_Quit (char *origin, char **argv, int argc, int srv);
+static void Usr_Mode (char *origin, char **argv, int argc, int srv);
+static void Usr_Smode (char *origin, char **argv, int argc, int srv);
+static void Usr_Kill (char *origin, char **argv, int argc, int srv);
+static void Usr_Pong (char *origin, char **argv, int argc, int srv);
+static void Usr_Away (char *origin, char **argv, int argc, int srv);
+static void Usr_Nick (char *origin, char **argv, int argc, int srv);
+static void Usr_Topic (char *origin, char **argv, int argc, int srv);
+static void Usr_Kick (char *origin, char **argv, int argc, int srv);
+static void Usr_Join (char *origin, char **argv, int argc, int srv);
+static void Usr_Part (char *origin, char **argv, int argc, int srv);
+static void Usr_Stats (char *origin, char **argv, int argc, int srv);
+static void Srv_Ping (char *origin, char **argv, int argc, int srv);
+static void Srv_Pass (char *origin, char **argv, int argc, int srv);
+static void Srv_Server (char *origin, char **argv, int argc, int srv);
+static void Srv_Squit (char *origin, char **argv, int argc, int srv);
+static void Srv_Nick (char *origin, char **argv, int argc, int srv);
+static void Srv_Svsnick (char *origin, char **argv, int argc, int srv);
+static void Srv_Kill (char *origin, char **argv, int argc, int srv);
+static void Srv_Protocol (char *origin, char **argv, int argc, int srv);
+static void Srv_Svinfo (char *origin, char **argv, int argc, int srv);
+static void Srv_Burst (char *origin, char **argv, int argc, int srv);
+static void Srv_Sjoin (char *origin, char **argv, int argc, int srv);
 
 static struct ircd_srv_ {
 	int uprot;
@@ -405,7 +405,7 @@ send_globops (char *from, char *buf)
 }
 
 static void
-Srv_Sjoin (char *origin, char **argv, int argc)
+Srv_Sjoin (char *origin, char **argv, int argc, int srv)
 {
 	char nick[MAXNICK];
 	long mode = 0;
@@ -491,7 +491,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 }
 
 static void
-Srv_Burst (char *origin, char **argv, int argc)
+Srv_Burst (char *origin, char **argv, int argc, int srv)
 {
 	if (argc > 0) {
 		if (ircd_srv.burst == 1) {
@@ -506,60 +506,60 @@ Srv_Burst (char *origin, char **argv, int argc)
 }
 
 static void
-Srv_Protocol (char *origin, char **argv, int argc)
+Srv_Protocol (char *origin, char **argv, int argc, int srv)
 {
 }
 
 static void
-Usr_Stats (char *origin, char **argv, int argc)
+Usr_Stats (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_stats (origin, argv, argc);
 }
 
 static void
-Usr_Version (char *origin, char **argv, int argc)
+Usr_Version (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_version (origin, argv, argc);
 }
 
 static void
-Usr_MOTD (char *origin, char **argv, int argc)
+Usr_MOTD (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_motd (origin, argv, argc);
 }
 
 static void
-Usr_Admin (char *origin, char **argv, int argc)
+Usr_Admin (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_admin (origin, argv, argc);
 }
 
 /*static void
-Usr_Credits (char *origin, char **argv, int argc)
+Usr_Credits (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_credits (origin, argv, argc);
 }*/
 
 static void
-Usr_Server (char *origin, char **argv, int argc)
+Usr_Server (char *origin, char **argv, int argc, int srv)
 {
 	AddServer (argv[0], origin, atoi (argv[1]));
 }
 
 static void
-Usr_Squit (char *origin, char **argv, int argc)
+Usr_Squit (char *origin, char **argv, int argc, int srv)
 {
 	DelServer (argv[0]);
 }
 
 static void
-Usr_Quit (char *origin, char **argv, int argc)
+Usr_Quit (char *origin, char **argv, int argc, int srv)
 {
 	UserQuit (origin, NULL);
 }
 
 static void
-Usr_Smode (char *origin, char **argv, int argc)
+Usr_Smode (char *origin, char **argv, int argc, int srv)
 {
 	if (!strchr (argv[0], '#')) {
 		/* its user svsmode change */
@@ -570,7 +570,7 @@ Usr_Smode (char *origin, char **argv, int argc)
 	}
 }
 static void
-Usr_Mode (char *origin, char **argv, int argc)
+Usr_Mode (char *origin, char **argv, int argc, int srv)
 {
 	if (!strchr (argv[0], '#')) {
 		nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[0]);
@@ -580,7 +580,7 @@ Usr_Mode (char *origin, char **argv, int argc)
 	}
 }
 static void
-Usr_Kill (char *origin, char **argv, int argc)
+Usr_Kill (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 1);
@@ -588,12 +588,12 @@ Usr_Kill (char *origin, char **argv, int argc)
 	free(tmpbuf);
 }
 static void
-Usr_Pong (char *origin, char **argv, int argc)
+Usr_Pong (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_pong (origin, argv, argc);
 }
 static void
-Usr_Away (char *origin, char **argv, int argc)
+Usr_Away (char *origin, char **argv, int argc, int srv)
 {
 	char *Buf;
 	User *u = finduser (origin);
@@ -612,13 +612,13 @@ Usr_Away (char *origin, char **argv, int argc)
 	}
 }
 static void
-Usr_Nick (char *origin, char **argv, int argc)
+Usr_Nick (char *origin, char **argv, int argc, int srv)
 {
 	UserNick (origin, argv[0]);
 }
 
 static void
-Usr_Topic (char *origin, char **argv, int argc)
+Usr_Topic (char *origin, char **argv, int argc, int srv)
 {
 	char *buf;
 
@@ -628,7 +628,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 }
 
 static void
-Usr_Kick (char *origin, char **argv, int argc)
+Usr_Kick (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 2);
@@ -636,7 +636,7 @@ Usr_Kick (char *origin, char **argv, int argc)
 	free(tmpbuf);
 }
 static void
-Usr_Join (char *origin, char **argv, int argc)
+Usr_Join (char *origin, char **argv, int argc, int srv)
 {
 	char *s, *t;
 	t = argv[0];
@@ -648,7 +648,7 @@ Usr_Join (char *origin, char **argv, int argc)
 	}
 }
 static void
-Usr_Part (char *origin, char **argv, int argc)
+Usr_Part (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 1);
@@ -657,7 +657,7 @@ Usr_Part (char *origin, char **argv, int argc)
 }
 
 static void
-Srv_Ping (char *origin, char **argv, int argc)
+Srv_Ping (char *origin, char **argv, int argc, int srv)
 {
 	spong_cmd (argv[0]);
 	if (ircd_srv.burst) {
@@ -666,18 +666,18 @@ Srv_Ping (char *origin, char **argv, int argc)
 }
 
 static void
-Srv_Svinfo (char *origin, char **argv, int argc)
+Srv_Svinfo (char *origin, char **argv, int argc, int srv)
 {
 	ssvinfo_cmd ();
 }
 
 
 static void
-Srv_Pass (char *origin, char **argv, int argc)
+Srv_Pass (char *origin, char **argv, int argc, int srv)
 {
 }
 static void
-Srv_Server (char *origin, char **argv, int argc)
+Srv_Server (char *origin, char **argv, int argc, int srv)
 {
 	if (*origin == 0) {
 		me.s = AddServer (argv[0], me.name, atoi (argv[1]));
@@ -687,13 +687,13 @@ Srv_Server (char *origin, char **argv, int argc)
 }
 
 static void
-Srv_Squit (char *origin, char **argv, int argc)
+Srv_Squit (char *origin, char **argv, int argc, int srv)
 {
 	SquitServer(argv[0]);
 }
 
 static void
-Srv_Nick (char *origin, char **argv, int argc)
+Srv_Nick (char *origin, char **argv, int argc, int srv)
 {
 	char *realname;
 
@@ -705,7 +705,7 @@ Srv_Nick (char *origin, char **argv, int argc)
 }
 
 static void
-Srv_Svsnick (char *origin, char **argv, int argc)
+Srv_Svsnick (char *origin, char **argv, int argc, int srv)
 {
 	if(UserNick (argv[0], argv[1]) == NS_FAILURE) {
 		nlog (LOG_WARNING, LOG_CORE, "Warning, SVSNICK for %s failed", argv[0]);
@@ -713,19 +713,8 @@ Srv_Svsnick (char *origin, char **argv, int argc)
 }
 
 static void
-Srv_Kill (char *origin, char **argv, int argc)
+Srv_Kill (char *origin, char **argv, int argc, int srv)
 {
 	nlog (LOG_WARNING, LOG_CORE, "Got Srv_Kill, but its un-handled (%s)", recbuf);
 }
 
-int
-SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode)
-{
-	snewnick_cmd (nick, user, host, rname, Umode);
-
-	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-		sjoin_cmd (nick, me.chan, CMODE_CHANOP);
-		
-	}
-	return 1;
-}

@@ -22,8 +22,8 @@
 ** NeoStats CVS Identification
 ** $Id$
 */
-#ifndef BAHAMUT_H
-#define BAHAMUT_H
+#ifndef VIAGRA_H
+#define VIAGRA_H
 
 /* Feature support for use by modules to determine whether
  * certain functionality is available
@@ -233,8 +233,8 @@
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))
-#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
-#define is_priv_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_pub_chan(x)  ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
 
 /* Umode macros */
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
