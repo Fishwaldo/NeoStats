@@ -1035,12 +1035,10 @@ do_protocol (char *origin, char **argv, int argc)
 			ircd_srv.noquit = 1;
 		}
 #endif
-#if 0
 #ifdef UNREAL32
 		if (!ircstrcasecmp ("NICKIP", argv[i])) {
 			ircd_srv.nickip = 1;
 		}
-#endif
 #endif
 	}
 }

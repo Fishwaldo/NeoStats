@@ -85,7 +85,7 @@ clean:
 	(cd pcre; $(MAKE) $@)
 	(cd curl; $(MAKE) $@)
 	(cd sqlsrv; $(MAKE) $@)
-	$(RM) *.o neostats *.cache Makefile config.h Makefile.inc dl/Makefile.inc *.log *.a *.d *.exe version.h
+	$(RM) *.o neostats Makefile config.h Makefile.inc dl/Makefile.inc *.log *.a *.d *.exe version.h
 
 distclean:
 	(cd dl; $(MAKE) $@)

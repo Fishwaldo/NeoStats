@@ -18,6 +18,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Option to Disable Channel Statistics in Statserv due to Performance problems. Read statserv.h for more Info  - Bug 162 (F)
  - Backport 3.0 fix for broken pipe loop (M)
  - Fix Unreal 3.2.1 md5 cloak keys (F)
+ - Unreal 3.2.1 NICKIP support. This should have significant speedups for some modules on newer versions of Unreal (F)
 
 * NeoStats * Mark (M) * Version 2.5.16
  - Fix problem with Unreal SVSMODE services TS processing (M)

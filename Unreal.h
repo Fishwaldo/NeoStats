@@ -63,9 +63,12 @@
 #define GOTSVSKILL
 /* we have automatic host cloaking support via Umode */
 #define GOTUMODECLOAKING
+#ifdef UNREAL32
 /* we dont have a nickip field in the nick message */
+#define GOTNICKIP
+#else
 #undef GOTNICKIP
-
+#endif
 
 
 
