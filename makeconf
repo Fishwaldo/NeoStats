@@ -5,6 +5,7 @@ TIME=`date +"%H:%M:%S %Z"`
 DATE=`date +"%a, %b %e %Y"`
 STATSCONF="neostats.cfg"
 SERVNAME="stats.somenet.net"
+SERVNUMERIC="1"
 COMMENT="NeoStats 2.5 IRC Statistical Server!"
 LINKPORT="6667"
 LINKSERVER="127.0.0.1"
@@ -302,6 +303,16 @@ CONNECT_PASS $LINKPASS
 #        SERVER_INFOLINE Network Auxiliary Services    
 
 SERVER_INFOLINE "$COMMENT"
+
+# SERVER_NUMERIC <numeric> [RECOMMENDED]
+#    Specify the numeric of the server to send on connect.
+#    This must be a value between 1 and 254, and must not be in use by
+#    any other IRC server on the network.  
+#    Currently only Unreal IRCd uses this option.
+#    
+#        SERVER_NUMERIC 1
+
+SERVER_NUMERIC "$SERVNUMERIC"
 
 # STATSERV_NETNAME <network name> [REQUIRED]
 #    Your network name, if unknown refer to your network file. Does not 

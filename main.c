@@ -131,6 +131,7 @@ main (int argc, char *argv[])
 	me.coder_debug = 0;
 	me.noticelag = 0;
 	me.r_time = 10;
+	me.numeric = 1;
 	me.lastmsg = time (NULL);
 	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
 	me.synced = 0;
@@ -529,7 +530,7 @@ static void
 login (void)
 {
 	SET_SEGV_LOCATION();
-	slogin_cmd (me.name, 1, me.infoline, me.pass);
+	slogin_cmd (me.name, me.numeric, me.infoline, me.pass);
 	sprotocol_cmd ("TOKEN CLIENT");
 }
 

@@ -393,6 +393,14 @@ SERVER_INFOLINE <info line> [REQUIRED]
     
         SERVER_INFOLINE Network Auxiliary Services    
     
+SERVER_NUMERIC <numeric> [RECOMMENDED]
+    Specify the numeric of the server to send on connect.
+    This must be a value between 1 and 254, and must not be in use by
+    any other IRC server on the network.  
+    Currently only Unreal IRCd uses this option.
+    
+        SERVER_NUMERIC 1
+
 STATSERV_NETNAME <network name> [REQUIRED]
     Your network name, if unknown refer to your network file. Does not 
     apply to all IRCDs e.g. 

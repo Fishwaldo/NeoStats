@@ -58,7 +58,8 @@ static config_option options[] = {
 	{"ONLY_OPERS", ARG_STR, cb_Server, 11},
 	{"NO_LOAD", ARG_STR, cb_Server, 12},
 	{"BINDTO", ARG_STR, cb_Server, 13},
-	{"LOGFILENAMEFORMAT", ARG_STR, cb_Server, 14}
+	{"LOGFILENAMEFORMAT", ARG_STR, cb_Server, 14},
+	{"SERVER_NUMERIC", ARG_STR, cb_Server, 15},
 };
 
 
@@ -240,6 +241,13 @@ cb_Server (char *arg, int configtype)
 		memcpy (me.local, arg, sizeof (me.local));
 	} else if (configtype == 14) {
 		strncpy(LogFileNameFormat,arg,MAX_LOGFILENAME);
+	} else if (configtype == 15) {
+		me.numeric = atoi (arg);
+		/* limit value - really need to print error and quit */
+		if(me.numeric<=0)
+			me.numeric=1;
+		if(me.numeric>254)
+			me.numeric=254;
 	}
 
 }

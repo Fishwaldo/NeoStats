@@ -182,6 +182,7 @@ struct me {
 	int port;
 	int r_time;
 	int lag_time;
+	int numeric; /* For Unreal and any other server that needs a numeric */
 	char uplink[MAXHOST];
 	char pass[MAXPASS];
 	char services_name[MAXHOST];
