@@ -572,9 +572,9 @@ dumpuser (User* u)
 	}
 	chanalert (ns_botptr->nick, "IP:       %s", inet_ntoa(u->ipaddr));
 	chanalert (ns_botptr->nick, "Vhost:    %s", u->vhost);
-	chanalert (ns_botptr->nick, "Flags:    0x%lx", u->flags);
-	chanalert (ns_botptr->nick, "Modes:    %s (0x%lx)", UmodeMaskToString(u->Umode), u->Umode);
-	chanalert (ns_botptr->nick, "Smodes:   %s (0x%lx)", SmodeMaskToString(u->Smode), u->Smode);
+	chanalert (ns_botptr->nick, "Flags:    0x%x", u->flags);
+	chanalert (ns_botptr->nick, "Modes:    %s (0x%x)", UmodeMaskToString(u->Umode), u->Umode);
+	chanalert (ns_botptr->nick, "Smodes:   %s (0x%x)", SmodeMaskToString(u->Smode), u->Smode);
 	if(u->is_away) {
 		chanalert (ns_botptr->nick, "Away:     %s", u->awaymsg);
 	}

@@ -750,7 +750,7 @@ dumpchan (Channel* c)
 	chanalert (ns_botptr->nick, "Mode:       %s creationtime %ld", mode, (long)c->creationtime);
 	chanalert (ns_botptr->nick, "TopicOwner: %s TopicTime: %ld Topic: %s", c->topicowner, (long)c->topictime, c->topic);
 	chanalert (ns_botptr->nick, "PubChan?:   %d", is_pub_chan (c));
-	chanalert (ns_botptr->nick, "Flags:      %lx", c->flags);
+	chanalert (ns_botptr->nick, "Flags:      %x", c->flags);
 	cmn = list_first (c->modeparms);
 	while (cmn) {
 		m = lnode_get (cmn);
