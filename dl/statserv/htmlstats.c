@@ -15,7 +15,7 @@
 
 
 char *tmpbuf;
-#define STARTBUFSIZE 20
+#define STARTBUFSIZE 161920
 int bufsize;
 
 char *get_map();
@@ -59,10 +59,11 @@ void ss_html() {
 		notice(s_StatServ, "Can't open StatServ HTML output file - Check Permissions");
 		return;
 	}
-	buf = malloc(512*2);
-	while (fgets(buf, 512, tpl)) {
-		bufsize = STARTBUFSIZE;
+	buf = malloc(STARTBUFSIZE*2);
+	while (fgets(buf, STARTBUFSIZE, tpl)) {
+		bufsize = STARTBUFSIZE *2;
 		tmpbuf = malloc(bufsize); 
+		memset(tmpbuf, 0, bufsize);
 		if (strstr(buf, "!MAP!")) {
 			tmpbuf = get_map("", 0);
 			sprintf(tmpbuf, "%s </table>\n", tmpbuf);
@@ -138,7 +139,7 @@ void ss_html() {
 
 		
 		fputs(buf, opf);
-		free(tmpbuf);
+		realloc(tmpbuf, 0);
 	}
 	if (!gothtml) {
 		tmpbuf = malloc(bufsize);
@@ -153,20 +154,24 @@ void ss_html() {
 
 char *neosprintf(char *buf, char *format, ...) {
 	va_list ap;
-	char tmpbuf[512];
+	char tmpbuf[10240];
 	int sizeoftmpbuf;
 	va_start(ap, format);
-	sizeoftmpbuf = vsnprintf(tmpbuf, 512, format, ap);
+	sizeoftmpbuf = vsnprintf(tmpbuf, 10240, format, ap);
 	va_end(ap);
 	if (sizeoftmpbuf == -1) {
 		log("Eeek, Problem with neosprintf in htmlstats. Report to www.neostats.net");
 		return NULL;
 	}
 	if ((sizeoftmpbuf + strlen(buf)) >= bufsize) {
-		buf = realloc(buf, (sizeoftmpbuf + strlen(buf) +1));
-		bufsize = sizeoftmpbuf + strlen(buf) +1;
-	}	
-	sprintf(buf, "%s\n%s", buf, tmpbuf);
+		buf = realloc(buf, (sizeoftmpbuf + strlen(buf)));
+		if (buf == NULL) {
+			log("Eeek, Problem with realloc, report to www.neostats.net");
+			return NULL;
+		}
+		bufsize = sizeoftmpbuf + strlen(buf);
+	}
+	sprintf(buf, "%s", tmpbuf);	
 	return buf;
 }
 
@@ -438,9 +443,9 @@ char *get_map(char *uplink, int level) {
 			get_map(s->name, level+1);
 		} else if ((level > 0) && !strcasecmp(uplink, s->uplink)) {
 			/* its not the root server */
-			neosprintf(buf, " ");
+			sprintf(buf, " ");
 			for (i = 1; i < level; i++) {
-				neosprintf(buf, "%s&nbsp&nbsp&nbsp&nbsp&nbsp|", buf);
+				sprintf(buf, "%s&nbsp&nbsp&nbsp&nbsp&nbsp|", buf);
 			}	
 			neosprintf(tmpbuf,  "%s<tr><td>%s\\_%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n",tmpbuf, buf, ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
 			get_map(s->name, level+1);
