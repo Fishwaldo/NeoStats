@@ -121,7 +121,7 @@ new_timer (char *name)
 
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, "new_timer: %s", name);
-	timer = malloc (sizeof (Timer));
+	timer = smalloc (sizeof (Timer));
 	strlcpy (timer->name, name, MAX_MOD_NAME);
 	tn = hnode_create (timer);
 	if (hash_isfull (th)) {
@@ -207,7 +207,7 @@ del_timer (char *name)
 		nlog (LOG_DEBUG2, "del_timer: Unregistered Timer function %s from Module %s", name, timer->moduleptr->info->name);
 		hash_delete (th, tn);
 		hnode_destroy (tn);
-		free (timer);
+		sfree (timer);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -321,7 +321,7 @@ run_mod_timers (void)
 					nlog(LOG_DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name);
 					hash_scan_delete(th, tn);
 					hnode_destroy(tn);
-					free(timer);
+					sfree(timer);
 				} else {
 					timer->lastrun = (int) me.now;
 				}

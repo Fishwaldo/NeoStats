@@ -51,7 +51,6 @@
 #define HASH_IMPLEMENTATION
 #include "hash.h"
 #include "neostats.h"
-#include "ircstring.h"
 
 #ifdef KAZLIB_RCSID
 static const char rcsid[] = "$Id$";
@@ -192,7 +191,7 @@ grow_table (hash_t * hash)
 
 	nassert (2 * hash->nchains > hash->nchains);	/* 1 */
 
-	newtable = realloc (hash->table, sizeof *newtable * hash->nchains * 2);	/* 4 */
+	newtable = srealloc (hash->table, sizeof *newtable * hash->nchains * 2);	/* 4 */
 
 	if (newtable) {		/* 5 */
 		hash_val_t mask = (hash->mask << 1) | 1;	/* 3 */
@@ -279,7 +278,7 @@ shrink_table (hash_t * hash)
 		else
 			nassert (hash->table[chain] == NULL);	/* 6 */
 	}
-	newtable = realloc (hash->table, sizeof *newtable * nchains);	/* 7 */
+	newtable = srealloc (hash->table, sizeof *newtable * nchains);	/* 7 */
 	if (newtable)		/* 8 */
 		hash->table = newtable;
 	hash->mask >>= 1;	/* 9 */
@@ -327,10 +326,10 @@ hash_create (hashcount_t maxcount, hash_comp_t compfun, hash_fun_t hashfun)
 	if (hash_val_t_bit == 0)	/* 1 */
 		compute_bits ();
 
-	hash = malloc (sizeof *hash);	/* 2 */
+	hash = smalloc (sizeof (*hash));	/* 2 */
 
 	if (hash) {		/* 3 */
-		hash->table = malloc (sizeof *hash->table * INIT_SIZE);	/* 4 */
+		hash->table = smalloc (sizeof *hash->table * INIT_SIZE);	/* 4 */
 		if (hash->table) {	/* 5 */
 			hash->nchains = INIT_SIZE;	/* 6 */
 			hash->highmark = INIT_SIZE * 2;
@@ -348,7 +347,7 @@ hash_create (hashcount_t maxcount, hash_comp_t compfun, hash_fun_t hashfun)
 			nassert (hash_verify (hash));
 			return hash;
 		}
-		free (hash);
+		sfree (hash);
 	}
 
 	return NULL;
@@ -412,8 +411,8 @@ hash_destroy (hash_t * hash)
 {
 	nassert (hash_val_t_bit != 0);
 	nassert (hash_isempty (hash));
-	free (hash->table);
-	free (hash);
+	sfree (hash->table);
+	sfree (hash);
 }
 
 /*
@@ -785,13 +784,13 @@ hash_isempty (hash_t * hash)
 static hnode_t *
 hnode_alloc (void *context)
 {
-	return malloc (sizeof *hnode_alloc (NULL));
+	return smalloc (sizeof *hnode_alloc (NULL));
 }
 
 static void
 hnode_free (hnode_t * node, void *context)
 {
-	free (node);
+	sfree (node);
 }
 
 
@@ -802,7 +801,7 @@ hnode_free (hnode_t * node, void *context)
 hnode_t *
 hnode_create (void *data)
 {
-	hnode_t *node = malloc (sizeof *node);
+	hnode_t *node = smalloc (sizeof *node);
 	if (node) {
 		node->data = data;
 		node->next = NULL;
@@ -829,7 +828,7 @@ hnode_init (hnode_t * hnode, void *data)
 void
 hnode_destroy (hnode_t * hnode)
 {
-	free (hnode);
+	sfree (hnode);
 }
 
 #undef hnode_put

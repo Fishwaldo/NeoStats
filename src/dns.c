@@ -90,7 +90,7 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 
 	SET_SEGV_LOCATION();
 
-	dnsdata = malloc (sizeof (DnsLookup));
+	dnsdata = smalloc (sizeof (DnsLookup));
 	DNSStats.totalq++;
 	if (!dnsdata) {
 		nlog (LOG_CRITICAL, "DNS: Out of Memory");
@@ -125,7 +125,7 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_
 	}
 	if (status) {
 		nlog (LOG_WARNING, "DNS: adns_submit error: %s", strerror (status));
-		free (dnsdata);
+		sfree (dnsdata);
 		DNSStats.failure++;
 		return 0;
 	}
@@ -184,14 +184,14 @@ void FiniDns (void)
 	while (dnsnode) {
 		dnsdata = lnode_get(dnsnode);
 		adns_cancel(dnsdata->q);
-		free (dnsdata->a);
-		free (dnsdata);
+		sfree (dnsdata->a);
+		sfree (dnsdata);
 	}
 	list_destroy_nodes(dnslist);
 	dnsnode = list_first(dnsqueue);
 	while (dnsnode) {
 		dnsdata = lnode_get(dnsnode);
-		free(dnsdata);
+		sfree(dnsdata);
 	}
 	list_destroy_nodes(dnsqueue);
 	free(ads);
@@ -212,8 +212,8 @@ void canx_dns(Module* modptr)
 		dnsdata = lnode_get(dnsnode);
 		if (dnsdata->modptr == modptr) {
 			adns_cancel(dnsdata->q);
-			free (dnsdata->a);
-			free (dnsdata);
+			sfree (dnsdata->a);
+			sfree (dnsdata);
 			lnode2 = list_next(dnslist, dnsnode);
 			list_delete(dnslist, dnsnode);
 			lnode_destroy(dnsnode);
@@ -224,7 +224,7 @@ void canx_dns(Module* modptr)
 	while (dnsnode) {
 		dnsdata = lnode_get(dnsnode);
 		if (dnsdata->modptr == modptr) {
-			free(dnsdata);
+			sfree(dnsdata);
 			lnode2 = list_next(dnsqueue, dnsnode);
 			list_delete(dnsqueue, dnsnode);
 			lnode_destroy(dnsnode);
@@ -279,8 +279,8 @@ void do_dns (void)
 			/* delete from list */
 			dnsnode1 = list_delete (dnslist, dnsnode);
 			dnsnode = list_next (dnslist, dnsnode1);
-			free (dnsdata->a);
-			free (dnsdata);
+			sfree (dnsdata->a);
+			sfree (dnsdata);
 			lnode_destroy (dnsnode1);
 			break;
 		}
@@ -293,8 +293,8 @@ void do_dns (void)
 		/* delete from list */
 		dnsnode1 = list_delete (dnslist, dnsnode);
 		dnsnode = list_next (dnslist, dnsnode1);
-		free (dnsdata->a);
-		free (dnsdata);
+		sfree (dnsdata->a);
+		sfree (dnsdata);
 		lnode_destroy (dnsnode1);
 	}
 	dns_check_queue();
@@ -329,7 +329,7 @@ void dns_check_queue() {
 			if (status) {
 				/* delete from queue and delete node */
 				nlog (LOG_WARNING, "DNS: adns_submit error: %s", strerror (status));
-				free (dnsdata);
+				sfree (dnsdata);
 				dnsnode2 = dnsnode;
 				dnsnode = list_next(dnsqueue, dnsnode);
 				list_delete(dnsqueue, dnsnode2);

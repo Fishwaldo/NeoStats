@@ -50,7 +50,7 @@ void ResetTLD()
 			/* don't delete the tld entry ??? as its our "unknown" entry */
 			if (ircstrcasecmp(t->tld, "???")) {
 				tn2 = list_next(Thead, tn);
-				free(t);
+				sfree(t);
 				list_delete(Thead, tn);
 				lnode_destroy(tn);
 				tn = tn2;
@@ -142,7 +142,7 @@ void AddTLD(User * u)
 		t->daily_users++;
 	} else {
 		country_name = GeoIP_country_name_by_addr(gi, ipaddr);
-		t = malloc(sizeof(TLD));
+		t = smalloc(sizeof(TLD));
 		strlcpy(t->tld, country_code, 5);
 		strlcpy(t->country, country_name, 32);
 		t->users = 1;
@@ -193,7 +193,7 @@ void FiniTLD(void)
 	tn = list_first(Thead);
 	while (tn != NULL) {
 		t = lnode_get(tn);
-		free(t);
+		sfree(t);
 		tn = list_next(Thead, tn);
 	}
 	list_destroy_nodes(Thead);

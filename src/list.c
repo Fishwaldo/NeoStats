@@ -91,7 +91,7 @@ list_init (list_t * list, listcount_t maxcount)
 }
 
 /*
- * Dynamically allocate a list object using malloc(), and initialize it so that
+ * Dynamically allocate a list object and initialize it so that
  * it is a valid empty list. If the list is to be ``unbounded'', the maxcount
  * should be specified as LISTCOUNT_T_MAX, or, alternately, as -1.
  */
@@ -99,7 +99,7 @@ list_init (list_t * list, listcount_t maxcount)
 list_t *
 list_create (listcount_t maxcount)
 {
-	list_t *new = malloc (sizeof *new);
+	list_t *new = smalloc (sizeof *new);
 	if (new) {
 		nassert (maxcount != 0);
 		new->nilnode.next = &new->nilnode;
@@ -119,7 +119,7 @@ void
 list_destroy (list_t * list)
 {
 	nassert (list_isempty (list));
-	free (list);
+	sfree (list);
 }
 
 /*
@@ -262,7 +262,7 @@ list_process (list_t * list, void *context, void (*function) (list_t * list, lno
 lnode_t *
 lnode_create (void *data)
 {
-	lnode_t *new = malloc (sizeof *new);
+	lnode_t *new = smalloc (sizeof *new);
 	if (new) {
 		new->data = data;
 		new->next = NULL;
@@ -292,7 +292,7 @@ void
 lnode_destroy (lnode_t * lnode)
 {
 	nassert (!lnode_is_in_a_list (lnode));
-	free (lnode);
+	sfree (lnode);
 }
 
 /*
@@ -331,12 +331,12 @@ lnode_pool_create (listcount_t n)
 
 	nassert (n != 0);
 
-	pool = malloc (sizeof *pool);
+	pool = smalloc (sizeof *pool);
 	if (!pool)
 		return NULL;
-	nodes = malloc (n * sizeof *nodes);
+	nodes = smalloc (n * sizeof *nodes);
 	if (!nodes) {
-		free (pool);
+		sfree (pool);
 		return NULL;
 	}
 	lnode_pool_init (pool, nodes, n);
@@ -370,8 +370,8 @@ lnode_pool_isfrom (lnodepool_t * pool, lnode_t * node)
 void
 lnode_pool_destroy (lnodepool_t * p)
 {
-	free (p->pool);
-	free (p);
+	sfree (p->pool);
+	sfree (p);
 }
 
 /*

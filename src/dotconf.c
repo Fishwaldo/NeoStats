@@ -4,6 +4,9 @@
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
 **
+**  Based on dotconf
+**  Copyright (C) 1999 Lukas Schröder
+**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -22,24 +25,6 @@
 **  Code portions Borrowed from the dotconf libary. Header follows:
 */
 
-/* dotconf
- * Copyright (C) 1999 Lukas Schröder
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
- */
-
 /*
 ** NeoStats CVS Identification
 ** $Id$
@@ -54,7 +39,6 @@
 #include "neostats.h"
 #include "dotconf.h"
 #include "support.h"
-#include "ircstring.h"
 static int word_count;		/* no. of option arguments */
 static char name[CFG_MAX_OPTION + 1];	/* option name */
 static char values[CFG_VALUES][CFG_MAX_VALUE + 1];	/* holds the arguments */
@@ -77,9 +61,10 @@ static config_option *config_options[CFG_MODULES];
 static void dotconf_cb_include (char *);	/* magic 'Include' */
 static void dotconf_cb_includepath (char *);	/* magic 'IncludePath' */
 
-static config_option dotconf_options[] = { {"Include", ARG_STR, dotconf_cb_include, 0},
-{"IncludePath", ARG_STR, dotconf_cb_includepath, 0},
-LAST_OPTION
+static config_option dotconf_options[] = { 
+	{"Include", ARG_STR, dotconf_cb_include, 0},
+	{"IncludePath", ARG_STR, dotconf_cb_includepath, 0},
+	LAST_OPTION
 };
 
 void
@@ -235,8 +220,7 @@ config_parse (FILE * config)
 				 * allocate a buffer of filesize bytes; should be enough to
 				 * prevent buffer overflows
 				 */
-				here_doc = malloc (finfo.st_size + 1);	/* allocate  buffer memory */
-				bzero (here_doc, finfo.st_size + 1);
+				here_doc = scalloc (finfo.st_size + 1);	/* allocate  buffer memory */
 
 				strlcpy (here_limit, cp3 + 2, 8);	/*   copy here-delimiter */
 				while (fgets (buffer, CFG_BUFSIZE, config)) {
@@ -251,14 +235,13 @@ config_parse (FILE * config)
 				here_doc[strlen (here_doc) - 1] = '\0';	/*    strip newline */
 				opt.callback (here_doc, opt.userdata);	/* call back */
 
-				free (here_doc);	/*  free buffer memory */
+				sfree (here_doc);	/*  free buffer memory */
 
 				continue;
 			}
 
 		}
 
-		free (here_doc);
 		/* skip whitespace */
 		while ((cp1 < eob) && (*cp1 != '\0') && (isspace (*cp1)))
 			cp1++;
@@ -352,7 +335,7 @@ config_parse (FILE * config)
 					opt.callback (data, word_count, USER_DATA);
 
 					for (i = 0; i < word_count; i++)	/* dump list */
-						free (data[i]);
+						sfree (data[i]);
 
 					break;
 				}
@@ -387,8 +370,7 @@ config_read (char *fname, config_option * options)
 		return 1;
 	}
 
-	dotconf_file = malloc (CFG_MAX_FILENAME + 1);	/* allocate fname buffer */
-	bzero (dotconf_file, CFG_MAX_FILENAME + 1);
+	dotconf_file = scalloc (CFG_MAX_FILENAME + 1);	/* allocate fname buffer */
 	bzero (dotconf_includepath, CFG_MAX_FILENAME + 1);
 
 	strlcpy (dotconf_file, fname, CFG_MAX_FILENAME);	/* fill fname buffer */
@@ -404,7 +386,7 @@ config_read (char *fname, config_option * options)
 	config_parse (config);	/* fire off parser */
 	fclose (config);
 
-	free (dotconf_file);	/* free fname buffer */
+	sfree (dotconf_file);	/* free fname buffer */
 
 	return 0;
 }

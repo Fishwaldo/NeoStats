@@ -28,7 +28,6 @@
 #include "neostats.h"
 #include "exclude.h"
 #include "conf.h"
-#include "ircstring.h"
 #include "services.h"
 
 list_t *exclude_list;
@@ -76,8 +75,8 @@ int InitExcludes(void)
 			en = lnode_create(e);
 			list_append(exclude_list, en);
 		}
+		free(row);
 	}
-	free(row);
 	return NS_SUCCESS;
 } 
 
@@ -96,13 +95,13 @@ void ns_do_exclude_add(User *u, char *type, char *pattern) {
 	char tmp[BUFSIZE];
 	
 	/* we dont do any checking to see if a similar entry already exists... oh well, thats upto the user */
-	e = malloc(sizeof(excludes));
+	e = smalloc(sizeof(excludes));
 	strlcpy(e->addedby, u->nick, MAXNICK);
 	e->addedon = me.now;
 	if (!ircstrcasecmp("HOST", type)) {
 		if (!index(pattern, '.')) {
 			prefmsg(u->nick, ns_botptr->nick, "Error, Pattern must contain at least one \2.\2");
-			free(e);
+			sfree(e);
 			return;
 		}
 		e->type = NS_EXCLUDE_HOST;
@@ -110,7 +109,7 @@ void ns_do_exclude_add(User *u, char *type, char *pattern) {
 	} else if (!ircstrcasecmp("CHAN", type)) {
 		if (pattern[0] != '#') {
 			prefmsg(u->nick, ns_botptr->nick, "Error, Pattern must begin with a \2#\2");
-			free(e);
+			sfree(e);
 			return;
 		}
 		e->type = NS_EXCLUDE_CHAN;
@@ -118,14 +117,14 @@ void ns_do_exclude_add(User *u, char *type, char *pattern) {
 	} else if (!ircstrcasecmp("SERVER", type)) {
 		if (!index(pattern, '.')) {
 			prefmsg(u->nick, ns_botptr->nick, "Error, Pattern must contain at least one \2.\2");
-			free(e);
+			sfree(e);
 			return;
 		}
 		e->type = NS_EXCLUDE_SERVER;
 		strlcpy(e->pattern, collapse(pattern), MAXHOST);
 	} else {
 		prefmsg(u->nick, ns_botptr->nick, "Error, Unknown type %s", type);
-		free(e);
+		sfree(e);
 		return;
 	}
 	/* if we get here, then e is valid */
@@ -166,7 +165,7 @@ void ns_do_exclude_del(User *u, char *position) {
 			ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
 			DelRow("Exclusions", tmp);
 			prefmsg(u->nick, ns_botptr->nick, "Deleted %s out of Exclusion List", e->pattern);
-			free(e);
+			sfree(e);
 			list_delete(exclude_list, en);
 			lnode_destroy(en);
 			return;

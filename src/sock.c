@@ -39,7 +39,6 @@
 #include "dns.h"
 #include "transfer.h"
 #include "curl.h"
-#include "ircstring.h"
 #include "dotconf.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
@@ -56,6 +55,8 @@ static hash_t *sockh;
 /* @brief server socket */
 static int servsock;
 char recbuf[BUFSIZE];
+static struct timeval *TimeOut;
+static struct pollfd *ufds;
 
 #ifdef SQLSRV
 
@@ -122,7 +123,7 @@ ConnectTo (char *host, int port)
 	}
 
 	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0) {
-		free(hp);
+		sfree(hp);
 		return NS_FAILURE;
 	}
 	if (dobind > 0) {
@@ -163,13 +164,12 @@ static void
 read_loop ()
 {
 	register int i, j, SelectResult;
-	struct timeval *TimeOut, tvbuf;
+	struct timeval tvbuf;
 	fd_set readfds, writefds, errfds;
 	int maxfdsunused;
 	char c;
 	char buf[BUFSIZE];
 	Sock *sock;
-	struct pollfd *ufds;
 	int pollsize, pollflag;
 	hscan_t ss;
 	hnode_t *sn;
@@ -177,10 +177,6 @@ read_loop ()
 	lnode_t *sqlnode;
 	Sql_Conn *sqldata;
 #endif
-
-	/* XXX Valgrind reports these two as lost memory, Should clean up before we exit */
-	TimeOut = malloc (sizeof (struct timeval));
-	ufds = malloc((sizeof *ufds) *  me.maxsocks);
 
 	me.lastmsg = me.now;
 	while (1) {
@@ -426,10 +422,12 @@ getmaxsock (void)
 	struct rlimit *lim;
 	int ret;
 
-	lim = malloc (sizeof (struct rlimit));
+	lim = smalloc (sizeof (struct rlimit));
 	getrlimit (RLIMIT_NOFILE, lim);
 	ret = lim->rlim_max;
-	free (lim);
+	sfree (lim);
+	if(ret<0)
+		ret = 0xffff;
 	return ret;
 }
 
@@ -677,7 +675,7 @@ sql_accept_conn(int srvfd)
   
   /* We have a new UI/DB/manager connection request.  So make a free
      slot and allocate it */
-  newui = malloc(sizeof(Sql_Conn));
+  newui = smalloc(sizeof(Sql_Conn));
   
 
   /* OK, we've got the ui slot, now accept the conn */
@@ -687,7 +685,7 @@ sql_accept_conn(int srvfd)
   if (newui->fd < 0)
   {
     nlog(LOG_WARNING, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
-    free(newui);
+    sfree(newui);
     close(srvfd);
     return;
   }
@@ -698,7 +696,7 @@ sql_accept_conn(int srvfd)
     	/* we didnt get a match, bye bye */
 	nlog(LOG_NOTICE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
 	close(newui->fd);
-	free(newui);
+	sfree(newui);
         return;
     }
     /* inc number ui, then init new ui */
@@ -761,7 +759,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
     close(sqlconn->fd);
     list_delete(sqlconnections, sqlnode);
     lnode_destroy(sqlnode);
-    free(sqlconn);
+    sfree(sqlconn);
     return NS_FAILURE;
   }
   sqlconn->cmdpos += ret;
@@ -819,7 +817,7 @@ sql_handle_ui_output(lnode_t *sqlnode)
       	close(sqlconn->fd);
 	list_delete(sqlconnections, sqlnode);
 	lnode_destroy(sqlnode);
-	free(sqlconn);
+	sfree(sqlconn);
       	return NS_FAILURE;
     }
     else if (ret == (50000 - sqlconn->responsefree))
@@ -850,11 +848,15 @@ int InitSocks (void)
 		nlog (LOG_CRITICAL, "Unable to create socks hash");
 		return NS_FAILURE;
 	}
+	TimeOut = smalloc (sizeof (struct timeval));
+	ufds = smalloc((sizeof *ufds) *  me.maxsocks);
 	return NS_SUCCESS;
 }
 
 int FiniSocks (void) 
 {
+	sfree(TimeOut);
+	sfree(ufds);
 	if (servsock > 0)
 		close (servsock);
 	hash_destroy(sockh);
@@ -1010,7 +1012,7 @@ del_socket (char *sock_name)
 		nlog (LOG_DEBUG2, "del_socket: Unregistered Socket function %s from Module %s", sock_name, sock->moduleptr->info->name);
 		hash_scan_delete (sockh, sn);
 		hnode_destroy (sn);
-		free (sock);
+		sfree (sock);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;

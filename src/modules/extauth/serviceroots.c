@@ -104,7 +104,7 @@ void ModFini()
 
 	un = list_first(srconf.ul);
 	while (un) {
-		free(lnode_get(un));
+		sfree(lnode_get(un));
 		un = list_next(srconf.ul, un);
 	}
 	list_destroy_nodes(srconf.ul);
@@ -135,7 +135,7 @@ void sr_cb_config(char *arg, int configtype)
 				nick = strtok(arg, "!");
 				user = strtok(NULL, "@");
 				host = strtok(NULL, "");
-				sru = malloc(sizeof(users));
+				sru = smalloc(sizeof(users));
 				strlcpy(sru->nick, nick, MAXNICK);
 				strlcpy(sru->ident, user, MAXUSER);
 				strlcpy(sru->host, host, MAXHOST);

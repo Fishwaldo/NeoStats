@@ -77,7 +77,7 @@ static void lookupnickip(char *data, adns_answer *a)
 		cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 		cmdparams->source.user = u;	
 		SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
-		free (cmdparams);
+		sfree (cmdparams);
 	}
 }
 #endif
@@ -106,12 +106,12 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 #ifndef GOTNICKIP
 	} else if (me.want_nickip == 1) {
 		/* first, if the u->host is a ip address, just convert it */
-		ipad = malloc(sizeof(struct in_addr));
+		ipad = smalloc(sizeof(struct in_addr));
 		res = inet_aton(host, ipad);
 		if (res > 0) {
 			/* its valid */
 			ipaddress = htonl(ipad->s_addr);
-			free(ipad);
+			sfree(ipad);
 		} else {		
 			/* kick of a dns reverse lookup for this host */
 			dns_lookup((char *)host, adns_r_addr, lookupnickip, (void *)nick);
@@ -156,7 +156,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 		/* only fire this event if we have the nickip and some module wants it */
 		SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
 	}
-	free (cmdparams);
+	sfree (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
 	if(me.versionscan && !IsExcluded(u)) {
 		privmsg(u->nick, ns_botptr->nick, "\1VERSION\1");
@@ -179,7 +179,7 @@ static void deluser(User* u)
 	hash_delete (uh, un);
 	hnode_destroy (un);
 	list_destroy (u->chans);
-	free (u);
+	sfree (u);
 }
 
 void 
@@ -209,7 +209,7 @@ KillUser (const char *nick, const char *reason)
 		SendModuleEvent (EVENT_BOTKILL, cmdparams, findbot(u->nick));
 	}
 	deluser(u);
-	free (cmdparams);
+	sfree (cmdparams);
 }
 
 void 
@@ -234,7 +234,7 @@ QuitUser (const char *nick, const char *reason)
 	}
 	SendAllModuleEvent (EVENT_QUIT, cmdparams);
 	deluser(u);
-	free (cmdparams);
+	sfree (cmdparams);
 }
 
 void
@@ -261,7 +261,7 @@ UserAway (const char *nick, const char *awaymsg)
 		u->is_away = 1;
 	}
 	SendAllModuleEvent (EVENT_AWAY, cmdparams);
-	free (cmdparams);
+	sfree (cmdparams);
 }
 
 int 
@@ -302,7 +302,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	cmdparams->source.user = u;
 	cmdparams->param = (char *)oldnick;
 	SendAllModuleEvent (EVENT_NICK, cmdparams);
-	free (cmdparams);
+	sfree (cmdparams);
 	return NS_SUCCESS;
 }
 
@@ -709,7 +709,7 @@ UserMode (const char *nick, const char *modes)
 	cmdparams->source.user = u;	
 	cmdparams->param = (char*)modes;
 	SendAllModuleEvent (EVENT_UMODE, cmdparams);
-	free (cmdparams);
+	sfree (cmdparams);
 }
 
 #ifdef GOTUSERSMODES
@@ -733,7 +733,7 @@ UserSMode (const char *nick, const char *modes)
 	cmdparams->source.user = u;	
 	cmdparams->param = modes;
 	SendAllModuleEvent (EVENT_SMODE, cmdparams);
-	free (cmdparams);
+	sfree (cmdparams);
 }
 #endif
 
@@ -768,7 +768,7 @@ void FiniUsers (void)
 		hash_scan_delete (uh, un);
 		hnode_destroy (un);
 		list_destroy (u->chans);
-		free (u);
+		sfree (u);
 	}
 	hash_destroy(uh);
 }

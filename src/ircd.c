@@ -262,7 +262,7 @@ CloakHost (Bot *bot_ptr)
 /** @brief split_buf
  * Taken from Epona - Thanks! 
  * Split a buffer into arguments and store the arguments in an
- * argument vector pointed to by argv (which will be malloc'd
+ * argument vector pointed to by argv (which will be alloced
  * as necessary); return the argument count.  If colon_special
  * is non-zero, then treat a parameter with a leading ':' as
  * the last parameter of the line, per the IRC RFC.  Destroys
@@ -279,14 +279,14 @@ splitbuf (char *buf, char ***argv, int colon_special)
 	char *s;
 	int colcount = 0;
 	SET_SEGV_LOCATION();
-	*argv = calloc (sizeof (char *) * argvsize, 1);
+	*argv = scalloc (sizeof (char *) * argvsize);
 	argc = 0;
 	/*if (*buf == ':')
 		buf++;*/
 	while (*buf) {
 		if (argc == argvsize) {
 			argvsize += 8;
-			*argv = realloc (*argv, sizeof (char *) * argvsize);
+			*argv = srealloc (*argv, sizeof (char *) * argvsize);
 		}
 		if ((*buf == ':') && (colcount < 1)) {
 			buf++;
@@ -322,14 +322,14 @@ split_buf (char *buf, char ***argv, int colon_special)
 	char *s;
 	int colcount = 0;
 	SET_SEGV_LOCATION();
-	*argv = calloc (sizeof (char *) * argvsize, 1);
+	*argv = scalloc (sizeof (char *) * argvsize);
 	argc = 0;
 	if (*buf == ':')
 		buf++;
 	while (*buf) {
 		if (argc == argvsize) {
 			argvsize += 8;
-			*argv = realloc (*argv, sizeof (char *) * argvsize);
+			*argv = srealloc (*argv, sizeof (char *) * argvsize);
 		}
 		if ((*buf == ':') && (colcount < 1)) {
 			buf++;
@@ -364,7 +364,7 @@ joinbuf (char **av, int ac, int from)
 	int i;
 	char *buf;
 
-	buf = malloc (BUFSIZE);
+	buf = smalloc (BUFSIZE);
 	/* from is zero based while ac has base of 1. 
 	 * Therefore we need to check >= before trying to perform
 	 * the join.
@@ -531,7 +531,7 @@ parse (char *line)
 	nlog (LOG_DEBUG1, "args  : %s", coreLine);
 	ac = splitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	free (av);
+	sfree (av);
 	nlog (LOG_DEBUG1, "---------------------------END PARSE----------------------------");
 }
 #endif
@@ -575,7 +575,7 @@ do_pong (const char* origin, const char* destination)
 		cmdparams = (CmdParams*)scalloc (sizeof(CmdParams));
 		cmdparams->source.server = s;
 		SendAllModuleEvent (EVENT_PONG, cmdparams);
-		free (cmdparams);
+		sfree (cmdparams);
 		return;
 	}
 	nlog (LOG_NOTICE, "Received PONG from unknown server: %s", origin);
@@ -958,7 +958,7 @@ scmode_op (const char *who, const char *chan, const char *mode, const char *bot)
 	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, bot);
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
-	free (av);
+	sfree (av);
 	return NS_SUCCESS;
 }
 #endif
@@ -973,7 +973,7 @@ schmode_cmd (const char *who, const char *chan, const char *mode, const char *ar
 	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
-	free (av);
+	sfree (av);
 	return NS_SUCCESS;
 }
 
@@ -1240,7 +1240,7 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 	ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", chan, mode, who);
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
-	free (av);
+	sfree (av);
 	return NS_SUCCESS;
 }
 
@@ -1401,7 +1401,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 			}
 		}
 	}
-	free(param);
+	sfree(param);
 }
 
 #ifdef MSG_NETINFO

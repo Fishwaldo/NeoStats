@@ -46,12 +46,12 @@ new_server (const char *name)
 	sn = hnode_create (s);
 	if (!sn) {
 		nlog (LOG_WARNING, "Server hash broken");
-		free (s);
+		sfree (s);
 		return NULL;
 	}
 	if (hash_isfull (sh)) {
 		nlog (LOG_WARNING, "Server hash full");
-		free (s);
+		sfree (s);
 		return NULL;
 	} else {
 		hash_insert (sh, sn, s->name);
@@ -89,7 +89,7 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source.server = s;
 	SendAllModuleEvent (EVENT_SERVER, cmdparams);
-	free (cmdparams);
+	sfree (cmdparams);
 	return(s);
 }
 
@@ -114,10 +114,10 @@ DelServer (const char *name, const char* reason)
 		cmdparams->param = (char*)reason;
 	}
 	SendAllModuleEvent (EVENT_SQUIT, cmdparams);
-	free (cmdparams);
+	sfree (cmdparams);
 	hash_delete (sh, sn);
 	hnode_destroy (sn);
-	free (s);
+	sfree (s);
 }
 
 #ifdef BASE64SERVERNAME
@@ -340,7 +340,7 @@ FiniServers (void)
 		s = hnode_get (sn);
 		hash_delete (sh, sn);
 		hnode_destroy (sn);
-		free (s);
+		sfree (s);
 	}
 	hash_destroy(sh);
 }

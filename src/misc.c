@@ -29,7 +29,6 @@
 
 static char misc_buf[BUFSIZE];
 
-
 /** @brief strip newlines carriage returns
  *
  * removes newlines and carriage returns from a string
@@ -48,58 +47,102 @@ strip (char *line)
 		*c = '\0';
 }
 
-/** @brief NeoStats implementation of malloc.
+/** @brief NeoStats wrapper for malloc.
  *
- * Allocates memory for internal variables. Useful for memory debugging
- * if enough memory can't be malloced, exit the program 
+ * Allocates memory for internal variables. 
+ * If enough memory can't be allocated, exit the program 
  *
  * @param size The amount of memory to alloc
  *
- * @returns size bytes of memory or NULL on error
+ * @returns pointer to allocated buffer
  */
 
-void *
-smalloc (long size)
+void * smalloc ( const int size )
 {
+	unsigned int allocsize;
 	void *buf;
 
-	if (!size) {
-		nlog (LOG_WARNING, "smalloc(): illegal attempt to allocate 0 bytes!");
-		size = 1;
+	allocsize = size;
+	if (!allocsize) {
+		nlog (LOG_WARNING, "smalloc: illegal attempt to allocate 0 bytes!");
+		allocsize = 1;
 	}
-	buf = malloc (size);
+	buf = malloc (allocsize);
 	if (!buf) {
-		nlog (LOG_CRITICAL, "smalloc(): out of memory.");
+		nlog (LOG_CRITICAL, "smalloc: out of memory.");
 		do_exit (NS_EXIT_ERROR, "Out of memory");
 	}
 	return buf;
 }
 
-/** @brief NeoStats implementation of calloc.
+/** @brief NeoStats wrapper for calloc.
  *
- * Allocates memory for internal variables. Useful for memory debugging
- * if enough memory can't be malloced, exit the program 
+ * Allocates memory for internal variables. 
+ * If enough memory can't be allocated, exit the program 
  *
  * @param size The amount of memory to alloc
  *
- * @returns size bytes of memory or NULL on error
+ * @returns pointer to allocated buffer
  */
 
-void *
-scalloc (long size)
+void * scalloc ( const int size )
 {
 	void *buf;
+	unsigned int allocsize;
 
-	if (!size) {
-		nlog (LOG_WARNING, "scalloc(): illegal attempt to allocate 0 bytes!");
-		size = 1;
+	allocsize = size;
+	if (!allocsize) {
+		nlog (LOG_WARNING, "scalloc: illegal attempt to allocate 0 bytes!");
+		allocsize = 1;
 	}
-	buf = calloc (1, size);
+	buf = calloc (1, allocsize);
 	if (!buf) {
-		nlog (LOG_CRITICAL, "scalloc(): out of memory.");
+		nlog (LOG_CRITICAL, "scalloc: out of memory.");
 		do_exit (NS_EXIT_ERROR, "Out of memory");
 	}
 	return buf;
+}
+
+/** @brief NeoStats wrapper for realloc.
+ *
+ * Reallocates memory
+ * If enough memory can't be allocated, exit the program 
+ *
+ * @param size The amount of memory to realloc
+ *
+ * @returns pointer to allocated buffer
+ */
+
+void * srealloc ( void* ptr, const int size )
+{
+	void* newptr;
+
+	newptr = realloc (ptr, size);
+	if (!newptr) {
+		nlog (LOG_CRITICAL, "srealloc: out of memory.");
+		do_exit (NS_EXIT_ERROR, "Out of memory");
+	}
+	return newptr;
+}
+
+/** @brief NeoStats wrapper for free.
+ *
+ * Free memory associated with pointer.
+ * If NULL pointer log error and ignore free
+ *
+ * @param size Pointer to buffer to free
+ *
+ * @returns none
+ */
+
+void sfree ( void *buf )
+{
+	if (!buf) {
+		nlog (LOG_WARNING, "sfree: illegal attempt to free NULL pointer");
+		return;
+	}
+	free (buf);
+	buf = 0;
 }
 
 /** @brief Duplicate a string
@@ -166,10 +209,10 @@ AddStringToList (char ***List, char S[], int *C)
 
 	if (*C == 0) {
 		numargs = 8;
-		*List = calloc (sizeof (char *) * numargs, 1);
+		*List = scalloc (sizeof (char *) * numargs);
 	} else if (*C  == numargs) {
 		numargs += 8;
-		*List = realloc (*List, sizeof (char *) * numargs);
+		*List = srealloc (*List, sizeof (char *) * numargs);
 	}
 	++*C;
 	(*List)[*C - 1] = S;

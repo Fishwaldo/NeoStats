@@ -83,7 +83,7 @@ add_chan_bot (char *bot, char *chan)
 
 	cbn = hash_lookup (bch, chan);
 	if (!cbn) {
-		mod_chan_bot = malloc (sizeof (ChanBot));
+		mod_chan_bot = smalloc (sizeof (ChanBot));
 		strlcpy (mod_chan_bot->chan, chan, CHANLEN);
 		mod_chan_bot->bots = list_create (B_TABLE_SIZE);
 		cbn = hnode_create (mod_chan_bot);
@@ -139,7 +139,7 @@ del_chan_bot (char *bot, char *chan)
 		/* delete the hash and list because its all over */
 		hash_delete (bch, cbn);
 		list_destroy (mod_chan_bot->bots);
-		free (mod_chan_bot->chan);
+		sfree (mod_chan_bot->chan);
 		hnode_destroy (cbn);
 	}
 }
@@ -240,7 +240,7 @@ void bot_notice (char *origin, char **av, int ac)
 		cmdparams->param += 9;
  		SendModuleEvent (EVENT_CTCPVERSION, cmdparams, NULL);
 	}
-	free (cmdparams);
+	sfree (cmdparams);
 
 }
 
@@ -267,7 +267,7 @@ void bot_chan_notice (char *origin, char **av, int ac)
 			}
 		}
 	}
-	free (cmdparams);
+	sfree (cmdparams);
 }
 
 /** @brief send a message to a bot
@@ -290,7 +290,7 @@ void bot_private (char *origin, char **av, int ac)
 			cmdparams->param = av[ac - 1];
 			if ((cmdparams->dest.bot->flags & BOT_FLAG_SERVICEBOT)) {
 				if(run_bot_cmd (cmdparams) != NS_FAILURE) {
-					free (cmdparams);
+					sfree (cmdparams);
 					return;
 				}
 			}
@@ -300,7 +300,7 @@ void bot_private (char *origin, char **av, int ac)
 			}
 		}
 	}
-	free (cmdparams);
+	sfree (cmdparams);
 }
 
 /** @brief send a message to a bot
@@ -326,7 +326,7 @@ void bot_chan_private (char *origin, char **av, int ac)
 			}
 		}
 	}
-	free (cmdparams);
+	sfree (cmdparams);
 }
 
 /** @brief create a new bot
@@ -343,7 +343,7 @@ new_bot (char *bot_name)
 
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, "new_bot: %s", bot_name);
-	botptr = malloc (sizeof (Bot));
+	botptr = smalloc (sizeof (Bot));
 	strlcpy (botptr->nick, bot_name, MAXNICK);
 	bn = hnode_create (botptr);
 	if (hash_isfull (bh)) {
@@ -417,7 +417,7 @@ del_ns_bot (char *bot_name)
 		botptr = hnode_get (bn);
 		del_all_bot_cmds(botptr);
 		hnode_destroy (bn);
-		free (botptr);
+		sfree (botptr);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;

@@ -172,7 +172,7 @@ void save_vhost(hs_map *vhost)
 void del_vhost(hs_map *vhost) 
 {
 	DelRow("Vhosts", vhost->nnick);
-	free(vhost);
+	sfree(vhost);
 	/* no need to list sort here, because its already sorted */
 }
 
@@ -181,7 +181,7 @@ void set_moddata(User* u)
 	hs_user *hs;
 
 	if (!u->moddata[hs_module->modnum]) {
-		hs = malloc(sizeof(hs_user));
+		hs = smalloc(sizeof(hs_user));
 		hs->vhostset = 1;
 		u->moddata[hs_module->modnum] = hs;
 	}
@@ -191,7 +191,7 @@ static int hs_event_quit(CmdParams* cmdparams)
 {
 	if (cmdparams->source.user->moddata[hs_module->modnum]) {
 		nlog(LOG_DEBUG2, "hs_event_quit: free module data");
-		free(cmdparams->source.user->moddata[hs_module->modnum]);
+		sfree(cmdparams->source.user->moddata[hs_module->modnum]);
 		cmdparams->source.user->moddata[hs_module->modnum] = NULL;
 	}
 	return 1;
@@ -279,7 +279,7 @@ void ModFini()
 
 	hn = list_first(vhosts);
 	while (hn != NULL) {
-		free(lnode_get(hn));
+		sfree(lnode_get(hn));
 		hn = list_next(vhosts, hn);
 	}
 	list_destroy_nodes(vhosts);
@@ -346,7 +346,7 @@ static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 	lnode_t *hn;
 	hs_map *map;
 
-	map = malloc(sizeof(hs_map));
+	map = smalloc(sizeof(hs_map));
 	strlcpy(map->nnick, nick, MAXNICK);
 	strlcpy(map->host, host, MAXHOST);
 	strlcpy(map->vhost, vhost, MAXHOST);
@@ -466,7 +466,7 @@ static void hs_addban(User* u, char *ban)
 			"%s already exists in the banned vhost list", ban);
 		return;
 	}
-	host = malloc(MAXHOST);
+	host = smalloc(MAXHOST);
 	strlcpy(host, ban, MAXHOST);
 	hn = hnode_create(host);
 	hash_insert(bannedvhosts, hn, host);
@@ -506,7 +506,7 @@ static void hs_delban(User* u, char *ban)
 			nlog(LOG_NOTICE,
 			     "%s deleted %s from the banned vhost list",
 			     u->nick, (char *) hnode_get(hn));
-			free(hnode_get(hn));
+			sfree(hnode_get(hn));
 			hnode_destroy(hn);
 			SaveBans();
 			return;
@@ -761,7 +761,7 @@ static void LoadHosts()
 	if (GetTableData("Vhosts", &LoadArry) > 0) {
 		load_synch = 1;
 		for (count = 0; LoadArry[count] != NULL; count++) {
-			map = malloc(sizeof(hs_map));
+			map = smalloc(sizeof(hs_map));
 			strlcpy(map->nnick, LoadArry[count], MAXNICK);
 			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Host") > 0) 
 				strlcpy(map->host, tmp, MAXHOST);
@@ -778,7 +778,7 @@ static void LoadHosts()
 			     map->nnick, map->vhost);
 		}
 	}			
-	free(LoadArry);
+	sfree(LoadArry);
 	list_sort(vhosts, findnick);
 }
 
@@ -920,12 +920,12 @@ static void LoadConfig(void)
 		host = strtok(temp, ";");
 		while (host != NULL) {
 			/* limit host to MAXHOST and avoid unterminated/huge strings */
-			host2 = malloc(MAXHOST);
+			host2 = smalloc(MAXHOST);
 			strlcpy(host2, host, MAXHOST);
 			hn = hnode_create(host2);
 			hash_insert(bannedvhosts, hn, host2);
 			host = strtok(NULL, ";");
 		}
-		free(temp);
+		sfree(temp);
 	}
 }

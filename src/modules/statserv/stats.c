@@ -110,11 +110,10 @@ static CVersions *findctcpversion(char *name)
 	cn = list_find(Vhead, name, comparef);
 	if (cn) {
 		cv = lnode_get(cn);
-	} else {
-		nlog(LOG_DEBUG2, "findctcpversion(%s) -> NOT FOUND", name);
-		return NULL;
+		return cv;
 	}
-	return cv;
+	nlog(LOG_DEBUG2, "findctcpversion(%s) -> NOT FOUND", name);
+	return NULL;
 }
 
 int save_client_versions(void)
@@ -146,7 +145,7 @@ int load_client_versions(void)
 	input = fopen("data/ssversions.dat", "rb");
 	if(input) {
 		while(!feof(input)) {
-			clientv = malloc(sizeof(CVersions));
+			clientv = smalloc(sizeof(CVersions));
 			fread(clientv, sizeof(CVersions), 1, input);	
 			node = lnode_create(clientv);
 			list_append(Vhead, node);
@@ -215,7 +214,7 @@ void StatsAddCTCPVersion(char* version)
 		clientv->count++;
 		return;
 	}
-	clientv = malloc(sizeof(CVersions));
+	clientv = smalloc(sizeof(CVersions));
 	strlcpy(clientv->name, nocols, BUFSIZE);
 	clientv->count = 1;
 	node = lnode_create(clientv);
@@ -234,7 +233,7 @@ void StatsDelChan(Channel* c)
 		save_chan(cs);
 		list_delete(Chead, ln);
 		lnode_destroy(ln);
-		free(cs);
+		sfree(cs);
 	} else {
 		nlog(LOG_WARNING, "Couldn't find channel %s when deleting from stats", c->name);
 	}
@@ -328,9 +327,6 @@ SStats *newserverstats(const char *name)
 	SET_SEGV_LOCATION();
 	nlog(LOG_DEBUG2, "newserverstats(%s)", name);
 	s = scalloc(sizeof(SStats));
-	if (!s) {
-		FATAL_ERROR("Out of memory.")
-	}
 	memcpy(s->name, name, MAXHOST);
 	s->t_maxusers = me.now;
 	s->t_maxopers = me.now;
@@ -341,7 +337,7 @@ SStats *newserverstats(const char *name)
 	sn = hnode_create(s);
 	if (hash_isfull(Shead)) {
 		nlog(LOG_CRITICAL, "StatServ Server hash is full!");
-		free(s);
+		sfree(s);
 		return NULL;
 	}
 	hash_insert(Shead, sn, s->name);
@@ -466,7 +462,7 @@ void StatsKillUser(User* u)
 		ss = findserverstats(who);
 		ss->serverkills ++;
 	}
-	free(rbuf);
+	sfree(rbuf);
 }
 
 void StatsUserMode(User* u, char *modes)
@@ -629,7 +625,7 @@ void FiniStats(void)
 	hash_scan_begin(&ss, Shead);
 	while ((sn = hash_scan_next(&ss))) {
 		s = hnode_get(sn);
-		free(s);
+		sfree(s);
 		hash_scan_delete(Shead, sn);
 		hnode_destroy(sn);
 	}
@@ -637,7 +633,7 @@ void FiniStats(void)
 	cn = list_first(Chead);
 	while (cn) {
 		c = lnode_get(cn);
-		free(c);
+		sfree(c);
 		cn = list_next(Chead, cn);
 	}
 	list_destroy_nodes(Chead);

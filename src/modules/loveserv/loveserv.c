@@ -236,7 +236,7 @@ static int ls_lovenote(CmdParams* cmdparams)
 	prefmsg(target_nick, ls_bot->nick,
 		"%s has sent you a love note which reads: \2%s\2", 
 		cmdparams->source.user->nick, message);
-	free(message);
+	sfree(message);
 	return 1;
 }
 
@@ -256,7 +256,7 @@ static int ls_apology(CmdParams* cmdparams)
 	prefmsg(target_nick, ls_bot->nick,
 		"%s is sorry, and would like to apologise for \2%s\2",
 		cmdparams->source.user->nick, message);
-	free(message);
+	sfree(message);
 	return 1;
 }
 
@@ -275,6 +275,6 @@ static int ls_thankyou(CmdParams* cmdparams)
 		"Thank you sent to %s", target_nick);
 	prefmsg(target_nick, ls_bot->nick, "%s wishes to thank you for \2%s\2",
 		cmdparams->source.user->nick, message);
-	free(message);
+	sfree(message);
 	return 1;
 }

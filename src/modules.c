@@ -386,7 +386,7 @@ load_module (char *modfilename, User * u)
 		}
 		nlog (LOG_WARNING, "Unable to load module: module list is full");
 		ns_dlclose (dl_handle);
-		free (mod_ptr);
+		sfree (mod_ptr);
 		return NULL;
 	} 
 	hash_insert (mh, mn, info_ptr->name);
@@ -414,7 +414,7 @@ load_module (char *modfilename, User * u)
 		}
 		nlog (LOG_WARNING, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
 		ns_dlclose (dl_handle);
-		free (mod_ptr);
+		sfree (mod_ptr);
 		return NULL;
 	} else {
 		int err;
@@ -440,7 +440,7 @@ load_module (char *modfilename, User * u)
 				event_ptr->function (NULL);
 				RESET_RUN_LEVEL();
 				SET_SEGV_LOCATION();
-				free (av);
+				sfree (av);
 				break;
 			}
 			event_ptr++;
@@ -540,7 +540,7 @@ unload_module (const char *modname, User * u)
 		nlog (LOG_DEBUG1, "Free %d from Module Numbers", i);
 		ModList[i] = NULL;
 	}
-	free (mod_ptr);
+	sfree (mod_ptr);
 	return NS_SUCCESS;
 }
 
@@ -601,7 +601,7 @@ ModuleConfig(bot_setting* set_ptr)
 			case SET_TYPE_IPV4:
 				if(GetConf((void *) &temp, CFGSTR, set_ptr->confitem) > 0) {
 					strlcpy(set_ptr->varptr, temp, MAXNICK);
-					free(temp);
+					sfree(temp);
 				} else {
 					strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
 					

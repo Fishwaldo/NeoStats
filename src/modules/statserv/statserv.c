@@ -867,7 +867,7 @@ static int ss_stats(CmdParams* cmdparams)
 				hash_delete(Shead, node);
 				st = hnode_get(node);
 				hnode_destroy(node);
-				free(st);
+				sfree(st);
 				prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Removed %s from the database.",
 					cmdparams->av[1]);
 				nlog(LOG_NOTICE, "%s requested STATS DEL %s", cmdparams->source.user->nick, cmdparams->av[1]);
@@ -892,7 +892,7 @@ static int ss_stats(CmdParams* cmdparams)
 		}
 		st = findserverstats(cmdparams->av[2]);
 		if (st)
-			free(st);
+			sfree(st);
 
 		st = findserverstats(cmdparams->av[1]);
 		if (!st) {

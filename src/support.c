@@ -169,10 +169,7 @@ char *strndup(const char *src, size_t count)
 	}
 	
 	/* Allocate count plus one for trailing NULL */
-	dup = (char*)malloc(count+1);
-	if (!dup) {
-		return NULL;
-	}
+	dup = (char*)smalloc(count+1);
 	
 	/* Copy string into created buffer */
 	memcpy(dup, src, count);

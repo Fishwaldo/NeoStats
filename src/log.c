@@ -112,7 +112,7 @@ CloseLogs (void)
 		}
 		hash_scan_delete (logs, hn);
 		hnode_destroy (hn);
-		free (logentry);
+		sfree (logentry);
 	}
 }
 
@@ -139,7 +139,7 @@ FiniLogs (void)
 		}
 		hash_scan_delete (logs, hn);
 		hnode_destroy (hn);
-		free (logentry);
+		sfree (logentry);
 	}
 	/* for some reason, the logs are not getting flushed correctly */
 	hash_destroy(logs);
@@ -206,7 +206,7 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 			if(!logentry->logfile)
 				logentry->logfile = fopen (logentry->logname, "a");
 		} else {
-			logentry = malloc (sizeof (struct logs_));
+			logentry = smalloc (sizeof (struct logs_));
 			strlcpy (logentry->name, GET_CUR_MODNAME() , MAX_MOD_NAME);
 			make_log_filename(logentry->name, logentry->logname);
 			logentry->logfile = fopen (logentry->logname, "a");

@@ -446,8 +446,8 @@ run_bot_cmd (CmdParams * cmdparams)
 	if (( (cmdparams->dest.bot->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
 		( (cmdparams->dest.bot->flags & BOT_FLAG_ONLY_OPERS) && me.onlyopers && (userlevel < NS_ULEVEL_OPER) )){
 		msg_only_opers (cmdparams);
-		free (av);
-		free (cmdparams->av);
+		sfree (av);
+		sfree (cmdparams->av);
 		return NS_SUCCESS;
 	}	
 	if(cmdparams->dest.bot->botcmds) {
@@ -459,15 +459,15 @@ run_bot_cmd (CmdParams * cmdparams)
 			/* Is user authorised to issue this command? */
 			if (userlevel < cmdlevel) {
 				msg_permission_denied(cmdparams, NULL);
-				free (av);
-				free (cmdparams->av);
+				sfree (av);
+				sfree (cmdparams->av);
 				return NS_SUCCESS;
 			}
 			/* Check parameter count */
 			if(cmdparams->ac < cmd_ptr->minparams ) {
 				msg_error_need_more_params(cmdparams);
-				free (av);
-				free (cmdparams->av);
+				sfree (av);
+				sfree (cmdparams->av);
 				return NS_SUCCESS;
 			}
 			/* Seems OK so report the command call so modules do not have to */
@@ -494,20 +494,20 @@ run_bot_cmd (CmdParams * cmdparams)
 				default:
 					break;
 			}
-			free (av);
-			free (cmdparams->av);
+			sfree (av);
+			sfree (cmdparams->av);
 			return NS_SUCCESS;
 		}
 	}
 	if(run_intrinsic_cmds (av[0], cmdparams) == NS_SUCCESS) {
-		free (av);
-		free (cmdparams->av);
+		sfree (av);
+		sfree (cmdparams->av);
 		return NS_SUCCESS;
 	}
 	/* We have run out of commands so report failure */
 	msg_unknown_command (cmdparams);
-	free (av);
-	free (cmdparams->av);
+	sfree (av);
+	sfree (cmdparams->av);
 	return NS_FAILURE;
 }
 
@@ -833,7 +833,7 @@ bot_cmd_set_msg (CmdParams * cmdparams, bot_setting* set_ptr)
 	strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
 	SetConf((void *)buf, CFGSTR, set_ptr->confitem);
 	bot_cmd_set_report (cmdparams, set_ptr, buf);
-	free(buf);
+	sfree(buf);
 	return NS_SUCCESS;
 }
 
@@ -893,7 +893,7 @@ bot_cmd_set_realname (CmdParams * cmdparams, bot_setting* set_ptr)
 	strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
 	SetConf((void *)buf, CFGSTR, set_ptr->confitem);
 	bot_cmd_set_report (cmdparams, set_ptr, buf);
-	free(buf);
+	sfree(buf);
 	return NS_SUCCESS;
 }
 

@@ -803,8 +803,10 @@ void fatal_error(char* file, int line, char* func, char* error_text) __attribute
 
 /* misc.c */
 void strip (char * line);
-void *smalloc (long size);
-void *scalloc (long size);
+void *smalloc ( const int size );
+void *scalloc ( const int size );
+void *srealloc ( void* ptr, const int size );
+void sfree ( void *buf );
 char *sstrdup (const char * s);
 char *strlwr (char * s);
 void AddStringToList (char ***List, char S[], int *C);

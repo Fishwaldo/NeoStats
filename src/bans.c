@@ -74,8 +74,8 @@ void AddBan(const char* type, const char* user, const char* host, const char* ma
 	AddStringToList (&cmdparams->av, (char*)tsset, &cmdparams->ac);
 	AddStringToList (&cmdparams->av, (char*)tsexpires, &cmdparams->ac);
 	SendAllModuleEvent (EVENT_ADDBAN, cmdparams);
-	free (cmdparams->av);
-	free (cmdparams);
+	sfree (cmdparams->av);
+	sfree (cmdparams);
 }
 
 void 
@@ -104,12 +104,12 @@ DelBan(const char* type, const char* user, const char* host, const char* mask,
 	AddStringToList (&cmdparams->av, (char*)tsset, &cmdparams->ac);
 	AddStringToList (&cmdparams->av, (char*)tsexpires, &cmdparams->ac);
 	SendAllModuleEvent (EVENT_DELBAN, cmdparams);
-	free (cmdparams->av);
-	free (cmdparams);
+	sfree (cmdparams->av);
+	sfree (cmdparams);
 
 	hash_delete (banshash, bansnode);
 	hnode_destroy (bansnode);
-	free (ban);
+	sfree (ban);
 }
 
 void
@@ -139,7 +139,7 @@ void FiniBans (void)
 		ban = hnode_get (bansnode);
 		hash_delete (banshash, bansnode);
 		hnode_destroy (bansnode);
-		free (ban);
+		sfree (ban);
 	}
 	hash_destroy(banshash);
 }

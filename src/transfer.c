@@ -74,7 +74,7 @@ static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, vo
 			size *= nmemb;
 			rembuffer = neotrans->savememsize - neotrans->savemempos; /* the remianing buffer size */
 			if (size > rembuffer) {
-				newbuf = realloc(neotrans->savemem, neotrans->savememsize + (size - rembuffer));
+				newbuf = srealloc(neotrans->savemem, neotrans->savememsize + (size - rembuffer));
 				if (newbuf == NULL) {
 					nlog(LOG_WARNING, "Ran out of Memory for transfer %s. %s", neotrans->url, strerror(errno));
 					return -1;
@@ -117,14 +117,14 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 			/* if we don't have a filename, bail out */
 			if (filename[0] == 0) {
 				nlog(LOG_WARNING, "Undefined Filename for new_transfer URL %s, Aborting", url);
-				free(newtrans);
+				sfree(newtrans);
 				return NS_FAILURE;
 			}
 			
 			newtrans->savefile = fopen(filename, "w");
 			if (!newtrans->savefile) {
 				nlog(LOG_WARNING, "Error Opening file for writting in new_transfer: %s", strerror(errno));
-				free(newtrans);
+				sfree(newtrans);
 				return NS_FAILURE;
 			}
 			newtrans->savefileormem = NS_FILE;
@@ -147,14 +147,14 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	newtrans->curleasyhandle = curl_easy_init();
 	if (!newtrans->curleasyhandle) {
 		nlog(LOG_WARNING, "Curl Easy Init Failed for url %s", url);
-		free(newtrans);
+		sfree(newtrans);
 		return NS_FAILURE;
 	}
 	/* setup some standard options we use globally */
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_ERRORBUFFER, newtrans->curlerror)) != 0 ) {
 		nlog(LOG_WARNING, "Curl set errorbuffer failed. Returned %d for url %s", ret, url);
 		curl_easy_cleanup(newtrans->curleasyhandle);
-		free(newtrans);
+		sfree(newtrans);
 		return NS_FAILURE;
 	}
 #ifdef DEBUG
@@ -163,7 +163,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
-		free(newtrans);
+		sfree(newtrans);
 		return NS_FAILURE;
 	}	
 #endif
@@ -172,7 +172,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
-		free(newtrans);
+		sfree(newtrans);
 		return NS_FAILURE;
 	}	
 
@@ -181,7 +181,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
-		free(newtrans);
+		sfree(newtrans);
 		return NS_FAILURE;
 	}	
 
@@ -191,7 +191,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		nlog(LOG_WARNING, "Curl Set useragent failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
-		free(newtrans);
+		sfree(newtrans);
 		return NS_FAILURE;
 	}	
 
@@ -201,7 +201,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
-		free(newtrans);
+		sfree(newtrans);
 		return NS_FAILURE;
 	}	
 
@@ -210,7 +210,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
-		free(newtrans);
+		sfree(newtrans);
 		return NS_FAILURE;
 	}	
 
@@ -221,7 +221,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 			nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
 			nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 			curl_easy_cleanup(newtrans->curleasyhandle);
-			free(newtrans);
+			sfree(newtrans);
 			return NS_FAILURE;
 		}
 	}	
@@ -231,7 +231,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
-		free(newtrans);
+		sfree(newtrans);
 		return NS_FAILURE;
 	}
 	
@@ -241,14 +241,14 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
-		free(newtrans);
+		sfree(newtrans);
 		return NS_FAILURE;
 	}
 	
 	
 	if (!curl_multi_add_handle(curlmultihandle, newtrans->curleasyhandle)) {
 		nlog(LOG_WARNING, "Curl Init Failed: %s", newtrans->curlerror);
-		free(newtrans);
+		sfree(newtrans);
 		return NS_FAILURE;
 	}
 	/* we have to do this at least once to get things going */
@@ -295,8 +295,8 @@ void transfer_status(void)
 			curl_easy_cleanup(neotrans->curleasyhandle);
 			/* XXX remove from list */
 			if (neotrans->savefileormem == NS_MEMORY)
-				free(neotrans->savemem);
-			free(neotrans);
+				sfree(neotrans->savemem);
+			sfree(neotrans);
 		}
 	}
 }

@@ -431,7 +431,7 @@ ns_raw (CmdParams* cmdparams)
 	chanalert (ns_botptr->nick, "\2RAW COMMAND\2 \2%s\2 issued a raw command!(%s)", cmdparams->source.user->nick, message);
 	nlog (LOG_INFO, "RAW COMMAND %s issued a raw command!(%s)", cmdparams->source.user->nick, message);
 	send_cmd ("%s", message);
-	free (message);
+	sfree (message);
    	return NS_SUCCESS;
 }
 #endif
