@@ -132,7 +132,6 @@ logs/.keepme -text
 /makeconf -text
 /neoircd.c -text
 /neoircd.h -text
-/neostats.cfg.dist -text
 /neostats.motd -text
 /ns_help.c -text
 /server.c -text

@@ -322,7 +322,7 @@ RECONNECT_TIME $NEOCONN
 $NEOWRITE
 
 # Path to NeoStats HTML Output file.  INCLUDE FILENAME!! This is required.
-# Example: /home/shmad/public_html/stats.html
+# Example: HTML_PATH /home/shmad/public_html/stats.html
 HTML_PATH $NEOHTML
 
 
