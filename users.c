@@ -82,6 +82,7 @@ lookupnickip(char *data, adns_answer *a) {
 		u->ipaddr.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
 		AddStringToList (&av, u->nick, &ac);
 		ModuleEvent (EVENT_GOTNICKIP, av, ac);
+		free (av);
 	}
 }
 #endif

@@ -10,7 +10,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - send_sjoin bug fix where user has no modes (M)
  - IRCu: Fix statserv map (M)
  - IRCu: Umode +g no longer sets auth level (M)
-
+ - Fix mem leak in NICKIP code (M)
+ 
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.15
  - Remove sprotocol_cmd since it is very ircd specfic (M)
  - Initialize me.now at bootup so we do not get random timestamps (M)
