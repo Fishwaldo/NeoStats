@@ -62,6 +62,7 @@ include/Makefile.in -text
 include/auth.h -text
 include/bans.h -text
 include/base64.h -text
+include/botinfo.h -text
 include/bots.h -text
 include/channels.h eol=lf
 include/commands.h -text
@@ -89,9 +90,11 @@ include/ns_help.h eol=lf
 include/nsdba.h -text
 include/nsdbm.h -text
 include/numeric.h -text
+include/numerics.h -text
 include/rtaserv.h -text
 include/servers.h eol=lf
 include/services.h eol=lf
+include/settings.h -text
 include/signals.h -text
 include/sock.h eol=lf
 include/support.h eol=lf
@@ -485,6 +488,7 @@ src/Makefile.in -text
 src/auth.c -text
 src/bans.c -text
 src/base64.c -text
+src/botinfo.c -text
 src/bots.c -text
 src/channels.c eol=lf
 src/commands.c -text
@@ -517,6 +521,7 @@ src/neostats.vcproj -text
 src/ns_help.c eol=lf
 src/nsdba.c -text
 src/nsmemory.c -text
+src/numerics.c -text
 src/oscalls.c -text
 src/protocol/Makefile.am -text
 src/protocol/Makefile.in -text
@@ -568,6 +573,7 @@ src/rtaservers.c -text
 src/rtausers.c -text
 src/servers.c eol=lf
 src/services.c eol=lf
+src/settings.c -text
 src/signals.c -text
 src/sock.c eol=lf
 src/support.c eol=lf

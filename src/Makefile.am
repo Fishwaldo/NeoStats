@@ -8,7 +8,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c nsdba.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c modes.c ctcp.c dcc.c oscalls.c nsmemory.c \
 		rtaserv.c rtabans.c rtachannels.c rtamodules.c rtaservers.c rtausers.c \
-		base64.c
+		base64.c numerics.c settings.c botinfo.c
 AM_CFLAGS = -I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/rta \
 		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE
 neostats_LDADD = $(top_srcdir)/lib/rta/librtadb.a \

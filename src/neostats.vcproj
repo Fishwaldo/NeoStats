@@ -129,6 +129,9 @@
 				RelativePath=".\base64.c">
 			</File>
 			<File
+				RelativePath=".\botinfo.c">
+			</File>
+			<File
 				RelativePath=".\bots.c">
 			</File>
 			<File
@@ -201,6 +204,9 @@
 				RelativePath=".\nsmemory.c">
 			</File>
 			<File
+				RelativePath=".\numerics.c">
+			</File>
+			<File
 				RelativePath=".\oscalls.c">
 			</File>
 			<File
@@ -226,6 +232,9 @@
 			</File>
 			<File
 				RelativePath=".\services.c">
+			</File>
+			<File
+				RelativePath=".\settings.c">
 			</File>
 			<File
 				RelativePath=".\signals.c">
@@ -261,6 +270,9 @@
 			</File>
 			<File
 				RelativePath="..\include\base64.h">
+			</File>
+			<File
+				RelativePath="..\include\botinfo.h">
 			</File>
 			<File
 				RelativePath="..\include\bots.h">
@@ -347,6 +359,9 @@
 				RelativePath="..\include\numeric.h">
 			</File>
 			<File
+				RelativePath="..\include\numerics.h">
+			</File>
+			<File
 				RelativePath="..\..\src\win32\resource.h">
 			</File>
 			<File
@@ -357,6 +372,9 @@
 			</File>
 			<File
 				RelativePath="..\include\services.h">
+			</File>
+			<File
+				RelativePath="..\include\settings.h">
 			</File>
 			<File
 				RelativePath="..\include\signals.h">

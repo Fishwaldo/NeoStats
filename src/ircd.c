@@ -29,6 +29,7 @@
 
 #include "neostats.h"
 #include "ircd.h"
+#include "numerics.h"
 #include "modes.h"
 #include "modules.h"
 #include "dl.h"
@@ -170,16 +171,6 @@ static ircd_sym ircd_sym_table[] =
 	{( void * )&irc_send_setident, "send_setident", 0, 0},
 	{( void * )&irc_send_cloakhost, "cloakhost", 0, 0},
 	{NULL, NULL, 0, 0},
-};
-
-static void m_numeric242( char *origin, char **argv, int argc, int srv );
-static void m_numeric351( char *origin, char **argv, int argc, int srv );
-
-ircd_cmd numeric_cmd_list[] = {
-	/*Message	Token	handler	usage */
-	{"351", "351", m_numeric351, 0},
-	{"242", "242", m_numeric242, 0},
-	{0, 0, 0, 0},
 };
 
 static void IrcdError( char* err )
@@ -637,7 +628,7 @@ void _m_away( char *origin, char **argv, int argc, int srv )
 /** @brief _m_kill
  *
  *  process KILL command
- *	argv[0] = kill victim( s ) - comma separated list
+ *	argv[0] = kill victim(s) - comma separated list
  *	argv[1] = kill path
  *
  *  @param origin source of message (user/server)
@@ -1237,7 +1228,7 @@ int irc_nickchange( const Bot *botptr, const char *newnick )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int  irc_setname( const Bot *botptr, const char* realname )
+int irc_setname( const Bot *botptr, const char* realname )
 {
 	if( !irc_send_setname ) {
 		unsupported_cmd( "SETNAME" );
@@ -1253,7 +1244,7 @@ int  irc_setname( const Bot *botptr, const char* realname )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int  irc_sethost( const Bot *botptr, const char* host )
+int irc_sethost( const Bot *botptr, const char* host )
 {
 	if( !irc_send_sethost ) {
 		unsupported_cmd( "SETNAME" );
@@ -1269,7 +1260,7 @@ int  irc_sethost( const Bot *botptr, const char* host )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int  irc_setident( const Bot *botptr, const char* ident )
+int irc_setident( const Bot *botptr, const char* ident )
 {
 	if( !irc_send_setident ) {
 		unsupported_cmd( "SETNAME" );
@@ -1371,7 +1362,7 @@ int irc_kick( const Bot *botptr, const char *chan, const char *target, const cha
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int  irc_invite( const Bot *botptr, const Client *target, const char *chan ) 
+int irc_invite( const Bot *botptr, const Client *target, const char *chan ) 
 {
 	if( !irc_send_invite ) {
 		unsupported_cmd( "INVITE" );
@@ -1386,7 +1377,7 @@ int  irc_invite( const Bot *botptr, const Client *target, const char *chan )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int  irc_svstime( const Bot *botptr, Client *target, const time_t ts )
+int irc_svstime( const Bot *botptr, Client *target, const time_t ts )
 {
 	if( !irc_send_svstime ) {
 		unsupported_cmd( "SVSTIME" );
@@ -2496,81 +2487,6 @@ void send_cmd( char *fmt, ... )
 	}
 	buflen = strnlen( buf, BUFSIZE );
 	send_to_socket( buf, buflen );
-}
-
-/*  RX: :irc.foo.com 250 NeoStats :Highest connection count: 3( 2 clients )
- *  RX: :irc.foo.com 219 NeoStats u :End of /STATS report
- */
-
-/** @brief m_numeric351
- *
- *  process numeric 351
- *  RX: :irc.foo.com 351 stats.neostats.net Unreal3.2. irc.foo.com :FinWXOoZ [*=2303]
- *
- *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
- *
- *  @return none
- */
-
-static void m_numeric351( char *origin, char **argv, int argc, int srv )
-{
-	Client *s;
-
-	s = FindServer( origin );
-	if( s ) {
-		strlcpy( s->version, argv[1], MAXHOST );
-	}
-}
-
-/** @brief m_numeric242
- *
- *  process numeric 242
- *  RX: :irc.foo.com 242 NeoStats :Server Up 6 days, 23:52:55
- *
- *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
- *
- *  @return none
- */
-
-static void m_numeric242( char *origin, char **argv, int argc, int srv )
-{
-	Client *s;
-
-	s = FindServer( origin );
-	if( s ) {
-		/* Convert "Server Up 6 days, 23:52:55" to seconds*/
-		char *ptr;
-		time_t secs;
-
-		/* Server Up 6 days, 23:52:55 */
-		strtok( argv[argc-1], " " );
-		/* Up 6 days, 23:52:55 */
-		strtok( NULL, " " );
-		/* 6 days, 23:52:55 */
-		ptr = strtok( NULL, " " );
-		secs = atoi( ptr ) * 86400;
-		/* days, 23:52:55 */
-		strtok( NULL, " " );
-		/* , 23:52:55 */
-		ptr = strtok( NULL, "" );
-		/* 23:52:55 */
-		ptr = strtok( ptr , ":" );
-		secs += atoi( ptr )*3600;
-		/* 52:55 */
-		ptr = strtok( NULL, ":" );
-		secs += atoi( ptr )*60;
-		/* 55 */
-		ptr = strtok( NULL, "" );
-		secs += atoi( ptr );
-
-		s->server->uptime = secs;
-	}
 }
 
 /** @brief HaveFeature

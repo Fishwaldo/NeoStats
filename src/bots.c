@@ -31,6 +31,8 @@
 #include "modes.h"
 #include "services.h"
 #include "commands.h"
+#include "botinfo.h"
+#include "settings.h"
 #include "bots.h"
 #include "users.h"
 #include "ctcp.h"

@@ -21,19 +21,12 @@
 ** $Id$
 */
 
-#ifndef _COMMANDS_H_
-#define _COMMANDS_H_
+#ifndef _SETTINGS_H_
+#define _SETTINGS_H_
 
-int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list );
-int del_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list );
-int del_all_bot_cmds( Bot* bot_ptr );
-int run_bot_cmd( CmdParams * cmdparams, int ischancmd );
-int getuserlevel( CmdParams *cmdparams );
-void msg_permission_denied( CmdParams *cmdparams, char *subcommand );
-void msg_error_need_more_params( CmdParams *cmdparams );
-void msg_error_param_out_of_range( CmdParams *cmdparams );
-void msg_syntax_error( CmdParams *cmdparams );
-void msg_unknown_command( CmdParams *cmdparams );
-void msg_only_opers( CmdParams *cmdparams );
+int add_bot_setting_list( Bot *bot_ptr, bot_setting *bot_setting_list );
+int del_bot_setting_list( Bot *bot_ptr, bot_setting *bot_setting_list );
+int del_all_bot_settings( Bot* bot_ptr );
+int bot_cmd_set( CmdParams *cmdparams );
 
-#endif /* _COMMANDS_H_ */
+#endif /* _SETTINGS_H_ */

@@ -10,7 +10,7 @@ noinst_HEADERS		=	commands.h dns.h servers.h users.h conf.h \
 				bans.h base64.h ctcp.h ircd.h ns_help.h support.h \
 				bots.h dcc.h ircstring.h numeric.h timer.h \
 				channels.h dl.h lang.h rtaserv.h transfer.h nsdbm.h \
-				nsdba.h main.h
+				nsdba.h main.h numerics.h settings.h botinfo.h
 
 version.h:
 	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
