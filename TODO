@@ -4,9 +4,5 @@ NeoStats - TODO Log:
 
 Shmad:
 ------
-- Make the makeconf even more idiot proof.. someone has been breading bigger idiots lately.
 
-- ConnectServ, cs.h ifdef for ircd type so it states proper modes.
-
-- Port ALL modules.
-
+- Just Bug fixes right now.
