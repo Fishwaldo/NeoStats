@@ -39,7 +39,7 @@
 #define __attribute__(x)  /* NOTHING */
 #endif
 #endif
-#include "ircstring.h"
+#include "stats.h"
 
 /* buffer for itoa conversion 
  * int ranges from 
