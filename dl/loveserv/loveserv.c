@@ -79,16 +79,16 @@ Functions __module_functions[] = {
 static bot_cmd ls_commands[]=
 {
 	{"ABOUT",		ls_about,		0, 	0,	ls_help_about,		1,	ls_help_about_oneline },
-	{"ROSE",		ls_rose,		0, 	0,	ls_help_rose,		1,	ls_help_rose_oneline },
-	{"KISS",		ls_kiss,		0, 	0,	ls_help_kiss,		1,	ls_help_kiss_oneline },
-	{"TONSIL",		ls_tonsil,		0, 	0,	ls_help_tonsil,		1,	ls_help_tonsil_oneline },
-	{"HUG",			ls_hug,			0, 	0,	ls_help_hug,		1,	ls_help_hug_oneline },
-	{"ADMIRER",		ls_admirer,		0, 	0,	ls_help_admirer,	1,	ls_help_admirer_oneline },
-	{"CHOCOLATE",	ls_choco,		0, 	0,	ls_help_chocolate,	1,	ls_help_chocolate_oneline },
-	{"CANDY",		ls_candy,		0, 	0,	ls_help_candy,		1,	ls_help_candy_oneline },
-	{"LOVENOTE",	ls_lovenote,	0, 	0,	ls_help_lovenote,	1,	ls_help_lovenote_oneline },
-	{"APOLOGY",		ls_apology,		0, 	0,	ls_help_apology,	1,	ls_help_apology_oneline },
-	{"THANKYOU",	ls_thankyou,	0, 	0,	ls_help_thankyou,	1,	ls_help_thankyou_oneline },
+	{"ROSE",		ls_rose,		1, 	0,	ls_help_rose,		1,	ls_help_rose_oneline },
+	{"KISS",		ls_kiss,		1, 	0,	ls_help_kiss,		1,	ls_help_kiss_oneline },
+	{"TONSIL",		ls_tonsil,		1, 	0,	ls_help_tonsil,		1,	ls_help_tonsil_oneline },
+	{"HUG",			ls_hug,			1, 	0,	ls_help_hug,		1,	ls_help_hug_oneline },
+	{"ADMIRER",		ls_admirer,		1, 	0,	ls_help_admirer,	1,	ls_help_admirer_oneline },
+	{"CHOCOLATE",	ls_choco,		1, 	0,	ls_help_chocolate,	1,	ls_help_chocolate_oneline },
+	{"CANDY",		ls_candy,		1, 	0,	ls_help_candy,		1,	ls_help_candy_oneline },
+	{"LOVENOTE",	ls_lovenote,	2, 	0,	ls_help_lovenote,	1,	ls_help_lovenote_oneline },
+	{"APOLOGY",		ls_apology,		2, 	0,	ls_help_apology,	1,	ls_help_apology_oneline },
+	{"THANKYOU",	ls_thankyou,	2, 	0,	ls_help_thankyou,	1,	ls_help_thankyou_oneline },
 	{"VERSION",		ls_version,		0, 	0,	ls_help_version,	1,	ls_help_version_oneline },
 	{NULL,			NULL,			0, 	0,	NULL, 				0,	NULL}
 };
@@ -119,15 +119,8 @@ void __ModFini()
 static int ls_rose(User * u, char **av, int ac)
 {
 	char *cmd;
+
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_LoveServ,
-			"Syntax: /msg %s ROSE NICK", s_LoveServ);
-		prefmsg(u->nick, s_LoveServ,
-			"For additional help: /msg %s HELP",
-			s_LoveServ);
-		return -1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
@@ -153,15 +146,8 @@ static int ls_rose(User * u, char **av, int ac)
 static int ls_kiss(User * u, char **av, int ac)
 {
 	char *cmd;
+
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_LoveServ,
-			"Syntax: /msg %s KISS NICK", s_LoveServ);
-		prefmsg(u->nick, s_LoveServ,
-			"For additional help: /msg %s HELP",
-			s_LoveServ);
-		return -1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
@@ -184,15 +170,8 @@ static int ls_kiss(User * u, char **av, int ac)
 static int ls_tonsil(User * u, char **av, int ac)
 {
 	char *cmd;
+
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_LoveServ,
-			"Syntax: /msg %s TONSIL NICK", s_LoveServ);
-		prefmsg(u->nick, s_LoveServ,
-			"For additional help: /msg %s HELP",
-			s_LoveServ);
-		return -1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
@@ -219,15 +198,8 @@ static int ls_tonsil(User * u, char **av, int ac)
 static int ls_hug(User * u, char **av, int ac)
 {
 	char *cmd;
+
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_LoveServ,
-			"Syntax: /msg %s HUG NICK", s_LoveServ);
-		prefmsg(u->nick, s_LoveServ,
-			"For additional help: /msg %s HELP",
-			s_LoveServ);
-		return -1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
@@ -251,16 +223,8 @@ static int ls_hug(User * u, char **av, int ac)
 static int ls_admirer(User * u, char **av, int ac)
 {
 	char *cmd;
+
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_LoveServ,
-			"Syntax: /msg %s ADMIRER NICK",
-			s_LoveServ);
-		prefmsg(u->nick, s_LoveServ,
-			"For additional help: /msg %s HELP",
-			s_LoveServ);
-		return -1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
@@ -284,16 +248,8 @@ static int ls_admirer(User * u, char **av, int ac)
 static int ls_choco(User * u, char **av, int ac)
 {
 	char *cmd;
+
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_LoveServ,
-			"Syntax: /msg %s CHOCOLATE NICK",
-			s_LoveServ);
-		prefmsg(u->nick, s_LoveServ,
-			"For additional help: /msg %s HELP",
-			s_LoveServ);
-		return -1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
@@ -320,15 +276,8 @@ static int ls_choco(User * u, char **av, int ac)
 static int ls_candy(User * u, char **av, int ac)
 {
 	char *cmd;
+
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_LoveServ,
-			"Syntax: /msg %s CANDY NICK", s_LoveServ);
-		prefmsg(u->nick, s_LoveServ,
-			"For additional help: /msg %s HELP",
-			s_LoveServ);
-		return -1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
@@ -357,16 +306,8 @@ static int ls_lovenote(User * u, char **av, int ac)
 {
 	char *cmd;
 	char *m;
+
 	SET_SEGV_LOCATION();
-	if (ac < 4) {
-		prefmsg(u->nick, s_LoveServ,
-			"Syntax: /msg %s LOVENOTE NICK NOTE",
-			s_LoveServ);
-		prefmsg(u->nick, s_LoveServ,
-			"For additional help: /msg %s HELP",
-			s_LoveServ);
-		return -1;
-	}
 	m = av[2];
 	cmd = joinbuf(av, ac, 3);
 	if (!strcasecmp(cmd, s_LoveServ)) {
@@ -398,16 +339,8 @@ static int ls_apology(User * u, char **av, int ac)
 {
 	char *cmd;
 	char *m;
+
 	SET_SEGV_LOCATION();
-	if (ac < 4) {
-		prefmsg(u->nick, s_LoveServ,
-			"Syntax: /msg %s APOLOGY NICK APOLOGY-REASON",
-			s_LoveServ);
-		prefmsg(u->nick, s_LoveServ,
-			"For additional help: /msg %s HELP",
-			s_LoveServ);
-		return -1;
-	}
 	m = av[2];
 	cmd = joinbuf(av, ac, 3);
 	if (!strcasecmp(cmd, s_LoveServ)) {
@@ -439,16 +372,8 @@ static int ls_thankyou(User * u, char **av, int ac)
 {
 	char *cmd;
 	char *m;
+
 	SET_SEGV_LOCATION();
-	if (ac < 4) {
-		prefmsg(u->nick, s_LoveServ,
-			"Syntax: /msg %s THANKYOU NICK THANKYOU-REASON",
-			s_LoveServ);
-		prefmsg(u->nick, s_LoveServ,
-			"For additional help: /msg %s HELP",
-			s_LoveServ);
-		return -1;
-	}
 	m = av[2];
 	cmd = joinbuf(av, ac, 3);
 	if (!strcasecmp(cmd, s_LoveServ)) {

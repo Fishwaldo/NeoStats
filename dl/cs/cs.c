@@ -179,7 +179,7 @@ Functions __module_functions[] = {
 
 static bot_cmd cs_commands[]=
 {
-	{"SET",			cs_set,			0, 	NS_ULEVEL_ADMIN,	cs_help_set, 	1, 	cs_help_set_oneline },
+	{"SET",			cs_set,			1, 	NS_ULEVEL_ADMIN,	cs_help_set, 	1, 	cs_help_set_oneline },
 	{"ABOUT",		cs_about,		0, 	NS_ULEVEL_ADMIN,	cs_help_about, 	1, 	cs_help_about_oneline },
 	{"VERSION",		cs_version,		0, 	NS_ULEVEL_ADMIN,	cs_help_version,1, 	cs_help_version_oneline },
 	{NULL,			NULL,			0, 	0,			NULL, 			0,	NULL}
@@ -193,11 +193,6 @@ static int cs_about(User * u, char **av, int ac)
 
 static int cs_set(User * u, char **av, int ac)
 {
-	if (ac < 3) {
-		prefmsg(u->nick, s_ConnectServ,
-			"Invalid Syntax. /msg %s help set for more info",
-			s_ConnectServ);
-		return 0;
 #if 0
 /* work in progress */
 	} else if (!strcasecmp(av[2], "NICK")) {

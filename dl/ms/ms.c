@@ -74,16 +74,16 @@ Functions __module_functions[] = {
 
 static bot_cmd ms_commands[]=
 {
-	{"HAIL",		ms_hail,		0, 	0,	ms_help_hail,		1,	ms_help_hail_oneline },
-	{"ODE",			ms_ode,			0, 	0,	ms_help_ode,		1,	ms_help_ode_oneline },
-	{"LAPDANCE",	ms_lapdance,	0, 	0,	ms_help_lapdance,	1,	ms_help_lapdance_oneline },
+	{"HAIL",		ms_hail,		2, 	0,	ms_help_hail,		1,	ms_help_hail_oneline },
+	{"ODE",			ms_ode,			2, 	0,	ms_help_ode,		1,	ms_help_ode_oneline },
+	{"LAPDANCE",	ms_lapdance,	1, 	0,	ms_help_lapdance,	1,	ms_help_lapdance_oneline },
 	{"VERSION",		ms_version,		0, 	0,	ms_help_version,	1,	ms_help_version_oneline },
 	{"ABOUT",		ms_about,		0, 	0,	ms_help_about,		1,	ms_help_about_oneline },
-	{"POEM",		ms_poem,		0, 	0,	ms_help_poem,		1,	ms_help_poem_oneline },
-	{"REDNECK",		ms_redneck,		0, 	0,	ms_help_redneck,	1,	ms_help_redneck_oneline },
-	{"CHEERUP",		ms_cheerup,		0, 	0,	ms_help_cheerup,	1,	ms_help_cheerup_oneline },
-	{"BEHAPPY",		ms_behappy,		0, 	0,	ms_help_behappy,	1,	ms_help_behappy_oneline },
-	{"WONDERFUL",	ms_wonderful,	0, 	0,	ms_help_wonderful,	1,	ms_help_wonderful_oneline },
+	{"POEM",		ms_poem,		2, 	0,	ms_help_poem,		1,	ms_help_poem_oneline },
+	{"REDNECK",		ms_redneck,		1, 	0,	ms_help_redneck,	1,	ms_help_redneck_oneline },
+	{"CHEERUP",		ms_cheerup,		1, 	0,	ms_help_cheerup,	1,	ms_help_cheerup_oneline },
+	{"BEHAPPY",		ms_behappy,		1, 	0,	ms_help_behappy,	1,	ms_help_behappy_oneline },
+	{"WONDERFUL",	ms_wonderful,	1, 	0,	ms_help_wonderful,	1,	ms_help_wonderful_oneline },
 	{NULL,			NULL,			0, 	0,			NULL, 		0,	NULL}
 };
 
@@ -122,15 +122,6 @@ static int ms_hail(User * u, char **av, int ac)
 	char *m;
 
 	SET_SEGV_LOCATION();
-	if (ac < 4) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Syntax: /msg %s HAIL <WHO TO HAIL> <NICK TO SEND HAIL TO>",
-			s_MoraleServ);
-		prefmsg(u->nick, s_MoraleServ,
-			"For additional help: /msg %s HELP",
-			s_MoraleServ);
-		return 1;
-	}
 	cmd = av[2];
 	m = av[3];
 	if (!strcasecmp(m, s_MoraleServ)) {
@@ -170,15 +161,6 @@ static int ms_lapdance(User * u, char **av, int ac)
 	char *cmd;
 	
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Syntax: /msg %s LAPDANCE <NICK>",
-			s_MoraleServ);
-		prefmsg(u->nick, s_MoraleServ,
-			"For additional help: /msg %s HELP",
-			s_MoraleServ);
-		return 1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
@@ -208,7 +190,6 @@ static int ms_lapdance(User * u, char **av, int ac)
 		  u->nick, cmd);
 	nlog(LOG_NORMAL, LOG_MOD,
 	     "%s Wanted a LAPDANCE to be preformed on %s", u->nick, cmd);
-
 	return 1;
 }
 
@@ -218,17 +199,8 @@ static int ms_ode(User * u, char **av, int ac)
 {
 	char *cmd;
 	char *m;
-	SET_SEGV_LOCATION();
 
-	if (ac < 4) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Syntax: /msg %s ODE <WHO THE ODE ODE IS ABOUT> <NICK TO SEND ODE TO>",
-			s_MoraleServ);
-		prefmsg(u->nick, s_MoraleServ,
-			"For additional help: /msg %s HELP",
-			s_MoraleServ);
-		return 1;
-	}
+	SET_SEGV_LOCATION();
 	cmd = av[2];
 	m = av[3];
 	if (!m) {
@@ -306,15 +278,6 @@ static int ms_poem(User * u, char **av, int ac)
 	char *cmd;
 	char *m;
 	SET_SEGV_LOCATION();
-	if (ac < 4) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Syntax: /msg %s POEM <WHO THE POEM IS ABOUT> <NICK TO SEND TO>",
-			s_MoraleServ);
-		prefmsg(u->nick, s_MoraleServ,
-			"For additional help: /msg %s HELP",
-			s_MoraleServ);
-		return 1;
-	}
 	cmd = av[2];
 	m = av[3];
 	if (!m) {
@@ -364,15 +327,6 @@ static int ms_redneck(User * u, char **av, int ac)
 {
 	char *cmd;
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Syntax: /msg %s REDNECK <NICK>",
-			s_MoraleServ);
-		prefmsg(u->nick, s_MoraleServ,
-			"For additional help: /msg %s HELP",
-			s_MoraleServ);
-		return 1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
@@ -412,15 +366,6 @@ static int ms_cheerup(User * u, char **av, int ac)
 {
 	char *cmd;
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Syntax: /msg %s CHEERUP <NICK>",
-			s_MoraleServ);
-		prefmsg(u->nick, s_MoraleServ,
-			"For additional help: /msg %s HELP",
-			s_MoraleServ);
-		return 1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
@@ -453,15 +398,6 @@ static int ms_behappy(User * u, char **av, int ac)
 {
 	char *cmd;
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Syntax: /msg %s BEHAPPY <NICK>",
-			s_MoraleServ);
-		prefmsg(u->nick, s_MoraleServ,
-			"For additional help: /msg %s HELP",
-			s_MoraleServ);
-		return 1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
@@ -543,15 +479,6 @@ static int ms_wonderful(User * u, char **av, int ac)
 {
 	char *cmd;
 	SET_SEGV_LOCATION();
-	if (ac < 3) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Syntax: /msg %s WONDERFUL <NICK>",
-			s_MoraleServ);
-		prefmsg(u->nick, s_MoraleServ,
-			"For additional help: /msg %s HELP",
-			s_MoraleServ);
-		return 1;
-	}
 	cmd = av[2];
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
