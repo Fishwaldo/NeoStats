@@ -168,8 +168,8 @@ void
 AddStringToList (char ***List, char S[], int *C)
 {
 	if (*C == 0) {
-		*List = calloc (sizeof (char *) * 20, 1);
-	} else if (*C >= 20) {
+		*List = calloc (sizeof (char *) * 30, 1);
+	} else if (*C >= 30) {
 		nlog(LOG_CRITICAL, LOG_CORE, "AddStringToList is full. Not Adding");
 		return;
 	}

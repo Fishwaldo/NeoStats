@@ -13,9 +13,10 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Log message when no configured modules in neostats.cfg (M)
  - UMODE_CH_xxxx defines for Smodes changed to SMODE_CH_xxxx (M)
  - Fix a off by one error in quit messages (F)
-
+ - Temp fix for kick_chan when its a server performing the kick (BugID 108) (F)
+ - Increaes Storage Size for AddStringToList (F)
+ 
 * NeoStats * Fish (F) * Version 2.5.14
- - Temp fix for kick_chan when its a server performing the kick (BugID 108)
  - Fix a bug with HostServ unable to load the database
 
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.13
