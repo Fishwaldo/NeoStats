@@ -78,7 +78,7 @@ Functions __module_functions[] = {
  */
 int __ChanMessage(char *origin, char **argv, int argc)
 {
-	char *chan = av[0];
+	char *chan = argv[0];
 	return 1;
 }
 
