@@ -216,7 +216,12 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 #else
 	sjoin_cmd(who, chan);
 	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN)
+#if defined(IRCU)
+		schmode_cmd(who, chan, "+o", getnumfromnick(who));
+#else
 		schmode_cmd(who, chan, "+o", who);
+#endif
+
 #endif
 	SET_SEGV_INMODULE(savemod);
 	return NS_SUCCESS;
