@@ -40,6 +40,10 @@
 hash_t *uh;
 
 static User *new_user (const char *nick);
+#ifdef BASE64NICKNAME
+void
+setusernumeric (const char *nick, const char* num)
+#endif
 
 static char quitreason[BUFSIZE];
 
@@ -133,7 +137,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 
 #ifdef BASE64NICKNAME
 	if(numeric) {
-		setusernumeric (u->nick, argv[argc-2]);
+		setusernumeric (u->nick, numeric);
 	}
 #endif
 
