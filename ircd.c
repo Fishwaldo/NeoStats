@@ -517,6 +517,9 @@ joinbuf (char **av, int ac, int from)
 void 
 m_notice (char* origin, char **av, int ac, int cmdptr)
 {
+	int i;
+	int splitargc;
+	char **splitargv;
 	int argc;
 	char **argv;
 
@@ -527,7 +530,12 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 	}
 	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
 	strlcpy (privmsgbuffer, av[ac-1], BUFSIZE);
-	argc = split_buf (av[ac-1], &argv, 1);
+	splitargc = split_buf (av[ac-1], &splitargv, 0);
+	argc = 0;
+	AddStringToList (&argv, av[0], &argc);
+	for( i = 0 ; i < splitargc ; i++ ) {
+		AddStringToList (&argv, splitargv[i], &argc);
+	}
 	ModuleFunction (cmdptr, MSG_NOTICE, origin, argv, argc);
 	free (argv);
 	argc = 0;
