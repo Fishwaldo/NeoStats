@@ -41,4 +41,10 @@ CommandLine options:
 	Several Commandline options are now available to help you control
 	the way that NeoStats starts up. Type "./neostats -h" for a list.
 
+3rd Party Modules:
+	All 3rd Party Modules (Those not included with this Distribution,
+	such as opsb or StupidServ) need to be recompiled. If your a 3rd 
+	Party Module Author, you should be aware that you need to change 
+	your module to use nlog now, instead of log
+
 Read the ChangeLog for a complete description of what has changed

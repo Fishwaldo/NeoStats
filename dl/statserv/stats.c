@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.35 2003/04/17 13:48:25 fishwaldo Exp $
+** $Id: stats.c,v 1.36 2003/05/05 14:42:18 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -33,6 +33,9 @@ int ok_to_wallop() {
 	if (StatServ.newdb || !StatServ.onchan || !me.synced) {
 		return -1;
 	}
+	/* -1 means all wallops disabled */
+	if (StatServ.interval == -1)
+		return -1;
 	if (time(NULL) - lasttime < StatServ.interval) {
 		if (++count > 5)
 			return -1;

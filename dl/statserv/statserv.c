@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.62 2003/04/17 13:48:25 fishwaldo Exp $
+** $Id: statserv.c,v 1.63 2003/05/05 14:42:19 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -141,7 +141,6 @@ void ss_Config() {
 	if (GetConf((void *)&StatServ.interval, CFGINT, "Wallop_Throttle") < 0) {
 		StatServ.interval = 0;
 	}
-	
 }
 
 
@@ -395,15 +394,22 @@ static void ss_set(User *u, char **av, int ac) {
  			prefmsg(u->nick, s_StatServ, "Invalid Syntax. /msg %s help set for more info", s_StatServ);
  			return;
  		}
- 		StatServ.interval = atoi(av[3]);
-		if (StatServ.interval <= 0) {
-	 		prefmsg(u->nick, s_StatServ, "Wallop Throttles are disabled");
-	 		chanalert(s_StatServ, "%s disabled Wallop Throttling", u->nick);
-	 		StatServ.interval = 0;
-	 	} else {
-	 		prefmsg(u->nick, s_StatServ, "Wallop Throttle is now set to 5 messages per %d Seconds", StatServ.interval);
-	 		chanalert(s_StatServ, "%s set Wallop Throttle to 5 messages per %d Seconds", u->nick, StatServ.interval);
-	 	}
+		if (!strcasecmp(av[3], "off")) {
+	 			prefmsg(u->nick, s_StatServ, "Record Yelling is Now Disabled. ");
+	 			chanalert(s_StatServ, "%s disabled Record Broadcasts", u->nick);
+			StatServ.interval = -1;
+		} else {
+	 		StatServ.interval = atoi(av[3]);
+			/* atoi will = 0 if av[3] != isnumeric */
+			if (StatServ.interval <= 0) {
+	 			prefmsg(u->nick, s_StatServ, "Wallop Throttles are disabled");
+	 			chanalert(s_StatServ, "%s disabled Wallop Throttling", u->nick);
+		 		StatServ.interval = 0;
+		 	} else {
+	 			prefmsg(u->nick, s_StatServ, "Wallop Throttle is now set to 5 messages per %d Seconds", StatServ.interval);
+	 			chanalert(s_StatServ, "%s set Wallop Throttle to 5 messages per %d Seconds", u->nick, StatServ.interval);
+		 	}
+		}
 	 	SetConf((void *)StatServ.interval, CFGINT, "Wallop_Throttle");
 	 	return;
 	 } else if (!strcasecmp(av[2], "HTMLPATH")) {

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ss_help.c,v 1.7 2003/04/17 13:48:24 fishwaldo Exp $
+** $Id: ss_help.c,v 1.8 2003/05/05 14:42:16 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -70,9 +70,10 @@ const char *ss_set_help[] = {
 "\2HTML\2", 
 "Toggle HTML Statistics Generation on/off",
 "",
-"\2MSGTHROTTLE <seconds>\2",
+"\2MSGTHROTTLE [<seconds>/off]\2",
 "if <seconds> is greater than 0, then set 5 Wallops per <seconds> throttle",
 "if <seconds> is equal to 0, then disable Wallop Throttling",
+"if \"off\" then all Wallops are disabled",
 "",
 "\2LAGWALLOP <seconds>\2",
 "if <seconds> is greater than 0, then when servers are lagged by this many seconds, issue a warning",

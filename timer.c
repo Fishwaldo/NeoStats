@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: timer.c,v 1.21 2003/04/11 09:26:31 fishwaldo Exp $
+** $Id: timer.c,v 1.22 2003/05/05 14:42:16 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -50,7 +50,7 @@ void chk()
 			strcpy(segvinmodule, mod_ptr->modname);
 			if (setjmp(sigvbuf) == 0) {
 				mod_ptr->function();
-				mod_ptr->lastrun = time(NULL);
+				mod_ptr->lastrun = (int)time(NULL);
 			} else {
 				nlog(LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", mod_ptr->modname);
 			}
