@@ -33,6 +33,7 @@ static void hs_add(User *u, char *cmd, char *m, char *h);
 static void hs_list(User *u);
 static void hs_view(User *u, int tmpint);
 static void hs_del(User *u, int tmpint);
+static int new_m_version(char *origin, char **av, int ac);
 
 void hslog(char *, ...);
 void hsdat(char *, ...);
@@ -49,14 +50,15 @@ int LoadArryCount = 0;
 int DelArryCount = 0;
 int ListArryCount = 0;
 
-Module_Info my_info[] = { {
+Module_Info HostServ_info[] = { {
     "HostServ",
     "Network User Virtual Host Service",
     "2.0"
 } };
 
-int new_m_version(char *av, char *tmp) {
-    snumeric_cmd(351, av, "Module HostServ Loaded, Version: %s %s %s",my_info[0].module_version,hsversion_date,hsversion_time);
+
+int new_m_version(char *origin, char **av, int ac) {
+    snumeric_cmd(351, origin, "Module HostServ Loaded, Version: %s %s %s",HostServ_info[0].module_version,hsversion_date,hsversion_time);
     return 0;
 }
 
@@ -91,9 +93,9 @@ static int hs_sign_on(char **av, int ac) {
 return 1;
 }
 
-
-Functions my_fn_list[] = { 
-    { "VERSION",    new_m_version,    1 },
+Functions HostServ_fn_list[] = { 
+    { MSG_VERSION,  new_m_version,  1 },
+    { TOK_VERSION,  new_m_version,  1 },
     { NULL,        NULL,     0}
 };
 
@@ -173,32 +175,31 @@ int __Bot_Message(char *origin, char **av, int ac)
 
 }
 
-int Online(Server *data) {
-
-    if (init_bot(s_HostServ,"HostServ",me.name,"Network User Virtual Host Service", "+oikSdwgleq-x", my_info[0].module_name) == -1 ) {
+int Online(char **av, int ac) {
+    if (init_bot(s_HostServ,"HostServ",me.name,"Network User Virtual Host Service", "+oikSdwgleq-x", HostServ_info[0].module_name) == -1 ) {
         /* Nick was in use */
         s_HostServ = strcat(s_HostServ, "_");
-        init_bot(s_HostServ,"HostServ",me.name,"Network User Virtual Host Service", "+oikSdwgleq-x", my_info[0].module_name);
+        init_bot(s_HostServ,"HostServ",me.name,"Network User Virtual Host Service", "+oikSdwgleq-x", HostServ_info[0].module_name);
     }
     return 1;
 };
 
-EventFnList my_event_list[] = {
+EventFnList HostServ_Event_list[] = {
     { "ONLINE", Online},
     { "SIGNON", hs_sign_on},
     { NULL, NULL}
 };
 
 Module_Info *__module_get_info() {
-    return my_info;
+    return HostServ_info;
 };
 
 Functions *__module_get_functions() {
-    return my_fn_list;
+    return HostServ_fn_list;
 };
 
 EventFnList *__module_get_events() {
-    return my_event_list;
+    return HostServ_Event_list;
 };
 
 

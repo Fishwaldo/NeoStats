@@ -37,6 +37,7 @@ static void ms_wonderful(User *u, char *cmd);
 static void ms_reset(User *u);
 static void ms_logbackup(User *u);
 static void ms_printfile(User *u, char *cmd);
+static int new_m_version(char *origin, char **av, int ac);
 
 void mslog(char *, ...);
 void lovelogs(char *, ...);
@@ -48,14 +49,15 @@ Module_Info my_info[] = { {
 } };
 
 
-int new_m_version(char *av, char *tmp) {
-    snumeric_cmd(351, av, "Module MoraleServ Loaded, Version: %s %s %s",my_info[0].module_version,msversion_date,msversion_time);
+int new_m_version(char *origin, char **av, int ac) {
+    snumeric_cmd(351, origin, "Module MoraleServ Loaded, Version: %s %s %s",my_info[0].module_version,msversion_date,msversion_time);
     return 0;
 }
 
 Functions my_fn_list[] = {
-    { "VERSION",    new_m_version,    1 },
-    { NULL,        NULL,        0 }
+        { MSG_VERSION,  new_m_version,  1 },
+        { TOK_VERSION,  new_m_version,  1 },
+	{ NULL,        NULL,        0 }
 };
 
 
@@ -288,8 +290,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 
 }
 
-int Online(Server *data) {
-
+int Online(char **av, int ac) {
     if (init_bot(s_MoraleServ,"MoraleServ",me.name,"A Network Morale Service", "+Sqd-x", my_info[0].module_name) == -1 ) {
         /* Nick was in use */
         s_MoraleServ = strcat(s_MoraleServ, "_");

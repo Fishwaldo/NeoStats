@@ -28,6 +28,7 @@ static void ls_apology(User *u, char *cmd, char *m);
 static void ls_thankyou(User *u, char *cmd, char *m);
 static void ls_version(User *u);
 static void ls_viewlogs(User *u);
+static int new_m_version(char *origin, char **av, int ac);
 
 void lslog(char *, ...);
 
@@ -37,14 +38,15 @@ Module_Info my_info[] = { {
     "1.5"
 } };
 
-int new_m_version(char *av, char *tmp) {
-    snumeric_cmd(351, av, "Module LoveServ Loaded, Version: %s %s %s",my_info[0].module_version,loveversion_date,loveversion_time);
+int new_m_version(char *origin, char **av, int ac) {
+    snumeric_cmd(351, origin, "Module LoveServ Loaded, Version: %s %s %s",my_info[0].module_version,loveversion_date,loveversion_time);
     return 0;
 }
 
 Functions my_fn_list[] = {
-    { "VERSION",    new_m_version,    1 },
-    { NULL,        NULL,        0 }
+        { MSG_VERSION,  new_m_version,  1 },
+        { TOK_VERSION,  new_m_version,  1 },
+	{ NULL,        NULL,        0 }
 };
 
 
@@ -190,8 +192,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 }
 
 
-int Online(Server *data) {
-
+int Online(char **av, int ac) {
     if (init_bot(s_LoveServ,"love",me.name,"Network Love Service", "+Sqd-x", my_info[0].module_name) == -1 ) {
         /* Nick was in use!!!! */
         s_LoveServ = strcat(s_LoveServ, "_");

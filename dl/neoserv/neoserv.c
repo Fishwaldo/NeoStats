@@ -21,6 +21,7 @@ static void neoserv_send(User *u, char *cmd, char *m);
 void neoservlog(char *, ...);
 static void neoserv_viewlog(User *u);
 static void neoserv_logbackup(User *u);
+static int new_m_version(char *origin, char **av, int ac);
 
 Module_Info my_info[] = { {
     "NeoServ",
@@ -29,15 +30,16 @@ Module_Info my_info[] = { {
 } };
 
 
-int new_m_version(char *av, char *tmp) {
-    snumeric_cmd(351, av, "Module NeoServ Loaded, Version: %s %s %s",my_info[0].module_version,neoservversion_date,neoservversion_time);
+int new_m_version(char *origin, char **av, int ac) {
+    snumeric_cmd(351, origin, "Module NeoServ Loaded, Version: %s %s %s",my_info[0].module_version,neoservversion_date,neoservversion_time);
     return 0;
 }
 
 
 Functions my_fn_list[] = {
-    { "VERSION",    new_m_version,    1 },
-    { NULL,        NULL,        0 }
+        { MSG_VERSION,  new_m_version,  1 },
+        { TOK_VERSION,  new_m_version,  1 },
+	{ NULL,        NULL,        0 }
 };
 
 
@@ -220,8 +222,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 }
 
 
-int Online(Server *data) {
-
+int Online(char **av, int ac) {
     if (init_bot(s_NeoServ,"NeoServ",me.name,"Network NeoStats Help Service", "+Sqd-x", my_info[0].module_name) == -1 ) {
         /* Nick was in use!!!! */
         s_NeoServ = strcat(s_NeoServ, "_");

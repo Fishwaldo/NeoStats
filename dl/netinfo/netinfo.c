@@ -49,10 +49,10 @@ char Message[255];
 
 void Loadconfig();
 void Saveconfig();
-static int s_sign_on(User *);
-static int s_mode(User *);
+static int s_sign_on(char **av, int ac);
+static int s_mode(char **av, int ac);
 int checktld(char *data);
-
+static int new_m_version(char *origin, char **av, int ac);
 
 
 Module_Info my_info[] = { {
@@ -65,12 +65,16 @@ Module_Info my_info[] = { {
 ** Run when someone signs onto the network 
 ** and it was a simple hack to put in the channel support :)
 */
-static int s_sign_on(User *u) {
+static int s_sign_on(char **av, int ac) {
 	NI_Map *map;
 	NI_Ignore *ignore;
 	char *tmp = NULL;
 	char *tmpident = NULL;
 	char *tmphost = NULL;
+    User *u;
+    /* Approximate Segfault Location */
+    strcpy(segv_location, "Netinfo-s_sign_on");
+    u = finduser(av[0]);
 
 	if (findbot(u->nick)) return 1;
 	/* make tmphost contain ident and host */
@@ -91,22 +95,28 @@ static int s_sign_on(User *u) {
 	/* Now lets figure out what channel to join them */		
 	for (map = tldmap; map; map = map->next) {
 		if (fnmatch(map->tld, strlower(u->hostname), 0) == 0) {
-			sts(":%s SVSJOIN %s %s", me.name, u->nick, map->channel);
-			sts(":%s NOTICE %s :%s", s_Netinfo, u->nick, map->Message);
+			ssvsjoin_cmd(u->nick, map->channel);
+			prefmsg(u->nick, s_Netinfo, "%s", map->Message);
 			return 1;
 		}
 	}
 
 	/* ok, the didnt fall into any defined tld, join them to the Default channel. */
 	
-	sts(":%s SVSJOIN %s %s", me.name, u->nick, Nchannel);
-	sts(":%s NOTICE %s :%s", s_Netinfo, u->nick, Message);
+	ssvsjoin_cmd(u->nick, Nchannel);
+	prefmsg(u->nick, s_Netinfo, "%s", Message);
 	return 1;
 }
 
-static int s_mode(User *u) {
+static int s_mode(char **av, int ac) {
 	char *modes;
 	int add = 0;
+	User *u;
+
+	/* Approximate Segfault Location */
+	strcpy(segv_location, "Netinfo-s_mode");
+	u = finduser(av[0]);
+
 
 	if (findbot(u->nick)) return 1;
 	modes = u->modes;
@@ -116,20 +126,21 @@ static int s_mode(User *u) {
 			case 'O':
 			case 'o':
 				if (add) {
-					sts(":%s svsjoin %s %s", s_Netinfo, u->nick, Ochannel);
+					ssvsjoin_cmd(u->nick, Ochannel);
 				}
 		}
 	}
 	return 1;
 }
 
-int new_m_version(char *av, char *tmp) {
-	sts(":%s 351 %s :Module NetInfo Loaded, Version: %s %s %s",me.name,av,my_info[0].module_version,netversion_date,netversion_time);
+int new_m_version(char *origin, char **av, int ac) {
+        snumeric_cmd(351, origin, "Module Netinfo Loaded, Version: %s %s %s", my_info[0].module_version,netversion_date,netversion_time);
 	return 0;
 }
 
 Functions my_fn_list[] = {
-	{ "VERSION",	new_m_version,	1 },
+        { MSG_VERSION,  new_m_version,  1 },
+        { TOK_VERSION,  new_m_version,  1 },
 	{ NULL,		NULL,		0 }
 };
 
@@ -159,93 +170,93 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 					for (ignore = nickignore; ignore; ignore = ignore->next) {
 						if (fnmatch(ignore->nick, strlower(u->nick),0) == 0) {
 							/* got a nick Match */
-							privmsg(u->nick, s_Netinfo, "Your NickName will not be AutoJoined");
+							prefmsg(u->nick, s_Netinfo, "Your NickName will not be AutoJoined");
 							break;
 						} else {
-							privmsg(u->nick, s_Netinfo, "Your Nickname will be AutoJoined to a Channel");
+							prefmsg(u->nick, s_Netinfo, "Your Nickname will be AutoJoined to a Channel");
 						}
 					}
 				} else {
-					privmsg(u->nick, s_Netinfo, "You must Either Register your Nick with Nickserv, or Register your Nick with Services (/msg nickserv help register");
+					prefmsg(u->nick, s_Netinfo, "You must Either Register your Nick with Nickserv, or Register your Nick with Services (/msg nickserv help register");
 				}
 				if (UserLevel(u) >= 150) {
-					privmsg(u->nick, s_Netinfo, "/2Also available to Net Administrators:/2");
-					privmsg(u->nick, s_Netinfo, "/msg %s show map -> Shows Current Domain to Channel Mapping", s_Netinfo);
-					privmsg(u->nick, s_Netinfo, "/msg %s show ignore -> Shows Current Nicks/Hosts to Not AutoJoin", s_Netinfo);
+					prefmsg(u->nick, s_Netinfo, "/2Also available to Net Administrators:/2");
+					prefmsg(u->nick, s_Netinfo, "/msg %s show map -> Shows Current Domain to Channel Mapping", s_Netinfo);
+					prefmsg(u->nick, s_Netinfo, "/msg %s show ignore -> Shows Current Nicks/Hosts to Not AutoJoin", s_Netinfo);
 				} else {
-			privmsg(u->nick, s_Netinfo, "Access Denied");
+			prefmsg(u->nick, s_Netinfo, "Access Denied");
 		}
 			} else if (!strcasecmp(tmp, "MAP")) {
 				if (UserLevel(u) >= 50) {
-					privmsg(u->nick, s_Netinfo, "Domain to Channel Mapping:");
+					prefmsg(u->nick, s_Netinfo, "Domain to Channel Mapping:");
 					for (map = tldmap; map; map = map->next) {
-						privmsg(u->nick, s_Netinfo, "Hosts *%s will be joined to Channel %s", map->tld, map->channel);
-						privmsg(u->nick, s_Netinfo, "Greeting Message: %s", map->Message);
+						prefmsg(u->nick, s_Netinfo, "Hosts *%s will be joined to Channel %s", map->tld, map->channel);
+						prefmsg(u->nick, s_Netinfo, "Greeting Message: %s", map->Message);
 					}
-					privmsg(u->nick, s_Netinfo, "End of List.");
+					prefmsg(u->nick, s_Netinfo, "End of List.");
 				}  else {
-			privmsg(u->nick, s_Netinfo, "Access Denied");
+			prefmsg(u->nick, s_Netinfo, "Access Denied");
 		}
 			} else if (!strcasecmp(tmp, "IGNORE")) {
 				if (UserLevel(u) >= 50) {
-					privmsg(u->nick, s_Netinfo, "Nicks Hosts to not Autojoin:");
+					prefmsg(u->nick, s_Netinfo, "Nicks Hosts to not Autojoin:");
 					for (ignore = nickignore; ignore; ignore = ignore->next) 
-						privmsg(u->nick, s_Netinfo, "Nick: %s Host: %s", ignore->nick, ignore->host);		
-					privmsg(u->nick, s_Netinfo, "End of List.");
+						prefmsg(u->nick, s_Netinfo, "Nick: %s Host: %s", ignore->nick, ignore->host);		
+					prefmsg(u->nick, s_Netinfo, "End of List.");
 				} else {
-			privmsg(u->nick, s_Netinfo, "Access Denied");
+			prefmsg(u->nick, s_Netinfo, "Access Denied");
 		}
 			}
 		} else {
-			privmsg(u->nick, s_Netinfo, "Access Denied");
+			prefmsg(u->nick, s_Netinfo, "Access Denied");
 		}
 		return 1;
         } else if (!strcasecmp(cmd, "VERSION")) {
-               privmsg(u->nick, s_Netinfo,"\2NetInfo Version Information\2");
-               privmsg(u->nick, s_Netinfo,"%s - %s",me.name, my_info[0].module_version);
+               prefmsg(u->nick, s_Netinfo,"\2NetInfo Version Information\2");
+               prefmsg(u->nick, s_Netinfo,"%s - %s",me.name, my_info[0].module_version);
                return 1; 
 	} else if (!strcasecmp(cmd, "SET")) {
 		tmp = strtok(NULL, " ");
 		if (!tmp) {
-			privmsg(u->nick, s_Netinfo, "Incorrect Syntax");
+			prefmsg(u->nick, s_Netinfo, "Incorrect Syntax");
 			return 1;
 		} else if (!strcasecmp(tmp, "AUTOJOIN")) {
 			tmp2 = strtok(NULL, " ");
 			if (!tmp2) {
-				privmsg(u->nick, s_Netinfo, "Incorrect Syntax");
+				prefmsg(u->nick, s_Netinfo, "Incorrect Syntax");
 				return 1;
 			} else if (u->Umode & UMODE_REGNICK) {
 				if (!strcasecmp(tmp2, "ON")) {
-					privmsg(u->nick, s_Netinfo, "Not Done yet");
+					prefmsg(u->nick, s_Netinfo, "Not Done yet");
 				} else if (!strcasecmp(tmp2, "OFF")) {
-					privmsg(u->nick, s_Netinfo, "Not Done yet");
+					prefmsg(u->nick, s_Netinfo, "Not Done yet");
 				} else {
-					privmsg(u->nick, s_Netinfo, "Incorrect Syntax. /msg %s SET AUTOJOIN ON/OFF", s_Netinfo);
+					prefmsg(u->nick, s_Netinfo, "Incorrect Syntax. /msg %s SET AUTOJOIN ON/OFF", s_Netinfo);
 				}	
 			} else {
-				privmsg(u->nick, s_Netinfo, "You need to register your nick to use this service");
+				prefmsg(u->nick, s_Netinfo, "You need to register your nick to use this service");
 			}
 			return 1;
 		} else if (!strcasecmp(tmp, "MAP")) {
 			if (UserLevel(u) < 150) {
-				privmsg(u->nick, s_Netinfo, "Access Denined");
+				prefmsg(u->nick, s_Netinfo, "Access Denined");
 				return 1;
 			}
 			tmp2 = strtok(NULL, " ");
 			if (!tmp2) {
-				privmsg(u->nick, s_Netinfo, "Incorrect Syntax");
+				prefmsg(u->nick, s_Netinfo, "Incorrect Syntax");
 				return 1;
 			} else if (!strcasecmp(tmp2, "ADD")) {
 				tmp = strtok(NULL, " ");
 				if (checktld(tmp) == 1) {
 					chan = strtok(NULL, " ");
 					if (!chan) {
-						privmsg(u->nick, s_Netinfo, "Incorrect Syntax");
+						prefmsg(u->nick, s_Netinfo, "Incorrect Syntax");
 						return 1;		
 					}		
 					message = strtok(NULL, "");
 					if (!message) {
-						privmsg(u->nick, s_Netinfo, "Incorrect Syntax");
+						prefmsg(u->nick, s_Netinfo, "Incorrect Syntax");
 					}	
 					map = smalloc(sizeof(NI_Map));
 					strcpy(map->tld, tmp);
@@ -258,20 +269,20 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 						map->next = tldmap;
 						tldmap = map;
 					}
-					privmsg(u->nick, s_Netinfo, "Added Mapping: %s ==> %s with Message %s", tmp, chan, message);
+					prefmsg(u->nick, s_Netinfo, "Added Mapping: %s ==> %s with Message %s", tmp, chan, message);
 					return 1;
 				} else {
-					privmsg(u->nick, s_Netinfo, "The TLD Syntax is Incorrect eg: *@*.ac");
+					prefmsg(u->nick, s_Netinfo, "The TLD Syntax is Incorrect eg: *@*.ac");
 					return -1;
 				}				
 			} else if (!strcasecmp(tmp2, "DEL")) {
 			
 			} else {
-				privmsg(u->nick, s_Netinfo, "Incorrect Syntax");
+				prefmsg(u->nick, s_Netinfo, "Incorrect Syntax");
 				return 1;
 			}	
 			
-			privmsg(u->nick, s_Netinfo, "I'm lazy and havn't done this yet, so shoot me - Fish");
+			prefmsg(u->nick, s_Netinfo, "I'm lazy and havn't done this yet, so shoot me - Fish");
 			return 1;
 		}	
 	} else if (!strcasecmp(cmd, "HELP")) {
@@ -300,8 +311,7 @@ int checktld(char *data) {
 	return 1;	
 }
 
-int Online(Server *data) {
-
+int Online(char **av, int ac) {
 	if (init_bot(s_Netinfo,"Service",me.name,"Network Information Service", "+SAd", my_info[0].module_name) == -1 ) {
 		/* Nick was in use!!!! */
 		s_Netinfo = strcat(s_Netinfo, "_");
@@ -337,13 +347,13 @@ void _init() {
 	Loadconfig();
 
 
-	sts(":%s GLOBOPS :NetInfo Module Loaded",me.name);
+	globops(me.name, "NetInfo Module Loaded",me.name);
 }
 
 
 void _fini() {
 	Saveconfig();
-	sts(":%s GLOBOPS :NetInfo Module Unloaded",me.name);
+	globops(me.name, "NetInfo Module Loaded",me.name);
 
 };
 void Saveconfig()
