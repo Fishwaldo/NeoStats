@@ -1,10 +1,18 @@
 HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
+
+* Version 2.3 * Shmad * January 4th, 2002
++ Write to DB who added the record.
++ VIEW # now shows also who added the record.
++ hostserv.h now contains defines for access for each function.
+
+
 * Version 2.2 * Fish * December 26th, 2002
 + Due to massive bitching by people who use HostServ opers can
   ADD/LIST/VIEW now and only admins and higher can DEL
 + Fixed a problem with Permissions and a typo in the help file
+
 
 * Version 2.1 * Shmad * October 20, 2002
 + Fixed an issue with fnmatch being a hoe.

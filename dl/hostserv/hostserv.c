@@ -20,13 +20,14 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.25 2003/01/04 04:48:26 shmad Exp $
+** $Id: hostserv.c,v 1.26 2003/01/05 07:21:02 shmad Exp $
 */
 
 #include <stdio.h>
 #include <fnmatch.h>
 #include "dl.h"
 #include "stats.h"
+#include "hostserv.h"
 #include "hs_help.c"
 
 
@@ -48,6 +49,7 @@ struct hs_map_ {
     char host[MAXHOST];
     char vhost[MAXHOST];
     char passwd[30];
+    char added[30];
 };
 HS_Map *nnickmap;
 
@@ -82,7 +84,7 @@ int ListArryCount = 0;
 Module_Info HostServ_info[] = { {
     "HostServ",
     "Network User Virtual Host Service",
-    "2.2"
+    "2.3"
 } };
 
 
@@ -142,16 +144,16 @@ int __Bot_Message(char *origin, char **av, int ac)
         if (ac <= 2) {
             privmsg_list(u->nick, s_HostServ, hs_help); 
             return 1;
-        } else if (!strcasecmp(av[2], "ADD") && (UserLevel(u) >= 40)) {
+        } else if (!strcasecmp(av[2], "ADD") && (UserLevel(u) >= CAN_ADD)) {
             privmsg_list(u->nick, s_HostServ, hs_help_add);
             return 1;
-        } else if (!strcasecmp(av[2], "DEL") && (UserLevel(u) >= 100)) {
+        } else if (!strcasecmp(av[2], "DEL") && (UserLevel(u) >= CAN_DEL)) {
             privmsg_list(u->nick, s_HostServ, hs_help_del);
             return 1;        
-        } else if (!strcasecmp(av[2], "LIST") && (UserLevel(u) >= 40)) {
+        } else if (!strcasecmp(av[2], "LIST") && (UserLevel(u) >= CAN_LIST)) {
             privmsg_list(u->nick, s_HostServ, hs_help_list);
             return 1;
-	} else if (!strcasecmp(av[2], "VIEW") && (UserLevel(u) >= 40)) {
+	} else if (!strcasecmp(av[2], "VIEW") && (UserLevel(u) >= CAN_VIEW)) {
 	    privmsg_list(u->nick, s_HostServ, hs_help_view);
 	    return 1;
 	} else if (!strcasecmp(av[2], "LOGIN")) {
@@ -166,14 +168,14 @@ int __Bot_Message(char *origin, char **av, int ac)
 
     if (!strcasecmp(av[1], "ABOUT")) {
                 privmsg_list(u->nick, s_HostServ, hs_help_about);
-    } else if (!strcasecmp(av[1], "ADD") && (UserLevel(u) >= 40)) {
+    } else if (!strcasecmp(av[1], "ADD") && (UserLevel(u) >= CAN_ADD)) {
                 if (ac < 6) {
                     prefmsg(u->nick, s_HostServ, "Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>", s_HostServ);
                     prefmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
                     return -1;
                 }
                 hs_add(u, av[2], av[3], av[4], av[5]);
-    } else if (!strcasecmp(av[1], "DEL") && (UserLevel(u) >= 100)) {
+    } else if (!strcasecmp(av[1], "DEL") && (UserLevel(u) >= CAN_DEL)) {
                 if (!av[2]) {
                     prefmsg(u->nick, s_HostServ, "Syntax: /msg %s DEL #", s_HostServ);
                     prefmsg(u->nick, s_HostServ, "The users # is got from /msg %s LIST", s_HostServ);
@@ -186,9 +188,9 @@ int __Bot_Message(char *origin, char **av, int ac)
                     return -1;
                 }
                 hs_del(u, t);
-    } else if (!strcasecmp(av[1], "LIST") && (UserLevel(u) >= 40)) {
+    } else if (!strcasecmp(av[1], "LIST") && (UserLevel(u) >= CAN_LIST)) {
                 hs_list(u);
-    } else if (!strcasecmp(av[1], "VIEW") && (UserLevel(u) >= 40)) {
+    } else if (!strcasecmp(av[1], "VIEW") && (UserLevel(u) >= CAN_VIEW)) {
 		if (!av[2]) {
 		    prefmsg(u->nick, s_HostServ, "Syntax: /msg %s VIEW #", s_HostServ);
 		    prefmsg(u->nick, s_HostServ, "The users # is got from /msg %s LIST", s_HostServ);
@@ -335,7 +337,7 @@ static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
 
     char *tmp;
     strcpy(segv_location, "hs_add");
-    hsdat(":%s %s %s %s", cmd, m, h, p);
+    hsdat(":%s %s %s %s %s", cmd, m, h, p, u->nick);
     hslog("%s added a vhost for %s with realhost %s vhost %s and password %s",u->nick, cmd, m, h, p);
     prefmsg(u->nick, s_HostServ, "%s has sucessfuly been registered under realhost: %s vhost: %s and password: %s",cmd, m, h, p);
     /* Apply The New Hostname If The User Is Online */        
@@ -361,7 +363,7 @@ static void hs_list(User *u)
     int i;
 
     strcpy(segv_location, "hs_list");
-    if (!(UserLevel(u) >= 40)) {
+    if (!(UserLevel(u) >= CAN_LIST)) {
         hslog("Access Denied (LIST) to %s", u->nick);
         prefmsg(u->nick, s_HostServ, "Access Denied.");
         return;
@@ -395,7 +397,7 @@ static void hs_view(User *u, int tmpint)
     char buf[512];
     int i;
     strcpy(segv_location, "hs_view");
-    if (!(UserLevel(u) >= 40)) {
+    if (!(UserLevel(u) >= CAN_VIEW)) {
         hslog("Access Denied (LIST) to %s", u->nick);
         prefmsg(u->nick, s_HostServ, "Access Denied.");
         return;
@@ -417,6 +419,7 @@ static void hs_view(User *u, int tmpint)
 	    prefmsg(u->nick, s_HostServ, "RealHost: %s", ListArry[1]);
 	    prefmsg(u->nick, s_HostServ, "V-host:   %s", ListArry[2]);
 	    prefmsg(u->nick, s_HostServ, "Password: %s", ListArry[3]);
+	    prefmsg(u->nick, s_HostServ, "Added by: %s", ListArry[4]);
 	    prefmsg(u->nick, s_HostServ, "--- End of information for %s ---",ListArry[0]);
         }
 	i++;
@@ -446,6 +449,10 @@ void Loadhosts()
             strcpy(map->host, LoadArry[1]);
             strcpy(map->vhost, LoadArry[2]);
 	    strcpy(map->passwd, LoadArry[3]);
+	    if (LoadArry[4]) { /* Does who set it exist? Yes? go ahead */
+	    	strcpy(map->added, LoadArry[4]);
+	    } else /* We have no information on who set it so its null */
+	    	strcpy(map->added, "0");
             if (!nnickmap) {
                 nnickmap = map;
                 nnickmap->next = NULL;
@@ -473,7 +480,7 @@ static void hs_del(User *u, int tmpint)
     int i = 1;
 
     strcpy(segv_location, "hs_del");
-    if (!(UserLevel(u) >= 100)) {
+    if (!(UserLevel(u) >= CAN_DEL)) {
         hslog("Access Denied To %s To User on Access list #%s", u->nick, tmpint);
         prefmsg(u->nick, s_HostServ, "Access Denied To %s To Delete User \2#%s\2", u->nick, tmpint);
         return;
