@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.5 2003/03/06 11:18:12 fishwaldo Exp $
+** $Id: neoircd.c,v 1.6 2003/04/10 15:26:57 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -307,7 +307,7 @@ void sts(char *fmt,...)
 	sent = write (servsock, buf, strlen (buf));
 	if (sent == -1) {
 		log("Write error.");
-		exit(0);
+		do_exit(0);
 	}
 	me.SendM++;
 	me.SendBytes = me.SendBytes + sent;
@@ -334,7 +334,7 @@ void chanalert(char *who, char *buf,...)
 		if (sent == -1) {
 			me.onchan = 0;
 			log("Write error.");
-			exit(0);
+			do_exit(0);
 		}
 		me.SendM++;
 		me.SendBytes = me.SendBytes + sent;

@@ -1,29 +1,17 @@
 NeoStats - TODO Log:
 --------------------
 
-
 Shmad:
 ------
 
-
-
-
 Fish:
 -----
-Bind sockets to a IP address
-
-
 fnmatch is Baaaad news... find a good ircmatch function and port it over... 
 
 unkline on Hybrid7
 
-2.6.0 Series - Yep, I'm already thinking about this....
+2.6.0 Series - 
 ------------
-
-Channel (Not IRC Channels, Event Channels)  Based Logging... Means we can get rid of the #ifdef DEBUG, log(... 
-stuff, and define what gets logged when.
-
-Module Config File Support improvements. (I got ideas - Find Keeper Config libary for more info:)
 
 Re-Do the send/recv code... Its Horrible.. (Backup Server links etc can
 then be implemented)
@@ -31,9 +19,6 @@ then be implemented)
 Move all the stuff in ircd.c into relevent ircd support files. ircd.c is
 getting just way to hard to manage now and will get worse as
 we add aditional IRCd support.
-
-"Driver" modules??? (eg, Unreal, Ultimate are drivers. So is DB/SQL
-or WebServer)
 
 Redo Config files. I pretty much got Bison/Flex figured out... 
 
@@ -45,3 +30,5 @@ modules
 DCC chat interface???
 
 Language File support
+
+do some nice cleanups of code in do_exit... 

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: timer.c,v 1.19 2002/09/04 08:50:48 fishwaldo Exp $
+** $Id: timer.c,v 1.20 2003/04/10 15:26:58 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -77,8 +77,8 @@ void chk()
 		if (hash_verify(th) == 0) {
 			log("Eeeek, Corruption of the Timer hash");
 		}
-	
-
+		/* flush log files */
+		fflush(NULL);	
 	}
 	if (is_midnight() == 1 && midnight == 0) {
 		TimerMidnight();

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: services.c,v 1.50 2003/04/03 14:36:36 fishwaldo Exp $
+** $Id: services.c,v 1.51 2003/04/10 15:26:57 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -307,7 +307,7 @@ extern void ns_shutdown(User *u, char *reason)
 	remove("neostats.pid");
 	log("%s [%s](%s) requested SHUTDOWN.", u->nick, u->username,
 		u->hostname);
-	exit(0);
+	do_exit(0);
 }
 
 static void ns_reload(User *u, char *reason)
@@ -329,7 +329,7 @@ static void ns_reload(User *u, char *reason)
 	squit_cmd(s_Services, quitmsg);
 	ssquit_cmd(me.name);
 	sleep(5);
-	execve("./neostats", NULL, NULL);
+	do_exit(2);
 }
 
 
@@ -399,7 +399,7 @@ static void ns_raw(User *u, char *message)
         sent = write (servsock, message, strlen (message));
         if (sent == -1) {
         	log("Write error.");
-                exit(0);
+                do_exit(0);
         }
         me.SendM++;
         me.SendBytes = me.SendBytes + sent;

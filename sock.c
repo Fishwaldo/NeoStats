@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.31 2003/04/10 09:32:01 fishwaldo Exp $
+** $Id: sock.c,v 1.32 2003/04/10 15:26:57 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -194,7 +194,7 @@ void read_loop()
 				close(servsock);
 				sleep(5);
 				log("Eeek, Zombie Server, Reconnecting");
-				execve("./neostats", NULL, NULL);
+				do_exit(2);
 			}
 		} else if (SelectResult == -1) {
 			if (errno != EINTR) 

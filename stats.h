@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.71 2003/04/10 06:06:10 fishwaldo Exp $
+** $Id: stats.h,v 1.72 2003/04/10 15:26:57 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -265,6 +265,7 @@ extern unsigned long HASH(const unsigned char *, int);
 extern char *strlower(char *);
 extern void AddStringToList(char ***List,char S[],int *C);
 void FreeList(char **List,int C);
+void do_exit(int);
 
 /* ircd.c */
 extern void parse();

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.c,v 1.20 2003/04/10 09:32:01 fishwaldo Exp $
+** $Id: conf.c,v 1.21 2003/04/10 15:26:56 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -107,6 +107,7 @@ void ConfLoad() {
 		printf("*                                                 *\n");
 		printf("*             NeoStats NOT Started                *\n");
 		printf("***************************************************\n");
+		/* no need to call do_exit, we havn't even started! */
 		exit(0);
 	}
 	printf("Sucessfully Loaded Config File, Now Booting NeoStats\n");

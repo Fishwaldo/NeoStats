@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.h,v 1.1 2003/04/10 09:32:01 fishwaldo Exp $
+** $Id: log.h,v 1.2 2003/04/10 15:26:57 fishwaldo Exp $
 */
 
 
@@ -56,6 +56,14 @@
 #define LOG_DEBUG4	10
 
 
+/* Scope of Logging Defines: */
+
+#define LOG_CORE	0
+#define LOG_MOD		1
+
+
 extern void nlog(int level, int scope, char *fmt, ...);
+void *close_logs();
+void init_logs();
 
 #endif

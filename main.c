@@ -22,18 +22,19 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.84 2003/04/10 09:32:01 fishwaldo Exp $
+** $Id: main.c,v 1.85 2003/04/10 15:26:57 fishwaldo Exp $
 */
 
 #include <setjmp.h>
 #include <stdio.h>
 #include "stats.h"
-#include "signal.h"
-#include "dl.h"
-#include "conf.h"
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #endif
+#include "signal.h"
+#include "dl.h"
+#include "conf.h"
+#include "log.h"
 
 
 /*! this is the name of the services bot */
@@ -81,9 +82,9 @@ int forked = 0;
 int main(int argc, char *argv[])
 {
 	FILE *fp;
+#if 0
 	char *test;
 	int i;
-#if 0
 /* testing of keeper database */	
 	SetConf("test", 1, "testconf");
 	SetConf((void *)12, 2, "this");
@@ -96,11 +97,19 @@ int main(int argc, char *argv[])
 	printf("%d\n", i);
 	free(test);
 #endif
+	/* get our commandline options */
+	get_options(argc, argv);
 	
+	/* before we do anything, make sure logging is setup */
+	init_logs();
+
+
+	/* our crash trace variables */
 	strcpy(segv_location, "main");
 	strcpy(segvinmodule, "");
+	/* for modules, let them know we are not ready */
 	me.onchan = 0;
-	get_options(argc, argv);
+	/* keep quiet if we are told to :) */
 	if (!config.quiet) {
 		printf("NeoStats %d.%d.%d%s Loading...\n", MAJOR, MINOR, REV, version);
 		printf("-----------------------------------------------\n");
@@ -110,6 +119,7 @@ int main(int argc, char *argv[])
 		printf("^Enigma^ (enigma@neostats.net)\n");
 		printf("-----------------------------------------------\n\n");
 	}
+	/* set some defaults before we parse the config file */
 	me.t_start = time(NULL);
 	me.want_privmsg = 0;
 	me.enable_spam = 0;
@@ -128,11 +138,18 @@ int main(int argc, char *argv[])
 	me.client = 0;
 #endif
 	strcpy(me.modpath,"dl");
-#ifdef RECVLOG
-	remove("logs/recv.log");
-#endif
+
+	/* if we are doing recv.log, remove the previous version */
+	if (config.recvlog)
+		remove("logs/recv.log");
+		
+	/* initilze our Module subsystem */
 	__init_mod_list();
+	
+	/* prepare to catch errors */
 	setup_signals();
+	
+	/* load the config files */
 	ConfLoad();
         if (me.die) {
 		printf("\n-----> ERROR: Read the README file then edit neostats.cfg! <-----\n\n");
@@ -140,13 +157,17 @@ int main(int argc, char *argv[])
                 sleep(1);
                 close(servsock);
                 remove("neostats.pid");
+                /* we are exiting the parent, not the program, don't call do_exit() */
                 exit(0);
         }
+        
+        /* initilize the rest of the subsystems */
 	TimerReset();
 	init_dns();
 	init_server_hash();
 	init_user_hash();
 	init_chan_hash();
+	
 /** This section ALWAYS craps out so we ignore it-- for now */
 	if (init_modules()) {
 /*		printf("WARNING: Some Modules Failed to Load"); */
@@ -154,10 +175,12 @@ int main(int argc, char *argv[])
 
 
 #ifndef DEBUG
+	/* if we are compiled with debug, or forground switch was specified, DONT FORK */
 	if (!config.foreground) {
 		forked=fork();
 #endif
 		if (forked) {
+			/* write out our PID */
 			fp = fopen("neostats.pid", "w");
 			fprintf(fp, "%i", forked);
 			fclose(fp);
@@ -169,6 +192,7 @@ int main(int argc, char *argv[])
 			return 0;
 		}
 #ifndef DEBUG
+		/* detach from parent process */
 		if (setpgid(0, 0) < 0) {
 			log("setpgid() failed");
 		}
@@ -176,6 +200,7 @@ int main(int argc, char *argv[])
 #endif
 	log("Statistics Started (NeoStats %d.%d.%d%s).", MAJOR, MINOR, REV, version);
 
+	/* we are ready to start now Duh! */
 	start();
 
 	return 1;
@@ -361,8 +386,8 @@ RETSIGTYPE serv_segv() {
 		sleep(2);
 		kill(forked, 3);
 		kill(forked, 9);
-		exit(-1);
-		ssquit_cmd(me.name);
+		/* clean up */
+		do_exit(1);
 	}
 }
 
@@ -448,7 +473,7 @@ void start()
 		unload_module(mod_ptr->info->module_name, finduser(s_Services));
 	}
 	sleep(5);
-	execve("./neostats", NULL, NULL);
+	do_exit(2);
 }
 /** @brief Login to IRC
  *
@@ -489,7 +514,7 @@ void *smalloc(long size)
 	buf = malloc(size);
 	if (!buf) {
 		log("smalloc(): out of memory.");
-		exit(0);
+		do_exit(1);
 	}
 	return buf;
 }
@@ -510,7 +535,7 @@ char *sstrdup(const char *s)
 	char *t = strdup(s);
 	if (!t) {
 		log("sstrdup(): out of memory.");
-		exit(0);
+		do_exit(1);
 	}
 	return t;
 }
@@ -597,3 +622,32 @@ for (i = 0; i== C; i++)
 C = 0; 
 }
 
+/** @brief before exiting call this function. It flushes log files and tidy's up.
+ *
+ *  Cleans up before exiting 
+ *  @parm segv 1 = we are exiting because of a segv fault, 0, we are not.
+ *  if 1, we don't prompt to save data
+ */
+void do_exit(int segv) {
+	switch (segv) {
+	case 0:
+		nlog(LOG_NORMAL, LOG_CORE, "Normal shut down SubSystems");
+		break;
+	case 2:
+		nlog(LOG_NORMAL, LOG_CORE, "Restarting NeoStats SubSystems");
+		break;
+	case 1:
+		nlog(LOG_NORMAL, LOG_CORE, "Shutting Down SubSystems without saving data due to core");
+		break;
+	}
+	close_logs();
+	
+	if (segv == 1) {
+		exit(-1);
+	} else if (segv == 2) {
+		execve("./neostats", NULL, NULL);
+	} else {
+		exit(1);
+	}
+
+}

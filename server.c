@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: server.c,v 1.13 2002/09/04 08:40:27 fishwaldo Exp $
+** $Id: server.c,v 1.14 2003/04/10 15:26:57 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -141,7 +141,7 @@ void init_server_hash()
 	sh = hash_create(S_TABLE_SIZE, 0, 0);	
 	if (!sh) {
 		log("Create Server Hash Failed\n");
-		exit(-1);
+		do_exit(1);
 	}
 	AddServer(me.name,NULL, 0);
 }
