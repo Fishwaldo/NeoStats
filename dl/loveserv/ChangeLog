@@ -1,11 +1,34 @@
-LoveServ Module for NeoStats 2.x ChangeLog
-Shmad <shmad@neostats.net>
+Program: LoveServ Module for NeoStats 2.x ChangeLog
+Author:  Shmad <shmad@neostats.net>
 
 
-* Version 1.1 * October 25, 2001 ---- Fish
-- Removed Hardcoded servernames, and replaced with me.name
+* Version 1.4 * November 25, 2001 
 
-* Version 1.0 * September 1st, 2001 ---- Shmad
+- Fixed some typos/formatting in Help System.
+- Changed the way LoveServ checks to see if a user exists before sending any data.
+- LoveServ now CANNOT send itself things.. You ppl :)
+- Added APOLOGY to send someone an APOLOGY (w/reason)
+- Added THANKYOU to send someone a thank you note (w/reason)
+
+
+* Version 1.2 * October 31, 2001
+
+- Added VERSION to show LoveServ's Version & Author contact information.
+- LoveServ now checks to see if User Exists before sending any data (much safer)
+  ^Enigma^ should switch MoraleServ to this as well before MoraleServ sends any data.
+- Made LoveServ Neo compliant storing logs in logs/ directory instead of main directory.
+- VIEWLOGS added for Network and Technical Admins to view the LoveServ log file.
+- Added Network/Technical Admin Features
+- Added Missing HELP Topics.
+- Improved on HELP parsing routine in main help function for LoveServ, much faster now.
+
+
+* Version 1.1 * October 25, 2001
+
+- Removed Hardcoded servernames, and replaced with me.name (Thanks to fish for noticing and Patching)
+
+
+* Version 1.0 * September 1st, 2001
 
 - Send someone a customized LOVENOTE
 - Send someone some CANDY yummy!

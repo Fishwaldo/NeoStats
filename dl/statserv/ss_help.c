@@ -1,11 +1,12 @@
-/* NetStats - IRC Statistical Services
-** Copyright (c) 1999 Adam Rutter, Justin Hammond
-** http://codeworks.kamserve.com
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2001 NeoStats Group Inc.
+** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
 *
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
-** NetStats CVS Identification
-** $Id: ss_help.c,v 1.1 2000/02/03 23:46:03 fishwaldo Exp $
+** NeoStats Identification:
+** ID:      ss_help.c, 
+** Version: 1.2
+** Date:    22/11/2001
 */
 
 #include "stats.h"
@@ -30,11 +31,14 @@ NULL
 
 const char *ss_myuser_help[] = {
 "",
-"*** Additional Commands For Tech Admins!***",
+"*** Additional Commands For Net & Tech Admins:***",
 "",
+"\2HTMLSTATS\2  Output IRC statistics to a HTML file",
+"\2FORCEHTML\2  Force an update of the HTML ouput file",
 "\2RESET\2      DELETES data files and starts stats over new!",
 "\2JOIN\2       Join a Channel.",
 "\2STATS\2      Modify Statistic Entries.",
+"\2NOTICES\2    Enable/Disable 'User requested to see...' Notices.",
 "End of Help",
 NULL
 };
@@ -196,3 +200,39 @@ const char *icq_help[] = {
 NULL
 };
 
+const char *ss_htmlstats_help[] = {
+"*** Statistics: \2HTMLSTATS\2 Help ***",
+"",
+"Usage: \2HTMLSTATS <ON/OFF> <PATH TO HTML FILE IF HTMLTURNING STATS ON>\2",
+"",
+"Print the Statistics to a .html file for veiwing on a website.",
+"The path to the html file should be from the /NeoStats-2.x directory eg:",
+"'../public_html/neostats/mystats.html'",
+"",
+"End of Help.",
+NULL
+};
+
+const char *ss_forcehtml_help[] = {
+"*** Statistics: \2FORCEUPDATE\2 Help ***",
+"",
+"Usage: \2FORCEUPDATE\2",
+"",
+"Forces an update of the HTML data file with the most current",
+"network statistics.",
+"",
+"End of Help.",
+NULL
+};
+
+const char *ss_notices_help[] = {
+"*** Statistics: \2NOTICES\2 Help ***",
+"",
+"Usage: \2NOTICES\2",
+"",
+"Turns StatServ Information requests on and off. The default",
+"setting when neostats is loaded is 'off'",
+"",
+"End of Help.",
+NULL
+};

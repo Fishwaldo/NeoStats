@@ -1,7 +1,7 @@
 /* NeoStats - IRC Statistical Services Copryight (c) 1999-2001 NeoStats Group.
 *
 ** Module:  LoveServ
-** Version: 1.0
+** Version: 1.3
 */
 
 
@@ -22,13 +22,17 @@ static void ls_admirer(User *u, char *cmd);
 static void ls_choco(User *u, char *cmd);
 static void ls_candy(User *u, char *cmd);
 static void ls_lovenote(User *u, char *cmd, char *m);
+static void ls_apology(User *u, char *cmd, char *m);
+static void ls_thankyou(User *u, char *cmd, char *m);
+static void ls_version(User *u);
+static void ls_viewlogs(User *u);
 
 void lslog(char *, ...);
 
 Module_Info my_info[] = { {
 	"LoveServ",
 	"A Network Love Service",
-	"1.1"
+	"1.4"
 } };
 
 
@@ -41,6 +45,7 @@ Functions my_fn_list[] = {
 	{ "VERSION",	new_m_version,	1 },
 	{ NULL,		NULL,		0 }
 };
+
 
 int __Bot_Message(char *origin, char *coreLine, int type)
 {
@@ -59,21 +64,52 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 		coreLine = strtok(NULL, " ");
 		if (!coreLine) {
 			privmsg_list(u->nick, s_LoveServ, ls_help);
+			if (UserLevel(u) >= 180)
+				privmsg_list(u->nick, s_LoveServ, ls_help_admin);
 			return 1;
 		} else if (!strcasecmp(coreLine, "ROSE")) {
 			privmsg_list(u->nick, s_LoveServ, ls_help_rose);
 			return 1;
-                } else if (!strcasecmp(coreLine, "KISS")) {
-			lslog("HELP FOR KISS");
+        } else if (!strcasecmp(coreLine, "KISS")) {
+			privmsg_list(u->nick, s_LoveServ, ls_help_kiss);
+			return 1;
+        } else if (!strcasecmp(coreLine, "TONSIL")) {
+			privmsg_list(u->nick, s_LoveServ, ls_help_tonsil);
+			return 1;
+        } else if (!strcasecmp(coreLine, "HUG")) {
+			privmsg_list(u->nick, s_LoveServ, ls_help_hug);
+			return 1;
+        } else if (!strcasecmp(coreLine, "ADMIRER")) {
+			privmsg_list(u->nick, s_LoveServ, ls_help_admirer);
+			return 1;
+        } else if (!strcasecmp(coreLine, "CHOCOLATE")) {
+			privmsg_list(u->nick, s_LoveServ, ls_help_chocolate);
+			return 1;
+        } else if (!strcasecmp(coreLine, "CANDY")) {
+			privmsg_list(u->nick, s_LoveServ, ls_help_candy);
+			return 1;
+        } else if (!strcasecmp(coreLine, "LOVENOTE")) {
+		    privmsg_list(u->nick, s_LoveServ, ls_help_lovenote);
+			return 1;
+		} else if (!strcasecmp(coreLine, "APOLOGY")) {
+		    privmsg_list(u->nick, s_LoveServ, ls_help_apology);
+			return 1;
+		} else if (!strcasecmp(coreLine, "THANKYOU")) {
+		    privmsg_list(u->nick, s_LoveServ, ls_help_thankyou);
+			return 1;
+		} else if (!strcasecmp(coreLine, "VERSION")) {
+			privmsg_list(u->nick, s_LoveServ, ls_help_version);
+			return 1;
+		} else if (!strcasecmp(coreLine, "VIEWLOGS") && (UserLevel(u) >= 180)) {
+			privmsg_list(u->nick, s_LoveServ, ls_help_viewlogs);
 			return 1;
 		} else 
-			privmsg(u->nick, s_LoveServ, "Unknown Help Topic: \2%s\2",
-				coreLine);
-        }
+			privmsg(u->nick, s_LoveServ, "Unknown Help Topic: \2%s\2", coreLine);
+		}
 
 	if (!strcasecmp(cmd, "ROSE")) {
-                cmd = strtok(NULL, " ");
-                ls_rose(u, cmd);
+        cmd = strtok(NULL, " ");
+        ls_rose(u, cmd);
 	} else if (!strcasecmp(cmd, "KISS")) {
 		cmd = strtok(NULL, " ");
 		ls_kiss(u, cmd);
@@ -93,28 +129,39 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 		cmd = strtok(NULL, " ");
 		ls_candy(u,cmd);
 	} else if (!strcasecmp(cmd, "LOVENOTE")) {
-                char *m;
-                cmd = strtok(NULL, " ");
-                m = strtok(NULL, "");
-                ls_lovenote(u, cmd, m);
-
-/*		cmd = strtok(NULL, " ");
-		ls_lovenote(u, cmd); */
+        char *m;
+        cmd = strtok(NULL, " ");
+        m = strtok(NULL, "");
+        ls_lovenote(u, cmd, m);
+	} else if (!strcasecmp(cmd, "APOLOGY")) {
+        char *m;
+        cmd = strtok(NULL, " ");
+        m = strtok(NULL, "");
+        ls_apology(u, cmd, m);
+	} else if (!strcasecmp(cmd, "THANKYOU")) {
+        char *m;
+        cmd = strtok(NULL, " ");
+        m = strtok(NULL, "");
+        ls_thankyou(u, cmd, m);
+	} else if (!strcasecmp(cmd, "VERSION"))	{
+		ls_version(u);
+	} else if (!strcasecmp(cmd, "VIEWLOGS") && (UserLevel(u) >= 180)) {
+		notice(s_LoveServ,"%s Requested to Look at Loveserv's Logs",u->nick);
+		ls_viewlogs(u);
 	} else {
 		privmsg(u->nick, s_LoveServ, "Unknown Command: \2%s\2, maybe you love me?",
 			cmd);
 	}
 	return 1;
-
-
 }
+
 
 int Online(Server *data) {
 
-	if (init_bot(s_LoveServ,"love",me.name,"Network Love Service", "+xd", my_info[0].module_name) == -1 ) {
+	if (init_bot(s_LoveServ,"love",me.name,"Network Love Service", "+Sqd-x", my_info[0].module_name) == -1 ) {
 		/* Nick was in use!!!! */
 		s_LoveServ = strcat(s_LoveServ, "_");
-		init_bot(s_LoveServ,"love",me.name,"Network Love Service", "+xd", my_info[0].module_name);
+		init_bot(s_LoveServ,"love",me.name,"Network Love Service", "+Sqd-x", my_info[0].module_name);
 	}
 	return 1;
 };
@@ -126,18 +173,20 @@ EventFnList my_event_list[] = {
 };
 
 
-
 Module_Info *__module_get_info() {
 	return my_info;
 };
+
 
 Functions *__module_get_functions() {
 	return my_fn_list;
 };
 
+
 EventFnList *__module_get_events() {
 	return my_event_list;
 };
+
 
 void _init() {
 	s_LoveServ = "LoveServ";
@@ -154,7 +203,7 @@ void _fini() {
 void lslog(char *fmt, ...)
 {
         va_list ap;
-        FILE *lovefile = fopen("loveserv.log", "a");
+        FILE *lovefile = fopen("logs/loveserv.log", "a");
         char buf[512], fmtime[80];
         time_t tmp = time(NULL);
 
@@ -171,104 +220,251 @@ void lslog(char *fmt, ...)
 	fprintf(lovefile, "(%s) %s\n", fmtime, buf);
         va_end(ap);
         fclose(lovefile);
-
 }
 
 
 static void ls_rose(User *u, char *cmd) {
-        if (!cmd) {
-                privmsg(u->nick, s_LoveServ, "Syntax: /msg %s ROSE NICK", s_LoveServ);
+	if (!cmd) {
+		privmsg(u->nick, s_LoveServ, "Syntax: /msg %s ROSE NICK", s_LoveServ);
 		privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
-                return;
-        }
+        return;
+	}
+	if (!strcasecmp(cmd, s_LoveServ)) {
+		privmsg(u->nick, s_LoveServ, "Surley we have better things to do with our time than make a service message itself?");
+		return;
+	}
+	if (!finduser(cmd)) {
+		privmsg(u->nick, s_LoveServ, "That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
+		return;
+	}
 
 	privmsg(u->nick, s_LoveServ, "Your rose has been sent to %s!",cmd);
-        privmsg(cmd, s_LoveServ, "%s has sent you this beautiful rose! 3--<--<--<{4@",u->nick);
+	privmsg(cmd, s_LoveServ, "%s has sent you this beautiful rose! 3--<--<--<{4@",u->nick);
 	lslog("%s sent a ROSE to %s",u->nick,cmd);
 }
 
-static void ls_kiss(User *u, char *cmd) {
-        if (!cmd) {
-                privmsg(u->nick, s_LoveServ, "Syntax: /msg %s KISS NICK", s_LoveServ);
-                privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
-                return;
-        }
 
-        privmsg(u->nick, s_LoveServ, "You have virtually kissed %s!",cmd);
-        privmsg(cmd, s_LoveServ, "%s has virtually kissed you!",u->nick);
-        lslog("%s sent a KISS to %s",u->nick,cmd);
+static void ls_kiss(User *u, char *cmd) {
+    if (!cmd) {
+		privmsg(u->nick, s_LoveServ, "Syntax: /msg %s KISS NICK", s_LoveServ);
+        privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
+        return;
+    }
+	if (!strcasecmp(cmd, s_LoveServ)) {
+		privmsg(u->nick, s_LoveServ, "Surley we have better things to do with our time than make a service message itself?");
+		return;
+	}
+	if (!finduser(cmd)) {
+		privmsg(u->nick, s_LoveServ, "That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
+		return;
+	}
+
+    privmsg(u->nick, s_LoveServ, "You have virtually kissed %s!",cmd);
+    privmsg(cmd, s_LoveServ, "%s has virtually kissed you!",u->nick);
+    lslog("%s sent a KISS to %s",u->nick,cmd);
 }
 
-static void ls_tonsil(User *u, char *cmd) {
-        if (!cmd) {
-                privmsg(u->nick, s_LoveServ, "Syntax: /msg %s TONSIL NICK", s_LoveServ);
-                privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
-                return;
-        }
 
-        privmsg(u->nick, s_LoveServ, "You have virtually tonsilly kissed %s!",cmd);
-        privmsg(cmd, s_LoveServ, "%s would like to send a SLoW..LoNG..DeeP..PeNeTRaTiNG..ToNSiL-TiCKLiNG.. HaiR STRaiGHTeNiNG..Toe-CuRLiNG..NeRVe-JaNGLiNG..LiFe-aLTeRiNG.. FaNTaSY-CauSiNG..i JuST SaW GoD!..GoSH, DiD MY CLoTHeS FaLL oFF?.. YeS, i'M GLaD i CaMe oN iRC..KiSS oN Da LiPS!!!",u->nick);
-        lslog("%s sent a TONSIL KISS to %s",u->nick,cmd);
+static void ls_tonsil(User *u, char *cmd) {
+    if (!cmd) {
+		privmsg(u->nick, s_LoveServ, "Syntax: /msg %s TONSIL NICK", s_LoveServ);
+        privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
+        return;
+    }
+	if (!strcasecmp(cmd, s_LoveServ)) {
+		privmsg(u->nick, s_LoveServ, "Surley we have better things to do with our time than make a service message itself?");
+		return;
+	}
+	if (!finduser(cmd)) {
+		privmsg(u->nick, s_LoveServ, "That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
+		return;
+	}
+
+    privmsg(u->nick, s_LoveServ, "You have virtually tonsilly kissed %s!",cmd);
+    privmsg(cmd, s_LoveServ, "%s would like to send a SLoW..LoNG..DeeP..PeNeTRaTiNG..ToNSiL-TiCKLiNG.. HaiR STRaiGHTeNiNG..Toe-CuRLiNG..NeRVe-JaNGLiNG..LiFe-aLTeRiNG.. FaNTaSY-CauSiNG..i JuST SaW GoD!..GoSH, DiD MY CLoTHeS FaLL oFF?.. YeS, i'M GLaD i CaMe oN iRC..KiSS oN Da LiPS!!!",u->nick);
+    lslog("%s sent a TONSIL KISS to %s",u->nick,cmd);
 }
 
 
 static void ls_hug(User *u, char *cmd) {
-        if (!cmd) {
-                privmsg(u->nick, s_LoveServ, "Syntax: /msg %s HUG NICK", s_LoveServ);
-                privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
-                return;
-        }
+    if (!cmd) {
+		privmsg(u->nick, s_LoveServ, "Syntax: /msg %s HUG NICK", s_LoveServ);
+        privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
+        return;
+    }
+	if (!strcasecmp(cmd, s_LoveServ)) {
+		privmsg(u->nick, s_LoveServ, "Surley we have better things to do with our time than make a service message itself?");
+		return;
+	}
+	if (!finduser(cmd)) {
+		privmsg(u->nick, s_LoveServ, "That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
+		return;
+	}
 
-        privmsg(u->nick, s_LoveServ, "%s has received your hug! :)",cmd);
-        privmsg(cmd, s_LoveServ, "%s has sent you a *BIG WARM HUG*!",u->nick);
-        lslog("%s sent a HUG to %s",u->nick,cmd);
+    privmsg(u->nick, s_LoveServ, "%s has received your hug! :)",cmd);
+    privmsg(cmd, s_LoveServ, "%s has sent you a *BIG WARM HUG*!",u->nick);
+    lslog("%s sent a HUG to %s",u->nick,cmd);
 }
+
 
 static void ls_admirer(User *u, char *cmd) {
-        if (!cmd) {
-                privmsg(u->nick, s_LoveServ, "Syntax: /msg %s ADMIRER NICK", s_LoveServ);
-                privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
-                return;
-        }
+	if (!cmd) {
+		privmsg(u->nick, s_LoveServ, "Syntax: /msg %s ADMIRER NICK", s_LoveServ);
+        privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
+        return;
+    }
+	if (!strcasecmp(cmd, s_LoveServ)) {
+		privmsg(u->nick, s_LoveServ, "Surley we have better things to do with our time than make a service message itself?");
+		return;
+	}
+	if (!finduser(cmd)) {
+		privmsg(u->nick, s_LoveServ, "That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
+		return;
+	}
 
-        privmsg(u->nick, s_LoveServ, "Anonymous admire sent to %s :)",cmd);
-        privmsg(cmd, s_LoveServ, "You have a secret admirer! ;)");
-        lslog("%s sent a ADMIRER to %s",u->nick,cmd);
+    privmsg(u->nick, s_LoveServ, "Anonymous admire sent to %s :)",cmd);
+    privmsg(cmd, s_LoveServ, "You have a secret admirer! ;)");
+    lslog("%s sent a ADMIRER to %s",u->nick,cmd);
 }
+
 
 static void ls_choco(User *u, char *cmd) {
-        if (!cmd) {
-                privmsg(u->nick, s_LoveServ, "Syntax: /msg %s CHOCOLATE NICK", s_LoveServ);
-                privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
-                return;
-        }
+    if (!cmd) {
+		privmsg(u->nick, s_LoveServ, "Syntax: /msg %s CHOCOLATE NICK", s_LoveServ);
+        privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
+        return;
+	}
+	if (!strcasecmp(cmd, s_LoveServ)) {
+		privmsg(u->nick, s_LoveServ, "Surley we have better things to do with our time than make a service message itself?");
+		return;
+	}
+	if (!finduser(cmd)) {
+		privmsg(u->nick, s_LoveServ, "That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
+		return;
+	}
 
-        privmsg(u->nick, s_LoveServ, "A box of cholocates has been sent to %s :)",cmd);
-        privmsg(cmd, s_LoveServ, "%s would like you to have this YUMMY box of chocolates!",u->nick);
-        lslog("%s sent a Box of Chocolates to %s",u->nick,cmd);
+    privmsg(u->nick, s_LoveServ, "A box of cholocates has been sent to %s :)",cmd);
+    privmsg(cmd, s_LoveServ, "%s would like you to have this YUMMY box of chocolates!",u->nick);
+    lslog("%s sent a Box of Chocolates to %s",u->nick,cmd);
 }
+
 
 static void ls_candy(User *u, char *cmd) {
-        if (!cmd) {
-                privmsg(u->nick, s_LoveServ, "Syntax: /msg %s CANDY NICK", s_LoveServ);
-                privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
-                return;
-        }
+    if (!cmd) {
+		privmsg(u->nick, s_LoveServ, "Syntax: /msg %s CANDY NICK", s_LoveServ);
+        privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
+        return;
+    }
+	if (!strcasecmp(cmd, s_LoveServ)) {
+		privmsg(u->nick, s_LoveServ, "Surley we have better things to do with our time than make a service message itself?");
+		return;
+	}
+	if (!finduser(cmd)) {
+		privmsg(u->nick, s_LoveServ, "That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
+		return;
+	}
 
-        privmsg(u->nick, s_LoveServ, "A bag of yummy heart shaped candies has been sent to %s :)",cmd);
-        privmsg(cmd, s_LoveServ, "%s would like you to have this big YUMMY bag of heart shaped candies!",u->nick);
-        lslog("%s sent a BAG OF HEART SHAPED CANDIES to %s",u->nick,cmd);
+    privmsg(u->nick, s_LoveServ, "A bag of yummy heart shaped candies has been sent to %s :)",cmd);
+    privmsg(cmd, s_LoveServ, "%s would like you to have this big YUMMY bag of heart shaped candies!",u->nick);
+    lslog("%s sent a BAG OF HEART SHAPED CANDIES to %s",u->nick,cmd);
 }
 
-static void ls_lovenote(User *u, char *cmd, char *m) {
-        if (!m) {
-                privmsg(u->nick, s_LoveServ, "Syntax: /msg %s LOVENOTE NICK NOTE", s_LoveServ);
-                privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
-                return;
-        }
 
-        privmsg(u->nick, s_LoveServ, "Your lovenote to %s has been sent! :)", cmd);
-        privmsg(cmd, s_LoveServ, "%s has sent you a LoveNote which reads: \2%s\2", u->nick, m);
-        lslog("%s sent a LOVE NOTE to %s which reads %s", u->nick, cmd, m);
+static void ls_lovenote(User *u, char *cmd, char *m) {
+    if (!m) {
+		privmsg(u->nick, s_LoveServ, "Syntax: /msg %s LOVENOTE NICK NOTE", s_LoveServ);
+        privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
+        return;
+    }
+	if (!strcasecmp(cmd, s_LoveServ)) {
+		privmsg(u->nick, s_LoveServ, "Surley we have better things to do with our time than make a service message itself?");
+		return;
+	}
+	if (!finduser(cmd)) {
+		privmsg(u->nick, s_LoveServ, "That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
+		return;
+	}
+
+    privmsg(u->nick, s_LoveServ, "Your lovenote to %s has been sent! :)", cmd);
+    privmsg(cmd, s_LoveServ, "%s has sent you a LoveNote which reads: \2%s\2", u->nick, m);
+    lslog("%s sent a LOVE NOTE to %s which reads %s", u->nick, cmd, m);
+}
+
+
+static void ls_apology(User *u, char *cmd, char *m) {
+    if (!m) {
+		privmsg(u->nick, s_LoveServ, "Syntax: /msg %s APOLOGY NICK APOLOGY-REASON", s_LoveServ);
+        privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
+        return;
+    }
+	if (!strcasecmp(cmd, s_LoveServ)) {
+		privmsg(u->nick, s_LoveServ, "Surley we have better things to do with our time than make a service message itself?");
+		return;
+	}
+	if (!finduser(cmd)) {
+		privmsg(u->nick, s_LoveServ, "That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
+		return;
+	}
+
+    privmsg(u->nick, s_LoveServ, "Your apology has been sent to %s", cmd);
+    privmsg(cmd, s_LoveServ, "%s is sorry, and would like to apologise for \2%s\2", u->nick, m);
+    lslog("%s sent an APOLOGY to %s for %s", u->nick, cmd, m);
+}
+
+
+static void ls_thankyou(User *u, char *cmd, char *m) {
+    if (!m) {
+		privmsg(u->nick, s_LoveServ, "Syntax: /msg %s THANKYOU NICK THANKYOU-REASON", s_LoveServ);
+        privmsg(u->nick, s_LoveServ, "For addtional help: /msg %s HELP", s_LoveServ);
+        return;
+    }
+	if (!strcasecmp(cmd, s_LoveServ)) {
+		privmsg(u->nick, s_LoveServ, "Surley we have better things to do with our time than make a service message itself?");
+		return;
+	}
+	if (!finduser(cmd)) {
+		privmsg(u->nick, s_LoveServ, "That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
+		return;
+	}
+
+    privmsg(u->nick, s_LoveServ, "Your Thank You has been sent to %s", cmd);
+    privmsg(cmd, s_LoveServ, "%s wishes to thank you for \2%s\2", u->nick, m);
+    lslog("%s sent a THANKYOU to %s for %s", u->nick, cmd, m);
+}
+
+
+static void ls_version(User *u)
+{
+	    segv_location = sstrdup("ls_version");
+        privmsg(u->nick, s_LoveServ, "\2%s Version Information\2", s_LoveServ);
+        privmsg(u->nick, s_LoveServ, "%s Version: %s - running on: %s", s_LoveServ, my_info[0].module_version, me.name);
+		privmsg(u->nick, s_LoveServ, "%s Author: Shmad <shmad@neostats.net>", s_LoveServ);
+		privmsg(u->nick, s_LoveServ, "Neostats Satistical Software: http://www.neostats.net");
+
+}
+
+
+static void ls_viewlogs(User *u)
+{
+	FILE *fp;
+	char buf[512];
+
+	segv_location = sstrdup("ls_viewlogs");
+	if (!(UserLevel(u) >= 180)) {
+		lslog("Access Denied (LOGS) to %s", u->nick);
+		privmsg(u->nick, s_LoveServ, "Access Denied.");
+		return;
+	}
+	fp = fopen("logs/loveserv.log", "r");
+	if (!fp) {
+		privmsg(u->nick, s_LoveServ, "Unable to open logs/loveserv.log");
+		return;
+	}
+	while (fgets(buf, sizeof(buf), fp)) {
+		buf[strlen(buf)] = '\0';
+		privmsg(u->nick, s_LoveServ, "%s", buf);
+	}
+	fclose(fp);
+	lslog("%s viewed LoveServ's logs", u->nick);
 }
 

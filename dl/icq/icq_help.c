@@ -1,11 +1,12 @@
-/* NetStats - IRC Statistical Services
-** Copyright (c) 1999 Adam Rutter, Justin Hammond
-** http://codeworks.kamserve.com
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2001 NeoStats Group Inc.
+** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
 *
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
-** NetStats CVS Identification
-** $Id: icq_help.c,v 1.1 2000/03/02 01:34:00 fishwaldo Exp $
+** NeoStats Identification:
+** ID:      icq_help.c, 
+** Version: 1.1
+** Date:    02/03/2000
 */
 
 #include "stats.h"
