@@ -147,21 +147,19 @@ echo "*----------------------------------------*"
 
 ###########################################################################
 # select IRCd
-IRCD_DEFAULT="no default"
-IRCD=
 validselection=0
 echo "Which IRC server do you use?"
-echo "     1) Unreal 3.1.x"
-echo "     2) Unreal 3.2.x"
-echo "     3) Ultimate 2.x.x"
-echo "     4) Ultimate 3.x.x"
-echo "     5) Hybrid7"
-echo "     6) NeoIRCd"
-echo "     7) Bahamut"
-echo "     8) Mystic"
-echo "     9) Quantum"
-echo "     10) Viagra"
-echo "     11) IRCu P10"
+echo "     1) Unreal 3.1.x IRCD"
+echo "     2) Unreal 3.2.x IRCD"
+echo "     3) Ultimate 2.x.x IRCD"
+echo "     4) Ultimate 3.x.x IRCD"
+echo "     5) Hybrid7 IRCD"
+echo "     6) NeoIRCd IRCD"
+echo "     7) Bahamut IRCD"
+echo "     8) Mystic IRCD"
+echo "     9) Quantum IRCD"
+echo "     10) Viagra IRCD"
+echo "     11) IRCu P10 (Experimental)"
 while [ $validselection -eq 0 ] ; do
 	echo $n " [$IRCD_DEFAULT] -> $c"
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
@@ -174,48 +172,48 @@ while [ $validselection -eq 0 ] ; do
 			echo "correctly."
 			;;
 		1)
- 			IRCD="unreal31"
+ 			IRCD="--enable-unreal31"
 			validselection=1
 			;;
 		2)
- 			IRCD="unreal32"
+ 			IRCD="--enable-unreal32"
 			validselection=1
 			;;
 		3)
-			IRCD="ultimate2"
+			IRCD="--enable-ultimate2"
 			validselection=1
 			;;
 		4)
-			IRCD="ultimate3"
+			IRCD="--enable-ultimate3"
 			validselection=1
 			;;
 		5)
-			IRCD="hybrid7"
+			IRCD="--enable-hybrid7"
 			MEXTAUTHALLOWED=0
 			validselection=1
 			;;
 		6)
-			IRCD="neoircd"
+			IRCD="--enable-neoircd"
 			validselection=1
 			;;
 		7)
-			IRCD="bahamut"
+			IRCD="--enable-bahamut"
 			validselection=1
 			;;
 		8)
-			IRCD="mystic"
+			IRCD="--enable-mystic"
 			validselection=1
 			;;
 		9)
-			IRCD="quantum"
+			IRCD="--enable-quantum"
 			validselection=1
 			;;
 		10)
-			IRCD="viagra"
+			IRCD="--enable-viagra"
 			validselection=1
 			;;
 		11)
-			IRCD="ircup10"
+			IRCD="--enable-ircup10"
 			validselection=1
 			;;
 		*)
@@ -225,6 +223,8 @@ while [ $validselection -eq 0 ] ; do
 done
 IRCD_DEFAULT=$INPUT
 echo ""
+
+####
 
 ###########################################################################
 # select IRCd
