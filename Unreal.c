@@ -267,8 +267,6 @@ Oper_Modes usr_mds[] = {
 	,
 	{UMODE_DEAF, 'd', 0}
 	,
-	{UMODE_HIDING, 'I', 0}
-	,
 	{UMODE_ADMIN, 'A', 70}
 	,
 	{UMODE_NETADMIN, 'N', NS_ULEVEL_ADMIN}
