@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.35 2003/05/07 09:29:27 fishwaldo Exp $
+** $Id: sock.c,v 1.36 2003/05/22 13:51:54 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -83,7 +83,6 @@ int ConnectTo(char *host, int port)
 
 	return s;
 }
-
 void read_loop()
 {
 	register int i, j, SelectResult;

@@ -7,6 +7,12 @@ RedHat 9.0 Users:
 	NeoStats. If you are running RedHat 9.0 please read
 	http://www.neostats.net/boards/viewtopic.php?t=391
 
+"make install"
+	After compiling, you MUST make install neostats, otherwise it will
+	not run. This is to fix about 40 emails I have from people that
+	don't read the documentation/boards and then complain when they 
+	can't compile opsb or stupidserv.
+
 OPSB and StupidServ Modules:
 	These modules must be recompiled for NeoStats 2.5.3 due to changes
 	within the core version. No need to upgrade, just a recompile is all 

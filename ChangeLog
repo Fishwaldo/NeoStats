@@ -9,6 +9,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - make install was failing in the tools directory on some systems. Fixed - BugID#8
  - missed -f switch in ./neostats -h summary usage
  - This should teach people to "make install" :)
+ - changed the fork-Load_modules corder to fix some issues with calling_fini after we exit the foreground process after forking. 
+ - removed a un-used variable in the server struct
 
 * NeoStats * Fish * Version 2.5.2
  - Added Keeper Library for storing configuration and optionally data, and reserved space for language file storage

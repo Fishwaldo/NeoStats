@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.10 2003/05/09 13:17:15 fishwaldo Exp $
+** $Id: neoircd.c,v 1.11 2003/05/22 13:51:54 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -137,19 +137,18 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 	return 1;
 }
 int snewnick_cmd(const char *nick, const char *ident, const char *host, const char *realname, long mode) {
-	int i;
+	int i, j;
 	char newmode[20];
-	char newmode1[20];
-	newmode1[0] = '+';
-	newmode1[1] = '\0';
-	snprintf(newmode, 20, "%s", newmode1);
+	newmode[0] = '+';
+	j=1;
 	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1); i++) {
 		if (mode & usr_mds[i].umodes) {
-			snprintf(newmode1, 20, "%s%c", newmode, usr_mds[i].mode);
-			strncpy(newmode, newmode1, 20);
+			newmode[j]= usr_mds[i].mode;
+			j++;
 		}
 		
 	}
+	newmode[j] = '\0';
 	sts("%s %s 1 %lu %s %s %s * %s 0 :%s", MSG_NICK, nick, time(NULL), newmode, ident, host, me.name, realname);
 	AddUser(nick,ident, host, me.name, 0, time(NULL));
 	UserMode(nick, newmode);
@@ -161,16 +160,18 @@ int sping_cmd(const char *from, const char *reply, const char *to) {
 	return 1;
 }
 
-int sumode_cmd(const char *who, const char *target, long mode) {
-	int i;
+int sumode_cmd(const char *who, const char *target, long mode) {	int i, j;
 	char newmode[20];
 	newmode[0] = '+';
-	newmode[1] = '\0';
+	j=1;
 	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1); i++) {
 		if (mode & usr_mds[i].umodes) {
-			snprintf(newmode, 512, "%s%c", newmode, usr_mds[i].mode);
+			newmode[j]= usr_mds[i].mode;
+			j++;
 		}
+		
 	}
+	newmode[j] = '\0';
 	sts(":%s %s %s :%s", who, MSG_MODE, target, newmode);
 	UserMode(target, newmode);
 	return 1;

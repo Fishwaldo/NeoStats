@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.75 2003/05/14 14:00:04 fishwaldo Exp $
+** $Id: stats.h,v 1.76 2003/05/22 13:51:54 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -183,7 +183,7 @@ struct server_ {
 	int hops;
 	long hash;
 	time_t connected_since;
-	time_t last_announce;
+/*	time_t last_announce; */
 	int ping;
 	char uplink[MAXHOST];
 };

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.45 2003/05/09 14:19:08 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.46 2003/05/22 13:51:54 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -239,15 +239,18 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host, const ch
 	AddUser(nick,ident, host, me.name, 0, time(NULL));
 #else 
 int snewnick_cmd(const char *nick, const char *ident, const char *host, const char *realname, long mode) {
-	int i;
+	int i, j;
 	char newmode[20];
 	newmode[0] = '+';
-	newmode[1] = '\0';
+	j=1;
 	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1); i++) {
 		if (mode & usr_mds[i].umodes) {
-			snprintf(newmode, 20, "%s%c", newmode, usr_mds[i].mode);
+			newmode[j]= usr_mds[i].mode;
+			j++;
 		}
+		
 	}
+	newmode[j] = '\0';
 	sts("%s %s 1 %lu +%s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), newmode, ident, host, me.name, time(NULL), realname);
 	AddUser(nick,ident, host, me.name, 0, time(NULL));
 #ifdef ULTIMATE3
@@ -265,17 +268,18 @@ int sping_cmd(const char *from, const char *reply, const char *to) {
 }
 
 int sumode_cmd(const char *who, const char *target, long mode) {
-	int i;
+	int i, j;
 	char newmode[20];
-	char newmode2[20];
 	newmode[0] = '+';
-	newmode[1] = '\0';
+	j=1;
 	for (i = 0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1); i++) {
 		if (mode & usr_mds[i].umodes) {
-			snprintf(newmode2, 20, "%s%c", newmode, usr_mds[i].mode);
-			snprintf(newmode, 20, "%s", newmode);
+			newmode[j]= usr_mds[i].mode;
+			j++;
 		}
+		
 	}
+	newmode[j] = '\0';
 	sts(":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, newmode);
 #ifdef ULTIMATE3
 	UserMode(target, newmode, 0);

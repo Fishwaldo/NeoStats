@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.42 2003/05/12 11:38:56 shmad Exp $
+** $Id: hostserv.c,v 1.43 2003/05/22 13:51:55 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -377,10 +377,10 @@ int Online(char **av, int ac) {
 	}
 
 
-    if (init_bot(s_HostServ,user,host,rname, "+oikSwgleq-x", HostServ_info[0].module_name) == -1 ) {
+    if (init_bot(s_HostServ,user,host,rname, "+oS", HostServ_info[0].module_name) == -1 ) {
         /* Nick was in use */
         snprintf(s_HostServ, MAXNICK, "%s_", s_HostServ);
-        init_bot(s_HostServ,user,host,rname, "+oikSwgleq-x", HostServ_info[0].module_name);
+        init_bot(s_HostServ,user,host,rname, "+oS", HostServ_info[0].module_name);
     }
     free(user);
     free(host);

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.23 2003/04/15 14:03:37 fishwaldo Exp $
+** $Id: cs.c,v 1.24 2003/05/22 13:51:55 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -159,10 +159,10 @@ int Online(char **av, int ac) {
 	}
 
 
-    if (init_bot(s_ConnectServ,user, host, rname, "+oikSwgleq-x", my_info[0].module_name) == -1 ) {
+    if (init_bot(s_ConnectServ,user, host, rname, "+oS", my_info[0].module_name) == -1 ) {
         /* Nick was in use */
         s_ConnectServ = strcat(s_ConnectServ, "_");
-        init_bot(s_ConnectServ,user, host, rname, "+oikSwgleq-x", my_info[0].module_name);
+        init_bot(s_ConnectServ,user, host, rname, "+oS", my_info[0].module_name);
     }
     cs_online = 1;
     free(user);

@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.91 2003/05/21 09:33:17 fishwaldo Exp $
+** $Id: main.c,v 1.92 2003/05/22 13:51:54 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -161,10 +161,6 @@ int main(int argc, char *argv[])
 	init_user_hash();
 	init_chan_hash();
 	
-/** This section ALWAYS craps out so we ignore it-- for now */
-	if (init_modules()) {
-/*		printf("WARNING: Some Modules Failed to Load"); */
-	}
 
 
 #ifndef DEBUG
@@ -192,6 +188,9 @@ int main(int argc, char *argv[])
 	}	
 #endif
 	nlog(LOG_NOTICE, LOG_CORE, "Statistics Started (NeoStats %d.%d.%d%s).", MAJOR, MINOR, REV, version);
+
+	/* don't init_modules till after we fork. This fixes the load->fork-exit->call _fini problems when we fork */
+	init_modules();
 
 	/* we are ready to start now Duh! */
 	start();

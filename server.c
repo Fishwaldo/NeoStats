@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: server.c,v 1.15 2003/04/11 09:26:30 fishwaldo Exp $
+** $Id: server.c,v 1.16 2003/05/22 13:51:54 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -68,7 +68,8 @@ void AddServer(char *name,char *uplink, int hops)
 	s = new_server(name);
 	s->hops = hops;
 	s->connected_since = time(NULL);
-	s->last_announce = time(NULL);
+	/* this is kionda useless right ? */
+/*	s->last_announce = time(NULL); */
 	if (uplink) {
 		memcpy(s->uplink,uplink, MAXHOST);
 	} else {
