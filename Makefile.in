@@ -57,8 +57,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
-CONFIG_HEADER = $(top_builddir)/include/config.h \
-	$(top_builddir)/src/dbm/gdbm/autoconf.h
+CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES = neostats
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(datadir)" \
 	"$(DESTDIR)$(docdir)"

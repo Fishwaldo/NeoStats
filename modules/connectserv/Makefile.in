@@ -50,8 +50,7 @@ am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
-CONFIG_HEADER = $(top_builddir)/include/config.h \
-	$(top_builddir)/src/dbm/gdbm/autoconf.h
+CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -65,7 +64,7 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 connectserv_la_LIBADD =
 am_connectserv_la_OBJECTS = cs.lo cs_help.lo
 connectserv_la_OBJECTS = $(am_connectserv_la_OBJECTS)
-DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include -I$(top_builddir)/src/dbm/gdbm
+DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
