@@ -423,7 +423,7 @@ src/modes.c -text
 src/modules.c -text
 src/neostats.vcproj -text
 src/ns_help.c eol=lf
-src/portab.c -text
+src/oscalls.c -text
 src/protocol/Makefile.am -text
 src/protocol/Makefile.in -text
 src/protocol/bahamut.c eol=lf
