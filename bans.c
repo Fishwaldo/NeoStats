@@ -27,19 +27,21 @@
 static hash_t *banshash;
 
 void 
-AddBan(const char* type, const char* user, const char* host, const char* mask,
-	const char* reason, const char* setby, const char* tsset, const char* tsexpires)
+AddBan()
 {
+#if 0
+	AddBan(const char* type, const char* user, const char* host, const char* mask,
+	const char* reason, const char* setby, const char* tsset, const char* tsexpires)
 	Ban* ban;
-	ban.type = type;
-	strlcpy(ban.user, user, MAXUSER];
-	strlcpy(ban.host, host, MAXHOST];
-	strlcpy(ban.mask, mask, MAXHOST];
-	strlcpy(ban.reason, reason,,BUFSIZE];
-	strlcpy(ban.setby ,setby, MAXHOST];
-	ban.tsset;
-	ban.tsexpires;
-
+	ban->type = type;
+	strlcpy(ban->user, user, MAXUSER);
+	strlcpy(ban->host, host, MAXHOST);
+	strlcpy(ban->mask, mask, MAXHOST);
+	strlcpy(ban->reason, reason,,BUFSIZE);
+	strlcpy(ban->setby ,setby, MAXHOST);
+	ban->tsset = atol(tsset);
+	ban->tsexpires = atol(tsexpires);
+#endif
 }
 
 void 
