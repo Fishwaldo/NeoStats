@@ -177,7 +177,7 @@ send_join (const char *sender, const char *who, const char *chan, const unsigned
 }
 
 void 
-send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
+send_sjoin (const char *sender, const char *who, const char *chan, const unsigned long ts)
 {
 }
 

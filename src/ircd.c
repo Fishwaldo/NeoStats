@@ -1248,7 +1248,12 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 		flag = ' ';
 		mode= '\0';
 	}
-	send_sjoin (me.name, who, chan, flag, (unsigned long)ts);
+	if (mode == 0) {
+		ircsnprintf (ircd_buf, BUFSIZE, "%s", flag, who);
+	} else {
+		ircsnprintf (ircd_buf, BUFSIZE, "%c%s", flag, who);
+	}
+	send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
 	join_chan (who, chan);
 	ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", chan, mode, who);
 	ac = split_buf (ircd_buf, &av, 0);
