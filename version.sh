@@ -1,12 +1,10 @@
 # Script to generate SVN version information
 id=`svn info |grep 'Revision:'`
 id=`echo $id |sed 's/.* Revision: \(.*\) .* Exp .*/\1/'`
-#echo "$id"
 
 if test -r version.h
 then
 	idold=`sed -n 's/^#define NEOSTATS_REVISION \"\(.*\)\"/\1/p' < version.h`
-#	echo "$idold"
 	if [ "$idold" = "$id" ] 
 	then 
 		echo "version.h up to date"
@@ -34,4 +32,3 @@ cat >version.h <<EOF
 
 EOF
 fi
-
