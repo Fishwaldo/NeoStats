@@ -248,10 +248,10 @@ cat > $CONF << __EOF__
 #    Valid options are:
 #          gdbm
 #
-#          PROTOCOL "gdbm"
+#          DBM "gdbm"
 #      
 
-PROTOCOL "gdbm"
+DBM "gdbm"
 
 # SERVER_NAME <hostname> [REQUIRED]
 #    Specifies the name of the NeoStats Server as it will appear on 
