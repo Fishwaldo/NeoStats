@@ -276,6 +276,9 @@ echo "(|                                   #neostats channel      |)"
 echo "(|    WWW:   http://www.neostats.net/cgi-bin/forum.cgi      |)"
 echo "(|           http://www.sf.net/projects/neostats/           |)"
 echo "(*----------------------------------------------------------*)"
-echo "(| Now that Configure is complete, just type "make" to        |)"
+echo "(| Now that Configure is complete, just type 'make' to        |)"
 echo "(| compile the program                                      |)"
 echo "(*----------------------------------------------------------*)"
+read -p "Press any Key to Read the Release Notes" -n 1
+clear
+more ./RelNotes.txt

@@ -12,6 +12,7 @@
 /NEWS -text
 /README -text
 /README.pt -text
+/RelNotes.txt -text
 /TODO -text
 /Ultimate.c -text
 /Ultimate.h -text

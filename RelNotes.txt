@@ -1,0 +1,22 @@
+* NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 2 
+
+==============================================================================
+Important Changes you should know:
+==============================================================================
+HostServ: 
+	HostServ uses a new Database format to support the login option. 
+	This means that your old HostServ database (data/hostserv.db) is not 
+	Compatible with this version. Please delete hostserv.db before you run 
+	this version
+
+Core:
+	You must uncomment the NO_LOAD option after running makeconf. This is 
+	to Ensure that people read their config file before running!
+	UltimateIRCD Version 3.0.0.a26 (Current at release time) is the only 
+	version of Ultimate thats supported)
+	If you use the Raw command (Bad IRCOP, Bad!) then you have to 
+	explicitly enable it via the configure interface
+	recv.log is no longer enabled on production builds. No more eating up 
+	Disk Space!
+
+Read the ChangeLog for a complete description of what has changed
