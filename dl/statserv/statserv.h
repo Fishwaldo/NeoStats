@@ -202,9 +202,6 @@ void save_chan(CStats *c);
 CStats *load_chan(char *name);
 
 /* ss_help.c */
-extern const char *ss_help[];
-extern const char *ss_help_on_help[];
-extern const char *ss_help_myuser[];
 extern const char *ss_help_about[];
 extern const char *ss_help_server[];
 extern const char *ss_help_map[];

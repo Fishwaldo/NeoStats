@@ -45,45 +45,6 @@ const char ss_help_set_oneline[]="Change StatServ Settings";
 const char ss_help_forcehtml_oneline[]="Force an update of the HTML output file";
 const char ss_help_stats_oneline[]="Modify Statistic Entries.";
 
-const char *ss_help[] = {
-	"The following commands can be used with StatServ",
-	"",
-	"    ABOUT           About StatServ",
-	"    VERSION         Shows you the current StatServ Version",
-	"    SERVER          Request information about a server",
-	"    MAP             Show the network map",
-	"    CHAN            Channel Information",
-	"    NETSTATS        General Network Statistics",
-	"    DAILY           Daily Network Statistics",
-	"    TLD             Show what country a TLD represents",
-	"    TLDMAP          Statistics on TLD's",
-	"    OPERLIST        Show a listing of on-line IRCops",
-#ifdef HAVE_BOT_MODE
-	"    BOTLIST         Show a listing of on-line BOTS",
-#endif
-	"    CLIENTVERSIONS  Shows you a list of Client Versions",
-	NULL
-};
-
-const char *ss_help_on_help[] = {
-	"",
-	"To use a command, type",
-	"    \2/msg StatServ command\2",
-	"For for more information on a command, type", 
-	"    \2/msg StatServ HELP command\2.",
-	NULL
-};
-
-const char *ss_myuser_help[] = {
-	"",
-	"Additional commands for Service Roots",
-	"",
-	"    SET             Change StatServ Settings",
-	"    FORCEHTML       Force an update of the HTML output file",
-	"    STATS           Modify Statistic Entries.",
-	NULL
-};
-
 const char *ss_help_about[] = {
 	"\2StatServ\2 provides detailed statistics about your",
 	"IRC network users, channels and servers.",
