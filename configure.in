@@ -154,20 +154,20 @@ dnl Default values for miscellaneous macros
 AC_DEFINE(POSIX_MALLOC_THRESHOLD,10)
 
 dnl How to copy one va_list to another?
-AC_CACHE_CHECK([for va_copy], unet_cv_c_va_copy, [AC_LINK_IFELSE(
+AC_CACHE_CHECK([for va_copy], ns_va_copy, [AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);])],
-  [unet_cv_c_va_copy="yes"],
-  [unet_cv_c_va_copy="no"]
+  [ns_va_copy="yes"],
+  [ns_va_copy="no"]
 )])
-if test "$unet_cv_c_va_copy" = "yes" ; then
+if test "$ns_va_copy" = "yes" ; then
   AC_DEFINE(HAVE_VA_COPY, 1, [Define if we have va_copy]) fi
 
-AC_CACHE_CHECK([for __va_copy], unet_cv_c___va_copy, [AC_LINK_IFELSE(
+AC_CACHE_CHECK([for __va_copy], ns___va_copy, [AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([#include <stdarg.h>], [va_list ap1, ap2; __va_copy(ap1, ap2);])],
-  [unet_cv_c___va_copy="yes"],
-  [unet_cv_c___va_copy="no"]
+  [ns___va_copy="yes"],
+  [ns___va_copy="no"]
 )])
-if test "$unet_cv_c___va_copy" = "yes" ; then
+if test "$ns___va_copy" = "yes" ; then
   AC_DEFINE(HAVE___VA_COPY, 1, [Define if we have __va_copy]) fi
 
 
