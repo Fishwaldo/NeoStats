@@ -837,6 +837,7 @@ void Usr_Vhost (char *, char **, int argc);
 void Srv_Topic (char *, char **, int argc);
 void Srv_Ping (char *, char **, int argc);
 void Srv_Netinfo (char *, char **, int argc);
+void Srv_Sjoin (char *origin, char **argv, int argc);
 void Srv_Pass (char *, char **, int argc);
 void Srv_Server (char *, char **, int argc);
 void Srv_Squit (char *, char **, int argc);

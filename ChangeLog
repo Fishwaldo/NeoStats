@@ -4,10 +4,13 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - removed unused "hash" entry from structures (M)
  - new files to handle command related functions for new bot message system (M)
  - introduced flags field into ModUser structure (M)
- - early version of generic bot message handler (M)
+ - generic bot message handler introduced to reduce module code bloat (M)
  - log messages now have second resolution (M)
  - Unreal support split between 3.1.x and 3.2.x since they require different support now (M)
  - Unreal updates to reflect the current versions of Unreal (M)
+ - add MSG_SJOIN handling to Unreal (M)
+ - added command handler support function is_target_valid to validate a user (M)
+ - added __attribute__((format(printf,x,y))) and __attribute__((noreturn)) to header files (M)
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.9
  - import of libpcre into core (M)

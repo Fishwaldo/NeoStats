@@ -113,137 +113,6 @@ void __ModFini()
 {
 };
 
-
-/* Routine for HAIL */
-static int ms_hail(User * u, char **av, int ac)
-{
-	char *cmd;
-	char *m;
-
-	SET_SEGV_LOCATION();
-	cmd = av[2];
-	m = av[3];
-	if (!strcasecmp(m, s_MoraleServ)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_MoraleServ,
-			  "Prevented %s from making %s message %s",
-			  u->nick, s_MoraleServ, s_MoraleServ);
-		return 1;
-	}
-	if (!finduser(m)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-	/* The user has passed the minimum requirements for input */
-
-	prefmsg(u->nick, s_MoraleServ, 
-		"Your \"HAIL\" song greeting has been sent to %s!", m);
-	chanalert(s_MoraleServ,
-		  "%s Wanted %s to be hailed by sending the song to %s",
-		  u->nick, cmd, m);
-	prefmsg(m, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
-	prefmsg(m, s_MoraleServ,
-		"*sings* Hail to the %s, they're the %s and they need hailing, hail to the %s so you better all hail like crazy...",
-		cmd, cmd, cmd);
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent a HAIL to the %s song to %s",
-	     u->nick, cmd, m);
-	return 1;
-
-}
-
-
-/* Routine for LAPDANCE */
-static int ms_lapdance(User * u, char **av, int ac)
-{
-	char *cmd;
-	
-	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_MoraleServ)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_MoraleServ,
-			  "Prevented %s from making %s message %s",
-			  u->nick, s_MoraleServ, s_MoraleServ);
-		return 1;
-	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-	/* The user has passed the minimum requirements for input */
-
-	prefmsg(cmd, s_MoraleServ,
-		"*%s Seductively walks up to %s and gives %s a sly look*",
-		s_MoraleServ, cmd, cmd);
-	prefmsg(cmd, s_MoraleServ,
-		"*%s Sits across %s's legs and gives %s the best Lap Dance of their life*",
-		s_MoraleServ, cmd, cmd);
-	prefmsg(cmd, s_MoraleServ,
-		"*I Think we both need a cold shower now*... *wink*",
-		s_MoraleServ, cmd);
-	chanalert(s_MoraleServ, "%s Wanted a LAPDANCE to be preformed on %s",
-		  u->nick, cmd);
-	nlog(LOG_NORMAL, LOG_MOD,
-	     "%s Wanted a LAPDANCE to be preformed on %s", u->nick, cmd);
-	return 1;
-}
-
-
-/* Routine for ODE */
-static int ms_ode(User * u, char **av, int ac)
-{
-	char *cmd;
-	char *m;
-
-	SET_SEGV_LOCATION();
-	cmd = av[2];
-	m = av[3];
-	if (!m) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Syntax: /msg %s ODE <WHO THE ODE ODE IS ABOUT> <NICK TO SEND ODE TO>",
-			s_MoraleServ);
-		prefmsg(u->nick, s_MoraleServ,
-			"For additional help: /msg %s HELP", s_MoraleServ);
-		return 1;
-	}
-	if (!strcasecmp(m, s_MoraleServ)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_MoraleServ,
-			  "Prevented %s from making %s message %s",
-			  u->nick, s_MoraleServ, s_MoraleServ);
-		return 1;
-	}
-	if (!finduser(m)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-	/* The user has passed the minimum requirements for input */
-
-	prefmsg(u->nick, s_MoraleServ,
-		"Your ODE to %s has been sent to %s!", cmd, m);
-	chanalert(s_MoraleServ, "%s Wanted an ODE to %s to be recited to %s",
-		  u->nick, cmd, m);
-	prefmsg(m, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
-	prefmsg(m, s_MoraleServ, "*recites*", u->nick);
-	prefmsg(m, s_MoraleServ, "How I wish to be a %s,", cmd);
-	prefmsg(m, s_MoraleServ, "a %s I would like to be.", cmd);
-	prefmsg(m, s_MoraleServ, "For if I was a %s,", cmd);
-	prefmsg(m, s_MoraleServ, "I'd watch the network hail thee.", cmd);
-	prefmsg(m, s_MoraleServ, "*bows*", u->nick);
-	nlog(LOG_NORMAL, LOG_MOD,
-	     "%s sent an ODE to %s to be recited to %s", u->nick, cmd, m);
-	return 1;
-
-}
-
-
-
 /* Routine for VERSION */
 static int ms_version(User * u, char **av, int ac)
 {
@@ -264,53 +133,96 @@ static int ms_about(User * u, char **av, int ac)
 	return 1;
 }
 
+/* Routine for HAIL */
+static int ms_hail(User * u, char **av, int ac)
+{
+	char *about_nick;
+	char *target_nick;
+
+	SET_SEGV_LOCATION();
+	about_nick = av[2];
+	target_nick = av[3];
+	if(!is_target_valid(s_MoraleServ, u, target_nick)) {
+		return 0;
+	}
+	prefmsg(u->nick, s_MoraleServ, 
+		"Your \"HAIL\" song greeting has been sent to %s!", target_nick);
+	prefmsg(target_nick, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
+	prefmsg(target_nick, s_MoraleServ,
+		"*sings* Hail to the %s, they're the %s and they need hailing, hail to the %s so you better all hail like crazy...",
+		about_nick, about_nick, about_nick);
+	return 1;     
+}
+
+
+/* Routine for LAPDANCE */
+static int ms_lapdance(User * u, char **av, int ac)
+{
+	char *target_nick;
+	
+	SET_SEGV_LOCATION();
+	target_nick = av[2];
+	if(!is_target_valid(s_MoraleServ, u, target_nick)) {
+		return 0;
+	}
+	prefmsg(target_nick, s_MoraleServ,
+		"*%s Seductively walks up to %s and gives %s a sly look*",
+		s_MoraleServ, target_nick, target_nick);
+	prefmsg(target_nick, s_MoraleServ,
+		"*%s Sits across %s's legs and gives %s the best Lap Dance of their life*",
+		s_MoraleServ, target_nick, target_nick);
+	prefmsg(target_nick, s_MoraleServ,
+		"*I Think we both need a cold shower now*... *wink*");
+	return 1;
+}
+
+
+/* Routine for ODE */
+static int ms_ode(User * u, char **av, int ac)
+{
+	char *about_nick;
+	char *target_nick;
+
+	SET_SEGV_LOCATION();
+	about_nick = av[2];
+	target_nick = av[3];
+	if(!is_target_valid(s_MoraleServ, u, target_nick)) {
+		return 0;
+	}
+	prefmsg(u->nick, s_MoraleServ,
+		"Your ODE to %s has been sent to %s!", about_nick, target_nick);
+	prefmsg(target_nick, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
+	prefmsg(target_nick, s_MoraleServ, "*recites*");
+	prefmsg(target_nick, s_MoraleServ, "How I wish to be a %s,", about_nick);
+	prefmsg(target_nick, s_MoraleServ, "a %s I would like to be.", about_nick);
+	prefmsg(target_nick, s_MoraleServ, "For if I was a %s,", about_nick);
+	prefmsg(target_nick, s_MoraleServ, "I'd watch the network hail thee.");
+	prefmsg(target_nick, s_MoraleServ, "*bows*");
+	return 1;       
+}
+
 
 /* Routine for POEM */
 static int ms_poem(User * u, char **av, int ac)
 {
-	char *cmd;
-	char *m;
+	char *about_nick;
+	char *target_nick;
+
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	m = av[3];
-	if (!m) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Syntax: /msg %s POEM <WHO THE POEM IS ABOUT> <NICK TO SEND TO>",
-			s_MoraleServ);
-		prefmsg(u->nick, s_MoraleServ,
-			"For additional help: /msg %s HELP", s_MoraleServ);
-		return 1;
+	about_nick = av[2];
+	target_nick = av[3];
+	if(!is_target_valid(s_MoraleServ, u, target_nick)) {
+		return 0;
 	}
-	if (!strcasecmp(m, s_MoraleServ)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_MoraleServ,
-			  "Prevented %s from making %s message %s",
-			  u->nick, s_MoraleServ, s_MoraleServ);
-		return 1;
-	}
-	if (!finduser(m)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-	/* The user has passed the minimum requirements for input */
-
 	prefmsg(u->nick, s_MoraleServ,
-		"Your POEM about %s has been sent to %s!", cmd, m);
-	chanalert(s_MoraleServ,
-		  "%s Wanted a POEM about %s to be recited to %s", u->nick,
-		  cmd, m);
-	prefmsg(m, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
-	prefmsg(m, s_MoraleServ, "*recites*");
-	prefmsg(m, s_MoraleServ, "I wish I was a %s,", cmd);
-	prefmsg(m, s_MoraleServ, "A %s is never glum,", cmd);
-	prefmsg(m, s_MoraleServ, "Coz how can you be grumpy,");
-	prefmsg(m, s_MoraleServ, "When the sun shines out your bum.");
-	prefmsg(m, s_MoraleServ, "*bows*");
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent a POEM about %s to %s", u->nick,
-	     cmd, m);
-
+		"Your POEM about %s has been sent to %s!", about_nick, target_nick);
+	prefmsg(target_nick, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
+	prefmsg(target_nick, s_MoraleServ, "*recites*");
+	prefmsg(target_nick, s_MoraleServ, "I wish I was a %s,", about_nick);
+	prefmsg(target_nick, s_MoraleServ, "A %s is never glum,", about_nick);
+	prefmsg(target_nick, s_MoraleServ, "Coz how can you be grumpy,");
+	prefmsg(target_nick, s_MoraleServ, "When the sun shines out your bum.");
+	prefmsg(target_nick, s_MoraleServ, "*bows*");
 	return 1;
 }
 
@@ -318,38 +230,20 @@ static int ms_poem(User * u, char **av, int ac)
 /* Routine for REDNECK */
 static int ms_redneck(User * u, char **av, int ac)
 {
-	char *cmd;
+	char *target_nick;
+
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_MoraleServ)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_MoraleServ,
-			  "Prevented %s from making %s message %s",
-			  u->nick, s_MoraleServ, s_MoraleServ);
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_MoraleServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-	/* The user has passed the minimum requirements for input */
-
 	prefmsg(u->nick, s_MoraleServ,
-		"Your redneck message has been sent to %s!", cmd);
-	chanalert(s_MoraleServ,
-		  "%s Wanted a REDNECK \"dubbing\" to be preformed on %s",
-		  u->nick, cmd);
-	prefmsg(cmd, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
-	prefmsg(cmd, s_MoraleServ, "*recites*", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"I dub thee \"Redneck\", May you enjoy your coons and over sexation and many hours of weird contemplation. If its dead you eat it, ifs living kill it than eat it. This is the redneck way. Country Music all the time no rap no jive no rock no hop this is the redneck way, now go forth into a redneck world and don't forget your boots.",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ, "*bows*", u->nick);
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent a REDNECK \"dubbing\" to %s",
-	     u->nick, cmd);
-
+		"Your redneck message has been sent to %s!", target_nick);
+	prefmsg(target_nick, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
+	prefmsg(target_nick, s_MoraleServ, "*recites*");
+	prefmsg(target_nick, s_MoraleServ,
+		"I dub thee \"Redneck\", May you enjoy your coons and over sexation and many hours of weird contemplation. If its dead you eat it, ifs living kill it than eat it. This is the redneck way. Country Music all the time no rap no jive no rock no hop this is the redneck way, now go forth into a redneck world and don't forget your boots.");
+	prefmsg(target_nick, s_MoraleServ, "*bows*");
 	return 1;
 }
 
@@ -357,161 +251,102 @@ static int ms_redneck(User * u, char **av, int ac)
 
 static int ms_cheerup(User * u, char **av, int ac)
 {
-	char *cmd;
+	char *target_nick;
+
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_MoraleServ)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_MoraleServ,
-			  "Prevented %s from making %s message %s",
-			  u->nick, s_MoraleServ, s_MoraleServ);
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_MoraleServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-	/* The user has passed the minimum requirements for input */
-
-	prefmsg(cmd, s_MoraleServ, "Cheer up %s .....", cmd);
-	prefmsg(cmd, s_MoraleServ,
-		"All of us on the network love you! 3--<--<--<{4@",
-		u->nick);
-	chanalert(s_MoraleServ, "%s Wanted %s to CHEERUP", u->nick, cmd);
-	nlog(LOG_NORMAL, LOG_MOD, "%s Wanted %s to CHEERUP", u->nick, cmd);
+	prefmsg(target_nick, s_MoraleServ, "Cheer up %s .....", target_nick);
+	prefmsg(target_nick, s_MoraleServ,
+		"All of us on the network love you! 3--<--<--<{4@");
 	return 1;
-
 }
 
 
 /* Routine for BEHAPPY */
 static int ms_behappy(User * u, char **av, int ac)
 {
-	char *cmd;
+	char *target_nick;
+
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_MoraleServ)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_MoraleServ,
-			  "Prevented %s from making %s message %s",
-			  u->nick, s_MoraleServ, s_MoraleServ);
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_MoraleServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-	/* The user has passed the minimum requirements for input */
-
-	prefmsg(cmd, s_MoraleServ, "%s thinks that your a little sad.....",
+	prefmsg(target_nick, s_MoraleServ, "%s thinks that you're a little sad.....",
 		u->nick);
-	prefmsg(cmd, s_MoraleServ, "*starts singing*", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Here's a little song I wrote, You might want to sing it note for note",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ, "Don't Worry - Be Happy", u->nick);
-	prefmsg(cmd, s_MoraleServ, " ", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"In every life we have some trouble, But when you worry you make it Double",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Don't Worry - Be Happy, Don't Worry - Be Happy now",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Don't Worry - Be Happy, Don't Worry - Be Happy", u->nick);
-	prefmsg(cmd, s_MoraleServ, " ", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Ain't got no place to lay your head, Somebody came and took your bed",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ, "Don't Worry - Be Happy", u->nick);
-	prefmsg(cmd, s_MoraleServ, " ", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"The landlord say your rent is late, He may have to litigate",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Don't Worry - Be Happy, Look at Me - I'm Happy", u->nick);
-	prefmsg(cmd, s_MoraleServ, "Don't Worry - Be Happy", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Here I give you my phone number, When you worry call me, I make you happy",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ, "Don't Worry - Be Happy", u->nick);
-	prefmsg(cmd, s_MoraleServ, " ", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Ain't got not cash, ain't got no style, Ain't got no gal to make you smile",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ, "Don't Worry - Be Happy", u->nick);
-	prefmsg(cmd, s_MoraleServ, " ", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"'Cause when you worry your face will frown, and that will bring everybody down",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Don't Worry - Be Happy, Don't Worry, Don't Worry - Don't do it",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Be Happy - Put a smile on your face, Don't bring everybody down",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Don't Worry, it will soon pass, whatever it is", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Don't Worry - Be Happy, I'm not worried, I'm happy . . . .",
-		u->nick);
-
-	chanalert(s_MoraleServ, "%s Wanted %s to BEHAPPY", u->nick, cmd);
-	nlog(LOG_NORMAL, LOG_MOD, "%s Wanted %s to BEHAPPY", u->nick, cmd);
+	prefmsg(target_nick, s_MoraleServ, "*starts singing*");
+	prefmsg(target_nick, s_MoraleServ,
+		"Here's a little song I wrote, You might want to sing it note for note");
+	prefmsg(target_nick, s_MoraleServ, "Don't Worry - Be Happy");
+	prefmsg(target_nick, s_MoraleServ, " ");
+	prefmsg(target_nick, s_MoraleServ,
+		"In every life we have some trouble, But when you worry you make it Double");
+	prefmsg(target_nick, s_MoraleServ,
+		"Don't Worry - Be Happy, Don't Worry - Be Happy now");
+	prefmsg(target_nick, s_MoraleServ,
+		"Don't Worry - Be Happy, Don't Worry - Be Happy");
+	prefmsg(target_nick, s_MoraleServ, " ");
+	prefmsg(target_nick, s_MoraleServ,
+		"Ain't got no place to lay your head, Somebody came and took your bed");
+	prefmsg(target_nick, s_MoraleServ, "Don't Worry - Be Happy");
+	prefmsg(target_nick, s_MoraleServ, " ");
+	prefmsg(target_nick, s_MoraleServ,
+		"The landlord say your rent is late, He may have to litigate");
+	prefmsg(target_nick, s_MoraleServ,
+		"Don't Worry - Be Happy, Look at Me - I'm Happy");
+	prefmsg(target_nick, s_MoraleServ, "Don't Worry - Be Happy");
+	prefmsg(target_nick, s_MoraleServ,
+		"Here I give you my phone number, When you worry call me, I make you happy");
+	prefmsg(target_nick, s_MoraleServ, "Don't Worry - Be Happy");
+	prefmsg(target_nick, s_MoraleServ, " ");
+	prefmsg(target_nick, s_MoraleServ,
+		"Ain't got not cash, ain't got no style, Ain't got no gal to make you smile");
+	prefmsg(target_nick, s_MoraleServ, "Don't Worry - Be Happy");
+	prefmsg(target_nick, s_MoraleServ, " ");
+	prefmsg(target_nick, s_MoraleServ,
+		"'Cause when you worry your face will frown, and that will bring everybody down");
+	prefmsg(target_nick, s_MoraleServ,
+		"Don't Worry - Be Happy, Don't Worry, Don't Worry - Don't do it");
+	prefmsg(target_nick, s_MoraleServ,
+		"Be Happy - Put a smile on your face, Don't bring everybody down");
+	prefmsg(target_nick, s_MoraleServ,
+		"Don't Worry, it will soon pass, whatever it is");
+	prefmsg(target_nick, s_MoraleServ,
+		"Don't Worry - Be Happy, I'm not worried, I'm happy . . . .");
 	return 1;
-
 }
 
 
 /* Routine for WONDERFUL */
 static int ms_wonderful(User * u, char **av, int ac)
 {
-	char *cmd;
+	char *target_nick;
+
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_MoraleServ)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		chanalert(s_MoraleServ,
-			  "Prevented %s from making %s message %s",
-			  u->nick, s_MoraleServ, s_MoraleServ);
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_MoraleServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_MoraleServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-	/* The user has passed the minimum requirements for input */
-
-	prefmsg(cmd, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
-	prefmsg(cmd, s_MoraleServ, "*starts singing*", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"So excuse me forgetting but these things I do", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"You see I've forgotten if they're green or they're blue",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Anyway the thing is what I really mean", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"Yours are the sweetest eyes I've ever seen", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"And you can tell everybody this is your song", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"It may be quite simple but now that it's done", u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"I hope you don't mind, I hope you don't mind that I put down in words",
-		u->nick);
-	prefmsg(cmd, s_MoraleServ,
-		"How wonderful life is while %s is in the world", cmd);
-
-	chanalert(s_MoraleServ, "%s Wanted to express how WONDERFUL %s is",
-		  u->nick, cmd);
-	nlog(LOG_NORMAL, LOG_MOD,
-	     "%s Wanted to express how WONDERFUL %s is", u->nick, cmd);
+	prefmsg(target_nick, s_MoraleServ, "Courtesy of your friend %s:", u->nick);
+	prefmsg(target_nick, s_MoraleServ, "*starts singing*");
+	prefmsg(target_nick, s_MoraleServ,
+		"So excuse me forgetting but these things I do");
+	prefmsg(target_nick, s_MoraleServ,
+		"You see I've forgotten if they're green or they're blue");
+	prefmsg(target_nick, s_MoraleServ,
+		"Anyway the thing is what I really mean");
+	prefmsg(target_nick, s_MoraleServ,
+		"Yours are the sweetest eyes I've ever seen");
+	prefmsg(target_nick, s_MoraleServ,
+		"And you can tell everybody this is your song");
+	prefmsg(target_nick, s_MoraleServ,
+		"It may be quite simple but now that it's done");
+	prefmsg(target_nick, s_MoraleServ,
+		"I hope you don't mind, I hope you don't mind that I put down in words");
+	prefmsg(target_nick, s_MoraleServ,
+		"How wonderful life is while %s is in the world", target_nick);
 	return 1;
 }

@@ -30,9 +30,8 @@
 #include "ls_help.c"
 #include "log.h"
 
-char s_LoveServ[MAXNICK];
-
-ModUser *ls_bot;
+static char s_LoveServ[MAXNICK];
+static ModUser *ls_bot;
 
 static int ls_rose(User * u, char **av, int ac);
 static int ls_kiss(User * u, char **av, int ac);
@@ -117,284 +116,179 @@ void __ModFini()
 
 static int ls_rose(User * u, char **av, int ac)
 {
-	char *cmd;
+	char *target_nick;
 
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_LoveServ)) {
-		prefmsg(u->nick, s_LoveServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_LoveServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-
 	prefmsg(u->nick, s_LoveServ, "Your rose has been sent to %s!",
-		cmd);
-	prefmsg(cmd, s_LoveServ,
+		target_nick);
+	prefmsg(target_nick, s_LoveServ,
 		"%s has sent you this beautiful rose! 3--<--<--<{4@",
 		u->nick);
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent a ROSE to %s", u->nick, cmd);
 	return 1;
 }
 
 
 static int ls_kiss(User * u, char **av, int ac)
 {
-	char *cmd;
+	char *target_nick;
 
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_LoveServ)) {
-		prefmsg(u->nick, s_LoveServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_LoveServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-
-	prefmsg(u->nick, s_LoveServ, "You have virtually kissed %s!", cmd);
-	prefmsg(cmd, s_LoveServ, "%s has virtually kissed you!", u->nick);
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent a KISS to %s", u->nick, cmd);
+	prefmsg(u->nick, s_LoveServ, "You have virtually kissed %s!", target_nick);
+	prefmsg(target_nick, s_LoveServ, "%s has virtually kissed you!", u->nick);
 	return 1;
 }
 
 
 static int ls_tonsil(User * u, char **av, int ac)
 {
-	char *cmd;
+	char *target_nick;
 
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_LoveServ)) {
-		prefmsg(u->nick, s_LoveServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_LoveServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-
 	prefmsg(u->nick, s_LoveServ,
-		"You have virtually tonsilly kissed %s!", cmd);
-	prefmsg(cmd, s_LoveServ,
+		"You have virtually tonsilly kissed %s!", target_nick);
+	prefmsg(target_nick, s_LoveServ,
 		"%s would like to send a SLoW..LoNG..DeeP..PeNeTRaTiNG..ToNSiL-TiCKLiNG.. HaiR STRaiGHTeNiNG..Toe-CuRLiNG..NeRVe-JaNGLiNG..LiFe-aLTeRiNG.. FaNTaSY-CauSiNG..i JuST SaW GoD!..GoSH, DiD MY CLoTHeS FaLL oFF?.. YeS, i'M GLaD i CaMe oN iRC..KiSS oN Da LiPS!!!",
 		u->nick);
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent a TONSIL KISS to %s", u->nick,
-	     cmd);
+	     target_nick);
 	return 1;
 }
 
 
 static int ls_hug(User * u, char **av, int ac)
 {
-	char *cmd;
+	char *target_nick;
 
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_LoveServ)) {
-		prefmsg(u->nick, s_LoveServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_LoveServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-
-	prefmsg(u->nick, s_LoveServ, "%s has received your hug! :)", cmd);
-	prefmsg(cmd, s_LoveServ, "%s has sent you a *BIG WARM HUG*!",
-		u->nick);
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent a HUG to %s", u->nick, cmd);
+	prefmsg(u->nick, s_LoveServ, "%s has received your hug! :)", target_nick);
+	prefmsg(target_nick, s_LoveServ, "%s has sent you a *BIG WARM HUG*!", u->nick);
 	return 1;
 }
 
 
 static int ls_admirer(User * u, char **av, int ac)
 {
-	char *cmd;
+	char *target_nick;
 
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_LoveServ)) {
-		prefmsg(u->nick, s_LoveServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_LoveServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-
-	prefmsg(u->nick, s_LoveServ, "Anonymous admire sent to %s :)",
-		cmd);
-	prefmsg(cmd, s_LoveServ, "You have a secret admirer! ;)");
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent an ADMIRER to %s", u->nick, cmd);
+	prefmsg(u->nick, s_LoveServ, "Secret admirer sent to %s :)", target_nick);
+	prefmsg(target_nick, s_LoveServ, "You have a secret admirer! ;)");
 	return 1;
 }
 
 
 static int ls_choco(User * u, char **av, int ac)
 {
-	char *cmd;
+	char *target_nick;
 
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_LoveServ)) {
-		prefmsg(u->nick, s_LoveServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_LoveServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-
 	prefmsg(u->nick, s_LoveServ,
-		"A box of cholocates has been sent to %s :)", cmd);
-	prefmsg(cmd, s_LoveServ,
+		"A box of cholocates has been sent to %s :)", target_nick);
+	prefmsg(target_nick, s_LoveServ,
 		"%s would like you to have this YUMMY box of chocolates!",
 		u->nick);
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent a Box of Chocolates to %s",
-	     u->nick, cmd);
 	return 1;
 }
 
 
 static int ls_candy(User * u, char **av, int ac)
 {
-	char *cmd;
+	char *target_nick;
 
 	SET_SEGV_LOCATION();
-	cmd = av[2];
-	if (!strcasecmp(cmd, s_LoveServ)) {
-		prefmsg(u->nick, s_LoveServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_LoveServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		return 1;
-	}
-
 	prefmsg(u->nick, s_LoveServ,
-		"A bag of yummy heart shaped candies has been sent to %s :)",
-		cmd);
-	prefmsg(cmd, s_LoveServ,
+		"A bag of yummy heart shaped candies has been sent to %s :)", target_nick);
+	prefmsg(target_nick, s_LoveServ,
 		"%s would like you to have this big YUMMY bag of heart shaped candies!",
 		u->nick);
-	nlog(LOG_NORMAL, LOG_MOD,
-	     "%s sent a BAG OF HEART SHAPED CANDIES to %s", u->nick, cmd);
 	return 1;
 }
 
 
 static int ls_lovenote(User * u, char **av, int ac)
 {
-	char *cmd;
-	char *m;
+	char *target_nick;
+	char *message;
 
 	SET_SEGV_LOCATION();
-	m = av[2];
-	cmd = joinbuf(av, ac, 3);
-	if (!strcasecmp(cmd, s_LoveServ)) {
-		prefmsg(u->nick, s_LoveServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		free(cmd);
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_LoveServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		free(cmd);
-		return 1;
-	}
-
-	prefmsg(u->nick, s_LoveServ,
-		"Your lovenote to %s has been sent! :)", cmd);
-	prefmsg(cmd, s_LoveServ,
-		"%s has sent you a LoveNote which reads: \2%s\2", u->nick,
-		m);
-	nlog(LOG_NORMAL, LOG_MOD,
-	     "%s sent a LOVE NOTE to %s which reads %s", u->nick, cmd, m);
-	free(cmd);
+	message = joinbuf(av, ac, 3);
+	prefmsg(u->nick, s_LoveServ, 
+		"Your lovenote to %s has been sent! :)", target_nick);
+	prefmsg(target_nick, s_LoveServ,
+		"%s has sent you a LoveNote which reads: \2%s\2", u->nick, message);
+	free(message);
 	return 1;
 }
 
 
 static int ls_apology(User * u, char **av, int ac)
 {
-	char *cmd;
-	char *m;
+	char *target_nick;
+	char *message;
 
 	SET_SEGV_LOCATION();
-	m = av[2];
-	cmd = joinbuf(av, ac, 3);
-	if (!strcasecmp(cmd, s_LoveServ)) {
-		prefmsg(u->nick, s_LoveServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		free(cmd);
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_LoveServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		free(cmd);
-		return 1;
-	}
-
+	message = joinbuf(av, ac, 3);
 	prefmsg(u->nick, s_LoveServ, "Your apology has been sent to %s",
-		cmd);
-	prefmsg(cmd, s_LoveServ,
+		target_nick);
+	prefmsg(target_nick, s_LoveServ,
 		"%s is sorry, and would like to apologise for \2%s\2",
-		u->nick, m);
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent an APOLOGY to %s for %s",
-	     u->nick, cmd, m);
-	free(cmd);
+		u->nick, message);
+	free(message);
 	return 1;
 }
 
 
 static int ls_thankyou(User * u, char **av, int ac)
 {
-	char *cmd;
-	char *m;
+	char *target_nick;
+	char *message;
 
 	SET_SEGV_LOCATION();
-	m = av[2];
-	cmd = joinbuf(av, ac, 3);
-	if (!strcasecmp(cmd, s_LoveServ)) {
-		prefmsg(u->nick, s_LoveServ,
-			"Surely we have better things to do with our time than make a service message itself?");
-		free(cmd);
-		return 1;
+	target_nick = av[2];
+	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+		return 0;
 	}
-	if (!finduser(cmd)) {
-		prefmsg(u->nick, s_LoveServ,
-			"That user cannot be found on IRC. As a result, your message was not sent. Please check the spelling and try again!");
-		free(cmd);
-		return 1;
-	}
-
+	message = joinbuf(av, ac, 3);
 	prefmsg(u->nick, s_LoveServ, "Your Thank You has been sent to %s",
-		cmd);
-	prefmsg(cmd, s_LoveServ, "%s wishes to thank you for \2%s\2",
-		u->nick, m);
-	nlog(LOG_NORMAL, LOG_MOD, "%s sent a THANKYOU to %s for %s",
-	     u->nick, cmd, m);
-	free(cmd);
+		target_nick);
+	prefmsg(target_nick, s_LoveServ, "%s wishes to thank you for \2%s\2",
+		u->nick, message);
+	free(message);
 	return 1;
 }
 

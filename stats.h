@@ -45,6 +45,12 @@
 #include <sys/resource.h>
 #include <setjmp.h>
 #include <assert.h>
+
+/* If we're not using GNU C, elide __attribute__ */
+#ifndef __GNUC__
+#define __attribute__(x)  /* NOTHING */
+#endif
+
 #include <adns.h>
 #include "pcre.h"
 #include "list.h"
@@ -414,8 +420,8 @@ void rehash (void);
 int ConfLoadModules (void);
 
 /* main.c */
-void do_exit (NS_EXIT_TYPE exitcode, char* quitmsg);
-void fatal_error(char* file, int line, char* func, char* error_text);
+void do_exit (NS_EXIT_TYPE exitcode, char* quitmsg) __attribute__((noreturn));
+void fatal_error(char* file, int line, char* func, char* error_text) __attribute__((noreturn));;
 #define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__,(error_text)); 
 
 /* misc.c */
@@ -427,7 +433,7 @@ void AddStringToList (char ***List, char S[], int *C);
 void strip_mirc_codes(char *text);
 char *sctime (time_t t);
 char *sftime (time_t t);
-void debugtochannel(char *message, ...);
+void debugtochannel(char *message, ...) __attribute__((format(printf,1,2))); /* 1=format 2=params */
 
 /* ircd.c */
 void parse (char* line);
@@ -439,11 +445,11 @@ int init_bot (char * nick, char * user, char * host, char * rname, const char *m
 int del_bot (char * nick, char * reason);
 
 /* ircd specific files */
-void prefmsg (char * to, const char * from, char * fmt, ...);
-void privmsg (char *to, const char *from, char *fmt, ...);
-void notice (char *to, const char *from, char *fmt, ...);
+void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+void privmsg (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+void notice (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 void privmsg_list (char *to, char *from, const char **text);
-void globops (char * from, char * fmt, ...);
+void globops (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
 /* users.c */
 User *finduser (const char *nick);
@@ -465,5 +471,6 @@ int init_services(void);
 int add_services_cmd_list(bot_cmd* bot_cmd_list);
 int del_services_cmd_list(bot_cmd* bot_cmd_list);
 void services_cmd_help (User * u, char **av, int ac);
+int is_target_valid(char* bot_name, User* u, char* target_nick);
 
 #endif

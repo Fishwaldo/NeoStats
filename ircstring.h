@@ -28,10 +28,10 @@
 #include <stdio.h>
 
 /* [v]s[n]printf replacements */
-int ircsprintf(char *buf, const char *fmt, ...);
+int ircsprintf(char *buf, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int ircvsprintf(char *buf, const char *fmt, va_list args);
 int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args);
-int ircsnprintf(char *buf, size_t size, const char *fmt, ...);
+int ircsnprintf(char *buf, size_t size, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 
 /* str[n]casecmp replacements */
 int ircstrcasecmp(const char *s1, const char *s2);

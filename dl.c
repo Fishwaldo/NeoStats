@@ -828,7 +828,7 @@ ModuleEvent (char *event, char **av, int ac)
 			while (ev_list->cmd_name != NULL) {
 				/* This goes through each Command */
 				if (!strcasecmp (ev_list->cmd_name, event)) {
-					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Comamnd %s -> %s", module_ptr->info->module_name, event, ev_list->cmd_name);
+					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Command %s -> %s", module_ptr->info->module_name, event, ev_list->cmd_name);
 					SET_SEGV_LOCATION();
 					SET_SEGV_INMODULE(module_ptr->info->module_name);
 					if (setjmp (sigvbuf) == 0) {

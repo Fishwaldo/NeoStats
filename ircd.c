@@ -515,7 +515,7 @@ ShowMOTD (char *nick)
 
 	SET_SEGV_LOCATION();
 	snumeric_cmd (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
-	snumeric_cmd (RPL_MOTD, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
+	snumeric_cmd (RPL_MOTD, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2003 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
 	snumeric_cmd (RPL_MOTD, nick, ":-");
 
 	fp = fopen (MOTD_FILENAME, "r");
@@ -546,7 +546,7 @@ ShowADMIN (char *nick)
 	SET_SEGV_LOCATION();
 
 	snumeric_cmd (RPL_ADMINME, nick, ":- %s NeoStats Admins -", me.name);
-	snumeric_cmd (RPL_ADMINME, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
+	snumeric_cmd (RPL_ADMINME, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2003 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
 
 	fp = fopen (ADMIN_FILENAME, "r");
 

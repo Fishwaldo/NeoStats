@@ -47,7 +47,7 @@ const char sr_help_list_oneline[] = "ServiceRoots List";
 bot_cmd extauth_commands[]=
 {
 	{"SRLIST",		ext_auth_list,	0,	NS_ULEVEL_OPER, sr_help_list,	0,	sr_help_list_oneline},
-	{"\0",			NULL,			0, 	0,				NULL, 			0,	"\0"}
+	{NULL,			NULL,			0, 	0,				NULL, 			0,	"\0"}
 };
 
 ModuleInfo __module_info = {

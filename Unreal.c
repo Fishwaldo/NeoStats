@@ -35,7 +35,11 @@
 
 static char ircd_buf[BUFSIZE];
 
-const char ircd_version[] = "(U)";
+#ifdef UNREAL32
+const char ircd_version[] = "(U32)";
+#else
+const char ircd_version[] = "(U31)";
+#endif
 const char services_bot_modes[]= "+oS";
 
 IntCommands cmd_list[] = {

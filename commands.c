@@ -39,19 +39,30 @@ char * help_level_title[]=
 	"Service Roots",
 };
 
-/* Intrinsic commands 
- * (Work in progress, not yet operation)
- * These are all automatically added to a bot for handling 
- * by the core. A module can override these by defining them
- * in it's local bot command array.
+/*  Intrinsic commands 
+ *  (Work in progress, not yet operation)
+ *  These are all automatically added to a bot for handling 
+ *  by the core. A module can override these by defining them
+ *  in it's local bot command array.
  */
-/*
-bot_cmd intrinsic_commands[]=
-{
-	{"HELP",		do_help,		0, 	0,			help_on_help, 	1, 	help_help_oneline},
-	{NULL,			NULL,			0, 	0,			NULL, 			0,	NULL}
+static const char cmd_help_oneline[]="Online help";
+static const char *cmd_help_help[] = {
+	"Syntax: \2HELP [command]\2",
+	"",
+	"Provides help on the bot commands",
+	NULL
 };
-*/
+
+/*  Simplified command table for handling intrinsic commands.
+ *  We do not require all entries since we only use a few for
+ *  intrinsic handling. 
+ */
+static bot_cmd intrinsic_commands[]=
+{
+	{"HELP",	NULL,	0, 	0,	cmd_help_help, 	1, 	cmd_help_oneline},
+	{NULL,		NULL,	0, 	0,	NULL, 			0,	NULL}
+};
+
 
 /** @brief calc_cmd_ulevel calculate cmd ulevel
  *  done as a function so we can support potentially complex  
@@ -263,6 +274,7 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	bot_cmd* cmd_ptr;
 	hnode_t *cmdnode;
 	int cmdlevel;
+	char* parambuf; 
 
 	SET_SEGV_LOCATION();
 	userlevel = UserLevel (u);
@@ -294,9 +306,13 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 			prefmsg (u->nick, bot_ptr->nick, "/msg %s HELP %s for more information", bot_ptr->nick, cmd_ptr->cmd);
 			return 1;
 		}
-		/* Seems OK so report the command call then call appropriate handler */
+		/* Seems OK so report the command call so modules do not have to */
 		chanalert (bot_ptr->nick, "%s used %s", u->nick, cmd_ptr->cmd);
-		nlog (LOG_NORMAL, LOG_MOD, "%s used %s", u->nick, cmd_ptr->cmd);
+		/* Grab the parameters for the log so modules do not have to log */
+		parambuf = joinbuf(av, ac, 2);
+		nlog (LOG_NORMAL, LOG_MOD, "%s used %s %s", u->nick, cmd_ptr->cmd, parambuf);
+		free(parambuf);
+		/* call handler */
 		cmd_ptr->handler(u, av, ac);
 		return 1;
 	}
@@ -337,8 +353,17 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 		lowlevel = 0;
 		curlevel = NS_ULEVEL_OPER;
 		chanalert (bot_ptr->nick, "%s requested %s help", u->nick, bot_ptr->nick);
+		nlog (LOG_NORMAL, LOG_MOD, "%s requested %s help", u->nick, bot_ptr->nick);
 		prefmsg(u->nick, bot_ptr->nick, "The following commands can be used with %s:", bot_ptr->nick);
 
+		/* Handle intrinsic commands */
+		cmd_ptr = intrinsic_commands;
+		while(cmd_ptr->cmd) {
+			/* Check for module override */	
+			if(!hash_lookup(bot_ptr->botcmds, cmd_ptr->cmd))
+				prefmsg(u->nick, bot_ptr->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
+			cmd_ptr++;
+		}
 		restartlevel:
 		hash_scan_begin(&hs, bot_ptr->botcmds);
 		while ((cmdnode = hash_scan_next(&hs)) != NULL) {
@@ -373,8 +398,8 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 						donemsg=0;
 						goto restartlevel;
 				case NS_ULEVEL_ROOT:
-						curlevel = 201;
-						lowlevel = 200;
+						curlevel = (NS_ULEVEL_ROOT + 1);
+						lowlevel = NS_ULEVEL_ROOT;
 						curlevelmsg=help_level_title[2];
 						donemsg=0;
 						goto restartlevel;
@@ -391,6 +416,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 		return 1;
 	}
 	chanalert (bot_ptr->nick, "%s requested %s help on %s", u->nick, bot_ptr->nick, av[2]);
+	nlog (LOG_NORMAL, LOG_MOD, "%s requested %s help on %s", u->nick, bot_ptr->nick, av[2]);
 
 	/* Process command list */
 	cmdnode = hash_lookup(bot_ptr->botcmds, av[2]);
@@ -411,15 +437,38 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 	}
 
 	/* Handle intrinsic commands */
-	/* Help */
-	if (!strcasecmp(av[2], "HELP")) {
-		prefmsg(u->nick, bot_ptr->nick, "Syntax: \2HELP [command]\2");
-		prefmsg(u->nick, bot_ptr->nick, "");
-		prefmsg(u->nick, bot_ptr->nick, "Provides help on the bot commands");
-		return 1;
+	cmd_ptr = intrinsic_commands;
+	while(cmd_ptr->cmd) {
+		if (!strcasecmp(av[1],cmd_ptr->cmd)) {
+			privmsg_list (u->nick, bot_ptr->nick, cmd_ptr->helptext);
+			return 1;
+		}
+		cmd_ptr++;
 	}
 
 	/* Command not found so report as unknown */
 	prefmsg (u->nick, bot_ptr->nick, "No help available or unknown help topic: \2%s\2", av[2]);
 	return 1;
 }
+
+/**	Support function for command handlers to call to check that target nick 
+ *	is not the bot and is on IRC. Done in core to avoid module code bloat.
+ */ 
+int is_target_valid(char* bot_name, User* u, char* target_nick)
+{
+	/* Check for message to self */
+	if (!strcasecmp(target_nick, bot_name)) {
+		prefmsg(u->nick, bot_name,
+			"Surely we have better things to do with our time than make a service message itself!");
+		return 0;
+	}
+	/* Check target user is on IRC */
+	if (!finduser(target_nick)) {
+		prefmsg(u->nick, bot_name,
+			"%s cannot be found on IRC, your message was not sent. Please check the spelling and try again.", target_nick);
+		return 0;
+	}
+	/* User OK */
+	return 1;
+}
+
