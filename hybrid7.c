@@ -32,9 +32,9 @@
 #include "chans.h"
 
 static void Usr_Version (char *origin, char **argv, int argc);
-static void Usr_ShowMOTD (char *origin, char **argv, int argc);
-static void Usr_ShowADMIN (char *origin, char **argv, int argc);
-static void Usr_Showcredits (char *origin, char **argv, int argc);
+static void Usr_MOTD (char *origin, char **argv, int argc);
+static void Usr_Admin (char *origin, char **argv, int argc);
+static void Usr_Credits (char *origin, char **argv, int argc);
 static void Usr_AddServer (char *origin, char **argv, int argc);
 static void Usr_DelServer (char *origin, char **argv, int argc);
 static void Usr_DelUser (char *origin, char **argv, int argc);
@@ -70,11 +70,11 @@ IntCommands cmd_list[] = {
 	,
 	{MSG_VERSION, Usr_Version, 1, 0}
 	,
-	{MSG_MOTD, Usr_ShowMOTD, 1, 0}
+	{MSG_MOTD, Usr_MOTD, 1, 0}
 	,
-	{MSG_ADMIN, Usr_ShowADMIN, 1, 0}
+	{MSG_ADMIN, Usr_Admin, 1, 0}
 	,
-	{MSG_CREDITS, Usr_Showcredits, 1, 0}
+	{MSG_CREDITS, Usr_Credits, 1, 0}
 	,
 	{MSG_SERVER, Usr_AddServer, 1, 0}
 	,
@@ -576,7 +576,7 @@ globops (char *from, char *fmt, ...)
 	}
 }
 
-void
+static void
 Srv_Sjoin (char *origin, char **argv, int argc)
 {
 	char nick[MAXNICK];
@@ -660,13 +660,13 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 	}
 	list_destroy (tl);
 }
-void
+static void
 Srv_Burst (char *origin, char **argv, int argc)
 {
 	seob_cmd (me.name);
 	init_services_bot ();
 }
-void
+static void
 Srv_Connect (char *origin, char **argv, int argc)
 {
 	int i;
@@ -679,55 +679,55 @@ Srv_Connect (char *origin, char **argv, int argc)
 }
 
 
-void
+static void
 Usr_Stats (char *origin, char **argv, int argc)
 {
 	ns_usr_stats (origin, argv, argc);
 }
 
-void
+static void
 Usr_Version (char *origin, char **argv, int argc)
 {
 	snumeric_cmd (RPL_VERSION, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, ircd_version, me.name, version_date, version_time);
 }
 
-void
-Usr_ShowMOTD (char *origin, char **argv, int argc)
+static void
+Usr_MOTD (char *origin, char **argv, int argc)
 {
 	ns_usr_motd (origin, argv, argc);
 }
 
-void
-Usr_ShowADMIN (char *origin, char **argv, int argc)
+static void
+Usr_Admin (char *origin, char **argv, int argc)
 {
 	ns_usr_admin (origin, argv, argc);
 }
 
-void
-Usr_Showcredits (char *origin, char **argv, int argc)
+static void
+Usr_Credits (char *origin, char **argv, int argc)
 {
 	ns_usr_credits (origin, argv, argc);
 }
 
-void
+static void
 Usr_AddServer (char *origin, char **argv, int argc)
 {
 	AddServer (argv[0], origin, atoi (argv[1]));
 }
 
-void
+static void
 Usr_DelServer (char *origin, char **argv, int argc)
 {
 	DelServer (argv[0]);
 }
 
-void
+static void
 Usr_DelUser (char *origin, char **argv, int argc)
 {
 	DelUser (origin);
 }
 
-void
+static void
 Usr_Smode (char *origin, char **argv, int argc)
 {
 	if (!strchr (argv[0], '#')) {
@@ -738,7 +738,7 @@ Usr_Smode (char *origin, char **argv, int argc)
 		ChanMode (origin, argv, argc);
 	}
 }
-void
+static void
 Usr_Mode (char *origin, char **argv, int argc)
 {
 	if (!strchr (argv[0], '#')) {
@@ -748,7 +748,7 @@ Usr_Mode (char *origin, char **argv, int argc)
 		ChanMode (origin, argv, argc);
 	}
 }
-void
+static void
 Usr_Kill (char *origin, char **argv, int argc)
 {
 	User *u;
@@ -759,12 +759,12 @@ Usr_Kill (char *origin, char **argv, int argc)
 		nlog (LOG_WARNING, LOG_CORE, "Can't find user %s for Kill", argv[0]);
 	}
 }
-void
+static void
 Usr_Pong (char *origin, char **argv, int argc)
 {
 	ns_usr_pong (origin, argv, argc);
 }
-void
+static void
 Usr_Away (char *origin, char **argv, int argc)
 {
 	User *u = finduser (origin);
@@ -783,12 +783,12 @@ Usr_Away (char *origin, char **argv, int argc)
 		nlog (LOG_NOTICE, LOG_CORE, "Warning, Unable to find User %s for Away", origin);
 	}
 }
-void
+static void
 Usr_Nick (char *origin, char **argv, int argc)
 {
 	UserNick (origin, argv[0]);
 }
-void
+static void
 Usr_Topic (char *origin, char **argv, int argc)
 {
 	char *buf;
@@ -819,7 +819,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 
 }
 
-void
+static void
 Usr_Kick (char *origin, char **argv, int argc)
 {
 	User *u, *k;
@@ -831,7 +831,7 @@ Usr_Kick (char *origin, char **argv, int argc)
 		nlog (LOG_WARNING, LOG_CORE, "Warning, Can't find user %s for kick %s", argv[1], argv[0]);
 	}
 }
-void
+static void
 Usr_Join (char *origin, char **argv, int argc)
 {
 	char *s, *t;
@@ -843,29 +843,29 @@ Usr_Join (char *origin, char **argv, int argc)
 		join_chan (finduser (origin), s);
 	}
 }
-void
+static void
 Usr_Part (char *origin, char **argv, int argc)
 {
 	part_chan (finduser (origin), argv[0]);
 }
 
-void
+static void
 Srv_Ping (char *origin, char **argv, int argc)
 {
 	spong_cmd (argv[0]);
 }
 
-void
+static void
 Srv_Svinfo (char *origin, char **argv, int argc)
 {
 	ssvinfo_cmd ();
 }
 
-void
+static void
 Srv_Pass (char *origin, char **argv, int argc)
 {
 }
-void
+static void
 Srv_Server (char *origin, char **argv, int argc)
 {
 	if (*origin == 0) {
@@ -875,7 +875,7 @@ Srv_Server (char *origin, char **argv, int argc)
 	}
 }
 
-void
+static void
 Srv_Squit (char *origin, char **argv, int argc)
 {
 	Server *s;
@@ -888,7 +888,7 @@ Srv_Squit (char *origin, char **argv, int argc)
 
 }
 
-void
+static void
 Srv_Nick (char *origin, char **argv, int argc)
 {
 	char *realname;
@@ -900,7 +900,7 @@ Srv_Nick (char *origin, char **argv, int argc)
 	UserMode (argv[0], argv[3]);
 }
 
-void
+static void
 Srv_Kill (char *origin, char **argv, int argc)
 {
 }

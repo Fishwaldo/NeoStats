@@ -34,9 +34,9 @@
 #include "chans.h"
 
 static void Usr_Version (char *origin, char **argv, int argc);
-static void Usr_ShowMOTD (char *origin, char **argv, int argc);
-static void Usr_ShowADMIN (char *origin, char **argv, int argc);
-static void Usr_Showcredits (char *origin, char **argv, int argc);
+static void Usr_MOTD (char *origin, char **argv, int argc);
+static void Usr_Admin (char *origin, char **argv, int argc);
+static void Usr_Credits (char *origin, char **argv, int argc);
 static void Usr_AddServer (char *origin, char **argv, int argc);
 static void Usr_DelServer (char *origin, char **argv, int argc);
 static void Usr_DelUser (char *origin, char **argv, int argc);
@@ -76,131 +76,41 @@ const char services_bot_modes[]= "+oS";
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
-	{MSG_STATS, Usr_Stats, 1, 0}
-	,
-	{TOK_STATS, Usr_Stats, 1, 0}
-	,
-	{MSG_SETHOST, Usr_Vhost, 1, 0}
-	,
-	{TOK_SETHOST, Usr_Vhost, 1, 0}
-	,
-	{MSG_VERSION, Usr_Version, 1, 0}
-	,
-	{TOK_VERSION, Usr_Version, 1, 0}
-	,
-	{MSG_MOTD, Usr_ShowMOTD, 1, 0}
-	,
-	{TOK_MOTD, Usr_ShowMOTD, 1, 0}
-	,
-	{MSG_ADMIN, Usr_ShowADMIN, 1, 0}
-	,
-	{TOK_ADMIN, Usr_ShowADMIN, 1, 0}
-	,
-	{MSG_CREDITS, Usr_Showcredits, 1, 0}
-	,
-	{TOK_CREDITS, Usr_Showcredits, 1, 0}
-	,
-	{MSG_SERVER, Usr_AddServer, 1, 0}
-	,
-	{TOK_SERVER, Usr_AddServer, 1, 0}
-	,
-	{MSG_SQUIT, Usr_DelServer, 1, 0}
-	,
-	{TOK_SQUIT, Usr_DelServer, 1, 0}
-	,
-	{MSG_QUIT, Usr_DelUser, 1, 0}
-	,
-	{TOK_QUIT, Usr_DelUser, 1, 0}
-	,
-	{MSG_MODE, Usr_Mode, 1, 0}
-	,
-	{TOK_MODE, Usr_Mode, 1, 0}
-	,
-	{MSG_SVSMODE, Usr_Smode, 1, 0}
-	,
-	{TOK_SVSMODE, Usr_Smode, 1, 0}
-	,
-	{MSG_KILL, Usr_Kill, 1, 0}
-	,
-	{TOK_KILL, Usr_Kill, 1, 0}
-	,
-	{MSG_PONG, Usr_Pong, 1, 0}
-	,
-	{TOK_PONG, Usr_Pong, 1, 0}
-	,
-	{MSG_AWAY, Usr_Away, 1, 0}
-	,
-	{TOK_AWAY, Usr_Away, 1, 0}
-	,
-	{MSG_NICK, Usr_Nick, 1, 0}
-	,
-	{TOK_NICK, Usr_Nick, 1, 0}
-	,
-	{MSG_TOPIC, Usr_Topic, 1, 0}
-	,
-	{TOK_TOPIC, Usr_Topic, 1, 0}
-	,
-	{MSG_KICK, Usr_Kick, 1, 0}
-	,
-	{TOK_KICK, Usr_Kick, 1, 0}
-	,
-	{MSG_JOIN, Usr_Join, 1, 0}
-	,
-	{TOK_JOIN, Usr_Join, 1, 0}
-	,
-	{MSG_PART, Usr_Part, 1, 0}
-	,
-	{TOK_PART, Usr_Part, 1, 0}
-	,
-	{MSG_PING, Srv_Ping, 0, 0}
-	,
-	{TOK_PING, Srv_Ping, 0, 0}
-	,
-	{MSG_SVINFO, Srv_Svinfo, 0, 0}
-	,
-	{MSG_CAPAB, Srv_Connect, 0, 0}
-	,
-	{MSG_BURST, Srv_Burst, 0, 0}
-	,
-	{MSG_SJOIN, Srv_Sjoin, 1, 0}
-	,
-	{MSG_CLIENT, Srv_Client, 0, 0}
-	,
-	{MSG_SMODE, Srv_Smode, 1, 0}
-	,
-	{MSG_VCTRL, Srv_Vctrl, 0, 0}
-	,
-	{TOK_VCTRL, Srv_Vctrl, 0, 0}
-	,
-	{MSG_PASS, Srv_Pass, 0, 0}
-	,
-	{TOK_PASS, Srv_Pass, 0, 0}
-	,
-	{MSG_SERVER, Srv_Server, 0, 0}
-	,
-	{TOK_SERVER, Srv_Server, 0, 0}
-	,
-	{MSG_SQUIT, Srv_Squit, 0, 0}
-	,
-	{TOK_SQUIT, Srv_Squit, 0, 0}
-	,
-	{MSG_NICK, Srv_Nick, 0, 0}
-	,
-	{TOK_NICK, Srv_Nick, 0, 0}
-	,
-	{MSG_SVSNICK, Srv_Svsnick, 0, 0}
-	,
-	{TOK_SVSNICK, Srv_Svsnick, 0, 0}
-	,
-	{MSG_KILL, Srv_Kill, 0, 0}
-	,
-	{TOK_KILL, Srv_Kill, 0, 0}
-	,
-	{MSG_PROTOCTL, Srv_Connect, 0, 0}
-	,
-	{TOK_PROTOCTL, Srv_Connect, 0, 0}
-	,
-	{NULL, NULL, 0, 0}
+	{MSG_STATS, TOK_STATS, Usr_Stats, 1, 0},
+	{MSG_SETHOST, TOK_SETHOST, Usr_Vhost, 1, 0},
+	{MSG_VERSION, TOK_VERSION, Usr_Version, 1, 0},
+	{MSG_MOTD, TOK_MOTD, Usr_MOTD, 1, 0},
+	{MSG_ADMIN, TOK_ADMIN, Usr_Admin, 1, 0},
+	{MSG_CREDITS, TOK_CREDITS, Usr_Credits, 1, 0},
+	{MSG_SERVER, TOK_SERVER, Usr_AddServer, 1, 0},
+	{MSG_SQUIT, TOK_SQUIT, Usr_DelServer, 1, 0},
+	{MSG_QUIT, TOK_QUIT, Usr_DelUser, 1, 0},
+	{MSG_MODE, TOK_MODE, Usr_Mode, 1, 0},
+	{MSG_SVSMODE, TOK_SVSMODE, Usr_Smode, 1, 0},
+	{MSG_KILL, TOK_KILL, Usr_Kill, 1, 0},
+	{MSG_PONG, TOK_PONG, Usr_Pong, 1, 0},
+	{MSG_AWAY, TOK_AWAY, Usr_Away, 1, 0},
+	{MSG_NICK, TOK_NICK, Usr_Nick, 1, 0},
+	{MSG_TOPIC, TOK_TOPIC, Usr_Topic, 1, 0},
+	{MSG_KICK, TOK_KICK, Usr_Kick, 1, 0},
+	{MSG_JOIN, TOK_JOIN, Usr_Join, 1, 0},
+	{MSG_PART, TOK_PART, Usr_Part, 1, 0},
+	{MSG_PING, TOK_PING, Srv_Ping, 0, 0},
+	{MSG_SVINFO, NULL, Srv_Svinfo, 0, 0},
+	{MSG_CAPAB, NULL, Srv_Connect, 0, 0},
+	{MSG_BURST, NULL, Srv_Burst, 0, 0},
+	{MSG_SJOIN, NULL, Srv_Sjoin, 1, 0},
+	{MSG_CLIENT, NULL, Srv_Client, 0, 0},
+	{MSG_SMODE, NULL, Srv_Smode, 1, 0},
+	{MSG_VCTRL, TOK_VCTRL, Srv_Vctrl, 0, 0},
+	{MSG_PASS, TOK_PASS, Srv_Pass, 0, 0},
+	{MSG_SERVER, TOK_SERVER, Srv_Server, 0, 0},
+	{MSG_SQUIT, TOK_SQUIT, Srv_Squit, 0, 0},
+	{MSG_NICK, TOK_NICK, Srv_Nick, 0, 0},
+	{MSG_SVSNICK, TOK_SVSNICK, Srv_Svsnick, 0, 0},
+	{MSG_KILL, TOK_KILL, Srv_Kill, 0, 0},
+	{MSG_PROTOCTL, TOK_PROTOCTL, Srv_Connect, 0, 0},
+	{NULL, NULL, NULL, 0, 0}
 };
 
 
@@ -770,7 +680,7 @@ globops (char *from, char *fmt, ...)
 }
 
 
-void
+static void
 Srv_Sjoin (char *origin, char **argv, int argc)
 {
 	char nick[MAXNICK];
@@ -858,7 +768,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 	list_destroy (tl);
 }
 
-void
+static void
 Srv_Burst (char *origin, char **argv, int argc)
 {
 	if (argc > 0) {
@@ -873,7 +783,7 @@ Srv_Burst (char *origin, char **argv, int argc)
 	}
 }
 
-void
+static void
 Srv_Connect (char *origin, char **argv, int argc)
 {
 	int i;
@@ -889,55 +799,55 @@ Srv_Connect (char *origin, char **argv, int argc)
 }
 
 
-void
+static void
 Usr_Stats (char *origin, char **argv, int argc)
 {
 	ns_usr_stats (origin, argv, argc);
 }
 
-void
+static void
 Usr_Version (char *origin, char **argv, int argc)
 {
 	snumeric_cmd (RPL_VERSION, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, ircd_version, me.name, version_date, version_time);
 }
 
-void
-Usr_ShowMOTD (char *origin, char **argv, int argc)
+static void
+Usr_MOTD (char *origin, char **argv, int argc)
 {
 	ns_usr_motd (origin, argv, argc);
 }
 
-void
-Usr_ShowADMIN (char *origin, char **argv, int argc)
+static void
+Usr_Admin (char *origin, char **argv, int argc)
 {
 	ns_usr_admin (origin, argv, argc);
 }
 
-void
-Usr_Showcredits (char *origin, char **argv, int argc)
+static void
+Usr_Credits (char *origin, char **argv, int argc)
 {
 	ns_usr_credits (origin, argv, argc);
 }
 
-void
+static void
 Usr_AddServer (char *origin, char **argv, int argc)
 {
 	AddServer (argv[0], origin, atoi (argv[1]));
 }
 
-void
+static void
 Usr_DelServer (char *origin, char **argv, int argc)
 {
 	DelServer (argv[0]);
 }
 
-void
+static void
 Usr_DelUser (char *origin, char **argv, int argc)
 {
 	DelUser (origin);
 }
 
-void
+static void
 Usr_Smode (char *origin, char **argv, int argc)
 {
 	if (!strchr (argv[0], '#')) {
@@ -948,7 +858,7 @@ Usr_Smode (char *origin, char **argv, int argc)
 		ChanMode (origin, argv, argc);
 	}
 }
-void
+static void
 Usr_Mode (char *origin, char **argv, int argc)
 {
 	if (!strchr (argv[0], '#')) {
@@ -958,7 +868,7 @@ Usr_Mode (char *origin, char **argv, int argc)
 		ChanMode (origin, argv, argc);
 	}
 }
-void
+static void
 Usr_Kill (char *origin, char **argv, int argc)
 {
 	User *u;
@@ -969,7 +879,7 @@ Usr_Kill (char *origin, char **argv, int argc)
 		nlog (LOG_WARNING, LOG_CORE, "Can't find user %s for Kill", argv[0]);
 	}
 }
-void
+static void
 Usr_Vhost (char *origin, char **argv, int argc)
 {
 	User *u;
@@ -978,12 +888,12 @@ Usr_Vhost (char *origin, char **argv, int argc)
 		strlcpy (u->vhost, argv[1], MAXHOST);
 	}
 }
-void
+static void
 Usr_Pong (char *origin, char **argv, int argc)
 {
 	ns_usr_pong (origin, argv, argc);
 }
-void
+static void
 Usr_Away (char *origin, char **argv, int argc)
 {
 	char *Buf;
@@ -1002,12 +912,12 @@ Usr_Away (char *origin, char **argv, int argc)
 		nlog (LOG_NOTICE, LOG_CORE, "Warning, Unable to find User %s for Away", origin);
 	}
 }
-void
+static void
 Usr_Nick (char *origin, char **argv, int argc)
 {
 	UserNick (origin, argv[0]);
 }
-void
+static void
 Usr_Topic (char *origin, char **argv, int argc)
 {
 	char *buf;
@@ -1023,7 +933,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 
 }
 
-void
+static void
 Usr_Kick (char *origin, char **argv, int argc)
 {
 	User *u, *k;
@@ -1035,7 +945,7 @@ Usr_Kick (char *origin, char **argv, int argc)
 		nlog (LOG_WARNING, LOG_CORE, "Warning, Can't find user %s for kick %s", argv[1], argv[0]);
 	}
 }
-void
+static void
 Usr_Join (char *origin, char **argv, int argc)
 {
 	char *s, *t;
@@ -1047,13 +957,13 @@ Usr_Join (char *origin, char **argv, int argc)
 		join_chan (finduser (origin), s);
 	}
 }
-void
+static void
 Usr_Part (char *origin, char **argv, int argc)
 {
 	part_chan (finduser (origin), argv[0]);
 }
 
-void
+static void
 Srv_Ping (char *origin, char **argv, int argc)
 {
 	spong_cmd (argv[0]);
@@ -1062,7 +972,7 @@ Srv_Ping (char *origin, char **argv, int argc)
 	}
 }
 
-void
+static void
 Srv_Vctrl (char *origin, char **argv, int argc)
 {
 	ircd_srv.uprot = atoi (argv[0]);
@@ -1073,18 +983,18 @@ Srv_Vctrl (char *origin, char **argv, int argc)
 	vctrl_cmd ();
 }
 
-void
+static void
 Srv_Svinfo (char *origin, char **argv, int argc)
 {
 	ssvinfo_cmd ();
 }
 
 
-void
+static void
 Srv_Pass (char *origin, char **argv, int argc)
 {
 }
-void
+static void
 Srv_Server (char *origin, char **argv, int argc)
 {
 	if (*origin == 0) {
@@ -1094,7 +1004,7 @@ Srv_Server (char *origin, char **argv, int argc)
 	}
 }
 
-void
+static void
 Srv_Squit (char *origin, char **argv, int argc)
 {
 	Server *s;
@@ -1107,7 +1017,7 @@ Srv_Squit (char *origin, char **argv, int argc)
 
 }
 
-void
+static void
 Srv_Nick (char *origin, char **argv, int argc)
 {
 	char *realname;
@@ -1120,7 +1030,7 @@ Srv_Nick (char *origin, char **argv, int argc)
 }
 
 /* Ultimate3 Client Support */
-void
+static void
 Srv_Client (char *origin, char **argv, int argc)
 {
 	char *realname;
@@ -1135,7 +1045,7 @@ Srv_Client (char *origin, char **argv, int argc)
 
 }
 
-void
+static void
 Srv_Smode (char *origin, char **argv, int argc)
 {
 	UserSMode (argv[0], argv[1]);
@@ -1143,7 +1053,7 @@ Srv_Smode (char *origin, char **argv, int argc)
 
 /* ultimate 3 */
 
-void
+static void
 Srv_Svsnick (char *origin, char **argv, int argc)
 {
 	if(UserNick (argv[0], argv[1]) == NS_FAILURE) {
@@ -1151,7 +1061,7 @@ Srv_Svsnick (char *origin, char **argv, int argc)
 	}
 
 }
-void
+static void
 Srv_Kill (char *origin, char **argv, int argc)
 {
 }

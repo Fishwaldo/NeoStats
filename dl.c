@@ -862,6 +862,7 @@ ModuleFunction (int cmdptr, char *cmd, char* origin, char **av, int ac)
 	hscan_t ms;
 	hnode_t *mn;
 
+	SET_SEGV_LOCATION();
 	hash_scan_begin (&ms, mh);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);

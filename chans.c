@@ -111,11 +111,7 @@ ChangeTopic (char *owner, Chans * c, time_t time, char *topic)
 	if(topic) {
 		AddStringToList (&av, topic, &ac);
 	} else {
-		/* For debugging the reported topic crash.
-		 * Keep in for 2.5.11 so people can report any occurence 
-		 * of this in logs then remove in 2.5.12
-		 */
-		nlog (LOG_WARNING, LOG_CORE, "ChangeTopic: NULL topic");
+		nlog (LOG_DEBUG1, LOG_CORE, "ChangeTopic: NULL topic");
 	}
 	ModuleEvent (EVENT_TOPICCHANGE, av, ac);
 	free (av);

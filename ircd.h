@@ -25,9 +25,14 @@
 
 #define MAX_CMD_LINE_LENGTH		350
 
+typedef void (*int_cmd_handler) (char *origin, char **argv, int argc);
+
 typedef struct IntCommands{
-	char *name;
-	void (*function) (char *origin, char **argv, int argc);
+	const char *name;
+#ifdef GOTTOKENSUPPORT
+	const char *token;
+#endif
+	int_cmd_handler function;
 	int srvmsg;		/* Should this be a Server Message(1), or a User Message?(0) */
 	int usage;
 }IntCommands;
