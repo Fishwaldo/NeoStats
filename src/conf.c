@@ -223,7 +223,7 @@ ConfLoadModules ()
 		nlog (LOG_NORMAL, "No modules configured for loading"); 
 	} else {
 		nlog (LOG_NORMAL, "Loading configured modules"); 
-		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
+		for (i = 0; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
 			dlog(DEBUG1, "ConfLoadModules: Loading Module %s", (char *)load_mods[i]);
 			if (load_module (load_mods[i], NULL)) {
 				nlog (LOG_NORMAL, "Successfully Loaded Module %s", (char *)load_mods[i]);
