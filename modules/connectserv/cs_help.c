@@ -66,6 +66,11 @@ const char *cs_help_set_nickwatch[] = {
 	"Report nick changes to the services channel.",
 	NULL
 };
+const char *cs_help_set_awaywatch[] = {
+	"AWAYWATCH <ON|OFF>",
+	"Report away events to the services channel.",
+	NULL
+};
 const char *cs_help_set_servwatch[] = {
 	"SERVWATCH <ON|OFF>",
 	"Report server joins and quits to the services channel.",

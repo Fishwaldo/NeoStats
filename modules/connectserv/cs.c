@@ -36,6 +36,7 @@ struct cs_cfg {
 	int kill_watch;
 	int mode_watch;
 	int nick_watch;
+	int away_watch;
 	int serv_watch;
 	int exclusions;
 	int logging;
@@ -50,6 +51,7 @@ typedef struct ModeDef {
 /** output message and format strings */
 #ifdef ENABLE_COLOUR_SUPPORT
 static char msg_nickchange[] = "\2\0037NICK\2 user: \2%s\2 (%s@%s) changed their nick to \2%s\2\003"; 
+static char msg_away[] = "\2AWAY\2 %s (%s@%s) is %s away";
 static char msg_signon[] = "\2\0034SIGNON\2 user: \2%s\2 (%s@%s %s) at \2%s\2\003";
 static char msg_signoff[] = "\2\0033SIGNOFF\2 user: %s (%s@%s %s) at %s %s\003";
 static char msg_localkill[] = "\2\00312LOCAL KILL\2 user: \2%s\2 (%s@%s) killed by \2%s\2 for \2%s\2\003";
@@ -62,6 +64,7 @@ static char msg_server[] = "\2SERVER\2 %s joined the network at %s";
 static char msg_squit[] = "\2SERVER\2 %s left the network at %s for %s";
 #else
 static char msg_nickchange[] = "\2NICK\2 %s (%s@%s) changed their nick to %s";
+static char msg_away[] = "\2AWAY\2 %s (%s@%s) is %s away";
 static char msg_signon[] = "\2SIGNON\2 %s (%s@%s %s) signed on at %s";
 static char msg_signoff[] = "\2SIGNOFF\2 %s (%s@%s %s) signed off at %s %s";
 static char msg_localkill[] = "\2LOCAL KILL\2 %s (%s@%s) killed by %s for \2%s\2";
@@ -83,6 +86,7 @@ static int cs_event_localkill( CmdParams *cmdparams );
 static int cs_event_globalkill( CmdParams *cmdparams );
 static int cs_event_serverkill( CmdParams *cmdparams );
 static int cs_event_nick( CmdParams *cmdparams );
+static int cs_event_away( CmdParams *cmdparams );
 static int cs_event_server( CmdParams *cmdparams );
 static int cs_event_squit( CmdParams *cmdparams );
 
@@ -92,6 +96,7 @@ static int cs_set_sign_watch_cb( CmdParams *cmdparams, SET_REASON reason );
 static int cs_set_kill_watch_cb( CmdParams *cmdparams, SET_REASON reason );
 static int cs_set_mode_watch_cb( CmdParams *cmdparams, SET_REASON reason );
 static int cs_set_nick_watch_cb( CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_away_watch_cb( CmdParams *cmdparams, SET_REASON reason );
 static int cs_set_serv_watch_cb( CmdParams *cmdparams, SET_REASON reason );
 
 /** Bot pointer */
@@ -126,6 +131,7 @@ static bot_setting cs_settings[]=
 	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "KillWatch",	NULL,	cs_help_set_killwatch, cs_set_kill_watch_cb,( void* )1 },
 	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ModeWatch",	NULL,	cs_help_set_modewatch, cs_set_mode_watch_cb,( void* )1 },
 	{"NICKWATCH",	&cs_cfg.nick_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "NickWatch",	NULL,	cs_help_set_nickwatch, cs_set_nick_watch_cb,( void* )1 },
+	{"AWAYWATCH",	&cs_cfg.away_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "AwayWatch",	NULL,	cs_help_set_awaywatch, cs_set_away_watch_cb,( void* )1 },
 	{"SERVWATCH",	&cs_cfg.serv_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ServWatch",	NULL,	cs_help_set_servwatch, cs_set_serv_watch_cb,( void* )1 },
 	{"EXCLUSIONS",	&cs_cfg.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "Exclusions",	NULL,	cs_help_set_exclusions, cs_set_exclusions_cb,( void* )1 },
 	{"LOGGING",		&cs_cfg.logging,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "logging",		NULL,	cs_help_set_logging, NULL,( void* )1 },
@@ -155,6 +161,7 @@ ModuleEvent module_events[] = {
 	{EVENT_GLOBALKILL,	cs_event_globalkill,EVENT_FLAG_EXCLUDE_ME},
 	{EVENT_SERVERKILL,	cs_event_serverkill,EVENT_FLAG_EXCLUDE_ME},
 	{EVENT_NICK,		cs_event_nick,		EVENT_FLAG_EXCLUDE_ME},
+	{EVENT_AWAY,		cs_event_away,		EVENT_FLAG_EXCLUDE_ME},
 	{EVENT_SERVER,		cs_event_server,	EVENT_FLAG_EXCLUDE_ME},
 	{EVENT_SQUIT,		cs_event_squit,		EVENT_FLAG_EXCLUDE_ME},
 	{EVENT_NULL,		NULL}
@@ -499,6 +506,24 @@ static int cs_event_nick( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
+/** @brief cs_event_away
+ *
+ *  report away event
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int cs_event_away( CmdParams *cmdparams )
+{
+	SET_SEGV_LOCATION();
+	cs_report( msg_away, cmdparams->source->name, 
+		cmdparams->source->user->username, cmdparams->source->user->hostname, 
+		IsAway( cmdparams->source ) ? "now" : "no longer" );
+	return NS_SUCCESS;
+}
+
 /** @brief cs_event_server
  *
  *  report server connect
@@ -632,6 +657,27 @@ static int cs_set_mode_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 static int cs_set_nick_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( cs_cfg.nick_watch ) {
+		EnableEvent( EVENT_NICK );
+	} else {
+		DisableEvent( EVENT_NICK );
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief cs_set_away_watch_cb
+ *
+ *  Set callback for away watch
+ *  Enable or disable events associated with away events
+ *
+ *  @cmdparams pointer to commands param struct
+ *  @cmdparams reason for SET
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int cs_set_away_watch_cb( CmdParams *cmdparams, SET_REASON reason )
+{
+	if( cs_cfg.away_watch ) {
 		EnableEvent( EVENT_NICK );
 	} else {
 		DisableEvent( EVENT_NICK );
