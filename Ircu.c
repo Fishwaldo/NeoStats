@@ -300,6 +300,12 @@ send_part (const char *who, const char *chan)
 	send_cmd (":%s %s %s", who, TOK_PART, chan);
 }
 
+void 
+send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
+{
+
+}
+
 void
 send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
 {
@@ -363,11 +369,6 @@ send_nickchange (const char *oldnick, const char *newnick, const unsigned long t
 
 void
 send_invite (const char *from, const char *to, const char *chan) 
-{
-}
-
-void 
-send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
 {
 }
 

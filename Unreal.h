@@ -35,7 +35,7 @@
 
 /* we have token support */
 #define GOTTOKENSUPPORT
-/* we don't have sjoin */
+/* we have sjoin */
 #define GOTSJOIN
 /* we don't support CLIENT */
 #undef GOTCLIENTSUPPORT
