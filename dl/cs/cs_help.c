@@ -6,6 +6,8 @@
 ** Authors: ^Enigma^ & Shmad
 */
 
+#include <stats.h>
+
 const char *cs_help[] = {
 "\2ConnectServ HELP\2",
 "",

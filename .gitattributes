@@ -5,8 +5,8 @@
 /ChangeLog -text
 /INSTALL -text
 /LICENCE -text
-/Makefile.am -text
 /Makefile.in -text
+/Makefile.inc -text
 /NEWS -text
 /README -text
 /TODO -text
@@ -129,17 +129,13 @@ doc/read-userman -text
 logs/.keepme -text
 logs/Makefile.am -text
 logs/Makefile.in -text
-/ltmain.sh -text
 /main.c -text
 /makeconf -text
-/missing -text
-/mkinstalldirs -text
 /ns_help.c -text
 /server.c -text
 /services.c -text
 /sock.c -text
 /ss_help.c -text
-/stamp-h.in -text
 /stats.cfg.dist -text
 /stats.h -text
 /timer.c -text

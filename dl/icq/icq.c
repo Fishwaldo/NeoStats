@@ -24,7 +24,6 @@
 #include "dl.h"
 #include "dotconf.h"
 
-#include "icq_help.c"
 
 
 struct uin_info
