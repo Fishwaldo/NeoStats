@@ -531,6 +531,12 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 		nlog (LOG_DEBUG1, LOG_CORE, "m_notice: dropping unknown privmsg from %s, to %s : %s", origin, av[0], av[ac-1]);
 		return;
 	}
+#if 0
+	if( ircstrcasecmp(av[0], "AUTH")) {
+		nlog (LOG_DEBUG1, LOG_CORE, "m_notice: dropping server notice from %s, to %s : %s", origin, av[0], av[ac-1]);
+		return;
+	}
+#endif
 	nlog (LOG_DEBUG1, LOG_CORE, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
 	strlcpy (privmsgbuffer, av[ac-1], BUFSIZE);
 	splitargc = split_buf (av[ac-1], &splitargv, 0);

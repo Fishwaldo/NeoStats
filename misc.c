@@ -165,12 +165,14 @@ strlwr (char *s)
 void
 AddStringToList (char ***List, char S[], int *C)
 {
+	static int numargs = 8;
+
 	if (*C == 0) {
-		*List = calloc (sizeof (char *) * 30, 1);
-	} else if (*C >= 30) {
-		nlog(LOG_CRITICAL, LOG_MOD, "AddStringToList is full. Not Adding");
-		nlog(LOG_CRITICAL, LOG_MOD, "RX: %s", recbuf);
-		return;
+		numargs = 8;
+		*List = calloc (sizeof (char *) * numargs, 1);
+	} else if (*C  == numargs) {
+		numargs += 8;
+		*List = realloc (*List, sizeof (char *) * numargs);
 	}
 	++*C;
 	(*List)[*C - 1] = S;
