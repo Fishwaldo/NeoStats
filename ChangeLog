@@ -4,7 +4,6 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
- - Initial import of language support files. (M)
  - Change init_bot so that in client mode, module commands and settings are
    just added to the main bot. (M)
  - Begin adding a client protocol so that NeoStats can connect as a normal
