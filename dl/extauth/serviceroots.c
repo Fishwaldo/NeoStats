@@ -24,7 +24,6 @@
 */
 
 #include <stdio.h>
-#include <fnmatch.h>
 #include "dl.h"
 #include "stats.h"
 #include "dotconf.h"
@@ -157,9 +156,9 @@ int __do_auth(User * u, int curlvl)
 	un = list_first(srconf.ul);
 	while (un) {
 		sru = lnode_get(un);
-		if ((!fnmatch(sru->nick, u->nick, 0))
-		    && (!fnmatch(sru->ident, u->username, 0))
-		    && (!fnmatch(sru->host, u->hostname, 0))) {
+		if ((!match(sru->nick, u->nick))
+		    && (!match(sru->ident, u->username))
+		    && (!match(sru->host, u->hostname))) {
 			return (sru->lvl);
 		}
 		un = list_next(srconf.ul, un);
