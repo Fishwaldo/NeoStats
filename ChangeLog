@@ -6,6 +6,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - introduced flags field into ModUser structure (M)
  - early version of generic bot message handler (M)
  - log messages now have second resolution (M)
+ - Unreal support split between 3.1.x and 3.2.x since they require different support now (M)
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.9
  - import of libpcre into core (M)

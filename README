@@ -176,7 +176,9 @@ Required settings:
 IRCD Support:
     To specify the IRCD you are compiling for. e.g.:
 
-        --enable-unreal    - enable Unreal IRCD Support
+        --enable-unreal    - enable Unreal 3.1.x IRCD Support
+
+        --enable-unreal32  - enable Unreal 3.2.x IRCD Support
 
         --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support
 

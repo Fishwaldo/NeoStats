@@ -120,6 +120,9 @@
 /* 'Enable Unreal Support' */
 #undef UNREAL
 
+/* 'Enable Unreal 3.2.x Support' */
+#undef UNREAL32
+
 /* enable hybrid support */
 #undef HYBRID7
 
