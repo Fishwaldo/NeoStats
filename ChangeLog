@@ -35,6 +35,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fix potential High CPU usage (F)
  - Reformatted segfault reports to encourage users to submit full information with bug reports (M)
  - IRCd cleanups for common commands like admin/stats/motd/pong (M)
+ - AddUser changes to fix bug 94 (M)
 
 * NeoStats * Fish (F) * Version 2.5.10
  - Fix a problem with Umode +T being reintroduced on Unreal Beta19 as a normal usermode. 

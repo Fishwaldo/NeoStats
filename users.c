@@ -60,12 +60,15 @@ new_user (const char *nick)
 }
 
 void
-AddUser (const char *nick, const char *user, const char *host, const char *server, const unsigned long ipaddr, const unsigned long TS)
+AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const unsigned long ipaddr, const unsigned long TS)
 {
+	char **av;
+	int ac = 0;
 	User *u;
 	int i;
 
 	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): %s (%s@%s)(%d) -> %s at %lu", nick, user, host, (int)htonl (ipaddr), server, (unsigned long)TS);
+	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): RealName(%s): %s", nick, realname);
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
 	if (u) {
@@ -76,8 +79,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *serve
 	u = new_user (nick);
 	strlcpy (u->hostname, host, MAXHOST);
 	strlcpy (u->username, user, MAXUSER);
-	/* its empty for the moment */
-	strsetnull (u->realname);
+	strlcpy (u->realname, realname, MAXREALNAME);
 	u->server = findserver (server);
 	u->t_flood = me.now;
 	u->flood = 0;
@@ -95,22 +97,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *serve
 	for (i = 0; i < NUM_MODULES; i++) {
 		u->moddata[i] = NULL;
 	}
-}
 
-void
-AddRealName (const char *nick, const char *realname)
-{
-	char **av;
-	int ac = 0;
-
-	User *u = finduser (nick);
-
-	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Can not find User %s for Realname", nick);
-		return;
-	}
-	nlog (LOG_DEBUG2, LOG_CORE, "RealName(%s): %s", nick, realname);
-	strlcpy (u->realname, realname, MAXREALNAME);
 	AddStringToList (&av, u->nick, &ac);
 	ModuleEvent (EVENT_SIGNON, av, ac);
 	free (av);

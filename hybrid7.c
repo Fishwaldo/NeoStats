@@ -299,7 +299,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 	}
 	newmode[j] = '\0';
 	sts ("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, me.now, newmode, ident, host, me.name, realname);
-	AddUser (nick, ident, host, me.name, 0, me.now);
+	AddUser (nick, ident, host, realname, me.name, 0, me.now);
 	UserMode (nick, newmode);
 	return 1;
 }
@@ -917,9 +917,8 @@ Srv_Nick (char *origin, char **argv, int argc)
 {
 	char *realname;
 
-	AddUser (argv[0], argv[4], argv[5], argv[6], 0, strtoul (argv[2], NULL, 10));
 	realname = joinbuf (argv, argc, 7);
-	AddRealName (argv[0], realname);
+	AddUser (argv[0], argv[4], argv[5], realname, argv[6], 0, strtoul (argv[2], NULL, 10));
 	free (realname);
 	nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[3]);
 	UserMode (argv[0], argv[3]);

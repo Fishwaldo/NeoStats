@@ -375,7 +375,7 @@ int
 snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
 {
 	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, me.now, ident, host, me.name, realname);
-	AddUser (nick, ident, host, me.name, 0, me.now);
+	AddUser (nick, ident, host, realname, me.name, 0, me.now);
 	return 1;
 }
 
@@ -927,9 +927,9 @@ void
 Srv_Nick (char *origin, char **argv, int argc)
 {
 	char *realname;
-	AddUser (argv[0], argv[3], argv[4], argv[5], 0, strtoul (argv[2], NULL, 10));
+
 	realname = joinbuf (argv, argc, 7);
-	AddRealName (argv[0], realname);
+	AddUser (argv[0], argv[3], argv[4], realname, argv[5], 0, strtoul (argv[2], NULL, 10));
 	free (realname);
 }
 

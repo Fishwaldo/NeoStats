@@ -544,7 +544,7 @@ int
 snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname)
 {
 	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, me.now, ident, host, me.name, realname);
-	AddUser (nick, ident, host, me.name, 0, me.now);
+	AddUser (nick, ident, host, realname, me.name, 0, me.now);
 #else
 int
 snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
@@ -562,7 +562,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 	}
 	newmode[j] = '\0';
 	sts ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, me.now, newmode, ident, host, me.name, me.now, realname);
-	AddUser (nick, ident, host, me.name, 0, me.now);
+	AddUser (nick, ident, host, realname, me.name, 0, me.now);
 	UserMode (nick, newmode);
 #endif
 	return 1;
@@ -1273,17 +1273,16 @@ void
 Srv_Nick (char *origin, char **argv, int argc)
 {
 	char *realname;
+
 #if ULTIMATE3
-	AddUser (argv[0], argv[4], argv[5], argv[6], strtoul (argv[8], NULL, 10), strtoul (argv[2], NULL, 10));
 	realname = joinbuf (argv, argc, 9);
-	AddRealName (argv[0], realname);
+	AddUser (argv[0], argv[4], argv[5], realname, argv[6], strtoul (argv[8], NULL, 10), strtoul (argv[2], NULL, 10));
 	free (realname);
 	nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[3]);
 	UserMode (argv[0], argv[3]);
 #elif ULTIMATE
-	AddUser (argv[0], argv[3], argv[4], argv[5], 0, strtoul (argv[2], NULL, 10));
 	realname = joinbuf (argv, argc, 7);
-	AddRealName (argv[0], realname);
+	AddUser (argv[0], argv[3], argv[4], realname, argv[5], 0, strtoul (argv[2], NULL, 10));
 	free (realname);
 #endif
 }
@@ -1295,9 +1294,8 @@ Srv_Client (char *origin, char **argv, int argc)
 {
 	char *realname;
 
-	AddUser (argv[0], argv[5], argv[6], argv[8], strtoul (argv[10], NULL, 10), strtoul (argv[2], NULL, 10));
 	realname = joinbuf (argv, argc, 11);
-	AddRealName (argv[0], realname);
+	AddUser (argv[0], argv[5], argv[6], realname, argv[8], strtoul (argv[10], NULL, 10), strtoul (argv[2], NULL, 10));
 	free (realname);
 	nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[3]);
 	UserMode (argv[0], argv[3]);

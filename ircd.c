@@ -84,8 +84,6 @@ int
 init_bot (char *nick, char *user, char *host, char *rname, const char *modes, char *mod_name)
 {
 	User *u;
-	char **av;
-	int ac = 0;
 	long Umode;
 
 	SET_SEGV_LOCATION();
@@ -103,9 +101,6 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
 	}
 	Umode = init_bot_modes(modes);
 	SignOn_NewBot (nick, user, host, rname, Umode);
-	AddStringToList (&av, nick, &ac);
-	ModuleEvent (EVENT_SIGNON, av, ac);
-	free (av);
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
 	return NS_SUCCESS;
@@ -123,8 +118,6 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 {
 	ModUser * bot_ptr; 
 	User *u;
-	char **av;
-	int ac = 0;
 	long Umode;
 
 	SET_SEGV_LOCATION();
@@ -143,9 +136,6 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 	}
 	Umode = init_bot_modes(modes);
 	SignOn_NewBot (nick, user, host, rname, Umode);
-	AddStringToList (&av, nick, &ac);
-	ModuleEvent (EVENT_SIGNON, av, ac);
-	free (av);
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
 	bot_ptr->flags = flags;
@@ -446,6 +436,9 @@ init_services_bot (void)
 	long Umode;
 
 	SET_SEGV_LOCATION();
+	AddStringToList (&av, me.uplink, &ac);
+	ModuleEvent (EVENT_ONLINE, av, ac);
+	free (av);
 	if (finduser (s_Services)) {
 		/* nick already exists on the network */
 		strlcat (s_Services, "1", MAXNICK);
@@ -454,13 +447,6 @@ init_services_bot (void)
 	Umode = init_bot_modes(services_bot_modes);
 	SignOn_NewBot (s_Services, me.user, me.host, me.rname, Umode);
 	me.onchan = 1;
-	AddStringToList (&av, me.uplink, &ac);
-	ModuleEvent (EVENT_ONLINE, av, ac);
-	free (av);
-	ac = 0;
-	AddStringToList (&av, s_Services, &ac);
-	ModuleEvent (EVENT_SIGNON, av, ac);
-	free (av);
 	return NS_SUCCESS;
 }
 

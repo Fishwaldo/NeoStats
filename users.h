@@ -24,9 +24,8 @@
 #ifndef _USERS_H_
 #define _USERS_H_
 
-void AddUser (const char *nick, const char *user, const char *host, const char *server, const unsigned long ip, const unsigned long TS);
+void AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const unsigned long ip, const unsigned long TS);
 void DelUser (const char *nick);
-void AddRealName (const char *nick, const char *realname);
 void Change_User (User *u, const char * newnick);
 void UserDump (char *nick);
 void part_u_chan (list_t *list, lnode_t *node, void *v);
