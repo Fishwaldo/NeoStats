@@ -449,7 +449,7 @@ ssvshost_cmd (const char *who, const char *vhost)
 }
 int 
 sinvite_cmd (const char *from, const char *to, const char *chan) {
-	sts (":%s INVITE %s %s", from, to, chan);
+	sts (":%s %s %s %s", from, MSG_INVITE, to, chan);
 	return 1;
 }
 
@@ -502,7 +502,7 @@ chanalert (char *who, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	sts (":%s PRIVMSG %s :%s", who, me.chan, ircd_buf);
+	sts (":%s %s %s :%s", who, MSG_PRIVATE, me.chan, ircd_buf);
 }
 
 void
@@ -519,9 +519,9 @@ prefmsg (char *to, const char *from, char *fmt, ...)
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 	if (me.want_privmsg) {
-		sts (":%s PRIVMSG %s :%s", from, to, ircd_buf);
+		sts (":%s %s %s :%s", from, MSG_PRIVATE, to, ircd_buf);
 	} else {
-		sts (":%s NOTICE %s :%s", from, to, ircd_buf);
+		sts (":%s %s %s :%s", from, MSG_NOTICE, to, ircd_buf);
 	}
 }
 
@@ -538,7 +538,7 @@ privmsg (char *to, const char *from, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	sts (":%s PRIVMSG %s :%s", from, to, ircd_buf);
+	sts (":%s %s %s :%s", from, MSG_PRIVATE, to, ircd_buf);
 }
 
 void
@@ -554,7 +554,7 @@ notice (char *to, const char *from, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	sts (":%s NOTICE %s :%s", from, to, ircd_buf);
+	sts (":%s %s %s :%s", from, MSG_NOTICE, to, ircd_buf);
 }
 
 void
@@ -567,7 +567,7 @@ globops (char *from, char *fmt, ...)
 	va_end (ap);
 
 	if (me.onchan) {
-		sts (":%s GLOBOPS :%s", from, ircd_buf);
+		sts (":%s %s :%s", from, MSG_GLOBOPS, ircd_buf);
 	} else {
 		nlog (LOG_NORMAL, LOG_CORE, ircd_buf);
 	}

@@ -393,9 +393,9 @@ parse (char *line)
 
 	/* First, check if its a privmsg, and if so, handle it in the correct Function */
 #ifndef IRCU
-	if (!strcmp ("PRIVMSG", cmd) || (!strcmp ("!", cmd))) {
+	if (!strcmp (MSG_PRIVATE, cmd) || (!strcmp ("!", cmd))) {
 #else 
-	if (!strcmp("PRIVMSG", cmd) || !strcmp("P", cmd) || !strcmp("CPRIVMSG", cmd) || !strcmp("CP", cmd)) {
+	if (!strcmp(MSG_PRIVATE, cmd) || !strcmp("P", cmd) || !strcmp("CPRIVMSG", cmd) || !strcmp("CP", cmd)) {
 #endif
 
 		/* its a privmsg, now lets see who too... */
