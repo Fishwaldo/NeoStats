@@ -148,6 +148,7 @@
 #define B_TABLE_SIZE	100	/* Number of Bots */
 #define MAXMODES		-1
 #define DNS_QUEUE_SIZE  100	/* number on concurrent DNS lookups */
+#define MAX_TRANSFERS	10	/* number of curl transfers */
 
 #define bzero(x, y)		memset(x, '\0', y);
 #define is_synced		me.synced
@@ -486,4 +487,8 @@ int del_services_cmd_list(bot_cmd* bot_cmd_list);
 void services_cmd_help (User * u, char **av, int ac);
 int is_target_valid(char* bot_name, User* u, char* target_nick);
 
+/* transfer.c stuff */
+typedef void (*transfer_callback) (void *data, int returncode, void *body);
+void transfer_status();
+int new_transfer(char *url, char *params, int savetofileormemory, char *filename, void *data, transfer_callback *callback);
 #endif

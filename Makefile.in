@@ -159,3 +159,4 @@ server.o: server.c stats.h adns/adns.h list.h hash.h config.h neoircd.h log.h
 keeper.o: keeper.c stats.h adns/adns.h list.h hash.h config.h neoircd.h keeper/keeper.h conf.h log.h
 log.o: log.c stats.h adns/adns.h list.h hash.h config.h neoircd.h conf.h log.h
 neoircd.o: neoircd.c stats.h adns/adns.h list.h hash.h config.h neoircd.h hybrid7.h dl.h log.h
+transfer.o: transfer.c transfer.h stats.h list.h
