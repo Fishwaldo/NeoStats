@@ -1452,7 +1452,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 	char* nicklist;
 	long mode = 0;
 	long mode1 = 0;
-	int ok = 1, i;
+	int ok = 1, i, j = 3;
 	ModesParm *m;
 	Chans *c;
 	lnode_t *mn = NULL;
@@ -1470,7 +1470,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 					if (chan_modes[i].parameters) {
 						m = smalloc (sizeof (ModesParm));
 						m->mode = chan_modes[i].mode;
-						strlcpy (m->param, argv[offset], PARAMSIZE);
+						strlcpy (m->param, argv[j], PARAMSIZE);
 						mn = lnode_create (m);
 						if (!list_isfull (tl)) {
 							list_append (tl, mn);
@@ -1478,7 +1478,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 							nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
 							do_exit (NS_EXIT_ERROR, "List full - see log file");
 						}
-						offset++;
+						j++;
 					} else {
 						mode1 |= chan_modes[i].mode;
 					}
@@ -1487,8 +1487,8 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 			modes++;
 		}
 	}
-	while (argc > offset) {
-		nicklist = argv[offset];
+	while (argc > j) {
+		nicklist = argv[j];
 		mode = 0;
 		while (ok == 1) {
 			for (i = 0; i < ircd_cmodecount; i++) {
@@ -1508,7 +1508,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		}
 		join_chan (nick, channame); 
 		ChanUserMode (channame, nick, 1, mode);
-		offset++;
+		j++;
 		ok = 1;
 	}
 	c = findchan (channame);
