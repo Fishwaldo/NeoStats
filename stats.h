@@ -440,6 +440,7 @@ typedef struct bot_setting {
 	SET_TYPE		type;		/* type of var */
 	unsigned int	min;		/* min value */
 	unsigned int	max;		/* max value */
+	unsigned int	ulevel;		/* min user level */
 	char			*confitem;	/* config string for kptool */
 	const char		*desc;		/* description of setting for messages e.g. seconds, days*/
 	const char**	helptext;	/* pointer to help text */

@@ -134,6 +134,8 @@ typedef struct ModUser {
 	hash_t *botcmds;
 	/* hash for settings */
 	bot_setting *bot_settings;
+	/* min ulevel for settings */
+	unsigned int set_ulevel;
 	/** bot message function */
 	message_function function;
 	/** channel message function */

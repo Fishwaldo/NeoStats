@@ -232,7 +232,19 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 	SET_SEGV_INMODULE(mod_name);
 	bot_ptr->flags = flags;
 	add_bot_cmd_list(bot_ptr, bot_cmd_list);
-	bot_ptr->bot_settings = bot_setting_list;	
+	if (bot_setting_list != NULL) {
+		bot_ptr->bot_settings = bot_setting_list;	
+		/* Default SET to ROOT only */
+		bot_ptr->set_ulevel = NS_ULEVEL_ROOT;
+		/* Now calculate minimum defined user level */
+		while(bot_setting_list->option != NULL) {
+			if(bot_setting_list->ulevel < bot_ptr->set_ulevel)
+				bot_ptr->set_ulevel = bot_setting_list->ulevel;
+		}
+	} else {
+		bot_ptr->bot_settings = NULL;	
+		bot_ptr->set_ulevel = NS_ULEVEL_ROOT;
+	}
 	return bot_ptr;
 }
 

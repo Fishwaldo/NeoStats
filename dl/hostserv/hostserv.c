@@ -251,10 +251,10 @@ static bot_cmd hs_commands[]=
 
 static bot_setting hs_settings[]=
 {
-	{"EXPIRE",		&hs_cfg.old,		SET_TYPE_INT,		0, 99,	"ExpireDays",	"days",	hs_help_set	},
-	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0,	"UnetVhosts",	NULL,	NULL	},
-	{"HOSTNAME",	&hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST,	"UnetDomain",	NULL,	NULL	},
-	{NULL,			NULL,				0,					0, 0,	NULL,			NULL,	NULL	},
+	{"EXPIRE",		&hs_cfg.old,		SET_TYPE_INT,		0, 99, 	NS_ULEVEL_ADMIN,	"ExpireDays",	"days",	hs_help_set	},
+	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN,	"UnetVhosts",	NULL,	NULL	},
+	{"HOSTNAME",	&hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN,	"UnetDomain",	NULL,	NULL	},
+	{NULL,			NULL,				0,					0, 0, 	0,	NULL,			NULL,	NULL	},
 };
 
 int Online(char **av, int ac)

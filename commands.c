@@ -375,7 +375,7 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 			cmd_ptr++;
 		}
 		/* Do we have a set command? */
-		if(bot_ptr->bot_settings) {
+		if(bot_ptr->bot_settings && userlevel >= bot_ptr->set_ulevel) {
 			prefmsg(u->nick, bot_ptr->nick, "SET                 Configure %s", bot_ptr->nick);
 		}
 		restartlevel:
@@ -460,12 +460,12 @@ bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac)
 		cmd_ptr++;
 	}
 	/* Handle SET if we have it */
-	if (bot_ptr->bot_settings && !strcasecmp(av[2], "SET") ) {
+	if (bot_ptr->bot_settings && userlevel >= bot_ptr->set_ulevel && !strcasecmp(av[2], "SET") ) {
 		bot_setting* set_ptr;
 		set_ptr = bot_ptr->bot_settings;
 		while(set_ptr->option)
 		{
-			if(set_ptr->helptext)
+			if(set_ptr->helptext && userlevel >= set_ptr->ulevel)
 				privmsg_list (u->nick, bot_ptr->nick, set_ptr->helptext);
 			set_ptr++;
 		}
@@ -507,6 +507,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 {
 	int intval;
 	bot_setting* set_ptr;
+	int userlevel;
 
 	if (ac < 3) {
 		prefmsg(u->nick, bot_ptr->nick,
@@ -515,34 +516,45 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 		return 1;
 	} 
 
+	userlevel = UserLevel(u);
+	if( userlevel < bot_ptr->set_ulevel) {
+		prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
+		chanalert (bot_ptr->nick, "%s tried to use SET, but is not authorised", u->nick);
+		nlog (LOG_NORMAL, LOG_MOD, "%s tried to use SET, but is not authorised", u->nick);
+		return 1;
+	}
+
 	if(!strcasecmp(av[2], "LIST"))
 	{
 		prefmsg(u->nick, bot_ptr->nick, "Current %s settings:", bot_ptr->nick);
 		set_ptr = bot_ptr->bot_settings;
 		while(set_ptr->option)
 		{
-			switch(set_ptr->type) {
-				case SET_TYPE_BOOLEAN:
-					prefmsg(u->nick, bot_ptr->nick, "%s: %s",
-						set_ptr->option, *(int*)set_ptr->varptr ? "Enabled" : "Disabled");
-					break;
-				case SET_TYPE_INT:
-					if(set_ptr->desc) {
-							prefmsg(u->nick, bot_ptr->nick, "%s: %d %s",
-								set_ptr->option, *(int*)set_ptr->varptr, set_ptr->desc);
-						} else {
-							prefmsg(u->nick, bot_ptr->nick, "%s: %d",
-								set_ptr->option, *(int*)set_ptr->varptr);
-						}
-					break;
-				case SET_TYPE_STRING:
-					prefmsg(u->nick, bot_ptr->nick, "%s: %s",
-						set_ptr->option, (char*)set_ptr->varptr);
-					break;
-				default:
-					prefmsg(u->nick, bot_ptr->nick, "%s: uses an unsupported type",
-						set_ptr->option);
-					break;
+			/* Only list authorised SETTINGS */
+			if( userlevel >= set_ptr->ulevel) {
+				switch(set_ptr->type) {
+					case SET_TYPE_BOOLEAN:
+						prefmsg(u->nick, bot_ptr->nick, "%s: %s",
+							set_ptr->option, *(int*)set_ptr->varptr ? "Enabled" : "Disabled");
+						break;
+					case SET_TYPE_INT:
+						if(set_ptr->desc) {
+								prefmsg(u->nick, bot_ptr->nick, "%s: %d %s",
+									set_ptr->option, *(int*)set_ptr->varptr, set_ptr->desc);
+							} else {
+								prefmsg(u->nick, bot_ptr->nick, "%s: %d",
+									set_ptr->option, *(int*)set_ptr->varptr);
+							}
+						break;
+					case SET_TYPE_STRING:
+						prefmsg(u->nick, bot_ptr->nick, "%s: %s",
+							set_ptr->option, (char*)set_ptr->varptr);
+						break;
+					default:
+						prefmsg(u->nick, bot_ptr->nick, "%s: uses an unsupported type",
+							set_ptr->option);
+						break;
+				}
 			}
 			set_ptr++;
 		}
@@ -567,6 +579,12 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 		prefmsg(u->nick, bot_ptr->nick,
 			"Unknown set option. /msg %s HELP SET for more info",
 			bot_ptr->nick);
+		return 1;
+	}
+	if( userlevel < set_ptr->ulevel) {
+		prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
+		chanalert (bot_ptr->nick, "%s tried to use SET %s, but is not authorised", u->nick, av[2]);
+		nlog (LOG_NORMAL, LOG_MOD, "%s tried to use SET %s, but is not authorised", u->nick, av[2]);
 		return 1;
 	}
 	switch(set_ptr->type) {
