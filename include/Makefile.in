@@ -49,7 +49,7 @@ am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
-CONFIG_HEADER = config.h $(top_builddir)/lib/gdbm/autoconf.h
+CONFIG_HEADER = config.h $(top_builddir)/src/dbm/gdbm/autoconf.h
 CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =

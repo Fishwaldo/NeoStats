@@ -38,7 +38,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/autotools/rules.mk
+	$(srcdir)/autoconf.h.in $(top_srcdir)/autotools/rules.mk
 subdir = src/dbm/gdbm
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
@@ -50,8 +50,7 @@ am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
-CONFIG_HEADER = $(top_builddir)/include/config.h \
-	$(top_builddir)/lib/gdbm/autoconf.h
+CONFIG_HEADER = $(top_builddir)/include/config.h autoconf.h
 CONFIG_CLEAN_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -63,13 +62,13 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 gdbm_la_LIBADD =
-am_gdbm_la_OBJECTS = gdbm.lo gdbmopen.lo gdbmdelete.lo gdbmfetch.lo \
-	gdbmstore.lo gdbmclose.lo gdbmreorg.lo gdbmseq.lo gdbmsync.lo \
-	gdbmerrno.lo gdbmexists.lo gdbmfdesc.lo gdbmsetopt.lo \
-	bucket.lo falloc.lo findkey.lo global.lo hash.lo update.lo \
-	version.lo
+am_gdbm_la_OBJECTS = gdbm.lo bucket.lo falloc.lo findkey.lo \
+	gdbmclose.lo gdbmdelete.lo gdbmerrno.lo gdbmexists.lo \
+	gdbmfdesc.lo gdbmfetch.lo gdbmopen.lo gdbmreorg.lo gdbmseq.lo \
+	gdbmsetopt.lo gdbmstore.lo gdbmsync.lo global.lo hash.lo \
+	update.lo version.lo
 gdbm_la_OBJECTS = $(am_gdbm_la_OBJECTS)
-DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include -I$(top_builddir)/lib/gdbm
+DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include -I.
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -207,23 +206,18 @@ target_alias = @target_alias@
 wi_PWD = @wi_PWD@
 pkglib_LTLIBRARIES = gdbm.la 
 gdbm_la_SOURCES = gdbm.c \
-	../../../lib/gdbm/gdbmopen.c ../../../lib/gdbm/gdbmdelete.c \
-	../../../lib/gdbm/gdbmfetch.c ../../../lib/gdbm/gdbmstore.c \
-	../../../lib/gdbm/gdbmclose.c ../../../lib/gdbm/gdbmreorg.c \
-	../../../lib/gdbm/gdbmseq.c ../../../lib/gdbm/gdbmsync.c \
-	../../../lib/gdbm/gdbmerrno.c ../../../lib/gdbm/gdbmexists.c \
-	../../../lib/gdbm/gdbmfdesc.c ../../../lib/gdbm/gdbmsetopt.c \
-	../../../lib/gdbm/bucket.c ../../../lib/gdbm/falloc.c \
-	../../../lib/gdbm/findkey.c ../../../lib/gdbm/global.c \
-	../../../lib/gdbm/hash.c ../../../lib/gdbm/update.c \
-	../../../lib/gdbm/version.c 
+	bucket.c falloc.c findkey.c \
+	gdbmclose.c gdbmdelete.c gdbmerrno.c gdbmexists.c gdbmfdesc.c \
+	gdbmfetch.c gdbmopen.c gdbmreorg.c gdbmseq.c gdbmsetopt.c \
+	gdbmstore.c gdbmsync.c global.c hash.c update.c version.c
 
 AM_LDFLAGS = -module -avoid-version -no-undefined
-AM_CFLAGS = -I$(top_srcdir)/lib/adns/ -I$(top_srcdir)/lib/gdbm/ @PCRE_CFLAGS@ @CURL_CFLAGS@
+AM_CFLAGS = -I$(top_srcdir)/lib/adns/ @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-all: all-am
+all: autoconf.h
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -256,6 +250,23 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+
+autoconf.h: stamp-h2
+	@if test ! -f $@; then \
+	  rm -f stamp-h2; \
+	  $(MAKE) stamp-h2; \
+	else :; fi
+
+stamp-h2: $(srcdir)/autoconf.h.in $(top_builddir)/config.status
+	@rm -f stamp-h2
+	cd $(top_builddir) && $(SHELL) ./config.status src/dbm/gdbm/autoconf.h
+$(srcdir)/autoconf.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+	cd $(top_srcdir) && $(AUTOHEADER)
+	rm -f stamp-h2
+	touch $@
+
+distclean-hdr:
+	-rm -f autoconf.h stamp-h2
 
 uninstall-pkglibLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
@@ -303,139 +314,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/update.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version.Plo@am__quote@
 
-gdbmopen.lo: ../../../lib/gdbm/gdbmopen.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmopen.lo -MD -MP -MF "$(DEPDIR)/gdbmopen.Tpo" -c -o gdbmopen.lo `test -f '../../../lib/gdbm/gdbmopen.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmopen.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmopen.Tpo" "$(DEPDIR)/gdbmopen.Plo"; else rm -f "$(DEPDIR)/gdbmopen.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmopen.c' object='gdbmopen.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmopen.lo `test -f '../../../lib/gdbm/gdbmopen.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmopen.c
-
-gdbmdelete.lo: ../../../lib/gdbm/gdbmdelete.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmdelete.lo -MD -MP -MF "$(DEPDIR)/gdbmdelete.Tpo" -c -o gdbmdelete.lo `test -f '../../../lib/gdbm/gdbmdelete.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmdelete.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmdelete.Tpo" "$(DEPDIR)/gdbmdelete.Plo"; else rm -f "$(DEPDIR)/gdbmdelete.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmdelete.c' object='gdbmdelete.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmdelete.lo `test -f '../../../lib/gdbm/gdbmdelete.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmdelete.c
-
-gdbmfetch.lo: ../../../lib/gdbm/gdbmfetch.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmfetch.lo -MD -MP -MF "$(DEPDIR)/gdbmfetch.Tpo" -c -o gdbmfetch.lo `test -f '../../../lib/gdbm/gdbmfetch.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmfetch.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmfetch.Tpo" "$(DEPDIR)/gdbmfetch.Plo"; else rm -f "$(DEPDIR)/gdbmfetch.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmfetch.c' object='gdbmfetch.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmfetch.lo `test -f '../../../lib/gdbm/gdbmfetch.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmfetch.c
-
-gdbmstore.lo: ../../../lib/gdbm/gdbmstore.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmstore.lo -MD -MP -MF "$(DEPDIR)/gdbmstore.Tpo" -c -o gdbmstore.lo `test -f '../../../lib/gdbm/gdbmstore.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmstore.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmstore.Tpo" "$(DEPDIR)/gdbmstore.Plo"; else rm -f "$(DEPDIR)/gdbmstore.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmstore.c' object='gdbmstore.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmstore.lo `test -f '../../../lib/gdbm/gdbmstore.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmstore.c
-
-gdbmclose.lo: ../../../lib/gdbm/gdbmclose.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmclose.lo -MD -MP -MF "$(DEPDIR)/gdbmclose.Tpo" -c -o gdbmclose.lo `test -f '../../../lib/gdbm/gdbmclose.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmclose.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmclose.Tpo" "$(DEPDIR)/gdbmclose.Plo"; else rm -f "$(DEPDIR)/gdbmclose.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmclose.c' object='gdbmclose.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmclose.lo `test -f '../../../lib/gdbm/gdbmclose.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmclose.c
-
-gdbmreorg.lo: ../../../lib/gdbm/gdbmreorg.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmreorg.lo -MD -MP -MF "$(DEPDIR)/gdbmreorg.Tpo" -c -o gdbmreorg.lo `test -f '../../../lib/gdbm/gdbmreorg.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmreorg.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmreorg.Tpo" "$(DEPDIR)/gdbmreorg.Plo"; else rm -f "$(DEPDIR)/gdbmreorg.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmreorg.c' object='gdbmreorg.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmreorg.lo `test -f '../../../lib/gdbm/gdbmreorg.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmreorg.c
-
-gdbmseq.lo: ../../../lib/gdbm/gdbmseq.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmseq.lo -MD -MP -MF "$(DEPDIR)/gdbmseq.Tpo" -c -o gdbmseq.lo `test -f '../../../lib/gdbm/gdbmseq.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmseq.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmseq.Tpo" "$(DEPDIR)/gdbmseq.Plo"; else rm -f "$(DEPDIR)/gdbmseq.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmseq.c' object='gdbmseq.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmseq.lo `test -f '../../../lib/gdbm/gdbmseq.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmseq.c
-
-gdbmsync.lo: ../../../lib/gdbm/gdbmsync.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmsync.lo -MD -MP -MF "$(DEPDIR)/gdbmsync.Tpo" -c -o gdbmsync.lo `test -f '../../../lib/gdbm/gdbmsync.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmsync.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmsync.Tpo" "$(DEPDIR)/gdbmsync.Plo"; else rm -f "$(DEPDIR)/gdbmsync.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmsync.c' object='gdbmsync.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmsync.lo `test -f '../../../lib/gdbm/gdbmsync.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmsync.c
-
-gdbmerrno.lo: ../../../lib/gdbm/gdbmerrno.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmerrno.lo -MD -MP -MF "$(DEPDIR)/gdbmerrno.Tpo" -c -o gdbmerrno.lo `test -f '../../../lib/gdbm/gdbmerrno.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmerrno.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmerrno.Tpo" "$(DEPDIR)/gdbmerrno.Plo"; else rm -f "$(DEPDIR)/gdbmerrno.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmerrno.c' object='gdbmerrno.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmerrno.lo `test -f '../../../lib/gdbm/gdbmerrno.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmerrno.c
-
-gdbmexists.lo: ../../../lib/gdbm/gdbmexists.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmexists.lo -MD -MP -MF "$(DEPDIR)/gdbmexists.Tpo" -c -o gdbmexists.lo `test -f '../../../lib/gdbm/gdbmexists.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmexists.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmexists.Tpo" "$(DEPDIR)/gdbmexists.Plo"; else rm -f "$(DEPDIR)/gdbmexists.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmexists.c' object='gdbmexists.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmexists.lo `test -f '../../../lib/gdbm/gdbmexists.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmexists.c
-
-gdbmfdesc.lo: ../../../lib/gdbm/gdbmfdesc.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmfdesc.lo -MD -MP -MF "$(DEPDIR)/gdbmfdesc.Tpo" -c -o gdbmfdesc.lo `test -f '../../../lib/gdbm/gdbmfdesc.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmfdesc.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmfdesc.Tpo" "$(DEPDIR)/gdbmfdesc.Plo"; else rm -f "$(DEPDIR)/gdbmfdesc.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmfdesc.c' object='gdbmfdesc.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmfdesc.lo `test -f '../../../lib/gdbm/gdbmfdesc.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmfdesc.c
-
-gdbmsetopt.lo: ../../../lib/gdbm/gdbmsetopt.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gdbmsetopt.lo -MD -MP -MF "$(DEPDIR)/gdbmsetopt.Tpo" -c -o gdbmsetopt.lo `test -f '../../../lib/gdbm/gdbmsetopt.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmsetopt.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdbmsetopt.Tpo" "$(DEPDIR)/gdbmsetopt.Plo"; else rm -f "$(DEPDIR)/gdbmsetopt.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/gdbmsetopt.c' object='gdbmsetopt.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gdbmsetopt.lo `test -f '../../../lib/gdbm/gdbmsetopt.c' || echo '$(srcdir)/'`../../../lib/gdbm/gdbmsetopt.c
-
-bucket.lo: ../../../lib/gdbm/bucket.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bucket.lo -MD -MP -MF "$(DEPDIR)/bucket.Tpo" -c -o bucket.lo `test -f '../../../lib/gdbm/bucket.c' || echo '$(srcdir)/'`../../../lib/gdbm/bucket.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/bucket.Tpo" "$(DEPDIR)/bucket.Plo"; else rm -f "$(DEPDIR)/bucket.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/bucket.c' object='bucket.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bucket.lo `test -f '../../../lib/gdbm/bucket.c' || echo '$(srcdir)/'`../../../lib/gdbm/bucket.c
-
-falloc.lo: ../../../lib/gdbm/falloc.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT falloc.lo -MD -MP -MF "$(DEPDIR)/falloc.Tpo" -c -o falloc.lo `test -f '../../../lib/gdbm/falloc.c' || echo '$(srcdir)/'`../../../lib/gdbm/falloc.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/falloc.Tpo" "$(DEPDIR)/falloc.Plo"; else rm -f "$(DEPDIR)/falloc.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/falloc.c' object='falloc.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o falloc.lo `test -f '../../../lib/gdbm/falloc.c' || echo '$(srcdir)/'`../../../lib/gdbm/falloc.c
-
-findkey.lo: ../../../lib/gdbm/findkey.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT findkey.lo -MD -MP -MF "$(DEPDIR)/findkey.Tpo" -c -o findkey.lo `test -f '../../../lib/gdbm/findkey.c' || echo '$(srcdir)/'`../../../lib/gdbm/findkey.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/findkey.Tpo" "$(DEPDIR)/findkey.Plo"; else rm -f "$(DEPDIR)/findkey.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/findkey.c' object='findkey.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o findkey.lo `test -f '../../../lib/gdbm/findkey.c' || echo '$(srcdir)/'`../../../lib/gdbm/findkey.c
-
-global.lo: ../../../lib/gdbm/global.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT global.lo -MD -MP -MF "$(DEPDIR)/global.Tpo" -c -o global.lo `test -f '../../../lib/gdbm/global.c' || echo '$(srcdir)/'`../../../lib/gdbm/global.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/global.Tpo" "$(DEPDIR)/global.Plo"; else rm -f "$(DEPDIR)/global.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/global.c' object='global.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o global.lo `test -f '../../../lib/gdbm/global.c' || echo '$(srcdir)/'`../../../lib/gdbm/global.c
-
-hash.lo: ../../../lib/gdbm/hash.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT hash.lo -MD -MP -MF "$(DEPDIR)/hash.Tpo" -c -o hash.lo `test -f '../../../lib/gdbm/hash.c' || echo '$(srcdir)/'`../../../lib/gdbm/hash.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/hash.Tpo" "$(DEPDIR)/hash.Plo"; else rm -f "$(DEPDIR)/hash.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/hash.c' object='hash.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o hash.lo `test -f '../../../lib/gdbm/hash.c' || echo '$(srcdir)/'`../../../lib/gdbm/hash.c
-
-update.lo: ../../../lib/gdbm/update.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT update.lo -MD -MP -MF "$(DEPDIR)/update.Tpo" -c -o update.lo `test -f '../../../lib/gdbm/update.c' || echo '$(srcdir)/'`../../../lib/gdbm/update.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/update.Tpo" "$(DEPDIR)/update.Plo"; else rm -f "$(DEPDIR)/update.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/update.c' object='update.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o update.lo `test -f '../../../lib/gdbm/update.c' || echo '$(srcdir)/'`../../../lib/gdbm/update.c
-
-version.lo: ../../../lib/gdbm/version.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT version.lo -MD -MP -MF "$(DEPDIR)/version.Tpo" -c -o version.lo `test -f '../../../lib/gdbm/version.c' || echo '$(srcdir)/'`../../../lib/gdbm/version.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/version.Tpo" "$(DEPDIR)/version.Plo"; else rm -f "$(DEPDIR)/version.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../../lib/gdbm/version.c' object='version.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o version.lo `test -f '../../../lib/gdbm/version.c' || echo '$(srcdir)/'`../../../lib/gdbm/version.c
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -456,11 +334,11 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS:  $(HEADERS) $(SOURCES) autoconf.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) autoconf.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -472,11 +350,11 @@ TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	    $$tags $$unique; \
 	fi
 ctags: CTAGS
-CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS:  $(HEADERS) $(SOURCES) autoconf.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) autoconf.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -524,7 +402,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile $(LTLIBRARIES) autoconf.h
 installdirs:
 	for dir in "$(DESTDIR)$(pkglibdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
@@ -562,7 +440,7 @@ distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-libtool distclean-tags
+	distclean-hdr distclean-libtool distclean-tags
 
 dvi: dvi-am
 
@@ -606,16 +484,16 @@ uninstall-am: uninstall-info-am uninstall-pkglibLTLIBRARIES
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
 	clean-libtool clean-pkglibLTLIBRARIES ctags distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-man \
-	install-pkglibLTLIBRARIES install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-info-am \
-	uninstall-pkglibLTLIBRARIES
+	distclean-compile distclean-generic distclean-hdr \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-exec install-exec-am install-info \
+	install-info-am install-man install-pkglibLTLIBRARIES \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-info-am uninstall-pkglibLTLIBRARIES
 
 
 .c.o:

@@ -40,10 +40,10 @@ DIST_COMMON = README $(am__configure_deps) $(dist_bin_SCRIPTS) \
 	$(dist_data_DATA) $(dist_doc_DATA) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/neostats.in \
 	$(top_srcdir)/autotools/rules.mk $(top_srcdir)/configure \
-	$(top_srcdir)/lib/gdbm/autoconf.h.in AUTHORS COPYING ChangeLog \
-	INSTALL NEWS TODO autotools/compile autotools/config.guess \
-	autotools/config.sub autotools/depcomp autotools/install-sh \
-	autotools/ltmain.sh autotools/missing autotools/mkinstalldirs
+	AUTHORS COPYING ChangeLog INSTALL NEWS TODO autotools/compile \
+	autotools/config.guess autotools/config.sub autotools/depcomp \
+	autotools/install-sh autotools/ltmain.sh autotools/missing \
+	autotools/mkinstalldirs
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
@@ -58,7 +58,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/config.h \
-	$(top_builddir)/lib/gdbm/autoconf.h
+	$(top_builddir)/src/dbm/gdbm/autoconf.h
 CONFIG_CLEAN_FILES = neostats
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(datadir)" \
 	"$(DESTDIR)$(docdir)"
@@ -267,23 +267,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(srcdir) && $(AUTOCONF)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
-
-lib/gdbm/autoconf.h: lib/gdbm/stamp-h2
-	@if test ! -f $@; then \
-	  rm -f lib/gdbm/stamp-h2; \
-	  $(MAKE) lib/gdbm/stamp-h2; \
-	else :; fi
-
-lib/gdbm/stamp-h2: $(top_srcdir)/lib/gdbm/autoconf.h.in $(top_builddir)/config.status
-	@rm -f lib/gdbm/stamp-h2
-	cd $(top_builddir) && $(SHELL) ./config.status lib/gdbm/autoconf.h
-$(top_srcdir)/lib/gdbm/autoconf.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
-	cd $(top_srcdir) && $(AUTOHEADER)
-	rm -f lib/gdbm/stamp-h2
-	touch $@
-
-distclean-hdr:
-	-rm -f lib/gdbm/autoconf.h lib/gdbm/stamp-h2
 neostats: $(top_builddir)/config.status $(srcdir)/neostats.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
@@ -444,7 +427,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/autotools $(distdir)/doc $(distdir)/lib/gdbm
+	$(mkdir_p) $(distdir)/. $(distdir)/autotools $(distdir)/doc
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -623,8 +606,8 @@ clean-am: clean-generic clean-libtool mostlyclean-am
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-hdr \
-	distclean-libtool distclean-tags
+distclean-am: clean-am distclean-generic distclean-libtool \
+	distclean-tags
 
 dvi: dvi-recursive
 
@@ -677,21 +660,20 @@ uninstall-info: uninstall-info-recursive
 	am--refresh check check-am clean clean-generic clean-libtool \
 	clean-recursive ctags ctags-recursive dist dist-all dist-bzip2 \
 	dist-gzip dist-shar dist-tarZ dist-zip distcheck distclean \
-	distclean-generic distclean-hdr distclean-libtool \
-	distclean-recursive distclean-tags distcleancheck distdir \
-	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am \
-	install-data-hook install-dist_binSCRIPTS \
-	install-dist_dataDATA install-dist_docDATA install-exec \
-	install-exec-am install-exec-hook install-info install-info-am \
-	install-man install-strip installcheck installcheck-am \
-	installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-generic mostlyclean-libtool \
-	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-dist_binSCRIPTS \
-	uninstall-dist_dataDATA uninstall-dist_docDATA \
-	uninstall-info-am
+	distclean-generic distclean-libtool distclean-recursive \
+	distclean-tags distcleancheck distdir distuninstallcheck dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-data-hook \
+	install-dist_binSCRIPTS install-dist_dataDATA \
+	install-dist_docDATA install-exec install-exec-am \
+	install-exec-hook install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am \
+	uninstall-dist_binSCRIPTS uninstall-dist_dataDATA \
+	uninstall-dist_docDATA uninstall-info-am
 
 
 all-local:

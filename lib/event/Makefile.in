@@ -52,7 +52,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/config.h \
-	$(top_builddir)/lib/gdbm/autoconf.h
+	$(top_builddir)/src/dbm/gdbm/autoconf.h
 CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
@@ -64,7 +64,7 @@ am_libevent_a_OBJECTS = buffer.$(OBJEXT) devpoll.$(OBJEXT) \
 	rtsig.$(OBJEXT) select.$(OBJEXT) signal.$(OBJEXT) \
 	log.$(OBJEXT)
 libevent_a_OBJECTS = $(am_libevent_a_OBJECTS)
-DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include -I$(top_builddir)/lib/gdbm
+DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include -I$(top_builddir)/src/dbm/gdbm
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \

@@ -38,6 +38,7 @@
 #include "gdbmerrno.h"
 #include "extern.h"
 
+#ifndef WIN32
 #if !HAVE_RENAME
 
 /* Rename takes OLD_NAME and renames it as NEW_NAME.  If it can not rename
@@ -62,6 +63,7 @@ _gdbm_rename (old_name, new_name)
 }
 
 #define rename _gdbm_rename
+#endif
 #endif
 
 
