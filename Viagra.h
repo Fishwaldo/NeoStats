@@ -59,13 +59,13 @@
 #define GOTUMODECLOAKING
 
 /* buffer sizes */
-#define MAXHOST			128
-#define MAXPASS			63
-#define MAXNICK			30
-#define MAXUSER			10
-#define MAXREALNAME		50
-#define CHANLEN			32
-#define TOPICLEN		307
+#define MAXHOST			(128 + 1)
+#define MAXPASS			(63 + 1)
+#define MAXNICK			(30 + 1)
+#define MAXUSER			(10 + 1)
+#define MAXREALNAME		(50 + 1)
+#define CHANLEN			(32 + 1)
+#define TOPICLEN		(307 + 1)
 
 /* Messages/Tokens */
 #define MSG_PRIVATE  "PRIVMSG"		/* PRIV */
