@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.h,v 1.26 2003/05/26 09:18:28 fishwaldo Exp $
+** $Id: dl.h,v 1.27 2003/07/11 13:43:27 fishwaldo Exp $
 */
 
 
@@ -130,6 +130,12 @@ struct module {
 typedef struct module Module;
 
 hash_t *mh;
+
+struct mod_num {
+	Module *mod;
+	int used;
+};
+struct mod_num ModNum[NUM_MODULES];
 
 
 extern void __init_mod_list();

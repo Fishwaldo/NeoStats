@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.59 2003/06/13 13:11:48 fishwaldo Exp $
+** $Id: dl.c,v 1.60 2003/07/11 13:43:27 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -38,6 +38,8 @@
 
 void __init_mod_list()
 {
+	int i;
+	
 	strcpy(segv_location, "__init_mod_list");
 
 	mh = hash_create(NUM_MODULES, 0, 0);
@@ -45,6 +47,12 @@ void __init_mod_list()
 	th = hash_create(T_TABLE_SIZE, 0, 0);
 	bch = hash_create(C_TABLE_SIZE, 0, 0);
 	sockh = hash_create(me.maxsocks, 0, 0);
+#if 0
+	for (i = 0; i <= NUM_MODULES; i++) {
+		ModNum[i].mod = NULL;
+		ModNum[i].used = 0;
+	}
+#endif
 }
 
 static Mod_Timer *new_timer(char *timer_name)
@@ -550,6 +558,7 @@ int load_module(char *path1, User * u)
 	char p[255];
 	char **av;
 	int ac = 0;
+	int i = 0;
 	Module_Info *(*mod_get_info) () = NULL;
 	Functions *(*mod_get_funcs) () = NULL;
 	EventFnList *(*mod_get_events) () = NULL;
@@ -681,6 +690,17 @@ int load_module(char *path1, User * u)
 	mod_ptr->dl_handle = dl_handle;
 	mod_ptr->other_funcs = event_fn_ptr;
 
+	/* assign a module number to this module */
+	i = 0;
+	while (ModNum[i].used != 0) i++;
+	/* no need to check for overflow of NUM_MODULES, as its done above */
+	ModNum[i].used = 1;
+	ModNum[i].mod = mod_ptr;
+	nlog(LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, ModNum[i].mod->info->module_name);
+	
+
+	
+
 	/* Let this module know we are online if we are! */
 	if (me.onchan == 1) {
 		while (event_fn_ptr->cmd_name != NULL) {
@@ -725,8 +745,20 @@ extern int get_dl_handle(char *mod_name)
 	}
 	return 0;
 }
-
-
+extern int get_mod_num(char *mod_name)
+{
+	int i;
+	for (i = 0; i <= NUM_MODULES; i++) {
+		if (ModNum[i].used > 0) {
+			if (!strcasecmp(ModNum[i].mod->info->module_name, mod_name)) {
+				return i;
+			}
+		}
+	}
+	/* if we get here, it wasn't found */
+	nlog(LOG_DEBUG1, LOG_CORE, "Can't find %s in module number list", mod_name);
+	return -1;
+};
 
 
 void list_module(User * u)
@@ -744,6 +776,8 @@ void list_module(User * u)
 			mod_ptr->info->module_version);
 		prefmsg(u->nick, s_Services, "Module Description: %s",
 			mod_ptr->info->module_description);
+		prefmsg(u->nick, s_Services, "Module Number: %d",
+			get_mod_num(mod_ptr->info->module_name));
 	}
 	prefmsg(u->nick, s_Services, "End of Module List");
 }
@@ -756,6 +790,7 @@ int unload_module(char *module_name, User * u)
 	Sock_List *mod_sock = NULL;
 	hnode_t *modnode;
 	hscan_t hscan;
+	int i;
 
 	strcpy(segv_location, "unload_module");
 	/* Check to see if this Module has any timers registered....  */
@@ -814,6 +849,9 @@ int unload_module(char *module_name, User * u)
 		nlog(LOG_DEBUG1, LOG_CORE,
 		     "Deleting Module %s from ModHash", module_name);
 		globops(me.name, "%s Module Unloaded", module_name);
+
+		i = get_mod_num(module_name);
+
 		list = hnode_get(modnode);
 		hash_delete(mh, modnode);
 		hnode_destroy(modnode);
@@ -821,6 +859,13 @@ int unload_module(char *module_name, User * u)
 		strcpy(segvinmodule, module_name);
 		dlclose(list->dl_handle);
 		strcpy(segvinmodule, "");
+
+		if (i >= 0) {
+			nlog(LOG_DEBUG1, LOG_CORE, "Freeing %d from Module Numbers", i);
+			/* free the module number */
+			ModNum[i].mod = NULL;
+			ModNum[i].used = 0;
+		}
 		free(list);
 		return 1;
 	}

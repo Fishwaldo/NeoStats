@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Unreal.c,v 1.48 2003/06/30 14:56:25 fishwaldo Exp $
+** $Id: Unreal.c,v 1.49 2003/07/11 13:43:27 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -836,10 +836,11 @@ void Usr_Topic(char *origin, char **argv, int argc)
 
 void Usr_Kick(char *origin, char **argv, int argc)
 {
-	User *u;
+	User *u, *k;
 	u = finduser(argv[1]);
+	k = finduser(origin);
 	if (u) {
-		kick_chan(u, argv[0]);
+		kick_chan(u, argv[0], k);
 	} else {
 		nlog(LOG_WARNING, LOG_CORE,
 		     "Waring, Can't find user %s for Kick %s", argv[1],
