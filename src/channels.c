@@ -285,8 +285,8 @@ KickChannel (const char *kickby, const char *chan, const char *kicked, const cha
 	} 
 	/* If PROTOCOL_KICKPART then we will also get part so DO NOT REMOVE USER */
 	if (!(ircd_srv.protocol & PROTOCOL_KICKPART)) {
-		del_channel_member (c, u);
 		del_user_channel (c, u);
+		del_channel_member (c, u);
 	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->target = u;
@@ -344,8 +344,8 @@ void PartChannel (Client * u, const char *chan, const char *reason)
 		SendModuleEvent (EVENT_PARTBOT, cmdparams, u->user->bot->moduleptr);
 		c->neousers --;
 	}
-	del_channel_member (c, u);
 	del_user_channel (c, u);
+	del_channel_member (c, u);
 	ns_free (cmdparams);
 }
 
