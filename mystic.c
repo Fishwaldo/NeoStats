@@ -159,7 +159,7 @@ send_server (const char *sender, const char *name, const int numeric, const char
 }
 
 void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
 	send_cmd ("%s %s", (ircd_srv.token ? TOK_PASS : MSG_PASS), pass);
 	send_cmd ("%s %s %d :%s", (ircd_srv.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);

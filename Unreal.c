@@ -196,7 +196,7 @@ send_server (const char *sender, const char *name, const int numeric, const char
 }
 
 void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
 /* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 */
 #ifdef SJOIN

@@ -141,7 +141,7 @@ send_server (const char *sender, const char *name, const int numeric, const char
 }
 
 void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
 	send_cmd ("%s %s :TS", MSG_PASS, pass);
 	send_cmd ("CAPAB :TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS MX");

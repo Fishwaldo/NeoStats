@@ -520,7 +520,7 @@ start (void)
 		nlog (LOG_WARNING, LOG_CORE, "Unable to connect to %s", me.uplink);
 	} else {
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
-		send_server_connect (me.name, me.numeric, me.infoline, me.pass);
+		send_server_connect (me.name, me.numeric, me.infoline, me.pass, (unsigned long)me.t_start, (unsigned long)me.now);
 		read_loop ();
 	}
 

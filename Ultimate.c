@@ -229,7 +229,7 @@ send_server (const char *sender, const char *name, const int numeric, const char
 }
 
 void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
 #ifdef ULTIMATE3
 	send_cmd ("%s %s :TS", (ircd_srv.token ? TOK_PASS : MSG_PASS), pass);
