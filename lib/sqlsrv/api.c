@@ -344,7 +344,7 @@ dbcommand(char *buf, int *nin, char *out, int *nout, int connid)
         }
         else
         {
-          conn = scalloc(sizeof(EpgConn));
+          conn = ns_calloc (sizeof(EpgConn));
           snprintf(conn->cmd, 1000, "Authenticating");
           snprintf((char *) conn->username, 32, "%s", &buf[72]);
           conn->id = connid;

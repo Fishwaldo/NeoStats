@@ -115,6 +115,9 @@
  * your new settings.
  **************************************************************/
 
+/* Temporary */
+#define EXPORTFUNC
+
 #include <limits.h>             /* for PATH_MAX */
 #include "list.h"
 #include "hash.h"
