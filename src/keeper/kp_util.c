@@ -84,7 +84,11 @@ static char *kp_init_localdb(void)
 
 	basedir = (char *) smalloc(strlen(LOCALDIR) + 2);
 	sprintf(basedir, "%s/", LOCALDIR);
+#ifdef WIN32
+	mkdir(basedir);
+#else
 	mkdir(basedir, 0755);
+#endif
 
 	return basedir;
 }
@@ -112,7 +116,11 @@ static char *kp_init_userdb(void)
 						strlen(USERSUBDIR) + 2);
 		sprintf(basedir, "%s/%s/", homeval, USERSUBDIR);
 	}
+#ifdef WIN32
+	mkdir(basedir);
+#else
 	mkdir(basedir, 0755);
+#endif
 
 	return basedir;
 #endif
@@ -139,7 +147,11 @@ static char *kp_init_globaldb(void)
 	sprintf(basedir, "%s/", globaldir);
 	free(globaldir);
 
+#ifdef WIN32
+	mkdir(basedir);
+#else
 	mkdir(basedir, 0755);
+#endif
 
 	return basedir;
 }

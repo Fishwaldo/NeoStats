@@ -35,18 +35,37 @@
 #include "neostats.h"
 #include "dl.h"
 
+#ifndef HAVE_LIBDL
+const char *ns_dlerrormsg;
+#else /* HAVE_LIBDL */
+char *ns_dlerrormsg;
+#endif /* HAVE_LIBDL */
+
 void *ns_dlsym (void *handle, const char *name)
 {
 #ifdef WIN32
 	return NULL;
 #else
 #ifdef NEED_UNDERSCORE_PREFIX
-	char sym[128];
+	static char sym[128];
 	void* ret;
+
+	/* reset error */
+	ns_dlerrormsg[0] = 0;
 	ret = dlsym ((int *) handle, name);
+	/* Check with underscore prefix */
 	if (ret == NULL) {
 		ircsnprintf(sym, 128, "_%s", name);
-		return (dlsym ((int *) handle, sym));
+		ret = dlsym ((int *) handle, sym);
+	}
+	/* Check for error */
+#ifndef HAVE_LIBDL
+	if(ret == NULL) {
+		ns_dlerrormsg = ns_dlerror ();
+#else /* HAVE_LIBDL */
+	if ((ns_dlerrormsg = ns_dlerror ()) != NULL) {
+#endif /* HAVE_LIBDL */
+		return NULL;
 	}
 	return ret;
 #else
@@ -60,7 +79,21 @@ void *ns_dlopen (const char *file, int mode)
 #ifdef WIN32
 	return NULL;
 #else
-	return (dlopen (file, mode));
+	void* ret;
+
+	/* reset error */
+	ns_dlerrormsg[0] = 0;
+	ret = dlopen (file, mode);
+	/* Check for error */
+#ifndef HAVE_LIBDL
+	if(ret == NULL) {
+		ns_dlerrormsg = ns_dlerror ();
+#else /* HAVE_LIBDL */
+	if ((ns_dlerrormsg = ns_dlerror ()) != NULL) {
+#endif /* HAVE_LIBDL */
+		return NULL;
+	}
+	return ret;
 #endif
 }
 

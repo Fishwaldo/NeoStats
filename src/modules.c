@@ -304,11 +304,6 @@ ModulesVersion (const char* nick, const char *remoteserver)
 Module *
 load_module (const char *modfilename, User * u)
 {
-#ifndef HAVE_LIBDL
-	const char *dl_error;
-#else /* HAVE_LIBDL */
-	char *dl_error;
-#endif /* HAVE_LIBDL */
 	void *dl_handle;
 	int do_msg = 0;
 	char path[255];
@@ -337,25 +332,19 @@ load_module (const char *modfilename, User * u)
 	ircsnprintf (path, 255, "%s/%s.so", MOD_PATH, loadmodname);
 	dl_handle = ns_dlopen (path, RTLD_NOW || RTLD_GLOBAL);
 	if (!dl_handle) {
-		dl_error = ns_dlerror ();
 		if (do_msg) {
-			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s %s", dl_error, path);
+			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s %s", ns_dlerrormsg, path);
 		}
-		nlog (LOG_WARNING, "Unable to load module: %s %s", dl_error, path);
+		nlog (LOG_WARNING, "Unable to load module: %s %s", ns_dlerrormsg, path);
 		return NULL;
 	}
 
 	info_ptr = ns_dlsym (dl_handle, "module_info");
-#ifndef HAVE_LIBDL
 	if(info_ptr == NULL) {
-		dl_error = ns_dlerror ();
-#else /* HAVE_LIBDL */
-	if ((dl_error = ns_dlerror ()) != NULL) {
-#endif /* HAVE_LIBDL */
 		if (do_msg) {
-			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s %s", dl_error, path);
+			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s %s", ns_dlerrormsg, path);
 		}
-		nlog (LOG_WARNING, "Unable to load module: %s %s", dl_error, path);
+		nlog (LOG_WARNING, "Unable to load module: %s %s", ns_dlerrormsg, path);
 		ns_dlclose (dl_handle);
 		return NULL;
 	}

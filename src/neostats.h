@@ -55,7 +55,6 @@
 #include "configwin32.h"
 #define __PRETTY_FUNCTION__ __FUNCTION__
 #define ssize_t int
-#define RTLD_LAZY  1
 #define inline __inline
 #define sleep(n)
 #define snprintf _snprintf

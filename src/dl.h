@@ -41,6 +41,9 @@
  *   Ensure RTLD flags correctly defined
  */
 #ifndef RTLD_NOW
+#define RTLD_NOW  1 
+#endif
+#ifndef RTLD_NOW
 #define RTLD_NOW RTLD_LAZY	/* openbsd deficiency */
 #endif
 #ifndef RTLD_GLOBAL
@@ -54,5 +57,7 @@ void *ns_dlsym (void *handle, const char *name);
 void *ns_dlopen (const char *file, int mode);
 int ns_dlclose (void *handle);
 char *ns_dlerror (void);
+
+char *ns_dlerrormsg;
 
 #endif /* !_dl_h_ */

@@ -336,7 +336,11 @@ static int kp_create_path(kp_path * kpp)
 
 		ipath[i] = '\0';
 		cmode = kp_get_cmode(ipath, 1);
+#ifdef WIN32
+		res = mkdir(ipath);
+#else
 		res = mkdir(ipath, cmode);
+#endif
 		ipath[i] = '/';
 
 		if (res == -1) {

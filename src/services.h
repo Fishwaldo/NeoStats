@@ -50,7 +50,7 @@ struct config {
 	unsigned int die:1;
 	unsigned int error:1;
 	unsigned int onlyopers:1;
-	unsigned int setservertimes;
+	int setservertimes;
 	unsigned int versionscan;
 	int r_time;
 	int port;
