@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Bahamut.c,v 1.3 2003/07/23 10:35:47 fishwaldo Exp $
+** $Id: Bahamut.c,v 1.4 2003/07/23 12:45:51 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -35,75 +35,39 @@ IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
 	{MSG_STATS, Usr_Stats, 1, 0}
 	,
-	{TOK_STATS, Usr_Stats, 1, 0}
-	,
 	{MSG_VERSION, Usr_Version, 1, 0}
-	,
-	{TOK_VERSION, Usr_Version, 1, 0}
 	,
 	{MSG_MOTD, Usr_ShowMOTD, 1, 0}
 	,
-	{TOK_MOTD, Usr_ShowMOTD, 1, 0}
-	,
 	{MSG_CREDITS, Usr_Showcredits, 1, 0}
-	,
-	{TOK_CREDITS, Usr_Showcredits, 1, 0}
 	,
 	{MSG_SERVER, Usr_AddServer, 1, 0}
 	,
-	{TOK_SERVER, Usr_AddServer, 1, 0}
-	,
 	{MSG_SQUIT, Usr_DelServer, 1, 0}
-	,
-	{TOK_SQUIT, Usr_DelServer, 1, 0}
 	,
 	{MSG_QUIT, Usr_DelUser, 1, 0}
 	,
-	{TOK_QUIT, Usr_DelUser, 1, 0}
-	,
 	{MSG_MODE, Usr_Mode, 1, 0}
-	,
-	{TOK_MODE, Usr_Mode, 1, 0}
 	,
 	{MSG_SVSMODE, Usr_Smode, 1, 0}
 	,
-	{TOK_SVSMODE, Usr_Smode, 1, 0}
-	,
 	{MSG_KILL, Usr_Kill, 1, 0}
-	,
-	{TOK_KILL, Usr_Kill, 1, 0}
 	,
 	{MSG_PONG, Usr_Pong, 1, 0}
 	,
-	{TOK_PONG, Usr_Pong, 1, 0}
-	,
 	{MSG_AWAY, Usr_Away, 1, 0}
-	,
-	{TOK_AWAY, Usr_Away, 1, 0}
 	,
 	{MSG_NICK, Usr_Nick, 1, 0}
 	,
-	{TOK_NICK, Usr_Nick, 1, 0}
-	,
 	{MSG_TOPIC, Usr_Topic, 1, 0}
-	,
-	{TOK_TOPIC, Usr_Topic, 1, 0}
 	,
 	{MSG_KICK, Usr_Kick, 1, 0}
 	,
-	{TOK_KICK, Usr_Kick, 1, 0}
-	,
 	{MSG_JOIN, Usr_Join, 1, 0}
-	,
-	{TOK_JOIN, Usr_Join, 1, 0}
 	,
 	{MSG_PART, Usr_Part, 1, 0}
 	,
-	{TOK_PART, Usr_Part, 1, 0}
-	,
 	{MSG_PING, Srv_Ping, 0, 0}
-	,
-	{TOK_PING, Srv_Ping, 0, 0}
 	,
 	{MSG_SVINFO, Srv_Svinfo, 0, 0}
 	,
@@ -115,27 +79,15 @@ IntCommands cmd_list[] = {
 	,
 	{MSG_PASS, Srv_Pass, 0, 0}
 	,
-	{TOK_PASS, Srv_Pass, 0, 0}
-	,
 	{MSG_SERVER, Srv_Server, 0, 0}
-	,
-	{TOK_SERVER, Srv_Server, 0, 0}
 	,
 	{MSG_SQUIT, Srv_Squit, 0, 0}
 	,
-	{TOK_SQUIT, Srv_Squit, 0, 0}
-	,
 	{MSG_NICK, Srv_Nick, 0, 0}
-	,
-	{TOK_NICK, Srv_Nick, 0, 0}
 	,
 	{MSG_SVSNICK, Srv_Svsnick, 0, 0}
 	,
-	{TOK_SVSNICK, Srv_Svsnick, 0, 0}
-	,
 	{MSG_KILL, Srv_Kill, 0, 0}
-	,
-	{TOK_KILL, Srv_Kill, 0, 0}
 	,
 	{NULL, NULL, 0, 0}
 };
@@ -182,45 +134,15 @@ aCtab cFlagTab[] = {
 Oper_Modes usr_mds[] = {
 	{UMODE_OPER, 'o', 50}
 	,
-	{UMODE_LOCOP, 'O', 40}
-	,
 	{UMODE_INVISIBLE, 'i', 0}
-	,
-	{UMODE_WALLOP, 'w', 0}
-	,
-	{UMODE_SERVNOTICE, 's', 0}
-	,
-	{UMODE_CLIENT, 'c', 0}
 	,
 	{UMODE_REGNICK, 'r', 10}
 	,
-	{UMODE_KILLS, 'k', 0}
-	,
-	{UMODE_HELPOP, 'h', 30}
-	,
-	{UMODE_FLOOD, 'f', 0}
-	,
-	{UMODE_SPY, 'y', 0}
-	,
-	{UMODE_DCC, 'D', 0}
-	,
-	{UMODE_GLOBOPS, 'g', 0}
-	,
-	{UMODE_CHATOP, 'c', 0}
-	,
 	{UMODE_SERVICESADMIN, 'a', 200}
 	,
-	{UMODE_REJ, 'j', 0}
-	,
-	{UMODE_ROUTE, 'n', 0}
-	,
-	{UMODE_SPAM, 'm', 0}
-	,
-	{UMODE_HIDE, 'x', 0}
-	,
-	{UMODE_DEBUG, 'd', 0}
-	,
 	{UMODE_SERVADMIN, 'A', 100}
+	,
+	{UMODE_REGONLY, 'R', 0}
 	,
 	/* this is needed for bot support */
 	{UMODE_SERVICES, 'S', 200}
@@ -237,23 +159,23 @@ void init_ircd()
 int sserver_cmd(const char *name, const int numeric, const char *infoline)
 {
 	sts(":%s %s %s %d :%s", me.name,
-	    (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	    MSG_SERVER, name, numeric, infoline);
 	return 1;
 }
 
 int slogin_cmd(const char *name, const int numeric, const char *infoline,
 	       const char *pass)
 {
-	sts("%s %s :TS", (me.token ? TOK_PASS : MSG_PASS), pass);
-	sts("CAPAB TS5 SSJOIN BURST NICKIP CLIENT");
-	sts("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name,
+	sts("%s %s :TS", MSG_PASS, pass);
+	sts("CAPAB TS3 SSJOIN BURST NICKIP");
+	sts("%s %s %d :%s", MSG_SERVER, name,
 	    numeric, infoline);
 	return 1;
 }
 
 int ssquit_cmd(const char *server)
 {
-	sts("%s %s", (me.token ? TOK_SQUIT : MSG_SQUIT), server);
+	sts("%s %s", MSG_SQUIT, server);
 	return 1;
 }
 
@@ -264,14 +186,14 @@ int sprotocol_cmd(const char *option)
 
 int squit_cmd(const char *who, const char *quitmsg)
 {
-	sts(":%s %s :%s", who, (me.token ? TOK_QUIT : MSG_QUIT), quitmsg);
+	sts(":%s %s :%s", who, MSG_QUIT, quitmsg);
 	DelUser(who);
 	return 1;
 }
 
 int spart_cmd(const char *who, const char *chan)
 {
-	sts(":%s %s %s", who, (me.token ? TOK_PART : MSG_PART), chan);
+	sts(":%s %s %s", who, MSG_PART, chan);
 	part_chan(finduser(who), (char *) chan);
 	return 1;
 }
@@ -322,7 +244,7 @@ int schmode_cmd(const char *who, const char *chan, const char *mode,
 	char tmp[512];
 
 	sts(":%s %s %s %s %s %lu", me.name,
-	    (me.token ? TOK_MODE : MSG_MODE), chan, mode, args,
+	    MSG_MODE, chan, mode, args,
 	    time(NULL));
 	snprintf(tmp, 512, "%s %s %s", chan, mode, args);
 	ac = split_buf(tmp, &av, 0);
@@ -347,7 +269,7 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host,
 	}
 	newmode[j] = '\0';
 	sts("%s %s 1 %lu %s %s %s %s 0 %lu :%s",
-	    (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), newmode,
+	    MSG_NICK, nick, time(NULL), newmode,
 	    ident, host, me.name, time(NULL), realname);
 	AddUser(nick, ident, host, me.name, 0, time(NULL));
 	UserMode(nick, newmode, 0);
@@ -356,7 +278,7 @@ int snewnick_cmd(const char *nick, const char *ident, const char *host,
 
 int sping_cmd(const char *from, const char *reply, const char *to)
 {
-	sts(":%s %s %s :%s", from, (me.token ? TOK_PING : MSG_PING), reply,
+	sts(":%s %s %s :%s", from, MSG_PING, reply,
 	    to);
 	return 1;
 }
@@ -375,7 +297,7 @@ int sumode_cmd(const char *who, const char *target, long mode)
 
 	}
 	newmode[j] = '\0';
-	sts(":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target,
+	sts(":%s %s %s :%s", who, MSG_MODE, target,
 	    newmode);
 	UserMode(target, newmode, 0);
 	return 1;
@@ -395,17 +317,17 @@ int snumeric_cmd(const int numeric, const char *target, const char *data,
 
 int spong_cmd(const char *reply)
 {
-	sts("%s %s", (me.token ? TOK_PONG : MSG_PONG), reply);
+	sts("%s %s", MSG_PONG, reply);
 	return 1;
 }
-
+#if 0
 int snetinfo_cmd()
 {
 	sts(":%s %s 0 %d %d %s 0 0 0 :%s", me.name, MSG_SNETINFO,
 	    time(NULL), ircd_srv.uprot, ircd_srv.cloak, me.netname);
 	return 1;
 }
-
+#endif
 int skill_cmd(const char *from, const char *target, const char *reason,
 	      ...)
 {
@@ -413,7 +335,7 @@ int skill_cmd(const char *from, const char *target, const char *reason,
 	char buf[512];
 	va_start(ap, reason);
 	vsnprintf(buf, 512, reason, ap);
-	sts(":%s %s %s :%s", from, (me.token ? TOK_KILL : MSG_KILL),
+	sts(":%s %s %s :%s", from, MSG_KILL,
 	    target, buf);
 	va_end(ap);
 	DelUser(target);
@@ -435,10 +357,10 @@ int ssvskill_cmd(const char *who, const char *reason, ...)
 int ssmo_cmd(const char *from, const char *umodetarget, const char *msg)
 {
 	chanalert(s_Services,
-	       "Warning, Module %s tried to SMO, which is not supported in Ultimate",
+	       "Warning, Module %s tried to SMO, which is not supported in Bahamut",
 	       segvinmodule);
 	nlog(LOG_NOTICE, LOG_CORE,
-	     "Warning, Module %s tried to SMO, which is not supported in Ultimate",
+	     "Warning, Module %s tried to SMO, which is not supported in Bahamut",
 	     segvinmodule);
 	return 1;
 }
@@ -446,23 +368,23 @@ int ssmo_cmd(const char *from, const char *umodetarget, const char *msg)
 int snick_cmd(const char *oldnick, const char *newnick)
 {
 	Change_User(finduser(oldnick), newnick);
-	sts(":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK),
+	sts(":%s %s %s %d", oldnick, MSG_NICK,
 	    newnick, time(NULL));
 	return 1;
 }
 int sswhois_cmd(const char *target, const char *swhois)
 {
 	chanalert(s_Services,
-	       "Warning Module %s tried to SWHOIS, which is not supported in Ultimate",
+	       "Warning Module %s tried to SWHOIS, which is not supported in Bahamut",
 	       segvinmodule);
 	nlog(LOG_NOTICE, LOG_CORE,
-	     "Warning. Module %s tried to SWHOIS, which is not supported in Ultimate",
+	     "Warning. Module %s tried to SWHOIS, which is not supported in Bahamut",
 	     segvinmodule);
 	return 1;
 }
 int ssvsnick_cmd(const char *target, const char *newnick)
 {
-	sts("%s %s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target,
+	sts("%s %s %s :%d", MSG_SVSNICK, target,
 	    newnick, time(NULL));
 	return 1;
 }
@@ -470,10 +392,10 @@ int ssvsnick_cmd(const char *target, const char *newnick)
 int ssvsjoin_cmd(const char *target, const char *chan)
 {
 	chanalert(s_Services,
-	       "Warning Module %s tried to SVSJOIN, which is not supported in Ultimate",
+	       "Warning Module %s tried to SVSJOIN, which is not supported in Bahamut",
 	       segvinmodule);
 	nlog(LOG_NOTICE, LOG_CORE,
-	     "Warning. Module %s tried to SVSJOIN, which is not supported in Ultimate",
+	     "Warning. Module %s tried to SVSJOIN, which is not supported in Bahamut",
 	     segvinmodule);
 	return 1;
 }
@@ -481,10 +403,10 @@ int ssvsjoin_cmd(const char *target, const char *chan)
 int ssvspart_cmd(const char *target, const char *chan)
 {
 	chanalert(s_Services,
-	       "Warning Module %s tried to SVSPART, which is not supported in Ultimate",
+	       "Warning Module %s tried to SVSPART, which is not supported in Bahamut",
 	       segvinmodule);
 	nlog(LOG_NOTICE, LOG_CORE,
-	     "Warning. Module %s tried to SVSPART, which is not supported in Ultimate",
+	     "Warning. Module %s tried to SVSPART, which is not supported in Bahamut",
 	     segvinmodule);
 	return 1;
 }
@@ -492,7 +414,7 @@ int ssvspart_cmd(const char *target, const char *chan)
 int skick_cmd(const char *who, const char *target, const char *chan,
 	      const char *reason)
 {
-	sts(":%s %s %s %s :%s", who, (me.token ? TOK_KICK : MSG_KICK),
+	sts(":%s %s %s %s :%s", who, MSG_KICK,
 	    chan, target, (reason ? reason : "No Reason Given"));
 	part_chan(finduser(target), (char *) chan);
 	return 1;
@@ -503,7 +425,7 @@ int swallops_cmd(const char *who, const char *msg, ...)
 	char buf[512];
 	va_start(ap, msg);
 	vsnprintf(buf, 512, msg, ap);
-	sts(":%s %s :%s", who, (me.token ? TOK_WALLOPS : MSG_WALLOPS),
+	sts(":%s %s :%s", who, MSG_WALLOPS,
 	    buf);
 	va_end(ap);
 	return 1;
@@ -512,10 +434,10 @@ int swallops_cmd(const char *who, const char *msg, ...)
 int ssvshost_cmd(const char *who, const char *vhost)
 {
 	chanalert(s_Services,
-	       "Warning Module %s tried to SVSHOST, which is not supported in Ultimate",
+	       "Warning Module %s tried to SVSHOST, which is not supported in Bahamut",
 	       segvinmodule);
 	nlog(LOG_NOTICE, LOG_CORE,
-	     "Warning. Module %s tried to SVSHOST, which is not supported in Ultimate",
+	     "Warning. Module %s tried to SVSHOST, which is not supported in Bahamut",
 	     segvinmodule);
 		return 1;
 }
@@ -527,7 +449,7 @@ int sakill_cmd(const char *host, const char *ident, const char *setby,
 	va_start(ap, reason);
 	vsnprintf(buf, 512, reason, ap);
 	sts(":%s %s %s %s %d %s %d :%s", me.name,
-	    (me.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby,
+	    MSG_AKILL, host, ident, length, setby,
 	    time(NULL), buf);
 	va_end(ap);
 	return 1;
@@ -535,7 +457,7 @@ int sakill_cmd(const char *host, const char *ident, const char *setby,
 
 int srakill_cmd(const char *host, const char *ident)
 {
-	sts(":%s %s %s %s", me.name, (me.token ? TOK_RAKILL : MSG_RAKILL),
+	sts(":%s %s %s %s", me.name, MSG_RAKILL,
 	    host, ident);
 	return 1;
 }
@@ -543,7 +465,7 @@ int srakill_cmd(const char *host, const char *ident)
 
 int ssvinfo_cmd()
 {
-	sts("SVINFO 5 3 0 :%d", time(NULL));
+	sts("SVINFO 3 3 0 :%d", time(NULL));
 	return 1;
 }
 int sburst_cmd(int b)
@@ -569,7 +491,6 @@ void chanalert(char *who, char *buf, ...)
 	if (me.onchan) {
 		snprintf(out, 512, ":%s PRIVMSG %s :%s", who, me.chan,
 			 tmp);
-		nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", out);
 		sts("%s", out);
 	}
 	va_end(ap);
