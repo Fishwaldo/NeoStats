@@ -99,18 +99,6 @@ ModuleInfo module_info = {
 	0,
 };
 
-static BotInfo ss_botinfo = 
-{
-	"StatServ", 
-	"StatServ", 
-	"SS", 
-	BOT_COMMON_HOST, 
-	"Statistics service", 
-	BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
-	ss_commands, 
-	ss_settings,
-};
-
 static bot_cmd ss_commands[]=
 {
 	{"SERVER",			ss_server,		0, 	0,		ss_help_server,		 	ss_help_server_oneline},
@@ -138,6 +126,18 @@ static bot_setting ss_settings[]=
 	{"RECORDALERT", &StatServ.recordalert,	SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, "RecordAlert",	NULL,		ss_help_set_recordalert },
 	{"USEEXCLUSIONS",&StatServ.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, "Exclusions",	NULL,		ss_help_set_exclusions },
 	{NULL,			NULL,					0,					0, 0,			0,				 NULL,			NULL,		NULL },
+};
+
+static BotInfo ss_botinfo = 
+{
+	"StatServ", 
+	"StatServ1", 
+	"SS", 
+	BOT_COMMON_HOST, 
+	"Statistics service", 
+	BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
+	ss_commands, 
+	ss_settings,
 };
 
 static int ss_event_online(CmdParams* cmdparams)
