@@ -247,6 +247,9 @@ SendAllModuleEvent (Event event, CmdParams* cmdparams)
 	hash_scan_begin (&ms, modulehash);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
+		if(event == EVENT_ONLINE) {
+			module_ptr->synched = 1;
+		}
 		ev_list = module_ptr->event_list;
 		if (ev_list) {
 			while (ev_list->event != EVENT_NULL) {
@@ -387,7 +390,7 @@ load_module (const char *modfilename, User * u)
 		return NULL;
 	}
 	/* Allocate module */
-	mod_ptr = (Module *) smalloc (sizeof (Module));
+	mod_ptr = (Module *) scalloc (sizeof (Module));
 	mn = hnode_create (mod_ptr);
 	hash_insert (modulehash, mn, info_ptr->name);
 	dlog(DEBUG1, "Module Internal name: %s", info_ptr->name);
@@ -416,6 +419,7 @@ load_module (const char *modfilename, User * u)
 
 	/* Let this module know we are online if we are! */
 	if (me.onchan == 1) {
+		mod_ptr->synched = 1;
 		SendModuleEvent (EVENT_ONLINE, NULL, mod_ptr);
 	}
 	if (do_msg) {
