@@ -94,6 +94,7 @@ close_logs ()
 		{
 			fflush (logentry->logfile);
 			fclose (logentry->logfile);
+			logentry->logfile = NULL;
 		}
 		hash_scan_delete (logs, hn);
 		hnode_destroy (hn);
