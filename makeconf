@@ -234,35 +234,37 @@ echo ""
 ####
 
 ###########################################################################
-# select datbase
-DATABASE_DEFAULT="1"
-DATABASE=
-validselection=0
-echo "Which datbase storage do you wish to use?"
-echo "     1) GDBM"
-echo "     2) Berkeley DB"
-while [ $validselection -eq 0 ] ; do
-	echo $n " [$DATABASE_DEFAULT] -> $c"
-	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
-	if [ ! "$INPUT" ] ; then
-		INPUT=$DATABASE_DEFAULT
-	fi
-	case $INPUT in
-		"1")
- 			DATABASE="gdbm"
-			validselection=1
-			;;
-		"2")
- 			DATABASE="bdb"
-			validselection=1
-			;;
-		*)
-			echo "Please enter a valid option number."
-			;;
-	esac
-done
-DATABASE_DEFAULT=$INPUT
-echo ""
+# select database
+#temp force until we have other support
+DATABASE="gdbm"
+#DATABASE_DEFAULT="1"
+#DATABASE=
+#validselection=0
+#echo "Which datbase storage do you wish to use?"
+#echo "     1) GDBM"
+#echo "     2) Berkeley DB"
+#while [ $validselection -eq 0 ] ; do
+#	echo $n " [$DATABASE_DEFAULT] -> $c"
+#	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+#	if [ ! "$INPUT" ] ; then
+#		INPUT=$DATABASE_DEFAULT
+#	fi
+#	case $INPUT in
+#		"1")
+# 			DATABASE="gdbm"
+#			validselection=1
+#			;;
+#		"2")
+# 			DATABASE="bdb"
+#			validselection=1
+#			;;
+#		*)
+#			echo "Please enter a valid option number."
+#			;;
+#	esac
+#done
+#DATABASE_DEFAULT=$INPUT
+#echo ""
 
 echo " "
 echo "What will your root nickname be? (ie: $ROOTNICK)"
