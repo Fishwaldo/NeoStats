@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: tld.c,v 1.4 2003/04/17 13:48:26 fishwaldo Exp $
+** $Id: tld.c,v 1.5 2003/05/09 13:29:02 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -154,6 +154,7 @@ void init_tld()
 
     for (t = tldhead; t; t = t->next) {
         t->users = 0;
+	t->daily_users = 0;
     }
 }
 

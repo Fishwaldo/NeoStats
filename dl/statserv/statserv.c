@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.63 2003/05/05 14:42:19 fishwaldo Exp $
+** $Id: statserv.c,v 1.64 2003/05/09 13:29:02 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -53,7 +53,7 @@ void ss_html();
 Module_Info Statserv_Info[] = { {
 	SSMNAME,
 	"Statistical Bot For NeoStats",
-	"3.7"
+	"3.8"
 } };
 
 

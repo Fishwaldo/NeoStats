@@ -2,6 +2,9 @@ StatServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish
+* Version 3.8 * May 9th, 2003 (F)
+ - Fixed TLDCount for Daily users for Unresolved Domains
+
 * Version 3.7 * April 17th, 2003 (F)
  - Moved to new logging and conf API
  - Fixed a wrong usercount on channels with kick
