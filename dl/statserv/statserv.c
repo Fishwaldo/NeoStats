@@ -65,6 +65,7 @@ EventFnList StatServ_Event_List[] = {
 	{ "JOINCHAN",	s_chan_join},
 	{ "PARTCHAN", 	s_chan_part},
 	{ "KICK", 	s_chan_kick},
+	{ "TOPICCHANGE", s_topic_change},
 	{ NULL,	 NULL}
 };
 
@@ -133,6 +134,9 @@ void _init() {
 	User *u;
 	hnode_t *node;
 	hscan_t scan;
+	int count, i;
+	Chans *c;
+
 	strcpy(segv_location, "StatServ-_init");
 	StatServ.onchan = 0;
 	globops(me.name, "StatServ Module Loaded");	
@@ -168,11 +172,20 @@ void _init() {
 	hash_scan_begin(&scan, uh);
 	while ((node = hash_scan_next(&scan)) != NULL ) {
 		u = hnode_get(node);
-	s_new_user(u);
-	s_user_modes(u);
+		s_new_user(u);
+		s_user_modes(u);
 #ifdef DEBUG
 			log("Adduser user %s to StatServ List", u->nick);
 #endif
+	}
+	hash_scan_begin(&scan, ch);
+	while ((node = hash_scan_next(&scan)) != NULL ) {
+		c = hnode_get(node);
+		count = list_count(c->chanmembers);
+		for (i = 1; i == count; i++) {
+log("Chanjoin %s", c->name);
+			s_chan_join(c);
+		}
 	}
 }
 
