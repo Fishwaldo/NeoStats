@@ -96,6 +96,20 @@ AC_ARG_ENABLE(ultimate3, [ --enable-ultimate3 - enable Ultimate 3.x.x IRCD Suppo
 esac],
 AC_MSG_RESULT(no)
 )
+AC_MSG_CHECKING(A compatible IRCD is specified)
+case "$IRCD_FILES_SRC" in 
+   "Ultimate.c")
+	AC_MSG_RESULT(yes)
+	;;
+   "Unreal.c")
+	AC_MSG_RESULT(yes)
+	;;
+  *)
+	AC_MSG_ERROR('You must define a IRCD to use. See ./configure --help for more information')
+	;;
+esac
+
+
 dnl check to see what type of authentication to use
 AC_MSG_CHECKING(What type of Authentication to use...)
 AC_ARG_ENABLE(auth, [ --enable-auth==TYPE - what type of Authentication to use. See Readme File],
