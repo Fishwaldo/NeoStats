@@ -443,7 +443,9 @@ sjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 		flag = ' ';
 		mode= '\0';
 	}
-	sts (":%s %s 0 %s + :%c%s", me.name, MSG_SJOIN, chan, flag, who);
+	
+	/* NO TS SUPPORT. BAAAAAAD. need to port the Bahumat TS stuff to all IRCd's and test */
+	sts (":%s %s %d %s + :%c%s", me.name, MSG_SJOIN, time(NULL), chan, flag, who);
 	join_chan (finduser (who), (char *) chan);
 	snprintf (tmp, 512, "%s +%c %s", chan, mode, who);
 	ac = split_buf (tmp, &av, 0);
