@@ -51,9 +51,9 @@ static char *kp_tmpname = NULL;
 /* String array containing the base path of the different sections */
 static char *kp_basedirs[KPDB_NUMDBS];
 
-#define GLOBALDIR "conf"   /* Default global database path */
-#define LOCALDIR  "data"    /* Local database path */
-#define USERSUBDIR "help"       /* Default user database dir */
+#define GLOBALDIR "kpconf"   /* Default global database path */
+#define LOCALDIR  "kpdata"    /* Local database path */
+#define USERSUBDIR "kphelp"       /* Default user database dir */
 #define LOCKFILE ":lock:"          /* Lock file name */
 
 /* ------------------------------------------------------------------------- 
@@ -93,10 +93,10 @@ static char *kp_init_localdb(void)
  * ------------------------------------------------------------------------- */
 static char *kp_init_userdb(void)
 {
+#if 0
     const char *homeval;
     char *userdir;
     char *basedir;
-
     userdir = getenv("KEEPER_USERDIR");
     if(userdir != 0) {
         basedir = (char *) malloc_check(strlen(userdir) + 2);
@@ -115,6 +115,8 @@ static char *kp_init_userdb(void)
     mkdir(basedir, 0755);
 
     return basedir;
+#endif
+    return "";
 }
 
 /* ------------------------------------------------------------------------- 
@@ -126,9 +128,11 @@ static char *kp_init_globaldb(void)
     char *globaldir;
 
     /* Be careful. This is a recursion */
+#if 0
     globaldir = NULL;
     kp_get_string("l/keeper/globaldir", &globaldir);
     if(globaldir == NULL)
+#endif
         globaldir = strdup_check(GLOBALDIR);
 
     basedir = (char *) malloc_check(strlen(globaldir) + 2);
@@ -322,6 +326,7 @@ int _kp_get_path(const char *keypath, kp_path *kpp, char **keynamep,
  * ------------------------------------------------------------------------- */
 int _kp_lock_file(int dbindex, int iswrite)
 {
+#if 0 /* not needed for Neo? */
     struct flock flock;
     int res;
     char *basedir;
@@ -368,6 +373,8 @@ int _kp_lock_file(int dbindex, int iswrite)
     }
 
     return lockfd;
+#endif
+    return -1;
 }
 
 /* ------------------------------------------------------------------------- 
@@ -375,6 +382,7 @@ int _kp_lock_file(int dbindex, int iswrite)
  * ------------------------------------------------------------------------- */
 void _kp_unlock_file(int lockfd)
 {
+#if 0 /* not needed for Neo? */
     struct flock flock;
 
     memset(&flock, 0, sizeof(flock));
@@ -386,6 +394,7 @@ void _kp_unlock_file(int lockfd)
 
     fcntl(lockfd, F_SETLK, &flock);
     close(lockfd);
+#endif
 }
 
 /* ------------------------------------------------------------------------- 

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.c,v 1.4 2003/04/11 10:50:28 fishwaldo Exp $
+** $Id: log.c,v 1.5 2003/04/17 00:16:26 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -43,8 +43,8 @@ const char *loglevels[10] = {
 struct logs_ {
 	FILE *logfile;
 	char name[30];
-	unsigned int flush : 1;
-} ;
+	unsigned int flush;
+} logs_ ;
 
 hash_t *logs;
 
@@ -53,7 +53,7 @@ void *close_logs();
 /** @brief Initilize the logging functions 
  */
 void init_logs() {
-	logs = hash_create(NUM_MODULES+1, 0, 0);
+	logs = hash_create(-1, 0, 0);
 	if (!logs) {
 		printf("ERROR: Can't Initilize Log SubSystem. Exiting!");
 		/* if this fails, no need to call do_exit, as this is the first thing that runs... so nothing to do! */
@@ -97,7 +97,7 @@ void nlog(int level, int scope, char *fmt, ...) {
 	hnode_t *hn;
 	struct logs_ *logentry;
 	time_t ts = time(NULL);
-	
+
 	if (level <= config.debug) {	
 		/* if scope is > 0, then log to a diff file */
 		if (scope > 0) {
@@ -123,7 +123,6 @@ void nlog(int level, int scope, char *fmt, ...) {
 				/* bad, but hey !*/
 				scope = 0;
 			}
-				
 			logentry = malloc(sizeof(struct logs_));
 			strncpy(logentry->name, scope > 0 ? segvinmodule : "core", 30);
 			snprintf(buf, 40, "logs/%s.log", scope > 0 ? segvinmodule : "NeoStats");
@@ -134,6 +133,7 @@ void nlog(int level, int scope, char *fmt, ...) {
 		}
 
 		if (!logentry->logfile) {
+
 #ifdef DEBUG
 			printf("%s\n", strerror(errno));
 			do_exit(0);

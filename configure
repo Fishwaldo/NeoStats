@@ -4228,6 +4228,63 @@ _ACEOF
 fi
 
 
+echo "$as_me:$LINENO: checking for *_unlocked file operations" >&5
+echo $ECHO_N "checking for *_unlocked file operations... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#define _BSD_SOURCE
+#include <stdio.h>
+
+int
+main ()
+{
+
+  fgets_unlocked("", 0, -1);
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  have_unlocked_code=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+have_unlocked_code=no
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+if test "$have_unlocked_code" = yes; then
+ echo "$as_me:$LINENO: result: found" >&5
+echo "${ECHO_T}found" >&6
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_UNLOCKED 1
+_ACEOF
+
+else
+ echo "$as_me:$LINENO: result: Not Found" >&5
+echo "${ECHO_T}Not Found" >&6
+fi
+
+
 echo "$as_me:$LINENO: checking for INADDR_LOOPBACK" >&5
 echo $ECHO_N "checking for INADDR_LOOPBACK... $ECHO_C" >&6
 if test "${adns_cv_decl_inaddrloopback+set}" = set; then

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.51 2003/04/15 14:03:33 fishwaldo Exp $
+** $Id: dl.c,v 1.52 2003/04/17 00:16:26 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -330,7 +330,7 @@ static Mod_User *new_bot(char *bot_name)
 	hnode_t *bn;
 	strcpy(segv_location, "Mod_User");
 	nlog(LOG_DEBUG2, LOG_CORE, "New Bot: %s", bot_name);
-	u = smalloc(sizeof(Mod_User));
+	u = malloc(sizeof(Mod_User));
 	if (!bot_name)
 		bot_name="";
 	strncpy(u->nick, bot_name, MAXNICK);

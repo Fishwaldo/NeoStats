@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.39 2003/04/15 14:03:39 fishwaldo Exp $
+** $Id: hostserv.c,v 1.40 2003/04/17 00:16:27 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -43,7 +43,7 @@
 
 const char hsversion_date[] = __DATE__;
 const char hsversion_time[] = __TIME__;
-char *s_HostServ;
+char s_HostServ[MAXNICK];
 typedef struct hs_map_ {
     char nnick[MAXNICK];
     char host[MAXHOST];
@@ -88,7 +88,6 @@ void Loadhosts();
 int data_synch;
 int load_synch;
 
-char **LoadArry;
 char **DelArry;
 char **ListArry;
 int LoadArryCount = 0;
@@ -106,6 +105,7 @@ void hs_Config() {
 	char *host;
 	char *host2;
 	hnode_t *hn;
+	char *ban2;
 
 	strcpy(segv_location, "HostServ-hs_cb_Config");
 	GetConf((void *)&hs_lvl.view, CFGINT, "ViewLevel");
@@ -125,6 +125,7 @@ void hs_Config() {
 	/* banned vhosts */
 	ban = NULL;
 	GetConf((void *)&ban, CFGSTR, "BannedVhosts");
+	ban2 = ban;
 	if (ban) {
 		host = strtok(ban, ";");
 		if (host) {
@@ -142,6 +143,7 @@ void hs_Config() {
 			hash_insert(bannedvhosts, hn, host2);
 		}
 	} 
+	free(ban2); 
 }
 
 int new_m_version(char *origin, char **av, int ac) {
@@ -356,12 +358,13 @@ int Online(char **av, int ac) {
 	char *user;
 	char *host;
 	char *rname;
-	
+
 	if (GetConf((void *)&s_HostServ, CFGSTR, "Nick") < 0) {
-		s_HostServ = "HostServ";
+/*		s_HostServ = malloc(MAXNICK); */
+		snprintf(s_HostServ, MAXNICK, "HostServ");
 	}
 	if (GetConf((void *)&user, CFGSTR, "User") < 0) {
-		user = malloc(MAXUSER);
+		user = malloc(MAXUSER); 
 		snprintf(user, MAXUSER, "HS");
 	}
 	if (GetConf((void *)&host, CFGSTR, "Host") < 0) {
@@ -369,22 +372,24 @@ int Online(char **av, int ac) {
 		snprintf(host, MAXHOST, me.name);
 	}
 	if (GetConf((void *)&rname, CFGSTR, "RealName") < 0) {
-		rname = malloc(MAXHOST);
+		rname = malloc(MAXHOST); 
 		snprintf(rname, MAXHOST, "Network Virtual Host Service");
 	}
 
 
-
     if (init_bot(s_HostServ,user,host,rname, "+oikSwgleq-x", HostServ_info[0].module_name) == -1 ) {
         /* Nick was in use */
-        s_HostServ = strcat(s_HostServ, "_");
+        snprintf(s_HostServ, MAXNICK, "%s_", s_HostServ);
         init_bot(s_HostServ,user,host,rname, "+oikSwgleq-x", HostServ_info[0].module_name);
     }
     free(user);
     free(host);
     free(rname);
     chanalert(s_HostServ, "Configured Levels: Add: %d, Del: %d, List: %d, View: %d", hs_lvl.add, hs_lvl.del, hs_lvl.list, hs_lvl.view);
-    add_mod_timer("CleanupHosts", "Cleanup_Old_Vhosts", HostServ_info[0].module_name, 7200);
+
+    add_mod_timer("CleanupHosts", "Cleanup_Old_Vhosts", HostServ_info[0].module_name, 7200); 
+    Loadhosts(); 
+
     return 1;
 };
 
@@ -410,9 +415,7 @@ EventFnList *__module_get_events() {
 void _init() {
     strcpy(segvinmodule, HostServ_info[0].module_name);
     
-    s_HostServ = malloc(MAXNICK);
-    strcpy(s_HostServ, "HostServ");
-    vhosts = hash_create(100, 0, 0);
+    vhosts = hash_create(-1, 0, 0);
     bannedvhosts = hash_create(-1, 0, 0);
     if (!vhosts) {
 	nlog(LOG_CRITICAL, LOG_CORE, "Error, Can't create vhosts hash");
@@ -424,7 +427,6 @@ void _init() {
     hs_lvl.view = 100;
     hs_lvl.old = 60;
     hs_Config();
-    Loadhosts();
 }
 
 void _fini() {
@@ -678,43 +680,54 @@ static void hs_view(User *u, int tmpint)
 /* Routine For Loading The Hosts into Array */
 void Loadhosts()
 {
-    FILE *fp = fopen("data/vhosts.db", "r");
+    FILE *fp;
     hs_map *map;
     hnode_t *hn;
     char buf[512];
-
+    char **LoadArry;
+    fp = fopen("data/vhosts.db", "r");
     if (fp) {
     	load_synch = 1;
 		while (fgets(buf, 512, fp)) {
-        	    strip(buf);
+printf("fget\n");
+        	    strip(buf); 
+        	    printf("buf\n");
         	    LoadArryCount = split_buf(buf, &LoadArry, 0);
+        	    printf("split\n");
 		    if (!hash_lookup(vhosts, LoadArry[0])) {
+#if 1
+		    	printf("adding %s %d\n", LoadArry[0], sizeof(hs_map));
 		            map = malloc(sizeof(hs_map));
-		            strcpy(map->nnick, LoadArry[0]);
-        		    strcpy(map->host, LoadArry[1]);
-		            strcpy(map->vhost, LoadArry[2]);
+		            strncpy(map->nnick, LoadArry[0], MAXNICK);
+        		    strncpy(map->host, LoadArry[1], MAXHOST);
+		            strncpy(map->vhost, LoadArry[2], MAXHOST);
 			    if (LoadArryCount > 3) { /* Check for upgrades from earlier versions */
-				strcpy(map->passwd, LoadArry[3]);
+				strncpy(map->passwd, LoadArry[3], 50);
 			    } else /* Upgrading from earlier version, no passwds exist */
-				strcpy(map->passwd, NULL);
+				strncpy(map->passwd, NULL, 50);
 			    if (LoadArryCount > 4) { /* Does who set it exist? Yes? go ahead */
-	    			strcpy(map->added, LoadArry[4]);
+	    			strncpy(map->added, LoadArry[4], MAXNICK);
 			    } else /* We have no information on who set it so its null */
-			    	strcpy(map->added, "0");
+			    	strcpy(map->added, "\0");
 			    if (LoadArryCount > 5) {
-			    	map->lused = (time_t)atoi(LoadArry[5]);
+			    	map->lused = atoi(LoadArry[5]);
 			    } else 
 			    	map->lused = time(NULL);
 			    map->nnick[strlen(map->nnick)] = '\0';
 			    /* add it to the hash */
 			    hn = hnode_create(map);
 			    hash_insert(vhosts, hn, map->nnick);
-		    } else
+			    nlog(LOG_DEBUG1, LOG_CORE, "Loaded %s (%s) into Vhosts", map->nnick, map->vhost);
+#endif
+printf("next\n");
+		    } else {
 	    		    nlog(LOG_NOTICE, LOG_CORE, "HostServ: db entry for %s already exists", LoadArry[0]);
-		
+	    	    }
+	            free(LoadArry);		
 	    	}
+	    	printf("close\n");
     	fclose(fp);
-    } 
+    }
 }
 
 

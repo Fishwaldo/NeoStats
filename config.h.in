@@ -148,3 +148,6 @@
  
 /* Have pthread mutex locking and unlocking functions in libc */
 #undef HAVE_PTHREAD_MUTEX
+
+/* have fgets_unlocked and friends? */
+#undef HAVE_UNLOCKED
