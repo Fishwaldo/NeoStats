@@ -36,7 +36,6 @@
 #include "sqlsrv/rta.h"
 #endif
 
-
 hash_t *uh;
 
 static void doDelUser (const char *nick, int killflag);
@@ -530,17 +529,13 @@ SetUserVhost(char* nick, char* vhost)
 	}
 }
 
+/* I don't know why, but I spent like 3 hours trying to make this function work and 
+	I finally got it... what a waste of time... gah, oh well... basically, it sets both the User Flags, and also the User Levels.. 
+	if a user is losing modes (ie -o) then its a real pain in the butt, but tough... */
 void
 UserMode (const char *nick, const char *modes)
 {
-	/* I don't know why, but I spent like 3 hours trying to make this function work and 
-	   I finally got it... what a waste of time... gah, oh well... basically, it sets both the User Flags, and also the User Levels.. 
-	   if a user is losing modes (ie -o) then its a real pain in the butt, but tough... */
-
 	User *u;
-	int add = 0;
-	int i;
-	char tmpmode;
 	char **av;
 	int ac = 0;
 
@@ -557,31 +552,7 @@ UserMode (const char *nick, const char *modes)
 	AddStringToList (&av, (char *) modes, &ac);
 	ModuleEvent (EVENT_UMODE, av, ac);
 	free (av);
-
-	tmpmode = *(modes);
-	while (tmpmode) {
-		switch (tmpmode) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			for (i = 0; i < ircd_srv.umodecount; i++) {
-				if (usr_mds[i].mode == tmpmode) {
-					if (add) {
-						u->Umode |= usr_mds[i].umodes;
-						break;
-					} else {
-						u->Umode &= ~usr_mds[i].umodes;
-						break;
-					}
-				}
-			}
-		}
-		tmpmode = *modes++;
-	}
+	u->Umode = UmodeStringToMask(modes);
 	nlog (LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, (int *)u->Umode);
 }
 
@@ -589,14 +560,7 @@ UserMode (const char *nick, const char *modes)
 void
 UserSMode (const char *nick, const char *modes)
 {
-	/* I don't know why, but I spent like 3 hours trying to make this function work and 
-	   I finally got it... what a waste of time... gah, oh well... basically, it sets both the User Flags, and also the User Levels.. 
-	   if a user is losing modes (ie -o) then its a real pain in the butt, but tough... */
-
 	User *u;
-	int add = 0;
-	int i;
-	char tmpmode;
 	char **av;
 	int ac = 0;
 
@@ -612,31 +576,7 @@ UserSMode (const char *nick, const char *modes)
 	AddStringToList (&av, (char *) modes, &ac);
 	ModuleEvent (EVENT_SMODE, av, ac);
 	free (av);
-
-	tmpmode = *(modes);
-	while (tmpmode) {
-		switch (tmpmode) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			for (i = 0; i < ircd_srv.usmodecount; i++) {
-				if (susr_mds[i].mode == tmpmode) {
-					if (add) {
-						u->Smode |= susr_mds[i].umodes;
-						break;
-					} else {
-						u->Smode &= ~susr_mds[i].umodes;
-						break;
-					}
-				}
-			}
-		}
-		tmpmode = *modes++;
-	}
+	u->Smode = SmodeStringToMask(modes);
 	nlog (LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p", u->nick, (int *)u->Smode);
 }
 #endif

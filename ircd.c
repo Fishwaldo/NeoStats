@@ -70,15 +70,31 @@ long
 UmodeStringToMask(char* UmodeString)
 {
 	int i;
-	char tmpmode;
+	int add = 0;
 	long Umode = 0;
+	char tmpmode;
 
+	/* Walk through mode string and convert to umode */
 	tmpmode = *(UmodeString);
 	while (tmpmode) {
-		for (i = 0; i < ircd_srv.umodecount; i++) {
-			if (usr_mds[i].mode == tmpmode) {
-				Umode |= usr_mds[i].umodes;
-				break;
+		switch (tmpmode) {
+		case '+':
+			add = 1;
+			break;
+		case '-':
+			add = 0;
+			break;
+		default:
+			for (i = 0; i < ircd_srv.umodecount; i++) {
+				if (usr_mds[i].mode == tmpmode) {
+					if (add) {
+						Umode |= usr_mds[i].umodes;
+						break;
+					} else {
+						Umode &= ~usr_mds[i].umodes;
+						break;
+					}
+				}
 			}
 		}
 		tmpmode = *UmodeString++;
@@ -119,26 +135,13 @@ SmodeMaskToString(long Smode)
 long
 SmodeStringToMask(char* SmodeString)
 {
-	return(0);
-}
-#endif
-
-/** @brief init_bot_modes
- *
- *  Translate a mode string to the mask equivalent
- *
- * @return Umode mask
- */
-static int
-init_bot_modes (const char *modes)
-{
-	int add = 0;
-	long Umode = 0;
-	char tmpmode;
 	int i;
+	int add = 0;
+	long Smode = 0;
+	char tmpmode;
 
-	/* Walk through mode string and convert to umode */
-	tmpmode = *(modes);
+	/* Walk through mode string and convert to smode */
+	tmpmode = *(SmodeString);
 	while (tmpmode) {
 		switch (tmpmode) {
 		case '+':
@@ -148,23 +151,23 @@ init_bot_modes (const char *modes)
 			add = 0;
 			break;
 		default:
-			for (i = 0; i < ircd_srv.umodecount; i++) {
-				if (usr_mds[i].mode == tmpmode) {
+			for (i = 0; i < ircd_srv.usmodecount; i++) {
+				if (susr_mds[i].mode == tmpmode) {
 					if (add) {
-						Umode |= usr_mds[i].umodes;
+						Smode |= susr_mds[i].umodes;
 						break;
 					} else {
-						Umode &= ~usr_mds[i].umodes;
+						Smode &= ~susr_mds[i].umodes;
 						break;
 					}
 				}
 			}
 		}
-		tmpmode = *modes++;
+		tmpmode = *SmodeString++;
 	}
-	return(Umode);
+	return(Smode);
 }
-
+#endif
 
 /** @brief init_bot
  *
@@ -191,7 +194,7 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
 		nlog (LOG_WARNING, LOG_CORE, "add_mod_user failed for module %s bot %s", mod_name, nick);
 		return NS_FAILURE;
 	}
-	Umode = init_bot_modes(modes);
+	Umode = UmodeStringToMask(modes);
 	SignOn_NewBot (nick, user, host, rname, Umode);
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
@@ -226,7 +229,7 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 		nlog (LOG_WARNING, LOG_CORE, "add_mod_user failed for module %s bot %s", mod_name, nick);
 		return NULL;
 	}
-	Umode = init_bot_modes(modes);
+	Umode = UmodeStringToMask(modes);
 	SignOn_NewBot (nick, user, host, rname, Umode);
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
@@ -564,7 +567,7 @@ init_services_bot (void)
 		strlcat (s_Services, "1", MAXNICK);
 	}
 	ircsnprintf (me.rname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
-	Umode = init_bot_modes(services_bot_modes);
+	Umode = UmodeStringToMask(services_bot_modes);
 	SignOn_NewBot (s_Services, me.user, me.host, me.rname, Umode);
 	me.onchan = 1;
 	return NS_SUCCESS;
