@@ -872,16 +872,8 @@ bot_message (char *origin, char **av, int ac)
 
 	bot_user = finduser(av[0]);
 	if (!bot_user) {
-#ifdef BASE64NICKNAME
-		bot_user = finduser(base64tonick(av[0]));
-		if (!bot_user) {
-			nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", av[0]);
-			return;
-		}
-#else
 		nlog (LOG_DEBUG1, LOG_CORE, "bot_message: %s not found", av[0]);
 		return;
-#endif
 	}
 	mod_usr = findbot (bot_user->nick);
 	/* Check to see if any of the Modules have this nick Registered */
