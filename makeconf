@@ -163,7 +163,7 @@ echo "     9) Quantum"
 echo "     10) Viagra"
 echo "     11) IRCu P10"
 while [ $validselection -eq 0 ] ; do
-	echo_no_lf "[$IRCD_DEFAULT] "
+	echo $n " [$IRCD_DEFAULT] -> $c"
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 	if [ ! "$INPUT" ] ; then
 		INPUT=$IRCD_DEFAULT
@@ -235,10 +235,10 @@ echo "Which datbase storage do you wish to use?"
 echo "     1) GDBM"
 echo "     2) Berkeley DB"
 while [ $validselection -eq 0 ] ; do
-	echo_no_lf "[$IRCD_DEFAULT] "
+	echo $n " [$DATABASE_DEFAULT] -> $c"
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 	if [ ! "$INPUT" ] ; then
-		INPUT=$IRCD_DEFAULT
+		INPUT=$DATABASE_DEFAULT
 	fi
 	case $INPUT in
 		no\ default)
