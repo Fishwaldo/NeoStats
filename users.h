@@ -29,6 +29,7 @@ void DelUser (const char *nick);
 int UserNick (const char * oldnick, const char * newnick);
 void UserDump (char *nick);
 void UserPart (list_t *list, lnode_t *node, void *v);
+void SetUserVhost(char* nick, char* vhost);
 void UserMode (const char *nick, const char *modes);
 #ifdef GOTUSERSMODES
 void UserSMode (const char *nick, const char *modes);

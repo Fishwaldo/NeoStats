@@ -110,6 +110,18 @@ DelServer (char *name)
 	free (s);
 }
 
+void 
+SquitServer(char* name)
+{
+	Server *s;
+	s = findserver (name);
+	if (s) {
+		DelServer (name);
+	} else {
+		nlog (LOG_WARNING, LOG_CORE, "Warning, Squit from Unknown Server %s", name);
+	}
+}
+
 Server *
 findserver (const char *name)
 {

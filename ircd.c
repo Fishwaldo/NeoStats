@@ -322,6 +322,11 @@ process_ircd_cmd(int cmdptr, char *cmd, char* origin, char **av, int ac)
 			}
 		}
 	}
+#if 0
+	if(i >= ircd_srv.cmdcount) {
+		nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);
+	}
+#endif
 }
 
 /** @brief parse

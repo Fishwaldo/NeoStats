@@ -690,11 +690,7 @@ Usr_Kill (char *origin, char **argv, int argc)
 static void
 Usr_Vhost (char *origin, char **argv, int argc)
 {
-	User *u;
-	u = finduser (origin);
-	if (u) {
-		strlcpy (u->vhost, argv[0], MAXHOST);
-	}
+	SetUserVhost(origin, argv[0]);
 }
 static void
 Usr_Pong (char *origin, char **argv, int argc)

@@ -777,14 +777,7 @@ Srv_Server (char *origin, char **argv, int argc)
 static void
 Srv_Squit (char *origin, char **argv, int argc)
 {
-	Server *s;
-	s = findserver (argv[0]);
-	if (s) {
-		DelServer (argv[0]);
-	} else {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Squit from Unknown Server %s", argv[0]);
-	}
-
+	SquitServer(argv[0]);
 }
 
 static void

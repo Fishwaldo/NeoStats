@@ -335,6 +335,15 @@ UserLevel (User * u)
 	return tmplvl;
 }
 
+void
+SetUserVhost(char* nick, char* vhost) 
+{
+	User *u;
+	u = finduser (nick);
+	if (u) {
+		strlcpy (u->vhost, vhost, MAXHOST);
+	}
+}
 
 void
 UserMode (const char *nick, const char *modes)

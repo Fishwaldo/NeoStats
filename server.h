@@ -29,5 +29,6 @@ void DelServer (char *name);
 void ServerDump (void);
 int init_server_hash (void);
 void PingServers (void);
+void SquitServer(char* name);
 
 #endif /* _SERVER_H_ */
