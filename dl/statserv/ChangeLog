@@ -4,6 +4,9 @@ Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish (M) denotes Mark
 
+* Revision 810 * Nov 23rd, 2003 (M)
+ - change SSMNAME to s_StatServ so bot name is more easily configured and consitent with other modules (M)
+
 * Revision 791 * Oct 30th, 2003 (F)
  - Channel stats are now dynamically loaded, and saved as needed. Not loaded into
    memory at boot time. Should help large networks with lots of channels

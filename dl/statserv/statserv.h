@@ -31,8 +31,6 @@
 #include "stats.h"
 #include "dotconf.h"
 
-#define SSMNAME "statserv"
-
 /* this is the max number of statserv channels our database can hold... */
 #define SS_CHAN_SIZE -1
 
@@ -44,7 +42,7 @@
 /* but only save data older than 1 hour! */
 #define PROGCHANTIME 3600
 
-char *s_StatServ;
+extern char s_StatServ[MAXNICK];
 
 typedef struct tld_ TLD;
 typedef struct server_stats SStats;

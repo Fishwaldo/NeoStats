@@ -50,8 +50,10 @@ static void ss_Config();
 static int new_m_version(char *origin, char **av, int ac);
 void ss_html();
 
+char s_StatServ[MAXNICK];
+
 ModuleInfo __module_info = {
-	 SSMNAME,
+	 "StatServ",
 	 "Statistical Bot For NeoStats",
 	 "$Rev$",
 	__DATE__,
@@ -92,9 +94,11 @@ void ss_Config()
 
 	SET_SEGV_LOCATION();
 
-	if (GetConf((void *) &s_StatServ, CFGSTR, "Nick") < 0) {
-		s_StatServ = malloc(MAXNICK);
+	if (GetConf((void *) &tmp, CFGSTR, "Nick") < 0) {
 		strlcpy(s_StatServ, "StatServ", MAXNICK);
+	} else {
+		strlcpy(s_StatServ, tmp, MAXUSER);
+		free(tmp);
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "User") < 0) {
 		strlcpy(StatServ.user, "SS", MAXUSER);
