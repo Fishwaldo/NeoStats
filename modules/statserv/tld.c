@@ -182,6 +182,7 @@ void SaveTLDStats (void)
 	tn = list_first(tldstatlist);
 	while (tn != NULL) {
 		t = lnode_get(tn);
+		SetData((void *)t->country, CFGSTR, "TLD", t->tld, "country");
 		SaveStatistic (&t->users, "TLD", t->tld, "users");
 		tn = list_next(tldstatlist, tn);
 	}
@@ -192,6 +193,7 @@ void LoadTLDStats (void)
 	TLD *t;
 	int i;
 	char **data;
+	char *tmp;
 
 	if (GetTableData ("TLD", &data) > 0) {
 		for (i = 0; data[i] != NULL; i++) {
@@ -199,6 +201,13 @@ void LoadTLDStats (void)
 			{
 				t = ns_calloc (sizeof (TLD));
 				strlcpy (t->tld, data[i], 5);
+				if (GetData((void *)&tmp, CFGSTR, "TLD", t->tld, "country") > 0) {
+					strlcpy(t->country, tmp, MAXHOST);
+					ns_free (tmp);
+				} else {
+					strlcpy(t->country, "???", MAXHOST);
+					continue;
+				}
 				LoadStatistic (&t->users, "TLD", t->tld, "users");
 				lnode_create_append (tldstatlist, t);
 			}
