@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.24 2002/08/28 09:11:47 fishwaldo Exp $
+** $Id: sock.c,v 1.25 2002/08/29 08:32:56 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -156,7 +156,7 @@ void read_loop()
 				close(servsock);
 				sleep(5);
 				log("Eeek, Zombie Server, Reconnecting");
-				execve("./stats", NULL, NULL);
+				execve("./neostats", NULL, NULL);
 			}
 		} else if (SelectResult == -1) {
 				log("Lost connection to server."); 
