@@ -1792,6 +1792,7 @@ void do_credits( const char* nick, const char *remoteserver )
 	irc_numeric( RPL_VERSION, nick, ":- OvErRiTe - Giving us patches for Viagra IRCd support" );
 	irc_numeric( RPL_VERSION, nick, ":- Reed Loden - Contributions to IRCu support" );
 	irc_numeric( RPL_VERSION, nick, ":- Adam Rutter (Shmad) - Developer from the 1.0 days to 2.0 Days");
+	irc_numeric( RPL_VERSION, nick, ":- DeadNotBuried - early testing of 3.0, providing patches and feedback and his NeoStats modules" );
 }
 
 /** @brief 
