@@ -32,7 +32,7 @@ typedef struct UserAuthModes{
 	int level;
 } UserAuthModes;
 
-const char *ns_copyright[] = {
+static const char *ns_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
@@ -118,18 +118,24 @@ static int auth_cmd_authmodelist(CmdParams* cmdparams)
 		irc_prefmsg(NULL, cmdparams->source, "%s: %d", 
 			user_auth_modes[i].modename, user_auth_modes[i].level);
 	}
-	return 1;
+	if (HaveFeature (FEATURE_USERSMODES)) {
+		for (i = 0; i < user_auth_smode_count; i++) {
+			irc_prefmsg(NULL, cmdparams->source, "%s: %d", 
+				user_auth_smodes[i].modename, user_auth_smodes[i].level);
+		}
+	}
+	return NS_SUCCESS;
 }
 
 static int auth_event_online(CmdParams* cmdparams)
 {
 	add_services_cmd_list(auth_commands);
-	return 1;
+	return NS_SUCCESS;
 };
 
 static int auth_event_mode(CmdParams* cmdparams) 
 {
-	return 1;
+	return NS_SUCCESS;
 }
 
 ModuleEvent module_events[] = {
@@ -140,7 +146,7 @@ ModuleEvent module_events[] = {
 
 int ModInit(Module* modptr)
 {
-	return 1;
+	return NS_SUCCESS;
 }
 
 void ModFini()
@@ -164,10 +170,10 @@ int ModAuthUser(Client * u)
 	dlog(DEBUG1, "UmodeAuth: umode level for %s is %d", u->name, authlevel);
 	if (HaveFeature (FEATURE_USERSMODES)) {
 		/* Check smodes */
-		for (i = 0; i < user_auth_mode_count; i++) {
-			if (u->user->Smode & user_auth_modes[i].umode) {
-				if(user_auth_modes[i].level > authlevel) {
-					authlevel = user_auth_modes[i].level;
+		for (i = 0; i < user_auth_smode_count; i++) {
+			if (u->user->Smode & user_auth_smodes[i].umode) {
+				if(user_auth_smodes[i].level > authlevel) {
+					authlevel = user_auth_smodes[i].level;
 				}
 			}
 		}

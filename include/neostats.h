@@ -131,8 +131,7 @@
 #define FEATURE_SVSKILL		0x00000080	/* SVSKILL */
 #define FEATURE_UMODECLOAK  0x00000100	/* auto cloak host with umode */
 #define FEATURE_USERSMODES	0x00000200	/* User Smode field */
-#define FEATURE_BOTMODES	0x00000400	/* Umodes for bots available */
-#define FEATURE_SMO			0x00000800	/* SMO */
+#define FEATURE_SMO			0x00000400	/* SMO */
 
 /* cumodes are channel modes which affect a user */
 #define CUMODE_CHANOP		0x00000001
@@ -1064,8 +1063,6 @@ EXPORTFUNC int new_transfer(char *url, char *params, NS_TRANSFER savetofileormem
 
 /* Mark server as synched */
 #define SynchServer(x) (((x)->flags |= NS_FLAGS_SYNCHED))
-
-extern const char *ns_copyright[];
 
 EXPORTFUNC int validate_nick (char* nick);
 EXPORTFUNC int validate_user (char* user);

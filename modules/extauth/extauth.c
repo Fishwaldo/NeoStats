@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include "neostats.h"
 
-const char *ns_copyright[] = {
+static const char *ns_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL

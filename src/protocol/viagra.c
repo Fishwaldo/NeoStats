@@ -67,7 +67,7 @@ ProtocolInfo protocol_info = {
 	/* Protocol options negotiated at link by this IRCd */
 	0,
 	/* Features supported by this IRCd */
-	FEATURE_BOTMODES | FEATURE_UMODECLOAK,
+	FEATURE_UMODECLOAK,
 	"+oS",
 	"+a",
 };

@@ -86,7 +86,7 @@ ModuleEvent module_events[] = {
 	{EVENT_NULL,		NULL}
 };
 
-const char *ns_copyright[] = {
+static const char *ns_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL

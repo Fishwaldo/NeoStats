@@ -64,6 +64,12 @@ static const char *ns_about[] = {
 	NULL
 };
 
+static const char *ns_copyright[] = {
+	"Copyright (c) 1999-2004, NeoStats",
+	"http://www.neostats.net/",
+	NULL
+};
+
 ModuleInfo ns_module_info = {
 	"NeoStats",
 	"NeoStats Statistical services", 	

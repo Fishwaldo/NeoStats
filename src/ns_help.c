@@ -322,12 +322,6 @@ const char *ns_help_set_serviceumode[] = {
 	NULL
 };
 
-const char *ns_copyright[] = {
-	"Copyright (c) 1999-2004, NeoStats",
-	"http://www.neostats.net/",
-	NULL
-};
-
 const char *cmd_help_help[] = {
 	"Syntax: \2HELP [command]\2",
 	"",

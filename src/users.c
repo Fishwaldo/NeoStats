@@ -696,6 +696,8 @@ UserMode (const char *nick, const char *modes)
 		nlog (LOG_WARNING, "UserMode: mode change for unknown user %s %s", nick, modes);
 		return;
 	}
+	/* Reset user level so it will be recalculated */
+	u->user->ulevel = -1;
 	strlcpy (u->user->modes, modes, MODESIZE);
 	oldmode = u->user->Umode;
 	u->user->Umode = UmodeStringToMask(modes, u->user->Umode);
@@ -704,10 +706,6 @@ UserMode (const char *nick, const char *modes)
 		if((oldmode & UMODE_HIDE) && (!(u->user->Umode & UMODE_HIDE))) {
 			strlcpy(u->user->vhost, u->user->hostname, MAXHOST);
 		}
-	}
-	/* If modes changed reset user level so it will be recalculated */
-	if(u->user->Umode != oldmode) {
-		u->user->ulevel = -1;
 	}
 	dlog(DEBUG1, "UserMode: modes for %s is now %x", u->name, u->user->Umode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
@@ -730,6 +728,8 @@ UserSMode (const char *nick, const char *modes)
 		nlog (LOG_WARNING, "UserSMode: smode change for unknown user %s %s", nick, modes);
 		return;
 	}
+	/* Reset user level so it will be recalculated */
+	u->user->ulevel = -1;
 	u->user->Smode = SmodeStringToMask(modes, u->user->Smode);
 	dlog(DEBUG1, "UserSMode: smode for %s is now %x", u->name, u->user->Smode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
