@@ -601,6 +601,15 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			break;
 		case SET_TYPE_INT:
 			intval = atoi(av[3]);	
+			/* atoi will return 0 for a string instead of a digit so check it! */
+			if(intval == 0) {
+				if(strcmp(av[3],"0")!=0) {
+					prefmsg(u->nick, bot_ptr->nick,
+						"%s invalid setting for %s", av[3], set_ptr->option);
+					prefmsg(u->nick, bot_ptr->nick,
+						"Valid values are %d to %d", set_ptr->min, set_ptr->max);
+				}
+			}
 			if(set_ptr->min != -1 && intval < set_ptr->min) {
 				prefmsg(u->nick, bot_ptr->nick,
 					"%d out of range for %s", intval, set_ptr->option);
