@@ -173,7 +173,7 @@
 #define HAVE_PERROR 1
 
 /* Define to 1 if you have the `poll' function. */
-#define HAVE_POLL 1
+/* #undef HAVE_POLL */
 
 /* Define to 1 if you have the <pwd.h> header file. */
 /* #undef HAVE_PWD_H */

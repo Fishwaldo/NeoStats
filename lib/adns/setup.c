@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2005 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Based on adns, which is
@@ -36,7 +36,11 @@
 #include <iphlpapi.h>
 #else
 #include <limits.h>
-#include <fcntl.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h> 
+#endif
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 
@@ -120,14 +124,12 @@ static int nextword(const char **bufp_io, const char **word_r, int *l_r)
 	return 1;
 }
 
-static void ccf_nameserver(adns_state ads, const char *fn, int lno,
-			   const char *buf)
+static void ccf_nameserver(adns_state ads, const char *fn, int lno, const char *buf)
 {
 	struct in_addr ia;
 
 	if (!inet_aton(buf, &ia)) {
-		configparseerr(ads, fn, lno,
-			       "invalid nameserver address `%s'", buf);
+		configparseerr(ads, fn, lno, "invalid nameserver address `%s'", buf);
 		return;
 	}
 	adns__debug(ads, -1, 0, "using nameserver %s", inet_ntoa(ia));
@@ -178,8 +180,7 @@ static void ccf_search(adns_state ads, const char *fn, int lno,
 	ads->searchlist = newptrs;
 }
 
-static void ccf_sortlist(adns_state ads, const char *fn, int lno,
-			 const char *buf)
+static void ccf_sortlist(adns_state ads, const char *fn, int lno, const char *buf)
 {
 	const char *word;
 	char tbuf[200], *slash, *ep;
@@ -270,8 +271,7 @@ static void ccf_sortlist(adns_state ads, const char *fn, int lno,
 	}
 }
 
-static void ccf_options(adns_state ads, const char *fn, int lno,
-			const char *buf)
+static void ccf_options(adns_state ads, const char *fn, int lno, const char *buf)
 {
 	const char *word;
 	char *ep;
@@ -319,14 +319,12 @@ static void ccf_options(adns_state ads, const char *fn, int lno,
 	}
 }
 
-static void ccf_clearnss(adns_state ads, const char *fn, int lno,
-			 const char *buf)
+static void ccf_clearnss(adns_state ads, const char *fn, int lno, const char *buf)
 {
 	ads->nservers = 0;
 }
 
-static void ccf_include(adns_state ads, const char *fn, int lno,
-			const char *buf)
+static void ccf_include(adns_state ads, const char *fn, int lno, const char *buf)
 {
 	if (!*buf) {
 		configparseerr(ads, fn, lno,
@@ -338,8 +336,7 @@ static void ccf_include(adns_state ads, const char *fn, int lno,
 
 static const struct configcommandinfo {
 	const char *name;
-	void (*fn) (adns_state ads, const char *fn, int lno,
-		    const char *buf);
+	void (*fn) (adns_state ads, const char *fn, int lno, const char *buf);
 } configcommandinfos[] = {
   { "nameserver",        ccf_nameserver  },
   { "domain",            ccf_search      },
@@ -356,7 +353,7 @@ typedef union {
 	const char *text;
 } getline_ctx;
 
-static int gl_file(adns_state ads, getline_ctx * src_io,
+static int gl_file(adns_state ads, getline_ctx * src_io, 
 		   const char *filename, int lno, char *buf, int buflen)
 {
 	FILE *file = src_io->file;
@@ -435,25 +432,21 @@ static int gl_text(adns_state ads, getline_ctx * src_io,
 }
 
 static void readconfiggeneric(adns_state ads, const char *filename,
-			      int (*getline) (adns_state ads,
-					      getline_ctx *,
-					      const char *filename,
-					      int lno, char *buf,
-					      int buflen),
-			      /* Returns >=0 for success, -1 for EOF or error
-			       * (error will have been reported), or -2 for
-			       * bad line was encountered, try again.
-			       */
-			      getline_ctx gl_ctx)
+			int (*getline) (adns_state ads, getline_ctx *,
+				const char *filename, int lno, char *buf, int buflen),
+				/* Returns >=0 for success, -1 for EOF or error
+				 * (error will have been reported), or -2 for
+				 * bad line was encountered, try again.
+		         */
+			     getline_ctx gl_ctx)
 {
 	char linebuf[2000], *p, *q;
 	int lno, l, dirl;
 	const struct configcommandinfo *ccip;
 
 	for (lno = 1;
-	     (l =
-	      getline(ads, &gl_ctx, filename, lno, linebuf,
-		      sizeof(linebuf))) != -1; lno++) {
+	    (l = getline(ads, &gl_ctx, filename, lno, linebuf, sizeof(linebuf))) != -1; 
+		lno++) {
 		if (l == -2)
 			continue;
 		while (l > 0 && ctype_whitespace(linebuf[l - 1]))

@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2005 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Based on adns, which is
@@ -31,8 +31,7 @@
  * - user-visible check/wait and event-loop-related functions
  */
 
-#ifdef WIN32
-#else
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 
