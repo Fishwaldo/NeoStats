@@ -153,7 +153,7 @@ static bot_setting hs_settings[]=
 int findnick(const void *key1, const void *key2)
 {
 	const hs_map *vhost = key1;
-	return (strcasecmp(vhost->nnick, (char *)key2));
+	return (ircstrcasecmp(vhost->nnick, (char *)key2));
 }
 
 void save_vhost(hs_map *vhost) {
@@ -382,7 +382,7 @@ static int hs_levels(User * u, char **av, int ac)
 			return 1;
 	} else if (ac == 3) {
 		if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
-			if (!strcasecmp(av[2], "RESET")) {
+			if (!ircstrcasecmp(av[2], "RESET")) {
 				hs_cfg.add = 40;
 				SetConf((void *) &hs_cfg.add, CFGINT, "AddLevel");
 				hs_cfg.del = 40;
@@ -402,19 +402,19 @@ static int hs_levels(User * u, char **av, int ac)
 					"Invalid Level. Must be between 1 and %d", NS_ULEVEL_ROOT);
 				return 1;
 			}
-			if (!strcasecmp(av[2], "ADD")) {
+			if (!ircstrcasecmp(av[2], "ADD")) {
 				hs_cfg.add = t;
 				SetConf((void *) t, CFGINT,
 					"AddLevel");
-			} else if (!strcasecmp(av[2], "DEL")) {
+			} else if (!ircstrcasecmp(av[2], "DEL")) {
 				hs_cfg.del = t;
 				SetConf((void *) t, CFGINT,
 					"DelLevel");
-			} else if (!strcasecmp(av[2], "LIST")) {
+			} else if (!ircstrcasecmp(av[2], "LIST")) {
 				hs_cfg.list = t;
 				SetConf((void *) t, CFGINT,
 					"ListLevel");
-			} else if (!strcasecmp(av[2], "VIEW")) {
+			} else if (!ircstrcasecmp(av[2], "VIEW")) {
 				hs_cfg.view = t;
 				SetConf((void *) t, CFGINT,
 					"ViewLevel");
@@ -442,10 +442,10 @@ static int hs_bans(User * u, char **av, int ac)
 		hs_listban(u);
 	} else if (ac == 4) {
 		if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
-			if (!strcasecmp(av[2], "ADD")) {
+			if (!ircstrcasecmp(av[2], "ADD")) {
 				hs_addban(u, av[3]);
 				return 1;
-			} else if (!strcasecmp(av[2], "DEL")) {
+			} else if (!ircstrcasecmp(av[2], "DEL")) {
 				hs_delban(u, av[3]);
 				return 1;
 			}
@@ -571,7 +571,7 @@ static int hs_chpass(User * u, char **av, int ac)
 		map = lnode_get(hn);
 		if ((fnmatch(map->host, u->hostname, 0) == 0)
 		    || (UserLevel(u) >= 100)) {
-			if (!strcasecmp(map->passwd, oldpass)) {
+			if (!ircstrcasecmp(map->passwd, oldpass)) {
 				strlcpy(map->passwd, newpass, MAXPASSWORD);
 				prefmsg(u->nick, s_HostServ,
 					"Password Successfully changed");
@@ -919,7 +919,7 @@ static int hs_login(User * u, char **av, int ac)
 	hn = list_find(vhosts, login, findnick);
 	if (hn) {
 		map = lnode_get(hn);
-		if (!strcasecmp(map->passwd, pass)) {
+		if (!ircstrcasecmp(map->passwd, pass)) {
 			ssvshost_cmd(u->nick, map->vhost);
 			map->lused = me.now;
 			prefmsg(u->nick, s_HostServ,
