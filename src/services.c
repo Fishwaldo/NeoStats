@@ -184,7 +184,7 @@ init_services_bot (void)
 	me.synched = 1;
 	SynchAllModules ();
 	RequestServerUptimes();	
-	rtaserv_init2 ();
+	rtaserv_init ();
 	return NS_SUCCESS;
 }
 

@@ -26,6 +26,7 @@
 #include "rtaserv.h"
 #include <fcntl.h>
 
+static int rta_active = 0;
 #define MAXSQLCON 5
 
 /* sqlsrv struct for tracking connections */
@@ -43,10 +44,10 @@ typedef struct Sql_Conn {
 OS_SOCKET sqlListenSock = -1;
 
 list_t *sqlconnections;
-char sqlsrvuser[MAXUSER];
-char sqlsrvpass[MAXPASS];
-char sqlsrvhost[MAXHOST];
-int sqlsrvport;
+char rtauser[MAXUSER];
+char rtapass[MAXPASS];
+char rtahost[MAXHOST];
+int rtaport;
 
 static void sql_accept_conn(OS_SOCKET srvfd);
 static OS_SOCKET sqllisten_on_port(int port);
@@ -55,15 +56,15 @@ static int sql_handle_ui_output(lnode_t *sqlnode);
 int check_sql_sock();
 
 /* this is for sqlserver logging callback */
-void sqlsrvlog(char *logline) 
+void rtaservlog(char *logline) 
 {
-	dlog(DEBUG1, "SqlSrv: %s", logline);
+	dlog(DEBUG1, "rtaserv: %s", logline);
 }
 
-int InitSqlSrv (void)
+int InitRTAServ (void)
 {
-	sqlsrvport = 8888;
-	rta_init(sqlsrvlog);
+	rtaport = 8888;
+	rta_init(rtaservlog);
 	/* add the server hash to the sql library */
 	neo_bans.address = GetBanHash();
 	rta_add_table(&neo_bans);
@@ -82,7 +83,7 @@ int InitSqlSrv (void)
 
 	/* init the sql Listen Socket now as well */
 	sqlconnections = list_create(MAXSQLCON);
-	sqlListenSock = sqllisten_on_port(sqlsrvport);
+	sqlListenSock = sqllisten_on_port(rtaport);
 	if (sqlListenSock == -1) {
 		nlog(LOG_CRITICAL, "Failed to Setup Sql Port. SQL not available");
 		return NS_FAILURE;
@@ -100,55 +101,55 @@ int InitSqlSrv (void)
  * @returns Nothing
  */
 
-const char *sql_help_set_sqluser[] = {
-	"SQLUSER ",
+const char *rta_help_set_rtauser[] = {
+	"RTAUSER ",
 	NULL
 };
 
-const char *sql_help_set_sqlpass[] = {
-	"SQLPASS ",
+const char *rta_help_set_rtapass[] = {
+	"RTAPASS ",
 	NULL
 };
 
-const char *sql_help_set_sqlhost[] = {
-	"SQLHOST ",
+const char *rta_help_set_rtahost[] = {
+	"RTAHOST ",
 	NULL
 };
 
-const char *sql_help_set_sqlport[] = {
-	"SQLPORT ",
+const char *rta_help_set_rtaport[] = {
+	"RTAPORT ",
 	NULL
 };
 
-static int sql_set_sqluser_cb (CmdParams* cmdparams, SET_REASON reason)
+static int rta_set_rtauser_cb (CmdParams* cmdparams, SET_REASON reason)
 {
-	rta_change_auth(sqlsrvuser, sqlsrvpass);
+	rta_change_auth(rtauser, rtapass);
 	return NS_SUCCESS;
 }
 
-static int sql_set_sqlpass_cb (CmdParams* cmdparams, SET_REASON reason)
+static int rta_set_rtapass_cb (CmdParams* cmdparams, SET_REASON reason)
 {
-	rta_change_auth(sqlsrvuser, sqlsrvpass);
+	rta_change_auth(rtauser, rtapass);
 	return NS_SUCCESS;
 }
 
-static int sql_set_sqlhost_cb (CmdParams* cmdparams, SET_REASON reason)
-{
-	return NS_SUCCESS;
-}
-
-static int sql_set_sqlport_cb (CmdParams* cmdparams, SET_REASON reason)
+static int rta_set_rtahost_cb (CmdParams* cmdparams, SET_REASON reason)
 {
 	return NS_SUCCESS;
 }
 
-static bot_setting sql_settings[]=
+static int rta_set_rtaport_cb (CmdParams* cmdparams, SET_REASON reason)
 {
-	{"SQLUSER",	&sqlsrvuser,	SET_TYPE_STRING,	0, MAXUSER, NS_ULEVEL_ADMIN, "sqluser",	NULL,	sql_help_set_sqluser, sql_set_sqluser_cb, (void*)"user" },
-	{"SQLPASS",	&sqlsrvpass,	SET_TYPE_STRING,	0, MAXPASS, NS_ULEVEL_ADMIN, "sqlpass",	NULL,	sql_help_set_sqlpass, sql_set_sqlpass_cb, (void*)"pass" },
-	{"SQLHOST",	&sqlsrvhost,	SET_TYPE_HOST,		0, MAXHOST, NS_ULEVEL_ADMIN, "sqlhost",	NULL,	sql_help_set_sqlhost, sql_set_sqlhost_cb, (void*)"127.0.0.1" },
-	{"SQLPORT",	&sqlsrvport,	SET_TYPE_INT,		0, 0, 		NS_ULEVEL_ADMIN, "sqlport",	NULL,	sql_help_set_sqlport, sql_set_sqlport_cb, (void*)8888 },
-	{NULL,		NULL,			0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
+	return NS_SUCCESS;
+}
+
+static bot_setting rta_settings[]=
+{
+	{"RTAUSER",	&rtauser,	SET_TYPE_STRING,	0, MAXUSER, NS_ULEVEL_ADMIN, "rtauser",	NULL,	rta_help_set_rtauser, rta_set_rtauser_cb, (void*)"user" },
+	{"RTAPASS",	&rtapass,	SET_TYPE_STRING,	0, MAXPASS, NS_ULEVEL_ADMIN, "rtapass",	NULL,	rta_help_set_rtapass, rta_set_rtapass_cb, (void*)"pass" },
+	{"RTAHOST",	&rtahost,	SET_TYPE_HOST,		0, MAXHOST, NS_ULEVEL_ADMIN, "rtahost",	NULL,	rta_help_set_rtahost, rta_set_rtahost_cb, (void*)"127.0.0.1" },
+	{"RTAPORT",	&rtaport,	SET_TYPE_INT,		0, 0, 		NS_ULEVEL_ADMIN, "rtaport",	NULL,	rta_help_set_rtaport, rta_set_rtaport_cb, (void*)8888 },
+	{NULL,		NULL,		0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
 
 /* the following functions are taken from the RTA example app shipped with the library, 
@@ -163,7 +164,7 @@ int check_sql_sock()
 {
 	if (sqlListenSock < 1) {
 		dlog(DEBUG1, "Rehashing SQL sock");
-		sqlListenSock = sqllisten_on_port(sqlsrvport);
+		sqlListenSock = sqllisten_on_port(rtaport);
 		if (sqlListenSock == -1) {
 			nlog(LOG_CRITICAL, "Failed to Setup Sql Port. SQL not available");
 			return NS_FAILURE;
@@ -198,10 +199,10 @@ sqllisten_on_port(int port)
 	} else {
 		srvskt.sin_addr.s_addr = INADDR_ANY;
 	}
-	srvskt.sin_port = htons(sqlsrvport);
+	srvskt.sin_port = htons(rtaport);
 	if ((srvfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
-		nlog(LOG_CRITICAL, "SqlSrv: Unable to get socket for port %d.", port);
+		nlog(LOG_CRITICAL, "rtaserv: Unable to get socket for port %d.", port);
 		return -1;
 	}
 	os_sock_set_nonblocking (srvfd);
@@ -255,7 +256,7 @@ sql_accept_conn(OS_SOCKET srvfd)
 
 	if (newui->fd < 0)
 	{
-		nlog(LOG_WARNING, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
+		nlog(LOG_WARNING, "rtaserv: Manager accept() error (%s). \n", strerror(errno));
 		ns_free(newui);
 		os_sock_close (srvfd);
 		return;
@@ -263,9 +264,9 @@ sql_accept_conn(OS_SOCKET srvfd)
 	else
 	{
 		inet_ntop(AF_INET, &newui->cliskt.sin_addr.s_addr, tmp, 16);
-		if (!match(sqlsrvhost, tmp)) {
+		if (!match(rtahost, tmp)) {
     	/* we didnt get a match, bye bye */
-			nlog(LOG_NOTICE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
+			nlog(LOG_NOTICE, "rtaserv: Rejecting SQL Connection from %s", tmp);
 			os_sock_close (newui->fd);
 			ns_free(newui);
 			return;
@@ -410,7 +411,10 @@ void rta_hook_1 (fd_set *read_fd_set, fd_set *write_fd_set)
 {
 	lnode_t *sqlnode;
 	Sql_Conn *sqldata;
-
+	
+	if (!rta_active) {
+		return ;
+	}
 	/* if we have sql support, add the Listen Socket to the fds */
 	if (sqlListenSock > 0)
 		FD_SET(sqlListenSock, read_fd_set);
@@ -434,6 +438,9 @@ void rta_hook_2 (fd_set *read_fd_set, fd_set *write_fd_set)
 	lnode_t *sqlnode;
 	Sql_Conn *sqldata;
 
+	if (!rta_active) {
+		return ;
+	}
 	/* did we get a connection to the SQL listen sock */
 	if ((sqlListenSock > 0) && (FD_ISSET(sqlListenSock, read_fd_set)))
 		sql_accept_conn(sqlListenSock);
@@ -459,7 +466,7 @@ restart:
 
 #if 0
 /** Copyright info */
-static const char *sql_copyright[] = {
+static const char *rta_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
@@ -467,9 +474,9 @@ static const char *sql_copyright[] = {
 
 /** Module info */
 ModuleInfo module_info = {
-	"SqlSrv",
+	"RTAServ",
 	"RTA Module",
-	sql_copyright,
+	rta_copyright,
 	NULL,
 	NEOSTATS_VERSION,
 	CORE_MODULE_VERSION,
@@ -491,8 +498,8 @@ ModuleInfo module_info = {
 
 int ModInit (Module *modptr)
 {
-	ModuleConfig (sql_settings);
-	if (InitSqlSrv () != NS_SUCCESS) {
+	ModuleConfig (rta_settings);
+	if (InitRTAServ () != NS_SUCCESS) {
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
@@ -509,7 +516,7 @@ int ModInit (Module *modptr)
 
 int ModSynch (void)
 {
-	if (add_services_set_list (sql_settings) != NS_SUCCESS) {
+	if (add_services_set_list (rta_settings) != NS_SUCCESS) {
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
@@ -526,24 +533,22 @@ int ModSynch (void)
 
 void ModFini (void)
 {
-	del_services_set_list (sql_settings);
+	del_services_set_list (rta_settings);
 }
 #else
 
 void rtaserv_init (void)
 {
-	ModuleConfig (sql_settings);
-	InitSqlSrv ();
-}
-
-void rtaserv_init2 (void)
-{
-	//add_services_set_list (sql_settings);
+	rta_active = 1;
+	ModuleConfig (rta_settings);
+	InitRTAServ ();
+	add_services_set_list (rta_settings);
 }
 
 void rtaserv_fini (void)
 {
-	//del_services_set_list (sql_settings);
+	rta_active = 1;
+	del_services_set_list (rta_settings);
 }
 
 #endif
