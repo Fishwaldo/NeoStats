@@ -162,7 +162,7 @@ bin_SCRIPTS = cronchk
 dist_data_DATA = neostats.motd
 
 docdir = @prefix@/doc
-doc_DATA = doc/* doc/old/*
+dist_doc_DATA = doc/* doc/old/*
 LINK = @echo "Linking $@"; $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
@@ -174,7 +174,7 @@ CONFIG_CLEAN_FILES = cronchk
 SCRIPTS = $(bin_SCRIPTS) $(dist_bin_SCRIPTS)
 
 DIST_SOURCES =
-DATA = $(dist_data_DATA) $(doc_DATA)
+DATA = $(dist_data_DATA) $(dist_doc_DATA)
 
 
 RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
@@ -183,7 +183,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	installdirs-recursive install-recursive uninstall-recursive \
 	check-recursive installcheck-recursive
 DIST_COMMON = README $(dist_bin_SCRIPTS) $(dist_data_DATA) \
-	$(srcdir)/Makefile.in $(srcdir)/configure \
+	$(dist_doc_DATA) $(srcdir)/Makefile.in $(srcdir)/configure \
 	$(top_srcdir)/autotools/rules.mk AUTHORS COPYING ChangeLog \
 	INSTALL Makefile.am NEWS TODO aclocal.m4 autotools/acinclude.m4 \
 	autotools/compile autotools/config.guess autotools/config.sub \
@@ -281,20 +281,20 @@ uninstall-dist_dataDATA:
 	  echo " rm -f $(DESTDIR)$(datadir)/$$f"; \
 	  rm -f $(DESTDIR)$(datadir)/$$f; \
 	done
-docDATA_INSTALL = $(INSTALL_DATA)
-install-docDATA: $(doc_DATA)
+dist_docDATA_INSTALL = $(INSTALL_DATA)
+install-dist_docDATA: $(dist_doc_DATA)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(docdir)
-	@list='$(doc_DATA)'; for p in $$list; do \
+	@list='$(dist_doc_DATA)'; for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(docDATA_INSTALL) $$d$$p $(DESTDIR)$(docdir)/$$f"; \
-	  $(docDATA_INSTALL) $$d$$p $(DESTDIR)$(docdir)/$$f; \
+	  echo " $(dist_docDATA_INSTALL) $$d$$p $(DESTDIR)$(docdir)/$$f"; \
+	  $(dist_docDATA_INSTALL) $$d$$p $(DESTDIR)$(docdir)/$$f; \
 	done
 
-uninstall-docDATA:
+uninstall-dist_docDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(doc_DATA)'; for p in $$list; do \
+	@list='$(dist_doc_DATA)'; for p in $$list; do \
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " rm -f $(DESTDIR)$(docdir)/$$f"; \
 	  rm -f $(DESTDIR)$(docdir)/$$f; \
@@ -440,7 +440,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/. $(distdir)/./autotools $(distdir)/autotools
+	$(mkinstalldirs) $(distdir)/. $(distdir)/./autotools $(distdir)/autotools $(distdir)/doc $(distdir)/doc/old
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -598,7 +598,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-dist_dataDATA install-docDATA
+install-data-am: install-dist_dataDATA install-dist_docDATA
 
 install-exec-am: install-binSCRIPTS install-dist_binSCRIPTS
 
@@ -627,7 +627,8 @@ ps: ps-recursive
 ps-am:
 
 uninstall-am: uninstall-binSCRIPTS uninstall-dist_binSCRIPTS \
-	uninstall-dist_dataDATA uninstall-docDATA uninstall-info-am
+	uninstall-dist_dataDATA uninstall-dist_docDATA \
+	uninstall-info-am
 
 uninstall-info: uninstall-info-recursive
 
@@ -639,7 +640,7 @@ uninstall-info: uninstall-info-recursive
 	dvi-am dvi-recursive info info-am info-recursive install \
 	install-am install-binSCRIPTS install-data install-data-am \
 	install-data-recursive install-dist_binSCRIPTS \
-	install-dist_dataDATA install-docDATA install-exec \
+	install-dist_dataDATA install-dist_docDATA install-exec \
 	install-exec-am install-exec-recursive install-info \
 	install-info-am install-info-recursive install-man \
 	install-recursive install-strip installcheck installcheck-am \
@@ -650,8 +651,8 @@ uninstall-info: uninstall-info-recursive
 	pdf-recursive ps ps-am ps-recursive tags tags-recursive \
 	uninstall uninstall-am uninstall-binSCRIPTS \
 	uninstall-dist_binSCRIPTS uninstall-dist_dataDATA \
-	uninstall-docDATA uninstall-info-am uninstall-info-recursive \
-	uninstall-recursive
+	uninstall-dist_docDATA uninstall-info-am \
+	uninstall-info-recursive uninstall-recursive
 
 
 .c.o:

@@ -7,6 +7,6 @@ bin_SCRIPTS		= cronchk
 dist_data_DATA		= neostats.motd
 
 docdir			= @prefix@/doc
-doc_DATA		= doc/* doc/old/*
+dist_doc_DATA		= doc/* doc/old/*
 
 include $(top_srcdir)/autotools/rules.mk
