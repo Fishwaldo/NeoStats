@@ -62,7 +62,7 @@ extern int   yylex();
 
 %left AND
 %left ','
-
+%left '.'
 %%
 
 
@@ -132,7 +132,7 @@ table_name:
 			cmd.tbl = parsestr[(int) $1];
 			parsestr[(int) $1] = (char *) NULL;
 		}
-	|	NAME "." NAME
+	|	NAME  "." NAME
 		{
 			cmd.tbl = parsestr[(int) $3];
 			parsestr[(int) $3] = (char *) NULL;

@@ -20,10 +20,14 @@ SQLINCLUDES = -I. -I..
 LIBS   = 
 LEX    = @LEX@
 LEXLIBS= @LEXLIBS@
-YACC   = @YACC@
+YACC   = yacc
 
 
 all: librtadb.a
+
+redoparser:
+	$(LEX) -otoken.c token.l 
+	$(YACC) -dv -bparse parse.y 
 
 .c.o:
 	$(CC) $(SQLINCLUDES) $(CFLAGS) -c $<
@@ -32,13 +36,7 @@ all: librtadb.a
 librtadb.a: $(OBJS)
 	ar -rcs librtadb.a $(OBJS)
 
-token.c:
-	$(LEX) -otoken.c token.l 
-
 token.o: parse.tab.c do_sql.h
-
-parse.tab.c: parse.y do_sql.h
-	$(YACC) -dv -bparse parse.y 
 
 api.o: api.c rta.h do_sql.h
 
@@ -48,5 +46,5 @@ rtatables.o: rtatables.c do_sql.h rta.h
 
 
 clean: 
-	rm -rf *.o parse.tab.? token.c lib* parse.output parse.save
+	rm -rf *.o lib* parse.output parse.save
 
