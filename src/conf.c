@@ -49,7 +49,7 @@ static config_option options[] = {
 	{"CONNECT_TO", ARG_STR, cb_Server, 2},
 	{"CONNECT_PASS", ARG_STR, cb_Server, 3},
 	{"SERVER_INFOLINE", ARG_STR, cb_Server, 4},
-	{"STATSERV_NETNAME", ARG_STR, cb_Server, 5},
+	{"SERVICE_HOST", ARG_STR, cb_Server, 5},
 	{"RECONNECT_TIME", ARG_STR, cb_Server, 6},
 	{"WANT_PRIVMSG", ARG_STR, cb_Server, 9},
 	{"SERVICES_CHAN", ARG_STR, cb_Server, 10},
@@ -188,8 +188,8 @@ cb_Server( char *arg, int configtype )
 		/* Server InfoLine */
 		strlcpy( me.infoline, arg, sizeof( me.infoline ) );
 	} else if( configtype == 5 ) {
-		/* NetName */
-		strlcpy( me.netname, arg, sizeof( me.netname ) );
+		/* Service host */
+		strlcpy( me.servicehost, arg, sizeof( me.servicehost ) );
 	} else if( configtype == 6 ) {
 		/* Reconnect time */
 		nsconfig.r_time = atoi( arg );

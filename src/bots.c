@@ -645,7 +645,7 @@ Bot *AddBot( BotInfo *botinfo )
 	botptr->set_ulevel = NS_ULEVEL_ROOT;
 	/* For more efficient transversal of bot/user lists, link 
 	 * associated user struct to bot and link bot into user struct */
-	botptr->u = AddUser( botptr->name, botinfo->user, ( (*botinfo->host ) == 0 ? me.name : botinfo->host ), botinfo->realname, me.name, NULL, NULL, NULL );
+	botptr->u = AddUser( botptr->name, botinfo->user, ( (*botinfo->host ) == 0 ? me.servicehost : botinfo->host ), botinfo->realname, me.name, NULL, NULL, NULL );
 	botptr->u->user->bot = botptr;
 	botptr->flags = botinfo->flags;
 	ConnectBot( botptr );

@@ -216,6 +216,8 @@ static int InitCore( void )
 	/* load the config files */
 	if( ConfLoad() != NS_SUCCESS )
 		return NS_FAILURE;
+	if( !me.servicehost[0] )
+		strlcpy( me.servicehost, me.name, sizeof( me.name ) );
 	/* initialize Lang Subsystem */
 	ircsnprintf( dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX );
 	LANGinit( 1, dbpath, NULL );

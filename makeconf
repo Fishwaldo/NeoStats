@@ -7,12 +7,11 @@ else
 	NEOSTATSCONF="neostats.conf"
 fi
 
-
 TIME=`date +"%H:%M:%S %Z"`
 DATE=`date +"%a, %b %e %Y"`
-#NEOSTATSCONF="neostats.conf"
 SERVNAME="stats.somenet.net"
 ROOTNICK="NeoStats"
+SERVICEHOST="stats.net"
 SERVNUMERIC="1"
 INFOLINE="NeoStats 3.0 IRC Services"
 LINKPORT="6667"
@@ -250,6 +249,14 @@ if [ ! -z "$cc" ]; then
 fi
 
 echo " "
+echo "What will your service host be? (ie: $SERVICEHOST)"
+echo $n " [$SERVICEHOST] -> $c"
+read cc
+if [ ! -z "$cc" ]; then
+	SERVICEHOST="$cc"
+fi
+
+echo " "
 echo "What will your server name be? (ie: $SERVNAME)"
 echo $n " [$SERVNAME] -> $c"
 read cc
@@ -359,16 +366,6 @@ PROTOCOL "$IRCD"
 #
 #DBM "$DATABASE"
 
-# ROOT_NICK <nick> [REQUIRED]
-#    Specifies the nick of the NeoStats root bot
-#    e.g. 
-#      
-#          ROOT_NICK NeoStats
-#      
-#    When NeoStats links, it create a root bot with nick NeoStats
-
-ROOT_NICK "$ROOTNICK"
-
 # SERVER_NAME <hostname> [REQUIRED]
 #    Specifies the name of the NeoStats Server as it will appear on 
 #    the network. e.g. 
@@ -428,6 +425,27 @@ SERVER_NUMERIC "$SERVNUMERIC"
 # NeoStats Configuration #
 ##########################
 
+# ROOT_NICK <nick> [REQUIRED]
+#    Specifies the nick of the NeoStats root bot
+#    e.g. 
+#      
+#          ROOT_NICK NeoStats
+#      
+#    When NeoStats links, it create a root bot with nick NeoStats
+
+ROOT_NICK "$ROOTNICK"
+
+# SERVICE_HOST <nick> [REQUIRED]
+#    Specifies the default host of NeoStats service bots
+#    e.g. 
+#      
+#          SERVICE_HOST stats.net
+#      
+#    Service bots will now we user@stats.net
+#    If not specified NeoStats will default to the server name
+
+#SERVICE_HOST "$SERVICEHOST"
+
 # SERVICES_CHAN #<channel name> [REQUIRED]
 #    Specify the channel that all bots on NeoStats
 #    will automatically join, and echo out any
@@ -439,16 +457,6 @@ SERVER_NUMERIC "$SERVNUMERIC"
 #    start-up/load.
 
 SERVICES_CHAN $NEOCHAN
-
-# NO_LOAD [YOU MUST REMOVE THIS]
-#    If this is in the neostats.conf your NeoStats WILL NOT START UP. To 
-#    disable this simply comment this line out. e.g.
-#        
-#        NO_LOAD  <- NeoStats will not load.
-#        
-#        #NO_LOAD <- NeoStats will load.
-
-NO_LOAD
 
 # WANT_PRIVMSG [DISCOURAGED]
 #    Specify if the bots should send all messages as privmsgs or as 
@@ -548,6 +556,31 @@ RECONNECT_TIME $NEOCONN
 
 SET_SERVER_TIMES 24
 
+########################################
+# NeoStats ROOT user                   #
+########################################
+
+#SERVICE_ROOT <nick!ident@host> [REQUIRED]
+#    Who should get master access to manage NeoStats regardless of 
+#    authentication systems. Only one entry allowed. e.g.
+#    
+#        SERVICE_ROOT fish!?Fish@*.neostats.net
+#        
+#    Will give "fish" complete access to NeoStats if fish has 
+#    umode +r and comes from the specified hostname and ident. 
+
+#SERVICE_ROOT nick!ident@host
+
+# NO_LOAD [YOU MUST REMOVE THIS]
+#    If this is in the neostats.conf your NeoStats WILL NOT START UP. To 
+#    disable this simply comment this line out. e.g.
+#        
+#        NO_LOAD  <- NeoStats will not load.
+#        
+#        #NO_LOAD <- NeoStats will load.
+
+NO_LOAD
+
 #####################################
 # Module Configurations and Loading #
 #####################################
@@ -607,21 +640,6 @@ SET_SERVER_TIMES 24
 
 # YahzteeServ. You must download and install YahzteeServ first.
 #LOAD_MODULE yahtzeeserv
-
-########################################
-# NeoStats ROOT user                   #
-########################################
-
-#SERVICE_ROOT <nick!ident@host> [REQUIRED]
-#    Who should get master access to manage NeoStats regardless of 
-#    authentication systems. Only one entry allowed. e.g.
-#    
-#        SERVICE_ROOT fish!?Fish@*.neostats.net
-#        
-#    Will give "fish" complete access to NeoStats if fish has 
-#    umode +r and comes from the specified hostname and ident. 
-
-#SERVICE_ROOT nick!ident@host
 
 ###############################################################################
 ## End of Configuration                                                      ##

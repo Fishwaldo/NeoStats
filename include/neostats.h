@@ -564,6 +564,7 @@ typedef struct tme {
 	char infoline[MAXHOST];
 	char netname[MAXPASS];
 	char local[MAXHOST];
+	char servicehost[MAXHOST];
 	int port;
 	int lang;
 	time_t ts_boot;
