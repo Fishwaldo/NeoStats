@@ -533,6 +533,7 @@ int sjoin_cmd (const char *who, const char *chan, unsigned long chflag);
 int sjoin_cmd (const char *who, const char *chan);
 #endif
 int spart_cmd (const char *who, const char *chan);
+int squit_cmd (const char *who, const char *quitmsg);
 int skick_cmd (const char *who, const char *target, const char *chan, const char *reason);
 int sinvite_cmd (const char *from, const char *to, const char *chan);
 int schmode_cmd (const char *who, const char *chan, const char *mode, const char *args);
