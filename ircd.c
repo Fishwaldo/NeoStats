@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.136 2003/08/14 13:14:35 fishwaldo Exp $
+** $Id: ircd.c,v 1.137 2003/08/14 13:23:03 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -225,7 +225,6 @@ void
 parse (char *line)
 {
 	char origin[64], cmd[64], *coreLine;
-	char *nick;
 	int cmdptr = 0;
 	int I = 0;
 	int ac;

@@ -393,6 +393,6 @@ chmod 700 $STATSCONF
 		echo "| **README FILE BEFORE ASKING FOR HELP!!!!!   ** |"
 		echo "*------------------------------------------------*"
 		echo "| This file was updated by M (mark@ctcp.net)     |"
-		echo "*------------------------------------------------*
-                echo ""
+		echo "*------------------------------------------------*"
+                echo 
 		exit 1
