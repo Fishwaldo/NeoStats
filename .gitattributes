@@ -21,7 +21,7 @@
 adns/Makefile -text
 adns/adns.h -text
 adns/check.c -text
-adns/config.h -text
+adns/config.h.in -text
 adns/dlist.h -text
 adns/event.c -text
 adns/general.c -text
