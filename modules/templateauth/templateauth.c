@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: serviceroots.c 1721 2004-04-09 22:17:19Z Mark $
+** $Id$
 */
 
 /** TemplateAuth Module
@@ -40,7 +40,8 @@ const char *template_copyright[] = {
 };
 
 /** Module info */
-ModuleInfo module_info = {
+ModuleInfo module_info = 
+{
 	"TemplateAuth",
 	"Template Authentication Module",
 	template_copyright,
@@ -63,7 +64,7 @@ ModuleInfo module_info = {
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModInit (Module *modptr)
+int ModInit( Module *modptr )
 {
 	return NS_SUCCESS;
 }
@@ -77,7 +78,7 @@ int ModInit (Module *modptr)
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModSynch (void)
+int ModSynch( void )
 {
 	return NS_SUCCESS;
 }
@@ -91,7 +92,7 @@ int ModSynch (void)
  *  @return none
  */
 
-void ModFini (void)
+void ModFini( void )
 {
 }
 
@@ -104,7 +105,7 @@ void ModFini (void)
  *  @return authentication level for user
  */
 
-int ModAuthUser (Client * u)
+int ModAuthUser( Client * u )
 {
 	return 0;
 }

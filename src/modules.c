@@ -131,7 +131,7 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 {
 	SET_SEGV_LOCATION();
 	if (module_ptr->event_list) {
-		if (module_ptr->event_list[event] && module_ptr->event_list[event]->function) {
+		if (module_ptr->event_list[event] && module_ptr->event_list[event]->handler) {
 			/* If we are not yet synched, check that the module supports 
 				* the event before we are synched. */
 			if (!module_ptr->synched && !(module_ptr->event_list[event]->flags & EVENT_FLAG_IGNORE_SYNCH)) {
@@ -160,7 +160,7 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 			SET_SEGV_LOCATION();
 			if (setjmp (sigvbuf) == 0) {
 				SET_RUN_LEVEL(module_ptr);
-				module_ptr->event_list[event]->function (cmdparams);
+				module_ptr->event_list[event]->handler (cmdparams);
 				RESET_RUN_LEVEL();
 			} else {
 				nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s", module_ptr->info->name);

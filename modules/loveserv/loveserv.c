@@ -27,16 +27,16 @@
 #include "loveserv.h"
 
 /** Bot command function prototypes */
-static int ls_rose(CmdParams* cmdparams);
-static int ls_kiss(CmdParams* cmdparams);
-static int ls_tonsil(CmdParams* cmdparams);
-static int ls_hug(CmdParams* cmdparams);
-static int ls_admirer(CmdParams* cmdparams);
-static int ls_chocolate(CmdParams* cmdparams);
-static int ls_candy(CmdParams* cmdparams);
-static int ls_lovenote(CmdParams* cmdparams);
-static int ls_apology(CmdParams* cmdparams);
-static int ls_thankyou(CmdParams* cmdparams);
+static int ls_rose( CmdParams* cmdparams );
+static int ls_kiss( CmdParams* cmdparams );
+static int ls_tonsil( CmdParams* cmdparams );
+static int ls_hug( CmdParams* cmdparams );
+static int ls_admirer( CmdParams* cmdparams );
+static int ls_chocolate( CmdParams* cmdparams );
+static int ls_candy( CmdParams* cmdparams );
+static int ls_lovenote( CmdParams* cmdparams );
+static int ls_apology( CmdParams* cmdparams );
+static int ls_thankyou( CmdParams* cmdparams );
 
 /** Bot pointer */
 static Bot *ls_bot;
@@ -100,7 +100,7 @@ static BotInfo ls_botinfo =
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModInit (Module *mod_ptr)
+int ModInit( Module *mod_ptr )
 {
 	return NS_SUCCESS;
 }
@@ -108,16 +108,18 @@ int ModInit (Module *mod_ptr)
 /** @brief ModSynch
  *
  *  Startup handler
+ *  Introduce bot onto network
  *
  *  @param none
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModSynch (void)
+int ModSynch( void )
 {
-	ls_bot = AddBot (&ls_botinfo);
-	if (!ls_bot) {
+	ls_bot = AddBot( &ls_botinfo );
+	if( !ls_bot ) 
+	{
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
@@ -132,178 +134,278 @@ int ModSynch (void)
  *  @return none
  */
 
-void ModFini (void)
+void ModFini( void )
 {
 }
 
-static int ls_rose(CmdParams* cmdparams)
+/** @brief ls_rose
+ *
+ *  ls_rose
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ls_rose( CmdParams* cmdparams )
 {
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
-	if(!target) {
+	target = FindValidUser( ls_bot, cmdparams->source, cmdparams->av[0] );
+	if( !target ) 
+	{
 		return NS_FAILURE;
 	}
-	irc_prefmsg(ls_bot, cmdparams->source,  
-		"Rose has been sent to %s", target->name);
-	irc_prefmsg(ls_bot, target, 
+	irc_prefmsg( ls_bot, cmdparams->source,  
+		"Rose has been sent to %s", target->name );
+	irc_prefmsg( ls_bot, target, 
 		"%s has sent you this beautiful rose! 3--<--<--<{4@",
-		cmdparams->source->name);
+		cmdparams->source->name );
 	return NS_SUCCESS;
 }
 
-static int ls_kiss(CmdParams* cmdparams)
+/** @brief ls_kiss
+ *
+ *  kiss command handler
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ls_kiss( CmdParams* cmdparams )
 {
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
-	if(!target) {
+	target = FindValidUser( ls_bot, cmdparams->source, cmdparams->av[0] );
+	if( !target ) 
+	{
 		return NS_FAILURE;
 	}
-	irc_prefmsg(ls_bot, cmdparams->source,  
-		"You have virtually kissed %s", target->name);
-	irc_prefmsg(ls_bot, target,  "%s has virtually kissed you!", cmdparams->source->name);
+	irc_prefmsg( ls_bot, cmdparams->source,  
+		"You have virtually kissed %s", target->name );
+	irc_prefmsg( ls_bot, target,  "%s has virtually kissed you!", cmdparams->source->name );
 	return NS_SUCCESS;
 }
 
-static int ls_tonsil(CmdParams* cmdparams)
+/** @brief ls_tonsil
+ *
+ *  tonsil command handler
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ls_tonsil( CmdParams* cmdparams )
 {
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
-	if(!target) {
+	target = FindValidUser( ls_bot, cmdparams->source, cmdparams->av[0] );
+	if( !target ) 
+	{
 		return NS_FAILURE;
 	}
-	irc_prefmsg(ls_bot, cmdparams->source, 
-		"You have virtually tonsil kissed %s", target->name);
-	irc_prefmsg(ls_bot, target, 
+	irc_prefmsg( ls_bot, cmdparams->source, 
+		"You have virtually tonsil kissed %s", target->name );
+	irc_prefmsg( ls_bot, target, 
 		"%s would like to send a SLoW..LoNG..DeeP..PeNeTRaTiNG..ToNSiL-TiCKLiNG.. HaiR STRaiGHTeNiNG..Toe-CuRLiNG..NeRVe-JaNGLiNG..LiFe-aLTeRiNG.. FaNTaSY-CauSiNG..i JuST SaW GoD!..GoSH, DiD MY CLoTHeS FaLL oFF?.. YeS, i'M GLaD i CaMe oN iRC..KiSS oN Da LiPS!!!",
-		cmdparams->source->name);
+		cmdparams->source->name );
 	return NS_SUCCESS;
 }
 
-static int ls_hug(CmdParams* cmdparams)
+/** @brief ls_hug
+ *
+ *  hug command handler
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ls_hug( CmdParams* cmdparams )
 {
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
-	if(!target) {
+	target = FindValidUser( ls_bot, cmdparams->source, cmdparams->av[0] );
+	if( !target ) 
+	{
 		return NS_FAILURE;
 	}
-	irc_prefmsg(ls_bot, cmdparams->source,  
-		"You have hugged %s", target->name);
-	irc_prefmsg(ls_bot, target,  "%s has sent you a *BIG WARM HUG*!", cmdparams->source->name);
+	irc_prefmsg( ls_bot, cmdparams->source,  
+		"You have hugged %s", target->name );
+	irc_prefmsg( ls_bot, target,  "%s has sent you a *BIG WARM HUG*!", cmdparams->source->name );
 	return NS_SUCCESS;
 }
 
-static int ls_admirer(CmdParams* cmdparams)
+/** @brief ls_admirer
+ *
+ *  admirer command handler
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ls_admirer( CmdParams* cmdparams )
 {
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
-	if(!target) {
+	target = FindValidUser( ls_bot, cmdparams->source, cmdparams->av[0] );
+	if( !target ) 
+	{
 		return NS_FAILURE;
 	}
-	irc_prefmsg(ls_bot, cmdparams->source,  
-		"Secret admirer sent to %s", target->name);
-	irc_prefmsg(ls_bot, target,  "You have a secret admirer! ;)");
+	irc_prefmsg( ls_bot, cmdparams->source,  
+		"Secret admirer sent to %s", target->name );
+	irc_prefmsg( ls_bot, target,  "You have a secret admirer! ; )" );
 	return NS_SUCCESS;
 }
 
-static int ls_chocolate(CmdParams* cmdparams)
+/** @brief ls_chocolate
+ *
+ *  chocolate command handler
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ls_chocolate( CmdParams* cmdparams )
 {
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
-	if(!target) {
+	target = FindValidUser( ls_bot, cmdparams->source, cmdparams->av[0] );
+	if( !target ) 
+	{
 		return NS_FAILURE;
 	}
-	irc_prefmsg(ls_bot, cmdparams->source, 
-		"Cholocates sent to %s", target->name);
-	irc_prefmsg(ls_bot, target, 
+	irc_prefmsg( ls_bot, cmdparams->source, 
+		"Cholocates sent to %s", target->name );
+	irc_prefmsg( ls_bot, target, 
 		"%s would like you to have this YUMMY box of chocolates!",
-		cmdparams->source->name);
+		cmdparams->source->name );
 	return NS_SUCCESS;
 }
 
-static int ls_candy(CmdParams* cmdparams)
+/** @brief ls_candy
+ *
+ *  candy command handler
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ls_candy( CmdParams* cmdparams )
 {
 	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
-	if(!target) {
+	target = FindValidUser( ls_bot, cmdparams->source, cmdparams->av[0] );
+	if( !target ) 
+	{
 		return NS_FAILURE;
 	}
-	irc_prefmsg(ls_bot, cmdparams->source, 
-		"Candy sent to %s", target->name);
-	irc_prefmsg(ls_bot, target, 
+	irc_prefmsg( ls_bot, cmdparams->source, 
+		"Candy sent to %s", target->name );
+	irc_prefmsg( ls_bot, target, 
 		"%s would like you to have this big YUMMY bag of heart shaped candies!",
-		cmdparams->source->name);
+		cmdparams->source->name );
 	return NS_SUCCESS;
 }
 
-static int ls_lovenote(CmdParams* cmdparams)
+/** @brief ls_lovenote
+ *
+ *  lovenote command handler
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ls_lovenote( CmdParams* cmdparams )
 {
 	Client *target;
 	char *message;
 
 	SET_SEGV_LOCATION();
-	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
-	if(!target) {
+	target = FindValidUser( ls_bot, cmdparams->source, cmdparams->av[0] );
+	if( !target ) 
+	{
 		return NS_FAILURE;
 	}
-	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
-	irc_prefmsg(ls_bot, cmdparams->source,  
-		"Love note sent to %s", target->name);
-	irc_prefmsg(ls_bot, target, 
+	message = joinbuf( cmdparams->av, cmdparams->ac, 1 );
+	irc_prefmsg( ls_bot, cmdparams->source,  
+		"Love note sent to %s", target->name );
+	irc_prefmsg( ls_bot, target, 
 		"%s has sent you a love note which reads: \2%s\2", 
-		cmdparams->source->name, message);
-	ns_free(message);
+		cmdparams->source->name, message );
+	ns_free( message );
 	return NS_SUCCESS;
 }
 
-static int ls_apology(CmdParams* cmdparams)
+/** @brief ls_apology
+ *
+ *  apology command handler
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ls_apology( CmdParams* cmdparams )
 {
 	Client *target;
 	char *message;
 
 	SET_SEGV_LOCATION();
-	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
-	if(!target) {
+	target = FindValidUser( ls_bot, cmdparams->source, cmdparams->av[0] );
+	if( !target ) 
+	{
 		return NS_FAILURE;
 	}
-	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
-	irc_prefmsg(ls_bot, cmdparams->source,  
-		"Apology sent to %s", target->name);
-	irc_prefmsg(ls_bot, target, 
+	message = joinbuf( cmdparams->av, cmdparams->ac, 1 );
+	irc_prefmsg( ls_bot, cmdparams->source,  
+		"Apology sent to %s", target->name );
+	irc_prefmsg( ls_bot, target, 
 		"%s is sorry, and would like to apologise for \2%s\2",
-		cmdparams->source->name, message);
-	ns_free(message);
+		cmdparams->source->name, message );
+	ns_free( message );
 	return NS_SUCCESS;
 }
 
-static int ls_thankyou(CmdParams* cmdparams)
+/** @brief ls_thankyou
+ *
+ *  thankyou command handler
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ls_thankyou( CmdParams* cmdparams )
 {
 	Client *target;
 	char *message;
 
 	SET_SEGV_LOCATION();
-	target = FindValidUser(ls_bot, cmdparams->source, cmdparams->av[0]);
-	if(!target) {
+	target = FindValidUser( ls_bot, cmdparams->source, cmdparams->av[0] );
+	if( !target ) 
+	{
 		return NS_FAILURE;
 	}
-	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
-	irc_prefmsg(ls_bot, cmdparams->source,  
-		"Thank you sent to %s", target->name);
-	irc_prefmsg(ls_bot, target,  "%s wishes to thank you for \2%s\2",
-		cmdparams->source->name, message);
-	ns_free(message);
+	message = joinbuf( cmdparams->av, cmdparams->ac, 1 );
+	irc_prefmsg( ls_bot, cmdparams->source,  
+		"Thank you sent to %s", target->name );
+	irc_prefmsg( ls_bot, target,  "%s wishes to thank you for \2%s\2",
+		cmdparams->source->name, message );
+	ns_free( message );
 	return NS_SUCCESS;
 }

@@ -772,7 +772,7 @@ typedef struct bot_setting {
 /** @brief Message function types
  * 
  */
-typedef int (*timer_function) ( void );
+typedef int (*timer_handler) ( void );
 
 /** @brief Socket function types
  * 
@@ -795,7 +795,7 @@ typedef void (*after_poll_func) ( void *data, struct pollfd *, unsigned int );
 /** @brief Event function types
  * 
  */
-typedef int (*event_function) ( CmdParams *cmdparams );
+typedef int (*event_handler) ( CmdParams *cmdparams );
 
 /** @brief ModuleEvent functions structure
  * 
@@ -803,7 +803,7 @@ typedef int (*event_function) ( CmdParams *cmdparams );
 
 typedef struct ModuleEvent {
 	Event event;
-	event_function function;
+	event_handler handler;
 	unsigned int flags;
 }ModuleEvent;
 
@@ -961,8 +961,8 @@ typedef struct Timer {
 	int interval;
 	/** Time last run */
 	time_t lastrun;
-	/** Timer function */
-	timer_function function;
+	/** Timer handler */
+	timer_handler handler;
 } Timer;
 
 /** @brief BotInfo structure
@@ -1014,7 +1014,7 @@ typedef struct _Bot {
 EXPORTFUNC int ModuleConfig( bot_setting *bot_settings );
 
 /* Add a new timer callback to NeoStats */
-EXPORTFUNC int AddTimer( TIMER_TYPE type, timer_function func, const char *name, int interval );
+EXPORTFUNC int AddTimer( TIMER_TYPE type, timer_handler handler, const char *name, int interval );
 /* Delete a timer callback from NeoStats */
 EXPORTFUNC int DelTimer( const char *timer_name );
 /* Change timer callback interval counter */

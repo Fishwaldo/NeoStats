@@ -49,9 +49,9 @@ const char* template_copyright[] =
 /** 
  *  Help text for example command
  *  Help text is in two parts:
- *  1) A single line returned in the list when a user requests 
+ *  1 ) A single line returned in the list when a user requests 
  *     /msg help botname
- *  2) Multi-line help text returned when a user requests:
+ *  2 ) Multi-line help text returned when a user requests:
  *     /msg help botname command
  */
 const char template_help_hello_world_oneline[]="Hello world example command";
@@ -90,7 +90,8 @@ const char* template_about[] =
  *  to end users when modules are queried.
  *  The structure is required but some fields are optional.
  */
-ModuleInfo module_info = {
+ModuleInfo module_info = 
+{
 	/* REQUIRED: 
 	 * name of module e.g. StatServ */
 	"Template",
@@ -136,11 +137,11 @@ ModuleInfo module_info = {
  *  example command
  *  Just sends "Hello World!" to the services channel
  */
-static int template_hello_world (CmdParams* cmdparams)
+static int template_hello_world( CmdParams* cmdparams )
 {
 	SET_SEGV_LOCATION();
-	irc_chanalert (template_bot, "%s says \"Hello World!\"",
-		cmdparams->source->name);
+	irc_chanalert( template_bot, "%s says \"Hello World!\"",
+		cmdparams->source->name );
 	return NS_SUCCESS;
 }
 
@@ -170,7 +171,7 @@ static bot_cmd template_commands[]=
 	{NULL,		NULL,					0, 	0,	NULL, 			NULL}
 };
 
-int static example_setting = 0;
+static int example_setting = 0;
 
 /** OPTIONAL:
  *  Table of settings available in our bot
@@ -199,8 +200,8 @@ static bot_setting template_settings[]=
 	example_help_set_example, 
 	/* handler for custom/post-set processing */
 	NULL, 
-	/* default value for setting, must be cast to (void *) */
-	(void*)1 
+	/* default value for setting, must be cast to( void * ) */
+	( void* )1 
 	},
 	/* End setting list with a NULL entry */
 	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
@@ -242,7 +243,8 @@ BotInfo template_bot_info =
  *  This is required if you want your module to respond to events on IRC
  *  see events.h for a list of all events available
  */
-ModuleEvent module_events[] = {
+ModuleEvent module_events[] = 
+{
 	{EVENT_NULL,	NULL}
 };
 
@@ -254,7 +256,7 @@ ModuleEvent module_events[] = {
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
-int ModInit (Module *mod_ptr)
+int ModInit( Module *mod_ptr )
 {
 	return NS_SUCCESS;
 }
@@ -262,17 +264,19 @@ int ModInit (Module *mod_ptr)
 /** @brief ModSynch
  *
  *  Startup handler
+ *  Introduce bot onto network
  *
  *  @param none
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModSynch (void)
+int ModSynch( void )
 {
 	/* Introduce a bot onto the network saving the bot handle */
-	template_bot = AddBot (&template_bot_info);
-	if (!template_bot) {
+	template_bot = AddBot( &template_bot_info );
+	if( !template_bot ) 
+	{
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
@@ -287,7 +291,7 @@ int ModSynch (void)
  *  @return none
  */
 
-void ModFini (void)
+void ModFini( void )
 {
 }
 

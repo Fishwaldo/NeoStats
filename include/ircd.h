@@ -36,7 +36,7 @@ typedef void (*ircd_cmd_handler) (char *origin, char **argv, int argc, int srv);
 typedef struct ircd_cmd{
 	const char *name;
 	const char *token;
-	ircd_cmd_handler function;
+	ircd_cmd_handler handler;
 	unsigned int usage;
 }ircd_cmd;
 

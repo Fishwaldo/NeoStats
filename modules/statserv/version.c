@@ -108,7 +108,7 @@ int ss_cmd_userversion(CmdParams *cmdparams)
 	cn = list_first (versionstatlist);
 	for (i = 0; i < num && cn; i++) {
 		cv = lnode_get (cn);
-		irc_prefmsg (ss_bot, cmdparams->source, "%d) %d ->  %s", i, cv->users.current, cv->name);
+		irc_prefmsg (ss_bot, cmdparams->source, "%d) %d ->  %s", i + 1, cv->users.current, cv->name);
 		cn = list_next (versionstatlist, cn);
 	}
 	irc_prefmsg (ss_bot, cmdparams->source, "End of list.");

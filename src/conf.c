@@ -73,8 +73,7 @@ static config_option options[] = {
  * @returns nothing
  */
 
-int
-ConfLoad(  )
+int ConfLoad( void )
 {
 	/* Read in the Config File */
 	printf( "Reading the Config File. Please wait.....\n" );
@@ -137,8 +136,7 @@ cb_Module( char *arg, int configtype )
  * @bugs if a single module fails to load, it stops trying to load any other modules
  */
 
-int
-ConfLoadModules(  )
+int ConfLoadModules( void )
 {
 	int i;
 

@@ -146,7 +146,7 @@ FindTimer (const char *name)
  *
  * For module use. Adds a timer with the given function to the timer list
  *
- * @param func_name the name of function to register with this timer
+ * @param handler the name of function to register with this timer
  * @param name the name of timer to register
  * @param mod_name the name of module registering the timer
  * @param interval the interval at which the timer triggers in seconds
@@ -154,14 +154,14 @@ FindTimer (const char *name)
  * @return NS_SUCCESS if added, NS_FAILURE if not 
 */
 int
-AddTimer (TIMER_TYPE type, timer_function func_name, const char *name, int interval)
+AddTimer (TIMER_TYPE type, timer_handler handler, const char *name, int interval)
 {
 	Timer *timer;
 	Module* moduleptr;
 
 	SET_SEGV_LOCATION();
 	moduleptr = GET_CUR_MODULE();
-	if (func_name == NULL) {
+	if (handler == NULL) {
 		nlog (LOG_WARNING, "Module %s timer %s does not exist", moduleptr->info->name, name);
 		return NS_FAILURE;
 	}
@@ -175,7 +175,7 @@ AddTimer (TIMER_TYPE type, timer_function func_name, const char *name, int inter
 		timer->interval = interval;
 		timer->lastrun = me.now;
 		timer->moduleptr = moduleptr;
-		timer->function = func_name;
+		timer->handler = handler;
 		dlog (DEBUG2, "AddTimer: Module %s added timer %s", moduleptr->info->name, name);
 		return NS_SUCCESS;
 	}
@@ -348,7 +348,7 @@ run_mod_timers (int ismidnight)
 			if (setjmp (sigvbuf) == 0) {
 				dlog (DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name);
 				SET_RUN_LEVEL (timer->moduleptr);
-				if (timer->function () < 0) {
+				if (timer->handler () < 0) {
 					dlog (DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name);
 					hash_scan_delete (timerhash, tn);
 					hnode_destroy (tn);

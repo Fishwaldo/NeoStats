@@ -434,6 +434,7 @@ int ModInit (Module *mod_ptr)
 /** @brief ModSynch
  *
  *  Startup handler
+ *  Introduce bot onto network
  *
  *  @param none
  *

@@ -25,54 +25,67 @@
 
 #include "neostats.h"
 
-const char *cs_about[] = {
-	"\2ConnectServ\2 tracks users signing on and off the network,",
+const char *cs_about[] = 
+{
+	"\2ConnectServ\2 tracks users joining and leaving the network,",
 	"kills, operator modes, nickname changes, server connects and",
 	"server quits. These events can be reported to the services",
 	"channel and logged.",
 	NULL
 };
 
-const char *cs_help_set_signwatch[] = {
+const char *cs_help_set_signwatch[] = 
+{
 	"SIGNWATCH <ON|OFF>",
-	"Report signon/signoff of users to the services channel.",
+	"Report users joining and leaving the network.",
 	NULL
 };
 
-const char *cs_help_set_exclusions[] = {
+const char *cs_help_set_exclusions[] = 
+{
 	"EXCLUSIONS <ON|OFF>",
-	"Use the global exclusions before displaying reports",
+	"Use the global exclusions before reporting events",
 	NULL
 };
 
-const char *cs_help_set_logging[] = {
+const char *cs_help_set_logging[] = 
+{
 	"LOGGING <ON|OFF>",
-	"Log connectserv reports",
+	"Log connectserv event reports",
 	NULL
 };
 
-const char *cs_help_set_killwatch[] = {
+const char *cs_help_set_killwatch[] = 
+{
 	"KILLWATCH <ON|OFF>",
-	"Report kills to the services channel.",
+	"Report kills.",
 	NULL
 };
-const char *cs_help_set_modewatch[] = {
+
+const char *cs_help_set_modewatch[] = 
+{
 	"MODEWATCH <ON|OFF>",
-	"Report operator mode changes to the services channel.",
+	"Report operator mode changes.",
 	NULL
 };
-const char *cs_help_set_nickwatch[] = {
+
+const char *cs_help_set_nickwatch[] = 
+{
 	"NICKWATCH <ON|OFF>",
-	"Report nick changes to the services channel.",
+	"Report nick changes.",
 	NULL
 };
-const char *cs_help_set_awaywatch[] = {
+
+const char *cs_help_set_awaywatch[] = 
+{
 	"AWAYWATCH <ON|OFF>",
-	"Report away events to the services channel.",
+	"Report away events.",
 	NULL
 };
-const char *cs_help_set_servwatch[] = {
+
+const char *cs_help_set_servwatch[] = 
+{
 	"SERVWATCH <ON|OFF>",
-	"Report server joins and quits to the services channel.",
+	"Report server joins and quits.",
 	NULL
 };

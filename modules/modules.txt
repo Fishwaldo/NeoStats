@@ -158,6 +158,7 @@ where you would init a bot if you wanted one.
 /** @brief ModSynch
  *
  *  Startup handler
+ *  Introduce bot onto network
  *
  *  @param none
  *

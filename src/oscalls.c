@@ -369,7 +369,7 @@ int os_file_get_size( const char* filename )
 			nlog( LOG_CRITICAL, "No such file: %s", filename );
 			return -1;
 		} else {
-			nlog( LOG_CRITICAL, "File error: %s", os_strerror(  ) );
+			nlog( LOG_CRITICAL, "File error: %s", os_strerror() );
 			return -1;
 		}
 	}
