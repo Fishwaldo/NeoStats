@@ -256,6 +256,7 @@ int __ModInit(int modnum, int apiver)
 #ifdef USE_BERKELEY
 	DBOpenDatabase();
 #endif
+	load_client_versions();
 	return 1;
 }
 
@@ -264,7 +265,7 @@ void __ModFini()
 	StatServ.shutdown = 1;
 	SaveStats();
 	fini_tld();
-
+	save_client_versions();
 #if SQLSRV
 	list_destroy_nodes(fakedaily);
 	list_destroy_nodes(fakenetwork);

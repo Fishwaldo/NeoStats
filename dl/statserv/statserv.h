@@ -176,6 +176,8 @@ int toptopics(const void *key1, const void *key2);
 int topversions(const void *key1, const void *key2);
 /* stats.c */
 int s_client_version(char **av, int ac);
+int load_client_versions(void);
+int save_client_versions(void);
 void AddStats(Server *);
 SStats *findstats(char *);
 void SaveStats();

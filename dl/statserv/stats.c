@@ -118,6 +118,44 @@ static CVersions *findversions(char *name)
 	return cv;
 }
 
+int save_client_versions(void)
+{
+	CVersions *cv;
+	lnode_t *cn;
+	FILE* output;
+	
+	output = fopen("data/ssversions.dat", "wb");
+	if(output) {
+		cn = list_first(Vhead);
+		while (cn != NULL) {
+			cv = lnode_get(cn);
+			fwrite(cv, sizeof(CVersions), 1, output);	
+			nlog(LOG_DEBUG2, LOG_MOD, "Save version %s", cv->name);
+			cn = list_next(Vhead, cn);
+		}
+		fclose(output);
+	}
+	return 1;
+}
+
+int load_client_versions(void)
+{
+	lnode_t *node;
+	CVersions *clientv;
+	FILE* input;
+	
+	input = fopen("data/ssversions.dat", "rb");
+	if(input) {
+		clientv = malloc(sizeof(CVersions));
+		fread(clientv, sizeof(CVersions), 1, input);	
+		node = lnode_create(clientv);
+		list_append(Vhead, node);
+		nlog(LOG_DEBUG2, LOG_MOD, "Loaded version %s", clientv->name);
+		fclose(input);
+	}
+	return 1;
+}
+
 int s_client_version(char **av, int ac)
 {
 	lnode_t *node;
