@@ -151,6 +151,7 @@
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
 #define MAXCMDSIZE		15
+#define MAXINFO			128
 
 /* MAXCHANLIST
  * the max length a string can be that holds channel lists 
@@ -294,6 +295,7 @@ typedef struct Server {
 	time_t connected_since;
 	int ping;
 	char uplink[MAXHOST];
+	char infoline[MAXINFO];
 	void *moddata[NUM_MODULES];
 	long flags;
 } Server;

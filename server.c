@@ -57,7 +57,7 @@ new_server (const char *name)
 }
 
 Server *
-AddServer (const char *name, const char *uplink, const int hops)
+AddServer (const char *name, const char *uplink, const int hops, const char *infoline)
 {
 	Server *s;
 	char **av;
@@ -74,10 +74,18 @@ AddServer (const char *name, const char *uplink, const int hops)
 	}
 	s->ping = 0;
 	s->flags = 0;
-	
+	if(infoline) {
+		strlcpy (s->infoline, infoline, MAXINFO);
+	} else {
+		strsetnull (s->infoline);
+	}
+
 	/* run the module event for a new server. */
 	AddStringToList (&av, s->name, &ac);
 	AddStringToList (&av, (char*)uplink, &ac);
+/*	Work in progress
+    AddStringToList (&av, (char*)hops, &ac);
+	AddStringToList (&av, (char*)infoline, &ac);*/
 	ModuleEvent (EVENT_SERVER, av, ac);
 	free (av);
 	return(s);
@@ -215,6 +223,17 @@ COLDEF neo_serverscols[] = {
 		NULL,
 		"The uplink Server this server is connected to. if it = self, means the NeoStats Server"
 	},
+	{	
+		"servers",
+		"infoline",
+		RTA_STR,
+		MAXINFO,
+		offsetof(struct Server, infoline),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"The description of this server"
+	},
 };
 
 TBLDEF neo_servers = {
@@ -239,7 +258,7 @@ init_server_hash (void)
 		nlog (LOG_CRITICAL, LOG_CORE, "Create Server Hash Failed\n");
 		return NS_FAILURE;
 	}
-	AddServer (me.name, NULL, 0);
+	AddServer (me.name, NULL, 0, NULL);
 #ifdef SQLSRV
 	/* add the server hash to the sql library */
 	neo_servers.address = sh;

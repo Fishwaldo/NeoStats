@@ -24,7 +24,7 @@
 #ifndef _SERVER_H_
 #define _SERVER_H_
 
-Server *AddServer (const char *name, const char *uplink, const int hops);
+Server *AddServer (const char *name, const char *uplink, const int hops, const char *infoline);
 void SquitServer(const char *name, const char* reason);
 void ServerDump (void);
 int init_server_hash (void);

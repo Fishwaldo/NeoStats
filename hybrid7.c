@@ -356,7 +356,7 @@ Usr_Credits (char *origin, char **argv, int argc)
 static void
 Usr_Server (char *origin, char **argv, int argc)
 {
-	AddServer (argv[0], origin, atoi (argv[1]));
+	AddServer (argv[0], origin, atoi (argv[1]), NULL);
 }
 
 static void
@@ -485,9 +485,9 @@ static void
 Srv_Server (char *origin, char **argv, int argc)
 {
 	if (*origin == 0) {
-		me.s = AddServer (argv[0], me.name, atoi (argv[1]));
+		me.s = AddServer (argv[0], me.name, atoi (argv[1]), NULL);
 	} else {
-		me.s = AddServer (argv[0], origin, atoi (argv[1]));
+		me.s = AddServer (argv[0], origin, atoi (argv[1]), NULL);
 	}
 }
 
