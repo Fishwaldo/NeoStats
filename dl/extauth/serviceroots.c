@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: serviceroots.c,v 1.5 2002/09/04 08:40:27 fishwaldo Exp $
+** $Id: serviceroots.c,v 1.6 2002/11/19 11:09:40 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -98,7 +98,8 @@ void _fini() {
 void sr_cb_config(char *arg, int configtype) {
 	lnode_t *un;
 	char *nick;
-	nick = malloc(strlen(arg));
+	nick = malloc(strlen(arg)+1);
+	bzero(nick, strlen(arg)+1);
 	strcpy(segv_location, "StatServ-ss_cb_Config");
 	if (configtype == 0) {
 		if (list_isfull(srconf.ul)) {
@@ -130,7 +131,7 @@ extern int __do_auth(User *u, int curlvl) {
 		while (un) {
 			if (!strcasecmp(u->nick, lnode_get(un))) {
 				if (srconf.auth == 1) {
-					return (1200);
+					return (0);
 				} else {
 					return (200);
 				}

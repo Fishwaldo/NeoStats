@@ -18,6 +18,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fixed up NeoIRCd protocol support for hostserv etc
  - updated some of the modules to work with NeoIRCd
  - ./configure --enable-raw to enable raw command now as it was tending to be abused
+ - Fixed a Serviceroots buffer overflow
 
 * NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 1
  - Fixed problem where NeoStats (Or the bots) were not signing onto the network with Hyrbid7 IRCD (F)
