@@ -124,21 +124,21 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now) {
 		assert(!ads->tcprecv_skip);
 
 		proto = getprotobyname("tcp");
-    if (!proto) { adns__diag(ads,-1,0,"unable to find protocol no. for TCP !"); return; }
-	ADNS_CLEAR_ERRNO
+		if (!proto) 
+		{ 
+			adns__diag(ads,-1,0,"unable to find protocol no. for TCP !"); 
+			return; 
+		}
+		ADNS_CLEAR_ERRNO;
 		fd = socket(AF_INET, SOCK_STREAM, proto->p_proto);
-	ADNS_CAPTURE_ERRNO;
+		ADNS_CAPTURE_ERRNO;
 		if (fd < 0) {
-			adns__diag(ads, -1, 0,
-				   "cannot create TCP socket: %s",
-				   strerror(errno));
+			adns__diag(ads, -1, 0, "cannot create TCP socket: %s", strerror(errno));
 			return;
 		}
-		r = adns__setnonblock(ads, fd);
-		if (r) {
-			adns__diag(ads, -1, 0,
-				   "cannot make TCP socket nonblocking: %s",
-				   strerror(r));
+		if( os_sock_set_nonblocking( fd ) < 0 )
+		{
+			adns__diag(ads, -1, 0, "cannot make TCP socket nonblocking: %s", strerror(r));
 			os_sock_close(fd);
 			return;
 		}
@@ -146,9 +146,9 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now) {
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(DNS_PORT);
 		addr.sin_addr = ads->servers[ads->tcpserver].addr;
-    ADNS_CLEAR_ERRNO;
-    r= connect(fd,(const struct sockaddr*)&addr,sizeof(addr));
-    ADNS_CAPTURE_ERRNO;
+		ADNS_CLEAR_ERRNO;
+		r= connect(fd,(const struct sockaddr*)&addr,sizeof(addr));
+		ADNS_CAPTURE_ERRNO;
 		ads->tcpsocket = fd;
 		ads->tcpstate = server_connecting;
 		if (r == 0) {

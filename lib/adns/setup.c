@@ -557,36 +557,11 @@ static void readconfigenvtext(adns_state ads, const char *envvar)
 }
 
 
-int adns__setnonblock(adns_state ads, OS_SOCKET fd) {
-#ifdef WIN32
-   unsigned long Val = 1;
-   return (ioctlsocket (fd, FIONBIO, &Val) == 0) ? 0 : -1;
-#else
-	int r;
-
-	r = fcntl(fd, F_GETFL, 0);
-	if (r < 0)
-		return errno;
-	r |= O_NONBLOCK;
-	r = fcntl(fd, F_SETFL, r);
-	if (r < 0)
-		return errno;
-	return 0;
-#endif
-}
-
-static int init_begin(adns_state * ads_r, adns_initflags flags,
-		      FILE * diagfile)
+static int init_begin(adns_state * ads_r, adns_initflags flags, FILE * diagfile)
 {
 	adns_state ads;
 
-#ifdef WIN32  
-  WORD wVersionRequested = MAKEWORD( 2, 0 );
-  WSADATA wsaData;
-  int err;
-#endif
-    
-  ads= ns_malloc(sizeof(*ads)); if (!ads) return errno;
+	ads= ns_malloc(sizeof(*ads)); if (!ads) return errno;
 
 	ads->iflags = flags;
 	ads->diagfile = diagfile;
@@ -602,30 +577,13 @@ static int init_begin(adns_state * ads_r, adns_initflags flags,
 	adns__vbuf_init(&ads->tcprecv);
 	ads->tcprecv_skip = 0;
 	ads->nservers = ads->nsortlist = ads->nsearchlist =
-	    ads->tcpserver = 0;
+	ads->tcpserver = 0;
 	ads->searchndots = 1;
 	ads->tcpstate = server_disconnected;
 	timerclear(&ads->tcptimeout);
 	ads->searchlist = 0;
 
- #ifdef WIN32 
-  err= WSAStartup( wVersionRequested, &wsaData );
-  if ( err != 0 ) {
-    if (ads->diagfile && ads->iflags & adns_if_debug)
-      fprintf(ads->diagfile,"adns: WSAStartup() failed. \n");
-    return -1;}
-  if (LOBYTE( wsaData.wVersion ) != 2 ||
-    HIBYTE( wsaData.wVersion ) != 0 ) {
-    if (ads->diagfile && ads->iflags & adns_if_debug)
-      fprintf(ads->diagfile,"adns: Need Winsock 2.0 or better!\n");
-    
-    WSACleanup();
-    return -1;}
-  
-  /* The WinSock DLL is acceptable. Proceed. */
-#endif
-
-	*ads_r = ads;
+ 	*ads_r = ads;
 	return 0;
 }
 
@@ -637,8 +595,7 @@ static int init_finish(adns_state ads)
 
 	if (!ads->nservers) {
 		if (ads->diagfile && ads->iflags & adns_if_debug)
-			fprintf(ads->diagfile,
-				"adns: no nameservers, using localhost\n");
+			fprintf(ads->diagfile, "adns: no nameservers, using localhost\n");
 		ia.s_addr = htonl(INADDR_LOOPBACK);
 		addserver(ads, ia);
 	}
@@ -656,37 +613,29 @@ static int init_finish(adns_state ads)
 		goto x_free;
 	}
 
-	r = adns__setnonblock(ads, ads->udpsocket);
-	if (r) {
+	if( os_sock_set_nonblocking( ads->udpsocket ) < 0 )
+	{
 		r = errno;
-		goto x_closeudp;
+		os_sock_close(ads->udpsocket);
+		goto x_free;
 	}
     if (ads->fdfunc)
-      ads->fdfunc(ads->udpsocket, POLLIN);
-/* EVNT read */
+		ads->fdfunc(ads->udpsocket, POLLIN);
+	/* EVNT read */
 	return 0;
-
-      x_closeudp:
-  os_sock_close(ads->udpsocket);
-      x_free:
-  ns_free(ads);
-#ifdef WIN32
-  WSACleanup();
-#endif /* WIN32 */
+	
+x_free:
+	ns_free(ads);
 	return r;
 }
 
 static void init_abort(adns_state ads)
 {
 	if (ads->nsearchlist) {
-    ns_free(ads->searchlist[0]);
-    ns_free(ads->searchlist);
+		ns_free(ads->searchlist[0]);
+		ns_free(ads->searchlist);
 	}
-  ns_free(ads);
-#ifdef WIN32
-  WSACleanup();
-#endif /* WIN32 */
-
+	ns_free(ads);
 }
 
 int adns_init(adns_state * ads_r, adns_initflags flags, FILE * diagfile, fd_update func)
@@ -695,15 +644,15 @@ int adns_init(adns_state * ads_r, adns_initflags flags, FILE * diagfile, fd_upda
 	const char *res_options, *adns_res_options;
 	int r;
 #ifdef WIN32
-  #define SECURE_PATH_LEN (MAX_PATH - 64)
-  char PathBuf[MAX_PATH];
-  struct in_addr addr;
-  #define ADNS_PFIXED_INFO_BLEN (2048)
-  PFIXED_INFO network_info = (PFIXED_INFO)alloca(ADNS_PFIXED_INFO_BLEN);
-  ULONG network_info_blen = ADNS_PFIXED_INFO_BLEN;
-  DWORD network_info_result;
-  PIP_ADDR_STRING pip;
-  const char *network_err_str = "";
+	#define SECURE_PATH_LEN (MAX_PATH - 64)
+	char PathBuf[MAX_PATH];
+	struct in_addr addr;
+	#define ADNS_PFIXED_INFO_BLEN (2048)
+	PFIXED_INFO network_info = (PFIXED_INFO)alloca(ADNS_PFIXED_INFO_BLEN);
+	ULONG network_info_blen = ADNS_PFIXED_INFO_BLEN;
+	DWORD network_info_result;
+	PIP_ADDR_STRING pip;
+	const char *network_err_str = "";
 #endif
 
 	r = init_begin(&ads, flags, diagfile ? diagfile : stderr);
@@ -716,35 +665,47 @@ int adns_init(adns_state * ads_r, adns_initflags flags, FILE * diagfile, fd_upda
 	ccf_options(ads, "ADNS_RES_OPTIONS", -1, adns_res_options);
 
 #ifdef WIN32
-  GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
-  strcat(PathBuf,"\\resolv.conf");
-  readconfig(ads,PathBuf,1);
-  GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
-  strcat(PathBuf,"\\resolv-adns.conf");
-  readconfig(ads,PathBuf,0);
-  GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
-  strcat(PathBuf,"\\System32\\Drivers\\etc\\resolv.conf");
-  readconfig(ads,PathBuf,1);
-  GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
-  strcat(PathBuf,"\\System32\\Drivers\\etc\\resolv-adns.conf");
-  readconfig(ads,PathBuf,0);
-  network_info_result = GetNetworkParams(network_info, &network_info_blen);
-  if (network_info_result != ERROR_SUCCESS){
-    switch(network_info_result) {
-    case ERROR_BUFFER_OVERFLOW: network_err_str = "ERROR_BUFFER_OVERFLOW"; break;
-    case ERROR_INVALID_PARAMETER: network_err_str = "ERROR_INVALID_PARAMETER"; break;
-    case ERROR_NO_DATA: network_err_str = "ERROR_NO_DATA"; break;
-    case ERROR_NOT_SUPPORTED: network_err_str = "ERROR_NOT_SUPPORTED"; break;}
-    adns__diag(ads,-1,0,"GetNetworkParams() failed with error [%d] %s",
-      network_info_result,network_err_str);
-    }
-  else {
-    for(pip = &(network_info->DnsServerList); pip; pip = pip->Next) {
-      addr.s_addr = inet_addr(pip->IpAddress.String);
-      if ((addr.s_addr != INADDR_ANY) && (addr.s_addr != INADDR_NONE))
-        addserver(ads, addr); 
-    }
-  }
+	GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
+	strcat(PathBuf,"\\resolv.conf");
+	readconfig(ads,PathBuf,1);
+	GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
+	strcat(PathBuf,"\\resolv-adns.conf");
+	readconfig(ads,PathBuf,0);
+	GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
+	strcat(PathBuf,"\\System32\\Drivers\\etc\\resolv.conf");
+	readconfig(ads,PathBuf,1);
+	GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
+	strcat(PathBuf,"\\System32\\Drivers\\etc\\resolv-adns.conf");
+	readconfig(ads,PathBuf,0);
+	network_info_result = GetNetworkParams(network_info, &network_info_blen);
+	if (network_info_result != ERROR_SUCCESS)
+	{
+		switch(network_info_result) 
+		{
+			case ERROR_BUFFER_OVERFLOW: 
+				network_err_str = "ERROR_BUFFER_OVERFLOW"; 
+				break;
+			case ERROR_INVALID_PARAMETER: 
+				network_err_str = "ERROR_INVALID_PARAMETER"; 
+				break;
+			case ERROR_NO_DATA: 
+				network_err_str = "ERROR_NO_DATA"; 
+				break;
+			case ERROR_NOT_SUPPORTED: 
+				network_err_str = "ERROR_NOT_SUPPORTED"; 
+				break;
+		}
+		adns__diag(ads,-1,0,"GetNetworkParams() failed with error [%d] %s", network_info_result,network_err_str);
+	}
+	else 
+	{
+		for(pip = &(network_info->DnsServerList); pip; pip = pip->Next) 
+		{
+			addr.s_addr = inet_addr(pip->IpAddress.String);
+			if ((addr.s_addr != INADDR_ANY) && (addr.s_addr != INADDR_NONE))
+				addserver(ads, addr); 
+		}
+	}
 #else
 	readconfig(ads, "/etc/resolv.conf", 1);
 	readconfig(ads, "/etc/resolv-adns.conf", 0);
@@ -759,10 +720,8 @@ int adns_init(adns_state * ads_r, adns_initflags flags, FILE * diagfile, fd_upda
 	ccf_options(ads, "RES_OPTIONS", -1, res_options);
 	ccf_options(ads, "ADNS_RES_OPTIONS", -1, adns_res_options);
 
-	ccf_search(ads, "LOCALDOMAIN", -1,
-		   instrum_getenv(ads, "LOCALDOMAIN"));
-	ccf_search(ads, "ADNS_LOCALDOMAIN", -1,
-		   instrum_getenv(ads, "ADNS_LOCALDOMAIN"));
+	ccf_search(ads, "LOCALDOMAIN", -1, instrum_getenv(ads, "LOCALDOMAIN"));
+	ccf_search(ads, "ADNS_LOCALDOMAIN", -1, instrum_getenv(ads, "ADNS_LOCALDOMAIN"));
 
 	if (ads->configerrno && ads->configerrno != EINVAL) {
 		r = ads->configerrno;
@@ -835,9 +794,6 @@ void adns_finish(adns_state ads)
 	adns__vbuf_free(&ads->tcprecv);
 	freesearchlist(ads);
   ns_free(ads);
-#ifdef WIN32
-  WSACleanup();
-#endif /* WIN32 */
 
 }
 

@@ -344,10 +344,6 @@ struct adns__state {
 	char **searchlist;
 };
 
-/* From setup.c: */
-
-int adns__setnonblock(adns_state ads, OS_SOCKET fd); /* => errno value */
-
 /* From general.c: */
 
 void adns__vdiag(adns_state ads, const char *pfx, adns_initflags prevent,
