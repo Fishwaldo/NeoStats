@@ -50,16 +50,10 @@ example basic module layout in template/template.c. We will use that
 file in our disucssion of how to setup the module.
 
 -----------------------------------<>-----------------------------------
-First we must include some files which give our code access to the 
-NeoStats APIs:
+First we must include the header file which gives our code access to the 
+NeoStats API:
 
-#include "dl.h"
-#include "stats.h"
-
-"dl.h" is required since it defines the Module API.
-"stats.h" is recommended if you want to use some of the internal 
-functions of NeoStats. If your module is going to have a Bot in it,
-then it is required.
+#include "neostats.h"
 
 Next we have to export a definition which include specific information
 about our module. This is required.
