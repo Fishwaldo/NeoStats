@@ -66,7 +66,7 @@ const char *ss_myuser_help[] = {
 	NULL
 };
 
-const char *ss_help_about[] = {
+const char *ss_about_help[] = {
 	"\2StatServ\2 provides detailed statistics about your",
 	"IRC network users, channels and servers.",
 	NULL
