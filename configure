@@ -1283,7 +1283,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 PACKAGE=NeoStats
 MAJOR=2
 MINOR=5
-REV=15
+REV=16
 cat >>confdefs.h <<_ACEOF
 #define MAJOR $MAJOR
 _ACEOF
