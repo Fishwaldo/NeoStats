@@ -137,45 +137,24 @@
 #define MSG_LAG         "LAG"           /* LAG */
 #define MSG_LAGTEST     "LAGTEST"       /* LAGTEST */
 
-/* Umode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_ADMIN 'A'
-#define UMODE_CH_NETADMIN 'N'
-#define UMODE_CH_TECHADMIN 'T'
-#define UMODE_CH_SADMIN 'a'
-#define UMODE_CH_BOT 'B'
-
 /* Umodes */
-#define UMODE_SERVNOTICE     0x00010	/* umode +s - Server notices */
-#define UMODE_CLIENT     0x4000000	/* umode +c - Client connections/exits */
-#define UMODE_KILLS     0x00080	/* umode +k - Server kill messages */
-#define UMODE_FLOOD     0x00100	/* umode +f - Server flood messages */
-#define UMODE_SPY     0x00200	/* umode +y - Stats/links */
-#define UMODE_DEBUG     0x00400	/* umode +d - Debug info */
-#define UMODE_GLOBOPS     0x00800	/* umode +g - Globops */
-#define UMODE_CHATOPS     0x01000	/* umode +b - Chatops */
-#define UMODE_SADMIN     0x02000	/* umode +a - Services Admin */
-#define UMODE_ADMIN     0x04000     /* umode +A - Server Admin */
-#define UMODE_ROUTE     0x08000	/* umode +n - Routing Notices */
-#define UMODE_HELPOP     0x10000     /* umode +h - Helper */
-#define UMODE_SPAM     0x20000     /* umode +m - spambot notices */
-#define UMODE_RGSTRONLY     0x40000     /* unmode +R - No non registered msgs */
-#define UMODE_OPERNOTICE     0x80000    /* umode +e - oper notices for the above +D */
-#define UMODE_SQUELCH     0x100000    /* umode +x - Squelch with notice */
-#define UMODE_BOT     0x200000    /* umode +B - Bot Flag */
-#define UMODE_HIDDENDCC     0x400000    /* umode +D - Hidden dccallow umode */
-#define UMODE_THROTTLE     0x800000   /* umode +F - no cptr->since message rate throttle */
-#define UMODE_REJ	    0x1000000   /* umode +j - client rejection notices */
-#define UMODE_ULINEKILL     0x2000000   /* umode +K - U: lined server kill messages */
-#define UMODE_NETADMIN	    0x8000000   /* Network Administrator */
-#define UMODE_TECHADMIN     0x10000000  /* Technical Administrator */
-#define UMODE_CODER     0x20000000  /* */
-#define UMODE_KIX	    0x40000000  /* Protection Flag */
-#define UMODE_WHOIS	    0x80000000  /* whois */
-
-/* Smodes */
-#define SMODE_SSL              0x1  /* */
+#define UMODE_SERVNOTICE    0x00008000	/* umode +s - Server notices */
+#define UMODE_KILLS			0x00010000	/* umode +k - Server kill messages */
+#define UMODE_FLOOD			0x00020000	/* umode +f - Server flood messages */
+#define UMODE_SPY			0x00040000	/* umode +y - Stats/links */
+#define UMODE_DEBUG			0x00080000	/* umode +d - Debug info */
+#define UMODE_GLOBOPS		0x00100000	/* umode +g - Globops */
+#define UMODE_CHATOPS		0x00200000	/* umode +b - Chatops */
+#define UMODE_ROUTE			0x00400000	/* umode +n - Routing Notices */
+#define UMODE_SPAM			0x00800000	/* umode +m - spambot notices */
+#define UMODE_OPERNOTICE    0x01000000	/* umode +e - oper notices for the above +D */
+#define UMODE_SQUELCH		0x02000000	/* umode +x - Squelch with notice */
+#define UMODE_HIDDENDCC     0x04000000	/* umode +D - Hidden dccallow umode */
+#define UMODE_THROTTLE		0x08000000	/* umode +F - no cptr->since message rate throttle */
+#define UMODE_REJ			0x10000000	/* umode +j - client rejection notices */
+#define UMODE_ULINEKILL     0x20000000	/* umode +K - U: lined server kill messages */
+#define UMODE_CODER			0x40000000	/* */
+#define UMODE_WHOIS			0x80000000	/* whois */
 
 /* Cmodes */
 #define CMODE_UOP			0x02000000

@@ -131,29 +131,9 @@
 #define MSG_OPERMOTD    "OPERMOTD"	/* OPERMOTD */
 #define MSG_MAKEPASS	"MAKEPASS"	/* MAKEPASS */
 
-
-/* Umode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_ADMIN 'A'
-#define UMODE_CH_COADMIN 'C'
-#define UMODE_CH_NETADMIN 'N'
-#define UMODE_CH_TECHADMIN 'T'
-#define UMODE_CH_SADMIN 'a'
-#define UMODE_CH_SERVICES 'S'
-#define UMODE_CH_BOT 'B'
-
 /* Umodes */
-#define UMODE_RGSTRONLY		0x00000080 /* only registered nicks may PM */
-#define UMODE_ADMIN			0x00000100 /* server admin */
-#define UMODE_SADMIN		0x00000200 /* Marks the client as a Services Administrator */
-#define UMODE_HELPOP	 	0x00000400 /* Help system operator */
-#define UMODE_ALTADMIN	 	0x00000800 /* Admin */
-#define UMODE_NETADMIN  	0x00001000 /* Network Admin */
-#define UMODE_TECHADMIN		0x00002000 /* Marks the client as a Technical Admin */
-#define UMODE_WHOIS    		0x00004000 /* Lets Opers see when people do a /WhoIs on them */
-#define UMODE_CLIENT	 	0x00008000 /* Show client information */
-#define UMODE_GLOBCON		0x00010000 /* Global Connect notices */
+#define UMODE_ALTADMIN	 	0x40000000 /* Admin */
+#define UMODE_WHOIS    		0x80000000 /* Lets Opers see when people do a /WhoIs on them */
 
 /* Cmodes */
 

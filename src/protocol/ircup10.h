@@ -194,24 +194,17 @@
 #define MSG_PRIVS		"PRIVS"		/* PRIV */
 #define TOK_PRIVS		"PRIVS"
 
-/* Umode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-
  /* User modes: */
-#define UMODE_SERVNOTICE        0x2000	/* See server notices */
-#define UMODE_CHSERV            0x0040	/* Unkickable/-o able */
-#define UMODE_DEBUG             0x0080	/* See hack notices */
-#define UMODE_ACCOUNT			0x1000	/* */
-#ifdef NEFARIOUS
-#define UMODE_BOT				0x4000	/* */
-#endif
+#define UMODE_SERVNOTICE        0x00800000	/* See server notices */
+#define UMODE_CHSERV            0x01000000	/* Unkickable/-o able */
+#define UMODE_DEBUG             0x02000000	/* See hack notices */
+#define UMODE_ACCOUNT			0x04000000	/* */
 #if ( defined NEFARIOUS ) || (defined ASUKA )
-#define UMODE_SETHOST			0x8000	/* */
-#define UMODE_ACCOUNTONLY		0x10000	/* */
-#define UMODE_XTRAOP			0x20000	/* */
-#define UMODE_NOCHAN			0x40000	/* */
-#define UMODE_NOIDLE			0x80000	/* */
+#define UMODE_SETHOST			0x08000000	/* */
+#define UMODE_ACCOUNTONLY		0x10000000	/* */
+#define UMODE_XTRAOP			0x20000000	/* */
+#define UMODE_NOCHAN			0x40000000	/* */
+#define UMODE_NOIDLE			0x80000000	/* */
 #endif
 
 /* Cmodes */

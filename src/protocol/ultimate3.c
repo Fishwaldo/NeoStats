@@ -188,11 +188,11 @@ umode_init user_umodes[] = {
 
 umode_init user_smodes[] = {
 	{'N', SMODE_NETADMIN},
-	{'n', SMODE_CONET},
+	{'n', SMODE_CONETADMIN},
 	{'T', SMODE_TECHADMIN},
-	{'t', SMODE_COTECH},
-	{'A', SMODE_SERVADMIN},
-	{'G', SMODE_GUEST},
+	{'t', SMODE_COTECHADMIN},
+	{'A', SMODE_ADMIN},
+	{'G', SMODE_GUESTADMIN},
 	{'a', SMODE_COADMIN},
 	{'s', SMODE_SSL},
 	{0, 0},

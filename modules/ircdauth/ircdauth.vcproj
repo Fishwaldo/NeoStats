@@ -33,7 +33,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="neostats.lib"
-				OutputFile="$(OutDir)/ircdauth.dll"
+				OutputFile="../ircdauthd.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\src\Debug"
 				GenerateDebugInformation="TRUE"
@@ -82,7 +82,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="neostats.lib"
-				OutputFile="$(OutDir)/ircdauth.dll"
+				OutputFile="../ircdauth.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\src\Release"
 				GenerateDebugInformation="TRUE"

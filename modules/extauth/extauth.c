@@ -84,7 +84,9 @@ static int LoadAccessList(void)
 				}
 			}
 		}
-		free(data);
+		if(*data) {
+			free(data);
+		}
 	}	
 	return 1;
 }
@@ -234,7 +236,7 @@ static int ea_event_mode(CmdParams* cmdparams)
 		return -1;
 
 	/* first, find if its a regnick mode */
-	modes = cmdparams->av[1];
+	modes = cmdparams->param;
 	while (*modes) {
 		switch (*modes) {
 		case '+':

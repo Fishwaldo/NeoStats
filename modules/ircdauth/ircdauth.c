@@ -70,9 +70,7 @@ UserAuthModes user_auth_modes[] = {
 #ifdef UMODE_DEBUG
 	{"Debug",			UMODE_DEBUG, NS_ULEVEL_ROOT},
 #endif
-#ifdef UMODE_TECHADMIN
 	{"Technical admin",	UMODE_TECHADMIN, NS_ULEVEL_ADMIN},
-#endif
 #ifdef UMODE_SERVICESOPER
 	{"Services operator",	UMODE_SERVICESOPER, NS_ULEVEL_OPER},
 #endif
@@ -85,54 +83,26 @@ UserAuthModes user_auth_modes[] = {
 #ifdef UMODE_SRA
 	{"Services root",	UMODE_SRA, NS_ULEVEL_ROOT},
 #endif
-#ifdef UMODE_SERVICES
 	{"Services",		UMODE_SERVICES,	NS_ULEVEL_ROOT},
-#endif
-#ifdef UMODE_NETADMIN
 	{"Network admin",	UMODE_NETADMIN,	NS_ULEVEL_ADMIN},
-#endif
-#ifdef UMODE_SADMIN
 	{"Services admin",	UMODE_SADMIN,	NS_ULEVEL_ADMIN},
-#endif
-#ifdef UMODE_ADMIN
 	{"Server admin",	UMODE_ADMIN,	NS_ULEVEL_OPER},
-#endif
-#ifdef UMODE_COADMIN
 	{"Co-admin",		UMODE_COADMIN,	NS_ULEVEL_OPER},
-#endif
-#ifdef UMODE_OPER
 	{"IRC operator",	UMODE_OPER,		NS_ULEVEL_OPER},
-#endif
-#ifdef UMODE_LOCOP
 	{"Local operator",	UMODE_LOCOP,	NS_ULEVEL_LOCOPER},
-#endif
 	{"Registered nick",	UMODE_REGNICK,	NS_ULEVEL_REG},
 };
 
 const int user_auth_mode_count = ((sizeof (user_auth_modes) / sizeof (user_auth_modes[0])));
 
 UserAuthModes user_auth_smodes[] = {
-#ifdef SMODE_NETADMIN
-	{"Network admin",	SMODE_NETADMIN, 190},
-#endif
-#ifdef SMODE_CONET
-	{"Co-netadmin",		SMODE_CONET, 175},
-#endif
-#ifdef SMODE_TECHADMIN
-	{"Technical admin",	SMODE_TECHADMIN, 150},
-#endif
-#ifdef SMODE_COTECH
-	{"Co-techadmin",	SMODE_COTECH, 125},
-#endif
-#ifdef SMODE_SERVADMIN
-	{"Server admin",	SMODE_SERVADMIN, 100},
-#endif
-#ifdef SMODE_GUEST
-	{"Guest admin",		SMODE_GUEST, 100},
-#endif
-#ifdef SMODE_COADMIN
-	{"Co-admin",		SMODE_COADMIN, 75},
-#endif
+	{"Network admin",	SMODE_NETADMIN,		NS_ULEVEL_ADMIN},
+	{"Co-netadmin",		SMODE_CONETADMIN,		175},
+	{"Technical admin",	SMODE_TECHADMIN,	150},
+	{"Co-techadmin",	SMODE_COTECHADMIN,		125},
+	{"Server admin",	SMODE_ADMIN,	100},
+	{"Guest admin",		SMODE_GUESTADMIN,	100},
+	{"Co-admin",		SMODE_COADMIN,		NS_ULEVEL_OPER},
 	0
 };
 

@@ -313,53 +313,24 @@
 #define MSG_CLIENT	"CLIENT"
 #define MSG_SMODE	"SMODE"
 
-/* IRCD Specific mode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_SADMIN 'a'
-#define UMODE_CH_SERVICES 'S'
-
-/* Smode chars */
-#define SMODE_CH_GUESTADMIN 'G'
-#define SMODE_CH_COADMIN 'J'
-#define SMODE_CH_ADMIN 'A'
-#define SMODE_CH_CONETADMIN 'n'
-#define SMODE_CH_NETADMIN 'N'
-#define SMODE_CH_COTECHADMIN 't'
-#define SMODE_CH_TECHADMIN 'T'		/* Set to a number as we dont use */
-
 /* Umodes */
-#define UMODE_SERVNOTICE     	0x00000010	/* umode +s - Server notices */
-#define UMODE_CLIENT     	0x00000020	/* umode +c - Client connections/exits */
-#define UMODE_KILLS     	0x00000080	/* umode +k - Server kill messages */
-#define UMODE_FLOOD     	0x00000100	/* umode +f - Server flood messages */
-#define UMODE_SPY		0x00000200	/* umode +y - Stats/links */
-#define UMODE_DCC     	0x00000400	/* umode +D - pseudo/hidden, has seen dcc warning message */
-#define UMODE_GLOBOPS     	0x00001000	/* umode +g - Globops */
-#define UMODE_CHATOPS     	0x00002000	/* umode +C - Chatops */
-#define UMODE_SERVICESOPER     	0x00004000	/* umode +a - Services Operator - Should be moved to smode */
-#define UMODE_REJ		0x00008000	/* umode +j - Reject notices */
-#define UMODE_ROUTE     	0x00010000	/* umode +n - Routing Notices */
-#define UMODE_HELPOP     	0x00020000	/* umode +h - Helper */
-#define UMODE_SPAM     	0x00040000	/* umode +m - spambot notices */
-#define UMODE_SRA		0x01000000	/* umode +Z - Services Root Admin - Should be moved to smode */
-#define UMODE_SADMIN		0x02000000	/* umode +P - Services Admin - Should be moved to smode */
-#define UMODE_SERVICES		0x04000000	/* umode +S - Services Client - Should be moved to smode if possible without breaking services compat */
-#define UMODE_KIX		0x08000000	/* umode +p - Protected Oper */
-#define UMODE_FCLIENT		0x10000000	/* umode +F - Global client connections/exits */
-#define UMODE_DEBUG		0x20000000	/* umode +d - Debug Info */
+#define UMODE_SERVNOTICE    0x00020000	/* umode +s - Server notices */
+#define UMODE_KILLS     	0x00040000	/* umode +k - Server kill messages */
+#define UMODE_FLOOD     	0x00080000	/* umode +f - Server flood messages */
+#define UMODE_SPY			0x00100000	/* umode +y - Stats/links */
+#define UMODE_DCC     		0x00200000	/* umode +D - pseudo/hidden, has seen dcc warning message */
+#define UMODE_GLOBOPS     	0x00400000	/* umode +g - Globops */
+#define UMODE_CHATOPS     	0x00800000	/* umode +C - Chatops */
+#define UMODE_SERVICESOPER  0x01000000	/* umode +a - Services Operator - Should be moved to smode */
+#define UMODE_REJ			0x02000000	/* umode +j - Reject notices */
+#define UMODE_ROUTE     	0x04000000	/* umode +n - Routing Notices */
+#define UMODE_SPAM     		0x08000000	/* umode +m - spambot notices */
+#define UMODE_SRA			0x10000000	/* umode +Z - Services Root Admin - Should be moved to smode */
+#define UMODE_DEBUG			0x20000000	/* umode +d - Debug Info */
 #define UMODE_DCCWARN		0x40000000	/* umode +e - See DCC send warnings */
-#define UMODE_WHOIS		0x80000000	/* umode +W - Opers can see when a user /whois's them */
+#define UMODE_WHOIS			0x80000000	/* umode +W - Opers can see when a user /whois's them */
 
 /* Smodes */
-#define SMODE_SSL		0x1	/* ssl client */
-#define SMODE_COADMIN		0x2	/* co admin on a server */
-#define SMODE_SERVADMIN		0x4	/* server admin */
-#define SMODE_COTECH		0x8	/* co-tech admin */
-#define SMODE_TECHADMIN		0x10	/* tech administrator */
-#define SMODE_CONET		0x20	/* Co-Network Admin */
-#define SMODE_NETADMIN		0x40	/* Network Admin */
-#define SMODE_GUEST		0x80	/* Guest Admin */
 
 /* Cmodes */
 

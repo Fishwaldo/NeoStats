@@ -33,7 +33,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="neostats.lib"
-				OutputFile="$(OutDir)/extauth.dll"
+				OutputFile="../extauthd.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\src\Debug"
 				GenerateDebugInformation="TRUE"
@@ -82,7 +82,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="neostats.lib"
-				OutputFile="$(OutDir)/extauth.dll"
+				OutputFile="../extauth.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\src\Release"
 				GenerateDebugInformation="TRUE"

@@ -144,6 +144,37 @@ ModuleEvent module_events[] = {
 	{EVENT_NULL,	NULL}
 };
 
+typedef struct ModeDesc {
+	unsigned int mask;
+	unsigned int serverflag;
+	const char* desc;
+}ModeDesc;
+
+ModeDesc OperUmodes[]=
+{
+	{UMODE_NETADMIN, 0, mode_netadmin},
+	{UMODE_TECHADMIN, 0, mode_techadmin},
+	{UMODE_ADMIN, 1, mode_serveradmin},
+	{UMODE_COADMIN, 1, mode_coserveradmin},
+	{UMODE_SADMIN, 0, mode_servicesadmin},
+	{UMODE_OPER, 1, mode_globop},
+	{UMODE_LOCOP, 1, mode_locop},
+	{UMODE_SERVICES, 0, mode_netservice},
+	{0, 0, 0},
+};
+
+ModeDesc OperSmodes[]=
+{
+	{SMODE_NETADMIN, 0, mode_netadmin},
+	{SMODE_CONETADMIN, 0, mode_conetadmin},
+	{SMODE_TECHADMIN, 0, mode_techadmin},
+	{SMODE_COTECHADMIN, 0, mode_cotechadmin},
+	{SMODE_ADMIN, 1, mode_serveradmin},
+	{SMODE_COADMIN, 1, mode_coserveradmin},
+	{SMODE_GUESTADMIN, 1, mode_guestadmin},
+	{0, 0, 0},
+};
+
 int ModInit(Module* mod_ptr)
 {
 	cs_module = mod_ptr;
@@ -247,18 +278,30 @@ static int cs_event_quit(CmdParams* cmdparams)
  * report mode change
  */
 
-static int cs_report_mode(Client * u, int add, char mode, const char* mode_desc, int serverinfo)
+static int cs_report_mode (ModeDesc* desclist, Client * u, int mask, int add, char mode)
 {
-	if(serverinfo) {
+	ModeDesc* desc;
+
+	desc = desclist;
+	while(desc->mask) {
+		if(desc->mask == mask) 
+			break;
+		desc ++;
+	}
+	if(desc->mask == 0) {
+		return 0;
+	}
+    
+	if(desc->serverflag) {
 		irc_chanalert(cs_bot, msg_mode_serv, u->name, 
 			add?"now":"no longer", 
-			mode_desc,
+			desc->desc,
 			add?'+':'-',
 			mode, u->user->server->name);
 	} else {
 		irc_chanalert(cs_bot, msg_mode, u->name, 
 			add?"now":"no longer", 
-			mode_desc,
+			desc->desc,
 			add?'+':'-',
 			mode);
 	}
@@ -270,6 +313,7 @@ static int cs_report_mode(Client * u, int add, char mode, const char* mode_desc,
  */
 static int cs_event_umode(CmdParams* cmdparams)
 {
+	int mask;
 	int add = 1;
 	char *modes;
 
@@ -294,14 +338,13 @@ static int cs_event_umode(CmdParams* cmdparams)
 			add = 0;
 			break;
 		default:
-#if 0
-			if(IsOperMode(*modes)) {
-				cs_report_mode(cmdparams->source, add, *modes, mode_netadmin, 0);
-			} else if(IsBotMode(*modes)) {
-				irc_chanalert(cs_bot, msg_bot, cmdparams->source->name, 
+			mask = GetModeMask (*modes);
+			if (mask == UMODE_BOT) {
+				irc_chanalert (cs_bot, msg_bot, cmdparams->source->name, 
 					add?"now":"no longer", add?'+':'-', *modes);			
+			} else {
+				cs_report_mode (OperUmodes, cmdparams->source, mask, add, *modes);
 			}
-#endif
 			break;
 		}
 		modes++;
@@ -312,6 +355,7 @@ static int cs_event_umode(CmdParams* cmdparams)
 /* smode support */
 static int cs_event_smode(CmdParams* cmdparams)
 {
+	int mask;
 	int add = 1;
 	char *modes;
 
@@ -329,49 +373,16 @@ static int cs_event_smode(CmdParams* cmdparams)
 	modes = cmdparams->param;
 	while (*modes) {
 		switch (*modes) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-#ifdef SMODE_CH_NETADMIN
-		case SMODE_CH_NETADMIN:
-			cs_report_mode(cmdparams->source, add, SMODE_CH_NETADMIN, mode_netadmin, 0);
-			break;
-#endif
-#ifdef SMODE_CH_CONETADMIN
-		case SMODE_CH_CONETADMIN:
-			cs_report_mode(cmdparams->source, add, SMODE_CH_CONETADMIN, mode_conetadmin, 0);
-			break;
-#endif
-#ifdef SMODE_CH_TECHADMIN
-		case SMODE_CH_TECHADMIN:
-			cs_report_mode(cmdparams->source, add, SMODE_CH_TECHADMIN, mode_techadmin, 0);
-			break;
-#endif
-#ifdef SMODE_CH_COTECHADMIN
-		case SMODE_CH_COTECHADMIN:
-			cs_report_mode(cmdparams->source, add, SMODE_CH_COTECHADMIN, mode_cotechadmin, 0);
-			break;
-#endif
-#ifdef SMODE_CH_ADMIN
-		case SMODE_CH_ADMIN:
-			cs_report_mode(cmdparams->source, add, SMODE_CH_ADMIN, mode_serveradmin, 1);
-			break;
-#endif
-#ifdef SMODE_CH_COADMIN
-		case SMODE_CH_COADMIN:
-			cs_report_mode(cmdparams->source, add, SMODE_CH_COADMIN, mode_coserveradmin, 1);
-			break;
-#endif
-#ifdef SMODE_CH_GUESTADMIN
-		case SMODE_CH_GUESTADMIN:
-			cs_report_mode(cmdparams->source, add, SMODE_CH_GUESTADMIN, mode_guestadmin, 1);
-			break;
-#endif
-		default:
-			break;
+			case '+':
+				add = 1;
+				break;
+			case '-':
+				add = 0;
+				break;
+			default:
+				mask = GetSModeMask (*modes);
+				cs_report_mode (OperSmodes, cmdparams->source, mask, add, *modes);
+				break;
 		}
 		modes++;
 	}

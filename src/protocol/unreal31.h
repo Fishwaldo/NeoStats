@@ -296,41 +296,18 @@
 #define MSG_BOTSERV	"BOTSERV"
 #define TOK_BOTSERV	"BS"
 
-/* Umode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_COADMIN 'C'
-#define UMODE_CH_ADMIN 'A'
-#define UMODE_CH_NETADMIN 'N'
-#define UMODE_CH_SADMIN 'a'
-#define UMODE_CH_SERVICES 'S'
-#define UMODE_CH_BOT 'B'
-
 /* Umodes */
-#define UMODE_FAILOP		0x00000080	/* Shows some global messages */
-#define UMODE_HELPOP		0x00000100	/* Help system operator */
-#define UMODE_SADMIN		0x00000200	/* Services Admin */
-#define UMODE_ADMIN			0x00000400	/* Admin */
-#define UMODE_SERVNOTICE	0x00000800	/* server notices such as kill */
-#define UMODE_KILLS			0x00001000	/* Show server-kills... */
-#define UMODE_CLIENT		0x00002000	/* Show client information */
-#define UMODE_FLOOD			0x00004000	/* Receive flood warnings */
-#define UMODE_JUNK			0x00008000	/* can junk */
-#define UMODE_SERVICES		0x00010000	/* services */
-#define UMODE_NETADMIN		0x00020000	/* Network Admin */
-#define UMODE_EYES			0x00040000	/* Mode to see server stuff */
-#define UMODE_COADMIN		0x00080000	/* Co Admin */
-#define UMODE_WHOIS			0x00100000	/* gets notice on /whois */
-#define UMODE_KIX			0x00200000	/* usermode +q 
-										   cannot be kicked from any channel 
-										   except by U:Lines */
-#define UMODE_BOT			0x00400000	/* User is a bot */
-#define UMODE_SECURE		0x00800000	/* User is a secure connect */
-#define UMODE_FCLIENT		0x01000000	/* recieve client on far connects.. */
-
-#define UMODE_VICTIM		0x01000000	/* Intentional Victim */
-#define UMODE_HIDEOPER		0x02000000	/* Hide oper mode */
-#define UMODE_SETHOST		0x04000000	/* used sethost */
+#define UMODE_FAILOP		0x00100000	/* Shows some global messages */
+#define UMODE_SERVNOTICE	0x00200000	/* server notices such as kill */
+#define UMODE_KILLS			0x00400000	/* Show server-kills... */
+#define UMODE_FLOOD			0x00800000	/* Receive flood warnings */
+#define UMODE_JUNK			0x01000000	/* can junk */
+#define UMODE_EYES			0x02000000	/* Mode to see server stuff */
+#define UMODE_WHOIS			0x04000000	/* gets notice on /whois */
+#define UMODE_SECURE		0x08000000	/* User is a secure connect */
+#define UMODE_VICTIM		0x10000000	/* Intentional Victim */
+#define UMODE_HIDEOPER		0x20000000	/* Hide oper mode */
+#define UMODE_SETHOST		0x40000000	/* used sethost */
 #define UMODE_STRIPBADWORDS 0x80000000	/* */
 
 /* Cmodes */

@@ -260,3 +260,20 @@ CUmodeStringToMask(const char* UmodeString, long Umode)
 	return(Umode);
 }
 
+int IsBotMode(const char mode)
+{
+	if(ircd_umodes[(int)mode].umode & UMODE_BOT) {
+		return 1;
+	}
+	return 0;
+}
+
+int GetModeMask(const char mode)
+{
+	return ircd_umodes[(int)mode].umode;
+}
+
+int GetSModeMask(const char mode)
+{
+	return ircd_smodes[(int)mode].umode;
+}

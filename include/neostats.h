@@ -188,10 +188,37 @@
 #define UMODE_REGNICK		0x00000010	/* umode +r - registered nick */
 #define UMODE_DEAF          0x00000020	/* Dont see chan msgs */
 #define UMODE_HIDE          0x00000040	/* Hide from Nukes */
+#define UMODE_BOT			0x00000080	/* User is a bot */
+
+#define UMODE_RBOT			UMODE_BOT	/* Registered Bot */
+#define UMODE_SBOT			UMODE_BOT	/* Server Bot */
+
+#define UMODE_SADMIN		0x00000100	/* Services Admin */
+#define UMODE_ADMIN			0x00000200	/* Admin */
+#define UMODE_SERVICES		0x00000400	/* services */
+#define UMODE_NETADMIN		0x00000800	/* Network Admin */
+#define UMODE_COADMIN		0x00001000	/* Co Admin */
+#define UMODE_TECHADMIN     0x00002000  /* Technical Administrator */
+#define UMODE_CLIENT		0x00004000	/* Show client information */
+#define UMODE_FCLIENT		0x00008000	/* recieve client on far connects.. */
+#define UMODE_KIX			0x00010000	/* protected oper, only ulines can kick */
+
+#define UMODE_HELPOP		0x00020000	/* Help system operator */
+#define UMODE_RGSTRONLY		0x00040000	/* only registered nicks may PM */
 
 /* Other user modes available on IRCds cannot be easily supported so 
  * should be defined locally beginning at 0x00000080
  */
+
+/* Smodes */
+#define SMODE_SSL			0x00000001	/* ssl client */
+#define SMODE_COADMIN		0x00000002	/* co admin on a server */
+#define SMODE_ADMIN			0x00000004	/* server admin */
+#define SMODE_COTECHADMIN	0x00000008	/* co-tech admin */
+#define SMODE_TECHADMIN		0x00000010	/* tech administrator */
+#define SMODE_CONETADMIN	0x00000020	/* Co-Network Admin */
+#define SMODE_NETADMIN		0x00000040	/* Network Admin */
+#define SMODE_GUESTADMIN	0x00000080	/* Guest Admin */
 
 EXPORTVAR extern unsigned int ircd_supported_umodes;
 EXPORTVAR extern unsigned int ircd_supported_smodes;
@@ -201,16 +228,7 @@ EXPORTVAR extern unsigned int ircd_supported_smodes;
 /* Umode macros */
 /* ifdef checks for macros until umodes updated */
 #define is_oper(x) ((x) && ((x->user->Umode & (UMODE_OPER|UMODE_LOCOP))))
-#ifdef UMODE_BOT
 #define is_bot(x) ((x) && (x->user->Umode & UMODE_BOT))
-#else
-/* Hack for Ultimate 2 while umodes are updated */
-#ifdef UMODE_RBOT
-#define is_bot(x) ((x) && ((x->user->Umode & (UMODE_RBOT|UMODE_SBOT))))
-#else
-#define is_bot(x) (0)
-#endif
-#endif
 
 #define BOTMODE		0x00000001
 #define OPERMODE	0x00000002
@@ -218,6 +236,8 @@ EXPORTVAR extern unsigned int ircd_supported_smodes;
 EXPORTFUNC int IsOperMode(const char mode);
 EXPORTFUNC int IsOperSMode(const char mode);
 EXPORTFUNC int IsBotMode(const char mode);
+EXPORTFUNC int GetModeMask(const char mode);
+EXPORTFUNC int GetSModeMask(const char mode);
 
 #ifndef NEOSTATS_PACKAGE_VERSION
 #define NEOSTATS_PACKAGE_VERSION PACKAGE
@@ -1017,6 +1037,8 @@ EXPORTFUNC int test_cumode(char* chan, char* nick, int flag);
 #define is_chanadmin(chan, nick)	test_cumode(chan, nick, CUMODE_CHANADMIN)
 
 EXPORTVAR unsigned char UmodeChRegNick;
+
+EXPORTFUNC int IsBotMode(const char mode);
 
 /* dns.c */
 EXPORTFUNC int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);

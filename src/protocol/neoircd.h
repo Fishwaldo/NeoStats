@@ -174,27 +174,19 @@
 #define MSG_SJOIN	"SJOIN"
 #define MSG_TBURST	"TBURST"
 
-/* Umode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_ADMIN 'a'
-
 /* Umodes */
-#define UMODE_ADMIN	0x0080	/* admin flag */
-#define UMODE_BOTS	0x4000	/* shows bots */
-#define UMODE_CLIENT	0x80000	/* shows client connections */
-#define UMODE_DEBUG	0x0010	/* show debug info */
-#define UMODE_FULL	0x0020	/* show full messages */
-#define UMODE_CALLERID	0x0040	/* client has callerid enabled */
-#define UMODE_SKILL	0x0100	/* client see's server kills */
-#define UMODE_NCHANGE	0x0400	/* client can see nick change notices */
-#define UMODE_REJ	0x0800	/* client is registered */
-#define UMODE_SERVNOTICE	0x1000	/* client can see server notices */
-#define UMODE_UNAUTH	0x2000	/* client can see unauthd connections */
-#define UMODE_EXTERNAL	0x8000	/* client can see server joins/splits */
-#define UMODE_SPY	0x10000	/* client can spy on user commands */
-#define UMODE_OPERWALL	0x20000	/* client gets operwalls */
-#define UMODE_SERVICES	0x40000	/* client is services */
+#define UMODE_BOTS			0x00100000	/* shows bots */
+#define UMODE_DEBUG			0x00200000	/* show debug info */
+#define UMODE_FULL			0x00400000	/* show full messages */
+#define UMODE_CALLERID		0x00800000	/* client has callerid enabled */
+#define UMODE_SKILL			0x01000000	/* client see's server kills */
+#define UMODE_NCHANGE		0x02000000	/* client can see nick change notices */
+#define UMODE_REJ			0x04000000	/* client is registered */
+#define UMODE_SERVNOTICE	0x08000000	/* client can see server notices */
+#define UMODE_UNAUTH		0x10000000	/* client can see unauthd connections */
+#define UMODE_EXTERNAL		0x20000000	/* client can see server joins/splits */
+#define UMODE_SPY			0x40000000	/* client can spy on user commands */
+#define UMODE_OPERWALL		0x80000000	/* client gets operwalls */
 /* Cmodes */
 #define CMODE_HIDEOPS	0x02000000
 #define CMODE_INVEX		0x04000000

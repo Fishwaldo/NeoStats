@@ -705,6 +705,10 @@ UserMode (const char *nick, const char *modes)
 			strlcpy(u->user->vhost, u->user->hostname, MAXHOST);
 		}
 	}
+	/* If modes changed reset user level so it will be recalculated */
+	if(u->user->Umode != oldmode) {
+		u->user->ulevel = -1;
+	}
 	dlog(DEBUG1, "UserMode: modes for %s is now %x", u->name, u->user->Umode);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
 	cmdparams->source = u;	

@@ -174,26 +174,19 @@
 #define MSG_SJOIN	"SJOIN"
 #define MSG_TBURST	"TBURST"
 
-/* Umode chars */
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_ADMIN 'a'
-
 /* Umodes */
-#define UMODE_SERVNOTICE   0x0400 /* server notices such as kill */
-#define UMODE_CLIENT        0x20000 /* Client Connections */
-#define UMODE_REJ          0x0100 /* Bot Rejections */
-#define UMODE_SKILL        0x0008 /* Server Killed */
-#define UMODE_FULL         0x0010 /* Full messages */
-#define UMODE_SPY          0x0020 /* see STATS / LINKS */
-#define UMODE_DEBUG        0x0040 /* 'debugging' info */
-#define UMODE_NCHANGE      0x0080 /* Nick change notice */
-#define UMODE_OPERWALL     0x0200 /* Operwalls */
-#define UMODE_BOTS         0x0800 /* shows bots */
-#define UMODE_EXTERNAL     0x1000 /* show servers introduced and splitting */
-#define UMODE_CALLERID     0x4000 /* block unless caller id's */
-#define UMODE_UNAUTH       0x8000 /* show unauth connects here */
-#define UMODE_ADMIN        0x40000 /* Admin on server */
+#define UMODE_SERVNOTICE   0x00100000 /* server notices such as kill */
+#define UMODE_REJ          0x00200000 /* Bot Rejections */
+#define UMODE_SKILL        0x00400000 /* Server Killed */
+#define UMODE_FULL         0x00800000 /* Full messages */
+#define UMODE_SPY          0x01000000 /* see STATS / LINKS */
+#define UMODE_DEBUG        0x02000000 /* 'debugging' info */
+#define UMODE_NCHANGE      0x04000000 /* Nick change notice */
+#define UMODE_OPERWALL     0x08000000 /* Operwalls */
+#define UMODE_BOTS         0x10000000 /* shows bots */
+#define UMODE_EXTERNAL     0x20000000 /* show servers introduced and splitting */
+#define UMODE_CALLERID     0x40000000 /* block unless caller id's */
+#define UMODE_UNAUTH       0x80000000 /* show unauth connects here */
  
 /* Channel Visibility macros */
 #define CMODE_INVEX		0x02000000

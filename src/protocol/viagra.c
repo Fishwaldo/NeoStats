@@ -140,7 +140,7 @@ umode_init user_umodes[] = {
 	{'w', UMODE_WALLOP},
 	{'c', UMODE_CLIENT},
 	{'h', UMODE_HELPOP},
-	{'e', UMODE_GLOBCON},
+	{'e', UMODE_FCLIENT},
 	{'W', UMODE_WHOIS},
 	{0, 0},
 };

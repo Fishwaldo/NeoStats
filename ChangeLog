@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - ConnectServ: mode reports now run from a table. (M)
+ - More core side UMODE support. (M)
  - Add support for online bot realname, host and ident changes. (M)
  - Add support for IRCd SETNAME, SETIDENT and SETHOST functions. (M)
  - Add support for online bot nick changes. (M)
