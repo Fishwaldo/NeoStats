@@ -531,13 +531,13 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
  *
  * @param u the User structure corrosponding to the user that left the channel
  * @param chan the channel to part them from
- * @param partreason the reason the user parted, if any
+ * @param reason the reason the user parted, if any
  *
  * @returns Nothing
 */
 
 void
-part_chan (User * u, const char *chan, char *partreason)
+part_chan (User * u, const char *chan, const char *reason)
 {
 	Chans *c;
 	lnode_t *un;
@@ -573,8 +573,8 @@ part_chan (User * u, const char *chan, char *partreason)
 			free (cm);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			if (partreason != NULL) {
-				AddStringToList (&av, partreason, &ac);
+			if (reason != NULL) {
+				AddStringToList (&av, (char*)reason, &ac);
 			}
 			ModuleEvent (EVENT_PARTCHAN, av, ac);
 			free (av);
@@ -586,8 +586,8 @@ part_chan (User * u, const char *chan, char *partreason)
 			del_bot_from_chan (u->nick, c->name);
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
-			if (partreason != NULL) {
-				AddStringToList (&av, partreason, &ac);
+			if (reason != NULL) {
+				AddStringToList (&av, (char*)reason, &ac);
 			}
 			ModuleEvent (EVENT_PARTBOT, av, ac);
 			free (av);

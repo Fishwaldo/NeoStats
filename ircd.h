@@ -56,6 +56,8 @@ typedef struct ircd_server {
 	int nicklen;
 	int gc;
 	char cloak[25];
+	int maxglobalcnt;
+	int tsendsync;
 } ircd_server;
 
 extern UserModes user_umodes[];
@@ -77,23 +79,27 @@ long UmodeStringToMask(const char* UmodeString, long Umode);
 char* SmodeMaskToString(const long Umode);
 long SmodeStringToMask(const char* UmodeString, long Smode);
 int init_services_bot (void);
-void ns_usr_motd (char *nick, char **argv, int argc);
-void ns_usr_admin (char *nick, char **argv, int argc);
-void ns_usr_credits (char *nick, char **argv, int argc);
-void ns_usr_stats (char *origin, char **argv, int argc);
-void ns_usr_pong (char *origin, char **argv, int argc);
-void ns_usr_version (char *origin, char **argv, int argc);
-void ns_srv_protocol(char *origin, char **argv, int argc);
-void handle_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc);
 void m_privmsg (char* origin, char **av, int ac, int cmdptr);
 void m_notice (char* origin, char **av, int ac, int cmdptr);
+void do_motd (const char* nick, const char *remoteserver);
+void do_admin (const char* nick, const char *remoteserver);
+void do_credits (const char* nick, const char *remoteserver);
+void do_stats (const char* nick, const char *what);
+void do_ping (const char* origin, const char *destination);
+void do_pong (const char* origin, const char* destination);
+void do_version (const char* nick, const char *remoteserver);
+void do_protocol (char *origin, char **argv, int argc);
+void do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc);
+void do_netinfo (const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname);
+void do_snetinfo (const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname);
+void do_part (const char* nick, const char* chan, const char* reason);
 
 /* Defined in ircd specific files but common to all */
 void init_ircd (void);
-void send_privmsg (char *to, const char *from, char *buf);
-void send_notice (char *to, const char *from, char *buf);
-void send_globops (char *from, char *buf);
-void send_wallops (char *from, char *buf);
+void send_privmsg (const char *to, const char *from, const char *buf);
+void send_notice (const char *to, const char *from, const char *buf);
+void send_globops (const char *from, const char *buf);
+void send_wallops (const char *who, const char *buf);
 void send_numeric (const int numeric, const char *target, const char *buf);
 void send_umode (const char *who, const char *target, const char *mode);
 void send_join (const char *who, const char *chan);
@@ -137,9 +143,12 @@ void send_server (const char *name, const int numeric, const char *infoline);
 void send_squit (const char *server, const char *quitmsg);
 void send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime);
 void send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass);
+void send_netinfo (const char* from, const int prot, const char* cloak, const char* netname);
+void send_snetinfo (const char* from, const int prot, const char* cloak, const char* netname);
 
 int sserver_cmd (const char *name, const int numeric, const char *infoline);
 int ssquit_cmd (const char *server, const char *quitmsg);
+
 /*int snetinfo_cmd (void);*/
 /*int ssvinfo_cmd (void);*/
 /*int sburst_cmd (int b);*/

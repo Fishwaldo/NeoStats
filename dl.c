@@ -1199,7 +1199,7 @@ ModuleFunction (int cmdptr, char *cmd, char* origin, char **av, int ac)
  * @return none
  */
 void
-ModulesVersion (char* origin, char **av, int ac)
+ModulesVersion (const char* nick, const char *remoteserver)
 {
 	Module *module_ptr;
 	hscan_t ms;
@@ -1210,7 +1210,7 @@ ModulesVersion (char* origin, char **av, int ac)
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
 		if(module_ptr->isnewstyle && module_ptr->function_list == NULL) {
-			numeric(RPL_VERSION, origin,
+			numeric(RPL_VERSION, nick,
 				"Module %s version: %s %s %s",
 				module_ptr->info->module_name, module_ptr->info->module_version, 
 				module_ptr->info->module_build_date, module_ptr->info->module_build_time);

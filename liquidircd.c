@@ -274,7 +274,7 @@ send_kick (const char *who, const char *target, const char *chan, const char *re
 }
 
 void 
-send_wallops (char *who, char *buf)
+send_wallops (const char *who, const char *buf)
 {
 	sts (":%s %s :%s", who, MSG_WALLOPS, buf);
 }
@@ -307,7 +307,7 @@ send_rakill (const char *host, const char *ident)
 void
 send_svinfo (void)
 {
-	sts ("SVINFO 3 3 0 :%d", (int)me.now);
+	sts ("%s %d %d 0 :%ld", MSG_SVINFO, TS_CURRENT, TS_MIN, (long)me.now);
 }
 
 void
@@ -321,19 +321,19 @@ send_burst (int b)
 }
 
 void
-send_privmsg (char *to, const char *from, char *buf)
+send_privmsg (const char *to, const char *from, const char *buf)
 {
 	sts (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
 }
 
 void
-send_notice (char *to, const char *from, char *buf)
+send_notice (const char *to, const char *from, const char *buf)
 {
 	sts (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
 }
 
 void
-send_globops (char *from, char *buf)
+send_globops (const char *from, const char *buf)
 {
 	sts (":%s %s :%s", from, MSG_GLOBOPS, buf);
 }
@@ -342,7 +342,7 @@ send_globops (char *from, char *buf)
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
-	handle_sjoin (argv[0], argv[1], ((argc > 4) ? argv[2] : argv[1]), 3, origin, argv, argc);
+	do_sjoin (argv[0], argv[1], ((argc > 4) ? argv[2] : argv[1]), 3, origin, argv, argc);
 }
 
 static void
@@ -368,25 +368,25 @@ m_protoctl (char *origin, char **argv, int argc, int srv)
 static void
 m_stats (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_stats (origin, argv, argc);
+	do_stats (origin, argv[0]);
 }
 
 static void
 m_version (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_version (origin, argv, argc);
+	do_version (origin, argv[0]);
 }
 
 static void
 m_motd (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_motd (origin, argv, argc);
+	do_motd (origin, argv[0]);
 }
 
 static void
 m_admin (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_admin (origin, argv, argc);
+	do_admin (origin, argv[0]);
 }
 
 static void
@@ -455,7 +455,7 @@ m_vhost (char *origin, char **argv, int argc, int srv)
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_pong (origin, argv, argc);
+	do_pong (argv[0], argv[1]);
 }
 static void
 m_away (char *origin, char **argv, int argc, int srv)
@@ -512,17 +512,14 @@ m_part (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 1);
-	part_chan (finduser (origin), argv[0], tmpbuf);
+	do_part (origin, argv[0], tmpbuf);
 	free(tmpbuf);
 }
 
 static void
 m_ping (char *origin, char **argv, int argc, int srv)
 {
-	send_pong (argv[0]);
-	if (ircd_srv.burst) {
-		send_ping (me.name, argv[0], argv[0]);
-	}
+	do_ping (argv[0], argv[1]);
 }
 
 static void

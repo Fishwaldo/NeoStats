@@ -272,9 +272,9 @@ send_pong (const char *reply)
 }
 
 void
-send_netinfo (void)
+send_netinfo (const char* from, const int prot, const char* cloak, const char* netname)
 {
-	sts (":%s %s 0 %d %d %s 0 0 0 :%s", me.name, (me.token ? TOK_NETINFO : MSG_NETINFO), (int)me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname);
+	sts (":%s %s 0 %d %d %s 0 0 0 :%s", from, (me.token ? TOK_NETINFO : MSG_NETINFO), (int)me.now, prot, cloak, netname);
 }
 
 void 
@@ -326,7 +326,7 @@ send_kick (const char *who, const char *target, const char *chan, const char *re
 }
 
 void 
-send_wallops (char *who, char *buf)
+send_wallops (const char *who, const char *buf)
 {
 	sts (":%s %s :%s", who, (me.token ? TOK_WALLOPS : MSG_WALLOPS), buf);
 }
@@ -369,19 +369,19 @@ send_rakill (const char *host, const char *ident)
 }
 
 void
-send_privmsg (char *to, const char *from, char *buf)
+send_privmsg (const char *to, const char *from, const char *buf)
 {
 	sts (":%s %s %s :%s", from, (me.token ? TOK_PRIVATE : MSG_PRIVATE), to, buf);
 }
 
 void
-send_notice (char *to, const char *from, char *buf)
+send_notice (const char *to, const char *from, const char *buf)
 {
 	sts (":%s %s %s :%s", from, (me.token ? TOK_NOTICE : MSG_NOTICE), to, buf);
 }
 
 void
-send_globops (char *from, char *buf)
+send_globops (const char *from, const char *buf)
 {
 	sts (":%s %s :%s", from, (me.token ? TOK_GLOBOPS : MSG_GLOBOPS), buf);
 }
@@ -389,13 +389,13 @@ send_globops (char *from, char *buf)
 static void
 m_protocol (char *origin, char **argv, int argc, int srv)
 {
-	ns_srv_protocol(origin, argv, argc);
+	do_protocol (origin, argv, argc);
 }
 
 static void
 m_stats (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_stats (origin, argv, argc);
+	do_stats (origin, argv[0]);
 }
 
 /*
@@ -405,13 +405,13 @@ m_stats (char *origin, char **argv, int argc, int srv)
 static void
 m_version (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_version (origin, argv, argc);
+	do_version (origin, argv[0]);
 }
 
 static void
 m_motd (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_motd (origin, argv, argc);
+	do_motd (origin, argv[0]);
 }
 
 /* m_admin
@@ -420,7 +420,7 @@ m_motd (char *origin, char **argv, int argc, int srv)
 static void
 m_admin (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_admin (origin, argv, argc);
+	do_admin (origin, argv[0]);
 }
 
 /*m_credits
@@ -429,7 +429,7 @@ m_admin (char *origin, char **argv, int argc, int srv)
 static void
 m_credits (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_credits (origin, argv, argc);
+	do_credits (origin, argv[0]);
 }
 
 /* m_server
@@ -563,7 +563,7 @@ m_vhost (char *origin, char **argv, int argc, int srv)
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_pong (origin, argv, argc);
+	do_pong (argv[0], argv[1]);
 }
 
 /* m_away
@@ -653,7 +653,7 @@ m_join (char *origin, char **argv, int argc, int srv)
 static void
 m_part (char *origin, char **argv, int argc, int srv)
 {
-	part_chan (finduser (origin), argv[0], argv[1]);
+	do_part (origin, argv[0], argv[1]);
 }
 
 /* m_ping
@@ -663,7 +663,7 @@ m_part (char *origin, char **argv, int argc, int srv)
 static void
 m_ping (char *origin, char **argv, int argc, int srv)
 {
-	send_pong (argv[0]);
+	do_ping (argv[0], argv[1]);
 }
 
 /* m_netinfo
@@ -679,14 +679,7 @@ m_ping (char *origin, char **argv, int argc, int srv)
 static void
 m_netinfo (char *origin, char **argv, int argc, int srv)
 {
-	ircd_srv.uprot = atoi (argv[2]);
-	strlcpy (ircd_srv.cloak, argv[3], 10);
-	strlcpy (me.netname, argv[7], MAXPASS);
-	send_netinfo ();
-	init_services_bot ();
-	globops (me.name, "Link with Network \2Complete!\2");
-	ModuleEvent (EVENT_NETINFO, NULL, 0);
-	me.synced = 1;
+	do_netinfo(argv[0], argv[1], argv[2], argv[3], argv[7]);
 }
 
 #ifdef UNREAL32
@@ -725,7 +718,7 @@ static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
 	nlog (LOG_INFO, LOG_CORE, "SJOIN: %s", recbuf);
-	handle_sjoin (argv[0], argv[1], argv[2], 4, origin, argv, argc);
+	do_sjoin (argv[0], argv[1], argv[2], 4, origin, argv, argc);
 }
 
 /*

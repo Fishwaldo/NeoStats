@@ -238,9 +238,9 @@ send_pong (const char *reply)
 }
 
 void
-send_snetinfo (void)
+send_snetinfo (const char* from, const int prot, const char* cloak, const char* netname)
 {
-	sts (":%s %s 0 %d %d %s 0 0 0 :%s", me.name, MSG_SNETINFO, (int)me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname);
+	sts (":%s %s 0 %d %d %s 0 0 0 :%s", from, (me.token ? TOK_SNETINFO : MSG_SNETINFO), (int)me.now, prot, cloak, netname);
 }
 
 void
@@ -291,7 +291,8 @@ send_kick (const char *who, const char *target, const char *chan, const char *re
 	sts (":%s %s %s %s :%s", who, (me.token ? TOK_KICK : MSG_KICK), chan, target, (reason ? reason : "No Reason Given"));
 }
 
-void send_wallops (char *who, char *buf)
+void 
+send_wallops (const char *who, const char *buf)
 {
 	sts (":%s %s :%s", who, (me.token ? TOK_WALLOPS : MSG_WALLOPS), buf);
 }
@@ -321,19 +322,19 @@ send_rakill (const char *host, const char *ident)
 }
 
 void
-send_privmsg (char *to, const char *from, char *buf)
+send_privmsg (const char *to, const char *from, const char *buf)
 {
 	sts (":%s %s %s :%s", from, (me.token ? TOK_PRIVATE : MSG_PRIVATE), to, buf);
 }
 
 void
-send_notice (char *to, const char *from, char *buf)
+send_notice (const char *to, const char *from, const char *buf)
 {
 	sts (":%s %s %s :%s", from, (me.token ? TOK_NOTICE : MSG_NOTICE), to, buf);
 }
 
 void
-send_globops (char *from, char *buf)
+send_globops (const char *from, const char *buf)
 {
 	sts (":%s %s :%s", from, (me.token ? TOK_GLOBOPS : MSG_GLOBOPS), buf);
 }
@@ -341,37 +342,37 @@ send_globops (char *from, char *buf)
 static void
 m_protoctl (char *origin, char **argv, int argc, int srv)
 {
-	ns_srv_protocol(origin, argv, argc);
+	do_protocol (origin, argv, argc);
 }
 
 static void
 m_stats (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_stats (origin, argv, argc);
+	do_stats (origin, argv[0]);
 }
 
 static void
 m_version (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_version (origin, argv, argc);
+	do_version (origin, argv[0]);
 }
 
 static void
 m_motd (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_motd (origin, argv, argc);
+	do_motd (origin, argv[0]);
 }
 
 static void
 m_admin (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_admin (origin, argv, argc);
+	do_admin (origin, argv[0]);
 }
 
 static void
 m_credits (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_credits (origin, argv, argc);
+	do_credits (origin, argv[0]);
 }
 
 static void
@@ -442,7 +443,7 @@ m_vhost (char *origin, char **argv, int argc, int srv)
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
 {
-	ns_usr_pong (origin, argv, argc);
+	do_pong (argv[0], argv[1]);
 }
 
 static void
@@ -503,14 +504,14 @@ m_part (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 1);
-	part_chan (finduser (origin), argv[0], tmpbuf);
+	do_part (origin, argv[0], tmpbuf);
 	free(tmpbuf);
 }
 
 static void
 m_ping (char *origin, char **argv, int argc, int srv)
 {
-	send_pong (argv[0]);
+	do_ping (argv[0], argv[1]);
 }
 
 static void
@@ -527,18 +528,7 @@ m_vctrl (char *origin, char **argv, int argc, int srv)
 static void
 m_snetinfo (char *origin, char **argv, int argc, int srv)
 {
-	ircd_srv.uprot = atoi (argv[2]);
-	strlcpy (ircd_srv.cloak, argv[3], 10);
-	strlcpy (me.netname, argv[7], MAXPASS);
-
-	send_snetinfo ();
-	init_services_bot ();
-	globops (me.name, "Link with Network \2Complete!\2");
-#ifdef DEBUG
-	me.debug_mode = 1;
-#endif
-	ModuleEvent (EVENT_NETINFO, NULL, 0);
-	me.synced = 1;
+	do_snetinfo(NULL, NULL, argv[2], argv[3], argv[7]);
 }
 
 static void

@@ -90,6 +90,27 @@
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
 
+#ifndef TS_CURRENT	/* Allow IRCd to overide */
+#define TS5
+
+#ifdef TS5
+#define	TS_CURRENT	5	/* current TS protocol version */
+#else
+#define	TS_CURRENT	3	/* current TS protocol version */
+#endif
+
+#endif
+
+#ifndef TS_CURRENT	/* Allow IRCd to overide */
+/* #define TS5_ONLY */
+
+#ifdef TS5_ONLY
+#define TS_MIN          5
+#else
+#define TS_MIN          3       /* minimum supported TS protocol version */
+#endif
+#endif
+
 /* SecureServ wants CHANADMIN but only a few ircds support it so we have to "fake" it */
 #ifndef CMODE_CHANADMIN
 #define CMODE_CHANADMIN CMODE_CHANOP

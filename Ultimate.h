@@ -533,11 +533,4 @@
 #define is_bot(x) ((x) && ((x->Umode & UMODE_RBOT) || (x->Umode & UMODE_SBOT)))
 #endif /* ULTIMATE3 */
 
-#ifdef TS5
-#define	TS_CURRENT	5	/* current TS protocol version */
-#else
-#define	TS_CURRENT	3	/* current TS protocol version */
-#endif
-#define	TS_MIN		3	/* minimum supported TS protocol version */
-
 #endif

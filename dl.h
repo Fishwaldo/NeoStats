@@ -256,7 +256,7 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname, con
 int CloakHost (ModUser *bot_ptr);
 int del_mod_bot (ModUser *bot_ptr, char * reason);
 
-void ModulesVersion (char* origin, char **av, int ac);
+void ModulesVersion (const char* nick, const char *remoteserver);
 
 /* 
  * Module Interface 

@@ -700,20 +700,37 @@ init_services_bot (void)
 	return NS_SUCCESS;
 }
 
-/** @brief ns_usr_pong
+/** @brief do_ping
  *
  * 
  *
  * @return none
  */
 void
-ns_usr_pong (char *origin, char **argv, int argc)
+do_ping (const char* origin, const char* destination)
+{
+	send_pong (origin);
+#ifdef MSG_BURST
+	if (ircd_srv.burst) {
+		send_ping (me.name, origin, origin);
+	}
+#endif
+}
+
+/** @brief do_pong
+ *
+ * 
+ *
+ * @return none
+ */
+void
+do_pong (const char* origin, const char* destination)
 {
 	Server *s;
 	char **av;
 	int ac = 0;
 
-	s = findserver (argv[0]);
+	s = findserver (origin);
 	if (s) {
 		s->ping = me.now - ping.last_sent;
 		if (ping.ulag > 1)
@@ -724,7 +741,7 @@ ns_usr_pong (char *origin, char **argv, int argc)
 		ModuleEvent (EVENT_PONG, av, ac);
 		free (av);
 	} else {
-		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", argv[0]);
+		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", origin);
 	}
 }
 
@@ -767,11 +784,11 @@ flood (User * u)
  * @return 
  */
 void
-ns_usr_version (char *origin, char **argv, int argc)
+do_version (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
-	numeric (RPL_VERSION, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, ircd_version, me.name, version_date, version_time);
-	ModulesVersion (origin, argv, argc);
+	numeric (RPL_VERSION, nick, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, ircd_version, me.name, version_date, version_time);
+	ModulesVersion (nick, remoteserver);
 }
 
 /** @brief Display our MOTD Message of the Day from the external neostats.motd file 
@@ -781,7 +798,7 @@ ns_usr_version (char *origin, char **argv, int argc)
  * @return 
  */
 void
-ns_usr_motd (char *nick, char **argv, int argc)
+do_motd (const char* nick, const char *remoteserver)
 {
 	FILE *fp;
 	char buf[BUFSIZE];
@@ -812,7 +829,7 @@ ns_usr_motd (char *nick, char **argv, int argc)
  * @return 
  */
 void
-ns_usr_admin (char *nick, char **argv, int argc)
+do_admin (const char* nick, const char *remoteserver)
 {
 	FILE *fp;
 	char buf[BUFSIZE];
@@ -840,7 +857,7 @@ ns_usr_admin (char *nick, char **argv, int argc)
  * @return 
  */
 void
-ns_usr_credits (char *nick, char **argv, int argc)
+do_credits (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
 	numeric (RPL_VERSION, nick, ":- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, ircd_version);
@@ -873,7 +890,7 @@ ns_usr_credits (char *nick, char **argv, int argc)
  * @return 
  */
 void
-ns_usr_stats (char *origin, char **argv, int argc)
+do_stats (const char* nick, const char *what)
 {
 	time_t tmp;
 	time_t tmp2;
@@ -883,15 +900,13 @@ ns_usr_stats (char *origin, char **argv, int argc)
 	int (*listauth) (User * u);
 #endif
 	User *u;
-	char *what;
 
 	SET_SEGV_LOCATION();
-	u = finduser (origin);
+	u = finduser (nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "ns_usr_stats: message from unknown user %s", origin);
+		nlog (LOG_WARNING, LOG_CORE, "do_stats: message from unknown user %s", nick);
 		return;
 	}
-	what = argv[0];
 	if (!strcasecmp (what, "u")) {
 		/* server uptime - Shmad */
 		int uptime = me.now - me.t_start;
@@ -928,10 +943,11 @@ ns_usr_stats (char *origin, char **argv, int argc)
 };
 
 void
-ns_srv_protocol(char *origin, char **argv, int argc)
+do_protocol (char *origin, char **argv, int argc)
 {
 	int i;
 
+	ircd_srv.unkline = 0;
 	for (i = 0; i < argc; i++) {
 #ifdef GOTTOKENSUPPORT
 		if (!strcasecmp ("TOKEN", argv[i])) {
@@ -941,6 +957,11 @@ ns_srv_protocol(char *origin, char **argv, int argc)
 #ifdef GOTCLIENTSUPPORT
 		if (!strcasecmp ("CLIENT", argv[i])) {
 			me.client = 1;
+		}
+#endif
+#if defined(HYBRID7)
+		if (!strcasecmp ("UNKLN", argv[i])) {
+			ircd_srv.unkline = 1;
 		}
 #endif
 	}
@@ -1424,7 +1445,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 /* SJOIN <TS> #<channel> <modes> :[@][+]<nick_1> ...  [@][+]<nick_n> */
 #ifndef NEW_STYLE_SPLITBUF
 void 
-handle_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc)
+do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc)
 {
 	char nick[MAXNICK];
 	char* nicklist;
@@ -1508,7 +1529,7 @@ handle_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoin
 }
 #else
 void 
-handle_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc)
+do_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc)
 {
 	char nick[MAXNICK];
 	char* nicklist;
@@ -1597,3 +1618,41 @@ handle_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoin
 	free(param);
 }
 #endif
+
+#ifdef MSG_NETINFO
+void 
+do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname)
+{
+	ircd_srv.maxglobalcnt = atoi (maxglobalcnt);
+	ircd_srv.tsendsync = atoi (tsendsync);
+	ircd_srv.uprot = atoi (prot);
+	strlcpy (ircd_srv.cloak, cloak, 10);
+	strlcpy (me.netname, netname, MAXPASS);
+	send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname);
+	init_services_bot ();
+	globops (me.name, "Link with Network \2Complete!\2");
+	ModuleEvent (EVENT_NETINFO, NULL, 0);
+	me.synced = 1;
+}
+#endif
+
+#ifdef MSG_SNETINFO
+void 
+do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname)
+{
+	ircd_srv.uprot = atoi (prot);
+	strlcpy (ircd_srv.cloak, cloak, 10);
+	strlcpy (me.netname, netname, MAXPASS);
+	send_snetinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname);
+	init_services_bot ();
+	globops (me.name, "Link with Network \2Complete!\2");
+	ModuleEvent (EVENT_NETINFO, NULL, 0);
+	me.synced = 1;
+}
+#endif
+
+void 
+do_part (const char* nick, const char* chan, const char* reason)
+{
+	part_chan (finduser (nick), chan, reason);
+}
