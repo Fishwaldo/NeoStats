@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: services.c,v 1.10 2000/04/22 04:45:08 fishwaldo Exp $
+** $Id: services.c,v 1.11 2000/06/10 08:48:53 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -241,6 +241,7 @@ char *uptime(time_t when)
 
 extern void ns_shutdown(User *u, char *reason)
 {
+	DLL_Return ExitCode;
 	Module *mod_ptr = NULL;
 	segv_loc("ns_shutdown");
 	if (strcasecmp(u->nick, s_Services)) {
@@ -251,15 +252,17 @@ extern void ns_shutdown(User *u, char *reason)
 		}
 	}
 	/* Unload the Modules */
-	mod_ptr = module_list->next;
-	while(mod_ptr != NULL) {
-		notice(s_Services,"Module %s Unloaded by %s",mod_ptr->info->module_name,u->nick);
-		unload_module(mod_ptr->info->module_name, u);
-		mod_ptr = module_list->next;
+	if (DLL_CurrentPointerToHead(LL_Mods) == DLL_NORMAL) {
+		while (1) {
+			if (ExitCode = DLL_GetCurrentRecord(LL_Mods, CurMod) == DLL_NORMAL) {
+				unload_module(CurMod->info->module_name, u);
+			} else {
+				break;
+			}
+		DLL_IncrementCurrentPointer(LL_Mods);
+		}
 	}
-	if (mod_ptr) free(mod_ptr);
-
-
+	notice(s_Services, "\2UNLOAD\2 All Modules Unloaded");
         globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
 	sleep(1);
 	sts(":%s QUIT :%s Sent SHUTDOWN: %s",s_Services,u->nick,reason);

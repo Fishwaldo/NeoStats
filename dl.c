@@ -11,7 +11,6 @@
 #include "stats.h"
 #include "config.h"
 
-Module *module_list;
 LD_Path *ld_path_list;
 
 void __init_mod_list() {
@@ -19,16 +18,52 @@ void __init_mod_list() {
 	Mod_Timer *t, *Tprev;
 	Mod_User *u, *Uprev;
 	Sock_List *s, *Sprev;
+	DLL_Return ExitCode;
 	
 	segv_loc("__init_mod_list");
-	module_list = (Module *)malloc(sizeof(Module));
-	bzero(module_list, sizeof(Module));
-	module_list->prev = NULL;
-	module_list->next = NULL;
+	/* Create the Modules Linked List */
+	if (DLl_CreateList(&LL_Mods) == NULL) {
+		log("Error, Could not Create ModList");
+		exit(-1);
+	}
+	if ((ExitCode = DLL_InitializeList(LL_Mods, sizeof(Module))) != DLL_NORMAL) {
+		if (ExitCode == DLL_ZERO_INFO) log("Error, Module Structure is 0");
+		if (ExitCode == DLL_NULL_LIST) log("Error, Module Structure is NULL");
+		exit(-1);
+	}
+	CurMod = smalloc(sizeof(Module));
+	/* Create the Events List */
+	if (DLl_CreateList(&LL_Mods_Evnts) == NULL) {
+		log("Error, Could not Create ModListEvnts");
+		exit(-1);
+	}
+	if ((ExitCode = DLL_InitializeList(LL_Mods, sizeof(EventFnList))) != DLL_NORMAL) {
+		if (ExitCode == DLL_ZERO_INFO) log("Error, Module Structure is 0");
+		if (ExitCode == DLL_NULL_LIST) log("Error, Module Structure is NULL");
+		exit(-1);
+	}
+	CurModEvnts = smalloc(sizeof(EventFnList));
+	/* Create the Functions list */
+	if (DLl_CreateList(&LL_Mods_Fncts) == NULL) {
+		log("Error, Could not Create ModListFncts");
+		exit(-1);
+	}
+	if ((ExitCode = DLL_InitializeList(LL_Mods, sizeof(Functions))) != DLL_NORMAL) {
+		if (ExitCode == DLL_ZERO_INFO) log("Error, Module Structure is 0");
+		if (ExitCode == DLL_NULL_LIST) log("Error, Module Structure is NULL");
+		exit(-1);
+	}
+	CurModFncts = smalloc(sizeof(Functions));
+
+	/* Path is Simple, so Leave it as it is */
+
 	ld_path_list = (LD_Path *)malloc(sizeof(LD_Path));
 	bzero(ld_path_list, sizeof(LD_Path));
 	ld_path_list->prev = NULL;
 	ld_path_list->next = NULL;
+
+	/* Bot lists are Linked Lists as well */
+	
 	for (i = 0; i < B_TABLE_SIZE; i++) {
 		u = module_bot_lists[i];
 		while (u) {
@@ -39,6 +74,9 @@ void __init_mod_list() {
 		module_bot_lists[i] = NULL;
 	}
 	bzero((char *)module_bot_lists, sizeof(module_bot_lists));	
+	
+	/* As are Timer Lists */
+	
 	for (i = 0; i < T_TABLE_SIZE; i++) {
 		t = module_timer_lists[i];
 		while (t) {
@@ -49,6 +87,8 @@ void __init_mod_list() {
 		module_timer_lists[i] = NULL;
 	}
 	bzero((char *)module_timer_lists, sizeof(module_timer_lists));
+	
+	/* Socket Lists are also Linked Lists */
 	for (i = 0; i < MAX_SOCKS; i++) {
 		s = Socket_lists[i];
 		while (s) {
@@ -366,9 +406,6 @@ int del_mod_user(char *bot_name) {
 		return 1;
 	}		
 	return -1;
-
-
-
 }
 
 
@@ -450,7 +487,22 @@ void list_module_bots(User *u) {
 	privmsg(u->nick,s_Services,"End of Module Bot List");
 }		
 
-
+Module Find_Module(char *name) {
+#ifdef DEBUGLL
+	log("DEBUGLL: FindModule: %s", name);
+#endif
+	DLL_SetSearchModes(LL_Mods, DLL_HEAD, DLL_DOWN);
+	switch(DLL_FindRecord(LL_Mods, CurMod, name, strcasecmp(mod->module_name, name))) {
+		case DLL_NORMAL:
+#ifdef DEBUGLL
+		log("DEBUGLL: FindModule Found %s", CurMod->info->module_name);
+#endif;
+		return CurMod;
+		break;
+	default:
+		return NULL;
+	}
+}
 
 
 int load_module(char *path1, User *u) {
@@ -526,16 +578,15 @@ int load_module(char *path1, User *u) {
 	
 	/* Check that the Module hasn't already been loaded */
 	
-	list_ptr = module_list->next;
-	while (list_ptr != NULL) {
-		if (!strcasecmp(list_ptr->info->module_name, mod_info_ptr->module_name )) {
-			dlclose(dl_handle);
-			if (do_msg) privmsg(u->nick,s_Services,"Module %s already Loaded, Can't Load 2 Copies",mod_info_ptr->module_name);
-			return -1;
-		}
-		list_ptr = list_ptr->next;
+	/* search for Modname */
+	if (Find_Module(mod_info_ptr->module_name) == NULL) {
+		dlclose(dl_handle);
+		if (do_msg) privmsg(u->nick,s_Services,"Module %s already Loaded, Can't Load 2 Copies",mod_info_ptr->module_name);
+		return -1;
 	}
 	
+
+
 	mod_ptr = (Module *)malloc(sizeof(Module));
 	if (mod_ptr == NULL) {
 		fprintf(stderr, "%s: Out of memory!\n", __PRETTY_FUNCTION__);
@@ -543,36 +594,33 @@ int load_module(char *path1, User *u) {
 		exit(1);
 	}
 
-	list_ptr = module_list;
-	while (list_ptr->next != NULL) list_ptr = list_ptr->next;
-
-	bzero(mod_ptr, sizeof(Module));
-
 	log("internal module name: %s", mod_info_ptr->module_name);
 	log("module description: %s", mod_info_ptr->module_description);
 
-	mod_ptr->prev = list_ptr;
-	list_ptr->next = mod_ptr;
 	mod_ptr->info = mod_info_ptr;
-	mod_ptr->function_list = mod_funcs_ptr;
 	mod_ptr->dl_handle = dl_handle;
-	mod_ptr->other_funcs = event_fn_ptr;
+	event_fn_ptr->module_name = mod_info_ptr->module_name;
+	mod_funcs_ptr->module_name = mod_info_ptr->module_name;
+
+	/* add them to the Linked Lists */
+	if (DLL_AddRecord(LL_Mods, mod_ptr, NULL) == DLL_MEM_ERROR) {
+		log("Error, Couldn't addmod, Out of Memory");
+		exit(-1);
+	}
+	if (DLL_AddRecord(LL_Mods_Evnts, event_fn_ptr, NULL) == DLL_MEM_ERROR) {
+		log("Error, Couldn't AddmodEvnts, Out of Memory");
+		exit(-1);
+	}
+	if (DLL_AddRecord(LL_Mods_fncts, mod_funcs_ptr, NULL) == DLL_MEM_ERROR) {
+		log("Error, Couldn't AddModFncts, Out of Memory");
+		exit(-1);
+	}
 
 	/* Let this module know we are online if we are! */
 	if (me.onchan == 1) {
-		while (event_fn_ptr->cmd_name != NULL ) {
-			if (!strcasecmp(event_fn_ptr->cmd_name, "ONLINE")) {
-				event_fn_ptr->function(me.s);
-				break;
-			}
-			event_fn_ptr++;
-		}
-	}
+		Module_Event("ONLINE", me.s) {
 	if (do_msg) privmsg(u->nick,s_Services,"Module %s Loaded, Description: %s",mod_info_ptr->module_name,mod_info_ptr->module_description);
-	
 	return 0;
-
-
 };
 void list_module(User *u) {
 	Module *mod_ptr = NULL;
@@ -640,3 +688,27 @@ int unload_module(char *module_name, User *u) {
 	return -1;
 }
 
+void Module_Event(char *event, void *data) {
+	Module *module_ptr;
+	EventFnList *ev_list;
+	DLL_Return ExitCode;
+
+
+	segv_loc("Module_Event");
+#ifdef DEBUGLL
+	log("DEBUGLL: ModEvent %s", event);
+#endif
+	/* To Start with, we have to start at the top of the list */
+	DLL_SetSearchModes(LL_Mods_Evnts, DLL_HEAD, DLL_DOWN);
+
+	While (DLL_FindRecord(LL_Mods_Evnts, CurModEvnts, event, strcasecmp(tmp->cmd_name, event)) == DLL_NORMAL) {
+#ifdef DEBUG
+		log("Running Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
+#endif
+		segv_loc(CurModEvnts->module_name);
+		CurModEvnts->function(data);			
+		segv_loc("Module_Event_Return");
+		/* now we search from the Current Record */
+		DLL_SetSearchModes(LL_Mods_Evnts, DLL_CURRENT, DLL_DOWN);
+	}
+}

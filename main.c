@@ -140,15 +140,12 @@ static	void	setup_signals()
 	(void)sigaddset(&act.sa_mask, SIGTERM);
 	(void)sigaction(SIGTERM, &act, NULL);
 /* handling of SIGSEGV as well -sts */
-/*	act.sa_handler = serv_segv;
+	act.sa_handler = serv_segv;
+	act.sa_flags = SA_ONESHOT;
 	(void)sigaddset(&act.sa_mask, SIGSEGV);
 	(void)sigaction(SIGSEGV, &act, NULL);
 
 
-	(void)signal(SIGHUP, conf_rehash);
-	(void)signal(SIGTERM, serv_die); 
-	(void)signal(SIGSEGV, serv_segv);
-*/
 }
 
 

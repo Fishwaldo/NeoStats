@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.12 2000/04/22 04:45:08 fishwaldo Exp $
+** $Id: stats.h,v 1.13 2000/06/10 08:48:53 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -26,9 +26,9 @@
 #include <ctype.h>
 #include <sys/stat.h>
 #include <sys/resource.h>
-#include <dmalloc.h>
 
 #include "Unreal.h"
+#include "linklist.h"
 #include "config.h"
 
 /* Define this to enable Debug Code */
@@ -51,11 +51,16 @@
 
 #define bzero(x, y)		memset(x, '\0', y);
 
+#define DEBUGLL
+
 int servsock;
 int times;
 extern char s_Debug[MAXNICK], s_Services[MAXNICK];
 extern const char version[];
 char recbuf[BUFSIZE], segv_location[255];
+
+List *LL_Users;
+List *LL_Servers;
 
 typedef struct server_ Server;
 typedef struct user_ User;
@@ -63,6 +68,8 @@ typedef struct myuser_ MyUser;
 typedef struct chans_ Chans;
 typedef struct config_mod_ Config_Mod;
 
+User *CurU;
+Server *CurS;
 
 struct me {
 	char name[MAXHOST];
@@ -147,10 +154,12 @@ struct user_ {
 	char nick[MAXNICK];
 	char hostname[BUFSIZE];
 	char username[BUFSIZE];
-	Server *server;
+	char server[MAXHOST];
+	char virthost[BUFSIZE];
 	MyUser *myuser;
 	int flood;
 	int is_away;
+	char awaymsg[BUFSIZE];
 	time_t t_flood;
 	long hash;
 	char modes[BUFSIZE];
@@ -282,4 +291,7 @@ extern void servicesbot(char *nick, char *line);
 extern void ns_debug_to_coders(char *);
 extern void ns_shutdown(User *, char *);
 
+/* servers.c */
+extern int Server_Ping(Server *);
+extern int User_Away(User *, char *);
 #endif

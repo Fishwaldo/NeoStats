@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: timer.c,v 1.6 2000/04/22 04:45:08 fishwaldo Exp $
+** $Id: timer.c,v 1.7 2000/06/10 08:48:53 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -57,23 +57,28 @@ void TimerReset()
 
 void TimerPings()
 {
-	register int i;
 	Server *s;
+	DLL_Return ExitCode;
 
 #ifdef DEBUG
 	log("Sendings pings...");
 #endif
 	ping.ulag = 0;
 
-	for (i = 0; i < S_TABLE_SIZE; i++) {
-		for (s = serverlist[i]; s; s = s->next) {
+	s = smalloc(sizeof(Server));
+	ExitCode = DLL_CurrentPointerToHead(LL_Servers);
+	if (ExitCode == DLL_NORMAL) {
+		while (ExitCode == DLL_NORMAL) {
+			ExitCode = DLL_GetCurrentRecord(LL_Servers, s);
 			if (!strcmp(me.name, s->name)) {
 				s->ping = 0;
-				continue;
+			} else {
+				sts(":%s PING %s :%s", me.name, me.name, s->name);
 			}
-			sts(":%s PING %s :%s", me.name, me.name, s->name);
+			if ((ExitCode = DLL_IncrementCurrentPointer(LL_Servers)) == DLL_NOT_FOUND) break;
 		}
 	}
+	if (s) free(s);
 }
 
 

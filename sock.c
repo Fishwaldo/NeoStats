@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.7 2000/04/22 04:45:08 fishwaldo Exp $
+** $Id: sock.c,v 1.8 2000/06/10 08:48:53 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -50,8 +50,10 @@ void read_loop()
 
 	while (1) {
 		segv_loc("Read_Loop");
+		/* free any pointers (Cur*) */
 		memset(buf, '\0', BUFSIZE);
 		chk();
+		/* do it again, as our Timers might have Malloc'd them :) */
 		segv_loc("Read_Loop2");
 		FD_ZERO(&readfds);
 		TimeOut.tv_sec = 1;

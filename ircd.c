@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.13 2000/04/22 04:45:07 fishwaldo Exp $
+** $Id: ircd.c,v 1.14 2000/06/10 08:48:53 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -162,33 +162,6 @@ int del_bot(char *nick, char *reason)
 		
 
 
-void Module_Event(char *event, void *data) {
-	Module *module_ptr;
-	EventFnList *ev_list;
-
-
-	segv_loc("Module_Event");
-	module_ptr = module_list->next;
-	while (module_ptr != NULL) {
-		/* this goes through each Module */
-		ev_list = module_ptr->other_funcs;
-		while (ev_list->cmd_name != NULL) {
-			/* This goes through each Command */
-			if (!strcasecmp(ev_list->cmd_name, event)) {
-#ifdef DEBUG
-					log("Running Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
-#endif
-					segv_loc(module_ptr->info->module_name);
-					ev_list->function(data);			
-					segv_loc("Module_Event_Return");
-					break;
-			}
-		ev_list++;
-		}	
-	module_ptr = module_ptr->next;
-	}
-
-}
 void parse(char *line)
 {
 	char *origin, *cmd, *coreLine;
@@ -293,6 +266,7 @@ void Usr_Stats(char *origin, char *coreLine) {
 	char *stats;
 	time_t tmp;
 	time_t tmp2;
+	int size;
 		
 	u=finduser(origin);
 	if (!u) {
@@ -313,7 +287,13 @@ void Usr_Stats(char *origin, char *coreLine) {
 		tmp = time(NULL) - me.lastmsg; 
 		tmp2 = time(NULL) - me.t_start;
 		sts(":%s 211 %s l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE", me.name, u->nick);
-		sts(":%s 241 %s %s 0 %d %d %d %d %d 0 :%d", me.name, u->nick, me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
+		sts(":%s 241 %s l %s 0 %d %d %d %d %d 0 :%d", me.name, u->nick, me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
+	} else if (!strcasecmp(stats, "z")) {
+		/* Struct Usage */
+		size = sizeof(User) * DLL_GetNumberOfRecords(LL_Users);
+		sts(":%s 249 %s Users %d (%d Bytes)", me.name, u->nick, DLL_GetNumberOfRecords(LL_Users), size);
+		size = sizeof(Server) * DLL_GetNumberOfRecords(LL_Servers);
+		sts(":%s 249 %s Servers %d (%d Bytes)", me.name, u->nick, DLL_GetNumberOfRecords(LL_Servers), size);
 	}
 	sts(":%s 219 %s %s :End of /STATS report", me.name, u->nick, stats);
 	notice(s_Services,"%s Requested Stats %s", u->nick, stats);
@@ -331,6 +311,7 @@ void Usr_Showcredits(char *origin, char *coreLine) {
 void Usr_AddServer(char *origin, char *coreLine){
 	char *cmd;
 	cmd = strtok(coreLine, " ");
+	log("Usr_addServer");
 	AddServer(cmd,origin,1);
 	Module_Event("NEWSERVER", findserver(cmd));
 }
@@ -398,29 +379,14 @@ void Usr_Pong(char *origin, char *coreLine) {
 			cmd = strtok(coreLine, " ");
 			s = findserver(cmd);
 			if (s) {
-				s->ping = time(NULL) - ping.last_sent;
-				if (ping.ulag > 1)
-					s->ping -= (float) ping.ulag;
-				if (!strcmp(me.s->name, s->name))
-					ping.ulag = me.s->ping;
-				Module_Event("PONG", s);
-
+				if (Server_Ping(s)) Module_Event("PONG", s);
 			} else {
 				log("Received PONG from unknown server: %s", cmd);
 			}
 }
 void Usr_Away(char *origin, char *coreLine) {
 			User *u = finduser(origin);
-			if (u) {
-				if (u->is_away) {
-					u->is_away = 0;
-				} else {
-					u->is_away = 1;
-				}
-				Module_Event("AWAY", u);
-			} else {
-				log("Warning, Unable to find User %s for Away", origin);
-			}
+			if (User_Away(u, coreLine) == 1) Module_Event("AWAY", u);
 }	
 void Usr_Nick(char *origin, char *coreLine) {
 			char *cmd;
@@ -488,7 +454,7 @@ void Srv_Pass(char *origin, char *coreLine) {
 }
 void Srv_Server(char *origin, char *coreLine) {
 			Server *s;
-			AddServer(strtok(coreLine, " "),origin, 1);
+			AddServer(strtok(coreLine, " "),me.name, 1);
 			s = findserver(coreLine);
 			me.s = s;
 			Module_Event("ONLINE", s);
