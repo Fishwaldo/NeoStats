@@ -27,10 +27,10 @@
  *		- Make command alerts optional
  */
 
+#include "neostats.h"
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-#include "neostats.h"
 #include "ns_help.h"
 #include "modules.h"
 #include "services.h"
@@ -665,7 +665,7 @@ bot_cmd_help (CmdParams * cmdparams)
 				return NS_ERR_NO_PERMISSION;
 			}		
 			if(!cmd_ptr->helptext) {
-				irc_privmsg (cmdparams->bot, cmdparams->source, __("Missing help text for command", cmdparams->source));
+				irc_prefmsg (cmdparams->bot, cmdparams->source, __("Missing help text for command", cmdparams->source));
 			} else {
 				irc_prefmsg_list (cmdparams->bot, cmdparams->source, cmd_ptr->helptext);
 			}

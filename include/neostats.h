@@ -79,7 +79,7 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
-#ifdef HAVE_CTYPE_H
+#if 1 /*def HAVE_CTYPE_H*/
 #include <ctype.h>
 #endif
 #ifdef HAVE_SYS_STAT_H
