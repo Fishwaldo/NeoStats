@@ -94,4 +94,15 @@ void send_kill (const char *from, const char *target, const char *reason);
 void send_svskill (const char *target, const char *reason);
 void send_kick (const char *who, const char *target, const char *chan, const char *reason);
 
+int sserver_cmd (const char *name, const int numeric, const char *infoline);
+int squit_cmd (const char *who, const char *quitmsg);
+int slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass);
+int ssquit_cmd (const char *server);
+int sprotocol_cmd (const char *option);
+int snetinfo_cmd (void);
+int ssvinfo_cmd (void);
+int sburst_cmd (int b);
+int seob_cmd (const char *server);
+int ssmo_cmd (const char *from, const char *umodetarget, const char *msg);
+
 #endif

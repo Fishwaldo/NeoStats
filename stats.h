@@ -508,42 +508,32 @@ int numeric (const int numeric, const char *target, const char *data, ...) __att
 #define snumeric_cmd numeric
 
 /* function declarations */
-int sserver_cmd (const char *name, const int numeric, const char *infoline);
-int slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass);
-int ssquit_cmd (const char *server);
-int sprotocol_cmd (const char *option);
-int squit_cmd (const char *who, const char *quitmsg);
-int spart_cmd (const char *who, const char *chan);
 #if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID)
 int sjoin_cmd (const char *who, const char *chan, unsigned long chflag);
 #else
 int sjoin_cmd (const char *who, const char *chan);
 #endif
+int spart_cmd (const char *who, const char *chan);
+int skick_cmd (const char *who, const char *target, const char *chan, const char *reason);
+int sinvite_cmd (const char *from, const char *to, const char *chan);
 int schmode_cmd (const char *who, const char *chan, const char *mode, const char *args);
 int snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode);
-int sping_cmd (const char *from, const char *reply, const char *to);
 int sumode_cmd (const char *who, const char *target, long mode);
-int spong_cmd (const char *reply);
-int snetinfo_cmd (void);
 int skill_cmd (const char *from, const char *target, const char *reason, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-int ssvskill_cmd (const char *who, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-int ssmo_cmd (const char *from, const char *umodetarget, const char *msg);
+int sping_cmd (const char *from, const char *reply, const char *to);
+int spong_cmd (const char *reply);
 int snick_cmd (const char *oldnick, const char *newnick);
 int sswhois_cmd (const char *target, const char *swhois);
+int ssvskill_cmd (const char *who, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int ssvsnick_cmd (const char *target, const char *newnick);
 int ssvsjoin_cmd (const char *target, const char *chan);
 int ssvspart_cmd (const char *target, const char *chan);
 int ssvshost_cmd (const char *who, const char *vhost);
-int skick_cmd (const char *who, const char *target, const char *chan, const char *reason);
 int ssvsmode_cmd (const char *target, const char *modes);
 int ssvshost_cmd (const char *who, const char *vhost);
 int ssvskill_cmd (const char *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...);
 int srakill_cmd (const char *host, const char *ident);
-int sinvite_cmd (const char *from, const char *to, const char *chan);
-int ssvinfo_cmd (void);
-int sburst_cmd (int b);
-int seob_cmd (const char *server);
 
 /* users.c */
 User *finduser (const char *nick);
