@@ -47,7 +47,7 @@ static int new_m_version(char *origin, char **av, int ac);
 Module_Info my_info[] = { {
 			   "MoraleServ",
 			   "A Network Morale Service",
-			   "2.20"}
+			   "2.21"}
 };
 
 
