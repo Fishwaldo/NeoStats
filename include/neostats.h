@@ -1359,7 +1359,6 @@ EXPORTFUNC int os_stat( const char *path, struct stat *buffer );
 EXPORTFUNC int os_access( const char *path, int mode );
 EXPORTFUNC int os_write( int fd, const void *buffer, unsigned int count );
 EXPORTFUNC int os_close( int fd );
-EXPORTFUNC char *os_tempnam( const char *dir, const char *prefix );
 EXPORTFUNC int os_mkstemp( char *ftemplate );
 EXPORTFUNC int os_write_temp_file( char *ftemplate, const void *buffer, unsigned int count );
 EXPORTFUNC char *os_strerror( void );
