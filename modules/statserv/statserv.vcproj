@@ -209,9 +209,6 @@
 			<File
 				RelativePath=".\geoip\GeoIPCity.h">
 			</File>
-			<File
-				RelativePath=".\geoip\global.h">
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\html\index.tpl">

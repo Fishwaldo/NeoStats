@@ -502,7 +502,6 @@ modules/statserv/geoip/GeoIPBitReader.c -text
 modules/statserv/geoip/GeoIPBitReader.h -text
 modules/statserv/geoip/GeoIPCity.c -text
 modules/statserv/geoip/GeoIPCity.h -text
-modules/statserv/geoip/global.h -text
 modules/statserv/html/index.tpl -text
 modules/statserv/htmlstats.c -text
 modules/statserv/htmlstats.h -text
