@@ -515,12 +515,6 @@ sburst_cmd (int b)
 }
 
 void
-chan_privmsg (char *who, char *buf)
-{
-	sts (":%s %s %s :%s", who, (me.token ? TOK_PRIVATE : MSG_PRIVATE), me.chan, buf);
-}
-
-void
 send_privmsg (char *to, const char *from, char *buf)
 {
 	sts (":%s %s %s :%s", from, (me.token ? TOK_PRIVATE : MSG_PRIVATE), to, buf);

@@ -316,13 +316,6 @@ send_rakill (const char *host, const char *ident)
 	chanalert (s_Services, "Please Manually remove KLINES using /unkline on each server");
 }
 
-
-void
-chan_privmsg (char *who, char *buf)
-{
-	sts (":%s %s %s :%s", who, MSG_PRIVATE, me.chan, buf);
-}
-
 void
 send_privmsg (char *to, const char *from, char *buf)
 {

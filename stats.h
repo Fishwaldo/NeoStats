@@ -520,8 +520,8 @@ void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((form
 void privmsg (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 void notice (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 void globops (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-void chanalert (char * who, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-int wallops (const char *who, const char *msg, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+void chanalert (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+int wallops (const char *from, const char *msg, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 /* Temp for backwards compatibility */
 #define snumeric_cmd numeric

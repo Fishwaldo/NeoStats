@@ -905,7 +905,7 @@ privmsg_list (char *to, char *from, const char **text)
 }
 
 void
-chanalert (char *who, char *fmt, ...)
+chanalert (char *from, char *fmt, ...)
 {
 	va_list ap;
 
@@ -915,7 +915,7 @@ chanalert (char *who, char *fmt, ...)
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	chan_privmsg(who, ircd_buf);
+	send_privmsg (me.chan, from, ircd_buf);
 }
 
 void
@@ -987,14 +987,14 @@ globops (char *from, char *fmt, ...)
 }
 
 int
-wallops (const char *who, const char *msg, ...)
+wallops (const char *from, const char *msg, ...)
 {
 	va_list ap;
 
 	va_start (ap, msg);
 	ircvsnprintf (ircd_buf, BUFSIZE, msg, ap);
 	va_end (ap);
-	send_wallops ((char*)who, (char*)ircd_buf);
+	send_wallops ((char*)from, (char*)ircd_buf);
 	return 1;
 }
 
