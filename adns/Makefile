@@ -2,14 +2,13 @@ include ../Makefile.inc
 
 INCLUDES = -I..
 RANLIB=ranlib
-CFLAGS2=-O2 -ggdb -fPIC -DPIC -I..
 
 SOURCES= check.c  event.c  general.c  parse.c  query.c  reply.c  setup.c  transmit.c  types.c
 OBJECTS= check.o  event.o  general.o  parse.o  query.o  reply.o  setup.o  transmit.o  types.o
 all:	libadns.a
 
 .c.o:
-	$(CC) $(CFLAGS2) $(INCLUDES) -c $<
+	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 libadns.a: $(OBJECTS)
 	ar cru $@ ${OBJECTS}

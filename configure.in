@@ -4,7 +4,7 @@ AC_CONFIG_HEADER(config.h)
 PACKAGE=NeoStats
 VERSION=2.5.0-RC3
 AC_PREFIX_DEFAULT(~/NeoStats)
-CFLAGS="$CFLAGS -O2 -Wall"
+CFLAGS="$CFLAGS -O2"
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -86,7 +86,7 @@ AC_ARG_ENABLE(debug,
 [ case "$enableval" in
   yes)
 	AC_DEFINE(DEBUG, 1, 'Enable Debugging')
-	CFLAGS="$CFLAGS -ggdb"
+	CFLAGS="$CFLAGS -ggdb -Wall"
 	AC_MSG_RESULT(yes - Watch your Log Files)
 	;;
   *)
