@@ -5,6 +5,7 @@ Author:  Shmad <shmad@neostats.net>
  - Help text cleanup (M) 
  - Added ABOUT command (M)
  - Changed to use new module export API (M)
+ - Added missing NULL checks for finduser results to avoid referencing NULL pointers (M)
 
 * Version 1.7 * April 17th, 2003
  - Updated with new Logging functions

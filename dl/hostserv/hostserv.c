@@ -146,6 +146,8 @@ int del_moddata(char **av, int ac) {
 
 	User *u;
 	u = finduser(av[0]);
+	if (!u) /* User not found */
+		return 1;
 	if (u->moddata[hs_cfg.modnum]) {
 		nlog(LOG_DEBUG2, LOG_MOD, "Freeing Module data");
 		free(u->moddata[hs_cfg.modnum]);
@@ -284,6 +286,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 	int t = 0;
 	User *u;
 	u = finduser(origin);
+	if (!u) /* User not found */
+		return 1;
 
 	if (!strcasecmp(av[1], "HELP")) {
 		if (ac <= 2) {
@@ -686,6 +690,8 @@ int hs_mode(char **av, int ac) {
 	/* first, find if its a regnick mode */
 	if (index(av[1], 'r')) {
 		u = finduser(av[0]);
+		if (!u) /* User not found */
+			return 1;
 		if (u->moddata[hs_cfg.modnum] != NULL) {
 			nlog(LOG_DEBUG2, LOG_MOD, "not setting hidden host on %s", av[0]);
 			return -1;

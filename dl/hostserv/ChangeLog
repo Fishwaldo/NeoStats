@@ -9,6 +9,7 @@ Shmad <shmad@neostats.net>
  - Added ABOUT command (M)
  - Undernet Style Hidden Hosts for registered nicknames is now supported! (F)
  - Changed to use new module export API (M)
+ - Added missing NULL checks for finduser results to avoid referencing NULL pointers (M)
  
 * Version 2.7.1 * Shmad * May 11th, 2003
  - Fixed a nasty seg bug *smacks fish* we don't free(s_HostServ);

@@ -92,6 +92,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 {
 	User *u;
 	u = finduser(origin);
+	if (!u) /* User not found */
+		return 1;
 
 	if (!cs_online)
 		return 1;
@@ -263,6 +265,8 @@ int cs_new_user(char **av, int ac)
 		return 1;
 
 	u = finduser(av[0]);
+	if (!u) /* User not found */
+		return 1;
 	if (!strcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
 		return 1;
@@ -300,6 +304,8 @@ int cs_del_user(char **av, int ac)
 		return 1;
 
 	u = finduser(av[0]);
+	if (!u) /* User not found */
+		return 1;
 
 	if (!strcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */
@@ -853,6 +859,8 @@ int cs_user_kill(char **av, int ac)
 		return 1;
 
 	u = finduser(av[0]);
+	if (!u) /* User not found */
+		return 1;
 	
 	if (!strcasecmp(u->server->name, me.name)) {
 		/* its me, forget it */

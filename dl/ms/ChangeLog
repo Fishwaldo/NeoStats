@@ -4,6 +4,7 @@ MoraleServ ChangeLog - Anything we add/remove/fix/change is in here (even our ra
  - Help text cleanup (M)
  - Added ABOUT command (M)
  - Changed to use new module export API (M)
+ - Added missing NULL checks for finduser results to avoid referencing NULL pointers (M)
 
 * MoraleServ * Fish * Version 2.20
  - Moved to new Logging Functions

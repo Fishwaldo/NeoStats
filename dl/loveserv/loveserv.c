@@ -78,6 +78,8 @@ int __Bot_Message(char *origin, char **av, int ac)
 	User *u;
 	char *cmd;
 	u = finduser(origin);
+	if (!u) /* User not found */
+		return 1;
 
 	if (!strcasecmp(av[1], "HELP")) {
 		if (ac <= 2) {
