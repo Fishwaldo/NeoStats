@@ -1,4 +1,7 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Version 2.5.4
+ - Updated all copywrite notices.
+ - added updated makeconf script from M (mark@ctcp.net)
 * NeoStats * Fish * Version 2.5.3
  - Added ability to turn off StatServ wallops. "/msg statserv set msgthrottle off" - BugID#6
  - NLOG called from a Module Socket Function was Fubar. Fixed

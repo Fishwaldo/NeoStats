@@ -1,5 +1,5 @@
-/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
-** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+/* NeoStats - IRC Statistical Services 
+** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.11 2003/05/22 13:51:54 fishwaldo Exp $
+** $Id: neoircd.c,v 1.12 2003/05/26 09:18:28 fishwaldo Exp $
 */
  
 #include "stats.h"

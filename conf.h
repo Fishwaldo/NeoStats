@@ -1,5 +1,5 @@
-/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
-** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+/* NeoStats - IRC Statistical Services 
+** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.h,v 1.4 2003/04/30 13:10:48 fishwaldo Exp $
+** $Id: conf.h,v 1.5 2003/05/26 09:18:28 fishwaldo Exp $
 */
 
 

@@ -1,5 +1,5 @@
-/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
-** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+/* NeoStats - IRC Statistical Services 
+** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@
  * into proprietary software; there is no requirement for such software to
  * contain a copyright notice related to this source.
  *
- * $Id: list.c,v 1.6 2002/09/04 08:40:27 fishwaldo Exp $
+ * $Id: list.c,v 1.7 2003/05/26 09:18:28 fishwaldo Exp $
  * $Name:  $
  */
 
@@ -68,7 +68,7 @@
 #define lnode_prev(N)		((N)->prev)
 
 #ifdef KAZLIB_RCSID
-static const char rcsid[] = "$Id: list.c,v 1.6 2002/09/04 08:40:27 fishwaldo Exp $";
+static const char rcsid[] = "$Id: list.c,v 1.7 2003/05/26 09:18:28 fishwaldo Exp $";
 #endif
 
 /*

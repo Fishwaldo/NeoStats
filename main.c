@@ -1,5 +1,5 @@
-/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
-** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+/* NeoStats - IRC Statistical Services 
+** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.92 2003/05/22 13:51:54 fishwaldo Exp $
+** $Id: main.c,v 1.93 2003/05/26 09:18:28 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 	if (!config.quiet) {
 		printf("NeoStats %d.%d.%d%s Loading...\n", MAJOR, MINOR, REV, version);
 		printf("-----------------------------------------------\n");
-		printf("Copyright: NeoStats Group. 2000-2002\n");
+		printf("Copyright: NeoStats Group. 2000-2003\n");
 		printf("Justin Hammond (fish@neostats.net)\n");
 		printf("Adam Rutter (shmad@neostats.net)\n");
 		printf("^Enigma^ (enigma@neostats.net)\n");

@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services
-** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
 **
@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.41 2003/04/11 09:26:30 fishwaldo Exp $
+** $Id: chans.c,v 1.42 2003/05/26 09:18:28 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
