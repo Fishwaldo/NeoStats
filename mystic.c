@@ -403,7 +403,7 @@ m_svsmode (char *origin, char **argv, int argc, int srv)
 	if (argv[0][0] == '#') {
 		do_svsmode_channel (origin, argv, argc);
 	} else {
-		do_svsmode_user (argv[0], argv[1]);
+		do_svsmode_user (argv[0], argv[1], NULL);
 	}
 }
 static void

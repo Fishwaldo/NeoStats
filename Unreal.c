@@ -499,10 +499,7 @@ m_svsmode (char *origin, char **argv, int argc, int srv)
 	if (argv[0][0] == '#') {
 		do_svsmode_channel (origin, argv, argc);
 	} else {
-		if (argv[2] && isdigit(*argv[2])) {
-			do_svsmode_servicests (argv[0], argv[2]); 
-		}
-		do_svsmode_user (argv[0], argv[1]);
+		do_svsmode_user (argv[0], argv[1], argv[2]);
 	}
 }
 

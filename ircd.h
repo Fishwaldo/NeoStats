@@ -123,16 +123,15 @@ void do_smode (const char* nick, const char* modes);
 #endif
 void do_mode_user (const char* nick, const char* modes);
 void do_mode_channel (char *origin, char **argv, int argc);
+void do_svsmode_user (const char* nick, const char* modes, const char* ts);
 /* These are the same for now but we might need to be different in the 
  * future so use macros
  */
-#define do_svsmode_user do_mode_user
 #define do_svsmode_channel do_mode_channel
 void do_away (const char* nick, const char *reason);
 void do_vhost (const char* nick, const char *vhost);
 void do_nickchange (const char * oldnick, const char *newnick, const char * ts);
 void do_topic (const char* chan, const char *owner, const char* ts, const char *topic);
-void do_svsmode_servicests (const char* nick, const char* ts);
 void do_server (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline, int srv);
 #ifdef MSG_BURST
 void do_burst (char *origin, char **argv, int argc);

@@ -1784,6 +1784,40 @@ do_mode_user (const char* nick, const char* modes)
 }
 
 void 
+do_svsmode_user (const char* nick, const char* modes, const char* ts)
+{
+	char modebuf[MODESIZE];
+	
+	if (ts && isdigit(*ts)) {
+		char* pModes;	
+		char* pNewModes;	
+		int cnt = 0;
+
+		SetUserServicesTS (nick, ts);
+		/* If only setting TS, we do not need further mode processing */
+		if(strcasecmp(modes, "+d") == 0) {
+			nlog (LOG_DEBUG3, LOG_CORE, "dropping modes since this is a services TS", modes);
+			return;
+		}
+		/* We need to strip the d from the mode string */
+		pNewModes = modebuf;
+		pModes = modebuf;
+		while(*pModes) {
+			if(*pModes != 'd') {
+				*pNewModes = *pModes;
+			}
+			pModes++;
+			pNewModes++;			
+		}
+		/* NULL terminate */
+		*pNewModes = 0;
+		UserMode (nick, modebuf);
+	} else {
+		UserMode (nick, modes);
+	}
+}
+
+void 
 do_mode_channel (char *origin, char **argv, int argc)
 {
 	ChanMode (origin, argv, argc);
@@ -1811,12 +1845,6 @@ void
 do_topic (const char* chan, const char *owner, const char* ts, const char *topic)
 {
 	ChanTopic (chan, owner, ts, topic);
-}
-
-void 
-do_svsmode_servicests (const char* nick, const char* ts)
-{	
-	SetUserServicesTS (nick, ts);
 }
 
 void 

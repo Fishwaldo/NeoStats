@@ -534,9 +534,9 @@ m_svsmode (char *origin, char **argv, int argc, int srv)
 		do_svsmode_channel (origin, argv, argc);
 	} else {
 #ifdef ULTIMATE3
-		do_svsmode_user (argv[0], argv[2]);
+		do_svsmode_user (argv[0], argv[2], NULL);
 #else
-		do_svsmode_user (argv[0], argv[1]);
+		do_svsmode_user (argv[0], argv[1], NULL);
 #endif
 	}
 }
