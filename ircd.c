@@ -220,7 +220,7 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 	sjoin_cmd(who, chan);
 	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN)
 #if defined(IRCU)
-		scmode_op(who, chan, "+o", nicktobase64 (who));
+		scmode_op(who, chan, "+o", who);
 #else
 		schmode_cmd(who, chan, "+o", who);
 #endif
@@ -247,7 +247,7 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 #else
 		sjoin_cmd (nick, me.chan);
 #if defined(IRCU)
-		scmode_op(nick, me.chan, "+o", nicktobase64 (nick));
+		scmode_op(nick, me.chan, "+o", nick);
 #else
 		schmode_cmd(nick, me.chan, "+o", nick);
 #endif
@@ -1178,7 +1178,7 @@ scmode_op (const char *who, const char *chan, const char *mode, const char *bot)
 	char **av;
 	int ac;
 
-	send_cmode (me.name, who, chan, mode, bot, me.now);
+	send_cmode (me.name, who, chan, mode, nicktobase64 (bot), me.now);
 	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, bot);
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
