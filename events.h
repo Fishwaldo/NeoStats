@@ -23,207 +23,247 @@
 ** $Id$
 */
 
-/* List of events available to be sent to modules 
- * Once all modules are ported to use these defines,
- * events should be tokenised to improve performance
+/*  Events sent to modules. Each event has 2 parameters:
+ *    av is a list of parameters.
+ *    ac is the number of parameters
  */
 
-/*  ONLINE is called when NeoStats connects to the Network. 
- *  Can be used to init bots, and so on. 
- *  ONLINE parameters are:
- *	server connected to
+/*  EVENT_ONLINE
+ *    Called when NeoStats connects to the Network. 
+ *    Can be used to init bots, and so on. 
+ *    parameters:
+ *      av[0] server connected to
  */
-#define EVENT_ONLINE	    "ONLINE"
+#define EVENT_ONLINE "ONLINE"
 
-/*  SIGNON is called when a new user signs onto the network. the user 
- *  nickname is passed as a parameter, so you can see who signed on.
- *  SIGNON parameters are:
- *	nick
+/*  EVENT_SIGNON 
+ *    Called when a new user signs onto the network. the user 
+ *    nickname is passed as a parameter, so you can see who signed on.
+ *    parameters:
+ *      av[0] nick
  */
-#define EVENT_SIGNON		"SIGNON"
+#define EVENT_SIGNON "SIGNON"
 
-/*  SIGNOFF is called when a user quits the network. The user 
- *  nickname is passed as a parameter, so you can see who signed off.
- *  SIGNOFF parameters are:
- *	nick
- *	reason
+/*  EVENT_SIGNOFF 
+ *    Called when a user quits the network. The user 
+ *    nickname is passed as a parameter, so you can see who signed off.
+ *    parameters:
+ *      av[0] nick
+ *      av[1] reason
  */
-#define EVENT_SIGNOFF		"SIGNOFF"
+#define EVENT_SIGNOFF "SIGNOFF"
 
-/*  KILL is called when a user is killed on the network. the user 
- *  nick is passed as a parameter, so you can see who
- *  was killed (You would have to use the recbuf global 
- *  variable to see who killed them though)
- *  KILL parameters are:
- *	nick
+/*  EVENT_KILL 
+ *    Called when a user is killed on the network. the user 
+ *    nick is passed as a parameter, so you can see who
+ *    was killed (You would have to use the recbuf global 
+ *    variable to see who killed them though)
+ *    parameters:
+ *      av[0] nick
  */
-#define EVENT_KILL			"KILL"
+#define EVENT_KILL "KILL"
 
-/*  BOTKILL	is called if one of the NeoStats bots gets killed. You would 
- *  use it to reinitialize the bot.
- *  BOTKILL parameters are:
- *	botnick
+/*  EVENT_BOTKILL 
+ *    is called if one of the NeoStats bots gets killed. You would 
+ *    use it to reinitialize the bot.
+ *    parameters:
+ *      av[0] botnick
  */
-#define EVENT_BOTKILL		"BOTKILL"
+#define EVENT_BOTKILL "BOTKILL"
 
-/*  SERVER is called when a server connects to the network. the server 
- *  structure Server is passed as a parameter so you can see 
- *  details about the new server
- *  SERVER parameters are:
- *	server name
- *	uplink
- *	hops
- *	numeric
- *	infoline
+/*  EVENT_SERVER 
+ *    Called when a server connects to the network. 
+ *    parameters:
+ *      av[0] server name
+ *      av[1] uplink
+ *      av[2] hops
+ *      av[3] numeric
+ *      av[4] infoline
  */
-#define EVENT_SERVER		"SERVER"
+#define EVENT_SERVER "SERVER"
 
-/*  SQUIT is called when a server squits the network 
- *  SQUIT parameters are:
- *	server name
- *	reason
+/*  EVENT_SQUIT 
+ *    Called when a server squits the network 
+ *    parameters:
+ *      av[0] server name
+ *      av[1] reason
  */
-#define EVENT_SQUIT			"SQUIT"
+#define EVENT_SQUIT "SQUIT"
 
-/*  NETINFO	is called when the connection to the network is synced. 
- *  NETINFO parameters are:
- *	none
+/*  EVENT_NETINFO 
+ *    Called when the connection to the network is synced. 
+ *    parameters:
+ *      av[0] none
  */
-#define EVENT_NETINFO		"NETINFO"
+#define EVENT_NETINFO "NETINFO"
 
-/*  UMODE is called when a user changes Umodes. (e.g., /mode +o fish) 
- *  the user structure User is passed as a parameter.
- *  UMODE parameters are:
- *	nick
- *	mode string
+/*  EVENT_UMODE 
+ *    Called when a user changes Umodes. (e.g., /mode +o fish) 
+ *    parameters:
+ *      av[0] nick
+ *      av[1] mode string
  */
-#define EVENT_UMODE			"UMODE"
+#define EVENT_UMODE "UMODE"
 
-/*  SMODE is called when a user changes Smodes.
- *  the user structure User is passed as a parameter.
- *  SMODE parameters are:
- *	nick
- *	mode string
+/*  EVENT_SMODE 
+ *    Called when a user changes Smodes.
+ *    parameters:
+ *      av[0] nick
+ *      av[1] mode string
  */
-#define EVENT_SMODE			"SMODE"
+#define EVENT_SMODE "SMODE"
 
-/*  NICKCHANGE is called when a user changes nick
- *  the user structure User is passed as a parameter.
- *  NICKCHANGE parameters are:
- *	old nick
- *	new nick
+/*  EVENT_NICKCHANGE 
+ *    Called when a user changes nick
+ *    parameters:
+ *      av[0] old nick
+ *      av[1] new nick
  */
-#define EVENT_NICKCHANGE	"NICKCHANGE"
+#define EVENT_NICKCHANGE "NICKCHANGE"
 
-/*  PONG parameters are:
- *	server name
+/*  EVENT_PONG 
+ *    parameters:
+ *      av[0] server name
  */
-#define EVENT_PONG			"PONG"
+#define EVENT_PONG "PONG"
 
-/*  AWAY parameters are:
- *	nick
- *	away message if setting away, NULL if cancel away
+/*  EVENT_AWAY 
+ *    parameters:
+ *      av[0] nick
+ *      av[1] away message if setting away, NULL if cancel away
  */
-#define EVENT_AWAY			"AWAY"
+#define EVENT_AWAY "AWAY"
 
-/*  NEWCHAN parameters are:
- *	channel name
+/*  EVENT_NEWCHAN 
+ *    parameters:
+ *      av[0] channel name
  */
-#define EVENT_NEWCHAN		"NEWCHAN"
+#define EVENT_NEWCHAN "NEWCHAN"
 
-/*  DELCHAN parameters are:
- *	channel name
+/*  EVENT_DELCHAN 
+ *    parameters:
+ *      av[0] channel name
  */
-#define EVENT_DELCHAN		"DELCHAN"
+#define EVENT_DELCHAN "DELCHAN"
 
-/*  JOINCHAN parameters are:
- *	channel name
- *	user nick
+/*  EVENT_JOINCHAN 
+ *    parameters:
+ *      av[0] channel name
+ *      av[1] user nick
  */
-#define EVENT_JOINCHAN		"JOINCHAN"
+#define EVENT_JOINCHAN "JOINCHAN"
 
-/*  PARTCHAN parameters are:
- *	channel name
- *	user nick
- *	reason
+/*  EVENT_PARTCHAN 
+ *    parameters:
+ *      av[0] channel name
+ *      av[1] user nick
+ *      av[2] reason
  */
-#define EVENT_PARTCHAN		"PARTCHAN"
+#define EVENT_PARTCHAN "PARTCHAN"
 
-/*  KICK parameters are:
- *	channel name
- *	nick of user who made the kick
- *	nick of user who was kick
- *	reason
+/*  EVENT_KICK 
+ *    parameters:
+ *      av[0] channel name
+ *      av[1] nick of user who made the kick
+ *      av[2] nick of user who was kick
+ *      av[3] reason
  */
-#define EVENT_KICK			"KICK"
+#define EVENT_KICK "KICK"
 
-/*  KICKBOT parameters are:
- *	channel name
- *	nick of user who made the kick
- *	nick of user who was kick
- *	reason
+/*  EVENT_KICKBOT 
+ *    parameters:
+ *      av[0] channel name
+ *      av[1] nick of user who made the kick
+ *      av[2] nick of user who was kick
+ *      av[3] reason
  */
-#define EVENT_KICKBOT		"KICKBOT"
+#define EVENT_KICKBOT "KICKBOT"
 
-/*  PARTBOT parameters are:
- *	channel name
- *	user nick
- *	reason
+/*  EVENT_PARTBOT 
+ *    parameters:
+ *      av[0] channel name
+ *      av[1] user nick
+ *      av[2] reason
  */
-#define EVENT_PARTBOT		"PARTBOT"
+#define EVENT_PARTBOT "PARTBOT"
 
-/*  TOPICCHANGE parameters are:
- *	channel name
- *	owner
- *	topic
+/*  EVENT_TOPICCHANGE 
+ *    parameters:
+ *      av[0] channel name
+ *      av[1] owner
+ *      av[2] topic
  */
-#define EVENT_TOPICCHANGE	"TOPICCHANGE"
+#define EVENT_TOPICCHANGE "TOPICCHANGE"
 
-/*  CLIENTVERSION parameters are:
- *	user nick
- *	client version string
+/*  EVENT_CLIENTVERSION 
+ *    parameters:
+ *      av[0] user nick
+ *      av[1] client version string
  */
-#define EVENT_CLIENTVERSION	"CLIENTVERSION"
+#define EVENT_CLIENTVERSION "CLIENTVERSION"
 
-/* CHANMODE params are:
- *	channel name
- *	mode string
+/*  EVENT_CHANMODE
+ *    parameters:
+ *      av[0] channel name
+ *      av[1] mode string
  */
-#define EVENT_CHANMODE		"CHANMODE"
+#define EVENT_CHANMODE "CHANMODE"
 
-/* PRIVATE params are:
- *	from nick 
- *	to nick 
- *	message
+/*  EVENT_PRIVATE
+ *    parameters:
+ *      av[0] from nick 
+ *      av[1] to nick 
+ *      av[2] message
  */
-#define EVENT_PRIVATE		"PRIVATE"
+#define EVENT_PRIVATE "PRIVATE"
 
-/* NOTICE params are:
- *	from nick 
- *	to nick 
- *	message
+/*  EVENT_NOTICE
+ *    parameters:
+ *      av[0] from nick 
+ *      av[1] to nick 
+ *      av[2] message
  */
-#define EVENT_NOTICE		"NOTICE"
+#define EVENT_NOTICE "NOTICE"
 
-/* CPRIVATE params are:
- *	from nick 
- *	to channel
- *	message
+/*  EVENT_CPRIVATE
+ *    parameters:
+ *      av[0] from nick 
+ *      av[1] to channel
+ *      av[2] message
  */
-#define EVENT_CPRIVATE		"CPRIVATE"
+#define EVENT_CPRIVATE "CPRIVATE"
 
-/* CNOTICE params are:
- *	from nick 
- *	to channel
- *	message
+/*  EVENT_CNOTICE
+ *    parameters:
+ *      av[0] from nick 
+ *      av[1] to channel
+ *      av[2] message
  */
-#define EVENT_CNOTICE		"CNOTICE"
+#define EVENT_CNOTICE "CNOTICE"
 
-/* ADDBAN params are:
+/*  EVENT_ADDBAN
+ *    parameters:
+ *      av[0] type
+ *      av[1] user
+ *      av[2] host
+ *      av[3] mask
+ *      av[4] reason
+ *      av[5] setby
+ *      av[6] tsset
+ *      av[7] tsexpires
  */
-#define EVENT_ADDBAN		"ADDBAN"
+#define EVENT_ADDBAN "ADDBAN"
 
-/* DELBAN params are:
+/*  EVENT_DELBAN
+ *    parameters:
+ *      av[0] type
+ *      av[1] user
+ *      av[2] host
+ *      av[3] mask
+ *      av[4] reason
+ *      av[5] setby
+ *      av[6] tsset
+ *      av[7] tsexpires
  */
-#define EVENT_DELBAN		"DELBAN"
+#define EVENT_DELBAN "DELBAN"
 
