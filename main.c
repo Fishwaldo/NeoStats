@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.75 2002/12/13 10:50:08 fishwaldo Exp $
+** $Id: main.c,v 1.76 2002/12/26 14:15:07 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -34,8 +34,11 @@
 #include <execinfo.h>
 #endif
 
+
+/*! this is the name of the services bot */
 char s_Services[MAXNICK] = "NeoStats";
 
+/*! depending on what IRCD is selected, we change the version string */
 #ifdef UNREAL
 const char version[] = "NeoStats-2.5-RC3(U)";
 #elif ULTIMATE3
@@ -51,16 +54,29 @@ const char version[] = "NeoStats-2.5-RC3(N)";
 
 
 
-
+/*! Date when we were compiled */
 const char version_date[] = __DATE__;
+/*! Time we were compiled */
 const char version_time[] = __TIME__;
 
 static void start();
 static void setup_signals();
 
 
+
+/*! have we forked */
 int forked = 0;
 
+
+/** @brief Main Entry point into program
+ *
+ * Sets up defaults, and parses the config file.
+ * Also initilizes different parts of NeoStats
+ * 
+ * @return Exits the program!
+ *
+ * @todo Close STDIN etc correctly
+ */
 int main()
 {
 	FILE *fp;
@@ -111,7 +127,7 @@ int main()
 	init_user_hash();
 	init_chan_hash();
 
-/* This section ALWAYS craps out so we ignore it-- for now */
+/** This section ALWAYS craps out so we ignore it-- for now */
 	if (init_modules()) {
 /*		printf("WARNING: Some Modules Failed to Load"); */
 	}
@@ -141,7 +157,15 @@ int main()
 
 	return 1;
 }
-
+/** @brief Sigterm Signal handler
+ *
+ * Called by the signal handler if we get a SIGTERM
+ * This shutsdown NeoStats and exits
+ * 
+ * @return Exits the program!
+ *
+ * @todo Do a nice shutdown, no thtis crap :)
+ */
 RETSIGTYPE serv_die() {
 	User *u;
 	u = finduser(s_Services);
@@ -151,7 +175,15 @@ RETSIGTYPE serv_die() {
 
 }
 
-
+/** @brief Sighup Signal handler
+ *
+ * Called by the signal handler if we get a SIGHUP
+ * and rehashes the config file.
+ * 
+ * @return Nothing
+ *
+ * @todo Implement a Rehash function. What can we actually rehash?
+ */
 RETSIGTYPE conf_rehash() {
 /*	struct sigaction act; */
 	chanalert(s_Services, "Recieved SIGHUP, Attempting to Rehash");
@@ -168,6 +200,21 @@ RETSIGTYPE conf_rehash() {
 	/* gotta do the rehash code dun I? */
 }
 
+
+/** @brief Sigsegv  Signal handler
+ *
+ * This function is called when we get a SEGV
+ * and will send some debug into to the logs and to IRC
+ * to help us track down where the problem occured.
+ * if the platform we are using supports backtrace
+ * also print out the backtrace.
+ * if the segv happened inside a module, try to unload the module
+ * and continue on our merry way :)
+ * 
+ * @return Nothing
+ *
+ */
+
 RETSIGTYPE serv_segv() {
 	char name[30];
 #ifdef HAVE_BACKTRACE
@@ -179,6 +226,10 @@ RETSIGTYPE serv_segv() {
 	size = backtrace (array, 10);
 	strings = backtrace_symbols (array, size);
 #endif
+	/** if the segv happened while we were inside a module, unload and try to restore 
+	 *  the stack to where we were before we jumped into the module
+	 *  and continue on
+	 */
 	if (strlen(segvinmodule) > 1) {
 		globops(me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
 		chanalert(s_Services, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
@@ -205,6 +256,7 @@ RETSIGTYPE serv_segv() {
 		free(strings);
 #endif
 	} else {	
+		/** The segv happened in our core, damn it */
 		/* Thanks to Stskeeps and Unreal for this stuff :) */
 		log("Uh Oh, Segmentation Fault.. Server Terminating");
 		log("Details: Buffer: %s", recbuf);
@@ -229,7 +281,15 @@ RETSIGTYPE serv_segv() {
 	}
 }
 
-
+/** @brief Sets up the signal handlers
+ *
+ * Sets up the signal handlers for SIGHUP (rehash)
+ * SIGTERM (die) and SIGSEGV (segv fault)
+ * and ignore the others (Such as SIGPIPE)
+ * 
+ * @return Nothing
+ *
+ */
 static	void	setup_signals()
 {
 	struct	sigaction act;
@@ -260,7 +320,16 @@ static	void	setup_signals()
 	(void)signal(SIGSEGV, serv_segv);
 }
 
-
+/** @brief Connects to IRC and starts the main loop
+ *
+ * Connects to the IRC server and attempts to login
+ * If it connects and logs in, then starts the main program loop
+ * if control is returned to this function, restart
+ * 
+ * @return Nothing
+ *
+ * @todo make the restart code nicer so it doesn't go mad when we can't connect
+ */
 void start()
 {
 	static int attempts = 0;
@@ -296,6 +365,13 @@ void start()
 	sleep(5);
 	execve("./neostats", NULL, NULL);
 }
+/** @brief Login to IRC
+ *
+ * Calls the IRC specific function slogin_cmd to login as a server to IRC
+ * 
+ * @return Nothing
+ *
+ */
 
 void login()
 	{
@@ -304,6 +380,17 @@ void login()
 	sprotocol_cmd("TOKEN");
 }
 
+/** @brief Our Own implementation of Malloc.
+ *
+ * Allocates memory for internal variables. Usefull for Memory Debugging
+ * if enough memory can't be malloced, exit the program 
+ *
+ * @param size The amount of memory to Malloc
+ *
+ * @returns size bytes of memory or NULL on malloc error
+ *
+ * @todo move this to a util type file, as it being in main is crazy
+ */
 
 void *smalloc(long size)
 {
@@ -321,6 +408,17 @@ void *smalloc(long size)
 	}
 	return buf;
 }
+/** @brief Duplicate a string
+ *
+ * make a copy of a string, with memory allocated for the new string
+ *
+ * @param s a pointer to the string to duplicate
+ *
+ * @returns a pointer to the new string
+ *
+ * @deprecated  Try not to use this function, it will go away one day
+ *
+ */
 
 char *sstrdup(const char *s)
 {
@@ -331,6 +429,19 @@ char *sstrdup(const char *s)
 	}
 	return t;
 }
+/** @brief Create a HASH from a string
+ *
+ * Makes a hash of a string for a table
+ *
+ * @param name The string to use as the base for the hash
+ *
+ * @param size_of_table The size of the hash table
+ *
+ * @returns unsigned long of the hash
+ *
+ * @deprecated  Try not to use this function, it will go away one day
+ *
+ */
 
 unsigned long HASH(const unsigned char *name, int size_of_table)
 {
@@ -345,6 +456,16 @@ unsigned long HASH(const unsigned char *name, int size_of_table)
 	return h % size_of_table;
 }
 
+/** @brief convert a string to lowercase
+ *
+ * makes a string lowercase
+ *
+ * @param s the string to convert to lowercase. WARNING: the result overwrites this variable
+ *
+ * @returns pointer to the lowercase version of s
+ *
+ */
+
 char *strlower(char *s)
 {
 	char *t = s; 
@@ -353,6 +474,18 @@ char *strlower(char *s)
 	}
 return t;
 }
+/** @brief Adds a string to a array of strings
+ *
+ * used for the event functions, adds a string to a array of string pointers to pass to modules
+ *
+ * @param List the array you wish to append S to 
+ * @param S the string you wish to append
+ * @param C the current size of the array
+ * 
+ * @returns Nothing
+ *
+ */
+
 void AddStringToList(char ***List,char S[],int *C)
 {
 	if (*C == 0) {
@@ -361,8 +494,16 @@ void AddStringToList(char ***List,char S[],int *C)
 	++*C;
 	(*List)[*C-1] = S;
 }
-                            
-                            
+/** @brief Frees a list created with AddStringToList
+ *
+ * Frees the memory used for a string array used with AddStringToList
+ *
+ * @param List the array you wish to delete
+ * @param C the current size of the array as returned by AddStringToList
+ * 
+ * @returns Nothing
+ *
+ */
 void FreeList(char **List,int C)
 {
 int i;

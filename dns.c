@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dns.c,v 1.7 2002/09/06 04:34:11 fishwaldo Exp $
+** $Id: dns.c,v 1.8 2002/12/26 14:15:07 fishwaldo Exp $
 */
 
 
@@ -45,16 +45,18 @@ typedef struct dnslookup_struct DnsLookup;
 
 list_t *dnslist;
 
-/* dns_lookup
-** inputs	- adns_query struct of what we are looking up
-**		- callback function when we get a answer
-**		- data string to pass to callback function to identify this lookup
-** 
-** outputs	- integer saying if the addition to lookup succeded. (1 = yes, 0 = no)
-**
-** side effects - Adds the query to the list dnslist for lookups
-** 
-** use this function to add a dns query to the list of ones that need to be performed.
+
+/** @brief starts a DNS lookup
+ *
+ * starts a DNS lookup for str of type type can callback the function
+ * when complete. Data is a identifier that is not modified to identify this lookup to the callback function
+ *
+ * @param str the record to lookup 
+ * @param type The type of record to lookup. See adns.h for more details
+ * @param callback the function to callback when we are complete
+ * @param data a string to pass unmodified to the callback function to help identifing this lookup
+ * 
+ * @return returns 1 on success, 0 on failure (to add the lookup, not a successfull lookup
 */
 
 int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_answer *a), char *data) {
