@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.71 2002/10/14 05:44:39 fishwaldo Exp $
+** $Id: main.c,v 1.72 2002/10/15 19:09:32 shmad Exp $
 */
 
 #include <setjmp.h>
@@ -203,7 +203,7 @@ RETSIGTYPE serv_segv() {
 		log("Approx Location: %s Backtrace:", segv_location);
 		/* Broadcast it out! */
 		globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
-		chanalert(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s Backtrace:", recbuf, segv_location);
+		chanalert(s_Services, "Damn IT, Server Terminating (%s), Segmentation Fault. Buffer: %s, Approx Location: %s Backtrace:", version, recbuf, segv_location);
 #ifdef HAVE_BACKTRACE
 		for (i = 1; i < size; i++) {
 			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
