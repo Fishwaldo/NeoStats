@@ -45,7 +45,7 @@ const char ns_help_channellist_oneline[]="List channels";
 const char ns_help_serverlist_oneline[]="List servers";
 const char ns_help_banlist_oneline[]="List bans";
 const char cmd_help_oneline[]="Online help";
-const char cmd_help_about_oneline[] = "Display About text";
+const char cmd_help_about_oneline[] = "Display about text";
 const char cmd_help_credits_oneline[] = "Display credits";
 const char cmd_help_version_oneline[] = "Display version";
 const char cmd_help_levels_oneline[] = "Change command user level";
@@ -214,7 +214,7 @@ const char *ns_help_status[] = {
 };
 
 const char *ns_help_set_joinserviceschan[] = {
-	"\2JOINSERVICESCHAN <on/off>\2",
+	"\2JOINSERVICESCHAN <ON|OFF>\2",
 	"Whether NeoStats service bots join services channel",
 	NULL
 };
@@ -358,7 +358,7 @@ const char *ns_help_set_serviceumode[] = {
 
 const char *ns_help_set_recvq[] = {
 	"\2RECVQ <size>\2",
-	"Set the Default RecieveQ size for socket based actions",
+	"Receive queue size for sockets",
 	NULL
 };
 

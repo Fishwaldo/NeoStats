@@ -391,7 +391,7 @@ signal_process(void)
 {
 	struct event *ev;
 	short ncalls;
-
+ 
 	TAILQ_FOREACH(ev, &signalqueue, ev_signal_next) {
 		ncalls = evsigcaught[EVENT_SIGNAL(ev)];
 		if (ncalls) {

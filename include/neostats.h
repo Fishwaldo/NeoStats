@@ -266,7 +266,7 @@ char *LANGgettext( const char *string, int mylang );
 #define UMODE_COADMIN		0x00001000	/* Co Admin */
 #define UMODE_TECHADMIN     0x00002000  /* Technical Administrator */
 #define UMODE_CLIENT		0x00004000	/* Show client information */
-#define UMODE_FCLIENT		0x00008000	/* recieve client on far connects.. */
+#define UMODE_FCLIENT		0x00008000	/* receive client on far connects.. */
 #define UMODE_KIX			0x00010000	/* protected oper, only ulines can kick */
 
 #define UMODE_HELPOP		0x00020000	/* Help system operator */

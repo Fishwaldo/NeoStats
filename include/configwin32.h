@@ -496,6 +496,7 @@
 
 /* type to use in place of socklen_t if not defined */
 /* #undef socklen_t */
+#define socklen_t int
 
 /* the signed version of size_t */
 /* #undef ssize_t */

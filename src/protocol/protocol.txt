@@ -78,7 +78,7 @@ ProtocolInfo protocol_info = {
 -----------------------------------<>-----------------------------------
 Command list
 
-This is parsed by NeoStats when we recieve a message from an IRCd server
+This is parsed by NeoStats when we receive a message from an IRCd server
 in order to handle the message and is formatted as follows.
 
 ircd_cmd cmd_list[] = {
