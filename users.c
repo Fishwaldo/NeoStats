@@ -272,6 +272,59 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 	return NS_SUCCESS;
 }
 
+#ifdef BASE64NICKNAME
+void
+setusernumeric (const char *nick, const char* num)
+{
+	User *u;
+
+	u = finduser(nick);
+	if(u) {
+		nlog (LOG_DEBUG1, LOG_CORE, "setusernumeric: setting %s to %s", nick, num);
+		strlcpy(u->nick64, num, B64SIZE);
+	} else {
+		nlog (LOG_DEBUG1, LOG_CORE, "setusernumeric: cannot find %s for %s", nick, num);
+	}
+}
+
+char* 
+getnumfromnick(const char* nick)
+{
+	User *u;
+
+	nlog (LOG_DEBUG1, LOG_CORE, "getnumfromnick: scanning for %s", nick);
+	u = finduser(nick);
+	if(u) {
+		return u->nick64;
+	} else {
+		nlog (LOG_DEBUG1, LOG_CORE, "getnumfromnick: cannot find %s", nick);
+	}
+	return NULL;
+}
+
+
+User *
+finduserbase64 (const char *num)
+{
+	User *u;
+	hnode_t *un;
+	lnode_t *cm;
+	hscan_t us;
+
+	nlog (LOG_DEBUG1, LOG_CORE, "finduserbase64: scanning for %s", num);
+	hash_scan_begin (&us, uh);
+	while ((un = hash_scan_next (&us)) != NULL) {
+		u = hnode_get (un);
+		if(strncmp(u->nick64, num, 5) == 0) {
+			nlog (LOG_DEBUG1, LOG_CORE, "finduserbase64: %s -> %s", num, u->nick);
+			return u;
+		}
+	}
+	nlog (LOG_DEBUG3, LOG_CORE, "finduserbase64: %s not found", num);
+	return NULL;
+}
+#endif
+
 User *
 finduser (const char *nick)
 {
@@ -284,7 +337,11 @@ finduser (const char *nick)
 		return u;
 	}
 	nlog (LOG_DEBUG3, LOG_CORE, "finduser: %s not found", nick);
+#ifdef BASE64NICKNAME
+	return finduserbase64 (nick);
+#else
 	return NULL;
+#endif
 }
 
 #ifdef SQLSRV

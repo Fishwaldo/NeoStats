@@ -124,43 +124,9 @@ const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 /* Temporary buffers for numeric conversion */
-char servlist[4096][MAXHOST];
-
-struct {
-	char nick [MAXNICK];
-	char numeric [32];
-}nicknum[4096];
-
-int numnicks = 0;
-
-char nicklist[262144][MAXNICK];
 int neonumeric;
 char neonumericbuf[3];
 int neonickcount = 0;
-
-char* getnickfromnum(const char* num)
-{
-	int i;
-	nlog (LOG_DEBUG1, LOG_CORE, "getnickfromnum %s", num);
-	for(i = 0; i < numnicks; i++) {
-		if(strncmp(nicknum[i].numeric, num, 5) == 0)
-			return nicknum[i].nick;
-	}
-	nlog (LOG_DEBUG1, LOG_CORE, "%s not found", num);
-	return NULL;
-}
-
-char* getnumfromnick(const char* nick)
-{
-	int i;
-	nlog (LOG_DEBUG1, LOG_CORE, "getnickfromnum %s", nick);
-	for(i = 0; i < numnicks; i++) {
-		if(strcmp(nicknum[i].nick, nick) == 0)
-			return nicknum[i].numeric;
-	}
-	nlog (LOG_DEBUG1, LOG_CORE, "%s not found", nick);
-	return NULL;
-}
 
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
@@ -291,14 +257,14 @@ void ircu_m_private (char* origin, char **av, int ac, int cmdptr)
 	int argc = 0;
 	int i;
 
-	AddStringToList (&argv, getnickfromnum(av[0]), &argc);
+	AddStringToList (&argv, av[0], &argc);
 	/* strip colon */
 	AddStringToList (&argv, &av[1][1], &argc);
 	for(i = 2; i < ac; i++) {
 		AddStringToList (&argv, av[i], &argc);
 	}
 
-	m_private (getnickfromnum(origin), argv, argc, cmdptr);
+	m_private (origin, argv, argc, cmdptr);
 	free(argv);
 }
 
@@ -315,6 +281,7 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 	inttobase64(neonumericbuf, neonumeric, 2);
 	send_cmd ("%s %s", MSG_PASS, pass);
     send_cmd ("%s %s 1 %lu %lu P10 %s]]] :[%s] %s\n", MSG_SERVER, name, (unsigned long)time(NULL), (unsigned long)time(NULL), neonumericbuf, name,  infoline);
+	setservernumeric (name, neonumericbuf);
 }
 
 void
@@ -341,19 +308,21 @@ send_join (const char *sender, const char *who, const char *chan, const unsigned
 	send_cmd (":%s %s %s %lu :%s", who, TOK_JOIN, chan, ts, who);
 }
 
+/* R: ABAAH M #c3 +tn */
 void 
 send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %s %s %lu", who, TOK_MODE, chan, mode, args, ts);
+	send_cmd ("%s %s %s %s %s %lu", neonumericbuf, TOK_MODE, chan, mode, args, ts);
 }
 
 void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
+	char nicknumbuf[6];
+	
 	send_cmd ("%s %s %s 1 %lu %s %s %sAA%c :%s", neonumericbuf, TOK_NICK, nick, ts, ident, host, neonumericbuf, (neonickcount+'A'), realname);
-	strlcpy(nicknum[numnicks].nick, nick, MAXNICK);
-	snprintf(nicknum[numnicks].numeric, 6, "%sAA%c", neonumericbuf, (neonickcount+'A'));
-	numnicks ++;
+	snprintf(nicknumbuf, 6, "%sAA%c", neonumericbuf, (neonickcount+'A'));
+	setusernumeric (nick, nicknumbuf);
 	neonickcount ++;
 }
 
@@ -526,12 +495,8 @@ m_admin (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	char buf[3];
-	buf[0] = argv[5][0];
-	buf[1] = argv[5][1];
-	buf[2] = '\0';
-	strlcpy(servlist[base64toint(buf)], argv[0], MAXHOST);
 	do_server (argv[0], origin, argv[1], NULL, argv[argc-1], srv);
+	setservernumeric (argv[0], argv[5]);
 }
 
 /* R: AB SQ mark.local.org 0 :Ping timeout */
@@ -544,7 +509,7 @@ m_squit (char *origin, char **argv, int argc, int srv)
 	buf[1] = argv[0][1];
 	buf[2] = '\0';
 	tmpbuf = joinbuf(argv, argc, 2);
-	do_squit (servlist[base64toint(buf)], tmpbuf);
+	do_squit (buf, tmpbuf);
 	free(tmpbuf);
 }
 
@@ -553,11 +518,13 @@ m_quit (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 0);
-	do_quit (getnickfromnum(origin), tmpbuf);
+	do_quit (origin, tmpbuf);
 	free(tmpbuf);
 }
 
 /* R: ABAAE M Mark :+i */
+/* R: ABAAH M #c3 +tn */
+/* R: ABAAG M #chan1 +v ABAAH */
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
@@ -580,7 +547,7 @@ m_kill (char *origin, char **argv, int argc, int srv)
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
 {
-	do_pong (servlist[base64toint(argv[0])], argv[1]);
+	do_pong (argv[0], argv[1]);
 }
 
 static void
@@ -616,26 +583,13 @@ m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(argc > 2) {
 		char *realname;
-		char buf[4];
-		buf[0] = argv[6][0];
-		buf[1] = argv[6][1];
-		buf[2] = '\0';
 		realname = joinbuf (argv, argc, (argc - 1));
-		nlog (LOG_DEBUG2, LOG_CORE, "m_nick: %s", buf);
         do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
-			servlist[base64toint(buf)], NULL, NULL, NULL, NULL, realname);
+			argv[6], NULL, NULL, NULL, NULL, realname);
 		free (realname);
-		strlcpy(nicknum[numnicks].nick, argv[0], MAXNICK);
-		strlcpy(nicknum[numnicks].numeric, argv[argc-2], 6);
-		nlog (LOG_DEBUG1, LOG_CORE, "adding %s %s", nicknum[numnicks].nick, nicknum[numnicks].numeric);
-		numnicks++;
+		setusernumeric (argv[0], argv[argc-2]);
 	} else {
-		int i;
-		do_nickchange (getnickfromnum(origin), argv[0], NULL);
-		for(i = 0; i < numnicks; i++) {
-			if(strncmp(nicknum[i].numeric, origin, 5) == 0)
-				strlcpy(nicknum[i].nick, argv[0], MAXNICK);
-		}
+		do_nickchange (origin, argv[0], NULL);
 	}
 }
 static void
@@ -643,7 +597,7 @@ m_topic (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf (argv, argc, 2);
-	do_topic (argv[0], getnickfromnum(origin), NULL, tmpbuf);
+	do_topic (argv[0], origin, NULL, tmpbuf);
 	free (tmpbuf);
 }
 
@@ -652,7 +606,7 @@ m_kick (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 2);
-	do_kick (getnickfromnum(origin), argv[0], getnickfromnum(argv[1]), tmpbuf);
+	do_kick (origin, argv[0], argv[1], tmpbuf);
 	free(tmpbuf);
 }
 
@@ -660,13 +614,13 @@ m_kick (char *origin, char **argv, int argc, int srv)
 static void
 m_create (char *origin, char **argv, int argc, int srv)
 {
-	do_join (getnickfromnum(origin), argv[0], argv[1]);
+	do_join (origin, argv[0], argv[1]);
 }
 
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
-	do_join (getnickfromnum(origin), argv[0], argv[1]);
+	do_join (origin, argv[0], argv[1]);
 }
 
 static void
@@ -674,7 +628,7 @@ m_part (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 1);
-	do_part (getnickfromnum(origin), argv[0], tmpbuf);
+	do_part (origin, argv[0], tmpbuf);
 	free(tmpbuf);
 }
 
@@ -682,7 +636,6 @@ static void
 m_ping (char *origin, char **argv, int argc, int srv)
 {
 	do_ping (argv[0], argv[1]);
-//servlist[base64toint(buf)]
 }
 
 static void
@@ -696,17 +649,22 @@ m_pass (char *origin, char **argv, int argc, int srv)
 3+ [<modes> [<mode extra parameters>]] [<users>] [<bans>]
 */
 /* R: AB B #chan 1076064445 ABAAA:o */
+/* R: AB B #c3 1076083205 +tn ABAAH:o */
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
 
 	char *s, *t;
-	t = (char*)argv[2];
+	if(argv[2][0] == '+') {
+		t = (char*)argv[3];
+	} else {
+		t = (char*)argv[2];
+	}
 	while (*(s = t)) {
 		t = s + strcspn (s, ",");
 		if (*t)
 			*t++ = 0;
-		do_join (getnickfromnum(s), argv[0], argv[1]);
+		do_join (s, argv[0], argv[1]);
 	}
 
 }
