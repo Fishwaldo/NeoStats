@@ -305,7 +305,7 @@ void ircu_m_private (char* origin, char **av, int ac, int cmdptr)
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
-	send_cmd (":%s %s %s %d :%s", sender, TOK_SERVER, name, numeric, infoline);
+	send_cmd ("%s %s * +%s 86400 %lu :%s", sender, TOK_SERVER, name, me.now, infoline);
 }
 
 void
