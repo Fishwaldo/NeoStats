@@ -317,6 +317,11 @@ void get_netstats()
 	fprintf(opf,
 		"<tr><td colspan=2>Total Users Ever Connected</td><td colspan=2>%ld</td></tr>",
 		stats_network.totusers);
+	fprintf(opf, "<tr><td>Current Channels: </td>\n");
+	fprintf(opf, "<td> %i </td>\n", stats_network.chans);
+	fprintf(opf, "<td>Maximum Channels: </td>\n");
+	fprintf(opf, "<td> %ld [%s] </td></tr>\n", stats_network.maxchans,
+		sftime(stats_network.t_chans));
 	fprintf(opf, "<tr><td>Current Opers: </td>\n");
 	fprintf(opf, "<td> %i </td>\n", stats_network.opers);
 	fprintf(opf, "<td>Maximum Opers: </td>\n");
@@ -346,6 +351,10 @@ void get_dailystats()
 		"<tr><td colspan=\"2\">Total Users Connected:</td>\n");
 	fprintf(opf, "<td colspan=\"2\"> %-2d</td></tr>\n",
 		daily.tot_users);
+	fprintf(opf,
+		"<tr><td colspan=\"2\">Max Channels:</td>\n");
+	fprintf(opf, "<td colspan=\"2\"> %-2ld</td></tr>\n",
+		daily.chans);
 	fprintf(opf, "<tr><td colspan=\"2\">Max Daily Opers: </td>\n");
 	fprintf(opf, "<td colspan=\"2\"> %-2d %s </td></tr>\n",
 		daily.opers, sftime(daily.t_opers));
