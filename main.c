@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.97 2003/07/01 12:02:33 fishwaldo Exp $
+** $Id: main.c,v 1.98 2003/07/18 06:09:17 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -103,7 +103,6 @@ int main(int argc, char *argv[])
 
 	/* before we do anything, make sure logging is setup */
 	init_logs();
-
 
 	/* our crash trace variables */
 	strcpy(segv_location, "main");

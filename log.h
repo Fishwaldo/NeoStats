@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.h,v 1.4 2003/07/17 10:13:51 fishwaldo Exp $
+** $Id: log.h,v 1.5 2003/07/18 06:09:17 fishwaldo Exp $
 */
 
 
@@ -69,16 +69,11 @@
    C9x has a similar variable called __func__, but prefer the GCC one since
    it demangles C++ function names.  */
 
-# if defined __cplusplus ? __GNUC_PREREQ (2, 6) : __GNUC_PREREQ (2, 4)
-#   define __NASSERT_FUNCTION    __PRETTY_FUNCTION__
-# else
-#  if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
-#   define __NASSERT_FUNCTION    __func__
-#  else
-#   define __NASSERT_FUNCTION    ((__const char *) 0)
-#  endif
-# endif
+#define __NASSERT_FUNCTION    __PRETTY_FUNCTION__
 
+#ifndef __ASSERT_VOID_CAST
+#define __ASSERT_VOID_CAST (void)
+#endif
 extern void nassert_fail(const char *expr, const char *file, const int line, const char *infunk);
 
 #define nassert(expr) \
