@@ -8,6 +8,7 @@ TARGET= hostserv.so
 
 all:	hostserv
 
+
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
