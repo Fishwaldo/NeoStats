@@ -245,9 +245,9 @@ typedef union {
 
 
 
-#define YYFINAL		61
-#define YYFLAG		-32768
-#define YYNTBASE	22
+#define	YYFINAL		61
+#define	YYFLAG		-32768
+#define	YYNTBASE	22
 
 /* YYTRANSLATE(YYLEX) -- Bison token number corresponding to YYLEX. */
 #define YYTRANSLATE(x) ((unsigned)(x) <= 272 ? yytranslate[x] : 32)
@@ -401,7 +401,7 @@ static const short yypgoto[] =
 };
 
 
-#define YYLAST		51
+#define	YYLAST		51
 
 
 static const short yytable[] =
