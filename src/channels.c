@@ -228,6 +228,12 @@ ChanMode (char *origin, char **av, int ac)
 
 	modes = av[1];
 	while (*modes) {
+		unsigned int mode;
+		unsigned int flags;      
+
+		mode = ircd_cmodes[(int)*modes].mode;
+		flags = ircd_cmodes[(int)*modes].flags;
+
 		switch (*modes) {
 		case '+':
 			add = 1;
@@ -236,23 +242,23 @@ ChanMode (char *origin, char **av, int ac)
 			add = 0;
 			break;
 		default:
-			if (ircd_cmodes[*modes].flags&NICKPARAM) {
-				ChanUserMode (av[0], av[j], add, ircd_cmodes[*modes].mode);
+			if (flags&NICKPARAM) {
+				ChanUserMode (av[0], av[j], add, mode);
 				j++;
 			} else if (add) {
 				/* mode limit and mode key replace current values */
-				if (ircd_cmodes[*modes].mode == CMODE_LIMIT) {
+				if (mode == CMODE_LIMIT) {
 					c->limit = atoi(av[j]);
 					j++;
-				} else if (ircd_cmodes[*modes].mode == CMODE_KEY) {
+				} else if (mode == CMODE_KEY) {
 					strlcpy (c->key, av[j], KEYLEN);
 					j++;
-				} else if (ircd_cmodes[*modes].flags) {
+				} else if (flags) {
 					mn = list_first (c->modeparms);
 					modeexists = 0;
 					while (mn) {
 						m = lnode_get (mn);
-						if (((int *) m->mode == (int *) ircd_cmodes[*modes].mode) && !ircstrcasecmp (m->param, av[j])) {
+						if ((m->mode == mode) && !ircstrcasecmp (m->param, av[j])) {
 							dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", *modes, av[j]);
 							j++;
 							modeexists = 1;
@@ -262,7 +268,7 @@ ChanMode (char *origin, char **av, int ac)
 					}
 					if (modeexists != 1) {
 						m = smalloc (sizeof (ModesParm));
-						m->mode = ircd_cmodes[*modes].mode;
+						m->mode = mode;
 						strlcpy (m->param, av[j], PARAMSIZE);
 						mn = lnode_create (m);
 						if (list_isfull (c->modeparms)) {
@@ -274,16 +280,16 @@ ChanMode (char *origin, char **av, int ac)
 						j++;
 					}
 				} else {
-					c->modes |= ircd_cmodes[*modes].mode;
+					c->modes |= mode;
 				}
 			} else {
-				if(ircd_cmodes[*modes].mode == CMODE_LIMIT) {
+				if(mode == CMODE_LIMIT) {
 					c->limit = 0;
-				} else if (ircd_cmodes[*modes].mode == CMODE_KEY) {
+				} else if (mode == CMODE_KEY) {
 					c->key[0] = 0;
 					j++;
-				} else if (ircd_cmodes[*modes].flags) {
-					mn = list_find (c->modeparms, (int *) ircd_cmodes[*modes].mode, comparemode);
+				} else if (flags) {
+					mn = list_find (c->modeparms, (void *) mode, comparemode);
 					if (!mn) {
 						dlog(DEBUG1, "ChanMode: can't find mode %c for channel %s", *modes, c->name);
 					} else {
@@ -293,7 +299,7 @@ ChanMode (char *origin, char **av, int ac)
 						sfree (m);
 					}
 				} else {
-					c->modes &= ~ircd_cmodes[*modes].mode;
+					c->modes &= ~mode;
 				}
 			}
 		}

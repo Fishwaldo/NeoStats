@@ -37,34 +37,34 @@ typedef struct ircd_cmd{
 	const char *name;
 	const char *token;
 	ircd_cmd_handler function;
-	int usage;
+	unsigned int usage;
 }ircd_cmd;
 
 typedef struct cmode_init {
 	char modechar;
-	long mode;
-	unsigned flags;
+	unsigned int mode;
+	unsigned int flags;
 } cmode_init;
 
 typedef struct ChanModes {
-	long mode;
-	unsigned flags;
+	unsigned int mode;
+	unsigned int flags;
 	char sjoin;
 } ChanModes;
 
 typedef struct cumode_init {
 	char modechar;
-	long mode;
+	unsigned int mode;
 	char sjoin;
 } cumode_init;
 
 typedef struct umode_init {
 	char modechar;
-	unsigned long umode;
+	unsigned int umode;
 } umode_init;
 
 typedef struct UserModes {
-	unsigned long umode;
+	unsigned int umode;
 } UserModes;
 
 typedef struct ircd_server {

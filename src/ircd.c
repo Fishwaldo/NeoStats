@@ -194,17 +194,17 @@ InitIrcdModes (void)
 	while(cmodes->modechar) 
 	{
 		dlog(DEBUG4, "Adding channel mode %c", cmodes->modechar);
-		ircd_cmodes[cmodes->modechar].mode = cmodes->mode;
-		ircd_cmodes[cmodes->modechar].flags = cmodes->flags;
+		ircd_cmodes[(int)cmodes->modechar].mode = cmodes->mode;
+		ircd_cmodes[(int)cmodes->modechar].flags = cmodes->flags;
 		cmodes ++;
 	}
 	cumodes = chan_umodes;
 	while(cumodes->modechar) 
 	{
 		dlog(DEBUG4, "Adding channel user mode %c", cumodes->modechar);
-		ircd_cmodes[cumodes->modechar].mode = cumodes->mode;
-		ircd_cmodes[cumodes->modechar].sjoin = cumodes->sjoin;
-		ircd_cmodes[cmodes->modechar].flags = NICKPARAM;
+		ircd_cmodes[(int)cumodes->modechar].mode = cumodes->mode;
+		ircd_cmodes[(int)cumodes->modechar].sjoin = cumodes->sjoin;
+		ircd_cmodes[(int)cmodes->modechar].flags = NICKPARAM;
 		cumodes ++;
 	}
 	/* build umode lookup table */
@@ -213,7 +213,7 @@ InitIrcdModes (void)
 	while(umodes->modechar) 
 	{
 		dlog(DEBUG4, "Adding user mode %c", umodes->modechar);
-		ircd_umodes[umodes->modechar].umode = umodes->umode;
+		ircd_umodes[(int)umodes->modechar].umode = umodes->umode;
 		/* Build supported modes mask */
 		ircd_supported_umodes |= umodes->umode;
 		umodes ++;
@@ -224,7 +224,7 @@ InitIrcdModes (void)
 	while(umodes->modechar) 
 	{
 		dlog(DEBUG4, "Adding user smode %c", smodes->modechar);
-		ircd_smodes[smodes->modechar].umode = smodes->umode;
+		ircd_smodes[(int)smodes->modechar].umode = smodes->umode;
 		/* Build supported smodes mask */
 		ircd_supported_umodes |= umodes->umode;
 		smodes ++;
@@ -299,10 +299,10 @@ UmodeStringToMask(const char* UmodeString, long Umode)
 			break;
 		default:
 			if (add) {
-				Umode |= ircd_umodes[*tmpmode].umode;
+				Umode |= ircd_umodes[(int)*tmpmode].umode;
 				break;
 			} else {
-				Umode &= ~ircd_umodes[*tmpmode].umode;
+				Umode &= ~ircd_umodes[(int)*tmpmode].umode;
 				break;
 			}
 		}
@@ -358,10 +358,10 @@ SmodeStringToMask(const char* SmodeString, long Smode)
 			break;
 		default:
 			if (add) {
-				Smode |= ircd_smodes[*tmpmode].umode;
+				Smode |= ircd_smodes[(int)*tmpmode].umode;
 				break;
 			} else {
-				Smode &= ~ircd_smodes[*tmpmode].umode;
+				Smode &= ~ircd_smodes[(int)*tmpmode].umode;
 				break;
 			}
 		}
@@ -394,10 +394,10 @@ CUmodeStringToMask(const char* UmodeString, long Umode)
 			break;
 		default:
 			if (add) {
-				Umode |= ircd_cmodes[*tmpmode].mode;
+				Umode |= ircd_cmodes[(int)*tmpmode].mode;
 				break;
 			} else {
-				Umode &= ~ircd_cmodes[*tmpmode].mode;
+				Umode &= ~ircd_cmodes[(int)*tmpmode].mode;
 				break;
 			}
 		}
@@ -425,7 +425,7 @@ join_bot_to_chan (const char *who, const char *chan, const char *mode)
 		if (mode == NULL) {
 			irc_send_sjoin (me.name, who, chan, (unsigned long)ts);
 		} else {
-			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", ircd_cmodes[mode[1]].sjoin, who);
+			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", ircd_cmodes[(int)mode[1]].sjoin, who);
 			irc_send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
 		}
 		join_chan (who, chan);
@@ -1453,19 +1453,25 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		SetChanTS (c, atoi (tstime)); 
 		if (*modes == '+') {
 			while (*modes) {
+				unsigned int mode;
+				unsigned int flags;      
+
+				mode = ircd_cmodes[(int)*modes].mode;
+				flags = ircd_cmodes[(int)*modes].flags;
+
 				/* mode limit and mode key replace current values */
-				if (ircd_cmodes[*modes].mode == CMODE_LIMIT) {
+				if (mode == CMODE_LIMIT) {
 					c->limit = atoi(argv[j]);
 					j++;
-				} else if (ircd_cmodes[*modes].mode == CMODE_KEY) {
+				} else if (mode == CMODE_KEY) {
 					strlcpy (c->key, argv[j], KEYLEN);
 					j++;
-				} else if (ircd_cmodes[*modes].flags) {
+				} else if (flags) {
 					mn = list_first (c->modeparms);
 					modeexists = 0;
 					while (mn) {
 						m = lnode_get (mn);
-						if ((m->mode == ircd_cmodes[*modes].mode) && !ircstrcasecmp (m->param, argv[j])) {
+						if ((m->mode == mode) && !ircstrcasecmp (m->param, argv[j])) {
 							dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", *modes, argv[j]);
 							j++;
 							modeexists = 1;
@@ -1475,7 +1481,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 					}
 					if (modeexists != 1) {
 						m = smalloc (sizeof (ModesParm));
-						m->mode = ircd_cmodes[*modes].mode;
+						m->mode = mode;
 						strlcpy (m->param, argv[j], PARAMSIZE);
 						mn = lnode_create (m);
 						if (list_isfull (c->modeparms)) {
@@ -1487,7 +1493,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 						j++;
 					}
 				} else {
-					c->modes |= ircd_cmodes[*modes].mode;
+					c->modes |= mode;
 				}
 				modes++;
 			}
