@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: loveserv.c,v 1.9 2002/10/14 01:06:21 shmad Exp $
+** $Id: loveserv.c,v 1.10 2002/10/27 05:55:31 fishwaldo Exp $
 */
 
 
@@ -62,7 +62,9 @@ int new_m_version(char *origin, char **av, int ac) {
 
 Functions my_fn_list[] = {
         { MSG_VERSION,  new_m_version,  1 },
+#ifdef HAVE_TOKEN_SUP
         { TOK_VERSION,  new_m_version,  1 },
+#endif
 	{ NULL,        NULL,        0 }
 };
 

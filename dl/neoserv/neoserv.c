@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoserv.c,v 1.5 2002/09/04 08:40:28 fishwaldo Exp $
+** $Id: neoserv.c,v 1.6 2002/10/27 05:55:31 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -54,7 +54,9 @@ int new_m_version(char *origin, char **av, int ac) {
 
 Functions my_fn_list[] = {
         { MSG_VERSION,  new_m_version,  1 },
+#ifdef HAVE_TOKEN_SUP
         { TOK_VERSION,  new_m_version,  1 },
+#endif
 	{ NULL,        NULL,        0 }
 };
 
