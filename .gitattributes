@@ -166,6 +166,7 @@ keeper/kp_util.h -text
 logs/.keepme -text
 /main.c -text
 /makeconf -text
+/misc.c -text
 /mystic.c -text
 /mystic.h -text
 /neoircd.c -text
