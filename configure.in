@@ -18,6 +18,7 @@ MODULES="connectserv hostserv loveserv moraleserv statserv"
 
 x_version=$x_maj.$x_min.$x_rev
 AM_INIT_AUTOMAKE($x_package, $x_version)
+AM_MAINTAINER_MODE
 AC_DEFINE_UNQUOTED(MAJOR, $x_maj, "Major Version Number")
 AC_DEFINE_UNQUOTED(MINOR, $x_min, "Minor Version Number")
 AC_DEFINE_UNQUOTED(REV, $x_rev, "Revision Version Number")
