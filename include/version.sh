@@ -1,7 +1,5 @@
 # Script to generate SVN version information
 
-touch version.sh
-
 id=`svn info |grep 'Revision:'`
 id=`echo $id |sed 's/.* Revision: \(.*\) .* Exp .*/\1/'`
 

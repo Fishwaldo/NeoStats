@@ -9,6 +9,6 @@ docdir			= @prefix@/doc
 doc_DATA		= doc/* doc/old/*
 
 all-local:
-	@rm include/version.h
+	@touch include/version.sh
 
 include $(top_srcdir)/autotools/rules.mk

@@ -642,7 +642,7 @@ uninstall-info: uninstall-info-recursive
 
 
 all-local:
-	@rm include/version.h
+	@touch include/version.sh
 
 .c.o:
 			@echo "Building $@"
