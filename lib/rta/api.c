@@ -101,7 +101,11 @@ rta_init(logcb logfunc)
 #endif
 }
 
-
+void
+rta_exit(void)
+{
+	list_destroy_auto (pgconn);
+}
 
 /***************************************************************
  * rta_add_table(): - Add one table to the list of
