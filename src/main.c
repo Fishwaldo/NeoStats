@@ -218,9 +218,7 @@ static int InitCore( void )
 	/* initialize Lang Subsystem */
 	ircsnprintf( dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX );
 	LANGinit( 1, dbpath, NULL );
-#ifndef WIN32
 	event_init();
-#endif
 	/* initialize Module subsystem */
 	if( InitDBA() != NS_SUCCESS )
 		return NS_FAILURE;
