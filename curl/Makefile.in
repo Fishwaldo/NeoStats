@@ -1,0 +1,132 @@
+#curl Makefile
+CC=@CC@
+CFLAGS= -DHAVE_CONFIG_H @CFLAGS@ @CPPFLAGS@
+LDFLAGS= @LDFLAGS@ @LIBS@
+
+SOURCES= base64.c easy.c getdate.c http.c if2ip.c md5.c progress.c ssluse.c transfer.c connect.c escape.c getenv.c http_chunks.c \
+         inet_pton.c memdebug.c security.c strequal.c url.c content_encoding.c file.c getinfo.c http_digest.c krb4.c mprintf.c sendf.c \
+         strtok.c version.c cookie.c formdata.c hash.c http_negotiate.c ldap.c multi.c share.c telnet.c dict.c ftp.c hostip.c \
+         http_ntlm.c llist.c netrc.c speedcheck.c timeval.c
+OBJECTS= ${SOURCES:.c=.o}
+DOCS=README.pcre COPYING
+
+all:	 ${OBJECTS}
+
+.c.o:	
+	 $(CC) -c $(CFLAGS) $<
+
+getdate.c:
+	 @YACC@  getdate.y
+	 mv -f y.tab.c getdate.c
+
+clean:
+	 /bin/rm -rf *.o config.h Makefile getdate.c mycurl-config
+
+install: 
+
+dist:	
+
+$(OBJECTS): Makefile
+base64.o: base64.c setup.h config.h mprintf.h base64.h
+easy.o: easy.c setup.h config.h strequal.h curl.h types.h easy.h multi.h \
+  urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \
+  llist.h transfer.h ssluse.h url.h getinfo.h share.h mprintf.h
+getdate.c: getdate.y
+getdate.o: getdate.c setup.h config.h getdate.h
+http.o: http.c setup.h config.h curl.h types.h easy.h multi.h urldata.h \
+  cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h llist.h \
+  transfer.h sendf.h progress.h base64.h strequal.h ssluse.h \
+  http_digest.h http_ntlm.h http_negotiate.h url.h share.h http.h \
+  mprintf.h
+if2ip.o: if2ip.c setup.h config.h
+md5.o: md5.c setup.h config.h
+progress.o: progress.c setup.h config.h curl.h types.h easy.h multi.h \
+  urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \
+  llist.h sendf.h progress.h mprintf.h
+ssluse.o: ssluse.c setup.h config.h curl.h types.h easy.h multi.h \
+  urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \
+  llist.h sendf.h url.h inet_pton.h
+transfer.o: transfer.c setup.h config.h strequal.h curl.h types.h easy.h \
+  multi.h urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h \
+  hash.h llist.h netrc.h content_encoding.h transfer.h sendf.h \
+  speedcheck.h progress.h getdate.h http.h url.h getinfo.h ssluse.h \
+  http_digest.h http_ntlm.h http_negotiate.h share.h mprintf.h
+connect.o: connect.c setup.h config.h curl.h types.h easy.h multi.h \
+  urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \
+  llist.h sendf.h if2ip.h
+escape.o: escape.c setup.h config.h curl.h types.h easy.h multi.h
+getenv.o: getenv.c setup.h config.h
+http_chunks.o: http_chunks.c setup.h config.h curl.h types.h easy.h \
+  multi.h urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h \
+  hash.h llist.h sendf.h content_encoding.h mprintf.h
+inet_pton.o: inet_pton.c setup.h config.h
+memdebug.o: memdebug.c
+security.o: security.c setup.h config.h
+strequal.o: strequal.c setup.h config.h
+url.o: url.c setup.h config.h curl.h types.h easy.h multi.h urldata.h \
+  cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h llist.h \
+  netrc.h base64.h ssluse.h if2ip.h transfer.h sendf.h progress.h \
+  strequal.h escape.h strtok.h share.h content_encoding.h http_digest.h \
+  http_negotiate.h ftp.h dict.h telnet.h http.h file.h ldap.h url.h \
+  connect.h mprintf.h
+content_encoding.o: content_encoding.c setup.h config.h curl.h types.h \
+  easy.h multi.h urldata.h cookie.h formdata.h timeval.h http_chunks.h \
+  hostip.h hash.h llist.h sendf.h
+file.o: file.c setup.h config.h curl.h types.h easy.h multi.h urldata.h \
+  cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h llist.h \
+  progress.h sendf.h escape.h mprintf.h
+getinfo.o: getinfo.c setup.h config.h curl.h types.h easy.h multi.h \
+  urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \
+  llist.h
+http_digest.o: http_digest.c setup.h config.h curl.h types.h easy.h \
+  multi.h urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h \
+  hash.h llist.h sendf.h strequal.h md5.h http_digest.h mprintf.h
+krb4.o: krb4.c setup.h config.h
+mprintf.o: mprintf.c setup.h config.h
+sendf.o: sendf.c setup.h config.h curl.h types.h easy.h multi.h urldata.h \
+  cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h llist.h \
+  sendf.h connect.h mprintf.h
+strtok.o: strtok.c setup.h config.h
+version.o: version.c setup.h config.h curl.h types.h easy.h multi.h \
+  urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \
+  llist.h
+cookie.o: cookie.c setup.h config.h curl.h types.h easy.h multi.h \
+  urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \
+  llist.h getdate.h strequal.h strtok.h sendf.h
+formdata.o: formdata.c setup.h config.h curl.h types.h easy.h multi.h \
+  formdata.h strequal.h
+hash.o: hash.c setup.h config.h hash.h llist.h
+http_negotiate.o: http_negotiate.c setup.h config.h
+ldap.o: ldap.c setup.h config.h curl.h types.h easy.h multi.h urldata.h \
+  cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h llist.h \
+  sendf.h escape.h transfer.h mprintf.h
+multi.o: multi.c setup.h config.h curl.h types.h easy.h multi.h urldata.h \
+  cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h llist.h \
+  transfer.h url.h connect.h progress.h
+share.o: share.c setup.h config.h curl.h types.h easy.h multi.h urldata.h \
+  cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h llist.h \
+  share.h
+telnet.o: telnet.c setup.h config.h curl.h types.h easy.h multi.h \
+  urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \
+  llist.h transfer.h sendf.h mprintf.h arpa_telnet.h
+dict.o: dict.c setup.h config.h curl.h types.h easy.h multi.h urldata.h \
+  cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h llist.h \
+  transfer.h sendf.h progress.h strequal.h mprintf.h
+ftp.o: ftp.c setup.h config.h curl.h types.h easy.h multi.h urldata.h \
+  cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h llist.h \
+  sendf.h if2ip.h progress.h transfer.h escape.h http.h ftp.h strequal.h \
+  ssluse.h connect.h mprintf.h
+hostip.o: hostip.c setup.h config.h curl.h types.h easy.h multi.h \
+  urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \
+  llist.h sendf.h share.h url.h mprintf.h
+http_ntlm.o: http_ntlm.c setup.h config.h curl.h types.h easy.h multi.h \
+  urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \
+  llist.h sendf.h strequal.h base64.h http_ntlm.h url.h http.h mprintf.h
+llist.o: llist.c setup.h config.h llist.h
+netrc.o: netrc.c setup.h config.h curl.h types.h easy.h multi.h \
+  strequal.h strtok.h mprintf.h
+speedcheck.o: speedcheck.c setup.h config.h curl.h types.h easy.h multi.h \
+  urldata.h cookie.h formdata.h timeval.h http_chunks.h hostip.h hash.h \
+  llist.h sendf.h speedcheck.h
+timeval.o: timeval.c timeval.h setup.h config.h
+
