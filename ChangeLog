@@ -1,5 +1,8 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 =====================================================================================
+* NeoStats * Mark (M) * Version 2.5.20
+ - Fix crash on IRCu in do_server (M)
+
 * NeoStats * Fish (F) * Version 2.5.19
  - Fix up a problem with exclude lists (F)
  - Fix up a problem with NICKIP issues on Unreal 3.2.0 (BugID 180) (F)
