@@ -896,7 +896,6 @@ static void makemap(char *uplink, User * u, int level)
 			/* its not the root server */
 			buf[0]='\0';
 			for (i = 1; i < level; i++) {
-				strncat(buf, buf, 256);
 				strncat(buf, "     |", 256);
 			}
 			prefmsg(u->nick, s_StatServ,
