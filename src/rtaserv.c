@@ -532,7 +532,7 @@ void ModFini (void)
 
 void rtaserv_init (void)
 {
-	//ModuleConfig (sql_settings);
+	ModuleConfig (sql_settings);
 	InitSqlSrv ();
 }
 

@@ -262,7 +262,7 @@ get_options (int argc, char **argv)
 	int level;
 
 	/* Clear config */
-	memset(&config, 0 , sizeof(config));
+	memset(&ns_config, 0 , sizeof(config));
 	/* Debug mode overrides */
 #ifdef DEBUG
 	nsconfig.loglevel = LOG_INFO;
