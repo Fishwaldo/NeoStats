@@ -112,6 +112,7 @@ src/commands.c -text
 src/commands.h -text
 src/conf.c eol=lf
 src/conf.h eol=lf
+src/configwin32.h -text
 src/curl/COPYING -text
 src/curl/Makefile.am -text
 src/curl/Makefile.in -text
@@ -343,6 +344,7 @@ src/pcre/COPYING -text
 src/pcre/Makefile.am -text
 src/pcre/Makefile.in -text
 src/pcre/README -text
+src/pcre/configwin32.h -text
 src/pcre/dftables.c eol=lf
 src/pcre/get.c eol=lf
 src/pcre/internal.h eol=lf
