@@ -10,6 +10,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fix ConnectServ ServWatch problem (F)
  - Add recursion to squit to automatically remove leaves (M)
  - Add NOQUIT protocol support to core (M)
+ - StatServ: fix alerts not disabled - bug 157 (M)
 
 * NeoStats * Mark (M) * Version 2.5.16
  - Fix problem with Unreal SVSMODE services TS processing (M)

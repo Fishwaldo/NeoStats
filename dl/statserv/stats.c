@@ -50,7 +50,7 @@ announce_record(const char *msg, ...)
 {
 	va_list ap;
 
-	if(StatServ.recordalert < 0) {
+	if(StatServ.recordalert <= 0) {
 		return 1;
 	}
 
@@ -79,7 +79,7 @@ announce_lag(const char *msg, ...)
 {
 	va_list ap;
 
-	if(StatServ.lagalert < 0) {
+	if(StatServ.lagalert <= 0) {
 		return 1;
 	}
 
