@@ -1735,7 +1735,7 @@ do_server (const char *name, const char *uplink, const char* hops, const char *n
 {
 	if(!srv) {
 		if (*uplink == 0) {
-			me.s = AddServer (name, uplink, hops, numeric, infoline);
+			me.s = AddServer (name, me.name, hops, numeric, infoline);
 		} else {
 			me.s = AddServer (name, uplink, hops, numeric, infoline);
 		}
