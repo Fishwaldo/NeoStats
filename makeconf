@@ -365,20 +365,20 @@ RECONNECT_TIME $NEOCONN
 
 #ONLY_OPERS
 
-# BINDTO [OPTIONAL]
+# BIND_TO [OPTIONAL]
 #    Make NeoStats bind to a particular IP Address. If not
 #    specified NeoStats will attempt to find this address
 #    itself. e.g. 
 #    
-#        BINDTO 203.203.123.12
+#        BIND_TO 203.203.123.12
 #    
 #    All outgoing connections from NeoStats will originate from this 
 #    IP address
 #    This IP address should not be localhost (127.0.0.1)
 
-#BINDTO $BINDIP
+#BIND_TO $BINDIP
 
-# LOGFILENAMEFORMAT <format> [OPTIONAL]
+# LOG_FILENAME_FORMAT <format> [OPTIONAL]
 #    Defines the format for dated log files. This allows you to choose 
 #    what date format is used for log file names when they are rotated at 
 #    midnight. The option uses the parameters passed to strftime so you 
@@ -395,24 +395,24 @@ RECONNECT_TIME $NEOCONN
 #    Examples using 30 September 2003 as the date:
 #    For NeoStats0930.log:
 #        
-#        LOGFILENAMEFORMAT %m%d
+#        LOG_FILENAME_FORMAT %m%d
 #    
 #    For NeoStats20030930.log:
 #    
-#        LOGFILENAMEFORMAT %Y%m%d      
+#        LOG_FILENAME_FORMAT %Y%m%d      
 #    
 #    If not defined, the default is the original NeoStats log format of
 #    "-%m-%d" i.e. NeoStats-09-30.log
 
-#LOGFILENAMEFORMAT $LOGFNAMEFORMAT
+#LOG_FILENAME_FORMAT $LOGFNAMEFORMAT
 
-# SETSERVERTIMES <INTERVAL> [OPTIONAL]
+# SET_SERVER_TIMES <INTERVAL> [OPTIONAL]
 #    Cause NeoStats to sync server times at the given interval
 #    INTERVAL is an integer representing the number of hours
 #        
 #    Examples
 #        
-#        SETSERVERTIMES 24
+#        SET_SERVER_TIMES 24
 #    
 #    Cause NeoStats to sync server times every 24 hours
 #    If not present, NeoStats will not sync times.
@@ -421,7 +421,7 @@ RECONNECT_TIME $NEOCONN
 #    cause NeoStats to sync servers when it first joins the 
 #    network.
 
-SETSERVERTIMES 24
+SET_SERVER_TIMES 24
 
 #####################################
 # Module Configurations and Loading #
@@ -436,38 +436,37 @@ SETSERVERTIMES 24
 #    
 #    Multiple instances of LOAD_MODULE may be specified 
 
-# this is the StatServ Module
+# StatServ, maintain and report various networks statistics
 #LOAD_MODULE statserv
 
-#This is a new module.  LoveServ, send a rose, hug, kiss, chocolate, etc to that
-# Special IRC Somebody. :D
+# LoveServ, send a rose, hug, kiss, etc to that special IRC somebody
 #LOAD_MODULE loveserv
 
-# The HostServ module provides vhost services
+# HostServ, vhost services for users
 #LOAD_MODULE hostserv
 
-# MoraleServ. A fun module to cheer people up.
+# MoraleServ, fun module to cheer people up.
 #LOAD_MODULE moraleserv
 
-# ConnectServ will watch all connections to the network and can report them
-# to the services channel. It can also watch and report Nickname changes.
+# ConnectServ, monitor connections to the network: user connections, oper 
+# modes, server connections and nick changes.
 #LOAD_MODULE connectserv
 
-# IRCdauth will authenticate users based on their user modes.
-#LOAD_AUTH_MODULE ircdauth
+# IRCdauth, authenticate users based on their user modes.
+#LOAD_MODULE ircdauth
 
-# Extauth will authenticate users based on nick!user@host access lists
-#LOAD_AUTH_MODULE extauth
+# Extauth, authenticate users based on nick!user@host access lists
+#LOAD_MODULE extauth
 
 ########################################
 # NeoStats ROOT user                   #
 ########################################
 
-#SERVICEROOT <nick!user@host> [REQUIRED]
+#SERVICE_ROOT <nick!user@host> [REQUIRED]
 #    Set who should get master access to manage NeoStats regardless of 
 #    authentication systems. Only one entry allowed. e.g.
 #    
-#        SERVICEROOT fish!?Fish@*.neostats.net
+#        SERVICE_ROOT fish!?Fish@*.neostats.net
 #        
 #    Will give "fish" complete access to NeoStats if fish has 
 #    umode +r and comes from the specified hostname and ident. 

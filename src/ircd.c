@@ -611,7 +611,6 @@ do_stats (const char* nick, const char *what)
 		irc_numeric (RPL_STATSCLINE, u->name, "C *@%s * * %d 50", me.uplink, config.port);
 	} else if (!ircstrcasecmp (what, "o")) {
 		/* Operators */
-		ListAuth(u);
 	} else if (!ircstrcasecmp (what, "l")) {
 		/* Port Lists */
 		tmp = me.now - me.lastmsg;
@@ -716,7 +715,7 @@ irc_chanalert (const Bot *botptr, const char *fmt, ...)
 {
 	va_list ap;
 
-	if (!me.onchan)
+	if (!is_synched)
 		return;
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
@@ -804,7 +803,7 @@ irc_globops (const Bot *botptr, const char *fmt, ...)
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 
-	if (me.onchan) {
+	if (is_synched) {
 		if(irc_send_globops) {
 			irc_send_globops((botptr?botptr->u->name:me.name), ircd_buf);
 		} else {

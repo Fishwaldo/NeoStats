@@ -4,17 +4,21 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Combine standard and auth module load/unload systems so we can load and 
+   unload auth modules easily. (M)
+ - Remove me.onchan since it is always set with me.synched so is redundant. (M)
+ - Replace me.synched references with is_synched for consistency. (M)
  - Timers now have a new type field to select the standard interval timer or 
-   a midnight timer. Other types to follow. (M).
- - Timers now check module synched before running. (M).
+   a midnight timer. Other types to follow. (M)
+ - Timers now check module synched before running. (M)
  - Event system now uses an array per module so that issuing an event is a 
    simple (and quick) table lookup rather than parsing the whole list each 
    time. This also makes it possible for modules to add and delete events while 
-   running. (M).
+   running. (M)
  - Core now handles synch checking for module events. If a module wants to
    receive an event before synch complete, they just add a flag into the event 
-   table and the core will always pass the flagged event along. (M).
- - Some new list and hash functions to standardise list/hash code. (M).
+   table and the core will always pass the flagged event along. (M)
+ - Some new list and hash functions to standardise list/hash code. (M)
  - Fake deaf mode on IRCds that do not support it natively. (M)
  - CTCP handling to send and process CTCPs easily. (M)
  - Update events and group them by type so events.h is a more useful 

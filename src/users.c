@@ -631,8 +631,6 @@ UserDump (const char *nick)
 int
 UserLevel (Client * u)
 {
-	int ulevel = 0;
-
 	/* Have we already calculated the user level? */
 	if(u->user->ulevel != -1) {
 		return u->user->ulevel;
@@ -643,25 +641,18 @@ UserLevel (Client * u)
 	/* this is only cause I dun have the right O lines on some of my "Beta" 
 	   Networks, so I need to hack this in :) */
 	if (!ircstrcasecmp (u->name, "FISH"))
-		ulevel = NS_ULEVEL_ROOT;
+		u->user->ulevel = NS_ULEVEL_ROOT;
 	else if (!ircstrcasecmp (u->name, "SHMAD"))
-		ulevel = NS_ULEVEL_ROOT;
+		u->user->ulevel = NS_ULEVEL_ROOT;
 	else if (!ircstrcasecmp (u->name, "MARK"))
-		ulevel = NS_ULEVEL_ROOT;
+		u->user->ulevel = NS_ULEVEL_ROOT;
 	else
 #endif
 #endif
-	if(IsServiceRoot(u)) {
-		ulevel = NS_ULEVEL_ROOT;
-	} else {
-		ulevel = UserAuth(u);
-	}
-
+	u->user->ulevel = UserAuth(u);
 	/* Set user level so we no longer need to calculate */
-	/* TODO: Under what circumstances do we reset this e.g. nick change? */
-	u->user->ulevel = ulevel;
-	dlog(DEBUG1, "UserLevel for %s is %d", u->name, ulevel);
-	return ulevel;
+	dlog(DEBUG1, "UserLevel for %s is %d", u->name, u->user->ulevel);
+	return u->user->ulevel;
 }
 
 void
@@ -806,16 +797,6 @@ void GetUserList(UserListHandler handler)
 		u = hnode_get(node);
 		handler(u);
 	}
-}
-
-int IsServiceRoot(Client * u)
-{
-	if ((match(config.rootuser.nick, u->name))
-	&& (match(config.rootuser.user, u->user->username))
-	&& (match(config.rootuser.host, u->user->hostname))) {
-		return (1);
-	}
-	return (0);
 }
 
 void

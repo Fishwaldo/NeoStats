@@ -166,12 +166,10 @@ static int getuserlevel(CmdParams * cmdparams)
 	ulevel = UserLevel(cmdparams->source);
 	/* If less than a locop see if the module can give us a user level */
 	if(ulevel < NS_ULEVEL_LOCOPER) {
-		if(cmdparams->bot->moduleptr) {
-			if(cmdparams->bot->moduleptr->mod_auth_cb) {
-				modlevel = cmdparams->bot->moduleptr->mod_auth_cb(cmdparams->source);
-				if(modlevel > ulevel) {
-					ulevel = modlevel;
-				}
+		if(cmdparams->bot->moduleptr->mod_auth_cb) {
+			modlevel = cmdparams->bot->moduleptr->mod_auth_cb(cmdparams->source);
+			if(modlevel > ulevel) {
+				ulevel = modlevel;
 			}
 		}
 	}

@@ -520,7 +520,6 @@ typedef struct tme {
 	char servicesumode[64];
 	unsigned int servicesumodemask;
 	char serviceschan[MAXCHANLEN];
-	unsigned int onchan:1;
 	unsigned int synched:1;
 	Client *s;
 	int requests;
@@ -732,9 +731,13 @@ typedef struct ModuleEvent {
 	unsigned int flags;
 }ModuleEvent;
 
-typedef int ModuleFlags;
 typedef int ModuleProtocol;
 typedef int ModuleFeatures;
+
+typedef enum ModuleFlags {
+	MODULE_FLAG_NONE = 0,
+	MODULE_FLAG_AUTH
+} ModuleFlags;
 
 /** @brief Module Info structure
  *	This describes the module to the NeoStats core and provides information
@@ -789,6 +792,7 @@ typedef struct ModuleInfo {
 }ModuleInfo;
 
 typedef int (*mod_auth) (Client * u);
+typedef int (*userauthfunc) (Client *u);
 
 /** @brief Module structure
  * 
@@ -797,6 +801,7 @@ typedef struct Module {
 	ModuleInfo *info;
 	ModuleEvent *event_list;
 	mod_auth mod_auth_cb;
+	mod_auth userauth;
 	void *dl_handle;
 	unsigned int modnum;
 	unsigned int synched;

@@ -30,6 +30,7 @@
 #include "bots.h"
 #include "dns.h"
 #include "ircd.h"
+#include "auth.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -325,6 +326,20 @@ void DeleteEvent (Event event)
 	}
 }
 
+static void load_module_error(const Client *target, const char *fmt, ...)
+{
+	static char buf[BUFSIZE];
+	va_list ap;
+
+	va_start (ap, fmt);
+	ircvsnprintf (buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	if (target) {
+		irc_prefmsg (ns_botptr, target, buf);
+	}
+	nlog (LOG_WARNING, buf);
+}
+
 /** @brief 
  *
  * @param 
@@ -336,7 +351,6 @@ load_module (const char *modfilename, Client * u)
 {
 	int err;
 	void *dl_handle;
-	int do_msg = 0;
 	char path[255];
 	char loadmodname[255];
 	int moduleindex = 0;
@@ -347,84 +361,70 @@ load_module (const char *modfilename, Client * u)
 
 	SET_SEGV_LOCATION();
 	if (hash_isfull (modulehash)) {
-		if (do_msg) {
-			irc_prefmsg (ns_botptr, u, "Unable to load module: module list is full");
-		}
-		nlog (LOG_WARNING, "Unable to load module: module list is full");
+		load_module_error (u, "Unable to load module: module list is full");
 		return NULL;
 	} 
-	if (u) {
-		do_msg = 1;
-	}
 	strlcpy (loadmodname, modfilename, 255);
 	strlwr (loadmodname);
 	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_EXT);
 	dl_handle = ns_dlopen (path, RTLD_NOW || RTLD_GLOBAL);
 	if (!dl_handle) {
-		if (do_msg) {
-			irc_prefmsg (ns_botptr, u, "Unable to load module: %s %s", ns_dlerrormsg, path);
-		}
-		nlog (LOG_WARNING, "Unable to load module: %s %s", ns_dlerrormsg, path);
+		load_module_error (u, "Unable to load module: %s %s", ns_dlerrormsg, path);
 		return NULL;
 	}
-
 	info_ptr = ns_dlsym (dl_handle, "module_info");
 	if(info_ptr == NULL) {
-		if (do_msg) {
-			irc_prefmsg (ns_botptr, u, "Unable to load module: %s %s", ns_dlerrormsg, path);
-		}
-		nlog (LOG_WARNING, "Unable to load module: %s %s", ns_dlerrormsg, path);
+		load_module_error (u, "Unable to load module: %s missing module_info", path);
 		ns_dlclose (dl_handle);
 		return NULL;
 	}
 	/* Check module was built for this version of NeoStats */
 	if(	ircstrncasecmp (NEOSTATS_VERSION, info_ptr->neostats_version, VERSIONSIZE) !=0 ) {
-		nlog (LOG_WARNING, "Unable to load module: %s was built with an old version of NeoStats and must be rebuilt.", modfilename);
+		load_module_error (u, "Unable to load module: %s was built with an old version of NeoStats and must be rebuilt.", modfilename);
 		ns_dlclose (dl_handle);
 		return NULL;
 	}
 	/* Check that the Module hasn't already been loaded */
 	if (hash_lookup (modulehash, info_ptr->name)) {
 		ns_dlclose (dl_handle);
-		if (do_msg) {
-			irc_prefmsg (ns_botptr, u, "Unable to load module: %s already loaded", info_ptr->name);
-		}
-		nlog (LOG_WARNING, "Unable to load module: %s already loaded", info_ptr->name);
+		load_module_error (u, "Unable to load module: %s already loaded", info_ptr->name);
 		return NULL;
 	}
 	/* Check we have require PROTOCOL/FEATURE support for module */
 	if((info_ptr->features & ircd_srv.features) != info_ptr->features) {
-		nlog (LOG_WARNING, "Unable to load module: %s Required module features not available on this IRCd.", modfilename);
-		if (do_msg) {
-			irc_prefmsg (ns_botptr, u, "Unable to load module: %s Required module features not available on this IRCd.", modfilename);
-		}
+		load_module_error (u, "Unable to load module: %s Required module features not available on this IRCd.", modfilename);
 		ns_dlclose (dl_handle);
 		return NULL;
 	}
-	/* Extract pointer to event list */
-	event_ptr = ns_dlsym (dl_handle, "module_events");
 	/* Lookup ModInit (replacement for library __init() call */
 	ModInit = ns_dlsym ((int *) dl_handle, "ModInit");
 	if (!ModInit) {
-		if (do_msg) {
-			irc_prefmsg (ns_botptr, u, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
-		}
-		nlog (LOG_WARNING, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
+		load_module_error (u, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
 		ns_dlclose (dl_handle);
 		return NULL;
 	}
 	/* Allocate module */
 	mod_ptr = (Module *) scalloc (sizeof (Module));
 	hnode_create_insert (modulehash, mod_ptr, info_ptr->name);
-	dlog(DEBUG1, "Module Internal name: %s", info_ptr->name);
+	dlog(DEBUG1, "Module internal name: %s", info_ptr->name);
 	dlog(DEBUG1, "Module description: %s", info_ptr->description);
 	mod_ptr->info = info_ptr;
 	mod_ptr->dl_handle = dl_handle;
+	/* Extract pointer to event list */
+	event_ptr = ns_dlsym (dl_handle, "module_events");
 	if(event_ptr) {
 		RegisterEventList (mod_ptr, event_ptr);
 	}
-	/* Module side user authentication for SecureServ helpers */
-	mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "ModAuth");
+	if (mod_ptr->info->flags & MODULE_FLAG_AUTH) {
+		if (init_auth_module (mod_ptr) != NS_SUCCESS) {
+			load_module_error (u, "Unable to load auth module: %s missing ModAuthUser function", mod_ptr->info->name);
+			unload_module(mod_ptr->info->name, NULL);
+			return NULL;
+		}
+	} else {
+		/* Module side user authentication for e.g. SecureServ helpers */
+		mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "ModAuth");
+	}
 	/* assign a module number to this module */
 	while (ModList[moduleindex] != NULL)
 		moduleindex++;
@@ -437,18 +437,17 @@ load_module (const char *modfilename, Client * u)
 	err = (*ModInit) (mod_ptr); 
 	RESET_RUN_LEVEL();
 	if (err < 1) {
-		nlog (LOG_NORMAL, "Unable to load module: %s. See %s.log for further information.", mod_ptr->info->name, mod_ptr->info->name);
+		load_module_error (u, "Unable to load module: %s. See %s.log for further information.", mod_ptr->info->name, mod_ptr->info->name);
 		unload_module(mod_ptr->info->name, NULL);
 		return NULL;
 	}
 	SET_SEGV_LOCATION();
 
 	/* Let this module know we are online if we are! */
-	if (me.onchan == 1) {
-		mod_ptr->synched = 1;
+	if (is_synched) {
 		SendModuleEvent (EVENT_ONLINE, NULL, mod_ptr);
 	}
-	if (do_msg) {
+	if (u) {
 		irc_prefmsg (ns_botptr, u, "Module %s loaded, %s", info_ptr->name, info_ptr->description);
 		irc_globops (NULL, "Module %s loaded", info_ptr->name);
 	}
@@ -472,9 +471,8 @@ list_modules (CmdParams* cmdparams)
 	hash_scan_begin (&hs, modulehash);
 	while ((mn = hash_scan_next (&hs)) != NULL) {
 		mod_ptr = hnode_get (mn);
-		irc_prefmsg (ns_botptr, cmdparams->source, "Module: %s (%s)", mod_ptr->info->name, mod_ptr->info->version);
-		irc_prefmsg (ns_botptr, cmdparams->source, "Module Description: %s", mod_ptr->info->description);
-		irc_prefmsg (ns_botptr, cmdparams->source, "Module Number: %d", mod_ptr->modnum);
+		irc_prefmsg (ns_botptr, cmdparams->source, "Module: %d %s (%s)", mod_ptr->modnum, mod_ptr->info->name, mod_ptr->info->version);
+		irc_prefmsg (ns_botptr, cmdparams->source, "      : %s", mod_ptr->info->description);
 	}
 	irc_prefmsg (ns_botptr, cmdparams->source, "End of Module List");
 	return 0;
@@ -505,6 +503,10 @@ unload_module (const char *modname, Client * u)
 		return NS_FAILURE;
 	}
 	mod_ptr = hnode_get (modnode);
+	if (mod_ptr->info->flags & MODULE_FLAG_AUTH)
+	{
+		delete_auth_module (mod_ptr);
+	}
 	moduleindex = mod_ptr->modnum;
 	irc_chanalert (ns_botptr, "Unloading module %s", modname);
 	/* canx any DNS queries used by this module */

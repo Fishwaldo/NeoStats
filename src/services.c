@@ -172,7 +172,6 @@ init_services_bot (void)
 	ns_botinfo.flags |= BOT_FLAG_DEAF;
 	ns_botptr = init_bot (&ns_botinfo);
 	me.synched = 1;
-	me.onchan = 1;
 	SendAllModuleEvent (EVENT_ONLINE, NULL);
 	RequestServerUptimes();	
 	return NS_SUCCESS;

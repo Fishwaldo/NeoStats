@@ -15,8 +15,7 @@ statistics on the number of users/operators/channels/servers, and
 MoraleServ, which is a *fun* module, to send funny messages to users, 
 and utility modules. Some modules have a useful function on your 
 network, other modules are developed for fun, and to make your IRC 
-network more attractive to users (that's what it all about right?, 
-IRC users?)
+network more attractive to users.
 
 The 3.0 series of NeoStats [blurb]
 
@@ -33,7 +32,7 @@ on your network. These documents include README, and all the documents
 in the doc directory. 
 
 -----------------------------------<>-----------------------------------
-All documentation applies to version 3.0 and higher. For older 
+All documentation applies to version 3.0.0 and higher. For older 
 versions consult the documentation with that version or consider 
 upgrading. New versions of NeoStats have many new features and bug 
 fixes. We are not able to provide support for older versions of
@@ -52,9 +51,7 @@ RELNOTES -      Release notes about the current version. This is
                 refer to it if you have problems.
 ChangeLog -     Information about what has changed between versions. 
                 Consult this document for detailed information about the
-                changes. Additionally, some modules contain ChangeLogs 
-                in their directories (e.g., dl/statserv) so you should 
-                consult these documents as well.                 
+                changes. 
 README.kptool - Description and instructions for maintaining the 
                 NeoStats Internal Database and Dynamic Configuration. 
                 FOR ADVANCED USERS ONLY!
@@ -360,22 +357,22 @@ ONLY_OPERS [OPTIONAL]
         
     Only opers may use NeoStats and StatServ.
     
-BINDTO [OPTIONAL]
+BIND_TO [OPTIONAL]
     Make NeoStats bind to a particular IP Address. If not
     specified NeoStats will attempt to find this address
     itself. e.g. 
     
-        BINDTO 203.203.123.12
+        BIND_TO 203.203.123.12
     
     All outgoing connections from NeoStats will originate from this 
     IP address. 
     
-LOGFILENAMEFORMAT <format> [OPTIONAL]
+LOG_FILENAME_FORMAT <format> [OPTIONAL]
     Defines the format for dated log files. This allows you to choose 
     what date format is used for log file names when they are rotated at 
     midnight. The option uses the parameters passed to strftime so you 
     can use any options valid for that function. Common ones are:
-        %a    Abbreviated weekday name 
+        %a  Abbreviated weekday name 
         %A  Full weekday name 
         %b  Abbreviated month name 
         %B  Full month name 
@@ -387,21 +384,21 @@ LOGFILENAMEFORMAT <format> [OPTIONAL]
     Examples using 30 September 2003 as the date:
     For NeoStats0930.log:
         
-        LOGFILENAMEFORMAT %m%d
+        LOG_FILENAME_FORMAT %m%d
     
     For NeoStats20030930.log:
     
-        LOGFILENAMEFORMAT %Y%m%d      
+        LOG_FILENAME_FORMAT %Y%m%d      
     
     If not defined, default is "-%m-%d" i.e. NeoStats-09-30.log
 
-SETSERVERTIMES <INTERVAL> [OPTIONAL]
+SET_SERVER_TIMES <INTERVAL> [OPTIONAL]
     Cause NeoStats to sync server times at the given interval
     INTERVAL is an integer representing the number of hours
         
     Examples
         
-        SETSERVERTIMES 24
+        SET_SERVER_TIMES 24
     
     Cause NeoStats to sync server times every 24 hours
     If not present, NeoStats will not sync times.
@@ -422,30 +419,15 @@ LOAD_MODULE <module name> [OPTIONAL]
     
     Multiple instances of LOAD_MODULE may be specified 
 
-Authentication Module Configuration Options
--------------------------------------------
-    
-LOAD_AUTH_MODULE <auth_module_name> [OPTIONAL]
-    what authentication modules to load at startup.
-    
-        LOAD_AUTH_MODULE ircdauth
-        
-    will load IRCd umode based authentication
-
-    Multiple instances of LOAD_AUTH_MODULE may be specified.
-    NeoStats is distributed with two authentication modules,
-    ircdauth which validates users against their usermodes
-    and extauth which uses a list of nick!user@host masks to
-    authenticate against.
 
 NeoStats Root user
 ------------------
     
-SERVICEROOT <nick!user@host> [REQUIRED]
+SERVICE_ROOT <nick!user@host> [REQUIRED]
     Set who should get master access to manage NeoStats regardless of 
     authentication systems. Only one entry allowed. e.g.
     
-        SERVICEROOT fish!?Fish@*.neostats.net
+        SERVICE_ROOT fish!?Fish@*.neostats.net
         
     Will give "fish" complete access to NeoStats if fish has 
     umode +r and comes from the specified hostname and ident. 
@@ -563,57 +545,53 @@ NeoStats so there is no need to rebuild them for a restore.
 
 ** IMPORTANT - PLEASE READ BEFORE CONTACTING US **
 
-In order that we can dedicate time to developing NeoStats and can 
-address support issues quickly, there are some ways you can help to 
-reduce unnecessary support calls to the NeoStats team. 
+In order that we can dedicate time to developing NeoStats and can address 
+support issues quickly, there are some ways you can help to reduce 
+unnecessary support calls to the NeoStats team. 
 
-First, check you are using the latest release version of NeoStats as 
-found on the NeoStats download page. It could be that your problem is 
-fixed or your suggestion implemented in the latest version. We are not 
-able to provide support for older versions of NeoStats than the current 
-release. 
+First, check you are using the latest release version of NeoStats as found on 
+the NeoStats download page. It could be that your problem is fixed or your 
+suggestion implemented in the latest version. We are not able to provide 
+support for older versions of NeoStats than the current release. 
 
-We provide no support for SVN snapshots whether released on the web site 
-or not. If you have downloaded a SVN snapshot and are having problems, 
-you should revert back to your previous working version or if this is 
-your first installation, the current release build as indicated on the 
-web site. Please do not contact us about problems with SVN versions. We 
-will advise users occasionally to try a SVN snapshot to fix a problem, 
-but as we do not put our SVN versions through extensive testing, there 
-might be new bugs or problems. 
+We provide no support for SVN snapshots whether released on the web site or 
+not. If you have downloaded a SVN snapshot and are having problems, you should 
+revert back to your previous working version or if this is your first 
+installation, the current release build as indicated on the web site. Please 
+do not contact us about problems with SVN versions. We will advise users 
+occasionally to try a SVN snapshot to fix a problem, but as we do not put our 
+SVN versions through extensive testing, there might be new bugs or problems. 
 
-We may occasionally provide a custom modification to resolve a problem. 
-Other than in this event, we provide no support for modified versions of 
-NeoStats. If you have modified NeoStats in any way and experience problems, 
-you should only contact us if you can reproduce the problem with an
-unmodified version. We are not able to support modifications to NeoStats
-made by others. 
+We may occasionally provide a custom modification to resolve a problem. Other 
+than in this event, we provide no support for modified versions of NeoStats. 
+If you have modified NeoStats in any way and experience problems, you should 
+only contact us if you can reproduce the problem with an unmodified version. 
+We are not able to support modifications to NeoStats made by others. 
 
-Before contacting us with a problem or a bug, please make sure you have 
-read all the documentation provided. You should then check the web site 
-bug list and search the forums to see if your problem has already been 
-reported and if a solution has been posted. 
+Before contacting us with a problem or a bug, please make sure you have read 
+all the documentation provided. You should then check the web site bug list 
+and search the forums to see if your problem has already been reported and if 
+a solution has been posted. 
 
-Before sending us a suggestion, you should check the forums carefully to 
-see if your suggestion has already been made and if the NeoStats team 
-have decided to implement it or not. The use of the "Search" feature on 
-the forums is a great way to quickly get answers to your problem if 
-other users have already encountered the issue. 
+Before sending us a suggestion, you should check the forums carefully to see 
+if your suggestion has already been made and if the NeoStats team have decided 
+to implement it or not. 
 
 You do not have to read all the messages to find out if your issue has 
-already been discussed. The message board has a search function so 
-you can quickly check to see if there is a discussion on your problem. 
+already been discussed. The use of the "Search" feature on the forums is a 
+great way to quickly get answers to your problem if other users have already 
+encountered the issue. 
 
-NeoStats Group are only able to help with issues affecting NeoStats. 
-We are not able to help set up your IRC Server or Services on your 
-network (including the setup of C: N: and U: lines) so please don't 
-ask us. If you have a question about your IRC Server or Services 
-package, please check the documentation that came with them and contact 
-their team if you still need assistance. 
+NeoStats Group are only able to help with issues affecting NeoStats. We are 
+not able to help set up your IRC Server or Services on your network (including 
+the setup of C: N: and U: lines) so please don't ask us. If you have a 
+question about your IRC Server or Services package, please check the 
+documentation that came with them and contact their team if you still need 
+assistance. 
 
-The RAW command is an unsupported command. If you need help using it,
-you should probably not be using it. Please do not ask us for help
-on the RAW command.
+The RAW command is an unsupported command. If you need help using it, you 
+should probably not be using it. Please do not ask us for help on the RAW 
+command.
 
 Thank you. 
 

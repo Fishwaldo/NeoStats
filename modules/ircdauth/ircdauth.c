@@ -61,6 +61,7 @@ ModuleInfo module_info = {
 	CORE_MODULE_VERSION,
 	__DATE__,
 	__TIME__,
+	MODULE_FLAG_AUTH,
 	0,
 	0,
 };

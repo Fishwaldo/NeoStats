@@ -25,7 +25,8 @@
 #define _AUTH_H_
 
 int InitAuth(void);
+int init_auth_module (Module *mod_ptr);
+int delete_auth_module (Module *mod_ptr);
 int UserAuth(Client *u);
-int ListAuth(Client *u);
 
 #endif /* _AUTH_H_ */

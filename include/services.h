@@ -72,6 +72,5 @@ extern BotInfo ns_botinfo;
 EXPORTVAR extern Bot* ns_botptr;
 
 void InitServices(void);
-int IsServiceRoot(Client * u);
 
 #endif /* _SERVICES_H_ */

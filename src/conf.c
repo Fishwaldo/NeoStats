@@ -35,7 +35,6 @@
 
 static void cb_Server (char *arg, int configtype);
 static void cb_Module (char *arg, int configtype);
-static void cb_AuthModule (char *arg, int configtype);
 #ifdef SQLSRV
 static void cb_SqlConf (char *arg, int configtype);
 #endif
@@ -43,7 +42,6 @@ static void cb_SqlConf (char *arg, int configtype);
 /** @brief The list of modules to load
  */
 static void *load_mods[NUM_MODULES];
-void *load_auth_mods[NUM_MODULES];
 
 /** @brief Core Configuration Items
  * 
@@ -60,15 +58,14 @@ static config_option options[] = {
 	{"WANT_PRIVMSG", ARG_STR, cb_Server, 9},
 	{"SERVICES_CHAN", ARG_STR, cb_Server, 10},
 	{"LOAD_MODULE", ARG_STR, cb_Module, 0},
-	{"LOAD_AUTH_MODULE", ARG_STR, cb_AuthModule, 17},
 	{"ONLY_OPERS", ARG_STR, cb_Server, 11},
 	{"NO_LOAD", ARG_STR, cb_Server, 12},
-	{"BINDTO", ARG_STR, cb_Server, 13},
-	{"LOGFILENAMEFORMAT", ARG_STR, cb_Server, 14},
+	{"BIND_TO", ARG_STR, cb_Server, 13},
+	{"LOG_FILENAME_FORMAT", ARG_STR, cb_Server, 14},
 	{"SERVER_NUMERIC", ARG_STR, cb_Server, 15},
-	{"SETSERVERTIMES", ARG_STR, cb_Server, 16},
-	{"SERVICEROOT", ARG_STR, cb_Server, 18},
-	{"PROTOCOL", ARG_STR, cb_Server, 19},
+	{"SET_SERVER_TIMES", ARG_STR, cb_Server, 16},
+	{"SERVICE_ROOT", ARG_STR, cb_Server, 17},
+	{"PROTOCOL", ARG_STR, cb_Server, 18},
 #ifdef SQLSRV
 	{"SQLSRV_AUTH", ARG_STR, cb_SqlConf, 0},
 	{"SQLSRV_PORT", ARG_STR, cb_SqlConf, 1},
@@ -137,31 +134,6 @@ cb_Module (char *arg, int configtype)
 		dlog(DEBUG1, "Added Module %d :%s", i, (char *)load_mods[i]);
 	}
 }
-
-
-/** @brief prepare Modules defined in the config file
- *
- * When the config file encounters directives to Load Modules, it calls this function which prepares to load the modules (but doesn't actually load them)
- *
- * @param arg the module name in this case
- * @param configtype an index of what config item is currently being processed. Ignored
- * @returns Nothing
- */
-void
-cb_AuthModule (char *arg, int configtype)
-{
-	int i;
-
-	SET_SEGV_LOCATION();
-	for (i = 0; (i < NUM_MODULES) && (load_auth_mods[i] != 0); i++) {
-		if (!ircstrcasecmp (load_auth_mods[i], arg)) {
-			return;
-		}
-	}
-	load_auth_mods[i] = sstrdup (arg);
-	dlog(DEBUG1, "Added Auth Module %d :%s", i, (char *)load_auth_mods[i]);
-}
-
 
 #ifdef SQLSRV
 /** @brief prepare SqlAuthentication defined in the config file
@@ -297,7 +269,7 @@ cb_Server (char *arg, int configtype)
 		if(config.setservertimes <= 0) {
 			config.setservertimes = (24 * 60 * 60);
 		}
-	} else if (configtype == 18) {
+	} else if (configtype == 17) {
 		char *nick;
 		char *user;
 		char *host;
@@ -316,7 +288,7 @@ cb_Server (char *arg, int configtype)
 			strlcpy(config.rootuser.host, host, MAXHOST);
 			config.rootuser.level = NS_ULEVEL_ROOT;
 		}
-	} else if (configtype == 19) {
+	} else if (configtype == 18) {
 		strlcpy(me.protocol,arg,MAXHOST);
 	}
 }

@@ -26,19 +26,17 @@
 #include "dl.h"
 #include "services.h"
 
-typedef int (*userauthfunc) (Client *u);
-typedef int (*listauthfunc) (Client * u);
+static Module* AuthModList[NUM_MODULES];
 
-typedef struct AuthModule {
-	Module* module_ptr;
-	userauthfunc userauth;
-	listauthfunc listauth;
-}AuthModule;
-
-extern void *load_auth_mods[NUM_MODULES];
-
-static AuthModule AuthModList[NUM_MODULES];
-static int AuthModuleCount = 0;
+int IsServiceRoot(Client * u)
+{
+	if ((match(config.rootuser.nick, u->name))
+	&& (match(config.rootuser.user, u->user->username))
+	&& (match(config.rootuser.host, u->user->hostname))) {
+		return (1);
+	}
+	return (0);
+}
 
 int UserAuth(Client * u)
 {
@@ -46,54 +44,58 @@ int UserAuth(Client * u)
 	int authlvl = 0;
 	int i;
 	
-	for(i = 0; i < AuthModuleCount; i ++)
+	if(IsServiceRoot(u)) {
+		return NS_ULEVEL_ROOT;
+	} 
+	for(i = 0; i < NUM_MODULES; i++)
 	{
-		if (AuthModList[i].userauth) {
-			authlvl = AuthModList[i].userauth (u);
-			/* if authlvl is greater than newauthlvl, then auth is authoritive */
-			if (authlvl > newauthlvl) {
-				newauthlvl = authlvl;
-			}
+		authlvl = AuthModList[i]->userauth (u);
+		/* if authlvl is greater than newauthlvl, then auth is authoritive */
+		if (authlvl > newauthlvl) {
+			newauthlvl = authlvl;
 		}
 	}
 	return newauthlvl;
 }
 
-static void load_auth_module(const char* name)
+int init_auth_module(Module *mod_ptr)
 {
-	AuthModule* auth_module;
-	
-	auth_module = &AuthModList[AuthModuleCount];
-	auth_module->module_ptr = load_module (name, NULL);
-	if(auth_module->module_ptr) {
-		auth_module->userauth = 
-			ns_dlsym (auth_module->module_ptr->dl_handle, "ModAuthUser");
-		auth_module->listauth = 
-			ns_dlsym (auth_module->module_ptr->dl_handle, "ModAuthList");
-		AuthModuleCount ++;
+	int i;
+	mod_auth auth;
+
+	auth = ns_dlsym (mod_ptr->dl_handle, "ModAuthUser");
+	if (auth) 
+	{
+		for(i = 0; i < NUM_MODULES; i++)
+		{
+			if (AuthModList[i] == NULL)
+			{
+				mod_ptr->userauth = auth;					
+				AuthModList[i] = mod_ptr;
+				return NS_SUCCESS;
+			}
+		}
 	}
+	return NS_FAILURE;
+}
+
+int delete_auth_module(Module *mod_ptr)
+{
+	int i;
+
+	for(i = 0; i < NUM_MODULES; i++)
+	{
+		if (AuthModList[i] == mod_ptr)
+		{
+			AuthModList[i] = NULL;
+			return NS_SUCCESS;
+		}
+	}
+	return NS_FAILURE;
 }
 
 int InitAuth(void)
 {
-	int i;
-
 	memset(AuthModList, 0, sizeof(AuthModList));
-	for (i = 0; (i < NUM_MODULES) && (load_auth_mods[i] != 0); i++) {
-		load_auth_module((char*)load_auth_mods[i]);
-	}
-	return NS_SUCCESS;
-}
-
-int ListAuth(Client *u)
-{
-	int i;
-	
-	for(i = 0; i < AuthModuleCount; i ++)
-	{
-		if (AuthModList[i].listauth) {
-			AuthModList[i].listauth (u);
-		}
-	}
 	return NS_SUCCESS;
 }
