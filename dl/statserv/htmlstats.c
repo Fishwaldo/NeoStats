@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: htmlstats.c,v 1.25 2003/06/13 14:49:33 fishwaldo Exp $
+** $Id: htmlstats.c,v 1.26 2003/09/11 12:55:40 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -44,6 +44,7 @@ void get_chantops();
 void get_chantop10();
 void get_chantop10eva();
 void get_unwelcomechan();
+void get_clientstats();
 void get_title();
 void get_tldmap();
 FILE *tpl, *opf;
@@ -179,6 +180,13 @@ void ss_html()
 			fwrite(buf, startstr, 1, opf);
 			get_title();
 			buf = buf1 + strlen("!TITLE!");
+		}
+		buf1 = strstr(buf, "!CLIENTSTATS!");
+		if (buf1) {
+			startstr = strlen(buf) - strlen(buf1);
+			fwrite(buf, startstr, 1, opf);
+			get_clientstats();
+			buf = buf1 + strlen("!CLIENTSTATS!");
 		}
 
 
@@ -418,6 +426,31 @@ void get_chantop10eva()
 		cn = list_next(Chead, cn);
 		if (cn) {
 			cs = lnode_get(cn);
+		} else {
+			break;
+		}
+	}
+	fprintf(opf, "</table>");
+}
+void get_clientstats()
+{
+	CVersions *cv;
+	lnode_t *cn;
+	int i;
+	if (!list_is_sorted(Vhead, topversions)) {
+		list_sort(Vhead, topversions);
+	}
+	cn = list_first(Vhead);
+	cv = lnode_get(cn);
+	fprintf(opf,
+		"<table border = 0><tr><th>Version</th><th align=right>Count</th></tr>");
+	for (i = 0; i <= 10; i++) {
+		fprintf(opf,
+			"<tr><td>%s</td><td align=right>%d</td></tr>\n",
+			cv->name, cv->count);
+		cn = list_next(Vhead, cn);
+		if (cn) {
+			cv = lnode_get(cn);
 		} else {
 			break;
 		}

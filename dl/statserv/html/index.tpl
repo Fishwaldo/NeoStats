@@ -134,6 +134,13 @@ cellspacing="0" border="1">
 				<a name=top10chan>!DAILYTOPCHAN!
 			</td>
 			</tr>
+	 	 	<td class="cat" height="30"><span class="cattitle"><b>Top10</b>&nbsp;Client Versions</span></td>
+			</tr>
+			<tr>
+				<td class="row1" align="center">
+				<a name=clivers>!CLIENTSTATS!
+			</td>
+			</tr>
 	 		<td class="cat" height="30"><span class="cattitle"><b>Server</b>&nbsp;List</span></td>
 			</tr>
 			<tr>

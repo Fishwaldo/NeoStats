@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.h,v 1.25 2003/06/13 14:49:34 fishwaldo Exp $
+** $Id: statserv.h,v 1.26 2003/09/11 12:55:40 fishwaldo Exp $
 */
 
 #ifndef STATSERV_H
@@ -157,7 +157,7 @@ int topchan(const void *key1, const void *key2);
 int topjoin(const void *key1, const void *key2);
 int topkick(const void *key1, const void *key2);
 int toptopics(const void *key1, const void *key2);
-
+int topversions(const void *key1, const void *key2);
 /* stats.c */
 TLD *tldhead;
 TLD *findtld(char *);

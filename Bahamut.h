@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Bahamut.h,v 1.5 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: Bahamut.h,v 1.6 2003/09/11 12:55:40 fishwaldo Exp $
 */
 #ifndef BAHAMUT_H
 #define BAHAMUT_H
@@ -202,7 +202,7 @@
 
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_OPERONLY)))
-#define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
+#define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
 #define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_RGSTRONLY) || CheckChanMode(x, MODE_OPERONLY) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_KEY)))
 
 
