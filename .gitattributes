@@ -6,11 +6,9 @@
 /CREDITS -text
 /ChangeLog -text
 /Config -text
-/INSTALL.pt -text
 /Makefile.in -text
 /Makefile.inc.in -text
 /README -text
-/README.pt -text
 /RELNOTES -text
 /TODO -text
 /Ultimate.c -text
