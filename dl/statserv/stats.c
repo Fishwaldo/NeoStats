@@ -25,7 +25,6 @@
 
 #include "statserv.h"
 #include "log.h"
-#include "exclude.h"
 
 static char announce_buf[BUFSIZE];
 

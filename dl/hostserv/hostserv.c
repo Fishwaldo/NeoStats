@@ -31,7 +31,6 @@
 #include "hs_help.c"
 #include "log.h"
 #include "conf.h"
-#include "exclude.h"
 
 
 /* hostserv doesn't work on Hybrid, Echo an error and exit the compile */

@@ -27,7 +27,6 @@
 #include "dl.h"
 #include "stats.h"
 #include "statserv.h"
-#include "exclude.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #include "sqlstats.h"

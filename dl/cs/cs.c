@@ -30,7 +30,6 @@
 #include "cs.h"
 #include "log.h"
 #include "conf.h"
-#include "exclude.h"
 
 /* Uncomment this line to disable colours in ConnectServ 
    channel messages
