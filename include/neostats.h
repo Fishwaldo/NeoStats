@@ -121,6 +121,8 @@
 #define PROTOCOL_UNKLN		0x00008000  /* Have UNKLINE support */
 #define PROTOCOL_NICKIP		0x00010000  /* NICK passes IP address */
 
+#define PROTOCOL_CLIENTMODE		0x80000000  /* Client mode */
+
 #define FEATURE_SWHOIS		0x00000001	/* SWHOIS */
 #define FEATURE_SVSTIME		0x00000002	/* SVSTIME */
 #define FEATURE_SVSHOST		0x00000004	/* SVSHOST */

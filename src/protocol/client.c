@@ -55,7 +55,7 @@ const int proto_topiclen	= (307 + 1);
 
 ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
-	0,
+	PROTOCOL_CLIENTMODE,
 	/* Protocol options negotiated at link by this IRCd */
 	0,
 	/* Features supported by this IRCd */

@@ -263,6 +263,10 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 	 * check validity during processing. Only check critical elements.
 	 * For now we verify help during processing since it is not critical. */
 	/* No command, we cannot recover from this */
+	if( hash_lookup(cmd_hash, cmd_ptr->cmd) ) {
+		nlog (LOG_ERROR, "add_bot_cmd: attempt to add duplicate command %s", cmd_ptr->cmd);
+		return NS_FAILURE;
+	}
 	if(!cmd_ptr->cmd) {
 		nlog (LOG_ERROR, "add_bot_cmd: missing command");
 		return NS_FAILURE;

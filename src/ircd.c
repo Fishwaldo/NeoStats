@@ -131,6 +131,10 @@ InitIrcdSymbols (void)
 		return NS_FAILURE;	
 	}
 
+	if (protocol_info->minprotocol & PROTOCOL_CLIENTMODE) {
+		config.singlebotmode = 1;
+	}
+
 	strcpy(me.servicescmode,protocol_info->services_cmode);
 	strcpy(me.servicesumode,protocol_info->services_umode);
 

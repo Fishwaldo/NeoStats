@@ -78,9 +78,6 @@ void InitMe(void)
 #ifdef SQLSRV
 	me.sqlport = 8888;
 #endif
-#ifdef CLIENT
-	config.singlebotmode = 1;
-#endif
 }
 
 /** @brief init core sub systems

@@ -501,16 +501,24 @@ Bot *init_bot (BotInfo* botinfo)
 	char* host;
 
 	SET_SEGV_LOCATION();
+	modptr = GET_CUR_MODULE();
 	/* When we are using single bot mode, for example in client mode where we
 	 * can only use one bot, if we have initialised the main bot just add all 
 	 * commands and settings to it 
 	 */
 	if(config.singlebotmode && ns_botptr) {
-		add_bot_cmd_list (ns_botptr, botinfo->bot_cmd_list);
-		add_bot_setting_list (ns_botptr, botinfo->bot_setting_list);
+		if (botinfo->bot_cmd_list) {
+			SET_RUN_LEVEL(modptr);
+			add_bot_cmd_list (ns_botptr, botinfo->bot_cmd_list);
+			RESET_RUN_LEVEL();
+		}
+		if (botinfo->bot_setting_list) {
+			SET_RUN_LEVEL(modptr);
+			add_bot_setting_list (ns_botptr, botinfo->bot_setting_list);
+			RESET_RUN_LEVEL();
+		}
 		return(ns_botptr);
 	}
-	modptr = GET_CUR_MODULE();
 	nick = botinfo->nick;
 	if (find_user (nick)) {
 		nlog (LOG_WARNING, "Bot nick %s already in use", botinfo->nick);
