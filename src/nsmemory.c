@@ -42,7 +42,7 @@ void *ns_malloc (const int size)
 	void *buf;
 	allocsize = size;
 	if (!allocsize) {
-		nlog (LOG_WARNING, "ns_malloc: illegal attempt to allocate 0 bytes!");
+		dlog( DEBUG2, "ns_malloc: illegal attempt to allocate 0 bytes!");
 		allocsize = 1;
 	}
 	buf = malloc (allocsize);
@@ -70,7 +70,7 @@ void *ns_calloc (const int size)
 
 	allocsize = size;
 	if (!allocsize) {
-		nlog (LOG_WARNING, "ns_calloc: illegal attempt to allocate 0 bytes!");
+		dlog( DEBUG2, "ns_calloc: illegal attempt to allocate 0 bytes!");
 		allocsize = 1;
 	}
 	buf = calloc (1, allocsize);
@@ -115,7 +115,7 @@ void *ns_realloc (void* ptr, const int size)
 void _ns_free (void **ptr)
 {
 	if (!*ptr) {
-		nlog (LOG_WARNING, "ns_free: illegal attempt to free NULL pointer");
+		dlog( DEBUG2, "ns_free: illegal attempt to free NULL pointer");
 		return;
 	}
 	free (*ptr);
