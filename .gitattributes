@@ -61,8 +61,6 @@ curl/base64.c -text
 curl/base64.h -text
 curl/config.guess -text
 curl/config.h.in -text
-curl/config.log -text
-curl/config.status -text
 curl/config.sub -text
 curl/configure -text
 curl/configure.in -text
