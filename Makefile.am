@@ -4,7 +4,7 @@ ACLOCAL_AMFLAGS 	= -I autotools
 AM_MAKEFLAGS		= -s
 dist_bin_SCRIPTS = makeconf
 bin_SCRIPTS		= cronchk
-data_DATA		= neostats.motd
+dist_data_DATA		= neostats.motd
 
 docdir			= @prefix@/doc
 doc_DATA		= doc/* doc/old/*

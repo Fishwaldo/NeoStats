@@ -159,7 +159,7 @@ ACLOCAL_AMFLAGS = -I autotools
 AM_MAKEFLAGS = -s
 dist_bin_SCRIPTS = makeconf
 bin_SCRIPTS = cronchk
-data_DATA = neostats.motd
+dist_data_DATA = neostats.motd
 
 docdir = @prefix@/doc
 doc_DATA = doc/* doc/old/*
@@ -174,7 +174,7 @@ CONFIG_CLEAN_FILES = cronchk
 SCRIPTS = $(bin_SCRIPTS) $(dist_bin_SCRIPTS)
 
 DIST_SOURCES =
-DATA = $(data_DATA) $(doc_DATA)
+DATA = $(dist_data_DATA) $(doc_DATA)
 
 
 RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
@@ -182,13 +182,14 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	all-recursive install-data-recursive install-exec-recursive \
 	installdirs-recursive install-recursive uninstall-recursive \
 	check-recursive installcheck-recursive
-DIST_COMMON = README $(dist_bin_SCRIPTS) $(srcdir)/Makefile.in \
-	$(srcdir)/configure $(top_srcdir)/autotools/rules.mk AUTHORS \
-	COPYING ChangeLog INSTALL Makefile.am NEWS TODO aclocal.m4 \
-	autotools/acinclude.m4 autotools/compile autotools/config.guess \
-	autotools/config.sub autotools/depcomp autotools/install-sh \
-	autotools/ltmain.sh autotools/missing autotools/mkinstalldirs \
-	configure configure.in cronchk.in
+DIST_COMMON = README $(dist_bin_SCRIPTS) $(dist_data_DATA) \
+	$(srcdir)/Makefile.in $(srcdir)/configure \
+	$(top_srcdir)/autotools/rules.mk AUTHORS COPYING ChangeLog \
+	INSTALL Makefile.am NEWS TODO aclocal.m4 autotools/acinclude.m4 \
+	autotools/compile autotools/config.guess autotools/config.sub \
+	autotools/depcomp autotools/install-sh autotools/ltmain.sh \
+	autotools/missing autotools/mkinstalldirs configure \
+	configure.in cronchk.in
 DIST_SUBDIRS = $(SUBDIRS)
 all: all-recursive
 
@@ -262,20 +263,20 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-dataDATA_INSTALL = $(INSTALL_DATA)
-install-dataDATA: $(data_DATA)
+dist_dataDATA_INSTALL = $(INSTALL_DATA)
+install-dist_dataDATA: $(dist_data_DATA)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(datadir)
-	@list='$(data_DATA)'; for p in $$list; do \
+	@list='$(dist_data_DATA)'; for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(dataDATA_INSTALL) $$d$$p $(DESTDIR)$(datadir)/$$f"; \
-	  $(dataDATA_INSTALL) $$d$$p $(DESTDIR)$(datadir)/$$f; \
+	  echo " $(dist_dataDATA_INSTALL) $$d$$p $(DESTDIR)$(datadir)/$$f"; \
+	  $(dist_dataDATA_INSTALL) $$d$$p $(DESTDIR)$(datadir)/$$f; \
 	done
 
-uninstall-dataDATA:
+uninstall-dist_dataDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(data_DATA)'; for p in $$list; do \
+	@list='$(dist_data_DATA)'; for p in $$list; do \
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " rm -f $(DESTDIR)$(datadir)/$$f"; \
 	  rm -f $(DESTDIR)$(datadir)/$$f; \
@@ -597,7 +598,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-dataDATA install-docDATA
+install-data-am: install-dist_dataDATA install-docDATA
 
 install-exec-am: install-binSCRIPTS install-dist_binSCRIPTS
 
@@ -625,8 +626,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binSCRIPTS uninstall-dataDATA \
-	uninstall-dist_binSCRIPTS uninstall-docDATA uninstall-info-am
+uninstall-am: uninstall-binSCRIPTS uninstall-dist_binSCRIPTS \
+	uninstall-dist_dataDATA uninstall-docDATA uninstall-info-am
 
 uninstall-info: uninstall-info-recursive
 
@@ -637,18 +638,20 @@ uninstall-info: uninstall-info-recursive
 	distclean-tags distcleancheck distdir distuninstallcheck dvi \
 	dvi-am dvi-recursive info info-am info-recursive install \
 	install-am install-binSCRIPTS install-data install-data-am \
-	install-data-recursive install-dataDATA install-dist_binSCRIPTS \
-	install-docDATA install-exec install-exec-am \
-	install-exec-recursive install-info install-info-am \
-	install-info-recursive install-man install-recursive \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am installdirs-recursive maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive mostlyclean \
-	mostlyclean-generic mostlyclean-libtool mostlyclean-recursive \
-	pdf pdf-am pdf-recursive ps ps-am ps-recursive tags \
-	tags-recursive uninstall uninstall-am uninstall-binSCRIPTS \
-	uninstall-dataDATA uninstall-dist_binSCRIPTS uninstall-docDATA \
-	uninstall-info-am uninstall-info-recursive uninstall-recursive
+	install-data-recursive install-dist_binSCRIPTS \
+	install-dist_dataDATA install-docDATA install-exec \
+	install-exec-am install-exec-recursive install-info \
+	install-info-am install-info-recursive install-man \
+	install-recursive install-strip installcheck installcheck-am \
+	installdirs installdirs-am installdirs-recursive \
+	maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am \
+	pdf-recursive ps ps-am ps-recursive tags tags-recursive \
+	uninstall uninstall-am uninstall-binSCRIPTS \
+	uninstall-dist_binSCRIPTS uninstall-dist_dataDATA \
+	uninstall-docDATA uninstall-info-am uninstall-info-recursive \
+	uninstall-recursive
 
 
 .c.o:
