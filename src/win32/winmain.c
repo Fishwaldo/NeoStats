@@ -34,6 +34,7 @@ static char* szNeoStatsErrorTitle="NeoStats for Windows Error";
 HINSTANCE hInstance = 0;
 HANDLE hNeoStatsThread = 0;
 
+#ifndef NDEBUG
 void InitDebugConsole(void)
 {
 	long lStdHandle;
@@ -58,6 +59,7 @@ void FiniDebugConsole(void)
 {
 	FreeConsole();
 }
+#endif
 
 void ErrorMessageBox(char* error)
 {
@@ -79,11 +81,21 @@ BOOL CALLBACK DialogProc (HWND hwnd,
 			return 0;
 		case WM_DESTROY:
 			PostQuitMessage(0);
-			FiniDebugConsole();
 			return TRUE;
 		case WM_CLOSE:
-			DestroyWindow (hwnd);
-			FiniDebugConsole();
+			if (MessageBox(hwnd, "Close NeoStats?", "Are you sure?", MB_YESNO|MB_ICONQUESTION) == IDNO)
+			{
+				return 0;
+			}
+			else 
+			{
+#ifndef NDEBUG
+				FiniDebugConsole();
+#endif
+				DestroyWindow (hwnd);				
+				TerminateThread(hNeoStatsThread, 0);
+				do_exit (0, "Terminated");
+			}
 			return TRUE;
     }
     return FALSE;
@@ -105,7 +117,9 @@ int WINAPI WinMain
         ErrorMessageBox("Unable to initialize WinSock");
         return FALSE;
 	}
+#ifndef NDEBUG
 	InitDebugConsole();
+#endif
 	hDialog = CreateDialog (hInst, 
                             MAKEINTRESOURCE (IDD_DIALOG1), 
                             0, 
