@@ -60,6 +60,7 @@ static void m_swhois (char *origin, char **argv, int argc, int srv);
 static void m_tkl (char *origin, char **argv, int argc, int srv);
 
 #define NICKV2	
+#define NICKIP
 
 /* buffer sizes */
 const int proto_maxhost		= (128 + 1);
@@ -207,6 +208,128 @@ umode_init user_smodes[] = {
 	{0, '0'},
 };
 
+static const char Base64[] =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const char Pad64 = '=';
+
+int b64_decode(char const *src, unsigned char *target, size_t targsize)
+{
+	int tarindex, state, ch;
+	char *pos;
+
+	state = 0;
+	tarindex = 0;
+
+	while ((ch = *src++) != '\0') {
+		if (isspace(ch))	/* Skip whitespace anywhere. */
+			continue;
+
+		if (ch == Pad64)
+			break;
+
+		pos = strchr(Base64, ch);
+		if (pos == 0) 		/* A non-base64 character. */
+			return (-1);
+
+		switch (state) {
+		case 0:
+			if (target) {
+				if ((size_t)tarindex >= targsize)
+					return (-1);
+				target[tarindex] = (pos - Base64) << 2;
+			}
+			state = 1;
+			break;
+		case 1:
+			if (target) {
+				if ((size_t)tarindex + 1 >= targsize)
+					return (-1);
+				target[tarindex]   |=  (pos - Base64) >> 4;
+				target[tarindex+1]  = ((pos - Base64) & 0x0f)
+							<< 4 ;
+			}
+			tarindex++;
+			state = 2;
+			break;
+		case 2:
+			if (target) {
+				if ((size_t)tarindex + 1 >= targsize)
+					return (-1);
+				target[tarindex]   |=  (pos - Base64) >> 2;
+				target[tarindex+1]  = ((pos - Base64) & 0x03)
+							<< 6;
+			}
+			tarindex++;
+			state = 3;
+			break;
+		case 3:
+			if (target) {
+				if ((size_t)tarindex >= targsize)
+					return (-1);
+				target[tarindex] |= (pos - Base64);
+			}
+			tarindex++;
+			state = 0;
+			break;
+		default:
+			abort();
+		}
+	}
+
+	/*
+	 * We are done decoding Base-64 chars.  Let's see if we ended
+	 * on a byte boundary, and/or with erroneous trailing characters.
+	 */
+
+	if (ch == Pad64) {		/* We got a pad char. */
+		ch = *src++;		/* Skip it, get next. */
+		switch (state) {
+		case 0:		/* Invalid = in first position */
+		case 1:		/* Invalid = in second position */
+			return (-1);
+
+		case 2:		/* Valid, means one byte of info */
+			/* Skip any number of spaces. */
+			for ((void)NULL; ch != '\0'; ch = *src++)
+				if (!isspace(ch))
+					break;
+			/* Make sure there is another trailing = sign. */
+			if (ch != Pad64)
+				return (-1);
+			ch = *src++;		/* Skip the = */
+			/* Fall through to "single trailing =" case. */
+			/* FALLTHROUGH */
+
+		case 3:		/* Valid, means two bytes of info */
+			/*
+			 * We know this char is an =.  Is there anything but
+			 * whitespace after it?
+			 */
+			for ((void)NULL; ch != '\0'; ch = *src++)
+				if (!isspace(ch))
+					return (-1);
+
+			/*
+			 * Now make sure for cases 2 and 3 that the "extra"
+			 * bits that slopped past the last full byte were
+			 * zeros.  If we don't check them, they become a
+			 * subliminal channel.
+			 */
+			if (target && target[tarindex] != 0)
+				return (-1);
+		}
+	} else {
+		/*
+		 * We ended by seeing the end of the string.  Make sure we
+		 * have no partial bytes lying around.
+		 */
+		if (state != 0)
+			return (-1);
+	}
+
+	return (tarindex);
+}
+
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
@@ -216,8 +339,8 @@ send_server (const char *sender, const char *name, const int numeric, const char
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
-/* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 */
-	send_cmd ("%s TOKEN NICKv2 VHP SJOIN SJOIN2 SJ3 UMODE2", MSGTOK(PROTOCTL));
+/* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 TKLEXT NICKIP CHANMODES=be,kfL,l,psmntirRcOAQKVGCuzNSMT */
+	send_cmd ("%s TOKEN NICKv2 VHP SJOIN SJOIN2 SJ3 UMODE2 NICKIP", MSGTOK(PROTOCTL));
 	send_cmd ("%s %s", MSGTOK(PASS), pass);
 	send_cmd ("%s %s %d :%s", MSGTOK(SERVER), name, numeric, infoline);
 }
@@ -276,7 +399,14 @@ send_cmode (const char *sender, const char *who, const char *chan, const char *m
  *  argv[7] = umodes
  *  argv[8] = virthost, * if none
  *  argv[9] = info
+ * if NICKIP:
+ *  argv[9] = ip
+ *  argv[10] = info
  */
+/*
+RX: & Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP fwAAAQ== :Mark
+RX: & Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP :Mark
+*/
 void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
@@ -619,14 +749,39 @@ m_away (char *origin, char **argv, int argc, int srv)
  *  argv[7] = umodes
  *  argv[8] = virthost, * if none
  *  argv[9] = info
+ * if NICKIP:
+ *  argv[9] = ip
+ *  argv[10] = info
  */
+
+int decode_ip(char *buf)
+{
+	int len = strlen(buf);
+	char targ[25];
+	struct in_addr ia;
+
+	b64_decode(buf, targ, 25);
+	ia = *( struct in_addr *)targ;
+	if (len == 8)  /* IPv4 */
+		return ia.s_addr;
+}
+
+
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 #ifdef NICKV2	
+#ifdef NICKIP
+		char ip[25];
+
+		ircsnprintf(ip, 25, "%d", decode_ip(argv[9]));
+		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+			ip, argv[6], argv[7], argv[8], argv[10], NULL, NULL);
+#else
 		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
 			NULL, argv[6], argv[7], argv[8], argv[9], NULL, NULL);
+#endif
 #else
 		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
 			NULL, argv[6], NULL, NULL, argv[9], NULL, NULL);
