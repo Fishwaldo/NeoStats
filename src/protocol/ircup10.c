@@ -165,7 +165,6 @@ umode_init user_smodes[] = {
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
-const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 /* Temporary buffers for numeric conversion */
 char neostatsbase64[3] = "\0";
@@ -762,14 +761,8 @@ m_burst (char *origin, char **argv, int argc, int srv)
 				param++;
 				modes++;
 				while(*modes) {
-					int i;
-					for (i = 0; i < ircd_cmodecount; i++) {
-						if (*modes == chan_modes[i].flag) {
-							if (chan_modes[i].flags&MODEPARAM) {
-								param ++;
-							}
-							break;
-						}
+					if (ircd_cmodes[*modes].flags&MODEPARAM) {
+						param ++;
 					}
 					modes++;
 				}
@@ -821,21 +814,16 @@ m_burst (char *origin, char **argv, int argc, int srv)
 				while(*modes) {
 					char **av;
 					int ac;
-					int i;
-					for (i = 0; i < ircd_cmodecount; i++) {
-						if (*modes == chan_modes[i].flag) {
-							if (chan_modes[i].flags&MODEPARAM) {
-								ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], *modes, argv[param]);
-								param ++;
-							} else {
-								ircsnprintf (ircd_buf, BUFSIZE, "%s +%c", argv[0], *modes);
-							}
-							ac = split_buf (ircd_buf, &av, 0);
-							ChanMode (me.name, av, ac);
-							sfree (av);
-							break;
-						}
+
+					if (ircd_cmodes[*modes].flags&MODEPARAM) {
+						ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], *modes, argv[param]);
+						param ++;
+					} else {
+						ircsnprintf (ircd_buf, BUFSIZE, "%s +%c", argv[0], *modes);
 					}
+					ac = split_buf (ircd_buf, &av, 0);
+					ChanMode (me.name, av, ac);
+					sfree (av);
 					modes++;
 				}
 				break;
