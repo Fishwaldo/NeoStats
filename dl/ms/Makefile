@@ -5,7 +5,7 @@ INCLUDES = -I../.. -I../../adns
 SOURCES= ms.c
 OBJECTS= ms.o
 TARGET= ms.so
-
+DISTFILES = $(SOURCES) Makefile ChangeLog ms_help.c
 all:	ms
 
 .c.o:
@@ -22,6 +22,10 @@ clean:
 install: ms
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
 
+dist:	$(DISTFILES)
+	@for files in $(DISTFILES); do \
+		cp $$files $(distdir)/$$files; \
+	done
 
 
 

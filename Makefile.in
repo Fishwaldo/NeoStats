@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.30 2003/01/06 12:07:25 fishwaldo Exp $
+# $Id: Makefile.in,v 1.31 2003/01/29 11:36:32 fishwaldo Exp $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
@@ -12,10 +12,16 @@ SRCS =	dns.c chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c us
 
 PROGS = neostats cronchk makeconf
 CONF = neostats.motd
-DOCS = doc/FAQ doc/USERMAN README BUGS AUTHORS COPYING INSTALL LICENCE NEWS TODO
+DOCS = doc/FAQ* doc/USERMAN README* BUGS AUTHORS COPYING CREDITS INSTALL* LICENCE NEWS TODO
 DOCS_PROGS = doc/read-faq doc/read-userman
 DATA = data/tlds.nfo
 INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h  Unreal.h adns/adns.h hybrid7.h neoircd.h
+BUILDFILES = configure *.in adns/Makefile adns/config.h.in dl/Makefile dl/modules.txt RelNotes.txt
+DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) $(BUILDFILES) adns/*.c adns/adns.h adns/dlist.h  adns/internal.h  adns/tvarith.h
+ 
+distdir = @PACKAGE@-@VERSION@
+SUBDIRS = doc data adns
+DISTMOD = cs extauth hostserv loveserv ms spam statserv version
 
 .c.o:
 	$(CC) $(NEOINCLUDES) $(CFLAGS) -c $< 
@@ -53,6 +59,40 @@ install: neostats modules
 	$(INSTALL) -m 644 $(DATA) @prefix@/data
 	$(INSTALL) -m 644 $(INCLUDES) @prefix@/include
 	(cd dl; $(MAKE) $@)
+
+dist: 	$(DISTFILES)
+	@echo -n "Creating Directories"
+	@-rm -rf $(distdir)
+	@echo -n "."
+	@mkdir $(distdir)
+	@echo -n "."
+	@mkdir $(distdir)/dl
+	@echo -n "."
+	@for subdir in $(SUBDIRS); do \
+		echo -n "."; \
+		mkdir $(distdir)/$$subdir; \
+		chmod 777 $(distdir)/$$subdir; \
+	done
+	@echo "Done"
+	@echo -n "Coping Core Distribution files"
+	@for file in $(DISTFILES); do \
+		echo -n "."; \
+		cp -pr $$file $(distdir)/$$file; \
+	done
+	@rm -rf $(distdir)/config.h
+	@echo "Done"
+	@echo "Copying Module Distribution files"
+	@for mod in $(DISTMOD); do \
+		mkdir $(distdir)/dl/$$mod; \
+		(cd dl/$$mod && $(MAKE) dist distdir=../../$(distdir)/dl/$$mod && cd ../..) || exit 1; \
+	done
+	@echo "Done"
+	@tar -czf $(distdir).tar.gz $(distdir)/*
+	@rm -rf $(distdir)
+	@echo "Tar file $(distdir).tar.gz created. Freshmeat time!"
+
+
+
 
 # Catch any changes in compilation options at the top of this file
 $(OBJS): Makefile

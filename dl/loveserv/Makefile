@@ -5,6 +5,7 @@ INCLUDES = -I../.. -I../../adns
 SOURCES= loveserv.c
 OBJECTS= loveserv.o
 TARGET= loveserv.so
+DISTFILES = $(SOURCES) ls_help.c Makefile ChangeLog 
 
 all:	loveserv
 
@@ -22,6 +23,10 @@ clean:
 install: loveserv
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
 
+dist:	$(DISTFILES)
+	@for files in $(DISTFILES); do \
+		cp $$files $(distdir)/$$files; \
+	done
 
 
 

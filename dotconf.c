@@ -42,7 +42,7 @@
 
 /*
 ** NeoStats CVS Identification
-** $Id: dotconf.c,v 1.6 2002/10/15 19:05:38 shmad Exp $
+** $Id: dotconf.c,v 1.7 2003/01/29 11:36:38 fishwaldo Exp $
 */
 
 #include <time.h>
@@ -368,6 +368,9 @@ int config_parse(FILE *config)
 							}
 						case ARG_RAW:     /* this has been handled before */
 						default:
+							{
+								break;
+							}
 						}
 				}
 		}

@@ -6,6 +6,7 @@ SOURCES= statserv.c ss_help.c database.c tld.c stats.c htmlstats.c
 OBJECTS= statserv.o ss_help.o database.o tld.o stats.o htmlstats.o
 TARGET= statserv.so
 HTML= html/index.tpl
+DISTFILES= $(SOURCES) $(HTML) ChangeLog statserv.h m_stats.h Makefile
 
 all:	statserv
 
@@ -24,6 +25,12 @@ install: statserv
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
 	$(INSTALL) -m 644 $(HTML) $(DIRECTORY)/data
 
+dist:	$(DISTFILES)
+	@mkdir $(distdir)/html
+	@chmod 777 $(distdir)/html
+	@for files in $(DISTFILES); do \
+		cp $$files $(distdir)/$$files; \
+	done
 
 
 $(OBJECTS): Makefile

@@ -5,6 +5,7 @@ INCLUDES = -I../.. -I../../adns
 SOURCES= cs.c
 OBJECTS= cs.o
 TARGET= cs.so
+DISTFILES = $(SOURCES) cs.h Makefile ChangeLog
 
 all:	cs
 
@@ -22,6 +23,10 @@ clean:
 install: cs
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
 
+dist: 	$(DISTFILES)
+	@for files in $(DISTFILES); do \
+		cp $$files $(distdir)/$$files; \
+	done
 
 
 

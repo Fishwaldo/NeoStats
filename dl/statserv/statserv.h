@@ -124,7 +124,7 @@ struct daily_ {
 
 struct tld_ {
 	TLD *next;
-	char tld[4];
+	char tld[5];
 	char *country;
 	int users;
 	int daily_users;

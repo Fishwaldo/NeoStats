@@ -5,6 +5,7 @@ INCLUDES = -I../.. -I../../adns
 SOURCES= spam.c
 OBJECTS= spam.o
 TARGET= spam.so
+DISTFILES= $(SOURCES) Makefile
 
 all:	spam
 
@@ -22,6 +23,10 @@ clean:
 install: spam
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
 
+dist:	$(DISTFILES)
+	@for files in $(DISTFILES); do \
+		cp $$files $(distdir)/$$files; \
+	done
 
 
 

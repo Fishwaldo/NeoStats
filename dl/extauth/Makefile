@@ -5,6 +5,8 @@ INCLUDES = -I../.. -I../../adns
 SOURCES= $(extauth_src) 
 OBJECTS= $(extauth_objs)
 TARGET= extauth.so
+DISTFILES = serviceroots.c Makefile
+
 
 all:	extauth
 
@@ -22,6 +24,10 @@ clean:
 install: extauth
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
 
+dist:	$(DISTFILES)
+	@for files in $(DISTFILES); do \
+		cp $$files $(distdir)/$$files; \
+	done
 
 
 
