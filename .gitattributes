@@ -251,6 +251,7 @@ lib/gdbm/NEWS -text
 lib/gdbm/README -text
 lib/gdbm/aclocal.m4 -text
 lib/gdbm/autoconf.h.in -text
+lib/gdbm/autoconfwin32.h -text
 lib/gdbm/bucket.c -text
 lib/gdbm/close.c -text
 lib/gdbm/config.guess -text
