@@ -79,19 +79,19 @@ ele irá pelo código fonte e compilá-lo num ficheiro binário executável.
 Se vir alguns warnings, por favor ignore-os - estamos a tratar deles.
 
 
-[4] Configurando o ficheiro stats.cfg
+[4] Configurando o ficheiro neostats.cfg
 
 Escreva:
 
 ./makeconf
 
-Isto irá levá-lo através do "criador" do stats.cfg. É recomendado após
-correr o makeconf, verificar o ficheiro stats.cfg manualmente.
+Isto irá levá-lo através do "criador" do neostats.cfg. É recomendado após
+correr o makeconf, verificar o ficheiro neostats.cfg manualmente.
 Isto pode ser feiro escrevendo:
 
-pico stats.cfg
+pico neostats.cfg
 
-O ficheiro stats.cfg é bastante compreensível, se tiver alguma questão,
+O ficheiro neostats.cfg é bastante compreensível, se tiver alguma questão,
 esteja à vontade para me perguntar.. Uma vez terminada a edição do ficheiro
 carreguem em Ctrl-X e depois em Y e finalmente em enter para salvar o ficheiro.
 
@@ -125,7 +125,7 @@ Ok, se tudo correu bem, está agora preparado para correr o NeoStats. Para correr
 o NeoStats a partir da shell, terá que escrever:
 
 cd ~/NeoStats-2.0.11
-./stats
+./neostats
 
 
 Ele deverá "linkar-se" e sincronizar-se com o seu servidor, numa questão de segundos.

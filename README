@@ -37,10 +37,10 @@ Table of Contents:
 	[1.2] Running configure
 	[1.3] Compiling NeoStats
 	[1.4] Installing NeoStats
-	[1.5] Setting up the stats.cfg file
+	[1.5] Setting up the neostats.cfg file
 	[1.6] Finished!
 [2] NeoStats Bot Help
-	[2.1] stats.cfg options
+	[2.1] neostats.cfg options
 	[2.2] Available commands
 	[2.3] 	INFO
 	[2.4] 	VERSION
@@ -54,7 +54,7 @@ Table of Contents:
 	[2.12]	JUPE
 	[2.13]	RAW
 [3] StatServ Bot Help
-	[2.1] stats.cfg options
+	[2.1] neostats.cfg options
 	[2.2] Available Commands
 	[2.3]		SERVER
 	[2.4]	 	MAP
@@ -149,14 +149,17 @@ Table of Contents:
 
 
 
-	[1.5] Setting up the stats.cfg file
+	[1.5] Setting up the neostats.cfg file
 
 		Now you should change to the installation directory (~/NeoStats/, or whatever you specified in ./configure)
 
-		once in this directory, you need to edit the configuration file. A template is provided called stats.cfg.dist
-		copy this file to stats.cfg and edit the file. All the options are pretty self explainatory.
+		once in this directory, you need to edit the configuration file. A template is provided called 
+		neostats.cfg.dist
+		copy this file to neostats.cfg and edit the file. All the options are pretty self explainatory.
 		if you have a question please feel free to ask me.. Once you are done editting the file Press 
-		NOTE: some additional modules, like StatServ or scriptserv have additional configuration options that must be specified in the stats.cfg file. Please see the documentation for the individual modules on available configuration options
+		NOTE: some additional modules, like StatServ or scriptserv have additional configuration options that 
+		must be specified in the neostats.cfg file. Please see the documentation for the individual modules on
+		available configuration options
 
 		The available options are:
 		SERVER_NAME	- Specifies the name of the NeoStats Server as it will apear on the network. 
@@ -192,7 +195,7 @@ Table of Contents:
 		**       Please Please Please! Remember to add the proper C & N lines
 			 on your server as well!
 
-		Once your CNU lines are setup, you need to start stats. That is as simple as ./stats
+		Once your CNU lines are setup, you need to start stats. That is as simple as ./neostats
 
 		If anything goes wrong, there *might* be a error message in the log files. Have a look in ~/NeoStats/logs/stats.log it might give you a clue to whats wrong!
 
@@ -202,8 +205,8 @@ Table of Contents:
 		YOU SHOULD READ THE IRCd's DOCUMENTATION IF YOU DO NOT KNOW HOW TO DO IT!!!
 
 [2] NeoStats Bot Help
-	[2.1] stats.cfg options
-	The following options are available for the NeoStats bot in stats.cfg:
+	[2.1] neostats.cfg options
+	The following options are available for the NeoStats bot in neostats.cfg:
 	NEOSTATS_HOST	- Specifies the Hostname that NeoStats apears to come from
 		eg: NEOSTATS_HOST stats.neostats.net	-Means the bot will apear as NeoStats!user@stats.neostats.net
 	NEOSTATS_USER	- Specifies the User/ident of the NeoStats Bot:
@@ -308,7 +311,7 @@ Table of Contents:
 				 <NeoStats> RAW COMMAND Fish Issued a Raw Command!(:neostats invite fish #blah)
 				*** NeoStats (Neo@NeoStats.net) invites you to #blah
 [3]	StatServ Help
-	[2.1] Stats.cfg config options
+	[2.1] neoStats.cfg config options
 		STATSERV_NICK	-Sets the nickname of the StatServ bot. If not specified, defaults to statserv
 			eg: STATSERV_NICK stats	-Set statserv bot to appear as 'stats'
 		STATSERV_USER	-Sets the username portion of the statserv bot
@@ -514,7 +517,7 @@ Table of Contents:
 		We may request that you enable debugging and submit us the results of debugging. if this is the case, we need you to re-run configure with the following option:
 		./configure --enable-debug (any other options you need, like IRCD type and module lists)
 		"make"
-		./stats
+		./neostats
 		When it crashes, or the bug has been reproduced, please send us:
 		logs/stats.log
 		logs/recv.log

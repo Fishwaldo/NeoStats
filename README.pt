@@ -37,10 +37,10 @@ Tabela de Conteúdos:
 	[1.2] Correndo o configure
 	[1.3] Compilando o NeoStats
 	[1.4] Instalando o NeoStats
-	[1.5] Configurando o ficheiro stats.cfg 
+	[1.5] Configurando o ficheiro neostats.cfg 
 	[1.6] Fim!
 [2] Ajuda ao Bot NeoStats
-	[2.1] Opções do stats.cfg
+	[2.1] Opções do neostats.cfg
 	[2.2] Comandos disponíveis
 	[2.3] INFO
 	[2.4] VERSION
@@ -54,7 +54,7 @@ Tabela de Conteúdos:
 	[2.12] JUPE
 	[2.13] RAW
 [3] Ajuda ao Bot StatServ
-	[2.1] Opções do stats.cfg
+	[2.1] Opções do neostats.cfg
 	[2.2] Comandos disponíveis
 	[2.3] SERVER
 	[2.4] MAP
@@ -148,14 +148,17 @@ Tabela de Conteúdos:
 
 
 
-	[1.5] Configurando o ficheiro stats.cfg
+	[1.5] Configurando o ficheiro neostats.cfg
 
 		Agora deverá mudar para o directório de instalação (~/NeoStats/ ou o que especificou no ./configure)
 
-		Uma vez neste directório, necessitará de editar o ficheiro de configuração. Um molde é fornecido, stats.cfg.dist
-		mude o nome deste ficheiro para stats.cfg e edite-o. Todas as opções estão explicadas de forma suficientemente clara.
-		Se tiver alguma pergunta, esteja à vontade para ma perguntar.. Uma vez terminada a edição do ficheiro, pressionel CTRL + X
-		NOTA: alguns módulos adicionais, como o StatServ ou o ScriptServ têm opções de configuração adicionais que têm que ser especificadas no ficheiro stats.cfg. Por favor veja a documentação para cada um dos módulos individuais relativamente a opções de configuração.
+		Uma vez neste directório, necessitará de editar o ficheiro de configuração. Um molde é fornecido, 
+		neostats.cfg.dist mude o nome deste ficheiro para neostats.cfg e edite-o. Todas as opções estão 
+		explicadas de forma suficientemente clara. Se tiver alguma pergunta, esteja à vontade para ma 
+		perguntar.. Uma vez terminada a edição do ficheiro, pressionel CTRL + X
+		NOTA: alguns módulos adicionais, como o StatServ ou o ScriptServ têm opções de configuração adicionais 
+		que têm que ser especificadas no ficheiro stats.cfg. Por favor veja a documentação para cada um dos 
+		módulos individuais relativamente a opções de configuração.
 
 		As opções disponíveis são:
 		SERVER_NAME	- Especifica o nome do servidor do NeoStats como aparecerá na rede.
@@ -191,7 +194,8 @@ Tabela de Conteúdos:
 		**       Por favor, por favor, por favor! Lembre-se de adicionar as C/N-lines correctas no
 			 seu servidor!
 
-		Uma vez as C/N e u-lines configuradas, necessitará de iniciar o NeoStats. Tão simples quanto escrever ./stats
+		Uma vez as C/N e u-lines configuradas, necessitará de iniciar o NeoStats. Tão simples quanto escrever 
+		./neostats
 
 		Se algo correr mal, *talvez* haja uma mensagem de erro nos ficheiros de log. Dê uma vista de olhos em ~/NeoStats/logs/stats.log este ficheiro poderá dar-lhe uma pista do que possa estar errado!
 
@@ -201,8 +205,8 @@ Tabela de Conteúdos:
 		VOCÊ DEVERÁ LER A DOCUMENTAÇÃO DO SEU IRCD SE NÃO SABE COMO O FAZER!!!
 
 [2] Ajuda ao Bot NeoStats
-	[2.1] Opções do stats.cfg
-	As opções seguintes estão disponíveis para o bot NeoStats no stats.cfg:
+	[2.1] Opções do neostats.cfg
+	As opções seguintes estão disponíveis para o bot NeoStats no neostats.cfg:
 	NEOSTATS_HOST	- Especifica a hostname que o NeoStats aparenta ter
 		eg: NEOSTATS_HOST stats.neostats.net	- Significa que o bot irá ter a host: NeoStats!user@stats.neostats.net
 	NEOSTATS_USER	- Especifica a identd do bot NeoStats
@@ -307,7 +311,7 @@ Tabela de Conteúdos:
 				 <NeoStats> RAW COMMAND Fish Issued a Raw Command!(:neostats invite fish #blah)
 				*** NeoStats (Neo@NeoStats.net) invites you to #blah
 [3] Ajuda ao Bot StatServ
-	[3.1] Opções do stats.cfg
+	[3.1] Opções do neostats.cfg
 		STATSERV_NICK	-Define o nickname do bot StarServ. Se não for especificado, o default é StatServ.
 			eg: STATSERV_NICK stats	-Define o nickname do bot StatServ como 'stats'
 		STATSERV_USER	-Define a identd do bot StatServ
@@ -513,7 +517,7 @@ Tabela de Conteúdos:
 		Poderemos pedir que active a opção debugging e nos fornecer os resultados. Se é este o caso, você precisará de reconfigurar o NeoStats com a seguinte opção:
 		./configure --enable-debug (e quaisquer outras opções que possa necessitar, como o tipo de IRCD e lista de módulos)
 		"make"
-		./stats
+		./neostats
 		Quando o NeoStats crashar, ou o problema se reproduzir, por favor envie-nos os ficheiros:
 		logs/stats.log
 		logs/recv.log

@@ -80,19 +80,19 @@ If you get some warnings, please ignore them -- we are working on the warnings.
 
 
 
-[4] Setting up the stats.cfg file
+[4] Setting up the neostats.cfg file
 
 Type:
 
 ./makeconf
 
-This will take you through the stats.cfg creator.  it is recommended after
-running makeconf to check the stats.cfg manually as well.
+This will take you through the neostats.cfg creator.  it is recommended after
+running makeconf to check the neostats.cfg manually as well.
 this can be done by typing:
 
-pico stats.cfg
+pico neostats.cfg
 
-The 'stats.cfg' file is pretty self explainitory, if you have a question
+The 'neostats.cfg' file is pretty self explainitory, if you have a question
 please feel free to ask me.. Once you are done editting the file Press 
 Ctrl-X then hit Y and enter to save the file.
 
@@ -130,7 +130,7 @@ Ok, if everything else went fine, you are now read to run NeoStats.  To run
 NeoStats from the shell you have to type:
 
 cd ~/NeoStats-2.0.11
-./stats
+./neostats
 
 
 It should link and sync with your server in a matter of seconds.
