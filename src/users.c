@@ -606,3 +606,20 @@ hash_t *GetUserHash (void)
 {
 	return userhash;
 }
+
+void set_user_moddata (Client* u, void * data)
+{
+	if (u)
+	{
+		u->moddata[GET_CUR_MODNUM()] = data;
+	}
+}
+
+void* get_user_moddata (Client* u)
+{
+	if (u)
+	{
+		return u->moddata[GET_CUR_MODNUM()];
+	}
+	return NULL;	
+}

@@ -1359,4 +1359,11 @@ MODULEVAR extern ModuleEvent module_events[];
 /* Module Auth Interface */
 MODULEFUNC int ModAuthUser (Client * u);
 
+EXPORTFUNC void set_channel_moddata (Channel* c, void * data);
+EXPORTFUNC void* get_channel_moddata (Channel* c);
+EXPORTFUNC void set_user_moddata (Client* u, void * data);
+EXPORTFUNC void* get_user_moddata (Client* u);
+EXPORTFUNC void set_server_moddata (Client* s, void * data);
+EXPORTFUNC void* get_server_moddata (Client* s);
+
 #endif /* NEOSTATS_H */

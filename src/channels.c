@@ -612,3 +612,20 @@ hash_t *GetChannelHash (void)
 {
 	return channelhash;
 }
+
+void set_channel_moddata (Channel* c, void * data)
+{
+	if (c)
+	{
+		c->moddata[GET_CUR_MODNUM()] = data;
+	}
+}
+
+void* get_channel_moddata (Channel* c)
+{
+	if (c)
+	{
+		return c->moddata[GET_CUR_MODNUM()];
+	}
+	return NULL;	
+}

@@ -194,7 +194,7 @@ typedef enum Event {
  */
 	EVENT_PARTBOT,
 
-/*  EVENT_PARTBOTFORCE
+/*  EVENT_EMPTYCHAN
  *    When no real users are left in a channel that the module has a bot in,
  *    the core bot will PART the bot and issue this event.
  *    by the core
@@ -203,7 +203,7 @@ typedef enum Event {
  *      channel in cmdparams->channel
  *      reason in cmdparams->param
  */
-	EVENT_PARTBOTFORCE,
+	EVENT_EMPTYCHAN,
 
 /*  EVENT_KICK 
  *    parameters:

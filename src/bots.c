@@ -662,7 +662,7 @@ restart:
 					/* Force the bot to leave the channel */
 					irc_part (botptr, c->name);
 					/* Tell the module we kicked them out */
-					SendModuleEvent (EVENT_PARTBOTFORCE, cmdparams, botptr->moduleptr);
+					SendModuleEvent (EVENT_EMPTYCHAN, cmdparams, botptr->moduleptr);
 					goto restart;
 				}
 				cm = list_next (botptr->u->user->chans, cm);

@@ -298,3 +298,20 @@ hash_t *GetServerHash (void)
 {
 	return serverhash;
 }
+
+void set_server_moddata (Client* s, void * data)
+{
+	if (s)
+	{
+		s->moddata[GET_CUR_MODNUM()] = data;
+	}
+}
+
+void* get_server_moddata (Client* s)
+{
+	if (s)
+	{
+		return s->moddata[GET_CUR_MODNUM()];
+	}
+	return NULL;	
+}

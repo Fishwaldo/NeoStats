@@ -26,8 +26,6 @@
 #include "neostats.h"
 #include "hostserv.h"
 
-#define MAXPASSWORD	30
-
 #define BANBUFSIZE	4096
 static char ban_buf[BANBUFSIZE];
 
@@ -35,7 +33,7 @@ typedef struct hs_map_ {
 	char nnick[MAXNICK];
 	char host[MAXHOST];
 	char vhost[MAXHOST];
-	char passwd[MAXPASSWORD];
+	char passwd[MAXPASS];
 	char added[MAXNICK];
 	time_t lused;
 } hs_map;
@@ -52,7 +50,6 @@ struct hs_cfg {
 	int expire;
 	int regnick;
 	char vhostdom[MAXHOST];
-	int modnum;
 	int operhosts;
 } hs_cfg;
 
@@ -86,8 +83,6 @@ static void LoadConfig(void);
 
 /** Bot pointer */
 Bot *hs_bot;
-/** Module pointer */
-static Module* hs_module;
 
 /** Copyright info */
 const char *hs_copyright[] = {
@@ -184,21 +179,24 @@ void set_moddata(Client * u)
 {
 	hs_user *hs;
 
-	if (!u->moddata[hs_module->modnum]) {
+	if (!get_user_moddata (u)) {
 		hs = ns_malloc(sizeof(hs_user));
 		hs->vhostset = 1;
-		u->moddata[hs_module->modnum] = hs;
+		set_user_moddata (u, hs);
 	}
 }
 
 static int hs_event_quit(CmdParams* cmdparams) 
 {
-	if (cmdparams->source->moddata[hs_module->modnum]) {
+	hs_user *hs;
+
+	hs = get_user_moddata (cmdparams->source);
+	if (hs) {
 		dlog(DEBUG2, "hs_event_quit: free module data");
-		ns_free(cmdparams->source->moddata[hs_module->modnum]);
-		cmdparams->source->moddata[hs_module->modnum] = NULL;
+		ns_free(hs);
+		set_user_moddata (cmdparams->source, NULL);
 	}
-	return 1;
+	return NS_SUCCESS;
 }
 	
 /* Routine For Setting the Virtual Host */
@@ -222,7 +220,7 @@ static int hs_event_signon (CmdParams* cmdparams)
 			}
 		}
 	}
-	return 1;
+	return NS_SUCCESS;
 }
 
 /** @brief ModInit
@@ -236,7 +234,6 @@ static int hs_event_signon (CmdParams* cmdparams)
 
 int ModInit (Module *mod_ptr)
 {
-	hs_module = mod_ptr;
 	vhosts = list_create(-1);
 	bannedvhosts = hash_create(-1, 0, 0);
 	if (!vhosts) {
@@ -299,7 +296,7 @@ int hs_event_mode (CmdParams* cmdparams)
 		return -1;
 
 	if (is_oper(cmdparams->source) && hs_cfg.operhosts == 0) 
-		return 1;
+		return NS_SUCCESS;
 		
 	/* first, find if its a regnick mode */
 	modes = cmdparams->av[1];
@@ -314,7 +311,7 @@ int hs_event_mode (CmdParams* cmdparams)
 		default:
 			if(*modes == UmodeChRegNick) {
 				if (add) {
-					if (cmdparams->source->moddata[hs_module->modnum] != NULL) {
+					if (get_user_moddata (cmdparams->source) != NULL) {
 						dlog(DEBUG2, "not setting hidden host on %s", cmdparams->av[0]);
 						return -1;
 					}
@@ -330,7 +327,7 @@ int hs_event_mode (CmdParams* cmdparams)
 		}
 		modes++;
 	}
-	return 1;
+	return NS_SUCCESS;
 }
 
 /* Routine for registrations with the 'vhosts.db' file */
@@ -342,7 +339,7 @@ static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 	strlcpy(map->nnick, nick, MAXNICK);
 	strlcpy(map->host, host, MAXHOST);
 	strlcpy(map->vhost, vhost, MAXHOST);
-	strlcpy(map->passwd, pass, MAXPASSWORD);
+	strlcpy(map->passwd, pass, MAXPASS);
 	strlcpy(map->added, who, MAXNICK);
 	map->lused = me.now;
 	lnode_create_append (vhosts, map);
@@ -396,7 +393,7 @@ static int hs_levels(CmdParams* cmdparams)
 			} else {
 				irc_prefmsg(hs_bot, cmdparams->source, 
 					"Invalid Level. /msg %s help levels", hs_bot->name);
-				return 1;
+				return NS_SUCCESS;
 			}
 			irc_prefmsg(hs_bot, cmdparams->source, 
 				"Level for %s set to %d", cmdparams->av[0], t);
@@ -517,20 +514,13 @@ static void SaveBans()
 static int hs_chpass(CmdParams* cmdparams)
 {
 	hs_map *map;
-	char *nick;
-	char *oldpass;
-	char *newpass;
 
-	nick = cmdparams->av[0];
-	oldpass = cmdparams->av[1];
-	newpass = cmdparams->av[2];
-
-	map = lnode_find (vhosts, nick, findnick);
+	map = lnode_find (vhosts, cmdparams->av[0], findnick);
 	if (map) {
 		if ((match(map->host, cmdparams->source->user->hostname))
 		    || (UserLevel(cmdparams->source) >= 100)) {
-			if (!ircstrcasecmp(map->passwd, oldpass)) {
-				strlcpy(map->passwd, newpass, MAXPASSWORD);
+			if (!ircstrcasecmp(map->passwd, cmdparams->av[1])) {
+				strlcpy(map->passwd, cmdparams->av[2], MAXPASS);
 				irc_prefmsg(hs_bot, cmdparams->source, 
 					"Password Successfully changed");
 				irc_chanalert(hs_bot,
@@ -538,7 +528,7 @@ static int hs_chpass(CmdParams* cmdparams)
 					  cmdparams->source->name, map->nnick);
 				map->lused = me.now;
 				save_vhost(map);
-				return 1;
+				return NS_SUCCESS;
 			}
 		} else {
 			irc_prefmsg(hs_bot, cmdparams->source,  
@@ -550,7 +540,7 @@ static int hs_chpass(CmdParams* cmdparams)
 			nlog(LOG_WARNING,
 			     "%s tried to change the password for %s but the hosts do not match (%s -> %s)",
 			     cmdparams->source->name, map->nnick, cmdparams->source->user->hostname, map->host);
-			return 1;
+			return NS_SUCCESS;
 		}
 	}
 
@@ -558,74 +548,63 @@ static int hs_chpass(CmdParams* cmdparams)
 		"Invalid Username or Password. Access Denied");
 	irc_chanalert(hs_bot,
 		  "%s tried to change the password for %s, but got it wrong",
-		  cmdparams->source->name, nick);
-	return 1;
+		  cmdparams->source->name, cmdparams->av[0]);
+	return NS_SUCCESS;
 
 }
 
 /* Routine for ADD */
 static int hs_add(CmdParams* cmdparams)
 {
-
 	hnode_t *hn;
 	hscan_t hs;
 	Client *nu;
-	char *cmd;
-	char *m;
-	char *h; 
-	char *p;
-
-	cmd = cmdparams->av[0];
-	m = cmdparams->av[1];
-	h = cmdparams->av[2]; 
-	p = cmdparams->av[3];
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin(&hs, bannedvhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
-		if (match(hnode_get(hn), h)) {
+		if (match(hnode_get(hn), cmdparams->av[2])) {
 			irc_prefmsg(hs_bot, cmdparams->source, 
 				"%s has been matched against the vhost ban %s",
-				h, (char *) hnode_get(hn));
-			irc_chanalert(hs_bot,
-				  "%s tried to add a banned vhost %s",
-				  cmdparams->source->name, h);
-			return 1;
+				cmdparams->av[2], (char *) hnode_get(hn));
+			irc_chanalert(hs_bot, "%s tried to add a banned vhost %s",
+				  cmdparams->source->name, cmdparams->av[2]);
+			return NS_SUCCESS;
 		}
 	}
 
-	if(validate_host (h) == NS_FAILURE) {
+	if(validate_host (cmdparams->av[2]) == NS_FAILURE) {
 		irc_prefmsg(hs_bot, cmdparams->source, 
-			"%s is an invalid host", h);
-		return 1;
+			"%s is an invalid host", cmdparams->av[2]);
+		return NS_SUCCESS;
 	}
 
-	if (list_find(vhosts, cmd, findnick)) {
+	if (list_find(vhosts, cmdparams->av[0], findnick)) {
 		irc_prefmsg(hs_bot, cmdparams->source, 
-			"%s already has a vhost entry", cmd);
-		return 1;
+			"%s already has a vhost entry", cmdparams->av[0]);
+		return NS_SUCCESS;
 	}
-	hsdat(cmd, m, h, p, cmdparams->source->name);
+	hsdat(cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3], cmdparams->source->name);
 	nlog(LOG_NOTICE,
 		    "%s added a vhost for %s with realhost %s vhost %s and password %s",
-		    cmdparams->source->name, cmd, m, h, p);
+		    cmdparams->source->name, cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3]);
 	irc_prefmsg(hs_bot, cmdparams->source, 
 		"%s has sucessfully been registered under realhost: %s vhost: %s and password: %s",
-		cmd, m, h, p);
+		cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3]);
 	irc_chanalert(hs_bot,
 			"%s added a vhost %s for %s with realhost %s",
-			cmdparams->source->name, h, cmd, m);
+			cmdparams->source->name, cmdparams->av[2], cmdparams->av[0], cmdparams->av[1]);
 	/* Apply The New Hostname If The User Is Online */
-	if ((nu = find_user(cmd)) != NULL) {
+	if ((nu = find_user(cmdparams->av[0])) != NULL) {
 		if (!IsMe(nu)) {
-			if (match(m, nu->user->hostname)) {
-				irc_svshost(hs_bot, nu, h);
+			if (match(cmdparams->av[1], nu->user->hostname)) {
+				irc_svshost(hs_bot, nu, cmdparams->av[2]);
 				irc_prefmsg(hs_bot, cmdparams->source, 
 					"%s is online now, setting vhost to %s",
-					cmd, h);
+					cmdparams->av[0], cmdparams->av[2]);
 				irc_prefmsg(hs_bot, nu, 
 					"Your vhost has been created with hostmask of %s and username %s with password %s",
-					m, cmd, p);
+					cmdparams->av[1], cmdparams->av[0], cmdparams->av[3]);
 				irc_prefmsg(hs_bot, nu, 
 					"For security, you should change your vhost password. See /msg %s help chpass",
 					hs_bot->name);
@@ -634,7 +613,7 @@ static int hs_add(CmdParams* cmdparams)
 			}
 		}
 	}
-	return 1;
+	return NS_SUCCESS;
 }
 
 
@@ -658,7 +637,7 @@ static int hs_list(CmdParams* cmdparams)
 
 	if (start >= vhostcount) {
 		irc_prefmsg(hs_bot, cmdparams->source,   "Value out of range. There are only %d entries", (int)vhostcount);
-		return 1;
+		return NS_SUCCESS;
 	}
 		
 	i = 1;
@@ -687,7 +666,7 @@ static int hs_list(CmdParams* cmdparams)
 	irc_prefmsg(hs_bot, cmdparams->source,  "End of list.");
 	if (vhostcount >= i) 
 		irc_prefmsg(hs_bot, cmdparams->source,  "Type \2/msg %s list %d\2 to see next page", hs_bot->name, i-1);
-	return 1;
+	return NS_SUCCESS;
 }
 
 /* Routine for VIEW */
@@ -707,7 +686,7 @@ static int hs_view(CmdParams* cmdparams)
 		irc_prefmsg(hs_bot, cmdparams->source, 
 			"The users # is got from /msg %s LIST",
 			hs_bot->name);
-		return 1;
+		return NS_SUCCESS;
 	}
 	i = 1;
 	hn = list_first(vhosts);
@@ -732,7 +711,7 @@ static int hs_view(CmdParams* cmdparams)
 		irc_prefmsg(hs_bot, cmdparams->source, 
 			"ERROR: There is no vhost on list number \2%d\2",
 			tmpint);
-	return 1;
+	return NS_SUCCESS;
 }
 
 
@@ -755,7 +734,7 @@ static void LoadHosts()
 			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Vhost") > 0) 
 				strlcpy(map->vhost, tmp, MAXHOST);
 			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Passwd") > 0) 
-				strlcpy(map->passwd, tmp, MAXPASSWORD);
+				strlcpy(map->passwd, tmp, MAXPASS);
 			if (GetData((void *)&tmp, CFGSTR, "Vhosts", map->nnick, "Added") > 0)
 				strlcpy(map->added, tmp, MAXNICK);
 			GetData((void *)&map->lused, CFGINT, "Vhosts", map->nnick, "LastUsed");
@@ -785,7 +764,7 @@ static int hs_del(CmdParams* cmdparams)
 		irc_prefmsg(hs_bot, cmdparams->source, 
 			"The users # is got from /msg %s LIST",
 			hs_bot->name);
-		return 1;
+		return NS_SUCCESS;
 	}
 
 	hn = list_first(vhosts);
@@ -801,7 +780,7 @@ static int hs_del(CmdParams* cmdparams)
 			del_vhost(map);
 			list_delete(vhosts, hn);
 			lnode_destroy(hn);
-			return 1;
+			return NS_SUCCESS;
 		}
 		hn = list_next(vhosts, hn);
 		i++;
@@ -810,7 +789,7 @@ static int hs_del(CmdParams* cmdparams)
 	if (tmpint > i)
 		irc_prefmsg(hs_bot, cmdparams->source,  "ERROR: no vhost number \2%d\2",
 			tmpint);
-	return 1;
+	return NS_SUCCESS;
 }
 
 
@@ -839,12 +818,12 @@ static int hs_login(CmdParams* cmdparams)
 			if(HaveUmodeRegNick()) 
 				set_moddata(cmdparams->source);
 			save_vhost(map);
-			return 1;
+			return NS_SUCCESS;
 		}
 	}
 	irc_prefmsg(hs_bot, cmdparams->source, 
 		"Incorrect login or password. Do you have a vhost added?");
-	return 1;
+	return NS_SUCCESS;
 }
 
 int CleanupHosts()
@@ -855,7 +834,7 @@ int CleanupHosts()
 	SET_SEGV_LOCATION();
 	/* Use zero value to disable this feature */
 	if(hs_cfg.old == 0)
-		return 1;
+		return NS_SUCCESS;
 	hn = list_first(vhosts);
 	while (hn != NULL) {
 		map = lnode_get(hn);
@@ -871,7 +850,7 @@ int CleanupHosts()
 			hn = list_next(vhosts, hn);
 		}
 	}
-		return 1;
+	return NS_SUCCESS;
 }
 
 /* 
