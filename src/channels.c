@@ -246,14 +246,21 @@ int del_channel_member( Channel *c, Client *u )
 	ns_free( cm );
 	dlog( DEBUG3, "del_channel_member: cur users %s %d (list %d)", c->name, c->users,( int )list_count( c->members ) );
 	c->users--;
+	return NS_SUCCESS;
+}
+
+/** @brief Delete empty channels and raise appropriate events
+ *
+ *
+ */
+void CheckEmptyChannel( Channel *c )
+{
 	if( c->users <= 0 ) {
 		del_chan( c );
 	} else if( ( c->neousers > 0 ) && ( c->neousers == c->users ) ) {
 		/* all real users have left the channel */
 		handle_dead_channel( c );
 	}
-
-	return NS_SUCCESS;
 }
 
 /** @brief Process a kick from a channel. 
@@ -311,6 +318,7 @@ KickChannel( const char *kickby, const char *chan, const char *kicked, const cha
 			SendModuleEvent( EVENT_KICKBOT, cmdparams, u->user->bot->moduleptr );
 		}
 		ns_free( cmdparams );
+		CheckEmptyChannel( c );
 	}
 }
 
@@ -373,6 +381,7 @@ void PartChannel( Client *u, const char *chan, const char *reason )
 		SendModuleEvent( EVENT_PARTBOT, cmdparams, u->user->bot->moduleptr );
 		c->neousers --;
 	}
+	CheckEmptyChannel( c );
 	ns_free( cmdparams );
 }
 
