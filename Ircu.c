@@ -293,7 +293,6 @@ send_akill (const char *host, const char *ident, const char *setby, const int le
 		s = hnode_get (sn);
 		sts (":%s %s %s %lu %s %s :%s", setby, MSG_KLINE, s->name, (unsigned long)length, ident, host, reason);
 	}
-	return 1;
 }
 
 void 

@@ -1004,7 +1004,7 @@ wallops (const char *from, const char *msg, ...)
 	ircvsnprintf (ircd_buf, BUFSIZE, msg, ap);
 	va_end (ap);
 	send_wallops ((char*)from, (char*)ircd_buf);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1016,7 +1016,7 @@ numeric (const int numeric, const char *target, const char *data, ...)
 	ircvsnprintf (ircd_buf, BUFSIZE, data, ap);
 	va_end (ap);
 	send_numeric (numeric, target, ircd_buf);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1027,7 +1027,7 @@ sumode_cmd (const char *who, const char *target, long mode)
 	newmode = UmodeMaskToString(mode);
 	send_umode (who, target, newmode);
 	UserMode (target, newmode);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1035,7 +1035,7 @@ spart_cmd (const char *who, const char *chan)
 {
 	send_part(who, chan);
 	part_chan (finduser (who), (char *) chan, NULL);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1043,7 +1043,7 @@ snick_cmd (const char *oldnick, const char *newnick)
 {
 	UserNick (oldnick, newnick);
 	send_nickchange (oldnick, newnick);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1057,7 +1057,7 @@ schmode_cmd (const char *who, const char *chan, const char *mode, const char *ar
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode ("", av, ac);
 	free (av);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1065,7 +1065,7 @@ squit_cmd (const char *who, const char *quitmsg)
 {
 	send_quit (who, quitmsg);
 	UserQuit (who, quitmsg);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1078,7 +1078,7 @@ skill_cmd (const char *from, const char *target, const char *reason, ...)
 	va_end (ap);
 	send_kill (from, target, ircd_buf);
 	UserQuit (target, ircd_buf);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1095,7 +1095,7 @@ ssvskill_cmd (const char *target, const char *reason, ...)
 	send_kill (me.name, target, ircd_buf);
 	UserQuit (target, ircd_buf);
 #endif
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1103,14 +1103,14 @@ skick_cmd (const char *who, const char *target, const char *chan, const char *re
 {
 	send_kick (who, target, chan, reason);
 	part_chan (finduser (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int 
 sinvite_cmd (const char *from, const char *to, const char *chan) 
 {
 	send_invite(from, to, chan);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1130,7 +1130,7 @@ ssvsmode_cmd (const char *target, const char *modes)
 	chanalert (s_Services, "Warning, Module %s tried to SVSMODE which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to SVSMODE, which is not supported", segvinmodule);
 #endif
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1147,12 +1147,12 @@ ssvshost_cmd (const char *who, const char *vhost)
 
 	strlcpy (u->vhost, vhost, MAXHOST);
 	send_svshost(who, vhost);
-	return 1;
+	return NS_SUCCESS;
 #else
 	chanalert (s_Services, "Warning Module %s tried to SVSHOST, which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSHOST, which is not supported", segvinmodule);
 #endif
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1164,7 +1164,7 @@ ssvsjoin_cmd (const char *target, const char *chan)
 	chanalert (s_Services, "Warning Module %s tried to SVSJOIN, which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSJOIN, which is not supported", segvinmodule);
 #endif
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1176,7 +1176,7 @@ ssvspart_cmd (const char *target, const char *chan)
 	chanalert (s_Services, "Warning Module %s tried to SVSPART, which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSPART, which is not supported", segvinmodule);
 #endif
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1188,7 +1188,7 @@ sswhois_cmd (const char *target, const char *swhois)
 	chanalert (s_Services, "Warning Module %s tried to SWHOIS, which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SWHOIS, which is not supported", segvinmodule);
 #endif
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1200,7 +1200,7 @@ ssvsnick_cmd (const char *target, const char *newnick)
 	notice (s_Services, "Warning Module %s tried to SVSNICK, which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSNICK, which is not supported", segvinmodule);
 #endif
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1212,7 +1212,7 @@ ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
 	chanalert (s_Services, "Warning, Module %s tried to SMO, which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning, Module %s tried to SMO, which is not supported", segvinmodule);
 #endif
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1224,14 +1224,14 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
 	send_akill(host, ident, setby, length, ircd_buf);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
 srakill_cmd (const char *host, const char *ident)
 {
 	send_rakill(host, ident);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1317,7 +1317,7 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
 	free (av);
-	return 1;
+	return NS_SUCCESS;
 }
 
 /* temp until SecureServ 1.1 */
@@ -1328,7 +1328,7 @@ sjoin_cmd (const char *who, const char *chan)
 {
 	send_join (who, chan);
 	join_chan (who, chan);
-	return 1;
+	return NS_SUCCESS;
 }
 #endif
 
@@ -1336,28 +1336,28 @@ int
 sping_cmd (const char *from, const char *reply, const char *to)
 {
 	send_ping (from, reply, to);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
 spong_cmd (const char *reply)
 {
 	send_pong (reply);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
 sserver_cmd (const char *name, const int numeric, const char *infoline)
 {
 	send_server (name, numeric, infoline);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
 ssquit_cmd (const char *server, const char *quitmsg)
 {
 	send_squit (server, quitmsg);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int
@@ -1373,7 +1373,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 #else
 	sumode_cmd (nick, nick, mode);
 #endif
-	return 1;
+	return NS_SUCCESS;
 }
 
 /* SJOIN <TS> #<channel> <modes> :[@][+]<nick_1> ...  [@][+]<nick_n> */
