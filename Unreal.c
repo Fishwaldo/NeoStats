@@ -52,6 +52,7 @@ static void Usr_Join (char *origin, char **argv, int argc);
 static void Usr_Part (char *origin, char **argv, int argc);
 static void Usr_Stats (char *origin, char **argv, int argc);
 static void Usr_Vhost (char *origin, char **argv, int argc);
+static void Usr_Eos (char *origin, char **argv, int argc);
 static void Srv_Ping (char *origin, char **argv, int argc);
 static void Srv_Netinfo (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
@@ -100,6 +101,7 @@ IntCommands cmd_list[] = {
 	{MSG_KICK, TOK_KICK, Usr_Kick, 1, 0},
 	{MSG_JOIN, TOK_JOIN, Usr_Join, 1, 0},
 	{MSG_PART, TOK_PART, Usr_Part, 1, 0},
+	{MSG_EOS, TOK_EOS, Usr_Eos, 0, 0},
 	{MSG_PING, TOK_PING, Srv_Ping, 0, 0},
 	{MSG_NETINFO, TOK_NETINFO, Srv_Netinfo, 0, 0},
 	{MSG_SJOIN, TOK_SJOIN, Srv_Sjoin, 1, 0},
@@ -478,6 +480,11 @@ Usr_Smode (char *origin, char **argv, int argc)
 		ChanMode (origin, argv, argc);
 	}
 }
+
+/*  MODE
+ *  :nick MODE nick :+modestring 
+ *  :servername MODE #channel +modes parameter list TS 
+ */
 static void
 Usr_Mode (char *origin, char **argv, int argc)
 {
@@ -526,6 +533,8 @@ Usr_Nick (char *origin, char **argv, int argc)
 {
 	UserNick (origin, argv[0]);
 }
+
+/* TOPIC #channel ownder TS :topic */
 static void
 Usr_Topic (char *origin, char **argv, int argc)
 {
@@ -565,6 +574,16 @@ Srv_Ping (char *origin, char **argv, int argc)
 	spong_cmd (argv[0]);
 }
 
+/*  NETINFO 
+ *  argv[0] global_max 
+ *  argv[1] TStime 
+ *  argv[2] UnrealProtocol 
+ *  argv[3] CLOAK_KEYCRC 
+ *  argv[4] 0 
+ *  argv[5] 0 
+ *  argv[6] 0 
+ *  argv[7] :netname
+ */
 static void
 Srv_Netinfo (char *origin, char **argv, int argc)
 {
@@ -578,6 +597,15 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 	globops (me.name, "Link with Network \2Complete!\2");
 	ModuleEvent (EVENT_NETINFO, NULL, 0);
 	me.synced = 1;
+}
+
+/*  EOS
+ *  :servername EOS
+ */
+static void 
+Usr_Eos (char *origin, char **argv, int argc)
+{
+    
 }
 
 static void
