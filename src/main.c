@@ -42,6 +42,7 @@
 #include "signals.h"
 #include "lang.h"
 #include "nsdba.h"
+#include "rtaserv.h"
 
 #define PID_FILENAME	"neostats.pid"
 

@@ -122,7 +122,7 @@ static void serverlistdetailhandler (serverstat *ss, void *v)
 		fprintf (opf, "<tr><td>Last Seen:</td><td colspan = 2>%s</td></tr>\n",
 			sftime(ss->ts_lastseen));
 	} else {
-		fprintf (opf,"<tr><td>Current Users:</td><td>%d (%d%%)</td><td>Max %ld at %s</td></tr>\n",
+		fprintf (opf,"<tr><td>Current Users:</td><td>%d (%d%%)</td><td>Max %d at %s</td></tr>\n",
 			ss->users.current, (int)(((float) ss->users.current / (float) networkstats.users.current) * 100),
 			ss->users.alltime.max, sftime(ss->users.alltime.ts_max));
 		fprintf (opf,
@@ -130,7 +130,7 @@ static void serverlistdetailhandler (serverstat *ss, void *v)
 			ss->opers.current, (int)(((float) ss->opers.current / (float) networkstats.opers.current) * 100),
 			ss->opers.alltime.max, sftime(ss->opers.alltime.ts_max));
 	}
-	fprintf (opf, "<tr><td>Total Users Connected:</td><td colspan = 2>%ld</td></tr>",
+	fprintf (opf, "<tr><td>Total Users Connected:</td><td colspan = 2>%d</td></tr>",
 		ss->users.alltime.runningtotal);
 	fprintf (opf, "<tr><td>IrcOp Kills</td><td colspan = 2>%d</td></tr>", 
 		ss->operkills.alltime.runningtotal);
@@ -157,35 +157,35 @@ static void html_netstats (void)
 	fprintf (opf, "<table border = 0>");
 	fprintf (opf, "<tr><th><b></b></th><th><b>Total</b></th><th><b>Current</b></th><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n");
 	fprintf (opf, "<td>Users:</td>\n");
-	fprintf (opf, "<td>%ld</td>\n", networkstats.users.alltime.runningtotal);
-	fprintf (opf, "<td>%ld (%d%%)</td>\n", networkstats.users.current,
+	fprintf (opf, "<td>%d</td>\n", networkstats.users.alltime.runningtotal);
+	fprintf (opf, "<td>%d (%d%%)</td>\n", networkstats.users.current,
 		GetAllTimePercent (&networkstats.users));
-	fprintf (opf, "<td>%ld</td>\n", networkstats.users.alltime.average);
-	fprintf (opf, "<td>%ld</td>\n", networkstats.users.alltime.max);
+	fprintf (opf, "<td>%d</td>\n", networkstats.users.alltime.average);
+	fprintf (opf, "<td>%d</td>\n", networkstats.users.alltime.max);
 	fprintf (opf, "<td>%s</td></tr>\n", sftime(networkstats.users.alltime.ts_max));
 	fprintf (opf, "<tr><td>Channels:</td>\n");
-	fprintf (opf, "<td>%ld</td>\n", networkstats.channels.alltime.runningtotal);
+	fprintf (opf, "<td>%d</td>\n", networkstats.channels.alltime.runningtotal);
 	fprintf (opf, "<td>%i (%d%%)</td>\n", networkstats.channels.current,
 		GetAllTimePercent (&networkstats.channels));
 	fprintf (opf, "<td>%i</td>\n", networkstats.channels.alltime.average);
-	fprintf (opf, "<td>%ld</td>\n", networkstats.channels.alltime.max);
+	fprintf (opf, "<td>%d</td>\n", networkstats.channels.alltime.max);
 	fprintf (opf, "<td>%s</td></tr>\n", sftime(networkstats.channels.alltime.ts_max));
 	fprintf (opf, "<tr><td>Opers:</td>\n");
-	fprintf (opf, "<td>%ld</td>\n", networkstats.opers.alltime.runningtotal);
+	fprintf (opf, "<td>%d</td>\n", networkstats.opers.alltime.runningtotal);
 	fprintf (opf, "<td>%i (%d%%)</td>\n", networkstats.opers.current,
 		GetAllTimePercent (&networkstats.opers));
 	fprintf (opf, "<td>%i</td>\n", networkstats.opers.alltime.average);
 	fprintf (opf, "<td>%i</td>\n", networkstats.opers.alltime.max);
 	fprintf (opf, "<td>%s</td></tr>\n", sftime(networkstats.opers.alltime.ts_max));
 	fprintf (opf, "<td>Servers:</td>\n");
-	fprintf (opf, "<td>%ld</td>\n", networkstats.servers.alltime.runningtotal);
+	fprintf (opf, "<td>%d</td>\n", networkstats.servers.alltime.runningtotal);
 	fprintf (opf, "<td>%d (%d%%)</td>\n", networkstats.servers.current,
 		GetAllTimePercent (&networkstats.servers));
 	fprintf (opf, "<td>%d</td>\n", networkstats.servers.alltime.average);
 	fprintf (opf, "<td>%d</td>\n", networkstats.servers.alltime.max);
 	fprintf (opf, "<td>%s</td>\n", sftime(networkstats.servers.alltime.ts_max));
 	fprintf (opf, "<tr><td colspan=\"3\">Users Set Away:</td>\n");
-	fprintf (opf, "<td colspan=\"3\">%ld</td></tr></table>\n", me.awaycount);
+	fprintf (opf, "<td colspan=\"3\">%d</td></tr></table>\n", me.awaycount);
 }
 
 static void html_dailystats (void)
@@ -295,7 +295,7 @@ static void html_monthlystats (void)
 
 static void top10membershandler (channelstat *cs, void *v)
 {
-	fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+	fprintf (opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->c->users);
 }
 
@@ -308,7 +308,7 @@ static void html_channeltop10members (void)
 
 static void top10joinshandler (channelstat *cs, void *v)
 {
-	fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+	fprintf (opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->users.alltime.runningtotal);
 }
 
@@ -321,7 +321,7 @@ static void html_channeltop10joins (void)
 
 static void top10kickshandler (channelstat *cs, void *v)
 {
-	fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+	fprintf (opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->kicks.alltime.runningtotal);
 }
 
@@ -334,7 +334,7 @@ static void html_channeltop10kicks (void)
 
 static void top10topicshandler (channelstat *cs, void *v)
 {
-	fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
+	fprintf (opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->topics.alltime.runningtotal);
 }
 
@@ -395,7 +395,7 @@ void get_map(char *uplink, int level)
 		if ((level == 0) && (s->uplinkname[0] == 0)) {
 			/* its the root server */
 			fprintf (opf, "<table border=0><tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Ping/Max</th></tr>");
-			fprintf (opf, "<tr><td>%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
+			fprintf (opf, "<tr><td>%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
 				s->server->ping, (int)ss->highest_ping);
 			get_map(s->name, level + 1);
@@ -405,7 +405,7 @@ void get_map(char *uplink, int level)
 			for (i = 1; i < level; i++) {
 				ircsnprintf (buf, MAPBUFSIZE, "%s&nbsp&nbsp&nbsp&nbsp&nbsp|", buf);
 			}
-			fprintf (opf, "<tr><td>%s\\_%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
+			fprintf (opf, "<tr><td>%s\\_%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				buf, ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
 				s->server->ping, (int)ss->highest_ping);
 			get_map(s->name, level + 1);

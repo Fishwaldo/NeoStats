@@ -128,7 +128,7 @@ static int AddServerStat (Client *s, void *v)
 {
 	serverstat *ss;
 
-	dlog (DEBUG2, "AddServerStat(%s)", s);
+	dlog (DEBUG2, "AddServerStat(%s)", s->name);
 	ss = findserverstats (s->name);
 	if (!ss) {
 		ss = new_server_stat (s->name);
@@ -212,9 +212,9 @@ static void makemap(char *uplink, Client * u, int level)
 				makemap(s->name, u, level);
 			}
 			irc_prefmsg (ss_bot, u,
-				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
+				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %d/%d ]",
 				ss->name, s->server->users, (int)ss->users.alltime.max,
-				ss->opers.current, ss->opers.alltime.max, (long)s->server->ping, ss->highest_ping);
+				ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
 		} else if ((level > 0) && !ircstrcasecmp (uplink, s->uplinkname)) {
 			if (StatServ.exclusions && IsExcluded(s)) {
 				makemap(s->name, u, level);
@@ -225,9 +225,9 @@ static void makemap(char *uplink, Client * u, int level)
 				strlcat (buf, "     |", 256);
 			}
 			irc_prefmsg (ss_bot, u,
-				"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
+				"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%d ]",
 				buf, ss->name, s->server->users, (int)ss->users.alltime.max,
-				ss->opers.current, ss->opers.alltime.max, (long)s->server->ping, ss->highest_ping);
+				ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
 		}
 		makemap(s->name, u, level + 1);
 	}
@@ -287,18 +287,18 @@ int ss_cmd_server (CmdParams *cmdparams)
 		irc_prefmsg (ss_bot, cmdparams->source, "Server Last Seen: %s", 
 			sftime(ss->ts_lastseen));
 	} else {
-		irc_prefmsg (ss_bot, cmdparams->source, "Current Users: %-3ld (%d%%)", 
-			(long) s->server->users, 
-			(int)(float) s->server->users / (float) networkstats.users.current * 100);
+		irc_prefmsg (ss_bot, cmdparams->source, "Current Users: %-3d (%d%%)", 
+			s->server->users, 
+			(int)((float) s->server->users / (float) networkstats.users.current * 100));
 	}
-	irc_prefmsg (ss_bot, cmdparams->source, "Maximum users: %-3ld at %s",
+	irc_prefmsg (ss_bot, cmdparams->source, "Maximum users: %-3d at %s",
 		ss->users.alltime.max, sftime(ss->users.alltime.ts_max));
-	irc_prefmsg (ss_bot, cmdparams->source, "Total users connected: %-3ld", ss->users.alltime.runningtotal);
+	irc_prefmsg (ss_bot, cmdparams->source, "Total users connected: %-3d", ss->users.alltime.runningtotal);
 	if (s) {
-		irc_prefmsg (ss_bot, cmdparams->source, "Current opers: %-3ld", (long)ss->opers.current);
+		irc_prefmsg (ss_bot, cmdparams->source, "Current opers: %-3d", ss->opers.current);
 	}
-	irc_prefmsg (ss_bot, cmdparams->source, "Maximum opers: %-3ld at %s",
-		(long)ss->opers.alltime.max, sftime(ss->opers.alltime.ts_max));
+	irc_prefmsg (ss_bot, cmdparams->source, "Maximum opers: %-3d at %s",
+		ss->opers.alltime.max, sftime(ss->opers.alltime.ts_max));
 	irc_prefmsg (ss_bot, cmdparams->source, "IRCop kills: %d", ss->operkills.alltime.runningtotal);
 	irc_prefmsg (ss_bot, cmdparams->source, "Server kills: %d", ss->serverkills.alltime.runningtotal);
 	irc_prefmsg (ss_bot, cmdparams->source, "Lowest ping: %-3d at %s",

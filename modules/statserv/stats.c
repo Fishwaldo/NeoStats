@@ -158,7 +158,7 @@ int SetStatisticEntry (statisticentry *stat, unsigned int current, int diff)
 
 int SetStatistic (statistic *stat, int current)
 {
-	int diff;
+	int diff = 0;
 
 	if (current != stat->current) {
 		/* Subtract this way so that diff is the correct sign for a 

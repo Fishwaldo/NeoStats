@@ -154,7 +154,7 @@ int ns_cmd_exclude_del(CmdParams* cmdparams)
 		en = list_next(exclude_list, en);
 	}
 	/* if we get here, means that we never got a match */
-	irc_prefmsg(ns_botptr, cmdparams->source, __("% not found in the exclusion list",cmdparams->source), cmdparams->av[1]);
+	irc_prefmsg(ns_botptr, cmdparams->source, __("%s not found in the exclusion list",cmdparams->source), cmdparams->av[1]);
 	return NS_SUCCESS;
 } 
 

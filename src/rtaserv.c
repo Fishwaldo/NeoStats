@@ -26,6 +26,8 @@
 #include "rtaserv.h"
 #include <fcntl.h>
 
+void rta_exit(void);
+
 static int rta_active = 0;
 #define MAXSQLCON 5
 
