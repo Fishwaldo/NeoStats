@@ -347,7 +347,6 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 #endif /* TS_MIN */
 
 #define MOD_PATH		"modules"
-#define RECV_LOG		"logs/recv.log"
 
 #define BASE64SERVERSIZE	2
 #define BASE64NICKSIZE		5

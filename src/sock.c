@@ -45,8 +45,6 @@
 #include "rtaserv.h"
 #include "dcc.h"
 
-static void recvlog (char *line);
-
 /* @brief Module Socket List hash */
 static hash_t *sockethash;
 /* @brief server socket */
@@ -228,8 +226,6 @@ read_loop ()
 						if ((c == '\n') || (c == '\r')) {
 							me.RcveM++;
 							me.lastmsg = me.now;
-							if (nsconfig.recvlog)
-								recvlog (buf);
 							strip (buf);
 							strlcpy (recbuf, buf, BUFSIZE);
 							irc_parse (buf);
@@ -370,24 +366,6 @@ getmaxsock (void)
 		ret = 0xffff;
 	return ret;
 #endif
-}
-
-/** @brief recv logging for all data received by us
- *
- * @param line of text received
- * 
- * @return none
- */
-static void
-recvlog (char *line)
-{
-	FILE *logfile;
-
-	if ((logfile = fopen (RECV_LOG, "a")) == NULL)
-		return;
-	if (logfile)
-		fprintf (logfile, "%s", line);
-	fclose (logfile);
 }
 
 /** @brief connect to a socket

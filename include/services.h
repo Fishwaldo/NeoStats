@@ -37,8 +37,6 @@ typedef struct config {
 	LOG_LEVEL	loglevel;
 	/* debug level */
 	unsigned int debuglevel;
-	/* enable recv.log */
-	unsigned int recvlog:1;
 	/* dont load modules on startup */
 	unsigned int modnoload:1;
 	/* dont output anything on start */

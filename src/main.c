@@ -94,9 +94,6 @@ static int InitCore(void)
 {
 	char dbpath[MAXPATH];
 	InitMe();
-	/* if we are doing recv.log, remove the previous version */
-	if (nsconfig.recvlog)
-		remove (RECV_LOG);
 	/* prepare to catch errors */
 	InitSignals ();
 	/* load the config files */
@@ -312,10 +309,6 @@ get_options (int argc, char **argv)
 			printf ("Version:  %s\n", me.version);
 			printf ("Compiled: %s at %s\n", ns_module_info.build_date, ns_module_info.build_time);
 			return NS_FAILURE;
-		case 'r':
-			printf ("recv.log enabled. Watch your disk space\n");
-			nsconfig.recvlog = 1;
-			break;
 		case 'd':
 			level = atoi (optarg);
 			if ((level >= DEBUGMAX) || (level < 1)) {

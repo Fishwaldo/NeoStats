@@ -558,10 +558,10 @@ RECONNECT_TIME $NEOCONN
 #    
 #    Cause NeoStats to sync server times every 24 hours
 #    If not present, NeoStats will not sync times.
-#    This option only works on Unreal servers and defaults to 
-#    a sync interval of 24 hours. Enabling this option will also
-#    cause NeoStats to sync servers when it first joins the 
-#    network.
+#    This option only works on servers that support this and
+#    defaults to a sync interval of 24 hours. Enabling this
+#    option will also cause NeoStats to sync servers when it
+#    first joins the network.
 
 SET_SERVER_TIMES 24
 
@@ -577,6 +577,7 @@ SET_SERVER_TIMES 24
 #    Will load up StatServ at boot
 #    
 #    Multiple instances of LOAD_MODULE may be specified 
+#    
 #    We have provided example lines for convenience for 
 #    official modules but you must download and install
 #    external modules before trying to load them.

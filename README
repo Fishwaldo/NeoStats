@@ -149,12 +149,6 @@ have problems and are about to fill out a bug form.
 
         --enable-debug        Enables Debugging
 
-XWindows Configuration Tool:
-
-To enable building of the configtool program (Needs X windows)
-
-        --enable-configtool
-
 Enabling RAW command:
 
 We strongly recommend against the use of this option. Use of RAW 
@@ -225,212 +219,11 @@ want it before NeoStats will run. You can do this with:
 
         pico neostats.conf
 
-All the options are described below and in the neostats.conf file. Once 
-you are done editing the file save it. 
+All the options are described in the neostats.conf file and you should
+refer to this file for assistance. 
 
-If using pico as in the previous example, press Ctrl-X then hit Y and 
-enter to save the file.
-
-NOTE: some additional modules have additional configuration options that 
-must be specified in the neostats.conf file. Please see the documentation 
-for the individual modules for any configuration options. 
-
-The available options for the main NeoStats distribution are described
-below. 
-
-Each of the options has an indicator as follows:
-    [REQUIRED]    - must be set or NeoStats will not run
-    [RECOMMENDED] - optional but may cause problems if not set
-    [OPTIONAL]    - optional and the feature will be disabled if not set
-    [DISCOURAGED] - may cause undesirable side effects if enabled
-
-IRCD Linking Configuration Options
-----------------------------------
-
-PROTOCOL <protocol> [REQUIRED]
-    Specifies the protocol module to use.
-    Valid protocol options are:
-          bahamut client hybrid7 ircup10 
-          liquid mystic neoircd quantum 
-          ultimate2 ultimate3 unreal31 unreal32 
-          viagra
-    e.g.
-          PROTOCOL "unreal32"
-      
-
-SERVER_NAME <hostname> [REQUIRED]
-    Specifies the name of the NeoStats Server as it will appear on 
-    the network. e.g. 
-      
-          SERVER_NAME stats.neostats.net        
-      
-    When NeoStats links, it will appear as stats.neostats.net.
-
-SERVER_PORT <port number> [REQUIRED]
-    Specifies the port to connect to on the IRC Server e.g.
-    
-        SERVER_PORT 6667        
-    
-    When connecting, NeoStats will connect to port 6667
-
-CONNECT_TO <ip address> [REQUIRED]
-    Specifies the IP address to connect to. e.g.
-        
-        CONNECT_TO 127.0.0.1    
-    
-    This will force stats to connect to 127.0.0.1
-
-CONNECT_PASS <link password> [REQUIRED]
-    Specifies the password used to connect. This must match your C/N 
-    lines in your IRCD configuration e.g.
-  
-      CONNECT_PASS linkpass    
-      
-    Send "linkpass" as the password to connect
-    
-SERVER_INFOLINE <info line> [REQUIRED]
-    Specify the description of the server that
-    appears when you do /links e.g.
-    
-        SERVER_INFOLINE Network Auxiliary Services    
-    
-SERVER_NUMERIC <numeric> [RECOMMENDED]
-    Specify the numeric of the server to send on connect.
-    This must be a value between 1 and 254, and must not be in use by
-    any other IRC server on the network.  
-    Currently only Unreal IRCd uses this option.
-    
-        SERVER_NUMERIC 1
-
-NeoStats Configuration options
-------------------------------
-    
-SERVICES_CHAN #<channel name> [REQUIRED]
-    Specify the channel that all bots on NeoStats
-    will automatically join, and echo out any
-    important information e.g.
-    
-        SERVICES_CHAN #services    
-        
-    Makes NeoStats, and all the other bots join #services channel on 
-    start-up/load.
-
-NO_LOAD [YOU MUST REMOVE THIS]
-    If this is in the neostats.conf your NeoStats WILL NOT START UP. To 
-    disable this simply comment this line out. e.g.
-        
-        NO_LOAD  <- NeoStats will not load.
-        
-        #NO_LOAD <- NeoStats will load.
-    
-WANT_PRIVMSG [NOT RECOMMENDED]
-    Specify if the bots should send all messages as privmsgs or as 
-    notices (Most Services use notice) e.g.
-     
-        WANT_PRIVMSG    
-    
-    If present, will send all messages as privmsgs (if commented out, 
-    it will send as Notices) *NOTE:* This option Violates IRC RFC, and 
-    can cause flooding problems on your network. Its NOT recommended. 
-    
-RECONNECT_TIME <seconds> [RECOMMENDED]
-    If NeoStats server gets split from the network, how long to wait 
-    before attempting to reconnect to the network. A value of 0 will 
-    cause NeoStats to shutdown and not attempt to reconnect. e.g.
-    
-        RECONNECT_TIME 10    
-    
-    Specifies wait 10 seconds before trying to reconnect
-        
-        RECONNECT_TIME 0
-    
-    Tells NeoStats to never reconnect to the network
-    
-    If not specified, NeoStats will default to 10 seconds.
-    
-ONLY_OPERS [OPTIONAL]
-    Restrict NeoStats and StatServ to opers use only.
-    If not specified, users will have some access to NeoStats
-    and StatServ commands. e.g.
-    
-        ONLY_OPERS 
-        
-    Only opers may use NeoStats and StatServ.
-    
-BIND_TO [OPTIONAL]
-    Make NeoStats bind to a particular IP Address. If not
-    specified NeoStats will attempt to find this address
-    itself. e.g. 
-    
-        BIND_TO 203.203.123.12
-    
-    All outgoing connections from NeoStats will originate from this 
-    IP address. 
-    
-LOG_FILENAME_FORMAT <format> [OPTIONAL]
-    Defines the format for dated log files. This allows you to choose 
-    what date format is used for log file names when they are rotated at 
-    midnight. The option uses the parameters passed to strftime so you 
-    can use any options valid for that function. Common ones are:
-        %a  Abbreviated weekday name 
-        %A  Full weekday name 
-        %b  Abbreviated month name 
-        %B  Full month name 
-        %d  Day of month as decimal number (01 – 31) 
-        %m  Month as decimal number (01 – 12) 
-        %y  Year without century, as decimal number (00 – 99) 
-        %Y  Year with century, as decimal number 
-
-    Examples using 30 September 2003 as the date:
-    For NeoStats0930.log:
-        
-        LOG_FILENAME_FORMAT %m%d
-    
-    For NeoStats20030930.log:
-    
-        LOG_FILENAME_FORMAT %Y%m%d      
-    
-    If not defined, default is "-%m-%d" i.e. NeoStats-09-30.log
-
-SET_SERVER_TIMES <INTERVAL> [OPTIONAL]
-    Cause NeoStats to sync server times at the given interval
-    INTERVAL is an integer representing the number of hours
-        
-    Examples
-        
-        SET_SERVER_TIMES 24
-    
-    Cause NeoStats to sync server times every 24 hours
-    If not present, NeoStats will not sync times.
-    This option only works on Unreal servers and defaults to 
-    a sync interval of 24 hours. Enabling this option will also
-    cause NeoStats to sync servers when it first joins the 
-    network.
-
-Module Configuration Options
-----------------------------
-    
-LOAD_MODULE <module name> [OPTIONAL]
-    what module to load at start-up. e.g. 
-        
-        LOAD_MODULE statserv
-    
-    Will load up StatServ at boot
-    
-    Multiple instances of LOAD_MODULE may be specified 
-
-
-NeoStats Root user
-------------------
-    
-SERVICE_ROOT <nick!user@host> [REQUIRED]
-    Set who should get master access to manage NeoStats regardless of 
-    authentication systems. Only one entry allowed. e.g.
-    
-        SERVICE_ROOT fish!?Fish@*.neostats.net
-        
-    Will give "fish" complete access to NeoStats if fish has 
-    umode +r and comes from the specified hostname and ident. 
+When you are finished, save the file. If using pico as in the previous 
+example, press Ctrl-X then hit Y and enter to save the file and exit.
 
 1.7 Compiling additional modules
 --------------------------------
@@ -441,7 +234,8 @@ separate modules to work with the new version of NeoStats. See the
 documentation with these modules for instructions on building and 
 installing them. Modules written for previous series of NeoStats will
 not work with the 3.0 series. You must contact the module author for an
-updated version of the module.
+updated version of the module. All official modules have a 3.0 compatible 
+version available
 
 1.8 Running NeoStats
 --------------------
@@ -461,7 +255,7 @@ change to the directory where NeoStats in installed e.g.
 
 Then to run NeoStats type:
 
-        ./neostats
+        ./bin/neostats
 
 It should link and sync with your server in a matter of seconds.
 
@@ -478,7 +272,6 @@ useful:
 
     -h        will display a help screen showing these options.
     -v        will display the version number
-    -r        Enable recv.log
     -d 1-10   Enable debugging output 1= lowest, 10 = highest
     -n        Do not load any modules on startup
     -q        Quiet start - for cron scripts
@@ -641,13 +434,11 @@ We may request that you enable debugging and submit us the results of
 debugging. To enable Debugging, use the following command to start 
 NeoStats:
 
-        ./neostats -d 9 -r
+        ./neostats -d10
 
 When it crashes, or the bug has been reproduced, send us:
         
         logs/debug.log
-        logs/recv.log (if it exists, You may wish to edit the first few 
-        lines of the file to remove the link password)
 
 This will help us to be able to reproduce the bug and create a fix for 
 it.
@@ -675,6 +466,5 @@ on how to contact us.
 -----------------------------------<>-----------------------------------
 
 ************************************************************************
-** This document was last updated on October 6th, 2003 by M and is    **
-** on documents originally created by Shmad and Fish.                 **
+** This document was last updated on October 3th, 2004 by M           **
 ************************************************************************
