@@ -794,3 +794,53 @@ int IsServiceRoot(User* u)
 	}
 	return (0);
 }
+
+void
+AddFakeUser(const char *mask)
+{
+	char maskcopy[MAXHOST];
+	char *nick;
+	char *user;
+	char *host;
+	User *u;
+
+	SET_SEGV_LOCATION();
+	strcpy(maskcopy, mask);
+	nick = strtok(maskcopy, "!");
+	user = strtok(NULL, "@");
+	host = strtok(NULL, "");
+	u = finduser (nick);
+	if (u) {
+		nlog (LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick);
+		return;
+	}
+	u = new_user (nick);
+	if (!u) {
+		return;
+	}
+	u->TS = me.now;
+	strlcpy (u->hostname, host, MAXHOST);
+	strlcpy (u->vhost, host, MAXHOST);
+	strlcpy (u->username, user, MAXUSER);
+	strlcpy (u->realname, "fake user", MAXREALNAME);
+	u->tslastmsg = me.now;
+	u->chans = list_create (MAXJOINCHANS);
+}
+
+void
+DelFakeUser(const char *mask)
+{
+	char maskcopy[MAXHOST];
+	char *nick;
+	char *user;
+	char *host;
+	User *u;
+
+	SET_SEGV_LOCATION();
+	strcpy(maskcopy, mask);
+	nick = strtok(maskcopy, "!");
+	user = strtok(NULL, "@");
+	host = strtok(NULL, "");
+	u = finduser (nick);
+	deluser(u);
+}

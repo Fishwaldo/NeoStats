@@ -528,6 +528,15 @@ Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd
 	Module* modptr;
 
 	SET_SEGV_LOCATION();
+	/* When we are using single bot mode, for example in client mode where we
+	 * can only use one bot, if we have initialised the main bot just add all 
+	 * commands and settings to it 
+	 */
+	if(config.singlebotmode && ns_botptr) {
+		add_bot_cmd_list (ns_botptr, bot_cmd_list);
+		add_bot_settings (ns_botptr, bot_setting_list);
+		return(ns_botptr);
+	}
 	modptr = GET_CUR_MODULE();
 	nick = botinfo->nick;
 	u = finduser (nick);

@@ -145,29 +145,31 @@
  * should be defined locally beginning at 0x02000000
  */
 
-#if UNREAL31 == 1
+#ifdef CLIENT
+#include "protocol/client.h"
+#elif defined UNREAL31
 #include "protocol/unreal31.h"
-#elif UNREAL32 == 1
+#elif defined UNREAL32
 #include "protocol/unreal32.h"
-#elif ULTIMATE2 == 1
+#elif defined ULTIMATE2
 #include "protocol/ultimate2.h"
-#elif ULTIMATE3 == 1
+#elif defined ULTIMATE3
 #include "protocol/ultimate3.h"
-#elif HYBRID7 == 1	
+#elif defined HYBRID7	
 #include "protocol/hybrid7.h"
-#elif NEOIRCD == 1
+#elif defined NEOIRCD
 #include "protocol/neoircd.h"
-#elif MYSTIC == 1
+#elif defined MYSTIC
 #include "protocol/mystic.h" 
-#elif IRCUP10 == 1
+#elif defined IRCUP10
 #include "protocol/ircup10.h"
-#elif BAHAMUT == 1
+#elif defined BAHAMUT
 #include "protocol/bahamut.h"
-#elif QUANTUM == 1
+#elif defined QUANTUM
 #include "protocol/quantum.h"
-#elif LIQUID == 1
+#elif defined LIQUID
 #include "protocol/liquid.h"
-#elif VIAGRA == 1 
+#elif defined VIAGRA 
 #include "protocol/viagra.h"
 #else
 #error Error, you must select an IRCD to use. See ./configure --help for more information

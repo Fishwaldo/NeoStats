@@ -479,6 +479,7 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
  *
  * @return none
  */
+
 void
 m_private (char* origin, char **av, int ac, int cmdptr)
 {

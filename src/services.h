@@ -61,6 +61,7 @@ struct config {
 	int pingtime;
 	neoroot rootuser;
 	char debugmodule[MAX_MOD_NAME];
+	unsigned int singlebotmode;
 } config;
 
 extern ModuleInfo ns_module_info;

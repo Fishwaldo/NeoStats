@@ -119,7 +119,7 @@ static bot_setting ns_settings[]=
 	{NULL,				NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
 
-Bot* ns_botptr;
+Bot* ns_botptr = NULL;
 BotInfo ns_botinfo = {
 	"NeoStats",
 	"NeoStats-",

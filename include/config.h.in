@@ -572,6 +572,9 @@
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 #undef TM_IN_SYS_TIME
 
+/* 'Enable client only Support' */
+#undef CLIENT
+
 /* 'Enable Ultimate 2.x.x Support' */
 #undef ULTIMATE2
 

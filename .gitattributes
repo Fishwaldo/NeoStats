@@ -334,6 +334,8 @@ src/protocol/Makefile.am -text
 src/protocol/Makefile.in -text
 src/protocol/bahamut.c eol=lf
 src/protocol/bahamut.h eol=lf
+src/protocol/client.c -text
+src/protocol/client.h -text
 src/protocol/hybrid7.c eol=lf
 src/protocol/hybrid7.h eol=lf
 src/protocol/ircup10.c eol=lf
