@@ -196,38 +196,31 @@ int FiniModules (void)
  * @return none
  */
 void
-SendModuleEvent (Event event, CmdParams* cmdparams, Bot* bot)
+SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 {
-	Module *module_ptr;
 	ModuleEvent *ev_list;
-	hscan_t ms;
-	hnode_t *mn;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin (&ms, modulehash);
-	while ((mn = hash_scan_next (&ms)) != NULL) {
-		module_ptr = hnode_get (mn);
-		ev_list = module_ptr->event_list;
-		if (ev_list) {
-			while (ev_list->event != EVENT_NULL) {
-				/* This goes through each Command */
-				if (ev_list->event == event) {
-					nlog (LOG_DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
-					SET_SEGV_LOCATION();
-					if (setjmp (sigvbuf) == 0) {
-						SET_RUN_LEVEL(module_ptr);
-						ev_list->function (cmdparams);
-						RESET_RUN_LEVEL();
-					} else {
-						nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->name);
-					}
-					SET_SEGV_LOCATION();
-#ifndef VALGRIND
-					break;
-#endif
+	ev_list = module_ptr->event_list;
+	if (ev_list) {
+		while (ev_list->event != EVENT_NULL) {
+			/* This goes through each Command */
+			if (ev_list->event == event) {
+				nlog (LOG_DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
+				SET_SEGV_LOCATION();
+				if (setjmp (sigvbuf) == 0) {
+					SET_RUN_LEVEL(module_ptr);
+					ev_list->function (cmdparams);
+					RESET_RUN_LEVEL();
+				} else {
+					nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->name);
 				}
-				ev_list++;
+				SET_SEGV_LOCATION();
+#ifndef VALGRIND
+				break;
+#endif
 			}
+			ev_list++;
 		}
 	}
 }
@@ -306,7 +299,7 @@ ModulesVersion (const char* nick, const char *remoteserver)
  * @return
  */
 Module *
-load_module (char *modfilename, User * u)
+load_module (const char *modfilename, User * u)
 {
 #ifndef HAVE_LIBDL
 	const char *dl_error;
@@ -317,9 +310,7 @@ load_module (char *modfilename, User * u)
 	int do_msg = 0;
 	char path[255];
 	char loadmodname[255];
-	char **av;
-	int ac = 0;
-	int i = 0;
+	int moduleindex = 0;
 	ModuleInfo *info_ptr = NULL;
 	ModuleEvent *event_ptr = NULL;
 	Module *mod_ptr = NULL;
@@ -382,6 +373,17 @@ load_module (char *modfilename, User * u)
 	}
 	/* Extract pointer to event list */
 	event_ptr = ns_dlsym (dl_handle, "module_events");
+	/* Lookup ModInit (replacement for library __init() call */
+	ModInit = ns_dlsym ((int *) dl_handle, "ModInit");
+	if (!ModInit) {
+		if (do_msg) {
+			chanalert (ns_botptr->nick, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
+			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
+		}
+		nlog (LOG_WARNING, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
+		ns_dlclose (dl_handle);
+		return NULL;
+	}
 	/* Allocate module */
 	mod_ptr = (Module *) smalloc (sizeof (Module));
 	mn = hnode_create (mod_ptr);
@@ -394,51 +396,25 @@ load_module (char *modfilename, User * u)
 	/* Module side user authentication for SecureServ helpers */
 	mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "ModAuth");
 	/* assign a module number to this module */
-	i = 0;
-	while (ModList[i] != NULL)
-		i++;
-	ModList[i] = mod_ptr;
-	mod_ptr->modnum = i;
-	nlog (LOG_DEBUG1, "Assigned %d to module %s for modulenum", i, mod_ptr->info->name);
+	while (ModList[moduleindex] != NULL)
+		moduleindex++;
+	ModList[moduleindex] = mod_ptr;
+	mod_ptr->modnum = moduleindex;
+	nlog (LOG_DEBUG1, "Assigned %d to module %s for modulenum", moduleindex, mod_ptr->info->name);
 
-	/* call ModInit (replacement for library __init() call */
-	ModInit = ns_dlsym ((int *) dl_handle, "ModInit");
-	if (!ModInit) {
-		if (do_msg) {
-			chanalert (ns_botptr->nick, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
-			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
-		}
-		nlog (LOG_WARNING, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
-		ns_dlclose (dl_handle);
-		sfree (mod_ptr);
+	SET_SEGV_LOCATION();
+	SET_RUN_LEVEL(mod_ptr);
+	if (((*ModInit) (mod_ptr)) < 1) {
+		nlog (LOG_NORMAL, "Unable to load module: %s. See %s.log for further information.", mod_ptr->info->name, mod_ptr->info->name);
+		unload_module(mod_ptr->info->name, NULL);
 		return NULL;
-	} else {
-		SET_SEGV_LOCATION();
-		SET_RUN_LEVEL(mod_ptr);
-		if (((*ModInit) (mod_ptr)) < 1) {
-			nlog (LOG_NORMAL, "Unable to load module: %s. See %s.log for further information.", mod_ptr->info->name, mod_ptr->info->name);
-			unload_module(mod_ptr->info->name, NULL);
-			return NULL;
-		}
-		RESET_RUN_LEVEL();
-		SET_SEGV_LOCATION();
 	}
+	RESET_RUN_LEVEL();
+	SET_SEGV_LOCATION();
 
 	/* Let this module know we are online if we are! */
 	if (me.onchan == 1) {
-		while (event_ptr->event != EVENT_NULL) {
-			if (event_ptr->event == EVENT_ONLINE) {
-				AddStringToList (&av, me.s->name, &ac);
-				SET_SEGV_LOCATION();
-				SET_RUN_LEVEL(mod_ptr);
-				event_ptr->function (NULL);
-				RESET_RUN_LEVEL();
-				SET_SEGV_LOCATION();
-				sfree (av);
-				break;
-			}
-			event_ptr++;
-		}
+		SendModuleEvent (EVENT_ONLINE, NULL, mod_ptr);
 	}
 	if (do_msg) {
 		prefmsg (u->nick, ns_botptr->nick, "Module %s loaded, %s", info_ptr->name, info_ptr->description);
@@ -483,7 +459,7 @@ unload_module (const char *modname, User * u)
 {
 	Module *mod_ptr;
 	hnode_t *modnode;
-	int i;
+	int moduleindex;
 	void (*ModFini) ();
 
 	SET_SEGV_LOCATION();
@@ -497,7 +473,7 @@ unload_module (const char *modname, User * u)
 		return NS_FAILURE;
 	}
 	mod_ptr = hnode_get (modnode);
-	i = mod_ptr->modnum;
+	moduleindex = mod_ptr->modnum;
 	chanalert (ns_botptr->nick, "Unloading module %s", modname);
 	/* canx any DNS queries used by this module */
 	canx_dns (mod_ptr);
@@ -530,9 +506,9 @@ unload_module (const char *modname, User * u)
 #endif
 	RESET_RUN_LEVEL();
 	/* free the module number */
-	if (i >= 0) {
-		nlog (LOG_DEBUG1, "Free %d from Module Numbers", i);
-		ModList[i] = NULL;
+	if (moduleindex >= 0) {
+		nlog (LOG_DEBUG1, "Free %d from Module Numbers", moduleindex);
+		ModList[moduleindex] = NULL;
 	}
 	sfree (mod_ptr);
 	return NS_SUCCESS;

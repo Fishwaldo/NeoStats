@@ -857,8 +857,9 @@ Optional Features:
  --enable-ircu - enable IRCu IRCD Support
  --enable-liquid - enable Liquid IRCD Support
  --enable-viagra - enable Viagra IRCD Support
+ --enable-ircdauth - IRCd user mode authentication
+ --enable-extauth - whether to enable nick!user@host authentication
  --enable-debug - Enable Debuging
- --enable-auth=TYPE - what type of Authentication to use. See Readme File
  --enable-raw - Enable Raw command
  --enable-sqlsrv - Enable Sql Server Emulation
  --enable-modules="MODULES" - space seperated list of modules to compile
@@ -1337,8 +1338,10 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-do_serviceroots=no
+do_extauth=no
+do_ircdauth=no
 PROTOCOL=no
+AUTH=no
 
 echo "$as_me:$LINENO: checking Whether to Enable Unreal 3.1.x IRCD Support..." >&5
 echo $ECHO_N "checking Whether to Enable Unreal 3.1.x IRCD Support...... $ECHO_C" >&6
@@ -1489,14 +1492,7 @@ _ACEOF
 	PROTOCOL="hybrid7"
 	echo "$as_me:$LINENO: checking Auto-Enabling ServiceRoots Authentication Module" >&5
 echo $ECHO_N "checking Auto-Enabling ServiceRoots Authentication Module... $ECHO_C" >&6
-	do_serviceroots=yes
-
-cat >>confdefs.h <<\_ACEOF
-#define EXTAUTH 1
-_ACEOF
-
-	EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
-	EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
+	do_extauth=yes
 	MODULES="$MODULES extauth"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
@@ -1732,6 +1728,67 @@ if test "$PROTOCOL" = no; then
 echo "${ECHO_T}no" >&6
 	{ { echo "$as_me:$LINENO: error: 'You must define a IRCD to use. See ./configure --help for more information'" >&5
 echo "$as_me: error: 'You must define a IRCD to use. See ./configure --help for more information'" >&2;}
+   { (exit 1); exit 1; }; }
+else
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+fi
+
+echo "$as_me:$LINENO: checking Whether to enable IRCd user mode authentication..." >&5
+echo $ECHO_N "checking Whether to enable IRCd user mode authentication...... $ECHO_C" >&6
+# Check whether --enable-ircdauth or --disable-ircdauth was given.
+if test "${enable_ircdauth+set}" = set; then
+  enableval="$enable_ircdauth"
+   case "$enableval" in
+yes)
+	MODULES="$MODULES ircdauth"
+	AUTH=yes
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+*)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
+
+if test "$do_extauth" = no; then
+	echo "$as_me:$LINENO: checking Whether to enable nick!user@host authentication..." >&5
+echo $ECHO_N "checking Whether to enable nick!user@host authentication...... $ECHO_C" >&6
+	# Check whether --enable-extauth or --disable-extauth was given.
+if test "${enable_extauth+set}" = set; then
+  enableval="$enable_extauth"
+   case "$enableval" in
+	yes)
+		MODULES="$MODULES extauth"
+		AUTH=yes
+		echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+		;;
+	*)
+		echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+		;;
+	esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
+fi
+
+echo "$as_me:$LINENO: checking An authentication module is specified" >&5
+echo $ECHO_N "checking An authentication module is specified... $ECHO_C" >&6
+if test "$AUTH" = no; then
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	{ { echo "$as_me:$LINENO: error: 'You must define an authentication module to use. See ./configure --help for more information'" >&5
+echo "$as_me: error: 'You must define an authentication module to use. See ./configure --help for more information'" >&2;}
    { (exit 1); exit 1; }; }
 else
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -7027,38 +7084,6 @@ if diff $cache_file confcache >/dev/null 2>&1; then :; else
   fi
 fi
 rm -f confcache
-
-if test "$do_serviceroots" = no; then
-		echo "$as_me:$LINENO: checking What type of Authentication to use..." >&5
-echo $ECHO_N "checking What type of Authentication to use...... $ECHO_C" >&6
-	# Check whether --enable-auth or --disable-auth was given.
-if test "${enable_auth+set}" = set; then
-  enableval="$enable_auth"
-   case "$enableval" in
-	  sr)
-
-cat >>confdefs.h <<\_ACEOF
-#define EXTAUTH 1
-_ACEOF
-
-		EXTAUTH_SRC="$EXTAUTH_SRC serviceroots.c"
-		EXTAUTH_OBJS="$EXTAUTH_OBJS serviceroots.o"
-		echo "$as_me:$LINENO: result: External" >&5
-echo "${ECHO_T}External" >&6
-		MODULES="$MODULES extauth"
-		;;
-	  *)
-		echo "$as_me:$LINENO: result: IRCD" >&5
-echo "${ECHO_T}IRCD" >&6
-		;;
-	esac
-else
-  echo "$as_me:$LINENO: result: IRCD" >&5
-echo "${ECHO_T}IRCD" >&6
-
-fi;
-fi
-
 
 echo "$as_me:$LINENO: checking To Enable Raw command?" >&5
 echo $ECHO_N "checking To Enable Raw command?... $ECHO_C" >&6

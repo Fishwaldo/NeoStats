@@ -1014,6 +1014,8 @@ void GetServerList(ServerListHandler handler);
 int ModInit(Module* mod_ptr);
 void ModFini(void);
 int ModAuth (User * u);
+int ModAuthUser(User * u, int curlvl);
+int ModAuthList(User * u);
 extern ModuleInfo module_info;   
 extern ModuleEvent module_events[];  
 

@@ -232,13 +232,13 @@ void bot_notice (char *origin, char **av, int ac)
 		/* Find target bot */
 		if (process_target_user(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
-			SendModuleEvent (EVENT_NOTICE, cmdparams, NULL);
+			SendModuleEvent (EVENT_NOTICE, cmdparams, cmdparams->dest.bot->moduleptr);
 		}
 	}
 	if (!strncasecmp(av[ac - 1], "\1version", 8)) {
 		/* skip "\1version " */
 		cmdparams->param += 9;
- 		SendModuleEvent (EVENT_CTCPVERSION, cmdparams, NULL);
+ 		SendModuleEvent (EVENT_CTCPVERSION, cmdparams, cmdparams->dest.bot->moduleptr);
 	}
 	sfree (cmdparams);
 
@@ -261,7 +261,7 @@ void bot_chan_notice (char *origin, char **av, int ac)
 	if(process_origin(cmdparams, origin)) {
 		if(process_target_chan(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
-			SendModuleEvent (EVENT_CNOTICE, cmdparams, NULL);
+			SendModuleEvent (EVENT_CNOTICE, cmdparams, cmdparams->dest.bot->moduleptr);
 			if (av[ac - 1][0] == '\1') {
 				/* TODO CTCP handler */
 			}
@@ -294,7 +294,7 @@ void bot_private (char *origin, char **av, int ac)
 					return;
 				}
 			}
-			SendModuleEvent (EVENT_PRIVATE, cmdparams, NULL);
+			SendModuleEvent (EVENT_PRIVATE, cmdparams, cmdparams->dest.bot->moduleptr);
 			if (av[ac - 1][0] == '\1') {
 				/* TODO CTCP handler */
 			}
@@ -320,7 +320,7 @@ void bot_chan_private (char *origin, char **av, int ac)
 	if(process_origin(cmdparams, origin)) {
 		if(process_target_chan(cmdparams, av[0])) {
 			cmdparams->param = av[ac - 1];
-			SendModuleEvent (EVENT_CPRIVATE, cmdparams, NULL);
+			SendModuleEvent (EVENT_CPRIVATE, cmdparams, cmdparams->dest.bot->moduleptr);
 			if (av[ac - 1][0] == '\1') {
 				/* TODO CTCP handler */
 			}

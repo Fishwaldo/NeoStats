@@ -240,6 +240,8 @@ src/modules/hostserv/README -text
 src/modules/hostserv/hostserv.c -text
 src/modules/hostserv/hostserv.h -text
 src/modules/hostserv/hs_help.c -text
+src/modules/ircdauth/Makefile -text
+src/modules/ircdauth/ircdauth.c -text
 src/modules/loveserv/.indent.pro -text
 src/modules/loveserv/Makefile -text
 src/modules/loveserv/TODO -text
@@ -282,6 +284,8 @@ src/modules/statserv/statserv.h -text
 src/modules/statserv/tld.c -text
 src/modules/template/Makefile -text
 src/modules/template/template.c -text
+src/modules/templateauth/Makefile -text
+src/modules/templateauth/templateauth.c -text
 src/neostats.h -text
 src/ns_help.c eol=lf
 src/ns_help.h eol=lf

@@ -28,8 +28,8 @@ BUILDFILES = *.in modules/Makefile modules/Makefile.inc.in
 DISTFILES = $(INCLUDES) $(COREINCS) $(SRCS) $(BUILDFILES) 
  
 DISTLIBS = neoprotocol libs sqlsrv
-DISTMOD = connectserv extauth hostserv loveserv moraleserv statserv \
-		  template
+DISTMOD = connectserv hostserv loveserv moraleserv statserv template \
+		  templateauth extauth ircdauth
 
 all: buildversion @buildsqlsrv@ libs neoprotocol neostats neomodules utils 
 

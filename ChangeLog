@@ -4,14 +4,22 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - New module auth system to support auth systems other than the 2.5 extauth.
+   The core is now unable to provide any authentication and an auth module must 
+   be loaded. The old IRCd umode based auth is now a loadable module so is 
+   optional. Where a module wants to have local control over authentication,
+   the 2.5.15+ ModAuth function has been renamed to ModLocalAuth to distinguish
+   it from auth only modules. New config load module options have been added
+   to support auth modules which require a slightly different style to standard
+   modules. templateauth provides the example code for auth modules. (M)
  - configure now checks IRCD first so that if this required option is missed 
-   the user will be told immediately rather than after all other checks.
+   the user will be told immediately rather than after all other checks. (M)
  - Build process updates so that at configure time we only do what we need to 
-   and reduce the number of config.h files we need to maintain.
- - New memory allocation wrappers functions scalloc, srealloc and sfree.
- - Add SET VERSIONSCAN option to core for CTCP version scanning.
+   and reduce the number of config.h files we need to maintain. (M)
+ - New memory allocation wrappers functions scalloc, srealloc and sfree. (M)
+ - Add SET VERSIONSCAN option to core for CTCP version scanning. (M)
  - StatServ: Optimise database save to further reduce code required and get 
-   back a little CPU.
+   back a little CPU. (M)
  - StatServ: Adjust exclusions so that counts are accurate. The exclusions 
    produced cases where the current channel count was greater than the network 
    record! (M)

@@ -10,9 +10,6 @@
 /* Whether symbols need underscore prefix */
 #undef NEED_UNDERSCORE_PREFIX
 
-/* Use External Authentication */
-#undef EXTAUTH
-
 /* Define to 1 if you have the <db.h> header file. */
 #undef HAVE_DB_H
 

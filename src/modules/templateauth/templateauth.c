@@ -1,6 +1,8 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
+**
+**  Portions Copyright (c) 2000-2001 ^Enigma^
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -18,22 +20,41 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id$
+** $Id: serviceroots.c 1721 2004-04-09 22:17:19Z Mark $
 */
 
-#ifndef _MODULES_H_
-#define _MODULES_H_
+#include <stdio.h>
+#include "neostats.h"
 
-extern jmp_buf sigvbuf;
+ModuleInfo module_info = {
+	"TemplateAuth",
+	"Template Authentication Module",
+	ns_copyright,
+	NULL,
+	NEOSTATS_VERSION,
+	CORE_MODULE_VERSION,
+	__DATE__,
+	__TIME__,
+	0,
+	0,
+};
 
-int InitModules (void);
-int FiniModules (void);
-Module *load_module (const char *path, User * u);
-int unload_module (const char *module_name, User * u);
-void unload_modules(void);
-int list_modules (CmdParams* cmdparams);
-void ModulesVersion (const char* nick, const char *remoteserver);
-void SendAllModuleEvent (Event event, CmdParams* cmdparams);
-void SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr);
+int ModInit(Module* modptr)
+{
+	return 1;
+}
 
-#endif /* _MODULES_H_ */
+void ModFini()
+{
+}
+
+int ModAuthUser(User * u, int curlvl)
+{
+	return curlvl;
+}
+
+int ModAuthList(User * u)
+{
+	return 1;
+}
+

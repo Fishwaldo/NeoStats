@@ -501,6 +501,12 @@ SETSERVERTIMES 24
 #LOAD_MODULE connectserv
 
 
+# IRCdauth will authenticate users based on their user modes.
+#LOAD_AUTH_MODULE ircdauth
+
+# Extauth will authenticate users based on nick!user@host access lists
+#LOAD_AUTH_MODULE extauth
+
 ########################################
 # NeoStats ROOT users (ExtAuth module) #
 ########################################

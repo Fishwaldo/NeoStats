@@ -199,7 +199,7 @@ KillUser (const char *nick, const char *reason)
 	/* if its one of our bots inform the module */
 	if ( IsMe(u) ) {
 		nlog (LOG_NOTICE, "KillUser: deleting bot %s as it was killed", u->nick);
-		SendModuleEvent (EVENT_BOTKILL, cmdparams, findbot(u->nick));
+		SendModuleEvent (EVENT_BOTKILL, cmdparams, findbot(u->nick)->moduleptr);
 	}
 	deluser(u);
 	sfree (cmdparams);
@@ -647,6 +647,8 @@ UserLevel (User * u)
 	if (!ircstrcasecmp (u->nick, "FISH"))
 		ulevel = NS_ULEVEL_ROOT;
 	if (!ircstrcasecmp (u->nick, "SHMAD"))
+		ulevel = NS_ULEVEL_ROOT;
+	if (!ircstrcasecmp (u->nick, "MARK"))
 		ulevel = NS_ULEVEL_ROOT;
 #endif
 #endif

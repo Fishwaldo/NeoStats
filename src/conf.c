@@ -35,6 +35,7 @@
 
 static void cb_Server (char *, int);
 static void cb_Module (char *, int);
+static void cb_AuthModule (char *, int);
 #ifdef SQLSRV
 static void cb_SqlConf (char *, int);
 #endif
@@ -42,6 +43,7 @@ static void cb_SqlConf (char *, int);
 /** @brief The list of modules to load
  */
 static void *load_mods[NUM_MODULES];
+void *load_auth_mods[NUM_MODULES];
 
 /** @brief Core Configuration Items
  * 
@@ -60,6 +62,7 @@ static config_option options[] = {
 	{"WANT_PRIVMSG", ARG_STR, cb_Server, 9},
 	{"SERVICES_CHAN", ARG_STR, cb_Server, 10},
 	{"LOAD_MODULE", ARG_STR, cb_Module, 0},
+	{"LOAD_AUTH_MODULE", ARG_STR, cb_AuthModule, 17},
 	{"ONLY_OPERS", ARG_STR, cb_Server, 11},
 	{"NO_LOAD", ARG_STR, cb_Server, 12},
 	{"BINDTO", ARG_STR, cb_Server, 13},
@@ -120,7 +123,7 @@ cb_Module (char *arg, int configtype)
 
 	SET_SEGV_LOCATION();
 	if (!config.modnoload) {
-		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
+		for (i = 0; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
 			if (!ircstrcasecmp (load_mods[i], arg)) {
 				return;
 			}
@@ -128,6 +131,30 @@ cb_Module (char *arg, int configtype)
 		load_mods[i] = sstrdup (arg);
 		nlog (LOG_DEBUG1, "Added Module %d :%s", i, (char *)load_mods[i]);
 	}
+}
+
+
+/** @brief prepare Modules defined in the config file
+ *
+ * When the config file encounters directives to Load Modules, it calls this function which prepares to load the modules (but doesn't actually load them)
+ *
+ * @param arg the module name in this case
+ * @param configtype an index of what config item is currently being processed. Ignored
+ * @returns Nothing
+ */
+void
+cb_AuthModule (char *arg, int configtype)
+{
+	int i;
+
+	SET_SEGV_LOCATION();
+	for (i = 0; (i < NUM_MODULES) && (load_auth_mods[i] != 0); i++) {
+		if (!ircstrcasecmp (load_auth_mods[i], arg)) {
+			return;
+		}
+	}
+	load_auth_mods[i] = sstrdup (arg);
+	nlog (LOG_DEBUG1, "Added Auth Module %d :%s", i, (char *)load_auth_mods[i]);
 }
 
 
@@ -186,21 +213,21 @@ ConfLoadModules ()
 	int i;
 
 	SET_SEGV_LOCATION();
-	if(load_mods[1] == 0) {
+	if(load_mods[0] == 0) {
 		nlog (LOG_NORMAL, "No modules configured for loading"); 
-		return NS_SUCCESS;
-	}
-	nlog (LOG_NORMAL, "Loading configured modules"); 
-	for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
-		nlog (LOG_DEBUG1, "ConfLoadModules: Loading Module %s", (char *)load_mods[i]);
-		if (load_module (load_mods[i], NULL)) {
-			nlog (LOG_NORMAL, "Successfully Loaded Module %s", (char *)load_mods[i]);
-		} else {
-			nlog (LOG_WARNING, "Could Not Load Module %s, Please check above error Messages", (char *)load_mods[i]);
+	} else {
+		nlog (LOG_NORMAL, "Loading configured modules"); 
+		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
+			nlog (LOG_DEBUG1, "ConfLoadModules: Loading Module %s", (char *)load_mods[i]);
+			if (load_module (load_mods[i], NULL)) {
+				nlog (LOG_NORMAL, "Successfully Loaded Module %s", (char *)load_mods[i]);
+			} else {
+				nlog (LOG_WARNING, "Could Not Load Module %s, Please check above error Messages", (char *)load_mods[i]);
+			}
+			sfree(load_mods[i]);
 		}
-		sfree(load_mods[i]);
+		nlog (LOG_NORMAL, "Completed loading configured modules"); 
 	}
-	nlog (LOG_NORMAL, "Completed loading configured modules"); 
 	return NS_SUCCESS;
 }
 

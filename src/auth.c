@@ -21,24 +21,31 @@
 ** $Id$
 */
 
+#define IRCDAUTH	/* Temp */
+
 #include "neostats.h"
 #include "modules.h"
 #include "dl.h"
 #include "ircd.h"
 
-Module* extauth_modptr;
+typedef int (*getauthfunc) (User *, int curlvl);
+typedef int (*listauthfunc) (User * u);
+
+typedef struct AuthModule {
+	Module* module_ptr;
+	getauthfunc getauth;
+	listauthfunc listauth;
+}AuthModule;
+
+extern void *load_auth_mods[NUM_MODULES];
+
+static AuthModule AuthModList[NUM_MODULES];
+
+static int AuthModuleCount = 0;
 
 /* Do dl lookups in advance to speed up UserLevel processing 
  *
  */
-#ifdef EXTAUTH
-int (*getauth) (User *, int curlvl);
-int InitExtAuth(void)
-{
-	getauth = ns_dlsym (extauth_modptr->dl_handle , "__do_auth");
-	return NS_SUCCESS;
-}
-#endif
 
 int UmodeAuth(User * u)
 {
@@ -82,41 +89,58 @@ int UmodeAuth(User * u)
 int UserAuth(User * u)
 {
 	int tmplvl = 0;
-#ifdef EXTAUTH
-	int i = 0;
-#endif
-
-	tmplvl = UmodeAuth(u);
-#ifdef EXTAUTH
-	if (getauth)
-		i = (*getauth) (u, tmplvl);
-	/* if tmplvl is greater than 1000, then extauth is authoritive */
-	if (i > tmplvl)
-		tmplvl = i;
-#endif
+	int authlvl = 0;
+	int i;
+	
+	/* tmplvl = UmodeAuth(u); */
+	for(i = 0; i < AuthModuleCount; i ++)
+	{
+		if (AuthModList[AuthModuleCount].getauth) {
+			authlvl = AuthModList[AuthModuleCount].getauth (u, tmplvl);
+			/* if authlvl is greater than tmplvl, then auth is authoritive */
+			if (authlvl > tmplvl) {
+				tmplvl = authlvl;
+			}
+		}
+	}
 	return tmplvl;
+}
+
+static void load_auth_module(const char* name)
+{
+	AuthModule* newauth;
+	
+	newauth = &AuthModList[AuthModuleCount];
+	newauth->module_ptr = load_module (name, NULL);
+	if(newauth->module_ptr) {
+		newauth->getauth = 
+			ns_dlsym (newauth->module_ptr->dl_handle, "ModAuthUser");
+		newauth->listauth = 
+			ns_dlsym (newauth->module_ptr->dl_handle, "ModAuthList");
+		AuthModuleCount ++;
+	}
 }
 
 int InitAuth(void)
 {
-#ifdef EXTAUTH
-	/* load extauth if we need to */
-	extauth_modptr = load_module ("extauth", NULL);
-	InitExtAuth();
-#endif
+	int i;
+
+	memset(AuthModList, 0, sizeof(AuthModList));
+	for (i = 0; (i < NUM_MODULES) && (load_auth_mods[i] != 0); i++) {
+		load_auth_module((char*)load_auth_mods[i]);
+	}
 	return NS_SUCCESS;
 }
 
 int ListAuth(User *u)
 {
-#ifdef EXTAUTH
-	int (*listauth) (User * u);
-
-	listauth = ns_dlsym (extauth_modptr->dl_handle, "__list_auth");
-	if (listauth) {
-		(*listauth) (u);
-		return NS_SUCCESS;
+	int i;
+	
+	for(i = 0; i < AuthModuleCount; i ++)
+	{
+		if (AuthModList[AuthModuleCount].listauth) {
+			AuthModList[AuthModuleCount].listauth (u);
+		}
 	}
-#endif
-	return NS_FAILURE;
+	return NS_SUCCESS;
 }

@@ -147,7 +147,7 @@ void sr_cb_config(char *arg, int configtype)
 	}
 }
 
-int __do_auth(User * u, int curlvl)
+int ModAuthUser(User * u, int curlvl)
 {
 	lnode_t *un;
 	users *sru;
@@ -166,7 +166,7 @@ int __do_auth(User * u, int curlvl)
 	return curlvl;
 }
 
-int __list_auth(User * u)
+int ModAuthList(User * u)
 {
 	lnode_t *un;
 	users *sru;

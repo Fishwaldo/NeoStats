@@ -12,9 +12,11 @@ MLOVESERV=1
 MHOSTSERV=1
 MMORALESERV=1
 MCONNECTSERV=1
+MIRCDAUTH=1
 MEXTAUTH=0
 MEXTAUTHALLOWED=1
 MEXTAUTHSTRING=""
+MIRCDAUTHSTRING=""
 HAVEMOD=0
 HAVEMODS=0
 
@@ -269,6 +271,12 @@ while [ $validselection -eq 0 ] ; do
 done
 echo ""
 
+if [ "$MIRCDAUTH" = 1 ] ; then
+	YN_DEFAULT=yes
+else
+	YN_DEFAULT=no
+fi
+
 if [ "$MCONNECTSERV" = 1 ] ; then
 	YN_DEFAULT=yes
 else
@@ -301,6 +309,33 @@ done
 echo ""
 
 ###########################################################################
+validselection=0
+echo "Do you want to enable IRCD user mode authentication?"
+while [ $validselection -eq 0 ] ; do
+	echo_no_lf "[$YN_DEFAULT] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$YN_DEFAULT
+	fi
+	case $INPUT in
+		n*|N*)
+			MIRCDAUTH=0
+			validselection=1
+			;;
+		y*|Y*)
+			MIRCDAUTH=1
+			MIRCDAUTHSTRING="--enable-ircdauth"
+			HAVEMODS=1
+			validselection=1
+			;;
+		*)
+			echo 'Please enter "yes" or "no".'
+			;;
+	esac
+done
+echo ""
+
+###########################################################################
 # ExtAuth (do not ask for hybrid or any ircd which auto sets it)
 if [ "$MEXTAUTHALLOWED" = 1 ] ; then
 
@@ -311,8 +346,7 @@ else
 fi
 
 validselection=0
-echo "Do you want to enable ExtAuth?"
-echo "If you do not know what this is select no"
+echo "Do you want to enable nick!user@host mask authentication?"
 while [ $validselection -eq 0 ] ; do
 	echo_no_lf "[$YN_DEFAULT] "
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
@@ -326,7 +360,7 @@ while [ $validselection -eq 0 ] ; do
 			;;
 		y*|Y*)
 			MEXTAUTH=1
-			MEXTAUTHSTRING="--enable-auth=sr"
+			MEXTAUTHSTRING="--enable-extauth"
 			validselection=1
 			;;
 		*)
@@ -379,7 +413,7 @@ fi
 fi
 ###########################################################################
 #print ./configure line
-#echo ./configure $IRCD $MEXTAUTHSTRING --enable-modules="$MODULELIST"
-./configure $IRCD $MEXTAUTHSTRING --enable-modules="$MODULELIST"
+#echo ./configure $IRCD $MEXTAUTHSTRING $MIRCDAUTHSTRING --enable-modules="$MODULELIST"
+./configure $IRCD $MEXTAUTHSTRING $MIRCDAUTHSTRING --enable-modules="$MODULELIST"
 
 ###########################################################################

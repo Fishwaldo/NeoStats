@@ -536,7 +536,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 			if ( IsMe (u) ) {
 				/* its one of our bots */
 				del_chan_bot (u->nick, c->name);
-				SendModuleEvent (EVENT_KICKBOT, cmdparams, findbot(u->nick));
+				SendModuleEvent (EVENT_KICKBOT, cmdparams, findbot(u->nick)->moduleptr);
 			}
 			sfree (cmdparams);
 			c->users--;
@@ -603,7 +603,7 @@ part_chan (User * u, const char *chan, const char *reason)
 			if ( IsMe (u) ) {
 				/* its one of our bots */
 				del_chan_bot (u->nick, c->name);
-				SendModuleEvent (EVENT_PARTBOT, cmdparams, findbot(u->nick));
+				SendModuleEvent (EVENT_PARTBOT, cmdparams, findbot(u->nick)->moduleptr);
 			}
 			sfree (cmdparams);
 			c->users--;
