@@ -814,6 +814,7 @@ typedef void (*after_poll_func) ( void *data, struct pollfd *, unsigned int );
 #define SOCK_BUFFERED 3
 #define SOCK_LINEMODE 4
 #define SOCK_LISTEN 5
+#define SOCK_NOTIFY 6
 
 /* Event system flags */
 #define	EVENT_FLAG_DISABLED			0x00000001	/* Event is disabled */
@@ -935,6 +936,16 @@ typedef void (*linemodecb)(char *);
 typedef int (*sockcb)(int, void *data);
 typedef int (*sockfunccb)(void *, void *, size_t);
 
+#if 0
+
+struct sockinfo {
+        int fd;
+        struct event ev;
+        int what;
+        int rwhat;
+        int pollswitch;
+}
+#endif
 
 /** @brief Module socket list structure
  * 
@@ -991,6 +1002,11 @@ typedef struct Sock {
 			sockcb writefunc;
 		} standmode;
 	} sfunc;		
+#if 0
+	struct sockinfo *sockets[];
+	int pollswitch
+	int highfds;
+#endif
 } Sock;
 
 typedef enum TIMER_TYPE {
@@ -1083,7 +1099,7 @@ EXPORTFUNC int SetTimerInterval( const char *timer_name, int interval );
 /* Find timer from name */
 EXPORTFUNC Timer *FindTimer( const char *timer_name );
 
-EXPORTFUNC Sock *add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv);
+EXPORTFUNC Sock *add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv, int type);
 EXPORTFUNC int update_sock(Sock *sock, short what, short reset, struct timeval *tv);
 EXPORTFUNC int add_sockpoll( const char *sock_name, void *data, before_poll_func beforepoll, after_poll_func afterpoll );
 EXPORTFUNC int del_sock(Sock *sock);

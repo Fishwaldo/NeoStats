@@ -290,6 +290,11 @@ extern "C" {			/* I really dislike this - iwj. */
 		} rrs;
 	} adns_answer;
 
+
+/* this is called when there is a update for a socket */
+typedef void (*fd_update) (int fd, short what);
+void set_fdupdate(adns_state ads, fd_update func);
+
 /* Memory management:
  *  adns_state and adns_query are actually pointers to malloc'd state;
  *  On submission questions are copied, including the owner domain;
@@ -324,7 +329,7 @@ extern "C" {			/* I really dislike this - iwj. */
  */
 
 	int adns_init(adns_state * newstate_r, adns_initflags flags,
-		      FILE * diagfile /*0=>stderr */ );
+		      FILE * diagfile /*0=>stderr */, fd_update func );
 
 	int adns_init_strcfg(adns_state * newstate_r, adns_initflags flags,
 			     FILE * diagfile /*0=>discard */ ,

@@ -31,6 +31,13 @@
 #endif
 #include "dns.h"
 #include "services.h"
+#include "event.h"
+#ifdef HAVE_POLL_H
+#include <poll.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
 
 #define DNS_QUEUE_SIZE  300	/* number on concurrent DNS lookups */
 #define DNS_DATA_SIZE	255
@@ -47,6 +54,7 @@ typedef struct DnsLookup {
 } DnsLookup;
 
 adns_state ads;
+struct event *dnstimeout;
 
 struct DNSStats {
 	int totalq;
@@ -128,6 +136,56 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (void *data, adns_
 	return 1;
 }
 
+int
+adns_read(void *data, void *notused, size_t len) {
+    Sock *sock = (Sock *)data;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    if (len > 0) {
+        adns_processreadable(ads, sock->sock_no, &tv);
+    } else {
+        adns_processexceptional(ads, sock->sock_no, &tv);
+    }
+    do_dns(0,0,NULL);
+    return NS_SUCCESS;
+}
+int
+adns_write(int fd, void *data) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    adns_processwriteable(ads, fd, &tv);
+    do_dns(0,0,NULL);
+    return NS_SUCCESS;
+}
+
+void 
+sock_update (int fd, short what) {
+    Sock *sock;
+    char tmpname[BUFSIZE];
+    int what2;
+
+    ircsnprintf(tmpname, BUFSIZE, "ADNS-%d", fd);
+    sock = find_sock(tmpname);
+    what2 = EV_PERSIST;
+    if (what & POLLIN) {
+          what2 |= EV_READ;
+    } else if (what & POLLOUT) {
+          what2 |= EV_WRITE;
+    } else if (what == -1) {
+          del_sock(sock);
+          return;
+    }
+    if (sock) {
+          update_sock(sock, what2, 1, NULL);
+          /* just update */
+    } else {
+          /* its new */
+          sock = add_sock(tmpname, fd, adns_read, adns_write, what2, sock, NULL, SOCK_NOTIFY);
+          sock->data = sock;
+    }
+
+}
+
 /** @brief sets up DNS subsystem
  *
  * configures ADNS for use with NeoStats.
@@ -137,7 +195,7 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (void *data, adns_
 int InitDns (void)
 {
 	int adnsstart;
-
+	struct timeval tv;
 	SET_SEGV_LOCATION();
 	dnslist = list_create (DNS_QUEUE_SIZE);
 	if (!dnslist) {
@@ -149,14 +207,21 @@ int InitDns (void)
 	if (!dnsqueue) 
 		return NS_FAILURE;
 #ifndef DEBUG
-	adnsstart = adns_init (&ads, adns_if_noerrprint | adns_if_noautosys, 0);
+	adnsstart = adns_init (&ads, adns_if_noerrprint | adns_if_noautosys, 0, sock_update);
 #else
-	adnsstart = adns_init (&ads, adns_if_debug | adns_if_noautosys, 0);
+	adnsstart = adns_init (&ads, adns_if_debug | adns_if_noautosys, 0, sock_update);
 #endif
 	if (adnsstart) {
 		nlog (LOG_CRITICAL, "ADNS init failed: %s", strerror (adnsstart));
 		return NS_FAILURE;
 	}
+
+	dnstimeout = os_malloc(sizeof(struct event));
+	timerclear(&tv);
+	tv.tv_sec = 1;
+	event_set(dnstimeout, 0, EV_TIMEOUT|EV_PERSIST, do_dns, NULL);
+	event_add(dnstimeout, &tv);
+
 	return NS_SUCCESS;
 }
 
@@ -185,6 +250,9 @@ void FiniDns (void)
 	}
 	list_destroy_nodes (dnsqueue);
 	list_destroy (dnsqueue);
+	event_del(dnstimeout);
+	free(dnstimeout);
+
 	free(ads);
 }
 /** @brief Canx any DNS queries for modules we might be unloading
@@ -233,13 +301,19 @@ void canx_dns(Module* modptr)
  *
  * @return Nothing
 */
-void do_dns (void)
+void do_dns (int notused, short event, void *arg)
 {
 	lnode_t *dnsnode, *dnsnode1;
 	int status;
 	DnsLookup *dnsdata;
-
+	struct timeval tv;
 	SET_SEGV_LOCATION();
+
+
+	/* process timeouts for ADNS */
+    gettimeofday(&tv,NULL);
+    adns_processtimeouts(ads, &tv);
+    
 	/* if the list is empty, no use doing anything */
 	if (list_isempty (dnslist)) {
 		dns_check_queue();

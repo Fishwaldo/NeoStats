@@ -263,7 +263,7 @@ sql_accept_conn(int srvfd, void *data)
 
 		ircsnprintf(tmpname, BUFSIZE, "RTAConn%d", newui->fd);
 		
-		add_sock(tmpname, newui->fd, sql_handle_ui_request, sql_handle_ui_output, EV_READ|EV_PERSIST|EV_TIMEOUT, newui, &rtatimeout);		
+		add_sock(tmpname, newui->fd, sql_handle_ui_request, sql_handle_ui_output, EV_READ|EV_PERSIST|EV_TIMEOUT, newui, &rtatimeout, SOCK_STANDARD);		
 		return NS_SUCCESS;
 	}
 }

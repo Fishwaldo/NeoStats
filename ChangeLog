@@ -4,6 +4,13 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.a2-dev
+ - Fix bug with ordering of process_ip in AddUser. nick variable isn't
+   static, and usually is gone when we callback (F)
+ - DCC Partyline support added (F)
+ - replace socket/select code with a libevent based implementation (F)
+ - Provide a "buffered" socket implementation for network communications (F)
+ - Provide a "newline terminated protocol" socket implementation to handle
+   IRCd and DCC Chat communications (F)
  - Remove fieldname from settings structure since option already provides a 
    unique string for storage. (M)
  - Add validate and random channel key functions. (M)

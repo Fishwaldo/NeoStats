@@ -971,43 +971,49 @@ read_sock_activity(int fd, short what, void *data) {
 #else 
 #warning FIONREAD not available
 #endif	
-			if (howmuch > 0) {
-				p = os_malloc(howmuch);
-			}
 #if SOCKDEBUG
 printf("read called with %d bytes %d\n", howmuch, what);
 #endif
-
-#ifndef WIN32
-			n = read(sock->sock_no, p, howmuch);
-			if (n == -1) {
-				dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
-				sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
-				del_sock(sock);
-				return;
-			}
-			if (n == 0) {
-				dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
-				sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
-				del_sock(sock);
-				return;
-			}
-#else
-			n = ReadFile((HANDLE)sock->sock_no, p, howmuch, &dwBytesRead, NULL);
-			if (n == 0) {
-				dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
-				sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
-				del_sock(sock);
-				return;
-			}
-			if (dwBytesRead == 0)
-				return;
-			n = dwBytesRead;
-#endif
-			dlog(DEBUG1, "sock_read: Read %d bytes from fd %d (%s)", n, sock->sock_no, sock->name);
-			sock->rbytes += n;
-			/* rmsgs is just a counter for how many times we read in the standard sockets */
+			sock->rbytes += howmuch;
 			sock->rmsgs++;
+
+			if (sock->socktype == SOCK_STANDARD) {
+    			if (howmuch > 0) {
+	    			p = os_malloc(howmuch);
+		    	}
+#ifndef WIN32
+			    n = read(sock->sock_no, p, howmuch);
+    			if (n == -1) {
+	    			dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
+		    		sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
+			    	del_sock(sock);
+                    return;
+    			}
+	    		if (n == 0) {
+		    		dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
+			    	sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
+                    del_sock(sock);
+    				return;
+	    		}
+#else
+		    	n = ReadFile((HANDLE)sock->sock_no, p, howmuch, &dwBytesRead, NULL);
+		    	    if (n == 0) {
+    				dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
+	    			sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
+		    		del_sock(sock);
+			    	return;
+    			}
+	    		if (dwBytesRead == 0)
+		    		return;
+    			n = dwBytesRead;
+#endif
+    			dlog(DEBUG1, "sock_read: Read %d bytes from fd %d (%s)", n, sock->sock_no, sock->name);
+            } else {
+                p = NULL;
+                n = howmuch;
+            }
+			/* rmsgs is just a counter for how many times we read in the standard sockets */
+
 			if (sock->sfunc.standmode.readfunc(sock->data, p, n) == NS_FAILURE) {
 				dlog(DEBUG1, "sock_read_activity: Read Callback failed, Closing Socket on fd %d (%s)", sock->sock_no, sock->name);
 				del_sock(sock);
@@ -1081,7 +1087,7 @@ update_sock(Sock *sock, short what, short reset, struct timeval *tv) {
  * @return pointer to socket if found, NULL if not found
 */
 Sock *
-add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv)
+add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv, int type)
 {
 	Sock *sock;
 	Module* moduleptr;
@@ -1106,7 +1112,11 @@ add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writef
 	sock->data = data;
 	sock->sfunc.standmode.readfunc = readfunc;
 	sock->sfunc.standmode.writefunc = writefunc;
-	sock->socktype = SOCK_STANDARD;
+	if (type == SOCK_STANDARD) {
+    	sock->socktype = SOCK_STANDARD;
+    } else if (type == SOCK_NOTIFY) {
+        sock->socktype = SOCK_NOTIFY;
+    }
 
 	sock->event.event = os_malloc(sizeof(struct event));
 	event_set(sock->event.event, sock->sock_no, what, read_sock_activity, (void*) sock);
@@ -1115,6 +1125,9 @@ add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writef
 	dlog(DEBUG2, "add_sock: Registered Module %s with Standard Socket functions %s", moduleptr->info->name, sock->name);
 	return sock;
 }
+
+#if 0
+
 
 /** @brief add a poll interface to the socket list
  *
@@ -1126,9 +1139,10 @@ add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writef
  * @param mod_name the name of module registering the socket
  * 
  * @return pointer to socket if found, NULL if not found
+ * @warning Depreciated Interface. memory Hog Too!
 */
 int
-add_sockpoll (const char *sock_name, void *data, before_poll_func beforepoll, after_poll_func afterpoll)
+_add_sockpoll (const char *sock_name, void *data, before_poll_func beforepoll, after_poll_func afterpoll)
 {
 	Sock *sock;
 	Module* moduleptr;
@@ -1149,9 +1163,119 @@ add_sockpoll (const char *sock_name, void *data, before_poll_func beforepoll, af
 	sock->beforepoll = beforepoll;
 	sock->afterpoll = afterpoll;
 	sock->data = data;
+	sock->highfds = 0;
+#if 0
+	/* allocate a array of pointers that will point to each individual socket */
+	sock->sockets = malloc(sizeof(struct pollinfo) * me.maxsocks)
+#endif
+
 	dlog(DEBUG2, "add_sockpoll: Registered Module %s with Poll Socket functions %s", moduleptr->info->name, sock->name);
 	return NS_SUCCESS;
 }
+/** @brief Call library or module functions that pass a ufds structure of sockets they
+ *  are interested in 
+ *
+ *
+ * @param none
+ * 
+ * @return NS_SUCCESS if deleted, NS_FAILURE if not found
+*/
+
+void
+beforepoll_sock() {
+	hash_scan_begin (&ss, sockethash);
+	while ((sn = hash_scan_next (&ss)) != NULL) {
+		sock = hnode_get (sn);
+		if (sock->socktype == SOCK_POLL) {
+			/* its a poll interface, setup for select instead */
+			SET_RUN_LEVEL(sock->moduleptr);
+			j = sock->beforepoll (sock->data, ufds, highfd);
+			RESET_RUN_LEVEL();
+			/* if we don't have any socks, just continue */
+			if (j <= 0)
+				continue;
+
+			/* This is just a flipflop switch, used to help tell 
+			 * what sockets are deleted */
+			 */
+			if (sock->pollswitch == 1) {
+				sock->pollswitch = 0;
+			} else {
+				sock->pollswitch = 1;
+			}
+	
+			/* next, if highfds is greater than previous, realloc 
+			 * the sock->sockets structure.
+			 */
+			 if (sock->highfds > highfds) {
+			 	sock->sockets = os_realloc(sock->sockets, sizeof(struct pollinfo) * highfds);
+			 	sock->highfds = highfds;
+			}
+			/* run through the ufds set provided by the module
+			 * and check if we already have it registered in our 
+			 * libevent cache. If not, create it and register it
+			 */
+			for (i = 0; i < j; i++) {
+				if (sock->sockets[ufds[i].fd]) {
+					printf("its registered...\n");
+					/* do we need to update the what option? */
+					what = 0;
+					if (ufds[i].events & POLLIN) {
+						what |= EV_READ;
+					}
+					if (ufds[i].events & POLLOUT) {
+						what |= EV_WRITE;
+					}
+					if (what != sock->sockets[ufds.[i].fd].what) {
+						printf("update\n");
+						event_set(sock->sockets[ufds[i].fd].ev, ufds[i].fd, what, sock_pollcallback, (void *)sock);
+					}
+				} else {
+					what = 0;
+					printf("create\n");
+					if (ufds[i].events & POLLIN) {
+						what |= EV_READ;
+					}
+					if (ufds[i].events & POLLOUT) {
+						what |= EV_WRITE;
+					}
+#if 0
+					if (ufds[i].events & POLLERR) {
+						FD_SET (ufds[i].fd, &errfds);
+					}
+#endif
+					sock->sockets[ufds[i].fd] = os_malloc(sizeof (struct pollinfo));
+					sock->sockets[ufds[i].fd].ev = os_malloc(sizeof (struct event));
+					sock->sockets[ufds[i].fd].pollswitch = sock->pollswitch;
+					sock->sockets[ufds[i].fd].what = what;
+					event_set(sock->sockets[ufds[i].fd].ev, ufds[i].fd, what, pollcallback_sock, (void*) sock);
+					event_add(sock->sockets[ufds[i].fd].ev, NULL);
+										
+				}
+			}
+			for (i = 0; i < highfds; i++) {
+				if (sock->sockets[i].pollswitch != sock->pollswitch) {
+					/* this isn't in use anymore */
+					printf("delete\n");
+					event_del(sock->sockets[i].ev);
+					ns_free(sock->sockets[i].ev);
+					ns_free(sock->sockets[i]);
+				}
+			}
+		}
+	}
+}
+
+void 
+pollcallback_sock(int fd, short what, void *data) {
+	Sock *sock = (Sock *)data;
+	if (sock->socktype = SOCK_SOCKPOLL) {
+		
+
+
+} 
+
+#endif
 
 /** @brief delete a socket from the socket list
  *
@@ -1170,6 +1294,7 @@ del_sock (Sock *sock)
 	switch (sock->socktype) {
 		case SOCK_STANDARD:
 		case SOCK_LISTEN:
+		case SOCK_NOTIFY:
 				event_del(sock->event.event);
 				/* needed? */
 				os_free(sock->event.event);
@@ -1180,6 +1305,8 @@ del_sock (Sock *sock)
 		case SOCK_BUFFERED:
 				bufferevent_free(sock->event.buffered);
 				os_sock_close (sock->sock_no);
+				break;
+		case SOCK_POLL:
 				break;
 	}				
 	
@@ -1246,6 +1373,9 @@ ns_cmd_socklist (CmdParams* cmdparams)
 		switch (sock->socktype) {
 			case SOCK_STANDARD:
 				irc_prefmsg (ns_botptr, cmdparams->source, __("Standard Socket - fd: %d", cmdparams->source), sock->sock_no);
+				break;
+			case SOCK_NOTIFY:
+				irc_prefmsg (ns_botptr, cmdparams->source, __("Native Socket - fd: %d", cmdparams->source), sock->sock_no);
 				break;
 			case SOCK_POLL:
 				irc_prefmsg (ns_botptr, cmdparams->source, __("Poll Interface", cmdparams->source));
