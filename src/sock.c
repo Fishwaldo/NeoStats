@@ -441,7 +441,7 @@ recvlog (char *line)
 	if ((logfile = fopen (RECV_LOG, "a")) == NULL)
 		return;
 	if (logfile)
-		fprintf (logfile, line);
+		fprintf (logfile, "%s", line);
 	fclose (logfile);
 }
 
