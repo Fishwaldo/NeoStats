@@ -2,6 +2,8 @@ HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
 ==============================================================================
+* Version 3.3 * Fish (F) * Jan 27, 2003
+ - HostServ uses Global Exclusions in Unet style vhosts, and also on signon
 
 * Version 3.2 * Mark (M) * November 27, 2003
  - Use core bot message handler to process commands (M)

@@ -31,6 +31,8 @@
 #include "hs_help.c"
 #include "log.h"
 #include "conf.h"
+#include "exclude.h"
+
 
 /* hostserv doesn't work on Hybrid, Echo an error and exit the compile */
 #ifndef GOTSVSHOST 
@@ -121,7 +123,7 @@ ModUser *hs_bot;
 ModuleInfo __module_info = {
 	 "HostServ",
 	 "Network User Virtual Host Service",
-	 "3.2",
+	 "3.3",
 	__DATE__,
 	__TIME__
 };
@@ -208,6 +210,10 @@ static int hs_sign_on(char **av, int ac)
 		return 1;
 
 	if (u->server->name == me.name)
+		return 1;
+
+	/* is this user excluded via a global exclusion? */
+	if (Is_Excluded(u)) 
 		return 1;
 
 	if (findbot(u->nick))
@@ -304,6 +310,10 @@ int hs_mode(char **av, int ac) {
 	if (is_oper(u)) 
 		/* don't set a opers vhost. Most likely already done */
 		return 1;
+		
+	if (Is_Excluded(u)) 
+		return 1;
+		
 	/* first, find if its a regnick mode */
 	modes = av[1];
 	while (*modes) {
