@@ -5,7 +5,7 @@
 *
 ** NeoStats Identification:
 ** ID:      statserv.c, 
-** Version: 3.1
+** Version: 3.3
 ** Date:    08/03/2002
 */
 
@@ -39,7 +39,7 @@ char s_StatServ[MAXNICK] = "StatServ";
 Module_Info Statserv_Info[] = { {
 	SSMNAME,
 	"Statistical Bot For NeoStats",
-	"3.1"
+	"3.3"
 } };
 
 
