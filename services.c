@@ -424,9 +424,20 @@ void ns_debug_to_coders(char *u)
 }										  
 static void ns_raw(User *u, char *message)
 {
+	int sent;
 	segv_location = sstrdup("ns_raw");
 	notice(s_Services,"\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!",u->nick);
-	sts("%s",message);
+#ifdef DEBUG
+        log("SENT: %s", message);
+#endif
+	strcat (message, "\n");
+        sent = write (servsock, message, strlen (message));
+        if (sent == -1) {
+        	log("Write error.");
+                exit(0);
+        }
+        me.SendM++;
+        me.SendBytes = me.SendBytes + sent;
 }	
 static void ns_user_dump(User *u)
 {

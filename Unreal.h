@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.6 2002/03/05 08:13:45 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.7 2002/03/05 08:39:26 fishwaldo Exp $
  */
 
 
@@ -362,4 +362,7 @@ extern int sjoin_cmd(const char *, const char *);
 extern int schmode_cmd(const char *, const char *, const char *, const char *);
 extern int snick_cmd(const char *, const char *, const char *, const char *);
 extern int sping_cmd(const char *from, const char *reply, const char *to);
+extern int sumode_cmd(const char *who, const char *target, const char *mode);
+
+
 #endif  /* UNREAL_H Define */

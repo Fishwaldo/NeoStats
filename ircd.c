@@ -195,7 +195,6 @@ IntCommands cmd_list[] = {
 int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char *mod_name)
 {
 	User *u;
-	char tmp[512];
 	segv_location = sstrdup("init_bot");
 	u = finduser(nick);
 	if (u) {
@@ -203,14 +202,10 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 		return -1;
 	}
 	add_mod_user(nick, mod_name);
-	sts("NICK %s 1 %d %s %s %s 0 :%s", nick, time(NULL), user, host, me.name, rname);
-	AddUser(nick, user, host, me.name);
-	sts(":%s MODE %s :%s", nick, nick,modes);
-	sts(":%s JOIN %s",nick ,me.chan);
-	sts(":%s MODE %s +o %s",me.name,me.chan,nick);
-	sts(":%s MODE %s +a %s",nick,me.chan,nick);
-	sprintf(tmp, ":%s", modes);
-	UserMode(nick, tmp);
+	snick_cmd(nick, user, host, rname);
+	sumode_cmd(me.name, nick, modes);
+	sjoin_cmd(nick, me.chan);
+	schmode_cmd(me.name, me.chan, "+oa", nick);
 	Module_Event("SIGNON", finduser(nick));
 	return 1;
 }
@@ -228,8 +223,7 @@ int del_bot(char *nick, char *reason)
 		return -1;
 	}
 	Module_Event("SIGNOFF", finduser(nick));
-	sts(":%s QUIT :%s",nick,reason);
-	DelUser(nick);
+	squit_cmd(nick, reason);
 	del_mod_user(nick);
 	return 1;
 }
@@ -402,15 +396,14 @@ they should update the internal Structures */
 
 void init_ServBot()
 {
+	char rname[63];
 	segv_location = sstrdup("init_ServBot");
-	sts("NICK %s 1 %d %s %s %s 0 :/msg %s \2HELP\2", s_Services, time(NULL),
-		Servbot.user, Servbot.host, me.name, s_Services);
-	AddUser(s_Services, Servbot.user, Servbot.host, me.name);
-	sts(":%s MODE %s +Sqd", s_Services, s_Services);
-	sts(":%s JOIN %s",s_Services ,me.chan);
-	sts(":%s MODE %s +o %s",me.name,me.chan,s_Services);
-	sts(":%s MODE %s +a %s",s_Services,me.chan,s_Services);
-	UserMode(s_Services, ":+Sqd"); 
+
+	sprintf(rname, "/msg %s \2HELP\2", s_Services);
+	snick_cmd(s_Services, Servbot.user, Servbot.host, rname);
+	sumode_cmd(me.name, s_Services, "+Sqd");
+	sjoin_cmd(s_Services, me.chan);
+	schmode_cmd(me.name, me.chan, "+oa", s_Services);
 	me.onchan = 1;
 	Module_Event("SIGNON", finduser(s_Services));
 }
@@ -729,8 +722,13 @@ void globops(char *from, char *fmt, ...)
 
 /* Shmad - have to get rid of nasty term echos :-) */
 
-	if (me.onchan) sprintf(buf, ":%s GLOBOPS :%s", from, buf2);
-	sts("%s", buf);
+/* Fish - now that was crackhead coding! */
+	if (me.onchan) { 
+		sprintf(buf, ":%s GLOBOPS :%s", from, buf2);
+		sts("%s", buf);
+	} else {
+		log("%s", buf2);
+	}
 	va_end(ap);
 }
 
@@ -764,7 +762,6 @@ static void ShowMOTD(char *nick)
     char buf[BUFSIZE];
 
     sts(":%s 375 %s :- %s Message of the Day -", me.name, nick, me.name);
-/*    sts(":%s 372 %s :- ", me.name, nick); */
     sts(":%s 372 %s :- %s.  Copyright (c) 1999 - 2002 The NeoStats Group", me.name, nick, version);
     sts(":%s 372 %s :-", me.name, nick);
 

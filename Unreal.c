@@ -21,8 +21,8 @@ int sserver_cmd(const char *name, const int numeric, const char *infoline) {
 }
 
 int slogin_cmd(const char *name, const int numeric, const char *infoline, const char *pass) {
-	sts("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 	sts("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
+	sts("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 	return 1;
 }
 
@@ -65,6 +65,13 @@ int snick_cmd(const char *nick, const char *ident, const char *host, const char 
 
 int sping_cmd(const char *from, const char *reply, const char *to) {
 	sts(":%s %s %s :%s", from, (me.token ? TOK_NICK : MSG_NICK), reply, to);
+	return 1;
+}
+
+int sumode_cmd(const char *who, const char *target, const char *mode) { 
+	sts(":%s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, mode);
+/* TODO usermode is broken (expects mode to start with :) fix it! */
+	UserMode(target, mode);
 	return 1;
 }
 
