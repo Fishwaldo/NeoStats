@@ -39,7 +39,7 @@
 
 /** List of registered authentication modules 
  *  Auth subsystem use only. */
-static Module* AuthModList[NUM_MODULES];
+static Module *AuthModList[NUM_MODULES];
 
 /** @brief IsServiceRoot
  *

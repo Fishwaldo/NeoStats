@@ -42,6 +42,12 @@ void *display_server_ping (void *tbl, char *col, char *sql, void *row)
 	return &data->server->ping;                        
 }                        
 
+void *display_server_uplink(void *tbl, char *col, char *sql, void *row) 
+{
+	Client *data = row;
+	return &data->uplink->name;
+}                        
+
 COLDEF neo_serverscols[] = {
 	{
 		"servers",
@@ -114,9 +120,9 @@ COLDEF neo_serverscols[] = {
 		"uplink",
 		RTA_STR,
 		MAXHOST,
-		offsetof(Client, uplink),
+		0,
 		RTA_READONLY,
-		NULL,
+		display_server_uplink,
 		NULL,
 		"The uplink Server this server is connected to. if it = self, means the NeoStats Server"
 	},
