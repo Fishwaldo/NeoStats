@@ -49,6 +49,7 @@ dl/README -text
 dl/cs/ChangeLog -text
 dl/cs/Makefile -text
 dl/cs/cs.c -text
+dl/cs/cs.h -text
 dl/cs/cs_help.c -text
 dl/extauth/Makefile -text
 dl/extauth/serviceroots.c -text
