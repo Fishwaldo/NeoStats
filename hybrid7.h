@@ -223,41 +223,43 @@
 #define UMODE_CH_ADMIN 'a'
 
 /* Umodes */
-#define UMODE_OPER	0x0001	/* oper flag */
-#define UMODE_ADMIN	0x0002	/* admin flag */
-#define UMODE_BOTS	0x0004	/* shows bots */
-#define UMODE_CCONN	0x0008	/* shows client connections */
-#define UMODE_DEBUG	0x0010	/* show debug info */
-#define UMODE_FULL	0x0020	/* show full messages */
-#define UMODE_CALLERID	0x0040	/* client has callerid enabled */
-#define UMODE_INVISIBLE 0x0080	/* client has +i flag */
-#define UMODE_SKILL	0x0100	/* client see's server kills */
-#define UMODE_LOCOPS	0x0200	/* client is localop */
-#define UMODE_NCHANGE	0x0400	/* client can see nick change notices */
-#define UMODE_REJ	0x0800	/* client is registered */
-#define UMODE_SERVNOTICE	0x1000	/* client can see server notices */
-#define UMODE_UNAUTH	0x2000	/* client can see unauthd connections */
-#define UMODE_WALLOP	0x4000	/* client can get wallop messages */
-#define UMODE_EXTERNAL	0x8000	/* client can see server joins/splits */
-#define UMODE_SPY	0x10000	/* client can spy on user commands */
-#define UMODE_OPERWALL	0x20000	/* client gets operwalls */
-
-/* Cmodes */
-#define	CMODE_CHANOP	0x0001
-#define CMODE_HALFOP	0x0002
-#define	CMODE_VOICE	0x0004
-#define	CMODE_PRIVATE	0x0008
-#define	CMODE_SECRET	0x0010
-#define	CMODE_MODERATED  0x0020
-#define	CMODE_TOPICLIMIT 0x0040
-#define	CMODE_INVITEONLY 0x0080
-#define	CMODE_NOPRIVMSGS 0x0100
-#define	CMODE_KEY	0x0200
-#define CMODE_EXCEPT	0x0400
-#define	CMODE_BAN	0x0800
-#define	CMODE_LIMIT	0x1000
-#define CMODE_HIDEOPS	0x2000
-#define CMODE_INVEX	0x4000
+#define UMODE_SERVNOTICE   0x0001 /* server notices such as kill */
+#define UMODE_CCONN        0x0002 /* Client Connections */
+#define UMODE_REJ          0x0004 /* Bot Rejections */
+#define UMODE_SKILL        0x0008 /* Server Killed */
+#define UMODE_FULL         0x0010 /* Full messages */
+#define UMODE_SPY          0x0020 /* see STATS / LINKS */
+#define UMODE_DEBUG        0x0040 /* 'debugging' info */
+#define UMODE_NCHANGE      0x0080 /* Nick change notice */
+#define UMODE_WALLOP       0x0100 /* send wallops to them */
+#define UMODE_OPERWALL     0x0200 /* Operwalls */
+#define UMODE_INVISIBLE    0x0400 /* makes user invisible */
+#define UMODE_BOTS         0x0800 /* shows bots */
+#define UMODE_EXTERNAL     0x1000 /* show servers introduced and splitting */
+#define UMODE_CALLERID     0x4000 /* block unless caller id's */
+#define UMODE_UNAUTH       0x8000 /* show unauth connects here */
+#define UMODE_LOCOPS       0x10000 /* show locops */
+#define UMODE_OPER         0x20000 /* Operator */
+#define UMODE_ADMIN        0x40000 /* Admin on server */
+ 
+/* Channel Visibility macros */
+#define CMODE_PEON		 0x0000
+#define CMODE_CHANOP     0x0001	
+#define CMODE_VOICE      0x0002 
+#define CMODE_HALFOP	 0x0008	
+#define CMODE_DEOPPED	 0x0004
+#define CMODE_PRIVATE    0x0008	
+#define CMODE_SECRET     0x0010 
+#define CMODE_MODERATED  0x0020	
+#define CMODE_TOPICLIMIT 0x0040	
+#define CMODE_INVITEONLY 0x0080	
+#define CMODE_NOPRIVMSGS 0x0100 
+#define CMODE_BAN        0x0400 
+#define CMODE_EXCEPT	 0x0800 
+#define CMODE_INVEX		 0x2000 
+#define CMODE_HIDEOPS    0x4000 
+#define CMODE_KEY		 0x10000 /* Fake value */
+#define CMODE_LIMIT      0x12000 /* Fake value */
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))
