@@ -1,0 +1,25 @@
+NeoStats CREDITS:
+
+The following people in this list are people who have helped us with the further
+development of NeoStats in their own various ways over the years and who have
+helped better this project for all users.  Thanks to everyone :)
+
+
+chrisv@b0rked.dhs.org		Code for Dynamically Loading Modules (Hurrican IRCD)
+
+monkeyIRCD			Module Segv Catching code
+
+Global-irc.net			The original "beta" testers of NeoStats
+
+sre (Stig)			Hosting of NeoStats website and development shells
+				for well over a year!
+
+ErroR|51			Translation of FAQ and README files to portuguese.
+
+eggy				Proving to us our code still had bugs when we thought
+				we had ironed them all out (and all his bug reports!)
+
+
+
+If we left anyone out of this list please email support@neostats.net and if you
+do deserve to be on this list you shall be added.
