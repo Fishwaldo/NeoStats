@@ -292,12 +292,6 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	char* parambuf; 
 
 	SET_SEGV_LOCATION();
-	/* this is a hack, so we can load out of core, not NeoStats */
-	if (!ircstrcasecmp(bot_ptr->modname, s_Services)) {
-		CLEAR_SEGV_INMODULE();
-	} else {
-		SET_SEGV_INMODULE(bot_ptr->modname);
-	}
 	userlevel = UserLevel (u);
 	/* Check user authority to use this command set */
 	if (( (bot_ptr->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
@@ -305,7 +299,6 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 		prefmsg (u->nick, bot_ptr->nick, "This service is only available to IRC operators.");
 		chanalert (bot_ptr->nick, "%s requested %s, but is not an operator.", u->nick, av[1]);
 		nlog (LOG_NORMAL, LOG_MOD, "%s requested %s, but is not an operator.", u->nick, av[1]);
-		CLEAR_SEGV_INMODULE();
 		return NS_SUCCESS;
 	}
 
@@ -319,7 +312,6 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 			prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
 			chanalert (bot_ptr->nick, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
 			nlog (LOG_NORMAL, LOG_MOD, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
-			CLEAR_SEGV_INMODULE();
 			return NS_SUCCESS;
 		}
 		/* First two parameters are bot name and command name so 
@@ -327,7 +319,6 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 		if((ac - 2) < cmd_ptr->minparams ) {
 			prefmsg (u->nick, bot_ptr->nick, "Syntax error: insufficient parameters");
 			prefmsg (u->nick, bot_ptr->nick, "/msg %s HELP %s for more information", bot_ptr->nick, cmd_ptr->cmd);
-			CLEAR_SEGV_INMODULE();
 			return NS_SUCCESS;
 		}
 		/* Seems OK so report the command call so modules do not have to */
@@ -342,7 +333,6 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 		}
 		/* call handler */
 		cmd_ptr->handler(u, av, ac);
-		CLEAR_SEGV_INMODULE();
 		return NS_SUCCESS;
 	}
 
@@ -350,13 +340,11 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	/* Help */
 	if (!ircstrcasecmp(av[1], "HELP")) {
 		bot_cmd_help(bot_ptr, u, av, ac);
-		CLEAR_SEGV_INMODULE();
 		return NS_SUCCESS;
 	}
 	/* Handle SET if we have it */
 	if (bot_ptr->bot_settings && !ircstrcasecmp(av[1], "SET") ) {
 		bot_cmd_set(bot_ptr, u, av, ac);
-		CLEAR_SEGV_INMODULE();
 		return NS_SUCCESS;
 	}
 
@@ -364,14 +352,12 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	/* About */
 	if (!ircstrcasecmp(av[1], "ABOUT")) {
 		bot_cmd_about(bot_ptr, u, av, ac);
-		CLEAR_SEGV_INMODULE();
 		return NS_SUCCESS;
 	}
 
 	/* Version */
 	if (!ircstrcasecmp(av[1], "VERSION")) {
 		bot_cmd_version(bot_ptr, u, av, ac);
-		CLEAR_SEGV_INMODULE();
 		return NS_SUCCESS;
 	}
 #endif
@@ -379,7 +365,6 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 	/* We have run out of commands so report failure */
 	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[1]);
 	chanalert (bot_ptr->nick, "%s requested %s, but that is an unknown command", u->nick, av[1]);
-	CLEAR_SEGV_INMODULE();
 	return NS_SUCCESS;
 }
 

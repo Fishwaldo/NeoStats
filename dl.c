@@ -862,6 +862,10 @@ bot_message (char *origin, char **av, int ac)
 			if (!u) {
 				nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", origin, mod_usr->nick);
 			} else {
+				/* this is a hack, so we can load out of core, not NeoStats */
+				if (!ircstrcasecmp(mod_usr->modname, s_Services)) {
+					CLEAR_SEGV_INMODULE();
+				}
 				run_bot_cmd(mod_usr, u, av, ac);
 			}
 		}
