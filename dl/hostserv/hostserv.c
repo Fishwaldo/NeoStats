@@ -338,8 +338,6 @@ int __Bot_Message(char *origin, char **av, int ac)
 
 	if (!strcasecmp(av[1], "ABOUT")) {
 		privmsg_list(u->nick, s_HostServ, hs_help_about);
-		prefmsg(u->nick, s_HostServ,
-			"Un-used Vhosts expire after %d days", hs_cfg.old);
 		return 1;
 	} else if (!strcasecmp(av[1], "ADD")
 		   && (UserLevel(u) >= hs_cfg.add)) {
@@ -398,7 +396,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 				prefmsg(u->nick, s_HostServ,
 					"Permission Denied");
 				chanalert(s_HostServ,
-					  "%s tried to %s bans, but was denied",
+					  "%s tried to %s bans, but was not authorized",
 					  u->nick, av[2]);
 				return 1;
 			}
@@ -653,6 +651,7 @@ int __ModInit(int modnum, int apiver)
 		nlog(LOG_CRITICAL, LOG_CORE,
 		     "Error, Can't create vhosts hash");
 		chanalert(s_Services, "Error, Can't create Vhosts Hash");
+		return -1;
 	}
 	hs_cfg.modnum = modnum;
 	hs_cfg.add = 40;
