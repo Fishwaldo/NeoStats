@@ -17,6 +17,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Tested long and hard the Ultimate3 IRCd port. Should be good. :)
  - Added Quantum/Bahamut/IRCu framework
  - Commited Bluds IRCd port for Mystic. Un-tested.
+ - Ultimate2 akills are moved to glines. BugID#29
 
 * NeoStats * Fish * Version 2.5.3
  - Added ability to turn off StatServ wallops. "/msg statserv set msgthrottle off" - BugID#6

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.54 2003/06/30 14:56:25 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.55 2003/07/01 12:54:32 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -683,17 +683,25 @@ int sakill_cmd(const char *host, const char *ident, const char *setby,
 	char buf[512];
 	va_start(ap, reason);
 	vsnprintf(buf, 512, reason, ap);
+#ifdef ULTIMATE3
 	sts(":%s %s %s %s %d %s %d :%s", me.name,
 	    (me.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby,
 	    time(NULL), buf);
+#elif ULTIMATE
+	sts(":%s %s %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, time(NULL) + length, time(NULL), setby, buf);
+#endif
 	va_end(ap);
 	return 1;
 }
 
 int srakill_cmd(const char *host, const char *ident)
 {
+#ifdef ULTIMATE3
 	sts(":%s %s %s %s", me.name, (me.token ? TOK_RAKILL : MSG_RAKILL),
 	    host, ident);
+#elif ULTIMATE
+	chanalert(s_Services, "Warning, Ultimate2 doesn't support removing Glines");
+#endif 
 	return 1;
 }
 
@@ -1273,10 +1281,11 @@ int SignOn_NewBot(const char *nick, const char *user,
 	if ((me.allbots > 0) || (Umode & UMODE_SERVICES)) {
 #ifdef ULTIMATE3
 		sjoin_cmd(nick, me.chan, MODE_CHANADMIN);
+		schmode_cmd(nick, me.chan, "+a", nick);
 #else				/* ulitmate3 */
 		sjoin_cmd(nick, me.chan);
+		schmode_cmd(nick, me.chan, "+o", nick);
 #endif
-		schmode_cmd(nick, me.chan, "+a", nick);
 		/* all bots join */
 	}
 	return 1;
