@@ -12,7 +12,7 @@ all:	loveserv
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 loveserv: $(OBJECTS)
-	$(CC) -nostdlib -shared -o $(TARGET) $(LIBS) $(OBJECTS)
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
 	/bin/cp $(TARGET) ../
 
 clean:

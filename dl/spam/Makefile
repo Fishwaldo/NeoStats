@@ -12,7 +12,7 @@ all:	spam
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 spam: $(OBJECTS)
-	$(CC) -nostdlib -shared -o $(TARGET) $(LIBS) $(OBJECTS)
+	$(LD) $(LDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
 	/bin/cp $(TARGET) ../
 
 clean:

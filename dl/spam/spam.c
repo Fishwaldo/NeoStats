@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.11 2002/07/13 06:30:36 fishwaldo Exp $
+** $Id: spam.c,v 1.12 2002/07/17 05:25:38 fishwaldo Exp $
 */
 
 
@@ -35,7 +35,7 @@ Functions my_fn_list[] = {
 };
 	/* a easter egg for all the Neo users */
 
-int __Chan_Message(char *chan, char **argv, int argc)
+int __Chan_Message(char *origin, char *chan, char **argv, int argc)
 {
 	FILE *fort;
 	char *fortune;

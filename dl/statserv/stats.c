@@ -11,9 +11,8 @@
 
 #include "statserv.h"
 
-void s_chan_new(Chans *c) {
+int s_chan_new(char **av, int ac) {
 	long count;
-	
 	IncreaseChans();
 	count = hash_count(ch);
 	if (count > stats_network.maxchans) {
@@ -25,17 +24,17 @@ void s_chan_new(Chans *c) {
 		daily.chans = count;
 		daily.t_chans = time(NULL);
 	}
-
+	return 1;
 }
 
-void s_chan_del(Chans *c) {
+int s_chan_del(char **av, int ac) {
 	DecreaseChans();
+	return 1;
 }
 
-void s_chan_join(Chans *c) {
+int s_chan_join(char **av, int ac) {
 	CStats *cs;
-	
-	cs = findchanstats(c->name);
+	cs = findchanstats(av[0]);
 	if (cs) {
 		Increasemems(cs);
 		if (cs->maxmemtoday < cs->members) {
@@ -51,39 +50,43 @@ void s_chan_join(Chans *c) {
 			cs->t_maxjoins = time(NULL);
 		}
 	} else {
-		cs = AddChanStats(c->name);		
+		cs = AddChanStats(av[0]);		
 		Increasemems(cs);
 		cs->maxmemtoday++;
 		cs->t_maxmemtoday = time(NULL);
 		cs->maxmems++;
 		cs->t_maxmems = time(NULL);
 	}
+	return 1;
 }			
-void s_chan_part(Chans *c) {
+int s_chan_part(char **av, int ac) {
 	CStats *cs;
-	cs = findchanstats(c->name);
+	cs = findchanstats(av[0]);
 	if (cs) {
 		Decreasemems(cs);
 	}
+	return 1;
 }
 
-void s_topic_change(Chans *c) {
+int s_topic_change(char **av, int ac) {
 	CStats *cs;
-	cs = findchanstats(c->name);
+	cs = findchanstats(av[0]);
 	if (cs) {
 		IncreaseTops(cs);
 	}
+	return 1;
 }
-void s_chan_kick(Chans *c) {
+int s_chan_kick(char **av, int ac) {
 	CStats *cs;
-	cs = findchanstats(c->name);
+	cs = findchanstats(av[0]);
 	if (cs) {
 		IncreaseKicks(cs);
 		if (cs->maxkicks < cs->maxkickstoday) {
 			cs->maxkicks = cs->maxkickstoday;
 			cs->t_maxkicks = time(NULL);
 		}
-	}		
+	}	
+	return 1;	
 
 }
 
@@ -153,9 +156,11 @@ CStats *AddChanStats(char *name) {
 	return cs;
 }
 
-int s_new_server(Server *s) {
+int s_new_server(char **av, int ac) {
+	Server *s;
 	strcpy(segv_location, "StatServ-s_new_server");
-
+	s = findserver(av[0]);
+	if (!s) return 0;
 	AddStats(s);
 	IncreaseServers();
 	if (stats_network.maxservers < stats_network.servers) {
@@ -172,11 +177,12 @@ int s_new_server(Server *s) {
 
 }
 
-extern int s_del_server(Server *s) {
+int s_del_server(char **av, int ac) {
 	SStats *ss;
-
+	Server *s;
 	strcpy(segv_location, "StatServ-s_del_server");
-
+	s = findserver(av[0]);
+	if (!s) return 0;
 	DecreaseServers();
 	if (StatServ.onchan) notice(s_StatServ, "\2SERVER\2 %s has left the Network at %s", s->name, s->uplink);
 	ss = findstats(s->name);
@@ -187,10 +193,13 @@ extern int s_del_server(Server *s) {
 }
 
 
-extern int s_user_kill(User *u) {
+int s_user_kill(char **av, int ac) {
 	SStats *s;
 	SStats *ss;
 	char *cmd, *who;
+	User *u;
+	u = finduser(av[0]);
+	if (!u) return 0;
 #ifdef DEBUG
 	log(" Server %s", u->server->name);
 #endif
@@ -221,14 +230,15 @@ extern int s_user_kill(User *u) {
 	return 1;
 }
 
-extern int s_user_modes(User *u) {
+int s_user_modes(char **av, int ac) {
 	int add = 1;
 	char *modes;
 	SStats *s;
-
+	User *u;
+	
 	strcpy(segv_location, "StatServ-s_user_modes");
 
-
+	u = finduser(av[0]);
 	if (!u) {
 		log("Changing modes for unknown user: %s", u->nick);
 		return -1;
@@ -275,8 +285,11 @@ void re_init_bot() {
 	notice(s_Services, "Re-Initilizing %s Bot", s_StatServ);
 	init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+oikSdwgle", SSMNAME);
 }
-extern int s_del_user(User *u) {
+int s_del_user(char **av, int ac) {
 	SStats *s;
+	User *u;
+	u = finduser(av[0]);
+	if (!u) return 0;
 
 #ifdef DEBUG
 	log(" Server %s", u->server->name);
@@ -293,15 +306,15 @@ extern int s_del_user(User *u) {
 }
 
 
-extern int s_user_away(User *u) {
+int s_user_away(char **av, int ac) {
+	User *u;
 	strcpy(segv_location, "StatServ-s_user_away");
-
+	u = finduser(av[0]);
+	if (!u) return 0;
 	if (u->is_away) {
-	u->is_away = 1;
 		stats_network.away = stats_network.away +1;
 	} else {
-	u->is_away = 0;
-	stats_network.away = stats_network.away -1;
+		stats_network.away = stats_network.away -1;
 	}
 	return 1;
 
@@ -309,8 +322,11 @@ extern int s_user_away(User *u) {
 
 
 
-extern int s_new_user(User *u) {
+int s_new_user(char **av, int ac) {
 	SStats *s;
+	User *u;
+	u = finduser(av[0]);
+	if (!u) return 0;
 	
 	if (u->server->name == me.name) return 0;
 
@@ -346,11 +362,13 @@ extern int s_new_user(User *u) {
 	return 1;
 }
 
-int pong(Server *s) {
+int pong(char **av, int ac) {
 	SStats *ss;
+	Server *s;
 
 	strcpy(segv_location, "StatServ-pong");
-
+	s = findserver(av[0]);
+	if (!s) return 0;
 
 	/* we don't want negative pings! */
 	if (s->ping < 0) return -1; 
@@ -500,7 +518,7 @@ void Is_Midnight() {
 	if (ltm->tm_hour == 0) {
 		if (ltm->tm_min == 0) {
 			/* its Midnight! */
-			notice(s_StatServ, "Reseting Daily Statistics - Its Midnight here!");
+			chanalert(s_StatServ, "Reseting Daily Statistics - Its Midnight here!");
 			log("Resetting Daily Statistics");
 			daily.servers = stats_network.servers;
 			daily.t_servers = time(NULL);

@@ -114,7 +114,7 @@ RETSIGTYPE serv_die() {
 
 RETSIGTYPE conf_rehash() {
 /*	struct sigaction act; */
-	notice(s_Services, "Recieved SIGHUP, Attempting to Rehash");
+	chanalert(s_Services, "Recieved SIGHUP, Attempting to Rehash");
 	globops(me.name, "Received SIGHUP, Attempted to Rehash");
 /*	act.sa_handler = conf_rehash;
 	act.sa_flags=0;
@@ -136,14 +136,14 @@ RETSIGTYPE serv_segv() {
 		log("Location could be %s", segv_location);
 		log("Unloading Module and restoring stacks");
 		globops(me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
-		notice(s_Services, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
-		notice(s_Services, "Location *could* be %s", segv_location);
+		chanalert(s_Services, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
+		chanalert(s_Services, "Location *could* be %s", segv_location);
 		strcpy(name, segvinmodule);
 		strcpy(segvinmodule, "");
 		unload_module(name, NULL);
-		notice(s_Services, "Restoring Stack to before Crash");
+		chanalert(s_Services, "Restoring Stack to before Crash");
 		longjmp(sigvbuf, -1);
-		notice(s_Services, "Done");
+		chanalert(s_Services, "Done");
 	} else {	
 		/* Thanks to Stskeeps and Unreal for this stuff :) */
 		log("Uh Oh, Segmentation Fault.. Server Terminating");
@@ -151,7 +151,7 @@ RETSIGTYPE serv_segv() {
 		log("Approx Location: %s", segv_location);
 		/* Broadcast it out! */
 		globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
-		notice(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
+		chanalert(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 		globops(me.name,"Dumped Core to netstats.debug, Please Read the Readme file to find out what to do with it!");
 		RemoveLock();		
 		sleep(2);
@@ -314,5 +314,6 @@ void FreeList(char **List,int C)
 int i;
 for (i = 0; i == C; i++) 
 	free(List[i]);
+C = 0;
 }
-                                          
+

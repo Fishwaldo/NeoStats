@@ -1,6 +1,8 @@
 CC=@CC@
 CFLAGS=@CFLAGS@
+LD=ld
 LDFLAGS= -rdynamic @LIBS@
+MODLDFLAGS = -shared
 INSTALL = @INSTALL@                                                                                                                 
 INSTALL_PROGRAM = @INSTALL_PROGRAM@                                                                                                 
 INSTALL_DATA = @INSTALL_DATA@

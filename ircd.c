@@ -437,7 +437,7 @@ void parse(char *line)
 
 		/* if its a message from our own internal bots, silently drop it */
                 if (findbot(origin)) {
-			notice(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", origin, av[0]);
+			chanalert(s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", origin, av[0]);
 			free(av);
 	                return;
 		}
@@ -458,7 +458,7 @@ void parse(char *line)
 
 				/* Check to make sure there are no blank spaces so we dont crash */
 			        if (strlen(av[1]) >= 350) {
-			                privmsg(origin, s_Services, "command line too long!");
+			                prefmsg(origin, s_Services, "command line too long!");
 			                notice (s_Services,"%s tried to send a very LARGE command, we told them to shove it!", origin);
 					free(av);
 			                return;
@@ -474,7 +474,7 @@ void parse(char *line)
 				free(av);
 				return;
 			} else {
-				bot_chan_message(av[0], av, ac);
+				bot_chan_message(origin, av[0], av, ac);
 			}
 		}
         }	
@@ -716,7 +716,7 @@ void Usr_Stats(char *origin, char **argv, int argc) {
 		snumeric_cmd(241, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
 	}
 	snumeric_cmd(219, u->nick, "%s :End of /STATS report", argv[0]);
-	notice(s_Services,"%s Requested Stats %s", u->nick, argv[0]);
+	chanalert(s_Services,"%s Requested Stats %s", u->nick, argv[0]);
 }
 
 void Usr_Version(char *origin, char **argv, int argc) {

@@ -12,7 +12,7 @@ all:	version
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 version: $(OBJECTS)
-	$(CC) -nostdlib -shared -o $(TARGET) $(LIBS) $(OBJECTS)
+	$(LD) $(MODLDGLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
 	/bin/cp $(TARGET) ../
 
 clean:

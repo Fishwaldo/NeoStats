@@ -39,7 +39,7 @@ char s_StatServ[MAXNICK] = "StatServ";
 Module_Info Statserv_Info[] = { {
 	SSMNAME,
 	"Statistical Bot For NeoStats",
-	"3.3"
+	"3.4"
 } };
 
 
@@ -136,6 +136,10 @@ void _init() {
 	hscan_t scan;
 	int count, i;
 	Chans *c;
+	char **av;
+	int ac = 0;
+	char *chan;
+	lnode_t *chanmem;
 
 	strcpy(segv_location, "StatServ-_init");
 	StatServ.onchan = 0;
@@ -146,7 +150,7 @@ void _init() {
 	StatServ.html = 0;
 	if (!config_read("stats.cfg", options) == 0) {
 		log("Error, Statserv could not be configured");
-		notice(s_Services, "Error, Statserv could not be configured");
+		chanalert(s_Services, "Error, Statserv could not be configured");
 		return;
 	}
 	if (StatServ.html) {
@@ -163,17 +167,23 @@ void _init() {
 
 	hash_scan_begin(&scan, sh);
 	while ((node = hash_scan_next(&scan)) != NULL ) {
-   	ss = hnode_get(node);
-	s_new_server(ss);
+	   	ss = hnode_get(node);
+		AddStringToList(&av, ss->name, &ac);
+		s_new_server(av, ac);
+		FreeList(av, ac);
 #ifdef DEBUG
-			log("Added Server %s to StatServ List", ss->name);
+		log("Added Server %s to StatServ List", ss->name);
 #endif
 	}
 	hash_scan_begin(&scan, uh);
 	while ((node = hash_scan_next(&scan)) != NULL ) {
 		u = hnode_get(node);
-		s_new_user(u);
-		s_user_modes(u);
+		ac = 0;
+		AddStringToList(&av, u->nick, &ac);
+		s_new_user(av, ac);
+		AddStringToList(&av, u->modes, &ac);
+		s_user_modes(av, ac);
+		FreeList(av, ac);
 #ifdef DEBUG
 			log("Adduser user %s to StatServ List", u->nick);
 #endif
@@ -182,11 +192,25 @@ void _init() {
 	while ((node = hash_scan_next(&scan)) != NULL ) {
 		c = hnode_get(node);
 		count = list_count(c->chanmembers);
-		for (i = 1; i == count; i++) {
+		chanmem = list_first(c->chanmembers);
+		chan = lnode_get(chanmem);
+		ac = 0;
+		AddStringToList(&av, c->name, &ac);
+		s_chan_new(av, ac);
+		FreeList(av, ac);
+		for (i = 1; i <= count; i++) {
 #ifdef DEBUG
 			log("Chanjoin %s", c->name);
 #endif
-			s_chan_join(c);
+			ac = 0;
+			AddStringToList(&av, c->name, &ac);
+			AddStringToList(&av, chan, &ac);
+			s_chan_join(av, ac);
+			FreeList(av, ac);
+			if (i < count) {
+				chanmem = list_next(c->chanmembers, chanmem);
+				chan = lnode_get(chanmem);
+			}
 		}
 	}
 }
@@ -217,17 +241,17 @@ int __Bot_Message(char *origin, char **av, int ac)
 	log("%s received message from %s: %s", s_StatServ, u->nick, av[1]);
 
 	if (me.onlyopers && UserLevel(u) < 40) {
-		privmsg(u->nick, s_StatServ,
+		prefmsg(u->nick, s_StatServ,
 			"This service is only available to IRCops.");
-		notice(s_StatServ, "%s tried to use me but is not Authorized", u->nick);
+		chanalert(s_StatServ, "%s tried to use me but is not Authorized", u->nick);
 		return -1;
 	}
 
 	if (!strcasecmp(av[1], "HELP")) {
 		if(ac < 3) {
-			notice(s_StatServ, "%s requested %s Help", u->nick, s_StatServ);
+			chanalert(s_StatServ, "%s requested %s Help", u->nick, s_StatServ);
 		} else {
-		  notice(s_StatServ,"%s requested more help from %s on %s",u->nick, s_StatServ, av[2]);
+		  chanalert(s_StatServ,"%s requested more help from %s on %s",u->nick, s_StatServ, av[2]);
 		}
 		if (ac < 3) {
 			privmsg_list(u->nick, s_StatServ, ss_help);
@@ -262,62 +286,62 @@ int __Bot_Message(char *origin, char **av, int ac)
 		else if (!strcasecmp(av[2], "STATS") && UserLevel(u) >= 190)
 			privmsg_list(u->nick, s_StatServ, ss_stats_help);
 		else
-			privmsg(u->nick, s_StatServ, "Unknown Help Topic: \2%s\2", av[2]);
+			prefmsg(u->nick, s_StatServ, "Unknown Help Topic: \2%s\2", av[2]);
 	} else if (!strcasecmp(av[1], "CHAN")) {
 		if (ac < 2) {
 			ss_chans(u, NULL);
 		} else {
 			ss_chans(u, av[2]);
 		}
-		notice(s_StatServ, "%s Wanted to see Channel Statistics", u->nick);
+		chanalert(s_StatServ, "%s Wanted to see Channel Statistics", u->nick);
 	} else if (!strcasecmp(av[1], "SERVER")) {
 		ss_server(u, av[2]);
-		notice(s_StatServ,"%s Wanted Server Information on %s",u->nick, av[2]);
+		chanalert(s_StatServ,"%s Wanted Server Information on %s",u->nick, av[2]);
 	} else if (!strcasecmp(av[1], "JOIN") && (UserLevel(u) >= 185)) {
 		ss_JOIN(u, av[2]);
 	} else if (!strcasecmp(av[1], "MAP")) {
 		ss_map(u);
-		notice(s_StatServ,"%s Wanted to see the Current Network MAP",u->nick);
+		chanalert(s_StatServ,"%s Wanted to see the Current Network MAP",u->nick);
 	} else if (!strcasecmp(av[1], "VERSION")) {
 		ss_version(u);
-		notice(s_StatServ,"%s Wanted to know our version number ",u->nick);
+		chanalert(s_StatServ,"%s Wanted to know our version number ",u->nick);
 	} else if (!strcasecmp(av[1], "NETSTATS")) {
 		ss_netstats(u);
-		notice(s_StatServ,"%s Wanted to see the NetStats ",u->nick);
+		chanalert(s_StatServ,"%s Wanted to see the NetStats ",u->nick);
 	} else if (!strcasecmp(av[1], "DAILY")) {
 		ss_daily(u);
-		notice(s_StatServ,"%s Wanted to see the Daily NetStats ",u->nick);
+		chanalert(s_StatServ,"%s Wanted to see the Daily NetStats ",u->nick);
 	} else if (!strcasecmp(av[1], "FORCEHTML") && (UserLevel(u) >= 185)) {
 		log("%s!%s@%s Forced an update of the NeoStats Statistics HTML file with the most current statistics", u->nick, u->username, u->hostname);
-		notice(s_StatServ,"%s Forced the NeoStats Statistics HTML file to be updated with the most current statistics",u->nick);
+		chanalert(s_StatServ,"%s Forced the NeoStats Statistics HTML file to be updated with the most current statistics",u->nick);
 		ss_html();
 	} else if (!strcasecmp(av[1], "TLD")) {
 		ss_tld(u, av[2]);
-		notice(s_StatServ,"%s Wanted to find the Country that is Represented by %s ",u->nick,av[2]);
+		chanalert(s_StatServ,"%s Wanted to find the Country that is Represented by %s ",u->nick,av[2]);
 	} else if (!strcasecmp(av[1], "TLDMAP")) {
 		ss_tld_map(u);
-		notice(s_StatServ,"%s Wanted to see a Country Breakdown",u->nick);
+		chanalert(s_StatServ,"%s Wanted to see a Country Breakdown",u->nick);
 	} else if (!strcasecmp(av[1], "OPERLIST")) {
 		if (ac < 4) {
-			privmsg(u->nick, s_StatServ, "OperList Syntax Not Valid");
-			privmsg(u->nick, s_StatServ, "For Help: /msg %s HELP OPERLIST", s_StatServ);
+			prefmsg(u->nick, s_StatServ, "OperList Syntax Not Valid");
+			prefmsg(u->nick, s_StatServ, "For Help: /msg %s HELP OPERLIST", s_StatServ);
 		}
 		ss_operlist(u, av[2], av[3]);
 	} else if (!strcasecmp(av[1], "BOTLIST")) {
 		ss_botlist(u);
-		notice(s_StatServ,"%s Wanted to see the Bot List",u->nick);
+		chanalert(s_StatServ,"%s Wanted to see the Bot List",u->nick);
 	} else if (!strcasecmp(av[1], "STATS") && (UserLevel(u) >= 185)) {
 		if (ac < 5) {
-			privmsg(u->nick, s_StatServ, "Incorrect Syntax: /msg %s HELP STATS", s_StatServ);
+			prefmsg(u->nick, s_StatServ, "Incorrect Syntax: /msg %s HELP STATS", s_StatServ);
 		}
 		ss_stats(u, av[2], av[3], av[4]);
-		notice(s_StatServ,"%s Wants to Look at my Stats!! 34/24/34",u->nick);
+		chanalert(s_StatServ,"%s Wants to Look at my Stats!! 34/24/34",u->nick);
 	} else if (!strcasecmp(av[1], "RESET") && (UserLevel(u) >= 185)) {
-		notice(s_StatServ,"%s Wants me to RESET the databases.. here goes..",u->nick);
+		chanalert(s_StatServ,"%s Wants me to RESET the databases.. here goes..",u->nick);
 		ss_reset(u);
 	} else {
-		privmsg(u->nick, s_StatServ, "Unknown Command: \2%s\2", av[1]);
-		notice(s_StatServ,"%s Reqested %s, but that is a Unknown Command",u->nick,av[1]);
+		prefmsg(u->nick, s_StatServ, "Unknown Command: \2%s\2", av[1]);
+		chanalert(s_StatServ,"%s Reqested %s, but that is a Unknown Command",u->nick,av[1]);
 	}
 	return 1;
 }
@@ -355,8 +379,8 @@ static void ss_chans(User *u, char *chan) {
 		} 
 		cn = list_first(Chead);
 		cs = lnode_get(cn);
-		privmsg(u->nick, s_StatServ, "Top10 Online Channels:");
-		privmsg(u->nick, s_StatServ, "======================");
+		prefmsg(u->nick, s_StatServ, "Top10 Online Channels:");
+		prefmsg(u->nick, s_StatServ, "======================");
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(findchan(cs->name)) && (UserLevel(u) < 40)) {
@@ -369,7 +393,7 @@ static void ss_chans(User *u, char *chan) {
 				}
 				continue;
 			}
-			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Members", cs->name, cs->members);
+			prefmsg(u->nick, s_StatServ, "Channel %s -> %ld Members", cs->name, cs->members);
 			cn = list_next(Chead, cn);
 			if (cn) {
 				cs = lnode_get(cn);
@@ -377,7 +401,7 @@ static void ss_chans(User *u, char *chan) {
 				break;
 			}
 		}
-		privmsg(u->nick, s_StatServ, "End of List.");
+		prefmsg(u->nick, s_StatServ, "End of List.");
 	} else if (!strcasecmp(chan, "POP")) {
 		/* they want the top10 Popular Channels (based on joins) */
 		if (!list_is_sorted(Chead, topjoin)) {
@@ -385,8 +409,8 @@ static void ss_chans(User *u, char *chan) {
 		}
 		cn = list_first(Chead);
 		cs = lnode_get(cn);
-		privmsg(u->nick, s_StatServ, "Top10 Channels (Ever):");
-		privmsg(u->nick, s_StatServ, "======================");
+		prefmsg(u->nick, s_StatServ, "Top10 Channels (Ever):");
+		prefmsg(u->nick, s_StatServ, "======================");
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(findchan(cs->name)) && (UserLevel(u) < 40)) {
@@ -399,7 +423,7 @@ static void ss_chans(User *u, char *chan) {
 				}
 				continue;
 			}
-			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Joins", cs->name, cs->totmem);
+			prefmsg(u->nick, s_StatServ, "Channel %s -> %ld Joins", cs->name, cs->totmem);
 			cn = list_next(Chead, cn);
 			if (cn) {
 				cs = lnode_get(cn);
@@ -407,7 +431,7 @@ static void ss_chans(User *u, char *chan) {
 				break;
 			}
 		}
-		privmsg(u->nick, s_StatServ, "End of List.");
+		prefmsg(u->nick, s_StatServ, "End of List.");
 	} else if (!strcasecmp(chan, "KICKS")) {
 		/* they want the top10 most unwelcome channels (based on kicks) */
 		if (!list_is_sorted(Chead, topkick)) {
@@ -415,8 +439,8 @@ static void ss_chans(User *u, char *chan) {
 		}
 		cn = list_first(Chead);
 		cs = lnode_get(cn);
-		privmsg(u->nick, s_StatServ, "Top10 Most un-welcome Channels (Ever):");
-		privmsg(u->nick, s_StatServ, "======================================");
+		prefmsg(u->nick, s_StatServ, "Top10 Most un-welcome Channels (Ever):");
+		prefmsg(u->nick, s_StatServ, "======================================");
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(findchan(cs->name)) && (UserLevel(u) < 40)) {
@@ -429,7 +453,7 @@ static void ss_chans(User *u, char *chan) {
 				}
 				continue;
 			}
-			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Kicks", cs->name, cs->kicks);
+			prefmsg(u->nick, s_StatServ, "Channel %s -> %ld Kicks", cs->name, cs->kicks);
 			cn = list_next(Chead, cn);
 			if (cn) {
 				cs = lnode_get(cn);
@@ -437,7 +461,7 @@ static void ss_chans(User *u, char *chan) {
 				break;
 			}
 		}
-		privmsg(u->nick, s_StatServ, "End of List.");
+		prefmsg(u->nick, s_StatServ, "End of List.");
 	} else if (!strcasecmp(chan, "TOPICS")) {
 		/* they want the top10 most undecisive channels (based on topics) */
 		if (!list_is_sorted(Chead, toptopics)) {
@@ -445,8 +469,8 @@ static void ss_chans(User *u, char *chan) {
 		}
 		cn = list_first(Chead);
 		cs = lnode_get(cn);
-		privmsg(u->nick, s_StatServ, "Top10 Most undecisive Channels (Ever):");
-		privmsg(u->nick, s_StatServ, "======================================");
+		prefmsg(u->nick, s_StatServ, "Top10 Most undecisive Channels (Ever):");
+		prefmsg(u->nick, s_StatServ, "======================================");
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(findchan(cs->name)) && (UserLevel(u) < 40)) {
@@ -459,7 +483,7 @@ static void ss_chans(User *u, char *chan) {
 				}
 				continue;
 			}
-			privmsg(u->nick, s_StatServ, "Channel %s -> %ld Topics", cs->name, cs->topics);
+			prefmsg(u->nick, s_StatServ, "Channel %s -> %ld Topics", cs->name, cs->topics);
 			cn = list_next(Chead, cn);
 			if (cn) {
 				cs = lnode_get(cn);
@@ -467,23 +491,23 @@ static void ss_chans(User *u, char *chan) {
 				break;
 			}
 		}
-		privmsg(u->nick, s_StatServ, "End of List.");
+		prefmsg(u->nick, s_StatServ, "End of List.");
 	} else {
 		cs = findchanstats(chan);
 		if (!cs) {
-			privmsg(u->nick, s_StatServ, "Error, Can't find any information about Channel %s", chan);
+			prefmsg(u->nick, s_StatServ, "Error, Can't find any information about Channel %s", chan);
 			return;
 		}
-		privmsg(u->nick, s_StatServ, "\2Channel Information for %s (%s)\2", chan, (findchan(chan) ? "Online" : "Offline"));
-		privmsg(u->nick, s_StatServ, "Current Members: %ld (Max %ld on %s)", cs->members, cs->maxmems, sftime(cs->t_maxmems));
-		privmsg(u->nick, s_StatServ, "Max Members today: %ld at %s", cs->maxmemtoday, sftime(cs->t_maxmemtoday));
-		privmsg(u->nick, s_StatServ, "Total Number of Channel Joins: %ld", cs->totmem);	
-		privmsg(u->nick, s_StatServ, "Total Member Joins today: %ld (Max %ld on %s)", cs->joinstoday, cs->maxjoins, sftime(cs->t_maxjoins));
-		privmsg(u->nick, s_StatServ, "Total Topic Changes %ld (Today %ld)", cs->topics, cs->topicstoday);
-		privmsg(u->nick, s_StatServ, "Total Kicks: %ld", cs->kicks);
-		privmsg(u->nick, s_StatServ, "Total Kicks today %ld (Max %ld on %s)", cs->maxkickstoday, cs->maxkicks, sftime(cs->t_maxkicks));
+		prefmsg(u->nick, s_StatServ, "\2Channel Information for %s (%s)\2", chan, (findchan(chan) ? "Online" : "Offline"));
+		prefmsg(u->nick, s_StatServ, "Current Members: %ld (Max %ld on %s)", cs->members, cs->maxmems, sftime(cs->t_maxmems));
+		prefmsg(u->nick, s_StatServ, "Max Members today: %ld at %s", cs->maxmemtoday, sftime(cs->t_maxmemtoday));
+		prefmsg(u->nick, s_StatServ, "Total Number of Channel Joins: %ld", cs->totmem);	
+		prefmsg(u->nick, s_StatServ, "Total Member Joins today: %ld (Max %ld on %s)", cs->joinstoday, cs->maxjoins, sftime(cs->t_maxjoins));
+		prefmsg(u->nick, s_StatServ, "Total Topic Changes %ld (Today %ld)", cs->topics, cs->topicstoday);
+		prefmsg(u->nick, s_StatServ, "Total Kicks: %ld", cs->kicks);
+		prefmsg(u->nick, s_StatServ, "Total Kicks today %ld (Max %ld on %s)", cs->maxkickstoday, cs->maxkicks, sftime(cs->t_maxkicks));
 		if (!findchan(chan)) 
-			privmsg(u->nick, s_StatServ, "Channel was last seen at %s", sftime(cs->lastseen));
+			prefmsg(u->nick, s_StatServ, "Channel was last seen at %s", sftime(cs->lastseen));
 	}
 }
 
@@ -493,52 +517,52 @@ static void ss_tld_map(User *u) {
 	strcpy(segv_location, "StatServ-ss_tld_map");
 
 
-	privmsg(u->nick, s_StatServ, "Top Level Domain Statistics:");
+	prefmsg(u->nick, s_StatServ, "Top Level Domain Statistics:");
 	for (t = tldhead; t; t = t->next) {
 		if (t->users != 0)
-			privmsg(u->nick, s_StatServ, "%3s \2%3d\2 (%2.0f%%) -> %s ---> Daily Total: %d", t->tld, t->users, (float)t->users / (float)stats_network.users * 100, t->country, t->daily_users);
+			prefmsg(u->nick, s_StatServ, "%3s \2%3d\2 (%2.0f%%) -> %s ---> Daily Total: %d", t->tld, t->users, (float)t->users / (float)stats_network.users * 100, t->country, t->daily_users);
 	}		
-	privmsg(u->nick, s_StatServ, "End of List");
+	prefmsg(u->nick, s_StatServ, "End of List");
 }	
 
 static void ss_version(User *u)
 {
 	strcpy(segv_location, "StatServ-ss_version");
 
-		privmsg(u->nick, s_StatServ, "\2StatServ Version Information\2");
-		privmsg(u->nick, s_StatServ, "-------------------------------------");
-		privmsg(u->nick, s_StatServ, "StatServ Version: %s Compiled %s at %s", Statserv_Info[0].module_version, version_date, version_time);
-		privmsg(u->nick, s_StatServ, "http://www.neostats.net");
-		privmsg(u->nick, s_StatServ, "-------------------------------------");
-		privmsg(u->nick, s_StatServ, "HTML Stats is: %s", (StatServ.html ? StatServ.htmlpath : "Disabled"));
+		prefmsg(u->nick, s_StatServ, "\2StatServ Version Information\2");
+		prefmsg(u->nick, s_StatServ, "-------------------------------------");
+		prefmsg(u->nick, s_StatServ, "StatServ Version: %s Compiled %s at %s", Statserv_Info[0].module_version, version_date, version_time);
+		prefmsg(u->nick, s_StatServ, "http://www.neostats.net");
+		prefmsg(u->nick, s_StatServ, "-------------------------------------");
+		prefmsg(u->nick, s_StatServ, "HTML Stats is: %s", (StatServ.html ? StatServ.htmlpath : "Disabled"));
 }
 static void ss_netstats(User *u) {
 
 	strcpy(segv_location, "StatServ-ss_netstats");
 
-	privmsg(u->nick, s_StatServ, "Network Statistics:-----");
-	privmsg(u->nick, s_StatServ, "Current Users: %ld", stats_network.users);
-	privmsg(u->nick, s_StatServ, "Maximum Users: %ld [%s]", stats_network.maxusers, sftime(stats_network.t_maxusers));
-	privmsg(u->nick, s_StatServ, "Current Channels %ld", stats_network.chans);
-	privmsg(u->nick, s_StatServ, "Maximum Channels %ld [%s]", stats_network.maxchans, sftime(stats_network.t_chans));
-	privmsg(u->nick, s_StatServ, "Current Opers: %ld", stats_network.opers);
-	privmsg(u->nick, s_StatServ, "Maximum Opers: %ld [%s]", stats_network.maxopers, sftime(stats_network.t_maxopers));
-	privmsg(u->nick, s_StatServ, "Users Set Away: %d", stats_network.away);
-	privmsg(u->nick, s_StatServ, "Current Servers: %d", stats_network.servers);
-	privmsg(u->nick, s_StatServ, "Maximum Servers: %d [%s]", stats_network.maxservers, sftime(stats_network.t_maxservers));
-	privmsg(u->nick, s_StatServ, "--- End of List ---");
+	prefmsg(u->nick, s_StatServ, "Network Statistics:-----");
+	prefmsg(u->nick, s_StatServ, "Current Users: %ld", stats_network.users);
+	prefmsg(u->nick, s_StatServ, "Maximum Users: %ld [%s]", stats_network.maxusers, sftime(stats_network.t_maxusers));
+	prefmsg(u->nick, s_StatServ, "Current Channels %ld", stats_network.chans);
+	prefmsg(u->nick, s_StatServ, "Maximum Channels %ld [%s]", stats_network.maxchans, sftime(stats_network.t_chans));
+	prefmsg(u->nick, s_StatServ, "Current Opers: %ld", stats_network.opers);
+	prefmsg(u->nick, s_StatServ, "Maximum Opers: %ld [%s]", stats_network.maxopers, sftime(stats_network.t_maxopers));
+	prefmsg(u->nick, s_StatServ, "Users Set Away: %d", stats_network.away);
+	prefmsg(u->nick, s_StatServ, "Current Servers: %d", stats_network.servers);
+	prefmsg(u->nick, s_StatServ, "Maximum Servers: %d [%s]", stats_network.maxservers, sftime(stats_network.t_maxservers));
+	prefmsg(u->nick, s_StatServ, "--- End of List ---");
 }
 static void ss_daily(User *u) {
 
 	strcpy(segv_location, "StatServ-ss_daily");
 
-	privmsg(u->nick, s_StatServ, "Daily Network Statistics:");
-	privmsg(u->nick, s_StatServ, "Maximum Servers: %-2d %s", daily.servers, sftime(daily.t_servers));
-	privmsg(u->nick, s_StatServ, "Maximum Users: %-2d %s", daily.users, sftime(daily.t_users));
-	privmsg(u->nick, s_StatServ, "Maximum Chans: %-2d %s", daily.chans, sftime(daily.t_chans));
-	privmsg(u->nick, s_StatServ, "Maximum Opers: %-2d %s", daily.opers, sftime(daily.t_opers));
-	privmsg(u->nick, s_StatServ, "All Daily Statistics are reset at Midnight");
-	privmsg(u->nick, s_StatServ, "End of Information.");
+	prefmsg(u->nick, s_StatServ, "Daily Network Statistics:");
+	prefmsg(u->nick, s_StatServ, "Maximum Servers: %-2d %s", daily.servers, sftime(daily.t_servers));
+	prefmsg(u->nick, s_StatServ, "Maximum Users: %-2d %s", daily.users, sftime(daily.t_users));
+	prefmsg(u->nick, s_StatServ, "Maximum Chans: %-2d %s", daily.chans, sftime(daily.t_chans));
+	prefmsg(u->nick, s_StatServ, "Maximum Opers: %-2d %s", daily.opers, sftime(daily.t_opers));
+	prefmsg(u->nick, s_StatServ, "All Daily Statistics are reset at Midnight");
+	prefmsg(u->nick, s_StatServ, "End of Information.");
 }
 
 static void makemap(char *uplink, User *u, int level) {
@@ -555,7 +579,7 @@ static void makemap(char *uplink, User *u, int level) {
 
 		if ((level == 0) && (strlen(s->uplink) <= 0)) { 
 			/* its the root server */
-			privmsg(u->nick, s_StatServ, "\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]", ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
+			prefmsg(u->nick, s_StatServ, "\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]", ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
 			makemap(s->name, u, level+1);
 		} else if ((level > 0) && !strcasecmp(uplink, s->uplink)) {
 			/* its not the root server */
@@ -563,7 +587,7 @@ static void makemap(char *uplink, User *u, int level) {
 			for (i = 1; i < level; i++) {
 				sprintf(buf, "%s     |", buf);
 			}	
-			privmsg(u->nick, s_StatServ, "%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]", buf, ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
+			prefmsg(u->nick, s_StatServ, "%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]", buf, ss->name, ss->users, ss->maxusers, ss->opers, ss->maxopers, s->ping, ss->highest_ping);
 			makemap(s->name, u, level+1);
 		}
 	}
@@ -572,9 +596,9 @@ static void makemap(char *uplink, User *u, int level) {
 
 static void ss_map(User *u) {
 	strcpy(segv_location, "StatServ-ss_map");
-	privmsg(u->nick, s_StatServ, "%-40s      %-10s %-10s %-10s", "\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2",  "\2[LAG/MAX]\2");
+	prefmsg(u->nick, s_StatServ, "%-40s      %-10s %-10s %-10s", "\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2",  "\2[LAG/MAX]\2");
 	makemap("", u, 0);
-	privmsg(u->nick, s_StatServ, "--- End of Listing ---");
+	prefmsg(u->nick, s_StatServ, "--- End of Listing ---");
 }
 
 static void ss_server(User *u, char *server) {
@@ -588,18 +612,18 @@ static void ss_server(User *u, char *server) {
 
 
 	if (!server) {
-		privmsg(u->nick, s_StatServ, "Error, the Syntax is Incorrect. Please Specify a Server");
-		privmsg(u->nick, s_StatServ, "Server Listing:");
+		prefmsg(u->nick, s_StatServ, "Error, the Syntax is Incorrect. Please Specify a Server");
+		prefmsg(u->nick, s_StatServ, "Server Listing:");
 		hash_scan_begin(&hs, Shead);
 		while ((sn = hash_scan_next(&hs))) {
 			ss = hnode_get(sn);
 			if (findserver(ss->name)) {
-				privmsg(u->nick, s_StatServ, "Server: %s (*)", ss->name);
+				prefmsg(u->nick, s_StatServ, "Server: %s (*)", ss->name);
 			} else {
-				privmsg(u->nick, s_StatServ, "Server: %s",ss->name);
+				prefmsg(u->nick, s_StatServ, "Server: %s",ss->name);
 			}
 		}		
-		privmsg(u->nick, s_StatServ, "***** End of List (* indicates Server is online at the moment) *****");		
+		prefmsg(u->nick, s_StatServ, "***** End of List (* indicates Server is online at the moment) *****");		
 		return;
 	}
 
@@ -608,25 +632,25 @@ static void ss_server(User *u, char *server) {
 	s=findserver(server);
 	if (!ss) {
 		log("Wups, Problem, Cant find Server Statistics for Server %s", server);
-		privmsg(u->nick, s_StatServ, "Internal Error! Please Consult the Log file");
+		prefmsg(u->nick, s_StatServ, "Internal Error! Please Consult the Log file");
 		return;
 	}
-	privmsg(u->nick, s_StatServ, "Statistics for \2%s\2 since %s", ss->name, sftime(ss->starttime));
-	if (!s) privmsg(u->nick, s_StatServ, "Server Last Seen: %s", sftime(ss->lastseen));
-	if (s) privmsg(u->nick, s_StatServ, "Current Users: %-3ld (%2.0f%%)", ss->users, (float)ss->users / (float)stats_network.users * 100);
-	privmsg(u->nick, s_StatServ, "Maximum Users: %-3ld at %s", ss->maxusers, sftime(ss->t_maxusers));
-	if (s) privmsg(u->nick, s_StatServ, "Current Opers: %-3ld", ss->opers);
-	privmsg(u->nick, s_StatServ, "Maximum Opers: %-3ld at %s", ss->maxopers, sftime(ss->t_maxopers));
-	privmsg(u->nick, s_StatServ, "IRCop Kills: %d", ss->operkills);
-	privmsg(u->nick, s_StatServ, "Server Kills: %d", ss->serverkills);
-	privmsg(u->nick, s_StatServ, "Lowest Ping: %-3d at %s", ss->lowest_ping, sftime(ss->t_lowest_ping));
-	privmsg(u->nick, s_StatServ, "Higest Ping: %-3d at %s", ss->highest_ping, sftime(ss->t_highest_ping));
-	if (s) privmsg(u->nick, s_StatServ, "Current Ping: %-3d", s->ping);
+	prefmsg(u->nick, s_StatServ, "Statistics for \2%s\2 since %s", ss->name, sftime(ss->starttime));
+	if (!s) prefmsg(u->nick, s_StatServ, "Server Last Seen: %s", sftime(ss->lastseen));
+	if (s) prefmsg(u->nick, s_StatServ, "Current Users: %-3ld (%2.0f%%)", ss->users, (float)ss->users / (float)stats_network.users * 100);
+	prefmsg(u->nick, s_StatServ, "Maximum Users: %-3ld at %s", ss->maxusers, sftime(ss->t_maxusers));
+	if (s) prefmsg(u->nick, s_StatServ, "Current Opers: %-3ld", ss->opers);
+	prefmsg(u->nick, s_StatServ, "Maximum Opers: %-3ld at %s", ss->maxopers, sftime(ss->t_maxopers));
+	prefmsg(u->nick, s_StatServ, "IRCop Kills: %d", ss->operkills);
+	prefmsg(u->nick, s_StatServ, "Server Kills: %d", ss->serverkills);
+	prefmsg(u->nick, s_StatServ, "Lowest Ping: %-3d at %s", ss->lowest_ping, sftime(ss->t_lowest_ping));
+	prefmsg(u->nick, s_StatServ, "Higest Ping: %-3d at %s", ss->highest_ping, sftime(ss->t_highest_ping));
+	if (s) prefmsg(u->nick, s_StatServ, "Current Ping: %-3d", s->ping);
 	if (ss->numsplits >= 1) 
-		privmsg(u->nick, s_StatServ, "%s has Split from the network %d time%s", ss->name, ss->numsplits, (ss->numsplits == 1) ? "" : "s");
+		prefmsg(u->nick, s_StatServ, "%s has Split from the network %d time%s", ss->name, ss->numsplits, (ss->numsplits == 1) ? "" : "s");
 	else
-		privmsg(u->nick, s_StatServ, "%s has never split from the Network.", ss->name);
-	privmsg(u->nick, s_StatServ, "***** End of Statistics *****");	
+		prefmsg(u->nick, s_StatServ, "%s has never split from the Network.", ss->name);
+	prefmsg(u->nick, s_StatServ, "***** End of Statistics *****");	
 }
 
 static void ss_tld(User *u, char *tld)
@@ -637,8 +661,8 @@ static void ss_tld(User *u, char *tld)
 
 
 	if (!tld) {
-		privmsg(u->nick, s_StatServ, "Syntax: /msg %s TLD <tld>", s_StatServ);
-		privmsg(u->nick, s_StatServ, "For additional help, /msg %s HELP", 
+		prefmsg(u->nick, s_StatServ, "Syntax: /msg %s TLD <tld>", s_StatServ);
+		prefmsg(u->nick, s_StatServ, "For additional help, /msg %s HELP", 
 			s_StatServ);
 		return;
 	}
@@ -651,10 +675,10 @@ static void ss_tld(User *u, char *tld)
 	tmp = findtld(tld);
 
 	if (!tmp)
-		privmsg(u->nick, s_StatServ, "Top Level Domain \2%s\2 does not exist.",
+		prefmsg(u->nick, s_StatServ, "Top Level Domain \2%s\2 does not exist.",
 			tld);
 	else
-		privmsg(u->nick, s_StatServ, "%s", tmp->country);
+		prefmsg(u->nick, s_StatServ, "%s", tmp->country);
 }
 
 static void ss_operlist(User *origuser, char *flags, char *server)
@@ -670,20 +694,20 @@ static void ss_operlist(User *origuser, char *flags, char *server)
 
 
 	if (!flags) {
-		privmsg(origuser->nick, s_StatServ, "On-Line IRCops:");
-		notice (s_StatServ, "%s Requested OperList",origuser->nick);
+		prefmsg(origuser->nick, s_StatServ, "On-Line IRCops:");
+		chanalert (s_StatServ, "%s Requested OperList",origuser->nick);
 	}		
 
 	if (flags && !strcasecmp(flags, "NOAWAY")) {
 		away = 1;
 		flags = NULL;
-		privmsg(origuser->nick, s_StatServ, "On-Line IRCops (Not Away):");
-		notice(s_StatServ,"%s Reqested Operlist of Non-Away Opers",origuser->nick);
+		prefmsg(origuser->nick, s_StatServ, "On-Line IRCops (Not Away):");
+		chanalert(s_StatServ,"%s Reqested Operlist of Non-Away Opers",origuser->nick);
 	}
 	if (!away && flags && strchr(flags, '.')) {
 		server = flags;
-		privmsg(origuser->nick, s_StatServ, "On-Line IRCops on Server %s", server);
-		notice(s_StatServ,"%s Reqested Operlist on Server %s",origuser->nick, server);
+		prefmsg(origuser->nick, s_StatServ, "On-Line IRCops on Server %s", server);
+		chanalert(s_StatServ,"%s Reqested Operlist on Server %s",origuser->nick, server);
 	}
 	hash_scan_begin(&scan, uh);
 	while ((node = hash_scan_next(&scan)) != NULL) {
@@ -698,19 +722,19 @@ static void ss_operlist(User *origuser, char *flags, char *server)
 			if (!server) {
 				if (UserLevel(u) < 40)	continue;
 				j++;
-				privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s %-10d",j, u->nick,u->modes,
+				prefmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s %-10d",j, u->nick,u->modes,
 					u->server->name, tech);
 				continue;
 			} else {
 				if (strcasecmp(server, u->server->name))	continue;
 				if (UserLevel(u) < 40)	continue;
 				j++;
-				privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s %-10d",j, u->nick,u->modes,
+				prefmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s %-10d",j, u->nick,u->modes,
 					u->server->name, tech);
 				continue;
 			}
 	}
-	privmsg(origuser->nick, s_StatServ, "End of Listing.");
+	prefmsg(origuser->nick, s_StatServ, "End of Listing.");
 }
 
 
@@ -723,7 +747,7 @@ static void ss_botlist(User *origuser)
 		strcpy(segv_location, "StatServ-ss_botlist");
 
 
-		privmsg(origuser->nick, s_StatServ, "On-Line Bots:");
+		prefmsg(origuser->nick, s_StatServ, "On-Line Bots:");
 	hash_scan_begin(&scan, uh);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		u = hnode_get(node);
@@ -733,11 +757,11 @@ static void ss_botlist(User *origuser)
 		if ((u->Umode & UMODE_RBOT) || (u->Umode & UMODE_SBOT)) {
 #endif
 					j++;
-						privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %s",j, u->nick, u->server->name);
+						prefmsg(origuser->nick, s_StatServ, "[%2d] %-15s %s",j, u->nick, u->server->name);
 						continue;
 	   		}
 		}	   
-		privmsg(origuser->nick, s_StatServ, "End of Listing.");
+		prefmsg(origuser->nick, s_StatServ, "End of Listing.");
 }
 
 
@@ -752,39 +776,39 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 
 	if (UserLevel(u) < 190) {
 		log("Access Denied (STATS) to %s", u->nick);
-		privmsg(u->nick, s_StatServ, "Access Denied.");
+		prefmsg(u->nick, s_StatServ, "Access Denied.");
 		return;
 	}
 
 	if (!cmd) {
-		privmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS [DEL|LIST|COPY]",
+		prefmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS [DEL|LIST|COPY]",
 			s_StatServ);
-		privmsg(u->nick, s_StatServ, "For additional help, /msg %s HELP",
+		prefmsg(u->nick, s_StatServ, "For additional help, /msg %s HELP",
 			s_StatServ);	
 		return;
 	}
 	if (!strcasecmp(cmd, "LIST")) {
 		int i = 1;
-		privmsg(u->nick, s_StatServ, "Statistics Database:");
+		prefmsg(u->nick, s_StatServ, "Statistics Database:");
 		hash_scan_begin(&hs, Shead);
 		while ((sn = hash_scan_next(&hs))) {
 			st = hnode_get(sn);
-			privmsg(u->nick, s_StatServ, "[%-2d] %s", i, st->name);
+			prefmsg(u->nick, s_StatServ, "[%-2d] %s", i, st->name);
 			i++;
 		}
-		privmsg(u->nick, s_StatServ, "End of List.");
+		prefmsg(u->nick, s_StatServ, "End of List.");
 		log("%s requested STATS LIST.", u->nick);
 	} else if (!strcasecmp(cmd, "DEL")) {
 		if (!arg) {
-			privmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS DEL <name>",
+			prefmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS DEL <name>",
 				s_StatServ);
-			privmsg(u->nick, s_StatServ, "For additonal help, /msg %s HELP",
+			prefmsg(u->nick, s_StatServ, "For additonal help, /msg %s HELP",
 				s_StatServ);
 			return;
 		}
 		st = findstats(arg);
 		if (!st) {
-			privmsg(u->nick, s_StatServ, "%s is not in the database!",
+			prefmsg(u->nick, s_StatServ, "%s is not in the database!",
 				arg);
 			return;
 		}
@@ -795,13 +819,13 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 			hnode_destroy(sn);
 			free(st);
 		}
-		privmsg(u->nick, s_StatServ, "Removed %s from the database.", arg);
+		prefmsg(u->nick, s_StatServ, "Removed %s from the database.", arg);
 		log("%s requested STATS DEL %s", u->nick, arg);
 	} else if (!strcasecmp(cmd, "COPY")) {
 		Server *s;
 
 		if (!arg || !arg2) {
-			privmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS COPY <name> "
+			prefmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS COPY <name> "
 				" <newname>", s_StatServ);
 			return;
 		}
@@ -811,23 +835,23 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 
 		st = findstats(arg);
 		if (!st) {
-			privmsg(u->nick, s_StatServ, "No entry in the database for %s",
+			prefmsg(u->nick, s_StatServ, "No entry in the database for %s",
 				arg);
 			return;
 		}
 		s = findserver(arg);
 		if (s) {
-			privmsg(u->nick, s_StatServ, "Server %s is online!", arg);
+			prefmsg(u->nick, s_StatServ, "Server %s is online!", arg);
 			return;
 		}
 		s = NULL;
 		memcpy(st->name, arg2, sizeof(st->name));
-		privmsg(u->nick, s_StatServ, "Moved database entry for %s to %s",
+		prefmsg(u->nick, s_StatServ, "Moved database entry for %s to %s",
 			arg, arg2);
 		log("%s requested STATS COPY %s -> %s", u->nick, arg, arg2);
 	} else {
-		privmsg(u->nick, s_StatServ, "Invalid Argument.");
-		privmsg(u->nick, s_StatServ, "For help, /msg %s HELP", s_StatServ);
+		prefmsg(u->nick, s_StatServ, "Invalid Argument.");
+		prefmsg(u->nick, s_StatServ, "For help, /msg %s HELP", s_StatServ);
 	}
 }
 
@@ -839,7 +863,7 @@ static void ss_reset(User *u)
 
 		if (UserLevel(u) < 190) {
 				log("Access Denied (RELOAD) to %s", u->nick);
-				privmsg(u->nick, s_StatServ, "Access Denied.");
+				prefmsg(u->nick, s_StatServ, "Access Denied.");
 				return;
 		}
 		remove("data/nstats.db");
@@ -847,7 +871,7 @@ static void ss_reset(User *u)
 		globops(s_StatServ, "%s requested \2RESET\2 databases.", u->nick);
 		log("%s requested RESET.", u->nick);
 		globops(s_StatServ, "Rebuilding Statistics DataBase after RESET...");
-	privmsg(u->nick, s_StatServ, "Databases Reset! I hope you wanted to really do that!");
+	prefmsg(u->nick, s_StatServ, "Databases Reset! I hope you wanted to really do that!");
 }
 
 static void ss_JOIN(User *u, char *chan)
@@ -858,16 +882,16 @@ static void ss_JOIN(User *u, char *chan)
 
 	if (UserLevel(u) < 190) {
 		log("Access Denied (JOIN) to %s", u->nick);
-		privmsg(u->nick, s_StatServ, "Access Denied.");
-		notice(s_StatServ,"%s Requested JOIN, but is not a god!",u->nick);
+		prefmsg(u->nick, s_StatServ, "Access Denied.");
+		chanalert(s_StatServ,"%s Requested JOIN, but is not a god!",u->nick);
 		return;
 	}
 	if (!chan) {
-		privmsg(u->nick, s_StatServ, "Syntax: /msg %s JOIN <chan>",s_StatServ);
+		prefmsg(u->nick, s_StatServ, "Syntax: /msg %s JOIN <chan>",s_StatServ);
 		return;
 	}
 	globops(s_StatServ, "JOINING CHANNEL -\2(%s)\2- Thanks to %s!%s@%s)", chan, u->nick, u->username, u->hostname);
-	privmsg(me.chan, s_StatServ, "%s Asked me to Join %s, So, I'm Leaving %s", u->nick, chan, me.chan);
+	prefmsg(me.chan, s_StatServ, "%s Asked me to Join %s, So, I'm Leaving %s", u->nick, chan, me.chan);
 	spart_cmd(s_StatServ, me.chan);
 	log("%s!%s@%s Asked me to Join %s, I was on %s", u->nick, u->username, u->hostname, chan, me.chan);
 	sjoin_cmd(s_StatServ, chan);

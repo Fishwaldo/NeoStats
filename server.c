@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: server.c,v 1.10 2002/06/21 07:06:13 fishwaldo Exp $
+** $Id: server.c,v 1.11 2002/07/17 05:25:37 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -28,7 +28,7 @@ Server *new_server(char *name)
 
 	if (!hash_verify(sh)) {
 		globops(me.name, "Eeek, Server Table is corrupted! Continuing, but expect a crash");
-		notice(me.name, "Eeek, Server Table is corrupted! Continuing, but expect a crash");
+		chanalert(me.name, "Eeek, Server Table is corrupted! Continuing, but expect a crash");
 		log("Eeek, Server table is corrupted");
 	}	
 	s = calloc(sizeof(Server), 1);

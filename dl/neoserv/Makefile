@@ -11,9 +11,9 @@ all:	neoserv
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-neoserv: $(OBJECTS)
-	$(CC) -nostdlib -shared -o $(TARGET) $(LIBS) $(OBJECTS)
-	/bin/cp $(TARGET) ../
+neoserv: $(OBJECTS) 
+	(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
+	$bin/cp $(TARGET) ../
 
 clean:
 	/bin/rm -rf ../$(TARGET)

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.32 2002/06/21 07:06:14 fishwaldo Exp $
+** $Id: users.c,v 1.33 2002/07/17 05:25:37 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -37,7 +37,7 @@ User *new_user(const char *nick)
 	/* before we add a new user, we check the table */
 	if (!hash_verify(uh)) {
 		globops(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
-		notice(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
+		chanalert(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
 		log("Eeek, Users table is corrupted!");
 	}
 	u = smalloc(sizeof(User));
@@ -148,12 +148,12 @@ void sendcoders(char *message,...)
 #endif
 #ifdef UNREAL
 	if (!me.usesmo) {
-		notice(s_Services, tmp);
+		chanalert(s_Services, tmp);
 	} else {		
 		ssmo_cmd(me.name, "o", tmp);
 	}
 #elif ULTIMATE
-	notice(s_Services, "Debuging: %s", tmp);
+	chanalert(s_Services, "Debuging: %s", tmp);
 #endif
 	va_end (ap);	
 }

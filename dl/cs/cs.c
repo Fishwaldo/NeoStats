@@ -46,7 +46,7 @@ int ConfigCount = 0;
 Module_Info my_info[] = { {
     "ConnectServ",
     "Network Connection & Mode Monitoring Service",
-    "1.3"
+    "1.4"
 } };
 
 int new_m_version(char *origin, char **av, int ac) {
@@ -66,7 +66,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 
     if (!strcasecmp(av[1], "HELP")) {
         if (ac <= 2 && (!(UserLevel(u) >= 185))) {
-            privmsg(u->nick, s_ConnectServ, "Permission Denied, you need to be a TechAdmin or a Network Administrator to do that!");
+            prefmsg(u->nick, s_ConnectServ, "Permission Denied, you need to be a TechAdmin or a Network Administrator to do that!");
             return 1;
         } else if (ac <= 2) {
             privmsg_list(u->nick, s_ConnectServ, cs_help);
@@ -87,7 +87,7 @@ int __Bot_Message(char *origin, char **av, int ac)
                 privmsg_list(u->nick, s_ConnectServ, cs_help_about);
             return 1;        
         } else 
-            privmsg(u->nick, s_ConnectServ, "Unknown Help Topic: \2%s\2", av[2]);
+            prefmsg(u->nick, s_ConnectServ, "Unknown Help Topic: \2%s\2", av[2]);
         }
 	
 	if (!strcasecmp(av[1], "ABOUT")) {
@@ -101,7 +101,7 @@ int __Bot_Message(char *origin, char **av, int ac)
     } else if (!strcasecmp(av[1], "STATUS")) {
                 cs_status(u);
     } else {
-        privmsg(u->nick, s_ConnectServ, "Unknown Command: \2%s\2, perhaps you need some HELP?", av[1]);
+        prefmsg(u->nick, s_ConnectServ, "Unknown Command: \2%s\2, perhaps you need some HELP?", av[1]);
     }
     return 1;
 
@@ -197,7 +197,7 @@ int cs_new_user(char **av, int ac) {
     u = finduser(av[0]);
     /* Print Connection Notice */
     if (sign_watch) {
-    if (is_synced) notice(s_ConnectServ, "\2SIGNON\2 %s (%s@%s) has Signed on at %s", u->nick, u->username, u->hostname, u->server->name);
+    if (is_synced) chanalert(s_ConnectServ, "\2SIGNON\2 %s (%s@%s) has Signed on at %s", u->nick, u->username, u->hostname, u->server->name);
     }
     if (findbot(u->nick)) return 1;
   return 1;
@@ -224,7 +224,7 @@ int cs_del_user(char **av, int ac) {
 		  LocalCount = split_buf(lcl, &Local, 0);
           KillMsg = joinbuf (Local, LocalCount, 7);
 
-		  if (is_synced) notice(s_ConnectServ, "\2LOCAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Local[6], KillMsg);
+		  if (is_synced) chanalert(s_ConnectServ, "\2LOCAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Local[6], KillMsg);
           free(KillMsg);
 		  return 1;
 
@@ -233,7 +233,7 @@ int cs_del_user(char **av, int ac) {
 
     /* Print Disconnection Notice */
     if (sign_watch) {
-        if (is_synced) notice(s_ConnectServ, "\2SIGNOFF\2 %s (%s@%s) has Signed off at %s - %s", u->nick, u->username, u->hostname, u->server->name, QuitMsg);
+        if (is_synced) chanalert(s_ConnectServ, "\2SIGNOFF\2 %s (%s@%s) has Signed off at %s - %s", u->nick, u->username, u->hostname, u->server->name, QuitMsg);
 	}
 	free(QuitMsg);
 
@@ -271,51 +271,51 @@ int cs_user_modes(char **av, int ac) {
             case '-': add = 0;    break;
             case 'N':
                 if (add) {
-                    if (is_synced) notice(s_ConnectServ, "\2NetAdmin\2 %s is Now a Network Administrator (+N)", u->nick);
+                    if (is_synced) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is Now a Network Administrator (+N)", u->nick);
                 } else {
-                    if (is_synced) notice(s_ConnectServ, "\2NetAdmin\2 %s is No Longer a Network Administrator (-N)", u->nick);
+                    if (is_synced) chanalert(s_ConnectServ, "\2NetAdmin\2 %s is No Longer a Network Administrator (-N)", u->nick);
                 }
                 break;
             case 'S':
                 if (add) {
-                    if (is_synced) notice(s_ConnectServ, "\2Services\2 %s is Now a Network Service (+S)", u->nick);
+                    if (is_synced) chanalert(s_ConnectServ, "\2Services\2 %s is Now a Network Service (+S)", u->nick);
                 } else {
-                    if (is_synced) notice(s_ConnectServ, "\2Services\2 %s is No Longer a Network Service (-S)", u->nick);
+                    if (is_synced) chanalert(s_ConnectServ, "\2Services\2 %s is No Longer a Network Service (-S)", u->nick);
                 }
                 break;
             case 'T':
                 if (add) {
-                    if (is_synced) notice(s_ConnectServ, "\2TechAdmin\2 %s is Now a Network Technical Administrator (+T)", u->nick);
+                    if (is_synced) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is Now a Network Technical Administrator (+T)", u->nick);
                 } else {
-                    if (is_synced) notice(s_ConnectServ, "\2TechAdmin\2 %s is No Longer a Network Technical Administrator (-T)", u->nick);
+                    if (is_synced) chanalert(s_ConnectServ, "\2TechAdmin\2 %s is No Longer a Network Technical Administrator (-T)", u->nick);
                 }
                 break;
             case 'A':
                 if (add) {
-                    if (is_synced) notice(s_ConnectServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s (+A)", u->nick, u->server->name);
+                    if (is_synced) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s (+A)", u->nick, u->server->name);
                 } else {
-                    if (is_synced) notice(s_ConnectServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s (-A)", u->nick, u->server->name);
+                    if (is_synced) chanalert(s_ConnectServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s (-A)", u->nick, u->server->name);
                 }
                 break;
             case 'a':
                 if (add) {
-                    if (is_synced) notice(s_ConnectServ, "\2ServicesAdmin\2 %s is Now a Services Administrator (+a)", u->nick);
+                    if (is_synced) chanalert(s_ConnectServ, "\2ServicesAdmin\2 %s is Now a Services Administrator (+a)", u->nick);
                 } else {
-                    if (is_synced) notice(s_ConnectServ, "\2ServicesAdmin\2 %s is No Longer a Services Administrator (-a)", u->nick);
+                    if (is_synced) chanalert(s_ConnectServ, "\2ServicesAdmin\2 %s is No Longer a Services Administrator (-a)", u->nick);
                 }
                 break;
             case 'C':
                 if (add) {
-                    if (is_synced) notice(s_ConnectServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s (+C)", u->nick, u->server->name);
+                    if (is_synced) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s (+C)", u->nick, u->server->name);
                 } else {
-                    if (is_synced) notice(s_ConnectServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s (-C)", u->nick, u->server->name);
+                    if (is_synced) chanalert(s_ConnectServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s (-C)", u->nick, u->server->name);
                 }
                 break;
             case 'B':
                 if (add) {
-                    if (is_synced) notice(s_ConnectServ, "\2Bot\2 %s is Now a Bot (+B)", u->nick);
+                    if (is_synced) chanalert(s_ConnectServ, "\2Bot\2 %s is Now a Bot (+B)", u->nick);
                 } else {
-                    if (is_synced) notice(s_ConnectServ, "\2Bot\2 %s is No Longer a Bot (-B)", u->nick);
+                    if (is_synced) chanalert(s_ConnectServ, "\2Bot\2 %s is No Longer a Bot (-B)", u->nick);
                 }
                 break;
             case 'I':
@@ -327,16 +327,16 @@ int cs_user_modes(char **av, int ac) {
                 break;
             case 'o':
                 if (add) {
-                    if (is_synced) notice(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
+                    if (is_synced) chanalert(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
                 } else {
-                    if (is_synced) notice(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
+                    if (is_synced) chanalert(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
                 }
                 break;
             case 'O':
                 if (add) {
-                    if (is_synced) notice(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
+                    if (is_synced) chanalert(s_ConnectServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
                 } else {
-                    if (is_synced) notice(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
+                    if (is_synced) chanalert(s_ConnectServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
                 }
                 break;
             default: 
@@ -360,9 +360,9 @@ int cs_user_kill(char **av, int ac) {
 
     if (finduser(Kill[2])) {
     /* it was a User who was killed */
-        if (kill_watch) if (is_synced) notice(s_ConnectServ, "\2GLOBAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Kill[0], GlobalMsg);
+        if (kill_watch) if (is_synced) chanalert(s_ConnectServ, "\2GLOBAL KILL\2 %s (%s@%s) was Killed by %s - Reason sighted: \2%s\2", u->nick, u->username, u->hostname, Kill[0], GlobalMsg);
 	} else if (findserver(Kill[2])) {
-        if (kill_watch) if (is_synced) notice(s_ConnectServ, "\2SERVER KILL\2 %s was Killed by the Server %s - Reason sighted: %s", u->nick, Kill[0], GlobalMsg);
+        if (kill_watch) if (is_synced) chanalert(s_ConnectServ, "\2SERVER KILL\2 %s was Killed by the Server %s - Reason sighted: %s", u->nick, Kill[0], GlobalMsg);
     }
     free(GlobalMsg);
 	return 1;
@@ -375,23 +375,23 @@ static void cs_signwatch(User *u)
     /* Approximate Segfault Location */
     strcpy(segv_location, "cs_signwatch");
     if (!(UserLevel(u) >= 185)) {
-        privmsg(u->nick, s_ConnectServ, "Permission Denied, you need to be a TechAdmin or a Network Administrator to do that!");
+        prefmsg(u->nick, s_ConnectServ, "Permission Denied, you need to be a TechAdmin or a Network Administrator to do that!");
         return;
     }
     /* The user has passed the minimum requirements for the ENABLE/DISABLE */
 
     if (!sign_watch) {
         sign_watch = 1;
-        if (is_synced) notice(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated by %s",u->nick);
+        if (is_synced) chanalert(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated by %s",u->nick);
         cslog("%s!%s@%s Activated SIGNON/SIGNOFF WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
-        privmsg(u->nick, s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated");
+        prefmsg(u->nick, s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Activated");
    } else {
         sign_watch = 0;
-        if (is_synced) notice(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated by %s",u->nick);
+        if (is_synced) chanalert(s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated by %s",u->nick);
         cslog("%s!%s@%s Deactivated SIGNON/SIGNOFF WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
-        privmsg(u->nick, s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated");
+        prefmsg(u->nick, s_ConnectServ, "\2SIGNON/SIGNOFF WATCH\2 Deactivated");
     }
 
 }
@@ -403,23 +403,23 @@ static void cs_killwatch(User *u)
     /* Approximate Segfault Location */
     strcpy(segv_location, "cs_killwatch");
     if (!(UserLevel(u) >= 185)) {
-        privmsg(u->nick, s_ConnectServ, "Permission Denied, you need to be a TechAdmin or a Network Administrator to do that!");
+        prefmsg(u->nick, s_ConnectServ, "Permission Denied, you need to be a TechAdmin or a Network Administrator to do that!");
         return;
     }
     /* The user has passed the minimum requirements for the ENABLE/DISABLE */
 
     if (!kill_watch) {
         kill_watch = 1;
-        if (is_synced) notice(s_ConnectServ, "\2KILL WATCH\2 Activated by %s",u->nick);
+        if (is_synced) chanalert(s_ConnectServ, "\2KILL WATCH\2 Activated by %s",u->nick);
         cslog("%s!%s@%s Activated KILL WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
-        privmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 Activated");
+        prefmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 Activated");
    } else {
         kill_watch = 0;
-        if (is_synced) notice(s_ConnectServ, "\2KILL WATCH\2 Deactivated by %s",u->nick);
+        if (is_synced) chanalert(s_ConnectServ, "\2KILL WATCH\2 Deactivated by %s",u->nick);
         cslog("%s!%s@%s Deactivated KILL WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
-        privmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 Deactivated");
+        prefmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 Deactivated");
     }
 
 }
@@ -431,23 +431,23 @@ static void cs_modewatch(User *u)
     /* Approximate Segfault Location */
     strcpy(segv_location, "cs_modewatch");
     if (!(UserLevel(u) >= 185)) {
-        privmsg(u->nick, s_ConnectServ, "Permission Denied, you need to be a TechAdmin or a Network Administrator to do that!");
+        prefmsg(u->nick, s_ConnectServ, "Permission Denied, you need to be a TechAdmin or a Network Administrator to do that!");
         return;
     }
     /* The user has passed the minimum requirements for the ENABLE/DISABLE */
 
     if (!mode_watch) {
         mode_watch = 1;
-        if (is_synced) notice(s_ConnectServ, "\2MODE WATCH\2 Activated by %s",u->nick);
+        if (is_synced) chanalert(s_ConnectServ, "\2MODE WATCH\2 Activated by %s",u->nick);
         cslog("%s!%s@%s Activated MODE WATCH", u->nick, u->username, u->hostname);
         SaveSettings();    
-        privmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 Activated");
+        prefmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 Activated");
    } else {
         mode_watch = 0;
-        if (is_synced) notice(s_ConnectServ, "\2MODE WATCH\2 Deactivated by %s",u->nick);
+        if (is_synced) chanalert(s_ConnectServ, "\2MODE WATCH\2 Deactivated by %s",u->nick);
         cslog("%s!%s@%s Deactivated MODE WATCH", u->nick, u->username, u->hostname);
         SaveSettings();
-        privmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 Deactivated");
+        prefmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 Deactivated");
     }
 
 }
@@ -459,30 +459,30 @@ static void cs_status(User *u)
     /* Approximate Segfault Location */
     strcpy(segv_location, "cs_status");
 
-    privmsg(u->nick, s_ConnectServ, "Current %s Settings:", s_ConnectServ);
+    prefmsg(u->nick, s_ConnectServ, "Current %s Settings:", s_ConnectServ);
 
     /* SIGNWATCH Check */
     if (!sign_watch) {
-        privmsg(u->nick, s_ConnectServ, "\2SIGN WATCH\2 is Not Currently Active");
+        prefmsg(u->nick, s_ConnectServ, "\2SIGN WATCH\2 is Not Currently Active");
     }
     if (sign_watch) {   
-        privmsg(u->nick, s_ConnectServ, "\2SIGN WATCH\2 is Currently Active");
+        prefmsg(u->nick, s_ConnectServ, "\2SIGN WATCH\2 is Currently Active");
     }
 
     /* KILLWATCH Check */
     if (!kill_watch) {
-        privmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 is Not Currently Active");
+        prefmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 is Not Currently Active");
     }
     if (kill_watch) {   
-        privmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 is Currently Active");
+        prefmsg(u->nick, s_ConnectServ, "\2KILL WATCH\2 is Currently Active");
     }
 
     /* MODEWATCH Check */
     if (!mode_watch) {
-        privmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 is Not Currently Active");
+        prefmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 is Not Currently Active");
     }
     if (mode_watch) {   
-        privmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 is Currently Active");
+        prefmsg(u->nick, s_ConnectServ, "\2MODE WATCH\2 is Currently Active");
     }
 
 }
@@ -507,12 +507,12 @@ void Loadconfig()
                                 mode_watch = atoi(Config[1]);
             } else {
                 cslog("%s is not a valid connect.db option!", Config[0]);
-                if (is_synced) notice(s_Services, "%s is not a valid connect.db option! Please check your data/connect.db file!", Config[0]);
+                if (is_synced) chanalert(s_Services, "%s is not a valid connect.db option! Please check your data/connect.db file!", Config[0]);
             }
     }
         fclose(fp);
     } else {
-        if (is_synced) notice(s_Services, "No Database Found! Creating one with Defaults!");
+        if (is_synced) chanalert(s_Services, "No Database Found! Creating one with Defaults!");
         sign_watch=1;
         kill_watch=1;
         mode_watch=1; 

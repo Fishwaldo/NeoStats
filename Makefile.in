@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.19 2002/03/28 16:29:09 fishwaldo Exp $
+# $Id: Makefile.in,v 1.20 2002/07/17 05:25:37 fishwaldo Exp $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
@@ -10,7 +10,7 @@ OBJS =	chans.o dotconf.o services.o main.o sock.o conf.o ircd.o timer.o users.o 
 SRCS =	chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c users.c \
 		ns_help.c dl.c list.c hash.c server.c @IRCD_FILES_SRC@
 
-PROGS = stats chkstats makeconf
+PROGS = neostats chkstats makeconf
 CONF = stats.cfg.dist
 DOCS = doc/FAQ doc/USERMAN README BUGS AUTHORS COPYING INSTALL LICENCE NEWS TODO
 DOCS_PROGS = doc/read-faq doc/read-userman
@@ -21,7 +21,7 @@ INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h Unreal.h
 	$(CC) $(CFLAGS) -c $< 2>> make.log
 
 
-all: 	stats modules
+all: 	neostats modules
 
 modules:
 	(cd dl; $(MAKE) $@)
@@ -29,13 +29,13 @@ modules:
 
 clean:
 	(cd dl; $(MAKE) $@)
-	/bin/rm -rf *.o stats *.cache Makefile config.status config.h Makefile.inc *.log
+	/bin/rm -rf *.o neostats *.cache Makefile config.status config.h Makefile.inc *.log
 
 
-stats: $(OBJS)
+neostats: $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS)  -o $@
 
-install: stats modules
+install: neostats modules
 	$(INSTALL) -m 755 -d @prefix@
 	$(INSTALL) -m 755 -d @prefix@/dl
 	$(INSTALL) -m 755 -d @prefix@/include

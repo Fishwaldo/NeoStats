@@ -2,6 +2,11 @@ StatServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish
+* Version 3.4 * July 17th, 2002(F)
+ - Ported to the new Module Event API
+ - Fixed a bug with getting incorrect channel count and channel member count when loaded as a module after neo has already been running
+ - Why the hell was statserv changing the u->is_away structure. StatServ doesn't and shouldn't do that. Fixed (maybe fixes crazy away count bug?)
+
 * Version 3.3 * May 19th, 2002 (F)
  - added tldmap to statserv output
  - fixed htmlstats to write out straight away, instead of buffer, this fixed overflow problems and random crashes on large networks

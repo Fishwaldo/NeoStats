@@ -13,7 +13,7 @@ all:	statserv
 	$(CC) -c $< $(CFLAGS) $(INCLUDES)
 
 statserv: $(OBJECTS)
-	$(CC) -nostdlib -shared -o $(TARGET) $(LIBS) $(OBJECTS)
+	ld $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
 	/bin/cp $(TARGET) ../
 
 clean:

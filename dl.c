@@ -106,16 +106,16 @@ void list_module_timer(User *u) {
 	hnode_t *tn;
 
 	strcpy(segv_location, "list_module_timer");
-	privmsg(u->nick,s_Services,"Module timer List:");
+	prefmsg(u->nick,s_Services,"Module timer List:");
 	hash_scan_begin(&ts, th);
 	while ((tn = hash_scan_next(&ts)) != NULL) {
 		mod_ptr= hnode_get(tn);
-		privmsg(u->nick,s_Services,"%s:--------------------------------",mod_ptr->modname);
-		privmsg(u->nick,s_Services,"Module Timer Name: %s",mod_ptr->timername);
-		privmsg(u->nick,s_Services,"Module Interval: %d",mod_ptr->interval);
-		privmsg(u->nick,s_Services,"Time till next Run: %d", mod_ptr->interval - (time(NULL) - mod_ptr->lastrun));
+		prefmsg(u->nick,s_Services,"%s:--------------------------------",mod_ptr->modname);
+		prefmsg(u->nick,s_Services,"Module Timer Name: %s",mod_ptr->timername);
+		prefmsg(u->nick,s_Services,"Module Interval: %d",mod_ptr->interval);
+		prefmsg(u->nick,s_Services,"Time till next Run: %d", mod_ptr->interval - (time(NULL) - mod_ptr->lastrun));
 	}
-	privmsg(u->nick,s_Services,"End of Module timer List");
+	prefmsg(u->nick,s_Services,"End of Module timer List");
 }		
 
 static Sock_List *new_sock(char *sock_name)
@@ -193,15 +193,15 @@ void list_sockets(User *u) {
 	hnode_t *sn;
 
 	strcpy(segv_location, "list_sockets");
-	privmsg(u->nick,s_Services,"Sockets List: (%d)", hash_count(sockh));
+	prefmsg(u->nick,s_Services,"Sockets List: (%d)", hash_count(sockh));
 	hash_scan_begin(&ss, sockh);
 	while ((sn = hash_scan_next(&ss)) != NULL) {
 		mod_ptr = hnode_get(sn);
-		privmsg(u->nick,s_Services,"%s:--------------------------------",mod_ptr->modname);
-		privmsg(u->nick,s_Services,"Socket Name: %s",mod_ptr->sockname);
-		privmsg(u->nick,s_Services,"Socket Number: %d",mod_ptr->sock_no);
+		prefmsg(u->nick,s_Services,"%s:--------------------------------",mod_ptr->modname);
+		prefmsg(u->nick,s_Services,"Socket Name: %s",mod_ptr->sockname);
+		prefmsg(u->nick,s_Services,"Socket Number: %d",mod_ptr->sock_no);
 	}
-	privmsg(u->nick,s_Services,"End of Socket List");
+	prefmsg(u->nick,s_Services,"End of Socket List");
 }		
 
 extern void add_bot_to_chan(char *bot, char *chan) {
@@ -209,13 +209,17 @@ extern void add_bot_to_chan(char *bot, char *chan) {
 	Chan_Bot *bc;
 	lnode_t *bmn;	
 	char *botname;
-	printf("addbot\n");
 	cbn = hash_lookup(bch, chan);
 	if (!cbn) {
 		bc = malloc(sizeof(Chan_Bot));
 		bc->chan = sstrdup(chan);
 		bc->bots = list_create(B_TABLE_SIZE);
 		cbn = hnode_create(bc);
+		if (hash_isfull(bch)) {
+			log("eek, bot channel hash is full");
+			return;
+		}
+		hash_insert(bch, cbn, bc->chan);
 	} else {
 		bc = hnode_get(cbn);
 	}
@@ -226,11 +230,6 @@ extern void add_bot_to_chan(char *bot, char *chan) {
 	botname = sstrdup(bot);
 	bmn = lnode_create(botname);
 	list_append(bc->bots, bmn);
-	if (hash_isfull(bch)) {
-		log("eek, bot channel hash is full");
-		return;
-	}
-	hash_insert(bch, cbn, bc->chan);
 	return;
 }
 
@@ -262,7 +261,7 @@ extern void del_bot_from_chan(char *bot, char *chan) {
 	}
 }	
 
-extern void bot_chan_message(char *chan, char **av, int ac) {
+extern void bot_chan_message(char *origin, char *chan, char **av, int ac) {
 	hnode_t *cbn;
 	Chan_Bot *bc;
 	lnode_t *bmn;
@@ -280,7 +279,7 @@ extern void bot_chan_message(char *chan, char **av, int ac) {
 #ifdef DEBUG
 				log("Running Module for Chanmessage %s", chan);
 #endif
-				u->chanfunc(chan, av, ac);
+				u->chanfunc(origin, chan, av, ac);
 		}
 		bmn = list_next(bc->bots, bmn);
 	}
@@ -294,14 +293,14 @@ extern void botchandump(User *u) {
 	hnode_t *hn;
 	lnode_t *ln;
 	Chan_Bot *bc;
-	privmsg(u->nick, s_Services, "BotChanDump:");
+	prefmsg(u->nick, s_Services, "BotChanDump:");
         hash_scan_begin(&hs, bch);
         while ((hn = hash_scan_next(&hs)) != NULL) {
 	        bc = hnode_get(hn);
-	        privmsg(u->nick,s_Services,"%s:--------------------------------",bc->chan);
+	        prefmsg(u->nick,s_Services,"%s:--------------------------------",bc->chan);
 		ln = list_first(bc->bots);
 		while (ln) {
-	        	privmsg(u->nick,s_Services,"Bot Name: %s",lnode_get(ln));
+	        	prefmsg(u->nick,s_Services,"Bot Name: %s",lnode_get(ln));
 			ln = list_next(bc->bots, ln);
 		}
 	}
@@ -322,7 +321,7 @@ static Mod_User *new_bot(char *bot_name)
 	u->chanlist = hash_create(C_TABLE_SIZE, 0, 0);
 	bn = hnode_create(u);
 	if (hash_isfull(bh)) {
-		notice(s_Services, "Warning ModuleBotlist is full");
+		chanalert(s_Services, "Warning ModuleBotlist is full");
 		return NULL;
 	} else {
 		hash_insert(bh, bn, bot_name);
@@ -436,14 +435,14 @@ void list_module_bots(User *u) {
 	hscan_t bs;
 	strcpy(segv_location, "list_module_bots");
 
-	privmsg(u->nick,s_Services,"Module Bot List:");
+	prefmsg(u->nick,s_Services,"Module Bot List:");
 	hash_scan_begin(&bs, bh);
 	while ((bn = hash_scan_next(&bs)) != NULL) {
 		mod_ptr = hnode_get(bn);
-		privmsg(u->nick,s_Services,"Module: %s",mod_ptr->modname);
-		privmsg(u->nick,s_Services,"Module Bots: %s",mod_ptr->nick);
+		prefmsg(u->nick,s_Services,"Module: %s",mod_ptr->modname);
+		prefmsg(u->nick,s_Services,"Module Bots: %s",mod_ptr->nick);
 	}
-	privmsg(u->nick,s_Services,"End of Module Bot List");
+	prefmsg(u->nick,s_Services,"End of Module Bot List");
 }		
 
 
@@ -495,8 +494,8 @@ int load_module(char *path1, User *u) {
 		dl_handle = dlopen(p, RTLD_NOW || RTLD_GLOBAL); 
 	}
 	if (!dl_handle) {
-		if (do_msg) privmsg(u->nick, s_Services, "Error, Couldn't Load Module");
-		if (do_msg) privmsg(u->nick, s_Services, "%s",dlerror());
+		if (do_msg) prefmsg(u->nick, s_Services, "Error, Couldn't Load Module");
+		if (do_msg) prefmsg(u->nick, s_Services, "%s",dlerror());
 		log("Couldn't Load Module: %s", dlerror());
 		return -1;
 	}
@@ -508,8 +507,8 @@ int load_module(char *path1, User *u) {
 #else
         if ((dl_error = dlerror()) != NULL) {
 #endif
-		if (do_msg) privmsg(u->nick, s_Services, "Error, Couldn't Load Module");
-		if (do_msg) privmsg(u->nick, s_Services, "%s",dl_error);
+		if (do_msg) prefmsg(u->nick, s_Services, "Error, Couldn't Load Module");
+		if (do_msg) prefmsg(u->nick, s_Services, "%s",dl_error);
 		log("Couldn't Load Module: %s", dl_error);
 		dlclose(dl_handle);
 		return -1;
@@ -522,8 +521,8 @@ int load_module(char *path1, User *u) {
 #else
         if ((dl_error = dlerror()) != NULL) {
 #endif
-		if (do_msg) privmsg(u->nick, s_Services, "Error, Couldn't Load Module");
-		if (do_msg) privmsg(u->nick, s_Services, "%s",dl_error);
+		if (do_msg) prefmsg(u->nick, s_Services, "Error, Couldn't Load Module");
+		if (do_msg) prefmsg(u->nick, s_Services, "%s",dl_error);
 		log("Couldn't Load Module: %s", dl_error);
 		dlclose(dl_handle);
 		return -1;
@@ -547,7 +546,7 @@ int load_module(char *path1, User *u) {
 	
 	if (hash_lookup(mh, mod_info_ptr->module_name)) {
 			dlclose(dl_handle);
-			if (do_msg) privmsg(u->nick,s_Services,"Module %s already Loaded, Can't Load 2 Copies",mod_info_ptr->module_name);
+			if (do_msg) prefmsg(u->nick,s_Services,"Module %s already Loaded, Can't Load 2 Copies",mod_info_ptr->module_name);
 			free(mod_ptr);
 			return -1;
 	}
@@ -556,8 +555,8 @@ int load_module(char *path1, User *u) {
 
 	mn = hnode_create(mod_ptr);
 	if (hash_isfull(mh)) {
-		if (do_msg) notice(s_Services, "Module List is Full. Can't Load any more modules");	
-		if (do_msg) privmsg(u->nick, s_Services, "Module List is Full, Can't Load any more Modules");
+		if (do_msg) chanalert(s_Services, "Module List is Full. Can't Load any more modules");	
+		if (do_msg) prefmsg(u->nick, s_Services, "Module List is Full, Can't Load any more Modules");
 		dlclose(dl_handle);
 		free(mod_ptr);
 		return -1;
@@ -602,7 +601,7 @@ int load_module(char *path1, User *u) {
 	chmod(lock, fmode);
 	/* End .so Module 555 Permission Setting */
 #endif
-	if (do_msg) privmsg(u->nick,s_Services,"Module %s Loaded, Description: %s",mod_info_ptr->module_name,mod_info_ptr->module_description);
+	if (do_msg) prefmsg(u->nick,s_Services,"Module %s Loaded, Description: %s",mod_info_ptr->module_name,mod_info_ptr->module_description);
 	return 0;
 
 
@@ -633,10 +632,10 @@ void list_module(User *u) {
 	hash_scan_begin(&hs, mh);
 	while ((mn = hash_scan_next(&hs)) != NULL) {
 		mod_ptr=hnode_get(mn);
-		privmsg(u->nick,s_Services,"Module: %s (%s)",mod_ptr->info->module_name, mod_ptr->info->module_version);
-		privmsg(u->nick,s_Services,"Module Description: %s",mod_ptr->info->module_description);
+		prefmsg(u->nick,s_Services,"Module: %s (%s)",mod_ptr->info->module_name, mod_ptr->info->module_version);
+		prefmsg(u->nick,s_Services,"Module Description: %s",mod_ptr->info->module_description);
 	}
-	privmsg(u->nick,s_Services,"End of Module List");
+	prefmsg(u->nick,s_Services,"End of Module List");
 }		
 
 int unload_module(char *module_name, User *u) {
@@ -661,13 +660,13 @@ int unload_module(char *module_name, User *u) {
 
 	strcpy(segv_location, "unload_module");
 	/* Check to see if this Module has any timers registered....  */
-	notice(s_Services, "Unloading Module %s", module_name);
+	chanalert(s_Services, "Unloading Module %s", module_name);
 
 	hash_scan_begin(&hscan, th);
 	while ((modnode = hash_scan_next(&hscan)) != NULL) {
 		mod_tmr = hnode_get(modnode);
 		if (!strcasecmp(mod_tmr->modname, module_name)) {
-			notice(s_Services, "Module %s has timer %s Registered. Deleting..", module_name, mod_tmr->timername);
+			chanalert(s_Services, "Module %s has timer %s Registered. Deleting..", module_name, mod_tmr->timername);
 			del_mod_timer(mod_tmr->timername);
 		}
 	}
@@ -686,7 +685,7 @@ int unload_module(char *module_name, User *u) {
 	while ((modnode = hash_scan_next(&hscan)) != NULL) {
 		mod_ptr = hnode_get(modnode);
 		if (!strcasecmp(mod_ptr->modname, module_name)) {
-			notice(s_Services,"Module %s had bot %s Registered. Deleting..",module_name,mod_ptr->nick);
+			chanalert(s_Services,"Module %s had bot %s Registered. Deleting..",module_name,mod_ptr->nick);
 			del_bot(mod_ptr->nick, "Module Unloaded");
 		}
 	}
@@ -734,8 +733,8 @@ int unload_module(char *module_name, User *u) {
 		return 1;
 	} else {
 		if (u) {
-			privmsg(u->nick,s_Services,"Couldn't Find Module  %s Loaded, Try /msg %s modlist",module_name,s_Services);
-			notice(s_Services,"%s tried to Unload %s but its not loaded",u->nick,module_name);
+			prefmsg(u->nick,s_Services,"Couldn't Find Module  %s Loaded, Try /msg %s modlist",module_name,s_Services);
+			chanalert(s_Services,"%s tried to Unload %s but its not loaded",u->nick,module_name);
 		}
 	}
 	return -1;

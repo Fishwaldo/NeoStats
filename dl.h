@@ -43,7 +43,7 @@ struct mod_user_list {
 	char *nick;
 	char *modname;
 	int (*function)(char *origin, char **av, int ac);
-	int (*chanfunc)(char *chan, char **av, int ac);
+	int (*chanfunc)(char *origin, char *chan, char **av, int ac);
 	hash_t *chanlist;
 };
 
@@ -114,4 +114,6 @@ extern Mod_User *findbot(char *);
 extern int get_dl_handle(char *mod_name);
 extern void add_bot_to_chan(char *, char *);
 extern void del_bot_from_chan(char *, char *);
+extern void bot_chan_message(char *origin, char *chan, char **av, int ac);
+extern void botchandump(User *u);
 #endif /* !_dl_h_ */

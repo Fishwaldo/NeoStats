@@ -52,13 +52,13 @@ void ss_html() {
 	}
 	if (!tpl) {
 		log("can't open StatServ HTML template");
-		notice(s_StatServ, "Can't Open StatServ HTML Template");
+		chanalert(s_StatServ, "Can't Open StatServ HTML Template");
 		return;
 	}
 	opf = fopen(StatServ.htmlpath, "w");
 	if (!opf) {
 		log("Can't open StatServ HTML output file - Check Permissions");
-		notice(s_StatServ, "Can't open StatServ HTML output file - Check Permissions");
+		chanalert(s_StatServ, "Can't open StatServ HTML output file - Check Permissions");
 		return;
 	}
 	buf = malloc(STARTBUFSIZE*2);

@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.17 2002/05/13 22:15:52 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.18 2002/07/17 05:25:37 fishwaldo Exp $
  */
 
 
@@ -419,7 +419,7 @@ Oper_Modes usr_mds[27];
 
 /* function declarations */
 extern void init_ircd();
-extern void notice(char *,char *, ...);
+extern void chanalert(char *,char *, ...);
 extern int sserver_cmd(const char *, const int numeric, const char *);
 extern int slogin_cmd(const char *, const int numeric, const char *, const char *);
 extern int ssquit_cmd(const char *);

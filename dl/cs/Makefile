@@ -12,7 +12,7 @@ all:	cs
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 cs: $(OBJECTS)
-	$(CC) -nostdlib -shared -o $(TARGET) $(LIBS) $(OBJECTS)
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
 	/bin/cp $(TARGET) ../
 
 clean:
