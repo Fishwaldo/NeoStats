@@ -88,12 +88,15 @@ close_logs ()
 	hash_scan_begin (&hs, logs);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
 		logentry = hnode_get (hn);
-		fflush (logentry->logfile);
 		logentry->flush = 0;
 #ifdef DEBUG
 		printf ("Closing Logfile %s (%s)\n", logentry->name, (char *) hnode_getkey (hn));
 #endif
-		fclose (logentry->logfile);
+		if(logentry->logfile)
+		{
+			fflush (logentry->logfile);
+			fclose (logentry->logfile);
+		}
 		hash_scan_delete (logs, hn);
 		hnode_destroy (hn);
 		free (logentry);
