@@ -313,7 +313,9 @@ char *get_tldmap() {
 	TLD *t;
 	sprintf(tmpbuf, "<table border = 0><tr><th>tld</th><th>Country</th><th>Current Users</th><th>Daily Total</th></tr>");
 	for (t = tldhead; t; t = t->next) {
-		sprintf(tmpbuf, "%s\n<tr><td>%s</td><td>%s</td><td>%3d</td><td>%3d</td></tr>", tmpbuf, t->tld, t->country, t->users, t->daily_users);
+		if (t->users <= 0) {
+			sprintf(tmpbuf, "%s\n<tr><td>%s</td><td>%s</td><td>%3d</td><td>%3d</td></tr>", tmpbuf, t->tld, t->country, t->users, t->daily_users);
+		}
 	}
 	sprintf(tmpbuf, "%s</table>", tmpbuf);
 	return tmpbuf;
