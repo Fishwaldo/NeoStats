@@ -638,6 +638,11 @@ static int hs_add(User * u, char **av, int ac)
 		}
 	}
 
+	if(validate_host (h) == NS_FAILURE) {
+		prefmsg(u->nick, s_HostServ,
+			"%s is an invalid host", h);
+		return 1;
+	}
 
 	if (!list_find(vhosts, cmd, findnick)) {
 		hsdat(cmd, m, h, p, u->nick);
