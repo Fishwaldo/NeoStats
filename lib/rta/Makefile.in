@@ -154,6 +154,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 noinst_LIBRARIES = librtadb.a
+noinst_HEADERS = do_sql.h parse.tab.h rta.h
 librtadb_a_SOURCES = parse.tab.c token.l api.c do_sql.c rtatables.c 
 AM_CFLAGS = -I../pcre -I../adns -I../curl 
 LINK = @echo "Linking $@"; $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -186,7 +187,9 @@ CCLD = $(CC)
 LEXCOMPILE = $(LEX) $(LFLAGS) $(AM_LFLAGS)
 LTLEXCOMPILE = $(LIBTOOL) --mode=compile $(LEX) $(LFLAGS) $(AM_LFLAGS)
 DIST_SOURCES = $(librtadb_a_SOURCES)
-DIST_COMMON = README $(srcdir)/Makefile.in \
+HEADERS = $(noinst_HEADERS)
+
+DIST_COMMON = README $(noinst_HEADERS) $(srcdir)/Makefile.in \
 	$(top_srcdir)/autotools/rules.mk Makefile.am token.c
 SOURCES = $(librtadb_a_SOURCES)
 
@@ -322,7 +325,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LIBRARIES) $(HEADERS)
 
 installdirs:
 install: install-am

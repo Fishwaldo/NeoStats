@@ -158,6 +158,7 @@ noinst_PROGRAMS = dftables
 libpcre_la_SOURCES = chartables.c get.c pcre.c study.c internal.h pcre.h
 dftables_SOURCES = dftables.c internal.h pcre.h
 dftables_DEPENDENCES = maketables.c
+noinst_HEADERS = maketables.c
 
 include_HEADERS = pcre.h
 
@@ -197,10 +198,11 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
 	$(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 DIST_SOURCES = $(libpcre_la_SOURCES) $(dftables_SOURCES)
-HEADERS = $(include_HEADERS)
+HEADERS = $(include_HEADERS) $(noinst_HEADERS)
 
-DIST_COMMON = README $(include_HEADERS) $(srcdir)/Makefile.in \
-	$(top_srcdir)/autotools/rules.mk COPYING Makefile.am
+DIST_COMMON = README $(include_HEADERS) $(noinst_HEADERS) \
+	$(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk COPYING \
+	Makefile.am
 SOURCES = $(libpcre_la_SOURCES) $(dftables_SOURCES)
 
 all: all-am
