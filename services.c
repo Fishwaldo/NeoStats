@@ -118,6 +118,10 @@ init_services(void)
 static int
 ns_exclude (User *u, char **av, int ac) 
 {
+	if (ac < 3) {
+		prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);
+		return NS_FAILURE;
+	}
 	if (!ircstrcasecmp(av[2], "ADD")) {
 		if (ac < 5) {
 			prefmsg(u->nick, s_Services, "Invalid Syntax. /msg %s help exclude", s_Services);

@@ -26,7 +26,7 @@
 #include "stats.h"
 #include "ircd.h"
 #include "sock.h"
-#include "viagra.h"
+#include "Viagra.h"
 #include "dl.h"
 #include "log.h"
 #include "server.h"
