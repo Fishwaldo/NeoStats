@@ -209,6 +209,14 @@ const char* inttobase64(char* buf, unsigned int v, unsigned int count)
 	return buf;
 }
 
+/* server
+inttobase64(cli_yxx(c), numeric, 2) */
+
+/* nick
+inttobase64(cli_yxx(cptr), last_nn, 3) */
+
+
+
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
@@ -218,9 +226,8 @@ send_server (const char *sender, const char *name, const int numeric, const char
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
-	send_cmd ("%s %s :TS", MSG_PASS, pass);
-	send_cmd ("CAPAB :TS EX CHW IE KLN GLN KNOCK HOPS HUB AOPS MX");
-	send_cmd ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
+	send_cmd ("%s %s", MSG_PASS, pass);
+    send_cmd ("%s %s 1 0 %lu P10 %cD] :[%s] %s\n", MSG_SERVER, name, (unsigned long)time(NULL), convert2y[numeric], name,  infoline);
 }
 
 void

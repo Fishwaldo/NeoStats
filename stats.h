@@ -175,6 +175,8 @@
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
 #define MAXCMDSIZE		15
 #define MAXINFO			128
+#define B64SIZE			16
+
 
 /* MAXCHANLIST
  * the max length a string can be that holds channel lists 
@@ -324,6 +326,7 @@ extern const char version_date[], version_time[];
  */
 typedef struct Server {
 	char name[MAXHOST];
+	char name64[B64SIZE];
 	int hops;
 	int numeric;
 	time_t connected_since;
@@ -339,6 +342,7 @@ typedef struct Server {
  */
 struct me {
 	char name[MAXHOST];
+	char nameb64[B64SIZE];
 	int port;
 	int r_time;
 	int numeric; /* For Unreal and any other server that needs a numeric */
@@ -388,6 +392,7 @@ struct me {
  */
 typedef struct User {
 	char nick[MAXNICK];
+	char nick64[B64SIZE];
 	char hostname[MAXHOST];
 	char username[MAXUSER];
 	char realname[MAXREALNAME];
@@ -413,6 +418,7 @@ typedef struct User {
  */
 typedef struct Chans {
 	char name[CHANLEN];
+	char name64[B64SIZE];
 	long cur_users;
 	long modes;
 	list_t *chanmembers;
