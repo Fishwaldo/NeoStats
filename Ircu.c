@@ -310,7 +310,7 @@ Usr_Admin (char *origin, char **argv, int argc, int srv)
 static void
 Usr_Server (char *origin, char **argv, int argc, int srv)
 {
-	AddServer (argv[0], origin, atoi (argv[1]), NULL);
+	AddServer (argv[0], origin, argv[1], NULL);
 }
 
 static void
@@ -377,7 +377,7 @@ Usr_Topic (char *origin, char **argv, int argc, int srv)
 	char *buf;
 
 	buf = joinbuf (argv, argc, 2);
-	ChanTopic (origin, argv[0], me.now, buf);
+	ChanTopic (origin, argv[0], NULL, buf);
 	free (buf);
 }
 
@@ -417,9 +417,9 @@ static void
 Srv_Server (char *origin, char **argv, int argc, int srv)
 {
 	if (*origin == 0) {
-		me.s = AddServer (argv[0], me.name, atoi (argv[1]), NULL);
+		me.s = AddServer (argv[0], me.name, argv[1], NULL);
 	} else {
-		me.s = AddServer (argv[0], origin, atoi (argv[1]), NULL);
+		me.s = AddServer (argv[0], origin, argv[1], NULL);
 	}
 }
 

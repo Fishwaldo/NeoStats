@@ -57,15 +57,16 @@ new_server (const char *name)
 }
 
 Server *
-AddServer (const char *name, const char *uplink, const int hops, const char *infoline)
+AddServer (const char *name, const char *uplink, const char* hops, const char *infoline)
 {
 	Server *s;
 	char **av;
 	int ac = 0;
+	int nhops;
 
 	nlog (LOG_DEBUG1, LOG_CORE, "New Server: %s", name);
 	s = new_server (name);
-	s->hops = hops;
+	s->hops = atoi (hops);
 	s->connected_since = me.now;
 	if (uplink) {
 		strlcpy (s->uplink, uplink, MAXHOST);
@@ -83,9 +84,8 @@ AddServer (const char *name, const char *uplink, const int hops, const char *inf
 	/* run the module event for a new server. */
 	AddStringToList (&av, s->name, &ac);
 	AddStringToList (&av, (char*)uplink, &ac);
-/*	Work in progress
     AddStringToList (&av, (char*)hops, &ac);
-	AddStringToList (&av, (char*)infoline, &ac);*/
+	AddStringToList (&av, s->infoline, &ac);
 	ModuleEvent (EVENT_SERVER, av, ac);
 	free (av);
 	return(s);

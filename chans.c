@@ -76,17 +76,24 @@ SetChanTS (Chans * c, time_t tstime)
 */
 
 void
-ChanTopic (const char *owner, const char* chan, time_t time, const char *topic)
+ChanTopic (const char *owner, const char* chan, const char* ts, const char *topic)
 {
 	char **av;
 	int ac = 0;
 	Chans *c;
+	time_t time;
 
 	c = findchan (chan);
 	if (!c) {
 		nlog (LOG_WARNING, LOG_CORE, "ChanTopic: can't find channel %s", chan);
 		return;
 	}
+	if(ts) {
+		time = atoi (ts);
+	} else {
+		time = me.now;
+	}
+
 	if(topic) {
 		strlcpy (c->topic, topic, BUFSIZE);
 	} else {

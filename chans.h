@@ -29,7 +29,7 @@ void part_chan (User * u, const char *chan, char *);
 void join_chan (const char* nick, const char *chan);
 void ChanNickChange (Chans * c, const char *newnick, const char *oldnick);
 int ChanMode (char *origin, char **av, int ac);
-void ChanTopic (const char *owner, const char* chan, time_t time, const char *topic);
+void ChanTopic (const char *owner, const char* chan, const char* ts, const char *topic);
 void ChanUserMode (const char* chan, const char* nick, int add, long mode);
 void kick_chan (const char *chan, const char *kicked, const char *kickby, char *);
 void SetChanTS (Chans * c, time_t tstime);

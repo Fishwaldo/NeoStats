@@ -356,7 +356,7 @@ Usr_Credits (char *origin, char **argv, int argc, int srv)
 static void
 Usr_Server (char *origin, char **argv, int argc, int srv)
 {
-	AddServer (argv[0], origin, atoi (argv[1]), NULL);
+	AddServer (argv[0], origin, argv[1], NULL);
 }
 
 static void
@@ -432,11 +432,11 @@ Usr_Topic (char *origin, char **argv, int argc, int srv)
 	*/	
 	if (finduser(origin)) {
 		buf = joinbuf (argv, argc, 1);
-		ChanTopic (origin, argv[0], me.now, buf);
+		ChanTopic (origin, argv[0], NULL, buf);
 		free (buf);
 	} else if (findserver(origin)) {
 		buf = joinbuf (argv, argc, 3);
-		ChanTopic (argv[1], argv[0], atoi(argv[2]), buf);
+		ChanTopic (argv[1], argv[0], argv[2], buf);
 		free (buf);
 	} else {
 		nlog(LOG_WARNING, LOG_CORE, "Usr_Topic: can't find topic setter %s for topic %s", origin, argv[1]); 
@@ -485,9 +485,9 @@ static void
 Srv_Server (char *origin, char **argv, int argc, int srv)
 {
 	if (*origin == 0) {
-		me.s = AddServer (argv[0], me.name, atoi (argv[1]), NULL);
+		me.s = AddServer (argv[0], me.name, argv[1], NULL);
 	} else {
-		me.s = AddServer (argv[0], origin, atoi (argv[1]), NULL);
+		me.s = AddServer (argv[0], origin, argv[1], NULL);
 	}
 }
 

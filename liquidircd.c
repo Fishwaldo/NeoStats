@@ -40,7 +40,7 @@ static void Usr_Server (char *origin, char **argv, int argc, int srv);
 static void Usr_Squit (char *origin, char **argv, int argc, int srv);
 static void Usr_Quit (char *origin, char **argv, int argc, int srv);
 static void Usr_Mode (char *origin, char **argv, int argc, int srv);
-static void Usr_Smode (char *origin, char **argv, int argc, int srv);
+static void Usr_Svsmode (char *origin, char **argv, int argc, int srv);
 static void Usr_Kill (char *origin, char **argv, int argc, int srv);
 static void Usr_Pong (char *origin, char **argv, int argc, int srv);
 static void Usr_Away (char *origin, char **argv, int argc, int srv);
@@ -81,7 +81,7 @@ IrcdCommands cmd_list[] = {
 	{MSG_SQUIT, Usr_Squit, 1, 0},
 	{MSG_QUIT, Usr_Quit, 1, 0},
 	{MSG_MODE, Usr_Mode, 1, 0},
-	{MSG_SVSMODE, Usr_Smode, 1, 0},
+	{MSG_SVSMODE, Usr_Svsmode, 1, 0},
 	{MSG_KILL, Usr_Kill, 1, 0},
 	{MSG_PONG, Usr_Pong, 1, 0},
 	{MSG_AWAY, Usr_Away, 1, 0},
@@ -401,7 +401,7 @@ Usr_Admin (char *origin, char **argv, int argc, int srv)
 static void
 Usr_Server (char *origin, char **argv, int argc, int srv)
 {
-	AddServer (argv[0], origin, atoi (argv[1]), NULL);
+	AddServer (argv[0], origin, argv[1], NULL);
 }
 
 static void
@@ -423,7 +423,7 @@ Usr_Quit (char *origin, char **argv, int argc, int srv)
 }
 
 static void
-Usr_Smode (char *origin, char **argv, int argc, int srv)
+Usr_Svsmode (char *origin, char **argv, int argc, int srv)
 {
 	if (!strchr (argv[0], '#')) {
 		/* its user svsmode change */
@@ -484,7 +484,7 @@ Usr_Topic (char *origin, char **argv, int argc, int srv)
 	char *buf;
 
 	buf = joinbuf (argv, argc, 3);
-	ChanTopic (argv[1], argv[0], atoi (argv[2]), buf);
+	ChanTopic (argv[1], argv[0], argv[2], buf);
 	free (buf);
 }
 
@@ -534,9 +534,9 @@ static void
 Srv_Server (char *origin, char **argv, int argc, int srv)
 {
 	if (*origin == 0) {
-		me.s = AddServer (argv[0], me.name, atoi (argv[1]), NULL);
+		me.s = AddServer (argv[0], me.name, argv[1], NULL);
 	} else {
-		me.s = AddServer (argv[0], origin, atoi (argv[1]), NULL);
+		me.s = AddServer (argv[0], origin, argv[1], NULL);
 	}
 }
 
