@@ -7,7 +7,5 @@ or modtimerlist entries do not work.
 not show the reloaded module) (Could be due to
 hash code, which I'm doing right now 28.2.2002)
 
-User/Bot code is Case sensitive at the moment.
-eg, finduser, findbot so on are case sensitive. Have to fix this up :)
 
 Raw mode strips the first char sent out
