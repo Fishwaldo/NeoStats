@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -28,53 +28,78 @@
  * events should be tokenised to improve performance
  */
 
-/*  ONLINE parameters are:
+/*  ONLINE is called when NeoStats connects to the Network. 
+ *  Can be used to init bots, and so on. 
+ *  ONLINE parameters are:
  *	server connected to
  */
 #define EVENT_ONLINE	    "ONLINE"
-/*  SIGNON parameters are:
+/*  SIGNON is called when a new user signs onto the network. the user 
+ *  structure User is passed as a parameter, so you can see who signed on.
+ *  SIGNON parameters are:
  *	user nick
  */
 #define EVENT_SIGNON		"SIGNON"
-/*  SIGNOFF parameters are:
+/*  SIGNOFF is called when a user quits the network. The user structure 
+ *  User is passed as a parameter, so you can see who signed off.
+ *  SIGNOFF parameters are:
  *	user nick
  */
 #define EVENT_SIGNOFF		"SIGNOFF"
-/*  KILL parameters are:
+/*  KILL is called when a user is killed on the network. the user 
+ *  structure User is passed as a parameter, so you can see who
+ *  was killed (You would have to use the recbuf global 
+ *  variable to see who killed them though)
+ *  KILL parameters are:
  *	user nick
  */
 #define EVENT_KILL			"KILL"
-/*  BOTKILL parameters are:
+/*  BOTKILL	is called if one of the NeoStats bots gets killed. You would 
+ *  use it to reinitialize the bot.
+ *  BOTKILL parameters are:
  *	
  */
 #define EVENT_BOTKILL		"BOTKILL"
-/*  NEWSERVER parameters are:
+/*  NEWSERVER is called when a server connects to the network. the server 
+ *  structure Server is passed as a parameter so you can see 
+ *  details about the new server
+ *  NEWSERVER parameters are:
  *	server name
  */
 #define EVENT_NEWSERVER		"NEWSERVER"
-/*  DELSERVER parameters are:
+/*  DELSERVER is called when a server leaves the network. 
+ *  DELSERVER parameters are:
  *	
  */
 #define EVENT_DELSERVER		"DELSERVER"
-/*  SQUIT parameters are:
+/*  SQUIT is called when a server squits the network 
+ *           (ED: what's the diff with above?)
+ *  SQUIT parameters are:
  *	server name
  */
 #define EVENT_SQUIT			"SQUIT"
-/*  NETINFO parameters are:
+/*  NETINFO	is called when the connection to the network is synced. 
+ *  NETINFO parameters are:
  *	none
  */
 #define EVENT_NETINFO		"NETINFO"
-/*  UMODE parameters are:
+/*  UMODE is called when a user changes Umodes. (e.g., /mode +o fish) 
+ *  the user structure User is passed as a parameter.
+ *  UMODE parameters are:
  *	user nick
  *	mode string
  */
 #define EVENT_UMODE			"UMODE"
-/*  SMODE parameters are:
+/*  SMODE is called when a user changes Smodes.
+ *  the user structure User is passed as a parameter.
+ *  SMODE parameters are:
  *	user nick
  *	mode string
  */
 #define EVENT_SMODE			"SMODE"
-/*  NICKCHANGE parameters are:
+/*  NICKCHANGE is called when a user changes nick
+ *  the user structure User is passed as a parameter.
+ *  NICKCHANGE parameters are:
  *	old nick
  *	new nick
  */

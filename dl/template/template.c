@@ -1,10 +1,8 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
-**
-**  Portions Copyright (c) 1999 Johnathan George net@lite.net
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -37,7 +35,7 @@
 /** 
  * A string to hold the name of our bot
  */
-char *s_module_bot_name;
+char s_module_bot_name[MAXNICK];
 
 /** Module Info definition 
  * version information about our module
@@ -88,13 +86,20 @@ int __ChanMessage(char *origin, char **argv, int argc)
 }
 
 /** Bot message processing
- * What do we do with messages sent to our bot with /mag
- * This is required if you want your module to respond to /msg
+ *  What do we do with messages sent to our bot with /msg
+ *  This is required if you want your module to respond to /msg
+ *  Parameters:
+ *      origin - who sent the message to you. It could be a user nickname 
+ *               or could be a server message
+ *      argv[0] - Your bot name;
+ *      argv[1] .. argv[argc] - the parameters sent in the message
+ *      argc - The count of arguments received
  */
 int __BotMessage(char *origin, char **argv, int argc)
 {
 	User *u;
 	char *buf;
+
 	u = finduser(origin);
 	if (!u) {
 		nlog(LOG_WARNING, LOG_CORE, "Unable to find user %s ", origin);
@@ -138,7 +143,7 @@ EventFnList __module_events[] = {
  */
 int __ModInit(int modnum, int apiver)
 {
-	s_module_bot_name = "TemplateBot";
+	strlcpy(s_module_bot_name, "TemplateBot", MAXNICK);
 	return 1;
 }
 

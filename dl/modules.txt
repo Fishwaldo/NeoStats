@@ -88,27 +88,15 @@ This information is used to report back to users on what modules and
 what versions are loaded and can be used by the core and other modules 
 to check that they are compatible.
 
-We also need to export a list of the functions availble in our module.
-These functions are responses to IRCd commands sent by users to our
-modules e.g. /VERSION mymodule.
+We also need to export a list of any responses to IRCd commands sent by 
+users to our modules that we wish to support e.g. /VERSION mymodule. This
+is optional.
 
-Functions __module_functions[] = {
-	{ "VERSION", 	new_m_version,  1 }
-	{ NULL,		NULL,		0 }
-};
-
-The table entries are:
-    - the server command you want to respond to (e.g. VERSION)
-    - the function to call when this happens (e.g. new_m_version)
-    - Flag to say whether to process 
-        only local server commands (0) or 
-        network commands (1)
-
-NeoStats, and many IRCD's use tokens now, so "VERSION" might not always 
-work. You should also try "+" as that's the token for version. For easy 
-CrossIRCD support, we provide macros for all the available commands 
-such as MSG_VERSION and TOK_VERSION. These will make your module more 
-portable if you wish to release it. e.g.
+NeoStats, and many IRCD's use tokens now, and the strings differ between
+IRCds so a hard coded string such as "VERSION" might not always work. 
+For easy CrossIRCD support, we provide macros for all the available 
+commands such as MSG_VERSION and TOK_VERSION. These will make your module 
+more portable if you wish to release it. e.g.
 
 Functions __module_functions[] = {
 	{MSG_VERSION, new_m_version, 1}	,
@@ -118,15 +106,22 @@ Functions __module_functions[] = {
 	{NULL, NULL, 0}
 };
 
+The table entries are:
+    - the server command you want to respond to (e.g. MSG_VERSION)
+    - the function to call when this happens (e.g. new_m_version)
+    - Flag to say whether to process 
+        only local server commands (0) or 
+        network commands (1)
+
 Each function in this table is passed 2 variables: char **av and int ac. 
 av is a array containing the parsed command, ac contains the number of
 elements.
 
-The array array must be NULL terminated, so set the command and function
+The array must be NULL terminated, so set the final command and function
 fields to NULL and the flag to 0. 
 
-We also have a table for any events on IRC that we wish to process. This
-is optional.
+We can also have a table for any events on IRC that we wish to process. 
+This is optional.
 
 EventFnList __module_events[] = {
 	{ EVENT_ONLINE, 	Online},
@@ -142,46 +137,10 @@ a user joins the network).
 The array must be NULL terminated with both event string and function 
 fields set to NULL.
 
-The current list of events that you can process are:
-
-ONLINE     - called when NeoStats connects to the Network. Can be used 
-             to init bots, and so on. 
-SIGNON     - called when a new user signs onto the network. the user 
-             structure User is passed as a parameter, so you can see who 
-             signed on.
-SIGNOFF    - called when a user quits the network. The user structure 
-             User is passed as a parameter, so you can see who signed off.
-KILL       - called when a user is killed on the network. the user 
-             structure User is passed as a parameter, so you can see who
-             was killed (You would have to use the recbuf global 
-             variable to see who killed them though)
-BOTKILL	   - called if one of the NeoStats bots gets killed. You would 
-             use it to reinitialize the bot.
-NEWSERVER  - called when a server connects to the network. the server 
-             structure Server is passed as a parameter so you can see 
-             details about the new server
-DELSERVER  - called when a server leaves the network. 
-SQUIT      - called when a server squits the network 
-             (ED: what's the diff with above?)
-NETINFO	   - called when the connection to the network is synced. 
-UMODE	   - called when a user changes Umodes. (e.g., /mode +o fish) 
-             the user structure User is passed as a parameter.
-SMODE	   - (ULTIMATE3 only) called when a user changes Smodes.
-             the user structure User is passed as a parameter.
-NICK_CHANGE- called when a user changes nick
-             the user structure User is passed as a parameter.
-PONG	   - TODO
-AWAY	   - TODO
-NEWCHAN	   - TODO
-DELCHAN	   - TODO
-JOINCHAN   - TODO
-PARTCHAN   - TODO
-KICK	   - TODO
-KICKBOT    - TODO
-PARTBOT    - TODO
-TOPICCHANGE- TODO
-CLIENTVERSION-   TODO
-
+We provide macros for each event which are listed with descriptions and
+available parameters in "events.h". The header file is automatically 
+included by "stats.h" so you do not need to worry about including it in
+your module.
 
 -----------------------------------<>-----------------------------------
 Although that is all you need for a working module, there are a number
