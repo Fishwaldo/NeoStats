@@ -8,6 +8,7 @@ Shmad & ^Enigma & Fish^
  - strip colors/underlines etc from client versions (F)
  - Help text cleanup (M)
  - Added ABOUT command (M)
+ - Changed to use new module export API (M)
  
 * Version 3.9 * July 15th, 2003 (F)
  - Fixed a minor problem with oper counting. 

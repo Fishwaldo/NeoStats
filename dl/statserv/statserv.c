@@ -30,8 +30,6 @@
 #include "log.h"
 #include "conf.h"
 
-const char ssversion_date[] = __DATE__;
-const char ssversion_time[] = __TIME__;
 static void ss_chans(User * u, char *chan);
 static void ss_daily(User * u);
 static void ss_stats(User * u, char *cmd, char *arg, char *arg2);
@@ -52,14 +50,15 @@ static void ss_Config();
 static int new_m_version(char *origin, char **av, int ac);
 void ss_html();
 
-Module_Info Statserv_Info[] = { {
-				 SSMNAME,
-				 "Statistical Bot For NeoStats",
-				 "3.10"}
+ModuleInfo __module_info = {
+	 SSMNAME,
+	 "Statistical Bot For NeoStats",
+	 "3.10",
+	__DATE__,
+	__TIME__
 };
 
-
-Functions StatServ_fn_list[] = {
+Functions __module_functions[] = {
 	{MSG_VERSION, new_m_version, 1},
 #ifdef HAVE_TOKEN_SUP
 	{TOK_VERSION, new_m_version, 1},
@@ -67,8 +66,7 @@ Functions StatServ_fn_list[] = {
 	{NULL, NULL, 0}
 };
 
-
-EventFnList StatServ_Event_List[] = {
+EventFnList __module_events[] = {
 	{"ONLINE", Online},
 	{"PONG", pong},
 	{"NEWSERVER", s_new_server},
@@ -86,23 +84,6 @@ EventFnList StatServ_Event_List[] = {
 	{"TOPICCHANGE", s_topic_change},
 	{"CLIENTVERSION", s_client_version},
 	{NULL, NULL}
-};
-
-
-
-Module_Info *__module_get_info()
-{
-	return Statserv_Info;
-};
-
-Functions *__module_get_functions()
-{
-	return StatServ_fn_list;
-};
-
-EventFnList *__module_get_events()
-{
-	return StatServ_Event_List;
 };
 
 void ss_Config()
@@ -162,8 +143,8 @@ int new_m_version(char *origin, char **av, int ac)
 	SET_SEGV_LOCATION();
 	snumeric_cmd(351, origin,
 		     "Module StatServ Loaded, Version: %s %s %s",
-		     Statserv_Info[0].module_version, ssversion_date,
-		     ssversion_time);
+			 __module_info.module_version, __module_info.module_build_date,
+			 __module_info.module_build_time);
 	return 0;
 }
 
@@ -836,8 +817,8 @@ static void ss_version(User * u)
 		"-------------------------------------");
 	prefmsg(u->nick, s_StatServ,
 		"StatServ Version: %s Compiled %s at %s",
-		Statserv_Info[0].module_version, ssversion_date,
-		ssversion_time);
+		__module_info.module_version, __module_info.module_build_date,
+		__module_info.module_build_time);
 	prefmsg(u->nick, s_StatServ, "http://www.neostats.net");
 	prefmsg(u->nick, s_StatServ,
 		"-------------------------------------");

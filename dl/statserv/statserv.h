@@ -48,9 +48,6 @@ list_t *Chead;
 TLD *tldhead;
 list_t *Vhead;
 
-
-extern const char ssversion_date[], ssversion_time[];
-
 struct stats_network_ {
 	int opers;
 	int chans;
