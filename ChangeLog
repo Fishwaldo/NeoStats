@@ -50,6 +50,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - New IsMe macro and associated user and server flags. We can now detect NeoStats users/servers without a string compare (M)
  - Tidy up set and reset of segv_inmodule (M)
  - Valgrind Fixes. Some. Not All. Long way to go (F)
+ - Add Viagra IRCD support contributed by OvErRiTe (M)
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database
