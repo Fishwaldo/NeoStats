@@ -1,0 +1,17 @@
+Program: NeoServ Module for NeoStats 2.x ChangeLog
+Author:  ^Enigma^ <enigma@neostats.net>
+
+* Version 1.2 * December 22nd, 2001
+- More topics Added (now 22 topics)
+- Logging Function added to monitor usage
+
+* Version 1.1 * December 22nd, 2001
+- 15 Help Topics to Date
+- 'SEND' fucntion added for Net Admins or higher to have
+   NeoServ send a relevant topic to a user
+
+* Version 1.0 * December 21st, 2001
+
+- ChangeLog & Core Files Created.... so far today the
+  village idiots are quiet!
+

@@ -1,0 +1,56 @@
+MoraleServ ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+
+
+* MoraleServ * Shmad * Version Increment -> 2.16
+  - Fixed retarded crash..
+
+* MoraleServ * ^Enigma^ * Version Increment -> 2.15
+  - Slight typo in the "User Not Found" message corrected.
+  - "Channel Not Found" Code added (main use in the MSG routine... although used in
+    other parts of the code)
+  - Minimum access 180 raised to 185 (NA level) nfi what I was thinking when I dropped
+    it to 180 ;p
+  - Realised not all routines had the seggie code. All routines now have it
+  - Some older code indented... looks purdy now :P
+  - NA/TA requirement moved to first minimum requirement for the "special" commands
+
+* MoraleServ * ^Enigma^ * Version Increment -> 2.14
+  - In line with LoveServ the "User Not Found" Patch was added
+  - Proper Stats.* host name now ;o) (-x)
+
+* MoraleServ * ^Enigma^ * Version Increment -> 2.13
+  - Many little things changed for "standard" release.
+
+* MoraleServ * ^Enigma^ * Version Increment -> 2.12
+ - MoraleServ Echos unknown topics (in full) to the Services chan - JB's idea (odd little man)
+ - MoraleServ no longer a "Test Code" service.
+
+* MoraleServ * ^Enigma^ * Version Increment -> 2.1
+ - Changed 185->190 "TechAdmin-Ship" sounds much nicer than "NetAdmin-Ship"... plus I'm a TA,
+   not a NA :P~~~~
+ - Changed 190->185 @ request of shmad. This is a sad day in irc. Lets take a little moment to
+   remember when only the "clever" people could screw the system with raw commands shall we?
+ - Decision made about Version 2.5 -> will no longer be a "Test Code Service". Renaming of
+   NigglesServ to MoraleServ on the agenda but may not happen will V3.0
+ - printfile & unlinkfile added to code... no HELP menu docuementation... too evil for that ;p
+   (Although commands are documented through "HELP PRINTFILE" & "HELP UNLINKFILE")
+   # printfile can open and print any file via PRIVMSG/NOTICE. God I'd hate to be the poor bastard
+   who tries to dump a couple thousand lines lmao. Originaly designed to create a backup of 
+   "hostserv.c" on a shell without ftpd (there is proof that Shmad & Me are REALLY coding it! :P)
+ - LOAD & UNLOAD of module now recorded in the log. Useful for uptime calculation (cept for
+   seggies) prolly won't go much further than this lmao.
+ - Overhauls to the entire LOG system. Backup and reset offered. LOGS renamed to VIEWLOG
+ - MSG command changed due to a little abuse problem. Non-Access list people now have a 
+   "(MSG issued by xxx)" added to thier MSG command. Hopefully this will deter. Access-Users don't
+   get the attachment ;p
+ - Fixed the "root access denied" for 'normal users' requesting HELP 
+ - Added new feature - "WONDERFUL"... sings a little song, makes the user feel special
+
+Log Started (V2.0.11)
+
+* Prelim information:
+MoraleServ orginally started off as something other than the service it is today. Over time, 
+MoraleServ grew into a some what popular "play service". New fuctions were added, both good 
+and evil ;p Version 2.0 saw an increase in the use due to the features and 2.0.11 offered some 
+advanced techie features. 2.0.11 was then renamed to MoraleServ and the "Test Code" was dropped
+to become the stable 2.1

@@ -1,0 +1,30 @@
+ConnectServ Module for NeoStats 2.x ChangeLog
+Shmad & ^Enigma^
+
+* Version 1.2 * November 18th, 2001
+- Add u->mode check for Local Kills (^Enigma^)
+- Changed LOCAL KILL format to same as GLOBAL format (much nicer..) (Shmad)
+- Changed KILL code. Local kills prefixed with LOCAL KILL, Globals with GLOBAL KILL (Shmad)
+- Added Local Kill code. (Shmad)
+- Fixed Global Kill reason msg (Shmad)
+
+* Version 1.1 * November 16th, 2001
+
+- Version 1.1 is ready to be released in next ver of NeoStats
+- fixed compiler warnings. (Shmad)
+- Fixed cs_user_modes() segfault.  Was in _init() *thwaps niggles* (Shmad)
+- Updated LoadConf(); to parse quicker. :) (Shmad)
+- Updated LoadConf(); to only load valid settings!! (Shmad)
+- Added LoadConfig(); to load connect.db (Shmad)
+- Command Settings in connect.db loaded upon module load (Shmad)
+- Command settings now saved to connect.db (^Enigma^)
+
+* Version 1.0 * November 13th, 2001
+
+- Version 1.0 is ready to use in the devel NeoStats
+- ABOUT Added - Little info about service (^Enigma^)
+- STATUS Added - Check if KILLWATCH, MODEWATCH or SIGNWATCH is active or not (^Enigma^)
+- KILLWATCH Added - Watch for server or oper /kill's (^Enigma^)
+- MODEWATCH Added - Watch for users chaning to oper flags or opers changing flags (^Enigma^)
+- SIGNWATCH Added - Watch for signon/signoffs (^Enigma^)
+- Started the module, not much here yet. (^Enigma^)

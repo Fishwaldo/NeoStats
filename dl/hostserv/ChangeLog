@@ -1,0 +1,40 @@
+HostServ Module for NeoStats 2.x ChangeLog
+Shmad <shmad@neostats.net>
+^Enigma^ <enigma@neostats.net>
+
+* Version 1.5 * January 14th, 2002
+- Access levels reviewed and changed.
+
+* Version 1.4 * January 8th, 2002
+- Overhauls to "DEL" routine:
+  + Syntax must be entire and complete
+  + The "xxx Has been deleted" message will only
+    show up when something has actually been deleted
+  + Deletion code cleaned up slightly
+- "/msg HostServ DEL" exploit taken out (Thanks to 
+  JK & Error|51 informing me and then crashing thier
+  NeoStats every 5 minutes with it :P)
+
+* Version 1.3 * January 6th, 2002
+- Access levels changed (JK's Request)
+
+* Version 1.2 * December 19th, 2001
+- I feel like chicken tonight, like chicken tonight!
+- fnmatch.h was missing from includes, *thwaps niggles*
+- Wildcards now supported w00t!.... 1-2-3.myisp.com.country can
+  have thier host check set to *.myisp.com.country
+- When vhost is added and user is online... the vhost is 
+  set (no need to disconnect & reconnect)
+- Issued With 'ADD' Fixed
+- 'DEL' Function added
+
+* Version 1.1 * December 18th, 2001
+- Vhost now works... w00t!
+- small issue with 'ADD'... will possibly fix within the next day or so
+
+* Version 1.0 * November 5th, 2001
+- Entire Code Overhauled
+
+* Version 0.1 * September 30th, 2001
+- Started the module, not much here yet.
+
