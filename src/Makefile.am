@@ -2,7 +2,7 @@ SUBDIRS = dbm protocol
 
 bin_PROGRAMS = neostats
 
-neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.l nsdba.c \
+neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.c nsdba.c \
 		dotconf.c conf.c dl.c dns.c exclude.c hash.c ircd.c ircstring.c \
 		lang.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
@@ -16,5 +16,7 @@ neostats_LDADD = $(top_srcdir)/lib/adns/libadns.la \
 		@PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ \
 		$(top_srcdir)/lib/event/libevent.a
 neostats_LDFLAGS = --export-dynamic -rdynamic
+noinst_HEADERS          =       confuselexer.l
+
 
 include $(top_srcdir)/autotools/rules.mk 

@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 SOURCES = $(neostats_SOURCES)
 
 srcdir = @srcdir@
@@ -38,8 +39,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = neostats$(EXEEXT)
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/autotools/rules.mk confuselexer.c
+DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
@@ -83,8 +84,6 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LEXCOMPILE = $(LEX) $(LFLAGS) $(AM_LFLAGS)
-LTLEXCOMPILE = $(LIBTOOL) --mode=compile $(LEX) $(LFLAGS) $(AM_LFLAGS)
 SOURCES = $(neostats_SOURCES)
 DIST_SOURCES = $(neostats_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -93,6 +92,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	install-recursive installcheck-recursive installdirs-recursive \
 	pdf-recursive ps-recursive uninstall-info-recursive \
 	uninstall-recursive
+HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
@@ -221,7 +221,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 wi_PWD = @wi_PWD@
 SUBDIRS = dbm protocol
-neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.l nsdba.c \
+neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.c nsdba.c \
 		dotconf.c conf.c dl.c dns.c exclude.c hash.c ircd.c ircstring.c \
 		lang.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
@@ -238,13 +238,14 @@ neostats_LDADD = $(top_srcdir)/lib/adns/libadns.la \
 		$(top_srcdir)/lib/event/libevent.a
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
+noinst_HEADERS = confuselexer.l
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .l .lo .o .obj
+.SUFFIXES: .c .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/autotools/rules.mk $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -342,11 +343,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transfer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/users.Po@am__quote@
-
-.l.c:
-	$(LEXCOMPILE) $<
-	sed '/^#/ s|$(LEX_OUTPUT_ROOT)\.c|$@|' $(LEX_OUTPUT_ROOT).c >$@
-	rm -f $(LEX_OUTPUT_ROOT).c
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -523,7 +519,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(PROGRAMS) $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(bindir)"; do \
@@ -553,7 +549,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-rm -f confuselexer.c
 clean: clean-recursive
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
