@@ -549,18 +549,9 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 int
 snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode)
 {
-	int i, j;
-	char newmode[20];
-	newmode[0] = '+';
-	j = 1;
-	for (i = 0; i < ircd_srv.umodecount; i++) {
-		if (mode & usr_mds[i].umodes) {
-			newmode[j] = usr_mds[i].mode;
-			j++;
-		}
-
-	}
-	newmode[j] = '\0';
+	char* newmode;
+	
+	newmode = UmodeMaskToString(mode);
 	sts ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, me.now, newmode, ident, host, me.name, me.now, realname);
 	AddUser (nick, ident, host, realname, me.name, 0, me.now);
 	UserMode (nick, newmode);
@@ -578,18 +569,9 @@ sping_cmd (const char *from, const char *reply, const char *to)
 int
 sumode_cmd (const char *who, const char *target, long mode)
 {
-	int i, j;
-	char newmode[20];
-	newmode[0] = '+';
-	j = 1;
-	for (i = 0; i < ircd_srv.umodecount; i++) {
-		if (mode & usr_mds[i].umodes) {
-			newmode[j] = usr_mds[i].mode;
-			j++;
-		}
-
-	}
-	newmode[j] = '\0';
+	char* newmode;
+	
+	newmode = UmodeMaskToString(mode);
 	sts (":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, newmode);
 	UserMode (target, newmode);
 	return 1;

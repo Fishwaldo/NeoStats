@@ -210,10 +210,9 @@ UserNick (const char * oldnick, const char *newnick)
 	}
 	SET_SEGV_LOCATION();
 	hash_delete (uh, un);
-	AddStringToList (&av, oldnick, &ac);
 	strlcpy (u->nick, newnick, MAXNICK);
 	hash_insert (uh, un, u->nick);
-
+	AddStringToList (&av, oldnick, &ac);
 	AddStringToList (&av, u->nick, &ac);
 	ModuleEvent (EVENT_NICKCHANGE, av, ac);
 	free (av);
@@ -362,6 +361,7 @@ UserMode (const char *nick, const char *modes)
 	AddStringToList (&av, u->nick, &ac);
 	AddStringToList (&av, (char *) modes, &ac);
 	ModuleEvent (EVENT_UMODE, av, ac);
+	free (av);
 
 	tmpmode = *(modes);
 	while (tmpmode) {
@@ -388,7 +388,6 @@ UserMode (const char *nick, const char *modes)
 		tmpmode = *modes++;
 	}
 	nlog (LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, (int *)u->Umode);
-	free (av);
 }
 
 #ifdef GOTUSERSMODES
@@ -414,11 +413,10 @@ UserSMode (const char *nick, const char *modes)
 		return;
 	}
 	nlog (LOG_DEBUG1, LOG_CORE, "Smodes: %s", modes);
-
 	AddStringToList (&av, u->nick, &ac);
 	AddStringToList (&av, (char *) modes, &ac);
-
 	ModuleEvent (EVENT_SMODE, av, ac);
+	free (av);
 
 	tmpmode = *(modes);
 	while (tmpmode) {
@@ -445,6 +443,5 @@ UserSMode (const char *nick, const char *modes)
 		tmpmode = *modes++;
 	}
 	nlog (LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p", u->nick, (int *)u->Smode);
-	free (av);
 }
 #endif

@@ -31,11 +31,46 @@
 #include "log.h"
 #include "services.h"
 
+static UmodeStringBuf[64];
+
+/** @brief UmodeMaskToString
+ *
+ *  Translate a mode mask to the string equivalent
+ *
+ * @return 
+ */
+char* 
+UmodeMaskToString(long Umode) 
+{
+	int i, j;
+
+	UmodeStringBuf[0] = '+';
+	j = 1;
+	for (i = 0; i < ircd_srv.umodecount; i++) {
+		if (Umode & usr_mds[i].umodes) {
+			UmodeStringBuf[j] = usr_mds[i].mode;
+			j++;
+		}
+	}
+	UmodeStringBuf[j] = '\0';
+}
+
+/** @brief UmodeStringToMask
+ *
+ *  Translate a mode string to the mask equivalent
+ *
+ * @return 
+ */
+long
+UmodeStringToMask(char* UmodeString)
+{
+}
+
 /** @brief init_bot_modes
  *
- *  Translate a mode string to the bitwise mode
+ *  Translate a mode string to the mask equivalent
  *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ * @return Umode mask
  */
 static int
 init_bot_modes (const char *modes)
