@@ -110,13 +110,27 @@ const int user_auth_mode_count = ((sizeof (user_auth_modes) / sizeof (user_auth_
 
 #ifdef GOTUSERSMODES
 UserAuthModes user_auth_smodes[] = {
+#ifdef SMODE_NETADMIN
 	{"Network admin",	SMODE_NETADMIN, 190},
-/*	{SMODE_CONET, 175},
-	{SMODE_TECHADMIN, 150},
-	{SMODE_COTECH, 125},
-	{SMODE_SERVADMIN, 100},
-	{SMODE_GUEST, 100},
-	{SMODE_COADMIN, 75},*/
+#endif
+#ifdef SMODE_CONET
+	{"Co-netadmin",		SMODE_CONET, 175},
+#endif
+#ifdef SMODE_TECHADMIN
+	{"Technical admin",	SMODE_TECHADMIN, 150},
+#endif
+#ifdef SMODE_COTECH
+	{"Co-techadmin",	SMODE_COTECH, 125},
+#endif
+#ifdef SMODE_SERVADMIN
+	{"Server admin",	SMODE_SERVADMIN, 100},
+#endif
+#ifdef SMODE_GUEST
+	{"Guest admin",		SMODE_GUEST, 100},
+#endif
+#ifdef SMODE_COADMIN
+	{"Co-admin",		SMODE_COADMIN, 75},
+#endif
 };
 
 const int user_auth_smode_count = ((sizeof (user_auth_smodes) / sizeof (user_auth_smodes[0])));

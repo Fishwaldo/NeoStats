@@ -21,8 +21,6 @@
 ** $Id$
 */
 
-#define IRCDAUTH	/* Temp */
-
 #include "neostats.h"
 #include "modules.h"
 #include "dl.h"
