@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.43 2003/04/11 09:26:30 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.44 2003/05/09 13:17:15 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -145,7 +145,7 @@ Oper_Modes usr_mds[] = {
 
 
 int sserver_cmd(const char *name, const int numeric, const char *infoline) {
-	sts("%s %s %s %d :%s", me.name, (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	sts(":%s %s %s %d :%s", me.name, (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 	return 1;
 }
 

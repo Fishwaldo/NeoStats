@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.9 2003/04/21 10:30:37 fishwaldo Exp $
+** $Id: neoircd.c,v 1.10 2003/05/09 13:17:15 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -86,14 +86,14 @@ int seob_cmd(const char *server) {
 
 
 int sserver_cmd(const char *name, const int numeric, const char *infoline) {
-	sts("%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
+	sts(":%s %s %s 2 0 :%s", me.name, MSG_SERVER, name, infoline);
 	return 1;
 }
 
 int slogin_cmd(const char *name, const int numeric, const char *infoline, const char *pass) {
 	sts("%s %s :TS", MSG_PASS, pass);
 	sts("CAPAB :TS EOB HUB PARA");
-	sts("%s %s %d 0 :%s", MSG_SERVER, name, numeric, infoline);
+	sts("%s %s 0 0 :%s", MSG_SERVER, name, infoline);
 	return 1;
 }
 

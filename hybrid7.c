@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hybrid7.c,v 1.12 2003/04/11 09:26:30 fishwaldo Exp $
+** $Id: hybrid7.c,v 1.13 2003/05/09 13:17:15 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -82,7 +82,7 @@ int seob_cmd(const char *server) {
 
 
 int sserver_cmd(const char *name, const int numeric, const char *infoline) {
-	sts("%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
+	sts(":%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
 	return 1;
 }
 
