@@ -142,7 +142,7 @@
 				RelativePath="adns_win32.h">
 			</File>
 			<File
-				RelativePath="config.h">
+				RelativePath=".\configwin32.h">
 			</File>
 			<File
 				RelativePath="dlist.h">

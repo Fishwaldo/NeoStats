@@ -30,7 +30,11 @@
 #ifndef ADNS_INTERNAL_H_INCLUDED
 #define ADNS_INTERNAL_H_INCLUDED
 
+#ifdef WIN32
+#include "configwin32.h"
+#else
 #include "config.h"
+#endif
 typedef unsigned char byte;
 
 #include <stdarg.h>
