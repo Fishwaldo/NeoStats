@@ -1556,9 +1556,9 @@ fi
 #Standard Defines for autoconf here
 x_maj=3
 x_min='0'
-x_rev="a2"
+x_rev="a3-dev"
 x_package='NeoStats'
-MODULES="connectserv hostserv loveserv moraleserv statserv ircdauth extauth"
+MODULES="connectserv hostserv statserv ircdauth extauth textserv"
 #dont edit anything after this line!
 
 x_version=$x_maj.$x_min.$x_rev
@@ -28872,7 +28872,7 @@ fi;
 
 
 
-                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile lib/Makefile lib/curl/Makefile lib/adns/Makefile lib/pcre/Makefile lib/rta/Makefile lib/event/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/loveserv/Makefile modules/moraleserv/Makefile modules/statserv/Makefile neostats"
+                                                                                                                                                                                              ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile lib/Makefile lib/curl/Makefile lib/adns/Makefile lib/pcre/Makefile lib/rta/Makefile lib/event/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile neostats"
 
 
 cat >confcache <<\_ACEOF
@@ -29525,9 +29525,8 @@ do
   "modules/extauth/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/extauth/Makefile" ;;
   "modules/hostserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/hostserv/Makefile" ;;
   "modules/ircdauth/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/ircdauth/Makefile" ;;
-  "modules/loveserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/loveserv/Makefile" ;;
-  "modules/moraleserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/moraleserv/Makefile" ;;
   "modules/statserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/statserv/Makefile" ;;
+  "modules/textserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/textserv/Makefile" ;;
   "neostats" ) CONFIG_FILES="$CONFIG_FILES neostats" ;;
   "$ac_config_libobj_dir/fnmatch.h" ) CONFIG_LINKS="$CONFIG_LINKS $ac_config_libobj_dir/fnmatch.h:$ac_config_libobj_dir/fnmatch_.h" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;

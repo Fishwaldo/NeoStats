@@ -88,16 +88,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ircdauth", "modules\ircdaut
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loveserv", "modules\loveserv\loveserv.vcproj", "{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "moraleserv", "modules\moraleserv\moraleserv.vcproj", "{AED0EA8B-9F95-47C2-A024-C0B0FF2474BE}"
-	ProjectSection(ProjectDependencies) = postProject
-		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "statserv", "modules\statserv\statserv.vcproj", "{46CEA1C0-DA36-4E6A-B9B6-6799FC1407E3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
@@ -112,6 +102,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "templateauth", "modules\tem
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gdbm", "src\dbm\gdbm.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "textserv", "modules\textserv\textserv.vcproj", "{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -193,14 +187,6 @@ Global
 		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Debug.Build.0 = Debug|Win32
 		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Release.ActiveCfg = Release|Win32
 		{4150DD6A-504E-40BB-830C-DE9D03BC9D6B}.Release.Build.0 = Release|Win32
-		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Debug.ActiveCfg = Debug|Win32
-		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Debug.Build.0 = Debug|Win32
-		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Release.ActiveCfg = Release|Win32
-		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Release.Build.0 = Release|Win32
-		{AED0EA8B-9F95-47C2-A024-C0B0FF2474BE}.Debug.ActiveCfg = Debug|Win32
-		{AED0EA8B-9F95-47C2-A024-C0B0FF2474BE}.Debug.Build.0 = Debug|Win32
-		{AED0EA8B-9F95-47C2-A024-C0B0FF2474BE}.Release.ActiveCfg = Release|Win32
-		{AED0EA8B-9F95-47C2-A024-C0B0FF2474BE}.Release.Build.0 = Release|Win32
 		{46CEA1C0-DA36-4E6A-B9B6-6799FC1407E3}.Debug.ActiveCfg = Debug|Win32
 		{46CEA1C0-DA36-4E6A-B9B6-6799FC1407E3}.Debug.Build.0 = Debug|Win32
 		{46CEA1C0-DA36-4E6A-B9B6-6799FC1407E3}.Release.ActiveCfg = Release|Win32
@@ -217,6 +203,10 @@ Global
 		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.Build.0 = Debug|Win32
 		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.ActiveCfg = Release|Win32
 		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.Build.0 = Release|Win32
+		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Debug.ActiveCfg = Debug|Win32
+		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Debug.Build.0 = Debug|Win32
+		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Release.ActiveCfg = Release|Win32
+		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

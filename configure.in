@@ -14,7 +14,7 @@ x_maj=3
 x_min='0'
 x_rev="a3-dev"
 x_package='NeoStats'
-MODULES="connectserv hostserv loveserv moraleserv statserv ircdauth extauth"
+MODULES="connectserv hostserv statserv ircdauth extauth textserv"
 #dont edit anything after this line!
 
 x_version=$x_maj.$x_min.$x_rev
@@ -370,9 +370,8 @@ AC_CONFIG_FILES([Makefile
 		modules/extauth/Makefile
 		modules/hostserv/Makefile
 		modules/ircdauth/Makefile
-		modules/loveserv/Makefile
-		modules/moraleserv/Makefile
 		modules/statserv/Makefile
+		modules/textserv/Makefile
 		neostats])
 
 AC_CACHE_SAVE
