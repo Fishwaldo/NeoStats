@@ -66,7 +66,7 @@
 #undef GOTUMODECLOAKING
 
 /* Override NeoStats core splitbuf function */
-#define IRCD_SPLITBUF
+/* #define IRCD_SPLITBUF */
 /* Override NeoStats core parse function */
 #define IRCD_PARSE
 

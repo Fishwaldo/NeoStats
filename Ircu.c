@@ -57,15 +57,13 @@ static void m_end_of_burst (char *origin, char **argv, int argc, int srv);
 void send_end_of_burst_ack(void);
 void send_end_of_burst(void);
 
-void ircu_m_private (char* origin, char **av, int ac, int cmdptr);
-
 const char ircd_version[] = "(IRCu)";
 const char services_bot_modes[]= "+iok";
 
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
-	{MSG_PRIVATE, TOK_PRIVATE, ircu_m_private, 0},
+	{MSG_PRIVATE, TOK_PRIVATE, m_private, 0},
 	{MSG_CPRIVMSG, TOK_CPRIVMSG, m_private, 0},
 	{MSG_NOTICE, TOK_NOTICE, m_notice, 0},
 	{MSG_CNOTICE, TOK_CNOTICE, m_notice, 0},
@@ -255,23 +253,6 @@ DEBUG1 CORE - R: AB SQ mark.local.org 0 :Ping timeout
 DEBUG3 CORE - Sendings pings...
 DEBUG2 CORE - SENT: :stats.mark.net PING stats.mark.net :mark.local.org
 */
-
-void ircu_m_private (char* origin, char **av, int ac, int cmdptr)
-{
-	char** argv;
-	int argc = 0;
-	int i;
-
-	AddStringToList (&argv, av[0], &argc);
-	/* strip colon */
-	AddStringToList (&argv, &av[1][1], &argc);
-	for(i = 2; i < ac; i++) {
-		AddStringToList (&argv, av[i], &argc);
-	}
-
-	m_private (origin, argv, argc, cmdptr);
-	free(argv);
-}
 
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
@@ -608,13 +589,12 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		ircsnprintf( IPAddress, 32, "%lu", IP);
 
 		realname = joinbuf (argv, argc, (argc - 1));
-		/* Note realname + 1 is temp to dump colon - remove when parser fixed */
 		/*       nick,    hopcount, TS,     user,    host, */       
 		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
 			/* server, ip, servicestamp, modes*/
 			origin, IPAddress, NULL, (argv[5][0] == '+' ? argv[5]: NULL),
 			/*, vhost, realname, numeric*/ 
-			NULL, (realname + 1), argv[argc-2]);
+			NULL, realname, argv[argc-2]);
 		free (realname);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
@@ -678,11 +658,13 @@ m_pass (char *origin, char **argv, int argc, int srv)
 */
 /* R: AB B #chan 1076064445 ABAAA:o */
 /* R: AB B #c3 1076083205 +tn ABAAH:o */
+static char ircd_buf[BUFSIZE];
+
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
-
 	char *s, *t;
+	char modechar = 0;
 	if(argv[2][0] == '+') {
 		t = (char*)argv[3];
 	} else {
@@ -692,7 +674,18 @@ m_burst (char *origin, char **argv, int argc, int srv)
 		t = s + strcspn (s, ",");
 		if (*t)
 			*t++ = 0;
-		do_join (s, argv[0], argv[1]);
+		do_join (s, argv[0], NULL);
+		if(argv[0][5] == ':') {
+			modechar = argv[0][6];
+		}
+		if(modechar) {
+			char **av;
+			int ac;
+			ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", s, modechar, argv[0]);
+			ac = split_buf (ircd_buf, &av, 0);
+			ChanMode (me.name, av, ac);
+			free (av);
+		}
 	}
 
 }
@@ -703,41 +696,7 @@ m_end_of_burst (char *origin, char **argv, int argc, int srv)
 	send_end_of_burst_ack();
 }
 
-/* Override the core splitbuf and parse functions until 
- * IRCU support is complete
- */
-
-int
-splitbuf (char *buf, char ***argv, int colon_special)
-{
-	int argvsize = 8;
-	int argc;
-	char *s;
-
-	SET_SEGV_LOCATION();
-	*argv = calloc (sizeof (char *) * argvsize, 1);
-	argc = 0;
-	while (*buf) {
-		if (argc == argvsize) {
-			argvsize += 8;
-			*argv = realloc (*argv, sizeof (char *) * argvsize);
-		}
-		s = strpbrk (buf, " ");
-		if (s) {
-			*s++ = 0;
-			while (isspace (*s))
-				s++;
-		} else {
-			s = buf + strnlen (buf, BUFSIZE);
-		}
-		if (*buf == 0) {
-			buf++;
-		}
-		(*argv)[argc++] = buf;
-		buf = s;
-	}
-	return argc;
-}
+extern char privmsgbuffer[BUFSIZE];
 
 /* :<source> <command> <param1> <paramN> :<last parameter> */
 /* <source> <command> <param1> <paramN> :<last parameter> */
@@ -762,9 +721,9 @@ parse (char *line)
 		while (isspace (*++coreLine));
 	} else
 		coreLine = line + strlen (line);
-//	nlog (LOG_DEBUG1, LOG_CORE, "coreLine %s ", coreLine);
-//	nlog (LOG_DEBUG1, LOG_CORE, "line %s", line);
-//	nlog (LOG_DEBUG1, LOG_CORE, "================================================================");
+/*	nlog (LOG_DEBUG1, LOG_CORE, "coreLine %s ", coreLine); */
+/*	nlog (LOG_DEBUG1, LOG_CORE, "line %s", line); */
+/*	nlog (LOG_DEBUG1, LOG_CORE, "================================================================"); */
 	if ((!ircstrcasecmp(line, "SERVER")) || (!ircstrcasecmp(line, "PASS"))) {
 		strlcpy(cmd, line, sizeof(cmd));
 		nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
@@ -785,6 +744,7 @@ parse (char *line)
 		nlog (LOG_DEBUG1, LOG_CORE, "origin: %s", origin);
 		nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
 		nlog (LOG_DEBUG1, LOG_CORE, "args  : %s", line);
+		strlcpy (privmsgbuffer, line, BUFSIZE);
 		if(line) ac = splitbuf(line, &av, 0);
 		nlog (LOG_DEBUG1, LOG_CORE, "0 %d", ac);
 	}

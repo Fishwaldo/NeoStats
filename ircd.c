@@ -46,7 +46,9 @@ static char SmodeStringBuf[64];
 static long services_bot_umode= 0;
 
 /* Fully split buffer */
-#ifndef IRCU
+#ifdef IRCU
+char privmsgbuffer[BUFSIZE];
+#else
 static char privmsgbuffer[BUFSIZE];
 #endif
 /* Temp flag for backward compatibility in new splitbuf system */
@@ -451,27 +453,21 @@ split_buf (char *buf, char ***argv, int colon_special)
 	int argvsize = 8;
 	int argc;
 	char *s;
-#ifndef IRCU
 	int colcount = 0;
-#endif
 	SET_SEGV_LOCATION();
 	*argv = calloc (sizeof (char *) * argvsize, 1);
 	argc = 0;
-#ifndef IRCU
 	if (*buf == ':')
 		buf++;
-#endif
 	while (*buf) {
 		if (argc == argvsize) {
 			argvsize += 8;
 			*argv = realloc (*argv, sizeof (char *) * argvsize);
 		}
-#ifndef IRCU
 		if ((*buf == ':') && (colcount < 1)) {
 			buf++;
 			colcount++;
 		}
-#endif
 		s = strpbrk (buf, " ");
 		if (s) {
 			*s++ = 0;
@@ -550,9 +546,7 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 	ud = finduser(av[0]);
 	if(u && ud) {
 		AddStringToList (&argv, ud->nick, &argc);
-		/* strip colon */
-		AddStringToList (&argv, &av[1][1], &argc);
-		for(i = 2; i < ac; i++) {
+		for(i = 1; i < ac; i++) {
 			AddStringToList (&argv, av[i], &argc);
 		}
 		ModuleFunction (1, MSG_NOTICE, u->nick, argv, argc);
@@ -573,10 +567,8 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 void
 m_private (char* origin, char **av, int ac, int cmdptr)
 {
-#ifndef IRCU
 	int argc;
 	char **argv;
-#endif
 	char target[64];
 
 	/* its a privmsg, now lets see who too... */
@@ -588,7 +580,6 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 		av[0] = strtok (target, "@");
 	}
 
-#ifndef IRCU
 	argc = split_buf (privmsgbuffer, &argv, 1);
 	if(av[0][0] == '#') {
 		bot_chan_message (origin, argv, argc);
@@ -596,13 +587,6 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 		bot_message (origin, argv, argc);
 	}
 	free (argv);
-#else
-	if(av[0][0] == '#') {
-		bot_chan_message (origin, av, ac);
-	} else {
-		bot_message (origin, av, ac);
-	}
-#endif
 	return;
 }
 
@@ -696,9 +680,7 @@ parse (char *line)
 		coreLine = line + strlen (line);
 	}
 	strlcpy (cmd, line, sizeof (cmd)); 
-#ifndef IRCU
 	strlcpy (privmsgbuffer, coreLine, BUFSIZE);
-#endif
 	ac = splitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	free (av);
