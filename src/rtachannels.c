@@ -39,7 +39,7 @@ void *display_chanusers (void *tbl, char *col, char *sql, void *row)
 	cmn = list_first (c->members);
 	while (cmn) {
 		cm = lnode_get (cmn);
-		ircsnprintf(final, BUFSIZE*2, "%s %s%s,", CmodeMaskToString (cm->flags), CmodeMaskToPrefixString (cm->flags), cm->nick);
+		ircsnprintf(final, BUFSIZE*2, "%s %s%s,", CmodeMaskToString (cm->flags), CmodeMaskToPrefixString (cm->flags), cm->u->name);
 		strlcat(chanusers, final, BUFSIZE*10);
 		cmn = list_next (c->members, cmn);
 	}

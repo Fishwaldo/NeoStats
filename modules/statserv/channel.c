@@ -105,7 +105,7 @@ int toptopicrunningtotalchannel(const void *key1, const void *key2)
 	return (chan2->topics.alltime.runningtotal - chan1->topics.alltime.runningtotal);
 }
 
-static void AddChannel (Channel* c, void *v)
+static int AddChannel (Channel* c, void *v)
 {
 	channelstat *cs;
 
@@ -113,6 +113,7 @@ static void AddChannel (Channel* c, void *v)
 	AddNetworkChannel ();
     SetChannelModValue (c, (void *)cs);
 	cs->c = c;
+	return NS_FALSE;
 }
 
 int ss_event_newchan (CmdParams *cmdparams)

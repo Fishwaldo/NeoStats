@@ -70,12 +70,13 @@ int ss_event_mode(CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-static void AddUser (Client * u, void *v)
+static int AddUser (Client * u, void *v)
 {
 	SET_SEGV_LOCATION();
 	AddServerUser (u);
 	AddNetworkUser ();
 	AddTLDUser (u);
+	return NS_FALSE;
 }
 
 static void DelUser (Client * u)
@@ -124,24 +125,25 @@ int ss_event_signon(CmdParams *cmdparams)
 static int operlistaway = 0;
 static char* operlistserver;
 
-static void operlist(Client * u, void * v)
+static int operlist(Client * u, void * v)
 {
 	Client * listu;
 
 	listu = (Client *)v;
 	if (!is_oper(u))
-		return;
+		return NS_FALSE;
 	if (operlistaway && u->user->is_away)
-		return;
+		return NS_FALSE;
 	if (!operlistserver) {
 		irc_prefmsg (ss_bot, listu, "%-15s %-15s %-10d",
 			u->name, u->uplink->name, UserLevel(u));
 	} else {
 		if (ircstrcasecmp(operlistserver, u->uplink->name))
-			return;
+			return NS_FALSE;
 		irc_prefmsg (ss_bot, listu, "%-15s %-15s %-10d", 
 			u->name, u->uplink->name, UserLevel(u));
 	}
+	return NS_FALSE;
 }
 
 int ss_cmd_operlist(CmdParams *cmdparams)
@@ -174,7 +176,7 @@ int ss_cmd_operlist(CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-static void botlist(Client * u, void * v)
+static int botlist(Client * u, void * v)
 {
 	Client * listu;
 
@@ -182,6 +184,7 @@ static void botlist(Client * u, void * v)
 	if is_bot(u) { 
 		irc_prefmsg (ss_bot, listu, "%-15s %s", u->name, u->uplink->name);
 	}
+	return NS_FALSE;
 }
 
 int ss_cmd_botlist(CmdParams *cmdparams)

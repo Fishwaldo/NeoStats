@@ -271,7 +271,7 @@ FiniServers (void)
 	hash_destroy(serverhash);
 }
 
-void GetServerList (ServerListHandler handler, void *v)
+int GetServerList (ServerListHandler handler, void *v)
 {
 	hnode_t *node;
 	hscan_t scan;
@@ -281,8 +281,10 @@ void GetServerList (ServerListHandler handler, void *v)
 	hash_scan_begin(&scan, serverhash);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		ss = hnode_get(node);
-		handler (ss, v);
+		if (handler (ss, v) == NS_TRUE)
+			break;
 	}
+	return NS_SUCCESS;
 }
 
 void RequestServerUptimes (void)

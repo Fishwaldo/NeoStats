@@ -318,7 +318,6 @@ int UserNickChange (const char *oldnick, const char *newnick, const char *ts)
 {
 	CmdParams *cmdparams;
 	hnode_t *un;
-	lnode_t *cm;
 	Client *u;
 
 	SET_SEGV_LOCATION();
@@ -329,12 +328,6 @@ int UserNickChange (const char *oldnick, const char *newnick, const char *ts)
 		return NS_FAILURE;
 	}
 	u = (Client *) hnode_get (un);
-	cm = list_first (u->user->chans);
-	while (cm) {
-		ChannelNickChange (find_channel (lnode_get (cm)), (char *) newnick, u->name);
-		cm = list_next (u->user->chans, cm);
-	}
-	SET_SEGV_LOCATION();
 	hash_delete (userhash, un);
 	strlcpy (u->name, newnick, MAXNICK);
 	if (ts) {
@@ -394,7 +387,7 @@ int InitUsers (void)
 	return NS_SUCCESS;
 }
 
-static void dumpuser (Client *u, void* v)
+static int dumpuser (Client *u, void* v)
 {
 	CmdParams *cmdparams;
 	lnode_t *cm;
@@ -427,6 +420,7 @@ static void dumpuser (Client *u, void* v)
 		i++;
 	}
 	irc_prefmsg (ns_botptr, cmdparams->source, "========================================");
+	return NS_FALSE;
 }
 
 void ListUsers (CmdParams *cmdparams, const char *nick)
@@ -590,7 +584,7 @@ void QuitServerUsers (Client *s)
 	}
 }
 
-void GetUserList (UserListHandler handler, void *v)
+int GetUserList (UserListHandler handler, void *v)
 {
 	Client *u;
 	hscan_t scan;
@@ -600,8 +594,10 @@ void GetUserList (UserListHandler handler, void *v)
 	hash_scan_begin (&scan, userhash);
 	while ((node = hash_scan_next (&scan)) != NULL) {
 		u = hnode_get (node);
-		handler (u, v);
+		if (handler (u, v) == NS_TRUE)
+			break;
 	}
+	return NS_SUCCESS;
 }
 
 void AddFakeUser (const char *mask)

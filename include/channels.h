@@ -24,20 +24,10 @@
 #ifndef _CHANNELS_H_
 #define _CHANNELS_H_
 
-/** @brief ChannelMember structure
- *  
- */
-typedef struct ChannelMember {
-	char nick[MAXNICK];
-	time_t tsjoin;
-	long flags;
-} ChannelMember;
-
 void ListChannels (CmdParams* cmdparams, const char *chan);
 void PartChannel (Client *u, const char *chan, const char *reason);
 void PartAllChannels (Client *u, const char *reason);
 void JoinChannel (const char *nick, const char *chan);
-void ChannelNickChange (Channel *c, const char *newnick, const char *oldnick);
 void ChannelTopic (const char *chan, const char *owner, const char *ts, const char *topic);
 void KickChannel (const char *kickby, const char *chan, const char *kicked, const char *kickreason);
 int InitChannels (void);

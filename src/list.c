@@ -869,6 +869,17 @@ void lnode_create_append (list_t *list, void *data)
 }
 
 /*
+ * Create node and append to list
+ */
+void lnode_create_prepend (list_t *list, void *data)
+{
+	lnode_t *ln;
+	
+	ln = lnode_create(data);
+	list_prepend(list, ln);
+}
+
+/*
  * Find list entry and return data pointer
  */
 void *

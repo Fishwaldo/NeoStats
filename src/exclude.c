@@ -31,23 +31,25 @@
 
 static list_t *exclude_list;
 
-typedef struct exclude {
-	enum type {
-		NS_EXCLUDE_HOST	= 0x1,
-		NS_EXCLUDE_SERVER = 0x2,
-		NS_EXCLUDE_CHAN = 0x4,
-	} type;
-	char pattern[MAXHOST]; /* becuase hostname is the biggest this can get */
+typedef struct Exclude {
+	NS_EXCLUDE type;
+	char pattern[MAXHOST]; /* because hostname is the biggest this can get */
 	char addedby[MAXNICK];
 	time_t addedon;
-} exclude;
+} Exclude;
+
+const char* ExcludeDesc[NS_EXCLUDE_MAX] = {
+	"Host",
+	"Server",
+	"Channel",
+};
 
 void new_exclude (void *data)
 {
-	exclude *e;
+	Exclude *e;
 
-	e = ns_calloc(sizeof(exclude));
-	os_memcpy (e, data, sizeof(exclude));
+	e = ns_calloc(sizeof(Exclude));
+	os_memcpy (e, data, sizeof(Exclude));
 	lnode_create_append (exclude_list, e);
 	dlog(DEBUG2, "Added Exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
 }
@@ -77,14 +79,13 @@ void FiniExcludes(void)
  */
 int ns_cmd_exclude_add(CmdParams* cmdparams) 
 {
-	exclude *e;
-	static char tmp[BUFSIZE];
+	Exclude *e;
 	
 	if (cmdparams->ac < 3) {
 		return NS_ERR_NEED_MORE_PARAMS;
 	}
 	/* we dont do any checking to see if a similar entry already exists... oh well, thats upto the user */
-	e = ns_calloc (sizeof(exclude));
+	e = ns_calloc (sizeof(Exclude));
 	strlcpy(e->addedby, cmdparams->source->name, MAXNICK);
 	e->addedon = me.now;
 	if (!ircstrcasecmp("HOST", cmdparams->av[1])) {
@@ -95,13 +96,13 @@ int ns_cmd_exclude_add(CmdParams* cmdparams)
 		}
 		e->type = NS_EXCLUDE_HOST;
 		strlcpy(e->pattern, collapse(cmdparams->av[2]), MAXHOST);
-	} else if (!ircstrcasecmp("CHAN", cmdparams->av[1])) {
+	} else if (!ircstrcasecmp("CHANNEL", cmdparams->av[1])) {
 		if (cmdparams->av[2][0] != '#') {
 			irc_prefmsg(ns_botptr, cmdparams->source, __("Error, Pattern must begin with a \2#\2", cmdparams->source));
 			ns_free(e);
 			return NS_SUCCESS;
 		}
-		e->type = NS_EXCLUDE_CHAN;
+		e->type = NS_EXCLUDE_CHANNEL;
 		strlcpy(e->pattern, collapse(cmdparams->av[2]), MAXHOST);
 	} else if (!ircstrcasecmp("SERVER", cmdparams->av[1])) {
 		if (!index(cmdparams->av[2], '.')) {
@@ -120,10 +121,8 @@ int ns_cmd_exclude_add(CmdParams* cmdparams)
 	lnode_create_append (exclude_list, e);
 	irc_prefmsg(ns_botptr, cmdparams->source, __("Added %s (%s) to exclusion list", cmdparams->source), e->pattern, cmdparams->av[1]);
 	irc_chanalert(ns_botptr, _("%s added %s (%s) to the exclusion list"), cmdparams->source->name, e->pattern, cmdparams->av[1]);
-
 	/* now save the exclusion list */
-	ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
-	DBAStore ("Exclusions", tmp, (void *)e, sizeof (exclude));
+	DBAStore ("exclusions", e->pattern, (void *)e, sizeof (Exclude));
 	return NS_SUCCESS;
 } 
 
@@ -136,35 +135,26 @@ int ns_cmd_exclude_add(CmdParams* cmdparams)
 int ns_cmd_exclude_del(CmdParams* cmdparams) 
 {
 	lnode_t *en;
-	exclude *e;
-	int i, pos;
-	static char tmp[BUFSIZE];
+	Exclude *e;
 	
 	if (cmdparams->ac < 2) {
 		return NS_ERR_NEED_MORE_PARAMS;
 	}
-	pos = atoi(cmdparams->av[1]);
-	if (pos < 1) {
-		return NS_ERR_PARAM_OUT_OF_RANGE;
-	}
 	en = list_first(exclude_list);
-	i = 1;
 	while (en != NULL) {
-		if (i == pos) {
-			e = lnode_get(en);
-			ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
-			DBADelete ("Exclusions", tmp);
-			irc_prefmsg(ns_botptr, cmdparams->source, __("Deleted %s out of exclusion list",cmdparams->source), e->pattern);
+		e = lnode_get(en);
+		if (ircstrcasecmp (e->pattern, cmdparams->av[1]) == 0) { 
+			DBADelete ("exclusions", e->pattern);
+			irc_prefmsg(ns_botptr, cmdparams->source, __("%s delete from exclusion list",cmdparams->source), e->pattern);
 			ns_free(e);
 			list_delete(exclude_list, en);
 			lnode_destroy(en);
 			return NS_SUCCESS;
 		}
 		en = list_next(exclude_list, en);
-		i++;
 	}
 	/* if we get here, means that we never got a match */
-	irc_prefmsg(ns_botptr, cmdparams->source, __("Entry %d was not found in the exclusion list",cmdparams->source), pos);
+	irc_prefmsg(ns_botptr, cmdparams->source, __("% not found in the exclusion list",cmdparams->source), cmdparams->av[1]);
 	return NS_SUCCESS;
 } 
 
@@ -177,32 +167,13 @@ int ns_cmd_exclude_del(CmdParams* cmdparams)
 int ns_cmd_exclude_list(CmdParams* cmdparams) 
 {
 	lnode_t *en;
-	exclude *e;
-	int i = 0;
-	static char tmp[BUFSIZE];
+	Exclude *e;
 	
 	irc_prefmsg(ns_botptr, cmdparams->source, __("Global exclusion list:", cmdparams->source));
 	en = list_first(exclude_list);
-	i = 1;
 	while (en != NULL) {
-		e = lnode_get(en);
-		switch (e->type) {
-			case NS_EXCLUDE_HOST:
-				ircsnprintf(tmp, BUFSIZE, __("Host", cmdparams->source));
-				break;
-			case NS_EXCLUDE_CHAN:
-				ircsnprintf(tmp, BUFSIZE, __("Chan", cmdparams->source));
-				break;
-			case NS_EXCLUDE_SERVER:
-				ircsnprintf(tmp, BUFSIZE, __("Server", cmdparams->source));
-				break;
-			default:
-				ircsnprintf(tmp, BUFSIZE, __("Unknown", cmdparams->source));
-				break;
-		}
-				
-		irc_prefmsg(ns_botptr, cmdparams->source, __("%d) %s (%s) Added by %s on %s", cmdparams->source), i, e->pattern, tmp, e->addedby, sftime(e->addedon));
-		i++;
+		e = lnode_get(en);			
+		irc_prefmsg(ns_botptr, cmdparams->source, __("%s (%s) Added by %s on %s", cmdparams->source), e->pattern, ExcludeDesc[e->type], e->addedby, sftime(e->addedon));
 		en = list_next(exclude_list, en);
 	}
 	irc_prefmsg(ns_botptr, cmdparams->source, __("End of list.", cmdparams->source));
@@ -221,16 +192,13 @@ int ns_cmd_exclude_list(CmdParams* cmdparams)
 void ns_do_exclude_user(Client *u) 
 {
 	lnode_t *en;
-	exclude *e;
+	Exclude *e;
 	
-	/* first thing we check is the server flag. if the server
-	 * is excluded, then the user is excluded as well
-	 */
+	/* if the server is excluded, user is excluded as well */
 	if (u->uplink->flags & NS_FLAG_EXCLUDED) {
 	 	u->flags |= NS_FLAG_EXCLUDED;
 		return;
-	}
-	
+	}	
 	en = list_first(exclude_list);
 	while (en != NULL) {
 		e = lnode_get(en);
@@ -258,7 +226,7 @@ void ns_do_exclude_user(Client *u)
 void ns_do_exclude_server(Client *s) 
 {
 	lnode_t *en;
-	exclude *e;
+	Exclude *e;
 	
 	en = list_first(exclude_list);
 	while (en != NULL) {
@@ -287,12 +255,12 @@ void ns_do_exclude_server(Client *s)
 void ns_do_exclude_chan(Channel *c) 
 {
 	lnode_t *en;
-	exclude *e;
+	Exclude *e;
 	
 	en = list_first(exclude_list);
 	while (en != NULL) {
 		e = lnode_get(en);
-		if (e->type == NS_EXCLUDE_CHAN) {
+		if (e->type == NS_EXCLUDE_CHANNEL) {
 			if (match(e->pattern, c->name)) {
 				c->flags |= NS_FLAG_EXCLUDED;
 				return;

@@ -345,33 +345,6 @@ void PartChannel (Client * u, const char *chan, const char *reason)
 	ns_free (cmdparams);
 }
 
-/** @brief Change channel records when a nick change occurs
- *
- * goes through the channel members list, changing users nicks after a nickname change occurs
- *
- * @param c the channel to check (as called by the user functions)
- * @param newnick the New Nickname of the client
- * @param oldnick the old nickname of the client
- *
- * @returns Nothing
- * @todo What happens if one of our bots change their nick?
-*/
-
-void
-ChannelNickChange (Channel *c, const char *newnick, const char *oldnick)
-{
-	ChannelMember *cml;
-
-	SET_SEGV_LOCATION();
-	cml = lnode_find (c->members, oldnick, comparef);
-	if (!cml) {
-		nlog (LOG_WARNING, "ChannelNickChange: %s isn't a member of %s", oldnick, c->name);
-		return;
-	}
-    dlog (DEBUG3, "ChannelNickChange: newnick %s, oldnick %s", newnick, oldnick);
-	strlcpy (cml->nick, newnick, MAXNICK);
-}
-
 /** @brief Process a user joining a channel
  *
  * joins a user to a channel and raises JOINCHAN event and if required NEWCHAN events
@@ -421,7 +394,7 @@ JoinChannel (const char* nick, const char *chan)
 	}
 	dlog (DEBUG2, "JoinChannel: adding usernode %s to channel %s", u->name, chan);
 	cm = ns_calloc (sizeof (ChannelMember));
-	strlcpy (cm->nick, u->name, MAXNICK);
+	cm->u = find_user(nick);
 	cm->tsjoin = me.now;
 	cm->flags = 0;
 	lnode_create_append (c->members, cm);
@@ -462,7 +435,7 @@ static void ListChannelMembers (CmdParams* cmdparams, Channel *c)
 	cmn = list_first (c->members);
 	while (cmn) {
 		cm = lnode_get (cmn);
-		irc_prefmsg (ns_botptr, cmdparams->source, __("            %s Modes %s Joined: %ld", cmdparams->source), cm->nick, CmodeMaskToString (cm->flags), (long)cm->tsjoin);
+		irc_prefmsg (ns_botptr, cmdparams->source, __("            %s Modes %s Joined: %ld", cmdparams->source), cm->u->name, CmodeMaskToString (cm->flags), (long)cm->tsjoin);
 		cmn = list_next (c->members, cmn);
 	}
 }
@@ -636,7 +609,7 @@ Channel *GetRandomChan(void)
 	return NULL;
 }
 
-void GetChannelList (ChannelListHandler handler, void *v)
+int GetChannelList (ChannelListHandler handler, void *v)
 {
 	hnode_t *node;
 	hscan_t scan;
@@ -646,9 +619,27 @@ void GetChannelList (ChannelListHandler handler, void *v)
 	hash_scan_begin(&scan, channelhash);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		c = hnode_get(node);
-		handler (c, v);
+		if (handler (c, v) == NS_TRUE)
+			break;
 	}
+	return NS_SUCCESS;
 }
+
+int GetChannelMembers (Channel *c, ChannelMemberHandler handler, void *v)
+{
+ 	ChannelMember *cm;
+	lnode_t *cmn;
+
+	cmn = list_first (c->members);
+	while (cmn) {
+		cm = lnode_get (cmn);
+		if (handler (c, cm, v) == NS_TRUE)
+			break;
+		cmn = list_next (c->members, cmn);
+	}
+	return NS_SUCCESS;
+}
+
 hash_t *GetChannelHash (void)
 {
 	return channelhash;

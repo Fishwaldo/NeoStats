@@ -3,6 +3,12 @@ NeoStats 3.x ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
+* NeoStats * Version 3.0.prealpha3-dev
+ - Updated handler systems so that a caller can "break" the list loop. (M)
+ - Exclude system del now takes a host rather than an index. (M)
+ - Channel members now use client pointer so they do not need to track nick 
+   changes. (M)
+
 * NeoStats * Version 3.0.prealpha2
  - First recommended release to devlist only as prealpha2. (M)
  - Port all database interaction to new DBA interface. (M)

@@ -124,7 +124,7 @@ void DelServerOper (Client *u)
 	DecStatistic (&ss->opers);
 }
 
-static void AddServerStat (Client *s, void *v)
+static int AddServerStat (Client *s, void *v)
 {
 	serverstat *ss;
 
@@ -137,6 +137,7 @@ static void AddServerStat (Client *s, void *v)
 	AddNetworkServer ();
 	SetServerModValue (s, (void *)ss);
 	ss->s = s;
+	return NS_FALSE;
 }
 
 int ss_event_server (CmdParams *cmdparams)

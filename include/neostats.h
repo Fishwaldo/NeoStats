@@ -464,6 +464,14 @@ typedef enum {
 	NS_EXIT_SEGFAULT,
 }NS_EXIT_TYPE;
 
+typedef enum NS_EXCLUDE {
+	NS_EXCLUDE_HOST	= 0,
+	NS_EXCLUDE_SERVER,
+	NS_EXCLUDE_CHANNEL,
+	NS_EXCLUDE_MAX,
+} NS_EXCLUDE;
+
+
 /* NeoStats levels */
 #define NS_ULEVEL_ROOT	200
 #define NS_ULEVEL_ADMIN	185
@@ -622,6 +630,15 @@ typedef struct ModesParm {
 	unsigned int mask;
 	char param[PARAMSIZE];
 } ModesParm;
+
+/** @brief ChannelMember structure
+ *  
+ */
+typedef struct ChannelMember {
+	Client *u;
+	time_t tsjoin;
+	unsigned int flags;
+} ChannelMember;
 
 /** @brief Channel structure
  *  
@@ -1276,12 +1293,15 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 EXPORTFUNC void nlog (LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC void dlog (DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
-typedef void (*ChannelListHandler) (Channel *c, void *v);
-EXPORTFUNC void GetChannelList (ChannelListHandler handler, void *v);
-typedef void (*UserListHandler) (Client *u, void *v);
-EXPORTFUNC void GetUserList (UserListHandler handler, void *v);
-typedef void (*ServerListHandler) (Client *s, void *v);
-EXPORTFUNC void GetServerList (ServerListHandler handler, void *v);
+typedef int (*ChannelListHandler) (Channel *c, void *v);
+EXPORTFUNC int GetChannelList (ChannelListHandler handler, void *v);
+typedef int (*ChannelMemberHandler) (Channel *c, ChannelMember *m, void *v);
+EXPORTFUNC int GetChannelMembers (Channel *c, ChannelMemberHandler handler, void *v);
+
+typedef int (*UserListHandler) (Client *u, void *v);
+EXPORTFUNC int GetUserList (UserListHandler handler, void *v);
+typedef int (*ServerListHandler) (Client *s, void *v);
+EXPORTFUNC int GetServerList (ServerListHandler handler, void *v);
 
 EXPORTFUNC hash_t *GetServerHash (void);
 EXPORTFUNC hash_t *GetBanHash (void);
