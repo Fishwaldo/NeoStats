@@ -144,9 +144,8 @@ read_loop ()
 
 			/* do and dns related callbacks now */
 			do_dns ();
-
-			for (j = 0; j < BUFSIZE; j++) {
-				if (FD_ISSET (servsock, &readfds)) {
+			if (FD_ISSET (servsock, &readfds)) {
+				for (j = 0; j < BUFSIZE; j++) {
 					i = read (servsock, &c, 1);
 					me.RcveBytes++;
 					if (i >= 0) {
@@ -164,31 +163,31 @@ read_loop ()
 						nlog (LOG_WARNING, LOG_CORE, "read returned an Error");
 						return;
 					}
-				} else {
-					/* this checks if there is any data waiting on a socket for a module */
-					hash_scan_begin (&ss, sockh);
-					while ((sn = hash_scan_next (&ss)) != NULL) {
-						mod_sock = hnode_get (sn);
-						SET_SEGV_INMODULE(mod_sock->modname);
-						if (FD_ISSET (mod_sock->sock_no, &readfds)) {
-							nlog (LOG_DEBUG3, LOG_CORE, "Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
-							if (mod_sock->readfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
-								break;
-						}
-						if (FD_ISSET (mod_sock->sock_no, &writefds)) {
-							nlog (LOG_DEBUG3, LOG_CORE, "Running module %s writesock function for %s", mod_sock->modname, mod_sock->sockname);
-							if (mod_sock->writefnc (mod_sock->sock_no, mod_sock->sockname) < 0)
-								break;
-						}
-						if (FD_ISSET (mod_sock->sock_no, &errfds)) {
-							nlog (LOG_DEBUG3, LOG_CORE, "Running module %s errorsock function for %s", mod_sock->modname, mod_sock->sockname);
-							if (mod_sock->errfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
-								break;
-						}
-					}
-					CLEAR_SEGV_INMODULE();
-					break;
 				}
+			} else {
+				/* this checks if there is any data waiting on a socket for a module */
+				hash_scan_begin (&ss, sockh);
+				while ((sn = hash_scan_next (&ss)) != NULL) {
+					mod_sock = hnode_get (sn);
+					SET_SEGV_INMODULE(mod_sock->modname);
+					if (FD_ISSET (mod_sock->sock_no, &readfds)) {
+						nlog (LOG_DEBUG3, LOG_CORE, "Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
+						if (mod_sock->readfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
+							break;
+					}
+					if (FD_ISSET (mod_sock->sock_no, &writefds)) {
+						nlog (LOG_DEBUG3, LOG_CORE, "Running module %s writesock function for %s", mod_sock->modname, mod_sock->sockname);
+						if (mod_sock->writefnc (mod_sock->sock_no, mod_sock->sockname) < 0)
+							break;
+					}
+					if (FD_ISSET (mod_sock->sock_no, &errfds)) {
+						nlog (LOG_DEBUG3, LOG_CORE, "Running module %s errorsock function for %s", mod_sock->modname, mod_sock->sockname);
+						if (mod_sock->errfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
+							break;
+					}
+				}
+				CLEAR_SEGV_INMODULE();
+				break;
 			}
 		} else if (SelectResult == 0) {
 			if ((time (NULL) - me.lastmsg) > 180) {
