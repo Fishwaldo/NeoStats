@@ -1,8 +1,4 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "adns", "lib\adnswin32\adns.vcproj", "{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "curl", "lib\curl\curl.vcproj", "{F9973FED-1759-4B07-ACD0-B949A9F73F29}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -19,16 +15,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libevent", "lib\event\WIN32
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "adns", "lib\adns\adns.vcproj", "{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
 		Release = Release
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
-		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Debug.ActiveCfg = Debug|Win32
-		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Debug.Build.0 = Debug|Win32
-		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Release.ActiveCfg = Release|Win32
-		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Release.Build.0 = Release|Win32
 		{F9973FED-1759-4B07-ACD0-B949A9F73F29}.Debug.ActiveCfg = Debug|Win32
 		{F9973FED-1759-4B07-ACD0-B949A9F73F29}.Debug.Build.0 = Debug|Win32
 		{F9973FED-1759-4B07-ACD0-B949A9F73F29}.Release.ActiveCfg = Release|Win32
@@ -45,6 +41,10 @@ Global
 		{387B391F-49E3-4DBF-AC32-C97D8ADE78C7}.Debug.Build.0 = Debug|Win32
 		{387B391F-49E3-4DBF-AC32-C97D8ADE78C7}.Release.ActiveCfg = Release|Win32
 		{387B391F-49E3-4DBF-AC32-C97D8ADE78C7}.Release.Build.0 = Release|Win32
+		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Debug.ActiveCfg = Debug|Win32
+		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Debug.Build.0 = Debug|Win32
+		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Release.ActiveCfg = Release|Win32
+		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
