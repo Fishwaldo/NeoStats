@@ -58,21 +58,17 @@ add_services_cmd(bot_cmd* cmd_ptr)
 	cmdnode = hnode_create(cmd_ptr);
 	hash_insert(botcmds, cmdnode, cmd_ptr->cmd);
 	nlog(LOG_DEBUG2, LOG_CORE, "Added a new command %s to Services Bot", cmd_ptr->cmd);
-	return 1;
+	return NS_SUCCESS;
 }
 
 int 
 add_services_cmd_list(bot_cmd* cmd_list) 
 {
-	hnode_t *cmdnode;
-	
 	while(cmd_list->cmd) {
-		cmdnode = hnode_create(cmd_list);
-		hash_insert(botcmds, cmdnode, cmd_list->cmd);
-		nlog(LOG_DEBUG2, LOG_CORE, "Added a new command %s to Services Bot", cmd_list->cmd);
+		add_services_cmd(cmd_list);
 		cmd_list++;
 	}
-	return 1;
+	return NS_SUCCESS;
 }
 
 int 
@@ -83,7 +79,6 @@ del_services_cmd(bot_cmd* cmd_ptr)
 	cmdnode = hash_lookup(botcmds, cmd_ptr->cmd);
 	if (cmdnode) {
 		hash_delete(botcmds, cmdnode);
-		cmd_ptr = hnode_get(cmdnode);
 		hnode_destroy(cmdnode);
 		return NS_SUCCESS;
 	}
@@ -93,14 +88,8 @@ del_services_cmd(bot_cmd* cmd_ptr)
 int 
 del_services_cmd_list(bot_cmd* cmd_list) 
 {
-	hnode_t *cmdnode;
-	
 	while(cmd_list->cmd) {
-		cmdnode = hash_lookup(botcmds, cmd_list->cmd);
-		if (cmdnode) {
-			hash_delete(botcmds, cmdnode);
-			hnode_destroy(cmdnode);
-		}
+		del_services_cmd(cmd_list->cmd);
 		cmd_list++;
 	}
 	return NS_SUCCESS;
