@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.60 2003/01/15 14:18:47 fishwaldo Exp $
+** $Id: statserv.c,v 1.61 2003/04/03 14:45:50 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -54,7 +54,7 @@ char s_StatServ[MAXNICK] = "StatServ";
 Module_Info Statserv_Info[] = { {
 	SSMNAME,
 	"Statistical Bot For NeoStats",
-	"3.5"
+	"3.6"
 } };
 
 
