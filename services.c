@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: services.c,v 1.9 2000/03/29 13:05:56 fishwaldo Exp $
+** $Id: services.c,v 1.10 2000/04/22 04:45:08 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -242,7 +242,7 @@ char *uptime(time_t when)
 extern void ns_shutdown(User *u, char *reason)
 {
 	Module *mod_ptr = NULL;
-	segv_location = sstrdup("ns_shutdown");
+	segv_loc("ns_shutdown");
 	if (strcasecmp(u->nick, s_Services)) {
 		if (!(UserLevel(u) >= 190)) {
 			log("Access Denied (SHUTDOWN) to %s", u->nick);
@@ -257,22 +257,24 @@ extern void ns_shutdown(User *u, char *reason)
 		unload_module(mod_ptr->info->module_name, u);
 		mod_ptr = module_list->next;
 	}
-	free(mod_ptr);
+	if (mod_ptr) free(mod_ptr);
 
 
         globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
+	sleep(1);
 	sts(":%s QUIT :%s Sent SHUTDOWN: %s",s_Services,u->nick,reason);
 	sts("SQUIT %s",me.name);
 	sleep(1);
 	close(servsock);
 	log("%s [%s](%s) requested SHUTDOWN.", u->nick, u->username,
 		u->hostname);
+	cleanmem();
 	exit(0);
 }
 
 static void ns_reload(User *u, char *reason)
 {
-	segv_location = sstrdup("ns_reload");
+	segv_loc("ns_reload");
         if (!(UserLevel(u) >= 190)) {
                 log("Access Denied (RELOAD) to %s", u->nick);
                 privmsg(u->nick, s_Services, "Access Denied.");
@@ -324,7 +326,7 @@ static void ns_logs(User *u)
 	FILE *fp;
 	char buf[512];
 
-	segv_location = sstrdup("ns_logs");
+	segv_loc("ns_logs");
 	if (!(UserLevel(u) >= 190)) {
 		log("Access Denied (LOGS) to %s", u->nick);
 		privmsg(u->nick, s_Services, "Access Denied.");
@@ -346,7 +348,7 @@ static void ns_logs(User *u)
 
 static void ns_jupe(User *u, char *server)
 {
-	segv_location = sstrdup("ns_jupe");
+	segv_loc("ns_jupe");
 	if (!(UserLevel(u) >= 190)) {
 		privmsg(u->nick, s_Services, "Access Denied.");
 		return;
@@ -362,7 +364,7 @@ static void ns_jupe(User *u, char *server)
 
 static void ns_JOIN(User *u, char *chan)
 {
-	segv_location = sstrdup("ns_JOIN");
+	segv_loc("ns_JOIN");
 	if (!(UserLevel(u) >= 190)) {
 		log("Access Denied (JOIN) to %s", u->nick);
 		privmsg(u->nick, s_Services, "Access Denied.");
@@ -383,7 +385,7 @@ static void ns_JOIN(User *u, char *chan)
 }
 void ns_debug_to_coders(char *u)
 {
-	segv_location = sstrdup("ns_debug_to_coders");
+	segv_loc("ns_debug_to_coders");
 	if (!me.coder_debug) {
 		me.coder_debug = 1;
 		globops(me.name, "\2DEBUG MODE\2 Activated by %s",u);
@@ -404,7 +406,7 @@ void ns_debug_to_coders(char *u)
 }                                          
 static void ns_raw(User *u, char *message)
 {
-	segv_location = sstrdup("ns_raw");
+	segv_loc("ns_raw");
 	if (!(UserLevel(u) >= 190)) {
 		privmsg(u->nick, s_Services, "Permission Denied, you need to be a TechAdmin to do that!");
 		return;
@@ -414,7 +416,7 @@ static void ns_raw(User *u, char *message)
 }	
 static void ns_user_dump(User *u)
 {
-	segv_location = sstrdup("ns_user_dump");
+	segv_loc("ns_user_dump");
 	if (!(UserLevel(u) >= 200)) {
 		privmsg(u->nick, s_Services, "Permission Denied, you need to be a Coder to Enable Debug Mode!");
 		return;
@@ -424,7 +426,7 @@ static void ns_user_dump(User *u)
 }
 static void ns_server_dump(User *u)
 {
-	segv_location = sstrdup("ns_server_dump");
+	segv_loc("ns_server_dump");
 	if (!(UserLevel(u) >= 200)) {
 		privmsg(u->nick, s_Services, "Permission Denied, you need to be a Coder to Enable Debug Mode!");
 		return;
@@ -434,7 +436,7 @@ static void ns_server_dump(User *u)
 }
 static void ns_chan_dump(User *u)
 {
-	segv_location = sstrdup("ns_chan_dump");
+	segv_loc("ns_chan_dump");
 	if (!(UserLevel(u) >= 200)) {
 	
 		privmsg(u->nick, s_Services, "Permission Denied, you need to be a Coder to Enable Debug Mode!");
@@ -445,7 +447,7 @@ static void ns_chan_dump(User *u)
 }
 static void ns_uptime(User *u)
 {
-	segv_location = sstrdup("ns_uptime");
+	segv_loc("ns_uptime");
 
 	log("time %d", me.t_start);
 	privmsg(u->nick, s_Services, "Statistics Information:");
@@ -464,7 +466,7 @@ static void ns_uptime(User *u)
 }
 static void ns_version(User *u)
 {
-	segv_location = sstrdup("ns_version");
+	segv_loc("ns_version");
         privmsg(u->nick, s_Services, "\2StatServ Version Information\2");
         privmsg(u->nick, s_Services, "%s - %s", me.name, version,
                                 me.name, version_date, version_time);

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.12 2000/04/08 12:40:07 fishwaldo Exp $
+** $Id: ircd.c,v 1.13 2000/04/22 04:45:07 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -121,7 +121,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 {
 	User *u;
 	char tmp[512];
-	segv_location = sstrdup("init_bot");
+	segv_loc("init_bot");
 	u = finduser(nick);
 	if (u) {
 		log("Attempting to Login with a Nickname that already Exists: %s",nick);
@@ -143,7 +143,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 int del_bot(char *nick, char *reason)
 {
 	User *u;
-	segv_location = sstrdup("del_bot");
+	segv_loc("del_bot");
 	u = finduser(nick);
 #ifdef DEBUG
 	log("Killing %s for %s",nick,reason);
@@ -167,7 +167,7 @@ void Module_Event(char *event, void *data) {
 	EventFnList *ev_list;
 
 
-	segv_location = sstrdup("Module_Event");
+	segv_loc("Module_Event");
 	module_ptr = module_list->next;
 	while (module_ptr != NULL) {
 		/* this goes through each Module */
@@ -178,9 +178,9 @@ void Module_Event(char *event, void *data) {
 #ifdef DEBUG
 					log("Running Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
 #endif
-					segv_location = sstrdup(module_ptr->info->module_name);
+					segv_loc(module_ptr->info->module_name);
 					ev_list->function(data);			
-					segv_location = sstrdup("Module_Event_Return");
+					segv_loc("Module_Event_Return");
 					break;
 			}
 		ev_list++;
@@ -198,9 +198,9 @@ void parse(char *line)
 	Functions *fn_list;
 	Mod_User *list;
 	
-	segv_location = sstrdup("parse");
+	segv_loc("parse");
 	strip(line);
-	strcpy(recbuf, line);
+	strncpy(recbuf, line, 255);
 
 	if (!(*line))
 		return;
@@ -226,9 +226,9 @@ void parse(char *line)
 		/* coreLine contains the Actual Message now, cmd, is who its too */
 		if (!strcasecmp(s_Services,cmd)) {
 			/* its to the Internal Services Bot */
-			segv_location = sstrdup("servicesbot");
+			segv_loc("servicesbot");
 			servicesbot(origin,coreLine);
-			segv_location = sstrdup("ServicesBot_return");
+			segv_loc("ServicesBot_return");
 			return;
 		} else {
 			list = findbot(cmd);
@@ -237,7 +237,7 @@ void parse(char *line)
 #ifdef DEBUG
 				log("nicks: %s", list->nick);
 #endif
-				segv_location = sstrdup(list->modname);
+				segv_loc(list->modname);
 				list->function(origin, coreLine);
 				return;
 			}
@@ -246,18 +246,18 @@ void parse(char *line)
         }	
         	
         /* now, Parse the Command to the Internal Functions... */
-	segv_location = sstrdup("Parse - Internal Functions");
+	segv_loc("Parse - Internal Functions");
 	for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
 		if (!strcasecmp(cmd_list[I].name, cmd)) {
 			if (cmd_list[I].srvmsg == cmdptr) {
-				segv_location = sstrdup(cmd_list[I].name);
+				segv_loc(cmd_list[I].name);
 				cmd_list[I].function(origin, coreLine);
 				break; log("should never get here-Parse");
 			}	
 		}
 	}
 	/* K, now Parse it to the Module functions */
-	segv_location = sstrdup("Parse - Module Functions");
+	segv_loc("Parse - Module Functions");
 	module_ptr = module_list->next;
 	while (module_ptr != NULL) {
 		/* this goes through each Module */
@@ -269,9 +269,9 @@ void parse(char *line)
 #ifdef DEBUG
 					log("Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
 #endif
-					segv_location = sstrdup(module_ptr->info->module_name);
+					segv_loc(module_ptr->info->module_name);
 					fn_list->function(origin, coreLine);			
-					segv_location = sstrdup("Parse_Return_Module");
+					segv_loc("Parse_Return_Module");
 					break;
 					log("Should never get here-Parse");
 				}	
@@ -337,7 +337,8 @@ void Usr_AddServer(char *origin, char *coreLine){
 void Usr_DelServer(char *origin, char *coreLine){
 	char *cmd;
 	cmd = strtok(coreLine, " ");
-	Module_Event("DELSERVER", coreLine);
+	log("Server %s", cmd);
+	Module_Event("DELSERVER", findserver(cmd));
 	DelServer(cmd);
 }
 void Usr_DelUser(char *origin, char *coreLine) {
@@ -494,13 +495,11 @@ void Srv_Server(char *origin, char *coreLine) {
 			Module_Event("NEWSERVER", s);
 }
 void Srv_Squit(char *origin, char *coreLine) {
-			Server *s;
-			s = findserver(coreLine);
-			if (s) {
-				Module_Event("SQUIT", s);
-				DelServer(coreLine);
-			}
-						
+	char *cmd;
+	cmd = strtok(coreLine, " ");
+	log("Server %s", cmd);
+	Module_Event("DELSERVER", findserver(cmd));
+	DelServer(cmd);
 }
 void Srv_Nick(char *origin, char *coreLine) {
 			char *user, *host, *server, *cmd;

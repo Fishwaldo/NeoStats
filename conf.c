@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: conf.c,v 1.4 2000/03/29 13:05:56 fishwaldo Exp $
+** $Id: conf.c,v 1.5 2000/04/22 04:45:07 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -64,7 +64,7 @@ done_mods = 0;
 }
 void cb_Module(char *arg, int configtype) {
 	int i;
-		segv_location= sstrdup("cb_Module");
+		segv_loc("cb_Module");
 		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) { 
 			if (!strcasecmp(load_mods[i], arg)) {
 				return;
@@ -78,7 +78,7 @@ int init_modules() {
 	int i;
 	int rval;
 	
-	segv_location=sstrdup("init_modules");
+	segv_loc("init_modules");
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] !=0); i++) {
 #ifdef DEBUG
 		log("Loading Module %s", load_mods[i]);

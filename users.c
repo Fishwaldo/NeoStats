@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.6 2000/03/29 13:05:56 fishwaldo Exp $
+** $Id: users.c,v 1.7 2000/04/22 04:45:08 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -445,6 +445,26 @@ void DelUser(char *nick)
 	free(u);
 }
 
+void cleanmem() {
+	User *u;
+	int i;
+	Server *s;
+	register int j;
+	test:
+/*	for (i = 0; i < U_TABLE_SIZE; i++) {
+		for (u = userlist[i]; u; u = u->next)
+			DelUser(u->nick);
+			goto test;
+	}
+	for (j = 0; j < S_TABLE_SIZE; j++) {
+		for (s = serverlist[j]; s; s = s->next) {
+			DelServer(s->name);
+			j = 0;
+		}
+	}
+*/
+}
+
 void Change_User(User *u, char *newnick)
 {
 #ifdef DEBUG
@@ -492,7 +512,9 @@ User *finduser(char *nick)
 				return u;
 		}
 	}
+#ifdef DEBUG
 	log("FindUser(%s) -> NOTFOUND", nick);
+#endif
 	return NULL;
 }
 
@@ -624,7 +646,7 @@ void DelServer(char *name)
 		log("DelServer(): %s failed!", name);
 		return;
 	}
-
+	log("DelServer(%s)", name);
 	del_server_from_hash_table(name, s);
 	free(s);
 }

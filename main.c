@@ -36,7 +36,7 @@ int forked = 0;
 int main()
 {
 	FILE *fp;
-	segv_location = sstrdup("main");
+	segv_loc("Main");
 	me.onchan = 0;
 	printf("%s Loading...\n", version);
 	printf("-----------------------------------------------\n");
@@ -117,9 +117,6 @@ RETSIGTYPE serv_segv() {
 	sts("SQUIT %s",me.name);
 	
 	sleep(2);
-	kill(forked, 3);
-	kill(forked, 9);
-	exit(-1);	
 }
 
 
@@ -143,7 +140,7 @@ static	void	setup_signals()
 	(void)sigaddset(&act.sa_mask, SIGTERM);
 	(void)sigaction(SIGTERM, &act, NULL);
 /* handling of SIGSEGV as well -sts */
-	act.sa_handler = serv_segv;
+/*	act.sa_handler = serv_segv;
 	(void)sigaddset(&act.sa_mask, SIGSEGV);
 	(void)sigaction(SIGSEGV, &act, NULL);
 
@@ -151,6 +148,7 @@ static	void	setup_signals()
 	(void)signal(SIGHUP, conf_rehash);
 	(void)signal(SIGTERM, serv_die); 
 	(void)signal(SIGSEGV, serv_segv);
+*/
 }
 
 
@@ -158,7 +156,7 @@ void start()
 {
 	static int attempts = 0;
 	
-	segv_location = sstrdup("start");
+	segv_loc("start");
 	TimerReset();
 	init_server_hash();
 	init_user_hash();
@@ -191,7 +189,7 @@ void start()
 
 void login()
 	{
-	segv_location = sstrdup("login");
+	segv_loc("login");
 	sts("PASS %s", me.pass);
 	sts("SERVER %s 1 :%s", me.name,me.infoline);
 	sts("PROTOCTL TOKEN");
@@ -201,7 +199,7 @@ void login()
 
 void init_ServBot()
 {
-	segv_location = sstrdup("init_ServBot");
+	segv_loc("init_ServBot");
 	sts("NICK %s 1 %d %s %s %s 0 :/msg %s \2HELP\2", s_Services, time(NULL),
 		Servbot.user, Servbot.host, me.name, s_Services);
 	AddUser(s_Services, Servbot.user, Servbot.host, me.name);
@@ -218,11 +216,12 @@ void *smalloc(long size)
 {
 	void *buf;
 	
-	segv_location = sstrdup("smalloc");
+	segv_loc("smalloc");
 	if (!size) {
 		log("smalloc(): illegal attempt to allocate 0 bytes!");
 		size = 1;
 	}
+
 	buf = malloc(size);
 	if (!buf) {
 		log("smalloc(): out of memory.");
@@ -240,6 +239,10 @@ char *sstrdup(const char *s)
 	}
 	return t;
 }
+
+void segv_loc(const char *s) {
+	strncpy(segv_location, s, 255);	
+}	
 
 unsigned long HASH(const unsigned char *name, int size_of_table)
 {

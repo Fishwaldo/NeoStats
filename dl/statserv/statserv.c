@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.c,v 1.12 2000/03/29 13:05:57 fishwaldo Exp $
+** $Id: statserv.c,v 1.13 2000/04/22 04:45:08 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -30,6 +30,7 @@ static void ss_netstats(User *);
 static int Online(Server *);
 static int pong(Server *);
 static int s_new_server(Server *);
+static int s_del_server(Server *);
 static int s_new_user(User *);
 static int s_del_user(User *);
 static int s_user_modes(User *);
@@ -38,6 +39,7 @@ int s_bot_kill(char *);
 static void ss_cb_Config(char *, int);
 static int new_m_version(char *av, char *tmp);
 static void DelTLD(User *u);
+static int DelStats(Server *);
 
 char s_StatServ[MAXNICK] = "StatServ";
 
@@ -59,6 +61,7 @@ EventFnList StatServ_Event_List[] = {
 	{"ONLINE", 	Online},
 	{"PONG", 	pong},
 	{"NEWSERVER",	s_new_server},
+	{"DELSERVER",   s_del_server},
 	{"SIGNON", 	s_new_user},
 	{"UMODE", 	s_user_modes},
 	{"SIGNOFF", 	s_del_user},
@@ -145,6 +148,19 @@ static int s_new_server(Server *s) {
 	return 1;
 
 }
+static int s_del_server(Server *s) {
+
+	DelStats(s);
+	DecreaseServers();
+	if (synced) notice(s_StatServ, "\2SERVER\2 %s has SQUITED the Network at %s", s->name, s->uplink);
+	if (synced) sts(":%s WALLOPS :\2Oh Oh Server %s has parted the Network",s_StatServ, s->name);
+	return 1;
+
+}
+
+
+
+
 static int s_user_kill(User *u) {
 	SStats *s;
 	char *cmd, *who;
@@ -167,8 +183,11 @@ static int s_user_kill(User *u) {
 	if (finduser(who)) {
 	/* it was a User that killed the target */
 		if (synced) notice(s_StatServ, "\2KILL\2 %s was Killed by %s --> %s", u->nick, who, cmd);
+		s->operkills++;
 	} else if (findserver(who)) {
 		if (synced) notice(s_StatServ, "\2SERVER KILL\2 %s was Killed by the Server %s --> %s", u->nick, who, cmd);
+		s->serverkills++;
+
 	}
 	return 1;
 }
@@ -1066,6 +1085,18 @@ static SStats *new_stats(const char *name)
 	return s;
 }
 
+static int DelStats(Server *s) {
+	SStats *st = findstats(s->name);
+#ifdef DEBUG
+	log("DelStats(%s)", s->name);
+#endif
+	if (st) {
+		st->lastseen = time(NULL);
+		st->numsplits++;
+		return 1;
+	}
+	return -1;
+}
 void AddStats(Server *s)
 {
 	SStats *st = findstats(s->name);

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.11 2000/03/29 13:05:56 fishwaldo Exp $
+** $Id: stats.h,v 1.12 2000/04/22 04:45:08 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -26,6 +26,7 @@
 #include <ctype.h>
 #include <sys/stat.h>
 #include <sys/resource.h>
+#include <dmalloc.h>
 
 #include "Unreal.h"
 #include "config.h"
@@ -54,7 +55,7 @@ int servsock;
 int times;
 extern char s_Debug[MAXNICK], s_Services[MAXNICK];
 extern const char version[];
-char recbuf[BUFSIZE], *segv_location;
+char recbuf[BUFSIZE], segv_location[255];
 
 typedef struct server_ Server;
 typedef struct user_ User;
@@ -197,6 +198,7 @@ extern void *smalloc(long);
 extern char *sstrdup(const char *);
 extern unsigned long HASH(const unsigned char *, int);
 extern char *strlower(char *);
+extern void segv_loc(const char *);
 
 /* ircd.c */
 extern void parse();
@@ -246,7 +248,7 @@ extern void SaveMyUsers();
 extern void DeleteMyUser(char *);
 extern MyUser *findmyuser(char *);
 extern int UserLevel(User *);
-
+extern void cleanmem();
 
 /* ns_help.c */
 extern const char *ns_help[];

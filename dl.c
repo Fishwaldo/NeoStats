@@ -20,7 +20,7 @@ void __init_mod_list() {
 	Mod_User *u, *Uprev;
 	Sock_List *s, *Sprev;
 	
-	segv_location = sstrdup("__init_mod_list");
+	segv_loc("__init_mod_list");
 	module_list = (Module *)malloc(sizeof(Module));
 	bzero(module_list, sizeof(Module));
 	module_list->prev = NULL;
@@ -64,7 +64,7 @@ void __init_mod_list() {
 int add_ld_path(char *path) {
 	LD_Path *path_ent, *list;
 	
-	segv_location = sstrdup("add_ld_path");
+	segv_loc("add_ld_path");
 	path_ent = (LD_Path *)malloc(sizeof(LD_Path));
 	
 	bzero(path_ent, sizeof(LD_Path));
@@ -128,7 +128,7 @@ int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interva
 	Mod_Timer *Mod_timer_list;
 	Module *list_ptr;
 
-	segv_location = sstrdup("add_mod_timer");
+	segv_loc("add_mod_timer");
 
 
 	Mod_timer_list = new_timer(timer_name);
@@ -159,7 +159,7 @@ int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interva
 int del_mod_timer(char *timer_name) {
 	Mod_Timer *list;
 
-	segv_location = sstrdup("del_mod_timer");
+	segv_loc("del_mod_timer");
 	
 	list = findtimer(timer_name);
 		
@@ -177,7 +177,7 @@ int del_mod_timer(char *timer_name) {
 void list_module_timer(User *u) {
 	Mod_Timer *mod_ptr = NULL;
 	register int j;
-	segv_location = sstrdup("list_module_timer");
+	segv_loc("list_module_timer");
 	privmsg(u->nick,s_Services,"Module timer List:");
 	for (j = 0; j < T_TABLE_SIZE; j++) {
 		for (mod_ptr = module_timer_lists[j]; mod_ptr; mod_ptr = mod_ptr->next) { 
@@ -239,7 +239,7 @@ int add_socket(char *func_name, char *sock_name, int socknum, char *mod_name) {
 	Sock_List *Sockets_mod_list;
 	Module *list_ptr;
 
-	segv_location = sstrdup("add_Socket");
+	segv_loc("add_Socket");
 
 
 	Sockets_mod_list = new_sock(sock_name);
@@ -269,7 +269,7 @@ int add_socket(char *func_name, char *sock_name, int socknum, char *mod_name) {
 int del_socket(char *sock_name) {
 	Sock_List *list;
 
-	segv_location = sstrdup("del_mod_timer");
+	segv_loc("del_mod_timer");
 #ifdef DEBUG
 	log("Del_Sock");
 #endif
@@ -290,7 +290,7 @@ int del_socket(char *sock_name) {
 void list_sockets(User *u) {
 	Sock_List *mod_ptr = NULL;
 	register int j;
-	segv_location = sstrdup("list_sockets");
+	segv_loc("list_sockets");
 	privmsg(u->nick,s_Services,"Sockets List:");
 	for (j = 0; j < MAX_SOCKS; j++) {
 		for (mod_ptr = Socket_lists[j]; mod_ptr; mod_ptr = mod_ptr->next) { 
@@ -356,7 +356,7 @@ Mod_User *findbot(char *bot_name) {
 
 int del_mod_user(char *bot_name) {
 	Mod_User *list;
-	segv_location = sstrdup("del_mod_user");
+	segv_loc("del_mod_user");
 	
 	list = findbot(bot_name);
 		
@@ -376,7 +376,7 @@ int bot_nick_change(char *oldnick, char *newnick)
 {
 	User *u;
 	Mod_User *mod_tmp, *mod_ptr = NULL;
-	segv_location = sstrdup("bot_nick_change");
+	segv_loc("bot_nick_change");
 
 	/* First, try to find out if the newnick is unique! */
 #ifdef DEBUG
@@ -415,7 +415,7 @@ int add_mod_user(char *nick, char *mod_name) {
 	Mod_User *Mod_Usr_list;
 	Module *list_ptr;
 	
-	segv_location = sstrdup("add_mod_user");
+	segv_loc("add_mod_user");
 
 
 	Mod_Usr_list = new_bot(nick);
@@ -437,7 +437,7 @@ int add_mod_user(char *nick, char *mod_name) {
 void list_module_bots(User *u) {
 	Mod_User *mod_ptr = NULL;
 	register int j;
-	segv_location = sstrdup("list_module_bots");
+	segv_loc("list_module_bots");
 
 	privmsg(u->nick,s_Services,"Module Bot List:");
 
@@ -455,7 +455,7 @@ void list_module_bots(User *u) {
 
 int load_module(char *path1, User *u) {
 	char *dl_error = NULL;
-	void *dl_handle = NULL;
+	void *dl_handle;
 	int do_msg;
 	char *path = NULL;
 	Module_Info * (*mod_get_info)() = NULL;
@@ -466,7 +466,7 @@ int load_module(char *path1, User *u) {
 	EventFnList *event_fn_ptr = NULL;
 	Module *mod_ptr = NULL, *list_ptr = NULL;
 
-	segv_location = sstrdup("load_module");
+	segv_loc("load_module");
 	if (u == NULL) {
 		do_msg = 0;
 	} else {
@@ -576,7 +576,7 @@ int load_module(char *path1, User *u) {
 };
 void list_module(User *u) {
 	Module *mod_ptr = NULL;
-	segv_location = sstrdup("list_module");
+	segv_loc("list_module");
 	mod_ptr = module_list->next;
 	privmsg(u->nick,s_Services,"Module List:");
 	while(mod_ptr != NULL) {
@@ -594,7 +594,7 @@ int unload_module(char *module_name, User *u) {
 	Mod_Timer *mod_tmr = NULL;
 	register int j;
 
-	segv_location = sstrdup("unload_module");
+	segv_loc("unload_module");
 	/* Check to see if this Module has any timers registered....  */
 	for (j = 0; j < T_TABLE_SIZE; j++ ) {
 		for (mod_tmr = module_timer_lists[j]; mod_tmr; mod_tmr = mod_tmr->next) {
