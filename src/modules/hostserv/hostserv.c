@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 #include "neostats.h"
-#include <fnmatch.h>
 #include "hostserv.h"
 
 #define MAXPASSWORD	30
@@ -252,7 +251,7 @@ static int hs_event_signon(CmdParams* cmdparams)
 	if (hn) {
 		map = lnode_get(hn);
 		dlog(DEBUG1, "Checking %s against %s", map->host, cmdparams->source.user->hostname);
-		if (fnmatch(map->host, cmdparams->source.user->hostname, 0) == 0) {
+		if (match(map->host, cmdparams->source.user->hostname)) {
 			ssvshost_cmd(cmdparams->source.user->nick, map->vhost);
 			prefmsg(cmdparams->source.user->nick, hs_bot->nick,
 				"Automatically setting your Virtual Host to %s",
@@ -572,7 +571,7 @@ static int hs_chpass(CmdParams* cmdparams)
 	hn = list_find(vhosts, nick, findnick);
 	if (hn) {
 		map = lnode_get(hn);
-		if ((fnmatch(map->host, cmdparams->source.user->hostname, 0) == 0)
+		if ((match(map->host, cmdparams->source.user->hostname))
 		    || (UserLevel(cmdparams->source.user) >= 100)) {
 			if (!ircstrcasecmp(map->passwd, oldpass)) {
 				strlcpy(map->passwd, newpass, MAXPASSWORD);
@@ -628,7 +627,7 @@ static int hs_add(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	hash_scan_begin(&hs, bannedvhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
-		if (fnmatch(hnode_get(hn), h, 0) == 0) {
+		if (match(hnode_get(hn), h)) {
 			prefmsg(cmdparams->source.user->nick, hs_bot->nick,
 				"%s has been matched against the vhost ban %s",
 				h, (char *) hnode_get(hn));
@@ -660,7 +659,7 @@ static int hs_add(CmdParams* cmdparams)
 		if ((nu = finduser(cmd)) != NULL) {
 			if (IsMe(nu)) 
 				return 1;
-			if (fnmatch(m, nu->hostname, 0) == 0) {
+			if (match(m, nu->hostname)) {
 				ssvshost_cmd(nu->nick, h);
 				prefmsg(cmdparams->source.user->nick, hs_bot->nick,
 					"%s is online now, setting vhost to %s",
