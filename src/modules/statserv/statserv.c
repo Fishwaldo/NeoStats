@@ -63,7 +63,7 @@ static int ss_event_kick(CmdParams* cmdparams);
 static User* listu;
 static int listindex = 0;
 Bot *ss_bot;
-static Module* ss_module;
+Module* ss_module;
 
 ModuleEvent module_events[] = {
 	{EVENT_ONLINE,		ss_event_online},
@@ -144,7 +144,6 @@ static int ss_event_online(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	ss_bot = init_bot (&ss_botinfo);
-	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */
 	add_timer (SaveStats, "SaveStats", DBSAVETIME);
 	add_timer (ss_html, "ss_html", 3600);
@@ -162,7 +161,6 @@ int ModInit(Module* mod_ptr)
 
 	SET_SEGV_LOCATION();
 	ss_module = mod_ptr;
-	StatServ.onchan = 0;
 	StatServ.shutdown = 0;
 	/* we want nickip messages */
 	me.want_nickip = 1; 

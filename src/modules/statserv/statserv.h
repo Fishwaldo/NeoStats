@@ -37,6 +37,7 @@
 #define PROGCHANTIME 3600
 
 extern Bot *ss_bot;
+extern Module* ss_module;
 
 extern hash_t *Shead;
 extern list_t *Chead;
@@ -67,7 +68,6 @@ struct StatServ {
 	int recordalert; 
 	int html; 
 	char htmlpath[MAXPATH]; 
-	int onchan; 
 	int msginterval; 
 	int msglimit; 
 	int shutdown; 
