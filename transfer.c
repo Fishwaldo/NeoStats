@@ -65,7 +65,7 @@ int init_curl() {
 	activetransfers = list_create(MAX_TRANSFERS);
 	nlog(LOG_DEBUG1, LOG_CORE, "LibCurl Initilized successfully");
 	
-//	new_transfer("http://secure.irc-chat.net/", "", NS_MEMORY, "0", "Blah", testcallback);
+/*	new_transfer("http://secure.irc-chat.net/", "", NS_MEMORY, "0", "Blah", testcallback); */
 	return NS_SUCCESS;
 }
 
