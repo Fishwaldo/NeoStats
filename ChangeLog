@@ -8,6 +8,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fixed a big arse bug with Multiple SJOIN's for the same channel, and incorrect channel status modes getting set on users.
  - StatServ now only Wallops records in a configurable amount of time. eg, 5 records in 5 minutes 
  - Some of statserv stats were never displayed, fixed that
+ - Flood control now works by default for all module bots
  - Fix a adns compile error and remove the warnings
  - -Wall is only set when compiling with debug mode support. No need for the make.log file anymore
  - ./configure --enable-bignet support for more than 2000 users

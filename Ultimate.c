@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.32 2002/12/30 12:09:38 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.33 2003/01/04 04:46:58 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -69,6 +69,7 @@ Oper_Modes usr_mds[] = {
                                  {UMODE_KILLS, 'k',0},
                                  {UMODE_SERVICES, 'S',200},
                                  {UMODE_SERVICESADMIN, 'P',200},
+				 {UMODE_SERVADMIN, 'A', 100},
 				 {UMODE_RBOT, 'B',0},
 		 		 {UMODE_SBOT, 'b', 0},
 	   			 {UMODE_DEAF,    'd',0},
