@@ -71,7 +71,7 @@ const char ircd_version[] = "(U32)";
 #else
 const char ircd_version[] = "(U31)";
 #endif
-const char services_bot_modes[]= "+oS";
+const char services_bot_modes[]= "+oSqd";
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
