@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.h,v 1.12 2003/08/19 13:08:13 fishwaldo Exp $
+** $Id: cs.h,v 1.13 2003/08/29 11:16:00 fishwaldo Exp $
 */
 
 
@@ -39,15 +39,12 @@
   #define TECHADMIN_MODE 'T'		/* Set to a number as we dont use */
   #define SERVICESADMIN_MODE 'a'
   #define NETSERVICE_MODE 'S'
-  #define INVISIBLE_MODE '8'		/* Set to a number as we dont use */
-  #define BOT_MODE '9'			/* Set to a number as we dont use */
 #elif ULTIMATE
 /*
 ** If we are compiled to Use Ultimate 2.8.x use these modes and flags
 */
   #define LOCOP_MODE 'O'
   #define OPER_MODE 'o'
-  #define GUESTADMIN_MODE '7'		/* Set to a number as we dont use */
   #define COSERVERADMIN_MODE 'J'
   #define SERVERADMIN_MODE 'A'
   #define CONETADMIN_MODE 't'
@@ -55,7 +52,6 @@
   #define TECHADMIN_MODE 'T'
   #define SERVICESADMIN_MODE 'P'
   #define NETSERVICE_MODE 'S'
-  #define INVISIBLE_MODE '8'            /* Set to a number as we dont use */
   #define BOT_MODE 'B'
 #endif
 #ifdef MYSTIC
@@ -64,7 +60,6 @@
 */
   #define LOCOP_MODE 'O'
   #define OPER_MODE 'o'
-  #define GUESTADMIN_MODE '7'		/* Set to a number as we dont use */
   #define COSERVERADMIN_MODE 'J'
   #define SERVERADMIN_MODE 'A'
   #define CONETADMIN_MODE 't'
@@ -72,17 +67,14 @@
   #define TECHADMIN_MODE 'T'
   #define SERVICESADMIN_MODE 'P'
   #define NETSERVICE_MODE 'S'
-  #define INVISIBLE_MODE '8'            /* Set to a number as we dont use */
   #define BOT_MODE 'B'
 #endif
 
 #ifdef UNREAL
   #define LOCOP_MODE 'O'
   #define OPER_MODE 'o'
-  #define GUESTADMIN_MODE '7'		/* Set to a number we dont use */
   #define COSERVERADMIN_MODE 'C'
   #define SERVERADMIN_MODE 'A'
-  #define CONETADMIN_MODE '8'		/* Set to a number we dont use */
   #define NETADMIN_MODE 'N'
   #define TECHADMIN_MODE 'T'
   #define SERVICESADMIN_MODE 'a'
@@ -94,44 +86,17 @@
 #ifdef HYBRID7
   #define LOCOP_MODE 'O'
   #define OPER_MODE 'o'
-  #define GUESTADMIN_MODE '7'		/* Set to a number we dont use */
-  #define COSERVERADMIN_MODE '1'
   #define SERVERADMIN_MODE 'a'
-  #define CONETADMIN_MODE '8'		/* Set to a number we dont use */
-  #define NETADMIN_MODE '6'
-  #define TECHADMIN_MODE '9'
-  #define SERVICESADMIN_MODE '5'
-  #define NETSERVICE_MODE '4'
-  #define INVISIBLE_MODE '3'
-  #define BOT_MODE '2'
 #endif
 
 #ifdef NEOIRCD
   #define LOCOP_MODE 'O'
   #define OPER_MODE 'o'
-  #define GUESTADMIN_MODE '7'		/* Set to a number we dont use */
-  #define COSERVERADMIN_MODE '1'
   #define SERVERADMIN_MODE 'a'
-  #define CONETADMIN_MODE '8'		/* Set to a number we dont use */
-  #define NETADMIN_MODE '6'
-  #define TECHADMIN_MODE '9'
-  #define SERVICESADMIN_MODE '5'
-  #define NETSERVICE_MODE '4'
-  #define INVISIBLE_MODE '3'
-  #define BOT_MODE '2'
 #endif
 
 #ifdef BAHAMUT
   #define LOCOP_MODE 'O'
   #define OPER_MODE 'o'
-  #define GUESTADMIN_MODE '1'		/* Set to a number we dont use */
-  #define COSERVERADMIN_MODE '2'
   #define SERVERADMIN_MODE 'a'
-  #define CONETADMIN_MODE '3'		/* Set to a number we dont use */
-  #define NETADMIN_MODE '4'
-  #define TECHADMIN_MODE '5'
-  #define SERVICESADMIN_MODE '6'
-  #define NETSERVICE_MODE '7'
-  #define INVISIBLE_MODE '8'
-  #define BOT_MODE '9'
 #endif

@@ -1,5 +1,9 @@
 ConnectServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma^
+* Version 1.8 * August 29, 2003
+- Colorized Output thanks to MrAllThat
+- Now only compiles for Modes that are relevent
+
 * Version 1.7 * July 15th, 2003
 - Fixed a problem with connectserv clobering the avlist for modes
 
