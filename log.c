@@ -127,7 +127,9 @@ nlog (int level, int scope, char *fmt, ...)
 			if (segvinmodule[0] != 0) {
 				hn = hash_lookup (logs, segvinmodule);
 			} else {
+#if 0
 				nlog (LOG_ERROR, LOG_CORE, "Warning, nlog called with LOG_MOD, but segvinmodule is blank! Logging to Core");
+#endif
 				hn = hash_lookup (logs, CoreLogFileName);
 			}
 		} else {
