@@ -204,7 +204,7 @@ sqllisten_on_port(int port)
 		nlog(LOG_CRITICAL, "SqlSrv: Unable to get socket for port %d.", port);
 		return -1;
 	}
-	sys_set_nonblocking_sock (srvfd);
+	sys_sock_set_nonblocking (srvfd);
 	if (bind(srvfd, (struct sockaddr *) &srvskt, adrlen) < 0)
 	{
 		nlog(LOG_CRITICAL, "Unable to bind to port %d", port);
@@ -241,7 +241,7 @@ sql_accept_conn(SYS_SOCKET srvfd)
 	/* if we reached our max connection, just exit */
 	if (list_count(sqlconnections) > 5) {
 		nlog(LOG_NOTICE, "Can not accept new SQL connection. Full");
-		sys_close_sock (srvfd);
+		sys_sock_close (srvfd);
 		return;
 	}
 
@@ -257,7 +257,7 @@ sql_accept_conn(SYS_SOCKET srvfd)
 	{
 		nlog(LOG_WARNING, "SqlSrv: Manager accept() error (%s). \n", strerror(errno));
 		ns_free(newui);
-		sys_close_sock (srvfd);
+		sys_sock_close (srvfd);
 		return;
 	}
 	else
@@ -266,12 +266,12 @@ sql_accept_conn(SYS_SOCKET srvfd)
 		if (!match(sqlsrvhost, tmp)) {
     	/* we didnt get a match, bye bye */
 			nlog(LOG_NOTICE, "SqlSrv: Rejecting SQL Connection from %s", tmp);
-			sys_close_sock (newui->fd);
+			sys_sock_close (newui->fd);
 			ns_free(newui);
 			return;
 		}
 		/* inc number ui, then init new ui */
-		sys_set_nonblocking_sock (srvfd);
+		sys_sock_set_nonblocking (srvfd);
 		newui->cmdpos = 0;
 		newui->responsefree = 50000; /* max response packetsize if 50000 */
 		newui->nbytein = 0;
@@ -313,7 +313,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
 	/* We read data from the connection into the buffer in the ui struct. 
        Once we've read all of the data we can, we call the DB routine to
        parse out the SQL command and to execute it. */
-	ret = sys_read_sock (sqlconn->fd,
+	ret = sys_sock_read (sqlconn->fd,
 		&(sqlconn->cmd[sqlconn->cmdpos]), (1000 - sqlconn->cmdpos));
 
 	/* shutdown manager conn on error or on zero bytes read */
@@ -323,7 +323,7 @@ sql_handle_ui_request(lnode_t *sqlnode)
 		   client program? */
 		dlog(DEBUG1, "Disconnecting SqlClient for failed read");
 		deldbconnection(sqlconn->fd);
-		sys_close_sock (sqlconn->fd);
+		sys_sock_close (sqlconn->fd);
 		list_delete(sqlconnections, sqlnode);
 		lnode_destroy(sqlnode);
 		ns_free(sqlconn);
@@ -377,12 +377,12 @@ sql_handle_ui_output(lnode_t *sqlnode)
   
 	if (sqlconn->responsefree < 50000)
 	{
-		ret = sys_write_sock (sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree));
+		ret = sys_sock_write (sqlconn->fd, sqlconn->response, (50000 - sqlconn->responsefree));
 		if (ret < 0)
 		{
 			nlog(LOG_WARNING, "Got a write error when attempting to return data to the SQL Server");
 			deldbconnection(sqlconn->fd);
-			sys_close_sock (sqlconn->fd);
+			sys_sock_close (sqlconn->fd);
 			list_delete(sqlconnections, sqlnode);
 			lnode_destroy(sqlnode);
 			ns_free(sqlconn);

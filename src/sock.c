@@ -109,7 +109,7 @@ ConnectTo (char *host, int port)
 #ifdef WIN32
 		nlog (LOG_ERROR, "Winsock error: %d", WSAGetLastError());
 #endif
-		sys_close_sock (s);
+		sys_sock_close (s);
 		return NS_FAILURE;
 	}
 	return s;
@@ -223,7 +223,7 @@ read_loop ()
 			}
 			if (FD_ISSET (servsock, &readfds)) {
 				for (j = 0; j < BUFSIZE; j++) {
-					i = sys_read_sock (servsock, &c, 1);
+					i = sys_sock_read (servsock, &c, 1);
 					me.RcveBytes++;
 					if (i >= 0) {
 						buf[j] = c;
@@ -433,7 +433,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 
 	/* set non blocking */
 
-	if ((i = sys_set_nonblocking_sock (s)) < 0) {
+	if ((i = sys_sock_set_nonblocking (s)) < 0) {
 		nlog (LOG_CRITICAL, "can't set socket %s(%s) non-blocking: %s", name, moduleptr->info->name, strerror (i));
 		return NS_FAILURE;
 	}
@@ -444,7 +444,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 			break;
 		default:
 			nlog (LOG_WARNING, "Socket %s(%s) cant connect %s", name, moduleptr->info->name, strerror (errno));
-			sys_close_sock (s);
+			sys_sock_close (s);
 			return NS_FAILURE;
 		}
 	}
@@ -485,7 +485,7 @@ sock_disconnect (const char *name)
 		return NS_FAILURE;
 	}
 	dlog(DEBUG3, "Closing Socket %s with Number %d", name, sock->sock_no);
-	sys_close_sock (sock->sock_no);
+	sys_sock_close (sock->sock_no);
 	del_sock (name);
 	return NS_SUCCESS;
 }
@@ -505,11 +505,11 @@ sts (const char *buf, const int buflen)
 		nlog(LOG_WARNING, "Not sending to server as we have a invalid socket");
 		return;
 	}
-	sent = sys_write_sock (servsock, buf, buflen);
+	sent = sys_sock_write (servsock, buf, buflen);
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
 		/* Try to close socket then reset the servsock value to avoid cyclic calls */
-		sys_close_sock (servsock);
+		sys_sock_close (servsock);
 		servsock = -1;
 		do_exit (NS_EXIT_ERROR, NULL);
 	}
@@ -536,7 +536,7 @@ int FiniSocks (void)
 	ns_free(TimeOut);
 	ns_free(ufds);
 	if (servsock > 0)
-		sys_close_sock (servsock);
+		sys_sock_close (servsock);
 	hash_destroy(sockethash);
 	return NS_SUCCESS;
 }

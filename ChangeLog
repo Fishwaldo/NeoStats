@@ -4,6 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - More portability wrappers for file access since Win32 DLLs do not appear to
+   be able to use fopen etc locally. This also means we can look at using more
+   optimal Win32 native file processing calls. (M)
  - NeoStats alloc/free functions updated. (M)
  - Begin adding portability functions for file system calls, socket management 
    etc to make it easy for modules to be Win32 compatible. (M)

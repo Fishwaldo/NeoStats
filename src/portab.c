@@ -39,7 +39,73 @@ int sys_mkdir (const char *filename, mode_t mode)
 #endif
 }
 
-int sys_close_sock (SYS_SOCKET sock)
+int sys_check_create_dir (const char* dirname)
+{
+	struct stat st;
+	int res;
+
+	/* first, make sure the logdir dir exists */
+	res = stat(dirname, &st);
+	if (res != 0) {
+		/* hrm, error */
+		if (errno == ENOENT) {
+			/* ok, it doesn't exist, create it */
+			res = sys_mkdir (dirname, 0700);
+			if (res != 0) {
+				/* error */
+				nlog (LOG_CRITICAL, "Couldn't create directory: %s", strerror(errno));
+				return NS_FAILURE;
+			}
+			nlog (LOG_NOTICE, "Created directory: %s", dirname);
+		} else {
+			nlog (LOG_CRITICAL, "Stat returned error: %s", strerror(errno));
+			return NS_FAILURE;
+		}
+	} else if (!S_ISDIR(st.st_mode))	{
+		nlog (LOG_CRITICAL, "%s is not a Directory", dirname);
+		return NS_FAILURE;
+	}
+	return NS_SUCCESS;
+}
+
+FILE_HANDLE sys_file_open (const char * filename, int filemode)
+{
+	return fopen (filename, "a");
+}
+
+int sys_file_close (FILE_HANDLE handle)
+{
+	return fclose (handle);
+}
+
+static char tempbuf[BUFSIZE*2];
+
+int sys_file_printf (FILE_HANDLE handle, char *fmt, ...)
+{
+	va_list ap;
+
+	va_start (ap, fmt);
+	ircvsnprintf (tempbuf, BUFSIZE*2, fmt, ap);
+	va_end (ap);
+	return fprintf (handle, "%s", tempbuf);	
+}
+
+int sys_file_read (const void *buffer, size_t size, size_t count, FILE_HANDLE handle)
+{
+	return fread (buffer, size, count, handle);
+}
+
+int sys_file_write (const void *buffer, size_t size, size_t count, FILE_HANDLE handle)
+{
+	return fwrite (buffer, size, count, handle);
+}
+
+int sys_file_flush (FILE_HANDLE handle)
+{
+	return fflush (handle);
+}
+
+int sys_sock_close (SYS_SOCKET sock)
 {
 #ifdef WIN32
 	return closesocket (sock);
@@ -48,7 +114,7 @@ int sys_close_sock (SYS_SOCKET sock)
 #endif      			
 }
 
-int sys_write_sock (SYS_SOCKET s, const char* buf, int len)
+int sys_sock_write (SYS_SOCKET s, const char* buf, int len)
 {
 #ifdef WIN32
 	return send (s, buf, len, 0);
@@ -57,7 +123,7 @@ int sys_write_sock (SYS_SOCKET s, const char* buf, int len)
 #endif
 }
 
-int sys_read_sock (SYS_SOCKET s, char* buf, int len)
+int sys_sock_read (SYS_SOCKET s, char* buf, int len)
 {
 #ifdef WIN32
 	return recv (s, buf, len, 0);
@@ -66,7 +132,7 @@ int sys_read_sock (SYS_SOCKET s, char* buf, int len)
 #endif
 }
 
-int sys_set_nonblocking_sock (SYS_SOCKET s)
+int sys_sock_set_nonblocking (SYS_SOCKET s)
 {
 	int flags;
 #ifdef WIN32
@@ -79,3 +145,4 @@ int sys_set_nonblocking_sock (SYS_SOCKET s)
 	return fcntl (s, F_SETFL, flags);
 #endif
 }
+
