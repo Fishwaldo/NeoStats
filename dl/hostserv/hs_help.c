@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hs_help.c,v 1.8 2002/12/29 21:52:57 shmad Exp $
+** $Id: hs_help.c,v 1.9 2003/01/07 13:07:08 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -31,6 +31,7 @@ const char *hs_help[] = {
 "COMMANDS:",
 "     ABOUT     LOGIN     ADD",
 "     DEL       LIST      VIEW",
+"     CHPASS    LISTBAN",
 "",
 "Only Network Admins can use the DEL function",
 "",
@@ -99,6 +100,27 @@ const char *hs_help_login[] = {
 "",
 "Login to HostServ with your NICK and PASSWORD and your vhost",
 "will be assigned to your nick on successful login.",
+"",
+NULL
+};
+
+const char *hs_help_chpass[] = {
+"\2HostServ Help : CHPASS",
+"\2Usage:\2 CHPASS <NICK> <OLDPASS> <NEWPASS>",
+"",
+"Use this command to change the password assigned to your",
+"Vhost Account. You must supply your current password and a ",
+"valid account for it to be successfull",
+"",
+NULL
+};
+
+const char *hs_help_listban[] = {
+"\2HostServ Help : LISTBAN",
+"\2Usage:\2 LISTBAN",
+"",
+"This lists current vhosts that are banned by the network adminstration.",
+"Wildcards, like *fbi* are permitted.",
 "",
 NULL
 };
