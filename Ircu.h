@@ -25,7 +25,10 @@
 #ifndef IRCU_H
 #define IRCU_H
 
-/* IRCu modification support */
+/* IRCu modification support 
+ * Currently we only support modifications for Nefarious and Asuka
+ * To enable support uncomment the appropriate line below.
+ */
 /* #define NEFARIOUS */
 /* #define ASUKA */
 
