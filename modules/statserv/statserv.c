@@ -111,7 +111,8 @@ static bot_setting ss_settings[]=
 {
 	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, "HTML_Enabled",NULL,		ss_help_set_html, ss_set_html_cb, (void *)0},
 	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,		NS_ULEVEL_ADMIN, "HTML_Path",	NULL,		ss_help_set_htmlpath, ss_set_htmlpath_cb, (void *)""},
-	{"HTMLTIME",	&StatServ.htmltime,		SET_TYPE_INT,		600, 3600,			NS_ULEVEL_ADMIN, "htmltime",		"seconds",	ss_help_set_htmltime, ss_set_htmltime_cb, (void*)3600},
+	{"HTMLTIME",	&StatServ.htmltime,		SET_TYPE_INT,		600, 3600,		NS_ULEVEL_ADMIN, "htmltime",		"seconds",	ss_help_set_htmltime, ss_set_htmltime_cb, (void*)3600},
+	{"CHANNELTIME",	&StatServ.channeltime,	SET_TYPE_INT,		86400, 18144000,NS_ULEVEL_ADMIN, "htmltime",		"seconds",	ss_help_set_channeltime, NULL, (void*)604800},
 	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, "MsgInterval",	"seconds",	ss_help_set_msginterval, NULL, (void *)60},
 	{"MSGLIMIT",	&StatServ.msglimit,		SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, "MsgLimit",	NULL,		ss_help_set_msglimit, NULL, (void *)5},
 	{"LAGTIME",		&StatServ.lagtime,		SET_TYPE_INT,		1, 256,			NS_ULEVEL_ADMIN, "LagTime",		"seconds",	ss_help_set_lagtime, NULL, (void *)30},

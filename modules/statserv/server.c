@@ -420,7 +420,7 @@ void SaveServerStats(void)
 	}
 }
 
-void LoadServerStats(void *data) 
+int LoadServerStats(void *data) 
 {
 	serverstat *ss;
 
@@ -433,6 +433,7 @@ void LoadServerStats(void *data)
 	PostLoadStatistic (&ss->operkills);
 	PostLoadStatistic (&ss->serverkills);
 	PostLoadStatistic (&ss->splits);
+	return NS_FALSE;
 }
 
 void InitServerStats (void)

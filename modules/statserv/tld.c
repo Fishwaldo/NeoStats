@@ -188,18 +188,20 @@ void SaveTLDStats (void)
 	}
 }
 
-void new_tld (void *data)
+int new_tld (void *data)
 {
 	TLD *t;
 
 	t = ns_calloc (sizeof (TLD));
 	os_memcpy (t, data, sizeof(TLD));
 	lnode_create_append (tldstatlist, t);
+	return NS_FALSE;
 }
 
-void LoadTLDStats (void)
+int LoadTLDStats (void)
 {
 	DBAFetchRows ("TLD", new_tld);
+	return NS_SUCCESS;
 }
 
 /** @brief InitTLDStatistics

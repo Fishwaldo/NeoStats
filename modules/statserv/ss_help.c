@@ -115,6 +115,12 @@ const char *ss_help_set_recordalert[] = {
 	NULL
 };
 
+const char *ss_help_set_channeltime[] = {
+	"\2CHANNELTIME <seconds>\2",
+	"Time in seconds a channel is unused before it is deleted from statistics.",
+	NULL
+};
+
 const char *ss_help_channel[] = {
 	"Syntax: \2CHANNEL\2",
 	"        \2CHANNEL <Channame>\2",

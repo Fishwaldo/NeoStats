@@ -96,13 +96,14 @@ bot_cmd extauth_commands[] =
  *  @return none
  */
 
-static void dbaccesslisthandler (void *data)
+static int dbaccesslisthandler (void *data)
 {
 	AccessEntry *access;
 	
 	access = ns_calloc( sizeof( AccessEntry ) );
 	os_memcpy( access, data, sizeof( AccessEntry ) );
 	hnode_create_insert( accesshash, access, access->nick );
+	return NS_FALSE;
 }
 
 /** @brief LoadAccessList

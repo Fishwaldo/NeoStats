@@ -1213,7 +1213,7 @@ EXPORTFUNC int ValidateChannel( char *channel_name );
 
 #define CONFIG_TABLE_NAME	"config"
 
-typedef void (*DBRowHandler) ( void *data );
+typedef int (*DBRowHandler) ( void *data );
 
 /* DB API */
 EXPORTFUNC int DBAOpenDatabase( void );

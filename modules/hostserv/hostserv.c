@@ -202,13 +202,14 @@ int ExpireOldHosts (void)
 	return NS_SUCCESS;
 }
 
-void new_dbvhost (void *data)
+int new_dbvhost (void *data)
 {
 	vhostentry *vhe;
 
 	vhe = ns_calloc(sizeof(vhostentry));
 	os_memcpy (vhe, data, sizeof(vhostentry));
 	lnode_create_append (vhost_list, vhe);
+	return NS_FALSE;
 }
 
 /** @brief LoadHosts
@@ -265,13 +266,14 @@ static void SaveBan (banentry *ban)
  *  @return none
  */
 
-static void new_ban (void *data)
+static int new_ban (void *data)
 {
 	banentry *ban;
 
 	ban = ns_calloc (sizeof (banentry));
 	os_memcpy (ban, data, sizeof (banentry));
 	hnode_create_insert (banhash, ban, ban->host);
+	return NS_FALSE;
 }
 
 static void LoadBans (void)

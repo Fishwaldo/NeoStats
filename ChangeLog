@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.prealpha3-dev
+ - Add option to configure StatServ old channel time. (M)
  - Add options to configure message flood sample time and threshold. (M)
  - StatServ: Since stats command only allows management of server stats, 
    combined with server command. (M)

@@ -65,14 +65,16 @@ static void new_exclude(list_t *elist, void *data)
 	dlog(DEBUG2, "Added exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
 }
 
-static void new_global_exclude(void *data)
+static int new_global_exclude(void *data)
 {
 	new_exclude(exclude_list, data);
+	return NS_FALSE;
 }
 
-static void new_mod_exclude(void *data)
+static int new_mod_exclude(void *data)
 {
 	new_exclude(excludelists[GET_CUR_MODNUM()], data);
+	return NS_FALSE;
 }
 
 /* @brief initilize the exlusion list

@@ -47,6 +47,7 @@ struct StatServ {
 	int html; 
 	char htmlpath[MAXPATH]; 
 	int htmltime; 
+	int channeltime;
 	int msginterval; 
 	int msglimit; 
 	int shutdown; 
@@ -72,6 +73,7 @@ extern const char *ss_help_set_msginterval[];
 extern const char *ss_help_set_msglimit[];
 extern const char *ss_help_set_lagtime[];
 extern const char *ss_help_set_htmltime[];
+extern const char *ss_help_set_channeltime[];
 extern const char *ss_help_set_lagalert[];
 extern const char *ss_help_set_recordalert[];
 extern const char *ss_help_userversion[];

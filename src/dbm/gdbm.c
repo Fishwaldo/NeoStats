@@ -27,98 +27,109 @@
 #include "extern.h"
 #include "nsdbm.h"
 
-extern const char *gdbm_strerror __P((gdbm_error));
+extern const char *gdbm_strerror __P( ( gdbm_error ) );
 
-static datum dbkey;
-static datum dbdata;
-
-void *DBMOpenTable (const char *name)
+void *DBMOpenTable( const char *name )
 {
 	static char filename[MAXPATH];
 	gdbm_file_info *gdbm_file;
 	int cache_size = DEFAULT_CACHESIZE;
 
-	dlog (DEBUG1, "DBMOpenTable");
-	ircsprintf (filename, "%s.gdbm", name);
-	gdbm_file = gdbm_open (filename, 0, GDBM_WRCREAT, 00664, NULL);
-	if (gdbm_file == NULL)
+	dlog( DEBUG4, "DBMOpenTable" );
+	ircsprintf( filename, "%s.gdbm", name );
+	gdbm_file = gdbm_open( filename, 0, GDBM_WRCREAT, 00664, NULL );
+	if( gdbm_file == NULL )
 	{
-		dlog (DEBUG1, "gdbm_open fail: %s", gdbm_strerror(gdbm_errno));
+		dlog( DEBUG1, "gdbm_open fail: %s", gdbm_strerror( gdbm_errno ) );
 		return NULL;
 	}
-	if (gdbm_setopt(gdbm_file, GDBM_CACHESIZE, &cache_size, sizeof(int)) == -1)
+	if( gdbm_setopt( gdbm_file, GDBM_CACHESIZE, &cache_size, sizeof( int ) ) == -1 )
 	{
-		dlog (DEBUG1, "gdbm_setopt fail: %s", gdbm_strerror(gdbm_errno));
+		dlog( DEBUG1, "gdbm_setopt fail: %s", gdbm_strerror( gdbm_errno ) );
 		return NULL;
 	}
-	return (void *)gdbm_file;
+	return ( void * )gdbm_file;
 }
 
-int DBMCloseTable (void *handle)
+int DBMCloseTable( void *handle )
 {
-	if (!handle) {
+	if( !handle ) 
+	{
 		return NS_FAILURE;
 	}
-	gdbm_close((gdbm_file_info *)handle); 
+	gdbm_close( ( gdbm_file_info * )handle ); 
 	return NS_SUCCESS;
 }
 
-int DBMGetData (void *handle, char *key, void *data, int size)
+int DBMGetData( void *handle, char *key, void *data, int size )
 {
-	memset(&dbdata, 0, sizeof(dbdata));
+	datum dbkey;
+	datum dbdata;
+
 	dbkey.dptr = key;
-	dbkey.dsize = strlen(key) + 1;
-	dbdata = gdbm_fetch ((gdbm_file_info *)handle, dbkey);
-	if (dbdata.dptr != NULL)
+	dbkey.dsize = strlen( key ) + 1;
+	dbdata = gdbm_fetch( ( gdbm_file_info * )handle, dbkey );
+	if( dbdata.dptr != NULL )
 	{
-		os_memcpy (data, dbdata.dptr, size);
-		free (dbdata.dptr);
+		os_memcpy( data, dbdata.dptr, size );
+		free( dbdata.dptr );
 		return NS_SUCCESS;
 	}
-	dlog (DEBUG1, "gdbm_fetch fail: %s %s", key, gdbm_strerror(gdbm_errno));
+	dlog( DEBUG1, "gdbm_fetch fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
 	return NS_FAILURE;
 }
 
-int DBMSetData (void *handle, char *key, void *data, int size)
+int DBMSetData( void *handle, char *key, void *data, int size )
 {
+	datum dbkey;
+	datum dbdata;
+
 	dbkey.dptr = key;
-	dbkey.dsize = strlen(key) + 1;
+	dbkey.dsize = strlen( key ) + 1;
 	dbdata.dptr = data;
 	dbdata.dsize = size;
-	if (gdbm_store ((gdbm_file_info *)handle, dbkey, dbdata, GDBM_REPLACE) != 0)
+	if( gdbm_store( ( gdbm_file_info * )handle, dbkey, dbdata, GDBM_REPLACE ) != 0 )
 	{
-		dlog (DEBUG1, "gdbm_store fail: %s %s", key, gdbm_strerror(gdbm_errno));
+		dlog( DEBUG1, "gdbm_store fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
 }
 
-int DBMGetTableRows (void *handle, DBRowHandler handler)
+int DBMGetTableRows( void *handle, DBRowHandler handler )
 {
+	datum dbkey;
+	datum dbdata;
 	int rowcount = 0;
 
-	memset(&dbkey, 0, sizeof(dbkey));
-	memset(&dbdata, 0, sizeof(dbdata));
-	dbkey = gdbm_firstkey ((gdbm_file_info *)handle);
-	while (dbkey.dptr != NULL)
+	dbkey = gdbm_firstkey( ( gdbm_file_info * )handle );
+	while( dbkey.dptr != NULL )
 	{
-		rowcount ++;
-		dlog (DEBUG1, "DBMGetTableRows: key %s", dbkey.dptr);
-		dbdata = gdbm_fetch ((gdbm_file_info *)handle, dbkey);
-		handler (dbdata.dptr);
-		free (dbdata.dptr);
-		dbdata = gdbm_nextkey ((gdbm_file_info *)handle, dbkey);
-		free (dbkey.dptr);
+		rowcount++;
+		dlog( DEBUG4, "DBMGetTableRows: key %s", dbkey.dptr );
+		dbdata = gdbm_fetch( ( gdbm_file_info * )handle, dbkey );
+		/* Allow handler to exit the fetch loop */
+		if( handler( dbdata.dptr ) != NS_FALSE  )
+		{
+			free( dbdata.dptr );
+			free( dbkey.dptr );
+			break;
+		}
+		free( dbdata.dptr );
+		dbdata = gdbm_nextkey( ( gdbm_file_info * )handle, dbkey );
+		free( dbkey.dptr );
 		dbkey = dbdata;
 	}
 	return rowcount;
 }
 
-int DBMDelData (void *handle, char * key)
+int DBMDelData( void *handle, char *key )
 {
+	datum dbkey;
+
 	dbkey.dptr = key;
-	dbkey.dsize = strlen(key) + 1;
-	if (gdbm_delete((gdbm_file_info *)handle, dbkey) != 0)
+	dbkey.dsize = strlen( key ) + 1;
+	if( gdbm_delete( ( gdbm_file_info * )handle, dbkey ) != 0 )
 	{
 		return NS_FAILURE;
 	}
