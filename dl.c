@@ -1035,18 +1035,12 @@ ModUser *
 findbot (char *bot_name)
 {
 	hnode_t *bn;
-	User* u;
 
 	SET_SEGV_LOCATION();
 
-	u = finduser(bot_name);
-	if(u) {
-		bn = hash_lookup (bh, u->nick);
-		if (bn) {
-			return (ModUser *) hnode_get (bn);
-		}
-	} else {
-		nlog (LOG_WARNING, LOG_CORE, "findbot: unable to find user %s", bot_name);
+	bn = hash_lookup (bh, bot_name);
+	if (bn) {
+		return (ModUser *) hnode_get (bn);
 	}
 	return NULL;
 }
