@@ -442,7 +442,7 @@ int os_sock_bind( OS_SOCKET s, const struct sockaddr* name, int namelen )
  *  Wrapper function for listen
  */
 
-int os_sock_listen( SOCKET s, int backlog )
+int os_sock_listen( OS_SOCKET s, int backlog )
 {
 	int ret;
 
