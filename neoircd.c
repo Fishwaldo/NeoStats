@@ -454,7 +454,6 @@ m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 		char *realname;
-		User *u;
 
 		realname = joinbuf (argv, argc, 9);
 		AddUser (argv[0], argv[4], argv[5], realname, argv[7], NULL, argv[2]);
@@ -470,7 +469,7 @@ m_topic (char *origin, char **argv, int argc, int srv)
 {
 	char *buf;
 
-	buf = joinbuf (argv, argc, 2);
+	buf = joinbuf (argv, argc, 3);
 	ChanTopic (argv[1], argv[0], argv[2], buf);
 	free (buf);
 }
