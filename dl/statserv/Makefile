@@ -1,40 +1,13 @@
-include ../../Makefile.inc
-
-SRCS = statserv.c ss_help.c database.c tld.c stats.c htmlstats.c 
-OBJS = ${SRCS:.c=.o}
+SRCS = statserv.c ss_help.c database.c tld.c stats.c htmlstats.c \
+       GeoIPBitReader.c GeoIP.c GeoIPCity.c md5.c
 TARGET = statserv.so
-GEOCFLAGS = $(CFLAGS) -DGEOIPDATADIR=\"$(DATADIRECTORY)\" -DSYSCONFDIR=\"$(DATADIRECTORY)\"
-GEOSRCS = GeoIPBitReader.c GeoIP.c GeoIPCity.c md5.c
-GEOOBJS = GeoIPBitReader.o GeoIP.o GeoIPCity.o md5.o
-HTML = html/index.tpl
-DATA = GeoIP.dat
-DISTFILES= $(SRCS) $(DATA) $(GEOSRCS) $(HTML) ChangeLog statserv.h m_stats.h Makefile sqlstats.h GeoIPBitReader.h GeoIP.h global.h GeoIPCity.h md5.h
+MODCFLAGS = -DGEOIPDATADIR=\"$(DATADIRECTORY)\" -DSYSCONFDIR=\"$(DATADIRECTORY)\"
+DATA = html/index.tpl GeoIP.dat
+DISTFILES= $(SRCS) $(DATA) ChangeLog statserv.h m_stats.h Makefile sqlstats.h GeoIPBitReader.h GeoIP.h global.h GeoIPCity.h md5.h
+SUBDIRS= html
 
-all: $(TARGET)
+include ../Makefile.inc
 
-.c.o:
-	$(CC) -c $< $(GEOCFLAGS) $(MODINCLUDES) 
-
-$(TARGET): $(OBJS) $(GEOOBJS)
-	ld $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS) $(GEOOBJS)
-
-clean:
-	$(RM) *.o *.lo *.so
-
-install: $(TARGET)
-	$(INSTALL_MOD) $(TARGET) $(MODDIRECTORY)
-	$(INSTALL_DATA) $(HTML) $(DATADIRECTORY)
-	$(INSTALL_DATA) $(DATA) $(DATADIRECTORY)
-
-dist:	$(DISTFILES)
-	@mkdir $(DISTDIR)/html
-	@chmod 777 $(DISTDIR)/html
-	@for files in $(DISTFILES); do \
-		cp $$files $(DISTDIR)/$$files; \
-	done
-
-
-$(OBJS): Makefile
 statserv.o:		statserv.c	ss_help.c	statserv.h  sqlstats.h
 ss_help.o:	ss_help.c	statserv.h
 database.o:	database.c	statserv.h
@@ -45,4 +18,3 @@ md5.o: md5.c global.h md5.h
 GeoIPCity.o: GeoIPCity.c
 GeoIP.o: GeoIP.c GeoIP.h
 GeoIPBitReader.o: GeoIPBitReader.c GeoIPBitReader.h
-statserv.so: statserv.o ss_help.o database.o tld.o stats.o htmlstats.o md5.o GeoIPCity.o GeoIP.o GeoIPBitReader.c
