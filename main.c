@@ -279,6 +279,7 @@ get_options (int argc, char **argv)
 			printf ("(Q)  - Quantum IRCd\n");
 			printf ("(B)  - Bahamut IRCd\n");
 			printf ("(IRCu) - IRCu (P10) IRCd\n");
+			printf ("(V)  - Viagra IRCd\n");
 			printf ("\nNeoStats: http://www.neostats.net\n");
 			return NS_FAILURE;
 		case 'r':

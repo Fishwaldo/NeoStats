@@ -94,6 +94,8 @@
 #elif LIQUID == 1
 #include "liquidircd.h"
 #define NEW_STYLE_SPLITBUF
+#elif VIAGRA == 1 
+#include "Viagra.h"
 #else
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
@@ -574,7 +576,7 @@ int numeric (const int numeric, const char *target, const char *data, ...) __att
 /* function declarations */
 int ssjoin_cmd (const char *who, const char *chan, unsigned long chflag);
 /* temp until SecureServ 1.1 */
-#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID)
+#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID) || defined(VIAGRA)
 #define sjoin_cmd ssjoin_cmd 
 #else
 int sjoin_cmd (const char *who, const char *chan);

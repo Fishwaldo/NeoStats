@@ -856,11 +856,12 @@ Optional Features:
  --enable-bahamut - enable Bahamut IRCD Support
  --enable-ircu - enable IRCu IRCD Support
  --enable-liquid - enable Liquid IRCD Support
+ --enable-viagra - enable Viagra IRCD Support
  --enable-auth=TYPE - what type of Authentication to use. See Readme File
  --enable-raw - Enable Raw command
  --enable-sqlsrv - Enable Sql Server Emulation
  --enable-modules="MODULES" - space seperated list of modules to compile
---enable-configtool - Enable building of the configtool program (Needs X windows)
+ --enable-configtool - Enable building of the configtool program (Needs X windows)
 
 Some influential environment variables:
   CC          C compiler command
@@ -6144,9 +6145,33 @@ echo "${ECHO_T}no" >&6
 
 fi;
 
+echo "$as_me:$LINENO: checking Whether to Enable Viagra IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Viagra IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-liquid or --disable-liquid was given.
+if test "${enable_liquid+set}" = set; then
+  enableval="$enable_liquid"
+   case "$enableval" in
+  yes)
 
+cat >>confdefs.h <<\_ACEOF
+#define VIAGRA 1
+_ACEOF
 
+	IRCD_FILES_SRC="Viagra.c"
+	IRCD_FILES_OBJS="Viagra.o"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
 
+fi;
 
 do_serviceroots=no
 echo "$as_me:$LINENO: checking A compatible IRCD is specified" >&5
@@ -6198,6 +6223,10 @@ echo "${ECHO_T}yes" >&6
 echo "${ECHO_T}yes" >&6
 	;;
    "liquidircd.c")
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+   "Viagra.c")
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;

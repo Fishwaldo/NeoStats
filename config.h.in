@@ -144,8 +144,11 @@
 /* enable Ircu support */
 #undef IRCU
 
-/* enable Ircu support */
+/* enable Liquid support */
 #undef LIQUID
+
+/* enable Viagra support */
+#undef VIAGRA
 
 /* Version number of package */
 #undef VERSION

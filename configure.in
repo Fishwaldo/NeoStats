@@ -15,7 +15,7 @@ MYHOST=$host_os
 case "$host_os" in
 *cygwin)
 	CFLAGS="$CFLAGS -O2 -g"
-	LDFLAGS="-rdynamic";;	
+	LDFLAGS="-export-dynamic";;
 *openbsd)
 	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
 	LDFLAGS="-export-dynamic";;
@@ -316,9 +316,22 @@ esac],
 AC_MSG_RESULT(no)
 )
 
-
-
-
+dnl check to see if we should enable Viagra IRCD Support
+AC_MSG_CHECKING(Whether to Enable Viagra IRCD Support...)
+AC_ARG_ENABLE(liquid, [ --enable-viagra - enable Viagra IRCD Support],
+[ case "$enableval" in
+  yes)  
+	AC_DEFINE(VIAGRA, 1, 'Enable ViagraLiquid IRCd Support')
+	IRCD_FILES_SRC="Viagra.c"
+	IRCD_FILES_OBJS="Viagra.o"
+	AC_MSG_RESULT(yes)
+	;;
+  *)
+	AC_MSG_RESULT(no)
+	;;
+esac],
+AC_MSG_RESULT(no)
+)
 
 do_serviceroots=no
 AC_MSG_CHECKING(A compatible IRCD is specified)
@@ -355,6 +368,9 @@ case "$IRCD_FILES_SRC" in
 	AC_MSG_RESULT(yes)
 	;;
    "liquidircd.c")
+	AC_MSG_RESULT(yes)
+	;;
+   "Viagra.c")
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -427,7 +443,7 @@ AC_MSG_RESULT(none)
 configtool=no
 AC_MSG_CHECKING(Enable Building of ConfigTool?)
 AC_ARG_ENABLE(configtool,
-[--enable-configtool - Enable building of the configtool program (Needs X windows)],
+[ --enable-configtool - Enable building of the configtool program (Needs X windows)],
 [if test "$enableval" = yes; then configtool=yes; else configtool=no; fi])
 
 if test "$configtool" = yes; then

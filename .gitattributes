@@ -21,6 +21,8 @@
 /Ultimate.h eol=lf
 /Unreal.c eol=lf
 /Unreal.h eol=lf
+/Viagra.c -text
+/Viagra.h -text
 /acconfig.h eol=lf
 /aclocal.m4 -text
 adns/.indent.pro -text

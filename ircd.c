@@ -206,7 +206,7 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 	char savemod[SEGV_INMODULE_BUFSIZE];
 
 	strlcpy(savemod, segv_inmodule, SEGV_INMODULE_BUFSIZE);
-#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID)
+#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID) || defined(VIAGRA)
 	sjoin_cmd(who, chan, chflag);
 #else
 	sjoin_cmd(who, chan);

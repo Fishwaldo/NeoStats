@@ -51,6 +51,7 @@ echo "     6) NeoIRCd IRCD"
 echo "     7) Bahamut IRCD"
 echo "     8) Mystic IRCD"
 echo "     9) Quantum IRCD"
+echo "     10) Viagra IRCD"
 while [ $validselection -eq 0 ] ; do
 	echo_no_lf "[$IRCD_DEFAULT] "
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
@@ -97,6 +98,10 @@ while [ $validselection -eq 0 ] ; do
 			;;
 		9)
 			IRCD="--enable-quantum"
+			validselection=1
+			;;
+		10)
+			IRCD="--enable-viagra"
 			validselection=1
 			;;
 		*)

@@ -29,14 +29,14 @@ DATA = data/tlds.nfo
 INCLUDES = config.h dl.h dotconf.h hash.h list.h stats.h Ultimate.h Unreal.h \
 		adns/adns.h hybrid7.h neoircd.h conf.h log.h Bahamut.h \
 		Ircu.h mystic.h QuantumIRCd.h sock.h ircd.h exclude.h\
-		support.h ircstring.h events.h liquidircd.h numeric.h pcre.h \
+		support.h ircstring.h events.h liquidircd.h Viagra.h numeric.h pcre.h \
 		dns.h services.h transfer.h sqlsrv/rta.h
 BUILDFILES = configure config.sub config.guess *.in adns/Makefile adns/config.h.in dl/Makefile \
 		dl/modules.txt RELNOTES install-sh neoircd.c neoircd.h \
 		hybrid7.c hybrid7.h Ultimate.c Ultimate.h Unreal.c Unreal.h \
 		makeconf cronchk tools/Makefile.in tools/cfgtool/Makefile \
 		keeper/Makefile doc/old/* Bahamut.c Ircu.c mystic.c \
-		QuantumIRCd.c Config liquidircd.c sqlsrv/*.c sqlsrv/*.h sqlsrv/*.y sqlsrv/*.l
+		QuantumIRCd.c Config liquidircd.c Viagra.c sqlsrv/*.c sqlsrv/*.h sqlsrv/*.y sqlsrv/*.l
 TOOLFILES = tools/*.c tools/*.h tools/cfgtool/*.h tools/cfgtool/*.c \
 		tools/cfgtool/pixmaps/*.xpm tools/sqlphp/*.php tools/sqlphp/README
 DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) \
