@@ -425,7 +425,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 		msg_only_opers( cmdparams );
 		cmdret = NS_SUCCESS;
 	} 
-	else if( cmdparams->bot->botcmds ) 
+	else if( ac && cmdparams->bot->botcmds ) 
 	{
 		/* Process command list */
 		cmd_ptr = ( bot_cmd * ) hnode_find( cmdparams->bot->botcmds, av[0] );
@@ -473,7 +473,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 			}
 		}
 	} 
-	if( !processed ) 
+	if( ac && !processed ) 
 	{
 		cmdret = run_intrinsic_cmds( av[0], cmdparams );
 		if( cmdret != NS_SUCCESS ) 
@@ -483,6 +483,10 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 				msg_unknown_command( cmdparams );
 			cmdret = NS_FAILURE;
 		}
+	}
+	if( ac == 0)
+	{
+		cmdret = NS_FAILURE;
 	}
 	if( ac )
 		ns_free( av );

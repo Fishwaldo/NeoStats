@@ -24,10 +24,6 @@
 /* @file Portability wrapper functions
  */
 
-/*  TODO:
- *  - port file functions from CRT to Win32 native calls (CreateFile etc)
- */
-
 #include "neostats.h"
 
 /*
