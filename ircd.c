@@ -106,8 +106,8 @@ IntCommands cmd_list[] = {
 	{TOK_NICK,	Usr_Nick,		1},
 	{MSG_TOPIC,	Usr_Topic,		1},
 	{TOK_TOPIC,	Usr_Topic,		1},
-	{MSG_TOPIC, 	Srv_Topic, 		0},
-	{TOK_TOPIC, 	Srv_Topic, 		0},
+	{MSG_TOPIC, 	Usr_Topic, 		0},
+	{TOK_TOPIC, 	Usr_Topic, 		0},
 	{MSG_KICK,	Usr_Kick,		1},
 	{TOK_KICK,	Usr_Kick,		1},
 	{MSG_JOIN,	Usr_Join,		1},
@@ -653,20 +653,10 @@ void Usr_Nick(char *origin, char **argv, int argc) {
 void Usr_Topic(char *origin, char **argv, int argc) {
 	char *buf;
 	buf = joinbuf(argv, argc, 3);
-	Change_Topic(argv[1], findchan(argv[0]), buf);
+	Change_Topic(argv[1], findchan(argv[0]), atoi(argv[2]), buf);
 	free(buf);
 
 }
-
-void Srv_Topic(char *origin, char **argv, int argc) {
-	char *buf;
-	buf = joinbuf(argv, argc, 3);
-	Change_Topic(argv[1], findchan(argv[0]), buf);
-	free(buf);
-
-}
-
-
 
 void Usr_Kick(char *origin, char **argv, int argc) {
 	part_chan(finduser(argv[1]), argv[0]);

@@ -16,9 +16,9 @@ void sts(char *fmt,...);
 
 aCtab cFlagTab[] = {
 	{MODE_LIMIT, 'l', 0, 1},
-	{MODE_VOICE, 'v', 1, 1},
-	{MODE_HALFOP, 'h', 1, 1},
-	{MODE_CHANOP, 'o', 1, 1},
+	{MODE_VOICE, 'v', 1, 0},
+	{MODE_HALFOP, 'h', 1, 0},
+	{MODE_CHANOP, 'o', 1, 0},
 	{MODE_PRIVATE, 'p', 0, 0},
 	{MODE_SECRET, 's', 0, 0},
 	{MODE_MODERATED, 'm', 0, 0},
@@ -29,15 +29,15 @@ aCtab cFlagTab[] = {
 	{MODE_RGSTR, 'r', 0, 0},
 	{MODE_RGSTRONLY, 'R', 0, 0},
 	{MODE_NOCOLOR, 'c', 0, 0},
-	{MODE_CHANPROT, 'a', 1, 1},
-	{MODE_CHANOWNER, 'q', 1, 1},
+	{MODE_CHANPROT, 'a', 1, 0},
+	{MODE_CHANOWNER, 'q', 1, 0},
 	{MODE_OPERONLY, 'O', 0, 0},
 	{MODE_ADMONLY, 'A', 0, 0},
 	{MODE_LINK, 'L', 0, 1},
 	{MODE_NOKICKS, 'Q', 0, 0},
 	{MODE_BAN, 'b', 0, 1},
 	{MODE_STRIP, 'S', 0, 0},	/* works? */
-	{MODE_EXCEPT, 'e', 0, 0},	/* exception ban */
+	{MODE_EXCEPT, 'e', 0, 1},	/* exception ban */
 	{MODE_NOKNOCK, 'K', 0, 0},	/* knock knock (no way!) */
 	{MODE_NOINVITE, 'V', 0, 0},	/* no invites */
 	{MODE_FLOODLIMIT, 'f', 0, 1},	/* flood limiter */

@@ -67,7 +67,7 @@
 #define MAXJOINCHANS	1000
 #define T_TABLE_SIZE	100 /* Number of Timers */
 #define B_TABLE_SIZE	100 /* Number of Bots */
-
+#define MAXMODES	50
 #define bzero(x, y)		memset(x, '\0', y);
 
 int servsock;
@@ -89,7 +89,7 @@ typedef struct myuser_ MyUser;
 typedef struct chans_ Chans;
 typedef struct config_mod_ Config_Mod;
 typedef struct chanmem_ Chanmem;
-
+typedef struct modeparms_ ModesParm;
 
 struct me {
 	char name[MAXHOST];
@@ -167,8 +167,10 @@ struct chans_ {
 	long cur_users;
 	long modes;
 	list_t *chanmembers;
+	list_t *modeparms;
 	char topic[BUFSIZE];
 	char topicowner[BUFSIZE];
+	time_t topictime;
 } chans_;
 
 struct chanmem_ {
@@ -176,6 +178,11 @@ struct chanmem_ {
 	time_t joint;
 	long flags;
 } chanmem_;
+
+struct modeparms_ {
+	long mode;
+	char param[64];
+} modeparms_;
 
 
 struct ping {
@@ -298,6 +305,6 @@ extern void join_chan(User *u, char *chan);
 extern void change_user_nick(Chans *c, char *newnick, char *oldnick);
 extern Chans *findchan(char *chan);
 void ChanMode(char *origin, char **av, int ac);
-extern void Change_Topic(char *, Chans *, char *);
+extern void Change_Topic(char *, Chans *, time_t t, char *);
 #endif
 

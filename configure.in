@@ -3,7 +3,7 @@ AC_INIT(dl.c)
 AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE(stats, 2.5.0Alpha5)
 PACKAGE=NeoStats
-VERSION=2.5.0Alpha5
+VERSION=2.5.0Alpha5a
 AC_PREFIX_DEFAULT(~/NeoStats/)
 bindir='${exec_prefix}'
 libdir='${exec_prefix}dl/'

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.11 2002/03/13 10:20:33 fishwaldo Exp $
+** $Id: chans.c,v 1.12 2002/03/13 11:35:09 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -24,11 +24,22 @@ void init_chan_hash()
 	
 }
 
-extern void Change_Topic(char *owner, Chans *c, char *topic) {
+extern void Change_Topic(char *owner, Chans *c, time_t time, char *topic) {
 
 	strncpy(c->topic, topic, BUFSIZE);
 	strncpy(c->topicowner, owner, BUFSIZE);
+	c->topictime = time;
 }
+
+int comparemode(ModesParm *m, long mode) {
+log("Modes %d -> %d", m->mode, mode);
+	if (m->mode == mode) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
 
 void ChanMode(char *origin, char **av, int ac) {
 	char *modes;
@@ -36,6 +47,8 @@ void ChanMode(char *origin, char **av, int ac) {
 	int j = 2; 
 	int i;
 	Chans *c;
+	ModesParm *m;
+	lnode_t *mn;
 
 	c = findchan(av[0]);
 	if (!c) {
@@ -54,12 +67,19 @@ void ChanMode(char *origin, char **av, int ac) {
 									ChangeChanUserMode(c, finduser(av[j]), 1, cFlagTab[i].mode);
 									j++;
 								} else {	
-									c->modes |= cFlagTab[i].mode;
 									if (cFlagTab[i].parameters) {
-#ifdef DEBUG
-										log("Mode Param: %s\n", av[j]);
-#endif
+										m = malloc(sizeof(ModesParm));
+										m->mode = cFlagTab[i].mode;
+										strcpy(m->param, av[j]);										
+										mn = lnode_create(m);
+										if (list_isfull(c->modeparms)) {
+											log("Eeek, Can't add additional Modes to Channel %s. Modelist is full", c->name);
+										} else {
+											list_append(c->modeparms, mn);
+										}
 										j++;
+									} else {
+										c->modes |= cFlagTab[i].mode;
 									}
 								}
 							} else {
@@ -67,11 +87,18 @@ void ChanMode(char *origin, char **av, int ac) {
 									ChangeChanUserMode(c, finduser(av[j]), 0, cFlagTab[i].mode);
 									j++;
 								} else {	
-									c->modes &= ~cFlagTab[i].mode;
 									if (cFlagTab[i].parameters) {
-#ifdef DEBUG
-										log("removeparam\n");
-#endif
+										mn = list_find(c->modeparms, (int *)cFlagTab[i].mode, comparemode);
+										if (!mn) {
+											log("Can't find Mode %c for Chan %s", *modes, c->name);
+										} else {
+											list_delete(c->modeparms, mn);
+											m = lnode_get(mn);
+											lnode_destroy(mn);
+											free(m);
+										}
+									} else {
+										c->modes &= ~cFlagTab[i].mode;
 									}
 								}
 							}
@@ -234,7 +261,9 @@ void join_chan(User *u, char *chan) {
 #endif
 		c = new_chan(chan);
 		c->chanmembers = list_create(CHAN_MEM_SIZE);
+		c->modeparms = list_create(MAXMODES);
 		c->cur_users =0;
+		c->topictime = 0;
 	} 
 	/* add this users details to the channel members hash */	
 	cm = malloc(sizeof(Chanmem));
@@ -278,6 +307,7 @@ void chandump(char *chan) {
 	Chanmem *cm;
 	char mode[10];
 	int i;
+	ModesParm *m;
 
 	strcpy(segv_location, "chandump");
 	if (!chan) {
@@ -293,7 +323,18 @@ void chandump(char *chan) {
 				}
 			}
 			sendcoders("Channel: %s Members: %d (List %d) Flags %s", c->name, c->cur_users, list_count(c->chanmembers), mode);
-			sendcoders("       Topic Owner %s, Topic %s", c->topicowner, c->topic);
+			sendcoders("       Topic Owner %s, TopicTime: %d, Topic %s", c->topicowner, c->topictime, c->topic);
+			cmn = list_first(c->modeparms);
+			while (cmn) {
+				m = lnode_get(cmn);
+				for (i = 0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1); i++) {
+					if (m->mode & cFlagTab[i].mode) {
+						sendcoders("        Modes: %c Parms %s", cFlagTab[i].flag, m->param);
+					}
+				}
+
+				cmn = list_next(c->modeparms, cmn);
+			}
 			cmn = list_first(c->chanmembers);
 			while (cmn) {
 				cm = lnode_get(cmn);
@@ -319,7 +360,17 @@ void chandump(char *chan) {
 				}
 			}
 			sendcoders("Channel: %s Members: %d (List %d) Flags %s", c->name, c->cur_users, list_count(c->chanmembers), mode);
-			sendcoders("       Topic Owner %s, Topic %s", c->topicowner, c->topic);
+			sendcoders("       Topic Owner %s, TopicTime: %d Topic %s", c->topicowner, c->topictime, c->topic);
+			cmn = list_first(c->modeparms);
+			while (cmn) {
+				m = lnode_get(cmn);
+				for (i = 0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) - 1); i++) {
+					if (m->mode & cFlagTab[i].mode) {
+						sendcoders("        Modes: %c Parms %s", cFlagTab[i].flag, m->param);
+					}
+				}
+				cmn = list_next(c->modeparms, cmn);
+			}
 			cmn = list_first(c->chanmembers);
 			while (cmn) {
 				cm = lnode_get(cmn);
