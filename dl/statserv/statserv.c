@@ -136,7 +136,7 @@ static void ss_Config(void)
 		StatServ.htmlpath[0] = 0;
 	} else {
 		/* assume that html is enabled if we don't have a setting for it */
-		if (GetConf((void *) &StatServ.html, CFGINT, "HTML_Enabled") < 0) {
+		if (GetConf((void *) &StatServ.html, CFGBOOL, "HTML_Enabled") < 0) {
 			StatServ.html = 1;
 		}
 		strlcpy(StatServ.htmlpath, tmp, MAXPATH);
