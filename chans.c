@@ -577,9 +577,9 @@ part_chan (User * u, const char *chan, char *partreason)
 		}
 		un = list_find (u->chans, c->name, comparef);
 		if (!un) {
-			nlog (LOG_WARNING, LOG_CORE, part_chan: user %s not found in channel %s", u->nick, chan);
+			nlog (LOG_WARNING, LOG_CORE, "part_chan: user %s not found in channel %s", u->nick, chan);
 			if (me.debug_mode) {
-				chanalert (s_Services, part_chan: user %s not found in channel %s", u->nick, chan);
+				chanalert (s_Services, "part_chan: user %s not found in channel %s", u->nick, chan);
 				ChanDump (c->name);
 				UserDump (u->nick);
 			}
