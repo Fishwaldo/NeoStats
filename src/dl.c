@@ -36,7 +36,7 @@
 #include "dl.h"
 
 #ifndef HAVE_LIBDL
-const char *ns_dlerrormsg;
+char *ns_dlerrormsg;
 #else /* HAVE_LIBDL */
 char *ns_dlerrormsg;
 #endif /* HAVE_LIBDL */
