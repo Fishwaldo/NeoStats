@@ -188,6 +188,119 @@ strlwr (char *s)
 	return s;
 }
 
+/** @brief split_buf
+ *  Split a buffer into argument list
+ *
+ * @return 
+ */
+EXPORTFUNC int
+ircsplitbuf (char *buf, char ***argv, int colon_special)
+{
+	int argvsize = 8;
+	int argc;
+	char *s;
+	int colcount = 0;
+	SET_SEGV_LOCATION();
+	*argv = scalloc (sizeof (char *) * argvsize);
+	argc = 0;
+	/*if (*buf == ':')
+		buf++;*/
+	while (*buf) {
+		if (argc == argvsize) {
+			argvsize += 8;
+			*argv = srealloc (*argv, sizeof (char *) * argvsize);
+		}
+		if ((*buf == ':') && (colcount < 1)) {
+			buf++;
+			colcount++;
+			if(colon_special) {
+				(*argv)[argc++] = buf;
+				break;
+			}
+		}
+		s = strpbrk (buf, " ");
+		if (s) {
+			*s++ = 0;
+			while (isspace (*s))
+				s++;
+		} else {
+			s = buf + strnlen (buf, BUFSIZE);
+		}
+		if (*buf == 0) {
+			buf++;
+		}
+		(*argv)[argc++] = buf;
+		buf = s;
+	}
+	return argc;
+}
+
+int
+split_buf (char *buf, char ***argv, int colon_special)
+{
+	int argvsize = 8;
+	int argc;
+	char *s;
+	int colcount = 0;
+	SET_SEGV_LOCATION();
+	*argv = scalloc (sizeof (char *) * argvsize);
+	argc = 0;
+	if (*buf == ':')
+		buf++;
+	while (*buf) {
+		if (argc == argvsize) {
+			argvsize += 8;
+			*argv = srealloc (*argv, sizeof (char *) * argvsize);
+		}
+		if ((*buf == ':') && (colcount < 1)) {
+			buf++;
+			colcount++;
+		}
+		s = strpbrk (buf, " ");
+		if (s) {
+			*s++ = 0;
+			while (isspace (*s))
+				s++;
+		} else {
+			s = buf + strnlen (buf, BUFSIZE);
+		}
+		if (*buf == 0) {
+			buf++;
+		}
+		(*argv)[argc++] = buf;
+		buf = s;
+	}
+	return argc;
+}
+
+/** @brief joinbuf 
+ *
+ *  join an array of arguments into a single buffer
+ *
+ * @return 
+ */
+char *
+joinbuf (char **av, int ac, int from)
+{
+	int i;
+	char *buf;
+
+	buf = smalloc (BUFSIZE);
+	if(from >= ac) {
+		dlog(DEBUG1, "joinbuf: from (%d) >= ac (%d)", from, ac);
+		strlcpy (buf, "(null)", BUFSIZE);
+	}
+	else {
+		strlcpy (buf, av[from], BUFSIZE);
+		for (i = from + 1; i < ac; i++) {
+			strlcat (buf, " ", BUFSIZE);
+			strlcat (buf, av[i], BUFSIZE);
+		}
+	}
+	return (char *) buf;
+}
+
+
 /** @brief Adds a string to an array of strings
  *
  * used for the event functions, adds a string to an array of string pointers to pass to modules

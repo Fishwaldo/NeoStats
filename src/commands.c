@@ -182,39 +182,39 @@ static int getuserlevel(CmdParams * cmdparams)
 
 void msg_permission_denied(CmdParams * cmdparams, char* subcommand)
 {
-	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Permission Denied");
-	chanalert (cmdparams->dest.bot->nick, "%s tried to use %s %s, but is not authorised", cmdparams->source.user->nick, cmdparams->param, subcommand);
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "Permission Denied");
+	irc_chanalert (cmdparams->dest.bot, "%s tried to use %s %s, but is not authorised", cmdparams->source.user->nick, cmdparams->param, subcommand);
 	nlog (LOG_NORMAL, "%s tried to use %s %s, but is not authorised", cmdparams->source.user->nick, cmdparams->param, subcommand);
 }
 
 void msg_error_need_more_params (CmdParams * cmdparams)
 {
-	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Syntax error: insufficient parameters");
-	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "/msg %s HELP %s for more information", cmdparams->dest.bot->nick, cmdparams->param);
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "Syntax error: insufficient parameters");
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "/msg %s HELP %s for more information", cmdparams->dest.bot->nick, cmdparams->param);
 }
 
 void msg_error_param_out_of_range (CmdParams * cmdparams)
 {
-	prefmsg(cmdparams->source.user->nick, NULL, "Parameter out of range.");
-	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "/msg %s HELP %s for more information", cmdparams->dest.bot->nick, cmdparams->param);
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "Parameter out of range.");
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "/msg %s HELP %s for more information", cmdparams->dest.bot->nick, cmdparams->param);
 }
 
 void msg_syntax_error (CmdParams * cmdparams)
 {
-	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Syntax error");
-	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "/msg %s HELP %s for more information", cmdparams->dest.bot->nick, cmdparams->param);
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "Syntax error");
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "/msg %s HELP %s for more information", cmdparams->dest.bot->nick, cmdparams->param);
 }
 
 void msg_unknown_command (CmdParams * cmdparams)
 {
-	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Syntax error: unknown command: \2%s\2", cmdparams->param);
-	chanalert (cmdparams->dest.bot->nick, "%s requested %s, but that is an unknown command", cmdparams->source.user->nick, cmdparams->param);
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "Syntax error: unknown command: \2%s\2", cmdparams->param);
+	irc_chanalert (cmdparams->dest.bot, "%s requested %s, but that is an unknown command", cmdparams->source.user->nick, cmdparams->param);
 }
 
 void msg_only_opers (CmdParams * cmdparams)
 {
-	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "This service is only available to IRC operators.");
-	chanalert (cmdparams->dest.bot->nick, "%s requested %s, but is not an operator.", cmdparams->source.user->nick, cmdparams->param);
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "This service is only available to IRC operators.");
+	irc_chanalert (cmdparams->dest.bot, "%s requested %s, but is not an operator.", cmdparams->source.user->nick, cmdparams->param);
 	nlog (LOG_NORMAL, "%s requested %s, but is not an operator.", cmdparams->source.user->nick, cmdparams->param);
 }
 
@@ -471,7 +471,7 @@ run_bot_cmd (CmdParams * cmdparams)
 				return NS_SUCCESS;
 			}
 			/* Seems OK so report the command call so modules do not have to */
-			chanalert (cmdparams->dest.bot->nick, "%s used %s", cmdparams->source.user->nick, cmd_ptr->cmd);
+			irc_chanalert (cmdparams->dest.bot, "%s used %s", cmdparams->source.user->nick, cmd_ptr->cmd);
 			/* Log command message */
 			nlog (LOG_NORMAL, "%s used %s", cmdparams->source.user->nick, cmdparams->param);
 			/* call handler */
@@ -511,15 +511,15 @@ bot_cmd_help_set (CmdParams * cmdparams, int userlevel)
 	bot_setting* set_ptr;
 
 	/* Display HELP SET intro text and LIST command */
-	privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmd_help_set);
+	irc_privmsg_list (cmdparams->dest.bot, cmdparams->source.user, cmd_help_set);
 	/* Display option specific text for current user level */
 	hash_scan_begin(&hs, cmdparams->dest.bot->botsettings);
 	while ((setnode = hash_scan_next(&hs)) != NULL) {
 		set_ptr = hnode_get(setnode);
 		if(set_ptr->helptext && userlevel >= set_ptr->ulevel)
 		{
-			privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, set_ptr->helptext);
-			prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, " ");
+			irc_privmsg_list (cmdparams->dest.bot, cmdparams->source.user, set_ptr->helptext);
+			irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, " ");
 		}
 	}
 	return NS_SUCCESS;
@@ -547,21 +547,21 @@ bot_cmd_help (CmdParams * cmdparams)
 	if (cmdparams->ac < 1) {
 		lowlevel = 0;
 		curlevel = 30;
-		chanalert (cmdparams->dest.bot->nick, "%s requested %s help", cmdparams->source.user->nick, cmdparams->dest.bot->nick);
+		irc_chanalert (cmdparams->dest.bot, "%s requested %s help", cmdparams->source.user->nick, cmdparams->dest.bot->nick);
 		nlog (LOG_NORMAL, "%s requested %s help", cmdparams->source.user->nick, cmdparams->dest.bot->nick);
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "\2The following commands can be used with %s:\2", cmdparams->dest.bot->nick);
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "\2The following commands can be used with %s:\2", cmdparams->dest.bot->nick);
 
 		/* Handle intrinsic commands */
 		cmd_ptr = intrinsic_commands;
 		while(cmd_ptr->cmd) {
 			/* Check for module override */	
 			if(!hash_lookup(cmdparams->dest.bot->botcmds, cmd_ptr->cmd))
-				prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
+				irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
 			cmd_ptr++;
 		}
 		/* Do we have a set command? */
 		if(cmdparams->dest.bot->botsettings && userlevel >= cmdparams->dest.bot->set_ulevel) {
-			prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    %-20s Configure %s", "SET", cmdparams->dest.bot->nick);
+			irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "    %-20s Configure %s", "SET", cmdparams->dest.bot->nick);
 		}
 		while(1) {
 			hash_scan_begin(&hs, cmdparams->dest.bot->botcmds);
@@ -570,13 +570,13 @@ bot_cmd_help (CmdParams * cmdparams)
 				cmdlevel = calc_cmd_ulevel(cmd_ptr);
 				if ((cmdlevel < curlevel) && (cmdlevel >= lowlevel)) {
 					if(curlevelmsg && !donemsg) {
-						prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "\2Additional commands available to %s:\2", curlevelmsg);
+						irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "\2Additional commands available to %s:\2", curlevelmsg);
 						donemsg = 1;
 					}
 					if(!cmd_ptr->onelinehelp) {
-						prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    %-20s *** Missing help text ***", cmd_ptr->cmd);
+						irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "    %-20s *** Missing help text ***", cmd_ptr->cmd);
 					} else {					
-						prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
+						irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
 					}
 				}
 			}
@@ -615,14 +615,14 @@ bot_cmd_help (CmdParams * cmdparams)
 			}						
 		}
 		/* Generate help on help footer text */
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, " ");
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "To execute a command:");
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    \2/msg %s command\2", cmdparams->dest.bot->nick);
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "For help on a command:");
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    \2/msg %s HELP command\2", cmdparams->dest.bot->nick);
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, " ");
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "To execute a command:");
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "    \2/msg %s command\2", cmdparams->dest.bot->nick);
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "For help on a command:");
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "    \2/msg %s HELP command\2", cmdparams->dest.bot->nick);
 		return NS_SUCCESS;
 	}
-	chanalert (cmdparams->dest.bot->nick, "%s requested %s help on %s", cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmdparams->av[0]);
+	irc_chanalert (cmdparams->dest.bot, "%s requested %s help on %s", cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmdparams->av[0]);
 	nlog (LOG_NORMAL, "%s requested %s help on %s", cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmdparams->av[0]);
 
 	/* Process command list */
@@ -635,9 +635,9 @@ bot_cmd_help (CmdParams * cmdparams)
 			return NS_ERR_NO_PERMISSION;
 		}		
 		if(!cmd_ptr->helptext) {
-			privmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Missing help text for command");
+			irc_privmsg (cmdparams->dest.bot, cmdparams->source.user, "Missing help text for command");
 		} else {
-			privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmd_ptr->helptext);
+			irc_privmsg_list (cmdparams->dest.bot, cmdparams->source.user, cmd_ptr->helptext);
 		}
 		return NS_SUCCESS;
 	}
@@ -646,7 +646,7 @@ bot_cmd_help (CmdParams * cmdparams)
 	cmd_ptr = intrinsic_commands;
 	while(cmd_ptr->cmd) {
 		if (!ircstrcasecmp(cmdparams->av[0], cmd_ptr->cmd)) {
-			privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmd_ptr->helptext);
+			irc_privmsg_list (cmdparams->dest.bot, cmdparams->source.user, cmd_ptr->helptext);
 			return NS_SUCCESS;
 		}
 		cmd_ptr++;
@@ -658,28 +658,31 @@ bot_cmd_help (CmdParams * cmdparams)
 	}
 
 	/* Command not found so report as unknown */
-	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "No help available or unknown help topic: \2%s\2", cmdparams->av[2]);
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "No help available or unknown help topic: \2%s\2", cmdparams->av[2]);
 	return NS_ERR_UNKNOWN_COMMAND;
 }
 
 /**	Support function for command handlers to call to check that target nick 
  *	is not the bot and is on IRC. Done in core to avoid module code bloat.
  */ 
-int is_target_valid(char* bot_name, User* u, char* target_nick)
+User* findvaliduser(Bot* botptr, User* sourceuser, const char* target_nick)
 {
-	/* Check for message to self */
-	if (!ircstrcasecmp(target_nick, bot_name)) {
-		prefmsg(u->nick, bot_name, "A service cannot message itself.");
-		return 0;
-	}
+	User* target;
+	
 	/* Check target user is on IRC */
-	if (!finduser(target_nick)) {
-		prefmsg(u->nick, bot_name,
-			"%s cannot be found on IRC, your message was not sent.", target_nick);
-		return 0;
+	target = finduser(target_nick);
+	if (!target) {
+		irc_prefmsg(botptr, sourceuser, 
+			"%s cannot be found on IRC, message not sent.", target_nick);
+		return NULL;
+	}
+	/* Check for message to self */
+	if (IsMe(target)) {
+		irc_prefmsg(botptr, sourceuser, "Cannot send message to a service bot.");
+		return NULL;
 	}
 	/* User OK */
-	return 1;
+	return target;
 }
 
 /** @brief bot_cmd_set_list process bot set list command
@@ -693,7 +696,7 @@ bot_cmd_set_list (CmdParams * cmdparams)
 	bot_setting* set_ptr;
 	int userlevel;
 
-	prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Current %s settings:", cmdparams->dest.bot->nick);
+	irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "Current %s settings:", cmdparams->dest.bot->nick);
 	userlevel = getuserlevel (cmdparams);
 
 	hash_scan_begin(&hs, cmdparams->dest.bot->botsettings);
@@ -703,15 +706,15 @@ bot_cmd_set_list (CmdParams * cmdparams)
 		if( userlevel >= set_ptr->ulevel) {
 			switch(set_ptr->type) {
 				case SET_TYPE_BOOLEAN:
-					prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s: %s",
+					irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "%s: %s",
 						set_ptr->option, *(int*)set_ptr->varptr ? "Enabled" : "Disabled");
 					break;
 				case SET_TYPE_INT:
 					if(set_ptr->desc) {
-						prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s: %d %s",
+						irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "%s: %d %s",
 							set_ptr->option, *(int*)set_ptr->varptr, set_ptr->desc);
 					} else {
-						prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s: %d",
+						irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "%s: %d",
 							set_ptr->option, *(int*)set_ptr->varptr);
 					}
 					break;				
@@ -723,7 +726,7 @@ bot_cmd_set_list (CmdParams * cmdparams)
 				case SET_TYPE_REALNAME:
 				case SET_TYPE_IPV4:	
 				case SET_TYPE_CHANNEL:							
-					prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s: %s",
+					irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "%s: %s",
 						set_ptr->option, (char*)set_ptr->varptr);
 					break;
 				case SET_TYPE_CUSTOM:
@@ -732,7 +735,7 @@ bot_cmd_set_list (CmdParams * cmdparams)
 					}
 					break;
 				default:
-					prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s: uses an unsupported type",
+					irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, "%s: uses an unsupported type",
 						set_ptr->option);
 					break;
 			}
@@ -745,11 +748,11 @@ bot_cmd_set_list (CmdParams * cmdparams)
 static int 
 bot_cmd_set_report (CmdParams * cmdparams, bot_setting* set_ptr, char* new_setting)
 {
-	chanalert(cmdparams->dest.bot->nick, "%s set to %s by \2%s\2", 
+	irc_chanalert(cmdparams->dest.bot, "%s set to %s by \2%s\2", 
 		set_ptr->option, new_setting, cmdparams->source.user->nick);
 	nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
 		cmdparams->source.user->nick, cmdparams->source.user->username, cmdparams->source.user->hostname, set_ptr->option, new_setting);
-	prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+	irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 		"%s set to %s", set_ptr->option, new_setting);
 	return NS_SUCCESS;
 } 
@@ -788,17 +791,17 @@ bot_cmd_set_int (CmdParams * cmdparams, bot_setting* set_ptr)
 	intval = atoi(cmdparams->av[1]);	
 	/* atoi will return 0 for a string instead of a digit so check it! */
 	if(intval == 0 && (strcmp(cmdparams->av[1],"0")!=0)) {
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 			"%s invalid setting for %s", cmdparams->av[1], set_ptr->option);
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 			"Valid values are %d to %d", set_ptr->min, set_ptr->max);
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	/* Check limits */
 	if((set_ptr->min != -1 && intval < set_ptr->min) || (set_ptr->max != -1 && intval > set_ptr->max)) {
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 			"%d out of range for %s", intval, set_ptr->option);
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 			"Valid values are %d to %d", set_ptr->min, set_ptr->max);
 		return NS_ERR_SYNTAX_ERROR;
 	}
@@ -826,7 +829,7 @@ static int
 bot_cmd_set_channel (CmdParams * cmdparams, bot_setting* set_ptr)
 {
 	if(validate_channel (cmdparams->av[1]) == NS_FAILURE) {
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 			"%s contains invalid characters", cmdparams->av[1]);
 		return NS_ERR_SYNTAX_ERROR;
 	}
@@ -857,7 +860,7 @@ static int
 bot_cmd_set_nick (CmdParams * cmdparams, bot_setting* set_ptr)
 {
 	if(validate_nick (cmdparams->av[1]) == NS_FAILURE) {
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 			"%s contains invalid characters", cmdparams->av[1]);
 		return NS_ERR_SYNTAX_ERROR;
 	}
@@ -873,7 +876,7 @@ static int
 bot_cmd_set_user (CmdParams * cmdparams, bot_setting* set_ptr)
 {
 	if(validate_user (cmdparams->av[1]) == NS_FAILURE) {
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 			"%s contains invalid characters", cmdparams->av[1]);
 		return NS_ERR_SYNTAX_ERROR;
 	}
@@ -889,12 +892,12 @@ static int
 bot_cmd_set_host (CmdParams * cmdparams, bot_setting* set_ptr)
 {
 	if (!index(cmdparams->av[1], '.')) {
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 			"%s is an invalid hostname", cmdparams->av[1]);
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	if(validate_host (cmdparams->av[1]) == NS_FAILURE) {
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 			"%s contains invalid characters", cmdparams->av[1]);
 		return NS_ERR_SYNTAX_ERROR;
 	}
@@ -925,7 +928,7 @@ static int
 bot_cmd_set_ipv4 (CmdParams * cmdparams, bot_setting* set_ptr)
 {
 	if (!inet_addr(cmdparams->av[1])) {
-		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 			"Invalid IPV4 format. Should be dotted quad, e.g. 1.2.3.4");
 		return NS_ERR_SYNTAX_ERROR;
 	}
@@ -1011,7 +1014,7 @@ bot_cmd_set (CmdParams * cmdparams)
 		}
 		return NS_SUCCESS;
 	}
-	prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+	irc_prefmsg(cmdparams->dest.bot, cmdparams->source.user, 
 		"Unknown set option. /msg %s HELP SET for more info",
 		cmdparams->dest.bot->nick);
 	return NS_ERR_UNKNOWN_OPTION;
@@ -1022,7 +1025,7 @@ bot_cmd_set (CmdParams * cmdparams)
  */
 static int bot_cmd_about (CmdParams * cmdparams)
 {
-	privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmdparams->dest.bot->moduleptr->info->about_text);
+	irc_privmsg_list (cmdparams->dest.bot, cmdparams->source.user, cmdparams->dest.bot->moduleptr->info->about_text);
 	return NS_SUCCESS;
 }
 
@@ -1031,8 +1034,8 @@ static int bot_cmd_about (CmdParams * cmdparams)
  */
 static int bot_cmd_version (CmdParams * cmdparams)
 {
-	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "\2%s version\2", cmdparams->dest.bot->moduleptr->info->name);
-	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s %s %s", cmdparams->dest.bot->moduleptr->info->version, 
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "\2%s version\2", cmdparams->dest.bot->moduleptr->info->name);
+	irc_prefmsg (cmdparams->dest.bot, cmdparams->source.user, "%s %s %s", cmdparams->dest.bot->moduleptr->info->version, 
 		cmdparams->dest.bot->moduleptr->info->build_date, cmdparams->dest.bot->moduleptr->info->build_time);
 	return NS_SUCCESS;
 }
@@ -1042,7 +1045,7 @@ static int bot_cmd_version (CmdParams * cmdparams)
  */
 static int bot_cmd_credits (CmdParams * cmdparams)
 {
-	privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmdparams->dest.bot->moduleptr->info->copyright);
+	irc_privmsg_list (cmdparams->dest.bot, cmdparams->source.user, cmdparams->dest.bot->moduleptr->info->copyright);
 	return NS_SUCCESS;
 }
 

@@ -138,7 +138,7 @@ debuglog (const char* time, const char* level, const char *line)
 	}
 	if(config.debugtochan&&!chanflag) {
 		chanflag = 1;
-		privmsg(config.debugchan, ns_botptr->nick, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line);
+		irc_chanprivmsg(ns_botptr, config.debugchan, "%s %s %s - %s\n", time, level, GET_CUR_MODNAME(), line);
 		chanflag = 0;
 	}
 }

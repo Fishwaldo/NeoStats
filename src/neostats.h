@@ -118,7 +118,7 @@
 #define PROTOCOL_CLIENT		0x00001000  /* CLIENT */
 #define PROTOCOL_B64SERVER	0x00002000  /* Server names use Base 64 */
 #define PROTOCOL_B64NICK	0x00004000  /* Nick names use Base 64 */
-#define PROTOCOL_UNKLN		0x00008000  /*  */
+#define PROTOCOL_UNKLN		0x00008000  /* Have UNKLINE support */
 #define PROTOCOL_NICKIP		0x00010000  /* NICK passes IP address */
 
 #define FEATURE_SWHOIS		0x00000001	/* SWHOIS */
@@ -130,10 +130,9 @@
 #define FEATURE_SVSNICK		0x00000040	/* SVSNICK */
 #define FEATURE_SVSKILL		0x00000080	/* SVSKILL */
 #define FEATURE_UMODECLOAK  0x00000100	/* auto cloak host with umode */
-#define FEATURE_SMODES		0x00000200	/* Smode field */
+#define FEATURE_USERSMODES	0x00000200	/* User Smode field */
 #define FEATURE_BOTMODES	0x00000400	/* Umodes for bots available */
 #define FEATURE_SMO			0x00000800	/* SMO */
-#define FEATURE_USERSMODES	0x00001000	/* User Smodes */
 
 /* cumodes are channel modes which affect a user */
 #define CUMODE_CHANOP		0x00000001
@@ -442,7 +441,9 @@ typedef struct tme {
 	unsigned int cursocks;
 	unsigned int want_nickip:1;
 	char servicescmode[64];
+	unsigned int servicescmodemask;
 	char servicesumode[64];
+	unsigned int servicesumodemask;
 	char serviceschan[MAXCHANLEN];
 	unsigned int onchan:1;
 	unsigned int synched:1;
@@ -961,11 +962,11 @@ EXPORTFUNC void flush_keeper();
 
 /* main.c */
 void do_exit (NS_EXIT_TYPE exitcode, char* quitmsg) __attribute__((noreturn));
-void fatal_error(char* file, int line, char* func, char* error_text) __attribute__((noreturn));;
+EXPORTFUNC void fatal_error(char* file, int line, char* func, char* error_text) __attribute__((noreturn));;
 #define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__,(error_text)); 
 
 /* misc.c */
-void strip (char * line);
+EXPORTFUNC void strip (char * line);
 EXPORTFUNC void *smalloc ( const int size );
 EXPORTFUNC void *scalloc ( const int size );
 EXPORTFUNC void *srealloc ( void* ptr, const int size );
@@ -974,46 +975,64 @@ EXPORTFUNC char *sstrdup (const char * s);
 char *strlwr (char * s);
 EXPORTFUNC void AddStringToList (char ***List, char S[], int *C);
 EXPORTFUNC void strip_mirc_codes(char *text);
-char *sctime (time_t t);
-char *sftime (time_t t);
+EXPORTFUNC char *sctime (time_t t);
+EXPORTFUNC char *sftime (time_t t);
 
 /* ircd.c */
 EXPORTFUNC char *joinbuf (char **av, int ac, int from);
 EXPORTFUNC int split_buf (char *buf, char ***argv, int colon_special);
 
-EXPORTFUNC void privmsg_list (char *to, char *from, const char **text);
-EXPORTFUNC void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC void privmsg (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC void notice (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC void globops (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC void chanalert (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC void wallops (const char *from, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC void numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+/*  Messaging functions to send messages to users and channels
+ */
+EXPORTFUNC void irc_privmsg_list (const Bot *botptr, const User *target, const char **text);
+EXPORTFUNC void irc_prefmsg (const Bot *botptr, const User *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void irc_privmsg (const Bot *botptr, const User *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void irc_notice (const Bot *botptr, const User *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void irc_chanprivmsg (const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void irc_channotice (const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void irc_chanalert (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void irc_numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC void irc_globops (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void irc_wallops (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
-EXPORTFUNC int join_bot_to_chan (const char *who, const char *chan, const char *modes);
-EXPORTFUNC int part_bot_from_chan (const char *who, const char *chan);
+/*  General irc actions for join/part channels etc
+ *  Require a bot to operate
+ */
+EXPORTFUNC int irc_quit (const Bot *botptr, const char *quitmsg);
+EXPORTFUNC int irc_join (const Bot *botptr, const char *chan, const char *chanmodes);
+EXPORTFUNC int irc_part (const Bot *botptr, const char *chan);
+EXPORTFUNC int irc_kick (const Bot *botptr, const char *chan, const char *target, const char *reason);
+EXPORTFUNC int irc_invite (const Bot *botptr, const char *target, const char *chan);
+EXPORTFUNC int irc_cloakhost (const Bot *botptr);
 
-/* function declarations */
-int squit_cmd (const char *who, const char *quitmsg);
-int skick_cmd (const char *who, const char *chan, const char *target, const char *reason);
-int sinvite_cmd (const char *from, const char *to, const char *chan);
-int scmode_cmd (const char *who, const char *chan, const char *mode, const char *args);
-int sumode_cmd (const char *who, const char *target, long mode);
-int skill_cmd (const char *from, const char *target, const char *reason, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-int sping_cmd (const char *from, const char *reply, const char *to);
-int spong_cmd (const char *reply);
-int snick_cmd (const char *oldnick, const char *newnick);
-int sswhois_cmd (const char *target, const char *swhois);
-int ssvsnick_cmd (const char *target, const char *newnick);
-int ssvsjoin_cmd (const char *target, const char *chan);
-int ssvspart_cmd (const char *target, const char *chan);
-EXPORTFUNC int ssvshost_cmd (const char *target, const char *vhost);
-int ssvsmode_cmd (const char *target, const char *modes);
-int ssvskill_cmd (const char *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-int sakill_cmd (const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, ...);
-int srakill_cmd (const char *host, const char *ident);
-int ssvstime_cmd (const time_t ts);
-int schanusermode_cmd (const char *who, const char *chan, const char *mode, const char *bot);
+/*  Mode functions
+ *  Require a bot to operate
+ */
+EXPORTFUNC int irc_usermode (const Bot *botptr, const char *target, long mode);
+EXPORTFUNC int irc_chanmode (const Bot *botptr, const char *chan, const char *mode, const char *args);
+EXPORTFUNC int irc_chanusermode (const Bot *botptr, const char *chan, const char *mode, const char *target);
+
+/*  Oper functions
+ *  Require an opered bot to operate
+ */
+EXPORTFUNC int irc_kill (const Bot *botptr, const char *target, const char *reason, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_akill (const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, ...);
+EXPORTFUNC int irc_rakill (const char *host, const char *ident);
+EXPORTFUNC int irc_swhois (const char *target, const char *swhois);
+
+int irc_ping (const char *source, const char *reply, const char *to);
+int irc_pong (const char *reply);
+
+/*  SVS functions 
+ *  these operate from the server rather than a bot 
+ */
+EXPORTFUNC int irc_svsnick (User *target, const char *newnick);
+EXPORTFUNC int irc_svsjoin (User *target, const char *chan);
+EXPORTFUNC int irc_svspart (User *target, const char *chan);
+EXPORTFUNC int irc_svshost (User *target, const char *vhost);
+EXPORTFUNC int irc_svsmode (User *target, const char *modes);
+EXPORTFUNC int irc_svskill (User *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC int irc_svstime (const time_t ts);
 
 /* users.c */
 EXPORTFUNC User *finduser (const char *nick);
@@ -1043,7 +1062,7 @@ EXPORTFUNC int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *
 /* services.c */
 EXPORTFUNC int add_services_cmd_list(bot_cmd* bot_cmd_list);
 EXPORTFUNC int del_services_cmd_list(bot_cmd* bot_cmd_list);
-EXPORTFUNC int is_target_valid(char* bot_name, User* u, char* target_nick);
+EXPORTFUNC User* findvaliduser(Bot* botptr, User* u, const char* target_nick);
 
 /* transfer.c stuff */
 typedef void (transfer_callback) (void *data, int returncode, char *body, int bodysize);
@@ -1133,8 +1152,6 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 
 EXPORTFUNC void nlog (LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC void dlog (DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-
-int CloakHost (Bot *bot_ptr);
 
 typedef void (*ChannelListHandler) (Channel * c);
 void GetChannelList(ChannelListHandler handler);

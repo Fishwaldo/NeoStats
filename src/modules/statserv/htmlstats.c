@@ -71,7 +71,7 @@ int ss_html()
 	if (!tpl) {
 		nlog(LOG_WARNING,
 			"Failed to open StatServ HTML template %s.", html_template);
-		chanalert(ss_bot->nick, 
+		irc_chanalert(ss_bot, 
 			"Failed to open StatServ HTML template %s.", html_template);
 		return 1;
 	}
@@ -79,7 +79,7 @@ int ss_html()
 	if (!opf) {
 		nlog(LOG_WARNING,
 			"Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath);
-		chanalert(ss_bot->nick,
+		irc_chanalert(ss_bot,
 			"Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath);
 		return 1;
 	}

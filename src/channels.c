@@ -22,8 +22,9 @@
 */
 
 #include "neostats.h"
-#include "bots.h"
 #include "ircd.h"
+#include "modes.h"
+#include "bots.h"
 #include "hash.h"
 #include "users.h"
 #include "channels.h"
@@ -341,7 +342,7 @@ ChanUserMode (const char* chan, const char* nick, int add, long mode)
 	cmn = list_find (c->chanmembers, u->nick, comparef);
 	if (!cmn) {
 		if (config.debug) {
-			chanalert (ns_botptr->nick, "ChanUserMode: %s is not a member of channel %s", u->nick, c->name);
+			irc_chanalert (ns_botptr, "ChanUserMode: %s is not a member of channel %s", u->nick, c->name);
 			ChanDump (c->name);
 			UserDump (u->nick);
 		}
@@ -452,7 +453,7 @@ void del_chan_user(Channel *c, User *u)
 	if (!un) {
 		nlog (LOG_WARNING, "del_chan_user: %s not found in channel %s", u->nick, c->name);
 		if (config.debug) {
-			chanalert (ns_botptr->nick, "del_chan_user: %s not found in channel %s", u->nick, c->name);
+			irc_chanalert (ns_botptr, "del_chan_user: %s not found in channel %s", u->nick, c->name);
 			ChanDump (c->name);
 			UserDump (u->nick);
 		}
@@ -488,7 +489,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 	if (!u) {
 		nlog (LOG_WARNING, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
 		if (config.debug) {
-			chanalert (ns_botptr->nick, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
+			irc_chanalert (ns_botptr, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
 			ChanDump (chan);
 		}
 		return;
@@ -503,7 +504,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 		if (!un) {
 			nlog (LOG_WARNING, "kick_chan: %s isn't a member of channel %s", u->nick, chan);
 			if (config.debug) {
-				chanalert (ns_botptr->nick, "kick_chan: %s isn't a member of channel %s", u->nick, chan);
+				irc_chanalert (ns_botptr, "kick_chan: %s isn't a member of channel %s", u->nick, chan);
 				ChanDump (c->name);
 				UserDump (u->nick);
 			}
@@ -556,7 +557,7 @@ part_chan (User * u, const char *chan, const char *reason)
 	if (!u) {
 		nlog (LOG_WARNING, "part_chan: trying to part NULL user from %s", chan);
 		if (config.debug) {
-			chanalert (ns_botptr->nick, "part_chan: trying to part NULL user from %s", chan);
+			irc_chanalert (ns_botptr, "part_chan: trying to part NULL user from %s", chan);
 			ChanDump (chan);
 		}
 		return;
@@ -571,7 +572,7 @@ part_chan (User * u, const char *chan, const char *reason)
 		if (!un) {
 			nlog (LOG_WARNING, "part_chan: user %s isn't a member of channel %s", u->nick, chan);
 			if (config.debug) {
-				chanalert (ns_botptr->nick, "part_chan: user %s isn't a member of channel %s", u->nick, chan);
+				irc_chanalert (ns_botptr, "part_chan: user %s isn't a member of channel %s", u->nick, chan);
 				ChanDump (c->name);
 				UserDump (u->nick);
 			}
@@ -622,7 +623,7 @@ ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 	if (!cm) {
 		nlog (LOG_WARNING, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
 		if (config.debug) {
-			chanalert (ns_botptr->nick, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
+			irc_chanalert (ns_botptr, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
 			ChanDump (c->name);
 			UserDump (oldnick);
 		}
@@ -685,7 +686,7 @@ join_chan (const char* nick, const char *chan)
 	if (list_find (c->chanmembers, u->nick, comparef)) {
 		nlog (LOG_WARNING, "join_chan: tried to add %s to channel %s but they are already a member", u->nick, chan);
 		if (config.debug) {
-			chanalert (ns_botptr->nick, "join_chan: tried to add %s to channel %s but they are already a member", u->nick, chan);
+			irc_chanalert (ns_botptr, "join_chan: tried to add %s to channel %s but they are already a member", u->nick, chan);
 			ChanDump (c->name);
 			UserDump (u->nick);
 		}
@@ -746,22 +747,22 @@ dumpchan (Channel* c)
 		}
 	}
 	mode[j] = 0;
-	chanalert (ns_botptr->nick, "Channel:    %s", c->name);
-	chanalert (ns_botptr->nick, "Mode:       %s creationtime %ld", mode, (long)c->creationtime);
-	chanalert (ns_botptr->nick, "TopicOwner: %s TopicTime: %ld Topic: %s", c->topicowner, (long)c->topictime, c->topic);
-	chanalert (ns_botptr->nick, "PubChan?:   %d", is_pub_chan (c));
-	chanalert (ns_botptr->nick, "Flags:      %x", c->flags);
+	irc_chanalert (ns_botptr, "Channel:    %s", c->name);
+	irc_chanalert (ns_botptr, "Mode:       %s creationtime %ld", mode, (long)c->creationtime);
+	irc_chanalert (ns_botptr, "TopicOwner: %s TopicTime: %ld Topic: %s", c->topicowner, (long)c->topictime, c->topic);
+	irc_chanalert (ns_botptr, "PubChan?:   %d", is_pub_chan (c));
+	irc_chanalert (ns_botptr, "Flags:      %x", c->flags);
 	cmn = list_first (c->modeparms);
 	while (cmn) {
 		m = lnode_get (cmn);
 		for (i = 0; i < MODE_TABLE_SIZE; i++) {
 			if (m->mode & ircd_cmodes[i].mode) {
-				chanalert (ns_botptr->nick, "Modes:      %c Parms %s", i, m->param);
+				irc_chanalert (ns_botptr, "Modes:      %c Parms %s", i, m->param);
 			}
 		}
 		cmn = list_next (c->modeparms, cmn);
 	}
-	chanalert (ns_botptr->nick, "Members:    %ld (List %d)", c->users, (int)list_count (c->chanmembers));
+	irc_chanalert (ns_botptr, "Members:    %ld (List %d)", c->users, (int)list_count (c->chanmembers));
 	cmn = list_first (c->chanmembers);
 	while (cmn) {
 		cm = lnode_get (cmn);
@@ -774,10 +775,10 @@ dumpchan (Channel* c)
 			}
 		}
 		mode[j] = 0;
-		chanalert (ns_botptr->nick, "            %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->tsjoin);
+		irc_chanalert (ns_botptr, "            %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->tsjoin);
 		cmn = list_next (c->chanmembers, cmn);
 	}
-	chanalert (ns_botptr->nick, "========================================");
+	irc_chanalert (ns_botptr, "========================================");
 }
 
 void ChanDump (const char *chan)
@@ -791,9 +792,9 @@ void ChanDump (const char *chan)
 		return;
 #endif
 	SET_SEGV_LOCATION();
-	chanalert (ns_botptr->nick, "================CHANDUMP================");
+	irc_chanalert (ns_botptr, "================CHANDUMP================");
 	if (!chan) {
-		chanalert (ns_botptr->nick, "Channels %d", (int)hash_count (channelhash));
+		irc_chanalert (ns_botptr, "Channels %d", (int)hash_count (channelhash));
 		hash_scan_begin (&sc, channelhash);
 		while ((cn = hash_scan_next (&sc)) != NULL) {
 			c = hnode_get (cn);
@@ -804,7 +805,7 @@ void ChanDump (const char *chan)
 		if (c) {
 			dumpchan(c);
 		} else {
-			chanalert (ns_botptr->nick, "ChanDump: can't find channel %s", chan);
+			irc_chanalert (ns_botptr, "ChanDump: can't find channel %s", chan);
 		}
 	}
 }

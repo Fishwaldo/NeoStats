@@ -24,6 +24,7 @@
 */
 #include "neostats.h"
 #include "ircd.h"
+#include "modes.h"
 #include "modules.h"
 #include "dl.h"
 #include "bots.h"
@@ -40,26 +41,10 @@
 ircd_server ircd_srv;
 
 static char ircd_buf[BUFSIZE];
-static char UmodeStringBuf[64];
-static char SmodeStringBuf[64];
-long service_umode_mask = 0;
-unsigned int ircd_supported_umodes = 0;
-unsigned int ircd_supported_smodes = 0;
 
-unsigned char UmodeChRegNick = 'r';
-
-ChanModes ircd_cmodes[MODE_TABLE_SIZE];
-UserModes ircd_umodes[MODE_TABLE_SIZE];
-UserModes ircd_smodes[MODE_TABLE_SIZE];
 ProtocolInfo* protocol_info;
-char* services_cmode;
-char* services_umode;
 
 ircd_cmd* cmd_list;
-cumode_init* chan_umodes;
-cmode_init* chan_modes;
-umode_init* user_umodes;
-umode_init* user_smodes;
 
 static void *protocol_module_handle;
 
@@ -69,28 +54,28 @@ void (*irc_send_globops) (const char *from, const char *buf);
 void (*irc_send_wallops) (const char *who, const char *buf);
 void (*irc_send_numeric) (const char *from, const int numeric, const char *target, const char *buf);
 void (*irc_send_umode) (const char *who, const char *target, const char *mode);
-void (*irc_send_join) (const char *sender, const char *who, const char *chan, const unsigned long ts);
-void (*irc_send_sjoin) (const char *sender, const char *who, const char *chan, const unsigned long ts);
+void (*irc_send_join) (const char *who, const char *chan, const unsigned long ts);
+void (*irc_send_sjoin) (const char *source, const char *who, const char *chan, const unsigned long ts);
 void (*irc_send_part) (const char *who, const char *chan);
 void (*irc_send_nickchange) (const char *oldnick, const char *newnick, const unsigned long ts);
-void (*irc_send_cmode) (const char *sender, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts);
+void (*irc_send_cmode) (const char *source, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts);
 void (*irc_send_quit) (const char *who, const char *quitmsg);
 void (*irc_send_kill) (const char *from, const char *target, const char *reason);
-void (*irc_send_kick) (const char *who, const char *chan, const char *target, const char *reason);
+void (*irc_send_kick) (const char *source, const char *chan, const char *target, const char *reason);
 void (*irc_send_invite) (const char *from, const char *to, const char *chan);
-void (*irc_send_svskill) (const char *sender, const char *target, const char *reason);
-void (*irc_send_svsmode) (const char *sender, const char *target, const char *modes);
-void (*irc_send_svshost) (const char *sender, const char *who, const char *vhost);
-void (*irc_send_svsjoin) (const char *sender, const char *target, const char *chan);
-void (*irc_send_svspart) (const char *sender, const char *target, const char *chan);
-void (*irc_send_svsnick) (const char *sender, const char *target, const char *newnick, const unsigned long ts);
-void (*irc_send_swhois) (const char *sender, const char *target, const char *swhois);
+void (*irc_send_svskill) (const char *source, const char *target, const char *reason);
+void (*irc_send_svsmode) (const char *source, const char *target, const char *modes);
+void (*irc_send_svshost) (const char *source, const char *who, const char *vhost);
+void (*irc_send_svsjoin) (const char *source, const char *target, const char *chan);
+void (*irc_send_svspart) (const char *source, const char *target, const char *chan);
+void (*irc_send_svsnick) (const char *source, const char *target, const char *newnick, const unsigned long ts);
+void (*irc_send_swhois) (const char *source, const char *target, const char *swhois);
 void (*irc_send_smo) (const char *from, const char *umodetarget, const char *msg);
-void (*irc_send_akill) (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, unsigned long ts);
-void (*irc_send_rakill) (const char *sender, const char *host, const char *ident);
+void (*irc_send_akill) (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, unsigned long ts);
+void (*irc_send_rakill) (const char *source, const char *host, const char *ident);
 void (*irc_send_ping) (const char *from, const char *reply, const char *to);
 void (*irc_send_pong) (const char *reply);
-void (*irc_send_server) (const char *sender, const char *name, const int numeric, const char *infoline);
+void (*irc_send_server) (const char *source, const char *name, const int numeric, const char *infoline);
 void (*irc_send_squit) (const char *server, const char *quitmsg);
 void (*irc_send_nick) (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname);
 void (*irc_send_server_connect) (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink);
@@ -99,7 +84,7 @@ void (*irc_send_snetinfo) (const char* from, const int prot, const char* cloak, 
 void (*irc_send_svinfo) (const int tscurrent, const int tsmin, const unsigned long tsnow);
 void (*irc_send_vctrl) (const int uprot, const int nicklen, const int modex, const int gc, const char* netname);
 void (*irc_send_burst) (int b);
-void (*irc_send_svstime) (const char *sender, const unsigned long ts);
+void (*irc_send_svstime) (const char *source, const unsigned long ts);
 
 static void m_numeric242 (char *origin, char **argv, int argc, int srv);
 static void m_numeric351 (char *origin, char **argv, int argc, int srv);
@@ -111,39 +96,82 @@ ircd_cmd numeric_cmd_list[] = {
 	{0, 0, 0, 0},
 };
 
+static void IrcdError(char* err)
+{
+	printf ("\nERROR: Unable to find %s in selected IRCd module\n", err);
+	nlog (LOG_CRITICAL, "Unable to find %s in selected IRCd module", err);
+}
 
-/** @brief InitIrcdCalls
+/** @brief InitIrcdSymbols
  *
- *  Map our function pointers to protocol functions
+ *  Map protocol module pointers to core pointers and check for minimum 
+ *  requirements
  *
  * @return 
  */
-static void
-InitIrcdCalls (void)
+static int
+InitIrcdSymbols (void)
 {
 	static char protocol_name[MAXHOST];
   
 	ircsnprintf (protocol_name, 255, "%s/%s.%s", MOD_PATH, me.protocol,MOD_EXT);
-	protocol_module_handle= ns_dlopen(protocol_name, RTLD_NOW || RTLD_GLOBAL);
+	protocol_module_handle = ns_dlopen(protocol_name, RTLD_NOW || RTLD_GLOBAL);
+	if(!protocol_module_handle) {
+		printf ("\nERROR: Unable to load protocol module %s\n", protocol_name);
+		nlog (LOG_CRITICAL, "Unable to load protocol module %s\n", protocol_name);
+		return NS_FAILURE;	
+	}
 	protocol_info = ns_dlsym( protocol_module_handle, "protocol_info");
-	services_umode = protocol_info->services_umode;
-	services_cmode = protocol_info->services_cmode;
+	if(!protocol_info) {
+		printf ("\nERROR: Unable to find protocol_info in protocol module %s\n", protocol_name);
+		nlog (LOG_CRITICAL, "Unable to find protocol_info in protocol module %s\n", protocol_name);
+		return NS_FAILURE;	
+	}
 
 	strcpy(me.servicescmode,protocol_info->services_cmode);
 	strcpy(me.servicesumode,protocol_info->services_umode);
 
+	/* Allow protocol module to "override" the parser */
 	irc_parse = ns_dlsym( protocol_module_handle, "parse");
 	if(irc_parse == NULL)
 		irc_parse = parse;
 
-	cmd_list    = ns_dlsym( protocol_module_handle, "cmd_list");
+	cmd_list = ns_dlsym( protocol_module_handle, "cmd_list");
+	if(!cmd_list) {
+		IrcdError("command list");
+		return NS_FAILURE;	
+	}
 	chan_umodes = ns_dlsym( protocol_module_handle, "chan_umodes");
+	if(!chan_umodes) {
+		IrcdError("channel umode table");
+		return NS_FAILURE;	
+	}
 	chan_modes  = ns_dlsym( protocol_module_handle, "chan_modes");
+	if(!chan_modes) {
+		IrcdError("channel mode table");
+		return NS_FAILURE;	
+	}
 	user_umodes = ns_dlsym( protocol_module_handle, "user_umodes");
+	if(!user_umodes) {
+		IrcdError("user mode table");
+		return NS_FAILURE;	
+	}
+	/* Not required */
 	user_smodes = ns_dlsym( protocol_module_handle, "user_smodes");
+	if(user_smodes) {
+		ircd_srv.features |= FEATURE_USERSMODES;
+	}
 
 	irc_send_privmsg = ns_dlsym( protocol_module_handle, "send_privmsg");
+	if(!irc_send_privmsg) {
+		IrcdError("send_privmsg handler");
+		return NS_FAILURE;	
+	}
 	irc_send_notice = ns_dlsym( protocol_module_handle, "send_notice");
+	if(!irc_send_notice) {
+		IrcdError("send_notice handler");
+		return NS_FAILURE;	
+	}
 	irc_send_globops = ns_dlsym( protocol_module_handle, "send_globops");
 	irc_send_wallops = ns_dlsym( protocol_module_handle, "send_wallops");
 	irc_send_numeric = ns_dlsym( protocol_module_handle, "send_numeric");
@@ -158,13 +186,41 @@ InitIrcdCalls (void)
 	irc_send_kick = ns_dlsym( protocol_module_handle, "send_kick");
 	irc_send_invite = ns_dlsym( protocol_module_handle, "send_invite");
 	irc_send_svskill = ns_dlsym( protocol_module_handle, "send_svskill");
+	if(irc_send_svskill) {
+		ircd_srv.features |= FEATURE_SVSKILL;
+	}
 	irc_send_svsmode = ns_dlsym( protocol_module_handle, "send_svsmode");
+	if(irc_send_svsmode) {
+		ircd_srv.features |= FEATURE_SVSMODE;
+	}
 	irc_send_svshost = ns_dlsym( protocol_module_handle, "send_svshost");
+	if(irc_send_svshost) {
+		ircd_srv.features |= FEATURE_SVSHOST;
+	}
 	irc_send_svsjoin = ns_dlsym( protocol_module_handle, "send_svsjoin");
+	if(irc_send_svsjoin) {
+		ircd_srv.features |= FEATURE_SVSJOIN;
+	}
 	irc_send_svspart = ns_dlsym( protocol_module_handle, "send_svspart");
+	if(irc_send_svspart) {
+		ircd_srv.features |= FEATURE_SVSPART;
+	}
 	irc_send_svsnick = ns_dlsym( protocol_module_handle, "send_svsnick");
+	if(irc_send_svsnick) {
+		ircd_srv.features |= FEATURE_SVSNICK;
+	}
 	irc_send_swhois = ns_dlsym( protocol_module_handle, "send_swhois");
+	if(irc_send_swhois) {
+		ircd_srv.features |= FEATURE_SWHOIS;
+	}
 	irc_send_smo = ns_dlsym( protocol_module_handle, "send_smo");
+	if(irc_send_smo) {
+		ircd_srv.features |= FEATURE_SMO;
+	}
+	irc_send_svstime = ns_dlsym( protocol_module_handle, "send_svstime");
+	if(irc_send_svstime) {
+		ircd_srv.features |= FEATURE_SVSTIME;
+	}
 	irc_send_akill = ns_dlsym( protocol_module_handle, "send_akill");
 	irc_send_rakill = ns_dlsym( protocol_module_handle, "send_rakill");
 	irc_send_ping = ns_dlsym( protocol_module_handle, "send_ping");
@@ -178,69 +234,8 @@ InitIrcdCalls (void)
 	irc_send_svinfo = ns_dlsym( protocol_module_handle, "send_svinfo");
 	irc_send_vctrl = ns_dlsym( protocol_module_handle, "send_vctrl");
 	irc_send_burst = ns_dlsym( protocol_module_handle, "send_burst");
-	irc_send_svstime = ns_dlsym( protocol_module_handle, "send_svstime");
+	return NS_SUCCESS;
 }
-
-/** @brief InitIrcdModes
- *
- *  Build internal mode tables by translating the protocol information
- *  into a faster indexed lookup table
- *
- * @return 
- */
-static void
-InitIrcdModes (void)
-{
-	cmode_init* cmodes;
-	cumode_init* cumodes;
-	umode_init* umodes;
-	umode_init* smodes;
-
-	/* build cmode lookup table */
-	memset(&ircd_cmodes, 0, sizeof(ircd_cmodes));
-	cmodes = chan_modes;
-	while(cmodes->modechar) 
-	{
-		dlog(DEBUG4, "Adding channel mode %c", cmodes->modechar);
-		ircd_cmodes[(int)cmodes->modechar].mode = cmodes->mode;
-		ircd_cmodes[(int)cmodes->modechar].flags = cmodes->flags;
-		cmodes ++;
-	}
-	cumodes = chan_umodes;
-	while(cumodes->modechar) 
-	{
-		dlog(DEBUG4, "Adding channel user mode %c", cumodes->modechar);
-		ircd_cmodes[(int)cumodes->modechar].mode = cumodes->mode;
-		ircd_cmodes[(int)cumodes->modechar].sjoin = cumodes->sjoin;
-		ircd_cmodes[(int)cmodes->modechar].flags = NICKPARAM;
-		cumodes ++;
-	}
-	/* build umode lookup table */
-	memset(&ircd_umodes, 0, sizeof(ircd_umodes));
-	umodes = user_umodes;
-	while(umodes->modechar) 
-	{	
-		dlog(DEBUG4, "Adding user mode %c", umodes->modechar);
-		ircd_umodes[(int)umodes->modechar].umode = umodes->umode;
-		/* Build supported modes mask */
-		ircd_supported_umodes |= umodes->umode;
-		if(umodes->umode&UMODE_REGNICK) {
-			UmodeChRegNick = umodes->modechar;
-		}
-		umodes ++;
-	}
-	/* build smode lookup table */
-	memset(&ircd_smodes, 0, sizeof(ircd_smodes));
-	smodes = user_smodes;
-	while(umodes->modechar) 
-	{
-		dlog(DEBUG4, "Adding user smode %c", smodes->modechar);
-		ircd_smodes[(int)smodes->modechar].umode = smodes->umode;
-		/* Build supported smodes mask */
-		ircd_supported_umodes |= umodes->umode;
-		smodes ++;
-	}
-};
 
 /** @brief InitIrcd
  *
@@ -248,377 +243,23 @@ InitIrcdModes (void)
  *
  * @return 
  */
-void
+int
 InitIrcd ()
 {
 	/* Clear IRCD info */
 	memset(&ircd_srv, 0, sizeof(ircd_srv));
 	/* Setup IRCD function calls */
-	InitIrcdCalls();
+	if(InitIrcdSymbols() != NS_SUCCESS) 
+		return NS_FAILURE;
 	/* set min protocol */
 	ircd_srv.protocol = protocol_info->minprotocol;
 	/* Build mode tables */
-	InitIrcdModes();
-	/* preset our umode mask so we do not have to calculate in real time */
-	service_umode_mask = UmodeStringToMask(me.servicesumode, 0);
-}
-
-/** @brief UmodeMaskToString
- *
- *  Translate a mode mask to the string equivalent
- *
- * @return 
- */
-char* 
-UmodeMaskToString(const long Umode) 
-{
-	int i, j;
-
-	UmodeStringBuf[0] = '+';
-	j = 1;
-	for (i = 0; i < MODE_TABLE_SIZE; i++) {
-		if (Umode & ircd_umodes[i].umode) {
-			UmodeStringBuf[j] = i;
-			j++;
-		}
-	}
-	UmodeStringBuf[j] = '\0';
-	return(UmodeStringBuf);
-}
-
-/** @brief UmodeStringToMask
- *
- *  Translate a mode string to the mask equivalent
- *
- * @return 
- */
-long
-UmodeStringToMask(const char* UmodeString, long Umode)
-{
-	int add = 0;
-	char* tmpmode;
-
-	/* Walk through mode string and convert to umode */
-	tmpmode = (char*)UmodeString;
-	while (*tmpmode) {
-		switch (*tmpmode) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			if (add) {
-				Umode |= ircd_umodes[(int)*tmpmode].umode;
-				break;
-			} else {
-				Umode &= ~ircd_umodes[(int)*tmpmode].umode;
-				break;
-			}
-		}
-		tmpmode++;
-	}
-	return(Umode);
-}
-
-/** @brief SmodeMaskToString
- *
- *  Translate a smode mask to the string equivalent
- *
- * @return 
- */
-char* 
-SmodeMaskToString(const long Smode) 
-{
-	int i, j;
-
-	SmodeStringBuf[0] = '+';
-	j = 1;
-	for (i = 0; i < MODE_TABLE_SIZE; i++) {
-		if (Smode & ircd_smodes[i].umode) {
-			SmodeStringBuf[j] = i;
-			j++;
-		}
-	}
-	SmodeStringBuf[j] = '\0';
-	return(SmodeStringBuf);
-}
-
-/** @brief SmodeStringToMask
- *
- *  Translate a smode string to the mask equivalent
- *
- * @return 
- */
-long
-SmodeStringToMask(const char* SmodeString, long Smode)
-{
-	int add = 0;
-	char* tmpmode;
-
-	/* Walk through mode string and convert to smode */
-	tmpmode = (char*)SmodeString;
-	while (*tmpmode) {
-		switch (*tmpmode) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			if (add) {
-				Smode |= ircd_smodes[(int)*tmpmode].umode;
-				break;
-			} else {
-				Smode &= ~ircd_smodes[(int)*tmpmode].umode;
-				break;
-			}
-		}
-		tmpmode++;
-	}
-	return(Smode);
-}
-
-/** @brief CUmodeStringToMask
- *
- *  Translate a mode string to the mask equivalent
- *
- * @return 
- */
-long
-CUmodeStringToMask(const char* UmodeString, long Umode)
-{
-	int add = 0;
-	char* tmpmode;
-
-	/* Walk through mode string and convert to umode */
-	tmpmode = (char*)UmodeString;
-	while (*tmpmode) {
-		switch (*tmpmode) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			if (add) {
-				Umode |= ircd_cmodes[(int)*tmpmode].mode;
-				break;
-			} else {
-				Umode &= ~ircd_cmodes[(int)*tmpmode].mode;
-				break;
-			}
-		}
-		tmpmode++;
-	}
-	return(Umode);
-}
-
-/** @brief join_bot_to_chan
- *
- * 
- *
- * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
- */
-int 
-join_bot_to_chan (const char *who, const char *chan, const char *mode)
-{
-	/* Use sjoin if available */
-	if(ircd_srv.protocol & PROTOCOL_SJOIN) {
-		time_t ts;
-		Channel *c;
-
-		c = findchan (chan);
-		ts = (!c) ? me.now : c->creationtime;
-		if (mode == NULL) {
-			irc_send_sjoin (me.name, who, chan, (unsigned long)ts);
-		} else {
-			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", ircd_cmodes[(int)mode[1]].sjoin, who);
-			irc_send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
-		}
-		join_chan (who, chan);
-		if (mode) {
-			ChanUserMode(chan, who, 1, CUmodeStringToMask(mode,0));
-		}
-	} else {
-		/* sjoin not available so use normal join */
-		irc_send_join (me.name, who, chan, me.now);
-		join_chan (who, chan);
-		if(mode) {
-			schanusermode_cmd(who, chan, mode, who);
-		}
-	}
+	if(InitIrcdModes() != NS_SUCCESS) 
+		return NS_FAILURE;
 	return NS_SUCCESS;
 }
 
-/** @brief signon_newbot
- *
- *  work in progress to replace ircd specific routines
- *  needs sjoin fix to complete
- *
- *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
- */
-int
-signon_newbot (const char *nick, const char *user, const char *host, const char *realname, const char *modes, long Umode)
-{
-	AddUser (nick, user, host, realname, me.name, NULL, NULL, NULL);
-	irc_send_nick (nick, (unsigned long)me.now, modes, user, host, me.name, realname);
-	UserMode (nick, modes);
-	if ((config.allbots > 0) || (Umode & service_umode_mask)) {
-		join_bot_to_chan(nick, me.serviceschan, me.servicescmode);
-	}
-	return NS_SUCCESS;
-}
-
-/** @brief CloakBotHost
- *
- *  Create a hidden hostmask for the bot 
- *  Currently only Unreal support via UMODE auto cloaking
- *  but function created for future use and propogation to
- *  external modules to avoid a future joint release.
- *
- *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
- */
-int 
-CloakHost (Bot *bot_ptr)
-{
-	if (protocol_info->features&FEATURE_UMODECLOAK) {
-		sumode_cmd (bot_ptr->nick, bot_ptr->nick, UMODE_HIDE);
-		return NS_SUCCESS;	
-	}
-	return NS_FAILURE;	
-}
-
-/** @brief split_buf
- * Taken from Epona - Thanks! 
- * Split a buffer into arguments and store the arguments in an
- * argument vector pointed to by argv (which will be alloced
- * as necessary); return the argument count.  If colon_special
- * is non-zero, then treat a parameter with a leading ':' as
- * the last parameter of the line, per the IRC RFC.  Destroys
- * the buffer by side effect. 
- *
- * @return 
- */
-EXPORTFUNC int
-splitbuf (char *buf, char ***argv, int colon_special)
-{
-	int argvsize = 8;
-	int argc;
-	char *s;
-	int colcount = 0;
-	SET_SEGV_LOCATION();
-	*argv = scalloc (sizeof (char *) * argvsize);
-	argc = 0;
-	/*if (*buf == ':')
-		buf++;*/
-	while (*buf) {
-		if (argc == argvsize) {
-			argvsize += 8;
-			*argv = srealloc (*argv, sizeof (char *) * argvsize);
-		}
-		if ((*buf == ':') && (colcount < 1)) {
-			buf++;
-			colcount++;
-			if(colon_special) {
-				(*argv)[argc++] = buf;
-				break;
-			}
-		}
-		s = strpbrk (buf, " ");
-		if (s) {
-			*s++ = 0;
-			while (isspace (*s))
-				s++;
-		} else {
-			s = buf + strnlen (buf, BUFSIZE);
-		}
-		if (*buf == 0) {
-			buf++;
-		}
-		(*argv)[argc++] = buf;
-		buf = s;
-	}
-	return argc;
-}
-
-int
-split_buf (char *buf, char ***argv, int colon_special)
-{
-	int argvsize = 8;
-	int argc;
-	char *s;
-	int colcount = 0;
-	SET_SEGV_LOCATION();
-	*argv = scalloc (sizeof (char *) * argvsize);
-	argc = 0;
-	if (*buf == ':')
-		buf++;
-	while (*buf) {
-		if (argc == argvsize) {
-			argvsize += 8;
-			*argv = srealloc (*argv, sizeof (char *) * argvsize);
-		}
-		if ((*buf == ':') && (colcount < 1)) {
-			buf++;
-			colcount++;
-		}
-		s = strpbrk (buf, " ");
-		if (s) {
-			*s++ = 0;
-			while (isspace (*s))
-				s++;
-		} else {
-			s = buf + strnlen (buf, BUFSIZE);
-		}
-		if (*buf == 0) {
-			buf++;
-		}
-		(*argv)[argc++] = buf;
-		buf = s;
-	}
-	return argc;
-}
-
-/** @brief joinbuf 
- *
- * 
- *
- * @return 
- */
-char *
-joinbuf (char **av, int ac, int from)
-{
-	int i;
-	char *buf;
-
-	buf = smalloc (BUFSIZE);
-	/* from is zero based while ac has base of 1. 
-	 * Therefore we need to check >= before trying to perform
-	 * the join.
-	 * The current (null) string we return may not be needed
-	 * so should be removed once all joinbuf calls are checked.
-	 * Maybe we should just return NULL if we fail and let
-	 * the caller handle that case. 
-	 */
-	if(from >= ac) {
-		dlog(DEBUG1, "joinbuf: from (%d) >= ac (%d)", from, ac);
-		strlcpy (buf, "(null)", BUFSIZE);
-	}
-	else {
-		strlcpy (buf, av[from], BUFSIZE);
-		for (i = from + 1; i < ac; i++) {
-			strlcat (buf, " ", BUFSIZE);
-			strlcat (buf, av[i], BUFSIZE);
-		}
-	}
-	return (char *) buf;
-}
-
-/** @brief process privmsg
+/** @brief process notice
  *
  * 
  *
@@ -773,7 +414,7 @@ parse (char *line)
 	dlog(DEBUG1, "origin: %s", origin);
 	dlog(DEBUG1, "cmd   : %s", cmd);
 	dlog(DEBUG1, "args  : %s", coreLine);
-	ac = splitbuf (coreLine, &av, 1);
+	ac = ircsplitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	sfree (av);
 	dlog(DEBUG1, "-------------------------END PARSE--------------------------");
@@ -822,36 +463,6 @@ do_pong (const char* origin, const char* destination)
 	nlog (LOG_NOTICE, "Received PONG from unknown server: %s", origin);
 }
 
-/** @brief flood
- *
- * 
- *
- * @return 
- */
-int
-flood (User * u)
-{
-	if (!u) {
-		nlog (LOG_WARNING, "flood: can't find user");
-		return 0;
-	}
-	if (UserLevel (u) >= NS_ULEVEL_OPER)	/* locop or higher */
-		return 0;
-	if ((me.now - u->tslastmsg) > 10) {
-		u->tslastmsg = me.now;
-		u->flood = 0;
-		return 0;
-	}
-	if (u->flood >= 5) {
-		nlog (LOG_NORMAL, "FLOODING: %s!%s@%s", u->nick, u->username, u->hostname);
-		ssvskill_cmd (u->nick, "%s!%s (Flooding Services.)", me.name, ns_botptr->nick);
-		return 1;
-	} else {
-		u->flood++;
-	}
-	return 0;
-}
-
 /** @brief Display NeoStats version info
  *
  * 
@@ -862,7 +473,7 @@ void
 do_version (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
-	numeric (RPL_VERSION, nick, "%s :%s -> %s %s", me.version, me.name, ns_module_info.build_date, ns_module_info.build_time);
+	irc_numeric (RPL_VERSION, nick, "%s :%s -> %s %s", me.version, me.name, ns_module_info.build_date, ns_module_info.build_time);
 	ModulesVersion (nick, remoteserver);
 }
 
@@ -881,18 +492,18 @@ do_motd (const char* nick, const char *remoteserver)
 	SET_SEGV_LOCATION();
 	fp = fopen (MOTD_FILENAME, "r");
 	if(!fp) {
-		numeric (ERR_NOMOTD, nick, ":- MOTD file Missing");
+		irc_numeric (ERR_NOMOTD, nick, ":- MOTD file Missing");
 	} else {
-		numeric (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
-		numeric (RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2004 The NeoStats Group", me.version);
-		numeric (RPL_MOTD, nick, ":-");
+		irc_numeric (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
+		irc_numeric (RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2004 The NeoStats Group", me.version);
+		irc_numeric (RPL_MOTD, nick, ":-");
 
 		while (fgets (buf, sizeof (buf), fp)) {
 			buf[strnlen (buf, BUFSIZE) - 1] = 0;
-			numeric (RPL_MOTD, nick, ":- %s", buf);
+			irc_numeric (RPL_MOTD, nick, ":- %s", buf);
 		}
 		fclose (fp);
-		numeric (RPL_ENDOFMOTD, nick, ":End of MOTD command.");
+		irc_numeric (RPL_ENDOFMOTD, nick, ":End of MOTD command.");
 	}
 }
 
@@ -911,16 +522,16 @@ do_admin (const char* nick, const char *remoteserver)
 
 	fp = fopen (ADMIN_FILENAME, "r");
 	if(!fp) {
-		numeric (ERR_NOADMININFO, nick, "%s :No administrative info available", me.name);
+		irc_numeric (ERR_NOADMININFO, nick, "%s :No administrative info available", me.name);
 	} else {
-		numeric (RPL_ADMINME, nick, ":%s :Administrative info", me.name);
-		numeric (RPL_ADMINME, nick, ":%s.  Copyright (c) 1999 - 2004 The NeoStats Group", me.version);
+		irc_numeric (RPL_ADMINME, nick, ":%s :Administrative info", me.name);
+		irc_numeric (RPL_ADMINME, nick, ":%s.  Copyright (c) 1999 - 2004 The NeoStats Group", me.version);
 		while (fgets (buf, sizeof (buf), fp)) {
 			buf[strnlen (buf, BUFSIZE) - 1] = 0;
-			numeric (RPL_ADMINLOC1, nick, ":- %s", buf);
+			irc_numeric (RPL_ADMINLOC1, nick, ":- %s", buf);
 		}
 		fclose (fp);
-		numeric (RPL_ADMINLOC2, nick, "End of /ADMIN command.");
+		irc_numeric (RPL_ADMINLOC2, nick, "End of /ADMIN command.");
 	}
 }
 
@@ -934,29 +545,29 @@ void
 do_credits (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
-	numeric (RPL_VERSION, nick, ":- NeoStats %s Credits ", me.version);
-	numeric (RPL_VERSION, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
-	numeric (RPL_VERSION, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
-	numeric (RPL_VERSION, nick, ":- irc.irc-chat.net #NeoStats");
-	numeric (RPL_VERSION, nick, ":- Thanks to:");
-	numeric (RPL_VERSION, nick, ":- Enigma for being part of the dev team");
-	numeric (RPL_VERSION, nick, ":- Stskeeps for writing the best IRCD ever!");
-	numeric (RPL_VERSION, nick, ":- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)");
-	numeric (RPL_VERSION, nick, ":- monkeyIRCD for the Module Segv Catching code");
-	numeric (RPL_VERSION, nick, ":- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!");
-	numeric (RPL_VERSION, nick, ":- Andy For Ideas");
-	numeric (RPL_VERSION, nick, ":- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies");
-	numeric (RPL_VERSION, nick, ":- sre and Jacob for development systems and access");
-	numeric (RPL_VERSION, nick, ":- Error51 for Translating our FAQ and README files");
-	numeric (RPL_VERSION, nick, ":- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!");
-	numeric (RPL_VERSION, nick, ":- Eggy for proving to use our code still had bugs when we thought it didn't (and all the bug reports!)");
-	numeric (RPL_VERSION, nick, ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
-	numeric (RPL_VERSION, nick, ":- M - Updating lots of Doco and code and providing lots of great feedback");
-	numeric (RPL_VERSION, nick, ":- J Michael Jones - Giving us Patches to support QuantumIRCd");
-	numeric (RPL_VERSION, nick, ":- Blud - Giving us patches for Mystic IRCd");
-	numeric (RPL_VERSION, nick, ":- herrohr - Giving us patches for Liquid IRCd support");
-	numeric (RPL_VERSION, nick, ":- OvErRiTe - Giving us patches for Viagra IRCd support");
-	numeric (RPL_VERSION, nick, ":- Reed Loden - Contributions to IRCu support");
+	irc_numeric (RPL_VERSION, nick, ":- NeoStats %s Credits ", me.version);
+	irc_numeric (RPL_VERSION, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
+	irc_numeric (RPL_VERSION, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
+	irc_numeric (RPL_VERSION, nick, ":- irc.irc-chat.net #NeoStats");
+	irc_numeric (RPL_VERSION, nick, ":- Thanks to:");
+	irc_numeric (RPL_VERSION, nick, ":- Enigma for being part of the dev team");
+	irc_numeric (RPL_VERSION, nick, ":- Stskeeps for writing the best IRCD ever!");
+	irc_numeric (RPL_VERSION, nick, ":- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)");
+	irc_numeric (RPL_VERSION, nick, ":- monkeyIRCD for the Module Segv Catching code");
+	irc_numeric (RPL_VERSION, nick, ":- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!");
+	irc_numeric (RPL_VERSION, nick, ":- Andy For Ideas");
+	irc_numeric (RPL_VERSION, nick, ":- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies");
+	irc_numeric (RPL_VERSION, nick, ":- sre and Jacob for development systems and access");
+	irc_numeric (RPL_VERSION, nick, ":- Error51 for Translating our FAQ and README files");
+	irc_numeric (RPL_VERSION, nick, ":- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!");
+	irc_numeric (RPL_VERSION, nick, ":- Eggy for proving to use our code still had bugs when we thought it didn't (and all the bug reports!)");
+	irc_numeric (RPL_VERSION, nick, ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
+	irc_numeric (RPL_VERSION, nick, ":- M - Updating lots of Doco and code and providing lots of great feedback");
+	irc_numeric (RPL_VERSION, nick, ":- J Michael Jones - Giving us Patches to support QuantumIRCd");
+	irc_numeric (RPL_VERSION, nick, ":- Blud - Giving us patches for Mystic IRCd");
+	irc_numeric (RPL_VERSION, nick, ":- herrohr - Giving us patches for Liquid IRCd support");
+	irc_numeric (RPL_VERSION, nick, ":- OvErRiTe - Giving us patches for Viagra IRCd support");
+	irc_numeric (RPL_VERSION, nick, ":- Reed Loden - Contributions to IRCu support");
 }
 
 /** @brief 
@@ -982,11 +593,11 @@ do_stats (const char* nick, const char *what)
 	if (!ircstrcasecmp (what, "u")) {
 		/* server uptime - Shmad */
 		int uptime = me.now - me.t_start;
-		numeric (RPL_STATSUPTIME, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
+		irc_numeric (RPL_STATSUPTIME, u->nick, "Statistical Server up %d days, %d:%02d:%02d", uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 	} else if (!ircstrcasecmp (what, "c")) {
 		/* Connections */
-		numeric (RPL_STATSNLINE, u->nick, "N *@%s * * %d 50", me.uplink, config.port);
-		numeric (RPL_STATSCLINE, u->nick, "C *@%s * * %d 50", me.uplink, config.port);
+		irc_numeric (RPL_STATSNLINE, u->nick, "N *@%s * * %d 50", me.uplink, config.port);
+		irc_numeric (RPL_STATSCLINE, u->nick, "C *@%s * * %d 50", me.uplink, config.port);
 	} else if (!ircstrcasecmp (what, "o")) {
 		/* Operators */
 		ListAuth(u);
@@ -994,8 +605,8 @@ do_stats (const char* nick, const char *what)
 		/* Port Lists */
 		tmp = me.now - me.lastmsg;
 		tmp2 = me.now - me.t_start;
-		numeric (RPL_STATSLINKINFO, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
-		numeric (RPL_STATSLLINE, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, (int)me.SendM, (int)me.SendBytes, (int)me.RcveM, (int)me.RcveBytes, (int)tmp2, (int)tmp);
+		irc_numeric (RPL_STATSLINKINFO, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
+		irc_numeric (RPL_STATSLLINE, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, (int)me.SendM, (int)me.SendBytes, (int)me.RcveM, (int)me.RcveBytes, (int)tmp2, (int)tmp);
         } else if (!ircstrcasecmp(what, "Z")) {
                 if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
                         do_dns_stats_Z(u);
@@ -1004,13 +615,13 @@ do_stats (const char* nick, const char *what)
 		ircd_cmd_ptr = cmd_list;
 		while(ircd_cmd_ptr->name) {
 			if (ircd_cmd_ptr->usage > 0) {
-				numeric (RPL_STATSCOMMANDS, u->nick, "Command %s Usage %d", ircd_cmd_ptr->name, ircd_cmd_ptr->usage);
+				irc_numeric (RPL_STATSCOMMANDS, u->nick, "Command %s Usage %d", ircd_cmd_ptr->name, ircd_cmd_ptr->usage);
 			}
 			ircd_cmd_ptr ++;
 		}
 	}
-	numeric (RPL_ENDOFSTATS, u->nick, "%s :End of /STATS report", what);
-	chanalert (ns_botptr->nick, "%s Requested Stats %s", u->nick, what);
+	irc_numeric (RPL_ENDOFSTATS, u->nick, "%s :End of /STATS report", what);
+	irc_chanalert (ns_botptr, "%s Requested Stats %s", u->nick, what);
 };
 
 void
@@ -1048,144 +659,143 @@ do_protocol (char *origin, char **argv, int argc)
 }
 
 void
-privmsg_list (char *to, char *from, const char **text)
+irc_privmsg_list (const Bot *botptr, const User* target, const char **text)
 {
+	if (IsMe(target)) {
+		nlog (LOG_NOTICE, "Dropping irc_privmsg_list from bot (%s) to bot (%s)", botptr->u->nick, target->nick);
+		return;
+	}
 	while (*text) {
 		if (**text) {
-			prefmsg (to, from, (char*)*text);
+			irc_prefmsg (botptr, target, (char*)*text);
 		} else {
-			prefmsg (to, from, " ");
+			irc_prefmsg (botptr, target, " ");
 		}
 		text++;
 	}
 }
 
 void
-chanalert (char *from, char *fmt, ...)
+irc_chanalert (const Bot *botptr, const char *fmt, ...)
 {
-	char* source;
 	va_list ap;
 
 	if (!me.onchan)
 		return;
-
-	source = from;
-	if(source == NULL) {
-		source = ns_botptr->nick;
-	}
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_privmsg (source, me.serviceschan, ircd_buf);
+	irc_send_privmsg (botptr->nick, me.serviceschan, ircd_buf);
 }
 
 void
-prefmsg (char *to, const char *from, char *fmt, ...)
+irc_prefmsg (const Bot *botptr, const User *target, const char *fmt, ...)
 {
-	char* source;
 	va_list ap;
 
-	if (findbot (to)) {
-		chanalert (ns_botptr->nick, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+	if (IsMe (target)) {
+		nlog (LOG_NOTICE, "Dropping irc_prefmsg from bot (%s) to bot (%s)", botptr->u->nick, target->nick);
 		return;
 	}
-
-	source = (char*)from;
-	if(source == NULL) {
-		source = ns_botptr->nick;
-	}
-
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 	if (config.want_privmsg) {
-		irc_send_privmsg (source, to, ircd_buf);
+		irc_send_privmsg (botptr->u->nick, target->nick, ircd_buf);
 	} else {
-		irc_send_notice (source, to, ircd_buf);
+		irc_send_notice (botptr->u->nick, target->nick, ircd_buf);
 	}
 }
 
 void
-privmsg (char *to, const char *from, char *fmt, ...)
+irc_privmsg (const Bot *botptr, const User *target, const char *fmt, ...)
 {
-	char* source;
 	va_list ap;
 
-	if (findbot (to)) {
-		chanalert (ns_botptr->nick, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+	if (IsMe(target)) {
+		nlog (LOG_NOTICE, "Dropping privmsg from bot (%s) to bot (%s)", botptr->u->nick, target->nick);
 		return;
 	}
-
-	source = (char*)from;
-	if(source == NULL) {
-		source = ns_botptr->nick;
-	}
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_privmsg (source, to, ircd_buf);
+	irc_send_privmsg (botptr->u->nick, target->nick, ircd_buf);
 }
 
 void
-notice (char *to, const char *from, char *fmt, ...)
+irc_notice (const Bot *botptr, const User *target, const char *fmt, ...)
 {
-	char* source;
 	va_list ap;
 
-	if (findbot (to)) {
-		chanalert (ns_botptr->nick, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+	if (IsMe(target)) {
+		nlog (LOG_NOTICE, "Dropping notice from bot (%s) to bot (%s)", botptr->u->nick, target->nick);
 		return;
 	}
-
-	source = (char*)from;
-	if(source == NULL) {
-		source = ns_botptr->nick;
-	}
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_notice (source, to, ircd_buf);
+	irc_send_notice (botptr->u->nick, target->nick, ircd_buf);
 }
 
 void
-globops (char *from, char *fmt, ...)
+irc_chanprivmsg (const Bot *botptr, const char *chan, const char *fmt, ...)
 {
-	char* source;
+	va_list ap;
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	irc_send_privmsg (botptr->u->nick, chan, ircd_buf);
+}
+
+void
+irc_channotice (const Bot *botptr, const char *chan, const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	irc_send_notice (botptr->u->nick, chan, ircd_buf);
+}
+
+void
+irc_globops (const Bot *botptr, const char *fmt, ...)
+{
 	va_list ap;
 
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 
-	source = from;
-	if(source == NULL) {
-		source = ns_botptr->nick;
-	}
 	if (me.onchan) {
-		irc_send_globops(source, ircd_buf);
+		if(irc_send_globops) {
+			irc_send_globops((botptr?botptr->u->nick:me.name), ircd_buf);
+		} else {
+			nlog (LOG_NOTICE, "Dropping unhandled globops: %s", ircd_buf);
+		}
 	} else {
 		nlog (LOG_NORMAL, ircd_buf);
 	}
 }
 
 void
-wallops (const char *from, const char *fmt, ...)
+irc_wallops (const Bot *botptr, const char *fmt, ...)
 {
-	char* source;
 	va_list ap;
 
-	source = (char*)from;
-	if(source == NULL) {
-		source = ns_botptr->nick;
-	}
 	va_start (ap, fmt);
 	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
-	irc_send_wallops ((char*)source, (char*)ircd_buf);
+	if(irc_send_wallops) {
+		irc_send_wallops ((botptr?botptr->nick:me.name), ircd_buf);
+	} else {
+		nlog (LOG_NOTICE, "Dropping unhandled wallops: %s", ircd_buf);
+	}
 }
 
 void
-numeric (const int numeric, const char *target, const char *data, ...)
+irc_numeric (const int numeric, const char *target, const char *data, ...)
 {
 	va_list ap;
 
@@ -1195,34 +805,112 @@ numeric (const int numeric, const char *target, const char *data, ...)
 	irc_send_numeric (me.name, numeric, target, ircd_buf);
 }
 
-void
+/** @brief unsupported_cmd
+ *
+ *  report attempts to use a feature not supported by the loaded protocol
+ *
+ * @return none
+ */
+static void
 unsupported_cmd(const char* cmd)
 {
-	chanalert (ns_botptr->nick, "Warning, %s tried to %s which is not supported", GET_CUR_MODNAME(), cmd);
+	irc_chanalert (ns_botptr, "Warning, %s tried to %s which is not supported", GET_CUR_MODNAME(), cmd);
 	nlog (LOG_NOTICE, "Warning, %s tried to %s, which is not supported", GET_CUR_MODNAME(), cmd);
 }
 
+/** @brief irc_nick
+ *
+ *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
 int
-sumode_cmd (const char *who, const char *target, long mode)
+irc_nick (const char *nick, const char *user, const char *host, const char *realname, const char *modes)
+{
+	if(irc_send_nick) {
+		irc_send_nick (nick, (unsigned long)me.now, modes, user, host, me.name, realname);
+	} else {
+		unsupported_cmd("NICK");
+	} 
+	return NS_SUCCESS;
+}
+
+/** @brief CloakBotHost
+ *
+ *  Create a hidden hostmask for the bot 
+ *  Currently only Unreal support via UMODE auto cloaking
+ *  but function created for future use and propogation to
+ *  external modules to avoid a future joint release.
+ *
+ *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+int 
+irc_cloakhost (const Bot *botptr)
+{
+	if (ircd_srv.features&FEATURE_UMODECLOAK) {
+		irc_usermode (botptr, botptr->nick, UMODE_HIDE);
+		return NS_SUCCESS;	
+	}
+	return NS_FAILURE;	
+}
+
+int
+irc_usermode (const Bot *botptr, const char *target, long mode)
 {
 	char* newmode;
 	
 	newmode = UmodeMaskToString(mode);
-	irc_send_umode (who, target, newmode);
+	irc_send_umode (botptr->u->nick, target, newmode);
 	UserMode (target, newmode);
 	return NS_SUCCESS;
 }
 
-int
-part_bot_from_chan (const char *who, const char *chan)
+/** @brief irc_join
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+int 
+irc_join (const Bot *botptr, const char *chan, const char *mode)
 {
-	irc_send_part(who, chan);
-	part_chan (finduser (who), (char *) chan, NULL);
+	time_t ts;
+	Channel *c;
+
+	c = findchan (chan);
+	ts = (!c) ? me.now : c->creationtime;
+	/* Use sjoin if available */
+	if((ircd_srv.protocol & PROTOCOL_SJOIN) && irc_send_sjoin) {
+		if (mode == NULL) {
+			irc_send_sjoin (me.name, botptr->u->nick, chan, (unsigned long)ts);
+		} else {
+			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", ircd_cmodes[(int)mode[1]].sjoin, botptr->u->nick);
+			irc_send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
+		}
+		join_chan (botptr->u->nick, chan);
+		if (mode) {
+			ChanUserMode(chan, botptr->u->nick, 1, CUmodeStringToMask(mode,0));
+		}
+	/* sjoin not available so use normal join */	
+	} else if(irc_send_join) {
+		irc_send_join (botptr->u->nick, chan, me.now);
+		join_chan (botptr->u->nick, chan);
+		if(mode) {
+			irc_chanusermode(botptr, chan, mode, botptr->u->nick);
+		}
+	/* Error */
+	} else {
+		unsupported_cmd("SJOIN/JOIN");
+	} 
 	return NS_SUCCESS;
 }
 
 int
-snick_cmd (const char *oldnick, const char *newnick)
+irc_part (const Bot *botptr, const char *chan)
+{
+	irc_send_part(botptr->u->nick, chan);
+	part_chan (botptr->u, (char *) chan, NULL);
+	return NS_SUCCESS;
+}
+
+int
+irc_nickchange (const char *oldnick, const char *newnick)
 {
 	UserNick (oldnick, newnick, NULL);
 	irc_send_nickchange (oldnick, newnick, me.now);
@@ -1230,12 +918,12 @@ snick_cmd (const char *oldnick, const char *newnick)
 }
 
 int
-scmode_cmd (const char *who, const char *chan, const char *mode, const char *args)
+irc_chanmode (const Bot *botptr, const char *chan, const char *mode, const char *args)
 {
 	char **av;
 	int ac;
 
-	irc_send_cmode (me.name, who, chan, mode, args, me.now);
+	irc_send_cmode (me.name, botptr->u->nick, chan, mode, args, me.now);
 	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode (me.name, av, ac);
@@ -1244,62 +932,67 @@ scmode_cmd (const char *who, const char *chan, const char *mode, const char *arg
 }
 
 int
-schanusermode_cmd (const char *who, const char *chan, const char *mode, const char *bot)
+irc_chanusermode (const Bot *botptr, const char *chan, const char *mode, const char *target)
 {
-
 	if((ircd_srv.protocol & PROTOCOL_B64NICK)) {
-		irc_send_cmode (me.name, who, chan, mode, nicktobase64 (bot), me.now);
+		irc_send_cmode (me.name, botptr->u->nick, chan, mode, nicktobase64 (target), me.now);
 	} else {
-		irc_send_cmode (me.name, who, chan, mode, bot, me.now);
+		irc_send_cmode (me.name, botptr->u->nick, chan, mode, target, me.now);
 	}
-	ChanUserMode (chan, who, 1, CUmodeStringToMask(mode,0));
+	ChanUserMode (chan, target, 1, CUmodeStringToMask(mode,0));
 	return NS_SUCCESS;
 }
 
 int
-squit_cmd (const char *who, const char *quitmsg)
+irc_quit (const Bot * botptr, const char *quitmsg)
 {
-	irc_send_quit (who, quitmsg);
-	do_quit (who, quitmsg);
+	irc_send_quit (botptr->u->nick, quitmsg);
+	do_quit (botptr->u->nick, quitmsg);
 	return NS_SUCCESS;
 }
 
 int
-skill_cmd (const char *from, const char *target, const char *reason, ...)
+irc_kill (const Bot *botptr, const char *target, const char *reason, ...)
 {
 	va_list ap;
 
 	va_start (ap, reason);
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
-	irc_send_kill (from, target, ircd_buf);
+	irc_send_kill (botptr->u->nick, target, ircd_buf);
 	do_quit (target, ircd_buf);
 	return NS_SUCCESS;
 }
 
 int
-ssvskill_cmd (const char *target, const char *reason, ...)
+irc_kick (const Bot *botptr, const char *chan, const char *target, const char *reason)
 {
-	va_list ap;
-
-	va_start (ap, reason);
-	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
-	va_end (ap);
-	if (protocol_info->features&FEATURE_SVSKILL) {
-		irc_send_svskill (me.name, target, ircd_buf);
+	if(irc_send_kick) {
+		irc_send_kick (botptr->u->nick, chan, target, reason);
+		part_chan (finduser (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
 	} else {
-		irc_send_kill (me.name, target, ircd_buf);
-		do_quit (target, ircd_buf);
+		unsupported_cmd("KICK");
 	}
 	return NS_SUCCESS;
 }
 
 int 
-ssvstime_cmd (const time_t ts)
+irc_invite (const Bot *botptr, const char *to, const char *chan) 
 {
-	if (protocol_info->features&FEATURE_SVSTIME) {
+	if(irc_send_invite) {
+		irc_send_invite(botptr->u->nick, to, chan);
+	} else {
+		unsupported_cmd("KICK");
+	}
+	return NS_SUCCESS;
+}
+
+int 
+irc_svstime (const time_t ts)
+{
+	if (irc_send_svstime) {
 		irc_send_svstime(me.name, (unsigned long)ts);
-		nlog (LOG_NOTICE, "ssvstime_cmd: synching server times to %lu", ts);
+		nlog (LOG_NOTICE, "irc_svstime: synching server times to %lu", ts);
 	} else {
 		unsupported_cmd("SVSTIME");
 	}
@@ -1307,33 +1000,30 @@ ssvstime_cmd (const time_t ts)
 }
 
 int
-skick_cmd (const char *who, const char *chan, const char *target, const char *reason)
+irc_svskill (User *target, const char *reason, ...)
 {
-	irc_send_kick (who, chan, target, reason);
-	part_chan (finduser (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
-	return NS_SUCCESS;
-}
+	va_list ap;
 
-int 
-sinvite_cmd (const char *from, const char *to, const char *chan) 
-{
-	irc_send_invite(from, to, chan);
+	va_start (ap, reason);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
+	va_end (ap);
+	if (irc_send_svskill) {
+		irc_send_svskill (me.name, target->nick, ircd_buf);
+	} else if(irc_send_kill) {
+		irc_send_kill (me.name, target->nick, ircd_buf);
+		do_quit (target->nick, ircd_buf);
+	} else {
+		unsupported_cmd("SVSKILL");
+	}
 	return NS_SUCCESS;
 }
 
 int
-ssvsmode_cmd (const char *target, const char *modes)
+irc_svsmode (User *target, const char *modes)
 {
-	if (protocol_info->features&FEATURE_SVSMODE) {
-		User *u;
-
-		u = finduser (target);
-		if (!u) {
-			nlog (LOG_WARNING, "ssvsmode_cmd: can't find user %s", target);
-			return 0;
-		}
-		irc_send_svsmode(me.name, target, modes);
-		UserMode (target, modes);
+	if (irc_send_svsmode) {
+		irc_send_svsmode(me.name, target->nick, modes);
+		UserMode (target->nick, modes);
 	} else {
 		unsupported_cmd("SVSMODE");
 	}
@@ -1341,19 +1031,11 @@ ssvsmode_cmd (const char *target, const char *modes)
 }
 
 int
-ssvshost_cmd (const char *target, const char *vhost)
+irc_svshost (User *target, const char *vhost)
 {
-	if (protocol_info->features&FEATURE_SVSHOST) {
-		User *u;
-
-		u = finduser (target);
-		if (!u) {
-			nlog (LOG_WARNING, "ssvshost_cmd: can't find user %s", target);
-			return 0;
-		}
-
-		strlcpy (u->vhost, vhost, MAXHOST);
-		irc_send_svshost(me.name, target, vhost);
+	if (irc_send_svshost) {
+		strlcpy (target->vhost, vhost, MAXHOST);
+		irc_send_svshost(me.name, target->nick, vhost);
 	} else {
 		unsupported_cmd("SVSHOST");
 	}
@@ -1361,10 +1043,10 @@ ssvshost_cmd (const char *target, const char *vhost)
 }
 
 int
-ssvsjoin_cmd (const char *target, const char *chan)
+irc_svsjoin (User *target, const char *chan)
 {
-	if (protocol_info->features&FEATURE_SVSJOIN) {
-		irc_send_svsjoin (me.name, target, chan);
+	if (irc_send_svsjoin) {
+		irc_send_svsjoin (me.name, target->nick, chan);
 	} else {
 		unsupported_cmd("SVSJOIN");
 	}
@@ -1372,10 +1054,10 @@ ssvsjoin_cmd (const char *target, const char *chan)
 }
 
 int
-ssvspart_cmd (const char *target, const char *chan)
+irc_svspart (User *target, const char *chan)
 {
-	if (protocol_info->features&FEATURE_SVSPART) {
-		irc_send_svspart (me.name, target, chan);
+	if (irc_send_svspart) {
+		irc_send_svspart (me.name, target->nick, chan);
 	} else {
 		unsupported_cmd("SVSPART");
 	}
@@ -1383,9 +1065,9 @@ ssvspart_cmd (const char *target, const char *chan)
 }
 
 int
-sswhois_cmd (const char *target, const char *swhois)
+irc_swhois (const char *target, const char *swhois)
 {
-	if (protocol_info->features&FEATURE_SWHOIS) {
+	if (irc_send_swhois) {
 		irc_send_swhois (me.name, target, swhois);
 	} else {
 		unsupported_cmd("SWHOIS");
@@ -1394,10 +1076,10 @@ sswhois_cmd (const char *target, const char *swhois)
 }
 
 int
-ssvsnick_cmd (const char *target, const char *newnick)
+irc_svsnick (User *target, const char *newnick)
 {
-	if (protocol_info->features&FEATURE_SVSNICK) {
-		irc_send_svsnick (me.name, target, newnick, me.now);
+	if (irc_send_svsnick) {
+		irc_send_svsnick (me.name, target->nick, newnick, me.now);
 	} else {
 		unsupported_cmd("SVSNICK");
 	}
@@ -1407,7 +1089,7 @@ ssvsnick_cmd (const char *target, const char *newnick)
 int
 ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
 {
-	if (protocol_info->features&FEATURE_SMO) {
+	if (irc_send_smo) {
 		irc_send_smo (from, umodetarget, msg);
 	} else {
 		unsupported_cmd("SMO");
@@ -1416,49 +1098,73 @@ ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
 }
 
 int
-sakill_cmd (const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, ...)
+irc_akill (const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, ...)
 {
 	va_list ap;
 
 	va_start (ap, reason);
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
-	irc_send_akill(me.name, host, ident, setby, length, ircd_buf, me.now);
+	if(irc_send_akill) {
+		irc_send_akill(me.name, host, ident, setby, length, ircd_buf, me.now);
+	} else {
+		unsupported_cmd("AKILL");
+	}
 	return NS_SUCCESS;
 }
 
 int
-srakill_cmd (const char *host, const char *ident)
+irc_rakill (const char *host, const char *ident)
 {
-	irc_send_rakill (me.name, host, ident);
+	if(irc_send_rakill) {
+		irc_send_rakill (me.name, host, ident);
+	} else {
+		unsupported_cmd("RAKILL");
+	}
 	return NS_SUCCESS;
 }
 
 int
-sping_cmd (const char *from, const char *reply, const char *to)
+irc_ping (const char *from, const char *reply, const char *to)
 {
-	irc_send_ping (from, reply, to);
+	if(irc_send_ping) {
+		irc_send_ping (from, reply, to);
+	} else {
+		unsupported_cmd("PING");
+	}
 	return NS_SUCCESS;
 }
 
 int
-spong_cmd (const char *reply)
+irc_pong (const char *reply)
 {
-	irc_send_pong (reply);
+	if(irc_send_pong) {
+		irc_send_pong (reply);
+	} else {
+		unsupported_cmd("PONG");
+	}
 	return NS_SUCCESS;
 }
 
 int
-sserver_cmd (const char *name, const int numeric, const char *infoline)
+irc_server (const char *name, const int numeric, const char *infoline)
 {
-	irc_send_server (me.name, name, numeric, infoline);
+	if(irc_send_server) {
+		irc_send_server (me.name, name, numeric, infoline);
+	} else {
+		unsupported_cmd("SERVER");
+	}
 	return NS_SUCCESS;
 }
 
 int
-ssquit_cmd (const char *server, const char *quitmsg)
+irc_squit (const char *server, const char *quitmsg)
 {
-	irc_send_squit (server, quitmsg);
+	if(irc_send_squit) {
+		irc_send_squit (server, quitmsg);
+	} else {
+		unsupported_cmd("SQUIT");
+	}
 	return NS_SUCCESS;
 }
 
@@ -1576,7 +1282,7 @@ do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, co
 	strlcpy (me.netname, netname, MAXPASS);
 	irc_send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
-	globops (me.name, "Link with Network \2Complete!\2");
+	irc_globops (NULL, "Link with Network \2Complete!\2");
 	SendAllModuleEvent (EVENT_NETINFO, NULL);
 	me.synched = 1;
 }
@@ -1589,7 +1295,7 @@ do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, c
 	strlcpy (me.netname, netname, MAXPASS);
 	irc_send_snetinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
-	globops (me.name, "Link with Network \2Complete!\2");
+	irc_globops (NULL, "Link with Network \2Complete!\2");
 	SendAllModuleEvent (EVENT_NETINFO, NULL);
 	me.synched = 1;
 }
@@ -1631,7 +1337,7 @@ do_nick (const char *nick, const char *hopcount, const char* TS,
 	if(vhost) {
 		SetUserVhost(nick, vhost);
 	}
-	if (protocol_info->features&FEATURE_USERSMODES) {
+	if (ircd_srv.features&FEATURE_USERSMODES) {
 		if(smodes) {
 			UserSMode (nick, smodes);
 		}
@@ -1699,23 +1405,25 @@ do_vctrl (const char* uprot, const char* nicklen, const char* modex, const char*
 	ircd_srv.modex = atoi(modex);
 	ircd_srv.gc = atoi(gc);
 	strlcpy (me.netname, netname, MAXPASS);
-	irc_send_vctrl (ircd_srv.uprot, ircd_srv.nicklen, ircd_srv.modex, ircd_srv.gc, me.netname);
+	if(irc_send_vctrl) {
+		irc_send_vctrl (ircd_srv.uprot, ircd_srv.nicklen, ircd_srv.modex, ircd_srv.gc, me.netname);
+	} 
 }
 
 void 
-do_smode (const char* nick, const char* modes)
+do_smode (const char* targetnick, const char* modes)
 {
-	UserSMode (nick, modes);
+	UserSMode (targetnick, modes);
 }
 
 void 
-do_mode_user (const char* nick, const char* modes)
+do_mode_user (const char* targetnick, const char* modes)
 {
-	UserMode (nick, modes);
+	UserMode (targetnick, modes);
 }
 
 void 
-do_svsmode_user (const char* nick, const char* modes, const char* ts)
+do_svsmode_user (const char* targetnick, const char* modes, const char* ts)
 {
 	char modebuf[MODESIZE];
 	
@@ -1723,7 +1431,7 @@ do_svsmode_user (const char* nick, const char* modes, const char* ts)
 		const char* pModes;	
 		char* pNewModes;	
 
-		SetUserServicesTS (nick, ts);
+		SetUserServicesTS (targetnick, ts);
 		/* If only setting TS, we do not need further mode processing */
 		if(strcasecmp(modes, "+d") == 0) {
 			dlog(DEBUG3, "dropping modes since this is a services TS %s", modes);
@@ -1741,9 +1449,9 @@ do_svsmode_user (const char* nick, const char* modes, const char* ts)
 		}
 		/* NULL terminate */
 		*pNewModes = 0;
-		UserMode (nick, modebuf);
+		UserMode (targetnick, modebuf);
 	} else {
-		UserMode (nick, modes);
+		UserMode (targetnick, modes);
 	}
 }
 
@@ -2008,6 +1716,6 @@ static void m_numeric242 (char *origin, char **argv, int argc, int srv)
 
 int HaveFeature (int mask)
 {
-	return (protocol_info->features&mask);
+	return (ircd_srv.features&mask);
 }
 

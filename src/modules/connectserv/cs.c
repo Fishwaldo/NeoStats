@@ -179,7 +179,7 @@ static int cs_event_signon(CmdParams* cmdparams)
 		return 1;
 	}
 	/* Print Connection Notice */
-	chanalert(cs_bot->nick, msg_signon,
+	irc_chanalert(cs_bot, msg_signon,
 		cmdparams->source.user->nick, cmdparams->source.user->username, 
 		cmdparams->source.user->hostname, cmdparams->source.user->realname,
 		cmdparams->source.user->server->name);
@@ -218,7 +218,7 @@ static int cs_event_quit(CmdParams* cmdparams)
 		    && strstr(cmd, "]")) {
 			LocalCount = split_buf(lcl, &Local, 0);
 			KillMsg = joinbuf(Local, LocalCount, 7);
-			chanalert(cs_bot->nick, msg_localkill,
+			irc_chanalert(cs_bot, msg_localkill,
 				  cmdparams->source.user->nick, cmdparams->source.user->username, 
 				  cmdparams->source.user->hostname,
 				  Local[6], KillMsg);
@@ -231,7 +231,7 @@ static int cs_event_quit(CmdParams* cmdparams)
 	}
 	/* Print Disconnection Notice */
 	if (cs_cfg.sign_watch) {
-		chanalert(cs_bot->nick, msg_signoff,
+		irc_chanalert(cs_bot, msg_signoff,
 			  cmdparams->source.user->nick, cmdparams->source.user->username, 
 			  cmdparams->source.user->hostname, cmdparams->source.user->realname,
 			  cmdparams->source.user->server->name, QuitMsg);
@@ -250,13 +250,13 @@ static int cs_event_quit(CmdParams* cmdparams)
 static int cs_report_mode(User* u, int add, char mode, const char* mode_desc, int serverinfo)
 {
 	if(serverinfo) {
-		chanalert(cs_bot->nick, msg_mode_serv, u->nick, 
+		irc_chanalert(cs_bot, msg_mode_serv, u->nick, 
 			add?"now":"no longer", 
 			mode_desc,
 			add?'+':'-',
 			mode, u->server->name);
 	} else {
-		chanalert(cs_bot->nick, msg_mode, u->nick, 
+		irc_chanalert(cs_bot, msg_mode, u->nick, 
 			add?"now":"no longer", 
 			mode_desc,
 			add?'+':'-',
@@ -325,7 +325,7 @@ static int cs_event_umode(CmdParams* cmdparams)
 #endif
 #ifdef UMODE_CH_BOT
 		case UMODE_CH_BOT:
-			chanalert(cs_bot->nick, msg_bot, cmdparams->source.user->nick, add?"now":"no longer", add?'+':'-', UMODE_CH_BOT);			
+			irc_chanalert(cs_bot, msg_bot, cmdparams->source.user->nick, add?"now":"no longer", add?'+':'-', UMODE_CH_BOT);			
 			break;
 #endif
 #ifdef UMODE_CH_SADMIN
@@ -450,12 +450,12 @@ static int cs_event_kill(CmdParams* cmdparams)
 	GlobalMsg = joinbuf(Kill, KillCount, 4);
 	if (finduser(Kill[2])) {
 		/* it was a User who was killed */
-		chanalert(cs_bot->nick, msg_globalkill,
+		irc_chanalert(cs_bot, msg_globalkill,
 			cmdparams->source.user->nick, cmdparams->source.user->username, 
 			cmdparams->source.user->hostname,
 			Kill[0], GlobalMsg);
 	} else if (findserver(Kill[2])) {
-		chanalert(cs_bot->nick, msg_serverkill,
+		irc_chanalert(cs_bot, msg_serverkill,
 			cmdparams->source.user->nick, cmdparams->source.user->username, 
 			cmdparams->source.user->hostname,
 			Kill[0], GlobalMsg);
@@ -481,7 +481,7 @@ static int cs_event_nick(CmdParams* cmdparams)
 		/* its me, forget it */
 		return 1;
 	}
-	chanalert(cs_bot->nick, msg_nickchange, cmdparams->param, 
+	irc_chanalert(cs_bot, msg_nickchange, cmdparams->param, 
 		cmdparams->source.user->username, cmdparams->source.user->hostname, 
 		cmdparams->source.user->nick);
 	return 1;
@@ -496,7 +496,7 @@ static int cs_event_server(CmdParams* cmdparams)
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.server)) {
 		return 1;
 	}
-	chanalert (cs_bot->nick, "\2SERVER\2 %s has joined the network at %s",
+	irc_chanalert (cs_bot, "\2SERVER\2 %s has joined the network at %s",
 		cmdparams->source.server->name, cmdparams->source.server->uplink);
 	return 1;
 }
@@ -510,7 +510,7 @@ static int cs_event_squit(CmdParams* cmdparams)
 	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.server)) {
 		return 1;
 	}
-	chanalert (cs_bot->nick, "\2SERVER\2 %s has left the network at %s for %s",
+	irc_chanalert (cs_bot, "\2SERVER\2 %s has left the network at %s for %s",
 		cmdparams->source.server->name, cmdparams->source.server->uplink, 
 		cmdparams->param ? cmdparams->param : "");
 	return 1;

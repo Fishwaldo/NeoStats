@@ -63,14 +63,14 @@ announce(int announcetype, const char *msg)
 {
 	switch(announcetype) {
 		case 3:
-			wallops (ss_bot->nick, "%s", msg);
+			irc_wallops (ss_bot, "%s", msg);
 			break;
 		case 2:
-			globops (ss_bot->nick, "%s", msg);
+			irc_globops (ss_bot, "%s", msg);
 			break;
 		case 1:
 		default:
-			chanalert (ss_bot->nick, "%s", msg);
+			irc_chanalert (ss_bot, "%s", msg);
 			break;
 	}
 }
@@ -165,7 +165,7 @@ void list_client_versions(User* u, int num)
 	int i;
 
 	if (list_count(Vhead) == 0) {
-		prefmsg(u->nick, ss_bot->nick, "No Stats Available.");
+		irc_prefmsg(ss_bot, u, "No Stats Available.");
 		return;
 	}
 	if (!list_is_sorted(Vhead, topversions)) {
@@ -173,10 +173,10 @@ void list_client_versions(User* u, int num)
 	}
 	cn = list_first(Vhead);
 	cv = lnode_get(cn);
-	prefmsg(u->nick, ss_bot->nick, "Top%d Client Versions:", num);
-	prefmsg(u->nick, ss_bot->nick, "======================");
+	irc_prefmsg(ss_bot, u, "Top%d Client Versions:", num);
+	irc_prefmsg(ss_bot, u, "======================");
 	for (i = 0; i <= num; i++) {
-		prefmsg(u->nick, ss_bot->nick, "%d) %d ->  %s", i, cv->count, cv->name);
+		irc_prefmsg(ss_bot, u, "%d) %d ->  %s", i, cv->count, cv->name);
 		cn = list_next(Vhead, cn);
 		if (cn) {
 			cv = lnode_get(cn);
@@ -184,7 +184,7 @@ void list_client_versions(User* u, int num)
 			break;
 		}
 	}
-	prefmsg(u->nick, ss_bot->nick, "End of List.");
+	irc_prefmsg(ss_bot, u, "End of List.");
 }
 
 void StatsAddChan(Channel* c)
@@ -583,7 +583,7 @@ int StatsMidnight(void)
 	SET_SEGV_LOCATION();
 	if (ltm->tm_hour == 0 && ltm->tm_min == 0) {
 		/* its Midnight! */
-		chanalert(ss_bot->nick, "Reset Daily Statistics - Its Midnight here!");
+		irc_chanalert(ss_bot, "Reset Daily Statistics - Its Midnight here!");
 		dlog(DEBUG1, "Reset Daily Statistics");
 		daily.servers = stats_network.servers;
 		daily.t_servers = me.now;

@@ -142,10 +142,10 @@ static int auth_cmd_authmodelist(CmdParams* cmdparams)
 {
 	int i;
 
-	prefmsg(cmdparams->source.user->nick, NULL,
+	irc_prefmsg(NULL, cmdparams->source.user, 
 		"User mode auth levels:");
 	for (i = 0; i < user_auth_mode_count; i++) {
-		prefmsg(cmdparams->source.user->nick, NULL, "%s: %d", 
+		irc_prefmsg(NULL, cmdparams->source.user, "%s: %d", 
 			user_auth_modes[i].modename, user_auth_modes[i].level);
 	}
 	return 1;

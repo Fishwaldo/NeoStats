@@ -60,14 +60,11 @@ const int proto_topiclen	= (512 + 1);
 
 ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
-	0,
+	PROTOCOL_SJOIN,
 	/* Protocol options negotiated at link by this IRCd */
 	0,
 	/* Features supported by this IRCd */
-	FEATURE_SVSHOST \
-		| FEATURE_SVSJOIN \
-		| FEATURE_SVSPART \
-		| FEATURE_SVSNICK ,
+	0,
 	"+oS",
 	"+a",
 };
@@ -152,10 +149,6 @@ umode_init user_umodes[] = {
 	{0, 0},
 };
 
-umode_init user_smodes[] = {
-	{0, '0'},
-};
-
 void
 send_eob (const char *server)
 {
@@ -163,9 +156,9 @@ send_eob (const char *server)
 }
 
 void
-send_server (const char *sender, const char *name, const int numeric, const char *infoline)
+send_server (const char *source, const char *name, const int numeric, const char *infoline)
 {
-	send_cmd (":%s %s %s 2 0 :%s", sender, MSG_SERVER, name, infoline);
+	send_cmd (":%s %s %s 2 0 :%s", source, MSG_SERVER, name, infoline);
 }
 
 void
@@ -195,18 +188,13 @@ send_part (const char *who, const char *chan)
 }
 
 void 
-send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
+send_sjoin (const char *source, const char *who, const char *chan, const unsigned long ts)
 {
-	send_cmd (":%s %s %lu %s + :%s", sender, MSG_SJOIN, ts, chan, who);
+	send_cmd (":%s %s %lu %s + :%s", source, MSG_SJOIN, ts, chan, who);
 }
 
 void 
-send_sjoin (const char *sender, const char *who, const char *chan, const unsigned long ts)
-{
-}
-
-void 
-send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
+send_cmode (const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
 	send_cmd (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, ts);
 }
@@ -266,33 +254,33 @@ send_nickchange (const char *oldnick, const char *newnick, const unsigned long t
 }
 
 void
-send_swhois (const char *sender, const char *target, const char *swhois)
+send_swhois (const char *source, const char *target, const char *swhois)
 {
-	send_cmd (":%s SWHOIS %s :%s", sender, target, swhois);
+	send_cmd (":%s SWHOIS %s :%s", source, target, swhois);
 }
 
 void 
-send_svsnick (const char *sender, const char *target, const char *newnick, const unsigned long ts)
+send_svsnick (const char *source, const char *target, const char *newnick, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %s :%lu", sender, MSG_SVSNICK, target, newnick, ts);
+	send_cmd (":%s %s %s %s :%lu", source, MSG_SVSNICK, target, newnick, ts);
 }
 
 void
-send_svsjoin (const char *sender, const char *target, const char *chan)
+send_svsjoin (const char *source, const char *target, const char *chan)
 {
-	send_cmd (":%s SVSJOIN %s %s", sender, target, chan);
+	send_cmd (":%s SVSJOIN %s %s", source, target, chan);
 }
 
 void
-send_svspart (const char *sender, const char *target, const char *chan)
+send_svspart (const char *source, const char *target, const char *chan)
 {
-	send_cmd (":%s SVSPART %s %s", sender, target, chan);
+	send_cmd (":%s SVSPART %s %s", source, target, chan);
 }
 
 void 
-send_kick (const char *who, const char *chan, const char *target, const char *reason)
+send_kick (const char *source, const char *chan, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
+	send_cmd (":%s %s %s %s :%s", source, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
 }
 
 void 
@@ -302,9 +290,9 @@ send_wallops (const char *who, const char *buf)
 }
 
 void
-send_svshost (const char *sender, const char *who, const char *vhost)
+send_svshost (const char *source, const char *who, const char *vhost)
 {
-	send_cmd (":%s SVSHOST %s :%s", sender, who, vhost);
+	send_cmd (":%s SVSHOST %s :%s", source, who, vhost);
 }
 
 void
@@ -330,15 +318,15 @@ send_burst (int b)
 }
 
 void 
-send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
+send_akill (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
 {
-	send_cmd (":%s GLINE %s %s %lu :%s", sender, ident, host, (ts + length), reason);
+	send_cmd (":%s GLINE %s %s %lu :%s", source, ident, host, (ts + length), reason);
 }
 
 void 
-send_rakill (const char *sender, const char *host, const char *ident)
+send_rakill (const char *source, const char *host, const char *ident)
 {
-	send_cmd (":%s UNGLINE %s@%s", sender, ident, host);
+	send_cmd (":%s UNGLINE %s@%s", source, ident, host);
 }
 
 void
@@ -357,19 +345,6 @@ void
 send_globops (const char *from, const char *buf)
 {
 	send_cmd (":%s %s :%s", from, MSG_WALLOPS, buf);
-}
-
-void 
-send_svstime (const char *sender, const unsigned long ts)
-{
-}
-void 
-send_smo (const char *from, const char *umodetarget, const char *msg)
-{
-}
-void 
-send_svsmode (const char *sender, const char *target, const char *modes)
-{
 }
 
 static void

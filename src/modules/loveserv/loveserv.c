@@ -107,16 +107,16 @@ void ModFini()
 
 static int ls_rose(CmdParams* cmdparams)
 {
-	char *target_nick;
+	User *target;
 
 	SET_SEGV_LOCATION();
-	target_nick = cmdparams->av[0];
-	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
+	target = findvaliduser(ls_bot, cmdparams->source.user, cmdparams->av[0]);
+	if(!target) {
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
-		"Rose has been sent to %s", target_nick);
-	prefmsg(target_nick, ls_bot->nick,
+	irc_prefmsg(ls_bot, cmdparams->source.user,  
+		"Rose has been sent to %s", target);
+	irc_prefmsg(ls_bot, target, 
 		"%s has sent you this beautiful rose! 3--<--<--<{4@",
 		cmdparams->source.user->nick);
 	return 1;
@@ -124,31 +124,31 @@ static int ls_rose(CmdParams* cmdparams)
 
 static int ls_kiss(CmdParams* cmdparams)
 {
-	char *target_nick;
+	User *target;
 
 	SET_SEGV_LOCATION();
-	target_nick = cmdparams->av[0];
-	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
+	target = findvaliduser(ls_bot, cmdparams->source.user, cmdparams->av[0]);
+	if(!target) {
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
-		"You have virtually kissed %s", target_nick);
-	prefmsg(target_nick, ls_bot->nick, "%s has virtually kissed you!", cmdparams->source.user->nick);
+	irc_prefmsg(ls_bot, cmdparams->source.user,  
+		"You have virtually kissed %s", target);
+	irc_prefmsg(ls_bot, target,  "%s has virtually kissed you!", cmdparams->source.user->nick);
 	return 1;
 }
 
 static int ls_tonsil(CmdParams* cmdparams)
 {
-	char *target_nick;
+	User *target;
 
 	SET_SEGV_LOCATION();
-	target_nick = cmdparams->av[0];
-	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
+	target = findvaliduser(ls_bot, cmdparams->source.user, cmdparams->av[0]);
+	if(!target) {
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick,
-		"You have virtually tonsil kissed %s", target_nick);
-	prefmsg(target_nick, ls_bot->nick,
+	irc_prefmsg(ls_bot, cmdparams->source.user, 
+		"You have virtually tonsil kissed %s", target);
+	irc_prefmsg(ls_bot, target, 
 		"%s would like to send a SLoW..LoNG..DeeP..PeNeTRaTiNG..ToNSiL-TiCKLiNG.. HaiR STRaiGHTeNiNG..Toe-CuRLiNG..NeRVe-JaNGLiNG..LiFe-aLTeRiNG.. FaNTaSY-CauSiNG..i JuST SaW GoD!..GoSH, DiD MY CLoTHeS FaLL oFF?.. YeS, i'M GLaD i CaMe oN iRC..KiSS oN Da LiPS!!!",
 		cmdparams->source.user->nick);
 	return 1;
@@ -156,46 +156,46 @@ static int ls_tonsil(CmdParams* cmdparams)
 
 static int ls_hug(CmdParams* cmdparams)
 {
-	char *target_nick;
+	User *target;
 
 	SET_SEGV_LOCATION();
-	target_nick = cmdparams->av[0];
-	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
+	target = findvaliduser(ls_bot, cmdparams->source.user, cmdparams->av[0]);
+	if(!target) {
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
-		"You have hugged %s", target_nick);
-	prefmsg(target_nick, ls_bot->nick, "%s has sent you a *BIG WARM HUG*!", cmdparams->source.user->nick);
+	irc_prefmsg(ls_bot, cmdparams->source.user,  
+		"You have hugged %s", target);
+	irc_prefmsg(ls_bot, target,  "%s has sent you a *BIG WARM HUG*!", cmdparams->source.user->nick);
 	return 1;
 }
 
 static int ls_admirer(CmdParams* cmdparams)
 {
-	char *target_nick;
+	User *target;
 
 	SET_SEGV_LOCATION();
-	target_nick = cmdparams->av[0];
-	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
+	target = findvaliduser(ls_bot, cmdparams->source.user, cmdparams->av[0]);
+	if(!target) {
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
-		"Secret admirer sent to %s", target_nick);
-	prefmsg(target_nick, ls_bot->nick, "You have a secret admirer! ;)");
+	irc_prefmsg(ls_bot, cmdparams->source.user,  
+		"Secret admirer sent to %s", target);
+	irc_prefmsg(ls_bot, target,  "You have a secret admirer! ;)");
 	return 1;
 }
 
 static int ls_chocolate(CmdParams* cmdparams)
 {
-	char *target_nick;
+	User *target;
 
 	SET_SEGV_LOCATION();
-	target_nick = cmdparams->av[0];
-	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
+	target = findvaliduser(ls_bot, cmdparams->source.user, cmdparams->av[0]);
+	if(!target) {
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick,
-		"Cholocates sent to %s", target_nick);
-	prefmsg(target_nick, ls_bot->nick,
+	irc_prefmsg(ls_bot, cmdparams->source.user, 
+		"Cholocates sent to %s", target);
+	irc_prefmsg(ls_bot, target, 
 		"%s would like you to have this YUMMY box of chocolates!",
 		cmdparams->source.user->nick);
 	return 1;
@@ -203,16 +203,16 @@ static int ls_chocolate(CmdParams* cmdparams)
 
 static int ls_candy(CmdParams* cmdparams)
 {
-	char *target_nick;
+	User *target;
 
 	SET_SEGV_LOCATION();
-	target_nick = cmdparams->av[0];
-	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
+	target = findvaliduser(ls_bot, cmdparams->source.user, cmdparams->av[0]);
+	if(!target) {
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick,
-		"Candy sent to %s", target_nick);
-	prefmsg(target_nick, ls_bot->nick,
+	irc_prefmsg(ls_bot, cmdparams->source.user, 
+		"Candy sent to %s", target);
+	irc_prefmsg(ls_bot, target, 
 		"%s would like you to have this big YUMMY bag of heart shaped candies!",
 		cmdparams->source.user->nick);
 	return 1;
@@ -220,18 +220,18 @@ static int ls_candy(CmdParams* cmdparams)
 
 static int ls_lovenote(CmdParams* cmdparams)
 {
-	char *target_nick;
+	User *target;
 	char *message;
 
 	SET_SEGV_LOCATION();
-	target_nick = cmdparams->av[0];
-	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
+	target = findvaliduser(ls_bot, cmdparams->source.user, cmdparams->av[0]);
+	if(!target) {
 		return 0;
 	}
 	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
-		"Love note sent to %s", target_nick);
-	prefmsg(target_nick, ls_bot->nick,
+	irc_prefmsg(ls_bot, cmdparams->source.user,  
+		"Love note sent to %s", target);
+	irc_prefmsg(ls_bot, target, 
 		"%s has sent you a love note which reads: \2%s\2", 
 		cmdparams->source.user->nick, message);
 	sfree(message);
@@ -240,18 +240,18 @@ static int ls_lovenote(CmdParams* cmdparams)
 
 static int ls_apology(CmdParams* cmdparams)
 {
-	char *target_nick;
+	User *target;
 	char *message;
 
 	SET_SEGV_LOCATION();
-	target_nick = cmdparams->av[0];
-	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
+	target = findvaliduser(ls_bot, cmdparams->source.user, cmdparams->av[0]);
+	if(!target) {
 		return 0;
 	}
 	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
-		"Apology sent to %s", target_nick);
-	prefmsg(target_nick, ls_bot->nick,
+	irc_prefmsg(ls_bot, cmdparams->source.user,  
+		"Apology sent to %s", target);
+	irc_prefmsg(ls_bot, target, 
 		"%s is sorry, and would like to apologise for \2%s\2",
 		cmdparams->source.user->nick, message);
 	sfree(message);
@@ -260,18 +260,18 @@ static int ls_apology(CmdParams* cmdparams)
 
 static int ls_thankyou(CmdParams* cmdparams)
 {
-	char *target_nick;
+	User *target;
 	char *message;
 
 	SET_SEGV_LOCATION();
-	target_nick = cmdparams->av[0];
-	if(!is_target_valid(ls_bot->nick, cmdparams->source.user, target_nick)) {
+	target = findvaliduser(ls_bot, cmdparams->source.user, cmdparams->av[0]);
+	if(!target) {
 		return 0;
 	}
 	message = joinbuf(cmdparams->av, cmdparams->ac, 1);
-	prefmsg(cmdparams->source.user->nick, ls_bot->nick, 
-		"Thank you sent to %s", target_nick);
-	prefmsg(target_nick, ls_bot->nick, "%s wishes to thank you for \2%s\2",
+	irc_prefmsg(ls_bot, cmdparams->source.user,  
+		"Thank you sent to %s", target);
+	irc_prefmsg(ls_bot, target,  "%s wishes to thank you for \2%s\2",
 		cmdparams->source.user->nick, message);
 	sfree(message);
 	return 1;

@@ -72,7 +72,7 @@ CheckTimers (void)
 			/* The above check does not need to be exact, but 
 			   setting times ought to be so reset me.now */
 			me.now = time(NULL);
-			ssvstime_cmd (me.now);
+			irc_svstime (me.now);
 			lastservertimesync = me.now;
 		}
 	}
@@ -280,16 +280,16 @@ list_timers (CmdParams* cmdparams)
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module timer List:");
+	irc_prefmsg (ns_botptr, cmdparams->source.user, "Module timer List:");
 	hash_scan_begin (&ts, timerhash);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
 		timer = hnode_get (tn);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "%s:--------------------------------", timer->moduleptr->info->name);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Timer Name: %s", timer->name);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Interval: %d", timer->interval);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Time till next Run: %ld", (long)(timer->interval - (me.now - timer->lastrun)));
+		irc_prefmsg (ns_botptr, cmdparams->source.user, "%s:--------------------------------", timer->moduleptr->info->name);
+		irc_prefmsg (ns_botptr, cmdparams->source.user, "Module Timer Name: %s", timer->name);
+		irc_prefmsg (ns_botptr, cmdparams->source.user, "Module Interval: %d", timer->interval);
+		irc_prefmsg (ns_botptr, cmdparams->source.user, "Time till next Run: %ld", (long)(timer->interval - (me.now - timer->lastrun)));
 	}
-	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "End of Module timer List");
+	irc_prefmsg (ns_botptr, cmdparams->source.user, "End of Module timer List");
 	return 0;
 }
 

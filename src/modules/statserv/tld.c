@@ -24,7 +24,9 @@
 */
 
 #include "neostats.h"
+#ifndef WIN32
 #include <arpa/inet.h>
+#endif
 
 #include "statserv.h"
 #include "GeoIP.h"
@@ -75,19 +77,19 @@ void DisplayTLDmap(User *u)
 	TLD *t;
 	lnode_t *tn;
 	
-	prefmsg(u->nick, ss_bot->nick, "Top Level Domain Statistics:");
+	irc_prefmsg(ss_bot, u, "Top Level Domain Statistics:");
 	list_sort(Thead, sortusers);
 	tn = list_first(Thead);
 	while (tn) {
 		t = lnode_get(tn);
-		prefmsg(u->nick, ss_bot->nick,
+		irc_prefmsg(ss_bot, u, 
 			"%3s \2%3d\2 (%2.0f%%) -> %s ---> Daily Total: %d",
 			t->tld, t->users,
 			((float) t->users / (float) stats_network.users) * 100,
 			t->country, t->daily_users);
 		tn = list_next(Thead, tn);
 	}
-	prefmsg(u->nick, ss_bot->nick, "End of List");
+	irc_prefmsg(ss_bot, u, "End of List");
 }
 
 void DelTLD(User * u)

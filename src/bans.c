@@ -125,13 +125,13 @@ BanDump (void)
 	hscan_t ss;
 	hnode_t *bansnode;
 
-	chanalert (ns_botptr->nick, "Server Listing:");
+	irc_chanalert (ns_botptr, "Server Listing:");
 	hash_scan_begin (&ss, banshash);
 	while ((bansnode = hash_scan_next (&ss)) != NULL) {
 		ban = hnode_get (bansnode);
-		chanalert (ns_botptr->nick, "Ban: %s ", ban->mask);
+		irc_chanalert (ns_botptr, "Ban: %s ", ban->mask);
 	}
-	chanalert (ns_botptr->nick, "End of Listing.");
+	irc_chanalert (ns_botptr, "End of Listing.");
 }
 
 void FiniBans (void)

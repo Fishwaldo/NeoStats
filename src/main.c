@@ -127,7 +127,8 @@ static int InitCore(void)
 		return NS_FAILURE;	
 	if (InitCurl () != NS_SUCCESS)
 		return NS_FAILURE;
-	InitIrcd ();
+	if (InitIrcd () != NS_SUCCESS)
+		return NS_FAILURE;
 	InitServices();
 	dlog(DEBUG1, "Core init successful");
 	return NS_SUCCESS;
@@ -357,8 +358,8 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		unload_modules();
 		if(quitmsg)
 		{
-			squit_cmd (ns_botptr->nick, quitmsg);
-			ssquit_cmd (me.name, quitmsg);
+			irc_quit (ns_botptr, quitmsg);
+			irc_squit (me.name, quitmsg);
 		}
 		sleep(1);
 		/* now free up the users and servers memory */

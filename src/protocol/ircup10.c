@@ -24,6 +24,7 @@
 #include "ircup10.h"
 #include "neostats.h"
 #include "ircd.h"
+#include "modes.h"
 #include "sock.h"
 #include "users.h"
 #include "servers.h"
@@ -31,9 +32,6 @@
 #ifndef WIN32
 #include <arpa/inet.h>
 #endif
-
-EXPORTFUNC void process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac);
-EXPORTFUNC int splitbuf (char *buf, char ***argv, int colon_special);
 
 static void ircu_m_private (char *origin, char **argv, int argc, int srv);
 static void ircu_m_notice (char *origin, char **argv, int argc, int srv);
@@ -177,10 +175,6 @@ umode_init user_umodes[] = {
 	{0, 0},
 };
 
-umode_init user_smodes[] = {
-	{0, '0'},
-};
-
 /* Temporary buffers for numeric conversion */
 char neostatsbase64[3] = "\0";
 /* Flags for numeric usage; limits to 64 clients */
@@ -315,7 +309,7 @@ DEBUG2 CORE - SENT: :stats.mark.net PING stats.mark.net :mark.local.org
 */
 
 void
-send_server (const char *sender, const char *name, const int numeric, const char *infoline)
+send_server (const char *source, const char *name, const int numeric, const char *infoline)
 {
 	send_cmd ("%s %s * +%s 604800 %lu :%s", neostatsbase64, TOK_JUPE, name, me.now, infoline);
 }
@@ -364,21 +358,15 @@ send_part (const char *who, const char *chan)
 	send_cmd ("%s %s %s", nicktobase64 (who), TOK_PART, chan);
 }
 
-void 
-send_sjoin (const char *sender, const char *who, const char *chan, const unsigned long ts)
-{
-
-}
-
 void
-send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
+send_join (const char *who, const char *chan, const unsigned long ts)
 {
 	send_cmd ("%s %s %s %lu", nicktobase64 (who), TOK_JOIN, chan, ts);
 }
 
 /* R: ABAAH M #c3 +tn */
 void 
-send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
+send_cmode (const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
 	send_cmd ("%s %s %s %s %s", neostatsbase64, TOK_MODE, chan, mode, args);
 }
@@ -446,9 +434,9 @@ send_invite (const char *from, const char *to, const char *chan)
 }
 
 void 
-send_kick (const char *who, const char *chan, const char *target, const char *reason)
+send_kick (const char *source, const char *chan, const char *target, const char *reason)
 {
-	send_cmd ("%s %s %s %s :%s", nicktobase64 (who), TOK_KICK, chan, nicktobase64 (target), (reason ? reason : "No Reason Given"));
+	send_cmd ("%s %s %s %s :%s", nicktobase64 (source), TOK_KICK, chan, nicktobase64 (target), (reason ? reason : "No Reason Given"));
 }
 
 void 
@@ -480,13 +468,13 @@ send_end_of_burst(void)
 }
 
 void 
-send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
+send_akill (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
 {
 	send_cmd ("%s %s * +%s@%s %lu :%s", neostatsbase64, TOK_GLINE, ident, host, length, reason);
 }
 
 void 
-send_rakill (const char *sender, const char *host, const char *ident)
+send_rakill (const char *source, const char *host, const char *ident)
 {
 	send_cmd ("%s %s * -%s@%s", neostatsbase64, TOK_GLINE, ident, host);
 }
@@ -515,23 +503,6 @@ send_globops (const char *from, const char *buf)
 	} else if(servertobase64 (from)) {
 		send_cmd ("%s %s :%s", servertobase64 (from), TOK_WALLOPS, buf);
 	}
-}
-
-void 
-send_svstime (const char *sender, const unsigned long ts)
-{
-}
-void 
-send_swhois (const char *sender, const char *target, const char *swhois)
-{
-}
-void 
-send_smo (const char *from, const char *umodetarget, const char *msg)
-{
-}
-void 
-send_svsmode (const char *sender, const char *target, const char *modes)
-{
 }
 
 static void
@@ -889,7 +860,7 @@ parse (char *line)
 		strlcpy(cmd, line, sizeof(cmd));
 		dlog(DEBUG1, "cmd   : %s", cmd);
 		dlog(DEBUG1, "args  : %s", coreLine);
-		ac = splitbuf(coreLine, &av, 1);
+		ac = ircsplitbuf(coreLine, &av, 1);
 		cmdptr = 2;
 		dlog(DEBUG1, "0 %d", ac);
 		/* really needs to be in AddServer since this is a NeoStats wide bug
@@ -913,7 +884,7 @@ parse (char *line)
 		dlog(DEBUG1, "cmd   : %s", cmd);
 		dlog(DEBUG1, "args  : %s", line);
 		if(line) {
-			ac = splitbuf(line, &av, 1);
+			ac = ircsplitbuf(line, &av, 1);
 		}
 		dlog(DEBUG1, "0 %d", ac);
 	}

@@ -215,9 +215,9 @@ int ModInit(Module* mod_ptr)
 void ModFini()
 {
 	StatServ.shutdown = 1;
-	chanalert(ss_bot->nick, "Saving StatServ Database. this *could* take a while");
+	irc_chanalert(ss_bot, "Saving StatServ Database. this *could* take a while");
 	SaveStats();
-	chanalert(ss_bot->nick, "Done");
+	irc_chanalert(ss_bot, "Done");
 	FiniStats();
 	FiniTLD();
 	save_client_versions();
@@ -414,8 +414,8 @@ static int ss_chans(CmdParams* cmdparams)
 		}
 		cn = list_first(Chead);
 		cs = lnode_get(cn);
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Top10 Online Channels:");
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "======================");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Top10 Online Channels:");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "======================");
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(findchan(cs->name))
@@ -429,7 +429,7 @@ static int ss_chans(CmdParams* cmdparams)
 				}
 				continue;
 			}
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick,
+			irc_prefmsg(ss_bot,cmdparams->source.user, 
 				"Channel %s -> %ld Members", cs->name,
 				cs->members);
 			cn = list_next(Chead, cn);
@@ -439,7 +439,7 @@ static int ss_chans(CmdParams* cmdparams)
 				break;
 			}
 		}
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List.");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "End of List.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "POP")) {
 		/* they want the top10 Popular Channels (based on joins) */
 		if (!list_is_sorted(Chead, topjoin)) {
@@ -447,8 +447,8 @@ static int ss_chans(CmdParams* cmdparams)
 		}
 		cn = list_first(Chead);
 		cs = lnode_get(cn);
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Top10 Channels (Ever):");
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "======================");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Top10 Channels (Ever):");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "======================");
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(findchan(cs->name))
@@ -462,7 +462,7 @@ static int ss_chans(CmdParams* cmdparams)
 				}
 				continue;
 			}
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Channel %s -> %ld Joins", 
+			irc_prefmsg(ss_bot, cmdparams->source.user, "Channel %s -> %ld Joins", 
 				cs->name, cs->totmem);
 			cn = list_next(Chead, cn);
 			if (cn) {
@@ -471,7 +471,7 @@ static int ss_chans(CmdParams* cmdparams)
 				break;
 			}
 		}
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List.");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "End of List.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "KICKS")) {
 		/* they want the top10 most unwelcome channels (based on kicks) */
 		if (!list_is_sorted(Chead, topkick)) {
@@ -479,9 +479,9 @@ static int ss_chans(CmdParams* cmdparams)
 		}
 		cn = list_first(Chead);
 		cs = lnode_get(cn);
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick,
+		irc_prefmsg(ss_bot,cmdparams->source.user, 
 			"Top10 Most un-welcome Channels (Ever):");
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick,
+		irc_prefmsg(ss_bot,cmdparams->source.user, 
 			"======================================");
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
@@ -496,7 +496,7 @@ static int ss_chans(CmdParams* cmdparams)
 				}
 				continue;
 			}
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Channel %s -> %ld Kicks", 
+			irc_prefmsg(ss_bot, cmdparams->source.user, "Channel %s -> %ld Kicks", 
 				cs->name, cs->kicks);
 			cn = list_next(Chead, cn);
 			if (cn) {
@@ -505,7 +505,7 @@ static int ss_chans(CmdParams* cmdparams)
 				break;
 			}
 		}
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List.");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "End of List.");
 	} else if (!ircstrcasecmp(cmdparams->av[0], "TOPICS")) {
 		/* they want the top10 most undecisive channels (based on topics) */
 		if (!list_is_sorted(Chead, toptopics)) {
@@ -513,8 +513,8 @@ static int ss_chans(CmdParams* cmdparams)
 		}
 		cn = list_first(Chead);
 		cs = lnode_get(cn);
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Top10 Most undecisive Channels (Ever):");
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "======================================");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Top10 Most undecisive Channels (Ever):");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "======================================");
 		for (i = 0; i <= 10; i++) {
 			/* only show hidden chans to operators */
 			if (is_hidden_chan(findchan(cs->name))
@@ -528,7 +528,7 @@ static int ss_chans(CmdParams* cmdparams)
 				}
 				continue;
 			}
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Channel %s -> %ld Topics", 
+			irc_prefmsg(ss_bot, cmdparams->source.user, "Channel %s -> %ld Topics", 
 				cs->name, cs->topics);
 			cn = list_next(Chead, cn);
 			if (cn) {
@@ -537,33 +537,33 @@ static int ss_chans(CmdParams* cmdparams)
 				break;
 			}
 		}
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List.");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "End of List.");
 	} else {
 		cs = findchanstats(cmdparams->av[0]);
 		if (!cs) {
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick,
+			irc_prefmsg(ss_bot,cmdparams->source.user, 
 				"Error, Can't find any information about Channel %s", cmdparams->av[0]);
 			return 0;
 		}
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "\2Channel Information for %s (%s)\2", 
+		irc_prefmsg(ss_bot, cmdparams->source.user, "\2Channel Information for %s (%s)\2", 
 			cmdparams->av[0], (findchan(cmdparams->av[0]) ? "Online" : "Offline"));
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Current Members: %ld (Max %ld on %s)",
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Current Members: %ld (Max %ld on %s)",
 			cs->members, cs->maxmems, sftime(cs->t_maxmems));
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick,
+		irc_prefmsg(ss_bot,cmdparams->source.user, 
 			"Max Members today: %ld at %s", cs->maxmemtoday,
 			sftime(cs->t_maxmemtoday));
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick,
+		irc_prefmsg(ss_bot,cmdparams->source.user, 
 			"Total Number of Channel Joins: %ld", cs->totmem);
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, 
+		irc_prefmsg(ss_bot, cmdparams->source.user, 
 			"Total Member Joins today: %ld (Max %ld on %s)",
 			cs->joinstoday, cs->maxjoins, sftime(cs->t_maxjoins));
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick,
+		irc_prefmsg(ss_bot,cmdparams->source.user, 
 			"Total Topic Changes %ld (Today %ld)", cs->topics, cs->topicstoday);
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Total Kicks: %ld", cs->kicks);
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Total Kicks today %ld (Max %ld on %s)",
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Total Kicks: %ld", cs->kicks);
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Total Kicks today %ld (Max %ld on %s)",
 			cs->maxkickstoday, cs->maxkicks, sftime(cs->t_maxkicks));
 		if (!findchan(cmdparams->av[0]))
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Channel was last seen at %s",
+			irc_prefmsg(ss_bot, cmdparams->source.user, "Channel was last seen at %s",
 				sftime(cs->lastseen));
 	}
 	return 1;
@@ -579,42 +579,42 @@ static int ss_tld_map(CmdParams* cmdparams)
 static int ss_netstats(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Network Statistics:-----");
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Current Users: %ld", stats_network.users);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum Users: %ld [%s]",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Network Statistics:-----");
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Current Users: %ld", stats_network.users);
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Maximum Users: %ld [%s]",
 		stats_network.maxusers, sftime(stats_network.t_maxusers));
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Total Users Connected: %ld",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Total Users Connected: %ld",
 		stats_network.totusers);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Current Channels %ld", stats_network.chans);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum Channels %ld [%s]",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Current Channels %ld", stats_network.chans);
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Maximum Channels %ld [%s]",
 		stats_network.maxchans, sftime(stats_network.t_chans));
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Current Opers: %ld", stats_network.opers);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum Opers: %ld [%s]",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Current Opers: %ld", stats_network.opers);
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Maximum Opers: %ld [%s]",
 		stats_network.maxopers, sftime(stats_network.t_maxopers));
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Users Set Away: %ld", stats_network.away);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Current Servers: %ld", stats_network.servers);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum Servers: %ld [%s]",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Users Set Away: %ld", stats_network.away);
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Current Servers: %ld", stats_network.servers);
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Maximum Servers: %ld [%s]",
 		stats_network.maxservers, sftime(stats_network.t_maxservers));
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "--- End of List ---");
+	irc_prefmsg(ss_bot, cmdparams->source.user, "--- End of List ---");
 	return 1;
 }
 
 static int ss_daily(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Daily Network Statistics:");
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum Servers: %-2d %s",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Daily Network Statistics:");
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Maximum Servers: %-2d %s",
 		daily.servers, sftime(daily.t_servers));
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum Users: %-2d %s", daily.users,
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Maximum Users: %-2d %s", daily.users,
 		sftime(daily.t_users));
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum Channel: %-2d %s", daily.chans,
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Maximum Channel: %-2d %s", daily.chans,
 		sftime(daily.t_chans));
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum Opers: %-2d %s", daily.opers,
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Maximum Opers: %-2d %s", daily.opers,
 		sftime(daily.t_opers));
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Total Users Connected: %-2d",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Total Users Connected: %-2d",
 		daily.tot_users);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Daily statistics are reset at midnight");
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of Information.");
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Daily statistics are reset at midnight");
+	irc_prefmsg(ss_bot, cmdparams->source.user, "End of Information.");
 	return 1;
 }
 
@@ -637,8 +637,8 @@ static void makemap(char *uplink, User * u, int level)
 			if (StatServ.exclusions && IsExcluded(s)) {
 				makemap(s->name, u, level);
 			}
-			prefmsg(u->nick, ss_bot->nick,
-				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
+			irc_prefmsg(u->nick, ss_bot,
+-45s      				%[ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
 				ss->name, ss->users, (int)ss->maxusers,
 				ss->opers, ss->maxopers, (long)s->ping, ss->highest_ping);
 			makemap(s->name, u, level + 1);
@@ -651,8 +651,8 @@ static void makemap(char *uplink, User * u, int level)
 			for (i = 1; i < level; i++) {
 				strlcat (buf, "     |", 256);
 			}
-			prefmsg(u->nick, ss_bot->nick,
-				"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
+			irc_prefmsg(u->nick, ss_bot,
+\_				\\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
 				buf, ss->name, ss->users, (int)ss->maxusers,
 				ss->opers, ss->maxopers, (long)s->ping, ss->highest_ping);
 			makemap(s->name, u, level + 1);
@@ -664,10 +664,10 @@ static void makemap(char *uplink, User * u, int level)
 static int ss_map(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "%-40s      %-10s %-10s %-10s",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "%-40s      %-10s %-10s %-10s",
 		"\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2", "\2[LAG/MAX]\2");
 	makemap("", cmdparams->source.user, 0);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "--- End of Listing ---");
+	irc_prefmsg(ss_bot, cmdparams->source.user, "--- End of Listing ---");
 	return 1;
 }
 
@@ -682,17 +682,17 @@ static int ss_server(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	server = cmdparams->av[0];
 	if (!server) {
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Server listing:");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Server listing:");
 		hash_scan_begin(&hs, Shead);
 		while ((sn = hash_scan_next(&hs))) {
 			ss = hnode_get(sn);
 			if (findserver(ss->name)) {
-				prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Server: %s (*)", ss->name);
+				irc_prefmsg(ss_bot, cmdparams->source.user, "Server: %s (*)", ss->name);
 			} else {
-				prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Server: %s", ss->name);
+				irc_prefmsg(ss_bot, cmdparams->source.user, "Server: %s", ss->name);
 			}
 		}
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick,
+		irc_prefmsg(ss_bot,cmdparams->source.user, 
 			"***** End of list (* indicates server is online) *****");
 		return 0;
 	}
@@ -702,46 +702,46 @@ static int ss_server(CmdParams* cmdparams)
 	s = findserver(server);
 	if (!ss) {
 		nlog(LOG_CRITICAL, "Unable to find server statistics for %s", server);
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick,
+		irc_prefmsg(ss_bot,cmdparams->source.user, 
 			"Internal Error! Please Consult the Log file");
 		return 0;
 	}
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Statistics for \2%s\2 since %s",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Statistics for \2%s\2 since %s",
 		ss->name, sftime(ss->starttime));
 	if (!s) {
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Server Last Seen: %s", 
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Server Last Seen: %s", 
 			sftime(ss->lastseen));
 	} else {
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Current Users: %-3ld (%2.0f%%)", 
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Current Users: %-3ld (%2.0f%%)", 
 			(long)ss->users, 
 			(float) ss->users / (float) stats_network.users * 100);
 	}
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum users: %-3ld at %s",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Maximum users: %-3ld at %s",
 		ss->maxusers, sftime(ss->t_maxusers));
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Total users connected: %-3ld", ss->totusers);
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Total users connected: %-3ld", ss->totusers);
 	if (s) {
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Current opers: %-3ld", (long)ss->opers);
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Current opers: %-3ld", (long)ss->opers);
 	}
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Maximum opers: %-3ld at %s",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Maximum opers: %-3ld at %s",
 		(long)ss->maxopers, sftime(ss->t_maxopers));
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "IRCop kills: %d", ss->operkills);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Server kills: %d", ss->serverkills);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Lowest ping: %-3d at %s",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "IRCop kills: %d", ss->operkills);
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Server kills: %d", ss->serverkills);
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Lowest ping: %-3d at %s",
 		(int)ss->lowest_ping, sftime(ss->t_lowest_ping));
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Higest ping: %-3d at %s",
+	irc_prefmsg(ss_bot, cmdparams->source.user, "Higest ping: %-3d at %s",
 		(int)ss->highest_ping, sftime(ss->t_highest_ping));
 	if (s) {
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Current Ping: %-3d", s->ping);
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Current Ping: %-3d", s->ping);
 	}
 	if (ss->numsplits >= 1) {
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, 
+		irc_prefmsg(ss_bot, cmdparams->source.user, 
 			"%s has split from the network %d time %s",
 			ss->name, ss->numsplits, (ss->numsplits == 1) ? "" : "s");
 	} else {
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick,"%s has never split from the network.", 
+		irc_prefmsg(ss_bot,"%cmdparams->source.user, s has never split from the network.", 
 			ss->name);
 	}
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "***** End of Statistics *****");
+	irc_prefmsg(ss_bot, cmdparams->source.user, "***** End of Statistics *****");
 	return 1;
 }
 
@@ -756,13 +756,13 @@ static void operlist(User* u)
 		return;
 	if (!operlistserver) {
 		listindex++;
-		prefmsg(listu->nick, ss_bot->nick, "[%2d] %-15s %-15s %-10d", listindex, 
+		irc_prefmsg(ss_bot, listu, "[%2d] %-15s %-15s %-10d", listindex, 
 			u->nick, u->server->name, UserLevel(u));
 	} else {
 		if (ircstrcasecmp(operlistserver, u->server->name))
 			return;
 		listindex++;
-		prefmsg(listu->nick, ss_bot->nick, "[%2d] %-15s %-15s %-10d", listindex, 
+		irc_prefmsg(ss_bot, listu, "[%2d] %-15s %-15s %-10d", listindex, 
 			u->nick, u->server->name, UserLevel(u));
 	}
 }
@@ -776,8 +776,8 @@ static int ss_operlist(CmdParams* cmdparams)
 	listindex = 0;
 	operlistserver = NULL;
 	if (cmdparams->ac == 0) {
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Online IRCops:");
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "ID  %-15s %-15s %-10s", 
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Online IRCops:");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "ID  %-15s %-15s %-10s", 
 			"Nick", "Server", "Level");
 	}
 	if (cmdparams->ac != 0) {
@@ -787,15 +787,15 @@ static int ss_operlist(CmdParams* cmdparams)
 	if (flags && !ircstrcasecmp(flags, "NOAWAY")) {
 		operlistaway = 1;
 		flags = NULL;
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Online IRCops (not away):");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Online IRCops (not away):");
 	}
 	if (!operlistaway && flags && strchr(flags, '.')) {
 		operlistserver = flags;
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Online IRCops on server %s", operlistserver);
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Online IRCops on server %s", operlistserver);
 	}
 	listu = cmdparams->source.user;
 	GetUserList(operlist);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of Listing.");
+	irc_prefmsg(ss_bot, cmdparams->source.user, "End of Listing.");
 	return 1;
 }
 
@@ -803,7 +803,7 @@ static void botlist(User* u)
 {
 	if is_bot(u) { 
 		listindex++;
-		prefmsg(listu->nick, ss_bot->nick,"[%2d] %-15s %s", listindex, 
+		irc_prefmsg(ss_bot, listu, "[%2d] %-15s %s", listindex, 
 			u->nick, u->server->name);
 	}
 }
@@ -812,10 +812,10 @@ static int ss_botlist(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
 	listindex = 0;
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "On-Line Bots:");
+	irc_prefmsg(ss_bot, cmdparams->source.user, "On-Line Bots:");
 	listu = cmdparams->source.user;
 	GetUserList(botlist);
-	prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of Listing.");
+	irc_prefmsg(ss_bot, cmdparams->source.user, "End of Listing.");
 	return 1;
 }
 
@@ -828,26 +828,26 @@ static int ss_stats(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
 		int i = 1;
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Statistics Database:");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Statistics Database:");
 		hash_scan_begin(&scan, Shead);
 		while ((node = hash_scan_next(&scan))) {
 			st = hnode_get(node);
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "[%-2d] %s", i, st->name);
+			irc_prefmsg(ss_bot, cmdparams->source.user, "[%-2d] %s", i, st->name);
 			i++;
 		}
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "End of List.");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "End of List.");
 		nlog(LOG_NOTICE, "%s requested STATS LIST.", cmdparams->source.user->nick);
 	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
 		if (!cmdparams->av[1]) {
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Syntax: /msg %s STATS DEL <name>",
+			irc_prefmsg(ss_bot, cmdparams->source.user, "Syntax: /msg %s STATS DEL <name>",
 				ss_bot->nick);
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "For additonal help, /msg %s HELP", 
+			irc_prefmsg(ss_bot, cmdparams->source.user, "For additonal help, /msg %s HELP", 
 				ss_bot->nick);
 			return 0;
 		}
 		st = findserverstats(cmdparams->av[1]);
 		if (!st) {
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "%s is not in the database", cmdparams->av[1]);
+			irc_prefmsg(ss_bot, cmdparams->source.user, "%s is not in the database", cmdparams->av[1]);
 			return 0;
 		}
 		if (!findserver(cmdparams->av[1])) {
@@ -857,13 +857,13 @@ static int ss_stats(CmdParams* cmdparams)
 				st = hnode_get(node);
 				hnode_destroy(node);
 				sfree(st);
-				prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Removed %s from the database.",
+				irc_prefmsg(ss_bot, cmdparams->source.user, "Removed %s from the database.",
 					cmdparams->av[1]);
 				nlog(LOG_NOTICE, "%s requested STATS DEL %s", cmdparams->source.user->nick, cmdparams->av[1]);
 				return 0;
 			}
 		} else {
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, 
+			irc_prefmsg(ss_bot, cmdparams->source.user, 
 				"Cannot remove %s from the database, it is online!!", cmdparams->av[1]);
 			nlog(LOG_WARNING,
 			     "%s requested STATS DEL %s, but that server is online!!",
@@ -875,7 +875,7 @@ static int ss_stats(CmdParams* cmdparams)
 		Server *s;
 
 		if (!cmdparams->av[1] || !cmdparams->av[2]) {
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Syntax: /msg %s STATS COPY <name> "
+			irc_prefmsg(ss_bot, cmdparams->source.user, "Syntax: /msg %s STATS COPY <name> "
 				" <newname>", ss_bot->nick);
 			return 0;
 		}
@@ -885,24 +885,24 @@ static int ss_stats(CmdParams* cmdparams)
 
 		st = findserverstats(cmdparams->av[1]);
 		if (!st) {
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "%s is not in the database", 
+			irc_prefmsg(ss_bot, cmdparams->source.user, "%s is not in the database", 
 				cmdparams->av[1]);
 			return 0;
 		}
 		s = findserver(cmdparams->av[1]);
 		if (s) {
-			prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Server %s is online!", cmdparams->av[1]);
+			irc_prefmsg(ss_bot, cmdparams->source.user, "Server %s is online!", cmdparams->av[1]);
 			return 0;
 		}
 		s = NULL;
 		memcpy(st->name, cmdparams->av[2], sizeof(st->name));
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Moved database entry for %s to %s", 
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Moved database entry for %s to %s", 
 			cmdparams->av[1], cmdparams->av[1]);
 		nlog(LOG_NOTICE, "%s requested STATS COPY %s -> %s", cmdparams->source.user->nick, 
 			cmdparams->av[1], cmdparams->av[2]);
 	} else {
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Invalid Argument.");
-		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "For help, /msg %s HELP", ss_bot->nick);
+		irc_prefmsg(ss_bot, cmdparams->source.user, "Invalid Argument.");
+		irc_prefmsg(ss_bot, cmdparams->source.user, "For help, /msg %s HELP", ss_bot->nick);
 	}
 	return 1;
 }

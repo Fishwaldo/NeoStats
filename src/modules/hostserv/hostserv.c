@@ -211,8 +211,8 @@ static int hs_event_signon(CmdParams* cmdparams)
 		map = lnode_get(hn);
 		dlog(DEBUG1, "Checking %s against %s", map->host, cmdparams->source.user->hostname);
 		if (match(map->host, cmdparams->source.user->hostname)) {
-			ssvshost_cmd(cmdparams->source.user->nick, map->vhost);
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+			irc_svshost(cmdparams->source.user, map->vhost);
+			irc_prefmsg(hs_bot, cmdparams->source.user, 
 				"Automatically setting your hidden host to %s", map->vhost);
 			map->lused = me.now;
 			save_vhost(map);
@@ -309,8 +309,8 @@ int hs_event_mode(CmdParams* cmdparams)
 					}
 					dlog(DEBUG2, "Regnick Mode on %s", cmdparams->av[0]);
 					ircsnprintf(vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom);
-					ssvshost_cmd(cmdparams->source.user->nick, vhost);
-					prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+					irc_svshost(cmdparams->source.user, vhost);
+					irc_prefmsg(hs_bot, cmdparams->source.user, 
 						"Automatically setting your hidden host to %s", vhost);
 					set_moddata(cmdparams->source.user);
 				}
@@ -345,7 +345,7 @@ static int hs_levels(CmdParams* cmdparams)
 	int t;	
 
 	if (cmdparams->ac == 2) {
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+		irc_prefmsg(hs_bot, cmdparams->source.user, 
 			"Configured Levels: ADD: %d, DEL: %d, LIST: %d, VIEW: %d",
 			hs_cfg.add, hs_cfg.del, hs_cfg.list,hs_cfg.view);
 			return NS_SUCCESS;
@@ -368,7 +368,7 @@ static int hs_levels(CmdParams* cmdparams)
 		if (UserLevel(cmdparams->source.user) >= NS_ULEVEL_ADMIN) {
 			t = atoi(cmdparams->av[3]);
 			if ((t <= 0) || (t > NS_ULEVEL_ROOT)) {
-				prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+				irc_prefmsg(hs_bot, cmdparams->source.user, 
 					"Invalid Level. Must be between 1 and %d", NS_ULEVEL_ROOT);
 				return NS_ERR_SYNTAX_ERROR;
 			}
@@ -385,11 +385,11 @@ static int hs_levels(CmdParams* cmdparams)
 				hs_cfg.view = t;
 				SetConf((void *) t, CFGINT, "ViewLevel");
 			} else {
-				prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+				irc_prefmsg(hs_bot, cmdparams->source.user, 
 					"Invalid Level. /msg %s help levels", hs_bot->nick);
 				return 1;
 			}
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+			irc_prefmsg(hs_bot, cmdparams->source.user, 
 				"Level for %s set to %d", cmdparams->av[2], t);
 			return NS_SUCCESS;
 		}
@@ -426,12 +426,12 @@ static void hs_listban(User* u)
 	int i = 1;
 
 	hash_scan_begin(&hs, bannedvhosts);
-	prefmsg(u->nick, hs_bot->nick, "Banned vhosts");
+	irc_prefmsg(hs_bot, u,  "Banned vhosts");
 	while ((hn = hash_scan_next(&hs)) != NULL) {
-		prefmsg(u->nick, hs_bot->nick, "%d - %s", i, (char *)hnode_get(hn));
+		irc_prefmsg(hs_bot, u,  "%d - %s", i, (char *)hnode_get(hn));
 		i++;
 	}
-	prefmsg(u->nick, hs_bot->nick, "End of List.");
+	irc_prefmsg(hs_bot, u, "End of List.");
 
 }
 static void hs_addban(User* u, char *ban)
@@ -440,7 +440,7 @@ static void hs_addban(User* u, char *ban)
 	char *host;
 
 	if (hash_lookup(bannedvhosts, ban) != NULL) {
-		prefmsg(u->nick, hs_bot->nick,
+		irc_prefmsg(hs_bot, u, 
 			"%s already exists in the banned vhost list", ban);
 		return;
 	}
@@ -448,9 +448,9 @@ static void hs_addban(User* u, char *ban)
 	strlcpy(host, ban, MAXHOST);
 	hn = hnode_create(host);
 	hash_insert(bannedvhosts, hn, host);
-	prefmsg(u->nick, hs_bot->nick,
+	irc_prefmsg(hs_bot, u, 
 		"%s added to the banned vhosts list", ban);
-	chanalert(hs_bot->nick, "%s added %s to the banned vhosts list",
+	irc_chanalert(hs_bot, "%s added %s to the banned vhosts list",
 		  u->nick, ban);
 	SaveBans();
 }
@@ -464,7 +464,7 @@ static void hs_delban(User* u, char *ban)
 
 	i = atoi(ban);
 	if ((i < 1) || (i > (int)hash_count(bannedvhosts))) {
-		prefmsg(u->nick, hs_bot->nick,
+		irc_prefmsg(hs_bot, u, 
 			"Invalid Entry. /msg %s bans for the list",
 			hs_bot->nick);
 		return;
@@ -475,10 +475,10 @@ static void hs_delban(User* u, char *ban)
 		++j;
 		if (i == j) {
 			hash_scan_delete(bannedvhosts, hn);
-			prefmsg(u->nick, hs_bot->nick,
+			irc_prefmsg(hs_bot, u, 
 				"Deleted %s from the banned vhost list",
 				(char *) hnode_get(hn));
-			chanalert(hs_bot->nick,
+			irc_chanalert(hs_bot,
 				  "%s deleted %s from the banned vhost list",
 				  u->nick, (char *) hnode_get(hn));
 			nlog(LOG_NOTICE,
@@ -490,7 +490,7 @@ static void hs_delban(User* u, char *ban)
 			return;
 		}
 	}
-	prefmsg(u->nick, hs_bot->nick, "Entry %d was not found (Weird?!?)", i);
+	irc_prefmsg(hs_bot, u,  "Entry %d was not found (Weird?!?)", i);
 }
 
 static void SaveBans()
@@ -526,9 +526,9 @@ static int hs_chpass(CmdParams* cmdparams)
 		    || (UserLevel(cmdparams->source.user) >= 100)) {
 			if (!ircstrcasecmp(map->passwd, oldpass)) {
 				strlcpy(map->passwd, newpass, MAXPASSWORD);
-				prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+				irc_prefmsg(hs_bot, cmdparams->source.user, 
 					"Password Successfully changed");
-				chanalert(hs_bot->nick,
+				irc_chanalert(hs_bot,
 					  "%s changed the password for %s",
 					  cmdparams->source.user->nick, map->nnick);
 				map->lused = me.now;
@@ -536,9 +536,9 @@ static int hs_chpass(CmdParams* cmdparams)
 				return 1;
 			}
 		} else {
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick, 
+			irc_prefmsg(hs_bot, cmdparams->source.user,  
 				"Error, Hostname Mis-Match");
-			chanalert(hs_bot->nick,
+			irc_chanalert(hs_bot,
 				  "%s tried to change the password for %s, but the hosts do not match (%s->%s)",
 				  cmdparams->source.user->nick, map->nnick, cmdparams->source.user->hostname,
 				  map->host);
@@ -549,9 +549,9 @@ static int hs_chpass(CmdParams* cmdparams)
 		}
 	}
 
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+	irc_prefmsg(hs_bot, cmdparams->source.user, 
 		"Invalid Username or Password. Access Denied");
-	chanalert(hs_bot->nick,
+	irc_chanalert(hs_bot,
 		  "%s tried to change the password for %s, but got it wrong",
 		  cmdparams->source.user->nick, nick);
 	return 1;
@@ -579,10 +579,10 @@ static int hs_add(CmdParams* cmdparams)
 	hash_scan_begin(&hs, bannedvhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
 		if (match(hnode_get(hn), h)) {
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+			irc_prefmsg(hs_bot, cmdparams->source.user, 
 				"%s has been matched against the vhost ban %s",
 				h, (char *) hnode_get(hn));
-			chanalert(cmdparams->source.user->nick,
+			irc_chanalert(hs_bot,
 				  "%s tried to add a banned vhost %s",
 				  cmdparams->source.user->nick, h);
 			return 1;
@@ -590,13 +590,13 @@ static int hs_add(CmdParams* cmdparams)
 	}
 
 	if(validate_host (h) == NS_FAILURE) {
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+		irc_prefmsg(hs_bot, cmdparams->source.user, 
 			"%s is an invalid host", h);
 		return 1;
 	}
 
 	if (list_find(vhosts, cmd, findnick)) {
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+		irc_prefmsg(hs_bot, cmdparams->source.user, 
 			"%s already has a vhost entry", cmd);
 		return 1;
 	}
@@ -604,24 +604,24 @@ static int hs_add(CmdParams* cmdparams)
 	nlog(LOG_NOTICE,
 		    "%s added a vhost for %s with realhost %s vhost %s and password %s",
 		    cmdparams->source.user->nick, cmd, m, h, p);
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+	irc_prefmsg(hs_bot, cmdparams->source.user, 
 		"%s has sucessfully been registered under realhost: %s vhost: %s and password: %s",
 		cmd, m, h, p);
-	chanalert(hs_bot->nick,
+	irc_chanalert(hs_bot,
 			"%s added a vhost %s for %s with realhost %s",
 			cmdparams->source.user->nick, h, cmd, m);
 	/* Apply The New Hostname If The User Is Online */
 	if ((nu = finduser(cmd)) != NULL) {
 		if (!IsMe(nu)) {
 			if (match(m, nu->hostname)) {
-				ssvshost_cmd(nu->nick, h);
-				prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+				irc_svshost(nu, h);
+				irc_prefmsg(hs_bot, cmdparams->source.user, 
 					"%s is online now, setting vhost to %s",
 					cmd, h);
-				prefmsg(cmd, hs_bot->nick,
+				irc_prefmsg(hs_bot, nu, 
 					"Your vhost has been created with hostmask of %s and username %s with password %s",
 					m, cmd, p);
-				prefmsg(cmd, hs_bot->nick,
+				irc_prefmsg(hs_bot, nu, 
 					"For security, you should change your vhost password. See /msg %s help chpass",
 					hs_bot->nick);
 				if(HaveUmodeRegNick()) 
@@ -652,14 +652,14 @@ static int hs_list(CmdParams* cmdparams)
 	vhostcount = list_count(vhosts);
 
 	if (start >= vhostcount) {
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,  "Value out of range. There are only %d entries", (int)vhostcount);
+		irc_prefmsg(hs_bot, cmdparams->source.user,   "Value out of range. There are only %d entries", (int)vhostcount);
 		return 1;
 	}
 		
 	i = 1;
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Current vhost list: ");
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Showing %d to %d entries of %d vhosts", start+1, start+20, (int)vhostcount);
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "%-5s %-12s %-30s", "Num", "Nick", "Vhost");
+	irc_prefmsg(hs_bot, cmdparams->source.user,  "Current vhost list: ");
+	irc_prefmsg(hs_bot, cmdparams->source.user,  "Showing %d to %d entries of %d vhosts", start+1, start+20, (int)vhostcount);
+	irc_prefmsg(hs_bot, cmdparams->source.user,  "%-5s %-12s %-30s", "Num", "Nick", "Vhost");
 	hn = list_first(vhosts);
 	while (hn != NULL) {
 		if (i <= start) {
@@ -668,7 +668,7 @@ static int hs_list(CmdParams* cmdparams)
 			continue;
 		}
 		map = lnode_get(hn);
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick, "%-5d %-12s %-30s", i,
+		irc_prefmsg(hs_bot, cmdparams->source.user,  "%-5d %-12s %-30s", i,
 			map->nnick, map->vhost);
 		i++;
 		/* limit to x entries per screen */
@@ -676,12 +676,12 @@ static int hs_list(CmdParams* cmdparams)
 			break;
 		hn = list_next(vhosts, hn);
 	}
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+	irc_prefmsg(hs_bot, cmdparams->source.user, 
 		"For more information on someone use /msg %s VIEW #",
 		hs_bot->nick);
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick, "--- End of List ---");
+	irc_prefmsg(hs_bot, cmdparams->source.user,  "--- End of List ---");
 	if (vhostcount >= i) 
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Type \2/msg %s list %d\2 to see next page", hs_bot->nick, i-1);
+		irc_prefmsg(hs_bot, cmdparams->source.user,  "Type \2/msg %s list %d\2 to see next page", hs_bot->nick, i-1);
 	return 1;
 }
 
@@ -697,9 +697,9 @@ static int hs_view(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	tmpint = atoi(cmdparams->av[2]);
 	if (!tmpint) {
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+		irc_prefmsg(hs_bot, cmdparams->source.user, 
 			"Syntax: /msg %s VIEW #", hs_bot->nick);
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+		irc_prefmsg(hs_bot, cmdparams->source.user, 
 			"The users # is got from /msg %s LIST",
 			hs_bot->nick);
 		return 1;
@@ -709,22 +709,22 @@ static int hs_view(CmdParams* cmdparams)
 	while (hn != NULL) {
 		if (tmpint == i) {
 			map = lnode_get(hn);
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Virtual Host information:");
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Nick:      %s", map->nnick);
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Real host: %s", map->host);
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Vhost:     %s", map->vhost);
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Password:  %s", map->passwd);
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Added by:  %s",
+			irc_prefmsg(hs_bot, cmdparams->source.user,  "Virtual Host information:");
+			irc_prefmsg(hs_bot, cmdparams->source.user,  "Nick:      %s", map->nnick);
+			irc_prefmsg(hs_bot, cmdparams->source.user,  "Real host: %s", map->host);
+			irc_prefmsg(hs_bot, cmdparams->source.user,  "Vhost:     %s", map->vhost);
+			irc_prefmsg(hs_bot, cmdparams->source.user,  "Password:  %s", map->passwd);
+			irc_prefmsg(hs_bot, cmdparams->source.user,  "Added by:  %s",
 				map->added ? map->added : "<unknown>");
 			strftime(ltime, 80, "%d/%m/%Y[%H:%M]", localtime(&map->lused));
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick, "Last used: %s", ltime);
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick, "--- End of information ---");
+			irc_prefmsg(hs_bot, cmdparams->source.user,  "Last used: %s", ltime);
+			irc_prefmsg(hs_bot, cmdparams->source.user,  "--- End of information ---");
 		}
 		hn = list_next(vhosts, hn);
 		i++;
 	}
 	if (tmpint > i)
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+		irc_prefmsg(hs_bot, cmdparams->source.user, 
 			"ERROR: There is no vhost on list number \2%d\2",
 			tmpint);
 	return 1;
@@ -777,9 +777,9 @@ static int hs_del(CmdParams* cmdparams)
 	SET_SEGV_LOCATION();
 	tmpint = atoi(cmdparams->av[2]);
 	if (!tmpint) {
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+		irc_prefmsg(hs_bot, cmdparams->source.user, 
 			"Syntax: /msg %s DEL #", hs_bot->nick);
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+		irc_prefmsg(hs_bot, cmdparams->source.user, 
 			"The users # is got from /msg %s LIST",
 			hs_bot->nick);
 		return 1;
@@ -789,11 +789,11 @@ static int hs_del(CmdParams* cmdparams)
 	while (hn != NULL) {
 		if (i == tmpint) {
 			map = lnode_get(hn);
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick, "removed vhost %s for %s",
+			irc_prefmsg(hs_bot, cmdparams->source.user,  "removed vhost %s for %s",
 				map->nnick, map->vhost);
 			nlog(LOG_NOTICE, "%s removed the vhost %s for %s", 
 				 cmdparams->source.user->nick, map->vhost, map->nnick);
-			chanalert(hs_bot->nick, "%s removed vhost %s for %s",
+			irc_chanalert(hs_bot, "%s removed vhost %s for %s",
 				  cmdparams->source.user->nick, map->vhost, map->nnick);
 			del_vhost(map);
 			list_delete(vhosts, hn);
@@ -805,7 +805,7 @@ static int hs_del(CmdParams* cmdparams)
 	}
 
 	if (tmpint > i)
-		prefmsg(cmdparams->source.user->nick, hs_bot->nick, "ERROR: no vhost number \2%d\2",
+		irc_prefmsg(hs_bot, cmdparams->source.user,  "ERROR: no vhost number \2%d\2",
 			tmpint);
 	return 1;
 }
@@ -827,13 +827,13 @@ static int hs_login(CmdParams* cmdparams)
 	if (hn) {
 		map = lnode_get(hn);
 		if (!ircstrcasecmp(map->passwd, pass)) {
-			ssvshost_cmd(cmdparams->source.user->nick, map->vhost);
+			irc_svshost(cmdparams->source.user, map->vhost);
 			map->lused = me.now;
-			prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+			irc_prefmsg(hs_bot, cmdparams->source.user, 
 				"Your vhost %s has been set.", map->vhost);
 			nlog(LOG_NORMAL, "%s used LOGIN to obtain vhost of %s",
 			    cmdparams->source.user->nick, map->vhost);
-			chanalert(hs_bot->nick, "%s used login to get vhost %s", 
+			irc_chanalert(hs_bot, "%s used login to get vhost %s", 
 				cmdparams->source.user->nick, map->vhost);
 			if(HaveUmodeRegNick()) 
 				set_moddata(cmdparams->source.user);
@@ -841,7 +841,7 @@ static int hs_login(CmdParams* cmdparams)
 			return 1;
 		}
 	}
-	prefmsg(cmdparams->source.user->nick, hs_bot->nick,
+	irc_prefmsg(hs_bot, cmdparams->source.user, 
 		"Incorrect login or password. Do you have a vhost added?");
 	return 1;
 }

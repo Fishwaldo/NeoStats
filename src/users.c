@@ -25,6 +25,7 @@
 
 #include "neostats.h"
 #include "ircd.h"
+#include "modes.h"
 #include "hash.h"
 #include "users.h"
 #include "channels.h"
@@ -144,7 +145,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	sfree (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
 	if(is_synched && config.versionscan && !IsExcluded(u) && !IsMe(u)) {
-		privmsg(u->nick, ns_botptr->nick, "\1VERSION\1");
+		irc_privmsg(ns_botptr, u, "\1VERSION\1");
 	}
 }
 
@@ -340,7 +341,7 @@ void *display_vhost(void *tbl, char *col, char *sql, void *row)
 {
 	User *u = row;
 
-	if (protocol_info->features&FEATURE_UMODECLOAK) {
+	if (ircd_srv.features&FEATURE_UMODECLOAK) {
 		/* Do we have a hidden host? */
 		if(u->Umode & UMODE_HIDE) {
 			return u->vhost;
@@ -567,31 +568,31 @@ dumpuser (User* u)
 	int i = 0;
 					          
 	if (ircd_srv.protocol & PROTOCOL_B64SERVER) {
-		chanalert (ns_botptr->nick, "User:     %s!%s@%s (%s)", u->nick, u->username, u->hostname, u->name64);
+		irc_chanalert (ns_botptr, "User:     %s!%s@%s (%s)", u->nick, u->username, u->hostname, u->name64);
 	} else {
-		chanalert (ns_botptr->nick, "User:     %s!%s@%s", u->nick, u->username, u->hostname);
+		irc_chanalert (ns_botptr, "User:     %s!%s@%s", u->nick, u->username, u->hostname);
 	}
-	chanalert (ns_botptr->nick, "IP:       %s", inet_ntoa(u->ipaddr));
-	chanalert (ns_botptr->nick, "Vhost:    %s", u->vhost);
-	chanalert (ns_botptr->nick, "Flags:    0x%x", u->flags);
-	chanalert (ns_botptr->nick, "Modes:    %s (0x%x)", UmodeMaskToString(u->Umode), u->Umode);
-	chanalert (ns_botptr->nick, "Smodes:   %s (0x%x)", SmodeMaskToString(u->Smode), u->Smode);
+	irc_chanalert (ns_botptr, "IP:       %s", inet_ntoa(u->ipaddr));
+	irc_chanalert (ns_botptr, "Vhost:    %s", u->vhost);
+	irc_chanalert (ns_botptr, "Flags:    0x%x", u->flags);
+	irc_chanalert (ns_botptr, "Modes:    %s (0x%x)", UmodeMaskToString(u->Umode), u->Umode);
+	irc_chanalert (ns_botptr, "Smodes:   %s (0x%x)", SmodeMaskToString(u->Smode), u->Smode);
 	if(u->is_away) {
-		chanalert (ns_botptr->nick, "Away:     %s", u->awaymsg);
+		irc_chanalert (ns_botptr, "Away:     %s", u->awaymsg);
 	}
-	chanalert (ns_botptr->nick, "Version:   %s", u->version);
+	irc_chanalert (ns_botptr, "Version:   %s", u->version);
 
 	cm = list_first (u->chans);
 	while (cm) {
 		if(i==0) {
-			chanalert (ns_botptr->nick, "Channels: %s", (char *) lnode_get (cm));
+			irc_chanalert (ns_botptr, "Channels: %s", (char *) lnode_get (cm));
 		} else {
-			chanalert (ns_botptr->nick, "          %s", (char *) lnode_get (cm));
+			irc_chanalert (ns_botptr, "          %s", (char *) lnode_get (cm));
 		}
 		cm = list_next (u->chans, cm);
 		i++;
 	}
-	chanalert (ns_botptr->nick, "========================================");
+	irc_chanalert (ns_botptr, "========================================");
 }
 
 void
@@ -606,7 +607,7 @@ UserDump (const char *nick)
 		return;
 #endif
 	SET_SEGV_LOCATION();
-	chanalert (ns_botptr->nick, "================USERDUMP================");
+	irc_chanalert (ns_botptr, "================USERDUMP================");
 	if (!nick) {
 		hash_scan_begin (&us, userhash);
 		while ((un = hash_scan_next (&us)) != NULL) {
@@ -619,7 +620,7 @@ UserDump (const char *nick)
 			u = hnode_get (un);
 			dumpuser (u);
 		} else {
-			chanalert (ns_botptr->nick, "UserDump: can't find user %s", nick);
+			irc_chanalert (ns_botptr, "UserDump: can't find user %s", nick);
 		}
 	}
 }
@@ -672,7 +673,7 @@ SetUserVhost(const char* nick, const char* vhost)
 		/* sethost on Unreal doesn't send +xt, but /umode +x sends +x 
 		* so, we will never be 100% sure about +t 
 		*/
-		if (protocol_info->features&FEATURE_UMODECLOAK) {
+		if (ircd_srv.features&FEATURE_UMODECLOAK) {
 			u->Umode |= UMODE_HIDE;
 		}
 	}
@@ -695,7 +696,7 @@ UserMode (const char *nick, const char *modes)
 	strlcpy (u->modes, modes, MODESIZE);
 	oldmode = u->Umode;
 	u->Umode = UmodeStringToMask(modes, u->Umode);
-	if (protocol_info->features&FEATURE_UMODECLOAK) {
+	if (ircd_srv.features&FEATURE_UMODECLOAK) {
 		/* Do we have a hidden host any more? */
 		if((oldmode & UMODE_HIDE) && (!(u->Umode & UMODE_HIDE))) {
 			strlcpy(u->vhost, u->hostname, MAXHOST);

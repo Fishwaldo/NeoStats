@@ -292,7 +292,7 @@ ModulesVersion (const char* nick, const char *remoteserver)
 	hash_scan_begin (&ms, modulehash);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
-		numeric(RPL_VERSION, nick,
+		irc_numeric (RPL_VERSION, nick,
 			"Module %s version: %s %s %s",
 			module_ptr->info->name, module_ptr->info->version, 
 			module_ptr->info->build_date, module_ptr->info->build_time);
@@ -322,8 +322,8 @@ load_module (const char *modfilename, User * u)
 	SET_SEGV_LOCATION();
 	if (hash_isfull (modulehash)) {
 		if (do_msg) {
-			chanalert (ns_botptr->nick, "Unable to load module: module list is full");
-			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: module list is full");
+			irc_chanalert (ns_botptr, "Unable to load module: module list is full");
+			irc_prefmsg (ns_botptr, u, "Unable to load module: module list is full");
 		}
 		nlog (LOG_WARNING, "Unable to load module: module list is full");
 		return NULL;
@@ -337,7 +337,7 @@ load_module (const char *modfilename, User * u)
 	dl_handle = ns_dlopen (path, RTLD_NOW || RTLD_GLOBAL);
 	if (!dl_handle) {
 		if (do_msg) {
-			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s %s", ns_dlerrormsg, path);
+			irc_prefmsg (ns_botptr, u, "Unable to load module: %s %s", ns_dlerrormsg, path);
 		}
 		nlog (LOG_WARNING, "Unable to load module: %s %s", ns_dlerrormsg, path);
 		return NULL;
@@ -346,7 +346,7 @@ load_module (const char *modfilename, User * u)
 	info_ptr = ns_dlsym (dl_handle, "module_info");
 	if(info_ptr == NULL) {
 		if (do_msg) {
-			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s %s", ns_dlerrormsg, path);
+			irc_prefmsg (ns_botptr, u, "Unable to load module: %s %s", ns_dlerrormsg, path);
 		}
 		nlog (LOG_WARNING, "Unable to load module: %s %s", ns_dlerrormsg, path);
 		ns_dlclose (dl_handle);
@@ -362,16 +362,16 @@ load_module (const char *modfilename, User * u)
 	if (hash_lookup (modulehash, info_ptr->name)) {
 		ns_dlclose (dl_handle);
 		if (do_msg) {
-			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s already loaded", info_ptr->name);
+			irc_prefmsg (ns_botptr, u, "Unable to load module: %s already loaded", info_ptr->name);
 		}
 		nlog (LOG_WARNING, "Unable to load module: %s already loaded", info_ptr->name);
 		return NULL;
 	}
 	/* Check we have require PROTOCOL/FEATURE support for module */
-	if((info_ptr->features & protocol_info->features) != info_ptr->features) {
+	if((info_ptr->features & ircd_srv.features) != info_ptr->features) {
 		nlog (LOG_WARNING, "Unable to load module: %s Required module features not available on this IRCd.", modfilename);
 		if (do_msg) {
-			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s Required module features not available on this IRCd.", modfilename);
+			irc_prefmsg (ns_botptr, u, "Unable to load module: %s Required module features not available on this IRCd.", modfilename);
 		}
 		ns_dlclose (dl_handle);
 		return NULL;
@@ -382,8 +382,8 @@ load_module (const char *modfilename, User * u)
 	ModInit = ns_dlsym ((int *) dl_handle, "ModInit");
 	if (!ModInit) {
 		if (do_msg) {
-			chanalert (ns_botptr->nick, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
-			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
+			irc_chanalert (ns_botptr, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
+			irc_prefmsg (ns_botptr, u, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
 		}
 		nlog (LOG_WARNING, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
 		ns_dlclose (dl_handle);
@@ -423,8 +423,8 @@ load_module (const char *modfilename, User * u)
 		SendModuleEvent (EVENT_ONLINE, NULL, mod_ptr);
 	}
 	if (do_msg) {
-		prefmsg (u->nick, ns_botptr->nick, "Module %s loaded, %s", info_ptr->name, info_ptr->description);
-		globops (me.name, "Module %s loaded", info_ptr->name);
+		irc_prefmsg (ns_botptr, u, "Module %s loaded, %s", info_ptr->name, info_ptr->description);
+		irc_globops (NULL, "Module %s loaded", info_ptr->name);
 	}
 	return mod_ptr;
 }
@@ -446,11 +446,11 @@ list_modules (CmdParams* cmdparams)
 	hash_scan_begin (&hs, modulehash);
 	while ((mn = hash_scan_next (&hs)) != NULL) {
 		mod_ptr = hnode_get (mn);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module: %s (%s)", mod_ptr->info->name, mod_ptr->info->version);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Description: %s", mod_ptr->info->description);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Number: %d", mod_ptr->modnum);
+		irc_prefmsg (ns_botptr, cmdparams->source.user, "Module: %s (%s)", mod_ptr->info->name, mod_ptr->info->version);
+		irc_prefmsg (ns_botptr, cmdparams->source.user, "Module Description: %s", mod_ptr->info->description);
+		irc_prefmsg (ns_botptr, cmdparams->source.user, "Module Number: %d", mod_ptr->modnum);
 	}
-	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "End of Module List");
+	irc_prefmsg (ns_botptr, cmdparams->source.user, "End of Module List");
 	return 0;
 }
 
@@ -473,14 +473,14 @@ unload_module (const char *modname, User * u)
 	modnode = hash_lookup (modulehash, modname);
 	if (!modnode) {
 		if (u) {
-			prefmsg (u->nick, ns_botptr->nick, "Module %s not loaded, try /msg %s modlist", modname, ns_botptr->nick);
-			chanalert (ns_botptr->nick, "%s tried to unload %s but its not loaded", u->nick, modname);
+			irc_prefmsg (ns_botptr, u, "Module %s not loaded, try /msg %s modlist", modname, ns_botptr->nick);
+			irc_chanalert (ns_botptr, "%s tried to unload %s but its not loaded", u->nick, modname);
 		}
 		return NS_FAILURE;
 	}
 	mod_ptr = hnode_get (modnode);
 	moduleindex = mod_ptr->modnum;
-	chanalert (ns_botptr->nick, "Unloading module %s", modname);
+	irc_chanalert (ns_botptr, "Unloading module %s", modname);
 	/* canx any DNS queries used by this module */
 	canx_dns (mod_ptr);
 	/* Delete any timers used by this module */
@@ -488,7 +488,7 @@ unload_module (const char *modname, User * u)
 	/* Delete any sockets used by this module */
 	del_sockets (mod_ptr);
 	dlog(DEBUG1, "Deleting Module %s from Hash", modname);
-	globops (me.name, "%s Module Unloaded", modname);
+	irc_globops (NULL, "%s Module Unloaded", modname);
 	/* Remove from the module hash so we dont call events for this module 
 	 * during signoff 
 	 */

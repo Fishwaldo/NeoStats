@@ -269,7 +269,7 @@ void do_dns (void)
 		/* there was an error */
 		if (status) {
 			nlog (LOG_CRITICAL, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror (status));
-			chanalert (ns_botptr->nick, "Bad Error on DNS lookup. Please check logfile");
+			irc_chanalert (ns_botptr, "Bad Error on DNS lookup. Please check logfile");
 			SET_RUN_LEVEL(dnsdata->modptr);
 			DNSStats.failure++;
 			/* call the callback function with answer set to NULL */
@@ -348,10 +348,10 @@ void dns_check_queue() {
 }
 
 void do_dns_stats_Z(User *u) {
-	numeric (RPL_MEMSTATS, u->nick, "Active DNS queries: %d", (int) list_count(dnslist));
-	numeric (RPL_MEMSTATS, u->nick, "Queued DNS Queries: %d", (int) list_count(dnsqueue));
-	numeric (RPL_MEMSTATS, u->nick, "Max Queued Queries: %d", DNSStats.maxqueued);
-	numeric (RPL_MEMSTATS, u->nick, "Total DNS Questions: %d", DNSStats.totalq);
-	numeric (RPL_MEMSTATS, u->nick, "SuccessFull Lookups: %d", DNSStats.success);
-	numeric (RPL_MEMSTATS, u->nick, "Un-Successfull Lookups: %d", DNSStats.failure);
+	irc_numeric (RPL_MEMSTATS, u->nick, "Active DNS queries: %d", (int) list_count(dnslist));
+	irc_numeric (RPL_MEMSTATS, u->nick, "Queued DNS Queries: %d", (int) list_count(dnsqueue));
+	irc_numeric (RPL_MEMSTATS, u->nick, "Max Queued Queries: %d", DNSStats.maxqueued);
+	irc_numeric (RPL_MEMSTATS, u->nick, "Total DNS Questions: %d", DNSStats.totalq);
+	irc_numeric (RPL_MEMSTATS, u->nick, "SuccessFull Lookups: %d", DNSStats.success);
+	irc_numeric (RPL_MEMSTATS, u->nick, "Un-Successfull Lookups: %d", DNSStats.failure);
 }

@@ -75,17 +75,7 @@ ProtocolInfo protocol_info = {
 	/* Protocol options negotiated at link by this IRCd */
 	PROTOCOL_TOKEN,
 	/* Features supported by this IRCd */
-	FEATURE_SVSHOST \
-		| FEATURE_SMO \
-		| FEATURE_SWHOIS \
-		| FEATURE_SVSTIME \
-		| FEATURE_SVSJOIN \
-		| FEATURE_SVSPART \
-		| FEATURE_SVSMODE \
-		| FEATURE_SVSNICK \
-		| FEATURE_SVSKILL \
-		| FEATURE_BOTMODES \
-		| FEATURE_UMODECLOAK,
+	FEATURE_BOTMODES | FEATURE_UMODECLOAK,
 	"+oSq",
 	"+o",
 };
@@ -202,14 +192,10 @@ umode_init user_umodes[] = {
 	{0, 0},
 };
 
-umode_init user_smodes[] = {
-	{0, '0'},
-};
-
 void
-send_server (const char *sender, const char *name, const int numeric, const char *infoline)
+send_server (const char *source, const char *name, const int numeric, const char *infoline)
 {
-	send_cmd (":%s %s %s %d :%s", sender, MSGTOK(SERVER), name, numeric, infoline);
+	send_cmd (":%s %s %s %d :%s", source, MSGTOK(SERVER), name, numeric, infoline);
 }
 
 void
@@ -240,19 +226,19 @@ send_part (const char *who, const char *chan)
 }
 
 void 
-send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
+send_join (const char *who, const char *chan, const unsigned long ts)
 {
 	send_cmd (":%s %s %s", who, MSGTOK(JOIN), chan);
 }
 
 void 
-send_sjoin (const char *sender, const char *who, const char *chan, const unsigned long ts)
+send_sjoin (const char *source, const char *who, const char *chan, const unsigned long ts)
 {
-	send_cmd (":%s %s %lu %s + :%s", sender, MSGTOK(SJOIN), ts, chan, who);
+	send_cmd (":%s %s %lu %s + :%s", source, MSGTOK(SJOIN), ts, chan, who);
 }
 
 void 
-send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
+send_cmode (const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
 	send_cmd (":%s %s %s %s %s %lu", who, MSGTOK(MODE), chan, mode, args, ts);
 }
@@ -331,33 +317,33 @@ send_nickchange (const char *oldnick, const char *newnick, const unsigned long t
 }
 
 void
-send_swhois (const char *sender, const char *target, const char *swhois)
+send_swhois (const char *source, const char *target, const char *swhois)
 {
 	send_cmd ("%s %s :%s", MSGTOK(SWHOIS), target, swhois);
 }
 
 void 
-send_svsnick (const char *sender, const char *target, const char *newnick, const unsigned long ts)
+send_svsnick (const char *source, const char *target, const char *newnick, const unsigned long ts)
 {
 	send_cmd ("%s %s %s :%lu", MSGTOK(SVSNICK), target, newnick, ts);
 }
 
 void
-send_svsjoin (const char *sender, const char *target, const char *chan)
+send_svsjoin (const char *source, const char *target, const char *chan)
 {
 	send_cmd ("%s %s %s", MSGTOK(SVSJOIN), target, chan);
 }
 
 void
-send_svspart (const char *sender, const char *target, const char *chan)
+send_svspart (const char *source, const char *target, const char *chan)
 {
 	send_cmd ("%s %s %s", MSGTOK(SVSPART), target, chan);
 }
 
 void 
-send_kick (const char *who, const char *chan, const char *target, const char *reason)
+send_kick (const char *source, const char *chan, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s %s :%s", who, MSGTOK(KICK), chan, target, (reason ? reason : "No Reason Given"));
+	send_cmd (":%s %s %s %s :%s", source, MSGTOK(KICK), chan, target, (reason ? reason : "No Reason Given"));
 }
 
 void 
@@ -367,9 +353,9 @@ send_wallops (const char *who, const char *buf)
 }
 
 void
-send_svshost (const char *sender, const char *who, const char *vhost)
+send_svshost (const char *source, const char *who, const char *vhost)
 {
-	send_cmd (":%s %s %s %s", sender, MSGTOK(CHGHOST), who, vhost);
+	send_cmd (":%s %s %s %s", source, MSGTOK(CHGHOST), who, vhost);
 }
 
 void
@@ -379,28 +365,28 @@ send_invite (const char *from, const char *to, const char *chan)
 }
 
 void
-send_svsmode (const char *sender, const char *target, const char *modes)
+send_svsmode (const char *source, const char *target, const char *modes)
 {
-	send_cmd (":%s %s %s %s", sender, MSGTOK(SVSMODE), target, modes);
+	send_cmd (":%s %s %s %s", source, MSGTOK(SVSMODE), target, modes);
 }
 
 void 
-send_svskill (const char *sender, const char *target, const char *reason)
+send_svskill (const char *source, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s :%s", sender, MSGTOK(SVSKILL), target, reason);
+	send_cmd (":%s %s %s :%s", source, MSGTOK(SVSKILL), target, reason);
 }
 
 /* akill is gone in the latest Unreals, so we set Glines instead */
 void 
-send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
+send_akill (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
 {
-	send_cmd (":%s %s + G %s %s %s %lu %lu :%s", sender, MSGTOK(TKL), ident, host, setby, (ts + length), ts, reason);
+	send_cmd (":%s %s + G %s %s %s %lu %lu :%s", source, MSGTOK(TKL), ident, host, setby, (ts + length), ts, reason);
 }
 
 void 
-send_rakill (const char *sender, const char *host, const char *ident)
+send_rakill (const char *source, const char *host, const char *ident)
 {
-	send_cmd (":%s %s - G %s %s %s", sender, MSGTOK(TKL), ident, host, sender);
+	send_cmd (":%s %s - G %s %s %s", source, MSGTOK(TKL), ident, host, source);
 }
 
 void
@@ -422,9 +408,9 @@ send_globops (const char *from, const char *buf)
 }
 
 void 
-send_svstime (const char *sender, const unsigned long ts)
+send_svstime (const char *source, const unsigned long ts)
 {
-	send_cmd (":%s %s SVSTIME %lu", sender, MSGTOK(TSCTL), ts);
+	send_cmd (":%s %s SVSTIME %lu", source, MSGTOK(TSCTL), ts);
 }
 
 static void

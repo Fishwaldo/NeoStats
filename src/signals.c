@@ -55,7 +55,7 @@ serv_die (int signum)
 	exit(NS_SUCCESS);
 #else /* VALGRIND */
 	nlog (LOG_CRITICAL, msg_sigterm);
-	globops (ns_botptr->nick, msg_sigterm);
+	irc_globops (NULL, msg_sigterm);
 	do_exit (NS_EXIT_NORMAL, msg_sigterm);
 #endif /* VALGRIND */
 }
@@ -72,8 +72,8 @@ serv_die (int signum)
 RETSIGTYPE
 conf_rehash (int signum)
 {
-	chanalert (ns_botptr->nick, "SIGHUP received, attempting to rehash");
-	globops (me.name, "SIGHUP received, attempted to rehash");
+	irc_chanalert (ns_botptr, "SIGHUP received, attempting to rehash");
+	irc_globops (NULL, "SIGHUP received, attempted to rehash");
 	/* at the moment, the reshash just checks for a the SQL port is opened, if enabled */
 #ifdef SQLSRV
 	check_sql_sock();
@@ -121,10 +121,10 @@ void report_segfault(const char* modulename)
 {
 	segfault = fopen ("segfault.log", "a");
 	if(modulename) {
-		globops (me.name, "Segmentation fault in %s. Refer to segfault.log for details.", GET_CUR_MODNAME());
+		irc_globops (NULL, "Segmentation fault in %s. Refer to segfault.log for details.", GET_CUR_MODNAME());
 		nlog (LOG_CRITICAL, "Segmentation fault in %s. Refer to segfault.log for details.", GET_CUR_MODNAME());
 	} else {
-		globops (me.name, "Segmentation fault. Server terminating. Refer to segfault.log.");
+		irc_globops (NULL, "Segmentation fault. Server terminating. Refer to segfault.log.");
 		nlog (LOG_CRITICAL, "Segmentation fault. Server terminating. Refer to segfault.log.");
 	}
 	fprintf (segfault, "------------------------SEGFAULT REPORT-------------------------\n");
@@ -136,7 +136,7 @@ void report_segfault(const char* modulename)
 	}
 	fprintf (segfault, "Location: %s\n", segv_location);
 	fprintf (segfault, "recbuf:   %s\n", recbuf);
-	chanalert (ns_botptr->nick, "Location *could* be %s.", segv_location);
+	irc_chanalert (ns_botptr, "Location *could* be %s.", segv_location);
 	do_backtrace();
 	fprintf (segfault, "-------------------------END OF REPORT--------------------------\n");
 	fflush (segfault);
@@ -155,11 +155,11 @@ serv_segv (int signum)
 		strlcpy (name, GET_CUR_MODNAME(), MAX_MOD_NAME);
 		RunLevel = 0;
 		unload_module (name, NULL);
-		chanalert (ns_botptr->nick, "Restoring Stack to before Crash");
+		irc_chanalert (ns_botptr, "Restoring Stack to before Crash");
 		/* flush the logs out */
 		CloseLogs (); 
 		longjmp (sigvbuf, -1);
-		chanalert (ns_botptr->nick, "Done");
+		irc_chanalert (ns_botptr, "Done");
 		return;
 	}
 	/** segv happened in our core */

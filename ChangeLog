@@ -4,6 +4,13 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - IRCD feature support is now self configuring based on whether a function 
+   exists to handle a feature. This means less work for IRCd coders and allows
+   a protocol module to "emulate" a feature locally that would normally require
+   additional core support. (M)
+ - Mode processing code moved to modes.c/h (M)
+ - Module API inmprovements and core flow optimisations. Functions now pass 
+   valid bot and user pointers rather than looking them up multiple times. (M)
  - makeconf updated to reflect changes and some tidy ups (M)
  - Depreciate some useless config items from neostats.cfg:
    STATSERV_NETNAME - we do not use this and overwrite it when we get netinfo

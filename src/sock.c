@@ -1144,19 +1144,19 @@ list_sockets (CmdParams* cmdparams)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Sockets List: (%d)", (int)hash_count (sockethash));
+	irc_prefmsg (ns_botptr, cmdparams->source.user, "Sockets List: (%d)", (int)hash_count (sockethash));
 	hash_scan_begin (&ss, sockethash);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		sock = hnode_get (sn);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "%s:--------------------------------", sock->moduleptr->info->name);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Socket Name: %s", sock->name);
+		irc_prefmsg (ns_botptr, cmdparams->source.user, "%s:--------------------------------", sock->moduleptr->info->name);
+		irc_prefmsg (ns_botptr, cmdparams->source.user, "Socket Name: %s", sock->name);
 		if (sock->socktype == SOCK_STANDARD) {
-			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Socket Number: %d", sock->sock_no);
+			irc_prefmsg (ns_botptr, cmdparams->source.user, "Socket Number: %d", sock->sock_no);
 		} else {
-			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Poll Interface");
+			irc_prefmsg (ns_botptr, cmdparams->source.user, "Poll Interface");
 		}
 	}
-	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "End of Socket List");
+	irc_prefmsg (ns_botptr, cmdparams->source.user, "End of Socket List");
 	return 0;
 }
 

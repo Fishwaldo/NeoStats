@@ -61,7 +61,7 @@ const int proto_topiclen	= (512 + 1);
 
 ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
-	0,
+	PROTOCOL_SJOIN,
 	/* Protocol options negotiated at link by this IRCd */
 	PROTOCOL_UNKLN,
 	/* Features supported by this IRCd */
@@ -148,10 +148,6 @@ umode_init user_umodes[] = {
 	{0, 0},
 };
 
-umode_init user_smodes[] = {
-	{0, '0'},
-};
-
 void
 send_eob (const char *server)
 {
@@ -159,9 +155,9 @@ send_eob (const char *server)
 }
 
 void
-send_server (const char *sender, const char *name, const int numeric, const char *infoline)
+send_server (const char *source, const char *name, const int numeric, const char *infoline)
 {
-	send_cmd (":%s %s %s %d :%s", sender, MSG_SERVER, name, numeric, infoline);
+	send_cmd (":%s %s %s %d :%s", source, MSG_SERVER, name, numeric, infoline);
 }
 
 void
@@ -196,18 +192,13 @@ send_part (const char *who, const char *chan)
 }
 
 void 
-send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
+send_sjoin (const char *source, const char *who, const char *chan, const unsigned long ts)
 {
-	send_cmd (":%s %s %lu %s + :%s", sender, MSG_SJOIN, ts, chan, who);
+	send_cmd (":%s %s %lu %s + :%s", source, MSG_SJOIN, ts, chan, who);
 }
 
 void 
-send_sjoin (const char *sender, const char *who, const char *chan, const unsigned long ts)
-{
-}
-
-void 
-send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
+send_cmode (const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
 	send_cmd (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, ts);
 }
@@ -267,9 +258,9 @@ send_nickchange (const char *oldnick, const char *newnick, const unsigned long t
 }
 
 void 
-send_kick (const char *who, const char *chan, const char *target, const char *reason)
+send_kick (const char *source, const char *chan, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
+	send_cmd (":%s %s %s %s :%s", source, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
 }
 
 void 
@@ -292,18 +283,18 @@ send_svinfo (const int tscurrent, const int tsmin, const unsigned long tsnow)
 
 /* there isn't an akill on Hybrid, so we send a kline to all servers! */
 void 
-send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
+send_akill (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
 {
 	send_cmd (":%s %s * %lu %s %s :%s", setby, MSG_KLINE, length, ident, host, reason);
 }
 
 void 
-send_rakill (const char *sender, const char *host, const char *ident)
+send_rakill (const char *source, const char *host, const char *ident)
 {
 	if (ircd_srv.protocol&PROTOCOL_UNKLN) {
-		send_cmd(":%s %s %s %s", sender, MSG_UNKLINE, ident, host);
+		send_cmd(":%s %s %s %s", source, MSG_UNKLINE, ident, host);
 	} else {
-		chanalert (ns_botptr->nick, "Please Manually remove KLINES using /unkline on each server");
+		irc_chanalert (ns_botptr, "Please Manually remove KLINES using /unkline on each server");
 	}
 }
 
@@ -323,23 +314,6 @@ void
 send_globops (const char *from, const char *buf)
 {
 	send_cmd (":%s %s :%s", from, MSG_WALLOPS, buf);
-}
-
-void 
-send_svstime (const char *sender, const unsigned long ts)
-{
-}
-void 
-send_swhois (const char *sender, const char *target, const char *swhois)
-{
-}
-void 
-send_smo (const char *from, const char *umodetarget, const char *msg)
-{
-}
-void 
-send_svsmode (const char *sender, const char *target, const char *modes)
-{
 }
 
 /* from SJOIN unsigned long chan modes param:" */

@@ -260,6 +260,12 @@
 				RelativePath="..\..\src\misc.c">
 			</File>
 			<File
+				RelativePath="..\..\src\modes.c">
+			</File>
+			<File
+				RelativePath="..\..\src\modes.h">
+			</File>
+			<File
 				RelativePath="..\..\src\modules.c">
 			</File>
 			<File

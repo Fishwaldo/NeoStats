@@ -99,7 +99,7 @@ void ns_do_exclude_add(User *u, char *type, char *pattern) {
 	e->addedon = me.now;
 	if (!ircstrcasecmp("HOST", type)) {
 		if (!index(pattern, '.')) {
-			prefmsg(u->nick, ns_botptr->nick, "Error, Pattern must contain at least one \2.\2");
+			irc_prefmsg(ns_botptr, u, "Error, Pattern must contain at least one \2.\2");
 			sfree(e);
 			return;
 		}
@@ -107,7 +107,7 @@ void ns_do_exclude_add(User *u, char *type, char *pattern) {
 		strlcpy(e->pattern, collapse(pattern), MAXHOST);
 	} else if (!ircstrcasecmp("CHAN", type)) {
 		if (pattern[0] != '#') {
-			prefmsg(u->nick, ns_botptr->nick, "Error, Pattern must begin with a \2#\2");
+			irc_prefmsg(ns_botptr, u, "Error, Pattern must begin with a \2#\2");
 			sfree(e);
 			return;
 		}
@@ -115,22 +115,22 @@ void ns_do_exclude_add(User *u, char *type, char *pattern) {
 		strlcpy(e->pattern, collapse(pattern), MAXHOST);
 	} else if (!ircstrcasecmp("SERVER", type)) {
 		if (!index(pattern, '.')) {
-			prefmsg(u->nick, ns_botptr->nick, "Error, Pattern must contain at least one \2.\2");
+			irc_prefmsg(ns_botptr, u, "Error, Pattern must contain at least one \2.\2");
 			sfree(e);
 			return;
 		}
 		e->type = NS_EXCLUDE_SERVER;
 		strlcpy(e->pattern, collapse(pattern), MAXHOST);
 	} else {
-		prefmsg(u->nick, ns_botptr->nick, "Error, Unknown type %s", type);
+		irc_prefmsg(ns_botptr, u, "Error, Unknown type %s", type);
 		sfree(e);
 		return;
 	}
 	/* if we get here, then e is valid */
 	en = lnode_create(e);
 	list_append(exclude_list, en);
-	prefmsg(u->nick, ns_botptr->nick, "Successfully added %s (%s) to Exclusion List", e->pattern, type);
-	chanalert(u->nick, ns_botptr->nick, "%s added %s (%s) to the Exclusion List", u->nick, e->pattern, type);
+	irc_prefmsg(ns_botptr, u, "Successfully added %s (%s) to Exclusion List", e->pattern, type);
+	irc_chanalert(ns_botptr, "%s added %s (%s) to the Exclusion List", u->nick, e->pattern, type);
 
 	/* now save the exclusion list */
 	ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
@@ -153,7 +153,7 @@ void ns_do_exclude_del(User *u, char *position) {
 	
 	pos = atoi(position);
 	if (pos < 1) {
-		prefmsg(u->nick, ns_botptr->nick, "Error, Position %d is out of range", pos);
+		irc_prefmsg(ns_botptr, u, "Error, Position %d is out of range", pos);
 		return;
 	}
 	en = list_first(exclude_list);
@@ -163,7 +163,7 @@ void ns_do_exclude_del(User *u, char *position) {
 			e = lnode_get(en);
 			ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
 			DelRow("Exclusions", tmp);
-			prefmsg(u->nick, ns_botptr->nick, "Deleted %s out of Exclusion List", e->pattern);
+			irc_prefmsg(ns_botptr, u, "Deleted %s out of Exclusion List", e->pattern);
 			sfree(e);
 			list_delete(exclude_list, en);
 			lnode_destroy(en);
@@ -173,7 +173,7 @@ void ns_do_exclude_del(User *u, char *position) {
 		i++;
 	}
 	/* if we get here, means that we never got a match */
-	prefmsg(u->nick, ns_botptr->nick, "Entry %d was not found in the exclusion list", pos);
+	irc_prefmsg(ns_botptr, u, "Entry %d was not found in the exclusion list", pos);
 	
 } 
 
@@ -189,7 +189,7 @@ void ns_do_exclude_list(User *u, char *from) {
 	int i = 0;
 	char tmp[BUFSIZE];
 	
-	prefmsg(u->nick, from, "Global Exclusion List:");
+	irc_prefmsg(findbot(from), u, "Global Exclusion List:");
 	en = list_first(exclude_list);
 	i = 1;
 	while (en != NULL) {
@@ -209,11 +209,11 @@ void ns_do_exclude_list(User *u, char *from) {
 				break;
 		}
 				
-		prefmsg(u->nick, from, "%d) %s (%s) Added by %s on %s", i, e->pattern, tmp, e->addedby, sftime(e->addedon));
+		irc_prefmsg(findbot(from), u, "%d) %s (%s) Added by %s on %s", i, e->pattern, tmp, e->addedby, sftime(e->addedon));
 		i++;
 		en = list_next(exclude_list, en);
 	}
-	prefmsg(u->nick, from, "End of Global Exclude List.");
+	irc_prefmsg(findbot(from), u, "End of Global Exclude List.");
 } 
 
 /* @brief check if a user is matched against a exclusion

@@ -100,16 +100,16 @@ static int AccessAdd(CmdParams* cmdparams)
 		return NS_ERR_NEED_MORE_PARAMS;
 	}
 	if (hash_lookup(accesshash, cmdparams->av[0])) {
-		prefmsg(cmdparams->source.user->nick, NULL, "Entry for %s already exists", cmdparams->av[0]);
+		irc_prefmsg(NULL, cmdparams->source.user, "Entry for %s already exists", cmdparams->av[0]);
 		return NS_SUCCESS;
 	}
 	if (strstr(cmdparams->av[1], "!")&& !strstr(cmdparams->av[1], "@")) {
-		prefmsg(cmdparams->source.user->nick, NULL, "Invalid format for hostmask. Must be of the form nick!user@host.");
+		irc_prefmsg(NULL, cmdparams->source.user, "Invalid format for hostmask. Must be of the form nick!user@host.");
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	level = atoi(cmdparams->av[2]);
 	if(level < 0 || level > NS_ULEVEL_ROOT) {
-		prefmsg(cmdparams->source.user->nick, NULL, "Level out of range. Valid values range from 0 to 200.");
+		irc_prefmsg(NULL, cmdparams->source.user, "Level out of range. Valid values range from 0 to 200.");
 		return NS_ERR_PARAM_OUT_OF_RANGE;
 	}
 	access = malloc(sizeof(NeoAccess));
@@ -123,7 +123,7 @@ static int AccessAdd(CmdParams* cmdparams)
 	SetConf((void *)access->mask, CFGSTR, confpath);
 	ircsnprintf(confpath, CONFBUFSIZE, "AccessList/%s/level", access->nick);
 	SetConf((void *)access->level, CFGINT, confpath);
-	prefmsg(cmdparams->source.user->nick, NULL, "Successfully added %s for host %s with level %d to access list", access->nick, access->mask, access->level);
+	irc_prefmsg(NULL, cmdparams->source.user, "Successfully added %s for host %s with level %d to access list", access->nick, access->mask, access->level);
 	return NS_SUCCESS;
 }
 
@@ -142,9 +142,9 @@ static int AccessDel(CmdParams* cmdparams)
 		hnode_destroy(node);
 		ircsnprintf(confpath, CONFBUFSIZE, "AccessList/%s", cmdparams->av[0]);
 		DelConf(confpath);
-		prefmsg(cmdparams->source.user->nick, NULL, "Deleted %s from Access List", cmdparams->av[0]);
+		irc_prefmsg(NULL, cmdparams->source.user, "Deleted %s from Access List", cmdparams->av[0]);
 	} else {
-		prefmsg(cmdparams->source.user->nick, NULL, "Error, Could not find %s in access list.", cmdparams->av[0]);
+		irc_prefmsg(NULL, cmdparams->source.user, "Error, Could not find %s in access list.", cmdparams->av[0]);
 	}
 	return NS_SUCCESS;
 }
@@ -156,13 +156,13 @@ static int AccessList(CmdParams* cmdparams)
 	NeoAccess *access;
 
 	SET_SEGV_LOCATION();	
-	prefmsg(cmdparams->source.user->nick, NULL, "Access List (%d):", (int)hash_count(accesshash));
+	irc_prefmsg(NULL, cmdparams->source.user, "Access List (%d):", (int)hash_count(accesshash));
 	hash_scan_begin(&accessscan, accesshash);
 	while ((node = hash_scan_next(&accessscan)) != NULL) {
 		access = hnode_get(node);
-		prefmsg(cmdparams->source.user->nick, NULL, "%s %s (%d)", access->nick, access->mask, access->level);
+		irc_prefmsg(NULL, cmdparams->source.user, NULL, "%s %s (%d)", access->nick, access->mask, access->level);
 	}
-	prefmsg(cmdparams->source.user->nick, NULL, "End of List.");	
+	irc_prefmsg(NULL, cmdparams->source.user, "End of List.");	
 	return NS_SUCCESS;
 }
 
@@ -176,7 +176,7 @@ static int ea_cmd_access(CmdParams* cmdparams)
 	} else if (!strcasecmp(cmdparams->av[2], "list")) {
 		return AccessList(cmdparams);
 	}
-	prefmsg(cmdparams->source.user->nick, NULL, "Invalid Syntax.");
+	irc_prefmsg(NULL, cmdparams->source.user, "Invalid Syntax.");
 	return NS_ERR_SYNTAX_ERROR;
 }
 
@@ -248,7 +248,7 @@ static int ea_event_mode(CmdParams* cmdparams)
 				if (add) {
 					cmdparams->source.user->ulevel = GetAccessLevel(cmdparams->source.user);
 					dlog(DEBUG2, "SetAccessLevel for %s to %d", cmdparams->source.user->nick, cmdparams->source.user->ulevel);
-					chanalert (NULL, "%s granted access level %d", cmdparams->source.user->nick, cmdparams->source.user->ulevel);
+					irc_chanalert (NULL, "%s granted access level %d", cmdparams->source.user->nick, cmdparams->source.user->ulevel);
 					nlog (LOG_NORMAL, "%s granted access level %d", cmdparams->source.user->nick, cmdparams->source.user->ulevel);
 				}
 			}
