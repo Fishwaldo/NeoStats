@@ -65,9 +65,9 @@ extern const int ircd_cmodecount;
 extern long services_bot_umode;
 
 char* UmodeMaskToString(const long Umode);
-long UmodeStringToMask(const char* UmodeString);
+long UmodeStringToMask(const char* UmodeString, long Umode);
 char* SmodeMaskToString(const long Umode);
-long SmodeStringToMask(const char* UmodeString);
+long SmodeStringToMask(const char* UmodeString, long Smode);
 int init_services_bot (void);
 void ns_usr_motd (char *nick, char **argv, int argc);
 void ns_usr_admin (char *nick, char **argv, int argc);

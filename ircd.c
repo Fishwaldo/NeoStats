@@ -46,8 +46,7 @@ static char SmodeStringBuf[64];
 void
 init_ircd ()
 {
-	services_bot_umode = UmodeStringToMask(services_bot_modes);
-	nlog (LOG_NORMAL, LOG_CORE, "Services bot modes are %s %d",services_bot_modes, services_bot_umode);
+	services_bot_umode = UmodeStringToMask(services_bot_modes, 0);
 };
 
 /** @brief UmodeMaskToString
@@ -80,11 +79,10 @@ UmodeMaskToString(const long Umode)
  * @return 
  */
 long
-UmodeStringToMask(const char* UmodeString)
+UmodeStringToMask(const char* UmodeString, long Umode)
 {
 	int i;
 	int add = 0;
-	long Umode = 0;
 	char tmpmode;
 
 	/* Walk through mode string and convert to umode */
@@ -146,11 +144,10 @@ SmodeMaskToString(const long Smode)
  * @return 
  */
 long
-SmodeStringToMask(const char* SmodeString)
+SmodeStringToMask(const char* SmodeString, long Smode)
 {
 	int i;
 	int add = 0;
-	long Smode = 0;
 	char tmpmode;
 
 	/* Walk through mode string and convert to smode */
@@ -207,7 +204,7 @@ init_bot (char *nick, char *user, char *host, char *rname, const char *modes, ch
 		nlog (LOG_WARNING, LOG_CORE, "add_mod_user failed for module %s bot %s", mod_name, nick);
 		return NS_FAILURE;
 	}
-	Umode = UmodeStringToMask(modes);
+	Umode = UmodeStringToMask(modes, 0);
 	SignOn_NewBot (nick, user, host, rname, Umode);
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
@@ -242,7 +239,7 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 		nlog (LOG_WARNING, LOG_CORE, "add_mod_user failed for module %s bot %s", mod_name, nick);
 		return NULL;
 	}
-	Umode = UmodeStringToMask(modes);
+	Umode = UmodeStringToMask(modes, 0);
 	SignOn_NewBot (nick, user, host, rname, Umode);
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
@@ -581,7 +578,7 @@ init_services_bot (void)
 		strlcat (s_Services, "1", MAXNICK);
 	}
 	ircsnprintf (me.rname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
-	Umode = UmodeStringToMask(services_bot_modes);
+	Umode = UmodeStringToMask(services_bot_modes, 0);
 	SignOn_NewBot (s_Services, me.user, me.host, me.rname, Umode);
 	me.onchan = 1;
 	return NS_SUCCESS;

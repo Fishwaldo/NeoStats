@@ -576,7 +576,7 @@ UserMode (const char *nick, const char *modes)
 	AddStringToList (&av, (char *) modes, &ac);
 	ModuleEvent (EVENT_UMODE, av, ac);
 	free (av);
-	u->Umode = UmodeStringToMask(modes);
+	u->Umode = UmodeStringToMask(modes, u->Umode);
 	nlog (LOG_DEBUG1, LOG_CORE, "Modes for %s are now %p", u->nick, (int *)u->Umode);
 }
 
@@ -600,7 +600,7 @@ UserSMode (const char *nick, const char *modes)
 	AddStringToList (&av, (char *) modes, &ac);
 	ModuleEvent (EVENT_SMODE, av, ac);
 	free (av);
-	u->Smode = SmodeStringToMask(modes);
+	u->Smode = SmodeStringToMask(modes, u->Smode);
 	nlog (LOG_DEBUG1, LOG_CORE, "SMODE for %s is are now %p", u->nick, (int *)u->Smode);
 }
 #endif
