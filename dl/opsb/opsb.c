@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: opsb.c,v 1.13 2002/08/28 16:11:03 fishwaldo Exp $
+** $Id: opsb.c,v 1.14 2002/08/29 11:58:52 fishwaldo Exp $
 */
 
 
@@ -44,7 +44,7 @@ extern const char *opsb_help_exclude[];
 Module_Info my_info[] = { {
 	"OPSB",
 	"A Open Proxy Scanning Bot",
-	"$Revision: 1.13 $"
+	"$Revision: 1.14 $"
 } };
 
 
@@ -576,11 +576,11 @@ void loadcache() {
 		return;
 	}
 	fgets(buf, 512, fp);
-	snprintf(opsb.opmdomain, MAXHOST, "%s", buf);
+	snprintf(opsb.opmdomain, MAXHOST, "%s", strtok(buf, "\n"));
 	fgets(buf, 512, fp);
-	snprintf(opsb.targethost, MAXHOST, "%s", buf);
+	snprintf(opsb.targethost, MAXHOST, "%s", strtok(buf, "\n"));
 	fgets(buf, 512, fp);
-	snprintf(opsb.lookforstring, 512, "%s", buf);
+	snprintf(opsb.lookforstring, 512, "%s", strtok(buf, "\n"));
 	fgets(buf, 512, fp);
 	opsb.targetport = atoi(buf);
 	fgets(buf, 512, fp);
@@ -590,7 +590,7 @@ void loadcache() {
 	fgets(buf, 512, fp);
 	opsb.timedif = atoi(buf);
 	fgets(buf, 512, fp);
-	snprintf(opsb.scanmsg, 512, "%s", buf);
+	snprintf(opsb.scanmsg, 512, "%s", strtok(buf, "\n"));
 	fgets(buf, 512, fp);
 	opsb.bantime = atoi(buf);
 	fgets(buf, 512, fp);
