@@ -119,6 +119,9 @@
 /* enable neoircd support */
 #undef NEOIRCD
 
+/* enable Mystic support */
+#undef MYSTIC
+
 /* Version number of package */
 #undef VERSION
 

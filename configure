@@ -846,6 +846,7 @@ Optional Features:
  --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support
  --enable-hybrid7 - enable Hybrid7 IRCD Support
  --enable-neoircd - enable NeoIRCd IRCD Support
+ --enable-mystic - enabled Mystic IRCd 1.1.x Support
  --enable-auth=TYPE - what type of Authentication to use. See Readme File
  --enable-raw - Enable Raw command
  --enable-modules="MODULES" - space seperated list of modules to compile
@@ -5267,6 +5268,36 @@ echo "${ECHO_T}no" >&6
 
 fi;
 
+echo "$as_me:$LINENO: checking Whether to Enable Mystic 1.1.x IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Mystic 1.1.x IRCD Support...... $ECHO_C" >&6
+
+# Check whether --enable-mystic or --disable-mystic was given.
+if test "${enable_mystic+set}" = set; then
+  enableval="$enable_mystic"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define MYSTIC 1
+_ACEOF
+
+        IRCD_FILES_SRC="mystic.c"
+        IRCD_FILES_OBJS="mystic.o"
+        echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+        ;;
+  *)
+        echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+        ;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi;
+
+
+
 echo "$as_me:$LINENO: checking Whether to Enable NeoIRCd IRCD Support..." >&5
 echo $ECHO_N "checking Whether to Enable NeoIRCd IRCD Support...... $ECHO_C" >&6
 # Check whether --enable-neoircd or --disable-neoircd was given.
@@ -5315,6 +5346,10 @@ echo "${ECHO_T}yes" >&6
 	echo "http://www.neostats.net/boards"
 	echo "*******************************************************"
 	;;
+   "mystic.c")
+        echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+        ;;
    "neoircd.c")
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
