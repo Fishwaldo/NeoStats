@@ -762,15 +762,15 @@ bot_cmd_set_boolean (CmdParams *cmdparams, bot_setting* set_ptr)
 {
 	if (!ircstrcasecmp (cmdparams->av[1], "ON")) {
 		*(int*)set_ptr->varptr = 1;
-		if (set_ptr->confitem) {
-			DBAStoreConfigBool (set_ptr->confitem, set_ptr->varptr);
+		if (set_ptr->fieldname) {
+			DBAStoreConfigBool (set_ptr->fieldname, set_ptr->varptr);
 		}
 		bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 		return NS_SUCCESS;
 	} else if (!ircstrcasecmp (cmdparams->av[1], "OFF")) {
 		*(int*)set_ptr->varptr = 0;
-		if (set_ptr->confitem) {
-			DBAStoreConfigBool (set_ptr->confitem, set_ptr->varptr);
+		if (set_ptr->fieldname) {
+			DBAStoreConfigBool (set_ptr->fieldname, set_ptr->varptr);
 		}
 		bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 		return NS_SUCCESS;
@@ -803,8 +803,8 @@ bot_cmd_set_int (CmdParams *cmdparams, bot_setting* set_ptr)
 	}
 	/* Set the new value */
 	*(int*)set_ptr->varptr = intval;
-	if (set_ptr->confitem) {
-		DBAStoreConfigInt (set_ptr->confitem, set_ptr->varptr);
+	if (set_ptr->fieldname) {
+		DBAStoreConfigInt (set_ptr->fieldname, set_ptr->varptr);
 	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
@@ -814,8 +814,8 @@ static int
 bot_cmd_set_string (CmdParams *cmdparams, bot_setting* set_ptr)
 {
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	if (set_ptr->confitem) {
-		DBAStoreConfigStr (set_ptr->confitem, cmdparams->av[1], set_ptr->max);
+	if (set_ptr->fieldname) {
+		DBAStoreConfigStr (set_ptr->fieldname, cmdparams->av[1], set_ptr->max);
 	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
@@ -830,8 +830,8 @@ bot_cmd_set_channel (CmdParams *cmdparams, bot_setting* set_ptr)
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	if (set_ptr->confitem) {
-		DBAStoreConfigStr (set_ptr->confitem, cmdparams->av[1], set_ptr->max);
+	if (set_ptr->fieldname) {
+		DBAStoreConfigStr (set_ptr->fieldname, cmdparams->av[1], set_ptr->max);
 	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
@@ -844,8 +844,8 @@ bot_cmd_set_msg (CmdParams *cmdparams, bot_setting* set_ptr)
 
 	buf = joinbuf(cmdparams->av, cmdparams->ac, 1);
 	strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
-	if (set_ptr->confitem) {
-		DBAStoreConfigStr (set_ptr->confitem, buf, set_ptr->max);
+	if (set_ptr->fieldname) {
+		DBAStoreConfigStr (set_ptr->fieldname, buf, set_ptr->max);
 	}
 	bot_cmd_set_report (cmdparams, set_ptr, buf);
 	ns_free (buf);
@@ -861,8 +861,8 @@ bot_cmd_set_nick (CmdParams *cmdparams, bot_setting* set_ptr)
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	if (set_ptr->confitem) {
-		DBAStoreConfigStr (set_ptr->confitem, cmdparams->av[1], set_ptr->max);
+	if (set_ptr->fieldname) {
+		DBAStoreConfigStr (set_ptr->fieldname, cmdparams->av[1], set_ptr->max);
 	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
@@ -877,8 +877,8 @@ bot_cmd_set_user (CmdParams *cmdparams, bot_setting* set_ptr)
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	if (set_ptr->confitem) {
-		DBAStoreConfigStr (set_ptr->confitem, cmdparams->av[1], set_ptr->max);
+	if (set_ptr->fieldname) {
+		DBAStoreConfigStr (set_ptr->fieldname, cmdparams->av[1], set_ptr->max);
 	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
@@ -898,8 +898,8 @@ bot_cmd_set_host (CmdParams *cmdparams, bot_setting* set_ptr)
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	if (set_ptr->confitem) {
-		DBAStoreConfigStr (set_ptr->confitem, cmdparams->av[1], set_ptr->max);
+	if (set_ptr->fieldname) {
+		DBAStoreConfigStr (set_ptr->fieldname, cmdparams->av[1], set_ptr->max);
 	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;
@@ -912,8 +912,8 @@ bot_cmd_set_realname (CmdParams *cmdparams, bot_setting* set_ptr)
 
 	buf = joinbuf(cmdparams->av, cmdparams->ac, 1);
 	strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
-	if (set_ptr->confitem) {
-		DBAStoreConfigStr (set_ptr->confitem, buf, set_ptr->max);
+	if (set_ptr->fieldname) {
+		DBAStoreConfigStr (set_ptr->fieldname, buf, set_ptr->max);
 	}
 	bot_cmd_set_report (cmdparams, set_ptr, buf);
 	ns_free (buf);
@@ -929,8 +929,8 @@ bot_cmd_set_ipv4 (CmdParams *cmdparams, bot_setting* set_ptr)
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
-	if (set_ptr->confitem) {
-		DBAStoreConfigStr (set_ptr->confitem, cmdparams->av[1], set_ptr->max);
+	if (set_ptr->fieldname) {
+		DBAStoreConfigStr (set_ptr->fieldname, cmdparams->av[1], set_ptr->max);
 	}
 	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
 	return NS_SUCCESS;

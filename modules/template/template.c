@@ -36,11 +36,6 @@
  */
 static Bot *template_bot;
 
-/** When a module loads, it is passed a handle that includes information
- *  we might need later so you should store this.
- */
-static Module* template_module;
-
 /** 
  *  Example copyright text
  */
@@ -251,14 +246,16 @@ ModuleEvent module_events[] = {
 	{EVENT_NULL,	NULL}
 };
 
-/** Init module
- *  Required if you need to do initialisation of your module when
- *  first loaded
+/** @brief ModInit
+ *
+ *  Init module
+ *
+ *  @param pointer to our module structure
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 int ModInit (Module *mod_ptr)
 {
-	/* Save our module handle */
-	template_module = mod_ptr;
 	return NS_SUCCESS;
 }
 

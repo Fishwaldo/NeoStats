@@ -6,48 +6,43 @@
 ** Homepage: http://www.neostats.net/                                 **
 ************************************************************************
 
-How to Write a NeoStats Module, and not stuff it all up! Version 2.5.6
-----------------------------------------------------------------------
+How to write a NeoStats 3.0 Module
+----------------------------------
 
-This document explains how to write modules for NeoStats. 
-
-The module instructions apply to versions 2.5.6 and higher. For older 
-versions you must refer to the documentation which comes with that 
-version since older versions had a different API specification.
+This document explains how to write modules for NeoStats 3.0. These 
+instructions apply to versions 3.0 and higher. For older versions you 
+must refer to the documentation which comes with that version since they
+versions had a different API specification.
 
 This document also includes a section at the end for upgrading your
-modules to the improved system available in 2.5.6. The new system
-is backwards compatible with the 2.5.x system but since the old
-system will eventually be removed, we recommend uprading your module
-as soon as possible. 
+modules to 3.0 from 2.5.x. 
 
-Modules are not simple but we are trying to make the API as simple as 
-possible so that they are easy to write. We suggest you use the source 
-of other modules as examples as well as this document.
+NeoStats 3.0 has four types of module.
 
-2.5.x includes a feature that will help you with your modules. This 
-feature is aimed at all the bad coders out there that write buggy code. 
-Basically, if your module executes an instruction that would cause a 
-segfault, NeoStats will unload your modules and return itself to its 
-state before your module was called. But, it has one drawback, it can't
-handle buffer overflows and so on. It might detect a segfault in your 
-module, but if your module has been overflowing memory left right and 
-center, then chances are that NeoStats will still crash. If I can find 
-a solution to this problem (without copying the entire NeoStats memory 
-before each call) then I'll implement it. 
-
-So, you're feeling very very lucky, and want to write your own wiz bang
-Services? Ok... Get out the aspirin, cause this is going to be fun....
+1) General Modules. These are the type of module you will usually want 
+to develop and are discussed in this file.
+2) Authentication Modules. These provide authentication systems which
+define what users have access to NeoStats functions and are discussed
+in this file.
+3) Protocol modules. These allow NeoStats to talk to a given type of
+IRCd. For information on protocol modules see protocol.txt.
+4) DBA modules. These allow NeoStats to store and fetch data from a 
+given DBM. For information on DBA modules see dba.txt.
 
 -----------------------------------<>-----------------------------------
+
+What can modules do?
+--------------------
 
 Anything that the Server receives from users, or other servers can be
 intercepted by a module. This basically means that you can do what ever 
 you want in your modules. 
 
 In order to help you learn how to make a module, we have included an
-example basic module layout in template/template.c. We will use that
-file in our disucssion of how to setup the module.
+example basic module in template/template.c. The easiest way to start
+a module is to copy that file and add the features you want. For
+authentication modules use the file templateauth/templateauth.c as
+the starting point.
 
 -----------------------------------<>-----------------------------------
 First we must include the header file which gives our code access to the 
@@ -55,195 +50,216 @@ NeoStats API:
 
 #include "neostats.h"
 
-Next we have to export a definition which include specific information
-about our module. This is required.
+We must export a definition of specific information about the module. 
+This is required.
 
-ModuleInfo __module_info = {
-	"example",
-	"example Module Description",
-	"version 1.0"
+/** Module Info definition 
+ *	This describes the module to the NeoStats core and provides information
+ *  to end users when modules are queried.
+ *  The structure is required but some fields are optional.
+ */
+ModuleInfo module_info = {
+	/* REQUIRED: 
+	 * name of module e.g. StatServ */
+	"Template",
+	/* REQUIRED: 
+	 * one line brief description of module */
+	"Put your brief module description here",
+	/* OPTIONAL: 
+	 * pointer to a NULL terminated list with copyright information
+	 * NeoStats will automatically provide a CREDITS command to output this
+	 * use NULL for none */
+	template_copyright,
+	/* OPTIONAL: 
+	 * pointer to a NULL terminated list with extended description
+	 * NeoStats will automatically provide an ABOUT command to output this
+	 * use NULL for none */
+	template_about,
+	/* REQUIRED: 
+	 * version of neostats used to build module
+	 * must be NEOSTATS_VERSION or your module will not load */
+	NEOSTATS_VERSION,
+	/* REQUIRED: 
+	 * string containing version of module 
+	 * returned when a user requests 
+	 * /msg botname version */
+	"1.0",
+	/* REQUIRED: string containing build date of module 
+	 * should be __DATE__ */
 	__DATE__,
-	__TIME__
+	/* REQUIRED: string containing build time of module 
+	 * should be __TIME__ */
+	__TIME__,
+	/* OPTIONAL: 
+	 * Module control flags, 
+	 * use 0 if not needed */
+	0,
+	/* OPTIONAL: 
+	 * Protocol flags for required protocol specfic features e.g. SETHOST
+	 * use 0 if not needed */
+	0,
 };
-
-This structure contains:
-    module_name        - A string for the module name 
-                         (one word e.g. "example")
-    module_description - A string short description of the module
-						 (e.g. "My example module")
-    module_version	   - A string containing a version number
-                         (e.g. "1,0", "Version 1.0" etc) 
-    module_build_date  - The build date of the module. The macro 
-                         __DATE__ allows us to create this automatically
-    module_build_time  - The build time of the module. The macro 
-                         __TIME__ allows us to create this automatically
 
 This information is used to report back to users on what modules and 
 what versions are loaded and can be used by the core and other modules 
 to check that they are compatible.
 
-We also need to export a list of any responses to IRCd commands sent by 
-users to our modules that we wish to support e.g. /VERSION mymodule. This
-is optional. 
-
-******************************** WARNING ********************************
-This table is optional but depreciated. You should respond to module 
-events to be portable across all ircds and only use this table as a
-last resort if a module event is not available. This table will be 
-removed from operation in a future release. If you need to use this 
-table for anything, tell us so we can add an appropiate event handler.
-******************************** WARNING ********************************
-
-NeoStats, and many IRCD's use tokens now, and the strings differ between
-IRCds so a hard coded string such as "VERSION" might not always work. 
-For easy CrossIRCD support, we provide macros for all the available 
-commands such as MSG_VERSION and TOK_VERSION. These will make your module 
-more portable if you wish to release it. e.g.
-
-Functions __module_functions[] = {
-	{MSG_VERSION, new_m_version, 1}	,
-#ifdef GOTTOKENSUPPORT
-	{TOK_VERSION, new_m_version, 1}	,
-#endif
-	{NULL, NULL, 0}
-};
-
-The table entries are:
-    - the server command you want to respond to (e.g. MSG_VERSION)
-    - the function to call when this happens (e.g. new_m_version)
-    - Flag to say whether to process 
-        only local server commands (0) or 
-        network commands (1)
-
-Each function in this table is passed 2 variables: char **av and int ac. 
-av is a array containing the parsed command, ac contains the number of
-elements.
-
-The array must be NULL terminated, so set the final command and function
-fields to NULL and the flag to 0. 
-
 We can also have a table for any events on IRC that we wish to process. 
 This is optional.
 
-EventFnList __module_events[] = {
-	{ EVENT_ONLINE, 	Online},
-	{ NULL, 	NULL}
+/** Module event list
+ *  What events we will act on
+ *  This is required if you want your module to respond to events on IRC
+ *  see events.h for a list of all events available
+ */
+ModuleEvent module_events[] = {
+	{EVENT_NULL,	NULL}
 };
 
-The table contains the event we want to process (e.g. ONLINE) and the 
-function to call when it happens (e.g. Online). Events signify both
-server actions (e.g. the ONLINE event is triggered when NeoStats 
-connects to the network) and user actions (e.g. SIGNON is triggered when
-a user joins the network).
+The table contains the event we want to process (e.g. SIGNON) and the 
+function to call when it happens (e.g. MySignonHandler). Events are 
+raised for both server and user actions.
 
-The array must be NULL terminated with both event string and function 
-fields set to NULL.
+The table must be NULL terminated with the event field set to EVENT_NULL
+and the function field set to NULL.
 
-We provide macros for each event which are listed with descriptions and
-available parameters in "events.h". The header file is automatically 
-included by "stats.h" so you do not need to worry about including it in
-your module.
+Descriptions of all available events and their parameters are listed in
+"events.h". The header file is automatically included by "neostats.h" 
+so you do not need to include it in your module.
 
------------------------------------<>-----------------------------------
-Although that is all you need for a working module, there are a number
-of other functions to further extend your module's capability.
+There are also three specialist functions that a module must define:
 
-__ModInit is called when a module is first loaded so can be used to 
+ModInit is called when a module is first loaded so can be used to 
 initialise settings for your module. It must not be used to start
 anything which will try to send commands to the IRC network such
 as starting a bot since you may not be connected to a network when
 this function is called. It is mainly useful for processing 
 configuration and starting databases.
 
-int __ModInit(int modnum, int apiver)
+/** @brief ModInit
+ *
+ *  Init module
+ *
+ *  @param pointer to our module structure
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+int ModInit (Module *mod_ptr)
 {
-	if(apiver<API_VER)
-	    return -1;
-	s_my_bot_name = "NeoBot";
-	return 1;
+	return NS_SUCCESS;
 }
 
-The function is passed two parameters
-    - the module number ...
-    - the api version. You should use this to check that your module is
-      compatible with the version of NeoStats loading your module using 
-      the api version. The API_VER value is used to determine this.
-You should return 1 for success or -1 one for failure (for example the
-api version is incompatible. 
+The function is passed a pointer to the module structure.
 
-__ModFini is called when a module is unloaded so is useful for saving
+ModSynch is called when your module is able to send over IRC so is
+where you would init a bot if you wanted one.
+
+/** @brief ModSynch
+ *
+ *  Startup handler
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModSynch (void)
+{
+	/* Introduce a bot onto the network saving the bot handle */
+	template_bot = AddBot (&template_bot_info);
+	if (!template_bot) {
+		return NS_FAILURE;
+	}
+	return NS_SUCCESS;
+}
+
+ModFini is called when a module is unloaded so is useful for saving
 databases.
 
-void __ModFini()
+/** @brief ModFini
+ *
+ *  Fini handler
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void ModFini (void)
 {
+}
+
+NeoStats provides an API to send commands over IRC. These are designed
+to mimic the way you send commands on IRC as a user to make them
+intuitive to use but must be sent from a bot you have created.
+
+To create a bot, you must define a definition describing the bot:
+
+/** Define information about our bot
+ */
+BotInfo template_bot_info = 
+{
+	/* REQUIRED: 
+	 * nick */
+	"changeme",
+	/* OPTIONAL: 
+	 * altnick, use "" if not needed */
+	"altnick",
+	/* REQUIRED: 
+	 * user */
+	"changeme",
+	/* REQUIRED: 
+	 * host that this bot will use 
+	 * for the neostats host, use BOT_COMMON_HOST */
+	BOT_COMMON_HOST,
+	/* REQUIRED: 
+	 * realname */
+	"Example NeoStats module",
+	/* OPTIONAL: 
+	 * flags */
+	0, 
+	/* OPTIONAL: 
+	 * bot command list pointer, use NULL if not needed */
+	template_commands, 
+	/* OPTIONAL: 
+	 * bot command setting pointer, use NULL if not needed */
+	template_settings,
 };
 
------------------------------------<>-----------------------------------
-You cannot use commands like "NICK" and "PRIVMSG" and "NOTICE" are 
-handled through specific NeoStats calls. Following are functions that 
-you will use to talk to the network and register bots on it.
+You then pass this structure to NeoStats with the AddBot function 
+call in your ModSynch function:
 
-init_bot allows you to create and initialize a bot to introduce for your
-module. This is the only way to reguster your bot on the network. 
+	/* Introduce a bot onto the network saving the bot handle */
+	template_bot = AddBot (&template_bot_info);
 
-    init_bot(nick, ident, hostname, realname, modes, 
-        __module_info.module_name);
+You bot can now issue commands on IRC as if it was a user but using
+the irc_command functions. E.g. if you want your bot to join a 
+channel you would use the irc_join function. 
 
-init bot will return 1 on success, or -1 if there is a failure. A 
-failure might be that the nickname already exists on the network, 
-in which case, you would have to try a different nickname.
+	irc_join (template_bot, "#channelname", "");
 
-bot_nick_change is used to change the nickname used for your bot.
-
-    bot_nick_change(currentnick, newnick);
-
-The function will return 1 on success, or -1 if the nickname is already 
-registered on the network.
-
-del_bot allows you to remove your bot from the network. 
-
-    del_bot(nick, reason);
-    
-The function will returns 1 on success or -1 otherwise for example if 
-you try to delete a nickname that isn't registered, 
-
-__Bot_Message is called whenever a message is sent to your bot, e.g.
-/msg yourbotname or /notice yourbotname.
-
-     int __Bot_Message(char *origin, char **av, int ac)
-
-The parameters are as follows:
-     
-     origin - who sent the message to you. It could be a user nickname 
-              or could be a server message
-     av     - an array of the message, starting with the bots name. 
-              So the message: 
-                  /msg NeoStats Help would be:
-                  av[0] = "NeoStats";
-                  av[1] = "help";
-     ac     - the number of elements in the array. 
-              (e.g. the above would be 2)
-
-You can process any custom commands for your bot inside this function
-e.g. to process /msg yourbotname help, you would check av[1] for the 
-string "help" and perform whatever task you desire.
+A full list of available irc functions are found in "neostats.h".
 
 -----------------------------------<>-----------------------------------
-Timers are available to register for your module.
+Timers are available for your module. There are several types of timer
+you can choose from. 
 
 To add a timer:
 
-    add_mod_timer(function name, timername, 
-        __module_info.module_name, interval);
+	AddTimer( type, func, name, interval );
 
-    function name - the function you want to trigger when this timer 
-                    is triggered
-    timername     - a descriptive name of the timer
-    module_name   - must be the same as that defined in your ModuleInfo
-                    structure so we recommend you use 
-                    __module_info.module_name
-    interval      - interval in seconds that this function is to be 
-                    called. 
+    type     - Type of timer from
+			   TIMER_TYPE_INTERVAL
+			   TIMER_TYPE_MIDNIGHT
+			   TIMER_TYPE_DAILY
+			   TIMER_TYPE_WEEKLY
+			   TIMER_TYPE_MONTHLY
+			   TIMER_TYPE_COUNTDOWN	   
+    func     - the function you want to trigger when this timer 
+               is triggered
+    name     - a descriptive name of the timer
+    interval - interval in seconds that this function is to be 
+               called (TIMER_TYPE_INTERVAL and TIMER_TYPE_COUNTDOWN). 
                     
 Note, this interval is not precise. NeoStats will check the timers and 
 if at least interval has passed, will call your routine. Since NeoStats 
@@ -254,14 +270,10 @@ interval of 60 seconds might be called after 65 seconds.
 
 To delete a timer:
 
-    int del_mod_timer(timername)
+    int DelTimer( name )
 
-    timername     - the name the timer created with in add_mod_timer
+    name     - the name the timer created with in AddTimer
 
-
------------------------------------<>-----------------------------------
-TODO:
-int __Chan_Message(char *origin, char **argv, int argc)
 
 -----------------------------------<>-----------------------------------
 TODO:
@@ -269,143 +281,10 @@ Sockets. They can make outgoing tcp connections to other servers (i.e.,
 web, email, etc)
 
 -----------------------------------<>-----------------------------------
-TODO:
-Call other functions in other modules.
+Upgrading modules from 2.5.x to 3.0
+-----------------------------------
 
------------------------------------<>-----------------------------------
-TODO:
-Document any other APIs for modules, kptool etc.
-
------------------------------------<>-----------------------------------
-Caveats:
-
-Not every platform supporting dynamic libraries so we are working on 
-support for static libraries but that might take a while. For now, if 
-your host does not support dynamic libraries, we suggest that you try to
-find one that does if you really want to run NeoStats.
-
-Don't bug me about it...
-
------------------------------------<>-----------------------------------
-Upgrading modules from 2.5.x to 2.5.6
--------------------------------------
-
-Although we retain backwards compatibility with the original 2.5.x API,
-we will eventually only support the newer API so you should upgrade 
-your module to use the new system. This is quite quick and easy to do.
-
-1) Module Info:
-
-Old System:
-
-const char exversion_date[] = __DATE__;
-const char exversion_time[] = __TIME__;
-
-Module_Info my_info[] = { {
-	"example",
-	"example Module Description",
-	"version 1.0"
-} };
-
-Module_Info *__module_get_info() {
-	return my_info;
-}
-
-New System:
-
-1) rename your info structure to be exactly as follows:
-ModuleInfo __module_info = {
-	"example",
-	"example Module Description",
-	"version 1.0"
-	__DATE__,
-	__TIME__
-};
-2) Delete the function __module_get_info since it is not longer needed.
-3) Change all occurences of exversion_date and exversion_time to 
-__module_info.module_build_date and __module_info.module_build_time 
-4) Change all references to my_info[0] to be __module_info
-
-2) Module functions:
-
-Old System:
-
-Functions my_fn_list[] = {
-	{ "VERSION",	new_m_version,	1 },
-	{ NULL,		NULL,		0 }
-};
-
-Functions *__module_get_functions() {
-	return my_fn_list;
-};
-
-New System:
-
-1) rename your Functions structure as follows:
-Functions __module_functions[] = {
-	{ "VERSION",	new_m_version,	1 },
-	{ NULL,		NULL,		0 }
-};
-2) Delete the function __module_get_functions since it is not longer 
-needed.
-
-3) Events:
-
-Old System:
-
-EventFnList my_event_list[] = {
-	{ NULL, 	NULL}
-};
-
-EventFnList *__module_get_events() {
-	return my_event_list;
-};
-
-New System:
-
-1) rename your Events structure as follows:
-EventFnList __module_events[] = {
-	{ NULL,		NULL,		0 }
-};
-2) Delete the function __module_get_events since it is not longer 
-needed.
-
-4) _init and _fini
-
-These were optional functions in the original system so you may not have
-them. If you do, please update as follows:
-
-Old System:
-
-void _init() 
-{
-}
-void _fini() 
-{
-}
-
-New System:
-
-1) replace _init with 
-
-int __ModInit(int modnum, int apiver)
-{
-	if(apiver<API_VER)
-	    return -1;
-	return 1;
-}
-
-You should include a check for the apiver and fail if your module was 
-compiled with a different version using the define as in the example.
-return 1 for success or -1 one for any failure.
-
-2)  replace _fini with 
-
-void __ModFini()
-{
-};
-
-That is all you need to do to update to the 2.5.6 module API. 
+TODO
 
 -----------------------------------<>-----------------------------------
 That's about it. 
@@ -413,14 +292,11 @@ That's about it.
 The module API is constantly reviewed and is updated and added to from 
 time to time. We try to maintain backwards compatibility where it is 
 possible for a short time after we make any major changes. Your modules
-should always work with all releases of the 2.5.x series, but you may 
-find that in version 2.6, you have to make a few changes to support
-new features and API changes.
+should always work with all releases of the 3.0 series.
 
 If you have any questions, comments or suggestions about our module API
 or this document, please post on our message boards at www.neostats.net. 
 
 ************************************************************************
-** This document was last updated on October 8th, 2003 by M and is    **
-** based on documents originally created by Fish.                     **
+** This document was last updated on October 20th, 2004 by M and is   **
 ************************************************************************
