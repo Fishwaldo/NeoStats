@@ -1,0 +1,31 @@
+include ../Makefile.inc
+
+INCLUDES = -I.. -I../keeper/ -I../adns/ -DHAVE_CONFIG_H 
+
+KP_SOURCES= kp_exp.c kp_imp.c kptool.c
+KP_OBJECTS= kp_exp.o kp_imp.o kptool.o
+all:	kptool @build_configtool@
+
+utils:  kptool @build_configtool@
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDES) -c $<
+kptool:	$(KP_OBJECTS)
+	$(CC) $(KP_OBJECTS) ../adns/libadns.a ../keeper/libkeeper.a -o $@
+
+configtool:
+	(cd cfgtool; $(MAKE) $@)
+
+clean:
+	(cd cfgtool; $(MAKE) $@)
+	/bin/rm -rf *.o *.lo *.so *.a kptool Makefile
+
+install: 
+
+
+
+
+$(OBJECTS): Makefile ../Makefile.inc
+kp_exp.c:	../keeper/libkeeper.a ../config.h
+kp_imp.c:	../keeper/libkeeper.a ../config.h
+kptool.c:	../keeper/libkeeper.a ../config.h

@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.34 2003/04/03 14:42:54 fishwaldo Exp $
+# $Id: Makefile.in,v 1.35 2003/04/08 13:23:43 fishwaldo Exp $
 # makefile originally created by Andy Church.
 include Makefile.inc 
 
@@ -20,14 +20,14 @@ BUILDFILES = configure *.in adns/Makefile adns/config.h.in dl/Makefile dl/module
 DISTFILES = $(INCLUDES) $(SRCS) $(DATA) $(DOCS) $(DOCS_PROGS) $(CONF) $(BUILDFILES) adns/*.c adns/adns.h adns/dlist.h  adns/internal.h  adns/tvarith.h
  
 distdir = @PACKAGE@-@VERSION@
-SUBDIRS = doc data adns logs
-DISTMOD = cs extauth hostserv loveserv ms spam statserv version
+SUBDIRS = doc data adns logs keeper tools tools/configtool
+DISTMOD = cs extauth hostserv loveserv ms spam statserv version 
 
 .c.o:
 	$(CC) $(NEOINCLUDES) $(CFLAGS) -c $< 
 
 
-all: 	libadns.a neostats modules
+all: 	libadns.a libkeeper.a neostats modules utils
 
 modules:
 	(cd dl; $(MAKE) $@)
@@ -35,15 +35,22 @@ modules:
 libadns.a:
 	(cd adns; $(MAKE) $@)
 
+libkeeper.a:
+	(cd keeper; $(MAKE) $@)
+
+utils:
+	(cd tools; $(MAKE) $@)
 
 clean:
 	(cd dl; $(MAKE) $@)
 	(cd adns; $(MAKE) $@)
-	/bin/rm -rf *.o neostats *.cache Makefile config.status config.h  Makefile.inc *.log *.a
+	(cd keeper; $(MAKE) $@)
+	(cd tools; $(MAKE) $@)
+	/bin/rm -rf *.o neostats *.cache Makefile config.h  Makefile.inc *.log *.a
 
 
 neostats: $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) adns/libadns.a -o $@
+	$(CC) $(LDFLAGS) $(OBJS) adns/libadns.a keeper/libkeeper.a -o $@
 
 install: neostats modules
 	$(INSTALL) -m 755 -d @prefix@
