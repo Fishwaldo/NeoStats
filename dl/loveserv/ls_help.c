@@ -24,103 +24,111 @@
 */
 
 const char *ls_help[] = {
-	"\2LoveServ Help\2",
+	"The following commands can be used with LoveServ",
 	"",
-	"Commands:",
-	"     ROSE       KISS     TONSIL     HUG       ADMIRER",
-	"     CHOCOLATE  CANDY    LOVENOTE   APOLOGY",
-	"     THANKYOU   VERSION",
+	"    ABOUT       About LoveServ",
+	"    ROSE        Give someone a rose",
+	"    KISS        Give someone a kiss",
+	"    TONSIL      Give someone a tonsil kiss",
+	"    HUG         Give someone a hug",
+	"    ADMIRER     Tell someone they have a secret admirer",
+	"    CHOCOLATE   Give someone chocolate",
+	"    CANDY       Give someone candy",
+	"    LOVENOTE    Give someone a lovenote",
+	"    APOLOGY     Give someone an apology",
+	"    THANKYOU    Give someone a thank you",
+	"    VERSION     Display version info",
+	NULL
+};
+
+const char *ls_help_on_help[] = {
 	"",
-	"For Additional Help on each command type:",
-	"EXAMPLE: /msg LoveServ HELP ROSE",
-	"",
+	"To use a command, type",
+	"    \2/msg LoveServ command\2",
+	"For for more information on a command, type", 
+	"    \2/msg LoveServ HELP command\2.",
+	NULL
+};
+
+const char *ls_help_about[] = {
+	"\2LoveServ\2 is a fun module to send presents and ",
+	"messages to loved ones on IRC.",
 	NULL
 };
 
 const char *ls_help_rose[] = {
-	"\2LoveServ Help : ROSE",
+	"Syntax: \2ROSE <NICK>\2",
 	"",
 	"Send a rose to a loved one on IRC.",
-	"\2SYNTAX:\2 /msg LoveServ ROSE NICK",
-	"",
 	NULL
 };
 
 const char *ls_help_kiss[] = {
-	"\2LoveServ Help: KISS",
-	"Send a kiss to that special someone on IRC.",
-	"\2SYNTAX:\2 /msg LoveServ KISS NICK",
+	"Syntax: \2KISS <NICK>\2",
 	"",
+	"Send a kiss to that special someone on IRC.",
 	NULL
 };
 
 const char *ls_help_tonsil[] = {
-	"\2LoveServ Help: TONSIL",
-	"Send a deep tonsil penitrating kiss to someone on IRC.",
-	"\2SYNTAX:\2 /msg LoveServ TONSIL NICK",
+	"Syntax: \2TONSIL <NICK>\2",
 	"",
+	"Send a deep tonsil penitrating kiss to someone on IRC.",
 	NULL
 };
 
 const char *ls_help_hug[] = {
-	"\2LoveServ HELP: HUG",
-	"Send a hug to someone on IRC.",
-	"\2SYNTAX:\2 /msg LoveServ HUG NICK",
+	"Syntax: \2HUG <NICK>\2",
 	"",
+	"Send a hug to someone on IRC.",
 	NULL
 };
 
 const char *ls_help_admirer[] = {
-	"\2LoveServ HELP: ADMIRER",
-	"Tell someone on IRC they have a SECRET Admirer!",
-	"\2SYNTAX:\2 /msg LoveServ ADMIRER NICK",
+	"Syntax: \2ADMIRER <NICK>\2",
 	"",
+	"Tell someone on IRC they have a SECRET Admirer!",
 	NULL
 };
 
 const char *ls_help_chocolate[] = {
-	"\2LoveServ HELP: CHOCOLATE",
-	"Send a big yummy box of candy to someone on IRC.",
-	"\2SYNTAX:\2 /msg LoveServ CHOCOLATE NICK",
+	"Syntax: \2CHOCOLATE <NICK>\2",
 	"",
+	"Send a big yummy box of candy to someone on IRC.",
 	NULL
 };
 
 const char *ls_help_candy[] = {
-	"\2LoveServ HELP: CANDY",
-	"Send someone a box of yummy heart shaped candies",
-	"\2SYNTAX:\2 /msg LoveServ CANDY NICK",
+	"Syntax: \2CANDY <NICK>\2",
 	"",
+	"Send someone a box of yummy heart shaped candies",
 	NULL
 };
 
 const char *ls_help_lovenote[] = {
-	"\2LoveServ HELP: LOVENOTE",
-	"Send that special someone a love note.",
-	"\2SYNTAX:\2 /msg LoveServ LOVENOTE NICK I love you dearly.",
+	"Syntax: \2LOVENOTE <NICK> I love you dearly.\2",
 	"",
+	"Send that special someone a love note.",
 	NULL
 };
 
 const char *ls_help_apology[] = {
-	"\2LoveServ HELP: APOLOGY",
-	"Send an Apology to someone",
-	"\2SYNTAX:\2 /msg LoveServ APOLOGY NICK deleting all those songs",
+	"Syntax: \2APOLOGY <NICK> deleting all those songs\2",
 	"",
+	"Send an Apology to someone",
 	NULL
 };
 
 const char *ls_help_thankyou[] = {
-	"\2LoveServ HELP: THANKYOU",
-	"Send a THANKYOU message to someone",
-	"\2SYNTAX:\2 /msg LoveServ THANKYOU NICK uploading those songs",
+	"Syntax: \2THANKYOU <NICK> uploading those songs\2",
 	"",
+	"Send a THANKYOU message to someone",
 	NULL
 };
 
 const char *ls_help_version[] = {
-	"\2LoveServ HELP: VERSION",
-	"Show LoveServ's current version",
+	"Syntax: \2VERSION\2",
 	"",
+	"Show LoveServ's current version",
 	NULL
 };

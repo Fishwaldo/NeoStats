@@ -33,7 +33,7 @@
 const char loveversion_date[] = __DATE__;
 const char loveversion_time[] = __TIME__;
 char *s_LoveServ;
-extern const char *ls_help[];
+
 static void ls_rose(User * u, char *cmd);
 static void ls_kiss(User * u, char *cmd);
 static void ls_tonsil(User * u, char *cmd);
@@ -46,8 +46,6 @@ static void ls_apology(User * u, char *cmd, char *m);
 static void ls_thankyou(User * u, char *cmd, char *m);
 static void ls_version(User * u);
 static int new_m_version(char *origin, char **av, int ac);
-
-void lslog(char *, ...);
 
 Module_Info my_info[] = { {
 			   "LoveServ",
@@ -84,6 +82,10 @@ int __Bot_Message(char *origin, char **av, int ac)
 	if (!strcasecmp(av[1], "HELP")) {
 		if (ac <= 2) {
 			privmsg_list(u->nick, s_LoveServ, ls_help);
+			privmsg_list(u->nick, s_LoveServ, ls_help_on_help);
+			return 1;
+		} else if (!strcasecmp(av[2], "ABOUT")) {
+			privmsg_list(u->nick, s_LoveServ, ls_help_about);
 			return 1;
 		} else if (!strcasecmp(av[2], "ROSE")) {
 			privmsg_list(u->nick, s_LoveServ, ls_help_rose);
@@ -126,7 +128,10 @@ int __Bot_Message(char *origin, char **av, int ac)
 				"Unknown Help Topic: \2%s\2", av[2]);
 	}
 
-	if (!strcasecmp(av[1], "ROSE")) {
+	if (!strcasecmp(av[1], "ABOUT")) {
+		privmsg_list(u->nick, s_LoveServ, ls_help_about);
+		return 1;
+	} else if (!strcasecmp(av[1], "ROSE")) {
 		if (ac < 3) {
 			prefmsg(u->nick, s_LoveServ,
 				"Syntax: /msg %s ROSE NICK", s_LoveServ);
