@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.66 2003/09/12 16:52:26 fishwaldo Exp $
+** $Id: dl.c,v 1.67 2003/09/17 14:49:55 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -541,16 +541,8 @@ load_module (char *path1, User * u)
 	} else {
 		do_msg = 1;
 	}
-#if 0
-	snprintf (path, 255, "%s.so", path1);
-	dl_handle = dlopen (path, RTLD_NOW || RTLD_GLOBAL);
-	if (!dl_handle) {
-#endif
-		snprintf (p, 255, "dl/%s.so", path1);
-		dl_handle = dlopen (p, RTLD_NOW || RTLD_GLOBAL);
-#if 0
-	}
-#endif
+	snprintf (p, 255, "dl/%s.so", path1);
+	dl_handle = dlopen (p, RTLD_NOW || RTLD_GLOBAL);
 	strcpy (segvinmodule, "");
 	if (!dl_handle) {
 		if (do_msg)

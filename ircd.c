@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.138 2003/08/19 13:08:13 fishwaldo Exp $
+** $Id: ircd.c,v 1.139 2003/09/17 14:49:55 fishwaldo Exp $
 */
 #include <setjmp.h>
 #include "stats.h"
@@ -178,13 +178,6 @@ split_buf (char *buf, char ***argv, int colon_special)
 			argvsize += 8;
 			*argv = realloc (*argv, sizeof (char *) * argvsize);
 		}
-#if 0
-		if ((colon_special == 1) && (*buf == ':')) {
-			(*argv)[argc++] = buf + 1;
-			buf = "";
-			flag = 1;
-		}
-#endif
 		if ((*buf == ':') && (colcount < 1)) {
 			buf++;
 			colcount++;

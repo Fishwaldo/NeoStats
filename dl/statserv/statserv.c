@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.71 2003/09/12 16:52:26 fishwaldo Exp $
+** $Id: statserv.c,v 1.72 2003/09/17 14:49:55 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -1143,7 +1143,6 @@ static void ss_botlist(User * origuser)
 			prefmsg(origuser->nick, s_StatServ,
 				"[%2d] %-15s %s", j, u->nick,
 				u->server->name);
-			continue;
 		}
 	}
 	prefmsg(origuser->nick, s_StatServ, "End of Listing.");

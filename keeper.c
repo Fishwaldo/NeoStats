@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: keeper.c,v 1.14 2003/09/15 10:39:39 fishwaldo Exp $
+** $Id: keeper.c,v 1.15 2003/09/17 14:49:55 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -62,9 +62,6 @@ GetConf (void **data, int type, const char *item)
 	}
 	/* check for errors */
 	if (i != 0) {
-/*
-		data = malloc(255);
-*/
 		nlog (LOG_DEBUG1, LOG_CORE, "GetConf: %s - Path: %s", kp_strerror (i), keypath);
 		return -1;
 	}
@@ -200,9 +197,6 @@ GetData (void **data, int type, const char *table, const char *row, const char *
 	}
 	/* check for errors */
 	if (i != 0) {
-/*
-		data = malloc(255);
-*/
 		nlog (LOG_DEBUG1, LOG_CORE, "GetData: %s - Path: %s", kp_strerror (i), keypath);
 		return -1;
 	}

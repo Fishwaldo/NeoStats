@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Bahamut.c,v 1.5 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: Bahamut.c,v 1.6 2003/09/17 14:49:55 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -323,14 +323,6 @@ spong_cmd (const char *reply)
 	return 1;
 }
 
-#if 0
-int
-snetinfo_cmd ()
-{
-	sts (":%s %s 0 %d %d %s 0 0 0 :%s", me.name, MSG_SNETINFO, time (NULL), ircd_srv.uprot, ircd_srv.cloak, me.netname);
-	return 1;
-}
-#endif
 int
 skill_cmd (const char *from, const char *target, const char *reason, ...)
 {
@@ -947,9 +939,6 @@ SignOn_NewBot (const char *nick, const char *user, const char *host, const char 
 	snewnick_cmd (nick, user, host, rname, Umode);
 	if ((me.allbots > 0) || (Umode & UMODE_SERVICES)) {
 		sjoin_cmd (nick, me.chan, MODE_CHANOP);
-#if 0
-		schmode_cmd (nick, me.chan, "+o", nick);
-#endif
 		/* all bots join */
 	}
 	return 1;

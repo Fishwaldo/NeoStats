@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.40 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: sock.c,v 1.41 2003/09/17 14:49:55 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -227,39 +227,6 @@ recvlog (char *line)
 		fprintf (logfile, "%s", line);
 	fclose (logfile);
 }
-
-#if 0
-
-void
-log (char *fmt, ...)
-{
-	va_list ap;
-	FILE *logfile;
-	char buf[512], fmtime[80];
-	time_t tmp = time (NULL);
-
-	va_start (ap, fmt);
-	vsnprintf (buf, 512, fmt, ap);
-
-	strftime (fmtime, 80, "%H:%M[%m/%d/%Y]", localtime (&tmp));
-
-
-	if ((logfile = fopen ("logs/neostats.log", "a")) == NULL)
-		return;
-
-	if (logfile)
-		fprintf (logfile, "(%s) %s\n", fmtime, buf);
-
-#ifdef DEBUG
-	fprintf (stderr, "(%s) %s\n", fmtime, buf);
-#endif
-
-	fclose (logfile);
-
-	va_end (ap);
-}
-
-#endif
 
 char *
 sctime (time_t stuff)

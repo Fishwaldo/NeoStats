@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: neoircd.c,v 1.23 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: neoircd.c,v 1.24 2003/09/17 14:49:55 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -460,11 +460,6 @@ int
 sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
 {
 	/* there isn't a akill on Hybrid, so we send a kline to all servers! */
-#if 0
-	hscan_t ss;
-	hnode_t *sn;
-	Server *s;
-#endif
 
 	va_list ap;
 	char buf[512];
