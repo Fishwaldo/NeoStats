@@ -1458,7 +1458,7 @@ load_module (char *modfilename, User * u)
 	nlog (LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, mod_ptr->info->module_name);
 
 	/* Module side user authentication for SecureServ helpers */
-	mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "__ModInit");
+	mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "__ModuleAuth");
 
 	/* call __ModInit (replacement for library __init() call */
 	ModInit = ns_dlsym ((int *) dl_handle, "__ModInit");

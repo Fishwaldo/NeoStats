@@ -724,7 +724,7 @@ parse (char *line)
 	strlcpy (recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
-	nlog (LOG_DEBUG1, LOG_CORE, "================================================================");
+	nlog (LOG_DEBUG1, LOG_CORE, "--------------------------BEGIN PARSE---------------------------");
 	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
 	coreLine = strpbrk (line, " ");
 	if (coreLine) {
@@ -732,9 +732,6 @@ parse (char *line)
 		while (isspace (*++coreLine));
 	} else
 		coreLine = line + strlen (line);
-/*	nlog (LOG_DEBUG1, LOG_CORE, "coreLine %s ", coreLine); */
-/*	nlog (LOG_DEBUG1, LOG_CORE, "line %s", line); */
-/*	nlog (LOG_DEBUG1, LOG_CORE, "================================================================"); */
 	if ((!ircstrcasecmp(line, "SERVER")) || (!ircstrcasecmp(line, "PASS"))) {
 		strlcpy(cmd, line, sizeof(cmd));
 		nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
@@ -769,7 +766,7 @@ parse (char *line)
 	}
 
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	nlog (LOG_DEBUG1, LOG_CORE, "================================================================");
+	nlog (LOG_DEBUG1, LOG_CORE, "---------------------------END PARSE----------------------------");
 	if(av) free (av);
 }
 
@@ -786,6 +783,10 @@ ircu_m_private (char *origin, char **argv, int argc, int srv)
 		av0 = argv[0];
 	} else {
 		av0 = base64tonick(argv[0]);
+		/* In case a real nick came through*/
+		if(av0 == NULL) {
+			av0 = argv[0];
+		}
 	}
 	
 	AddStringToList (&av, av0, &ac);
@@ -808,6 +809,10 @@ ircu_m_notice (char *origin, char **argv, int argc, int srv)
 		av0 = argv[0];
 	} else {
 		av0 = base64tonick(argv[0]);
+		/* In case a real nick came through*/
+		if(av0 == NULL) {
+			av0 = argv[0];
+		}
 	}
 	
 	AddStringToList (&av, av0, &ac);

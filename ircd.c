@@ -677,6 +677,7 @@ parse (char *line)
 	strlcpy (recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
+	nlog (LOG_DEBUG1, LOG_CORE, "--------------------------BEGIN PARSE---------------------------");
 	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
 	if (*line == ':') {
 		coreLine = strpbrk (line, " ");
@@ -701,8 +702,12 @@ parse (char *line)
 		coreLine = line + strlen (line);
 	}
 	strlcpy (cmd, line, sizeof (cmd)); 
+	nlog (LOG_DEBUG1, LOG_CORE, "origin: %s", origin);
+	nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
+	nlog (LOG_DEBUG1, LOG_CORE, "args  : %s", coreLine);
 	ac = splitbuf (coreLine, &av, 1);
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
+	nlog (LOG_DEBUG1, LOG_CORE, "---------------------------END PARSE----------------------------");
 	free (av);
 }
 #endif
