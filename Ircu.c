@@ -346,7 +346,7 @@ send_umode (const char *who, const char *target, const char *mode)
 void 
 send_numeric (const char *from, const int numeric, const char *target, const char *buf)
 {
-	send_cmd (":%s %d %s :%s", from, numeric, target, buf);
+	send_cmd ("%s %d %s :%s", neonumericbuf, numeric, getnumfromnick(target), buf);
 }
 
 void
