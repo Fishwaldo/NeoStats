@@ -28,7 +28,7 @@
 #include "stats.h"
 
 const char ns_help_help_oneline[]="Provides Help on Commands";
-const char ns_level_help_oneline[]="Show your permission level for NeoStats.";
+const char ns_level_help_oneline[]="Show permission level for NeoStats.";
 const char ns_info_help_oneline[]="Stats info on NeoStats.";
 const char ns_version_help_oneline[]="Show NeoStats version information.";
 const char ns_shutdown_help_oneline[]="Shutdown NeoStats";
@@ -61,10 +61,12 @@ const char *ns_help_on_help[] = {
 
 
 const char *ns_level_help[] = {
-	"Syntax: \2LEVEL\2",
+	"Syntax: \2LEVEL [nick]\2",
 	"",
 	"Show your permission level for NeoStats.",
 	"This may range from 0 (lowest) to 200 (highest).",
+	"Optional nick parameter allows you to see the level",
+	"for another user",
 	NULL
 };
 

@@ -20,7 +20,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Added services_bot_modes to each IRCd. This should contain the required ircd specific modes for a services bot (M)
  - fix a bug with statserv map (F)
  - Output channel related data in daily and network information on HTML page for statserv (F)
- - Added change_mod_timer_interval function to update timer interval for an existing timer (F)
+ - Added change_mod_timer_interval function to update timer interval for an existing timer (M)
+ - Added optional parameter to level command to lookup level of another user (M)
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.8
  - strncpy replaced by strlcpy - faster and safer (M)

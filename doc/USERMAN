@@ -193,7 +193,7 @@ privilege levels to users.
 HELP           Display help
 INFO           Stats Info on NeoStats and uptime.
 VERSION        Shows you the current NeoStats Version.
-LEVEL          Show you your Permission Level for NeoStats.
+LEVEL          Show Permission Level for NeoStats.
 SHUTDOWN       Shutdown NeoStats.
 RELOAD         Force NeoStats to Reload Itself.
 LOAD           Load a Module.
@@ -250,13 +250,16 @@ Example:
 2.3.4 LEVEL
 -----------
 Syntax: 
-    /msg NeoStats LEVEL
+    /msg NeoStats LEVEL [nick]
 Description: 
     Allows you to see your permissions level with regards NeoStats. 
     0 is lowest, 200 is highest, you could be anywhere in between!
     Available to users if ONLY_OPERS not set
+    The optional nick parameter allows you to see the level of another
+    user.
 Example:
     /msg NeoStats LEVEL
+    /msg NeoStats LEVEL somenick
 
 2.3.5 SHUTDOWN
 --------------
