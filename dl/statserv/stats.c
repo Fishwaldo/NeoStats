@@ -146,12 +146,14 @@ int load_client_versions(void)
 	
 	input = fopen("data/ssversions.dat", "rb");
 	if(input) {
+		clientv = malloc(sizeof(CVersions));
+		fread(clientv, sizeof(CVersions), 1, input);	
 		while(!feof(input)) {
-			clientv = malloc(sizeof(CVersions));
-			fread(clientv, sizeof(CVersions), 1, input);	
 			node = lnode_create(clientv);
 			list_append(Vhead, node);
 			nlog(LOG_DEBUG2, LOG_MOD, "Loaded version %s", clientv->name);
+			clientv = malloc(sizeof(CVersions));
+			fread(clientv, sizeof(CVersions), 1, input);	
 		}
 		fclose(input);
 	}
