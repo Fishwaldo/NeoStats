@@ -38,7 +38,7 @@ void chk()
 	if (current - ping.last_sent > 60) {
 		TimerPings();
 		ping.last_sent = time(NULL);
-		if (hash_verify(sh) == 0) {
+		if (hash_verify(sockh) == 0) {
 			log("Eeeek, Corruption of the socket hash");
 		}
 		if (hash_verify(mh) == 0) {

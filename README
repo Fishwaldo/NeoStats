@@ -1,7 +1,55 @@
-NeoStats 2.0.11
+NeoStats 2.5.0
 ~~~~~~~~~~~~~~~
 
-Ok.. we are FINALLY out of beta :) w00t!
+Installation:
+-------------
+The configure script has been changed compared to the old 2.0.x 
+releases and you must now make sure you supply the right arguments
+to configure.
+
+What is required:
+-----------------
+IRCD Support:
+	To specify the IRCD you are compiling for. eg:
+	--enable-unreal		for UnrealIRCD
+	--enable-ultimate 	for UltimateIRCD
+
+What is optional:
+-----------------
+Privledge System:
+	Originally, NeoStats was based on Operator Flags on a network.
+	If you had TechAdmin on Unreal, you were basically allowed full control to
+	Neostats.
+	The Currently available options are:
+	--enable-auth=IRCD 	This is the same as the old NeoStats, using User Flags on a network.
+	--enable-auth=ROOT 	This enables ServiceRoots, which have to be defined in the stats.cfg file. Read the docs in /docs/ for more information
+	--enable-auth=EXT 	This is a special option for some modules that can provide privledge system to NeoStats (Upcomming services will use this)
+	Default is IRCD
+
+Modules Support:
+	NeoStats has a expanding set of modules. Some Modules have their own --enable options, while other modules do not.
+	The Current Modules that can be enabled directly include:
+	--enable-statserv 	Enables the statserv module
+	--enable-spam		Enables the Spam Module
+	--enable-icq		Enables the ICQ Module (Work in progress)
+	--enable-version	A API Example. No practical use on a network.
+	--enable-netinfo	Enable the Netinfo Module
+	--enable-services	Enable Services
+	--enable-loveserv	Enables LoveServ
+
+	NeoStats also comes with many additional Modules, and many more can be downloaded from out site. A example is the scriptserv module
+	To enable a module at compile time (or multiple modules) use the following option:
+	--enable-modules="scriptserv cs"
+	
+	Defaults are StatServ and Spam
+
+Debuging:
+	Most users will never look at this option. It compiles NeoStats
+	with debuging turned on. I would only suggest using this if you have
+	problems are are about to fill out a bug form.
+	--enable-debug		Enables Debugging
+
+
 
 
 Module Status:

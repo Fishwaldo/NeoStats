@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.10 2002/02/28 07:54:13 fishwaldo Exp $
+** $Id: sock.c,v 1.11 2002/02/28 10:33:10 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -58,7 +58,7 @@ void read_loop()
 		TimeOut.tv_sec = 1;
 		TimeOut.tv_usec = 0;
 		FD_SET(servsock, &readfds);
-		hash_scan_begin(&ss, sh);
+		hash_scan_begin(&ss, sockh);
 		while ((sn = hash_scan_next(&ss)) != NULL) {
 			mod_sock = hnode_get(sn);
 			FD_SET(mod_sock->sock_no, &readfds);
@@ -83,7 +83,7 @@ void read_loop()
 					}
 				} else {
 				/* this checks if there is any data waiting on a socket for a module */
-					hash_scan_begin(&ss, sh);
+					hash_scan_begin(&ss, sockh);
 					while ((sn = hash_scan_next(&ss)) != NULL) {
 						mod_sock = hnode_get(sn);
 						if (FD_ISSET(mod_sock->sock_no, &readfds)) {

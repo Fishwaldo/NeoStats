@@ -25,7 +25,7 @@ void __init_mod_list() {
 	mh = hash_create(NUM_MODULES, 0, 0);
 	bh = hash_create(B_TABLE_SIZE, 0, 0);
 	th = hash_create(T_TABLE_SIZE, 0, 0);
-	sh = hash_create(MAX_SOCKS, 0, 0);
+	sockh = hash_create(MAX_SOCKS, 0, 0);
 };
 
 static Mod_Timer *new_timer(char *timer_name)
@@ -128,11 +128,11 @@ static Sock_List *new_sock(char *sock_name)
 		sock_name="";
 	s->sockname = sock_name;	
 	sn = hnode_create(s);
-	if (hash_isfull(sh)) {
+	if (hash_isfull(sockh)) {
 		log("Eeek, SocketHash is full, can not add a new socket");
 		return NULL;
 	} else {
-		hash_insert(sh, sn, sock_name);
+		hash_insert(sockh, sn, sock_name);
 	}
 	return s;
 }
@@ -140,7 +140,7 @@ static Sock_List *new_sock(char *sock_name)
 Sock_List *findsock(char *sock_name) {
 	hnode_t *sn;
 	segv_location = sstrdup("findsock");
-	sn = hash_lookup(sh, sock_name);
+	sn = hash_lookup(sockh, sock_name);
 	if (sn) return hnode_get(sn);
 	return NULL;
 }
@@ -169,13 +169,13 @@ int del_socket(char *sock_name) {
 	hnode_t *sn;
 	segv_location = sstrdup("del_mod_timer");
 	
-	sn = hash_lookup(sh, sock_name);
+	sn = hash_lookup(sockh, sock_name);
 	if (sn) {
 		list = hnode_get(sn);
 #ifdef DEBUG
 		log("Unregistered Socket function %s from Module %s", sock_name, list->modname);
 #endif
-		hash_delete(sh, sn);
+		hash_delete(sockh, sn);
 		hnode_destroy(sn);
 		free(list);
 		return 1;
@@ -189,8 +189,8 @@ void list_sockets(User *u) {
 	hnode_t *sn;
 
 	segv_location = sstrdup("list_sockets");
-	privmsg(u->nick,s_Services,"Sockets List: (%d)", hash_count(sh));
-	hash_scan_begin(&ss, sh);
+	privmsg(u->nick,s_Services,"Sockets List: (%d)", hash_count(sockh));
+	hash_scan_begin(&ss, sockh);
 	while ((sn = hash_scan_next(&ss)) != NULL) {
 		mod_ptr = hnode_get(sn);
 		privmsg(u->nick,s_Services,"%s:--------------------------------",mod_ptr->modname);
@@ -450,6 +450,7 @@ int load_module(char *path1, User *u) {
 	mod_ptr->other_funcs = event_fn_ptr;
 
 	/* Let this module know we are online if we are! */
+printf("%d\n", me.onchan);
 	if (me.onchan == 1) {
 		while (event_fn_ptr->cmd_name != NULL ) {
 			if (!strcasecmp(event_fn_ptr->cmd_name, "ONLINE")) {
@@ -555,7 +556,7 @@ int unload_module(char *module_name, User *u) {
 		}
 	}
 	/* check if the module had a socket registered... */
-	hash_scan_begin(&hscan, sh);
+	hash_scan_begin(&hscan, sockh);
 	while ((modnode = hash_scan_next(&hscan)) != NULL) {
 		mod_sock = hnode_get(modnode);
 		if (!strcasecmp(mod_sock->modname, module_name)) {
@@ -577,7 +578,7 @@ int unload_module(char *module_name, User *u) {
 	/* Unlock .so Module File to 755 Permissions */
 	/* Shmad Perscribes 666 */
 	modnme = fopen("Mod-Name.tmp","w");
-	fprintf(modnme, "%s", mod_ptr->modname);
+	fprintf(modnme, "%s", module_name);
 	fclose(modnme);
 
 	getmname = fopen("Mod-Name.tmp", "r");
@@ -609,16 +610,20 @@ int unload_module(char *module_name, User *u) {
 
 	modnode = hash_lookup(mh, module_name);
 	if (modnode) {
+#ifdef DEBUG
+		log("Deleting Module %s from ModHash", module_name);
+#endif
 		list = hnode_get(modnode);
-		dlclose(list->dl_handle);
 		hash_delete(mh, modnode);
 		hnode_destroy(modnode);
+		dlclose(list->dl_handle);
 		free(list);
 		return 1;
-	}
-	if (u) {
-		privmsg(u->nick,s_Services,"Couldn't Find Module  %s Loaded, Try /msg %s modlist",module_name,s_Services);
-		notice(s_Services,"%s tried to Unload %s but its not loaded",u->nick,module_name);
+	} else {
+		if (u) {
+			privmsg(u->nick,s_Services,"Couldn't Find Module  %s Loaded, Try /msg %s modlist",module_name,s_Services);
+			notice(s_Services,"%s tried to Unload %s but its not loaded",u->nick,module_name);
+		}
 	}
 	return -1;
 }

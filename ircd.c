@@ -411,6 +411,7 @@ void init_ServBot()
 	sts(":%s MODE %s +o %s",me.name,me.chan,s_Services);
 	sts(":%s MODE %s +a %s",s_Services,me.chan,s_Services);
 	UserMode(s_Services, ":+Sqd"); 
+	me.onchan = 1;
 	Module_Event("SIGNON", finduser(s_Services));
 }
 

@@ -25,7 +25,7 @@ struct sock_list_struct {
 	long rbytes;
 };
 typedef struct sock_list_struct Sock_List;
-hash_t *sh;
+hash_t *sockh;
 
 struct mod_timer_list {
 	long hash;

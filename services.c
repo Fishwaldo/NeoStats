@@ -134,10 +134,11 @@ void servicesbot(char *nick, char *line) {
 			return;
 		}
 		rval = unload_module(cmd,u);
-		if (!rval) { 
+		if (rval) { 
 			notice(s_Services,"%s Unloaded Module %s", u->nick, cmd);
 		} else {
 			notice(s_Services,"%s Tried to Unload the Module %s, but that does not exist", u->nick, cmd);
+			privmsg(s_Services, u->nick, "Module %s does not exist. Try modlist", cmd);
 		}
 	} else if (!strcasecmp(cmd, "MODBOTLIST")) {
 		if (!(UserLevel(u) >= 180)) {

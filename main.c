@@ -118,19 +118,17 @@ RETSIGTYPE conf_rehash() {
 RETSIGTYPE serv_segv() {
 	char name[30];
 
-	if (segvinmodule) {
+	if (strlen(segvinmodule) > 1) {
 		log("Uh Oh, Segmentation Fault in Modules Code %s", segvinmodule);
 		log("Unloading Module and restoring stacks");
 		globops(me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
-		notice(me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
+		notice(s_Services, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
 		strcpy(name, segvinmodule);
 		strcpy(segvinmodule, "");
-#ifndef DEBUG
 		unload_module(name, NULL);
+		notice(s_Services, "Restoring Stack to before Crash");
 		longjmp(sigvbuf, -1);
-#else
-		exit(-1);
-#endif
+		notice(s_Services, "Done");
 	} else {	
 		/* Thanks to Stskeeps and Unreal for this stuff :) */
 		log("Uh Oh, Segmentation Fault.. Server Terminating");

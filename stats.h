@@ -144,7 +144,6 @@ struct chans_ {
 
 
 struct server_ {
-	Server *next, *prev;
 	char name[MAXHOST];
 	int hops;
 	long hash;
@@ -155,7 +154,6 @@ struct server_ {
 };
 
 struct user_ {
-	User *next, *prev;
 	char nick[MAXNICK];
 	char hostname[BUFSIZE];
 	char username[BUFSIZE];
@@ -177,13 +175,6 @@ struct ping {
 } ping;
 
 
-struct myuser_ {
-	MyUser *next;
-	char username[BUFSIZE];
-	char password[BUFSIZE];
-	time_t lastseen;
-	unsigned int ison : 1;
-};
 
 /* sock.c */
 extern int ConnectTo(char *, int);
