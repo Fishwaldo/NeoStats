@@ -140,7 +140,9 @@ int new_m_version(char *origin, char **av, int ac) {
 
 Functions my_fn_list[] = {
         { MSG_VERSION,  new_m_version,  1 },
+#ifdef HAVE_TOKEN_SUP
         { TOK_VERSION,  new_m_version,  1 },
+#endif
 	{ NULL,		NULL,		0 }
 };
 
@@ -166,7 +168,11 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 			tmp = strtok(NULL, "");
 			if (!tmp) { 
 				/* show Settings */
+#ifndef HYBRID7
 				if (u->Umode & UMODE_REGNICK) {
+#else
+				if (1) {
+#endif
 					for (ignore = nickignore; ignore; ignore = ignore->next) {
 						if (fnmatch(ignore->nick, strlower(u->nick),0) == 0) {
 							/* got a nick Match */
@@ -225,7 +231,11 @@ int __Bot_Message(char *origin, char *coreLine, int type)
 			if (!tmp2) {
 				prefmsg(u->nick, s_Netinfo, "Incorrect Syntax");
 				return 1;
+#ifndef HYBRID7
 			} else if (u->Umode & UMODE_REGNICK) {
+#else
+			} else if (1) {
+#endif
 				if (!strcasecmp(tmp2, "ON")) {
 					prefmsg(u->nick, s_Netinfo, "Not Done yet");
 				} else if (!strcasecmp(tmp2, "OFF")) {

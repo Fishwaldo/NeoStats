@@ -58,3 +58,18 @@
   #define INVISIBLE_MODE 'I'
   #define BOT_MODE 'B'
 #endif
+
+#ifdef HYBRID7
+  #define LOCOP_MODE 'O'
+  #define OPER_MODE 'o'
+  #define GUESTADMIN_MODE '7'		/* Set to a number we dont use */
+  #define COSERVERADMIN_MODE '1'
+  #define SERVERADMIN_MODE 'a'
+  #define CONETADMIN_MODE '8'		/* Set to a number we dont use */
+  #define NETADMIN_MODE '6'
+  #define TECHADMIN_MODE '9'
+  #define SERVICESADMIN_MODE '5'
+  #define NETSERVICE_MODE '4'
+  #define INVISIBLE_MODE '3'
+  #define BOT_MODE '2'
+#endif

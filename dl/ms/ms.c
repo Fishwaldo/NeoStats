@@ -56,7 +56,9 @@ int new_m_version(char *origin, char **av, int ac) {
 
 Functions my_fn_list[] = {
         { MSG_VERSION,  new_m_version,  1 },
+#ifdef HAVE_TOKEN_SUP
         { TOK_VERSION,  new_m_version,  1 },
+#endif
 	{ NULL,        NULL,        0 }
 };
 

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.15 2002/07/31 05:54:53 fishwaldo Exp $
+** $Id: spam.c,v 1.16 2002/08/18 03:17:32 fishwaldo Exp $
 */
 
 
@@ -30,7 +30,9 @@ int new_m_version(char *origin, char **av, int ac) {
 
 Functions my_fn_list[] = {
 	{ MSG_VERSION,	new_m_version,	1 },
+#ifdef HAVE_TOKEN_SUP
 	{ TOK_VERSION,	new_m_version,	1 },
+#endif
 	{ NULL,		NULL,		0 }
 };
 	/* a easter egg for all the Neo users */

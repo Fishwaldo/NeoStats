@@ -2,6 +2,8 @@
 #define HYBRID7_H
 
 
+
+
 #define MSG_EOB		"EOB"		/* end of burst */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define MSG_WHO		"WHO"		/* WHO  -> WHOC */
@@ -190,7 +192,7 @@
 #define MODE_HIDEOPS	0x2000
 #define MODE_INVEX	0x4000
 
-#define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
+#define is_hidden_chan(x) ((x) && (x->modes & MODE_SECRET))
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
 
 

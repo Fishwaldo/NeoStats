@@ -27,7 +27,9 @@ Module_Info extauth_Info[] = { {
 
 Functions ServiceRoots_fn_list[] = { 
     { MSG_VERSION,    new_m_version,    1 },
+#ifdef HAVE_TOKEN_SUP
     { TOK_VERSION,    new_m_version,    1 },
+#endif
     { NULL,        NULL,     0}
 };
 
@@ -105,7 +107,12 @@ void sr_cb_config(char *arg, int configtype) {
 	
 extern int __do_auth(User *u, int curlvl) {
 	lnode_t *un;
+#ifndef HYBRID7
 	if (u->Umode & UMODE_REGNICK) {
+#else
+	/* this is *baaaaaaaaaaad* */
+	if (1) {
+#endif
 		un = list_first(srconf.ul);
 		while (un) {
 			if (!strcasecmp(u->nick, lnode_get(un))) {

@@ -1,6 +1,9 @@
 #ifndef ULTIMATE_H
 #define ULTIMATE_H
 
+/* we support tokens */
+#define HAVE_TOKEN_SUP
+
 
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"		/* 33 */

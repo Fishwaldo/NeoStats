@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.19 2002/08/08 16:25:48 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.20 2002/08/18 03:17:31 fishwaldo Exp $
  */
 
 
@@ -28,7 +28,8 @@
 
 
 
-
+/* we have token support */
+#define HAVE_TOKEN_SUP
 
 
 
@@ -385,7 +386,7 @@
 
 
 #define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
-#define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP))
+#define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
 
 
 struct ircd_srv_ {

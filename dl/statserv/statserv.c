@@ -45,7 +45,9 @@ Module_Info Statserv_Info[] = { {
 
 Functions StatServ_fn_list[] = { 
 	{ MSG_VERSION,	new_m_version,	1 },
+#ifdef HAVE_TOKEN_SUP
 	{ TOK_VERSION,	new_m_version,	1 },
+#endif
 	{ NULL,		NULL,	 0}
 };
 
@@ -762,6 +764,8 @@ static void ss_botlist(User *origuser)
 				if (u->Umode & UMODE_BOT) {
 #elif ULTIMATE
 		if ((u->Umode & UMODE_RBOT) || (u->Umode & UMODE_SBOT)) {
+#elif HYBRID7
+		if (0) {
 #endif
 					j++;
 						prefmsg(origuser->nick, s_StatServ, "[%2d] %-15s %s",j, u->nick, u->server->name);

@@ -12,6 +12,15 @@
 #include "stats.h"
 #include "hs_help.c"
 
+
+
+/* hostserv doesn't work on Hybrid, Echo a error and exit the compile */
+#ifdef HYBRID7
+#error "Error: Hybrid7 doesn't support changing a users host. This module will not compile"
+#endif
+
+
+
 const char hsversion_date[] = __DATE__;
 const char hsversion_time[] = __TIME__;
 char *s_HostServ;
@@ -95,7 +104,9 @@ return 1;
 
 Functions HostServ_fn_list[] = { 
     { MSG_VERSION,  new_m_version,  1 },
+#ifdef HAVE_TOKEN_SUP
     { TOK_VERSION,  new_m_version,  1 },
+#endif
     { NULL,        NULL,     0}
 };
 
