@@ -153,8 +153,9 @@ void __Bot_Message(char *origin, char *coreLine)
 {
 	char *cmd, *rest;
 	User *u;
-	
+#ifdef DEBUG	
 	log("origin %s, coreline %s", origin, coreLine);
+#endif
 	u = finduser(origin);
 	if (!u) {
 		log("Unable to finduser %s (IcqServ)", origin);
@@ -212,7 +213,9 @@ return 1;
 
 int do_connect(const char *server, int port)
 {
+#ifdef DEBUG
     log("Connecting to: %s:%d",server,port);
+#endif
     icq_UnsetProxy();
     icq_Connect(server,port);
     add_socket("icq_HandleServerResponse", "ICQ Port 400UDP", icq_Sok, my_info[0].module_name);

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.10 2000/03/03 06:03:42 fishwaldo Exp $
+** $Id: ircd.c,v 1.11 2000/03/29 13:05:56 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -80,8 +80,8 @@ IntCommands cmd_list[] = {
 	{TOK_MODE,	Usr_Mode,		1},
 	{MSG_SVSMODE,	Usr_Smode,		1},
 	{TOK_SVSMODE,	Usr_Smode,		1},
-	{MSG_SVS2MODE,	Usr_Mode,		1},
-	{TOK_SVS2MODE,	Usr_Mode,		1},
+	{MSG_SVS2MODE,	Usr_Smode,		1},
+	{TOK_SVS2MODE,	Usr_Smode,		1},
 	{MSG_KILL,	Usr_Kill,		1},
 	{TOK_KILL,	Usr_Kill,		1},
 	{MSG_PONG,	Usr_Pong,		1},
@@ -121,13 +121,12 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 {
 	User *u;
 	char tmp[512];
-	segv_location = "init_bot";
+	segv_location = sstrdup("init_bot");
 	u = finduser(nick);
 	if (u) {
 		log("Attempting to Login with a Nickname that already Exists: %s",nick);
 		return -1;
 	}
-	log("about to addnick %s",nick);
 	add_mod_user(nick, mod_name);
 	sts("NICK %s 1 %d %s %s %s 0 :%s", nick, time(NULL), user, host, me.name, rname);
 	AddUser(nick, user, host, me.name);
@@ -137,19 +136,23 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 	sts(":%s MODE %s +a %s",nick,me.chan,nick);
 	sprintf(tmp, ":%s", modes);
 	UserMode(nick, tmp);
+	Module_Event("SIGNON", finduser(nick));
 	return 1;
 }
 
 int del_bot(char *nick, char *reason)
 {
 	User *u;
-	segv_location = "del_bot";
+	segv_location = sstrdup("del_bot");
 	u = finduser(nick);
+#ifdef DEBUG
 	log("Killing %s for %s",nick,reason);
+#endif
 	if (!u) {
 		log("Attempting to Logoff with a Nickname that does not Exists: %s",nick);
 		return -1;
 	}
+	Module_Event("SIGNOFF", finduser(nick));
 	sts(":%s QUIT :%s",nick,reason);
 	DelUser(nick);
 	del_mod_user(nick);
@@ -164,7 +167,7 @@ void Module_Event(char *event, void *data) {
 	EventFnList *ev_list;
 
 
-	segv_location = "Module_Event";
+	segv_location = sstrdup("Module_Event");
 	module_ptr = module_list->next;
 	while (module_ptr != NULL) {
 		/* this goes through each Module */
@@ -175,9 +178,9 @@ void Module_Event(char *event, void *data) {
 #ifdef DEBUG
 					log("Running Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
 #endif
-					segv_location = module_ptr->info->module_name;
+					segv_location = sstrdup(module_ptr->info->module_name);
 					ev_list->function(data);			
-					segv_location = "Module_Event_Return";
+					segv_location = sstrdup("Module_Event_Return");
 					break;
 			}
 		ev_list++;
@@ -195,14 +198,12 @@ void parse(char *line)
 	Functions *fn_list;
 	Mod_User *list;
 	
-	segv_location = "parse";
+	segv_location = sstrdup("parse");
 	strip(line);
-	recbuf = strdup(line);
+	strcpy(recbuf, line);
 
 	if (!(*line))
 		return;
-
-	coreLine = sstrdup(line);
 
 #ifdef DEBUG
 	log("R: %s", line);
@@ -223,11 +224,11 @@ void parse(char *line)
 		coreLine = strtok(NULL, "");
 		coreLine++;
 		/* coreLine contains the Actual Message now, cmd, is who its too */
-		if (!strcmp(s_Services,cmd)) {
+		if (!strcasecmp(s_Services,cmd)) {
 			/* its to the Internal Services Bot */
-			segv_location = "servicesbot";
+			segv_location = sstrdup("servicesbot");
 			servicesbot(origin,coreLine);
-			segv_location = "ServicesBot_return";
+			segv_location = sstrdup("ServicesBot_return");
 			return;
 		} else {
 			list = findbot(cmd);
@@ -236,24 +237,27 @@ void parse(char *line)
 #ifdef DEBUG
 				log("nicks: %s", list->nick);
 #endif
-				segv_location = list->modname;
+				segv_location = sstrdup(list->modname);
 				list->function(origin, coreLine);
+				return;
 			}
 			log("Recieved a Message for %s, but that user is not registered with us!!!", cmd);
 		}
         }	
         	
         /* now, Parse the Command to the Internal Functions... */
+	segv_location = sstrdup("Parse - Internal Functions");
 	for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
 		if (!strcasecmp(cmd_list[I].name, cmd)) {
 			if (cmd_list[I].srvmsg == cmdptr) {
-				segv_location = cmd_list[I].name;
+				segv_location = sstrdup(cmd_list[I].name);
 				cmd_list[I].function(origin, coreLine);
 				break; log("should never get here-Parse");
 			}	
 		}
 	}
 	/* K, now Parse it to the Module functions */
+	segv_location = sstrdup("Parse - Module Functions");
 	module_ptr = module_list->next;
 	while (module_ptr != NULL) {
 		/* this goes through each Module */
@@ -265,9 +269,9 @@ void parse(char *line)
 #ifdef DEBUG
 					log("Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
 #endif
-					segv_location = module_ptr->info->module_name;
+					segv_location = sstrdup(module_ptr->info->module_name);
 					fn_list->function(origin, coreLine);			
-					segv_location = "Parse_Return_Module";
+					segv_location = sstrdup("Parse_Return_Module");
 					break;
 					log("Should never get here-Parse");
 				}	
@@ -341,10 +345,12 @@ void Usr_DelUser(char *origin, char *coreLine) {
 	DelUser(origin);
 }
 void Usr_Smode(char *origin, char *coreLine) {
-	char *cmd, *mode;
+	char *cmd, *mode, tmp[25];
 	cmd = strtok(coreLine, " ");
 	mode = strtok(NULL, "");
-	UserMode(cmd, mode);
+	/* this is a hack */
+	sprintf(tmp, ":%s", mode); 
+	UserMode(cmd, tmp);
 	Module_Event("UMODE", finduser(cmd));
 
 }
@@ -404,12 +410,16 @@ void Usr_Pong(char *origin, char *coreLine) {
 }
 void Usr_Away(char *origin, char *coreLine) {
 			User *u = finduser(origin);
-			if (u->is_away) {
-				u->is_away = 0;
+			if (u) {
+				if (u->is_away) {
+					u->is_away = 0;
+				} else {
+					u->is_away = 1;
+				}
+				Module_Event("AWAY", u);
 			} else {
-				u->is_away = 1;
+				log("Warning, Unable to find User %s for Away", origin);
 			}
-			Module_Event("AWAY", u);
 }	
 void Usr_Nick(char *origin, char *coreLine) {
 			char *cmd;
@@ -454,7 +464,7 @@ void Usr_Join(char *origin, char *coreLine) {
 void Usr_Part(char *origin, char *coreLine) {
 }
 void Srv_Ping(char *origin, char *coreLine) {
-			log("Ping: %s", coreLine);
+
 			sts("PONG %s", coreLine);
 }
 void Srv_Netinfo(char *origin, char *coreLine) {
@@ -494,7 +504,6 @@ void Srv_Squit(char *origin, char *coreLine) {
 }
 void Srv_Nick(char *origin, char *coreLine) {
 			char *user, *host, *server, *cmd;
-			log("start");
 			cmd = strtok(coreLine, " ");
 			user = strtok(NULL, " ");
 			user = strtok(NULL, " ");
@@ -598,9 +607,9 @@ static void ShowMOTD(char *nick)
 
 	sts(":%s 375 %s :- %s Message of the Day", me.name, nick, me.name);
 	sts(":%s 372 %s :- ", me.name, nick);
-	sts(":%s 372 %s :- Origonal Version Copyright:", me.name, nick);
+	sts(":%s 372 %s :- Version Copyright:", me.name, nick);
 	sts(":%s 372 %s :- %s", me.name, nick, copyright);
-	sts(":%s 372 %s :- Grab your copy at codebase.kamserve.com", me.name, nick);
+	sts(":%s 372 %s :- Grab your copy at www.neostats.net", me.name, nick);
 	sts(":%s 376 %s :End of /MOTD command.", me.name, nick);
 }
 static void Showcredits(char *nick)

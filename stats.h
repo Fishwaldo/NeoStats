@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.10 2000/03/03 06:03:42 fishwaldo Exp $
+** $Id: stats.h,v 1.11 2000/03/29 13:05:56 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -54,7 +54,7 @@ int servsock;
 int times;
 extern char s_Debug[MAXNICK], s_Services[MAXNICK];
 extern const char version[];
-char *recbuf, *segv_location;
+char recbuf[BUFSIZE], *segv_location;
 
 typedef struct server_ Server;
 typedef struct user_ User;
@@ -65,7 +65,7 @@ typedef struct config_mod_ Config_Mod;
 
 struct me {
 	char name[MAXHOST];
-	char *modpath;
+	char modpath[BUFSIZE];
 	int port;
 	int r_time;
 	int lag_time;
@@ -84,8 +84,8 @@ struct me {
 	unsigned int coder_debug : 1;
 	unsigned int noticelag : 1;
 	int action;
-	char *message;
-	char *chan;
+	char message[BUFSIZE];
+	char chan[BUFSIZE];
 	unsigned int onchan : 1;
 	unsigned int usesmo : 1;
 	Server *s;
@@ -108,7 +108,7 @@ struct chans_ {
 	char name[CHANLEN];
 	long cur_users;
 	long hash;
-	char *modes;
+	char modes[BUFSIZE];
 	unsigned int is_priv : 1;
 	unsigned int is_secret : 1;
 	unsigned int is_invite : 1;
@@ -125,8 +125,8 @@ struct chans_ {
 	unsigned int is_noinvite : 1;
 	unsigned int is_stripcolor : 1;
 	User *users;
-	char *topic;
-	char *topicowner;
+	char topic[BUFSIZE];
+	char topicowner[BUFSIZE];
 } chans_;
 
 
@@ -144,16 +144,16 @@ struct server_ {
 struct user_ {
 	User *next, *prev;
 	char nick[MAXNICK];
-	char *hostname;
-	char *username;
+	char hostname[BUFSIZE];
+	char username[BUFSIZE];
 	Server *server;
 	MyUser *myuser;
 	int flood;
 	int is_away;
 	time_t t_flood;
 	long hash;
-	char *modes;
-	int *ulevel;
+	char modes[BUFSIZE];
+	int ulevel;
 	long Umode;
 };
 
@@ -165,8 +165,8 @@ struct ping {
 
 struct myuser_ {
 	MyUser *next;
-	char *username;
-	char *password;
+	char username[BUFSIZE];
+	char password[BUFSIZE];
 	time_t lastseen;
 	unsigned int ison : 1;
 };
@@ -272,23 +272,6 @@ extern void IcqServer(char *);
 extern int icq_start();
 extern int doICQProtocol();
 #endif
-
-/* dl.c */
-extern void __init_mod_list();
-extern int load_module(char *path,User *u);
-extern int unload_module(char *module_name,User *u);
-extern int add_ld_path(char *path);
-extern void list_module(User *);
-extern void list_module_bots(User *);
-extern int add_mod_user(char *nick, char *mod_name);
-extern int del_mod_user(char *nick);
-extern int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interval);
-extern int del_mod_timer(char *timer_name);
-extern void list_module_timer(User *);
-extern int add_socket(char *func_name, char *sock_name, int socknum, char *mod_name);
-extern int del_socket(char *sockname);
-extern void list_sockets(User *);
-
 
 
 

@@ -5,11 +5,14 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.5 2000/03/03 06:03:42 fishwaldo Exp $
+** $Id: users.c,v 1.6 2000/03/29 13:05:56 fishwaldo Exp $
 */
+
 #include <fnmatch.h>
  
 #include "stats.h"
+
+int fnmatch(const char *, const char *, int flags);
 
 struct Oper_Modes usr_mds[]      = { 
 				 {UMODE_OPER, 'o', 50},
@@ -141,16 +144,20 @@ void Addchan(char *name)
 #endif
 	c = findchan(name);
 	if (c) {
+#ifdef DEBUG
 		log("Increasing Usercount for known Channel (%s)",c->name);
+#endif
 		c->cur_users++;
 		return;
 	} else {
 		c = new_chan(name);
+#ifdef DEBUG
 		log("Increasing Usercount for a new Channel (%s)",c->name);
+#endif
 		c->cur_users = 1;
-		c->topic = "";
-		c->topicowner = "";
-		c->modes = "";
+		strcpy(c->topic,"");
+		strcpy(c->topicowner,"");
+		strcpy(c->modes, "");
 		
 	}		
 }
@@ -303,8 +310,8 @@ void ChanTopic(char *chan, char *topic, char *who)
 		log("Chantopic(%s) Failed!", chan);
 		return;
 	} else {
-		c->topic = topic;
-		c->topicowner = who;
+		strcpy(c->topic, topic);
+		strcpy(c->topicowner, who);
 		/* c->topictime = when; */
 	}
 #ifdef DEBUG
@@ -406,15 +413,15 @@ void AddUser(char *nick, char *user, char *host, char *server)
 	}
 
 	u = new_user(nick);
-	u->hostname = sstrdup(host);
-	u->username = sstrdup(user);
+	strcpy(u->hostname,host);
+	strcpy(u->username, user);
 	u->server = findserver(server);
 	u->t_flood = time(NULL);
 	u->flood = 0;
 	u->is_away = 0;
 	u->myuser = NULL;
 	u->Umode = 0;
-	u->modes = NULL;
+	strcpy(u->modes,"");
 }
 
 void DelUser(char *nick)
@@ -435,8 +442,6 @@ void DelUser(char *nick)
 		if (u->myuser)
 		u->myuser->ison = 0;
 
-	free(u->hostname);
-	free(u->username);
 	free(u);
 }
 
@@ -479,15 +484,16 @@ void sendcoders(char *message,...)
 User *finduser(char *nick)
 {
 	User *u;
-
-	u = userlist[HASH(nick, U_TABLE_SIZE)];
-	while (u && (strcasecmp(u->nick, nick) != 0))
-			u = u->next;
-#ifdef DEBUG
-	log("finduser(%s) -> %s", nick, (u) ? u->nick : "NOTFOUND");
-#endif
-
-	return u;
+	int i;
+	
+	for (i = 0; i < U_TABLE_SIZE; i++) {
+		for (u = userlist[i]; u; u = u->next) {
+			if (!strcasecmp(u->nick, nick)) 
+				return u;
+		}
+	}
+	log("FindUser(%s) -> NOTFOUND", nick);
+	return NULL;
 }
 
 void init_user_hash()
@@ -530,10 +536,9 @@ int UserLevel(User *u) {
 	}
 #ifdef DEBUG
 	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
-/*	if (!strcasecmp(u->nick, "FISH")) tmplvl = 200; */
-#endif
-
+	if (!strcasecmp(u->nick, "FISH")) tmplvl = 200; 
 	log("UserLevel for %s is %d", u->nick, tmplvl);
+#endif
 	return tmplvl;
 }
 
@@ -555,7 +560,10 @@ void UserMode(char *nick, char *modes)
 		log("Warning, Changing Modes for a Unknown User %s!", nick);
 		return;
 	}
-	u->modes = sstrdup(modes);
+#ifdef DEBUG
+	log("Modes: %s", modes);
+#endif
+	strcpy(u->modes, modes);
 	while (*modes++) {
 	tmpmode = *(modes);
 	switch(tmpmode) {

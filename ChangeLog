@@ -1,3 +1,9 @@
+- Fixed up StatServ some more, now it displays all the information that
+previous versions of NeoStats did, although, it might not be accurate yet
+(still working on it)
+- Fixed up Module Bots not working if the recieved Nick case was different
+to what was in the hash table!
+
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 * NeoStats * Fish * Its Under CVS Control now... Still a Beta/Alpha Version though!
  - Implemented Levels for Users, and finally fixed it all up.. if your

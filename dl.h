@@ -100,5 +100,20 @@ struct path {
 
 typedef struct path LD_Path;
 
+extern void __init_mod_list();
+extern int load_module(char *path,User *u);
+extern int unload_module(char *module_name,User *u);
+extern int add_ld_path(char *path);
+extern void list_module(User *);
+extern void list_module_bots(User *);
+extern int add_mod_user(char *nick, char *mod_name);
+extern int del_mod_user(char *nick);
+extern int add_mod_timer(char *func_name, char *timer_name, char *mod_name, int interval);
+extern int del_mod_timer(char *timer_name);
+extern void list_module_timer(User *);
+extern int add_socket(char *func_name, char *sock_name, int socknum, char *mod_name);
+extern int del_socket(char *sockname);
+extern void list_sockets(User *);
+extern Mod_User *findbot(char *);
 
 #endif /* !_dl_h_ */

@@ -5,11 +5,12 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: conf.c,v 1.3 2000/02/22 03:32:32 fishwaldo Exp $
+** $Id: conf.c,v 1.4 2000/03/29 13:05:56 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "dotconf.h"
+#include "dl.h"
 
 static void cb_Server(char *, int);
 static void cb_Module(char *, int);
@@ -63,24 +64,26 @@ done_mods = 0;
 }
 void cb_Module(char *arg, int configtype) {
 	int i;
-		segv_location="cb_Module";
+		segv_location= sstrdup("cb_Module");
 		for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) { 
 			if (!strcasecmp(load_mods[i], arg)) {
 				return;
 			}
 		}
 		load_mods[i] = sstrdup(arg);
-		log("Added Module %s", load_mods[i]);
+		log("Added Module %d :%s", i, load_mods[i]);
 }
 
 int init_modules() {
 	int i;
 	int rval;
-	User *u=NULL;
-
-	segv_location="init_modules";
+	
+	segv_location=sstrdup("init_modules");
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] !=0); i++) {
-		rval = load_module(load_mods[i], u);
+#ifdef DEBUG
+		log("Loading Module %s", load_mods[i]);
+#endif
+		rval = load_module(load_mods[i], NULL);
 		if (!rval) {
 			log("Successfully Loaded Module %s", load_mods[i]);
 		} else {
@@ -122,9 +125,9 @@ void cb_Server(char *arg, int configtype) {
 		} else if (configtype == 9) {
 			me.want_privmsg = 1;
 		} else if (configtype == 10) {
-			me.chan = sstrdup(arg);
+			memcpy(me.chan,arg, sizeof(me.chan));
 		} else if (configtype == 11) {
-			me.modpath = sstrdup(arg);
+			memcpy(me.modpath, arg, sizeof(me.chan));
 			add_ld_path(me.modpath);
 		} else if (configtype == 12) {
 			me.onlyopers = 1;

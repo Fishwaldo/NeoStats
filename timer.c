@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: timer.c,v 1.4 2000/03/02 01:31:24 fishwaldo Exp $
+** $Id: timer.c,v 1.5 2000/03/29 13:05:56 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -21,7 +21,7 @@ void chk()
 	Mod_Timer *mod_ptr = NULL;
 	time_t current = time(NULL);
 	register int j;
-	segv_location = "chk";
+	segv_location = sstrdup("chk");
 /* First, lets see if any modules have a function that is due to run..... */
 	for (j = 0; j < T_TABLE_SIZE; j++) {
 		for (mod_ptr = module_timer_lists[j]; mod_ptr; mod_ptr = mod_ptr->next) {
@@ -94,17 +94,4 @@ int is_midnight()
 		return 1;
 
 	return 0;	
-}
-void WriteStats()
-{
-	Server *s;
-	register int i;
-
-#ifdef DEBUG
-	log("Its midnight!!! -> %s", sctime(time(NULL)));
-#endif
-	for (i = 0; i < S_TABLE_SIZE; i++) {
-		for (s = serverlist[i]; s; s = s->next) {
-		}
-	}
 }

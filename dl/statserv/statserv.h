@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.h,v 1.5 2000/02/23 05:39:25 fishwaldo Exp $
+** $Id: statserv.h,v 1.6 2000/03/29 13:05:57 fishwaldo Exp $
 */
 
 #ifndef STATSERV_H
@@ -84,6 +84,7 @@ struct tld_ {
 	char tld[4];
 	char *country;
 	int users;
+	int daily_users;
 };
 
 /* statserv.c */

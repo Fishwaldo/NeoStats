@@ -21,22 +21,22 @@
 
 #include "stats.h"
 #include "signal.h"
-
+#include "dl.h"
 
 char s_Debug[MAXNICK] = "Stats_Debug";
 char s_Services[MAXNICK] = "NeoStats";
-const char version[] = "NeoStats-2.0-Alpha4";
+const char version[] = "NeoStats-2.0b2";
 const char version_date[] = __DATE__;
 const char version_time[] = __TIME__;
 
 static void start();
 static void setup_signals();
+int forked = 0;
 
 int main()
 {
-	int forked = 0;
 	FILE *fp;
-	segv_location = "main";
+	segv_location = sstrdup("main");
 	me.onchan = 0;
 	printf("%s Loading...\n", version);
 	printf("-----------------------------------------------\n");
@@ -113,14 +113,13 @@ RETSIGTYPE serv_segv() {
 	/* Broadcast it out! */
 	globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 	notice(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
+	globops(me.name,"Dumped Core to netstats.debug, Please Read the Readme file to find out what to do with it!");
 	sts("SQUIT %s",me.name);
 	
-	/* Should put some clean up code in here, but for the moment, just die... */
-	printf("Ouch, Segmentation Fault, Server Terminating Check Log file for details\n");
 	sleep(2);
-	exit(0);	
-
-	
+	kill(forked, 3);
+	kill(forked, 9);
+	exit(-1);	
 }
 
 
@@ -159,7 +158,7 @@ void start()
 {
 	static int attempts = 0;
 	
-	segv_location = "start";
+	segv_location = sstrdup("start");
 	TimerReset();
 	init_server_hash();
 	init_user_hash();
@@ -195,7 +194,7 @@ void start()
 
 void login()
 	{
-	segv_location = "login";
+	segv_location = sstrdup("login");
 	sts("PASS %s", me.pass);
 	sts("SERVER %s 1 :%s", me.name,me.infoline);
 	sts("PROTOCTL TOKEN");
@@ -205,27 +204,23 @@ void login()
 
 void init_ServBot()
 {
-	segv_location = "init_ServBot";
+	segv_location = sstrdup("init_ServBot");
 	sts("NICK %s 1 %d %s %s %s 0 :/msg %s \2HELP\2", s_Services, time(NULL),
 		Servbot.user, Servbot.host, me.name, s_Services);
 	AddUser(s_Services, Servbot.user, Servbot.host, me.name);
-	segv_location = "init_ServBot";
 	sts(":%s MODE %s +Sqd", s_Services, s_Services);
 	sts(":%s JOIN %s",s_Services ,me.chan);
 	sts(":%s MODE %s +o %s",me.name,me.chan,s_Services);
 	sts(":%s MODE %s +a %s",s_Services,me.chan,s_Services);
 	UserMode(s_Services, ":+Sqd"); 
-
-#ifdef DEBUG
-	log ("Return from Mode");
-#endif
+	Module_Event("SIGNON", finduser(s_Services));
 }
 
 void *smalloc(long size)
 {
 	void *buf;
 	
-	segv_location = "smalloc";
+	segv_location = sstrdup("smalloc");
 	if (!size) {
 		log("smalloc(): illegal attempt to allocate 0 bytes!");
 		size = 1;

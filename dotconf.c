@@ -94,7 +94,7 @@ void config_substitute_env(char *str)
 					else while ( (cp1 != eos) && (*cp1 != '}') ) cp1++;
 					
 					if (*cp1 != '}')
-						fprintf(stderr, "%s:%ld: Unbalanced '{'\n",
+						fprintf(stderr, "%s:%d: Unbalanced '{'\n",
 										dotconf_file, dotconf_line);
 					else
 						{
@@ -342,7 +342,7 @@ int config_parse(FILE *config)
 						}
 				}
 		}
-
+	return -1;
 }
 /*
  * open and parse the config-file using the config_options list
