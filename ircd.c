@@ -247,7 +247,20 @@ joinbuf (char **av, int ac, int from)
 	char *buf;
 
 	buf = malloc (BUFSIZE);
-	if(from > ac) {
+	/* from is zero based while ac has base of 1. 
+	 * Therefore we need to check >= before trying to perform
+	 * the join.
+	 * The current (null) string we return may not be needed
+	 * so should be removed once all joinbuf calls are checked.
+	 * Maybe we should just return NULL if we fail and let
+	 * the caller handle that case. 
+	 */
+	if(from >= ac) {
+		/* For debugging the reported topic crash.
+		 * Keep in for 2.5.11 so people can report any occurence 
+		 * of this in logs then remove in 2.5.12
+		 */
+		nlog (LOG_WARNING, LOG_CORE, "joinbuf: from (%d) >= ac (%d)", from, ac);
 		strlcpy (buf, "(null)", BUFSIZE);
 	}
 	else {

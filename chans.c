@@ -99,12 +99,24 @@ ChangeTopic (char *owner, Chans * c, time_t time, char *topic)
 {
 	char **av;
 	int ac = 0;
-	strlcpy (c->topic, topic, BUFSIZE);
+	if(topic) {
+		strlcpy (c->topic, topic, BUFSIZE);
+	} else {
+		c->topic[0] = 0;
+	}
 	strlcpy (c->topicowner, owner, MAXHOST);
 	c->topictime = time;
 	AddStringToList (&av, c->name, &ac);
 	AddStringToList (&av, owner, &ac);
-	AddStringToList (&av, topic, &ac);
+	if(topic) {
+		AddStringToList (&av, topic, &ac);
+	} else {
+		/* For debugging the reported topic crash.
+		 * Keep in for 2.5.11 so people can report any occurence 
+		 * of this in logs then remove in 2.5.12
+		 */
+		nlog (LOG_WARNING, LOG_CORE, "ChangeTopic: NULL topic");
+	}
 	ModuleEvent (EVENT_TOPICCHANGE, av, ac);
 	free (av);
 }
