@@ -777,7 +777,7 @@ static int cs_server_join(char **av, int ac)
 
 	return 1;
 }
-static int cs_server_quit(char **av, int ac);
+static int cs_server_quit(char **av, int ac)
 {
 	Server *s;
 

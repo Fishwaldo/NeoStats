@@ -4,7 +4,7 @@ Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish (M) denotes Mark
 
-* Revision 810 * January 9, 2004 (M)
+* Revision 1123 * January 9, 2004 (M)
  - removed fopen attempt on old system of dl/statserv/html/index.tpl. 
  - improved error message for failed open of template and output file
  - begin reworking announcement code for wallops
