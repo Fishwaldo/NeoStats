@@ -606,6 +606,11 @@ UserDump (const char *nick)
 #else
 			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx)", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode);
 #endif
+#ifdef BASE64NICKNAME
+			debugtochannel("Base64: %s", u->nick64);
+#endif
+			debugtochannel("IP Address: %lu.%lu.%lu.%lu", (u->ipaddr.S_addr >> 24) & 255, (u->ipaddr.S_addr >> 16) & 255, (u->ipaddr.S_addr >> 8) & 255, u->ipaddr.S_addr & 255 );
+
 			cm = list_first (u->chans);
 			while (cm) {
 				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
@@ -621,6 +626,10 @@ UserDump (const char *nick)
 #else
 			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx)", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode);
 #endif
+#ifdef BASE64NICKNAME
+			debugtochannel("Base64: %s", u->nick64);
+#endif
+			debugtochannel("IP Address: %lu.%lu.%lu.%lu", (u->ipaddr.S_addr >> 24) & 255, (u->ipaddr.S_addr >> 16) & 255, (u->ipaddr.S_addr >> 8) & 255, u->ipaddr.S_addr & 255 );
 			cm = list_first (u->chans);
 			while (cm) {
 				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
