@@ -596,6 +596,7 @@ src/channels.c eol=lf
 src/commands.c -text
 src/conf.c eol=lf
 src/confuse.c -text
+src/confuselexer.c -text
 src/confuselexer.l -text
 src/ctcp.c -text
 src/dbm/Makefile.am -text
