@@ -272,16 +272,19 @@ CStats *load_chan(char *name) {
 		/* delete so when we save, we only save relevent information */
 		DelRow("ChanStats", c->name);
 	} else {
+		c->totmem = 0;
 		c->topics = 0;
 		c->kicks = 0;
 		c->lastseen = 0;
 		c->maxmems = 0;
 		c->t_maxmems = me.now;
 		c->maxkicks = 0;
-		c->t_maxkicks = c->t_maxmems;
+		c->t_maxkicks = 0;
 		c->maxjoins = 0;
-		c->t_maxjoins = c->t_maxmems;
+		c->t_maxjoins = 0;
 	}
+	c->maxmemtoday = 0;
+	c->maxkickstoday = 0;
 	c->topicstoday = 0;
 	c->joinstoday = 0;
 	c->members = 0;
@@ -294,15 +297,22 @@ CStats *load_chan(char *name) {
 		if ((me.now - c->lastseen) > 604800) {
 			nlog(LOG_DEBUG1, LOG_MOD,
 			     "Resetting Old Channel %s", c->name);
+			c->totmem = 0;
 			c->topics = 0;
 			c->kicks = 0;
 			c->lastseen = 0;
 			c->maxmems = 0;
 			c->t_maxmems = me.now;
 			c->maxkicks = 0;
-			c->t_maxkicks = c->t_maxmems;
+			c->t_maxkicks = 0;
 			c->maxjoins = 0;
-			c->t_maxjoins = c->t_maxmems;
+			c->t_maxjoins = 0;
+			c->maxmemtoday = 0;
+			c->maxkickstoday = 0;
+			c->topicstoday = 0;
+			c->joinstoday = 0;
+			c->members = 0;
+			c->lastsave = me.now;
 		}
 	}
 	list_append(Chead, cn);

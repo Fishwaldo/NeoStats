@@ -353,6 +353,7 @@ new_chan (const char *chan)
 
 	SET_SEGV_LOCATION();
 	c = smalloc (sizeof (Chans));
+	bzero(c, sizeof(Chans));
 	strlcpy (c->name, chan, CHANLEN);
 	cn = hnode_create (c);
 	if (hash_isfull (ch)) {
