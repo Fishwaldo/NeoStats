@@ -175,7 +175,7 @@ cb_Server (char *arg, int configtype)
 		strlcpy (me.name, arg, sizeof (me.name));
 	} else if (configtype == 1) {
 		/* Server Port */
-		config.port = atoi (arg);
+		me.port = atoi (arg);
 	} else if (configtype == 2) {
 		/* Connect To */
 		strlcpy (me.uplink, arg, sizeof (me.uplink));

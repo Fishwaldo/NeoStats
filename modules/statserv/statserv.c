@@ -670,7 +670,7 @@ static void makemap(char *uplink, Client * u, int level)
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
 		ss = findserverstats(s->name);
-		if ((level == 0) && (s->uplink[0] == 0)) {
+		if ((level == 0) && (s->uplinkname[0] == 0)) {
 			/* its the root server */
 			if (StatServ.exclusions && IsExcluded(s)) {
 				makemap(s->name, u, level);
@@ -680,7 +680,7 @@ static void makemap(char *uplink, Client * u, int level)
 				ss->name, ss->users, (int)ss->maxusers,
 				ss->opers, ss->maxopers, (long)s->server->ping, ss->highest_ping);
 			makemap(s->name, u, level + 1);
-		} else if ((level > 0) && !ircstrcasecmp(uplink, s->uplink)) {
+		} else if ((level > 0) && !ircstrcasecmp(uplink, s->uplinkname)) {
 			if (StatServ.exclusions && IsExcluded(s)) {
 				makemap(s->name, u, level);
 			}
@@ -794,13 +794,13 @@ static void operlist(Client * u)
 	if (!operlistserver) {
 		listindex++;
 		irc_prefmsg(ss_bot, listu, "[%2d] %-15s %-15s %-10d", listindex, 
-			u->name, u->user->server->name, UserLevel(u));
+			u->name, u->uplink->name, UserLevel(u));
 	} else {
-		if (ircstrcasecmp(operlistserver, u->user->server->name))
+		if (ircstrcasecmp(operlistserver, u->uplink->name))
 			return;
 		listindex++;
 		irc_prefmsg(ss_bot, listu, "[%2d] %-15s %-15s %-10d", listindex, 
-			u->name, u->user->server->name, UserLevel(u));
+			u->name, u->uplink->name, UserLevel(u));
 	}
 }
 
@@ -841,7 +841,7 @@ static void botlist(Client * u)
 	if is_bot(u) { 
 		listindex++;
 		irc_prefmsg(ss_bot, listu, "[%2d] %-15s %s", listindex, 
-			u->name, u->user->server->name);
+			u->name, u->uplink->name);
 	}
 }
 

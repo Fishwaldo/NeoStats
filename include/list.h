@@ -131,7 +131,7 @@ EXPORTFUNC	void list_destroy_nodes (list_t *);
 	void list_append (list_t *, lnode_t *);
 	void list_prepend (list_t *, lnode_t *);
 EXPORTFUNC	void list_ins_before (list_t *, lnode_t *, lnode_t *);
-	void list_ins_after (list_t *, lnode_t *, lnode_t *);
+EXPORTFUNC	void list_ins_after (list_t *, lnode_t *, lnode_t *);
 
 	lnode_t *list_first (list_t *);
 	lnode_t *list_last (list_t *);

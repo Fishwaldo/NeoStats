@@ -232,7 +232,7 @@ static int cs_event_signon (CmdParams* cmdparams)
 	irc_chanalert(cs_bot, msg_signon,
 		cmdparams->source->name, cmdparams->source->user->username, 
 		cmdparams->source->user->hostname, cmdparams->source->info,
-		cmdparams->source->user->server->name);
+		cmdparams->source->uplink->name);
 	return NS_SUCCESS;
 }
 
@@ -274,7 +274,7 @@ static int cs_event_quit (CmdParams* cmdparams)
 		irc_chanalert(cs_bot, msg_signoff,
 			  cmdparams->source->name, cmdparams->source->user->username, 
 			  cmdparams->source->user->hostname, cmdparams->source->info,
-			  cmdparams->source->user->server->name, QuitMsg);
+			  cmdparams->source->uplink->name, QuitMsg);
 	}
 	sfree(QuitMsg);
 	sfree(cmd);
@@ -294,7 +294,7 @@ static int cs_report_mode (const char* modedesc, int serverflag, Client * u, int
 			add?"now":"no longer", 
 			modedesc,
 			add?'+':'-',
-			mode, u->user->server->name);
+			mode, u->uplink->name);
 	} else {
 		irc_chanalert(cs_bot, msg_mode, u->name, 
 			add?"now":"no longer", 

@@ -587,7 +587,7 @@ void get_map(char *uplink, int level)
 		s = hnode_get(sn);
 		ss = findserverstats(s->name);
 
-		if ((level == 0) && (strlen(s->uplink) <= 0)) {
+		if ((level == 0) && (s->uplinkname[0] == 0)) {
 			/* its the root server */
 			fprintf(opf,
 				"<table border=0><tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Lag/Max</th></tr>");
@@ -597,7 +597,7 @@ void get_map(char *uplink, int level)
 				ss->opers, ss->maxopers, s->server->ping,
 				(int)ss->highest_ping);
 			get_map(s->name, level + 1);
-		} else if ((level > 0) && !ircstrcasecmp(uplink, s->uplink)) {
+		} else if ((level > 0) && !ircstrcasecmp(uplink, s->uplinkname)) {
 			/* its not the root server */
 			buf[0]='\0';
 			for (i = 1; i < level; i++) {

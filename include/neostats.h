@@ -497,7 +497,6 @@ typedef struct User {
 	unsigned int Smode;
 	int ulevel;
 	list_t *chans;
-	Client *server;
 	Bot * bot;
 } User;
 
@@ -509,7 +508,8 @@ typedef struct _Client {
 	Server *server;
 	char name[MAXNICK];
 	char name64[B64SIZE];
-	char uplink[MAXHOST];
+	char uplinkname[MAXHOST];
+	Client* uplink;
 	char info[MAXREALNAME];
 	char version[MAXHOST];
 	unsigned int flags;
@@ -530,6 +530,7 @@ typedef struct tme {
 	char infoline[MAXHOST];
 	char netname[MAXPASS];
 	char local[MAXHOST];
+	int port;
 	time_t t_start;
 	unsigned int maxsocks;
 	unsigned int cursocks;
@@ -763,10 +764,11 @@ extern rta_hook_func rta_hook_2;
  * 
  */
 
-#define	EVENT_FLAG_DISABLED		0x00000001
-#define	EVENT_FLAG_IGNORE_SYNCH 0x00000002
-#define	EVENT_FLAG_EXCLUDE_ME	0x00000004
-#define	EVENT_FLAG_USE_EXCLUDE	0x00000008
+#define	EVENT_FLAG_DISABLED			0x00000001
+#define	EVENT_FLAG_IGNORE_SYNCH		0x00000002
+#define	EVENT_FLAG_EXCLUDE_ME		0x00000004
+#define	EVENT_FLAG_EXCLUDE_MODME	0x00000008
+#define	EVENT_FLAG_USE_EXCLUDE		0x00000010
 
 typedef int (*event_function) (CmdParams *cmdparams);
 
@@ -1251,6 +1253,22 @@ EXPORTFUNC void SetAllEventFlags (unsigned int flag, unsigned int enable);
 EXPORTFUNC void SetEventFlags (Event event, unsigned int flag, unsigned int enable);
 EXPORTFUNC void EnableEvent (Event event);
 EXPORTFUNC void DisableEvent (Event event);
+
+/* 
+ *  Portability wrapper functions
+ */
+
+/* File system functions */
+int sys_mkdir (const char *filename, mode_t mode);
+
+/* Socket functions */
+#ifndef SOCKET 
+#define SOCKET int
+#endif
+int sys_close_sock (int sock);
+int sys_write_sock (SOCKET s, const char* buf, int len);
+int sys_read_sock (SOCKET s, char* buf, int len);
+int sys_set_nonblocking_sock (SOCKET s);
 
 /* 
  * Module Interface 

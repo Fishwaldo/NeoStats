@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\include;..\lib\adnswin32;..\lib\keeper;..\lib\curl;..\lib\pcre;win32"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ADNS_MAP_UNIXAPI;NEOSTATSCORE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ADNS_MAP_UNIXAPI;NEOSTATSCORE;ADNS_DLL_EXPORTS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
@@ -192,6 +192,9 @@
 			</File>
 			<File
 				RelativePath=".\ns_help.c">
+			</File>
+			<File
+				RelativePath=".\portab.c">
 			</File>
 			<File
 				RelativePath=".\servers.c">

@@ -115,11 +115,7 @@ ConnectTo (char *host, int port)
 #ifdef WIN32
 		nlog (LOG_ERROR, "Winsock error: %d", WSAGetLastError());
 #endif
-#ifdef WIN32
-		closesocket (s);
-#else
-		close (s);
-#endif      			
+		sys_close_sock (s);
 		return NS_FAILURE;
 	}
 	return s;
@@ -233,11 +229,7 @@ read_loop ()
 			}
 			if (FD_ISSET (servsock, &readfds)) {
 				for (j = 0; j < BUFSIZE; j++) {
-#ifdef WIN32
-					i = recv (servsock, &c, 1, 0);
-#else
-					i = read (servsock, &c, 1);
-#endif
+					i = sys_read_sock (servsock, &c, 1);
 					me.RcveBytes++;
 					if (i >= 0) {
 						buf[j] = c;
@@ -347,8 +339,8 @@ void
 Connect (void)
 {
 	SET_SEGV_LOCATION();
-	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, config.port);
-	servsock = ConnectTo (me.uplink, config.port);
+	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, me.port);
+	servsock = ConnectTo (me.uplink, me.port);
 	if (servsock <= 0) {
 		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
 	} else {
@@ -447,18 +439,10 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 
 	/* set non blocking */
 
-#ifdef WIN32
-	{
-		int flags;
-		flags = 1;
-		return ioctlsocket(s, FIONBIO, &flags);
-	}
-#else
-	if ((i = fcntl (s, F_SETFL, O_NONBLOCK)) < 0) {
+	if ((i = sys_set_nonblocking_sock (s)) < 0) {
 		nlog (LOG_CRITICAL, "can't set socket %s(%s) non-blocking: %s", name, moduleptr->info->name, strerror (i));
 		return NS_FAILURE;
 	}
-#endif
 
 	if ((i = connect (s, (struct sockaddr *) &sa, sizeof (sa))) < 0) {
 		switch (errno) {
@@ -466,11 +450,7 @@ sock_connect (int socktype, unsigned long ipaddr, int port, const char *name, so
 			break;
 		default:
 			nlog (LOG_WARNING, "Socket %s(%s) cant connect %s", name, moduleptr->info->name, strerror (errno));
-#ifdef WIN32
-			closesocket (s);
-#else
-			close (s);
-#endif      			
+			sys_close_sock (s);
 			return NS_FAILURE;
 		}
 	}
@@ -511,11 +491,7 @@ sock_disconnect (const char *name)
 		return NS_FAILURE;
 	}
 	dlog(DEBUG3, "Closing Socket %s with Number %d", name, sock->sock_no);
-#ifdef WIN32
-	closesocket (sock->sock_no);
-#else
-	close (sock->sock_no);
-#endif      			
+	sys_close_sock (sock->sock_no);
 	del_sock (name);
 	return NS_SUCCESS;
 }
@@ -535,19 +511,11 @@ sts (const char *buf, const int buflen)
 		nlog(LOG_WARNING, "Not sending to server as we have a invalid socket");
 		return;
 	}
-#ifdef WIN32
-	sent = send (servsock, buf, buflen, 0);
-#else	
-	sent = write (servsock, buf, buflen);
-#endif
+	sent = sys_write_sock (servsock, buf, buflen);
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, "Write error: %s", strerror(errno));
 		/* Try to close socket then reset the servsock value to avoid cyclic calls */
-#ifdef WIN32
-		closesocket (servsock);
-#else
-		close (servsock);
-#endif      			
+		sys_close_sock (servsock);
 		servsock = -1;
 		do_exit (NS_EXIT_ERROR, NULL);
 	}
@@ -574,11 +542,7 @@ int FiniSocks (void)
 	sfree(TimeOut);
 	sfree(ufds);
 	if (servsock > 0)
-#ifdef WIN32
-		closesocket (servsock);
-#else
-		close(servsock);
-#endif      			
+		sys_close_sock (servsock);
 	hash_destroy(sockethash);
 	return NS_SUCCESS;
 }

@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Begin adding portability functions for file system calls, socket management 
+   etc to make it easy for modules to be Win32 compatible. (M)
  - Remove all SqlSrv code from core in preparation for moving to a module. (M)
  - Alter CODERHACK dependency so it only requires a rebuild of auth.c rather 
    than potentially a reconfigure and full rebuild. (M)

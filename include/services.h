@@ -53,7 +53,6 @@ typedef struct tconfig {
 	int setservertimes;
 	unsigned int versionscan;
 	int r_time;
-	int port;
 	char pass[MAXPASS];
 	unsigned int debug;
 	int debugtochan;

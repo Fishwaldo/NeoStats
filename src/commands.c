@@ -1005,7 +1005,6 @@ bot_cmd_set (CmdParams * cmdparams)
 	int userlevel;
 
 	if (cmdparams->ac < 1) {
-		msg_syntax_error (cmdparams);
 		return NS_ERR_SYNTAX_ERROR;
 	} 
 	userlevel = getuserlevel (cmdparams);
@@ -1019,7 +1018,6 @@ bot_cmd_set (CmdParams * cmdparams)
 		return NS_SUCCESS;
 	}
 	if (cmdparams->ac < 2) {
-		msg_syntax_error (cmdparams);
 		return NS_ERR_SYNTAX_ERROR;
 	} 
 	set_ptr= (bot_setting*)hnode_find (cmdparams->bot->botsettings, cmdparams->av[0]);

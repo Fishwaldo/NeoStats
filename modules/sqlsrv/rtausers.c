@@ -30,7 +30,7 @@
 void *display_server(void *tbl, char *col, char *sql, void *row) 
 {
 	Client *data = row;
-	return data->user->server->name;                        
+	return data->uplink->name;                        
 }                        
 
 void *display_umode(void *tbl, char *col, char *sql, void *row) 

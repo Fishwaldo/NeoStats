@@ -65,7 +65,8 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 		s->server->hops = atoi (hops);
 	}
 	if (uplink) {
-		strlcpy (s->uplink, uplink, MAXHOST);
+		strlcpy (s->uplinkname, uplink, MAXHOST);
+		s->uplink = find_server (uplink);
 	}
 	if (infoline) {
 		strlcpy (s->info, infoline, MAXINFO);
@@ -97,7 +98,7 @@ static void del_server_leaves (Client * hub)
 	hash_scan_begin (&ss, serverhash);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		if(ircstrcasecmp (hub->name, s->uplink) == 0) {
+		if(ircstrcasecmp (hub->name, s->uplinkname) == 0) {
 			dlog(DEBUG1, "del_server_leaves: server %s had uplink %s", s->name, hub->name);
 			DelServer (s->name, hub->name);
 		}

@@ -56,6 +56,8 @@ extern "C"
 {
 #endif /* __cplusplus */
 
+#define ADNS_DLL
+
 #if defined(ADNS_DLL)
 # ifdef ADNS_DLL_EXPORTS
 #   define ADNS_API __declspec(dllexport)

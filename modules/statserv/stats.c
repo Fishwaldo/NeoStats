@@ -418,9 +418,9 @@ void StatsQuitUser(Client * u)
 {
 	SStats *s;
 
-	s = findserverstats(u->user->server->name);
+	s = findserverstats(u->uplink->name);
 	if (is_oper(u)) {
-		dlog(DEBUG2, "Decreasing OperCount on %s due to signoff", u->user->server->name);
+		dlog(DEBUG2, "Decreasing OperCount on %s due to signoff", u->uplink->name);
 		DecreaseOpers(s);
 	}
 	if (u->user->is_away == 1) {
@@ -448,7 +448,7 @@ void StatsKillUser(Client * u)
 	who++;
 	if (find_user(who)) {
 		/* it was a User that killed the target */
-		ss = findserverstats(u->user->server->name);
+		ss = findserverstats(u->uplink->name);
 		ss->operkills ++;
 	} else if (find_server(who)) {
 		ss = findserverstats(who);
@@ -463,9 +463,9 @@ void StatsUserMode(Client * u, char *modes)
 	SStats *s;
 
 	SET_SEGV_LOCATION();
-	s = findserverstats(u->user->server->name);
+	s = findserverstats(u->uplink->name);
 	if (!s) {
-		nlog (LOG_WARNING, "Unable to find stats for %s", u->user->server->name);
+		nlog (LOG_WARNING, "Unable to find stats for %s", u->uplink->name);
 		return;
 	}
 	while (*modes) {
@@ -479,7 +479,7 @@ void StatsUserMode(Client * u, char *modes)
 		case 'O':
 		case 'o':
 			if (add) {
-				dlog(DEBUG1, "Increasing OperCount for %s (%d)", u->user->server->name, s->opers);
+				dlog(DEBUG1, "Increasing OperCount for %s (%d)", u->uplink->name, s->opers);
 				IncreaseOpers(s);
 				if (stats_network.maxopers <
 				    stats_network.opers) {
@@ -500,7 +500,7 @@ void StatsUserMode(Client * u, char *modes)
 				}
 			} else {
 				if (is_oper(u)) {
-					dlog(DEBUG1, "Decreasing OperCount for %s", u->user->server->name);
+					dlog(DEBUG1, "Decreasing OperCount for %s", u->uplink->name);
 					DecreaseOpers(s);
 				}
 			}
@@ -527,7 +527,7 @@ void StatsAddUser(Client * u)
 	SStats *s;
 
 	SET_SEGV_LOCATION();
-	s = findserverstats(u->user->server->name);
+	s = findserverstats(u->uplink->name);
 	IncreaseUsers(s);
 	dlog(DEBUG2, "added %s to stats, now at %d", u->name, s->users);
 	if (s->maxusers < s->users) {

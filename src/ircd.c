@@ -607,8 +607,8 @@ do_stats (const char* nick, const char *what)
 		irc_numeric (RPL_STATSUPTIME, u->name, "Statistical Server up %d days, %d:%02d:%02d", uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 	} else if (!ircstrcasecmp (what, "c")) {
 		/* Connections */
-		irc_numeric (RPL_STATSNLINE, u->name, "N *@%s * * %d 50", me.uplink, config.port);
-		irc_numeric (RPL_STATSCLINE, u->name, "C *@%s * * %d 50", me.uplink, config.port);
+		irc_numeric (RPL_STATSNLINE, u->name, "N *@%s * * %d 50", me.uplink, me.port);
+		irc_numeric (RPL_STATSCLINE, u->name, "C *@%s * * %d 50", me.uplink, me.port);
 	} else if (!ircstrcasecmp (what, "o")) {
 		/* Operators */
 	} else if (!ircstrcasecmp (what, "l")) {
@@ -1256,7 +1256,6 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 	long mask = 0;
 	int ok = 1, j = 3;
 	Channel *c;
-	lnode_t *mn = NULL;
 	char **param;
 	int paramcnt = 0;
 	int paramidx = 0;

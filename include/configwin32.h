@@ -658,6 +658,8 @@
 #define S_ISDIR(mode) ((mode) & _S_IFDIR ? 1 : 0)
 #define S_ISREG(mode) ((mode) & _S_IFREG ? 1 : 0)
 #define R_OK 04
+typedef int int_t;
+typedef int_t mode_t; 
 
 /* Disable warning for:
    warning C4267: 'function' : conversion from 'size_t' to 'const int', possible loss of data */

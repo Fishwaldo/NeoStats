@@ -121,12 +121,12 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	strlcpy (u->user->username, user, MAXUSER);
 	strlcpy (u->info, realname, MAXREALNAME);
 	u->user->ulevel = -1;
-	u->user->server = find_server (server);
+	u->uplink = find_server (server);
 	u->user->tslastmsg = me.now;
 	u->user->chans = list_create (MAXJOINCHANS);
 	u->ip.s_addr = htonl (ipaddress);
 	strlcpy(u->hostip, inet_ntoa (u->ip), HOSTIPLEN);
-	if (IsMe(u->user->server)) {
+	if (IsMe(u->uplink)) {
 		u->flags |= NS_FLAGS_ME;
 	}
 	/* check if the user is excluded */
@@ -531,7 +531,7 @@ void QuitServerUsers (Client *s)
 	hash_scan_begin(&hs, userhash);
 	while ((un = hash_scan_next(&hs)) != NULL) {
 		u = hnode_get (un);
-		if(u->user->server == s) 
+		if(u->uplink == s) 
 		{
 			dlog (DEBUG1, "QuitServerUsers: deleting %s from %s", u->name, s->name);
 			QuitUser(u->name, s->name);

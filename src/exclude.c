@@ -230,7 +230,7 @@ void ns_do_exclude_user(Client *u)
 	/* first thing we check is the server flag. if the server
 	 * is excluded, then the user is excluded as well
 	 */
-	if (u->user->server->flags & NS_FLAGS_EXCLUDED) {
+	if (u->uplink->flags & NS_FLAGS_EXCLUDED) {
 	 	u->flags |= NS_FLAGS_EXCLUDED;
 		return;
 	}
