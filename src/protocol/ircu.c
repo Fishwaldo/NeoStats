@@ -125,7 +125,7 @@ ChanModes chan_modes[] = {
 	{CMODE_NOAMSG, 'T', 0, 0, 0},
 #endif
 	/*{CMODE_LISTED, 'b', 0, 1, 0},*/
-	{CMODE_REGONLY, 'r', 0, 0, 0},
+	{CMODE_RGSTRONLY, 'r', 0, 0, 0},
 };
 
 UserModes user_umodes[] = {
