@@ -849,6 +849,9 @@ bot_message (char *origin, char **av, int ac)
 	User *u;
 	User *bot_user;
 	ModUser *mod_usr;
+	char** argv;
+	int argc = 0;
+	int i;
 
 	/* Check command length */
 	if (strnlen (av[1], MAX_CMD_LINE_LENGTH) >= MAX_CMD_LINE_LENGTH) {
@@ -884,7 +887,12 @@ bot_message (char *origin, char **av, int ac)
 	if (setjmp (sigvbuf) == 0) {
 		SET_SEGV_INMODULE(mod_usr->modname);
 		if(mod_usr->function) {
-			mod_usr->function (origin, av, ac);
+			AddStringToList (&argv, bot_user->nick, &argc);
+			for(i = 1; i < ac; i++) {
+				AddStringToList (&argv, av[i], &argc);
+			}
+			mod_usr->function (u->nick, av, ac);
+			free(argv);
 		} else {
 			/* Trap CTCP commands and silently drop them to avoid unknown command errors 
 			 * Why bother? Well we might be able to use some of them in the future
@@ -895,14 +903,19 @@ bot_message (char *origin, char **av, int ac)
 			if (av[1][0] == '\1') {
 				char* buf;
 				buf = joinbuf(av, ac, 1);
-				nlog (LOG_NORMAL, LOG_MOD, "%s requested CTCP %s", origin, buf);
+				nlog (LOG_NORMAL, LOG_MOD, "%s requested CTCP %s", u->nick, buf);
 				free(buf);
 				return;
 			}
 			if (!u) {
-				nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", origin, mod_usr->nick);
+				nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", u->nick, mod_usr->nick);
 			} else {
+				AddStringToList (&argv, bot_user->nick, &argc);
+				for(i = 1; i < ac; i++) {
+					AddStringToList (&argv, av[i], &argc);
+				}
 				run_bot_cmd(mod_usr, u, av, ac);
+				free(argv);
 			}
 		}
 		CLEAR_SEGV_INMODULE();
