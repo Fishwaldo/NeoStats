@@ -66,7 +66,7 @@ Contents
     1.3 Running configure
     1.4 Compiling NeoStats
     1.5 Installing NeoStats
-    1.6 Setting up the neostats.cfg file
+    1.6 Setting up the neostats.conf file
     1.7 Compiling additional modules
     1.8 Running NeoStats
     1.9 Notes for upgraders
@@ -203,8 +203,8 @@ This will create the necessary files, and copy them to the
 installation directory. 
 
 
-1.6 Setting up the neostats.cfg file
-------------------------------------
+1.6 Setting up the neostats.conf file
+-------------------------------------
 
 Now you should change to the installation directory (~/NeoStats/, or 
 whatever you specified in ./configure) e.g.
@@ -220,19 +220,19 @@ should now run the makeconf script and answer the questions:
     
         ./makeconf
 
-You must edit neostats.cfg to check that everything is set the way you 
+You must edit neostats.conf to check that everything is set the way you 
 want it before NeoStats will run. You can do this with:
 
-        pico neostats.cfg
+        pico neostats.conf
 
-All the options are described below and in the neostats.cfg file. Once 
+All the options are described below and in the neostats.conf file. Once 
 you are done editing the file save it. 
 
 If using pico as in the previous example, press Ctrl-X then hit Y and 
 enter to save the file.
 
 NOTE: some additional modules have additional configuration options that 
-must be specified in the neostats.cfg file. Please see the documentation 
+must be specified in the neostats.conf file. Please see the documentation 
 for the individual modules for any configuration options. 
 
 The available options for the main NeoStats distribution are described
@@ -316,7 +316,7 @@ SERVICES_CHAN #<channel name> [REQUIRED]
     start-up/load.
 
 NO_LOAD [YOU MUST REMOVE THIS]
-    If this is in the neostats.cfg your NeoStats WILL NOT START UP. To 
+    If this is in the neostats.conf your NeoStats WILL NOT START UP. To 
     disable this simply comment this line out. e.g.
         
         NO_LOAD  <- NeoStats will not load.

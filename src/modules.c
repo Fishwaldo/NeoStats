@@ -403,6 +403,14 @@ load_module (const char *modfilename, Client * u)
 		ns_dlclose (dl_handle);
 		return NULL;
 	}
+    /* For Auth modules, register auth function */
+	if (info_ptr->flags & MODULE_FLAG_AUTH) {
+		if (init_auth_module (mod_ptr) != NS_SUCCESS) {
+			load_module_error (u, "Unable to load auth module: %s missing ModAuthUser function", info_ptr->name);
+			ns_dlclose (dl_handle);
+			return NULL;
+		}
+	}
 	/* Allocate module */
 	mod_ptr = (Module *) scalloc (sizeof (Module));
 	hnode_create_insert (modulehash, mod_ptr, info_ptr->name);
@@ -415,16 +423,8 @@ load_module (const char *modfilename, Client * u)
 	if(event_ptr) {
 		RegisterEventList (mod_ptr, event_ptr);
 	}
-	if (mod_ptr->info->flags & MODULE_FLAG_AUTH) {
-		if (init_auth_module (mod_ptr) != NS_SUCCESS) {
-			load_module_error (u, "Unable to load auth module: %s missing ModAuthUser function", mod_ptr->info->name);
-			unload_module(mod_ptr->info->name, NULL);
-			return NULL;
-		}
-	} else {
-		/* Module side user authentication for e.g. SecureServ helpers */
-		mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "ModAuth");
-	}
+    /* Module side user authentication for e.g. SecureServ helpers */
+	mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "ModAuth");
 	/* assign a module number to this module */
 	while (ModList[moduleindex] != NULL)
 		moduleindex++;
@@ -503,20 +503,18 @@ unload_module (const char *modname, Client * u)
 		return NS_FAILURE;
 	}
 	mod_ptr = hnode_get (modnode);
+	irc_chanalert (ns_botptr, "Unloading module %s", modname);
 	if (mod_ptr->info->flags & MODULE_FLAG_AUTH)
 	{
 		delete_auth_module (mod_ptr);
 	}
 	moduleindex = mod_ptr->modnum;
-	irc_chanalert (ns_botptr, "Unloading module %s", modname);
 	/* canx any DNS queries used by this module */
 	canx_dns (mod_ptr);
 	/* Delete any timers used by this module */
 	del_timers (mod_ptr);
 	/* Delete any sockets used by this module */
 	del_sockets (mod_ptr);
-	dlog(DEBUG1, "Deleting Module %s from Hash", modname);
-	irc_globops (NULL, "%s Module Unloaded", modname);
 	/* Delete any associated event list */
 	if (mod_ptr->event_list) {
 		sfree (mod_ptr->event_list);
@@ -525,6 +523,7 @@ unload_module (const char *modname, Client * u)
 	/* Remove from the module hash so we dont call events for this module 
 	 * during signoff 
 	 */
+	dlog(DEBUG1, "Deleting Module %s from Hash", modname);
 	hash_delete (modulehash, modnode);		
 	/* call ModFini (replacement for library __fini() call */
 	ModFini = ns_dlsym ((int *) mod_ptr->dl_handle, "ModFini");
@@ -550,6 +549,7 @@ unload_module (const char *modname, Client * u)
 		ModList[moduleindex] = NULL;
 	}
 	sfree (mod_ptr);
+	irc_globops (NULL, "%s Module Unloaded", modname);
 	return NS_SUCCESS;
 }
 

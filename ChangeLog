@@ -4,6 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - neostats.cfg renamed to neostats.conf. This is to be more consistent with 
+   other packages and to avoid someone using a config file from an older series
+   with NeoStats 3.0. (M)
  - Combine standard and auth module load/unload systems so we can load and 
    unload auth modules easily. (M)
  - Remove me.onchan since it is always set with me.synched so is redundant. (M)

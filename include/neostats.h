@@ -278,7 +278,7 @@ EXPORTFUNC const char * GetSmodeDesc (const unsigned int mask);
 
 #include "numeric.h"
 
-#define CONFIG_NAME		"neostats.cfg"
+#define CONFIG_NAME		"neostats.conf"
 #define MOD_PATH		"modules"
 #define RECV_LOG		"logs/recv.log"
 #define MOTD_FILENAME	"neostats.motd"
