@@ -90,6 +90,7 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 
 extern void nlog (int level, int scope, char *fmt, ...);
 void *close_logs ();
-void init_logs ();
+int init_logs ();
+void ResetLogs ();
 
 #endif

@@ -164,4 +164,14 @@ extern void del_bot_from_chan (char *, char *);
 extern void bot_chan_message (char *origin, char *chan, char **av, int ac);
 extern void botchandump (User * u);
 extern int get_mod_num (char *);
+
+/* Module Interface */
+int __ModInit(int modnum, int apiver);
+void __ModFini(void);
+int __Bot_Message(char *origin, char **av, int ac);
+/* need to check include order before enabling the following */
+/* Module_Info *__module_get_info(void); */
+/* Functions *__module_get_functions(void); */
+/* EventFnList *__module_get_events(void); */
+
 #endif /* !_dl_h_ */

@@ -71,7 +71,7 @@ const char version_time[] = __TIME__;
 
 static void start ();
 static void setup_signals ();
-void get_options (int argc, char **argv);
+static int get_options (int argc, char **argv);
 
 
 /*! have we forked */
@@ -92,7 +92,8 @@ main (int argc, char *argv[])
 {
 	FILE *fp;
 	/* get our commandline options */
-	get_options (argc, argv);
+	if(get_options (argc, argv)<0)
+		exit(-1);
 
 	/* Change to the working Directory */
 	if (chdir (NEO_PREFIX) < 0) {
@@ -103,11 +104,12 @@ main (int argc, char *argv[])
 	}
 
 	/* before we do anything, make sure logging is setup */
-	init_logs ();
+	if(init_logs ()<0)
+		exit(-1);
 
 	/* our crash trace variables */
 	SET_SEGV_LOCATION();
-	strcpy (segvinmodule, "");
+	CLEAR_SEGV_INMODULE();
 	/* for modules, let them know we are not ready */
 	me.onchan = 0;
 	/* keep quiet if we are told to :) */
@@ -122,7 +124,6 @@ main (int argc, char *argv[])
 	/* set some defaults before we parse the config file */
 	me.t_start = time (NULL);
 	me.want_privmsg = 0;
-	me.enable_spam = 0;
 	me.die = 0;
 	me.local[0] = '\0';
 	me.coder_debug = 0;
@@ -150,13 +151,13 @@ main (int argc, char *argv[])
 	setup_signals ();
 
 	/* load the config files */
-	ConfLoad ();
+	if(ConfLoad ()<0)
+		exit(-1);
 	if (me.die) {
 		printf ("\n-----> ERROR: Read the README file then edit neostats.cfg! <-----\n\n");
 		nlog (LOG_CRITICAL, LOG_CORE, "Read the README file and edit your neostats.cfg");
 		sleep (1);
 		close (servsock);
-		remove ("neostats.pid");
 		/* we are exiting the parent, not the program, don't call do_exit() */
 		exit (0);
 	}
@@ -198,7 +199,8 @@ main (int argc, char *argv[])
 #ifndef DEBUG
 		/* child (daemon) continues */ 
 		/* reopen logs for child */ 
-		init_logs (); 
+		if(init_logs ()<0)
+			exit(-1);
 		/* detach from parent process */
 		if (setpgid (0, 0) < 0) {
 			nlog (LOG_WARNING, LOG_CORE, "setpgid() failed");
@@ -219,8 +221,10 @@ main (int argc, char *argv[])
 /** @brief Process COmmandline Options
  *
  * Processes commandline options
+ *
+ * returns 0 on success, -1 on error
 */
-static void
+static int
 get_options (int argc, char **argv)
 {
 	int c;
@@ -235,26 +239,25 @@ get_options (int argc, char **argv)
 	config.foreground = 0;
 #endif
 
-
 	while ((c = getopt (argc, argv, "hvrd:nqf")) != -1) {
 		switch (c) {
 		case 'h':
 			printf ("NeoStats: Usage: \"neostats [options]\"\n");
-			printf ("          -h (Show this screen)\n");
-			printf ("	  -v (Show Version Number)\n");
-			printf ("	  -r (Enable Recv.log)\n");
-			printf ("	  -d 1-10 (Enable Debuging output 1= lowest, 10 = highest)\n");
+			printf ("     -h (Show this screen)\n");
+			printf ("	  -v (Show version number)\n");
+			printf ("	  -r (Enable recv.log)\n");
+			printf ("	  -d 1-10 (Enable debugging output 1= lowest, 10 = highest)\n");
 			printf ("	  -n (Do not load any modules on startup)\n");
-			printf ("	  -q (Quiet Start - For Cron Scripts)\n");
-			printf ("          -f (Do NOt fork into BackGround\n");
-			exit (1);
+			printf ("	  -q (Quiet start - for cron scripts)\n");
+			printf ("     -f (Do not fork into background\n");
+			return (-1);
 		case 'v':
 			printf ("NeoStats Version %d.%d.%d%s\n", MAJOR, MINOR, REV, version);
 			printf ("Compiled: %s at %s\n", version_date, version_time);
 			printf ("Flag after version number indicates what IRCd NeoStats is compiled for:\n");
 			printf ("(U)  - Unreal IRCd\n");
 			printf ("(UL3)- Ultimate 3.x.x IRCd\n");
-			printf ("(UL) - Ultimate 2.x.x IRCd (Depriciated)\n");
+			printf ("(UL) - Ultimate 2.x.x IRCd (Depreciated)\n");
 			printf ("(H)  - Hybrid 7.x IRCd\n");
 			printf ("(N)  - NeoIRCd IRCd\n");
 			printf ("(M)  - Mystic IRCd\n");
@@ -262,9 +265,9 @@ get_options (int argc, char **argv)
 			printf ("(B)  - Bahamut IRCd\n");
 			printf ("(IRCu) - IRCu (P10) IRCd\n");
 			printf ("\nNeoStats: http://www.neostats.net\n");
-			exit (1);
+			return (-1);
 		case 'r':
-			printf ("Recv.log enabled. Watch your DiskSpace\n");
+			printf ("recv.log enabled. Watch your DiskSpace\n");
 			config.recvlog = 1;
 			break;
 		case 'n':
@@ -277,7 +280,7 @@ get_options (int argc, char **argv)
 			dbg = atoi (optarg);
 			if ((dbg > 10) || (dbg < 1)) {
 				printf ("Invalid Debug Level %d\n", dbg);
-				exit (1);
+				return (-1);
 			}
 			config.debug = dbg;
 			break;
@@ -285,11 +288,10 @@ get_options (int argc, char **argv)
 			config.foreground = 1;
 			break;
 		default:
-			printf ("Unknown Commandline switch %c\n", optopt);
+			printf ("Unknown command line switch %c\n", optopt);
 		}
 	}
-
-
+	return(0);
 }
 
 
@@ -393,7 +395,7 @@ serv_segv ()
 		nlog (LOG_CRITICAL, LOG_CORE, "Backtrace not available on this platform");
 #endif
 		strcpy (name, segvinmodule);
-		strcpy (segvinmodule, "");
+		CLEAR_SEGV_INMODULE();
 		unload_module (name, NULL);
 		chanalert (s_Services, "Restoring Stack to before Crash");
 		longjmp (sigvbuf, -1);
@@ -516,7 +518,7 @@ start ()
 		unload_module (mod_ptr->info->module_name, finduser (s_Services));
 	}
 	if(me.r_time>0) {
-		sleep (5);
+		sleep (me.r_time);
 		do_exit (2);
 	}
 	else
@@ -691,6 +693,9 @@ FreeList (char **List, int C)
 void
 do_exit (int segv)
 {
+	/* Initialise exit code to OK */
+	int exit_code=1;
+
 	switch (segv) {
 	case 0:
 		nlog (LOG_CRITICAL, LOG_CORE, "Normal shut down SubSystems");
@@ -700,17 +705,81 @@ do_exit (int segv)
 		break;
 	case 1:
 		nlog (LOG_CRITICAL, LOG_CORE, "Shutting Down SubSystems without saving data due to core");
+		/* exit code to error */
+		exit_code=-1;
 		break;
 	}
 	kp_flush();
 	close_logs ();
-
-	if (segv == 1) {
-		exit (-1);
-	} else if (segv == 2) {
+	if (segv == 2) {
 		execve ("./neostats", NULL, NULL);
-	} else {
-		exit (1);
+		/* exit code to error */
+		exit_code=-2;
 	}
-
+	remove ("neostats.pid");
+	exit (exit_code);
 }
+
+/* this came from eggdrop sources */
+/* Remove the color control codes that mIRC,pIRCh etc use to make
+ * their client seem so fecking cool! (Sorry, Khaled, you are a nice
+ * guy, but when you added this feature you forced people to either
+ * use your *SHAREWARE* client or face screenfulls of crap!)
+ */
+void strip_mirc_codes(char *text)
+{
+  char *dd = text;
+
+  while (*text) {
+    switch (*text) {
+    case 1:
+    	text++;			/* ctcp stuff */
+    	continue;
+      break;
+    case 2:			/* Bold text */
+	text++;
+	continue;
+      break;
+    case 3:			/* mIRC colors? */
+	if (isdigit(text[1])) {	/* Is the first char a number? */
+	  text += 2;		/* Skip over the ^C and the first digit */
+	  if (isdigit(*text))
+	    text++;		/* Is this a double digit number? */
+	  if (*text == ',') {	/* Do we have a background color next? */
+	    if (isdigit(text[1]))
+	      text += 2;	/* Skip over the first background digit */
+	    if (isdigit(*text))
+	      text++;		/* Is it a double digit? */
+	  }
+	continue;
+      }
+      break;
+    case 7:
+	text++;
+	continue;
+      break;
+    case 0x16:			/* Reverse video */
+	text++;
+	continue;
+      break;
+    case 0x1f:			/* Underlined text */
+	text++;
+	continue;
+      break;
+    case 033:
+	text++;
+	if (*text == '[') {
+	  text++;
+	  while ((*text == ';') || isdigit(*text))
+	    text++;
+	  if (*text)
+	    text++;		/* also kill the following char */
+	}
+	continue;
+      break;
+    }
+    *dd++ = *text++;		/* Move on to the next char */
+  }
+  *dd = 0;
+}
+

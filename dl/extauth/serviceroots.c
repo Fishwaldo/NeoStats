@@ -31,7 +31,8 @@
 #include "log.h"
 #include "conf.h"
 
-extern const char version_date[], version_time[];
+const char eaversion_date[] = __DATE__;
+const char eaversion_time[] = __TIME__;
 
 static int new_m_version(char *origin, char **av, int ac);
 void sr_cb_config(char *arg, int configtype);
@@ -82,15 +83,15 @@ struct users {
 
 int new_m_version(char *origin, char **av, int ac)
 {
-	strcpy(segv_location, "serviceRoots-new_m_version");
+	SET_SEGV_LOCATION();
 	snumeric_cmd(351, origin,
 		     "Module ServiceRoots Loaded, Version: %s %s %s",
-		     extauth_Info[0].module_version, version_date,
-		     version_time);
+		     extauth_Info[0].module_version, eaversion_date,
+		     eaversion_time);
 	return 0;
 }
 
-void _init()
+int __ModInit()
 {
 	srconf.auth = 0;
 	/* only a max of 10 serviceroots */
@@ -98,10 +99,12 @@ void _init()
 	if (!config_read("neostats.cfg", options) == 0) {
 		nlog(LOG_WARNING, LOG_CORE,
 		     "ServiceRoots: ehh, config failed");
+		/* we can't unload the extauth module so don't return -1 */
 	}
+	return 1;
 }
 
-void _fini()
+void __ModFini()
 {
 	lnode_t *un;
 	un = list_first(srconf.ul);
@@ -120,8 +123,7 @@ void sr_cb_config(char *arg, int configtype)
 	char *host;
 	struct users *sru;
 
-
-	strcpy(segv_location, "StatServ-ss_cb_Config");
+	SET_SEGV_LOCATION();
 	if (configtype == 0) {
 		if (list_isfull(srconf.ul)) {
 			nlog(LOG_WARNING, LOG_CORE,

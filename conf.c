@@ -100,7 +100,7 @@ strip (char *line)
  */
 
 
-void
+int
 ConfLoad ()
 {
 	/* Read in the Config File */
@@ -115,7 +115,7 @@ ConfLoad ()
 		printf ("*             NeoStats NOT Started                *\n");
 		printf ("***************************************************\n");
 		/* no need to call do_exit, we havn't even started! */
-		exit (0);
+		return -1;
 	}
 	printf ("Sucessfully Loaded Config File, Now Booting NeoStats\n");
 #ifdef EXTAUTH
@@ -130,6 +130,7 @@ ConfLoad ()
 		me.pingtime = 120;
 	}
 	done_mods = 0;
+	return 0;
 }
 
 
@@ -154,7 +155,7 @@ cb_Module (char *arg, int configtype)
 			}
 		}
 		load_mods[i] = sstrdup (arg);
-		nlog (LOG_NORMAL, LOG_CORE, "Added Module %d :%s", i, load_mods[i]);
+		nlog (LOG_DEBUG1, LOG_CORE, "Added Module %d :%s", i, load_mods[i]);
 	}
 }
 
@@ -173,6 +174,7 @@ init_modules ()
 	int rval;
 
 	SET_SEGV_LOCATION();
+	nlog (LOG_NORMAL, LOG_CORE, "Loading configured modules"); 
 	for (i = 1; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
 		nlog (LOG_DEBUG1, LOG_CORE, "Loading Module %s", load_mods[i]);
 		rval = load_module (load_mods[i], NULL);
@@ -182,6 +184,7 @@ init_modules ()
 			nlog (LOG_WARNING, LOG_CORE, "Could Not Load Module %s, Please check above error Messages", load_mods[i]);
 		}
 	}
+	nlog (LOG_NORMAL, LOG_CORE, "Completed loading configured modules"); 
 	return 1;
 }
 

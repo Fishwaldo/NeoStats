@@ -49,7 +49,7 @@ chk ()
 		mod_ptr = hnode_get (tn);
 		if (current - mod_ptr->lastrun > mod_ptr->interval) {
 			strcpy (segv_location, mod_ptr->modname);
-			strcpy (segvinmodule, mod_ptr->modname);
+			SET_SEGV_INMODULE(mod_ptr->modname);
 			if (setjmp (sigvbuf) == 0) {
 				if (mod_ptr->function () < 0) {
 					nlog(LOG_DEBUG2, LOG_CORE, "Deleting Timer %s for Module %s as requested", mod_ptr->timername, mod_ptr->modname);
@@ -62,7 +62,7 @@ chk ()
 			} else {
 				nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", mod_ptr->modname);
 			}
-			strcpy (segvinmodule, "");
+			CLEAR_SEGV_INMODULE();
 		}
 	}
 	SET_SEGV_LOCATION();

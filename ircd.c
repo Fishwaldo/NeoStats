@@ -86,7 +86,7 @@ init_bot (char *nick, char *user, char *host, char *rname, char *modes, char *mo
 	Module_Event ("SIGNON", av, ac);
 	free (av);
 	/* restore segvinmodule from SIGNON */
-	strcpy (segvinmodule, mod_name);
+	SET_SEGV_INMODULE(mod_name);
 	return 1;
 }
 
@@ -128,13 +128,13 @@ Module_Event (char *event, char **av, int ac)
 				if (!strcasecmp (ev_list->cmd_name, event)) {
 					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Comamnd %s -> %s", module_ptr->info->module_name, event, ev_list->cmd_name);
 					SET_SEGV_LOCATION();
-					strcpy (segvinmodule, module_ptr->info->module_name);
+					SET_SEGV_INMODULE(module_ptr->info->module_name);
 					if (setjmp (sigvbuf) == 0) {
 						if (ev_list->function) ev_list->function (av, ac);
 					} else {
 						nlog (LOG_CRITICAL, LOG_CORE, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->module_name);
 					}
-					strcpy (segvinmodule, "");
+					CLEAR_SEGV_INMODULE();
 					SET_SEGV_LOCATION();
 #ifndef VALGRIND
 					break;
@@ -308,11 +308,11 @@ parse (char *line)
 				}
 
 				SET_SEGV_LOCATION();
-				strcpy (segvinmodule, list->modname);
+				SET_SEGV_INMODULE(list->modname);
 				if (setjmp (sigvbuf) == 0) {
 					list->function (origin, av, ac);
 				}
-				strcpy (segvinmodule, "");
+				CLEAR_SEGV_INMODULE();
 				SET_SEGV_LOCATION();
 				free (av);
 				return;
@@ -347,11 +347,11 @@ parse (char *line)
 				if (fn_list->srvmsg == cmdptr) {
 					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
 					SET_SEGV_LOCATION();
-					strcpy (segvinmodule, module_ptr->info->module_name);
+					SET_SEGV_INMODULE(module_ptr->info->module_name);
 					if (setjmp (sigvbuf) == 0) {
 						fn_list->function (origin, av, ac);
 					}
-					strcpy (segvinmodule, "");
+					CLEAR_SEGV_INMODULE();
 					SET_SEGV_LOCATION();
 					break;
 				}

@@ -40,7 +40,7 @@ void SaveStats()
 	hnode_t *sn;
 	lnode_t *cn;
 	hscan_t ss;
-	strcpy(segv_location, "StatServ-SaveStats");
+	SET_SEGV_LOCATION();
 
 	if (StatServ.newdb == 1) {
 		chanalert(s_StatServ, "Enabling Record yelling!");
@@ -112,7 +112,7 @@ void LoadStats() {
 	hnode_t *sn;
 	lnode_t *cn;
 	int count;
-	strcpy(segv_location, "StatServ-LoadStats");
+	SET_SEGV_LOCATION();
 	Chead = list_create(SS_CHAN_SIZE);
 	Shead = hash_create(S_TABLE_SIZE, 0, 0);
 
@@ -220,7 +220,7 @@ void LoadOldStats()
 	hnode_t *sn;
 	lnode_t *cn;
 	int count;
-	strcpy(segv_location, "StatServ-LoadStats");
+	SET_SEGV_LOCATION();
 
 	if (fp) {
 		while (fgets(buf, BUFSIZE, fp)) {

@@ -32,9 +32,7 @@ void DelTLD(User * u)
 	TLD *t = NULL;
 	char *m;
 
-	strcpy(segv_location, "StatServ-DelTLD");
-
-
+	SET_SEGV_LOCATION();
 	m = strrchr(u->hostname, '.');
 
 	if (!m)
@@ -63,9 +61,7 @@ TLD *findtld(char *tld)
 {
 	TLD *t;
 
-	strcpy(segv_location, "StatServ-findtld");
-
-
+	SET_SEGV_LOCATION();
 	for (t = tldhead; t; t = t->next) {
 		if (!strcasecmp(t->tld, tld))
 			return t;
@@ -79,8 +75,7 @@ TLD *AddTLD(User * u)
 	TLD *t = NULL;
 	char *m;
 
-	strcpy(segv_location, "StatServ-AddTLD");
-
+	SET_SEGV_LOCATION();
 	m = strrchr(u->hostname, '.');
 
 	if (!m)
@@ -115,9 +110,7 @@ void LoadTLD()
 	char *tmp = NULL, *tmp2 = NULL;
 	TLD *t;
 
-	strcpy(segv_location, "StatServ-LoadTLD");
-
-
+	SET_SEGV_LOCATION();
 	if ((fp = fopen("data/tlds.nfo", "r")) == NULL) {
 		nlog(LOG_WARNING, LOG_MOD,
 		     "Top Level Domain Statistics not loaded: file not found.");
@@ -156,9 +149,7 @@ void init_tld()
 {
 	TLD *t;
 
-	strcpy(segv_location, "StatServ-init_tld");
-
-
+	SET_SEGV_LOCATION();
 	for (t = tldhead; t; t = t->next) {
 		t->users = 0;
 		t->daily_users = 0;

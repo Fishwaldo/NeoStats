@@ -64,69 +64,6 @@ CVersions *findversions(char *name)
 	return cv;
 }
 
-/* this came from eggdrop sources */
-/* Remove the color control codes that mIRC,pIRCh etc use to make
- * their client seem so fecking cool! (Sorry, Khaled, you are a nice
- * guy, but when you added this feature you forced people to either
- * use your *SHAREWARE* client or face screenfulls of crap!)
- */
-static void strip_mirc_codes(char *text)
-{
-  char *dd = text;
-
-  while (*text) {
-    switch (*text) {
-    case 1:
-    	text++;			/* ctcp stuff */
-    	continue;
-      break;
-    case 2:			/* Bold text */
-	text++;
-	continue;
-      break;
-    case 3:			/* mIRC colors? */
-	if (isdigit(text[1])) {	/* Is the first char a number? */
-	  text += 2;		/* Skip over the ^C and the first digit */
-	  if (isdigit(*text))
-	    text++;		/* Is this a double digit number? */
-	  if (*text == ',') {	/* Do we have a background color next? */
-	    if (isdigit(text[1]))
-	      text += 2;	/* Skip over the first background digit */
-	    if (isdigit(*text))
-	      text++;		/* Is it a double digit? */
-	  }
-	continue;
-      }
-      break;
-    case 7:
-	text++;
-	continue;
-      break;
-    case 0x16:			/* Reverse video */
-	text++;
-	continue;
-      break;
-    case 0x1f:			/* Underlined text */
-	text++;
-	continue;
-      break;
-    case 033:
-	text++;
-	if (*text == '[') {
-	  text++;
-	  while ((*text == ';') || isdigit(*text))
-	    text++;
-	  if (*text)
-	    text++;		/* also kill the following char */
-	}
-	continue;
-      break;
-    }
-    *dd++ = *text++;		/* Move on to the next char */
-  }
-  *dd = 0;
-}
-
 int s_client_version(char **av, int ac)
 {
 	lnode_t *node;
@@ -316,7 +253,8 @@ CStats *AddChanStats(char *name)
 int s_new_server(char **av, int ac)
 {
 	Server *s;
-	strcpy(segv_location, "StatServ-s_new_server");
+
+	SET_SEGV_LOCATION();
 	s = findserver(av[0]);
 	if (!s)
 		return 0;
@@ -346,7 +284,8 @@ int s_del_server(char **av, int ac)
 {
 	SStats *ss;
 	Server *s;
-	strcpy(segv_location, "StatServ-s_del_server");
+
+	SET_SEGV_LOCATION();
 	s = findserver(av[0]);
 	if (!s)
 		return 0;
@@ -369,12 +308,11 @@ int s_user_kill(char **av, int ac)
 	SStats *ss;
 	char *cmd, *who;
 	User *u;
+
+	SET_SEGV_LOCATION();
 	u = finduser(av[0]);
 	if (!u)
 		return 0;
-
-	strcpy(segv_location, "StatServ-s_user_kill");
-
 	s = findstats(u->server->name);
 	if (is_oper(u)) {
 		nlog(LOG_DEBUG2, LOG_MOD, "Decreasing OperCount on %s due to kill", u->server->name);
@@ -407,8 +345,7 @@ int s_user_modes(char **av, int ac)
 	SStats *s;
 	User *u;
 
-	strcpy(segv_location, "StatServ-s_user_modes");
-
+	SET_SEGV_LOCATION();
 	u = finduser(av[0]);
 	if (!u) {
 		nlog(LOG_WARNING, LOG_MOD,
@@ -483,8 +420,7 @@ int s_user_modes(char **av, int ac)
 
 void re_init_bot()
 {
-	strcpy(segv_location, "StatServ-re_init_bot");
-
+	SET_SEGV_LOCATION();
 	chanalert(s_Services, "Re-Initilizing %s Bot", s_StatServ);
 	init_bot(s_StatServ, StatServ.user, StatServ.host,
 		 "/msg Statserv HELP", "+oS", SSMNAME);
@@ -514,7 +450,8 @@ int s_del_user(char **av, int ac)
 int s_user_away(char **av, int ac)
 {
 	User *u;
-	strcpy(segv_location, "StatServ-s_user_away");
+
+	SET_SEGV_LOCATION();
 	u = finduser(av[0]);
 	if (!u)
 		return 0;
@@ -533,14 +470,14 @@ int s_new_user(char **av, int ac)
 {
 	SStats *s;
 	User *u;
+
+	SET_SEGV_LOCATION();
 	u = finduser(av[0]);
 	if (!u)
 		return 0;
 
 	if (u->server->name == me.name)
 		return 0;
-
-	strcpy(segv_location, "StatServ-s_new_user");
 
 	s = findstats(u->server->name);
 	IncreaseUsers(s);
@@ -583,7 +520,7 @@ int pong(char **av, int ac)
 	SStats *ss;
 	Server *s;
 
-	strcpy(segv_location, "StatServ-pong");
+	SET_SEGV_LOCATION();
 	s = findserver(av[0]);
 	if (!s)
 		return 0;
@@ -627,9 +564,7 @@ int pong(char **av, int ac)
 
 int Online(char **av, int ac)
 {
-
-	strcpy(segv_location, "StatServ-Online");
-
+	SET_SEGV_LOCATION();
 	init_bot(s_StatServ, StatServ.user, StatServ.host, StatServ.rname,
 		 "+oS", SSMNAME);
 	StatServ.onchan = 1;
@@ -653,10 +588,8 @@ extern SStats *new_stats(const char *name)
 	hnode_t *sn;
 	SStats *s = calloc(sizeof(SStats), 1);
 
+	SET_SEGV_LOCATION();
 	nlog(LOG_DEBUG2, LOG_MOD, "new_stats(%s)", name);
-
-	strcpy(segv_location, "StatServ-SStats");
-
 
 	if (!s) {
 		nlog(LOG_CRITICAL, LOG_MOD, "Out of memory.");
@@ -694,9 +627,8 @@ extern SStats *new_stats(const char *name)
 void AddStats(Server * s)
 {
 	SStats *st = findstats(s->name);
-	strcpy(segv_location, "StatServ-AddStats");
 
-
+	SET_SEGV_LOCATION();
 	nlog(LOG_DEBUG2, LOG_MOD, "AddStats(%s)", s->name);
 
 	if (!st) {
@@ -710,8 +642,8 @@ SStats *findstats(char *name)
 {
 	hnode_t *sn;
 
+	SET_SEGV_LOCATION();
 	nlog(LOG_DEBUG2, LOG_MOD, "findstats(%s)", name);
-	strcpy(segv_location, "StatServ-findstats");
 
 	sn = hash_lookup(Shead, name);
 	if (sn) {
@@ -731,9 +663,7 @@ void Is_Midnight()
 	lnode_t *cn;
 	CStats *c;
 
-	strcpy(segv_location, "StatServ-Is_Midnight");
-
-
+	SET_SEGV_LOCATION();
 	if (ltm->tm_hour == 0) {
 		if (ltm->tm_min == 0) {
 			/* its Midnight! */

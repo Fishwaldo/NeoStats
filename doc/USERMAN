@@ -45,12 +45,11 @@ Contents
 		2.3.10 LOGS		
 		2.3.11 RAW			
 		2.3.12 JUPE		
-		2.3.13 JOIN		
-		2.3.14 DEBUG		
-		2.3.15 USERDUMP	
-		2.3.16 SERVERDUMP	
-		2.3.17 CHANDUMP	
-3.  StatServ
+		2.3.13 DEBUG		
+		2.3.14 USERDUMP	
+		2.3.15 SERVERDUMP	
+		2.3.16 CHANDUMP	
+3.  StatServ 
 	3.1 About StatServ
 	3.2 Available Commands
 	3.3 Command Reference
@@ -336,18 +335,7 @@ Description:
 Example:
 	/msg NeoStats JUPE jupe.com
 
-2.3.13 JOIN
------------
-Syntax: 
-	/msg NeoStats JOIN <CHANNEL>
-Description: 
-	Cause NeoStats to join channel CHANNEL.
-	It will then echo events as they happen to that channel, 
-	so it shouldn't join public channels
-Example:
-	/msg NeoStats JOIN #Services
-
-2.3.14 DEBUG
+2.3.13 DEBUG
 ------------
 Syntax: 
 	/msg NeoStats DEBUG
@@ -359,7 +347,7 @@ Description:
 Example:
 	/msg NeoStats DEBUG
 
-2.3.15 USERDUMP
+2.3.14 USERDUMP
 ---------------
 Syntax: 
 	/msg NeoStats USERDUMP
@@ -369,7 +357,7 @@ Description:
 Example:
 	/msg NeoStats USERDUMP
 
-2.3.16 SERVERDUMP
+2.3.15 SERVERDUMP
 -----------------
 Syntax: 
 	/msg NeoStats SERVERDUMP
@@ -379,7 +367,7 @@ Description:
 Example:
 	/msg NeoStats SERVERDUMP
 
-2.3.17 CHANDUMP
+2.3.16 CHANDUMP
 ---------------
 Syntax: 
 	/msg NeoStats CHANDUMP
@@ -638,7 +626,10 @@ Example:
 		!VERSION!	-Outputs the version of NeoStats
 		!TITLE!     -Outputs title in the form:
 		             "Network Statistics for YourNetName"
-
+		!CLIENTSTATS! --Outputs Top 10 clients used on
+					the network. (Requires SecureServ module
+					with version checks enabled).
+		
 	StatServ also puts out some information on when the page was
 	created, and what software created it by default at the end 
 	of your HTML page. This option can not be disabled. (Sorry,

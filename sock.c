@@ -159,7 +159,7 @@ read_loop ()
 					hash_scan_begin (&ss, sockh);
 					while ((sn = hash_scan_next (&ss)) != NULL) {
 						mod_sock = hnode_get (sn);
-						strcpy (segvinmodule, mod_sock->modname);
+						SET_SEGV_INMODULE(mod_sock->modname);
 						if (FD_ISSET (mod_sock->sock_no, &readfds)) {
 							nlog (LOG_DEBUG3, LOG_CORE, "Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
 							if (mod_sock->readfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
@@ -176,7 +176,7 @@ read_loop ()
 								break;
 						}
 					}
-					strcpy (segvinmodule, "");
+					CLEAR_SEGV_INMODULE();
 					break;
 				}
 			}

@@ -391,9 +391,12 @@ please see the Support section for how to contact us for help.
 
 	RECONNECT_TIME	-If NeoStats server gets split from the	network, how 
 			long to wait before attempting to reconnect to the 
-			network
+			network. A value of 0 will cause NeoStats to shutdown
+			and not attempt to reconnect. 
 		eg: RECONNECT_TIME 10	
 			-Specifies wait 10 seconds before trying to reconnect
+			RECONNECT_TIME 0
+			-Tells NeoStats to never reconnect to the network
 
 	LOAD_MODULE	-what module to load at startup. Multiple
 		instances of LOAD_MODULE may be specified

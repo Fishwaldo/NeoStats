@@ -49,7 +49,7 @@ TLD *tldhead;
 list_t *Vhead;
 
 
-extern const char version_date[], version_time[];
+extern const char ssversion_date[], ssversion_time[];
 
 struct stats_network_ {
 	int opers;
@@ -202,19 +202,9 @@ extern const char *ss_tld_map_help[];
 extern const char *ss_operlist_help[];
 extern const char *ss_botlist_help[];
 extern const char *ss_version_help[];
-extern const char *ss_reset_help[];
 extern const char *ss_stats_help[];
-extern const char *ss_join_help[];
-extern const char *ns_join_help[];
-extern const char *ns_raw_help[];
-extern const char *ns_debug_help[];
-extern const char *ns_userdump_help[];
-extern const char *ns_chandump_help[];
-extern const char *ns_serverdump_help[];
-extern const char *icq_help[];
 extern const char *ss_htmlstats_help[];
 extern const char *ss_forcehtml_help[];
-extern const char *ss_notices_help[];
 extern const char *ss_chan_help[];
 extern const char *ss_set_help[];
 extern const char *ss_clientversions_help[];

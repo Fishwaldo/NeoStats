@@ -170,13 +170,14 @@ EventFnList *__module_get_events()
 	return my_event_list;
 };
 
-void _init()
+int __ModInit(int modnum, int apiver)
 {
 	s_Spam = "sumyungguy";
+	return 1;
 }
 
 
-void _fini()
+void __ModFini()
 {
 
 };

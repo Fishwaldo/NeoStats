@@ -27,13 +27,6 @@
 
 #include "stats.h"
 
-void
-init_ns_help ()
-{
-	if (usr_mds);
-}
-
-
 const char *ns_help[] = {
 	"*** NeoStats Help ***",
 	"",
@@ -56,12 +49,13 @@ const char *ns_myuser_help[] = {
 	"\2UNLOAD\2     Unload a Module.",
 	"\2MODLIST\2    List Loaded Modules.",
 	"\2LOGS\2       View logfiles.",
+#ifdef USE_RAW
 	"\2RAW\2        Send a Raw Command from this Server!",
+#endif
 	"\2JUPE\2       Jupiter a Server",
 	"End of Help",
 	NULL
 };
-
 
 const char *ns_level_help[] = {
 	"*** NeoStats: \2LEVEL\2 Help ***",
@@ -86,6 +80,7 @@ const char *ns_jupe_help[] = {
 	NULL
 };
 
+#ifdef USE_RAW
 const char *ns_raw_help[] = {
 	"*** NeoStats: \2RAW\2 Help ***",
 	"",
@@ -97,6 +92,7 @@ const char *ns_raw_help[] = {
 	"End of Help.",
 	NULL
 };
+#endif
 
 const char *ns_load_help[] = {
 	"*** NeoStats: \2LOAD\2 Help ***",
@@ -109,7 +105,6 @@ const char *ns_load_help[] = {
 	"End of Help.",
 	NULL
 };
-
 
 const char *ns_unload_help[] = {
 	"*** NeoStats: \2UNLOAD\2 Help ***",
@@ -133,7 +128,6 @@ const char *ns_modlist_help[] = {
 	"End of Help.",
 	NULL
 };
-
 
 const char *ns_debug_help[] = {
 	"*** NeoStats: \2DEBUG\2 Help ***",
@@ -184,7 +178,6 @@ const char *ns_reload_help[] = {
 	NULL
 };
 
-
 const char *ns_userdump_help[] = {
 	"*** NeoStats: \2UserDump\2 Help ***",
 	"Usage: \2USERDUMP\2",
@@ -196,7 +189,6 @@ const char *ns_userdump_help[] = {
 	NULL
 };
 
-
 const char *ns_serverdump_help[] = {
 	"*** NeoStats: \2ServerDump\2 Help ***",
 	"Usage: \2SERVERDUMP\2",
@@ -207,7 +199,6 @@ const char *ns_serverdump_help[] = {
 	"End of Help.",
 	NULL
 };
-
 
 const char *ns_chandump_help[] = {
 	"*** NeoStats: \2ChanDump\2 Help ***",
@@ -230,13 +221,3 @@ const char *ns_logs_help[] = {
 	NULL
 };
 
-const char *ns_join_help[] = {
-	"*** NeoStats: \2JOIN\2 Help ***",
-	"Usage: \2JOIN <Channel>\2",
-	"",
-	"Get StatServ to Join a Channel",
-	"It will then Echo Events as they happen to that Channel, So it Shouldn't Join Public Channels",
-	"",
-	"End of Help.",
-	NULL
-};

@@ -31,8 +31,8 @@
 #include "log.h"
 #include "conf.h"
 
-
-extern const char version_date[], version_time[];
+const char ssversion_date[] = __DATE__;
+const char ssversion_time[] = __TIME__;
 static void ss_chans(User * u, char *chan);
 static void ss_daily(User * u);
 static void ss_stats(User * u, char *cmd, char *arg, char *arg2);
@@ -108,7 +108,7 @@ void ss_Config()
 {
 	char *tmp;
 
-	strcpy(segv_location, "StatServ-ss_Config");
+	SET_SEGV_LOCATION();
 
 	if (GetConf((void *) &s_StatServ, CFGSTR, "Nick") < 0) {
 		s_StatServ = malloc(MAXNICK);
@@ -158,15 +158,15 @@ void ss_Config()
 
 int new_m_version(char *origin, char **av, int ac)
 {
-	strcpy(segv_location, "StatServ-new_m_version");
+	SET_SEGV_LOCATION();
 	snumeric_cmd(351, origin,
 		     "Module StatServ Loaded, Version: %s %s %s",
-		     Statserv_Info[0].module_version, version_date,
-		     version_time);
+		     Statserv_Info[0].module_version, ssversion_date,
+		     ssversion_time);
 	return 0;
 }
 
-int __ModInit()
+int __ModInit(int modnum, int apiver)
 {
 	Server *ss;
 	User *u;
@@ -179,8 +179,7 @@ int __ModInit()
 	char *chan;
 	lnode_t *chanmem;
 
-	strcpy(segv_location, "StatServ-_init");
-	strcpy(segvinmodule, SSMNAME);
+	SET_SEGV_LOCATION();
 
 	StatServ.onchan = 0;
 	ss_Config();
@@ -260,9 +259,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 {
 	User *u;
 
-	strcpy(segv_location, "StatServ-__Bot_Message");
-
-
+	SET_SEGV_LOCATION();
 	u = finduser(origin);
 	if (!u) {
 		nlog(LOG_WARNING, LOG_CORE,
@@ -807,9 +804,7 @@ static void ss_tld_map(User * u)
 {
 	TLD *t;
 
-	strcpy(segv_location, "StatServ-ss_tld_map");
-
-
+	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_StatServ, "Top Level Domain Statistics:");
 	for (t = tldhead; t; t = t->next) {
 		if (t->users != 0)
@@ -825,15 +820,14 @@ static void ss_tld_map(User * u)
 
 static void ss_version(User * u)
 {
-	strcpy(segv_location, "StatServ-ss_version");
-
+	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_StatServ, "\2StatServ Version Information\2");
 	prefmsg(u->nick, s_StatServ,
 		"-------------------------------------");
 	prefmsg(u->nick, s_StatServ,
 		"StatServ Version: %s Compiled %s at %s",
-		Statserv_Info[0].module_version, version_date,
-		version_time);
+		Statserv_Info[0].module_version, ssversion_date,
+		ssversion_time);
 	prefmsg(u->nick, s_StatServ, "http://www.neostats.net");
 	prefmsg(u->nick, s_StatServ,
 		"-------------------------------------");
@@ -842,9 +836,7 @@ static void ss_version(User * u)
 }
 static void ss_netstats(User * u)
 {
-
-	strcpy(segv_location, "StatServ-ss_netstats");
-
+	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_StatServ, "Network Statistics:-----");
 	prefmsg(u->nick, s_StatServ, "Current Users: %ld",
 		stats_network.users);
@@ -871,9 +863,7 @@ static void ss_netstats(User * u)
 }
 static void ss_daily(User * u)
 {
-
-	strcpy(segv_location, "StatServ-ss_daily");
-
+	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_StatServ, "Daily Network Statistics:");
 	prefmsg(u->nick, s_StatServ, "Maximum Servers: %-2d %s",
 		daily.servers, sftime(daily.t_servers));
@@ -930,7 +920,7 @@ static void makemap(char *uplink, User * u, int level)
 
 static void ss_map(User * u)
 {
-	strcpy(segv_location, "StatServ-ss_map");
+	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_StatServ, "%-40s      %-10s %-10s %-10s",
 		"\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2",
 		"\2[LAG/MAX]\2");
@@ -946,9 +936,7 @@ static void ss_server(User * u, char *server)
 	hscan_t hs;
 	hnode_t *sn;
 
-	strcpy(segv_location, "StatServ-ss_server");
-
-
+	SET_SEGV_LOCATION();
 	if (!server) {
 		prefmsg(u->nick, s_StatServ,
 			"Error, the Syntax is Incorrect. Please Specify a Server");
@@ -1023,9 +1011,7 @@ static void ss_tld(User * u, char *tld)
 {
 	TLD *tmp;
 
-	strcpy(segv_location, "StatServ-ss_tld");
-
-
+	SET_SEGV_LOCATION();
 	if (!tld) {
 		prefmsg(u->nick, s_StatServ, "Syntax: /msg %s TLD <tld>",
 			s_StatServ);
@@ -1057,9 +1043,7 @@ static void ss_operlist(User * origuser, char *flags, char *server)
 	hscan_t scan;
 	hnode_t *node;
 
-	strcpy(segv_location, "StatServ-ss_operlist");
-
-
+	SET_SEGV_LOCATION();
 	if (!flags) {
 		prefmsg(origuser->nick, s_StatServ, "On-Line IRCops:");
 		prefmsg(origuser->nick, s_StatServ,
@@ -1123,9 +1107,8 @@ static void ss_botlist(User * origuser)
 	register User *u;
 	hscan_t scan;
 	hnode_t *node;
-	strcpy(segv_location, "StatServ-ss_botlist");
 
-
+	SET_SEGV_LOCATION();
 	prefmsg(origuser->nick, s_StatServ, "On-Line Bots:");
 	hash_scan_begin(&scan, uh);
 	while ((node = hash_scan_next(&scan)) != NULL) {
@@ -1155,10 +1138,7 @@ static void ss_stats(User * u, char *cmd, char *arg, char *arg2)
 	hnode_t *node;
 	hscan_t scan;
 
-
-	strcpy(segv_location, "StatServ-ss_stats");
-
-
+	SET_SEGV_LOCATION();
 	if (UserLevel(u) < 185) {
 		nlog(LOG_NORMAL, LOG_MOD, "Access Denied (STATS) to %s",
 		     u->nick);

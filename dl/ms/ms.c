@@ -75,7 +75,6 @@ Functions my_fn_list[] = {
 int __Bot_Message(char *origin, char **av, int ac)
 {
 	User *u;
-	char *cmd;
 	u = finduser(origin);
 
 	if (!strcasecmp(av[1], "HELP")) {
@@ -264,13 +263,14 @@ EventFnList *__module_get_events()
 	return my_event_list;
 };
 
-void _init()
+int __ModInit(int modnum, int apiver)
 {
 	s_MoraleServ = "MoraleServ";
+	return 1;
 }
 
 
-void _fini()
+void __ModFini()
 {
 };
 
@@ -278,7 +278,7 @@ void _fini()
 /* Routine for HAIL */
 static void ms_hail(User * u, char *cmd, char *m)
 {
-	strcpy(segv_location, "ms_hail");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(m, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -312,7 +312,7 @@ static void ms_hail(User * u, char *cmd, char *m)
 /* Routine for LAPDANCE */
 static void ms_lapdance(User * u, char *cmd)
 {
-	strcpy(segv_location, "ms_lapdance");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -348,7 +348,7 @@ static void ms_lapdance(User * u, char *cmd)
 /* Routine for ODE */
 static void ms_ode(User * u, char *cmd, char *m)
 {
-	strcpy(segv_location, "ms_ode");
+	SET_SEGV_LOCATION();
 	if (!m) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Syntax: /msg %s ODE <WHO THE ODE ODE IS ABOUT> <NICK TO SEND ODE TO>",
@@ -393,7 +393,7 @@ static void ms_ode(User * u, char *cmd, char *m)
 /* Routine for VERSION */
 static void ms_version(User * u)
 {
-	strcpy(segv_location, "ms_version");
+	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_MoraleServ, "\2%s Version Information\2",
 		s_MoraleServ);
 	prefmsg(u->nick, s_MoraleServ, "%s Version: %s - running on: %s",
@@ -408,7 +408,7 @@ static void ms_version(User * u)
 /* Routine for POEM */
 static void ms_poem(User * u, char *cmd, char *m)
 {
-	strcpy(segv_location, "ms_poem");
+	SET_SEGV_LOCATION();
 	if (!m) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Syntax: /msg %s POEM <WHO THE POEM IS ABOUT> <NICK TO SEND TO>",
@@ -453,7 +453,7 @@ static void ms_poem(User * u, char *cmd, char *m)
 /* Routine for REDNECK */
 static void ms_redneck(User * u, char *cmd)
 {
-	strcpy(segv_location, "ms_redneck");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -489,7 +489,7 @@ static void ms_redneck(User * u, char *cmd)
 
 static void ms_cheerup(User * u, char *cmd)
 {
-	strcpy(segv_location, "ms_cheerup");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -518,7 +518,7 @@ static void ms_cheerup(User * u, char *cmd)
 /* Routine for BEHAPPY */
 static void ms_behappy(User * u, char *cmd)
 {
-	strcpy(segv_location, "ms_behappy");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -596,7 +596,7 @@ static void ms_behappy(User * u, char *cmd)
 /* Routine for WONDERFUL */
 static void ms_wonderful(User * u, char *cmd)
 {
-	strcpy(segv_location, "ms_wonderful");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_MoraleServ)) {
 		prefmsg(u->nick, s_MoraleServ,
 			"Surley we have better things to do with our time than make a service message itself?");

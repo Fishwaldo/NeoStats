@@ -31,6 +31,12 @@
 #include <execinfo.h>
 #endif
 
+const char* CoreLogFileName="NeoStats";
+/*Original NeoStats logging format*/
+char* LogFileNameFormat="-%m-%d";
+/*test logging format*/
+/*char* LogFileNameFormat="%Y%M%d";*/
+
 const char *loglevels[10] = {
 	"CRITICAL",
 	"ERROR",
@@ -55,16 +61,16 @@ void *close_logs ();
 
 /** @brief Initilize the logging functions 
  */
-void
+int
 init_logs ()
 {
 	SET_SEGV_LOCATION();
 	logs = hash_create (-1, 0, 0);
 	if (!logs) {
 		printf ("ERROR: Can't Initilize Log SubSystem. Exiting!");
-		/* if this fails, no need to call do_exit, as this is the first thing that runs... so nothing to do! */
-		exit (-1);
+		return -1;
 	}
+	return 0;
 }
 
 /** @brief Occasionally flush log files out 
@@ -115,10 +121,10 @@ nlog (int level, int scope, char *fmt, ...)
 				hn = hash_lookup (logs, segvinmodule);
 			} else {
 				nlog (LOG_ERROR, LOG_CORE, "Warning, nlog called with LOG_MOD, but segvinmodule is blank! Logging to Core");
-				hn = hash_lookup (logs, "core");
+				hn = hash_lookup (logs, CoreLogFileName);
 			}
 		} else {
-			hn = hash_lookup (logs, "core");
+			hn = hash_lookup (logs, CoreLogFileName);
 		}
 		if (hn) {
 			/* we found our log entry */
@@ -134,8 +140,8 @@ nlog (int level, int scope, char *fmt, ...)
 				scope = 0;
 			}
 			logentry = malloc (sizeof (struct logs_));
-			strncpy (logentry->name, scope > 0 ? segvinmodule : "core", 30);
-			snprintf (buf, 40, "logs/%s.log", scope > 0 ? segvinmodule : "NeoStats");
+			strncpy (logentry->name, scope > 0 ? segvinmodule : CoreLogFileName, 30);
+			snprintf (buf, 40, "logs/%s.log", logentry->name);
 			logentry->logfile = fopen (buf, "a");
 			logentry->flush = 0;
 			hn = hnode_create (logentry);
@@ -183,17 +189,13 @@ ResetLogs ()
 			printf ("Closing Logfile %s (%s)\n", logentry->name, (char *) hnode_getkey (hn));
 #endif
 			fclose (logentry->logfile);
-			if (!strcasecmp (logentry->name, "core")) {
-				strftime (tmp, 255, "logs/NeoStats-%m-%d.log", localtime (&t));
-				rename ("logs/NeoStats.log", tmp);
-				logentry->logfile = fopen ("logs/NeoStats.log", "a");
-			} else {
-				strftime (tmp2, 255, "%m-%d.log", localtime (&t));
-				snprintf (tmp, 255, "logs/%s-%s", logentry->name, tmp2);
-				snprintf (tmp2, 255, "logs/%s.log", logentry->name);
-				rename (tmp2, tmp);
-				logentry->logfile = fopen (tmp2, "a");
-			}
+			
+			/* rename log file and open new file */
+			strftime (tmp2, 255, LogFileNameFormat, localtime (&t));
+			snprintf (tmp, 255, "logs/%s%s.log", logentry->name, tmp2);
+			snprintf (tmp2, 255, "logs/%s.log", logentry->name);
+			rename (tmp2, tmp);
+			logentry->logfile = fopen (tmp2, "a");		
 		}
 	}
 }

@@ -108,7 +108,7 @@ void hs_Config()
 	hnode_t *hn;
 	char *ban2;
 
-	strcpy(segv_location, "HostServ-hs_cb_Config");
+	SET_SEGV_LOCATION();
 	GetConf((void *) &hs_lvl.view, CFGINT, "ViewLevel");
 	GetConf((void *) &hs_lvl.add, CFGINT, "AddLevel");
 	GetConf((void *) &hs_lvl.del, CFGINT, "DelLevel");
@@ -164,6 +164,8 @@ static int hs_sign_on(char **av, int ac)
 	hs_map *map;
 	User *u;
 
+	SET_SEGV_LOCATION();
+
 	if (!is_synced)
 		return 0;
 
@@ -173,8 +175,6 @@ static int hs_sign_on(char **av, int ac)
 
 	if (u->server->name == me.name)
 		return 1;
-
-	strcpy(segv_location, "HostServ-hs_signon");
 
 	if (findbot(u->nick))
 		return 1;
@@ -497,10 +497,8 @@ EventFnList *__module_get_events()
 };
 
 
-void _init()
+int __ModInit(int modnum, int apiver)
 {
-	strcpy(segvinmodule, HostServ_info[0].module_name);
-
 	vhosts = hash_create(-1, 0, 0);
 	bannedvhosts = hash_create(-1, 0, 0);
 	if (!vhosts) {
@@ -514,10 +512,10 @@ void _init()
 	hs_lvl.view = 100;
 	hs_lvl.old = 60;
 	hs_Config();
-
+	return 1;
 }
 
-void _fini()
+void __ModFini()
 {
 	hnode_t *hn;
 	hscan_t hs;
@@ -710,7 +708,7 @@ static void hs_add(User * u, char *cmd, char *m, char *h, char *p)
 	hscan_t hs;
 	User *nu;
 
-	strcpy(segv_location, "hs_add");
+	SET_SEGV_LOCATION();
 	hash_scan_begin(&hs, bannedvhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
 		if (fnmatch(hnode_get(hn), h, 0) == 0) {
@@ -770,7 +768,7 @@ static void hs_list(User * u)
 	hscan_t hs;
 	hs_map *map;
 
-	strcpy(segv_location, "hs_list");
+	SET_SEGV_LOCATION();
 
 	i = 1;
 	prefmsg(u->nick, s_HostServ, "Current HostServ VHOST list:");
@@ -797,7 +795,7 @@ static void hs_view(User * u, int tmpint)
 	hscan_t hs;
 	hs_map *map;
 	char ltime[80];
-	strcpy(segv_location, "hs_view");
+	SET_SEGV_LOCATION();
 
 	i = 1;
 	hash_scan_begin(&hs, vhosts);
@@ -896,7 +894,7 @@ static void hs_del(User * u, int tmpint)
 	hscan_t hs;
 	hs_map *map;
 
-	strcpy(segv_location, "hs_del");
+	SET_SEGV_LOCATION();
 
 	hash_scan_begin(&hs, vhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
@@ -934,7 +932,7 @@ static void hs_login(User * u, char *login, char *pass)
 	hs_map *map;
 	hnode_t *hn;
 
-	strcpy(segv_location, "HostServ-hs_login");
+	SET_SEGV_LOCATION();
 
 	/* Check HostName Against Data Contained in vhosts.data */
 	hn = hash_lookup(vhosts, login);
@@ -965,7 +963,7 @@ void CleanupHosts()
 	hscan_t hs;
 	hs_map *map;
 
-	strcpy(segv_location, "hs_del");
+	SET_SEGV_LOCATION();
 
 	hash_scan_begin(&hs, vhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {

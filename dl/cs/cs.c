@@ -234,13 +234,13 @@ EventFnList *__module_get_events()
 	return my_event_list;
 };
 
-
-void _init()
+int __ModInit(int modnum, int apiver)
 {
 	Loadconfig();
+	return 1;
 }
 
-void _fini()
+void __ModFini()
 {
 
 };
@@ -249,7 +249,7 @@ void _fini()
 /* Routine for VERSION */
 static void cs_version(User * u)
 {
-	strcpy(segv_location, "cs_version");
+	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_ConnectServ,
 		"\2ConnectServ Version Information\2");
 	prefmsg(u->nick, s_ConnectServ,
@@ -267,8 +267,8 @@ static void cs_version(User * u)
 int cs_new_user(char **av, int ac)
 {
 	User *u;
-	/* Approximate Segfault Location */
-	strcpy(segv_location, "cs_new_user");
+
+	SET_SEGV_LOCATION();
 
 	if (!cs_online)
 		return 1;
@@ -295,8 +295,8 @@ int cs_del_user(char **av, int ac)
 {
 	char *cmd, *lcl, *QuitMsg, *KillMsg;
 	User *u;
-	/* Approximate Segfault Location */
-	strcpy(segv_location, "cs_del_user");
+
+	SET_SEGV_LOCATION();
 
 	if (!cs_online)
 		return 1;
@@ -357,8 +357,7 @@ int cs_user_modes(char **av, int ac)
 	char *modes;
 	User *u;
 
-	/* Approximate Segfault Location */
-	strcpy(segv_location, "cs_user_modes");
+	SET_SEGV_LOCATION();
 
 	if (!cs_online)
 		return 1;
@@ -569,8 +568,7 @@ int cs_user_smodes(char **av, int ac)
 	char *modes;
 	User *u;
 
-	/* Approximate Segfault Location */
-	strcpy(segv_location, "cs_user_modes");
+	SET_SEGV_LOCATION();
 
 	if (mode_watch != 1)
 		return -1;
@@ -709,8 +707,8 @@ int cs_user_kill(char **av, int ac)
 {
 	char *cmd, *GlobalMsg;
 	User *u;
-	/* Approximate Segfault Location */
-	strcpy(segv_location, "cs_user_kill");
+
+	SET_SEGV_LOCATION();
 
 	if (!cs_online)
 		return 1;
@@ -747,8 +745,8 @@ int cs_user_kill(char **av, int ac)
 int cs_user_nick(char **av, int ac)
 {
 	User *u;
-	/* Approximate Segfault Location */
-	strcpy(segv_location, "cs_user_nick");
+
+	SET_SEGV_LOCATION();
 
 	if (!cs_online)
 		return 1;
@@ -756,7 +754,7 @@ int cs_user_nick(char **av, int ac)
 	if (nick_watch) {
 		u = finduser(av[1]);
 		if (!u)
-			return -1
+			return -1;
 		if (!strcasecmp(u->server->name, me.name)) {
 			/* its me, forget it */
 			return 1;
@@ -771,8 +769,7 @@ int cs_user_nick(char **av, int ac)
 
 static void cs_set_nickwatch(User * u, char **av, int ac)
 {
-	/* Approximate Segfault Location */
-	strcpy(segv_location, "cs_nickwatch");
+	SET_SEGV_LOCATION();
 
 	if (ac < 4) {
 		prefmsg(u->nick, s_ConnectServ,
@@ -814,8 +811,7 @@ static void cs_set_nickwatch(User * u, char **av, int ac)
 /* Routine for Signon/Signoff ENABLE or DISABLE */
 static void cs_set_signwatch(User * u, char **av, int ac)
 {
-	/* Approximate Segfault Location */
-	strcpy(segv_location, "cs_signwatch");
+	SET_SEGV_LOCATION();
 
 	if (ac < 4) {
 		prefmsg(u->nick, s_ConnectServ,
@@ -859,8 +855,7 @@ static void cs_set_signwatch(User * u, char **av, int ac)
 /* Routine for kill watch ENABLE or DISABLE */
 static void cs_set_killwatch(User * u, char **av, int ac)
 {
-	/* Approximate Segfault Location */
-	strcpy(segv_location, "cs_killwatch");
+	SET_SEGV_LOCATION();
 
 	if (ac < 4) {
 		prefmsg(u->nick, s_ConnectServ,
@@ -901,8 +896,7 @@ static void cs_set_killwatch(User * u, char **av, int ac)
 /* Routine for mode watch ENABLE or DISABLE */
 static void cs_set_modewatch(User * u, char **av, int ac)
 {
-	/* Approximate Segfault Location */
-	strcpy(segv_location, "cs_modewatch");
+	SET_SEGV_LOCATION();
 
 	if (ac < 4) {
 		prefmsg(u->nick, s_ConnectServ,
@@ -943,8 +937,7 @@ static void cs_set_modewatch(User * u, char **av, int ac)
 /* Routine for STATUS echo */
 static void cs_set_list(User * u, char **av, int ac)
 {
-	/* Approximate Segfault Location */
-	strcpy(segv_location, "cs_set_list");
+	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_ConnectServ, "Current %s Settings:",
 		s_ConnectServ);
 	prefmsg(u->nick, s_ConnectServ, "SIGN WATCH: %s",
@@ -960,8 +953,7 @@ static void cs_set_list(User * u, char **av, int ac)
 /* Load ConnectServ Config file and set defaults if does not exist */
 void Loadconfig()
 {
-	strcpy(segv_location, "cs_Loadconfig");
-	strcpy(segvinmodule, my_info[0].module_name);
+	SET_SEGV_LOCATION();
 
 	/* some defaults */
 	sign_watch = 1;

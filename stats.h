@@ -104,15 +104,31 @@
 #define bzero(x, y)		memset(x, '\0', y);
 #define is_synced	me.synced
 
+#define SEGV_LOCATION_BUFSIZE	255
+#ifdef LEAN_AND_MEAN
+#define SET_SEGV_LOCATION()
+#define SET_SEGV_LOCATION_EXTRA(debug_text)
+#define CLEAR_SEGV_LOCATION()
+#else
+#define SET_SEGV_LOCATION() snprintf(segv_location,SEGV_LOCATION_BUFSIZE,"%s %d %s", __FILE__, __LINE__, __PRETTY_FUNCTION__); 
+#define SET_SEGV_LOCATION_EXTRA(debug_text) snprintf(segv_location,SEGV_LOCATION_BUFSIZE,"%s %d %s %s", __FILE__, __LINE__, __PRETTY_FUNCTION__,(debug_text)); 
+#define CLEAR_SEGV_LOCATION() segv_location[0]='\0';
+#endif
 
-#define SET_SEGV_LOCATION() sprintf(segv_location,"%s %d %s", __FILE__, __LINE__, __PRETTY_FUNCTION__); 
+#define SEGV_INMODULE_BUFSIZE	30
+#define SET_SEGV_INMODULE(module) strncpy(segv_inmodule,(module),SEGV_INMODULE_BUFSIZE);
+#define CLEAR_SEGV_INMODULE() segv_inmodule[0]='\0';
+
+/* temporary define while module settings are ported to macro system */
+#define segvinmodule segv_inmodule
 
 int servsock;
 int times;
-extern char s_Debug[MAXNICK], s_Services[MAXNICK];
+extern char s_Services[MAXNICK];
 extern const char version[];
-char recbuf[BUFSIZE], segv_location[255];
-char segvinmodule[30];
+char recbuf[BUFSIZE];
+char segv_location[SEGV_LOCATION_BUFSIZE];
+char segvinmodule[SEGV_INMODULE_BUFSIZE];
 jmp_buf sigvbuf;
 
 hash_t *sh;
@@ -153,7 +169,6 @@ struct me {
 	unsigned int allbots;
 	unsigned int maxsocks;
 	unsigned int cursocks;
-	unsigned int enable_spam:1;
 	unsigned int want_privmsg:1;
 	unsigned int send_extreme_lag_notices:1;
 	unsigned int onlyopers:1;
@@ -259,23 +274,20 @@ struct ping {
 /* sock.c */
 extern int ConnectTo (char *, int);
 extern void read_loop ();
-
-extern void ResetLogs ();
 extern char *sctime (time_t);
 extern char *sftime (time_t);
 extern int getmaxsock ();
 extern int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);
 extern int sock_disconnect (char *sockname);
+
 /* conf.c */
 extern void strip (char *);
-extern void ConfLoad ();
+extern int ConfLoad ();
 extern void rehash ();
-extern int init_modules ();
 
 /* main.c */
+extern int init_modules ();
 extern void login ();
-/* extern void init_statserv(); */
-extern void init_spam ();
 extern void init_ServBot ();
 extern void *smalloc (long);
 extern char *sstrdup (const char *);
@@ -284,6 +296,7 @@ extern char *strlower (char *);
 extern void AddStringToList (char ***List, char S[], int *C);
 void FreeList (char **List, int C);
 void do_exit (int);
+void strip_mirc_codes(char *text);
 
 /* ircd.c */
 extern void parse ();
@@ -338,12 +351,12 @@ void KillUser (const char *nick);
 /* ns_help.c */
 extern const char *ns_help[];
 extern const char *ns_myuser_help[];
-extern const char *ns_coder_help[];
 extern const char *ns_shutdown_help[];
 extern const char *ns_reload_help[];
 extern const char *ns_logs_help[];
-extern const char *ns_join_help[];
+#ifdef USE_RAW
 extern const char *ns_raw_help[];
+#endif
 extern const char *ns_debug_help[];
 extern const char *ns_userdump_help[];
 extern const char *ns_chandump_help[];
@@ -352,17 +365,13 @@ extern const char *ns_version_help[];
 extern const char *ns_load_help[];
 extern const char *ns_unload_help[];
 extern const char *ns_modlist_help[];
-extern const char *ns_raw_help[];
 extern const char *ns_jupe_help[];
 extern const char *ns_level_help[];
-
-
 
 /* services.c */
 extern void servicesbot (char *nick, char **av, int ac);
 extern void ns_debug_to_coders (char *);
 extern void ns_shutdown (User *, char *);
-
 
 /* chans.c */
 extern void chandump (char *chan);
@@ -377,9 +386,12 @@ void kick_chan (User *, char *, User *);
 void Change_Chan_Ts (Chans * c, time_t tstime);
 extern int CheckChanMode (Chans * c, long mode);
 extern int IsChanMember(Chans *c, User *u);
+
 /* dns.c */
 extern int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);
 extern int init_dns ();
 extern void do_dns ();
+
+
 
 #endif

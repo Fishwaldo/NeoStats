@@ -116,6 +116,8 @@ servicesbot (char *nick, char **av, int ac)
 #endif
 		else if (!strcasecmp (av[2], "LEVEL"))
 			privmsg_list (nick, s_Services, ns_level_help);
+		else if (!strcasecmp (av[2], "DEBUG"))
+			privmsg_list (nick, s_Services, ns_debug_help);
 		else
 			prefmsg (nick, s_Services, "Unknown Help Topic: \2%s\2", av[2]);
 	} else if (!strcasecmp (av[1], "LEVEL")) {
@@ -297,6 +299,7 @@ ns_shutdown (User * u, char *reason)
 	hscan_t ms;
 	hnode_t *mn;
 	char quitmsg[255];
+	char *no_reason="no reason given";
 
 	SET_SEGV_LOCATION();
 	/* Unload the Modules */
@@ -307,15 +310,13 @@ ns_shutdown (User * u, char *reason)
 		unload_module (mod_ptr->info->module_name, u);
 	}
 
-
-	globops (s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
-	snprintf (quitmsg, 255, "%s Set SHUTDOWN: %s", u->nick, (reason ? reason : "No Reason"));
+	globops (s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, (reason ? reason : no_reason));
+	snprintf (quitmsg, 255, "%s Set SHUTDOWN: %s", u->nick, (reason ? reason : no_reason));
+	nlog (LOG_NOTICE, LOG_CORE, "%s [%s](%s) requested SHUTDOWN for %s.", u->nick, u->username, u->hostname,(reason ? reason : no_reason));
 	squit_cmd (s_Services, quitmsg);
 	ssquit_cmd (me.name);
 	sleep (1);
 	close (servsock);
-	remove ("neostats.pid");
-	nlog (LOG_NOTICE, LOG_CORE, "%s [%s](%s) requested SHUTDOWN.", u->nick, u->username, u->hostname);
 	do_exit (0);
 }
 

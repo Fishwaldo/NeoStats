@@ -91,7 +91,7 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 		return 0;
 	}
 	/* set the module name */
-	strncpy (dnsdata->mod_name, segvinmodule, MAXHOST);
+	SET_SEGV_INMODULE(dnsdata->mod_name);
 	strncpy (dnsdata->data, data, 254);
 	dnsdata->callback = callback;
 	if (type == adns_r_ptr) {
@@ -184,11 +184,11 @@ do_dns ()
 			chanalert (s_Services, "Bad Error on DNS lookup. Please check logfile");
 
 			/* set this so nlog works good */
-			strncpy (segvinmodule, dnsdata->mod_name, MAXHOST);
+			SET_SEGV_INMODULE(dnsdata->mod_name);
 
 			/* call the callback function with answer set to NULL */
 			dnsdata->callback (dnsdata->data, NULL);
-			strcpy (segvinmodule, "");
+			CLEAR_SEGV_INMODULE();
 			/* delete from list */
 			dnsnode1 = list_delete (dnslist, dnsnode);
 			dnsnode = list_next (dnslist, dnsnode1);
@@ -198,10 +198,10 @@ do_dns ()
 			break;
 		}
 		nlog (LOG_DEBUG2, LOG_CORE, "DNS: Calling callback function with data %s", dnsdata->data);
-		strncpy (segvinmodule, dnsdata->mod_name, MAXHOST);
+		SET_SEGV_INMODULE(dnsdata->mod_name);
 		/* call the callback function */
 		dnsdata->callback (dnsdata->data, dnsdata->a);
-		strcpy (segvinmodule, "");
+		CLEAR_SEGV_INMODULE();
 		/* delete from list */
 		dnsnode1 = list_delete (dnslist, dnsnode);
 		dnsnode = list_next (dnslist, dnsnode1);

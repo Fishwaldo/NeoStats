@@ -532,7 +532,7 @@ load_module (char *path1, User * u)
 	}
 	snprintf (p, 255, "dl/%s.so", path1);
 	dl_handle = dlopen (p, RTLD_NOW || RTLD_GLOBAL);
-	strcpy (segvinmodule, "");
+	CLEAR_SEGV_INMODULE();
 	if (!dl_handle) {
 		dl_error = dlerror ();
 		if (do_msg) {
@@ -615,8 +615,8 @@ load_module (char *path1, User * u)
 	} else {
 		hash_insert (mh, mn, mod_info_ptr->module_name);
 	}
-	nlog (LOG_NORMAL, LOG_CORE, "Module Internal name: %s", mod_info_ptr->module_name);
-	nlog (LOG_NORMAL, LOG_CORE, "Module description: %s", mod_info_ptr->module_description);
+	nlog (LOG_DEBUG1, LOG_CORE, "Module Internal name: %s", mod_info_ptr->module_name);
+	nlog (LOG_DEBUG1, LOG_CORE, "Module description: %s", mod_info_ptr->module_description);
 
 	mod_ptr->info = mod_info_ptr;
 	mod_ptr->function_list = mod_funcs_ptr;
@@ -636,13 +636,13 @@ load_module (char *path1, User * u)
 	doinit = dlsym ((int *) dl_handle, "__ModInit");
 	if (doinit) {
 		SET_SEGV_LOCATION();
-		strcpy (segvinmodule, mod_ptr->info->module_name);
+		SET_SEGV_INMODULE(mod_ptr->info->module_name);
 		if ((*doinit) (i, API_VER) < 1) {
 			unload_module(ModNum[i].mod->info->module_name, NULL);
 			return -1;
 		}
 		SET_SEGV_LOCATION();
-		strcpy (segvinmodule, "");
+		CLEAR_SEGV_INMODULE();
 
 	}
 
@@ -655,10 +655,10 @@ load_module (char *path1, User * u)
 			if (!strcasecmp (event_fn_ptr->cmd_name, "ONLINE")) {
 				AddStringToList (&av, me.s->name, &ac);
 				SET_SEGV_LOCATION();
-				strcpy (segvinmodule, mod_ptr->info->module_name);
+				SET_SEGV_INMODULE(mod_ptr->info->module_name);
 				event_fn_ptr->function (av, ac);
 				SET_SEGV_LOCATION();
-				strcpy (segvinmodule, "");
+				CLEAR_SEGV_INMODULE();
 				free (av);
 				break;
 			}
@@ -787,20 +787,20 @@ unload_module (char *module_name, User * u)
 		i = get_mod_num (module_name);
 
 		list = hnode_get (modnode);
-		strcpy(segvinmodule, module_name);
+		SET_SEGV_INMODULE(module_name);
 		dofini = dlsym ((int *) list->dl_handle, "__ModFini");
 		if (dofini) {
 			(*dofini) ();
 		}
-		strcpy(segvinmodule, "");
+		CLEAR_SEGV_INMODULE();
 
 
 		hash_delete (mh, modnode);
 		hnode_destroy (modnode);
 		/* set segv in module */
-		strcpy (segvinmodule, module_name);
+		SET_SEGV_INMODULE(module_name);
 		dlclose (list->dl_handle);
-		strcpy (segvinmodule, "");
+		CLEAR_SEGV_INMODULE();
 
 		if (i >= 0) {
 			nlog (LOG_DEBUG1, LOG_CORE, "Freeing %d from Module Numbers", i);

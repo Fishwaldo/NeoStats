@@ -288,20 +288,21 @@ EventFnList *__module_get_events()
 };
 
 
-void _init()
+int __ModInit(int modnum, int apiver)
 {
 	s_LoveServ = "LoveServ";
+	return 1;
 }
 
 
-void _fini()
+void __ModFini()
 {
 };
 
 
 static void ls_rose(User * u, char *cmd)
 {
-	strcpy(segv_location, "ls_rose");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -324,7 +325,7 @@ static void ls_rose(User * u, char *cmd)
 
 static void ls_kiss(User * u, char *cmd)
 {
-	strcpy(segv_location, "ls_kiss");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -344,7 +345,7 @@ static void ls_kiss(User * u, char *cmd)
 
 static void ls_tonsil(User * u, char *cmd)
 {
-	strcpy(segv_location, "ls_tonsil");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -368,7 +369,7 @@ static void ls_tonsil(User * u, char *cmd)
 
 static void ls_hug(User * u, char *cmd)
 {
-	strcpy(segv_location, "ls_hug");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -389,7 +390,7 @@ static void ls_hug(User * u, char *cmd)
 
 static void ls_admirer(User * u, char *cmd)
 {
-	strcpy(segv_location, "ls_admirer");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -410,7 +411,7 @@ static void ls_admirer(User * u, char *cmd)
 
 static void ls_choco(User * u, char *cmd)
 {
-	strcpy(segv_location, "ls_choco");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -434,7 +435,7 @@ static void ls_choco(User * u, char *cmd)
 
 static void ls_candy(User * u, char *cmd)
 {
-	strcpy(segv_location, "ls_candy");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -459,7 +460,7 @@ static void ls_candy(User * u, char *cmd)
 
 static void ls_lovenote(User * u, char *cmd, char *m)
 {
-	strcpy(segv_location, "ls_lovenote");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -483,7 +484,7 @@ static void ls_lovenote(User * u, char *cmd, char *m)
 
 static void ls_apology(User * u, char *cmd, char *m)
 {
-	strcpy(segv_location, "ls_apology");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -507,7 +508,7 @@ static void ls_apology(User * u, char *cmd, char *m)
 
 static void ls_thankyou(User * u, char *cmd, char *m)
 {
-	strcpy(segv_location, "ls_thankyou");
+	SET_SEGV_LOCATION();
 	if (!strcasecmp(cmd, s_LoveServ)) {
 		prefmsg(u->nick, s_LoveServ,
 			"Surley we have better things to do with our time than make a service message itself?");
@@ -530,7 +531,7 @@ static void ls_thankyou(User * u, char *cmd, char *m)
 
 static void ls_version(User * u)
 {
-	strcpy(segv_location, "ls_version");
+	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_LoveServ, "\2%s Version Information\2",
 		s_LoveServ);
 	prefmsg(u->nick, s_LoveServ, "%s Version: %s - running on: %s",
