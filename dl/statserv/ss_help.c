@@ -25,7 +25,7 @@
 ** $Id$
 */
 
-#include <stdio.h>
+#include "stats.h"
 
 const char ss_help_about_oneline[]="About StatServ";
 const char ss_help_version_oneline[]="Shows you the current StatServ Version";
