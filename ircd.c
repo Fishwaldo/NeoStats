@@ -721,7 +721,7 @@ init_services_bot (void)
 #ifdef IRCU
 	sumode_cmd (s_Services, s_Services, UMODE_DEAF);
 #else
-	sumode_cmd (s_Services, nick, UMODE_DEAF);
+	sumode_cmd (s_Services, s_Services, UMODE_DEAF);
 #endif
 #endif
 	me.onchan = 1;
