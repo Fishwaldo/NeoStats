@@ -47,6 +47,7 @@ void
 init_ircd ()
 {
 	services_bot_umode = UmodeStringToMask(services_bot_modes);
+	nlog (LOG_NORMAL, LOG_CORE, "Services bot modes are %s %d",services_bot_modes, services_bot_umode);
 };
 
 /** @brief UmodeMaskToString
