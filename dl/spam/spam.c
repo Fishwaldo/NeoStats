@@ -32,26 +32,25 @@
 #include "conf.h"
 #include "log.h"
 
-const char spamversion_date[] = __DATE__;
-const char spamversion_time[] = __TIME__;
 char *s_Spam;
 
-Module_Info my_info[] = { {
-			   "Spam",
-			   "A User to Help Catch Spammers on the IRC network",
-			   "1.2"}
+ModuleInfo __module_info = {
+   "Spam",
+   "A User to Help Catch Spammers on the IRC network",
+   "1.2",
+	__DATE__,
+	__TIME__
 };
-
 
 int new_m_version(char *origin, char **av, int ac)
 {
 	snumeric_cmd(351, origin, "Module Spam Loaded, Version: %s %s %s",
-		     my_info[0].module_version, spamversion_date,
-		     spamversion_time);
+		__module_info.module_version, __module_info.module_build_date,
+		__module_info.module_build_time);
 	return 0;
 }
 
-Functions my_fn_list[] = {
+Functions __module_functions[] = {
 	{MSG_VERSION, new_m_version, 1}
 	,
 #ifdef HAVE_TOKEN_SUP
@@ -134,11 +133,11 @@ int Online(char **av, int ac)
 
 	if (init_bot
 	    (s_Spam, user, host, rname, "-x",
-	     my_info[0].module_name) == -1) {
+	     __module_info.module_name) == -1) {
 		/* Nick was in use!!!! */
 		s_Spam = strcat(s_Spam, "_");
 		init_bot(s_Spam, user, host, rname, "-x",
-			 my_info[0].module_name);
+			 __module_info.module_name);
 	}
 	free(user);
 	free(host);
@@ -147,27 +146,10 @@ int Online(char **av, int ac)
 };
 
 
-EventFnList my_event_list[] = {
+EventFnList __module_events[] = {
 	{"ONLINE", Online}
 	,
 	{NULL, NULL}
-};
-
-
-
-Module_Info *__module_get_info()
-{
-	return my_info;
-};
-
-Functions *__module_get_functions()
-{
-	return my_fn_list;
-};
-
-EventFnList *__module_get_events()
-{
-	return my_event_list;
 };
 
 int __ModInit(int modnum, int apiver)
