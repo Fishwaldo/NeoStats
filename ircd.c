@@ -996,6 +996,10 @@ do_stats (const char* nick, const char *what)
 			if (cmd_list[i].usage > 0)
 				numeric (RPL_STATSCOMMANDS, u->nick, "Command %s Usage %d", cmd_list[i].name, cmd_list[i].usage);
 		}
+	} else if (!ircstrcasecmp(what, "Z")) {
+		if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
+			do_dns_stats_Z(u);
+		}
 	}
 	numeric (RPL_ENDOFSTATS, u->nick, "%s :End of /STATS report", what);
 	chanalert (s_Services, "%s Requested Stats %s", u->nick, what);
