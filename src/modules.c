@@ -533,9 +533,7 @@ ModuleConfig(bot_setting* set_ptr)
 			switch(set_ptr->type) {
 				case SET_TYPE_BOOLEAN:
 					if (DBAFetchConfigBool (set_ptr->confitem, set_ptr->varptr) != NS_SUCCESS) {
-						if( set_ptr->defaultval ) {
-							*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
-						}
+						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
 						DBAStoreConfigBool (set_ptr->confitem, set_ptr->varptr);
 					}
 					if(set_ptr->handler) {
@@ -544,9 +542,7 @@ ModuleConfig(bot_setting* set_ptr)
 					break;
 				case SET_TYPE_INT:
 					if (DBAFetchConfigInt (set_ptr->confitem, set_ptr->varptr) != NS_SUCCESS) {
-						if( set_ptr->defaultval ) {
-							*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
-						}
+						*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
 						DBAStoreConfigInt(set_ptr->confitem, set_ptr->varptr);
 					}
 					if(set_ptr->handler) {
