@@ -150,8 +150,7 @@ read_loop ()
 					me.RcveBytes++;
 					if (i >= 0) {
 						buf[j] = c;
-						if ((c == '\n')
-						    || (c == '\r')) {
+						if ((c == '\n') || (c == '\r')) {
 							me.RcveM++;
 							me.lastmsg = time (NULL);
 							if (config.recvlog)
@@ -173,21 +172,21 @@ read_loop ()
 					if (FD_ISSET (mod_sock->sock_no, &readfds)) {
 						nlog (LOG_DEBUG3, LOG_CORE, "Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
 						if (mod_sock->readfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
-							break;
+							continue;
 					}
 					if (FD_ISSET (mod_sock->sock_no, &writefds)) {
 						nlog (LOG_DEBUG3, LOG_CORE, "Running module %s writesock function for %s", mod_sock->modname, mod_sock->sockname);
 						if (mod_sock->writefnc (mod_sock->sock_no, mod_sock->sockname) < 0)
-							break;
+							continue;
 					}
 					if (FD_ISSET (mod_sock->sock_no, &errfds)) {
 						nlog (LOG_DEBUG3, LOG_CORE, "Running module %s errorsock function for %s", mod_sock->modname, mod_sock->sockname);
 						if (mod_sock->errfnc (mod_sock->sock_no, mod_sock->sockname) < 0)
-							break;
+							continue;
 					}
 				}
 				CLEAR_SEGV_INMODULE();
-				break;
+				continue;
 			}
 		} else if (SelectResult == 0) {
 			if ((time (NULL) - me.lastmsg) > 180) {
