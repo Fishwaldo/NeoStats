@@ -505,7 +505,7 @@ ns_raw (User * u, char **av, int ac)
 	message = joinbuf (av, ac, 2);
 	chanalert (s_Services, "\2RAW COMMAND\2 \2%s\2 Issued a Raw Command!(%s)", u->nick, message);
 	nlog (LOG_INFO, LOG_CORE, "RAW COMMAND %sIssued a Raw Command!(%s)", u->nick, message);
-	sts ("%s", message);
+	send_cmd ("%s", message);
 	free (message);
    	return 1;
 }

@@ -133,184 +133,184 @@ const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 void
-send_server (const char *name, const int numeric, const char *infoline)
+send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
-	sts (":%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
+	send_cmd (":%s %s %s %d :%s", sender, MSG_SERVER, name, numeric, infoline);
 }
 
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
-	sts ("%s %s :TS", MSG_PASS, pass);
-	sts ("CAPAB TS3 SSJOIN BURST NICKIP");
-	sts ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
+	send_cmd ("%s %s :TS", MSG_PASS, pass);
+	send_cmd ("CAPAB TS3 SSJOIN BURST NICKIP");
+	send_cmd ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
 }
 
 void
 send_squit (const char *server, const char *quitmsg)
 {
-	sts ("%s %s :%s", MSG_SQUIT, server, quitmsg);
+	send_cmd ("%s %s :%s", MSG_SQUIT, server, quitmsg);
 }
 
 void 
 send_quit (const char *who, const char *quitmsg)
 {
-	sts (":%s %s :%s", who, MSG_QUIT, quitmsg);
+	send_cmd (":%s %s :%s", who, MSG_QUIT, quitmsg);
 }
 
 void 
 send_part (const char *who, const char *chan)
 {
-	sts (":%s %s %s", who, MSG_PART, chan);
+	send_cmd (":%s %s %s", who, MSG_PART, chan);
 }
 
 void 
-send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
+send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
 {
-	sts (":%s %s %d %s + :%c%s", me.name, MSG_SJOIN, (int)tstime, chan, flag, who);
+	send_cmd (":%s %s %lu %s + :%c%s", sender, MSG_SJOIN, ts, chan, flag, who);
 }
 
 void 
-send_cmode (const char *who, const char *chan, const char *mode, const char *args)
+send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
-	sts (":%s %s %s %s %s %lu", me.name, MSG_MODE, chan, mode, args, (unsigned long)me.now);
+	send_cmd (":%s %s %s %s %s %lu", sender, MSG_MODE, chan, mode, args, ts);
 }
 
 void
-send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime)
+send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
-	sts ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", MSG_NICK, nick, (unsigned long)me.now, newmode, ident, host, me.name, (unsigned long)me.now, realname);
+	send_cmd ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", MSG_NICK, nick, ts, newmode, ident, host, server, ts, realname);
 }
 
 void
 send_ping (const char *from, const char *reply, const char *to)
 {
-	sts (":%s %s %s :%s", from, MSG_PING, reply, to);
+	send_cmd (":%s %s %s :%s", from, MSG_PING, reply, to);
 }
 
 void 
 send_umode (const char *who, const char *target, const char *mode)
 {
-	sts (":%s %s %s :%s", who, MSG_MODE, target, mode);
+	send_cmd (":%s %s %s :%s", who, MSG_MODE, target, mode);
 }
 
 void 
 send_numeric (const char *from, const int numeric, const char *target, const char *buf)
 {
-	sts (":%s %d %s :%s", from, numeric, target, buf);
+	send_cmd (":%s %d %s :%s", from, numeric, target, buf);
 }
 
 void
 send_pong (const char *reply)
 {
-	sts ("%s %s", MSG_PONG, reply);
+	send_cmd ("%s %s", MSG_PONG, reply);
 }
 
 void 
 send_kill (const char *from, const char *target, const char *reason)
 {
-	sts (":%s %s %s :%s", from, MSG_KILL, target, reason);	
+	send_cmd (":%s %s %s :%s", from, MSG_KILL, target, reason);	
 }
 
 void 
-send_svskill (const char *target, const char *reason)
+send_svskill (const char *sender, const char *target, const char *reason)
 {
-	sts (":%s %s %s :%s", me.name, MSG_SVSKILL, target, reason);
+	send_cmd (":%s %s %s :%s", sender, MSG_SVSKILL, target, reason);
 }
 
 void 
-send_nickchange (const char *oldnick, const char *newnick, const time_t ts)
+send_nickchange (const char *oldnick, const char *newnick, const unsigned long  ts)
 {
-	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int)ts);
+	send_cmd (":%s %s %s %lu", oldnick, MSG_NICK, newnick, ts);
 }
 
 void 
-send_svsnick (const char *target, const char *newnick, const time_t ts)
+send_svsnick (const char *sender, const char *target, const char *newnick, const unsigned long  ts)
 {
-	sts ("%s %s %s :%d", MSG_SVSNICK, target, newnick, (int)ts);
+	send_cmd ("%s %s %s :%lu", MSG_SVSNICK, target, newnick, ts);
 }
 
 void
-send_svsjoin (const char *target, const char *chan)
+send_svsjoin (const char *sender, const char *target, const char *chan)
 {
-	sts ("%s %s %s", MSG_SVSJOIN, target, chan);
+	send_cmd ("%s %s %s", MSG_SVSJOIN, target, chan);
 }
 
 void
-send_svspart (const char *target, const char *chan)
+send_svspart (const char *sender, const char *target, const char *chan)
 {
-	sts ("%s %s %s", MSG_SVSPART, target, chan);
+	send_cmd ("%s %s %s", MSG_SVSPART, target, chan);
 }
 void
-send_svshost (const char *who, const char *vhost)
+send_svshost (const char *sender, const char *who, const char *vhost)
 {
-	sts (":%s %s %s %s", me.name, MSG_CHGHOST, who, vhost);
+	send_cmd (":%s %s %s %s", sender, MSG_CHGHOST, who, vhost);
 }
 void
-send_svsmode (const char *target, const char *modes)
+send_svsmode (const char *sender, const char *target, const char *modes)
 {
-	sts (":%s %s %s %s", me.name, MSG_SVSMODE, target, modes);
+	send_cmd (":%s %s %s %s", sender, MSG_SVSMODE, target, modes);
 }
 void
 send_kick (const char *who, const char *target, const char *chan, const char *reason)
 {
-	sts (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
+	send_cmd (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
 }
 
 void 
 send_wallops (const char *who, const char *buf)
 {
-	sts (":%s %s :%s", who, MSG_WALLOPS, buf);
+	send_cmd (":%s %s :%s", who, MSG_WALLOPS, buf);
 }
 void
-send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason)
+send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
-	sts (":%s %s %s %s %d %s %d :%s", me.name, MSG_AKILL, host, ident, length, setby, (int)me.now, reason);
+	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, MSG_AKILL, host, ident, length, setby, ts, reason);
 }
 void
 send_invite (const char *from, const char *to, const char *chan) 
 {
-	sts (":%s %s %s %s", from, MSG_INVITE, to, chan);
+	send_cmd (":%s %s %s %s", from, MSG_INVITE, to, chan);
 }
 void
-send_rakill (const char *host, const char *ident)
+send_rakill (const char *sender, const char *host, const char *ident)
 {
-	sts (":%s %s %s %s", me.name, MSG_RAKILL, host, ident);
+	send_cmd (":%s %s %s %s", sender, MSG_RAKILL, host, ident);
 }
 
 
 void
-send_svinfo (const int tscurrent, const int tsmin, const int tsnow)
+send_svinfo (const int tscurrent, const int tsmin, const unsigned long tsnow)
 {
-	sts ("%s %d %d 0 :%ld", MSG_SVINFO, tscurrent, tsmin, (long)tsnow);
+	send_cmd ("%s %d %d 0 :%lu", MSG_SVINFO, tscurrent, tsmin, tsnow);
 }
 
 void
 send_burst (int b)
 {
 	if (b == 0) {
-		sts ("BURST 0");
+		send_cmd ("BURST 0");
 	} else {
-		sts ("BURST");
+		send_cmd ("BURST");
 	}
 }
 
 void
 send_privmsg (const char *from, const char *to, const char *buf)
 {
-	sts (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
+	send_cmd (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
 }
 
 void
 send_notice (const char *from, const char *to, const char *buf)
 {
-	sts (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
+	send_cmd (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
 }
 
 void
 send_globops (const char *from, const char *buf)
 {
-	sts (":%s %s :%s", from, MSG_GLOBOPS, buf);
+	send_cmd (":%s %s :%s", from, MSG_GLOBOPS, buf);
 }
 
 static void

@@ -28,6 +28,7 @@
 #include "stats.h"
 #include "ircd.h"
 #include "dl.h"
+#include "sock.h"
 #include "log.h"
 #include "users.h"
 #include "chans.h"
@@ -593,7 +594,7 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 	for (i = 0; i < ircd_cmdcount; i++) {
 		if (!strcmp (cmd_list[i].name, cmd)
 #ifdef GOTTOKENSUPPORT
-			||(me.token && cmd_list[i].token && !strcmp (cmd_list[i].token, cmd))
+			||(ircd_srv.token && cmd_list[i].token && !strcmp (cmd_list[i].token, cmd))
 #endif
 			) {
 			if(cmd_list[i].function) {
@@ -807,21 +808,20 @@ do_motd (const char* nick, const char *remoteserver)
 	if(!fp) {
 		numeric (ERR_NOMOTD, nick, "MOTD File is missing");
 	} else {
-		numeric (RPL_MOTDSTART, nick, "- %s Message of the Day -", me.name);
-		numeric (RPL_MOTD, nick, "- %d.%d.%d%s. Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
-		numeric (RPL_MOTD, nick, "-");
-
+		numeric (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
+		numeric (RPL_MOTD, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
+		numeric (RPL_MOTD, nick, ":-");
 
 		if (fp) {
 			while (fgets (buf, sizeof (buf), fp)) {
 				buf[strnlen (buf, BUFSIZE) - 1] = 0;
-				numeric (RPL_MOTD, nick, "- %s", buf);
+				numeric (RPL_MOTD, nick, ":- %s", buf);
 			}
 			fclose (fp);
 		} else {
-			numeric (RPL_MOTD, nick, "- MOTD file Missing");
+			numeric (RPL_MOTD, nick, ":- MOTD file Missing");
 		}
-		numeric (RPL_ENDOFMOTD, nick, "End of /MOTD command.");
+		numeric (RPL_ENDOFMOTD, nick, ":End of MOTD command.");
 	}
 }
 
@@ -840,14 +840,14 @@ do_admin (const char* nick, const char *remoteserver)
 
 	fp = fopen (ADMIN_FILENAME, "r");
 	if(!fp) {
-		numeric (ERR_NOMOTD, nick, "No administrative info available");
+		numeric (ERR_NOADMININFO, nick, "%s :No administrative info available", me.name);
 	} else {
-		numeric (RPL_ADMINME, nick, "- %s NeoStats Admins -", me.name);
-		numeric (RPL_ADMINME, nick, "- %d.%d.%d%s.  Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
+		numeric (RPL_ADMINME, nick, ":%s :Administrative info", me.name);
+		numeric (RPL_ADMINME, nick, ":%d.%d.%d%s.  Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
 		if (fp) {
 			while (fgets (buf, sizeof (buf), fp)) {
 				buf[strnlen (buf, BUFSIZE) - 1] = 0;
-				numeric (RPL_ADMINLOC1, nick, "- %s", buf);
+				numeric (RPL_ADMINLOC1, nick, ":- %s", buf);
 			}
 			fclose (fp);
 		}
@@ -865,28 +865,28 @@ void
 do_credits (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
-	numeric (RPL_VERSION, nick, "- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, ircd_version);
-	numeric (RPL_VERSION, nick, "- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
-	numeric (RPL_VERSION, nick, "- For Support, you can find ^Enigma^ or Shmad at");
-	numeric (RPL_VERSION, nick, "- irc.irc-chat.net #NeoStats");
-	numeric (RPL_VERSION, nick, "- Thanks to:");
-	numeric (RPL_VERSION, nick, "- Enigma for being part of the dev team");
-	numeric (RPL_VERSION, nick, "- Stskeeps for writing the best IRCD ever!");
-	numeric (RPL_VERSION, nick, "- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)");
-	numeric (RPL_VERSION, nick, "- monkeyIRCD for the Module Segv Catching code");
-	numeric (RPL_VERSION, nick, "- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!");
-	numeric (RPL_VERSION, nick, "- Andy For Ideas");
-	numeric (RPL_VERSION, nick, "- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies");
-	numeric (RPL_VERSION, nick, "- sre and Jacob for development systems and access");
-	numeric (RPL_VERSION, nick, "- Error51 for Translating our FAQ and README files");
-	numeric (RPL_VERSION, nick, "- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!");
-	numeric (RPL_VERSION, nick, "- Eggy for proving to use our code still had bugs when we thought it didn't (and all the bug reports!)");
-	numeric (RPL_VERSION, nick, "- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
-	numeric (RPL_VERSION, nick, "- M - Updating lots of Doco and code and providing lots of great feedback");
-	numeric (RPL_VERSION, nick, "- J Michael Jones - Giving us Patches to support QuantumIRCd");
-	numeric (RPL_VERSION, nick, "- Blud - Giving us patches for Mystic IRCd");
-	numeric (RPL_VERSION, nick, "- herrohr - Giving us patches for Liquid IRCd support");
-	numeric (RPL_VERSION, nick, "- OvErRiTe - Giving us patches for Viagra IRCd support");
+	numeric (RPL_VERSION, nick, ":- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, ircd_version);
+	numeric (RPL_VERSION, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
+	numeric (RPL_VERSION, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
+	numeric (RPL_VERSION, nick, ":- irc.irc-chat.net #NeoStats");
+	numeric (RPL_VERSION, nick, ":- Thanks to:");
+	numeric (RPL_VERSION, nick, ":- Enigma for being part of the dev team");
+	numeric (RPL_VERSION, nick, ":- Stskeeps for writing the best IRCD ever!");
+	numeric (RPL_VERSION, nick, ":- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)");
+	numeric (RPL_VERSION, nick, ":- monkeyIRCD for the Module Segv Catching code");
+	numeric (RPL_VERSION, nick, ":- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!");
+	numeric (RPL_VERSION, nick, ":- Andy For Ideas");
+	numeric (RPL_VERSION, nick, ":- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies");
+	numeric (RPL_VERSION, nick, ":- sre and Jacob for development systems and access");
+	numeric (RPL_VERSION, nick, ":- Error51 for Translating our FAQ and README files");
+	numeric (RPL_VERSION, nick, ":- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!");
+	numeric (RPL_VERSION, nick, ":- Eggy for proving to use our code still had bugs when we thought it didn't (and all the bug reports!)");
+	numeric (RPL_VERSION, nick, ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips :)");
+	numeric (RPL_VERSION, nick, ":- M - Updating lots of Doco and code and providing lots of great feedback");
+	numeric (RPL_VERSION, nick, ":- J Michael Jones - Giving us Patches to support QuantumIRCd");
+	numeric (RPL_VERSION, nick, ":- Blud - Giving us patches for Mystic IRCd");
+	numeric (RPL_VERSION, nick, ":- herrohr - Giving us patches for Liquid IRCd support");
+	numeric (RPL_VERSION, nick, ":- OvErRiTe - Giving us patches for Viagra IRCd support");
 }
 
 /** @brief 
@@ -957,7 +957,7 @@ do_protocol (char *origin, char **argv, int argc)
 	for (i = 0; i < argc; i++) {
 #ifdef GOTTOKENSUPPORT
 		if (!ircstrcasecmp ("TOKEN", argv[i])) {
-			me.token = 1;
+			ircd_srv.token = 1;
 		}
 #endif
 #ifdef GOTCLIENTSUPPORT
@@ -1124,7 +1124,7 @@ schmode_cmd (const char *who, const char *chan, const char *mode, const char *ar
 	char **av;
 	int ac;
 
-	send_cmode (who, chan, mode, args);
+	send_cmode (me.name, who, chan, mode, args, me.now);
 	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
 	ac = split_buf (ircd_buf, &av, 0);
 	ChanMode ("", av, ac);
@@ -1162,7 +1162,7 @@ ssvskill_cmd (const char *target, const char *reason, ...)
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
 #ifdef GOTSVSKILL
-	send_svskill (target, ircd_buf);
+	send_svskill (me.name, target, ircd_buf);
 #else
 	send_kill (me.name, target, ircd_buf);
 	do_quit (target, ircd_buf);
@@ -1174,8 +1174,8 @@ ssvskill_cmd (const char *target, const char *reason, ...)
 int 
 ssvstime_cmd (const time_t ts)
 {
-	send_svstime(ts);
-	nlog (LOG_NOTICE, LOG_CORE, "ssvstime_cmd: synching server times to %ld", (int)ts);
+	send_svstime(me.name, (unsigned long)ts);
+	nlog (LOG_NOTICE, LOG_CORE, "ssvstime_cmd: synching server times to %lu", ts);
 	return NS_SUCCESS;
 }
 #endif
@@ -1206,7 +1206,7 @@ ssvsmode_cmd (const char *target, const char *modes)
 		nlog (LOG_WARNING, LOG_CORE, "ssvsmode_cmd: can't find user %s", target);
 		return 0;
 	}
-	send_svsmode(target, modes);
+	send_svsmode(me.name, target, modes);
 	UserMode (target, modes);
 #else
 	chanalert (s_Services, "Warning, Module %s tried to SVSMODE which is not supported", segvinmodule);
@@ -1228,7 +1228,7 @@ ssvshost_cmd (const char *who, const char *vhost)
 	}
 
 	strlcpy (u->vhost, vhost, MAXHOST);
-	send_svshost(who, vhost);
+	send_svshost(me.name, who, vhost);
 	return NS_SUCCESS;
 #else
 	chanalert (s_Services, "Warning Module %s tried to SVSHOST, which is not supported", segvinmodule);
@@ -1241,7 +1241,7 @@ int
 ssvsjoin_cmd (const char *target, const char *chan)
 {
 #ifdef GOTSVSJOIN 
-	send_svsjoin (target, chan);
+	send_svsjoin (me.name, target, chan);
 #else
 	chanalert (s_Services, "Warning Module %s tried to SVSJOIN, which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSJOIN, which is not supported", segvinmodule);
@@ -1253,7 +1253,7 @@ int
 ssvspart_cmd (const char *target, const char *chan)
 {
 #ifdef GOTSVSPART
-	send_svspart (target, chan);
+	send_svspart (me.name, target, chan);
 #else
 	chanalert (s_Services, "Warning Module %s tried to SVSPART, which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSPART, which is not supported", segvinmodule);
@@ -1265,7 +1265,7 @@ int
 sswhois_cmd (const char *target, const char *swhois)
 {
 #ifdef GOTSWHOIS
-	send_swhois (target, swhois);
+	send_swhois (me.name, target, swhois);
 #else
 	chanalert (s_Services, "Warning Module %s tried to SWHOIS, which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SWHOIS, which is not supported", segvinmodule);
@@ -1277,7 +1277,7 @@ int
 ssvsnick_cmd (const char *target, const char *newnick)
 {
 #ifdef GOTSVSNICK
-	send_svsnick (target, newnick, me.now);
+	send_svsnick (me.name, target, newnick, me.now);
 #else
 	notice (s_Services, "Warning Module %s tried to SVSNICK, which is not supported", segvinmodule);
 	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSNICK, which is not supported", segvinmodule);
@@ -1305,14 +1305,14 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 	va_start (ap, reason);
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
-	send_akill(host, ident, setby, length, ircd_buf);
+	send_akill(me.name, host, ident, setby, length, ircd_buf, me.now);
 	return NS_SUCCESS;
 }
 
 int
 srakill_cmd (const char *host, const char *ident)
 {
-	send_rakill(host, ident);
+	send_rakill (me.name, host, ident);
 	return NS_SUCCESS;
 }
 
@@ -1323,14 +1323,14 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 	char mode;
 	char **av;
 	int ac;
-	time_t tstime;
+	time_t ts;
 	Chans *c;
 
 	c = findchan ((char *) chan);
 	if (!c) {
-		tstime = me.now;
+		ts = me.now;
 	} else {
-		tstime = c->tstime;
+		ts = c->tstime;
 	}
 	switch (chflag) {
 #ifdef CMODE_FL_CHANOP
@@ -1393,7 +1393,7 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 		flag = ' ';
 		mode= '\0';
 	}
-	send_sjoin (who, chan, flag, tstime);
+	send_sjoin (me.name, who, chan, flag, (unsigned long)ts);
 	join_chan (who, chan);
 	ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", chan, mode, who);
 	ac = split_buf (ircd_buf, &av, 0);
@@ -1408,7 +1408,7 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 int
 sjoin_cmd (const char *who, const char *chan)
 {
-	send_join (who, chan);
+	send_join (me.name, who, chan, me.now);
 	join_chan (who, chan);
 	return NS_SUCCESS;
 }
@@ -1431,7 +1431,7 @@ spong_cmd (const char *reply)
 int
 sserver_cmd (const char *name, const int numeric, const char *infoline)
 {
-	send_server (name, numeric, infoline);
+	send_server (me.name, name, numeric, infoline);
 	return NS_SUCCESS;
 }
 
@@ -1448,7 +1448,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 	char* newmode;
 	
 	newmode = UmodeMaskToString(mode);
-	send_nick (nick, ident, host, realname, newmode, me.now);
+	send_nick (nick, (unsigned long)me.now, newmode, ident, host, me.name, realname);
 	AddUser (nick, ident, host, realname, me.name, NULL, NULL);
 #if defined(ULTIMATE3) || defined(BAHAMUT) || defined(HYBRID7) || defined(IRCU) || defined(NEOIRCD) || defined(QUANTUM) || defined(LIQUID)
 	UserMode (nick, newmode);
@@ -1568,7 +1568,7 @@ do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, co
 	ircd_srv.uprot = atoi (prot);
 	strlcpy (ircd_srv.cloak, cloak, 10);
 	strlcpy (me.netname, netname, MAXPASS);
-	send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname);
+	send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 	ModuleEvent (EVENT_NETINFO, NULL, 0);
@@ -1583,7 +1583,7 @@ do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, c
 	ircd_srv.uprot = atoi (prot);
 	strlcpy (ircd_srv.cloak, cloak, 10);
 	strlcpy (me.netname, netname, MAXPASS);
-	send_snetinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname);
+	send_snetinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 	ModuleEvent (EVENT_NETINFO, NULL, 0);
@@ -1683,7 +1683,7 @@ do_kick (const char *kickby, const char *chan, const char *kicked, const char *k
 void 
 do_svinfo (void)
 {
-	send_svinfo (TS_CURRENT, TS_MIN, me.now);
+	send_svinfo (TS_CURRENT, TS_MIN, (unsigned long)me.now);
 }
 #endif
 
@@ -1781,3 +1781,25 @@ do_burst (char *origin, char **argv, int argc)
 	}
 }
 #endif
+
+void
+send_cmd (char *fmt, ...)
+{
+	va_list ap;
+	char buf[BUFSIZE];
+	int buflen;
+	
+	va_start (ap, fmt);
+	ircvsnprintf (buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+
+	nlog (LOG_DEBUG2, LOG_CORE, "SENT: %s", buf);
+	if(strnlen (buf, BUFSIZE) < BUFSIZE - 2) {
+		strlcat (buf, "\n", BUFSIZE);
+	} else {
+		buf[BUFSIZE - 1] = 0;
+		buf[BUFSIZE - 2] = '\n';
+	}
+	buflen = strnlen (buf, BUFSIZE);
+	sts (buf, buflen);
+}

@@ -58,7 +58,7 @@ hash_t *ch;
  *
  */
 void
-SetChanTS (Chans * c, time_t tstime)
+SetChanTS (Chans * c, const time_t tstime)
 {
 	c->tstime = tstime;
 }

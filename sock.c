@@ -526,30 +526,14 @@ sock_disconnect (char *sockname)
  * @return none
  */
 void
-sts (char *fmt, ...)
+sts (const char *buf, const int buflen)
 {
-	va_list ap;
-	char buf[BUFSIZE];
 	int sent;
-	int buflen;
-	
+
 	if (servsock == -1) {
-		nlog(LOG_WARNING, LOG_CORE, "Not Sending to Server as we have a invaild Socket");
+		nlog(LOG_WARNING, LOG_CORE, "Not sending to server as we have a invalid socket");
 		return;
 	}
-
-	va_start (ap, fmt);
-	ircvsnprintf (buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-
-	nlog (LOG_DEBUG2, LOG_CORE, "SENT: %s", buf);
-	if(strnlen (buf, BUFSIZE) < BUFSIZE - 2) {
-		strlcat (buf, "\n", BUFSIZE);
-	} else {
-		buf[BUFSIZE - 1] = 0;
-		buf[BUFSIZE - 2] = '\n';
-	}
-	buflen = strnlen (buf, BUFSIZE);
 	sent = write (servsock, buf, buflen);
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Write error: %s", strerror(errno));

@@ -28,6 +28,8 @@
 #include "dl.h"
 #include "log.h"
 
+void process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac);
+
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
 static void m_admin (char *origin, char **argv, int argc, int srv);
@@ -112,90 +114,185 @@ const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
-void
-send_server (const char *name, const int numeric, const char *infoline)
+/*
+ * Numeric nicks are new as of version ircu2.10.00beta1.
+ *
+ * The idea is as follows:
+ * In most messages (for protocol 10+) the original nick will be
+ * replaced by a 3 character string: YXX
+ * Where 'Y' represents the server, and 'XX' the nick on that server.
+ *
+ * 'YXX' should not interfer with the input parser, and therefore is
+ * not allowed to contain spaces or a ':'.
+ * Also, 'Y' can't start with a '+' because of m_server().
+ *
+ * We keep the characters printable for debugging reasons too.
+ *
+ * The 'XX' value can be larger then the maximum number of clients
+ * per server, we use a mask (struct Server::nn_mask) to get the real
+ * client numeric. The overhead is used to have some redundancy so
+ * just-disconnected-client aren't confused with just-connected ones.
+ */
+
+/* These must be the same on ALL servers ! Do not change ! */
+
+#define NUMNICKLOG 6
+#define NUMNICKMAXCHAR 'z'      /* See convert2n[] */
+#define NUMNICKBASE 64          /* (2 << NUMNICKLOG) */
+#define NUMNICKMASK 63          /* (NUMNICKBASE-1) */
+#define NN_MAX_SERVER 4096      /* (NUMNICKBASE * NUMNICKBASE) */
+#define NN_MAX_CLIENT 262144    /* NUMNICKBASE ^ 3 */
+
+/* *INDENT-OFF* */
+
+/*
+ * convert2y[] converts a numeric to the corresponding character.
+ * The following characters are currently known to be forbidden:
+ *
+ * '\0' : Because we use '\0' as end of line.
+ *
+ * ' '  : Because parse_*() uses this as parameter seperator.
+ * ':'  : Because parse_server() uses this to detect if a prefix is a
+ *        numeric or a name.
+ * '+'  : Because m_nick() uses this to determine if parv[6] is a
+ *        umode or not.
+ * '&', '#', '+', '$', '@' and '%' :
+ *        Because m_message() matches these characters to detect special cases.
+ */
+static const char convert2y[] = {
+  'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
+  'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
+  'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
+  'w','x','y','z','0','1','2','3','4','5','6','7','8','9','[',']'
+};
+
+static const unsigned int convert2n[] = {
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  52,53,54,55,56,57,58,59,60,61, 0, 0, 0, 0, 0, 0, 
+   0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,
+  15,16,17,18,19,20,21,22,23,24,25,62, 0,63, 0, 0,
+   0,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
+  41,42,43,44,45,46,47,48,49,50,51, 0, 0, 0, 0, 0,
+
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+/* *INDENT-ON* */
+
+
+unsigned int base64toint(const char* s)
 {
-	sts (":%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
+	unsigned int i = convert2n[(unsigned char) *s++];
+	while (*s) {
+		i <<= NUMNICKLOG;
+		i += convert2n[(unsigned char) *s++];
+	}
+	return i;
+}
+
+const char* inttobase64(char* buf, unsigned int v, unsigned int count)
+{
+	buf[count] = '\0';  
+	while (count > 0) {
+		buf[--count] = convert2y[(v & NUMNICKMASK)];
+		v >>= NUMNICKLOG;
+	}
+	return buf;
+}
+
+void
+send_server (const char *sender, const char *name, const int numeric, const char *infoline)
+{
+	send_cmd (":%s %s %s %d :%s", sender, MSG_SERVER, name, numeric, infoline);
 }
 
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
-	sts ("%s %s :TS", MSG_PASS, pass);
-	sts ("CAPAB :TS EX CHW IE KLN GLN KNOCK HOPS HUB AOPS MX");
-	sts ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
+	send_cmd ("%s %s :TS", MSG_PASS, pass);
+	send_cmd ("CAPAB :TS EX CHW IE KLN GLN KNOCK HOPS HUB AOPS MX");
+	send_cmd ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
 }
 
 void
 send_squit (const char *server, const char *quitmsg)
 {
-	sts ("%s %s :%s", MSG_SQUIT, server, quitmsg);
+	send_cmd ("%s %s :%s", MSG_SQUIT, server, quitmsg);
 }
 
 void 
 send_quit (const char *who, const char *quitmsg)
 {
-	sts (":%s %s :%s", who, MSG_QUIT, quitmsg);
+	send_cmd (":%s %s :%s", who, MSG_QUIT, quitmsg);
 }
 
 void 
 send_part (const char *who, const char *chan)
 {
-	sts (":%s %s %s", who, MSG_PART, chan);
+	send_cmd (":%s %s %s", who, MSG_PART, chan);
 }
 
 void
-send_join (const char *who, const char *chan)
+send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
 {
-	sts (":%s %s 0 %s + :%s", me.name, MSG_JOIN, chan, who);
+	send_cmd (":%s %s 0 %s + :%s", sender, MSG_JOIN, chan, who);
 }
 
 void 
-send_cmode (const char *who, const char *chan, const char *mode, const char *args)
+send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
-	sts (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, me.now);
+	send_cmd (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, ts);
 }
 
 void
-send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime)
+send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
-	sts ("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, tstime, newmode, ident, host, me.name, realname);
+	send_cmd ("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, ts, newmode, ident, host, server, realname);
 }
 
 void
 send_ping (const char *from, const char *reply, const char *to)
 {
-	sts (":%s %s %s :%s", from, MSG_PING, reply, to);
+	send_cmd (":%s %s %s :%s", from, MSG_PING, reply, to);
 }
 
 void 
 send_umode (const char *who, const char *target, const char *mode)
 {
-	sts (":%s %s %s :%s", who, MSG_MODE, target, mode);
+	send_cmd (":%s %s %s :%s", who, MSG_MODE, target, mode);
 }
 
 void 
 send_numeric (const char *from, const int numeric, const char *target, const char *buf)
 {
-	sts (":%s %d %s :%s", from, numeric, target, buf);
+	send_cmd (":%s %d %s :%s", from, numeric, target, buf);
 }
 
 void
 send_pong (const char *reply)
 {
-	sts ("%s %s", MSG_PONG, reply);
+	send_cmd ("%s %s", MSG_PONG, reply);
 }
 
 void 
 send_kill (const char *from, const char *target, const char *reason)
 {
-	sts (":%s %s %s :%s", from, MSG_KILL, target, reason);
+	send_cmd (":%s %s %s :%s", from, MSG_KILL, target, reason);
 }
 
 void 
-send_nickchange (const char *oldnick, const char *newnick, const time_t ts)
+send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
 {
-	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int) me.now);
+	send_cmd (":%s %s %s %lu", oldnick, MSG_NICK, newnick, ts);
 }
 
 void
@@ -204,34 +301,34 @@ send_invite (const char *from, const char *to, const char *chan)
 }
 
 void 
-send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
+send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
 {
 }
 
 void 
 send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
-	sts (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
+	send_cmd (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
 }
 
 void 
 send_wallops (const char *who, const char *buf)
 {
-	sts (":%s %s :%s", who, MSG_WALLOPS, buf);
+	send_cmd (":%s %s :%s", who, MSG_WALLOPS, buf);
 }
 
 void
 send_burst (int b)
 {
 	if (b == 0) {
-		sts ("BURST 0");
+		send_cmd ("BURST 0");
 	} else {
-		sts ("BURST");
+		send_cmd ("BURST");
 	}
 }
 
 void 
-send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason)
+send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
 	/* there isn't an akill on Hybrid, so we send a kline to all servers! */
 	hscan_t ss;
@@ -241,12 +338,12 @@ send_akill (const char *host, const char *ident, const char *setby, const int le
 	hash_scan_begin (&ss, sh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		//sts (":%s %s %s %lu %s %s :%s", setby, MSG_KLINE, s->name, (unsigned long)length, ident, host, reason);
+		//send_cmd (":%s %s %s %lu %s %s :%s", setby, MSG_KLINE, s->name, (unsigned long)length, ident, host, reason);
 	}
 }
 
 void 
-send_rakill (const char *host, const char *ident)
+send_rakill (const char *sender, const char *host, const char *ident)
 {
 	chanalert (s_Services, "Please Manually remove KLINES using /unkline on each server");
 }
@@ -254,19 +351,19 @@ send_rakill (const char *host, const char *ident)
 void
 send_privmsg (const char *from, const char *to, const char *buf)
 {
-	sts (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
+	send_cmd (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
 }
 
 void
 send_notice (const char *from, const char *to, const char *buf)
 {
-	sts (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
+	send_cmd (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
 }
 
 void
 send_globops (const char *from, const char *buf)
 {
-//	sts (":%s %s :%s", from, MSG_GLOBOPS, buf);
+//	send_cmd (":%s %s :%s", from, MSG_GLOBOPS, buf);
 }
 
 
@@ -478,7 +575,6 @@ parse (char *line)
 	strlcpy (recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
-	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
 	if (!*line)
 		return;
 	coreLine = strpbrk (line, " ");

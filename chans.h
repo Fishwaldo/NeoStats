@@ -33,7 +33,7 @@ int ChanMode (char *origin, char **av, int ac);
 void ChanTopic (const char* chan, const char *owner, const char* ts, const char *topic);
 void ChanUserMode (const char* chan, const char* nick, int add, long mode);
 void kick_chan (const char *kickby, const char *chan, const char *kicked, const char *kickreason);
-void SetChanTS (Chans * c, time_t tstime);
+void SetChanTS (Chans * c, const time_t tstime);
 int init_chan_hash (void);
 
 #endif /* _CHANS_H_ */

@@ -25,9 +25,7 @@
 
 #include "stats.h"
 #include "ircd.h"
-#include "sock.h"
 #include "Ultimate.h"
-#include "dl.h"
 #include "log.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
@@ -225,237 +223,237 @@ const int ircd_smodecount = ((sizeof (user_smodes) / sizeof (user_smodes[0])));
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 void
-send_server (const char *name, const int numeric, const char *infoline)
+send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
-	sts (":%s %s %s %d :%s", me.name, (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	send_cmd (":%s %s %s %d :%s", sender, (ircd_srv.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 }
 
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
 #ifdef ULTIMATE3
-	sts ("%s %s :TS", (me.token ? TOK_PASS : MSG_PASS), pass);
-	sts ("CAPAB TS5 BURST SSJ5 NICKIP CLIENT");
-	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	send_cmd ("%s %s :TS", (ircd_srv.token ? TOK_PASS : MSG_PASS), pass);
+	send_cmd ("CAPAB TS5 BURST SSJ5 NICKIP CLIENT");
+	send_cmd ("%s %s %d :%s", (ircd_srv.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 #else
-	sts ("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
-	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
-/*	sts ("%s TOKEN CLIENT", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));*/
-	sts ("%s CLIENT", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
+	send_cmd ("%s %s", (ircd_srv.token ? TOK_PASS : MSG_PASS), pass);
+	send_cmd ("%s %s %d :%s", (ircd_srv.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+/*	send_cmd ("%s TOKEN CLIENT", (ircd_srv.token ? TOK_PROTOCTL : MSG_PROTOCTL));*/
+	send_cmd ("%s CLIENT", (ircd_srv.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 #endif
 }
 
 void
 send_squit (const char *server, const char *quitmsg)
 {
-	sts ("%s %s :%s", (me.token ? TOK_SQUIT : MSG_SQUIT), server, quitmsg);
+	send_cmd ("%s %s :%s", (ircd_srv.token ? TOK_SQUIT : MSG_SQUIT), server, quitmsg);
 }
 
 void 
 send_quit (const char *who, const char *quitmsg)
 {
-	sts (":%s %s :%s", who, (me.token ? TOK_QUIT : MSG_QUIT), quitmsg);
+	send_cmd (":%s %s :%s", who, (ircd_srv.token ? TOK_QUIT : MSG_QUIT), quitmsg);
 }
 
 void 
 send_part (const char *who, const char *chan)
 {
-	sts (":%s %s %s", who, (me.token ? TOK_PART : MSG_PART), chan);
+	send_cmd (":%s %s %s", who, (ircd_srv.token ? TOK_PART : MSG_PART), chan);
 }
 
 #ifdef ULTIMATE3
 void 
-send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
+send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
 {
-	sts (":%s %s %ld %s + :%c%s", me.name, MSG_SJOIN, (long)tstime, chan, flag, who);
+	send_cmd (":%s %s %lu %s + :%c%s", sender, MSG_SJOIN, ts, chan, flag, who);
 }
 #else
 void 
-send_join (const char *who, const char *chan)
+send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
 {
-	sts (":%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
+	send_cmd (":%s %s %s", who, (ircd_srv.token ? TOK_JOIN : MSG_JOIN), chan);
 }
 void 
-send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
+send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
 {
 }
 #endif
 
 void 
-send_cmode (const char *who, const char *chan, const char *mode, const char *args)
+send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts)
 {
-	sts (":%s %s %s %s %s %lu", who, (me.token ? TOK_MODE : MSG_MODE), chan, mode, args, me.now);
+	send_cmd (":%s %s %s %s %s %lu", who, (ircd_srv.token ? TOK_MODE : MSG_MODE), chan, mode, args, ts);
 }
 
 void
-send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime)
+send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
 #ifdef ULTIMATE3
-	sts ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, (long)tstime, newmode, ident, host, me.name, (long)tstime, realname);
+	send_cmd ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (ircd_srv.token ? TOK_NICK : MSG_NICK), nick, ts, newmode, ident, host, server, ts, realname);
 #else
-	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, (long)tstime, ident, host, me.name, realname);
+	send_cmd ("%s %s 1 %lu %s %s %s 0 :%s", (ircd_srv.token ? TOK_NICK : MSG_NICK), nick, ts, ident, host, server, realname);
 #endif
 }
 
 void
 send_ping (const char *from, const char *reply, const char *to)
 {
-	sts (":%s %s %s :%s", from, (me.token ? TOK_PING : MSG_PING), reply, to);
+	send_cmd (":%s %s %s :%s", from, (ircd_srv.token ? TOK_PING : MSG_PING), reply, to);
 }
 
 void 
 send_umode (const char *who, const char *target, const char *mode)
 {
-	sts (":%s %s %s :%s", who, (me.token ? TOK_MODE : MSG_MODE), target, mode);
+	send_cmd (":%s %s %s :%s", who, (ircd_srv.token ? TOK_MODE : MSG_MODE), target, mode);
 }
 
 void 
 send_numeric (const char *from, const int numeric, const char *target, const char *buf)
 {
-	sts (":%s %d %s :%s", from, numeric, target, buf);
+	send_cmd (":%s %d %s :%s", from, numeric, target, buf);
 }
 
 void
 send_pong (const char *reply)
 {
-	sts ("%s %s", (me.token ? TOK_PONG : MSG_PONG), reply);
+	send_cmd ("%s %s", (ircd_srv.token ? TOK_PONG : MSG_PONG), reply);
 }
 
 void
-send_snetinfo (const char* from, const int prot, const char* cloak, const char* netname)
+send_snetinfo (const char* from, const int prot, const char* cloak, const char* netname, const unsigned long ts)
 {
-	sts (":%s %s 0 %ld %d %s 0 0 0 :%s", from, MSG_SNETINFO, (long)me.now, prot, cloak, netname);
+	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", from, MSG_SNETINFO, ts, prot, cloak, netname);
 }
 
 void
-send_netinfo (const char* from, const int prot, const char* cloak, const char* netname)
+send_netinfo (const char* from, const int prot, const char* cloak, const char* netname, const unsigned long ts)
 {
-	sts (":%s %s 0 %ld %d %s 0 0 0 :%s", from, MSG_NETINFO, (long)me.now, prot, cloak, netname);
+	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", from, MSG_NETINFO, ts, prot, cloak, netname);
 }
 
 void
 send_vctrl (const int uprot, const int nicklen, const int modex, const int gc, const char* netname)
 {
-	sts ("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, uprot, nicklen, modex, gc, netname);
+	send_cmd ("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, uprot, nicklen, modex, gc, netname);
 }
 
 void 
 send_kill (const char *from, const char *target, const char *reason)
 {
-	sts (":%s %s %s :%s", from, (me.token ? TOK_KILL : MSG_KILL), target, reason);
+	send_cmd (":%s %s %s :%s", from, (ircd_srv.token ? TOK_KILL : MSG_KILL), target, reason);
 }
 
 void 
-send_svskill (const char *target, const char *reason)
+send_svskill (const char *sender, const char *target, const char *reason)
 {
-	sts (":%s %s %s :%s", me.name, MSG_SVSKILL, target, reason);
+	send_cmd (":%s %s %s :%s", sender, MSG_SVSKILL, target, reason);
 }
 
 void 
-send_nickchange (const char *oldnick, const char *newnick, const time_t ts)
+send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
 {
-	sts (":%s %s %s %ld", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, (long)ts);
+	send_cmd (":%s %s %s %lu", oldnick, (ircd_srv.token ? TOK_NICK : MSG_NICK), newnick, ts);
 }
 
 void 
-send_svsnick (const char *target, const char *newnick, const time_t ts)
+send_svsnick (const char *sender, const char *target, const char *newnick, const unsigned long ts)
 {
-	sts ("%s %s %s :%ld", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, (long)ts);
+	send_cmd ("%s %s %s :%lu", (ircd_srv.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, ts);
 }
 
 void
-send_svsjoin (const char *target, const char *chan)
+send_svsjoin (const char *sender, const char *target, const char *chan)
 {
-	sts ("%s %s %s", (me.token ? TOK_SVSJOIN : MSG_SVSJOIN), target, chan);
+	send_cmd ("%s %s %s", (ircd_srv.token ? TOK_SVSJOIN : MSG_SVSJOIN), target, chan);
 }
 
 void
-send_svspart (const char *target, const char *chan)
+send_svspart (const char *sender, const char *target, const char *chan)
 {
-	sts ("%s %s %s", (me.token ? TOK_SVSPART : MSG_SVSPART), target, chan);
+	send_cmd ("%s %s %s", (ircd_srv.token ? TOK_SVSPART : MSG_SVSPART), target, chan);
 }
 
 void 
 send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
-	sts (":%s %s %s %s :%s", who, (me.token ? TOK_KICK : MSG_KICK), chan, target, (reason ? reason : "No Reason Given"));
+	send_cmd (":%s %s %s %s :%s", who, (ircd_srv.token ? TOK_KICK : MSG_KICK), chan, target, (reason ? reason : "No Reason Given"));
 }
 
 void 
 send_wallops (const char *who, const char *buf)
 {
-	sts (":%s %s :%s", who, (me.token ? TOK_WALLOPS : MSG_WALLOPS), buf);
+	send_cmd (":%s %s :%s", who, (ircd_srv.token ? TOK_WALLOPS : MSG_WALLOPS), buf);
 }
 
 void
-send_svshost (const char *who, const char *vhost)
+send_svshost (const char *sender, const char *who, const char *vhost)
 {
 #ifdef ULTIMATE3
-	sts (":%s %s %s %s", me.name, (me.token ? TOK_SETHOST : MSG_SETHOST), who, vhost);
+	send_cmd (":%s %s %s %s", sender, (ircd_srv.token ? TOK_SETHOST : MSG_SETHOST), who, vhost);
 #elif ULTIMATE
-	sts (":%s %s %s %s", me.name, (me.token ? TOK_CHGHOST : MSG_CHGHOST), who, vhost);
+	send_cmd (":%s %s %s %s", sender, (ircd_srv.token ? TOK_CHGHOST : MSG_CHGHOST), who, vhost);
 #endif
 }
 
 void
 send_invite (const char *from, const char *to, const char *chan) 
 {
-	sts (":%s %s %s %s", from, (me.token ? TOK_INVITE : MSG_INVITE), to, chan);
+	send_cmd (":%s %s %s %s", from, (ircd_srv.token ? TOK_INVITE : MSG_INVITE), to, chan);
 }
 
 void 
-send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason)
+send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
 #ifdef ULTIMATE3
-	sts (":%s %s %s %s %d %s %ld :%s", me.name, (me.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, (long)me.now, reason);
+	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, (ircd_srv.token ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, ts, reason);
 #elif ULTIMATE
-	sts (":%s %s %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, (int)(me.now + length), (int)me.now, setby, reason);
+	send_cmd (":%s %s %s@%s %lu %lu %s :%s", sender, MSG_GLINE, ident, host, (ts + length), ts, setby, reason);
 #endif
 }
 
 void 
-send_rakill (const char *host, const char *ident)
+send_rakill (const char *sender, const char *host, const char *ident)
 {
 #ifdef ULTIMATE3
-	sts (":%s %s %s %s", me.name, (me.token ? TOK_RAKILL : MSG_RAKILL), host, ident);
+	send_cmd (":%s %s %s %s", sender, (ircd_srv.token ? TOK_RAKILL : MSG_RAKILL), host, ident);
 #elif ULTIMATE
 	/* ultimate2 needs an oper to remove */
-	sts (":%s %s :%s@%s", s_Services, MSG_REMGLINE, host, ident);
+	send_cmd (":%s %s :%s@%s", s_Services, MSG_REMGLINE, host, ident);
 #endif
 }
 
 void
-send_svinfo (const int tscurrent, const int tsmin, const int tsnow)
+send_svinfo (const int tscurrent, const int tsmin, const unsigned long tsnow)
 {
-	sts ("%s %d %d 0 :%ld", MSG_SVINFO, tscurrent, tsmin, (long)tsnow);
+	send_cmd ("%s %d %d 0 :%lu", MSG_SVINFO, tscurrent, tsmin, tsnow);
 }
 
 void
 send_burst (int b)
 {
 	if (b == 0) {
-		sts ("BURST 0");
+		send_cmd ("BURST 0");
 	} else {
-		sts ("BURST");
+		send_cmd ("BURST");
 	}
 }
 
 void
 send_privmsg (const char *from, const char *to, const char *buf)
 {
-	sts (":%s %s %s :%s", from, (me.token ? TOK_PRIVATE : MSG_PRIVATE), to, buf);
+	send_cmd (":%s %s %s :%s", from, (ircd_srv.token ? TOK_PRIVATE : MSG_PRIVATE), to, buf);
 }
 
 void
 send_notice (const char *from, const char *to, const char *buf)
 {
-	sts (":%s %s %s :%s", from, (me.token ? TOK_NOTICE : MSG_NOTICE), to, buf);
+	send_cmd (":%s %s %s :%s", from, (ircd_srv.token ? TOK_NOTICE : MSG_NOTICE), to, buf);
 }
 
 void
 send_globops (const char *from, const char *buf)
 {
-	sts (":%s %s :%s", from, (me.token ? TOK_GLOBOPS : MSG_GLOBOPS), buf);
+	send_cmd (":%s %s :%s", from, (ircd_srv.token ? TOK_GLOBOPS : MSG_GLOBOPS), buf);
 }
 
 #ifdef ULTIMATE3

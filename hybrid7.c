@@ -23,9 +23,7 @@
 
 #include "stats.h"
 #include "ircd.h"
-#include "sock.h"
 #include "hybrid7.h"
-#include "dl.h"
 #include "log.h"
 
 static void m_version (char *origin, char **argv, int argc, int srv);
@@ -133,21 +131,21 @@ const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 void
 send_eob (const char *server)
 {
-	sts (":%s %s", server, MSG_EOB);
+	send_cmd (":%s %s", server, MSG_EOB);
 }
 
 void
-send_server (const char *name, const int numeric, const char *infoline)
+send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
-	sts (":%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
+	send_cmd (":%s %s %s %d :%s", sender, MSG_SERVER, name, numeric, infoline);
 }
 
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
-	sts ("%s %s :TS", MSG_PASS, pass);
-	sts ("CAPAB :TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS MX");
-	sts ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
+	send_cmd ("%s %s :TS", MSG_PASS, pass);
+	send_cmd ("CAPAB :TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS MX");
+	send_cmd ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
 }
 
 void
@@ -158,128 +156,128 @@ send_burst (int b)
 void
 send_squit (const char *server, const char *quitmsg)
 {
-	sts ("%s %s :%s", MSG_SQUIT, server, quitmsg);
+	send_cmd ("%s %s :%s", MSG_SQUIT, server, quitmsg);
 }
 
 void 
 send_quit (const char *who, const char *quitmsg)
 {
-	sts (":%s %s :%s", who, MSG_QUIT, quitmsg);
+	send_cmd (":%s %s :%s", who, MSG_QUIT, quitmsg);
 }
 
 void 
 send_part (const char *who, const char *chan)
 {
-	sts (":%s %s %s", who, MSG_PART, chan);
+	send_cmd (":%s %s %s", who, MSG_PART, chan);
 }
 
 void 
-send_join (const char *who, const char *chan)
+send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
 {
-	sts (":%s %s %d %s + :%s", me.name, MSG_SJOIN, (int)me.now, chan, who);
+	send_cmd (":%s %s %lu %s + :%s", sender, MSG_SJOIN, ts, chan, who);
 }
 
 void 
-send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
+send_sjoin (const char *sender, const char *who, const char *chan, const char flag, const unsigned long ts)
 {
 }
 
 void 
-send_cmode (const char *who, const char *chan, const char *mode, const char *args)
+send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
-	sts (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, (unsigned long)me.now);
+	send_cmd (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, ts);
 }
 
 void
-send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime)
+send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
-	sts ("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, (unsigned long)tstime, newmode, ident, host, me.name, realname);
+	send_cmd ("%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, ts, newmode, ident, host, server, realname);
 }
 
 void
 send_ping (const char *from, const char *reply, const char *to)
 {
-	sts (":%s %s %s :%s", from, MSG_PING, reply, to);
+	send_cmd (":%s %s %s :%s", from, MSG_PING, reply, to);
 }
 
 void 
 send_umode (const char *who, const char *target, const char *mode)
 {
-	sts (":%s %s %s :%s", who, MSG_MODE, target, mode);
+	send_cmd (":%s %s %s :%s", who, MSG_MODE, target, mode);
 }
 
 void 
 send_numeric (const char *from, const int numeric, const char *target, const char *buf)
 {
-	sts (":%s %d %s :%s", from, numeric, target, buf);
+	send_cmd (":%s %d %s :%s", from, numeric, target, buf);
 }
 
 void
 send_pong (const char *reply)
 {
-	sts ("%s %s", MSG_PONG, reply);
+	send_cmd ("%s %s", MSG_PONG, reply);
 }
 
 void
-send_snetinfo (const char* from, const int prot, const char* cloak, const char* netname)
+send_snetinfo (const char* from, const int prot, const char* cloak, const char* netname, const unsigned long ts)
 {
-	sts (":%s %s 0 %ld %d %s 0 0 0 :%s", from, MSG_SNETINFO, (long)me.now, prot, cloak, netname);
+	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", from, MSG_SNETINFO, ts, prot, cloak, netname);
 }
 
 void
-send_netinfo (const char* from, const int prot, const char* cloak, const char* netname)
+send_netinfo (const char* from, const int prot, const char* cloak, const char* netname, const unsigned long ts)
 {
-	sts (":%s %s 0 %ld %d %s 0 0 0 :%s", from, MSG_NETINFO, (long)me.now, prot, cloak, netname);
+	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", from, MSG_NETINFO, ts, prot, cloak, netname);
 }
 
 void 
 send_kill (const char *from, const char *target, const char *reason)
 {
-	sts (":%s %s %s :%s", from, MSG_KILL, target, reason);
+	send_cmd (":%s %s %s :%s", from, MSG_KILL, target, reason);
 }
 
 void 
-send_nickchange (const char *oldnick, const char *newnick, const time_t ts)
+send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
 {
-	sts (":%s %s %s %d", oldnick, MSG_NICK, newnick, (int)me.now);
+	send_cmd (":%s %s %s %lu", oldnick, MSG_NICK, newnick, ts);
 }
 
 void 
 send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
-	sts (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
+	send_cmd (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
 }
 
 void 
 send_wallops (const char *who, const char *buf)
 {
-	sts (":%s %s :%s", who, MSG_WALLOPS, buf);
+	send_cmd (":%s %s :%s", who, MSG_WALLOPS, buf);
 }
 
 void
 send_invite (const char *from, const char *to, const char *chan) 
 {
-	sts (":%s %s %s %s", from, MSG_INVITE, to, chan);
+	send_cmd (":%s %s %s %s", from, MSG_INVITE, to, chan);
 }
 
 void
-send_svinfo (const int tscurrent, const int tsmin, const int tsnow)
+send_svinfo (const int tscurrent, const int tsmin, const unsigned long tsnow)
 {
-	sts ("%s %d %d 0 :%ld", MSG_SVINFO, tscurrent, tsmin, (long)tsnow);
+	send_cmd ("%s %d %d 0 :%lu", MSG_SVINFO, tscurrent, tsmin, tsnow);
 }
 
 /* there isn't an akill on Hybrid, so we send a kline to all servers! */
 void 
-send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason)
+send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
-	sts (":%s %s * %lu %s %s :%s", setby, MSG_KLINE, (unsigned long)length, ident, host, reason);
+	send_cmd (":%s %s * %d %s %s :%s", setby, MSG_KLINE, length, ident, host, reason);
 }
 
 void 
-send_rakill (const char *host, const char *ident)
+send_rakill (const char *sender, const char *host, const char *ident)
 {
 	if (ircd_srv.unkline) {
-		sts(":%s %s %s %s", me.name, MSG_UNKLINE, ident, host);
+		send_cmd(":%s %s %s %s", sender, MSG_UNKLINE, ident, host);
 	} else {
 		chanalert (s_Services, "Please Manually remove KLINES using /unkline on each server");
 	}
@@ -288,22 +286,22 @@ send_rakill (const char *host, const char *ident)
 void
 send_privmsg (const char *from, const char *to, const char *buf)
 {
-	sts (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
+	send_cmd (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
 }
 
 void
 send_notice (const char *from, const char *to, const char *buf)
 {
-	sts (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
+	send_cmd (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
 }
 
 void
 send_globops (const char *from, const char *buf)
 {
-	sts (":%s %s :%s", from, MSG_WALLOPS, buf);
+	send_cmd (":%s %s :%s", from, MSG_WALLOPS, buf);
 }
 
-/* from SJOIN ts chan modes param:" */
+/* from SJOIN unsigned long chan modes param:" */
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {

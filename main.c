@@ -487,7 +487,7 @@ setup_signals (void)
 	(void) sigaddset (&act.sa_mask, SIGINT);
 	(void) sigaction (SIGINT, &act, NULL);
 
-    /* SIGSEGV as well -sts */
+    /* SIGSEGV */
 	act.sa_handler = serv_segv;
 	(void) sigaddset (&act.sa_mask, SIGSEGV);
 	(void) sigaction (SIGSEGV, &act, NULL);

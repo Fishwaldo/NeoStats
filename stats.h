@@ -359,7 +359,6 @@ struct me {
 	unsigned int onlyopers:1;
 	unsigned int die:1;
 	unsigned int debug_mode:1;
-	unsigned int token:1;
 #if defined(ULTIMATE3) || defined(QUANTUM)
 	unsigned int client:1;
 #endif
