@@ -166,9 +166,7 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_OPER     0x00001	/* umode +o - Oper */
-#define UMODE_LOCOP     0x00002	/* umode +O - Local Oper */
-#define UMODE_INVISIBLE     0x00004	/* umode +i - Invisible */
+#define UMODE_LOCOP     0x00004	/* umode +O - Local Oper */
 #define UMODE_WALLOP     0x00008	/* umode +w - Get wallops */
 #define UMODE_SERVNOTICE     0x00010	/* umode +s - Server notices */
 #define UMODE_CLIENT     0x00020	/* umode +c - Client connections/exits */
@@ -207,15 +205,5 @@
 #define CMODE_MODREG		0x04000000
 #define CMODE_NONICKCHANGE	0x08000000
 #define CMODE_AUDITORIUM	0x10000000
-
-
-/* Cmode macros */
-#define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))
-#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
-#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
-
-/* Umode macros */
-#define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-#define is_bot(x) ((x) && (x->Umode & UMODE_BOT))    
 
 #endif

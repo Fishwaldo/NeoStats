@@ -195,8 +195,8 @@
 #define UMODE_CH_ADMIN 'a'
 
 /* Umodes */
-#define UMODE_SERVNOTICE   0x0001 /* server notices such as kill */
-#define UMODE_CCONN        0x0002 /* Client Connections */
+#define UMODE_SERVNOTICE   0x0400 /* server notices such as kill */
+#define UMODE_CCONN        0x20000 /* Client Connections */
 #define UMODE_REJ          0x0004 /* Bot Rejections */
 #define UMODE_SKILL        0x0008 /* Server Killed */
 #define UMODE_FULL         0x0010 /* Full messages */
@@ -205,26 +205,15 @@
 #define UMODE_NCHANGE      0x0080 /* Nick change notice */
 #define UMODE_WALLOP       0x0100 /* send wallops to them */
 #define UMODE_OPERWALL     0x0200 /* Operwalls */
-#define UMODE_INVISIBLE    0x0400 /* makes user invisible */
 #define UMODE_BOTS         0x0800 /* shows bots */
 #define UMODE_EXTERNAL     0x1000 /* show servers introduced and splitting */
 #define UMODE_CALLERID     0x4000 /* block unless caller id's */
 #define UMODE_UNAUTH       0x8000 /* show unauth connects here */
 #define UMODE_LOCOP       0x10000 /* show locops */
-#define UMODE_OPER         0x20000 /* Operator */
 #define UMODE_ADMIN        0x40000 /* Admin on server */
  
 /* Channel Visibility macros */
 #define CMODE_INVEX		0x02000000
 #define CMODE_HIDEOPS	0x04000000
-
-/* Cmode macros */
-#define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))
-#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_INVITEONLY)))
-#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_INVITEONLY)))
-
-/* Umode macros */
-#define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
-#define is_bot(x) (0)        
 
 #endif

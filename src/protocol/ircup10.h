@@ -219,9 +219,7 @@
 #define UMODE_CH_OPER 'o'
 
  /* User modes: */
-#define UMODE_OPER				0x0001	/* Operator */
-#define UMODE_LOCOP				0x0002	/* Local oper */
-#define UMODE_INVISIBLE         0x0004	/* Invisible */
+#define UMODE_LOCOP				0x0004	/* Local oper */
 #define UMODE_WALLOP            0x0008	/* see wallops */
 #define UMODE_SERVNOTICE        0x0010	/* See server notices */
 #define UMODE_DEAF              0x0020	/* Dont see chan msgs */
@@ -257,16 +255,5 @@
 #define CMODE_ACCONLY	0x1000000
 #define CMODE_NOAMSG	0x8000000
 #endif
-
-
-
-/* Cmode macros */
-#define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))
-#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
-#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
-
-/* Umode macros */
-#define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
-#define is_bot(x) (0)           
 
 #endif

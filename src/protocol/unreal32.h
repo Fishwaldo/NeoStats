@@ -336,8 +336,6 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_INVISIBLE		0x00000001	
-#define UMODE_OPER			0x00000002	
 #define UMODE_WALLOP		0x00000004	
 #define UMODE_FAILOP		0x00000008	
 #define UMODE_HELPOP		0x00000010	
@@ -372,14 +370,5 @@
 #define CMODE_AUDITORIUM	0x20000000
 #define CMODE_ONLYSECURE	0x40000000
 #define CMODE_NONICKCHANGE	0x80000000
-
-/* Cmode macros */
-#define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY)))
-#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY|CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_KEY) ))
-#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY|CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_KEY) ))
-
-/* Umode macros */
-#define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-#define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
 
 #endif /* UNREAL_H Define */

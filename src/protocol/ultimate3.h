@@ -349,9 +349,7 @@
 #define SMODE_CH_TECHADMIN 'T'		/* Set to a number as we dont use */
 
 /* Umodes */
-#define UMODE_OPER     	0x00000001	/* umode +o - Oper */
-#define UMODE_LOCOP     	0x00000002	/* umode +O - Local Oper */
-#define UMODE_INVISIBLE     	0x00000004	/* umode +i - Invisible */
+#define UMODE_LOCOP     	0x00000004	/* umode +O - Local Oper */
 #define UMODE_WALLOP     	0x00000008	/* umode +w - Get wallops */
 #define UMODE_SERVNOTICE     	0x00000010	/* umode +s - Server notices */
 #define UMODE_CLIENT     	0x00000020	/* umode +c - Client connections/exits */
@@ -388,14 +386,5 @@
 #define SMODE_GUEST		0x80	/* Guest Admin */
 
 /* Cmodes */
-
-/* Cmode macros */
-#define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY)))
-#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_INVITEONLY|CMODE_ADMONLY|CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY)))
-#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_INVITEONLY|CMODE_ADMONLY|CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY)))
-
-/* Umode macros */
-#define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-#define is_bot(x) (0)
 
 #endif

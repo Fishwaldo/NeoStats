@@ -199,14 +199,12 @@
 #define UMODE_CH_ADMIN 'a'
 
 /* Umodes */
-#define UMODE_OPER	0x0001	/* oper flag */
-#define UMODE_ADMIN	0x0002	/* admin flag */
+#define UMODE_ADMIN	0x0080	/* admin flag */
 #define UMODE_BOTS	0x0004	/* shows bots */
 #define UMODE_CCONN	0x0008	/* shows client connections */
 #define UMODE_DEBUG	0x0010	/* show debug info */
 #define UMODE_FULL	0x0020	/* show full messages */
 #define UMODE_CALLERID	0x0040	/* client has callerid enabled */
-#define UMODE_INVISIBLE 0x0080	/* client has +i flag */
 #define UMODE_SKILL	0x0100	/* client see's server kills */
 #define UMODE_LOCOP	0x0200	/* client is localop */
 #define UMODE_NCHANGE	0x0400	/* client can see nick change notices */
@@ -223,14 +221,5 @@
 /* Cmodes */
 #define CMODE_HIDEOPS	0x02000000
 #define CMODE_INVEX		0x04000000
-
-/* Cmode macros */
-#define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))
-#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_INVITEONLY|CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY) ))
-#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_INVITEONLY|CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY) ))
-
-/* Umode macros */
-#define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
-#define is_bot(x) (0)    
 
 #endif

@@ -167,8 +167,6 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_INVISIBLE  	0x0001	/* makes user invisible */
-#define UMODE_OPER       	0x0002	/* Operator */
 #define UMODE_REGONLY		0x0010	/* only registered nicks may PM */
 #define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
 #define UMODE_ADMIN		0x0040	/* server admin */
@@ -186,14 +184,5 @@
 #define UMODE_GLOBCON		0x800000	/* Global Connect notices */
 
 /* Cmodes */
-
-/* Cmode macros */
-#define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))
-#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
-#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
-
-/* Umode macros */
-#define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
-#define is_bot(x) (0)
 
 #endif

@@ -347,8 +347,6 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_INVISIBLE  	0x0001	/* makes user invisible */
-#define UMODE_OPER       	0x0002	/* Operator */
 #define UMODE_WALLOP     	0x0004	/* send wallops to them */
 #define UMODE_FAILOP	 	0x0008	/* Shows some global messages */
 #define UMODE_HELPOP	 	0x0010	/* Help system operator */
@@ -380,14 +378,5 @@
 
 /* Cmodes */
 #define CMODE_STRIPBADWORDS	0x02000000
-
-/* Cmode macros */
-#define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY)))
-#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_RGSTRONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY) ))
-#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_RGSTRONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY) ))
-
-/* Umode macros */
-#define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-#define is_bot(x) (0)               
 
 #endif

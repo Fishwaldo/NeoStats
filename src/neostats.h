@@ -147,6 +147,16 @@
  * should be defined locally beginning at 0x02000000
  */
 
+/* Cmode macros */
+#define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY)))
+#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+
+/* User modes available on all IRCds */
+#define UMODE_INVISIBLE		0x00000001	/* makes user invisible */
+#define UMODE_OPER			0x00000002	/* Operator */
+#define UMODE_WALLOP		0x00000004	/* send wallops to them */
+
 #ifdef CLIENT
 #include "protocol/client.h"
 #elif defined UNREAL31
@@ -175,6 +185,24 @@
 #include "protocol/viagra.h"
 #else
 #error Error, you must select an IRCD to use. See ./configure --help for more information
+#endif
+
+/* Umode macros */
+/* ifdef checks for macros until umodes updated */
+#ifdef UMODE_LOCOP
+#define is_oper(x) ((x) && ((x->Umode & (UMODE_OPER|UMODE_LOCOP)))
+#else
+#define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
+#endif
+#ifdef UMODE_BOT
+#define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
+#else
+/* Hack for Ultimate 2 while umodes are updated */
+#ifdef UMODE_RBOT
+#define is_bot(x) ((x) && ((x->Umode & (UMODE_RBOT|UMODE_SBOT)))
+#else
+#define is_bot(x) (0)
+#endif
 #endif
 
 #ifndef NEOSTATS_PACKAGE_VERSION
