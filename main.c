@@ -25,7 +25,7 @@
 
 char s_Debug[MAXNICK] = "Stats_Debug";
 char s_Services[MAXNICK] = "NeoStats";
-const char version[] = "NeoStats-2.5_Beta2-1";
+const char version[] = "NeoStats-2.5_Beta3";
 const char version_date[] = __DATE__;
 const char version_time[] = __TIME__;
 
