@@ -290,9 +290,9 @@ int DelOldChan(void)
 		for (count = 0; row[count] != NULL; count++) {
 			if (GetData((void *)&lastseen, CFGINT, "ChanStats", row[count], "LastSeen") > 0) {
 				/* delete it if its old and not online 
-				 * use findchan, instead of findchanstats, and findchan is based on hashes, so its faster 
+				 * use find_chan, instead of findchanstats, and find_chan is based on hashes, so its faster 
 				 */
-				if (((me.now - lastseen) > 604800) && (!findchan(row[count]))) {
+				if (((me.now - lastseen) > 604800) && (!find_chan(row[count]))) {
 					dlog(DEBUG1, "Deleting Channel %s", row[count]);
 					DelRow("ChanStats", row[count]);
 				}

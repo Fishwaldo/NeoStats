@@ -72,7 +72,7 @@ int sortusers(const void *v, const void *v2) {
 	return (t2->users - t->users);
 }
 
-void DisplayTLDmap(User *u) 
+void DisplayTLDmap(Client *u) 
 {
 	TLD *t;
 	lnode_t *tn;
@@ -92,7 +92,7 @@ void DisplayTLDmap(User *u)
 	irc_prefmsg(ss_bot, u, "End of List");
 }
 
-void DelTLD(User * u)
+void DelTLD(Client * u)
 {
 	const char *country_code;
 	const char *ipaddr;
@@ -117,7 +117,7 @@ void DelTLD(User * u)
 }
 
 
-void AddTLD(User * u)
+void AddTLD(Client * u)
 {
 	const char *country_name;
 	const char *country_code;

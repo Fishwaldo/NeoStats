@@ -158,7 +158,7 @@ int load_client_versions(void)
 	return 1;
 }
 
-void list_client_versions(User* u, int num)
+void list_client_versions(Client * u, int num)
 {
 	CVersions *cv;
 	lnode_t *cn;
@@ -241,7 +241,7 @@ void StatsDelChan(Channel* c)
 	}
 }
 
-void StatsJoinChan(User* u, Channel* c)
+void StatsJoinChan(Client * u, Channel* c)
 {
 	CStats *cs;
 
@@ -270,7 +270,7 @@ void StatsJoinChan(User* u, Channel* c)
 	}
 }
 
-void StatsPartChan(User* u, Channel* c)
+void StatsPartChan(Client * u, Channel* c)
 {
 	CStats *cs;
 
@@ -359,7 +359,7 @@ SStats *findserverstats(char *name)
 	return NULL;
 }
 
-void StatsAddServer(Server* s)
+void StatsAddServer(Client *s)
 {
 	SStats *st;
 
@@ -386,7 +386,7 @@ void StatsAddServer(Server* s)
 	}
 }
 
-void StatsDelServer(Server* s)
+void StatsDelServer(Client *s)
 {
 	SStats *ss;
 
@@ -397,13 +397,13 @@ void StatsDelServer(Server* s)
 		ss->numsplits ++;
 }
 
-void StatsServerPong(Server* s)
+void StatsServerPong(Client *s)
 {
 	SStats *ss;
 
 	SET_SEGV_LOCATION();
 	/* we don't want negative pings! */
-	if (s->ping < 0)
+	if (s->server->ping < 0)
 		return;
 	ss = findserverstats(s->name);
 	if (!ss)
@@ -415,34 +415,34 @@ void StatsServerPong(Server* s)
 	if (ss->highest_ping < 0) {
 		ss->highest_ping = 0;
 	}
-	if (s->ping > ss->highest_ping) {
-		ss->highest_ping = s->ping;
+	if (s->server->ping > ss->highest_ping) {
+		ss->highest_ping = s->server->ping;
 		ss->t_highest_ping = me.now;
 	}
-	if (s->ping < ss->lowest_ping) {
-		ss->lowest_ping = s->ping;
+	if (s->server->ping < ss->lowest_ping) {
+		ss->lowest_ping = s->server->ping;
 		ss->t_lowest_ping = me.now;
 	}
 	/* ok, updated the statistics, now lets see if this server is "lagged out" */
-	if (s->ping > StatServ.lagtime) {
+	if (s->server->ping > StatServ.lagtime) {
 		announce_lag("\2%s\2 is lagged out with a ping of %d",
-			s->name, s->ping);
+			s->name, s->server->ping);
 	}
 }
 
-void StatsKillUser(User* u)
+void StatsKillUser(Client * u)
 {
 	SStats *s;
 	SStats *ss;
 	char *rbuf, *cmd, *who;
 
 	SET_SEGV_LOCATION();
-	s = findserverstats(u->server->name);
+	s = findserverstats(u->user->server->name);
 	if (is_oper(u)) {
-		dlog(DEBUG2, "Decreasing OperCount on %s due to kill", u->server->name);
+		dlog(DEBUG2, "Decreasing OperCount on %s due to kill", u->user->server->name);
 		DecreaseOpers(s);
 	}
-	if (u->is_away == 1) {
+	if (u->user->is_away == 1) {
 		stats_network.away --;
 	}
 	DecreaseUsers(s);
@@ -455,26 +455,26 @@ void StatsKillUser(User* u)
 	cmd = strtok(NULL, "");
 	cmd++;
 	who++;
-	if (finduser(who)) {
+	if (find_user(who)) {
 		/* it was a User that killed the target */
-		ss = findserverstats(u->server->name);
+		ss = findserverstats(u->user->server->name);
 		ss->operkills ++;
-	} else if (findserver(who)) {
+	} else if (find_server(who)) {
 		ss = findserverstats(who);
 		ss->serverkills ++;
 	}
 	sfree(rbuf);
 }
 
-void StatsUserMode(User* u, char *modes)
+void StatsUserMode(Client * u, char *modes)
 {
 	int add = 1;
 	SStats *s;
 
 	SET_SEGV_LOCATION();
-	s = findserverstats(u->server->name);
+	s = findserverstats(u->user->server->name);
 	if (!s) {
-		nlog(LOG_WARNING, "Unable to find stats for %s", u->server->name);
+		nlog(LOG_WARNING, "Unable to find stats for %s", u->user->server->name);
 		return;
 	}
 	while (*modes) {
@@ -488,7 +488,7 @@ void StatsUserMode(User* u, char *modes)
 		case 'O':
 		case 'o':
 			if (add) {
-				dlog(DEBUG1, "Increasing OperCount for %s (%d)", u->server->name, s->opers);
+				dlog(DEBUG1, "Increasing OperCount for %s (%d)", u->user->server->name, s->opers);
 				IncreaseOpers(s);
 				if (stats_network.maxopers <
 				    stats_network.opers) {
@@ -509,7 +509,7 @@ void StatsUserMode(User* u, char *modes)
 				}
 			} else {
 				if (is_oper(u)) {
-					dlog(DEBUG1, "Decreasing OperCount for %s", u->server->name);
+					dlog(DEBUG1, "Decreasing OperCount for %s", u->user->server->name);
 					DecreaseOpers(s);
 				}
 			}
@@ -521,24 +521,24 @@ void StatsUserMode(User* u, char *modes)
 	}
 }
 
-void StatsUserAway(User* u)
+void StatsUserAway(Client * u)
 {
 	SET_SEGV_LOCATION();
-	if (u->is_away == 1) {
+	if (u->user->is_away == 1) {
 		stats_network.away ++;
 	} else {
 		stats_network.away --;
 	}
 }
 
-void StatsAddUser(User* u)
+void StatsAddUser(Client * u)
 {
 	SStats *s;
 
 	SET_SEGV_LOCATION();
-	s = findserverstats(u->server->name);
+	s = findserverstats(u->user->server->name);
 	IncreaseUsers(s);
-	dlog(DEBUG2, "added %s to stats, now at %d", u->nick, s->users);
+	dlog(DEBUG2, "added %s to stats, now at %d", u->name, s->users);
 	if (s->maxusers < s->users) {
 		/* New User Record */
 		s->maxusers = s->users;
@@ -558,16 +558,16 @@ void StatsAddUser(User* u)
 	}
 }
 
-void StatsDelUser(User* u)
+void StatsDelUser(Client * u)
 {
 	SStats *s;
 
-	s = findserverstats(u->server->name);
+	s = findserverstats(u->user->server->name);
 	if (is_oper(u)) {
-		dlog(DEBUG2, "Decreasing OperCount on %s due to signoff", u->server->name);
+		dlog(DEBUG2, "Decreasing OperCount on %s due to signoff", u->user->server->name);
 		DecreaseOpers(s);
 	}
-	if (u->is_away == 1) {
+	if (u->user->is_away == 1) {
 		stats_network.away = stats_network.away - 1;
 	}
 	DecreaseUsers(s);

@@ -171,18 +171,18 @@ static int cs_event_signon(CmdParams* cmdparams)
 	if (!cs_module->synched || !cs_cfg.sign_watch) {
 		return 1;
 	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
+	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
 		return 1;
 	}
-	if (IsMe(cmdparams->source.user)) {
+	if (IsMe(cmdparams->source)) {
 		/* its me, forget it */
 		return 1;
 	}
 	/* Print Connection Notice */
 	irc_chanalert(cs_bot, msg_signon,
-		cmdparams->source.user->nick, cmdparams->source.user->username, 
-		cmdparams->source.user->hostname, cmdparams->source.user->realname,
-		cmdparams->source.user->server->name);
+		cmdparams->source->name, cmdparams->source->user->username, 
+		cmdparams->source->user->hostname, cmdparams->source->info,
+		cmdparams->source->user->server->name);
 	return 1;
 }
 
@@ -201,10 +201,10 @@ static int cs_event_quit(CmdParams* cmdparams)
 	if (!cs_module->synched) {
 		return 1;
 	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
+	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
 		return 1;
 	}
-	if (IsMe(cmdparams->source.user)) {
+	if (IsMe(cmdparams->source)) {
 		/* its me, forget it */
 		return 1;
 	}
@@ -219,8 +219,8 @@ static int cs_event_quit(CmdParams* cmdparams)
 			LocalCount = split_buf(lcl, &Local, 0);
 			KillMsg = joinbuf(Local, LocalCount, 7);
 			irc_chanalert(cs_bot, msg_localkill,
-				  cmdparams->source.user->nick, cmdparams->source.user->username, 
-				  cmdparams->source.user->hostname,
+				  cmdparams->source->name, cmdparams->source->user->username, 
+				  cmdparams->source->user->hostname,
 				  Local[6], KillMsg);
 			sfree(KillMsg);
 			sfree(QuitMsg);
@@ -232,9 +232,9 @@ static int cs_event_quit(CmdParams* cmdparams)
 	/* Print Disconnection Notice */
 	if (cs_cfg.sign_watch) {
 		irc_chanalert(cs_bot, msg_signoff,
-			  cmdparams->source.user->nick, cmdparams->source.user->username, 
-			  cmdparams->source.user->hostname, cmdparams->source.user->realname,
-			  cmdparams->source.user->server->name, QuitMsg);
+			  cmdparams->source->name, cmdparams->source->user->username, 
+			  cmdparams->source->user->hostname, cmdparams->source->info,
+			  cmdparams->source->user->server->name, QuitMsg);
 	}
 	sfree(QuitMsg);
 	sfree(cmd);
@@ -247,16 +247,16 @@ static int cs_event_quit(CmdParams* cmdparams)
  * report mode change
  */
 
-static int cs_report_mode(User* u, int add, char mode, const char* mode_desc, int serverinfo)
+static int cs_report_mode(Client * u, int add, char mode, const char* mode_desc, int serverinfo)
 {
 	if(serverinfo) {
-		irc_chanalert(cs_bot, msg_mode_serv, u->nick, 
+		irc_chanalert(cs_bot, msg_mode_serv, u->name, 
 			add?"now":"no longer", 
 			mode_desc,
 			add?'+':'-',
-			mode, u->server->name);
+			mode, u->user->server->name);
 	} else {
-		irc_chanalert(cs_bot, msg_mode, u->nick, 
+		irc_chanalert(cs_bot, msg_mode, u->name, 
 			add?"now":"no longer", 
 			mode_desc,
 			add?'+':'-',
@@ -277,10 +277,10 @@ static int cs_event_umode(CmdParams* cmdparams)
 	if (!cs_module->synched || !cs_cfg.mode_watch) {
 		return -1;
 	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
+	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
 		return 1;
 	}
-	if (IsMe(cmdparams->source.user)) {
+	if (IsMe(cmdparams->source)) {
 		/* its me, forget it */
 		return 1;
 	}
@@ -293,61 +293,13 @@ static int cs_event_umode(CmdParams* cmdparams)
 		case '-':
 			add = 0;
 			break;
-#ifdef UMODE_CH_NETADMIN
-		case UMODE_CH_NETADMIN:
-			cs_report_mode(cmdparams->source.user, add, UMODE_CH_NETADMIN, mode_netadmin, 0);
-			break;
-#endif
-#ifdef UMODE_CH_CONETADMIN
-		case UMODE_CH_CONETADMIN:
-			cs_report_mode(cmdparams->source.user, add, UMODE_CH_CONETADMIN, mode_conetadmin, 0);
-			break;
-#endif
-#ifdef UMODE_CH_TECHADMIN
-		case UMODE_CH_TECHADMIN:
-			cs_report_mode(cmdparams->source.user, add, UMODE_CH_TECHADMIN, mode_techadmin, 0);
-			break;
-#endif
-#ifdef UMODE_CH_ADMIN
-		case UMODE_CH_ADMIN:
-			cs_report_mode(cmdparams->source.user, add, UMODE_CH_ADMIN, mode_serveradmin, 1);
-			break;
-#endif
-#ifdef UMODE_CH_COADMIN
-		case UMODE_CH_COADMIN:
-			cs_report_mode(cmdparams->source.user, add, UMODE_CH_COADMIN, mode_coserveradmin, 1);
-			break;
-#endif
-#ifdef UMODE_CH_GUESTADMIN
-		case UMODE_CH_GUESTADMIN:
-			cs_report_mode(cmdparams->source.user, add, UMODE_CH_GUESTADMIN, mode_guestadmin, 1);
-			break;
-#endif
-#ifdef UMODE_CH_BOT
-		case UMODE_CH_BOT:
-			irc_chanalert(cs_bot, msg_bot, cmdparams->source.user->nick, add?"now":"no longer", add?'+':'-', UMODE_CH_BOT);			
-			break;
-#endif
-#ifdef UMODE_CH_SADMIN
-		case UMODE_CH_SADMIN:
-			cs_report_mode(cmdparams->source.user, add, UMODE_CH_SADMIN, mode_servicesadmin, 0);
-			break;
-#endif
-#ifdef UMODE_CH_OPER
-		case UMODE_CH_OPER:
-			cs_report_mode(cmdparams->source.user, add, UMODE_CH_OPER, mode_globop, 1);
-			break;
-#endif
-#ifdef UMODE_CH_LOCOP
-		case UMODE_CH_LOCOP:
-			cs_report_mode(cmdparams->source.user, add, UMODE_CH_LOCOP, mode_locop, 1);
-			break;
-#endif
-#ifdef UMODE_CH_SERVICES
-		case UMODE_CH_SERVICES:
-			cs_report_mode(cmdparams->source.user, add, UMODE_CH_SERVICES, mode_netservice, 0);
-			break;
-#endif
+		default:
+			if(IsOperMode(*modes)) {
+				cs_report_mode(cmdparams->source, add, *modes, mode_netadmin, 0);
+			} else if(IsBotMode(*modes)) {
+				irc_chanalert(cs_bot, msg_bot, cmdparams->source->name, 
+					add?"now":"no longer", add?'+':'-', *modes);			
+			}
 		default:
 			break;
 		}
@@ -366,10 +318,10 @@ static int cs_event_smode(CmdParams* cmdparams)
 	if (!cs_module->synched || !cs_cfg.mode_watch) {
 		return -1;
 	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
+	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
 		return 1;
 	}
-	if (IsMe(cmdparams->source.user)) {
+	if (IsMe(cmdparams->source)) {
 		/* its me, forget it */
 		return 1;
 	}
@@ -384,37 +336,37 @@ static int cs_event_smode(CmdParams* cmdparams)
 			break;
 #ifdef SMODE_CH_NETADMIN
 		case SMODE_CH_NETADMIN:
-			cs_report_mode(cmdparams->source.user, add, SMODE_CH_NETADMIN, mode_netadmin, 0);
+			cs_report_mode(cmdparams->source, add, SMODE_CH_NETADMIN, mode_netadmin, 0);
 			break;
 #endif
 #ifdef SMODE_CH_CONETADMIN
 		case SMODE_CH_CONETADMIN:
-			cs_report_mode(cmdparams->source.user, add, SMODE_CH_CONETADMIN, mode_conetadmin, 0);
+			cs_report_mode(cmdparams->source, add, SMODE_CH_CONETADMIN, mode_conetadmin, 0);
 			break;
 #endif
 #ifdef SMODE_CH_TECHADMIN
 		case SMODE_CH_TECHADMIN:
-			cs_report_mode(cmdparams->source.user, add, SMODE_CH_TECHADMIN, mode_techadmin, 0);
+			cs_report_mode(cmdparams->source, add, SMODE_CH_TECHADMIN, mode_techadmin, 0);
 			break;
 #endif
 #ifdef SMODE_CH_COTECHADMIN
 		case SMODE_CH_COTECHADMIN:
-			cs_report_mode(cmdparams->source.user, add, SMODE_CH_COTECHADMIN, mode_cotechadmin, 0);
+			cs_report_mode(cmdparams->source, add, SMODE_CH_COTECHADMIN, mode_cotechadmin, 0);
 			break;
 #endif
 #ifdef SMODE_CH_ADMIN
 		case SMODE_CH_ADMIN:
-			cs_report_mode(cmdparams->source.user, add, SMODE_CH_ADMIN, mode_serveradmin, 1);
+			cs_report_mode(cmdparams->source, add, SMODE_CH_ADMIN, mode_serveradmin, 1);
 			break;
 #endif
 #ifdef SMODE_CH_COADMIN
 		case SMODE_CH_COADMIN:
-			cs_report_mode(cmdparams->source.user, add, SMODE_CH_COADMIN, mode_coserveradmin, 1);
+			cs_report_mode(cmdparams->source, add, SMODE_CH_COADMIN, mode_coserveradmin, 1);
 			break;
 #endif
 #ifdef SMODE_CH_GUESTADMIN
 		case SMODE_CH_GUESTADMIN:
-			cs_report_mode(cmdparams->source.user, add, SMODE_CH_GUESTADMIN, mode_guestadmin, 1);
+			cs_report_mode(cmdparams->source, add, SMODE_CH_GUESTADMIN, mode_guestadmin, 1);
 			break;
 #endif
 		default:
@@ -438,26 +390,26 @@ static int cs_event_kill(CmdParams* cmdparams)
 	if (!cs_module->synched || !cs_cfg.kill_watch) {
 		return 1;
 	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
+	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
 		return 1;
 	}
-	if (IsMe(cmdparams->source.user)) {
+	if (IsMe(cmdparams->source)) {
 		/* its me, forget it */
 		return 1;
 	}
 	cmd = sstrdup(recbuf);
 	KillCount = split_buf(cmd, &Kill, 0);
 	GlobalMsg = joinbuf(Kill, KillCount, 4);
-	if (finduser(Kill[2])) {
+	if (find_user(Kill[2])) {
 		/* it was a User who was killed */
 		irc_chanalert(cs_bot, msg_globalkill,
-			cmdparams->source.user->nick, cmdparams->source.user->username, 
-			cmdparams->source.user->hostname,
+			cmdparams->source->name, cmdparams->source->user->username, 
+			cmdparams->source->user->hostname,
 			Kill[0], GlobalMsg);
-	} else if (findserver(Kill[2])) {
+	} else if (find_server(Kill[2])) {
 		irc_chanalert(cs_bot, msg_serverkill,
-			cmdparams->source.user->nick, cmdparams->source.user->username, 
-			cmdparams->source.user->hostname,
+			cmdparams->source->name, cmdparams->source->user->username, 
+			cmdparams->source->user->hostname,
 			Kill[0], GlobalMsg);
 	}
 	sfree(cmd);
@@ -474,16 +426,16 @@ static int cs_event_nick(CmdParams* cmdparams)
 	if (!cs_module->synched || !cs_cfg.nick_watch) {
 		return 1;
 	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.user)) {
+	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
 		return 1;
 	}
-	if (IsMe(cmdparams->source.user)) {
+	if (IsMe(cmdparams->source)) {
 		/* its me, forget it */
 		return 1;
 	}
 	irc_chanalert(cs_bot, msg_nickchange, cmdparams->param, 
-		cmdparams->source.user->username, cmdparams->source.user->hostname, 
-		cmdparams->source.user->nick);
+		cmdparams->source->user->username, cmdparams->source->user->hostname, 
+		cmdparams->source->name);
 	return 1;
 }
 
@@ -493,11 +445,11 @@ static int cs_event_server(CmdParams* cmdparams)
 	if (!cs_module->synched || !cs_cfg.serv_watch) {
 		return 1;
 	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.server)) {
+	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
 		return 1;
 	}
 	irc_chanalert (cs_bot, "\2SERVER\2 %s has joined the network at %s",
-		cmdparams->source.server->name, cmdparams->source.server->uplink);
+		cmdparams->source->name, cmdparams->source->uplink);
 	return 1;
 }
 
@@ -507,11 +459,11 @@ static int cs_event_squit(CmdParams* cmdparams)
 	if (!cs_module->synched || !cs_cfg.serv_watch) {
 		return 1;
 	}
-	if (cs_cfg.use_exc && IsExcluded(cmdparams->source.server)) {
+	if (cs_cfg.use_exc && IsExcluded(cmdparams->source)) {
 		return 1;
 	}
 	irc_chanalert (cs_bot, "\2SERVER\2 %s has left the network at %s for %s",
-		cmdparams->source.server->name, cmdparams->source.server->uplink, 
+		cmdparams->source->name, cmdparams->source->uplink, 
 		cmdparams->param ? cmdparams->param : "");
 	return 1;
 }

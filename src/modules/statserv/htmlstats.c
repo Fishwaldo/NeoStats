@@ -232,7 +232,7 @@ void get_srvlist()
 	hash_scan_begin(&hs, Shead);
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
-		if (findserver(s->name)) {
+		if (find_server(s->name)) {
 			fprintf(opf,
 				"<tr><td height=\"4\">Server: </td>\n");
 			fprintf(opf,
@@ -252,14 +252,14 @@ void get_srvlist()
 void get_srvlistdet()
 {
 	SStats *s;
-	Server *ss;
+	Client *ss;
 	hscan_t hs;
 	hnode_t *sn;
 	fprintf(opf, "<table border=0>");
 	hash_scan_begin(&hs, Shead);
 	while ((sn = hash_scan_next(&hs))) {
 		s = hnode_get(sn);
-		ss = findserver(s->name);
+		ss = find_server(s->name);
 		fprintf(opf,
 			"<tr><th><a name=%s>Server:</th><th colspan = 2><b>%s</b></th></tr>\n",
 			s->name, s->name);
@@ -296,7 +296,7 @@ void get_srvlistdet()
 		if (ss)
 			fprintf(opf,
 				"<tr><td>Current Ping</td><td colspan = 2>%d</td></tr>",
-				ss->ping);
+				ss->server->ping);
 		fprintf(opf,
 			"<tr><td>Server Splits</td><td colspan = 2>%d</td></tr>",
 			s->numsplits);
@@ -382,7 +382,7 @@ void get_chantop10()
 		"<table border = 0><tr><th>Channel</th><th align=right>Members</th></tr>");
 	for (i = 0; i <= 10; i++) {
 		/* only show hidden chans to operators */
-		if (is_hidden_chan(findchan(cs->name))) {
+		if (is_hidden_chan(find_chan(cs->name))) {
 			i--;
 			cn = list_next(Chead, cn);
 			if (cn) {
@@ -420,7 +420,7 @@ void get_chantop10eva()
 		"<table border = 0><tr><th>Channel</th><th align=right>Total Joins</th></tr>");
 	for (i = 0; i <= 10; i++) {
 		/* only show hidden chans to operators */
-		if (is_hidden_chan(findchan(cs->name))) {
+		if (is_hidden_chan(find_chan(cs->name))) {
 			i--;
 			cn = list_next(Chead, cn);
 			if (cn) {
@@ -432,7 +432,7 @@ void get_chantop10eva()
 		}
 		fprintf(opf,
 			"<tr><td>%s %s</td><td align=right>%ld</td></tr>\n",
-			cs->name, (findchan(cs->name) ? "(*)" : ""),
+			cs->name, (find_chan(cs->name) ? "(*)" : ""),
 			cs->totmem);
 		cn = list_next(Chead, cn);
 		if (cn) {
@@ -509,7 +509,7 @@ void get_unwelcomechan()
 		"<table border = 0><tr><th>Channel</th><th>Total Kicks</th></tr>");
 	for (i = 0; i <= 10; i++) {
 		/* only show hidden chans to operators */
-		if (is_hidden_chan(findchan(cs->name))) {
+		if (is_hidden_chan(find_chan(cs->name))) {
 			i--;
 			cn = list_next(Chead, cn);
 			if (cn) {
@@ -521,7 +521,7 @@ void get_unwelcomechan()
 		}
 		fprintf(opf,
 			"<tr><td>%s %s</td><td align=right>%ld</td></tr>\n",
-			cs->name, (findchan(cs->name) ? "(*)" : ""),
+			cs->name, (find_chan(cs->name) ? "(*)" : ""),
 			cs->kicks);
 		cn = list_next(Chead, cn);
 		if (cn) {
@@ -548,7 +548,7 @@ void get_chantops()
 		"<table border = 0><tr><th>Channel</th><th>Total Topics</th></tr>");
 	for (i = 0; i <= 10; i++) {
 		/* only show hidden chans to operators */
-		if (is_hidden_chan(findchan(cs->name))) {
+		if (is_hidden_chan(find_chan(cs->name))) {
 			i--;
 			cn = list_next(Chead, cn);
 			if (cn) {
@@ -560,7 +560,7 @@ void get_chantops()
 		}
 		fprintf(opf,
 			"<tr><td>%s %s</td><td align=right>%ld</td></tr>\n",
-			cs->name, (findchan(cs->name) ? "(*)" : ""),
+			cs->name, (find_chan(cs->name) ? "(*)" : ""),
 			cs->topics);
 		cn = list_next(Chead, cn);
 		if (cn) {
@@ -578,7 +578,7 @@ void get_map(char *uplink, int level)
 #if 0
 	hscan_t hs;
 	hnode_t *sn;
-	Server *s;
+	Client *s;
 	SStats *ss;
 	char buf[256];
 	int i;
@@ -594,7 +594,7 @@ void get_map(char *uplink, int level)
 			fprintf(opf,
 				"<tr><td>%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				ss->name, ss->users, ss->maxusers,
-				ss->opers, ss->maxopers, s->ping,
+				ss->opers, ss->maxopers, s->server->ping,
 				(int)ss->highest_ping);
 			get_map(s->name, level + 1);
 		} else if ((level > 0) && !ircstrcasecmp(uplink, s->uplink)) {
@@ -608,7 +608,7 @@ void get_map(char *uplink, int level)
 			fprintf(opf,
 				"<tr><td>%s\\_%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				buf, ss->name, ss->users, ss->maxusers,
-				ss->opers, ss->maxopers, s->ping,
+				ss->opers, ss->maxopers, s->server->ping,
 				(int)ss->highest_ping);
 			get_map(s->name, level + 1);
 		}

@@ -105,17 +105,17 @@ void ModFini()
 static int ms_hail(CmdParams* cmdparams)
 {
 	char *about_nick;
-	User *target;
+	Client *target;
 
 	SET_SEGV_LOCATION();
 	about_nick = cmdparams->av[0];
-	target = findvaliduser(ms_bot, cmdparams->source.user, cmdparams->av[1]);
+	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[1]);
 	if(!target) {
 		return 0;
 	}
-	irc_prefmsg(ms_bot, cmdparams->source.user, 
-		"Your \"HAIL\" song greeting has been sent to %s!", target);
-	irc_prefmsg(ms_bot, target, "Courtesy of your friend %s:", cmdparams->source.user->nick);
+	irc_prefmsg(ms_bot, cmdparams->source, 
+		"Your \"HAIL\" song greeting has been sent to %s!", target->name);
+	irc_prefmsg(ms_bot, target, "Courtesy of your friend %s:", cmdparams->source->name);
 	irc_prefmsg(ms_bot, target, 
 		"*sings* Hail to the %s, they're the %s and they need hailing, hail to the %s so you better all hail like crazy...",
 		about_nick, about_nick, about_nick);
@@ -125,21 +125,21 @@ static int ms_hail(CmdParams* cmdparams)
 /* Routine for LAPDANCE */
 static int ms_lapdance(CmdParams* cmdparams)
 {
-	User *target;
+	Client *target;
 	
 	SET_SEGV_LOCATION();
-	target = findvaliduser(ms_bot, cmdparams->source.user, cmdparams->av[0]);
+	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return 0;
 	}
-	irc_prefmsg(ms_bot, cmdparams->source.user, 
-		"Lap dance sent to %s!", target);
+	irc_prefmsg(ms_bot, cmdparams->source, 
+		"Lap dance sent to %s!", target->name);
 	irc_prefmsg(ms_bot, target, 
 		"*%s Seductively walks up to %s and gives %s a sly look*",
-		ms_bot->nick, target, target);
+		ms_bot->name, target, target);
 	irc_prefmsg(ms_bot, target, 
 		"*%s Sits across %s's legs and gives %s the best Lap Dance of their life*",
-		ms_bot->nick, target, target);
+		ms_bot->name, target, target);
 	irc_prefmsg(ms_bot, target, 
 		"*I Think we both need a cold shower now*... *wink*");
 	return 1;
@@ -149,17 +149,17 @@ static int ms_lapdance(CmdParams* cmdparams)
 static int ms_ode(CmdParams* cmdparams)
 {
 	char *about_nick;
-	User *target;
+	Client *target;
 
 	SET_SEGV_LOCATION();
 	about_nick = cmdparams->av[0];
-	target = findvaliduser(ms_bot, cmdparams->source.user, cmdparams->av[1]);
+	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[1]);
 	if(!target) {
 		return 0;
 	}
-	irc_prefmsg(ms_bot, cmdparams->source.user, 
-		"Ode to %s sent to %s!", about_nick, target);
-	irc_prefmsg(ms_bot, target, "Courtesy of your friend %s:", cmdparams->source.user->nick);
+	irc_prefmsg(ms_bot, cmdparams->source, 
+		"Ode to %s sent to %s!", about_nick, target->name);
+	irc_prefmsg(ms_bot, target, "Courtesy of your friend %s:", cmdparams->source->name);
 	irc_prefmsg(ms_bot, target, "*recites*");
 	irc_prefmsg(ms_bot, target, "How I wish to be a %s,", about_nick);
 	irc_prefmsg(ms_bot, target, "a %s I would like to be.", about_nick);
@@ -173,17 +173,17 @@ static int ms_ode(CmdParams* cmdparams)
 static int ms_poem(CmdParams* cmdparams)
 {
 	char *about_nick;
-	User *target;
+	Client *target;
 
 	SET_SEGV_LOCATION();
 	about_nick = cmdparams->av[0];
-	target = findvaliduser(ms_bot, cmdparams->source.user, cmdparams->av[1]);
+	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[1]);
 	if(!target) {
 		return 0;
 	}
-	irc_prefmsg(ms_bot, cmdparams->source.user, 
-		"Poem about %s sent to %s!", about_nick, target);
-	irc_prefmsg(ms_bot, target, "Courtesy of your friend %s:", cmdparams->source.user->nick);
+	irc_prefmsg(ms_bot, cmdparams->source, 
+		"Poem about %s sent to %s!", about_nick, target->name);
+	irc_prefmsg(ms_bot, target, "Courtesy of your friend %s:", cmdparams->source->name);
 	irc_prefmsg(ms_bot, target, "*recites*");
 	irc_prefmsg(ms_bot, target, "I wish I was a %s,", about_nick);
 	irc_prefmsg(ms_bot, target, "A %s is never glum,", about_nick);
@@ -196,16 +196,16 @@ static int ms_poem(CmdParams* cmdparams)
 /* Routine for REDNECK */
 static int ms_redneck(CmdParams* cmdparams)
 {
-	User *target;
+	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = findvaliduser(ms_bot, cmdparams->source.user, cmdparams->av[0]);
+	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return 0;
 	}
-	irc_prefmsg(ms_bot, cmdparams->source.user, 
-		"Redneck message sent to %s!", target);
-	irc_prefmsg(ms_bot, target,  "Courtesy of your friend %s:", cmdparams->source.user->nick);
+	irc_prefmsg(ms_bot, cmdparams->source, 
+		"Redneck message sent to %s!", target->name);
+	irc_prefmsg(ms_bot, target,  "Courtesy of your friend %s:", cmdparams->source->name);
 	irc_prefmsg(ms_bot, target,  "*recites*");
 	irc_prefmsg(ms_bot, target, 
 		"I dub thee \"Redneck\", May you enjoy your coons and over sexation and many hours of weird contemplation. If its dead you eat it, ifs living kill it than eat it. This is the redneck way. Country Music all the time no rap no jive no rock no hop this is the redneck way, now go forth into a redneck world and don't forget your boots.");
@@ -215,13 +215,15 @@ static int ms_redneck(CmdParams* cmdparams)
 
 static int ms_cheerup(CmdParams* cmdparams)
 {
-	User *target;
+	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = findvaliduser(ms_bot, cmdparams->source.user, cmdparams->av[0]);
+	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return 0;
 	}
+	irc_prefmsg(ms_bot, cmdparams->source, 
+		"Cheerup sent to %s!", target->name);
 	irc_prefmsg(ms_bot, target,  "Cheer up %s .....", target);
 	irc_prefmsg(ms_bot, target, 
 		"All of us on the network love you! 3--<--<--<{4@");
@@ -231,17 +233,17 @@ static int ms_cheerup(CmdParams* cmdparams)
 /* Routine for BEHAPPY */
 static int ms_behappy(CmdParams* cmdparams)
 {
-	User *target;
+	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = findvaliduser(ms_bot, cmdparams->source.user, cmdparams->av[0]);
+	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return 0;
 	}
-	irc_prefmsg(ms_bot, cmdparams->source.user,  
-		"Behappy sent to %s!", target);
+	irc_prefmsg(ms_bot, cmdparams->source,  
+		"Behappy sent to %s!", target->name);
 	irc_prefmsg(ms_bot, target,  "%s thinks that you're a little sad.....",
-		cmdparams->source.user->nick);
+		cmdparams->source->name);
 	irc_prefmsg(ms_bot, target,  "*starts singing*");
 	irc_prefmsg(ms_bot, target, 
 		"Here's a little song I wrote, You might want to sing it note for note");
@@ -287,17 +289,17 @@ static int ms_behappy(CmdParams* cmdparams)
 /* Routine for WONDERFUL */
 static int ms_wonderful(CmdParams* cmdparams)
 {
-	User *target;
+	Client *target;
 
 	SET_SEGV_LOCATION();
-	target = findvaliduser(ms_bot, cmdparams->source.user, cmdparams->av[0]);
+	target = find_valid_user(ms_bot, cmdparams->source, cmdparams->av[0]);
 	if(!target) {
 		return 0;
 	}
-	irc_prefmsg(ms_bot, cmdparams->source.user,  
-		"wonderful sent to %s!", target);
+	irc_prefmsg(ms_bot, cmdparams->source,  
+		"wonderful sent to %s!", target->name);
 	irc_prefmsg(ms_bot, target, "Courtesy of your friend %s:", 
-		cmdparams->source.user->nick);
+		cmdparams->source->name);
 	irc_prefmsg(ms_bot, target, "*starts singing*");
 	irc_prefmsg(ms_bot, target, 
 		"So excuse me forgetting but these things I do");

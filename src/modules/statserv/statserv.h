@@ -158,19 +158,19 @@ int topkick(const void *key1, const void *key2);
 int toptopics(const void *key1, const void *key2);
 int topversions(const void *key1, const void *key2);
 /* stats.c */
-void list_client_versions(User* u, int num);
+void list_client_versions(Client * u, int num);
 int load_client_versions(void);
 int save_client_versions(void);
-void StatsAddServer(Server* s);
-void StatsDelServer(Server* s);
-void StatsServerPong(Server* s);
+void StatsAddServer(Client *s);
+void StatsDelServer(Client *s);
+void StatsServerPong(Client *s);
 SStats *findserverstats(char *name);
 void StatsAddCTCPVersion(char* version);
-void StatsAddUser(User* u);
-void StatsDelUser(User* u);
-void StatsKillUser(User* u);
-void StatsUserMode(User* u, char *modes);
-void StatsUserAway(User* u);
+void StatsAddUser(Client * u);
+void StatsDelUser(Client * u);
+void StatsKillUser(Client * u);
+void StatsUserMode(Client * u, char *modes);
+void StatsUserAway(Client * u);
 void InitStats(void);
 void FiniStats(void);
 
@@ -180,8 +180,8 @@ void LoadStats(void);
 CStats *findchanstats(char *name);
 void StatsAddChan(Channel* c);
 void StatsDelChan(Channel* c);
-void StatsJoinChan(User* u, Channel* c);
-void StatsPartChan(User* u, Channel* c);
+void StatsJoinChan(Client * u, Channel* c);
+void StatsPartChan(Client * u, Channel* c);
 void StatsChanTopic(Channel* c);
 void StatsChanKick(Channel* c);
 int DelOldChan(void);
@@ -228,11 +228,11 @@ extern const char ss_help_forcehtml_oneline[];
 extern const char ss_help_stats_oneline[];
 
 /* tld.c */
-void DelTLD(User * u);
+void DelTLD(Client * u);
 int sortusers(const void *v, const void *v2);
 void ResetTLD();
-void DisplayTLDmap(User *u);
-void AddTLD(User *);
+void DisplayTLDmap(Client *u);
+void AddTLD(Client *);
 void InitTLD(void);
 void FiniTLD(void);
 /* htmlstats.c */

@@ -142,10 +142,10 @@ static int auth_cmd_authmodelist(CmdParams* cmdparams)
 {
 	int i;
 
-	irc_prefmsg(NULL, cmdparams->source.user, 
+	irc_prefmsg(NULL, cmdparams->source, 
 		"User mode auth levels:");
 	for (i = 0; i < user_auth_mode_count; i++) {
-		irc_prefmsg(NULL, cmdparams->source.user, "%s: %d", 
+		irc_prefmsg(NULL, cmdparams->source, "%s: %d", 
 			user_auth_modes[i].modename, user_auth_modes[i].level);
 	}
 	return 1;
@@ -178,30 +178,30 @@ void ModFini()
 	del_services_cmd_list(auth_commands);
 }
 
-int ModAuthUser(User * u)
+int ModAuthUser(Client * u)
 {
 	int i, authlevel;
 
 	/* Check umodes */
 	authlevel = 0;
 	for (i = 0; i < user_auth_mode_count; i++) {
-		if (u->Umode & user_auth_modes[i].umode) {
+		if (u->user->Umode & user_auth_modes[i].umode) {
 			if(user_auth_modes[i].level > authlevel) {
 				authlevel = user_auth_modes[i].level;
 			}
 		}
 	}
-	dlog(DEBUG1, "UmodeAuth: umode level for %s is %d", u->nick, authlevel);
+	dlog(DEBUG1, "UmodeAuth: umode level for %s is %d", u->name, authlevel);
 	if (HaveFeature (FEATURE_USERSMODES)) {
 		/* Check smodes */
 		for (i = 0; i < user_auth_mode_count; i++) {
-			if (u->Smode & user_auth_modes[i].umode) {
+			if (u->user->Smode & user_auth_modes[i].umode) {
 				if(user_auth_modes[i].level > authlevel) {
 					authlevel = user_auth_modes[i].level;
 				}
 			}
 		}
-		dlog(DEBUG1, "UmodeAuth: smode level for %s is %d", u->nick, authlevel);
+		dlog(DEBUG1, "UmodeAuth: smode level for %s is %d", u->name, authlevel);
 	}
 	/* Return new level */
 	return authlevel;
