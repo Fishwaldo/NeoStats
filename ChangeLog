@@ -53,7 +53,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Lots of cleanups in the IRCd code. Should be much easier to maintain existing and create new IRCd support (M)
  - Fix up some compile problems with some of the IRCd's and fix lots of errors (F)
  - Created a script to check out the latest version each night, and do test compiles and email the results to devel@lists.neostats.net (F)
-
+ - Add CloakHost function to provide hidden hostname support for bots - currently only supports Unreal (M)
 
 * NeoStats * Fish (F) * Version 2.5.10
  - Fix a problem with Umode +T being reintroduced on Unreal Beta19 as a normal usermode. 

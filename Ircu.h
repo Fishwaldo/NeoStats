@@ -55,6 +55,8 @@
 #undef GOTUSERSMODES
 /* we don't have svskill support */
 #undef GOTSVSKILL
+/* we don't have automatic host cloaking support via Umode */
+#undef GOTUMODECLOAKING
 
 /* buffer sizes */
 #define MAXHOST			128

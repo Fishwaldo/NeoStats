@@ -328,6 +328,26 @@ del_bot (char *nick, char *reason)
 	return NS_SUCCESS;
 }
 
+/** @brief CloakBotHost
+ *
+ *  Create a hidden hostmask for the bot 
+ *  Currently only Unreal support via UMODE auto cloaking
+ *  but function created for future use and propogation to
+ *  external modules to avoid a future joint release.
+ *
+ *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+int 
+CloakHost (ModUser *bot_ptr)
+{
+#ifdef GOTUMODECLOAKING
+	sumode_cmd (bot_ptr->nick, bot_ptr->nick, UMODE_HIDE);
+	return NS_SUCCESS;	
+#else
+	return NS_FAILURE;	
+#endif
+}
+
 /** @brief split_buf
  * Taken from Epona - Thanks! 
  * Split a buffer into arguments and store the arguments in an

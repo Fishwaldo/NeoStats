@@ -49,6 +49,8 @@
 #define GOTUSERSMODES
 /* we have svskill support */
 #define GOTSVSKILL
+/* we don't have automatic host cloaking support via Umode */
+#undef GOTUMODECLOAKING
 
 #else /* !ULTIMATE3 */
 
@@ -74,6 +76,8 @@
 #define GOTBOTMODE
 /* we don't have user smode support */
 #undef GOTUSERSMODES
+/* we don't have automatic host cloaking support via Umode */
+#undef GOTUMODECLOAKING
 
 #endif /* ULTIMATE3 */
 
