@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.h,v 1.2 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: sock.h 581 2003-09-20 08:44:59Z Fish $
 */
 
 #ifndef SOCK_H

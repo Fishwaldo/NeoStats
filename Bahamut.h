@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Bahamut.h,v 1.6 2003/09/11 12:55:40 fishwaldo Exp $
+** $Id: Bahamut.h 581 2003-09-20 08:44:59Z Fish $
 */
 #ifndef BAHAMUT_H
 #define BAHAMUT_H

@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hybrid7.h,v 1.13 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: hybrid7.h 581 2003-09-20 08:44:59Z Fish $
 */
 
 

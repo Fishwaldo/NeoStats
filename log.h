@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: log.h,v 1.7 2003/09/18 11:22:03 fishwaldo Exp $
+** $Id: log.h 581 2003-09-20 08:44:59Z Fish $
 */
 
 

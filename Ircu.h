@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ircu.h,v 1.2 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: Ircu.h 581 2003-09-20 08:44:59Z Fish $
 */
 
 

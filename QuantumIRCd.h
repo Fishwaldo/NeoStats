@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: QuantumIRCd.h,v 1.4 2003/07/30 13:58:22 fishwaldo Exp $
+** $Id: QuantumIRCd.h 581 2003-09-20 08:44:59Z Fish $
 */
 #ifndef QUANTUM_H
 #define QUANTUM_H
