@@ -40,9 +40,6 @@ adns/types.c -text
 /config.sub -text
 /configure -text
 /configure.in -text
-data/niconfig.db -text
-data/nstats.db -text
-data/stats.db -text
 data/tlds.nfo -text
 /dl.c -text
 /dl.h -text
