@@ -94,11 +94,6 @@ dl/operme/Makefile -text
 dl/operme/README -text
 dl/operme/om_help.c -text
 dl/operme/operme.c -text
-dl/opsb/Makefile -text
-dl/opsb/opsb.c -text
-dl/opsb/opsb.h -text
-dl/opsb/opsb_help.c -text
-dl/opsb/proxy.c -text
 dl/spam/Makefile -text
 dl/spam/spam.c -text
 dl/statserv/ChangeLog -text
