@@ -22,35 +22,60 @@
 */
 
 #include "neostats.h"
-#include "modules.h"
-#include "dl.h"
 #include "services.h"
 
+/** Auth SubSystem
+ *
+ *  Manage user authentication and communication with authentication
+ *  modules
+ */
+
+
+/** List of registered authentication modules */
 static Module* AuthModList[NUM_MODULES];
 
-int IsServiceRoot(Client * u)
+/** @brief IsServiceRoot
+ *
+ *  Is user the master Service Root?
+ *
+ *  @param u pointer to client to test
+ *
+ *  @return NS_TRUE if is, NS_FALSE if not 
+ */
+
+static int IsServiceRoot (Client * u)
 {
-	if ((match(config.rootuser.nick, u->name))
-	&& (match(config.rootuser.user, u->user->username))
-	&& (match(config.rootuser.host, u->user->hostname))) {
-		return (1);
+	if ((match (config.rootuser.nick, u->name))
+		&& (match (config.rootuser.user, u->user->username))
+		&& (match (config.rootuser.host, u->user->hostname))) {
+		return NS_TRUE;
 	}
-	return (0);
+	return NS_FALSE;
 }
 
-int UserAuth(Client * u)
+/** @brief UserAuth
+ *
+ *  Determine authentication level of user
+ *
+ *  @param u pointer to client to test
+ *
+ *  @return authentication level
+ */
+
+int UserAuth (Client * u)
 {
 	int newauthlvl = 0;
 	int authlvl = 0;
 	int i;
 	
-	if(IsServiceRoot(u)) {
+	if (IsServiceRoot (u)) {
 		return NS_ULEVEL_ROOT;
 	} 
-	for(i = 0; i < NUM_MODULES; i++)
+	for (i = 0; i < NUM_MODULES; i++)
 	{
 		authlvl = AuthModList[i]->userauth (u);
-		/* if authlvl is greater than newauthlvl, then auth is authoritive */
+		/* if authlvl is greater than newauthlvl, then 
+		 * authentication is authoritive */
 		if (authlvl > newauthlvl) {
 			newauthlvl = authlvl;
 		}
@@ -58,7 +83,16 @@ int UserAuth(Client * u)
 	return newauthlvl;
 }
 
-int init_auth_module(Module *mod_ptr)
+/** @brief init_auth_module
+ *
+ *  Register authentication module
+ *
+ *  @param pointer to module to register
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int init_auth_module (Module *mod_ptr)
 {
 	int i;
 	mod_auth auth;
@@ -66,7 +100,7 @@ int init_auth_module(Module *mod_ptr)
 	auth = ns_dlsym (mod_ptr->dl_handle, "ModAuthUser");
 	if (auth) 
 	{
-		for(i = 0; i < NUM_MODULES; i++)
+		for( i = 0; i < NUM_MODULES; i++)
 		{
 			if (AuthModList[i] == NULL)
 			{
@@ -79,11 +113,20 @@ int init_auth_module(Module *mod_ptr)
 	return NS_FAILURE;
 }
 
-int delete_auth_module(Module *mod_ptr)
+/** @brief delete_auth_module
+ *
+ *  Unregister authentication module
+ *
+ *  @param pointer to module to register
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int delete_auth_module (Module *mod_ptr)
 {
 	int i;
 
-	for(i = 0; i < NUM_MODULES; i++)
+	for (i = 0; i < NUM_MODULES; i++)
 	{
 		if (AuthModList[i] == mod_ptr)
 		{
@@ -94,8 +137,17 @@ int delete_auth_module(Module *mod_ptr)
 	return NS_FAILURE;
 }
 
+/** @brief InitAuth
+ *
+ *  Init authentication sub system
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
 int InitAuth(void)
 {
-	memset(AuthModList, 0, sizeof(AuthModList));
+	memset (AuthModList, 0, sizeof(AuthModList));
 	return NS_SUCCESS;
 }
