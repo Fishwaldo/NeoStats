@@ -49,7 +49,6 @@ dl/loveserv/ls_help.c -text
 dl/modules.txt -text
 dl/ms/ChangeLog -text
 dl/ms/Makefile.in -text
-dl/ms/ms-bu.c -text
 dl/ms/ms.c -text
 dl/ms/ms_help.c -text
 dl/neoserv/ChangeLog -text
