@@ -110,7 +110,6 @@ void DelTLD(User * u)
 		tn = list_find(Thead, "???", findcc);
 	}
 	if (tn) {
-		printf("existing\n");
 		t = lnode_get(tn);
 		t->users--;
 	} 
