@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Add SET VERSIONSCAN option to core for CTCP version scanning.
  - StatServ: Optimise database save to further reduce code required and get 
    back a little CPU.
  - StatServ: Adjust exclusions so that counts are accurate. The exclusions 

@@ -102,6 +102,12 @@ static bot_cmd ns_commands[]=
 	{NULL,			NULL,			0, 	0,					NULL, 				NULL}
 };
 
+static bot_setting ns_settings[]=
+{
+	{"VERSIONSCAN",	&me.versionscan,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "versionscan",	NULL,	ns_help_set_versionscan, NULL, (void*)1 },
+	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
+};
+
 Bot* ns_botptr;
 BotInfo ns_botinfo = {
 	"NeoStats",
@@ -133,7 +139,7 @@ init_services_bot (void)
 	ircsnprintf (ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick);
 	flags = me.onlyopers ? BOT_FLAG_ONLY_OPERS : 0;
 	flags |= BOT_FLAG_DEAF;
-	ns_botptr = init_bot (&ns_botinfo, services_bot_modes, flags, ns_commands, NULL);
+	ns_botptr = init_bot (&ns_botinfo, services_bot_modes, flags, ns_commands, ns_settings);
 	me.onchan = 1;
 	SendAllModuleEvent (EVENT_ONLINE, NULL);
 	return NS_SUCCESS;

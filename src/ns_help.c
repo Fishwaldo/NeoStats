@@ -264,6 +264,13 @@ const char *ns_help_set_realname[] = {
 	NULL
 };
 
+const char *ns_help_set_versionscan[] = {
+	"\2VERSIONSCAN <ON|OFF>\2",
+	"Whether NeoStats performs a CTCP version scan",
+	"when users connect to the network.",
+	NULL
+};
+
 const char *ns_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",

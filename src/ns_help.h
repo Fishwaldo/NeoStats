@@ -46,6 +46,8 @@ extern const char *ns_help_timerlist[];
 extern const char *ns_help_botchanlist[];
 extern const char *ns_help_status[];
 
+extern const char *ns_help_set_versionscan[];
+
 extern const char ns_help_level_oneline[];
 extern const char ns_help_status_oneline[];
 extern const char ns_help_shutdown_oneline[];

@@ -344,6 +344,7 @@ struct me {
 	unsigned int client:1;
 #endif
 	unsigned int setservertimes;
+	unsigned int versionscan;
 	char chan[BUFSIZE];
 	unsigned int onchan:1;
 	unsigned int synced:1;
