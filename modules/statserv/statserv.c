@@ -911,8 +911,8 @@ static int ss_forcehtml(CmdParams* cmdparams)
 
 static int ss_set_htmlupdatetime_cb (CmdParams* cmdparams, SET_REASON reason)
 {
-	/* Ignore bootup callback */
-	if (reason == SET_LOAD) {
+	/* Ignore bootup and list callback */
+	if (reason != SET_CHANGE) {
 		return NS_SUCCESS;
 	}
 	set_timer_interval ("ss_html", StatServ.htmlupdatetime);

@@ -25,6 +25,9 @@
 #define _MODULES_H_
 
 extern jmp_buf sigvbuf;
+extern unsigned int fusermoddata;
+extern unsigned int fservermoddata;
+extern unsigned int fchannelmoddata;
 
 int InitModules (void);
 void FiniModules (void);

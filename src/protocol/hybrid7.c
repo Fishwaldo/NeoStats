@@ -33,9 +33,6 @@ static void m_kill (char *origin, char **argv, int argc, int srv);
 static void m_away (char *origin, char **argv, int argc, int srv);
 static void m_nick (char *origin, char **argv, int argc, int srv);
 static void m_topic (char *origin, char **argv, int argc, int srv);
-static void m_kick (char *origin, char **argv, int argc, int srv);
-static void m_join (char *origin, char **argv, int argc, int srv);
-static void m_part (char *origin, char **argv, int argc, int srv);
 static void m_svinfo (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
@@ -79,9 +76,9 @@ ircd_cmd cmd_list[] = {
 	{MSG_AWAY, 0, m_away, 0},
 	{MSG_NICK, 0, m_nick, 0},
 	{MSG_TOPIC, 0, m_topic, 0},
-	{MSG_KICK, 0, m_kick, 0},
-	{MSG_JOIN, 0, m_join, 0},
-	{MSG_PART, 0, m_part, 0},
+	{MSG_KICK, 0, _m_kick, 0},
+	{MSG_JOIN, 0, _m_join, 0},
+	{MSG_PART, 0, _m_part, 0},
 	{MSG_PING, 0, _m_ping, 0},
 	{MSG_SVINFO, 0, m_svinfo, 0},
 	{MSG_PASS, 0, _m_pass, 0},
@@ -174,9 +171,9 @@ send_quit (const char *source, const char *quitmsg)
 }
 
 void 
-send_part (const char *source, const char *chan)
+send_part (const char *source, const char *chan, const char *reason)
 {
-	send_cmd (":%s %s %s", source, MSG_PART, chan);
+	send_cmd (":%s %s %s :%s", source, MSG_PART, chan, reason);
 }
 
 void 
@@ -391,24 +388,6 @@ m_topic (char *origin, char **argv, int argc, int srv)
 	} else {
 		nlog(LOG_WARNING, "m_topic: can't find topic setter %s for topic %s", origin, argv[1]); 
 	}
-}
-
-static void
-m_kick (char *origin, char **argv, int argc, int srv)
-{
-	do_kick (origin, argv[0], argv[1], argv[2]); 
-}
-
-static void
-m_join (char *origin, char **argv, int argc, int srv)
-{
-	do_join (origin, argv[0], NULL);
-}
-
-static void
-m_part (char *origin, char **argv, int argc, int srv)
-{
-	do_part (origin, argv[0], argv[1]);
 }
 
 static void

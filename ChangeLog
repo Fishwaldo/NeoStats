@@ -4,12 +4,14 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - New moddata API. We now have two values for use by modules, one being an 
+   allocated address and one a value. This allows the core to clean up after
+   modules in the event that they fail to. (M)
  - RTA support has been moved back itno the core rather than being a module. 
    It did work fine as a module, but was limited to providing core info only
    since there is no module <-> module communication at this point and created
    module depedencies. Making this a module will be looked at again at some 
    future point. (M).
-   and similar functions into modules rather than (M)
  - HostServ: Improved ban handling. (M)
  - HostServ: LEVELS command removed since core now handles this. (M)
  - All commands now have a configurable minimum user level using the command

@@ -542,7 +542,8 @@ typedef struct Client {
 	struct in_addr ip;
 	char hostip[HOSTIPLEN];
 	int lang;
-	void *moddata[NUM_MODULES];
+	void *modptr[NUM_MODULES];
+	void *modvalue[NUM_MODULES];
 } Client; 
 
 /** @brief me structure
@@ -614,7 +615,6 @@ typedef struct Chanmem {
 	char nick[MAXNICK];
 	time_t tsjoin;
 	long flags;
-	void *moddata[NUM_MODULES];
 } Chanmem;
 
 /** @brief Channel structure
@@ -637,7 +637,8 @@ typedef struct Channel {
 	list_t *modeparms;
 	time_t creationtime;
 	unsigned int flags;
-	void *moddata[NUM_MODULES];
+	void *modptr[NUM_MODULES];
+	void *modvalue[NUM_MODULES];
 } Channel;
 
 typedef struct CmdParams {
@@ -1350,15 +1351,29 @@ MODULEVAR extern ModuleEvent module_events[];
 /* Module Auth Interface */
 MODULEFUNC int ModAuthUser (Client *u);
 
-EXPORTFUNC void clear_channel_moddata (Channel* c);
-EXPORTFUNC void set_channel_moddata (Channel* c, void *data);
-EXPORTFUNC void *get_channel_moddata (Channel* c);
-EXPORTFUNC void clear_user_moddata (Client* u);
-EXPORTFUNC void set_user_moddata (Client* u, void *data);
-EXPORTFUNC void *get_user_moddata (Client* u);
-EXPORTFUNC void clear_server_moddata (Client* s);
-EXPORTFUNC void set_server_moddata (Client* s, void *data);
-EXPORTFUNC void *get_server_moddata (Client* s);
+EXPORTFUNC void *AllocChannelModPtr (Channel* c, int size);
+EXPORTFUNC void FreeChannelModPtr (Channel *c);
+EXPORTFUNC void *GetChannelModPtr (Channel* c);
+
+EXPORTFUNC void *AllocUserModPtr (Client* u, int size);
+EXPORTFUNC void FreeUserModPtr (Client* u);
+EXPORTFUNC void *GetUserModPtr (Client* u);
+
+EXPORTFUNC void *AllocServerModPtr (Client* s, int size);
+EXPORTFUNC void FreeServerModPtr (Client* s);
+EXPORTFUNC void *GetServerModPtr (Client* s);
+
+EXPORTFUNC void ClearChannelModValue (Channel* c);
+EXPORTFUNC void SetChannelModValue (Channel* c, void *data);
+EXPORTFUNC void *GetChannelModValue (Channel* c);
+
+EXPORTFUNC void ClearUserModValue (Client* u);
+EXPORTFUNC void SetUserModValue (Client* u, void *data);
+EXPORTFUNC void *GetUserModValue (Client* u);
+
+EXPORTFUNC void ClearServerModValue (Client* s);
+EXPORTFUNC void SetServerModValue (Client* s, void *data);
+EXPORTFUNC void *GetServerModValue (Client* s);
 
 EXPORTFUNC void rtaserv_add_table (void *ptbl);
 

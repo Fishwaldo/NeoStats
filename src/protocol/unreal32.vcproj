@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="neostats.lib"
+				AdditionalDependencies="Ws2_32.lib  neostats.lib"
 				OutputFile="../../modules/unreal32d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\debug"
@@ -81,7 +81,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="neostats.lib"
+				AdditionalDependencies="Ws2_32.lib neostats.lib"
 				OutputFile="../../modules/unreal32.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../release"

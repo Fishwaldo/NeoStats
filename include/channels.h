@@ -33,5 +33,6 @@ void ChannelTopic (const char *chan, const char *owner, const char *ts, const ch
 void KickChannel (const char *kickby, const char *chan, const char *kicked, const char *kickreason);
 int InitChannels (void);
 void FiniChannels (void);
+void CleanupChannelModdata (int index);
 
 #endif /* _CHANNELS_H_ */

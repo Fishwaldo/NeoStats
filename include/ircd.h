@@ -109,6 +109,10 @@ EXPORTFUNC void _m_stats (char *origin, char **argv, int argc, int srv);
 EXPORTFUNC void _m_ping (char *origin, char **argv, int argc, int srv);
 EXPORTFUNC void _m_pong (char *origin, char **argv, int argc, int srv);
 EXPORTFUNC void _m_quit (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_topic (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_join (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_part (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_kick (char *origin, char **argv, int argc, int srv);
 
 EXPORTFUNC void do_synch_neostats (void);
 EXPORTFUNC void do_motd (const char *nick, const char *remoteserver);
@@ -168,13 +172,13 @@ MODULEFUNC void send_notice (const char *source, const char *target, const char 
 MODULEFUNC void send_globops (const char *source, const char *buf);
 MODULEFUNC void send_wallops (const char *source, const char *buf);
 MODULEFUNC void send_numeric (const char *source, const int numeric, const char *target, const char *buf);
-MODULEFUNC void send_umode (const char *who, const char *target, const char *mode);
-MODULEFUNC void send_join (const char *who, const char *chan, const unsigned long ts);
+MODULEFUNC void send_umode (const char *source, const char *target, const char *mode);
+MODULEFUNC void send_join (const char *source, const char *chan, const char *key, const unsigned long ts);
 MODULEFUNC void send_sjoin (const char *source, const char *who, const char *chan, const unsigned long ts);
-MODULEFUNC void send_part (const char *who, const char *chan);
+MODULEFUNC void send_part (const char *source, const char *chan, const char *reason);
 MODULEFUNC void send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts);
 MODULEFUNC void send_cmode (const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts);
-MODULEFUNC void send_quit (const char *who, const char *quitmsg);
+MODULEFUNC void send_quit (const char *source, const char *quitmsg);
 MODULEFUNC void send_kill (const char *source, const char *target, const char *reason);
 MODULEFUNC void send_kick (const char *source, const char *chan, const char *target, const char *reason);
 MODULEFUNC void send_invite(const char *source, const char *target, const char *chan);

@@ -341,13 +341,13 @@ send_quit (const char *source, const char *quitmsg)
 }
 
 void 
-send_part (const char *source, const char *chan)
+send_part (const char *source, const char *chan, const char *reason)
 {
-	send_cmd ("%s %s %s", nick_to_base64 (source), TOK_PART, chan);
+	send_cmd ("%s %s %s :%s", nick_to_base64 (source), TOK_PART, chan, reason);
 }
 
 void
-send_join (const char *source, const char *chan, const unsigned long ts)
+send_join (const char *source, const char *chan, const char *key, const unsigned long ts)
 {
 	send_cmd ("%s %s %s %lu", nick_to_base64 (source), TOK_JOIN, chan, ts);
 }

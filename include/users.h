@@ -40,5 +40,6 @@ void UserDump (CmdParams* cmdparams, const char *nick);
 void QuitServerUsers (Client *s);
 EXPORTFUNC void AddFakeUser(const char *mask);
 EXPORTFUNC void DelFakeUser(const char *mask);
+void CleanupUserModdata (int index);
 
 #endif /* _USERS_H_ */

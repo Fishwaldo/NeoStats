@@ -346,8 +346,8 @@ static int hs_set_regnick_cb (CmdParams* cmdparams, SET_REASON reason)
 
 static int hs_set_expire_cb (CmdParams* cmdparams, SET_REASON reason)
 {
-	/* Ignore bootup callback */
-	if (reason == SET_LOAD) {
+	/* Ignore bootup and list callback */
+	if (reason != SET_CHANGE) {
 		return NS_SUCCESS;
 	}
 	if (hs_cfg.expire) {

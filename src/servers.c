@@ -36,6 +36,8 @@
 config nsconfig;
 static hash_t *serverhash;
 
+static unsigned int moddatacnt[NUM_MODULES];
+
 static Client *
 new_server (const char *name)
 {
@@ -301,27 +303,72 @@ hash_t *GetServerHash (void)
 	return serverhash;
 }
 
-void clear_server_moddata (Client* s)
+void *AllocServerModPtr (Client* s, int size)
+{
+	void *ptr;
+	ptr = ns_calloc (size);
+	s->modptr[GET_CUR_MODNUM()] = ptr;
+	fservermoddata |= (1 << GET_CUR_MODNUM());
+	moddatacnt[GET_CUR_MODNUM()]++;
+	return ptr;
+}
+
+void FreeServerModPtr (Client* s)
+{
+	ns_free (s->modptr[GET_CUR_MODNUM()]);
+	moddatacnt[GET_CUR_MODNUM()]--;
+}
+
+void* GetServerModPtr (Client* s)
+{
+	return s->modptr[GET_CUR_MODNUM()];
+}
+
+void ClearServerModValue (Client* s)
 {
 	if (s)
 	{
-		s->moddata[GET_CUR_MODNUM()] = NULL;
+		s->modvalue[GET_CUR_MODNUM()] = NULL;
+		moddatacnt[GET_CUR_MODNUM()]--;
 	}
 }
 
-void set_server_moddata (Client* s, void * data)
+void SetServerModValue (Client* s, void *data)
 {
 	if (s)
 	{
-		s->moddata[GET_CUR_MODNUM()] = data;
+		s->modvalue[GET_CUR_MODNUM()] = data;
+		fservermoddata |= (1 << GET_CUR_MODNUM());
+		moddatacnt[GET_CUR_MODNUM()]++;
 	}
 }
 
-void* get_server_moddata (Client* s)
+void *GetServerModValue (Client* s)
 {
 	if (s)
 	{
-		return s->moddata[GET_CUR_MODNUM()];
+		return s->modvalue[GET_CUR_MODNUM()];
 	}
 	return NULL;	
+}
+
+void CleanupServerModdata (int index)
+{
+	hnode_t *node;
+	hscan_t scan;
+	Client *s;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin(&scan, serverhash);
+	if (moddatacnt[index] > 0) {
+		while ((node = hash_scan_next(&scan)) != NULL) {
+			s = hnode_get(node);
+			if (s->modptr[index]) {
+				ns_free (s->modptr[index]);		
+			}
+			s->modvalue[index] = NULL;
+		}
+	}
+	fservermoddata &= ~(1 << index);	
+	moddatacnt[index] = 0;
 }

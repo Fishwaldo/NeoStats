@@ -1197,8 +1197,8 @@ int del_services_set_list (bot_setting *bot_setting_list)
 
 int bot_set_nick_cb(CmdParams* cmdparams, SET_REASON reason)
 {
-	/* Ignore bootup callback */
-	if (reason == SET_LOAD) {
+	/* Ignore bootup and list callback */
+	if (reason != SET_CHANGE) {
 		return NS_SUCCESS;
 	}
 	irc_nickchange (cmdparams->bot, cmdparams->av[1]);
@@ -1207,8 +1207,8 @@ int bot_set_nick_cb(CmdParams* cmdparams, SET_REASON reason)
 
 int bot_set_altnick_cb(CmdParams* cmdparams, SET_REASON reason)
 {
-	/* Ignore bootup callback */
-	if (reason == SET_LOAD) {
+	/* Ignore bootup and list callback */
+	if (reason != SET_CHANGE) {
 		return NS_SUCCESS;
 	}
 	return NS_SUCCESS;
@@ -1216,8 +1216,8 @@ int bot_set_altnick_cb(CmdParams* cmdparams, SET_REASON reason)
 
 int bot_set_user_cb(CmdParams* cmdparams, SET_REASON reason)
 {
-	/* Ignore bootup callback */
-	if (reason == SET_LOAD) {
+	/* Ignore bootup and list callback */
+	if (reason != SET_CHANGE) {
 		return NS_SUCCESS;
 	}
 	irc_setident (cmdparams->bot, cmdparams->av[1]);
@@ -1226,8 +1226,8 @@ int bot_set_user_cb(CmdParams* cmdparams, SET_REASON reason)
 
 int bot_set_host_cb(CmdParams* cmdparams, SET_REASON reason)
 {
-	/* Ignore bootup callback */
-	if (reason == SET_LOAD) {
+	/* Ignore bootup and list callback */
+	if (reason != SET_CHANGE) {
 		return NS_SUCCESS;
 	}
 	irc_sethost (cmdparams->bot, cmdparams->av[1]);
@@ -1238,8 +1238,8 @@ int bot_set_realname_cb(CmdParams* cmdparams, SET_REASON reason)
 {
 	char *buf;
 
-	/* Ignore bootup callback */
-	if (reason == SET_LOAD) {
+	/* Ignore bootup and list callback */
+	if (reason != SET_CHANGE) {
 		return NS_SUCCESS;
 	}
 	buf = joinbuf (cmdparams->av, cmdparams->ac, 1);

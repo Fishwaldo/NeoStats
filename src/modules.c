@@ -38,6 +38,9 @@
 static Module *ModList[NUM_MODULES];
 Module* RunModule[10];
 int RunLevel = 0;
+unsigned int fusermoddata = 0;
+unsigned int fservermoddata = 0;
+unsigned int fchannelmoddata = 0;
 
 /* @brief Module hash list */
 static hash_t *modulehash;
@@ -439,17 +442,27 @@ unload_module (const char *modname, Client * u)
 	DelModuleBots (mod_ptr);
 	hnode_destroy (modnode);
 	/* Close module */
-	SET_RUN_LEVEL(mod_ptr);
 	irc_globops (NULL, _("%s Module Unloaded"), modname);
 #ifndef VALGRIND
+	SET_RUN_LEVEL(mod_ptr);
 	ns_dlclose (mod_ptr->dl_handle);
+	RESET_RUN_LEVEL();
 #endif
 	ns_free (mod_ptr);
-	RESET_RUN_LEVEL();
 	/* free the module number */
 	if (moduleindex >= 0) {
 		dlog(DEBUG1, "Free %d from Module Numbers", moduleindex);
 		ModList[moduleindex] = NULL;
+	}
+	/* Cleanup moddata */
+	if (fusermoddata & (1 << moduleindex)) {
+		CleanupUserModdata (moduleindex);
+	}
+	if (fservermoddata & (1 << moduleindex)) {
+		CleanupServerModdata (moduleindex);
+	}
+	if (fchannelmoddata & (1 << moduleindex)) {
+		CleanupChannelModdata (moduleindex);
 	}
 	return NS_SUCCESS;
 }

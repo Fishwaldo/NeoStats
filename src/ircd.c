@@ -71,9 +71,9 @@ static void (*irc_send_globops) (const char *source, const char *buf);
 static void (*irc_send_wallops) (const char *source, const char *buf);
 static void (*irc_send_numeric) (const char *source, const int numeric, const char *target, const char *buf);
 static void (*irc_send_umode) (const char *source, const char *target, const char *mode);
-static void (*irc_send_join) (const char *source, const char *chan, const unsigned long ts);
+static void (*irc_send_join) (const char *source, const char *chan, const char *key, const unsigned long ts);
 static void (*irc_send_sjoin) (const char *source, const char *who, const char *chan, const unsigned long ts);
-static void (*irc_send_part) (const char *source, const char *chan);
+static void (*irc_send_part) (const char *source, const char *chan, const char *reason);
 static void (*irc_send_nickchange) (const char *oldnick, const char *newnick, const unsigned long ts);
 static void (*irc_send_cmode) (const char *source, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts);
 static void (*irc_send_quit) (const char *source, const char *quitmsg);
@@ -443,6 +443,58 @@ void _m_pong (char *origin, char **argv, int argc, int srv)
 void _m_quit (char *origin, char **argv, int argc, int srv)
 {
 	do_quit (origin, argv[0]);
+}
+
+/** @brief process JOIN
+ *
+ * m_join
+ *	argv[0] = channel
+ *	argv[1] = channel password (key)
+ */
+void _m_join (char *origin, char **argv, int argc, int srv)
+{
+	do_join (origin, argv[0], argv[1]);
+}
+
+/** @brief process PART
+ *
+ * m_part
+ *	argv[0] = channel
+ *	argv[1] = comment
+ */
+void _m_part (char *origin, char **argv, int argc, int srv)
+{
+	do_part (origin, argv[0], argv[1]);
+}
+
+/** @brief process KICK
+ *
+ * _m_kick
+ *	argv[0] = channel
+ *	argv[1] = client to kick
+ *	argv[2] = kick comment
+ */
+void _m_kick (char *origin, char **argv, int argc, int srv)
+{
+	do_kick (origin, argv[0], argv[1], argv[2]);
+}
+
+/** @brief process TOPIC
+ *
+ * _m_topic
+ *  origin TOPIC #channel owner TS :topic
+ *  argv[0] = topic text
+ * For servers using TS:
+ *  argv[0] = channel name
+ *  argv[1] = topic nickname
+ *  argv[2] = topic time
+ *  argv[3] = topic text
+ *
+ * @return none
+ */
+void _m_topic (char *origin, char **argv, int argc, int srv)
+{
+	do_topic (argv[0], argv[1], argv[2], argv[3]);
 }
 
 /** @brief process notice
@@ -937,7 +989,7 @@ irc_join (const Bot *botptr, const char *chan, const char *mode)
 		return NS_SUCCESS;
 	}
 	/* sjoin not available so use normal join */	
-	irc_send_join (botptr->u->name, chan, me.now);
+	irc_send_join (botptr->u->name, chan, NULL, me.now);
 	JoinChannel (botptr->u->name, chan);
 	if (mode) {
 		irc_chanusermode (botptr, chan, mode, botptr->u->name);
@@ -966,7 +1018,7 @@ irc_part (const Bot *botptr, const char *chan)
 	if (botptr->flags & BOT_FLAG_PERSIST) {
 		c->persistentusers --;
 	}
-	irc_send_part (botptr->u->name, chan);
+	irc_send_part (botptr->u->name, chan, NULL);
 	PartChannel (botptr->u, (char *) chan, NULL);
 	return NS_SUCCESS;
 }
@@ -1449,12 +1501,6 @@ do_version (const char* nick, const char *remoteserver)
 	SET_SEGV_LOCATION();
 	irc_numeric (RPL_VERSION, nick, "%s :%s -> %s %s", me.version, me.name, ns_module_info.build_date, ns_module_info.build_time);
 	ModulesVersion (nick, remoteserver);
-}
-
-void
-m_version (char *origin, char **argv, int argc, int srv)
-{
-	do_version (origin, argv[0]);
 }
 
 /** @brief Display our MOTD Message of the Day from the external neostats.motd file 

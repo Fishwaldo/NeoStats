@@ -35,10 +35,6 @@ static void m_svsmode (char *origin, char **argv, int argc, int srv);
 static void m_kill (char *origin, char **argv, int argc, int srv);
 static void m_away (char *origin, char **argv, int argc, int srv);
 static void m_nick (char *origin, char **argv, int argc, int srv);
-static void m_topic (char *origin, char **argv, int argc, int srv);
-static void m_kick (char *origin, char **argv, int argc, int srv);
-static void m_join (char *origin, char **argv, int argc, int srv);
-static void m_part (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
 static void m_netinfo (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
@@ -91,10 +87,10 @@ ircd_cmd cmd_list[] = {
 	{MSG_PONG, TOK_PONG, _m_pong, 0},
 	{MSG_AWAY, TOK_AWAY, m_away, 0},
 	{MSG_NICK, TOK_NICK, m_nick, 0},
-	{MSG_TOPIC, TOK_TOPIC, m_topic, 0},
-	{MSG_KICK, TOK_KICK, m_kick, 0},
-	{MSG_JOIN, TOK_JOIN, m_join, 0},
-	{MSG_PART, TOK_PART, m_part, 0},
+	{MSG_TOPIC, TOK_TOPIC, _m_topic, 0},
+	{MSG_KICK, TOK_KICK, _m_kick, 0},
+	{MSG_JOIN, TOK_JOIN, _m_join, 0},
+	{MSG_PART, TOK_PART, _m_part, 0},
 	{MSG_PING, TOK_PING, _m_ping, 0},
 	{MSG_NETINFO, TOK_NETINFO, m_netinfo, 0},
 	{MSG_SJOIN, TOK_SJOIN, m_sjoin, 0},
@@ -210,13 +206,13 @@ send_quit (const char *source, const char *quitmsg)
 }
 
 void 
-send_part (const char *source, const char *chan)
+send_part (const char *source, const char *chan, const char *reason)
 {
-	send_cmd (":%s %s %s", source, MSGTOK(PART), chan);
+	send_cmd (":%s %s %s :%s", source, MSGTOK(PART), chan, reason);
 }
 
 void 
-send_join (const char *source, const char *chan, const unsigned long ts)
+send_join (const char *source, const char *chan, const char *key, const unsigned long ts)
 {
 	send_cmd (":%s %s %s", source, MSGTOK(JOIN), chan);
 }
@@ -544,52 +540,6 @@ m_nick (char *origin, char **argv, int argc, int srv)
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}
-}
-
-/* m_topic
- *  argv[0] = topic text
- * For servers using TS:
- *  argv[0] = channel name
- *  argv[1] = topic nickname
- *  argv[2] = topic time
- *  argv[3] = topic text
- */
-/* TOPIC #channel owner TS :topic */
-static void
-m_topic (char *origin, char **argv, int argc, int srv)
-{
-	do_topic (argv[0], argv[1], argv[2], argv[3]);
-}
-
-/* m_kick
- *	argv[0] = channel
- *	argv[1] = client to kick
- *	argv[2] = kick comment
- */
-static void
-m_kick (char *origin, char **argv, int argc, int srv)
-{
-	do_kick (origin, argv[0], argv[1], argv[2]);
-}
-
-/* m_join
- *	argv[0] = channel
- *	argv[1] = channel password (key)
- */
-static void
-m_join (char *origin, char **argv, int argc, int srv)
-{
-	do_join (origin, argv[0], argv[1]);
-}
-
-/* m_part
- *	argv[0] = channel
- *	argv[1] = comment
- */
-static void
-m_part (char *origin, char **argv, int argc, int srv)
-{
-	do_part (origin, argv[0], argv[1]);
 }
 
 /* m_netinfo

@@ -45,6 +45,8 @@ static hash_t *channelhash;
 /* @brief quit reason buffer */
 static char quitreason[BUFSIZE];
 
+static unsigned int moddatacnt[NUM_MODULES];
+
 /** @brief ChanPartHandler
  *
  *  list handler for channel parts
@@ -621,27 +623,71 @@ hash_t *GetChannelHash (void)
 	return channelhash;
 }
 
-void clear_channel_moddata (Channel *c)
+void *AllocChannelModPtr (Channel* c, int size)
+{
+	void *ptr;
+	ptr = ns_calloc (size);
+	c->modptr[GET_CUR_MODNUM()] = ptr;
+	fchannelmoddata |= (1 << GET_CUR_MODNUM());
+	moddatacnt[GET_CUR_MODNUM()]++;
+	return ptr;
+}
+
+void FreeChannelModPtr (Channel *c)
+{
+	ns_free (c->modptr[GET_CUR_MODNUM()]);
+}
+
+void* GetChannelModPtr (Channel *c)
+{
+	return c->modptr[GET_CUR_MODNUM()];
+}
+
+void ClearChannelModValue (Channel *c)
 {
 	if (c)
 	{
-		c->moddata[GET_CUR_MODNUM()] = NULL;
+		c->modvalue[GET_CUR_MODNUM()] = NULL;
+		moddatacnt[GET_CUR_MODNUM()]--;
 	}
 }
 
-void set_channel_moddata (Channel *c, void * data)
+void SetChannelModValue (Channel *c, void *data)
 {
 	if (c)
 	{
-		c->moddata[GET_CUR_MODNUM()] = data;
+		c->modvalue[GET_CUR_MODNUM()] = data;
+		fchannelmoddata |= (1 << GET_CUR_MODNUM());
+		moddatacnt[GET_CUR_MODNUM()]++;
 	}
 }
 
-void* get_channel_moddata (Channel *c)
+void *GetChannelModValue (Channel *c)
 {
 	if (c)
 	{
-		return c->moddata[GET_CUR_MODNUM()];
+		return c->modvalue[GET_CUR_MODNUM()];
 	}
 	return NULL;	
+}
+
+void CleanupChannelModdata (int index)
+{
+	hnode_t *node;
+	hscan_t scan;
+	Channel *c;
+
+	SET_SEGV_LOCATION();
+	if (moddatacnt[index] > 0) {
+		hash_scan_begin(&scan, channelhash);
+		while ((node = hash_scan_next(&scan)) != NULL) {
+			c = hnode_get(node);
+			if (c->modptr[index]) {
+				ns_free (c->modptr[index]);		
+			}
+			c->modvalue[index] = NULL;
+		}
+	}
+	fchannelmoddata &= ~(1 << index);
+	moddatacnt[index] = 0;
 }

@@ -44,6 +44,8 @@
 
 static hash_t *userhash;
 
+static unsigned int moddatacnt[NUM_MODULES];
+
 static Client *new_user (const char *nick)
 {
 	Client *u;
@@ -69,10 +71,12 @@ static void lookupnickip (char *data, adns_answer *a)
 	u = find_user ((char *)data);
 	if (a && a->nrrs > 0 && u && a->status == adns_s_ok) {
 		u->ip.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
-		cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-		cmdparams->source = u;	
-		SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
-		ns_free (cmdparams);
+		if (u->ip.s_addr > 0) {
+			cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
+			cmdparams->source = u;	
+			SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
+			ns_free (cmdparams);
+		}
 	}
 }
 
@@ -642,27 +646,72 @@ hash_t *GetUserHash (void)
 	return userhash;
 }
 
-void clear_user_moddata (Client *u)
+void *AllocUserModPtr (Client* u, int size)
+{
+	void *ptr;
+	ptr = ns_calloc (size);
+	u->modptr[GET_CUR_MODNUM()] = ptr;
+	fusermoddata |= (1 << GET_CUR_MODNUM());
+	moddatacnt[GET_CUR_MODNUM()]++;
+	return ptr;
+}
+
+void FreeUserModPtr (Client* u)
+{
+	ns_free (u->modptr[GET_CUR_MODNUM()]);
+	moddatacnt[GET_CUR_MODNUM()]--;
+}
+
+void* GetUserModPtr (Client* u)
+{
+	return u->modptr[GET_CUR_MODNUM()];
+}
+
+void ClearUserModValue (Client *u)
 {
 	if (u)
 	{
-		u->moddata[GET_CUR_MODNUM()] = NULL;
+		u->modvalue[GET_CUR_MODNUM()] = NULL;
+		moddatacnt[GET_CUR_MODNUM()]--;
 	}
 }
 
-void set_user_moddata (Client *u, void * data)
+void SetUserModValue (Client *u, void *data)
 {
 	if (u)
 	{
-		u->moddata[GET_CUR_MODNUM()] = data;
+		u->modvalue[GET_CUR_MODNUM()] = data;
+		fusermoddata |= (1 << GET_CUR_MODNUM());
+		moddatacnt[GET_CUR_MODNUM()]++;
 	}
 }
 
-void* get_user_moddata (Client *u)
+void *GetUserModValue (Client *u)
 {
 	if (u)
 	{
-		return u->moddata[GET_CUR_MODNUM()];
+		return u->modvalue[GET_CUR_MODNUM()];
 	}
 	return NULL;	
+}
+
+void CleanupUserModdata (int index)
+{
+	Client *u;
+	hscan_t scan;
+	hnode_t *node;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin (&scan, userhash);
+	if (moddatacnt[index] > 0) {
+		while ((node = hash_scan_next (&scan)) != NULL) {
+			u = hnode_get (node);
+			if (u->modptr[index]) {
+				ns_free (u->modptr[index]);		
+			}
+			u->modvalue[index] = NULL;
+		}
+	}
+	fusermoddata &= ~(1 << index);
+	moddatacnt[index] = 0;
 }

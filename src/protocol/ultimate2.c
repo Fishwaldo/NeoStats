@@ -35,10 +35,6 @@ static void m_svsmode (char *origin, char **argv, int argc, int srv);
 static void m_kill (char *origin, char **argv, int argc, int srv);
 static void m_away (char *origin, char **argv, int argc, int srv);
 static void m_nick (char *origin, char **argv, int argc, int srv);
-static void m_topic (char *origin, char **argv, int argc, int srv);
-static void m_kick (char *origin, char **argv, int argc, int srv);
-static void m_join (char *origin, char **argv, int argc, int srv);
-static void m_part (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
 static void m_svsnick (char *origin, char **argv, int argc, int srv);
 static void m_snetinfo (char *origin, char **argv, int argc, int srv);
@@ -83,10 +79,10 @@ ircd_cmd cmd_list[] = {
 	{MSG_PONG,      0,      _m_pong,      0},
 	{MSG_AWAY,      TOK_AWAY,      m_away,      0},
 	{MSG_NICK,      TOK_NICK,      m_nick,      0},
-	{MSG_TOPIC,     TOK_TOPIC,     m_topic,     0},
-	{MSG_KICK,      0,      m_kick,      0},
-	{MSG_JOIN,      TOK_JOIN,      m_join,      0},
-	{MSG_PART,      0,      m_part,      0},
+	{MSG_TOPIC,     TOK_TOPIC,     _m_topic,     0},
+	{MSG_KICK,      0,      _m_kick,      0},
+	{MSG_JOIN,      TOK_JOIN,      _m_join,      0},
+	{MSG_PART,      0,      _m_part,      0},
 	{MSG_PING,      0,      _m_ping,      0},
 	{MSG_SNETINFO,  0,  m_snetinfo,   0},
 	{MSG_VCTRL,     0,     m_vctrl,     0},
@@ -183,13 +179,13 @@ send_quit (const char *source, const char *quitmsg)
 }
 
 void 
-send_part (const char *source, const char *chan)
+send_part (const char *source, const char *chan, const char *reason)
 {
-	send_cmd (":%s %s %s", source, MSG_PART, chan);
+	send_cmd (":%s %s %s :%s", source, MSG_PART, chan, reason);
 }
 
 void 
-send_join (const char *source, const char *chan, const unsigned long ts)
+send_join (const char *source, const char *chan, const char *key, const unsigned long ts)
 {
 	send_cmd (":%s %s %s", source, MSG_JOIN, chan);
 }
@@ -414,27 +410,6 @@ m_nick (char *origin, char **argv, int argc, int srv)
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}
-}
-static void
-m_topic (char *origin, char **argv, int argc, int srv)
-{
-	do_topic (argv[0], argv[1], argv[2], argv[3]);
-}
-
-static void
-m_kick (char *origin, char **argv, int argc, int srv)
-{
-	do_kick (origin, argv[0], argv[1], argv[2]);
-}
-static void
-m_join (char *origin, char **argv, int argc, int srv)
-{
-	do_join (origin, argv[0], NULL);
-}
-static void
-m_part (char *origin, char **argv, int argc, int srv)
-{
-	do_part (origin, argv[0], argv[1]);
 }
 
 static void
