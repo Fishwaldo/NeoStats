@@ -470,7 +470,6 @@ src/support.c eol=lf
 src/timer.c eol=lf
 src/transfer.c -text
 src/users.c eol=lf
-src/win32/neostats.aps -text
 src/win32/neostats.bmp -text
 src/win32/neostats.rc -text
 src/win32/resource.h -text
