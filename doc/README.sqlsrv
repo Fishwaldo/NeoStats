@@ -1,4 +1,4 @@
-SQL Emulation Readme File				16/12/2003
+SQL Emulation Readme File				16/12/2004
 ====================================================================
 NeoStats now has the ability to emulate a Postgres SQL server 
 natively, what this means is that you don't need to operate a 
@@ -111,7 +111,7 @@ information and a working example.
 
 /***************************************************************
  * Run Time Access
- * Copyright (C) 2003 Robert W Smith (bsmith@linuxtoys.org)
+ * Copyright (C) 2004 Robert W Smith (bsmith@linuxtoys.org)
  *
  *  This program is distributed under the terms of the GNU LGPL.
  *  See the file COPYING file.

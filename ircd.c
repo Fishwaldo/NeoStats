@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -751,7 +751,7 @@ ns_usr_motd (char *nick, char **argv, int argc)
 
 	SET_SEGV_LOCATION();
 	numeric (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
-	numeric (RPL_MOTD, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2003 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
+	numeric (RPL_MOTD, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
 	numeric (RPL_MOTD, nick, ":-");
 
 	fp = fopen (MOTD_FILENAME, "r");
@@ -782,7 +782,7 @@ ns_usr_admin (char *nick, char **argv, int argc)
 	SET_SEGV_LOCATION();
 
 	numeric (RPL_ADMINME, nick, ":- %s NeoStats Admins -", me.name);
-	numeric (RPL_ADMINME, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2003 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
+	numeric (RPL_ADMINME, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2004 The NeoStats Group", MAJOR, MINOR, REV, ircd_version);
 
 	fp = fopen (ADMIN_FILENAME, "r");
 

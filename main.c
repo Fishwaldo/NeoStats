@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services k
-** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -100,7 +100,7 @@ main (int argc, char *argv[])
 	if (!config.quiet) {
 		printf ("NeoStats %d.%d.%d%s Loading...\n", MAJOR, MINOR, REV, ircd_version);
 		printf ("-----------------------------------------------\n");
-		printf ("Copyright: NeoStats Group. 2000-2003\n");
+		printf ("Copyright: NeoStats Group. 2000-2004\n");
 		printf ("Justin Hammond (fish@neostats.net)\n");
 		printf ("Adam Rutter (shmad@neostats.net)\n");
 		printf ("Mark (m@neostats.net)\n");

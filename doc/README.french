@@ -1,6 +1,6 @@
 ******************************************************************************
 ** NeoStats - ** Statistique De Services d'IRC                              **
-** Groupe 1999-2003 De Copyright De ** (c) NeoStats. Tous droits réservés.  **
+** Groupe 1999-2004 De Copyright De ** (c) NeoStats. Tous droits réservés.  **
 ** le ce programme et toute la documentation associée est libre mais        **
 ** logiciel garanti les droits d'auteur par; voyez le fichier COPIER pour   **
 ** des détails.                                                             **
@@ -551,12 +551,12 @@ LOGFILENAMEFORMAT < format > [ FACULTATIF ]
         année de %y sans siècle, en tant que nombre décimal (00 - 99) 
         année de %Y avec le siècle, en tant que nombre décimal 
 
-    Exemples en utilisant 30 septembre 2003 comme date :
+    Exemples en utilisant 30 septembre 2004 comme date :
     Pour NeoStats0930.logarithme naturel :
         
         LOGFILENAMEFORMAT %m%d
     
-    Pour NeoStats20030930.logarithme naturel :
+    Pour NeoStats20040930.logarithme naturel :
     
         LOGFILENAMEFORMAT %Y%m%d      
     
@@ -860,6 +860,6 @@ ci-dessus pour des détails sur la façon dont nous contacter.
 
 **************************************************************
 ** Ce document a été pour la dernière fois mis à jour le    **
-** 7 décembre, 2003 par Shmad et est basé sur des documents **
+** 7 décembre, 2004 par Shmad et est basé sur des documents **
 ** à l'origine créés par Shmad, Fish et M.                  **
 **************************************************************
