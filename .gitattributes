@@ -123,6 +123,7 @@ src/curl/aclocal.m4 -text
 src/curl/arpa_telnet.h -text
 src/curl/base64.c -text
 src/curl/base64.h -text
+src/curl/config-win32.h -text
 src/curl/connect.c -text
 src/curl/connect.h -text
 src/curl/content_encoding.c -text
