@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.c,v 1.10 2000/03/03 06:03:42 fishwaldo Exp $
+** $Id: statserv.c,v 1.11 2000/03/05 06:44:47 fishwaldo Exp $
 */
 
 #include "statserv.h"
