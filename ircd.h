@@ -126,14 +126,14 @@ void send_pong (const char *reply);
 void send_server (const char *name, const int numeric, const char *infoline);
 void send_squit (const char *server, const char *quitmsg);
 void send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime);
+void send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass);
 
 int sserver_cmd (const char *name, const int numeric, const char *infoline);
-int slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass);
 int ssquit_cmd (const char *server, const char *quitmsg);
 /*int snetinfo_cmd (void);*/
 /*int ssvinfo_cmd (void);*/
-int sburst_cmd (int b);
-int seob_cmd (const char *server);
+/*int sburst_cmd (int b);*/
+/*int seob_cmd (const char *server);*/
 int ssmo_cmd (const char *from, const char *umodetarget, const char *msg);
 
 #endif

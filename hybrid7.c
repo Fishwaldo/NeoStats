@@ -148,11 +148,10 @@ const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
-int
-seob_cmd (const char *server)
+void
+send_eob (const char *server)
 {
 	sts (":%s %s", server, MSG_EOB);
-	return 1;
 }
 
 
@@ -162,13 +161,12 @@ send_server (const char *name, const int numeric, const char *infoline)
 	sts (":%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
 }
 
-int
-slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass)
+void
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
 	sts ("%s %s :TS", MSG_PASS, pass);
 	sts ("CAPAB :TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS MX");
 	sts ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
-	return 1;
 }
 
 void
@@ -271,12 +269,6 @@ send_svinfo (void)
 	sts ("SVINFO 5 3 0 :%d", (int)me.now);
 }
 
-int
-sburst_cmd (int b)
-{
-	return 1;
-}
-
 /* there isn't an akill on Hybrid, so we send a kline to all servers! */
 void 
 send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason)
@@ -320,7 +312,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 static void
 Srv_Burst (char *origin, char **argv, int argc)
 {
-	seob_cmd (me.name);
+	send_eob (me.name);
 	init_services_bot ();
 }
 static void

@@ -512,8 +512,8 @@ start (void)
 	if (servsock <= 0) {
 		nlog (LOG_WARNING, LOG_CORE, "Unable to connect to %s", me.uplink);
 	} else {
-		/* Call the IRC specific function slogin_cmd to login as a server to IRC */
-		slogin_cmd (me.name, me.numeric, me.infoline, me.pass);
+		/* Call the IRC specific function send_server_connect to login as a server to IRC */
+		send_server_connect (me.name, me.numeric, me.infoline, me.pass);
 		read_loop ();
 	}
 

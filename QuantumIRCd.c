@@ -66,7 +66,7 @@ static void Srv_Sjoin (char *origin, char **argv, int argc);
 static void Srv_Vctrl (char *origin, char **argv, int argc);
 static void Srv_Client (char *origin, char **argv, int argc);
 static void Srv_Smode (char *origin, char **argv, int argc);
-static int vctrl_cmd ();
+static void send_vctrl (void);
 
 static struct ircd_srv_ {
 	int uprot;
@@ -203,13 +203,12 @@ send_server (const char *name, const int numeric, const char *infoline)
 	sts (":%s %s %s %d :%s", me.name, (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 }
 
-int
-slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass)
+void
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
 	sts ("%s %s :TS", (me.token ? TOK_PASS : MSG_PASS), pass);
 	sts ("CAPAB TS5 BURST SSJ5 NICKIP CLIENT");
 	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
-	return 1;
 }
 
 void
@@ -278,11 +277,10 @@ send_netinfo (void)
 	sts (":%s %s 0 %d %d %s 0 0 0 :%s", me.name, MSG_SNETINFO, (int)me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname);
 }
 
-int
-vctrl_cmd ()
+void
+send_vctrl ()
 {
 	sts ("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, ircd_srv.nicklg, ircd_srv.modex, ircd_srv.gc, me.netname);
-	return 1;
 }
 
 void 
@@ -363,15 +361,14 @@ send_svinfo (void)
 	sts ("SVINFO 5 3 0 :%d", (int)me.now);
 }
 
-int
-sburst_cmd (int b)
+void
+send_burst (int b)
 {
 	if (b == 0) {
 		sts ("BURST 0");
 	} else {
 		sts ("BURST");
 	}
-	return 1;
 }
 
 void
@@ -405,7 +402,7 @@ Srv_Burst (char *origin, char **argv, int argc)
 {
 	if (argc > 0) {
 		if (ircd_srv.burst == 1) {
-			sburst_cmd (0);
+			send_burst (0);
 			ircd_srv.burst = 0;
 			me.synced = 1;
 			init_services_bot ();
@@ -579,7 +576,7 @@ Srv_Vctrl (char *origin, char **argv, int argc)
 	ircd_srv.modex = atoi (argv[2]);
 	ircd_srv.gc = atoi (argv[3]);
 	strlcpy (me.netname, argv[14], MAXPASS);
-	vctrl_cmd ();
+	send_vctrl ();
 }
 
 static void

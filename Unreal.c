@@ -200,8 +200,8 @@ send_server (const char *name, const int numeric, const char *infoline)
 	sts (":%s %s %s %d :%s", me.name, (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 }
 
-int
-slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass)
+void
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
 #if 0
 	sts ("%s TOKEN SJOIN", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
@@ -210,7 +210,6 @@ slogin_cmd (const char *name, const int numeric, const char *infoline, const cha
 #endif
 	sts ("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
 	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
-	return 1;
 }
 
 void

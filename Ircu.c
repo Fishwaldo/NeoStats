@@ -151,11 +151,10 @@ const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
-int
-seob_cmd (const char *server)
+void
+send_eob (const char *server)
 {
 	sts (":%s %s", server, MSG_EOB);
-	return 1;
 }
 
 void
@@ -164,13 +163,12 @@ send_server (const char *name, const int numeric, const char *infoline)
 	sts (":%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
 }
 
-int
-slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass)
+void
+send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
 	sts ("%s %s :TS", MSG_PASS, pass);
 	sts ("CAPAB :TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS MX");
 	sts ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
-	return 1;
 }
 
 void
@@ -272,15 +270,14 @@ send_svinfo (void)
 	sts ("SVINFO 5 3 0 :%d", (int) me.now);
 }
 
-int
-sburst_cmd (int b)
+void
+send_burst (int b)
 {
 	if (b == 0) {
 		sts ("BURST 0");
 	} else {
 		sts ("BURST");
 	}
-	return 1;
 }
 
 void 
@@ -335,7 +332,7 @@ Srv_Burst (char *origin, char **argv, int argc)
 {
 	if (argc > 0) {
 		if (ircd_srv.burst == 1) {
-			sburst_cmd (0);
+			send_burst (0);
 			ircd_srv.burst = 0;
 			me.synced = 1;
 			init_services_bot ();
@@ -343,7 +340,7 @@ Srv_Burst (char *origin, char **argv, int argc)
 	} else {
 		ircd_srv.burst = 1;
 	}
-	seob_cmd (me.name);
+	send_eob (me.name);
 	init_services_bot ();
 }
 
