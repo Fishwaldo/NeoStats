@@ -30,7 +30,7 @@ char *strnrepl(char *s, int size, const char *old, const char *new)
     int diff = newlen - oldlen;
 
     while (left >= oldlen) {
-	if (strncmp(ptr, old, oldlen) != 0) {
+	if (strncasecmp(ptr, old, oldlen) != 0) {
 	    left--;
 	    ptr++;
 	    continue;

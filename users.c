@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.27 2002/03/21 04:12:04 fishwaldo Exp $
+** $Id: users.c,v 1.28 2002/03/26 04:26:36 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -278,6 +278,7 @@ void UserMode(const char *nick, const char *modes)
 	u = finduser(nick);
 	if (!u) {
 		log("Warning, Changing Modes for a Unknown User %s!", nick);
+		log("Recbuf: %s", recbuf);
 		return;
 	}
 #ifdef DEBUG
