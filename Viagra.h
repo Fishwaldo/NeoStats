@@ -202,6 +202,19 @@
 #define UMODE_CLIENT	 	0x0800	/* Show client information */
 #define UMODE_GLOBCON		0x800000	/* Global Connect notices */
 
+/* Cmode chars */
+#define CMODE_CH_CHANOP 'o'
+#define CMODE_CH_VOICE	'v'
+#define CMODE_CH_HALFOP	'h'
+#define CMODE_CH_CHANOWNER	'a'
+#define CMODE_CH_CHANADMIN	'a'
+
+/* Cmode sjoin flags */
+#define CMODE_FL_CHANOP '@'
+#define CMODE_FL_VOICE	'+'
+#define CMODE_FL_HALFOP	'%'
+#define CMODE_FL_CHANOWNER	'!'
+#define CMODE_FL_CHANADMIN	'*'
 
 /* Cmodes */
 #define CMODE_CHANOP	0x0001

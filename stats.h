@@ -96,6 +96,7 @@
 #define NEW_STYLE_SPLITBUF
 #elif VIAGRA == 1 
 #include "Viagra.h"
+#define NEW_STYLE_SPLITBUF
 #else
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif

@@ -6147,9 +6147,9 @@ fi;
 
 echo "$as_me:$LINENO: checking Whether to Enable Viagra IRCD Support..." >&5
 echo $ECHO_N "checking Whether to Enable Viagra IRCD Support...... $ECHO_C" >&6
-# Check whether --enable-liquid or --disable-liquid was given.
-if test "${enable_liquid+set}" = set; then
-  enableval="$enable_liquid"
+# Check whether --enable-viagra or --disable-viagra was given.
+if test "${enable_viagra+set}" = set; then
+  enableval="$enable_viagra"
    case "$enableval" in
   yes)
 

@@ -318,10 +318,10 @@ AC_MSG_RESULT(no)
 
 dnl check to see if we should enable Viagra IRCD Support
 AC_MSG_CHECKING(Whether to Enable Viagra IRCD Support...)
-AC_ARG_ENABLE(liquid, [ --enable-viagra - enable Viagra IRCD Support],
+AC_ARG_ENABLE(viagra, [ --enable-viagra - enable Viagra IRCD Support],
 [ case "$enableval" in
   yes)  
-	AC_DEFINE(VIAGRA, 1, 'Enable ViagraLiquid IRCd Support')
+	AC_DEFINE(VIAGRA, 1, 'Enable Viagra IRCd Support')
 	IRCD_FILES_SRC="Viagra.c"
 	IRCD_FILES_OBJS="Viagra.o"
 	AC_MSG_RESULT(yes)

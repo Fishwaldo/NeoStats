@@ -1393,7 +1393,7 @@ ssjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 }
 
 /* temp until SecureServ 1.1 */
-#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID)
+#if defined(ULTIMATE3) || defined(BAHAMUT) || defined(QUANTUM) || defined(LIQUID) || defined(VIAGRA)
 #else
 int
 sjoin_cmd (const char *who, const char *chan)
