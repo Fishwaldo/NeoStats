@@ -276,7 +276,7 @@ us for support of the RAW command.
 The configure script will then check to see if all necessary programs to 
 run NeoStats are installed on your system. A small note here, for those 
 of you who have emailed me paranoid, NeoStats DOES NOT actually check 
-your back account balance, nor can it.
+your bank account balance, nor can it.
 
 1.4 Compiling NeoStats
 ----------------------
