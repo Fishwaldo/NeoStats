@@ -30353,7 +30353,7 @@ _ACEOF
 
 
 
-                                                                                                                                                                                              ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile lib/Makefile lib/curl/Makefile lib/keeper/Makefile lib/adns/Makefile lib/pcre/Makefile lib/rta/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/loveserv/Makefile modules/moraleserv/Makefile modules/statserv/Makefile cronchk"
+                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile lib/Makefile lib/curl/Makefile lib/keeper/Makefile lib/adns/Makefile lib/pcre/Makefile lib/rta/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/loveserv/Makefile modules/moraleserv/Makefile modules/statserv/Makefile cronchk"
 
 
 cat >confcache <<\_ACEOF
@@ -31036,6 +31036,7 @@ do
   "include/Makefile" ) CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "src/protocol/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/protocol/Makefile" ;;
+  "src/dbm/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/dbm/Makefile" ;;
   "lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
   "lib/curl/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/curl/Makefile" ;;
   "lib/keeper/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/keeper/Makefile" ;;

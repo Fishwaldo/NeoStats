@@ -345,6 +345,7 @@ AC_CONFIG_FILES([Makefile
 		include/Makefile 
 		src/Makefile
 		src/protocol/Makefile 
+		src/dbm/Makefile 
 		lib/Makefile
 		lib/curl/Makefile
 		lib/keeper/Makefile 
