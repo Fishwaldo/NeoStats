@@ -26,7 +26,9 @@
 #include "statserv.h"
 #include "log.h"
 
-int ok_to_wallop()
+static char announce_buf[BUFSIZE];
+
+static int ok_to_wallop()
 {
 	static int lasttime;
 	static int count;
@@ -45,11 +47,51 @@ int ok_to_wallop()
 		count = 0;
 	}
 	return 1;
-
-
 }
 
-CVersions *findversions(char *name)
+static int
+announce_record(const char *msg, ...)
+{
+	va_list ap;
+
+	if (ok_to_wallop() > 0) {
+		va_start (ap, msg);
+		ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
+		va_end (ap);
+		wallops (s_StatServ, "%s", announce_buf);
+	}
+	return 1;
+}
+
+static int
+announce_server_join_part(const char *msg, ...)
+{
+	va_list ap;
+
+	if (ok_to_wallop() > 0) {
+		va_start (ap, msg);
+		ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
+		va_end (ap);
+		chanalert (s_StatServ, "%s", announce_buf);
+	}
+	return 1;
+}
+
+static int
+announce_lag(const char *msg, ...)
+{
+	va_list ap;
+
+	if (ok_to_wallop() > 0) {
+		va_start (ap, msg);
+		ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
+		va_end (ap);
+		globops (s_StatServ, "%s", announce_buf);
+	}
+	return 1;
+}
+
+static CVersions *findversions(char *name)
 {
 	CVersions *cv;
 	lnode_t *cn;
@@ -97,10 +139,8 @@ int s_chan_new(char **av, int ac)
 	if (count > stats_network.maxchans) {
 		stats_network.maxchans = count;
 		stats_network.t_chans = me.now;
-		if (ok_to_wallop() > 0)
-			wallops(s_StatServ,
-				     "\2NEW CHANNEL RECORD\2 Wow, there is now %ld Channels on the Network",
-				     stats_network.maxchans);
+		announce_record("\2NEW CHANNEL RECORD\2 Wow, there is now %ld Channels on the Network",
+		    stats_network.maxchans);
 	}
 	if (count > daily.chans) {
 		daily.chans = count;
@@ -251,19 +291,15 @@ int s_new_server(char **av, int ac)
 	if (stats_network.maxservers < stats_network.servers) {
 		stats_network.maxservers = stats_network.servers;
 		stats_network.t_maxservers = me.now;
-		if (ok_to_wallop() > 0)
-			wallops(s_StatServ,
-				     "\2NEW SERVER RECORD\2 Wow, there are now %ld Servers on the Network",
-				     stats_network.servers);
+		announce_record("\2NEW SERVER RECORD\2 Wow, there are now %ld Servers on the Network",
+			stats_network.servers);
 	}
 	if (stats_network.servers > daily.servers) {
 		daily.servers = stats_network.servers;
 		daily.t_servers = me.now;
 	}
-	if (ok_to_wallop() > 0)
-		chanalert(s_StatServ,
-			  "\2SERVER\2 %s has joined the Network at %s",
-			  s->name, s->uplink);
+	announce_server_join_part("\2SERVER\2 %s has joined the Network at %s",
+		s->name, s->uplink);
 	return 1;
 
 }
@@ -278,10 +314,8 @@ int s_del_server(char **av, int ac)
 	if (!s)
 		return 0;
 	DecreaseServers();
-	if (ok_to_wallop() > 0)
-		chanalert(s_StatServ,
-			  "\2SERVER\2 %s has left the Network at %s",
-			  s->name, s->uplink);
+	announce_server_join_part("\2SERVER\2 %s has left the Network at %s",
+		s->name, s->uplink);
 	ss = findstats(s->name);
 	if (s->name != me.uplink)
 		ss->numsplits = ss->numsplits + 1;
@@ -377,20 +411,14 @@ int s_user_modes(char **av, int ac)
 					    stats_network.opers;
 					stats_network.t_maxopers =
 					    me.now;
-					if (ok_to_wallop() > 0)
-						wallops(s_StatServ,
-							     "\2Oper Record\2 The Network has reached a New Record for Opers at %ld",
-							     stats_network.
-							     opers);
+					announce_record("\2Oper Record\2 The Network has reached a New Record for Opers at %ld",
+							     stats_network.opers);
 				}
 				if (s->maxopers < s->opers) {
 					s->maxopers = s->opers;
 					s->t_maxopers = me.now;
-					if (ok_to_wallop() > 0)
-						wallops(s_StatServ,
-							     "\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers",
-							     s->name,
-							     s->opers);
+					announce_record("\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers",
+							     s->name,s->opers);
 				}
 				if (s->opers > daily.opers) {
 					daily.opers = s->opers;
@@ -475,19 +503,14 @@ int s_new_user(char **av, int ac)
 		/* New User Record */
 		s->maxusers = s->users;
 		s->t_maxusers = me.now;
-		if (ok_to_wallop() > 0)
-			wallops(s_StatServ,
-				     "\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!",
+		announce_record("\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!",
 				     s->name, s->users);
-
 	}
 
 	if (stats_network.maxusers < stats_network.users) {
 		stats_network.maxusers = stats_network.users;
 		stats_network.t_maxusers = me.now;
-		if (ok_to_wallop() > 0)
-			wallops(s_StatServ,
-				     "\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %ld users!",
+		announce_record("\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %ld users!",
 				     stats_network.users);
 	}
 
@@ -539,10 +562,8 @@ int pong(char **av, int ac)
 	/* ok, updated the statistics, now lets see if this server is "lagged out" */
 	if (StatServ.lag > 0) {
 		if (s->ping > StatServ.lag) {
-			if (ok_to_wallop() > 0)
-				globops(s_StatServ,
-					"\2%s\2 is Lagged out with a ping of %d",
-					s->name, s->ping);
+			announce_lag("\2%s\2 is Lagged out with a ping of %d",
+				s->name, s->ping);
 		}
 	}
 	return 1;

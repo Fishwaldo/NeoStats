@@ -194,7 +194,6 @@ CStats *AddChanStats(char *);
 void DelOldChan();
 int s_topic_change(char **av, int ac);
 int s_chan_kick(char **av, int ac);
-int ok_to_wallop();
 
 /* database.c */
 void save_chan(CStats *c);

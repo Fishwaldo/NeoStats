@@ -5,6 +5,11 @@ Shmad & ^Enigma & Fish^
 (F) denotes Fish (M) denotes Mark
 
 * Revision 810 * Nov 23rd, 2003 (M)
+ - removed fopen attempt on old system of dl/statserv/html/index.tpl. 
+ - improved error message for failed open of template and output file
+ - begin reworking announcement code for wallops
+
+* Revision 810 * Nov 23rd, 2003 (M)
  - change SSMNAME to __module_info.module_name to be consistent with other modules (M)
  - Use core bot message handler to process commands (M)
  - Changed SET command so SET LIST displays current settings and SET alone will error (M)

@@ -48,6 +48,9 @@ void get_clientstats();
 void get_title();
 void get_tldmap();
 FILE *tpl, *opf;
+
+const char html_template[]="data/index.tpl";
+
 void ss_html()
 {
 	char *buf;
@@ -65,22 +68,20 @@ void ss_html()
 	} else {
 		return;
 	}
-	tpl = fopen("dl/statserv/html/index.tpl", "r");
-	if (!tpl) {
-		tpl = fopen("data/index.tpl", "r");
-	}
+	tpl = fopen(html_template, "r");
 	if (!tpl) {
 		nlog(LOG_WARNING, LOG_MOD,
-		     "can't open StatServ HTML template");
-		chanalert(s_StatServ, "Can't Open StatServ HTML Template");
+			"Failed to open StatServ HTML template %s.", html_template);
+		chanalert(s_StatServ, 
+			"Failed to open StatServ HTML template %s.", html_template);
 		return;
 	}
 	opf = fopen(StatServ.htmlpath, "w");
 	if (!opf) {
 		nlog(LOG_WARNING, LOG_MOD,
-		     "Can't open StatServ HTML output file - Check Permissions");
+			"Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath);
 		chanalert(s_StatServ,
-			  "Can't open StatServ HTML output file - Check Permissions");
+			"Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath);
 		return;
 	}
 	buf = malloc(STARTBUFSIZE * 2);
