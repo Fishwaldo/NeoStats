@@ -57,8 +57,8 @@ void send_end_of_burst(void);
 
 void ircu_m_private (char* origin, char **av, int ac, int cmdptr);
 
-const char ircd_version[] = "(IRCU)";
-const char services_bot_modes[]= "+oS";
+const char ircd_version[] = "(IRCu)";
+const char services_bot_modes[]= "+iok";
 
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
