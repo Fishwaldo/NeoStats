@@ -779,6 +779,9 @@ Example:
 HostServ is designed to let users use their own unique host
 while on the Network. IRC Operators add them to the database
 and upon connection the user gets their unique host.
+Additionally, it can set a "common" undernet style hidden host 
+for users, in the form of <regnick>.domain where domain can be 
+specified by IRC administrators. 
 
 5.2 Available Commands
 ----------------------
@@ -793,6 +796,7 @@ VIEW        Detailed vhost list
 CHPASS      Change password
 LISTBAN     List banned vhosts
 LEVELS      Levels to manage HostServ
+SET         Manage Various HostServ Settings.
 
 5.3 Command Reference
 ---------------------
@@ -855,12 +859,14 @@ Example:
 5.3.6 LIST
 ----------
 Syntax: 
-    /msg HostServ LIST
+    /msg HostServ LIST <start>
 Description: 
-    Lists the people and vhosts in the Database
+    Lists the people and vhosts in the Database.
+    The list is limited to 20 entries. To view more, specify 
+    a position to start at (eg, /msg HostServ LIST 20)
     For more descriptive info on a SINGLE vhost see HELP VIEW
 Example: 
-    /msg HostServ LIST
+    /msg HostServ LIST 20
 
 5.3.7 LOGIN
 -----------
@@ -913,6 +919,26 @@ Description:
     Change the User Levels required to perform administration functions. 
     Level must be between 1 and 200
 Example: 
+
+5.3.11 SET
+-------------
+
+Syntax: 
+    /msg HostServ SET <EXPIRE/HIDDENHOST> <option>
+Description: 
+    This command can manipulate or view the current HostServ Settings
+    The Following Options are only available to Network Administration:
+    EXPIRE  <days>
+    How long before un-used vhosts are automatically deleted. Default is 60
+    days
+    HIDDENHOST <domain/OFF>
+    Enable Undernet Style Hidden hosts (nick.domain) when users identify to
+    services. Only sets their Hidden host once, and will not reset the
+    hidden host if they identify for another nickname.
+    If you specify OFF, then this feature is disabled (default)
+Example: 
+    /msg HostServ SET EXPIRE 10
+    /msg HostServ SET HIDDENHOST NeoStats.net
 
 -----------------------------------<>-----------------------------------
 
