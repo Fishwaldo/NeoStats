@@ -512,6 +512,7 @@ static int cs_user_kill(char **av, int ac)
 			u->nick, u->username, u->hostname,
 			Kill[0], GlobalMsg);
 	}
+	free(cmd);
 	free(GlobalMsg);
 	return 1;
 }

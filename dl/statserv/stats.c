@@ -337,7 +337,7 @@ int s_user_kill(char **av, int ac)
 {
 	SStats *s;
 	SStats *ss;
-	char *cmd, *who;
+	char *rbuf, *cmd, *who;
 	User *u;
 
 	SET_SEGV_LOCATION();
@@ -351,7 +351,8 @@ int s_user_kill(char **av, int ac)
 	}
 	DecreaseUsers(s);
 	DelTLD(u);
-	cmd = sstrdup(recbuf);
+	rbuf = sstrdup(recbuf);
+	cmd = rbuf;
 	who = strtok(cmd, " ");
 	cmd = strtok(NULL, " ");
 	cmd = strtok(NULL, " ");
@@ -366,6 +367,7 @@ int s_user_kill(char **av, int ac)
 		ss = findstats(who);
 		ss->serverkills = ss->serverkills + 1;
 	}
+	free(rbuf);
 	return 1;
 }
 

@@ -41,8 +41,7 @@ hash_t *uh;
 static void doDelUser (const char *nick, int killflag, const char *quitreason);
 static User *new_user (const char *nick);
 
-char quitreason[BUFSIZE];
-
+static char quitreason[BUFSIZE];
 
 static User *
 new_user (const char *nick)
@@ -53,13 +52,16 @@ new_user (const char *nick)
 	SET_SEGV_LOCATION();
 	u = smalloc (sizeof (User));
 	bzero(u, sizeof(User));
-	if (!nick)
-		strsetnull (u->nick);
-	else
+	if (!nick) {
+		nlog (LOG_CRITICAL, LOG_CORE, "new_user: trying to add user with NULL nickname");
+		return NULL;
+	} else {
 		strlcpy (u->nick, nick, MAXNICK);
+	}
 	un = hnode_create (u);
 	if (hash_isfull (uh)) {
 		nlog (LOG_CRITICAL, LOG_CORE, "new_user: user hash is full");
+		return NULL;
 	} else {
 		hash_insert (uh, un, u->nick);
 	}
@@ -96,6 +98,9 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	nlog (LOG_DEBUG2, LOG_CORE, "AddUser: %s (%s@%s) %s (%d) -> %s at %lu", nick, user, host, realname, (int)htonl (ipaddress), server, (unsigned long)time);
 
 	u = new_user (nick);
+	if (!u) {
+		return;
+	}
 	strlcpy (u->hostname, host, MAXHOST);
 	strlcpy (u->vhost, host, MAXHOST);
 	strlcpy (u->username, user, MAXUSER);

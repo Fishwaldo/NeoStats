@@ -50,16 +50,14 @@ strip (char *line)
 		*c = '\0';
 }
 
-/** @brief Our Own implementation of Malloc.
+/** @brief NeoStats implementation of malloc.
  *
- * Allocates memory for internal variables. Usefull for Memory Debugging
+ * Allocates memory for internal variables. Useful for memory debugging
  * if enough memory can't be malloced, exit the program 
  *
  * @param size The amount of memory to Malloc
  *
  * @returns size bytes of memory or NULL on malloc error
- *
- * @todo move this to a util type file, as it being in main is crazy
  */
 
 void *

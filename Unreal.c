@@ -435,22 +435,21 @@ m_credits (char *origin, char **argv, int argc, int srv)
 
 /* m_server
  *	argv[0] = servername
- *  argv[2] = hopcount
- *  argv[3] = numeric
- *  argv[4] = serverinfo
- * on old protocols, serverinfo is argv[3], and numeric is left out
+ *  argv[1] = hopcount
+ *  argv[2] = numeric
+ *  argv[3] = serverinfo
+ * on old protocols, serverinfo is argv[2], and numeric is left out
  */
 /*SERVER servername hopcount :U<protocol>-flags-numeric serverdesc*/
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
 	char* s = NULL;
-	/* server desc is in argv[2] but so is some other stuff
+	/* server desc is in argv[3] but so is some other stuff
 	 * so we need to strip protocol, flags and numeric.
 	 */
-
 	if(argc > 2) {
-		s = argv[2];
+		s = argv[3];
 		while(*s != ' ')
 			s++;
 		s++;

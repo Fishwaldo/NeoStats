@@ -5,15 +5,16 @@ Shmad & ^Enigma & Fish^
 (F) denotes Fish (M) denotes Mark
 
 * Revision 1199 * January 9, 2004 (M)
- - removed fopen attempt on old system of dl/statserv/html/index.tpl. 
- - improved error message for failed open of template and output file
- - begin reworking announcement code for wallops
+ - removed fopen attempt on old system of dl/statserv/html/index.tpl.  (M)
+ - improved error message for failed open of template and output file (M)
+ - begin reworking announcement code for wallops (M)
  - move SERVER join/quit anouncements to ConnectServ since it is not really a 
-   StatServ task
+   StatServ task (M)
  - New set options LAGALERT and RECORDALERT which allow a user to determine
-   how these alerts are managed 0 none, 1 channel, 2 globops, 3 wallops
+   how these alerts are managed 0 none, 1 channel, 2 globops, 3 wallops (M)
  - Removed MSGTHROTTLE and LAG options. These are superceded by new options
-	MSGINTERVAL, MSGLIMIT, LAGTIME     
+	MSGINTERVAL, MSGLIMIT, LAGTIME (M)
+ - Fix mem leak from strdup (M)
     
 * Revision 810 * Nov 23rd, 2003 (M)
  - change SSMNAME to __module_info.module_name to be consistent with other modules (M)
