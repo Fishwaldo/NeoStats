@@ -29,7 +29,7 @@
 
 const char ns_help_oneline[]="Provides Help on Commands";
 const char ns_help_level_oneline[]="Show permission level for NeoStats.";
-const char ns_help_info_oneline[]="Stats info on NeoStats.";
+const char ns_help_status_oneline[]="Stats info on NeoStats.";
 const char ns_help_version_oneline[]="Show NeoStats version information.";
 const char ns_help_shutdown_oneline[]="Shutdown NeoStats";
 const char ns_help_reload_oneline[]="Force NeoStats to reload";
@@ -216,8 +216,8 @@ const char *ns_help_botchanlist[] = {
 	NULL
 };
 
-const char *ns_help_info[] = {
-	"Syntax: \2INFO\2",
+const char *ns_help_status[] = {
+	"Syntax: \2STATUS\2",
 	"",
 	"Display info about NeoStats uptime and other stats.",
 	NULL

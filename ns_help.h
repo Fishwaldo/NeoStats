@@ -45,11 +45,11 @@ extern const char *ns_help_botlist[];
 extern const char *ns_help_socklist[];
 extern const char *ns_help_timerlist[];
 extern const char *ns_help_botchanlist[];
-extern const char *ns_help_info[];
+extern const char *ns_help_status[];
 
 extern const char ns_help_oneline[];
 extern const char ns_help_level_oneline[];
-extern const char ns_help_info_oneline[];
+extern const char ns_help_status_oneline[];
 extern const char ns_help_version_oneline[];
 extern const char ns_help_shutdown_oneline[];
 extern const char ns_help_reload_oneline[];

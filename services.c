@@ -46,7 +46,7 @@ static int ns_raw (User * u, char **av, int ac);
 static int ns_userdump (User * u, char **av, int ac);
 static int ns_serverdump (User * u, char **av, int ac);
 static int ns_chandump (User * u, char **av, int ac);
-static int ns_info (User * u, char **av, int ac);
+static int ns_status (User * u, char **av, int ac);
 static int ns_version (User * u, char **av, int ac);
 static int ns_level (User * u, char **av, int ac);
 static int ns_load (User * u, char **av, int ac);
@@ -58,7 +58,7 @@ static char no_reason[]="no reason given";
 static bot_cmd ns_commands[]=
 {
 	{"LEVEL",		ns_level,		0, 	0,					ns_help_level, 		ns_help_level_oneline},
-	{"INFO",		ns_info,		0, 	0,					ns_help_info, 		ns_help_info_oneline},
+	{"STATUS",		ns_status,		0, 	0,					ns_help_status, 	ns_help_status_oneline},
 	{"VERSION",		ns_version,		0, 	0,					ns_help_version, 	ns_help_version_oneline},
 	{"SHUTDOWN",	ns_shutdown,	0, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown, 	ns_help_shutdown_oneline},
 	{"RELOAD",		ns_reload,		0, 	NS_ULEVEL_ADMIN, 	ns_help_reload,		ns_help_reload_oneline},
@@ -310,9 +310,9 @@ ns_chandump (User * u, char **av, int ac)
    	return 1;
 }
 
-/** @brief INFO command handler
+/** @brief STATUS command handler
  *
- *  Display NeoStats info
+ *  Display NeoStats status
  *   
  *  @param user
  *  @param list of arguments
@@ -320,12 +320,12 @@ ns_chandump (User * u, char **av, int ac)
  *  @returns none
  */
 static int 
-ns_info (User * u, char **av, int ac)
+ns_status (User * u, char **av, int ac)
 {
 	int uptime = me.now - me.t_start;
 
 	SET_SEGV_LOCATION();
-	prefmsg (u->nick, s_Services, "%s Information:", s_Services);
+	prefmsg (u->nick, s_Services, "%s Status:", s_Services);
 	if (uptime > 86400) {
 		prefmsg (u->nick, s_Services, "%s up \2%d\2 day%s, \2%02d:%02d\2", s_Services, uptime / 86400, (uptime / 86400 == 1) ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60);
 	} else if (uptime > 3600) {
@@ -344,7 +344,6 @@ ns_info (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "Debugging Mode is \2ON!\2");
 	else
 		prefmsg (u->nick, s_Services, "Debugging Mode is Disabled!");
-	prefmsg (u->nick, s_Services, "End of Information.");
 	return 0;
 }
 
@@ -361,7 +360,7 @@ static int
 ns_version (User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	prefmsg (u->nick, s_Services, "\2NeoStats Version Information\2");
+	prefmsg (u->nick, s_Services, "\2NeoStats Version\2");
 	prefmsg (u->nick, s_Services, "NeoStats Version: %d.%d.%d%s", 
 		MAJOR, MINOR, REV, ircd_version);
 	prefmsg (u->nick, s_Services, "http://www.neostats.net");
