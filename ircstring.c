@@ -131,7 +131,11 @@ int ircvsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 	    }
 	}
 	/* NULL terminate */
-	buf[len] = 0;
+	if(len < size) {
+		buf[len] = 0;
+	} else {
+		buf[size -1] = 0;
+	}
 	/* return count chars written */
 	return len;
 #endif

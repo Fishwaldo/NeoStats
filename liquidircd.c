@@ -295,15 +295,22 @@ send_invite (const char *from, const char *to, const char *chan)
 void 
 send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
+#if 0
 	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, MSG_AKILL, host, ident, length, setby, ts, reason);
+#else
+	send_cmd (":%s %s add %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, length, (int)me.now, setby, reason); 
+#endif
 }
 
 void 
 send_rakill (const char *sender, const char *host, const char *ident)
 {
+#if 0
 	send_cmd (":%s %s %s %s", sender, MSG_RAKILL, host, ident);
+#else
+	send_cmd (":%s %s del %s@%s", me.name, MSG_GLINE, ident, host); 
+#endif
 }
-
 
 void
 send_svinfo (const int tscurrent, const int tsmin, const unsigned long tsnow)
