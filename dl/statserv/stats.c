@@ -34,8 +34,8 @@ int ok_to_wallop()
 	if (StatServ.newdb || !StatServ.onchan || !me.synced) {
 		return -1;
 	}
-	/* -1 means all wallops disabled */
-	if (StatServ.interval == -1)
+	/* 0 means all wallops disabled */
+	if (StatServ.interval == 0)
 		return -1;
 	if (me.now - lasttime < StatServ.interval) {
 		if (++count > 5)

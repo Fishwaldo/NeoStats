@@ -504,11 +504,10 @@ Description:
     HTML 
     Toggle HTML Statistics Generation on/off
 
-    MSGTHROTTLE [<seconds>/off]
+    MSGTHROTTLE [<seconds>]
     if <seconds> is greater than 0, then set 5 Wallops per <seconds> 
     throttle
-    if <seconds> is equal to 0, then disable Wallop Throttling
-    if off then all Wallops are disabled
+    if <seconds> is equal to 0, then all Wallops are disabled
 
     LAGWALLOP <seconds>
     if <seconds> is greater than 0, then when servers are lagged by this 
