@@ -224,6 +224,7 @@ UserAway (const char *nick, const char *awaymsg)
 int 
 UserNick (const char * oldnick, const char *newnick, const char * ts)
 {
+	char uoldnick[MAXNICK];
 	hnode_t *un;
 	lnode_t *cm;
 	char **av;
@@ -237,6 +238,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 		nlog (LOG_WARNING, LOG_CORE, "UserNick: can't find user %s", oldnick);
 		return NS_FAILURE;
 	}
+	strlcpy(uoldnick, u->nick, MAXNICK);
 
 	if(ts) {
 		time = atoi (ts);
@@ -262,7 +264,7 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 		u->TS = time;
 	}
 	hash_insert (uh, un, u->nick);
-	AddStringToList (&av, (char*)oldnick, &ac);
+	AddStringToList (&av, (char*)uoldnick, &ac);
 	AddStringToList (&av, u->nick, &ac);
 	if(ts) {
 		AddStringToList (&av, (char*)ts, &ac);
