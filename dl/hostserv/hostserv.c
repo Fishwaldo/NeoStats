@@ -240,7 +240,7 @@ static int hs_sign_on(char **av, int ac)
 static int Online(char **av, int ac)
 {
 	hs_bot = init_mod_bot(s_HostServ, hs_cfg.user, hs_cfg.host, hs_cfg.rname, 
-		services_bot_modes, 0, hs_commands, hs_settings, __module_info.module_name);
+		services_bot_modes, BOT_FLAG_DEAF, hs_commands, hs_settings, __module_info.module_name);
 	add_mod_timer("CleanupHosts", "Cleanup_Old_Vhosts",
 		      __module_info.module_name, 7200);
 	LoadHosts();

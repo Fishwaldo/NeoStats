@@ -138,7 +138,7 @@ static int cs_about(User * u, char **av, int ac)
 static int Online(char **av, int ac)
 {
 	cs_bot = init_mod_bot(s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.rname, 
-		services_bot_modes, BOT_FLAG_RESTRICT_OPERS, cs_commands, cs_settings, __module_info.module_name);
+		services_bot_modes, BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, cs_commands, cs_settings, __module_info.module_name);
 	if(cs_bot)
 		cs_online = 1;
 	return 1;

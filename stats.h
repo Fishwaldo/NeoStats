@@ -507,6 +507,10 @@ typedef struct bot_cmd {
  * E.g. Connectserv
  */
 #define BOT_FLAG_RESTRICT_OPERS	0x00000002
+/* Stop bot listening to channel chatter when they do not need to
+ * E.g. Connectserv
+ */
+#define BOT_FLAG_DEAF	0x00000004
 
 /* SET Comand handling */
 /* (Work in progress) */

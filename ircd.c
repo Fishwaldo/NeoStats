@@ -327,6 +327,15 @@ ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname,
 	}
 	Umode = UmodeStringToMask(modes, 0);
 	signon_newbot (nick, user, host, rname, Umode);
+#ifdef UMODE_DEAF
+	if(flags&BOT_FLAG_DEAF) {
+#ifdef IRCU
+		schmode_cmd (nick, me.chan, "+d", getnumfromnick(nick));
+#else
+		schmode_cmd (nick, me.chan, "+d", nick);
+#endif
+	}
+#endif
 	/* restore segv_inmodule from SIGNON */
 	SET_SEGV_INMODULE(mod_name);
 	bot_ptr->flags = flags;

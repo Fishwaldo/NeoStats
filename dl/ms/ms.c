@@ -66,7 +66,7 @@ static bot_cmd ms_commands[]=
 static int Online(char **av, int ac)
 {
 	ms_bot = init_mod_bot(s_MoraleServ, "MS", me.name, "A Network Morale Service",
-		services_bot_modes, 0, ms_commands, NULL, __module_info.module_name);
+		services_bot_modes, BOT_FLAG_DEAF, ms_commands, NULL, __module_info.module_name);
 	return 1;
 };
 
