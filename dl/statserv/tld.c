@@ -122,13 +122,14 @@ void AddTLD(User * u)
 	lnode_t *tn;
 	TLD *t = NULL;
 	SET_SEGV_LOCATION();
-	
+
 	if (!gi) {
 		return;
 	}
 	
 	ipaddr = inet_ntoa(u->ipaddr);
 	country_code = GeoIP_country_code_by_addr(gi, ipaddr);
+
 	if (country_code) {
 		tn = list_find(Thead, country_code, findcc);
 	} else {

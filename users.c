@@ -36,11 +36,9 @@
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
-#ifndef GOTNICKIP
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#endif                     
 
 hash_t *uh;
 
@@ -90,7 +88,7 @@ lookupnickip(char *data, adns_answer *a) {
 void
 AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric)
 {
-	unsigned long ipaddress;
+	unsigned long ipaddress = 0;
 	unsigned long time;
 	char **av;
 	int ac = 0;
@@ -108,7 +106,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 		return;
 	}
 
-	if(0) {
+	if(ip) {
 		ipaddress = strtoul (ip, NULL, 10);
 	} else {
 #ifndef GOTNICKIP
@@ -128,8 +126,6 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 		} else {
 			ipaddress = 0;
 		}
-#else
-	ipaddress = 0;
 #endif
 	}
 	if(TS) {
@@ -633,7 +629,7 @@ dumpuser (User* u)
 #else
 	debugtochannel("User:     %s!%s@%s", u->nick, u->username, u->hostname);
 #endif
-	debugtochannel("IP:       %lu.%lu.%lu.%lu", (unsigned long)((u->ipaddr.s_addr >> 24) & 255), (unsigned long)((u->ipaddr.s_addr >> 16) & 255), (unsigned long)((u->ipaddr.s_addr >> 8) & 255), (unsigned long)(u->ipaddr.s_addr & 255) );
+	debugtochannel("IP:       %s", inet_ntoa(u->ipaddr));
 	debugtochannel("Vhost:    %s", u->vhost);
 #ifdef GOTUSERSMODES
 	debugtochannel("Flags:    0x%lx Modes: %s (0x%lx) Smodes: %lx", u->flags, UmodeMaskToString(u->Umode), u->Umode, u->Smode);
