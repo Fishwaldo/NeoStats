@@ -5,286 +5,182 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.1 2000/06/10 09:14:03 fishwaldo Exp $
+** $Id: chans.c,v 1.2 2000/12/10 06:25:51 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
  
-#include "linklist.h"
 #include "stats.h"
 
 
-Chans *chanlist[C_TABLE_SIZE];
-static void add_chan_to_hash_table(char *, Chans *);
-static void del_chan_from_hash_table(char *, Chans *);
-
-
-static void add_chan_to_hash_table(char *name, Chans *c)
+void init_chan_hash() 
 {
-	c->hash = HASH(name, C_TABLE_SIZE);
-	c->next = chanlist[c->hash];
-	chanlist[c->hash] = (void *)c;
-}
-
-static void del_chan_from_hash_table(char *name, Chans *c)
-{
-	Chans *tmp, *prev = NULL;
-
-	for (tmp = chanlist[c->hash]; tmp; tmp = tmp->next) {
-		if (tmp == c) {
-			if (prev)
-				prev->next = tmp->next;
-			else
-				chanlist[c->hash] = tmp->next;
-			tmp->next = NULL;
-			return;
-		}
-		prev = tmp;
+	DLL_Return ExitCode;
+	
+	if (DLL_CreateList(&LL_Chans) == NULL) {
+		log("Error, Could not create Chanlist");
+		exit(-1);
 	}
-}
-
-void init_chan_hash()
-{
-	int i;
-	Chans *c, *prev;
-
-	for (i = 0; i < C_TABLE_SIZE; i++) {
-		c = chanlist[i];
-		while (c) {
-			prev = c->next;
-			free(c);
-
-			c = prev;
-		}
-		chanlist[i] = NULL;
+	if ((ExitCode = DLL_InitializeList(LL_Chans, sizeof(Chans))) != DLL_NORMAL) {
+		if (ExitCode == DLL_ZERO_INFO) log("Error, Chans Structure is 0");
+		if (ExitCode == DLL_NULL_LIST) log("Error, Chans Structure is NULL");
+		exit(-1);
 	}
-	bzero((char *)chanlist, sizeof(chanlist));
 }
 void ChanDump()
 {
 	Chans *c;
-	register int j;
+	DLL_Return ExitCode;
+	DLL_Return ExitCode1;
+	Channel_Members *cm;
 
-	sendcoders("Channel Listing:");
-	for (j = 0; j < C_TABLE_SIZE; j++) {
-		for (c = chanlist[j]; c; c = c->next) {
-			sendcoders("Channel Entry: %s, Users: %d, Modes: %s, Topic %s",c->name,c->cur_users,c->modes,c->topic);
-		}
-	}
-	sendcoders("End of Listing.");
-}
-
-static Chans *new_chan(char *name)
-{
-	Chans *c;
-
+	sendcoders("\2Channel Listing:\2");
 	c = smalloc(sizeof(Chans));
-	if (!name)
-		name = "";
-	memcpy(c->name, name, CHANLEN);
-	add_chan_to_hash_table(name, c);
-
-	return c;
+	cm = smalloc(sizeof(Channel_Members));
+	ExitCode = DLL_CurrentPointerToHead(LL_Chans);
+	if (ExitCode == DLL_NORMAL) {
+		while (ExitCode == DLL_NORMAL) {
+			ExitCode = DLL_GetCurrentRecord(LL_Chans, c);
+			sendcoders("\2Chan: %s\2, Users %d", c->name, c->cur_users);
+			ExitCode1 = DLL_CurrentPointerToHead(c->chanmembers);
+			if (ExitCode1 == DLL_NORMAL) {
+				while (ExitCode1 == DLL_NORMAL) {
+					ExitCode1 = DLL_GetCurrentRecord(c->chanmembers, cm);
+					sendcoders("Chanmembers: %s", cm->nick);
+					if ((ExitCode1 = DLL_IncrementCurrentPointer(c->chanmembers)) == DLL_NOT_FOUND) break;
+				}
+			}		 
+			if ((ExitCode = DLL_IncrementCurrentPointer(LL_Chans)) == DLL_NOT_FOUND) break;
+		}
+	} else {
+		sendcoders("Channel List is Empty");
+	}
+	sendcoders("\2End of List...\2");
+	free(c);
+	free(cm);
 }
-void Addchan(char *name)
+int match_chan(Chans *c, char *s) {
+#ifdef DEBUGLL
+	log("DEBUGLL: MatchChan: %s -> %s", c->name, s);
+#endif
+	return(strcasecmp(c->name, s));
+}
+Chans *findchan(char *chan)
 {
 	Chans *c;
+	c = smalloc(sizeof(Chans));
+#ifdef DEBUGLL
+	log("DEBUGLL: FindChan: %s", chan);
+#endif
+	DLL_SetSearchModes(LL_Chans, DLL_HEAD, DLL_DOWN);
+	switch(DLL_FindRecord(LL_Chans, c, chan, (int (*)()) match_chan)) {
+		case DLL_NORMAL:
+#ifdef DEBUGLL
+			log("DEBUGLL: FindChan Found %s", c->name);
+#endif
+			return c;
+			break;
+		default:
+			return NULL;
+	}
+}
+int ChanJoin(char *chan, User *u) {
+	DLL_Return ExitCode;
+	Chans *c;
+	Channel_Members *cm;
+	User_Chans *uc;
+	
+	cm = smalloc(sizeof(Channel_Members));
+	c = findchan(chan);
+	if (!c) {
+		/* This is a New Channel, create it first */
+		AddChan(chan);
+		c = findchan(chan);
+	}
+	/* add the user to the members list, and increment the counter */
+	c->cur_users++;
+log("%s", u->nick);
 
+	memcpy(cm->nick,u->nick, sizeof(cm->nick));
+log("%s", u->nick);
+	if (DLL_AddRecord(c->chanmembers, cm, NULL) == DLL_MEM_ERROR) {
+		log("Error, couldn't Chanjoin, Out of Memory");
+		exit(-1);
+	}
+	/* k, update the channel list :) */
+	ExitCode = DLL_UpdateCurrentRecord(LL_Chans, c);
+	if (ExitCode != DLL_NORMAL) {
+		log("Error, Couldn't update Channel Record for %s", chan);
+	}
+	if (c) free(c);
+	if (cm) free(cm);
+	
+	/* now, update the users entry as well :) */
+	/*u = finduser(u->nick); */
 #ifdef DEBUG
-	log("Addchan(): %s", name);
+	log("DEBUGLL: Updating User %s Record for new Chan %s", u->nick, chan);
+#endif
+	uc = smalloc(sizeof(User_Chans));
+	memcpy(uc->chan, chan, sizeof(uc->chan));
+	if (DLL_AddRecord(u->chans, uc, NULL) == DLL_MEM_ERROR) {
+		log("Error, Couldn't update Users Chan, Out of Memory");
+		exit(-1);
+	}
+	ExitCode = DLL_UpdateCurrentRecord(LL_Users, u);
+	if (ExitCode != DLL_NORMAL) {
+		log("Error, Couldn't update Users Record for %s", u->nick);
+	}	
+	if (uc) free(uc);
+	return 1;
+}
+
+int AddChan(char *name)
+{
+	Chans *c;
+	DLL_Return ExitCode;
+#ifdef DEBUG
+	log("AddChan(): %s", name);
 #endif
 	c = findchan(name);
 	if (c) {
-#ifdef DEBUG
-		log("Increasing Usercount for known Channel (%s)",c->name);
-#endif
-		c->cur_users++;
-		return;
-	} else {
-		c = new_chan(name);
-#ifdef DEBUG
-		log("Increasing Usercount for a new Channel (%s)",c->name);
-#endif
-		c->cur_users = 1;
-		strcpy(c->topic,"");
-		strcpy(c->topicowner,"");
-		strcpy(c->modes, "");
-		
-	}		
-}
-Chans *findchan(char *name)
-{
-	Chans *c;
-
-
-	c = chanlist[HASH(name, C_TABLE_SIZE)];
-	while (c && strcasecmp(c->name, name) != 0)
-		c = c->next;
-
-#ifdef DEBUG
-	log("findchan(%s) -> %s", name, (c) ? c->name : "NOTFOUND");
-#endif
-
-	return c;
-}
-void ChanMode(char *chan, char *modes)
-{
-	int add = 0;
-
-	Chans *c = findchan(chan);
-#ifdef DEBUG
-	log("Chanmode(%s): %s", chan,modes);
-#endif
-
-	if (!c) {
-		log("Chanmode(%s) Failed!", chan);
-		return;
-	} else {
-		switch(*modes) {
-			case '+': add = 1;	break;
-			case '-': add = 0;	break;
-			case 'p':
-				if (add) {
-					c->is_priv = 1;
-				} else {
-					c->is_priv = 0;
-				}
-				break;
-			case 's':
-				if (add) {
-					c->is_secret = 1;
-				} else {
-					c->is_secret = 0;
-				}
-				break;
-			case 'i':
-				if (add) {
-					c->is_invite = 1;
-				} else {
-					c->is_invite = 0;
-				}
-				break;
-			case 'm':
-				if (add) {
-					c->is_mod = 1;
-				} else {
-					c->is_mod = 0;
-				}
-				break;
-			case 'n':
-				if (add) {
-					c->is_outside = 1;
-				} else {
-					c->is_outside = 0;
-				}
-				break;
-			case 't':
-				if (add) {
-					c->is_optopic = 1;
-				} else {
-					c->is_optopic = 0;
-				}
-				break;
-			case 'r':
-				if (add) {
-					c->is_regchan = 1;
-				} else {
-					c->is_regchan = 0;
-				}
-				break;
-			case 'R':
-				if (add) {
-					c->is_regnick = 1;
-				} else {
-					c->is_regnick = 0;
-				}
-				break;
-			case 'x':
-				if (add) {
-					c->is_nocolor = 1;
-				} else {
-					c->is_nocolor = 0;
-				}
-				break;
-			case 'Q':
-				if (add) {
-					c->is_nokick = 1;
-				} else {
-					c->is_nokick = 0;
-				}
-				break;
-			case 'O':
-				if (add) {
-					c->is_ircoponly = 1;
-				} else {
-					c->is_ircoponly = 0;
-				}
-				break;
-			case 'A':
-				if (add) {
-					c->is_Svrmode = 1;
-				} else {
-					c->is_Svrmode = 0;
-				}
-				break;
-			case 'K':
-				if (add) {
-					c->is_noknock = 1;
-				} else {
-					c->is_noknock = 0;
-				}
-				break;
-			case 'I':
-				if (add) {
-					c->is_noinvite = 1;
-				} else {
-					c->is_noinvite = 0;
-				}
-				break;
-			case 'S':
-				if (add) {
-					c->is_stripcolor = 1;
-				} else {
-					c->is_stripcolor = 0;
-				}
-				break;
-			default:
-				break;
-		}
+		log("Trying to add a Channel that already exists? (%s)", name);
+		return -1;
 	}
-}
-void ChanTopic(char *chan, char *topic, char *who)
-{
-	Chans *c = findchan(chan);
-
-	if (!c) {
-		log("Chantopic(%s) Failed!", chan);
-		return;
-	} else {
-		strcpy(c->topic, topic);
-		strcpy(c->topicowner, who);
-		/* c->topictime = when; */
+	c = smalloc(sizeof(Chans));
+	strcpy(c->name, name);
+	c->cur_users = 0;
+	/* create the list of users on this channel */
+	if (DLL_CreateList(&c->chanmembers) == NULL) {
+		log("Error, Could not create ChanMembers List for Chan %s", name);
+		exit(-1);
 	}
-#ifdef DEBUG
-	log("Chantopic(%s): %s Set By: %s", c->name,c->topic,c->topicowner);
+	if ((ExitCode = DLL_InitializeList(c->chanmembers, sizeof(Channel_Members))) != DLL_NORMAL) {
+		if (ExitCode == DLL_ZERO_INFO) log("Error, Channel Members structure is 0");
+		if (ExitCode == DLL_NULL_LIST) log("Error, Channel Members structure is NULL");
+		exit(-1);
+	}
+	if (DLL_AddRecord(LL_Chans, c, NULL) == DLL_MEM_ERROR) {
+		log("Error, Couldn't AddChan, Out of Memory");
+		exit(-1);
+	}
+#ifdef DEBUGLL
+	log("DEBUGLL: Number of Channel Records %ld", DLL_GetNumberOfRecords(LL_Chans));
+	log("DBEUGLL: Current User Indes %ld", DLL_GetCurrentIndex(LL_Chans));
 #endif
-	
+
+	return 1;
 }
 void DelChan(char *name)
 {
-	Chans *c = findchan(name);
-
-#ifdef DEBUG
-	log("DelChan(%s)", name);
-#endif
-
-	if (!c) {
-		log("DelChan(%s) failed!", name);
+	Chans *c;
+	
+	c = findchan(name);
+	if (DLL_IsListEmpty(c->chanmembers) != DLL_TRUE) {
+		log("Hrm, Deleting a Channel that has %d Users still?", DLL_GetNumberOfRecords(c->chanmembers));
 		return;
 	}
-
-	if (c->cur_users <= 0) {
-		del_chan_from_hash_table(name, c);
-		free(c);
+	DLL_DestroyList(&c->chanmembers);
+	if (DLL_DeleteCurrentRecord(LL_Chans) != DLL_NORMAL) {
+		log("Problems Deleting Channel Record for %s", c->name);
 	}
-}
+} 	

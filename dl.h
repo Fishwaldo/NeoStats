@@ -10,14 +10,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-
 #include "stats.h"
 
 extern char *sftime(time_t);
-
-List *LL_Mods;
-List *LL_Mods_Evnts;
-List *LL_Mods_Fncts;
 
 struct sock_list_struct {
 	struct sock_list_struct *prev;
@@ -63,13 +58,11 @@ struct functions {
 	char *cmd_name;
 	int (*function)(char *origin, char *av);
 	int srvmsg;
-	char *module_name;
 };
 
 struct evtfunctions {
 	char *cmd_name;
 	int (*function)(void *data);
-	char *module_name;
 };
 
 
@@ -85,21 +78,24 @@ struct mod_info {
 typedef struct mod_info Module_Info;
 
 struct module {
-	Module_Info info;
+	struct module *prev;
+	struct module *next;
+	Module_Info *info;
+	Functions *function_list;
+	EventFnList *other_funcs;
 	void *dl_handle;
+
 };
 
 
 typedef struct module Module;
 
-Module CurMod;
-EventFnList CurModEvnts;
-Functions CurModFncts;
+extern Module *module_list;
 
 struct path {
 	struct path *prev;
 	struct path *next;
-	char dl_path[255];
+	char dl_path[100];
 };
 
 typedef struct path LD_Path;

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.14 2000/06/10 08:48:53 fishwaldo Exp $
+** $Id: ircd.c,v 1.15 2000/12/10 06:25:51 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -170,6 +170,7 @@ void parse(char *line)
 	Module *module_ptr;
 	Functions *fn_list;
 	Mod_User *list;
+	DLL_Return ExitCode;
 	
 	segv_loc("parse");
 	strip(line);
@@ -236,7 +237,7 @@ void parse(char *line)
 		/* this goes through each Module */
 		fn_list = module_ptr->function_list;
 		while (fn_list->cmd_name != NULL) {
-			/* This goes through each Command */
+			/* this goes through each Command registered */
 			if (!strcasecmp(fn_list->cmd_name, cmd)) {
 				if (fn_list->srvmsg == cmdptr) {
 #ifdef DEBUG
@@ -245,19 +246,13 @@ void parse(char *line)
 					segv_loc(module_ptr->info->module_name);
 					fn_list->function(origin, coreLine);			
 					segv_loc("Parse_Return_Module");
-					break;
-					log("Should never get here-Parse");
-				}	
+				}
 			}
 		fn_list++;
-		}	
+		}
 	module_ptr = module_ptr->next;
 	}
-        	
-
-
 }
-
 /* Here are the Following Internal Functions.
 they should update the internal Structures */
 
@@ -294,6 +289,8 @@ void Usr_Stats(char *origin, char *coreLine) {
 		sts(":%s 249 %s Users %d (%d Bytes)", me.name, u->nick, DLL_GetNumberOfRecords(LL_Users), size);
 		size = sizeof(Server) * DLL_GetNumberOfRecords(LL_Servers);
 		sts(":%s 249 %s Servers %d (%d Bytes)", me.name, u->nick, DLL_GetNumberOfRecords(LL_Servers), size);
+		size = sizeof(Chans) * DLL_GetNumberOfRecords(LL_Chans);
+		sts(":%s 249 %s Channels %d (%d Bytes)", me.name, u->nick, DLL_GetNumberOfRecords(LL_Chans), size);
 	}
 	sts(":%s 219 %s %s :End of /STATS report", me.name, u->nick, stats);
 	notice(s_Services,"%s Requested Stats %s", u->nick, stats);
@@ -402,33 +399,30 @@ void Usr_Topic(char *origin, char *coreLine) {
 void Usr_Kick(char *origin, char *coreLine) {
 }
 void Usr_Join(char *origin, char *coreLine) {
-/*	char *cmd, *temp = NULL;
+	char *cmd, *temp = NULL;
 			User *u = finduser(origin);
 			cmd = strtok(coreLine, " ");
 			if (*cmd == ':')
 				cmd++;
-			if (strcasecmp(",",cmd)) {
-				log("double chan");
-				temp = strtok(cmd,",");
+			temp = strtok(cmd,",");
+			while (temp != NULL) {
+				ChanJoin(temp, u);
+				temp = strtok(NULL,",");
 			}
-			if (u) {
-				while (1) {
-					Addchan(temp);
-					temp = strtok(NULL,",");
-					if (temp == NULL) { 
-						log("Null: %s, %s",temp,cmd);
-						temp = cmd;
-						cmd = NULL;
-					}
-					if (temp == NULL) {
-						log("break: %s",temp);
-						break;
-					}
-				}
-			}
-*/
 }
 void Usr_Part(char *origin, char *coreLine) {
+	char *cmd, *temp;
+	User *u = finduser(origin);
+	cmd = strtok(coreLine, " ");
+	temp = strtok(cmd,",");
+	while (temp != NULL) {
+		if (!strcasecmp(temp, "0")) {
+		/* they parted all Channels */
+		
+		}
+		PartChan(temp, u);
+		temp = strtok(NULL,",");
+	}
 }
 void Srv_Ping(char *origin, char *coreLine) {
 

@@ -5,12 +5,11 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.8 2000/06/10 08:48:53 fishwaldo Exp $
+** $Id: users.c,v 1.9 2000/12/10 06:25:51 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
  
-#include "linklist.h"
 #include "stats.h"
 
 int fnmatch(const char *, const char *, int flags);
@@ -55,6 +54,7 @@ struct Oper_Modes usr_mds[]      = {
 void AddUser(char *nick, char *user, char *host, char *server)
 {
 	User *u;
+	DLL_Return ExitCode;
 
 #ifdef DEBUG
 	log("AddUser(): %s (%s@%s) -> %s", nick, user, host, server);
@@ -76,6 +76,16 @@ void AddUser(char *nick, char *user, char *host, char *server)
 	u->myuser = NULL;
 	u->Umode = 0;
 	strcpy(u->modes,"");
+	/* create the channel list */
+	if (DLL_CreateList(&u->chans) == NULL) {
+		log("Error, could not create UserChans list for User %s", nick);
+		exit(-1);
+	}
+	if ((ExitCode = DLL_InitializeList(u->chans, sizeof(User_Chans))) != DLL_NORMAL) {
+		if (ExitCode == DLL_ZERO_INFO) log("Error, Users Chans Structure was 0");
+		if (ExitCode == DLL_NULL_LIST) log("Error, Users Chans Structure was NULL");
+		exit(-1);
+	}
 	if(DLL_AddRecord(LL_Users, u, NULL) == DLL_MEM_ERROR) {
 		log("Error, Couldn't AddUser, Out Of Memory");
 		exit(-1);
@@ -167,6 +177,7 @@ void sendcoders(char *message,...)
 		} else {
 			sendcoders("Ehhh, Something is Wrong, UserList is Empty");
 		}
+
 	} else {		
 		sts(":%s SMO 1 :%s Debuging: %s ",me.name,s_Services, tmp);
 	}
@@ -220,15 +231,25 @@ void init_user_hash()
 void UserDump()
 {
 	User *u;
-	DLL_Return ExitCode;
+	User_Chans *uc;
+	DLL_Return ExitCode, ExitCode1;
 	
 	u = smalloc(sizeof(User));
+	uc = smalloc(sizeof(User_Chans));
 	sendcoders("\2UserDump:\2");
 	ExitCode = DLL_CurrentPointerToHead(LL_Users);
 	if (ExitCode == DLL_NORMAL) {
 		while (ExitCode == DLL_NORMAL) {
 			ExitCode = DLL_GetCurrentRecord(LL_Users, u);
-			sendcoders("User: %s!%s@%s Modes: %s Server %s", u->nick, u->username, u->hostname, u->modes, u->server);
+			sendcoders("\2User: %s!%s@%s \2Modes: %s Server %s", u->nick, u->username, u->hostname, u->modes, u->server);
+			ExitCode1 = DLL_CurrentPointerToHead(u->chans);
+			if (ExitCode1 == DLL_NORMAL) {
+				while (ExitCode1 == DLL_NORMAL) {
+					ExitCode1 = DLL_GetCurrentRecord(u->chans, uc);
+					sendcoders("Channel MemberShip: %s", uc->chan);
+					if ((ExitCode1 = DLL_IncrementCurrentPointer(u->chans)) == DLL_NOT_FOUND) break;
+				}
+			}
 			if ((ExitCode = DLL_IncrementCurrentPointer(LL_Users)) == DLL_NOT_FOUND) break;
 		}
 	} else {

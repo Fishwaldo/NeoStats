@@ -4,9 +4,10 @@ NeoStats - TODO Log:
 * Once we do these they are removed from the list, RIGHT FISH!? :P
 
 
- - Support SVSMODE changes for UserMode Changes!
  - Support HTML writeouts for the "networks" website. (Shmad)
  - Support SUSPEND - suspends an oper's access from Stats (Shmad)
- - FIX infoline relapse bug (hardly anything major) :P
-
+ - New Module API to register for Events and Server Commands _ due to
+	changes with LinkedList Support :(
+ - Move Modules over to new API
+ - More Doco
 

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: spam.c,v 1.2 2000/03/29 13:05:56 fishwaldo Exp $
+** $Id: spam.c,v 1.3 2000/12/10 06:25:51 fishwaldo Exp $
 */
 
 
@@ -16,7 +16,7 @@ const char spamversion_date[] = __DATE__;
 const char spamversion_time[] = __TIME__;
 char *s_Spam;
 
-Module_Info my_info[] = { {
+Module my_info[] = { {
 	"Spam",
 	"A User to Help Catch Spammers on the IRC network",
 	"1.0"
@@ -94,13 +94,13 @@ int Online(Server *data) {
 
 
 EventFnList my_event_list[] = {
-	{ "ONLINE", 	Online},
-	{ NULL, 	NULL}
+	{ "ONLINE", 	Online, "Spam"},
+ 	{ NULL, 	NULL, 	NULL}
 };
 
 
 
-Module_Info *__module_get_info() {
+Module *__module_get_info() {
 	return my_info;
 };
 

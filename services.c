@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: services.c,v 1.11 2000/06/10 08:48:53 fishwaldo Exp $
+** $Id: services.c,v 1.12 2000/12/10 06:25:51 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -175,6 +175,7 @@ void servicesbot(char *nick, char *line) {
 		ns_logs(u);
 		notice(s_Services,"%s Wants to Look at my Logs!!",u->nick);
 	} else if (!strcasecmp(cmd, "JUPE")) {
+		cmd = strtok(NULL, " ");
 		ns_jupe(u, cmd);
 		notice(s_Services,"%s Wants to JUPE this Server %s",u->nick,cmd);
 	} else if (!strcasecmp(cmd, "JOIN")) {
@@ -239,9 +240,7 @@ char *uptime(time_t when)
 	return buf;
 }
 
-extern void ns_shutdown(User *u, char *reason)
-{
-	DLL_Return ExitCode;
+extern void ns_shutdown(User *u, char *reason) {
 	Module *mod_ptr = NULL;
 	segv_loc("ns_shutdown");
 	if (strcasecmp(u->nick, s_Services)) {
@@ -252,16 +251,13 @@ extern void ns_shutdown(User *u, char *reason)
 		}
 	}
 	/* Unload the Modules */
-	if (DLL_CurrentPointerToHead(LL_Mods) == DLL_NORMAL) {
-		while (1) {
-			if (ExitCode = DLL_GetCurrentRecord(LL_Mods, CurMod) == DLL_NORMAL) {
-				unload_module(CurMod->info->module_name, u);
-			} else {
-				break;
-			}
-		DLL_IncrementCurrentPointer(LL_Mods);
-		}
+	mod_ptr = module_list->next;
+	while (mod_ptr != NULL) {
+		notice(s_Services, "Module %s Unloaded by %s", mod_ptr->info->module_name, u->nick);
+		unload_module(mod_ptr->info->module_name, u);
+		mod_ptr = module_list->next;
 	}
+	if (mod_ptr) free(mod_ptr);
 	notice(s_Services, "\2UNLOAD\2 All Modules Unloaded");
         globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
 	sleep(1);

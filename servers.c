@@ -5,12 +5,11 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: servers.c,v 1.1 2000/06/10 09:14:03 fishwaldo Exp $
+** $Id: servers.c,v 1.2 2000/12/10 06:25:51 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
  
-#include "linklist.h"
 #include "stats.h"
 
 int fnmatch(const char *, const char *, int flags);

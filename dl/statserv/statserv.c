@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.c,v 1.13 2000/04/22 04:45:08 fishwaldo Exp $
+** $Id: statserv.c,v 1.14 2000/12/10 06:25:51 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -98,7 +98,7 @@ int new_m_version(char *av, char *tmp) {
 void _init() {
    Server *ss;
    User *u;
-   int i;
+   DLL_Return ExitCode;
 
 	synced = 0;
 	sts(":%s GLOBOPS :StatServ Module Loaded", me.name);
@@ -106,28 +106,33 @@ void _init() {
 	LoadTLD();
 	init_tld();
 	LoadStats();
-	   for (i=0; i < S_TABLE_SIZE; i++) {
-   		for (ss = serverlist[i]; ss; ss = ss->next) {
-   			/* do server table stuff */ 
+	ss = smalloc(sizeof(Server));
+	u = smalloc(sizeof(User));
+	ExitCode = DLL_CurrentPointerToHead(LL_Servers);
+	if (ExitCode == DLL_NORMAL) {
+		while (ExitCode == DLL_NORMAL) {
+			ExitCode = DLL_GetCurrentRecord(LL_Servers, ss);
 			s_new_server(ss);
 #ifdef DEBUG
 			log("Added Server %s to StatServ List", ss->name);
 #endif
+			if ((ExitCode = DLL_IncrementCurrentPointer(LL_Servers)) == DLL_NOT_FOUND) break;
 		}
-	   }
-
-	   for (i=0; i < U_TABLE_SIZE; i++) {
-   		for (u = userlist[i]; u; u = u->next) {
-   			/* do User stuff, as yet, we have nuffin... :( */
-   			/* Should also process Usermodes and fun stuff like that (maybe?) */
+	}
+	ExitCode = DLL_CurrentPointerToHead(LL_Users);
+	if (ExitCode == DLL_NORMAL) {
+		while (ExitCode == DLL_NORMAL) {
+			ExitCode = DLL_GetCurrentRecord(LL_Users, u);
 			s_new_user(u);
 			s_user_modes(u);
 #ifdef DEBUG
 			log("Adduser user %s to StatServ List", u->nick);
 #endif
+			if ((ExitCode = DLL_IncrementCurrentPointer(LL_Users)) == DLL_NOT_FOUND) break;
 		}
 	}   	
-
+	free(ss);
+	free(u);
 }
 
 void _fini() {
@@ -165,9 +170,9 @@ static int s_user_kill(User *u) {
 	SStats *s;
 	char *cmd, *who;
 #ifdef DEBUG
-	log(" Server %s", u->server->name);
+	log(" Server %s", u->server);
 #endif
-	s=findstats(u->server->name);
+	s=findstats(u->server);
 	if (UserLevel(u) >= 40) {
 		DecreaseOpers(s);
 	}
@@ -248,9 +253,9 @@ static int s_user_modes(User *u) {
 				break;
 			case 'A':
 				if (add) {
-					if (synced) notice(s_StatServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s (+A)", u->nick, u->server->name);
+					if (synced) notice(s_StatServ, "\2ServerAdmin\2 %s is Now a Server Administrator on %s (+A)", u->nick, u->server);
 				} else {
-					if (synced) notice(s_StatServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s (-A)", u->nick, u->server->name);
+					if (synced) notice(s_StatServ, "\2ServerAdmin\2 %s is No Longer a Server Administrator on %s (-A)", u->nick, u->server);
 				}
 				break;
 			case 'a':
@@ -262,9 +267,9 @@ static int s_user_modes(User *u) {
 				break;
 			case 'C':
 				if (add) {
-					if (synced) notice(s_StatServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s (+C)", u->nick, u->server->name);
+					if (synced) notice(s_StatServ, "\2Co-ServerAdmin\2 %s is Now a Co-Server Administrator on %s (+C)", u->nick, u->server);
 				} else {
-					if (synced) notice(s_StatServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s (-C)", u->nick, u->server->name);
+					if (synced) notice(s_StatServ, "\2Co-ServerAdmin\2 %s is No Longer a Co-Server Administrator on %s (-C)", u->nick, u->server);
 				}
 				break;
 			case 'B':
@@ -283,9 +288,9 @@ static int s_user_modes(User *u) {
 				break;
 			case 'o':
 				if (add) {
-					if (synced) notice(s_StatServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
-					IncreaseOpers(findstats(u->server->name));
-					s = findstats(u->server->name);
+					if (synced) notice(s_StatServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server);
+					IncreaseOpers(findstats(u->server));
+					s = findstats(u->server);
 					if (stats_network.maxopers < stats_network.opers) {
 						stats_network.maxopers = stats_network.opers;
 						stats_network.t_maxopers = time(NULL);
@@ -297,8 +302,8 @@ static int s_user_modes(User *u) {
 						if (synced) sts(":%s WALLOPS :\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s_StatServ, s->name, s->opers);
 					}						
 				} else {
-					if (synced) notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
-					DecreaseOpers(findstats(u->server->name));
+					if (synced) notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server);
+					DecreaseOpers(findstats(u->server));
 #ifdef DEBUG
 					log("Decrease Opers");
 #endif
@@ -306,9 +311,9 @@ static int s_user_modes(User *u) {
 				break;
 			case 'O':
 				if (add) {
-					if (synced) notice(s_StatServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server->name);
-					IncreaseOpers(findstats(u->server->name));
-					s = findstats(u->server->name);
+					if (synced) notice(s_StatServ, "\2Oper\2 %s is Now a Oper on %s (+o)", u->nick, u->server);
+					IncreaseOpers(findstats(u->server));
+					s = findstats(u->server);
 					if (stats_network.maxopers < stats_network.opers) {
 						stats_network.maxopers = stats_network.opers;
 						stats_network.t_maxopers = time(NULL);
@@ -320,8 +325,8 @@ static int s_user_modes(User *u) {
 						if (synced) sts(":%s WALLOPS :\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers", s_StatServ, s->name, s->opers);
 					}						
 				} else {
-					if (synced) notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server->name);
-					DecreaseOpers(findstats(u->server->name));
+					if (synced) notice(s_StatServ, "\2Oper\2 %s is No Longer a Oper on %s (-o)", u->nick, u->server);
+					DecreaseOpers(findstats(u->server));
 #ifdef DEBUG
 					log("Decrease Opers");
 #endif
@@ -340,7 +345,7 @@ int s_bot_kill(char *nick) {
 	
 	u=finduser(nick);
 	log("Oh Oh, the StatServ Bot Got Killed! - Re-Initializing");
-	s=findstats(u->server->name);
+	s=findstats(u->server);
 	if (UserLevel(u) >= 40) {
 		DecreaseOpers(s);
 	}
@@ -362,9 +367,9 @@ static int s_del_user(User *u) {
 	SStats *s;
 	char *cmd;
 #ifdef DEBUG
-	log(" Server %s", u->server->name);
+	log(" Server %s", u->server);
 #endif
-	s=findstats(u->server->name);
+	s=findstats(u->server);
 	if (UserLevel(u) >= 40) {
 		DecreaseOpers(s);
 	}
@@ -375,7 +380,7 @@ static int s_del_user(User *u) {
 	cmd = strtok(NULL, " ");
 	cmd = strtok(NULL, "");
 	cmd++;
-	if (synced) notice(s_StatServ, "\2SIGNOFF\2 %s has Signed off at %s --> %s", u->nick, u->server->name, cmd);
+	if (synced) notice(s_StatServ, "\2SIGNOFF\2 %s has Signed off at %s --> %s", u->nick, u->server, cmd);
 	return 1;
 }
 
@@ -383,7 +388,7 @@ static int s_del_user(User *u) {
 static int s_new_user(User *u) {
 	SStats *s;
 	
-	s=findstats(u->server->name);
+	s=findstats(u->server);
 	IncreaseUsers(s);
 #ifdef DEBUG
 	log("added a User %s to stats, now at %d", u->nick, s->users);
@@ -400,7 +405,7 @@ static int s_new_user(User *u) {
 		if (synced) sts(":%s WALLOPS :\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %d users!", s_StatServ, stats_network.users);
 	}
 	
-	if (synced) notice(s_StatServ, "\2SIGNON\2 %s(%s@%s) has Signed on at %s", u->nick, u->username, u->hostname, u->server->name); 
+	if (synced) notice(s_StatServ, "\2SIGNON\2 %s(%s@%s) has Signed on at %s", u->nick, u->username, u->hostname, u->server); 
 	AddTLD(u);
 	return 1;
 }
@@ -730,11 +735,13 @@ static void ss_tld(User *u, char *tld)
 
 static void ss_operlist(User *origuser, char *flags, char *server)
 {
-	register int i, j = 0;
+	register int j = 0;
 	int away = 0;
 	register User *u;
 	int tech = 0;
+   	DLL_Return ExitCode;
 
+	u = smalloc(sizeof(User));
 	if (!flags) {
 		privmsg(origuser->nick, s_StatServ, "On-Line IRCops:");
 		notice (s_StatServ, "%s Requested OperList",origuser->nick);
@@ -751,50 +758,65 @@ static void ss_operlist(User *origuser, char *flags, char *server)
 		privmsg(origuser->nick, s_StatServ, "On-Line IRCops on Server %s", server);
 		notice(s_StatServ,"%s Reqested Operlist on Server %s",origuser->nick, server);
 	}
-	for (i = 0; i < U_TABLE_SIZE; i++) {
-		for (u = userlist[i]; u; u = u->next) {
+	ExitCode = DLL_CurrentPointerToHead(LL_Users);
+	if (ExitCode == DLL_NORMAL) {
+		while (ExitCode == DLL_NORMAL) {
+			ExitCode = DLL_GetCurrentRecord(LL_Users, u);
 			tech = UserLevel(u);
 			if (away && u->is_away)
+				if ((ExitCode == DLL_IncrementCurrentPointer(LL_Users)) == DLL_NOT_FOUND) break;
 				continue;
-			if (!strcasecmp(u->server->name, me.services_name))
+			if (!strcasecmp(u->server, me.services_name))
+				if ((ExitCode == DLL_IncrementCurrentPointer(LL_Users)) == DLL_NOT_FOUND) break;
 				continue;
 			if (tech < 40)
+				if ((ExitCode == DLL_IncrementCurrentPointer(LL_Users)) == DLL_NOT_FOUND) break;
 				continue;
 			if (!server) {
 				if (UserLevel(u) < 40)	continue;
 				j++;
 				privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s %-10d",j, u->nick,u->modes,
-					u->server->name, tech);
+					u->server, tech);
+				if ((ExitCode == DLL_IncrementCurrentPointer(LL_Users)) == DLL_NOT_FOUND) break;
 				continue;
 			} else {
-				if (strcasecmp(server, u->server->name))	continue;
+				if (strcasecmp(server, u->server))	continue;
 				if (UserLevel(u) < 40)	continue;
 				j++;
 				privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %-15s %-15s %-10d",j, u->nick,u->modes,
-					u->server->name, tech);
+					u->server, tech);
+				if ((ExitCode == DLL_IncrementCurrentPointer(LL_Users)) == DLL_NOT_FOUND) break;
 				continue;
 			}
+			if ((ExitCode == DLL_IncrementCurrentPointer(LL_Users)) == DLL_NOT_FOUND) break;
 		}
-	}
+	}   	
 	privmsg(origuser->nick, s_StatServ, "End of Listing.");
+	free(u);
 }
 
 
 static void ss_botlist(User *origuser)
 {
-        register int i, j = 0;
+        register int j = 0;
         register User *u;
+   	DLL_Return ExitCode;
+
+	u = smalloc(sizeof(User));
         privmsg(origuser->nick, s_StatServ, "On-Line Bots:");
-        for (i = 0; i < U_TABLE_SIZE; i++) {
-                for (u = userlist[i]; u; u = u->next) {
+	ExitCode = DLL_CurrentPointerToHead(LL_Users);
+	if (ExitCode == DLL_NORMAL) {
+		while (ExitCode == DLL_NORMAL) {
+			ExitCode = DLL_GetCurrentRecord(LL_Users, u);
                         if (u->Umode & UMODE_BOT) {
-                                j++;
-                                privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %s",j, u->nick, u->server->name);
+                                privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %s",j, u->nick, u->server);
+				if ((ExitCode == DLL_IncrementCurrentPointer(LL_Users)) == DLL_NOT_FOUND) break;
                                 continue;
 			}
                 }
         }       
         privmsg(origuser->nick, s_StatServ, "End of Listing.");
+	free(u);
 }
 
 
