@@ -103,7 +103,14 @@ void SaveStats()
 		     "Writting Statistics to database for %s (%d)", c->name, count);
 #endif
 		save_chan(c);
+		/* if we are shuting down, clean up */
+		if (StatServ.shutdown == 1) {
+			free(c);
+		}
 		cn = list_next(Chead, cn);
+	}
+	if (StatServ.shutdown == 1) {
+		list_destroy_nodes(Chead);
 	}
 
 	/* and finally, the network data */
@@ -181,7 +188,8 @@ void LoadStats() {
 				hash_insert(Shead, sn, s->name);
 			}
 		}
-	}                                        
+	}       
+	free(row);                                 
 /* we now load channel data dynamically. */
 	/* ok, and now the channel stats. */
 #if 0
@@ -223,6 +231,7 @@ void LoadStats() {
 			}
 		}
 	}
+	free(row);
 #endif
 	StatServ.newdb = 0;
 }
@@ -245,12 +254,10 @@ CStats *load_chan(char *name) {
 
 	c = malloc(sizeof(CStats));
 	strlcpy(c->name, name, CHANLEN);	
-	data = malloc(BUFSIZE);
 	if (GetData((void *)&data, CFGSTR, "ChanStats", c->name, "ChanData") > 0) {
 		/* its the new database format... Good */
 		sscanf(data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins);		
 		GetData((void *)&c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
-		free(data);
 	} else if (GetData((void *)&c->topics, CFGINT, "ChanStats", c->name, "Topics") > 0) {
 		GetData((void *)&c->totmem, CFGINT, "ChanStats", c->name, "TotalMems");
 		GetData((void *)&c->kicks, CFGINT, "ChanStats", c->name, "Kicks");
@@ -274,6 +281,7 @@ CStats *load_chan(char *name) {
 		c->maxjoins = 0;
 		c->t_maxjoins = c->t_maxmems;
 	}
+	free(data);
 	c->topicstoday = 0;
 	c->joinstoday = 0;
 	c->members = 0;
@@ -371,6 +379,7 @@ void DelOldChan()
 			}
 		}
 	}
+	free(row);
 	nlog(LOG_INFO, LOG_MOD, "Took %d seconds to clean %d channel stats", time(NULL) - start, count);
 }
 

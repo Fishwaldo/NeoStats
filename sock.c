@@ -141,7 +141,9 @@ read_loop ()
 				++me.cursocks;
 			} else {
 				/* its a poll interface, setup for select instead */
+				SET_SEGV_INMODULE(mod_sock->modname);
 				j = mod_sock->beforepoll (mod_sock->data, ufds);
+				CLEAR_SEGV_INMODULE();
 				if (j > pollsize) pollsize = j;
 				/* run through the ufds set and translate to select FDSET's */
 				for (i = 0; i < j; i++) {

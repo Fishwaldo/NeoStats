@@ -33,11 +33,10 @@
 
 #include <dlfcn.h>
 #include <stdio.h>
-#include <string.h>
 #include <time.h>
 #include <sys/poll.h>
-#include "hash.h"
 #include "stats.h"
+#include "hash.h"
 
 /* 
  * NeoStats core API version.

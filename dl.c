@@ -29,11 +29,10 @@
 
 #include <dlfcn.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include "stats.h"
 #include "dl.h"
 #include "hash.h"
-#include "stats.h"
 #include "config.h"
 #include "log.h"
 
@@ -1086,7 +1085,9 @@ unload_module (char *module_name, User * u)
 		hnode_destroy (modnode);
 		/* Close module */
 		SET_SEGV_INMODULE(module_name);
+#ifndef VALGRIND
 		dlclose (list->dl_handle);
+#endif
 		CLEAR_SEGV_INMODULE();
 
 		if (i >= 0) {

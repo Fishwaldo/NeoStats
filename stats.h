@@ -26,6 +26,8 @@
 #ifndef STATS_H
 #define STATS_H
 
+
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -34,7 +36,9 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <time.h>
+#define __USE_GNU
 #include <string.h>
+#undef __USE_GNU
 #include <stdarg.h>
 #include <stdlib.h>
 #include <sys/time.h>

@@ -25,7 +25,6 @@
  */
 
 #include <stdio.h>
-#include <string.h>
 #include "stats.h"
 
 #ifndef HAVE_STRNLEN
