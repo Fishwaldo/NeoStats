@@ -347,6 +347,11 @@ void list_module_bots(User *u) {
 
 int load_module(char *path1, User *u) {
 	char buf[512];
+#ifndef HAVE_LIBDL
+	const char *dl_error;
+#else 
+	char *dl_error = NULL;
+#endif
 	char *dl_error = NULL;
 	void *dl_handle = NULL;
 	int do_msg;
@@ -391,19 +396,29 @@ int load_module(char *path1, User *u) {
 	}
 
 	mod_get_info = dlsym(dl_handle, "__module_get_info");
-	if ((dl_error = dlerror()) != NULL) {
+#ifndef HAVE_LIBDL
+        if (mod_get_info == NULL) {
+	        dl_error = dlerror();
+#else
+        if ((dl_error = dlerror()) != NULL) {
+#endif
 		if (do_msg) privmsg(u->nick, s_Services, "Error, Couldn't Load Module");
 		if (do_msg) privmsg(u->nick, s_Services, "%s",dl_error);
-		log("Couldn't Load Module: %s", dlerror());
+		log("Couldn't Load Module: %s", dl_error);
 		dlclose(dl_handle);
 		return -1;
 	}
 
 	mod_get_funcs = dlsym(dl_handle, "__module_get_functions");
-	if ((dl_error = dlerror()) != NULL) {
+#ifndef HAVE_LIBDL
+        if (mod_get_info == NULL) {
+                dl_error = dlerror();
+#else
+        if ((dl_error = dlerror()) != NULL) {
+#endif
 		if (do_msg) privmsg(u->nick, s_Services, "Error, Couldn't Load Module");
 		if (do_msg) privmsg(u->nick, s_Services, "%s",dl_error);
-		log("Couldn't Load Module: %s", dlerror());
+		log("Couldn't Load Module: %s", dl_error);
 		dlclose(dl_handle);
 		return -1;
 	}
