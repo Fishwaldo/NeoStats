@@ -264,9 +264,8 @@ Fish (F), Mark (M)
  - Command line option -v now reports a full IRCd string in the version so we
    no longer need the flag "help" text. (M)
    this is now handled by IRCdAuth. (M)
- - Removed -l (log level) command line option. This is now an inline "SET" 
+ - Removed -l (log level) command line option. This is now an online "SET" 
    option which saved and restored via config system. (M)
-   this is now handled by IRCdAuth. (M)
  - Removed umode levels from IRCd protocol files and associated core code since 
    this is now handled by IRCdAuth. (M)
  - ExtAuth: Added support for an access list system such that the master 

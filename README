@@ -1,6 +1,6 @@
 ************************************************************************
 ** NeoStats - IRC Statistical Services                                **
-** Copyright (c) 1999-2003 NeoStats Group. All Rights Reserved.       **
+** Copyright (c) 1999-2004 NeoStats Group. All Rights Reserved.       **
 ** This program and all associated documentation is free but          **
 ** copyrighted software; see the file COPYING for details.            **
 ** Homepage: http://www.neostats.net/                                 **
@@ -17,12 +17,27 @@ and utility modules. Some modules have a useful function on your
 network, other modules are developed for fun, and to make your IRC 
 network more attractive to users.
 
-The 3.0 series of NeoStats [blurb]
-
-A detailed list of changes can be found in the ChangeLog file, but a 
-brief summary is:
-    -
-    -Many updates to the various Modules
+The 3.0 series of NeoStats offers many improvements over previous 
+versions. A detailed list of changes can be found in the ChangeLog file, 
+but a brief summary is:
+    - Simplified configure, build and install process.
+    - Improved debug mode to provide information to us more easily in
+      the event of problems and avoid polluting general logs with
+      debug information.
+    - New segfault log file to log any segfaults which occur with
+      NeoStats for better support.
+    - New and improved API for module coders.
+    - Many updates to the various modules.
+    - New backend database storage based on standard DBM systems.
+    - New athentication modules and API to allow custom authentication.
+    - Improved protocol module API to make it easier to add support for
+      other IRCds.
+    - Many optimisations of the core to speed up NeoStats operation and
+      reduce the resource requirements. 
+    - DCC chat support to allow users to operate NeoStats via a DCC chat
+      session.
+    - Native Windows support including full support for modules.
+    - All commands have configurable user levels.
 
 Visit http://www.neostats.net for the latest news and NeoStats updates.
 
@@ -52,9 +67,6 @@ RELNOTES -      Release notes about the current version. This is
 ChangeLog -     Information about what has changed between versions. 
                 Consult this document for detailed information about the
                 changes. 
-README.kptool - Description and instructions for maintaining the 
-                NeoStats Internal Database and Dynamic Configuration. 
-                FOR ADVANCED USERS ONLY!
 -----------------------------------<>-----------------------------------
 
 Contents
@@ -168,8 +180,7 @@ Ok, you should now be back at a shell prompt, type:
         make
 
 it will go through the source and compile it into an executable 
-binary file. If you get some warnings, please ignore them -- we are 
-working on the warnings.
+binary file. 
 
 
 1.5 Installing NeoStats
@@ -212,7 +223,7 @@ Your prompt should look something like:
 Once in this directory, you need to create a configuration file. You
 should now run the makeconf script and answer the questions:
     
-        ./makeconf
+        ./bin/makeconf
 
 You must edit neostats.conf to check that everything is set the way you 
 want it before NeoStats will run. You can do this with:
@@ -232,10 +243,11 @@ If you have downloaded other NeoStats modules e.g. OPSB, you should now
 install them. If you are upgrading NeoStats, you must rebuild all other 
 separate modules to work with the new version of NeoStats. See the 
 documentation with these modules for instructions on building and 
-installing them. Modules written for previous series of NeoStats will
-not work with the 3.0 series. You must contact the module author for an
-updated version of the module. All official modules have a 3.0 compatible 
-version available
+installing them. 
+
+Modules written for previous series of NeoStats will not work with the 
+3.0 series. You must contact the module author for an updated version of 
+the module. All official modules have a 3.0 compatible version available.
 
 1.8 Running NeoStats
 --------------------
@@ -244,7 +256,7 @@ NeoStats is now configured and installed.
 
 Before running NeoStats you must make sure that your server(s) have C: 
 N: and U: lines for your NeoStats server. 
-I WILL NOT ASSIST YOU WITH ADDING C: N: AND U: LINES TO YOUR SERVER, 
+WE WILL NOT ASSIST YOU WITH ADDING C: N: AND U: LINES TO YOUR SERVER, 
 YOU SHOULD READ THE IRCD DOCUMENTATION IF YOU DO NOT KNOW HOW TO DO 
 IT!!! DO NOT CONTACT US ABOUT C: N: and U: Lines
 
@@ -263,9 +275,9 @@ Please now read USERMAN for details on how to operate NeoStats from an
 IRC Client.
 
 If anything goes wrong, there *might* be an error message in the log 
-files. Have a look in ~/NeoStats/logs/NeoStats.log it might give you a 
-clue to what's wrong! NeoStats might also send a wallops to the network 
-about what went wrong. Check the status window of your IRC client. 
+files. Have a look in ~/NeoStats3.0/logs/neostats-date.log it might give 
+you a clue to what's wrong! NeoStats might also send a wallops to the 
+network about what went wrong. Check the status window of your IRC client. 
 
 There are some command line options for NeoStats that you may find
 useful:
@@ -280,7 +292,7 @@ useful:
 To use these options, add the option(s) you require when you run 
 NeoStats, e.g.:
 
-	./neostats -h
+	./bin/neostats -h
 	
 Note: although you can combine most of these options, -v (version)
 and -h (help) will return information to you and NeoStats will not
@@ -290,8 +302,13 @@ process any other options you pass.
 1.9 Notes for upgraders
 -----------------------
 
-If you are upgrading from an older version we recommend that you backup 
-the current version first. 
+This section is for users upgrading a NeoStats 3.0 series installation
+only. If you are upgrading from an older series of NeoStats such as 
+2.5.x, you must treat it as a new installation. Your configuration and
+data from 2.5.x is not compatible with NeoStats 3.0. 
+
+If you are upgrading from an older version of the 3.0 series we 
+recommend that you backup the current version first. 
 
 If you are running crontab for NeoStats, we recommend that you disable 
 this before making the upgrade so that cron does not start up an older
@@ -306,7 +323,7 @@ NeoStats will save important information so wait for this to finish.
 
 To make the backup go to your home directory and type:
 
-        cp NeoStats NeoStatsBackup -r
+        cp NeoStats3.0 NeoStatsBackup -r
 
 If you fail to perform this backup and the upgrade causes you problems, 
 you might lose all NeoStats information. 
@@ -322,7 +339,7 @@ the latest version of NeoStats.
 If you do run into problems upgrading and need to restore your backup, 
 you can do so by going to your home directory and typing:
 
-        cp NeoStatsBackup NeoStats -r
+        cp NeoStatsBackup NeoStats3.0 -r
 
 Your old modules will also be restored along with the old version of
 NeoStats so there is no need to rebuild them for a restore. 
@@ -434,7 +451,7 @@ We may request that you enable debugging and submit us the results of
 debugging. To enable Debugging, use the following command to start 
 NeoStats:
 
-        ./neostats -d10
+        ./bin/neostats -d10
 
 When it crashes, or the bug has been reproduced, send us:
         
@@ -466,5 +483,5 @@ on how to contact us.
 -----------------------------------<>-----------------------------------
 
 ************************************************************************
-** This document was last updated on October 3th, 2004 by M           **
+** This document was last updated on October 27th, 2004 by M          **
 ************************************************************************
