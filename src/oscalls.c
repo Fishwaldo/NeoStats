@@ -252,6 +252,33 @@ int os_access( const char *path, int mode )
 }
 
 /*
+ *  Wrapper function for write
+ */
+
+int os_write( int fd, const void *buffer, unsigned int count )
+{
+	int retval;
+
+	retval = write( fd, buffer, count );
+	printf( strerror( errno ) );
+	os_errno = errno;
+	return retval;
+}
+
+/*
+ *  Wrapper function for close
+ */
+
+int os_close( int fd )
+{
+	int retval;
+
+	retval = close( fd );
+	os_errno = errno;
+	return retval;
+}
+
+/*
  *  Wrapper function for tempnam
  */
 
@@ -267,11 +294,56 @@ char *os_tempnam( const char *dir, const char *prefix )
 int os_mkstemp( char *ftemplate )
 {
 #ifdef WIN32
-	return mktemp( ftemplate );
+	int retval;
+	char *name;
+
+	name = mktemp( ftemplate );
+	if( name )
+	{
+		retval = open( name, _O_CREAT, _S_IREAD | _S_IWRITE );
+		os_errno = errno;
+		printf( strerror( errno ) );
+		return retval;
+	}
+	return -1;
 #else
 	return mkstemp( ftemplate );
 #endif
 }
+
+/*
+ *  Wrapper function for write_temp_file
+ */
+
+int os_write_temp_file( char *ftemplate, const void *buffer, unsigned int count )
+{
+#ifdef WIN32
+	int retval;
+	char *name;
+
+	name = mktemp( ftemplate );
+	if( name )
+	{
+		FILE* file;
+		file = fopen( name, "w" );
+		if( file )
+		{
+			fwrite( buffer, count, 1, file );
+			fclose( file );
+			return 0;
+		}
+	}
+	return -1;
+#else
+	int i;
+
+	i = mkstemp( ftemplate );
+	write(i, buffer, count );
+	close(i);
+	return 0;
+#endif
+}
+
 
 /*
  *  Wrapper function for strerror
