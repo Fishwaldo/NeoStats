@@ -7,7 +7,22 @@ AC_DEFINE(MINOR, 5)
 AC_DEFINE(REV, 15)
 VERSION=2.5.15
 AC_PREFIX_DEFAULT(~/NeoStats)
-CFLAGS="$CFLAGS -O2 -g"
+MODLDFLAGS="-shared"
+
+dnl Get system type
+AC_CANONICAL_HOST
+MYHOST=$host_os
+case "$host_os" in
+*cygwin)
+	CFLAGS="$CFLAGS -O2 -g"
+	LDFLAGS="-rdynamic";;	
+*openbsd)
+	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
+	LDFLAGS="-export-dynamic";;
+*)
+	CFLAGS="$CFLAGS -O2 -g -fPIC -DPIC"
+	LDFLAGS="-rdynamic";;	
+esac
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -15,6 +30,7 @@ AC_PROG_INSTALL
 AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_RANLIB
+AC_CACHE_SAVE
 
 dnl Checks for libraries.
 dnl Replace `main' with a function in -ldl:
@@ -27,19 +43,21 @@ AC_CHECK_FUNC(backtrace,
 [AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available')
 LIBS="-g $LIBS"]
 )
-
+AC_CACHE_SAVE
 
 
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(sys/time.h unistd.h limits.h)
+AC_CACHE_SAVE
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
 AC_STRUCT_TM
+AC_CACHE_SAVE
 
 dnl Checks for library functions.
 AC_FUNC_FNMATCH
@@ -119,6 +137,7 @@ CFLAGS="$CFLAGS -DNDEBUG"
 AC_MSG_RESULT(no)
 )
 
+AC_CACHE_SAVE
 dnl check to see if we should enable Unreal IRCD Support
 AC_MSG_CHECKING(Whether to Enable Unreal 3.1.x IRCD Support...)
 AC_ARG_ENABLE(unreal31, [ --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
