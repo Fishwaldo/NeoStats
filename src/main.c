@@ -206,17 +206,6 @@ static int InitMe( void )
 
 static int InitCore( void )
 {
-	char dbpath[MAXPATH];
-	/* prepare to catch errors */
-	InitSignals();
-	/* load the config files */
-	if( ConfLoad() != NS_SUCCESS )
-		return NS_FAILURE;
-	if( !me.servicehost[0] )
-		strlcpy( me.servicehost, me.name, sizeof( me.name ) );
-	/* initialize Lang Subsystem */
-	ircsnprintf( dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX );
-	LANGinit( 1, dbpath, NULL );
 	/* initialize Module subsystem */
 	if( InitSocks() != NS_SUCCESS )
 		return NS_FAILURE;
@@ -323,6 +312,7 @@ int main( int argc, char *argv[] )
 #ifndef WIN32
 	FILE *fp;
 #endif /* WIN32 */
+   	char dbpath[MAXPATH];
 
 	if( InitMe() != NS_SUCCESS )
 		return EXIT_FAILURE;
@@ -356,13 +346,19 @@ int main( int argc, char *argv[] )
 	/* keep quiet if we are told to : ) */
 	if( !nsconfig.quiet ) 
 		print_copyright();
-	/* Init NeoStats sub systems */
-	if( InitCore() != NS_SUCCESS )
-		return EXIT_FAILURE;
+    /* init the major subsystems and config first */
+	/* prepare to catch errors */
+	InitSignals();
+	/* load the config files */
+	if( ConfLoad() != NS_SUCCESS )
+		return NS_FAILURE;
+	if( !me.servicehost[0] )
+		strlcpy( me.servicehost, me.name, sizeof( me.name ) );
+	/* initialize Lang Subsystem */
+	ircsnprintf( dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX );
+	LANGinit( 1, dbpath, NULL );
 
-#ifndef WIN32
-	printf("NeoStats will use %s\n", event_show_method());
-#endif
+
 #ifndef WIN32
 #ifndef DEBUG
 	/* if we are compiled with debug, or forground switch was specified, DONT FORK */
@@ -401,6 +397,22 @@ int main( int argc, char *argv[] )
 	}
 #endif  /* !DEBUG */
 #endif /* !WIN32 */
+
+  	/* Init NeoStats remaining sub systems now because:
+  	 * `man kevent`
+     *  The kqueue() system call creates a new kernel event queue and returns a
+  	 *  descriptor.  The queue is not inherited by a child created with fork(2).
+  	 *  However, if rfork(2) is called without the RFFDG flag, then the descrip-
+  	 *  tor table is shared, which will allow sharing of the kqueue between two
+  	 *  processes.
+  	 *
+  	 * <!@fish>SON OF A BITCH - This bug was a bastard to find!
+  	 */
+	if( InitCore() != NS_SUCCESS )
+		return EXIT_FAILURE;
+#ifndef WIN32
+	printf("NeoStats will use %s\n", event_show_method());
+#endif
 	nlog( LOG_NOTICE, "NeoStats \"%s\" started.", me.version );
 #ifdef WIN32
 	/* override pcre lib malloc calls with our own version */
