@@ -258,7 +258,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	}
 	
 	
-	if (curl_multi_add_handle(curlmultihandle, newtrans->curleasyhandle)) {
+	if (!curl_multi_add_handle(curlmultihandle, newtrans->curleasyhandle)) {
 		nlog(LOG_WARNING, LOG_CORE, "Curl Init Failed: %s", newtrans->curlerror);
 		free(newtrans);
 		return NS_FAILURE;
