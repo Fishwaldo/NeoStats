@@ -612,6 +612,8 @@ bot_cmd_help( CmdParams *cmdparams )
 							break;
 					}
 				}						
+				else
+					break;
 			}
 		}
 		bot_cmd_help_on_help( cmdparams  );
