@@ -33,7 +33,7 @@
 #include <arpa/inet.h>
 #include "stats.h"
 #include "log.h"
-#include <adns.h>
+#include "adns.h"
 #include "dns.h"
 
 adns_state ads;
