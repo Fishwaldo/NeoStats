@@ -267,7 +267,7 @@ send_part (const char *who, const char *chan)
 void 
 send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
 {
-	sts (":%s %s %ld %s + :%c%s", me.name, MSG_SJOIN, tstime, chan, flag, who);
+	sts (":%s %s %ld %s + :%c%s", me.name, MSG_SJOIN, (long)tstime, chan, flag, who);
 }
 #else
 void 
@@ -291,9 +291,9 @@ void
 send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime)
 {
 #ifdef ULTIMATE3
-	sts ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, tstime, newmode, ident, host, me.name, tstime, realname);
+	sts ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", (me.token ? TOK_NICK : MSG_NICK), nick, (long)tstime, newmode, ident, host, me.name, (long)tstime, realname);
 #else
-	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, tstime, ident, host, me.name, realname);
+	sts ("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, (long)tstime, ident, host, me.name, realname);
 #endif
 }
 

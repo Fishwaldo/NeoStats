@@ -210,7 +210,7 @@ int ns_dlclose (void *handle)
 
 char *ns_dlerror (void)
 {
-	return (dlerror ());
+	return ((char *)dlerror ());
 }
 
 /** @brief Initialise module list hashes
@@ -456,7 +456,7 @@ list_timers (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_tmr->modname);
 		prefmsg (u->nick, s_Services, "Module Timer Name: %s", mod_tmr->timername);
 		prefmsg (u->nick, s_Services, "Module Interval: %d", mod_tmr->interval);
-		prefmsg (u->nick, s_Services, "Time till next Run: %ld", mod_tmr->interval - (me.now - mod_tmr->lastrun));
+		prefmsg (u->nick, s_Services, "Time till next Run: %ld", (long)(mod_tmr->interval - (me.now - mod_tmr->lastrun)));
 	}
 	prefmsg (u->nick, s_Services, "End of Module timer List");
 	return 0;

@@ -184,13 +184,13 @@ send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
 void 
 send_cmode (const char *who, const char *chan, const char *mode, const char *args)
 {
-	sts (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, me.now);
+	sts (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, (unsigned long)me.now);
 }
 
 void
 send_nick (const char *nick, const char *ident, const char *host, const char *realname, const char* newmode, time_t tstime)
 {
-	sts ("%s %s 1 %lu %s %s %s * %s 0 :%s", MSG_NICK, nick, tstime, newmode, ident, host, me.name, realname);
+	sts ("%s %s 1 %lu %s %s %s * %s 0 :%s", MSG_NICK, nick, (unsigned long)tstime, newmode, ident, host, me.name, realname);
 }
 
 void
