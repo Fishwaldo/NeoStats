@@ -17,6 +17,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Updated Keeper to make sure it only writes files out that are readable by us
  - Fix BugID 52, ServiceRoots enabled twice for Hybrid7 compiles
  - Mark send a few patches for logging issues and dl.c issues as well as a updated Config script
+ - Fix a printf statement that shouldn't be there
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number

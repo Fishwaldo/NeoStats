@@ -589,12 +589,10 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 	} else {
 		modes = argv[1];
 	}
-	printf ("%s %s\n", argv[2], argv[1]);
 	if (*modes == '#') {
 		join_chan (finduser (origin), modes);
 		return;
 	}
-	printf ("%s\n", modes);
 	tl = list_create (10);
 	if (*modes != '+') {
 		goto nomodes;
