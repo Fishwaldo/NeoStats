@@ -183,7 +183,9 @@ void _init() {
 		c = hnode_get(node);
 		count = list_count(c->chanmembers);
 		for (i = 1; i == count; i++) {
-log("Chanjoin %s", c->name);
+#ifdef DEBUG
+			log("Chanjoin %s", c->name);
+#endif
 			s_chan_join(c);
 		}
 	}

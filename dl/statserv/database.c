@@ -81,7 +81,7 @@ void LoadStats()
     lnode_t *cn;
     int count;
     strcpy(segv_location, "StatServ-LoadStats");
-    Chead = list_create(C_TABLE_SIZE);
+    Chead = list_create(SS_CHAN_SIZE);
     Shead = hash_create(S_TABLE_SIZE,0,0);
 
 

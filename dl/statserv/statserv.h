@@ -19,6 +19,9 @@
 
 #define SSMNAME "statserv"
 
+/* this is the max number of statserv channels our database can hold... */
+#define SS_CHAN_SIZE 10240
+
 
 extern char s_StatServ[MAXNICK];
 
