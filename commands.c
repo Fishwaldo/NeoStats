@@ -167,7 +167,7 @@ del_bot_cmd_list(ModUser* bot_ptr, bot_cmd* bot_cmd_list)
 	}
 	/* Cycle through command list and delete them */
 	while(bot_cmd_list->cmd) {
-		add_bot_cmd(bot_ptr->botcmds, bot_cmd_list);
+		del_bot_cmd(bot_ptr->botcmds, bot_cmd_list);
 		bot_cmd_list++;
 	}
 	return NS_SUCCESS;
