@@ -175,4 +175,5 @@ tools/cfgtool/tree.c -text
 tools/kp_exp.c -text
 tools/kp_imp.c -text
 tools/kptool.c -text
+tools/kptool.h -text
 /users.c -text
