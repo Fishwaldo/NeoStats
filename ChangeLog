@@ -7,7 +7,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Add correct sjoin support to Unreal  (M)
  - Introduce new ssjoin_cmd for sjoin processing (M)
  - Fix midnight detection in core (M)
- - kick_chan tidyups  (M)
+ - kick_chan tidyups (M)
 
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.13
  - Added a new event for Channel Mode changes (F)

@@ -436,9 +436,9 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 	u = finduser (kicked);
 	k = finduser (kickby);
 	if (!u||!k) {
-		nlog (LOG_WARNING, LOG_CORE, "kick_chan: user %s not found %s %s", chan, kicked, kickby);
+		nlog (LOG_WARNING, LOG_CORE, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
 		if (me.debug_mode) {
-			chanalert (s_Services, "kick_chan: user %s not found %s %s", chan, kicked, kickby);
+			chanalert (s_Services, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
 			ChanDump (chan);
 		}
 		return;
