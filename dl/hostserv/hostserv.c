@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.18 2002/10/20 16:13:22 shmad Exp $
+** $Id: hostserv.c,v 1.19 2002/10/22 05:59:26 shmad Exp $
 */
 
 #include <stdio.h>
@@ -205,7 +205,7 @@ int __Bot_Message(char *origin, char **av, int ac)
                 }
 		hs_view(u, t);
     } else if (!strcasecmp(av[1], "LOGIN")) {
-                if (ac < 3) {
+                if (ac < 3) || (ac < 2) {
                     prefmsg(u->nick, s_HostServ, "Syntax: /msg %s LOGIN <NICK> <PASSWORD>", s_HostServ);
                     prefmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP LOGIN", s_HostServ);
                     return -1;
