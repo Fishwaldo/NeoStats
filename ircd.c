@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.91 2002/09/16 04:27:20 fishwaldo Exp $
+** $Id: ircd.c,v 1.92 2002/09/21 05:26:04 shmad Exp $
 */
  
 #include <setjmp.h>
@@ -685,7 +685,7 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 				modes++;
 #ifndef HYBRID7
 #ifndef UNREAL
-			} else if (*modes == '*') {
+			} else if (*modes == '!') {
 				mode |= MODE_CHANADMIN;
 				modes++;
 #endif

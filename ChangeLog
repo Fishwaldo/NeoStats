@@ -2,6 +2,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
 
 
 * NeoStats * Shmad & Fish * Version ????
+ - NeoStats NOW only supports UltimateIRCd 3.x.x a26+ for SSJ5 compatibility. (S)
  - Modified users.c so we could call NICK changes to events :) (S)
  - fixed 'make install' now copies the html template over (reported by eggy) (S)
  - Changed stats.pid to NeoStats.pid (reported by eggy) (S)

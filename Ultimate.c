@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.25 2002/09/16 04:27:20 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.26 2002/09/21 05:26:03 shmad Exp $
 */
  
 #include "stats.h"
@@ -138,7 +138,7 @@ int slogin_cmd(const char *name, const int numeric, const char *infoline, const 
 	sts("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
 #else
 	sts("%s %s :TS", (me.token ? TOK_PASS : MSG_PASS), pass);
-	sts("CAPAB TS5 BURST SSJ3 NICKIP");
+	sts("CAPAB TS5 BURST SSJ5 NICKIP");
 #endif
 	sts("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
 	return 1;
