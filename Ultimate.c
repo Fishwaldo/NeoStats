@@ -139,6 +139,7 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 	sprintf(tmp, "%s %s %s", chan, mode, args);
 	ac = split_buf(tmp, &av, 0);
 	ChanMode("", av, ac);
+	free(av);
 	return 1;
 }
 #ifndef ULTIMATE3

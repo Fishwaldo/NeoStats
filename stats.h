@@ -303,7 +303,7 @@ extern void part_chan(User *u, char *chan);
 extern void join_chan(User *u, char *chan);
 extern void change_user_nick(Chans *c, char *newnick, char *oldnick);
 extern Chans *findchan(char *chan);
-void ChanMode(char *origin, char **av, int ac);
+extern int ChanMode(char *origin, char **av, int ac);
 extern void Change_Topic(char *, Chans *, time_t t, char *);
 #endif
 

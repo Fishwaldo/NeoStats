@@ -552,33 +552,65 @@ void init_ServBot()
 void Srv_Sjoin(char *origin, char **argv, int argc) {
 	char nick[MAXNICK];
 	long mode = 0;
+	long mode1 = 0;
 	char *modes;
-	int ok = 1;
-	
-	modes = argv[3];
-	while (ok == 1) {
-		if (*modes == '@') {
-			mode |= MODE_CHANOP;
-			modes++;
-		} else if (*modes == '*') {
-			mode |= MODE_CHANADMIN;
-			modes++;
-		} else if (*modes == '%') {
-			mode |= MODE_HALFOP;
-			modes++;
-		} else if (*modes == '+') {
-			mode |= MODE_VOICE;
-			modes++;
-		} else {
-			strcpy(nick, modes);
-			ok = 0;
+	int ok = 1, i, j = 3;
+	ModesParm *m;
+	Chans *c;
+	lnode_t *mn = NULL;
+	list_t *tl;
+	modes = argv[2];
+	tl = list_create(10);
+	while (*modes) {
+		for (i=0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -1);i++) {
+			if (*modes == cFlagTab[i].flag) {
+				if (cFlagTab[i].parameters) {
+					m = smalloc(sizeof(ModesParm));
+					m->mode = cFlagTab[i].mode;
+					strcpy(m->param, argv[j]);										
+					mn = lnode_create(m);
+					list_append(tl, mn);
+					j++;
+				} else {
+					mode1 |= cFlagTab[i].mode;
+				}
+			}
 		}
+	modes++;
+	}	
+
+	while (argc > j) {
+		modes = argv[j];
+		while (ok == 1) {
+			if (*modes == '@') {
+				mode |= MODE_CHANOP;
+				modes++;
+			} else if (*modes == '*') {
+				mode |= MODE_CHANADMIN;
+				modes++;
+			} else if (*modes == '%') {
+				mode |= MODE_HALFOP;
+				modes++;
+			} else if (*modes == '+') {
+				mode |= MODE_VOICE;
+				modes++;
+			} else {
+				strcpy(nick, modes);
+				ok = 0;
+			}
+		}
+		join_chan(finduser(nick), argv[1]);
+		ChangeChanUserMode(findchan(argv[1]), finduser(nick), 1, mode);
+		j++;
+		ok = 1;
 	}
-	join_chan(finduser(nick), argv[1]);
-	ChangeChanUserMode(findchan(argv[1]), finduser(nick), 1, mode);
-
-
-
+	c = findchan(argv[1]);
+	c->modes = mode1;
+	if (!list_isempty(tl)) {
+		list_transfer(c->modeparms, tl, list_first(tl));
+	}
+	list_destroy(tl);
+	chandump(argv[1]);
 }
 void Srv_Burst(char *origin, char **argv, int argc) {
 	if (argc > 0) {

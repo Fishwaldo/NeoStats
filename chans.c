@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.15 2002/03/18 07:13:01 fishwaldo Exp $
+** $Id: chans.c,v 1.16 2002/03/21 04:12:04 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -41,7 +41,7 @@ int comparemode(const void *v, const void *mode) {
 }
 
 
-void ChanMode(char *origin, char **av, int ac) {
+int ChanMode(char *origin, char **av, int ac) {
 	char *modes;
 	int add = 0;
 	int j = 2; 
@@ -52,7 +52,7 @@ void ChanMode(char *origin, char **av, int ac) {
 
 	c = findchan(av[0]);
 	if (!c) {
-		return;
+		return 0;
 	}
 	modes = av[1];
 	while (*modes) {
@@ -107,7 +107,7 @@ void ChanMode(char *origin, char **av, int ac) {
 		}
 	modes++;
 	}
-		
+return j;		
 
 }
 
