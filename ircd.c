@@ -32,6 +32,7 @@
 #include "users.h"
 #include "chans.h"
 #include "services.h"
+#include "server.h"
 
 ircd_server ircd_srv;
 
@@ -1734,7 +1735,7 @@ do_vctrl (const char* uprot, const char* nicklen, const char* modex, const char*
 	ircd_srv.modex = modex;
 	ircd_srv.gc = gc;
 	strlcpy (me.netname, netname, MAXPASS);
-	send_vctrl ();
+	send_vctrl (ircd_srv.uprot, ircd_srv.nicklen, ircd_srv.modex, ircd_srv.gc);
 }
 #endif
 

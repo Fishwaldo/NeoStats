@@ -39,7 +39,6 @@
 
 hash_t *uh;
 
-static void doDelUser (const char *nick, int killflag, const char *quitreason);
 static User *new_user (const char *nick);
 
 static char quitreason[BUFSIZE];
