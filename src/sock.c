@@ -202,6 +202,7 @@ read_loop ()
 		/* XXX Should this be a pollsize or maxfdsunused... not sure yet */ 
 		curl_multi_fdset(curlmultihandle, &readfds, &writefds, &errfds, &maxfdsunused);
 		rta_hook_1 (&readfds, &writefds);
+		dcc_hook_1 (&readfds, &writefds);
 		SelectResult = select (FD_SETSIZE, &readfds, &writefds, &errfds, TimeOut);
 		me.now = time(NULL);
 		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
@@ -217,6 +218,7 @@ read_loop ()
 			}
 			transfer_status();
 			rta_hook_2 (&readfds, &writefds);
+			dcc_hook_2 (&readfds, &writefds);
 			if (FD_ISSET (servsock, &readfds)) {
 				for (j = 0; j < BUFSIZE; j++) {
 					i = os_sock_read (servsock, &c, 1);

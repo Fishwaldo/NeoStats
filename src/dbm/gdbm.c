@@ -63,7 +63,7 @@ int DBMCloseTable (void *handle)
 	return NS_SUCCESS;
 }
 
-void *DBMGetData (void *handle, char *key)
+int DBMGetData (void *handle, char *key, void *data, int size)
 {
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.dptr = key;
@@ -71,10 +71,12 @@ void *DBMGetData (void *handle, char *key)
 	dbdata = gdbm_fetch ((gdbm_file_info *)handle, dbkey);
 	if (dbdata.dptr != NULL)
 	{
-		return  (dbdata.dptr);
+		os_memcpy (data, dbdata.dptr, size);
+		free (dbdata.dptr);
+		return NS_SUCCESS;
 	}
 	dlog (DEBUG1, "gdbm_fetch fail: %s %s", key, gdbm_strerror(gdbm_errno));
-	return NULL;
+	return NS_FAILURE;
 }
 
 int DBMSetData (void *handle, char *key, void *data, int size)

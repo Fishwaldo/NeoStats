@@ -45,21 +45,12 @@ typedef struct dbm_sym {
 	char *sym;
 } dbm_sym;
 
-#if 1
 static void *(*DBMOpenTable) (const char *name);
 static int (*DBMCloseTable) (void *handle);
-static void *(*DBMGetData) (void *handle, char *key);
+static int (*DBMGetData) (void *handle, char *key, void *data, int size);
 static int (*DBMSetData) (void *handle, char *key, void *data, int size);
 static int (*DBMGetTableRows) (void *handle, DBRowHandler handler);
 static int (*DBMDelData) (void *handle, char * key);
-#else
-void *DBMOpenTable (const char *name);
-int DBMCloseTable (void *handle);
-void *DBMGetData (void *handle, char *key);
-int DBMSetData (void *handle, char *key, void *data, int size);
-int DBMGetTableRows (void *handle, DBRowHandler handler);
-int DBMDelData (void *handle, char * key);
-#endif
 
 static dbm_sym dbm_sym_table[] = 
 {
@@ -237,12 +228,7 @@ int DBAFetch (char *table, char *key, void *data, int size)
 	dlog (DEBUG1, "DBAFetch %s %s", table, key);
 	tbe = DBAFetchTableEntry (table);
 	if (tbe) {
-		dptr = DBMGetData (tbe->handle, key);
-		if (dptr)
-		{
-			os_memcpy (data, dptr, size);
-			return NS_SUCCESS;
-		}
+		return DBMGetData (tbe->handle, key, data, size);
 	}
 	return NS_FAILURE;
 }

@@ -63,7 +63,7 @@ int DBMCloseTable (void *handle)
 	return NS_SUCCESS;
 }
 
-void* DBMGetData (void *handle, char *key)
+int DBMGetData (void *handle, char *key, void *data, int size)
 {
 	int dbret;
 	DB *dbp = (DB *)handle;
@@ -75,10 +75,11 @@ void* DBMGetData (void *handle, char *key)
 	dbkey.size = strlen(key);
 	if ((dbret = dbp->get(dbp, NULL, &dbkey, &dbdata, 0)) == 0)
 	{
-		return dbdata.data;
+		os_memcpy (data, dbdata.data, size);
+		return NS_SUCCESS;
 	}
 	dlog(DEBUG1, "dbp->get: fail");
-	return NULL;
+	return NS_FAILURE;
 }
 
 int DBMSetData (void *handle, char *key, void *data, int size)
@@ -125,9 +126,9 @@ int DBMCloseTable (void *handle)
 	return NS_FAILURE;
 }
 
-void* DBMGetData (void *handle, char *key)
+int DBMGetData (void *handle, char *key, void *data, int size)
 {
-	return NULL;
+	return NS_FAILURE;
 }
 
 int DBMSetData (void *handle, char *key, void *data, int size)

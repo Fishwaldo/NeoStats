@@ -26,7 +26,7 @@
 
 MODULEFUNC void *DBMOpenTable (const char *name);
 MODULEFUNC int DBMCloseTable (void *handle);
-MODULEFUNC void *DBMGetData (void *handle, char *key);
+MODULEFUNC int DBMGetData (void *handle, char *key, void *data, int size);
 MODULEFUNC int DBMSetData (void *handle, char *key, void *data, int size);
 MODULEFUNC int DBMGetTableRows (void *handle, DBRowHandler handler);
 MODULEFUNC int DBMDelData (void *handle, char * key);
