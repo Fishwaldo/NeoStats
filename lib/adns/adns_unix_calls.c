@@ -28,7 +28,7 @@
 */
 
 
-#include "adns.h"
+#include "internal.h"
 
 int adns_writev(int FileDescriptor, const struct iovec * iov, int iovCount)
 {
