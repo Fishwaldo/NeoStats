@@ -38,6 +38,8 @@
 #include "Unreal.h"
 #elif ULTIMATE == 1
 #include "Ultimate.h"
+#elif HYBRID7 == 1
+#include "hybrid7.h"
 #else
 #error Error, you must select a IRCD to use. See ./configure --help for more information
 #endif

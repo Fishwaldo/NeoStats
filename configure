@@ -827,6 +827,7 @@ Optional Features:
  --enable-unreal - enable Unreal IRCD Support
  --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support
  --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support
+ --enable-hybrid7 - enable Hybrid7 IRCD Support
  --enable-auth==TYPE - what type of Authentication to use. See Readme File
  --enable-modules="MODULES" - space seperated list of modules to compile
 
@@ -3528,6 +3529,36 @@ else
 echo "${ECHO_T}no" >&6
 
 fi;
+
+echo "$as_me:$LINENO: checking Whether to Enable Hybrid 7.x.x IRCD Support..." >&5
+echo $ECHO_N "checking Whether to Enable Hybrid 7.x.x IRCD Support...... $ECHO_C" >&6
+# Check whether --enable-hybrid7 or --disable-hybrid7 was given.
+if test "${enable_hybrid7+set}" = set; then
+  enableval="$enable_hybrid7"
+   case "$enableval" in
+  yes)
+
+cat >>confdefs.h <<\_ACEOF
+#define HYBRID7 1
+_ACEOF
+
+	IRCD_FILES_SRC="hybrid7.c"
+	IRCD_FILES_OBJS="hybrid7.o"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
+  *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	;;
+esac
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi;
+
+
 echo "$as_me:$LINENO: checking A compatible IRCD is specified" >&5
 echo $ECHO_N "checking A compatible IRCD is specified... $ECHO_C" >&6
 case "$IRCD_FILES_SRC" in
@@ -3539,7 +3570,13 @@ echo "${ECHO_T}yes" >&6
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
+   "hybrid7.c")
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	;;
   *)
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
 	{ { echo "$as_me:$LINENO: error: 'You must define a IRCD to use. See ./configure --help for more information'" >&5
 echo "$as_me: error: 'You must define a IRCD to use. See ./configure --help for more information'" >&2;}
    { (exit 1); exit 1; }; }

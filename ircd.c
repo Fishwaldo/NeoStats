@@ -985,7 +985,8 @@ void Srv_Nick(char *origin, char **argv, int argc) {
 			AddUser(argv[0], argv[3], argv[4], argv[5], strtoul(argv[8], NULL, 10));
 			Module_Event("SIGNON", av, ac);
 #else
-			AddUser(argv[0], argv[4], argv[5], argv[6], strtoul(argv[8], NULL, 10));
+			/* unreal does seem to send IP addresses, Gah, that sucks */
+			AddUser(argv[0], argv[4], argv[5], argv[6], 0);
 #ifdef DEBUG
 			log("Mode: UserMode: %s",argv[3]);
 #endif

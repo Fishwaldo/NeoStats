@@ -145,6 +145,8 @@ doc/read-userman -text
 /dotconf.h -text
 /hash.c -text
 /hash.h -text
+/hybrid7.c -text
+/hybrid7.h -text
 /install-sh -text
 /ircd.c -text
 /ircdchk -text

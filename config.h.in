@@ -110,6 +110,9 @@
 /* 'Enable Unreal Support' */
 #undef UNREAL
 
+/* enable hybbid support */
+#undef HYBRID7
+
 
 /* Version number of package */
 #undef VERSION
