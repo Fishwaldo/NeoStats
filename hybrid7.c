@@ -436,7 +436,6 @@ int
 sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
 {
 	/* there isn't an akill on Hybrid, so we send a kline to all servers! */
-	Server *s;
 
 	va_list ap;
 	char buf[512];
@@ -864,19 +863,6 @@ void
 Srv_Svinfo (char *origin, char **argv, int argc)
 {
 	ssvinfo_cmd ();
-}
-
-void
-Srv_Netinfo (char *origin, char **argv, int argc)
-{
-	me.onchan = 1;
-	ircd_srv.uprot = atoi (argv[2]);
-	strncpy (ircd_srv.cloak, argv[3], 10);
-	strncpy (me.netname, argv[7], MAXPASS);
-	init_ServBot ();
-	globops (me.name, "Link with Network \2Complete!\2");
-	Module_Event ("NETINFO", NULL, 0);
-	me.synced = 1;
 }
 
 void
