@@ -354,7 +354,7 @@ del_bot (char *nick, char *reason)
 		nlog (LOG_WARNING, LOG_CORE, "Attempting to Logoff with a Nickname that does not Exists: %s", nick);
 		return NS_FAILURE;
 	}
-	nlog (LOG_DEBUG1, LOG_CORE, "Killing %s for %s", nick, reason);
+	nlog (LOG_DEBUG1, LOG_CORE, "Deleting bot %s for %s", nick, reason);
 	//XXXX TODO: need to free the channel list hash. We dont according to valgrind
 	squit_cmd (nick, reason);
 	del_mod_user (nick);
