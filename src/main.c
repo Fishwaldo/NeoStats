@@ -218,7 +218,9 @@ static int InitCore( void )
 	/* initialize Lang Subsystem */
 	ircsnprintf( dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX );
 	LANGinit( 1, dbpath, NULL );
+#ifndef WIN32
 	event_init();
+#endif
 	/* initialize Module subsystem */
 	if( InitDBA() != NS_SUCCESS )
 		return NS_FAILURE;
@@ -356,7 +358,9 @@ int main( int argc, char *argv[] )
 	if( InitCore() != NS_SUCCESS )
 		return EXIT_FAILURE;
 
+#ifndef WIN32
 	printf("NeoStats will use %s\n", event_show_method());
+#endif
 #ifndef WIN32
 #ifndef DEBUG
 	/* if we are compiled with debug, or forground switch was specified, DONT FORK */
