@@ -116,6 +116,8 @@ ChanModes chan_modes[] = {
 	{CMODE_VOICE, 'v', 1, 0, '+'},
 	{CMODE_HALFOP, 'h', 1, 0, '%'},
 	{CMODE_CHANOP, 'o', 1, 0, '@'},
+	{CMODE_CHANPROT, 'a', 1, 0, '\0'},
+	{CMODE_CHANOWNER, 'q', 1, 0, '\0'},
 	{CMODE_LIMIT, 'l', 0, 1},
 	{CMODE_PRIVATE, 'p', 0, 0},
 	{CMODE_SECRET, 's', 0, 0},
@@ -127,8 +129,6 @@ ChanModes chan_modes[] = {
 	{CMODE_RGSTR, 'r', 0, 0},
 	{CMODE_RGSTRONLY, 'R', 0, 0},
 	{CMODE_NOCOLOR, 'c', 0, 0},
-	{CMODE_CHANPROT, 'a', 1, 0},
-	{CMODE_CHANOWNER, 'q', 1, 0},
 	{CMODE_OPERONLY, 'O', 0, 0},
 	{CMODE_ADMONLY, 'A', 0, 0},
 	{CMODE_LINK, 'L', 0, 1},
@@ -389,6 +389,25 @@ send_globops (char *from, char *buf)
 static void
 Srv_Protocol (char *origin, char **argv, int argc)
 {
+	int i;
+
+    /*  Dodgy code to determine if PREFIX_AQ is enabled on the server 
+	    we are connecting to. We should really parse CHANMODES properly
+		but this is just an early test. Clients get sent CHPFIX which maps
+		the mode to the sjoin char but this is enabled per server and 
+		should be enabled on all servers if someone uses it <sigh>
+		If not enabled we get something like:
+	    R: PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 
+	    VL SJ3 NS SJB64 CHANMODES=beqa,kfL,l,psmntirRcOAQKVGCuzNSM 
+		When enabled, this changes to have CHANMODES=be,... so let's 
+		look for that.
+		*/
+	for (i = 0; i < argc; i++) {
+		if (strstr ("CHANMODES=be,", argv[i])) {
+			chan_modes[3].sjoin = '&';
+			chan_modes[4].sjoin = '~';
+		}
+	}
 	ns_srv_protocol(origin, argv, argc);
 }
 
