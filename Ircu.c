@@ -290,7 +290,7 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 	neonumeric = numeric;
 	inttobase64(neonumericbuf, neonumeric, 2);
 	send_cmd ("%s %s", MSG_PASS, pass);
-    send_cmd ("%s %s 1 %lu %lu P10 %s]]] +s :%s", MSG_SERVER, name, tsboot, tslink, neonumericbuf, infoline);
+    send_cmd ("%s %s 1 %lu %lu J10 %s]]] +s :%s", MSG_SERVER, name, tsboot, tslink, neonumericbuf, infoline);
 	setservernumeric (name, neonumericbuf);
 }
 
@@ -330,7 +330,7 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 {
 	char nicknumbuf[6];
 	
-	send_cmd ("%s %s %s 1 %lu %s %s %sAA%c :%s", neonumericbuf, TOK_NICK, nick, ts, ident, host, neonumericbuf, (neonickcount+'A'), realname);
+	send_cmd ("%s %s %s 1 %lu %s %s %s %sAA%c :%s", neonumericbuf, TOK_NICK, nick, ts, ident, host, newmode, neonumericbuf, (neonickcount+'A'), realname);
 	snprintf(nicknumbuf, 6, "%sAA%c", neonumericbuf, (neonickcount+'A'));
 	setusernumeric (nick, nicknumbuf);
 	neonickcount ++;
@@ -397,9 +397,9 @@ send_wallops (const char *who, const char *buf)
 void
 send_end_of_burst_ack(void)
 {
-	send_cmd ("%s %s", neonumericbuf, TOK_END_OF_BURST_ACK);
 	init_services_bot ();
 	send_end_of_burst ();
+	send_cmd ("%s %s", neonumericbuf, TOK_END_OF_BURST_ACK);
 	me.synced = 1;
 }
 
@@ -593,7 +593,9 @@ static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(argc > 2) {
+		char IPAddress[32]; /* argv[argc-3] */
 		char *realname;
+        		
 		realname = joinbuf (argv, argc, (argc - 1));
 		/*       nick,    hopcount, TS,     user,    host, */
         do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
