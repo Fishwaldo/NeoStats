@@ -260,11 +260,13 @@ slogin_cmd (const char *name, const int numeric, const char *infoline, const cha
 {
 #ifndef ULTIMATE3
 	sts ("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
+	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	sts ("%s TOKEN CLIENT", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 #else
 	sts ("%s %s :TS", (me.token ? TOK_PASS : MSG_PASS), pass);
 	sts ("CAPAB TS5 BURST SSJ5 NICKIP CLIENT");
-#endif
 	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+#endif
 	return 1;
 }
 
@@ -272,15 +274,6 @@ int
 ssquit_cmd (const char *server)
 {
 	sts ("%s %s", (me.token ? TOK_SQUIT : MSG_SQUIT), server);
-	return 1;
-}
-
-int
-sprotocol_cmd (const char *option)
-{
-#ifndef ULTIMATE3
-	sts ("%s %s", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL), option);
-#endif
 	return 1;
 }
 

@@ -164,12 +164,6 @@ ssquit_cmd (const char *server)
 	return 1;
 }
 
-int
-sprotocol_cmd (const char *option)
-{
-	return 1;
-}
-
 void 
 send_quit (const char *who, const char *quitmsg)
 {

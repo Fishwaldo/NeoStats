@@ -262,8 +262,13 @@ ns_userdump (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 	   	return 0;
 	}
-	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump!", u->nick);
-	UserDump (((ac < 3) ? NULL : av[2]));
+	if(ac < 3) {
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump!", u->nick);
+		UserDump (NULL);
+	} else {
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a UserDump for %s!", u->nick, av[2]);
+		UserDump (av[2]);
+	}
    	return 1;
 }
 
@@ -306,8 +311,13 @@ ns_chandump (User * u, char **av, int ac)
 		prefmsg (u->nick, s_Services, "\2Error:\2 Debug Mode Disabled");
 	   	return 0;
 	}
-	chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ChannelDump!", u->nick);
-	ChanDump (((ac < 3) ? NULL : av[2]));
+	if(ac < 3) {
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ChannelDump!", u->nick);
+		ChanDump (NULL);
+	} else {
+		chanalert (s_Services, "\2DEBUG\2 \2%s\2 Requested a ChannelDump for %s!", u->nick, av[2]);
+		ChanDump (av[2]);
+	}
    	return 1;
 }
 

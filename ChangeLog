@@ -1,5 +1,8 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 =====================================================================================
+* NeoStats * Fish (F) & Mark (M) * Version 2.5.14
+ - remove sprotocol_cmd since it is very ircd specfic
+
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.13
  - Added a new event for Channel Mode changes (F)
  - Fixed up Ultimate2 Token Support (M)

@@ -513,7 +513,6 @@ start (void)
 	} else {
 		/* Call the IRC specific function slogin_cmd to login as a server to IRC */
 		slogin_cmd (me.name, me.numeric, me.infoline, me.pass);
-		sprotocol_cmd ("TOKEN CLIENT");
 		read_loop ();
 	}
 

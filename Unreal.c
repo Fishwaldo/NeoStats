@@ -122,8 +122,8 @@ ChanModes chan_modes[] = {
 	{CMODE_VOICE, 'v', 1, 0, '+'},
 	{CMODE_HALFOP, 'h', 1, 0, '%'},
 	{CMODE_CHANOP, 'o', 1, 0, '@'},
-	{CMODE_CHANPROT, 'a', 1, 0, '\0'},
-	{CMODE_CHANOWNER, 'q', 1, 0, '\0'},
+	{CMODE_CHANPROT, 'a', 1, 0, '~'},
+	{CMODE_CHANOWNER, 'q', 1, 0, '*'},
 	{CMODE_LIMIT, 'l', 0, 1},
 	{CMODE_PRIVATE, 'p', 0, 0},
 	{CMODE_SECRET, 's', 0, 0},
@@ -206,6 +206,7 @@ slogin_cmd (const char *name, const int numeric, const char *infoline, const cha
 {
 	sts ("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
 	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	sts ("%s TOKEN SJOIN", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 	return 1;
 }
 
@@ -213,13 +214,6 @@ int
 ssquit_cmd (const char *server)
 {
 	sts ("%s %s", (me.token ? TOK_SQUIT : MSG_SQUIT), server);
-	return 1;
-}
-
-int
-sprotocol_cmd (const char *option)
-{
-	sts ("%s %s", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL), option);
 	return 1;
 }
 

@@ -124,7 +124,6 @@ int sserver_cmd (const char *name, const int numeric, const char *infoline);
 int squit_cmd (const char *who, const char *quitmsg);
 int slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass);
 int ssquit_cmd (const char *server);
-int sprotocol_cmd (const char *option);
 int snetinfo_cmd (void);
 int ssvinfo_cmd (void);
 int sburst_cmd (int b);
