@@ -138,8 +138,8 @@ int ListAuth(User *u)
 	
 	for(i = 0; i < AuthModuleCount; i ++)
 	{
-		if (AuthModList[AuthModuleCount].listauth) {
-			AuthModList[AuthModuleCount].listauth (u);
+		if (AuthModList[i].listauth) {
+			AuthModList[i].listauth (u);
 		}
 	}
 	return NS_SUCCESS;
