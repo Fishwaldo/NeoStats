@@ -568,7 +568,7 @@ int Online(char **av, int ac)
 
 	/* also add a timer to check if its midnight (to reset the daily stats */
 	add_mod_timer("Is_Midnight", "Daily_Stats_Reset", SSMNAME, 60);
-	add_mod_timer("DelOldChan", "DelOldStatServChans", SSMNAME, 60);
+	add_mod_timer("DelOldChan", "DelOldStatServChans", SSMNAME, 3600);
 
 
 	return 1;
