@@ -385,6 +385,7 @@ modules/statserv/stats.c -text
 modules/statserv/stats.h -text
 modules/statserv/statserv.c -text
 modules/statserv/statserv.h -text
+modules/statserv/statserv.vcproj -text
 modules/statserv/statsrta.c -text
 modules/statserv/statsrta.h -text
 modules/statserv/tld.c -text
