@@ -30,7 +30,7 @@
 #include "log.h"
 
 /* @brief Module Timer hash list */
-static hash_t *th;
+static hash_t *timerhash;
 
 static int midnight = 0;
 static int lastservertimesync = 0;
@@ -41,8 +41,8 @@ void run_mod_timers (void);
 
 int InitTimers (void)
 {
-	th = hash_create (T_TABLE_SIZE, 0, 0);
-	if(!th) {
+	timerhash = hash_create (T_TABLE_SIZE, 0, 0);
+	if(!timerhash) {
 		nlog (LOG_CRITICAL, "Unable to create timer hash");
 		return NS_FAILURE;
 	}
@@ -51,7 +51,7 @@ int InitTimers (void)
 
 int FiniTimers (void)
 {
-	hash_destroy(th);
+	hash_destroy(timerhash);
 	return NS_SUCCESS;
 }
 
@@ -120,15 +120,15 @@ new_timer (char *name)
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
+	if (hash_isfull (timerhash)) {
+		nlog (LOG_WARNING, "new_timer: timer hash is full");
+		return NULL;
+	}
 	nlog (LOG_DEBUG2, "new_timer: %s", name);
 	timer = smalloc (sizeof (Timer));
 	strlcpy (timer->name, name, MAX_MOD_NAME);
 	tn = hnode_create (timer);
-	if (hash_isfull (th)) {
-		nlog (LOG_WARNING, "new_timer: couldn't add new timer, hash is full!");
-		return NULL;
-	}
-	hash_insert (th, tn, name);
+	hash_insert (timerhash, tn, name);
 	return timer;
 }
 
@@ -145,7 +145,7 @@ findtimer (char *name)
 {
 	hnode_t *tn;
 
-	tn = hash_lookup (th, name);
+	tn = hash_lookup (timerhash, name);
 	if (tn)
 		return (Timer *) hnode_get (tn);
 	return NULL;
@@ -171,7 +171,7 @@ add_timer (timer_function func_name, char *name, int interval)
 	SET_SEGV_LOCATION();
 	moduleptr = GET_CUR_MODULE();
 	if (func_name == NULL) {
-		nlog (LOG_WARNING, "%s: Timer %s Function doesn't exist", moduleptr->info->name, name);
+		nlog (LOG_WARNING, "Module %s timer %s does not exist", moduleptr->info->name, name);
 		return NS_FAILURE;
 	}
 	timer = new_timer (name);
@@ -180,7 +180,7 @@ add_timer (timer_function func_name, char *name, int interval)
 		timer->lastrun = me.now;
 		timer->moduleptr = moduleptr;
 		timer->function = func_name;
-		nlog (LOG_DEBUG2, "add_timer: Registered Module %s with timer for Function %s", moduleptr->info->name, name);
+		nlog (LOG_DEBUG2, "add_timer: Module %s added timer %s", moduleptr->info->name, name);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -201,11 +201,11 @@ del_timer (char *name)
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	tn = hash_lookup (th, name);
+	tn = hash_lookup (timerhash, name);
 	if (tn) {
 		timer = hnode_get (tn);
-		nlog (LOG_DEBUG2, "del_timer: Unregistered Timer function %s from Module %s", name, timer->moduleptr->info->name);
-		hash_delete (th, tn);
+		nlog (LOG_DEBUG2, "del_timer: removed timer %s for module %s", name, timer->moduleptr->info->name);
+		hash_delete (timerhash, tn);
 		hnode_destroy (tn);
 		sfree (timer);
 		return NS_SUCCESS;
@@ -228,7 +228,7 @@ del_timers (Module *mod_ptr)
 	hnode_t *modnode;
 	hscan_t hscan;
 
-	hash_scan_begin (&hscan, th);
+	hash_scan_begin (&hscan, timerhash);
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		timer = hnode_get (modnode);
 		if (timer->moduleptr == mod_ptr) {
@@ -254,7 +254,7 @@ set_timer_interval (char *name, int interval)
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	tn = hash_lookup (th, name);
+	tn = hash_lookup (timerhash, name);
 	if (tn) {
 		timer = hnode_get (tn);
 		timer->interval = interval;
@@ -281,7 +281,7 @@ list_timers (CmdParams* cmdparams)
 
 	SET_SEGV_LOCATION();
 	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module timer List:");
-	hash_scan_begin (&ts, th);
+	hash_scan_begin (&ts, timerhash);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
 		timer = hnode_get (tn);
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "%s:--------------------------------", timer->moduleptr->info->name);
@@ -309,7 +309,7 @@ run_mod_timers (void)
 	hnode_t *tn;
 
 /* First, lets see if any modules have a function that is due to run..... */
-	hash_scan_begin (&ts, th);
+	hash_scan_begin (&ts, timerhash);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
 		SET_SEGV_LOCATION();
 		timer = hnode_get (tn);
@@ -319,7 +319,7 @@ run_mod_timers (void)
 				nlog(LOG_DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name);
 				if (timer->function () < 0) {
 					nlog(LOG_DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name);
-					hash_scan_delete(th, tn);
+					hash_scan_delete(timerhash, tn);
 					hnode_destroy(tn);
 					sfree(timer);
 				} else {

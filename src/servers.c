@@ -32,7 +32,7 @@
 #include "sqlsrv/rta.h"
 #endif
 
-static hash_t *sh;
+static hash_t *serverhash;
 
 static Server *
 new_server (const char *name)
@@ -41,6 +41,10 @@ new_server (const char *name)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
+	if (hash_isfull (serverhash)) {
+		nlog (LOG_CRITICAL, "new_ban: server hash is full");
+		return NULL;
+	}
 	s = scalloc (sizeof (Server));
 	strlcpy (s->name, name, MAXHOST);
 	sn = hnode_create (s);
@@ -49,13 +53,7 @@ new_server (const char *name)
 		sfree (s);
 		return NULL;
 	}
-	if (hash_isfull (sh)) {
-		nlog (LOG_WARNING, "Server hash full");
-		sfree (s);
-		return NULL;
-	} else {
-		hash_insert (sh, sn, s->name);
-	}
+	hash_insert (serverhash, sn, s->name);
 	return s;
 }
 
@@ -101,7 +99,7 @@ DelServer (const char *name, const char* reason)
 	hnode_t *sn;
 
 	nlog (LOG_DEBUG1, "DelServer: %s", name);
-	sn = hash_lookup (sh, name);
+	sn = hash_lookup (serverhash, name);
 	if (!sn) {
 		nlog (LOG_WARNING, "DelServer: squit from unknown server %s", name);
 		return;
@@ -115,7 +113,7 @@ DelServer (const char *name, const char* reason)
 	}
 	SendAllModuleEvent (EVENT_SQUIT, cmdparams);
 	sfree (cmdparams);
-	hash_delete (sh, sn);
+	hash_delete (serverhash, sn);
 	hnode_destroy (sn);
 	sfree (s);
 }
@@ -128,7 +126,7 @@ findserverbase64 (const char *num)
 	hscan_t ss;
 	hnode_t *sn;
 
-	hash_scan_begin (&ss, sh);
+	hash_scan_begin (&ss, serverhash);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
 		if(strncmp(s->name64, num, BASE64SERVERSIZE) == 0) {
@@ -147,7 +145,7 @@ findserver (const char *name)
 	Server *s;
 	hnode_t *sn;
 
-	sn = hash_lookup (sh, name);
+	sn = hash_lookup (serverhash, name);
 	if (sn) {
 		s = hnode_get (sn);
 		return s;
@@ -178,7 +176,7 @@ ServerDump (const char *name)
 
 	debugtochannel("===============SERVERDUMP===============");
 	if (!name) {
-		hash_scan_begin (&ss, sh);
+		hash_scan_begin (&ss, serverhash);
 		while ((sn = hash_scan_next (&ss)) != NULL) {
 			s = hnode_get (sn);
 			dumpserver (s);
@@ -291,15 +289,15 @@ TBLDEF neo_servers = {
 int 
 InitServers (void)
 {
-	sh = hash_create (S_TABLE_SIZE, 0, 0);
-	if (!sh) {
+	serverhash = hash_create (S_TABLE_SIZE, 0, 0);
+	if (!serverhash) {
 		nlog (LOG_CRITICAL, "Unable to create server hash");
 		return NS_FAILURE;
 	}
 	AddServer (me.name, NULL, 0, NULL, me.infoline);
 #ifdef SQLSRV
 	/* add the server hash to the sql library */
-	neo_servers.address = sh;
+	neo_servers.address = serverhash;
 	rta_add_table(&neo_servers);
 #endif
 	return NS_SUCCESS;
@@ -317,7 +315,7 @@ PingServers (void)
 		return;
 	nlog (LOG_DEBUG3, "Sending pings...");
 	ping.ulag = 0;
-	hash_scan_begin (&ss, sh);
+	hash_scan_begin (&ss, serverhash);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
 		if (!strcmp (me.name, s->name)) {
@@ -335,14 +333,14 @@ FiniServers (void)
 	hnode_t *sn;
 	hscan_t hs;
 
-	hash_scan_begin(&hs, sh);
+	hash_scan_begin(&hs, serverhash);
 	while ((sn = hash_scan_next(&hs)) != NULL ) {
 		s = hnode_get (sn);
-		hash_delete (sh, sn);
+		hash_delete (serverhash, sn);
 		hnode_destroy (sn);
 		sfree (s);
 	}
-	hash_destroy(sh);
+	hash_destroy(serverhash);
 }
 
 void GetServerList(ServerListHandler handler)
@@ -352,7 +350,7 @@ void GetServerList(ServerListHandler handler)
 	Server *ss;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin(&scan, sh);
+	hash_scan_begin(&scan, serverhash);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		ss = hnode_get(node);
 		handler(ss);

@@ -44,8 +44,7 @@ typedef struct Chanmem {
 	void *moddata[NUM_MODULES];
 } Chanmem;
 
-static hash_t *ch;
-
+static hash_t *channelhash;
 static char quitreason[BUFSIZE];
 
 static void
@@ -145,6 +144,7 @@ CheckChanMode (Channel * c, long mode)
 {
 	ModesParm *m;
 	lnode_t *mn;
+
 	if (!c) {
 		nlog (LOG_WARNING, "CheckChanMode: tied to check modes of empty channel");
 		return -1;
@@ -181,6 +181,7 @@ static int
 comparemode (const void *v, const void *mode)
 {
 	ModesParm *m = (void *) v;
+
 	if (m->mode == (long) mode) {
 		return 0;
 	} else {
@@ -382,16 +383,14 @@ new_chan (const char *chan)
 	Channel *c;
 	hnode_t *cn;
 
-	SET_SEGV_LOCATION();
+	if (hash_isfull (channelhash)) {
+		nlog (LOG_CRITICAL, "new_chan: channel hash is full");
+		return NULL;
+	}
 	c = scalloc (sizeof (Channel));
 	strlcpy (c->name, chan, CHANLEN);
 	cn = hnode_create (c);
-	if (hash_isfull (ch)) {
-		nlog (LOG_CRITICAL, "new_chan: channel hash is full");
-		sfree (c);
-		return NULL;
-	}
-	hash_insert (ch, cn, c->name);
+	hash_insert (channelhash, cn, c->name);
 	c->chanmembers = list_create (CHAN_MEM_SIZE);
 	c->modeparms = list_create (MAXMODES);
 	c->users = 0;
@@ -425,7 +424,7 @@ del_chan (Channel * c)
 	lnode_t *cm;
 
 	SET_SEGV_LOCATION();
-	cn = hash_lookup (ch, c->name);
+	cn = hash_lookup (channelhash, c->name);
 	if (!cn) {
 		nlog (LOG_WARNING, "del_chan: channel %s not found.", c->name);
 		return;
@@ -444,7 +443,7 @@ del_chan (Channel * c)
 		list_destroy_nodes (c->modeparms);
 		list_destroy (c->modeparms);
 		list_destroy (c->chanmembers);
-		hash_delete (ch, cn);
+		hash_delete (channelhash, cn);
 		hnode_destroy (cn);
 		sfree (c);
 	}
@@ -630,6 +629,7 @@ ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 {
 	lnode_t *cm;
 	Chanmem *cml;
+
 	SET_SEGV_LOCATION();
 	cm = list_find (c->chanmembers, oldnick, comparef);
 	if (!cm) {
@@ -801,8 +801,8 @@ void ChanDump (const char *chan)
 	SET_SEGV_LOCATION();
 	debugtochannel("================CHANDUMP================");
 	if (!chan) {
-		debugtochannel("Channels %d", (int)hash_count (ch));
-		hash_scan_begin (&sc, ch);
+		debugtochannel("Channels %d", (int)hash_count (channelhash));
+		hash_scan_begin (&sc, channelhash);
 		while ((cn = hash_scan_next (&sc)) != NULL) {
 			c = hnode_get (cn);
 			dumpchan(c);
@@ -834,7 +834,7 @@ findchan (const char *chan)
 	Channel *c;
 	hnode_t *cn;
 
-	cn = hash_lookup (ch, chan);
+	cn = hash_lookup (channelhash, chan);
 	if (cn) {
 		c = hnode_get (cn);
 		return c;
@@ -1092,7 +1092,7 @@ TBLDEF neo_chans = {
 
 /** @brief initialize the channel data
  *
- * initializes the channel data and channel hash ch.
+ * initializes the channel data and channel hash channelhash.
  *
  * @return Nothing
 */
@@ -1100,14 +1100,14 @@ TBLDEF neo_chans = {
 int 
 InitChannels ()
 {
-	ch = hash_create (C_TABLE_SIZE, 0, 0);
-	if(!ch)	{
+	channelhash = hash_create (C_TABLE_SIZE, 0, 0);
+	if(!channelhash)	{
 		nlog (LOG_CRITICAL, "Unable to create channel hash");
 		return NS_FAILURE;
 	}
 #ifdef SQLSRV
 	/* add the server hash to the sql library */
-	neo_chans.address = ch;
+	neo_chans.address = channelhash;
 	rta_add_table(&neo_chans);
 #endif
 	return NS_SUCCESS;
@@ -1115,7 +1115,7 @@ InitChannels ()
 
 void FiniChannels (void)
 {
-	hash_destroy(ch);
+	hash_destroy(channelhash);
 }
 
 void GetChannelList(ChannelListHandler handler)
@@ -1125,7 +1125,7 @@ void GetChannelList(ChannelListHandler handler)
 	Channel *c;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin(&scan, ch);
+	hash_scan_begin(&scan, channelhash);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		c = hnode_get(node);
 		handler(c);

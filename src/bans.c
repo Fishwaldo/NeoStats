@@ -35,15 +35,14 @@ new_ban (const char *mask)
 	Ban *ban;
 	hnode_t *bansnode;
 
-	SET_SEGV_LOCATION();
+	if (hash_isfull (banshash)) {
+		nlog (LOG_CRITICAL, "new_ban: bans hash is full");
+		return NULL;
+	}
 	ban = scalloc (sizeof (Ban));
 	strlcpy (ban->mask, mask, MAXHOST);
 	bansnode = hnode_create (ban);
-	if (hash_isfull (banshash)) {
-		nlog (LOG_WARNING, "bans hash is full!\n");
-	} else {
-		hash_insert (banshash, bansnode, ban->mask);
-	}
+	hash_insert (banshash, bansnode, ban->mask);
 	return ban;
 }
 
@@ -53,7 +52,11 @@ void AddBan(const char* type, const char* user, const char* host, const char* ma
 	CmdParams * cmdparams;
 	Ban* ban;
 
+	SET_SEGV_LOCATION();
 	ban = new_ban (mask);
+	if(!ban) {
+		return;
+	}
 	ban->type = type[0];
 	strlcpy(ban->user, user, MAXUSER);
 	strlcpy(ban->host, host, MAXHOST);
@@ -86,6 +89,7 @@ DelBan(const char* type, const char* user, const char* host, const char* mask,
 	Ban *ban;
 	hnode_t *bansnode;
 
+	SET_SEGV_LOCATION();
 	bansnode = hash_lookup (banshash, mask);
 	if (!bansnode) {
 		nlog (LOG_WARNING, "DelBan: unknown ban %s", mask);

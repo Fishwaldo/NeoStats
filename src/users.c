@@ -47,20 +47,14 @@ new_user (const char *nick)
 	hnode_t *un;
 
 	SET_SEGV_LOCATION();
-	u = scalloc (sizeof (User));
-	if (!nick) {
-		nlog (LOG_CRITICAL, "new_user: trying to add user with NULL nickname");
-		return NULL;
-	} else {
-		strlcpy (u->nick, nick, MAXNICK);
-	}
-	un = hnode_create (u);
 	if (hash_isfull (uh)) {
 		nlog (LOG_CRITICAL, "new_user: user hash is full");
 		return NULL;
-	} else {
-		hash_insert (uh, un, u->nick);
 	}
+	u = scalloc (sizeof (User));
+	strlcpy (u->nick, nick, MAXNICK);
+	un = hnode_create (u);
+	hash_insert (uh, un, u->nick);
 	return u;
 }
 #ifndef GOTNICKIP
@@ -93,6 +87,10 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 #endif
 
 	SET_SEGV_LOCATION();
+	if (!nick) {
+		nlog (LOG_CRITICAL, "AddUser: trying to add user with NULL nickname");
+		return;
+	}
 	u = finduser (nick);
 	if (u) {
 		nlog (LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick);

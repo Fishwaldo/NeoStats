@@ -48,7 +48,7 @@ static void recvlog (char *line);
 static struct sockaddr_in lsa;
 static int dobind;
 /* @brief Module Socket List hash */
-static hash_t *sockh;
+static hash_t *sockethash;
 /* @brief server socket */
 static int servsock;
 char recbuf[BUFSIZE];
@@ -191,7 +191,7 @@ read_loop ()
 //		memset(ufds, 0, (sizeof *ufds) * me.maxsocks);
 		pollsize = 0;
 		FD_SET (servsock, &readfds);
-		hash_scan_begin (&ss, sockh);
+		hash_scan_begin (&ss, sockethash);
 		me.cursocks = 1;	/* always one socket for ircd */
 		while ((sn = hash_scan_next (&ss)) != NULL) {
 			sock = hnode_get (sn);
@@ -318,7 +318,7 @@ restartsql:
 				}
 			} else {
 				/* this checks if there is any data waiting on a socket for a module */
-				hash_scan_begin (&ss, sockh);
+				hash_scan_begin (&ss, sockethash);
 				while ((sn = hash_scan_next (&ss)) != NULL) {
 					pollflag = 0;
 					sock = hnode_get (sn);
@@ -840,8 +840,8 @@ sql_handle_ui_output(lnode_t *sqlnode)
 int InitSocks (void)
 {
 	me.maxsocks = getmaxsock ();
-	sockh = hash_create (me.maxsocks, 0, 0);
-	if(!sockh) {
+	sockethash = hash_create (me.maxsocks, 0, 0);
+	if(!sockethash) {
 		nlog (LOG_CRITICAL, "Unable to create socks hash");
 		return NS_FAILURE;
 	}
@@ -856,7 +856,7 @@ int FiniSocks (void)
 	sfree(ufds);
 	if (servsock > 0)
 		close (servsock);
-	hash_destroy(sockh);
+	hash_destroy(sockethash);
 	return NS_SUCCESS;
 }
 
@@ -876,14 +876,14 @@ new_sock (char *sock_name)
 
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, "new_sock: %s", sock_name);
+	if (hash_isfull (sockethash)) {
+		nlog (LOG_CRITICAL, "new_sock: socket hash is full");
+		return NULL;
+	}
 	sock = smalloc (sizeof (Sock));
 	strlcpy (sock->name, sock_name, MAX_MOD_NAME);
 	sn = hnode_create (sock);
-	if (hash_isfull (sockh)) {
-		nlog (LOG_CRITICAL, "new_sock: socket hash is full, can't add a new socket");
-		return NULL;
-	}
-	hash_insert (sockh, sn, sock->name);
+	hash_insert (sockethash, sn, sock->name);
 	return sock;
 }
 
@@ -900,7 +900,7 @@ findsock (char *sock_name)
 {
 	hnode_t *sn;
 
-	sn = hash_lookup (sockh, sock_name);
+	sn = hash_lookup (sockethash, sock_name);
 	if (sn)
 		return hnode_get (sn);
 	return NULL;
@@ -1003,11 +1003,11 @@ del_socket (char *sock_name)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	sn = hash_lookup (sockh, sock_name);
+	sn = hash_lookup (sockethash, sock_name);
 	if (sn) {
 		sock = hnode_get (sn);
 		nlog (LOG_DEBUG2, "del_socket: Unregistered Socket function %s from Module %s", sock_name, sock->moduleptr->info->name);
-		hash_scan_delete (sockh, sn);
+		hash_scan_delete (sockethash, sn);
 		hnode_destroy (sn);
 		sfree (sock);
 		return NS_SUCCESS;
@@ -1030,7 +1030,7 @@ del_sockets (Module *mod_ptr)
 	hnode_t *modnode;
 	hscan_t hscan;
 
-	hash_scan_begin (&hscan, sockh);
+	hash_scan_begin (&hscan, sockethash);
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		sock = hnode_get (modnode);
 		if (sock->moduleptr == mod_ptr) {
@@ -1057,8 +1057,8 @@ list_sockets (CmdParams* cmdparams)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Sockets List: (%d)", (int)hash_count (sockh));
-	hash_scan_begin (&ss, sockh);
+	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Sockets List: (%d)", (int)hash_count (sockethash));
+	hash_scan_begin (&ss, sockethash);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		sock = hnode_get (sn);
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "%s:--------------------------------", sock->moduleptr->info->name);

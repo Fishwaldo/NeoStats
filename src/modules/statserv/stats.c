@@ -326,6 +326,10 @@ SStats *newserverstats(const char *name)
 
 	SET_SEGV_LOCATION();
 	nlog(LOG_DEBUG2, "newserverstats(%s)", name);
+	if (hash_isfull(Shead)) {
+		nlog(LOG_CRITICAL, "StatServ Server hash is full!");
+		return NULL;
+	}
 	s = scalloc(sizeof(SStats));
 	memcpy(s->name, name, MAXHOST);
 	s->t_maxusers = me.now;
@@ -335,11 +339,6 @@ SStats *newserverstats(const char *name)
 	s->t_highest_ping = me.now;
 	s->t_lowest_ping = me.now;
 	sn = hnode_create(s);
-	if (hash_isfull(Shead)) {
-		nlog(LOG_CRITICAL, "StatServ Server hash is full!");
-		sfree(s);
-		return NULL;
-	}
 	hash_insert(Shead, sn, s->name);
 	return s;
 }

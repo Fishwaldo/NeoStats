@@ -146,10 +146,11 @@ void LoadServerStats(void)
 			s->daily_totusers = 0;
 			s->lowest_ping = s->highest_ping = s->daily_totusers = 0;
 			nlog(LOG_DEBUG1, "Loaded statistics for %s", s->name);
-			sn = hnode_create(s);
 			if (hash_isfull(Shead)) {
 				nlog(LOG_CRITICAL, "StatServ server hash full");
+				break;
 			} else {
+				sn = hnode_create(s);
 				hash_insert(Shead, sn, s->name);
 			}
 		}

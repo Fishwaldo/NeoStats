@@ -40,19 +40,19 @@ typedef struct ChanBot {
 #define MAX_CMD_LINE_LENGTH		350
 
 /* @brief Module Bot hash list */
-static hash_t *bh;
+static hash_t *bothash;
 /* @brief Module Chan Bot hash list */
-static hash_t *bch;
+static hash_t *botchanhash;
 
 int InitBots (void)
 {
-	bh = hash_create (B_TABLE_SIZE, 0, 0);
-	if(!bh) {
+	bothash = hash_create (B_TABLE_SIZE, 0, 0);
+	if(!bothash) {
 		nlog (LOG_CRITICAL, "Unable to create bot hash");
 		return NS_FAILURE;
 	}
-	bch = hash_create (C_TABLE_SIZE, 0, 0);
-	if(!bch) {
+	botchanhash = hash_create (C_TABLE_SIZE, 0, 0);
+	if(!botchanhash) {
 		nlog (LOG_CRITICAL, "Unable to create bot channel hash");
 		return NS_FAILURE;
 	}
@@ -61,8 +61,8 @@ int InitBots (void)
 
 int FiniBots (void)
 {
-	hash_destroy(bh);
-	hash_destroy(bch);
+	hash_destroy(bothash);
+	hash_destroy(botchanhash);
 	return NS_SUCCESS;
 }
 
@@ -77,31 +77,31 @@ void
 add_chan_bot (char *bot, char *chan)
 {
 	hnode_t *cbn;
-	ChanBot *mod_chan_bot;
+	ChanBot *chanbot;
 	lnode_t *bmn;
 	char *botname;
 
-	cbn = hash_lookup (bch, chan);
+	cbn = hash_lookup (botchanhash, chan);
 	if (!cbn) {
-		mod_chan_bot = smalloc (sizeof (ChanBot));
-		strlcpy (mod_chan_bot->chan, chan, CHANLEN);
-		mod_chan_bot->bots = list_create (B_TABLE_SIZE);
-		cbn = hnode_create (mod_chan_bot);
-		if (hash_isfull (bch)) {
-			nlog (LOG_CRITICAL, "add_chan_bot: eek, bot channel hash is full");
+		if (hash_isfull (botchanhash)) {
+			nlog (LOG_CRITICAL, "add_chan_bot: bot channel hash is full");
 			return;
 		}
-		hash_insert (bch, cbn, mod_chan_bot->chan);
+		chanbot = smalloc (sizeof (ChanBot));
+		strlcpy (chanbot->chan, chan, CHANLEN);
+		chanbot->bots = list_create (B_TABLE_SIZE);
+		cbn = hnode_create (chanbot);
+		hash_insert (botchanhash, cbn, chanbot->chan);
 	} else {
-		mod_chan_bot = hnode_get (cbn);
+		chanbot = hnode_get (cbn);
 	}
-	if (list_isfull (mod_chan_bot->bots)) {
+	if (list_isfull (chanbot->bots)) {
 		nlog (LOG_CRITICAL, "add_chan_bot: bot channel list is full adding channel %s", chan);
 		return;
 	}
 	botname = sstrdup (bot);
 	bmn = lnode_create (botname);
-	list_append (mod_chan_bot->bots, bmn);
+	list_append (chanbot->bots, bmn);
 	return;
 }
 
@@ -116,30 +116,30 @@ void
 del_chan_bot (char *bot, char *chan)
 {
 	hnode_t *cbn;
-	ChanBot *mod_chan_bot;
+	ChanBot *chanbot;
 	lnode_t *bmn;
 	char *botname;
 
-	cbn = hash_lookup (bch, chan);
+	cbn = hash_lookup (botchanhash, chan);
 	if (!cbn) {
 		nlog (LOG_WARNING, "del_chan_bot: can't find channel %s for botchanhash", chan);
 		return;
 	}
-	mod_chan_bot = hnode_get (cbn);
-	bmn = list_find (mod_chan_bot->bots, bot, comparef);
+	chanbot = hnode_get (cbn);
+	bmn = list_find (chanbot->bots, bot, comparef);
 	if (!bmn) {
 		nlog (LOG_WARNING, "del_chan_bot: can't find bot %s in %s in botchanhash", bot, chan);
 		return;
 	}
-	list_delete (mod_chan_bot->bots, bmn);
+	list_delete (chanbot->bots, bmn);
 	botname = lnode_get(bmn);
 	free (botname);
 	lnode_destroy (bmn);
-	if (list_isempty (mod_chan_bot->bots)) {
+	if (list_isempty (chanbot->bots)) {
 		/* delete the hash and list because its all over */
-		hash_delete (bch, cbn);
-		list_destroy (mod_chan_bot->bots);
-		sfree (mod_chan_bot->chan);
+		hash_delete (botchanhash, cbn);
+		list_destroy (chanbot->bots);
+		sfree (chanbot->chan);
 		hnode_destroy (cbn);
 	}
 }
@@ -156,17 +156,17 @@ list_bot_chans (CmdParams* cmdparams)
 	hscan_t hs;
 	hnode_t *hn;
 	lnode_t *ln;
-	ChanBot *mod_chan_bot;
+	ChanBot *chanbot;
 
 	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "BotChanDump:");
-	hash_scan_begin (&hs, bch);
+	hash_scan_begin (&hs, botchanhash);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
-		mod_chan_bot = hnode_get (hn);
-		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "%s:--------------------------------", mod_chan_bot->chan);
-		ln = list_first (mod_chan_bot->bots);
+		chanbot = hnode_get (hn);
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "%s:--------------------------------", chanbot->chan);
+		ln = list_first (chanbot->bots);
 		while (ln) {
 			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Bot Name: %s", (char *)lnode_get (ln));
-			ln = list_next (mod_chan_bot->bots, ln);
+			ln = list_next (chanbot->bots, ln);
 		}
 	}
 	return 0;
@@ -346,11 +346,11 @@ new_bot (char *bot_name)
 	botptr = smalloc (sizeof (Bot));
 	strlcpy (botptr->nick, bot_name, MAXNICK);
 	bn = hnode_create (botptr);
-	if (hash_isfull (bh)) {
-		chanalert (ns_botptr->nick, "Warning bot list is full");
+	if (hash_isfull (bothash)) {
+		nlog (LOG_CRITICAL, "new_bot: bot list is full");
 		return NULL;
 	}
-	hash_insert (bh, bn, botptr->nick);
+	hash_insert (bothash, bn, botptr->nick);
 	return botptr;
 }
 
@@ -391,7 +391,7 @@ findbot (char *bot_name)
 	hnode_t *bn;
 
 	SET_SEGV_LOCATION(); 
-	bn = hash_lookup (bh, bot_name);
+	bn = hash_lookup (bothash, bot_name);
 	if (bn) {
 		return (Bot *) hnode_get (bn);
 	}
@@ -411,9 +411,9 @@ del_ns_bot (char *bot_name)
 	hnode_t *bn;
 
 	SET_SEGV_LOCATION();
-	bn = hash_lookup (bh, bot_name);
+	bn = hash_lookup (bothash, bot_name);
 	if (bn) {
-		hash_delete (bh, bn);
+		hash_delete (bothash, bn);
 		botptr = hnode_get (bn);
 		del_all_bot_cmds(botptr);
 		hnode_destroy (bn);
@@ -448,18 +448,18 @@ bot_nick_change (char *oldnick, char *newnick)
 		nlog (LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", oldnick, newnick);
 		return NS_FAILURE;
 	}
-	bn = hash_lookup (bh, oldnick);
+	bn = hash_lookup (bothash, oldnick);
 	if (!bn) {
 		nlog (LOG_NOTICE, "Couldn't find bot %s in bot list", oldnick);
 		return NS_FAILURE;
 	}
 	botptr = hnode_get (bn);
 	/* remove old hash entry */
-	hash_delete (bh, bn);
+	hash_delete (bothash, bn);
 	nlog (LOG_DEBUG3, "Bot %s changed nick to %s", oldnick, newnick);
 	strlcpy (botptr->nick, newnick, MAXNICK);
 	/* insert new hash entry */
-	hash_insert (bh, bn, botptr->nick);
+	hash_insert (bothash, bn, botptr->nick);
 	/* send bot nick change */   
 	snick_cmd (oldnick, newnick);
 	return NS_SUCCESS;
@@ -480,7 +480,7 @@ list_bots (CmdParams* cmdparams)
 
 	SET_SEGV_LOCATION();
 	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Bot List:");
-	hash_scan_begin (&bs, bh);
+	hash_scan_begin (&bs, bothash);
 	while ((bn = hash_scan_next (&bs)) != NULL) {
 		botptr = hnode_get (bn);
 		if(botptr->moduleptr == 0) {
@@ -507,7 +507,7 @@ int	del_bots (Module *mod_ptr)
 	hnode_t *modnode;
 	hscan_t hscan;
 
-	hash_scan_begin (&hscan, bh);
+	hash_scan_begin (&hscan, bothash);
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		botptr = hnode_get (modnode);
 		if (botptr->moduleptr == mod_ptr) {

@@ -40,7 +40,7 @@ int RunLevel = 0;
 int del_all_bot_cmds(Bot* bot_ptr);
 
 /* @brief Module hash list */
-static hash_t *mh;
+static hash_t *modulehash;
 
 #ifdef SQLSRV
 
@@ -168,15 +168,15 @@ int
 InitModules ()
 {
 	SET_SEGV_LOCATION();
-	mh = hash_create (NUM_MODULES, 0, 0);
-	if(!mh) {
+	modulehash = hash_create (NUM_MODULES, 0, 0);
+	if(!modulehash) {
 		nlog (LOG_CRITICAL, "Unable to create module hash");
 		return NS_FAILURE;
 	}
 
 #ifdef SQLSRV
         /* add the module hash to the sql library */
-	neo_modules.address = mh;
+	neo_modules.address = modulehash;
 	rta_add_table(&neo_modules);
 #endif                      
 
@@ -185,7 +185,7 @@ InitModules ()
 
 int FiniModules (void) 
 {
-	hash_destroy(mh);
+	hash_destroy(modulehash);
 	return NS_SUCCESS;
 }
 
@@ -204,7 +204,7 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Bot* bot)
 	hnode_t *mn;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin (&ms, mh);
+	hash_scan_begin (&ms, modulehash);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
 		ev_list = module_ptr->event_list;
@@ -247,7 +247,7 @@ SendAllModuleEvent (Event event, CmdParams* cmdparams)
 	hnode_t *mn;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin (&ms, mh);
+	hash_scan_begin (&ms, modulehash);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
 		ev_list = module_ptr->event_list;
@@ -289,7 +289,7 @@ ModulesVersion (const char* nick, const char *remoteserver)
 	hnode_t *mn;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin (&ms, mh);
+	hash_scan_begin (&ms, modulehash);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
 		numeric(RPL_VERSION, nick,
@@ -314,7 +314,7 @@ load_module (char *modfilename, User * u)
 	char *dl_error;
 #endif /* HAVE_LIBDL */
 	void *dl_handle;
-	int do_msg;
+	int do_msg = 0;
 	char path[255];
 	char loadmodname[255];
 	char **av;
@@ -327,9 +327,15 @@ load_module (char *modfilename, User * u)
 	int (*ModInit) (Module * module_ptr);
 
 	SET_SEGV_LOCATION();
-	if (u == NULL) {
-		do_msg = 0;
-	} else {
+	if (hash_isfull (modulehash)) {
+		if (do_msg) {
+			chanalert (ns_botptr->nick, "Unable to load module: module list is full");
+			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: module list is full");
+		}
+		nlog (LOG_WARNING, "Unable to load module: module list is full");
+		return NULL;
+	} 
+	if (u) {
 		do_msg = 1;
 	}
 	strlcpy (loadmodname, modfilename, 255);
@@ -366,7 +372,7 @@ load_module (char *modfilename, User * u)
 		return NULL;
 	}
 	/* Check that the Module hasn't already been loaded */
-	if (hash_lookup (mh, info_ptr->name)) {
+	if (hash_lookup (modulehash, info_ptr->name)) {
 		ns_dlclose (dl_handle);
 		if (do_msg) {
 			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s already loaded", info_ptr->name);
@@ -379,17 +385,7 @@ load_module (char *modfilename, User * u)
 	/* Allocate module */
 	mod_ptr = (Module *) smalloc (sizeof (Module));
 	mn = hnode_create (mod_ptr);
-	if (hash_isfull (mh)) {
-		if (do_msg) {
-			chanalert (ns_botptr->nick, "Unable to load module: module list is full");
-			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: module list is full");
-		}
-		nlog (LOG_WARNING, "Unable to load module: module list is full");
-		ns_dlclose (dl_handle);
-		sfree (mod_ptr);
-		return NULL;
-	} 
-	hash_insert (mh, mn, info_ptr->name);
+	hash_insert (modulehash, mn, info_ptr->name);
 	nlog (LOG_DEBUG1, "Module Internal name: %s", info_ptr->name);
 	nlog (LOG_DEBUG1, "Module description: %s", info_ptr->description);
 	mod_ptr->info = info_ptr;
@@ -417,11 +413,9 @@ load_module (char *modfilename, User * u)
 		sfree (mod_ptr);
 		return NULL;
 	} else {
-		int err;
 		SET_SEGV_LOCATION();
 		SET_RUN_LEVEL(mod_ptr);
-		err = (*ModInit) (mod_ptr);
-		if (err < 1) {
+		if (((*ModInit) (mod_ptr)) < 1) {
 			nlog (LOG_NORMAL, "Unable to load module: %s. See %s.log for further information.", mod_ptr->info->name, mod_ptr->info->name);
 			unload_module(mod_ptr->info->name, NULL);
 			return NULL;
@@ -467,7 +461,7 @@ list_modules (CmdParams* cmdparams)
 	hscan_t hs;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin (&hs, mh);
+	hash_scan_begin (&hs, modulehash);
 	while ((mn = hash_scan_next (&hs)) != NULL) {
 		mod_ptr = hnode_get (mn);
 		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module: %s (%s)", mod_ptr->info->name, mod_ptr->info->version);
@@ -494,7 +488,7 @@ unload_module (const char *modname, User * u)
 
 	SET_SEGV_LOCATION();
 	/* Check to see if module is loaded */
-	modnode = hash_lookup (mh, modname);
+	modnode = hash_lookup (modulehash, modname);
 	if (!modnode) {
 		if (u) {
 			prefmsg (u->nick, ns_botptr->nick, "Module %s not loaded, try /msg %s modlist", modname, ns_botptr->nick);
@@ -516,7 +510,7 @@ unload_module (const char *modname, User * u)
 	/* Remove from the module hash so we dont call events for this module 
 	 * during signoff 
 	 */
-	hash_delete (mh, modnode);		
+	hash_delete (modulehash, modnode);		
 	/* call ModFini (replacement for library __fini() call */
 	ModFini = ns_dlsym ((int *) mod_ptr->dl_handle, "ModFini");
 	if (ModFini) {
@@ -559,7 +553,7 @@ void unload_modules(void)
 	hnode_t *mn;
 
 	/* Walk through hash list unloading each module */
-	hash_scan_begin (&ms, mh);
+	hash_scan_begin (&ms, modulehash);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		mod_ptr = hnode_get (mn);
 		unload_module (mod_ptr->info->name, NULL);
