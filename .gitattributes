@@ -129,6 +129,7 @@ doc/read-faq -text
 doc/read-userman -text
 /dotconf.c -text
 /dotconf.h -text
+/events.h -text
 /hash.c -text
 /hash.h -text
 /hybrid7.c -text
@@ -136,6 +137,8 @@ doc/read-userman -text
 /install-sh -text
 /ircd.c -text
 /ircd.h -text
+/ircstring.c -text
+/ircstring.h -text
 /keeper.c -text
 keeper/.indent.pro -text
 keeper/Makefile -text
@@ -169,6 +172,8 @@ logs/.keepme -text
 /sock.c -text
 /sock.h -text
 /stats.h -text
+/support.c -text
+/support.h -text
 /timer.c -text
 tools/Makefile.in -text
 tools/README.kptool -text
