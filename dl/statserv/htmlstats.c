@@ -32,17 +32,21 @@
 int bufsize;
 
 void get_map();
+#ifdef STATSERV_DOCHANS
 void get_top10chan();
+#endif
 char *strnrepl(char *, int size, const char *old, const char *new);
 void put_copyright();
 void get_srvlist();
 void get_srvlistdet();
 void get_netstats();
 void get_dailystats();
+#ifdef STATSERV_DOCHANS
 void get_chantops();
 void get_chantop10();
 void get_chantop10eva();
 void get_unwelcomechan();
+#endif
 void get_clientstats();
 void get_title();
 void get_tldmap();
@@ -133,6 +137,7 @@ void ss_html()
 			get_dailystats();
 			buf = buf1 + strlen("!DAILYSTATS!");
 		}
+#ifdef STATSERV_DOCHANS
 		buf1 = strstr(buf, "!DAILYTOPCHAN!");
 		if (buf1) {
 			startstr = strlen(buf) - strlen(buf1);
@@ -161,6 +166,7 @@ void ss_html()
 			get_chantops();
 			buf = buf1 + strlen("!TOP10TOPICS!");
 		}
+#endif
 		buf1 = strstr(buf, "!TLDMAP!");
 		if (buf1) {
 			startstr = strlen(buf) - strlen(buf1);
@@ -319,11 +325,13 @@ void get_netstats()
 	fprintf(opf,
 		"<tr><td colspan=2>Total Users Ever Connected</td><td colspan=2>%ld</td></tr>",
 		stats_network.totusers);
+#ifdef STATSERV_DOCHANS
 	fprintf(opf, "<tr><td>Current Channels: </td>\n");
 	fprintf(opf, "<td> %i </td>\n", (int)stats_network.chans);
 	fprintf(opf, "<td>Maximum Channels: </td>\n");
 	fprintf(opf, "<td> %ld [%s] </td></tr>\n", stats_network.maxchans,
 		sftime(stats_network.t_chans));
+#endif
 	fprintf(opf, "<tr><td>Current Opers: </td>\n");
 	fprintf(opf, "<td> %i </td>\n", (int)stats_network.opers);
 	fprintf(opf, "<td>Maximum Opers: </td>\n");
@@ -353,10 +361,12 @@ void get_dailystats()
 		"<tr><td colspan=\"2\">Total Users Connected:</td>\n");
 	fprintf(opf, "<td colspan=\"2\"> %-2d</td></tr>\n",
 		daily.tot_users);
+#ifdef STATSERV_DOCHANS
 	fprintf(opf,
 		"<tr><td colspan=\"2\">Max Channels:</td>\n");
 	fprintf(opf, "<td colspan=\"2\"> %-2ld</td></tr>\n",
 		(long)daily.chans);
+#endif
 	fprintf(opf, "<tr><td colspan=\"2\">Max Daily Opers: </td>\n");
 	fprintf(opf, "<td colspan=\"2\"> %-2d %s </td></tr>\n",
 		daily.opers, sftime(daily.t_opers));
@@ -367,6 +377,8 @@ void get_dailystats()
 		"<tr><td colspan=\"4\"><center>(All Daily Statistics are reset at Midnight)</center></td>\n");
 	fprintf(opf, "</tr></table>\n");
 }
+
+#ifdef STATSERV_DOCHANS
 
 void get_chantop10()
 {
@@ -443,6 +455,7 @@ void get_chantop10eva()
 	}
 	fprintf(opf, "</table>");
 }
+#endif
 void get_clientstats()
 {
 	CVersions *cv;
@@ -494,7 +507,7 @@ void get_tldmap()
 
 
 
-
+#ifdef STATSERV_DOCHANS
 void get_unwelcomechan()
 {
 	CStats *cs;
@@ -571,7 +584,7 @@ void get_chantops()
 	}
 	fprintf(opf, "</table>");
 }
-
+#endif
 
 void get_map(char *uplink, int level)
 {

@@ -30,7 +30,9 @@
 #include "sqlstats.h"
 #endif
 
+#ifdef STATSERV_DOCHANS
 static int ss_chans(User * u, char **av, int ac);
+#endif
 static int ss_daily(User * u, char **av, int ac);
 static int ss_stats(User * u, char **av, int ac);
 static int ss_tld_map(User * u, char **av, int ac);
@@ -68,12 +70,14 @@ EventFnList __module_events[] = {
 	{EVENT_SIGNOFF, s_del_user},
 	{EVENT_AWAY, s_user_away},
 	{EVENT_KILL, s_user_kill},
+#ifdef STATSERV_DOCHANS
 	{EVENT_NEWCHAN, s_chan_new},
 	{EVENT_DELCHAN, s_chan_del},
 	{EVENT_JOINCHAN, s_chan_join},
 	{EVENT_PARTCHAN, s_chan_part},
 	{EVENT_KICK, s_chan_kick},
 	{EVENT_TOPICCHANGE, s_topic_change},
+#endif
 	{EVENT_CLIENTVERSION, s_client_version},
 	{NULL, NULL}
 };
@@ -149,12 +153,14 @@ int __ModInit(int modnum, int apiver)
 #ifdef SQLSRV
 	lnode_t *lnode;
 #endif
+#ifdef STATSERV_DOCHANS
 	int count, i;
 	Chans *c;
-	char **av;
-	int ac = 0;
 	char *chan;
 	lnode_t *chanmem;
+#endif
+	char **av;
+	int ac = 0;
 
 	SET_SEGV_LOCATION();
 
@@ -198,6 +204,7 @@ int __ModInit(int modnum, int apiver)
 		ac = 0;
 		nlog(LOG_DEBUG2, LOG_CORE, "Add user %s to StatServ List", u->nick);
 	}
+#ifdef STATSERV_DOCHANS
 	hash_scan_begin(&scan, ch);
 	while ((node = hash_scan_next(&scan)) != NULL) {
 		c = hnode_get(node);
@@ -224,7 +231,7 @@ int __ModInit(int modnum, int apiver)
 			}
 		}
 	}
-
+#endif
 #ifdef SQLSRV
 	/* ok, now export the server and chan data into the sql emulation layers */
 
@@ -238,9 +245,10 @@ int __ModInit(int modnum, int apiver)
 	list_append(fakenetwork, lnode);
 	
 	/* find the address of each list/hash, and export to rta */
-	 
+#ifdef STATSERV_DOCHANS	 
 	statserv_chans.address = Chead;
 	rta_add_table(&statserv_chans);
+#endif
 	statserv_tld.address = Thead;
 	rta_add_table(&statserv_tld);
 	statserv_servers.address = Shead;
@@ -281,7 +289,9 @@ bot_cmd ss_commands[]=
 	{"VERSION",			ss_version,		0, 	0,		ss_help_version, 	 	ss_help_version_oneline},
 	{"SERVER",			ss_server,		0, 	0,		ss_help_server,		 	ss_help_server_oneline},
 	{"MAP",				ss_map,			0, 	0,		ss_help_map, 		 	ss_help_map_oneline},
+#ifdef STATSERV_DOCHANS
 	{"CHAN",			ss_chans,		0, 	0,		ss_help_chan, 		 	ss_help_chan_oneline},
+#endif
 	{"NETSTATS",		ss_netstats,	0, 	0,		ss_help_netstats, 	 	ss_help_netstats_oneline},
 	{"DAILY",			ss_daily,		0, 	0,		ss_help_daily, 		 	ss_help_daily_oneline},
 	{"TLDMAP",			ss_tld_map,		0, 	0,		ss_help_tldmap, 	 	ss_help_tldmap_oneline},
@@ -312,6 +322,7 @@ bot_setting ss_settings[]=
 	{NULL,			NULL,					0,					0, 0,			0,					NULL,				NULL,		NULL },
 };
 
+#ifdef STATSERV_DOCHANS
 int topchan(const void *key1, const void *key2)
 {
 	const CStats *chan1 = key1;
@@ -346,7 +357,7 @@ int topversions(const void *key1, const void *key2)
 	const CVersions *ver2 = key2;
 	return (ver2->count - ver1->count);
 }
-
+#endif
 static int ss_clientversions(User * u, char **av, int ac)
 {
 	CVersions *cv;
@@ -383,6 +394,7 @@ static int ss_clientversions(User * u, char **av, int ac)
 	return 1;
 }
 
+#ifdef STATSERV_DOCHANS
 static int ss_chans(User * u, char **av, int ac)
 {
 	CStats *cs;
@@ -553,7 +565,7 @@ static int ss_chans(User * u, char **av, int ac)
 	}
 	return 1;
 }
-
+#endif /* chans */
 static int ss_tld_map(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
@@ -590,9 +602,11 @@ static int ss_netstats(User * u, char **av, int ac)
 		stats_network.maxusers, sftime(stats_network.t_maxusers));
 	prefmsg(u->nick, s_StatServ, "Total Users Connected: %ld",
 		stats_network.totusers);
+#ifdef STATSERV_DOCHANS
 	prefmsg(u->nick, s_StatServ, "Current Channels %ld", stats_network.chans);
 	prefmsg(u->nick, s_StatServ, "Maximum Channels %ld [%s]",
 		stats_network.maxchans, sftime(stats_network.t_chans));
+#endif
 	prefmsg(u->nick, s_StatServ, "Current Opers: %ld",
 		stats_network.opers);
 	prefmsg(u->nick, s_StatServ, "Maximum Opers: %ld [%s]",
@@ -614,8 +628,10 @@ static int ss_daily(User * u, char **av, int ac)
 		daily.servers, sftime(daily.t_servers));
 	prefmsg(u->nick, s_StatServ, "Maximum Users: %-2d %s", daily.users,
 		sftime(daily.t_users));
+#ifdef STATSERV_DOCHANS
 	prefmsg(u->nick, s_StatServ, "Maximum Chans: %-2d %s", daily.chans,
 		sftime(daily.t_chans));
+#endif
 	prefmsg(u->nick, s_StatServ, "Maximum Opers: %-2d %s", daily.opers,
 		sftime(daily.t_opers));
 	prefmsg(u->nick, s_StatServ, "Total Users Connected: %-2d",

@@ -40,4 +40,5 @@
 #define Decreasemems(x)		x->members--;	x->lastseen = time(NULL);
 #define IncreaseChans()		stats_network.chans++;
 #define DecreaseChans()		stats_network.chans--;
+
 #endif

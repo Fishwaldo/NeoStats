@@ -36,11 +36,13 @@ void LoadOldStats();
 void SaveStats()
 {
 	SStats *s;
+#ifdef STATSERV_DOCHANS
 	CStats *c;
-	hnode_t *sn;
 	lnode_t *cn;
-	hscan_t ss;
 	int count, limit;
+#endif
+	hnode_t *sn;
+	hscan_t ss;
 	SET_SEGV_LOCATION();
 
 	if (StatServ.newdb == 1) {
@@ -83,6 +85,7 @@ void SaveStats()
 		hash_destroy(Shead);
 	}
 
+#ifdef STATSERV_DOCHANS
 	/* ok, Now Channel Stats */
 	count = 0;
 	/* we want to only do 25% each progressive save */
@@ -117,7 +120,7 @@ void SaveStats()
 	if (StatServ.shutdown == 1) {
 		list_destroy_nodes(Chead);
 	}
-
+#endif
 	/* and finally, the network data */
 
 	SetData((void *)stats_network.maxopers, CFGINT, "NetStats", "Global", "MaxOpers");
@@ -127,8 +130,10 @@ void SaveStats()
 	SetData((void *)stats_network.t_maxusers, CFGINT, "NetStats", "Global", "MaxUsersTime");
 	SetData((void *)stats_network.t_maxservers, CFGINT, "NetStats", "Global", "MaxServersTime");
 	SetData((void *)stats_network.totusers, CFGINT, "NetStats", "Global", "TotalUsers");
+#ifdef STATSERV_DOCHANS
 	SetData((void *)stats_network.maxchans, CFGINT, "NetStats", "Global", "MaxChans");
 	SetData((void *)stats_network.t_chans, CFGINT, "NetStats", "Global", "MaxChansTime");
+#endif
 	if (StatServ.shutdown == 1) {
 		chanalert(s_Services, "Done");
 	}
@@ -142,7 +147,9 @@ void LoadStats() {
 	int count;
 	
 	SET_SEGV_LOCATION();
+#ifdef STATSERV_DOCHANS
 	Chead = list_create(SS_CHAN_SIZE);
+#endif
 	Shead = hash_create(S_TABLE_SIZE, 0, 0);
 
 	if (GetData ((void *) &stats_network.maxopers, CFGINT, "NetStats", "Global", "MaxOpers") <= 0) {
@@ -158,9 +165,10 @@ void LoadStats() {
 	GetData((void *)&stats_network.t_maxusers, CFGINT, "NetStats", "Global", "MaxUsersTime");
 	GetData((void *)&stats_network.t_maxservers, CFGINT, "NetStats", "Global", "MaxServersTime");
 	GetData((void *)&stats_network.totusers, CFGINT, "NetStats", "Global", "TotalUsers");
+#ifdef STATSERV_DOCHANS
 	GetData((void *)&stats_network.maxchans, CFGINT, "NetStats", "Global", "MaxChans");
 	GetData((void *)&stats_network.t_chans, CFGINT, "NetStats", "Global", "MaxChansTime");
-
+#endif
 
 	/* ok, now load the server stats */
 	if (GetTableData("ServerStats", &row) > 0) {
@@ -195,51 +203,10 @@ void LoadStats() {
 		}
 	}       
 	free(row);                                 
-/* we now load channel data dynamically. */
-	/* ok, and now the channel stats. */
-#if 0
-	if (GetTableData("ChanStats", &row) > 0) {
-		for (count = 0; row[count] != NULL; count++) {
-			load_chan(row[count]);
-		}
-	}
-			c = malloc(sizeof(CStats));
-			strlcpy(c->name, row[count], CHANLEN);	
-			GetData((void *)&c->topics, CFGINT, "ChanStats", c->name, "Topics");
-			GetData((void *)&c->totmem, CFGINT, "ChanStats", c->name, "TotalMems");
-			GetData((void *)&c->kicks, CFGINT, "ChanStats", c->name, "Kicks");
-			GetData((void *)&c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
-			GetData((void *)&c->maxmems, CFGINT, "ChanStats", c->name, "MaxMems");
-			GetData((void *)&c->t_maxmems, CFGINT, "ChanStats", c->name, "MaxMemsTime");
-			GetData((void *)&c->maxkicks, CFGINT, "ChanStats", c->name, "MaxKicks");
-			GetData((void *)&c->t_maxkicks, CFGINT, "ChanStats", c->name, "MaxKicksTime");
-			GetData((void *)&c->maxjoins, CFGINT, "ChanStats", c->name, "MaxJoins");
-			GetData((void *)&c->t_maxjoins, CFGINT, "ChanStats", c->name, "MaxJoinsTime");
-			c->topicstoday = 0;
-			c->joinstoday = 0;
-			c->members = 0;
-			cn = lnode_create(c);
-			if (list_isfull(Chead)) {
-				nlog(LOG_CRITICAL, LOG_MOD,
-				     "Eeek, StatServ Channel Hash is Full!");
-			} else {
-				nlog(LOG_DEBUG2, LOG_MOD,
-				     "Loading %s Channel Data", c->name);
-				if ((me.now - c->lastseen) < 604800) {
-					list_append(Chead, cn);
-				} else {
-					nlog(LOG_DEBUG1, LOG_MOD,
-					     "Deleting Old Channel %s", c->name);
-					lnode_destroy(cn);
-					free(c);
-				}
-			}
-		}
-	}
-	free(row);
-#endif
 	StatServ.newdb = 0;
 }
+
+#ifdef STATSERV_DOCHANS
 
 /* @brief load the info for a specific channel from the database 
  * or return null a blank if it does not exist. 
@@ -410,7 +377,7 @@ void DelOldChan()
 	free(row);
 	nlog(LOG_INFO, LOG_MOD, "Took %d seconds to clean %d channel stats", (int)(time(NULL) - start), count);
 }
-
+#endif
 
 /* @brief This loads the old database format for statistics. This is depreciated and only
  * retained for backwards compatibility with old DB formats. will go away one day.
@@ -419,18 +386,20 @@ void LoadOldStats()
 {
 	FILE *fp = fopen("data/nstats.db", "r");
 	SStats *s;
+#ifdef STATSERV_DOCHANS
 	CStats *c;
+	char *topics, *totmem, *kicks, *maxmems, *t_maxmems, *maxkicks,
+	    *t_maxkicks, *maxjoins, *t_maxjoins;
+	int count;
+#endif
 	char buf[BUFSIZE];
 	char *tmp;
 	char *name, *numsplits, *maxusers, *t_maxusers,
 	    *maxopers, *t_maxopers, *lastseen, *starttime,
 	    *operkills, *serverkills, *totusers;
-	char *topics, *totmem, *kicks, *maxmems, *t_maxmems, *maxkicks,
-	    *t_maxkicks, *maxjoins, *t_maxjoins;
 
 
 	hnode_t *sn;
-	int count;
 	SET_SEGV_LOCATION();
 
 	if (fp) {
@@ -455,12 +424,16 @@ void LoadOldStats()
 			if (tmp == NULL) {
 				nlog(LOG_NOTICE, LOG_MOD,
 				     "Detected Old version (3.0) of Network Database, Upgrading");
+#ifdef STATSERV_DOCHANS
 				stats_network.maxchans = 0;
 				stats_network.t_chans = me.now;
+#endif
 			} else {
+#ifdef STATSERV_DOCHANS
 				stats_network.maxchans = atol(tmp);
 				tmp = strtok(NULL, "");
 				stats_network.t_chans = atol(tmp);
+#endif
 			}
 		}
 		StatServ.newdb = 0;
@@ -518,7 +491,7 @@ void LoadOldStats()
 	}
 	fclose(fp);
 	unlink("data/stats.db");
-	
+#ifdef STATSERV_DOCHANS	
 	if ((fp = fopen("data/cstats.db", "r")) == NULL)
 		return;
 	memset(buf, '\0', BUFSIZE);
@@ -560,24 +533,6 @@ void LoadOldStats()
 			save_chan(c);
 		}
 		free(c);
-#if 0		
-		cn = lnode_create(c);
-		if (list_isfull(Chead)) {
-			nlog(LOG_CRITICAL, LOG_MOD,
-			     "Eeek, StatServ Channel Hash is Full!");
-		} else {
-			nlog(LOG_DEBUG2, LOG_MOD,
-			     "Loading %s Channel Data", c->name);
-			if ((me.now - c->lastseen) < 604800) {
-				list_append(Chead, cn);
-			} else {
-				nlog(LOG_DEBUG1, LOG_MOD,
-				     "Deleting Old Channel %s", c->name);
-				lnode_destroy(cn);
-				free(c);
-			}
-		}
-#endif
 	}
 	free(name);
 	free(topics);
@@ -592,8 +547,6 @@ void LoadOldStats()
 	free(t_maxjoins);
 	fclose(fp);
 	unlink("data/cstats.db");
+#endif
 	SaveStats();
-
-
-
 }

@@ -29,9 +29,19 @@
 #include "neostats.h"
 #include "m_stats.h"
 
+/* define this to enable channel tracking in statserv 
+ * If NeoStats lags out with statserv enabled, channel tracking is most likely the cause
+ * so undefine this to improve performance 
+ */
+
+#define STATSERV_DOCHANS 1
+
+
+
+#ifdef STATSERV_DOCHANS
 /* this is the max number of statserv channels our database can hold... */
 #define SS_CHAN_SIZE -1
-
+#endif
 /* this is the how often to save a portion of the DB. Don't alter this unless you need to */
 /* DO NOT set PROGCHANTIME less than ((DBSAVETIME + (DBSAVETIME/2)) * 4) otherwise you will not have the enitre database progressively saved! */
 
@@ -46,16 +56,22 @@ extern ModuleInfo __module_info;
 typedef struct tld_ TLD;
 typedef struct region_ Region;
 typedef struct server_stats SStats;
+#ifdef STATSERV_DOCHANS
 typedef struct chan_stats CStats;
+#endif
 typedef struct irc_client_version CVersions;
 hash_t *Shead;
+#ifdef STATSERV_DOCHANS
 list_t *Chead;
+#endif
 list_t *Thead;
 list_t *Vhead;
 
 struct stats_network_ {
 	long opers;
+#ifdef STATSERV_DOCHANS
 	long chans;
+#endif
 	long maxopers;
 	long users;
 	long totusers;
@@ -66,8 +82,10 @@ struct stats_network_ {
 	time_t t_maxopers;
 	time_t t_maxusers;
 	time_t t_maxservers;
+#ifdef STATSERV_DOCHANS
 	long maxchans;
 	time_t t_chans;
+#endif
 } stats_network;
 
 
@@ -119,6 +137,7 @@ struct irc_client_version {
 	int count;
 };
 
+#ifdef STATSERV_DOCHANS
 struct chan_stats {
 	char name[CHANLEN];
 	long members;
@@ -139,7 +158,7 @@ struct chan_stats {
 	time_t t_maxjoins;
 	time_t lastsave;
 };
-
+#endif
 struct daily_ {
 	int servers;
 	time_t t_servers;
@@ -148,8 +167,10 @@ struct daily_ {
 	int opers;
 	time_t t_opers;
 	int tot_users;
+#ifdef STATSERV_DOCHANS
 	int chans;
 	time_t t_chans;
+#endif
 } daily;
 
 struct tld_ {
@@ -169,10 +190,12 @@ struct region_ {
 
 /* statserv.c */
 void statserv(char *);
+#ifdef STATSERV_DOCHANS
 int topchan(const void *key1, const void *key2);
 int topjoin(const void *key1, const void *key2);
 int topkick(const void *key1, const void *key2);
 int toptopics(const void *key1, const void *key2);
+#endif
 int topversions(const void *key1, const void *key2);
 /* stats.c */
 int s_client_version(char **av, int ac);
@@ -192,6 +215,7 @@ int s_new_user(char **av, int ac);
 int s_del_user(char **av, int ac);
 int s_user_modes(char **av, int ac);
 int s_user_kill(char **av, int ac);
+#ifdef STATSERV_DOCHANS
 int s_chan_new(char **av, int ac);
 int s_chan_del(char **av, int ac);
 int s_chan_join(char **av, int ac);
@@ -203,11 +227,12 @@ CStats *AddChanStats(char *);
 void DelOldChan();
 int s_topic_change(char **av, int ac);
 int s_chan_kick(char **av, int ac);
-
+#endif /* chanstats */
 /* database.c */
+#ifdef STATSERV_DOCHANS
 void save_chan(CStats *c);
 CStats *load_chan(char *name);
-
+#endif
 /* ss_help.c */
 extern const char *ss_help_about[];
 extern const char *ss_help_server[];
@@ -224,7 +249,9 @@ extern const char *ss_help_version[];
 extern const char *ss_help_stats[];
 extern const char *ss_help_htmlstats[];
 extern const char *ss_help_forcehtml[];
+#ifdef STATSERV_DOCHANS
 extern const char *ss_help_chan[];
+#endif
 extern const char *ss_help_set_htmlpath[];
 extern const char *ss_help_set_html[];
 extern const char *ss_help_set_exclusions[];
@@ -239,7 +266,9 @@ extern const char ss_help_about_oneline[];
 extern const char ss_help_version_oneline[];
 extern const char ss_help_server_oneline[];
 extern const char ss_help_map_oneline[];
+#ifdef STATSERV_DOCHANS
 extern const char ss_help_chan_oneline[];
+#endif
 extern const char ss_help_netstats_oneline[];
 extern const char ss_help_daily_oneline[];
 extern const char ss_help_tld_oneline[];

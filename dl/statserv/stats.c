@@ -185,6 +185,8 @@ int s_client_version(char **av, int ac)
 	return 1;
 }
 
+#ifdef STATSERV_DOCHANS
+
 int s_chan_new(char **av, int ac)
 {
 	long count;
@@ -362,6 +364,8 @@ CStats *AddChanStats(char *name)
 	return cs;
 }
 #endif
+
+#endif /* chanstats */
 int s_new_server(char **av, int ac)
 {
 	Server *s;
@@ -782,8 +786,10 @@ SStats *findstats(char *name)
 void Is_Midnight()
 {
 	struct tm *ltm = localtime(&me.now);
+#ifdef STATSERV_DOCHANS
 	lnode_t *cn;
 	CStats *c;
+#endif
 
 	SET_SEGV_LOCATION();
 	if (ltm->tm_hour == 0) {
@@ -799,9 +805,12 @@ void Is_Midnight()
 			daily.t_users = me.now;
 			daily.opers = stats_network.opers;
 			daily.t_opers = me.now;
+#ifdef STATSERV_DOCHANS
 			daily.chans = stats_network.chans;
 			daily.t_chans = me.now;
+#endif
 			ResetTLD();
+#ifdef STATSERV_DOCHANS
 			cn = list_first(Chead);
 			while (cn) {
 				c = lnode_get(cn);
@@ -812,7 +821,7 @@ void Is_Midnight()
 				c->t_maxmemtoday = me.now;
 				cn = list_next(Chead, cn);
 			}
-
+#endif
 		}
 	}
 }
