@@ -778,18 +778,21 @@ static void operlist(User* u)
 
 static int ss_operlist(CmdParams* cmdparams)
 {
-	char *flags;
+	char *flags = NULL;
 
 	SET_SEGV_LOCATION();
 	operlistaway = 0;
 	listindex = 0;
+	operlistserver = NULL;
 	if (cmdparams->ac == 0) {
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "Online IRCops:");
 		prefmsg(cmdparams->source.user->nick, ss_bot->nick, "ID  %-15s %-15s %-10s", 
 			"Nick", "Server", "Level");
 	}
-	flags = cmdparams->av[0];
-	operlistserver = cmdparams->av[1];
+	if (cmdparams->ac != 0) {
+		flags = cmdparams->av[0];
+		operlistserver = cmdparams->av[1];
+	}
 	if (flags && !ircstrcasecmp(flags, "NOAWAY")) {
 		operlistaway = 1;
 		flags = NULL;
