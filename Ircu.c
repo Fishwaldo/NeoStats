@@ -110,9 +110,7 @@ ChanModes chan_modes[] = {
 	/*{CMODE_SENDTS, 'b', 0, 1, 0},*/
 	{CMODE_DELAYJOINS, 'D', 0, 1, 0},
 	/*{CMODE_LISTED, 'b', 0, 1, 0},*/
-#ifdef NEFARIOUS
 	{CMODE_REGONLY, 'r', 0, 0, 0},
-#endif
 };
 
 UserModes user_umodes[] = {
