@@ -91,7 +91,7 @@ static void ss_Config(void)
 	if (GetConf((void *) &tmp, CFGSTR, "Nick") < 0) {
 		strlcpy(s_StatServ, "StatServ", MAXNICK);
 	} else {
-		strlcpy(s_StatServ, tmp, MAXUSER);
+		strlcpy(s_StatServ, tmp, MAXNICK);
 		free(tmp);
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "User") < 0) {
