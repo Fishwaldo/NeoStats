@@ -262,6 +262,12 @@ send_snetinfo (const char* from, const int prot, const char* cloak, const char* 
 }
 
 void
+send_netinfo (const char* from, const int prot, const char* cloak, const char* netname)
+{
+	sts (":%s %s 0 %d %d %s 0 0 0 :%s", from, (me.token ? TOK_NETINFO : MSG_NETINFO), (int)me.now, prot, cloak, netname);
+}
+
+void
 send_vctrl ()
 {
 	sts ("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, ircd_srv.nicklen, ircd_srv.modex, ircd_srv.gc, me.netname);
@@ -343,7 +349,7 @@ send_rakill (const char *host, const char *ident)
 void
 send_svinfo (void)
 {
-	sts ("%s %d %d 0 :%ld", (me.token ? TOK_SVINFO : MSG_SVINFO), TS_CURRENT, TS_MIN, (long)me.now);
+	sts ("%s %d %d 0 :%ld", MSG_SVINFO, TS_CURRENT, TS_MIN, (long)me.now);
 }
 
 void

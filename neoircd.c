@@ -220,6 +220,17 @@ send_pong (const char *reply)
 	sts ("%s %s", MSG_PONG, reply);
 }
 
+void
+send_snetinfo (const char* from, const int prot, const char* cloak, const char* netname)
+{
+	sts (":%s %s 0 %ld %d %s 0 0 0 :%s", from, MSG_SNETINFO, (long)me.now, prot, cloak, netname);
+}
+
+void
+send_netinfo (const char* from, const int prot, const char* cloak, const char* netname)
+{
+	sts (":%s %s 0 %ld %d %s 0 0 0 :%s", from, MSG_NETINFO, (long)me.now, prot, cloak, netname);
+}
 
 void 
 send_kill (const char *from, const char *target, const char *reason)

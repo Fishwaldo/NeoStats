@@ -244,6 +244,12 @@ send_snetinfo (const char* from, const int prot, const char* cloak, const char* 
 }
 
 void
+send_netinfo (const char* from, const int prot, const char* cloak, const char* netname)
+{
+	sts (":%s %s 0 %ld %d %s 0 0 0 :%s", from, MSG_NETINFO, (long)me.now, prot, cloak, netname);
+}
+
+void
 send_vctrl (void)
 {
 	sts ("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, ircd_srv.nicklen, ircd_srv.modex, ircd_srv.gc, me.netname);
