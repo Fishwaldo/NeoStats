@@ -1,0 +1,23 @@
+Win32 Build files
+
+NeoStats for Windows requires Microsoft Visual Studio .NET 2003. 
+It may or not build on other versions of Visual Studio.
+
+To build NeoStats for Windows, load the main solution and select build 
+solution from tghe Build menu.
+
+Main build files:
+nswin32.sln			- Main solution. 
+nscon.vcproj		- Project to build a Win32 console based app.
+nswindow.vcproj		- Project to build a Win32 GUI based app.
+
+Both the GUI and console apps depend on the following.
+
+Library build files:
+adns/adns.vcproj	- Project to build ADNS library for Win32.
+curl/curl.vcproj	- Project to build curl library for Win32.
+pcre/pcre.vcproj	- Project to build pcre library for Win32.
+
+Specific source files for Win32 are found in src/win32.
+
+

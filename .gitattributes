@@ -444,6 +444,7 @@ src/win32/neostats.bmp -text
 src/win32/neostats.rc -text
 src/win32/resource.h -text
 src/win32/winmain.c -text
+win32/README -text
 win32/adns/adns.vcproj -text
 win32/curl/curl.vcproj -text
 win32/nscon.vcproj -text
