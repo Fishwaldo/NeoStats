@@ -1,11 +1,26 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
-* NeoStats * Fish * Version 2.5.0-Beta3
- - Module event vars are now passed as a array of strings. Brings more flexibility to Module Events.
- - Fixed a bug with -ob channel mode changes, due to me not incrementing a counter.
- - Modules/Bots now can support Channel messages via the callback function __Chan_Message(char *chan, char **av, int ac) in the module
- - added a test to see when we are fully synced to the network so it doesn't flood network with statserv/connect server messages (look at is_synced)
- - Tidy ups and clean ups. 
- - Time to start porting modules to new event code (again! - Last time, I promise)
+
+* NeoStats * Fish & Shmad * Version 2.5.0-Beta3
+ - StatServ wont flood records now - hehe
+ - Fixed StatServ STATS - wont say incorrect syntax now unless it is! Fish must've been tired that night. (Shmad) 
+ - Fixed problem with some Ultimate modes in ConnectServ again that fish missed (Shmad)
+ - Removed remaining tidbits of old locking code (Shmad)
+ - Module event vars are now passed as a array of strings. Brings more flexibility to Module Events. (fish)
+ - Fixed a bug with -ob channel mode changes, due to me not incrementing a counter. (fish)
+ - Modules/Bots now can support Channel messages via the callback function __Chan_Message(char *chan, char **av, int ac) 
+   in the module (fish)
+ - added a test to see when we are fully synced to the network so it doesn't flood network with statserv/connect server 
+   messages (look at is_synced) (fish)
+ - Tidy ups and clean ups. (fish)
+ - Trust no one (especially people who keep changing event code :P) (Shmad)
+ - Time to start porting modules to new event code (again! - Last time, I promise) (fish)
+
+* NeoStats * Shmad * Version 2.5.0-Beta2c (Beta 2.2)
+ - Thanks to StarMaster for a nice suse box to test on.
+ - Fixed issue in ircd.c for compiling with Ultimate 2.x.x support.
+ - Fixed issue in Ultimate.c for compiling with Ultimate 2.x.x support. 
+ - Fixed problem with StatServ crashing on Ultimate2. 
+
 * NeoStats * Fish * Version 2.5.0-Beta2b
  - Major Reworking internals. Passing Variables now as a struct. Doing a lot of Pre-Processing before Passing Vars to functions or Modules
  - If message is from a user, assign userlevel in parse function, and made a macro to call a DEFINE that returns u->ulevel;
@@ -34,14 +49,14 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fixed a bug with channel modes limited to 50. This was bad, as some channels voice/op a lot more than 50 users! increased max to the max channel membership list (currently 1000) (fish)
  - Fixed a bug with the html stats in statserv. Fixes a HUGE problem with large networks, and seeminly random crashs after 1 hour (1 hour, becauses thats when the html pages are updated!) (Fish)
 
-* NeoStats * Fish * Version 2.5.0-Beta1
+* NeoStats * Fish & Shmad * Version 2.5.0-Beta1
  - Fixed makeconf for new stats.cfg options (Shmad)
  - Updated FAQ (Shmad)
  - Updated Misc. other things and fixed Fish's typos (Shmad)
- - Some updates to sock.c to detect zombie servers (Servers that we havn't recieved anything from for 180 seconds) and restart if thats the case
- - restart, reconnect code updated to unload the modules and re-execute stats from scrath
- - updates to statserv to support channels (top channel data)
- - template support for StatServ html output
+ - Some updates to sock.c to detect zombie servers (Servers that we havn't recieved anything from for 180 seconds) and restart if thats the case (fish)
+ - restart, reconnect code updated to unload the modules and re-execute stats from scrath (fish)
+ - updates to statserv to support channels (top channel data) (fish)
+ - template support for StatServ html output (fish)
 
 * NeoStats * Fish * Version 2.5.0-Alpha6
  - Removed the config option ModulePath, as its always dl/, so its hardcoded in.
