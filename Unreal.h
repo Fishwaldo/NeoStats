@@ -54,7 +54,7 @@
 #define GOTSVSKILL
 
 /* buffer sizes */
-#define MAXHOST			63
+#define MAXHOST			128
 #define MAXPASS			32
 #define MAXNICK			30
 #define MAXUSER			10
