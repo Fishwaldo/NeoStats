@@ -1,7 +1,9 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 ==============================================================================
-* NeoStats * Fish (F)* Version 2.5.7
- - Update parse() and splitbuf to suport IRCu
+* NeoStats * Fish (F) & Mark (M)*  Version 2.5.7
+ - Update parse() and splitbuf to suport IRCu (F)
+ - DCC exploit fix which should also address other segfaults with long messages to connected bots (M)
+ - Fix for statserv map command (M)
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.6
  - Added MrAllThats Colourisation of ConnectServ Messages (F)
  - Fixed ConnectServ to not show notices for local events (BugID: 44) (F)
