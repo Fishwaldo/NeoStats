@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.c,v 1.1 2000/02/03 23:46:03 fishwaldo Exp $
+** $Id: statserv.c,v 1.2 2000/02/04 00:48:16 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -20,6 +20,7 @@ static void ss_botlist(User *origuser);
 static void ss_version(User *u);
 static int Online();
 static void ss_cb_Config(char *, int);
+static int new_m_version(char *av, char *tmp);
 
 char s_StatServ[MAXNICK] = "StatServ";
 
@@ -31,6 +32,7 @@ Module_Info Statserv_Info[] = { {
 } };
 
 Functions StatServ_fn_list[] = { 
+	{ "VERSION",	new_m_version,	1 },
 	{ NULL,		NULL, 	0}
 };
 
@@ -57,6 +59,12 @@ static config_option options[] = {
 { "STATSERV_USER", ARG_STR, ss_cb_Config, 1},
 { "STATSERV_HOST", ARG_STR, ss_cb_Config, 2}
 };
+
+
+int new_m_version(char *av, char *tmp) {
+	sts(":%s 351 %s :Module StatServ Loaded, Version: %s %s %s",me.name,av,Statserv_Info[0].module_version,version_date,version_time);
+	return 0;
+}
 
 void _init() {
 	sts(":%s GLOBOPS :StatServ Module Loaded", me.name);
@@ -94,6 +102,8 @@ void ss_cb_Config(char *arg, int configtype) {
 	if (configtype == 0) {
 		/* Nick */
 		memcpy(StatServ.nick, arg, MAXNICK);
+		memcpy(s_StatServ, StatServ.nick, MAXNICK);
+		log("Statserv nick :%s ", arg);
 	} else if (configtype == 1) {
 		/* User */
 		memcpy(StatServ.user, arg, 8);

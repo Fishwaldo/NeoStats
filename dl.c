@@ -170,20 +170,25 @@ int add_mod_user(char *nick, char *mod_name) {
 	
 	segv_location = "add_mod_user";
 	Mod_Usr_list = (Mod_User *)malloc(sizeof(Mod_User));
-	
 	bzero(Mod_Usr_list, sizeof(Mod_User));
 
-	while (module_bot_lists->nick != NULL) {
-		log("Bots1: %s",module_bot_lists->nick);
-		module_bot_lists = module_bot_lists->next;
-		log("Bots2: %s",module_bot_lists->nick);
-	}
-
-	module_bot_lists->next = Mod_Usr_list;
-	Mod_Usr_list->prev = module_bot_lists;
-	Mod_Usr_list->nick = sstrdup(nick);
-	Mod_Usr_list->modname = sstrdup(mod_name);
-		
+	if (module_bot_lists->nick == NULL) {
+		log("New Bots");
+		/* add a brand new user */
+		Mod_Usr_list->nick = sstrdup(nick);
+		Mod_Usr_list->modname = sstrdup(mod_name);
+		module_bot_lists = Mod_Usr_list;		
+	} else {
+		log("old Bots");
+		while (module_bot_lists->next != NULL) {
+			log("Bots1: %s",module_bot_lists->nick);
+			module_bot_lists = module_bot_lists->next;
+		}
+		module_bot_lists->next = Mod_Usr_list;	
+		Mod_Usr_list->prev = module_bot_lists;
+		Mod_Usr_list->nick = sstrdup(nick);
+		Mod_Usr_list->modname = sstrdup(mod_name);
+	}		
 	list_ptr = module_list->next;
 	while (list_ptr != NULL) {
 		if (!strcasecmp(list_ptr->info->module_name, mod_name)) {
