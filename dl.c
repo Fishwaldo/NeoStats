@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.53 2003/04/18 06:41:34 fishwaldo Exp $
+** $Id: dl.c,v 1.54 2003/04/30 13:10:49 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -161,22 +161,21 @@ int add_socket(char *readfunc, char *writefunc, char *errfunc, char *sock_name, 
 	Sock_List *Sockets_mod_list;
 
 	strcpy(segv_location, "add_Socket");
-
 	if (readfunc) {
 		if (dlsym((int *)get_dl_handle(mod_name), readfunc) == NULL) {
-			nlog(LOG_WARNING, LOG_CORE, "oh oh, the socket function doesn't exist");
+			nlog(LOG_WARNING, LOG_CORE, "oh oh, the Read socket function doesn't exist = %s (%s)", readfunc, mod_name);
 			return -1;
 		}
 	}
 	if (writefunc) {
 		if (dlsym((int *)get_dl_handle(mod_name), writefunc) == NULL) {
-			nlog(LOG_WARNING, LOG_CORE, "oh oh, the socket function doesn't exist");
+			nlog(LOG_WARNING, LOG_CORE, "oh oh, the Write socket function doesn't exist = %s (%s)", writefunc, mod_name);
 			return -1;
 		}
 	}
 	if (errfunc) {
 		if (dlsym((int *)get_dl_handle(mod_name), errfunc) == NULL) {
-			nlog(LOG_WARNING, LOG_CORE, "oh oh, the socket function doesn't exist");
+			nlog(LOG_WARNING, LOG_CORE, "oh oh, the Error socket function doesn't exist = %s (%s)", errfunc, mod_name);
 			return -1;
 		}
 	}	

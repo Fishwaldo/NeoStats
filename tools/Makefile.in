@@ -1,6 +1,6 @@
 include ../Makefile.inc
 
-INCLUDES = -I.. -I../keeper/ -I../adns/ -DHAVE_CONFIG_H 
+INCLUDES = -I.. -I../keeper/ -I../adns/ -DHAVE_CONFIG_H -DDST_DIR=@prefix@
 
 KP_SOURCES= kp_exp.c kp_imp.c kptool.c
 KP_OBJECTS= kp_exp.o kp_imp.o kptool.o

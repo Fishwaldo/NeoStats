@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.h,v 1.3 2003/04/18 06:41:34 fishwaldo Exp $
+** $Id: conf.h,v 1.4 2003/04/30 13:10:48 fishwaldo Exp $
 */
 
 
@@ -54,13 +54,8 @@ struct config {
 	unsigned int foreground : 1;
 } config;
 
-#define GetDir(x, y) kp_get_dir(x,y,NULL);
-
 int GetConf(void **data, int type, const char *item);
 int SetConf(void *data, int type, char *item);
-
-/* need this to stop modules complaining */
-int   kp_get_dir     (const char *keypath, char ***keysp, unsigned int *nump);
-
+int GetDir(char *item, char ***data);
 
 #endif

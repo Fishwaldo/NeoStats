@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: keeper.c,v 1.7 2003/04/18 06:41:34 fishwaldo Exp $
+** $Id: keeper.c,v 1.8 2003/04/30 13:10:50 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -68,6 +68,30 @@ int GetConf(void **data, int type, const char *item) {
 	} 
 	return 1;
 }
+
+/* @brief return a array of strings containing all subkeys in a directory */
+
+int GetDir(char *item, char ***data) {
+	int i;
+	char keypath[255];
+	char **data1;
+
+	/* determine if its a module setting */
+	if (strlen(segvinmodule) > 0) {
+		snprintf(keypath, 255, "g/%s:/%s", segvinmodule, item);
+	} else {
+		snprintf(keypath, 255, "g/core:/%s", item);
+	}
+	i = kp_get_dir(keypath, &data1, NULL);
+	if (i == 0) {
+		*data = data1;
+		return 1;
+	} 
+	*data = NULL;
+	nlog(LOG_DEBUG1, LOG_CORE, "GetDir: %s - Path: %s", kp_strerror(i), keypath);
+	return -1;
+		
+}	
 
 
 
