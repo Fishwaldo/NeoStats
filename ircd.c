@@ -1,6 +1,6 @@
 /* NeoStats - IRC Statistical Services Copyright (c) 1999-2001 NeoStats Group Inc.
 ** Adam Rutter, Justin Hammond & 'Niggles' http://www.neostats.net
-*
+**
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NeoStats Identification:
@@ -805,9 +805,15 @@ void Usr_Nick(char *origin, char **argv, int argc) {
 }
 void Usr_Topic(char *origin, char **argv, int argc) {
 	char *buf;
-	buf = joinbuf(argv, argc, 3);
-	Change_Topic(argv[1], findchan(argv[0]), atoi(argv[2]), buf);
-	free(buf);
+	Chans *c;
+	c = findchan(argv[0]);
+	if (c) {
+		buf = joinbuf(argv, argc, 3);
+		Change_Topic(argv[1], c, atoi(argv[2]), buf);
+		free(buf);
+	} else {
+		log("Ehhh, Can't find Channel %s", argv[0]);
+	}
 
 }
 
