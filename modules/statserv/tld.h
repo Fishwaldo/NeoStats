@@ -34,6 +34,7 @@ typedef void (*TLDStatHandler) (TLD *tld, void *v);
 
 extern list_t *tldstatlist;
 
+void AddTLDUser (Client * u);
 void DelTLDUser (Client * u);
 int ss_cmd_tldmap (CmdParams *cmdparams);
 int ss_event_nickip (CmdParams *cmdparams);

@@ -75,6 +75,7 @@ static void AddUser (Client * u, void *v)
 	SET_SEGV_LOCATION();
 	AddServerUser (u);
 	AddNetworkUser ();
+	AddTLDUser (u);
 }
 
 static void DelUser (Client * u)

@@ -172,7 +172,9 @@ int IncStatistic (statistic *stat)
 
 void DecStatistic (statistic *stat)
 {
-	stat->current--;
+	if (stat->current > 0) {
+		stat->current--;
+	}
 }
 
 static int check_interval()

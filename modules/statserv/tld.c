@@ -134,6 +134,31 @@ void DelTLDUser (Client * u)
 	DecStatistic (&t->users);		
 }
 
+void AddTLDUser (Client *u)
+{
+	const char *country_name;
+	const char *country_code;
+	TLD *t = NULL;
+
+	if (!gi) {
+		return;
+	}	
+	country_code = GeoIP_country_code_by_addr(gi, u->hostip);
+	if (country_code) {
+		t = lnode_find (tldstatlist, country_code, findcc);
+		if (!t) {
+			country_name = GeoIP_country_name_by_addr(gi, u->hostip);
+			t = ns_malloc(sizeof(TLD));
+			strlcpy(t->tld, country_code, 5);
+			strlcpy(t->country, country_name, 32);
+			lnode_create_append (tldstatlist, t);
+		}
+	} else {
+		t = lnode_find (tldstatlist, UNKNOWN_COUNTRY_CODE, findcc);
+	}
+	IncStatistic (&t->users);
+}
+	
 /** @brief AddTLD
  *
  *  Add a TLD to the current stats
@@ -144,28 +169,8 @@ void DelTLDUser (Client * u)
  */
 int ss_event_nickip (CmdParams *cmdparams)
 {
-	const char *country_name;
-	const char *country_code;
-	TLD *t = NULL;
-	
 	SET_SEGV_LOCATION();
-	if (!gi) {
-		return NS_SUCCESS;
-	}	
-	country_code = GeoIP_country_code_by_addr(gi, cmdparams->source->hostip);
-	if (country_code) {
-		t = lnode_find (tldstatlist, country_code, findcc);
-		if (!t) {
-			country_name = GeoIP_country_name_by_addr(gi, cmdparams->source->hostip);
-			t = ns_malloc(sizeof(TLD));
-			strlcpy(t->tld, country_code, 5);
-			strlcpy(t->country, country_name, 32);
-			lnode_create_append (tldstatlist, t);
-		}
-	} else {
-		t = lnode_find (tldstatlist, UNKNOWN_COUNTRY_CODE, findcc);
-	}
-	IncStatistic (&t->users);
+	AddTLDUser (cmdparams->source);
 	return NS_SUCCESS;
 }
 
@@ -192,7 +197,7 @@ void LoadTLDStats (void)
 		for (i = 0; data[i] != NULL; i++) {
 			if (strncmp (data[i], "???", 5) != 0)
 			{
-				t = ns_malloc (sizeof (TLD));
+				t = ns_calloc (sizeof (TLD));
 				strlcpy (t->tld, data[i], 5);
 				LoadStatistic (&t->users, "TLD", t->tld, "users");
 				lnode_create_append (tldstatlist, t);

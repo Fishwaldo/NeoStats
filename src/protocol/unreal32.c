@@ -166,8 +166,7 @@ mode_init user_umodes[] = {
 	{'s', UMODE_SERVNOTICE},
 	{'q', UMODE_KIX},
 	{'B', UMODE_BOT,		BOTMODE},
-/* temp removal of deaf for SVSMODE Services Stamp */
-/* 	{'d', UMODE_DEAF},*/
+ 	{'d', UMODE_DEAF},
 	{'R', UMODE_RGSTRONLY},
  	{'T', UMODE_NOCTCP},
 	{'V', UMODE_WEBTV},
