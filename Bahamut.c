@@ -122,8 +122,8 @@ ChanModes chan_modes[] = {
 
 UserModes user_umodes[] = {
 	{UMODE_SERVICESADMIN, 'a', NS_ULEVEL_ROOT},
-	{UMODE_SERVADMIN, 'A', 100},
-	{UMODE_OPER, 'o', 50},
+	{UMODE_SERVADMIN, 'A', NS_ULEVEL_ADMIN},
+	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
 	{UMODE_INVISIBLE, 'i', 0},
 	{UMODE_REGNICK, 'r', 0},
 	{UMODE_REGONLY, 'R', 0},
