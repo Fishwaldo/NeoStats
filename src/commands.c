@@ -23,7 +23,6 @@
 
 /*  TODO:
  *  - More error processing
- *  - /msg BOTNAME HELP vs /msg BOTNAME HELP COMMAND frees NULL ptr???
  *  - Fix LEVELS command for SET and other intrinsics
  */
 
@@ -414,6 +413,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 	strlcpy( privmsgbuffer, cmdparams->param, BUFSIZE );
 	ac = split_buf( privmsgbuffer, &av, 0 );
 	cmdparams->cmd = av[0];
+	cmdparams->ac = 0;
 	for( i = 1; i < ac; i++ ) {
 		AddStringToList( &cmdparams->av, av[i], &cmdparams->ac );
 	}
@@ -468,8 +468,10 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 			}
 		}
 	}
-	ns_free( av );
-	ns_free( cmdparams->av );
+	if( ac )
+		ns_free( av );
+	if( cmdparams->ac )
+		ns_free( cmdparams->av );
 	return cmdret;
 }
 
