@@ -108,33 +108,6 @@
 #define bzero(x, y)		memset(x, '\0', y);
 #define is_synced		me.synced
 
-/* 	Buffer overrun protection (Work in progress) */
-/* DO NOT ENABLE THIS, OR NEOSTATS MAY NOT RUN CORRECTLY */
-/*#define BUFFER_OVERRUN_PROTECTION*/
-#ifdef BUFFER_OVERRUN_PROTECTION
-/*  Note, this is considered a short term solution for 2.5.6 to avoid
-    lots of MAX-1 in the code and without rewriting everything immediately
-	including all modules used with NeoStats
-	Investigate a better solution for 2.5.7 and propogate throughout the code
-	There are also some remaining calls to strcpy and sprintf mainly
-	in lib type stuff like http which should be ported to the system
-	in 2.5.7 when complete.
-	Two functions are considered vulnerable: strncpy and snprintf.
-	They are addressed below by redirecting to a core wrapper function
-	which will address the overflow issues identified.
-*/
-/*	strncpy */
-#undef strncpy
-char *ns_strncpy(char *s1, const char *s2, size_t n);
-#define strncpy ns_strncpy
-
-/*  snprintf */
-int	ns_snprintf(char *string, size_t size, const char *format, ...);
-#undef snprintf
-#define snprintf ns_snprintf
-#endif /* BUFFER_OVERRUN_PROTECTION */
-/*  End buffer overflow protection */
-
 #define SEGV_LOCATION_BUFSIZE	255
 #ifdef LEAN_AND_MEAN
 #define SET_SEGV_LOCATION()
