@@ -212,8 +212,9 @@ void put_copyright()
 	fprintf(opf, "<br><br><center>Statistics last updated at %s<br>",
 		sftime(time(NULL)));
 	fprintf(opf, "<b>StatServ Information:</b>\n");
-	fprintf(opf, "<br> %s - %s Compiled %s at %s\n", me.name, __module_info.module_name,
-		version_date, version_time);
+	fprintf(opf, "<br> %s compiled on %s at %s\n", me.name, version_date, version_time);
+	fprintf(opf, "<br> %s compiled on %s at %s\n", __module_info.module_name,
+		__module_info.module_build_date, __module_info.module_build_time);
 	fprintf(opf,
 		"<br><a href=\"http://www.neostats.net\">http://www.neostats.net</a>\n");
 	fprintf(opf, "</center></html>\n");
