@@ -34,8 +34,6 @@ AC_PROG_LIBTOOL
 AC_PROG_YACC 
 AC_PATH_PROG( SED, sed, , $PATH:/usr/bin:/usr/local/bin)
 
-AC_SYS_LARGEFILE
-
 # Checks for libraries.
 AC_LIB_LTDL
 
@@ -177,84 +175,12 @@ AC_FUNC_STRNLEN
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(strnlen strlcpy strlcat strndup)
-CURL_CHECK_NONBLOCKING_SOCKET
-AC_DEFINE(DISABLED_THREADSAFE, 1, Set to explicitly specify we don't want to use thread-safe functions in curl)
 
 dnl backtrace is used for segv reporting
 AC_CHECK_FUNC(backtrace, 
 [AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available')
 LIBS="-g $LIBS"]
 )
-
-dnl gethostbyname in the nsl lib?
-AC_CHECK_FUNC(gethostbyname, , [ AC_CHECK_LIB(nsl, gethostbyname) ])
-
-if test "$ac_cv_lib_nsl_gethostbyname" != "yes" -a "$ac_cv_func_gethostbyname" != "yes"; then
-  dnl gethostbyname in the socket lib?
-  AC_CHECK_FUNC(gethostbyname, , [ AC_CHECK_LIB(socket, gethostbyname) ])
-fi
-
-dnl At least one system has been identified to require BOTH nsl and
-dnl socket libs to link properly.
-if test "$ac_cv_lib_nsl_gethostbyname" != "yes" -a "$ac_cv_lib_socket_gethostbyname" != "yes" -a "$ac_cv_func_gethostbyname" != "yes"; then
-  AC_MSG_CHECKING([trying both nsl and socket libs])
-  my_ac_save_LIBS=$LIBS
-  LIBS="-lnsl -lsocket $LIBS"
-  AC_TRY_LINK( ,
-             [gethostbyname();],
-             my_ac_link_result=success,
-             my_ac_link_result=failure )
-
-  if test "$my_ac_link_result" = "failure"; then
-    AC_MSG_RESULT([no])
-    AC_MSG_ERROR([couldn't find libraries for gethostbyname()])
-    dnl restore LIBS
-    LIBS=$my_ac_save_LIBS
-  else
-    AC_MSG_RESULT([yes])
-  fi
-fi
-
-dnl resolve lib?
-AC_CHECK_FUNC(strcasecmp, , [ AC_CHECK_LIB(resolve, strcasecmp) ])
-
-if test "$ac_cv_lib_resolve_strcasecmp" = "$ac_cv_func_strcasecmp"; then
-  AC_CHECK_LIB(resolve, strcasecmp,
-              [LIBS="-lresolve $LIBS"],
-               ,
-               -lnsl)
-fi
-
-dnl socket lib?
-AC_CHECK_FUNC(connect, , [ AC_CHECK_LIB(socket, connect) ])
-
-AC_MSG_CHECKING([if argv can be written to])
-AC_CACHE_VAL(curl_cv_writable_argv, [
-AC_RUN_IFELSE([[
-int main(int argc, char ** argv) {
-	argv[0][0] = ' ';
-	return (argv[0][0] == ' ')?0:1;
-}
-	]],
-	curl_cv_writable_argv=yes,
-	curl_cv_writable_argv=no,
-	curl_cv_writable_argv=cross)
-])
-case $curl_cv_writable_argv in
-yes)
-	AC_DEFINE(HAVE_WRITABLE_ARGV, 1, [Define this symbol if your OS supports changing the contents of argv])
-	AC_MSG_RESULT(yes)
-	;;
-no)
-	AC_MSG_RESULT(no)
-	;;
-*)
-        AC_MSG_RESULT(no)
-        AC_MSG_WARN([the previous check could not be made default was used])
-	;;
-esac
-
-
 
 dnl **** Check for underscore on external symbols ****
 
@@ -278,37 +204,6 @@ fi
 dnl check for berkeley db support
 AC_CHECK_HEADER(db.h, AC_DEFINE(HAVE_DB_H, 1, [Define to 1 if you have the <db.h> header file.])
 				AC_CHECK_LIB(db, db_create, LIBDB="-ldb"))
-
-
-AC_MSG_CHECKING([if we need -no-undefined])
-case $host in
-  *-*-cygwin | *-*-mingw* | *-*-pw32*)
-    need_no_undefined=yes
-    ;;
-  *)
-    need_no_undefined=no
-    ;;
-esac
-AC_MSG_RESULT($need_no_undefined)
-dnl AM_CONDITIONAL(NO_UNDEFINED, test x$need_no_undefined = xyes)
-
-AC_MSG_CHECKING([if we need -mimpure-text])
-case $host in
-  *-*-solaris2*)
-    if test "$GCC" = "yes"; then
-      mimpure="yes"
-    fi
-    ;;
-  *)
-    mimpure=no
-    ;;
-esac
-AC_MSG_RESULT($mimpure)
-dnl AM_CONDITIONAL(MIMPURE, test x$mimpure = xyes)
-
-
-dnl AC_CONFIG_SUBDIRS(src/libltdl)
-
 
 
 do_extauth=no
@@ -642,18 +537,9 @@ else
 fi
 
 
-dnl PCRE options
-NPCRE_MAJOR_VERSION=4
-NPCRE_MINOR_VERSION=3
-NPCRE_VERSION=$PCRE_MAJOR_VERSION.$PCRE_MINOR_VERSION
 
-AC_DEFINE(LINK_SIZE, 2, "PCRE Lnk size")
-AC_DEFINE(POSIX_MALLOC_THRESHOLD, 5, "Malloc Threshold")
-AC_DEFINE(MATCH_LIMIT, 10000000, "PCRE Match limit")
-
-AC_DEFINE(PCRE_MAJOR_VERSION, $NPCRE_MAJOR_VERSION, "PCRE Version")
-AC_DEFINE(PCRE_MINOR_VERSION, NPCRE_MINOR_VERSION, "PCRE Version")
-AC_DEFINE(PCRE_VERSION, NPCRE_VERSION, "Pcre full version")
+AX_PATH_LIB_PCRE
+AX_PATH_LIB_CURL
 
 AC_DEFINE_UNQUOTED(NS_HOST, "$host_os", "Operating System Host")
 

@@ -67,9 +67,9 @@
 #define API_VER 3
 
 #include "version.h"
+#include "pcre.h"
 
 #include "adns.h"
-#include "pcre.h"
 #include "list.h"
 #include "hash.h"
 #include "support.h"

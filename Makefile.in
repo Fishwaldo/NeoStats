@@ -48,6 +48,10 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BUILD_CURL_FALSE = @BUILD_CURL_FALSE@
+BUILD_CURL_TRUE = @BUILD_CURL_TRUE@
+BUILD_PCRE_FALSE = @BUILD_PCRE_FALSE@
+BUILD_PCRE_TRUE = @BUILD_PCRE_TRUE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -55,6 +59,8 @@ CONVENIENCE_LTDL_FALSE = @CONVENIENCE_LTDL_FALSE@
 CONVENIENCE_LTDL_TRUE = @CONVENIENCE_LTDL_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CURL_CFLAGS = @CURL_CFLAGS@
+CURL_LIBS = @CURL_LIBS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -101,6 +107,8 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PCRE_CFLAGS = @PCRE_CFLAGS@
+PCRE_LIBS = @PCRE_LIBS@
 POW_LIB = @POW_LIB@
 PROTOCOL = @PROTOCOL@
 RANLIB = @RANLIB@
@@ -207,7 +215,7 @@ $(top_builddir)/config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 $(srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
 	cd $(srcdir) && $(AUTOCONF)
 
-$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in autotools/acinclude.m4 autotools/aclocal.m4 autotools/ax_maintainer_mode_auto_silent.m4
+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in autotools/acinclude.m4 autotools/aclocal.m4 autotools/ax_maintainer_mode_auto_silent.m4 autotools/ax_path_lib_curl.m4 autotools/ax_path_lib_pcre.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 cronchk: $(top_builddir)/config.status cronchk.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

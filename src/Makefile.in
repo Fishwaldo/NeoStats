@@ -48,6 +48,10 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BUILD_CURL_FALSE = @BUILD_CURL_FALSE@
+BUILD_CURL_TRUE = @BUILD_CURL_TRUE@
+BUILD_PCRE_FALSE = @BUILD_PCRE_FALSE@
+BUILD_PCRE_TRUE = @BUILD_PCRE_TRUE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -55,6 +59,8 @@ CONVENIENCE_LTDL_FALSE = @CONVENIENCE_LTDL_FALSE@
 CONVENIENCE_LTDL_TRUE = @CONVENIENCE_LTDL_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CURL_CFLAGS = @CURL_CFLAGS@
+CURL_LIBS = @CURL_LIBS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -101,6 +107,8 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PCRE_CFLAGS = @PCRE_CFLAGS@
+PCRE_LIBS = @PCRE_LIBS@
 POW_LIB = @POW_LIB@
 PROTOCOL = @PROTOCOL@
 RANLIB = @RANLIB@
@@ -156,7 +164,13 @@ sharedstatedir = @sharedstatedir@
 sqlsrvbuild = @sqlsrvbuild@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-SUBDIRS = protocol curl keeper adns libltdl pcre modules
+@BUILD_PCRE_TRUE@PCREDIR = pcre
+@BUILD_PCRE_FALSE@PCREDIR = 
+@BUILD_CURL_FALSE@CURLDIR = 
+
+@BUILD_CURL_TRUE@CURLDIR = curl
+
+SUBDIRS = protocol $(CURLDIR) keeper adns libltdl $(PCREDIR) modules
 
 bin_PROGRAMS = neostats
 
@@ -166,9 +180,9 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c
 
-AM_CFLAGS = -Ipcre -Iadns -Icurl -Ikeeper @INCLTDL@
-neostats_LDADD = protocol/libprotocol.a curl/libcurl.la keeper/libkeeper.a \
-		adns/libadns.la libltdl/libltdlc.la pcre/libpcre.la
+AM_CFLAGS = @PCRE_CFLAGS@ -Iadns -Ikeeper @INCLTDL@ @CURL_CFLAGS@
+neostats_LDADD = protocol/libprotocol.a keeper/libkeeper.a \
+		adns/libadns.la libltdl/libltdlc.la @PCRE_LIBS@ @CURL_LIBS@
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
 subdir = src
@@ -190,9 +204,8 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	support.$(OBJEXT) timer.$(OBJEXT) transfer.$(OBJEXT) \
 	users.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
-neostats_DEPENDENCIES = protocol/libprotocol.a curl/libcurl.la \
-	keeper/libkeeper.a adns/libadns.la libltdl/libltdlc.la \
-	pcre/libpcre.la
+neostats_DEPENDENCIES = protocol/libprotocol.a keeper/libkeeper.a \
+	adns/libadns.la libltdl/libltdlc.la
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
@@ -228,7 +241,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	check-recursive installcheck-recursive
 DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk \
 	Makefile.am
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = protocol curl keeper adns libltdl pcre modules
 SOURCES = $(neostats_SOURCES)
 
 all: all-recursive
@@ -476,7 +489,7 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	list='$(SUBDIRS)'; for subdir in $$list; do \
+	list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
 	  if test "$$subdir" = .; then :; else \
 	    test -d $(distdir)/$$subdir \
 	    || mkdir $(distdir)/$$subdir \
