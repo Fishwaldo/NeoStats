@@ -46,20 +46,20 @@ typedef struct dbm_sym {
 } dbm_sym;
 
 static void *( *DBMOpenTable )( const char *name );
-static int( *DBMCloseTable )( void *handle );
-static int( *DBMGetData )( void *handle, char *key, void *data, int size );
-static int( *DBMSetData )( void *handle, char *key, void *data, int size );
-static int( *DBMGetTableRows )( void *handle, DBRowHandler handler );
-static int( *DBMDelData )( void *handle, char *key );
+static int ( *DBMCloseTable )( void *handle );
+static int ( *DBMGetData )( void *handle, char *key, void *data, int size );
+static int ( *DBMSetData )( void *handle, char *key, void *data, int size );
+static int ( *DBMGetTableRows )( void *handle, DBRowHandler handler );
+static int ( *DBMDelData )( void *handle, char *key );
 
 static dbm_sym dbm_sym_table[] = 
 {
-	{( void * )&DBMOpenTable,		"DBMOpenTable"},
-	{( void * )&DBMCloseTable,	"DBMCloseTable"},
-	{( void * )&DBMGetData,		"DBMGetData"},
-	{( void * )&DBMSetData,		"DBMSetData"},
-	{( void * )&DBMGetTableRows,	"DBMGetTableRows"},
-	{( void * )&DBMDelData,		"DBMDelData"},
+	{ ( void * )&DBMOpenTable,		"DBMOpenTable" },
+	{ ( void * )&DBMCloseTable,		"DBMCloseTable" },
+	{ ( void * )&DBMGetData,		"DBMGetData" },
+	{ ( void * )&DBMSetData,		"DBMSetData" },
+	{ ( void * )&DBMGetTableRows,	"DBMGetTableRows" },
+	{ ( void * )&DBMDelData,		"DBMDelData" },
 	{NULL, NULL},
 };
 
@@ -132,19 +132,30 @@ int InitDBA( void )
 
 void FiniDBA( void )
 {
-/*	dbentry *dbe;
+	tableentry *tbe;
+	dbentry *dbe;
 	hnode_t *node;
-	hscan_t hs;
+	hnode_t *tnode;
+	hscan_t ds;
+	hscan_t ts;
 
-	hash_scan_begin( &hs, dbhash );
-	while(( node = hash_scan_next( &hs ) ) != NULL  ) {
+	hash_scan_begin( &ds, dbhash );
+	while(( node = hash_scan_next( &ds ) ) != NULL  ) {
 		dbe = (dbentry *) hnode_get( node );
-		DBACloseTable( dbe->handle );
+		hash_scan_begin( &ts, dbe->tablehash );
+		while(( tnode = hash_scan_next( &ts ) ) != NULL  ) {
+			tbe = (tableentry *) hnode_get( tnode );
+			DBACloseTable( tbe->table );
+			hash_delete( dbe->tablehash, tnode );
+			hnode_destroy( tnode );
+			ns_free( tbe );
+		}
+		hash_destroy( dbe->tablehash );
 		hash_delete( dbhash, node );
 		hnode_destroy( node );
 		ns_free( dbe );
 	}
-	hash_destroy( dbhash );*/
+	hash_destroy( dbhash );
 }
 
 /** @brief DBAOpenDatabase
