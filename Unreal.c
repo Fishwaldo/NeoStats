@@ -608,24 +608,13 @@ Usr_Eos (char *origin, char **argv, int argc)
     
 }
 #endif
-
-/* R: ~ 1073861298 #services + <none> :Mark */
+    
+/*    MSG_SJOIN creationtime chname    modebuf parabuf :member list */
+/* R: ~         1073861298   #services +       <none>  :Mark */
 static void
 Srv_Sjoin (char *origin, char **argv, int argc)
 {
-	char* channame;
-	char* tstime;
-	char *modes;
-	int offset = 4;
-
-	channame = argv[1];
-	tstime = argv[0];
-	if (argc > 4) {
-		modes = argv[2];
-	} else {
-		modes = argv[1];
-	}
-	server_sjoin (channame, tstime, modes, offset, origin, argv, argc);
+	server_sjoin (argv[1], argv[0], ((argc >= 3) ? argv[2] : argv[1]), 4, origin, argv, argc);
 }
 
 static void
