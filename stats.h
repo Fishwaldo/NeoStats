@@ -180,7 +180,6 @@
 #ifndef TOPICLEN
 #define TOPICLEN		307
 #endif
-#define MAXUSERWARN		8
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
 #define MAXCMDSIZE		15

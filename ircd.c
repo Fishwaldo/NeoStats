@@ -229,7 +229,7 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 {
 	snewnick_cmd (nick, user, host, rname, Umode);
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-#if defined(BAHAMUT) || defined(LIQUID)
+#if defined(BAHAMUT) || defined(LIQUID) || defined(VIAGRA)
 		sjoin_cmd (nick, me.chan, CMODE_CHANOP);	
 #elif defined(ULTIMATE3) || defined(QUANTUM)
 		sjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
