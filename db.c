@@ -27,57 +27,82 @@
 #ifdef USE_BERKELEY
 #include <db.h>
 
-#define	DATABASE "data/statserv.db"
-static DB *dbp;
 static DBT dbkey;
 static DBT dbdata;
 static int dbret;
 
-void DBOpenDatabase(void)
+typedef struct db_entry {
+	DB* dbp;
+	char dbname[MAXPATH];
+}db_entry;
+
+db_entry db_list[NUM_MODULES];
+
+int DBOpenDatabase(void)
 {
+	int index;
 	nlog(LOG_DEBUG1, LOG_MOD, "DBOpenDatabase");
-	if ((dbret = db_create(&dbp, NULL, 0)) != 0) {
+
+	index = get_mod_num (segv_inmodule);
+
+	if (index == NS_FAILURE) {
+		return -1;
+	}
+
+	ircsnprintf(db_list[index].dbname, MAXPATH, "data/%s.db", segv_inmodule);
+
+	if ((dbret = db_create(&db_list[index].dbp, NULL, 0)) != 0) {
 		nlog(LOG_DEBUG1, LOG_MOD, "db_create: %s", db_strerror(dbret));
-		return;
+		return -1;
 	}
-	if ((dbret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664)) != 0) {
+	if ((dbret = db_list[index].dbp->open(db_list[index].dbp, NULL, db_list[index].dbname, NULL, DB_BTREE, DB_CREATE, 0664)) != 0) {
 		nlog(LOG_DEBUG1, LOG_MOD, "dbp->open: %s", db_strerror(dbret));
-		return;
+		return -1;
 	}
+	return 1;
 }
 
 void DBCloseDatabase(void)
 {
+	int index;
+
 	nlog(LOG_DEBUG1, LOG_MOD, "DBCloseDatabase");
-	dbp->close(dbp, 0); 
+	index = get_mod_num (segv_inmodule);
+	db_list[index].dbp->close(db_list[index].dbp, 0); 
 }
 
-char* DBGetData(char* key)
+void* DBGetData(char* key)
 {
+	int index;
+
 	nlog(LOG_DEBUG1, LOG_MOD, "DBGetData %s", key);
+	index = get_mod_num (segv_inmodule);
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.data = key;
 	dbkey.size = strlen(key);
-	if ((dbret = dbp->get(dbp, NULL, &dbkey, &dbdata, 0)) == 0)
+	if ((dbret = db_list[index].dbp->get(db_list[index].dbp, NULL, &dbkey, &dbdata, 0)) == 0)
 	{
-		nlog(LOG_DEBUG1, LOG_MOD, "DBGetData %s", dbdata.data);
+/*		nlog(LOG_DEBUG1, LOG_MOD, "DBGetData %s", dbdata.data);*/
 		return dbdata.data;
 	}
 	nlog(LOG_DEBUG1, LOG_MOD, "dbp->get: fail");
 	return NULL;
 }
 
-void DBSetData(char* key, char * data)
+void DBSetData(char* key, void* data, int size)
 {
+	int index;
+
 	nlog(LOG_DEBUG1, LOG_MOD, "DBSetData %s %s", key, data);
+	index = get_mod_num (segv_inmodule);
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.data = key;
 	dbkey.size = strlen(key);
 	dbdata.data = data;
-	dbdata.size = strlen(data);
-	if ((dbret = dbp->put(dbp, NULL, &dbkey, &dbdata, 0)) != 0) {
+	dbdata.size = size;
+	if ((dbret = db_list[index].dbp->put(db_list[index].dbp, NULL, &dbkey, &dbdata, 0)) != 0) {
 		nlog(LOG_DEBUG1, LOG_MOD, "dbp->put: %s", db_strerror(dbret));
 	}
 }

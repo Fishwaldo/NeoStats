@@ -145,12 +145,12 @@ void LoadStats() {
 	Chead = list_create(SS_CHAN_SIZE);
 	Shead = hash_create(S_TABLE_SIZE, 0, 0);
 
-        if (GetData ((void *) &stats_network.maxopers, CFGINT, "NetStats", "Global", "MaxOpers") <= 0) {
+	if (GetData ((void *) &stats_network.maxopers, CFGINT, "NetStats", "Global", "MaxOpers") <= 0) {
 		/* if this doesn't exist, then try LoadOldStats() */
 		nlog(LOG_WARNING, LOG_MOD, "Trying to load StatServ stats from old database");
 		LoadOldStats();
 		return;
-        }
+	}
 	/* the rest don't need such valid checking */
 	GetData((void *)&stats_network.maxusers, CFGINT, "NetStats", "Global", "MaxUsers");
 	GetData((void *)&stats_network.maxservers, CFGINT, "NetStats", "Global", "MaxServers");
@@ -258,11 +258,11 @@ CStats *load_chan(char *name) {
 
 	SET_SEGV_LOCATION();
 	c = malloc(sizeof(CStats));
-	strlcpy(c->name, name, CHANLEN);	
 #ifdef USE_BERKELEY
-	if ((data = DBGetData(c->name)) != NULL) {
-		sscanf(data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins, &c->lastseen);
+	if ((data = DBGetData(name)) != NULL) {
+		memcpy(c, data, sizeof(CStats));
 #else
+	strlcpy(c->name, name, CHANLEN);	
 	if (GetData((void *)&data, CFGSTR, "ChanStats", c->name, "ChanData") > 0) {
 		/* its the new database format... Good */
 		sscanf(data, "%ld %ld %ld %ld %ld %ld %ld %ld %ld", &c->topics, &c->totmem, &c->kicks, &c->maxmems, &c->t_maxmems, &c->maxkicks, &c->t_maxkicks, &c->maxjoins, &c->t_maxjoins);
@@ -282,6 +282,7 @@ CStats *load_chan(char *name) {
 		DelRow("ChanStats", c->name);
 #endif
 	} else {
+		strlcpy(c->name, name, CHANLEN);	
 		c->totmem = 0;
 		c->topics = 0;
 		c->kicks = 0;
@@ -343,8 +344,8 @@ void save_chan(CStats *c) {
 
 #ifdef USE_BERKELEY
 	SET_SEGV_LOCATION();
-	ircsnprintf(data, BUFSIZE, "%ld %ld %ld %ld %ld %ld %ld %ld %ld %ld", c->topics, c->totmem, c->kicks, c->maxmems, c->t_maxmems, c->maxkicks, c->t_maxkicks, c->maxjoins, c->t_maxjoins, c->lastseen);
-	DBSetData(c->name, data);
+	memcpy(data, c, sizeof(CStats));
+	DBSetData(c->name, data, sizeof(CStats));
 #else
 	SET_SEGV_LOCATION();
 	ircsnprintf(data, BUFSIZE, "%d %d %d %d %d %d %d %d %d", 

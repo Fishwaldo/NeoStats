@@ -695,10 +695,10 @@ int validate_user (char* user);
 int validate_host (char* host);
 
 #ifdef USE_BERKELEY
-void DBOpenDatabase(void);
+int DBOpenDatabase(void);
 void DBCloseDatabase(void);
-char* DBGetData(char* key);
-void DBSetData(char* key, char * data);
+void* DBGetData(char* key);
+void DBSetData(char* key, void * data, int size);
 #endif
 
 #endif
