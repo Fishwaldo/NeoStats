@@ -318,9 +318,9 @@ void
 send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
 {
 #if 0
-	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, MSG_AKILL, host, ident, length, setby, ts, reason);
+	send_cmd (":%s %s %s %s %lu %s %lu :%s", sender, MSG_AKILL, host, ident, length, setby, ts, reason);
 #else
-	send_cmd (":%s %s add %s@%s %d %d %s :%s", me.name, MSG_GLINE, ident, host, length, (int)me.now, setby, reason); 
+	send_cmd (":%s %s add %s@%s %lu %d %s :%s", me.name, MSG_GLINE, ident, host, length, (int)me.now, setby, reason); 
 #endif
 }
 

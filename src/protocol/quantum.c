@@ -360,7 +360,7 @@ send_invite (const char *from, const char *to, const char *chan)
 void 
 send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
 {
-	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, MSGTOK(AKILL), host, ident, length, setby, ts, reason);
+	send_cmd (":%s %s %s %s %lu %s %lu :%s", sender, MSGTOK(AKILL), host, ident, length, setby, ts, reason);
 }
 
 void 

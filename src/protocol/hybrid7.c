@@ -294,7 +294,7 @@ send_svinfo (const int tscurrent, const int tsmin, const unsigned long tsnow)
 void 
 send_akill (const char *sender, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
 {
-	send_cmd (":%s %s * %d %s %s :%s", setby, MSG_KLINE, length, ident, host, reason);
+	send_cmd (":%s %s * %lu %s %s :%s", setby, MSG_KLINE, length, ident, host, reason);
 }
 
 void 
