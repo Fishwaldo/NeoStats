@@ -28,6 +28,10 @@
 
 static int bot_cmd_help (ModUser* bot_ptr, User * u, char **av, int ac);
 static int bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac);
+#if 0
+static int bot_cmd_about (ModUser* bot_ptr, User * u, char **av, int ac);
+#endif
+static int bot_cmd_version (ModUser* bot_ptr, User * u, char **av, int ac);
 
 /* hash for services bot command list */
 static hash_t *botcmds = NULL;
@@ -55,6 +59,25 @@ static const char *cmd_help_help[] = {
 	NULL
 };
 
+#if 0
+const char cmd_help_about_oneline[] = "About Module";
+const char *cmd_help_about[] = {
+	"Syntax: \2ABOUT\2",
+	"",
+	"Provides information about the module",
+	NULL
+};
+
+const char cmd_help_version_oneline[] = "Display Module version info";
+const char *cs_help_version[] = {
+	"Syntax: \2VERSION\2",
+	"",
+	"Show version information",
+	NULL
+};
+#endif
+
+
 static const char *cmd_help_set[] = {
 	"Syntax: \2SET LIST\2",
 	"        \2SET <option> [<value>]\2",
@@ -72,8 +95,12 @@ static const char *cmd_help_set[] = {
  */
 static bot_cmd intrinsic_commands[]=
 {
-	{"HELP",	NULL,	0, 	0,	cmd_help_help, 	cmd_help_oneline},
-	{NULL,		NULL,	0, 	0,	NULL, 			NULL}
+	{"HELP",	NULL,	0, 	0,	cmd_help_help, 		cmd_help_oneline},	
+#if 0
+	{"VERSION",	NULL,	0, 	0,	cmd_help_version,	cmd_help_version_oneline},
+	{"ABOUT",	NULL,	0, 	0,	cmd_help_about, 	cmd_help_about_oneline },
+#endif
+	{NULL,		NULL,	0, 	0,	NULL, 				NULL}
 };
 
 
@@ -345,6 +372,20 @@ run_bot_cmd (ModUser* bot_ptr, User *u, char **av, int ac)
 		return 1;
 	}
 
+#if 0
+	/* About */
+	if (!strcasecmp(av[1], "ABOUT")) {
+		bot_cmd_about(bot_ptr, u, av, ac);
+		return 1;
+	}
+
+	/* Version */
+	if (!strcasecmp(av[1], "VERSION")) {
+		bot_cmd_version(bot_ptr, u, av, ac);
+		return 1;
+	}
+#endif
+
 	/* We have run out of commands so report failure */
 	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[1]);
 	chanalert (bot_ptr->nick, "%s requested %s, but that is an unknown command", u->nick, av[1]);
@@ -515,7 +556,7 @@ int is_target_valid(char* bot_name, User* u, char* target_nick)
 	return 1;
 }
 
-/** @brief bot_cmd_help process bot set command
+/** @brief bot_cmd_set process bot set command
  *	work in progress
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
@@ -687,3 +728,23 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 	}
 	return 1;
 }
+
+#if 0
+/** @brief bot_cmd_about process bot about command
+ *	work in progress
+ *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+static int bot_cmd_about (ModUser* bot_ptr, User * u, char **av, int ac)
+{
+	return 1;
+}
+
+/** @brief bot_cmd_version process bot version command
+ *	work in progress
+ *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+static int bot_cmd_version (ModUser* bot_ptr, User * u, char **av, int ac)
+{
+	return 1;
+}
+#endif

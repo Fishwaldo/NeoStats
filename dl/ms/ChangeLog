@@ -3,7 +3,8 @@ MoraleServ ChangeLog - Anything we add/remove/fix/change is in here (even our ra
 * MoraleServ * Mark (M) * Version 2.22
  - Use core bot message handler to process commands (M)
  - Fixed chanalert messages to report bot as sender, not neostats (M)
- - Code cleaned up to redduce bloat (M)
+ - Code cleaned up to reduce bloat (M)
+ - Removed local module_function table to use core for /VERSION replies (M)
 
 * MoraleServ * Mark (M) * Version 2.21
  - Help text cleanup (M)

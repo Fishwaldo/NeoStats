@@ -42,6 +42,9 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fix up vhost handling on Ultimate (F)
  - Addded Smodetostring function (F)
  - NeoStats INFO command renamed to STATUS to match similar commands in modules (M)
+ - __module_get_functions/__module_functions is now optional rather than required (M)
+ - /VERSION will now provide module information from the core if possible (M)
+ - Channel modes now use CMODE_ prefix rather than MODE_ (M)
 
 * NeoStats * Fish (F) * Version 2.5.10
  - Fix a problem with Umode +T being reintroduced on Unreal Beta19 as a normal usermode. 

@@ -656,7 +656,9 @@ flood (User * u)
 void
 ns_usr_version (char *origin, char **argv, int argc)
 {
+	SET_SEGV_LOCATION();
 	snumeric_cmd (RPL_VERSION, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, ircd_version, me.name, version_date, version_time);
+	ModulesVersion (origin, argv, argc);
 }
 
 /** @brief Display our MOTD Message of the Day from the external neostats.motd file 
@@ -907,7 +909,7 @@ globops (char *from, char *fmt, ...)
 }
 
 int
-swallops_cmd (const char *who, const char *msg, ...)
+wallops (const char *who, const char *msg, ...)
 {
 	va_list ap;
 
@@ -919,7 +921,7 @@ swallops_cmd (const char *who, const char *msg, ...)
 }
 
 int
-snumeric_cmd (const int numeric, const char *target, const char *data, ...)
+numeric (const int numeric, const char *target, const char *data, ...)
 {
 	va_list ap;
 

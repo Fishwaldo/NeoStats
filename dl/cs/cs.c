@@ -141,23 +141,6 @@ ModuleInfo __module_info = {
 	__TIME__
 };
 
-static int new_m_version(char *origin, char **av, int ac)
-{
-	snumeric_cmd(RPL_VERSION, origin,
-		     "Module ConnectServ Loaded, Version: %s %s %s",
-			 __module_info.module_version, __module_info.module_build_date,
-			 __module_info.module_build_time);
-	return 0;
-}
-
-Functions __module_functions[] = {
-	{MSG_VERSION, new_m_version, 1}	,
-#ifdef GOTTOKENSUPPORT
-	{TOK_VERSION, new_m_version, 1}	,
-#endif
-	{NULL, NULL, 0}
-};
-
 static bot_cmd cs_commands[]=
 {
 	{"ABOUT",	cs_about,	0, 	NS_ULEVEL_ADMIN,	cs_help_about, 	cs_help_about_oneline },
@@ -220,7 +203,7 @@ static int cs_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	prefmsg(u->nick, s_ConnectServ, "\2%s Version Information\2", s_ConnectServ);
-	prefmsg(u->nick, s_ConnectServ, "%s Version: %s Compiled %s at %s", s_ConnectServ,
+	prefmsg(u->nick, s_ConnectServ, "%s Version: %s Compiled %s at %s", __module_info.module_name,
 		__module_info.module_version, __module_info.module_build_date, __module_info.module_build_time);
 	prefmsg(u->nick, s_ConnectServ, "http://www.neostats.net");
 	return 1;

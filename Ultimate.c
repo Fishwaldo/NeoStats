@@ -131,30 +131,30 @@ IntCommands cmd_list[] = {
 };
 
 ChanModes chan_modes[] = {
-	{MODE_CHANOP, 'o', 1, 0, '@'},
-	{MODE_HALFOP, 'h', 1, 0, '%'},
-	{MODE_CHANADMIN, 'a', 1, 0, '!'},
-	{MODE_VOICE, 'v', 1, 0, '+'},
-	{MODE_BAN, 'b', 0, 1, 0},
-	{MODE_EXCEPT, 'e', 0, 1, 0},
-	{MODE_FLOODLIMIT, 'f', 0, 1, 0},			/* Flood limiter */
-	{MODE_INVITEONLY, 'i', 0, 0, 0},
-	{MODE_KEY, 'k', 0, 1, 0},
-	{MODE_LIMIT, 'l', 0, 1, 0},
-	{MODE_MODERATED, 'm', 0, 0, 0},
-	{MODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{MODE_PRIVATE, 'p', 0, 0, 0},
-	{MODE_RGSTR, 'r', 0, 0, 0},
-	{MODE_SECRET, 's', 0, 0, 0},
-	{MODE_TOPICLIMIT, 't', 0, 0, 0},
-	{MODE_NOCOLOR, 'x', 0, 0, 0},
-	{MODE_ADMONLY, 'A', 0, 0, 0},
-	{MODE_NOINVITE, 'I', 0, 0, 0},			/* no invites */
-	{MODE_NOKNOCK, 'K', 0, 0, 0},			/* knock knock (no way!) */
-	{MODE_LINK, 'L', 0, 1, 0},
-	{MODE_OPERONLY, 'O', 0, 0, 0},
-	{MODE_RGSTRONLY, 'R', 0, 0, 0},
-	{MODE_STRIP, 'S', 0, 0, 0},			/* works? */
+	{CMODE_CHANOP, 'o', 1, 0, '@'},
+	{CMODE_HALFOP, 'h', 1, 0, '%'},
+	{CMODE_CHANADMIN, 'a', 1, 0, '!'},
+	{CMODE_VOICE, 'v', 1, 0, '+'},
+	{CMODE_BAN, 'b', 0, 1, 0},
+	{CMODE_EXCEPT, 'e', 0, 1, 0},
+	{CMODE_FLOODLIMIT, 'f', 0, 1, 0},			/* Flood limiter */
+	{CMODE_INVITEONLY, 'i', 0, 0, 0},
+	{CMODE_KEY, 'k', 0, 1, 0},
+	{CMODE_LIMIT, 'l', 0, 1, 0},
+	{CMODE_MODERATED, 'm', 0, 0, 0},
+	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
+	{CMODE_PRIVATE, 'p', 0, 0, 0},
+	{CMODE_RGSTR, 'r', 0, 0, 0},
+	{CMODE_SECRET, 's', 0, 0, 0},
+	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
+	{CMODE_NOCOLOR, 'x', 0, 0, 0},
+	{CMODE_ADMONLY, 'A', 0, 0, 0},
+	{CMODE_NOINVITE, 'I', 0, 0, 0},			/* no invites */
+	{CMODE_NOKNOCK, 'K', 0, 0, 0},			/* knock knock (no way!) */
+	{CMODE_LINK, 'L', 0, 1, 0},
+	{CMODE_OPERONLY, 'O', 0, 0, 0},
+	{CMODE_RGSTRONLY, 'R', 0, 0, 0},
+	{CMODE_STRIP, 'S', 0, 0, 0},			/* works? */
 };
 
 #ifdef ULTIMATE3
@@ -297,19 +297,19 @@ sjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 	int ac;
 
 	switch (chflag) {
-	case MODE_CHANOP:
+	case CMODE_CHANOP:
 		flag = '@';
 		mode= '0';
 		break;
-	case MODE_HALFOP:
+	case CMODE_HALFOP:
 		flag = '%';
 		mode= 'h';
 		break;
-	case MODE_VOICE:
+	case CMODE_VOICE:
 		flag = '+';
 		mode= 'v';
 		break;
-	case MODE_CHANADMIN:
+	case CMODE_CHANADMIN:
 		flag = '!';
 		mode= 'a';
 		break;
@@ -518,7 +518,8 @@ ssvshost_cmd (const char *who, const char *vhost)
 }
 
 int 
-sinvite_cmd (const char *from, const char *to, const char *chan) {
+sinvite_cmd (const char *from, const char *to, const char *chan) 
+{
 	sts (":%s %s %s %s", from, (me.token ? TOK_INVITE : MSG_INVITE), to, chan);
 	return 1;
 }
@@ -1015,7 +1016,7 @@ SignOn_NewBot (const char *nick, const char *user, const char *host, const char 
 #endif
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
 #ifdef ULTIMATE3
-		sjoin_cmd (nick, me.chan, MODE_CHANADMIN);
+		sjoin_cmd (nick, me.chan, CMODE_CHANADMIN);
 		schmode_cmd (nick, me.chan, "+a", nick);
 #else /* ulitmate3 */
 		sjoin_cmd (nick, me.chan);

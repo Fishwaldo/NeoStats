@@ -110,38 +110,38 @@ IntCommands cmd_list[] = {
 };
 
 ChanModes chan_modes[] = {
-	{MODE_VOICE, 'v', 1, 0, '+'},
-	{MODE_HALFOP, 'h', 1, 0, '+'},
-	{MODE_CHANOP, 'o', 1, 0, '@'},
-	{MODE_LIMIT, 'l', 0, 1},
-	{MODE_PRIVATE, 'p', 0, 0},
-	{MODE_SECRET, 's', 0, 0},
-	{MODE_MODERATED, 'm', 0, 0},
-	{MODE_NOPRIVMSGS, 'n', 0, 0},
-	{MODE_TOPICLIMIT, 't', 0, 0},
-	{MODE_INVITEONLY, 'i', 0, 0},
-	{MODE_KEY, 'k', 0, 1},
-	{MODE_RGSTR, 'r', 0, 0},
-	{MODE_RGSTRONLY, 'R', 0, 0},
-	{MODE_NOCOLOR, 'c', 0, 0},
-	{MODE_CHANPROT, 'a', 1, 0},
-	{MODE_CHANOWNER, 'q', 1, 0},
-	{MODE_OPERONLY, 'O', 0, 0},
-	{MODE_ADMONLY, 'A', 0, 0},
-	{MODE_LINK, 'L', 0, 1},
-	{MODE_NOKICKS, 'Q', 0, 0},
-	{MODE_BAN, 'b', 0, 1},
-	{MODE_STRIP, 'S', 0, 0},			/* works? */
-	{MODE_EXCEPT, 'e', 0, 1},			/* exception ban */
-	{MODE_NOKNOCK, 'K', 0, 0},			/* knock knock (no way!) */
-	{MODE_NOINVITE, 'V', 0, 0},			/* no invites */
-	{MODE_FLOODLIMIT, 'f', 0, 1},			/* flood limiter */
-	{MODE_MODREG, 'M', 0, 0},			/* need umode +r to talk */
-	{MODE_STRIPBADWORDS, 'G', 0, 0},			/* no badwords */
-	{MODE_NOCTCP, 'C', 0, 0},			/* no CTCPs */
-	{MODE_AUDITORIUM, 'u', 0, 0},
-	{MODE_ONLYSECURE, 'z', 0, 0},
-	{MODE_NONICKCHANGE, 'N', 0, 0},
+	{CMODE_VOICE, 'v', 1, 0, '+'},
+	{CMODE_HALFOP, 'h', 1, 0, '+'},
+	{CMODE_CHANOP, 'o', 1, 0, '@'},
+	{CMODE_LIMIT, 'l', 0, 1},
+	{CMODE_PRIVATE, 'p', 0, 0},
+	{CMODE_SECRET, 's', 0, 0},
+	{CMODE_MODERATED, 'm', 0, 0},
+	{CMODE_NOPRIVMSGS, 'n', 0, 0},
+	{CMODE_TOPICLIMIT, 't', 0, 0},
+	{CMODE_INVITEONLY, 'i', 0, 0},
+	{CMODE_KEY, 'k', 0, 1},
+	{CMODE_RGSTR, 'r', 0, 0},
+	{CMODE_RGSTRONLY, 'R', 0, 0},
+	{CMODE_NOCOLOR, 'c', 0, 0},
+	{CMODE_CHANPROT, 'a', 1, 0},
+	{CMODE_CHANOWNER, 'q', 1, 0},
+	{CMODE_OPERONLY, 'O', 0, 0},
+	{CMODE_ADMONLY, 'A', 0, 0},
+	{CMODE_LINK, 'L', 0, 1},
+	{CMODE_NOKICKS, 'Q', 0, 0},
+	{CMODE_BAN, 'b', 0, 1},
+	{CMODE_STRIP, 'S', 0, 0},			/* works? */
+	{CMODE_EXCEPT, 'e', 0, 1},			/* exception ban */
+	{CMODE_NOKNOCK, 'K', 0, 0},			/* knock knock (no way!) */
+	{CMODE_NOINVITE, 'V', 0, 0},			/* no invites */
+	{CMODE_FLOODLIMIT, 'f', 0, 1},			/* flood limiter */
+	{CMODE_MODREG, 'M', 0, 0},			/* need umode +r to talk */
+	{CMODE_STRIPBADWORDS, 'G', 0, 0},			/* no badwords */
+	{CMODE_NOCTCP, 'C', 0, 0},			/* no CTCPs */
+	{CMODE_AUDITORIUM, 'u', 0, 0},
+	{CMODE_ONLYSECURE, 'z', 0, 0},
+	{CMODE_NONICKCHANGE, 'N', 0, 0},
 };
 
 UserModes user_umodes[] = {
@@ -157,22 +157,14 @@ UserModes user_umodes[] = {
 	{UMODE_FAILOP, 'g', 0},
 	{UMODE_HELPOP, 'h', 0},
 	{UMODE_SERVNOTICE, 's', 0},
-#ifndef UNREAL32
-	{UMODE_KILLS, 'k', 0},
-#endif
-#ifndef UNREAL32
-	{UMODE_EYES, 'e', 0},
-#endif
 	{UMODE_KIX, 'q', 0},
 	{UMODE_BOT, 'B', 0},
-#ifndef UNREAL32
-	{UMODE_FCLIENT, 'F', 0},
-#endif
 	{UMODE_DEAF, 'd', 0},
 #ifndef UNREAL32
+	{UMODE_KILLS, 'k', 0},
+	{UMODE_EYES, 'e', 0},
+	{UMODE_FCLIENT, 'F', 0},
 	{UMODE_CLIENT, 'c', 0},
-#endif
-#ifndef UNREAL32
 	{UMODE_FLOOD, 'f', 0},
 #endif
 	{UMODE_REGNICK, 'r', 0},
@@ -407,14 +399,7 @@ ssvsmode_cmd (const char *target, const char *modes)
 int
 ssvskill_cmd (const char *target, const char *reason, ...)
 {
-	User *u;
 	va_list ap;
-
-	u = finduser (target);
-	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Cant find user %s for ssvskill_cmd", target);
-		return 0;
-	}
 
 	va_start (ap, reason);
 	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);

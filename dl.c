@@ -211,6 +211,32 @@ del_mod_timer (char *timer_name)
 	return NS_FAILURE;
 }
 
+/** @brief delete all timers from the timer list for given module
+ *
+ * For core use. 
+ *
+ * @param 
+ * 
+ * @return NS_SUCCESS if deleted, NS_FAILURE if not found
+*/
+int
+del_mod_timers (char *module_name)
+{
+	ModTimer *mod_tmr;
+	hnode_t *modnode;
+	hscan_t hscan;
+
+	hash_scan_begin (&hscan, th);
+	while ((modnode = hash_scan_next (&hscan)) != NULL) {
+		mod_tmr = hnode_get (modnode);
+		if (!strcasecmp (mod_tmr->modname, module_name)) {
+			nlog (LOG_DEBUG1, LOG_CORE, "Module %s has timer %s Registered. Deleting..", module_name, mod_tmr->timername);
+			del_mod_timer (mod_tmr->timername);
+		}
+	}
+	return NS_SUCCESS;
+}
+
 /** @brief delete a timer from the timer list
  *
  * For module use. Deletes a timer with the given name from the timer list
@@ -464,6 +490,32 @@ del_socket (char *sock_name)
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
+}
+
+/** @brief delete a socket from the socket list
+ *
+ * For module use. Deletes a socket with the given name from the socket list
+ *
+ * @param socket_name the name of socket to delete
+ * 
+ * @return NS_SUCCESS if deleted, NS_FAILURE if not found
+*/
+int
+del_sockets (char *module_name)
+{
+	ModSock *mod_sock;
+	hnode_t *modnode;
+	hscan_t hscan;
+
+	hash_scan_begin (&hscan, sockh);
+	while ((modnode = hash_scan_next (&hscan)) != NULL) {
+		mod_sock = hnode_get (modnode);
+		if (!strcasecmp (mod_sock->modname, module_name)) {
+			nlog (LOG_DEBUG1, LOG_CORE, "Module %s had Socket %s Registered. Deleting..", module_name, mod_sock->sockname);
+			del_socket (mod_sock->sockname);
+		}
+	}
+	return NS_SUCCESS;
 }
 
 /** @brief list sockets in use
@@ -805,6 +857,28 @@ list_bots (User * u, char **av, int ac)
 	return 0;
 }
 
+/** @brief del_bots
+ *
+ * 
+ *
+ * @return none
+ */
+int	del_bots (char* module_name)
+{
+	ModUser *mod_usr;
+	hnode_t *modnode;
+	hscan_t hscan;
+
+	hash_scan_begin (&hscan, bh);
+	while ((modnode = hash_scan_next (&hscan)) != NULL) {
+		mod_usr = hnode_get (modnode);
+		if (!strcasecmp (mod_usr->modname, module_name)) {
+			nlog (LOG_DEBUG1, LOG_CORE, "Module %s had bot %s Registered. Deleting..", module_name, mod_usr->nick);
+			del_bot (mod_usr->nick, "Module Unloaded");
+		}
+	}
+	return NS_SUCCESS;
+}
 /** @brief ModuleEvent
  *
  * 
@@ -867,22 +941,50 @@ ModuleFunction (int cmdptr, char *cmd, char* origin, char **av, int ac)
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		module_ptr = hnode_get (mn);
 		fn_list = module_ptr->function_list;
-		while (fn_list->cmd_name != NULL) {
-			/* This goes through each Command */
-			if (!strcmp (fn_list->cmd_name, cmd)) {
+		if(fn_list) {
+			while (fn_list->cmd_name != NULL) {
+				/* This goes through each Command */
 				if (fn_list->srvmsg == cmdptr) {
-					nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
-					SET_SEGV_LOCATION();
-					SET_SEGV_INMODULE(module_ptr->info->module_name);
-					if (setjmp (sigvbuf) == 0) {
-						fn_list->function (origin, av, ac);
+					if (!strcmp (fn_list->cmd_name, cmd)) {
+						nlog (LOG_DEBUG1, LOG_CORE, "Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
+						SET_SEGV_LOCATION();
+						SET_SEGV_INMODULE(module_ptr->info->module_name);
+						if (setjmp (sigvbuf) == 0) {
+							fn_list->function (origin, av, ac);
+						}
+						CLEAR_SEGV_INMODULE();
+						SET_SEGV_LOCATION();
+						break;
 					}
-					CLEAR_SEGV_INMODULE();
-					SET_SEGV_LOCATION();
-					break;
 				}
+				fn_list++;
 			}
-			fn_list++;
+		}
+	}
+}
+
+/** @brief 
+ *
+ * 
+ *
+ * @return none
+ */
+void
+ModulesVersion (char* origin, char **av, int ac)
+{
+	Module *module_ptr;
+	hscan_t ms;
+	hnode_t *mn;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin (&ms, mh);
+	while ((mn = hash_scan_next (&ms)) != NULL) {
+		module_ptr = hnode_get (mn);
+		if(module_ptr->isnewstyle && module_ptr->function_list == NULL) {
+			snumeric_cmd(RPL_VERSION, origin,
+				"Module %s version: %s %s %s",
+				module_ptr->info->module_name, module_ptr->info->module_version, 
+				module_ptr->info->module_build_date, module_ptr->info->module_build_time);
 		}
 	}
 }
@@ -908,6 +1010,7 @@ load_module (char *modfilename, User * u)
 	char **av;
 	int ac = 0;
 	int i = 0;
+	int isnewstyle = 1;
 #ifdef OLD_MODULE_EXPORT_SUPPORT
 	ModuleInfo *(*mod_get_info) () = NULL;
 	Functions *(*mod_get_funcs) () = NULL;
@@ -918,7 +1021,7 @@ load_module (char *modfilename, User * u)
 	EventFnList *event_fn_ptr = NULL;
 	Module *mod_ptr = NULL;
 	hnode_t *mn;
-	int (*doinit) (int modnum, int apiver);
+	int (*ModInit) (int modnum, int apiver);
 
 	SET_SEGV_LOCATION();
 	if (u == NULL) {
@@ -945,6 +1048,7 @@ load_module (char *modfilename, User * u)
 #ifdef OLD_MODULE_EXPORT_SUPPORT
 	if(mod_info_ptr == NULL) {
 		/* old system */
+		isnewstyle = 0;
 		mod_get_info = dlsym (dl_handle, "__module_get_info");
 #ifndef HAVE_LIBDL
 		if (mod_get_info == NULL) {
@@ -981,45 +1085,18 @@ load_module (char *modfilename, User * u)
 		return NS_FAILURE;
 	}
 #endif /* OLD_MODULE_EXPORT_SUPPORT */
+
 	/* new system */
 	mod_funcs_ptr = dlsym (dl_handle, "__module_functions");
 #ifdef OLD_MODULE_EXPORT_SUPPORT
 	if(mod_funcs_ptr == NULL) {
 		/* old system */
 		mod_get_funcs = dlsym (dl_handle, "__module_get_functions");
-#ifndef HAVE_LIBDL
-		if (mod_get_funcs == NULL) {
-			dl_error = dlerror ();
-#else /* HAVE_LIBDL */
-		if ((dl_error = dlerror ()) != NULL) {
-#endif /* HAVE_LIBDL */
-			if (do_msg) {
-				prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
-			}
-			nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
-			dlclose (dl_handle);
-			return NS_FAILURE;
+		/* no error check here - this one isn't essential to the functioning of the module */
+
+		if (mod_get_funcs) {
+			mod_funcs_ptr = (*mod_get_funcs) ();
 		}
-		mod_funcs_ptr = (*mod_get_funcs) ();
-		if (mod_funcs_ptr == NULL) {
-			dlclose (dl_handle);
-			nlog (LOG_WARNING, LOG_CORE, "Module has no function structure: %s", path);
-			return NS_FAILURE;
-		}
-	}
-#else /* OLD_MODULE_EXPORT_SUPPORT */
-#ifndef HAVE_LIBDL
-	if(mod_info_ptr == NULL) {
-		dl_error = dlerror ();
-#else /* HAVE_LIBDL */
-	if ((dl_error = dlerror ()) != NULL) {
-#endif /* HAVE_LIBDL */
-		if (do_msg) {
-			prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
-		}
-		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
-		dlclose (dl_handle);
-		return NS_FAILURE;
 	}
 #endif /* OLD_MODULE_EXPORT_SUPPORT */
 
@@ -1066,6 +1143,7 @@ load_module (char *modfilename, User * u)
 	mod_ptr->function_list = mod_funcs_ptr;
 	mod_ptr->dl_handle = dl_handle;
 	mod_ptr->event_list = event_fn_ptr;
+	mod_ptr->isnewstyle = isnewstyle;
 
 	/* assign a module number to this module */
 	i = 0;
@@ -1076,11 +1154,11 @@ load_module (char *modfilename, User * u)
 	nlog (LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, mod_ptr->info->module_name);
 
 	/* call __ModInit (replacement for library __init() call */
-	doinit = dlsym ((int *) dl_handle, "__ModInit");
-	if (doinit) {
+	ModInit = dlsym ((int *) dl_handle, "__ModInit");
+	if (ModInit) {
 		SET_SEGV_LOCATION();
 		SET_SEGV_INMODULE(mod_ptr->info->module_name);
-		if ((*doinit) (i, API_VER) < 1) {
+		if ((*ModInit) (i, API_VER) < 1) {
 			nlog (LOG_NORMAL, LOG_CORE, "Unable to load module %s. See %s.log for further information.", mod_ptr->info->module_name, mod_ptr->info->module_name);
 			unload_module(mod_ptr->info->module_name, NULL);
 			return NS_FAILURE;
@@ -1191,13 +1269,9 @@ int
 unload_module (char *module_name, User * u)
 {
 	Module *mod_ptr;
-	ModUser *mod_usr;
-	ModTimer *mod_tmr;
-	ModSock *mod_sock;
 	hnode_t *modnode;
-	hscan_t hscan;
 	int i;
-	void (*dofini) ();
+	void (*ModFini) ();
 
 	SET_SEGV_LOCATION();
 	/* Check to see if this Module is loaded....  */
@@ -1213,35 +1287,15 @@ unload_module (char *module_name, User * u)
 	}
 
 	/* Check to see if this Module has any timers registered....  */
-	hash_scan_begin (&hscan, th);
-	while ((modnode = hash_scan_next (&hscan)) != NULL) {
-		mod_tmr = hnode_get (modnode);
-		if (!strcasecmp (mod_tmr->modname, module_name)) {
-			nlog (LOG_DEBUG1, LOG_CORE, "Module %s has timer %s Registered. Deleting..", module_name, mod_tmr->timername);
-			del_mod_timer (mod_tmr->timername);
-		}
-	}
-	/* check if the module had a socket registered... */
-	hash_scan_begin (&hscan, sockh);
-	while ((modnode = hash_scan_next (&hscan)) != NULL) {
-		mod_sock = hnode_get (modnode);
-		if (!strcasecmp (mod_sock->modname, module_name)) {
-			nlog (LOG_DEBUG1, LOG_CORE, "Module %s had Socket %s Registered. Deleting..", module_name, mod_sock->sockname);
-			del_socket (mod_sock->sockname);
-		}
-	}
+	del_mod_timers (module_name);
 
-		/* we delete the modules *after* we call ModFini, so the bot can still send messages generated from ModFini calls */
-	    /* (M) Temporarily changed this back to how it was since it causes segfaults during module unloading */
-		/* now, see if this Module has any bots with it */
-		hash_scan_begin (&hscan, bh);
-		while ((modnode = hash_scan_next (&hscan)) != NULL) {
-			mod_usr = hnode_get (modnode);
-			if (!strcasecmp (mod_usr->modname, module_name)) {
-				nlog (LOG_DEBUG1, LOG_CORE, "Module %s had bot %s Registered. Deleting..", module_name, mod_usr->nick);
-				del_bot (mod_usr->nick, "Module Unloaded");
-			}
-		}
+	/* check if the module had a socket registered... */
+	del_sockets (module_name);
+
+	/* we delete the modules *after* we call ModFini, so the bot can still send messages generated from ModFini calls */
+	/* (M) Temporarily changed this back to how it was since it causes segfaults during module unloading */
+	/* now, see if this Module has any bots with it */
+	del_bots(module_name);
 
 	/* Remove module....  */
 	modnode = hash_lookup (mh, module_name);
@@ -1255,9 +1309,9 @@ unload_module (char *module_name, User * u)
 		SET_SEGV_INMODULE(module_name);
 		
 		/* call __ModFini (replacement for library __fini() call */
-		dofini = dlsym ((int *) mod_ptr->dl_handle, "__ModFini");
-		if (dofini) {
-			(*dofini) ();
+		ModFini = dlsym ((int *) mod_ptr->dl_handle, "__ModFini");
+		if (ModFini) {
+			(*ModFini) ();
 		}
 		CLEAR_SEGV_INMODULE();
 

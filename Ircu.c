@@ -101,21 +101,21 @@ IntCommands cmd_list[] = {
 };
 
 ChanModes chan_modes[] = {
-	{MODE_HALFOP, 'h', 1, 0, '%'},
-	{MODE_CHANOP, 'o', 1, 0, '@'},
-	{MODE_VOICE, 'v', 1, 0, '+'},
-	{MODE_SECRET, 's', 0, 0, 0},
-	{MODE_PRIVATE, 'p', 0, 0, 0},
-	{MODE_MODERATED, 'm', 0, 0, 0},
-	{MODE_TOPICLIMIT, 't', 0, 0, 0},
-	{MODE_INVITEONLY, 'i', 0, 0, 0},
-	{MODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{MODE_HIDEOPS, 'a', 0, 0, 0},
-	{MODE_LIMIT, 'l', 0, 1, 0},
-	{MODE_KEY, 'k', 0, 1, 0},
-	{MODE_BAN, 'b', 0, 1, 0},
-	{MODE_EXCEPT, 'e', 0, 1, 0},
-	{MODE_INVEX, 'I', 0, 1, 0},
+	{CMODE_HALFOP, 'h', 1, 0, '%'},
+	{CMODE_CHANOP, 'o', 1, 0, '@'},
+	{CMODE_VOICE, 'v', 1, 0, '+'},
+	{CMODE_SECRET, 's', 0, 0, 0},
+	{CMODE_PRIVATE, 'p', 0, 0, 0},
+	{CMODE_MODERATED, 'm', 0, 0, 0},
+	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
+	{CMODE_INVITEONLY, 'i', 0, 0, 0},
+	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
+	{CMODE_HIDEOPS, 'a', 0, 0, 0},
+	{CMODE_LIMIT, 'l', 0, 1, 0},
+	{CMODE_KEY, 'k', 0, 1, 0},
+	{CMODE_BAN, 'b', 0, 1, 0},
+	{CMODE_EXCEPT, 'e', 0, 1, 0},
+	{CMODE_INVEX, 'I', 0, 1, 0},
 };
 
 UserModes user_umodes[] = {

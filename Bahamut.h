@@ -195,28 +195,28 @@
 
 
 
-#define MODE_CHANOP	0x0001
-#define	MODE_VOICE	0x0004
-#define	MODE_PRIVATE	0x0008
-#define	MODE_SECRET	0x0010
-#define	MODE_MODERATED  0x0020
-#define	MODE_TOPICLIMIT 0x0040
-#define	MODE_INVITEONLY 0x0080
-#define	MODE_NOPRIVMSGS 0x0100
-#define	MODE_KEY	0x0200
-#define	MODE_BAN	0x0800
-#define MODE_LIMIT	0x1000
-#define MODE_RGSTR	0x2000
-#define MODE_RGSTRONLY  0x4000
-#define MODE_OPERONLY   0x8000
-#define MODE_LINK	0x20000
-#define MODE_NOCOLOR	0x40000
+#define CMODE_CHANOP	0x0001
+#define	CMODE_VOICE	0x0004
+#define	CMODE_PRIVATE	0x0008
+#define	CMODE_SECRET	0x0010
+#define	CMODE_MODERATED  0x0020
+#define	CMODE_TOPICLIMIT 0x0040
+#define	CMODE_INVITEONLY 0x0080
+#define	CMODE_NOPRIVMSGS 0x0100
+#define	CMODE_KEY	0x0200
+#define	CMODE_BAN	0x0800
+#define CMODE_LIMIT	0x1000
+#define CMODE_RGSTR	0x2000
+#define CMODE_RGSTRONLY  0x4000
+#define CMODE_OPERONLY   0x8000
+#define CMODE_LINK	0x20000
+#define CMODE_NOCOLOR	0x40000
 
 
-#define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_OPERONLY)))
+#define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
 #define is_bot(x) (0)
-#define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_RGSTRONLY) || CheckChanMode(x, MODE_OPERONLY) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_KEY)))
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_RGSTRONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
 
 
 struct ircd_srv_ {

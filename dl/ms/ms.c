@@ -29,9 +29,8 @@
 #include "log.h"
 #include "ms_help.c"
 
-char s_MoraleServ[MAXNICK];
-
-ModUser *ms_bot;
+static char s_MoraleServ[MAXNICK];
+static ModUser *ms_bot;
 
 static int ms_hail(User * u, char **av, int ac);
 static int ms_ode(User * u, char **av, int ac);
@@ -43,7 +42,6 @@ static int ms_redneck(User * u, char **av, int ac);
 static int ms_cheerup(User * u, char **av, int ac);
 static int ms_behappy(User * u, char **av, int ac);
 static int ms_wonderful(User * u, char **av, int ac);
-static int new_m_version(char *origin, char **av, int ac);
 
 ModuleInfo __module_info = {
    "MoraleServ",
@@ -51,25 +49,6 @@ ModuleInfo __module_info = {
    "2.22",
 	__DATE__,
 	__TIME__
-};
-
-int new_m_version(char *origin, char **av, int ac)
-{
-	snumeric_cmd(RPL_VERSION, origin,
-		     "Module MoraleServ Loaded, Version: %s %s %s",
-			 __module_info.module_version, __module_info.module_build_date,
-			 __module_info.module_build_time);
-	return 0;
-}
-
-Functions __module_functions[] = {
-	{MSG_VERSION, new_m_version, 1}
-	,
-#ifdef GOTTOKENSUPPORT
-	{TOK_VERSION, new_m_version, 1}
-	,
-#endif
-	{NULL, NULL, 0}
 };
 
 static bot_cmd ms_commands[]=
@@ -84,30 +63,26 @@ static bot_cmd ms_commands[]=
 	{"CHEERUP",		ms_cheerup,		1, 	0,	ms_help_cheerup,	ms_help_cheerup_oneline },
 	{"BEHAPPY",		ms_behappy,		1, 	0,	ms_help_behappy,	ms_help_behappy_oneline },
 	{"WONDERFUL",	ms_wonderful,	1, 	0,	ms_help_wonderful,	ms_help_wonderful_oneline },
-	{NULL,			NULL,			0, 	0,			NULL, 		NULL}
+	{NULL,			NULL,			0, 	0,	NULL, 				NULL}
 };
 
-int Online(char **av, int ac)
+static int Online(char **av, int ac)
 {
 	ms_bot = init_mod_bot(s_MoraleServ, "MS", me.name, "A Network Morale Service",
 		services_bot_modes, 0, ms_commands, NULL, __module_info.module_name);
 	return 1;
 };
 
-
 EventFnList __module_events[] = {
-	{EVENT_ONLINE, Online}
-	,
+	{EVENT_ONLINE, Online},
 	{NULL, NULL}
 };
-
 
 int __ModInit(int modnum, int apiver)
 {
 	strlcpy(s_MoraleServ, "MoraleServ", MAXNICK);
 	return 1;
 }
-
 
 void __ModFini()
 {
@@ -154,7 +129,6 @@ static int ms_hail(User * u, char **av, int ac)
 	return 1;     
 }
 
-
 /* Routine for LAPDANCE */
 static int ms_lapdance(User * u, char **av, int ac)
 {
@@ -175,7 +149,6 @@ static int ms_lapdance(User * u, char **av, int ac)
 		"*I Think we both need a cold shower now*... *wink*");
 	return 1;
 }
-
 
 /* Routine for ODE */
 static int ms_ode(User * u, char **av, int ac)
@@ -201,7 +174,6 @@ static int ms_ode(User * u, char **av, int ac)
 	return 1;       
 }
 
-
 /* Routine for POEM */
 static int ms_poem(User * u, char **av, int ac)
 {
@@ -226,7 +198,6 @@ static int ms_poem(User * u, char **av, int ac)
 	return 1;
 }
 
-
 /* Routine for REDNECK */
 static int ms_redneck(User * u, char **av, int ac)
 {
@@ -247,8 +218,6 @@ static int ms_redneck(User * u, char **av, int ac)
 	return 1;
 }
 
-
-
 static int ms_cheerup(User * u, char **av, int ac)
 {
 	char *target_nick;
@@ -263,7 +232,6 @@ static int ms_cheerup(User * u, char **av, int ac)
 		"All of us on the network love you! 3--<--<--<{4@");
 	return 1;
 }
-
 
 /* Routine for BEHAPPY */
 static int ms_behappy(User * u, char **av, int ac)
@@ -318,7 +286,6 @@ static int ms_behappy(User * u, char **av, int ac)
 		"Don't Worry - Be Happy, I'm not worried, I'm happy . . . .");
 	return 1;
 }
-
 
 /* Routine for WONDERFUL */
 static int ms_wonderful(User * u, char **av, int ac)

@@ -682,44 +682,44 @@
 #define UMODE_STRIPBADWORDS 0x80000000	/* */
 #endif /* UNREAL32 */
 
-#define	MODE_CHANOP		0x0001
-#define	MODE_VOICE		0x0002
-#define	MODE_PRIVATE		0x0004
-#define	MODE_SECRET			0x0008
-#define	MODE_MODERATED  	0x0010
-#define	MODE_TOPICLIMIT 	0x0020
-#define MODE_CHANOWNER		0x0040
-#define MODE_CHANPROT		0x0080
-#define	MODE_HALFOP			0x0100
-#define MODE_EXCEPT			0x0200
-#define	MODE_BAN			0x0400
-#define	MODE_INVITEONLY 	0x0800
-#define	MODE_NOPRIVMSGS 	0x1000
-#define	MODE_KEY			0x2000
-#define	MODE_LIMIT			0x4000
-#define MODE_RGSTR			0x8000
-#define MODE_RGSTRONLY 		 	0x10000
-#define MODE_LINK			0x20000
-#define MODE_NOCOLOR		0x40000
-#define MODE_OPERONLY   	0x80000
-#define MODE_ADMONLY   		0x100000
-#define MODE_NOKICKS   		0x200000
-#define MODE_STRIP	   	0x400000
-#define MODE_NOKNOCK		0x800000
-#define MODE_NOINVITE  		0x1000000
-#define MODE_FLOODLIMIT		0x2000000
-#define MODE_MODREG		0x4000000
-#define MODE_STRIPBADWORDS	0x8000000
-#define MODE_NOCTCP		0x10000000
-#define MODE_AUDITORIUM		0x20000000
-#define MODE_ONLYSECURE		0x40000000
-#define MODE_NONICKCHANGE	0x80000000
+#define	CMODE_CHANOP		0x0001
+#define	CMODE_VOICE		0x0002
+#define	CMODE_PRIVATE		0x0004
+#define	CMODE_SECRET			0x0008
+#define	CMODE_MODERATED  	0x0010
+#define	CMODE_TOPICLIMIT 	0x0020
+#define CMODE_CHANOWNER		0x0040
+#define CMODE_CHANPROT		0x0080
+#define	CMODE_HALFOP			0x0100
+#define CMODE_EXCEPT			0x0200
+#define	CMODE_BAN			0x0400
+#define	CMODE_INVITEONLY 	0x0800
+#define	CMODE_NOPRIVMSGS 	0x1000
+#define	CMODE_KEY			0x2000
+#define	CMODE_LIMIT			0x4000
+#define CMODE_RGSTR			0x8000
+#define CMODE_RGSTRONLY 		 	0x10000
+#define CMODE_LINK			0x20000
+#define CMODE_NOCOLOR		0x40000
+#define CMODE_OPERONLY   	0x80000
+#define CMODE_ADMONLY   		0x100000
+#define CMODE_NOKICKS   		0x200000
+#define CMODE_STRIP	   	0x400000
+#define CMODE_NOKNOCK		0x800000
+#define CMODE_NOINVITE  		0x1000000
+#define CMODE_FLOODLIMIT		0x2000000
+#define CMODE_MODREG		0x4000000
+#define CMODE_STRIPBADWORDS	0x8000000
+#define CMODE_NOCTCP		0x10000000
+#define CMODE_AUDITORIUM		0x20000000
+#define CMODE_ONLYSECURE		0x40000000
+#define CMODE_NONICKCHANGE	0x80000000
 
 
-#define is_hidden_chan(x) ((x) && (x->modes & (MODE_PRIVATE|MODE_SECRET|MODE_ADMONLY|MODE_OPERONLY)))
+#define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY)))
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
 #define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
-#define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_ADMONLY) || CheckChanMode(x, MODE_OPERONLY) || CheckChanMode(x, MODE_KEY) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_RGSTRONLY)))
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_ADMONLY) || CheckChanMode(x, CMODE_OPERONLY) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_RGSTRONLY)))
 
 
 struct ircd_srv_ {

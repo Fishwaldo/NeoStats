@@ -3,7 +3,8 @@ Author:  Shmad <shmad@neostats.net>
 ==============================================================================
 * Version 1.9 * 
  - Use core bot message handler to process commands (M)
- - Code cleaned up to redduce bloat (M)
+ - Code cleaned up to reduce bloat (M)
+ - Removed local module_function table to use core for /VERSION replies (M)
 
 * Version 1.8 * October 6th, 2003
  - Help text cleanup (M) 

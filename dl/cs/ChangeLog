@@ -6,6 +6,7 @@ Shmad & ^Enigma^
  - Use core bot set handler (M)
  - Removed Invisibility (+I) handling since it no longer exists in Unreal and no other IRCDs need it (M)
  - Use GOTUSERSMODES feature define so we can support Quantum correctly and not just Ultimate 3 (M)
+ - Removed local module_function table to use core for /VERSION replies (M)
 
 * Version 1.10 * Mark (M) * November 13, 2003
  - Moved mode defines to ircd header files (M)

@@ -212,12 +212,12 @@ ChanMode (char *origin, char **av, int ac)
 								while (mn) {
 									m = lnode_get (mn);
 									/* mode limit and mode key replace current values */
-									if ((m->mode == MODE_LIMIT) && (chan_modes[i].mode == MODE_LIMIT)) {
+									if ((m->mode == CMODE_LIMIT) && (chan_modes[i].mode == CMODE_LIMIT)) {
 										strlcpy (m->param, av[j], PARAMSIZE);
 										j++;
 										modeexists = 1;
 										break;
-									} else if ((m->mode == MODE_KEY) && (chan_modes[i].mode == MODE_KEY)) {
+									} else if ((m->mode == CMODE_KEY) && (chan_modes[i].mode == CMODE_KEY)) {
 										strlcpy (m->param, av[j], PARAMSIZE);
 										j++;
 										modeexists = 1;
@@ -262,7 +262,7 @@ ChanMode (char *origin, char **av, int ac)
 									lnode_destroy (mn);
 									free (m);
 
-									if (!(chan_modes[i].mode == MODE_LIMIT || chan_modes[i].mode == MODE_KEY))
+									if (!(chan_modes[i].mode == CMODE_LIMIT || chan_modes[i].mode == CMODE_KEY))
 										j++;
 								}
 							} else {

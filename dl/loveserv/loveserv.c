@@ -23,7 +23,6 @@
 ** $Id$
 */
 
-
 #include <stdio.h>
 #include "dl.h"
 #include "stats.h"
@@ -46,33 +45,12 @@ static int ls_thankyou(User * u, char **av, int ac);
 static int ls_version(User * u, char **av, int ac);
 static int ls_about(User * u, char **av, int ac);
 
-static int new_m_version(char *origin, char **av, int ac);
-
 ModuleInfo __module_info = {
    "LoveServ",
    "A Network Love Service",
    "1.9",
 	__DATE__,
 	__TIME__
-};
-
-int new_m_version(char *origin, char **av, int ac)
-{
-	snumeric_cmd(RPL_VERSION, origin,
-		     "Module LoveServ Loaded, Version: %s %s %s",
-			 __module_info.module_version, __module_info.module_build_date,
-			 __module_info.module_build_time);
-	return 0;
-}
-
-Functions __module_functions[] = {
-	{MSG_VERSION, new_m_version, 1}
-	,
-#ifdef GOTTOKENSUPPORT
-	{TOK_VERSION, new_m_version, 1}
-	,
-#endif
-	{NULL, NULL, 0}
 };
 
 static bot_cmd ls_commands[]=
@@ -92,7 +70,7 @@ static bot_cmd ls_commands[]=
 	{NULL,			NULL,			0, 	0,	NULL, 				NULL}
 };
 
-int Online(char **av, int ac)
+static int Online(char **av, int ac)
 {
 	ls_bot = init_mod_bot(s_LoveServ, "love", me.name, "Network Love Service",
 		services_bot_modes, 0, ls_commands, NULL, __module_info.module_name);
@@ -131,7 +109,6 @@ static int ls_rose(User * u, char **av, int ac)
 	return 1;
 }
 
-
 static int ls_kiss(User * u, char **av, int ac)
 {
 	char *target_nick;
@@ -145,7 +122,6 @@ static int ls_kiss(User * u, char **av, int ac)
 	prefmsg(target_nick, s_LoveServ, "%s has virtually kissed you!", u->nick);
 	return 1;
 }
-
 
 static int ls_tonsil(User * u, char **av, int ac)
 {
@@ -164,7 +140,6 @@ static int ls_tonsil(User * u, char **av, int ac)
 	return 1;
 }
 
-
 static int ls_hug(User * u, char **av, int ac)
 {
 	char *target_nick;
@@ -179,7 +154,6 @@ static int ls_hug(User * u, char **av, int ac)
 	return 1;
 }
 
-
 static int ls_admirer(User * u, char **av, int ac)
 {
 	char *target_nick;
@@ -193,7 +167,6 @@ static int ls_admirer(User * u, char **av, int ac)
 	prefmsg(target_nick, s_LoveServ, "You have a secret admirer! ;)");
 	return 1;
 }
-
 
 static int ls_choco(User * u, char **av, int ac)
 {
@@ -212,7 +185,6 @@ static int ls_choco(User * u, char **av, int ac)
 	return 1;
 }
 
-
 static int ls_candy(User * u, char **av, int ac)
 {
 	char *target_nick;
@@ -229,7 +201,6 @@ static int ls_candy(User * u, char **av, int ac)
 		u->nick);
 	return 1;
 }
-
 
 static int ls_lovenote(User * u, char **av, int ac)
 {
@@ -249,7 +220,6 @@ static int ls_lovenote(User * u, char **av, int ac)
 	free(message);
 	return 1;
 }
-
 
 static int ls_apology(User * u, char **av, int ac)
 {
@@ -271,7 +241,6 @@ static int ls_apology(User * u, char **av, int ac)
 	return 1;
 }
 
-
 static int ls_thankyou(User * u, char **av, int ac)
 {
 	char *target_nick;
@@ -291,7 +260,6 @@ static int ls_thankyou(User * u, char **av, int ac)
 	return 1;
 }
 
-
 static int ls_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
@@ -301,7 +269,6 @@ static int ls_version(User * u, char **av, int ac)
 	prefmsg(u->nick, s_LoveServ, "%s Author: Shmad <shmad@neostats.net>", s_LoveServ);
 	prefmsg(u->nick, s_LoveServ, "http://www.neostats.net");
 	return 1;
-
 }
 
 static int ls_about(User * u, char **av, int ac)

@@ -83,6 +83,10 @@
 #error Error, you must select an IRCD to use. See ./configure --help for more information
 #endif
 
+/* Temp for backwards compatibility */
+#define MODE_CHANOP CMODE_CHANOP
+#define MODE_CHANADMIN CMODE_CHANADMIN
+
 /* Temp for backwards compatibility 
  * HAVE_TOKEN_SUP renamed to GOTTOKENSUPPORT so it matches other
  * feature set defines.
@@ -483,13 +487,15 @@ int flood (User * u);
 int init_bot (char * nick, char * user, char * host, char * rname, const char *modes, char * modname);
 int del_bot (char * nick, char * reason);
 void privmsg_list (char *to, char *from, const char **text);
-
-/* ircd specific files */
 void prefmsg (char * to, const char * from, char * fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 void privmsg (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 void notice (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 void globops (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 void chanalert (char * who, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+int wallops (const char *who, const char *msg, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+int numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+/* Temp for backwards compatibility */
+#define snumeric_cmd numeric
 
 /* function declarations */
 int sserver_cmd (const char *name, const int numeric, const char *infoline);
@@ -507,7 +513,6 @@ int schmode_cmd (const char *who, const char *chan, const char *mode, const char
 int snewnick_cmd (const char *nick, const char *ident, const char *host, const char *realname, long mode);
 int sping_cmd (const char *from, const char *reply, const char *to);
 int sumode_cmd (const char *who, const char *target, long mode);
-int snumeric_cmd (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 int spong_cmd (const char *reply);
 int snetinfo_cmd (void);
 int skill_cmd (const char *from, const char *target, const char *reason, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
@@ -520,7 +525,6 @@ int ssvsjoin_cmd (const char *target, const char *chan);
 int ssvspart_cmd (const char *target, const char *chan);
 int ssvshost_cmd (const char *who, const char *vhost);
 int skick_cmd (const char *who, const char *target, const char *chan, const char *reason);
-int swallops_cmd (const char *who, const char *msg, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 int ssvsmode_cmd (const char *target, const char *modes);
 int ssvshost_cmd (const char *who, const char *vhost);
 int ssvskill_cmd (const char *target, const char *reason, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */

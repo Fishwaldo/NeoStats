@@ -80,7 +80,6 @@ typedef struct hs_user {
 } hs_user;
 #endif
 
-extern const char *hs_help[];
 static int hs_sign_on(char **av, int ac);
 #if UMODE_REGNICK
 static int hs_mode(char **av, int ac);
@@ -100,7 +99,6 @@ static void hs_listban(User * u);
 static void hs_addban(User * u, char *ban);
 static void hs_delban(User * u, char *ban);
 
-static int new_m_version(char *origin, char **av, int ac);
 static void SaveBans(void);
 static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who);
 void CleanupHosts(void);
@@ -126,6 +124,28 @@ ModuleInfo __module_info = {
 	__TIME__
 };
 
+static bot_cmd hs_commands[]=
+{
+	{"ABOUT",	hs_about,	0, 	0,					hs_help_about,	hs_help_about_oneline },
+	{"ADD",		hs_add,		4,	(int)&hs_cfg.add,	hs_help_add,	hs_help_add_oneline },
+	{"DEL",		hs_del,		1, 	(int)&hs_cfg.del,	hs_help_del,	hs_help_del_oneline },
+	{"LIST",	hs_list,	0, 	(int)&hs_cfg.list,	hs_help_list,	hs_help_list_oneline },
+	{"BANS",	hs_bans,	0,  NS_ULEVEL_ADMIN,	hs_help_bans,	hs_help_bans_oneline },
+	{"LEVELS",	hs_levels,	0, 	NS_ULEVEL_OPER,		hs_help_levels,	hs_help_levels_oneline },
+	{"VIEW",	hs_view,	1, 	(int)&hs_cfg.view,	hs_help_view,	hs_help_view_oneline },
+	{"LOGIN",	hs_login,	2, 	0,					hs_help_login,	hs_help_login_oneline },
+	{"CHPASS",	hs_chpass,	3, 	0,					hs_help_chpass,	hs_help_chpass_oneline },
+	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
+};
+
+static bot_setting hs_settings[]=
+{
+	{"EXPIRE",		&hs_cfg.old,		SET_TYPE_INT,		0, 99, 	NS_ULEVEL_ADMIN,	"ExpireDays",	"days",	hs_help_set_expire	},
+	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN,	"UnetVhosts",	NULL,	hs_help_set_hiddenhost	},
+	{"HOSTNAME",	&hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN,	"UnetDomain",	NULL,	hs_help_set_hostname	},
+	{NULL,			NULL,				0,					0, 0, 	0,	NULL,			NULL,	NULL	},
+};
+
 int findnick(const void *key1, const void *key2)
 {
 	const hs_map *vhost = key1;
@@ -140,6 +160,7 @@ void save_vhost(hs_map *vhost) {
 	SetData((void *)vhost->lused, CFGINT, "Vhosts", vhost->nnick , "LastUsed");
 	list_sort(vhosts, findnick);
 }
+
 void del_vhost(hs_map *vhost) {
 	DelRow("Vhosts", vhost->nnick);
 	free(vhost);
@@ -169,17 +190,6 @@ int del_moddata(char **av, int ac) {
 	return 1;
 }
 	
-
-int new_m_version(char *origin, char **av, int ac)
-{
-	snumeric_cmd(RPL_VERSION, origin,
-		     "Module HostServ Loaded, Version: %s %s %s",
-			 __module_info.module_version, __module_info.module_build_date,
-			 __module_info.module_build_time);
-	return 0;
-}
-
-
 /* Routine For Setting the Virtual Host */
 static int hs_sign_on(char **av, int ac)
 {
@@ -225,62 +235,23 @@ static int hs_sign_on(char **av, int ac)
 	return 1;
 }
 
-Functions __module_functions[] = {
-	{MSG_VERSION, new_m_version, 1}
-	,
-#ifdef GOTTOKENSUPPORT
-	{TOK_VERSION, new_m_version, 1}
-	,
-#endif
-	{NULL, NULL, 0}
-};
-
-static bot_cmd hs_commands[]=
-{
-	{"ABOUT",	hs_about,	0, 	0,					hs_help_about,	hs_help_about_oneline },
-	{"ADD",		hs_add,		4,	(int)&hs_cfg.add,	hs_help_add,	hs_help_add_oneline },
-	{"DEL",		hs_del,		1, 	(int)&hs_cfg.del,	hs_help_del,	hs_help_del_oneline },
-	{"LIST",	hs_list,	0, 	(int)&hs_cfg.list,	hs_help_list,	hs_help_list_oneline },
-	{"BANS",	hs_bans,	0,  NS_ULEVEL_ADMIN,	hs_help_bans,	hs_help_bans_oneline },
-	{"LEVELS",	hs_levels,	0, 	NS_ULEVEL_OPER,		hs_help_levels,	hs_help_levels_oneline },
-	{"VIEW",	hs_view,	1, 	(int)&hs_cfg.view,	hs_help_view,	hs_help_view_oneline },
-	{"LOGIN",	hs_login,	2, 	0,					hs_help_login,	hs_help_login_oneline },
-	{"CHPASS",	hs_chpass,	3, 	0,					hs_help_chpass,	hs_help_chpass_oneline },
-	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
-};
-
-static bot_setting hs_settings[]=
-{
-	{"EXPIRE",		&hs_cfg.old,		SET_TYPE_INT,		0, 99, 	NS_ULEVEL_ADMIN,	"ExpireDays",	"days",	hs_help_set_expire	},
-	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN,	"UnetVhosts",	NULL,	hs_help_set_hiddenhost	},
-	{"HOSTNAME",	&hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN,	"UnetDomain",	NULL,	hs_help_set_hostname	},
-	{NULL,			NULL,				0,					0, 0, 	0,	NULL,			NULL,	NULL	},
-};
-
-int Online(char **av, int ac)
+static int Online(char **av, int ac)
 {
 	hs_bot = init_mod_bot(s_HostServ, hs_cfg.user, hs_cfg.host, hs_cfg.rname, 
 		services_bot_modes, 0, hs_commands, hs_settings, __module_info.module_name);
-
 	add_mod_timer("CleanupHosts", "Cleanup_Old_Vhosts",
 		      __module_info.module_name, 7200);
 	LoadHosts();
-
 	return 1;
 };
 
 EventFnList __module_events[] = {
-	{EVENT_ONLINE, Online}
-	,
-	{EVENT_SIGNON, hs_sign_on}
-	,
+	{EVENT_ONLINE, Online},
+	{EVENT_SIGNON, hs_sign_on},
 #ifdef UMODE_REGNICK
-	{EVENT_UMODE, hs_mode}
-	, 
-	{EVENT_SIGNOFF, del_moddata}
-	,
-	{EVENT_KILL, del_moddata}
-	,
+	{EVENT_UMODE, hs_mode}, 
+	{EVENT_SIGNOFF, del_moddata},
+	{EVENT_KILL, del_moddata},
 #endif
 	{NULL, NULL}
 };
@@ -571,7 +542,6 @@ static void SaveBans()
 	SetConf((void *) ban_buf, CFGSTR, "BannedVhosts");
 }
 
-
 static int hs_chpass(User * u, char **av, int ac)
 {
 	lnode_t *hn;
@@ -622,7 +592,6 @@ static int hs_chpass(User * u, char **av, int ac)
 	return 1;
 
 }
-
 
 /* Routine for ADD */
 static int hs_add(User * u, char **av, int ac)

@@ -103,21 +103,21 @@ IntCommands cmd_list[] = {
 };
 
 ChanModes chan_modes[] = {
-	{MODE_CHANOP, 'o', 1, 0, '@'},
-	{MODE_VOICE, 'v', 1, 0, '+'},
-	{MODE_BAN, 'b', 0, 1, 0},
-	{MODE_INVITEONLY, 'i', 0, 0, 0},
-	{MODE_KEY, 'k', 0, 1, 0},
-	{MODE_LIMIT, 'l', 0, 1, 0},
-	{MODE_MODERATED, 'm', 0, 0, 0},
-	{MODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{MODE_PRIVATE, 'p', 0, 0, 0},
-	{MODE_RGSTR, 'r', 0, 0, 0},
-	{MODE_SECRET, 's', 0, 0, 0},
-	{MODE_TOPICLIMIT, 't', 0, 0, 0},
-	{MODE_NOCOLOR, 'x', 0, 0, 0},
-	{MODE_OPERONLY, 'O', 0, 0, 0},
-	{MODE_RGSTRONLY, 'R', 0, 0, 0},
+	{CMODE_CHANOP, 'o', 1, 0, '@'},
+	{CMODE_VOICE, 'v', 1, 0, '+'},
+	{CMODE_BAN, 'b', 0, 1, 0},
+	{CMODE_INVITEONLY, 'i', 0, 0, 0},
+	{CMODE_KEY, 'k', 0, 1, 0},
+	{CMODE_LIMIT, 'l', 0, 1, 0},
+	{CMODE_MODERATED, 'm', 0, 0, 0},
+	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
+	{CMODE_PRIVATE, 'p', 0, 0, 0},
+	{CMODE_RGSTR, 'r', 0, 0, 0},
+	{CMODE_SECRET, 's', 0, 0, 0},
+	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
+	{CMODE_NOCOLOR, 'x', 0, 0, 0},
+	{CMODE_OPERONLY, 'O', 0, 0, 0},
+	{CMODE_RGSTRONLY, 'R', 0, 0, 0},
 };
 
 UserModes user_umodes[] = {
@@ -195,11 +195,11 @@ sjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 		tstime = c->tstime;
 	}
 	switch (chflag) {
-	case MODE_CHANOP:
+	case CMODE_CHANOP:
 		flag = '@';
 		mode= 'o';
 		break;
-	case MODE_VOICE:
+	case CMODE_VOICE:
 		flag = '+';
 		mode= 'v';
 		break;
@@ -753,7 +753,7 @@ SignOn_NewBot (const char *nick, const char *user, const char *host, const char 
 
 	snewnick_cmd (nick, user, host, rname, Umode);
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-		sjoin_cmd (nick, me.chan, MODE_CHANOP);
+		sjoin_cmd (nick, me.chan, CMODE_CHANOP);
 		/* all bots join */
 	}
 	return 1;

@@ -106,29 +106,29 @@ IntCommands cmd_list[] = {
 };
 
 ChanModes chan_modes[] = {
-	{MODE_CHANOWNER, 'q', 1, 0, '!'},
-	{MODE_CHANPROT, 'a', 1, 0, '*'},
-	{MODE_CHANOP, 'o', 1, 0, '@'},
-	{MODE_VIP, 'V', 1, 0, '='},
-	{MODE_HALFOP, 'h', 1, 0, '%'},
-	{MODE_VOICE, 'v', 1, 0, '+'},
-	{MODE_UOP, 'u', 1, 0, '-'},
-	{MODE_BAN, 'b', 0, 1, 0},
-	{MODE_NOCOLOR, 'c', 0, 0, 0},
-	{MODE_INVITEONLY, 'i', 0, 0, 0},
-	{MODE_KEY, 'k', 0, 1, 0},
-	{MODE_LIMIT, 'l', 0, 1, 0},
-	{MODE_LINK, 'L', 0, 1, 0},
-	{MODE_MODERATED, 'm', 0, 0, 0},
-	{MODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{MODE_NONICKCHANGE, 'N', 0, 0, 0},
-	{MODE_PRIVATE, 'p', 0, 0, 0},
-	{MODE_RGSTR, 'r', 0, 0, 0},
-	{MODE_RGSTRONLY, 'R', 0, 0, 0},
-	{MODE_SECRET, 's', 0, 0, 0},
-	{MODE_STRIP, 'S', 0, 0, 0},
-	{MODE_TOPICLIMIT, 't', 0, 0, 0},
-	{MODE_OPERONLY, 'O', 0, 0, 0},
+	{CMODE_CHANOWNER, 'q', 1, 0, '!'},
+	{CMODE_CHANPROT, 'a', 1, 0, '*'},
+	{CMODE_CHANOP, 'o', 1, 0, '@'},
+	{CMODE_VIP, 'V', 1, 0, '='},
+	{CMODE_HALFOP, 'h', 1, 0, '%'},
+	{CMODE_VOICE, 'v', 1, 0, '+'},
+	{CMODE_UOP, 'u', 1, 0, '-'},
+	{CMODE_BAN, 'b', 0, 1, 0},
+	{CMODE_NOCOLOR, 'c', 0, 0, 0},
+	{CMODE_INVITEONLY, 'i', 0, 0, 0},
+	{CMODE_KEY, 'k', 0, 1, 0},
+	{CMODE_LIMIT, 'l', 0, 1, 0},
+	{CMODE_LINK, 'L', 0, 1, 0},
+	{CMODE_MODERATED, 'm', 0, 0, 0},
+	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
+	{CMODE_NONICKCHANGE, 'N', 0, 0, 0},
+	{CMODE_PRIVATE, 'p', 0, 0, 0},
+	{CMODE_RGSTR, 'r', 0, 0, 0},
+	{CMODE_RGSTRONLY, 'R', 0, 0, 0},
+	{CMODE_SECRET, 's', 0, 0, 0},
+	{CMODE_STRIP, 'S', 0, 0, 0},
+	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
+	{CMODE_OPERONLY, 'O', 0, 0, 0},
 };
 
 UserModes user_umodes[] = {
@@ -225,31 +225,31 @@ sjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 		tstime = c->tstime;
 	}
 	switch (chflag) {
-        case MODE_CHANOWNER:
+        case CMODE_CHANOWNER:
                 flag = '!';
                 mode= 'q';
                 break;
-        case MODE_CHANPROT:
+        case CMODE_CHANPROT:
                 flag = '*';
                 mode= 'a';
                 break;
-        case MODE_VIP:
+        case CMODE_VIP:
                 flag = '=';
                 mode= 'V';
                 break;
-	case MODE_CHANOP:
+	case CMODE_CHANOP:
 		flag = '@';
 		mode= 'o';
 		break;
-        case MODE_HALFOP:
+        case CMODE_HALFOP:
                 flag = '%';
                 mode= 'h';
                 break;
-	case MODE_VOICE:
+	case CMODE_VOICE:
 		flag = '+';
 		mode= 'v';
 		break;
-        case MODE_UOP:
+        case CMODE_UOP:
                 flag = '-';
                 mode= 'u';
                 break;
@@ -814,7 +814,7 @@ SignOn_NewBot (const char *nick, const char *user, const char *host, const char 
 
 	snewnick_cmd (nick, user, host, rname, Umode);
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-		sjoin_cmd (nick, me.chan, MODE_CHANOP);
+		sjoin_cmd (nick, me.chan, CMODE_CHANOP);
 		/* all bots join */
 	}
 	return 1;

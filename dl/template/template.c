@@ -111,7 +111,7 @@ int __BotMessage(char *origin, char **argv, int argc)
 /** Online event processing
  * What we do when we first come online
  */
-int Online(char **av, int ac)
+static int Online(char **av, int ac)
 {
 	/* Introduce a bot onto the network */
 	if (init_bot(s_module_bot_name, "user", me.name, "Real Name", "-x",

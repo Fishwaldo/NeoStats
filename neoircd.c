@@ -99,27 +99,28 @@ IntCommands cmd_list[] = {
 };
 
 ChanModes chan_modes[] = {
-	{MODE_HALFOP, 'h', 1, 0, '%'},
-	{MODE_CHANOP, 'o', 1, 0, '@'},
-	{MODE_VOICE, 'v', 1, 0, '+'},
-	{MODE_CHANADMIN, 'a', 1, 0, '!'},
-	{MODE_SECRET, 's', 0, 0, 0},
-	{MODE_PRIVATE, 'p', 0, 0, 0},
-	{MODE_MODERATED, 'm', 0, 0, 0},
-	{MODE_TOPICLIMIT, 't', 0, 0, 0},
-	{MODE_INVITEONLY, 'i', 0, 0, 0},
-	{MODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{MODE_HIDEOPS, 'A', 0, 0, 0},
-	{MODE_LIMIT, 'l', 0, 1, 0},
-	{MODE_KEY, 'k', 0, 1, 0},
-	{MODE_BAN, 'b', 0, 1, 0},
-	{MODE_EXCEPT, 'e', 0, 1, 0},
-	{MODE_INVEX, 'I', 0, 1, 0},
-	{MODE_REGCHAN, 'r', 0, 0, 0},
-	{MODE_OPERSONLY, 'O', 0, 0, 0},
+	{CMODE_HALFOP, 'h', 1, 0, '%'},
+	{CMODE_CHANOP, 'o', 1, 0, '@'},
+	{CMODE_VOICE, 'v', 1, 0, '+'},
+	{CMODE_CHANADMIN, 'a', 1, 0, '!'},
+	{CMODE_SECRET, 's', 0, 0, 0},
+	{CMODE_PRIVATE, 'p', 0, 0, 0},
+	{CMODE_MODERATED, 'm', 0, 0, 0},
+	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
+	{CMODE_INVITEONLY, 'i', 0, 0, 0},
+	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
+	{CMODE_HIDEOPS, 'A', 0, 0, 0},
+	{CMODE_LIMIT, 'l', 0, 1, 0},
+	{CMODE_KEY, 'k', 0, 1, 0},
+	{CMODE_BAN, 'b', 0, 1, 0},
+	{CMODE_EXCEPT, 'e', 0, 1, 0},
+	{CMODE_INVEX, 'I', 0, 1, 0},
+	{CMODE_REGCHAN, 'r', 0, 0, 0},
+	{CMODE_OPERONLY, 'O', 0, 0, 0},
 };
 
 UserModes user_umodes[] = {
+	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT},
 	{UMODE_DEBUG, 'd', NS_ULEVEL_ROOT},
 	{UMODE_ADMIN, 'A', NS_ULEVEL_ADMIN},
 	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
@@ -138,7 +139,6 @@ UserModes user_umodes[] = {
 	{UMODE_EXTERNAL, 'x', 0},
 	{UMODE_SPY, 'y', 0},
 	{UMODE_OPERWALL, 'z', 0},
-	{UMODE_SERVICES, 'S', NS_ULEVEL_ROOT},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));

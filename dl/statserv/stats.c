@@ -98,7 +98,7 @@ int s_chan_new(char **av, int ac)
 		stats_network.maxchans = count;
 		stats_network.t_chans = me.now;
 		if (ok_to_wallop() > 0)
-			swallops_cmd(s_StatServ,
+			wallops(s_StatServ,
 				     "\2NEW CHANNEL RECORD\2 Wow, there is now %d Channels on the Network",
 				     stats_network.maxchans);
 	}
@@ -252,7 +252,7 @@ int s_new_server(char **av, int ac)
 		stats_network.maxservers = stats_network.servers;
 		stats_network.t_maxservers = me.now;
 		if (ok_to_wallop() > 0)
-			swallops_cmd(s_StatServ,
+			wallops(s_StatServ,
 				     "\2NEW SERVER RECORD\2 Wow, there are now %d Servers on the Network",
 				     stats_network.servers);
 	}
@@ -378,7 +378,7 @@ int s_user_modes(char **av, int ac)
 					stats_network.t_maxopers =
 					    me.now;
 					if (ok_to_wallop() > 0)
-						swallops_cmd(s_StatServ,
+						wallops(s_StatServ,
 							     "\2Oper Record\2 The Network has reached a New Record for Opers at %d",
 							     stats_network.
 							     opers);
@@ -387,7 +387,7 @@ int s_user_modes(char **av, int ac)
 					s->maxopers = s->opers;
 					s->t_maxopers = me.now;
 					if (ok_to_wallop() > 0)
-						swallops_cmd(s_StatServ,
+						wallops(s_StatServ,
 							     "\2Server Oper Record\2 Wow, the Server %s now has a New record with %d Opers",
 							     s->name,
 							     s->opers);
@@ -476,7 +476,7 @@ int s_new_user(char **av, int ac)
 		s->maxusers = s->users;
 		s->t_maxusers = me.now;
 		if (ok_to_wallop() > 0)
-			swallops_cmd(s_StatServ,
+			wallops(s_StatServ,
 				     "\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!",
 				     s->name, s->users);
 
@@ -486,7 +486,7 @@ int s_new_user(char **av, int ac)
 		stats_network.maxusers = stats_network.users;
 		stats_network.t_maxusers = me.now;
 		if (ok_to_wallop() > 0)
-			swallops_cmd(s_StatServ,
+			wallops(s_StatServ,
 				     "\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %d users!",
 				     stats_network.users);
 	}

@@ -31,7 +31,6 @@
 #include "log.h"
 #include "conf.h"
 
-static int new_m_version(char *origin, char **av, int ac);
 void sr_cb_config(char *arg, int configtype);
 static int ext_auth_list(User *u, char **av, int ac);
 
@@ -58,14 +57,6 @@ ModuleInfo __module_info = {
 	__TIME__
 };
 
-Functions __module_functions[] = {
-	{MSG_VERSION, new_m_version, 1},
-#ifdef GOTTOKENSUPPORT
-	{TOK_VERSION, new_m_version, 1},
-#endif
-	{NULL, NULL, 0}
-};
-
 static config_option options[] = {
 	{"SERVICE_ROOTS", ARG_STR, sr_cb_config, 0}
 };
@@ -82,16 +73,6 @@ typedef struct users {
 	char host[MAXHOST];
 	int lvl;
 } users;
-
-int new_m_version(char *origin, char **av, int ac)
-{
-	SET_SEGV_LOCATION();
-	snumeric_cmd(RPL_VERSION, origin,
-		     "Module ServiceRoots Loaded, Version: %s %s %s",
-			 __module_info.module_version, __module_info.module_build_date,
-			 __module_info.module_build_time);
-	return 0;
-}
 
 int __ModInit(int modnum, int apiver)
 {
@@ -208,7 +189,7 @@ int ext_auth_list(User *u, char **av, int ac) {
 	
 	SET_SEGV_LOCATION();
 	un = list_first(srconf.ul);
-		prefmsg(u->nick, s_Services, "ServiceRoots:");
+	prefmsg(u->nick, s_Services, "ServiceRoots:");
 	while (un) {
 		sru = lnode_get(un);
 		prefmsg(u->nick, s_Services, "%s!%s@%s %d", sru->nick, sru->ident,

@@ -217,29 +217,29 @@
 #define UMODE_SERVICES	0x40000	/* client is services */
 #define UMODE_REGNICK	0x80000	/* registered nickname */
 
-#define	MODE_CHANOP	0x0001
-#define MODE_HALFOP	0x0002
-#define	MODE_VOICE	0x0004
-#define	MODE_PRIVATE	0x0008
-#define	MODE_SECRET	0x0010
-#define	MODE_MODERATED  0x0020
-#define	MODE_TOPICLIMIT 0x0040
-#define	MODE_INVITEONLY 0x0080
-#define	MODE_NOPRIVMSGS 0x0100
-#define	MODE_KEY	0x0200
-#define MODE_EXCEPT	0x0400
-#define	MODE_BAN	0x0800
-#define	MODE_LIMIT	0x1000
-#define MODE_HIDEOPS	0x2000
-#define MODE_INVEX	0x4000
-#define MODE_CHANADMIN  0x8000
-#define MODE_OPERSONLY  0x10000
-#define MODE_REGCHAN	0x20000
+#define	CMODE_CHANOP	0x0001
+#define CMODE_HALFOP	0x0002
+#define	CMODE_VOICE	0x0004
+#define	CMODE_PRIVATE	0x0008
+#define	CMODE_SECRET	0x0010
+#define	CMODE_MODERATED  0x0020
+#define	CMODE_TOPICLIMIT 0x0040
+#define	CMODE_INVITEONLY 0x0080
+#define	CMODE_NOPRIVMSGS 0x0100
+#define	CMODE_KEY	0x0200
+#define CMODE_EXCEPT	0x0400
+#define	CMODE_BAN	0x0800
+#define	CMODE_LIMIT	0x1000
+#define CMODE_HIDEOPS	0x2000
+#define CMODE_INVEX	0x4000
+#define CMODE_CHANADMIN  0x8000
+#define CMODE_OPERONLY  0x10000
+#define CMODE_REGCHAN	0x20000
 
-#define is_hidden_chan(x) ((x) && (x->modes & MODE_SECRET))
+#define is_hidden_chan(x) ((x) && (x->modes & CMODE_SECRET))
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
 #define is_bot(x) (0)
-#define is_pub_chan(x) ((x) && (CheckChanMode(x, MODE_PRIVATE) || CheckChanMode(x, MODE_SECRET) || CheckChanMode(x, MODE_KEY) || CheckChanMode(x, MODE_INVITEONLY) || CheckChanMode(x, MODE_OPERSONLY)))
+#define is_pub_chan(x) ((x) && (CheckChanMode(x, CMODE_PRIVATE) || CheckChanMode(x, CMODE_SECRET) || CheckChanMode(x, CMODE_KEY) || CheckChanMode(x, CMODE_INVITEONLY) || CheckChanMode(x, CMODE_OPERONLY)))
 
 
 struct ircd_srv_ {

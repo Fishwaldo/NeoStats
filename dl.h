@@ -199,6 +199,10 @@ typedef struct Module {
 	Functions *function_list;
 	EventFnList *event_list;
 	void *dl_handle;
+	/* temp flag to distinguish new style module API which allows 
+	 * us access to additional information from the core.
+	 */
+	int	isnewstyle;
 }Module;
 
 /* @brief Module Socket List hash
@@ -248,6 +252,8 @@ int run_bot_cmd (ModUser *bot_ptr, User *u, char **av, int ac);
 ModUser * init_mod_bot (char * nick, char * user, char * host, char * rname, const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list, char * modname);
 int del_mod_bot (ModUser *bot_ptr, char * reason);
 
+void ModulesVersion (char* origin, char **av, int ac);
+
 /* 
  * Module Interface 
  */
@@ -273,5 +279,6 @@ EventFnList *__module_get_events(void);
 extern ModuleInfo		__module_info;   
 extern Functions		__module_functions[];
 extern EventFnList		__module_events[];  
+
 
 #endif /* !_dl_h_ */
