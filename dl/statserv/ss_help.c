@@ -17,7 +17,7 @@ const char *ss_help[] = {
 "Commands:",
 "\2SERVER\2     Request information about a server.",
 "\2MAP\2        Show the network map.",
-"\2CHAN\2	Channel Information.",
+"\2CHAN\2       Channel Information.",
 "\2NETSTATS\2   General Network Statistics.",
 "\2DAILY\2      Daily Network Statistics.",
 "\2TLD\2        Show what country a TLD represents.",
