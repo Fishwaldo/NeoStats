@@ -960,7 +960,7 @@ static int hs_login(User * u, char **av, int ac)
 	return 1;
 }
 
-static void CleanupHosts()
+void CleanupHosts()
 {
 	lnode_t *hn, *hn2;
 	hs_map *map;
