@@ -61,3 +61,8 @@ const char *cs_help_set_nickwatch[] = {
 	"events to the services channel.",
 	NULL
 };
+const char *cs_help_set_servwatch[] = {
+	"SERVWATCH <ON/OFF> whether to echo server",
+	"joins and quits to the services channel.",
+	NULL
+};

@@ -757,6 +757,10 @@ Description:
     
     NICKWATCH <ON|OFF> 
     echo nickname changes.
+
+    SERVWATCH <ON|OFF> 
+    echo server joins/quits.
+
 Example:
     /msg ConnectServ SET NICKWATCH ON
 

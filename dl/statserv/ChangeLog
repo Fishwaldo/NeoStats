@@ -4,10 +4,12 @@ Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish (M) denotes Mark
 
-* Revision 810 * Nov 23rd, 2003 (M)
+* Revision 810 * January 9, 2004 (M)
  - removed fopen attempt on old system of dl/statserv/html/index.tpl. 
  - improved error message for failed open of template and output file
  - begin reworking announcement code for wallops
+ - move SERVER join/quit anouncements to ConnectServ since it is not really a 
+   StatServ task
 
 * Revision 810 * Nov 23rd, 2003 (M)
  - change SSMNAME to __module_info.module_name to be consistent with other modules (M)

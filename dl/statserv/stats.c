@@ -64,20 +64,6 @@ announce_record(const char *msg, ...)
 }
 
 static int
-announce_server_join_part(const char *msg, ...)
-{
-	va_list ap;
-
-	if (ok_to_wallop() > 0) {
-		va_start (ap, msg);
-		ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
-		va_end (ap);
-		chanalert (s_StatServ, "%s", announce_buf);
-	}
-	return 1;
-}
-
-static int
 announce_lag(const char *msg, ...)
 {
 	va_list ap;
@@ -298,8 +284,6 @@ int s_new_server(char **av, int ac)
 		daily.servers = stats_network.servers;
 		daily.t_servers = me.now;
 	}
-	announce_server_join_part("\2SERVER\2 %s has joined the Network at %s",
-		s->name, s->uplink);
 	return 1;
 
 }
@@ -314,8 +298,6 @@ int s_del_server(char **av, int ac)
 	if (!s)
 		return 0;
 	DecreaseServers();
-	announce_server_join_part("\2SERVER\2 %s has left the Network at %s",
-		s->name, s->uplink);
 	ss = findstats(s->name);
 	if (s->name != me.uplink)
 		ss->numsplits = ss->numsplits + 1;
